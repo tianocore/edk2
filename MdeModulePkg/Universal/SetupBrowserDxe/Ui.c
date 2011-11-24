@@ -1891,6 +1891,7 @@ ProcessGotoOpCode (
   )
 {
   CHAR16                          *StringPtr;
+  UINTN                           StringLen;
   UINTN                           BufferSize;
   EFI_DEVICE_PATH_PROTOCOL        *DevicePath;
   CHAR16                          TemStr[2];
@@ -1905,8 +1906,23 @@ ProcessGotoOpCode (
   
   Status = EFI_SUCCESS;
   UpdateFormInfo = TRUE;
+  StringPtr = NULL;
+  StringLen = 0;
 
+  //
+  // Prepare the device path check, get the device path info first.
+  //
   if (Statement->HiiValue.Value.ref.DevicePath != 0) {
+    StringPtr = GetToken (Statement->HiiValue.Value.ref.DevicePath, Selection->FormSet->HiiHandle);
+    if (StringPtr != NULL) {
+      StringLen = StrLen (StringPtr);
+    }
+  }
+
+  //
+  // Check whether the device path string is a valid string.
+  //
+  if (Statement->HiiValue.Value.ref.DevicePath != 0 && StringPtr != NULL && StringLen != 0) {
     if (Selection->Form->ModalForm) {
       return Status;
     }
@@ -1914,16 +1930,6 @@ ProcessGotoOpCode (
     // Goto another Hii Package list
     //
     Selection->Action = UI_ACTION_REFRESH_FORMSET;
-
-    StringPtr = GetToken (Statement->HiiValue.Value.ref.DevicePath, Selection->FormSet->HiiHandle);
-    if (StringPtr == NULL) {
-      //
-      // No device path string not found, exit
-      //
-      Selection->Action = UI_ACTION_EXIT;
-      Selection->Statement = NULL;
-      return Status;
-    }
     BufferSize = StrLen (StringPtr) / 2;
     DevicePath = AllocatePool (BufferSize);
     ASSERT (DevicePath != NULL);
@@ -1947,8 +1953,11 @@ ProcessGotoOpCode (
         DevicePathBuffer [Index/2] = (UINT8) ((DevicePathBuffer [Index/2] << 4) + DigitUint8);
       }
     }
+    FreePool (StringPtr);
 
     Selection->Handle = DevicePathToHiiHandle (DevicePath);
+    FreePool (DevicePath);
+
     if (Selection->Handle == NULL) {
       //
       // If target Hii Handle not found, exit
@@ -1957,9 +1966,6 @@ ProcessGotoOpCode (
       Selection->Statement = NULL;
       return Status;
     }
-
-    FreePool (StringPtr);
-    FreePool (DevicePath);
 
     CopyMem (&Selection->FormSetGuid,&Statement->HiiValue.Value.ref.FormSetGuid, sizeof (EFI_GUID));
     Selection->FormId = Statement->HiiValue.Value.ref.FormId;

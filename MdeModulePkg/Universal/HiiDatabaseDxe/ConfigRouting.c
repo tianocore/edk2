@@ -661,7 +661,7 @@ InsertDefaultValue (
         //
         // Update the default value array in BlockData.
         //
-        DefaultValueArray->Value = DefaultValueData->Value;
+        CopyMem (&DefaultValueArray->Value, &DefaultValueData->Value, sizeof (EFI_IFR_TYPE_VALUE));
         DefaultValueArray->Type  = DefaultValueData->Type;
         DefaultValueArray->Cleaned = DefaultValueData->Cleaned;
       }
@@ -990,6 +990,7 @@ ParseIfrData (
   EFI_IFR_VARSTORE_EFI     *IfrEfiVarStore;
   EFI_IFR_OP_HEADER        *IfrOpHdr;
   EFI_IFR_ONE_OF           *IfrOneOf;
+  EFI_IFR_REF4             *IfrRef;
   EFI_IFR_ONE_OF_OPTION    *IfrOneOfOption;
   EFI_IFR_DEFAULT          *IfrDefault;
   EFI_IFR_ORDERED_LIST     *IfrOrderedList;
@@ -1178,6 +1179,65 @@ ParseIfrData (
       }
       break;
 
+    case EFI_IFR_REF_OP:
+      //
+      // Ref question is not in IFR Form. This IFR form is not valid. 
+      //
+      if (VarStorageData->Size == 0) {
+        Status = EFI_INVALID_PARAMETER;
+        goto Done;
+      }
+      //
+      // Check whether this question is for the requested varstore.
+      //
+      IfrRef = (EFI_IFR_REF4 *) IfrOpHdr;
+      if (IfrRef->Question.VarStoreId != VarStorageData->VarStoreId) {
+        break;
+      }
+      
+      //
+      // Get Offset/Width by Question header.
+      //
+      VarOffset = IfrRef->Question.VarStoreInfo.VarOffset;
+      VarWidth  = (UINT16) (sizeof (EFI_HII_REF));
+      //
+      // Check whether this question is in requested block array.
+      //
+      if (!BlockArrayCheck (RequestBlockArray, VarOffset, VarWidth)) {
+        //
+        // This question is not in the requested string. Skip it.
+        //
+        break;
+      }
+
+      //
+      // Check this var question is in the var storage 
+      //
+      if ((VarOffset + VarWidth) > VarStorageData->Size) {
+        Status = EFI_INVALID_PARAMETER;
+        goto Done;
+      }
+      
+      //
+      // Set Block Data
+      //
+      BlockData = (IFR_BLOCK_DATA *) AllocateZeroPool (sizeof (IFR_BLOCK_DATA));
+      if (BlockData == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Done;
+      }
+      BlockData->Offset     = VarOffset;
+      BlockData->Width      = VarWidth;
+      BlockData->QuestionId = IfrRef->Question.QuestionId;
+      BlockData->OpCode     = IfrOpHdr->OpCode;
+      BlockData->Scope      = IfrOpHdr->Scope;
+      InitializeListHead (&BlockData->DefaultValueEntry);
+      //
+      // Add Block Data into VarStorageData BlockEntry
+      //
+      InsertBlockData (&VarStorageData->BlockEntry, &BlockData);
+      break;
+
     case EFI_IFR_ONE_OF_OP:
     case EFI_IFR_NUMERIC_OP:
       //
@@ -1253,19 +1313,19 @@ ParseIfrData (
         DefaultData.Type        = DefaultValueFromDefault;
         switch (IfrOneOf->Flags & EFI_IFR_NUMERIC_SIZE) {
         case EFI_IFR_NUMERIC_SIZE_1:
-          DefaultData.Value = (UINT64) IfrOneOf->data.u8.MinValue;
+          DefaultData.Value.u8 = IfrOneOf->data.u8.MinValue;
           break;
   
         case EFI_IFR_NUMERIC_SIZE_2:
-          CopyMem (&DefaultData.Value, &IfrOneOf->data.u16.MinValue, sizeof (UINT16));
+          CopyMem (&DefaultData.Value.u16, &IfrOneOf->data.u16.MinValue, sizeof (UINT16));
           break;
   
         case EFI_IFR_NUMERIC_SIZE_4:
-          CopyMem (&DefaultData.Value, &IfrOneOf->data.u32.MinValue, sizeof (UINT32));
+          CopyMem (&DefaultData.Value.u32, &IfrOneOf->data.u32.MinValue, sizeof (UINT32));
           break;
   
         case EFI_IFR_NUMERIC_SIZE_8:
-          CopyMem (&DefaultData.Value, &IfrOneOf->data.u64.MinValue, sizeof (UINT64));
+          CopyMem (&DefaultData.Value.u64, &IfrOneOf->data.u64.MinValue, sizeof (UINT64));
           break;
         }
         //
@@ -1404,14 +1464,14 @@ ParseIfrData (
         //
         // When flag is set, defautl value is TRUE.
         //
-        DefaultData.Type     = DefaultValueFromFlag;
-        DefaultData.Value    = 1;
+        DefaultData.Type    = DefaultValueFromFlag;
+        DefaultData.Value.b = TRUE;
       } else {
         //
         // When flag is not set, defautl value is FASLE.
         //
-        DefaultData.Type     = DefaultValueFromDefault;
-        DefaultData.Value    = 0;
+        DefaultData.Type    = DefaultValueFromDefault;
+        DefaultData.Value.b = FALSE;
       }
       //
       // Add DefaultValue into current BlockData
@@ -1430,14 +1490,14 @@ ParseIfrData (
         //
         // When flag is set, defautl value is TRUE.
         //
-        DefaultData.Type     = DefaultValueFromFlag;
-        DefaultData.Value    = 1;
+        DefaultData.Type    = DefaultValueFromFlag;
+        DefaultData.Value.b = TRUE;
       } else {
         //
         // When flag is not set, defautl value is FASLE.
         //
-        DefaultData.Type     = DefaultValueFromDefault;        
-        DefaultData.Value    = 0;
+        DefaultData.Type    = DefaultValueFromDefault;        
+        DefaultData.Value.b = FALSE;
       }
       //
       // Add DefaultValue into current BlockData
@@ -1665,7 +1725,7 @@ ParseIfrData (
         // Prepare new DefaultValue
         //
         DefaultData.Type  = DefaultValueFromFlag;
-        DefaultData.Value = IfrOneOfOption->Value.u64;
+        CopyMem (&DefaultData.Value.u64, &IfrOneOfOption->Value.u64, sizeof (UINT64));
         if ((IfrOneOfOption->Flags & EFI_IFR_OPTION_DEFAULT) == EFI_IFR_OPTION_DEFAULT) {
           DefaultData.DefaultId = EFI_HII_DEFAULT_CLASS_STANDARD;
           InsertDefaultValue (BlockData, &DefaultData);
@@ -1690,7 +1750,7 @@ ParseIfrData (
         // Prepare new DefaultValue
         //        
         DefaultData.Type        = DefaultValueFromDefault;
-        DefaultData.Value       = IfrOneOfOption->Value.u64;        
+        CopyMem (&DefaultData.Value.u64, &IfrOneOfOption->Value.u64, sizeof (UINT64));      
         for (LinkData = DefaultIdArray->Entry.ForwardLink; LinkData != &DefaultIdArray->Entry; LinkData = LinkData->ForwardLink) {
           DefaultDataPtr = BASE_CR (LinkData, IFR_DEFAULT_DATA, Entry); 
           DefaultData.DefaultId   = DefaultDataPtr->DefaultId;
@@ -1726,7 +1786,7 @@ ParseIfrData (
       //
       DefaultData.Type        = DefaultValueFromOpcode;
       DefaultData.DefaultId   = VarDefaultId;
-      DefaultData.Value       = IfrDefault->Value.u64;  
+      CopyMem (&DefaultData.Value, &IfrDefault->Value, sizeof (EFI_IFR_TYPE_VALUE));
       
       // If the value field is expression, set the cleaned flag.
       if (IfrDefault->Type ==  EFI_IFR_TYPE_OTHER) {

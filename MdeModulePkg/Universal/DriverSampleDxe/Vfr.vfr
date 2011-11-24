@@ -645,11 +645,12 @@ formset
       prompt  = STRING_TOKEN(STR_GOTO_DYNAMIC3),
       help    = STRING_TOKEN(STR_GOTO_DYNAMIC3_HELP),
       flags   = INTERACTIVE,
-      key     = 0x1248;
+      key     = 0x1248,
       //
       // Set the defult value, format is QuestionId; FormId; FormsetGuid; Device Path String Token
       //
       default = 0;0;ZERO_GUID;STRING_TOKEN(STR_NULL_STRING),  
+    ;                                                         // goto opcode end flag.
 
     goto 
       prompt  = STRING_TOKEN(STR_GOTO_DYNAMIC4),

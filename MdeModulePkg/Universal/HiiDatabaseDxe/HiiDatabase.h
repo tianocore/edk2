@@ -96,7 +96,7 @@ typedef struct {
                                      // TRUE  Cleaned, the value can't be used
                                      // FALSE Not cleaned, the value can  be used.
   UINT16              DefaultId;
-  UINT64              Value;
+  EFI_IFR_TYPE_VALUE  Value;
 } IFR_DEFAULT_DATA;
 
 //
