@@ -1033,8 +1033,8 @@ GetConsoleOutMode (
   ConOut   = gST->ConOut;
   MaxMode  = (UINTN) (ConOut->Mode->MaxMode);
 
-  CurrentCol = PcdGet32 (PcdConOutColumn);
-  CurrentRow = PcdGet32 (PcdConOutRow);
+  CurrentCol = PcdGet32 (PcdSetupConOutColumn);
+  CurrentRow = PcdGet32 (PcdSetupConOutRow);
   for (Mode = 0; Mode < MaxMode; Mode++) {
     Status = ConOut->QueryMode (ConOut, Mode, &Col, &Row);
     if (!EFI_ERROR(Status)) {

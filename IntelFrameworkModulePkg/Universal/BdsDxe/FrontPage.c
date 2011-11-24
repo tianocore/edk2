@@ -17,6 +17,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Language.h"
 #include "Hotkey.h"
 
+BOOLEAN   mSetupModeInitialized = FALSE;
+UINT32    mSetupTextModeColumn;
+UINT32    mSetupTextModeRow;
+UINT32    mSetupHorizontalResolution;
+UINT32    mSetupVerticalResolution;
+
 BOOLEAN   gConnectAllHappened = FALSE;
 UINTN     gCallbackKey;
 
@@ -961,10 +967,6 @@ ChangeModeForSetup (
   UINT32                                MaxGopMode;
   UINT32                                MaxTextMode;
   UINT32                                ModeNumber;
-  UINT32                                SetupTextModeColumn;
-  UINT32                                SetupTextModeRow;
-  UINT32                                SetupHorizontalResolution;
-  UINT32                                SetupVerticalResolution;
   UINTN                                 HandleCount;
   EFI_HANDLE                            *HandleBuffer;
   EFI_STATUS                            Status;
@@ -995,12 +997,15 @@ ChangeModeForSetup (
   }
 
   //
-  // Get user defined text mode for setup.
+  // Get user defined text mode for setup only once.
   //  
-  SetupHorizontalResolution = PcdGet32 (PcdSetupVideoHorizontalResolution);
-  SetupVerticalResolution   = PcdGet32 (PcdSetupVideoVerticalResolution);      
-  SetupTextModeColumn       = PcdGet32 (PcdSetupConOutColumn);
-  SetupTextModeRow          = PcdGet32 (PcdSetupConOutRow);
+  if (!mSetupModeInitialized) {
+    mSetupHorizontalResolution = PcdGet32 (PcdSetupVideoHorizontalResolution);
+    mSetupVerticalResolution   = PcdGet32 (PcdSetupVideoVerticalResolution);      
+    mSetupTextModeColumn       = PcdGet32 (PcdSetupConOutColumn);
+    mSetupTextModeRow          = PcdGet32 (PcdSetupConOutRow);
+    mSetupModeInitialized     = TRUE;
+  }
 
   MaxGopMode  = GraphicsOutput->Mode->MaxMode;
   MaxTextMode = SimpleTextOut->Mode->MaxMode;
@@ -1020,17 +1025,17 @@ ChangeModeForSetup (
                        &Info
                        );
     if (!EFI_ERROR (Status)) {
-      if ((Info->HorizontalResolution == SetupHorizontalResolution) &&
-          (Info->VerticalResolution == SetupVerticalResolution)) {
-        if ((GraphicsOutput->Mode->Info->HorizontalResolution == SetupHorizontalResolution) &&
-            (GraphicsOutput->Mode->Info->VerticalResolution == SetupVerticalResolution)) {
+      if ((Info->HorizontalResolution == mSetupHorizontalResolution) &&
+          (Info->VerticalResolution == mSetupVerticalResolution)) {
+        if ((GraphicsOutput->Mode->Info->HorizontalResolution == mSetupHorizontalResolution) &&
+            (GraphicsOutput->Mode->Info->VerticalResolution == mSetupVerticalResolution)) {
           //
           // If current video resolution is same with setup video resolution, 
           // then check if current text mode is same with setup text mode.
           //
           Status = SimpleTextOut->QueryMode (SimpleTextOut, SimpleTextOut->Mode->Mode, &CurrentColumn, &CurrentRow);
           ASSERT_EFI_ERROR (Status);
-          if (CurrentColumn == SetupTextModeColumn && CurrentRow == SetupTextModeRow) {
+          if (CurrentColumn == mSetupTextModeColumn && CurrentRow == mSetupTextModeRow) {
             //
             // Current text mode is same with setup text mode, text mode need not be change.
             //
@@ -1043,7 +1048,7 @@ ChangeModeForSetup (
             for (Index = 0; Index < MaxTextMode; Index++) {
               Status = SimpleTextOut->QueryMode (SimpleTextOut, Index, &CurrentColumn, &CurrentRow);
               if (!EFI_ERROR(Status)) {
-                if ((CurrentColumn == SetupTextModeColumn) && (CurrentRow == SetupTextModeRow)) {
+                if ((CurrentColumn == mSetupTextModeColumn) && (CurrentRow == mSetupTextModeRow)) {
                   //
                   // setup text mode is supported, set it.
                   //
@@ -1052,8 +1057,8 @@ ChangeModeForSetup (
                   //
                   // Update text mode PCD.
                   //
-                  PcdSet32 (PcdConOutColumn, SetupTextModeColumn);
-                  PcdSet32 (PcdConOutRow, SetupTextModeRow);
+                  PcdSet32 (PcdConOutColumn, mSetupTextModeColumn);
+                  PcdSet32 (PcdConOutRow, mSetupTextModeRow);
                   FreePool (Info);
                   return EFI_SUCCESS;
                 }
@@ -1079,10 +1084,10 @@ ChangeModeForSetup (
             // Set PCD to restart GraphicsConsole and Consplitter to change video resolution 
             // and produce new text mode based on new resolution.
             //
-            PcdSet32 (PcdVideoHorizontalResolution, SetupHorizontalResolution);
-            PcdSet32 (PcdVideoVerticalResolution, SetupVerticalResolution);
-            PcdSet32 (PcdConOutColumn, SetupTextModeColumn);
-            PcdSet32 (PcdConOutRow, SetupTextModeRow);
+            PcdSet32 (PcdVideoHorizontalResolution, mSetupHorizontalResolution);
+            PcdSet32 (PcdVideoVerticalResolution, mSetupVerticalResolution);
+            PcdSet32 (PcdConOutColumn, mSetupTextModeColumn);
+            PcdSet32 (PcdConOutRow, mSetupTextModeRow);
             
             Status = gBS->LocateHandleBuffer (
                              ByProtocol,

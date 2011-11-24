@@ -152,6 +152,26 @@
   #  This PCD should be set as HII type PCD by platform integrator mapped to variable L"HwErrRecSupport"
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|0|UINT16|0x40000002
 
+[PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+  ## The 4 PCDs below are used to specify the video resolution and text mode of text setup.
+  #  To make text setup work in this resolution, PcdVideoHorizontalResolution, PcdVideoVerticalResolution,
+  #  PcdConOutColumn and PcdConOutRow in MdeModulePkg.dec should be created as PcdsDynamic or PcdsDynamicEx
+  #  in platform DSC file. Then BDS setup will update these PCDs defined in MdeModulePkg.dec and reconnect
+  #  console drivers (GraphicsConsole, Terminal, Consplitter) to make the video resolution and text mode work
+  #  for text setup.
+
+  ## The PCD is used to specify the video horizontal resolution of text setup.   
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution|800|UINT32|0x50000001
+  
+  ## The PCD is used to specify the video vertical resolution of text setup.
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution|600|UINT32|0x50000002
+
+  ## The PCD is used to specify the console output column of text setup.
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupConOutColumn|80|UINT32|0x50000003
+  
+  ## The PCD is used to specify the console output column of text setup.
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupConOutRow|25|UINT32|0x50000004
+
 [PcdsFixedAtBuild, PcdsDynamic, PcdsDynamicEx, PcdsPatchableInModule]
   ## I/O Base address of floppy device controller.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdFdcBaseAddress|0x3f0|UINT16|0x30000000
@@ -195,22 +215,4 @@
   ## The PCD is used to specify the high PMM (Post Memory Manager) size with bytes above 1MB.
   #  The value should be a multiple of 4KB.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHighPmmMemorySize|0x400000|UINT32|0x3000000a
-
-  ## The 4 PCDs below are used to specify the video resolution and text mode of text setup.
-  #  To make text setup work in this resolution, PcdVideoHorizontalResolution, PcdVideoVerticalResolution,
-  #  PcdConOutColumn and PcdConOutRow in MdeModulePkg.dec should be created as PcdsDynamic or PcdsDynamicEx
-  #  in platform DSC file. Then BDS setup will update these PCDs defined in MdeModulePkg.dec and reconnect
-  #  console drivers (GraphicsConsole, Terminal, Consplitter) to make the video resolution and text mode work
-  #  for text setup.
-
-  ## The PCD is used to specify the video horizontal resolution of text setup.   
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution|800|UINT32|0x3000000b
   
-  ## The PCD is used to specify the video vertical resolution of text setup.
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution|600|UINT32|0x3000000c
-
-  ## The PCD is used to specify the console output column of text setup.
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupConOutColumn|80|UINT32|0x3000000d
-  
-  ## The PCD is used to specify the console output column of text setup.
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupConOutRow|25|UINT32|0x3000000e

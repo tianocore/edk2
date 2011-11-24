@@ -1345,8 +1345,8 @@ Var_UpdateConMode (
 
   Status = gST->ConOut->QueryMode (gST->ConOut, Mode, &(ModeInfo.Column), &(ModeInfo.Row));
   if (!EFI_ERROR(Status)) {
-    PcdSet32 (PcdConOutColumn, (UINT32) ModeInfo.Column);
-    PcdSet32 (PcdConOutRow, (UINT32) ModeInfo.Row);
+    PcdSet32 (PcdSetupConOutColumn, (UINT32) ModeInfo.Column);
+    PcdSet32 (PcdSetupConOutRow, (UINT32) ModeInfo.Row);
   }
 
   return EFI_SUCCESS;
