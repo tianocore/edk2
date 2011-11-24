@@ -204,8 +204,8 @@
   gEfiUnixPkgTokenSpaceGuid.PcdUnixNetworkInterface|L"en0"
 
 [PcdsDynamicHii.common.DEFAULT]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|L"Setup"|gEfiUnixSystemConfigGuid|0x0|80
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|L"Setup"|gEfiUnixSystemConfigGuid|0x4|25
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupConOutColumn|L"SetupConsoleConfig"|gEfiGlobalVariableGuid|0x0|80
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupConOutRow|L"SetupConsoleConfig"|gEfiGlobalVariableGuid|0x4|25
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|10
   
 ###################################################################################################
