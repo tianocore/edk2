@@ -266,21 +266,6 @@ XhcWriteOpReg16 (
   );
 
 /**
-  Write the data to the 8-bytes width XHCI operational register.
-
-  @param  Xhc          The XHCI Instance.
-  @param  Offset       The offset of the 8-bytes width operational register.
-  @param  Data         The data to write.
-
-**/
-VOID
-XhcWriteOpReg64 (
-  IN USB_XHCI_INSTANCE    *Xhc,
-  IN UINT32               Offset,
-  IN UINT64               Data
-  );
-
-/**
   Read XHCI runtime register.
 
   @param  Xhc          The XHCI Instance.
@@ -291,21 +276,6 @@ XhcWriteOpReg64 (
 **/
 UINT32
 XhcReadRuntimeReg (
-  IN  USB_XHCI_INSTANCE   *Xhc,
-  IN  UINT32              Offset
-  );
-
-/**
-  Read 8-bytes width XHCI runtime register.
-
-  @param  Xhc          The XHCI Instance.
-  @param  Offset       The offset of the 8-bytes width runtime register.
-
-  @return The register content read
-
-**/
-UINT64
-XhcReadRuntimeReg64 (
   IN  USB_XHCI_INSTANCE   *Xhc,
   IN  UINT32              Offset
   );
@@ -323,21 +293,6 @@ XhcWriteRuntimeReg (
   IN USB_XHCI_INSTANCE    *Xhc,
   IN UINT32               Offset,
   IN UINT32               Data
-  );
-
-/**
-  Write the data to the 8-bytes width XHCI runtime register.
-
-  @param  Xhc          The XHCI Instance.
-  @param  Offset       The offset of the 8-bytes width runtime register.
-  @param  Data         The data to write.
-
-**/
-VOID
-XhcWriteRuntimeReg64 (
-  IN USB_XHCI_INSTANCE    *Xhc,
-  IN UINT32               Offset,
-  IN UINT64               Data
   );
 
 /**

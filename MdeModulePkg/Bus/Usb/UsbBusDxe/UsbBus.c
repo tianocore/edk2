@@ -1431,7 +1431,6 @@ UsbBusControllerDriverStop (
   // BugBug: Raise TPL to callback level instead of USB_BUS_TPL to avoid TPL conflict
   //
   OldTpl  = gBS->RaiseTPL (TPL_CALLBACK);
-  UsbHcSetState (Bus, EfiUsbHcStateHalt);
 
   RootHub = Bus->Devices[0];
   RootIf  = RootHub->Interfaces[0];

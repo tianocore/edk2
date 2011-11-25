@@ -111,6 +111,12 @@ typedef union _USB_DEV_ROUTE {
 // Endpoint address and its capabilities
 //
 typedef struct _USB_ENDPOINT {
+  //
+  // Store logical device address assigned by UsbBus
+  // It's because some XHCI host controllers may assign the same physcial device
+  // address for those devices inserted at different root port.
+  //
+  UINT8                     BusAddr;
   UINT8                     DevAddr;
   UINT8                     EpAddr;
   EFI_USB_DATA_DIRECTION    Direction;
@@ -144,7 +150,6 @@ typedef struct _TRANSFER_RING {
 } TRANSFER_RING;
 
 typedef struct _EVENT_RING {
-  UINT32                    EventInterrupter;
   VOID                      *ERSTBase;
   VOID                      *EventRingSeg0;
   UINTN                     TrbNumber;
@@ -577,6 +582,46 @@ typedef struct _SLOT_CONTEXT {
   UINT32                  RsvdZ7;
 } SLOT_CONTEXT;
 
+typedef struct _SLOT_CONTEXT_64 {
+  UINT32                  RouteString:20;
+  UINT32                  Speed:4;
+  UINT32                  RsvdZ1:1;
+  UINT32                  MTT:1;
+  UINT32                  Hub:1;
+  UINT32                  ContextEntries:5;
+
+  UINT32                  MaxExitLatency:16;
+  UINT32                  RootHubPortNum:8;
+  UINT32                  PortNum:8;
+
+  UINT32                  TTHubSlotId:8;
+  UINT32                  TTPortNum:8;
+  UINT32                  TTT:2;
+  UINT32                  RsvdZ2:4;
+  UINT32                  InterTarget:10;
+
+  UINT32                  DeviceAddress:8;
+  UINT32                  RsvdZ3:19;
+  UINT32                  SlotState:5;
+
+  UINT32                  RsvdZ4;
+  UINT32                  RsvdZ5;
+  UINT32                  RsvdZ6;
+  UINT32                  RsvdZ7;
+
+  UINT32                  RsvdZ8;
+  UINT32                  RsvdZ9;
+  UINT32                  RsvdZ10;
+  UINT32                  RsvdZ11;
+  
+  UINT32                  RsvdZ12;
+  UINT32                  RsvdZ13;
+  UINT32                  RsvdZ14;
+  UINT32                  RsvdZ15;
+
+} SLOT_CONTEXT_64;
+
+
 //
 // 6.2.3 Endpoint Context
 //
@@ -609,6 +654,47 @@ typedef struct _ENDPOINT_CONTEXT {
   UINT32                  RsvdZ7;
 } ENDPOINT_CONTEXT;
 
+typedef struct _ENDPOINT_CONTEXT_64 {
+  UINT32                  EPState:3;
+  UINT32                  RsvdZ1:5;
+  UINT32                  Mult:2;
+  UINT32                  MaxPStreams:5;
+  UINT32                  LSA:1;
+  UINT32                  Interval:8;
+  UINT32                  RsvdZ2:8;
+
+  UINT32                  RsvdZ3:1;
+  UINT32                  CErr:2;
+  UINT32                  EPType:3;
+  UINT32                  RsvdZ4:1;
+  UINT32                  HID:1;
+  UINT32                  MaxBurstSize:8;
+  UINT32                  MaxPacketSize:16;
+
+  UINT32                  PtrLo;
+
+  UINT32                  PtrHi;
+
+  UINT32                  AverageTRBLength:16;
+  UINT32                  MaxESITPayload:16;
+
+  UINT32                  RsvdZ5;
+  UINT32                  RsvdZ6;
+  UINT32                  RsvdZ7;
+  
+  UINT32                  RsvdZ8;
+  UINT32                  RsvdZ9;
+  UINT32                  RsvdZ10;
+  UINT32                  RsvdZ11;
+  
+  UINT32                  RsvdZ12;
+  UINT32                  RsvdZ13;
+  UINT32                  RsvdZ14;
+  UINT32                  RsvdZ15;
+
+} ENDPOINT_CONTEXT_64;
+
+
 //
 // 6.2.5.1 Input Control Context
 //
@@ -623,6 +709,25 @@ typedef struct _INPUT_CONTRL_CONTEXT {
   UINT32                  RsvdZ6;
 } INPUT_CONTRL_CONTEXT;
 
+typedef struct _INPUT_CONTRL_CONTEXT_64 {
+  UINT32                  Dword1;
+  UINT32                  Dword2;
+  UINT32                  RsvdZ1;
+  UINT32                  RsvdZ2;
+  UINT32                  RsvdZ3;
+  UINT32                  RsvdZ4;
+  UINT32                  RsvdZ5;
+  UINT32                  RsvdZ6;
+  UINT32                  RsvdZ7;
+  UINT32                  RsvdZ8;
+  UINT32                  RsvdZ9;
+  UINT32                  RsvdZ10;
+  UINT32                  RsvdZ11;
+  UINT32                  RsvdZ12;
+  UINT32                  RsvdZ13;
+  UINT32                  RsvdZ14;
+} INPUT_CONTRL_CONTEXT_64;
+
 //
 // 6.2.1 Device Context
 //
@@ -630,6 +735,11 @@ typedef struct _DEVICE_CONTEXT {
   SLOT_CONTEXT            Slot;
   ENDPOINT_CONTEXT        EP[31];
 } DEVICE_CONTEXT;
+
+typedef struct _DEVICE_CONTEXT_64 {
+  SLOT_CONTEXT_64         Slot;
+  ENDPOINT_CONTEXT_64     EP[31];
+} DEVICE_CONTEXT_64;
 
 //
 // 6.2.5 Input Context
@@ -639,6 +749,13 @@ typedef struct _INPUT_CONTEXT {
   SLOT_CONTEXT            Slot;
   ENDPOINT_CONTEXT        EP[31];
 } INPUT_CONTEXT;
+
+typedef struct _INPUT_CONTEXT_64 {
+  INPUT_CONTRL_CONTEXT_64 InputControlContext;
+  SLOT_CONTEXT_64         Slot;
+  ENDPOINT_CONTEXT_64     EP[31];
+} INPUT_CONTEXT_64;
+
 
 /**
   Initialize the XHCI host controller for schedule.
@@ -703,7 +820,7 @@ XhcExecTransfer (
   the device and endpoint.
 
   @param  Xhc                   The XHCI Instance.
-  @param  DevAddr               The address of the target device.
+  @param  BusAddr               The logical device address assigned by UsbBus driver.
   @param  EpNum                 The endpoint of the target.
 
   @retval EFI_SUCCESS           An asynchronous transfer is removed.
@@ -713,7 +830,7 @@ XhcExecTransfer (
 EFI_STATUS
 XhciDelAsyncIntTransfer (
   IN  USB_XHCI_INSTANCE   *Xhc,
-  IN  UINT8               DevAddr,
+  IN  UINT8               BusAddr,
   IN  UINT8               EpNum
   );
 
@@ -748,21 +865,6 @@ XhcSetBiosOwnership (
 VOID
 XhcClearBiosOwnership (
   IN USB_XHCI_INSTANCE    *Xhc
-  );
-
-/**
-  Find out the slot id according to device address assigned by XHCI's Address_Device cmd.
-
-  @param  Xhc             The XHCI Instance.
-  @param  DevAddr         The device address of the target device.
-
-  @return The slot id used by the device.
-
-**/
-UINT8
-XhcDevAddrToSlotId (
-  IN  USB_XHCI_INSTANCE  *Xhc,
-  IN  UINT8              DevAddr
   );
 
 /**
@@ -870,6 +972,29 @@ XhcConfigHubContext (
   IN UINT8                    MTT
   );
 
+
+/**
+  Evaluate the slot context for hub device through XHCI's Configure_Endpoint cmd.
+
+  @param  Xhc           The XHCI Instance.
+  @param  SlotId        The slot id to be configured.
+  @param  PortNum       The total number of downstream port supported by the hub.
+  @param  TTT           The TT think time of the hub device.
+  @param  MTT           The multi-TT of the hub device.
+
+  @retval EFI_SUCCESS   Successfully configure the hub device's slot context.
+
+**/
+EFI_STATUS
+XhcConfigHubContext64 (
+  IN USB_XHCI_INSTANCE        *Xhc,
+  IN UINT8                    SlotId,
+  IN UINT8                    PortNum,
+  IN UINT8                    TTT,
+  IN UINT8                    MTT
+  );
+
+
 /**
   Configure all the device endpoints through XHCI's Configure_Endpoint cmd.
 
@@ -889,6 +1014,28 @@ XhcSetConfigCmd (
   IN UINT8                    DeviceSpeed,
   IN USB_CONFIG_DESCRIPTOR    *ConfigDesc
   );
+
+
+/**
+  Configure all the device endpoints through XHCI's Configure_Endpoint cmd.
+
+  @param  Xhc           The XHCI Instance.
+  @param  SlotId        The slot id to be configured.
+  @param  DeviceSpeed   The device's speed.
+  @param  ConfigDesc    The pointer to the usb device configuration descriptor.
+
+  @retval EFI_SUCCESS   Successfully configure all the device endpoints.
+
+**/
+EFI_STATUS
+EFIAPI
+XhcSetConfigCmd64 (
+  IN USB_XHCI_INSTANCE        *Xhc,
+  IN UINT8                    SlotId,
+  IN UINT8                    DeviceSpeed,
+  IN USB_CONFIG_DESCRIPTOR    *ConfigDesc
+  );
+
 
 /**
   Find out the actual device address according to the requested device address from UsbBus.
@@ -929,6 +1076,28 @@ XhcInitializeDeviceSlot (
   );
 
 /**
+  Assign and initialize the device slot for a new device.
+
+  @param  Xhc                 The XHCI Instance.
+  @param  ParentRouteChart    The route string pointed to the parent device.
+  @param  ParentPort          The port at which the device is located.
+  @param  RouteChart          The route string pointed to the device.
+  @param  DeviceSpeed         The device speed.
+
+  @retval EFI_SUCCESS   Successfully assign a slot to the device and assign an address to it.
+
+**/
+EFI_STATUS
+EFIAPI
+XhcInitializeDeviceSlot64 (
+  IN  USB_XHCI_INSTANCE         *Xhc,
+  IN  USB_DEV_ROUTE             ParentRouteChart,
+  IN  UINT16                    ParentPort,
+  IN  USB_DEV_ROUTE             RouteChart,
+  IN  UINT8                     DeviceSpeed
+  );
+
+/**
   Evaluate the endpoint 0 context through XHCI's Evaluate_Context cmd.
 
   @param  Xhc           The XHCI Instance.
@@ -946,6 +1115,26 @@ XhcEvaluateContext (
   IN UINT32                   MaxPacketSize
   );
 
+
+/**
+  Evaluate the endpoint 0 context through XHCI's Evaluate_Context cmd.
+
+  @param  Xhc           The XHCI Instance.
+  @param  SlotId        The slot id to be evaluated.
+  @param  MaxPacketSize The max packet size supported by the device control transfer.
+
+  @retval EFI_SUCCESS   Successfully evaluate the device endpoint 0.
+
+**/
+EFI_STATUS
+EFIAPI
+XhcEvaluateContext64 (
+  IN USB_XHCI_INSTANCE        *Xhc,
+  IN UINT8                    SlotId,
+  IN UINT32                   MaxPacketSize
+  );
+
+
 /**
   Disable the specified device slot.
 
@@ -961,6 +1150,24 @@ XhcDisableSlotCmd (
   IN USB_XHCI_INSTANCE        *Xhc,
   IN UINT8                    SlotId
   );
+
+
+/**
+  Disable the specified device slot.
+
+  @param  Xhc           The XHCI Instance.
+  @param  SlotId        The slot id to be disabled.
+
+  @retval EFI_SUCCESS   Successfully disable the device slot.
+
+**/
+EFI_STATUS
+EFIAPI
+XhcDisableSlotCmd64 (
+  IN USB_XHCI_INSTANCE        *Xhc,
+  IN UINT8                    SlotId
+  );
+
 
 /**
   Synchronize the specified transfer ring to update the enqueue and dequeue pointer.
@@ -1032,14 +1239,12 @@ CreateTransferRing (
   Create XHCI event ring.
 
   @param  Xhc                 The XHCI Instance.
-  @param  EventInterrupter    The interrupter of event.
   @param  EventRing           The created event ring.
 
 **/
 VOID
 CreateEventRing (
   IN  USB_XHCI_INSTANCE     *Xhc,
-  IN  UINT8                 EventInterrupter,
   OUT EVENT_RING            *EventRing
   );
 

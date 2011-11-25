@@ -192,39 +192,6 @@ XhcWriteOpReg16 (
 }
 
 /**
-  Write the data to the 8-bytes width XHCI operational register.
-
-  @param  Xhc          The XHCI Instance.
-  @param  Offset       The offset of the 8-bytes width operational register.
-  @param  Data         The data to write.
-
-**/
-VOID
-XhcWriteOpReg64 (
-  IN USB_XHCI_INSTANCE    *Xhc,
-  IN UINT32               Offset,
-  IN UINT64               Data
-  )
-{
-  EFI_STATUS              Status;
-
-  ASSERT (Xhc->CapLength != 0);
-
-  Status = Xhc->PciIo->Mem.Write (
-                             Xhc->PciIo,
-                             EfiPciIoWidthUint64,
-                             XHC_BAR_INDEX,
-                             (UINT64) (Xhc->CapLength + Offset),
-                             1,
-                             &Data
-                             );
-
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcWriteOpReg64: Pci Io Write error: %r at %d\n", Status, Offset));
-  }
-}
-
-/**
   Read XHCI door bell register.
 
   @param  Xhc          The XHCI Instance.
@@ -332,43 +299,6 @@ XhcReadRuntimeReg (
 }
 
 /**
-  Read 8-bytes width XHCI runtime register.
-
-  @param  Xhc          The XHCI Instance.
-  @param  Offset       The offset of the 8-bytes width runtime register.
-
-  @return The register content read
-
-**/
-UINT64
-XhcReadRuntimeReg64 (
-  IN  USB_XHCI_INSTANCE   *Xhc,
-  IN  UINT32              Offset
-  )
-{
-  UINT64                  Data;
-  EFI_STATUS              Status;
-
-  ASSERT (Xhc->RTSOff != 0);
-
-  Status = Xhc->PciIo->Mem.Read (
-                             Xhc->PciIo,
-                             EfiPciIoWidthUint64,
-                             XHC_BAR_INDEX,
-                             (UINT64) (Xhc->RTSOff + Offset),
-                             1,
-                             &Data
-                             );
-
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcReadRuntimeReg64: Pci Io Read error - %r at %d\n", Status, Offset));
-    Data = 0xFFFFFFFFFFFFFFFFULL;
-  }
-
-  return Data;
-}
-
-/**
   Write the data to the XHCI runtime register.
 
   @param  Xhc          The XHCI Instance.
@@ -398,39 +328,6 @@ XhcWriteRuntimeReg (
 
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "XhcWriteRuntimeReg: Pci Io Write error: %r at %d\n", Status, Offset));
-  }
-}
-
-/**
-  Write the data to the 8-bytes width XHCI runtime register.
-
-  @param  Xhc          The XHCI Instance.
-  @param  Offset       The offset of the 8-bytes width runtime register.
-  @param  Data         The data to write.
-
-**/
-VOID
-XhcWriteRuntimeReg64 (
-  IN USB_XHCI_INSTANCE    *Xhc,
-  IN UINT32               Offset,
-  IN UINT64               Data
-  )
-{
-  EFI_STATUS              Status;
-
-  ASSERT (Xhc->RTSOff != 0);
-
-  Status = Xhc->PciIo->Mem.Write (
-                             Xhc->PciIo,
-                             EfiPciIoWidthUint64,
-                             XHC_BAR_INDEX,
-                             (UINT64) (Xhc->RTSOff + Offset),
-                             1,
-                             &Data
-                             );
-
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcWriteRuntimeReg64: Pci Io Write error: %r at %d\n", Status, Offset));
   }
 }
 

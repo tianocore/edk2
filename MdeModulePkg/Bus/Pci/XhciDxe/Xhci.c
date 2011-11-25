@@ -721,7 +721,6 @@ XhcControlTransfer (
   URB                     *Urb;
   UINT8                   Endpoint;
   UINT8                   Index;
-  UINT8                   XhciDevAddr;
   UINT8                   DescriptorType;
   UINT8                   SlotId;
   UINT8                   TTT;
@@ -794,11 +793,6 @@ XhcControlTransfer (
   }
 
   //
-  // Acquire the actual device address assigned by XHCI's Address_Device cmd.
-  //
-  XhciDevAddr = Xhc->UsbDevContext[SlotId].XhciDevAddr;
-
-  //
   // Hook the Set_Address request from UsbBus.
   // According to XHCI 1.0 spec, the Set_Address request is replaced by XHCI's Address_Device cmd.
   //
@@ -810,7 +804,7 @@ XhcControlTransfer (
     //
     for (Index = 0; Index < 255; Index++) {
       if (!Xhc->UsbDevContext[Index + 1].Enabled &&
-          (Xhc->UsbDevContext[Index + 1].SlotId != 0) &&
+          (Xhc->UsbDevContext[Index + 1].SlotId == 0) &&
           (Xhc->UsbDevContext[Index + 1].BusDevAddr == (UINT8)Request->Value)) {
         Xhc->UsbDevContext[Index + 1].BusDevAddr = 0;
       }
@@ -850,7 +844,7 @@ XhcControlTransfer (
   Endpoint = (UINT8) (0 | ((TransferDirection == EfiUsbDataIn) ? 0x80 : 0));
   Urb = XhcCreateUrb (
           Xhc,
-          XhciDevAddr,
+          DeviceAddress,
           Endpoint,
           DeviceSpeed,
           MaximumPacketLength,
@@ -867,7 +861,7 @@ XhcControlTransfer (
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
   }
-  ASSERT (Urb->EvtRing == &Xhc->CtrlTrEventRing);
+  ASSERT (Urb->EvtRing == &Xhc->EventRing);
   Status = XhcExecTransfer (Xhc, FALSE, Urb, Timeout);
 
   //
@@ -909,7 +903,11 @@ XhcControlTransfer (
           MaxPacket0 = Xhc->UsbDevContext[SlotId].DevDesc.MaxPacketSize0;
         }
         Xhc->UsbDevContext[SlotId].ConfDesc = AllocateZeroPool (Xhc->UsbDevContext[SlotId].DevDesc.NumConfigurations * sizeof (EFI_USB_CONFIG_DESCRIPTOR *));
-        Status = XhcEvaluateContext (Xhc, SlotId, MaxPacket0);
+        if (Xhc->HcCParams.Data.Csz == 0) {
+          Status = XhcEvaluateContext (Xhc, SlotId, MaxPacket0);
+        } else {
+          Status = XhcEvaluateContext64 (Xhc, SlotId, MaxPacket0);
+        }
         ASSERT_EFI_ERROR (Status);
     } else if (DescriptorType == USB_DESC_TYPE_CONFIG) {
       ASSERT (Data != NULL);
@@ -940,13 +938,12 @@ XhcControlTransfer (
         MTT = 0;
       }
 
-      Status = XhcConfigHubContext (
-                 Xhc,
-                 SlotId,
-                 HubDesc->NumPorts,
-                 TTT,
-                 MTT
-                 );
+      if (Xhc->HcCParams.Data.Csz == 0) {
+        Status = XhcConfigHubContext (Xhc, SlotId, HubDesc->NumPorts, TTT, MTT);
+      } else {
+        Status = XhcConfigHubContext64 (Xhc, SlotId, HubDesc->NumPorts, TTT, MTT);
+      }
+      ASSERT_EFI_ERROR (Status);
     }
   } else if ((Request->Request     == USB_REQ_SET_CONFIG) &&
              (Request->RequestType == USB_REQUEST_TYPE (EfiUsbNoData, USB_REQ_TYPE_STANDARD, USB_TARGET_DEVICE))) {
@@ -955,7 +952,12 @@ XhcControlTransfer (
     //
     for (Index = 0; Index < Xhc->UsbDevContext[SlotId].DevDesc.NumConfigurations; Index++) {
       if (Xhc->UsbDevContext[SlotId].ConfDesc[Index]->ConfigurationValue == (UINT8)Request->Value) {
-        XhcSetConfigCmd (Xhc, SlotId, DeviceSpeed, Xhc->UsbDevContext[SlotId].ConfDesc[Index]);
+        if (Xhc->HcCParams.Data.Csz == 0) {
+          Status = XhcSetConfigCmd (Xhc, SlotId, DeviceSpeed, Xhc->UsbDevContext[SlotId].ConfDesc[Index]);
+        } else {
+          Status = XhcSetConfigCmd64 (Xhc, SlotId, DeviceSpeed, Xhc->UsbDevContext[SlotId].ConfDesc[Index]);
+        }
+        ASSERT_EFI_ERROR (Status);
         break;
       }
     }
@@ -1073,7 +1075,6 @@ XhcBulkTransfer (
 {
   USB_XHCI_INSTANCE       *Xhc;
   URB                     *Urb;
-  UINT8                   XhciDevAddr;
   UINT8                   SlotId;
   EFI_STATUS              Status;
   EFI_STATUS              RecoveryStatus;
@@ -1119,17 +1120,12 @@ XhcBulkTransfer (
   }
 
   //
-  // Acquire the actual device address assigned by XHCI's Address_Device cmd.
-  //
-  XhciDevAddr = Xhc->UsbDevContext[SlotId].XhciDevAddr;
-
-  //
   // Create a new URB, insert it into the asynchronous
   // schedule list, then poll the execution status.
   //
   Urb = XhcCreateUrb (
           Xhc,
-          XhciDevAddr,
+          DeviceAddress,
           EndPointAddress,
           DeviceSpeed,
           MaximumPacketLength,
@@ -1147,7 +1143,7 @@ XhcBulkTransfer (
     goto ON_EXIT;
   }
 
-  ASSERT (Urb->EvtRing == &Xhc->BulkTrEventRing);
+  ASSERT (Urb->EvtRing == &Xhc->EventRing);
 
   Status = XhcExecTransfer (Xhc, FALSE, Urb, Timeout);
 
@@ -1223,7 +1219,6 @@ XhcAsyncInterruptTransfer (
   USB_XHCI_INSTANCE       *Xhc;
   URB                     *Urb;
   EFI_STATUS              Status;
-  UINT8                   XhciDevAddr;
   UINT8                   SlotId;
   UINT8                   Index;
   UINT8                   *Data;
@@ -1262,8 +1257,7 @@ XhcAsyncInterruptTransfer (
     // The delete request may happen after device is detached.
     //
     for (Index = 0; Index < 255; Index++) {
-      if ((Xhc->UsbDevContext[Index + 1].SlotId != 0) &&
-          (Xhc->UsbDevContext[Index + 1].BusDevAddr == DeviceAddress)) {
+      if (Xhc->UsbDevContext[Index + 1].BusDevAddr == DeviceAddress) {
         break;
       }
     }
@@ -1273,12 +1267,7 @@ XhcAsyncInterruptTransfer (
       goto ON_EXIT;
     }
 
-    //
-    // Acquire the actual device address assigned by XHCI's Address_Device cmd.
-    //
-    XhciDevAddr = Xhc->UsbDevContext[Index + 1].XhciDevAddr;
-
-    Status = XhciDelAsyncIntTransfer (Xhc, XhciDevAddr, EndPointAddress);
+    Status = XhciDelAsyncIntTransfer (Xhc, DeviceAddress, EndPointAddress);
     DEBUG ((EFI_D_INFO, "XhcAsyncInterruptTransfer: remove old transfer, Status = %r\n", Status));
     goto ON_EXIT;
   }
@@ -1299,11 +1288,6 @@ XhcAsyncInterruptTransfer (
     goto ON_EXIT;
   }
 
-  //
-  // Acquire the actual device address assigned by XHCI's Address_Device cmd.
-  //
-  XhciDevAddr = Xhc->UsbDevContext[SlotId].XhciDevAddr;
-
   Data = AllocateZeroPool (DataLength);
 
   if (Data == NULL) {
@@ -1314,7 +1298,7 @@ XhcAsyncInterruptTransfer (
 
   Urb = XhcCreateUrb (
           Xhc,
-          XhciDevAddr,
+          DeviceAddress,
           EndPointAddress,
           DeviceSpeed,
           MaximumPacketLength,
@@ -1333,7 +1317,7 @@ XhcAsyncInterruptTransfer (
     goto ON_EXIT;
   }
 
-  ASSERT (Urb->EvtRing == &Xhc->AsynIntTrEventRing);
+  ASSERT (Urb->EvtRing == &Xhc->EventRing);
 
   InsertHeadList (&Xhc->AsyncIntTransfers, &Urb->UrbList);
   //
@@ -1393,7 +1377,6 @@ XhcSyncInterruptTransfer (
 {
   USB_XHCI_INSTANCE       *Xhc;
   URB                     *Urb;
-  UINT8                   XhciDevAddr;
   UINT8                   SlotId;
   EFI_STATUS              Status;
   EFI_STATUS              RecoveryStatus;
@@ -1441,14 +1424,9 @@ XhcSyncInterruptTransfer (
     goto ON_EXIT;
   }
 
-  //
-  // Acquire the actual device address assigned by XHCI's Address_Device cmd.
-  //
-  XhciDevAddr = Xhc->UsbDevContext[SlotId].XhciDevAddr;
-
   Urb = XhcCreateUrb (
           Xhc,
-          XhciDevAddr,
+          DeviceAddress,
           EndPointAddress,
           DeviceSpeed,
           MaximumPacketLength,
@@ -2072,8 +2050,11 @@ XhcDriverBindingStop (
         (Xhc->UsbDevContext[Index + 1].SlotId == 0)) {
       continue;
     }
-
-    XhcDisableSlotCmd (Xhc, Xhc->UsbDevContext[Index + 1].SlotId);
+    if (Xhc->HcCParams.Data.Csz == 0) {
+      XhcDisableSlotCmd (Xhc, Xhc->UsbDevContext[Index + 1].SlotId);
+    } else {
+      XhcDisableSlotCmd64 (Xhc, Xhc->UsbDevContext[Index + 1].SlotId);
+    }
   }
 
   XhcHaltHC (Xhc, XHC_GENERIC_TIMEOUT);
@@ -2108,11 +2089,11 @@ XhcDriverBindingStop (
   // Restore original PCI attributes
   //
   PciIo->Attributes (
-                  PciIo,
-                  EfiPciIoAttributeOperationSet,
-                  Xhc->OriginalPciAttributes,
-                  NULL
-                  );
+           PciIo,
+           EfiPciIoAttributeOperationSet,
+           Xhc->OriginalPciAttributes,
+           NULL
+           );
 
   gBS->CloseProtocol (
          Controller,
