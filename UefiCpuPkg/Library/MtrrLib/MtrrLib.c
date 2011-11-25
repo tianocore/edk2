@@ -1027,16 +1027,6 @@ MtrrSetMemoryAttribute (
   }
 
   //
-  // Program Variable MTRRs
-  //
-  // Avoid hardcode here and read data dynamically
-  //
-  if (UsedMtrr >= FirmwareVariableMtrrCount) {
-    Status = RETURN_OUT_OF_RESOURCES;
-    goto Done;
-  }
-
-  //
   // The memory type is the same with the type specified by
   // MTRR_LIB_IA32_MTRR_DEF_TYPE.
   //
