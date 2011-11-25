@@ -320,7 +320,7 @@ formset
             minimum = 0,
             maximum = 0xf0,
             step    = 0,
-            default = 21,
+            default value = questionrefval(devicepath = STRING_TOKEN (STR_DEVICE_PATH), guid = DRIVER_SAMPLE_FORMSET_GUID, 0x1111),
 
             inconsistentif prompt = STRING_TOKEN(STR_ERROR_POPUP),
               ideqval MyIfrNVData.HowOldAreYouInYearsManual == 99

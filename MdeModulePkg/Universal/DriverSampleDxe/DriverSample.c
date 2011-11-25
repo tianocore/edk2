@@ -1910,6 +1910,14 @@ DriverSampleInit (
   PrivateData->HiiHandle[1] = HiiHandle[1];
 
   //
+  // Update the device path string.
+  //
+  if (HiiSetString (HiiHandle[0], STRING_TOKEN (STR_DEVICE_PATH), (EFI_STRING) &mHiiVendorDevicePath0, NULL) == 0) {
+    DriverSampleUnload (ImageHandle);
+    return EFI_OUT_OF_RESOURCES;
+  }
+  
+  //
   // Very simple example of how one would update a string that is already
   // in the HII database
   //
