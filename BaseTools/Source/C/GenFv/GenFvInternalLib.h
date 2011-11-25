@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -130,7 +130,7 @@ Abstract:
 #define EFI_FVB2_ALIGNMENT_64K_STRING     "EFI_FVB2_ALIGNMENT_64K" 
 #define EFI_FVB2_ALIGNMENT_128K_STRING    "EFI_FVB2_ALIGNMENT_128K"
 #define EFI_FVB2_ALIGNMENT_256K_STRING    "EFI_FVB2_ALIGNMENT_256K"
-#define EFI_FVB2_ALIGNMNET_512K_STRING    "EFI_FVB2_ALIGNMENT_512K"
+#define EFI_FVB2_ALIGNMENT_512K_STRING    "EFI_FVB2_ALIGNMENT_512K"
 #define EFI_FVB2_ALIGNMENT_1M_STRING      "EFI_FVB2_ALIGNMENT_1M"  
 #define EFI_FVB2_ALIGNMENT_2M_STRING      "EFI_FVB2_ALIGNMENT_2M"  
 #define EFI_FVB2_ALIGNMENT_4M_STRING      "EFI_FVB2_ALIGNMENT_4M"  
@@ -226,7 +226,7 @@ typedef struct {
   BOOLEAN                 FvNameGuidSet;
   CHAR8                   FvExtHeaderFile[_MAX_PATH];
   UINTN                   Size;
-  EFI_FVB_ATTRIBUTES      FvAttributes;
+  EFI_FVB_ATTRIBUTES_2    FvAttributes;
   CHAR8                   FvName[_MAX_PATH];
   EFI_FV_BLOCK_MAP_ENTRY  FvBlocks[MAX_NUMBER_OF_FV_BLOCKS];
   CHAR8                   FvFiles[MAX_NUMBER_OF_FILES_IN_FV][_MAX_PATH];

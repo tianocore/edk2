@@ -196,6 +196,7 @@ ERR_INF_PARSER_VER_EXIST_BOTH_NUM_STR = \
     _("The INF file %s defines both VERSION_NUMBER and VERSION_STRING, "
       "using VERSION_STRING")
 ERR_INF_PARSER_NOT_SUPPORT_EDKI_INF = _("EDKI INF is not supported")
+ERR_INF_PARSER_EDKI_COMMENT_IN_EDKII = _("The EDKI style comment is not supported in EDKII modules")
 
 ERR_INF_PARSER_FEATUREPCD_USAGE_INVALID = _("The usage for FeaturePcd can only"
     " be type of \"CONSUMES\".") 

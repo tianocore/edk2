@@ -24,14 +24,14 @@ SOURCES_PATH = .
 
 APPLICATIONS=$(BIN_DIR)\UPT.exe
 
-COMMON_PYTHON=$(SOURCES_PATH)\UPT.py
+UPT_BUILDVERSION_PYTHON=$(SOURCES_PATH)\BuildVersion.py
 
 all: SetPythonPath $(APPLICATIONS)
 
 SetPythonPath:
   set PYTHONPATH= $(SOURCES_PATH)
 
-$(BIN_DIR)\UPT.exe: $(SOURCES_PATH)\UPT.py $(COMMON_PYTHON)
+$(BIN_DIR)\UPT.exe: $(SOURCES_PATH)\UPT.py $(UPT_BUILDVERSION_PYTHON)
   @pushd . & @cd build & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) UPT.py & @popd
   @pushd . & @copy .\Dll\sqlite3.dll .\Bin\Sqlite3.dll & @popd 
 clean:

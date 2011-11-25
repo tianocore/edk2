@@ -62,7 +62,7 @@ OFFSET = 'offset'
 STRING = 'string'
 TO = 'to'
 STRING_TOKEN = re.compile('STRING_TOKEN *\(([A-Z0-9_]+) *\)', re.MULTILINE | re.UNICODE)
-COMPATIBLE_STRING_TOKEN = re.compile('STRING_TOKEN *\(([A-Za-z0-9_]+) *\)', re.MULTILINE | re.UNICODE)
+COMPATIBLE_STRING_TOKEN = re.compile('STRING_TOKEN *\(([A-Z0-9_]+) *\)', re.MULTILINE | re.UNICODE)
 
 EFI_HII_ARRAY_SIZE_LENGTH = 4
 EFI_HII_PACKAGE_HEADER_LENGTH = 4

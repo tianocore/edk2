@@ -134,6 +134,9 @@ DEFINE GCC44_X64_PREFIX        = /usr/bin/
 DEFINE GCC45_IA32_PREFIX       = /usr/bin/
 DEFINE GCC45_X64_PREFIX        = /usr/bin/
 
+DEFINE GCC46_IA32_PREFIX       = /usr/bin/
+DEFINE GCC46_X64_PREFIX        = /usr/bin/
+
 DEFINE UNIX_IASL_BIN           = /usr/bin/iasl
 #DEFINE UNIX_IASL_BIN           = $(HOME)/programs/iasl
 DEFINE WIN_ASL_BIN_DIR         = C:\ASL
@@ -239,6 +242,18 @@ DEFINE CLANG_BIN = /usr/bin/
 #                               http://www.acpica.org/downloads/previous_releases.php
 #   GCC44       -Linux-  Requires:
 #                             GCC 4.4 (Native)
+#                        Optional:
+#                             Required to build platforms or ACPI tables:
+#                               Intel(r) ACPI Compiler v20101013 from
+#                               http://www.acpica.org/downloads/previous_releases.php
+#   GCC45       -Linux-  Requires:
+#                             GCC 4.5 (Native)
+#                        Optional:
+#                             Required to build platforms or ACPI tables:
+#                               Intel(r) ACPI Compiler v20101013 from
+#                               http://www.acpica.org/downloads/previous_releases.php
+#   GCC46       -Linux-  Requires:
+#                             GCC 4.6 (Native)
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler v20101013 from
@@ -467,6 +482,7 @@ DEFINE CLANG_BIN = /usr/bin/
 #   MSFT           - Microsoft
 #   GCC            - GNU GCC
 #   INTEL          - INTEL
+#   RVCT           - ARM RealView Toolchain
 ####################################################################################
 ####################################################################################
 #
@@ -2011,6 +2027,14 @@ DEFINE GCC45_IA32_X64_DLINK_FLAGS    = DEF(GCC44_IA32_X64_DLINK_FLAGS)
 DEFINE GCC45_X64_DLINK_FLAGS         = DEF(GCC44_X64_DLINK_FLAGS)
 DEFINE GCC45_ASM_FLAGS               = DEF(GCC44_ASM_FLAGS)
 
+DEFINE GCC46_IA32_CC_FLAGS           = DEF(GCC45_IA32_CC_FLAGS) -Wno-address -Wno-unused-but-set-variable
+DEFINE GCC46_X64_CC_FLAGS            = DEF(GCC45_X64_CC_FLAGS) -Wno-address -Wno-unused-but-set-variable
+DEFINE GCC46_IA32_X64_DLINK_COMMON   = DEF(GCC45_IA32_X64_DLINK_COMMON)
+DEFINE GCC46_IA32_X64_ASLDLINK_FLAGS = DEF(GCC45_IA32_X64_ASLDLINK_FLAGS)
+DEFINE GCC46_IA32_X64_DLINK_FLAGS    = DEF(GCC45_IA32_X64_DLINK_FLAGS)
+DEFINE GCC46_X64_DLINK_FLAGS         = DEF(GCC45_X64_DLINK_FLAGS)
+DEFINE GCC46_ASM_FLAGS               = DEF(GCC45_ASM_FLAGS)
+
 ####################################################################################
 #
 # Unix GCC And Intel Linux ACPI Compiler
@@ -2226,6 +2250,71 @@ DEFINE GCC45_ASM_FLAGS               = DEF(GCC44_ASM_FLAGS)
 *_GCC45_X64_DLINK_FLAGS          = DEF(GCC45_X64_DLINK_FLAGS)
 *_GCC45_X64_RC_FLAGS             = DEF(GCC_X64_RC_FLAGS)
 *_GCC45_X64_OBJCOPY_FLAGS        = 
+
+####################################################################################
+#
+# GCC 4.6 - This configuration is used to compile under Linux to produce
+#           PE/COFF binaries using GCC 4.6.
+#
+####################################################################################
+*_GCC46_*_*_FAMILY               = GCC
+
+*_GCC46_*_MAKE_PATH                    = make
+*_GCC46_*_ASL_PATH                     = DEF(UNIX_IASL_BIN)
+
+*_GCC46_*_PP_FLAGS                     = DEF(GCC_PP_FLAGS)
+*_GCC46_*_ASLPP_FLAGS                  = DEF(GCC_ASLPP_FLAGS)
+*_GCC46_*_ASLCC_FLAGS                  = DEF(GCC_ASLCC_FLAGS)
+*_GCC46_*_VFRPP_FLAGS                  = DEF(GCC_VFRPP_FLAGS)
+*_GCC46_*_APP_FLAGS                    =
+*_GCC46_*_ASL_FLAGS                    = DEF(IASL_FLAGS)
+*_GCC46_*_ASL_OUTFLAGS                 = DEF(IASL_OUTFLAGS)
+
+##################
+# GCC46 IA32 definitions
+##################
+*_GCC46_IA32_OBJCOPY_PATH         = DEF(GCC46_IA32_PREFIX)objcopy
+*_GCC46_IA32_CC_PATH              = DEF(GCC46_IA32_PREFIX)gcc
+*_GCC46_IA32_SLINK_PATH           = DEF(GCC46_IA32_PREFIX)ar
+*_GCC46_IA32_DLINK_PATH           = DEF(GCC46_IA32_PREFIX)ld
+*_GCC46_IA32_ASLDLINK_PATH        = DEF(GCC46_IA32_PREFIX)ld
+*_GCC46_IA32_ASM_PATH             = DEF(GCC46_IA32_PREFIX)gcc
+*_GCC46_IA32_PP_PATH              = DEF(GCC46_IA32_PREFIX)gcc
+*_GCC46_IA32_VFRPP_PATH           = DEF(GCC46_IA32_PREFIX)gcc
+*_GCC46_IA32_ASLCC_PATH           = DEF(GCC46_IA32_PREFIX)gcc
+*_GCC46_IA32_ASLPP_PATH           = DEF(GCC46_IA32_PREFIX)gcc
+*_GCC46_IA32_RC_PATH              = DEF(GCC46_IA32_PREFIX)objcopy
+
+*_GCC46_IA32_ASLCC_FLAGS          = DEF(GCC_ASLCC_FLAGS) -m32
+*_GCC46_IA32_ASLDLINK_FLAGS       = DEF(GCC46_IA32_X64_ASLDLINK_FLAGS) -m elf_i386
+*_GCC46_IA32_ASM_FLAGS            = DEF(GCC46_ASM_FLAGS) -m32 -march=i386
+*_GCC46_IA32_CC_FLAGS             = DEF(GCC46_IA32_CC_FLAGS) -Os
+*_GCC46_IA32_DLINK_FLAGS          = DEF(GCC46_IA32_X64_DLINK_FLAGS) -m elf_i386 --oformat=elf32-i386
+*_GCC46_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
+*_GCC46_IA32_OBJCOPY_FLAGS        = 
+
+##################
+# GCC46 X64 definitions
+##################
+*_GCC46_X64_OBJCOPY_PATH         = DEF(GCC46_X64_PREFIX)objcopy
+*_GCC46_X64_CC_PATH              = DEF(GCC46_X64_PREFIX)gcc
+*_GCC46_X64_SLINK_PATH           = DEF(GCC46_X64_PREFIX)ar
+*_GCC46_X64_DLINK_PATH           = DEF(GCC46_X64_PREFIX)ld
+*_GCC46_X64_ASLDLINK_PATH        = DEF(GCC46_X64_PREFIX)ld
+*_GCC46_X64_ASM_PATH             = DEF(GCC46_X64_PREFIX)gcc
+*_GCC46_X64_PP_PATH              = DEF(GCC46_X64_PREFIX)gcc
+*_GCC46_X64_VFRPP_PATH           = DEF(GCC46_X64_PREFIX)gcc
+*_GCC46_X64_ASLCC_PATH           = DEF(GCC46_X64_PREFIX)gcc
+*_GCC46_X64_ASLPP_PATH           = DEF(GCC46_X64_PREFIX)gcc
+*_GCC46_X64_RC_PATH              = DEF(GCC46_X64_PREFIX)objcopy
+
+*_GCC46_X64_ASLCC_FLAGS          = DEF(GCC_ASLCC_FLAGS) -m64
+*_GCC46_X64_ASLDLINK_FLAGS       = DEF(GCC46_IA32_X64_ASLDLINK_FLAGS) -m elf_x86_64
+*_GCC46_X64_ASM_FLAGS            = DEF(GCC46_ASM_FLAGS) -m64 -melf_x86_64
+*_GCC46_X64_CC_FLAGS             = DEF(GCC46_X64_CC_FLAGS)
+*_GCC46_X64_DLINK_FLAGS          = DEF(GCC46_X64_DLINK_FLAGS)
+*_GCC46_X64_RC_FLAGS             = DEF(GCC_X64_RC_FLAGS)
+*_GCC46_X64_OBJCOPY_FLAGS        = 
 
 ####################################################################################
 #
@@ -4173,10 +4262,68 @@ RELEASE_ARMGCC_ARM_ASM_FLAGS   = $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) -mlittle-end
 *_ARMGCC_ARM_VFRPP_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -x c -E -P -DVFRCOMPILE --include $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
 
 *_ARMGCC_ARM_SLINK_FLAGS =  -rc
-*_ARMGCC_ARM_DLINK_FLAGS =  $(ARCHDLINK_FLAGS)  --oformat=elf32-littlearm --emit-relocs -nostdlib -u $(IMAGE_ENTRY_POINT) -e $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+*_ARMGCC_ARM_DLINK_FLAGS =  $(ARCHDLINK_FLAGS) -Ttext=0x0 --oformat=elf32-littlearm --emit-relocs -nostdlib -u $(IMAGE_ENTRY_POINT) -e $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
 
   DEBUG_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARMGCC_CC_FLAGS) -combine -O0
 RELEASE_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARMGCC_CC_FLAGS) -combine -Wno-unused
+
+####################################################################################
+#
+# ARM GNU/Linux GCC
+#
+####################################################################################
+#  ARMLINUXGCC         - ARM version of the GCC cross compiler
+
+*_ARMLINUXGCC_*_*_FAMILY          = GCC
+*_ARMLINUXGCC_*_*_BUILDRULEFAMILY = ARMLINUXGCC
+
+*_ARMLINUXGCC_*_MAKE_PATH         = make
+*_ARMLINUXGCC_*_MAKE_FLAGS        = --no-print-directory
+
+##################
+# ASL definitions
+##################
+*_ARMLINUXGCC_*_ASL_PATH           = DEF(UNIX_IASL_BIN)
+*_ARMLINUXGCC_*_ASL_FLAGS          = DEF(IASL_FLAGS)
+*_ARMLINUXGCC_*_ASL_OUTFLAGS       = DEF(IASL_OUTFLAGS)
+*_ARMLINUXGCC_*_ASLPP_FLAGS        = -x c -E -P
+*_ARMLINUXGCC_*_ASLCC_FLAGS        = -x c
+*_ARMLINUXGCC_*_ASLDLINK_FLAGS     = DEF(GCC_DLINK_FLAGS_COMMON) --entry _ReferenceAcpiTable
+
+##################
+# ARM definitions
+##################
+
+*_ARMLINUXGCC_ARM_ASLCC_PATH      = ENV(ARMLINUXGCC_TOOLS_PATH)arm-linux-gnueabi-gcc
+*_ARMLINUXGCC_ARM_ASLDLINK_PATH   = ENV(ARMLINUXGCC_TOOLS_PATH)arm-linux-gnueabi-ld
+*_ARMLINUXGCC_ARM_ASLPP_PATH      = ENV(ARMLINUXGCC_TOOLS_PATH)arm-linux-gnueabi-gcc
+
+*_ARMLINUXGCC_ARM_CC_PATH         = ENV(ARMLINUXGCC_TOOLS_PATH)arm-linux-gnueabi-gcc
+*_ARMLINUXGCC_ARM_SLINK_PATH      = ENV(ARMLINUXGCC_TOOLS_PATH)arm-linux-gnueabi-ar
+*_ARMLINUXGCC_ARM_DLINK_PATH      = ENV(ARMLINUXGCC_TOOLS_PATH)arm-linux-gnueabi-ld
+*_ARMLINUXGCC_ARM_ASM_PATH        = ENV(ARMLINUXGCC_TOOLS_PATH)arm-linux-gnueabi-as
+*_ARMLINUXGCC_ARM_PP_PATH         = ENV(ARMLINUXGCC_TOOLS_PATH)arm-linux-gnueabi-gcc
+*_ARMLINUXGCC_ARM_VFRPP_PATH      = ENV(ARMLINUXGCC_TOOLS_PATH)arm-linux-gnueabi-gcc
+
+#
+# Use default values, or override in DSC file
+#
+*_ARMLINUXGCC_ARM_ARCHCC_FLAGS    = -mthumb
+*_ARMLINUXGCC_ARM_ARCHASM_FLAGS   = 
+*_ARMLINUXGCC_ARM_ARCHDLINK_FLAGS =
+*_ARMLINUXGCC_ARM_PLATFORM_FLAGS  = -march=armv7-a
+
+  DEBUG_ARMLINUXGCC_ARM_ASM_FLAGS   = $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) -mlittle-endian -g
+RELEASE_ARMLINUXGCC_ARM_ASM_FLAGS   = $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) -mlittle-endian
+
+*_ARMLINUXGCC_ARM_PP_FLAGS    = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
+*_ARMLINUXGCC_ARM_VFRPP_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -x c -E -P -DVFRCOMPILE --include $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
+
+*_ARMLINUXGCC_ARM_SLINK_FLAGS =  -rc
+*_ARMLINUXGCC_ARM_DLINK_FLAGS =  $(ARCHDLINK_FLAGS)  --oformat=elf32-littlearm --emit-relocs -nostdlib -u $(IMAGE_ENTRY_POINT) -e $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+
+  DEBUG_ARMLINUXGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARMGCC_CC_FLAGS) -Wno-address -O0
+RELEASE_ARMLINUXGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARMGCC_CC_FLAGS) -Wno-address -Wno-unused-but-set-variable
 
 #################
 # ASM 16 linker defintions

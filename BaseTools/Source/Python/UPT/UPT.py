@@ -43,7 +43,7 @@ import RmPkg
 from Library.Misc import CheckEnvVariable
 from Library import GlobalData
 from Core.IpiDb import IpiDatabase
-from Common.BuildVersion import gBUILD_VERSION
+from BuildVersion import gBUILD_VERSION
 
 ##
 # Version and Copyright

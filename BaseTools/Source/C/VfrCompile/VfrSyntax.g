@@ -1989,6 +1989,7 @@ vfrStatementDate :
       Prompt "=" "STRING_TOKEN" "\(" DP:Number "\)" ","
       Help   "=" "STRING_TOKEN" "\(" DH:Number "\)" ","
       minMaxDateStepDefault[Val.date, 2]
+      { G:FLAGS "=" vfrDateFlags[DObj, G->getLine()] "," }
                                                        <<
                                                           mCVfrQuestionDB.RegisterOldDateQuestion (VarIdStr[0], VarIdStr[1], VarIdStr[2], QId);
                                                           DObj.SetQuestionId (QId);
@@ -2449,6 +2450,7 @@ vfrStatementTime :
       Prompt "=" "STRING_TOKEN" "\(" SP:Number "\)" ","
       Help   "=" "STRING_TOKEN" "\(" SH:Number "\)" ","
       minMaxTimeStepDefault[Val.time, 2]
+      { G:FLAGS "=" vfrTimeFlags[TObj, G->getLine()] "," }
                                                        <<
                                                           mCVfrQuestionDB.RegisterOldTimeQuestion (VarIdStr[0], VarIdStr[1], VarIdStr[2], QId);
                                                           TObj.SetQuestionId (QId);
@@ -3216,7 +3218,7 @@ vfrExpressionBuildInFunction [UINT32 & RootLevel, UINT32 & ExpOpCount] :
   | ideqvalExp[$RootLevel, $ExpOpCount]
   | ideqidExp[$RootLevel, $ExpOpCount]
   | ideqvallistExp[$RootLevel, $ExpOpCount]
-  | questionref13Exp[$RootLevel, $ExpOpCount]
+  | questionref1Exp[$RootLevel, $ExpOpCount]
   | rulerefExp[$RootLevel, $ExpOpCount]
   | stringref1Exp[$RootLevel, $ExpOpCount]
   | pushthisExp[$RootLevel, $ExpOpCount]
@@ -3451,50 +3453,26 @@ ideqvallistExp[UINT32 & RootLevel, UINT32 & ExpOpCount] :
                                                         >>
   ;
 
-questionref13Exp[UINT32 & RootLevel, UINT32 & ExpOpCount] :
+questionref1Exp[UINT32 & RootLevel, UINT32 & ExpOpCount] :
   <<
-     UINT8           Type = 0x1;
-     EFI_STRING_ID   DevPath = EFI_STRING_ID_INVALID;
-     EFI_GUID        Guid = {0,};
      EFI_QUESTION_ID QId = EFI_QUESTION_ID_INVALID;
      UINT32          BitMask;
      CHAR8           *QName = NULL;
      UINT32          LineNo = 0;
   >>
   L:QuestionRef
-  (
-    (
-                                                       << Type = 0x3; >>
-      {
-        Path "=" "STRING_TOKEN" "\(" S:Number "\)"     << Type = 0x4; DevPath = _STOSID(S->getText()); >>
-      }
-      {
-        Uuid "=" guidDefinition[Guid]                  << Type = 0x5; >>
-      }
-    )
-    |
-    (
-      "\("
-    (
+  "\("
+      (
           QN:StringIdentifier                          <<
                                                           QName  = QN->getText();
-                              LineNo = QN->getLine();
+                                                          LineNo = QN->getLine();
                                                           mCVfrQuestionDB.GetQuestionId (QN->getText(), NULL, QId, BitMask);
                                                        >>
         | ID:Number                                    << QId = _STOQID(ID->getText()); >>
       )
-      "\)"
-    )
-  )
+  "\)"
                                                        <<
-                                                          switch (Type) {
-                                                          case 0x1: {CIfrQuestionRef1 QR1Obj(L->getLine()); _SAVE_OPHDR_COND (QR1Obj, ($ExpOpCount == 0), L->getLine()); QR1Obj.SetQuestionId (QId, QName, LineNo); break;}
-                                                          case 0x3: {CIfrQuestionRef3 QR3Obj(L->getLine()); _SAVE_OPHDR_COND (QR3Obj, ($ExpOpCount == 0), L->getLine()); break;}
-                                                          case 0x4: {CIfrQuestionRef3_2 QR3_2Obj(L->getLine()); _SAVE_OPHDR_COND (QR3_2Obj, ($ExpOpCount == 0), L->getLine()); QR3_2Obj.SetDevicePath (DevPath); break;}
-                                                          case 0x5: {CIfrQuestionRef3_3 QR3_3Obj(L->getLine()); _SAVE_OPHDR_COND (QR3_3Obj, ($ExpOpCount == 0), L->getLine()); QR3_3Obj.SetDevicePath (DevPath); QR3_3Obj.SetGuid (&Guid); break;}
-                                                          }
-                                                          $ExpOpCount++;
-                                                       >>
+                                                          { CIfrQuestionRef1 QR1Obj(L->getLine()); _SAVE_OPHDR_COND (QR1Obj, ($ExpOpCount == 0), L->getLine()); QR1Obj.SetQuestionId (QId, QName, LineNo); } $ExpOpCount++; >>
   ;
 
 rulerefExp[UINT32 & RootLevel, UINT32 & ExpOpCount] :
@@ -3626,7 +3604,7 @@ vfrExpressionConstant[UINT32 & RootLevel, UINT32 & ExpOpCount] :
 vfrExpressionUnaryOp[UINT32 & RootLevel, UINT32 & ExpOpCount] :
     lengthExp[$RootLevel, $ExpOpCount]
   | bitwisenotExp[$RootLevel, $ExpOpCount]
-  | question2refExp[$RootLevel, $ExpOpCount]
+  | question23refExp[$RootLevel, $ExpOpCount]
   | stringref2Exp[$RootLevel, $ExpOpCount]
   | toboolExp[$RootLevel, $ExpOpCount]
   | tostringExp[$RootLevel, $ExpOpCount]
@@ -3648,10 +3626,30 @@ bitwisenotExp[UINT32 & RootLevel, UINT32 & ExpOpCount] :
                                                        << { CIfrBitWiseNot BWNObj(L->getLine()); $ExpOpCount++; } >>
   ;
 
-question2refExp[UINT32 & RootLevel, UINT32 & ExpOpCount] :
+question23refExp[UINT32 & RootLevel, UINT32 & ExpOpCount] :
+  <<
+     UINT8           Type = 0x1;
+     EFI_STRING_ID   DevPath = EFI_STRING_ID_INVALID;
+     EFI_GUID        Guid = {0,};
+  >>
   L:QuestionRefVal
-  "\(" vfrStatementExpressionSub[$RootLevel + 1, $ExpOpCount] "\)"
-                                                       << { CIfrQuestionRef2 QR2Obj(L->getLine()); $ExpOpCount++; } >>
+  "\("
+      {
+        DevicePath "=" "STRING_TOKEN" "\(" S:Number "\)" ","    << Type = 0x2; DevPath = _STOSID(S->getText()); >>
+      }
+      {
+        Uuid "=" guidDefinition[Guid] ","                       << Type = 0x3; >>
+      }
+      vfrStatementExpressionSub[$RootLevel + 1, $ExpOpCount] 
+  "\)"
+                                                       <<
+                                                          switch (Type) {
+                                                          case 0x1: {CIfrQuestionRef2 QR2Obj(L->getLine()); _SAVE_OPHDR_COND (QR2Obj, ($ExpOpCount == 0), L->getLine()); break;}
+                                                          case 0x2: {CIfrQuestionRef3_2 QR3_2Obj(L->getLine()); _SAVE_OPHDR_COND (QR3_2Obj, ($ExpOpCount == 0), L->getLine()); QR3_2Obj.SetDevicePath (DevPath); break;}
+                                                          case 0x3: {CIfrQuestionRef3_3 QR3_3Obj(L->getLine()); _SAVE_OPHDR_COND (QR3_3Obj, ($ExpOpCount == 0), L->getLine()); QR3_3Obj.SetDevicePath (DevPath); QR3_3Obj.SetGuid (&Guid); break;}
+                                                          }
+                                                          $ExpOpCount++;
+                                                       >>
   ;
 
 stringref2Exp[UINT32 & RootLevel, UINT32 & ExpOpCount] :

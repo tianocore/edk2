@@ -50,6 +50,7 @@ from Common.String import NormPath
 import Common.GlobalData as GlobalData
 from Common.Expression import *
 from Common import GlobalData
+from Common.String import ReplaceMacro
 
 import re
 import os
@@ -528,25 +529,35 @@ class FdfParser:
                 if not self.__GetNextToken():
                     raise Warning("expected include file name", self.FileName, self.CurrentLineNumber)
                 IncFileName = self.__Token
-                if not os.path.isabs(IncFileName):
-                    if IncFileName.startswith('$(WORKSPACE)'):
-                        Str = IncFileName.replace('$(WORKSPACE)', os.environ.get('WORKSPACE'))
-                        if os.path.exists(Str):
-                            if not os.path.isabs(Str):
-                                Str = os.path.abspath(Str)
-                        IncFileName = Str
-                    else:
-                        # file is in the same dir with FDF file
-                        FullFdf = self.FileName
-                        if not os.path.isabs(self.FileName):
-                            FullFdf = os.path.join(os.environ.get('WORKSPACE'), self.FileName)
+                __IncludeMacros = {}
+                __IncludeMacros['WORKSPACE'] = InputMacroDict['WORKSPACE']
+                __IncludeMacros['ECP_SOURCE'] = InputMacroDict['ECP_SOURCE']
+                __IncludeMacros['EFI_SOURCE'] = InputMacroDict['EFI_SOURCE']
+                __IncludeMacros['EDK_SOURCE'] = InputMacroDict['EDK_SOURCE']
+                
+                IncludedFile = NormPath(ReplaceMacro(IncFileName, __IncludeMacros, RaiseError=True))
+                #
+                # First search the include file under the same directory as FDF file
+                #
+                IncludedFile1 = PathClass(IncludedFile, os.path.dirname(self.FileName))
+                ErrorCode = IncludedFile1.Validate()[0]
+                if ErrorCode != 0:
+                    #
+                    # Then search the include file under the same directory as DSC file
+                    #
+                    IncludedFile1 = PathClass(IncludedFile, GenFdsGlobalVariable.ActivePlatform.Dir)
+                    ErrorCode = IncludedFile1.Validate()[0]
+                    if ErrorCode != 0:
+                        #
+                        # Also search file under the WORKSPACE directory
+                        #
+                        IncludedFile1 = PathClass(IncludedFile, GlobalData.gWorkspace)
+                        ErrorCode = IncludedFile1.Validate()[0]
+                        if ErrorCode != 0:
+                            raise Warning("The include file does not exist under below directories: \n%s\n%s\n%s\n"%(os.path.dirname(self.FileName), GenFdsGlobalVariable.ActivePlatform.Dir, GlobalData.gWorkspace), 
+                                          self.FileName, self.CurrentLineNumber)
 
-                        IncFileName = os.path.join(os.path.dirname(FullFdf), IncFileName)
-
-                if not os.path.exists(os.path.normpath(IncFileName)):
-                    raise Warning("Include file not exists", self.FileName, self.CurrentLineNumber)
-
-                IncFileProfile = IncludeFileProfile(os.path.normpath(IncFileName))
+                IncFileProfile = IncludeFileProfile(IncludedFile1.Path)
 
                 CurrentLine = self.CurrentLineNumber
                 CurrentOffset = self.CurrentOffsetWithinLine
@@ -2942,6 +2953,9 @@ class FdfParser:
         if not self.__GetNextToken():
             raise Warning("expected FV name", self.FileName, self.CurrentLineNumber)
 
+        if self.__Token.upper() not in self.Profile.FvDict.keys():
+            raise Warning("FV name does not exist", self.FileName, self.CurrentLineNumber)
+
         CapsuleFv = CapsuleData.CapsuleFv()
         CapsuleFv.FvName = self.__Token
         CapsuleObj.CapsuleDataList.append(CapsuleFv)
@@ -2966,6 +2980,9 @@ class FdfParser:
 
         if not self.__GetNextToken():
             raise Warning("expected FD name", self.FileName, self.CurrentLineNumber)
+
+        if self.__Token.upper() not in self.Profile.FdDict.keys():
+            raise Warning("FD name does not exist", self.FileName, self.CurrentLineNumber)
 
         CapsuleFd = CapsuleData.CapsuleFd()
         CapsuleFd.FdName = self.__Token

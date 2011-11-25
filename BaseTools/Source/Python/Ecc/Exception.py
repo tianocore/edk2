@@ -14,7 +14,7 @@
 ##
 # Import Modules
 #
-from Common.XmlRoutines import *
+from Xml.XmlRoutines import *
 import os.path
 
 # ExceptionXml to parse Exception Node of XML file

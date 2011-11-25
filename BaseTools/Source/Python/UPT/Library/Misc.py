@@ -834,6 +834,59 @@ def ProcessLineExtender(LineList):
 
     return NewList
 
+## ProcessEdkComment
+#
+# Process EDK style comment in LineList: c style /* */ comment or cpp style // comment 
+#
+#
+# @param LineList The LineList need to be processed.
+# 
+# @return LineList  The LineList been processed.
+# @return FirstPos  Where Edk comment is first found, -1 if not found
+#
+def ProcessEdkComment(LineList):
+    FindEdkBlockComment = False
+    Count = 0
+    StartPos = -1
+    EndPos = -1
+    FirstPos = -1
+    
+    while(Count < len(LineList)):
+        Line = LineList[Count].strip()
+        if Line.startswith("/*"):
+            #
+            # handling c style comment
+            #
+            StartPos = Count
+            while Count < len(LineList):
+                Line = LineList[Count].strip()
+                if Line.endswith("*/"):
+                    if (Count == StartPos) and Line.strip() == '/*/':
+                        Count = Count + 1
+                        continue
+                    EndPos = Count
+                    FindEdkBlockComment = True
+                    break
+                Count = Count + 1
+            
+            if FindEdkBlockComment:
+                if FirstPos == -1:
+                    FirstPos = StartPos
+                for Index in xrange(StartPos, EndPos+1):
+                    LineList[Index] = ''
+                FindEdkBlockComment = False
+        elif Line.find("//") != -1:
+            #
+            # handling cpp style comment
+            #
+            LineList[Count] = Line.replace("//", '#')
+            if FirstPos == -1:
+                FirstPos = Count
+        
+        Count = Count + 1
+    
+    return LineList, FirstPos
+
 ## GetLibInstanceInfo
 #
 # Get the information from Library Instance INF file.

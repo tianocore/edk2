@@ -670,6 +670,25 @@ CFormPkg::DeclarePendingQuestion (
         Info.mVarType = EFI_IFR_TYPE_NUM_SIZE_8;
       }
       CNObj.SetFlags (0, Info.mVarType);
+      //
+      // Use maximum value not to limit the vaild value for the undefined question.
+      //
+      switch (Info.mVarType) {
+      case EFI_IFR_TYPE_NUM_SIZE_64:
+        CNObj.SetMinMaxStepData ((UINT64) 0, (UINT64) -1 , (UINT64) 0);
+        break;
+      case EFI_IFR_TYPE_NUM_SIZE_32:
+        CNObj.SetMinMaxStepData ((UINT32) 0, (UINT32) -1 , (UINT32) 0);
+        break;
+      case EFI_IFR_TYPE_NUM_SIZE_16:
+        CNObj.SetMinMaxStepData ((UINT16) 0, (UINT16) -1 , (UINT16) 0);
+        break;
+      case EFI_IFR_TYPE_NUM_SIZE_8:
+        CNObj.SetMinMaxStepData ((UINT8) 0, (UINT8) -1 , (UINT8) 0);
+        break;
+      default:
+        break;
+      }
 
       //
       // For undefined Efi VarStore type question

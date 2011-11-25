@@ -94,6 +94,7 @@ ERROR_META_DATA_FILE_CHECK_DUPLICATE_PPI = 10013
 ERROR_META_DATA_FILE_CHECK_MODULE_FILE_NO_USE = 10014
 ERROR_META_DATA_FILE_CHECK_PCD_TYPE = 10015
 ERROR_META_DATA_FILE_CHECK_MODULE_FILE_GUID_DUPLICATION = 10016
+ERROR_META_DATA_FILE_CHECK_LIBRARY_NAME_DUPLICATE = 10017
 
 ERROR_SPELLING_CHECK_ALL = 11000
 
@@ -171,6 +172,7 @@ gEccErrorMessage = {
     ERROR_META_DATA_FILE_CHECK_LIBRARY_INSTANCE_DEPENDENT : "A library instance must be defined for all dependent library classes",
     ERROR_META_DATA_FILE_CHECK_LIBRARY_INSTANCE_ORDER : "The library Instances specified by the LibraryClasses sections should be listed in order of dependencies",
     ERROR_META_DATA_FILE_CHECK_LIBRARY_NO_USE : "There should be no unnecessary inclusion of library classes in the INF file",
+    ERROR_META_DATA_FILE_CHECK_LIBRARY_NAME_DUPLICATE : "Duplicate Library Class Name found",
     ERROR_META_DATA_FILE_CHECK_BINARY_INF_IN_FDF : "An INF file is specified in the FDF file, but not in the DSC file, therefore the INF file must be for a Binary module only",
     ERROR_META_DATA_FILE_CHECK_PCD_DUPLICATE : "Duplicate PCDs found",
     ERROR_META_DATA_FILE_CHECK_PCD_FLASH : "PCD settings in the FDF file should only be related to flash",

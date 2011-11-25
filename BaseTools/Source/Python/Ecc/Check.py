@@ -580,6 +580,7 @@ class Check(object):
             pass
 
     # Check whether the unnecessary inclusion of library classes in the Inf file
+    # Check whether the unnecessary duplication of library classe names in the DSC file
     def MetaDataFileCheckLibraryNoUse(self):
         if EccGlobalData.gConfig.MetaDataFileCheckLibraryNoUse == '1' or EccGlobalData.gConfig.MetaDataFileCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
             EdkLogger.quiet("Checking for library instance not used ...")
@@ -588,7 +589,20 @@ class Check(object):
             for Record in RecordSet:
                 if not EccGlobalData.gException.IsException(ERROR_META_DATA_FILE_CHECK_LIBRARY_NO_USE, Record[1]):
                     EccGlobalData.gDb.TblReport.Insert(ERROR_META_DATA_FILE_CHECK_LIBRARY_NO_USE, OtherMsg="The Library Class [%s] is not used in any platform" % (Record[1]), BelongsToTable='Inf', BelongsToItem=Record[0])
-
+            SqlCommand = """
+                         select A.ID, A.Value1, A.BelongsToFile, A.StartLine, B.StartLine from Dsc as A left join Dsc as B
+                         where A.Model = %s and B.Model = %s and A.Value3 = B.Value3 and A.Arch = B.Arch and A.ID <> B.ID
+                         and A.Value1 = B.Value1 and A.StartLine <> B.StartLine and B.BelongsToFile = A.BelongsToFile""" \
+                            % (MODEL_EFI_LIBRARY_CLASS, MODEL_EFI_LIBRARY_CLASS)
+            RecordSet = EccGlobalData.gDb.TblDsc.Exec(SqlCommand)
+            for Record in RecordSet:
+                if Record[3] and Record[4] and Record[3] != Record[4]:
+                    SqlCommand = """select FullPath from File where ID = %s""" % (Record[2])
+                    FilePathList = EccGlobalData.gDb.TblFile.Exec(SqlCommand)
+                    for FilePath in FilePathList:
+                        if not EccGlobalData.gException.IsException(ERROR_META_DATA_FILE_CHECK_LIBRARY_NAME_DUPLICATE, Record[1]):
+                            EccGlobalData.gDb.TblReport.Insert(ERROR_META_DATA_FILE_CHECK_LIBRARY_NAME_DUPLICATE, OtherMsg="The Library Class [%s] is duplicated in '%s' line %s and line %s." % (Record[1], FilePath, Record[3], Record[4]), BelongsToTable='Dsc', BelongsToItem=Record[0])
+                                                
     # Check whether an Inf file is specified in the FDF file, but not in the Dsc file, then the Inf file must be for a Binary module only
     def MetaDataFileCheckBinaryInfInFdf(self):
         if EccGlobalData.gConfig.MetaDataFileCheckBinaryInfInFdf == '1' or EccGlobalData.gConfig.MetaDataFileCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':

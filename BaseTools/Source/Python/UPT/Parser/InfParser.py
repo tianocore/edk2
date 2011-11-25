@@ -26,6 +26,7 @@ from copy import deepcopy
 from Library.String import GetSplitValueList
 from Library.String import ConvertSpecialChar
 from Library.Misc import ProcessLineExtender
+from Library.Misc import ProcessEdkComment
 from Library.Parsing import NormPath
 from Library.ParserValidate import IsValidInfMoudleTypeList
 from Library.ParserValidate import IsValidArch
@@ -163,6 +164,12 @@ class InfParser(InfSectionParser):
         # Process Line Extender
         #
         FileLinesList = ProcessLineExtender(FileLinesList)
+        
+        #
+        # Process EdkI INF style comment if found
+        #
+        OrigLines = [Line for Line in FileLinesList]
+        FileLinesList, EdkCommentStartPos = ProcessEdkComment(FileLinesList)
         
         #
         # Judge whether the INF file is Binary INF or not
@@ -337,6 +344,17 @@ class InfParser(InfSectionParser):
                          FORMAT_INVALID, 
                          ST.ERR_INF_PARSER_HEADER_MISSGING, 
                          File=self.FullPath)
+        
+        #
+        # EDKII INF should not have EDKI style comment
+        #
+        if EdkCommentStartPos != -1:
+            Logger.Error("InfParser", 
+                         FORMAT_INVALID, 
+                         ST.ERR_INF_PARSER_EDKI_COMMENT_IN_EDKII, 
+                         File=self.FullPath,
+                         Line=EdkCommentStartPos + 1,
+                         ExtraData=OrigLines[EdkCommentStartPos])
         
         #
         # extract [Event] [Hob] [BootMode] sections 

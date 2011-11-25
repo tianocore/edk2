@@ -129,7 +129,7 @@
         "$(CC)" $(CC_FLAGS) -o ${dst} $(INC) ${src}
         "$(SYMRENAME)" $(SYMRENAME_FLAGS) ${dst}
 
-    <Command.ARMGCC>
+    <Command.ARMGCC, Command.ARMLINUXGCC>
         "$(CC)" $(CC_FLAGS) -o ${dst} $(INC) ${src}
 
 
@@ -195,10 +195,8 @@
         $(DEBUG_DIR)(+)${s_dir}(+)${s_base}.c
 
     <Command>
-        -$(MD) $(OUTPUT_DIR)(+)${s_dir} > NUL 2>&1
-        "$(VFRPP)" $(VFRPP_FLAGS) $(INC) ${src} > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
-        -$(MD) ${d_path} > NUL 2>&1
-        "$(VFR)" $(VFR_FLAGS) --string-db $(OUTPUT_DIR)(+)$(MODULE_NAME)StrDefs.hpk --output-directory ${d_path} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
+        "$(VFRPP)" $(VFRPP_FLAGS) $(INC) ${src} > $(OUTPUT_DIR)(+)${s_base}.i
+        "$(VFR)" $(VFR_FLAGS) --string-db $(OUTPUT_DIR)(+)$(MODULE_NAME)StrDefs.hpk --output-directory ${d_path} $(OUTPUT_DIR)(+)${s_base}.i
 
 [Object-File]
     <InputFile>
@@ -217,7 +215,7 @@
     <Command.RVCT>
         "$(SLINK)" $(SLINK_FLAGS) ${dst} --via $(OBJECT_FILES_LIST)
     
-    <Command.RVCTCYGWIN, Command.ARMGCC>
+    <Command.RVCTCYGWIN, Command.ARMGCC, Command.ARMLINUXGCC>
         # $(OBJECT_FILES_LIST) has wrong paths for cygwin
         "$(SLINK)" $(SLINK_FLAGS) ${dst} $(OBJECT_FILES)
 
@@ -241,7 +239,7 @@
         "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -\( $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST) -\) $(DLINK2_FLAGS)
         "$(OBJCOPY)" $(OBJCOPY_FLAGS) ${dst}
 
-    <Command.ARMGCC>
+    <Command.ARMGCC, Command.ARMLINUXGCC>
         "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -\( $(DLINK_SPATH) $(STATIC_LIBRARY_FILES) -\) $(DLINK2_FLAGS)
 
     <Command.RVCT>
@@ -271,7 +269,7 @@
     <Command.GCC>
         "$(DLINK)" $(DLINK_FLAGS) -\( $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST) -\) $(DLINK2_FLAGS)
 
-    <Command.ARMGCC>
+    <Command.ARMGCC, Command.ARMLINUXGCC>
         "$(DLINK)" $(DLINK_FLAGS) -\( $(DLINK_SPATH) $(STATIC_LIBRARY_FILES) -\) $(DLINK2_FLAGS)
 
     <Command.RVCT>
@@ -292,7 +290,7 @@
     <OutputFile>
         $(DEBUG_DIR)(+)$(MODULE_NAME).efi
 
-    <Command.MSFT, Command.INTEL, Command.RVCT, Command.ARMGCC>  
+    <Command.MSFT, Command.INTEL, Command.RVCT, Command.ARMGCC, Command.ARMLINUXGCC>  
         "$(GENFW)" -e $(MODULE_TYPE) -o ${dst} ${src} $(GENFW_FLAGS)
         $(CP) ${dst} $(OUTPUT_DIR)
         $(CP) ${dst} $(BIN_DIR)
@@ -513,9 +511,7 @@
         $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.hpk
 
     <Command>
-        -$(MD) $(OUTPUT_DIR)(+)${s_dir} > NUL 2>&1
         "$(VFRPP)" $(VFRPP_FLAGS) $(INC) ${src} > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
-        -$(MD) $(OUTPUT_DIR)(+)${s_dir} > NUL 2>&1
         "$(VFR)" $(VFR_FLAGS) --create-ifr-package --string-db $(OUTPUT_DIR)(+)$(MODULE_NAME)StrDefs.hpk --output-directory $(OUTPUT_DIR)(+)${s_dir} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
 
 [Hii-Binary-Package.UEFI_HII]
@@ -536,7 +532,7 @@
         "$(GENFW)" -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) --hiibinpackage $(HII_BINARY_PACKAGES) $(GENFW_FLAGS)
         "$(RC)" $(RC_FLAGS) $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc ${dst}
         
-    <Command.XCODE, Command.RVCT, Command.ARMGCC>  
+    <Command.XCODE, Command.RVCT, Command.ARMGCC, Command.ARMLINUXGCC>  
         GenFw -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) --hiibinpackage $(HII_BINARY_PACKAGES)
         
         

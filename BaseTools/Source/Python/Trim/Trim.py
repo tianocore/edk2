@@ -37,7 +37,9 @@ gTypedefPattern = re.compile("^\s*typedef\s+struct(\s+\w+)?\s*[{]*$", re.MULTILI
 ## Regular expression for matching "#pragma pack"
 gPragmaPattern = re.compile("^\s*#pragma\s+pack", re.MULTILINE)
 ## Regular expression for matching HEX number
-gHexNumberPattern = re.compile("0[xX]([0-9a-fA-F]+)")
+gHexNumberPattern = re.compile("(0[xX])([0-9a-fA-F]+)U?")
+## Regular expression for matching decimal number with 'U' postfix
+gDecNumberPattern = re.compile("([0-9]+)U")
 ## Regular expression for matching "Include ()" in asl file
 gAslIncludePattern = re.compile("^(\s*)[iI]nclude\s*\(\"?([^\"\(\)]+)\"\)", re.MULTILINE)
 ## Regular expression for matching C style #include "XXX.asl" in asl file
@@ -169,9 +171,14 @@ def TrimPreprocessedFile(Source, Target, ConvertHex, TrimLong):
 
         # convert HEX number format if indicated
         if ConvertHex:
-            Line = gHexNumberPattern.sub(r"0\1h", Line)
+            Line = gHexNumberPattern.sub(r"0\2h", Line)
+        else:
+            Line = gHexNumberPattern.sub(r"\1\2", Line)
         if TrimLong:
             Line = gLongNumberPattern.sub(r"\1", Line)
+
+        # convert Decimal number format
+        Line = gDecNumberPattern.sub(r"\1", Line)
 
         if LineNumber != None:
             EdkLogger.verbose("Got line directive: line=%d" % LineNumber)

@@ -260,7 +260,7 @@ class UniFileClassObject(object):
 
         Name = Item.split()[1]
         # Check the string name is the upper character
-        if not self.IsCompatibleMode and Name != '':
+        if Name != '':
             MatchString = re.match('[A-Z0-9_]+', Name, re.UNICODE)
             if MatchString == None or MatchString.end(0) != len(Name):
                 EdkLogger.error('Unicode File Parser', FORMAT_INVALID, 'The string token name %s defined in UNI file %s contains the invalid lower case character.' %(Name, self.File))

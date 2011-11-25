@@ -84,7 +84,7 @@ CHAR8      *mFvbAlignmentName[] = {
   EFI_FVB2_ALIGNMENT_64K_STRING, 
   EFI_FVB2_ALIGNMENT_128K_STRING,
   EFI_FVB2_ALIGNMENT_256K_STRING,
-  EFI_FVB2_ALIGNMNET_512K_STRING,
+  EFI_FVB2_ALIGNMENT_512K_STRING,
   EFI_FVB2_ALIGNMENT_1M_STRING,  
   EFI_FVB2_ALIGNMENT_2M_STRING,  
   EFI_FVB2_ALIGNMENT_4M_STRING,  
@@ -1535,7 +1535,7 @@ Returns:
       //
       Status = FindApResetVectorPosition (FvImage, &BytePointer);
       if (EFI_ERROR (Status)) {
-        Error (NULL, 0, 3000, "Invalid", "Cannot find the appropriate location in FvImage to add Ap reset vector!");
+        Error (NULL, 0, 3000, "Invalid", "FV image does not have enough space to place AP reset vector. The FV image needs to reserve at least 4KB of unused space.");
         return EFI_ABORTED;
       }
     }

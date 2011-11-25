@@ -31,6 +31,8 @@ gIncludePattern = re.compile(r"^[ \t]*#?[ \t]*include(?:[ \t]*(?:\\(?:\r\n|\r|\n
 ## Regular expression for matching macro used in header file inclusion
 gMacroPattern = re.compile("([_A-Z][_A-Z0-9]*)[ \t]*\((.+)\)", re.UNICODE)
 
+gIsFileMap = {}
+
 ## pattern for include style in Edk.x code
 gProtocolDefinition = "Protocol/%(HeaderKey)s/%(HeaderKey)s.h"
 gGuidDefinition = "Guid/%(HeaderKey)s/%(HeaderKey)s.h"
@@ -421,6 +423,7 @@ cleanlib:
         self.FileListMacros = {}
         self.ListFileMacros = {}
 
+        self.FileCache = {}
         self.FileDependency = []
         self.LibraryBuildCommandList = []
         self.LibraryFileList = []
@@ -722,24 +725,26 @@ cleanlib:
         EdkLogger.debug(EdkLogger.DEBUG_1, "Try to get dependency files for %s" % File)
         FileStack = [File] + ForceList
         DependencySet = set()
-        MacroUsedByIncludedFile = False
 
         if self._AutoGenObject.Arch not in gDependencyDatabase:
             gDependencyDatabase[self._AutoGenObject.Arch] = {}
         DepDb = gDependencyDatabase[self._AutoGenObject.Arch]
 
-        # add path of given source file into search path list.
-        if File.Dir not in SearchPathList:
-            SearchPathList.append(File.Dir)
         while len(FileStack) > 0:
             F = FileStack.pop()
+
+            FullPathDependList = []
+            if F in self.FileCache:
+                for CacheFile in self.FileCache[F]:
+                    FullPathDependList.append(CacheFile)
+                    if CacheFile not in DependencySet:
+                        FileStack.append(CacheFile)
+                DependencySet.update(FullPathDependList)
+                continue
 
             CurrentFileDependencyList = []
             if F in DepDb:
                 CurrentFileDependencyList = DepDb[F]
-                for Dep in CurrentFileDependencyList:
-                    if Dep not in FileStack and Dep not in DependencySet:
-                        FileStack.append(Dep)
             else:
                 try:
                     Fd = open(F.Path, 'r')
@@ -755,7 +760,6 @@ cleanlib:
                     FileContent = unicode(FileContent, "utf-16")
                 IncludedFileList = gIncludePattern.findall(FileContent)
 
-                CurrentFilePath = F.Dir
                 for Inc in IncludedFileList:
                     Inc = Inc.strip()
                     # if there's macro used to reference header file, expand it
@@ -766,41 +770,44 @@ cleanlib:
                         if HeaderType in gIncludeMacroConversion:
                             Inc = gIncludeMacroConversion[HeaderType] % {"HeaderKey" : HeaderKey}
                         else:
-                            # not known macro used in #include
-                            MacroUsedByIncludedFile = True
-                            continue
+                            # not known macro used in #include, always build the file by
+                            # returning a empty dependency
+                            self.FileCache[File] = []
+                            return []
                     Inc = os.path.normpath(Inc)
-                    for SearchPath in [CurrentFilePath] + SearchPathList:
-                        FilePath = os.path.join(SearchPath, Inc)
-                        if not os.path.isfile(FilePath) or FilePath in CurrentFileDependencyList:
+                    CurrentFileDependencyList.append(Inc)
+                DepDb[F] = CurrentFileDependencyList
+
+            CurrentFilePath = F.Dir
+            PathList = [CurrentFilePath] + SearchPathList
+            for Inc in CurrentFileDependencyList:
+                for SearchPath in PathList:
+                    FilePath = os.path.join(SearchPath, Inc)
+                    if FilePath in gIsFileMap:
+                        if not gIsFileMap[FilePath]:
                             continue
-                        FilePath = PathClass(FilePath)
-                        CurrentFileDependencyList.append(FilePath)
-                        if FilePath not in FileStack and FilePath not in DependencySet:
-                            FileStack.append(FilePath)
-                        break
+                    # If isfile is called too many times, the performance is slow down.
+                    elif not os.path.isfile(FilePath):
+                        gIsFileMap[FilePath] = False
+                        continue
                     else:
-                        EdkLogger.debug(EdkLogger.DEBUG_9, "%s included by %s was not found "\
-                                        "in any given path:\n\t%s" % (Inc, F, "\n\t".join(SearchPathList)))
+                        gIsFileMap[FilePath] = True
+                    FilePath = PathClass(FilePath)
+                    FullPathDependList.append(FilePath)
+                    if FilePath not in DependencySet:
+                        FileStack.append(FilePath)
+                    break
+                else:
+                    EdkLogger.debug(EdkLogger.DEBUG_9, "%s included by %s was not found "\
+                                    "in any given path:\n\t%s" % (Inc, F, "\n\t".join(SearchPathList)))
 
-                if not MacroUsedByIncludedFile:
-                    if F == File:
-                        CurrentFileDependencyList += ForceList
-                    #
-                    # Don't keep the file in cache if it uses macro in included file.
-                    # So it will be scanned again if another file includes this file.
-                    #
-                    DepDb[F] = CurrentFileDependencyList
-            DependencySet.update(CurrentFileDependencyList)
+            self.FileCache[F] = FullPathDependList
+            DependencySet.update(FullPathDependList)
 
-        #
-        # If there's macro used in included file, always build the file by
-        # returning a empty dependency
-        #
-        if MacroUsedByIncludedFile:
-            DependencyList = []
-        else:
-            DependencyList = list(DependencySet)  # remove duplicate ones
+        DependencySet.update(ForceList)
+        if File in DependencySet:
+            DependencySet.remove(File)
+        DependencyList = list(DependencySet)  # remove duplicate ones
 
         return DependencyList
 
@@ -1314,16 +1321,16 @@ ${END}\t@cd $(BUILD_DIR)\n
             # macros passed to GenFds
             MacroList.append('"%s=%s"' % ("EFI_SOURCE", GlobalData.gEfiSource.replace('\\', '\\\\')))
             MacroList.append('"%s=%s"' % ("EDK_SOURCE", GlobalData.gEdkSource.replace('\\', '\\\\')))
-            for MacroName in GlobalData.gGlobalDefines:
-                if GlobalData.gGlobalDefines[MacroName] != "":
-                    MacroList.append('"%s=%s"' % (MacroName, GlobalData.gGlobalDefines[MacroName].replace('\\', '\\\\')))
+            MacroDict = {}
+            MacroDict.update(GlobalData.gGlobalDefines)
+            MacroDict.update(GlobalData.gCommandLineDefines)
+            MacroDict.pop("EFI_SOURCE", "dummy")
+            MacroDict.pop("EDK_SOURCE", "dummy")
+            for MacroName in MacroDict:
+                if MacroDict[MacroName] != "":
+                    MacroList.append('"%s=%s"' % (MacroName, MacroDict[MacroName].replace('\\', '\\\\')))
                 else:
                     MacroList.append('"%s"' % MacroName)
-            for MacroName in GlobalData.gCommandLineDefines:
-                if GlobalData.gCommandLineDefines[MacroName] != "":
-                    MacroList.append('"%s=%s"' % (MacroName, GlobalData.gCommandLineDefines[MacroName].replace('\\', '\\\\')))
-                else:
-                    MacroList.append('"%s"' % MacroName)                
         else:
             FdfFileList = []
 

@@ -553,7 +553,7 @@ Returns:
   EFI_FIRMWARE_VOLUME_HEADER *hdr = (EFI_FIRMWARE_VOLUME_HEADER*)Fv;
 
   EFI_FFS_FILE_HEADER *fhdr = NULL;
-  EFI_FVB_ATTRIBUTES FvbAttributes;
+  EFI_FVB_ATTRIBUTES_2 FvbAttributes;
   UINTN offset;
   UINTN fsize;
   UINTN newSize;
@@ -869,7 +869,7 @@ Returns:
   EFI_FIRMWARE_VOLUME_HEADER *hdr = (EFI_FIRMWARE_VOLUME_HEADER*)Fv;
 
   EFI_FFS_FILE_HEADER *fhdr = NULL;
-  EFI_FVB_ATTRIBUTES FvbAttributes;
+  EFI_FVB_ATTRIBUTES_2 FvbAttributes;
   UINTN fsize;
 
   EFI_STATUS Status;
