@@ -57,7 +57,49 @@ EFI_PEI_PPI_DESCRIPTOR  mPeiFfs3FvPpiList = {
   &gEfiFirmwareFileSystem3Guid,
   &mPeiFfs3FwVol.Fv
 };
- 
+
+/**
+Required Alignment             Alignment Value in FFS         Alignment Value in
+(bytes)                        Attributes Field               Firmware Volume Interfaces
+1                                    0                                     0
+16                                   1                                     4
+128                                  2                                     7
+512                                  3                                     9
+1 KB                                 4                                     10
+4 KB                                 5                                     12
+32 KB                                6                                     15
+64 KB                                7                                     16
+**/
+UINT8 mFvAttributes[] = {0, 4, 7, 9, 10, 12, 15, 16};
+
+/**
+  Convert the FFS File Attributes to FV File Attributes
+
+  @param  FfsAttributes              The attributes of UINT8 type.
+
+  @return The attributes of EFI_FV_FILE_ATTRIBUTES
+
+**/
+EFI_FV_FILE_ATTRIBUTES
+FfsAttributes2FvFileAttributes (
+  IN EFI_FFS_FILE_ATTRIBUTES FfsAttributes
+  )
+{
+  UINT8                     DataAlignment;
+  EFI_FV_FILE_ATTRIBUTES    FileAttribute;
+
+  DataAlignment = (UINT8) ((FfsAttributes & FFS_ATTRIB_DATA_ALIGNMENT) >> 3);
+  ASSERT (DataAlignment < 8);
+
+  FileAttribute = (EFI_FV_FILE_ATTRIBUTES) mFvAttributes[DataAlignment];
+
+  if ((FfsAttributes & FFS_ATTRIB_FIXED) == FFS_ATTRIB_FIXED) {
+    FileAttribute |= EFI_FV_FILE_ATTRIB_FIXED;
+  }
+
+  return FileAttribute;
+}
+
 /**
   Returns the file state set by the highest zero bit in the State field
 
@@ -1312,7 +1354,10 @@ PeiFfsFvPpiGetFileInfo (
   FileHeader = (EFI_FFS_FILE_HEADER *)FileHandle;
   CopyMem (&FileInfo->FileName, &FileHeader->Name, sizeof(EFI_GUID));
   FileInfo->FileType = FileHeader->Type;
-  FileInfo->FileAttributes = FileHeader->Attributes;
+  FileInfo->FileAttributes = FfsAttributes2FvFileAttributes (FileHeader->Attributes);
+  if ((CoreFvHandle->FvHeader->Attributes & EFI_FVB2_MEMORY_MAPPED) == EFI_FVB2_MEMORY_MAPPED) {
+    FileInfo->FileAttributes |= EFI_FV_FILE_ATTRIB_MEMORY_MAPPED;
+  }
   if (IS_FFS_FILE2 (FileHeader)) {
     ASSERT (FFS_FILE2_SIZE (FileHeader) > 0x00FFFFFF);
     if (!FwVolInstance->IsFfs3Fv) {

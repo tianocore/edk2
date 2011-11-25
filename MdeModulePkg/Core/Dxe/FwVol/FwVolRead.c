@@ -19,9 +19,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 Required Alignment             Alignment Value in FFS         Alignment Value in
 (bytes)                        Attributes Field               Firmware Volume Interfaces
 1                                    0                                     0
-2                                    0                                     1
-4                                    0                                     2
-8                                    0                                     3
 16                                   1                                     4
 128                                  2                                     7
 512                                  3                                     9
@@ -31,8 +28,6 @@ Required Alignment             Alignment Value in FFS         Alignment Value in
 64 KB                                7                                     16
 **/
 UINT8 mFvAttributes[] = {0, 4, 7, 9, 10, 12, 15, 16};
-
-
 
 /**
   Convert the FFS File Attributes to FV File Attributes
@@ -47,13 +42,20 @@ FfsAttributes2FvFileAttributes (
   IN EFI_FFS_FILE_ATTRIBUTES FfsAttributes
   )
 {
-  FfsAttributes = (EFI_FFS_FILE_ATTRIBUTES)((FfsAttributes & FFS_ATTRIB_DATA_ALIGNMENT) >> 3);
-  ASSERT (FfsAttributes < 8);
+  UINT8                     DataAlignment;
+  EFI_FV_FILE_ATTRIBUTES    FileAttribute;
 
-  return (EFI_FV_FILE_ATTRIBUTES) mFvAttributes[FfsAttributes];
+  DataAlignment = (UINT8) ((FfsAttributes & FFS_ATTRIB_DATA_ALIGNMENT) >> 3);
+  ASSERT (DataAlignment < 8);
+
+  FileAttribute = (EFI_FV_FILE_ATTRIBUTES) mFvAttributes[DataAlignment];
+
+  if ((FfsAttributes & FFS_ATTRIB_FIXED) == FFS_ATTRIB_FIXED) {
+    FileAttribute |= EFI_FV_FILE_ATTRIB_FIXED;
+  }
+
+  return FileAttribute;
 }
-
-
 
 /**
   Given the input key, search for the next matching file in the volume.
@@ -199,6 +201,9 @@ FvGetNextFile (
   *FileType = FfsFileHeader->Type;
   CopyGuid (NameGuid, &FfsFileHeader->Name);
   *Attributes = FfsAttributes2FvFileAttributes (FfsFileHeader->Attributes);
+  if ((FvDevice->FwVolHeader->Attributes & EFI_FVB2_MEMORY_MAPPED) == EFI_FVB2_MEMORY_MAPPED) {
+    *Attributes |= EFI_FV_FILE_ATTRIB_MEMORY_MAPPED;
+  }
 
   //
   // we need to substract the header size
@@ -318,6 +323,9 @@ FvReadFile (
   //
   *FoundType = FfsHeader->Type;
   *FileAttributes = FfsAttributes2FvFileAttributes (FfsHeader->Attributes);
+   if ((FvDevice->FwVolHeader->Attributes & EFI_FVB2_MEMORY_MAPPED) == EFI_FVB2_MEMORY_MAPPED) {
+     *FileAttributes |= EFI_FV_FILE_ATTRIB_MEMORY_MAPPED;
+   }
   *AuthenticationStatus = 0;
   *BufferSize = FileSize;
 
