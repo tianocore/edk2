@@ -6,7 +6,7 @@
   * Dp application.  In addition to global data, function declarations for
   * DpUtilities.c, DpTrace.c, and DpProfile.c are included here.
   *
-  * Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  * Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   * This program and the accompanying materials
   * are licensed and made available under the terms and conditions of the BSD License
   * which accompanies this distribution.  The full text of the license may be found at
@@ -17,13 +17,16 @@
 **/
 #ifndef _DP_INTELNAL_H_
 #define _DP_INTELNAL_H_
+
+#define DP_GAUGE_STRING_LENGTH   36
+
 //
 /// Module-Global Variables
 ///@{
 extern EFI_HII_HANDLE     gHiiHandle;
 extern CHAR16             *mPrintTokenBuffer;
-extern CHAR16             mGaugeString[DXE_PERFORMANCE_STRING_SIZE];
-extern CHAR16             mUnicodeToken[PERF_TOKEN_LENGTH + 1];
+extern CHAR16             mGaugeString[DP_GAUGE_STRING_LENGTH + 1];
+extern CHAR16             mUnicodeToken[DXE_PERFORMANCE_STRING_SIZE];
 extern UINT64             mInterestThreshold;
 
 extern PERF_SUMMARY_DATA  SummaryData;    ///< Create the SummaryData structure and init. to ZERO.
@@ -100,6 +103,13 @@ GetShortPdbFileName (
 
 /** 
   Get a human readable name for an image handle.
+  The following methods will be tried orderly:
+    1. Image PDB
+    2. ComponentName2 protocol
+    3. FFS UI section
+    4. Image GUID
+    5. Image DevicePath
+    6. Unknown Driver Name
   
   @param[in]    Handle
   
@@ -341,4 +351,16 @@ DumpRawProfile(
   IN UINTN          Limit,
   IN BOOLEAN        ExcludeFlag
   );
+
+/**
+  Wrap original FreePool to check NULL pointer first.
+
+  @param[in]    Buffer      The pointer to the buffer to free.
+
+**/
+VOID
+SafeFreePool (
+  IN VOID   *Buffer
+  );
+
 #endif

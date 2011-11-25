@@ -46,8 +46,8 @@
 EFI_HII_HANDLE   gHiiHandle;
 SHELL_PARAM_ITEM *DpParamList       = NULL;
 CHAR16           *mPrintTokenBuffer = NULL;
-CHAR16           mGaugeString[DXE_PERFORMANCE_STRING_SIZE];
-CHAR16           mUnicodeToken[PERF_TOKEN_LENGTH + 1];
+CHAR16           mGaugeString[DP_GAUGE_STRING_LENGTH + 1];
+CHAR16           mUnicodeToken[DXE_PERFORMANCE_STRING_SIZE];
 UINT64           mInterestThreshold;
 
 PERF_SUMMARY_DATA SummaryData = { 0 };    ///< Create the SummaryData structure and init. to ZERO.
@@ -84,22 +84,6 @@ PARAM_ITEM_LIST  ParamList[] = {
   };
 
 ///@}
-
-/**
-  Wrap original FreePool to check NULL pointer first.
-
-  @param[in]    Buffer      The pointer to the buffer to free.
-
-**/
-VOID
-SafeFreePool (
-  IN VOID   *Buffer
-  )
-{
-  if (Buffer != NULL) {
-    FreePool (Buffer);
-  }
-}
 
 /**
   Transfer the param list value and get the command line parse.

@@ -1,7 +1,7 @@
 /** @file
   * Trace reporting for the Dp utility.
   *
-  * Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  * Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   * This program and the accompanying materials
   * are licensed and made available under the terms and conditions of the BSD License
   * which accompanies this distribution.  The full text of the license may be found at
@@ -197,13 +197,10 @@ DumpAllTrace(
       else {
         IncFlag = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_INCOMPLETE), NULL);  // Mark incomplete records
       }
-      if ((ElapsedTime < mInterestThreshold)                 ||
+      if (((Measurement.EndTimeStamp != 0) && (ElapsedTime < mInterestThreshold)) ||
           ((ExcludeFlag) && (GetCumulativeItem(&Measurement) >= 0))
          ) {      // Ignore "uninteresting" or excluded records
         continue;
-      }
-      if (Measurement.EndTimeStamp == 0) {
-        ElapsedTime = Measurement.StartTimeStamp;
       }
       ++Count;    // Count the number of records printed
 
@@ -219,11 +216,16 @@ DumpAllTrace(
           }
         }
       }
-      // Ensure that the argument strings are not too long.
-      mGaugeString[31] = 0;
-      mUnicodeToken[18] = 0;
 
-      PrintToken( STRING_TOKEN (STR_DP_ALL_STATS),
+      if (AsciiStrnCmp (Measurement.Token, ALit_PEIM, PERF_TOKEN_LENGTH) == 0) {
+        UnicodeSPrint (mGaugeString, sizeof (mGaugeString), L"%g", Measurement.Handle);
+      }
+
+      // Ensure that the argument strings are not too long.
+      mGaugeString[DP_GAUGE_STRING_LENGTH] = 0;
+      mUnicodeToken[13] = 0;
+
+      PrintToken( STRING_TOKEN (STR_DP_ALL_VARS),
         Index,      // 1 based, Which measurement record is being printed
         IncFlag,
         Measurement.Handle,
@@ -510,7 +512,7 @@ ProcessHandles(
     Print (L"There are %,d Handles defined.\n", (Size / sizeof(HandleBuffer[0])));
 #endif
 
-    PrintToken (STRING_TOKEN (STR_DP_HANDLE_GUID) );
+    PrintToken (STRING_TOKEN (STR_DP_HANDLE_SECTION) );
     PrintToken (STRING_TOKEN (STR_DP_DASHES) );
 
     LogEntryKey = 0;
@@ -543,8 +545,8 @@ ProcessHandles(
         }
       }
       // Ensure that the argument strings are not too long.
-      mGaugeString[31] = 0;
-      mUnicodeToken[18] = 0;
+      mGaugeString[DP_GAUGE_STRING_LENGTH] = 0;
+      mUnicodeToken[11] = 0;
       if (mGaugeString[0] != 0) {
         // Display the record if it has a valid handle.
         PrintToken (
@@ -613,7 +615,7 @@ ProcessPeims(
     ElapsedTime = DurationInMicroSeconds ( Duration );  // Calculate elapsed time in microseconds
     if (ElapsedTime >= mInterestThreshold) {
       // PEIM FILE Handle is the start address of its FFS file that contains its file guid.
-      PrintToken (STRING_TOKEN (STR_DP_PEIM_STAT2),
+      PrintToken (STRING_TOKEN (STR_DP_PEIM_VARS),
             TIndex,   // 1 based, Which measurement record is being printed
             Measurement.Handle,  // base address
             Measurement.Handle,  // file guid
@@ -668,6 +670,8 @@ ProcessGlobal(
   {
     AsciiStrToUnicodeStr (Measurement.Module, mGaugeString);
     AsciiStrToUnicodeStr (Measurement.Token, mUnicodeToken);
+    mGaugeString[26] = 0;
+    mUnicodeToken[31] = 0;
     if ( ! ( IsPhase( &Measurement)  ||
         (Measurement.Handle != NULL)      ||
         (Measurement.EndTimeStamp == 0)
@@ -677,7 +681,7 @@ ProcessGlobal(
       ElapsedTime = DurationInMicroSeconds ( Duration );
       if (ElapsedTime >= mInterestThreshold) {
         PrintToken (
-          STRING_TOKEN (STR_DP_FOUR_VARS_2),
+          STRING_TOKEN (STR_DP_GLOBAL_VARS),
           Index,
           mGaugeString,
           mUnicodeToken,

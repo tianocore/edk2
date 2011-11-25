@@ -1,7 +1,7 @@
 /** @file
   * Utility functions used by the Dp application.
   *
-  * Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  * Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   * This program and the accompanying materials
   * are licensed and made available under the terms and conditions of the BSD License
   * which accompanies this distribution.  The full text of the license may be found at
@@ -21,15 +21,39 @@
 #include <Library/PrintLib.h>
 #include <Library/HiiLib.h>
 #include <Library/PcdLib.h>
+#include <Library/UefiLib.h>
+#include <Library/DevicePathLib.h>
+
+#include <Pi/PiFirmwareFile.h>
+#include <Library/DxeServicesLib.h>
 
 #include <Protocol/LoadedImage.h>
 #include <Protocol/DriverBinding.h>
+#include <Protocol/ComponentName2.h>
+#include <Protocol/DevicePath.h>
+#include <Protocol/DevicePathToText.h>
 
 #include <Guid/Performance.h>
 
 #include "Dp.h"
 #include "Literals.h"
 #include "DpInternal.h"
+
+/**
+  Wrap original FreePool to check NULL pointer first.
+
+  @param[in]    Buffer      The pointer to the buffer to free.
+
+**/
+VOID
+SafeFreePool (
+  IN VOID   *Buffer
+  )
+{
+  if (Buffer != NULL) {
+    FreePool (Buffer);
+  }
+}
 
 /** 
   Calculate an event's duration in timer ticks.
@@ -165,12 +189,19 @@ GetShortPdbFileName (
 
 /** 
   Get a human readable name for an image handle.
-  
+  The following methods will be tried orderly:
+    1. Image PDB
+    2. ComponentName2 protocol
+    3. FFS UI section
+    4. Image GUID
+    5. Image DevicePath
+    6. Unknown Driver Name
+
   @param[in]    Handle
-  
+
   @post   The resulting Unicode name string is stored in the
           mGaugeString global array.
-  
+
 **/
 VOID
 GetNameFromHandle (
@@ -182,52 +213,154 @@ GetNameFromHandle (
   CHAR8                       *PdbFileName;
   EFI_DRIVER_BINDING_PROTOCOL *DriverBinding;
   EFI_STRING                  StringPtr;
+  EFI_DEVICE_PATH_PROTOCOL    *LoadedImageDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL    *DevicePath;
+  EFI_GUID                    *NameGuid;
+  CHAR16                      *NameString;
+  UINTN                       StringSize;
+  CHAR8                       *PlatformLanguage;
+  EFI_COMPONENT_NAME2_PROTOCOL      *ComponentName2;
+  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL  *DevicePathToText;
 
-  // Proactively get the error message so it will be ready if needed
-  StringPtr = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_ERROR_NAME), NULL);
-  ASSERT (StringPtr != NULL);
-
-  // Get handle name from image protocol
+  //
+  // Method 1: Get the name string from image PDB
   //
   Status = gBS->HandleProtocol (
-                Handle,
-                &gEfiLoadedImageProtocolGuid,
-                (VOID**) &Image
-                );
+                  Handle,
+                  &gEfiLoadedImageProtocolGuid,
+                  (VOID **) &Image
+                  );
 
   if (EFI_ERROR (Status)) {
     Status = gBS->OpenProtocol (
+                    Handle,
+                    &gEfiDriverBindingProtocolGuid,
+                    (VOID **) &DriverBinding,
+                    NULL,
+                    NULL,
+                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                    );
+    if (!EFI_ERROR (Status)) {
+      Status = gBS->HandleProtocol (
+                      DriverBinding->ImageHandle,
+                      &gEfiLoadedImageProtocolGuid,
+                      (VOID **) &Image
+                      );
+    }
+  }
+
+  if (!EFI_ERROR (Status)) {
+    PdbFileName = PeCoffLoaderGetPdbPointer (Image->ImageBase);
+
+    if (PdbFileName != NULL) {
+      GetShortPdbFileName (PdbFileName, mGaugeString);
+      return;
+    }
+  }
+
+  //
+  // Method 2: Get the name string from ComponentName2 protocol
+  //
+  Status = gBS->HandleProtocol (
                   Handle,
-                  &gEfiDriverBindingProtocolGuid,
-                  (VOID **) &DriverBinding,
-                  NULL,
-                  NULL,
-                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  &gEfiComponentName2ProtocolGuid,
+                  (VOID **) &ComponentName2
                   );
-    if (EFI_ERROR (Status)) {
-      StrCpy (mGaugeString, StringPtr);
-      FreePool (StringPtr);
-      return ;
+  if (!EFI_ERROR (Status)) {
+    //
+    // Get the current platform language setting
+    //
+    PlatformLanguage = GetEfiGlobalVariable (L"PlatformLang");
+    Status = ComponentName2->GetDriverName (
+                               ComponentName2,
+                               PlatformLanguage != NULL ? PlatformLanguage : "en-US",
+                               &StringPtr
+                               );
+    if (!EFI_ERROR (Status)) {
+      SafeFreePool (PlatformLanguage);
+      StrnCpy (mGaugeString, StringPtr, DP_GAUGE_STRING_LENGTH);
+      mGaugeString[DP_GAUGE_STRING_LENGTH] = 0;
+      return;
+    }
+  }
+
+  Status = gBS->HandleProtocol (
+                  Handle,
+                  &gEfiLoadedImageDevicePathProtocolGuid,
+                  (VOID **) &LoadedImageDevicePath
+                  );
+  if (!EFI_ERROR (Status)) {
+    DevicePath = LoadedImageDevicePath;
+
+    //
+    // Try to get image GUID from LoadedImageDevicePath protocol
+    //
+    NameGuid = NULL;
+    while (!IsDevicePathEndType (DevicePath)) {
+      NameGuid = EfiGetNameGuidFromFwVolDevicePathNode ((MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) DevicePath);
+      if (NameGuid != NULL) {
+        break;
+      }
+      DevicePath = NextDevicePathNode (DevicePath);
     }
 
-    // Get handle name from image protocol
-    //
-    Status = gBS->HandleProtocol (
-                  DriverBinding->ImageHandle,
-                  &gEfiLoadedImageProtocolGuid,
-                  (VOID**) &Image
-                  );
+    if (NameGuid != NULL) {
+      //
+      // Try to get the image's FFS UI section by image GUID
+      //
+      NameString = NULL;
+      StringSize = 0;
+      Status = GetSectionFromAnyFv (
+                NameGuid,
+                EFI_SECTION_USER_INTERFACE,
+                0,
+                &NameString,
+                &StringSize
+                );
+
+      if (!EFI_ERROR (Status)) {
+        //
+        // Method 3. Get the name string from FFS UI section
+        //
+        StrnCpy (mGaugeString, NameString, DP_GAUGE_STRING_LENGTH);
+        mGaugeString[DP_GAUGE_STRING_LENGTH] = 0;
+        FreePool (NameString);
+      } else {
+        //
+        // Method 4: Get the name string from image GUID
+        //
+        UnicodeSPrint (mGaugeString, sizeof (mGaugeString), L"%g", NameGuid);
+      }
+      return;
+    } else {
+      //
+      // Method 5: Get the name string from image DevicePath
+      //
+      Status = gBS->LocateProtocol (
+                      &gEfiDevicePathToTextProtocolGuid,
+                      NULL,
+                      (VOID **) &DevicePathToText
+                      );
+      if (!EFI_ERROR (Status)) {
+        NameString = DevicePathToText->ConvertDevicePathToText (LoadedImageDevicePath, TRUE, FALSE);
+        if (NameString != NULL) {
+          StrnCpy (mGaugeString, NameString, DP_GAUGE_STRING_LENGTH);
+          mGaugeString[DP_GAUGE_STRING_LENGTH] = 0;
+          FreePool (NameString);
+          return;
+        }
+      }
+    }
   }
 
-  PdbFileName = PeCoffLoaderGetPdbPointer (Image->ImageBase);
-
-  if (PdbFileName != NULL) {
-    GetShortPdbFileName (PdbFileName, mGaugeString);
-  } else {
-    StrCpy (mGaugeString, StringPtr);
-  }
+  //
+  // Method 6: Unknown Driver Name
+  //
+  StringPtr = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_ERROR_NAME), NULL);
+  ASSERT (StringPtr != NULL);
+  StrCpy (mGaugeString, StringPtr);
   FreePool (StringPtr);
-  return ;
+  return;
 }
 
 /** 
