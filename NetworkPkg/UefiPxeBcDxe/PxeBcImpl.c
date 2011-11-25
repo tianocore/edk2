@@ -82,6 +82,17 @@ EfiPxeBcStart (
   if (Mode->UsingIpv6) {
     AsciiPrint ("\n>>Start PXE over IPv6");
     //
+    // Configure udp6 instance to receive data.
+    //
+    Status = Private->Udp6Read->Configure (
+                                  Private->Udp6Read,
+                                  &Private->Udp6CfgData
+                                  );
+    if (EFI_ERROR (Status)) {
+      goto ON_ERROR;
+    }
+    
+    //
     // Configure block size for TFTP as a default value to handle all link layers.
     //
     Private->BlockSize = (UINTN) (Private->Ip6MaxPacketSize -
@@ -115,6 +126,17 @@ EfiPxeBcStart (
     }
   } else {
     AsciiPrint ("\n>>Start PXE over IPv4");
+    //
+    // Configure udp4 instance to receive data.
+    //
+    Status = Private->Udp4Read->Configure (
+                                  Private->Udp4Read,
+                                  &Private->Udp4CfgData
+                                  );
+    if (EFI_ERROR (Status)) {
+      goto ON_ERROR;
+    }
+    
     //
     // Configure block size for TFTP as a default value to handle all link layers.
     //
