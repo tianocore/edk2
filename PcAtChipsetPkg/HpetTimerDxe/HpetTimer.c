@@ -492,9 +492,10 @@ TimerDriverSetTimerPeriod (
   IN UINT64                   TimerPeriod
   )
 {
-  UINT64  MainCounter;
-  UINT64  Delta;
-  UINT64  CurrentComparator;
+  UINT64                         MainCounter;
+  UINT64                         Delta;
+  UINT64                         CurrentComparator;
+  HPET_TIMER_MSI_ROUTE_REGISTER  HpetTimerMsiRoute;
   
   //
   // Disable HPET timer when adjusting the timer period
@@ -577,14 +578,22 @@ TimerDriverSetTimerPeriod (
     //
     if (mTimerConfiguration.Bits.MsiInterruptCapablity != 0 && FeaturePcdGet (PcdHpetMsiEnable)) {
       //
+      // Program MSI Address and MSI Data values in the selected HPET Timer
+      // Program HPET register with APIC ID of current BSP in case BSP has been switched
+      //
+      HpetTimerMsiRoute.Bits.Address = GetApicMsiAddress ();
+      HpetTimerMsiRoute.Bits.Value   = (UINT32)GetApicMsiValue (PcdGet8 (PcdHpetLocalApicVector), LOCAL_APIC_DELIVERY_MODE_LOWEST_PRIORITY, FALSE, FALSE);
+      HpetWrite (HPET_TIMER_MSI_ROUTE_OFFSET + mTimerIndex * HPET_TIMER_STRIDE, HpetTimerMsiRoute.Uint64);
+      //
       // Enable HPET MSI Interrupt
       //
       mTimerConfiguration.Bits.MsiInterruptEnable = 1;
     } else {
       //
       // Enable timer interrupt through I/O APIC
+      // Program IOAPIC register with APIC ID of current BSP in case BSP has been switched
       //
-      IoApicEnableInterrupt (mTimerIrq, TRUE);
+      IoApicConfigureInterrupt (mTimerIrq, PcdGet8 (PcdHpetLocalApicVector), IO_APIC_DELIVERY_MODE_LOWEST_PRIORITY, TRUE, FALSE);
     }
 
     //
