@@ -24,6 +24,59 @@
  #endif /* OPENSSL_NO_STDIO */
  
  #endif /* HEADER_BSS_FILE_C */
+--- crypto/err/err.c
++++ crypto/err/err.c
+@@ -313,7 +313,12 @@
+ 	es->err_data_flags[i]=flags;
+ 	}
+ 
++/* Add EFIAPI for UEFI version. */
++#if defined(OPENSSL_SYS_UEFI)
++void EFIAPI ERR_add_error_data(int num, ...)
++#else
+ void ERR_add_error_data(int num, ...)
++#endif
+ 	{
+ 	va_list args;
+ 	int i,n,s;
+--- crypto/err/err.h
++++ crypto/err/err.h
+@@ -286,8 +286,14 @@
+ #endif
+ #ifndef OPENSSL_NO_BIO
+ void ERR_print_errors(BIO *bp);
++
++/* Add EFIAPI for UEFI version. */
++#if defined(OPENSSL_SYS_UEFI)
++void EFIAPI ERR_add_error_data(int num, ...);
++#else
+ void ERR_add_error_data(int num, ...);
+ #endif
++#endif
+ void ERR_load_strings(int lib,ERR_STRING_DATA str[]);
+ void ERR_unload_strings(int lib,ERR_STRING_DATA str[]);
+ void ERR_load_ERR_strings(void);
+--- crypto/opensslconf.h
++++ crypto/opensslconf.h
+@@ -162,6 +162,9 @@
+ /* The prime number generation stuff may not work when
+  * EIGHT_BIT but I don't care since I've only used this mode
+  * for debuging the bignum libraries */
++
++/* Bypass following definition for UEFI version. */
++#if !defined(OPENSSL_SYS_UEFI)
+ #undef SIXTY_FOUR_BIT_LONG
+ #undef SIXTY_FOUR_BIT
+ #define THIRTY_TWO_BIT
+@@ -169,6 +172,8 @@
+ #undef EIGHT_BIT
+ #endif
+ 
++#endif
++
+ #if defined(HEADER_RC4_LOCL_H) && !defined(CONFIG_HEADER_RC4_LOCL_H)
+ #define CONFIG_HEADER_RC4_LOCL_H
+ /* if this is defined data[i] is used instead of *data, this is a %20
 --- crypto/pkcs7/pk7_smime.c	2009-03-15 21:36:02.000000000 +0800
 +++ crypto/pkcs7/pk7_smime.c	2011-09-13 14:11:36.019454700 +0800
 @@ -88,7 +88,10 @@

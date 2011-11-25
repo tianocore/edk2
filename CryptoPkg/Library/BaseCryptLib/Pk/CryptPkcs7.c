@@ -190,6 +190,7 @@ Pkcs7Sign (
   //
   Key = EVP_PKEY_new ();
   if (Key == NULL) {
+    Status = FALSE;
     goto _Exit;
   }
   Key->save_type = EVP_PKEY_RSA;
@@ -213,6 +214,7 @@ Pkcs7Sign (
             PKCS7_BINARY | PKCS7_NOATTR | PKCS7_DETACHED
             );
   if (Pkcs7 == NULL) {
+    Status = FALSE;
     goto _Exit;
   }
 
@@ -221,9 +223,16 @@ Pkcs7Sign (
   //
   P7DataSize = i2d_PKCS7 (Pkcs7, NULL);
   if (P7DataSize <= 19) {
+    Status = FALSE;
     goto _Exit;
   }
+
   P7Data     = OPENSSL_malloc (P7DataSize);
+  if (P7Data == NULL) {
+    Status = FALSE;
+    goto _Exit;
+  }
+
   Tmp        = P7Data;
   P7DataSize = i2d_PKCS7 (Pkcs7, (unsigned char **) &Tmp);
 
@@ -233,6 +242,12 @@ Pkcs7Sign (
   //
   *SignedDataSize = P7DataSize - 19;
   *SignedData     = OPENSSL_malloc (*SignedDataSize);
+  if (*SignedData == NULL) {
+    Status = FALSE;
+    OPENSSL_free (P7Data);
+    goto _Exit;
+  }
+
   CopyMem (*SignedData, P7Data + 19, *SignedDataSize);
   
   OPENSSL_free (P7Data);
