@@ -41,14 +41,18 @@ GRAPHICS_CONSOLE_DEV    mGraphicsConsoleDevTemplate = {
     0,
     TRUE
   },
-  {
-    { 80, 25, 0, 0, 0, 0, 0 },  // Mode 0
-    { 80, 50, 0, 0, 0, 0, 0 },  // Mode 1
-    { 100,31, 0, 0, 0, 0, 0 },  // Mode 2
-    {  0,  0, 0, 0, 0, 0, 0 },  // Mode 3
-    {  0,  0, 0, 0, 0, 0, 0 }   // Mode 4
-  },
+  (GRAPHICS_CONSOLE_MODE_DATA *) NULL,
   (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) NULL
+};
+
+GRAPHICS_CONSOLE_MODE_DATA mGraphicsConsoleModeData[] = {
+  {100, 31},
+  //
+  // New modes can be added here.
+  // The last 2 entries are specific for PcdConOutRow x PcdConOutColumn and full screen mode.
+  //
+  {0, 0},
+  {0, 0}
 };
 
 EFI_HII_DATABASE_PROTOCOL   *mHiiDatabase;
@@ -210,6 +214,159 @@ Error:
   return Status;
 }
 
+/**
+  Initialize all the text modes which the graphics console supports.
+
+  It returns information for available text modes that the graphics can support.
+
+  @param[in]  HorizontalResolution     The size of video screen in pixels in the X dimension.
+  @param[in]  VerticalResolution       The size of video screen in pixels in the Y dimension.
+  @param[in]  GopModeNumber            The graphics mode number which graphis console is based on.
+  @param[out] TextModeCount            The total number of text modes that graphics console supports.
+  @param[out] TextModeData             The buffer to the text modes column and row information.
+                                       Caller is responsible to free it when it's non-NULL.
+
+  @retval EFI_SUCCESS                  The supporting mode information is returned.
+  @retval EFI_INVALID_PARAMETER        The parameters are invalid.
+
+**/
+EFI_STATUS
+InitializeGraphicsConsoleTextMode (
+  IN UINT32                        HorizontalResolution,
+  IN UINT32                        VerticalResolution,
+  IN UINT32                        GopModeNumber,
+  OUT UINTN                        *TextModeCount,
+  OUT GRAPHICS_CONSOLE_MODE_DATA   **TextModeData
+  )
+{
+  UINTN                       Index;
+  UINTN                       Count;
+  GRAPHICS_CONSOLE_MODE_DATA  *ModeBuffer;
+  GRAPHICS_CONSOLE_MODE_DATA  *NewModeBuffer;
+  UINTN                       ValidCount;
+  UINTN                       ValidIndex;
+  UINTN                       MaxColumns;
+  UINTN                       MaxRows;  
+  
+  if ((TextModeCount == NULL) || (TextModeData == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Add PcdConOutColumn and PcdConOutRow to the last second entry.
+  //
+  Count = sizeof (mGraphicsConsoleModeData) / sizeof (GRAPHICS_CONSOLE_MODE_DATA);
+  mGraphicsConsoleModeData[Count - 2].Columns = (UINTN) PcdGet32 (PcdConOutColumn);
+  mGraphicsConsoleModeData[Count - 2].Rows    = (UINTN) PcdGet32 (PcdConOutRow);
+
+  //
+  // Compute the maximum number of text Rows and Columns that this current graphics mode can support.
+  // To make graphics console work well, MaxColumns and MaxRows should not be zero.
+  //
+  MaxColumns = HorizontalResolution / EFI_GLYPH_WIDTH;
+  MaxRows    = VerticalResolution / EFI_GLYPH_HEIGHT;
+
+  //
+  // Add full screen mode to the last entry.
+  //
+  mGraphicsConsoleModeData[Count - 1].Columns = MaxColumns;
+  mGraphicsConsoleModeData[Count - 1].Rows    = MaxRows;
+
+  //
+  // Get defined mode buffer pointer.
+  //
+  ModeBuffer = mGraphicsConsoleModeData;
+
+  //
+  // Here we make sure that the final mode exposed does not include the duplicated modes,
+  // and does not include the invalid modes which exceed the max column and row.
+  // Reserve 2 modes for 80x25, 80x50 of graphics console.
+  //
+  NewModeBuffer = AllocateZeroPool (sizeof (GRAPHICS_CONSOLE_MODE_DATA) * (Count + 2));
+  ASSERT (NewModeBuffer != NULL);
+
+  //
+  // Mode 0 and mode 1 is for 80x25, 80x50 according to UEFI spec.
+  //
+  ValidCount = 0;  
+
+  if ((MaxColumns >= 80) && (MaxRows >= 25)) {
+    //
+    // 80x25 can be supported.
+    //
+    NewModeBuffer[ValidCount].Columns = 80;
+    NewModeBuffer[ValidCount].Rows    = 25;
+  } else {
+    //
+    // 80x25 cannot be supported, set PCD defined mode.
+    //
+    NewModeBuffer[ValidCount].Columns = (UINTN) PcdGet32 (PcdConOutColumn);
+    NewModeBuffer[ValidCount].Rows    = (UINTN) PcdGet32 (PcdConOutRow);
+  }  
+  NewModeBuffer[ValidCount].GopWidth      = HorizontalResolution;
+  NewModeBuffer[ValidCount].GopHeight     = VerticalResolution;
+  NewModeBuffer[ValidCount].GopModeNumber = GopModeNumber;
+  NewModeBuffer[ValidCount].DeltaX        = (HorizontalResolution - (NewModeBuffer[ValidCount].Columns * EFI_GLYPH_WIDTH)) >> 1;
+  NewModeBuffer[ValidCount].DeltaY        = (VerticalResolution - (NewModeBuffer[ValidCount].Rows * EFI_GLYPH_HEIGHT)) >> 1;      
+  ValidCount++;
+
+  if ((MaxColumns >= 80) && (MaxRows >= 50)) {
+    NewModeBuffer[ValidCount].Columns = 80;
+    NewModeBuffer[ValidCount].Rows    = 50;
+    NewModeBuffer[ValidCount].DeltaX  = (HorizontalResolution - (80 * EFI_GLYPH_WIDTH)) >> 1;
+    NewModeBuffer[ValidCount].DeltaY  = (VerticalResolution - (50 * EFI_GLYPH_HEIGHT)) >> 1;    
+  }
+  NewModeBuffer[ValidCount].GopWidth      = HorizontalResolution;
+  NewModeBuffer[ValidCount].GopHeight     = VerticalResolution;
+  NewModeBuffer[ValidCount].GopModeNumber = GopModeNumber;
+  ValidCount++;
+  
+  //
+  // Start from mode 2 to put the valid mode other than 80x25 and 80x50 in the output mode buffer.
+  //
+  for (Index = 0; Index < Count; Index++) {
+    if ((ModeBuffer[Index].Columns == 0) || (ModeBuffer[Index].Rows == 0) ||
+        (ModeBuffer[Index].Columns > MaxColumns) || (ModeBuffer[Index].Rows > MaxRows)) {
+      //
+      // Skip the pre-defined mode which is invalid or exceeds the max column and row.
+      //
+      continue;
+    }
+    for (ValidIndex = 0; ValidIndex < ValidCount; ValidIndex++) {
+      if ((ModeBuffer[Index].Columns == NewModeBuffer[ValidIndex].Columns) &&
+          (ModeBuffer[Index].Rows == NewModeBuffer[ValidIndex].Rows)) {
+        //
+        // Skip the duplicated mode.
+        //
+        break;
+      }
+    }
+    if (ValidIndex == ValidCount) {
+      NewModeBuffer[ValidCount].Columns       = ModeBuffer[Index].Columns;
+      NewModeBuffer[ValidCount].Rows          = ModeBuffer[Index].Rows;
+      NewModeBuffer[ValidCount].GopWidth      = HorizontalResolution;
+      NewModeBuffer[ValidCount].GopHeight     = VerticalResolution;
+      NewModeBuffer[ValidCount].GopModeNumber = GopModeNumber;
+      NewModeBuffer[ValidCount].DeltaX        = (HorizontalResolution - (NewModeBuffer[ValidCount].Columns * EFI_GLYPH_WIDTH)) >> 1;
+      NewModeBuffer[ValidCount].DeltaY        = (VerticalResolution - (NewModeBuffer[ValidCount].Rows * EFI_GLYPH_HEIGHT)) >> 1;
+      ValidCount++;
+    }
+  }
+ 
+  DEBUG_CODE (
+    for (Index = 0; Index < ValidCount; Index++) {
+      DEBUG ((EFI_D_INFO, "Graphics - Mode %d, Column = %d, Row = %d\n", 
+                           Index, NewModeBuffer[Index].Columns, NewModeBuffer[Index].Rows));  
+    }
+  );
+  
+  //
+  // Return valid mode count and mode information buffer.
+  //
+  *TextModeCount = ValidCount;
+  *TextModeData  = NewModeBuffer;
+  return EFI_SUCCESS;
+}
 
 /**
   Start this driver on Controller by opening Graphics Output protocol or
@@ -241,14 +398,10 @@ GraphicsConsoleControllerDriverStart (
   UINT32                               RefreshRate;
   UINT32                               ModeIndex;
   UINTN                                MaxMode;
-  UINTN                                MaxColumns;
-  UINTN                                MaxRows;
   UINT32                               ModeNumber;
   EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE    *Mode;
-  GRAPHICS_CONSOLE_MODE_DATA           *ModeData;
   UINTN                                SizeOfInfo;  
   EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *Info;
-  BOOLEAN                              TextModeFound;
   
   ModeNumber = 0;
 
@@ -399,80 +552,17 @@ GraphicsConsoleControllerDriverStart (
   }
 
   //
-  // Include the existing pre-defined 80x25, 80x50 and 100x31 
-  // in mGraphicsConsoleDevTemplate.
+  // Initialize the mode which GraphicsConsole supports.
   //
-  MaxMode = 3;
+  Status = InitializeGraphicsConsoleTextMode (
+             HorizontalResolution,
+             VerticalResolution,
+             ModeNumber,
+             &MaxMode,
+             &Private->ModeData
+             );
 
-  //
-  // Compute the maximum number of text Rows and Columns that this current graphics mode can support
-  //
-  MaxColumns = HorizontalResolution / EFI_GLYPH_WIDTH;
-  MaxRows    = VerticalResolution / EFI_GLYPH_HEIGHT;
-
-  //
-  // Add Mode #3 that uses the entire display for user-defined mode
-  //
-  Private->ModeData[MaxMode].Columns = MaxColumns;
-  Private->ModeData[MaxMode].Rows    = MaxRows;
-  MaxMode++;
-
-  //
-  // Add Mode #4 that uses the PCD values
-  //
-  Private->ModeData[MaxMode].Columns = (UINTN) PcdGet32 (PcdConOutColumn);
-  Private->ModeData[MaxMode].Rows    = (UINTN) PcdGet32 (PcdConOutRow);  
-  if ((Private->ModeData[MaxMode].Columns != 0) && (Private->ModeData[MaxMode].Rows != 0)) {
-    MaxMode++;
-  }
-
-  //
-  // Here we make sure that mode 0 is valid
-  //
-  if (MaxColumns < Private->ModeData[0].Columns ||
-      MaxRows < Private->ModeData[0].Rows) {
-    //
-    // 80x25 cannot be supported.
-    //
-    if ((Private->ModeData[4].Columns != 0) && (Private->ModeData[4].Rows != 0)) {
-    //
-    // Fallback to using the Mode 4 for mode 0 if PcdConOutColumn and PcdConOutRow
-    // are not 0. If the PCDs are also too large, then mode 0
-    // will be shrunk to fit as needed. If the PCDs are all 0,
-    // then mode 0 will be the entire display.
-    //
-      Private->ModeData[0].Columns = MIN (Private->ModeData[4].Columns, MaxColumns);
-      Private->ModeData[0].Rows    = MIN (Private->ModeData[4].Rows, MaxRows);
-    } else {
-      Private->ModeData[0].Columns = MaxColumns;
-      Private->ModeData[0].Rows    = MaxRows;
-    }
-  }
-  
-  TextModeFound = FALSE;
-  for (ModeIndex = 0; ModeIndex < GRAPHICS_MAX_MODE; ModeIndex++) {
-    ModeData = &Private->ModeData[ModeIndex];
-    ModeData->GopWidth      = HorizontalResolution;
-    ModeData->GopHeight     = VerticalResolution;
-    ModeData->GopModeNumber = ModeNumber;
-    if ((ModeData->Columns != 0) && (ModeData->Rows != 0) &&
-        (MaxColumns >= ModeData->Columns) && (MaxRows >= ModeData->Rows)) {
-      ModeData->DeltaX        = (HorizontalResolution - (ModeData->Columns * EFI_GLYPH_WIDTH)) >> 1;
-      ModeData->DeltaY        = (VerticalResolution - (ModeData->Rows * EFI_GLYPH_HEIGHT)) >> 1;
-      TextModeFound = TRUE;
-    } else {
-      ModeData->Columns       = 0;
-      ModeData->Rows          = 0;
-      ModeData->DeltaX        = 0;
-      ModeData->DeltaY        = 0;
-    }
-  }
-
-  //
-  // See if the resolution was too small to support any text modes
-  //
-  if (!TextModeFound) {
-    Status = EFI_UNSUPPORTED;
+  if (EFI_ERROR (Status)) {
     goto Error;
   }
 
@@ -526,6 +616,10 @@ Error:
 
     if (Private->LineBuffer != NULL) {
       FreePool (Private->LineBuffer);
+    }
+
+    if (Private->ModeData != NULL) {
+      FreePool (Private->ModeData);
     }
 
     //
@@ -610,6 +704,10 @@ GraphicsConsoleControllerDriverStop (
 
     if (Private->LineBuffer != NULL) {
       FreePool (Private->LineBuffer);
+    }
+
+    if (Private->ModeData != NULL) {
+      FreePool (Private->ModeData);
     }
 
     //
@@ -1162,7 +1260,7 @@ GraphicsConsoleConOutQueryMode (
   *Columns  = Private->ModeData[ModeNumber].Columns;
   *Rows     = Private->ModeData[ModeNumber].Rows;
 
-  if (*Columns <= 0 && *Rows <= 0) {
+  if (*Columns <= 0 || *Rows <= 0) {
     Status = EFI_UNSUPPORTED;
     goto Done;
 

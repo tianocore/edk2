@@ -205,7 +205,7 @@ TerminalConOutOutputString (
   //
   Mode = This->Mode;
 
-  if (Mode->Mode >= TERMINAL_MAX_MODE) {
+  if (Mode->Mode >= Mode->MaxMode) {
     return EFI_UNSUPPORTED;
   }
 
@@ -392,8 +392,6 @@ TerminalConOutTestString (
 
   It returns information for an available text mode
   that the terminal supports.
-  In this driver, we support text mode 80x25 (mode 0),
-  80x50 (mode 1), 100x31 (mode 2).
 
   @param This        Indicates the calling context.
   @param ModeNumber  The mode number to return information on.
@@ -402,7 +400,6 @@ TerminalConOutTestString (
 
   @retval EFI_SUCCESS       The requested mode information is returned.
   @retval EFI_UNSUPPORTED   The mode number is not valid.
-  @retval EFI_DEVICE_ERROR
 
 **/
 EFI_STATUS
@@ -414,35 +411,20 @@ TerminalConOutQueryMode (
   OUT UINTN                            *Rows
   )
 {
-  if (This->Mode->MaxMode > TERMINAL_MAX_MODE) {
-    return EFI_DEVICE_ERROR;
+  TERMINAL_DEV  *TerminalDevice;
+
+  if (ModeNumber >= (UINTN) This->Mode->MaxMode) {
+    return EFI_UNSUPPORTED;
   }
 
-  if (ModeNumber == 0) {
-    *Columns  = MODE0_COLUMN_COUNT;
-    *Rows     = MODE0_ROW_COUNT;
-    return EFI_SUCCESS;
-  } else if (ModeNumber == 1) {
-    *Columns  = MODE1_COLUMN_COUNT;
-    *Rows     = MODE1_ROW_COUNT;
-    return EFI_SUCCESS;
-  } else if (ModeNumber == 2) {
-    *Columns  = MODE2_COLUMN_COUNT;
-    *Rows     = MODE2_ROW_COUNT;
-    return EFI_SUCCESS;
-  } else if (ModeNumber == 3) {
-    *Columns  = (UINTN) PcdGet32 (PcdConOutColumn);
-    if (*Columns == 0) {
-      *Columns = MODE0_COLUMN_COUNT;
-    }
-    *Rows  = (UINTN) PcdGet32 (PcdConOutRow);
-    if (*Rows == 0) {
-      *Rows     = MODE0_ROW_COUNT;
-    }
-    return EFI_SUCCESS;
-  }
+  //
+  // Get Terminal device data structure pointer.
+  //
+  TerminalDevice = TERMINAL_CON_OUT_DEV_FROM_THIS (This);  
+  *Columns = TerminalDevice->TerminalConsoleModeData[ModeNumber].Columns;
+  *Rows    = TerminalDevice->TerminalConsoleModeData[ModeNumber].Rows;
 
-  return EFI_UNSUPPORTED;
+  return EFI_SUCCESS;
 }
 
 
@@ -476,7 +458,7 @@ TerminalConOutSetMode (
   //
   TerminalDevice = TERMINAL_CON_OUT_DEV_FROM_THIS (This);
 
-  if (ModeNumber >= TERMINAL_MAX_MODE) {
+  if (ModeNumber >= (UINTN) This->Mode->MaxMode) {
     return EFI_UNSUPPORTED;
   }
 

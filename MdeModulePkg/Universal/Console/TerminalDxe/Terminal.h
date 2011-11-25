@@ -61,6 +61,11 @@ typedef struct {
   EFI_INPUT_KEY Data[FIFO_MAX_NUMBER + 1];
 } EFI_KEY_FIFO;
 
+typedef struct {
+  UINTN   Columns;
+  UINTN   Rows;
+} TERMINAL_CONSOLE_MODE_DATA;
+
 #define KEYBOARD_TIMER_INTERVAL         200000  // 0.02s
 
 #define TERMINAL_DEV_SIGNATURE  SIGNATURE_32 ('t', 'm', 'n', 'l')
@@ -83,6 +88,7 @@ typedef struct {
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL      SimpleInput;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL     SimpleTextOutput;
   EFI_SIMPLE_TEXT_OUTPUT_MODE         SimpleTextOutputMode;
+  TERMINAL_CONSOLE_MODE_DATA          *TerminalConsoleModeData;
   UINTN                               SerialInTimeOut;
   RAW_DATA_FIFO                       *RawFiFo;
   UNICODE_FIFO                        *UnicodeFiFo;
@@ -136,21 +142,6 @@ typedef union {
 #define BCAP                      0x42
 #define CCAP                      0x43
 #define DCAP                      0x44
-
-#define MODE0_COLUMN_COUNT        80
-#define MODE0_ROW_COUNT           25
-
-#define MODE1_COLUMN_COUNT        80
-#define MODE1_ROW_COUNT           50
-
-#define MODE2_COLUMN_COUNT        100
-#define MODE2_ROW_COUNT           31
-
-//
-// MODE3 is defined by PcdConOutColumn & PcdConOutRow
-//
-
-#define TERMINAL_MAX_MODE 4
 
 #define BACKSPACE                 8
 #define ESC                       27

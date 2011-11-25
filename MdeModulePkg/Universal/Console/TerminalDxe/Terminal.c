@@ -68,6 +68,7 @@ TERMINAL_DEV  mTerminalDevTemplate = {
     0,                                           // CursorRow
     TRUE                                         // CursorVisible
   },
+  NULL, // TerminalConsoleModeData
   0,  // SerialInTimeOut
 
   NULL, // RawFifo
@@ -92,6 +93,15 @@ TERMINAL_DEV  mTerminalDevTemplate = {
     NULL,
     NULL,
   }
+};
+
+TERMINAL_CONSOLE_MODE_DATA mTerminalConsoleModeData[] = {
+  {100, 31},
+  //
+  // New modes can be added here.
+  // The last entry is specific for PcdConOutRow x PcdConOutColumn.
+  //
+  {0, 0}
 };
 
 /**
@@ -398,6 +408,109 @@ TerminalFreeNotifyList (
   return EFI_SUCCESS;
 }
 
+/**
+  Initialize all the text modes which the terminal console supports.
+
+  It returns information for available text modes that the terminal can support.
+
+  @param[out] TextModeCount      The total number of text modes that terminal console supports.
+  @param[out] TextModeData       The buffer to the text modes column and row information.
+                                 Caller is responsible to free it when it's non-NULL.
+
+  @retval EFI_SUCCESS            The supporting mode information is returned.
+  @retval EFI_INVALID_PARAMETER  The parameters are invalid.
+
+**/
+EFI_STATUS
+InitializeTerminalConsoleTextMode (
+  OUT UINTN                         *TextModeCount,
+  OUT TERMINAL_CONSOLE_MODE_DATA    **TextModeData
+  )
+{
+  UINTN                       Index;
+  UINTN                       Count;
+  TERMINAL_CONSOLE_MODE_DATA  *ModeBuffer;
+  TERMINAL_CONSOLE_MODE_DATA  *NewModeBuffer;
+  UINTN                       ValidCount;
+  UINTN                       ValidIndex;
+  
+  if ((TextModeCount == NULL) || (TextModeData == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  //
+  // Assign the last entry as PcdConOutColumn and PcdConOutRow defined.
+  //
+  Count = sizeof (mTerminalConsoleModeData) / sizeof (TERMINAL_CONSOLE_MODE_DATA);
+  mTerminalConsoleModeData[Count - 1].Columns = (UINTN) PcdGet32 (PcdConOutColumn);
+  mTerminalConsoleModeData[Count - 1].Rows    = (UINTN) PcdGet32 (PcdConOutRow);;
+  
+  //
+  // Get defined mode buffer pointer.
+  //
+  ModeBuffer = mTerminalConsoleModeData;
+    
+  //
+  // Here we make sure that the final mode exposed does not include the duplicated modes,
+  // and does not include the invalid modes which exceed the max column and row.
+  // Reserve 2 modes for 80x25, 80x50 of terminal console.
+  //
+  NewModeBuffer = AllocateZeroPool (sizeof (TERMINAL_CONSOLE_MODE_DATA) * (Count + 2));
+  ASSERT (NewModeBuffer != NULL);
+
+  //
+  // Mode 0 and mode 1 is for 80x25, 80x50 according to UEFI spec.
+  //
+  ValidCount = 0;  
+
+  NewModeBuffer[ValidCount].Columns = 80;
+  NewModeBuffer[ValidCount].Rows    = 25;
+  ValidCount++;
+
+  NewModeBuffer[ValidCount].Columns = 80;
+  NewModeBuffer[ValidCount].Rows    = 50;
+  ValidCount++;
+  
+  //
+  // Start from mode 2 to put the valid mode other than 80x25 and 80x50 in the output mode buffer.
+  //
+  for (Index = 0; Index < Count; Index++) {
+    if ((ModeBuffer[Index].Columns == 0) || (ModeBuffer[Index].Rows == 0)) {
+      //
+      // Skip the pre-defined mode which is invalid.
+      //
+      continue;
+    }
+    for (ValidIndex = 0; ValidIndex < ValidCount; ValidIndex++) {
+      if ((ModeBuffer[Index].Columns == NewModeBuffer[ValidIndex].Columns) &&
+          (ModeBuffer[Index].Rows == NewModeBuffer[ValidIndex].Rows)) {
+        //
+        // Skip the duplicated mode.
+        //
+        break;
+      }
+    }
+    if (ValidIndex == ValidCount) {
+      NewModeBuffer[ValidCount].Columns = ModeBuffer[Index].Columns;
+      NewModeBuffer[ValidCount].Rows    = ModeBuffer[Index].Rows;
+      ValidCount++;
+    }
+  }
+ 
+  DEBUG_CODE (
+    for (Index = 0; Index < ValidCount; Index++) {
+      DEBUG ((EFI_D_INFO, "Terminal - Mode %d, Column = %d, Row = %d\n", 
+                           Index, NewModeBuffer[Index].Columns, NewModeBuffer[Index].Rows));  
+    }
+  );
+  
+  //
+  // Return valid mode count and mode information buffer.
+  //
+  *TextModeCount = ValidCount;
+  *TextModeData  = NewModeBuffer;
+  return EFI_SUCCESS;
+}
 
 /**
   Start this driver on Controller by opening a Serial IO protocol,
@@ -444,6 +557,7 @@ TerminalDriverBindingStart (
   BOOLEAN                             SimTxtInInstalled;
   BOOLEAN                             SimTxtOutInstalled;
   BOOLEAN                             FirstEnter;
+  UINTN                               ModeCount;
 
   TerminalDevice     = NULL;
   DefaultNode        = NULL;
@@ -724,8 +838,13 @@ TerminalDriverBindingStart (
                          sizeof (mTerminalDevTemplate.SimpleTextOutput)
                          );
     SimpleTextOutput->Mode = &TerminalDevice->SimpleTextOutputMode;
-
-    TerminalDevice->SimpleTextOutputMode.MaxMode = TERMINAL_MAX_MODE;
+    
+    Status = InitializeTerminalConsoleTextMode (&ModeCount, &TerminalDevice->TerminalConsoleModeData);
+    if (EFI_ERROR (Status)) {
+      goto ReportError;
+    }
+    TerminalDevice->SimpleTextOutputMode.MaxMode = (INT32) ModeCount;
+    
     //
     // For terminal devices, cursor is always visible
     //
@@ -1102,6 +1221,10 @@ Error:
         FreePool (TerminalDevice->DevicePath);
       }
 
+      if (TerminalDevice->TerminalConsoleModeData != NULL) {
+        FreePool (TerminalDevice->TerminalConsoleModeData);
+      }
+
       FreePool (TerminalDevice);
     }
   }
@@ -1273,6 +1396,9 @@ TerminalDriverBindingStop (
         gBS->CloseEvent (TerminalDevice->SimpleInputEx.WaitForKeyEx);
         TerminalFreeNotifyList (&TerminalDevice->NotifyList);
         FreePool (TerminalDevice->DevicePath);
+        if (TerminalDevice->TerminalConsoleModeData != NULL) {
+          FreePool (TerminalDevice->TerminalConsoleModeData);
+        }
         FreePool (TerminalDevice);
       }
     }

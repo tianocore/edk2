@@ -63,15 +63,13 @@ typedef struct {
   UINT32  GopModeNumber;
 } GRAPHICS_CONSOLE_MODE_DATA;
 
-#define GRAPHICS_MAX_MODE 5
-
 typedef struct {
   UINTN                            Signature;
   EFI_GRAPHICS_OUTPUT_PROTOCOL     *GraphicsOutput;
   EFI_UGA_DRAW_PROTOCOL            *UgaDraw;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  SimpleTextOutput;
   EFI_SIMPLE_TEXT_OUTPUT_MODE      SimpleTextOutputMode;
-  GRAPHICS_CONSOLE_MODE_DATA       ModeData[GRAPHICS_MAX_MODE];
+  GRAPHICS_CONSOLE_MODE_DATA       *ModeData;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *LineBuffer;
 } GRAPHICS_CONSOLE_DEV;
 
