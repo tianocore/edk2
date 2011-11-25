@@ -33,6 +33,48 @@ EFI_DISK_INFO_PROTOCOL gScsiDiskInfoProtocolTemplate = {
 };
 
 /**
+  Allocates an aligned buffer for SCSI disk.
+
+  This function allocates an aligned buffer for the SCSI disk to perform
+  SCSI IO operations. The alignment requirement is from SCSI IO interface.
+
+  @param  ScsiDiskDevice    The SCSI disk involved for the operation.
+  @param  BufferSize        The request buffer size.
+
+  @return A pointer to the aligned buffer or NULL if the allocation fails.
+
+**/
+VOID *
+AllocateAlignedBuffer (
+  IN SCSI_DISK_DEV            *ScsiDiskDevice,
+  IN UINTN                    BufferSize
+  )
+{
+  return AllocateAlignedPages (EFI_SIZE_TO_PAGES (BufferSize), ScsiDiskDevice->ScsiIo->IoAlign);
+}
+
+/**
+  Frees an aligned buffer for SCSI disk.
+
+  This function frees an aligned buffer for the SCSI disk to perform
+  SCSI IO operations.
+
+  @param  Buffer            The aligned buffer to be freed.
+  @param  BufferSize        The request buffer size.
+
+**/
+VOID
+FreeAlignedBuffer (
+  IN VOID                     *Buffer,
+  IN UINTN                    BufferSize
+  )
+{
+  if (Buffer != NULL) {
+    FreeAlignedPages (Buffer, EFI_SIZE_TO_PAGES (BufferSize));
+  }
+}
+
+/**
   The user Entry Point for module ScsiDisk.
 
   The user code starts with this function.
@@ -902,8 +944,8 @@ ScsiDiskInquiryDevice (
   EFI_STATUS                            Status;
   UINT8                                 MaxRetry;
   UINT8                                 Index;
-  EFI_SCSI_SUPPORTED_VPD_PAGES_VPD_PAGE SupportedVpdPages;
-  EFI_SCSI_BLOCK_LIMITS_VPD_PAGE        BlockLimits;
+  EFI_SCSI_SUPPORTED_VPD_PAGES_VPD_PAGE *SupportedVpdPages;
+  EFI_SCSI_BLOCK_LIMITS_VPD_PAGE        *BlockLimits;
   UINTN                                 PageLength;
 
   InquiryDataLength = sizeof (EFI_SCSI_INQUIRY_DATA);
@@ -930,8 +972,13 @@ ScsiDiskInquiryDevice (
       //
       // Check whether the device supports Block Limits VPD page (0xB0)
       //
-      ZeroMem (&SupportedVpdPages, sizeof (SupportedVpdPages));
-      InquiryDataLength = sizeof (SupportedVpdPages);
+      SupportedVpdPages = AllocateAlignedBuffer (ScsiDiskDevice, sizeof (EFI_SCSI_SUPPORTED_VPD_PAGES_VPD_PAGE));
+      if (SupportedVpdPages == NULL) {
+        *NeedRetry = FALSE;
+        return EFI_DEVICE_ERROR;
+      }
+      ZeroMem (SupportedVpdPages, sizeof (EFI_SCSI_SUPPORTED_VPD_PAGES_VPD_PAGE));
+      InquiryDataLength = sizeof (EFI_SCSI_SUPPORTED_VPD_PAGES_VPD_PAGE);
       SenseDataLength   = 0;
       Status = ScsiInquiryCommandEx (
                  ScsiDiskDevice->ScsiIo,
@@ -940,16 +987,16 @@ ScsiDiskInquiryDevice (
                  &SenseDataLength,
                  &HostAdapterStatus,
                  &TargetStatus,
-                 (VOID *) &SupportedVpdPages,
+                 (VOID *) SupportedVpdPages,
                  &InquiryDataLength,
                  TRUE,
                  EFI_SCSI_PAGE_CODE_SUPPORTED_VPD
                  );
       if (!EFI_ERROR (Status)) {
-        PageLength = (SupportedVpdPages.PageLength2 << 8)
-                   |  SupportedVpdPages.PageLength1;
+        PageLength = (SupportedVpdPages->PageLength2 << 8)
+                   |  SupportedVpdPages->PageLength1;
         for (Index = 0; Index < PageLength; Index++) {
-          if (SupportedVpdPages.SupportedVpdPageList[Index] == EFI_SCSI_PAGE_CODE_BLOCK_LIMITS_VPD) {
+          if (SupportedVpdPages->SupportedVpdPageList[Index] == EFI_SCSI_PAGE_CODE_BLOCK_LIMITS_VPD) {
             break;
           }
         }
@@ -958,8 +1005,14 @@ ScsiDiskInquiryDevice (
         // Query the Block Limits VPD page
         //
         if (Index < PageLength) {
-          ZeroMem (&BlockLimits, sizeof (BlockLimits));
-          InquiryDataLength = sizeof (BlockLimits);
+          BlockLimits = AllocateAlignedBuffer (ScsiDiskDevice, sizeof (EFI_SCSI_BLOCK_LIMITS_VPD_PAGE));
+          if (BlockLimits == NULL) {
+            FreeAlignedBuffer (SupportedVpdPages, sizeof (EFI_SCSI_SUPPORTED_VPD_PAGES_VPD_PAGE));
+            *NeedRetry = FALSE;
+            return EFI_DEVICE_ERROR;
+          }
+          ZeroMem (BlockLimits, sizeof (EFI_SCSI_BLOCK_LIMITS_VPD_PAGE));
+          InquiryDataLength = sizeof (EFI_SCSI_BLOCK_LIMITS_VPD_PAGE);
           SenseDataLength   = 0;
           Status = ScsiInquiryCommandEx (
                      ScsiDiskDevice->ScsiIo,
@@ -968,18 +1021,22 @@ ScsiDiskInquiryDevice (
                      &SenseDataLength,
                      &HostAdapterStatus,
                      &TargetStatus,
-                     (VOID *) &BlockLimits,
+                     (VOID *) BlockLimits,
                      &InquiryDataLength,
                      TRUE,
                      EFI_SCSI_PAGE_CODE_BLOCK_LIMITS_VPD
                      );
           if (!EFI_ERROR (Status)) {
             ScsiDiskDevice->BlkIo.Media->OptimalTransferLengthGranularity = 
-              (BlockLimits.OptimalTransferLengthGranularity2 << 8) |
-               BlockLimits.OptimalTransferLengthGranularity1;
+              (BlockLimits->OptimalTransferLengthGranularity2 << 8) |
+               BlockLimits->OptimalTransferLengthGranularity1;
           }
+
+          FreeAlignedBuffer (BlockLimits, sizeof (EFI_SCSI_BLOCK_LIMITS_VPD_PAGE));
         }
       }
+
+      FreeAlignedBuffer (SupportedVpdPages, sizeof (EFI_SCSI_SUPPORTED_VPD_PAGES_VPD_PAGE));
     }
   }
 
@@ -1285,15 +1342,26 @@ ScsiDiskReadCapacity (
   UINT8                         SenseDataLength;
   UINT32                        DataLength10;
   UINT32                        DataLength16;
-  EFI_SCSI_DISK_CAPACITY_DATA   CapacityData10;
-  EFI_SCSI_DISK_CAPACITY_DATA16 CapacityData16;
+  EFI_SCSI_DISK_CAPACITY_DATA   *CapacityData10;
+  EFI_SCSI_DISK_CAPACITY_DATA16 *CapacityData16;
 
+  CapacityData10 = AllocateAlignedBuffer (ScsiDiskDevice, sizeof (EFI_SCSI_DISK_CAPACITY_DATA));
+  if (CapacityData10 == NULL) {
+    *NeedRetry = FALSE;
+    return EFI_DEVICE_ERROR;
+  }
+  CapacityData16 = AllocateAlignedBuffer (ScsiDiskDevice, sizeof (EFI_SCSI_DISK_CAPACITY_DATA16));
+  if (CapacityData16 == NULL) {
+    FreeAlignedBuffer (CapacityData10, sizeof (EFI_SCSI_DISK_CAPACITY_DATA));
+    *NeedRetry = FALSE;
+    return EFI_DEVICE_ERROR;
+  }
 
   SenseDataLength       = 0;
   DataLength10          = sizeof (EFI_SCSI_DISK_CAPACITY_DATA);
   DataLength16          = sizeof (EFI_SCSI_DISK_CAPACITY_DATA16);
-  ZeroMem (&CapacityData10, sizeof (EFI_SCSI_DISK_CAPACITY_DATA));
-  ZeroMem (&CapacityData16, sizeof (EFI_SCSI_DISK_CAPACITY_DATA16));
+  ZeroMem (CapacityData10, sizeof (EFI_SCSI_DISK_CAPACITY_DATA));
+  ZeroMem (CapacityData16, sizeof (EFI_SCSI_DISK_CAPACITY_DATA16));
 
   *NumberOfSenseKeys  = 0;
   *NeedRetry          = FALSE;
@@ -1309,14 +1377,14 @@ ScsiDiskReadCapacity (
                     &SenseDataLength,
                     &HostAdapterStatus,
                     &TargetStatus,
-                    (VOID *) &CapacityData10,
+                    (VOID *) CapacityData10,
                     &DataLength10,
                     FALSE
                     );
 
   ScsiDiskDevice->Cdb16Byte = FALSE;
-  if ((!EFI_ERROR (CommandStatus)) && (CapacityData10.LastLba3 == 0xff) && (CapacityData10.LastLba2 == 0xff) &&
-      (CapacityData10.LastLba1 == 0xff) && (CapacityData10.LastLba0 == 0xff)) {
+  if ((!EFI_ERROR (CommandStatus)) && (CapacityData10->LastLba3 == 0xff) && (CapacityData10->LastLba2 == 0xff) &&
+      (CapacityData10->LastLba1 == 0xff) && (CapacityData10->LastLba0 == 0xff)) {
     //
     // use Read Capacity (16), Read (16) and Write (16) next when hard disk size > 2TB
     //
@@ -1332,7 +1400,7 @@ ScsiDiskReadCapacity (
                       &SenseDataLength,
                       &HostAdapterStatus,
                       &TargetStatus,
-                      (VOID *) &CapacityData16,
+                      (VOID *) CapacityData16,
                       &DataLength16,
                       FALSE
                       );
@@ -1342,17 +1410,23 @@ ScsiDiskReadCapacity (
     // no need to check HostAdapterStatus and TargetStatus
     //
    if (CommandStatus == EFI_SUCCESS) {
-     GetMediaInfo (ScsiDiskDevice, &CapacityData10,&CapacityData16);
+     GetMediaInfo (ScsiDiskDevice, CapacityData10, CapacityData16);
+     FreeAlignedBuffer (CapacityData10, sizeof (EFI_SCSI_DISK_CAPACITY_DATA));
+     FreeAlignedBuffer (CapacityData16, sizeof (EFI_SCSI_DISK_CAPACITY_DATA16));
      return EFI_SUCCESS;
- 
-   } else if (CommandStatus == EFI_NOT_READY) {
+   }
+
+   FreeAlignedBuffer (CapacityData10, sizeof (EFI_SCSI_DISK_CAPACITY_DATA));
+   FreeAlignedBuffer (CapacityData16, sizeof (EFI_SCSI_DISK_CAPACITY_DATA16));
+
+   if (CommandStatus == EFI_NOT_READY) {
      *NeedRetry = TRUE;
      return EFI_DEVICE_ERROR;
- 
    } else if ((CommandStatus == EFI_INVALID_PARAMETER) || (CommandStatus == EFI_UNSUPPORTED)) {
      *NeedRetry = FALSE;
      return EFI_DEVICE_ERROR;
    }
+
    //
    // go ahead to check HostAdapterStatus and TargetStatus
    // (EFI_TIMEOUT, EFI_DEVICE_ERROR, EFI_WARN_BUFFER_TOO_SMALL)

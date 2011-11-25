@@ -129,7 +129,7 @@ FreeAlignedBuffer (
   )
 {
   if (Buffer != NULL) {
-    FreePages (Buffer, EFI_SIZE_TO_PAGES (BufferSize));
+    FreeAlignedPages (Buffer, EFI_SIZE_TO_PAGES (BufferSize));
   }
 }
 

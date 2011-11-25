@@ -2,7 +2,7 @@
   SCSI Bus driver that layers on every SCSI Pass Thru and
   Extended SCSI Pass Thru protocol in the system.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -70,6 +70,49 @@ NotifyFunction (
   IN  EFI_EVENT  Event,
   IN  VOID       *Context
   );
+
+/**
+  Allocates an aligned buffer for SCSI device.
+
+  This function allocates an aligned buffer for the SCSI device to perform
+  SCSI pass through operations. The alignment requirement is from SCSI pass
+  through interface.
+
+  @param  ScsiIoDevice      The SCSI child device involved for the operation.
+  @param  BufferSize        The request buffer size.
+
+  @return A pointer to the aligned buffer or NULL if the allocation fails.
+
+**/
+VOID *
+AllocateAlignedBuffer (
+  IN SCSI_IO_DEV              *ScsiIoDevice,
+  IN UINTN                    BufferSize
+  )
+{
+  return AllocateAlignedPages (EFI_SIZE_TO_PAGES (BufferSize), ScsiIoDevice->ScsiIo.IoAlign);
+}
+
+/**
+  Frees an aligned buffer for SCSI device.
+
+  This function frees an aligned buffer for the SCSI device to perform
+  SCSI pass through operations.
+
+  @param  Buffer            The aligned buffer to be freed.
+  @param  BufferSize        The request buffer size.
+
+**/
+VOID
+FreeAlignedBuffer (
+  IN VOID                     *Buffer,
+  IN UINTN                    BufferSize
+  )
+{
+  if (Buffer != NULL) {
+    FreeAlignedPages (Buffer, EFI_SIZE_TO_PAGES (BufferSize));
+  }
+}
 
 /**
   The user Entry Point for module ScsiBus. The user code starts with this function.
@@ -1178,30 +1221,37 @@ DiscoverScsiDevice (
   UINT8                 SenseDataLength;
   UINT8                 HostAdapterStatus;
   UINT8                 TargetStatus;
-  EFI_SCSI_SENSE_DATA   SenseData;
-  EFI_SCSI_INQUIRY_DATA InquiryData;
+  EFI_SCSI_INQUIRY_DATA *InquiryData;
   UINT8                 MaxRetry;
   UINT8                 Index;
+  BOOLEAN               ScsiDeviceFound;
 
   HostAdapterStatus = 0;
   TargetStatus      = 0;
+
+  InquiryData = AllocateAlignedBuffer (ScsiIoDevice, sizeof (EFI_SCSI_INQUIRY_DATA));
+  if (InquiryData == NULL) {
+    ScsiDeviceFound = FALSE;
+    goto Done;
+  }
+
   //
   // Using Inquiry command to scan for the device
   //
   InquiryDataLength = sizeof (EFI_SCSI_INQUIRY_DATA);
-  SenseDataLength   = (UINT8) sizeof (EFI_SCSI_SENSE_DATA);
-  ZeroMem (&InquiryData, InquiryDataLength);
+  SenseDataLength   = 0;
+  ZeroMem (InquiryData, InquiryDataLength);
 
   MaxRetry = 2;
   for (Index = 0; Index < MaxRetry; Index++) {
     Status = ScsiInquiryCommand (
               &ScsiIoDevice->ScsiIo,
               EFI_TIMER_PERIOD_SECONDS (1),
-              (VOID *) &SenseData,
+              NULL,
               &SenseDataLength,
               &HostAdapterStatus,
               &TargetStatus,
-              (VOID *) &InquiryData,
+              (VOID *) InquiryData,
               &InquiryDataLength,
               FALSE
               );
@@ -1210,47 +1260,57 @@ DiscoverScsiDevice (
     } else if ((Status == EFI_BAD_BUFFER_SIZE) || 
                (Status == EFI_INVALID_PARAMETER) ||
                (Status == EFI_UNSUPPORTED)) {
-      return FALSE;
+      ScsiDeviceFound = FALSE;
+      goto Done;
     }
   }
 
   if (Index == MaxRetry) {
-    return FALSE;
+    ScsiDeviceFound = FALSE;
+    goto Done;
   }
   
   //
   // Retrieved inquiry data successfully
   //
-  if ((InquiryData.Peripheral_Qualifier != 0) &&
-      (InquiryData.Peripheral_Qualifier != 3)) {
-    return FALSE;
+  if ((InquiryData->Peripheral_Qualifier != 0) &&
+      (InquiryData->Peripheral_Qualifier != 3)) {
+    ScsiDeviceFound = FALSE;
+    goto Done;
   }
 
-  if (InquiryData.Peripheral_Qualifier == 3) {
-    if (InquiryData.Peripheral_Type != 0x1f) {
-      return FALSE;
+  if (InquiryData->Peripheral_Qualifier == 3) {
+    if (InquiryData->Peripheral_Type != 0x1f) {
+      ScsiDeviceFound = FALSE;
+      goto Done;
     }
   }
 
-  if (0x1e >= InquiryData.Peripheral_Type && InquiryData.Peripheral_Type >= 0xa) {
-    return FALSE;
+  if (0x1e >= InquiryData->Peripheral_Type && InquiryData->Peripheral_Type >= 0xa) {
+    ScsiDeviceFound = FALSE;
+    goto Done;
   }
 
   //
   // valid device type and peripheral qualifier combination.
   //
-  ScsiIoDevice->ScsiDeviceType  = InquiryData.Peripheral_Type;
-  ScsiIoDevice->RemovableDevice = InquiryData.Rmb;
-  if (InquiryData.Version == 0) {
+  ScsiIoDevice->ScsiDeviceType  = InquiryData->Peripheral_Type;
+  ScsiIoDevice->RemovableDevice = InquiryData->Rmb;
+  if (InquiryData->Version == 0) {
     ScsiIoDevice->ScsiVersion = 0;
   } else {
     //
     // ANSI-approved version
     //
-    ScsiIoDevice->ScsiVersion = (UINT8) (InquiryData.Version & 0x07);
+    ScsiIoDevice->ScsiVersion = (UINT8) (InquiryData->Version & 0x07);
   }
 
-  return TRUE;
+  ScsiDeviceFound = TRUE;
+
+Done:
+  FreeAlignedBuffer (InquiryData, sizeof (EFI_SCSI_INQUIRY_DATA));
+
+  return ScsiDeviceFound;
 }
 
 
