@@ -108,7 +108,7 @@ ProcessCapsuleImage (
       //
       // Allocate new aligned buffer to store FvImage.
       //
-      ProcessedFvImage = (EFI_FIRMWARE_VOLUME_HEADER *) AllocateAlignedPages ((UINTN) EFI_SIZE_TO_PAGES (FvImage->FvLength), (UINTN) FvAlignment);
+      ProcessedFvImage = (EFI_FIRMWARE_VOLUME_HEADER *) AllocateAlignedPages ((UINTN) EFI_SIZE_TO_PAGES ((UINTN) FvImage->FvLength), (UINTN) FvAlignment);
       if (ProcessedFvImage == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
         break;
