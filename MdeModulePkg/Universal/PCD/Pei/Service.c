@@ -2,7 +2,7 @@
   The driver internal functions are implmented here.
   They build Pei PCD database, and provide access service to PCD database.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -386,7 +386,11 @@ SetWorker (
   LocalTokenNumber = PeiPcdDb->Init.LocalTokenNumberTable[TokenNumber];
 
   if (PtrType) {
-    if (*Size > PeiPcdGetSize (TokenNumber + 1)) {
+    //
+    // Get MaxSize first, then check new size with max buffer size.
+    //
+    GetPtrTypeSize (TokenNumber, &MaxSize, PeiPcdDb);
+    if (*Size > MaxSize) {
       return EFI_INVALID_PARAMETER;
     }
   } else {
@@ -406,7 +410,7 @@ SetWorker (
 
   if ((LocalTokenNumber & PCD_TYPE_SKU_ENABLED) == PCD_TYPE_SKU_ENABLED) {
     if (PtrType) {
-      MaxSize = GetPtrTypeSize (TokenNumber, &MaxSize, PeiPcdDb);
+      GetPtrTypeSize (TokenNumber, &MaxSize, PeiPcdDb);
     } else {
       MaxSize = *Size;
     }

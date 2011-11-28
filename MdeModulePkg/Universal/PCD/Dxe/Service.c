@@ -1,7 +1,7 @@
 /** @file
     Help functions used by PCD DXE driver.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -741,7 +741,11 @@ SetWorker (
   ASSERT (TokenNumber + 1 < PCD_TOTAL_TOKEN_NUMBER + 1);
 
   if (PtrType) {
-    if (*Size > DxePcdGetSize (TokenNumber + 1)) {
+    //
+    // Get MaxSize first, then check new size with max buffer size.
+    //
+    GetPtrTypeSize (TokenNumber, &MaxSize);
+    if (*Size > MaxSize) {
       return EFI_INVALID_PARAMETER;
     }
   } else {
