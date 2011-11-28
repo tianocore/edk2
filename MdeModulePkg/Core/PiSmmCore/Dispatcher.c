@@ -448,7 +448,7 @@ SmmLoadImage (
        //
        // allocate the memory to load the SMM driver
        //
-       PageCount = (UINTN)EFI_SIZE_TO_PAGES(ImageContext.ImageSize + ImageContext.SectionAlignment);
+       PageCount = (UINTN)EFI_SIZE_TO_PAGES((UINTN)ImageContext.ImageSize + ImageContext.SectionAlignment);
        DstBuffer = (UINTN)(-1);
      
        Status = SmmAllocatePages (
@@ -466,7 +466,7 @@ SmmLoadImage (
       ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)DstBuffer;
     }
   } else {
-     PageCount = (UINTN)EFI_SIZE_TO_PAGES(ImageContext.ImageSize + ImageContext.SectionAlignment);
+     PageCount = (UINTN)EFI_SIZE_TO_PAGES((UINTN)ImageContext.ImageSize + ImageContext.SectionAlignment);
      DstBuffer = (UINTN)(-1);
      
      Status = SmmAllocatePages (

@@ -42,8 +42,11 @@
 
 #define MAX_IO_ADDRESS 0xFFFF
 
+//
+// Macro to convert a UEFI PCI address to a PCI Library PCI address
+//
 #define PCI_ADDRESS_ENCODE(A) (UINTN)PCI_LIB_ADDRESS( \
-        (((A)& 0xff000000) >> 24), (((A) &0x00ff0000) >> 16), (((A) & 0xff00) >> 8), ((RShiftU64 ((A), 32) & 0xfff) | ((A)& 0xff)) \
+        ((((UINTN)(A))& 0xff000000) >> 24), ((((UINTN)(A)) &0x00ff0000) >> 16), ((((UINTN)(A)) & 0xff00) >> 8), ((RShiftU64 ((A), 32) & 0xfff) | ((A)& 0xff)) \
         )
         
 

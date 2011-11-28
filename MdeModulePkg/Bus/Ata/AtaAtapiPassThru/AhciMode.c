@@ -503,12 +503,12 @@ AhciBuildCommand (
   IN     UINT8                      AtapiCommandLength,
   IN     UINT8                      CommandSlotNumber,
   IN OUT VOID                       *DataPhysicalAddr,
-  IN     UINT64                     DataLength
+  IN     UINT32                     DataLength
   )
 {
   UINT64     BaseAddr;
-  UINT64     PrdtNumber;
-  UINT64     PrdtIndex;
+  UINT32     PrdtNumber;
+  UINT32     PrdtIndex;
   UINTN      RemainedData;
   UINTN      MemAddr;
   DATA_64    Data64;
@@ -557,7 +557,7 @@ AhciBuildCommand (
 
   RemainedData = (UINTN) DataLength;
   MemAddr      = (UINTN) DataPhysicalAddr;
-  CommandList->AhciCmdPrdtl = (UINT32)PrdtNumber;
+  CommandList->AhciCmdPrdtl = PrdtNumber;
 
   for (PrdtIndex = 0; PrdtIndex < PrdtNumber; PrdtIndex++) {
     if (RemainedData < EFI_AHCI_MAX_DATA_PER_PRDT) {

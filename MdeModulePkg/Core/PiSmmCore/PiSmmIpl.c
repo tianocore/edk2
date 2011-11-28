@@ -913,7 +913,7 @@ ExecuteSmmCoreFromSmram (
       // Allocate memory for the image being loaded from the EFI_SRAM_DESCRIPTOR 
       // specified by SmramRange
       //
-      PageCount = (UINTN)EFI_SIZE_TO_PAGES(ImageContext.ImageSize + ImageContext.SectionAlignment);
+      PageCount = (UINTN)EFI_SIZE_TO_PAGES((UINTN)ImageContext.ImageSize + ImageContext.SectionAlignment);
 
       ASSERT ((SmramRange->PhysicalSize & EFI_PAGE_MASK) == 0);
       ASSERT (SmramRange->PhysicalSize > EFI_PAGES_TO_SIZE (PageCount));
@@ -931,7 +931,7 @@ ExecuteSmmCoreFromSmram (
     // Allocate memory for the image being loaded from the EFI_SRAM_DESCRIPTOR 
     // specified by SmramRange
     //
-    PageCount = (UINTN)EFI_SIZE_TO_PAGES(ImageContext.ImageSize + ImageContext.SectionAlignment);
+    PageCount = (UINTN)EFI_SIZE_TO_PAGES((UINTN)ImageContext.ImageSize + ImageContext.SectionAlignment);
 
     ASSERT ((SmramRange->PhysicalSize & EFI_PAGE_MASK) == 0);
     ASSERT (SmramRange->PhysicalSize > EFI_PAGES_TO_SIZE (PageCount));

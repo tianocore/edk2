@@ -781,7 +781,7 @@ XhcFreeEventRing (
   //
   for (Index = 0; Index < ERST_NUMBER; Index++) {
     EventRingPtr = TablePtr + Index;
-    RingBuf      = (VOID *)(UINTN)(EventRingPtr->PtrLo | ((UINT64)EventRingPtr->PtrHi << 32));
+    RingBuf      = (VOID *)(UINTN)(EventRingPtr->PtrLo | LShiftU64 ((UINT64)EventRingPtr->PtrHi, 32));
 
     if(RingBuf != NULL) {
       FreePages (RingBuf, EFI_SIZE_TO_PAGES (sizeof (TRB_TEMPLATE) * EVENT_RING_TRB_NUMBER));
@@ -922,7 +922,7 @@ XhcCheckUrbResult (
       continue;
     }
 
-    TRBPtr = (TRB_TEMPLATE *)(UINTN)(EvtTrb->TRBPtrLo | (UINT64) EvtTrb->TRBPtrHi << 32);
+    TRBPtr = (TRB_TEMPLATE *)(UINTN)(EvtTrb->TRBPtrLo | LShiftU64 ((UINT64) EvtTrb->TRBPtrHi, 32));
     if (IsTransferRingTrb (Urb->Ring, TRBPtr)) {
       switch (EvtTrb->Completecode) {
         case TRB_COMPLETION_STALL_ERROR:
@@ -1537,7 +1537,7 @@ XhcSyncTrsRing (
       // Toggle PCS maintained by software
       //
       TrsRing->RingPCS = (TrsRing->RingPCS & BIT0) ? 0 : 1;
-      TrsTrb           = (TRB_TEMPLATE *)(UINTN)((TrsTrb->Parameter1 | ((UINT64)TrsTrb->Parameter2 << 32)) & ~0x0F);
+      TrsTrb           = (TRB_TEMPLATE *)(UINTN)((TrsTrb->Parameter1 | LShiftU64 ((UINT64)TrsTrb->Parameter2, 32)) & ~0x0F);
     }
   }
 
