@@ -618,7 +618,7 @@ GetWorker (
 
   if ((LocalTokenNumber & PCD_TYPE_SKU_ENABLED) == PCD_TYPE_SKU_ENABLED) {
     if (GetSize == 0) {
-      MaxSize = GetPtrTypeSize (TokenNumber, &MaxSize, PeiPcdDb);
+      GetPtrTypeSize (TokenNumber, &MaxSize, PeiPcdDb);
     } else {
       MaxSize = GetSize;
     }
