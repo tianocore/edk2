@@ -731,10 +731,10 @@ ShellCommandRunTimeZone (
   // parse the command line
   //
   if (PcdGet8(PcdShellSupportLevel) == 2) {
-    Status = ShellCommandLineParse (TimeZoneParamList2, &Package, &ProblemParam, FALSE);
+    Status = ShellCommandLineParse (TimeZoneParamList2, &Package, &ProblemParam, TRUE);
   } else {
     ASSERT(PcdGet8(PcdShellSupportLevel) == 3);
-    Status = ShellCommandLineParseEx (TimeZoneParamList3, &Package, &ProblemParam, FALSE, TRUE);
+    Status = ShellCommandLineParseEx (TimeZoneParamList3, &Package, &ProblemParam, TRUE, TRUE);
   }
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
