@@ -2,7 +2,7 @@
                                  OVERVIEW
 ============================================================================
 The binaries of ShellBinPkg are generated with ShellPkg project and built with 
-BaseTools Package (r12380). The binaries are built with no debug information 
+BaseTools Package (r12797). The binaries are built with no debug information 
 by building with "RELEASE" target.
 
 The following steps can help to re-generate these binaries for customization:
@@ -40,7 +40,6 @@ developer may integrate this code into an existing platform:
 ============================================================================
 1. RM can delete current working directory via other map name.
 2. DrvCfg does not overlap boot manager functionality.
-3. ifConfig permanent settings are under investigation (may not function correctly)
-4. Shell documentation is in development and forthcoming.
+3. Shell documentation is in development and forthcoming.
 
 ============================================================================
