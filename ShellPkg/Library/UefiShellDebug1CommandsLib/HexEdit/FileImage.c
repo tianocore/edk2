@@ -169,7 +169,10 @@ HFileImageRead (
   // you should set the status string
   //
   Status = ReadFileIntoBuffer (FileName, (VOID**)&Buffer, &HFileImage.Size, &HFileImage.ReadOnly);
-  if (EFI_ERROR(Status) || Buffer == NULL) {
+  //
+  // NULL pointer is only also a failure for a non-zero file size.
+  //
+  if ((EFI_ERROR(Status)) || (Buffer == NULL && HFileImage.Size != 0)) {
     UnicodeBuffer = CatSPrint(NULL, L"Read error on file &s: %r", FileName, Status);
     if (UnicodeBuffer == NULL) {
       SHELL_FREE_NON_NULL(Buffer);
