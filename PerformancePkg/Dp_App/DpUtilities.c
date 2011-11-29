@@ -314,7 +314,7 @@ GetNameFromHandle (
                 NameGuid,
                 EFI_SECTION_USER_INTERFACE,
                 0,
-                &NameString,
+                (VOID **) &NameString,
                 &StringSize
                 );
 
