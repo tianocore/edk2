@@ -49,9 +49,8 @@ GRAPHICS_CONSOLE_MODE_DATA mGraphicsConsoleModeData[] = {
   {100, 31},
   //
   // New modes can be added here.
-  // The last 2 entries are specific for PcdConOutRow x PcdConOutColumn and full screen mode.
+  // The last entry is specific for full screen mode.
   //
-  {0, 0},
   {0, 0}
 };
 
@@ -252,12 +251,7 @@ InitializeGraphicsConsoleTextMode (
     return EFI_INVALID_PARAMETER;
   }
 
-  //
-  // Add PcdConOutColumn and PcdConOutRow to the last second entry.
-  //
   Count = sizeof (mGraphicsConsoleModeData) / sizeof (GRAPHICS_CONSOLE_MODE_DATA);
-  mGraphicsConsoleModeData[Count - 2].Columns = (UINTN) PcdGet32 (PcdConOutColumn);
-  mGraphicsConsoleModeData[Count - 2].Rows    = (UINTN) PcdGet32 (PcdConOutRow);
 
   //
   // Compute the maximum number of text Rows and Columns that this current graphics mode can support.
@@ -265,6 +259,11 @@ InitializeGraphicsConsoleTextMode (
   //
   MaxColumns = HorizontalResolution / EFI_GLYPH_WIDTH;
   MaxRows    = VerticalResolution / EFI_GLYPH_HEIGHT;
+
+  //
+  // According to UEFI spec, all output devices support at least 80x25 text mode.
+  //
+  ASSERT ((MaxColumns >= 80) && (MaxRows >= 25));
 
   //
   // Add full screen mode to the last entry.
@@ -290,19 +289,8 @@ InitializeGraphicsConsoleTextMode (
   //
   ValidCount = 0;  
 
-  if ((MaxColumns >= 80) && (MaxRows >= 25)) {
-    //
-    // 80x25 can be supported.
-    //
-    NewModeBuffer[ValidCount].Columns = 80;
-    NewModeBuffer[ValidCount].Rows    = 25;
-  } else {
-    //
-    // 80x25 cannot be supported, set PCD defined mode.
-    //
-    NewModeBuffer[ValidCount].Columns = (UINTN) PcdGet32 (PcdConOutColumn);
-    NewModeBuffer[ValidCount].Rows    = (UINTN) PcdGet32 (PcdConOutRow);
-  }  
+  NewModeBuffer[ValidCount].Columns       = 80;
+  NewModeBuffer[ValidCount].Rows          = 25;
   NewModeBuffer[ValidCount].GopWidth      = HorizontalResolution;
   NewModeBuffer[ValidCount].GopHeight     = VerticalResolution;
   NewModeBuffer[ValidCount].GopModeNumber = GopModeNumber;

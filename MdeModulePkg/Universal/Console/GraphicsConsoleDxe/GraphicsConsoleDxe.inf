@@ -65,8 +65,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
 

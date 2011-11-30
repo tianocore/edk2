@@ -75,8 +75,6 @@
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
 
 # [Event]
 #   ##

@@ -99,9 +99,7 @@ TERMINAL_CONSOLE_MODE_DATA mTerminalConsoleModeData[] = {
   {100, 31},
   //
   // New modes can be added here.
-  // The last entry is specific for PcdConOutRow x PcdConOutColumn.
   //
-  {0, 0}
 };
 
 /**
@@ -438,12 +436,7 @@ InitializeTerminalConsoleTextMode (
     return EFI_INVALID_PARAMETER;
   }
   
-  //
-  // Assign the last entry as PcdConOutColumn and PcdConOutRow defined.
-  //
   Count = sizeof (mTerminalConsoleModeData) / sizeof (TERMINAL_CONSOLE_MODE_DATA);
-  mTerminalConsoleModeData[Count - 1].Columns = (UINTN) PcdGet32 (PcdConOutColumn);
-  mTerminalConsoleModeData[Count - 1].Rows    = (UINTN) PcdGet32 (PcdConOutRow);;
   
   //
   // Get defined mode buffer pointer.
