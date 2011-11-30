@@ -1,7 +1,7 @@
 /** @file   
   ACPI 1.0b definitions from the ACPI Specification, revision 1.0b
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -13,6 +13,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #ifndef _ACPI_1_0_H_
 #define _ACPI_1_0_H_
+
+#include <IndustryStandard/AcpiAml.h>
 
 ///
 /// Common table header, this prefaces all ACPI tables, including FACS, but
@@ -43,15 +45,57 @@ typedef struct {
 //
 // Define for Desriptor
 //
-#define ACPI_DMA_DESCRIPTOR                       0x2A
-#define ACPI_IO_PORT_DESCRIPTOR                   0x47
-#define ACPI_FIXED_LOCATION_IO_PORT_DESCRIPTOR    0x4B
+#define ACPI_SMALL_ITEM_FLAG                   0x00
+#define ACPI_LARGE_ITEM_FLAG                   0x01
+
+//
+// Small Item Descriptor Name
+//
+#define ACPI_SMALL_IRQ_DESCRIPTOR_NAME                       0x04
+#define ACPI_SMALL_DMA_DESCRIPTOR_NAME                       0x05
+#define ACPI_SMALL_START_DEPENDENT_DESCRIPTOR_NAME           0x06
+#define ACPI_SMALL_END_DEPENDENT_DESCRIPTOR_NAME             0x07
+#define ACPI_SMALL_IO_PORT_DESCRIPTOR_NAME                   0x08
+#define ACPI_SMALL_FIXED_IO_PORT_DESCRIPTOR_NAME             0x09
+#define ACPI_SMALL_VENDOR_DEFINED_DESCRIPTOR_NAME            0x0E
+#define ACPI_SMALL_END_TAG_DESCRIPTOR_NAME                   0x0F
+
+//
+// Large Item Descriptor Name
+//
+#define ACPI_LARGE_24_BIT_MEMORY_RANGE_DESCRIPTOR_NAME       0x01
+#define ACPI_LARGE_VENDOR_DEFINED_DESCRIPTOR_NAME            0x04
+#define ACPI_LARGE_32_BIT_MEMORY_RANGE_DESCRIPTOR_NAME       0x05
+#define ACPI_LARGE_32_BIT_FIXED_MEMORY_RANGE_DESCRIPTOR_NAME 0x06
+#define ACPI_LARGE_DWORD_ADDRESS_SPACE_DESCRIPTOR_NAME       0x07
+#define ACPI_LARGE_WORD_ADDRESS_SPACE_DESCRIPTOR_NAME        0x08
+#define ACPI_LARGE_EXTENDED_IRQ_DESCRIPTOR_NAME              0x09
+#define ACPI_LARGE_QWORD_ADDRESS_SPACE_DESCRIPTOR_NAME       0x0A
+
+//
+// Small Item Descriptor Value
+//
 #define ACPI_IRQ_NOFLAG_DESCRIPTOR                0x22
 #define ACPI_IRQ_DESCRIPTOR                       0x23
+#define ACPI_DMA_DESCRIPTOR                       0x2A
+#define ACPI_START_DEPENDENT_DESCRIPTOR           0x30
+#define ACPI_START_DEPENDENT_EX_DESCRIPTOR        0x31
+#define ACPI_END_DEPENDENT_DESCRIPTOR             0x38
+#define ACPI_IO_PORT_DESCRIPTOR                   0x47
+#define ACPI_FIXED_LOCATION_IO_PORT_DESCRIPTOR    0x4B
+#define ACPI_END_TAG_DESCRIPTOR                   0x79
+
+//
+// Large Item Descriptor Value
+//
+#define ACPI_24_BIT_MEMORY_RANGE_DESCRIPTOR       0x81
 #define ACPI_32_BIT_MEMORY_RANGE_DESCRIPTOR       0x85
 #define ACPI_32_BIT_FIXED_MEMORY_RANGE_DESCRIPTOR 0x86
+#define ACPI_DWORD_ADDRESS_SPACE_DESCRIPTOR       0x87
+#define ACPI_WORD_ADDRESS_SPACE_DESCRIPTOR        0x88
+#define ACPI_EXTENDED_INTERRUPT_DESCRIPTOR        0x89
+#define ACPI_QWORD_ADDRESS_SPACE_DESCRIPTOR       0x8A
 #define ACPI_ADDRESS_SPACE_DESCRIPTOR             0x8A
-#define ACPI_END_TAG_DESCRIPTOR                   0x79
 
 //
 // Resource Type
@@ -155,6 +199,18 @@ typedef PACKED struct {
 } EFI_ACPI_FIXED_LOCATION_IO_PORT_DESCRIPTOR;
 
 ///
+/// 24-Bit Memory Range Descriptor
+///
+typedef PACKED struct {
+  ACPI_LARGE_RESOURCE_HEADER    Header;
+  UINT8                         Information;
+  UINT16                        BaseAddressMin;
+  UINT16                        BaseAddressMax;
+  UINT16                        Alignment;
+  UINT16                        Length;
+} EFI_ACPI_24_BIT_MEMORY_RANGE_DESCRIPTOR;
+
+///
 /// 32-Bit Memory Range Descriptor
 ///
 typedef PACKED struct {
@@ -175,6 +231,62 @@ typedef PACKED struct {
   UINT32                        BaseAddress;
   UINT32                        Length;
 } EFI_ACPI_32_BIT_FIXED_MEMORY_RANGE_DESCRIPTOR;
+
+///
+/// QWORD Address Space Descriptor
+///
+typedef PACKED struct {
+  ACPI_LARGE_RESOURCE_HEADER    Header;
+  UINT8                         ResType;
+  UINT8                         GenFlag;
+  UINT8                         SpecificFlag;
+  UINT64                        AddrSpaceGranularity;
+  UINT64                        AddrRangeMin;
+  UINT64                        AddrRangeMax;
+  UINT64                        AddrTranslationOffset;
+  UINT64                        AddrLen;
+} EFI_ACPI_QWORD_ADDRESS_SPACE_DESCRIPTOR;
+
+///
+/// DWORD Address Space Descriptor
+///
+typedef PACKED struct {
+  ACPI_LARGE_RESOURCE_HEADER    Header;
+  UINT8                         ResType;
+  UINT8                         GenFlag;
+  UINT8                         SpecificFlag;
+  UINT32                        AddrSpaceGranularity;
+  UINT32                        AddrRangeMin;
+  UINT32                        AddrRangeMax;
+  UINT32                        AddrTranslationOffset;
+  UINT32                        AddrLen;
+} EFI_ACPI_DWORD_ADDRESS_SPACE_DESCRIPTOR;
+
+///
+/// WORD Address Space Descriptor
+///
+typedef PACKED struct {
+  ACPI_LARGE_RESOURCE_HEADER    Header;
+  UINT8                         ResType;
+  UINT8                         GenFlag;
+  UINT8                         SpecificFlag;
+  UINT16                        AddrSpaceGranularity;
+  UINT16                        AddrRangeMin;
+  UINT16                        AddrRangeMax;
+  UINT16                        AddrTranslationOffset;
+  UINT16                        AddrLen;
+} EFI_ACPI_WORD_ADDRESS_SPACE_DESCRIPTOR;
+
+///
+/// Extended Interrupt Descriptor
+///
+typedef PACKED struct {
+  ACPI_LARGE_RESOURCE_HEADER    Header;
+  UINT8                         InterruptVectorFlags;
+  UINT8                         InterruptTableLength;
+  UINT32                        InterruptNumber[1];
+} EFI_ACPI_EXTENDED_INTERRUPT_DESCRIPTOR;
+
 #pragma pack()
 
 ///
@@ -350,6 +462,9 @@ typedef struct {
 /// FADT Version (as defined in ACPI 1.0b specification).
 ///
 #define EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION  0x01
+
+#define EFI_ACPI_1_0_INT_MODE_DUAL_PIC         0
+#define EFI_ACPI_1_0_INT_MODE_MULTIPLE_APIC    1
 
 //
 // Fixed ACPI Description Table Fixed Feature Flags

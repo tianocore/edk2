@@ -1,7 +1,7 @@
 /** @file   
   ACPI 2.0 definitions from the ACPI Specification, revision 2.0
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -15,6 +15,32 @@
 #define _ACPI_2_0_H_
 
 #include <IndustryStandard/Acpi10.h>
+
+//
+// Define for Desriptor
+//
+#define ACPI_LARGE_GENERIC_REGISTER_DESCRIPTOR_NAME          0x02
+
+#define ACPI_GENERIC_REGISTER_DESCRIPTOR          0x82
+
+//
+// Ensure proper structure formats
+//
+#pragma pack(1)
+
+///
+/// Generic Register Descriptor
+///
+typedef PACKED struct {
+  ACPI_LARGE_RESOURCE_HEADER    Header;
+  UINT8                         AddressSpaceId;
+  UINT8                         RegisterBitWidth;
+  UINT8                         RegisterBitOffset;
+  UINT8                         AddressSize;
+  UINT64                        RegisterAddress;
+} EFI_ACPI_GENERIC_REGISTER_DESCRIPTOR;
+
+#pragma pack()
 
 //
 // Ensure proper structure formats
@@ -159,6 +185,17 @@ typedef struct {
 /// FADT Version (as defined in ACPI 2.0 spec.)
 ///
 #define EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION  0x03
+
+//
+// Fixed ACPI Description Table Preferred Power Management Profile
+//
+#define EFI_ACPI_2_0_PM_PROFILE_UNSPECIFIED         0
+#define EFI_ACPI_2_0_PM_PROFILE_DESKTOP             1
+#define EFI_ACPI_2_0_PM_PROFILE_MOBILE              2
+#define EFI_ACPI_2_0_PM_PROFILE_WORKSTATION         3
+#define EFI_ACPI_2_0_PM_PROFILE_ENTERPRISE_SERVER   4
+#define EFI_ACPI_2_0_PM_PROFILE_SOHO_SERVER         5
+#define EFI_ACPI_2_0_PM_PROFILE_APPLIANCE_PC        6
 
 //
 // Fixed ACPI Description Table Boot Architecture Flags
@@ -499,7 +536,7 @@ typedef struct {
 #define EFI_ACPI_2_0_EXTENDED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE  SIGNATURE_32('X', 'S', 'D', 'T')
 
 ///
-/// "MCFG" Static Resource Affinity Table
+/// "MCFG" PCI Express Memory Mapped Configuration Space Base Address Description Table
 ///
 #define EFI_ACPI_2_0_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_SIGNATURE  SIGNATURE_32('M', 'C', 'F', 'G')
 

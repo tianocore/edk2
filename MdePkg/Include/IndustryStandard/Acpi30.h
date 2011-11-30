@@ -1,7 +1,7 @@
 /** @file   
   ACPI 3.0 definitions from the ACPI Specification Revision 3.0b October 10, 2006
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -15,6 +15,48 @@
 #define _ACPI_3_0_H_
 
 #include <IndustryStandard/Acpi20.h>
+
+//
+// Define for Desriptor
+//
+#define ACPI_LARGE_EXTENDED_ADDRESS_SPACE_DESCRIPTOR_NAME    0x0B
+
+#define ACPI_EXTENDED_ADDRESS_SPACE_DESCRIPTOR    0x8B
+
+//
+// Ensure proper structure formats
+//
+#pragma pack(1)
+
+///
+/// Extended Address Space Descriptor
+///
+typedef PACKED struct {
+  ACPI_LARGE_RESOURCE_HEADER    Header;
+  UINT8                         ResType;
+  UINT8                         GenFlag;
+  UINT8                         SpecificFlag;
+  UINT8                         RevisionId;
+  UINT8                         Reserved;
+  UINT64                        AddrSpaceGranularity;
+  UINT64                        AddrRangeMin;
+  UINT64                        AddrRangeMax;
+  UINT64                        AddrTranslationOffset;
+  UINT64                        AddrLen;
+  UINT64                        TypeSpecificAttribute;
+} EFI_ACPI_EXTENDED_ADDRESS_SPACE_DESCRIPTOR;
+
+#pragma pack()
+
+//
+// Memory Type Specific Flags
+//
+#define EFI_ACPI_MEMORY_TYPE_SPECIFIC_ATTRIBUTES_UC  0x0000000000000001
+#define EFI_ACPI_MEMORY_TYPE_SPECIFIC_ATTRIBUTES_WC  0x0000000000000002
+#define EFI_ACPI_MEMORY_TYPE_SPECIFIC_ATTRIBUTES_WT  0x0000000000000004
+#define EFI_ACPI_MEMORY_TYPE_SPECIFIC_ATTRIBUTES_WB  0x0000000000000008
+#define EFI_ACPI_MEMORY_TYPE_SPECIFIC_ATTRIBUTES_UCE 0x0000000000000010
+#define EFI_ACPI_MEMORY_TYPE_SPECIFIC_ATTRIBUTES_NV  0x0000000000008000
 
 //
 // Ensure proper structure formats
@@ -624,7 +666,6 @@ typedef struct {
 
 ///
 /// "CPEP" Corrected Platform Error Polling Table
-/// See
 ///
 #define EFI_ACPI_3_0_CORRECTED_PLATFORM_ERROR_POLLING_TABLE_SIGNATURE  SIGNATURE_32('C', 'P', 'E', 'P')
 
@@ -672,6 +713,11 @@ typedef struct {
 /// "WDAT" Watchdog Action Table
 ///
 #define EFI_ACPI_3_0_WATCHDOG_ACTION_TABLE_SIGNATURE  SIGNATURE_32('W', 'D', 'A', 'T')
+
+///
+/// "WSPT" Windows Specific Properties Table
+///
+#define EFI_ACPI_3_0_WINDOWS_SPECIFIC_PROPERTIES_TABLE_SIGNATURE  SIGNATURE_32('W', 'S', 'P', 'T')
 
 ///
 /// "iBFT" iSCSI Boot Firmware Table

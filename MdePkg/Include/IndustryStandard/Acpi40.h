@@ -1,7 +1,7 @@
 /** @file   
   ACPI 4.0 definitions from the ACPI Specification Revision 4.0a April 5, 2010
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -780,6 +780,13 @@ typedef struct {
   UINT32  AddressRegisterMsrAddress;
   UINT32  MiscRegisterMsrAddress;
 } EFI_ACPI_4_0_IA32_ARCHITECTURE_MACHINE_CHECK_ERROR_BANK_STRUCTURE;
+
+///
+/// IA-32 Architecture Machine Check Bank Structure MCA data format
+///
+#define EFI_ACPI_4_0_IA32_ARCHITECTURE_MACHINE_CHECK_ERROR_DATA_FORMAT_IA32      0x00
+#define EFI_ACPI_4_0_IA32_ARCHITECTURE_MACHINE_CHECK_ERROR_DATA_FORMAT_INTEL64   0x01
+#define EFI_ACPI_4_0_IA32_ARCHITECTURE_MACHINE_CHECK_ERROR_DATA_FORMAT_AMD64     0x02
 
 //
 // Hardware Error Notification types. All other values are reserved
