@@ -11,12 +11,12 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 #include <LibConfig.h>
-#include <sys/EfiSysCall.h>
 #include <sys/time.h>
 #include <time.h>
 #include <errno.h>
 #include <sys/signal.h>
 #include <signal.h>
+#include  <unistd.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiLib.h>

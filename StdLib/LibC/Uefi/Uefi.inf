@@ -52,4 +52,5 @@
   LibLocale
   LibString
   LibTime
+  LibGen
   DevUtility

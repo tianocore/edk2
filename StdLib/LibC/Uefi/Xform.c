@@ -57,8 +57,9 @@ Oflags2EFI( int oflags )
   return flags;
 }
 
-/*  Transform the permissions flags from the open() call into the
-    Attributes bits needed by UEFI.
+/*  Transform the permissions flags into their equivalent UEFI File Attribute bits.
+    This transformation is most frequently used when translating attributes for use
+    by the UEFI EFI_FILE_PROTOCOL.SetInfo() function.
 
     The UEFI File attributes are:
       // ******************************************************
@@ -72,27 +73,40 @@ Oflags2EFI( int oflags )
       #define EFI_FILE_ARCHIVE           0x0000000000000020
       #define EFI_FILE_VALID_ATTR        0x0000000000000037
 
-    The input permission flags consist of two groups:
-      ( S_IRUSR | S_IRGRP | S_IROTH ) -- S_ACC_READ
-      ( S_IWUSR | S_IWGRP | S_IWOTH ) -- S_ACC_WRITE
-
-    The only thing we can set, at this point, is whether or not
-    this is a SYSTEM file.  If the group and other bits are
-    zero and the user bits are non-zero then set SYSTEM.  Otherwise
-    the attributes are zero.
-
-    The attributes can be set later using fcntl().
+    The input permission flags consist of the following flags:
+      O_RDONLY    -- open for reading only
+      O_WRONLY    -- open for writing only
+      O_RDWR      -- open for reading and writing
+      O_ACCMODE   -- mask for above modes
+      O_NONBLOCK  -- no delay
+      O_APPEND    -- set append mode
+      O_CREAT     -- create if nonexistent
+      O_TRUNC     -- truncate to zero length
+      O_EXCL      -- error if already exists
+      O_HIDDEN    -- Hidden file attribute
+      O_SYSTEM    -- System file attribute
+      O_ARCHIVE   -- Archive file attribute
 */
 UINT64
 Omode2EFI( int mode)
 {
   UINT64  flags = 0;
 
-  if((mode & (S_IRWXG | S_IRWXO)) == 0) {
-    if((mode & S_IRWXU) != 0) {
-      // Only user permissions so set system
-      flags = EFI_FILE_SYSTEM;
+  /* File is Read-Only. */
+  if((mode & O_ACCMODE) == 0) {
+    flags = EFI_FILE_READ_ONLY;
+  }
+  /* Set the Hidden attribute. */
+  if((mode & O_HIDDEN) != 0) {
+    flags |= EFI_FILE_HIDDEN;
+  }
+  /* Set the System attribute. */
+  if((mode & O_SYSTEM) != 0) {
+    flags |= EFI_FILE_SYSTEM;
     }
+  /* Set the Archive attribute. */
+  if((mode & O_ARCHIVE) != 0) {
+    flags |= EFI_FILE_ARCHIVE;
   }
   return flags;
 }

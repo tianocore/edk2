@@ -25,6 +25,12 @@
 #define F_TLOCK   2
 #define F_TEST    3
 
+/* access function */
+#define F_OK      0     /* test for existence of file */
+#define X_OK      0x01  /* test for execute or search permission */
+#define W_OK      0x02  /* test for write permission */
+#define R_OK      0x04  /* test for read permission */
+
 
 __BEGIN_DECLS
 int             dup(int);
@@ -40,6 +46,65 @@ char           *getpass(const char *);
 int             usleep(useconds_t);
 unsigned int    sleep(unsigned int);
 char           *basename(char *path);
+
+#ifndef GETCWD_DECLARED
+  /** Gets the current working directory.
+
+  The getcwd() function shall place an absolute pathname of the current
+  working directory in the array pointed to by buf, and return buf. The
+  pathname copied to the array shall contain no components that are
+  symbolic links. The size argument is the size in bytes of the character
+  array pointed to by the buf argument.
+
+  @param[in,out] Buf        The buffer to fill.
+  @param[in]     BufSize    The number of bytes in buffer.
+
+  @retval NULL          The function failed.
+  @retval NULL          Buf was NULL.
+  @retval NULL          Size was 0.
+  @return buf           The function completed successfully. See errno for info.
+  **/
+  char           *getcwd(char *Buf, size_t BufSize);
+  #define GETCWD_DECLARED
+#endif
+
+#ifndef CHDIR_DECLARED
+  /** Change the current working directory.
+
+  The chdir() function shall cause the directory named by the pathname
+  pointed to by the path argument to become the current working directory;
+  that is, the starting point for path searches for pathnames not beginning
+  with '/'.
+
+  @param[in] Path   The new path to set.
+
+  @todo Add non-shell CWD changing.
+  **/
+  int       chdir(const char *Path);
+#define CHDIR_DECLARED
+#endif
+
+/** Determine accessibility of a file.
+    The access() function checks the file, named by the pathname pointed to by
+    the Path argument, for accessibility according to the bit pattern contained
+    in Mode.
+
+    The value of Mode is either the bitwise-inclusive OR of the access
+    permissions to be checked (R_OK, W_OK, X_OK) or the existence test (F_OK).
+
+    If Path ends in '/' or '\\', the target must be a directory, otherwise it doesn't matter.
+    A file is executable if it is NOT a directory and it ends in ".efi".
+
+    @param[in]    Path    Path or name of the file to be checked.
+    @param[in]    Mode    Access permissions to check for.
+
+    @retval   0   Successful completion.
+    @retval  -1   File is not accessible with the given Mode.  The error condition
+                  is indicated by errno.  Values of errno specific to the access
+                  function include: EACCES, ENOENT, ENOTDIR, ENAMETOOLONG
+**/
+int             access(const char *Path, int Mode);
+pid_t           getpid(void);
 
 // Networking
 long            gethostid(void);
@@ -77,7 +142,6 @@ gid_t           getegid(void);
 uid_t           geteuid(void);
 gid_t           getgid(void);
 int             getgroups(int, gid_t []);
-pid_t           getpid(void);
 pid_t           getppid(void);
 int             link(const char *, const char *);
 long            pathconf(const char *, int);

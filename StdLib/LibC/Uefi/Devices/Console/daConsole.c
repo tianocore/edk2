@@ -21,13 +21,13 @@
 #include  <Protocol/SimpleTextOut.h>
 
 #include  <LibConfig.h>
-#include  <sys/EfiSysCall.h>
 
 #include  <errno.h>
 #include  <wctype.h>
 #include  <wchar.h>
 #include  <stdarg.h>
 #include  <sys/fcntl.h>
+#include  <unistd.h>
 #include  <kfile.h>
 #include  <Device/Device.h>
 #include  <MainData.h>

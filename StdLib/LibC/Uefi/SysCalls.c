@@ -31,12 +31,13 @@
 #include  <sys/fcntl.h>
 #include  <sys/stat.h>
 #include  <sys/syslimits.h>
+#include  <sys/filio.h>
 #include  <Efi/SysEfi.h>
+#include  <unistd.h>
 #include  <kfile.h>
 #include  <Device/Device.h>
 #include  <MainData.h>
-#include  <extern.h>      // Library/include/extern.h: Private to implementation
-#include  <sys/EfiSysCall.h>
+#include  <extern.h>
 
 /* EFI versions of BSD system calls used in stdio */
 
@@ -136,6 +137,13 @@ isatty  (int fd)
   return retval;
 }
 
+/** Determine if file descriptor fd is a duplicate of some other fd.
+
+    @param[in]    fd    The file descriptor to check.
+
+    @retval   TRUE    fd is a duplicate of another fd.
+    @retval   FALSE   fd is unique.
+**/
 static BOOLEAN
 IsDupFd( int fd)
 {
@@ -161,6 +169,14 @@ IsDupFd( int fd)
   return Ret;
 }
 
+/** Close a file and set its fd to the specified state.
+
+    @param[in]    fd          The file descriptor to close.
+    @param[in]    NewState    State to set the fd to after the file is closed.
+
+    @retval    0    The operation completed successfully.
+    @retval   -1    The operation failed.  Further information is in errno.
+**/
 static int
 _closeX  (int fd, int NewState)
 {
@@ -199,19 +215,18 @@ _closeX  (int fd, int NewState)
   return retval;
 }
 
-/** The close() function shall deallocate the file descriptor indicated by fd.
+/** The close() function deallocates the file descriptor indicated by fd.
     To deallocate means to make the file descriptor available for return by
     subsequent calls to open() or other functions that allocate file
     descriptors. All outstanding record locks owned by the process on the file
-    associated with the file descriptor shall be removed (that is, unlocked).
+    associated with the file descriptor are removed (that is, unlocked).
 
-    @return   Upon successful completion, 0 shall be returned; otherwise,
-              -1 shall be returned and errno set to indicate the error.
+    @retval   0     Successful completion.
+    @retval   -1    An error occurred and errno is set to identify the error.
 **/
 int
 close  (int fd)
 {
-  //Print(L"Closing fd %d\n", fd);
   return _closeX(fd, 0);
 }
 
@@ -348,7 +363,7 @@ fcntl     (int fildes, int cmd, ...)
           errno = EINVAL;
         }
         break;
-      //case F_SETFD:
+
       case F_SETFL:
         retval = MyFd->Oflags;        // Get original value
         temp = va_arg(p3, int);
@@ -356,7 +371,7 @@ fcntl     (int fildes, int cmd, ...)
         temp |= retval & O_SETMASK;
         MyFd->Oflags = temp;          // Set new value
         break;
-      //case F_SETFL:
+
       case F_SETFD:
         retval = MyFd->f_iflags;
         break;
@@ -365,11 +380,9 @@ fcntl     (int fildes, int cmd, ...)
       //  MyFd->SocProc = va_arg(p3, int);
       //  break;
       case F_GETFD:
-        //retval = MyFd->Oflags;
         retval = MyFd->f_iflags;
         break;
       case F_GETFL:
-        //retval = MyFd->f_iflags;
         retval = MyFd->Oflags;
         break;
       //case F_GETOWN:
@@ -520,7 +533,7 @@ mkdir (const char *path, __mode_t perms)
   wchar_t            *NewPath;
   DeviceNode         *Node;
   char               *GenI;
-  RETURN_STATUS     Status;
+  RETURN_STATUS       Status;
   int                 Instance  = 0;
   int                 retval = 0;
 
@@ -860,6 +873,8 @@ rmdir(
     filp = &gMD->fdarray[fd];
 
     retval = filp->f_ops->fo_rmdir(filp);
+    filp->f_iflags = 0;           // Close this FD
+    filp->RefCount = 0;           // No one using this FD
       }
   return retval;
 }
@@ -962,7 +977,21 @@ ioctl(
 
   if(ValidateFD( fd, VALID_OPEN)) {
     filp = &gMD->fdarray[fd];
+
+    if(request == FIODLEX) {
+      /* set Delete-on-Close */
+      filp->f_iflags |= FIF_DELCLOSE;
+      retval = 0;
+    }
+    else if(request == FIONDLEX) {
+      /* clear Delete-on-Close */
+      filp->f_iflags &= ~FIF_DELCLOSE;
+      retval = 0;
+    }
+    else {
+      /* All other requests. */
     retval = filp->f_ops->fo_ioctl(filp, request, argp);
+  }
   }
   else {
     errno   =  EBADF;
@@ -1101,18 +1130,21 @@ write  (int fd, const void *buf, size_t nbyte)
 /** Gets the current working directory.
 
   The getcwd() function shall place an absolute pathname of the current
-  working directory in the array pointed to by buf, and return buf. The
-  pathname copied to the array shall contain no components that are
-  symbolic links. The size argument is the size in bytes of the character
-  array pointed to by the buf argument.
+  working directory in the array pointed to by buf, and return buf.The
+  size argument is the size in bytes of the character array pointed to
+  by the buf argument.
 
   @param[in,out] buf    The buffer to fill.
   @param[in]     size   The number of bytes in buffer.
 
-  @retval NULL          The function failed.
-  @retval NULL          Buf was NULL.
-  @retval NULL          Size was 0.
-  @return buf           The function completed successfully. See errno for info.
+  @retval NULL          The function failed.  The value in errno provides
+                        further information about the cause of the failure.
+                        Values for errno are:
+                          - EINVAL: buf is NULL or size is zero.
+                          - ENOENT: directory does not exist.
+                          - ERANGE: buf size is too small to hold CWD
+
+  @retval buf           The function completed successfully.
 **/
 char
 *getcwd (char *buf, size_t size)
@@ -1126,14 +1158,13 @@ char
 
   Cwd = ShellGetCurrentDir(NULL);
   if (Cwd == NULL) {
-    errno = EACCES;
+    errno = ENOENT;
     return NULL;
   }
   if (size < ((StrLen (Cwd) + 1) * sizeof (CHAR8))) {
     errno = ERANGE;
     return (NULL);
   }
-
   return (UnicodeStrToAsciiStr(Cwd, buf));
 }
 
@@ -1146,7 +1177,14 @@ char
 
   @param[in] path   The new path to set.
 
-  @todo Add non-shell CWD changing.
+  @retval   0   Operation completed successfully.
+  @retval  -1   Function failed.  The value in errno provides more
+                information on the cause of failure:
+                  - EPERM: Operation not supported with this Shell version.
+                  - ENOMEM: Unable to allocate memory.
+                  - ENOENT: Target directory does not exist.
+
+  @todo Add non-NEW-shell CWD changing.
 **/
 int
 chdir (const char *path)
@@ -1155,6 +1193,8 @@ chdir (const char *path)
   EFI_STATUS   Status;
   CHAR16       *UnicodePath;
 
+  /* Old Shell does not support Set Current Dir. */
+  if(gEfiShellProtocol != NULL) {
   Cwd = ShellGetCurrentDir(NULL);
   if (Cwd != NULL) {
     /* We have shell support */
@@ -1167,15 +1207,15 @@ chdir (const char *path)
     Status = gEfiShellProtocol->SetCurDir(NULL, UnicodePath);
     FreePool(UnicodePath);
     if (EFI_ERROR(Status)) {
-      errno = EACCES;
+        errno = ENOENT;
       return -1;
     } else {
       return 0;
     }
   }
-
+  }
   /* Add here for non-shell */
-  errno = EACCES;
+  errno = EPERM;
   return -1;
 }
 
@@ -1187,5 +1227,35 @@ pid_t tcgetpgrp (int x)
 pid_t getpgrp(void)
 {
   return ((pid_t)(UINTN)(gImageHandle));
+}
+
+/** Set file access and modification times.
+
+    @param[in]  path
+    @param[in]  times
+
+    @return
+**/
+int
+utimes(
+  const char *path,
+  const struct timeval *times
+  )
+{
+  struct __filedes   *filp;
+  va_list             ap;
+  int                 fd;
+  int                 retval  = -1;
+
+  va_start(ap, path);
+  fd = open(path, O_RDWR, 0);
+  if(fd >= 0) {
+    filp = &gMD->fdarray[fd];
+    retval = filp->f_ops->fo_ioctl( filp, FIOSETIME, ap);
+    close(fd);
+  }
+  va_end(ap);
+  return retval;
+
 }
 

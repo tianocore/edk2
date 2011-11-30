@@ -52,10 +52,10 @@
 #include  <assert.h>
 #include  <errno.h>
 #include  <fcntl.h>
-#include  <sys/EfiSysCall.h>
 #include  <stdio.h>
 #include  <stdlib.h>
 #include  <wchar.h>
+#include  <unistd.h>
 #include  "reentrant.h"
 #include  "local.h"
 

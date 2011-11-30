@@ -234,7 +234,7 @@ isblank(
   IN  int c
   )
 {
-  return (__isCClass( c, _CB));
+  return (__isCClass( c, (_CB)));
 }
 
 /** The isascii function tests that a character is one of the 128 7-bit ASCII characters.
@@ -250,4 +250,22 @@ isascii(
   )
 {
   return ((c >= 0) && (c < 128));
+}
+
+/** Test whether a character is one of the characters used as a separator
+    between directory elements in a path.
+
+    Characters are '/', '\\'
+
+    This non-standard function is unique to this implementation.
+
+    @param[in]    c   The character to be tested.
+
+    @return   Returns nonzero (true) if and only if the value of the parameter c
+              can be classified as specified in the description of the function.
+**/
+int
+isDirSep(int c)
+{
+  return (__isCClass( c, (_C0)));
 }

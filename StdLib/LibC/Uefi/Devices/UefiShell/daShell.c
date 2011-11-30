@@ -21,7 +21,6 @@
 #include  <Library/ShellLib.h>
 
 #include  <LibConfig.h>
-#include  <sys/EfiSysCall.h>
 
 #include  <errno.h>
 #include  <string.h>
@@ -30,12 +29,21 @@
 #include  <wctype.h>
 #include  <wchar.h>
 #include  <sys/fcntl.h>
+#include  <sys/filio.h>
 #include  <sys/syslimits.h>
+#include  <unistd.h>
 #include  <kfile.h>
 #include  <Device/Device.h>
 #include  <MainData.h>
 #include  <Efi/SysEfi.h>
 
+/** EFI Shell specific operations for close().
+
+    @param[in]    Fp    Pointer to a file descriptor structure.
+
+    @retval      0      Successful completion.
+    @retval     -1      Operation failed.  Further information is specified by errno.
+**/
 static
 int
 EFIAPI
@@ -50,6 +58,13 @@ da_ShellClose(
   return 0;
 }
 
+/** EFI Shell specific operations for deleting a file or directory.
+
+    @param[in]    filp    Pointer to a file descriptor structure.
+
+    @retval      0      Successful completion.
+    @retval     -1      Operation failed.  Further information is specified by errno.
+**/
 static
 int
 EFIAPI
@@ -68,6 +83,14 @@ da_ShellDelete(
   return 0;
 }
 
+/** EFI Shell specific operations for setting the position within a file.
+
+    @param[in]    filp    Pointer to a file descriptor structure.
+    @param[in]    offset  Relative position to move to.
+    @param[in]    whence  Specifies the location offset is relative to: Beginning, Current, End.
+
+    @return     Returns the new file position or EOF if the seek failed.
+**/
 static
 off_t
 EFIAPI
@@ -126,6 +149,9 @@ da_ShellSeek(
 
     The directory is closed after it is created.
 
+    @param[in]    path      The directory to be created.
+    @param[in]    perms     Access permissions for the new directory.
+
     @retval   0   The directory was created successfully.
     @retval  -1   An error occurred and an error code is stored in errno.
 **/
@@ -137,6 +163,7 @@ da_ShellMkdir(
   __mode_t      perms
   )
 {
+  UINT64            TempAttr;
   SHELL_FILE_HANDLE FileHandle;
   RETURN_STATUS     Status;
   EFI_FILE_INFO    *FileInfo;
@@ -152,7 +179,8 @@ da_ShellMkdir(
       FileInfo = ShellGetFileInfo( FileHandle);
       Status = RETURN_ABORTED;  // In case ShellGetFileInfo() failed
       if(FileInfo != NULL) {
-        FileInfo->Attribute = Omode2EFI(perms);
+        TempAttr  = FileInfo->Attribute & (EFI_FILE_RESERVED | EFI_FILE_DIRECTORY);
+        FileInfo->Attribute = TempAttr | Omode2EFI(perms);
         Status = ShellSetFileInfo( FileHandle, FileInfo);
         FreePool(FileInfo);
         if(Status == RETURN_SUCCESS) {
@@ -168,6 +196,16 @@ da_ShellMkdir(
   return retval;
 }
 
+/** EFI Shell specific operations for reading from a file.
+
+    @param[in]    filp        Pointer to a file descriptor structure.
+    @param[in]    offset      Offset into the file to begin reading at, or NULL.
+    @param[in]    BufferSize  Number of bytes in Buffer.  Max number of bytes to read.
+    @param[in]    Buffer      Pointer to a buffer to receive the read data.
+
+    @return     Returns the number of bytes successfully read,
+                or -1 if the operation failed.  Further information is specified by errno.
+**/
 static
 ssize_t
 EFIAPI
@@ -209,6 +247,16 @@ da_ShellRead(
   return BufSize;
 }
 
+/** EFI Shell specific operations for writing to a file.
+
+    @param[in]    filp        Pointer to a file descriptor structure.
+    @param[in]    offset      Offset into the file to begin writing at, or NULL.
+    @param[in]    BufferSize  Number of bytes in Buffer.  Max number of bytes to write.
+    @param[in]    Buffer      Pointer to a buffer containing the data to be written.
+
+    @return     Returns the number of bytes successfully written,
+                or -1 if the operation failed.  Further information is specified by errno.
+**/
 static
 ssize_t
 EFIAPI
@@ -261,6 +309,15 @@ da_ShellWrite(
   return BufSize;
 }
 
+/** EFI Shell specific operations for getting information about an open file.
+
+    @param[in]    filp        Pointer to a file descriptor structure.
+    @param[out]   statbuf     Buffer in which to store the file status.
+    @param[in]    Something   This parameter is not used by this device.
+
+    @retval      0      Successful completion.
+    @retval     -1      Operation failed.  Further information is specified by errno.
+**/
 static
 int
 EFIAPI
@@ -314,6 +371,15 @@ da_ShellStat(
   return (Status == RETURN_SUCCESS)? 0 : -1;
 }
 
+/** EFI Shell specific operations for low-level control of a file or device.
+
+    @param[in]      filp    Pointer to a file descriptor structure.
+    @param[in]      cmd     The command this ioctl is to perform.
+    @param[in,out]  argp    Zero or more arguments as needed by the command.
+
+    @retval      0      Successful completion.
+    @retval     -1      Operation failed.  Further information is specified by errno.
+**/
 static
 int
 EFIAPI
@@ -323,10 +389,70 @@ da_ShellIoctl(
   va_list             argp
   )
 {
-  return -EPERM;
+  EFI_FILE_INFO    *FileInfo      = NULL;
+  SHELL_FILE_HANDLE FileHandle;
+  RETURN_STATUS     Status        = RETURN_SUCCESS;
+  int               retval        = 0;
+
+  FileHandle = (SHELL_FILE_HANDLE)filp->devdata;
+
+  FileInfo = ShellGetFileInfo( FileHandle);
+
+  if(FileInfo != NULL) {
+    if( cmd == (ULONGN)FIOSETIME) {
+      struct timeval  *TV;
+      EFI_TIME        *ET;
+      int              mod = 0;
+
+      TV = va_arg(argp, struct timeval*);
+      if(TV[0].tv_sec != 0) {
+        ET = Time2Efi(TV[0].tv_sec);
+        if(ET != NULL) {
+          (void) memcpy(&FileInfo->LastAccessTime, ET, sizeof(EFI_TIME));
+          FileInfo->LastAccessTime.Nanosecond = TV[0].tv_usec * 1000;
+          free(ET);
+          ++mod;
+        }
+      }
+      if(TV[1].tv_sec != 0) {
+        ET = Time2Efi(TV[1].tv_sec);
+        if(ET != NULL) {
+          (void) memcpy(&FileInfo->ModificationTime, ET, sizeof(EFI_TIME));
+          FileInfo->ModificationTime.Nanosecond = TV[1].tv_usec * 1000;
+          free(ET);
+          ++mod;
+        }
+      }
+      /* Set access and modification times */
+      Status = ShellSetFileInfo(FileHandle, FileInfo);
+      errno = EFI2errno(Status);
+    }
+  }
+  else {
+    Status = RETURN_DEVICE_ERROR;
+    errno  = EIO;
+  }
+  if(RETURN_ERROR(Status)) {
+    retval = -1;
+  }
+  EFIerrno  = Status;
+
+  if(FileInfo != NULL) {
+    FreePool(FileInfo);     // Release the buffer allocated by the GetInfo function
+  }
+  return retval;
 }
 
-/** Open an abstract Shell File.
+/** EFI Shell specific operations for opening a file or directory.
+
+    @param[in]    DevNode   Pointer to a device descriptor
+    @param[in]    filp      Pointer to a file descriptor structure.
+    @param[in]    DevInstance   Not used by this device.
+    @param[in]    Path          File-system path to the file or directory.
+    @param[in]    MPath         Device or Map name on which Path resides.
+
+    @return     Returns a file descriptor for the newly opened file,
+                or -1 if the Operation failed.  Further information is specified by errno.
 **/
 int
 EFIAPI
@@ -447,14 +573,19 @@ da_ShellOpen(
 }
 
 #include  <sys/poll.h>
-/*  Returns a bit mask describing which operations could be completed immediately.
+/** Returns a bit mask describing which operations could be completed immediately.
 
     For now, assume the file system, via the shell, is always ready.
 
     (POLLIN | POLLRDNORM)   The file system is ready to be read.
     (POLLOUT)               The file system is ready for output.
 
-*/
+    @param[in]    filp    Pointer to a file descriptor structure.
+    @param[in]    events  Bit mask describing which operations to check.
+
+    @return     The returned value is a bit mask describing which operations
+                could be completed immediately, without blocking.
+**/
 static
 short
 EFIAPI
@@ -488,6 +619,14 @@ da_ShellPoll(
   return (retval & (events | POLL_RETONLY));
 }
 
+/** EFI Shell specific operations for renaming a file.
+
+    @param[in]    from    Name of the file to be renamed.
+    @param[in]    to      New name for the file.
+
+    @retval      0      Successful completion.
+    @retval     -1      Operation failed.  Further information is specified by errno.
+**/
 static
 int
 EFIAPI
@@ -553,6 +692,13 @@ da_ShellRename(
   return -1;
 }
 
+/** EFI Shell specific operations for deleting directories.
+
+    @param[in]    filp    Pointer to a file descriptor structure.
+
+    @retval      0      Successful completion.
+    @retval     -1      Operation failed.  Further information is specified by errno.
+**/
 static
 int
 EFIAPI
@@ -562,10 +708,12 @@ da_ShellRmdir(
 {
   SHELL_FILE_HANDLE FileHandle;
   RETURN_STATUS     Status = RETURN_SUCCESS;
-  EFI_FILE_INFO     *FileInfo = NULL;
+  EFI_FILE_INFO     *FileInfo;
+  int               OldErrno;
   int               Count = 0;
   BOOLEAN           NoFile = FALSE;
 
+  OldErrno  = errno;  // Save the original value
   errno = 0;    // Make it easier to see if we have an error later
 
   FileHandle = (SHELL_FILE_HANDLE)filp->devdata;
@@ -576,8 +724,8 @@ da_ShellRmdir(
       errno = ENOTDIR;
     }
     else {
-      // See if the directory has any entries other than ".." and ".".
       FreePool(FileInfo);  // Free up the buffer from ShellGetFileInfo()
+      // See if the directory has any entries other than ".." and ".".
       Status = ShellFindFirstFile( FileHandle, &FileInfo);
       if(Status == RETURN_SUCCESS) {
         ++Count;
@@ -593,15 +741,22 @@ da_ShellRmdir(
             Count = 99;
           }
         }
-        FreePool(FileInfo);   // Free buffer from ShellFindFirstFile()
+        /*  Count == 99 and FileInfo is allocated if ShellFindNextFile failed.
+            ShellFindNextFile has freed FileInfo itself if it sets NoFile TRUE.
+        */
+        if((! NoFile) || (Count == 99)) {
+          free(FileInfo);   // Free buffer from ShellFindFirstFile()
+        }
         if(Count < 3) {
           // Directory is empty
           Status = ShellDeleteFile( &FileHandle);
           if(Status == RETURN_SUCCESS) {
             EFIerrno = RETURN_SUCCESS;
+            errno    = OldErrno;    // Restore the original value
             return 0;
             /* ######## SUCCESSFUL RETURN ######## */
           }
+          /*  FileInfo is freed and FileHandle closed. */
         }
         else {
           if(Count == 99) {
@@ -617,6 +772,7 @@ da_ShellRmdir(
   else {
     errno = EIO;
   }
+  ShellCloseFile( &FileHandle);
   EFIerrno = Status;
   if(errno == 0) {
     errno = EFI2errno( Status );
@@ -628,6 +784,13 @@ da_ShellRmdir(
 
     Allocate the instance structure and populate it with the information for
     the device.
+
+    @param[in]    ImageHandle   This application's image handle.
+    @param[in]    SystemTable   Pointer to the UEFI System Table.
+
+    @retval     RETURN_SUCCESS            Successful completion.
+    @retval     RETURN_OUT_OF_RESOURCES   Failed to allocate memory for new device.
+    @retval     RETURN_INVALID_PARAMETER  A default device has already been created.
 **/
 RETURN_STATUS
 EFIAPI
@@ -669,6 +832,13 @@ __ctor_DevShell(
   return  Status;
 }
 
+/** Destructor for previously constructed EFI Shell device instances.
+
+    @param[in]    ImageHandle   This application's image handle.
+    @param[in]    SystemTable   Pointer to the UEFI System Table.
+
+    @retval      0      Successful completion is always returned.
+**/
 RETURN_STATUS
 EFIAPI
 __dtor_DevShell(

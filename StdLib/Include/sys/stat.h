@@ -113,7 +113,7 @@ struct stat {
 #define S_IARCHIVE    0x02000000    // Archive Bit
 #define S_IROFS       0x08000000   ///< Read Only File System
 
-#define S_EFIONLY     0xF0000000  ///< Flags only used by the EFI system calls.
+#define S_EFIONLY     0xFFF00000  ///< Flags only used by the EFI system calls.
 
 #define S_EFISHIFT    20            // LS bit of the UEFI attributes
 
@@ -142,6 +142,10 @@ struct stat {
 #define ALLPERMS  (S_IRWXU|S_IRWXG|S_IRWXO)       ///< 0777
 #define DEFFILEMODE (S_IRWXU|S_IRWXG|S_IRWXO)     ///< 0777
 
+#define READ_PERMS  (S_IRUSR | S_IRGRP | S_IROTH)   ///< 0444
+#define WRITE_PERMS (S_IWUSR | S_IWGRP | S_IWOTH)   ///< 0222
+#define EXEC_PERMS  (S_IXUSR | S_IXGRP | S_IXOTH)   ///< 0111
+
 #define S_BLKSIZE 512   ///< block size used in the stat struct
 
 /*
@@ -169,25 +173,29 @@ __BEGIN_DECLS
 #ifndef __STAT_SYSCALLS_DECLARED
   #define __STAT_SYSCALLS_DECLARED
 
-/**
-**/
-  extern int      mkdir     (const char *, mode_t);
+  /**
+  **/
+  mode_t  umask (mode_t);
 
   /**
   **/
-  extern int      fstat     (int, struct stat *);
+  int     mkdir (const char *, mode_t);
 
   /**
   **/
-  extern int      lstat     (const char *, struct stat *);
+  int     fstat (int, struct stat *);
 
   /**
   **/
-  extern int      stat      (const char *, struct stat *);
+  int     lstat (const char *, struct stat *);
 
   /**
   **/
-  extern int      chmod     (const char *, mode_t);
+  int     stat  (const char *, struct stat *);
+
+  /**
+  **/
+  int     chmod (const char *, mode_t);
 #endif  // __STAT_SYSCALLS_DECLARED
 __END_DECLS
 

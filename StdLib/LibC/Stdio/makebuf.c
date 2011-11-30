@@ -52,7 +52,7 @@
 #include  <assert.h>
 #include  <stdio.h>
 #include  <stdlib.h>
-#include  <sys/EfiSysCall.h>
+#include  <unistd.h>
 #include  "reentrant.h"
 #include  "local.h"
 #include  <MainData.h>

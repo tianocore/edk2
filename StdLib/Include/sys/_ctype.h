@@ -26,8 +26,8 @@ extern  int  __isCClass( int _c, unsigned int mask);   ///< Internal character c
 __END_DECLS
 
 
-/** Character Class bit masks.
-@{
+/** @{
+Character Class bit masks.
 **/
 #define _CC   0x0001U     ///< Control Characters
 #define _CW   0x0002U     ///< White Space
@@ -36,7 +36,7 @@ __END_DECLS
 #define _CU   0x0010U     ///< Uppercase Letter [A-Z]
 #define _CL   0x0020U     ///< Lowercase Letter [a-z]
 #define _CX   0x0040U     ///< Hexadecimal Digits [A-Fa-f]
-#define _C0   0x0080U
+#define _C0   0x0080U     ///< Path Separator Characters, '/' and '\\'
 #define _CS   0x0100U     ///< Space Characters, ' ' in C locale
 #define _CG   0x0200U     ///< Graphic Characters
 #define _CB   0x0400U     ///< Blank Characters, ' ' and '\t' in C locale

@@ -1,7 +1,7 @@
 /** @file
     Implementation of fopen as declared in <stdio.h>.
 
-    Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available
     under the terms and conditions of the BSD License that accompanies this
     distribution.  The full text of the license may be found at
@@ -50,9 +50,9 @@
 #include  <sys/stat.h>
 #include  <assert.h>
 #include  <fcntl.h>
-#include  <sys/EfiSysCall.h>
 #include  <stdio.h>
 #include  <errno.h>
+#include  <unistd.h>
 #include  "reentrant.h"
 #include  "local.h"
 

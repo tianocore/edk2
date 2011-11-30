@@ -54,8 +54,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include  <sys/EfiSysCall.h>
-
 /*
  * get next entry in a directory.
  */

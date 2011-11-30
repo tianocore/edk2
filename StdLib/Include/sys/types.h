@@ -238,7 +238,7 @@ typedef int64_t   dtime_t;  /* on-disk time_t */
 #endif
 
 #if   defined(_BSD_CLOCK_T_) && defined(_EFI_CLOCK_T)
-  typedef _BSD_CLOCK_T_     clock_t;
+  typedef _EFI_CLOCK_T      clock_t;
   #undef  _BSD_CLOCK_T_
   #undef  _EFI_CLOCK_T
 #endif
@@ -256,7 +256,7 @@ typedef int64_t   dtime_t;  /* on-disk time_t */
 #endif
 
 #if   defined(_BSD_TIME_T_) && defined(_EFI_TIME_T)
-  typedef _BSD_TIME_T_    time_t;
+  typedef _EFI_TIME_T     time_t;
   #undef  _BSD_TIME_T_
   #undef  _EFI_TIME_T
 #endif

@@ -11,6 +11,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
+#include  <LibConfig.h>
 #include  <sys/EfiCdefs.h>
 #include  <sys/featuretest.h>
 #include  <namespace.h>
@@ -25,7 +26,8 @@ getpwuid (uid_t uid)
   return NULL;
 }
 
-char *getlogin (void)
+char *
+getlogin (void)
 {
   errno = EPERM;
   return NULL;
@@ -38,40 +40,53 @@ getpwnam (const char *name)
   return NULL;
 }
 
-uid_t getuid (void)
+uid_t
+getuid (void)
 {
   return 0;
 }
 
-pid_t fork (void)
+pid_t
+getpid(void)
+{
+  return 0;
+}
+
+pid_t
+fork (void)
 {
   errno = EPERM;
   return (-1);
 }
 
-int chmod (const char *c, mode_t m)
+int
+chmod (const char *c, mode_t m)
 {
   errno = EPERM;
   return (-1);
 }
 
-pid_t   wait(int *stat_loc) {
+pid_t
+wait(int *stat_loc) {
   return 0;
 }
 
-FILE *popen (const char *cmd, const char *type)
+FILE *
+popen (const char *cmd, const char *type)
 {
   errno = EPERM;
   return NULL;
 }
 
-int pclose (FILE *stream)
+int
+pclose (FILE *stream)
 {
   errno = EPERM;
   return -1;
 }
 
-int access (const char *path, int amode)
+mode_t
+umask(mode_t cmask)
 {
-  return 0;
+  return (mode_t)0;
 }

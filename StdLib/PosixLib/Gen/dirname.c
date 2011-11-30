@@ -1,5 +1,14 @@
 /** @file
 
+  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available under
+  the terms and conditions of the BSD License that accompanies this distribution.
+  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
  * Copyright (c) 1997, 2002 The NetBSD Foundation, Inc.
  * All rights reserved.
  *
@@ -30,19 +39,17 @@
     NetBSD: dirname.c,v 1.10 2008/05/10 22:39:40 christos Exp
  */
 #include  <LibConfig.h>
-
 #include <sys/cdefs.h>
 
-//#include "namespace.h"
-//#include <libgen.h>
 #include <limits.h>
+#include  <ctype.h>
 #include <string.h>
 
 #ifdef __weak_alias
 __weak_alias(dirname,_dirname)
 #endif
 
-#if !HAVE_DIRNAME
+#ifdef HAVE_DIRNAME
 char *
 dirname(char *path)
 {
@@ -60,24 +67,34 @@ dirname(char *path)
 
   /* Strip trailing slashes, if any. */
   lastp = path + strlen(path) - 1;
-  while (lastp != path && *lastp == '/')
+  while (lastp != path && isDirSep(*lastp))
     lastp--;
 
   /* Terminate path at the last occurence of '/'. */
   do {
-    if (*lastp == '/') {
+    if (isDirSep(*lastp)) {
       /* Strip trailing slashes, if any. */
-      while (lastp != path && *lastp == '/')
+      while (lastp != path && isDirSep(*lastp))
         lastp--;
 
-      /* ...and copy the result into the result buffer. */
+      /* ...and copy the result into the result buffer.
+        We make sure that there will be room for the terminating NUL
+        and for a final '/', if necessary.
+      */
       len = (lastp - path) + 1 /* last char */;
-      if (len > (PATH_MAX - 1))
-        len = PATH_MAX - 1;
+      if (len > (PATH_MAX - 2))
+        len = PATH_MAX - 2;
 
       memcpy(result, path, len);
+      if(*lastp == ':') {   /* Have we stripped off all except the Volume name? */
+        if(isDirSep(lastp[1])) { /* Was ...":/"... so we want the root of the volume. */
+          result[len++] = '/';
+        }
+        else {
+          result[len++] = '.';
+        }
+      }
       result[len] = '\0';
-
       return (result);
     }
   } while (--lastp >= path);

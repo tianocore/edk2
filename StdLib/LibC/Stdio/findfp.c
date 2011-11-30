@@ -1,6 +1,14 @@
-/*  $NetBSD: findfp.c,v 1.23 2006/10/07 21:40:46 thorpej Exp $  */
+/** @file
 
-/*-
+  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available under
+  the terms and conditions of the BSD License that accompanies this distribution.
+  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
  * Copyright (c) 1990, 1993
  *  The Regents of the University of California.  All rights reserved.
  *
@@ -30,24 +38,20 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- */
+
+    NetBSD: findfp.c,v 1.23 2006/10/07 21:40:46 thorpej Exp
+    findfp.c  8.2 (Berkeley) 1/4/94
+**/
 #include  <LibConfig.h>
 #include  <sys/EfiCdefs.h>
-#if defined(LIBC_SCCS) && !defined(lint)
-#if 0
-static char sccsid[] = "@(#)findfp.c  8.2 (Berkeley) 1/4/94";
-#else
-__RCSID("$NetBSD: findfp.c,v 1.23 2006/10/07 21:40:46 thorpej Exp $");
-#endif
-#endif /* LIBC_SCCS and not lint */
 
 #include  "namespace.h"
 #include  <sys/param.h>
-#include  <sys/EfiSysCall.h>
 #include  <stdio.h>
 #include  <errno.h>
 #include  <stdlib.h>
 #include  <string.h>
+#include  <unistd.h>
 #include  "reentrant.h"
 #include  "local.h"
 #include  "glue.h"

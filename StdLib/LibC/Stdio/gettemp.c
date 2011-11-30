@@ -1,7 +1,7 @@
 /** @file
   Internal function to generate temporary file name for tmpnam.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License that accompanies this
   distribution.  The full text of the license may be found at
@@ -37,6 +37,7 @@
   OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
   SUCH DAMAGE.
 
+  mktemp.c  8.1 (Berkeley) 6/4/93
   NetBSD: gettemp.c,v 1.13 2003/12/05 00:57:36 uebayasi Exp
 **/
 #include  <LibConfig.h>
@@ -48,13 +49,6 @@
 #if !defined(HAVE_NBTOOL_CONFIG_H) || !defined(HAVE_MKSTEMP) || !defined(HAVE_MKDTEMP)
 
 #include <sys/EfiCdefs.h>
-#if defined(LIBC_SCCS) && !defined(lint)
-#if 0
-static char sccsid[] = "@(#)mktemp.c  8.1 (Berkeley) 6/4/93";
-#else
-__RCSID("$NetBSD: gettemp.c,v 1.13 2003/12/05 00:57:36 uebayasi Exp $");
-#endif
-#endif /* LIBC_SCCS and not lint */
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -65,7 +59,7 @@ __RCSID("$NetBSD: gettemp.c,v 1.13 2003/12/05 00:57:36 uebayasi Exp $");
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/EfiSysCall.h>
+#include  <unistd.h>
 
 #if HAVE_NBTOOL_CONFIG_H
 #define GETTEMP   gettemp

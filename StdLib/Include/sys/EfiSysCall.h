@@ -6,10 +6,6 @@
       STDIN_FILENO      0     standard input file descriptor
       STDOUT_FILENO     1     standard output file descriptor
       STDERR_FILENO     2     standard error file descriptor
-      F_OK              0     test for existence of file
-      X_OK           0x01     test for execute or search permission
-      W_OK           0x02     test for write permission
-      R_OK           0x04     test for read permission
       SEEK_SET          0     set file offset to offset
       SEEK_CUR          1     set file offset to current plus offset
       SEEK_END          2     set file offset to EOF plus offset
@@ -55,10 +51,6 @@
       int       DeleteOnClose (int fd);    Mark an open file to be deleted when closed.
       int       FindFreeFD    (int MinFd);
       BOOLEAN   ValidateFD    (int fd, int IsOpen);
-
-      ###############  Functions added for compatibility.
-      char     *getcwd    (char *, size_t);
-      int       chdir     (const char *);
 @endverbatim
 
   Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
@@ -81,12 +73,6 @@ struct stat;  /* Structure declared in <sys/stat.h> */
 #define STDIN_FILENO  0 /**< standard input file descriptor */
 #define STDOUT_FILENO 1 /**< standard output file descriptor */
 #define STDERR_FILENO 2 /**< standard error file descriptor */
-
-/* access function */
-#define F_OK       0  /**< test for existence of file */
-#define X_OK    0x01  /**< test for execute or search permission */
-#define W_OK    0x02  /**< test for write permission */
-#define R_OK    0x04  /**< test for read permission */
 
 /* whence values for lseek(2)
    Always ensure that these are consistent with <stdio.h> and <unistd.h>!
@@ -238,115 +224,100 @@ __BEGIN_DECLS
         - stdout:       Standard Output       (from the System Table)
         - stderr:       Standard Error Output (from the System Table)
 
-    @param[in]  name
-    @param[in]  oflags
-    @param[in]  mode
+    @param[in]  name      Name of file to open.
+    @param[in]  oflags    Flags as defined in fcntl.h.
+    @param[in]  mode      Access mode to use if creating the file.
 
-    @return
+    @return   Returns -1 on failure, otherwise the file descriptor for the open file.
   **/
   int     open      (const char *name, int oflags, int mode);
 
-  /**
-    @param[in]
+  /** Create a new file or rewrite an existing one.
 
-    @return
+      The creat() function behaves as if it is implemented as follows:
+
+        int creat(const char *path, mode_t mode)
+        {
+            return open(path, O_WRONLY|O_CREAT|O_TRUNC, mode);
+        }
+
+    @param[in]    Path    The name of the file to create.
+    @param[in]    Mode    Access mode (permissions) for the new file.
+
+    @return   Returns -1 on failure, otherwise the file descriptor for the open file.
   **/
-  int     creat     (const char *, mode_t);
+  int     creat     (const char *Path, mode_t Mode);
 
-  /**
-    @param[in]
+  /** File control
 
-    @return
+      This function performs the operations described below and defined in <fcntl.h>.
+
+        - F_DUPFD: Return the lowest numbered file descriptor available that is >= the third argument.
+                   The new file descriptor refers to the same open file as Fd.
+
+        - F_SETFD: Set the file descriptor flags to the value specified by the third argument.
+        - F_GETFD: Get the file descriptor flags associated with Fd.
+        - F_SETFL: Set the file status flags based upon the value of the third argument.
+        - F_GETFL: Get the file status flags and access modes for file Fd.
+
+    @param[in]  Fd      File descriptor associated with the file to be controlled.
+    @param[in]  Cmd     Command to execute.
+    @param[in]  ...     Additional arguments, as needed by Cmd.
+
+    @return   A -1 is returned to indicate failure, otherwise the value
+              returned is positive and depends upon Cmd as follows:
+                - F_DUPFD: A new file descriptor.
+                - F_SETFD: files previous file descriptor flags.
+                - F_GETFD: The files file descriptor flags.
+                - F_SETFL: The old status flags and access mode of the file.
+                - F_GETFL: The status flags and access mode of the file.
   **/
-  int     fcntl     (int, int, ...);
+  int     fcntl     (int Fd, int Cmd, ...);
 #endif  // __FCNTL_SYSCALLS_DECLARED
 
 /* These system calls are also declared in stat.h */
 #ifndef __STAT_SYSCALLS_DECLARED
   #define __STAT_SYSCALLS_DECLARED
 
-  /**
-    @param[in]
-
-    @return
-  **/
   int     mkdir     (const char *, mode_t);
-
-  /**
-    @param[in]
-
-    @return
-  **/
   int     fstat     (int, struct stat *);
-
-  /**
-    @param[in]
-
-    @return
-  **/
   int     lstat     (const char *, struct stat *);
-
-  /**
-    @param[in]
-
-    @return
-  **/
   int     stat      (const char *, struct stat *);
-
-  /**
-    @param[in]
-
-    @return
-  **/
   int     chmod     (const char *, mode_t);
+  mode_t  umask     (mode_t cmask);
+
 #endif  // __STAT_SYSCALLS_DECLARED
 
 // These are also declared in sys/types.h
 #ifndef __OFF_T_SYSCALLS_DECLARED
   #define __OFF_T_SYSCALLS_DECLARED
-
-  /**
-    @param[in]
-
-    @return
-  **/
   off_t   lseek     (int, off_t, int);
-
-  /**
-    @param[in]
-
-    @return
-  **/
   int     truncate  (const char *, off_t);
-
-  /**
-    @param[in]
-
-    @return
-  **/
   int     ftruncate (int, off_t);   //  IEEE Std 1003.1b-93
 #endif /* __OFF_T_SYSCALLS_DECLARED */
 
 /* EFI-specific Functions. */
 
-  /**
-    @param[in]
+  /** Mark an open file to be deleted when it is closed.
 
-    @return
+    @param[in]  fd    File descriptor for the open file.
+
+    @retval   0   The flag was set successfully.
+    @retval  -1   An invalid fd was specified.
   **/
-  int       DeleteOnClose(int fd);    /* Mark an open file to be deleted when closed. */
+  int       DeleteOnClose(int fd);
 
-/* Find and reserve a free File Descriptor.
+  /** Find and reserve a free File Descriptor.
 
   Returns the first free File Descriptor greater than or equal to the,
   already validated, fd specified by Minfd.
 
   @return   Returns -1 if there are no free FDs.  Otherwise returns the
             found fd.
-*/
+  */
   int       FindFreeFD  (int MinFd);
 
-/*  Validate that fd refers to a valid file descriptor.
+  /** Validate that fd refers to a valid file descriptor.
     IsOpen is interpreted as follows:
       - Positive  fd must be OPEN
       - Zero      fd must be CLOSED
@@ -354,26 +325,11 @@ __BEGIN_DECLS
 
     @retval TRUE  fd is VALID
     @retval FALSE fd is INVALID
-*/
+  */
   BOOLEAN   ValidateFD (int fd, int IsOpen);
 
 
-  /**
-    @param[in]
-
-    @return
-  **/
-  char     *getcwd    (char *, size_t);
-
-  /**
-    @param[in]
-
-    @return
-  **/
-  int       chdir     (const char *);
-
 /* These system calls don't YET have EFI implementations. */
-  int       access    (const char *path, int amode);
   int       reboot    (int, char *);
 __END_DECLS
 

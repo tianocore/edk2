@@ -66,7 +66,7 @@
 #include  <stdio.h>
 #include  <stdlib.h>
 #include  <string.h>
-#include  <sys/EfiSysCall.h>
+#include  <unistd.h>
 #include  "rune.h"
 #ifdef WITH_RUNE
   #include "rune_local.h"

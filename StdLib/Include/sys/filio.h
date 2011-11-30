@@ -1,8 +1,16 @@
-/*	$NetBSD: filio.h,v 1.10 2005/12/11 12:25:20 christos Exp $	*/
+/** @file
 
-/*-
+  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available under
+  the terms and conditions of the BSD License that accompanies this distribution.
+  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
  * Copyright (c) 1982, 1986, 1990, 1993, 1994
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  * (c) UNIX System Laboratories, Inc.
  * All or some portions of this file are derived from material licensed
  * to the University of California by American Telephone and Telegraph
@@ -33,30 +41,21 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)filio.h	8.1 (Berkeley) 3/28/94
+ *  @(#)filio.h 8.1 (Berkeley) 3/28/94
+    NetBSD: filio.h,v 1.10 2005/12/11 12:25:20 christos Exp
  */
 
-#ifndef	_SYS_FILIO_H_
-#define	_SYS_FILIO_H_
+#ifndef _SYS_FILIO_H_
+#define _SYS_FILIO_H_
 
 #include <sys/ioccom.h>
 
-/* Generic file-descriptor ioctl's. */
-#define	FIOCLEX		 _IO('f', 1)		/* set close on exec on fd */
-#define	FIONCLEX	 _IO('f', 2)		/* remove close on exec */
-#define	FIONREAD	_IOR('f', 127, int)	/* get # bytes to read */
-#define	FIONBIO		_IOW('f', 126, int)	/* set/clear non-blocking i/o */
-#define	FIOASYNC	_IOW('f', 125, int)	/* set/clear async i/o */
-#define	FIOSETOWN	_IOW('f', 124, int)	/* set owner */
-#define	FIOGETOWN	_IOR('f', 123, int)	/* get owner */
-#define	OFIOGETBMAP	_IOWR('f', 122, uint32_t) /* get underlying block no. */
-#define	FIOGETBMAP	_IOWR('f', 122, daddr_t) /* get underlying block no. */
-#define	FIONWRITE	_IOR('f', 121, int)	/* get # bytes outstanding
-						 * in send queue. */
-#define	FIONSPACE	_IOR('f', 120, int)	/* get space in send queue. */
+typedef const struct timeval*    ptimeval_t;
 
+/* File-descriptor ioctl's. */
 
-/* Ugly symbol for compatibility with other operating systems */
-#define	FIBMAP		FIOGETBMAP
+#define FIODLEX       _IO   ('f', 1)                  /* set Delete-on-Close */
+#define FIONDLEX      _IO   ('f', 2)                  /* clear Delete-on-Close */
+#define FIOSETIME     _IOW  ('f', 127, ptimeval_t)    /* Set access and modification times */
 
 #endif /* !_SYS_FILIO_H_ */

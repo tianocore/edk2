@@ -171,6 +171,20 @@ int isxdigit(int c);
 **/
 int isascii(int c);
 
+/** Test whether a character is one of the characters used as a separator
+    between directory elements in a path.
+
+    Characters are '/', '\\'
+
+    This non-standard function is unique to this implementation.
+
+    @param[in]    c   The character to be tested.
+
+    @return   Returns nonzero (true) if and only if the value of the parameter c
+              can be classified as specified in the description of the function.
+**/
+int isDirSep(int c);
+
 /** The tolower function converts an uppercase letter to a corresponding
     lowercase letter.
 
@@ -218,6 +232,7 @@ __END_DECLS
   #define isspace(c)    (__isCClass( (int)c, (_CW)))
   #define isupper(c)    (__isCClass( (int)c, (_CU)))
   #define isxdigit(c)   (__isCClass( (int)c, (_CD | _CX)))
+  #define isDirSep(c)   (__isCClass( (int)c, (_C0)))
   #define tolower(c)    (__toLower((int)c))
   #define toupper(c)    (__toUpper((int)c))
 #endif  /* NO_CTYPE_MACROS */

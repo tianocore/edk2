@@ -31,6 +31,8 @@
   opendir.c
   closedir.c
   readdir.c
+  access.c
+  utime.c
 
 [Packages]
   MdePkg/MdePkg.dec

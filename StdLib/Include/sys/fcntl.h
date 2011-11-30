@@ -54,11 +54,11 @@
 
 #include <sys/stat.h>
 
-/** File status flags used by open(2), fcntl(2).
+/** @{
+    File status flags used by open(2), fcntl(2).
     They are also used (indirectly) in the kernel file structure f_flags,
     which is a superset of the open/fcntl flags.
     Open/fcntl flags begin with O_; kernel-internal flags begin with F.
-@{
 **/
 /* open-only flags */
 #define O_RDONLY    0x00000000  ///< open for reading only
@@ -71,6 +71,11 @@
 #define O_CREAT     0x00000200  ///< create if nonexistent
 #define O_TRUNC     0x00000400  ///< truncate to zero length
 #define O_EXCL      0x00000800  ///< error if already exists
+
+/* UEFI-specific open-only flags. */
+#define O_HIDDEN    0x00010000  ///< Hidden file attribute
+#define O_SYSTEM    0x00020000  ///< System file attribute
+#define O_ARCHIVE   0x00040000  ///< Archive file attribute
 /// @}
 
 //#define O_DIRECT    0x00080000  /* direct I/O hint */
@@ -81,7 +86,7 @@
  * Constants used for fcntl(2)
  */
 
-/** command values. @{ **/
+/** @{ command values used for fcntl(2). **/
 #define F_DUPFD      0  ///< duplicate file descriptor
 #define F_GETFD      1  ///< get file descriptor flags
 #define F_SETFD      2  ///< set file descriptor flags
@@ -99,13 +104,13 @@
 /** file descriptor flags (F_GETFD, F_SETFD). **/
 #define FD_CLOEXEC  1   ///< close-on-exec flag
 
-/** record locking flags (F_GETLK, F_SETLK, F_SETLKW). @{ **/
+/** @{ record locking flags (F_GETLK, F_SETLK, F_SETLKW). **/
 #define F_RDLCK     1   ///< shared or read lock
 #define F_UNLCK     2   ///< unlock
 #define F_WRLCK     3   ///< exclusive or write lock
 /// @}
 
-/** Constants for fcntl's passed to the underlying fs - like ioctl's. @{ **/
+/** @{ Constants for fcntl's passed to the underlying fs - like ioctl's. **/
 #define F_PARAM_MASK    0xfff
 #define F_PARAM_LEN(x)  (((x) >> 16) & F_PARAM_MASK)
 #define F_PARAM_MAX     4095

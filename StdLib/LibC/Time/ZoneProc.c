@@ -1,7 +1,7 @@
 /** @file
     Time Zone processing.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at
@@ -19,7 +19,6 @@
   NetBSD: localtime.c,v 1.39 2006/03/22 14:01:30 christos Exp
 **/
 #include  <LibConfig.h>
-#include  <sys/EfiSysCall.h>
 
 #include  <ctype.h>
 #include  <fcntl.h>
@@ -27,6 +26,7 @@
 #include  <stdlib.h>
 #include  <string.h>
 #include  <time.h>
+#include  <unistd.h>
 #include  "tzfile.h"
 #include  "TimeVals.h"
 

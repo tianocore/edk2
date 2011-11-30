@@ -52,7 +52,7 @@
 #include  <errno.h>
 #include  <fcntl.h>
 #include  <stdio.h>
-#include  <sys/EfiSysCall.h>
+#include  <unistd.h>
 
 #include  "reentrant.h"
 #include  "local.h"

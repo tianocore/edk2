@@ -59,12 +59,10 @@ struct timeval {
 /*
  * Structure defined by POSIX.1b to be like a timeval.
  * This works within EFI since the times really are time_t.
- * Note that this is not exactly POSIX compliant since tv_nsec
- * is a UINT32 instead of the compliant long.
  */
 struct timespec {
   time_t  tv_sec;   /* seconds */
-  UINT32  tv_nsec;  /* and nanoseconds */
+  LONG32  tv_nsec;  /* and nanoseconds */
 };
 
 #define TIMEVAL_TO_TIMESPEC(tv, ts) do {        \
@@ -182,15 +180,21 @@ __BEGIN_DECLS
 /* Convert an EFI_TIME structure into a time_t value. */
 time_t  Efi2Time( EFI_TIME *EfiBDtime);
 
+/* Convert a time_t value into an EFI_TIME structure.
+    It is the caller's responsibility to free the returned structure.
+*/
+EFI_TIME *  Time2Efi(time_t OTime);
+
 /* Convert an EFI_TIME structure into a C Standard tm structure. */
 void    Efi2Tm( EFI_TIME *EfiBDtime, struct tm *NewTime);
-
-__END_DECLS
+void    Tm2Efi( struct tm *BdTime, EFI_TIME *ETime);
 
 /* BSD compatibility functions */
 int gettimeofday (struct timeval *tp, void *ignore);
 /* POSIX compatibility functions */
 int getitimer (int which, struct itimerval *value);
 int setitimer (int which, const struct itimerval *value, struct itimerval *ovalue);
+
+__END_DECLS
 
 #endif /* !_SYS_TIME_H_ */
