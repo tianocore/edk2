@@ -1,0 +1,73 @@
+## @file
+#  This module install ACPI Firmware Performance Data Table (FPDT).
+#
+#  This module register report status code listener to collect performance data
+#  for Firmware Basic Boot Performance Record and install FPDT to ACPI table.
+#
+#  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FirmwarePerformanceDxe
+  FILE_GUID                      = 00160F8D-2B35-4df2-BBE0-B272A8D631F0
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = FirmwarePerformanceDxeEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  FirmwarePerformanceDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  BaseLib
+  DebugLib
+  TimerLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  PcdLib
+  HobLib
+  PcdLib
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid                     ## SOMETIMES_CONSUMES
+  gEfiRscHandlerProtocolGuid                    ## CONSUMES
+
+[Guids]
+  gEfiEventExitBootServicesGuid                 ## CONSUMES
+  gEfiEventReadyToBootGuid                      ## CONSUMES
+  gEfiEventLegacyBootGuid                       ## CONSUMES
+  gEfiAcpiTableGuid                             ## SOMETIMES_CONSUMES
+  gEfiAcpi10TableGuid                           ## SOMETIMES_CONSUMES
+  gEfiAcpi20TableGuid                           ## SOMETIMES_CONSUMES
+  gEfiFirmwarePerformanceGuid                   ## CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderLoad
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderStart
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwarePerformanceDataTableS3Support
+
+[Depex]
+  gEfiRscHandlerProtocolGuid

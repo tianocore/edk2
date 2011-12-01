@@ -237,6 +237,10 @@
   ## Include/Guid/MtcVendor.h
   gMtcVendorGuid                     = { 0xeb704011, 0x1402, 0x11d3, { 0x8e, 0x77, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b }}
 
+  ## Guid for Firmware Performance Data Table (FPDT) implementation.
+  #  Include/Guid/FirmwarePerformance.h
+  gEfiFirmwarePerformanceGuid = { 0xc095791a, 0x3001, 0x47b2, { 0x80, 0xc9, 0xea, 0xc7, 0x31, 0x9f, 0x2f, 0xa4 }}
+
 [Ppis]
   ## Include/Ppi/AtaController.h
   gPeiAtaControllerPpiGuid       = { 0xa45e60d1, 0xc719, 0x44aa, { 0xb0, 0x7a, 0xaa, 0x77, 0x7f, 0x85, 0x90, 0x6d }}
@@ -448,6 +452,9 @@
 
   ## If TRUE, recovery from FAT USB disk will be supported.
   gEfiMdeModulePkgTokenSpaceGuid.PcdRecoveryOnFatUsbDisk|TRUE|BOOLEAN|0x00010063
+
+  ## If TRUE, S3 performance data will be supported in ACPI FPDT table.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwarePerformanceDataTableS3Support|TRUE|BOOLEAN|0x00010064
 
 [PcdsFeatureFlag.IA32, PcdsFeatureFlag.X64]
   ##

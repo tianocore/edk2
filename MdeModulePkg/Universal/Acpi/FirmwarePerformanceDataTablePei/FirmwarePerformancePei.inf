@@ -1,0 +1,65 @@
+## @file
+#  This module updates S3 Resume Performance Record in ACPI Firmware Performance
+#  Data Table in S3 resume boot mode. In normal boot mode, this module consumes
+#  SecPerformance PPI produced by SEC phase and build Hob to convey the SEC
+#  performance data to DXE phase.
+#
+#  This module register report status code listener to collect performance data
+#  for S3 Resume Performance Record on S3 resume boot path.
+#
+#  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FirmwarePerformancePei
+  FILE_GUID                      = ADF01BF6-47D6-495d-B95B-687777807214
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = FirmwarePerformancePeiEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  FirmwarePerformancePei.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  PeimEntryPoint
+  PeiServicesLib
+  BaseLib
+  DebugLib
+  HobLib
+  TimerLib
+  BaseMemoryLib
+  LockBoxLib
+  PcdLib
+
+[Ppis]
+  gEfiPeiRscHandlerPpiGuid                      ## CONSUMES
+  gEfiPeiReadOnlyVariable2PpiGuid               ## SOMETIMES_CONSUMES
+  gPeiSecPerformancePpiGuid                     ## CONSUMES
+
+[Guids]
+  gEfiFirmwarePerformanceGuid                   ## CONSUMES
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwarePerformanceDataTableS3Support
+
+[Depex]
+  gEfiPeiMasterBootModePpiGuid AND gEfiPeiRscHandlerPpiGuid
