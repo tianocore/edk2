@@ -1,7 +1,7 @@
 /** @file
   Uses the services of the I/O Library to produce the CPU I/O Protocol
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -175,8 +175,9 @@ CpuIoCheckParameter (
 
   //
   // Check to see if Buffer is aligned
+  // (IA-32 allows UINT64 and INT64 data types to be 32-bit aligned.)
   //
-  if (((UINTN)Buffer & (mInStride[Width] - 1)) != 0) {
+  if (((UINTN)Buffer & ((MIN (sizeof (UINTN), mInStride[Width])  - 1))) != 0) {
     return EFI_UNSUPPORTED;
   }
 
