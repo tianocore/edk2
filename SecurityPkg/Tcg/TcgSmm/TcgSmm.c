@@ -30,13 +30,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DxeServicesLib.h>
 
-//
-// AML parsing definitions
-//
-#define AML_OPREGION_OP     0x80
-#define AML_BYTE_PREFIX     0x0A
-#define AML_DWORD_PREFIX    0x0C
-
 #pragma pack(1)
 typedef struct {
   UINT8                  SoftwareSmi;
@@ -329,7 +322,7 @@ AssignOpRegion (
   for (OpRegion  = (AML_OP_REGION_32_8 *) (Table + 1);
        OpRegion <= (AML_OP_REGION_32_8 *) ((UINT8 *) Table + Table->Length);
        OpRegion  = (AML_OP_REGION_32_8 *) ((UINT8 *) OpRegion + 1)) {
-    if ((OpRegion->OpRegionOp  == AML_OPREGION_OP) && 
+    if ((OpRegion->OpRegionOp  == AML_EXT_REGION_OP) && 
         (OpRegion->NameString  == Name) &&
         (OpRegion->RegionLen   == Size) &&
         (OpRegion->DWordPrefix == AML_DWORD_PREFIX) &&
