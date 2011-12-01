@@ -165,27 +165,10 @@ PartitionDriverBindingSupported (
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_TEST_PROTOCOL
                   );
- if (EFI_ERROR (Status)) {
-   return Status;
- }
-  
- Status = gBS->OpenProtocol (
-                 ControllerHandle,
-                 &gEfiBlockIo2ProtocolGuid,
-                 NULL,
-                 This->DriverBindingHandle,
-                 ControllerHandle,
-                 EFI_OPEN_PROTOCOL_TEST_PROTOCOL
-                 );
   if (EFI_ERROR (Status)) {
-    //
-    // According to UEFI Spec 2.3.1, if a driver is written for a disk device, 
-    // then the EFI_BLOCK_IO_PROTOCOL and EFI_BLOCK_IO2_PROTOCOAL must be implemented.
-    // Currently, SCSI disk driver only produce the EFI_BLOCK_IO_PROTOCOL, it will
-    // not be updated until the non blocking SCSI Pass Thru Protocol is provided.
-    // If there is no EFI_BLOCK_IO2_PROTOCOL, skip here.
-    //    
-  } 
+    return Status;
+  }
+
   return EFI_SUCCESS;  
 }
 
@@ -222,6 +205,7 @@ PartitionDriverBindingStart (
   BOOLEAN                   MediaPresent;
   EFI_TPL                   OldTpl;
 
+  BlockIo2 = NULL;
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK); 
   //
   // Check RemainingDevicePath validation
@@ -261,15 +245,6 @@ PartitionDriverBindingStart (
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
-  if (EFI_ERROR (Status)) {
-    //
-    // According to UEFI Spec 2.3.1, if a driver is written for a disk device, 
-    // then the EFI_BLOCK_IO_PROTOCOL and EFI_BLOCK_IO2_PROTOCOAL must be implemented.
-    // Currently, SCSI disk driver only produce the EFI_BLOCK_IO_PROTOCOL, it will
-    // not be updated until the non blocking SCSI Pass Thru Protocol is provided.
-    // If there is no EFI_BLOCK_IO2_PROTOCOL, skip here.
-    //
-  }
 
   //
   // Get the Device Path Protocol on ControllerHandle's handle.
