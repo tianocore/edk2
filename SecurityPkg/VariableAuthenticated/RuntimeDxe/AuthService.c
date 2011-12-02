@@ -1467,7 +1467,7 @@ VerifyTimeBasedPayload (
       (CertData->TimeStamp.TimeZone != 0) ||
       (CertData->TimeStamp.Daylight != 0) ||
       (CertData->TimeStamp.Pad2 != 0)) {
-    return EFI_INVALID_PARAMETER;
+    return EFI_SECURITY_VIOLATION;
   }
 
   if ((Variable->CurrPtr != NULL) && ((Attributes & EFI_VARIABLE_APPEND_WRITE) == 0)) {
