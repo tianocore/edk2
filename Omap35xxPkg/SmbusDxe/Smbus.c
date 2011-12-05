@@ -259,8 +259,8 @@ EFI_STATUS
 EFIAPI
 SmbusArpDevice (
   IN CONST EFI_SMBUS_HC_PROTOCOL    *This,
-  IN CONST BOOLEAN                  ArpAll,
-  IN CONST EFI_SMBUS_UDID           *SmbusUdid OPTIONAL,
+  IN       BOOLEAN                  ArpAll,
+  IN       EFI_SMBUS_UDID           *SmbusUdid OPTIONAL,
   IN OUT   EFI_SMBUS_DEVICE_ADDRESS *SlaveAddress OPTIONAL
   )
 {
