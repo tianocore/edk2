@@ -241,7 +241,7 @@ IkeLookupUdp (
   Information packet.
 
   @param[in]  Private           Pointer of the IPSEC_PRIVATE_DATA.
-  @param[in]  IsDisableIPsec    Indicate whether needs to disable IPsec.
+  @param[in]  IsDisableIpsec    Indicate whether needs to disable IPsec.
 
 **/
 VOID
