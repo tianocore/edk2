@@ -2876,6 +2876,11 @@ UiDisplayMenu (
 
       switch (Key.UnicodeChar) {
       case CHAR_CARRIAGE_RETURN:
+        if(MenuOption->GrayOut || MenuOption->ReadOnly) {
+          ControlFlag = CfReadKey;
+          break;
+        }
+
         ScreenOperation = UiSelect;
         gDirection      = 0;
         break;
@@ -2890,7 +2895,7 @@ UiDisplayMenu (
         // If the screen has no menu items, and the user didn't select UiReset
         // ignore the selection and go back to reading keys.
         //
-        if(IsListEmpty (&gMenuOption)) {
+        if(IsListEmpty (&gMenuOption) || MenuOption->GrayOut || MenuOption->ReadOnly) {
           ControlFlag = CfReadKey;
           break;
         }
@@ -2943,7 +2948,7 @@ UiDisplayMenu (
           }
           
           ASSERT(MenuOption != NULL);
-          if (MenuOption->ThisTag->Operand == EFI_IFR_CHECKBOX_OP && !MenuOption->GrayOut) {
+          if (MenuOption->ThisTag->Operand == EFI_IFR_CHECKBOX_OP && !MenuOption->GrayOut && !MenuOption->ReadOnly) {
             ScreenOperation = UiSelect;
           }
         }
