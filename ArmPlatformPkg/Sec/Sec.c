@@ -47,6 +47,11 @@ CEntryPoint (
   // CPU specific settings
   ArmCpuSetup (MpId);
 
+  // Enable Floating Point Coprocessor if supported by the platform
+  if (FixedPcdGet32 (PcdVFPEnabled)) {
+    ArmEnableVFP();
+  }
+	
   // Primary CPU clears out the SCU tag RAMs, secondaries wait
   if (IS_PRIMARY_CORE(MpId)) {
     if (ArmIsMpCore()) {
@@ -81,10 +86,6 @@ CEntryPoint (
 
   // Enable Full Access to CoProcessors
   ArmWriteCPACR (CPACR_CP_FULL_ACCESS);
-
-  if (FixedPcdGet32 (PcdVFPEnabled)) {
-    ArmEnableVFP();
-  }
 
   if (IS_PRIMARY_CORE(MpId)) {
     // Initialize peripherals that must be done at the early stage
