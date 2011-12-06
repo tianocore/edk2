@@ -1,7 +1,7 @@
 /** @file
   UEFI Miscellaneous boot Services Stall service implementation
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -18,7 +18,26 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "DxeMain.h"
 
+/**
+  Internal worker function to call the Metronome Architectural Protocol for 
+  the number of ticks specified by the UINT64 Counter value.  WaitForTick() 
+  service of the Metronome Architectural Protocol uses a UINT32 for the number
+  of ticks to wait, so this function loops when Counter is larger than 0xffffffff.
 
+  @param  Counter           Number of ticks to wait.
+
+**/
+VOID
+CoreInternalWaitForTick (
+  IN UINT64  Counter
+  )
+{
+  while (Counter > 0xffffffff) {
+    gMetronome->WaitForTick (gMetronome, 0xffffffff);
+    Counter -= 0xffffffff;
+  }
+  gMetronome->WaitForTick (gMetronome, (UINT32)Counter);
+}
 
 /**
   Introduces a fine-grained stall.
@@ -36,33 +55,59 @@ CoreStall (
   IN UINTN            Microseconds
   )
 {
-  UINT32  Counter;
+  UINT64  Counter;
   UINT32  Remainder;
+  UINTN   Index;
 
   if (gMetronome == NULL) {
     return EFI_NOT_AVAILABLE_YET;
   }
 
   //
-  // Calculate the number of ticks by dividing the number of microseconds by
-  // the TickPeriod.
-  // Calculation is based on 100ns unit.
+  // Counter = Microseconds * 10 / gMetronome->TickPeriod
+  // 0x1999999999999999 = (2^64 - 1) / 10
   //
-  Counter = (UINT32) DivU64x32Remainder (
-                       Microseconds * 10,
-                       gMetronome->TickPeriod,
-                       &Remainder
-                       );
+  if (Microseconds > 0x1999999999999999ULL) {
+    //
+    // Microseconds is too large to multiple by 10 first.  Perform the divide 
+    // operation first and loop 10 times to avoid 64-bit math overflow.
+    //
+    Counter = DivU64x32Remainder (
+                Microseconds,
+                gMetronome->TickPeriod,
+                &Remainder
+                );
+    for (Index = 0; Index < 10; Index++) {
+      CoreInternalWaitForTick (Counter);
+    }      
 
-  //
-  // Call WaitForTick for Counter + 1 ticks to try to guarantee Counter tick
-  // periods, thus attempting to ensure Microseconds of stall time.
-  //
-  if (Remainder != 0) {
-    Counter++;
+    if (Remainder != 0) {
+      //
+      // If Remainder was not zero, then normally, Counter would be rounded 
+      // up by 1 tick.  In this case, since a loop for 10 counts was used
+      // to emulate the multiply by 10 operation, Counter needs to be rounded
+      // up by 10 counts.
+      //
+      CoreInternalWaitForTick (10);
+    }
+  } else {
+    //
+    // Calculate the number of ticks by dividing the number of microseconds by
+    // the TickPeriod.  Calculation is based on 100ns unit.
+    //
+    Counter = DivU64x32Remainder (
+                MultU64x32 (Microseconds, 10),
+                gMetronome->TickPeriod,
+                &Remainder
+                );
+    if (Remainder != 0) {
+      //
+      // If Remainder is not zero, then round Counter up by one tick.
+      //
+      Counter++;
+    }
+    CoreInternalWaitForTick (Counter);
   }
-
-  gMetronome->WaitForTick (gMetronome, Counter);
 
   return EFI_SUCCESS;
 }
