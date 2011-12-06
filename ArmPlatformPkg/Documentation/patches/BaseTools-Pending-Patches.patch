@@ -1,8 +1,37 @@
-Index: BaseTools/Source/C/GenFv/GenFv.c
-===================================================================
---- BaseTools/Source/C/GenFv/GenFv.c	(revision 12691)
-+++ BaseTools/Source/C/GenFv/GenFv.c	(working copy)
-@@ -623,12 +623,7 @@
+From c23ebebbcd3ee992017d4aad70e523ea7252c884 Mon Sep 17 00:00:00 2001
+From: Olivier Martin <olivier.martin@arm.com>
+Date: Tue, 6 Dec 2011 16:26:30 +0000
+Subject: [PATCH] BaseTools: Pending patches update
+
+Add patch:
+- ARMLINUXGCC: Set the linked base address at 0x0 (0x8000 by default)
+---
+ BaseTools/Conf/tools_def.template           |    2 +-
+ BaseTools/Source/C/GenFv/GenFv.c            |    7 +---
+ BaseTools/Source/C/GenFv/GenFvInternalLib.c |   48 +++++++++++---------------
+ 3 files changed, 22 insertions(+), 35 deletions(-)
+ mode change 100644 => 100755 BaseTools/Conf/tools_def.template
+
+diff --git a/BaseTools/Conf/tools_def.template b/BaseTools/Conf/tools_def.template
+old mode 100644
+new mode 100755
+index ee7e23e..68caf86
+--- a/BaseTools/Conf/tools_def.template
++++ b/BaseTools/Conf/tools_def.template
+@@ -4320,7 +4320,7 @@ RELEASE_ARMLINUXGCC_ARM_ASM_FLAGS   = $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) -mlittl
+ *_ARMLINUXGCC_ARM_VFRPP_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -x c -E -P -DVFRCOMPILE --include $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
+ 
+ *_ARMLINUXGCC_ARM_SLINK_FLAGS =  -rc
+-*_ARMLINUXGCC_ARM_DLINK_FLAGS =  $(ARCHDLINK_FLAGS)  --oformat=elf32-littlearm --emit-relocs -nostdlib -u $(IMAGE_ENTRY_POINT) -e $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
++*_ARMLINUXGCC_ARM_DLINK_FLAGS =  $(ARCHDLINK_FLAGS) -Ttext=0x0 --oformat=elf32-littlearm --emit-relocs -nostdlib -u $(IMAGE_ENTRY_POINT) -e $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+ 
+   DEBUG_ARMLINUXGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARMGCC_CC_FLAGS) -Wno-address -O0
+ RELEASE_ARMLINUXGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARMGCC_CC_FLAGS) -Wno-address -Wno-unused-but-set-variable
+diff --git a/BaseTools/Source/C/GenFv/GenFv.c b/BaseTools/Source/C/GenFv/GenFv.c
+index fa86d00..27bd2af 100644
+--- a/BaseTools/Source/C/GenFv/GenFv.c
++++ b/BaseTools/Source/C/GenFv/GenFv.c
+@@ -623,12 +623,7 @@ Returns:
                );
    } else {
      VerboseMsg ("Create Fv image and its map file");
@@ -16,11 +45,11 @@ Index: BaseTools/Source/C/GenFv/GenFv.c
        VerboseMsg ("FvImage Rebase Address is 0x%llX", (unsigned long long) mFvDataInfo.BaseAddress);
      }
      //
-Index: BaseTools/Source/C/GenFv/GenFvInternalLib.c
-===================================================================
---- BaseTools/Source/C/GenFv/GenFvInternalLib.c	(revision 12691)
-+++ BaseTools/Source/C/GenFv/GenFvInternalLib.c	(working copy)
-@@ -506,6 +506,7 @@
+diff --git a/BaseTools/Source/C/GenFv/GenFvInternalLib.c b/BaseTools/Source/C/GenFv/GenFvInternalLib.c
+index 684933f..aabba5b 100644
+--- a/BaseTools/Source/C/GenFv/GenFvInternalLib.c
++++ b/BaseTools/Source/C/GenFv/GenFvInternalLib.c
+@@ -506,6 +506,7 @@ Returns:
  
  EFI_STATUS
  AddPadFile (
@@ -28,7 +57,7 @@ Index: BaseTools/Source/C/GenFv/GenFvInternalLib.c
    IN OUT MEMORY_FILE  *FvImage,
    IN UINT32           DataAlignment,
    IN VOID             *FvEnd,
-@@ -537,6 +538,8 @@
+@@ -537,6 +538,8 @@ Returns:
  {
    EFI_FFS_FILE_HEADER *PadFile;
    UINTN               PadFileSize;
@@ -37,7 +66,7 @@ Index: BaseTools/Source/C/GenFv/GenFvInternalLib.c
  
    //
    // Verify input parameters.
-@@ -559,32 +562,29 @@
+@@ -559,32 +562,29 @@ Returns:
    // This is the earliest possible valid offset (current plus pad file header
    // plus the next file header)
    //
@@ -83,7 +112,7 @@ Index: BaseTools/Source/C/GenFv/GenFvInternalLib.c
    // Verify that we have enough space for the file header
    //
    if (((UINTN) FvImage->CurrentFilePointer + PadFileSize) > (UINTN) FvEnd) {
-@@ -1115,7 +1115,7 @@
+@@ -1115,7 +1115,7 @@ Returns:
    //
    // Add pad file if necessary
    //
@@ -92,7 +121,7 @@ Index: BaseTools/Source/C/GenFv/GenFvInternalLib.c
    if (EFI_ERROR (Status)) {
      Error (NULL, 0, 4002, "Resource", "FV space is full, could not add pad file for data alignment property.");
      free (FileBuffer);
-@@ -2304,7 +2304,7 @@
+@@ -2304,7 +2304,7 @@ Returns:
      //
      // Add FV Extended Header contents to the FV as a PAD file
      //
@@ -101,26 +130,29 @@ Index: BaseTools/Source/C/GenFv/GenFvInternalLib.c
  
      //
      // Fv Extension header change update Fv Header Check sum
-@@ -2825,20 +2825,12 @@
+@@ -2825,20 +2825,12 @@ Returns:
    PeFileBuffer       = NULL;
  
    //
 -  // Don't need to relocate image when BaseAddress is zero and no ForceRebase Flag specified.
-+  // Don't need to relocate image when BaseAddress is not set.
-   //
+-  //
 -  if ((FvInfo->BaseAddress == 0) && (FvInfo->ForceRebase == -1)) {
-+  if (FvInfo->BaseAddressSet == FALSE) {
-     return EFI_SUCCESS;
-   }
+-    return EFI_SUCCESS;
+-  }
 -  
 -  //
 -  // If ForceRebase Flag specified to FALSE, will always not take rebase action.
--  //
++  // Don't need to relocate image when BaseAddress is not set.
+   //
 -  if (FvInfo->ForceRebase == 0) {
--    return EFI_SUCCESS;
--  }
++  if (FvInfo->BaseAddressSet == FALSE) {
+     return EFI_SUCCESS;
+   }
  
 -
    XipBase = FvInfo->BaseAddress + XipOffset;
  
    //
+-- 
+1.7.0.4
+
