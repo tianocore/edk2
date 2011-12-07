@@ -180,7 +180,9 @@ class DistributionPackageXml(object):
             for Item in XmlList(self.Pkg, '/DistributionPackage/ModuleSurfaceArea'):
                 Msa = ModuleSurfaceAreaXml()
                 Module = Msa.FromXml(Item, 'ModuleSurfaceArea', True)
-                self.DistP.ModuleSurfaceArea[(Module.GetGuid(), Module.GetVersion(), Module.GetModulePath())] = Module
+                ModuleKey = (Module.GetGuid(), Module.GetVersion(), Module.GetName(), Module.GetModulePath())
+                self.DistP.ModuleSurfaceArea[ModuleKey] = Module
+
             #    
             # Parse Tools
             #

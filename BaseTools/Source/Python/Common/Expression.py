@@ -14,7 +14,6 @@
 #
 from Common.GlobalData import *
 from CommonDataClass.Exceptions import BadExpression
-from CommonDataClass.Exceptions import SymbolNotFound
 from CommonDataClass.Exceptions import WrnExpression
 from Misc import GuidStringToGuidStructureString
 
@@ -36,6 +35,7 @@ ERR_RELCMP_STR_OTHERS   = 'Operator taking Operand of string type and Boolean/Nu
 ERR_STRING_CMP          = 'Unicode string and general string cannot be compared: [%s %s %s]'
 ERR_ARRAY_TOKEN         = 'Bad C array or C format GUID token: [%s].'
 ERR_ARRAY_ELE           = 'This must be HEX value for NList or Array: [%s].'
+ERR_EMPTY_EXPR          = 'Empty expression is not allowed.'
 
 ## SplitString
 #  Split string to list according double quote
@@ -133,7 +133,7 @@ class ValueExpression(object):
     @staticmethod
     def Eval(Operator, Oprand1, Oprand2 = None):
         WrnExp = None
-        
+
         if Operator not in ["==", "!=", ">=", "<=", ">", "<", "in", "not in"] and \
             (type(Oprand1) == type('') or type(Oprand2) == type('')):
             raise BadExpression(ERR_STRING_EXPR % Operator)
@@ -166,13 +166,13 @@ class ValueExpression(object):
                     raise WrnExp
                 else:
                     raise BadExpression(ERR_RELCMP_STR_OTHERS % Operator)
-            elif TypeDict[type(Oprand1)] != TypeDict[type(Oprand2)]: 
+            elif TypeDict[type(Oprand1)] != TypeDict[type(Oprand2)]:
                 if Operator in ["==", "!=", ">=", "<=", ">", "<"] and set((TypeDict[type(Oprand1)], TypeDict[type(Oprand2)])) == set((TypeDict[type(True)], TypeDict[type(0)])):
                     # comparison between number and boolean is allowed
                     pass
-                elif Operator in ['&', '|', '^', "&&", "||"] and set((TypeDict[type(Oprand1)], TypeDict[type(Oprand2)])) == set((TypeDict[type(True)], TypeDict[type(0)])):
+                elif Operator in ['&', '|', '^', "and", "or"] and set((TypeDict[type(Oprand1)], TypeDict[type(Oprand2)])) == set((TypeDict[type(True)], TypeDict[type(0)])):
                     # bitwise and logical operation between number and boolean is allowed
-                    pass                
+                    pass
                 else:
                     raise BadExpression(ERR_EXPR_TYPE)
             if type(Oprand1) == type('') and type(Oprand2) == type(''):
@@ -198,7 +198,7 @@ class ValueExpression(object):
                 Val = True
             else:
                 Val = False
-        
+
         if WrnExp:
             WrnExp.result = Val
             raise WrnExp
@@ -216,8 +216,7 @@ class ValueExpression(object):
                                   ['TARGET', 'TOOL_CHAIN_TAG', 'ARCH'])
 
         if not self._Expr.strip():
-            self._NoProcess = True
-            return
+            raise BadExpression(ERR_EMPTY_EXPR)
 
         #
         # The symbol table including PCD and macro mapping
@@ -227,25 +226,64 @@ class ValueExpression(object):
         self._Idx = 0
         self._Len = len(self._Expr)
         self._Token = ''
+        self._WarnExcept = None
 
         # Literal token without any conversion
         self._LiteralToken = ''
 
     # Public entry for this class
-    def __call__(self):
+    #   @param RealValue: False: only evaluate if the expression is true or false, used for conditional expression
+    #                     True : return the evaluated str(value), used for PCD value
+    #
+    #   @return: True or False if RealValue is False
+    #            Evaluated value of string format if RealValue is True
+    #
+    def __call__(self, RealValue=False):
         if self._NoProcess:
             return self._Expr
 
+        self._Expr = self._Expr.strip()
+        if RealValue:
+            self._Token = self._Expr
+            if self.__IsNumberToken():
+                return self._Expr
+
+            Token = self._GetToken()
+            if type(Token) == type('') and Token.startswith('{') and Token.endswith('}') and self._Idx >= self._Len:
+                return self._Expr
+
+            self._Idx = 0
+            self._Token = ''
+
         Val = self._OrExpr()
-        if type(Val) == type('') and Val == 'L""':
-            Val = ''
+        RealVal = Val
+        if type(Val) == type(''):
+            if Val == 'L""':
+                Val = False
+            elif not Val:
+                Val = False
+                RealVal = '""'
+            elif not Val.startswith('L"') and not Val.startswith('{'):
+                Val = True
+                RealVal = '"' + RealVal + '"'
 
         # The expression has been parsed, but the end of expression is not reached
         # It means the rest does not comply EBNF of <Expression>
         if self._Idx != self._Len:
             raise BadExpression(ERR_SNYTAX % self._Expr[self._Idx:])
 
-        return Val
+        if RealValue:
+            RetVal = str(RealVal)
+        elif Val:
+            RetVal = True
+        else:
+            RetVal = False
+
+        if self._WarnExcept:
+            self._WarnExcept.result = RetVal
+            raise self._WarnExcept
+        else:
+            return RetVal
 
     # Template function to parse binary operators which have same precedence
     # Expr [Operator Expr]*
@@ -253,7 +291,11 @@ class ValueExpression(object):
         Val = EvalFunc()
         while self._IsOperator(OpLst):
             Op = self._Token
-            Val = self.Eval(Op, Val, EvalFunc())
+            try:
+                Val = self.Eval(Op, Val, EvalFunc())
+            except WrnExpression, Warn:
+                self._WarnExcept = Warn
+                Val = Warn.result
         return Val
 
     # A [|| B]*
@@ -285,7 +327,11 @@ class ValueExpression(object):
                 if not self._IsOperator(["IN", "in"]):
                     raise BadExpression(ERR_REL_NOT_IN)
                 Op += ' ' + self._Token
-            Val = self.Eval(Op, Val, self._RelExpr())
+            try:
+                Val = self.Eval(Op, Val, self._RelExpr())
+            except WrnExpression, Warn:
+                self._WarnExcept = Warn
+                Val = Warn.result
         return Val
 
     # A [ > B]*
@@ -300,7 +346,11 @@ class ValueExpression(object):
     def _UnaryExpr(self):
         if self._IsOperator(["!", "NOT", "not"]):
             Val = self._UnaryExpr()
-            return self.Eval('not', Val)
+            try:
+                return self.Eval('not', Val)
+            except WrnExpression, Warn:
+                self._WarnExcept = Warn
+                return Warn.result
         return self._IdenExpr()
 
     # Parse identifier or encapsulated expression
@@ -407,8 +457,8 @@ class ValueExpression(object):
         # PCD token
         if self.PcdPattern.match(self._Token):
             if self._Token not in self._Symb:
-                raise SymbolNotFound(ERR_PCD_RESOLVE % self._Token)
-            self._Token = ValueExpression(self._Symb[self._Token], self._Symb)()
+                raise BadExpression(ERR_PCD_RESOLVE % self._Token)
+            self._Token = ValueExpression(self._Symb[self._Token], self._Symb)(True)
             if type(self._Token) != type(''):
                 self._LiteralToken = hex(self._Token)
                 return
@@ -459,7 +509,7 @@ class ValueExpression(object):
             if not Token:
                 self._LiteralToken = '0x0'
             else:
-                self._LiteralToken = '0x' + Token
+                self._LiteralToken = '0x' + Token.lower()
             return True
         return False
 
@@ -488,7 +538,7 @@ class ValueExpression(object):
             if Match and not Expr[Match.end():Match.end()+1].isalnum() \
                 and Expr[Match.end():Match.end()+1] != '_':
                 self._Idx += Match.end()
-                self._Token = ValueExpression(GuidStringToGuidStructureString(Expr[0:Match.end()]))()
+                self._Token = ValueExpression(GuidStringToGuidStructureString(Expr[0:Match.end()]))(True)
                 return self._Token
             elif self.__IsIdChar(Ch):
                 return self.__GetIdToken()
@@ -526,7 +576,7 @@ class ValueExpression(object):
         OpToken = ''
         for Ch in Expr:
             if Ch in self.NonLetterOpLst:
-                if '!' == Ch and OpToken in ['!=', '!']:
+                if '!' == Ch and OpToken:
                     break
                 self._Idx += 1
                 OpToken += Ch
@@ -551,5 +601,15 @@ class ValueExpression(object):
 
 if __name__ == '__main__':
     pass
-
-
+    while True:
+        input = raw_input('Input expr: ')
+        if input in 'qQ':
+            break
+        try:
+            print ValueExpression(input)(True)
+            print ValueExpression(input)(False)
+        except WrnExpression, Ex:
+            print Ex.result
+            print str(Ex)
+        except Exception, Ex:
+            print str(Ex)

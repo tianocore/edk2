@@ -22,6 +22,7 @@ from CommonDataClass.DataClass import *
 from Common.String import CleanString, GetSplitValueList, ReplaceMacro
 import EotGlobalData
 from Common.Misc import sdict
+from Common.String import GetSplitList
 
 ## PreProcess() method
 #

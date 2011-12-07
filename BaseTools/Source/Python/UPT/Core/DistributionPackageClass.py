@@ -95,7 +95,7 @@ class DistributionPackageClass(object):
         #
         self.PackageSurfaceArea = Sdict() 
         #
-        # {(Guid, Version, Path) : ModuleObj}
+        # {(Guid, Version, Name, Path) : ModuleObj}
         #
         self.ModuleSurfaceArea = Sdict()  
         self.Tools = MiscFileObject()
@@ -149,6 +149,7 @@ class DistributionPackageClass(object):
                         ModuleDict = PackageObj.GetModuleDict()
                         ModuleDict[(ModuleObj.GetGuid(), \
                                     ModuleObj.GetVersion(), \
+                                    ModuleObj.GetName(), \
                                     ModuleObj.GetCombinePath())] = ModuleObj
                         PackageObj.SetModuleDict(ModuleDict)
                     except FatalError, ErrCode:
@@ -172,10 +173,11 @@ class DistributionPackageClass(object):
                 try:
                     ModuleObj = InfPomAlignment(ModuleFileFullPath, 
                                                 WorkspaceDir)
-                    self.ModuleSurfaceArea[(ModuleObj.GetGuid(), \
-                                            ModuleObj.GetVersion(), \
-                                            ModuleObj.GetCombinePath())] = \
-                                            ModuleObj
+                    ModuleKey = (ModuleObj.GetGuid(), 
+                                 ModuleObj.GetVersion(), 
+                                 ModuleObj.GetName(), 
+                                 ModuleObj.GetCombinePath())
+                    self.ModuleSurfaceArea[ModuleKey] = ModuleObj
                 except FatalError, ErrCode:
                     if ErrCode.message == EDK1_INF_ERROR:
                         Logger.Error("UPT",
@@ -207,16 +209,16 @@ class DistributionPackageClass(object):
         
             Module = None
             ModuleDict = Package.GetModuleDict()
-            for Guid, Version, Path in ModuleDict:
-                Module = ModuleDict[Guid, Version, Path]
+            for Guid, Version, Name, Path in ModuleDict:
+                Module = ModuleDict[Guid, Version, Name, Path]
                 ModulePath = Module.GetModulePath()
                 FullPath = Module.GetFullPath()
                 PkgRelPath = os.path.normpath(os.path.join(PackagePath, ModulePath))
                 MetaDataFileList.append(Path)
                 self.FileList += GetNonMetaDataFiles(os.path.dirname(FullPath), ['CVS', '.svn'], False, PkgRelPath)
      
-        for Guid, Version, Path in self.ModuleSurfaceArea:
-            Module = self.ModuleSurfaceArea[Guid, Version, Path]
+        for Guid, Version, Name, Path in self.ModuleSurfaceArea:
+            Module = self.ModuleSurfaceArea[Guid, Version, Name, Path]
             ModulePath = Module.GetModulePath()
             FullPath = Module.GetFullPath()
             MetaDataFileList.append(Path)

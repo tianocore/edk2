@@ -429,7 +429,7 @@ class DscBuildData(PlatformBuildClassObject):
                                     File=self.MetaFile, Line=Record[-1])
                 self._SkuIds[Record[1]] = Record[0]
             if 'DEFAULT' not in self._SkuIds:
-                self._SkuIds['DEFAULT'] = 0
+                self._SkuIds['DEFAULT'] = '0'
         return self._SkuIds
 
     ## Retrieve [Components] section information
@@ -1343,10 +1343,10 @@ class InfBuildData(ModuleBuildClassObject):
     def _GetMacros(self):
         if self.__Macros == None:
             self.__Macros = {}
-            # EDK_GLOBAL defined macros can be applied to EDK modoule
+            # EDK_GLOBAL defined macros can be applied to EDK module
             if self.AutoGenVersion < 0x00010005:
                 self.__Macros.update(GlobalData.gEdkGlobal)
-            self.__Macros.update(GlobalData.gGlobalDefines)
+                self.__Macros.update(GlobalData.gGlobalDefines)
         return self.__Macros
 
     ## Get architecture
@@ -1760,8 +1760,6 @@ class InfBuildData(ModuleBuildClassObject):
             self._Sources = []
             RecordList = self._RawData[MODEL_EFI_SOURCE_FILE, self._Arch, self._Platform]
             Macros = self._Macros
-            Macros["EDK_SOURCE"] = GlobalData.gEcpSource
-            Macros['PROCESSOR'] = self._Arch
             for Record in RecordList:
                 LineNo = Record[-1]
                 ToolChainFamily = Record[1]
@@ -1769,6 +1767,8 @@ class InfBuildData(ModuleBuildClassObject):
                 ToolCode = Record[3]
                 FeatureFlag = Record[4]
                 if self.AutoGenVersion < 0x00010005:
+                    Macros["EDK_SOURCE"] = GlobalData.gEcpSource
+                    Macros['PROCESSOR'] = self._Arch
                     # old module source files (Edk)
                     File = PathClass(NormPath(Record[0], Macros), self._ModuleDir, self._SourceOverridePath,
                                      '', False, self._Arch, ToolChainFamily, '', TagName, ToolCode)

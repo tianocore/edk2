@@ -22,13 +22,17 @@ from MetaDataParser import *
 from optparse import OptionParser
 from Configuration import Configuration
 from Check import Check
-from Common.InfClassObject import Inf
-from Common.DecClassObject import Dec
-from Common.DscClassObject import Dsc
-from Common.FdfClassObject import Fdf
+
+
 from Common.String import NormPath
 from Common.BuildVersion import gBUILD_VERSION
 from Common import BuildToolError
+
+from MetaFileWorkspace.MetaFileParser import DscParser
+from MetaFileWorkspace.MetaFileParser import DecParser
+from MetaFileWorkspace.MetaFileParser import InfParser
+from MetaFileWorkspace.MetaFileParser import Fdf
+from MetaFileWorkspace.MetaFileTable import MetaFileStorage
 import c
 import re, string
 from Exception import *
@@ -53,6 +57,7 @@ class Ecc(object):
         self.IsInit = True
         self.ScanSourceCode = True
         self.ScanMetaData = True
+        self.MetaFile = ''
 
         # Parse the options and args
         self.ParseOption()
@@ -124,7 +129,6 @@ class Ecc(object):
         for Root, Dirs, Files in os.walk(EccGlobalData.gTarget):
             if p.match(Root.upper()):
                 continue
-
             for Dir in Dirs:
                 Dirname = os.path.join(Root, Dir)
                 if os.path.islink(Dirname):
@@ -139,19 +143,28 @@ class Ecc(object):
                     Filename = os.path.normpath(os.path.join(Root, File))
                     EdkLogger.quiet("Parsing %s" % Filename)
                     Op.write("%s\r" % Filename)
-                    Dec(Filename, True, True, EccGlobalData.gWorkspace, EccGlobalData.gDb)
+                    #Dec(Filename, True, True, EccGlobalData.gWorkspace, EccGlobalData.gDb)
+                    self.MetaFile = DecParser(Filename, MODEL_FILE_DEC, EccGlobalData.gDb.TblDec)
+                    self.MetaFile.Start()
                     continue
                 if len(File) > 4 and File[-4:].upper() == ".DSC":
                     Filename = os.path.normpath(os.path.join(Root, File))
                     EdkLogger.quiet("Parsing %s" % Filename)
                     Op.write("%s\r" % Filename)
-                    Dsc(Filename, True, True, EccGlobalData.gWorkspace, EccGlobalData.gDb)
+                    #Dsc(Filename, True, True, EccGlobalData.gWorkspace, EccGlobalData.gDb)
+                    self.MetaFile = DscParser(Filename, MODEL_FILE_DSC, MetaFileStorage(EccGlobalData.gDb.TblDsc.Cur, Filename, MODEL_FILE_DSC, True))
+                    # alwasy do post-process, in case of macros change
+                    self.MetaFile.DoPostProcess()
+                    self.MetaFile.Start()
+                    self.MetaFile._PostProcess()
                     continue
                 if len(File) > 4 and File[-4:].upper() == ".INF":
                     Filename = os.path.normpath(os.path.join(Root, File))
                     EdkLogger.quiet("Parsing %s" % Filename)
                     Op.write("%s\r" % Filename)
-                    Inf(Filename, True, True, EccGlobalData.gWorkspace, EccGlobalData.gDb)
+                    #Inf(Filename, True, True, EccGlobalData.gWorkspace, EccGlobalData.gDb)
+                    self.MetaFile = InfParser(Filename, MODEL_FILE_INF, EccGlobalData.gDb.TblInf)
+                    self.MetaFile.Start()
                     continue
                 if len(File) > 4 and File[-4:].upper() == ".FDF":
                     Filename = os.path.normpath(os.path.join(Root, File))

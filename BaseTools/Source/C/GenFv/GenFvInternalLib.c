@@ -1021,7 +1021,7 @@ Returns:
   Status = VerifyFfsFile ((EFI_FFS_FILE_HEADER *)FileBuffer);
   if (EFI_ERROR (Status)) {
     free (FileBuffer);
-    Error (NULL, 0, 3000, "Invalid", "%s is a FFS file.", FvInfo->FvFiles[Index]);
+    Error (NULL, 0, 3000, "Invalid", "%s is not a valid FFS file.", FvInfo->FvFiles[Index]);
     return EFI_INVALID_PARAMETER;
   }
 

@@ -524,6 +524,7 @@ ERR_UNKNOWN_ERROR                = _("Unknown error")
 ERR_UPT_ALREADY_INSTALLED_ERROR  = _("Already installed")
 ERR_UPT_ENVIRON_MISSING_ERROR    = _("Environ missing")
 ERR_UPT_REPKG_ERROR              = _("File not allowed for RePackage")
+ERR_UPT_DB_UPDATE_ERROR          = _("Update database did not complete successfully")
 ERR_UPT_INI_PARSE_ERROR          = _("INI file parse error")
 ERR_COPYRIGHT_MISSING            = \
 _("Header comment section must have copyright information")

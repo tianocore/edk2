@@ -265,11 +265,11 @@ def GetModuleList(DistPkg, Dep, WorkspaceDir, ContentZipFile, ModuleList):
     #
     Module = None
     NewDict = Sdict()        
-    for Guid, Version, Path in DistPkg.ModuleSurfaceArea:
+    for Guid, Version, Name, Path in DistPkg.ModuleSurfaceArea:
         ModulePath = Path
-        Module = DistPkg.ModuleSurfaceArea[Guid, Version, Path]
+        Module = DistPkg.ModuleSurfaceArea[Guid, Version, Name, Path]
         Logger.Info(ST.MSG_INSTALL_MODULE % Module.GetName())
-        if Dep.CheckModuleExists(Guid, Version):
+        if Dep.CheckModuleExists(Guid, Version, Name, Path):
             Logger.Quiet(ST.WRN_MODULE_EXISTED %Path)
         #
         # here check for the multiple inf share the same module path cases:
@@ -291,7 +291,7 @@ def GetModuleList(DistPkg, Dep, WorkspaceDir, ContentZipFile, ModuleList):
         #
         Module.SetModulePath(Module.GetModulePath().replace(Path, NewModulePath, 1))
         
-        NewDict[Guid, Version, Module.GetModulePath()] = Module
+        NewDict[Guid, Version, Name, Module.GetModulePath()] = Module
 
     #
     # generate all inf for modules
@@ -737,8 +737,8 @@ def InstallPackageContent(FromPath, ToPath, Package, ContentZipFile, Dep,
     #
     Module = None
     ModuleDict = Package.GetModuleDict()
-    for ModuleGuid, ModuleVersion, ModulePath in ModuleDict:
-        Module = ModuleDict[ModuleGuid, ModuleVersion, ModulePath]
+    for ModuleGuid, ModuleVersion, ModuleName, ModulePath in ModuleDict:
+        Module = ModuleDict[ModuleGuid, ModuleVersion, ModuleName, ModulePath]
         InstallModuleContent(FromPath, ToPath, ModulePath, Module,
             ContentZipFile, WorkspaceDir, ModuleList, Package, ReadOnly)
 

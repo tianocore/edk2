@@ -875,7 +875,7 @@ def ProcessEdkComment(LineList):
                 for Index in xrange(StartPos, EndPos+1):
                     LineList[Index] = ''
                 FindEdkBlockComment = False
-        elif Line.find("//") != -1:
+        elif Line.find("//") != -1 and not Line.startswith("#"):
             #
             # handling cpp style comment
             #

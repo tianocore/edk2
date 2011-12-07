@@ -312,7 +312,7 @@ gAutoGenHPrologueString = TemplateString("""
 
 """)
 
-gAutoGenHCppPrologueString = """
+gAutoGenHCppPrologueString = """\
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -971,9 +971,9 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
 
         if Pcd.DatumType == 'BOOLEAN':
             BoolValue = Value.upper()
-            if BoolValue == 'TRUE':
+            if BoolValue == 'TRUE' or BoolValue == '1':
                 Value = '1U'
-            elif BoolValue == 'FALSE':
+            elif BoolValue == 'FALSE' or BoolValue == '0':
                 Value = '0U'
 
         if Pcd.DatumType in ['UINT64', 'UINT32', 'UINT16', 'UINT8']:
@@ -1193,14 +1193,14 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
 
     Dict = {
         'PHASE'                         : Phase,
-        'GUID_TABLE_SIZE'               : '1',
-        'STRING_TABLE_SIZE'             : '1',
-        'SKUID_TABLE_SIZE'              : '1',
-        'LOCAL_TOKEN_NUMBER_TABLE_SIZE' : '1',
-        'LOCAL_TOKEN_NUMBER'            : '0',
-        'EXMAPPING_TABLE_SIZE'          : '1',
-        'EX_TOKEN_NUMBER'               : '0',
-        'SIZE_TABLE_SIZE'               : '2',
+        'GUID_TABLE_SIZE'               : '1U',
+        'STRING_TABLE_SIZE'             : '1U',
+        'SKUID_TABLE_SIZE'              : '1U',
+        'LOCAL_TOKEN_NUMBER_TABLE_SIZE' : '1U',
+        'LOCAL_TOKEN_NUMBER'            : '0U',
+        'EXMAPPING_TABLE_SIZE'          : '1U',
+        'EX_TOKEN_NUMBER'               : '0U',
+        'SIZE_TABLE_SIZE'               : '2U',
         'GUID_TABLE_EMPTY'              : 'TRUE',
         'STRING_TABLE_EMPTY'            : 'TRUE',
         'SKUID_TABLE_EMPTY'             : 'TRUE',
@@ -1208,7 +1208,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
         'EXMAP_TABLE_EMPTY'             : 'TRUE',
         'PCD_DATABASE_UNINIT_EMPTY'     : '  UINT8  dummy; /* PCD_DATABASE_UNINIT is emptry */',
         'SYSTEM_SKU_ID'                 : '  SKU_ID             SystemSkuId;',
-        'SYSTEM_SKU_ID_VALUE'           : '0'
+        'SYSTEM_SKU_ID_VALUE'           : '0U'
     }
 
     for DatumType in ['UINT64','UINT32','UINT16','UINT8','BOOLEAN', "VOID*"]:
@@ -1313,10 +1313,10 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
             if SkuId == None or SkuId == '':
                 continue
 
-            if SkuId not in Dict['SKUID_VALUE']:
-                Dict['SKUID_VALUE'].append(SkuId)
+            if (SkuId + 'U') not in Dict['SKUID_VALUE']:
+                Dict['SKUID_VALUE'].append(SkuId + 'U')
 
-            SkuIdIndex =   Dict['SKUID_VALUE'].index(SkuId)
+            SkuIdIndex =   Dict['SKUID_VALUE'].index(SkuId + 'U')
             if len(Sku.VariableName) > 0:
                 Pcd.TokenTypeList += ['PCD_TYPE_HII']
                 Pcd.InitString = 'INIT'
@@ -1346,11 +1346,11 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
                 VariableHeadGuidIndex = GuidList.index(VariableGuid)
 
                 if "PCD_TYPE_STRING" in Pcd.TokenTypeList:
-                    VariableHeadValueList.append('%d, %d, %s, offsetof(%s_PCD_DATABASE, Init.%s_%s)' %
+                    VariableHeadValueList.append('%dU, %dU, %sU, offsetof(%s_PCD_DATABASE, Init.%s_%s)' %
                                                  (VariableHeadGuidIndex, VariableHeadStringIndex, Sku.VariableOffset,
                                                   Phase, CName, TokenSpaceGuid))
                 else:
-                    VariableHeadValueList.append('%d, %d, %s, offsetof(%s_PCD_DATABASE, Init.%s_%s_VariableDefault_%s)' %
+                    VariableHeadValueList.append('%dU, %dU, %sU, offsetof(%s_PCD_DATABASE, Init.%s_%s_VariableDefault_%s)' %
                                                  (VariableHeadGuidIndex, VariableHeadStringIndex, Sku.VariableOffset,
                                                   Phase, CName, TokenSpaceGuid, SkuIdIndex))
                 Dict['VARDEF_CNAME_'+Pcd.DatumType].append(CName)
@@ -1359,11 +1359,24 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
                 if "PCD_TYPE_STRING" in  Pcd.TokenTypeList:
                     Dict['VARDEF_VALUE_' + Pcd.DatumType].append("%s_%s[%d]" % (Pcd.TokenCName, TokenSpaceGuid, SkuIdIndex))
                 else:
-                    Dict['VARDEF_VALUE_'+Pcd.DatumType].append(Sku.HiiDefaultValue)
+                    #
+                    # ULL (for UINT64) or U(other integer type) should be append to avoid
+                    # warning under linux building environment.
+                    #
+                    if Pcd.DatumType == "UINT64":
+                        Dict['VARDEF_VALUE_'+Pcd.DatumType].append(Sku.HiiDefaultValue + "ULL")
+                    elif Pcd.DatumType in ("UINT32", "UINT16", "UINT8"):
+                        Dict['VARDEF_VALUE_'+Pcd.DatumType].append(Sku.HiiDefaultValue + "U")
+                    elif Pcd.DatumType == "BOOLEAN":
+                        if Sku.HiiDefaultValue in ["1", "0"]:
+                            Dict['VARDEF_VALUE_'+Pcd.DatumType].append(Sku.HiiDefaultValue + "U")
+                    else:
+                        Dict['VARDEF_VALUE_'+Pcd.DatumType].append(Sku.HiiDefaultValue)
+
             elif Sku.VpdOffset != '':
                 Pcd.TokenTypeList += ['PCD_TYPE_VPD']
                 Pcd.InitString = 'INIT'
-                VpdHeadOffsetList.append(Sku.VpdOffset)
+                VpdHeadOffsetList.append(str(Sku.VpdOffset) + 'U')
                 continue
           
             if Pcd.DatumType == 'VOID*':
@@ -1390,11 +1403,11 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
                         Size = len(Sku.DefaultValue.replace(',',' ').split())
                         Dict['STRING_TABLE_VALUE'].append(Sku.DefaultValue)
 
-                    StringHeadOffsetList.append(str(StringTableSize))
+                    StringHeadOffsetList.append(str(StringTableSize) + 'U')
                     Dict['SIZE_TABLE_CNAME'].append(CName)
                     Dict['SIZE_TABLE_GUID'].append(TokenSpaceGuid)
-                    Dict['SIZE_TABLE_CURRENT_LENGTH'].append(Size)
-                    Dict['SIZE_TABLE_MAXIMUM_LENGTH'].append(Pcd.MaxDatumSize)
+                    Dict['SIZE_TABLE_CURRENT_LENGTH'].append(str(Size) + 'U')
+                    Dict['SIZE_TABLE_MAXIMUM_LENGTH'].append(str(Pcd.MaxDatumSize) + 'U')
                     if Pcd.MaxDatumSize != '':
                         MaxDatumSize = int(Pcd.MaxDatumSize, 0)
                         if MaxDatumSize < Size:
@@ -1425,6 +1438,9 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
                     ValueList.append(Sku.DefaultValue + "ULL")
                 elif Pcd.DatumType in ("UINT32", "UINT16", "UINT8"):
                     ValueList.append(Sku.DefaultValue + "U")
+                elif Pcd.DatumType == "BOOLEAN":
+                    if Sku.DefaultValue in ["1", "0"]:
+                        ValueList.append(Sku.DefaultValue + "U")              
                 else:
                     ValueList.append(Sku.DefaultValue)
 
@@ -1489,8 +1505,19 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
         Dict['TOKEN_CNAME'][GeneratedTokenNumber] = CName
         Dict['TOKEN_GUID'][GeneratedTokenNumber] = TokenSpaceGuid
         Dict['TOKEN_TYPE'][GeneratedTokenNumber] = ' | '.join(Pcd.TokenTypeList)
+        
+        Pcd.TokenTypeList = list(set(Pcd.TokenTypeList))
+        #
+        # Update VARDEF_HEADER
+        #
+        if 'PCD_TYPE_HII' in Pcd.TokenTypeList:
+            Dict['VARDEF_HEADER'][GeneratedTokenNumber] = '_Variable_Header'
+        else:
+            Dict['VARDEF_HEADER'][GeneratedTokenNumber] = ''
+        
+        
         if Pcd.Type in gDynamicExPcd:
-            Dict['EXMAPPING_TABLE_EXTOKEN'].append(Pcd.TokenValue)
+            Dict['EXMAPPING_TABLE_EXTOKEN'].append(str(Pcd.TokenValue) + 'U')
             if Phase == 'DXE':
                 GeneratedTokenNumber += NumberOfPeiLocalTokens
             #
@@ -1502,12 +1529,12 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
             # Therefore, 1 is added to GeneratedTokenNumber to generate a PCD Token Number before being inserted
             # to the EXMAPPING_TABLE.
             #
-            Dict['EXMAPPING_TABLE_LOCAL_TOKEN'].append(GeneratedTokenNumber + 1)
-            Dict['EXMAPPING_TABLE_GUID_INDEX'].append(GuidList.index(TokenSpaceGuid))
+            Dict['EXMAPPING_TABLE_LOCAL_TOKEN'].append(str(GeneratedTokenNumber + 1) + 'U')
+            Dict['EXMAPPING_TABLE_GUID_INDEX'].append(str(GuidList.index(TokenSpaceGuid)) + 'U')
 
     if GuidList != []:
         Dict['GUID_TABLE_EMPTY'] = 'FALSE'
-        Dict['GUID_TABLE_SIZE'] = len(GuidList)
+        Dict['GUID_TABLE_SIZE'] = str(len(GuidList)) + 'U'
     else:
         Dict['GUID_STRUCTURE'] = [GuidStringToGuidStructureString('00000000-0000-0000-0000-000000000000')]
 
@@ -1519,13 +1546,13 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
         Dict['STRING_TABLE_VALUE'].append('{ 0 }')
     else:
         Dict['STRING_TABLE_EMPTY'] = 'FALSE'
-        Dict['STRING_TABLE_SIZE'] = StringTableSize
+        Dict['STRING_TABLE_SIZE'] = str(StringTableSize) + 'U'
 
     if Dict['SIZE_TABLE_CNAME'] == []:
         Dict['SIZE_TABLE_CNAME'].append('')
         Dict['SIZE_TABLE_GUID'].append('')
-        Dict['SIZE_TABLE_CURRENT_LENGTH'].append(0)
-        Dict['SIZE_TABLE_MAXIMUM_LENGTH'].append(0)
+        Dict['SIZE_TABLE_CURRENT_LENGTH'].append('0U')
+        Dict['SIZE_TABLE_MAXIMUM_LENGTH'].append('0U')
 
     if NumberOfLocalTokens != 0:
         Dict['DATABASE_EMPTY']                = 'FALSE'
@@ -1534,15 +1561,15 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
 
     if NumberOfExTokens != 0:
         Dict['EXMAP_TABLE_EMPTY']    = 'FALSE'
-        Dict['EXMAPPING_TABLE_SIZE'] = NumberOfExTokens
-        Dict['EX_TOKEN_NUMBER']      = NumberOfExTokens
+        Dict['EXMAPPING_TABLE_SIZE'] = str(NumberOfExTokens) + 'U'
+        Dict['EX_TOKEN_NUMBER']      = str(NumberOfExTokens) + 'U'
     else:
-        Dict['EXMAPPING_TABLE_EXTOKEN'].append(0)
-        Dict['EXMAPPING_TABLE_LOCAL_TOKEN'].append(0)
-        Dict['EXMAPPING_TABLE_GUID_INDEX'].append(0)
+        Dict['EXMAPPING_TABLE_EXTOKEN'].append('0U')
+        Dict['EXMAPPING_TABLE_LOCAL_TOKEN'].append('0U')
+        Dict['EXMAPPING_TABLE_GUID_INDEX'].append('0U')
 
     if NumberOfSizeItems != 0:
-        Dict['SIZE_TABLE_SIZE'] = NumberOfSizeItems * 2
+        Dict['SIZE_TABLE_SIZE'] = str(NumberOfSizeItems * 2) + 'U'
 
     AutoGenH.Append(gPcdDatabaseAutoGenH.Replace(Dict))
     if NumberOfLocalTokens == 0:
@@ -1716,8 +1743,8 @@ def CreateModuleEntryPointCode(Info, AutoGenC, AutoGenH):
         UefiSpecVersion = '0x00000000'
     Dict = {
         'Function'       :   Info.Module.ModuleEntryPointList,
-        'PiSpecVersion'  :   PiSpecVersion,
-        'UefiSpecVersion':   UefiSpecVersion
+        'PiSpecVersion'  :   PiSpecVersion + 'U',
+        'UefiSpecVersion':   UefiSpecVersion + 'U'
     }
 
     if Info.ModuleType in ['PEI_CORE', 'DXE_CORE', 'SMM_CORE']:
@@ -1777,7 +1804,7 @@ def CreateModuleUnloadImageCode(Info, AutoGenC, AutoGenH):
     # Unload Image Handlers
     #
     NumUnloadImage = len(Info.Module.ModuleUnloadImageList)
-    Dict = {'Count':NumUnloadImage, 'Function':Info.Module.ModuleUnloadImageList}
+    Dict = {'Count':str(NumUnloadImage) + 'U', 'Function':Info.Module.ModuleUnloadImageList}
     if NumUnloadImage < 2:
         AutoGenC.Append(gUefiUnloadImageString[NumUnloadImage].Replace(Dict))
     else:

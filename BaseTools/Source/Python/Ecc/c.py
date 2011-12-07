@@ -2305,28 +2305,90 @@ def CheckFileHeaderDoxygenComments(FullFileName):
                    """ % (FileTable, DataClass.MODEL_IDENTIFIER_COMMENT)
     ResultSet = Db.TblFile.Exec(SqlStatement)
     if len(ResultSet) == 0:
-        PrintErrorMsg(ERROR_HEADER_CHECK_FILE, 'No Comment appear at the very beginning of file.', 'File', FileID)
+        PrintErrorMsg(ERROR_HEADER_CHECK_FILE, 'No File License header appear at the very beginning of file.', 'File', FileID)
         return ErrorMsgList
 
-    IsFoundError1 = True
-    IsFoundError2 = True
-    IsFoundError3 = True
+    NoHeaderCommentStartFlag = True
+    NoHeaderCommentEndFlag = True
+    NoHeaderCommentPeriodFlag = True
+    NoCopyrightFlag = True
+    NoLicenseFlag = True
+    NoRevReferFlag = True
+    NextLineIndex = 0
     for Result in ResultSet:
+        FileStartFlag = False
+        CommentStrList = []
         CommentStr = Result[0].strip()
+        CommentStrListTemp = CommentStr.split('\n')
+        if (len(CommentStrListTemp) <= 1):
+            # For Mac
+            CommentStrListTemp = CommentStr.split('\r')
+        # Skip the content before the file  header    
+        for CommentLine in CommentStrListTemp:
+            if CommentLine.strip().startswith('/** @file'):
+                FileStartFlag = True
+            if FileStartFlag ==  True:
+                CommentStrList.append(CommentLine)
+                       
         ID = Result[1]
-        if CommentStr.startswith('/** @file'):
-            IsFoundError1 = False
-        if CommentStr.endswith('**/'):
-            IsFoundError2 = False
-        if CommentStr.find('.') != -1:
-            IsFoundError3 = False
+        Index = 0
+        if CommentStrList and CommentStrList[0].strip().startswith('/** @file'):
+            NoHeaderCommentStartFlag = False
+        else:
+            continue
+        if CommentStrList and CommentStrList[-1].strip().endswith('**/'):
+            NoHeaderCommentEndFlag = False
+        else:
+            continue
 
-    if IsFoundError1:
+        for CommentLine in CommentStrList:
+            Index = Index + 1
+            NextLineIndex = Index
+            if CommentLine.startswith('/** @file'):
+                continue
+            if CommentLine.startswith('**/'):
+                break
+            # Check whether C File header Comment content start with two spaces.
+            if EccGlobalData.gConfig.HeaderCheckCFileCommentStartSpacesNum == '1' or EccGlobalData.gConfig.HeaderCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
+                if CommentLine.startswith('/** @file') == False and CommentLine.startswith('**/') == False and CommentLine.strip() and CommentLine.startswith('  ') == False:
+                    PrintErrorMsg(ERROR_HEADER_CHECK_FILE, 'File header comment content should start with two spaces at each line', FileTable, ID)
+            
+            CommentLine = CommentLine.strip()
+            if CommentLine.startswith('Copyright'):
+                NoCopyrightFlag = False
+                if CommentLine.find('All rights reserved') == -1:
+                    PrintErrorMsg(ERROR_HEADER_CHECK_FILE, '""All rights reserved"" announcement should be following the ""Copyright"" at the same line', FileTable, ID)
+                if CommentLine.endswith('<BR>') == -1:
+                    PrintErrorMsg(ERROR_HEADER_CHECK_FILE, 'The ""<BR>"" at the end of the Copyright line is required', FileTable, ID)
+                if NextLineIndex < len(CommentStrList) and CommentStrList[NextLineIndex].strip().startswith('Copyright') == False and CommentStrList[NextLineIndex].strip():
+                    NoLicenseFlag = False
+            if CommentLine.startswith('@par Revision Reference:'):
+                NoRevReferFlag = False
+                RefListFlag = False
+                for RefLine in CommentStrList[NextLineIndex:]:
+                    if RefLine.strip() and (NextLineIndex + 1) < len(CommentStrList) and CommentStrList[NextLineIndex+1].strip() and CommentStrList[NextLineIndex+1].strip().startswith('**/') == False:
+                        RefListFlag = True
+                    if RefLine.strip() == False or RefLine.strip().startswith('**/'):
+                        RefListFlag = False
+                        break
+                    # Check whether C File header Comment's each reference at list should begin with a bullet character.
+                    if EccGlobalData.gConfig.HeaderCheckCFileCommentReferenceFormat == '1' or EccGlobalData.gConfig.HeaderCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
+                        if RefListFlag == True:
+                            if RefLine.strip() and RefLine.strip().startswith('**/') == False and RefLine.startswith('  -') == False:                            
+                                PrintErrorMsg(ERROR_HEADER_CHECK_FILE, 'Each reference on a separate line should begin with a bullet character ""-"" ', FileTable, ID)                    
+    
+    if NoHeaderCommentStartFlag:
         PrintErrorMsg(ERROR_DOXYGEN_CHECK_FILE_HEADER, 'File header comment should begin with ""/** @file""', FileTable, ID)
-    if IsFoundError2:
+        return
+    if NoHeaderCommentEndFlag:
         PrintErrorMsg(ERROR_HEADER_CHECK_FILE, 'File header comment should end with ""**/""', FileTable, ID)
-    if IsFoundError3:
-        PrintErrorMsg(ERROR_DOXYGEN_CHECK_COMMENT_DESCRIPTION, 'Comment description should end with period "".""', FileTable, ID)
+        return
+    if NoCopyrightFlag:
+        PrintErrorMsg(ERROR_HEADER_CHECK_FILE, 'File header comment missing the ""Copyright""', FileTable, ID)
+    #Check whether C File header Comment have the License immediately after the ""Copyright"" line.
+    if EccGlobalData.gConfig.HeaderCheckCFileCommentLicenseFormat == '1' or EccGlobalData.gConfig.HeaderCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
+        if NoLicenseFlag:
+            PrintErrorMsg(ERROR_HEADER_CHECK_FILE, 'File header comment should have the License immediately after the ""Copyright"" line', FileTable, ID)
 
 def CheckFuncHeaderDoxygenComments(FullFileName):
     ErrorMsgList = []

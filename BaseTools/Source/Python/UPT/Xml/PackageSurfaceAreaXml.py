@@ -273,7 +273,8 @@ class PackageSurfaceAreaXml(object):
         for SubItem in XmlList(Item, '/PackageSurfaceArea/Modules/ModuleSurfaceArea'):
             Tmp = ModuleSurfaceAreaXml()
             Module = Tmp.FromXml(SubItem, 'ModuleSurfaceArea')
-            Package.ModuleDict[(Module.GetGuid(), Module.GetVersion(), Module.GetModulePath())] = Module
+            ModuleDictKey = (Module.GetGuid(), Module.GetVersion(), Module.GetName(), Module.GetModulePath())
+            Package.ModuleDict[ModuleDictKey] = Module
         #    
         # MiscellaneousFile
         #

@@ -445,8 +445,10 @@ def RealPath2(File, Dir='', OverrideDir=''):
                 return NewFile[len(OverrideDir):], NewFile[0:len(OverrideDir)]
             else:
                 return NewFile[len(OverrideDir)+1:], NewFile[0:len(OverrideDir)]
-
-    NewFile = GlobalData.gAllFiles[os.path.normpath(os.path.join(Dir, File))]
+    if GlobalData.gAllFiles:
+        NewFile = GlobalData.gAllFiles[os.path.normpath(os.path.join(Dir, File))]
+    else:
+        NewFile = os.path.normpath(os.path.join(Dir, File))
     if NewFile:
         if Dir:
             if Dir[-1] == os.path.sep:

@@ -55,7 +55,8 @@ class TableFdf(Table):
                                                        Value1 VARCHAR NOT NULL,
                                                        Value2 VARCHAR,
                                                        Value3 VARCHAR,
-                                                       Arch VarCHAR,
+                                                       Scope1 VarCHAR,
+                                                       Scope2 VarCHAR,
                                                        BelongsToItem SINGLE NOT NULL,
                                                        BelongsToFile SINGLE NOT NULL,
                                                        StartLine INTEGER NOT NULL,
@@ -84,11 +85,11 @@ class TableFdf(Table):
     # @param EndColumn:      EndColumn of a Fdf item
     # @param Enabled:        If this item enabled
     #
-    def Insert(self, Model, Value1, Value2, Value3, Arch, BelongsToItem, BelongsToFile, StartLine, StartColumn, EndLine, EndColumn, Enabled):
+    def Insert(self, Model, Value1, Value2, Value3, Scope1, Scope2, BelongsToItem, BelongsToFile, StartLine, StartColumn, EndLine, EndColumn, Enabled):
         self.ID = self.ID + 1
-        (Value1, Value2, Value3, Arch) = ConvertToSqlString((Value1, Value2, Value3, Arch))
-        SqlCommand = """insert into %s values(%s, %s, '%s', '%s', '%s', '%s', %s, %s, %s, %s, %s, %s, %s)""" \
-                     % (self.Table, self.ID, Model, Value1, Value2, Value3, Arch, BelongsToItem, BelongsToFile, StartLine, StartColumn, EndLine, EndColumn, Enabled)
+        (Value1, Value2, Value3, Scope1, Scope2) = ConvertToSqlString((Value1, Value2, Value3, Scope1, Scope2))
+        SqlCommand = """insert into %s values(%s, %s, '%s', '%s', '%s', '%s', '%s', %s, %s, %s, %s, %s, %s, %s)""" \
+                     % (self.Table, self.ID, Model, Value1, Value2, Value3, Scope1, Scope2, BelongsToItem, BelongsToFile, StartLine, StartColumn, EndLine, EndColumn, Enabled)
         Table.Insert(self, SqlCommand)
         
         return self.ID
@@ -100,7 +101,7 @@ class TableFdf(Table):
     # @retval:       A recordSet of all found records 
     #
     def Query(self, Model):
-        SqlCommand = """select ID, Value1, Value2, Value3, Arch, BelongsToItem, BelongsToFile, StartLine from %s
+        SqlCommand = """select ID, Value1, Value2, Value3, Scope1, Scope2, BelongsToItem, BelongsToFile, StartLine from %s
                         where Model = %s
                         and Enabled > -1""" % (self.Table, Model)
         EdkLogger.debug(4, "SqlCommand: %s" % SqlCommand)

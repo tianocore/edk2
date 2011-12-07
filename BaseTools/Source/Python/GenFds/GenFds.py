@@ -278,8 +278,7 @@ def main():
                     ExtraData="Please send email to edk2-buildtools-devel@lists.sourceforge.net for help, attaching following call stack trace!\n",
                     RaiseError=False
                     )
-        if Options.debug != None:
-            EdkLogger.quiet(traceback.format_exc())
+        EdkLogger.quiet(traceback.format_exc())
         ReturnCode = CODE_ERROR
     return ReturnCode
 

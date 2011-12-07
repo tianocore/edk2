@@ -21,6 +21,7 @@ import copy
 
 import Common.EdkLogger as EdkLogger
 import Common.GlobalData as GlobalData
+import EccGlobalData
 
 from CommonDataClass.DataClass import *
 from Common.DataType import *
@@ -30,6 +31,7 @@ from Common.Expression import *
 from CommonDataClass.Exceptions import *
 
 from MetaFileTable import MetaFileStorage
+from GenFds.FdfParser import FdfParser  
 
 ## A decorator used to parse macro definition
 def ParseMacro(Parser):
@@ -60,28 +62,23 @@ def ParseMacro(Parser):
                             ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex+1)
 
         Value = ReplaceMacro(Value, self._Macros)
-        if Type in self.DataType:
-            self._ItemType = self.DataType[Type]
-        else:
-            self._ItemType = MODEL_META_DATA_DEFINE
+        self._ItemType = MODEL_META_DATA_DEFINE
         # DEFINE defined macros
         if Type == TAB_DSC_DEFINES_DEFINE:
-            #
-            # First judge whether this DEFINE is in conditional directive statements or not.
-            #
-            if type(self) == DscParser and self._InDirective > -1:
-                pass
-            else:
-                if type(self) == DecParser:
-                    if MODEL_META_DATA_HEADER in self._SectionType:
-                        self._FileLocalMacros[Name] = Value
-                    else:
-                        self._ConstructSectionMacroDict(Name, Value)
-                elif self._SectionType == MODEL_META_DATA_HEADER:
+            if type(self) == DecParser:
+                if MODEL_META_DATA_HEADER in self._SectionType:
                     self._FileLocalMacros[Name] = Value
                 else:
-                    self._ConstructSectionMacroDict(Name, Value)
-
+                    for Scope in self._Scope:
+                        self._SectionsMacroDict.setdefault((Scope[2], Scope[0], Scope[1]), {})[Name] = Value
+            elif self._SectionType == MODEL_META_DATA_HEADER:
+                self._FileLocalMacros[Name] = Value
+            else:
+                SectionDictKey = self._SectionType, self._Scope[0][0], self._Scope[0][1]
+                if SectionDictKey not in self._SectionsMacroDict:
+                    self._SectionsMacroDict[SectionDictKey] = {}
+                SectionLocalMacros = self._SectionsMacroDict[SectionDictKey]
+                SectionLocalMacros[Name] = Value
         # EDK_GLOBAL defined macros
         elif type(self) != DscParser:
             EdkLogger.error('Parser', FORMAT_INVALID, "EDK_GLOBAL can only be used in .dsc file",
@@ -151,7 +148,6 @@ class MetaFileParser(object):
         self._RawTable = Table
         self._FileType = FileType
         self.MetaFile = FilePath
-        self._FileDir = self.MetaFile.Dir
         self._Defines = {}
         self._FileLocalMacros = {}
         self._SectionsMacroDict = {}
@@ -366,60 +362,15 @@ class MetaFileParser(object):
         Macros.update(self._GetApplicableSectionMacro())
         return Macros
 
-    ## Construct section Macro dict 
-    def _ConstructSectionMacroDict(self, Name, Value):
-        ScopeKey = [(Scope[0], Scope[1]) for Scope in self._Scope]
-        ScopeKey = tuple(ScopeKey)
-        SectionDictKey = self._SectionType, ScopeKey
-        #
-        # DecParser SectionType is a list, will contain more than one item only in Pcd Section
-        # As Pcd section macro usage is not alllowed, so here it is safe
-        #
-        if type(self) == DecParser:
-            SectionDictKey = self._SectionType[0], ScopeKey
-        if SectionDictKey not in self._SectionsMacroDict:
-            self._SectionsMacroDict[SectionDictKey] = {}
-        SectionLocalMacros = self._SectionsMacroDict[SectionDictKey]
-        SectionLocalMacros[Name] = Value
 
     ## Get section Macros that are applicable to current line, which may come from other sections 
     ## that share the same name while scope is wider
     def _GetApplicableSectionMacro(self):
         Macros = {}
-
-        ComComMacroDict = {}
-        ComSpeMacroDict = {}
-        SpeSpeMacroDict = {}
-        
-        ActiveSectionType = self._SectionType
-        if type(self) == DecParser:
-            ActiveSectionType = self._SectionType[0]
-            
-        for (SectionType, Scope) in self._SectionsMacroDict:
-            if SectionType != ActiveSectionType:
-                continue
-
-            for ActiveScope in self._Scope:
-                Scope0, Scope1 = ActiveScope[0], ActiveScope[1]
-                if(Scope0, Scope1) not in Scope:
-                    break
-            else:
-                SpeSpeMacroDict.update(self._SectionsMacroDict[(SectionType, Scope)])
-            
-            for ActiveScope in self._Scope:
-                Scope0, Scope1 = ActiveScope[0], ActiveScope[1]
-                if(Scope0, Scope1) not in Scope and (Scope0, "COMMON") not in Scope and ("COMMON", Scope1) not in Scope:
-                    break
-            else:
-                ComSpeMacroDict.update(self._SectionsMacroDict[(SectionType, Scope)])
-
-            if ("COMMON", "COMMON") in Scope:
-                ComComMacroDict.update(self._SectionsMacroDict[(SectionType, Scope)])
-
-        Macros.update(ComComMacroDict)
-        Macros.update(ComSpeMacroDict)
-        Macros.update(SpeSpeMacroDict)
-
+        for Scope1, Scope2 in [("COMMON", "COMMON"), ("COMMON", self._Scope[0][1]),
+                               (self._Scope[0][0], "COMMON"), (self._Scope[0][0], self._Scope[0][1])]:
+            if (self._SectionType, Scope1, Scope2) in self._SectionsMacroDict:
+                Macros.update(self._SectionsMacroDict[(self._SectionType, Scope1, Scope2)])
         return Macros
 
     _SectionParser  = {}
@@ -474,6 +425,8 @@ class InfParser(MetaFileParser):
         if hasattr(self, "_Table"):
             return
         MetaFileParser.__init__(self, FilePath, FileType, Table)
+        self.TblFile = EccGlobalData.gDb.TblFile
+        self.FileID = -1
 
     ## Parser starter
     def Start(self):
@@ -483,7 +436,16 @@ class InfParser(MetaFileParser):
             Content = open(str(self.MetaFile), 'r').readlines()
         except:
             EdkLogger.error("Parser", FILE_READ_FAILURE, ExtraData=self.MetaFile)
-
+        #
+        # Insert a record for file
+        #
+        Filename = NormPath(self.MetaFile)
+        FileID = self.TblFile.GetFileId(Filename)
+        if FileID:
+            self.FileID = FileID
+        else:
+            self.FileID = self.TblFile.InsertFile(Filename, MODEL_FILE_INF)
+            
         # parse the file line by line
         IsFindBlockComment = False
 
@@ -562,6 +524,7 @@ class InfParser(MetaFileParser):
             # Model, Value1, Value2, Value3, Arch, Platform, BelongsToItem=-1,
             # LineBegin=-1, ColumnBegin=-1, LineEnd=-1, ColumnEnd=-1, Enabled=-1
             #
+            self._ValueList[0] = self._ValueList[0].replace('/', '\\')
             for Arch, Platform in self._Scope:
                 self._Store(self._SectionType,
                             self._ValueList[0],
@@ -570,6 +533,7 @@ class InfParser(MetaFileParser):
                             Arch,
                             Platform,
                             self._Owner[-1],
+                            self.FileID,
                             self._LineIndex+1,
                             -1,
                             self._LineIndex+1,
@@ -790,12 +754,7 @@ class DscParser(MetaFileParser):
         self._DirectiveStack = []
         self._DirectiveEvalStack = []
         self._Enabled = 1
-        
-        #
-        # Specify whether current line is in uncertain condition
-        #
-        self._InDirective = -1
-        
+
         # Final valid replacable symbols
         self._Symbols = {}
         #
@@ -803,6 +762,9 @@ class DscParser(MetaFileParser):
         #  the owner item
         #
         self._IdMapping = {-1:-1}
+        
+        self.TblFile = EccGlobalData.gDb.TblFile
+        self.FileID = -1
 
     ## Parser starter
     def Start(self):
@@ -811,7 +773,17 @@ class DscParser(MetaFileParser):
             Content = open(str(self.MetaFile), 'r').readlines()
         except:
             EdkLogger.error("Parser", FILE_READ_FAILURE, ExtraData=self.MetaFile)
-
+        #
+        # Insert a record for file
+        #
+        Filename = NormPath(self.MetaFile)
+        FileID = self.TblFile.GetFileId(Filename)
+        if FileID:
+            self.FileID = FileID
+        else:
+            self.FileID = self.TblFile.InsertFile(Filename, MODEL_FILE_DSC)
+        
+        
         for Index in range(0, len(Content)):
             Line = CleanString(Content[Index])
             # skip empty line
@@ -864,6 +836,7 @@ class DscParser(MetaFileParser):
                                         Arch,
                                         ModuleType,
                                         self._Owner[-1],
+                                        self.FileID,
                                         self._From,
                                         self._LineIndex+1,
                                         -1,
@@ -900,13 +873,6 @@ class DscParser(MetaFileParser):
         if DirectiveName not in self.DataType:
             EdkLogger.error("Parser", FORMAT_INVALID, "Unknown directive [%s]" % DirectiveName,
                             File=self.MetaFile, Line=self._LineIndex+1)
-
-        if DirectiveName in ['!IF', '!IFDEF', '!IFNDEF']:
-            self._InDirective += 1
-
-        if DirectiveName in ['!ENDIF']:
-            self._InDirective -= 1
-
         if DirectiveName in ['!IF', '!IFDEF', '!INCLUDE', '!IFNDEF', '!ELSEIF'] and self._ValueList[1] == '':
             EdkLogger.error("Parser", FORMAT_INVALID, "Missing expression",
                             File=self.MetaFile, Line=self._LineIndex+1,
@@ -953,6 +919,7 @@ class DscParser(MetaFileParser):
                                 'COMMON',
                                 'COMMON',
                                 self._Owner[-1],
+                                self.FileID,
                                 self._From,
                                 self._LineIndex+1,
                                 -1,
@@ -992,7 +959,6 @@ class DscParser(MetaFileParser):
         self._ValueList[0:len(TokenList)] = TokenList
 
     ## Parse Edk style of library modules
-    @ParseMacro
     def _LibraryInstanceParser(self):
         self._ValueList[0] = self._CurrentLine
 
@@ -1130,9 +1096,9 @@ class DscParser(MetaFileParser):
             MODEL_UNKNOWN                                   :   self._Skip,
             MODEL_META_DATA_USER_EXTENSION                  :   self._Skip,
         }
-
+        
+        self._RawTable = self._Table
         self._Table = MetaFileStorage(self._RawTable.Cur, self.MetaFile, MODEL_FILE_DSC, True)
-        self._Table.Create()
         self._DirectiveStack = []
         self._DirectiveEvalStack = []
         self._FileWithError = self.MetaFile
@@ -1145,7 +1111,7 @@ class DscParser(MetaFileParser):
         self._Content = self._RawTable.GetAll()
         self._ContentIndex = 0
         while self._ContentIndex < len(self._Content) :
-            Id, self._ItemType, V1, V2, V3, S1, S2, Owner, self._From, \
+            Id, self._ItemType, V1, V2, V3, S1, S2, Owner, BelongsToFile, self._From, \
                 LineStart, ColStart, LineEnd, ColEnd, Enabled = self._Content[self._ContentIndex]
 
             if self._From < 0:
@@ -1185,6 +1151,7 @@ class DscParser(MetaFileParser):
                                 S1,
                                 S2,
                                 NewOwner,
+                                BelongsToFile,
                                 self._From,
                                 self._LineIndex+1,
                                 -1,
@@ -1194,6 +1161,9 @@ class DscParser(MetaFileParser):
                                 )
             self._IdMapping[Id] = self._LastItem
 
+        RecordList = self._Table.GetAll()
+        for Record in RecordList:
+            EccGlobalData.gDb.TblDsc.Insert(Record[1],Record[2],Record[3],Record[4],Record[5],Record[6],Record[7],Record[8],Record[9],Record[10],Record[11],Record[12],Record[13],Record[14])
         GlobalData.gPlatformDefines.update(self._FileLocalMacros)
         self._PostProcessed = True
         self._Content = None
@@ -1216,13 +1186,27 @@ class DscParser(MetaFileParser):
         Records = self._RawTable.Query(MODEL_PCD_FEATURE_FLAG, BelongsToItem=-1.0)
         for TokenSpaceGuid,PcdName,Value,Dummy2,Dummy3,ID,Line in Records:
             Value, DatumType, MaxDatumSize = AnalyzePcdData(Value)
+            # Only use PCD whose value is straitforward (no macro and PCD)
+            if self.SymbolPattern.findall(Value):
+                continue
             Name = TokenSpaceGuid + '.' + PcdName
+            # Don't use PCD with different values.
+            if Name in self._Symbols and self._Symbols[Name] != Value:
+                self._Symbols.pop(Name)
+                continue 
             self._Symbols[Name] = Value
 
         Records = self._RawTable.Query(MODEL_PCD_FIXED_AT_BUILD, BelongsToItem=-1.0)
         for TokenSpaceGuid,PcdName,Value,Dummy2,Dummy3,ID,Line in Records:
             Value, DatumType, MaxDatumSize = AnalyzePcdData(Value)
-            Name = TokenSpaceGuid + '.' + PcdName
+            # Only use PCD whose value is straitforward (no macro and PCD)
+            if self.SymbolPattern.findall(Value):
+                continue 
+            Name = TokenSpaceGuid+'.'+PcdName
+            # Don't use PCD with different values.
+            if Name in self._Symbols and self._Symbols[Name] != Value:
+                self._Symbols.pop(Name)
+                continue 
             self._Symbols[Name] = Value
 
     def __ProcessDefine(self):
@@ -1235,7 +1219,11 @@ class DscParser(MetaFileParser):
             if self._SectionType == MODEL_META_DATA_HEADER:
                 self._FileLocalMacros[Name] = Value
             else:
-                self._ConstructSectionMacroDict(Name, Value)
+                SectionDictKey = self._SectionType, self._Scope[0][0], self._Scope[0][1]
+                if SectionDictKey not in self._SectionsMacroDict:
+                    self._SectionsMacroDict[SectionDictKey] = {}
+                SectionLocalMacros = self._SectionsMacroDict[SectionDictKey]
+                SectionLocalMacros[Name] = Value
         elif self._ItemType == MODEL_META_DATA_GLOBAL_DEFINE:
             GlobalData.gEdkGlobal[Name] = Value
         
@@ -1286,9 +1274,8 @@ class DscParser(MetaFileParser):
             self._DirectiveEvalStack[-1] = not self._DirectiveEvalStack[-1]
             self._DirectiveEvalStack.append(bool(Result))
         elif self._ItemType == MODEL_META_DATA_CONDITIONAL_STATEMENT_ELSE:
-            self._DirectiveStack.append(self._ItemType)
+            self._DirectiveStack[-1] = self._ItemType
             self._DirectiveEvalStack[-1] = not self._DirectiveEvalStack[-1]
-            self._DirectiveEvalStack.append(True)
         elif self._ItemType == MODEL_META_DATA_CONDITIONAL_STATEMENT_ENDIF:
             # Back to the nearest !if/!ifdef/!ifndef
             while self._DirectiveStack:
@@ -1296,6 +1283,7 @@ class DscParser(MetaFileParser):
                 Directive = self._DirectiveStack.pop()
                 if Directive in [MODEL_META_DATA_CONDITIONAL_STATEMENT_IF,
                                  MODEL_META_DATA_CONDITIONAL_STATEMENT_IFDEF,
+                                 MODEL_META_DATA_CONDITIONAL_STATEMENT_ELSE,
                                  MODEL_META_DATA_CONDITIONAL_STATEMENT_IFNDEF]:
                     break
         elif self._ItemType == MODEL_META_DATA_INCLUDE:
@@ -1338,7 +1326,7 @@ class DscParser(MetaFileParser):
 
             self._FileWithError = IncludedFile1
 
-            IncludedFileTable = MetaFileStorage(self._Table.Cur, IncludedFile1, MODEL_FILE_DSC, False)
+            IncludedFileTable = MetaFileStorage(self._Table.Cur, IncludedFile1, MODEL_FILE_DSC, True)
             Owner = self._Content[self._ContentIndex-1][0]
             Parser = DscParser(IncludedFile1, self._FileType, IncludedFileTable, 
                                Owner=Owner, From=Owner)
@@ -1376,7 +1364,6 @@ class DscParser(MetaFileParser):
         self._ValueList[1] = ReplaceMacro(self._ValueList[1], self._Macros, RaiseError=True)
 
     def __ProcessPcd(self):
-        PcdValue = None
         ValueList = GetSplitValueList(self._ValueList[2])
         #
         # PCD value can be an expression
@@ -1388,31 +1375,16 @@ class DscParser(MetaFileParser):
             except WrnExpression, Value:
                 ValueList[0] = Value.result          
         else:
-            #
-            # Int*/Boolean VPD PCD
-            # TokenSpace | PcdCName | Offset | [Value]
-            # 
-            # VOID* VPD PCD
-            # TokenSpace | PcdCName | Offset | [Size] | [Value]
-            #
-            if self._ItemType == MODEL_PCD_DYNAMIC_VPD:
-                if len(ValueList) >= 4:
-                    PcdValue = ValueList[-1]
-            else:
-                PcdValue = ValueList[-1]
-            #
-            # For the VPD PCD, there may not have PcdValue data in DSC file
-            #
-            if PcdValue:
-                try:
-                    ValueList[-1] = ValueExpression(PcdValue, self._Macros)(True)
-                except WrnExpression, Value:
-                    ValueList[-1] = Value.result
-                
-                if ValueList[-1] == 'True':
-                    ValueList[-1] = '1'
-                if ValueList[-1] == 'False':
-                    ValueList[-1] = '0'      
+            PcdValue = ValueList[-1]
+            try:
+                ValueList[-1] = ValueExpression(PcdValue, self._Macros)(True)
+            except WrnExpression, Value:
+                ValueList[-1] = Value.result
+            
+            if ValueList[-1] == 'True':
+                ValueList[-1] = '1'
+            if ValueList[-1] == 'False':
+                ValueList[-1] = '0'      
 
         self._ValueList[2] = '|'.join(ValueList)
 
@@ -1488,9 +1460,11 @@ class DecParser(MetaFileParser):
         # prevent re-initialization
         if hasattr(self, "_Table"):
             return
-        MetaFileParser.__init__(self, FilePath, FileType, Table, -1)
+        MetaFileParser.__init__(self, FilePath, FileType, Table)
         self._Comments = []
         self._Version = 0x00010005  # Only EDK2 dec file is supported
+        self.TblFile = EccGlobalData.gDb.TblFile
+        self.FileID = -1
 
     ## Parser starter
     def Start(self):
@@ -1500,6 +1474,16 @@ class DecParser(MetaFileParser):
         except:
             EdkLogger.error("Parser", FILE_READ_FAILURE, ExtraData=self.MetaFile)
 
+        #
+        # Insert a record for file
+        #
+        Filename = NormPath(self.MetaFile)
+        FileID = self.TblFile.GetFileId(Filename)
+        if FileID:
+            self.FileID = FileID
+        else:
+            self.FileID = self.TblFile.InsertFile(Filename, MODEL_FILE_DEC)
+        
         for Index in range(0, len(Content)):
             Line, Comment = CleanString2(Content[Index])
             self._CurrentLine = Line
@@ -1542,6 +1526,7 @@ class DecParser(MetaFileParser):
                     Arch,
                     ModuleType,
                     self._Owner[-1],
+                    self.FileID,
                     self._LineIndex+1,
                     -1,
                     self._LineIndex+1,
@@ -1557,6 +1542,7 @@ class DecParser(MetaFileParser):
                         Arch,
                         ModuleType,
                         self._LastItem,
+                        self.FileID,
                         LineNo,
                         -1,
                         LineNo,
@@ -1566,6 +1552,13 @@ class DecParser(MetaFileParser):
             self._Comments = []
         self._Done()
 
+    def _GetApplicableSectionMacro(self):
+        Macros = {}
+        for S1, S2, SectionType in self._Scope:
+            for Scope1, Scope2 in [("COMMON", "COMMON"), ("COMMON", S2), (S1, "COMMON"), (S1, S2)]:
+                if (SectionType, Scope1, Scope2) in self._SectionsMacroDict:
+                    Macros.update(self._SectionsMacroDict[(SectionType, Scope1, Scope2)])
+        return Macros
 
     ## Section header parser
     #
@@ -1643,7 +1636,28 @@ class DecParser(MetaFileParser):
                                       " (<CName> = <GuidValueInCFormat:{8,4,4,{2,2,2,2,2,2,2,2}}>)",
                             File=self.MetaFile, Line=self._LineIndex+1)
         self._ValueList[0] = TokenList[0]
-        self._ValueList[1] = TokenList[1]
+        #Parse the Guid value format
+        GuidValueList = TokenList[1].strip(' {}').split(',')
+        Index = 0
+        HexList = []
+        if len(GuidValueList) == 11:
+            for GuidValue in GuidValueList:
+                GuidValue = GuidValue.strip()
+                if GuidValue.startswith('0x') or GuidValue.startswith('0X'):
+                    HexList.append('0x' + str(GuidValue[2:]))
+                    Index += 1
+                    continue
+                else:
+                    if GuidValue.startswith('{'):
+                        HexList.append('0x' + str(GuidValue[3:]))
+                        Index += 1
+            self._ValueList[1] = "{ %s, %s, %s, { %s, %s, %s, %s, %s, %s, %s, %s }}" % (HexList[0], HexList[1], HexList[2],HexList[3],HexList[4],HexList[5],HexList[6],HexList[7],HexList[8],HexList[9],HexList[10])
+        else:
+            EdkLogger.error('Parser', FORMAT_INVALID, "Invalid GUID value format",
+                            ExtraData=self._CurrentLine + \
+                                      " (<CName> = <GuidValueInCFormat:{8,4,4,{2,2,2,2,2,2,2,2}}>)",
+                            File=self.MetaFile, Line=self._LineIndex+1)
+            self._ValueList[0] = ''
 
     ## PCD sections parser
     #
@@ -1735,6 +1749,95 @@ class DecParser(MetaFileParser):
         MODEL_UNKNOWN                   :   MetaFileParser._Skip,
         MODEL_META_DATA_USER_EXTENSION  :   MetaFileParser._Skip,
     }
+
+
+## FdfObject
+#
+# This class defined basic Fdf object which is used by inheriting
+# 
+# @param object:       Inherited from object class
+#
+class FdfObject(object):
+    def __init__(self):
+        object.__init__()
+
+## Fdf
+#
+# This class defined the structure used in Fdf object
+# 
+# @param FdfObject:     Inherited from FdfObject class
+# @param Filename:      Input value for Ffilename of Fdf file, default is None
+# @param WorkspaceDir:  Input value for current workspace directory, default is None
+#
+class Fdf(FdfObject):
+    def __init__(self, Filename = None, IsToDatabase = False, WorkspaceDir = None, Database = None):
+        self.WorkspaceDir = WorkspaceDir
+        self.IsToDatabase = IsToDatabase
+        
+        self.Cur = Database.Cur
+        self.TblFile = Database.TblFile
+        self.TblFdf = Database.TblFdf
+        self.FileID = -1
+        self.FileList = {}
+
+        #
+        # Load Fdf file if filename is not None
+        #
+        if Filename != None:
+            self.LoadFdfFile(Filename)
+
+    #
+    # Insert a FDF file record into database
+    #
+    def InsertFile(self, Filename):
+        FileID = -1
+        Filename = NormPath(Filename)
+        if Filename not in self.FileList:
+            FileID = self.TblFile.InsertFile(Filename, MODEL_FILE_FDF)
+            self.FileList[Filename] = FileID
+
+        return self.FileList[Filename]
+            
+    
+    ## Load Fdf file
+    #
+    # Load the file if it exists
+    #
+    # @param Filename:  Input value for filename of Fdf file
+    #
+    def LoadFdfFile(self, Filename):     
+        FileList = []
+        #
+        # Parse Fdf file
+        #
+        Filename = NormPath(Filename)
+        Fdf = FdfParser(Filename)
+        Fdf.ParseFile()
+
+        #
+        # Insert inf file and pcd information
+        #
+        if self.IsToDatabase:
+            (Model, Value1, Value2, Value3, Scope1, Scope2, BelongsToItem, BelongsToFile, StartLine, StartColumn, EndLine, EndColumn, Enabled) = \
+            (0, '', '', '', 'COMMON', 'COMMON', -1, -1, -1, -1, -1, -1, 0)
+            for Index in range(0, len(Fdf.Profile.PcdDict)):
+                pass
+            for Key in Fdf.Profile.PcdDict.keys():
+                Model = MODEL_PCD
+                Value1 = Key[1]
+                Value2 = Key[0]
+                FileName = Fdf.Profile.PcdFileLineDict[Key][0]
+                StartLine = Fdf.Profile.PcdFileLineDict[Key][1]
+                BelongsToFile = self.InsertFile(FileName)
+                self.TblFdf.Insert(Model, Value1, Value2, Value3, Scope1, Scope2, BelongsToItem, BelongsToFile, StartLine, StartColumn, EndLine, EndColumn, Enabled)
+            for Index in range(0, len(Fdf.Profile.InfList)):
+                Model = MODEL_META_DATA_COMPONENT
+                Value1 = Fdf.Profile.InfList[Index]
+                Value2 = ''
+                FileName = Fdf.Profile.InfFileLineList[Index][0]
+                StartLine = Fdf.Profile.InfFileLineList[Index][1]
+                BelongsToFile = self.InsertFile(FileName)
+                self.TblFdf.Insert(Model, Value1, Value2, Value3, Scope1, Scope2, BelongsToItem, BelongsToFile, StartLine, StartColumn, EndLine, EndColumn, Enabled)
 
 ##
 #

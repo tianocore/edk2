@@ -750,7 +750,7 @@ class Build():
         EdkLogger.info('%-16s = %s' % ("Build target", ' '.join(self.BuildTargetList)))
         EdkLogger.info('%-16s = %s' % ("Toolchain", ' '.join(self.ToolChainList)))
 
-        #EdkLogger.info('\n%-24s = %s' % ("Active Platform", self.PlatformFile))
+        EdkLogger.info('\n%-16s = %s' % ("Active Platform", self.PlatformFile))
         if self.ModuleFile:
             EdkLogger.info('%-16s = %s' % ("Active Module", self.ModuleFile))
 
@@ -1856,8 +1856,7 @@ def Main():
                     ExtraData="\n(Please send email to edk2-buildtools-devel@lists.sourceforge.net for help, attaching following call stack trace!)\n",
                     RaiseError=False
                     )
-        if Option != None and Option.debug != None:
-            EdkLogger.quiet("(Python %s on %s) " % (platform.python_version(), sys.platform) + traceback.format_exc())
+        EdkLogger.quiet("(Python %s on %s) " % (platform.python_version(), sys.platform) + traceback.format_exc())
         ReturnCode = CODE_ERROR
     finally:
         Utils.Progressor.Abort()

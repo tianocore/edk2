@@ -55,12 +55,12 @@ class DependencyRules(object):
     # @param Guid:  Guid of a module
     # @param Version: Version of a module
     #
-    def CheckModuleExists(self, Guid, Version, ReturnCode=DEPEX_CHECK_SUCCESS):
+    def CheckModuleExists(self, Guid, Version, Name, Path, ReturnCode=DEPEX_CHECK_SUCCESS):
         if ReturnCode:
             pass
         Logger.Verbose(ST.MSG_CHECK_MODULE_EXIST)
-        ModuleList = self.IpiDb.GetModInPackage(Guid, Version)
-        ModuleList.extend(self.IpiDb.GetStandaloneModule(Guid, Version))
+        ModuleList = self.IpiDb.GetModInPackage(Guid, Version, Name, Path)
+        ModuleList.extend(self.IpiDb.GetStandaloneModule(Guid, Version, Name, Path))
         Logger.Verbose(ST.MSG_CHECK_MODULE_EXIST_FINISH)
         if len(ModuleList) > 0:
             return True

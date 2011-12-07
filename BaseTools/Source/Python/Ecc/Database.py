@@ -26,9 +26,9 @@ from Table.TableFunction import TableFunction
 from Table.TablePcd import TablePcd
 from Table.TableIdentifier import TableIdentifier
 from Table.TableReport import TableReport
-from Table.TableInf import TableInf
-from Table.TableDec import TableDec
-from Table.TableDsc import TableDsc
+from MetaFileWorkspace.MetaFileTable import ModuleTable
+from MetaFileWorkspace.MetaFileTable import PackageTable
+from MetaFileWorkspace.MetaFileTable import PlatformTable
 from Table.TableFdf import TableFdf
 
 ##
@@ -92,9 +92,9 @@ class Database(object):
         self.TblIdentifier = TableIdentifier(self.Cur)
         self.TblPcd = TablePcd(self.Cur)
         self.TblReport = TableReport(self.Cur)
-        self.TblInf = TableInf(self.Cur)
-        self.TblDec = TableDec(self.Cur)
-        self.TblDsc = TableDsc(self.Cur)
+        self.TblInf = ModuleTable(self.Cur)
+        self.TblDec = PackageTable(self.Cur)
+        self.TblDsc = PlatformTable(self.Cur)
         self.TblFdf = TableFdf(self.Cur)
 
         #

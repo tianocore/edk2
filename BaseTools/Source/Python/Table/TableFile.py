@@ -89,3 +89,16 @@ class TableFile(Table):
         TimeStamp = os.stat(FileFullPath)[8]
         File = FileClass(-1, Name, Ext, Filepath, FileFullPath, Model, '', [], [], [])
         return self.Insert(File.Name, File.ExtName, File.Path, File.FullPath, File.Model, TimeStamp)
+    
+    ## Get ID of a given file
+    #
+    #   @param  FilePath    Path of file
+    #
+    #   @retval ID          ID value of given file in the table
+    #
+    def GetFileId(self, File):
+        QueryScript = "select ID from %s where FullPath = '%s'" % (self.Table, str(File))
+        RecordList = self.Exec(QueryScript)
+        if len(RecordList) == 0:
+            return None
+        return RecordList[0][0]

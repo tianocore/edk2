@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 1999 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available 
 under the terms and conditions of the BSD License which accompanies this 
 distribution.  The full text of the license may be found at
@@ -1200,19 +1200,19 @@ Returns:
   //
   // Summary usage
   //
-  fprintf (stdout, "Usage: %s [options] [file name<s>] \n\n", UTILITY_NAME);
+  fprintf (stdout, "Usage: %s -f VendorId -i DeviceId [options] [file name<s>] \n\n", UTILITY_NAME);
   
   //
   // Copyright declaration
   // 
-  fprintf (stdout, "Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.\n\n");
+  fprintf (stdout, "Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.\n\n");
 
   //
   // Details Option
   //
   fprintf (stdout, "Options:\n");
   fprintf (stdout, "  -o FileName, --output FileName\n\
-            File will be created to store the ouput content.\n");
+            File will be created to store the output content.\n");
   fprintf (stdout, "  -e EfiFileName\n\
             EFI PE32 image files.\n");
   fprintf (stdout, "  -ec EfiFileName\n\
@@ -1224,9 +1224,9 @@ Returns:
   fprintf (stdout, "  -r Rev    Hex Revision in the PCI data structure header.\n");
   fprintf (stdout, "  -n        Not to automatically set the LAST bit in the last file.\n");
   fprintf (stdout, "  -f VendorId\n\
-            Hex PCI Vendor ID for the device OpROM.\n");
+            Hex PCI Vendor ID for the device OpROM, must be specified\n");
   fprintf (stdout, "  -i DeviceId\n\
-            Hex PCI Device ID for the device OpROM.\n");
+            Hex PCI Device ID for the device OpROM, must be specified\n");
   fprintf (stdout, "  -p, --pci23\n\
             Default layout meets PCI 3.0 specifications\n\
             specifying this flag will for a PCI 2.3 layout.\n");

@@ -100,7 +100,15 @@ class Configuration(object):
         self.HeaderCheckFile = 1
         # Check whether Function header exists
         self.HeaderCheckFunction = 1
-
+        # Check whether Meta data File header Comment End with '##'
+        self.HeaderCheckFileCommentEnd = 1
+        # Check whether C File header Comment content start with two spaces
+        self.HeaderCheckCFileCommentStartSpacesNum = 1
+        # Check whether C File header Comment's each reference at list should begin with a bullet character '-'
+        self.HeaderCheckCFileCommentReferenceFormat = 1
+        # Check whether C File header Comment have the License immediately after the ""Copyright"" line
+        self.HeaderCheckCFileCommentLicenseFormat = 1
+  
         ## C Function Layout Checking
         self.CFunctionLayoutCheckAll = 0
 
