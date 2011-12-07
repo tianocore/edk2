@@ -179,8 +179,9 @@ struct _EFI_UNICODE_COLLATION_PROTOCOL {
   EFI_UNICODE_COLLATION_STRTOFAT    StrToFat;
   
   ///
-  /// A Null-terminated ASCII string array that contains one or more 
-  /// language codes. This array is specified in RFC 4646 format.
+  /// A Null-terminated ASCII string array that contains one or more language codes.
+  /// When this field is used for UnicodeCollation2, it is specified in RFC 4646 format.
+  /// When it is used for UnicodeCollation, it is specified in ISO 639-2 format.
   ///
   CHAR8                             *SupportedLanguages;
 };
