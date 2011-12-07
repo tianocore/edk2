@@ -1534,7 +1534,6 @@ SetupBrowser (
       if ((ConfigAccess != NULL) && 
           ((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) == EFI_IFR_FLAG_CALLBACK) && 
           (Statement->Operand != EFI_IFR_PASSWORD_OP)) {
-
         Status = ProcessCallBackFunction(Selection, Statement, EFI_BROWSER_ACTION_CHANGING, FALSE);         
         if (Statement->Operand == EFI_IFR_REF_OP && Selection->Action != UI_ACTION_EXIT) {
           //
@@ -1554,6 +1553,10 @@ SetupBrowser (
             Selection->FormId = Selection->Form->FormId;
             Selection->QuestionId = 0;
           }
+        }
+
+        if ((Status == EFI_SUCCESS) && (Statement->Operand != EFI_IFR_REF_OP)) {
+          ProcessCallBackFunction(Selection, Statement, EFI_BROWSER_ACTION_CHANGED, FALSE);
         }
       }
 
