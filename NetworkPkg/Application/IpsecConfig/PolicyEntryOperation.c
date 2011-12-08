@@ -913,7 +913,7 @@ CreateSadEntry (
   }
 
   //
-  // Convert user imput from string to integer, and fill in the DestAddress in EFI_IPSEC_SA_ID.
+  // Convert user input from string to integer, and fill in the DestAddress in EFI_IPSEC_SA_ID.
   //
   ValueStr = ShellCommandLineGetValue (ParamPackage, L"--tunnel-source");
   if (ValueStr != NULL) {
@@ -934,10 +934,12 @@ CreateSadEntry (
       *Mask |= SOURCE;
     }
   }
-  ReturnStatus = CreateSpdSelector ((*Data)->SpdSelector, ParamPackage, Mask);
 
-  if (CreateNew) {
-    if ((*Mask & (SPI | IPSEC_PROTO )) != (SPI | IPSEC_PROTO )) {
+  //
+  // If it is TunnelMode, then check if the tunnel-source and --tunnel-dest are set
+  //
+  if ((*Data)->Mode == EfiIPsecTunnel) {
+    if ((*Mask & (DEST|SOURCE)) != (DEST|SOURCE)) {
       ShellPrintHiiEx (
         -1,
         -1,
@@ -945,7 +947,23 @@ CreateSadEntry (
         STRING_TOKEN (STR_IPSEC_CONFIG_MISSING_ONE_OF_PARAMETERS),
         mHiiHandle,
         mAppName,
-        L"--spi --ipsec-proto --dest"
+        L"--tunnel-source --tunnel-dest"
+        );
+      ReturnStatus = EFI_INVALID_PARAMETER;
+    }
+  }
+  ReturnStatus = CreateSpdSelector ((*Data)->SpdSelector, ParamPackage, Mask);
+
+  if (CreateNew) {
+    if ((*Mask & (SPI|IPSEC_PROTO|LOCAL|REMOTE)) != (SPI|IPSEC_PROTO|LOCAL|REMOTE)) {
+      ShellPrintHiiEx (
+        -1,
+        -1,
+        NULL,
+        STRING_TOKEN (STR_IPSEC_CONFIG_MISSING_ONE_OF_PARAMETERS),
+        mHiiHandle,
+        mAppName,
+        L"--spi --ipsec-proto --local --remote"
         );
       ReturnStatus = EFI_INVALID_PARAMETER;
     } else {
@@ -974,7 +992,7 @@ CreateSadEntry (
           ReturnStatus = EFI_INVALID_PARAMETER;
         }
       } else {
-        if ((*Mask & ENCRYPT_ALGO) == 0) {
+        if ((*Mask & (ENCRYPT_ALGO|AUTH_ALGO)) != (ENCRYPT_ALGO|AUTH_ALGO) ) {
           ShellPrintHiiEx (
             -1,
             -1,
@@ -982,7 +1000,7 @@ CreateSadEntry (
             STRING_TOKEN (STR_IPSEC_CONFIG_MISSING_PARAMETER),
             mHiiHandle,
             mAppName,
-            L"--encrypt-algo"
+            L"--encrypt-algo --auth-algo"
             );
           ReturnStatus = EFI_INVALID_PARAMETER;
         } else if ((*Data)->AlgoInfo.EspAlgoInfo.EncAlgoId != IPSEC_EALG_NONE && (*Mask & ENCRYPT_KEY) == 0) {
@@ -994,6 +1012,17 @@ CreateSadEntry (
             mHiiHandle,
             mAppName,
             L"--encrypt-key"
+            );
+          ReturnStatus = EFI_INVALID_PARAMETER;
+        } else if ((*Data)->AlgoInfo.EspAlgoInfo.AuthAlgoId != IPSEC_AALG_NONE && (*Mask & AUTH_KEY) == 0) {
+          ShellPrintHiiEx (
+            -1,
+            -1,
+            NULL,
+            STRING_TOKEN (STR_IPSEC_CONFIG_MISSING_PARAMETER),
+            mHiiHandle,
+            mAppName,
+            L"--auth-key"
             );
           ReturnStatus = EFI_INVALID_PARAMETER;
         }

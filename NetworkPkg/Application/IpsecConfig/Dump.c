@@ -92,7 +92,7 @@ DumpBuf (
 {
   UINTN    Index;
   for (Index = 0; Index < Length; Index++) {
-    Print (L"%02x ", Data[Index]); 
+    Print (L"%02x ", Data[Index]);
   }
 }
 
@@ -457,12 +457,12 @@ DumpSadEntry (
       //
       Print (L"  Auth:%s/",AuthAlgoStr);
       DumpAsciiString (
-        Data->AlgoInfo.EspAlgoInfo.AuthKey, 
+        Data->AlgoInfo.EspAlgoInfo.AuthKey,
         Data->AlgoInfo.EspAlgoInfo.AuthKeyLength
         );
       Print (L"\n  Encrypt:%s/",EncAlgoStr);
       DumpAsciiString (
-        Data->AlgoInfo.EspAlgoInfo.EncKey, 
+        Data->AlgoInfo.EspAlgoInfo.EncKey,
         Data->AlgoInfo.EspAlgoInfo.EncKeyLength
         );
     } else {
@@ -472,13 +472,14 @@ DumpSadEntry (
       //
       Print (L"  Auth:%s/",AuthAlgoStr);
       DumpBuf ((UINT8 *)(Data->AlgoInfo.EspAlgoInfo.AuthKey), Data->AlgoInfo.EspAlgoInfo.AuthKeyLength);
-      
+
       Print (L"\n  Encrypt:%s/",EncAlgoStr);
-      DumpBuf ((UINT8 *)(Data->AlgoInfo.EspAlgoInfo.EncKey), Data->AlgoInfo.EspAlgoInfo.EncKeyLength);      
+      DumpBuf ((UINT8 *)(Data->AlgoInfo.EspAlgoInfo.EncKey), Data->AlgoInfo.EspAlgoInfo.EncKeyLength);
     }
   }
+  Print (L"\n");
   if (Data->SpdSelector != NULL) {
-    Print (L"\n  ");
+    Print (L"  ");
     DumpSpdSelector (Data->SpdSelector);
     Print (L"\n");
   }
