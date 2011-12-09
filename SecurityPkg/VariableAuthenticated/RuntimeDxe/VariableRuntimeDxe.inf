@@ -67,7 +67,7 @@
   gEfiAuthenticatedVariableGuid                 ## PRODUCES ## Configuration Table Guid
   gEfiGlobalVariableGuid                        ## PRODUCES ## Variable Guid
   gEfiEventVirtualAddressChangeGuid             ## PRODUCES ## Event
-  gEfiCertRsa2048Sha256Guid
+  gEfiCertTypeRsa2048Sha256Guid
   gEfiImageSecurityDatabaseGuid
   gEfiCertX509Guid
   gEfiCertPkcs7Guid

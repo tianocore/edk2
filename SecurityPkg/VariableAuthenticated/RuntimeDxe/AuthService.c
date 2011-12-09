@@ -416,7 +416,7 @@ AddPubKeyInStore (
 }
 
 /**
-  Verify data payload with AuthInfo in EFI_CERT_TYPE_RSA2048_SHA256 type.
+  Verify data payload with AuthInfo in EFI_CERT_TYPE_RSA2048_SHA256_GUID type.
   Follow the steps in UEFI2.2.
 
   @param[in]      Data                    Pointer to data with AuthInfo.
@@ -454,10 +454,10 @@ VerifyCounterBasedPayload (
 
   //
   // wCertificateType should be WIN_CERT_TYPE_EFI_GUID.
-  // Cert type should be EFI_CERT_TYPE_RSA2048_SHA256.
+  // Cert type should be EFI_CERT_TYPE_RSA2048_SHA256_GUID.
   //
   if ((CertData->AuthInfo.Hdr.wCertificateType != WIN_CERT_TYPE_EFI_GUID) ||
-      !CompareGuid (&CertData->AuthInfo.CertType, &gEfiCertRsa2048Sha256Guid)
+      !CompareGuid (&CertData->AuthInfo.CertType, &gEfiCertTypeRsa2048Sha256Guid)
         ) {
     //
     // Invalid AuthInfo type, return EFI_SECURITY_VIOLATION.

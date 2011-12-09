@@ -139,7 +139,7 @@ typedef struct {
 ///   
 /// AuthInfo is a WIN_CERTIFICATE using the wCertificateType
 /// WIN_CERTIFICATE_UEFI_GUID and the CertType
-/// EFI_CERT_TYPE_RSA2048_SHA256. If the attribute specifies
+/// EFI_CERT_TYPE_RSA2048_SHA256_GUID. If the attribute specifies
 /// authenticated access, then the Data buffer should begin with an
 /// authentication descriptor prior to the data payload and DataSize
 /// should reflect the the data.and descriptor size. The caller
