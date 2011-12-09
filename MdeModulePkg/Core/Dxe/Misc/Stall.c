@@ -32,7 +32,7 @@ CoreInternalWaitForTick (
   IN UINT64  Counter
   )
 {
-  while (Counter > 0xffffffff) {
+  while ((Counter & 0xffffffff00000000ULL) != 0) {
     gMetronome->WaitForTick (gMetronome, 0xffffffff);
     Counter -= 0xffffffff;
   }
