@@ -113,7 +113,9 @@ INF  OvmfPkg/PlatformPei/PlatformPei.inf
 INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
 FILE FV_IMAGE = A4EF5A93-3F1B-4232-A1C4-F0910E6D1D9C {
-  SECTION FV_IMAGE = DXEFV
+  SECTION COMPRESS PI_NONE {
+    SECTION FV_IMAGE = DXEFV
+  }
 }
 
 ################################################################################
