@@ -37,6 +37,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/GlobalVariable.h>
 #include <Guid/EventGroup.h>
 #include <Guid/VariableFormat.h>
+#include <Guid/SystemNvDataGuid.h>
 
 #define VARIABLE_RECLAIM_THRESHOLD (1024)
 

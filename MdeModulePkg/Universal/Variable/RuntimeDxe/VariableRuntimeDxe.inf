@@ -64,6 +64,7 @@
   gEfiVariableGuid                              ## PRODUCES ## Configuration Table Guid 
   gEfiGlobalVariableGuid                        ## PRODUCES ## Variable Guid
   gEfiEventVirtualAddressChangeGuid             ## PRODUCES ## Event
+  gEfiSystemNvDataFvGuid                        ## CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize

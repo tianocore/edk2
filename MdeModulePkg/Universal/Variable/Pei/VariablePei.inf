@@ -48,6 +48,7 @@
 [Guids]
   gEfiVariableGuid
   gEfiVariableIndexTableGuid
+  gEfiSystemNvDataFvGuid
 
 [Ppis]
   gEfiPeiReadOnlyVariable2PpiGuid                ## SOMETIMES_PRODUCES (Not for boot mode RECOVERY)

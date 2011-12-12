@@ -1153,7 +1153,7 @@ VariableGetBestLanguage (
 
 **/
 VOID
-AutoUpdateLangVariable(
+AutoUpdateLangVariable (
   IN  CHAR16             *VariableName,
   IN  VOID               *Data,
   IN  UINTN              DataSize
@@ -2463,6 +2463,17 @@ VariableCommonInitialize (
   if (TempVariableStoreHeader == 0) {
     TempVariableStoreHeader = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageVariableBase);
   }
+
+  //
+  // Check if the Firmware Volume is not corrupted
+  //
+  if ((((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)(TempVariableStoreHeader))->Signature != EFI_FVH_SIGNATURE) ||
+      (!CompareGuid (&gEfiSystemNvDataFvGuid, &((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)(TempVariableStoreHeader))->FileSystemGuid))) {
+    Status = EFI_VOLUME_CORRUPTED;
+    DEBUG ((EFI_D_ERROR, "Firmware Volume for Variable Store is corrupted\n"));
+    goto Done;
+  }
+
   VariableStoreBase       = TempVariableStoreHeader + \
                               (((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)(TempVariableStoreHeader)) -> HeaderLength);
   VariableStoreLength     = (UINT64) PcdGet32 (PcdFlashNvStorageVariableSize) - \
