@@ -1,5 +1,5 @@
 /** @file   
-  ACPI 5.0 definitions from the ACPI Specification Revision 5.0 November 23, 2011
+  ACPI 5.0 definitions from the ACPI Specification Revision 5.0 December 6, 2011
 
   Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
