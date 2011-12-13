@@ -16,5 +16,5 @@
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = FatBinPkg
   PACKAGE_GUID                   = EEAC1173-A27D-4c1a-958F-0A7F21C0FFA0
-  PACKAGE_VERSION                = 0.1
+  PACKAGE_VERSION                = 0.2
 
