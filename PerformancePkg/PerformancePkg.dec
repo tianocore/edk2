@@ -16,7 +16,7 @@
 [Defines]
   PACKAGE_NAME                   = PerformancePkg
   PACKAGE_GUID                   = ce898697-b945-46e2-a26e-5752af565185
-  PACKAGE_VERSION                = 0.1
+  PACKAGE_VERSION                = 0.2
   DEC_SPECIFICATION              = 0x00010005
 
 [Includes]

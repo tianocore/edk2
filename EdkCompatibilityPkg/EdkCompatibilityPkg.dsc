@@ -22,7 +22,7 @@
 [Defines]
   PLATFORM_NAME                  = EdkCompatibilityPkg
   PLATFORM_GUID                  = 6CBD2F63-BCF2-42b0-937E-869C67D2F734
-  PLATFORM_VERSION               = 0.91
+  PLATFORM_VERSION               = 0.92
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/EdkCompatibilityPkg
   SUPPORTED_ARCHITECTURES        = IA32|X64|IPF|EBC
