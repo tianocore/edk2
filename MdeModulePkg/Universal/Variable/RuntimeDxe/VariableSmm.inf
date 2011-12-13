@@ -67,6 +67,7 @@
   gEfiVariableGuid                              ## PRODUCES ## Configuration Table Guid 
   gEfiGlobalVariableGuid                        ## PRODUCES ## Variable Guid
   gSmmVariableWriteGuid                         ## PRODUCES ## SMM Variable Write Guid 
+  gEfiSystemNvDataFvGuid                        ## CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
