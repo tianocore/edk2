@@ -19,7 +19,7 @@
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = CryptoPkg
   PACKAGE_GUID                   = 36470E80-36F2-4ba0-8CC8-937C7D9FF888
-  PACKAGE_VERSION                = 0.91
+  PACKAGE_VERSION                = 0.92
 
 [Includes]
   Include

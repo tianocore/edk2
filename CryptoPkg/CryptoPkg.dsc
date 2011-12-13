@@ -20,7 +20,7 @@
 [Defines]
   PLATFORM_NAME                  = CryptoPkg
   PLATFORM_GUID                  = E1063286-6C8C-4c25-AEF0-67A9A5B6E6B6
-  PLATFORM_VERSION               = 0.91
+  PLATFORM_VERSION               = 0.92
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/CryptoPkg
   SUPPORTED_ARCHITECTURES        = IA32|X64|IPF|ARM
