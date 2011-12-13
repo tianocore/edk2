@@ -28,7 +28,7 @@
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = Nt32Pkg
   PACKAGE_GUID                   = 0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3
-  PACKAGE_VERSION                = 0.1
+  PACKAGE_VERSION                = 0.4
 
 [Includes]
   Include

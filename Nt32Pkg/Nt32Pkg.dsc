@@ -24,7 +24,7 @@
 [Defines]
   PLATFORM_NAME                  = NT32
   PLATFORM_GUID                  = EB216561-961F-47EE-9EF9-CA426EF547C2
-  PLATFORM_VERSION               = 0.3
+  PLATFORM_VERSION               = 0.4
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/NT32
   SUPPORTED_ARCHITECTURES        = IA32
