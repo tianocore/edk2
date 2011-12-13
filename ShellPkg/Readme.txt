@@ -25,10 +25,5 @@ developer may integrate this code into an existing platform:
 
 5. Build NT32
 
-============================================================================
-                          KNOWN LIMITATIONS
-============================================================================
-1. Redirecting StdErr is not completely functional.
-2. CTRL-C is not functional.
 
 ============================================================================

@@ -18,7 +18,7 @@
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = ShellPkg
   PACKAGE_GUID                   = 9FB7587C-93F7-40a7-9C04-FD7BA94EE646
-  PACKAGE_VERSION                = 0.40
+  PACKAGE_VERSION                = 0.50
 
 [Includes]
   Include
@@ -41,7 +41,7 @@
 
   ## @libraryclass   Provides advanced parsing functions
   HandleParsingLib|Include/Library/HandleParsingLib.h
-  
+
   ## @libraryclass   Provides path manipulation functions
   PathLib|Include/Library/PathLib.h
 
@@ -59,7 +59,7 @@
   gShellLevel2HiiGuid             = {0xf95a7ccc, 0x4c55, 0x4426, {0xa7, 0xb4, 0xdc, 0x89, 0x61, 0x95, 0xb, 0xae}}
   gShellLevel3HiiGuid             = {0x4344558d, 0x4ef9, 0x4725, {0xb1, 0xe4, 0x33, 0x76, 0xe8, 0xd6, 0x97, 0x4f}}
   gShellNetwork1HiiGuid           = {0xf3d301bb, 0xf4a5, 0x45a8, {0xb0, 0xb7, 0xfa, 0x99, 0x9c, 0x62, 0x37, 0xae}}
-  
+
 [Protocols]
   gEfiShellProtocolGuid           = {0x6302d008, 0x7f9b, 0x4f30, {0x87, 0xac, 0x60, 0xc9, 0xfe, 0xf5, 0xda, 0x4e}}
   gEfiShellParametersProtocolGuid = {0x752f3136, 0x4e16, 0x4fdc, {0xa2, 0x2a, 0xe5, 0xf4, 0x68, 0x12, 0xf4, 0xca}}
@@ -76,7 +76,7 @@
 
   ## This flag is used to control HII required by the shell
   gEfiShellPkgTokenSpaceGuid.PcdShellSupportFrameworkHii|FALSE|BOOLEAN|0x00000004
-  
+
   ## This flag forces the shell to present a user console.  Allows for earlier debugging of platforms.
   gEfiShellPkgTokenSpaceGuid.PcdShellForceConsole|FALSE|BOOLEAN|0x0000000F
 
