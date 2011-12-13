@@ -39,6 +39,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/EventGroup.h>
 #include <Guid/AuthenticatedVariableFormat.h>
 #include <Guid/ImageAuthentication.h>
+#include <Guid/SystemNvDataGuid.h>
 
 #define VARIABLE_RECLAIM_THRESHOLD (1024)
 

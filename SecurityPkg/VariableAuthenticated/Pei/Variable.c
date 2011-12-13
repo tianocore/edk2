@@ -359,6 +359,15 @@ GetVariableStore (
                                                            PcdGet64 (PcdFlashNvStorageVariableBase64) : 
                                                            PcdGet32 (PcdFlashNvStorageVariableBase)
                                                           );
+
+        //
+        // Check if the Firmware Volume is not corrupted
+        //
+        if ((FvHeader->Signature != EFI_FVH_SIGNATURE) || (!CompareGuid (&gEfiSystemNvDataFvGuid, &FvHeader->FileSystemGuid))) {
+          DEBUG ((EFI_D_ERROR, "Firmware Volume for Variable Store is corrupted\n"));
+          break;
+        }
+        
         VariableStoreHeader = (VARIABLE_STORE_HEADER *) ((UINT8 *) FvHeader + FvHeader->HeaderLength);
 
         if (IndexTable != NULL) {

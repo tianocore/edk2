@@ -78,6 +78,7 @@
   gEfiCertPkcs7Guid
   gEfiCertRsa2048Guid
   gEfiSecureBootEnableDisableGuid
+  gEfiSystemNvDataFvGuid                        ## CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
