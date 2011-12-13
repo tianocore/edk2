@@ -3,7 +3,7 @@
 # This Package provides all definitions(including functions, MACROs, structures and library classes)
 # and libraries instances, which are only used by Duet platform.
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License which accompanies this distribution.
@@ -19,7 +19,7 @@
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = DuetPkg
   PACKAGE_GUID                   = 151B568B-B390-4cf1-ABD6-228E0AB96F57
-  PACKAGE_VERSION                = 0.1
+  PACKAGE_VERSION                = 0.4
 
 [Includes]
   Include
