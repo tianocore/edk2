@@ -22,7 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 UINT8    mPubKeyStore[MAX_KEYDB_SIZE];
 UINT32   mPubKeyNumber;
 UINT32   mPlatformMode;
-EFI_GUID mSignatureSupport[SIGSUPPORT_NUM] = {EFI_CERT_RSA2048_SHA256_GUID, EFI_CERT_RSA2048_SHA1_GUID};
+EFI_GUID mSignatureSupport[] = {EFI_CERT_SHA1_GUID, EFI_CERT_SHA256_GUID, EFI_CERT_RSA2048_GUID, EFI_CERT_X509_GUID};
 //
 // Public Exponent of RSA Key.
 //
@@ -244,7 +244,7 @@ AutenticatedVariableServiceInitialize (
                 EFI_SIGNATURE_SUPPORT_NAME,
                 &gEfiGlobalVariableGuid,
                 mSignatureSupport,
-                SIGSUPPORT_NUM * sizeof(EFI_GUID),
+                sizeof(mSignatureSupport),
                 VarAttr,
                 0,
                 0,

@@ -45,11 +45,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define MAX_KEY_NUM     (MAX_KEYDB_SIZE / EFI_CERT_TYPE_RSA2048_SIZE)
 
 ///
-/// Item number of support signature types.
-///
-#define SIGSUPPORT_NUM 2
-
-///
 /// Struct to record signature requirement defined by UEFI spec.
 /// For SigHeaderSize and SigDataSize, ((UINT32) ~0) means NO exact length requirement for this field.
 ///
