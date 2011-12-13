@@ -16,7 +16,7 @@
 [Defines]
   PLATFORM_NAME                  = PcAtChipset
   PLATFORM_GUID                  = a653167b-34d7-4b91-bfe3-f0c7608f48da
-  PLATFORM_VERSION               = 0.1
+  PLATFORM_VERSION               = 0.2
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/PcAtChipset
   SUPPORTED_ARCHITECTURES        = IA32|X64

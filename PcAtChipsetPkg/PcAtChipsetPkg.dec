@@ -20,7 +20,7 @@
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = PcAtChipsetPkg
   PACKAGE_GUID                   = B728689A-52D3-4b8c-AE89-2CE5514CC6DC
-  PACKAGE_VERSION                = 0.1
+  PACKAGE_VERSION                = 0.2
 
 [Includes]
   Include
