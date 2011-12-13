@@ -16,5 +16,5 @@
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = EdkShellBinPkg
   PACKAGE_GUID                   = d4266a1b-1d38-4116-93ae-60dc3e2012a6
-  PACKAGE_VERSION                = 0.3
+  PACKAGE_VERSION                = 0.4
 
