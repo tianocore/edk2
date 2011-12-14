@@ -112,7 +112,7 @@ CEntryPoint (
     }
 
     // Enter Monitor Mode
-    enter_monitor_mode ((VOID*)(PcdGet32(PcdCPUCoresSecMonStackBase) + (PcdGet32(PcdCPUCoreSecMonStackSize) * GET_CORE_POS(MpId))));
+    enter_monitor_mode ((VOID*)(PcdGet32(PcdCPUCoresSecMonStackBase) + (PcdGet32(PcdCPUCoreSecMonStackSize) * (GET_CORE_POS(MpId) + 1))));
 
     //Write the monitor mode vector table address
     ArmWriteVMBar((UINT32) &monitor_vector_table);
