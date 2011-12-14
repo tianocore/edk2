@@ -18,7 +18,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = RealTimeClock
   FILE_GUID                      = B336F62D-4135-4A55-AE4E-4971BBF0885D
-  MODULE_TYPE                    = DXE_DRIVER
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
 
   ENTRY_POINT                    = InitializeRealTimeClock

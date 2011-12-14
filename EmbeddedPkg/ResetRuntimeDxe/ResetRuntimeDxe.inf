@@ -18,7 +18,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = Reset
   FILE_GUID                      = 16036A73-E8EF-46D0-953C-9B8E96527D13
-  MODULE_TYPE                    = DXE_DRIVER
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
 
   ENTRY_POINT                    = InitializeReset
