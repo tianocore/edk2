@@ -15,7 +15,7 @@
 [Defines]
   PLATFORM_NAME                  = SecurityPkg
   PLATFORM_GUID                  = B2C4614D-AE76-47ba-B876-5988BFED064F
-  PLATFORM_VERSION               = 0.91
+  PLATFORM_VERSION               = 0.92
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/SecurityPkg
   SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC

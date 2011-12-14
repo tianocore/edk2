@@ -17,7 +17,7 @@
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = SecurityPkg
   PACKAGE_GUID                   = 24369CAC-6AA6-4fb8-88DB-90BF061668AD
-  PACKAGE_VERSION                = 0.91
+  PACKAGE_VERSION                = 0.92
 
 [Includes]
   Include
