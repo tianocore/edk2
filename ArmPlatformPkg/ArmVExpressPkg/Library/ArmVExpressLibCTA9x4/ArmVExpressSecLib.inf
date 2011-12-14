@@ -30,7 +30,7 @@
   ArmLib
   ArmTrustZoneLib
   ArmPlatformSysConfigLib
-  DebugSecExtraActionLib
+  ArmPlatformSecExtraActionLib
   IoLib
   L2X0CacheLib
   PL301AxiLib
