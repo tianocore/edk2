@@ -136,6 +136,10 @@
   ## PL111 Versatile Express Motherboard controller
   gArmPlatformTokenSpaceGuid.PcdPL111LcdBase|0x1C1F0000
   
+  ## PL180 MMC/SD card controller
+  gArmPlatformTokenSpaceGuid.PcdPL180SysMciRegAddress|0x1C010048
+  gArmPlatformTokenSpaceGuid.PcdPL180MciBaseAddress|0x1C050000
+  
   #
   # ARM PL390 General Interrupt Controller
   #

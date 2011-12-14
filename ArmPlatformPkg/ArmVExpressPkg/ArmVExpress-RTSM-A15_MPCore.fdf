@@ -158,6 +158,12 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 
   #
+  # Multimedia Card Interface
+  #
+  INF EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
+  INF ArmPlatformPkg/Drivers/PL180MciDxe/PL180MciDxe.inf
+
+  #
   # UEFI application (Shell Embedded Boot Loader) 
   #  
   INF EmbeddedPkg/Ebl/Ebl.inf
