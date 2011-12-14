@@ -16,7 +16,7 @@
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = IntelFrameworkPkg
   PACKAGE_GUID                   = 2759ded5-bb57-4b06-af4f-c398fa552719
-  PACKAGE_VERSION                = 0.91
+  PACKAGE_VERSION                = 0.92
 
 [Includes]
   Include                        # Root include for the package
