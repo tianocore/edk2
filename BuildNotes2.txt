@@ -1,11 +1,11 @@
 Intel(R) Platform Innovation Framework for EFI
 EFI Development Kit II (EDK II)
-2010-03-31
+2011-12-14
 
 Intel is a trademark or registered trademark of Intel Corporation or its
 subsidiaries in the United States and other countries.
 * Other names and brands may be claimed as the property of others.
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.
+Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.
 
 EDK II packages can be checked out from the following SVN address:
 http://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2 
@@ -45,15 +45,16 @@ dlls are not required for normal development.
 
     c:\MyWork\edk2\> edksetup --nt32
 
-The default tool chain (named MYTOOLS) is pre-configured to use VS2005 for IA32
-and X64 target architectures and the DDK for IPF target architectures. To use a
+The default tool chain (named MYTOOLS) is pre-configured to use VS2008 for IA32
+and X64 target architectures and DDK3790 for IPF target architectures. To use a
 different tool chain, either modify the tools_def.txt file's MYTOOLS entries,
 or modify the %WORKSPACE%\Conf\target.txt file's TOOL_CHAIN_TAG. The pre-defined
 tags are listed near the top of the %WORKSPACE%\Conf\tools_def.txt file, below
 the Supported Tool Chains comment.
 Alternatively, you may use the build command's -t option to specify a different
-tool chain tag name: build -t VS2003 ... , for example.  Using this method will
-require that you always use the build command's -t option.
+tool chain tag name: build -t VS2008 ... , for example.  Using this method will
+require that you always use the build command's -t option. If you use 64-bit 
+windows OS, you should use tool chain tag name with x86, such as VS2008x86.
 
 
 Next, go to the module directory and begin to build.  This example is for the
@@ -120,7 +121,7 @@ Tools in Python
 
 * Run buld tool written in Python from source
   The build tool written in Python can be executed from its source directly as
-  long as you have the Python interpreter (version 2.5) installed. The source
+  long as you have the Python interpreter (version 2.5.4) installed. The source
   of Python code is locating at:
 
     http://edk2-buildtools.svn.sourceforge.net/svnroot/edk2-buildtools/trunk/BaseTools
