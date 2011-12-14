@@ -18,7 +18,7 @@
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = NetworkPkg
   PACKAGE_GUID                   = 947988BE-8D5C-471a-893D-AD181C46BEBB
-  PACKAGE_VERSION                = 0.92
+  PACKAGE_VERSION                = 0.93
 
 [Includes]
   Include
