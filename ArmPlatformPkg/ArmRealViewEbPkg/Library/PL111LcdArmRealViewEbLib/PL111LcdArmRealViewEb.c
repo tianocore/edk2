@@ -13,9 +13,13 @@
 
 #include <PiDxe.h>
 
-#include <Library/LcdPlatformLib.h>
-#include <Library/IoLib.h>
 #include <Library/DebugLib.h>
+#include <Library/IoLib.h>
+#include <Library/LcdPlatformLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+
+#include <Protocol/EdidDiscovered.h>
+#include <Protocol/EdidActive.h>
 
 #include <Drivers/PL111Lcd.h>
 
@@ -50,13 +54,32 @@ CLCD_RESOLUTION mResolutions[] = {
     }
 };
 
+EFI_EDID_DISCOVERED_PROTOCOL  mEdidDiscovered = {
+  0,
+  NULL
+};
+
+EFI_EDID_ACTIVE_PROTOCOL      mEdidActive = {
+  0,
+  NULL
+};
 
 EFI_STATUS
 LcdPlatformInitializeDisplay (
-  VOID
+  IN EFI_HANDLE   Handle
   )
 {
+  EFI_STATUS  Status;
+
   MmioWrite32(ARM_EB_SYS_CLCD_REG, 1);
+
+  // Install the EDID Protocols
+  Status = gBS->InstallMultipleProtocolInterfaces(
+    &Handle,
+    &gEfiEdidDiscoveredProtocolGuid,  &mEdidDiscovered,
+    &gEfiEdidActiveProtocolGuid,      &mEdidActive,
+    NULL
+  );
 
   return EFI_SUCCESS;
 }

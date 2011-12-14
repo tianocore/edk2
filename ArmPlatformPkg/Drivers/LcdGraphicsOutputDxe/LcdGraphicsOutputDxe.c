@@ -125,7 +125,7 @@ InitializeDisplay (
     goto EXIT_ERROR_LCD_SHUTDOWN;
   }
 
-  Status = LcdPlatformInitializeDisplay ();
+  Status = LcdPlatformInitializeDisplay (Instance->Handle);
   if (EFI_ERROR(Status)) {
     goto EXIT_ERROR_LCD_SHUTDOWN;
   }

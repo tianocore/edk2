@@ -158,7 +158,7 @@ typedef enum {
 
 EFI_STATUS
 LcdPlatformInitializeDisplay (
-  VOID
+  IN EFI_HANDLE   Handle
   );
 
 EFI_STATUS
