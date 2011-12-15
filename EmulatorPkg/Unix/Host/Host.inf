@@ -111,6 +111,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
   gEmulatorPkgTokenSpaceGuid.PcdPeiServicesTablePage
 
+[FeaturePcd]
+  gEmulatorPkgTokenSpaceGuid.PcdEmulatorLazyLoadSymbols
+
 
 [BuildOptions]
    GCC:*_*_IA32_DLINK_FLAGS == -o $(BIN_DIR)/Host -m elf_i386 -dynamic-linker $(HOST_DLINK_PATHS) -L/usr/X11R6/lib -lXext -lX11

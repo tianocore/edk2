@@ -1113,6 +1113,18 @@ DlLoadImage (
 }
 
 
+VOID
+SecGdbScriptBreak (
+  char                *FileName,
+  int                 FileNameLength,
+  long unsigned int   LoadAddress,
+  int                 AddSymbolFlag
+  )
+{
+  return;
+}
+
+
 /**
   Adds the image to a gdb script so it's symbols can be loaded.
   The AddFirmwareSymbolFile helper macro is used.
@@ -1130,20 +1142,41 @@ GdbScriptAddImage (
 
   if (ImageContext->PdbPointer != NULL && !IsPdbFile (ImageContext->PdbPointer)) {
     FILE  *GdbTempFile;
-    GdbTempFile = fopen (gGdbWorkingFileName, "a");
-    if (GdbTempFile != NULL) {
-      long unsigned int SymbolsAddr = (long unsigned int)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders);
-      mScriptSymbolChangesCount++;
-      fprintf (
-        GdbTempFile,
-        "AddFirmwareSymbolFile 0x%x %s 0x%08lx\n",
-        mScriptSymbolChangesCount,
-        ImageContext->PdbPointer,
-        SymbolsAddr
-        );
-      fclose (GdbTempFile);
+    if (FeaturePcdGet (PcdEmulatorLazyLoadSymbols)) {    
+      GdbTempFile = fopen (gGdbWorkingFileName, "a");
+      if (GdbTempFile != NULL) {
+        long unsigned int SymbolsAddr = (long unsigned int)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders);
+        mScriptSymbolChangesCount++;
+        fprintf (
+          GdbTempFile,
+          "AddFirmwareSymbolFile 0x%x %s 0x%08lx\n",
+          mScriptSymbolChangesCount,
+          ImageContext->PdbPointer,
+          SymbolsAddr
+          );
+        fclose (GdbTempFile);
+      } else {
+        ASSERT (FALSE);
+      }
     } else {
-      ASSERT (FALSE);
+      GdbTempFile = fopen (gGdbWorkingFileName, "w");
+      if (GdbTempFile != NULL) {
+        fprintf (
+          GdbTempFile, 
+          "add-symbol-file %s 0x%08lx\n", 
+          ImageContext->PdbPointer, 
+          (long unsigned int)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders)
+          );
+        fclose (GdbTempFile);
+  
+        //
+        // Target for gdb breakpoint in a script that uses gGdbWorkingFileName to set a breakpoint.
+        // Hey what can you say scripting in gdb is not that great....
+        //
+        SecGdbScriptBreak (ImageContext->PdbPointer, strlen (ImageContext->PdbPointer), (long unsigned int)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders), 1);
+      } else {
+        ASSERT (FALSE);
+      }
     }
   }
 }
@@ -1182,21 +1215,37 @@ GdbScriptRemoveImage (
     return;
   }
 
-  //
-  // Write the file we need for the gdb script
-  //
-  GdbTempFile = fopen (gGdbWorkingFileName, "a");
-  if (GdbTempFile != NULL) {
-    mScriptSymbolChangesCount++;
-    fprintf (
-      GdbTempFile,
-      "RemoveFirmwareSymbolFile 0x%x %s\n",
-      mScriptSymbolChangesCount,
-      ImageContext->PdbPointer
-      );
-    fclose (GdbTempFile);
+  if (FeaturePcdGet (PcdEmulatorLazyLoadSymbols)) {    
+    //
+    // Write the file we need for the gdb script
+    //
+    GdbTempFile = fopen (gGdbWorkingFileName, "a");
+    if (GdbTempFile != NULL) {
+      mScriptSymbolChangesCount++;
+      fprintf (
+        GdbTempFile,
+        "RemoveFirmwareSymbolFile 0x%x %s\n",
+        mScriptSymbolChangesCount,
+        ImageContext->PdbPointer
+        );
+      fclose (GdbTempFile);
+    } else {
+      ASSERT (FALSE);
+    }
   } else {
-    ASSERT (FALSE);
+    GdbTempFile = fopen (gGdbWorkingFileName, "w");
+    if (GdbTempFile != NULL) {
+      fprintf (GdbTempFile, "remove-symbol-file %s\n", ImageContext->PdbPointer);
+      fclose (GdbTempFile);
+
+      //
+      // Target for gdb breakpoint in a script that uses gGdbWorkingFileName to set a breakpoint.
+      // Hey what can you say scripting in gdb is not that great....
+      //
+      SecGdbScriptBreak (ImageContext->PdbPointer, strlen (ImageContext->PdbPointer), 0, 0);
+    } else {
+      ASSERT (FALSE);
+    }  
   }
 }
 

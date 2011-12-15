@@ -48,6 +48,10 @@
   gEmuVirtualDisksGuid       = { 0xf2ba331a, 0x8985, 0x11db, { 0xa4, 0x06, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35 } }
   gEmuPhysicalDisksGuid      = { 0xf2bdcc96, 0x8985, 0x11db, { 0x87, 0x19, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35 } }
 
+[PcdsFeatureFlag]
+  ## If TRUE, if symbols only load on breakpoints and gdb entry
+  gEmulatorPkgTokenSpaceGuid.PcdEmulatorLazyLoadSymbols|TRUE|BOOLEAN|0x00020000
+
 [PcdsFixedAtBuild]
   gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageVariableBase|0x0|UINT64|0x00001014
   gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageFtwSpareBase|0x0|UINT64|0x00001015
