@@ -1334,17 +1334,25 @@ PlatOverMngrCallback (
   EFI_INPUT_KEY                             Key;
   PLAT_OVER_MNGR_DATA                       *FakeNvData;
 
-  if (Action == EFI_BROWSER_ACTION_CHANGING) {
-    Private = EFI_CALLBACK_INFO_FROM_THIS (This);
-    FakeNvData = &Private->FakeNvData;
-    if (!HiiGetBrowserData (&gPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData)) {
-      return EFI_NOT_FOUND;
-    }
+  if ((Action != EFI_BROWSER_ACTION_CHANGING) && (Action != EFI_BROWSER_ACTION_CHANGED)) {
+    //
+    // All other action return unsupported.
+    //
+    return EFI_UNSUPPORTED;
+  }
 
-    if (KeyValue == KEY_VALUE_DEVICE_REFRESH ||
-        KeyValue == KEY_VALUE_DEVICE_FILTER ||
-        KeyValue == KEY_VALUE_DRIVER_GOTO_PREVIOUS
-        ) {
+  Private = EFI_CALLBACK_INFO_FROM_THIS (This);
+  FakeNvData = &Private->FakeNvData;
+  if (!HiiGetBrowserData (&gPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData)) {
+    return EFI_NOT_FOUND;
+  }
+
+  if (Action == EFI_BROWSER_ACTION_CHANGING) {
+    if (Value == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+    
+    if (KeyValue == KEY_VALUE_DRIVER_GOTO_PREVIOUS) {
       UpdateDeviceSelectPage (Private, KeyValue, FakeNvData);
       //
       // Update page title string
@@ -1380,15 +1388,6 @@ PlatOverMngrCallback (
       }
     }
 
-    if (KeyValue == KEY_VALUE_ORDER_SAVE_AND_EXIT) {
-      Status = CommintChanges (Private, KeyValue, FakeNvData);
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
-      if (EFI_ERROR (Status)) {
-        CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Single Override Info too large, Saving Error!", NULL);
-        return EFI_DEVICE_ERROR;
-      }
-    }
-
     if (KeyValue == KEY_VALUE_DEVICE_CLEAR) {
       //
       // Deletes all environment variable(s) that contain the override mappings info
@@ -1397,18 +1396,40 @@ PlatOverMngrCallback (
       Status = SaveOverridesMapping (&mMappingDataBase);
       UpdateDeviceSelectPage (Private, KeyValue, FakeNvData);
     }
-    //
-    // Pass changed uncommitted data back to Form Browser
-    //
-    HiiSetBrowserData (&gPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData, NULL);
+  } else if (Action == EFI_BROWSER_ACTION_CHANGED) {
+    switch (KeyValue) {
+    case KEY_VALUE_DEVICE_REFRESH:
+    case KEY_VALUE_DEVICE_FILTER:
+      UpdateDeviceSelectPage (Private, KeyValue, FakeNvData);
+      //
+      // Update page title string
+      //
+      NewStringToken = STRING_TOKEN (STR_TITLE);
+      if (HiiSetString (Private->RegisteredHandle, NewStringToken, L"First, Select the controller by device path", NULL) == 0) {
+        ASSERT (FALSE);
+      }
+    break;
+    
+    case KEY_VALUE_ORDER_SAVE_AND_EXIT:
+      Status = CommintChanges (Private, KeyValue, FakeNvData);
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+      if (EFI_ERROR (Status)) {
+        CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Single Override Info too large, Saving Error!", NULL);
+        return EFI_DEVICE_ERROR;
+      }
+    break;
 
-    return EFI_SUCCESS;
-  } 
+    default:
+    break;
+    }
+  }
 
   //
-  // All other action return unsupported.
+  // Pass changed uncommitted data back to Form Browser
   //
-  return EFI_UNSUPPORTED;
+  HiiSetBrowserData (&gPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *) FakeNvData, NULL);
+
+  return EFI_SUCCESS;
 }
 
 /**

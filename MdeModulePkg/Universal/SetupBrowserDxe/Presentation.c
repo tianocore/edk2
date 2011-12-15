@@ -1248,45 +1248,50 @@ ProcessCallBackFunction (
                              &ActionRequest
                              );
     if (!EFI_ERROR (Status)) {
-      switch (ActionRequest) {
-      case EFI_BROWSER_ACTION_REQUEST_RESET:
-        gResetRequired = TRUE;
-        Selection->Action = UI_ACTION_EXIT;
-        break;
+      //
+      // Only for EFI_BROWSER_ACTION_CHANGED need to handle this ActionRequest.
+      //
+      if (Action == EFI_BROWSER_ACTION_CHANGED) {
+        switch (ActionRequest) {
+        case EFI_BROWSER_ACTION_REQUEST_RESET:
+          gResetRequired = TRUE;
+          Selection->Action = UI_ACTION_EXIT;
+          break;
 
-      case EFI_BROWSER_ACTION_REQUEST_SUBMIT:
-        SubmitFormIsRequired = TRUE;
-        Selection->Action = UI_ACTION_EXIT;
-        break;
+        case EFI_BROWSER_ACTION_REQUEST_SUBMIT:
+          SubmitFormIsRequired = TRUE;
+          Selection->Action = UI_ACTION_EXIT;
+          break;
 
-      case EFI_BROWSER_ACTION_REQUEST_EXIT:
-        Selection->Action = UI_ACTION_EXIT;
-        break;
+        case EFI_BROWSER_ACTION_REQUEST_EXIT:
+          Selection->Action = UI_ACTION_EXIT;
+          break;
 
-      case EFI_BROWSER_ACTION_REQUEST_FORM_SUBMIT_EXIT:
-        SubmitFormIsRequired  = TRUE;
-        SettingLevel          = FormLevel;
-        NeedExit              = TRUE;
-        break;
+        case EFI_BROWSER_ACTION_REQUEST_FORM_SUBMIT_EXIT:
+          SubmitFormIsRequired  = TRUE;
+          SettingLevel          = FormLevel;
+          NeedExit              = TRUE;
+          break;
 
-      case EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD_EXIT:
-        DiscardFormIsRequired = TRUE;
-        SettingLevel          = FormLevel;      
-        NeedExit              = TRUE;
-        break;
+        case EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD_EXIT:
+          DiscardFormIsRequired = TRUE;
+          SettingLevel          = FormLevel;      
+          NeedExit              = TRUE;
+          break;
 
-      case EFI_BROWSER_ACTION_REQUEST_FORM_APPLY:
-        SubmitFormIsRequired  = TRUE;
-        SettingLevel          = FormLevel;
-        break;
+        case EFI_BROWSER_ACTION_REQUEST_FORM_APPLY:
+          SubmitFormIsRequired  = TRUE;
+          SettingLevel          = FormLevel;
+          break;
 
-      case EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD:
-        DiscardFormIsRequired = TRUE;
-        SettingLevel          = FormLevel;
-        break;
+        case EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD:
+          DiscardFormIsRequired = TRUE;
+          SettingLevel          = FormLevel;
+          break;
 
-      default:
-        break;
+        default:
+          break;
+        }
       }
 
       //
@@ -1555,7 +1560,7 @@ SetupBrowser (
           }
         }
 
-        if ((Status == EFI_SUCCESS) && (Statement->Operand != EFI_IFR_REF_OP)) {
+        if (!EFI_ERROR (Status) && Statement->Operand != EFI_IFR_REF_OP) {
           ProcessCallBackFunction(Selection, Statement, EFI_BROWSER_ACTION_CHANGED, FALSE);
         }
       }

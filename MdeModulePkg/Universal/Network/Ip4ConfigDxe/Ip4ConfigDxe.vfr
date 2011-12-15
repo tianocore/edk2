@@ -78,13 +78,14 @@ formset
     endif;
 
     subtitle text = STRING_TOKEN(STR_NULL);
-
-    goto FORMID_DEVICE_FORM,
-    prompt = STRING_TOKEN (STR_SAVE_CHANGES),
-    help   = STRING_TOKEN (STR_SAVE_CHANGES),
-    flags  = INTERACTIVE,
-    key    = KEY_SAVE_CHANGES;
-
+    
+    text
+      help   = STRING_TOKEN(STR_SAVE_CHANGES),
+      text   = STRING_TOKEN(STR_SAVE_CHANGES),
+        text   = STRING_TOKEN(STR_SAVE_CHANGES),
+      flags  = INTERACTIVE,
+      key    = KEY_SAVE_CHANGES;
+      
   endform;
 
 endformset;

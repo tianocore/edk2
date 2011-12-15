@@ -1667,50 +1667,6 @@ DriverCallback (
       }
       break;
 
-    case 0x1237:
-      //
-      // User press "Exit now", request Browser to exit
-      //
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-      break;
-
-    case 0x1238:
-      //
-      // User press "Save now", request Browser to save the uncommitted data.
-      //
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
-      break;
-
-    case 0x1241:
-    case 0x1246:
-      //
-      // User press "Submit current form and Exit now", request Browser to submit current form and exit
-      //
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_SUBMIT_EXIT;
-      break;
-
-    case 0x1242:
-      //
-      // User press "Discard current form now", request Browser to discard the uncommitted data.
-      //
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD;
-      break;
-
-    case 0x1243:
-      //
-      // User press "Submit current form now", request Browser to save the uncommitted data.
-      //
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
-      break;
-
-    case 0x1244:
-    case 0x1245:
-      //
-      // User press "Discard current form and Exit now", request Browser to discard the uncommitted data and exit.
-      //
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD_EXIT;
-      break;
-
     case 0x2000:
       //
       // Only used to update the state.
@@ -1749,6 +1705,57 @@ DriverCallback (
       break;
     }
   }
+  break;
+
+  case EFI_BROWSER_ACTION_CHANGED:
+    switch (QuestionId) {
+      case 0x1237:
+        //
+        // User press "Exit now", request Browser to exit
+        //
+        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+        break;
+      
+      case 0x1238:
+        //
+        // User press "Save now", request Browser to save the uncommitted data.
+        //
+        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+        break;
+      
+      case 0x1241:
+      case 0x1246:
+        //
+        // User press "Submit current form and Exit now", request Browser to submit current form and exit
+        //
+        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_SUBMIT_EXIT;
+        break;
+      
+      case 0x1242:
+        //
+        // User press "Discard current form now", request Browser to discard the uncommitted data.
+        //
+        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD;
+        break;
+      
+      case 0x1243:
+        //
+        // User press "Submit current form now", request Browser to save the uncommitted data.
+        //
+        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
+        break;
+      
+      case 0x1244:
+      case 0x1245:
+        //
+        // User press "Discard current form and Exit now", request Browser to discard the uncommitted data and exit.
+        //
+        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD_EXIT;
+        break;
+        
+      default:
+      break;
+    }
   break;
 
   default:

@@ -239,16 +239,23 @@ VlanCallback (
     return EFI_SUCCESS;
   }
 
-  if (Action == EFI_BROWSER_ACTION_CHANGING) {
+  if ((Action != EFI_BROWSER_ACTION_CHANGED) && (Action != EFI_BROWSER_ACTION_CHANGING)) {
     //
-    // Get Browser data
+    // All other action return unsupported.
     //
-    Configuration = AllocateZeroPool (sizeof (VLAN_CONFIGURATION));
-    ASSERT (Configuration != NULL);
-    HiiGetBrowserData (&gVlanConfigFormSetGuid, mVlanStorageName, sizeof (VLAN_CONFIGURATION), (UINT8 *) Configuration);
+    return EFI_UNSUPPORTED;
+  }
 
-    VlanConfig = PrivateData->VlanConfig;
+  //
+  // Get Browser data
+  //
+  Configuration = AllocateZeroPool (sizeof (VLAN_CONFIGURATION));
+  ASSERT (Configuration != NULL);
+  HiiGetBrowserData (&gVlanConfigFormSetGuid, mVlanStorageName, sizeof (VLAN_CONFIGURATION), (UINT8 *) Configuration);
 
+  VlanConfig = PrivateData->VlanConfig;
+
+  if (Action == EFI_BROWSER_ACTION_CHANGED) {
     switch (QuestionId) {
     case VLAN_ADD_QUESTION_ID:
       //
@@ -304,6 +311,11 @@ VlanCallback (
       ZeroMem (Configuration->VlanList, MAX_VLAN_NUMBER);
       break;
 
+    default:
+      break;
+    }
+  } else if (Action == EFI_BROWSER_ACTION_CHANGING) {
+    switch (QuestionId) {
     case VLAN_UPDATE_QUESTION_ID:
       //
       // Update current VLAN list into Form.
@@ -314,16 +326,11 @@ VlanCallback (
     default:
       break;
     }
-
-    HiiSetBrowserData (&gVlanConfigFormSetGuid, mVlanStorageName, sizeof (VLAN_CONFIGURATION), (UINT8 *) Configuration, NULL);
-    FreePool (Configuration);
-    return EFI_SUCCESS;
   }
-
-  //
-  // All other action return unsupported.
-  //
-  return EFI_UNSUPPORTED;
+  
+  HiiSetBrowserData (&gVlanConfigFormSetGuid, mVlanStorageName, sizeof (VLAN_CONFIGURATION), (UINT8 *) Configuration, NULL);
+  FreePool (Configuration);
+  return EFI_SUCCESS;
 }
 
 

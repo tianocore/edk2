@@ -99,11 +99,12 @@ formset
 
     subtitle text = STRING_TOKEN(STR_NULL_STRING);
 
-    goto FORM_ID_ORDER,
-      prompt  = STRING_TOKEN(STR_SAVE_AND_EXIT),
-      help    = STRING_TOKEN(STR_NULL_STRING),
-      flags   = INTERACTIVE | RESET_REQUIRED,
-      key     = KEY_VALUE_ORDER_SAVE_AND_EXIT;
+    text
+      help   = STRING_TOKEN (STR_NULL_STRING),
+      text   = STRING_TOKEN (STR_SAVE_AND_EXIT),
+        text   = STRING_TOKEN (STR_SAVE_AND_EXIT),
+      flags  = INTERACTIVE | RESET_REQUIRED,
+      key    = KEY_VALUE_ORDER_SAVE_AND_EXIT;
   endform;
 
 endformset;

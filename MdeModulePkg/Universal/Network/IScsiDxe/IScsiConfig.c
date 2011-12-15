@@ -676,20 +676,40 @@ IScsiFormCallback (
   EFI_STATUS                Status;
   EFI_INPUT_KEY             Key;
 
-  if (Action == EFI_BROWSER_ACTION_CHANGING) {
-    Private   = ISCSI_FORM_CALLBACK_INFO_FROM_FORM_CALLBACK (This);
-    //
-    // Retrive uncommitted data from Browser
-    //
-    IfrNvData = AllocateZeroPool (sizeof (ISCSI_CONFIG_IFR_NVDATA));
-    ASSERT (IfrNvData != NULL);
-    if (!HiiGetBrowserData (&gIp4IScsiConfigGuid, mVendorStorageName, sizeof (ISCSI_CONFIG_IFR_NVDATA), (UINT8 *) IfrNvData)) {
-      FreePool (IfrNvData);
-      return EFI_NOT_FOUND;
-    }
-    Status = EFI_SUCCESS;
+  if (Action != EFI_BROWSER_ACTION_CHANGING && Action != EFI_BROWSER_ACTION_CHANGED) {
+    return EFI_UNSUPPORTED;
+  }
 
-    switch (QuestionId) {
+  Private   = ISCSI_FORM_CALLBACK_INFO_FROM_FORM_CALLBACK (This);
+  //
+  // Retrive uncommitted data from Browser
+  //
+  IfrNvData = AllocateZeroPool (sizeof (ISCSI_CONFIG_IFR_NVDATA));
+  ASSERT (IfrNvData != NULL);
+  if (!HiiGetBrowserData (&gIp4IScsiConfigGuid, mVendorStorageName, sizeof (ISCSI_CONFIG_IFR_NVDATA), (UINT8 *) IfrNvData)) {
+    FreePool (IfrNvData);
+    return EFI_NOT_FOUND;
+  }
+  Status = EFI_SUCCESS;
+
+  if (Action == EFI_BROWSER_ACTION_CHANGING) {
+    if ((QuestionId >= KEY_DEVICE_ENTRY_BASE) && (QuestionId < (mNumberOfIScsiDevices + KEY_DEVICE_ENTRY_BASE))) {
+      //
+      // In case goto the device configuration form, update the device form title.
+      //
+      ConfigFormEntry = IScsiGetConfigFormEntryByIndex ((UINT32) (QuestionId - KEY_DEVICE_ENTRY_BASE));
+      ASSERT (ConfigFormEntry != NULL);
+
+      UnicodeSPrint (PortString, (UINTN) 128, L"Port %s", ConfigFormEntry->MacString);
+      DeviceFormTitleToken = (EFI_STRING_ID) STR_ISCSI_DEVICE_FORM_TITLE;
+      HiiSetString (Private->RegisteredHandle, DeviceFormTitleToken, PortString, NULL);
+
+      IScsiConvertDeviceConfigDataToIfrNvData (ConfigFormEntry, IfrNvData);
+
+      Private->Current = ConfigFormEntry;
+    }
+  } else if (Action == EFI_BROWSER_ACTION_CHANGED) {
+    switch (QuestionId) { 
     case KEY_INITIATOR_NAME:
       IScsiUnicodeStrToAsciiStr (IfrNvData->InitiatorName, IScsiName);
       BufferSize  = AsciiStrSize (IScsiName);
@@ -889,41 +909,20 @@ IScsiFormCallback (
       break;
 
     default:
-      if ((QuestionId >= KEY_DEVICE_ENTRY_BASE) && (QuestionId < (mNumberOfIScsiDevices + KEY_DEVICE_ENTRY_BASE))) {
-        //
-        // In case goto the device configuration form, update the device form title.
-        //
-        ConfigFormEntry = IScsiGetConfigFormEntryByIndex ((UINT32) (QuestionId - KEY_DEVICE_ENTRY_BASE));
-        ASSERT (ConfigFormEntry != NULL);
-
-        UnicodeSPrint (PortString, (UINTN) 128, L"Port %s", ConfigFormEntry->MacString);
-        DeviceFormTitleToken = (EFI_STRING_ID) STR_ISCSI_DEVICE_FORM_TITLE;
-        HiiSetString (Private->RegisteredHandle, DeviceFormTitleToken, PortString, NULL);
-
-        IScsiConvertDeviceConfigDataToIfrNvData (ConfigFormEntry, IfrNvData);
-
-        Private->Current = ConfigFormEntry;
-      }
-
       break;
     }
-
-    if (!EFI_ERROR (Status)) {
-      //
-      // Pass changed uncommitted data back to Form Browser
-      //
-      HiiSetBrowserData (&gIp4IScsiConfigGuid, mVendorStorageName, sizeof (ISCSI_CONFIG_IFR_NVDATA), (UINT8 *) IfrNvData, NULL);
-    }
-    
-    FreePool (IfrNvData);
-
-    return Status;
   }
 
-  //
-  // All other action return unsupported.
-  //
-  return EFI_UNSUPPORTED;
+  if (!EFI_ERROR (Status)) {
+    //
+    // Pass changed uncommitted data back to Form Browser
+    //
+    HiiSetBrowserData (&gIp4IScsiConfigGuid, mVendorStorageName, sizeof (ISCSI_CONFIG_IFR_NVDATA), (UINT8 *) IfrNvData, NULL);
+  }
+  
+  FreePool (IfrNvData);
+  
+  return Status;
 }
 
 /**
