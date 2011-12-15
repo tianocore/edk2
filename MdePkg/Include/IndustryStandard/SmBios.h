@@ -857,8 +857,8 @@ typedef struct {
   UINT16  NonBurst      :1;
   UINT16  Burst         :1;
   UINT16  PipelineBurst :1;
-  UINT16  Asynchronous  :1;
   UINT16  Synchronous   :1;
+  UINT16  Asynchronous  :1;
   UINT16  Reserved      :9;
 } CACHE_SRAM_TYPE_DATA;
 
