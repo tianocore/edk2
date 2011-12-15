@@ -22,7 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 typedef struct _EFI_FORM_BROWSER_EXTENSION_PROTOCOL   EFI_FORM_BROWSER_EXTENSION_PROTOCOL;
 
 //
-// Return value of EXIT_REMINDER() that describes whether the changed data is saved or discarded.
+// Return value of SAVE_REMINDER() that describes whether the changed data is saved or discarded.
 //
 #define BROWSER_NO_CHANGES          0
 #define BROWSER_SAVE_CHANGES        1
