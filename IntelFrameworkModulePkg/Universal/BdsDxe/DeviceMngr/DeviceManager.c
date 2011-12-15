@@ -133,35 +133,30 @@ DeviceManagerCallback (
 {
   UINTN CurIndex;
 
-  if (Action == EFI_BROWSER_ACTION_CHANGING) {
-    if ((Value == NULL) || (ActionRequest == NULL)) {
-      return EFI_INVALID_PARAMETER;
-    }
-
-    gCallbackKey = QuestionId;
-    if ((QuestionId < MAX_KEY_SECTION_LEN + NETWORK_DEVICE_LIST_KEY_OFFSET) && (QuestionId >= NETWORK_DEVICE_LIST_KEY_OFFSET)) {
-      //
-      // If user select the mac address, need to record mac address string to support next form show.
-      //
-      for (CurIndex = 0; CurIndex < mMacDeviceList.CurListLen; CurIndex ++) {
-        if (mMacDeviceList.NodeList[CurIndex].QuestionId == QuestionId) {
-           mSelectedMacAddrString = HiiGetString (gDeviceManagerPrivate.HiiHandle, mMacDeviceList.NodeList[CurIndex].PromptId, NULL);
-        }
-      }
-    }
-  
+  if (Action != EFI_BROWSER_ACTION_CHANGING) {
     //
-    // Request to exit SendForm(), so as to switch to selected form
+    // All other action return unsupported.
     //
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-
-    return EFI_SUCCESS;
+    return EFI_UNSUPPORTED;
   }
 
-  //
-  // All other action return unsupported.
-  //
-  return EFI_UNSUPPORTED;
+  if (Value == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  gCallbackKey = QuestionId;
+  if ((QuestionId < MAX_KEY_SECTION_LEN + NETWORK_DEVICE_LIST_KEY_OFFSET) && (QuestionId >= NETWORK_DEVICE_LIST_KEY_OFFSET)) {
+    //
+    // If user select the mac address, need to record mac address string to support next form show.
+    //
+    for (CurIndex = 0; CurIndex < mMacDeviceList.CurListLen; CurIndex ++) {
+      if (mMacDeviceList.NodeList[CurIndex].QuestionId == QuestionId) {
+         mSelectedMacAddrString = HiiGetString (gDeviceManagerPrivate.HiiHandle, mMacDeviceList.NodeList[CurIndex].PromptId, NULL);
+      }
+    }
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -873,7 +868,7 @@ CallDeviceManager (
           AddNetworkMenu = TRUE;
           HiiCreateGotoOpCode (
             StartOpCodeHandle,
-            DEVICE_MANAGER_FORM_ID,
+            INVALID_FORM_ID,
             STRING_TOKEN (STR_FORM_NETWORK_DEVICE_LIST_TITLE),
             STRING_TOKEN (STR_FORM_NETWORK_DEVICE_LIST_HELP),
             EFI_IFR_FLAG_CALLBACK,
@@ -887,7 +882,7 @@ CallDeviceManager (
         while (AddItemCount > 0) {
             HiiCreateGotoOpCode (
               StartOpCodeHandle,
-              NETWORK_DEVICE_LIST_FORM_ID,
+              INVALID_FORM_ID,
               mMacDeviceList.NodeList[mMacDeviceList.CurListLen - AddItemCount].PromptId,
               STRING_TOKEN (STR_NETWORK_DEVICE_HELP),
               EFI_IFR_FLAG_CALLBACK,
@@ -901,7 +896,7 @@ CallDeviceManager (
         //
         HiiCreateGotoOpCode (
           StartOpCodeHandle,
-          NETWORK_DEVICE_FORM_ID,
+          INVALID_FORM_ID,
           Token,
           TokenHelp,
           EFI_IFR_FLAG_CALLBACK,
@@ -916,7 +911,7 @@ CallDeviceManager (
       if (mNextShowFormId == DEVICE_MANAGER_FORM_ID) {
         HiiCreateGotoOpCode (
           StartOpCodeHandle,
-          DEVICE_MANAGER_FORM_ID,
+          INVALID_FORM_ID,
           Token,
           TokenHelp,
           EFI_IFR_FLAG_CALLBACK,
@@ -1097,7 +1092,7 @@ DriverHealthCallback (
   OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
   )
 {
-  if (Action == EFI_BROWSER_ACTION_CHANGING) {
+  if (Action == EFI_BROWSER_ACTION_CHANGED) {
     if ((Value == NULL) || (ActionRequest == NULL)) {
       return EFI_INVALID_PARAMETER;
     }

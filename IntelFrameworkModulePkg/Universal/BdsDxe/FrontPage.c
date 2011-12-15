@@ -175,23 +175,26 @@ FrontPageCallback (
   CHAR8                         *PlatformSupportedLanguages;
   CHAR8                         *BestLanguage;
 
-  if (Action == EFI_BROWSER_ACTION_CHANGING) {
+  if (Action != EFI_BROWSER_ACTION_CHANGING && Action != EFI_BROWSER_ACTION_CHANGED) {
+    //
+    // All other action return unsupported.
+    //
+    return EFI_UNSUPPORTED;
+  }
+  
+  gCallbackKey = QuestionId;
+
+  if (Action == EFI_BROWSER_ACTION_CHANGED) {
     if ((Value == NULL) || (ActionRequest == NULL)) {
       return EFI_INVALID_PARAMETER;
     }
 
-    gCallbackKey = QuestionId;
-
-    //
-    // The first 4 entries in the Front Page are to be GUARANTEED to remain constant so IHV's can
-    // describe to their customers in documentation how to find their setup information (namely
-    // under the device manager and specific buckets)
-    //
     switch (QuestionId) {
     case FRONT_PAGE_KEY_CONTINUE:
       //
       // This is the continue - clear the screen and return an error to get out of FrontPage loop
       //
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
       break;
 
     case FRONT_PAGE_KEY_LANGUAGE:
@@ -250,11 +253,27 @@ FrontPageCallback (
         ASSERT (FALSE);
       }
 
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+
       FreePool (PlatformSupportedLanguages);
       FreePool (Lang);
       FreePool (LanguageString);
       break;
 
+    default:
+      break;
+    }
+  } else if (Action == EFI_BROWSER_ACTION_CHANGING) {
+    if (Value == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    //
+    // The first 4 entries in the Front Page are to be GUARANTEED to remain constant so IHV's can
+    // describe to their customers in documentation how to find their setup information (namely
+    // under the device manager and specific buckets)
+    //
+    switch (QuestionId) {
     case FRONT_PAGE_KEY_BOOT_MANAGER:
       //
       // Boot Manager
@@ -277,16 +296,9 @@ FrontPageCallback (
       gCallbackKey = 0;
       break;
     }
-
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-
-    return EFI_SUCCESS;
   }
 
-  //
-  // All other action return unsupported.
-  //
-  return EFI_UNSUPPORTED;
+  return EFI_SUCCESS;  
 }
 
 /**
@@ -1181,6 +1193,7 @@ PlatformBdsEnterFrontPage (
     BootLogo->SetBootLogo (BootLogo, NULL, 0, 0, 0, 0);
   }
 
+  Status = EFI_SUCCESS;
   do {
     //
     // Set proper video resolution and text mode for setup
@@ -1195,7 +1208,7 @@ PlatformBdsEnterFrontPage (
     UpdateFrontPageStrings ();
 
     gCallbackKey = 0;
-    Status = CallFrontPage ();
+    CallFrontPage ();
 
     //
     // If gCallbackKey is greater than 1 and less or equal to 5,

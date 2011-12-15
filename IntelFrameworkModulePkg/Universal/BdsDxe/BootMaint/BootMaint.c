@@ -286,30 +286,35 @@ BootMaintCallback (
   UINT8             *NewLegacyDev;
   UINT8             *DisMap;
   EFI_FORM_ID       FormId;
-  Status = EFI_SUCCESS;
 
+  if (Action != EFI_BROWSER_ACTION_CHANGING && Action != EFI_BROWSER_ACTION_CHANGED) {    
+    //
+    // All other action return unsupported.
+    //
+    return EFI_UNSUPPORTED;
+  }
+  
+  Status       = EFI_SUCCESS;
+  OldValue     = 0;
+  NewValue     = 0;
+  Number       = 0;
+  OldLegacyDev = NULL;
+  NewLegacyDev = NULL;
+  NewValuePos  = 0;
+  DisMap       = NULL;
+
+  Private      = BMM_CALLBACK_DATA_FROM_THIS (This);
+  //
+  // Retrive uncommitted data from Form Browser
+  //
+  CurrentFakeNVMap = &Private->BmmFakeNvData;
+  HiiGetBrowserData (&gBootMaintFormSetGuid, mBootMaintStorageName, sizeof (BMM_FAKE_NV_DATA), (UINT8 *) CurrentFakeNVMap);
   if (Action == EFI_BROWSER_ACTION_CHANGING) {
-    if ((Value == NULL) || (ActionRequest == NULL)) {
+    if (Value == NULL) {
       return EFI_INVALID_PARAMETER;
     }
-
-    OldValue       = 0;
-    NewValue       = 0;
-    Number         = 0;
-    OldLegacyDev   = NULL;
-    NewLegacyDev   = NULL;
-    NewValuePos    = 0;
-    DisMap         = NULL;
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
-
-    Private        = BMM_CALLBACK_DATA_FROM_THIS (This);
+    
     UpdatePageId (Private, QuestionId);
-
-    //
-    // Retrive uncommitted data from Form Browser
-    //
-    CurrentFakeNVMap = &Private->BmmFakeNvData;
-    HiiGetBrowserData (&gBootMaintFormSetGuid, mBootMaintStorageName, sizeof (BMM_FAKE_NV_DATA), (UINT8 *) CurrentFakeNVMap);
 
     //
     // need to be subtituded.
@@ -488,29 +493,14 @@ BootMaintCallback (
         switch (QuestionId) {
         case KEY_VALUE_BOOT_FROM_FILE:
           Private->FeCurrentState = FileExplorerStateBootFromFile;
-
-          //
-          // Exit Bmm main formset to send File Explorer formset.
-          //
-          *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
           break;
 
         case FORM_BOOT_ADD_ID:
           Private->FeCurrentState = FileExplorerStateAddBootOption;
-
-          //
-          // Exit Bmm main formset to send File Explorer formset.
-          //
-          *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
           break;
 
         case FORM_DRV_ADD_FILE_ID:
           Private->FeCurrentState = FileExplorerStateAddDriverOptionState;
-
-          //
-          // Exit Bmm main formset to send File Explorer formset.
-          //
-          *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
           break;
 
         case FORM_DRV_ADD_HANDLE_ID:
@@ -543,10 +533,6 @@ BootMaintCallback (
           UpdateTimeOutPage (Private);
           break;
 
-        case FORM_RESET:
-          gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
-          return EFI_UNSUPPORTED;
-
         case FORM_CON_IN_ID:
         case FORM_CON_OUT_ID:
         case FORM_CON_ERR_ID:
@@ -570,25 +556,6 @@ BootMaintCallback (
         case FORM_SET_BEV_ORDER_ID:
           CleanUpPage (QuestionId, Private);
           UpdateSetLegacyDeviceOrderPage (QuestionId, Private);
-          break;
-
-        case KEY_VALUE_SAVE_AND_EXIT:
-        case KEY_VALUE_NO_SAVE_AND_EXIT:
-
-          if (QuestionId == KEY_VALUE_SAVE_AND_EXIT) {
-            Status = ApplyChangeHandler (Private, CurrentFakeNVMap, Private->BmmPreviousPageId);
-            if (EFI_ERROR (Status)) {
-              return Status;
-            }
-          } else if (QuestionId == KEY_VALUE_NO_SAVE_AND_EXIT) {
-            DiscardChangeHandler (Private, CurrentFakeNVMap);
-          }
-
-          //
-          // Tell browser not to ask for confirmation of changes,
-          // since we have already applied or discarded.
-          //
-          *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
           break;
 
         default:
@@ -616,18 +583,44 @@ BootMaintCallback (
         UpdateDriverAddHandleDescPage (Private);
       }
     }
+  } else if (Action == EFI_BROWSER_ACTION_CHANGED) {
+    if ((Value == NULL) || (ActionRequest == NULL)) {
+      return EFI_INVALID_PARAMETER;
+    }
+    
+    switch (QuestionId) {
+    case KEY_VALUE_SAVE_AND_EXIT:
+    case KEY_VALUE_NO_SAVE_AND_EXIT:
+      if (QuestionId == KEY_VALUE_SAVE_AND_EXIT) {
+        Status = ApplyChangeHandler (Private, CurrentFakeNVMap, Private->BmmPreviousPageId);
+        if (EFI_ERROR (Status)) {
+          return Status;
+        }
+      } else if (QuestionId == KEY_VALUE_NO_SAVE_AND_EXIT) {
+        DiscardChangeHandler (Private, CurrentFakeNVMap);
+      }
 
-    //
-    // Pass changed uncommitted data back to Form Browser
-    //
-    Status = HiiSetBrowserData (&gBootMaintFormSetGuid, mBootMaintStorageName, sizeof (BMM_FAKE_NV_DATA), (UINT8 *) CurrentFakeNVMap, NULL);
-    return Status;
+      //
+      // Tell browser not to ask for confirmation of changes,
+      // since we have already applied or discarded.
+      //
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_SUBMIT_EXIT;
+      break;  
+
+    case FORM_RESET:
+      gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
+      return EFI_UNSUPPORTED;
+
+    default:
+      break;
+    }
   }
 
   //
-  // All other action return unsupported.
+  // Pass changed uncommitted data back to Form Browser
   //
-  return EFI_UNSUPPORTED;
+  HiiSetBrowserData (&gBootMaintFormSetGuid, mBootMaintStorageName, sizeof (BMM_FAKE_NV_DATA), (UINT8 *) CurrentFakeNVMap, NULL);
+  return EFI_SUCCESS;
 }
 
 /**

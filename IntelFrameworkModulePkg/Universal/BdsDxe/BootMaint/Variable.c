@@ -673,14 +673,13 @@ Var_UpdateDriverOption (
                       &gEfiGlobalVariableGuid,
                       &DriverOrderListSize
                       );
-  ASSERT (DriverOrderList != NULL);
   NewDriverOrderList = AllocateZeroPool (DriverOrderListSize + sizeof (UINT16));
   ASSERT (NewDriverOrderList != NULL);
-  CopyMem (NewDriverOrderList, DriverOrderList, DriverOrderListSize);
-  NewDriverOrderList[DriverOrderListSize / sizeof (UINT16)] = Index;
   if (DriverOrderList != NULL) {
+    CopyMem (NewDriverOrderList, DriverOrderList, DriverOrderListSize);
     EfiLibDeleteVariable (L"DriverOrder", &gEfiGlobalVariableGuid);
   }
+  NewDriverOrderList[DriverOrderListSize / sizeof (UINT16)] = Index;
 
   Status = gRT->SetVariable (
                   L"DriverOrder",

@@ -253,21 +253,27 @@ FileExplorerCallback (
   FILE_EXPLORER_NV_DATA *NvRamMap;
   EFI_STATUS            Status;
 
-  if (Action == EFI_BROWSER_ACTION_CHANGING) {
+  if (Action != EFI_BROWSER_ACTION_CHANGING && Action != EFI_BROWSER_ACTION_CHANGED) {
+    //
+    // All other action return unsupported.
+    //
+    return EFI_UNSUPPORTED;
+  }
+  
+  Status         = EFI_SUCCESS;
+  Private        = FE_CALLBACK_DATA_FROM_THIS (This);
+
+  //
+  // Retrieve uncommitted data from Form Browser
+  //
+  NvRamMap = &Private->FeFakeNvData;
+  HiiGetBrowserData (&gFileExploreFormSetGuid, mFileExplorerStorageName, sizeof (FILE_EXPLORER_NV_DATA), (UINT8 *) NvRamMap);
+
+  if (Action == EFI_BROWSER_ACTION_CHANGED) {
     if ((Value == NULL) || (ActionRequest == NULL)) {
       return EFI_INVALID_PARAMETER;
     }
-
-    Status         = EFI_SUCCESS;
-    Private        = FE_CALLBACK_DATA_FROM_THIS (This);
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
-
-    //
-    // Retrieve uncommitted data from Form Browser
-    //
-    NvRamMap = &Private->FeFakeNvData;
-    HiiGetBrowserData (&gFileExploreFormSetGuid, mFileExplorerStorageName, sizeof (FILE_EXPLORER_NV_DATA), (UINT8 *) NvRamMap);
-
+    
     if (QuestionId == KEY_VALUE_SAVE_AND_EXIT_BOOT || QuestionId == KEY_VALUE_SAVE_AND_EXIT_DRIVER) {
       //
       // Apply changes and exit formset
@@ -309,16 +315,16 @@ FileExplorerCallback (
       // Exit File Explorer formset
       //
       *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-    } else {
-      if (UpdateFileExplorer (Private, QuestionId)) {
-        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-      }
     }
-
-    return Status;
+  } else if (Action == EFI_BROWSER_ACTION_CHANGING) {
+    if (Value == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+    
+    if (QuestionId >= FILE_OPTION_OFFSET) {
+      UpdateFileExplorer (Private, QuestionId);
+    }
   }
-  //
-  // All other action return unsupported.
-  //
-  return EFI_UNSUPPORTED;
+
+  return Status;
 }

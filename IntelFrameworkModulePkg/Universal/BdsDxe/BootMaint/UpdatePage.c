@@ -99,26 +99,26 @@ UpdatePageEnd (
       0
       );
 
-    HiiCreateGotoOpCode (
+    HiiCreateActionOpCode (
       mStartOpCodeHandle,
-      FORM_MAIN_ID,
+      KEY_VALUE_SAVE_AND_EXIT,
       STRING_TOKEN (STR_SAVE_AND_EXIT),
       STRING_TOKEN (STR_NULL_STRING),
       EFI_IFR_FLAG_CALLBACK,
-      KEY_VALUE_SAVE_AND_EXIT
+      0
       );
   }
 
   //
   // Ensure user can return to the main page.
   //
-  HiiCreateGotoOpCode (
+  HiiCreateActionOpCode (
     mStartOpCodeHandle,
-    FORM_MAIN_ID,
+    KEY_VALUE_NO_SAVE_AND_EXIT,
     STRING_TOKEN (STR_NO_SAVE_AND_EXIT),
     STRING_TOKEN (STR_NULL_STRING),
     EFI_IFR_FLAG_CALLBACK,
-    KEY_VALUE_NO_SAVE_AND_EXIT
+    0
     );
 
   HiiUpdateForm (

@@ -31,6 +31,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define LABEL_VBIOS                          0x0040
 
+#define INVALID_FORM_ID                      0x0FFF
 #define DEVICE_MANAGER_FORM_ID               0x1000
 #define NETWORK_DEVICE_LIST_FORM_ID          0x1001
 #define NETWORK_DEVICE_FORM_ID               0x1002

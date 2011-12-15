@@ -55,7 +55,7 @@ formset
 
     subtitle text = STRING_TOKEN(STR_NULL_STRING);
 
-    goto FORM_CON_MAIN_ID,
+    goto FORM_BOOT_FROM_FILE_ID,
          prompt = STRING_TOKEN(STR_BOOT_FROM_FILE),
          help   = STRING_TOKEN(STR_BOOT_FROM_FILE_HELP),
          flags = INTERACTIVE,
@@ -152,13 +152,6 @@ formset
             help = STRING_TOKEN(STR_FORM_NEXT_BOOT_HELP),
             flags = INTERACTIVE,
             key = FORM_DRV_CHG_ID;
-  endform;
-
-  form formid = FORM_BOOT_ADD_ID,
-       title = STRING_TOKEN(STR_FORM_BOOT_ADD_TITLE);
-
-       label FORM_BOOT_ADD_ID;
-       label LABEL_END;
   endform;
 
   form formid = FORM_BOOT_DEL_ID,
@@ -295,13 +288,6 @@ formset
        title = STRING_TOKEN(STR_FORM_BOOT_ADD_TITLE);
 
        label FORM_FILE_NEW_SEEK_ID;
-       label LABEL_END;
-  endform;
-
-  form formid = FORM_DRV_ADD_FILE_ID,
-       title = STRING_TOKEN(STR_FORM_DRV_ADD_FILE_TITLE);
-
-       label FORM_DRV_ADD_FILE_ID;
        label LABEL_END;
   endform;
 
