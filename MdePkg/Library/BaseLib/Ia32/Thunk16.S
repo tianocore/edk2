@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -55,7 +55,8 @@ ASM_PFX(ThunkAttr): .space  4
     orb     $2, %al
     outb    %al, $0x92                  # deactivate A20M#
 2:
-    movw    %ss, %ax
+    xorw    %ax, %ax                    # xor eax, eax
+    movl    %ss, %eax                   # mov ax, ss
     .byte   0x67, 0x66, 0x8d, 0x6c, 0x24, 0x34, 0x66
     mov     %ebp, 0xffffffd8(%esi)
     mov     0xfffffff8(%esi), %ebx

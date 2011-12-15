@@ -3,7 +3,7 @@
 
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -105,7 +105,8 @@ _ThunkAttr  DD      ?
     or      al, 2
     out     92h, al                     ; deactivate A20M#
 @2:
-    mov     ax, ss
+    xor     ax, ax                      ; xor eax, eax
+    mov     eax, ss                     ; mov ax, ss
     lea     bp, [esp + sizeof (IA32_REGS)]
     ;
     ; rsi in the following 2 instructions is indeed bp in 16-bit code

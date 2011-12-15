@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -109,7 +109,8 @@ L_1:
     orb     $2,%al
     outb    %al, $0x92                   # deactivate A20M#
 L_2: 
-    movw    %ss,%ax
+    xorw    %ax, %ax                     # xor eax, eax
+    movl    %ss, %eax                    # mov ax, ss
     lea     IA32_REGS_SIZE(%esp), %bp
     #
     # rsi in the following 2 instructions is indeed bp in 16-bit code
