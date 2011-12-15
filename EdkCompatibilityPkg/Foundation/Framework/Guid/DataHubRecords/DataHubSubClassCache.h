@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -43,6 +43,11 @@ typedef struct {
   UINT32  NonBurst    :1;
   UINT32  Burst     :1;
   UINT32  PipelineBurst :1;
+  //
+  // Inconsistent between CacheSubclass 0.9 and SMBIOS specifications here:
+  // In CacheSubclass specification 0.9, the sequence of Asynchronous and Synchronous fileds
+  // are opposite to SMBIOS specification.
+  //
   UINT32  Asynchronous  :1;
   UINT32  Synchronous :1;
   UINT32  Reserved    :25;
