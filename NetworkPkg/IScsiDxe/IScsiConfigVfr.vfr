@@ -85,18 +85,19 @@ formset
     label ORDER_ENTRY_LABEL;
     label LABEL_END;
 
-    goto FORMID_MAIN_FORM,
-      prompt = STRING_TOKEN (STR_SAVE_AND_EXIT),
+    text
       help   = STRING_TOKEN (STR_SAVE_AND_EXIT),
+      text   = STRING_TOKEN (STR_SAVE_AND_EXIT),
+        text   = STRING_TOKEN (STR_SAVE_AND_EXIT),
       flags  = INTERACTIVE,
       key    = KEY_SAVE_ORDER_CHANGES;
-      
-    goto FORMID_MAIN_FORM,
-      prompt = STRING_TOKEN (STR_NO_SAVE_AND_EXIT),
+
+    text
       help   = STRING_TOKEN (STR_NO_SAVE_AND_EXIT),
+      text   = STRING_TOKEN (STR_NO_SAVE_AND_EXIT),
+        text   = STRING_TOKEN (STR_NO_SAVE_AND_EXIT),
       flags  = INTERACTIVE,
       key    = KEY_IGNORE_ORDER_CHANGES;
-
   endform;
 
   form formid = FORMID_DELETE_FORM,
@@ -105,18 +106,19 @@ formset
     label DELETE_ENTRY_LABEL;
     label LABEL_END;
 
-    goto FORMID_MAIN_FORM,
-      prompt = STRING_TOKEN (STR_SAVE_AND_EXIT),
+    text
       help   = STRING_TOKEN (STR_SAVE_AND_EXIT),
+      text   = STRING_TOKEN (STR_SAVE_AND_EXIT),
+        text   = STRING_TOKEN (STR_SAVE_AND_EXIT),
       flags  = INTERACTIVE,
       key    = KEY_SAVE_DELETE_ATTEMPT;
-      
-    goto FORMID_MAIN_FORM,
-      prompt = STRING_TOKEN (STR_NO_SAVE_AND_EXIT),
+
+    text
       help   = STRING_TOKEN (STR_NO_SAVE_AND_EXIT),
+      text   = STRING_TOKEN (STR_NO_SAVE_AND_EXIT),
+        text   = STRING_TOKEN (STR_NO_SAVE_AND_EXIT),
       flags  = INTERACTIVE,
       key    = KEY_IGNORE_DELETE_ATTEMPT;
-      
   endform;    
 
   form formid = FORMID_ATTEMPT_FORM,
@@ -348,12 +350,13 @@ formset
 
     subtitle text = STRING_TOKEN(STR_NULL);
 
-    goto FORMID_ATTEMPT_FORM,
-    prompt = STRING_TOKEN (STR_SAVE_CHANGES),
-    help   = STRING_TOKEN (STR_SAVE_CHANGES_HELP),
-    flags  = INTERACTIVE,
-    key    = KEY_SAVE_ATTEMPT_CONFIG;
-
+    text
+      help   = STRING_TOKEN (STR_SAVE_CHANGES_HELP),
+      text   = STRING_TOKEN (STR_SAVE_CHANGES),
+        text   = STRING_TOKEN (STR_SAVE_CHANGES),
+      flags  = INTERACTIVE,
+      key    = KEY_SAVE_ATTEMPT_CONFIG;
+      
     goto FORMID_MAIN_FORM,
     prompt = STRING_TOKEN (STR_RETURN_MAIN_FORM),
     help   = STRING_TOKEN (STR_RETURN_MAIN_FORM),

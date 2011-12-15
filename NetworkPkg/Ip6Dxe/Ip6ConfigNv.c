@@ -1651,7 +1651,7 @@ Ip6FormCallback (
     return EFI_SUCCESS;
   }
 
-  if (Action != EFI_BROWSER_ACTION_CHANGING) {
+  if (Action != EFI_BROWSER_ACTION_CHANGING && Action != EFI_BROWSER_ACTION_CHANGED) {
     return EFI_UNSUPPORTED;
   }
 
@@ -1677,224 +1677,230 @@ Ip6FormCallback (
 
   CopyMem (&OldIfrNvData, IfrNvData, BufferSize);
 
-  switch (QuestionId) {
-  case KEY_INTERFACE_ID:
-    Status = Ip6ParseInterfaceIdFromString (IfrNvData->InterfaceId, &Ip6NvData->InterfaceId);
-    if (EFI_ERROR (Status)) {
-      CreatePopUp (
-        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-        &Key,
-        L"Invalid Interface ID!",
-        NULL
-        );
-    }
+  if (Action == EFI_BROWSER_ACTION_CHANGING) {
+    switch (QuestionId) {
+    case KEY_GET_CURRENT_SETTING:
+      Ip6Config = &Instance->Ip6Config;
+      HiiHandle = Instance->CallbackInfo.RegisteredHandle;
+      Data      = NULL;
 
-    break;
+      //
+      // Get current interface info.
+      //
+      Status = Ip6ConfigNvGetData (
+                 Ip6Config,
+                 Ip6ConfigDataTypeInterfaceInfo,
+                 &DataSize,
+                 (VOID **) &Data
+                 );
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
 
-  case KEY_MANUAL_ADDRESS:
-    Status = Ip6ParseAddressListFromString (
-               IfrNvData->ManualAddress,
-               &Ip6NvData->ManualAddress,
-               &Ip6NvData->ManualAddressCount
-               );
-    if (EFI_ERROR (Status)) {
-      CreatePopUp (
-        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-        &Key,
-        L"Invalid Host Addresses!",
-        NULL
-        );
-    }
+      //
+      // Generate dynamic text opcode for host address and draw it.
+      //
+      IfInfo = (EFI_IP6_CONFIG_INTERFACE_INFO *) Data;
+      Status = Ip6ConvertAddressListToString (
+                 PortString,
+                 HiiHandle,
+                 Ip6ConfigNvHostAddress,
+                 IfInfo->AddressInfo,
+                 IfInfo->AddressInfoCount
+                 );
+      if (EFI_ERROR (Status)) {
+        FreePool (Data);
+        return Status;
+      }
 
-    break;
+      //
+      // Generate the dynamic text opcode for route table and draw it.
+      //
+      Status = Ip6ConvertAddressListToString (
+                 PortString,
+                 HiiHandle,
+                 Ip6ConfigNvRouteTable,
+                 IfInfo->RouteTable,
+                 IfInfo->RouteCount
+                 );
+      if (EFI_ERROR (Status)) {
+        FreePool (Data);
+        return Status;
+      }
 
-  case KEY_GATEWAY_ADDRESS:
-    Status = Ip6ParseAddressListFromString (
-               IfrNvData->GatewayAddress,
-               &Ip6NvData->GatewayAddress,
-               &Ip6NvData->GatewayAddressCount
-               );
-    if (EFI_ERROR (Status)) {
-      CreatePopUp (
-        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-        &Key,
-        L"Invalid Gateway Addresses!",
-        NULL
-        );
-    }
+      //
+      // Get DNS server list.
+      //
+      FreePool (Data);
+      DataSize = 0;
+      Data = NULL;
+      Status = Ip6ConfigNvGetData (
+                 Ip6Config,
+                 Ip6ConfigDataTypeDnsServer,
+                 &DataSize,
+                 (VOID **) &Data
+                 );
+      if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+        if (Data != NULL) {
+          FreePool (Data);
+        }
+        return Status;
+      }
 
-    break;
+      if (DataSize > 0) {
+        //
+        // Generate the dynamic text opcode for DNS server and draw it.
+        //
+        Status = Ip6ConvertAddressListToString (
+                   PortString,
+                   HiiHandle,
+                   Ip6ConfigNvDnsAddress,
+                   Data,
+                   DataSize / sizeof (EFI_IPv6_ADDRESS)
+                   );
+        if (EFI_ERROR (Status)) {
+          FreePool (Data);
+          return Status;
+        }
+      }
 
-  case KEY_DNS_ADDRESS:
-    Status = Ip6ParseAddressListFromString (
-               IfrNvData->DnsAddress,
-               &Ip6NvData->DnsAddress,
-               &Ip6NvData->DnsAddressCount
-               );
-    if (EFI_ERROR (Status)) {
-      CreatePopUp (
-        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-        &Key,
-        L"Invalid DNS Addresses!",
-        NULL
-        );
-    }
+      //
+      // Get gateway adderss list.
+      //
+      if (Data != NULL) {
+        FreePool (Data);
+      }
 
-    break;
+      DataSize = 0;
+      Data = NULL;
+      Status = Ip6ConfigNvGetData (
+                 Ip6Config,
+                 Ip6ConfigDataTypeGateway,
+                 &DataSize,
+                 (VOID **) &Data
+                 );
+      if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+        if (Data != NULL) {
+          FreePool (Data);
+        }
+        return Status;
+      }
 
-  case KEY_SAVE_CONFIG_CHANGES:
-    CopyMem (&OldIfrNvData, IfrNvData, sizeof (IP6_CONFIG_IFR_NVDATA));
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
-    break;
+      if (DataSize > 0) {
+        //
+        // Generate the dynamic text opcode for gateway and draw it.
+        //
+        Status = Ip6ConvertAddressListToString (
+                   PortString,
+                   HiiHandle,
+                   Ip6ConfigNvGatewayAddress,
+                   Data,
+                   DataSize / sizeof (EFI_IPv6_ADDRESS)
+                   );
+        if (EFI_ERROR (Status)) {
+          FreePool (Data);
+          return Status;
+        }
+      }
 
-  case KEY_IGNORE_CONFIG_CHANGES:
-    CopyMem (IfrNvData, &OldIfrNvData, sizeof (IP6_CONFIG_IFR_NVDATA));
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD;
-    break;
+      if (Data != NULL) {
+        FreePool (Data);
+      }
 
-  case KEY_SAVE_CHANGES:
-    Status = Ip6ConvertIfrNvDataToConfigNvData (IfrNvData, Instance);
-    if (EFI_ERROR (Status)) {
+      Status = EFI_SUCCESS;
+
+      break;
+
+    default:
       break;
     }
+  } else if (Action == EFI_BROWSER_ACTION_CHANGED) {
+    switch (QuestionId) {
+    case KEY_SAVE_CONFIG_CHANGES:
+      CopyMem (&OldIfrNvData, IfrNvData, sizeof (IP6_CONFIG_IFR_NVDATA));
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_SUBMIT_EXIT;
+      break;
 
-    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
-    break;
+    case KEY_IGNORE_CONFIG_CHANGES:
+      CopyMem (IfrNvData, &OldIfrNvData, sizeof (IP6_CONFIG_IFR_NVDATA));
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD_EXIT;
+      break;
 
-  case KEY_GET_CURRENT_SETTING:
-    Ip6Config = &Instance->Ip6Config;
-    HiiHandle = Instance->CallbackInfo.RegisteredHandle;
-    Data      = NULL;
-
-    //
-    // Get current interface info.
-    //
-    Status = Ip6ConfigNvGetData (
-               Ip6Config,
-               Ip6ConfigDataTypeInterfaceInfo,
-               &DataSize,
-               (VOID **) &Data
-               );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
-    //
-    // Generate dynamic text opcode for host address and draw it.
-    //
-    IfInfo = (EFI_IP6_CONFIG_INTERFACE_INFO *) Data;
-    Status = Ip6ConvertAddressListToString (
-               PortString,
-               HiiHandle,
-               Ip6ConfigNvHostAddress,
-               IfInfo->AddressInfo,
-               IfInfo->AddressInfoCount
-               );
-    if (EFI_ERROR (Status)) {
-      FreePool (Data);
-      return Status;
-    }
-
-    //
-    // Generate the dynamic text opcode for route table and draw it.
-    //
-    Status = Ip6ConvertAddressListToString (
-               PortString,
-               HiiHandle,
-               Ip6ConfigNvRouteTable,
-               IfInfo->RouteTable,
-               IfInfo->RouteCount
-               );
-    if (EFI_ERROR (Status)) {
-      FreePool (Data);
-      return Status;
-    }
-
-    //
-    // Get DNS server list.
-    //
-    FreePool (Data);
-    DataSize = 0;
-    Data = NULL;
-    Status = Ip6ConfigNvGetData (
-               Ip6Config,
-               Ip6ConfigDataTypeDnsServer,
-               &DataSize,
-               (VOID **) &Data
-               );
-    if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
-      if (Data != NULL) {
-        FreePool (Data);
+    case KEY_SAVE_CHANGES:
+      Status = Ip6ConvertIfrNvDataToConfigNvData (IfrNvData, Instance);
+      if (EFI_ERROR (Status)) {
+        break;
       }
-      return Status;
-    }
-
-    if (DataSize > 0) {
-      //
-      // Generate the dynamic text opcode for DNS server and draw it.
-      //
-      Status = Ip6ConvertAddressListToString (
-                 PortString,
-                 HiiHandle,
-                 Ip6ConfigNvDnsAddress,
-                 Data,
-                 DataSize / sizeof (EFI_IPv6_ADDRESS)
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+      break;
+    
+    case KEY_INTERFACE_ID:
+      Status = Ip6ParseInterfaceIdFromString (IfrNvData->InterfaceId, &Ip6NvData->InterfaceId);
+      if (EFI_ERROR (Status)) {
+        CreatePopUp (
+          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+          &Key,
+          L"Invalid Interface ID!",
+          NULL
+          );
+      }
+    
+      break;
+    
+    case KEY_MANUAL_ADDRESS:
+      Status = Ip6ParseAddressListFromString (
+                 IfrNvData->ManualAddress,
+                 &Ip6NvData->ManualAddress,
+                 &Ip6NvData->ManualAddressCount
                  );
       if (EFI_ERROR (Status)) {
-        FreePool (Data);
-        return Status;
+        CreatePopUp (
+          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+          &Key,
+          L"Invalid Host Addresses!",
+          NULL
+          );
       }
-    }
-
-    //
-    // Get gateway adderss list.
-    //
-    if (Data != NULL) {
-      FreePool (Data);
-    }
-
-    DataSize = 0;
-    Data = NULL;
-    Status = Ip6ConfigNvGetData (
-               Ip6Config,
-               Ip6ConfigDataTypeGateway,
-               &DataSize,
-               (VOID **) &Data
-               );
-    if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
-      if (Data != NULL) {
-        FreePool (Data);
-      }
-      return Status;
-    }
-
-    if (DataSize > 0) {
-      //
-      // Generate the dynamic text opcode for gateway and draw it.
-      //
-      Status = Ip6ConvertAddressListToString (
-                 PortString,
-                 HiiHandle,
-                 Ip6ConfigNvGatewayAddress,
-                 Data,
-                 DataSize / sizeof (EFI_IPv6_ADDRESS)
+    
+      break;
+    
+    case KEY_GATEWAY_ADDRESS:
+      Status = Ip6ParseAddressListFromString (
+                 IfrNvData->GatewayAddress,
+                 &Ip6NvData->GatewayAddress,
+                 &Ip6NvData->GatewayAddressCount
                  );
       if (EFI_ERROR (Status)) {
-        FreePool (Data);
-        return Status;
+        CreatePopUp (
+          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+          &Key,
+          L"Invalid Gateway Addresses!",
+          NULL
+          );
       }
+    
+      break;
+    
+    case KEY_DNS_ADDRESS:
+      Status = Ip6ParseAddressListFromString (
+                 IfrNvData->DnsAddress,
+                 &Ip6NvData->DnsAddress,
+                 &Ip6NvData->DnsAddressCount
+                 );
+      if (EFI_ERROR (Status)) {
+        CreatePopUp (
+          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+          &Key,
+          L"Invalid DNS Addresses!",
+          NULL
+          );
+      }
+    
+      break;
+
+    default:
+      break;
     }
-
-    if (Data != NULL) {
-      FreePool (Data);
-    }
-
-    Status = EFI_SUCCESS;
-
-    break;
-
-  default:
-    break;
   }
 
   if (!EFI_ERROR (Status)) {

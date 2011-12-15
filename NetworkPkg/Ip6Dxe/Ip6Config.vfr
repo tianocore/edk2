@@ -163,17 +163,19 @@ formset
             maxsize = ADDRESS_STR_MAX_SIZE,
     endstring;
 
-    goto FORMID_MAIN_FORM,
-    prompt = STRING_TOKEN (STR_SAVE_AND_EXIT),
-    help   = STRING_TOKEN (STR_SAVE_AND_EXIT),
-    flags  = INTERACTIVE,
-    key    = KEY_SAVE_CONFIG_CHANGES;
+    text
+      help   = STRING_TOKEN (STR_SAVE_AND_EXIT),
+      text   = STRING_TOKEN (STR_SAVE_AND_EXIT),
+        text   = STRING_TOKEN (STR_SAVE_AND_EXIT),
+      flags  = INTERACTIVE,
+      key    = KEY_SAVE_CONFIG_CHANGES;
 
-    goto FORMID_MAIN_FORM,
-    prompt = STRING_TOKEN (STR_NO_SAVE_AND_EXIT),
-    help   = STRING_TOKEN (STR_NO_SAVE_AND_EXIT),
-    flags  = INTERACTIVE,
-    key    = KEY_IGNORE_CONFIG_CHANGES;
+    text
+      help   = STRING_TOKEN (STR_NO_SAVE_AND_EXIT),
+      text   = STRING_TOKEN (STR_NO_SAVE_AND_EXIT),
+        text   = STRING_TOKEN (STR_NO_SAVE_AND_EXIT),
+      flags  = INTERACTIVE,
+      key    = KEY_IGNORE_CONFIG_CHANGES;
 
   endform;
 
