@@ -366,22 +366,6 @@ SetFileState (
   IN EFI_FFS_FILE_HEADER  *FfsHeader
   );
 
-
-/**
-  Verify checksum of the firmware volume header.
-
-  @param  FvHeader       Points to the firmware volume header to be checked
-
-  @retval TRUE           Checksum verification passed
-  @retval FALSE          Checksum verification failed
-
-**/
-BOOLEAN
-VerifyFvHeaderChecksum (
-  IN EFI_FIRMWARE_VOLUME_HEADER *FvHeader
-  );
-
-
 /**
   Check if it's a valid FFS file header.
 

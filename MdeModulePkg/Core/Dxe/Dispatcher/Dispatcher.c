@@ -708,25 +708,102 @@ FvHasBeenProcessed (
 
 /**
   Remember that Fv protocol on FvHandle has had it's drivers placed on the
-  mDiscoveredList. This fucntion adds entries on the mFvHandleList. Items are
-  never removed/freed from the mFvHandleList.
+  mDiscoveredList. This fucntion adds entries on the mFvHandleList if new 
+  entry is different from one in mFvHandleList by checking FvImage Guid.
+  Items are never removed/freed from the mFvHandleList.
 
   @param  FvHandle              The handle of a FV that has been processed
 
+  @return A point to new added FvHandle entry. If FvHandle with the same FvImage guid
+          has been added, NULL will return. 
+
 **/
-VOID
+KNOWN_HANDLE * 
 FvIsBeingProcesssed (
   IN  EFI_HANDLE    FvHandle
   )
 {
-  KNOWN_HANDLE  *KnownHandle;
+  EFI_STATUS                            Status;
+  EFI_GUID                              FvNameGuid;
+  BOOLEAN                               FvNameGuidIsFound;
+  UINT32                                ExtHeaderOffset;
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *Fvb;
+  EFI_FIRMWARE_VOLUME_HEADER            *FwVolHeader;
+  EFI_FV_BLOCK_MAP_ENTRY                *BlockMap;
+  UINTN                                 LbaOffset;
+  UINTN                                 Index;
+  EFI_LBA                               LbaIndex;
+  LIST_ENTRY                            *Link;
+  KNOWN_HANDLE                          *KnownHandle;
 
-  KnownHandle = AllocatePool (sizeof (KNOWN_HANDLE));
+  //
+  // Get the FirmwareVolumeBlock protocol on that handle
+  //
+  FvNameGuidIsFound = FALSE;
+  Status = CoreHandleProtocol (FvHandle, &gEfiFirmwareVolumeBlockProtocolGuid, (VOID **)&Fvb);
+  if (!EFI_ERROR (Status)) {
+    //
+    // Get the full FV header based on FVB protocol.
+    //
+    Status = GetFwVolHeader (Fvb, &FwVolHeader);
+    if (EFI_ERROR (Status)) {
+      FwVolHeader = NULL;
+    } else if (VerifyFvHeaderChecksum (FwVolHeader) && FwVolHeader->ExtHeaderOffset != 0) {
+      ExtHeaderOffset = (UINT32) FwVolHeader->ExtHeaderOffset;
+      BlockMap  = FwVolHeader->BlockMap;
+      LbaIndex  = 0;
+      LbaOffset = 0;
+      //
+      // Find LbaIndex and LbaOffset for FV extension header based on BlockMap.
+      //
+      while ((BlockMap->NumBlocks != 0) || (BlockMap->Length != 0)) {
+        for (Index = 0; Index < BlockMap->NumBlocks && ExtHeaderOffset >= BlockMap->Length; Index ++) {
+          ExtHeaderOffset -= BlockMap->Length;
+          LbaIndex ++;
+        }
+        //
+        // Check whether FvExtHeader is crossing the multi block range.
+        //
+        if (Index < BlockMap->NumBlocks) {
+          LbaOffset = ExtHeaderOffset;
+          break;
+        }
+        BlockMap++;
+      }
+      //
+      // Read FvNameGuid from FV extension header.
+      //
+      Status = ReadFvbData (Fvb, &LbaIndex, &LbaOffset, sizeof (FvNameGuid), (UINT8 *) &FvNameGuid);
+      if (!EFI_ERROR (Status)) {
+        FvNameGuidIsFound = TRUE;
+      }
+    }
+    CoreFreePool (FwVolHeader);
+  }
+
+  if (FvNameGuidIsFound) {
+    //
+    // Check whether the FV image with the found FvNameGuid has been processed.
+    //
+    for (Link = mFvHandleList.ForwardLink; Link != &mFvHandleList; Link = Link->ForwardLink) {
+      KnownHandle = CR(Link, KNOWN_HANDLE, Link, KNOWN_HANDLE_SIGNATURE);
+      if (CompareGuid (&FvNameGuid, &KnownHandle->FvNameGuid)) {
+        DEBUG ((EFI_D_ERROR, "FvImage on FvHandle %p and %p has the same FvNameGuid %g.\n", FvHandle, KnownHandle->Handle, FvNameGuid));
+        return NULL;
+      }
+    }
+  }
+
+  KnownHandle = AllocateZeroPool (sizeof (KNOWN_HANDLE));
   ASSERT (KnownHandle != NULL);
 
   KnownHandle->Signature = KNOWN_HANDLE_SIGNATURE;
   KnownHandle->Handle = FvHandle;
+  if (FvNameGuidIsFound) {
+    CopyGuid (&KnownHandle->FvNameGuid, &FvNameGuid);
+  }
   InsertTailList (&mFvHandleList, &KnownHandle->Link);
+  return KnownHandle;
 }
 
 
@@ -844,7 +921,7 @@ CoreAddToDriverList (
   Check if a FV Image type file (EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE) is
   described by a EFI_HOB_FIRMWARE_VOLUME2 Hob.
 
-  @param  FvHandle              The handle which FVB protocol installed on.
+  @param  FvNameGuid            The FV image guid specified.
   @param  DriverName            The driver guid specified.
 
   @retval TRUE                  This file is found in a EFI_HOB_FIRMWARE_VOLUME2
@@ -854,7 +931,7 @@ CoreAddToDriverList (
 **/
 BOOLEAN
 FvFoundInHobFv2 (
-  IN  EFI_HANDLE                      FvHandle,
+  IN  CONST EFI_GUID                  *FvNameGuid,
   IN  CONST EFI_GUID                  *DriverName
   )
 {
@@ -863,7 +940,11 @@ FvFoundInHobFv2 (
   HobFv2.Raw = GetHobList ();
 
   while ((HobFv2.Raw = GetNextHob (EFI_HOB_TYPE_FV2, HobFv2.Raw)) != NULL) {
-    if (CompareGuid (DriverName, &HobFv2.FirmwareVolume2->FileName)) {
+    //
+    // Compare parent FvNameGuid and FileGuid both.
+    //
+    if (CompareGuid (DriverName, &HobFv2.FirmwareVolume2->FileName) &&
+        CompareGuid (FvNameGuid, &HobFv2.FirmwareVolume2->FvName)) {
       return TRUE;
     }
     HobFv2.Raw = GET_NEXT_HOB (HobFv2);
@@ -1021,6 +1102,7 @@ CoreFwVolEventProtocolNotify (
   UINT32                        AuthenticationStatus;
   UINTN                         SizeOfBuffer;
   VOID                          *DepexBuffer;
+  KNOWN_HANDLE                  *KnownHandle;
 
   while (TRUE) {
     BufferSize = sizeof (EFI_HANDLE);
@@ -1048,7 +1130,14 @@ CoreFwVolEventProtocolNotify (
     //
     // Since we are about to process this Fv mark it as processed.
     //
-    FvIsBeingProcesssed (FvHandle);
+    KnownHandle = FvIsBeingProcesssed (FvHandle);
+    if (KnownHandle == NULL) {
+      //
+      // The FV with the same FV name guid has already been processed. 
+      // So lets skip it!
+      //
+      continue;
+    }
 
     Status = CoreHandleProtocol (FvHandle, &gEfiFirmwareVolume2ProtocolGuid, (VOID **)&Fv);
     if (EFI_ERROR (Status) || Fv == NULL) {
@@ -1131,7 +1220,7 @@ CoreFwVolEventProtocolNotify (
             // Check if this EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE file has already
             // been extracted.
             //
-            if (FvFoundInHobFv2 (FvHandle, &NameGuid)) {
+            if (FvFoundInHobFv2 (&KnownHandle->FvNameGuid, &NameGuid)) {
               continue;
             }
 

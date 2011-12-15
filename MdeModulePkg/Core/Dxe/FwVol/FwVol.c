@@ -357,7 +357,7 @@ FvCheck (
       //
       // Check whether FvHeader is crossing the multi block range.
       //
-      if (HeaderSize > BlockMap->Length) {
+      if (Index >= BlockMap->NumBlocks) {
         BlockMap++;
         continue;
       } else if (HeaderSize > 0) {

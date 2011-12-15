@@ -134,6 +134,7 @@ typedef struct {
   UINTN           Signature;
   LIST_ENTRY      Link;         // mFvHandleList
   EFI_HANDLE      Handle;
+  EFI_GUID        FvNameGuid;
 } KNOWN_HANDLE;
 
 
@@ -2487,6 +2488,66 @@ EFIAPI
 CoreEmptyCallbackFunction (
   IN EFI_EVENT                Event,
   IN VOID                     *Context
+  );
+
+/**
+  Read data from Firmware Block by FVB protocol Read. 
+  The data may cross the multi block ranges.
+
+  @param  Fvb                   The FW_VOL_BLOCK_PROTOCOL instance from which to read data.
+  @param  StartLba              Pointer to StartLba.
+                                On input, the start logical block index from which to read.
+                                On output,the end logical block index after reading.
+  @param  Offset                Pointer to Offset
+                                On input, offset into the block at which to begin reading.
+                                On output, offset into the end block after reading.
+  @param  DataSize              Size of data to be read.
+  @param  Data                  Pointer to Buffer that the data will be read into.
+
+  @retval EFI_SUCCESS           Successfully read data from firmware block.
+  @retval others
+**/
+EFI_STATUS
+ReadFvbData (
+  IN     EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL     *Fvb,
+  IN OUT EFI_LBA                                *StartLba,
+  IN OUT UINTN                                  *Offset,
+  IN     UINTN                                  DataSize,
+  OUT    UINT8                                  *Data
+  );
+
+/**
+  Given the supplied FW_VOL_BLOCK_PROTOCOL, allocate a buffer for output and
+  copy the real length volume header into it.
+
+  @param  Fvb                   The FW_VOL_BLOCK_PROTOCOL instance from which to
+                                read the volume header
+  @param  FwVolHeader           Pointer to pointer to allocated buffer in which
+                                the volume header is returned.
+
+  @retval EFI_OUT_OF_RESOURCES  No enough buffer could be allocated.
+  @retval EFI_SUCCESS           Successfully read volume header to the allocated
+                                buffer.
+
+**/
+EFI_STATUS
+GetFwVolHeader (
+  IN     EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL     *Fvb,
+  OUT    EFI_FIRMWARE_VOLUME_HEADER             **FwVolHeader
+  );
+
+/**
+  Verify checksum of the firmware volume header.
+
+  @param  FvHeader       Points to the firmware volume header to be checked
+
+  @retval TRUE           Checksum verification passed
+  @retval FALSE          Checksum verification failed
+
+**/
+BOOLEAN
+VerifyFvHeaderChecksum (
+  IN EFI_FIRMWARE_VOLUME_HEADER *FvHeader
   );
 
 #endif
