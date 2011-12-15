@@ -390,8 +390,6 @@ InstallAcpiTable (
   EFI_ACPI_SUPPORT_PROTOCOL *AcpiSupport;
   EFI_STATUS                Status;
   VOID                      *AcpiTableBufferConst;
-  UINT32                    Length;
-  UINT8                     Checksum;
 
   //
   // Check for invalid input parameters
@@ -399,16 +397,6 @@ InstallAcpiTable (
   if ((AcpiTableBuffer == NULL) || (TableKey == NULL)
      || (((EFI_ACPI_DESCRIPTION_HEADER *) AcpiTableBuffer)->Length != AcpiTableBufferSize)) {
     return EFI_INVALID_PARAMETER;
-  }
-
-  Length = ((EFI_ACPI_COMMON_HEADER *) AcpiTableBuffer)->Length;
-  Checksum = CalculateCheckSum8 ((UINT8 *)AcpiTableBuffer, Length);
-  if (Checksum != 0) {
-    AcpiPlatformChecksum (
-      (VOID *)AcpiTableBuffer,
-      (UINTN)Length,
-      OFFSET_OF (EFI_ACPI_DESCRIPTION_HEADER, Checksum)
-      );
   }
 
   //
@@ -425,7 +413,7 @@ InstallAcpiTable (
   Status = AcpiSupport->SetAcpiTable (
                           AcpiSupport,
                           AcpiTableBufferConst,
-                          FALSE,
+                          TRUE,
                           EFI_ACPI_TABLE_VERSION_1_0B | EFI_ACPI_TABLE_VERSION_2_0 | EFI_ACPI_TABLE_VERSION_3_0,
                           TableKey
                           );
