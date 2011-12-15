@@ -1,6 +1,6 @@
 ;*****************************************************************************
 ;*
-;*   Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+;*   Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 ;*   This program and the accompanying materials                          
 ;*   are licensed and made available under the terms and conditions of the BSD License         
 ;*   which accompanies this distribution.  The full text of the license may be found at        
@@ -141,7 +141,8 @@ __Thunk16   PROC    USES    ebp ebx esi edi ds  es  fs  gs
     mov     cr4, eax                    ; disable PAE & PSE
     db      67h, 0FFh, 06Ch, 024h, 0FCh ; jmp     dword ptr [esp-4]
 @@:
-    mov     eax, ss
+    xor     eax, eax
+    mov     ax, ss
     shl     eax, 4
     add     eax, esp                    ; eax <- address of 16-bit stack
     lss     esp, fword ptr (_STK16 ptr [esp + sizeof (IA32_REGS)]).SavedEsp

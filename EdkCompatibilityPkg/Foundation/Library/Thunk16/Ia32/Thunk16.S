@@ -1,6 +1,6 @@
 #*****************************************************************************
 #*
-#*   Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#*   Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 #*   This program and the accompanying materials                          
 #*   are licensed and made available under the terms and conditions of the BSD License         
 #*   which accompanies this distribution.  The full text of the license may be found at        
@@ -116,7 +116,8 @@ L_16Bit:
     .byte  0xfc
     
 L_Lable1:
-    movl   %ss,%eax
+    xor    %eax,%eax
+    movw   %ss,%ax
     shl    $0x4,%eax
     add    %esp,%eax
     lss    0x3c(%esp),%esp

@@ -148,7 +148,7 @@ Label_16Bit:
 
 Label:
       xor    %rax,%rax
-      movl   %ss,%eax
+      movw   %ss,%ax
       shl    $0x4,%eax
       add    %esp,%eax
       mov    %r15,%rsp

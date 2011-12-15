@@ -144,7 +144,7 @@ _Thunk16    PROC    USES    rbp rbx rsi rdi r12 r13 r14 r15
     retf
 @@:
     xor     rax, rax
-    mov     eax, ss
+    mov     ax, ss
     shl     eax, 4
     add     eax, esp                    ; rax <- address of 16-bit stack
     mov     rsp, r15
