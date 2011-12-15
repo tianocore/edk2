@@ -314,7 +314,7 @@ SecureBootCallback (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((Action != EFI_BROWSER_ACTION_CHANGING) || (QuestionId != KEY_SECURE_BOOT_ENABLE)) {
+  if ((Action != EFI_BROWSER_ACTION_CHANGED) || (QuestionId != KEY_SECURE_BOOT_ENABLE)) {
     return EFI_UNSUPPORTED;
   }
 

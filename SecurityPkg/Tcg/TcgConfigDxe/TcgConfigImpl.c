@@ -404,7 +404,7 @@ TcgCallback (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((Action != EFI_BROWSER_ACTION_CHANGING) || (QuestionId != KEY_TPM_ACTION)) {
+  if ((Action != EFI_BROWSER_ACTION_CHANGED) || (QuestionId != KEY_TPM_ACTION)) {
     return EFI_UNSUPPORTED;
   }
 

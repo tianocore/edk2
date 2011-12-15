@@ -114,12 +114,12 @@ formset
     subtitle 
       text   = STRING_TOKEN(STR_NULL_STRING);
 
-    goto FORMID_USER_INFO,
-      prompt  = STRING_TOKEN(STR_SAVE),
-      help    = STRING_TOKEN(STR_IDENTIFY_SAVE_HELP),
-      flags   = INTERACTIVE,
-      key     = KEY_IP_RETURN;
-      
+    text
+      help   = STRING_TOKEN(STR_IDENTIFY_SAVE_HELP),
+      text   = STRING_TOKEN(STR_SAVE),
+      flags  = INTERACTIVE,
+      key    = KEY_IP_RETURN;
+
   endform;
   
   //
@@ -146,12 +146,12 @@ formset
     subtitle 
       text   = STRING_TOKEN(STR_NULL_STRING);
    
-    goto FORMID_USER_INFO,
-      prompt  = STRING_TOKEN(STR_SAVE),
-      help    = STRING_TOKEN(STR_ACCESS_SAVE_HELP),
-      flags   = INTERACTIVE,
-      key     = KEY_AP_RETURN;
-    
+    text
+      help   = STRING_TOKEN(STR_ACCESS_SAVE_HELP),
+      text   = STRING_TOKEN(STR_SAVE),
+      flags  = INTERACTIVE,
+      key    = KEY_AP_RETURN;
+
   endform;
 
   //

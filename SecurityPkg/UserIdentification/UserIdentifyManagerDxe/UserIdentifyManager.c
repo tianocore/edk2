@@ -2411,8 +2411,7 @@ UserIdentifyManagerCallback (
     Status = EFI_SUCCESS;
     break;
 
-  case EFI_BROWSER_ACTION_CHANGING:
-  {
+  case EFI_BROWSER_ACTION_CHANGED:
     if (QuestionId >= LABEL_PROVIDER_NAME) {
       //
       // QuestionId comes from the second Form (Select a Credential Provider if identity  
@@ -2425,10 +2424,16 @@ UserIdentifyManagerCallback (
       }
       return EFI_SUCCESS;
     }
-
+    break;
+    
+  case EFI_BROWSER_ACTION_CHANGING:
     //
     // QuestionId comes from the first Form (Select a user to identify).
     //
+    if (QuestionId >= LABEL_PROVIDER_NAME) {
+      return EFI_SUCCESS;
+    }
+
     User   = (USER_PROFILE_ENTRY *) mUserProfileDb->UserProfile[QuestionId & 0xFFF];
     Status = GetIdentifyType (User, &PolicyType);
     if (EFI_ERROR (Status)) {
@@ -2456,9 +2461,10 @@ UserIdentifyManagerCallback (
 
       mCurrentUser    = (EFI_USER_PROFILE_HANDLE) User;
       mIdentified     = TRUE;
-      *ActionRequest  = EFI_BROWSER_ACTION_REQUEST_EXIT;
+      if (Type == EFI_IFR_TYPE_REF) {
+        Value->ref.FormId = FORMID_INVALID_FORM;
+      }
     }
-  }
   break;
 
   default:

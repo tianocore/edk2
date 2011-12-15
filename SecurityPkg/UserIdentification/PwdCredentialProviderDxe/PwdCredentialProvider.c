@@ -548,7 +548,7 @@ CredentialDriverCallback (
   CHAR8         Password[CREDENTIAL_LEN];
   CHAR16        *PromptStr;
 
-  if (Action == EFI_BROWSER_ACTION_CHANGING) {
+  if (Action == EFI_BROWSER_ACTION_CHANGED) {
     if (QuestionId == KEY_GET_PASSWORD) {
       //
       // Get and check password.
