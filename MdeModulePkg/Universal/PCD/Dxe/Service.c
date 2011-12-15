@@ -746,6 +746,7 @@ SetWorker (
     //
     GetPtrTypeSize (TokenNumber, &MaxSize);
     if (*Size > MaxSize) {
+      *Size = MaxSize;
       return EFI_INVALID_PARAMETER;
     }
   } else {

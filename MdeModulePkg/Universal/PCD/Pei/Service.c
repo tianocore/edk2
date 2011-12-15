@@ -391,6 +391,7 @@ SetWorker (
     //
     GetPtrTypeSize (TokenNumber, &MaxSize, PeiPcdDb);
     if (*Size > MaxSize) {
+      *Size = MaxSize;
       return EFI_INVALID_PARAMETER;
     }
   } else {
