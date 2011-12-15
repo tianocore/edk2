@@ -369,7 +369,8 @@ EFI_STATUS
                                 BaseAddress and Length cannot be modified.
   @retval EFI_OUT_OF_RESOURCES  There are not enough system resources to modify the attributes of
                                 the memory resource range.
-
+  @retval EFI_NOT_AVAILABLE_YET The attributes cannot be set because CPU architectural protocol is
+                                not available yet.
 **/
 typedef
 EFI_STATUS
