@@ -36,6 +36,8 @@
 [Guids]
 
 [Protocols]
+  gEfiEdidDiscoveredProtocolGuid                # Produced
+  gEfiEdidActiveProtocolGuid                    # Produced
 
 [FixedPcd.common]
 
