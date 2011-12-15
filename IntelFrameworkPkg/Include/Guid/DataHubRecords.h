@@ -859,6 +859,11 @@ typedef struct {
   UINT32                            NonBurst      :1;
   UINT32                            Burst         :1;
   UINT32                            PipelineBurst :1;
+  ///
+  /// Inconsistent between CacheSubclass 0.9 and SMBIOS specifications here:
+  /// In CacheSubclass specification 0.9, the sequence of Asynchronous and Synchronous fileds
+  /// are opposite to SMBIOS specification.
+  ///
   UINT32                            Asynchronous  :1;
   UINT32                            Synchronous   :1;
   UINT32                            Reserved      :25;
