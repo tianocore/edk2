@@ -1626,6 +1626,14 @@ PxeBcDhcp6Discover (
   }
   ReadSize = (UINTN) Reply->Size;
 
+  //
+  // Start Udp6Read instance
+  //
+  Status = Private->Udp6Read->Configure (Private->Udp6Read, &Private->Udp6CfgData);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
   Status = PxeBc->UdpRead (
                     PxeBc,
                     OpFlags,
@@ -1638,6 +1646,10 @@ PxeBcDhcp6Discover (
                     &ReadSize,
                     (VOID *) &Reply->Dhcp6
                     );
+  //
+  // Stop Udp6Read instance
+  //
+  Private->Udp6Read->Configure (Private->Udp6Read, NULL);
   if (EFI_ERROR (Status)) {
     return Status;
   }

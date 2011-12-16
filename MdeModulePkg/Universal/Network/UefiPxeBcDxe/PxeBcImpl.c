@@ -727,7 +727,7 @@ ON_EXIT:
     }
   }
 
-  Status = Private->Udp4Read->Configure (Private->Udp4Read, &Private->Udp4CfgData);
+  Private->Udp4Read->Configure (Private->Udp4Read, &Private->Udp4CfgData);
 
   //
   // Dhcp(), Discover(), and Mtftp() set the IP filter, and return with the IP 
@@ -1024,7 +1024,7 @@ EfiPxeBcDiscover (
     } else {
       Status = EFI_DEVICE_ERROR;
     }
-    return Status;
+    goto ON_EXIT;
   } else {
     PxeBcParseCachedDhcpPacket (&Private->PxeReply);
   }
@@ -1043,7 +1043,7 @@ EfiPxeBcDiscover (
 
 ON_EXIT:
 
-  Status = Private->Udp4Read->Configure (Private->Udp4Read, &Private->Udp4CfgData);
+  Private->Udp4Read->Configure (Private->Udp4Read, &Private->Udp4CfgData);
   
   //
   // Dhcp(), Discover(), and Mtftp() set the IP filter, and return with the IP 
@@ -1280,10 +1280,11 @@ EfiPxeBcMtftp (
   }
 
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto ON_EXIT;
   }
 
-  Status = Private->Udp4Read->Configure (Private->Udp4Read, &Private->Udp4CfgData);
+ON_EXIT:
+  Private->Udp4Read->Configure (Private->Udp4Read, &Private->Udp4CfgData);
   //
   // Dhcp(), Discover(), and Mtftp() set the IP filter, and return with the IP 
   // receive filter list emptied and the filter set to EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP.
