@@ -286,7 +286,7 @@ def IsValidInstallPath(Path):
         if os.path.isabs(Path):
             return False
     else:
-        if Path[1:2] == ':' or Path.find('\\') >=0:
+        if Path[1:2] == ':':
             return False
         if os.path.isabs(Path):
             return False

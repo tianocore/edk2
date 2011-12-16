@@ -1575,6 +1575,35 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
     if NumberOfLocalTokens == 0:
         AutoGenC.Append(gEmptyPcdDatabaseAutoGenC.Replace(Dict))
     else:
+        #
+        # Update Size Table to the right order, it should be same with LocalTokenNumberTable
+        #
+        SizeCNameTempList = []
+        SizeGuidTempList = []
+        SizeCurLenTempList = []
+        SizeMaxLenTempList = []
+        ReOrderFlag = True
+  
+        if len(Dict['SIZE_TABLE_CNAME']) == 1:
+            if not (Dict['SIZE_TABLE_CNAME'][0] and Dict['SIZE_TABLE_GUID'][0]):
+                ReOrderFlag = False
+        
+        if ReOrderFlag:
+            for Count in range(len(Dict['TOKEN_CNAME'])):
+                for Count1 in range(len(Dict['SIZE_TABLE_CNAME'])):
+                    if Dict['TOKEN_CNAME'][Count] == Dict['SIZE_TABLE_CNAME'][Count1] and \
+                        Dict['TOKEN_GUID'][Count] == Dict['SIZE_TABLE_GUID'][Count1]:
+                        SizeCNameTempList.append(Dict['SIZE_TABLE_CNAME'][Count1])
+                        SizeGuidTempList.append(Dict['SIZE_TABLE_GUID'][Count1])
+                        SizeCurLenTempList.append(Dict['SIZE_TABLE_CURRENT_LENGTH'][Count1])
+                        SizeMaxLenTempList.append(Dict['SIZE_TABLE_MAXIMUM_LENGTH'][Count1])
+                        
+            for Count in range(len(Dict['SIZE_TABLE_CNAME'])):
+                Dict['SIZE_TABLE_CNAME'][Count] = SizeCNameTempList[Count]
+                Dict['SIZE_TABLE_GUID'][Count] = SizeGuidTempList[Count]
+                Dict['SIZE_TABLE_CURRENT_LENGTH'][Count] = SizeCurLenTempList[Count]
+                Dict['SIZE_TABLE_MAXIMUM_LENGTH'][Count] = SizeMaxLenTempList[Count]
+                
         AutoGenC.Append(gPcdDatabaseAutoGenC.Replace(Dict))
 
     return AutoGenH, AutoGenC

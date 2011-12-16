@@ -173,7 +173,8 @@ class WorkspaceAutoGen(AutoGen):
     #   @param  SkuId                   SKU id from command line
     #
     def _Init(self, WorkspaceDir, ActivePlatform, Target, Toolchain, ArchList, MetaFileDb,
-              BuildConfig, ToolDefinition, FlashDefinitionFile='', Fds=None, Fvs=None, Caps=None, SkuId='', UniFlag=None):
+              BuildConfig, ToolDefinition, FlashDefinitionFile='', Fds=None, Fvs=None, Caps=None, SkuId='', UniFlag=None, 
+              Progress=None, BuildModule=None):
         if Fds is None:
             Fds = []
         if Fvs is None:
@@ -236,8 +237,25 @@ class WorkspaceAutoGen(AutoGen):
         # parse FDF file to get PCDs in it, if any
         if not self.FdfFile:
             self.FdfFile = self.Platform.FlashDefinition
-        EdkLogger.verbose("\nFLASH_DEFINITION = %s" % self.FdfFile)
+        
+        EdkLogger.info("")
+        if self.ArchList:
+            EdkLogger.info('%-16s = %s' % ("Architecture(s)", ' '.join(self.ArchList)))
+        EdkLogger.info('%-16s = %s' % ("Build target", self.BuildTarget))
+        EdkLogger.info('%-16s = %s' % ("Toolchain",self.ToolChain))        
+        
+        EdkLogger.info('\n%-24s = %s' % ("Active Platform", self.Platform))
+        if BuildModule:
+            EdkLogger.info('%-24s = %s' % ("Active Module", BuildModule))
+        
+        if self.FdfFile:
+            EdkLogger.info('%-24s = %s' % ("Flash Image Definition", self.FdfFile))
 
+        EdkLogger.verbose("\nFLASH_DEFINITION = %s" % self.FdfFile)
+        
+        if Progress:
+            Progress.Start("\nProcessing meta-data")
+        
         if self.FdfFile:
             #
             # Mark now build in AutoGen Phase

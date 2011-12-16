@@ -22,12 +22,12 @@ from MetaDataParser import *
 from optparse import OptionParser
 from Configuration import Configuration
 from Check import Check
-
+import Common.GlobalData as GlobalData
 
 from Common.String import NormPath
 from Common.BuildVersion import gBUILD_VERSION
 from Common import BuildToolError
-
+from Common.Misc import PathClass
 from MetaFileWorkspace.MetaFileParser import DscParser
 from MetaFileWorkspace.MetaFileParser import DecParser
 from MetaFileWorkspace.MetaFileParser import InfParser
@@ -61,7 +61,41 @@ class Ecc(object):
 
         # Parse the options and args
         self.ParseOption()
+        
+        #
+        # Check EFI_SOURCE (Edk build convention). EDK_SOURCE will always point to ECP
+        #
+        WorkspaceDir = os.path.normcase(os.path.normpath(os.environ["WORKSPACE"]))
+        os.environ["WORKSPACE"] = WorkspaceDir
+        if "ECP_SOURCE" not in os.environ:
+            os.environ["ECP_SOURCE"] = os.path.join(WorkspaceDir, GlobalData.gEdkCompatibilityPkg)
+        if "EFI_SOURCE" not in os.environ:
+            os.environ["EFI_SOURCE"] = os.environ["ECP_SOURCE"]
+        if "EDK_SOURCE" not in os.environ:
+            os.environ["EDK_SOURCE"] = os.environ["ECP_SOURCE"]
 
+        #
+        # Unify case of characters on case-insensitive systems
+        #
+        EfiSourceDir = os.path.normcase(os.path.normpath(os.environ["EFI_SOURCE"]))
+        EdkSourceDir = os.path.normcase(os.path.normpath(os.environ["EDK_SOURCE"]))
+        EcpSourceDir = os.path.normcase(os.path.normpath(os.environ["ECP_SOURCE"]))
+        
+        os.environ["EFI_SOURCE"] = EfiSourceDir
+        os.environ["EDK_SOURCE"] = EdkSourceDir
+        os.environ["ECP_SOURCE"] = EcpSourceDir
+        
+        GlobalData.gWorkspace = WorkspaceDir
+        GlobalData.gEfiSource = EfiSourceDir
+        GlobalData.gEdkSource = EdkSourceDir
+        GlobalData.gEcpSource = EcpSourceDir
+
+        GlobalData.gGlobalDefines["WORKSPACE"]  = WorkspaceDir
+        GlobalData.gGlobalDefines["EFI_SOURCE"] = EfiSourceDir
+        GlobalData.gGlobalDefines["EDK_SOURCE"] = EdkSourceDir
+        GlobalData.gGlobalDefines["ECP_SOURCE"] = EcpSourceDir
+        
+        
         # Generate checkpoints list
         EccGlobalData.gConfig = Configuration(self.ConfigFile)
 
@@ -152,7 +186,7 @@ class Ecc(object):
                     EdkLogger.quiet("Parsing %s" % Filename)
                     Op.write("%s\r" % Filename)
                     #Dsc(Filename, True, True, EccGlobalData.gWorkspace, EccGlobalData.gDb)
-                    self.MetaFile = DscParser(Filename, MODEL_FILE_DSC, MetaFileStorage(EccGlobalData.gDb.TblDsc.Cur, Filename, MODEL_FILE_DSC, True))
+                    self.MetaFile = DscParser(PathClass(Filename, Root), MODEL_FILE_DSC, MetaFileStorage(EccGlobalData.gDb.TblDsc.Cur, Filename, MODEL_FILE_DSC, True))
                     # alwasy do post-process, in case of macros change
                     self.MetaFile.DoPostProcess()
                     self.MetaFile.Start()

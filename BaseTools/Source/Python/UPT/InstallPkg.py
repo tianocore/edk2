@@ -403,7 +403,7 @@ def Main(Options = None):
         DestFile = os.path.normpath(os.path.join(DestDir, DistFileName))
         if os.path.exists(DestFile):
             FileName, Ext = os.path.splitext(DistFileName)
-            NewFileName = FileName + '_' + DistPkg.Header.GetGuid() + '_' + DistPkg.Header.GetVersion() + '.' + Ext
+            NewFileName = FileName + '_' + DistPkg.Header.GetGuid() + '_' + DistPkg.Header.GetVersion() + Ext
             DestFile = os.path.normpath(os.path.join(DestDir, NewFileName))
             if os.path.exists(DestFile):
                 #

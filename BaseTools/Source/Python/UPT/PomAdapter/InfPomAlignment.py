@@ -750,7 +750,6 @@ class InfPomAlignment(ModuleObject):
         BinaryObj = self.Parser.InfBinariesSection.GetBinary()
 
         BinaryData = BinaryObj.keys()
-        BinaryData.sort()
 
         #
         # If the INF file does not contain a [Sources] section, and the INF file does contain a [Binaries] section, 

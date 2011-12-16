@@ -770,13 +770,13 @@ class DscParser(MetaFileParser):
     def Start(self):
         Content = ''
         try:
-            Content = open(str(self.MetaFile), 'r').readlines()
+            Content = open(str(self.MetaFile.Path), 'r').readlines()
         except:
             EdkLogger.error("Parser", FILE_READ_FAILURE, ExtraData=self.MetaFile)
         #
         # Insert a record for file
         #
-        Filename = NormPath(self.MetaFile)
+        Filename = NormPath(self.MetaFile.Path)
         FileID = self.TblFile.GetFileId(Filename)
         if FileID:
             self.FileID = FileID
@@ -1162,6 +1162,8 @@ class DscParser(MetaFileParser):
             self._IdMapping[Id] = self._LastItem
 
         RecordList = self._Table.GetAll()
+        self._Table.Drop()
+        self._RawTable.Drop()
         for Record in RecordList:
             EccGlobalData.gDb.TblDsc.Insert(Record[1],Record[2],Record[3],Record[4],Record[5],Record[6],Record[7],Record[8],Record[9],Record[10],Record[11],Record[12],Record[13],Record[14])
         GlobalData.gPlatformDefines.update(self._FileLocalMacros)
@@ -1300,7 +1302,7 @@ class DscParser(MetaFileParser):
             #
             elif "ECP_SOURCE" in GlobalData.gCommandLineDefines.keys():
                 __IncludeMacros['ECP_SOURCE'] = GlobalData.gCommandLineDefines['ECP_SOURCE']
-
+                
             __IncludeMacros['EFI_SOURCE'] = GlobalData.gGlobalDefines['EFI_SOURCE']
             __IncludeMacros['EDK_SOURCE'] = GlobalData.gGlobalDefines['EDK_SOURCE']
             #

@@ -383,10 +383,21 @@ class DscBuildData(PlatformBuildClassObject):
                 self._LoadFixAddress = int (self._LoadFixAddress, 0)
             except:
                 EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS %s is not valid dec or hex string" % (self._LoadFixAddress))
-            if self._LoadFixAddress < 0:
-                EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS is set to the invalid negative value %s" % (self._LoadFixAddress))
-            if self._LoadFixAddress != 0xFFFFFFFFFFFFFFFF and self._LoadFixAddress % 0x1000 != 0:
-                EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS is set to the invalid unaligned 4K value %s" % (self._LoadFixAddress))
+         
+        #
+        # If command line defined, should override the value in DSC file.
+        #
+        if 'FIX_LOAD_TOP_MEMORY_ADDRESS' in GlobalData.gCommandLineDefines.keys():
+            try:
+                self._LoadFixAddress = int(GlobalData.gCommandLineDefines['FIX_LOAD_TOP_MEMORY_ADDRESS'], 0)
+            except:
+                EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS %s is not valid dec or hex string" % (GlobalData.gCommandLineDefines['FIX_LOAD_TOP_MEMORY_ADDRESS']))
+                
+        if self._LoadFixAddress < 0:
+            EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS is set to the invalid negative value 0x%x" % (self._LoadFixAddress))
+        if self._LoadFixAddress != 0xFFFFFFFFFFFFFFFF and self._LoadFixAddress % 0x1000 != 0:
+            EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS is set to the invalid unaligned 4K value 0x%x" % (self._LoadFixAddress))
+            
         return self._LoadFixAddress
 
     ## Retrieve RFCLanguage filter

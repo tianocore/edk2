@@ -339,7 +339,7 @@ class InfParser(InfSectionParser):
         #
         # Found the first section, No file header.
         #
-        if not DefineSectionParsedFlag:
+        if DefineSectionParsedFlag and not HeaderCommentEnd:
             Logger.Error("InfParser", 
                          FORMAT_INVALID, 
                          ST.ERR_INF_PARSER_HEADER_MISSGING, 

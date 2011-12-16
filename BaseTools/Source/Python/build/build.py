@@ -745,17 +745,8 @@ class Build():
         EdkLogger.quiet("%-16s = %s" % ("EDK_TOOLS_PATH", os.environ["EDK_TOOLS_PATH"]))
 
         EdkLogger.info("")
-        if self.ArchList:
-            EdkLogger.info('%-16s = %s' % ("Architecture(s)", ' '.join(self.ArchList)))
-        EdkLogger.info('%-16s = %s' % ("Build target", ' '.join(self.BuildTargetList)))
-        EdkLogger.info('%-16s = %s' % ("Toolchain", ' '.join(self.ToolChainList)))
-
-        EdkLogger.info('\n%-16s = %s' % ("Active Platform", self.PlatformFile))
-        if self.ModuleFile:
-            EdkLogger.info('%-16s = %s' % ("Active Module", self.ModuleFile))
 
         os.chdir(self.WorkspaceDir)
-        self.Progress.Start("\nProcessing meta-data")
 
     ## Load configuration
     #
@@ -1241,7 +1232,8 @@ class Build():
                         self.FvList,
                         self.CapList,
                         self.SkuId,
-                        self.UniFlag
+                        self.UniFlag,
+                        self.Progress
                         )
                 self.Fdf = Wa.FdfFile
                 self.LoadFixAddress = Wa.Platform.LoadFixAddress
@@ -1316,7 +1308,9 @@ class Build():
                         self.FvList,
                         self.CapList,
                         self.SkuId,
-                        self.UniFlag
+                        self.UniFlag,
+                        self.Progress,
+                        self.ModuleFile
                         )
                 self.Fdf = Wa.FdfFile
                 self.LoadFixAddress = Wa.Platform.LoadFixAddress
@@ -1401,7 +1395,8 @@ class Build():
                         self.FvList,
                         self.CapList,
                         self.SkuId,
-                        self.UniFlag
+                        self.UniFlag,
+                        self.Progress
                         )
                 self.Fdf = Wa.FdfFile
                 self.LoadFixAddress = Wa.Platform.LoadFixAddress

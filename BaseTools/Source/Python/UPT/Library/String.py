@@ -643,35 +643,6 @@ def ConvertToSqlString(StringList):
 def ConvertToSqlString2(String):
     return String.replace("'", "''")
 
-## RemoveBlockComment
-#
-# Remove comment block
-#
-# @param Lines: Block Comment Lines  
-#
-def RemoveBlockComment(Lines):
-    IsFindBlockComment = False
-    ReservedLine = ''
-    NewLines = []
-
-    for Line in Lines:
-        Line = Line.strip()
-        #
-        # Remove comment block
-        #
-        if Line.find(DataType.TAB_COMMENT_EDK1_START) > -1:
-            ReservedLine = GetSplitList(Line, DataType.TAB_COMMENT_EDK1_START, 1)[0]
-            IsFindBlockComment = True
-        if Line.find(DataType.TAB_COMMENT_EDK1_END) > -1:
-            Line = ReservedLine + GetSplitList(Line, DataType.TAB_COMMENT_EDK1_END, 1)[1]
-            ReservedLine = ''
-            IsFindBlockComment = False
-        if IsFindBlockComment:
-            NewLines.append('')
-            continue
-        NewLines.append(Line)
-    return NewLines
-
 ## GetStringOfList
 #
 # Get String of a List

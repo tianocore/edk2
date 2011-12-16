@@ -679,7 +679,7 @@ class FdfParser:
                     PreIndex = 0
                     StartPos = CurLine.find('$(', PreIndex)
                     EndPos = CurLine.find(')', StartPos+2)
-                    while StartPos != -1 and EndPos != -1:
+                    while StartPos != -1 and EndPos != -1 and not (self.__Token == '!ifdef' or self.__Token == '!ifndef'):
                         MacroName = CurLine[StartPos+2 : EndPos]
                         MacorValue = self.__GetMacroValue(MacroName)
                         if MacorValue != None:

@@ -316,7 +316,7 @@ class FV (FvClassObject):
                         Buffer += pack('B', int(ByteList[Index1], 16))
 
             Guid = self.FvNameGuid.split('-')
-            Buffer = pack('LHHBBBBBBBBL', 
+            Buffer = pack('=LHHBBBBBBBBL', 
                         int(Guid[0], 16), 
                         int(Guid[1], 16), 
                         int(Guid[2], 16), 
