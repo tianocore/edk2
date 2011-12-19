@@ -745,40 +745,42 @@ FvIsBeingProcesssed (
     //
     // Get the full FV header based on FVB protocol.
     //
+    ASSERT (Fvb != NULL);
     Status = GetFwVolHeader (Fvb, &FwVolHeader);
-    if (EFI_ERROR (Status)) {
-      FwVolHeader = NULL;
-    } else if (VerifyFvHeaderChecksum (FwVolHeader) && FwVolHeader->ExtHeaderOffset != 0) {
-      ExtHeaderOffset = (UINT32) FwVolHeader->ExtHeaderOffset;
-      BlockMap  = FwVolHeader->BlockMap;
-      LbaIndex  = 0;
-      LbaOffset = 0;
-      //
-      // Find LbaIndex and LbaOffset for FV extension header based on BlockMap.
-      //
-      while ((BlockMap->NumBlocks != 0) || (BlockMap->Length != 0)) {
-        for (Index = 0; Index < BlockMap->NumBlocks && ExtHeaderOffset >= BlockMap->Length; Index ++) {
-          ExtHeaderOffset -= BlockMap->Length;
-          LbaIndex ++;
+    if (!EFI_ERROR (Status)) {
+      ASSERT (FwVolHeader != NULL);
+      if (VerifyFvHeaderChecksum (FwVolHeader) && FwVolHeader->ExtHeaderOffset != 0) {
+        ExtHeaderOffset = (UINT32) FwVolHeader->ExtHeaderOffset;
+        BlockMap  = FwVolHeader->BlockMap;
+        LbaIndex  = 0;
+        LbaOffset = 0;
+        //
+        // Find LbaIndex and LbaOffset for FV extension header based on BlockMap.
+        //
+        while ((BlockMap->NumBlocks != 0) || (BlockMap->Length != 0)) {
+          for (Index = 0; Index < BlockMap->NumBlocks && ExtHeaderOffset >= BlockMap->Length; Index ++) {
+            ExtHeaderOffset -= BlockMap->Length;
+            LbaIndex ++;
+          }
+          //
+          // Check whether FvExtHeader is crossing the multi block range.
+          //
+          if (Index < BlockMap->NumBlocks) {
+            LbaOffset = ExtHeaderOffset;
+            break;
+          }
+          BlockMap++;
         }
         //
-        // Check whether FvExtHeader is crossing the multi block range.
+        // Read FvNameGuid from FV extension header.
         //
-        if (Index < BlockMap->NumBlocks) {
-          LbaOffset = ExtHeaderOffset;
-          break;
+        Status = ReadFvbData (Fvb, &LbaIndex, &LbaOffset, sizeof (FvNameGuid), (UINT8 *) &FvNameGuid);
+        if (!EFI_ERROR (Status)) {
+          FvNameGuidIsFound = TRUE;
         }
-        BlockMap++;
       }
-      //
-      // Read FvNameGuid from FV extension header.
-      //
-      Status = ReadFvbData (Fvb, &LbaIndex, &LbaOffset, sizeof (FvNameGuid), (UINT8 *) &FvNameGuid);
-      if (!EFI_ERROR (Status)) {
-        FvNameGuidIsFound = TRUE;
-      }
+      CoreFreePool (FwVolHeader);
     }
-    CoreFreePool (FwVolHeader);
   }
 
   if (FvNameGuidIsFound) {
