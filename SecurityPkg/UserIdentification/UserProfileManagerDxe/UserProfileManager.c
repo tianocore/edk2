@@ -452,60 +452,6 @@ UserProfileManagerCallback (
             break;
 
           //
-          // Load device path form.
-          //
-          case KEY_MODIFY_LOAD:
-            //
-            // Judge next 2 bits.
-            //
-            switch (QuestionId & KEY_DISPLAY_DP_MASK) {
-            //
-            // Permit load device path.
-            //
-            case KEY_PERMIT_MODIFY:
-              DisplayLoadPermit ();
-              break;
-
-            //
-            // Forbid load device path.
-            //
-            case KEY_FORBID_MODIFY:
-              DisplayLoadForbid ();
-              break;
-
-            default:
-              break;
-            }
-            break;
-
-          //
-          // Connect device path form.
-          //
-          case KEY_MODIFY_CONNECT:
-            //
-            // Judge next 2 bits.
-            //
-            switch (QuestionId & KEY_DISPLAY_DP_MASK) {
-            //
-            // Permit connect device path.
-            //
-            case KEY_PERMIT_MODIFY:
-              DisplayConnectPermit ();
-              break;
-
-            //
-            // Forbid connect device path.
-            //
-            case KEY_FORBID_MODIFY:
-              DisplayConnectForbid ();
-              break;
-
-            default:
-              break;
-            }
-            break;
-
-          //
           // Return to user profile information form.
           //
           case KEY_AP_RETURN_UIF:
@@ -704,6 +650,59 @@ UserProfileManagerCallback (
           //
           case KEY_ENTER_NEXT_FORM:
             ModidyAccessPolicy ();
+            break;
+          //
+          // Load device path form.
+          //
+          case KEY_MODIFY_LOAD:
+            //
+            // Judge next 2 bits.
+            //
+            switch (QuestionId & KEY_DISPLAY_DP_MASK) {
+            //
+            // Permit load device path.
+            //
+            case KEY_PERMIT_MODIFY:
+              DisplayLoadPermit ();
+              break;
+          
+            //
+            // Forbid load device path.
+            //
+            case KEY_FORBID_MODIFY:
+              DisplayLoadForbid ();
+              break;
+          
+            default:
+              break;
+            }
+            break;
+            
+          //
+          // Connect device path form.
+          //
+          case KEY_MODIFY_CONNECT:
+            //
+            // Judge next 2 bits.
+            //
+            switch (QuestionId & KEY_DISPLAY_DP_MASK) {
+            //
+            // Permit connect device path.
+            //
+            case KEY_PERMIT_MODIFY:
+              DisplayConnectPermit ();
+              break;
+          
+            //
+            // Forbid connect device path.
+            //
+            case KEY_FORBID_MODIFY:
+              DisplayConnectForbid ();
+              break;
+          
+            default:
+              break;
+            }
             break;
 
           default:
