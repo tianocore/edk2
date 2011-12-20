@@ -690,7 +690,7 @@ DevPathToTextSasEx (
   CatPrint (Str, L",0x%x,", SasEx->RelativeTargetPort);
 
   if ((SasEx->DeviceTopology & 0x0f) == 0) {
-    CatPrint (Str, L"NoTopology,0,0,0,");
+    CatPrint (Str, L"NoTopology,0,0,0");
   } else if (((SasEx->DeviceTopology & 0x0f) == 1) || ((SasEx->DeviceTopology & 0x0f) == 2)) {
     CatPrint (
       Str,
@@ -700,12 +700,12 @@ DevPathToTextSasEx (
       ((SasEx->DeviceTopology & (0x1 << 6)) != 0) ? L"Expanded" : L"Direct"
       );
     if ((SasEx->DeviceTopology & 0x0f) == 1) {
-      CatPrint (Str, L"0,");
+      CatPrint (Str, L"0");
     } else {
-      CatPrint (Str, L"0x%x,", (SasEx->DeviceTopology >> 8) & 0xff);
+      CatPrint (Str, L"0x%x", (SasEx->DeviceTopology >> 8) & 0xff);
     }
   } else {
-    CatPrint (Str, L"0,0,0,0,");
+    CatPrint (Str, L"0,0,0,0");
   }
 
   CatPrint (Str, L")");
