@@ -135,7 +135,7 @@ typedef struct {
   UINT8  AcpiIsSupported                   :1;
   UINT8  UsbLegacyIsSupported              :1;
   UINT8  AgpIsSupported                    :1;
-  UINT8  I20BootIsSupported                :1;
+  UINT8  I2OBootIsSupported                :1;
   UINT8  Ls120BootIsSupported              :1;
   UINT8  AtapiZipDriveBootIsSupported      :1;
   UINT8  Boot1394IsSupported               :1;
@@ -400,10 +400,8 @@ typedef enum {
   ProcessorFamilyPentiumIII             = 0x11, 
   ProcessorFamilyM1                     = 0x12,
   ProcessorFamilyM2                     = 0x13,
-  ProcessorFamilyM1Reserved2            = 0x14,
-  ProcessorFamilyM1Reserved3            = 0x15,
-  ProcessorFamilyM1Reserved4            = 0x16,
-  ProcessorFamilyM1Reserved5            = 0x17,
+  ProcessorFamilyIntelCeleronM          = 0x14,
+  ProcessorFamilyIntelPentium4Ht        = 0x15,
   ProcessorFamilyAmdDuron               = 0x18,
   ProcessorFamilyK5                     = 0x19, 
   ProcessorFamilyK6                     = 0x1A,
@@ -945,7 +943,7 @@ typedef enum {
   PortConnectorTypeRJ45                   = 0x0B,
   PortConnectorType50PinMiniScsi          = 0x0C,
   PortConnectorTypeMiniDin                = 0x0D,
-  PortConnectorTypeMicriDin               = 0x0E,
+  PortConnectorTypeMicroDin               = 0x0E,
   PortConnectorTypePS2                    = 0x0F,
   PortConnectorTypeInfrared               = 0x10,
   PortConnectorTypeHpHil                  = 0x11,
@@ -965,6 +963,7 @@ typedef enum {
   PortConnectorTypeHeadPhoneMiniJack      = 0x1F,
   PortConnectorTypeBNC                    = 0x20,
   PortConnectorType1394                   = 0x21,
+  PortConnectorTypeSasSata                = 0x22,
   PortConnectorTypePC98                   = 0xA0,
   PortConnectorTypePC98Hireso             = 0xA1,
   PortConnectorTypePCH98                  = 0xA2,
@@ -1176,7 +1175,10 @@ typedef enum {
   OnBoardDeviceTypeScsiController = 0x04,
   OnBoardDeviceTypeEthernet       = 0x05,
   OnBoardDeviceTypeTokenRing      = 0x06,
-  OnBoardDeviceTypeSound          = 0x07
+  OnBoardDeviceTypeSound          = 0x07,
+  OnBoardDeviceTypePATAController = 0x08,
+  OnBoardDeviceTypeSATAController = 0x09,
+  OnBoardDeviceTypeSASController  = 0x0A
 } MISC_ONBOARD_DEVICE_TYPE;
 
 ///
@@ -1238,6 +1240,27 @@ typedef struct {
 } SMBIOS_TABLE_TYPE13;
 
 ///
+/// Group Item Entry
+///
+typedef struct {
+  UINT8                 ItemType;
+  UINT16                ItemHandle;
+} GROUP_STRUCT;
+
+///
+/// Group Associations (Type 14).
+///
+/// The Group Associations structure is provided for OEMs who want to specify 
+/// the arrangement or hierarchy of certain components (including other Group Associations) 
+/// within the system. 
+///
+typedef struct {
+  SMBIOS_STRUCTURE      Hdr;
+  SMBIOS_TABLE_STRING   GroupName;
+  GROUP_STRUCT          Group[1];
+} SMBIOS_TABLE_TYPE14;
+
+///
 /// System Event Log - Event Log Types.
 /// 
 typedef enum {
@@ -1285,33 +1308,12 @@ typedef enum {
 } EVENT_LOG_VARIABLE_DATA;
 
 ///
-/// Group Item Entry
-///
-typedef struct {
-  UINT8                 ItemType;
-  UINT16                ItemHandle;
-} GROUP_STRUCT;
-
-///
 /// Event Log Type Descriptors
 ///
 typedef struct {
   UINT8                 LogType;                    ///< The enumeration value from EVENT_LOG_TYPE_DATA.
   UINT8                 DataFormatType;
 } EVENT_LOG_TYPE;
-
-///
-/// Group Associations (Type 14).
-///
-/// The Group Associations structure is provided for OEMs who want to specify 
-/// the arrangement or hierarchy of certain components (including other Group Associations) 
-/// within the system. 
-///
-typedef struct {
-  SMBIOS_STRUCTURE      Hdr;
-  SMBIOS_TABLE_STRING   GroupName;
-  GROUP_STRUCT          Group[1];
-} SMBIOS_TABLE_TYPE14;
 
 ///
 /// System Event Log (Type 15).
