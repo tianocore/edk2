@@ -2028,7 +2028,8 @@ ExtScsiPassThruGetNextTargetLun (
 
       if ((DeviceInfo->Type == EfiIdeCdrom) &&
          ((Target8[0] < DeviceInfo->Port) || 
-          (Target8[1] < DeviceInfo->PortMultiplier))) {
+          ((Target8[0] == DeviceInfo->Port) &&
+           (Target8[1] < DeviceInfo->PortMultiplier)))) {
         Target8[0] = (UINT8)DeviceInfo->Port;
         Target8[1] = (UINT8)DeviceInfo->PortMultiplier;
         goto Exit;
@@ -2366,7 +2367,8 @@ ExtScsiPassThruGetNextTarget (
 
       if ((DeviceInfo->Type == EfiIdeCdrom) &&
          ((Target8[0] < DeviceInfo->Port) || 
-          (Target8[1] < DeviceInfo->PortMultiplier))) {
+          ((Target8[0] == DeviceInfo->Port) &&
+           (Target8[1] < DeviceInfo->PortMultiplier)))) {
         Target8[0] = (UINT8)DeviceInfo->Port;
         Target8[1] = (UINT8)DeviceInfo->PortMultiplier;
         goto Exit;
