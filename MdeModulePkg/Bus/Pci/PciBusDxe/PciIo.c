@@ -1580,24 +1580,6 @@ PciIoAttributes (
   }
 
   //
-  // workaround for PCI drivers which always set ISA_IO or VGA_IO attribute without detecting support of
-  // ISA_IO/ISA_IO_16 or VGA_IO/VGA_IO_16 to maintain backward-compatibility.
-  //
-  if (((Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_IO) != 0) && 
-      ((PciIoDevice->Supports & (EFI_PCI_IO_ATTRIBUTE_VGA_IO | EFI_PCI_IO_ATTRIBUTE_VGA_IO_16)) \
-        == EFI_PCI_IO_ATTRIBUTE_VGA_IO_16)) {
-    Attributes &= ~(UINT64)EFI_PCI_IO_ATTRIBUTE_VGA_IO;
-    Attributes |= EFI_PCI_IO_ATTRIBUTE_VGA_IO_16;
-  }
-
-  if (((Attributes & EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO) != 0) && 
-      ((PciIoDevice->Supports & (EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO | EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO_16)) \
-        == EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO_16)) {
-    Attributes &= ~(UINT64)EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO;
-    Attributes |= EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO_16;
-  }
-
-  //
   // If no attributes can be supported, then return.
   // Otherwise, set the attributes that it can support.
   //
