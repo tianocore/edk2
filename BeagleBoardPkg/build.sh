@@ -37,7 +37,7 @@ function process_debug_scripts {
 #
 # Setup workspace if it is not set
 #
-if [ -z "$WORKSPACE" ]
+if [ -z "${WORKSPACE:-}" ]
 then
   echo Initializing workspace
   cd ..
@@ -53,7 +53,7 @@ fi
 #
 # Pick a default tool type for a given OS if no toolchain already defined
 #
-if [ -z "$TARGET_TOOLS" ]
+if [ -z "${TARGET_TOOLS:-}" ]
 then
   case `uname` in
     CYGWIN*) 
@@ -105,9 +105,9 @@ fi
 # Build the edk2 BeagleBoard code
 #
 if [[ $TARGET == RELEASE ]]; then
-  build -p $WORKSPACE/BeagleBoardPkg/BeagleBoardPkg.dsc -a ARM -t $TARGET_TOOLS -b $TARGET -D DEBUG_TARGET=RELEASE $2 $3 $4 $5 $6 $7 $8
+  build -p $WORKSPACE/BeagleBoardPkg/BeagleBoardPkg.dsc -a ARM -t $TARGET_TOOLS -b $TARGET -D DEBUG_TARGET=RELEASE ${2:-} ${3:-} ${4:-} ${5:-} ${6:-} ${7:-} ${8:-}
 else
-  build -p $WORKSPACE/BeagleBoardPkg/BeagleBoardPkg.dsc -a ARM -t $TARGET_TOOLS -b $TARGET $1 $2 $3 $4 $5 $6 $7 $8
+  build -p ${WORKSPACE:-}/BeagleBoardPkg/BeagleBoardPkg.dsc -a ARM -t $TARGET_TOOLS -b $TARGET ${1:-} ${2:-} ${3:-} ${4:-} ${5:-} ${6:-} ${7:-} ${8:-}
 fi
 
 
