@@ -51,20 +51,22 @@ else
 fi
 
 #
-# Pick a default tool type for a given OS
+# Pick a default tool type for a given OS if no toolchain already defined
 #
-case `uname` in
-  CYGWIN*) 
+if [ -z "$TARGET_TOOLS" ]
+then
+  case `uname` in
+    CYGWIN*) 
       TARGET_TOOLS=RVCT31CYGWIN 
       ;;
-  Linux*)  
+    Linux*)  
       if [[ ! -z `locate arm-linux-gnueabi-gcc` ]]; then
         TARGET_TOOLS=ARMLINUXGCC
       else 
         TARGET_TOOLS=ARMGCC 
       fi
       ;;
-  Darwin*) 
+    Darwin*) 
       Major=$(uname -r | cut -f 1 -d '.')
       if [[ $Major == 9 ]]
       then
@@ -74,7 +76,8 @@ case `uname` in
         TARGET_TOOLS=XCODE32
       fi  
       ;;
-esac
+  esac
+fi
 
 TARGET=DEBUG
 for arg in "$@"
