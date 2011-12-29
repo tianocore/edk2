@@ -792,6 +792,7 @@ FfsProcessFvFile (
   //
   // Collect FvImage Info.
   //
+  ZeroMem (&FvImageInfo, sizeof (FvImageInfo));
   Status = FfsGetVolumeInfo (FvImageHandle, &FvImageInfo);
   ASSERT_EFI_ERROR (Status);
   
