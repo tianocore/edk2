@@ -1224,8 +1224,11 @@ RunSplitCommand(
     SHELL_FREE_NON_NULL(OurCommandLine);
     SHELL_FREE_NON_NULL(NextCommandLine);
     return (EFI_OUT_OF_RESOURCES);
-  }
-  if (NextCommandLine[0] != CHAR_NULL &&
+  } else if (StrStr(OurCommandLine, L"|") != NULL || Size1 == 0 || Size2 == 0) {
+    SHELL_FREE_NON_NULL(OurCommandLine);
+    SHELL_FREE_NON_NULL(NextCommandLine);
+    return (EFI_INVALID_PARAMETER);
+  } else if (NextCommandLine[0] != CHAR_NULL &&
       NextCommandLine[0] == L'a' &&
       NextCommandLine[1] == L' '
      ){
@@ -1246,7 +1249,6 @@ RunSplitCommand(
   ASSERT(Split->SplitStdOut != NULL);
   InsertHeadList(&ShellInfoObject.SplitList.Link, &Split->Link);
 
-  ASSERT(StrStr(OurCommandLine, L"|") == NULL);
   Status = RunCommand(OurCommandLine);
 
   //
@@ -1431,6 +1433,9 @@ RunCommand(
       Status = RunSplitCommand(PostVariableCmdLine, NULL, NULL);
     } else {
       Status = RunSplitCommand(PostVariableCmdLine, Split->SplitStdIn, Split->SplitStdOut);
+    }
+    if (EFI_ERROR(Status)) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_INVALID_SPLIT), ShellInfoObject.HiiHandle, PostVariableCmdLine);
     }
   } else {
 
