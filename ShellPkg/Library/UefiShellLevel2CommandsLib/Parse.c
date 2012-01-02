@@ -1,7 +1,7 @@
 /** @file
   Main file for Parse shell level 2 function.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -91,22 +91,26 @@ PerformParsing(
             }
           }
           if (ColumnLoop == ColumnIndex) {
-            ASSERT(ColumnPointer != NULL);
-            TempSpot = StrStr(ColumnPointer, L",");
-            if (TempSpot != NULL) {
-              *TempSpot = CHAR_NULL;
-            }
-            while (ColumnPointer != NULL && *ColumnPointer != CHAR_NULL && ColumnPointer[0] == L' '){
-              ColumnPointer++;
-            }
-            if (ColumnPointer != NULL && *ColumnPointer != CHAR_NULL && ColumnPointer[0] == L'\"'){
-              ColumnPointer++;
-            }
-            if (ColumnPointer != NULL && *ColumnPointer != CHAR_NULL && ColumnPointer[StrLen(ColumnPointer)-1] == L'\"'){
-              ColumnPointer[StrLen(ColumnPointer)-1] = CHAR_NULL;
-            }
+            if (ColumnPointer == NULL) {
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellLevel2HiiHandle, L"Column Index");
+              ShellStatus = SHELL_INVALID_PARAMETER;
+            } else {
+              TempSpot = StrStr(ColumnPointer, L",");
+              if (TempSpot != NULL) {
+                *TempSpot = CHAR_NULL;
+              }
+              while (ColumnPointer != NULL && *ColumnPointer != CHAR_NULL && ColumnPointer[0] == L' '){
+                ColumnPointer++;
+              }
+              if (ColumnPointer != NULL && *ColumnPointer != CHAR_NULL && ColumnPointer[0] == L'\"'){
+                ColumnPointer++;
+              }
+              if (ColumnPointer != NULL && *ColumnPointer != CHAR_NULL && ColumnPointer[StrLen(ColumnPointer)-1] == L'\"'){
+                ColumnPointer[StrLen(ColumnPointer)-1] = CHAR_NULL;
+              }
 
-            ShellPrintEx(-1, -1, L"%s\r\n", ColumnPointer);
+              ShellPrintEx(-1, -1, L"%s\r\n", ColumnPointer);
+            }
           }
         }
         SHELL_FREE_NON_NULL(TempLine);
