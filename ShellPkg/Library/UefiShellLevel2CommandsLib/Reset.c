@@ -81,9 +81,9 @@ ShellCommandRunReset (
         } else {
           String = ShellCommandLineGetValue(Package, L"-w");
           if (String != NULL) {
-            gRT->ResetSystem(EfiResetCold, EFI_SUCCESS, StrSize(String), (VOID*)String);
+            gRT->ResetSystem(EfiResetWarm, EFI_SUCCESS, StrSize(String), (VOID*)String);
           } else {
-            gRT->ResetSystem(EfiResetCold, EFI_SUCCESS, 0, NULL);
+            gRT->ResetSystem(EfiResetWarm, EFI_SUCCESS, 0, NULL);
           }
         }
       } else if (ShellCommandLineGetFlag(Package, L"-s")) {
@@ -105,9 +105,9 @@ ShellCommandRunReset (
         //
         String = ShellCommandLineGetValue(Package, L"-c");
         if (String != NULL) {
-          gRT->ResetSystem(EfiResetWarm, EFI_SUCCESS, StrSize(String), (VOID*)String);
+          gRT->ResetSystem(EfiResetCold, EFI_SUCCESS, StrSize(String), (VOID*)String);
         } else {
-          gRT->ResetSystem(EfiResetWarm, EFI_SUCCESS, 0, NULL);
+          gRT->ResetSystem(EfiResetCold, EFI_SUCCESS, 0, NULL);
         }
       }
     }
