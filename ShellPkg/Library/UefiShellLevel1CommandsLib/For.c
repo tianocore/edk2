@@ -1,7 +1,7 @@
 /** @file
   Main file for endfor and for shell level 1 functions.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -425,6 +425,7 @@ ShellCommandRunFor (
         //
         Info = AllocateZeroPool(sizeof(SHELL_FOR_INFO)+StrSize(gEfiShellParametersProtocol->Argv[1]));
         ASSERT(Info != NULL);
+        Info->Signature = SHELL_FOR_INFO_SIGNATURE;
         CopyMem(Info->Set, gEfiShellParametersProtocol->Argv[1], StrSize(gEfiShellParametersProtocol->Argv[1]));
         Info->ReplacementName = Info->Set;
         Info->CurrentValue    = NULL;
@@ -659,12 +660,9 @@ ShellCommandRunFor (
       //
       ASSERT(Info->Set != NULL);
       if (Info->CurrentValue != NULL && *Info->CurrentValue != CHAR_NULL) {
-        if (Info->CurrentValue[0] == L'\"') {
+        if (Info->CurrentValue[0] == L' ') {
           Info->CurrentValue++;
         }
-//        while (Info->CurrentValue[0] == L' ') {
-//          Info->CurrentValue++;
-//        }
         if (Info->CurrentValue[0] == L'\"') {
           Info->CurrentValue++;
         }
