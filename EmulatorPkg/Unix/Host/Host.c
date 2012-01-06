@@ -287,6 +287,12 @@ main (
 
     printf ("\n");
   }
+
+  if (SecFile == NULL) {
+    printf ("ERROR : SEC not found!\n");
+    exit (1);
+  }
+
   //
   // Calculate memory regions and store the information in the gSystemMemory
   //  global for later use. The autosizing code will use this data to
