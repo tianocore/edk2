@@ -661,6 +661,8 @@ EmuBlockIoThunkOpen (
     }
   }
 
+  Private->Mode = Private->WriteProtected ? O_RDONLY : O_RDWR;
+
   This->Interface = &Private->EmuBlockIo;
   This->Private   = Private;
   return EFI_SUCCESS;
