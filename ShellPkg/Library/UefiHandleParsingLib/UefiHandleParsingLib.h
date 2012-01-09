@@ -1,7 +1,7 @@
 /** @file
   Provides interface to advanced shell functionality for parsing both handle and protocol database.
 
-  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -104,6 +104,32 @@
 #include <Protocol/DevicePathUtilities.h>
 //#include <Protocol/FirmwareVolume.h>
 //#include <Protocol/FirmwareVolume2.h>
+#include <Protocol/DriverFamilyOverride.h>
+#include <Protocol/Pcd.h>
+#include <Protocol/TcgService.h>
+#include <Protocol/HiiPackageList.h>
+#include <Protocol/Ip6.h>
+#include <Protocol/Ip6Config.h>
+#include <Protocol/Mtftp6.h>
+#include <Protocol/Dhcp6.h>
+#include <Protocol/Udp6.h>
+#include <Protocol/Tcp6.h>
+#include <Protocol/VlanConfig.h>
+#include <Protocol/Eap.h>
+#include <Protocol/EapManagement.h>
+#include <Protocol/Ftp4.h>
+#include <Protocol/IpSecConfig.h>
+#include <Protocol/DriverHealth.h>
+#include <Protocol/DeferredImageLoad.h>
+#include <Protocol/UserCredential.h>
+#include <Protocol/UserManager.h>
+#include <Protocol/AtaPassThru.h>
+#include <Protocol/FirmwareManagement.h>
+#include <Protocol/IpSec.h>
+#include <Protocol/Kms.h>
+#include <Protocol/BlockIo2.h>
+#include <Protocol/StorageSecurityCommand.h>
+#include <Protocol/UserCredential2.h>
 
 #include <Library/HandleParsingLib.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -136,12 +162,11 @@ CHAR16 *
   IN CONST BOOLEAN    Verbose
   );
 
-
-typedef struct {
+typedef struct _GUID_INFO_BLOCK{
   EFI_STRING_ID                 StringId;
   EFI_GUID                      *GuidId;
   DUMP_PROTOCOL_INFO            DumpInfo;
-} PROTOCOL_INFO_BLOCK;
+} GUID_INFO_BLOCK;
 
 #endif
 

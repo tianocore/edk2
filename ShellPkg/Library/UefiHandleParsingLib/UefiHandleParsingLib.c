@@ -1,7 +1,7 @@
 /** @file
   Provides interface to advanced shell functionality for parsing both handle and protocol database.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -333,14 +333,14 @@ STATIC CONST EFI_GUID WinNtThunkProtocolGuid = LOCAL_EFI_WIN_NT_THUNK_PROTOCOL_G
 STATIC CONST EFI_GUID WinNtIoProtocolGuid    = LOCAL_EFI_WIN_NT_BUS_DRIVER_IO_PROTOCOL_GUID;
 STATIC CONST EFI_GUID WinNtSerialPortGuid    = LOCAL_EFI_WIN_NT_SERIAL_PORT_GUID;
 
-STATIC CONST PROTOCOL_INFO_BLOCK mGuidStringListNT[] = {
+STATIC CONST GUID_INFO_BLOCK mGuidStringListNT[] = {
   {STRING_TOKEN(STR_WINNT_THUNK),           (EFI_GUID*)&WinNtThunkProtocolGuid,               NULL},
   {STRING_TOKEN(STR_WINNT_DRIVER_IO),       (EFI_GUID*)&WinNtIoProtocolGuid,                  NULL},
   {STRING_TOKEN(STR_WINNT_SERIAL_PORT),     (EFI_GUID*)&WinNtSerialPortGuid,                  NULL},
   {STRING_TOKEN(STR_UNKNOWN_DEVICE),        NULL,                                             NULL},
 };
 
-STATIC CONST PROTOCOL_INFO_BLOCK mGuidStringList[] = {
+STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_LOADED_IMAGE),          &gEfiLoadedImageProtocolGuid,                     NULL},
   {STRING_TOKEN(STR_DEVICE_PATH),           &gEfiDevicePathProtocolGuid,                      DevicePathProtocolDumpInformation},
   {STRING_TOKEN(STR_IMAGE_PATH),            &gEfiLoadedImageDevicePathProtocolGuid,           DevicePathProtocolDumpInformation},
@@ -376,8 +376,6 @@ STATIC CONST PROTOCOL_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_LOAD_FILE),             &gEfiLoadFileProtocolGuid,                        NULL},
   {STRING_TOKEN(STR_LOAD_FILE2),            &gEfiLoadFile2ProtocolGuid,                       NULL},
   {STRING_TOKEN(STR_SIMPLE_FILE_SYS),       &gEfiSimpleFileSystemProtocolGuid,                NULL},
-  {STRING_TOKEN(STR_FILE_INFO),             &gEfiFileInfoGuid,                                NULL},
-  {STRING_TOKEN(STR_FILE_SYS_INFO),         &gEfiFileSystemInfoGuid,                          NULL},
   {STRING_TOKEN(STR_TAPE_IO),               &gEfiTapeIoProtocolGuid,                          NULL},
   {STRING_TOKEN(STR_DISK_IO),               &gEfiDiskIoProtocolGuid,                          NULL},
   {STRING_TOKEN(STR_BLK_IO),                &gEfiBlockIoProtocolGuid,                         NULL},
@@ -416,7 +414,6 @@ STATIC CONST PROTOCOL_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_IPV4_CFG),              &gEfiIp4ConfigProtocolGuid,                       NULL},
   {STRING_TOKEN(STR_SHELL_PARAMETERS),      &gEfiShellParametersProtocolGuid,                 NULL},
   {STRING_TOKEN(STR_SHELL),                 &gEfiShellProtocolGuid,                           NULL},
-  {STRING_TOKEN(STR_EFI_GLOBAL_VARIABLE),   &gEfiGlobalVariableGuid,                          NULL},
   {STRING_TOKEN(STR_UDPV4_SB),              &gEfiUdp4ServiceBindingProtocolGuid,              NULL},
   {STRING_TOKEN(STR_UDPV4),                 &gEfiUdp4ProtocolGuid,                            NULL},
   {STRING_TOKEN(STR_MTFTPV4_SB),            &gEfiMtftp4ServiceBindingProtocolGuid,            NULL},
@@ -431,6 +428,14 @@ STATIC CONST PROTOCOL_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_HII_CONFIG_ROUT),       &gEfiHiiConfigRoutingProtocolGuid,                NULL},
   {STRING_TOKEN(STR_HII_CONFIG_ACC),        &gEfiHiiConfigAccessProtocolGuid,                 NULL},
   {STRING_TOKEN(STR_HII_FORM_BROWSER2),     &gEfiFormBrowser2ProtocolGuid,                    NULL},
+  {STRING_TOKEN(STR_DRIVER_FAM_OVERRIDE),   &gEfiDriverFamilyOverrideProtocolGuid,            NULL},
+  {STRING_TOKEN(STR_PCD),                   &gPcdProtocolGuid,                                NULL},
+  {STRING_TOKEN(STR_TCG),                   &gEfiTcgProtocolGuid,                             NULL},
+  {STRING_TOKEN(STR_HII_PACKAGE_LIST),      &gEfiHiiPackageListProtocolGuid,                  NULL},
+
+//
+// the ones under this are deprecated by the current UEFI Spec, but may be found anyways...
+//
   {STRING_TOKEN(STR_SHELL_INTERFACE),       &gEfiShellInterfaceGuid,                          NULL},
   {STRING_TOKEN(STR_SHELL_ENV2),            &gEfiShellEnvironment2Guid,                       NULL},
   {STRING_TOKEN(STR_SHELL_ENV),             &gEfiShellEnvironment2Guid,                       NULL},
@@ -441,6 +446,62 @@ STATIC CONST PROTOCOL_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_GPT_NBR),               &gEfiPartTypeLegacyMbrGuid,                       NULL},
   {STRING_TOKEN(STR_DRIVER_CONFIG),         &gEfiDriverConfigurationProtocolGuid,             NULL},
   {STRING_TOKEN(STR_DRIVER_CONFIG2),        &gEfiDriverConfiguration2ProtocolGuid,            NULL},
+
+//
+// the ones under this are GUID identified structs, not protocols
+//
+  {STRING_TOKEN(STR_FILE_INFO),             &gEfiFileInfoGuid,                                NULL},
+  {STRING_TOKEN(STR_FILE_SYS_INFO),         &gEfiFileSystemInfoGuid,                          NULL},
+
+//
+// the ones under this are misc GUIDS.
+//
+  {STRING_TOKEN(STR_EFI_GLOBAL_VARIABLE),   &gEfiGlobalVariableGuid,                          NULL},
+
+//
+// UEFI 2.2
+//
+  {STRING_TOKEN(STR_IP6_SB),                &gEfiIp6ServiceBindingProtocolGuid,               NULL},
+  {STRING_TOKEN(STR_IP6),                   &gEfiIp6ProtocolGuid,                             NULL},
+  {STRING_TOKEN(STR_IP6_CONFIG),            &gEfiIp6ConfigProtocolGuid,                       NULL},
+  {STRING_TOKEN(STR_MTFTP6_SB),             &gEfiMtftp6ServiceBindingProtocolGuid,            NULL},
+  {STRING_TOKEN(STR_MTFTP6),                &gEfiMtftp6ProtocolGuid,                          NULL},
+  {STRING_TOKEN(STR_DHCP6_SB),              &gEfiDhcp6ServiceBindingProtocolGuid,             NULL},
+  {STRING_TOKEN(STR_DHCP6),                 &gEfiDhcp6ProtocolGuid,                           NULL},
+  {STRING_TOKEN(STR_UDP6_SB),               &gEfiUdp6ServiceBindingProtocolGuid,              NULL},
+  {STRING_TOKEN(STR_UDP6),                  &gEfiUdp6ProtocolGuid,                            NULL},
+  {STRING_TOKEN(STR_TCP6_SB),               &gEfiTcp6ServiceBindingProtocolGuid,              NULL},
+  {STRING_TOKEN(STR_TCP6),                  &gEfiTcp6ProtocolGuid,                            NULL},
+  {STRING_TOKEN(STR_VLAN_CONFIG),           &gEfiVlanConfigProtocolGuid,                      NULL},
+  {STRING_TOKEN(STR_EAP),                   &gEfiEapProtocolGuid,                             NULL},
+  {STRING_TOKEN(STR_EAP_MGMT),              &gEfiEapManagementProtocolGuid,                   NULL},
+  {STRING_TOKEN(STR_FTP4_SB),               &gEfiFtp4ServiceBindingProtocolGuid,              NULL},
+  {STRING_TOKEN(STR_FTP4),                  &gEfiFtp4ProtocolGuid,                            NULL},
+  {STRING_TOKEN(STR_IP_SEC_CONFIG),         &gEfiIpSecConfigProtocolGuid,                     NULL},
+  {STRING_TOKEN(STR_DH),                    &gEfiDriverHealthProtocolGuid,                    NULL},
+  {STRING_TOKEN(STR_DEF_IMG_LOAD),          &gEfiDeferredImageLoadProtocolGuid,               NULL},
+  {STRING_TOKEN(STR_USER_CRED),             &gEfiUserCredentialProtocolGuid,                  NULL},
+  {STRING_TOKEN(STR_USER_MNGR),             &gEfiUserManagerProtocolGuid,                     NULL},
+  {STRING_TOKEN(STR_ATA_PASS_THRU),         &gEfiAtaPassThruProtocolGuid,                     NULL},
+
+//
+// UEFI 2.3
+//
+  {STRING_TOKEN(STR_FW_MGMT),               &gEfiFirmwareManagementProtocolGuid,              NULL},
+  {STRING_TOKEN(STR_IP_SEC),                &gEfiIpSecProtocolGuid,                           NULL},
+  {STRING_TOKEN(STR_IP_SEC2),               &gEfiIpSec2ProtocolGuid,                          NULL},
+
+//
+// UEFI 2.3.1
+//
+  {STRING_TOKEN(STR_KMS),                   &gEfiKmsProtocolGuid,                             NULL},
+  {STRING_TOKEN(STR_BLK_IO2),               &gEfiBlockIo2ProtocolGuid,                        NULL},
+  {STRING_TOKEN(STR_SSC),                   &gEfiStorageSecurityCommandProtocolGuid,          NULL},
+  {STRING_TOKEN(STR_UC2),                   &gEfiUserCredential2ProtocolGuid,                 NULL},
+
+//
+// terminator
+//
   {STRING_TOKEN(STR_UNKNOWN_DEVICE),        NULL,                                             NULL},
 };
 
@@ -453,13 +514,13 @@ STATIC CONST PROTOCOL_INFO_BLOCK mGuidStringList[] = {
 
   @return                       The node.
 **/
-CONST PROTOCOL_INFO_BLOCK *
+CONST GUID_INFO_BLOCK *
 EFIAPI
 InternalShellGetNodeFromGuid(
   IN CONST EFI_GUID* Guid
   )
 {
-  CONST PROTOCOL_INFO_BLOCK *ListWalker;
+  CONST GUID_INFO_BLOCK *ListWalker;
 
   ASSERT(Guid != NULL);
 
@@ -496,7 +557,7 @@ GetStringNameFromGuid(
   IN CONST CHAR8    *Lang OPTIONAL
   )
 {
-  CONST PROTOCOL_INFO_BLOCK *Id;
+  CONST GUID_INFO_BLOCK *Id;
 
   Id = InternalShellGetNodeFromGuid(Guid);
   return (HiiGetString(mHandleParsingHiiHandle, Id->StringId, Lang));
@@ -526,7 +587,7 @@ GetProtocolInformationDump(
   IN CONST BOOLEAN    Verbose
   )
 {
-  CONST PROTOCOL_INFO_BLOCK *Id;
+  CONST GUID_INFO_BLOCK *Id;
 
   ASSERT(TheHandle  != NULL);
   ASSERT(Guid       != NULL);
@@ -559,7 +620,7 @@ GetGuidFromStringName(
   IN EFI_GUID     **Guid
   )
 {
-  CONST PROTOCOL_INFO_BLOCK  *ListWalker;
+  CONST GUID_INFO_BLOCK  *ListWalker;
   CHAR16                     *String;
 
   ASSERT(Guid != NULL);
