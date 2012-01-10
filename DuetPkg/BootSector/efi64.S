@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #*
-#*   Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+#*   Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 #*   This program and the accompanying materials                          
 #*   are licensed and made available under the terms and conditions of the BSD License         
 #*   which accompanies this distribution.  The full text of the license may be found at        
@@ -23,6 +23,9 @@
         .stack: 
         .code: 
         .org 0x21000
+
+.global _start
+_start:
 
 .equ                 DEFAULT_HANDLER_SIZE, INT1 - INT0
 
@@ -1279,9 +1282,9 @@ looptop:
     andb    $0xf,%bl
     addb    $'0', %bl
     cmpb    $'9', %bl
-    jle     @f
+    jle     LN_C4
     addb    $7,%bl
-@@: 
+LN_C4: 
     movb %bl, (%edi)
     addl    $2,%edi
     loop    looptop
@@ -1300,10 +1303,10 @@ ClearScreen:
     movb    $0xc,%ah
     movl    $0xb8000,%edi
     movl    $80*24,%ecx
-LN_C4: 
+LN_C5: 
     movw    %ax, (%edi)
     addl    $2,%edi
-    loop    LN_C4
+    loop    LN_C5
     movl    $0xb8000,%edi
 
     popl    %ecx
@@ -1315,9 +1318,9 @@ A2C:
     andb    $0xf,%al
     addb    $'0', %al
     cmpb    $'9', %al
-    jle     @f
+    jle     LN_C6
     addb    $7,%al
-LN_C5: 
+LN_C6: 
     ret
 
 String1:            .asciz      "*** INT "

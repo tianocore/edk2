@@ -1,7 +1,7 @@
 ## @file
 #  Just use host GCC to compile boot sector image.
 #
-#  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -20,11 +20,15 @@ ASSEMBLY_CODE_FILE_LIST = $(MODULE_DIR)/bootsect.S \
                           $(MODULE_DIR)/bs16.S \
                           $(MODULE_DIR)/bs32.S \
                           $(MODULE_DIR)/efi32.S \
+                          $(MODULE_DIR)/efi64.S \
                           $(MODULE_DIR)/Gpt.S \
                           $(MODULE_DIR)/Mbr.S \
                           $(MODULE_DIR)/start.S \
                           $(MODULE_DIR)/start16.S \
-                          $(MODULE_DIR)/start32.S
+                          $(MODULE_DIR)/start32.S \
+                          $(MODULE_DIR)/start64.S \
+                          $(MODULE_DIR)/st16_64.S \
+                          $(MODULE_DIR)/st32_64.S
 
 TARGET_FILES = $(OUTPUT_DIR)/bootsect.com \
                $(OUTPUT_DIR)/bs16.com \
@@ -34,11 +38,11 @@ TARGET_FILES = $(OUTPUT_DIR)/bootsect.com \
                $(OUTPUT_DIR)/start.com \
                $(OUTPUT_DIR)/start16.com \
                $(OUTPUT_DIR)/start32.com \
-               $(OUTPUT_DIR)/efi32.com2
-               #$(OUTPUT_DIR)/start64.com \
-               #$(OUTPUT_DIR)/st16_64.com \
-               #$(OUTPUT_DIR)/st32_64.com \
-               #$(OUTPUT_DIR)/efi64.com2
+               $(OUTPUT_DIR)/efi32.com2 \
+               $(OUTPUT_DIR)/start64.com \
+               $(OUTPUT_DIR)/st16_64.com \
+               $(OUTPUT_DIR)/st32_64.com \
+               $(OUTPUT_DIR)/efi64.com2
 
 .PHONY : all
 all: $(TARGET_FILES)
@@ -98,16 +102,16 @@ $(OUTPUT_DIR)/start64.com: $(OUTPUT_DIR)/start64.o
 	$(DLINK) --oformat binary -o $(OUTPUT_DIR)/start64.com $(OUTPUT_DIR)/start64.o -Ttext 0 -Map $(OUTPUT_DIR)/start64.map
 
 # start16_64.S
-$(OUTPUT_DIR)/start16_64.o: $(MODULE_DIR)/start16_64.S
-	$(ASM) -c -o $(OUTPUT_DIR)/start16_64.o $(MODULE_DIR)/start16_64.S
-$(OUTPUT_DIR)/start16_64.com: $(OUTPUT_DIR)/start16_64.o
-	$(DLINK) --oformat binary -o $(OUTPUT_DIR)/start16_64.com $(OUTPUT_DIR)/start16_64.o -Ttext 0 -Map $(OUTPUT_DIR)/start16_64.map
+$(OUTPUT_DIR)/st16_64.o: $(MODULE_DIR)/st16_64.S
+	$(ASM) -c -o $(OUTPUT_DIR)/st16_64.o $(MODULE_DIR)/st16_64.S
+$(OUTPUT_DIR)/st16_64.com: $(OUTPUT_DIR)/st16_64.o
+	$(DLINK) --oformat binary -o $(OUTPUT_DIR)/st16_64.com $(OUTPUT_DIR)/st16_64.o -Ttext 0 -Map $(OUTPUT_DIR)/st16_64.map
 
 # start32_64.S
-$(OUTPUT_DIR)/start32_64.o: $(MODULE_DIR)/start32_64.S
-	$(ASM) -c -o $(OUTPUT_DIR)/start32_64.o $(MODULE_DIR)/start32_64.S
-$(OUTPUT_DIR)/start32_64.com: $(OUTPUT_DIR)/start32_64.o
-	$(DLINK) --oformat binary -o $(OUTPUT_DIR)/start32_64.com $(OUTPUT_DIR)/start32_64.o -Ttext 0 -Map $(OUTPUT_DIR)/start32_64.map
+$(OUTPUT_DIR)/st32_64.o: $(MODULE_DIR)/st32_64.S
+	$(ASM) -c -o $(OUTPUT_DIR)/st32_64.o $(MODULE_DIR)/st32_64.S
+$(OUTPUT_DIR)/st32_64.com: $(OUTPUT_DIR)/st32_64.o
+	$(DLINK) --oformat binary -o $(OUTPUT_DIR)/st32_64.com $(OUTPUT_DIR)/st32_64.o -Ttext 0 -Map $(OUTPUT_DIR)/st32_64.map
 
 # efi32.S
 $(OUTPUT_DIR)/efi32.o: $(MODULE_DIR)/efi32.S

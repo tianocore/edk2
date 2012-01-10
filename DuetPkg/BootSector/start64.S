@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #*
-#*   Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
+#*   Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 #*   This program and the accompanying materials                          
 #*   are licensed and made available under the terms and conditions of the BSD License         
 #*   which accompanies this distribution.  The full text of the license may be found at        
@@ -27,6 +27,10 @@
 .equ                        BLOCK_SHIFT, 9
 
         .org 0x0
+
+.global _start
+_start:
+
 Ia32Jump: 
   jmp   BootSectorEntryPoint  # JMP inst    - 3 bytes
   nop
@@ -123,11 +127,11 @@ CheckEm64T:
         movw $18,%cx
         jmp  PrintStringAndHalt
 CheckEm64TPass: 
-jumpFarInstruction: 
+JumpFarInstruction: 
         .byte 0xea
-jumpOffset: 
+JumpOffset: 
         .word 0x200
-jumpSegment: 
+JumpSegment: 
         .word 0x2000
 
 
@@ -510,7 +514,7 @@ In32BitProtectedMode:
     #
     # Enable paging to activate long mode (set CR0.PG=1)
     #
-    movl  $cr0, %eax      # Read CR0.
+    movl  %cr0, %eax      # Read CR0.
     .byte 0xf
     .byte 0xba
     .byte 0xe8
@@ -1105,7 +1109,6 @@ MemoryMap:  .long 0,0,0,0,0,0,0,0
         .long 0,0,0,0,0,0,0,0
         .long 0,0,0,0,0,0,0,0
 
-        .long 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
         .long 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
         .org 0x0fe0
