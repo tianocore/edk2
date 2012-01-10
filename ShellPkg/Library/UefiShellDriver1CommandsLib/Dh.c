@@ -202,7 +202,7 @@ GetProtocolInfoString(
           if (!Verbose) {
             StrnCatGrow(&RetVal, &Size, L"(", 0);
             StrnCatGrow(&RetVal, &Size, Temp, 0);
-            StrnCatGrow(&RetVal, &Size, L")", 0);
+            StrnCatGrow(&RetVal, &Size, L")\r\n", 0);
           } else {
             StrnCatGrow(&RetVal, &Size, Seperator, 0);
             StrnCatGrow(&RetVal, &Size, Temp, 0);
@@ -728,6 +728,7 @@ DoDhByHandle(
   Display information for all handles on a list.
 
   @param[in] HandleList       The NULL-terminated list of handles.
+  @param[in] Verbose          TRUE for extra info, FALSE otherwise.
   @param[in] Sfo              TRUE to output in standard format output (spec).
   @param[in] Language         Language string per UEFI specification.
   @param[in] DriverInfo       TRUE to show all info about the handle.
@@ -739,6 +740,7 @@ SHELL_STATUS
 EFIAPI
 DoDhForHandleList(
   IN CONST EFI_HANDLE *HandleList,
+  IN CONST BOOLEAN    Verbose,
   IN CONST BOOLEAN    Sfo,
   IN CONST CHAR8      *Language,
   IN CONST BOOLEAN    DriverInfo
@@ -752,7 +754,7 @@ DoDhForHandleList(
   for (HandleWalker = HandleList ; HandleWalker != NULL && *HandleWalker != NULL && ShellStatus == SHELL_SUCCESS; HandleWalker++) {
     ShellStatus = DoDhByHandle(
           *HandleWalker,
-          FALSE,
+          Verbose,
           Sfo,
           Language,
           DriverInfo,
@@ -766,6 +768,7 @@ DoDhForHandleList(
   Display information for all handles.
 
   @param[in] Sfo              TRUE to output in standard format output (spec).
+  @param[in] Verbose          TRUE for extra info, FALSE otherwise.
   @param[in] Language         Language string per UEFI specification.
   @param[in] DriverInfo       TRUE to show all info about the handle.
 
@@ -776,6 +779,7 @@ SHELL_STATUS
 EFIAPI
 DoDhForAll(
   IN CONST BOOLEAN  Sfo,
+  IN CONST BOOLEAN  Verbose,
   IN CONST CHAR8    *Language,
   IN CONST BOOLEAN  DriverInfo
   )
@@ -787,6 +791,7 @@ DoDhForAll(
 
   ShellStatus = DoDhForHandleList(
     HandleList,
+    Verbose,
     Sfo,
     Language,
     DriverInfo);
@@ -800,6 +805,7 @@ DoDhForAll(
   Display information for all handles which have a specific protocol.
 
   @param[in] ProtocolName     The pointer to the name of the protocol.
+  @param[in] Verbose          TRUE for extra info, FALSE otherwise.
   @param[in] Sfo              TRUE to output in standard format output (spec).
   @param[in] Language         Language string per UEFI specification.
   @param[in] DriverInfo       TRUE to show all info about the handle.
@@ -811,6 +817,7 @@ SHELL_STATUS
 EFIAPI
 DoDhByProtocol(
   IN CONST CHAR16   *ProtocolName,
+  IN CONST BOOLEAN  Verbose,
   IN CONST BOOLEAN  Sfo,
   IN CONST CHAR8    *Language,
   IN CONST BOOLEAN  DriverInfo
@@ -835,6 +842,7 @@ DoDhByProtocol(
 
   ShellStatus = DoDhForHandleList(
     HandleList,
+    Verbose,
     Sfo,
     Language,
     DriverInfo);
@@ -932,6 +940,7 @@ ShellCommandRunDh (
         //
         ShellStatus = DoDhByProtocol(
           ShellCommandLineGetValue(Package, L"-p"),
+          Verbose,
           SfoMode,
           Lang==NULL?NULL:Language,
           FlagD
@@ -945,6 +954,7 @@ ShellCommandRunDh (
         //
         ShellStatus = DoDhForAll(
           SfoMode,
+          Verbose,
           Lang==NULL?NULL:Language,
           FlagD
          );
