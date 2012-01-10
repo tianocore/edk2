@@ -13,6 +13,7 @@
 **/
 
 #include "UefiHandleParsingLib.h"
+#include "IndustryStandard/Acpi10.h"
 
 EFI_HANDLE mHandleParsingHiiHandle;
 HANDLE_INDEX_LIST mHandleList = {{{NULL,NULL},0,0},0};
@@ -159,6 +160,125 @@ LoadedImageProtocolDumpInformation(
   return Buffer;
 }
 */
+
+/**
+  Function to dump information about PciRootBridgeIo.
+
+  This will allocate the return buffer from boot services pool.
+
+  @param[in] TheHandle      The handle that has PciRootBridgeIo installed.
+  @param[in] Verbose        TRUE for additional information, FALSE otherwise.
+
+  @retval A poitner to a string containing the information.
+**/
+CHAR16*
+EFIAPI
+PciRootBridgeIoDumpInformation(
+  IN CONST EFI_HANDLE TheHandle,
+  IN CONST BOOLEAN    Verbose
+  )
+{
+  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL   *PciRootBridgeIo;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Configuration;
+  UINT64                            Supports;
+  UINT64                            Attributes;
+  CHAR16                            *Temp;
+  CHAR16                            *Temp2;
+  CHAR16                            *RetVal;
+  EFI_STATUS                        Status;
+
+  RetVal  = NULL;
+
+  if (!Verbose) {
+    return (CatSPrint(NULL, L"PciRootBridgeIo"));
+  }
+
+  Status = gBS->HandleProtocol(
+    TheHandle,
+    &gEfiPciRootBridgeIoProtocolGuid,
+    (VOID**)&PciRootBridgeIo);
+
+  if (EFI_ERROR(Status)) {
+    return NULL;
+  }
+
+  Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_PCIRB_DUMP_PH), NULL);
+  Temp2 = CatSPrint(L"\r\n", Temp, PciRootBridgeIo->ParentHandle);
+  FreePool(Temp);
+  RetVal = Temp2;
+  Temp2 = NULL;
+ 
+  Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_PCIRB_DUMP_SEG), NULL);
+  Temp2 = CatSPrint(RetVal, Temp, PciRootBridgeIo->SegmentNumber);
+  FreePool(Temp);
+  FreePool(RetVal);
+  RetVal = Temp2;
+  Temp2 = NULL;
+
+  Supports   = 0;
+  Attributes = 0;
+  Status = PciRootBridgeIo->GetAttributes (PciRootBridgeIo, &Supports, &Attributes);
+  if (!EFI_ERROR(Status)) {
+    Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_PCIRB_DUMP_ATT), NULL);
+    Temp2 = CatSPrint(RetVal, Temp, Attributes);
+    FreePool(Temp);
+    FreePool(RetVal);
+    RetVal = Temp2;
+    Temp2 = NULL;
+    
+    Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_PCIRB_DUMP_SUPPORTS), NULL);
+    Temp2 = CatSPrint(RetVal, Temp, Supports);
+    FreePool(Temp);
+    FreePool(RetVal);
+    RetVal = Temp2;
+    Temp2 = NULL;
+  }
+
+  Configuration   = NULL;
+  Status = PciRootBridgeIo->Configuration (PciRootBridgeIo, (VOID **) &Configuration);
+  if (!EFI_ERROR(Status) && Configuration != NULL) {
+    Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_PCIRB_DUMP_TITLE), NULL);
+    Temp2 = CatSPrint(RetVal, Temp, Supports);
+    FreePool(Temp);
+    FreePool(RetVal);
+    RetVal = Temp2;
+    Temp2 = NULL;
+    while (Configuration->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR) {
+      Temp = NULL;
+      switch (Configuration->ResType) {
+      case ACPI_ADDRESS_SPACE_TYPE_MEM:
+        Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_PCIRB_DUMP_MEM), NULL);
+        break;
+      case ACPI_ADDRESS_SPACE_TYPE_IO:
+        Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_PCIRB_DUMP_IO), NULL);
+        break;
+      case ACPI_ADDRESS_SPACE_TYPE_BUS:
+        Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_PCIRB_DUMP_BUS), NULL);
+        break;
+      }
+      if (Temp != NULL) {
+        Temp2 = CatSPrint(RetVal, L"%s", Temp);
+        FreePool(Temp);
+        FreePool(RetVal);
+        RetVal = Temp2;
+        Temp2 = NULL;
+      }
+
+      Temp2 = CatSPrint(RetVal, 
+        L"%H%02x    %016lx  %016lx  %02x%N\r\n",
+        Configuration->SpecificFlag,
+        Configuration->AddrRangeMin,
+        Configuration->AddrRangeMax,
+        Configuration->AddrSpaceGranularity
+        );
+      FreePool(RetVal);
+      RetVal = Temp2;
+      Temp2 = NULL;
+      Configuration++;
+    }
+  }
+  return (RetVal);
+}
 
 /**
   Function to dump information about SimpleTextOut.
@@ -381,7 +501,7 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_BLK_IO),                &gEfiBlockIoProtocolGuid,                         NULL},
   {STRING_TOKEN(STR_UC),                    &gEfiUnicodeCollationProtocolGuid,                NULL},
   {STRING_TOKEN(STR_UC2),                   &gEfiUnicodeCollation2ProtocolGuid,               NULL},
-  {STRING_TOKEN(STR_PCIRB_IO),              &gEfiPciRootBridgeIoProtocolGuid,                 NULL},
+  {STRING_TOKEN(STR_PCIRB_IO),              &gEfiPciRootBridgeIoProtocolGuid,                 PciRootBridgeIoDumpInformation},
   {STRING_TOKEN(STR_PCI_IO),                &gEfiPciIoProtocolGuid,                           NULL},
   {STRING_TOKEN(STR_SCSI_PT),               &gEfiScsiPassThruProtocolGuid,                    NULL},
   {STRING_TOKEN(STR_SCSI_IO),               &gEfiScsiIoProtocolGuid,                          NULL},
