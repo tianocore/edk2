@@ -42,7 +42,35 @@ EFI_SIMPLE_NETWORK_PROTOCOL gEmuSnpTemplate = {
   NULL                      // Mode
  };
 
-
+EFI_SIMPLE_NETWORK_MODE gEmuSnpModeTemplate = {                 
+  EfiSimpleNetworkStopped,      //  State
+  NET_ETHER_ADDR_LEN,           //  HwAddressSize
+  NET_ETHER_HEADER_SIZE,        //  MediaHeaderSize
+  1500,                         //  MaxPacketSize
+  0,                            //  NvRamSize
+  0,                            //  NvRamAccessSize
+  0,                            //  ReceiveFilterMask
+  0,                            //  ReceiveFilterSetting
+  MAX_MCAST_FILTER_CNT,         //  MaxMCastFilterCount
+  0,                            //  MCastFilterCount
+  {
+    { { 0 } }
+  },                            //  MCastFilter
+  {
+    { 0 }
+  },                            //  CurrentAddress
+  {
+    { 0 }
+  },                            //  BroadcastAddress
+  {
+    { 0 }
+  },                            //  PermanentAddress
+  NET_IFTYPE_ETHERNET,          //  IfType
+  FALSE,                        //  MacAddressChangeable
+  FALSE,                        //  MultipleTxSupported
+  FALSE,                        //  MediaPresentSupported
+  TRUE                          //  MediaPresent
+};
 
 
 /**
@@ -586,14 +614,6 @@ EmuSnpDriverBindingSupported (
   }
 
   //
-  // Make sure GUID is for a File System handle.
-  //
-  Status = EFI_UNSUPPORTED;
-  if (CompareGuid (EmuIoThunk->Protocol, &gEmuSnpProtocolGuid)) {
-    Status = EFI_SUCCESS;
-  }
-
-  //
   // Close the I/O Abstraction(s) used to perform the supported test
   //
   gBS->CloseProtocol (
@@ -621,6 +641,14 @@ EmuSnpDriverBindingSupported (
 
   if (EFI_ERROR (Status)) {
     return Status;
+  }
+
+  //
+  // Make sure GUID is for a SNP handle.
+  //
+  Status = EFI_UNSUPPORTED;
+  if (CompareGuid (EmuIoThunk->Protocol, &gEmuSnpProtocolGuid)) {
+    Status = EFI_SUCCESS;
   }
 
   //
@@ -715,6 +743,7 @@ EmuSnpDriverBindingStart (
   }
 
   CopyMem (&Private->Snp, &gEmuSnpTemplate, sizeof (EFI_SIMPLE_NETWORK_PROTOCOL));
+  CopyMem (&Private->Mode, &gEmuSnpModeTemplate, sizeof (EFI_SIMPLE_NETWORK_MODE));
 
   Private->Signature    = EMU_SNP_PRIVATE_DATA_SIGNATURE;
   Private->IoThunk      = EmuIoThunk;
@@ -944,7 +973,6 @@ InitializeEmuSnpDriver (
   //
   // Install the Driver Protocols
   //
-
   Status = EfiLibInstallDriverBindingComponentName2(
               ImageHandle,
               SystemTable,
