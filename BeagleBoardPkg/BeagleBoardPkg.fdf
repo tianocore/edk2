@@ -157,8 +157,6 @@ READ_LOCK_STATUS   = TRUE
 
   INF Omap35xxPkg/PciEmulation/PciEmulation.inf
 
-  #NOTE: Open source EHCI stack doesn't work on Beagleboard.
-  #NOTE: UsbBus and UsbMassStorage don't work using iPhond SDK tool chain.
   INF MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
   INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
