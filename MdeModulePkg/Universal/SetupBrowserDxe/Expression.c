@@ -1,7 +1,7 @@
 /** @file
 Utility functions for expression evaluation.
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1909,7 +1909,7 @@ EvaluateExpression (
       Value->Value.b = (BOOLEAN) ((Result == 0) ? TRUE : FALSE);
       break;
 
-    case EFI_IFR_EQ_ID_LIST_OP:
+    case EFI_IFR_EQ_ID_VAL_LIST_OP:
       Question = IdToQuestion (FormSet, Form, OpCode->QuestionId);
       if (Question == NULL) {
         Status = EFI_NOT_FOUND;

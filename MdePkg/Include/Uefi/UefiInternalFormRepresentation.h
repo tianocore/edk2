@@ -3,7 +3,7 @@
   IFR is primarily consumed by the EFI presentation engine, and produced by EFI
   internal application and drivers as well as all add-in card option-ROM drivers
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -700,7 +700,7 @@ typedef union {
 #define EFI_IFR_INCONSISTENT_IF_OP     0x11
 #define EFI_IFR_EQ_ID_VAL_OP           0x12
 #define EFI_IFR_EQ_ID_ID_OP            0x13
-#define EFI_IFR_EQ_ID_LIST_OP          0x14
+#define EFI_IFR_EQ_ID_VAL_LIST_OP      0x14
 #define EFI_IFR_AND_OP                 0x15
 #define EFI_IFR_OR_OP                  0x16
 #define EFI_IFR_NOT_OP                 0x17
