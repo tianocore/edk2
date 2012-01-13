@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #*
-#*   Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+#*   Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 #*   This program and the accompanying materials
 #*   are licensed and made available under the terms and conditions of the BSD License
 #*   which accompanies this distribution.  The full text of the license may be found at
@@ -54,7 +54,7 @@ _start:
         xorw  %ax, %ax                            # AX = 0x0000
         movw  $0x7c00, %bx                        # BX = 0x7C00
         movw  $0x600, %bp                         # BP = 0x0600
-        movw  RelocatedStart, %si                 # SI = Offset(RelocatedStart)
+        movw  $RelocatedStart, %si                # SI = Offset(RelocatedStart)
         movw  $0x200, %cx                         # CX = 0x0200
         subw  %si, %cx                            # CS = 0x0200 - Offset(RelocatedStart)
         leaw  (%bp,%si,), %di                     # DI = 0x0600 + Offset(RelocatedStart)

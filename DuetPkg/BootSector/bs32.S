@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #*
-#*   Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
+#*   Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 #*   This program and the accompanying materials                          
 #*   are licensed and made available under the terms and conditions of the BSD License         
 #*   which accompanies this distribution.  The full text of the license may be found at        
@@ -207,7 +207,7 @@ PrintString:
   movw %ax, %es
   movw $0x7c0, %ax
   movw %ax, %ds
-  movw $7, %cx
+  movw $6, %cx
   movw $160, %di
   rep
   movsw
@@ -288,15 +288,15 @@ Halt:
   jmp   Halt
 
 StartString: 
-  .byte 'B', 0x0c, 'S', 0x0c, 't', 0x0c, 'a', 0x0c, 'r', 0x0c, 't', 0x0c, '!', 0x0c
+  .byte 'B', 0x0c, 'S', 0x0c, 't', 0x0c, 'a', 0x0c, 'r', 0x0c, 't', 0x0c
 ErrorString: 
-  .byte 'B', 0x0c, 'E', 0x0c, 'r', 0x0c, 'r', 0x0c, 'o', 0x0c, 'r', 0x0c, '!', 0x0c
+  .byte 'B', 0x0c, 'E', 0x0c, 'r', 0x0c, 'r', 0x0c, 'o', 0x0c, 'r', 0x0c
 
 # ****************************************************************************
 # LBA Offset for BootSector, need patched by tool for HD boot.
 # ****************************************************************************
 
-  #.org 0x01fa
+  .org 0x01fa
 LBAOffsetForBootSector: 
   .long     0x0
 
@@ -304,7 +304,7 @@ LBAOffsetForBootSector:
 # Sector Signature
 # ****************************************************************************
 
-  #.org 0x01fe
+  .org 0x01fe
 SectorSignature: 
   .word     0xaa55      # Boot Sector Signature
 

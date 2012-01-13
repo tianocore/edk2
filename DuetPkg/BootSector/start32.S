@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #*
-#*   Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+#*   Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 #*   This program and the accompanying materials                          
 #*   are licensed and made available under the terms and conditions of the BSD License         
 #*   which accompanies this distribution.  The full text of the license may be found at        
@@ -311,11 +311,11 @@ Halt:
 ErrorString: 
         .byte 'S', 0x0c, 'E', 0x0c, 'r', 0x0c, 'r', 0x0c, 'o', 0x0c, 'r', 0x0c, '!', 0x0c
 
-        # .org     0x01fa  # Will cause build break
+        .org     0x01fa
 LBAOffsetForBootSector: 
         .long   0x0
 
-        # .org    0x01fe   # Will cause build break
+        .org    0x01fe
         .word   0xaa55
 
 #******************************************************************************
@@ -328,7 +328,7 @@ LBAOffsetForBootSector:
 .equ                 WRITE_DATA_PORT_CMD, 0x0d1  # 8042 command to write the data port
 .equ                 ENABLE_A20_CMD, 0x0df       # 8042 command to enable A20
 
-# .org     0x200  # Will cause build break
+        .org    0x200
         jmp start
 Em64String: 
         .byte 'E', 0x0c, 'm', 0x0c, '6', 0x0c, '4', 0x0c, 'T', 0x0c, ' ', 0x0c, 'U', 0x0c, 'n', 0x0c, 's', 0x0c, 'u', 0x0c, 'p', 0x0c, 'p', 0x0c, 'o', 0x0c, 'r', 0x0c, 't', 0x0c, 'e', 0x0c, 'd', 0x0c, '!', 0x0c

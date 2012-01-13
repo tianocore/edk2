@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;*
-;*   Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
+;*   Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 ;*   This program and the accompanying materials                          
 ;*   are licensed and made available under the terms and conditions of the BSD License         
 ;*   which accompanies this distribution.  The full text of the license may be found at        
@@ -78,7 +78,7 @@ BootSectorEntryPoint:
 ; ****************************************************************************
 ; Start Print
 ; ****************************************************************************
-  lea  si, cs:[StartString]
+  mov  si, offset StartString
   call PrintString
 
 ; ****************************************************************************
@@ -206,7 +206,7 @@ PrintString:
   mov  es,ax
   mov  ax, 07c0h
   mov  ds, ax
-  mov  cx, 7
+  mov  cx, 6
   mov  di, 160
   rep  movsw
   ret
@@ -280,15 +280,15 @@ NotFoundAll:
   jne  FoundEFILDR
 BadBootSector:
 DiskError:
-  lea  si, cs:[ErrorString]
+  mov  si, offset ErrorString
   call PrintString
 Halt:
   jmp   Halt
 
 StartString:
-  db 'B', 0ch, 'S', 0ch, 't', 0ch, 'a', 0ch, 'r', 0ch, 't', 0ch, '!', 0ch
+  db 'B', 0ch, 'S', 0ch, 't', 0ch, 'a', 0ch, 'r', 0ch, 't', 0ch
 ErrorString:
-  db 'B', 0ch, 'E', 0ch, 'r', 0ch, 'r', 0ch, 'o', 0ch, 'r', 0ch, '!', 0ch
+  db 'B', 0ch, 'E', 0ch, 'r', 0ch, 'r', 0ch, 'o', 0ch, 'r', 0ch
 
 ; ****************************************************************************
 ; LBA Offset for BootSector, need patched by tool for HD boot.

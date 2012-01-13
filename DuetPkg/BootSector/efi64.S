@@ -59,15 +59,16 @@ Start:
     call    ClearScreen
 
     # Populate IDT with meaningful offsets for exception handlers...
-    sidt    Idtr 
+    movl    $Idtr, %eax
+    sidt    (%eax)                      # get fword address of IDT
     
 
-    movl    Halt, %eax
+    movl    $Halt, %eax
     movl    %eax,%ebx                   # use bx to copy 15..0 to descriptors
     shrl    $16,%eax                    # use ax to copy 31..16 to descriptors 
                                         # 63..32 of descriptors is 0
     movl    $0x78,%ecx                  # 78h IDT entries to initialize with unique entry points (exceptions)
-    movl    (Idtr + 2), %esi
+    movl    $(Idtr + 2), %esi
     movl    (%esi),%edi
 
 LOOP_1:                                         # loop through all IDT entries exception handlers and initialize to default handler
@@ -77,7 +78,7 @@ LOOP_1:                                         # loop through all IDT entries e
     movw    %ax, 6(%edi)                        # write bits 31..16 of offset
     movl    $0, 8(%edi)                         # write bits 31..16 of offset  
     addl    $16, %edi                           # move up to next descriptor
-    addw    DEFAULT_HANDLER_SIZE, %bx           # move to next entry point
+    addw    $DEFAULT_HANDLER_SIZE, %bx          # move to next entry point
     loopl   LOOP_1                              # loop back through again until all descriptors are initialized
 
     ## at this point edi contains the offset of the descriptor for INT 20
@@ -126,7 +127,7 @@ LOOP_1:                                         # loop through all IDT entries e
     movl    0x30(%ebp),%edi             # edi = [[22000 + [22014] + 3c] + 2c] = ImageBase (63..32 is zero, ignore)
     movl    0x28(%ebp),%eax             # eax = [[22000 + [22014] + 3c] + 24] = EntryPoint
     addl    %edi,%eax                   # eax = ImageBase + EntryPoint
-    movl    %ebx, EfiLdrOffset          
+    movl    $EfiLdrOffset, %ebx
     movl    %eax, (%ebx)                # Modify far jump instruction for correct entry point
 
     movw    6(%ebp), %bx                # bx = Number of sections
@@ -158,8 +159,8 @@ SectionLoop:
     cmpw    $0,%bx
     jne     SectionLoop
 
-    movl    (Idtr), %eax                  # get size of IDT
-    movzx   (%edx), %eax
+    movl    $Idtr, %edx                  # get size of IDT
+    movzxw  (%edx), %eax
     .byte 0xff
     .byte 0xc0
 #    inc     eax
@@ -968,7 +969,7 @@ commonIdtEntry:
 ##      
 
     call    ClearScreen
-    mov     String1, %esi 
+    movl    $String1, %esi 
     call    PrintString
     .byte 0x48
     movl    16*8(%ebp),%eax       ## move Int number into RAX 
@@ -977,11 +978,11 @@ commonIdtEntry:
     ja      PrintDefaultString
 PrintExceptionString: 
     shll    $3,%eax             ## multiply by 8 to get offset from StringTable to actual string address
-    addl    StringTable, %eax
+    addl    $StringTable, %eax
     movl    (%eax),%esi
     jmp     PrintTheString
 PrintDefaultString: 
-    movl    IntUnknownString, %esi
+    movl    $IntUnknownString, %esi
     # patch Int number
     movl    %eax,%edx
     call    A2C
@@ -992,7 +993,7 @@ PrintDefaultString:
     movb    %al,(%esi)
 PrintTheString:        
     call    PrintString
-    movl    String2, %esi
+    movl    $String2, %esi
     call    PrintString
     .byte 0x48
     movl    19*8(%ebp),%eax    # CS
@@ -1003,24 +1004,24 @@ PrintTheString:
     .byte 0x48
     movl    18*8(%ebp),%eax    # RIP
     call    PrintQword
-    movl    String3, %esi
+    movl    $String3, %esi
     call    PrintString
 
     movl    $0xb8140,%edi
 
-    movl    StringRax, %esi
+    movl    $StringRax, %esi
     call    PrintString
     .byte 0x48
     movl    15*8(%ebp),%eax
     call    PrintQword
 
-    movl    StringRcx, %esi
+    movl    $StringRcx, %esi
     call    PrintString
     .byte 0x48
     movl    14*8(%ebp),%eax
     call    PrintQword
 
-    movl    StringRdx, %esi
+    movl    $StringRdx, %esi
     call    PrintString
     .byte 0x48
     movl    13*8(%ebp),%eax
@@ -1028,19 +1029,19 @@ PrintTheString:
 
     movl    $0xb81e0,%edi
 
-    movl    StringRbx, %esi
+    movl    $StringRbx, %esi
     call    PrintString
     .byte 0x48
     movl    12*8(%ebp),%eax
     call    PrintQword
 
-    movl    StringRsp, %esi
+    movl    $StringRsp, %esi
     call    PrintString
     .byte 0x48
     movl    21*8(%ebp),%eax
     call    PrintQword
 
-    movl    StringRbp, %esi
+    movl    $StringRbp, %esi
     call    PrintString
     .byte 0x48
     movl    10*8(%ebp),%eax
@@ -1048,19 +1049,19 @@ PrintTheString:
 
     movl    $0xb8280,%edi
 
-    movl    StringRsi, %esi
+    movl    $StringRsi, %esi
     call    PrintString
     .byte 0x48
     movl    9*8(%ebp),%eax
     call    PrintQword
 
-    movl    StringRdi, %esi
+    movl    $StringRdi, %esi
     call    PrintString
     .byte 0x48
     movl    8*8(%ebp),%eax
     call    PrintQword
 
-    movl    StringEcode, %esi
+    movl    $StringEcode, %esi
     call    PrintString
     .byte 0x48
     movl    17*8(%ebp),%eax
@@ -1068,19 +1069,19 @@ PrintTheString:
 
     movl    $0xb8320,%edi
 
-    movl    StringR8, %esi
+    movl    $StringR8, %esi
     call    PrintString
     .byte 0x48
     movl    7*8(%ebp),%eax
     call    PrintQword
 
-    movl    StringR9, %esi
+    movl    $StringR9, %esi
     call    PrintString
     .byte 0x48
     movl    6*8(%ebp),%eax
     call    PrintQword
 
-    movl    StringR10, %esi
+    movl    $StringR10, %esi
     call    PrintString
     .byte 0x48
     movl    5*8(%ebp),%eax
@@ -1088,19 +1089,19 @@ PrintTheString:
 
     movl    $0xb83c0,%edi
 
-    movl    StringR11, %esi
+    movl    $StringR11, %esi
     call    PrintString
     .byte 0x48
     movl    4*8(%ebp),%eax
     call    PrintQword
 
-    movl    StringR12, %esi
+    movl    $StringR12, %esi
     call    PrintString
     .byte 0x48
     movl    3*8(%ebp),%eax
     call    PrintQword
 
-    movl    StringR13, %esi
+    movl    $StringR13, %esi
     call    PrintString
     .byte 0x48
     movl    2*8(%ebp),%eax
@@ -1108,19 +1109,19 @@ PrintTheString:
 
     movl    $0xb8460,%edi
 
-    movl    StringR14, %esi
+    movl    $StringR14, %esi
     call    PrintString
     .byte 0x48
     movl    1*8(%ebp),%eax
     call    PrintQword
 
-    movl    StringR15, %esi
+    movl    $StringR15, %esi
     call    PrintString
     .byte 0x48
     movl    0*8(%ebp),%eax
     call    PrintQword
 
-    movl    StringSs, %esi
+    movl    $StringSs, %esi
     call    PrintString
     .byte 0x48
     movl    22*8(%ebp),%eax
@@ -1128,7 +1129,7 @@ PrintTheString:
 
     movl    $0xb8500,%edi
 
-    movl    StringRflags, %esi
+    movl    $StringRflags, %esi
     call    PrintString
     .byte 0x48
     movl    20*8(%ebp),%eax
@@ -1152,7 +1153,7 @@ InnerLoop:
     movl    (%esi),%eax
     call    PrintQword
     addl    $8,%esi
-    mov     $0x00, %al 
+    movb    $0x20, %al       # blank character
     movb    %al,(%edi)
     addl    $2,%edi
     loop    InnerLoop
@@ -1183,7 +1184,7 @@ InnerLoop1:
     movl    (%esi),%eax
     call    PrintQword
     addl    $8,%esi
-    movb    $0x00, %al
+    movb    $0x20, %al     # blank character
     movb    %al,(%edi)
     addl    $2,%edi
     loop    InnerLoop1
@@ -1299,7 +1300,7 @@ ClearScreen:
     pushl   %eax
     pushl   %ecx
 
-    movb    $0x00, %al
+    movb    $0x20, %al       # blank character
     movb    $0xc,%ah
     movl    $0xb8000,%edi
     movl    $80*24,%ecx
@@ -1347,11 +1348,11 @@ Int18String:        .asciz      "12h Machine check -"
 Int19String:        .asciz      "13h SIMD Floating-Point Exception -"
 IntUnknownString:   .asciz      "??h Unknown interrupt -"
 
-StringTable:   .long  Int0String, Int1String, Int2String, Int3String,    \
-                      Int4String, Int5String, Int6String, Int7String,    \
-                      Int8String, Int9String, Int10String, Int11String,  \
-                      Int12String, Int13String, Int14String, Int15String,\
-                      Int16String, Int17String, Int18String, Int19String
+StringTable:   .long  Int0String, 0, Int1String, 0, Int2String, 0, Int3String, 0,  \
+                      Int4String, 0, Int5String, 0, Int6String, 0, Int7String, 0,  \
+                      Int8String, 0, Int9String, 0, Int10String, 0, Int11String, 0,  \
+                      Int12String, 0, Int13String, 0, Int14String, 0, Int15String, 0,  \
+                      Int16String, 0, Int17String, 0, Int18String, 0, Int19String, 0
 
 String2:           .asciz  " HALT!! *** ("
 String3:           .asciz  ")"
