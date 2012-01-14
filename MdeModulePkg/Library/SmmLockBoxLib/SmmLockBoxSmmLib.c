@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 ~ 2012, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -265,6 +265,7 @@ SaveLockBox (
   CopyMem (&LockBox->Guid, Guid, sizeof(EFI_GUID));
   LockBox->Buffer      = (EFI_PHYSICAL_ADDRESS)(UINTN)Buffer;
   LockBox->Length      = (UINT64)Length;
+  LockBox->Attributes  = 0;
   LockBox->SmramBuffer = SmramBuffer;
   
   LockBoxQueue = InternalGetLockBoxQueue ();
