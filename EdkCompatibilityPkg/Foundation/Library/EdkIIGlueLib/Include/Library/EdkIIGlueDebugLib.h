@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -47,6 +47,7 @@ Abstract:
 #undef EFI_D_UNDI
 #undef EFI_D_LOADFILE
 #undef EFI_D_EVENT
+#undef EFI_D_VERBOSE
 #undef EFI_D_ERROR
 
 //
@@ -68,7 +69,7 @@ Abstract:
 #define DEBUG_FS        0x00000008  // EFI File system
 #define DEBUG_POOL      0x00000010  // Alloc & Free's
 #define DEBUG_PAGE      0x00000020  // Alloc & Free's
-#define DEBUG_INFO      0x00000040  // Verbose
+#define DEBUG_INFO      0x00000040  // Informational debug messages
 #define DEBUG_VARIABLE  0x00000100  // Variable
 #define DEBUG_BM        0x00000400  // Boot Manager
 #define DEBUG_BLKIO     0x00001000  // BlkIo Driver
@@ -76,6 +77,7 @@ Abstract:
 #define DEBUG_UNDI      0x00010000  // UNDI Driver
 #define DEBUG_LOADFILE  0x00020000  // UNDI Driver
 #define DEBUG_EVENT     0x00080000  // Event messages
+#define DEBUG_VERBOSE   0x00400000  // Detailed debug messages that may significantly impact boot performance
 #define DEBUG_ERROR     0x80000000  // Error
 
 //
@@ -95,6 +97,7 @@ Abstract:
 #define EFI_D_UNDI      DEBUG_UNDI
 #define EFI_D_LOADFILE  DEBUG_LOADFILE
 #define EFI_D_EVENT     DEBUG_EVENT
+#define EFI_D_VERBOSE   DEBUG_VERBOSE
 #define EFI_D_ERROR     DEBUG_ERROR
 
 
