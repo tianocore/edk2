@@ -601,7 +601,7 @@ Empty8042Loop:
 
         .p2align 1
 
-        gdtr:    .long  GDT_END - GDT_BASE - 1  # GDT limit 
+        gdtr:    .word  GDT_END - GDT_BASE - 1  # GDT limit 
         .long 0                     # (GDT base gets set above)
 ##############################################################################
 #   global descriptor table (GDT)
