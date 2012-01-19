@@ -1,7 +1,7 @@
 /** @file
   VFR file used by the IP6 configuration component.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -27,6 +27,17 @@ formset
   varstore IP6_CONFIG_IFR_NVDATA,
     name = IP6_CONFIG_IFR_NVDATA,
     guid = IP6_CONFIG_NVDATA_GUID;
+
+  form formid = FORMID_HEAD_FORM,
+    title  = STRING_TOKEN(STR_IP6_DEVICE_FORM_TITLE);
+
+    goto FORMID_MAIN_FORM,
+    prompt = STRING_TOKEN (STR_GET_CURRENT_SETTING),
+    help   = STRING_TOKEN (STR_GET_CURRENT_SETTING_HELP),
+    flags  = INTERACTIVE,
+    key    = KEY_GET_CURRENT_SETTING;
+
+  endform;
 
   form formid = FORMID_MAIN_FORM,
     title  = STRING_TOKEN(STR_IP6_DEVICE_FORM_TITLE);

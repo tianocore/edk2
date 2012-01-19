@@ -1,7 +1,7 @@
 /** @file
   NVData structure used by the IP6 configuration component.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -23,6 +23,7 @@
 
 #define FORMID_MAIN_FORM          1
 #define FORMID_MANUAL_CONFIG_FORM 2
+#define FORMID_HEAD_FORM          3
 
 #define IP6_POLICY_AUTO           0
 #define IP6_POLICY_MANUAL         1
@@ -35,6 +36,7 @@
 #define KEY_SAVE_CHANGES          0x105
 #define KEY_SAVE_CONFIG_CHANGES   0x106
 #define KEY_IGNORE_CONFIG_CHANGES 0x107
+#define KEY_GET_CURRENT_SETTING   0x108
 
 #define HOST_ADDRESS_LABEL        0x9000
 #define ROUTE_TABLE_LABEL         0xa000
