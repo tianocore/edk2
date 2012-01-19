@@ -2,7 +2,7 @@
   Member functions of EFI_SHELL_PROTOCOL and functions for creation,
   manipulation, and initialization of EFI_SHELL_PROTOCOL.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -3336,8 +3336,8 @@ NotificationFunction(
   IN EFI_KEY_DATA *KeyData
   )
 {
-//  ShellPrintEx(-1,-1,L"  <Notify>  ");
-   if ((KeyData->Key.UnicodeChar == L'c' || KeyData->Key.UnicodeChar == 3) &&
+  EFI_INPUT_KEY Key;
+  if ((KeyData->Key.UnicodeChar == L'c' || KeyData->Key.UnicodeChar == 3) &&
       (KeyData->KeyState.KeyShiftState == (EFI_SHIFT_STATE_VALID|EFI_LEFT_CONTROL_PRESSED) || KeyData->KeyState.KeyShiftState  == (EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED))
       ){ 
     if (ShellInfoObject.NewEfiShellProtocol->ExecutionBreak == NULL) {
@@ -3348,6 +3348,12 @@ NotificationFunction(
               (KeyData->KeyState.KeyShiftState  == (EFI_SHIFT_STATE_VALID|EFI_LEFT_CONTROL_PRESSED) || KeyData->KeyState.KeyShiftState  == (EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED))
               ){ 
     ShellInfoObject.HaltOutput = TRUE;
+
+    //
+    // Make sure that there are no pending keystrokes to pervent the pause.
+    //
+    gST->ConIn->Reset(gST->ConIn, FALSE);
+    while (gST->ConIn->ReadKeyStroke (gST->ConIn, &Key)==EFI_SUCCESS);
   }
   return (EFI_SUCCESS);
 }
