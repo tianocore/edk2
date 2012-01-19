@@ -53,6 +53,7 @@
   HwErrRecSupport.h
 
   DeviceMngr/DeviceManager.h
+  DeviceMngr/DeviceManagerVfr.h
   DeviceMngr/DeviceManagerVfr.Vfr
   DeviceMngr/DriverHealthVfr.Vfr
   DeviceMngr/DeviceManagerStrings.uni
