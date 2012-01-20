@@ -1,0 +1,189 @@
+
+                        Microsoft Visual C Stuff
+
+
+[Tom Moog 2-Oct-98
+
+    Users of Microsoft Visual C++ should download a separate
+    ready-to-run zip file from my web site.  It contains 
+    binaries, static library, and a sample project.
+]
+
+[
+  Two notes added by Tom Moog 23-Sep-97.  I believe the *.dsp and
+  *.mak files that were once at the end of this file are now obsolete.
+  
+  The following MSVC .dsp and .mak files for pccts and sorcerer
+  were contributed by Stanislaw Bochnak (S.Bochnak@microtool.com.pl)
+  and Jeff Vincent (jvincent@novell.com)
+
+        PCCTS Distribution Kit
+        ----------------------
+        pccts/antlr/AntlrMSVC50.dsp
+        pccts/antlr/AntlrMSVC50.mak
+
+        pccts/dlg/DlgMSVC50.dsp
+        pccts/dlg/DlgMSVC50.mak
+
+        pccts/support/genmk/watgenmk.mak
+        pccts/support/msvc.dsp
+
+        Sorcerer Distribution Kit
+        -------------------------
+        pccts/sorcerer/SorcererMSVC50.dsp
+        pccts/sorcerer/SorcererMSVC50.mak
+
+        pccts/sorcerer/lib/msvc.dsp
+
+  I do not have an MS based computer.  If you discover problems
+  please report them so as to save trouble for others in the future.
+]
+
+[
+ Modified by Terence Parr (September 1995) to change .C to .cpp
+]
+
+[
+ This file contains notes on MSVC for Windows NT console execs by Dave
+ Seidel and an explanation of flags etc.. by John Hall; good luck,
+ Terence
+]
+
+===============================================================================
+Date: Sat, 31 Dec 1994 11:40:36 -0500 (EST)
+From: David Seidel <75342.2034@compuserve.com>
+
+I've succesfully build 1.31b3 with djgpp for DOS and MSVC 2.0 for Windows 
+NT.  The only (minor) problem I had was that GNU make (version 3.71, in the 
+djgpp port) complained about "multiple targets" in both the antlr and dlg 
+makefiles.  I got around the error by, in each makefile, commenting out the 
+$(SRC) dependency, for example:
+
+   antlr: $(OBJ) #$(SRC)
+
+I don't know why this is happenning, since you haven't changed that part of 
+the makefile at all, and I think this used to work ok...
+
+Here are the makefiles I built from within the MSVC 2.0 environment for antlr 
+and dlg and Windows NT console executables.  Please feel free to pass them 
+on.  Of course, as soon as 1.31 "goes gold", I will send you nice new 
+binaries.  I'm not going to bother to keep doing both Borland and djgpp for 
+DOS however.  Instead, I'll just keep the djgpp version up to date and also 
+provide WinNT binaries.
+
+Dave
+===============================================================================
+
+         How to port PCCTS 1.10 (and 1.32 hopefully) to Visual C++
+
+                                   By
+
+                       John Hall <jhall@ivy.wpi.edu>
+
+Here is how to compile an ANTLR grammar in Visual C++.  These steps
+describe how to have your ANTLR grammar parse the input file the user
+selects when they choose File Open in your Windows application.  (Even
+if you aren't using Visual C++, the steps should be portable enough to
+other compilers.)
+
+ * Make sure that ANTLR and DLG generate ANSI code (use the -ga
+   switch).
+
+ * Set the following compiler flags in Visual C++ (these are in the
+   Memory Model category of the compiler options in the Project
+   Options menu):
+
+   FLAG MEANING
+   ==== ==============================================================
+   /AL  Large memory model (multiple data segments; data items must be
+    smaller than 64K).
+
+   /Gtn Allocates all items whose size is greater than or equal to n
+    in a new data segment.  (I let n be 256: /Gt256.)
+
+   /Gx- All references to data items are done with far addressing in
+    case they are placed in a far segment.
+
+ * Add the following member variable to the attributes section of your
+   derived CDocument class (you will need to make sure you also
+   include stdio.h):
+
+   FILE *fp;
+
+ * Add the following method to your derived CDocument class:
+
+   BOOL CAppDoc::OnOpenDocument(const char* pszPathName)
+   {
+       // Call CDocument's OnOpenDocument to do housekeeping for us
+       // DON'T add anything to the loading section of Serialize
+       if (!CDocument::OnOpenDocument(pszPathName))
+           return FALSE;
+   
+       // Open input file
+       if ((fp = fopen(pszPathName, "r")) == NULL)
+           return FALSE;
+   
+       // Parse input file
+       ANTLR(start(), fp);
+   
+       // Close input file
+       fclose(fp);
+       return TRUE;
+   }
+
+   (Note: additional code may be necessary, depending on your parser.
+   For example, if your parser uses PCCTS's symbol table library, you
+   will need to insert calls to zzs_init and zzs_done.)
+
+ * Compile the generated C files as C++ files.  (I renamed the files
+   to have a .CPP extension to fool Visual C++ into thinking they were
+   C++ files.  One might also use the /Tp switch, but that switch
+   requires you separately include the filename.)  [I used this step
+   as an easy out for all the external linking errors I was getting
+   that I couldn't fix by declaring things extern "C".]
+
+ * Make sure the __STDC__ portion of the generated files gets
+   compiled.  (Either define __STDC__ yourself or else change all
+   occurrences of __STDC__ to __cplusplus in the generated files.  You
+   can define __STDC__ in the Preprocessor category of the compiler
+   options.)
+
+        ================================================================
+        = Note 23-Sep-97: This is probably not necessary any more.     =
+        = With 1.33MRxxx the use of __STDC__ was replaced with the     =
+        = macro __USE_PROTOS to control the compilation of prototypes. =
+        ================================================================
+                        
+That last step is important for Visual C++, but may not apply to other
+compilers.  For C++ compilers, whether __STDC__ is defined is
+implementation dependent (ARM, page 379).  Apparently, Visual C++ does
+not to define it; it also does not support "old style" C function
+definitions (which is okay, according to page 404 of the ARM).  Those
+two things together caused problems when trying to port the code.
+When it saw this:
+
+#ifdef __STDC__
+void
+globals(AST **_root)
+#else
+globals(_root)
+AST **_root;
+#endif
+
+it skipped the __STDC__ section and tried to process the "old style"
+function definition, where it choked.
+
+When you finally get your parser to compile and link without error,
+you may get General Protection Fault errors at run time.  The problem
+I had was that a NULL was passed to a variable argument function
+without an explicit cast.  The function grabbed a pointer (32-bits)
+off the stack using va_arg, but the NULL was passed silently as the
+integer 0 (16 bits), making the resulting pointer was invalid.  (This
+was in PCCTS's sample C parser.)
+
+There is one other thing I might suggest to help you avoid a run-time
+error.  Make sure you redefine the default error reporting function,
+zzsyn.  To do this, put "#define USER_ZZSYN" in your #header section
+and put your own zzsyn somewhere.  You can then pop up a MessageBox or
+print the error to some output window.
+===============================================================================
