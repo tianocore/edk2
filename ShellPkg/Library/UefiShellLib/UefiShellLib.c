@@ -2587,10 +2587,12 @@ InternalPrintTo (
     return (gEfiShellProtocol->WriteFile(gEfiShellParametersProtocol->StdOut, &Size, (VOID*)String));
   }
   if (mEfiShellInterface          != NULL) {
-    //
-    // Divide in half for old shell.  Must be string length not size.
-    //
-    Size /= 2;
+    if (mEfiShellInterface->RedirArgc == 0) { 
+      //
+      // Divide in half for old shell.  Must be string length not size.
+      // 
+      Size /=2;  // Divide in half only when no redirection.
+    }
     return (mEfiShellInterface->StdOut->Write(mEfiShellInterface->StdOut,          &Size, (VOID*)String));
   }
   ASSERT(FALSE);
