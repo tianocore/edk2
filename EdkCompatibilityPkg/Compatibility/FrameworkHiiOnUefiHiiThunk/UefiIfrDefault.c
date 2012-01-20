@@ -358,7 +358,7 @@ UefiIfrGetBufferTypeDefaults (
   ASSERT (UefiDefaults != NULL);
 
   *UefiDefaults = AllocateZeroPool (sizeof (LIST_ENTRY));
-  ASSERT (UefiDefaults != NULL);
+  ASSERT (*UefiDefaults != NULL);
   InitializeListHead (*UefiDefaults);
 
   DefaultLink = GetFirstNode (&ThunkContext->FormSet->DefaultStoreListHead);

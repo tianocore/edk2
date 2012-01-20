@@ -311,8 +311,15 @@ Returns:
 
 --*/
 {
-  RegisterSet->E.EIP = (UINT16)((UINT32 *)NULL)[IntNumber];
-  RegisterSet->E.CS  = (UINT16)(((UINT32 *)NULL)[IntNumber] >> 16);
+  UINT32  *VectorBase;
+  
+  //
+  // The base address of legacy interrupt vector table is 0.
+  // We use this base address to get the legacy interrupt handler.
+  //
+  VectorBase = 0;
+  RegisterSet->E.EIP = (UINT16)(VectorBase)[IntNumber];
+  RegisterSet->E.CS  = (UINT16)((VectorBase)[IntNumber] >> 16);
 
   return AsmThunk16 (ThunkContext, RegisterSet, Flags | THUNK_INTERRUPT);
 }
