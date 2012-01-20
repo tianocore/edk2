@@ -1,7 +1,7 @@
 /** @file
   Main file for attrib shell level 2 function.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -202,7 +202,10 @@ IsValidDeleteTarget(
   Size          = 0;
   Pattern       = StrnCatGrow(&Pattern     , NULL, TempLocation  , 0);
   SearchString  = StrnCatGrow(&SearchString, &Size, Node->FullName, 0);
-  SearchString  = StrnCatGrow(&SearchString, &Size, L"*", 0);
+  if (!EFI_ERROR(ShellIsDirectory(SearchString))) {
+    SearchString  = StrnCatGrow(&SearchString, &Size, L"\\", 0);
+    SearchString  = StrnCatGrow(&SearchString, &Size, L"*", 0);
+  }
 
   if (Pattern == NULL || SearchString == NULL) {
     RetVal = FALSE;
