@@ -1,7 +1,7 @@
 /** @file
   The implementation of IPSEC_CONFIG_PROTOCOL.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1995,6 +1995,10 @@ IpSecGetVariable (
                         VariableNameISizeNew,
                         VariableNameI
                         );
+      if (VariableNameI == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        break;
+      }
       VariableNameISize = VariableNameISizeNew;
 
       Status = gRT->GetNextVariableName (
@@ -2071,7 +2075,9 @@ IpSecGetVariable (
   }
 
 ON_EXIT:
-  FreePool (VariableNameI);
+  if (VariableNameI != NULL) {
+    FreePool (VariableNameI);
+  }
   return Status;
 }
 
@@ -2498,8 +2504,8 @@ IpSecCopyPolicyEntry (
     //
     Buffer->Capacity += EntrySize;
     TempPoint         = AllocatePool (Buffer->Capacity);
-
-    if (Buffer->Ptr == NULL) {
+    
+    if (TempPoint == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
     //

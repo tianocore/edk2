@@ -1784,6 +1784,10 @@ InternalCommandLineParse (
   // initialize the linked list
   //
   *CheckPackage = (LIST_ENTRY*)AllocateZeroPool(sizeof(LIST_ENTRY));
+  if (*CheckPackage == NULL) {
+    return (EFI_OUT_OF_RESOURCES);
+  }
+
   InitializeListHead(*CheckPackage);
 
   //
