@@ -533,6 +533,8 @@ ArpMatchAddress (
   IN NET_ARP_ADDRESS  *AddressTwo
   )
 {
+  ASSERT (AddressOne != NULL && AddressTwo != NULL);
+
   if ((AddressOne->Type != AddressTwo->Type) ||
     (AddressOne->Length != AddressTwo->Length)) {
     //

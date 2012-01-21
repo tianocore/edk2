@@ -1177,6 +1177,7 @@ EmuGetVariable (
   VARIABLE_POINTER_TRACK  Variable;
   UINTN                   VarDataSize;
   EFI_STATUS              Status;
+  UINT8                   *VariableDataPtr;
 
   if (VariableName == NULL || VendorGuid == NULL || DataSize == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1201,8 +1202,10 @@ EmuGetVariable (
       Status = EFI_INVALID_PARAMETER;
       goto Done;
     }
-
-    CopyMem (Data, GetVariableDataPtr (Variable.CurrPtr), VarDataSize);
+    VariableDataPtr = GetVariableDataPtr (Variable.CurrPtr);
+    ASSERT (VariableDataPtr != NULL);
+    
+    CopyMem (Data, VariableDataPtr, VarDataSize);
     if (Attributes != NULL) {
       *Attributes = Variable.CurrPtr->Attributes;
     }

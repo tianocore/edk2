@@ -339,6 +339,7 @@ FindStringBlock (
       for (Index = 0; Index < StringCount; Index++) {
         BlockSize += AsciiStrSize ((CHAR8 *) StringTextPtr);
         if (CurrentStringId == StringId) {
+          ASSERT (BlockType != NULL && StringBlockAddr != NULL && StringTextOffset != NULL);
           *BlockType        = *BlockHdr;
           *StringBlockAddr  = BlockHdr;
           *StringTextOffset = StringTextPtr - BlockHdr;
@@ -361,6 +362,7 @@ FindStringBlock (
       for (Index = 0; Index < StringCount; Index++) {
         BlockSize += AsciiStrSize ((CHAR8 *) StringTextPtr);
         if (CurrentStringId == StringId) {
+          ASSERT (BlockType != NULL && StringBlockAddr != NULL && StringTextOffset != NULL);
           *BlockType        = *BlockHdr;
           *StringBlockAddr  = BlockHdr;
           *StringTextOffset = StringTextPtr - BlockHdr;
@@ -404,6 +406,7 @@ FindStringBlock (
         GetUnicodeStringTextOrSize (NULL, StringTextPtr, &StringSize);
         BlockSize += StringSize;
         if (CurrentStringId == StringId) {
+          ASSERT (BlockType != NULL && StringBlockAddr != NULL && StringTextOffset != NULL);
           *BlockType        = *BlockHdr;
           *StringBlockAddr  = BlockHdr;
           *StringTextOffset = StringTextPtr - BlockHdr;
@@ -427,6 +430,7 @@ FindStringBlock (
         GetUnicodeStringTextOrSize (NULL, StringTextPtr, &StringSize);
         BlockSize += StringSize;
         if (CurrentStringId == StringId) {
+          ASSERT (BlockType != NULL && StringBlockAddr != NULL && StringTextOffset != NULL);
           *BlockType        = *BlockHdr;
           *StringBlockAddr  = BlockHdr;
           *StringTextOffset = StringTextPtr - BlockHdr;
@@ -559,7 +563,7 @@ FindStringBlock (
   //
   // Get last string ID
   //
-  if (StringId == (EFI_STRING_ID) (-1)) {
+  if (StringId == (EFI_STRING_ID) (-1) && LastStringId != NULL) {
     *LastStringId = (EFI_STRING_ID) (CurrentStringId - 1);
     return EFI_SUCCESS;
   }
