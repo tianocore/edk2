@@ -17,22 +17,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _CPU_ARCHITECTURAL_PROTOCOL_DRIVER_H_
 
 
-#include <FrameworkDxe.h>
+#include <PiDxe.h>
 #include <IndustryStandard/SmBios.h>
 
 #include <Protocol/Cpu.h>
 #include <Protocol/Smbios.h>
-#include <Protocol/FrameworkHii.h>
 #include <Protocol/MpService.h>
 #include <Protocol/EmuThread.h>
 #include <Protocol/CpuIo2.h>
 
-#include <Guid/DataHubRecords.h>
 #include <Guid/IdleLoopEvent.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
-#include <Library/HiiLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -42,7 +39,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 
 
-extern UINT8  CpuStrings[];
 
 //
 // Internal Data Structures
@@ -230,7 +226,7 @@ EmuSetMemoryAttributes (
 
 EFI_STATUS
 CpuMpServicesInit (
-  VOID
+  OUT UINTN *MaxCores
   );
 
 EFI_STATUS

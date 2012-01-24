@@ -2,7 +2,7 @@
   Emu driver to produce CPU Architectural Protocol.
 
 Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
-Portions copyright (c) 2011, Apple Inc. All rights reserved.
+Portions copyright (c) 2011 - 2012, Apple Inc. All rights reserved.
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -47,6 +47,179 @@ CPU_ARCH_PROTOCOL_PRIVATE mCpuTemplate = {
 
 #define EFI_CPU_DATA_MAXIMUM_LENGTH 0x100
 
+SMBIOS_TABLE_TYPE4 mCpuSmbiosType4 = {
+  { EFI_SMBIOS_TYPE_PROCESSOR_INFORMATION, sizeof (SMBIOS_TABLE_TYPE4), 0},
+  1,                    // Socket String
+  ProcessorOther,       // ProcessorType;          ///< The enumeration value from PROCESSOR_TYPE_DATA.
+  ProcessorFamilyOther, // ProcessorFamily;        ///< The enumeration value from PROCESSOR_FAMILY_DATA.
+  2,                    // ProcessorManufacture String;
+  {                     // ProcessorId;
+    {  // PROCESSOR_SIGNATURE
+      0, //  ProcessorSteppingId:4;
+      0, //  ProcessorModel:     4;
+      0, //  ProcessorFamily:    4;
+      0, //  ProcessorType:      2;
+      0, //  ProcessorReserved1: 2;
+      0, //  ProcessorXModel:    4;
+      0, //  ProcessorXFamily:   8;
+      0, //  ProcessorReserved2: 4;
+    }, 
+    {  // PROCESSOR_FEATURE_FLAGS
+      0, //  ProcessorFpu       :1;
+      0, //  ProcessorVme       :1;
+      0, //  ProcessorDe        :1;
+      0, //  ProcessorPse       :1;
+      0, //  ProcessorTsc       :1;
+      0, //  ProcessorMsr       :1;
+      0, //  ProcessorPae       :1;
+      0, //  ProcessorMce       :1;
+      0, //  ProcessorCx8       :1;
+      0, //  ProcessorApic      :1;
+      0, //  ProcessorReserved1 :1;
+      0, //  ProcessorSep       :1;
+      0, //  ProcessorMtrr      :1;
+      0, //  ProcessorPge       :1;
+      0, //  ProcessorMca       :1;
+      0, //  ProcessorCmov      :1;
+      0, //  ProcessorPat       :1;
+      0, //  ProcessorPse36     :1;
+      0, //  ProcessorPsn       :1;
+      0, //  ProcessorClfsh     :1;
+      0, //  ProcessorReserved2 :1;
+      0, //  ProcessorDs        :1;
+      0, //  ProcessorAcpi      :1;
+      0, //  ProcessorMmx       :1;
+      0, //  ProcessorFxsr      :1;
+      0, //  ProcessorSse       :1;
+      0, //  ProcessorSse2      :1;
+      0, //  ProcessorSs        :1;
+      0, //  ProcessorReserved3 :1;
+      0, //  ProcessorTm        :1;
+      0, //  ProcessorReserved4 :2;
+    }
+  },
+  3,                    // ProcessorVersion String;
+  {                     // Voltage;
+    1,  // ProcessorVoltageCapability5V        :1; 
+    1,  // ProcessorVoltageCapability3_3V      :1;  
+    1,  // ProcessorVoltageCapability2_9V      :1;  
+    0,  // ProcessorVoltageCapabilityReserved  :1; ///< Bit 3, must be zero.
+    0,  // ProcessorVoltageReserved            :3; ///< Bits 4-6, must be zero.
+    0   // ProcessorVoltageIndicateLegacy      :1;
+  },              
+  0,                      // ExternalClock;
+  0,                      // MaxSpeed;
+  0,                      // CurrentSpeed;
+  0x41,                   // Status;
+  ProcessorUpgradeOther,  // ProcessorUpgrade;      ///< The enumeration value from PROCESSOR_UPGRADE.
+  0,                      // L1CacheHandle;
+  0,                      // L2CacheHandle;
+  0,                      // L3CacheHandle;
+  4,                      // SerialNumber;
+  5,                      // AssetTag;
+  6,                      // PartNumber;
+  0,                      // CoreCount;
+  0,                      // EnabledCoreCount;
+  0,                      // ThreadCount;
+  0,                      // ProcessorCharacteristics;
+  0,                      // ProcessorFamily2;
+};
+
+CHAR8 *mCpuSmbiosType4Strings[] = {
+  "Socket",
+  "edk2.svn.sourceforge.net",
+  "Emulated Processor",
+  "1.0",
+  "1.0",
+  "1.0",
+  NULL
+};
+
+
+/**
+  Logs SMBIOS record.
+
+  Note: This should be a genric library function.
+
+  @param  Template    Fixed SMBIOS structure
+  @param  StringPack  Array of strings to convert to an SMBIOS string pack. 
+
+**/
+EFI_STATUS
+LogSmbiosData (
+  IN  EFI_SMBIOS_TABLE_HEADER *Template,
+  IN  CHAR8                   **StringPack 
+  )
+{
+  EFI_STATUS                Status;
+  EFI_SMBIOS_PROTOCOL       *Smbios;  
+  EFI_SMBIOS_HANDLE         SmbiosHandle;
+  EFI_SMBIOS_TABLE_HEADER   *Record;
+  UINTN                     Index;
+  UINTN                     StringSize;
+  UINTN                     Size;
+  CHAR8                     *Str;
+
+  //
+  // Locate Smbios protocol.
+  //
+  Status = gBS->LocateProtocol (&gEfiSmbiosProtocolGuid, NULL, (VOID **)&Smbios);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // Calculate the size of the fixed record and optional string pack
+  Size = Template->Length;
+  for (Index = 0; StringPack[Index] != NULL; Index++) {
+    StringSize = AsciiStrSize (StringPack[Index]);
+    Size += StringSize;
+  }
+  // Don't forget the terminating double null
+  Size += 1;
+
+  // Copy over Template
+  Record = (EFI_SMBIOS_TABLE_HEADER *)AllocateZeroPool (Size);
+  if (Record == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  CopyMem (Record, Template, Template->Length);
+
+  // Append string pack
+  Str = ((CHAR8 *)Record) + Record->Length;
+  for (Index = 0; StringPack[Index] != NULL; Index++) {
+    StringSize = AsciiStrSize (StringPack[Index]);
+    CopyMem (Str, StringPack[Index], StringSize);
+    Str += StringSize;
+  }
+  *Str = 0;
+  
+  SmbiosHandle = SMBIOS_HANDLE_PI_RESERVED;
+  Status = Smbios->Add (
+                     Smbios,
+                     gImageHandle,
+                     &SmbiosHandle,
+                     Record
+                     );
+  ASSERT_EFI_ERROR (Status);
+  
+  FreePool (Record);
+  return Status;
+}
+
+
+
+
+VOID
+CpuUpdateSmbios (
+  IN UINTN  MaxCpus
+  )
+{
+  mCpuSmbiosType4.CoreCount        = MaxCpus;
+  mCpuSmbiosType4.EnabledCoreCount = MaxCpus;
+  mCpuSmbiosType4.ThreadCount      = MaxCpus;
+
+  LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mCpuSmbiosType4, mCpuSmbiosType4Strings);
+}
 
 
 //
@@ -127,6 +300,9 @@ EmuInit (
   IN EFI_CPU_INIT_TYPE      InitType
   )
 {
+  CPU_ARCH_PROTOCOL_PRIVATE *Private;
+
+  Private = CPU_ARCH_PROTOCOL_PRIVATE_DATA_FROM_THIS (This);
   return EFI_UNSUPPORTED;
 }
 
@@ -138,6 +314,8 @@ EmuRegisterInterruptHandler (
   IN EFI_CPU_INTERRUPT_HANDLER  InterruptHandler
   )
 {
+  CPU_ARCH_PROTOCOL_PRIVATE *Private;
+
   //
   // Do parameter checking for EFI spec conformance
   //
@@ -147,6 +325,7 @@ EmuRegisterInterruptHandler (
   //
   // Do nothing for Emu emulation
   //
+  Private = CPU_ARCH_PROTOCOL_PRIVATE_DATA_FROM_THIS (This);
   return EFI_UNSUPPORTED;
 }
 
@@ -186,6 +365,8 @@ EmuSetMemoryAttributes (
   IN UINT64                 Attributes
   )
 {
+  CPU_ARCH_PROTOCOL_PRIVATE *Private;
+
   //
   // Check for invalid parameter for Spec conformance
   //
@@ -196,105 +377,10 @@ EmuSetMemoryAttributes (
   //
   // Do nothing for Nt32 emulation
   //
+  Private = CPU_ARCH_PROTOCOL_PRIVATE_DATA_FROM_THIS (This);
   return EFI_UNSUPPORTED;
 }
 
-
-
-/**
-  Logs SMBIOS record.
-
-  @param  Smbios   Pointer to SMBIOS protocol instance.
-  @param  Buffer   Pointer to the data buffer.
-
-**/
-VOID
-LogSmbiosData (
-  IN  EFI_SMBIOS_PROTOCOL        *Smbios,
-  IN  UINT8                      *Buffer
-  )
-{
-  EFI_STATUS         Status;
-  EFI_SMBIOS_HANDLE  SmbiosHandle;
-
-  SmbiosHandle = SMBIOS_HANDLE_PI_RESERVED;
-  Status = Smbios->Add (
-                     Smbios,
-                     NULL,
-                     &SmbiosHandle,
-                     (EFI_SMBIOS_TABLE_HEADER*)Buffer
-                     );
-  ASSERT_EFI_ERROR (Status);
-}
-
-VOID
-CpuUpdateSmbios (
-  VOID
-  )
-{
-  EFI_STATUS                  Status;
-  UINT32                      TotalSize;
-  EFI_SMBIOS_PROTOCOL         *Smbios;
-  EFI_HII_HANDLE              HiiHandle;
-  STRING_REF                  Token;
-  UINTN                       CpuVerStrLen;
-  EFI_STRING                  CpuVerStr;
-  SMBIOS_TABLE_TYPE4          *SmbiosRecord;
-  CHAR8                       *OptionalStrStart;
-
-  //
-  // Locate Smbios protocol.
-  //
-  Status = gBS->LocateProtocol (&gEfiSmbiosProtocolGuid, NULL, (VOID **)&Smbios);
-
-  if (EFI_ERROR (Status)) {
-    return;
-  }
-
-  //
-  // Initialize strings to HII database
-  //
-  HiiHandle = HiiAddPackages (
-                &gEfiCallerIdGuid,
-                NULL,
-                CpuStrings,
-                NULL
-                );
-  ASSERT (HiiHandle != NULL);
-
-  Token  = STRING_TOKEN (STR_PROCESSOR_VERSION);
-  CpuVerStr = HiiGetPackageString(&gEfiCallerIdGuid, Token, NULL);
-  CpuVerStrLen = StrLen(CpuVerStr);
-  ASSERT (CpuVerStrLen <= SMBIOS_STRING_MAX_LENGTH);
-
-  TotalSize = sizeof(SMBIOS_TABLE_TYPE4) + CpuVerStrLen + 1 + 1;
-  SmbiosRecord = AllocatePool(TotalSize);
-  ZeroMem(SmbiosRecord, TotalSize);
-
-  SmbiosRecord->Hdr.Type = EFI_SMBIOS_TYPE_PROCESSOR_INFORMATION;
-  SmbiosRecord->Hdr.Length = sizeof (SMBIOS_TABLE_TYPE4);
-  //
-  // Make handle chosen by smbios protocol.add automatically.
-  //
-  SmbiosRecord->Hdr.Handle = 0;
-  //
-  // Processor version is the 1st string.
-  //
-  SmbiosRecord->ProcessorVersion = 1;
-  //
-  // Store CPU frequency data record to data hub - It's an emulator so make up a value
-  //
-  SmbiosRecord->CurrentSpeed  = 1234;
-
-  OptionalStrStart = (CHAR8 *)(SmbiosRecord + 1);
-  UnicodeStrToAsciiStr(CpuVerStr, OptionalStrStart);
-
-  //
-  // Now we have got the full smbios record, call smbios protocol to add this record.
-  //
-  LogSmbiosData(Smbios, (UINT8 *) SmbiosRecord);
-  FreePool (SmbiosRecord);
-}
 
 
 
@@ -327,6 +413,7 @@ InitializeCpu (
   EFI_STATUS    Status;
   UINT64        Frequency;
   EFI_EVENT     IdleLoopEvent;
+  UINTN         MaxCpu;
 
   //
   // Retrieve the frequency of the performance counter in Hz.
@@ -338,9 +425,10 @@ InitializeCpu (
   //
   mTimerPeriod = DivU64x64Remainder (1000000000000000ULL, Frequency, NULL);
 
-  CpuUpdateSmbios ();
+  CpuMpServicesInit (&MaxCpu);
 
-  CpuMpServicesInit ();
+  CpuUpdateSmbios (MaxCpu);
+
 
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,

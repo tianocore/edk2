@@ -18,12 +18,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <FrameworkDxe.h>
+#include <PiDxe.h>
 #include <Protocol/Cpu.h>
-#include <Protocol/DataHub.h>
-#include <Guid/DataHubRecords.h>
 #include <Protocol/CpuIo2.h>
-#include <Protocol/FrameworkHii.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>

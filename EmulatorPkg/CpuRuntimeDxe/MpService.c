@@ -1308,35 +1308,33 @@ CpuReadToBootFunction (
 
 EFI_STATUS
 CpuMpServicesInit (
-  VOID
+  OUT UINTN *MaxCpus
   )
 {
   EFI_STATUS              Status;
   EFI_HANDLE              Handle;
   EMU_IO_THUNK_PROTOCOL   *IoThunk;
-  UINTN                   MaxCpus;
 
-  MaxCpus = 1; // BSP
-
+  *MaxCpus = 1; // BSP
   IoThunk = GetIoThunkInstance (&gEmuThreadThunkProtocolGuid, 0);
   if (IoThunk != NULL) {
     Status = IoThunk->Open (IoThunk);
     if (!EFI_ERROR (Status)) {
       if (IoThunk->ConfigString != NULL) {
-        MaxCpus += StrDecimalToUintn (IoThunk->ConfigString);
+        *MaxCpus += StrDecimalToUintn (IoThunk->ConfigString);
         gThread = IoThunk->Interface;
       }
     }
   }
 
-  if (MaxCpus == 1) {
+  if (*MaxCpus == 1) {
     // We are not MP so nothing to do
     return EFI_SUCCESS;
   }
 
   gPollInterval = PcdGet64 (PcdEmuMpServicesPollingInterval);
 
-  Status  = InitializeMpSystemData (MaxCpus);
+  Status  = InitializeMpSystemData (*MaxCpus);
   if (EFI_ERROR (Status)) {
     return Status;
   }

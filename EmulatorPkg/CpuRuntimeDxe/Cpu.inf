@@ -34,14 +34,12 @@
   CpuIo.c
   Cpu.c
   CpuDriver.h
-  Strings.uni
   MpService.c
 
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
   EmulatorPkg/EmulatorPkg.dec
 
 
@@ -60,7 +58,6 @@
 [Protocols]
   gEmuIoThunkProtocolGuid                       # PROTOCOL_NOTIFY SOMETIMES_CONSUMED
   gEfiSmbiosProtocolGuid                        # PROTOCOL SOMETIMES_CONSUMED
-  gEfiHiiProtocolGuid                           # PROTOCOL SOMETIMES_CONSUMED
   gEfiCpuIo2ProtocolGuid                        # PROTOCOL ALWAYS_PRODUCED
   gEfiCpuArchProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
   gEmuThreadThunkProtocolGuid
