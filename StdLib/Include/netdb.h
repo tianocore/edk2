@@ -1,8 +1,16 @@
-/*	$NetBSD: netdb.h,v 1.55.2.1 2007/05/17 21:25:10 jdc Exp $	*/
+/** @file
 
-/*
+    Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+    This program and the accompanying materials
+    are licensed and made available under the terms and conditions of the BSD License
+    which accompanies this distribution.  The full text of the license may be found at
+    http://opensource.org/licenses/bsd-license.php
+
+    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
  * Copyright (c) 1980, 1983, 1988, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -77,16 +85,12 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  * -
- * --Copyright--
+ *      @(#)netdb.h 8.1 (Berkeley) 6/2/93
+ *      netdb.h,v 1.15.18.6 2006/10/02 01:23:09 marka Exp
+ *      netdb.h,v 1.55.2.1 2007/05/17 21:25:10 jdc Exp
  */
-
-/*
- *      @(#)netdb.h	8.1 (Berkeley) 6/2/93
- *	Id: netdb.h,v 1.15.18.6 2006/10/02 01:23:09 marka Exp
- */
-
 #ifndef _NETDB_H_
-#define	_NETDB_H_
+#define _NETDB_H_
 
 #include <machine/ansi.h>
 #include <machine/endian_machdep.h>
@@ -95,72 +99,64 @@
 #include <sys/featuretest.h>
 #include <inttypes.h>
 #include <paths.h>
-/*
- * Data types
- */
+
+/* Data types */
 #ifndef socklen_t
-typedef __socklen_t	socklen_t;
-#define	socklen_t	__socklen_t
+typedef __socklen_t socklen_t;
+#define socklen_t   __socklen_t
 #endif
 
 #ifdef _EFI_SIZE_T_
   typedef _EFI_SIZE_T_  size_t;
-  #undef _EFI_SIZE_T_
-  #undef _BSD_SIZE_T_
+  #undef  _EFI_SIZE_T_
+  #undef  _BSD_SIZE_T_
 #endif
 
 __BEGIN_DECLS
 extern int h_errno;
 __END_DECLS
 
-/*%
- * Structures returned by network data base library.  All addresses are
- * supplied in host order, and returned in network order (suitable for
- * use in system calls).
+/** Structures returned by network data base library.  All addresses are
+ *  supplied in host order, and returned in network order (suitable for
+ *  use in system calls).
  */
-struct	hostent {
-	char	*h_name;	/*%< official name of host */
-	char	**h_aliases;	/*%< alias list */
-	int	h_addrtype;	/*%< host address type */
-	int	h_length;	/*%< length of address */
-	char	**h_addr_list;	/*%< list of addresses from name server */
-#define	h_addr	h_addr_list[0]	/*%< address, for backward compatiblity */
+struct  hostent {
+  char   *h_name;       /**< official name of host */
+  char  **h_aliases;    /**< alias list */
+  int     h_addrtype;   /**< host address type */
+  int     h_length;     /**< length of address */
+  char  **h_addr_list;  /**< list of addresses from name server */
 };
+#define h_addr  h_addr_list[0]  /**< address, for backward compatiblity */
 
-/*%
- * Assumption here is that a network number
- * fits in an unsigned long -- probably a poor one.
+/** Assumption here is that a network number
+ *  fits in an unsigned long -- probably a poor one.
  */
-struct	netent {
-	char		*n_name;	/*%< official name of net */
-	char		**n_aliases;	/*%< alias list */
-	int		n_addrtype;	/*%< net address type */
-#if (defined(__sparc__) && defined(_LP64)) || \
-    (defined(__sh__) && defined(_LP64) && (_BYTE_ORDER == _BIG_ENDIAN))
-	int		__n_pad0;	/* ABI compatibility */
-#endif
-	uint32_t	n_net;		/*%< network # */
+struct  netent {
+  char     *n_name;     /**< official name of net */
+  char    **n_aliases;  /**< alias list */
+  int       n_addrtype; /**< net address type */
+  uint32_t  n_net;      /**< network # */
 #if defined(__alpha__) || (defined(__i386__) && defined(_LP64)) || \
     (defined(__sh__) && defined(_LP64) && (_BYTE_ORDER == _LITTLE_ENDIAN))
-	int		__n_pad0;	/* ABI compatibility */
+  int       __n_pad0;   /* ABI compatibility */
 #endif
 };
 
-struct	servent {
-	char	*s_name;	/*%< official service name */
-	char	**s_aliases;	/*%< alias list */
-	int	s_port;		/*%< port # */
-	char	*s_proto;	/*%< protocol to use */
+struct  servent {
+  char   *s_name;     /**< official service name */
+  char  **s_aliases;  /**< alias list */
+  int     s_port;     /**< port # */
+  char   *s_proto;    /**< protocol to use */
 };
 
-struct	protoent {
-	char	*p_name;	/*%< official protocol name */
-	char	**p_aliases;	/*%< alias list */
-	int	p_proto;	/*%< protocol # */
+struct  protoent {
+  char   *p_name;     /**< official protocol name */
+  char  **p_aliases;  /**< alias list */
+  int     p_proto;    /**< protocol # */
 };
 
-/*
- * Note: ai_addrlen used to be a size_t, per RFC 2553.
+/* Note: ai_addrlen used to be a size_t, per RFC 2553.
  * In XNS5.2, and subsequently in POSIX-2001 and
  * draft-ietf-ipngwg-rfc2553bis-02.txt it was changed to a socklen_t.
  * To accommodate for this while preserving binary compatibility with the
@@ -170,169 +166,104 @@ struct	protoent {
  * This should be deleted the next time the libc major number is
  * incremented.
  */
-#if (_POSIX_C_SOURCE - 0) >= 200112L || (_XOPEN_SOURCE - 0) >= 520 || \
-    defined(_NETBSD_SOURCE)
 struct addrinfo {
-	int		ai_flags;	/*%< AI_PASSIVE, AI_CANONNAME */
-	int		ai_family;	/*%< PF_xxx */
-	int		ai_socktype;	/*%< SOCK_xxx */
-	int		ai_protocol;	/*%< 0 or IPPROTO_xxx for IPv4 and IPv6 */
-#if defined(__sparc__) && defined(_LP64)
-	int		__ai_pad0;	/* ABI compatibility */
-#endif
-	socklen_t	 ai_addrlen;	/*%< length of ai_addr */
+  int               ai_flags;     /**< AI_PASSIVE, AI_CANONNAME */
+  int               ai_family;    /**< PF_xxx */
+  int               ai_socktype;  /**< SOCK_xxx */
+  int               ai_protocol;  /**< 0 or IPPROTO_xxx for IPv4 and IPv6 */
+  socklen_t         ai_addrlen;   /**< length of ai_addr */
 #if defined(__alpha__) || (defined(__i386__) && defined(_LP64))
-	int		__ai_pad0;	/* ABI compatibility */
+  int               __ai_pad0;    /* ABI compatibility */
 #endif
-	char		*ai_canonname;	/*%< canonical name for hostname */
-	struct sockaddr	*ai_addr; 	/*%< binary address */
-	struct addrinfo	*ai_next; 	/*%< next structure in linked list */
+  char             *ai_canonname; /**< canonical name for hostname */
+  struct sockaddr  *ai_addr;      /**< binary address */
+  struct addrinfo  *ai_next;      /**< next structure in linked list */
 };
-#endif
 
-/*%
- * Error return codes from gethostbyname() and gethostbyaddr()
+/* Error return codes from gethostbyname() and gethostbyaddr()
  * (left in extern int h_errno).
- */
+*/
 
-#if defined(_NETBSD_SOURCE)
-#define	NETDB_INTERNAL	-1	/*%< see errno */
-#define	NETDB_SUCCESS	0	/*%< no problem */
-#endif
-#define	NO_ADDRESS	NO_DATA		/* no address, look for MX record */
-#define	HOST_NOT_FOUND	1 /*%< Authoritative Answer Host not found */
-#define	TRY_AGAIN	2 /*%< Non-Authoritive Host not found, or SERVERFAIL */
-#define	NO_RECOVERY	3 /*%< Non recoverable errors, FORMERR, REFUSED, NOTIMP */
-#define	NO_DATA		4 /*%< Valid name, no data record of requested type */
+#define NETDB_INTERNAL   -1         /**< see errno */
+#define NETDB_SUCCESS     0         /**< no problem */
+#define NO_ADDRESS        NO_DATA   /* no address, look for MX record */
+#define HOST_NOT_FOUND    1         /**< Authoritative Answer Host not found */
+#define TRY_AGAIN         2         /**< Non-Authoritive Host not found, or SERVERFAIL */
+#define NO_RECOVERY       3         /**< Non recoverable errors, FORMERR, REFUSED, NOTIMP */
+#define NO_DATA           4         /**< Valid name, no data record of requested type */
 
-/*
- * Error return codes from getaddrinfo()
- */
-#if 0  //  Not supported by UEFI
-#if (_POSIX_C_SOURCE - 0) >= 200112L || (_XOPEN_SOURCE - 0) >= 520 || \
-    defined(_NETBSD_SOURCE)
-#define	EAI_ADDRFAMILY	 1	/*%< address family for hostname not supported */
-#define	EAI_AGAIN	 2	/*%< temporary failure in name resolution */
-#define	EAI_BADFLAGS	 3	/*%< invalid value for ai_flags */
-#define	EAI_FAIL	 4	/*%< non-recoverable failure in name resolution */
-#define	EAI_FAMILY	 5	/*%< ai_family not supported */
-#define	EAI_MEMORY	 6	/*%< memory allocation failure */
-#define	EAI_NODATA	 7	/*%< no address associated with hostname */
-#define	EAI_NONAME	 8	/*%< hostname nor servname provided, or not known */
-#define	EAI_SERVICE	 9	/*%< servname not supported for ai_socktype */
-#define	EAI_SOCKTYPE	10	/*%< ai_socktype not supported */
-#define	EAI_SYSTEM	11	/*%< system error returned in errno */
-#define	EAI_BADHINTS	12	/* invalid value for hints */
-#define	EAI_PROTOCOL	13	/* resolved protocol is unknown */
-#define	EAI_OVERFLOW	14	/* argument buffer overflow */
-#define	EAI_MAX		15
-#endif /* _POSIX_C_SOURCE >= 200112 || _XOPEN_SOURCE >= 520 || _NETBSD_SOURCE */
-#endif  // 0  Not supported by UEFI
+/* Error return codes from getaddrinfo() */
+#define EAI_ADDRFAMILY    1   /**< address family for hostname not supported */
+#define EAI_AGAIN         2   /**< temporary failure in name resolution */
+#define EAI_BADFLAGS      3   /**< invalid value for ai_flags */
+#define EAI_FAIL          4   /**< non-recoverable failure in name resolution */
+#define EAI_FAMILY        5   /**< ai_family not supported */
+#define EAI_MEMORY        6   /**< memory allocation failure */
+#define EAI_NODATA        7   /**< no address associated with hostname */
+#define EAI_NONAME        8   /**< hostname nor servname provided, or not known */
+#define EAI_SERVICE       9   /**< servname not supported for ai_socktype */
+#define EAI_SOCKTYPE      10  /**< ai_socktype not supported */
+#define EAI_SYSTEM        11  /**< system error returned in errno */
+#define EAI_BADHINTS      12  /**< invalid value for hints */
+#define EAI_PROTOCOL      13  /**< resolved protocol is unknown */
+#define EAI_OVERFLOW      14  /**< argument buffer overflow */
+#define EAI_MAX           15
 
-/*%
- * Flag values for getaddrinfo()
- */
-#if 0  //  Not supported by UEFI
-#if (_POSIX_C_SOURCE - 0) >= 200112L || (_XOPEN_SOURCE - 0) >= 520 || \
-    defined(_NETBSD_SOURCE)
-#define	AI_PASSIVE	0x00000001 /* get address to use bind() */
-#endif
-#endif  // 0  Not supported by UEFI
+/* Flag values for getaddrinfo() */
+#define AI_PASSIVE      0x00000001  /* get address to use bind() */
+#define AI_CANONNAME    0x00000002  /* fill ai_canonname */
 
-#define AI_CANONNAME  0x00000002 /* fill ai_canonname */
-
-#if 0  //  Not supported by UEFI
-#if (_POSIX_C_SOURCE - 0) >= 200112L || (_XOPEN_SOURCE - 0) >= 520 || \
-    defined(_NETBSD_SOURCE)
-#define	AI_NUMERICHOST	0x00000004 /* prevent host name resolution */
-#define	AI_NUMERICSERV	0x00000008 /* prevent service name resolution */
+#define AI_NUMERICHOST  0x00000004  /* prevent host name resolution */
+#define AI_NUMERICSERV  0x00000008  /* prevent service name resolution */
 /* valid flags for addrinfo (not a standard def, apps should not use it) */
-#define	AI_MASK	\
-    (AI_PASSIVE | AI_CANONNAME | AI_NUMERICHOST | AI_NUMERICSERV)
-#endif
-#endif  // 0  Not supported by UEFI
+#define AI_MASK         (AI_PASSIVE | AI_CANONNAME | AI_NUMERICHOST | AI_NUMERICSERV)
 
-/*%
- * Constants for getnameinfo()
- */
-////#if defined(_NETBSD_SOURCE)
-#define	NI_MAXHOST	1025
-#define	NI_MAXSERV	32
-////#endif
+/* Constants for getnameinfo() */
+#define NI_MAXHOST      1025
+#define NI_MAXSERV      32
 
-/*%
- * Flag values for getnameinfo()
- */
-////#define	NI_NOFQDN	0x00000001
+/* Flag values for getnameinfo() */
+#define NI_NOFQDN       0x00000001
 #define NI_NUMERICHOST  0x00000002
-////#define	NI_NAMEREQD	0x00000004
+#define NI_NAMEREQD     0x00000004
 #define NI_NUMERICSERV  0x00000008
-////#define	NI_DGRAM	0x00000010
-////#define	NI_NUMERICSCOPE	0x00000040
+#define NI_DGRAM        0x00000010
+#define NI_NUMERICSCOPE 0x00000040
 
-#if 0  //  Not supported by UEFI
-#if (_POSIX_C_SOURCE - 0) >= 200112L || (_XOPEN_SOURCE - 0) >= 520 || \
-    defined(_NETBSD_SOURCE)
-/*%
- * Scope delimit character
- */
-#if defined(_NETBSD_SOURCE)
-#define	SCOPE_DELIMITER	'%'
-#endif
-#endif /* (_POSIX_C_SOURCE - 0) >= 200112L || ... */
-#endif  // 0  Not supported by UEFI
+/** Scope delimit character */
+#define SCOPE_DELIMITER '%'
 
 __BEGIN_DECLS
-void		endhostent(void);
-void		endnetent(void);
-void		endprotoent(void);
-void		endservent(void);
-#if 0  //  Not supported by UEFI
-#if (_XOPEN_SOURCE - 0) >= 520 && (_XOPEN_SOURCE - 0) < 600 || \
-    defined(_NETBSD_SOURCE)
-#if 0 /* we do not ship this */
-void		freehostent(struct hostent *);
-#endif
-#endif
-#endif  // 0  Not supported by UEFI
-struct hostent	*gethostbyaddr(const char *, socklen_t, int);
-struct hostent	*gethostbyname(const char *);
-#if defined(_NETBSD_SOURCE)
-struct hostent	*gethostbyname2(const char *, int);
-#endif
-struct hostent	*gethostent(void);
-struct netent	*getnetbyaddr(uint32_t, int);
-struct netent	*getnetbyname(const char *);
-struct netent	*getnetent(void);
-struct protoent	*getprotobyname(const char *);
-struct protoent	*getprotobynumber(int);
-struct protoent	*getprotoent(void);
-struct servent	*getservbyname(const char *, const char *);
-struct servent	*getservbyport(int, const char *);
-struct servent	*getservent(void);
-////#if defined(_NETBSD_SOURCE)
-////void		herror(const char *);
-////const char	*hstrerror(int);
-////#endif
-void		sethostent(int);
-////#if defined(_NETBSD_SOURCE)
-/* void		sethostfile(const char *); */
-////#endif
-void		setnetent(int);
-void		setprotoent(int);
-#if (_POSIX_C_SOURCE - 0) >= 200112L || (_XOPEN_SOURCE - 0) >= 520 || \
-    defined(_NETBSD_SOURCE)
-void		setservent(int);
-int		getaddrinfo(const char * __restrict, const char * __restrict,
-				 const struct addrinfo * __restrict,
-				 struct addrinfo ** __restrict);
-int		getnameinfo(const struct sockaddr * __restrict, socklen_t,
-				 char * __restrict, socklen_t,
-				 char * __restrict, socklen_t, int);
-void		freeaddrinfo(struct addrinfo *);
-const char	*gai_strerror(int);
-#endif
-void		setservent(int);
+void              endhostent      (void);
+void              endnetent       (void);
+void              endprotoent     (void);
+void              endservent      (void);
+struct hostent   *gethostbyaddr   (const char *, socklen_t, int);
+struct hostent   *gethostbyname   (const char *);
+struct hostent   *gethostbyname2  (const char *, int);
+struct hostent   *gethostent      (void);
+struct netent    *getnetbyaddr    (uint32_t, int);
+struct netent    *getnetbyname    (const char *);
+struct netent    *getnetent       (void);
+struct protoent  *getprotobyname  (const char *);
+struct protoent  *getprotobynumber(int);
+struct protoent  *getprotoent     (void);
+struct servent   *getservbyname   (const char *, const char *);
+struct servent   *getservbyport   (int, const char *);
+struct servent   *getservent      (void);
+void              sethostent      (int);
+void              setnetent       (int);
+void              setprotoent     (int);
+void              setservent      (int);
+int               getaddrinfo     ( const char * __restrict, const char * __restrict,
+                                    const struct addrinfo * __restrict,
+                                    struct addrinfo ** __restrict);
+int               getnameinfo     ( const struct sockaddr * __restrict, socklen_t,
+                                    char * __restrict, socklen_t,
+                                    char * __restrict, socklen_t, int);
+void              freeaddrinfo    (struct addrinfo *);
+const char       *gai_strerror    (int);
+void              setservent      (int);
 
 __END_DECLS
 
