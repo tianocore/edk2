@@ -34,19 +34,19 @@
   LibString
   LibStdio
   LibGdtoa
-  LibWchar
   LibMath
+  LibWchar
   LibGen
   LibNetUtil
-  DevShell
   BsdSocketLib
   EfiSocketLib
+  DevShell
 
 [Sources]
 #EFI -- EFI specific code
   Efi/config.c
-  Efi/getpath.c
   Efi/edk2module.c
+  Efi/getpath.c
 
 #Parser
   Python-2.7.2/Parser/acceler.c
@@ -63,6 +63,10 @@
   Python-2.7.2/Parser/tokenizer.c
 
 #Python
+  PyMod-2.7.2/Python/getcopyright.c
+  PyMod-2.7.2/Python/import.c
+  PyMod-2.7.2/Python/marshal.c
+
   Python-2.7.2/Python/_warnings.c
   Python-2.7.2/Python/asdl.c
   Python-2.7.2/Python/ast.c
@@ -79,14 +83,11 @@
   Python-2.7.2/Python/future.c
   Python-2.7.2/Python/getargs.c
   Python-2.7.2/Python/getcompiler.c
-  Python-2.7.2/Python/getcopyright.c
   Python-2.7.2/Python/getopt.c
   Python-2.7.2/Python/getplatform.c
   Python-2.7.2/Python/getversion.c
   Python-2.7.2/Python/graminit.c
-  Python-2.7.2/Python/import.c
   Python-2.7.2/Python/importdl.c
-  Python-2.7.2/Python/marshal.c
   Python-2.7.2/Python/modsupport.c
   Python-2.7.2/Python/mysnprintf.c
   Python-2.7.2/Python/mystrtoul.c
@@ -111,47 +112,42 @@
   Python-2.7.2/Modules/python.c
   Python-2.7.2/Modules/getbuildinfo.c
 
-  Python-2.7.2/Modules/arraymodule.c
-  Python-2.7.2/Modules/binascii.c
-  Python-2.7.2/Modules/errnomodule.c
-  Python-2.7.2/Modules/gcmodule.c
-  Python-2.7.2/Modules/signalmodule.c
-  Python-2.7.2/Modules/operator.c
-  Python-2.7.2/Modules/_weakref.c
-  Python-2.7.2/Modules/mathmodule.c
-  Python-2.7.2/Modules/_math.c
-  Python-2.7.2/Modules/timemodule.c
-  Python-2.7.2/Modules/datetimemodule.c
-  Python-2.7.2/Modules/cStringIO.c
-  Python-2.7.2/Modules/_codecsmodule.c
-  Python-2.7.2/Modules/_randommodule.c
-  Python-2.7.2/Modules/xxsubtype.c
-
-  Python-2.7.2/Modules/_heapqmodule.c
-  Python-2.7.2/Modules/itertoolsmodule.c
-  Python-2.7.2/Modules/_collectionsmodule.c
-  Python-2.7.2/Modules/_sre.c
-  Python-2.7.2/Modules/parsermodule.c
-  Python-2.7.2/Modules/_struct.c
-  Python-2.7.2/Modules/cPickle.c
-  Python-2.7.2/Modules/_functoolsmodule.c
-  Python-2.7.2/Modules/cmathmodule.c
-  Python-2.7.2/Modules/_json.c
+  PyMod-2.7.2/Modules/_sre.c
+  PyMod-2.7.2/Modules/errnomodule.c
+  PyMod-2.7.2/Modules/selectmodule.c
 
   Python-2.7.2/Modules/_bisectmodule.c
+  Python-2.7.2/Modules/_codecsmodule.c
+  Python-2.7.2/Modules/_collectionsmodule.c
+  Python-2.7.2/Modules/_functoolsmodule.c
+  Python-2.7.2/Modules/_heapqmodule.c
+  Python-2.7.2/Modules/_json.c
+  Python-2.7.2/Modules/_math.c
+  Python-2.7.2/Modules/_randommodule.c
+  Python-2.7.2/Modules/_struct.c
+  Python-2.7.2/Modules/_weakref.c
+  Python-2.7.2/Modules/arraymodule.c
+  Python-2.7.2/Modules/binascii.c
+  Python-2.7.2/Modules/cmathmodule.c
+  Python-2.7.2/Modules/cPickle.c
+  Python-2.7.2/Modules/cStringIO.c
+  Python-2.7.2/Modules/datetimemodule.c
   Python-2.7.2/Modules/future_builtins.c
+  Python-2.7.2/Modules/gcmodule.c
+  Python-2.7.2/Modules/itertoolsmodule.c
+  Python-2.7.2/Modules/mathmodule.c
   Python-2.7.2/Modules/md5.c
   Python-2.7.2/Modules/md5module.c
+  Python-2.7.2/Modules/operator.c
+  Python-2.7.2/Modules/parsermodule.c
   Python-2.7.2/Modules/shamodule.c
   Python-2.7.2/Modules/sha256module.c
   Python-2.7.2/Modules/sha512module.c
-  Python-2.7.2/Modules/stropmodule.c
-
-  # Socket related modules
-#  Python-$(PYTHON_VERSION)/Modules/getaddrinfo.c       # included by socketmodule.c
-#  Python-$(PYTHON_VERSION)/Modules/getnameinfo.c       # included by socketmodule.c
-  Python-2.7.2/Modules/selectmodule.c
+  Python-2.7.2/Modules/signalmodule.c
   Python-2.7.2/Modules/socketmodule.c
+  Python-2.7.2/Modules/stropmodule.c
+  Python-2.7.2/Modules/timemodule.c
+  Python-2.7.2/Modules/xxsubtype.c
 
 #  Python-$(PYTHON_VERSION)/Modules/imageop.c
 #  Python-$(PYTHON_VERSION)/Modules/_csv.c

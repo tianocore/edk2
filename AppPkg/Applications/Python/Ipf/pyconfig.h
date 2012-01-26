@@ -1,9 +1,24 @@
-/* pyconfig.h.in.  Generated from configure.in by autoheader.  */
+/** @file
+    Manually generated Python Configuration file for EDK II.
 
+    Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+    This program and the accompanying materials are licensed and made available under
+    the terms and conditions of the BSD License that accompanies this distribution.
+    The full text of the license may be found at
+    http://opensource.org/licenses/bsd-license.
 
+    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+**/
 #ifndef Py_PYCONFIG_H
 #define Py_PYCONFIG_H
 
+#include  <Uefi.h>
+
+/* Define to indicate that code is being built to run in the UEFI Environment. */
+#define UEFI_ENV    EFI_SYSTEM_TABLE_REVISION
+
+#define PLATFORM    "UEFI"
 
 /* Define if building universal (internal helper macro) */
 #undef AC_APPLE_UNIVERSAL_BUILD
@@ -89,16 +104,16 @@
 #undef HAVE_BROKEN_POLL
 
 /* Define if the Posix semaphores do not work on your system */
-#define HAVE_BROKEN_POSIX_SEMAPHORES
+#define HAVE_BROKEN_POSIX_SEMAPHORES  1
 
 /* Define if pthread_sigmask() does not work on your system. */
-#define HAVE_BROKEN_PTHREAD_SIGMASK
+#define HAVE_BROKEN_PTHREAD_SIGMASK   1
 
 /* define to 1 if your sem_getvalue is broken. */
-#undef HAVE_BROKEN_SEM_GETVALUE
+#define HAVE_BROKEN_SEM_GETVALUE      1
 
 /* Define this if you have the type _Bool. */
-#define HAVE_C99_BOOL
+#define HAVE_C99_BOOL                 1
 
 /* Define to 1 if you have the `chflags' function. */
 #undef HAVE_CHFLAGS
@@ -110,7 +125,7 @@
 #undef HAVE_CHROOT
 
 /* Define to 1 if you have the `clock' function. */
-#define HAVE_CLOCK
+#define HAVE_CLOCK                    1
 
 /* Define to 1 if you have the `confstr' function. */
 #undef HAVE_CONFSTR
@@ -119,7 +134,7 @@
 #undef HAVE_CONIO_H
 
 /* Define to 1 if you have the `copysign' function. */
-#define HAVE_COPYSIGN   1
+#undef HAVE_COPYSIGN
 
 /* Define to 1 if you have the `ctermid' function. */
 #undef HAVE_CTERMID
@@ -169,7 +184,7 @@
 
 /* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
    */
-#undef HAVE_DIRENT_H
+#define HAVE_DIRENT_H   1
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
@@ -269,10 +284,10 @@
 #undef HAVE_GETADDRINFO
 
 /* Define to 1 if you have the `getcwd' function. */
-#undef HAVE_GETCWD
+#define HAVE_GETCWD   1
 
 /* Define this if you have flockfile(), getc_unlocked(), and funlockfile() */
-#define HAVE_GETC_UNLOCKED
+#undef HAVE_GETC_UNLOCKED
 
 /* Define to 1 if you have the `getgroups' function. */
 #undef HAVE_GETGROUPS
@@ -308,7 +323,7 @@
 #undef HAVE_GETPAGESIZE
 
 /* Define to 1 if you have the `getpeername' function. */
-#undef HAVE_GETPEERNAME
+#define HAVE_GETPEERNAME  1
 
 /* Define to 1 if you have the `getpgid' function. */
 #undef HAVE_GETPGID
@@ -359,10 +374,10 @@
 #undef HAVE_IEEEFP_H
 
 /* Define if you have the 'inet_aton' function. */
-#undef HAVE_INET_ATON
+#define HAVE_INET_ATON    1
 
 /* Define if you have the 'inet_pton' function. */
-#undef HAVE_INET_PTON
+#define HAVE_INET_PTON    1
 
 /* Define to 1 if you have the `initgroups' function. */
 #undef HAVE_INITGROUPS
@@ -383,7 +398,7 @@
 #undef HAVE_KQUEUE
 
 /* Define to 1 if you have the <langinfo.h> header file. */
-#define HAVE_LANGINFO_H   1
+#undef HAVE_LANGINFO_H   /* non-functional in EFI. */
 
 /* Defined to enable large file support when an off_t is bigger than a long
    and long long is available and at least as big as an off_t. You may need to
@@ -437,10 +452,10 @@
 #undef HAVE_LOG1P
 
 /* Define this if you have the type long double. */
-#define HAVE_LONG_DOUBLE
+#undef HAVE_LONG_DOUBLE
 
 /* Define this if you have the type long long. */
-#define HAVE_LONG_LONG
+#define HAVE_LONG_LONG  1
 
 /* Define to 1 if you have the `lstat' function. */
 #define HAVE_LSTAT      1
@@ -494,7 +509,7 @@
 #undef HAVE_PLOCK
 
 /* Define to 1 if you have the `poll' function. */
-#undef HAVE_POLL
+#define HAVE_POLL         1
 
 /* Define to 1 if you have the <poll.h> header file. */
 #undef HAVE_POLL_H
@@ -503,7 +518,7 @@
 #undef HAVE_PROCESS_H
 
 /* Define if your compiler supports function prototype */
-#define HAVE_PROTOTYPES
+#define HAVE_PROTOTYPES   1
 
 /* Define if you have GNU PTH threads. */
 #undef HAVE_PTH
@@ -530,7 +545,7 @@
 #undef HAVE_READLINK
 
 /* Define to 1 if you have the `realpath' function. */
-#undef HAVE_REALPATH
+#define HAVE_REALPATH   1
 
 /* Define if you have readline 2.1 */
 #undef HAVE_RL_CALLBACK
@@ -557,7 +572,7 @@
 #undef HAVE_ROUND
 
 /* Define to 1 if you have the `select' function. */
-#undef HAVE_SELECT
+#define HAVE_SELECT       1
 
 /* Define to 1 if you have the `sem_getvalue' function. */
 #undef HAVE_SEM_GETVALUE
@@ -614,7 +629,7 @@
 #undef HAVE_SETUID
 
 /* Define to 1 if you have the `setvbuf' function. */
-#undef HAVE_SETVBUF
+#define HAVE_SETVBUF    1
 
 /* Define to 1 if you have the <shadow.h> header file. */
 #undef HAVE_SHADOW_H
@@ -647,7 +662,7 @@
 #undef HAVE_SPAWN_H
 
 /* Define if your compiler provides ssize_t */
-#undef HAVE_SSIZE_T
+#define HAVE_SSIZE_T    1
 
 /* Define to 1 if you have the `statvfs' function. */
 #undef HAVE_STATVFS
@@ -660,7 +675,7 @@
 
 /* Define if your compiler supports variable length function prototypes (e.g.
    void fprintf(FILE *, char *, ...);) *and* <stdarg.h> */
-#define HAVE_STDARG_PROTOTYPES
+#define HAVE_STDARG_PROTOTYPES          1
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #define HAVE_STDINT_H   1
@@ -756,16 +771,16 @@
 #define HAVE_SYS_PARAM_H    1
 
 /* Define to 1 if you have the <sys/poll.h> header file. */
-#undef HAVE_SYS_POLL_H
+#define HAVE_SYS_POLL_H                 1
 
 /* Define to 1 if you have the <sys/resource.h> header file. */
 #define HAVE_SYS_RESOURCE_H   1
 
 /* Define to 1 if you have the <sys/select.h> header file. */
-#undef HAVE_SYS_SELECT_H
+#define HAVE_SYS_SELECT_H               1
 
 /* Define to 1 if you have the <sys/socket.h> header file. */
-#undef HAVE_SYS_SOCKET_H
+#define HAVE_SYS_SOCKET_H               1
 
 /* Define to 1 if you have the <sys/statvfs.h> header file. */
 #undef HAVE_SYS_STATVFS_H
@@ -804,7 +819,7 @@
 #define HAVE_TEMPNAM      1
 
 /* Define to 1 if you have the <termios.h> header file. */
-#define HAVE_TERMIOS_H    1
+#undef HAVE_TERMIOS_H
 
 /* Define to 1 if you have the <term.h> header file. */
 #undef HAVE_TERM_H
@@ -851,7 +866,7 @@
 #undef HAVE_UNAME
 
 /* Define to 1 if you have the <unistd.h> header file. */
-#undef HAVE_UNISTD_H
+#define HAVE_UNISTD_H                   1
 
 /* Define to 1 if you have the `unsetenv' function. */
 #undef HAVE_UNSETENV
@@ -859,7 +874,7 @@
 /* Define if you have a useable wchar_t type defined in wchar.h; useable means
    wchar_t must be an unsigned type with at least 16 bits. (see
    Include/unicodeobject.h). */
-#define HAVE_USABLE_WCHAR_T
+#define HAVE_USABLE_WCHAR_T             1
 
 /* Define to 1 if you have the <util.h> header file. */
 #undef HAVE_UTIL_H
@@ -868,7 +883,7 @@
 #undef HAVE_UTIMES
 
 /* Define to 1 if you have the <utime.h> header file. */
-#undef HAVE_UTIME_H
+#define HAVE_UTIME_H    1
 
 /* Define to 1 if you have the `wait3' function. */
 #undef HAVE_WAIT3
@@ -880,14 +895,14 @@
 #undef HAVE_WAITPID
 
 /* Define if the compiler provides a wchar.h header file. */
-#define HAVE_WCHAR_H
+#define HAVE_WCHAR_H    1
 
 /* Define to 1 if you have the `wcscoll' function. */
-#undef HAVE_WCSCOLL
+#define HAVE_WCSCOLL    1
 
 /* Define if tzset() actually switches the local timezone in a meaningful way.
    */
-#define HAVE_WORKING_TZSET
+#undef HAVE_WORKING_TZSET
 
 /* Define if the zlib library has inflateCopy */
 #undef HAVE_ZLIB_COPY
@@ -913,25 +928,25 @@
 #undef MVWDELCH_IS_EXPRESSION
 
 /* Define to the address where bug reports for this package should be sent. */
-#undef PACKAGE_BUGREPORT
+#define PACKAGE_BUGREPORT   "edk2-devel@lists.sourceforge.net"
 
 /* Define to the full name of this package. */
-#define PACKAGE_NAME    EDK II Python Package
+#define PACKAGE_NAME    "EDK II Python Package"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING  EDK II Python Package V0.1
+#define PACKAGE_STRING  "EDK II Python Package V0.2"
 
 /* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME   UDK_Python
+#define PACKAGE_TARNAME   "EADK_Python"
 
 /* Define to the home page for this package. */
-#define PACKAGE_URL   http://edk2.tianocore.org/toolkit/python
+#define PACKAGE_URL   "http://edk2.tianocore.org/toolkit/python"
 
 /* Define to the version of this package. */
-#undef PACKAGE_VERSION  V0.1
+#define PACKAGE_VERSION  "V0.2"
 
 /* Define if POSIX semaphores aren't enabled on your system */
-#define POSIX_SEMAPHORES_NOT_ENABLED
+#define POSIX_SEMAPHORES_NOT_ENABLED    1
 
 /* Defined if PTHREAD_SCOPE_SYSTEM supported. */
 #undef PTHREAD_SYSTEM_SCHED_SUPPORTED
@@ -940,13 +955,13 @@
 #undef PYLONG_BITS_IN_DIGIT
 
 /* Define to printf format modifier for long long type */
-#undef PY_FORMAT_LONG_LONG
+#define PY_FORMAT_LONG_LONG   "ll"
 
 /* Define to printf format modifier for Py_ssize_t */
-#undef PY_FORMAT_SIZE_T
+#define PY_FORMAT_SIZE_T    "z"
 
 /* Define as the integral type used for Unicode representation. */
-#undef PY_UNICODE_TYPE
+#define PY_UNICODE_TYPE     wchar_t
 
 /* Define if you want to build an interpreter with many run-time checks. */
 #undef Py_DEBUG
@@ -973,55 +988,59 @@
 #undef SIGNED_RIGHT_SHIFT_ZERO_FILLS
 
 /* The size of `double', as computed by sizeof. */
-#undef SIZEOF_DOUBLE
+#define SIZEOF_DOUBLE     8
 
 /* The size of `float', as computed by sizeof. */
-#undef SIZEOF_FLOAT
+#define SIZEOF_FLOAT      4
 
 /* The size of `fpos_t', as computed by sizeof. */
-#undef SIZEOF_FPOS_T
+#define SIZEOF_FPOS_T     8
 
 /* The size of `int', as computed by sizeof. */
-#undef SIZEOF_INT
+#define SIZEOF_INT        4
 
 /* The size of `long', as computed by sizeof. */
-#undef SIZEOF_LONG
+#if defined(_MSC_VER)           /* Handle Microsoft VC++ compiler specifics. */
+#define SIZEOF_LONG       4
+#else
+#define SIZEOF_LONG       8
+#endif
 
 /* The size of `long double', as computed by sizeof. */
 #undef SIZEOF_LONG_DOUBLE
 
 /* The size of `long long', as computed by sizeof. */
-#undef SIZEOF_LONG_LONG
+#define SIZEOF_LONG_LONG  8
 
 /* The size of `off_t', as computed by sizeof. */
-#undef SIZEOF_OFF_T
+#define SIZEOF_OFF_T      8
 
 /* The size of `pid_t', as computed by sizeof. */
-#undef SIZEOF_PID_T
+#define SIZEOF_PID_T      4
 
 /* The size of `pthread_t', as computed by sizeof. */
 #undef SIZEOF_PTHREAD_T
 
 /* The size of `short', as computed by sizeof. */
-#undef SIZEOF_SHORT
+#define SIZEOF_SHORT      2
 
 /* The size of `size_t', as computed by sizeof. */
-#undef SIZEOF_SIZE_T
+#define SIZEOF_SIZE_T     8
 
 /* The size of `time_t', as computed by sizeof. */
-#undef SIZEOF_TIME_T
+#define SIZEOF_TIME_T     4
 
 /* The size of `uintptr_t', as computed by sizeof. */
-#undef SIZEOF_UINTPTR_T
+#define SIZEOF_UINTPTR_T  8
 
 /* The size of `void *', as computed by sizeof. */
-#undef SIZEOF_VOID_P
+#define SIZEOF_VOID_P     8
 
 /* The size of `wchar_t', as computed by sizeof. */
-#undef SIZEOF_WCHAR_T
+#define SIZEOF_WCHAR_T    2
 
 /* The size of `_Bool', as computed by sizeof. */
-#undef SIZEOF__BOOL
+#define SIZEOF__BOOL      1
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS    1
@@ -1190,59 +1209,52 @@
 #undef __EXTENSIONS__
 
 /* Define to 'long' if <time.h> doesn't define. */
-#undef clock_t
+//#undef clock_t
 
 /* Define to empty if `const' does not conform to ANSI C. */
-#undef const
+//#undef const
 
 /* Define to `int' if <sys/types.h> doesn't define. */
-#undef gid_t
+//#undef gid_t
 
 /* Define to the type of a signed integer type of width exactly 32 bits if
    such a type exists and the standard includes do not define it. */
-#undef int32_t
+//#undef int32_t
 
 /* Define to the type of a signed integer type of width exactly 64 bits if
    such a type exists and the standard includes do not define it. */
-#undef int64_t
+//#undef int64_t
 
 /* Define to `int' if <sys/types.h> does not define. */
-#undef mode_t
+//#undef mode_t
 
 /* Define to `long int' if <sys/types.h> does not define. */
-#undef off_t
+//#undef off_t
 
 /* Define to `int' if <sys/types.h> does not define. */
-#undef pid_t
+//#undef pid_t
 
 /* Define to empty if the keyword does not work. */
-#undef signed
+//#undef signed
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
-#undef size_t
+//#undef size_t
 
 /* Define to `int' if <sys/socket.h> does not define. */
-#undef socklen_t
+//#undef socklen_t
 
 /* Define to `int' if <sys/types.h> doesn't define. */
-#undef uid_t
+//#undef uid_t
 
 /* Define to the type of an unsigned integer type of width exactly 32 bits if
    such a type exists and the standard includes do not define it. */
-#undef uint32_t
+//#undef uint32_t
 
 /* Define to the type of an unsigned integer type of width exactly 64 bits if
    such a type exists and the standard includes do not define it. */
-#undef uint64_t
+//#undef uint64_t
 
 /* Define to empty if the keyword does not work. */
-#undef volatile
-
-
-/* Define the macros needed if on a UnixWare 7.x system. */
-#if defined(__USLC__) && defined(__SCO_VERSION__)
-#define STRICT_SYSV_CURSES /* Don't use ncurses extensions */
-#endif
+//#undef volatile
 
 #endif /*Py_PYCONFIG_H*/
-

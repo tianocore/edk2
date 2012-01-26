@@ -10,16 +10,15 @@
     THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
     WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
-
-
 #ifndef Py_PYCONFIG_H
 #define Py_PYCONFIG_H
 
-#define PLATFORM    "UEFI 2.3 X64"
+#include  <Uefi.h>
 
-//#ifndef PYTHONPATH
-//# define PYTHONPATH "/Efi/StdLib/lib/python.27;/Efi/StdLib/lib/python.27/lib-dynload"
-//#endif
+/* Define to indicate that code is being built to run in the UEFI Environment. */
+#define UEFI_ENV    EFI_SYSTEM_TABLE_REVISION
+
+#define PLATFORM    "UEFI"
 
 /* Define if building universal (internal helper macro) */
 #undef AC_APPLE_UNIVERSAL_BUILD
@@ -185,7 +184,7 @@
 
 /* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
    */
-#undef HAVE_DIRENT_H
+#define HAVE_DIRENT_H   1
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
@@ -328,7 +327,7 @@
 #undef HAVE_GETPAGESIZE
 
 /* Define to 1 if you have the `getpeername' function. */
-#undef HAVE_GETPEERNAME
+#define HAVE_GETPEERNAME  1
 
 /* Define to 1 if you have the `getpgid' function. */
 #undef HAVE_GETPGID
@@ -514,10 +513,10 @@
 #undef HAVE_PLOCK
 
 /* Define to 1 if you have the `poll' function. */
-#undef HAVE_POLL
+#define HAVE_POLL         1
 
 /* Define to 1 if you have the <poll.h> header file. */
-#define HAVE_POLL_H     1
+#undef HAVE_POLL_H
 
 /* Define to 1 if you have the <process.h> header file. */
 #undef HAVE_PROCESS_H
@@ -550,7 +549,7 @@
 #undef HAVE_READLINK
 
 /* Define to 1 if you have the `realpath' function. */
-#undef HAVE_REALPATH
+#define HAVE_REALPATH   1
 
 /* Define if you have readline 2.1 */
 #undef HAVE_RL_CALLBACK
@@ -577,7 +576,7 @@
 #undef HAVE_ROUND
 
 /* Define to 1 if you have the `select' function. */
-#undef HAVE_SELECT
+#define HAVE_SELECT       1
 
 /* Define to 1 if you have the `sem_getvalue' function. */
 #undef HAVE_SEM_GETVALUE
@@ -824,7 +823,7 @@
 #define HAVE_TEMPNAM      1
 
 /* Define to 1 if you have the <termios.h> header file. */
-#define HAVE_TERMIOS_H    1
+#undef HAVE_TERMIOS_H
 
 /* Define to 1 if you have the <term.h> header file. */
 #undef HAVE_TERM_H
@@ -888,7 +887,7 @@
 #undef HAVE_UTIMES
 
 /* Define to 1 if you have the <utime.h> header file. */
-#undef HAVE_UTIME_H
+#define HAVE_UTIME_H    1
 
 /* Define to 1 if you have the `wait3' function. */
 #undef HAVE_WAIT3

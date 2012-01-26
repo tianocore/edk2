@@ -30,7 +30,7 @@ extern void initimageop(void);
 #endif
 extern void initmath(void);
 extern void init_md5(void);
-extern void initnt(void);
+extern void initedk2(void);
 extern void initoperator(void);
 extern void initsignal(void);
 extern void init_sha(void);
@@ -80,6 +80,9 @@ extern void init_ast(void);
 extern void init_io(void);
 extern void _PyWarnings_Init(void);
 
+extern void init_socket(void);
+extern void initselect(void);
+
 /* tools/freeze/makeconfig.py marker for additional "extern" */
 /* -- ADDMODULE MARKER 1 -- */
 
@@ -90,71 +93,19 @@ struct _inittab _PyImport_Inittab[] = {
 
     {"array", initarray},
     {"_ast", init_ast},
-#ifdef MS_WINDOWS
-#ifndef MS_WINI64
-    {"audioop", initaudioop},
-#endif
-#endif
     {"binascii", initbinascii},
-    //{"cmath", initcmath},
     {"errno", initerrno},
-
+    {"future_builtins", initfuture_builtins},
     {"gc", initgc},
     {"signal", initsignal},
-
-#if 0
-    {"future_builtins", initfuture_builtins},
-#ifndef MS_WINI64
-    {"imageop", initimageop},
-#endif
-    {"math", initmath},
-    {"_md5", init_md5},
-    //{"nt", initnt}, /* Use the NT os functions, not posix */
+    {"edk2", initedk2},
     {"operator", initoperator},
-    {"_sha", init_sha},
-    {"_sha256", init_sha256},
-    {"_sha512", init_sha512},
-    {"strop", initstrop},
+    {"_weakref", init_weakref},
+    {"math", initmath},
     {"time", inittime},
-#ifdef WITH_THREAD
-    {"thread", initthread},
-#endif
-    {"cStringIO", initcStringIO},
-    {"cPickle", initcPickle},
-#ifdef WIN32
-    {"msvcrt", initmsvcrt},
-    {"_locale", init_locale},
-#endif
-    /* XXX Should _subprocess go in a WIN32 block?  not WIN64? */
-    //{"_subprocess", init_subprocess},
-
-    {"_codecs", init_codecs},
-    //{"_weakref", init_weakref},
-    //{"_hotshot", init_hotshot},
-    {"_random", init_random},
-    {"_bisect", init_bisect},
-    {"_heapq", init_heapq},
-    //{"_lsprof", init_lsprof},
-    {"itertools", inititertools},
-    {"_collections", init_collections},
-    {"_symtable", init_symtable},
-    //{"mmap", initmmap},
-    {"_csv", init_csv},
-    {"_sre", init_sre},
-#endif
-
-    {"parser", initparser},
-
-#if 0
-    //{"_winreg", init_winreg},
-    {"_struct", init_struct},
     {"datetime", initdatetime},
-    {"_functools", init_functools},
-    {"_json", init_json},
-
-    {"xxsubtype", initxxsubtype},
-    //{"zipimport", initzipimport},
-    //{"zlib", initzlib},
+    {"cStringIO", initcStringIO},
+    {"_codecs", init_codecs},
 
     /* CJK codecs */
     {"_multibytecodec", init_multibytecodec},
@@ -164,6 +115,53 @@ struct _inittab _PyImport_Inittab[] = {
     {"_codecs_jp", init_codecs_jp},
     {"_codecs_kr", init_codecs_kr},
     {"_codecs_tw", init_codecs_tw},
+
+    {"_bisect", init_bisect},
+    {"_md5", init_md5},
+    {"_sha", init_sha},
+    {"_sha256", init_sha256},
+    {"_sha512", init_sha512},
+    {"_random", init_random},
+    {"_heapq", init_heapq},
+    {"itertools", inititertools},
+    {"_collections", init_collections},
+    {"_sre", init_sre},
+    {"parser", initparser},
+    {"_struct", init_struct},
+    {"cPickle", initcPickle},
+
+    {"strop", initstrop},
+    {"_functools", init_functools},
+    {"cmath", initcmath},
+    {"_json", init_json},
+
+    {"_socket", init_socket},
+    {"select", initselect},
+
+    {"xxsubtype", initxxsubtype},
+
+#if 0
+#ifndef MS_WINI64
+    {"imageop", initimageop},
+#endif
+#ifdef WITH_THREAD
+    {"thread", initthread},
+#endif
+#ifdef WIN32
+    {"msvcrt", initmsvcrt},
+    {"_locale", init_locale},
+#endif
+    /* XXX Should _subprocess go in a WIN32 block?  not WIN64? */
+    //{"_subprocess", init_subprocess},
+
+    //{"_hotshot", init_hotshot},
+    //{"_lsprof", init_lsprof},
+    //{"mmap", initmmap},
+    //{"_winreg", init_winreg},
+    {"_symtable", init_symtable},
+    {"_csv", init_csv},
+    {"zipimport", initzipimport},
+    {"zlib", initzlib},
 #endif
 
 /* tools/freeze/makeconfig.py marker for additional "_inittab" entries */

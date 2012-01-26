@@ -18,7 +18,7 @@ extern "C" {
 
 
 /* Mod by chrish: QNX has WATCOM, but isn't DOS */
-#if !defined(__QNX__) && !defined(EFIAPI)
+#if !defined(__QNX__) && !defined(UEFI_ENV)
 #if defined(MS_WINDOWS) || defined(__BORLANDC__) || defined(__WATCOMC__) || defined(__DJGPP__) || defined(PYOS_OS2)
 #if defined(PYOS_OS2) && defined(PYCC_GCC)
 #define MAXPATHLEN 260
@@ -57,8 +57,9 @@ extern "C" {
 
 /* Search path entry delimiter */
 #ifndef DELIM
-  #ifdef  EFIAPI
+  #ifdef  UEFI_ENV
     #define DELIM   ';'
+    #define DELIM_STR   ";"
   #else
     #define DELIM   ':'
   #endif

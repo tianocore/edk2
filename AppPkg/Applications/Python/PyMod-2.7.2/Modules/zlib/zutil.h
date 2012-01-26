@@ -161,8 +161,8 @@ extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 #  define fdopen(fd,mode) NULL /* No fdopen() */
 #endif
 
-#if (defined(_MSC_VER) && (_MSC_VER > 600))
-#  if defined(_WIN32_WCE) || defined(_EFI_STDLIB)
+#if (defined(_MSC_VER) && (_MSC_VER > 600)) && !defined(UEFI_ENV)
+#  if defined(_WIN32_WCE)
 #    define fdopen(fd,mode) NULL /* No fdopen() */
 #    ifndef _PTRDIFF_T_DEFINED
        typedef int ptrdiff_t;

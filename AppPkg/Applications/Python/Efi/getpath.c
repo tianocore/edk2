@@ -32,6 +32,7 @@
 **/
 #include <Python.h>
 #include <osdefs.h>
+#include  <ctype.h>
 
 #ifdef __cplusplus
  extern "C" {
@@ -126,15 +127,12 @@ isfile(char *filename)
 {
     struct stat buf;
     if (stat(filename, &buf) != 0) {
-      //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d] Not Found: file = \"%s\"\n", __func__, __LINE__, filename);
       return 0;
     }
     //if (!S_ISREG(buf.st_mode))
     if (S_ISDIR(buf.st_mode)) {
-      //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d] Is DIR: file = \"%s\"\n", __func__, __LINE__, filename);
       return 0;
     }
-    //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d] SUCCESS: file = \"%s\"\n", __func__, __LINE__, filename);
     return 1;
 }
 
@@ -159,11 +157,9 @@ ismodule(char *filename)
     if (strlen(filename) < MAXPATHLEN) {
         strcat(filename, Py_OptimizeFlag ? "o" : "c");
         if (isfile(filename)) {
-          //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]: file = \"%s\"\n", __func__, __LINE__, filename);
           return 1;
         }
     }
-    //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d] FAIL: file = \"%s\"\n", __func__, __LINE__, filename);
     return 0;
 }
 
@@ -304,7 +300,6 @@ isxfile(char *filename)
     char        *newbn;
     int          bnlen;
 
-    //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d] ENTER: file = \"%s\"\n", __func__, __LINE__, filename);
     bn = basename(filename);            // Separate off the file name component
     reduce(filename);                   // and isolate the path component
     bnlen = strlen(bn);
@@ -315,22 +310,17 @@ isxfile(char *filename)
       bnlen += 4;
     }
     else if(strcmp(newbn, ".efi") != 0) {
-      //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]: Bad extension\n", __func__, __LINE__);
       return 0;                         // File can not be executable.
     }
     joinpath(filename, bn);             // Stitch path and file name back together
-    //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]: file = \"%s\"\n", __func__, __LINE__, filename);
 
     if (stat(filename, &buf) != 0) {    // Now, verify that file exists
-      //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]: Does not exist\n", __func__, __LINE__);
       return 0;
     }
     if(S_ISDIR(buf.st_mode)) {          // And it is not a directory.
-      //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]: Is a directory\n", __func__, __LINE__);
       return 0;
     }
 
-    //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d] EXIT: file = \"%s\"\n", __func__, __LINE__, filename);
     return 1;
 }
 
@@ -390,17 +380,12 @@ set_volume(char *Dest, char *path)
 {
   size_t    VolLen;
 
-  //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d] ENTER: path = \"%s\"\n", __func__, __LINE__, path);
   if(is_absolute(path)) {
     VolLen = strcspn(path, "/\\:");
-    //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]: VolLen = %d\n", __func__, __LINE__, VolLen);
     if((VolLen != 0) && (path[VolLen] == ':')) {
       (void) strncpyX(Dest, path, VolLen + 1);
-      //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]: VolLen = %d, Dest = \"%s\" path = \"%s\"\n",
-      //                                      __func__, __LINE__, VolLen, Dest, path);
     }
   }
-  //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d] EXIT: Dest = \"%s\"\n", __func__, __LINE__, Dest);
 }
 
 
@@ -481,16 +466,10 @@ calculate_path(void)
     char *prog = Py_GetProgramName();
     char argv0_path[MAXPATHLEN+1];
     char zip_path[MAXPATHLEN+1];
-    //int pfound, efound; /* 1 if found; -1 if found build directory */
     char *buf;
     size_t bufsz;
     size_t prefixsz;
     char *defpath;
-    //uint32_t nsexeclength = MAXPATHLEN;
-
-    //unixify(path);
-    //unixify(rtpypath);
-    //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]:\nENTER prog=\"%s\"\n      path=\"%s\"\n", __func__, __LINE__, prog, path);
 
 
 /* ###########################################################################
@@ -520,7 +499,6 @@ calculate_path(void)
                 strncpy(progpath, path, MAXPATHLEN);
 
         joinpath(progpath, prog);
-        //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]: progpath = \"%s\"\n", __func__, __LINE__, progpath);
         if (isxfile(progpath))
                 break;
 
@@ -539,10 +517,7 @@ calculate_path(void)
     argv0_path[MAXPATHLEN] = '\0';
     set_volume(volume_name, argv0_path);
 
-    //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]: volume_name = \"%s\"\n", __func__, __LINE__, volume_name);
     reduce(argv0_path);
-    //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]: progpath = \"%s\"\n", __func__, __LINE__, progpath);
-    //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]: argv0_path = \"%s\"\n", __func__, __LINE__, argv0_path);
     /* At this point, argv0_path is guaranteed to be less than
        MAXPATHLEN bytes long.
     */
@@ -552,17 +527,9 @@ calculate_path(void)
       This is the full path to the platform independent libraries.
 ########################################################################### */
 
-    //if (!(pfound = search_for_prefix(argv0_path, home))) {
-    //    if (!Py_FrozenFlag)
-    //        fprintf(stderr,
-    //            "Could not find platform independent libraries <prefix>\n");
         strncpy(prefix, volume_name, MAXPATHLEN);
         joinpath(prefix, PREFIX);
         joinpath(prefix, lib_python);
-    //}
-    //else
-    //    reduce(prefix);
-    //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]: V = \"%s\", Prefix = \"%s\"\n", __func__, __LINE__, volume_name, prefix);
 
 /* ###########################################################################
       Build the FULL path to the zipped-up Python library.
@@ -570,37 +537,20 @@ calculate_path(void)
 
     strncpy(zip_path, prefix, MAXPATHLEN);
     zip_path[MAXPATHLEN] = '\0';
-    //if (pfound > 0) { /* Use the reduced prefix returned by Py_GetPrefix() */
-        reduce(zip_path);
-        //reduce(zip_path);
-    //}
-    //else
-    //    strncpy(zip_path, PREFIX, MAXPATHLEN);
+    reduce(zip_path);
     joinpath(zip_path, "python00.zip");
     bufsz = strlen(zip_path);   /* Replace "00" with version */
     zip_path[bufsz - 6] = VERSION[0];
     zip_path[bufsz - 5] = VERSION[1];
-    //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]: Zip_path = \"%s\"\n", __func__, __LINE__, zip_path);
 
 /* ###########################################################################
       Build the FULL path to dynamically loadable libraries.
 ########################################################################### */
 
-    //if (!(efound = search_for_exec_prefix(argv0_path, home))) {
-    //    if (!Py_FrozenFlag)
-    //        fprintf(stderr,
-    //            "Could not find platform dependent libraries <exec_prefix>\n");
         strncpy(exec_prefix, volume_name, MAXPATHLEN);
         joinpath(exec_prefix, EXEC_PREFIX);
         joinpath(exec_prefix, lib_python);
-        joinpath(exec_prefix, "dynaload");
-    //}
-    /* If we found EXEC_PREFIX do *not* reduce it!  (Yet.) */
-    //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]: Exec_prefix = \"%s\"\n", __func__, __LINE__, exec_prefix);
-
-    //if ((!pfound || !efound) && !Py_FrozenFlag)
-    //    fprintf(stderr,
-    //            "Consider setting $PYTHONHOME to <prefix>[%c<exec_prefix>]\n", DELIM);
+        joinpath(exec_prefix, "lib-dynload");
 
 /* ###########################################################################
       Build the module search path.
@@ -611,7 +561,6 @@ calculate_path(void)
      * If we're loading relative to the build directory,
      * return the compiled-in defaults instead.
      */
-    //if (pfound > 0) {
     reduce(prefix);
     reduce(prefix);
     /* The prefix is the root directory, but reduce() chopped
@@ -624,11 +573,6 @@ calculate_path(void)
       prefix[bufsz] = SEP;
       prefix[bufsz+1] = 0;
     }
-    //}
-    //else
-    //    strncpy(prefix, PREFIX, MAXPATHLEN);
-
-//if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]: prefix = \"%s\"\n", __func__, __LINE__, prefix);
 
     /* Calculate size of return buffer.
      */
@@ -655,7 +599,6 @@ calculate_path(void)
         }
         defpath = delim + 1;
     }
-//if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]: defpath = \"%s\"\n", __func__, __LINE__, defpath);
 
     bufsz += strlen(zip_path) + 1;
     bufsz += strlen(exec_prefix) + 1;
@@ -670,7 +613,6 @@ calculate_path(void)
         module_search_path = PYTHONPATH;
     }
     else {
-      //if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]:\n", __func__, __LINE__);
         /* Run-time value of $PYTHONPATH goes first */
         if (rtpypath) {
             strcpy(buf, rtpypath);
@@ -678,12 +620,10 @@ calculate_path(void)
         }
         else
             buf[0] = '\0';
-//if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]: RTpath = \"%s\"\n", __func__, __LINE__, buf);
 
         /* Next is the default zip path */
         strcat(buf, zip_path);
         strcat(buf, delimiter);
-//if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]: +Zip = \"%s\"\n", __func__, __LINE__, buf);
 
         /* Next goes merge of compile-time $PYTHONPATH with
          * dynamically located prefix.
@@ -710,17 +650,13 @@ calculate_path(void)
             defpath = delim + 1;
         }
         strcat(buf, delimiter);
-//if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]: +Merge = \"%s\"\n", __func__, __LINE__, buf);
 
         /* Finally, on goes the directory for dynamic-load modules */
         strcat(buf, exec_prefix);
 
         /* And publish the results */
         module_search_path = buf;
-//if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]: module_search_path = \"%s\"\n", __func__, __LINE__, module_search_path);
     }
-
-    //if (efound > 0) {
         /*  At this point, exec_prefix is set to VOL:/Efi/StdLib/lib/python.27/dynalib.
             We want to get back to the root value, so we have to remove the final three
             segments to get VOL:/Efi/StdLib.  Because we don't know what VOL is, and
@@ -737,9 +673,6 @@ calculate_path(void)
           exec_prefix[bufsz] = SEP;
           exec_prefix[bufsz+1] = 0;
         }
-    //}
-    //else
-    //    strncpy(exec_prefix, EXEC_PREFIX, MAXPATHLEN);
     if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]: module_search_path = \"%s\"\n", __func__, __LINE__, module_search_path);
     if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]: prefix             = \"%s\"\n", __func__, __LINE__, prefix);
     if (Py_VerboseFlag) PySys_WriteStderr("%s[%d]: exec_prefix        = \"%s\"\n", __func__, __LINE__, exec_prefix);

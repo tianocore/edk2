@@ -71,6 +71,8 @@
   SortLib|ShellPkg/Library/UefiSortLib/UefiSortLib.inf
   PathLib|ShellPkg/Library/BasePathLib/BasePathLib.inf
 
+  CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
+
 ###################################################################################################
 #
 # Components Section - list of the modules and components that will be processed by compilation
@@ -100,37 +102,18 @@
 #### After extracting the Python distribution, un-comment the following line to build Python.
 #  AppPkg/Applications/Python/PythonCore.inf
 
-##########
-#    Socket Applications - LibC based
-##########
-#  AppPkg/Applications/Sockets/DataSink/DataSink.inf
-#  AppPkg/Applications/Sockets/DataSource/DataSource.inf
-#  SocketPkg/Application/FtpNew/FTP.inf
-#  AppPkg/Applications/Sockets/GetHostByAddr/GetHostByAddr.inf
-#  AppPkg/Applications/Sockets/GetHostByDns/GetHostByDns.inf
-#  AppPkg/Applications/Sockets/GetHostByName/GetHostByName.inf
-#  AppPkg/Applications/Sockets/GetNetByAddr/GetNetByAddr.inf
-#  AppPkg/Applications/Sockets/GetNetByName/GetNetByName.inf
-#  AppPkg/Applications/Sockets/GetServByName/GetServByName.inf
-#  AppPkg/Applications/Sockets/GetServByPort/GetServByPort.inf
-#  AppPkg/Applications/Sockets/RecvDgram/RecvDgram.inf
-#  SocketPkg/Application/route/route.inf
-#  AppPkg/Applications/Sockets/SetHostName/SetHostName.inf
-#  AppPkg/Applications/Sockets/SetSockOpt/SetSockOpt.inf
-#  AppPkg/Applications/Sockets/TftpServer/TftpServer.inf
-#  AppPkg/Applications/Sockets/WebServer/WebServer.inf {
-#    <PcdsFixedAtBuild>
-#      gStdLibTokenSpaceGuid.WebServer_HttpPort|80
-#  }
+
+##############################################################################
+#
+# Specify whether we are running in an emulation environment, or not.
+# Define EMULATE if we are, else keep the DEFINE commented out.
+#
+# DEFINE  EMULATE = 1
 
 ##############################################################################
 #
 #  Include Boilerplate text required for building with the Standard Libraries.
 #
 ##############################################################################
-# Specify whether we are running in an emulation environment, or not.
-# Define EMULATE if we are.
-#
-#DEFINE  EMULATE = 1
-
 !include StdLib/StdLib.inc
+!include AppPkg/Applications/Sockets/Sockets.inc
