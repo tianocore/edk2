@@ -137,12 +137,30 @@ CHAR8 *mCpuSmbiosType4Strings[] = {
 
 
 /**
-  Logs SMBIOS record.
+  Create SMBIOS record.
 
-  Note: This should be a genric library function.
+  Converts a fixed SMBIOS structure and an array of pointers to strings into
+  an SMBIOS record where the strings are cat'ed on the end of the fixed record
+  and terminated via a double NULL and add to SMBIOS table.
 
-  @param  Template    Fixed SMBIOS structure
-  @param  StringPack  Array of strings to convert to an SMBIOS string pack. 
+  SMBIOS_TABLE_TYPE32 gSmbiosType12 = {
+    { EFI_SMBIOS_TYPE_SYSTEM_CONFIGURATION_OPTIONS, sizeof (SMBIOS_TABLE_TYPE12), 0 },
+    1 // StringCount
+  };
+  CHAR8 *gSmbiosType12Strings[] = {
+    "Not Found",
+    NULL
+  };
+  
+  ...
+  LogSmbiosData (
+    (EFI_SMBIOS_TABLE_HEADER*)&gSmbiosType12, 
+    gSmbiosType12Strings
+    );
+
+  @param  Template    Fixed SMBIOS structure, required.
+  @param  StringArray Array of strings to convert to an SMBIOS string pack. 
+                      NULL is OK.
 
 **/
 EFI_STATUS
@@ -170,12 +188,21 @@ LogSmbiosData (
 
   // Calculate the size of the fixed record and optional string pack
   Size = Template->Length;
-  for (Index = 0; StringPack[Index] != NULL; Index++) {
-    StringSize = AsciiStrSize (StringPack[Index]);
-    Size += StringSize;
+  if (StringPack == NULL) {
+    // At least a double null is required
+    Size += 2;
+  } else {
+    for (Index = 0; StringPack[Index] != NULL; Index++) {
+      StringSize = AsciiStrSize (StringPack[Index]);
+      Size += StringSize;
+    }
+    if (StringPack[0] == NULL) {
+      // At least a double null is required
+      Size += 1;
+    }
+    // Don't forget the terminating double null
+    Size += 1;
   }
-  // Don't forget the terminating double null
-  Size += 1;
 
   // Copy over Template
   Record = (EFI_SMBIOS_TABLE_HEADER *)AllocateZeroPool (Size);
