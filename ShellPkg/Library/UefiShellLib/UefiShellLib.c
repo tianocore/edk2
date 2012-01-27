@@ -1,7 +1,7 @@
 /** @file
   Provides interface to shell functionality for shell commands and applications.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -2015,15 +2015,34 @@ InternalCommandLineParse (
       //
       // get the item VALUE for a previous flag
       //
-      CurrentItemPackage->Value = ReallocatePool(ValueSize, ValueSize + StrSize(Argv[LoopCounter]) + sizeof(CHAR16), CurrentItemPackage->Value);
-      ASSERT(CurrentItemPackage->Value != NULL);
-      if (ValueSize == 0) {
-        StrCpy(CurrentItemPackage->Value, Argv[LoopCounter]);
+      if (StrStr(Argv[LoopCounter], L" ") == NULL) {
+        CurrentItemPackage->Value = ReallocatePool(ValueSize, ValueSize + StrSize(Argv[LoopCounter]) + sizeof(CHAR16), CurrentItemPackage->Value);
+        ASSERT(CurrentItemPackage->Value != NULL);
+        if (ValueSize == 0) {
+          StrCpy(CurrentItemPackage->Value, Argv[LoopCounter]);
+        } else {
+          StrCat(CurrentItemPackage->Value, L" ");
+          StrCat(CurrentItemPackage->Value, Argv[LoopCounter]);
+        }
+        ValueSize += StrSize(Argv[LoopCounter]) + sizeof(CHAR16);
       } else {
-        StrCat(CurrentItemPackage->Value, L" ");
-        StrCat(CurrentItemPackage->Value, Argv[LoopCounter]);
+        //
+        // the parameter has spaces.  must be quoted.
+        //
+        CurrentItemPackage->Value = ReallocatePool(ValueSize, ValueSize + StrSize(Argv[LoopCounter]) + sizeof(CHAR16) + sizeof(CHAR16) + sizeof(CHAR16), CurrentItemPackage->Value);
+        ASSERT(CurrentItemPackage->Value != NULL);
+        if (ValueSize == 0) {
+          StrCpy(CurrentItemPackage->Value, L"\"");
+          StrCat(CurrentItemPackage->Value, Argv[LoopCounter]);
+          StrCat(CurrentItemPackage->Value, L"\"");
+        } else {
+          StrCat(CurrentItemPackage->Value, L" ");
+          StrCat(CurrentItemPackage->Value, L"\"");
+          StrCat(CurrentItemPackage->Value, Argv[LoopCounter]);
+          StrCat(CurrentItemPackage->Value, L"\"");
+       }
+        ValueSize += StrSize(Argv[LoopCounter]) + sizeof(CHAR16);
       }
-      ValueSize += StrSize(Argv[LoopCounter]) + sizeof(CHAR16);
       GetItemValue--;
       if (GetItemValue == 0) {
         InsertHeadList(*CheckPackage, &CurrentItemPackage->Link);
@@ -2587,12 +2606,10 @@ InternalPrintTo (
     return (gEfiShellProtocol->WriteFile(gEfiShellParametersProtocol->StdOut, &Size, (VOID*)String));
   }
   if (mEfiShellInterface          != NULL) {
-    if (mEfiShellInterface->RedirArgc == 0) { 
-      //
-      // Divide in half for old shell.  Must be string length not size.
-      // 
-      Size /=2;  // Divide in half only when no redirection.
-    }
+    //
+    // Divide in half for old shell.  Must be string length not size.
+    //
+    Size /= 2;
     return (mEfiShellInterface->StdOut->Write(mEfiShellInterface->StdOut,          &Size, (VOID*)String));
   }
   ASSERT(FALSE);
@@ -3647,10 +3664,10 @@ InternalShellStrHexToUint64 (
     String++;
 
     //
-    // Skip spaces if requested
+    // stop at spaces if requested
     //
-    while (StopAtSpace && *String == L' ') {
-      String++;
+    if (StopAtSpace && *String == L' ') {
+      break;
     }
   }
 
