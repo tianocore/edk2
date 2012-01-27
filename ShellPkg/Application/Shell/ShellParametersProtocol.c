@@ -2,7 +2,7 @@
   Member functions of EFI_SHELL_PARAMETERS_PROTOCOL and functions for creation,
   manipulation, and initialization of EFI_SHELL_PARAMETERS_PROTOCOL.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -523,6 +523,9 @@ FixFileName (
     }    
   } else {
     Copy = FileName;
+    while(Copy[0] == L' ') {
+      Copy++;
+    }
     if ((TempLocation = StrStr(Copy , L" ")) != NULL) {
       TempLocation[0] = CHAR_NULL;
     }    
