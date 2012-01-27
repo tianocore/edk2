@@ -1,7 +1,7 @@
 /** @file
   Main file for bcfg shell Debug1 function.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -46,6 +46,150 @@ typedef struct {
   UINT16                *Order;
   CONST CHAR16          *OptData;
 } BGFG_OPERATION;
+
+/**
+  Update the optional data for a boot or driver option.
+
+  If optional data exists it will be changed.
+
+  @param[in]      Index     The boot or driver option index update.
+  @param[in]      DataSize  The size in bytes of Data.
+  @param[in]      Data      The buffer for the optioanl data.
+  @param[in]      Target    The target of the operation.
+
+  @retval EFI_SUCCESS       The data was sucessfully updated.
+  @retval other             A error occured.
+**/
+EFI_STATUS
+EFIAPI
+UpdateOptionalDataDebug1(
+  UINT16                          Index, 
+  UINTN                           DataSize, 
+  UINT8                           *Data,
+  IN CONST BCFG_OPERATION_TARGET  Target
+  )
+{
+  EFI_STATUS  Status;
+  CHAR16      VariableName[12];
+  UINTN       OriginalSize;
+  UINT8       *OriginalData;
+  UINTN       NewSize;
+  UINT8       *NewData;
+  UINTN       OriginalOptionDataSize;
+
+  UnicodeSPrint(VariableName, sizeof(VariableName), L"%s%04x", Target == BcfgTargetBootOrder?L"Boot":L"Driver", Index);
+  
+  OriginalSize = 0;
+  OriginalData = NULL;
+  NewData      = NULL;
+  NewSize      = 0;
+
+  Status = gRT->GetVariable(
+      VariableName,
+      (EFI_GUID*)&gEfiGlobalVariableGuid,
+      NULL,
+      &OriginalSize,
+      OriginalData);
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    OriginalData = AllocateZeroPool(OriginalSize);
+    if (OriginalData == NULL) {
+      return (EFI_OUT_OF_RESOURCES);
+    }
+    Status = gRT->GetVariable(
+        VariableName,
+        (EFI_GUID*)&gEfiGlobalVariableGuid,
+        NULL,
+        &OriginalSize,
+        OriginalData);
+  }
+
+  if (!EFI_ERROR(Status)) {
+    //
+    // Allocate new struct and discard old optional data.
+    //
+    OriginalOptionDataSize  = sizeof(UINT32) + sizeof(UINT16) + StrSize(((CHAR16*)(OriginalData + sizeof(UINT32) + sizeof(UINT16))));
+    OriginalOptionDataSize += (*(UINT16*)(OriginalData + sizeof(UINT32)));
+    OriginalOptionDataSize -= OriginalSize;
+    NewSize = OriginalSize - OriginalOptionDataSize + DataSize;
+    NewData = AllocateCopyPool(NewSize, OriginalData);
+    if (NewData == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+    } else {
+      CopyMem(NewData + OriginalSize - OriginalOptionDataSize, Data, DataSize);
+    }
+  }
+
+  if (!EFI_ERROR(Status)) {
+    //
+    // put the data back under the variable
+    //
+    Status = gRT->SetVariable(
+      VariableName, 
+      (EFI_GUID*)&gEfiGlobalVariableGuid,
+      EFI_VARIABLE_NON_VOLATILE|EFI_VARIABLE_BOOTSERVICE_ACCESS|EFI_VARIABLE_RUNTIME_ACCESS,
+      NewSize,
+      NewData);
+  }
+
+  SHELL_FREE_NON_NULL(OriginalData);
+  SHELL_FREE_NON_NULL(NewData);
+  return (Status);
+}
+
+/**
+  This function will get a CRC for a boot option.
+
+  @param[in, out] Crc     The CRC value to return.
+  @param[in]      Index   The boot option index to CRC.
+
+  @retval EFI_SUCCESS           The CRC was sucessfully returned.
+  @retval other                 A error occured.
+**/
+EFI_STATUS
+EFIAPI
+GetBootOptionCrcDebug1(
+  UINT32      *Crc, 
+  UINT16      BootIndex
+  )
+{
+  CHAR16      VariableName[12];
+  EFI_STATUS  Status;
+  UINT8       *Buffer;
+  UINTN       BufferSize;
+
+  Buffer      = NULL;
+  BufferSize  = 0;
+
+  //
+  // Get the data Buffer
+  //
+  UnicodeSPrint(VariableName, sizeof(VariableName), L"%Boot%04x", BootIndex);
+  Status = gRT->GetVariable(
+      VariableName,
+      (EFI_GUID*)&gEfiGlobalVariableGuid,
+      NULL,
+      &BufferSize,
+      NULL);
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    Buffer = AllocateZeroPool(BufferSize);
+    Status = gRT->GetVariable(
+        VariableName,
+        (EFI_GUID*)&gEfiGlobalVariableGuid,
+        NULL,
+        &BufferSize,
+        Buffer);
+  }
+
+  //
+  // Get the CRC computed
+  //
+  if (!EFI_ERROR(Status)) {
+    Status = gBS->CalculateCrc32 (Buffer, BufferSize, Crc);
+  }
+
+  SHELL_FREE_NON_NULL(Buffer);
+  return EFI_SUCCESS;
+}
 
 /**
   This function will populate the device path protocol parameter based on TheHandle.
@@ -139,9 +283,7 @@ BcfgAddDebug1(
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *FilePath;
   EFI_DEVICE_PATH_PROTOCOL  *FileNode;
-//  EFI_DEVICE_PATH_PROTOCOL  *DevPath;
   CHAR16                    *Str;
-//  CONST CHAR16              *StringWalker;
   UINT8                     *TempByteBuffer;
   UINT8                     *TempByteStart;
   EFI_SHELL_FILE_INFO       *Arg;
@@ -560,6 +702,8 @@ BcfgMoveDebug1(
   Function to add optional data to an option.
 
   @param[in] OptData      The optional data to add.
+  @param[in] CurrentOrder The pointer to the current order of items.
+  @param[in] OrderCount   The number if items in CurrentOrder.
   @param[in] Target       The target of the operation.
 
   @retval SHELL_SUCCESS   The operation was succesful.
@@ -568,11 +712,261 @@ SHELL_STATUS
 EFIAPI
 BcfgAddOptDebug1(
   IN CONST CHAR16                 *OptData,
+  IN CONST UINT16                 *CurrentOrder,
+  IN CONST UINTN                  OrderCount,
   IN CONST BCFG_OPERATION_TARGET  Target
   )
 {
-  ASSERT(OptData != NULL);
-  return SHELL_SUCCESS;
+  EFI_KEY_OPTION  NewKeyOption;
+  EFI_KEY_OPTION *KeyOptionBuffer;
+  SHELL_STATUS    ShellStatus;
+  EFI_STATUS      Status;
+  UINT16          OptionIndex;
+  UINT16          LoopCounter;
+  UINT64          Intermediate;
+  CONST CHAR16    *Temp;
+  CONST CHAR16    *Walker;
+  CHAR16          *FileName;
+  CHAR16          *Temp2;
+  CHAR16          *Data;
+  UINT16          KeyIndex;
+  CHAR16          VariableName[12];
+
+  SHELL_FILE_HANDLE FileHandle;
+
+  Status          = EFI_SUCCESS;
+  ShellStatus     = SHELL_SUCCESS;
+  Walker          = OptData;
+  FileName        = NULL;
+  Data            = NULL;
+  KeyOptionBuffer = NULL;
+
+  ZeroMem(&NewKeyOption, sizeof(EFI_KEY_OPTION));
+
+  while(Walker[0] == L' ') {
+    Walker++;
+  }
+
+  //
+  // Get the index of the variable we are changing.
+  //
+  Status = ShellConvertStringToUint64(Walker, &Intermediate, FALSE, TRUE);
+  if (EFI_ERROR(Status) || (((UINT16)Intermediate) != Intermediate) || StrStr(Walker, L" ") == NULL || ((UINT16)Intermediate) > ((UINT16)OrderCount)) {
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"Option Index");
+    ShellStatus = SHELL_INVALID_PARAMETER;
+    return (ShellStatus);
+  }
+  OptionIndex = (UINT16)Intermediate;
+
+  Temp = StrStr(Walker, L" ");
+  if (Temp != NULL) {
+    Walker = Temp;
+  }
+  while(Walker[0] == L' ') {
+    Walker++;
+  }
+
+  //
+  // determine whether we have file with data, quote delimited information, or a hot-key 
+  //
+  if (Walker[0] == L'\"') {
+    //
+    // quoted filename or quoted information.
+    //
+    Temp = StrStr(Walker+1, L"\"");
+    if (Temp == NULL || StrLen(Temp) != 1) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Walker);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      FileName = StrnCatGrow(&FileName, NULL, Walker+1, 0);
+      Temp2 = StrStr(FileName, L"\"");
+      ASSERT(Temp2 != NULL);
+      Temp2[0] = CHAR_NULL;
+      Temp2++;
+      if (StrLen(Temp2)>0) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Walker);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      }
+      if (EFI_ERROR(ShellFileExists(Walker))) {
+        //
+        // Not a file.  must be misc information.
+        //
+        Data     = FileName;
+        FileName = NULL;
+      } else {
+        FileName = StrnCatGrow(&FileName, NULL, Walker, 0);
+      }
+    }
+  } else {
+    //
+    // filename or hot key information.
+    //
+    if (StrStr(Walker, L" ") == NULL) {
+      //
+      // filename
+      //
+      if (EFI_ERROR(ShellFileExists(Walker))) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FIND_FAIL), gShellDebug1HiiHandle, Walker);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      } else {
+        FileName = StrnCatGrow(&FileName, NULL, Walker, 0);
+      }
+    } else {
+      if (Target != BcfgTargetBootOrder) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_BOOT_ONLY), gShellDebug1HiiHandle);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      }
+
+      if (ShellStatus == SHELL_SUCCESS) {
+        //
+        // Get hot key information
+        //
+        Status = ShellConvertStringToUint64(Walker, &Intermediate, FALSE, TRUE);
+        if (EFI_ERROR(Status) || (((UINT32)Intermediate) != Intermediate) || StrStr(Walker, L" ") == NULL) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Walker);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        }
+        NewKeyOption.KeyData.PackedValue = (UINT32)Intermediate;
+        Temp = StrStr(Walker, L" ");
+        if (Temp != NULL) {
+          Walker = Temp;
+        }
+        while(Walker[0] == L' ') {
+          Walker++;
+        }
+      }
+
+      if (ShellStatus == SHELL_SUCCESS) {
+        //
+        // Now we know how many EFI_INPUT_KEY structs we need to attach to the end of the EFI_KEY_OPTION struct.  
+        // Re-allocate with the added information.
+        //
+        KeyOptionBuffer = AllocateCopyPool(sizeof(EFI_KEY_OPTION) + (sizeof(EFI_KEY_DATA) * NewKeyOption.KeyData.Options.InputKeyCount), &NewKeyOption);
+        if (KeyOptionBuffer == NULL) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_MEM), gShellDebug1HiiHandle);
+          ShellStatus = SHELL_OUT_OF_RESOURCES;
+        }
+      }
+      for (LoopCounter = 0 ; ShellStatus == SHELL_SUCCESS && LoopCounter < KeyOptionBuffer->KeyData.Options.InputKeyCount; LoopCounter++) {
+        //
+        // ScanCode
+        //
+        Status = ShellConvertStringToUint64(Walker, &Intermediate, FALSE, TRUE);
+        if (EFI_ERROR(Status) || (((UINT16)Intermediate) != Intermediate) || StrStr(Walker, L" ") == NULL) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Walker);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        }
+        ((EFI_INPUT_KEY*)(((UINT8*)KeyOptionBuffer) + sizeof(EFI_KEY_OPTION)))[LoopCounter].ScanCode = (UINT16)Intermediate;
+        Temp = StrStr(Walker, L" ");
+        if (Temp != NULL) {
+          Walker = Temp;
+        }
+        while(Walker[0] == L' ') {
+          Walker++;
+        }
+
+        //
+        // UnicodeChar
+        //
+        Status = ShellConvertStringToUint64(Walker, &Intermediate, FALSE, TRUE);
+        if (EFI_ERROR(Status) || (((UINT16)Intermediate) != Intermediate)) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Walker);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        }
+        ((EFI_INPUT_KEY*)(((UINT8*)KeyOptionBuffer) + sizeof(EFI_KEY_OPTION)))[LoopCounter].UnicodeChar = (UINT16)Intermediate;
+        Temp = StrStr(Walker, L" ");
+        if (Temp != NULL) {
+          Walker = Temp;
+        }
+        while(Walker[0] == L' ') {
+          Walker++;
+        }
+      }
+
+      if (ShellStatus == SHELL_SUCCESS) {
+        //
+        // Now do the BootOption / BootOptionCrc
+        //
+        ASSERT (OptionIndex <= OrderCount);
+        KeyOptionBuffer->BootOption    = CurrentOrder[OptionIndex];
+        Status = GetBootOptionCrcDebug1(&(KeyOptionBuffer->BootOptionCrc), KeyOptionBuffer->BootOption);
+        if (EFI_ERROR(Status)) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"Option Index");
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        }        
+      }
+
+      if (ShellStatus == SHELL_SUCCESS) {
+        for (Temp2 = NULL, KeyIndex = 0 ; KeyIndex < 0xFFFF ; KeyIndex++) {
+          UnicodeSPrint(VariableName, sizeof(VariableName), L"Key%04x", KeyIndex);
+          Status = gRT->GetVariable(
+              VariableName,
+              (EFI_GUID*)&gEfiGlobalVariableGuid,
+              NULL,
+              (UINTN*)&Intermediate,
+              NULL);
+          if (Status == EFI_NOT_FOUND) {
+            break;
+          }
+        }
+        Status = gRT->SetVariable(
+          VariableName,
+          (EFI_GUID*)&gEfiGlobalVariableGuid,
+          EFI_VARIABLE_NON_VOLATILE|EFI_VARIABLE_BOOTSERVICE_ACCESS|EFI_VARIABLE_RUNTIME_ACCESS,
+          sizeof(EFI_KEY_OPTION) + (sizeof(EFI_KEY_DATA) * NewKeyOption.KeyData.Options.InputKeyCount),
+          KeyOptionBuffer);
+        if (EFI_ERROR(Status)) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_SET_VAR_FAIL), gShellDebug1HiiHandle, VariableName, Status);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        }   
+        ASSERT(FileName == NULL && Data == NULL);
+      }
+    }
+  }
+
+  //
+  // Shouldn't be possible to have have both. Neither is ok though.
+  //
+  ASSERT(FileName == NULL || Data == NULL);
+
+  if (ShellStatus == SHELL_SUCCESS && FileName != NULL || Data != NULL) {
+    if (FileName != NULL) {
+      //
+      // Open the file and populate the data buffer.
+      //
+      ShellStatus = ShellOpenFileByName(
+        FileName,
+        &FileHandle,
+        EFI_FILE_MODE_READ,
+        0);
+      if (ShellStatus == SHELL_SUCCESS) {
+        ShellStatus = ShellGetFileSize(FileHandle, &Intermediate);
+      }
+      Data = AllocateZeroPool((UINTN)Intermediate);
+      if (Data == NULL) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_MEM), gShellDebug1HiiHandle);
+        ShellStatus = SHELL_OUT_OF_RESOURCES;
+      }
+      if (ShellStatus == SHELL_SUCCESS) {
+        ShellStatus = ShellReadFile(FileHandle, &(UINTN)Intermediate, Data);
+      }
+    } else {
+      Intermediate = StrSize(Data);
+    }
+
+    if (ShellStatus == SHELL_SUCCESS && Data != NULL) {
+      Status = UpdateOptionalDataDebug1(CurrentOrder[OptionIndex], (UINTN)Intermediate, (UINT8*)Data, Target);
+      if (EFI_ERROR(Status)) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_SET_VAR_FAIL), gShellDebug1HiiHandle, VariableName, Status);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      }   
+    }
+  }
+
+  SHELL_FREE_NON_NULL(Data);
+  SHELL_FREE_NON_NULL(KeyOptionBuffer);
+  SHELL_FREE_NON_NULL(FileName);
+  return ShellStatus;
 }
 
 /**
@@ -798,7 +1192,7 @@ ShellCommandRunBcfg (
     //
     // Read in the boot or driver order environment variable (not needed for opt)
     //
-    if (ShellStatus == SHELL_SUCCESS && CurrentOperation.Target < BcfgTargetMax && CurrentOperation.Type != BcfgTypeOpt) {
+    if (ShellStatus == SHELL_SUCCESS && CurrentOperation.Target < BcfgTargetMax) {
       Length = 0;
       Status = gRT->GetVariable(
         CurrentOperation.Target == BcfgTargetBootOrder?(CHAR16*)L"BootOrder":(CHAR16*)L"DriverOrder",
@@ -989,6 +1383,8 @@ ShellCommandRunBcfg (
         case   BcfgTypeOpt:
           ShellStatus = BcfgAddOptDebug1(
             CurrentOperation.OptData,
+            CurrentOperation.Order,
+            Length / sizeof(CurrentOperation.Order[0]),
             CurrentOperation.Target);
           break;
         default:
