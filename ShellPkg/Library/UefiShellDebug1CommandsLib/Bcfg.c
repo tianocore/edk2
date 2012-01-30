@@ -929,7 +929,7 @@ BcfgAddOptDebug1(
   //
   ASSERT(FileName == NULL || Data == NULL);
 
-  if (ShellStatus == SHELL_SUCCESS && FileName != NULL || Data != NULL) {
+  if (ShellStatus == SHELL_SUCCESS && (FileName != NULL || Data != NULL)) {
     if (FileName != NULL) {
       //
       // Open the file and populate the data buffer.
@@ -948,7 +948,7 @@ BcfgAddOptDebug1(
         ShellStatus = SHELL_OUT_OF_RESOURCES;
       }
       if (ShellStatus == SHELL_SUCCESS) {
-        ShellStatus = ShellReadFile(FileHandle, &(UINTN)Intermediate, Data);
+        ShellStatus = ShellReadFile(FileHandle, &((UINTN)Intermediate), Data);
       }
     } else {
       Intermediate = StrSize(Data);
