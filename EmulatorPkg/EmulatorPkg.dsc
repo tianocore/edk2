@@ -71,6 +71,8 @@
   PeiServicesLib|MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
+  SmbiosLib|EmulatorPkg/Library/SmbiosLib/SmbiosLib.inf
+
   #
   # Generic Modules
   #
@@ -303,7 +305,7 @@
   EmulatorPkg/EmuThunkDxe/EmuThunk.inf
   EmulatorPkg/CpuRuntimeDxe/Cpu.inf
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
-  EmulatorPkg/MiscSubClassPlatformDxe/MiscSubClassDriver.inf
+  EmulatorPkg/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
   EmulatorPkg/TimerDxe/Timer.inf
 
 

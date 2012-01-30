@@ -150,7 +150,7 @@ INF  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
 INF  EmulatorPkg/EmuThunkDxe/EmuThunk.inf
 INF  EmulatorPkg/CpuRuntimeDxe/Cpu.inf
 INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
-INF  EmulatorPkg/MiscSubClassPlatformDxe/MiscSubClassDriver.inf
+INF  EmulatorPkg/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
 INF  EmulatorPkg/TimerDxe/Timer.inf
 INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 INF  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
