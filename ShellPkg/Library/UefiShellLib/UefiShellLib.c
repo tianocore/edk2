@@ -2721,6 +2721,11 @@ InternalShellPrintWorker(
     if (ResumeLocation != NULL) {
       if (*(ResumeLocation-1) == L'^') {
         //
+        // Move cursor back 1 position to overwrite the ^
+        //
+        gST->ConOut->SetCursorPosition(gST->ConOut, gST->ConOut->Mode->CursorColumn - 1, gST->ConOut->Mode->CursorRow);
+
+        //
         // Print a simple '%' symbol
         //
         Status = InternalPrintTo(L"%");

@@ -1,7 +1,7 @@
 /** @file
   Implements filebuffer interface functions.
 
-  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -489,6 +489,7 @@ FileBufferPrintLine (
   CHAR16  *Buffer;
   UINTN   Limit;
   CHAR16  PrintLine[200];
+  CHAR16  PrintLine2[250];
 
   //
   // print start from correct character
@@ -506,12 +507,13 @@ FileBufferPrintLine (
   }
 
   PrintLine[MainEditor.ScreenSize.Column] = CHAR_NULL;
+  ShellCopySearchAndReplace(PrintLine, PrintLine2,  250, L"%", L"^%", FALSE, FALSE);
 
   ShellPrintEx (
     0,
     (INT32)Row - 1,
     L"%s",
-    PrintLine
+    PrintLine2
     );
 
   return EFI_SUCCESS;
