@@ -48,13 +48,13 @@ CreatePlatformSmbiosMemoryRecords (
   EFI_SMBIOS_HANDLE           PhyscialMemoryArrayHandle;
   EFI_SMBIOS_HANDLE           SmbiosHandle;
 
-  Smbios16.Hdr = SmbiosGetRecord (EFI_SMBIOS_TYPE_PHYSICAL_MEMORY_ARRAY, 0, &PhyscialMemoryArrayHandle);
+  Smbios16.Hdr = SmbiosLibGetRecord (EFI_SMBIOS_TYPE_PHYSICAL_MEMORY_ARRAY, 0, &PhyscialMemoryArrayHandle);
   if (Smbios16.Hdr == NULL) {
     // Only make a Type19 entry if a Type16 entry exists.
     return;
   }
 
-  Smbios17.Hdr = SmbiosGetRecord (EFI_SMBIOS_TYPE_MEMORY_DEVICE, 0, &SmbiosHandle);
+  Smbios17.Hdr = SmbiosLibGetRecord (EFI_SMBIOS_TYPE_MEMORY_DEVICE, 0, &SmbiosHandle);
   if (Smbios17.Hdr == NULL) {
     // if type17 exits update with type16 Smbios handle
     Smbios17.Type17->MemoryArrayHandle = PhyscialMemoryArrayHandle;
@@ -70,7 +70,7 @@ CreatePlatformSmbiosMemoryRecords (
         HobPtr.ResourceDescriptor->PhysicalStart + 
         HobPtr.ResourceDescriptor->ResourceLength - 1;
       
-      CreateSmbiosEntry ((SMBIOS_STRUCTURE *)&gSmbiosType19Template, NULL);
+      SmbiosLibCreateEntry ((SMBIOS_STRUCTURE *)&gSmbiosType19Template, NULL);
     }
     HobPtr.Raw = GET_NEXT_HOB (HobPtr);
   }
@@ -96,32 +96,27 @@ PlatfomrSmbiosDriverEntryPoint (
   EFI_STATUS                  Status;
   EFI_SMBIOS_HANDLE           SmbiosHandle;
   SMBIOS_STRUCTURE_POINTER    Smbios;
-  UINT8                       SmbiosMajorVersion;
-  UINT8                       SmbiosMinorVersion;
-
-  Status = SmbiosGetVersion (&SmbiosMajorVersion, &SmbiosMinorVersion);
-  ASSERT_EFI_ERROR (Status);
 
   // Phase 0 - Patch table to make SMBIOS 2.7 structures smaller to conform 
   //           to an early version of the specification.
 
   // Phase 1 - Initialize SMBIOS tables from template
-  Status = InitializeSmbiosTableFromTemplate (gSmbiosTemplate);
+  Status = SmbiosLibInitializeFromTemplate (gSmbiosTemplate);
   ASSERT_EFI_ERROR (Status);
 
   // Phase 2 - Patch SMBIOS table entries
 
-  Smbios.Hdr = SmbiosGetRecord (EFI_SMBIOS_TYPE_BIOS_INFORMATION, 0, &SmbiosHandle);
+  Smbios.Hdr = SmbiosLibGetRecord (EFI_SMBIOS_TYPE_BIOS_INFORMATION, 0, &SmbiosHandle);
   if (Smbios.Type0 != NULL) {
     // 64K * (n+1) bytes
     Smbios.Type0->BiosSize = (UINT8)DivU64x32 (FixedPcdGet64 (PcdEmuFirmwareFdSize), 64*1024) - 1;
 
-    SmbiosUpdateUnicodeString (
+    SmbiosLibUpdateUnicodeString (
       SmbiosHandle, 
       Smbios.Type0->BiosVersion, 
       (CHAR16 *) PcdGetPtr (PcdFirmwareVersionString)
       );
-    SmbiosUpdateUnicodeString (
+    SmbiosLibUpdateUnicodeString (
       SmbiosHandle, 
       Smbios.Type0->BiosReleaseDate, 
       (CHAR16 *) PcdGetPtr (PcdFirmwareReleaseDateString)

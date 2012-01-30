@@ -28,9 +28,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 EFI_SMBIOS_PROTOCOL *gSmbios = NULL;
 
 
+/**
+  Create an initial SMBIOS Table from an array of SMBIOS_TEMPLATE_ENTRY 
+  entries. SMBIOS_TEMPLATE_ENTRY.NULL indicates the end of the table.
+
+  @param  Template   Array of SMBIOS_TEMPLATE_ENTRY entries.
+ 
+  @retval EFI_SUCCESS          New SMBIOS tables were created.
+  @retval EFI_OUT_OF_RESOURCES New SMBIOS tables were not created. 
+**/
 EFI_STATUS
 EFIAPI
-InitializeSmbiosTableFromTemplate (
+SmbiosLibInitializeFromTemplate (
   IN  SMBIOS_TEMPLATE_ENTRY   *Template
   )
 {
@@ -42,7 +51,7 @@ InitializeSmbiosTableFromTemplate (
   }
 
   for (Index = 0; Template[Index].Entry != NULL; Index++) {
-    Status = CreateSmbiosEntry (Template[Index].Entry, Template[Index].StringArray);
+    Status = SmbiosLibCreateEntry (Template[Index].Entry, Template[Index].StringArray);
   }
   
   return Status;
@@ -79,7 +88,7 @@ InitializeSmbiosTableFromTemplate (
 **/
 EFI_STATUS
 EFIAPI
-CreateSmbiosEntry (
+SmbiosLibCreateEntry (
   IN  SMBIOS_STRUCTURE *SmbiosEntry,
   IN  CHAR8            **StringArray 
   )
@@ -156,7 +165,7 @@ CreateSmbiosEntry (
 **/
 EFI_STATUS
 EFIAPI
-SmbiosUpdateString (
+SmbiosLibUpdateString (
   IN  EFI_SMBIOS_HANDLE     SmbiosHandle,
   IN  SMBIOS_TABLE_STRING   StringNumber,
   IN  CHAR8                 *String
@@ -195,7 +204,7 @@ SmbiosUpdateString (
 **/
 EFI_STATUS
 EFIAPI
-SmbiosUpdateUnicodeString (
+SmbiosLibUpdateUnicodeString (
   IN  EFI_SMBIOS_HANDLE     SmbiosHandle,
   IN  SMBIOS_TABLE_STRING   StringNumber,
   IN  CHAR16                *String
@@ -238,7 +247,7 @@ SmbiosUpdateUnicodeString (
   @retval Other                 Pointer to matching SMBIOS string. 
 **/
 CHAR8 *
-SmbiosReadString (
+SmbiosLibReadString (
   IN SMBIOS_STRUCTURE *Header,
   IN UINTN            Instance
   )
@@ -273,7 +282,7 @@ SmbiosReadString (
 **/
 SMBIOS_STRUCTURE *
 EFIAPI
-SmbiosGetRecord (
+SmbiosLibGetRecord (
   IN  EFI_SMBIOS_TYPE   Type,
   IN  UINTN             Instance,
   OUT EFI_SMBIOS_HANDLE *SmbiosHandle
@@ -311,7 +320,7 @@ SmbiosGetRecord (
 **/
 EFI_STATUS
 EFIAPI
-SmbiosRemove (
+SmbiosLibRemove (
   OUT EFI_SMBIOS_HANDLE SmbiosHandle
   )
 {
@@ -319,26 +328,9 @@ SmbiosRemove (
 }
 
 
-EFI_STATUS
-EFIAPI
-SmbiosGetVersion (
-  OUT UINT8   *SmbiosMajorVersion,
-  OUT UINT8   *SmbiosMinorVersion
-  )
-{
-  if (SmbiosMajorVersion != NULL) {
-    *SmbiosMajorVersion = gSmbios->MajorVersion;
-  }
-  if (SmbiosMinorVersion != NULL) {
-    *SmbiosMinorVersion = gSmbios->MinorVersion;
-  }
-  return EFI_SUCCESS;
-}  
-
 
 /**
   
-
   @param  ImageHandle  ImageHandle of the loaded driver.
   @param  SystemTable  Pointer to the EFI System Table.
 

@@ -22,15 +22,42 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/Smbios.h>
 
 
+///
+/// Cache copy of the SMBIOS Protocol pointer
+///
+extern EFI_SMBIOS_PROTOCOL *gSmbios;
+
+
+///
+/// Template for SMBIOS table initialization.
+/// The SMBIOS_TABLE_STRING types in the formated area must match the 
+/// StringArray sequene. 
+///
 typedef struct {
+  //
+  // formatted area of a given SMBIOS record
+  //
   SMBIOS_STRUCTURE    *Entry;
+  //
+  // NULL terminated array of ASCII strings to be added to the SMBIOS record. 
+  //
   CHAR8               **StringArray;
 } SMBIOS_TEMPLATE_ENTRY;
 
 
+/**
+  Create an initial SMBIOS Table from an array of SMBIOS_TEMPLATE_ENTRY 
+  entries. SMBIOS_TEMPLATE_ENTRY.NULL indicates the end of the table.
+
+  @param  Template   Array of SMBIOS_TEMPLATE_ENTRY entries.
+ 
+  @retval EFI_SUCCESS          New SMBIOS tables were created.
+  @retval EFI_OUT_OF_RESOURCES New SMBIOS tables were not created. 
+**/
 EFI_STATUS
-InitializeSmbiosTableFromTemplate (
-  IN  SMBIOS_TEMPLATE_ENTRY   *template
+EFIAPI
+SmbiosLibInitializeFromTemplate (
+  IN  SMBIOS_TEMPLATE_ENTRY   *Template
   );
 
 
@@ -61,13 +88,15 @@ InitializeSmbiosTableFromTemplate (
   @param  StringArray   Array of strings to convert to an SMBIOS string pack. 
                         NULL is OK.
 
+  @retval EFI_SUCCESS          New SmbiosEntry was added to SMBIOS table.
+  @retval EFI_OUT_OF_RESOURCES SmbiosEntry was not added.
 **/
 EFI_STATUS
-CreateSmbiosEntry (
+EFIAPI
+SmbiosLibCreateEntry (
   IN  SMBIOS_STRUCTURE *SmbiosEntry,
   IN  CHAR8            **StringArray 
   );
-
 
 
 /**
@@ -86,7 +115,8 @@ CreateSmbiosEntry (
   @retval EFI_NOT_FOUND         The StringNumber.is not valid for this SMBIOS record.    
 **/
 EFI_STATUS
-SmbiosUpdateString (
+EFIAPI
+SmbiosLibUpdateString (
   IN  EFI_SMBIOS_HANDLE     SmbiosHandle,
   IN  SMBIOS_TABLE_STRING   StringNumber,
   IN  CHAR8                 *String
@@ -108,7 +138,8 @@ SmbiosUpdateString (
   @retval EFI_NOT_FOUND         The StringNumber.is not valid for this SMBIOS record.    
 **/
 EFI_STATUS
-SmbiosUpdateUnicodeString (
+EFIAPI
+SmbiosLibUpdateUnicodeString (
   IN  EFI_SMBIOS_HANDLE     SmbiosHandle,
   IN  SMBIOS_TABLE_STRING   StringNumber,
   IN  CHAR16                *String
@@ -124,7 +155,7 @@ SmbiosUpdateUnicodeString (
   @retval Other                 Pointer to matching SMBIOS string. 
 **/
 CHAR8 *
-SmbiosReadString (
+SmbiosLibReadString (
   IN SMBIOS_STRUCTURE *Header,
   IN UINTN            Instance
   );
@@ -142,7 +173,7 @@ SmbiosReadString (
 **/
 SMBIOS_STRUCTURE *
 EFIAPI
-SmbiosGetRecord (
+SmbiosLibGetRecord (
   IN  EFI_SMBIOS_TYPE   Type,
   IN  UINTN             Instance,
   OUT EFI_SMBIOS_HANDLE *SmbiosHandle
@@ -160,17 +191,11 @@ SmbiosGetRecord (
 **/
 EFI_STATUS
 EFIAPI
-SmbiosRemove (
+SmbiosLibRemove (
   OUT EFI_SMBIOS_HANDLE SmbiosHandle
   );
 
 
-EFI_STATUS
-EFIAPI
-SmbiosGetVersion (
-  OUT UINT8   *SmbiosMajorVersion,
-  OUT UINT8   *SmbiosMinorVersion
-  );
 
 
 #endif
