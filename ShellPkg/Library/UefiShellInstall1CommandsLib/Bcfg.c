@@ -948,7 +948,7 @@ BcfgAddOptInstall1(
         ShellStatus = SHELL_OUT_OF_RESOURCES;
       }
       if (ShellStatus == SHELL_SUCCESS) {
-        ShellStatus = ShellReadFile(FileHandle, &((UINTN)Intermediate), Data);
+        ShellStatus = ShellReadFile(FileHandle, (UINTN *)&Intermediate, Data);
       }
     } else {
       Intermediate = StrSize(Data);
