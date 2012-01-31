@@ -321,6 +321,11 @@ typedef struct {
   UINT32        EndingAddress;
   UINT16        MemoryArrayHandle;
   UINT8         PartitionWidth;
+  //
+  // Add for smbios 2.7
+  //
+  UINT64                ExtendedStartingAddress;
+  UINT64                ExtendedEndingAddress;
 } SMBIOS_TYPE19;
 
 typedef struct {

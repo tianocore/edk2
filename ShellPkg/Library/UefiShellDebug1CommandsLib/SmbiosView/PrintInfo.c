@@ -58,6 +58,12 @@
     ShellPrintEx(-1,-1,L": 0x%x\n", (pStruct->type->element)); \
   } while (0);
 
+#define PRINT_STRUCT_VALUE_LH(pStruct, type, element) \
+  do { \
+    ShellPrintEx(-1,-1,L"%a",#element); \
+    ShellPrintEx(-1,-1,L": 0x%lx\n", (pStruct->type->element)); \
+  } while (0);
+
 #define PRINT_BIT_FIELD(pStruct, type, element, size) \
   do { \
     ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_DUMP), gShellDebug1HiiHandle); \
@@ -630,6 +636,11 @@ SmbiosPrintStructure (
     PRINT_STRUCT_VALUE_H (Struct, Type19, EndingAddress);
     PRINT_STRUCT_VALUE_H (Struct, Type19, MemoryArrayHandle);
     PRINT_STRUCT_VALUE_H (Struct, Type19, PartitionWidth);
+    if (Struct->Hdr->Length >= 0x19) {
+      // SMBIOS 2.7+
+      PRINT_STRUCT_VALUE_LH (Struct, Type19, ExtendedStartingAddress);
+      PRINT_STRUCT_VALUE_LH (Struct, Type19, ExtendedEndingAddress);
+    }
     break;
 
   //
