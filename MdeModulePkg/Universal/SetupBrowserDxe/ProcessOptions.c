@@ -84,12 +84,13 @@ ValueToOption (
 {
   LIST_ENTRY       *Link;
   QUESTION_OPTION  *Option;
+  INTN             Result;
 
   Link = GetFirstNode (&Question->OptionListHead);
   while (!IsNull (&Question->OptionListHead, Link)) {
     Option = QUESTION_OPTION_FROM_LINK (Link);
 
-    if (CompareHiiValue (&Option->Value, OptionValue, NULL) == 0) {
+    if ((CompareHiiValue (&Option->Value, OptionValue, &Result, NULL) == EFI_SUCCESS) && (Result == 0)) {
       return Option;
     }
 

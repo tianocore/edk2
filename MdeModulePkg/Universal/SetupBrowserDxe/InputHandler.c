@@ -931,6 +931,7 @@ GetSelectionInputPopUp (
   QUESTION_OPTION         *OneOfOption;
   QUESTION_OPTION         *CurrentOption;
   FORM_BROWSER_STATEMENT  *Question;
+  INTN                    Result;
 
   DimensionsWidth   = gScreenDimensions.RightColumn - gScreenDimensions.LeftColumn;
 
@@ -1035,7 +1036,7 @@ GetSelectionInputPopUp (
     }
     FreePool (StringPtr);
 
-    if (!OrderedList && CompareHiiValue (&Question->HiiValue, &OneOfOption->Value, NULL) == 0) {
+    if (!OrderedList && (CompareHiiValue (&Question->HiiValue, &OneOfOption->Value, &Result, NULL) == EFI_SUCCESS) && (Result == 0)) {
       //
       // Find current selected Option for OneOf
       //

@@ -1950,7 +1950,7 @@ ValidateQuestion (
       return Status;
     }
 
-    if (Expression->Result.Value.b) {
+    if ((Expression->Result.Type == EFI_IFR_TYPE_BOOLEAN) && Expression->Result.Value.b) {
       //
       // Condition meet, show up error message
       //

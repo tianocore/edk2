@@ -956,18 +956,21 @@ ExtendValueToU64 (
 
   @param  Value1                 Expression value to compare on left-hand.
   @param  Value2                 Expression value to compare on right-hand.
+  @param  Result                 Return value after compare.
+                                 retval 0                      Two operators equal.
+                                 return Positive value if Value1 is greater than Value2.
+                                 retval Negative value if Value1 is less than Value2.
   @param  HiiHandle              Only required for string compare.
 
-  @retval EFI_INVALID_PARAMETER  Could not perform comparation on two values.
-  @retval 0                      Two operators equeal.
-  @return Positive value if Value1 is greater than Value2.
-  @retval Negative value if Value1 is less than Value2.
+  @retval other                  Could not perform compare on two values.
+  @retval EFI_SUCCESS            Compare the value success.
 
 **/
-INTN
+EFI_STATUS
 CompareHiiValue (
   IN  EFI_HII_VALUE   *Value1,
   IN  EFI_HII_VALUE   *Value2,
+  OUT INTN            *Result,
   IN  EFI_HII_HANDLE  HiiHandle OPTIONAL
   );
 
