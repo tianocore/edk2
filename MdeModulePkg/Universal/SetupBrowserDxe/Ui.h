@@ -1,7 +1,7 @@
 /** @file
 Private structure, MACRO and function definitions for User Interface related functionalities.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -742,6 +742,67 @@ ResetScopeStack (
   );
 
 /**
+  Push the expression options onto the Stack.
+
+  @param  Pointer                Pointer to the current expression.
+  @param  Level                  Which type this expression belong to. Form, 
+                                 statement or option?
+
+  @retval EFI_SUCCESS            The value was pushed onto the stack.
+  @retval EFI_OUT_OF_RESOURCES   There is not enough system memory to grow the stack.
+
+**/
+EFI_STATUS
+PushConditionalExpression (
+  IN FORM_EXPRESSION     *Pointer,
+  IN EXPRESS_LEVEL               Level
+  );
+
+/**
+  Pop the expression options from the Stack
+
+  @param  Level                  Which type this expression belong to. Form, 
+                                 statement or option?
+
+  @retval EFI_SUCCESS            The value was pushed onto the stack.
+  @retval EFI_OUT_OF_RESOURCES   There is not enough system memory to grow the stack.
+
+**/
+EFI_STATUS
+PopConditionalExpression (
+  IN  EXPRESS_LEVEL      Level
+  );
+  
+/**
+  Get the expression Buffer pointer.
+  
+  @param  Level                  Which type this expression belong to. Form, 
+                                 statement or option?
+
+  @retval  The start pointer of the expression buffer or NULL.
+
+**/
+FORM_EXPRESSION **
+GetConditionalExpressionList (
+  IN EXPRESS_LEVEL       Level
+  );
+
+/**
+  Get the expression list count.
+  
+  @param  Level                  Which type this expression belong to. Form, 
+                                 statement or option?
+
+  @retval >=0                    The expression count
+  @retval -1                     Input parameter error.
+
+**/
+INTN 
+GetConditionalExpressionCount (
+  IN EXPRESS_LEVEL       Level
+  );
+
+/**
   Push an Operand onto the Stack
 
   @param  Operand                Operand to push.
@@ -933,6 +994,30 @@ EvaluateExpression (
   IN FORM_BROWSER_FORMSET  *FormSet,
   IN FORM_BROWSER_FORM     *Form,
   IN OUT FORM_EXPRESSION   *Expression
+  );
+
+/**
+  Return the result of the expression list. Check the expression list and 
+  return the highest priority express result.  
+  Priority: DisableIf > SuppressIf > GrayOutIf > FALSE
+
+  @param  ExpList             The input expression list.
+  @param  Evaluate            Whether need to evaluate the expression first.
+  @param  FormSet             FormSet associated with this expression. Only 
+                              needed when Evaluate is TRUE
+  @param  Form                Form associated with this expression. Only 
+                              needed when Evaluate is TRUE 
+
+  @retval EXPRESS_RESULT      Return the higher priority express result. 
+                              DisableIf > SuppressIf > GrayOutIf > FALSE
+
+**/
+EXPRESS_RESULT 
+EvaluateExpressionList (
+  IN FORM_EXPRESSION_LIST *ExpList,
+  IN BOOLEAN              Evaluate,
+  IN FORM_BROWSER_FORMSET *FormSet, OPTIONAL
+  IN FORM_BROWSER_FORM    *Form OPTIONAL
   );
 
 #endif // _UI_H

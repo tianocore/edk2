@@ -18,13 +18,6 @@ UINT16           mStatementIndex;
 UINT16           mExpressionOpCodeIndex;
 
 BOOLEAN          mInScopeSubtitle;
-BOOLEAN          mInScopeSuppress;
-BOOLEAN          mInScopeGrayOut;
-BOOLEAN          mInScopeDisable;
-FORM_EXPRESSION  *mSuppressExpression;
-FORM_EXPRESSION  *mGrayOutExpression;
-FORM_EXPRESSION  *mDisableExpression;
-
 /**
   Initialize Statement header members.
 
@@ -44,6 +37,7 @@ CreateStatement (
 {
   FORM_BROWSER_STATEMENT    *Statement;
   EFI_IFR_STATEMENT_HEADER  *StatementHdr;
+  INTN                      ConditionalExprCount; 
 
   if (Form == NULL) {
     //
@@ -68,17 +62,18 @@ CreateStatement (
   CopyMem (&Statement->Prompt, &StatementHdr->Prompt, sizeof (EFI_STRING_ID));
   CopyMem (&Statement->Help, &StatementHdr->Help, sizeof (EFI_STRING_ID));
 
-  if (mInScopeSuppress) {
-    Statement->SuppressExpression = mSuppressExpression;
-  }
-
-  if (mInScopeGrayOut) {
-    Statement->GrayOutExpression = mGrayOutExpression;
-  }
-
-
-  if (mInScopeDisable) {
-    Statement->DisableExpression = mDisableExpression;
+  ConditionalExprCount = GetConditionalExpressionCount(ExpressStatement);
+  if (ConditionalExprCount > 0) {
+    //
+    // Form is inside of suppressif
+    //
+    
+    Statement->Expression = (FORM_EXPRESSION_LIST *) AllocatePool( 
+                                             (UINTN) (sizeof(FORM_EXPRESSION_LIST) + ((ConditionalExprCount -1) * sizeof(FORM_EXPRESSION *))));
+    ASSERT (Statement->Expression != NULL);
+    Statement->Expression->Count     = (UINTN) ConditionalExprCount;
+    Statement->Expression->Signature = FORM_EXPRESSION_LIST_SIGNATURE;
+    CopyMem (Statement->Expression->Expression, GetConditionalExpressionList(ExpressStatement), (UINTN) (sizeof (FORM_EXPRESSION *) * ConditionalExprCount));
   }
 
   Statement->InSubtitle = mInScopeSubtitle;
@@ -629,6 +624,9 @@ DestroyStatement (
   while (!IsListEmpty (&Statement->OptionListHead)) {
     Link = GetFirstNode (&Statement->OptionListHead);
     Option = QUESTION_OPTION_FROM_LINK (Link);
+    if (Option->SuppressExpression != NULL) {
+      FreePool (Option->SuppressExpression);
+    }
     RemoveEntryList (&Option->Link);
 
     FreePool (Option);
@@ -654,6 +652,10 @@ DestroyStatement (
     RemoveEntryList (&Expression->Link);
 
     DestroyExpression (Expression);
+  }
+
+  if (Statement->Expression != NULL) {
+    FreePool (Statement->Expression);
   }
 
   if (Statement->VariableName != NULL) {
@@ -721,6 +723,10 @@ DestroyForm (
 
     FreePool (ConfigInfo->ConfigRequest);
     FreePool (ConfigInfo);
+  }
+
+  if (Form->SuppressExpression != NULL) {
+    FreePool (Form->SuppressExpression);
   }
 
   //
@@ -931,10 +937,6 @@ ParseOpCodes (
   EFI_IMAGE_ID            *ImageId;
   BOOLEAN                 SuppressForQuestion;
   BOOLEAN                 SuppressForOption;
-  BOOLEAN                 InScopeOptionSuppress;
-  FORM_EXPRESSION         *OptionSuppressExpression;
-  BOOLEAN                 InScopeFormSuppress;
-  FORM_EXPRESSION         *FormSuppressExpression;
   UINT16                  DepthOfDisable;
   BOOLEAN                 OpCodeDisabled;
   BOOLEAN                 SingleOpCodeExpression;
@@ -946,15 +948,13 @@ ParseOpCodes (
   FORMSET_STORAGE         *VarStorage;
   LIST_ENTRY              *MapExpressionList;
   EFI_VARSTORE_ID         TempVarstoreId;
+  BOOLEAN                 InScopeDisable;
+  INTN                    ConditionalExprCount;
 
   mInScopeSubtitle         = FALSE;
   SuppressForQuestion      = FALSE;
   SuppressForOption        = FALSE;
-  InScopeFormSuppress      = FALSE;
-  mInScopeSuppress         = FALSE;
-  InScopeOptionSuppress    = FALSE;
-  mInScopeGrayOut          = FALSE;
-  mInScopeDisable          = FALSE;
+  InScopeDisable           = FALSE;
   DepthOfDisable           = 0;
   OpCodeDisabled           = FALSE;
   SingleOpCodeExpression   = FALSE;
@@ -962,8 +962,6 @@ ParseOpCodes (
   CurrentExpression        = NULL;
   CurrentDefault           = NULL;
   CurrentOption            = NULL;
-  OptionSuppressExpression = NULL;
-  FormSuppressExpression   = NULL;
   ImageId                  = NULL;
   MapMethod                = NULL;
   MapScopeDepth            = 0;
@@ -971,6 +969,7 @@ ParseOpCodes (
   VarStorage               = NULL;
   MapExpressionList        = NULL;
   TempVarstoreId           = 0;
+  ConditionalExprCount     = 0;
 
   //
   // Get the number of Statements and Expressions
@@ -1032,7 +1031,7 @@ ParseOpCodes (
 
         if (ScopeOpCode == EFI_IFR_DISABLE_IF_OP) {
           if (DepthOfDisable == 0) {
-            mInScopeDisable = FALSE;
+            InScopeDisable = FALSE;
             OpCodeDisabled = FALSE;
           } else {
             DepthOfDisable--;
@@ -1288,7 +1287,7 @@ ParseOpCodes (
         //
         SingleOpCodeExpression = FALSE;
 
-        if (mInScopeDisable && CurrentForm == NULL) {
+        if (InScopeDisable && CurrentForm == NULL) {
           //
           // This is DisableIf expression for Form, it should be a constant expression
           //
@@ -1351,11 +1350,17 @@ ParseOpCodes (
       CopyMem (&CurrentForm->FormId,    &((EFI_IFR_FORM *) OpCodeData)->FormId,    sizeof (UINT16));
       CopyMem (&CurrentForm->FormTitle, &((EFI_IFR_FORM *) OpCodeData)->FormTitle, sizeof (EFI_STRING_ID));
 
-      if (InScopeFormSuppress) {
+      ConditionalExprCount = GetConditionalExpressionCount(ExpressForm);
+      if ( ConditionalExprCount > 0) {
         //
         // Form is inside of suppressif
         //
-        CurrentForm->SuppressExpression = FormSuppressExpression;
+        CurrentForm->SuppressExpression = (FORM_EXPRESSION_LIST *) AllocatePool( 
+                                                 (UINTN) (sizeof(FORM_EXPRESSION_LIST) + ((ConditionalExprCount -1) * sizeof(FORM_EXPRESSION *))));
+        ASSERT (CurrentForm->SuppressExpression != NULL);
+        CurrentForm->SuppressExpression->Count     = (UINTN) ConditionalExprCount;
+        CurrentForm->SuppressExpression->Signature = FORM_EXPRESSION_LIST_SIGNATURE;
+        CopyMem (CurrentForm->SuppressExpression->Expression, GetConditionalExpressionList(ExpressForm), (UINTN) (sizeof (FORM_EXPRESSION *) * ConditionalExprCount));
       }
 
       if (Scope != 0) {
@@ -1410,11 +1415,17 @@ ParseOpCodes (
         CopyMem (&CurrentForm->FormTitle, &MapMethod->MethodTitle, sizeof (EFI_STRING_ID));
       }
 
-      if (InScopeFormSuppress) {
+      ConditionalExprCount = GetConditionalExpressionCount(ExpressForm);
+      if ( ConditionalExprCount > 0) {
         //
         // Form is inside of suppressif
         //
-        CurrentForm->SuppressExpression = FormSuppressExpression;
+        CurrentForm->SuppressExpression = (FORM_EXPRESSION_LIST *) AllocatePool( 
+                                                 (UINTN) (sizeof(FORM_EXPRESSION_LIST) + ((ConditionalExprCount -1) * sizeof(FORM_EXPRESSION *))));
+        ASSERT (CurrentForm->SuppressExpression != NULL);
+        CurrentForm->SuppressExpression->Count     = (UINTN) ConditionalExprCount;
+        CurrentForm->SuppressExpression->Signature = FORM_EXPRESSION_LIST_SIGNATURE;
+        CopyMem (CurrentForm->SuppressExpression->Expression, GetConditionalExpressionList(ExpressForm), (UINTN) (sizeof (FORM_EXPRESSION *) * ConditionalExprCount));
       }
 
       if (Scope != 0) {
@@ -1799,8 +1810,17 @@ ParseOpCodes (
       CopyMem (&CurrentOption->Value.Value, &((EFI_IFR_ONE_OF_OPTION *) OpCodeData)->Value, sizeof (EFI_IFR_TYPE_VALUE));
       ExtendValueToU64 (&CurrentOption->Value);
 
-      if (InScopeOptionSuppress) {
-        CurrentOption->SuppressExpression = OptionSuppressExpression;
+      ConditionalExprCount = GetConditionalExpressionCount(ExpressOption);
+      if ( ConditionalExprCount > 0) {
+        //
+        // Form is inside of suppressif
+        //
+        CurrentOption->SuppressExpression = (FORM_EXPRESSION_LIST *) AllocatePool( 
+                                                 (UINTN) (sizeof(FORM_EXPRESSION_LIST) + ((ConditionalExprCount -1) * sizeof(FORM_EXPRESSION *))));
+        ASSERT (CurrentOption->SuppressExpression != NULL);
+        CurrentOption->SuppressExpression->Count     = (UINTN) ConditionalExprCount;
+        CurrentOption->SuppressExpression->Signature = FORM_EXPRESSION_LIST_SIGNATURE;
+        CopyMem (CurrentOption->SuppressExpression->Expression, GetConditionalExpressionList(ExpressOption), (UINTN) (sizeof (FORM_EXPRESSION *) * ConditionalExprCount));
       }
 
       //
@@ -1892,14 +1912,11 @@ ParseOpCodes (
       }
 
       if (SuppressForOption) {
-        InScopeOptionSuppress = TRUE;
-        OptionSuppressExpression = CurrentExpression;
+        PushConditionalExpression(CurrentExpression, ExpressOption);       
       } else if (SuppressForQuestion) {
-        mInScopeSuppress = TRUE;
-        mSuppressExpression = CurrentExpression;
+        PushConditionalExpression(CurrentExpression, ExpressStatement);  
       } else {
-        InScopeFormSuppress = TRUE;
-        FormSuppressExpression = CurrentExpression;
+        PushConditionalExpression(CurrentExpression, ExpressForm);  
       }
 
       //
@@ -1918,9 +1935,7 @@ ParseOpCodes (
       CurrentExpression = CreateExpression (CurrentForm);
       CurrentExpression->Type = EFI_HII_EXPRESSION_GRAY_OUT_IF;
       InsertTailList (&CurrentForm->ExpressionListHead, &CurrentExpression->Link);
-
-      mInScopeGrayOut = TRUE;
-      mGrayOutExpression = CurrentExpression;
+      PushConditionalExpression(CurrentExpression, ExpressStatement);
 
       //
       // Take a look at next OpCode to see whether current expression consists
@@ -1947,12 +1962,11 @@ ParseOpCodes (
         // This is DisableIf for Question, enqueue it to Form expression list
         //
         InsertTailList (&CurrentForm->ExpressionListHead, &CurrentExpression->Link);
+        PushConditionalExpression(CurrentExpression, ExpressStatement);
       }
 
-      mDisableExpression = CurrentExpression;
-      mInScopeDisable    = TRUE;
-      OpCodeDisabled     = FALSE;
-
+      OpCodeDisabled  = FALSE;
+      InScopeDisable  = TRUE;
       //
       // Take a look at next OpCode to see whether current expression consists
       // of single OpCode
@@ -2235,20 +2249,23 @@ ParseOpCodes (
 
       case EFI_IFR_SUPPRESS_IF_OP:
         if (SuppressForOption) {
-          InScopeOptionSuppress = FALSE;
+          PopConditionalExpression(ExpressOption);      
         } else if (SuppressForQuestion) {
-          mInScopeSuppress = FALSE;
+          PopConditionalExpression(ExpressStatement);
         } else {
-          InScopeFormSuppress = FALSE;
+          PopConditionalExpression(ExpressForm);
         }
         break;
 
       case EFI_IFR_GRAY_OUT_IF_OP:
-        mInScopeGrayOut = FALSE;
+        PopConditionalExpression(ExpressStatement);
         break;
 
       case EFI_IFR_DISABLE_IF_OP:
-        mInScopeDisable = FALSE;
+        if (CurrentForm != NULL) {
+          PopConditionalExpression(ExpressStatement);
+        }
+        InScopeDisable = FALSE;
         OpCodeDisabled = FALSE;
         break;
 
@@ -2280,7 +2297,7 @@ ParseOpCodes (
 
       default:
         if (IsExpressionOpCode (ScopeOpCode)) {
-          if (mInScopeDisable && CurrentForm == NULL) {
+          if (InScopeDisable && CurrentForm == NULL) {
             //
             // This is DisableIf expression for Form, it should be a constant expression
             //

@@ -2,7 +2,7 @@
 Implementation for handling the User Interface option processing.
 
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -491,7 +491,7 @@ ProcessOptions (
 
         Suppress = FALSE;
         if ((OneOfOption->SuppressExpression != NULL) &&
-            (OneOfOption->SuppressExpression->Result.Value.b)) {
+            (EvaluateExpressionList(OneOfOption->SuppressExpression, FALSE, NULL, NULL) == ExpressSuppress)) {
           //
           // This option is suppressed
           //
@@ -548,7 +548,7 @@ ProcessOptions (
           Option = QUESTION_OPTION_FROM_LINK (Link);
 
           if ((Option->SuppressExpression == NULL) ||
-              !Option->SuppressExpression->Result.Value.b) {
+              (EvaluateExpressionList(Option->SuppressExpression, FALSE, NULL, NULL) == ExpressFalse)) {
             CopyMem (QuestionValue, &Option->Value, sizeof (EFI_HII_VALUE));
             SetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);
             UpdateStatusBar (Selection, NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
@@ -564,7 +564,7 @@ ProcessOptions (
       }
 
       if ((OneOfOption->SuppressExpression != NULL) &&
-          (OneOfOption->SuppressExpression->Result.Value.b)) {
+          ((EvaluateExpressionList(OneOfOption->SuppressExpression, FALSE, NULL, NULL) == ExpressSuppress))) {
         //
         // This option is suppressed
         //
@@ -583,7 +583,7 @@ ProcessOptions (
           OneOfOption = QUESTION_OPTION_FROM_LINK (Link);
 
           if ((OneOfOption->SuppressExpression == NULL) ||
-              !OneOfOption->SuppressExpression->Result.Value.b) {
+              (EvaluateExpressionList(OneOfOption->SuppressExpression, FALSE, NULL, NULL) == ExpressFalse)) {
             Suppress = FALSE;
             CopyMem (QuestionValue, &OneOfOption->Value, sizeof (EFI_HII_VALUE));
             SetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);

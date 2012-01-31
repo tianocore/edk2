@@ -34,6 +34,19 @@ EFI_HII_VALUE *mMapExpressionListStack = NULL;
 EFI_HII_VALUE *mMapExpressionListEnd = NULL;
 EFI_HII_VALUE *mMapExpressionListPointer = NULL;
 
+FORM_EXPRESSION   **mFormExpressionStack = NULL;
+FORM_EXPRESSION   **mFormExpressionEnd = NULL;
+FORM_EXPRESSION   **mFormExpressionPointer = NULL;
+
+FORM_EXPRESSION   **mStatementExpressionStack = NULL;
+FORM_EXPRESSION   **mStatementExpressionEnd = NULL;
+FORM_EXPRESSION   **mStatementExpressionPointer = NULL;
+
+FORM_EXPRESSION   **mOptionExpressionStack = NULL;
+FORM_EXPRESSION   **mOptionExpressionEnd = NULL;
+FORM_EXPRESSION   **mOptionExpressionPointer = NULL;
+
+
 //
 // Unicode collation protocol interface
 //
@@ -194,7 +207,10 @@ ResetCurrentExpressionStack (
   VOID
   )
 {
-  mCurrentExpressionPointer = mCurrentExpressionStack;
+  mCurrentExpressionPointer   = mCurrentExpressionStack;
+  mFormExpressionPointer      = mFormExpressionStack;
+  mStatementExpressionPointer = mStatementExpressionStack;
+  mOptionExpressionPointer    = mOptionExpressionStack;  
 }
 
 
@@ -264,6 +280,294 @@ ResetMapExpressionListStack (
   )
 {
   mMapExpressionListPointer = mMapExpressionListStack;
+}
+
+
+/**
+  Grow size of the stack.
+
+  This is an internal function.
+
+  @param  Stack                  On input: old stack; On output: new stack
+  @param  StackPtr               On input: old stack pointer; On output: new stack
+                                 pointer
+  @param  StackEnd               On input: old stack end; On output: new stack end
+  @param  MemberSize             The stack member size.
+  
+  @retval EFI_SUCCESS            Grow stack success.
+  @retval EFI_OUT_OF_RESOURCES   No enough memory for stack space.
+
+**/
+EFI_STATUS
+GrowConditionalStack (
+  IN OUT FORM_EXPRESSION   ***Stack,
+  IN OUT FORM_EXPRESSION   ***StackPtr,
+  IN OUT FORM_EXPRESSION   ***StackEnd,
+  IN     UINTN             MemberSize
+  )
+{
+  UINTN             Size;
+  FORM_EXPRESSION   **NewStack;
+
+  Size = EXPRESSION_STACK_SIZE_INCREMENT;
+  if (*StackPtr != NULL) {
+    Size = Size + (*StackEnd - *Stack);
+  }
+
+  NewStack = AllocatePool (Size * MemberSize);
+  if (NewStack == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  if (*StackPtr != NULL) {
+    //
+    // Copy from Old Stack to the New Stack
+    //
+    CopyMem (
+      NewStack,
+      *Stack,
+      (*StackEnd - *Stack) * MemberSize
+      );
+
+    //
+    // Free The Old Stack
+    //
+    FreePool (*Stack);
+  }
+
+  //
+  // Make the Stack pointer point to the old data in the new stack
+  //
+  *StackPtr = NewStack + (*StackPtr - *Stack);
+  *Stack    = NewStack;
+  *StackEnd = NewStack + Size;
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Push an element onto the Stack.
+
+  @param  Stack                  On input: old stack; On output: new stack
+  @param  StackPtr               On input: old stack pointer; On output: new stack
+                                 pointer
+  @param  StackEnd               On input: old stack end; On output: new stack end
+  @param  Data                   Data to push.
+
+  @retval EFI_SUCCESS            Push stack success.
+
+**/
+EFI_STATUS
+PushConditionalStack (
+  IN OUT FORM_EXPRESSION   ***Stack,
+  IN OUT FORM_EXPRESSION   ***StackPtr,
+  IN OUT FORM_EXPRESSION   ***StackEnd,
+  IN     FORM_EXPRESSION   **Data
+  )
+{
+  EFI_STATUS  Status;
+
+  //
+  // Check for a stack overflow condition
+  //
+  if (*StackPtr >= *StackEnd) {
+    //
+    // Grow the stack
+    //
+    Status = GrowConditionalStack (Stack, StackPtr, StackEnd, sizeof (FORM_EXPRESSION *));
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  //
+  // Push the item onto the stack
+  //
+  CopyMem (*StackPtr, Data, sizeof (FORM_EXPRESSION *)); 
+  *StackPtr = *StackPtr + 1;
+
+  return EFI_SUCCESS;
+
+}
+
+/**
+  Pop an element from the stack.
+
+  @param  Stack                  On input: old stack
+  @param  StackPtr               On input: old stack pointer; On output: new stack pointer
+  @param  Data                   Data to pop.
+
+  @retval EFI_SUCCESS            The value was popped onto the stack.
+  @retval EFI_ACCESS_DENIED      The pop operation underflowed the stack
+
+**/
+EFI_STATUS
+PopConditionalStack (
+  IN     FORM_EXPRESSION   **Stack,
+  IN OUT FORM_EXPRESSION   ***StackPtr,
+  OUT    FORM_EXPRESSION   **Data
+  )
+{
+  //
+  // Check for a stack underflow condition
+  //
+  if (*StackPtr == Stack) {
+    return EFI_ACCESS_DENIED;
+  }
+
+  //
+  // Pop the item off the stack
+  //
+  *StackPtr = *StackPtr - 1;
+  CopyMem (Data, *StackPtr, sizeof (FORM_EXPRESSION  *));
+  return EFI_SUCCESS;
+
+}
+
+/**
+  Get the expression list count.
+  
+  @param  Level                  Which type this expression belong to. Form, 
+                                 statement or option?
+
+  @retval >=0                    The expression count
+  @retval -1                     Input parameter error.
+
+**/
+INTN 
+GetConditionalExpressionCount (
+  IN EXPRESS_LEVEL       Level
+  )
+{
+  switch (Level) {
+    case ExpressForm:
+      return mFormExpressionPointer - mFormExpressionStack;
+    case ExpressStatement:
+      return mStatementExpressionPointer - mStatementExpressionStack;
+    case ExpressOption:
+      return mOptionExpressionPointer - mOptionExpressionStack;
+    default:
+      ASSERT (FALSE);
+      return -1;
+  } 
+}
+
+/**
+  Get the expression Buffer pointer.
+  
+  @param  Level                  Which type this expression belong to. Form, 
+                                 statement or option?
+
+  @retval  The start pointer of the expression buffer or NULL.
+
+**/
+FORM_EXPRESSION **
+GetConditionalExpressionList (
+  IN EXPRESS_LEVEL       Level
+  )
+{
+  switch (Level) {
+    case ExpressForm:
+      return mFormExpressionStack;
+    case ExpressStatement:
+      return mStatementExpressionStack;
+    case ExpressOption:
+      return mOptionExpressionStack;
+    default:
+      ASSERT (FALSE);
+      return NULL;
+  } 
+}
+
+
+/**
+  Push the expression options onto the Stack.
+
+  @param  Pointer                Pointer to the current expression.
+  @param  Level                  Which type this expression belong to. Form, 
+                                 statement or option?
+
+  @retval EFI_SUCCESS            The value was pushed onto the stack.
+  @retval EFI_OUT_OF_RESOURCES   There is not enough system memory to grow the stack.
+
+**/
+EFI_STATUS
+PushConditionalExpression (
+  IN FORM_EXPRESSION   *Pointer,
+  IN EXPRESS_LEVEL     Level
+  )
+{
+  switch (Level) {
+    case ExpressForm:
+      return PushConditionalStack (
+        &mFormExpressionStack,
+        &mFormExpressionPointer,
+        &mFormExpressionEnd,
+        &Pointer
+        );
+    case ExpressStatement:
+      return PushConditionalStack (
+        &mStatementExpressionStack,
+        &mStatementExpressionPointer,
+        &mStatementExpressionEnd,
+        &Pointer
+        );
+    case ExpressOption:
+      return PushConditionalStack (
+        &mOptionExpressionStack,
+        &mOptionExpressionPointer,
+        &mOptionExpressionEnd,
+        &Pointer
+        );
+    default:
+      ASSERT (FALSE);
+      return EFI_INVALID_PARAMETER;
+  }
+}
+
+/**
+  Pop the expression options from the Stack
+
+  @param  Level                  Which type this expression belong to. Form, 
+                                 statement or option?
+
+  @retval EFI_SUCCESS            The value was pushed onto the stack.
+  @retval EFI_OUT_OF_RESOURCES   There is not enough system memory to grow the stack.
+
+**/
+EFI_STATUS
+PopConditionalExpression (
+  IN  EXPRESS_LEVEL      Level
+  )
+{
+  FORM_EXPRESSION   *Pointer;
+
+  switch (Level) {
+    case ExpressForm:
+      return PopConditionalStack (
+        mFormExpressionStack,
+        &mFormExpressionPointer,
+        &Pointer
+      );
+
+    case ExpressStatement:
+      return PopConditionalStack (
+        mStatementExpressionStack,
+        &mStatementExpressionPointer,
+        &Pointer
+      );
+
+    case ExpressOption:
+      return PopConditionalStack (
+        mOptionExpressionStack,
+        &mOptionExpressionPointer,
+        &Pointer
+      );
+
+    default:
+      ASSERT (FALSE);
+      return EFI_INVALID_PARAMETER;
+  }
 }
 
 
@@ -2867,4 +3171,81 @@ Done:
   }
 
   return Status;
+}
+
+/**
+  Return the result of the expression list. Check the expression list and 
+  return the highest priority express result.  
+  Priority: DisableIf > SuppressIf > GrayOutIf > FALSE
+
+  @param  ExpList             The input expression list.
+  @param  Evaluate            Whether need to evaluate the expression first.
+  @param  FormSet             FormSet associated with this expression.
+  @param  Form                Form associated with this expression.  
+
+  @retval EXPRESS_RESULT      Return the higher priority express result. 
+                              DisableIf > SuppressIf > GrayOutIf > FALSE
+
+**/
+EXPRESS_RESULT 
+EvaluateExpressionList (
+  IN FORM_EXPRESSION_LIST *ExpList,
+  IN BOOLEAN              Evaluate,
+  IN FORM_BROWSER_FORMSET *FormSet, OPTIONAL
+  IN FORM_BROWSER_FORM    *Form OPTIONAL
+  )
+{
+  UINTN              Index;
+  EXPRESS_RESULT     ReturnVal;
+  EXPRESS_RESULT     CompareOne;
+  EFI_STATUS         Status;
+
+  if (ExpList == NULL) {
+    return ExpressFalse;
+  }
+
+  ASSERT(ExpList->Signature == FORM_EXPRESSION_LIST_SIGNATURE);
+  Index     = 0;
+
+  //
+  // Check whether need to evaluate the expression first.
+  //
+  if (Evaluate) {  
+    while (ExpList->Count > Index) {
+      Status = EvaluateExpression (FormSet, Form, ExpList->Expression[Index++]);
+      if (EFI_ERROR (Status)) {
+        return ExpressFalse;
+      }
+    }
+  }
+
+  //
+  // Run the list of expressions.
+  //
+  ReturnVal = ExpressFalse;
+  for (Index = 0; Index < ExpList->Count; Index++) {
+    if (ExpList->Expression[Index]->Result.Type == EFI_IFR_TYPE_BOOLEAN &&
+        ExpList->Expression[Index]->Result.Value.b) {
+      switch (ExpList->Expression[Index]->Type) {
+        case EFI_HII_EXPRESSION_SUPPRESS_IF:
+          CompareOne = ExpressSuppress;
+          break;
+
+        case EFI_HII_EXPRESSION_GRAY_OUT_IF:
+          CompareOne = ExpressGrayOut;
+          break;
+
+        case EFI_HII_EXPRESSION_DISABLE_IF:
+          CompareOne = ExpressDisable;
+          break;
+
+        default:
+          return ExpressFalse; 
+      }
+
+      ReturnVal = ReturnVal < CompareOne ? CompareOne : ReturnVal;
+    }
+  }
+  
+  return ReturnVal;
 }

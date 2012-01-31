@@ -1,7 +1,7 @@
 /** @file
 Implementation for handling user input from the User Interfaces.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1005,7 +1005,7 @@ GetSelectionInputPopUp (
     RemoveEntryList (&OneOfOption->Link);
 
     if ((OneOfOption->SuppressExpression != NULL) &&
-        (OneOfOption->SuppressExpression->Result.Value.b)) {
+        EvaluateExpressionList(OneOfOption->SuppressExpression, FALSE, NULL, NULL) != ExpressFalse) {
       //
       // This option is suppressed, insert to tail
       //

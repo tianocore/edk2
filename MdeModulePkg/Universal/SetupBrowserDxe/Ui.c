@@ -1,7 +1,7 @@
 /** @file
 Utility functions for User Interface functions.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -731,8 +731,10 @@ UiAddMenuOption (
     }
     MenuOption->Sequence = Index;
 
-    if (Statement->GrayOutExpression != NULL) {
-      MenuOption->GrayOut = Statement->GrayOutExpression->Result.Value.b;
+    if (EvaluateExpressionList(Statement->Expression, FALSE, NULL, NULL) == ExpressGrayOut ) {
+      MenuOption->GrayOut = TRUE;
+    } else {
+      MenuOption->GrayOut = FALSE;
     }
 
     //
@@ -1999,12 +2001,7 @@ ProcessGotoOpCode (
     RefForm = IdToForm (Selection->FormSet, Statement->HiiValue.Value.ref.FormId);
 
     if ((RefForm != NULL) && (RefForm->SuppressExpression != NULL)) {
-      Status = EvaluateExpression (Selection->FormSet, RefForm, RefForm->SuppressExpression);
-      if (EFI_ERROR (Status)) {
-        return Status;
-      }
-
-      if (RefForm->SuppressExpression->Result.Value.b) {
+      if (EvaluateExpressionList(RefForm->SuppressExpression, TRUE, Selection->FormSet, RefForm) != ExpressFalse) {
         //
         // Form is suppressed. 
         //
