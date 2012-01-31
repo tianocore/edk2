@@ -1,7 +1,7 @@
 /** @file
   PCI emumeration support functions implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -459,6 +459,9 @@ GatherPpbInfo (
   UINT8                           Value;
   EFI_PCI_IO_PROTOCOL             *PciIo;
   UINT8                           Temp;
+  UINT32                          PMemBaseLimit;
+  UINT16                          PrefetchableMemoryBase;
+  UINT16                          PrefetchableMemoryLimit;
 
   PciIoDevice = CreatePciIoDevice (
                   Bridge,
@@ -552,14 +555,22 @@ GatherPpbInfo (
             PciIoDevice,
             0x24,
             NULL,
-            NULL
+            &PMemBaseLimit
             );
 
   //
   // Test if it supports 64 memory or not
   //
-  if (!EFI_ERROR (Status)) {
-
+  // The bottom 4 bits of both the Prefetchable Memory Base and Prefetchable Memory Limit
+  // registers:
+  //   0 - the bridge supports only 32 bit addresses.
+  //   1 - the bridge supports 64-bit addresses.
+  //
+  PrefetchableMemoryBase = PMemBaseLimit & 0xffff;
+  PrefetchableMemoryLimit = PMemBaseLimit >> 16;
+  if (!EFI_ERROR (Status) &&
+      (PrefetchableMemoryBase & 0x000f) == 0x0001 &&
+      (PrefetchableMemoryLimit & 0x000f) == 0x0001) {
     Status = BarExisted (
               PciIoDevice,
               0x28,
