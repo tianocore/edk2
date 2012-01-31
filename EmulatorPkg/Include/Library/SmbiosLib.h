@@ -149,15 +149,16 @@ SmbiosLibUpdateUnicodeString (
   Allow caller to read a specific SMBIOS string
   
   @param[in]    Header          SMBIOS record that contains the string. 
-  @param[in[    Intance         Instance of SMBIOS string 0 - N-1. 
+  @param[in[    StringNumber    Instance of SMBIOS string 1 - N. 
 
   @retval NULL                  Instance of Type SMBIOS string was not found. 
   @retval Other                 Pointer to matching SMBIOS string. 
 **/
 CHAR8 *
+EFIAPI
 SmbiosLibReadString (
-  IN SMBIOS_STRUCTURE *Header,
-  IN UINTN            Instance
+  IN SMBIOS_STRUCTURE   *Header,
+  IN EFI_SMBIOS_STRING  StringNumber
   );
 
 
