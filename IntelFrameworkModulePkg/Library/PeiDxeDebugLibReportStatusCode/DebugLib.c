@@ -4,7 +4,7 @@
   Note that if the debug message length is larger than the maximum allowable
   record length, then the debug message will be ignored directly.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -207,6 +207,7 @@ DebugPrint (
     // If the converted BASE_LIST is larger than the 12 * sizeof (UINT64) allocated bytes, then return
     //
     if ((CHAR8 *)BaseListMarker > FormatString) {
+      VA_END (VaListMarker);
       return;
     }
   }

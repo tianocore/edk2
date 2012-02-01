@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -950,12 +950,8 @@ Returns:
     //
     // Check input parameters
     //
-    if (NumOfLba == 0) {
+    if (NumOfLba == 0 || (StartingLba + NumOfLba) > NumOfBlocks) {
       VA_END (args);
-      return EFI_INVALID_PARAMETER;
-    }
-
-    if ((StartingLba + NumOfLba) > NumOfBlocks) {
       return EFI_INVALID_PARAMETER;
     }
   } while (1);

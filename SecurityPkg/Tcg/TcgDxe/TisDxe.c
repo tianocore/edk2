@@ -1,7 +1,7 @@
 /** @file  
   TIS (TPM Interface Specification) functions used by TPM Dxe driver.
   
-Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -376,7 +376,7 @@ TisPcExecute (
     if (*Fmt == '/') break;
     Status = TisPcSendV (*Fmt, &Ap, TpmCommandBuf, &BufSize);
     if (EFI_ERROR( Status )) {
-      return Status;
+      goto Error;
     }
     Fmt++;
   }
@@ -389,7 +389,7 @@ TisPcExecute (
     // Ensure the TPM state change from "Reception" to "Idle/Ready"
     //
     MmioWrite8 ((UINTN) &(((TIS_PC_REGISTERS_PTR) TisReg)->Status), TIS_PC_STS_READY);
-    return Status; 
+    goto Error;
   }
 
   MmioWrite8 ((UINTN) &(((TIS_PC_REGISTERS_PTR) TisReg)->Status), TIS_PC_STS_GO);
@@ -404,7 +404,7 @@ TisPcExecute (
   //
   MmioWrite8 ((UINTN) &(((TIS_PC_REGISTERS_PTR) TisReg)->Status), TIS_PC_STS_READY);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Error;
   }
   
   //
@@ -418,14 +418,16 @@ TisPcExecute (
     }
     Status = TisPcReceiveV (*Fmt, &Ap, TpmCommandBuf, &BufSize, ResponseSize, &DataFinished);
     if (EFI_ERROR (Status)) {
-      return Status;
+      goto Error;
     }
     if (DataFinished) {
+      VA_END (Ap);
       return EFI_SUCCESS;
     }
     Fmt++;
   }
 
+Error:
   VA_END (Ap);
   return Status;
 }

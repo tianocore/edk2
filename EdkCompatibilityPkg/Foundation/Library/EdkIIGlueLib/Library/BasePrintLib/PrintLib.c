@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -601,9 +601,12 @@ BasePrintLibSPrint (
   )
 {
   VA_LIST  Marker;
+  UINTN    NumberOfPrinted;
 
   VA_START (Marker, FormatString);
-  return BasePrintLibVSPrint (StartOfBuffer, BufferSize, Flags, FormatString, Marker);
+  NumberOfPrinted = BasePrintLibVSPrint (StartOfBuffer, BufferSize, Flags, FormatString, Marker);
+  VA_END (Marker);
+  return NumberOfPrinted;
 }
 
 /**
@@ -696,9 +699,12 @@ UnicodeSPrint (
   )
 {
   VA_LIST Marker;
+  UINTN   NumberOfPrinted;
 
   VA_START (Marker, FormatString);
-  return UnicodeVSPrint (StartOfBuffer, BufferSize, FormatString, Marker);
+  NumberOfPrinted = UnicodeVSPrint (StartOfBuffer, BufferSize, FormatString, Marker);
+  VA_END (Marker);
+  return NumberOfPrinted;
 }
 
 /**
@@ -789,9 +795,12 @@ UnicodeSPrintAsciiFormat (
   )
 {
   VA_LIST Marker;
+  UINTN   NumberOfPrinted;
 
   VA_START (Marker, FormatString);
-  return UnicodeVSPrintAsciiFormat (StartOfBuffer, BufferSize, FormatString, Marker);
+  NumberOfPrinted = UnicodeVSPrintAsciiFormat (StartOfBuffer, BufferSize, FormatString, Marker);
+  VA_END (Marker);
+  return NumberOfPrinted;
 }
 
 /**
@@ -933,9 +942,12 @@ AsciiSPrint (
   )
 {
   VA_LIST Marker;
+  UINTN   NumberOfPrinted;
 
   VA_START (Marker, FormatString);
-  return AsciiVSPrint (StartOfBuffer, BufferSize, FormatString, Marker);
+  NumberOfPrinted = AsciiVSPrint (StartOfBuffer, BufferSize, FormatString, Marker);
+  VA_END (Marker);
+  return NumberOfPrinted;
 }
 
 /**
@@ -1026,9 +1038,12 @@ AsciiSPrintUnicodeFormat (
   )
 {
   VA_LIST Marker;
+  UINTN   NumberOfPrinted;
 
   VA_START (Marker, FormatString);
-  return AsciiVSPrintUnicodeFormat (StartOfBuffer, BufferSize, FormatString, Marker);
+  NumberOfPrinted = AsciiVSPrintUnicodeFormat (StartOfBuffer, BufferSize, FormatString, Marker);
+  VA_END (Marker);
+  return NumberOfPrinted;
 }
 
 

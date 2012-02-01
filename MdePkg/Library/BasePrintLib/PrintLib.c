@@ -1,7 +1,7 @@
 /** @file
   Base Print Library instance implementation.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -165,9 +165,12 @@ UnicodeSPrint (
   )
 {
   VA_LIST Marker;
+  UINTN   NumberOfPrinted;
 
   VA_START (Marker, FormatString);
-  return UnicodeVSPrint (StartOfBuffer, BufferSize, FormatString, Marker);
+  NumberOfPrinted = UnicodeVSPrint (StartOfBuffer, BufferSize, FormatString, Marker);
+  VA_END (Marker);
+  return NumberOfPrinted;
 }
 
 /**
@@ -306,9 +309,12 @@ UnicodeSPrintAsciiFormat (
   )
 {
   VA_LIST Marker;
+  UINTN   NumberOfPrinted;
 
   VA_START (Marker, FormatString);
-  return UnicodeVSPrintAsciiFormat (StartOfBuffer, BufferSize, FormatString, Marker);
+  NumberOfPrinted = UnicodeVSPrintAsciiFormat (StartOfBuffer, BufferSize, FormatString, Marker);
+  VA_END (Marker);
+  return NumberOfPrinted;
 }
 
 /**
@@ -496,9 +502,12 @@ AsciiSPrint (
   )
 {
   VA_LIST Marker;
+  UINTN   NumberOfPrinted;
 
   VA_START (Marker, FormatString);
-  return AsciiVSPrint (StartOfBuffer, BufferSize, FormatString, Marker);
+  NumberOfPrinted = AsciiVSPrint (StartOfBuffer, BufferSize, FormatString, Marker);
+  VA_END (Marker);
+  return NumberOfPrinted;
 }
 
 /**
@@ -637,9 +646,12 @@ AsciiSPrintUnicodeFormat (
   )
 {
   VA_LIST Marker;
+  UINTN   NumberOfPrinted;
 
   VA_START (Marker, FormatString);
-  return AsciiVSPrintUnicodeFormat (StartOfBuffer, BufferSize, FormatString, Marker);
+  NumberOfPrinted = AsciiVSPrintUnicodeFormat (StartOfBuffer, BufferSize, FormatString, Marker);
+  VA_END (Marker);
+  return NumberOfPrinted;
 }
 
 

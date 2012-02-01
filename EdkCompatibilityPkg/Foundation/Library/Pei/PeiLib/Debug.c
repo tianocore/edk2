@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2005, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -113,6 +113,7 @@ Returns:
 
   VA_START (Marker, Format);
   EfiDebugVPrintWorker (ErrorLevel, Format, Marker, sizeof (Buffer), Buffer);
+  VA_END (Marker);
 
   //
   // We choose NOT to use PEI_REPORT_STATUS_CODE here, because when debug is enable,
@@ -127,5 +128,4 @@ Returns:
                     (EFI_STATUS_CODE_DATA *) Buffer
                     );
 
-  return ;
 }

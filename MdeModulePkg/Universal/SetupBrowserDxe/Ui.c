@@ -852,8 +852,6 @@ CreateDialog (
   ASSERT (TempString);
   ASSERT (BufferedString);
 
-  VA_START (Marker, KeyValue);
-
   //
   // Zero the outgoing buffer
   //
@@ -874,6 +872,8 @@ CreateDialog (
   gST->ConOut->EnableCursor (gST->ConOut, FALSE);
 
   LargestString = 0;
+
+  VA_START (Marker, KeyValue);
 
   //
   // Determine the largest string in the dialog box
