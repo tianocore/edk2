@@ -190,11 +190,11 @@ _closeX  (int fd, int NewState)
     if(Fp->RefCount == 1) { // There should be no other users
     if(! IsDupFd(fd)) {
       // Only do the close if no one else is using the FileHandle
-        if(Fp->f_iflags & FIF_DELCLOSE) {
-          /* Handle files marked "Delete on Close". */
-          if(Fp->f_ops->fo_delete != NULL) {
-            retval = Fp->f_ops->fo_delete(Fp);
-          }
+      if(Fp->f_iflags & FIF_DELCLOSE) {
+        /* Handle files marked "Delete on Close". */
+        if(Fp->f_ops->fo_delete != NULL) {
+          retval = Fp->f_ops->fo_delete(Fp);
+        }
       }
       else {
           retval = Fp->f_ops->fo_close( Fp);
@@ -875,7 +875,7 @@ rmdir(
     retval = filp->f_ops->fo_rmdir(filp);
     filp->f_iflags = 0;           // Close this FD
     filp->RefCount = 0;           // No one using this FD
-      }
+  }
   return retval;
 }
 
@@ -990,8 +990,8 @@ ioctl(
     }
     else {
       /* All other requests. */
-    retval = filp->f_ops->fo_ioctl(filp, request, argp);
-  }
+      retval = filp->f_ops->fo_ioctl(filp, request, argp);
+    }
   }
   else {
     errno   =  EBADF;
@@ -1195,24 +1195,24 @@ chdir (const char *path)
 
   /* Old Shell does not support Set Current Dir. */
   if(gEfiShellProtocol != NULL) {
-  Cwd = ShellGetCurrentDir(NULL);
-  if (Cwd != NULL) {
-    /* We have shell support */
-    UnicodePath = AllocatePool(((AsciiStrLen (path) + 1) * sizeof (CHAR16)));
-    if (UnicodePath == NULL) {
-      errno = ENOMEM;
-      return -1;
-    }
-    AsciiStrToUnicodeStr(path, UnicodePath);
-    Status = gEfiShellProtocol->SetCurDir(NULL, UnicodePath);
-    FreePool(UnicodePath);
-    if (EFI_ERROR(Status)) {
+    Cwd = ShellGetCurrentDir(NULL);
+    if (Cwd != NULL) {
+      /* We have shell support */
+      UnicodePath = AllocatePool(((AsciiStrLen (path) + 1) * sizeof (CHAR16)));
+      if (UnicodePath == NULL) {
+        errno = ENOMEM;
+        return -1;
+      }
+      AsciiStrToUnicodeStr(path, UnicodePath);
+      Status = gEfiShellProtocol->SetCurDir(NULL, UnicodePath);
+      FreePool(UnicodePath);
+      if (EFI_ERROR(Status)) {
         errno = ENOENT;
-      return -1;
-    } else {
-      return 0;
+        return -1;
+      } else {
+        return 0;
+      }
     }
-  }
   }
   /* Add here for non-shell */
   errno = EPERM;
@@ -1229,17 +1229,16 @@ pid_t getpgrp(void)
   return ((pid_t)(UINTN)(gImageHandle));
 }
 
-/** Set file access and modification times.
-
-    @param[in]  path
-    @param[in]  times
-
-    @return
-**/
+/* Internal worker function for utimes.
+    This works around an error produced by GCC when the va_* macros
+    are used within a function with a fixed number of arguments.
+*/
+static
 int
-utimes(
-  const char *path,
-  const struct timeval *times
+EFIAPI
+va_Utimes(
+  const char   *path,
+  ...
   )
 {
   struct __filedes   *filp;
@@ -1256,6 +1255,21 @@ utimes(
   }
   va_end(ap);
   return retval;
+}
 
+/** Set file access and modification times.
+
+    @param[in]  path
+    @param[in]  times
+
+    @return
+**/
+int
+utimes(
+  const char *path,
+  const struct timeval *times
+  )
+{
+  return va_Utimes(path, times);
 }
 
