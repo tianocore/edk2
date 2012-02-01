@@ -566,8 +566,8 @@ GatherPpbInfo (
   //   0 - the bridge supports only 32 bit addresses.
   //   1 - the bridge supports 64-bit addresses.
   //
-  PrefetchableMemoryBase = PMemBaseLimit & 0xffff;
-  PrefetchableMemoryLimit = PMemBaseLimit >> 16;
+  PrefetchableMemoryBase = (UINT16)(PMemBaseLimit & 0xffff);
+  PrefetchableMemoryLimit = (UINT16)(PMemBaseLimit >> 16);
   if (!EFI_ERROR (Status) &&
       (PrefetchableMemoryBase & 0x000f) == 0x0001 &&
       (PrefetchableMemoryLimit & 0x000f) == 0x0001) {
