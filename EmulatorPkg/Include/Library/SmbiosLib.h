@@ -18,7 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _SMBIOS_LIB_H__
 #define _SMBIOS_LIB_H__
 
-#include <IndustryStandard/Smbios.h>
+#include <IndustryStandard/SmBios.h>
 #include <Protocol/Smbios.h>
 
 
