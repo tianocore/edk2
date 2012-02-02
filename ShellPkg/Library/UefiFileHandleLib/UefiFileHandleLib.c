@@ -509,9 +509,12 @@ FileHandleFindFirstFile (
   //
   Status = FileHandleRead (DirHandle, &BufferSize, *Buffer);
   ASSERT(Status != EFI_BUFFER_TOO_SMALL);
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR(Status) || BufferSize == 0) {
     FreePool(*Buffer);
     *Buffer = NULL;
+    if (BufferSize == 0) {
+      return (EFI_NOT_FOUND);
+    }
     return (Status);
   }
   return (EFI_SUCCESS);

@@ -1799,7 +1799,7 @@ CreateAndPopulateShellFileInfo(
   if (ShellFileListItem == NULL) {
     return (NULL);
   }
-  if (Info != NULL) {
+  if (Info != NULL && Info->Size != 0) {
     ShellFileListItem->Info = AllocateZeroPool((UINTN)Info->Size);
     if (ShellFileListItem->Info == NULL) {
       FreePool(ShellFileListItem);

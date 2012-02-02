@@ -66,14 +66,22 @@ PrintLsOutput(
   CorrectedPath = NULL;
 
   CorrectedPath = StrnCatGrow(&CorrectedPath, NULL, Path, 0);
-  ASSERT(CorrectedPath != NULL);
+  if (CorrectedPath == NULL) {
+    return (SHELL_OUT_OF_RESOURCES);
+  }
+
   PathCleanUpDirectories(CorrectedPath);
 
   Status = ShellOpenFileMetaArg((CHAR16*)CorrectedPath, EFI_FILE_MODE_READ, &ListHead);
   if (EFI_ERROR(Status)) {
+    SHELL_FREE_NON_NULL(CorrectedPath);
+    if(Status == EFI_NOT_FOUND){
+      return (SHELL_NOT_FOUND);
+    }
     return (SHELL_DEVICE_ERROR);
   }
   if (ListHead == NULL || IsListEmpty(&ListHead->Link)) {
+    SHELL_FREE_NON_NULL(CorrectedPath);
     //
     // On the first one only we expect to find something...
     // do we find the . and .. directories otherwise?
