@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -77,8 +77,7 @@ LogMemorySmbiosRecord (
   //
   // Generate Memory Array Mapped Address info
   //
-  Type19Record = AllocatePool(sizeof (SMBIOS_TABLE_TYPE19));
-  ZeroMem(Type19Record, sizeof(SMBIOS_TABLE_TYPE19));
+  Type19Record = AllocateZeroPool(sizeof (SMBIOS_TABLE_TYPE19) + 2);
   Type19Record->Hdr.Type = EFI_SMBIOS_TYPE_MEMORY_ARRAY_MAPPED_ADDRESS;
   Type19Record->Hdr.Length = sizeof(SMBIOS_TABLE_TYPE19);
   Type19Record->Hdr.Handle = 0;
