@@ -1,7 +1,7 @@
 ## @file
 #  Debug Agent library instance for Dxe Core and Dxe modules.
 #
-#  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -76,6 +76,7 @@
   SynchronizationLib
   MemoryAllocationLib
   LocalApicLib
+  TimerLib
 
 [Guids]
   gEfiDebugAgentGuid                            ## PRODUCES ## Configuration Table

@@ -4,7 +4,7 @@
   read/write debug packet to communication with HOST based on transfer
   protocol.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -637,9 +637,11 @@ CommandCommunication (
 
       ResetCold ();
       //
-      // Wait for reset
+      // Assume system resets in 2 seconds, otherwise send TIMEOUT packet.
+      // PCD can be used if 2 seconds isn't long enough for some platforms.
       //
-      CpuDeadLoop ();
+      MicroSecondDelay (2000000);
+      SendAckPacket (DEBUG_COMMAND_TIMEOUT);
       break;
 
     case DEBUG_COMMAND_GO:
