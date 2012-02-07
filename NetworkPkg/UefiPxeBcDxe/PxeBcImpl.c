@@ -1,7 +1,7 @@
 /** @file
   This implementation of EFI_PXE_BASE_CODE_PROTOCOL and EFI_LOAD_FILE_PROTOCOL.
 
-  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1378,7 +1378,9 @@ EfiPxeBcUdpRead (
       if (Udp6Rx->DataLength - HeaderLen > *BufferSize) {
         Status = EFI_BUFFER_TOO_SMALL;
       } else {
-        *HeaderSize = HeaderLen;
+        if (HeaderSize != NULL) {
+          *HeaderSize = HeaderLen;
+        }
         *BufferSize = Udp6Rx->DataLength - HeaderLen;
 
         HeaderCopiedLen = 0;
@@ -1430,7 +1432,9 @@ EfiPxeBcUdpRead (
       if (Udp4Rx->DataLength - HeaderLen > *BufferSize) {
         Status = EFI_BUFFER_TOO_SMALL;
       } else {
-        *HeaderSize = HeaderLen;
+        if (HeaderSize != NULL) {
+          *HeaderSize = HeaderLen;
+        }
         *BufferSize = Udp4Rx->DataLength - HeaderLen;
 
         HeaderCopiedLen = 0;

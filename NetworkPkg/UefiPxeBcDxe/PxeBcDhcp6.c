@@ -1,7 +1,7 @@
 /** @file
   Functions implementation related with DHCPv6 for UefiPxeBc Driver.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -15,6 +15,12 @@
 
 #include "PxeBcImpl.h"
 
+//
+// Well-known multi-cast address defined in section-24.1 of rfc-3315
+//
+//   ALL_DHCP_Relay_Agents_and_Servers address: FF02::1:2
+//
+EFI_IPv6_ADDRESS   mAllDhcpRelayAndServersAddress = {{0xFF, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 2}};
 
 /**
   Parse out a DHCPv6 option by OptTag, and find the position in buffer.
@@ -788,7 +794,7 @@ PxeBcRequestBootService (
     
   Status = PxeBc->UdpRead (
                     PxeBc,
-                    OpFlags,
+                    EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_SRC_IP,
                     &Private->StationIp,
                     &SrcPort,
                     &Private->ServerIp,
@@ -844,19 +850,29 @@ PxeBcRetryDhcp6Binl (
   Mode                  = Private->PxeBc.Mode;
   Private->IsDoDiscover = FALSE;
   Offer                 = &Private->OfferBuffer[Index].Dhcp6;
-
-  ASSERT (Offer->OptList[PXEBC_DHCP6_IDX_BOOT_FILE_URL] != NULL);
-  //
-  // Parse out the next server address from the last offer, and store it
-  //
-  Status = PxeBcExtractBootFileUrl (
-             &Private->BootFileName,
-             &Private->ServerIp.v6,
-             (CHAR8 *) (Offer->OptList[PXEBC_DHCP6_IDX_BOOT_FILE_URL]->Data),
-             NTOHS (Offer->OptList[PXEBC_DHCP6_IDX_BOOT_FILE_URL]->OpLen)
-             );
-  if (EFI_ERROR (Status)) {
-    return Status;
+  if (Offer->OfferType == PxeOfferTypeDhcpBinl) {
+    //
+    // There is no BootFileUrl option in dhcp6 offer, so use servers multi-cast address instead.
+    //
+    CopyMem (
+      &Private->ServerIp.v6,
+      &mAllDhcpRelayAndServersAddress,
+      sizeof (EFI_IPv6_ADDRESS)
+      );
+  } else {
+    ASSERT (Offer->OptList[PXEBC_DHCP6_IDX_BOOT_FILE_URL] != NULL);
+    //
+    // Parse out the next server address from the last offer, and store it
+    //
+    Status = PxeBcExtractBootFileUrl (
+               &Private->BootFileName,
+               &Private->ServerIp.v6,
+               (CHAR8 *) (Offer->OptList[PXEBC_DHCP6_IDX_BOOT_FILE_URL]->Data),
+               NTOHS (Offer->OptList[PXEBC_DHCP6_IDX_BOOT_FILE_URL]->OpLen)
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
   }
 
   //
