@@ -31,12 +31,14 @@
   bind.c
   close.c
   connect.c
+  getaddrinfo.c
   gethostbydns.c
   gethostbyht.c
   gethostbynis.c
   gethostname.c
   gethostnamadr.c
   gethostbynis.c
+  getnameinfo.c
   getnetbydns.c
   getnetbynis.c
   getnetbyht.c
@@ -51,16 +53,9 @@
   getsockname.c
   getsockopt.c
   herror.c
-#  inet_addr.c
-#  inet_lnaof.c
-#  inet_makeaddr.c
   inet_net_ntop.c
   inet_net_pton.c
   inet_neta.c
-#  inet_netof.c
-#  inet_network.c
-#  inet_ntoa.c
-#  inet_ntop.c
   inet_pton.c
   listen.c
   map_v4v6.c

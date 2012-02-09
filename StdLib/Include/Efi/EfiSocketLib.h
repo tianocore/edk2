@@ -26,7 +26,9 @@
 #include <Protocol/EfiSocket.h>
 #include <Protocol/ServiceBinding.h>
 #include <Protocol/Tcp4.h>
+#include <Protocol/Tcp6.h>
 #include <Protocol/Udp4.h>
+#include <Protocol/Udp6.h>
 
 #include <sys/time.h>
 
@@ -154,8 +156,11 @@ typedef struct {
 //------------------------------------------------------------------------------
 
 extern CONST EFI_GUID mEslIp4ServiceGuid;   ///<  Tag GUID for the IPv4 layer
+extern CONST EFI_GUID mEslIp6ServiceGuid;   ///<  Tag GUID for the IPv6 layer
 extern CONST EFI_GUID mEslTcp4ServiceGuid;  ///<  Tag GUID for the TCPv4 layer
+extern CONST EFI_GUID mEslTcp6ServiceGuid;  ///<  Tag GUID for the TCPv6 layer
 extern CONST EFI_GUID mEslUdp4ServiceGuid;  ///<  Tag GUID for the UDPv4 layer
+extern CONST EFI_GUID mEslUdp6ServiceGuid;  ///<  Tag GUID for the UDPv6 layer
 
 //------------------------------------------------------------------------------
 // Data

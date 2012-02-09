@@ -138,6 +138,26 @@ typedef struct
 
 
 /**
+  Receive context for SOCK_STREAM and SOCK_SEQPACKET sockets using TCPv6.
+**/
+typedef struct
+{
+  EFI_TCP6_RECEIVE_DATA RxData;         ///<  Receive operation description
+  UINT8 Buffer[ RX_PACKET_DATA ];       ///<  Data buffer
+} ESL_TCP6_RX_DATA;
+
+
+/**
+  Transmit context for SOCK_STREAM and SOCK_SEQPACKET sockets using TCPv6.
+**/
+typedef struct
+{
+  EFI_TCP6_TRANSMIT_DATA TxData;        ///<  Transmit operation description
+  UINT8 Buffer[ 1 ];                    ///<  Data buffer
+} ESL_TCP6_TX_DATA;
+
+
+/**
   Receive context for SOCK_DGRAM sockets using UDPv4.
 **/
 typedef struct
@@ -160,6 +180,28 @@ typedef struct
 
 
 /**
+  Receive context for SOCK_DGRAM sockets using UDPv6.
+**/
+typedef struct
+{
+  EFI_UDP6_SESSION_DATA Session;        ///<  Remote network address
+  EFI_UDP6_RECEIVE_DATA * pRxData;      ///<  Receive operation description
+} ESL_UDP6_RX_DATA;
+
+
+/**
+  Transmit context for SOCK_DGRAM sockets using UDPv6.
+**/
+typedef struct
+{
+  EFI_UDP6_SESSION_DATA Session;        ///<  Remote network address
+  EFI_UDP6_TRANSMIT_DATA TxData;        ///<  Transmit operation description
+  UINTN RetransmitCount;                ///<  Retransmit to handle ARP negotiation
+  UINT8 Buffer[ 1 ];                    ///<  Data buffer
+} ESL_UDP6_TX_DATA;
+
+
+/**
   Network specific context for transmit and receive packets.
 **/
 typedef struct _ESL_PACKET {
@@ -172,8 +214,12 @@ typedef struct _ESL_PACKET {
     ESL_IP4_TX_DATA Ip4Tx;              ///<  Transmit operation description
     ESL_TCP4_RX_DATA Tcp4Rx;            ///<  Receive operation description
     ESL_TCP4_TX_DATA Tcp4Tx;            ///<  Transmit operation description
+    ESL_TCP6_RX_DATA Tcp6Rx;            ///<  Receive operation description
+    ESL_TCP6_TX_DATA Tcp6Tx;            ///<  Transmit operation description
     ESL_UDP4_RX_DATA Udp4Rx;            ///<  Receive operation description
     ESL_UDP4_TX_DATA Udp4Tx;            ///<  Transmit operation description
+    ESL_UDP6_RX_DATA Udp6Rx;            ///<  Receive operation description
+    ESL_UDP6_TX_DATA Udp6Tx;            ///<  Transmit operation description
   } Op;                                 ///<  Network specific context
 } GCC_ESL_PACKET;
 
@@ -217,8 +263,12 @@ typedef struct _ESL_IO_MGMT {
     EFI_IP4_COMPLETION_TOKEN Ip4Tx;   ///<  IP4 transmit token
     EFI_TCP4_IO_TOKEN Tcp4Rx;         ///<  TCP4 receive token
     EFI_TCP4_IO_TOKEN Tcp4Tx;         ///<  TCP4 transmit token
+    EFI_TCP6_IO_TOKEN Tcp6Rx;         ///<  TCP6 receive token
+    EFI_TCP6_IO_TOKEN Tcp6Tx;         ///<  TCP6 transmit token
     EFI_UDP4_COMPLETION_TOKEN Udp4Rx; ///<  UDP4 receive token
     EFI_UDP4_COMPLETION_TOKEN Udp4Tx; ///<  UDP4 transmit token
+    EFI_UDP6_COMPLETION_TOKEN Udp6Rx; ///<  UDP6 receive token
+    EFI_UDP6_COMPLETION_TOKEN Udp6Tx; ///<  UDP6 transmit token
   } Token;                            ///<  Completion token for the network operation
 } GCC_IO_MGMT;
 
@@ -257,6 +307,26 @@ typedef struct {
 } ESL_TCP4_CONTEXT;
 
 /**
+  TCP6 context structure
+
+  The driver uses this structure to manage the TCP6 connections.
+**/
+typedef struct {
+  //
+  //  TCP6 context
+  //
+  EFI_TCP6_CONFIG_DATA ConfigData;        ///<  TCP6 configuration data
+  EFI_TCP6_OPTION Option;                 ///<  TCP6 port options
+
+  //
+  //  Tokens
+  //
+  EFI_TCP6_LISTEN_TOKEN ListenToken;      ///<  Listen control
+  EFI_TCP6_CONNECTION_TOKEN ConnectToken; ///<  Connection control
+  EFI_TCP6_CLOSE_TOKEN CloseToken;        ///<  Close control
+} ESL_TCP6_CONTEXT;
+
+/**
   UDP4 context structure
 
   The driver uses this structure to manage the UDP4 connections.
@@ -267,6 +337,18 @@ typedef struct {
   //
   EFI_UDP4_CONFIG_DATA ConfigData;  ///<  UDP4 configuration data
 } ESL_UDP4_CONTEXT;
+
+/**
+  UDP6 context structure
+
+  The driver uses this structure to manage the UDP6 connections.
+**/
+typedef struct {
+  //
+  //  UDP6 context
+  //
+  EFI_UDP6_CONFIG_DATA ConfigData;  ///<  UDP6 configuration data
+} ESL_UDP6_CONTEXT;
 
 
 /**
@@ -299,6 +381,21 @@ EFI_STATUS
 (* PFN_NET_IO_START) (
   IN VOID * pProtocol,
   IN VOID * pToken
+  );
+
+/**
+  Poll the LAN adapter for receive packets.
+
+  @param [in] pProtocol   Protocol structure address
+  @param [in] pToken      Completion token address
+
+  @return   Returns EFI_SUCCESS if the operation is successfully
+            started.
+**/
+typedef
+EFI_STATUS
+(* PFN_NET_POLL) (
+  IN VOID * pProtocol
   );
 
 /**
@@ -353,6 +450,7 @@ typedef struct _ESL_PORT {
   //  Receive data management
   //
   PFN_NET_IO_START pfnRxCancel; ///<  Cancel a receive on the network
+  PFN_NET_POLL pfnRxPoll;       ///<  Poll the LAN adapter for receive packets
   PFN_NET_IO_START pfnRxStart;  ///<  Start a receive on the network
   ESL_IO_MGMT * pRxActive;      ///<  Active receive operation queue
   ESL_IO_MGMT * pRxFree;        ///<  Free structure queue
@@ -364,12 +462,16 @@ typedef struct _ESL_PORT {
     VOID * v;                   ///<  VOID pointer
     EFI_IP4_PROTOCOL * IPv4;    ///<  IP4 protocol pointer
     EFI_TCP4_PROTOCOL * TCPv4;  ///<  TCP4 protocol pointer
+    EFI_TCP6_PROTOCOL * TCPv6;  ///<  TCP6 protocol pointer
     EFI_UDP4_PROTOCOL * UDPv4;  ///<  UDP4 protocol pointer
+    EFI_UDP6_PROTOCOL * UDPv6;  ///<  UDP6 protocol pointer
   } pProtocol;                  ///<  Protocol structure address
   union {
     ESL_IP4_CONTEXT Ip4;        ///<  IPv4 management data
     ESL_TCP4_CONTEXT Tcp4;      ///<  TCPv4 management data
+    ESL_TCP6_CONTEXT Tcp6;      ///<  TCPv6 management data
     ESL_UDP4_CONTEXT Udp4;      ///<  UDPv4 management data
+    ESL_UDP6_CONTEXT Udp6;      ///<  UDPv6 management data
   } Context;                    ///<  Network specific context
 }GCC_ESL_PORT;
 
@@ -975,7 +1077,9 @@ typedef struct {
   //
   ESL_SERVICE * pIp4List;       ///<  List of Ip4 services
   ESL_SERVICE * pTcp4List;      ///<  List of Tcp4 services
+  ESL_SERVICE * pTcp6List;      ///<  List of Tcp6 services
   ESL_SERVICE * pUdp4List;      ///<  List of Udp4 services
+  ESL_SERVICE * pUdp6List;      ///<  List of Udp6 services
 
   //
   //  Socket management
@@ -992,8 +1096,11 @@ typedef struct {
 extern ESL_LAYER mEslLayer;
 
 extern CONST ESL_PROTOCOL_API cEslIp4Api;
+extern CONST ESL_PROTOCOL_API cEslIp6Api;
 extern CONST ESL_PROTOCOL_API cEslTcp4Api;
+extern CONST ESL_PROTOCOL_API cEslTcp6Api;
 extern CONST ESL_PROTOCOL_API cEslUdp4Api;
+extern CONST ESL_PROTOCOL_API cEslUdp6Api;
 
 extern CONST EFI_SERVICE_BINDING_PROTOCOL mEfiServiceBinding;
 
@@ -1421,6 +1528,24 @@ EslSocketRxComplete (
   IN EFI_STATUS Status,
   IN UINTN LengthInBytes,
   IN BOOLEAN bUrgent
+  );
+
+/**
+  Poll a socket for pending receive activity.
+
+  This routine is called at elivated TPL and extends the idle
+  loop which polls a socket down into the LAN driver layer to
+  determine if there is any receive activity.
+
+  The ::EslSocketPoll, ::EslSocketReceive and ::EslSocketTransmit
+  routines call this routine when there is nothing to do.
+
+  @param [in] pSocket   Address of an ::EFI_SOCKET structure.
+
+ **/
+VOID
+EslSocketRxPoll (
+  IN ESL_SOCKET * pSocket
   );
 
 /**

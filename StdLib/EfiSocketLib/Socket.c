@@ -481,11 +481,27 @@ CONST ESL_SOCKET_BINDING cEslSocketBinding[] = {
     4,    //  RX buffers
     4,    //  TX buffers
     4 },  //  TX Oob buffers
+  { L"Tcp6",
+    &gEfiTcp6ServiceBindingProtocolGuid,
+    &gEfiTcp6ProtocolGuid,
+    &mEslTcp6ServiceGuid,
+    OFFSET_OF ( ESL_LAYER, pTcp6List ),
+    4,    //  RX buffers
+    4,    //  TX buffers
+    4 },  //  TX Oob buffers
   { L"Udp4",
     &gEfiUdp4ServiceBindingProtocolGuid,
     &gEfiUdp4ProtocolGuid,
     &mEslUdp4ServiceGuid,
     OFFSET_OF ( ESL_LAYER, pUdp4List ),
+    4,    //  RX buffers
+    4,    //  TX buffers
+    0 },  //  TX Oob buffers
+  { L"Udp6",
+    &gEfiUdp6ServiceBindingProtocolGuid,
+    &gEfiUdp6ProtocolGuid,
+    &mEslUdp6ServiceGuid,
+    OFFSET_OF ( ESL_LAYER, pUdp6List ),
     4,    //  RX buffers
     4,    //  TX buffers
     0 }   //  TX Oob buffers
@@ -516,11 +532,11 @@ CONST int cEslAfInetApiSize = DIM ( cEslAfInetApi );
 **/
 CONST ESL_PROTOCOL_API * cEslAfInet6Api[] = {
   NULL,             //  0
-  NULL,             //  SOCK_STREAM
-  NULL,             //  SOCK_DGRAM
+  &cEslTcp6Api,     //  SOCK_STREAM
+  &cEslUdp6Api,     //  SOCK_DGRAM
   NULL,             //  SOCK_RAW
   NULL,             //  SOCK_RDM
-  NULL              //  SOCK_SEQPACKET
+  &cEslTcp6Api      //  SOCK_SEQPACKET
 };
 
 /**
@@ -603,6 +619,7 @@ EslSocket (
     //  Validate the domain value
     //
     if (( AF_INET != domain )
+      && ( AF_INET6 != domain )
       && ( AF_LOCAL != domain )) {
       DEBUG (( DEBUG_ERROR | DEBUG_SOCKET,
                 "ERROR - Invalid domain value\r\n" ));
@@ -1789,6 +1806,11 @@ EslSocketConnect (
           if ( EFI_NOT_READY != Status ) {
             if ( !EFI_ERROR ( Status )) {
               pSocket->State = SOCKET_STATE_CONNECTED;
+
+              //
+              //  Start the receive operations
+              //
+              EslSocketRxStart ( pSocket->pPortList );
             }
             else {
               pSocket->State = SOCKET_STATE_BOUND;
@@ -1980,7 +2002,8 @@ EslSocketGetLocalAddress (
         //
         //  Verify the socket state
         //
-        if ( SOCKET_STATE_CONNECTED == pSocket->State ) {
+        if (( SOCKET_STATE_CONNECTED == pSocket->State )
+          || ( SOCKET_STATE_LISTENING == pSocket->State )) {
           //
           //  Verify the API
           //
@@ -3096,7 +3119,7 @@ EslSocketPacketAllocate (
                                LengthInBytes,
                                (VOID **)&pPacket );
   if ( !EFI_ERROR ( Status )) {
-    DEBUG (( DebugFlags | DEBUG_POOL | DEBUG_INIT,
+    DEBUG (( DebugFlags | DEBUG_POOL,
               "0x%08x: Allocate pPacket, %d bytes\r\n",
               pPacket,
               LengthInBytes ));
@@ -3210,6 +3233,7 @@ EslSocketPoll (
   short DetectedEvents;
   ESL_SOCKET * pSocket;
   EFI_STATUS Status;
+  EFI_TPL TplPrevious;
   short ValidEvents;
 
   DEBUG (( DEBUG_POLL, "Entering SocketPoll\r\n" ));
@@ -3247,6 +3271,22 @@ EslSocketPoll (
                 Events & ( ~ValidEvents )));
     }
     else {
+      //
+      //  Synchronize with the socket layer
+      //
+      RAISE_TPL ( TplPrevious, TPL_SOCKETS );
+      
+      //
+      //  Increase the network performance by extending the
+      //  polling (idle) loop down into the LAN driver
+      //
+      EslSocketRxPoll ( pSocket );
+      
+      //
+      //  Release the socket layer synchronization
+      //
+      RESTORE_TPL ( TplPrevious );
+
       //
       //  Check for pending connections
       //
@@ -4367,6 +4407,11 @@ EslSocketReceive (
               //
               if ( SOCKET_STATE_CONNECTED == pSocket->State ) {
                 //
+                //  Poll the network to increase performance
+                //
+                EslSocketRxPoll ( pSocket );
+
+                //
                 //  Locate the port
                 //
                 pPort = pSocket->pPortList;
@@ -4848,6 +4893,49 @@ EslSocketRxComplete (
 
 
 /**
+  Poll a socket for pending receive activity.
+
+  This routine is called at elivated TPL and extends the idle
+  loop which polls a socket down into the LAN driver layer to
+  determine if there is any receive activity.
+
+  The ::EslSocketPoll, ::EslSocketReceive and ::EslSocketTransmit
+  routines call this routine when there is nothing to do.
+
+  @param [in] pSocket   Address of an ::EFI_SOCKET structure.
+
+ **/
+VOID
+EslSocketRxPoll (
+  IN ESL_SOCKET * pSocket
+  )
+{
+  ESL_PORT * pPort;
+
+  DEBUG (( DEBUG_POLL, "Entering EslSocketRxPoll\r\n" ));
+
+  //
+  //  Increase the network performance by extending the
+  //  polling (idle) loop down into the LAN driver
+  //
+  pPort = pSocket->pPortList;
+  while ( NULL != pPort ) {
+    //
+    //  Poll the LAN adapter
+    //
+    pPort->pfnRxPoll ( pPort->pProtocol.v );
+
+    //
+    //  Locate the next LAN adapter
+    //
+    pPort = pPort->pLinkSocket;
+  }
+
+  DEBUG (( DEBUG_POLL, "Exiting EslSocketRxPoll\r\n" ));
+}
+
+
+/**
   Start a receive operation
 
   This routine posts a receive buffer to the network adapter.
@@ -5290,6 +5378,11 @@ EslSocketTransmit (
                 //  Synchronize with the socket layer
                 //
                 RAISE_TPL ( TplPrevious, TPL_SOCKETS );
+
+                //
+                //  Poll the network to increase performance
+                //
+                EslSocketRxPoll ( pSocket );
 
                 //
                 //  Attempt to buffer the packet for transmission

@@ -383,6 +383,7 @@ EslIp4PortAllocate (
   //
   pPort->pfnConfigure = (PFN_NET_CONFIGURE)pPort->pProtocol.IPv4->Configure;
   pPort->pfnRxCancel = (PFN_NET_IO_START)pPort->pProtocol.IPv4->Cancel;
+  pPort->pfnRxPoll = (PFN_NET_POLL)pPort->pProtocol.IPv4->Poll;
   pPort->pfnRxStart = (PFN_NET_IO_START)pPort->pProtocol.IPv4->Receive;
   pPort->pfnTxStart = (PFN_NET_IO_START)pPort->pProtocol.IPv4->Transmit;
 

@@ -112,6 +112,8 @@ struct __res_state {
 	char	pad[72];		/* on an i386 this means 512b total */
 };
 
+typedef struct __res_state *res_state;
+
 /*
  * Resolver options (keep these in synch with res_debug.c, please)
  */
@@ -201,6 +203,7 @@ extern const struct res_sym __p_type_syms[];
 #define	hostalias	__hostalias
 #define	putlong		__putlong
 #define	putshort	__putshort
+uint16_t	_getshort(const u_char *);
 #define	p_class		__p_class
 #define	p_time		__p_time
 #define	p_type		__p_type
@@ -288,6 +291,7 @@ int		res_mkupdate __P((ns_updrec *, u_char *, int));
 ns_updrec *	res_mkupdrec __P((int, const char *, u_int, u_int, u_long));
 void		res_freeupdrec __P((ns_updrec *));
 #endif
+
 __END_DECLS
 
 #endif /* !_RESOLV_H_ */

@@ -1,5 +1,5 @@
 /** @file
-  Implement the TCP4 driver support for the socket layer.
+  Implement the TCP6 driver support for the socket layer.
 
   Copyright (c) 2011, Intel Corporation
   All rights reserved. This program and the accompanying materials
@@ -13,15 +13,15 @@
 
   \section ConnectionManagement Connection Management
   
-  The ::EslTcp4Listen routine initially places the SOCK_STREAM or
+  The ::EslTcp6Listen routine initially places the SOCK_STREAM or
   SOCK_SEQPACKET socket into a listen state.   When a remote machine
-  makes a connection to the socket, the TCPv4 network layer calls
-  ::EslTcp4ListenComplete to complete the connection processing.
-  EslTcp4ListenComplete manages the connections by placing them in
+  makes a connection to the socket, the TCPv6 network layer calls
+  ::EslTcp6ListenComplete to complete the connection processing.
+  EslTcp6ListenComplete manages the connections by placing them in
   FIFO order in a queue to be serviced by the application.  When the
   number of connections exceeds the backlog (ESL_SOCKET::MaxFifoDepth),
   the new connection is closed.  Eventually, the application indirectly
-  calls ::EslTcp4Accept to remove the next connection from the queue
+  calls ::EslTcp6Accept to remove the next connection from the queue
   and get the associated socket.
 
 **/
@@ -33,16 +33,16 @@
   Attempt to connect to a remote TCP port
 
   This routine starts the connection processing for a SOCK_STREAM
-  or SOCK_SEQPAKCET socket using the TCPv4 network layer.  It
-  configures the local TCPv4 connection point and then attempts to
+  or SOCK_SEQPAKCET socket using the TCPv6 network layer.  It
+  configures the local TCPv6 connection point and then attempts to
   connect to a remote system.  Upon completion, the
-  ::EslTcp4ConnectComplete routine gets called with the connection
+  ::EslTcp6ConnectComplete routine gets called with the connection
   status.
 
-  This routine is called by ::EslSocketConnect to initiate the TCPv4
+  This routine is called by ::EslSocketConnect to initiate the TCPv6
   network specific connect operations.  The connection processing is
-  initiated by this routine and finished by ::EslTcp4ConnectComplete.
-  This pair of routines walks through the list of local TCPv4
+  initiated by this routine and finished by ::EslTcp6ConnectComplete.
+  This pair of routines walks through the list of local TCPv6
   connection points until a connection to the remote system is
   made.
 
@@ -54,7 +54,7 @@
 
  **/
 EFI_STATUS
-EslTcp4ConnectStart (
+EslTcp6ConnectStart (
   IN ESL_SOCKET * pSocket
   );
 
@@ -65,7 +65,7 @@ EslTcp4ConnectStart (
   A system has initiated a connection attempt with a socket in the
   listen state.  Attempt to complete the connection.
 
-  The TCPv4 layer calls this routine when a connection is made to
+  The TCPv6 layer calls this routine when a connection is made to
   the socket in the listen state.  See the
   \ref ConnectionManagement section.
 
@@ -75,7 +75,7 @@ EslTcp4ConnectStart (
 
 **/
 VOID
-EslTcp4ListenComplete (
+EslTcp6ListenComplete (
   IN EFI_EVENT Event,
   IN ESL_PORT * pPort
   );
@@ -87,7 +87,7 @@ EslTcp4ListenComplete (
   This routine waits for a network connection to the socket and
   returns the remote network address to the caller if requested.
 
-  This routine is called by ::EslSocketAccept to handle the TCPv4 protocol
+  This routine is called by ::EslSocketAccept to handle the TCPv6 protocol
   specific accept operations for SOCK_STREAM and SOCK_SEQPACKET sockets.
   See the \ref ConnectionManagement section.
 
@@ -105,16 +105,15 @@ EslTcp4ListenComplete (
 
  **/
 EFI_STATUS
-EslTcp4Accept (
+EslTcp6Accept (
   IN ESL_SOCKET * pSocket,
   IN struct sockaddr * pSockAddr,
   IN OUT socklen_t * pSockAddrLength
   )
 {
   ESL_PORT * pPort;
-  struct sockaddr_in * pRemoteAddress;
-  ESL_TCP4_CONTEXT * pTcp4;
-  UINT32 RemoteAddress;
+  struct sockaddr_in6 * pRemoteAddress;
+  ESL_TCP6_CONTEXT * pTcp6;
   EFI_STATUS Status;
 
   DBG_ENTER ( );
@@ -122,7 +121,7 @@ EslTcp4Accept (
   //
   //  Validate the socket length
   //
-  pRemoteAddress = (struct sockaddr_in *) pSockAddr;
+  pRemoteAddress = (struct sockaddr_in6 *) pSockAddr;
   if (( NULL == pSockAddrLength )
     || ( sizeof ( *pRemoteAddress ) > *pSockAddrLength )) {
     //
@@ -143,23 +142,18 @@ EslTcp4Accept (
     //  Locate the address context
     //
     pPort = pSocket->pPortList;
-    pTcp4 = &pPort->Context.Tcp4;
+    pTcp6 = &pPort->Context.Tcp6;
 
     //
     //  Fill-in the remote address structure
     //
     ZeroMem ( pRemoteAddress, sizeof ( *pRemoteAddress ));
-    pRemoteAddress->sin_len = sizeof ( *pRemoteAddress );
-    pRemoteAddress->sin_family = AF_INET;
-    pRemoteAddress->sin_port = SwapBytes16 ( pTcp4->ConfigData.AccessPoint.RemotePort );
-    RemoteAddress = pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[3];
-    RemoteAddress <<= 8;
-    RemoteAddress |= pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[2];
-    RemoteAddress <<= 8;
-    RemoteAddress |= pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[1];
-    RemoteAddress <<= 8;
-    RemoteAddress |= pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[0];
-    pRemoteAddress->sin_addr.s_addr = RemoteAddress;
+    pRemoteAddress->sin6_len = sizeof ( *pRemoteAddress );
+    pRemoteAddress->sin6_family = AF_INET6;
+    pRemoteAddress->sin6_port = SwapBytes16 ( pTcp6->ConfigData.AccessPoint.RemotePort );
+    CopyMem ( &pRemoteAddress->sin6_addr.__u6_addr.__u6_addr8 [ 0 ],
+              &pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[0],
+              sizeof ( pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr ));
   }
 
   //
@@ -174,14 +168,14 @@ EslTcp4Accept (
   Process the remote connection completion event.
 
   This routine handles the completion of a connection attempt.  It
-  releases the port (TCPv4 adapter connection) in the case of an
+  releases the port (TCPv6 adapter connection) in the case of an
   error and start a connection attempt on the next port.  If the
   connection attempt was successful then this routine releases all
   of the other ports.
 
-  This routine is called by the TCPv4 layer when a connect request
+  This routine is called by the TCPv6 layer when a connect request
   completes.  It sets the ESL_SOCKET::bConnected flag to notify the
-  ::EslTcp4ConnectComplete routine that the connection is available.
+  ::EslTcp6ConnectComplete routine that the connection is available.
   The flag is set when the connection is established or no more ports
   exist in the list.  The connection status is passed via
   ESL_SOCKET::ConnectStatus.
@@ -192,7 +186,7 @@ EslTcp4Accept (
 
 **/
 VOID
-EslTcp4ConnectComplete (
+EslTcp6ConnectComplete (
   IN EFI_EVENT Event,
   IN ESL_PORT * pPort
   )
@@ -201,7 +195,7 @@ EslTcp4ConnectComplete (
   BOOLEAN bRemovePorts;
   ESL_PORT * pNextPort;
   ESL_SOCKET * pSocket;
-  ESL_TCP4_CONTEXT * pTcp4;
+  ESL_TCP6_CONTEXT * pTcp6;
   EFI_STATUS Status;
 
   DBG_ENTER ( );
@@ -210,27 +204,39 @@ EslTcp4ConnectComplete (
   //  Locate the TCP context
   //
   pSocket = pPort->pSocket;
-  pTcp4 = &pPort->Context.Tcp4;
+  pTcp6 = &pPort->Context.Tcp6;
 
   //
   //  Get the connection status
   //
   bRemoveFirstPort = FALSE;
   bRemovePorts = FALSE;
-  Status = pTcp4->ConnectToken.CompletionToken.Status;
+  Status = pTcp6->ConnectToken.CompletionToken.Status;
   pSocket->ConnectStatus = Status;
   if ( !EFI_ERROR ( Status )) {
     //
     //  The connection was successful
     //
     DEBUG (( DEBUG_CONNECT,
-              "0x%08x: Port connected to %d.%d.%d.%d:%d\r\n",
+              "0x%08x: Port connected to [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d\r\n",
               pPort,
-              pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[0],
-              pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[1],
-              pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[2],
-              pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[3],
-              pTcp4->ConfigData.AccessPoint.RemotePort ));
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[0],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[1],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[2],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[3],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[4],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[5],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[6],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[7],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[8],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[9],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[10],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[11],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[12],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[13],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[14],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[15],
+              pTcp6->ConfigData.AccessPoint.RemotePort ));
 
     //
     //  Remove the rest of the ports
@@ -242,13 +248,25 @@ EslTcp4ConnectComplete (
     //  The connection failed
     //
     DEBUG (( DEBUG_CONNECT,
-              "0x%08x: Port connection to %d.%d.%d.%d:%d failed, Status: %r\r\n",
+              "0x%08x: Port connection to [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d failed, Status: %r\r\n",
               pPort,
-              pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[0],
-              pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[1],
-              pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[2],
-              pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[3],
-              pTcp4->ConfigData.AccessPoint.RemotePort,
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[0],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[1],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[2],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[3],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[4],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[5],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[6],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[7],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[8],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[9],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[10],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[11],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[12],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[13],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[14],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[15],
+              pTcp6->ConfigData.AccessPoint.RemotePort,
               Status ));
 
     //
@@ -270,7 +288,7 @@ EslTcp4ConnectComplete (
     //
     //  Try to connect using the next port
     //
-    Status = EslTcp4ConnectStart ( pSocket );
+    Status = EslTcp6ConnectStart ( pSocket );
     if ( EFI_NOT_READY != Status ) {
       pSocket->ConnectStatus = Status;
       bRemoveFirstPort = TRUE;
@@ -327,7 +345,7 @@ EslTcp4ConnectComplete (
 
   This routine is called from ::EslSocketConnect to determine when
   the connection is complete.  The ESL_SOCKET::bConnected flag is
-  set by ::EslTcp4ConnectComplete when the TCPv4 layer establishes
+  set by ::EslTcp6ConnectComplete when the TCPv6 layer establishes
   a connection or runs out of local network adapters.  This routine
   gets the connection status from ESL_SOCKET::ConnectStatus.
 
@@ -339,7 +357,7 @@ EslTcp4ConnectComplete (
 
  **/
 EFI_STATUS
-EslTcp4ConnectPoll (
+EslTcp6ConnectPoll (
   IN ESL_SOCKET * pSocket
   )
 {
@@ -425,16 +443,16 @@ EslTcp4ConnectPoll (
   Attempt to connect to a remote TCP port
 
   This routine starts the connection processing for a SOCK_STREAM
-  or SOCK_SEQPAKCET socket using the TCPv4 network layer.  It
-  configures the local TCPv4 connection point and then attempts to
+  or SOCK_SEQPAKCET socket using the TCPv6 network layer.  It
+  configures the local TCPv6 connection point and then attempts to
   connect to a remote system.  Upon completion, the
-  ::EslTcp4ConnectComplete routine gets called with the connection
+  ::EslTcp6ConnectComplete routine gets called with the connection
   status.
 
-  This routine is called by ::EslSocketConnect to initiate the TCPv4
+  This routine is called by ::EslSocketConnect to initiate the TCPv6
   network specific connect operations.  The connection processing is
-  initiated by this routine and finished by ::EslTcp4ConnectComplete.
-  This pair of routines walks through the list of local TCPv4
+  initiated by this routine and finished by ::EslTcp6ConnectComplete.
+  This pair of routines walks through the list of local TCPv6
   connection points until a connection to the remote system is
   made.
 
@@ -446,13 +464,13 @@ EslTcp4ConnectPoll (
 
  **/
 EFI_STATUS
-EslTcp4ConnectStart (
+EslTcp6ConnectStart (
   IN ESL_SOCKET * pSocket
   )
 {
   ESL_PORT * pPort;
-  ESL_TCP4_CONTEXT * pTcp4;
-  EFI_TCP4_PROTOCOL * pTcp4Protocol;
+  ESL_TCP6_CONTEXT * pTcp6;
+  EFI_TCP6_PROTOCOL * pTcp6Protocol;
   EFI_STATUS Status;
 
   DBG_ENTER ( );
@@ -465,15 +483,16 @@ EslTcp4ConnectStart (
     //
     //  Configure the port
     //
-    pTcp4 = &pPort->Context.Tcp4;
-    pTcp4->ConfigData.AccessPoint.ActiveFlag = TRUE;
-    pTcp4->ConfigData.TimeToLive = 255;
-    pTcp4Protocol = pPort->pProtocol.TCPv4;
-    Status = pTcp4Protocol->Configure ( pTcp4Protocol,
-                                        &pTcp4->ConfigData );
+    pTcp6 = &pPort->Context.Tcp6;
+    pTcp6->ConfigData.AccessPoint.ActiveFlag = TRUE;
+    pTcp6->ConfigData.TrafficClass = 0;
+    pTcp6->ConfigData.HopLimit = 255;
+    pTcp6Protocol = pPort->pProtocol.TCPv6;
+    Status = pTcp6Protocol->Configure ( pTcp6Protocol,
+                                        &pTcp6->ConfigData );
     if ( EFI_ERROR ( Status )) {
       DEBUG (( DEBUG_CONNECT,
-                "ERROR - Failed to configure the Tcp4 port, Status: %r\r\n",
+                "ERROR - Failed to configure the Tcp6 port, Status: %r\r\n",
                 Status ));
       switch ( Status ) {
       case EFI_ACCESS_DENIED:
@@ -511,8 +530,8 @@ EslTcp4ConnectStart (
       //
       //  Attempt the connection to the remote system
       //
-      Status = pTcp4Protocol->Connect ( pTcp4Protocol,
-                                        &pTcp4->ConnectToken );
+      Status = pTcp6Protocol->Connect ( pTcp6Protocol,
+                                        &pTcp6->ConnectToken );
       if ( !EFI_ERROR ( Status )) {
         //
         //  Connection in progress
@@ -520,13 +539,25 @@ EslTcp4ConnectStart (
         pSocket->errno = EINPROGRESS;
         Status = EFI_NOT_READY;
         DEBUG (( DEBUG_CONNECT,
-                  "0x%08x: Port attempting connection to %d.%d.%d.%d:%d\r\n",
+                  "0x%08x: Port attempting connection to [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d\r\n",
                   pPort,
-                  pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[0],
-                  pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[1],
-                  pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[2],
-                  pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[3],
-                  pTcp4->ConfigData.AccessPoint.RemotePort ));
+                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[0],
+                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[1],
+                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[2],
+                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[3],
+                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[4],
+                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[5],
+                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[6],
+                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[7],
+                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[8],
+                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[9],
+                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[10],
+                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[11],
+                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[12],
+                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[13],
+                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[14],
+                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[15],
+                  pTcp6->ConfigData.AccessPoint.RemotePort ));
       }
       else {
         //
@@ -606,14 +637,14 @@ EslTcp4ConnectStart (
 
 **/
 EFI_STATUS
-EslTcp4Listen (
+EslTcp6Listen (
   IN ESL_SOCKET * pSocket
   )
 {
   ESL_PORT * pNextPort;
   ESL_PORT * pPort;
-  ESL_TCP4_CONTEXT * pTcp4;
-  EFI_TCP4_PROTOCOL * pTcp4Protocol;
+  ESL_TCP6_CONTEXT * pTcp6;
+  EFI_TCP6_PROTOCOL * pTcp6Protocol;
   EFI_STATUS Status;
 
   DBG_ENTER ( );
@@ -650,12 +681,12 @@ EslTcp4Listen (
         //
         //  Create the listen completion event
         //
-        pTcp4 = &pPort->Context.Tcp4;
+        pTcp6 = &pPort->Context.Tcp6;
         Status = gBS->CreateEvent ( EVT_NOTIFY_SIGNAL,
                                     TPL_SOCKETS,
-                                    (EFI_EVENT_NOTIFY)EslTcp4ListenComplete,
+                                    (EFI_EVENT_NOTIFY)EslTcp6ListenComplete,
                                     pPort,
-                                    &pTcp4->ListenToken.CompletionToken.Event );
+                                    &pTcp6->ListenToken.CompletionToken.Event );
         if ( EFI_ERROR ( Status )) {
           DEBUG (( DEBUG_ERROR | DEBUG_LISTEN,
                     "ERROR - Failed to create the listen completion event, Status: %r\r\n",
@@ -665,17 +696,17 @@ EslTcp4Listen (
         }
         DEBUG (( DEBUG_POOL,
                   "0x%08x: Created listen completion event\r\n",
-                  pTcp4->ListenToken.CompletionToken.Event ));
+                  pTcp6->ListenToken.CompletionToken.Event ));
 
         //
         //  Configure the port
         //
-        pTcp4Protocol = pPort->pProtocol.TCPv4;
-        Status = pTcp4Protocol->Configure ( pTcp4Protocol,
-                                            &pTcp4->ConfigData );
+        pTcp6Protocol = pPort->pProtocol.TCPv6;
+        Status = pTcp6Protocol->Configure ( pTcp6Protocol,
+                                            &pTcp6->ConfigData );
         if ( EFI_ERROR ( Status )) {
           DEBUG (( DEBUG_LISTEN,
-                    "ERROR - Failed to configure the Tcp4 port, Status: %r\r\n",
+                    "ERROR - Failed to configure the Tcp6 port, Status: %r\r\n",
                     Status ));
           switch ( Status ) {
           case EFI_ACCESS_DENIED:
@@ -713,11 +744,11 @@ EslTcp4Listen (
         //
         //  Start the listen operation on the port
         //
-        Status = pTcp4Protocol->Accept ( pTcp4Protocol,
-                                         &pTcp4->ListenToken );
+        Status = pTcp6Protocol->Accept ( pTcp6Protocol,
+                                         &pTcp6->ListenToken );
         if ( EFI_ERROR ( Status )) {
           DEBUG (( DEBUG_LISTEN,
-                    "ERROR - Failed Tcp4 accept, Status: %r\r\n",
+                    "ERROR - Failed Tcp6 accept, Status: %r\r\n",
                     Status ));
           switch ( Status ) {
           case EFI_ACCESS_DENIED:
@@ -814,7 +845,7 @@ EslTcp4Listen (
   A system has initiated a connection attempt with a socket in the
   listen state.  Attempt to complete the connection.
 
-  The TCPv4 layer calls this routine when a connection is made to
+  The TCPv6 layer calls this routine when a connection is made to
   the socket in the listen state.  See the
   \ref ConnectionManagement section.
 
@@ -824,20 +855,20 @@ EslTcp4Listen (
 
 **/
 VOID
-EslTcp4ListenComplete (
+EslTcp6ListenComplete (
   IN EFI_EVENT Event,
   IN ESL_PORT * pPort
   )
 {
   EFI_HANDLE ChildHandle;
-  struct sockaddr_in LocalAddress;
-  EFI_TCP4_CONFIG_DATA * pConfigData;
+  struct sockaddr_in6 LocalAddress;
+  EFI_TCP6_CONFIG_DATA * pConfigData;
   ESL_LAYER * pLayer;
   ESL_PORT * pNewPort;
   ESL_SOCKET * pNewSocket;
   ESL_SOCKET * pSocket;
-  ESL_TCP4_CONTEXT * pTcp4;
-  EFI_TCP4_PROTOCOL * pTcp4Protocol;
+  ESL_TCP6_CONTEXT * pTcp6;
+  EFI_TCP6_PROTOCOL * pTcp6Protocol;
   EFI_STATUS Status;
   EFI_HANDLE TcpPortHandle;
   EFI_STATUS TempStatus;
@@ -854,7 +885,7 @@ EslTcp4ListenComplete (
   //  Determine if this connection fits into the connection FIFO
   //
   pSocket = pPort->pSocket;
-  TcpPortHandle = pPort->Context.Tcp4.ListenToken.NewChildHandle;
+  TcpPortHandle = pPort->Context.Tcp6.ListenToken.NewChildHandle;
   if (( SOCKET_STATE_LISTENING == pSocket->State )
     && ( pSocket->MaxFifoDepth > pSocket->FifoDepth )) {
     //
@@ -877,11 +908,13 @@ EslTcp4ListenComplete (
       //
       //  Build the local address
       //
-      pTcp4 = &pPort->Context.Tcp4;
-      LocalAddress.sin_len = (uint8_t)pNewSocket->pApi->MinimumAddressLength;
-      LocalAddress.sin_family = AF_INET;
-      LocalAddress.sin_port = 0;
-      LocalAddress.sin_addr.s_addr = *(UINT32 *)&pTcp4->ConfigData.AccessPoint.StationAddress.Addr[0];
+      pTcp6 = &pPort->Context.Tcp6;
+      LocalAddress.sin6_len = (uint8_t)pNewSocket->pApi->MinimumAddressLength;
+      LocalAddress.sin6_family = AF_INET6;
+      LocalAddress.sin6_port = 0;
+      CopyMem ( &LocalAddress.sin6_addr.__u6_addr.__u6_addr8 [ 0 ],
+                &pTcp6->ConfigData.AccessPoint.StationAddress.Addr [ 0 ],
+                sizeof ( pTcp6->ConfigData.AccessPoint.StationAddress.Addr ));
 
       //
       //  Allocate a port for this connection
@@ -898,15 +931,15 @@ EslTcp4ListenComplete (
         //
         //  Restart the listen operation on the port
         //
-        pTcp4Protocol = pPort->pProtocol.TCPv4;
-        Status = pTcp4Protocol->Accept ( pTcp4Protocol,
-                                         &pTcp4->ListenToken );
+        pTcp6Protocol = pPort->pProtocol.TCPv6;
+        Status = pTcp6Protocol->Accept ( pTcp6Protocol,
+                                         &pTcp6->ListenToken );
 
         //
         //  Close the TCP port using SocketClose
         //
         TcpPortHandle = NULL;
-        pTcp4 = &pNewPort->Context.Tcp4;
+        pTcp6 = &pNewPort->Context.Tcp6;
 
         //
         //  Check for an accept call error
@@ -916,10 +949,10 @@ EslTcp4ListenComplete (
           //  Get the port configuration
           //
           pNewPort->bConfigured = TRUE;
-          pConfigData = &pTcp4->ConfigData;
-          pConfigData->ControlOption = &pTcp4->Option;
-          pTcp4Protocol = pNewPort->pProtocol.TCPv4;
-          Status = pTcp4Protocol->GetModeData ( pTcp4Protocol,
+          pConfigData = &pTcp6->ConfigData;
+          pConfigData->ControlOption = &pTcp6->Option;
+          pTcp6Protocol = pNewPort->pProtocol.TCPv6;
+          Status = pTcp6Protocol->GetModeData ( pTcp6Protocol,
                                                 NULL,
                                                 pConfigData,
                                                 NULL,
@@ -953,17 +986,41 @@ EslTcp4ListenComplete (
             //  Log the connection
             //
             DEBUG (( DEBUG_CONNECTION | DEBUG_INFO,
-                      "0x%08x: Socket on port %d.%d.%d.%d:%d connected to %d.%d.%d.%d:%d\r\n",
+                      "0x%08x: Socket on port [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d connected to [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d\r\n",
                       pNewSocket,
                       pConfigData->AccessPoint.StationAddress.Addr[0],
                       pConfigData->AccessPoint.StationAddress.Addr[1],
                       pConfigData->AccessPoint.StationAddress.Addr[2],
                       pConfigData->AccessPoint.StationAddress.Addr[3],
+                      pConfigData->AccessPoint.StationAddress.Addr[4],
+                      pConfigData->AccessPoint.StationAddress.Addr[5],
+                      pConfigData->AccessPoint.StationAddress.Addr[6],
+                      pConfigData->AccessPoint.StationAddress.Addr[7],
+                      pConfigData->AccessPoint.StationAddress.Addr[8],
+                      pConfigData->AccessPoint.StationAddress.Addr[9],
+                      pConfigData->AccessPoint.StationAddress.Addr[10],
+                      pConfigData->AccessPoint.StationAddress.Addr[11],
+                      pConfigData->AccessPoint.StationAddress.Addr[12],
+                      pConfigData->AccessPoint.StationAddress.Addr[13],
+                      pConfigData->AccessPoint.StationAddress.Addr[14],
+                      pConfigData->AccessPoint.StationAddress.Addr[15],
                       pConfigData->AccessPoint.StationPort,
                       pConfigData->AccessPoint.RemoteAddress.Addr[0],
                       pConfigData->AccessPoint.RemoteAddress.Addr[1],
                       pConfigData->AccessPoint.RemoteAddress.Addr[2],
                       pConfigData->AccessPoint.RemoteAddress.Addr[3],
+                      pConfigData->AccessPoint.RemoteAddress.Addr[4],
+                      pConfigData->AccessPoint.RemoteAddress.Addr[5],
+                      pConfigData->AccessPoint.RemoteAddress.Addr[6],
+                      pConfigData->AccessPoint.RemoteAddress.Addr[7],
+                      pConfigData->AccessPoint.RemoteAddress.Addr[8],
+                      pConfigData->AccessPoint.RemoteAddress.Addr[9],
+                      pConfigData->AccessPoint.RemoteAddress.Addr[10],
+                      pConfigData->AccessPoint.RemoteAddress.Addr[11],
+                      pConfigData->AccessPoint.RemoteAddress.Addr[12],
+                      pConfigData->AccessPoint.RemoteAddress.Addr[13],
+                      pConfigData->AccessPoint.RemoteAddress.Addr[14],
+                      pConfigData->AccessPoint.RemoteAddress.Addr[15],
                       pConfigData->AccessPoint.RemotePort ));
             DEBUG (( DEBUG_CONNECTION | DEBUG_INFO,
                       "0x%08x: Listen socket adding socket 0x%08x to FIFO, depth: %d\r\n",
@@ -1043,7 +1100,7 @@ EslTcp4ListenComplete (
 /**
   Get the local socket address.
 
-  This routine returns the IPv4 address and TCP port number associated
+  This routine returns the IPv6 address and TCP port number associated
   with the local socket.
 
   This routine is called by ::EslSocketGetLocalAddress to determine the
@@ -1055,26 +1112,26 @@ EslTcp4ListenComplete (
 
 **/
 VOID
-EslTcp4LocalAddressGet (
+EslTcp6LocalAddressGet (
   IN ESL_PORT * pPort,
   OUT struct sockaddr * pSockAddr
   )
 {
-  struct sockaddr_in * pLocalAddress;
-  ESL_TCP4_CONTEXT * pTcp4;
+  struct sockaddr_in6 * pLocalAddress;
+  ESL_TCP6_CONTEXT * pTcp6;
 
   DBG_ENTER ( );
 
   //
   //  Return the local address
   //
-  pTcp4 = &pPort->Context.Tcp4;
-  pLocalAddress = (struct sockaddr_in *)pSockAddr;
-  pLocalAddress->sin_family = AF_INET;
-  pLocalAddress->sin_port = SwapBytes16 ( pTcp4->ConfigData.AccessPoint.StationPort );
-  CopyMem ( &pLocalAddress->sin_addr,
-            &pTcp4->ConfigData.AccessPoint.StationAddress.Addr[0],
-            sizeof ( pLocalAddress->sin_addr ));
+  pTcp6 = &pPort->Context.Tcp6;
+  pLocalAddress = (struct sockaddr_in6 *)pSockAddr;
+  pLocalAddress->sin6_family = AF_INET6;
+  pLocalAddress->sin6_port = SwapBytes16 ( pTcp6->ConfigData.AccessPoint.StationPort );
+  CopyMem ( &pLocalAddress->sin6_addr,
+            &pTcp6->ConfigData.AccessPoint.StationAddress.Addr[0],
+            sizeof ( pLocalAddress->sin6_addr ));
 
   DBG_EXIT ( );
 }
@@ -1089,10 +1146,10 @@ EslTcp4LocalAddressGet (
 
   @param [in] pPort       Address of an ESL_PORT structure
   @param [in] pSockAddr   Address of a sockaddr structure that contains the
-                          connection point on the local machine.  An IPv4 address
+                          connection point on the local machine.  An IPv6 address
                           of INADDR_ANY specifies that the connection is made to
                           all of the network stacks on the platform.  Specifying a
-                          specific IPv4 address restricts the connection to the
+                          specific IPv6 address restricts the connection to the
                           network stack supporting that address.  Specifying zero
                           for the port causes the network layer to assign a port
                           number from the dynamic range.  Specifying a specific
@@ -1104,15 +1161,14 @@ EslTcp4LocalAddressGet (
 
  **/
 EFI_STATUS
-EslTcp4LocalAddressSet (
+EslTcp6LocalAddressSet (
   IN ESL_PORT * pPort,
   IN CONST struct sockaddr * pSockAddr,
   IN BOOLEAN bBindTest
   )
 {
-  EFI_TCP4_ACCESS_POINT * pAccessPoint;
-  CONST struct sockaddr_in * pIpAddress;
-  CONST UINT8 * pIpv4Address;
+  EFI_TCP6_ACCESS_POINT * pAccessPoint;
+  CONST struct sockaddr_in6 * pIpAddress;
   EFI_STATUS Status;
 
   DBG_ENTER ( );
@@ -1120,8 +1176,12 @@ EslTcp4LocalAddressSet (
   //
   //  Validate the address
   //
-  pIpAddress = (struct sockaddr_in *)pSockAddr;
-  if ( INADDR_BROADCAST == pIpAddress->sin_addr.s_addr ) {
+  pIpAddress = (struct sockaddr_in6 *)pSockAddr;
+//
+// TODO: Fix the following check
+//
+/*
+  if ( INADDR_BROADCAST == pIpAddress->sin6_addr.s_addr ) {
     //
     //  The local address must not be the broadcast address
     //
@@ -1129,36 +1189,15 @@ EslTcp4LocalAddressSet (
     pPort->pSocket->errno = EADDRNOTAVAIL;
   }
   else {
+*/
+{
     //
     //  Set the local address
     //
-    pIpv4Address = (UINT8 *)&pIpAddress->sin_addr.s_addr;
-    pAccessPoint = &pPort->Context.Tcp4.ConfigData.AccessPoint;
-    pAccessPoint->StationAddress.Addr[0] = pIpv4Address[0];
-    pAccessPoint->StationAddress.Addr[1] = pIpv4Address[1];
-    pAccessPoint->StationAddress.Addr[2] = pIpv4Address[2];
-    pAccessPoint->StationAddress.Addr[3] = pIpv4Address[3];
-
-    //
-    //  Determine if the default address is used
-    //
-    pAccessPoint->UseDefaultAddress = (BOOLEAN)( 0 == pIpAddress->sin_addr.s_addr );
-    
-    //
-    //  Set the subnet mask
-    //
-    if ( pAccessPoint->UseDefaultAddress ) {
-      pAccessPoint->SubnetMask.Addr[0] = 0;
-      pAccessPoint->SubnetMask.Addr[1] = 0;
-      pAccessPoint->SubnetMask.Addr[2] = 0;
-      pAccessPoint->SubnetMask.Addr[3] = 0;
-    }
-    else {
-      pAccessPoint->SubnetMask.Addr[0] = 0xff;
-      pAccessPoint->SubnetMask.Addr[1] = 0xff;
-      pAccessPoint->SubnetMask.Addr[2] = 0xff;
-      pAccessPoint->SubnetMask.Addr[3] = 0xff;
-    }
+    pAccessPoint = &pPort->Context.Tcp6.ConfigData.AccessPoint;
+    CopyMem ( &pAccessPoint->StationAddress.Addr[0],
+              &pIpAddress->sin6_addr.__u6_addr.__u6_addr8 [ 0 ],
+              sizeof ( pIpAddress->sin6_addr.__u6_addr.__u6_addr8 [ 0 ]));
 
     //
     //  Validate the IP address
@@ -1170,18 +1209,30 @@ EslTcp4LocalAddressSet (
       //
       //  Set the port number
       //
-      pAccessPoint->StationPort = SwapBytes16 ( pIpAddress->sin_port );
+      pAccessPoint->StationPort = SwapBytes16 ( pIpAddress->sin6_port );
 
       //
       //  Display the local address
       //
       DEBUG (( DEBUG_BIND,
-                "0x%08x: Port, Local TCP4 Address: %d.%d.%d.%d:%d\r\n",
+                "0x%08x: Port, Local Tcp6 Address: [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d\r\n",
                 pPort,
                 pAccessPoint->StationAddress.Addr[0],
                 pAccessPoint->StationAddress.Addr[1],
                 pAccessPoint->StationAddress.Addr[2],
                 pAccessPoint->StationAddress.Addr[3],
+                pAccessPoint->StationAddress.Addr[4],
+                pAccessPoint->StationAddress.Addr[5],
+                pAccessPoint->StationAddress.Addr[6],
+                pAccessPoint->StationAddress.Addr[7],
+                pAccessPoint->StationAddress.Addr[8],
+                pAccessPoint->StationAddress.Addr[9],
+                pAccessPoint->StationAddress.Addr[10],
+                pAccessPoint->StationAddress.Addr[11],
+                pAccessPoint->StationAddress.Addr[12],
+                pAccessPoint->StationAddress.Addr[13],
+                pAccessPoint->StationAddress.Addr[14],
+                pAccessPoint->StationAddress.Addr[15],
                 pAccessPoint->StationPort ));
     }
   }
@@ -1208,7 +1259,7 @@ EslTcp4LocalAddressSet (
 
 **/
 VOID
-EslTcp4PacketFree (
+EslTcp6PacketFree (
   IN ESL_PACKET * pPacket,
   IN OUT size_t * pRxBytes
   )
@@ -1218,7 +1269,7 @@ EslTcp4PacketFree (
   //
   //  Account for the receive bytes
   //
-  *pRxBytes -= pPacket->Op.Tcp4Rx.RxData.DataLength;
+  *pRxBytes -= pPacket->Op.Tcp6Rx.RxData.DataLength;
   DBG_EXIT ( );
 }
 
@@ -1231,7 +1282,7 @@ EslTcp4PacketFree (
 
   This support routine is called by ::EslSocketPortAllocate
   to connect the socket with the underlying network adapter
-  running the TCPv4 protocol.
+  running the TCPv6 protocol.
 
   @param [in] pPort       Address of an ESL_PORT structure
   @param [in] DebugFlags  Flags for debug messages
@@ -1240,14 +1291,14 @@ EslTcp4PacketFree (
 
  **/
 EFI_STATUS
-EslTcp4PortAllocate (
+EslTcp6PortAllocate (
   IN ESL_PORT * pPort,
   IN UINTN DebugFlags
   )
 {
-  EFI_TCP4_ACCESS_POINT * pAccessPoint;
+  EFI_TCP6_ACCESS_POINT * pAccessPoint;
   ESL_SOCKET * pSocket;
-  ESL_TCP4_CONTEXT * pTcp4;
+  ESL_TCP6_CONTEXT * pTcp6;
   EFI_STATUS Status;
 
   DBG_ENTER ( );
@@ -1259,12 +1310,12 @@ EslTcp4PortAllocate (
     //  Allocate the close event
     //
     pSocket = pPort->pSocket;
-    pTcp4 = &pPort->Context.Tcp4;
+    pTcp6 = &pPort->Context.Tcp6;
     Status = gBS->CreateEvent (  EVT_NOTIFY_SIGNAL,
                                  TPL_SOCKETS,
                                  (EFI_EVENT_NOTIFY)EslSocketPortCloseComplete,
                                  pPort,
-                                 &pTcp4->CloseToken.CompletionToken.Event);
+                                 &pTcp6->CloseToken.CompletionToken.Event);
     if ( EFI_ERROR ( Status )) {
       DEBUG (( DEBUG_ERROR | DebugFlags,
                 "ERROR - Failed to create the close event, Status: %r\r\n",
@@ -1274,16 +1325,16 @@ EslTcp4PortAllocate (
     }
     DEBUG (( DEBUG_CLOSE | DEBUG_POOL,
               "0x%08x: Created close event\r\n",
-              pTcp4->CloseToken.CompletionToken.Event ));
+              pTcp6->CloseToken.CompletionToken.Event ));
 
     //
     //  Allocate the connection event
     //
     Status = gBS->CreateEvent (  EVT_NOTIFY_SIGNAL,
                                  TPL_SOCKETS,
-                                 (EFI_EVENT_NOTIFY)EslTcp4ConnectComplete,
+                                 (EFI_EVENT_NOTIFY)EslTcp6ConnectComplete,
                                  pPort,
-                                 &pTcp4->ConnectToken.CompletionToken.Event);
+                                 &pTcp6->ConnectToken.CompletionToken.Event);
     if ( EFI_ERROR ( Status )) {
       DEBUG (( DEBUG_ERROR | DebugFlags,
                 "ERROR - Failed to create the connect event, Status: %r\r\n",
@@ -1293,30 +1344,31 @@ EslTcp4PortAllocate (
     }
     DEBUG (( DEBUG_CLOSE | DEBUG_POOL,
               "0x%08x: Created connect event\r\n",
-              pTcp4->ConnectToken.CompletionToken.Event ));
+              pTcp6->ConnectToken.CompletionToken.Event ));
 
     //
     //  Initialize the port
     //
-    pSocket->TxPacketOffset = OFFSET_OF ( ESL_PACKET, Op.Tcp4Tx.TxData );
-    pSocket->TxTokenEventOffset = OFFSET_OF ( ESL_IO_MGMT, Token.Tcp4Tx.CompletionToken.Event );
-    pSocket->TxTokenOffset = OFFSET_OF ( EFI_TCP4_IO_TOKEN, Packet.TxData );
+    pSocket->TxPacketOffset = OFFSET_OF ( ESL_PACKET, Op.Tcp6Tx.TxData );
+    pSocket->TxTokenEventOffset = OFFSET_OF ( ESL_IO_MGMT, Token.Tcp6Tx.CompletionToken.Event );
+    pSocket->TxTokenOffset = OFFSET_OF ( EFI_TCP6_IO_TOKEN, Packet.TxData );
 
     //
     //  Save the cancel, receive and transmit addresses
     //  pPort->pfnRxCancel = NULL; since the UEFI implementation returns EFI_UNSUPPORTED
     //
-    pPort->pfnConfigure = (PFN_NET_CONFIGURE)pPort->pProtocol.TCPv4->Configure;
-    pPort->pfnRxPoll = (PFN_NET_POLL)pPort->pProtocol.TCPv4->Poll;
-    pPort->pfnRxStart = (PFN_NET_IO_START)pPort->pProtocol.TCPv4->Receive;
-    pPort->pfnTxStart = (PFN_NET_IO_START)pPort->pProtocol.TCPv4->Transmit;
+    pPort->pfnConfigure = (PFN_NET_CONFIGURE)pPort->pProtocol.TCPv6->Configure;
+    pPort->pfnRxPoll = (PFN_NET_POLL)pPort->pProtocol.TCPv6->Poll;
+    pPort->pfnRxStart = (PFN_NET_IO_START)pPort->pProtocol.TCPv6->Receive;
+    pPort->pfnTxStart = (PFN_NET_IO_START)pPort->pProtocol.TCPv6->Transmit;
 
     //
     //  Set the configuration flags
     //
-    pAccessPoint = &pPort->Context.Tcp4.ConfigData.AccessPoint;
+    pAccessPoint = &pPort->Context.Tcp6.ConfigData.AccessPoint;
     pAccessPoint->ActiveFlag = FALSE;
-    pTcp4->ConfigData.TimeToLive = 255;
+    pTcp6->ConfigData.TrafficClass = 0;
+    pTcp6->ConfigData.HopLimit = 255;
     break;
   }
 
@@ -1329,10 +1381,10 @@ EslTcp4PortAllocate (
 
 
 /**
-  Close a TCP4 port.
+  Close a Tcp6 port.
 
   This routine releases the network specific resources allocated by
-  ::EslTcp4PortAllocate.
+  ::EslTcp6PortAllocate.
 
   This routine is called by ::EslSocketPortClose.
   See the \ref PortCloseStateMachine section.
@@ -1344,12 +1396,12 @@ EslTcp4PortAllocate (
 
 **/
 EFI_STATUS
-EslTcp4PortClose (
+EslTcp6PortClose (
   IN ESL_PORT * pPort
   )
 {
   UINTN DebugFlags;
-  ESL_TCP4_CONTEXT * pTcp4;
+  ESL_TCP6_CONTEXT * pTcp6;
   EFI_STATUS Status;
   
   DBG_ENTER ( );
@@ -1359,17 +1411,17 @@ EslTcp4PortClose (
   //
   Status = EFI_SUCCESS;
   DebugFlags = pPort->DebugFlags;
-  pTcp4 = &pPort->Context.Tcp4;
+  pTcp6 = &pPort->Context.Tcp6;
 
   //
   //  Done with the connect event
   //
-  if ( NULL != pTcp4->ConnectToken.CompletionToken.Event ) {
-    Status = gBS->CloseEvent ( pTcp4->ConnectToken.CompletionToken.Event );
+  if ( NULL != pTcp6->ConnectToken.CompletionToken.Event ) {
+    Status = gBS->CloseEvent ( pTcp6->ConnectToken.CompletionToken.Event );
     if ( !EFI_ERROR ( Status )) {
       DEBUG (( DebugFlags | DEBUG_POOL,
                 "0x%08x: Closed connect event\r\n",
-                pTcp4->ConnectToken.CompletionToken.Event ));
+                pTcp6->ConnectToken.CompletionToken.Event ));
     }
     else {
       DEBUG (( DEBUG_ERROR | DebugFlags,
@@ -1382,12 +1434,12 @@ EslTcp4PortClose (
   //
   //  Done with the close event
   //
-  if ( NULL != pTcp4->CloseToken.CompletionToken.Event ) {
-    Status = gBS->CloseEvent ( pTcp4->CloseToken.CompletionToken.Event );
+  if ( NULL != pTcp6->CloseToken.CompletionToken.Event ) {
+    Status = gBS->CloseEvent ( pTcp6->CloseToken.CompletionToken.Event );
     if ( !EFI_ERROR ( Status )) {
       DEBUG (( DebugFlags | DEBUG_POOL,
                 "0x%08x: Closed close event\r\n",
-                pTcp4->CloseToken.CompletionToken.Event ));
+                pTcp6->CloseToken.CompletionToken.Event ));
     }
     else {
       DEBUG (( DEBUG_ERROR | DebugFlags,
@@ -1400,12 +1452,12 @@ EslTcp4PortClose (
   //
   //  Done with the listen completion event
   //
-  if ( NULL != pTcp4->ListenToken.CompletionToken.Event ) {
-    Status = gBS->CloseEvent ( pTcp4->ListenToken.CompletionToken.Event );
+  if ( NULL != pTcp6->ListenToken.CompletionToken.Event ) {
+    Status = gBS->CloseEvent ( pTcp6->ListenToken.CompletionToken.Event );
     if ( !EFI_ERROR ( Status )) {
       DEBUG (( DebugFlags | DEBUG_POOL,
                 "0x%08x: Closed listen completion event\r\n",
-                pTcp4->ListenToken.CompletionToken.Event ));
+                pTcp6->ListenToken.CompletionToken.Event ));
     }
     else {
       DEBUG (( DEBUG_ERROR | DebugFlags,
@@ -1426,7 +1478,7 @@ EslTcp4PortClose (
 /**
   Perform the network specific close operation on the port.
 
-  This routine performs a cancel operations on the TCPv4 port to
+  This routine performs a cancel operations on the TCPv6 port to
   shutdown the receive operations on the port.
 
   This routine is called by the ::EslSocketPortCloseTxDone
@@ -1441,12 +1493,12 @@ EslTcp4PortClose (
 
 **/
 EFI_STATUS
-EslTcp4PortCloseOp (
+EslTcp6PortCloseOp (
   IN ESL_PORT * pPort
   )
 {
-  ESL_TCP4_CONTEXT * pTcp4;
-  EFI_TCP4_PROTOCOL * pTcp4Protocol;
+  ESL_TCP6_CONTEXT * pTcp6;
+  EFI_TCP6_PROTOCOL * pTcp6Protocol;
   EFI_STATUS Status;
 
   DBG_ENTER ( );
@@ -1455,11 +1507,11 @@ EslTcp4PortCloseOp (
   //  Close the configured port
   //
   Status = EFI_SUCCESS;
-  pTcp4 = &pPort->Context.Tcp4;
-  pTcp4Protocol = pPort->pProtocol.TCPv4;
-  pTcp4->CloseToken.AbortOnClose = pPort->bCloseNow;
-  Status = pTcp4Protocol->Close ( pTcp4Protocol,
-                                  &pTcp4->CloseToken );
+  pTcp6 = &pPort->Context.Tcp6;
+  pTcp6Protocol = pPort->pProtocol.TCPv6;
+  pTcp6->CloseToken.AbortOnClose = pPort->bCloseNow;
+  Status = pTcp6Protocol->Close ( pTcp6Protocol,
+                                  &pTcp6->CloseToken );
   if ( !EFI_ERROR ( Status )) {
     DEBUG (( pPort->DebugFlags | DEBUG_CLOSE | DEBUG_INFO,
               "0x%08x: Port close started\r\n",
@@ -1512,7 +1564,7 @@ EslTcp4PortCloseOp (
 
  **/
 UINT8 *
-EslTcp4Receive (
+EslTcp6Receive (
   IN ESL_PORT * pPort,
   IN ESL_PACKET * pPacket,
   IN BOOLEAN * pbConsumePacket,
@@ -1524,8 +1576,8 @@ EslTcp4Receive (
   )
 {
   size_t DataLength;
-  struct sockaddr_in * pRemoteAddress;
-  ESL_TCP4_CONTEXT * pTcp4;
+  struct sockaddr_in6 * pRemoteAddress;
+  ESL_TCP6_CONTEXT * pTcp6;
 
   DBG_ENTER ( );
 
@@ -1536,19 +1588,31 @@ EslTcp4Receive (
     //
     //  Build the remote address
     //
-    pTcp4 = &pPort->Context.Tcp4;
+    pTcp6 = &pPort->Context.Tcp6;
     DEBUG (( DEBUG_RX,
-              "Getting packet remote address: %d.%d.%d.%d:%d\r\n",
-              pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[0],
-              pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[1],
-              pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[2],
-              pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[3],
-              pTcp4->ConfigData.AccessPoint.RemotePort ));
-    pRemoteAddress = (struct sockaddr_in *)pAddress;
-    CopyMem ( &pRemoteAddress->sin_addr,
-              &pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[0],
-              sizeof ( pRemoteAddress->sin_addr ));
-    pRemoteAddress->sin_port = SwapBytes16 ( pTcp4->ConfigData.AccessPoint.RemotePort );
+              "Getting packet remote address: [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d\r\n",
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[0],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[1],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[2],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[3],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[4],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[5],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[6],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[7],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[8],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[9],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[10],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[11],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[12],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[13],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[14],
+              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[15],
+              pTcp6->ConfigData.AccessPoint.RemotePort ));
+    pRemoteAddress = (struct sockaddr_in6 *)pAddress;
+    CopyMem ( &pRemoteAddress->sin6_addr,
+              &pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[0],
+              sizeof ( pRemoteAddress->sin6_addr ));
+    pRemoteAddress->sin6_port = SwapBytes16 ( pTcp6->ConfigData.AccessPoint.RemotePort );
   }
 
   //
@@ -1620,7 +1684,7 @@ EslTcp4Receive (
   associated with the SOCK_STREAM or SOCK_SEQPACKET socket.
 
   This routine is called by ::EslSocketGetPeerAddress to detemine
-  the TCPv4 address and por number associated with the network adapter.
+  the TCPv6 address and por number associated with the network adapter.
 
   @param [in] pPort       Address of an ::ESL_PORT structure.
 
@@ -1628,26 +1692,26 @@ EslTcp4Receive (
 
 **/
 VOID
-EslTcp4RemoteAddressGet (
+EslTcp6RemoteAddressGet (
   IN ESL_PORT * pPort,
   OUT struct sockaddr * pAddress
   )
 {
-  struct sockaddr_in * pRemoteAddress;
-  ESL_TCP4_CONTEXT * pTcp4;
+  struct sockaddr_in6 * pRemoteAddress;
+  ESL_TCP6_CONTEXT * pTcp6;
 
   DBG_ENTER ( );
 
   //
   //  Return the remote address
   //
-  pTcp4 = &pPort->Context.Tcp4;
-  pRemoteAddress = (struct sockaddr_in *)pAddress;
-  pRemoteAddress->sin_family = AF_INET;
-  pRemoteAddress->sin_port = SwapBytes16 ( pTcp4->ConfigData.AccessPoint.RemotePort );
-  CopyMem ( &pRemoteAddress->sin_addr,
-            &pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[0],
-            sizeof ( pRemoteAddress->sin_addr ));
+  pTcp6 = &pPort->Context.Tcp6;
+  pRemoteAddress = (struct sockaddr_in6 *)pAddress;
+  pRemoteAddress->sin6_family = AF_INET6;
+  pRemoteAddress->sin6_port = SwapBytes16 ( pTcp6->ConfigData.AccessPoint.RemotePort );
+  CopyMem ( &pRemoteAddress->sin6_addr,
+            &pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[0],
+            sizeof ( pRemoteAddress->sin6_addr ));
 
   DBG_EXIT ( );
 }
@@ -1671,14 +1735,14 @@ EslTcp4RemoteAddressGet (
 
  **/
 EFI_STATUS
-EslTcp4RemoteAddressSet (
+EslTcp6RemoteAddressSet (
   IN ESL_PORT * pPort,
   IN CONST struct sockaddr * pSockAddr,
   IN socklen_t SockAddrLength
   )
 {
-  CONST struct sockaddr_in * pRemoteAddress;
-  ESL_TCP4_CONTEXT * pTcp4;
+  CONST struct sockaddr_in6 * pRemoteAddress;
+  ESL_TCP6_CONTEXT * pTcp6;
   EFI_STATUS Status;
 
   DBG_ENTER ( );
@@ -1686,20 +1750,25 @@ EslTcp4RemoteAddressSet (
   //
   //  Set the remote address
   //
-  pTcp4 = &pPort->Context.Tcp4;
-  pRemoteAddress = (struct sockaddr_in *)pSockAddr;
-  pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[0] = (UINT8)( pRemoteAddress->sin_addr.s_addr );
-  pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[1] = (UINT8)( pRemoteAddress->sin_addr.s_addr >> 8 );
-  pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[2] = (UINT8)( pRemoteAddress->sin_addr.s_addr >> 16 );
-  pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[3] = (UINT8)( pRemoteAddress->sin_addr.s_addr >> 24 );
-  pTcp4->ConfigData.AccessPoint.RemotePort = SwapBytes16 ( pRemoteAddress->sin_port );
+  pTcp6 = &pPort->Context.Tcp6;
+  pRemoteAddress = (struct sockaddr_in6 *)pSockAddr;
+  CopyMem ( &pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr [ 0 ],
+            &pRemoteAddress->sin6_addr.__u6_addr.__u6_addr8 [ 0 ],
+            sizeof ( pRemoteAddress->sin6_addr.__u6_addr.__u6_addr8 ));
+  pTcp6->ConfigData.AccessPoint.RemotePort = SwapBytes16 ( pRemoteAddress->sin6_port );
   Status = EFI_SUCCESS;
-  if ( INADDR_BROADCAST == pRemoteAddress->sin_addr.s_addr ) {
+
+//
+// TODO: Fix the following check
+//
+/*
+  if ( INADDR_BROADCAST == pRemoteAddress->sin6_addr.s_addr ) {
     DEBUG (( DEBUG_CONNECT,
               "ERROR - Invalid remote address\r\n" ));
     Status = EFI_INVALID_PARAMETER;
     pPort->pSocket->errno = EAFNOSUPPORT;
   }
+*/
 
   //
   //  Return the operation status
@@ -1716,7 +1785,7 @@ EslTcp4RemoteAddressSet (
   or normal data queues depending upon the type of data received.
   See the \ref ReceiveEngine section.
 
-  This routine is called by the TCPv4 driver when some data is
+  This routine is called by the TCPv6 driver when some data is
   received.
 
   Buffer the data that was just received.
@@ -1727,7 +1796,7 @@ EslTcp4RemoteAddressSet (
 
 **/
 VOID
-EslTcp4RxComplete (
+EslTcp6RxComplete (
   IN EFI_EVENT Event,
   IN ESL_IO_MGMT * pIo
   )
@@ -1742,14 +1811,14 @@ EslTcp4RxComplete (
   //
   //  Get the operation status.
   //
-  Status = pIo->Token.Tcp4Rx.CompletionToken.Status;
+  Status = pIo->Token.Tcp6Rx.CompletionToken.Status;
 
   //
   //      +--------------------+   +---------------------------+
   //      | ESL_IO_MGMT        |   | ESL_PACKET                |
   //      |                    |   |                           |
   //      |    +---------------+   +-----------------------+   |
-  //      |    | Token         |   | EFI_TCP4_RECEIVE_DATA |   |
+  //      |    | Token         |   | EFI_Tcp6_RECEIVE_DATA |   |
   //      |    |        RxData --> |                       |   |
   //      |    |               |   +-----------------------+---+
   //      |    |        Event  |   |       Data Buffer         |
@@ -1759,20 +1828,20 @@ EslTcp4RxComplete (
   //
   //
   //  Duplicate the buffer address and length for use by the
-  //  buffer handling code in EslTcp4Receive.  These fields are
+  //  buffer handling code in EslTcp6Receive.  These fields are
   //  used when a partial read is done of the data from the
   //  packet.
   //
   pPacket = pIo->pPacket;
-  pPacket->pBuffer = pPacket->Op.Tcp4Rx.RxData.FragmentTable[0].FragmentBuffer;
-  LengthInBytes = pPacket->Op.Tcp4Rx.RxData.DataLength;
+  pPacket->pBuffer = pPacket->Op.Tcp6Rx.RxData.FragmentTable[0].FragmentBuffer;
+  LengthInBytes = pPacket->Op.Tcp6Rx.RxData.DataLength;
   pPacket->ValidBytes = LengthInBytes;
 
   //
   //  Get the data type so that it may be linked to the
   //  correct receive buffer list on the ESL_SOCKET structure
   //
-  bUrgent = pPacket->Op.Tcp4Rx.RxData.UrgentFlag;
+  bUrgent = pPacket->Op.Tcp6Rx.RxData.UrgentFlag;
 
   //
   //  Complete this request
@@ -1785,7 +1854,7 @@ EslTcp4RxComplete (
 /**
   Start a receive operation
 
-  This routine posts a receive buffer to the TCPv4 driver.
+  This routine posts a receive buffer to the TCPv6 driver.
   See the \ref ReceiveEngine section.
 
   This support routine is called by EslSocketRxStart.
@@ -1795,7 +1864,7 @@ EslTcp4RxComplete (
 
  **/
 VOID
-EslTcp4RxStart (
+EslTcp6RxStart (
   IN ESL_PORT * pPort,
   IN ESL_IO_MGMT * pIo
   )
@@ -1808,11 +1877,11 @@ EslTcp4RxStart (
   //  Initialize the buffer for receive
   //
   pPacket = pIo->pPacket;
-  pIo->Token.Tcp4Rx.Packet.RxData = &pPacket->Op.Tcp4Rx.RxData;
-  pPacket->Op.Tcp4Rx.RxData.DataLength = sizeof ( pPacket->Op.Tcp4Rx.Buffer );
-  pPacket->Op.Tcp4Rx.RxData.FragmentCount = 1;
-  pPacket->Op.Tcp4Rx.RxData.FragmentTable[0].FragmentLength = pPacket->Op.Tcp4Rx.RxData.DataLength;
-  pPacket->Op.Tcp4Rx.RxData.FragmentTable[0].FragmentBuffer = &pPacket->Op.Tcp4Rx.Buffer[0];
+  pIo->Token.Tcp6Rx.Packet.RxData = &pPacket->Op.Tcp6Rx.RxData;
+  pPacket->Op.Tcp6Rx.RxData.DataLength = sizeof ( pPacket->Op.Tcp6Rx.Buffer );
+  pPacket->Op.Tcp6Rx.RxData.FragmentCount = 1;
+  pPacket->Op.Tcp6Rx.RxData.FragmentTable[0].FragmentLength = pPacket->Op.Tcp6Rx.RxData.DataLength;
+  pPacket->Op.Tcp6Rx.RxData.FragmentTable[0].FragmentBuffer = &pPacket->Op.Tcp6Rx.Buffer[0];
 
   DBG_EXIT ( );
 }
@@ -1834,7 +1903,7 @@ EslTcp4RxStart (
 
  **/
  EFI_STATUS
- EslTcp4SocketIsConfigured (
+ EslTcp6SocketIsConfigured (
   IN ESL_SOCKET * pSocket
   )
 {
@@ -1891,7 +1960,7 @@ EslTcp4RxStart (
 
  **/
 EFI_STATUS
-EslTcp4TxBuffer (
+EslTcp6TxBuffer (
   IN ESL_SOCKET * pSocket,
   IN int Flags,
   IN size_t BufferLength,
@@ -1910,9 +1979,9 @@ EslTcp4TxBuffer (
   ESL_PACKET ** ppQueueHead;
   ESL_PACKET ** ppQueueTail;
   ESL_PACKET * pPreviousPacket;
-  ESL_TCP4_CONTEXT * pTcp4;
+  ESL_TCP6_CONTEXT * pTcp6;
   size_t * pTxBytes;
-  EFI_TCP4_TRANSMIT_DATA * pTxData;
+  EFI_TCP6_TRANSMIT_DATA * pTxData;
   EFI_STATUS Status;
   EFI_TPL TplPrevious;
 
@@ -1937,7 +2006,7 @@ EslTcp4TxBuffer (
       //
       //  Determine the queue head
       //
-      pTcp4 = &pPort->Context.Tcp4;
+      pTcp6 = &pPort->Context.Tcp6;
       bUrgent = (BOOLEAN)( 0 != ( Flags & MSG_OOB ));
       bUrgentQueue = bUrgent
                     && ( !pSocket->bOobInLine )
@@ -1975,8 +2044,8 @@ EslTcp4TxBuffer (
         //  Attempt to allocate the packet
         //
         Status = EslSocketPacketAllocate ( &pPacket,
-                                           sizeof ( pPacket->Op.Tcp4Tx )
-                                           - sizeof ( pPacket->Op.Tcp4Tx.Buffer )
+                                           sizeof ( pPacket->Op.Tcp6Tx )
+                                           - sizeof ( pPacket->Op.Tcp6Tx.Buffer )
                                            + BufferLength,
                                            0,
                                            DEBUG_TX );
@@ -1984,18 +2053,18 @@ EslTcp4TxBuffer (
           //
           //  Initialize the transmit operation
           //
-          pTxData = &pPacket->Op.Tcp4Tx.TxData;
+          pTxData = &pPacket->Op.Tcp6Tx.TxData;
           pTxData->Push = TRUE || bUrgent;
           pTxData->Urgent = bUrgent;
           pTxData->DataLength = (UINT32) BufferLength;
           pTxData->FragmentCount = 1;
           pTxData->FragmentTable[0].FragmentLength = (UINT32) BufferLength;
-          pTxData->FragmentTable[0].FragmentBuffer = &pPacket->Op.Tcp4Tx.Buffer[0];
+          pTxData->FragmentTable[0].FragmentBuffer = &pPacket->Op.Tcp6Tx.Buffer[0];
 
           //
           //  Copy the data into the buffer
           //
-          CopyMem ( &pPacket->Op.Tcp4Tx.Buffer[0],
+          CopyMem ( &pPacket->Op.Tcp6Tx.Buffer[0],
                     pBuffer,
                     BufferLength );
 
@@ -2109,7 +2178,7 @@ EslTcp4TxBuffer (
   This routine use ::EslSocketTxComplete to perform the transmit
   completion processing for normal data.
 
-  This routine is called by the TCPv4 network layer when a
+  This routine is called by the TCPv6 network layer when a
   normal data transmit request completes.
 
   @param [in] Event     The normal transmit completion event
@@ -2118,7 +2187,7 @@ EslTcp4TxBuffer (
 
 **/
 VOID
-EslTcp4TxComplete (
+EslTcp6TxComplete (
   IN EFI_EVENT Event,
   IN ESL_IO_MGMT * pIo
   )
@@ -2141,9 +2210,9 @@ EslTcp4TxComplete (
   //
   //  Get the transmit length and status
   //
-  LengthInBytes = pPacket->Op.Tcp4Tx.TxData.DataLength;
+  LengthInBytes = pPacket->Op.Tcp6Tx.TxData.DataLength;
   pSocket->TxBytes -= LengthInBytes;
-  Status = pIo->Token.Tcp4Tx.CompletionToken.Status;
+  Status = pIo->Token.Tcp6Tx.CompletionToken.Status;
 
   //
   //  Complete the transmit operation
@@ -2166,7 +2235,7 @@ EslTcp4TxComplete (
   This routine use ::EslSocketTxComplete to perform the transmit
   completion processing for urgent data.
 
-  This routine is called by the TCPv4 network layer when a
+  This routine is called by the TCPv6 network layer when a
   urgent data transmit request completes.
 
   @param [in] Event     The urgent transmit completion event
@@ -2175,7 +2244,7 @@ EslTcp4TxComplete (
 
 **/
 VOID
-EslTcp4TxOobComplete (
+EslTcp6TxOobComplete (
   IN EFI_EVENT Event,
   IN ESL_IO_MGMT * pIo
   )
@@ -2198,9 +2267,9 @@ EslTcp4TxOobComplete (
   //
   //  Get the transmit length and status
   //
-  LengthInBytes = pPacket->Op.Tcp4Tx.TxData.DataLength;
+  LengthInBytes = pPacket->Op.Tcp6Tx.TxData.DataLength;
   pSocket->TxOobBytes -= LengthInBytes;
-  Status = pIo->Token.Tcp4Tx.CompletionToken.Status;
+  Status = pIo->Token.Tcp6Tx.CompletionToken.Status;
 
   //
   //  Complete the transmit operation
@@ -2220,41 +2289,41 @@ EslTcp4TxOobComplete (
 /**
   Interface between the socket layer and the network specific
   code that supports SOCK_STREAM and SOCK_SEQPACKET sockets
-  over TCPv4.
+  over TCPv6.
 **/
-CONST ESL_PROTOCOL_API cEslTcp4Api = {
-  "TCPv4",
+CONST ESL_PROTOCOL_API cEslTcp6Api = {
+  "TCPv6",
   IPPROTO_TCP,
-  OFFSET_OF ( ESL_PORT, Context.Tcp4.ConfigData ),
-  OFFSET_OF ( ESL_LAYER, pTcp4List ),
-  OFFSET_OF ( struct sockaddr_in, sin_zero ),
-  sizeof ( struct sockaddr_in ),
-  AF_INET,
-  sizeof (((ESL_PACKET *)0 )->Op.Tcp4Rx ),
-  OFFSET_OF ( ESL_PACKET, Op.Tcp4Rx.Buffer ) - OFFSET_OF ( ESL_PACKET, Op ),
-  OFFSET_OF ( ESL_IO_MGMT, Token.Tcp4Rx.Packet.RxData ),
+  OFFSET_OF ( ESL_PORT, Context.Tcp6.ConfigData ),
+  OFFSET_OF ( ESL_LAYER, pTcp6List ),
+  sizeof ( struct sockaddr_in6 ),
+  sizeof ( struct sockaddr_in6 ),
+  AF_INET6,
+  sizeof (((ESL_PACKET *)0 )->Op.Tcp6Rx ),
+  OFFSET_OF ( ESL_PACKET, Op.Tcp6Rx.Buffer ) - OFFSET_OF ( ESL_PACKET, Op ),
+  OFFSET_OF ( ESL_IO_MGMT, Token.Tcp6Rx.Packet.RxData ),
   TRUE,
   EADDRINUSE,
-  EslTcp4Accept,
-  EslTcp4ConnectPoll,
-  EslTcp4ConnectStart,
-  EslTcp4SocketIsConfigured,
-  EslTcp4LocalAddressGet,
-  EslTcp4LocalAddressSet,
-  EslTcp4Listen,
+  EslTcp6Accept,
+  EslTcp6ConnectPoll,
+  EslTcp6ConnectStart,
+  EslTcp6SocketIsConfigured,
+  EslTcp6LocalAddressGet,
+  EslTcp6LocalAddressSet,
+  EslTcp6Listen,
   NULL,   //  OptionGet
   NULL,   //  OptionSet
-  EslTcp4PacketFree,
-  EslTcp4PortAllocate,
-  EslTcp4PortClose,
-  EslTcp4PortCloseOp,
+  EslTcp6PacketFree,
+  EslTcp6PortAllocate,
+  EslTcp6PortClose,
+  EslTcp6PortCloseOp,
   FALSE,
-  EslTcp4Receive,
-  EslTcp4RemoteAddressGet,
-  EslTcp4RemoteAddressSet,
-  EslTcp4RxComplete,
-  EslTcp4RxStart,
-  EslTcp4TxBuffer,
-  EslTcp4TxComplete,
-  EslTcp4TxOobComplete
+  EslTcp6Receive,
+  EslTcp6RemoteAddressGet,
+  EslTcp6RemoteAddressSet,
+  EslTcp6RxComplete,
+  EslTcp6RxStart,
+  EslTcp6TxBuffer,
+  EslTcp6TxComplete,
+  EslTcp6TxOobComplete
 };

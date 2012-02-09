@@ -18,7 +18,7 @@
 /**
   Get the local socket address
 
-  This routine returns the IPv4 address and UDP port number associated
+  This routine returns the IPv6 address and UDP port number associated
   with the local socket.
 
   This routine is called by ::EslSocketGetLocalAddress to determine the
@@ -30,26 +30,26 @@
 
 **/
 VOID
-EslUdp4LocalAddressGet (
+EslUdp6LocalAddressGet (
   IN ESL_PORT * pPort,
   OUT struct sockaddr * pSockAddr
   )
 {
-  struct sockaddr_in * pLocalAddress;
-  ESL_UDP4_CONTEXT * pUdp4;
+  struct sockaddr_in6 * pLocalAddress;
+  ESL_UDP6_CONTEXT * pUdp6;
 
   DBG_ENTER ( );
 
   //
   //  Return the local address
   //
-  pUdp4 = &pPort->Context.Udp4;
-  pLocalAddress = (struct sockaddr_in *)pSockAddr;
-  pLocalAddress->sin_family = AF_INET;
-  pLocalAddress->sin_port = SwapBytes16 ( pUdp4->ConfigData.StationPort );
-  CopyMem ( &pLocalAddress->sin_addr,
-            &pUdp4->ConfigData.StationAddress.Addr[0],
-            sizeof ( pLocalAddress->sin_addr ));
+  pUdp6 = &pPort->Context.Udp6;
+  pLocalAddress = (struct sockaddr_in6 *)pSockAddr;
+  pLocalAddress->sin6_family = AF_INET6;
+  pLocalAddress->sin6_port = SwapBytes16 ( pUdp6->ConfigData.StationPort );
+  CopyMem ( &pLocalAddress->sin6_addr,
+            &pUdp6->ConfigData.StationAddress.Addr[0],
+            sizeof ( pLocalAddress->sin6_addr ));
 
   DBG_EXIT ( );
 }
@@ -64,10 +64,10 @@ EslUdp4LocalAddressGet (
 
   @param [in] pPort       Address of an ESL_PORT structure
   @param [in] pSockAddr   Address of a sockaddr structure that contains the
-                          connection point on the local machine.  An IPv4 address
+                          connection point on the local machine.  An IPv6 address
                           of INADDR_ANY specifies that the connection is made to
                           all of the network stacks on the platform.  Specifying a
-                          specific IPv4 address restricts the connection to the
+                          specific IPv6 address restricts the connection to the
                           network stack supporting that address.  Specifying zero
                           for the port causes the network layer to assign a port
                           number from the dynamic range.  Specifying a specific
@@ -79,87 +79,64 @@ EslUdp4LocalAddressGet (
 
  **/
 EFI_STATUS
-EslUdp4LocalAddressSet (
+EslUdp6LocalAddressSet (
   IN ESL_PORT * pPort,
   IN CONST struct sockaddr * pSockAddr,
   IN BOOLEAN bBindTest
   )
 {
-  EFI_UDP4_CONFIG_DATA * pConfig;
-  CONST struct sockaddr_in * pIpAddress;
-  CONST UINT8 * pIpv4Address;
+  EFI_UDP6_CONFIG_DATA * pConfig;
+  CONST struct sockaddr_in6 * pIpAddress;
+  CONST UINT8 * pIPv6Address;
   EFI_STATUS Status;
 
   DBG_ENTER ( );
 
   //
-  //  Validate the address
+  //  Set the local address
   //
-  pIpAddress = (struct sockaddr_in *)pSockAddr;
-  if ( INADDR_BROADCAST == pIpAddress->sin_addr.s_addr ) {
+  pIpAddress = (struct sockaddr_in6 *)pSockAddr;
+  pIPv6Address = (UINT8 *)&pIpAddress->sin6_addr;
+  pConfig = &pPort->Context.Udp6.ConfigData;
+  CopyMem ( &pConfig->StationAddress,
+            pIPv6Address,
+            sizeof ( pConfig->StationAddress ));
+
+  //
+  //  Validate the IP address
+  //
+  pConfig->StationPort = 0;
+  Status = bBindTest ? EslSocketBindTest ( pPort, EADDRNOTAVAIL )
+                     : EFI_SUCCESS;
+  if ( !EFI_ERROR ( Status )) {
     //
-    //  The local address must not be the broadcast address
+    //  Set the port number
     //
-    Status = EFI_INVALID_PARAMETER;
-    pPort->pSocket->errno = EADDRNOTAVAIL;
-  }
-  else {
-    //
-    //  Set the local address
-    //
-    pIpAddress = (struct sockaddr_in *)pSockAddr;
-    pIpv4Address = (UINT8 *)&pIpAddress->sin_addr.s_addr;
-    pConfig = &pPort->Context.Udp4.ConfigData;
-    pConfig->StationAddress.Addr[0] = pIpv4Address[0];
-    pConfig->StationAddress.Addr[1] = pIpv4Address[1];
-    pConfig->StationAddress.Addr[2] = pIpv4Address[2];
-    pConfig->StationAddress.Addr[3] = pIpv4Address[3];
+    pConfig->StationPort = SwapBytes16 ( pIpAddress->sin6_port );
 
     //
-    //  Determine if the default address is used
+    //  Display the local address
     //
-    pConfig->UseDefaultAddress = (BOOLEAN)( 0 == pIpAddress->sin_addr.s_addr );
-    
-    //
-    //  Set the subnet mask
-    //
-    if ( pConfig->UseDefaultAddress ) {
-      pConfig->SubnetMask.Addr[0] = 0;
-      pConfig->SubnetMask.Addr[1] = 0;
-      pConfig->SubnetMask.Addr[2] = 0;
-      pConfig->SubnetMask.Addr[3] = 0;
-    }
-    else {
-      pConfig->SubnetMask.Addr[0] = 0xff;
-      pConfig->SubnetMask.Addr[1] = 0xff;
-      pConfig->SubnetMask.Addr[2] = 0xff;
-      pConfig->SubnetMask.Addr[3] = 0xff;
-    }
-
-    //
-    //  Validate the IP address
-    //
-    pConfig->StationPort = 0;
-    Status = bBindTest ? EslSocketBindTest ( pPort, EADDRNOTAVAIL )
-                       : EFI_SUCCESS;
-    if ( !EFI_ERROR ( Status )) {
-      //
-      //  Set the port number
-      //
-      pConfig->StationPort = SwapBytes16 ( pIpAddress->sin_port );
-
-      //
-      //  Display the local address
-      //
-      DEBUG (( DEBUG_BIND,
-                "0x%08x: Port, Local UDP4 Address: %d.%d.%d.%d:%d\r\n",
-                pPort,
-                pConfig->StationAddress.Addr[0],
-                pConfig->StationAddress.Addr[1],
-                pConfig->StationAddress.Addr[2],
-                pConfig->StationAddress.Addr[3],
-                pConfig->StationPort ));
-    }
+    DEBUG (( DEBUG_BIND,
+              "0x%08x: Port, Local UDP6 Address: [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d\r\n",
+              pPort,
+              pConfig->StationAddress.Addr[0],
+              pConfig->StationAddress.Addr[1],
+              pConfig->StationAddress.Addr[2],
+              pConfig->StationAddress.Addr[3],
+              pConfig->StationAddress.Addr[4],
+              pConfig->StationAddress.Addr[5],
+              pConfig->StationAddress.Addr[6],
+              pConfig->StationAddress.Addr[7],
+              pConfig->StationAddress.Addr[8],
+              pConfig->StationAddress.Addr[9],
+              pConfig->StationAddress.Addr[10],
+              pConfig->StationAddress.Addr[11],
+              pConfig->StationAddress.Addr[12],
+              pConfig->StationAddress.Addr[13],
+              pConfig->StationAddress.Addr[14],
+              pConfig->StationAddress.Addr[15],
+              pConfig->StationPort ));
   }
 
   //
@@ -184,28 +161,28 @@ EslUdp4LocalAddressSet (
 
 **/
 VOID
-EslUdp4PacketFree (
+EslUdp6PacketFree (
   IN ESL_PACKET * pPacket,
   IN OUT size_t * pRxBytes
   )
 {
-  EFI_UDP4_RECEIVE_DATA * pRxData;
+  EFI_UDP6_RECEIVE_DATA * pRxData;
 
   DBG_ENTER ( );
 
   //
   //  Account for the receive bytes
   //
-  pRxData = pPacket->Op.Udp4Rx.pRxData;
+  pRxData = pPacket->Op.Udp6Rx.pRxData;
   *pRxBytes -= pRxData->DataLength;
 
   //
   //  Disconnect the buffer from the packet
   //
-  pPacket->Op.Udp4Rx.pRxData = NULL;
+  pPacket->Op.Udp6Rx.pRxData = NULL;
 
   //
-  //  Return the buffer to the UDP4 driver
+  //  Return the buffer to the UDP6 driver
   //
   gBS->SignalEvent ( pRxData->RecycleSignal );
   DBG_EXIT ( );
@@ -229,12 +206,12 @@ EslUdp4PacketFree (
 
  **/
 EFI_STATUS
-EslUdp4PortAllocate (
+EslUdp6PortAllocate (
   IN ESL_PORT * pPort,
   IN UINTN DebugFlags
   )
 {
-  EFI_UDP4_CONFIG_DATA * pConfig;
+  EFI_UDP6_CONFIG_DATA * pConfig;
   ESL_SOCKET * pSocket;
   EFI_STATUS Status;
 
@@ -244,29 +221,35 @@ EslUdp4PortAllocate (
   //  Initialize the port
   //
   pSocket = pPort->pSocket;
-  pSocket->TxPacketOffset = OFFSET_OF ( ESL_PACKET, Op.Udp4Tx.TxData );
-  pSocket->TxTokenEventOffset = OFFSET_OF ( ESL_IO_MGMT, Token.Udp4Tx.Event );
-  pSocket->TxTokenOffset = OFFSET_OF ( EFI_UDP4_COMPLETION_TOKEN, Packet.TxData );
+  pSocket->TxPacketOffset = OFFSET_OF ( ESL_PACKET, Op.Udp6Tx.TxData );
+  pSocket->TxTokenEventOffset = OFFSET_OF ( ESL_IO_MGMT, Token.Udp6Tx.Event );
+  pSocket->TxTokenOffset = OFFSET_OF ( EFI_UDP6_COMPLETION_TOKEN, Packet.TxData );
 
   //
   //  Save the cancel, receive and transmit addresses
   //
-  pPort->pfnConfigure = (PFN_NET_CONFIGURE)pPort->pProtocol.UDPv4->Configure;
-  pPort->pfnRxCancel = (PFN_NET_IO_START)pPort->pProtocol.UDPv4->Cancel;
-  pPort->pfnRxPoll = (PFN_NET_POLL)pPort->pProtocol.UDPv4->Poll;
-  pPort->pfnRxStart = (PFN_NET_IO_START)pPort->pProtocol.UDPv4->Receive;
-  pPort->pfnTxStart = (PFN_NET_IO_START)pPort->pProtocol.UDPv4->Transmit;
+  pPort->pfnConfigure = (PFN_NET_CONFIGURE)pPort->pProtocol.UDPv6->Configure;
+  pPort->pfnRxCancel = (PFN_NET_IO_START)pPort->pProtocol.UDPv6->Cancel;
+  pPort->pfnRxPoll = (PFN_NET_POLL)pPort->pProtocol.UDPv6->Poll;
+  pPort->pfnRxStart = (PFN_NET_IO_START)pPort->pProtocol.UDPv6->Receive;
+  pPort->pfnTxStart = (PFN_NET_IO_START)pPort->pProtocol.UDPv6->Transmit;
+
+  //
+  //  Do not drop packets
+  //
+  pConfig = &pPort->Context.Udp6.ConfigData;
+  pConfig->ReceiveTimeout = 0;
+  pConfig->ReceiveTimeout = pConfig->ReceiveTimeout;
 
   //
   //  Set the configuration flags
   //
-  pConfig = &pPort->Context.Udp4.ConfigData;
-  pConfig->TimeToLive = 255;
-  pConfig->AcceptAnyPort = FALSE;
-  pConfig->AcceptBroadcast = FALSE;
-  pConfig->AcceptPromiscuous = FALSE;
   pConfig->AllowDuplicatePort = TRUE;
-  pConfig->DoNotFragment = TRUE;
+  pConfig->AcceptAnyPort = FALSE;
+  pConfig->AcceptPromiscuous = FALSE;
+  pConfig->HopLimit = 255;
+  pConfig->TrafficClass = 0;
+
   Status = EFI_SUCCESS;
 
   //
@@ -308,7 +291,7 @@ EslUdp4PortAllocate (
 
  **/
 UINT8 *
-EslUdp4Receive (
+EslUdp6Receive (
   IN ESL_PORT * pPort,
   IN ESL_PACKET * pPacket,
   IN BOOLEAN * pbConsumePacket,
@@ -320,12 +303,12 @@ EslUdp4Receive (
   )
 {
   size_t DataBytes;
-  struct sockaddr_in * pRemoteAddress;
-  EFI_UDP4_RECEIVE_DATA * pRxData;
+  struct sockaddr_in6 * pRemoteAddress;
+  EFI_UDP6_RECEIVE_DATA * pRxData;
 
   DBG_ENTER ( );
 
-  pRxData = pPacket->Op.Udp4Rx.pRxData;
+  pRxData = pPacket->Op.Udp6Rx.pRxData;
   //
   //  Return the remote system address if requested
   //
@@ -334,17 +317,29 @@ EslUdp4Receive (
     //  Build the remote address
     //
     DEBUG (( DEBUG_RX,
-              "Getting packet remote address: %d.%d.%d.%d:%d\r\n",
+              "Getting packet remote address: [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d\r\n",
               pRxData->UdpSession.SourceAddress.Addr[0],
               pRxData->UdpSession.SourceAddress.Addr[1],
               pRxData->UdpSession.SourceAddress.Addr[2],
               pRxData->UdpSession.SourceAddress.Addr[3],
+              pRxData->UdpSession.SourceAddress.Addr[4],
+              pRxData->UdpSession.SourceAddress.Addr[5],
+              pRxData->UdpSession.SourceAddress.Addr[6],
+              pRxData->UdpSession.SourceAddress.Addr[7],
+              pRxData->UdpSession.SourceAddress.Addr[8],
+              pRxData->UdpSession.SourceAddress.Addr[9],
+              pRxData->UdpSession.SourceAddress.Addr[10],
+              pRxData->UdpSession.SourceAddress.Addr[11],
+              pRxData->UdpSession.SourceAddress.Addr[12],
+              pRxData->UdpSession.SourceAddress.Addr[13],
+              pRxData->UdpSession.SourceAddress.Addr[14],
+              pRxData->UdpSession.SourceAddress.Addr[15],
               pRxData->UdpSession.SourcePort ));
-    pRemoteAddress = (struct sockaddr_in *)pAddress;
-    CopyMem ( &pRemoteAddress->sin_addr,
+    pRemoteAddress = (struct sockaddr_in6 *)pAddress;
+    CopyMem ( &pRemoteAddress->sin6_addr,
               &pRxData->UdpSession.SourceAddress.Addr[0],
-              sizeof ( pRemoteAddress->sin_addr ));
-    pRemoteAddress->sin_port = SwapBytes16 ( pRxData->UdpSession.SourcePort );
+              sizeof ( pRemoteAddress->sin6_addr ));
+    pRemoteAddress->sin6_port = SwapBytes16 ( pRxData->UdpSession.SourcePort );
   }
 
   //
@@ -398,26 +393,26 @@ EslUdp4Receive (
 
 **/
 VOID
-EslUdp4RemoteAddressGet (
+EslUdp6RemoteAddressGet (
   IN ESL_PORT * pPort,
   OUT struct sockaddr * pAddress
   )
 {
-  struct sockaddr_in * pRemoteAddress;
-  ESL_UDP4_CONTEXT * pUdp4;
+  struct sockaddr_in6 * pRemoteAddress;
+  ESL_UDP6_CONTEXT * pUdp6;
 
   DBG_ENTER ( );
 
   //
   //  Return the remote address
   //
-  pUdp4 = &pPort->Context.Udp4;
-  pRemoteAddress = (struct sockaddr_in *)pAddress;
-  pRemoteAddress->sin_family = AF_INET;
-  pRemoteAddress->sin_port = SwapBytes16 ( pUdp4->ConfigData.RemotePort );
-  CopyMem ( &pRemoteAddress->sin_addr,
-            &pUdp4->ConfigData.RemoteAddress.Addr[0],
-            sizeof ( pRemoteAddress->sin_addr ));
+  pUdp6 = &pPort->Context.Udp6;
+  pRemoteAddress = (struct sockaddr_in6 *)pAddress;
+  pRemoteAddress->sin6_family = AF_INET6;
+  pRemoteAddress->sin6_port = SwapBytes16 ( pUdp6->ConfigData.RemotePort );
+  CopyMem ( &pRemoteAddress->sin6_addr,
+            &pUdp6->ConfigData.RemoteAddress.Addr[0],
+            sizeof ( pRemoteAddress->sin6_addr ));
 
   DBG_EXIT ( );
 }
@@ -441,14 +436,14 @@ EslUdp4RemoteAddressGet (
 
  **/
 EFI_STATUS
-EslUdp4RemoteAddressSet (
+EslUdp6RemoteAddressSet (
   IN ESL_PORT * pPort,
   IN CONST struct sockaddr * pSockAddr,
   IN socklen_t SockAddrLength
   )
 {
-  CONST struct sockaddr_in * pRemoteAddress;
-  ESL_UDP4_CONTEXT * pUdp4;
+  CONST struct sockaddr_in6 * pRemoteAddress;
+  ESL_UDP6_CONTEXT * pUdp6;
   EFI_STATUS Status;
 
   DBG_ENTER ( );
@@ -456,13 +451,12 @@ EslUdp4RemoteAddressSet (
   //
   //  Set the remote address
   //
-  pUdp4 = &pPort->Context.Udp4;
-  pRemoteAddress = (struct sockaddr_in *)pSockAddr;
-  pUdp4->ConfigData.RemoteAddress.Addr[0] = (UINT8)( pRemoteAddress->sin_addr.s_addr );
-  pUdp4->ConfigData.RemoteAddress.Addr[1] = (UINT8)( pRemoteAddress->sin_addr.s_addr >> 8 );
-  pUdp4->ConfigData.RemoteAddress.Addr[2] = (UINT8)( pRemoteAddress->sin_addr.s_addr >> 16 );
-  pUdp4->ConfigData.RemoteAddress.Addr[3] = (UINT8)( pRemoteAddress->sin_addr.s_addr >> 24 );
-  pUdp4->ConfigData.RemotePort = SwapBytes16 ( pRemoteAddress->sin_port );
+  pUdp6 = &pPort->Context.Udp6;
+  pRemoteAddress = (struct sockaddr_in6 *)pSockAddr;
+  CopyMem ( &pUdp6->ConfigData.RemoteAddress,
+            &pRemoteAddress->sin6_addr,
+            sizeof ( pUdp6->ConfigData.RemoteAddress ));
+  pUdp6->ConfigData.RemotePort = SwapBytes16 ( pRemoteAddress->sin6_port );
   Status = EFI_SUCCESS;
 
   //
@@ -477,8 +471,8 @@ EslUdp4RemoteAddressSet (
   Process the receive completion
 
   This routine keeps the UDPv4 driver's buffer and queues it in
-  in FIFO order to the data queue.  The UDP4 driver's buffer will
-  be returned by either ::EslUdp4Receive or ::EslSocketPortCloseTxDone.
+  in FIFO order to the data queue.  The UDP6 driver's buffer will
+  be returned by either ::EslUdp6Receive or ::EslSocketPortCloseTxDone.
   See the \ref ReceiveEngine section.
 
   This routine is called by the UDPv4 driver when data is
@@ -490,14 +484,14 @@ EslUdp4RemoteAddressSet (
 
 **/
 VOID
-EslUdp4RxComplete (
+EslUdp6RxComplete (
   IN EFI_EVENT Event,
   IN ESL_IO_MGMT * pIo
   )
 {
   size_t LengthInBytes;
   ESL_PACKET * pPacket;
-  EFI_UDP4_RECEIVE_DATA * pRxData;
+  EFI_UDP6_RECEIVE_DATA * pRxData;
   EFI_STATUS Status;
   
   DBG_ENTER ( );
@@ -505,12 +499,12 @@ EslUdp4RxComplete (
   //
   //  Get the operation status.
   //
-  Status = pIo->Token.Udp4Rx.Status;
+  Status = pIo->Token.Udp6Rx.Status;
   
   //
   //  Get the packet length
   //
-  pRxData = pIo->Token.Udp4Rx.Packet.RxData;
+  pRxData = pIo->Token.Udp6Rx.Packet.RxData;
   LengthInBytes = pRxData->DataLength;
 
   //
@@ -521,7 +515,7 @@ EslUdp4RxComplete (
   //      |    | Token         |               ^
   //      |    |      Rx Event |               |
   //      |    |               |   +-----------------------+
-  //      |    |        RxData --> | EFI_UDP4_RECEIVE_DATA |
+  //      |    |        RxData --> | EFI_UDP6_RECEIVE_DATA |
   //      +----+---------------+   |     (Driver owned)    |
   //                               +-----------------------+
   //      +--------------------+               ^
@@ -535,7 +529,7 @@ EslUdp4RxComplete (
   //  Save the data in the packet
   //
   pPacket = pIo->pPacket;
-  pPacket->Op.Udp4Rx.pRxData = pRxData;
+  pPacket->Op.Udp6Rx.pRxData = pRxData;
 
   //
   //  Complete this request
@@ -564,17 +558,17 @@ EslUdp4RxComplete (
 
  **/
  EFI_STATUS
- EslUdp4SocketIsConfigured (
+ EslUdp6SocketIsConfigured (
   IN ESL_SOCKET * pSocket
   )
 {
-  EFI_UDP4_CONFIG_DATA * pConfigData;
+  EFI_UDP6_CONFIG_DATA * pConfigData;
   ESL_PORT * pPort;
   ESL_PORT * pNextPort;
-  ESL_UDP4_CONTEXT * pUdp4;
-  EFI_UDP4_PROTOCOL * pUdp4Protocol;
+  ESL_UDP6_CONTEXT * pUdp6;
+  EFI_UDP6_PROTOCOL * pUdp6Protocol;
   EFI_STATUS Status;
-  struct sockaddr_in LocalAddress;
+  struct sockaddr_in6 LocalAddress;
 
   DBG_ENTER ( );
 
@@ -591,13 +585,12 @@ EslUdp4RxComplete (
     //  Fill in the port list if necessary
     //
     if ( NULL == pSocket->pPortList ) {
-      LocalAddress.sin_len = sizeof ( LocalAddress );
-      LocalAddress.sin_family = AF_INET;
-      LocalAddress.sin_addr.s_addr = 0;
-      LocalAddress.sin_port = 0;
+      ZeroMem ( &LocalAddress, sizeof ( LocalAddress ));
+      LocalAddress.sin6_len = sizeof ( LocalAddress );
+      LocalAddress.sin6_family = AF_INET6;
       Status = EslSocketBind ( &pSocket->SocketProtocol,
                                (struct sockaddr *)&LocalAddress,
-                               LocalAddress.sin_len,
+                               LocalAddress.sin6_len,
                                &pSocket->errno );
     }
 
@@ -610,29 +603,53 @@ EslUdp4RxComplete (
       //  Attempt to configure the port
       //
       pNextPort = pPort->pLinkSocket;
-      pUdp4 = &pPort->Context.Udp4;
-      pUdp4Protocol = pPort->pProtocol.UDPv4;
-      pConfigData = &pUdp4->ConfigData;
+      pUdp6 = &pPort->Context.Udp6;
+      pUdp6Protocol = pPort->pProtocol.UDPv6;
+      pConfigData = &pUdp6->ConfigData;
       DEBUG (( DEBUG_TX,
-                "0x%08x: pPort Configuring for %d.%d.%d.%d:%d --> %d.%d.%d.%d:%d\r\n",
+                "0x%08x: pPort Configuring for [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d --> [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d\r\n",
                 pPort,
                 pConfigData->StationAddress.Addr[0],
                 pConfigData->StationAddress.Addr[1],
                 pConfigData->StationAddress.Addr[2],
                 pConfigData->StationAddress.Addr[3],
+                pConfigData->StationAddress.Addr[4],
+                pConfigData->StationAddress.Addr[5],
+                pConfigData->StationAddress.Addr[6],
+                pConfigData->StationAddress.Addr[7],
+                pConfigData->StationAddress.Addr[8],
+                pConfigData->StationAddress.Addr[9],
+                pConfigData->StationAddress.Addr[10],
+                pConfigData->StationAddress.Addr[11],
+                pConfigData->StationAddress.Addr[12],
+                pConfigData->StationAddress.Addr[13],
+                pConfigData->StationAddress.Addr[14],
+                pConfigData->StationAddress.Addr[15],
                 pConfigData->StationPort,
                 pConfigData->RemoteAddress.Addr[0],
                 pConfigData->RemoteAddress.Addr[1],
                 pConfigData->RemoteAddress.Addr[2],
                 pConfigData->RemoteAddress.Addr[3],
+                pConfigData->RemoteAddress.Addr[4],
+                pConfigData->RemoteAddress.Addr[5],
+                pConfigData->RemoteAddress.Addr[6],
+                pConfigData->RemoteAddress.Addr[7],
+                pConfigData->RemoteAddress.Addr[8],
+                pConfigData->RemoteAddress.Addr[9],
+                pConfigData->RemoteAddress.Addr[10],
+                pConfigData->RemoteAddress.Addr[11],
+                pConfigData->RemoteAddress.Addr[12],
+                pConfigData->RemoteAddress.Addr[13],
+                pConfigData->RemoteAddress.Addr[14],
+                pConfigData->RemoteAddress.Addr[15],
                 pConfigData->RemotePort ));
-      Status = pUdp4Protocol->Configure ( pUdp4Protocol,
+      Status = pUdp6Protocol->Configure ( pUdp6Protocol,
                                           pConfigData );
       if ( !EFI_ERROR ( Status )) {
         //
         //  Update the configuration data
         //
-        Status = pUdp4Protocol->GetModeData ( pUdp4Protocol,
+        Status = pUdp6Protocol->GetModeData ( pUdp6Protocol,
                                               pConfigData,
                                               NULL,
                                               NULL,
@@ -640,7 +657,7 @@ EslUdp4RxComplete (
       }
       if ( EFI_ERROR ( Status )) {
         DEBUG (( DEBUG_LISTEN,
-                  "ERROR - Failed to configure the Udp4 port, Status: %r\r\n",
+                  "ERROR - Failed to configure the Udp6 port, Status: %r\r\n",
                   Status ));
         switch ( Status ) {
         case EFI_ACCESS_DENIED:
@@ -671,17 +688,41 @@ EslUdp4RxComplete (
       }
       else {
         DEBUG (( DEBUG_TX,
-                  "0x%08x: pPort Configured for %d.%d.%d.%d:%d --> %d.%d.%d.%d:%d\r\n",
+                  "0x%08x: pPort Configured for [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d --> [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d\r\n",
                   pPort,
                   pConfigData->StationAddress.Addr[0],
                   pConfigData->StationAddress.Addr[1],
                   pConfigData->StationAddress.Addr[2],
                   pConfigData->StationAddress.Addr[3],
+                  pConfigData->StationAddress.Addr[4],
+                  pConfigData->StationAddress.Addr[5],
+                  pConfigData->StationAddress.Addr[6],
+                  pConfigData->StationAddress.Addr[7],
+                  pConfigData->StationAddress.Addr[8],
+                  pConfigData->StationAddress.Addr[9],
+                  pConfigData->StationAddress.Addr[10],
+                  pConfigData->StationAddress.Addr[11],
+                  pConfigData->StationAddress.Addr[12],
+                  pConfigData->StationAddress.Addr[13],
+                  pConfigData->StationAddress.Addr[14],
+                  pConfigData->StationAddress.Addr[15],
                   pConfigData->StationPort,
                   pConfigData->RemoteAddress.Addr[0],
                   pConfigData->RemoteAddress.Addr[1],
                   pConfigData->RemoteAddress.Addr[2],
                   pConfigData->RemoteAddress.Addr[3],
+                  pConfigData->RemoteAddress.Addr[4],
+                  pConfigData->RemoteAddress.Addr[5],
+                  pConfigData->RemoteAddress.Addr[6],
+                  pConfigData->RemoteAddress.Addr[7],
+                  pConfigData->RemoteAddress.Addr[8],
+                  pConfigData->RemoteAddress.Addr[9],
+                  pConfigData->RemoteAddress.Addr[10],
+                  pConfigData->RemoteAddress.Addr[11],
+                  pConfigData->RemoteAddress.Addr[12],
+                  pConfigData->RemoteAddress.Addr[13],
+                  pConfigData->RemoteAddress.Addr[14],
+                  pConfigData->RemoteAddress.Addr[15],
                   pConfigData->RemotePort ));
         pPort->bConfigured = TRUE;
 
@@ -763,7 +804,7 @@ EslUdp4RxComplete (
 
 **/
 EFI_STATUS
-EslUdp4TxBuffer (
+EslUdp6TxBuffer (
   IN ESL_SOCKET * pSocket,
   IN int Flags,
   IN size_t BufferLength,
@@ -776,10 +817,10 @@ EslUdp4TxBuffer (
   ESL_PACKET * pPacket;
   ESL_PACKET * pPreviousPacket;
   ESL_PORT * pPort;
-  const struct sockaddr_in * pRemoteAddress;
-  ESL_UDP4_CONTEXT * pUdp4;
+  const struct sockaddr_in6 * pRemoteAddress;
+  ESL_UDP6_CONTEXT * pUdp6;
   size_t * pTxBytes;
-  ESL_UDP4_TX_DATA * pTxData;
+  ESL_UDP6_TX_DATA * pTxData;
   EFI_STATUS Status;
   EFI_TPL TplPrevious;
 
@@ -804,7 +845,7 @@ EslUdp4TxBuffer (
       //
       //  Determine the queue head
       //
-      pUdp4 = &pPort->Context.Udp4;
+      pUdp6 = &pPort->Context.Udp6;
       pTxBytes = &pSocket->TxBytes;
 
       //
@@ -816,8 +857,8 @@ EslUdp4TxBuffer (
         //  Attempt to allocate the packet
         //
         Status = EslSocketPacketAllocate ( &pPacket,
-                                           sizeof ( pPacket->Op.Udp4Tx )
-                                           - sizeof ( pPacket->Op.Udp4Tx.Buffer )
+                                           sizeof ( pPacket->Op.Udp6Tx )
+                                           - sizeof ( pPacket->Op.Udp6Tx.Buffer )
                                            + BufferLength,
                                            0,
                                            DEBUG_TX );
@@ -825,31 +866,27 @@ EslUdp4TxBuffer (
           //
           //  Initialize the transmit operation
           //
-          pTxData = &pPacket->Op.Udp4Tx;
-          pTxData->TxData.GatewayAddress = NULL;
+          pTxData = &pPacket->Op.Udp6Tx;
           pTxData->TxData.UdpSessionData = NULL;
           pTxData->TxData.DataLength = (UINT32) BufferLength;
           pTxData->TxData.FragmentCount = 1;
           pTxData->TxData.FragmentTable[0].FragmentLength = (UINT32) BufferLength;
-          pTxData->TxData.FragmentTable[0].FragmentBuffer = &pPacket->Op.Udp4Tx.Buffer[0];
-          pTxData->RetransmitCount = 0;
+          pTxData->TxData.FragmentTable[0].FragmentBuffer = &pPacket->Op.Udp6Tx.Buffer[0];
 
           //
           //  Set the remote system address if necessary
           //
           pTxData->TxData.UdpSessionData = NULL;
           if ( NULL != pAddress ) {
-            pRemoteAddress = (const struct sockaddr_in *)pAddress;
-            pTxData->Session.SourceAddress.Addr[0] = pUdp4->ConfigData.StationAddress.Addr[0];
-            pTxData->Session.SourceAddress.Addr[1] = pUdp4->ConfigData.StationAddress.Addr[1];
-            pTxData->Session.SourceAddress.Addr[2] = pUdp4->ConfigData.StationAddress.Addr[2];
-            pTxData->Session.SourceAddress.Addr[3] = pUdp4->ConfigData.StationAddress.Addr[3];
+            pRemoteAddress = (const struct sockaddr_in6 *)pAddress;
+            CopyMem ( &pTxData->Session.SourceAddress,
+                      &pUdp6->ConfigData.StationAddress,
+                      sizeof ( pTxData->Session.SourceAddress ));
             pTxData->Session.SourcePort = 0;
-            pTxData->Session.DestinationAddress.Addr[0] = (UINT8)pRemoteAddress->sin_addr.s_addr;
-            pTxData->Session.DestinationAddress.Addr[1] = (UINT8)( pRemoteAddress->sin_addr.s_addr >> 8 );
-            pTxData->Session.DestinationAddress.Addr[2] = (UINT8)( pRemoteAddress->sin_addr.s_addr >> 16 );
-            pTxData->Session.DestinationAddress.Addr[3] = (UINT8)( pRemoteAddress->sin_addr.s_addr >> 24 );
-            pTxData->Session.DestinationPort = SwapBytes16 ( pRemoteAddress->sin_port );
+            CopyMem ( &pTxData->Session.DestinationAddress,
+                      &pRemoteAddress->sin6_addr,
+                      sizeof ( pTxData->Session.DestinationAddress ));
+            pTxData->Session.DestinationPort = SwapBytes16 ( pRemoteAddress->sin6_port );
 
             //
             //  Use the remote system address when sending this packet
@@ -860,7 +897,7 @@ EslUdp4TxBuffer (
           //
           //  Copy the data into the buffer
           //
-          CopyMem ( &pPacket->Op.Udp4Tx.Buffer[0],
+          CopyMem ( &pPacket->Op.Udp6Tx.Buffer[0],
                     pBuffer,
                     BufferLength );
 
@@ -973,7 +1010,7 @@ EslUdp4TxBuffer (
 
 **/
 VOID
-EslUdp4TxComplete (
+EslUdp6TxComplete (
   IN EFI_EVENT Event,
   IN ESL_IO_MGMT * pIo
   )
@@ -996,9 +1033,9 @@ EslUdp4TxComplete (
   //
   //  Get the transmit length and status
   //
-  LengthInBytes = pPacket->Op.Udp4Tx.TxData.DataLength;
+  LengthInBytes = pPacket->Op.Udp6Tx.TxData.DataLength;
   pSocket->TxBytes -= LengthInBytes;
-  Status = pIo->Token.Udp4Tx.Status;
+  Status = pIo->Token.Udp6Tx.Status;
 
   //
   //  Complete the transmit operation
@@ -1019,39 +1056,39 @@ EslUdp4TxComplete (
   Interface between the socket layer and the network specific
   code that supports SOCK_DGRAM sockets over UDPv4.
 **/
-CONST ESL_PROTOCOL_API cEslUdp4Api = {
-  "UDPv4",
+CONST ESL_PROTOCOL_API cEslUdp6Api = {
+  "UDPv6",
   IPPROTO_UDP,
-  OFFSET_OF ( ESL_PORT, Context.Udp4.ConfigData ),
-  OFFSET_OF ( ESL_LAYER, pUdp4List ),
-  OFFSET_OF ( struct sockaddr_in, sin_zero ),
-  sizeof ( struct sockaddr_in ),
-  AF_INET,
-  sizeof (((ESL_PACKET *)0 )->Op.Udp4Rx ),
-  sizeof (((ESL_PACKET *)0 )->Op.Udp4Rx ),
-  OFFSET_OF ( ESL_IO_MGMT, Token.Udp4Rx.Packet.RxData ),
+  OFFSET_OF ( ESL_PORT, Context.Udp6.ConfigData ),
+  OFFSET_OF ( ESL_LAYER, pUdp6List ),
+  sizeof ( struct sockaddr_in6 ),
+  sizeof ( struct sockaddr_in6 ),
+  AF_INET6,
+  sizeof (((ESL_PACKET *)0 )->Op.Udp6Rx ),
+  sizeof (((ESL_PACKET *)0 )->Op.Udp6Rx ),
+  OFFSET_OF ( ESL_IO_MGMT, Token.Udp6Rx.Packet.RxData ),
   FALSE,
   EADDRINUSE,
   NULL,   //  Accept
   NULL,   //  ConnectPoll
   NULL,   //  ConnectStart
-  EslUdp4SocketIsConfigured,
-  EslUdp4LocalAddressGet,
-  EslUdp4LocalAddressSet,
+  EslUdp6SocketIsConfigured,
+  EslUdp6LocalAddressGet,
+  EslUdp6LocalAddressSet,
   NULL,   //  Listen
   NULL,   //  OptionGet
   NULL,   //  OptionSet
-  EslUdp4PacketFree,
-  EslUdp4PortAllocate,
+  EslUdp6PacketFree,
+  EslUdp6PortAllocate,
   NULL,   //  PortClose,
   NULL,   //  PortCloseOp
   TRUE,
-  EslUdp4Receive,
-  EslUdp4RemoteAddressGet,
-  EslUdp4RemoteAddressSet,
-  EslUdp4RxComplete,
+  EslUdp6Receive,
+  EslUdp6RemoteAddressGet,
+  EslUdp6RemoteAddressSet,
+  EslUdp6RxComplete,
   NULL,   //  RxStart
-  EslUdp4TxBuffer,
-  EslUdp4TxComplete,
+  EslUdp6TxBuffer,
+  EslUdp6TxComplete,
   NULL    //  TxOobComplete
 };
