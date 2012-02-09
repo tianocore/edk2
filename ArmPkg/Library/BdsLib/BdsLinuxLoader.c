@@ -155,7 +155,12 @@ BdsBootLinuxAtag (
   }
 
   if (InitrdDevicePath) {
-    Status = BdsLoadImage (InitrdDevicePath, AllocateAnyPages, &InitrdImage, &InitrdImageSize);
+    // Load the initrd near to the Linux kernel
+    InitrdImage = LINUX_KERNEL_MAX_OFFSET;
+    Status = BdsLoadImage (InitrdDevicePath, AllocateMaxAddress, &InitrdImage, &InitrdImageSize);
+    if (Status == EFI_OUT_OF_RESOURCES) {
+      Status = BdsLoadImage (InitrdDevicePath, AllocateAnyPages, &InitrdImage, &InitrdImageSize);
+    }
     if (EFI_ERROR(Status)) {
       Print (L"ERROR: Did not find initrd image.\n");
       return Status;
@@ -218,7 +223,11 @@ BdsBootLinuxFdt (
   }
 
   if (InitrdDevicePath) {
-    Status = BdsLoadImage (InitrdDevicePath, AllocateAnyPages, &InitrdImage, &InitrdImageSize);
+    InitrdImage = LINUX_KERNEL_MAX_OFFSET;
+    Status = BdsLoadImage (InitrdDevicePath, AllocateMaxAddress, &InitrdImage, &InitrdImageSize);
+    if (Status == EFI_OUT_OF_RESOURCES) {
+      Status = BdsLoadImage (InitrdDevicePath, AllocateAnyPages, &InitrdImage, &InitrdImageSize);
+    }
     if (EFI_ERROR(Status)) {
       Print (L"ERROR: Did not find initrd image.\n");
       return Status;
