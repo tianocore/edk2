@@ -83,7 +83,7 @@ BdsGetDeviceUsb (
 
   // Check if one of the handles matches the USB description
   for (Index = 0; Index < UsbIoHandleCount; Index++) {
-    Status = gBS->HandleProtocol (UsbIoBuffer[Index], &gEfiDevicePathProtocolGuid, (VOID *) &UsbIoDevicePath);
+    Status = gBS->HandleProtocol (UsbIoBuffer[Index], &gEfiDevicePathProtocolGuid, (VOID **) &UsbIoDevicePath);
     if (!EFI_ERROR(Status)) {
       TmpDevicePath = UsbIoDevicePath;
       while (!IsDevicePathEnd (TmpDevicePath)) {
@@ -159,7 +159,7 @@ BdsGetDeviceHd (
 
   // Check if one of the handles matches the Hard Disk Description
   for (Index = 0; Index < PartitionHandleCount; Index++) {
-    Status = gBS->HandleProtocol (PartitionBuffer[Index], &gEfiDevicePathProtocolGuid, (VOID *) &PartitionDevicePath);
+    Status = gBS->HandleProtocol (PartitionBuffer[Index], &gEfiDevicePathProtocolGuid, (VOID **) &PartitionDevicePath);
     if (!EFI_ERROR(Status)) {
       TmpDevicePath = PartitionDevicePath;
       while (!IsDevicePathEnd (TmpDevicePath)) {
