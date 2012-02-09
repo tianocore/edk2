@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -216,7 +216,7 @@ BootOptionToLoadOptionVariable (
     }
 
     // Update (or Create) the BootOrder environment variable
-    Status = gRT->SetVariable (
+    gRT->SetVariable (
         L"BootOrder",
         &gEfiGlobalVariableGuid,
         EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
@@ -224,6 +224,11 @@ BootOptionToLoadOptionVariable (
         BootOrder
         );
     DEBUG((EFI_D_ERROR,"Create %s\n",BootVariableName));
+
+    // Free memory allocated by GetEnvironmentVariable
+    if (!EFI_ERROR(Status)) {
+      FreePool (BootOrder);
+    }
   } else {
     DEBUG((EFI_D_ERROR,"Update %s\n",BootVariableName));
   }
@@ -258,6 +263,7 @@ BootOptionAllocateBootIndex (
         return BootIndex;
       }
     }
+    FreePool (BootOrder);
   }
   // Return the first index
   return 0;
