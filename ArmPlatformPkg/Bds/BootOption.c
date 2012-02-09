@@ -32,6 +32,7 @@ BootOptionStart (
   UINTN                                 CmdLineSize;
   UINTN                                 InitrdSize;
   EFI_DEVICE_PATH*                      Initrd;
+  UINT16                                LoadOptionIndexSize;
 
   if (IS_ARM_BDS_BOOTENTRY (BootOption)) {
     Status = EFI_UNSUPPORTED;
@@ -86,7 +87,19 @@ BootOptionStart (
       FreePool (FdtDevicePath);
     }
   } else {
+    // Set BootCurrent variable
+    LoadOptionIndexSize = sizeof(UINT16);
+    gRT->SetVariable (L"BootCurrent", &gEfiGlobalVariableGuid,
+              EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+              LoadOptionIndexSize, &(BootOption->LoadOptionIndex));
+
     Status = BdsStartEfiApplication (mImageHandle, BootOption->FilePathList, BootOption->OptionalDataSize, BootOption->OptionalData);
+
+    // Clear BootCurrent variable
+    LoadOptionIndexSize = sizeof(UINT16);
+    gRT->SetVariable (L"BootCurrent", &gEfiGlobalVariableGuid,
+              EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+              0, NULL);
   }
 
   return Status;
