@@ -86,7 +86,7 @@
 
 #define DEBUG_SOCKET_POLL       0x00080000  ///<  Display the socket poll messages
 #define DEBUG_PORT_WORK         0x00040000  ///<  Display the port work messages
-#define DEBUG_SERVER_TIMER      0x00020000  ///<  Display the socket poll messages
+#define DEBUG_SERVER_LISTEN     0x00020000  ///<  Display the socket poll messages
 #define DEBUG_HTTP_PORT         0x00010000  ///<  Display HTTP port related messages
 #define DEBUG_REQUEST           0x00008000  ///<  Display the HTTP request messages
 
@@ -173,9 +173,10 @@ typedef struct {
   //
   //  HTTP port management
   //
-  BOOLEAN   bTimerRunning;      ///<  Port creation timer status
+  BOOLEAN   bRunning;           ///<  Web server running
   EFI_EVENT TimerEvent;         ///<  Timer to open HTTP port
-  int       HttpListenPort;     ///<  File descriptor for the HTTP listen port
+  int       HttpListenPort;     ///<  File descriptor for the HTTP listen port over TCP4
+  int       HttpListenPort6;    ///<  File descriptor for the HTTP listen port over TCP6
 
   //
   //  Client port management
@@ -378,6 +379,23 @@ DxeServicesTablePage (
   );
 
 /**
+  Respond with the Exit page
+
+  @param [in] SocketFD      The socket's file descriptor to add to the list.
+  @param [in] pPort         The WSDT_PORT structure address
+  @param [out] pbDone       Address to receive the request completion status
+
+  @retval EFI_SUCCESS       The request was successfully processed
+
+**/
+EFI_STATUS
+ExitPage (
+  IN int SocketFD,
+  IN WSDT_PORT * pPort,
+  OUT BOOLEAN * pbDone
+  );
+
+/**
   Respond with the firmware status
 
   @param [in] SocketFD      The socket's file descriptor to add to the list.
@@ -440,6 +458,23 @@ HelloPage (
 **/
 EFI_STATUS
 IndexPage (
+  IN int SocketFD,
+  IN WSDT_PORT * pPort,
+  OUT BOOLEAN * pbDone
+  );
+
+/**
+  Respond with the Ports page
+
+  @param [in] SocketFD      The socket's file descriptor to add to the list.
+  @param [in] pPort         The WSDT_PORT structure address
+  @param [out] pbDone       Address to receive the request completion status
+
+  @retval EFI_SUCCESS       The request was successfully processed
+
+**/
+EFI_STATUS
+PortsPage (
   IN int SocketFD,
   IN WSDT_PORT * pPort,
   OUT BOOLEAN * pbDone
@@ -723,7 +758,7 @@ EFI_STATUS
 HttpSendIpAddress (
   IN int SocketFD,
   IN WSDT_PORT * pPort,
-  IN struct sockaddr_in * pAddress
+  IN struct sockaddr_in6 * pAddress
   );
 
 /**

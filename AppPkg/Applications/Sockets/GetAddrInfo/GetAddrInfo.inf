@@ -1,5 +1,5 @@
 #/** @file
-#  GetNetByAddr Application
+#  GetAddrInfo Application
 #
 # This file contains an 'Intel Peripheral Driver' and is      
 # licensed for Intel CPUs and chipsets under the terms of your
@@ -22,8 +22,8 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = GetNetByAddr
-  FILE_GUID                      = 22198FD5-4835-4842-BF31-EB957C7DD70D
+  BASE_NAME                      = GetAddrInfo
+  FILE_GUID                      = 4C26DF71-EBE7-4dea-B5E2-0B5980433908
   MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = ShellCEntryLib
@@ -35,7 +35,7 @@
 #
 
 [Sources]
-  GetNetByAddr.c
+  GetAddrInfo.c
 
 
 [Packages]
@@ -47,7 +47,6 @@
 [LibraryClasses]
   BaseMemoryLib
   BsdSocketLib
-  DebugLib
   DevShell
   EfiSocketLib
   LibC
@@ -55,7 +54,6 @@
   LibNetUtil
   ShellCEntryLib
   UefiBootServicesTableLib
-  UefiLib
 #  UseSocketDxe
 
 [BuildOptions]

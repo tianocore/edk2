@@ -8,7 +8,7 @@
 # license agreement                                           
 #
 #
-# Copyright (c)  20011 Intel Corporation. All rights reserved
+# Copyright (c)  2011 Intel Corporation. All rights reserved
 # This software and associated documentation (if any) is furnished
 # under a license and may only be used or copied in accordance
 # with the terms of the license. Except as permitted by such
@@ -40,12 +40,14 @@
   ConfigurationTable.c
   DhcpOptions.c
   DxeServicesTable.c
+  Exit.c
   Firmware.c
   Handles.c
   Hello.c
   HTTP.c
   Index.c
   PageList.c
+  Ports.c
   Reboot.c
   RuntimeServicesTable.c
   SystemTable.c
@@ -53,10 +55,10 @@
 
 
 [Pcd]
-  gStdLibTokenSpaceGuid.WebServer_HttpPort
-
+  gAppPkgTokenSpaceGuid.WebServer_HttpPort
 
 [Packages]
+  AppPkg/AppPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   ShellPkg/ShellPkg.dec
@@ -68,14 +70,14 @@
   BsdSocketLib
   DebugLib
   DevShell
-#  EfiSocketLib
+  EfiSocketLib
   LibC
   ShellLib
   ShellCEntryLib
   UefiBootServicesTableLib
   UefiLib
   UefiRuntimeServicesTableLib
-  UseSocketDxe
+#  UseSocketDxe
 
 [Guids]
   gEfiAcpi10TableGuid

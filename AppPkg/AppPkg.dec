@@ -1,0 +1,36 @@
+## @file
+#   Declarations for the UDK Standard Libraries.
+#
+# Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License which accompanies this distribution.
+# The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+##
+
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = AppPkg
+  PACKAGE_GUID                   = B3E3D3D5-D62B-4497-A175-264F489D127E
+  PACKAGE_VERSION                = 0.01
+
+
+[Guids]
+  gAppPkgTokenSpaceGuid          = { 0xe7e1efa6, 0x7607, 0x4a78, { 0xa7, 0xdd, 0x43, 0xe4, 0xbd, 0x72, 0xc0, 0x99 }}
+
+
+[PcdsFixedAtBuild]
+  gAppPkgTokenSpaceGuid.DataSource_Port|1234|UINT16|0
+  gAppPkgTokenSpaceGuid.Tftp_AckLogBase|4|UINT32|1
+  gAppPkgTokenSpaceGuid.Tftp_AckMultiplier|4|UINT32|2
+  gAppPkgTokenSpaceGuid.Tftp_Bandwidth|0|BOOLEAN|3
+  gAppPkgTokenSpaceGuid.Tftp_HighSpeed|0|BOOLEAN|4
+  gAppPkgTokenSpaceGuid.Tftp_MaxRetry|10|UINT32|5
+  gAppPkgTokenSpaceGuid.Tftp_MaxTimeoutInSec|3|UINT32|6
+  gAppPkgTokenSpaceGuid.WebServer_HttpPort|80|UINT16|7
+

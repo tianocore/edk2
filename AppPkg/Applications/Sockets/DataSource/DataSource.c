@@ -30,10 +30,14 @@
 #include <sys/poll.h>
 #include <sys/socket.h>
 
+#include <stdio.h>
 
-#define RANGE_SWITCH                2048  ///<  Switch display ranges
-#define DATA_RATE_UPDATE_SHIFT      2     ///<  2n seconds between updates
+
+#define DATA_SAMPLE_SHIFT           5       ///<  Shift for number of samples
+#define RANGE_SWITCH        ( 1024 * 1024 ) ///<  Switch display ranges
+#define DATA_RATE_UPDATE_SHIFT      2       ///<  2n seconds between updates
 #define AVERAGE_SHIFT_COUNT ( 6 - DATA_RATE_UPDATE_SHIFT )  ///<  2n samples in average
+#define DATA_SAMPLES        ( 1 << DATA_SAMPLE_SHIFT )      ///<  Number of samples
 
 #define TPL_DATASOURCE      TPL_CALLBACK  ///<  Synchronization TPL
 
@@ -74,16 +78,16 @@ EFI_EVENT pTimer;
 //
 //  Remote IP Address Data
 //
-struct sockaddr_in RemoteHostAddress;
+struct sockaddr_in6 RemoteHostAddress;
 CHAR8 * pRemoteHost;
 
 //
 //  Traffic Data
 //
 UINT64 TotalBytesSent;
-UINT64 PreviousBytes;
-UINT64 AverageBytes;
-UINT64 Samples;
+UINT32 In;
+UINT32 Samples;
+UINT64 BytesSent[ DATA_SAMPLES ];
 UINT8 Buffer[ DATA_BUFFER_SIZE ];
 
 
@@ -185,13 +189,18 @@ EFI_STATUS
 IpAddress (
   )
 {
-  CHAR8 * pSeparator;
-  INT32 RemoteAddress;
+  struct sockaddr_in * pRemoteAddress4;
+  struct sockaddr_in6 * pRemoteAddress6;
+  UINT32 RemoteAddress;
   EFI_STATUS Status;
   UINT32 Value1;
   UINT32 Value2;
   UINT32 Value3;
   UINT32 Value4;
+  UINT32 Value5;
+  UINT32 Value6;
+  UINT32 Value7;
+  UINT32 Value8;
 
   //
   //  Assume failure
@@ -199,34 +208,105 @@ IpAddress (
   Status = EFI_INVALID_PARAMETER;
 
   //
+  //  Get the port number
+  //
+  ZeroMem ( &RemoteHostAddress, sizeof ( RemoteHostAddress ));
+  RemoteHostAddress.sin6_port = htons ( PcdGet16 ( DataSource_Port ));
+  pRemoteAddress4 = (struct sockaddr_in *)&RemoteHostAddress;
+  pRemoteAddress6 = &RemoteHostAddress;
+  
+  //
   //  Convert the IP address from a string to a numeric value
   //
-  pSeparator = GetDigit ( pRemoteHost, &Value1 );
-  if (( 255 >= Value1 ) && ( '.' == *pSeparator )) {
-    pSeparator = GetDigit ( ++pSeparator, &Value2 );
-    if (( 255 >= Value2 ) && ( '.' == *pSeparator )) {
-      pSeparator = GetDigit ( ++pSeparator, &Value3 );
-      if (( 255 >= Value3 ) && ( '.' == *pSeparator )) {
-        pSeparator = GetDigit ( ++pSeparator, &Value4 );
-        if (( 255 >= Value4 ) && ( 0 == *pSeparator )) {
-          RemoteAddress = Value1
-                        | ( Value2 << 8 )
-                        | ( Value3 << 16 )
-                        | ( Value4 << 24 );
-          RemoteHostAddress.sin_addr.s_addr = (UINT32) RemoteAddress;
-          Status = EFI_SUCCESS;
-          DEBUG (( DEBUG_INFO,
-                    "%d.%d.%d.%d: Remote host IP address\r\n",
-                    Value1,
-                    Value2,
-                    Value3,
-                    Value4 ));
-        }
-      }
-    }
+  if (( 4 == sscanf ( pRemoteHost,
+                      "%d.%d.%d.%d",
+                      &Value1,
+                      &Value2,
+                      &Value3,
+                      &Value4 ))
+      && ( 255 >= Value1 )
+      && ( 255 >= Value2 )
+      && ( 255 >= Value3 )
+      && ( 255 >= Value4 )) {
+    //
+    //  Build the IPv4 address
+    //
+    pRemoteAddress4->sin_len = sizeof ( *pRemoteAddress4 );
+    pRemoteAddress4->sin_family = AF_INET;
+    RemoteAddress = Value1
+                  | ( Value2 << 8 )
+                  | ( Value3 << 16 )
+                  | ( Value4 << 24 );
+    pRemoteAddress4->sin_addr.s_addr = RemoteAddress;
+    Status = EFI_SUCCESS;
+
+    //
+    //  Display the IP address
+    //
+    DEBUG (( DEBUG_INFO,
+              "%d.%d.%d.%d: Remote host IP address\r\n",
+              Value1,
+              Value2,
+              Value3,
+              Value4 ));
   }
-  if ( EFI_ERROR ( Status )) {
-    Print ( L"Invalid digit detected: %d\r\n", *pSeparator );
+  else if (( 8 == sscanf ( pRemoteHost,
+                           "%x:%x:%x:%x:%x:%x:%x:%x",
+                           &Value1,
+                           &Value2,
+                           &Value3,
+                           &Value4,
+                           &Value5,
+                           &Value6,
+                           &Value7,
+                           &Value8 ))
+            && ( 0xffff >= Value1 )
+            && ( 0xffff >= Value2 )
+            && ( 0xffff >= Value3 )
+            && ( 0xffff >= Value4 )
+            && ( 0xffff >= Value5 )
+            && ( 0xffff >= Value6 )
+            && ( 0xffff >= Value7 )
+            && ( 0xffff >= Value8 )) {
+    //
+    //  Build the IPv6 address
+    //
+    pRemoteAddress6->sin6_len = sizeof ( *pRemoteAddress6 );
+    pRemoteAddress6->sin6_family = AF_INET6;
+    pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 0 ] = (UINT8)( Value1 >> 8 );
+    pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 1 ] = (UINT8)Value1;
+    pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 2 ] = (UINT8)( Value2 >> 8 );
+    pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 3 ] = (UINT8)Value2;
+    pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 4 ] = (UINT8)( Value3 >> 8 );
+    pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 5 ] = (UINT8)Value3;
+    pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 6 ] = (UINT8)( Value4 >> 8 );
+    pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 7 ] = (UINT8)Value4;
+    pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 8 ] = (UINT8)( Value5 >> 8 );
+    pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 9 ] = (UINT8)Value5;
+    pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 10 ] = (UINT8)( Value6 >> 8 );
+    pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 11 ] = (UINT8)Value6;
+    pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 12 ] = (UINT8)( Value7 >> 8 );
+    pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 13 ] = (UINT8)Value7;
+    pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 14 ] = (UINT8)( Value8 >> 8 );
+    pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 15 ] = (UINT8)Value8;
+    Status = EFI_SUCCESS;
+
+    //
+    //  Display the IP address
+    //
+    DEBUG (( DEBUG_INFO,
+              "[%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x]: Remote host IP address\r\n",
+              Value1,
+              Value2,
+              Value3,
+              Value4,
+              Value5,
+              Value6,
+              Value7,
+              Value8 ));
+  }
+  else {
+    Print ( L"ERROR - Invalid IP address!\r\n" );
   }
 
   //
@@ -290,19 +370,43 @@ SocketConnect (
   )
 {
   int ConnectStatus;
-  UINT32 RemoteAddress;
+  struct sockaddr_in * pRemoteAddress4;
+  struct sockaddr_in6 * pRemoteAddress6;
   EFI_STATUS Status;
 
   //
   //  Display the connecting message
   //
-  RemoteAddress = RemoteHostAddress.sin_addr.s_addr;
-  Print ( L"Connecting to remote system %d.%d.%d.%d:%d\r\n",
-          RemoteAddress & 0xff,
-          ( RemoteAddress >> 8 ) & 0xff,
-          ( RemoteAddress >> 16 ) & 0xff,
-          ( RemoteAddress >> 24 ) & 0xff,
-          htons ( RemoteHostAddress.sin_port ));
+  pRemoteAddress4 = (struct sockaddr_in *)&RemoteHostAddress;
+  pRemoteAddress6 = &RemoteHostAddress;
+  if ( AF_INET == pRemoteAddress6->sin6_family ) {
+    Print ( L"Connecting to remote system %d.%d.%d.%d:%d\r\n",
+            pRemoteAddress4->sin_addr.s_addr & 0xff,
+            ( pRemoteAddress4->sin_addr.s_addr >> 8 ) & 0xff,
+            ( pRemoteAddress4->sin_addr.s_addr >> 16 ) & 0xff,
+            ( pRemoteAddress4->sin_addr.s_addr >> 24 ) & 0xff,
+            htons ( pRemoteAddress4->sin_port ));
+  }
+  else {
+    Print ( L"Connecting to remote system [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d\r\n",
+            pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 0 ],
+            pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 1 ],
+            pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 2 ],
+            pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 3 ],
+            pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 4 ],
+            pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 5 ],
+            pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 6 ],
+            pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 7 ],
+            pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 8 ],
+            pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 9 ],
+            pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 10 ],
+            pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 11 ],
+            pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 12 ],
+            pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 13 ],
+            pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 14 ],
+            pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 15 ],
+            htons ( pRemoteAddress6->sin6_port ));
+  }
 
   //
   //  Connect to the remote system
@@ -327,15 +431,37 @@ SocketConnect (
     //  Connect to the remote system
     //
     ConnectStatus = connect ( Socket,
-                              (struct sockaddr *) &RemoteHostAddress,
-                              RemoteHostAddress.sin_len );
+                              (struct sockaddr *)pRemoteAddress6,
+                              pRemoteAddress6->sin6_len );
     if ( -1 != ConnectStatus ) {
-      Print ( L"Connected to remote system %d.%d.%d.%d:%d\r\n",
-              RemoteAddress & 0xff,
-              ( RemoteAddress >> 8 ) & 0xff,
-              ( RemoteAddress >> 16 ) & 0xff,
-              ( RemoteAddress >> 24 ) & 0xff,
-              htons ( RemoteHostAddress.sin_port ));
+      if ( AF_INET == pRemoteAddress6->sin6_family ) {
+        Print ( L"Connected to remote system %d.%d.%d.%d:%d\r\n",
+                pRemoteAddress4->sin_addr.s_addr & 0xff,
+                ( pRemoteAddress4->sin_addr.s_addr >> 8 ) & 0xff,
+                ( pRemoteAddress4->sin_addr.s_addr >> 16 ) & 0xff,
+                ( pRemoteAddress4->sin_addr.s_addr >> 24 ) & 0xff,
+                htons ( pRemoteAddress4->sin_port ));
+      }
+      else {
+        Print ( L"Connected to remote system [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d\r\n",
+                pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 0 ],
+                pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 1 ],
+                pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 2 ],
+                pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 3 ],
+                pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 4 ],
+                pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 5 ],
+                pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 6 ],
+                pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 7 ],
+                pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 8 ],
+                pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 9 ],
+                pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 10 ],
+                pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 11 ],
+                pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 12 ],
+                pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 13 ],
+                pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 14 ],
+                pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 15 ],
+                htons ( pRemoteAddress6->sin6_port ));
+      }
     }
     else {
       //
@@ -358,11 +484,14 @@ SocketConnect (
 /**
   Create the socket
 
+  @param [in] Family    Network family, AF_INET or AF_INET6
+
   @retval  EFI_SUCCESS  The application is running normally
   @retval  Other        The user stopped the application
 **/
 EFI_STATUS
 SocketNew (
+  sa_family_t Family
   )
 {
   EFI_STATUS Status;
@@ -384,7 +513,7 @@ SocketNew (
     //
     //  Attempt to create the socket
     //
-    Socket = socket ( AF_INET,
+    Socket = socket ( Family,
                       SOCK_STREAM,
                       IPPROTO_TCP );
     if ( -1 != Socket ) {
@@ -419,7 +548,7 @@ SocketSend (
   //
   //  Restart the timer
   //
-  TimerStart ( 1000 << DATA_RATE_UPDATE_SHIFT );
+  TimerStart ( 1 * 1000 );
 
   //
   //  Loop until the connection breaks or the user stops
@@ -497,7 +626,7 @@ SocketOpen (
     //
     //  Wait for the network layer to initialize
     //
-    Status = SocketNew ( );
+    Status = SocketNew ( RemoteHostAddress.sin6_family );
     if ( EFI_ERROR ( Status )) {
       break;
     }
@@ -584,13 +713,13 @@ Tcp4Close (
           //
           //  Display the port closed message
           //
-          pIpAddress = (UINT8 *)&RemoteHostAddress.sin_addr.s_addr;
+          pIpAddress = (UINT8 *)&((struct sockaddr_in *)&RemoteHostAddress)->sin_addr.s_addr;
           Print ( L"Closed connection to %d.%d.%d.%d:%d\r\n",
                   pIpAddress[0],
                   pIpAddress[1],
                   pIpAddress[2],
                   pIpAddress[3],
-                  htons ( RemoteHostAddress.sin_port ));
+                  htons ( ((struct sockaddr_in *)&RemoteHostAddress)->sin_port ));
         }
       }
     }
@@ -786,13 +915,13 @@ Tcp4Locate (
     //  Display the connecting message
     //
     if ( bTcp4Connecting ) {
-      pIpAddress = (UINT8 *)&RemoteHostAddress.sin_addr.s_addr;
+      pIpAddress = (UINT8 *)&((struct sockaddr_in *)&RemoteHostAddress)->sin_addr.s_addr;
       Print ( L"Connecting to %d.%d.%d.%d:%d\r\n",
               pIpAddress[0],
               pIpAddress[1],
               pIpAddress[2],
               pIpAddress[3],
-              htons ( RemoteHostAddress.sin_port ));
+              htons ( ((struct sockaddr_in *)&RemoteHostAddress)->sin_port ));
       bTcp4Connecting = FALSE;
     }
 
@@ -885,7 +1014,7 @@ Tcp4Send (
   //
   //  Restart the timer
   //
-  TimerStart ( 1000 << DATA_RATE_UPDATE_SHIFT );
+  TimerStart ( 1 * 1000 );
 
   //
   //  Initialize the packet
@@ -1095,11 +1224,11 @@ Tcp4Open (
     Tcp4ConfigData.AccessPoint.StationAddress.Addr[2] = 0;
     Tcp4ConfigData.AccessPoint.StationAddress.Addr[3] = 0;
     Tcp4ConfigData.AccessPoint.StationPort = 0;
-    Tcp4ConfigData.AccessPoint.RemoteAddress.Addr[0] = (UINT8)  RemoteHostAddress.sin_addr.s_addr;
-    Tcp4ConfigData.AccessPoint.RemoteAddress.Addr[1] = (UINT8)( RemoteHostAddress.sin_addr.s_addr >> 8 );
-    Tcp4ConfigData.AccessPoint.RemoteAddress.Addr[2] = (UINT8)( RemoteHostAddress.sin_addr.s_addr >> 16 );
-    Tcp4ConfigData.AccessPoint.RemoteAddress.Addr[3] = (UINT8)( RemoteHostAddress.sin_addr.s_addr >> 24 );
-    Tcp4ConfigData.AccessPoint.RemotePort = RemoteHostAddress.sin_port;
+    Tcp4ConfigData.AccessPoint.RemoteAddress.Addr[0] = (UINT8)  ((struct sockaddr_in *)&RemoteHostAddress)->sin_addr.s_addr;
+    Tcp4ConfigData.AccessPoint.RemoteAddress.Addr[1] = (UINT8)( ((struct sockaddr_in *)&RemoteHostAddress)->sin_addr.s_addr >> 8 );
+    Tcp4ConfigData.AccessPoint.RemoteAddress.Addr[2] = (UINT8)( ((struct sockaddr_in *)&RemoteHostAddress)->sin_addr.s_addr >> 16 );
+    Tcp4ConfigData.AccessPoint.RemoteAddress.Addr[3] = (UINT8)( ((struct sockaddr_in *)&RemoteHostAddress)->sin_addr.s_addr >> 24 );
+    Tcp4ConfigData.AccessPoint.RemotePort = ((struct sockaddr_in *)&RemoteHostAddress)->sin_port;
     Tcp4ConfigData.AccessPoint.UseDefaultAddress = TRUE;
     Tcp4ConfigData.AccessPoint.SubnetMask.Addr[0] = 0;
     Tcp4ConfigData.AccessPoint.SubnetMask.Addr[1] = 0;
@@ -1152,13 +1281,13 @@ Tcp4Open (
     //
     //  Display the connection
     //
-    pIpAddress = (UINT8 *)&RemoteHostAddress.sin_addr.s_addr;
+    pIpAddress = (UINT8 *)&((struct sockaddr_in *)&RemoteHostAddress)->sin_addr.s_addr;
     Print ( L"Connected to %d.%d.%d.%d:%d\r\n",
             pIpAddress[0],
             pIpAddress[1],
             pIpAddress[2],
             pIpAddress[3],
-            htons ( RemoteHostAddress.sin_port ));
+            htons ( ((struct sockaddr_in *)&RemoteHostAddress)->sin_port ));
   } while ( 0 );
 
   if ( EFI_ERROR ( Status )) {
@@ -1193,10 +1322,10 @@ TimerCallback (
   IN VOID * pContext
   )
 {
-  UINT64 BytesSent;
-  UINT64 DeltaBytes;
-  UINT32 Delta;
-  UINT64 Average;
+  UINT32 Average;
+  UINT64 BitsPerSecond;
+  UINT32 Index;
+  UINT64 TotalBytes;
 
   //
   //  Notify the other code of the timer tick
@@ -1206,65 +1335,82 @@ TimerCallback (
   //
   //  Update the average bytes per second
   //
-  BytesSent = TotalBytesSent;
-  if ( 0 != BytesSent ) {
-    DeltaBytes = AverageBytes >> AVERAGE_SHIFT_COUNT;
-    AverageBytes -= DeltaBytes;
-    DeltaBytes = BytesSent - PreviousBytes;
-    PreviousBytes = BytesSent;
-    AverageBytes += DeltaBytes;
+  if ( 0 != TotalBytesSent ) {
+    BytesSent[ In ] = TotalBytesSent;
+    TotalBytesSent = 0;
+    In += 1;
+    if ( DATA_SAMPLES <= In ) {
+      In = 0;
+    }
 
     //
     //  Separate the samples
     //
-    if (( 2 << AVERAGE_SHIFT_COUNT ) == Samples ) {
+    if ( DATA_SAMPLES == Samples ) {
       Print ( L"---------- Stable average ----------\r\n" );
     }
     Samples += 1;
 
     //
+    //  Compute the data rate
+    //
+    TotalBytes = 0;
+    for ( Index = 0; DATA_SAMPLES > Index; Index++ ) {
+      TotalBytes += BytesSent[ Index ];
+    }
+    Average = (UINT32)RShiftU64 ( TotalBytes, DATA_SAMPLE_SHIFT );
+    BitsPerSecond = Average * 8;
+
+    //
     //  Display the data rate
     //
-    Delta = (UINT32)( DeltaBytes >> DATA_RATE_UPDATE_SHIFT );
-    Average = AverageBytes >> ( AVERAGE_SHIFT_COUNT + DATA_RATE_UPDATE_SHIFT );
-    if ( Average < RANGE_SWITCH ) {
-      Print ( L"%d Bytes/sec, Ave: %d Bytes/Sec\r\n",
-              Delta,
-              (UINT32) Average );
+    if (( RANGE_SWITCH >> 10 ) > Average ) {
+      Print ( L"Ave: %d Bytes/Sec, %Ld Bits/sec\r\n",
+              Average,
+              BitsPerSecond );
     }
     else {
-      Average >>= 10;
-      if ( Average < RANGE_SWITCH ) {
-        Print ( L"%d Bytes/sec, Ave: %d KiBytes/Sec\r\n",
-                Delta,
-                (UINT32) Average );
+      BitsPerSecond /= 1000;
+      if ( RANGE_SWITCH > Average ) {
+        Print ( L"Ave: %d.%03d KiBytes/Sec, %Ld KBits/sec\r\n",
+                Average >> 10,
+                (( Average & 0x3ff ) * 1000 ) >> 10,
+                BitsPerSecond );
       }
       else {
+        BitsPerSecond /= 1000;
         Average >>= 10;
-        if ( Average < RANGE_SWITCH ) {
-          Print ( L"%d Bytes/sec, Ave: %d MiBytes/Sec\r\n",
-                  Delta,
-                  (UINT32) Average );
+        if ( RANGE_SWITCH > Average ) {
+          Print ( L"Ave: %d.%03d MiBytes/Sec, %Ld MBits/sec\r\n",
+                  Average >> 10,
+                  (( Average & 0x3ff ) * 1000 ) >> 10,
+                  BitsPerSecond );
         }
         else {
+          BitsPerSecond /= 1000;
           Average >>= 10;
-          if ( Average < RANGE_SWITCH ) {
-            Print ( L"%d Bytes/sec, Ave: %d GiBytes/Sec\r\n",
-                    Delta,
-                    (UINT32) Average );
+          if ( RANGE_SWITCH > Average ) {
+            Print ( L"Ave: %d.%03d GiBytes/Sec, %Ld GBits/sec\r\n",
+                    Average >> 10,
+                    (( Average & 0x3ff ) * 1000 ) >> 10,
+                    BitsPerSecond );
           }
           else {
+            BitsPerSecond /= 1000;
             Average >>= 10;
-            if ( Average < RANGE_SWITCH ) {
-              Print ( L"%d Bytes/sec, Ave: %d TiBytes/Sec\r\n",
-                      Delta,
-                      Average );
+            if ( RANGE_SWITCH > Average ) {
+              Print ( L"Ave: %d.%03d TiBytes/Sec, %Ld TBits/sec\r\n",
+                      Average >> 10,
+                      (( Average & 0x3ff ) * 1000 ) >> 10,
+                      BitsPerSecond );
             }
             else {
+              BitsPerSecond /= 1000;
               Average >>= 10;
-              Print ( L"%d Bytes/sec, Ave: %d PiBytes/Sec\r\n",
-                      Delta,
-                      (UINT32) Average );
+              Print ( L"Ave: %d.%03d PiBytes/Sec, %Ld PBits/sec\r\n",
+                      Average >> 10,
+                      (( Average & 0x3ff ) * 1000 ) >> 10,
+                      BitsPerSecond );
             }
           }
         }
@@ -1528,17 +1674,8 @@ main (
     //  No bytes sent so far
     //
     TotalBytesSent = 0;
-    AverageBytes = 0;
-    PreviousBytes = 0;
     Samples = 0;
-
-    //
-    //  Get the port number
-    //
-    ZeroMem ( &RemoteHostAddress, sizeof ( RemoteHostAddress ));
-    RemoteHostAddress.sin_len = sizeof ( RemoteHostAddress );
-    RemoteHostAddress.sin_family = AF_INET;
-    RemoteHostAddress.sin_port = htons ( PcdGet16 ( DataSource_Port ));
+    memset ( &BytesSent, 0, sizeof ( BytesSent ));
 
     //
     //  Get the IP address

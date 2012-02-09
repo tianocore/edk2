@@ -44,10 +44,12 @@ CONST DT_PAGE mPageList[] = {
   { L"/DhcpOptions", DhcpOptionsPage, L"DHCP Options" },                                ///<  Display the DHCP options
   { PAGE_ACPI_DSDT, AcpiDsdtPage, L"DSDT - Differentiated System Description Table" },  ///<  Format DSDT
   { PAGE_DXE_SERVICES_TABLE, DxeServicesTablePage, L"DXE Services Table" },             ///<  Format DXE services table
+  { L"/Exit", ExitPage, L"Exit the web server" },       ///<  Exit the web server application
   { PAGE_ACPI_FADT, AcpiFadtPage, L"FADT - Fixed ACPI Description Table" },             ///<  Format FADT
   { L"/Firmware", FirmwarePage, L"Firmware" },          ///<  Firmware status
   { L"/Handles", HandlePage, L"Display handles and associated protocol GUIDs" },        ///<  Handle database page
   { L"/Hello", HelloPage, L"Hello World" },             ///<  Hello world page
+  { L"/Ports", PortsPage, L"Display web-server ports" },///<  Web-server ports page
   { L"/Reboot", RebootPage, L"Reboot the sytem" },      ///<  Reboot page
   { PAGE_ACPI_RSDP_10B, AcpiRsdp10Page, L"RSDP 1.0b - ACPI Root System Description Pointer" },  ///<  Format RSDP 1.0b table
   { PAGE_ACPI_RSDP_30, AcpiRsdp30Page, L"RSDP 3.0 - ACPI Root System Description Pointer" },    ///<  Format RSDP 3.0 table

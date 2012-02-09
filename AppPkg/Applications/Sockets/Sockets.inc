@@ -6,9 +6,11 @@
 [Components]
   AppPkg/Applications/Sockets/DataSink/DataSink.inf
   AppPkg/Applications/Sockets/DataSource/DataSource.inf
+  AppPkg/Applications/Sockets/GetAddrInfo/GetAddrInfo.inf
   AppPkg/Applications/Sockets/GetHostByAddr/GetHostByAddr.inf
   AppPkg/Applications/Sockets/GetHostByDns/GetHostByDns.inf
   AppPkg/Applications/Sockets/GetHostByName/GetHostByName.inf
+  AppPkg/Applications/Sockets/GetNameInfo/GetNameInfo.inf
   AppPkg/Applications/Sockets/GetNetByAddr/GetNetByAddr.inf
   AppPkg/Applications/Sockets/GetNetByName/GetNetByName.inf
   AppPkg/Applications/Sockets/GetServByName/GetServByName.inf

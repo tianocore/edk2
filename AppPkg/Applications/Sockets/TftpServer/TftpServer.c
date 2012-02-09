@@ -1,106 +1,211 @@
-/*++
-  This file contains an 'Intel UEFI Application' and is
-  licensed for Intel CPUs and chipsets under the terms of your
-  license agreement with Intel or your vendor.  This file may
-  be modified by the user, subject to additional terms of the
-  license agreement
---*/
-/*++
-
-Copyright (c)  2011 Intel Corporation. All rights reserved
-This software and associated documentation (if any) is furnished
-under a license and may only be used or copied in accordance
-with the terms of the license. Except as permitted by such
-license, no part of this software or documentation may be
-reproduced, stored in a retrieval system, or transmitted in any
-form or by any means without the express written consent of
-Intel Corporation.
-
---*/
-
 /** @file
   This is a simple TFTP server application
+
+  Copyright (c) 2011, 2012, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
 #include <TftpServer.h>
 
-TSDT_TFTP_SERVER mTftpServer; ///<  TFTP server's control structure
+TSDT_TFTP_SERVER mTftpServer;       ///<  TFTP server's control structure
+volatile BOOLEAN mbTftpServerExit;  ///<  Set TRUE to cause TFTP server to exit
+
+
+/**
+  Read file data into a buffer
+
+  @param [in] pContext    Connection context structure address
+
+  @retval TRUE if a read error occurred
+
+**/
+BOOLEAN
+BufferFill (
+  IN TSDT_CONNECTION_CONTEXT * pContext
+  )
+{
+  BOOLEAN bReadError;
+  size_t BytesRead;
+  UINT64 LengthInBytes;
+
+  DBG_ENTER ( );
+
+  //
+  //  Use break instead of goto
+  //
+  bReadError = FALSE;
+  for ( ; ; ) {
+    //
+    //  Determine if there is any work to do
+    //
+    LengthInBytes = DIM ( pContext->FileData ) >> 1;
+    if (( pContext->ValidBytes > LengthInBytes )
+      || ( 0 == pContext->BytesRemaining )) {
+      break;
+    }
+
+    //
+    //  Determine the number of bytes to read
+    //
+    if ( LengthInBytes > pContext->BytesRemaining ) {
+      LengthInBytes = pContext->BytesRemaining;
+    }
+
+    //
+    //  Read in the next portion of the file
+    //
+    BytesRead = fread ( pContext->pFill,
+                        1,
+                        (size_t)LengthInBytes,
+                        pContext->File );
+    if ( -1 == BytesRead ) {
+      bReadError = TRUE;
+      break;
+    }
+
+    //
+    //  Account for the file data read
+    //
+    pContext->BytesRemaining -= BytesRead;
+    pContext->ValidBytes += BytesRead;
+    DEBUG (( DEBUG_FILE_BUFFER,
+              "0x%08x: Buffer filled with %Ld bytes, %Ld bytes ramaining\r\n",
+              pContext->pFill,
+              BytesRead,
+              pContext->BytesRemaining ));
+
+    //
+    //  Set the next buffer location
+    //
+    pContext->pFill += BytesRead;
+    if ( pContext->pEnd <= pContext->pFill ) {
+      pContext->pFill = &pContext->FileData[ 0 ];
+    }
+
+    //
+    //  Verify that the end of the buffer is reached
+    //
+    ASSERT ( 0 == ( DIM ( pContext->FileData ) & 1 ));
+    break;
+  }
+
+  //
+  //  Return the read status
+  //
+  DBG_EXIT ( );
+  return bReadError;
+}
 
 
 /**
   Add a connection context to the list of connection contexts.
 
-  @param [in] pTftpServer   The TFTP server control structure address.
+  @param [in] pTftpServer   Address of the ::TSDT_TFTP_SERVER structure
+  @param [in] SocketFd      Socket file descriptor
 
   @retval Context structure address, NULL if allocation fails
 
 **/
 TSDT_CONNECTION_CONTEXT *
 ContextAdd (
-  IN TSDT_TFTP_SERVER * pTftpServer
+  IN TSDT_TFTP_SERVER * pTftpServer,
+  IN int SocketFd
   )
 {
-  size_t LengthInBytes;
   TSDT_CONNECTION_CONTEXT * pContext;
-  EFI_STATUS Status;
+  TFTP_PACKET * pEnd;
+  TFTP_PACKET * pPacket;
 
   DBG_ENTER ( );
 
   //
-  //  Use for/break instead of goto
+  //  Allocate a new context
   //
-  for ( ; ; ) {
-    //
-    //  Allocate a new context
-    //
-    LengthInBytes = sizeof ( *pContext );
-    Status = gBS->AllocatePool ( EfiRuntimeServicesData,
-                                 LengthInBytes,
-                                 (VOID **)&pContext );
-    if ( EFI_ERROR ( Status )) {
-      DEBUG (( DEBUG_ERROR | DEBUG_POOL,
-                "ERROR - Failed to allocate the context, Status: %r\r\n",
-                Status ));
-      pContext = NULL;
-      break;
-    }
-
+  pContext = (TSDT_CONNECTION_CONTEXT *)AllocateZeroPool ( sizeof ( *pContext ));
+  if ( NULL != pContext ) {
     //
     //  Initialize the context
     //
-    ZeroMem ( pContext, LengthInBytes );
+    pContext->SocketFd = SocketFd;
     CopyMem ( &pContext->RemoteAddress,
               &pTftpServer->RemoteAddress,
               sizeof ( pContext->RemoteAddress ));
-    pContext->BlockSize = TFTP_MAX_BLOCK_SIZE;
-    pContext->pBuffer = &pContext->FileData[0];
-    pContext->pEnd = &pContext->pBuffer[sizeof ( pContext->pBuffer )];
-    pContext->MaxTransferSize = 0;
-    pContext->MaxTransferSize -= 1;
+    pContext->BlockSize = 512;
+
+    //
+    //  Buffer management
+    //
+    pContext->pFill = &pContext->FileData[ 0 ];
+    pContext->pEnd = &pContext->FileData[ sizeof ( pContext->FileData )];
+    pContext->pBuffer = pContext->pFill;
+
+    //
+    //  Window management
+    //
+    pContext->MaxTimeout = MultU64x32 ( PcdGet32 ( Tftp_MaxTimeoutInSec ),
+                                        2 * 1000 * 1000 * 1000 );
+    pContext->Rtt2x = pContext->MaxTimeout;
+    pContext->WindowSize = MAX_PACKETS;
+    WindowTimeout ( pContext );
+
+    //
+    //  Place the packets on the free list
+    //
+    pPacket = &pContext->Tx[ 0 ];
+    pEnd = &pPacket[ DIM ( pContext->Tx )];
+    while ( pEnd > pPacket ) {
+      PacketFree ( pContext, pPacket );
+      pPacket += 1;
+    }
 
     //
     //  Display the new context
     //
-    DEBUG (( DEBUG_PORT_WORK | DEBUG_INFO,
-              "0x%08x: Context for %d.%d.%d.%d:%d\r\n",
-              pContext,
-              (UINT8)pContext->RemoteAddress.sin_addr.s_addr,
-              (UINT8)( pContext->RemoteAddress.sin_addr.s_addr >> 8 ),
-              (UINT8)( pContext->RemoteAddress.sin_addr.s_addr >> 16 ),
-              (UINT8)( pContext->RemoteAddress.sin_addr.s_addr >> 24 ),
-              htons ( pContext->RemoteAddress.sin_port )));
+    if ( AF_INET == pTftpServer->RemoteAddress.v4.sin_family ) {
+      DEBUG (( DEBUG_PORT_WORK,
+                "0x%08x: Context for %d.%d.%d.%d:%d\r\n",
+                pContext,
+                (UINT8)pTftpServer->RemoteAddress.v4.sin_addr.s_addr,
+                (UINT8)( pTftpServer->RemoteAddress.v4.sin_addr.s_addr >> 8 ),
+                (UINT8)( pTftpServer->RemoteAddress.v4.sin_addr.s_addr >> 16 ),
+                (UINT8)( pTftpServer->RemoteAddress.v4.sin_addr.s_addr >> 24 ),
+                htons ( pTftpServer->RemoteAddress.v4.sin_port )));
+    }
+    else {
+      DEBUG (( DEBUG_PORT_WORK,
+                "0x%08x: Context for [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d\r\n",
+                pContext,
+                pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 0 ],
+                pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 1 ],
+                pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 2 ],
+                pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 3 ],
+                pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 4 ],
+                pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 5 ],
+                pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 6 ],
+                pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 7 ],
+                pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 8 ],
+                pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 9 ],
+                pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 10 ],
+                pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 11 ],
+                pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 12 ],
+                pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 13 ],
+                pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 14 ],
+                pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 15 ],
+                htons ( pTftpServer->RemoteAddress.v6.sin6_port )));
+    }
 
     //
     //  Add the context to the context list
     //
     pContext->pNext = pTftpServer->pContextList;
     pTftpServer->pContextList = pContext;
-
-    //
-    //  All done
-    //
-    break;
   }
 
   //
@@ -114,10 +219,8 @@ ContextAdd (
 /**
   Locate a remote connection context.
 
-  @param [in] pTftpServer   The TFTP server control structure address.
-
+  @param [in] pTftpServer   Address of the ::TSDT_TFTP_SERVER structure
   @param [in] pIpAddress    The start of the remote IP address in network order
-
   @param [in] Port          The remote port number
 
   @retval Context structure address, NULL if not found
@@ -140,8 +243,9 @@ ContextFind (
     //
     //  Attempt to locate the remote network connection
     //
-    if (( pTftpServer->RemoteAddress.sin_addr.s_addr == pContext->RemoteAddress.sin_addr.s_addr )
-      && ( pTftpServer->RemoteAddress.sin_port == pContext->RemoteAddress.sin_port )) {
+    if ( 0 == memcmp ( &pTftpServer->RemoteAddress,
+                       &pContext->RemoteAddress,
+                       pTftpServer->RemoteAddress.v6.sin6_len )) {
       //
       //  The connection was found
       //
@@ -168,9 +272,8 @@ ContextFind (
 /**
   Remove a context from the list.
 
-  @param [in] pTftpServer    The TFTP server control structure address.
-
-  @param [in] pContext       The context structure address.
+  @param [in] pTftpServer   Address of the ::TSDT_TFTP_SERVER structure
+  @param [in] pContext      Address of a ::TSDT_CONNECTION_CONTEXT structure
 
 **/
 VOID
@@ -228,79 +331,151 @@ ContextRemove (
 
 
 /**
-  Process the work for the sockets.
+  Queue data packets for transmission
 
-  @param [in] pTftpServer   The TFTP server control structure address.
+  @param [in] pContext    Connection context structure address
+
+  @retval TRUE if a read error occurred
 
 **/
-VOID
-PortWork (
-  IN TSDT_TFTP_SERVER * pTftpServer
+BOOLEAN
+PacketFill (
+  IN TSDT_CONNECTION_CONTEXT * pContext
   )
 {
-  TSDT_CONNECTION_CONTEXT * pContext;
-  socklen_t RemoteAddressLength;
+  BOOLEAN bReadError;
+  UINT64 LengthInBytes;
+  UINT8 * pBuffer;
+  TFTP_PACKET * pPacket;
 
   DBG_ENTER ( );
 
   //
-  //  Handle input events
+  //  Use break instead of goto
   //
-  if ( 0 != ( pTftpServer->TftpPort.revents & POLLRDNORM )) {
+  bReadError = FALSE;
+  for ( ; ; ) {
     //
-    //  Receive the message from the remote system
+    //  Fill the buffer if necessary
     //
-    RemoteAddressLength = sizeof ( pTftpServer->RemoteAddress );
-    pTftpServer->RxBytes = recvfrom ( pTftpServer->TftpPort.fd,
-                                      &pTftpServer->RxBuffer[0],
-                                      sizeof ( pTftpServer->RxBuffer ),
-                                      0,
-                                      (struct sockaddr *) &pTftpServer->RemoteAddress,
-                                      &RemoteAddressLength );
-    if ( -1 != pTftpServer->RxBytes ) {
-      pTftpServer->RemoteAddress.sin_len = (UINT8) RemoteAddressLength;
-      DEBUG (( DEBUG_TFTP_PORT,
-                 "Received %d bytes from %d.%d.%d.%d:%d\r\n",
-                 pTftpServer->RxBytes,
-                 pTftpServer->RemoteAddress.sin_addr.s_addr & 0xff,
-                 ( pTftpServer->RemoteAddress.sin_addr.s_addr >> 8 ) & 0xff,
-                 ( pTftpServer->RemoteAddress.sin_addr.s_addr >> 16 ) & 0xff,
-                 ( pTftpServer->RemoteAddress.sin_addr.s_addr >> 24 ) & 0xff,
-                 htons ( pTftpServer->RemoteAddress.sin_port )));
+    bReadError = BufferFill ( pContext );
+    if ( bReadError ) {
+      //
+      //  File access mode not supported
+      //
+      DEBUG (( DEBUG_ERROR | DEBUG_TFTP_REQUEST,
+                "ERROR - File read failure!\r\n" ));
 
       //
-      //  Lookup connection context using the remote system address and port
-      //  to determine if an existing connection to this remote
-      //  system exists
+      //  Tell the client of the error
       //
-      pContext = ContextFind ( pTftpServer );
+      SendError ( pContext,
+                  TFTP_ERROR_SEE_MSG,
+                  (UINT8 *)"Read failure" );
+      break;
+    }
+
+    //
+    //  Determine if any packets can be filled
+    //
+    if ( pContext->bEofSent
+      || ( NULL == pContext->pFreeList )) {
+      //
+      //  All of the packets are filled
+      //
+      break;
+    }
+
+    //
+    //  Set the TFTP opcode and block number
+    //
+    pPacket = PacketGet ( pContext );
+    pBuffer = &pPacket->TxBuffer[ 0 ];
+    *pBuffer++ = 0;
+    *pBuffer++ = TFTP_OP_DATA;
+    *pBuffer++ = (UINT8)( pContext->BlockNumber >> 8 );
+    *pBuffer++ = (UINT8)pContext->BlockNumber;
+
+    //
+    //  Determine how much data needs to be sent
+    //
+    LengthInBytes = pContext->BlockSize;
+    if (( pContext->BytesToSend < TFTP_MAX_BLOCK_SIZE )
+      && ( LengthInBytes > pContext->BytesToSend )) {
+      LengthInBytes = pContext->BytesToSend;
+      pContext->bEofSent = TRUE;
+    }
+    DEBUG (( DEBUG_TX_PACKET,
+              "0x%08x: Packet, Block %d filled with %d bytes\r\n",
+              pPacket,
+              pContext->BlockNumber,
+              (UINT32)LengthInBytes ));
+    
+    //
+    //  Copy the file data into the packet
+    //
+    pPacket->TxBytes = (ssize_t)( 2 + 2 + LengthInBytes );
+    if ( 0 < LengthInBytes ) {
+      CopyMem ( pBuffer,
+                pContext->pBuffer,
+                (UINTN)LengthInBytes );
+      DEBUG (( DEBUG_FILE_BUFFER,
+                "0x%08x: Buffer consumed %d bytes of file data\r\n",
+                pContext->pBuffer,
+                LengthInBytes ));
 
       //
-      //  Process the received message
+      //  Account for the file data consumed
       //
-      TftpProcessRequest ( pTftpServer, pContext );
+      pContext->ValidBytes -= LengthInBytes;
+      pContext->BytesToSend -= LengthInBytes;
+      pContext->pBuffer += LengthInBytes;
+      if ( pContext->pEnd <= pContext->pBuffer ) {
+        pContext->pBuffer = &pContext->FileData[ 0 ];
+      }
     }
-    else {
-      //
-      //  Receive error on the TFTP server port
-      //  Close the server socket
-      //
-      DEBUG (( DEBUG_ERROR,
-                "ERROR - Failed receive on TFTP server port, errno: 0x%08x\r\n",
-                errno ));
-      pTftpServer->TftpPort.revents |= POLLHUP;
-    }
+    
+    //
+    //  Queue the packet for transmission
+    //
+    PacketQueue ( pContext, pPacket );
   }
 
   //
-  //  Handle the close event
+  //  Return the read status
   //
-  if ( 0 != ( pTftpServer->TftpPort.revents & POLLHUP )) {
+  DBG_EXIT ( );
+  return bReadError;
+}
+
+
+/**
+  Free the packet
+
+  @param [in] pContext    Address of a ::TSDT_CONNECTION_CONTEXT structure
+  @param [in] pPacket     Address of a ::TFTP_PACKET structure
+
+**/
+VOID
+PacketFree(
+  IN TSDT_CONNECTION_CONTEXT * pContext,
+  IN TFTP_PACKET * pPacket
+  )
+{
+  DBG_ENTER ( );
+
+  //
+  //  Don't free the error packet
+  //
+  if ( pPacket != &pContext->ErrorPacket ) {
     //
-    //  Close the port
+    //  Place the packet on the free list
     //
-    close ( pTftpServer->TftpPort.fd );
-    pTftpServer->TftpPort.fd = -1;
+    pPacket->pNext = pContext->pFreeList;
+    pContext->pFreeList = pPacket;
+    DEBUG (( DEBUG_TX_PACKET,
+              "0x%08x: Packet queued to free list\r\n",
+              pPacket ));
   }
 
   DBG_EXIT ( );
@@ -308,9 +483,416 @@ PortWork (
 
 
 /**
+  Get a packet from the free list for transmission
+
+  @param [in] pContext    Address of a ::TSDT_CONNECTION_CONTEXT structure
+
+  @retval Address of a ::TFTP_PACKET structure
+
+**/
+TFTP_PACKET *
+PacketGet (
+  IN TSDT_CONNECTION_CONTEXT * pContext
+  )
+{
+  TFTP_PACKET * pPacket;
+
+  DBG_ENTER ( );
+
+  //
+  //  Get the next packet from the free list
+  //
+  pPacket = pContext->pFreeList;
+  if ( NULL != pPacket ) {
+    pContext->pFreeList = pPacket->pNext;
+    pPacket->RetryCount = 0;
+    DEBUG (( DEBUG_TX_PACKET,
+              "0x%08x: Packet removed from free list\r\n",
+              pPacket ));
+  }
+
+  //
+  //  Return the packet
+  //
+  DBG_EXIT_HEX ( pPacket );
+  return pPacket;
+}
+
+
+/**
+  Queue the packet for transmission
+
+  @param [in] pContext    Address of a ::TSDT_CONNECTION_CONTEXT structure
+  @param [in] pPacket     Address of a ::TFTP_PACKET structure
+
+  @retval TRUE if a transmission error has occurred
+
+**/
+BOOLEAN
+PacketQueue (
+  IN TSDT_CONNECTION_CONTEXT * pContext,
+  IN TFTP_PACKET * pPacket
+  )
+{
+  BOOLEAN bTransmitError;
+  TFTP_PACKET * pTail;
+  EFI_STATUS Status;
+
+  DBG_ENTER ( );
+
+  //
+  //  Account for this data block
+  //
+  pPacket->BlockNumber = pContext->BlockNumber;
+  pContext->BlockNumber += 1;
+
+  //
+  //  Queue the packet for transmission
+  //
+  pTail = pContext->pTxTail;
+  if ( NULL == pTail ) {
+    pContext->pTxHead = pPacket;
+  }
+  else {
+    pTail->pNext = pPacket;
+  }
+  pContext->pTxTail = pPacket;
+  pPacket->pNext = NULL;
+  DEBUG (( DEBUG_TX_PACKET,
+            "0x%08x: Packet queued to TX list\r\n",
+            pPacket ));
+
+  //
+  //  Start the transmission if necessary
+  //
+  bTransmitError = FALSE;
+  if ( pContext->PacketsInWindow < pContext->WindowSize ) {
+    Status = PacketTx ( pContext, pPacket );
+    bTransmitError = (BOOLEAN)( EFI_ERROR ( Status ));
+  }
+
+  //
+  //  Return the transmit status
+  //
+  DBG_EXIT_TF ( bTransmitError );
+  return bTransmitError;
+}
+
+
+/**
+  Remove a packet from the transmit queue
+
+  @param [in] pContext    Address of a ::TSDT_CONNECTION_CONTEXT structure
+
+**/
+TFTP_PACKET *
+PacketRemove(
+  IN TSDT_CONNECTION_CONTEXT * pContext
+  )
+{
+  TFTP_PACKET * pNext;
+  TFTP_PACKET * pPacket;
+
+  DBG_ENTER ( );
+
+  //
+  //  Remove a packet from the transmit queue
+  //
+  //
+  pPacket = pContext->pTxHead;
+  if ( NULL != pPacket ) {
+    pNext = pPacket->pNext;
+    pContext->pTxHead = pNext;
+    if ( NULL == pNext ) {
+      pContext->pTxTail = NULL;
+    }
+    DEBUG (( DEBUG_TX_PACKET,
+              "0x%08x: Packet removed from TX list\r\n",
+              pPacket ));
+
+    //
+    //  Remove this packet from the window
+    //
+    pContext->PacketsInWindow -= 1;
+  }
+
+  //
+  //  Return the packet
+  //
+  DBG_EXIT_HEX ( pPacket );
+  return pPacket;
+}
+
+
+/**
+  Transmit the packet
+
+  @param [in] pContext    Address of a ::TSDT_CONNECTION_CONTEXT structure
+  @param [in] pPacket     Address of a ::TFTP_PACKET structure
+
+  @retval EFI_SUCCESS   Message processed successfully
+
+**/
+EFI_STATUS
+PacketTx (
+  IN TSDT_CONNECTION_CONTEXT * pContext,
+  IN TFTP_PACKET * pPacket
+  )
+{
+  ssize_t LengthInBytes;
+  EFI_STATUS Status;
+
+  DBG_ENTER ( );
+
+  //
+  //  Assume success
+  //
+  Status = EFI_SUCCESS;
+
+  //
+  //  Determine if this packet should be transmitted
+  //
+  if ( PcdGet32 ( Tftp_MaxRetry ) >= pPacket->RetryCount ) {
+    pPacket->RetryCount += 1;
+
+    //
+    //  Display the operation
+    //
+    DEBUG (( DEBUG_TX_PACKET,
+              "0x%08x: Packet transmiting\r\n",
+              pPacket ));
+    DEBUG (( DEBUG_TX,
+              "0x%08x: pContext sending 0x%08x bytes\r\n",
+              pContext,
+              pPacket->TxBytes ));
+
+    //
+    //  Keep track of when the packet was transmitted
+    //
+    if ( PcdGetBool ( Tftp_HighSpeed )) {
+      pPacket->TxTime = GetPerformanceCounter ( );
+    }
+
+    //
+    //  Send the TFTP packet
+    //
+    pContext->PacketsInWindow += 1;
+    LengthInBytes = sendto ( pContext->SocketFd,
+                             &pPacket->TxBuffer[ 0 ],
+                             pPacket->TxBytes,
+                             0,
+                             (struct sockaddr *)&pContext->RemoteAddress,
+                             pContext->RemoteAddress.sin6_len );
+    if ( -1 == LengthInBytes ) {
+      DEBUG (( DEBUG_ERROR | DEBUG_TX,
+                "ERROR - Transmit failure, errno: 0x%08x\r\n",
+                errno ));
+      pContext->PacketsInWindow -= 1;
+      Status = EFI_DEVICE_ERROR;
+    }
+  }
+  else {
+    //
+    //  Too many retries
+    //
+    Status = EFI_NO_RESPONSE;
+    DEBUG (( DEBUG_WARN | DEBUG_WINDOW,
+              "WARNING - No response from TFTP client\r\n" ));
+  }
+
+  //
+  //  Return the operation status
+  //
+  DBG_EXIT_STATUS ( Status );
+  return Status;
+}
+
+
+/**
+  Process the work for the sockets.
+
+  @param [in] pTftpServer   Address of the ::TSDT_TFTP_SERVER structure
+  @param [in] pIndex        Address of an index into the pollfd array
+
+**/
+VOID
+PortWork (
+  IN TSDT_TFTP_SERVER * pTftpServer,
+  IN int * pIndex
+  )
+{
+  int Index;
+  TSDT_CONNECTION_CONTEXT * pContext;
+  struct pollfd * pTftpPort;
+  socklen_t RemoteAddressLength;
+  int revents;
+
+  DBG_ENTER ( );
+
+  //
+  //  Locate the port
+  //
+  Index = *pIndex;
+  if ( -1 != Index ) {
+    pTftpPort = &pTftpServer->TftpPort[ *pIndex ];
+
+    //
+    //  Handle input events
+    //
+    revents = pTftpPort->revents;
+    pTftpPort->revents = 0;
+    if ( 0 != ( revents & POLLRDNORM )) {
+      //
+      //  Receive the message from the remote system
+      //
+      RemoteAddressLength = sizeof ( pTftpServer->RemoteAddress );
+      pTftpServer->RxBytes = recvfrom ( pTftpPort->fd,
+                                        &pTftpServer->RxBuffer[ 0 ],
+                                        sizeof ( pTftpServer->RxBuffer ),
+                                        0,
+                                        (struct sockaddr *) &pTftpServer->RemoteAddress,
+                                        &RemoteAddressLength );
+      if ( -1 != pTftpServer->RxBytes ) {
+        if ( PcdGetBool ( Tftp_HighSpeed )) {
+          pTftpServer->RxTime = GetPerformanceCounter ( );
+        }
+        if ( AF_INET == pTftpServer->RemoteAddress.v4.sin_family ) {
+          DEBUG (( DEBUG_TFTP_PORT,
+                   "Received %d bytes from %d.%d.%d.%d:%d\r\n",
+                   pTftpServer->RxBytes,
+                   pTftpServer->RemoteAddress.v4.sin_addr.s_addr & 0xff,
+                   ( pTftpServer->RemoteAddress.v4.sin_addr.s_addr >> 8 ) & 0xff,
+                   ( pTftpServer->RemoteAddress.v4.sin_addr.s_addr >> 16 ) & 0xff,
+                   ( pTftpServer->RemoteAddress.v4.sin_addr.s_addr >> 24 ) & 0xff,
+                   htons ( pTftpServer->RemoteAddress.v4.sin_port )));
+        }
+        else {
+          DEBUG (( DEBUG_TFTP_PORT,
+                   "Received %d bytes from [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d\r\n",
+                   pTftpServer->RxBytes,
+                   pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 0 ],
+                   pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 1 ],
+                   pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 2 ],
+                   pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 3 ],
+                   pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 4 ],
+                   pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 5 ],
+                   pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 6 ],
+                   pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 7 ],
+                   pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 8 ],
+                   pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 9 ],
+                   pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 10 ],
+                   pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 11 ],
+                   pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 12 ],
+                   pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 13 ],
+                   pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 14 ],
+                   pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 15 ],
+                   htons ( pTftpServer->RemoteAddress.v6.sin6_port )));
+        }
+
+        //
+        //  Lookup connection context using the remote system address and port
+        //  to determine if an existing connection to this remote
+        //  system exists
+        //
+        pContext = ContextFind ( pTftpServer );
+
+        //
+        //  Process the received message
+        //
+        TftpProcessRequest ( pTftpServer, pContext, pTftpPort->fd );
+      }
+      else {
+        //
+        //  Receive error on the TFTP server port
+        //  Close the server socket
+        //
+        DEBUG (( DEBUG_ERROR,
+                  "ERROR - Failed receive on TFTP server port, errno: 0x%08x\r\n",
+                  errno ));
+        revents |= POLLHUP;
+      }
+    }
+
+    //
+    //  Handle the close event
+    //
+    if ( 0 != ( revents & POLLHUP )) {
+      //
+      //  Close the port
+      //
+      close ( pTftpPort->fd );
+      pTftpPort->fd = -1;
+      *pIndex = -1;
+      pTftpServer->Entries -= 1;
+      ASSERT ( 0 <= pTftpServer->Entries );
+    }
+  }
+
+  DBG_EXIT ( );
+}
+
+
+/**
+  Build and send an error packet
+
+  @param [in] pContext    Address of a ::TSDT_CONNECTION_CONTEXT structure
+  @param [in] Error       Error number for the packet
+  @param [in] pError      Zero terminated error string address
+
+  @retval EFI_SUCCESS     Message processed successfully
+
+**/
+EFI_STATUS
+SendError (
+  IN TSDT_CONNECTION_CONTEXT * pContext,
+  IN UINT16 Error,
+  IN UINT8 * pError
+  )
+{
+  UINT8 Character;
+  UINT8 * pBuffer;
+  TFTP_PACKET * pPacket;
+  EFI_STATUS Status;
+
+  DBG_ENTER ( );
+
+  //
+  //  Build the error packet
+  //
+  pPacket = &pContext->ErrorPacket;
+  pBuffer = &pPacket->TxBuffer[ 0 ];
+  pBuffer[ 0 ] = 0;
+  pBuffer[ 1 ] = TFTP_OP_ERROR;
+  pBuffer[ 2 ] = (UINT8)( Error >> 8 );
+  pBuffer[ 3 ] = (UINT8)Error;
+
+  //
+  //  Copy the zero terminated string into the buffer
+  //
+  pBuffer += 4;
+  do {
+    Character = *pError++;
+    *pBuffer++ = Character;
+  } while ( 0 != Character );
+
+  //
+  //  Send the error message
+  //
+  pPacket->TxBytes = pBuffer - &pPacket->TxBuffer[ 0 ];
+  Status = PacketTx ( pContext, pPacket );
+
+  //
+  //  Return the operation status
+  //
+  DBG_EXIT_STATUS ( Status );
+  return Status;
+}
+
+
+/**
   Scan the list of sockets and process any pending work
 
-  @param [in] pTftpServer   The TFTP server control structure address.
+  @param [in] pTftpServer   Address of the ::TSDT_TFTP_SERVER structure
 
 **/
 VOID
@@ -325,21 +907,17 @@ SocketPoll (
   //
   //  Determine if any ports are active
   //
-  FDCount = poll ( &pTftpServer->TftpPort,
-                   1,
-                   CLIENT_POLL_DELAY );
-  if ( -1 == FDCount ) {
-    DEBUG (( DEBUG_ERROR | DEBUG_SOCKET_POLL,
-              "ERROR - errno: %d\r\n",
-              errno ));
-  }
-
-  if ( 0 < FDCount ) {
-    //
-    //  Process this port
-    //
-    PortWork ( pTftpServer );
-    pTftpServer->TftpPort.revents = 0;
+  if ( 0 != pTftpServer->Entries ) {
+    FDCount = poll ( &pTftpServer->TftpPort[ 0 ],
+                     pTftpServer->Entries,
+                     CLIENT_POLL_DELAY );
+    if ( 0 < FDCount ) {
+      //
+      //  Process this port
+      //
+      PortWork ( pTftpServer, &pTftpServer->Udpv4Index );
+      PortWork ( pTftpServer, &pTftpServer->Udpv6Index );
+    }
   }
 
   DEBUG (( DEBUG_SOCKET_POLL, "Exiting SocketPoll\r\n" ));
@@ -347,88 +925,216 @@ SocketPoll (
 
 
 /**
-  Convert a character to lower case
+  Process the ACK
 
-  @param [in] Character The character to convert
+  @param [in] pTftpServer   Address of the ::TSDT_TFTP_SERVER structure
+  @param [in] pContext    Connection context structure address
 
-  @return   The lower case equivalent of the character
-
-**/
-int
-tolower (
-  int Character
-  )
-{
-  //
-  //  Determine if the character is upper case
-  //
-  if (( 'A' <= Character ) && ( 'Z' >= Character )) {
-    //
-    //  Convert the character to lower caes
-    //
-    Character += 'a' - 'A';
-  }
-
-  //
-  //  Return the converted character
-  //
-  return Character;
-}
-
-
-/**
-  Case independent string comparison
-
-  @param [in] pString1  Zero terminated string address
-  @param [in] pString2  Zero terminated string address
-
-  @return     Returns the first character difference between string 1
-              and string 2.
+  @retval TRUE if the context should be closed
 
 **/
-int
-stricmp (
-  char * pString1,
-  char * pString2
+BOOLEAN
+TftpAck (
+  IN TSDT_TFTP_SERVER * pTftpServer,
+  IN TSDT_CONNECTION_CONTEXT * pContext
   )
 {
-  int Char1;
-  int Char2;
-  int Difference;
+  INTN AckNumber;
+  BOOLEAN bCloseContext;
+  UINT16 BlockNumber;
+  UINT8 * pBuffer;
+  TFTP_PACKET * pPacket;
+  EFI_STATUS Status;
+
+  DBG_ENTER ( );
 
   //
-  //  Walk the length of the strings
+  //  Use break instead of goto
   //
-  do {
+  bCloseContext = FALSE;
+  for ( ; ; ) {
     //
-    //  Get the next characters
+    //  Validate the parameters
     //
-    Char1 = (UINT8)*pString1++;
-    Char2 = (UINT8)*pString2++;
-
-    //
-    //  Convert them to lower case
-    //
-    Char1 = tolower ( Char1 );
-    Char2 = tolower ( Char2 );
-
-    //
-    //  Done when the characters differ
-    //
-    Difference = Char1 - Char2;
-    if ( 0 != Difference ) {
+    if ( NULL == pContext ) {
+      if ( AF_INET == pTftpServer->RemoteAddress.v4.sin_family ) {
+        DEBUG (( DEBUG_ERROR,
+                  "ERROR - File not open for %d.%d.%d.%d:%d\r\n",
+                  (UINT8)pTftpServer->RemoteAddress.v4.sin_addr.s_addr,
+                  (UINT8)( pTftpServer->RemoteAddress.v4.sin_addr.s_addr >> 8 ),
+                  (UINT8)( pTftpServer->RemoteAddress.v4.sin_addr.s_addr >> 16 ),
+                  (UINT8)( pTftpServer->RemoteAddress.v4.sin_addr.s_addr >> 24 ),
+                  htons ( pTftpServer->RemoteAddress.v4.sin_port )));
+      }
+      else {
+        DEBUG (( DEBUG_ERROR,
+                  "ERROR - File not open for [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d\r\n",
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 0 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 1 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 2 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 3 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 4 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 5 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 6 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 7 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 8 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 9 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 10 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 11 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 12 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 13 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 14 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 15 ],
+                  htons ( pTftpServer->RemoteAddress.v6.sin6_port )));
+      }
       break;
     }
 
     //
-    //  Done at the end of the string
+    //  Verify that the ACK was expected
     //
-  } while ( 0 != Char1 );
+    pPacket = pContext->pTxHead;
+    if ( NULL == pPacket ) {
+      //
+      //  ACK not expected!
+      //
+      DEBUG (( DEBUG_ERROR,
+                "ERROR - Expecting data not ACKs for pContext 0x%08x\r\n",
+                pContext ));
+      break;
+    }
+
+    //
+    //  Get the ACKed block number
+    //
+    pBuffer = &pTftpServer->RxBuffer[ 0 ];
+    BlockNumber = HTONS ( *(UINT16 *)&pBuffer[ 2 ]);
+
+    //
+    //  Determine if this is the correct ACK
+    //
+    DEBUG (( DEBUG_TFTP_ACK,
+              "ACK for block 0x%04x received\r\n",
+              BlockNumber ));
+    AckNumber = BlockNumber - pPacket->BlockNumber;
+    if (( 0 > AckNumber ) || ( AckNumber >= (INTN)pContext->PacketsInWindow )){
+      DEBUG (( DEBUG_WARN | DEBUG_TFTP_ACK,
+                "WARNING - Expecting ACK 0x%0x4 not received ACK 0x%08x\r\n",
+                pPacket->BlockNumber,
+                BlockNumber ));
+      break;
+    }
+
+    //
+    //  Release the ACKed packets
+    //
+    do {
+      //
+      //  Remove the packet from the transmit list and window
+      //
+      pPacket = PacketRemove ( pContext );
+
+      //
+      //  Get the block number of this packet
+      //
+      AckNumber = pPacket->BlockNumber;
+
+      //
+      //  Increase the size of the transmit window
+      //
+      if ( PcdGetBool ( Tftp_HighSpeed )
+        && ( AckNumber == BlockNumber )) {
+        WindowAck ( pTftpServer, pContext, pPacket );
+      }
+
+      //
+      //  Free this packet
+      //
+      PacketFree ( pContext, pPacket );
+    } while (( NULL != pContext->pTxHead ) && ( AckNumber != BlockNumber ));
+
+    //
+    //  Fill the window with packets
+    //
+    pPacket = pContext->pTxHead;
+    while (( NULL != pPacket )
+      && ( pContext->PacketsInWindow < pContext->WindowSize )
+      && ( !bCloseContext )) {
+      Status = PacketTx ( pContext, pPacket );
+      bCloseContext = (BOOLEAN)( EFI_ERROR ( Status ));
+      pPacket = pPacket->pNext;
+    }
+    
+    //
+    //  Get more packets ready for transmission
+    //
+    PacketFill ( pContext );
+
+    //
+    //  Close the context when the last packet is ACKed
+    //
+    if ( 0 == pContext->PacketsInWindow ) {
+      bCloseContext = TRUE;
+
+      //
+      //  Display the bandwidth
+      //
+      if ( PcdGetBool ( Tftp_Bandwidth )) {
+        UINT64 Bandwidth;
+        UINT64 DeltaTime;
+        UINT64 NanoSeconds;
+        UINT32 Value;
+
+        //
+        //  Compute the download time
+        //
+        DeltaTime = GetPerformanceCounter ( );
+        if ( pTftpServer->Time2 > pTftpServer->Time1 ) {
+          DeltaTime = DeltaTime - pContext->TimeStart;
+        }
+        else {
+          DeltaTime = pContext->TimeStart - DeltaTime;
+        }
+        NanoSeconds = GetTimeInNanoSecond ( DeltaTime );
+        Bandwidth = pContext->LengthInBytes;
+        DEBUG (( DEBUG_WINDOW,
+                  "File Length %Ld, Transfer Time: %d.%03d Sec\r\n",
+                  Bandwidth,
+                  DivU64x32 ( NanoSeconds, 1000 * 1000 * 1000 ),
+                  ((UINT32)DivU64x32 ( NanoSeconds, 1000 * 1000 )) % 1000 ));
+
+        //
+        //  Display the round trip time
+        //
+        Bandwidth = MultU64x32 ( Bandwidth, 8 * 1000 * 1000 );
+        Bandwidth /= NanoSeconds;
+        if ( 1000 > Bandwidth ) {
+          Value = (UINT32)Bandwidth;
+          Print ( L"Bandwidth: %d Kbits/Sec\r\n",
+                  Value );
+        }
+        else if (( 1000 * 1000 ) > Bandwidth ) {
+          Value = (UINT32)Bandwidth;
+          Print ( L"Bandwidth: %d.%03d Mbits/Sec\r\n",
+                  Value / 1000,
+                  Value % 1000 );
+        }
+        else {
+          Value = (UINT32)DivU64x32 ( Bandwidth, 1000 );
+          Print ( L"Bandwidth: %d.%03d Gbits/Sec\r\n",
+                  Value / 1000,
+                  Value % 1000 );
+        }
+      }
+    }
+    break;
+  }
 
   //
-  //  Return the difference
+  //  Return the operation status
   //
-  return Difference;
+  DBG_EXIT ( );
+  return bCloseContext;
 }
 
 
@@ -539,7 +1245,7 @@ TftpOptionSet (
 /**
   Process the TFTP request
 
-  @param [in] pContext  The context structure address.
+  @param [in] pContext  Address of a ::TSDT_CONNECTION_CONTEXT structure
   @param [in] pOption   Address of the first zero terminated option string
   @param [in] pEnd      End of buffer address
 
@@ -553,20 +1259,27 @@ TftpOptions (
 {
   UINT8 * pNextOption;
   UINT8 * pOack;
+  TFTP_PACKET * pPacket;
   UINT8 * pTemp;
   UINT8 * pValue;
   EFI_STATUS Status;
   INT32 Value;
 
   //
+  //  Get a packet
+  //
+  pPacket = PacketGet ( pContext );
+
+  //
   //  Start the OACK packet
   //  Let the OACK handle the parsing errors
   //  See http://tools.ietf.org/html/rfc2347
   //
-  pOack = &pContext->TxBuffer[0];
+  pOack = &pPacket->TxBuffer[ 0 ];
   *pOack++ = 0;
   *pOack++ = TFTP_OP_OACK;
-  pContext->TxBytes = 2;
+  pPacket->TxBytes = 2;
+  pPacket->BlockNumber = 0;
 
   //
   //  Walk the list of options
@@ -585,7 +1298,7 @@ TftpOptions (
       //  blksize - See http://tools.ietf.org/html/rfc2348
       //
       pValue = pNextOption;
-      if ( 0 == stricmp ((char *)pOption, "blksize" )) {
+      if ( 0 == strcasecmp ((char *)pOption, "blksize" )) {
         //
         //  Get the value
         //
@@ -625,7 +1338,7 @@ TftpOptions (
             *pOack++ = 0;
             pOack = TftpOptionSet ( pOack, pContext->BlockSize );
             *pOack++ = 0;
-            pContext->TxBytes += pOack - pTemp;
+            pPacket->TxBytes += pOack - pTemp;
           }
         }
       }
@@ -633,7 +1346,7 @@ TftpOptions (
       //
       //  timeout - See http://tools.ietf.org/html/rfc2349
       //
-      else if ( 0 == stricmp ((char *)pOption, "timeout" )) {
+      else if ( 0 == strcasecmp ((char *)pOption, "timeout" )) {
         //
         //  Get the value
         //
@@ -644,10 +1357,10 @@ TftpOptions (
             //
             //  Set the timeout value
             //
-            pContext->Timeout = Value;
+            pContext->MaxTimeout = Value;
             DEBUG (( DEBUG_TFTP_REQUEST,
                       "Using timeout of %d seconds\r\n",
-                      pContext->Timeout ));
+                      pContext->MaxTimeout ));
 
             //
             //  Update the OACK
@@ -661,9 +1374,9 @@ TftpOptions (
             *pOack++ = 'u';
             *pOack++ = 't';
             *pOack++ = 0;
-            pOack = TftpOptionSet ( pOack, pContext->Timeout );
+            pOack = TftpOptionSet ( pOack, pContext->MaxTimeout );
             *pOack++ = 0;
-            pContext->TxBytes += pOack - pTemp;
+            pPacket->TxBytes += pOack - pTemp;
           }
         }
       }
@@ -671,7 +1384,7 @@ TftpOptions (
       //
       //  tsize - See http://tools.ietf.org/html/rfc2349
       //
-      else if ( 0 == stricmp ((char *)pOption, "tsize" )) {
+      else if ( 0 == strcasecmp ((char *)pOption, "tsize" )) {
         //
         //  Get the value
         //
@@ -698,7 +1411,7 @@ TftpOptions (
             *pOack++ = 0;
             pOack = TftpOptionSet ( pOack, pContext->LengthInBytes );
             *pOack++ = 0;
-            pContext->TxBytes += pOack - pTemp;
+            pPacket->TxBytes += pOack - pTemp;
           }
         }
       }
@@ -717,6 +1430,16 @@ TftpOptions (
     //
     pOption = pNextOption;
   } while ( pEnd > pOption );
+
+  //
+  //  Transmit the OACK if necessary
+  //
+  if ( 2 < pPacket->TxBytes ) {
+    PacketQueue ( pContext, pPacket );
+  }
+  else {
+    PacketFree ( pContext, pPacket );
+  }
 }
 
 
@@ -781,69 +1504,91 @@ TftpOptionValue (
 /**
   Process the TFTP request
 
-  @param [in] pTftpServer The TFTP server control structure address.
-  @param [in] pContext    Connection context structure address
+  @param [in] pTftpServer Address of the ::TSDT_TFTP_SERVER structure
+  @param [in] pContext    Address of a ::TSDT_CONNECTION_CONTEXT structure
+  @param [in] SocketFd    Socket file descriptor
 
 **/
 VOID
 TftpProcessRequest (
   IN TSDT_TFTP_SERVER * pTftpServer,
-  IN TSDT_CONNECTION_CONTEXT * pContext
+  IN TSDT_CONNECTION_CONTEXT * pContext,
+  IN int SocketFd
   )
 {
   BOOLEAN bCloseContext;
-  BOOLEAN bIgnorePacket;
-  UINT16 BlockNumber;
   UINT16 Opcode;
-  UINT8 * pBuffer;
-  UINT8 * pEnd;
-  UINT8 * pFileName;
-  UINT8 * pMode;
-  UINT8 * pOption;
-  EFI_STATUS Status;
 
   DBG_ENTER ( );
 
   //
   //  Get the opcode
   //
-  pBuffer = &pTftpServer->RxBuffer[0];
-  Opcode = HTONS ( *(UINT16 *)&pBuffer[0]);
-Print ( L"TFTP Opcode: 0x%08x\r\n", Opcode );
+  Opcode = HTONS ( *(UINT16 *)&pTftpServer->RxBuffer[ 0 ]);
+  DEBUG (( DEBUG_TFTP_REQUEST,
+            "TFTP Opcode: 0x%08x\r\n",
+            Opcode ));
 
   //
   //  Validate the parameters
   //
   bCloseContext = FALSE;
-  bIgnorePacket = FALSE;
   switch ( Opcode ) {
   default:
     DEBUG (( DEBUG_TFTP_REQUEST,
               "ERROR - Unknown TFTP opcode: %d\r\n",
               Opcode ));
-    bIgnorePacket = TRUE;
+    break;
+
+  case TFTP_OP_ACK:
+    bCloseContext = TftpAck ( pTftpServer, pContext );
     break;
 
   case TFTP_OP_READ_REQUEST:
+    bCloseContext = TftpRead ( pTftpServer, pContext, SocketFd );
     break;
 
+
+
+  
   case TFTP_OP_DATA:
     if ( NULL == pContext ) {
-      DEBUG (( DEBUG_ERROR,
-                "ERROR - File not open for %d.%d.%d.%d:%d\r\n",
-                (UINT8)pTftpServer->RemoteAddress.sin_addr.s_addr,
-                (UINT8)( pTftpServer->RemoteAddress.sin_addr.s_addr >> 8 ),
-                (UINT8)( pTftpServer->RemoteAddress.sin_addr.s_addr >> 16 ),
-                (UINT8)( pTftpServer->RemoteAddress.sin_addr.s_addr >> 24 ),
-                htons ( pTftpServer->RemoteAddress.sin_port )));
-      bIgnorePacket = TRUE;
+      if ( AF_INET == pTftpServer->RemoteAddress.v4.sin_family ) {
+        DEBUG (( DEBUG_ERROR,
+                  "ERROR - File not open for %d.%d.%d.%d:%d\r\n",
+                  (UINT8)pTftpServer->RemoteAddress.v4.sin_addr.s_addr,
+                  (UINT8)( pTftpServer->RemoteAddress.v4.sin_addr.s_addr >> 8 ),
+                  (UINT8)( pTftpServer->RemoteAddress.v4.sin_addr.s_addr >> 16 ),
+                  (UINT8)( pTftpServer->RemoteAddress.v4.sin_addr.s_addr >> 24 ),
+                  htons ( pTftpServer->RemoteAddress.v4.sin_port )));
+      }
+      else {
+        DEBUG (( DEBUG_ERROR,
+                  "ERROR - File not open for [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d\r\n",
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 0 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 1 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 2 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 3 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 4 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 5 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 6 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 7 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 8 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 9 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 10 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 11 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 12 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 13 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 14 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 15 ],
+                  htons ( pTftpServer->RemoteAddress.v6.sin6_port )));
+      }
       break;
     }
-    if ( pContext->bExpectAck ) {
+    if ( 0 != pContext->PacketsInWindow ) {
       DEBUG (( DEBUG_ERROR,
                 "ERROR - Expecting ACKs not data for pContext 0x%08x\r\n",
                 pContext ));
-      bIgnorePacket = TRUE;
       break;
     }
     if ( pTftpServer->RxBytes > (ssize_t)( pContext->BlockSize + 2 + 2 )) {
@@ -852,229 +1597,44 @@ Print ( L"TFTP Opcode: 0x%08x\r\n", Opcode );
                 pTftpServer->RxBytes - 2 - 2,
                 pContext->BlockSize,
                 pContext ));
-      bIgnorePacket = TRUE;
-      break;
-    }
-    break;
-
-  case TFTP_OP_ACK:
-    if ( NULL == pContext ) {
-      DEBUG (( DEBUG_ERROR,
-                "ERROR - File not open for %d.%d.%d.%d:%d\r\n",
-                (UINT8)pTftpServer->RemoteAddress.sin_addr.s_addr,
-                (UINT8)( pTftpServer->RemoteAddress.sin_addr.s_addr >> 8 ),
-                (UINT8)( pTftpServer->RemoteAddress.sin_addr.s_addr >> 16 ),
-                (UINT8)( pTftpServer->RemoteAddress.sin_addr.s_addr >> 24 ),
-                htons ( pTftpServer->RemoteAddress.sin_port )));
-      bIgnorePacket = TRUE;
-    }
-    if ( !pContext->bExpectAck ) {
-      DEBUG (( DEBUG_ERROR,
-                "ERROR - Expecting data not ACKs for pContext 0x%08x\r\n",
-                pContext ));
-      bIgnorePacket = TRUE;
       break;
     }
     break;
 
   case TFTP_OP_ERROR:
     if ( NULL == pContext ) {
-      DEBUG (( DEBUG_ERROR,
-                "ERROR - File not open for %d.%d.%d.%d:%d\r\n",
-                (UINT8)pTftpServer->RemoteAddress.sin_addr.s_addr,
-                (UINT8)( pTftpServer->RemoteAddress.sin_addr.s_addr >> 8 ),
-                (UINT8)( pTftpServer->RemoteAddress.sin_addr.s_addr >> 16 ),
-                (UINT8)( pTftpServer->RemoteAddress.sin_addr.s_addr >> 24 ),
-                htons ( pTftpServer->RemoteAddress.sin_port )));
-      bIgnorePacket = TRUE;
+      if ( AF_INET == pTftpServer->RemoteAddress.v4.sin_family ) {
+        DEBUG (( DEBUG_ERROR,
+                  "ERROR - File not open for %d.%d.%d.%d:%d\r\n",
+                  (UINT8)pTftpServer->RemoteAddress.v4.sin_addr.s_addr,
+                  (UINT8)( pTftpServer->RemoteAddress.v4.sin_addr.s_addr >> 8 ),
+                  (UINT8)( pTftpServer->RemoteAddress.v4.sin_addr.s_addr >> 16 ),
+                  (UINT8)( pTftpServer->RemoteAddress.v4.sin_addr.s_addr >> 24 ),
+                  htons ( pTftpServer->RemoteAddress.v4.sin_port )));
+      }
+      else {
+        DEBUG (( DEBUG_ERROR,
+                  "ERROR - File not open for [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d\r\n",
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 0 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 1 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 2 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 3 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 4 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 5 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 6 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 7 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 8 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 9 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 10 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 11 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 12 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 13 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 14 ],
+                  pTftpServer->RemoteAddress.v6.sin6_addr.__u6_addr.__u6_addr8[ 15 ],
+                  htons ( pTftpServer->RemoteAddress.v6.sin6_port )));
+      }
     }
     break;
-  }
-  if ( !bIgnorePacket ) {
-    //
-    //  Process the request
-    //
-    switch ( Opcode ) {
-    default:
-      DEBUG (( DEBUG_TFTP_REQUEST,
-                "ERROR - Unable to process TFTP opcode: %d\r\n",
-                Opcode ));
-      break;
-
-    case TFTP_OP_READ_REQUEST:
-
-      //
-      //  Close the context if necessary
-      //
-      if ( NULL != pContext ) {
-        ContextRemove ( pTftpServer, pContext );
-      }
-
-      //
-      //  Create the connection context
-      //
-      pContext = ContextAdd ( pTftpServer );
-      if ( NULL == pContext ) {
-        break;
-      }
-
-      //
-      //  Locate the mode
-      //
-      pFileName = &pBuffer[2];
-      pEnd = &pBuffer[pTftpServer->RxBytes];
-      pMode = pFileName;
-      while (( pEnd > pMode ) && ( 0 != *pMode )) {
-        pMode += 1;
-      }
-      if ( pEnd <= pMode ) {
-        //
-        //  Mode not found
-        //
-        DEBUG (( DEBUG_ERROR | DEBUG_RX,
-                  "ERROR - File mode not found\r\n" ));
-        //
-        //  Tell the client of the error
-        //
-        TftpSendError ( pTftpServer,
-                        pContext,
-                        0,
-                        (UINT8 *)"File open mode not found" );
-        break;
-      }
-      pMode += 1;
-      DEBUG (( DEBUG_TFTP_REQUEST,
-                "TFTP - FileName: %a\n",
-                pFileName ));
-
-      //
-      //  Locate the options
-      //
-      pOption = pMode;
-      while (( pEnd > pOption ) && ( 0 != *pOption )) {
-        pOption += 1;
-      }
-      if ( pEnd <= pOption ) {
-        //
-        //  End of mode not found
-        //
-        DEBUG (( DEBUG_ERROR | DEBUG_RX,
-                  "ERROR - File mode not valid\r\n" ));
-        //
-        //  Tell the client of the error
-        //
-        TftpSendError ( pTftpServer,
-                        pContext,
-                        0,
-                        (UINT8 *)"File open mode not valid" );
-        break;
-      }
-      pOption += 1;
-      DEBUG (( DEBUG_TFTP_REQUEST,
-                "TFTP - Mode: %a\r\n",
-                pMode ));
-
-      //
-      //  Verify the mode is supported
-      //
-      if ( 0 != stricmp ((char *)pMode, "octet" )) {
-        //
-        //  File access mode not supported
-        //
-        DEBUG (( DEBUG_ERROR | DEBUG_TFTP_REQUEST,
-                  "ERROR - File mode %a not supported\r\n",
-                  pMode ));
-
-        //
-        //  Tell the client of the error
-        //
-        TftpSendError ( pTftpServer,
-                        pContext,
-                        0,
-                        (UINT8 *)"File open mode not supported" );
-        break;
-      }
-
-      //
-      //  Open the file, close the context on error
-      //
-// TODO: Remove the following line
-pContext->File = (EFI_HANDLE)1;
-
-      //
-      //  Determine the file length
-      //
-//fstat
-
-      //
-      //  Process the options
-      //
-      TftpOptions ( pContext, pOption, pEnd );
-
-      //
-      //  Read in the first portion of the file
-      //
-
-      //
-      //  Send the first block
-      //
-      pContext->bExpectAck = TRUE;
-      if ( 2 < pContext->TxBytes ) {
-        //
-        //  Send the OACK
-        //
-        Status = TftpTxPacket ( pTftpServer, pContext );
-      }
-      else {
-        //
-        //  Send the first block of data
-        //
-        Status = TftpSendNextBlock ( pTftpServer, pContext );
-      }
-      break;
-
-    case TFTP_OP_ACK:
-      //
-      //  Get the block number that is being ACKed
-      //
-      BlockNumber = pTftpServer->RxBuffer[2];
-      BlockNumber <<= 8;
-      BlockNumber |= pTftpServer->RxBuffer[3];
-
-      //
-      //  Determine if this is the correct ACK
-      //
-      DEBUG (( DEBUG_TFTP_ACK,
-                "ACK for block 0x%04x received\r\n",
-                BlockNumber ));
-      if (( !pContext->bExpectAck )
-        || ( BlockNumber != pContext->AckNext )) {
-        DEBUG (( DEBUG_WARN | DEBUG_TFTP_ACK,
-                  "WARNING - Expecting ACK 0x%0x4 not received ACK 0x%08x\r\n",
-                  pContext->AckNext,
-                  BlockNumber ));
-      }
-      else {
-        //
-        //  Process the expected ACK
-        //
-        if ( pContext->bEofSent ) {
-          bCloseContext = TRUE;
-        }
-        else {
-          //
-          //  Set the next expected ACK
-          //
-          pContext->AckNext += 1;
-
-          //
-          //  Send the next packet of data
-          //
-          Status = TftpSendNextBlock ( pTftpServer, pContext );
-        }
-      }
-      break;
-    }
   }
 
   //
@@ -1089,119 +1649,229 @@ pContext->File = (EFI_HANDLE)1;
 
 
 /**
-  Build and send an error packet
+  Process the read request
 
-  @param [in] pTftpServer The TFTP server control structure address.
-  @param [in] pContext    The context structure address.
-  @param [in] Error       Error number for the packet
-  @param [in] pError      Zero terminated error string address
+  @param [in] pTftpServer Address of the ::TSDT_TFTP_SERVER structure
+  @param [in] pContext    Address of a ::TSDT_CONNECTION_CONTEXT structure
+  @param [in] SocketFd    Socket file descriptor
 
-  @retval EFI_SUCCESS     Message processed successfully
+  @retval TRUE if the context should be closed
 
 **/
-EFI_STATUS
-TftpSendError (
+BOOLEAN
+TftpRead (
   IN TSDT_TFTP_SERVER * pTftpServer,
   IN TSDT_CONNECTION_CONTEXT * pContext,
-  IN UINT16 Error,
-  IN UINT8 * pError
+  IN int SocketFd
   )
 {
-  UINT8 Character;
+  BOOLEAN bCloseContext;
+  struct stat FileStatus;
   UINT8 * pBuffer;
-  EFI_STATUS Status;
+  UINT8 * pEnd;
+  UINT8 * pFileName;
+  UINT8 * pMode;
+  UINT8 * pOption;
+  CHAR8 * pReadMode;
+  UINT64 TimeStart;
 
   DBG_ENTER ( );
 
   //
-  //  Build the error packet
+  //  Log the receive time
   //
-  pBuffer = &pContext->TxBuffer[0];
-  pBuffer[0] = 0;
-  pBuffer[1] = TFTP_OP_ERROR;
-  pBuffer[2] = (UINT8)( Error >> 8 );
-  pBuffer[3] = (UINT8)Error;
-
-  //
-  //  Copy the zero terminated string into the buffer
-  //
-  pBuffer += 4;
-  do {
-    Character = *pError++;
-    *pBuffer++ = Character;
-  } while ( 0 != Character );
-
-  //
-  //  Send the error message
-  //
-  pContext->TxBytes = pBuffer - &pContext->TxBuffer[0];
-  Status = TftpTxPacket ( pTftpServer, pContext );
-
-  //
-  //  Return the operation status
-  //
-  DBG_EXIT_STATUS ( Status );
-  return Status;
-}
-
-
-/**
-  Send the next block of file system data
-
-  @param [in] pTftpServer The TFTP server control structure address.
-  @param [in] pContext    The context structure address.
-
-  @retval EFI_SUCCESS   Message processed successfully
-
-**/
-EFI_STATUS
-TftpSendNextBlock (
-  IN TSDT_TFTP_SERVER * pTftpServer,
-  IN TSDT_CONNECTION_CONTEXT * pContext
-  )
-{
-  ssize_t LengthInBytes;
-  UINT8 * pBuffer;
-  EFI_STATUS Status;
-
-  //
-  //  Determine how much data needs to be sent
-  //
-  LengthInBytes = pContext->BlockSize;
-  if (( pContext->LengthInBytes < TFTP_MAX_BLOCK_SIZE )
-    || ( LengthInBytes > (ssize_t)pContext->LengthInBytes )) {
-    LengthInBytes = (ssize_t)pContext->LengthInBytes;
-    pContext->bEofSent = TRUE;
+  TimeStart = 0;
+  if ( PcdGetBool ( Tftp_Bandwidth )) {
+    TimeStart = GetPerformanceCounter ( );
   }
 
   //
-  //  Set the TFTP opcode and block number
+  //  Close the context if necessary
   //
-  pBuffer = &pContext->TxBuffer[0];
-  *pBuffer++ = 0;
-  *pBuffer++ = TFTP_OP_DATA;
-  *pBuffer++ = (UINT8)( pContext->AckNext >> 8 );
-  *pBuffer++ = (UINT8)pContext->AckNext;
-
-  //
-  //  Copy the file data into the transmit buffer
-  //
-  pContext->TxBytes = 2 + 2 + LengthInBytes;
-  if ( 0 < LengthInBytes ) {
-    CopyMem ( &pBuffer,
-              pContext->pBuffer,
-              LengthInBytes );
+  bCloseContext = FALSE;
+  if ( NULL != pContext ) {
+    ContextRemove ( pTftpServer, pContext );
   }
 
   //
-  //  Send the next block
+  //  Use break instead of goto
   //
-  Status = TftpTxPacket ( pTftpServer, pContext );
+  for ( ; ; ) {
+    //
+    //  Create the connection context
+    //
+    pContext = ContextAdd ( pTftpServer, SocketFd );
+    if ( NULL == pContext ) {
+      break;
+    }
+
+    //
+    //  Set the start time
+    //
+    if ( PcdGetBool ( Tftp_Bandwidth )) {
+      pContext->TimeStart = TimeStart;
+    }
+
+    //
+    //  Locate the mode
+    //
+    pBuffer = &pTftpServer->RxBuffer[ 0 ];
+    pEnd = &pBuffer[ pTftpServer->RxBytes ];
+    pFileName = &pBuffer[ 2 ];
+    pMode = pFileName;
+    while (( pEnd > pMode ) && ( 0 != *pMode )) {
+      pMode += 1;
+    }
+    if ( pEnd <= pMode ) {
+      //
+      //  Mode not found
+      //
+      DEBUG (( DEBUG_ERROR | DEBUG_RX,
+                "ERROR - File mode not found\r\n" ));
+      //
+      //  Tell the client of the error
+      //
+      SendError ( pContext,
+                  TFTP_ERROR_SEE_MSG,
+                  (UINT8 *)"File open mode not found" );
+      break;
+    }
+    pMode += 1;
+    DEBUG (( DEBUG_TFTP_REQUEST,
+              "TFTP - FileName: %a\r\n",
+              pFileName ));
+
+    //
+    //  Locate the options
+    //
+    pOption = pMode;
+    while (( pEnd > pOption ) && ( 0 != *pOption )) {
+      pOption += 1;
+    }
+    if ( pEnd <= pOption ) {
+      //
+      //  End of mode not found
+      //
+      DEBUG (( DEBUG_ERROR | DEBUG_RX,
+                "ERROR - File mode not valid\r\n" ));
+      //
+      //  Tell the client of the error
+      //
+      SendError ( pContext,
+                  TFTP_ERROR_SEE_MSG,
+                  (UINT8 *)"File open mode not valid" );
+      break;
+    }
+    pOption += 1;
+    DEBUG (( DEBUG_TFTP_REQUEST,
+              "TFTP - Mode: %a\r\n",
+              pMode ));
+
+    //
+    //  Verify the mode is supported
+    //
+    pReadMode = "r";
+    if ( 0 == strcasecmp ((char *)pMode, "octet" )) {
+      //
+      //  Read the file as binary input
+      //
+      pReadMode = "rb";
+    }
+
+    //
+    //  Determine the file length
+    //
+    pContext->File = fopen ( pFileName, pReadMode );
+    if (( NULL == pContext->File )
+        || ( -1 == stat ( pFileName, &FileStatus ))) {
+      //
+      //  File not found
+      //
+      DEBUG (( DEBUG_ERROR | DEBUG_TFTP_REQUEST,
+                ( NULL == pContext->File )
+                ? "ERROR - File not found!\r\n"
+                : "ERROR - Unable to determine file %a size!\r\n",
+                pFileName ));
+
+      //
+      //  Tell the client of the error
+      //
+      SendError ( pContext,
+                  TFTP_ERROR_NOT_FOUND,
+                  (UINT8 *)"File not found" );
+      break;
+    }
+    pContext->LengthInBytes = FileStatus.st_size;
+    pContext->BytesRemaining = pContext->LengthInBytes;
+    pContext->BytesToSend = pContext->LengthInBytes;
+
+    //
+    //  Display the file size
+    //
+    DEBUG_CODE_BEGIN ( );
+    UINT32 Value;
+
+    if ( 1024 > pContext->LengthInBytes ) {
+      Value = (UINT32)pContext->LengthInBytes;
+      DEBUG (( DEBUG_FILE_BUFFER,
+                "%a size: %d Bytes\r\n",
+                pFileName,
+                Value ));
+    }
+    else if (( 1024 * 1024 ) > pContext->LengthInBytes ) {
+      Value = (UINT32)pContext->LengthInBytes;
+      DEBUG (( DEBUG_FILE_BUFFER,
+                "%a size: %d.%03d KiBytes (%Ld Bytes)\r\n",
+                pFileName,
+                Value / 1024,
+                (( Value % 1024 ) * 1000 ) / 1024,
+                pContext->LengthInBytes ));
+    }
+    else if (( 1024 * 1024 * 1024 ) > pContext->LengthInBytes ) {
+      Value = (UINT32)DivU64x32 ( pContext->LengthInBytes, 1024 );
+      DEBUG (( DEBUG_FILE_BUFFER,
+                "%a size: %d.%03d MiBytes (%Ld Bytes)\r\n",
+                pFileName,
+                Value / 1024,
+                (( Value % 1024 ) * 1000 ) / 1024,
+                pContext->LengthInBytes ));
+    }
+    else {
+      Value = (UINT32)DivU64x32 ( pContext->LengthInBytes, 1024 * 1024 );
+      DEBUG (( DEBUG_FILE_BUFFER,
+                "%a size: %d.%03d GiBytes (%Ld Bytes)\r\n",
+                pFileName,
+                Value / 1024,
+                (( Value % 1024 ) * 1000 ) / 1024,
+                pContext->LengthInBytes ));
+    }
+    DEBUG_CODE_END ( );
+
+    //
+    //  Process the options
+    //
+    if ( pEnd > pOption ) {
+      TftpOptions ( pContext, pOption, pEnd );
+    }
+    else {
+      //
+      //  Skip the open ACK
+      //
+      pContext->BlockNumber = 1;
+    }
+
+    //
+    //  Send the first packet (OACK or data block)
+    //
+    bCloseContext = PacketFill ( pContext );
+    break;
+  }
 
   //
-  //  Return the operation status
+  //  Return the close status
   //
-  return Status;
+  DBG_EXIT ( );
+  return bCloseContext;
 }
 
 
@@ -1213,241 +1883,314 @@ TftpSendNextBlock (
   some time to get the IP address and initialize the upper layers of
   the network stack.
 
-  @param [in] pTftpServer  The TFTP server control structure address.
+  @param [in] pTftpServer   Address of the ::TSDT_TFTP_SERVER structure
+  @param [in] AddressFamily The address family to use for the conection.
+  @param [in] pIndex        Address of the index into the port array
 
 **/
 VOID
-TftpServerTimer (
-  IN TSDT_TFTP_SERVER * pTftpServer
+TftpServerSocket (
+  IN TSDT_TFTP_SERVER * pTftpServer,
+  IN sa_family_t AddressFamily,
+  IN int * pIndex
   )
 {
-  UINT16 TftpPort;
   int SocketStatus;
-  EFI_STATUS Status;
+  struct pollfd * pTftpPort;
+  UINT16 TftpPort;
+  union {
+    struct sockaddr_in v4;
+    struct sockaddr_in6 v6;
+  } TftpServerAddress;
 
-  DEBUG (( DEBUG_SERVER_TIMER, "Entering TftpServerTimer\r\n" ));
+  DEBUG (( DEBUG_SERVER_TIMER, "Entering TftpServerListen\r\n" ));
 
   //
-  //  Open the TFTP port on the server
+  //  Determine if the socket is already initialized
   //
-  do {
-    do {
-      //
-      //  Wait for a while
-      //
-      Status = gBS->CheckEvent ( pTftpServer->TimerEvent );
-    } while ( EFI_SUCCESS != Status );
-
+  if ( -1 == *pIndex ) {
     //
     //  Attempt to create the socket for the TFTP server
     //
-    pTftpServer->TftpPort.events = POLLRDNORM | POLLHUP;
-    pTftpServer->TftpPort.revents = 0;
-    pTftpServer->TftpPort.fd = socket ( AF_INET,
-                                        SOCK_DGRAM,
-                                        IPPROTO_UDP );
-    if ( -1 != pTftpServer->TftpPort.fd ) {
+    pTftpPort = &pTftpServer->TftpPort[ pTftpServer->Entries ];
+    pTftpPort->fd = socket ( AddressFamily,
+                             SOCK_DGRAM,
+                             IPPROTO_UDP );
+    if ( -1 != pTftpPort->fd ) {
+      //
+      //  Initialize the poll structure
+      //
+      pTftpPort->events = POLLRDNORM | POLLHUP;
+      pTftpPort->revents = 0;
+
       //
       //  Set the socket address
       //
-      ZeroMem ( &pTftpServer->TftpServerAddress,
-                sizeof ( pTftpServer->TftpServerAddress ));
       TftpPort = 69;
-      DEBUG (( DEBUG_TFTP_PORT,
-                "TFTP Port: %d\r\n",
-                TftpPort ));
-      pTftpServer->TftpServerAddress.sin_len = sizeof ( pTftpServer->TftpServerAddress );
-      pTftpServer->TftpServerAddress.sin_family = AF_INET;
-      pTftpServer->TftpServerAddress.sin_addr.s_addr = INADDR_ANY;
-      pTftpServer->TftpServerAddress.sin_port = htons ( TftpPort );
+      ZeroMem ( &TftpServerAddress, sizeof ( TftpServerAddress ));
+      TftpServerAddress.v4.sin_port = htons ( TftpPort );
+      if ( AF_INET == AddressFamily ) {
+        TftpServerAddress.v4.sin_len = sizeof ( TftpServerAddress.v4 );
+        TftpServerAddress.v4.sin_family = AF_INET;
+      }
+      else {
+        TftpServerAddress.v6.sin6_len = sizeof ( TftpServerAddress.v6 );
+        TftpServerAddress.v6.sin6_family = AF_INET6;
+      }
 
       //
       //  Bind the socket to the TFTP port
       //
-      SocketStatus = bind ( pTftpServer->TftpPort.fd,
-                            (struct sockaddr *) &pTftpServer->TftpServerAddress,
-                            pTftpServer->TftpServerAddress.sin_len );
+      SocketStatus = bind ( pTftpPort->fd,
+                            (struct sockaddr *) &TftpServerAddress,
+                            TftpServerAddress.v6.sin6_len );
       if ( -1 != SocketStatus ) {
         DEBUG (( DEBUG_TFTP_PORT,
                   "0x%08x: Socket bound to port %d\r\n",
-                  pTftpServer->TftpPort.fd,
+                  pTftpPort->fd,
                   TftpPort ));
+
+        //
+        //  Account for this connection
+        //
+        *pIndex = pTftpServer->Entries;
+        pTftpServer->Entries += 1;
+        ASSERT ( DIM ( pTftpServer->TftpPort ) >= pTftpServer->Entries );
       }
 
       //
       //  Release the socket if necessary
       //
       if ( -1 == SocketStatus ) {
-        close ( pTftpServer->TftpPort.fd );
-        pTftpServer->TftpPort.fd = -1;
+        close ( pTftpPort->fd );
+        pTftpPort->fd = -1;
+      }
+    }
+  }
+
+  DEBUG (( DEBUG_SERVER_TIMER, "Exiting TftpServerListen\r\n" ));
+}
+
+
+/**
+  Update the window due to the ACK
+
+  @param [in] pTftpServer Address of the ::TSDT_TFTP_SERVER structure
+  @param [in] pContext    Address of a ::TSDT_CONNECTION_CONTEXT structure
+  @param [in] pPacket     Address of a ::TFTP_PACKET structure
+
+**/
+VOID
+WindowAck (
+  IN TSDT_TFTP_SERVER * pTftpServer,
+  IN TSDT_CONNECTION_CONTEXT * pContext,
+  IN TFTP_PACKET * pPacket
+  )
+{
+  if ( PcdGetBool ( Tftp_HighSpeed )) {
+    UINT64 DeltaTime;
+    UINT64 NanoSeconds;
+
+    DBG_ENTER ( );
+
+    //
+    //  Compute the round trip time
+    //
+    if ( pTftpServer->Time2 > pTftpServer->Time1 ) {
+      DeltaTime = pTftpServer->RxTime - pPacket->TxTime;
+    }
+    else {
+      DeltaTime = pPacket->TxTime - pTftpServer->RxTime;
+    }
+
+    //
+    //  Adjust the round trip time
+    //
+    NanoSeconds = GetTimeInNanoSecond ( DeltaTime );
+    DeltaTime = RShiftU64 ( pContext->Rtt2x, ACK_SHIFT );
+    pContext->Rtt2x += NanoSeconds + NanoSeconds - DeltaTime;
+    if ( pContext->Rtt2x > pContext->MaxTimeout ) {
+      pContext->Rtt2x = pContext->MaxTimeout;
+    }
+
+    //
+    //  Account for the ACK
+    //
+    if ( pContext->WindowSize < MAX_PACKETS ) {
+      pContext->AckCount -= 1;
+      if ( 0 == pContext->AckCount ) {
+        //
+        //  Increase the window
+        //
+        pContext->WindowSize += 1;
+
+        //
+        //  Set the ACK count
+        //
+        if ( pContext->WindowSize < pContext->Threshold ) {
+          pContext->AckCount = pContext->WindowSize * PcdGet32 ( Tftp_AckMultiplier );
+        }
+        else {
+          pContext->AckCount = PcdGet32 ( Tftp_AckLogBase ) << pContext->WindowSize;
+        }
+
+        //
+        //  Display the round trip time
+        //
+        DEBUG_CODE_BEGIN ( );
+        UINT32 Value;
+        
+        DeltaTime = RShiftU64 ( pContext->Rtt2x, 1 );
+        if ( 1000 > DeltaTime ) {
+          DEBUG (( DEBUG_WINDOW,
+                    "WindowSize: %d, Threshold: %d, AckCount: %4d, RTT: %Ld nSec\r\n",
+                    pContext->WindowSize,
+                    pContext->Threshold,
+                    pContext->AckCount,
+                    DeltaTime ));
+        }
+        else if (( 1000 * 1000 ) > DeltaTime ) {
+          Value = (UINT32)DeltaTime;
+          DEBUG (( DEBUG_WINDOW,
+                    "WindowSize: %d, Threshold: %d, AckCount: %4d, RTT: %d.%03d uSec\r\n",
+                    pContext->WindowSize,
+                    pContext->Threshold,
+                    pContext->AckCount,
+                    Value / 1000,
+                    Value % 1000 ));
+        }
+        else if (( 1000 * 1000 * 1000 ) > DeltaTime ) {
+          Value = (UINT32)DivU64x32 ( DeltaTime, 1000 );
+          DEBUG (( DEBUG_WINDOW,
+                    "WindowSize: %d, Threshold: %d, AckCount: %4d, RTT: %d.%03d mSec\r\n",
+                    pContext->WindowSize,
+                    pContext->Threshold,
+                    pContext->AckCount,
+                    Value / 1000,
+                    Value % 1000 ));
+        }
+        else {
+          Value = (UINT32)DivU64x32 ( DeltaTime, 1000 * 1000 );
+          DEBUG (( DEBUG_WINDOW,
+                    "WindowSize: %d, Threshold: %d, AckCount: %4d, RTT: %d.%03d Sec\r\n",
+                    pContext->WindowSize,
+                    pContext->Threshold,
+                    pContext->AckCount,
+                    Value / 1000,
+                    Value % 1000 ));
+        }
+        DEBUG_CODE_END ( );
       }
     }
 
-    //
-    //  Wait until the socket is open
-    //
-  }while ( -1 == pTftpServer->TftpPort.fd );
-
-  DEBUG (( DEBUG_SERVER_TIMER, "Exiting TftpServerTimer\r\n" ));
-}
-
-
-/**
-  Start the TFTP server port creation timer
-
-  @param [in] pTftpServer The TFTP server control structure address.
-
-  @retval EFI_SUCCESS         The timer was successfully started.
-  @retval EFI_ALREADY_STARTED The timer is already running.
-  @retval Other               The timer failed to start.
-
-**/
-EFI_STATUS
-TftpServerTimerStart (
-  IN TSDT_TFTP_SERVER * pTftpServer
-  )
-{
-  EFI_STATUS Status;
-  UINT64 TriggerTime;
-
-  DBG_ENTER ( );
-
-  //
-  //  Assume the timer is already running
-  //
-  Status = EFI_ALREADY_STARTED;
-  if ( !pTftpServer->bTimerRunning ) {
-    //
-    //  Compute the poll interval
-    //
-    TriggerTime = TFTP_PORT_POLL_DELAY * ( 1000 * 10 );
-    Status = gBS->SetTimer ( pTftpServer->TimerEvent,
-                             TimerPeriodic,
-                             TriggerTime );
-    if ( !EFI_ERROR ( Status )) {
-      DEBUG (( DEBUG_TFTP_PORT, "TFTP port timer started\r\n" ));
-
-      //
-      //  Mark the timer running
-      //
-      pTftpServer->bTimerRunning = TRUE;
-    }
-    else {
-      DEBUG (( DEBUG_ERROR | DEBUG_TFTP_PORT,
-                "ERROR - Failed to start TFTP port timer, Status: %r\r\n",
-                Status ));
-    }
+    DBG_EXIT ( );
   }
-
-  //
-  //  Return the operation status
-  //
-  DBG_EXIT_STATUS ( Status );
-  return Status;
 }
 
 
 /**
-  Stop the TFTP server port creation timer
+  A timeout has occurred, close the window
 
-  @param [in] pTftpServer The TFTP server control structure address.
-
-  @retval EFI_SUCCESS   The TFTP port timer is stopped
-  @retval Other         Failed to stop the TFTP port timer
+  @param [in] pContext    Address of a ::TSDT_CONNECTION_CONTEXT structure
 
 **/
-EFI_STATUS
-TftpServerTimerStop (
-  IN TSDT_TFTP_SERVER * pTftpServer
-  )
-{
-  EFI_STATUS Status;
-
-  DBG_ENTER ( );
-
-  //
-  //  Assume the timer is stopped
-  //
-  Status = EFI_SUCCESS;
-  if ( pTftpServer->bTimerRunning ) {
-    //
-    //  Stop the port creation polling
-    //
-    Status = gBS->SetTimer ( pTftpServer->TimerEvent,
-                             TimerCancel,
-                             0 );
-    if ( !EFI_ERROR ( Status )) {
-      DEBUG (( DEBUG_TFTP_PORT, "TFT[ port timer stopped\r\n" ));
-
-      //
-      //  Mark the timer stopped
-      //
-      pTftpServer->bTimerRunning = FALSE;
-    }
-    else {
-      DEBUG (( DEBUG_ERROR | DEBUG_TFTP_PORT,
-                "ERROR - Failed to stop TFT[ port timer, Status: %r\r\n",
-                Status ));
-    }
-  }
-
-  //
-  //  Return the operation status
-  //
-  DBG_EXIT_STATUS ( Status );
-  return Status;
-}
-
-/**
-  Send the next TFTP packet
-
-  @param [in] pTftpServer   The TFTP server control structure address.
-  @param [in] pContext      The context structure address.
-
-  @retval EFI_SUCCESS   Message processed successfully
-
-**/
-EFI_STATUS
-TftpTxPacket (
-  IN TSDT_TFTP_SERVER * pTftpServer,
+VOID
+WindowTimeout (
   IN TSDT_CONNECTION_CONTEXT * pContext
   )
 {
-  ssize_t LengthInBytes;
-  EFI_STATUS Status;
+  if ( PcdGetBool ( Tftp_HighSpeed )) {
+    TFTP_PACKET * pPacket;
 
-  DBG_ENTER ( );
+    DBG_ENTER ( );
 
-  //
-  //  Assume success
-  //
-  Status = EFI_SUCCESS;
+    //
+    //  Set the threshold at half the previous window size
+    //
+    pContext->Threshold = ( pContext->WindowSize + 1 ) >> 1;
 
-  //
-  //  Send the TFTP packet
-  //
-  DEBUG (( DEBUG_TX,
-            "0x%08x: pContext sending 0x%08x bytes\r\n",
-            pContext,
-            pContext->TxBytes ));
-  LengthInBytes = sendto ( pTftpServer->TftpPort.fd,
-                           &pContext->TxBuffer[0],
-                           pContext->TxBytes,
-                           0,
-                           (struct sockaddr *)&pContext->RemoteAddress,
-                           pContext->RemoteAddress.sin_len );
-  if ( -1 == LengthInBytes ) {
-    DEBUG (( DEBUG_ERROR | DEBUG_TX,
-              "ERROR - Transmit failure, errno: 0x%08x\r\n",
-              errno ));
-    Status = EFI_DEVICE_ERROR;
+    //
+    //  Close the transmit window
+    //
+    pContext->WindowSize = 1;
+    pContext->PacketsInWindow = 0;
+
+    //
+    //  Double the round trip time
+    //
+    pContext->Rtt2x = LShiftU64 ( pContext->Rtt2x, 1 );
+    if ( pContext->Rtt2x > pContext->MaxTimeout ) {
+      pContext->Rtt2x = pContext->MaxTimeout;
+    }
+
+    //
+    //  Set the ACK count
+    //
+    if ( pContext->WindowSize < pContext->Threshold ) {
+      pContext->AckCount = pContext->WindowSize * PcdGet32 ( Tftp_AckMultiplier );
+    }
+    else {
+      pContext->AckCount = PcdGet32 ( Tftp_AckLogBase ) << pContext->WindowSize;
+    }
+
+    //
+    //  Display the round trip time
+    //
+    DEBUG_CODE_BEGIN ( );
+    UINT64 DeltaTime;
+    UINT32 Value;
+    
+    DeltaTime = RShiftU64 ( pContext->Rtt2x, 1 );
+    if ( 1000 > DeltaTime ) {
+      DEBUG (( DEBUG_WINDOW,
+                "WindowSize: %d, Threshold: %d, AckCount: %4d, RTT: %Ld nSec\r\n",
+                pContext->WindowSize,
+                pContext->Threshold,
+                pContext->AckCount,
+                DeltaTime ));
+    }
+    else if (( 1000 * 1000 ) > DeltaTime ) {
+      Value = (UINT32)DeltaTime;
+      DEBUG (( DEBUG_WINDOW,
+                "WindowSize: %d, Threshold: %d, AckCount: %4d, RTT: %d.%03d uSec\r\n",
+                pContext->WindowSize,
+                pContext->Threshold,
+                pContext->AckCount,
+                Value / 1000,
+                Value % 1000 ));
+    }
+    else if (( 1000 * 1000 * 1000 ) > DeltaTime ) {
+      Value = (UINT32)DivU64x32 ( DeltaTime, 1000 );
+      DEBUG (( DEBUG_WINDOW,
+                "WindowSize: %d, Threshold: %d, AckCount: %4d, RTT: %d.%03d mSec\r\n",
+                pContext->WindowSize,
+                pContext->Threshold,
+                pContext->AckCount,
+                Value / 1000,
+                Value % 1000 ));
+    }
+    else {
+      Value = (UINT32)DivU64x32 ( DeltaTime, 1000 * 1000 );
+      DEBUG (( DEBUG_WINDOW,
+                "WindowSize: %d, Threshold: %d, AckCount: %4d, RTT: %d.%03d Sec\r\n",
+                pContext->WindowSize,
+                pContext->Threshold,
+                pContext->AckCount,
+                Value / 1000,
+                Value % 1000 ));
+    }
+    DEBUG_CODE_END ( );
+
+    //
+    //  Retransmit the first packet in the window
+    //
+    pPacket = pContext->pTxHead;
+    if ( NULL != pPacket ) {
+      PacketTx ( pContext, pPacket );
+    }
+    
+    DBG_EXIT ( );
   }
-
-  //
-  //  Return the operation status
-  //
-  DBG_EXIT_STATUS ( Status );
-  return Status;
 }
 
 
@@ -1466,25 +2209,46 @@ main (
   IN char **Argv
   )
 {
+  UINTN Index;
   TSDT_TFTP_SERVER * pTftpServer;
   EFI_STATUS Status;
+  UINT64 TriggerTime;
+
+  //
+  //  Get the performance counter characteristics
+  //
+  pTftpServer = &mTftpServer;
+  if ( PcdGetBool ( Tftp_HighSpeed )
+    || PcdGetBool ( Tftp_Bandwidth )) {
+    pTftpServer->ClockFrequency = GetPerformanceCounterProperties ( &pTftpServer->Time1,
+                                                                  &pTftpServer->Time2 );
+  }
 
   //
   //  Create a timer event to start TFTP port
   //
-  pTftpServer = &mTftpServer;
   Status = gBS->CreateEvent ( EVT_TIMER,
                               TPL_TFTP_SERVER,
                               NULL,
                               NULL,
                               &pTftpServer->TimerEvent );
   if ( !EFI_ERROR ( Status )) {
-    Status = TftpServerTimerStart ( pTftpServer );
+    //
+    //  Compute the poll interval
+    //
+    TriggerTime = TFTP_PORT_POLL_DELAY * ( 1000 * 10 );
+    Status = gBS->SetTimer ( pTftpServer->TimerEvent,
+                             TimerPeriodic,
+                             TriggerTime );
     if ( !EFI_ERROR ( Status )) {
+      DEBUG (( DEBUG_TFTP_PORT, "TFTP port timer started\r\n" ));
+
       //
       //  Run the TFTP server forever
       //
-      for ( ; ; ) {
+      pTftpServer->Udpv4Index = -1;
+      pTftpServer->Udpv6Index = -1;
+      do {
         //
         //  Poll the network layer to create the TFTP port
         //  for the tftp server.  More than one attempt may
@@ -1492,28 +2256,107 @@ main (
         //  the IP address and initialize the upper layers
         //  of the network stack.
         //
-        TftpServerTimer ( pTftpServer );
+        if ( DIM ( pTftpServer->TftpPort ) != pTftpServer->Entries ) {
+          do {
+            //
+            //  Wait a while before polling for a connection
+            //
+            if ( EFI_SUCCESS != gBS->CheckEvent ( pTftpServer->TimerEvent )) {
+              if ( 0 == pTftpServer->Entries ) {
+                break;
+              }
+              gBS->WaitForEvent ( 1, &pTftpServer->TimerEvent, &Index );
+            }
+
+            //
+            //  Poll for a network connection
+            //
+            TftpServerSocket ( pTftpServer,
+                               AF_INET,
+                               &pTftpServer->Udpv4Index );
+            TftpServerSocket ( pTftpServer,
+                               AF_INET6,
+                               &pTftpServer->Udpv6Index );
+          } while ( 0 == pTftpServer->Entries );
+        }
 
         //
         //  Poll the socket for activity
         //
         do {
           SocketPoll ( pTftpServer );
-        } while ( -1 != pTftpServer->TftpPort.fd );
 
-//
-// TODO: Remove the following test code
-//  Exit when the network connection is broken
-//
-break;
-      }
+          //
+          //  Normal TFTP lets the client request the retransmit by
+          //  sending another ACK for the previous packet
+          //
+          if ( PcdGetBool ( Tftp_HighSpeed )) {
+            UINT64 CurrentTime;
+            UINT64 ElapsedTime;
+            TSDT_CONNECTION_CONTEXT * pContext;
+            TFTP_PACKET * pPacket;
+
+            //
+            //  High speed TFTP uses an agressive retransmit to
+            //  get the TFTP client moving again when the ACK or
+            //  previous data packet was lost.
+            //
+            //  Get the current time
+            //
+            CurrentTime = GetPerformanceCounter ( );
+
+            //
+            //  Walk the list of contexts
+            //
+            pContext = pTftpServer->pContextList;
+            while ( NULL != pContext )
+            {
+              //
+              //  Check for a transmit timeout
+              //
+              pPacket = pContext->pTxHead;
+              if ( NULL != pPacket ) {
+                //
+                //  Compute the elapsed time
+                //
+                if ( pTftpServer->Time2 > pTftpServer->Time1 ) {
+                  ElapsedTime = CurrentTime - pPacket->TxTime;
+                }
+                else {
+                  ElapsedTime = pPacket->TxTime - CurrentTime;
+                }
+                ElapsedTime = GetTimeInNanoSecond ( ElapsedTime );
+
+                //
+                //  Determine if a retransmission is necessary
+                //
+                if ( ElapsedTime >= pContext->Rtt2x ) {
+                  DEBUG (( DEBUG_WINDOW,
+                            "0x%08x: Context TX timeout for packet 0x%08x, Window: %d\r\n",
+                            pContext,
+                            pPacket,
+                            pContext->WindowSize ));
+                  WindowTimeout ( pContext );
+                }
+              }
+
+              //
+              //  Set the next context
+              //
+              pContext = pContext->pNext;
+            }
+          }
+        } while ( DIM ( pTftpServer->TftpPort ) == pTftpServer->Entries );
+      } while ( !mbTftpServerExit );
 
       //
       //  Done with the timer event
       //
-      TftpServerTimerStop ( pTftpServer );
-      Status = gBS->CloseEvent ( pTftpServer->TimerEvent );
+      gBS->SetTimer ( pTftpServer->TimerEvent,
+                      TimerCancel,
+                      0 );
     }
+    gBS->CloseEvent ( pTftpServer->TimerEvent );
   }
 
   //

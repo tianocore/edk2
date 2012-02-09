@@ -337,7 +337,7 @@ PortWork (
   size_t LengthInBytes;
   int NewSocket;
   EFI_STATUS OpStatus;
-  struct sockaddr RemoteAddress;
+  struct sockaddr_in6 RemoteAddress;
   socklen_t RemoteAddressLength;
   EFI_STATUS Status;
 
@@ -355,14 +355,15 @@ PortWork (
     //
     //  Determine if this is a connection attempt
     //
-    if ( SocketFD == pWebServer->HttpListenPort ) {
+    if (( SocketFD == pWebServer->HttpListenPort )
+      || ( SocketFD == pWebServer->HttpListenPort6 )) {
       //
       //  Handle connection attempts
       //  Accepts arrive as read events
       //
       RemoteAddressLength = sizeof ( RemoteAddress );
       NewSocket = accept ( SocketFD,
-                           &RemoteAddress,
+                           (struct sockaddr *)&RemoteAddress,
                            &RemoteAddressLength );
       if ( -1 != NewSocket ) {
         if ( 0 != NewSocket ) {
@@ -561,9 +562,9 @@ SocketPoll (
 
 
 /**
-  Create the HTTP port for the web server
+  Create an HTTP port for the web server
 
-  This routine polls the network layer to create the HTTP port for the
+  This routine polls the network layer to create an HTTP port for the
   web server.  More than one attempt may be necessary since it may take
   some time to get the IP address and initialize the upper layers of
   the network stack.
@@ -572,194 +573,92 @@ SocketPoll (
   coming and going of the network connections until the last network
   connection is broken.
 
-  @param [in] pWebServer  The web server control structure address.
+  @param [in] pWebServer    The web server control structure address.
+  @param [in] AddressFamily Address family for the network connection
+  @param [in] Protocol      Protocol to use for the network connection
+  @param [in] HttpPort      Port number for the HTTP connection
+  @param [out] pPort        Address of the port
 
 **/
 VOID
-WebServerTimer (
-  IN DT_WEB_SERVER * pWebServer
+WebServerListen (
+  IN DT_WEB_SERVER * pWebServer,
+  IN sa_family_t AddressFamily,
+  IN int Protocol,
+  IN UINT16 HttpPort,
+  OUT int * pPort
   )
 {
-  UINT16 HttpPort;
-  struct sockaddr_in WebServerAddress;
+  union {
+    struct sockaddr_in v4;
+    struct sockaddr_in6 v6;
+  } WebServerAddress;
   int SocketStatus;
   EFI_STATUS Status;
 
-  DEBUG (( DEBUG_SERVER_TIMER, "Entering WebServerTimer\r\n" ));
+  DEBUG (( DEBUG_SERVER_LISTEN, "Entering WebServerListen\r\n" ));
 
   //
-  //  Open the HTTP port on the server
+  //  Attempt to create the socket for the web server
   //
-  do {
-    do {
-      //
-      //  Complete the client operations
-      //
-      SocketPoll ( pWebServer );
-
-      //
-      //  Wait for a while
-      //
-      Status = gBS->CheckEvent ( pWebServer->TimerEvent );
-    } while ( EFI_SUCCESS != Status );
+  * pPort = socket ( AddressFamily, SOCK_STREAM, Protocol );
+  if ( -1 != *pPort ) {
+    //
+    //  Build the socket address
+    //
+    ZeroMem ( &WebServerAddress, sizeof ( WebServerAddress ));
+    if ( AF_INET == AddressFamily ) {
+      WebServerAddress.v4.sin_len = sizeof ( WebServerAddress.v4 );
+      WebServerAddress.v4.sin_family = AddressFamily;
+      WebServerAddress.v4.sin_port = htons ( HttpPort );
+    }
+    else {
+      WebServerAddress.v6.sin6_len = sizeof ( WebServerAddress.v6 );
+      WebServerAddress.v6.sin6_family = AddressFamily;
+      WebServerAddress.v6.sin6_port = htons ( HttpPort );
+      WebServerAddress.v6.sin6_scope_id = __IPV6_ADDR_SCOPE_GLOBAL;
+    }
 
     //
-    //  Attempt to create the socket for the web server
+    //  Bind the socket to the HTTP port
     //
-    pWebServer->HttpListenPort = socket ( AF_INET,
-                                          SOCK_STREAM,
-                                          IPPROTO_TCP );
-    if ( -1 != pWebServer->HttpListenPort ) {
+    SocketStatus = bind ( *pPort,
+                          (struct sockaddr *) &WebServerAddress,
+                          WebServerAddress.v4.sin_len );
+    if ( -1 != SocketStatus ) {
       //
-      //  Set the socket address
+      //  Enable connections to the HTTP port
       //
-      ZeroMem ( &WebServerAddress, sizeof ( WebServerAddress ));
-      HttpPort = PcdGet16 ( WebServer_HttpPort );
-      DEBUG (( DEBUG_HTTP_PORT,
-                "HTTP Port: %d\r\n",
-                HttpPort ));
-      WebServerAddress.sin_len = sizeof ( WebServerAddress );
-      WebServerAddress.sin_family = AF_INET;
-      WebServerAddress.sin_addr.s_addr = INADDR_ANY;
-      WebServerAddress.sin_port = htons ( HttpPort );
-
-      //
-      //  Bind the socket to the HTTP port
-      //
-      SocketStatus = bind ( pWebServer->HttpListenPort,
-                            (struct sockaddr *) &WebServerAddress,
-                            WebServerAddress.sin_len );
+      SocketStatus = listen ( *pPort, SOMAXCONN );
       if ( -1 != SocketStatus ) {
         //
-        //  Enable connections to the HTTP port
+        //  Add the HTTP port to the list of ports to poll
         //
-        SocketStatus = listen ( pWebServer->HttpListenPort,
-                                SOMAXCONN );
-      }
-  
-      //
-      //  Release the socket if necessary
-      //
-      if ( -1 == SocketStatus ) {
-        close ( pWebServer->HttpListenPort );
-        pWebServer->HttpListenPort = -1;
+        Status = PortAdd ( pWebServer, *pPort );
+        if ( EFI_ERROR ( Status )) {
+          SocketStatus = -1;
+        }
+        else {
+          DEBUG (( DEBUG_PORT_WORK,
+                    "Listening on Tcp%d:%d\r\n",
+                    ( AF_INET == AddressFamily ) ? 4 : 6,
+                    HttpPort ));
+        }
       }
     }
 
     //
-    //  Wait until the socket is open
+    //  Release the socket if necessary
     //
-  }while ( -1 == pWebServer->HttpListenPort );
-
-  DEBUG (( DEBUG_SERVER_TIMER, "Exiting WebServerTimer\r\n" ));
-}
-
-
-/**
-  Start the web server port creation timer
-
-  @param [in] pWebServer  The web server control structure address.
-
-  @retval EFI_SUCCESS         The timer was successfully started.
-  @retval EFI_ALREADY_STARTED The timer is already running.
-  @retval Other               The timer failed to start.
-
-**/
-EFI_STATUS
-WebServerTimerStart (
-  IN DT_WEB_SERVER * pWebServer
-  )
-{
-  EFI_STATUS Status;
-  UINT64 TriggerTime;
-
-  DBG_ENTER ( );
-
-  //
-  //  Assume the timer is already running
-  //
-  Status = EFI_ALREADY_STARTED;
-  if ( !pWebServer->bTimerRunning ) {
-    //
-    //  Compute the poll interval
-    //
-    TriggerTime = HTTP_PORT_POLL_DELAY * ( 1000 * 10 );
-    Status = gBS->SetTimer ( pWebServer->TimerEvent,
-                             TimerPeriodic,
-                             TriggerTime );
-    if ( !EFI_ERROR ( Status )) {
-      DEBUG (( DEBUG_HTTP_PORT, "HTTP port timer started\r\n" ));
-
-      //
-      //  Mark the timer running
-      //
-      pWebServer->bTimerRunning = TRUE;
-    }
-    else {
-      DEBUG (( DEBUG_ERROR | DEBUG_HTTP_PORT,
-                "ERROR - Failed to start HTTP port timer, Status: %r\r\n",
-                Status ));
+    if ( -1 == SocketStatus ) {
+      close ( *pPort );
+      *pPort = -1;
     }
   }
 
-  //
-  //  Return the operation status
-  //
-  DBG_EXIT_STATUS ( Status );
-  return Status;
+  DEBUG (( DEBUG_SERVER_LISTEN, "Exiting WebServerListen\r\n" ));
 }
 
-
-/**
-  Stop the web server port creation timer
-
-  @param [in] pWebServer  The web server control structure address.
-
-  @retval EFI_SUCCESS   The HTTP port timer is stopped
-  @retval Other         Failed to stop the HTTP port timer
-
-**/
-EFI_STATUS
-WebServerTimerStop (
-  IN DT_WEB_SERVER * pWebServer
-  )
-{
-  EFI_STATUS Status;
-
-  DBG_ENTER ( );
-
-  //
-  //  Assume the timer is stopped
-  //
-  Status = EFI_SUCCESS;
-  if ( pWebServer->bTimerRunning ) {
-    //
-    //  Stop the port creation polling
-    //
-    Status = gBS->SetTimer ( pWebServer->TimerEvent,
-                             TimerCancel,
-                             0 );
-    if ( !EFI_ERROR ( Status )) {
-      DEBUG (( DEBUG_HTTP_PORT, "HTTP port timer stopped\r\n" ));
-
-      //
-      //  Mark the timer stopped
-      //
-      pWebServer->bTimerRunning = FALSE;
-    }
-    else {
-      DEBUG (( DEBUG_ERROR | DEBUG_HTTP_PORT,
-                "ERROR - Failed to stop HTTP port timer, Status: %r\r\n",
-                Status ));
-    }
-  }
-
-  //
-  //  Return the operation status
-  //
-  DBG_EXIT_STATUS ( Status );
-  return Status;
-}
 
 /**
   Entry point for the web server application.
@@ -776,8 +675,19 @@ main (
   IN char **Argv
   )
 {
+  UINT16 HttpPort;
+  UINTN Index;
   DT_WEB_SERVER * pWebServer;
   EFI_STATUS Status;
+  UINT64 TriggerTime;
+
+  //
+  //  Get the HTTP port
+  //
+  HttpPort = PcdGet16 ( WebServer_HttpPort );
+  DEBUG (( DEBUG_HTTP_PORT,
+            "HTTP Port: %d\r\n",
+            HttpPort ));
 
   //
   //  Create a timer event to start HTTP port
@@ -789,12 +699,18 @@ main (
                               NULL,
                               &pWebServer->TimerEvent );
   if ( !EFI_ERROR ( Status )) {
-    Status = WebServerTimerStart ( pWebServer );
+    TriggerTime = HTTP_PORT_POLL_DELAY * ( 1000 * 10 );
+    Status = gBS->SetTimer ( pWebServer->TimerEvent,
+                             TimerPeriodic,
+                             TriggerTime );
     if ( !EFI_ERROR ( Status )) {
       //
       //  Run the web server forever
       //
-      for ( ; ; ) {
+      pWebServer->HttpListenPort = -1;
+      pWebServer->HttpListenPort6 = -1;
+      pWebServer->bRunning = TRUE;
+      do {
         //
         //  Poll the network layer to create the HTTP port
         //  for the web server.  More than one attempt may
@@ -802,45 +718,72 @@ main (
         //  the IP address and initialize the upper layers
         //  of the network stack.
         //
-        WebServerTimer ( pWebServer );
-
-        //
-        //  Add the HTTP port to the list of ports
-        //
-        Status = PortAdd ( pWebServer, pWebServer->HttpListenPort );
-        if ( !EFI_ERROR ( Status )) {
-          //
-          //  Poll the sockets for activity
-          //
+        if (( -1 == pWebServer->HttpListenPort )
+          || ( -1 == pWebServer->HttpListenPort6 )) {
           do {
-            SocketPoll ( pWebServer );
-          } while ( -1 != pWebServer->HttpListenPort );
+            //
+            //  Wait a while before polling for a connection
+            //
+            if ( EFI_SUCCESS != gBS->CheckEvent ( pWebServer->TimerEvent )) {
+              if ( 0 != pWebServer->Entries ) {
+                  break;
+              }
+              gBS->WaitForEvent ( 1, &pWebServer->TimerEvent, &Index );
+            }
 
-          //
-          //  The HTTP port failed the accept and was closed
-          //
+            //
+            //  Poll for a network connection
+            //
+            if ( -1 == pWebServer->HttpListenPort ) {
+              WebServerListen ( pWebServer,
+                                AF_INET,
+                                IPPROTO_TCP,
+                                HttpPort,
+                                &pWebServer->HttpListenPort );
+            }
+            if ( -1 == pWebServer->HttpListenPort6 ) {
+              WebServerListen ( pWebServer,
+                                AF_INET6,
+                                IPPROTO_TCP,
+                                HttpPort,
+                                &pWebServer->HttpListenPort6 );
+            }
+
+            //
+            //  Continue polling while both network connections are
+            //  not present
+            //
+          } while ( 0 == pWebServer->Entries );
         }
 
         //
-        //  Close the HTTP port if necessary
+        //  Poll the sockets for activity while both network
+        //  connections are connected
         //
-        if ( -1 != pWebServer->HttpListenPort ) {
-          close ( pWebServer->HttpListenPort );
-          pWebServer->HttpListenPort = -1;
-        }
-//
-// TODO: Remove the following test code
-//  Exit when the network connection is broken
-//
-break;
-      }
+        do {
+          SocketPoll ( pWebServer );
+        } while ( pWebServer->bRunning
+                && ( -1 != pWebServer->HttpListenPort )
+                && ( -1 != pWebServer->HttpListenPort6 ));
+
+        //
+        //  Continue polling the network connections until both
+        //  TCP4 and TCP6 are connected
+        //
+      } while ( pWebServer->bRunning );
 
       //
-      //  Done with the timer event
+      //  Stop the timer
       //
-      WebServerTimerStop ( pWebServer );
-      Status = gBS->CloseEvent ( pWebServer->TimerEvent );
+      gBS->SetTimer ( pWebServer->TimerEvent,
+                      TimerCancel,
+                      0 );
     }
+
+    //
+    //  Done with the timer event
+    //
+    gBS->CloseEvent ( pWebServer->TimerEvent );
   }
 
   //
