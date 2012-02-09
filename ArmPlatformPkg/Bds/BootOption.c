@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -82,6 +82,8 @@ BootOptionStart (
                                 Initrd, // Initrd
                                 (CHAR8*)(LinuxArguments + 1),
                                 FdtDevicePath);
+
+      FreePool (FdtDevicePath);
     }
   } else {
     Status = BdsStartEfiApplication (mImageHandle, BootOption->FilePathList, BootOption->OptionalDataSize, BootOption->OptionalData);
@@ -118,6 +120,8 @@ BootOptionList (
       InsertTailList (BootOptionList,&BdsLoadOptionEntry->Link);
     }
   }
+
+  FreePool (BootOrder);
 
   return EFI_SUCCESS;
 }
@@ -290,6 +294,11 @@ BootOptionCreate (
       BootOrder
       );
 
+  // We only free it if the UEFI Variable 'BootOrder' was already existing
+  if (BootOrderSize > sizeof(UINT16)) {
+    FreePool (BootOrder);
+  }
+
   *BdsLoadOption = BootOption;
   return Status;
 }
@@ -360,6 +369,8 @@ BootOptionDelete (
         BootOrder
         );
   }
+
+  FreePool (BootOrder);
 
   return EFI_SUCCESS;
 }

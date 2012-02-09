@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -196,6 +196,17 @@ InitializeConsole (
     gST->StdErr = gST->ConOut;
   }
 
+  // Free Memory allocated for reading the UEFI Variables
+  if (ConOutDevicePaths) {
+    FreePool (ConOutDevicePaths);
+  }
+  if (ConInDevicePaths) {
+    FreePool (ConInDevicePaths);
+  }
+  if (ConErrDevicePaths) {
+    FreePool (ConErrDevicePaths);
+  }
+
   return EFI_SUCCESS;
 }
 
@@ -344,6 +355,7 @@ StartDefaultBootOnTimeout (
         }
         // In case of success, we should not return from this call.
       }
+      FreePool (BootOrder);
     }
   }
   return EFI_SUCCESS;
