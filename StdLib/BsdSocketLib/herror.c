@@ -95,7 +95,6 @@ herror(
 {
   struct iovec iov[4];
   register struct iovec *v = iov;
-  int   i;
 
   if (s && *s) {
     v->iov_base = (char *)s;
@@ -110,11 +109,14 @@ herror(
   v++;
   v->iov_base = "\n";
   v->iov_len = 1;
-#ifdef _ORG_FREEBSD_
+#if defined(_ORG_FREEBSD_) || defined(__GNUC__)
   writev(STDERR_FILENO, iov, (v - iov) + 1);
 #else
-  for (i = 0; i < (v - iov) + 1; i++)
-    fprintf( stderr, iov[i].iov_base);
+  {
+    int   i;
+    for (i = 0; i < (v - iov) + 1; i++)
+      fprintf( stderr, iov[i].iov_base);
+  }
 #endif
 
 }

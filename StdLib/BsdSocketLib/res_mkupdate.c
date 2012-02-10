@@ -60,10 +60,6 @@
  * <viraj_bais@ccm.fm.intel.com>
  */
 
-#if !defined(lint) && !defined(SABER)
-static char rcsid[] = "$Id: res_mkupdate.c,v 1.1.1.1 2003/11/19 01:51:38 kyu3 Exp $";
-#endif /* not lint */
-
 #include <sys/types.h>
 #include <sys/param.h>
 

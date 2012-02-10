@@ -55,10 +55,6 @@
  * 
  */
 
-#ifndef lint
-static char rcsid[] = "$Id: ns_ttl.c,v 1.1.1.1 2003/11/19 01:51:34 kyu3 Exp $";
-#endif
-
 /* Import. */
 
 #include <arpa/nameser.h>

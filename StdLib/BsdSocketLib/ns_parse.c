@@ -55,10 +55,6 @@
  * 
  */
 
-#ifndef lint
-static char rcsid[] = "$Id: ns_parse.c,v 1.1.1.1 2003/11/19 01:51:33 kyu3 Exp $";
-#endif
-
 #include <sys/types.h>
 
 #include <netinet/in.h>

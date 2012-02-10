@@ -556,6 +556,13 @@ getaddrinfo(const char *hostname, const char *servname,
 	return error;
 }
 
+static const ns_dtab dtab[] = {
+  NS_FILES_CB(_files_getaddrinfo, NULL)
+  { NSSRC_DNS, _dns_getaddrinfo, NULL },  /* force -DHESIOD */
+  NS_NIS_CB(_yp_getaddrinfo, NULL)
+  NS_NULL_CB
+};
+
 /*
  * FQDN hostname, DNS lookup
  */
@@ -566,12 +573,6 @@ explore_fqdn(const struct addrinfo *pai, const char *hostname,
 	struct addrinfo *result;
 	struct addrinfo *cur;
 	int error = 0;
-	static const ns_dtab dtab[] = {
-		NS_FILES_CB(_files_getaddrinfo, NULL)
-		{ NSSRC_DNS, _dns_getaddrinfo, NULL },	/* force -DHESIOD */
-		NS_NIS_CB(_yp_getaddrinfo, NULL)
-		NS_NULL_CB
-	};
 
 	_DIAGASSERT(pai != NULL);
 	/* hostname may be NULL */

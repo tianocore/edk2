@@ -15,10 +15,6 @@
  * SOFTWARE.
  */
 
-#if defined(LIBC_SCCS) && !defined(lint)
-static char rcsid[] = "$Id: nsap_addr.c,v 1.1.1.1 2003/11/19 01:51:31 kyu3 Exp $";
-#endif /* LIBC_SCCS and not lint */
-
 #include <sys/types.h>
 #include <sys/param.h>
 #include <sys/socket.h>
