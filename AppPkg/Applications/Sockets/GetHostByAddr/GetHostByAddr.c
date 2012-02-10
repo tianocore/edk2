@@ -73,7 +73,7 @@ main (
     IpAddress[1] = (UINT8)RemoteAddress[1];
     IpAddress[2] = (UINT8)RemoteAddress[2];
     IpAddress[3] = (UINT8)RemoteAddress[3];
-    pHost = gethostbyaddr ( &IpAddress[0], INADDRSZ, AF_INET );
+    pHost = gethostbyaddr ( (const char *)&IpAddress[0], INADDRSZ, AF_INET );
     if ( NULL == pHost ) {
       Print ( L"ERROR - host not found, h_errno: %d\r\n", h_errno );
     }

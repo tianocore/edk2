@@ -192,6 +192,9 @@ GetOptionValue (
   if ( pOption->bSetAllowed ) {
     Value.u8 = &mValue[0];
     switch ( pOption->DataType ) {
+    default:
+      break;
+
     case DATA_TYPE_INT32_DECIMAL:
       Values = sscanf ( pValue, "%d", Value.i32 );
       if ( 1 == Values ) {
@@ -201,7 +204,7 @@ GetOptionValue (
       break;
 
     case DATA_TYPE_TIMEVAL:
-      Values = sscanf ( pValue, "%d.%0d",
+      Values = sscanf ( pValue, "%d.%d",
                         &Value.TimeVal->tv_sec,
                         &Value.TimeVal->tv_usec );
       if (( 2 == Values )

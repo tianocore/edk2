@@ -918,7 +918,7 @@ HttpSendDump (
       Status = HttpSendHexBits ( SocketFD,
                                  pPort,
                                  sizeof ( pData ) * 8,
-                                 (UINT64)pData );
+                                 (UINT64)(UINTN)pData );
       if ( EFI_ERROR ( Status )) {
         break;
       }
@@ -1663,25 +1663,25 @@ HttpSendValue (
   CONST UINT64 * pEnd;
   CONST UINT64 * pDivisor;
   CONST UINT64 pDivisors[ ] = {
-     10000000000000000000L,
-      1000000000000000000L,
-       100000000000000000L,
-        10000000000000000L,
-         1000000000000000L,
-          100000000000000L,
-           10000000000000L,
-            1000000000000L,
-             100000000000L,
-              10000000000L,
-               1000000000L,
-                100000000L,
-                 10000000L,
-                  1000000L,
-                   100000L,
-                    10000L,
-                     1000L,
-                      100L,
-                       10L
+     10000000000000000000ULL,
+      1000000000000000000ULL,
+       100000000000000000ULL,
+        10000000000000000ULL,
+         1000000000000000ULL,
+          100000000000000ULL,
+           10000000000000ULL,
+            1000000000000ULL,
+             100000000000ULL,
+              10000000000ULL,
+               1000000000ULL,
+                100000000ULL,
+                 10000000ULL,
+                  1000000ULL,
+                   100000ULL,
+                    10000ULL,
+                     1000ULL,
+                      100ULL,
+                       10ULL
   };
   EFI_STATUS Status;
   UINT64 Temp;

@@ -151,7 +151,7 @@ DhcpOptionsPage (
           Status = gBS->OpenProtocol ( *pHandle,
 //                                       Dhcp4Handle,
                                        &gEfiDhcp4ProtocolGuid,
-                                       &pDhcp4,
+                                       (VOID **)&pDhcp4,
                                        NULL,
                                        gImageHandle,
                                        EFI_OPEN_PROTOCOL_GET_PROTOCOL );

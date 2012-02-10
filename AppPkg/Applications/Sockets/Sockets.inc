@@ -22,9 +22,16 @@
   AppPkg/Applications/Sockets/RecvDgram/RecvDgram.inf
   AppPkg/Applications/Sockets/SetHostName/SetHostName.inf
   AppPkg/Applications/Sockets/SetSockOpt/SetSockOpt.inf
-  AppPkg/Applications/Sockets/TftpServer/TftpServer.inf
   AppPkg/Applications/Sockets/WebServer/WebServer.inf {
     <PcdsFixedAtBuild>
-      gStdLibTokenSpaceGuid.WebServer_HttpPort|80
+      gAppPkgTokenSpaceGuid.WebServer_HttpPort|80
   }
+
+################################################################################
+#  The following application requires TimerLib (platform specific library)
+################################################################################
+
+[Components]
+#  AppPkg/Applications/Sockets/TftpServer/TftpServer.inf
+
 

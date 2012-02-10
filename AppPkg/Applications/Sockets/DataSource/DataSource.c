@@ -31,6 +31,7 @@
 #include <sys/socket.h>
 
 #include <stdio.h>
+#include <string.h>
 
 
 #define DATA_SAMPLE_SHIFT           5       ///<  Shift for number of samples

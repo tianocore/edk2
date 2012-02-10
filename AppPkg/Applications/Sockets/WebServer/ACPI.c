@@ -28,7 +28,9 @@ Intel Corporation.
 #include <IndustryStandard/Acpi10.h>
 #include <IndustryStandard/Acpi30.h>
 
+#if defined(_MSC_VER)   //  Handle Microsoft VC++ compiler specifics.
 #pragma warning ( disable : 4305 )
+#endif  //  defined(_MSC_VER)
 
 //
 // Ensure proper structure formats
@@ -848,7 +850,7 @@ AcpiDsdtPage (
       Status = EFI_NOT_FOUND;
       break;
     }
-    pDsdt = (VOID *)pFadt->XDsdt;
+    pDsdt = (VOID *)(UINTN)pFadt->XDsdt;
 
     //
     //  Send the page and table header
@@ -895,7 +897,7 @@ AcpiDsdtPage (
                             pPort,
                             "OEMID",
                             sizeof ( pDsdt->OemId ),
-                            &pDsdt->OemId[ 0 ]);
+                            (CONST CHAR8 *)&pDsdt->OemId[ 0 ]);
     if ( EFI_ERROR ( Status )) {
       break;
     }
@@ -903,7 +905,7 @@ AcpiDsdtPage (
                             pPort,
                             "OEM Table ID",
                             sizeof ( pDsdt->OemTableId ),
-                            &pDsdt->OemTableId[ 0 ]);
+                            (CONST CHAR8 *)&pDsdt->OemTableId[ 0 ]);
     if ( EFI_ERROR ( Status )) {
       break;
     }
@@ -1039,7 +1041,7 @@ AcpiFadtPage (
                             pPort,
                             "OEMID",
                             sizeof ( pFadt->OemId ),
-                            &pFadt->OemId[ 0 ]);
+                            (CONST CHAR8 *)&pFadt->OemId[ 0 ]);
     if ( EFI_ERROR ( Status )) {
       break;
     }
@@ -1047,7 +1049,7 @@ AcpiFadtPage (
                             pPort,
                             "OEM Table ID",
                             sizeof ( pFadt->OemTableId ),
-                            &pFadt->OemTableId[ 0 ]);
+                            (CONST CHAR8 *)&pFadt->OemTableId[ 0 ]);
     if ( EFI_ERROR ( Status )) {
       break;
     }
@@ -1576,7 +1578,7 @@ AcpiRsdp10Page (
                             pPort,
                             "OemId",
                             sizeof ( pRsdp10b->OemId ),
-                            &pRsdp10b->OemId[ 0 ]);
+                            (CONST CHAR8 *)&pRsdp10b->OemId[ 0 ]);
     if ( EFI_ERROR ( Status )) {
       break;
     }
@@ -1679,7 +1681,7 @@ AcpiRsdp30Page (
                             pPort,
                             "OemId",
                             sizeof ( pRsdp30->OemId ),
-                            &pRsdp30->OemId[ 0 ]);
+                            (CONST CHAR8 *)&pRsdp30->OemId[ 0 ]);
     if ( EFI_ERROR ( Status )) {
       break;
     }
@@ -1709,7 +1711,7 @@ AcpiRsdp30Page (
     Status = RowPointer ( SocketFD,
                           pPort,
                           "XsdtAddress",
-                          (VOID *)pRsdp30->XsdtAddress,
+                          (VOID *)(UINTN)pRsdp30->XsdtAddress,
                           NULL );
     if ( EFI_ERROR ( Status )) {
       break;
@@ -1833,7 +1835,7 @@ AcpiRsdtPage (
                             pPort,
                             "OEMID",
                             sizeof ( pRsdt->OemId ),
-                            &pRsdt->OemId[ 0 ]);
+                            (CONST CHAR8 *)&pRsdt->OemId[ 0 ]);
     if ( EFI_ERROR ( Status )) {
       break;
     }
@@ -1841,7 +1843,7 @@ AcpiRsdtPage (
                             pPort,
                             "OEM Table ID",
                             sizeof ( pRsdt->OemTableId ),
-                            &pRsdt->OemTableId[ 0 ]);
+                            (CONST CHAR8 *)&pRsdt->OemTableId[ 0 ]);
     if ( EFI_ERROR ( Status )) {
       break;
     }

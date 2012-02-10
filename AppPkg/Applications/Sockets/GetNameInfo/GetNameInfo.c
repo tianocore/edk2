@@ -97,7 +97,7 @@ main (
         //
         //  Display this entry
         //
-        printf ( "%s: HostName\r\n", mHostName[0]);
+        printf ( "%s: HostName\r\n", &mHostName[0]);
         printf ( "%s: Service Name\r\n", &mServiceName[0]);
 
         //

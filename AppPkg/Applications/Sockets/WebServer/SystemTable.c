@@ -358,7 +358,7 @@ RowPointer (
     Status = HttpSendHexBits ( SocketFD,
                                pPort,
                                sizeof ( pAddress ) * 8,
-                               (UINT64) pAddress );
+                               (UINT64)(UINTN)pAddress );
     if ( EFI_ERROR ( Status )) {
       break;
     }
@@ -586,7 +586,7 @@ TableHeader (
       Status = HttpSendHexBits ( SocketFD,
                                  pPort,
                                  sizeof ( pTable ) *  8,
-                                 (UINT64)pTable );
+                                 (UINT64)(UINTN)pTable );
       if ( EFI_ERROR ( Status )) {
         break;
       }

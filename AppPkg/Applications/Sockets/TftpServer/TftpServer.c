@@ -1781,9 +1781,9 @@ TftpRead (
     //
     //  Determine the file length
     //
-    pContext->File = fopen ( pFileName, pReadMode );
+    pContext->File = fopen ((const char *)pFileName, pReadMode );
     if (( NULL == pContext->File )
-        || ( -1 == stat ( pFileName, &FileStatus ))) {
+        || ( -1 == stat ((const char *)pFileName, &FileStatus ))) {
       //
       //  File not found
       //

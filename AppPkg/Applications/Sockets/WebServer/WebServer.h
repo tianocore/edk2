@@ -34,8 +34,10 @@
 #include <sys/poll.h>
 #include <sys/socket.h>
 
+#if defined(_MSC_VER)   //  Handle Microsoft VC++ compiler specifics.
 #pragma warning ( disable : 4054 )
 #pragma warning ( disable : 4152 )
+#endif  //  defined(_MSC_VER)
 
 //------------------------------------------------------------------------------
 //  Pages
