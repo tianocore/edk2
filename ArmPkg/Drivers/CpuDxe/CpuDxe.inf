@@ -81,7 +81,6 @@
   gArmTokenSpaceGuid.PcdCpuDxeProduceDebugSupport
   gArmTokenSpaceGuid.PcdRelocateVectorTable
   gArmTokenSpaceGuid.PcdDebuggerExceptionSupport
-  gArmTokenSpaceGuid.PcdEfiUncachedMemoryToStronglyOrdered
 
 [Depex]
   TRUE

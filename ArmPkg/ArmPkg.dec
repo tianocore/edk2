@@ -65,8 +65,6 @@
   # it has been configured by the CPU DXE
   gArmTokenSpaceGuid.PcdDebuggerExceptionSupport|FALSE|BOOLEAN|0x00000032
   
-  gArmTokenSpaceGuid.PcdEfiUncachedMemoryToStronglyOrdered|FALSE|BOOLEAN|0x00000025
-
 [PcdsFixedAtBuild.common]
   gArmTokenSpaceGuid.PcdTrustzoneSupport|FALSE|BOOLEAN|0x00000006
 
