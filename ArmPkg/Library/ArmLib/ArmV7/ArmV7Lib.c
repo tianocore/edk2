@@ -196,10 +196,29 @@ ArmV7DataCacheOperation (
   UINTN     SavedInterruptState;
 
   SavedInterruptState = ArmGetInterruptState ();
-  ArmDisableInterrupts();
+  ArmDisableInterrupts ();
   
-
   ArmV7AllDataCachesOperation (DataCacheOperation);
+  
+  ArmDrainWriteBuffer ();
+  
+  if (SavedInterruptState) {
+    ArmEnableInterrupts ();
+  }
+}
+
+
+VOID
+ArmV7PoUDataCacheOperation (
+  IN  ARM_V7_CACHE_OPERATION  DataCacheOperation
+  )
+{
+  UINTN     SavedInterruptState;
+
+  SavedInterruptState = ArmGetInterruptState ();
+  ArmDisableInterrupts ();
+  
+  ArmV7PerformPoUDataCacheOperation (DataCacheOperation);
   
   ArmDrainWriteBuffer ();
   
@@ -235,3 +254,11 @@ ArmCleanDataCache (
   ArmV7DataCacheOperation (ArmCleanDataCacheEntryBySetWay);
 }
 
+VOID
+EFIAPI
+ArmCleanDataCacheToPoU (
+  VOID
+  )
+{
+  ArmV7PoUDataCacheOperation (ArmCleanDataCacheEntryBySetWay);
+}

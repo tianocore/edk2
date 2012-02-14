@@ -192,6 +192,12 @@ ArmCleanDataCache (
 
 VOID
 EFIAPI
+ArmCleanDataCacheToPoU (
+  VOID
+  );
+
+VOID
+EFIAPI
 ArmInvalidateInstructionCache (
   VOID
   );

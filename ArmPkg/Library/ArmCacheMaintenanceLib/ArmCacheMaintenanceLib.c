@@ -68,8 +68,8 @@ InvalidateInstructionCacheRange (
   IN      UINTN                     Length
   )
 {
-  CacheRangeOperation(Address, Length, ArmCleanDataCache, ArmCleanDataCacheEntryByMVA);
-  ArmInvalidateInstructionCache();
+  CacheRangeOperation (Address, Length, ArmCleanDataCacheToPoU, ArmCleanDataCacheEntryByMVA);
+  ArmInvalidateInstructionCache ();
   return Address;
 }
 

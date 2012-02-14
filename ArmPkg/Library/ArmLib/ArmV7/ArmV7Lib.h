@@ -15,6 +15,7 @@
 #ifndef __ARM_V7_LIB_H__
 #define __ARM_V7_LIB_H__
 
+typedef VOID (*ARM_V7_CACHE_OPERATION)(UINT32);
 
 VOID
 EFIAPI
@@ -31,6 +32,12 @@ ArmInvalidateDataCacheEntryBySetWay (
 VOID
 EFIAPI
 ArmCleanDataCacheEntryBySetWay (
+  IN  UINT32  SetWayFormat
+  );
+
+VOID
+EFIAPI
+ArmCleanDataCacheToPoUEntryBySetWay (
   IN  UINT32  SetWayFormat
   );
 
@@ -76,5 +83,15 @@ ArmDisableFiq (
   VOID
   );
 
+VOID
+ArmV7PerformPoUDataCacheOperation (
+  IN  ARM_V7_CACHE_OPERATION  DataCacheOperation
+  );
+
+VOID
+ArmV7AllDataCachesOperation (
+  IN  ARM_V7_CACHE_OPERATION  DataCacheOperation
+  );
+  
 #endif // __ARM_V7_LIB_H__
 
