@@ -1,7 +1,7 @@
 /** @file
 Private functions used by PCD DXE driver.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -29,6 +29,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
+
+//
+// Please make sure the PCD Serivce DXE Version is consistent with
+// the version of the generated DXE PCD Database by build tool.
+//
+#define PCD_SERVICE_DXE_VERSION      2
+
+//
+// PCD_DXE_SERVICE_DRIVER_VERSION is defined in Autogen.h.
+//
+#if (PCD_SERVICE_DXE_VERSION != PCD_DXE_SERVICE_DRIVER_VERSION)
+  #error "Please make sure the version of PCD DXE Service and the generated PCD DXE Database match."
+#endif
 
 //
 // Protocol Interface function declaration.
