@@ -2567,7 +2567,7 @@ EslSocketListen (
         //  Create the event for SocketAccept completion
         //
         Status = gBS->CreateEvent ( 0,
-                                    TplPrevious,
+                                    TPL_SOCKETS,
                                     NULL,
                                     NULL,
                                     &pSocket->WaitAccept );
