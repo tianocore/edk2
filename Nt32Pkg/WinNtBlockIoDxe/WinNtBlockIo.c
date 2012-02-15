@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -972,8 +972,10 @@ WinNtBlockIoWriteBlocks (
   WIN_NT_BLOCK_IO_PRIVATE *Private;
   UINTN                   BytesWritten;
   BOOL                    Flag;
+  BOOL                    Locked;
   EFI_STATUS              Status;
   EFI_TPL                 OldTpl;
+  UINTN                   BytesReturned;
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
@@ -984,7 +986,20 @@ WinNtBlockIoWriteBlocks (
     goto Done;
   }
 
+  //
+  // According the Windows requirement, first need to lock the volume before 
+  // write to it.
+  //
+  Locked = Private->WinNtThunk->DeviceIoControl (Private->NtHandle, FSCTL_LOCK_VOLUME, NULL, 0, NULL, 0, &BytesReturned, NULL);
+  if (Locked == 0) {
+    DEBUG ((EFI_D_INIT, "ReadBlocks: Lock volume failed. (%d)\n", Private->WinNtThunk->GetLastError ()));
+    Status = WinNtBlockIoError (Private);
+    goto Done;
+  }
   Flag = Private->WinNtThunk->WriteFile (Private->NtHandle, Buffer, (DWORD) BufferSize, (LPDWORD) &BytesWritten, NULL);
+  if (Locked != 0) {
+    Private->WinNtThunk->DeviceIoControl (Private->NtHandle, FSCTL_UNLOCK_VOLUME, NULL, 0, NULL, 0, &BytesReturned, NULL);
+  }
   if (!Flag || (BytesWritten != BufferSize)) {
     DEBUG ((EFI_D_INIT, "ReadBlocks: WriteFile failed. (%d)\n", Private->WinNtThunk->GetLastError ()));
     Status = WinNtBlockIoError (Private);
