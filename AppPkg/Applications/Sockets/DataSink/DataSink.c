@@ -834,6 +834,7 @@ SocketPoll (
   @param [in] pContext  Context for this routine
 **/
 VOID
+EFIAPI
 TimerCallback (
   IN EFI_EVENT Event,
   IN VOID * pContext

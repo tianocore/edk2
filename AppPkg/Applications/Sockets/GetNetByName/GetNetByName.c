@@ -65,7 +65,7 @@ main (
       Print ( L"ERROR - network not found, errno: %d\r\n", errno );
     }
     else {
-      pIpAddress = (UINT8 *)pNetwork->n_net;
+      pIpAddress = (UINT8 *)(UINTN)&pNetwork->n_net;
       Print ( L"%a: Type %d, %d.%d.%d.%d\r\n",
               pNetwork->n_name,
               pNetwork->n_addrtype,

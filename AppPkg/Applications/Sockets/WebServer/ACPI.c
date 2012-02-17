@@ -180,14 +180,14 @@ LocateRsdt (
     //
     Status = EfiGetSystemConfigurationTable ( &gEfiAcpiTableGuid, (VOID **)&pRsdp30 );
     if ( !EFI_ERROR ( Status )) {
-      pRsdt = (ACPI_RSDT *)pRsdp30->RsdtAddress;
+      pRsdt = (ACPI_RSDT *)(UINTN)pRsdp30->RsdtAddress;
     }
     else {
       Status = EfiGetSystemConfigurationTable (&gEfiAcpi10TableGuid, (VOID **)&pRsdp10b );
       if ( EFI_ERROR ( Status )) {
         break;
       }
-      pRsdt = (ACPI_RSDT *)pRsdp10b->RsdtAddress;
+      pRsdt = (ACPI_RSDT *)(UINTN)pRsdp10b->RsdtAddress;
     }
     break;
   }
@@ -229,14 +229,14 @@ LocateTable (
     //
     Status = EfiGetSystemConfigurationTable ( &gEfiAcpiTableGuid, (VOID **)&pRsdp30 );
     if ( !EFI_ERROR ( Status )) {
-      pRsdt = (ACPI_RSDT *)pRsdp30->RsdtAddress;
+      pRsdt = (ACPI_RSDT *)(UINTN)pRsdp30->RsdtAddress;
     }
     else {
       Status = EfiGetSystemConfigurationTable (&gEfiAcpi10TableGuid, (VOID **)&pRsdp10b );
       if ( EFI_ERROR ( Status )) {
         break;
       }
-      pRsdt = (ACPI_RSDT *)pRsdp10b->RsdtAddress;
+      pRsdt = (ACPI_RSDT *)(UINTN)pRsdp10b->RsdtAddress;
     }
 
     //
@@ -249,9 +249,9 @@ LocateTable (
       //  The entry is actually a 32-bit physical table address
       //  The first entry in the table is the 32-bit table signature
       //
-      pSignature = (UINT32 *)*pEntry;
+      pSignature = (UINT32 *)(UINTN)*pEntry;
       if ( *pSignature == Signature ) {
-        return (CONST VOID *) *pEntry;
+        return (CONST VOID *)(UINTN)*pEntry;
       }
 
       //
@@ -1082,7 +1082,7 @@ AcpiFadtPage (
     Status = RowPointer ( SocketFD,
                           pPort,
                           "FIRMWARE_CTRL",
-                          (CONST VOID *)pFadt->FirmwareCtrl,
+                          (CONST VOID *)(UINTN)pFadt->FirmwareCtrl,
                           NULL );
     if ( EFI_ERROR ( Status )) {
       break;
@@ -1090,7 +1090,7 @@ AcpiFadtPage (
     Status = RowPointer ( SocketFD,
                           pPort,
                           "DSDT",
-                          (CONST VOID *)pFadt->DSDT,
+                          (CONST VOID *)(UINTN)pFadt->DSDT,
                           ( pFadt->DSDT == pFadt->XDsdt ) ? PAGE_ACPI_DSDT : NULL );
     if ( EFI_ERROR ( Status )) {
       break;
@@ -1593,7 +1593,7 @@ AcpiRsdp10Page (
     Status = RowPointer ( SocketFD,
                           pPort,
                           "RsdtAddress",
-                          (VOID *)pRsdp10b->RsdtAddress,
+                          (VOID *)(UINTN)pRsdp10b->RsdtAddress,
                           PAGE_ACPI_RSDT );
     if ( EFI_ERROR ( Status )) {
       break;
@@ -1696,7 +1696,7 @@ AcpiRsdp30Page (
     Status = RowPointer ( SocketFD,
                           pPort,
                           "RsdtAddress",
-                          (VOID *)pRsdp30->RsdtAddress,
+                          (VOID *)(UINTN)pRsdp30->RsdtAddress,
                           PAGE_ACPI_RSDT );
     if ( EFI_ERROR ( Status )) {
       break;
@@ -1881,7 +1881,7 @@ AcpiRsdtPage (
       //  The entry is actually a 32-bit physical table address
       //  The first entry in the table is the 32-bit table signature
       //
-      TableName[ 0 ] = *(UINT32 *)*pEntry;
+      TableName[ 0 ] = *(UINT32 *)(UINTN)*pEntry;
       pWebPage = SignatureLookup ( &TableName[ 0 ], &pTableName );
 
       //
@@ -1890,7 +1890,7 @@ AcpiRsdtPage (
       Status = RowPointer ( SocketFD,
                             pPort,
                             pTableName,
-                            (VOID *)*pEntry,
+                            (VOID *)(UINTN)*pEntry,
                             pWebPage );
       if ( EFI_ERROR ( Status )) {
         break;
