@@ -2,7 +2,7 @@
   Firmware File System protocol. Layers on top of Firmware
   Block protocol to produce a file abstraction of FV based files.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -421,23 +421,6 @@ EFI_STATUS
 GetFwVolHeader (
   IN     EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL     *Fvb,
   OUT    EFI_FIRMWARE_VOLUME_HEADER             **FwVolHeader
-  );
-
-
-
-/**
-  Check if an FV is consistent and allocate cache for it.
-
-  @param  FvDevice              A pointer to the FvDevice to be checked.
-
-  @retval EFI_OUT_OF_RESOURCES  No enough buffer could be allocated.
-  @retval EFI_SUCCESS           FV is consistent and cache is allocated.
-  @retval EFI_VOLUME_CORRUPTED  File system is corrupted.
-
-**/
-EFI_STATUS
-FvCheck (
-  IN OUT FV_DEVICE  *FvDevice
   );
 
 #endif
