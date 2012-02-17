@@ -120,9 +120,9 @@
   StdLib/PosixLib/Stringlist/LibStringlist.inf
 
 #    Socket Libraries - LibC based
-#  StdLib/BsdSocketLib/BsdSocketLib.inf
-#  StdLib/EfiSocketLib/EfiSocketLib.inf
-#  StdLib/UseSocketDxe/UseSocketDxe.inf
+  StdLib/BsdSocketLib/BsdSocketLib.inf
+  StdLib/EfiSocketLib/EfiSocketLib.inf
+  StdLib/UseSocketDxe/UseSocketDxe.inf
 
 ##############################################################################
 #

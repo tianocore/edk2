@@ -557,8 +557,8 @@ getaddrinfo(const char *hostname, const char *servname,
 }
 
 static const ns_dtab dtab[] = {
-  NS_FILES_CB(_files_getaddrinfo, NULL)
-  { NSSRC_DNS, _dns_getaddrinfo, NULL },  /* force -DHESIOD */
+  NS_FILES_CB(((nss_method)_files_getaddrinfo), NULL)
+  { NSSRC_DNS, ((nss_method)_dns_getaddrinfo), NULL },  /* force -DHESIOD */
   NS_NIS_CB(_yp_getaddrinfo, NULL)
   NS_NULL_CB
 };

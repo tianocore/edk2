@@ -228,7 +228,7 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
 		/* Serial number. */
 		t = ns_get32(rdata);  rdata += NS_INT32SZ;
 		T(addstr("\t\t\t\t\t", 5, &buf, &buflen));
-		len = SPRINTF((tmp, "%lu", t));
+		len = SPRINTF((tmp, "%Lu", t));
 		T(addstr(tmp, len, &buf, &buflen));
 		T(spaced = addtab(len, 16, spaced, &buf, &buflen));
 		T(addstr("; serial\n", 9, &buf, &buflen));
@@ -284,7 +284,7 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
 		/* Priority. */
 		t = ns_get16(rdata);
 		rdata += NS_INT16SZ;
-		len = SPRINTF((tmp, "%u ", t));
+		len = SPRINTF((tmp, "%u ", (unsigned int)t));
 		T(addstr(tmp, len, &buf, &buflen));
 
 		/* Target. */
@@ -302,7 +302,7 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
 		/* Priority. */
 		t = ns_get16(rdata);
 		rdata += NS_INT16SZ;
-		len = SPRINTF((tmp, "%u ", t));
+		len = SPRINTF((tmp, "%u ", (unsigned int)t));
 		T(addstr(tmp, len, &buf, &buflen));
 
 		/* Name1. */
@@ -363,7 +363,7 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
 		/* Order, Precedence. */
 		order = ns_get16(rdata);	rdata += NS_INT16SZ;
 		preference = ns_get16(rdata);	rdata += NS_INT16SZ;
-		len = SPRINTF((t, "%u %u ", order, preference));
+		len = SPRINTF((t, "%u %u ", (unsigned int)order, (unsigned int)preference));
 		T(addstr(t, len, &buf, &buflen));
 
 		/* Flags. */
@@ -404,7 +404,7 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
 		priority = ns_get16(rdata);  rdata += NS_INT16SZ;
 		weight   = ns_get16(rdata);  rdata += NS_INT16SZ;
 		port     = ns_get16(rdata);  rdata += NS_INT16SZ;
-		len = SPRINTF((t, "%u %u %u ", priority, weight, port));
+		len = SPRINTF((t, "%u %u %u ", (unsigned int)priority, (unsigned int)weight, (unsigned int)port));
 		T(addstr(t, len, &buf, &buflen));
 
 		/* Server. */
@@ -477,7 +477,7 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
 		protocol = *rdata++;
 		algorithm = *rdata++;
 		len = SPRINTF((tmp, "0x%04x %u %u",
-			       keyflags, protocol, algorithm));
+			       (unsigned int)keyflags, (unsigned int)protocol, (unsigned int)algorithm));
 		T(addstr(tmp, len, &buf, &buflen));
 
 		/* Public key data. */
@@ -516,8 +516,8 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
 		algorithm = *rdata++;
 		labels = *rdata++;
 		t = ns_get32(rdata);  rdata += NS_INT32SZ;
-		len = SPRINTF((tmp, " %s %d %lu ",
-			       p_type((int)type), algorithm, t));
+		len = SPRINTF((tmp, " %s %d %Lu ",
+			       p_type((int)type), (int)algorithm, t));
 		T(addstr(tmp, len, &buf, &buflen));
 		if (labels != (u_int)dn_count_labels(name))
 			goto formerr;
@@ -534,7 +534,7 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
 
 		/* Signature Footprint. */
 		footprint = ns_get16(rdata);  rdata += NS_INT16SZ;
-		len = SPRINTF((tmp, "%u ", footprint));
+		len = SPRINTF((tmp, "%u ", (unsigned int)footprint));
 		T(addstr(tmp, len, &buf, &buflen));
 
 		/* Signer's name. */

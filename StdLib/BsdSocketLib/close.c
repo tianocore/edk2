@@ -94,6 +94,7 @@ BslSocketCloseWork (
 
 **/
 int
+EFIAPI
 BslSocketClose (
   struct __filedes * pDescriptor
   )

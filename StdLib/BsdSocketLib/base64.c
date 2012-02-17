@@ -171,6 +171,7 @@ b64_ntop(u_char const *src, size_t srclength, char *target, size_t targsize) {
   u_char output[4];
   size_t i;
 
+  input[0] = input[1] = input[2] = '\0';
   while (2 < srclength) {
     input[0] = *src++;
     input[1] = *src++;

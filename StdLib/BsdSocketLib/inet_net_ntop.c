@@ -126,7 +126,7 @@ inet_net_ntop_ipv4(
 		if (dst != odst)
 			*dst++ = '.';
 		m = ((1 << b) - 1) << (8 - b);
-		dst += SPRINTF((dst, "%u", *src & m));
+		dst += SPRINTF((dst, "%u", ((unsigned int)(*src & m))));
 		size -= (size_t)(dst - t);
 	}
 

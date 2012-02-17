@@ -243,7 +243,7 @@ fp_nquery(const u_char *msg, int len, FILE *file) {
     if ((!_res.pfcode) || (_res.pfcode & RES_PRF_HEADX) || rcode)
         fprintf(file,
             ";; ->>HEADER<<- opcode: %s, status: %s, id: %d\n",
-            _res_opcodes[opcode], _res_resultcodes[rcode], id);
+            _res_opcodes[opcode], _res_resultcodes[rcode], (int)id);
     if ((!_res.pfcode) || (_res.pfcode & RES_PRF_HEADX))
         putc(';', file);
     if ((!_res.pfcode) || (_res.pfcode & RES_PRF_HEAD2)) {
@@ -536,7 +536,7 @@ p_option(u_long option) {
     case RES_DNSRCH:    return "dnsrch";
     case RES_INSECURE1: return "insecure1";
     case RES_INSECURE2: return "insecure2";
-    default:        sprintf(nbuf, "?0x%lx?", (u_long)option);
+    default:        sprintf(nbuf, "?0x%Lx?", (u_long)option);
                 return (nbuf);
     }
 }

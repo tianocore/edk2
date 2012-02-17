@@ -26,6 +26,7 @@
 
  **/
 short
+EFIAPI
 BslSocketPoll (
   IN struct __filedes * pDescriptor,
   IN short Events
