@@ -742,8 +742,11 @@ CatVSPrint (
   UINTN   CharactersRequired;
   UINTN   SizeRequired;
   CHAR16  *BufferToReturn;
+  VA_LIST ExtraMarker;
 
-  CharactersRequired = SPrintLength(FormatString, Marker);
+  VA_COPY (ExtraMarker, Marker);
+  CharactersRequired = SPrintLength(FormatString, ExtraMarker);
+  VA_END (ExtraMarker);
 
   if (String != NULL) {
     SizeRequired = StrSize(String) + (CharactersRequired * sizeof(CHAR16));
