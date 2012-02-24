@@ -934,33 +934,37 @@ BcfgAddOptInstall1(
       //
       // Open the file and populate the data buffer.
       //
-      ShellStatus = ShellOpenFileByName(
+      Status = ShellOpenFileByName(
         FileName,
         &FileHandle,
         EFI_FILE_MODE_READ,
         0);
-      if (ShellStatus == SHELL_SUCCESS) {
-        ShellStatus = ShellGetFileSize(FileHandle, &Intermediate);
+      if (!EFI_ERROR(Status)) {
+        Status = ShellGetFileSize(FileHandle, &Intermediate);
       }
       Data = AllocateZeroPool((UINTN)Intermediate);
       if (Data == NULL) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_MEM), gShellInstall1HiiHandle);
         ShellStatus = SHELL_OUT_OF_RESOURCES;
       }
-      if (ShellStatus == SHELL_SUCCESS) {
-        ShellStatus = ShellReadFile(FileHandle, (UINTN *)&Intermediate, Data);
+      if (!EFI_ERROR(Status)) {
+        Status = ShellReadFile(FileHandle, (UINTN *)&Intermediate, Data);
       }
     } else {
       Intermediate = StrSize(Data);
     }
 
-    if (ShellStatus == SHELL_SUCCESS && Data != NULL) {
+    if (!EFI_ERROR(Status) && ShellStatus == SHELL_SUCCESS && Data != NULL) {
       Status = UpdateOptionalData(CurrentOrder[OptionIndex], (UINTN)Intermediate, (UINT8*)Data, Target);
       if (EFI_ERROR(Status)) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_SET_VAR_FAIL), gShellInstall1HiiHandle, VariableName, Status);
         ShellStatus = SHELL_INVALID_PARAMETER;
       }   
     }
+    if (EFI_ERROR(Status) && ShellStatus == SHELL_SUCCESS) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_SET_VAR_FAIL), gShellInstall1HiiHandle, VariableName, Status);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    }   
   }
 
   SHELL_FREE_NON_NULL(Data);
