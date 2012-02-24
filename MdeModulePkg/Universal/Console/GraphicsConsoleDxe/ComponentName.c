@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name(2) protocol implementation for GraphicsConsole driver.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -36,7 +36,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gGraphicsConsoleCompo
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mGraphicsConsoleDriverNameTable[] = {
   {
     "eng;en",
-    (CHAR16 *)L"UGA Console Driver"
+    (CHAR16 *)L"Graphics Console Driver"
   },
   {
     NULL,
