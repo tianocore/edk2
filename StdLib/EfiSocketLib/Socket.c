@@ -1259,7 +1259,10 @@ EslSocketBind (
       //
       //  Verify that at least one network connection was found
       //
-      if ( NULL == pSocket->pPortList ) {
+      if ( NULL != pSocket->pPortList ) {
+        Status = EFI_SUCCESS;
+      }
+      else {
         if ( EADDRNOTAVAIL == pSocket->errno ) {
           DEBUG (( DEBUG_BIND | DEBUG_POOL | DEBUG_INIT,
                     "ERROR - Socket address is not available!\r\n" ));
@@ -1993,76 +1996,73 @@ EslSocketGetLocalAddress (
     //
     //  Verify the socket state
     //
-    Status = EslSocketIsConfigured ( pSocket );
-    if ( !EFI_ERROR ( Status )) {
+    EslSocketIsConfigured ( pSocket );
+    if ( pSocket->bAddressSet ) {
       //
       //  Verify the address buffer and length address
       //
       if (( NULL != pAddress ) && ( NULL != pAddressLength )) {
         //
-        //  Verify the socket state
+        //  Verify the API
         //
-        if (( SOCKET_STATE_CONNECTED == pSocket->State )
-          || ( SOCKET_STATE_LISTENING == pSocket->State )) {
-          //
-          //  Verify the API
-          //
-          if ( NULL == pSocket->pApi->pfnLocalAddrGet ) {
-            Status = EFI_UNSUPPORTED;
-            pSocket->errno = ENOTSUP;
-          }
-          else {
-            //
-            //  Synchronize with the socket layer
-            //
-            RAISE_TPL ( TplPrevious, TPL_SOCKETS );
-
-            //
-            //  Verify that there is just a single connection
-            //
-            pPort = pSocket->pPortList;
-            if (( NULL != pPort ) && ( NULL == pPort->pLinkSocket )) {
-              //
-              //  Verify the address length
-              //
-              LengthInBytes = pSocket->pApi->AddressLength;
-              if (( LengthInBytes <= *pAddressLength ) 
-                && ( 255 >= LengthInBytes )) {
-                //
-                //  Return the local address and address length
-                //
-                ZeroMem ( pAddress, LengthInBytes );
-                pAddress->sa_len = (uint8_t)LengthInBytes;
-                *pAddressLength = pAddress->sa_len;
-                pSocket->pApi->pfnLocalAddrGet ( pPort, pAddress );
-                pSocket->errno = 0;
-                Status = EFI_SUCCESS;
-              }
-              else {
-                pSocket->errno = EINVAL;
-                Status = EFI_INVALID_PARAMETER;
-              }
-            }
-            else {
-              pSocket->errno = ENOTCONN;
-              Status = EFI_NOT_STARTED;
-            }
-            
-            //
-            //  Release the socket layer synchronization
-            //
-            RESTORE_TPL ( TplPrevious );
-          }
+        if ( NULL == pSocket->pApi->pfnLocalAddrGet ) {
+          Status = EFI_UNSUPPORTED;
+          pSocket->errno = ENOTSUP;
         }
         else {
-          pSocket->errno = ENOTCONN;
-          Status = EFI_NOT_STARTED;
+          //
+          //  Synchronize with the socket layer
+          //
+          RAISE_TPL ( TplPrevious, TPL_SOCKETS );
+
+          //
+          //  Verify that there is just a single connection
+          //
+          pPort = pSocket->pPortList;
+          if ( NULL != pPort ) {
+            //
+            //  Verify the address length
+            //
+            LengthInBytes = pSocket->pApi->AddressLength;
+            if (( LengthInBytes <= *pAddressLength ) 
+              && ( 255 >= LengthInBytes )) {
+              //
+              //  Return the local address and address length
+              //
+              ZeroMem ( pAddress, LengthInBytes );
+              pAddress->sa_len = (uint8_t)LengthInBytes;
+              *pAddressLength = pAddress->sa_len;
+              pSocket->pApi->pfnLocalAddrGet ( pPort, pAddress );
+              pSocket->errno = 0;
+              Status = EFI_SUCCESS;
+            }
+            else {
+              pSocket->errno = EINVAL;
+              Status = EFI_INVALID_PARAMETER;
+            }
+          }
+          else {
+            pSocket->errno = ENOTCONN;
+            Status = EFI_NOT_STARTED;
+          }
+          
+          //
+          //  Release the socket layer synchronization
+          //
+          RESTORE_TPL ( TplPrevious );
         }
       }
       else {
         pSocket->errno = EINVAL;
         Status = EFI_INVALID_PARAMETER;
       }
+    }
+    else {
+      //
+      //  Address not set
+      //
+      Status = EFI_NOT_STARTED;
+      pSocket->errno = EADDRNOTAVAIL;
     }
   }
   
@@ -2808,6 +2808,14 @@ EslSocketOptionGet (
         LengthInBytes = sizeof ( pSocket->MaxRxBuf );
         break;
 
+      case SO_REUSEADDR:
+        //
+        //  Return the address reuse flag
+        //
+        pOptionData = (UINT8 *)&pSocket->bReUseAddr;
+        LengthInBytes = sizeof ( pSocket->bReUseAddr );
+        break;
+      
       case SO_SNDBUF:
         //
         //  Return the maximum transmit buffer size
@@ -3030,6 +3038,14 @@ EslSocketOptionSet (
           //
           pOptionData = (UINT8 *)&pSocket->MaxRxBuf;
           LengthInBytes = sizeof ( pSocket->MaxRxBuf );
+          break;
+
+        case SO_REUSEADDR:
+          //
+          //  Return the address reuse flag
+          //
+          pOptionData = (UINT8 *)&pSocket->bReUseAddr;
+          LengthInBytes = sizeof ( pSocket->bReUseAddr );
           break;
 
         case SO_SNDBUF:

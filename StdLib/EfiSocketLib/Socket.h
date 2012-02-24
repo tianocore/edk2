@@ -989,9 +989,10 @@ typedef struct _ESL_SOCKET {
   //
   //  Socket options
   //
+  BOOLEAN bIncludeHeader;       ///<  TRUE if including the IP header
   BOOLEAN bListenCalled;        ///<  TRUE if listen was successfully called
   BOOLEAN bOobInLine;           ///<  TRUE if out-of-band messages are to be received inline with normal data
-  BOOLEAN bIncludeHeader;       ///<  TRUE if including the IP header
+  BOOLEAN bReUseAddr;           ///<  TRUE if using same address is allowed
 
   //
   //  Socket data
@@ -999,6 +1000,7 @@ typedef struct _ESL_SOCKET {
   int Domain;                   ///<  Specifies family of protocols
   int Type;                     ///<  Specifies how to make network connection
   int Protocol;                 ///<  Specifies lower layer protocol to use
+  BOOLEAN bAddressSet;          ///<  Set when the address is specified
   BOOLEAN bConfigured;          ///<  Set after the socket is configured
 
   BOOLEAN bRxDisable;           ///<  Receive disabled via shutdown

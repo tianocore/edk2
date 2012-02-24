@@ -113,6 +113,7 @@ EslUdp6LocalAddressSet (
     //  Set the port number
     //
     pConfig->StationPort = SwapBytes16 ( pIpAddress->sin6_port );
+    pPort->pSocket->bAddressSet = TRUE;
 
     //
     //  Display the local address

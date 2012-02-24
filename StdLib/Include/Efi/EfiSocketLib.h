@@ -115,18 +115,12 @@
 **/
 #define RAISE_TPL(PreviousTpl, tpl)     \
   VERIFY_TPL ( tpl );                   \
-  PreviousTpl = gBS->RaiseTPL ( tpl );  \
-  DEBUG (( DEBUG_TPL | DEBUG_TPL,       \
-          "%d: TPL\r\n",                \
-          tpl ))
+  PreviousTpl = gBS->RaiseTPL ( tpl );
 
 /**
   Restore the TPL to the previous value
 **/
 #define RESTORE_TPL(tpl)            \
-  DEBUG (( DEBUG_TPL | DEBUG_TPL,   \
-          "%d: TPL\r\n",            \
-          tpl ));                   \
   gBS->RestoreTPL ( tpl )
 
 //------------------------------------------------------------------------------

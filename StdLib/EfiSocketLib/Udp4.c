@@ -463,6 +463,7 @@ EslUdp4RemoteAddressSet (
   pUdp4->ConfigData.RemoteAddress.Addr[2] = (UINT8)( pRemoteAddress->sin_addr.s_addr >> 16 );
   pUdp4->ConfigData.RemoteAddress.Addr[3] = (UINT8)( pRemoteAddress->sin_addr.s_addr >> 24 );
   pUdp4->ConfigData.RemotePort = SwapBytes16 ( pRemoteAddress->sin_port );
+  pPort->pSocket->bAddressSet = TRUE;
   Status = EFI_SUCCESS;
 
   //

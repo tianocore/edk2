@@ -619,6 +619,7 @@ EslIp4RemoteAddressSet (
   pIp4->DestinationAddress.Addr[1] = (UINT8)( pRemoteAddress->sin_addr.s_addr >> 8 );
   pIp4->DestinationAddress.Addr[2] = (UINT8)( pRemoteAddress->sin_addr.s_addr >> 16 );
   pIp4->DestinationAddress.Addr[3] = (UINT8)( pRemoteAddress->sin_addr.s_addr >> 24 );
+  pPort->pSocket->bAddressSet = TRUE;
   Status = EFI_SUCCESS;
 
   //

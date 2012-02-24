@@ -1171,6 +1171,7 @@ EslTcp4LocalAddressSet (
       //  Set the port number
       //
       pAccessPoint->StationPort = SwapBytes16 ( pIpAddress->sin_port );
+      pPort->pSocket->bAddressSet = TRUE;
 
       //
       //  Display the local address

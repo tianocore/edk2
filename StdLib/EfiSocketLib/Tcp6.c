@@ -1210,6 +1210,7 @@ EslTcp6LocalAddressSet (
       //  Set the port number
       //
       pAccessPoint->StationPort = SwapBytes16 ( pIpAddress->sin6_port );
+      pPort->pSocket->bAddressSet = TRUE;
 
       //
       //  Display the local address
