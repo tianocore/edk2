@@ -166,6 +166,13 @@ BdsBootLinuxAtag (
       Print (L"ERROR: Did not find initrd image.\n");
       return Status;
     }
+    
+    // Check if the initrd is a uInitrd
+    if (*(UINT32*)((UINTN)InitrdImage) == LINUX_UIMAGE_SIGNATURE) {
+      // Skip the 64-byte image header
+      InitrdImage = (EFI_PHYSICAL_ADDRESS)((UINTN)InitrdImage + 64);
+      InitrdImageSize -= 64;
+    }
   }
 
   //
@@ -232,6 +239,13 @@ BdsBootLinuxFdt (
     if (EFI_ERROR(Status)) {
       Print (L"ERROR: Did not find initrd image.\n");
       return Status;
+    }
+
+    // Check if the initrd is a uInitrd
+    if (*(UINT32*)((UINTN)InitrdImage) == LINUX_UIMAGE_SIGNATURE) {
+      // Skip the 64-byte image header
+      InitrdImage = (EFI_PHYSICAL_ADDRESS)((UINTN)InitrdImage + 64);
+      InitrdImageSize -= 64;
     }
   }
 
