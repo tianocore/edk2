@@ -1,7 +1,8 @@
 /*++
 
 Copyright (c) 2009, Hewlett-Packard Company. All rights reserved.<BR>
-Portions copyright (c) 2010, Apple Inc. All rights reserved.<BR>                                                         
+Portions copyright (c) 2010, Apple Inc. All rights reserved.<BR>
+Portions copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR> 
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -309,10 +310,6 @@ ExitBootServicesEvent (
 {
   UINTN    Index;
   
-  for (Index = 0; Index < PcdGet32(PcdGicNumInterrupts); Index++) {
-    DisableInterruptSource (&gHardwareInterruptProtocol, Index);
-  }
-
   // Acknowledge all pending interrupts
   for (Index = 0; Index < PcdGet32(PcdGicNumInterrupts); Index++) {
     DisableInterruptSource (&gHardwareInterruptProtocol, Index);
