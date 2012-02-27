@@ -2,7 +2,7 @@
   Provides string functions, linked list functions, math functions, synchronization
   functions, and CPU architecture-specific functions.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -7122,7 +7122,7 @@ AsmGetThunk16Properties (
 VOID
 EFIAPI
 AsmPrepareThunk16 (
-  OUT     THUNK_CONTEXT             *ThunkContext
+  IN OUT  THUNK_CONTEXT             *ThunkContext
   );
 
 
