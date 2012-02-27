@@ -2,6 +2,7 @@
   Template for Timer Architecture Protocol driver of the ARM flavor
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 20i1 - 2012, ARM Ltd. All rights reserved.<BR>
   
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
@@ -356,6 +357,9 @@ TimerInitialize (
   EFI_HANDLE  Handle = NULL;
   EFI_STATUS  Status;
 
+  // Set the interrupt timer number
+  gVector = PcdGet32(PcdSP804TimerPeriodicInterruptNum);
+
   // Find the interrupt controller protocol.  ASSERT if not found.
   Status = gBS->LocateProtocol (&gHardwareInterruptProtocolGuid, NULL, (VOID **)&gInterrupt);
   ASSERT_EFI_ERROR (Status);
@@ -365,7 +369,6 @@ TimerInitialize (
   ASSERT_EFI_ERROR (Status);
 
   // Install interrupt handler
-  gVector = PcdGet32(PcdSP804TimerPeriodicInterruptNum);
   Status = gInterrupt->RegisterInterruptSource (gInterrupt, gVector, TimerInterruptHandler);
   ASSERT_EFI_ERROR (Status);
 
