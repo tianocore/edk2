@@ -50,6 +50,10 @@ GetExtractGuidedSectionHandlerInfo (
   // Set the available memory address to handler info.
   //
   HandlerInfo = (EXTRACT_GUIDED_SECTION_HANDLER_INFO*)(VOID*)(UINTN) PcdGet64 (PcdGuidedExtractHandlerTableAddress);
+  if (HandlerInfo == NULL) {
+    *InfoPointer = NULL;
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   //
   // First check whether the handler information structure is initialized.
@@ -129,6 +133,7 @@ ExtractGuidedSectionGetGuidList (
   //
   // Get GuidTable and Table Number
   //
+  ASSERT (HandlerInfo != NULL);
   *ExtractHandlerGuidTable = HandlerInfo->ExtractHandlerGuidTable;
   return HandlerInfo->NumberOfExtractHandler;
 }
@@ -187,6 +192,7 @@ ExtractGuidedSectionRegisterHandlers (
   //
   // Search the match registered GetInfo handler for the input guided section.
   //
+  ASSERT (HandlerInfo != NULL);
   for (Index = 0; Index < HandlerInfo->NumberOfExtractHandler; Index ++) {
     if (CompareGuid (HandlerInfo->ExtractHandlerGuidTable + Index, SectionGuid)) {
       //
@@ -288,6 +294,7 @@ ExtractGuidedSectionGetInfo (
   //
   // Search the match registered GetInfo handler for the input guided section.
   //
+  ASSERT (HandlerInfo != NULL);
   for (Index = 0; Index < HandlerInfo->NumberOfExtractHandler; Index ++) {
     if (CompareGuid (HandlerInfo->ExtractHandlerGuidTable + Index, SectionDefinitionGuid)) {
       //
@@ -381,6 +388,7 @@ ExtractGuidedSectionDecode (
   //
   // Search the match registered Extract handler for the input guided section.
   //
+  ASSERT (HandlerInfo != NULL);
   for (Index = 0; Index < HandlerInfo->NumberOfExtractHandler; Index ++) {
     if (CompareGuid (HandlerInfo->ExtractHandlerGuidTable + Index, SectionDefinitionGuid)) {
       //
