@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -43,6 +43,10 @@ PrimaryMain (
   TemporaryRamBase = (UINTN)PcdGet32 (PcdCPUCoresStackBase) + PpiListSize;
   TemporaryRamSize = (UINTN)PcdGet32 (PcdCPUCorePrimaryStackSize) - PpiListSize;
 
+  // Make sure the size is 8-byte aligned. Once divided by 2, the size should be 4-byte aligned
+  // to ensure the stack pointer is 4-byte aligned.
+  TemporaryRamSize = TemporaryRamSize - (TemporaryRamSize & (0x8-1));
+
   //
   // Bind this information into the SEC hand-off state
   // Note: this must be in sync with the stuff in the asm file
@@ -55,8 +59,8 @@ PrimaryMain (
   SecCoreData.TemporaryRamSize       = TemporaryRamSize;
   SecCoreData.PeiTemporaryRamBase    = SecCoreData.TemporaryRamBase;
   SecCoreData.PeiTemporaryRamSize    = SecCoreData.TemporaryRamSize / 2;
-  SecCoreData.StackBase              = (VOID *)((UINTN)(SecCoreData.TemporaryRamBase) + (SecCoreData.TemporaryRamSize/2));
-  SecCoreData.StackSize              = SecCoreData.TemporaryRamSize / 2;
+  SecCoreData.StackBase              = (VOID *)ALIGN_VALUE((UINTN)(SecCoreData.TemporaryRamBase) + SecCoreData.PeiTemporaryRamSize, 0x4);
+  SecCoreData.StackSize              = (TemporaryRamBase + TemporaryRamSize) - (UINTN)SecCoreData.StackBase;
 
   // Jump to PEI core entry point
   (PeiCoreEntryPoint)(&SecCoreData, PpiList);
