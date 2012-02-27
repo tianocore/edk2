@@ -1,6 +1,14 @@
-/*  $NetBSD: paths.h,v 1.30 2004/12/11 06:01:33 christos Exp $  */
+/** @file
 
-/*
+    Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+    This program and the accompanying materials
+    are licensed and made available under the terms and conditions of the BSD License
+    which accompanies this distribution.  The full text of the license may be found at
+    http://opensource.org/licenses/bsd-license.php
+
+    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
  * Copyright (c) 1989, 1993
  *  The Regents of the University of California.  All rights reserved.
  *
@@ -29,87 +37,32 @@
  * SUCH DAMAGE.
  *
  *  @(#)paths.h 8.1 (Berkeley) 6/2/93
+ *  $NetBSD: paths.h,v 1.30 2004/12/11 06:01:33 christos Exp
  */
 
 #ifndef _PATHS_H_
 #define _PATHS_H_
 
-///*
-// * Default user search path.
-// * set by login(1), rshd(8), rexecd(8)
-// * used by execvp(3) absent PATH from the environ(7)
-// */
-//#ifdef RESCUEDIR
-//#define _PATH_DEFPATH RESCUEDIR ":/usr/bin:/bin:/usr/pkg/bin:/usr/local/bin"
-//#else
-//#define _PATH_DEFPATH "/usr/bin:/bin:/usr/pkg/bin:/usr/local/bin"
-//#endif
-
-/*
- * Provide trailing slash, since mostly used for building pathnames.
+/* Provide trailing slash, since mostly used for building pathnames.
  * see the __CONCAT() macro from <sys/EfiCdefs.h> for cpp examples.
  */
-#define _PATH_DEV "/dev/"
-#define _PATH_ETC "/Efi/etc/"
-#define _PATH_TMP "/Efi/Temp/"
-//#define _PATH_DEV_PTS "/dev/pts/"
-//#define _PATH_EMUL_AOUT "/emul/aout/"
-//#define _PATH_VARDB "/var/db/"
-//#define _PATH_VARRUN  "/var/run/"
-//#define _PATH_VARTMP  "/var/tmp/"
+#define _PATH_DEV         "/dev/"
+#define _PATH_STDLIB      "/Efi/StdLib/"
+#define _PATH_ETC         _PATH_STDLIB "etc/"
+#define _PATH_TMP         _PATH_STDLIB "tmp/"
+#define _PATH_BIN         "/Efi/Tools/"
 
-///*
-// * All standard utilities path.
-// * set by init(8) for system programs & scripts (e.g. /etc/rc)
-// * used by ttyaction(3), whereis(1)
-// */
-//#define _PATH_STDPATH   "/usr/bin:/bin:/usr/sbin:/sbin:/usr/pkg/bin:/usr/pkg/sbin:/usr/local/bin:/usr/local/sbin"
+/* DOS style device paths */
+#define _PATH_TTYDEV      "tty:"
+#define _PATH_NULLDEV     "null:"
+#define _PATH_CONSOLE     "console:"
+#define _PATH_CONSTTY     "constty:"
+#define _PATH_STDIN       "stdin:"
+#define _PATH_STDOUT      "stdout:"
+#define _PATH_STDERR      "stderr:"
+#define _PATH_SOCKET      "socket:"
 
-//#define _PATH_AUDIO "/dev/audio"
-//#define _PATH_AUDIO0  "/dev/audio0"
-//#define _PATH_AUDIOCTL  "/dev/audioctl"
-//#define _PATH_AUDIOCTL0 "/dev/audioctl0"
-//#define _PATH_BPF "/dev/bpf"
-//#define _PATH_CLOCKCTL  "/dev/clockctl"
-//#define _PATH_CSMAPPER  "/usr/share/i18n/csmapper"
-//#define _PATH_DEFTAPE "/dev/nrst0"
-//#define _PATH_DEVDB "/var/run/dev.db"
-//#define _PATH_DRUM  "/dev/drum"
-//#define _PATH_ESDB  "/usr/share/i18n/esdb"
-//#define _PATH_FTPUSERS  "/etc/ftpusers"
-//#define _PATH_I18NMODULE "/usr/lib/i18n"
-//#define _PATH_ICONV "/usr/share/i18n/iconv"
-//#define _PATH_KMEM  "/dev/kmem"
-//#define _PATH_KSYMS "/dev/ksyms"
-//#define _PATH_KVMDB "/var/db/kvm.db"
-//#define _PATH_MAILDIR "/var/mail"
-//#define _PATH_MAN "/usr/share/man"
-//#define _PATH_MEM "/dev/mem"
-//#define _PATH_MIXER "/dev/mixer"
-//#define _PATH_MIXER0  "/dev/mixer0"
-//#define _PATH_NOLOGIN "/etc/nologin"
-//#define _PATH_RANDOM  "/dev/random"
-//#define _PATH_SENDMAIL  "/usr/sbin/sendmail"
-//#define _PATH_SHELLS  "/etc/shells"
-//#define _PATH_SKEYKEYS  "/etc/skeykeys"
-//#define _PATH_SOUND "/dev/sound"
-//#define _PATH_SOUND0  "/dev/sound0"
-//#define _PATH_SYSMON  "/dev/sysmon"
-//#define _PATH_UNIX  "/netbsd"
-//#define _PATH_URANDOM "/dev/urandom"
-//#define _PATH_VI  "/usr/bin/vi"
-
-// DOS style device paths
-#define _PATH_TTYDEV "tty:"
-#define _PATH_NULLDEV "null:"
-#define _PATH_CONSOLE "console:"
-#define _PATH_CONSTTY "constty:"
-#define _PATH_STDIN   "stdin:"
-#define _PATH_STDOUT  "stdout:"
-#define _PATH_STDERR  "stderr:"
-#define _PATH_SOCKET  "socket:"
-
-// *nix style device paths
+/* *nix style device paths */
 #define _PATH_DEVTTY      _PATH_DEV "tty"
 #define _PATH_DEVNULL     _PATH_DEV "null"
 #define _PATH_DEVCONSOLE  _PATH_DEV "console"
@@ -119,9 +72,8 @@
 #define _PATH_DEVSTDERR   _PATH_DEV "stderr"
 #define _PATH_DEVSOCKET   _PATH_DEV "socket"
 
-// Special files and locations
+/* Special files and locations */
 #define _PATH_FSTAB       _PATH_ETC "fstab"
-////#define _PATH_HEQUIV      _PATH_ETC "hosts.equiv"
 #define _PATH_HOSTNAME    _PATH_ETC "hostname"
 #define _PATH_HOSTS       _PATH_ETC "hosts"
 #define _PATH_HOSTCONF    _PATH_ETC "host.conf"
@@ -130,17 +82,11 @@
 #define _PATH_NETWORKS    _PATH_ETC "networks"
 #define _PATH_PROTOCOLS   _PATH_ETC "protocols"
 
-/*
- * Resolver configuration file.
+/* Resolver configuration file.
  * Normally not present, but may contain the address of the
  * inital name server(s) to query and the domain search list.
  */
 #define _PATH_RESCONF     _PATH_ETC "resolv.conf"
 #define _PATH_SERVICES    _PATH_ETC "services"
-////#define _PATH_SERVICES_DB "/Efi/var/db/services.db"
-
-//#define _PATH_BSHELL  RESCUEDIR "/sh"
-//#define _PATH_CSHELL  RESCUEDIR "/csh"
 
 #endif /* !_PATHS_H_ */
-
