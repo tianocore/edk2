@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -17,9 +17,7 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/PcdLib.h>
-
-//TODO: RemoveMe
-//#include <Library/DebugLib.h>
+#include <Library/DebugLib.h>
 
 VOID
 ArmPlatformGetGlobalVariable (
@@ -30,6 +28,9 @@ ArmPlatformGetGlobalVariable (
 {
   UINTN  GlobalVariableBase;
 
+  // Ensure the Global Variable Size have been initialized
+  ASSERT (VariableOffset < PcdGet32 (PcdSecGlobalVariableSize));
+
   GlobalVariableBase = PcdGet32 (PcdCPUCoresSecStackBase) + PcdGet32 (PcdCPUCoreSecPrimaryStackSize) - PcdGet32 (PcdSecGlobalVariableSize) + VariableOffset;
   
   if (VariableSize == 4) {
@@ -39,8 +40,6 @@ ArmPlatformGetGlobalVariable (
   } else {
     CopyMem (Variable, (VOID*)(GlobalVariableBase + VariableOffset), VariableSize);
   }
-
-  //DEBUG((EFI_D_ERROR,"++ GET Offset[%d] = 0x%x\n",VariableOffset,*(UINTN*)Variable));
 }
 
 VOID
@@ -52,6 +51,9 @@ ArmPlatformSetGlobalVariable (
 {
   UINTN  GlobalVariableBase;
 
+  // Ensure the Global Variable Size have been initialized
+  ASSERT (VariableOffset < PcdGet32 (PcdSecGlobalVariableSize));
+
   GlobalVariableBase = PcdGet32 (PcdCPUCoresSecStackBase) + PcdGet32 (PcdCPUCoreSecPrimaryStackSize) - PcdGet32 (PcdSecGlobalVariableSize) + VariableOffset;
 
   if (VariableSize == 4) {
@@ -61,7 +63,5 @@ ArmPlatformSetGlobalVariable (
   } else {
     CopyMem ((VOID*)(GlobalVariableBase + VariableOffset), Variable, VariableSize);
   }
-
-  //DEBUG((EFI_D_ERROR,"++ SET Offset[%d] = 0x%x\n",VariableOffset,*(UINTN*)Variable));
 }
 

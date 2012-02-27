@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -17,9 +17,7 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/PcdLib.h>
-
-//TODO: RemoveMe
-//#include <Library/DebugLib.h>
+#include <Library/DebugLib.h>
 
 // Declared by ArmPlatformPkg/PrePi Module
 extern UINTN mGlobalVariableBase;
@@ -32,6 +30,9 @@ ArmPlatformGetGlobalVariable (
   )
 {
   UINTN  GlobalVariableBase;
+
+  // Ensure the Global Variable Size have been initialized
+  ASSERT (VariableOffset < PcdGet32 (PcdPeiGlobalVariableSize));
 
   GlobalVariableBase = PcdGet32 (PcdCPUCoresStackBase) + PcdGet32 (PcdCPUCorePrimaryStackSize) - PcdGet32 (PcdPeiGlobalVariableSize) + VariableOffset;
 
@@ -54,6 +55,9 @@ ArmPlatformSetGlobalVariable (
   )
 {
   UINTN  GlobalVariableBase;
+
+  // Ensure the Global Variable Size have been initialized
+  ASSERT (VariableOffset < PcdGet32 (PcdPeiGlobalVariableSize));
 
   GlobalVariableBase = PcdGet32 (PcdCPUCoresStackBase) + PcdGet32 (PcdCPUCorePrimaryStackSize) - PcdGet32 (PcdPeiGlobalVariableSize) + VariableOffset;
 
