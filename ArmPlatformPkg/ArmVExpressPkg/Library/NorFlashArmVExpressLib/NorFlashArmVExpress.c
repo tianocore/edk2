@@ -1,6 +1,7 @@
 /** @file
 
- Copyright (c) 2011, ARM Ltd. All rights reserved.<BR>
+ Copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR>
+
  This program and the accompanying materials
  are licensed and made available under the terms and conditions of the BSD License
  which accompanies this distribution.  The full text of the license may be found at
@@ -22,11 +23,13 @@
 NOR_FLASH_DESCRIPTION mNorFlashDevices[NOR_FLASH_DEVICE_COUNT] = {
   { // BootMon
     ARM_VE_SMB_NOR0_BASE,
+    ARM_VE_SMB_NOR0_BASE,
     SIZE_256KB * 255,
     SIZE_256KB,
     {0xE7223039, 0x5836, 0x41E1, 0xB5, 0x42, 0xD7, 0xEC, 0x73, 0x6C, 0x5E, 0x59}
   },
   { // BootMon non-volatile storage
+    ARM_VE_SMB_NOR0_BASE,
     ARM_VE_SMB_NOR0_BASE + SIZE_256KB * 255,
     SIZE_64KB * 4,
     SIZE_64KB,
@@ -34,11 +37,13 @@ NOR_FLASH_DESCRIPTION mNorFlashDevices[NOR_FLASH_DEVICE_COUNT] = {
   },
   { // UEFI
     ARM_VE_SMB_NOR1_BASE,
+    ARM_VE_SMB_NOR1_BASE,
     SIZE_256KB * 255,
     SIZE_256KB,
     {0x1F15DA3C, 0x37FF, 0x4070, 0xB4, 0x71, 0xBB, 0x4A, 0xF1, 0x2A, 0x72, 0x4A}
   },
   { // UEFI Variable Services non-volatile storage
+    ARM_VE_SMB_NOR1_BASE,
     ARM_VE_SMB_NOR1_BASE + SIZE_256KB * 255,
     SIZE_64KB * 3, //FIXME: Set 3 blocks because I did not succeed to copy 4 blocks into the ARM Versatile Express NOR Flash in the last NOR Flash. It should be 4 blocks
     SIZE_64KB,

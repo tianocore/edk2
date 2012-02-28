@@ -1,6 +1,7 @@
 /** @file
 
- Copyright (c) 2011, ARM Ltd. All rights reserved.<BR>
+ Copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR>
+
  This program and the accompanying materials
  are licensed and made available under the terms and conditions of the BSD License
  which accompanies this distribution.  The full text of the license may be found at
@@ -20,6 +21,7 @@
 // RTSM
 NOR_FLASH_DESCRIPTION mNorFlashDevices[NOR_FLASH_DEVICE_COUNT] = {
   { // UEFI
+    ARM_EB_SMB_NOR_BASE,
     ARM_EB_SMB_NOR_BASE,
     SIZE_128KB * 512,
     SIZE_128KB,

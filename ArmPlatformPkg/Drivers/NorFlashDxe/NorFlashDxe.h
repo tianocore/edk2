@@ -1,6 +1,7 @@
 /** @file  NorFlashDxe.h
 
-  Copyright (c) 2011, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR>
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -26,12 +27,14 @@
 #include <Library/NorFlashPlatformLib.h>
 #include <Library/UefiLib.h>
 
-#define HIGH_16_BITS                              0xFFFF0000
-#define LOW_16_BITS                               0x0000FFFF
-#define LOW_8_BITS                                0x000000FF
+#define NOR_FLASH_ERASE_RETRY                     10
 
 // Device access macros
 // These are necessary because we use 2 x 16bit parts to make up 32bit data
+
+#define HIGH_16_BITS                              0xFFFF0000
+#define LOW_16_BITS                               0x0000FFFF
+#define LOW_8_BITS                                0x000000FF
 
 #define FOLD_32BIT_INTO_16BIT(value)              ( ( value >> 16 ) | ( value & LOW_16_BITS ) )
 
@@ -42,7 +45,7 @@
 // i.e. at the lower 16 bits AND at the higher 16 bits
 #define CREATE_NOR_ADDRESS(BaseAddr,OffsetAddr)   ((BaseAddr) + ((OffsetAddr) << 2))
 #define CREATE_DUAL_CMD(Cmd)                      ( ( Cmd << 16) | ( Cmd & LOW_16_BITS) )
-#define SEND_NOR_COMMAND(BaseAddr,OffsetAddr,Cmd) MmioWrite32 (CREATE_NOR_ADDRESS(BaseAddr,OffsetAddr), CREATE_DUAL_CMD(Cmd))
+#define SEND_NOR_COMMAND(BaseAddr,Offset,Cmd) MmioWrite32 (CREATE_NOR_ADDRESS(BaseAddr,Offset), CREATE_DUAL_CMD(Cmd))
 #define GET_NOR_BLOCK_ADDRESS(BaseAddr,Lba,LbaSize)( BaseAddr + (UINTN)((Lba) * LbaSize) )
 
 // Status Register Bits
@@ -128,7 +131,8 @@ struct _NOR_FLASH_INSTANCE {
   BOOLEAN                             Initialized;
   NOR_FLASH_INITIALIZE                Initialize;
 
-  UINTN                               BaseAddress;
+  UINTN                               DeviceBaseAddress;
+  UINTN                               RegionBaseAddress;
   UINTN                               Size;
   EFI_LBA                             StartLba;
 
@@ -142,44 +146,20 @@ struct _NOR_FLASH_INSTANCE {
 };
 
 EFI_STATUS
-EFIAPI
-NorFlashGetDriverName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
-  IN  CHAR8                        *Language,
-  OUT CHAR16                       **DriverName
-  );
-
-EFI_STATUS
-EFIAPI
-NorFlashGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
-  );
-
-EFI_STATUS
-EFIAPI
-NorFlashBlkIoInitialize (
-  IN NOR_FLASH_INSTANCE*      Instance
-  );
-
-EFI_STATUS
 NorFlashReadCfiData (
-  IN UINTN                    BaseAddress,
-  IN UINTN                    CFI_Offset,
-  IN UINT32                   NumberOfBytes,
+  IN  UINTN                   DeviceBaseAddress,
+  IN  UINTN                   CFI_Offset,
+  IN  UINT32                  NumberOfBytes,
   OUT UINT32                  *Data
-);
+  );
 
 EFI_STATUS
 NorFlashWriteBuffer (
-    IN  UINTN                 TargetAddress,
-    IN  UINTN                 BufferSizeInBytes,
-    IN  UINT32                *Buffer
-);
-
+  IN NOR_FLASH_INSTANCE     *Instance,
+  IN UINTN                  TargetAddress,
+  IN UINTN                  BufferSizeInBytes,
+  IN UINT32                 *Buffer
+  );
 
 //
 // BlockIO Protocol function EFI_BLOCK_IO_PROTOCOL.Reset
@@ -235,28 +215,28 @@ EFI_STATUS
 EFIAPI
 NorFlashFvbInitialize (
   IN NOR_FLASH_INSTANCE*                            Instance
-);
+  );
 
 EFI_STATUS
 EFIAPI
 FvbGetAttributes(
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL     *This,
   OUT       EFI_FVB_ATTRIBUTES_2                    *Attributes
-);
+  );
 
 EFI_STATUS
 EFIAPI
 FvbSetAttributes(
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL     *This,
   IN OUT    EFI_FVB_ATTRIBUTES_2                    *Attributes
-);
+  );
 
 EFI_STATUS
 EFIAPI
 FvbGetPhysicalAddress(
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL     *This,
   OUT       EFI_PHYSICAL_ADDRESS                    *Address
-);
+  );
 
 EFI_STATUS
 EFIAPI
@@ -265,7 +245,7 @@ FvbGetBlockSize(
   IN        EFI_LBA                                 Lba,
   OUT       UINTN                                   *BlockSize,
   OUT       UINTN                                   *NumberOfBlocks
-);
+  );
 
 EFI_STATUS
 EFIAPI
@@ -275,7 +255,7 @@ FvbRead(
   IN        UINTN                                   Offset,
   IN OUT    UINTN                                   *NumBytes,
   IN OUT    UINT8                                   *Buffer
-);
+  );
 
 EFI_STATUS
 EFIAPI
@@ -285,31 +265,32 @@ FvbWrite(
   IN        UINTN                                   Offset,
   IN OUT    UINTN                                   *NumBytes,
   IN        UINT8                                   *Buffer
-);
+  );
 
 EFI_STATUS
 EFIAPI
 FvbEraseBlocks(
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL     *This,
   ...
-);
+  );
 
 //
 // NorFlashDxe.c
 //
 
 EFI_STATUS
-NorFlashUnlockAndEraseSingleBlock(
-  IN  UINTN             BlockAddress
-);
+NorFlashUnlockAndEraseSingleBlock (
+  IN NOR_FLASH_INSTANCE     *Instance,
+  IN UINTN                  BlockAddress
+  );
 
 EFI_STATUS
 NorFlashWriteSingleBlock (
-  IN  UINTN             DeviceBaseAddress,
-  IN  EFI_LBA           Lba,
-  IN  UINT32            *pDataBuffer,
-  IN  UINT32            BlockSizeInWords
-);
+  IN NOR_FLASH_INSTANCE     *Instance,
+  IN EFI_LBA                Lba,
+  IN UINT32                 *DataBuffer,
+  IN UINT32                 BlockSizeInWords
+  );
 
 EFI_STATUS
 NorFlashWriteBlocks (
@@ -317,19 +298,19 @@ NorFlashWriteBlocks (
   IN  EFI_LBA           Lba,
   IN  UINTN             BufferSizeInBytes,
   IN  VOID              *Buffer
-);
+  );
 
 EFI_STATUS
 NorFlashReadBlocks (
-  IN  NOR_FLASH_INSTANCE *Instance,
-  IN  EFI_LBA           Lba,
-  IN  UINTN             BufferSizeInBytes,
-  OUT VOID              *Buffer
-);
+  IN NOR_FLASH_INSTANCE   *Instance,
+  IN EFI_LBA              Lba,
+  IN UINTN                BufferSizeInBytes,
+  OUT VOID                *Buffer
+  );
 
 EFI_STATUS
 NorFlashReset (
   IN  NOR_FLASH_INSTANCE *Instance
-);
+  );
 
 #endif /* __NOR_FLASH_DXE_H__ */

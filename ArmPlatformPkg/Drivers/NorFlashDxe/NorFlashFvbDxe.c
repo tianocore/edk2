@@ -1,6 +1,7 @@
 /*++ @file  NorFlashFvbDxe.c
 
- Copyright (c) 2011, ARM Ltd. All rights reserved.<BR>
+ Copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR>
+
  This program and the accompanying materials
  are licensed and made available under the terms and conditions of the BSD License
  which accompanies this distribution.  The full text of the license may be found at
@@ -15,6 +16,7 @@
 
 #include <Library/PcdLib.h>
 #include <Library/BaseLib.h>
+#include <Library/HobLib.h>
 #include <Library/UefiLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -54,8 +56,8 @@ InitializeFvAndVariableStoreHeaders (
   EFI_FIRMWARE_VOLUME_HEADER          *FirmwareVolumeHeader;
   VARIABLE_STORE_HEADER               *VariableStoreHeader;
 
-  if (!Instance->Initialized) {
-    Instance->Initialize(Instance);
+  if (!Instance->Initialized && Instance->Initialize) {
+    Instance->Initialize (Instance);
   }
 
   HeadersLength = sizeof(EFI_FIRMWARE_VOLUME_HEADER) + sizeof(EFI_FV_BLOCK_MAP_ENTRY) + sizeof(VARIABLE_STORE_HEADER);
@@ -138,7 +140,7 @@ ValidateFvHeader (
   UINTN                       VariableStoreLength;
   UINTN						  FvLength;
 
-  FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER*)Instance->BaseAddress;
+  FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER*)Instance->RegionBaseAddress;
 
   FvLength = PcdGet32(PcdFlashNvStorageVariableSize) + PcdGet32(PcdFlashNvStorageFtwWorkingSize) +
       PcdGet32(PcdFlashNvStorageFtwSpareSize);
@@ -286,7 +288,7 @@ FvbSetAttributes(
  **/
 EFI_STATUS
 EFIAPI
-FvbGetPhysicalAddress(
+FvbGetPhysicalAddress (
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL  *This,
   OUT       EFI_PHYSICAL_ADDRESS                 *Address
   )
@@ -295,7 +297,7 @@ FvbGetPhysicalAddress(
 
   Instance = INSTANCE_FROM_FVB_THIS(This);
 
-  DEBUG ((DEBUG_BLKIO, "FvbGetPhysicalAddress(BaseAddress=0x%08x)\n", Instance->BaseAddress));
+  DEBUG ((DEBUG_BLKIO, "FvbGetPhysicalAddress(BaseAddress=0x%08x)\n", Instance->RegionBaseAddress));
 
   ASSERT(Address != NULL);
 
@@ -422,7 +424,7 @@ FvbRead (
 
   DEBUG ((DEBUG_BLKIO, "FvbRead(Parameters: Lba=%ld, Offset=0x%x, *NumBytes=0x%x, Buffer @ 0x%08x)\n", Instance->StartLba + Lba, Offset, *NumBytes, Buffer));
 
-  if (!Instance->Initialized) {
+  if (!Instance->Initialized && Instance->Initialize) {
     Instance->Initialize(Instance);
   }
 
@@ -451,7 +453,7 @@ FvbRead (
   // FixMe: Allow an arbitrary number of bytes to be read out, not just a multiple of block size.
 
   // Allocate runtime memory to read in the NOR Flash data. Variable Services are runtime.
-  BlockBuffer = AllocateRuntimePool(BlockSize);
+  BlockBuffer = AllocateRuntimePool (BlockSize);
 
   // Check if the memory allocation was successful
   if (BlockBuffer == NULL) {
@@ -549,7 +551,7 @@ FvbWrite (
 
   Instance = INSTANCE_FROM_FVB_THIS(This);
 
-  if (!Instance->Initialized) {
+  if (!Instance->Initialized && Instance->Initialize) {
     Instance->Initialize(Instance);
   }
 
@@ -586,7 +588,7 @@ FvbWrite (
   // Allocate runtime memory to read in the NOR Flash data.
   // Since the intention is to use this with Variable Services and since these are runtime,
   // allocate the memory from the runtime pool.
-  BlockBuffer = AllocateRuntimePool(BlockSize);
+  BlockBuffer = AllocateRuntimePool (BlockSize);
 
   // Check we did get some memory
   if( BlockBuffer == NULL ) {
@@ -595,7 +597,7 @@ FvbWrite (
   }
 
   // Read NOR Flash data into shadow buffer
-  TempStatus = NorFlashReadBlocks(Instance, Instance->StartLba + Lba, BlockSize, BlockBuffer);
+  TempStatus = NorFlashReadBlocks (Instance, Instance->StartLba + Lba, BlockSize, BlockBuffer);
   if (EFI_ERROR (TempStatus)) {
     // Return one of the pre-approved error statuses
     Status = EFI_DEVICE_ERROR;
@@ -606,7 +608,7 @@ FvbWrite (
   CopyMem((BlockBuffer + Offset), Buffer, *NumBytes);
 
   // Write the modified buffer back to the NorFlash
-  Status = NorFlashWriteBlocks(Instance, Instance->StartLba + Lba, BlockSize, BlockBuffer);
+  Status = NorFlashWriteBlocks (Instance, Instance->StartLba + Lba, BlockSize, BlockBuffer);
   if (EFI_ERROR (TempStatus)) {
     // Return one of the pre-approved error statuses
     Status = EFI_DEVICE_ERROR;
@@ -715,7 +717,6 @@ FvbEraseBlocks (
   } while (TRUE);
   VA_END (Args);
 
-
   //
   // To get here, all must be ok, so start erasing
   //
@@ -738,14 +739,14 @@ FvbEraseBlocks (
 
       // Get the physical address of Lba to erase
       BlockAddress = GET_NOR_BLOCK_ADDRESS (
-          Instance->BaseAddress,
+          Instance->RegionBaseAddress,
           Instance->StartLba + StartingLba,
           Instance->Media.BlockSize
       );
 
       // Erase it
       DEBUG ((DEBUG_BLKIO, "FvbEraseBlocks: Erasing Lba=%ld @ 0x%08x.\n", Instance->StartLba + StartingLba, BlockAddress));
-      Status = NorFlashUnlockAndEraseSingleBlock (BlockAddress);
+      Status = NorFlashUnlockAndEraseSingleBlock (Instance, BlockAddress);
       if (EFI_ERROR(Status)) {
         VA_END (Args);
         Status = EFI_DEVICE_ERROR;
@@ -771,21 +772,24 @@ NorFlashFvbInitialize (
 {
   EFI_STATUS  Status;
   UINT32      FvbNumLba;
+  EFI_BOOT_MODE BootMode;
 
   DEBUG((DEBUG_BLKIO,"NorFlashFvbInitialize\n"));
 
-  Status = NorFlashBlkIoInitialize (Instance);
-  if (EFI_ERROR(Status)) {
-    DEBUG((EFI_D_ERROR,"NorFlashFvbInitialize: ERROR - Failed to initialize FVB\n"));
-    return Status;
-  }
   Instance->Initialized = TRUE;
 
   // Set the index of the first LBA for the FVB
-  Instance->StartLba = (PcdGet32 (PcdFlashNvStorageVariableBase) - Instance->BaseAddress) / Instance->Media.BlockSize;
+  Instance->StartLba = (PcdGet32 (PcdFlashNvStorageVariableBase) - Instance->RegionBaseAddress) / Instance->Media.BlockSize;
 
-  // Determine if there is a valid header at the beginning of the NorFlash
-  Status = ValidateFvHeader (Instance);
+  BootMode = GetBootModeHob ();
+  if (BootMode == BOOT_WITH_DEFAULT_SETTINGS) {
+    Status = EFI_INVALID_PARAMETER;
+  } else {
+    // Determine if there is a valid header at the beginning of the NorFlash
+    Status = ValidateFvHeader (Instance);
+  }
+
+  // Install the Default FVB header if required  
   if (EFI_ERROR(Status)) {
     // There is no valid header, so time to install one.
     DEBUG((EFI_D_ERROR,"NorFlashFvbInitialize: ERROR - The FVB Header is not valid. Installing a correct one for this volume.\n"));
