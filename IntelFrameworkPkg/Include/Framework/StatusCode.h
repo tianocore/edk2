@@ -2,7 +2,7 @@
   Status Code Definitions, according to Intel Platform Innovation Framework
   for EFI Status Codes Specification
 
-  Copyright (c) 2007, Intel Corporation
+  Copyright (c) 2007 - 2012, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -137,6 +137,25 @@
 ///
 ///@{
 #define EFI_CPU_CAUSE_NOT_DISABLED              0x0000
+///@}
+
+///
+/// Software Class PEI Module Subclass Progress Code definitions.
+///
+///@{
+#define EFI_SW_PEIM_PC_RECOVERY_BEGIN  EFI_SW_PEI_PC_RECOVERY_BEGIN
+#define EFI_SW_PEIM_PC_CAPSULE_LOAD    EFI_SW_PEI_PC_CAPSULE_LOAD
+#define EFI_SW_PEIM_PC_CAPSULE_START   EFI_SW_PEI_PC_CAPSULE_START
+#define EFI_SW_PEIM_PC_RECOVERY_USER   EFI_SW_PEI_PC_RECOVERY_USER
+#define EFI_SW_PEIM_PC_RECOVERY_AUTO   EFI_SW_PEI_PC_RECOVERY_AUTO
+///@}
+
+///
+/// Software Class PEI Core Subclass Error Code definitions.
+///
+///@{
+#define EFI_SW_PEIM_CORE_EC_DXE_CORRUPT       EFI_SW_PEI_CORE_EC_DXE_CORRUPT
+#define EFI_SW_PEIM_CORE_EC_DXEIPL_NOT_FOUND  EFI_SW_PEI_CORE_EC_DXEIPL_NOT_FOUND
 ///@}
 
 #endif
