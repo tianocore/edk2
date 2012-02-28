@@ -152,6 +152,16 @@ ArmPlatformSysConfigGet (
 }
 
 EFI_STATUS
+ArmPlatformSysConfigGetValues (
+  IN  SYS_CONFIG_FUNCTION   Function,
+  IN  UINTN                 Size,
+  OUT UINT32*               Values
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+EFI_STATUS
 ArmPlatformSysConfigSet (
   IN  SYS_CONFIG_FUNCTION   Function,
   IN  UINT32                Value
