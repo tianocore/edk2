@@ -1,7 +1,7 @@
 /** @file
 *  File managing the MMU for ARMv7 architecture
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -235,7 +235,7 @@ ArmConfigureMmu (
   TranslationTableAttribute = (ARM_MEMORY_REGION_ATTRIBUTES)0;
   while (MemoryTable->Length != 0) {
     // Find the memory attribute for the Translation Table
-    if ((TranslationTable >= MemoryTable->PhysicalBase) && (TranslationTable < MemoryTable->PhysicalBase + MemoryTable->Length)) {
+    if ((TranslationTable >= MemoryTable->PhysicalBase) && (TranslationTable <= MemoryTable->PhysicalBase - 1 + MemoryTable->Length)) {
       TranslationTableAttribute = MemoryTable->Attributes;
     }
 
