@@ -2,6 +2,7 @@
   Macros to work around lack of Apple support for LDR register, =expr
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -132,7 +133,16 @@
   and     Tmp, GlobalSize, #7         ;             \
   rsbne   Tmp, Tmp, #8                ;             \
   add     GlobalSize, GlobalSize, Tmp ;             \
-  sub     sp, StackTop, GlobalSize
+  sub     sp, StackTop, GlobalSize    ;             \
+                                      ;             \
+  mov     Tmp, sp                     ;             \
+  mov     GlobalSize, #0x0            ;             \
+_SetPrimaryStackInitGlobals:          ;             \
+  cmp     Tmp, StackTop               ;             \
+  beq     _SetPrimaryStackEnd         ;             \
+  str     GlobalSize, [Tmp], #4       ;             \
+  b       _SetPrimaryStackInitGlobals ;             \
+_SetPrimaryStackEnd:
 
 
 #elif defined (__GNUC__)
@@ -192,7 +202,16 @@
   and     Tmp, GlobalSize, #7         ;             \
   rsbne   Tmp, Tmp, #8                ;             \
   add     GlobalSize, GlobalSize, Tmp ;             \
-  sub     sp, StackTop, GlobalSize
+  sub     sp, StackTop, GlobalSize    ;             \
+                                      ;             \
+  mov     Tmp, sp                     ;             \
+  mov     GlobalSize, #0x0            ;             \
+_SetPrimaryStackInitGlobals:          ;             \
+  cmp     Tmp, StackTop               ;             \
+  beq     _SetPrimaryStackEnd         ;             \
+  str     GlobalSize, [Tmp], #4       ;             \
+  b       _SetPrimaryStackInitGlobals ;             \
+_SetPrimaryStackEnd:
 
 #else
 

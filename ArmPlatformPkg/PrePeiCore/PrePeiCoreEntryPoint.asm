@@ -32,50 +32,31 @@ _ModuleEntryPoint
   bl    ArmReadMpidr
   // Get ID of this CPU in Multicore system
   LoadConstantToReg (FixedPcdGet32(PcdArmPrimaryCoreMask), r1)
-  and   r0, r0, r1
-
-  // Calculate the top of the primary stack
+  and   r5, r0, r1
+  
+  // Get the top of the primary stacks (and the base of the secondary stacks)
   LoadConstantToReg (FixedPcdGet32(PcdCPUCoresStackBase), r1)
   LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), r2)
-  add   r2, r2, r1
+  add   r1, r1, r2
 
   // Is it the Primary Core ?
-  LoadConstantToReg (FixedPcdGet32(PcdArmPrimaryCore), r1)
-  cmp   r0, r1
+  LoadConstantToReg (FixedPcdGet32(PcdArmPrimaryCore), r3)
+  cmp   r5, r3
   beq   _SetupPrimaryCoreStack
 
 _SetupSecondaryCoreStack
-  // r2 = Top of the primary stack = Base of the Secondary Stacks
+  // r1 contains the base of the secondary stacks
 
-  // Get the position of the cores (ClusterId * 4) + CoreId
-  GetCorePositionInStack(r3, r0, r1)
+  // Get the Core Position (ClusterId * 4) + CoreId
+  GetCorePositionInStack(r0, r5, r2)
   // The stack starts at the top of the stack region. Add '1' to the Core Position to get the top of the stack
-  add   r3, r3, #1
+  add   r0, r0, #1
 
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecondaryStackSize), r1)
   // StackOffset = CorePos * StackSize
-  mul   r3, r3, r1
+  LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecondaryStackSize), r2)
+  mul   r0, r0, r2
   // SP = StackBase + StackOffset
-  add   sp, r2, r3
-
-  b     _PrepareArguments
-
-_SetupPrimaryCoreStack
-  // r2 = Top of the primary stack
-  LoadConstantToReg (FixedPcdGet32(PcdPeiGlobalVariableSize), r3)
-
-  // The reserved space for global variable must be 8-bytes aligned for pushing
-  // 64-bit variable on the stack
-  SetPrimaryStack (r2, r3, r1)
-
-  // Set all the PEI global variables to 0
-  mov   r3, sp
-  mov   r1, #0x0
-_InitGlobals
-  cmp   r3, r2
-  beq   _PrepareArguments
-  str   r1, [r3], #4
-  b     _InitGlobals
+  add   sp, r1, r0
 
 _PrepareArguments
   // The PEI Core Entry Point has been computed by GenFV and stored in the second entry of the Reset Vector
@@ -83,14 +64,24 @@ _PrepareArguments
   add   r2, r2, #4
   ldr   r1, [r2]
 
-  // move sec startup address into a data register
-  // ensure we're jumping to FV version of the code (not boot remapped alias)
-  ldr   r2, StartupAddr
-
-  // jump to PrePeiCore C code
+  // Move sec startup address into a data register
+  // Ensure we're jumping to FV version of the code (not boot remapped alias)
+  ldr   r3, StartupAddr
+  
+  // Jump to PrePeiCore C code
   //    r0 = mp_id
   //    r1 = pei_core_address
-  blx   r2
+  mov   r0, r5
+  blx   r3
+
+_SetupPrimaryCoreStack
+  // r1 contains the top of the primary stack
+  LoadConstantToReg (FixedPcdGet32(PcdPeiGlobalVariableSize), r2)
+
+  // The reserved space for global variable must be 8-bytes aligned for pushing
+  // 64-bit variable on the stack
+  SetPrimaryStack (r1, r2, r3)
+  b     _PrepareArguments
 
 _NeverReturn
   b _NeverReturn

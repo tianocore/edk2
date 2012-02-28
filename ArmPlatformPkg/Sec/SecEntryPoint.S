@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2011, ARM Limited. All rights reserved.
+//  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 //  
 //  This program and the accompanying materials                          
 //  are licensed and made available under the terms and conditions of the BSD License         
@@ -53,8 +53,8 @@ _IdentifyCpu:
   and   r5, r0, r1
   
   // Is it the Primary Core ?
-  LoadConstantToReg (FixedPcdGet32(PcdArmPrimaryCore), r1)
-  cmp   r5, r1
+  LoadConstantToReg (FixedPcdGet32(PcdArmPrimaryCore), r3)
+  cmp   r5, r3
   // Only the primary core initialize the memory (SMC)
   beq   _InitMem
   
@@ -72,41 +72,34 @@ _InitMem:
   LoadConstantToReg (FixedPcdGet32(PcdArmPrimaryCore), r5)
 
 _SetupPrimaryCoreStack:
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCoresSecStackBase), r2)
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecPrimaryStackSize), r3)
-  // Calculate the Top of the Stack
-  add   r2, r2, r3
-  LoadConstantToReg (FixedPcdGet32(PcdSecGlobalVariableSize), r3)
+  // Get the top of the primary stacks (and the base of the secondary stacks)
+  LoadConstantToReg (FixedPcdGet32(PcdCPUCoresSecStackBase), r1)
+  LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecPrimaryStackSize), r2)
+  add   r1, r1, r2
+
+  LoadConstantToReg (FixedPcdGet32(PcdSecGlobalVariableSize), r2)
 
   // The reserved space for global variable must be 8-bytes aligned for pushing
   // 64-bit variable on the stack
-  SetPrimaryStack (r2, r3, r1)
-
-  // Set all the SEC global variables to 0
-  mov     r3, sp
-  mov     r1, #0x0
-_InitGlobals:
-  cmp     r3, r2
-  beq     _PrepareArguments
-  str     r1, [r3], #4
-  b       _InitGlobals
+  SetPrimaryStack (r1, r2, r3)
+  b     _PrepareArguments
 
 _SetupSecondaryCoreStack:
+  // Get the top of the primary stacks (and the base of the secondary stacks)
+  LoadConstantToReg (FixedPcdGet32(PcdCPUCoresSecStackBase), r1)
+  LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecPrimaryStackSize), r2)
+  add   r1, r1, r2
+
   // Get the Core Position (ClusterId * 4) + CoreId
-  GetCorePositionInStack(r0, r5, r1)
+  GetCorePositionInStack(r0, r5, r2)
   // The stack starts at the top of the stack region. Add '1' to the Core Position to get the top of the stack
   add   r0, r0, #1
 
-  // Get the base of the stack for the secondary cores
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCoresSecStackBase), r1)
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecSecondaryStackSize), r2)
-  add   r1, r1, r2
-
   // StackOffset = CorePos * StackSize
+  LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecSecondaryStackSize), r2)
   mul   r0, r0, r2
   // SP = StackBase + StackOffset
   add   sp, r1, r0
-
 
 _PrepareArguments:
   // Move sec startup address into a data register

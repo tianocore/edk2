@@ -3,6 +3,8 @@
 ;  Macros to work around lack of Apple support for LDR register, =expr
 ;
 ;  Copyright (c) 2009, Apple Inc. All rights reserved.<BR>
+;  Copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR>
+;
 ;  This program and the accompanying materials                          
 ;  are licensed and made available under the terms and conditions of the BSD License         
 ;  which accompanies this distribution.  The full text of the license may be found at        
@@ -86,12 +88,24 @@
   MEND
   
   ; The reserved place must be 8-bytes aligned for pushing 64-bit variable on the stack
+  ; Note: Global Size will be modified
   MACRO
   SetPrimaryStack $StackTop, $GlobalSize, $Tmp
   and     $Tmp, $GlobalSize, #7
   rsbne   $Tmp, $Tmp, #8
   add     $GlobalSize, $GlobalSize, $Tmp
   sub     sp, $StackTop, $GlobalSize
+
+  ; Set all the global variables to 0
+  mov     $Tmp, sp
+  mov     $GlobalSize, #0x0
+_SetPrimaryStackInitGlobals
+  cmp     $Tmp, $StackTop
+  beq     _SetPrimaryStackEnd
+  str     $GlobalSize, [$Tmp], #4
+  b       _SetPrimaryStackInitGlobals
+
+_SetPrimaryStackEnd
   MEND
 
   END
