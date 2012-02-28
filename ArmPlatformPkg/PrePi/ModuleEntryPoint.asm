@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2011, ARM Limited. All rights reserved.
+//  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 //
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
@@ -46,11 +46,13 @@ _SetupStackPosition
   // Compute Top of System Memory
   LoadConstantToReg (FixedPcdGet32(PcdSystemMemoryBase), r1)
   LoadConstantToReg (FixedPcdGet32(PcdSystemMemorySize), r2)
+  sub   r2, r2, #1
   add   r1, r1, r2      // r1 = SystemMemoryTop = PcdSystemMemoryBase + PcdSystemMemorySize
 
   // Calculate Top of the Firmware Device
   LoadConstantToReg (FixedPcdGet32(PcdFdBaseAddress), r2)
   LoadConstantToReg (FixedPcdGet32(PcdFdSize), r3)
+  sub   r3, r3, #1
   add   r3, r3, r2      // r4 = FdTop = PcdFdBaseAddress + PcdFdSize
 
   // UEFI Memory Size (stacks are allocated in this region)
@@ -72,6 +74,24 @@ _SetupStackPosition
 _SetupStack
   // r1 contains the top of the stack (and the UEFI Memory)
 
+  // Because the 'push' instruction is equivalent to 'stmdb' (decrement before), we need to increment
+  // one to the top of the stack. We check if incrementing one does not overflow (case of DRAM at the
+  // top of the memory space)
+  adds  r6, r1, #1
+  bcs   _SetupOverflowStack
+
+_SetupAlignedStack
+  mov   r1, r6
+  b     _GetBaseUefiMemory
+
+_SetupOverflowStack
+  // Case memory at the top of the address space. Ensure the top of the stack is EFI_PAGE_SIZE
+  // aligned (4KB)
+  LoadConstantToReg (EFI_PAGE_MASK, r6)
+  and   r6, r6, r1
+  sub   r1, r1, r6
+
+_GetBaseUefiMemory
   // Calculate the Base of the UEFI Memory
   sub   r6, r1, r4
 
