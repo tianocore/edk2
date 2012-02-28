@@ -106,6 +106,11 @@ CEntryPoint (
       ArmCpuSetupSmpNonSecure (GET_CORE_ID(MpId));
     }
 
+    // Either we use the Secure Stacks for Secure Monitor (in this case (Base == 0) && (Size == 0))
+    // Or we use separate Secure Monitor stacks (but (Base != 0) && (Size != 0))
+    ASSERT (((PcdGet32(PcdCPUCoresSecMonStackBase) == 0) && (PcdGet32(PcdCPUCoreSecMonStackSize) == 0)) ||
+            ((PcdGet32(PcdCPUCoresSecMonStackBase) != 0) && (PcdGet32(PcdCPUCoreSecMonStackSize) != 0)));
+
     // Enter Monitor Mode
     enter_monitor_mode ((UINTN)TrustedWorldInitialization, MpId, (VOID*)(PcdGet32(PcdCPUCoresSecMonStackBase) + (PcdGet32(PcdCPUCoreSecMonStackSize) * (GET_CORE_POS(MpId) + 1))));
   } else {
