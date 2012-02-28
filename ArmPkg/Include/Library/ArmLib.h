@@ -59,9 +59,9 @@ typedef enum {
 #define IS_ARM_MEMORY_REGION_ATTRIBUTES_SECURE(attr) ((UINT32)(attr) & 1)
 
 typedef struct {
-  UINT32                        PhysicalBase;
-  UINT32                        VirtualBase;
-  UINT32                        Length;
+  UINTN                         PhysicalBase;
+  UINTN                         VirtualBase;
+  UINTN                         Length;
   ARM_MEMORY_REGION_ATTRIBUTES  Attributes;
 } ARM_MEMORY_REGION_DESCRIPTOR;
 
