@@ -1,7 +1,7 @@
 /** @file
   Linked List Library Functions.
 
-  Copyright (c) 2006 - 2008, Intel Corporation<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -350,8 +350,8 @@ IsListEmpty (
   @param  List  A pointer to the head node of a doubly linked list.
   @param  Node  A pointer to a node in the doubly linked list.
 
-  @retval TRUE  Node is one of the nodes in the doubly linked list.
-  @retval FALSE Node is not one of the nodes in the doubly linked list.
+  @retval TRUE  Node is the head of the doubly-linked list pointed by List.
+  @retval FALSE Node is not the head of the doubly-linked list pointed by List.
 
 **/
 BOOLEAN
