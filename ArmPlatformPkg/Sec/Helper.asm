@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2011, ARM Limited. All rights reserved.
+//  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 //  
 //  This program and the accompanying materials                          
 //  are licensed and made available under the terms and conditions of the BSD License         
@@ -11,24 +11,12 @@
 //
 //
 
-    EXPORT  monitor_vector_table
     EXPORT  return_from_exception
     EXPORT  enter_monitor_mode
     EXPORT  copy_cpsr_into_spsr
     EXPORT  set_non_secure_mode
     
     AREA   Helper, CODE, READONLY
-
-    ALIGN 32
-monitor_vector_table
-    ldr pc, dead
-    ldr pc, dead
-    ldr pc, dead
-    ldr pc, dead
-    ldr pc, dead
-    ldr pc, dead
-    ldr pc, dead
-    ldr pc, dead
 
 // arg0: Secure Monitor mode stack
 enter_monitor_mode

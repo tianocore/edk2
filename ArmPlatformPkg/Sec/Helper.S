@@ -1,5 +1,5 @@
 #========================================================================================
-#  Copyright (c) 2011, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 #  
 #  This program and the accompanying materials                          
 #  are licensed and made available under the terms and conditions of the BSD License         
@@ -15,21 +15,10 @@
 .text 
 .align 3
 
-GCC_ASM_EXPORT(monitor_vector_table)
 GCC_ASM_EXPORT(return_from_exception)
 GCC_ASM_EXPORT(enter_monitor_mode)
 GCC_ASM_EXPORT(copy_cpsr_into_spsr)
 GCC_ASM_EXPORT(set_non_secure_mode)
-
-ASM_PFX(monitor_vector_table):
-    ldr pc, dead
-    ldr pc, dead
-    ldr pc, dead
-    ldr pc, dead
-    ldr pc, dead
-    ldr pc, dead
-    ldr pc, dead
-    ldr pc, dead
 
 # arg0: Secure Monitor mode stack
 ASM_PFX(enter_monitor_mode):

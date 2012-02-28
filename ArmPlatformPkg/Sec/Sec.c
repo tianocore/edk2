@@ -1,7 +1,7 @@
 /** @file
 *  Main file supporting the SEC Phase on ARM Platforms
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -13,6 +13,7 @@
 *
 **/
 
+#include <Library/ArmTrustedMonitorLib.h>
 #include <Library/DebugAgentLib.h>
 #include <Library/PrintLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -23,8 +24,6 @@
 #include "SecInternal.h"
 
 #define SerialPrint(txt)  SerialPortWrite ((UINT8*)txt, AsciiStrLen(txt)+1);
-
-extern VOID *monitor_vector_table;
 
 VOID
 CEntryPoint (
@@ -114,10 +113,11 @@ CEntryPoint (
     // Enter Monitor Mode
     enter_monitor_mode ((VOID*)(PcdGet32(PcdCPUCoresSecMonStackBase) + (PcdGet32(PcdCPUCoreSecMonStackSize) * (GET_CORE_POS(MpId) + 1))));
 
-    //Write the monitor mode vector table address
-    ArmWriteVMBar((UINT32) &monitor_vector_table);
+  //-------------------- Monitor Mode ---------------------
 
-    //-------------------- Monitor Mode ---------------------
+  // Set up Monitor World (Vector Table, etc)
+  ArmSecureMonitorWorldInitialize ();
+
     // Setup the Trustzone Chipsets
     if (IS_PRIMARY_CORE(MpId)) {
       ArmPlatformTrustzoneInit ();
