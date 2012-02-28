@@ -33,7 +33,8 @@ TrustedWorldInitialization (
 
 VOID
 NonTrustedWorldTransition (
-  IN  UINTN                 MpId
+  IN  UINTN                     MpId,
+  IN  UINTN                     JumpAddress
   );
 
 VOID

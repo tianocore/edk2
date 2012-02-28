@@ -32,6 +32,7 @@ CEntryPoint (
 {
   CHAR8           Buffer[100];
   UINTN           CharCount;
+  UINTN           JumpAddress;
 
   // Invalidate the data cache. Doesn't have to do the Data cache clean.
   ArmInvalidateDataCache();
@@ -100,10 +101,6 @@ CEntryPoint (
 
   // Test if Trustzone is supported on this platform
   if (FixedPcdGetBool (PcdTrustzoneSupport)) {
-    // Ensure the Monitor Stack Base & Size have been set
-    ASSERT(PcdGet32(PcdCPUCoresSecMonStackBase) != 0);
-    ASSERT(PcdGet32(PcdCPUCoreSecMonStackSize) != 0);
-
     if (ArmIsMpCore()) {
       // Setup SMP in Non Secure world
       ArmCpuSetupSmpNonSecure (GET_CORE_ID(MpId));
@@ -121,7 +118,11 @@ CEntryPoint (
     // Status Register as the the current one (CPSR).
     copy_cpsr_into_spsr ();
 
-    NonTrustedWorldTransition (MpId);
+    // Call the Platform specific function to execute additional actions if required
+    JumpAddress = PcdGet32 (PcdFvBaseAddress);
+    ArmPlatformSecExtraAction (MpId, &JumpAddress);
+
+    NonTrustedWorldTransition (MpId, JumpAddress);
   }
   ASSERT (0); // We must never return from the above function
 }
@@ -131,6 +132,8 @@ TrustedWorldInitialization (
   IN  UINTN                     MpId
   )
 {
+  UINTN   JumpAddress;
+
   //-------------------- Monitor Mode ---------------------
 
   // Set up Monitor World (Vector Table, etc)
@@ -155,25 +158,25 @@ TrustedWorldInitialization (
   // Transfer the interrupt to Non-secure World
   ArmGicSetupNonSecure (PcdGet32(PcdGicDistributorBase), PcdGet32(PcdGicInterruptInterfaceBase));
 
+  // Call the Platform specific fucntion to execute additional actions if required
+  JumpAddress = PcdGet32 (PcdFvBaseAddress);
+  ArmPlatformSecExtraAction (MpId, &JumpAddress);
+
   // Write to CP15 Non-secure Access Control Register
   ArmWriteNsacr (PcdGet32 (PcdArmNsacr));
 
   // CP15 Secure Configuration Register
   ArmWriteScr (PcdGet32 (PcdArmScr));
 
-  NonTrustedWorldTransition (MpId);
+  NonTrustedWorldTransition (MpId, JumpAddress);
 }
 
 VOID
 NonTrustedWorldTransition (
-  IN  UINTN                     MpId
+  IN  UINTN                     MpId,
+  IN  UINTN                     JumpAddress
   )
 {
-  UINTN           JumpAddress;
-
-  JumpAddress = PcdGet32 (PcdFvBaseAddress);
-  ArmPlatformSecExtraAction (MpId, &JumpAddress);
-
   // If PcdArmNonSecModeTransition is defined then set this specific mode to CPSR before the transition
   // By not set, the mode for Non Secure World is SVC
   if (PcdGet32 (PcdArmNonSecModeTransition) != 0) {
