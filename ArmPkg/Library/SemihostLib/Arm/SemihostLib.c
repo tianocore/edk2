@@ -11,7 +11,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
-#include <Uefi.h>
+#include <Base.h>
 
 #include <Library/BaseLib.h>
 #include <Library/SemihostLib.h>
@@ -26,7 +26,7 @@ SemihostConnectionSupported (
   return SEMIHOST_SUPPORTED;
 }
 
-EFI_STATUS
+RETURN_STATUS
 SemihostFileOpen (
   IN  CHAR8  *FileName,
   IN  UINT32 Mode,
@@ -37,7 +37,7 @@ SemihostFileOpen (
   INT32                     Result;
 
   if (FileHandle == NULL) {
-    return EFI_INVALID_PARAMETER;
+    return RETURN_INVALID_PARAMETER;
   }
 
   OpenBlock.FileName    = FileName;
@@ -47,14 +47,14 @@ SemihostFileOpen (
   Result = Semihost_SYS_OPEN(&OpenBlock);
 
   if (Result == -1) {
-    return EFI_NOT_FOUND;
+    return RETURN_NOT_FOUND;
   } else {
     *FileHandle = Result;
-    return EFI_SUCCESS;
+    return RETURN_SUCCESS;
   }
 }
 
-EFI_STATUS
+RETURN_STATUS
 SemihostFileSeek (
   IN UINT32 FileHandle,
   IN UINT32 Offset
@@ -69,13 +69,13 @@ SemihostFileSeek (
   Result = Semihost_SYS_SEEK(&SeekBlock);
 
   if (Result == 0) {
-    return EFI_SUCCESS;
+    return RETURN_SUCCESS;
   } else {
-    return EFI_ABORTED;
+    return RETURN_ABORTED;
   }
 }
 
-EFI_STATUS
+RETURN_STATUS
 SemihostFileRead (
   IN     UINT32 FileHandle,
   IN OUT UINT32 *Length,
@@ -86,7 +86,7 @@ SemihostFileRead (
   UINT32                          Result;
 
   if ((Length == NULL) || (Buffer == NULL)) {
-    return EFI_INVALID_PARAMETER;
+    return RETURN_INVALID_PARAMETER;
   }
 
   ReadBlock.Handle = FileHandle;
@@ -96,14 +96,14 @@ SemihostFileRead (
   Result = Semihost_SYS_READ(&ReadBlock);
 
   if (Result == *Length) {
-    return EFI_ABORTED;
+    return RETURN_ABORTED;
   } else {
     *Length -= Result;
-    return EFI_SUCCESS;
+    return RETURN_SUCCESS;
   }
 }
 
-EFI_STATUS
+RETURN_STATUS
 SemihostFileWrite (
   IN     UINT32 FileHandle,
   IN OUT UINT32 *Length,
@@ -113,7 +113,7 @@ SemihostFileWrite (
   SEMIHOST_FILE_READ_WRITE_BLOCK  WriteBlock;
 
   if ((Length == NULL) || (Buffer == NULL)) {
-    return EFI_INVALID_PARAMETER;
+    return RETURN_INVALID_PARAMETER;
   }
 
   WriteBlock.Handle = FileHandle;
@@ -122,10 +122,10 @@ SemihostFileWrite (
 
   *Length = Semihost_SYS_WRITE(&WriteBlock);
   
-  return EFI_SUCCESS;
+  return RETURN_SUCCESS;
 }
 
-EFI_STATUS
+RETURN_STATUS
 SemihostFileClose (
   IN UINT32 FileHandle
   )
@@ -133,13 +133,13 @@ SemihostFileClose (
   INT32 Result = Semihost_SYS_CLOSE(&FileHandle);
 
   if (Result == -1) {
-    return EFI_INVALID_PARAMETER;
+    return RETURN_INVALID_PARAMETER;
   } else {
-    return EFI_SUCCESS;
+    return RETURN_SUCCESS;
   }
 }
 
-EFI_STATUS
+RETURN_STATUS
 SemihostFileLength (
   IN  UINT32 FileHandle,
   OUT UINT32 *Length
@@ -148,20 +148,20 @@ SemihostFileLength (
   INT32       Result;
 
   if (Length == NULL) {
-    return EFI_INVALID_PARAMETER;
+    return RETURN_INVALID_PARAMETER;
   }
 
   Result = Semihost_SYS_FLEN(&FileHandle);
 
   if (Result == -1) {
-    return EFI_ABORTED;
+    return RETURN_ABORTED;
   } else {
     *Length = Result;
-    return EFI_SUCCESS;
+    return RETURN_SUCCESS;
   }
 }
 
-EFI_STATUS
+RETURN_STATUS
 SemihostFileRemove (
   IN CHAR8 *FileName
   )
@@ -175,9 +175,9 @@ SemihostFileRemove (
   Result = Semihost_SYS_REMOVE(&RemoveBlock);
 
   if (Result == 0) {
-    return EFI_SUCCESS;
+    return RETURN_SUCCESS;
   } else {
-    return EFI_ABORTED;
+    return RETURN_ABORTED;
   }
 }
 

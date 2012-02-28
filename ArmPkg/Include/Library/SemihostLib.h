@@ -34,45 +34,45 @@ SemihostConnectionSupported (
   VOID
   );
 
-EFI_STATUS
+RETURN_STATUS
 SemihostFileOpen (
   IN  CHAR8  *FileName,
   IN  UINT32 Mode,
   OUT UINT32 *FileHandle
   );
 
-EFI_STATUS
+RETURN_STATUS
 SemihostFileSeek (
   IN UINT32 FileHandle,
   IN UINT32 Offset
   );
 
-EFI_STATUS
+RETURN_STATUS
 SemihostFileRead (
   IN     UINT32 FileHandle,
   IN OUT UINT32 *Length,
   OUT    VOID   *Buffer
   );
 
-EFI_STATUS
+RETURN_STATUS
 SemihostFileWrite (
   IN     UINT32 FileHandle,
   IN OUT UINT32 *Length,
   IN     VOID   *Buffer
   );
 
-EFI_STATUS
+RETURN_STATUS
 SemihostFileClose (
   IN UINT32 FileHandle
   );
 
-EFI_STATUS
+RETURN_STATUS
 SemihostFileLength (
   IN  UINT32 FileHandle,
   OUT UINT32 *Length
   );
 
-EFI_STATUS
+RETURN_STATUS
 SemihostFileRemove (
   IN CHAR8 *FileName
   );
