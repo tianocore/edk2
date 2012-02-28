@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -12,8 +12,8 @@
 *
 **/
 
-#ifndef __ARM_TRUSTZONE_LIB_H__
-#define __ARM_TRUSTZONE_LIB_H__
+#ifndef __ARM_TRUSTZONE_H__
+#define __ARM_TRUSTZONE_H__
 
 #include <Uefi.h>
 

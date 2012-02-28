@@ -100,7 +100,6 @@
   ArmPkg/Library/ArmLib/ArmV7/ArmV7LibPrePi.inf
   ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
   ArmPkg/Library/ArmLib/Null/NullArmLib.inf
-  ArmPkg/Library/ArmTrustZoneLib/ArmTrustZoneLib.inf
   ArmPkg/Library/BaseMemoryLibStm/BaseMemoryLibStm.inf
   ArmPkg/Library/BaseMemoryLibVstm/BaseMemoryLibVstm.inf
   ArmPkg/Library/BasePeCoffLib/BasePeCoffLib.inf

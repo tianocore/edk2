@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -14,7 +14,8 @@
 
 #include <Library/BaseLib.h>
 #include <Library/IoLib.h>
-#include <Library/ArmTrustZoneLib.h>
+
+#include <Drivers/ArmTrustzone.h>
 
 #define TZPC_DECPROT0_STATUS_REG        0x800
 #define TZPC_DECPROT0_SET_REG           0x804
