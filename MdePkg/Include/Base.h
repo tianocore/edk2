@@ -455,6 +455,11 @@ struct _LIST_ENTRY {
 
 #define VA_END(Marker)                ((void)0)
 
+// For some ARM RVCT compilers, __va_copy is not defined
+#ifndef __va_copy
+  #define __va_copy(dest, src) ((void)((dest) = (src)))
+#endif
+
 #define VA_COPY(Dest, Start)          __va_copy (Dest, Start)
 
 #elif defined(__GNUC__) && !defined(NO_BUILTIN_VA_FUNCS)
