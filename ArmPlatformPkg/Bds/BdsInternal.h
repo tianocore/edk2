@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -36,7 +36,7 @@
 #define BOOT_DEVICE_DESCRIPTION_MAX   100
 #define BOOT_DEVICE_FILEPATH_MAX      100
 #define BOOT_DEVICE_OPTION_MAX        300
-#define BOOT_DEVICE_ADDRESS_MAX       20
+#define BOOT_DEVICE_ADDRESS_MAX       (sizeof(L"0x0000000000000000"))
 
 #define ARM_BDS_OPTIONAL_DATA_SIGNATURE   SIGNATURE_32('a', 'b', 'o', 'd')
 
