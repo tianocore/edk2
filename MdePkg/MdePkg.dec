@@ -5,7 +5,7 @@
 # It also provides the definitions(including PPIs/PROTOCOLs/GUIDs) of
 # EFI1.10/UEFI2.0/UEFI2.1/PI1.0 and some Industry Standards.
 #
-# Copyright (c) 2007 - 2009, Intel Corporation.
+# Copyright (c) 2007 - 2012, Intel Corporation.
 #
 # All rights reserved.
 # This program and the accompanying materials are licensed and made available under
@@ -582,7 +582,7 @@
   gEfiPlatformDriverOverrideProtocolGuid = { 0x6b30c738, 0xa391, 0x11d4, {0x9a, 0x3b, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d } }
 
   ## Include/Protocol/DriverFamilyOverride.h
-  gEfiDriverFamilyOverrideProtocolGuid = {0x6b30c738, 0xa391, 0x11d4, {0x9a, 0x3b, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d }}
+  gEfiDriverFamilyOverrideProtocolGuid = {0xb1ee129e, 0xda36, 0x4181, { 0x91, 0xf8, 0x4, 0xa4, 0x92, 0x37, 0x66, 0xa7 }}
 
   ## Include/Protocol/BusSpecificDriverOverride.h
   gEfiBusSpecificDriverOverrideProtocolGuid = { 0x3BC1B285, 0x8A15, 0x4A82, { 0xAA, 0xBF, 0x4D, 0x7D, 0x13, 0xFB, 0x32, 0x65 }}
