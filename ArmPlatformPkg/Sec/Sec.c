@@ -32,7 +32,6 @@ CEntryPoint (
 {
   CHAR8           Buffer[100];
   UINTN           CharCount;
-  UINTN           JumpAddress;
 
   // Invalidate the data cache. Doesn't have to do the Data cache clean.
   ArmInvalidateDataCache();
@@ -111,35 +110,7 @@ CEntryPoint (
     }
 
     // Enter Monitor Mode
-    enter_monitor_mode ((VOID*)(PcdGet32(PcdCPUCoresSecMonStackBase) + (PcdGet32(PcdCPUCoreSecMonStackSize) * (GET_CORE_POS(MpId) + 1))));
-
-  //-------------------- Monitor Mode ---------------------
-
-  // Set up Monitor World (Vector Table, etc)
-  ArmSecureMonitorWorldInitialize ();
-
-    // Setup the Trustzone Chipsets
-    if (IS_PRIMARY_CORE(MpId)) {
-      ArmPlatformTrustzoneInit ();
-
-      // Waiting for the Primary Core to have finished to initialize the Secure World
-      ArmCpuSynchronizeSignal (ARM_CPU_EVENT_SECURE_INIT);
-    } else {
-      // The secondary cores need to wait until the Trustzone chipsets configuration is done
-      // before switching to Non Secure World
-
-      // Waiting for the Primary Core to have finished to initialize the Secure World
-      ArmCpuSynchronizeWait (ARM_CPU_EVENT_SECURE_INIT);
-    }
-
-    // Transfer the interrupt to Non-secure World
-    ArmGicSetupNonSecure (PcdGet32(PcdGicDistributorBase), PcdGet32(PcdGicInterruptInterfaceBase));
-
-    // Write to CP15 Non-secure Access Control Register
-    ArmWriteNsacr (PcdGet32 (PcdArmNsacr));
-
-    // CP15 Secure Configuration Register
-    ArmWriteScr (PcdGet32 (PcdArmScr));
+    enter_monitor_mode ((UINTN)TrustedWorldInitialization, MpId, (VOID*)(PcdGet32(PcdCPUCoresSecMonStackBase) + (PcdGet32(PcdCPUCoreSecMonStackSize) * (GET_CORE_POS(MpId) + 1))));
   } else {
     if (IS_PRIMARY_CORE(MpId)) {
       SerialPrint ("Trust Zone Configuration is disabled\n\r");
@@ -149,7 +120,56 @@ CEntryPoint (
     // If we want to keep this function call we need to ensure the SVC's SPSR point to the same Program
     // Status Register as the the current one (CPSR).
     copy_cpsr_into_spsr ();
+
+    NonTrustedWorldTransition (MpId);
   }
+  ASSERT (0); // We must never return from the above function
+}
+
+VOID
+TrustedWorldInitialization (
+  IN  UINTN                     MpId
+  )
+{
+  //-------------------- Monitor Mode ---------------------
+
+  // Set up Monitor World (Vector Table, etc)
+  ArmSecureMonitorWorldInitialize ();
+
+  // Setup the Trustzone Chipsets
+  if (IS_PRIMARY_CORE(MpId)) {
+    ArmPlatformTrustzoneInit ();
+
+    if (ArmIsMpCore()) {
+      // Waiting for the Primary Core to have finished to initialize the Secure World
+      ArmCpuSynchronizeSignal (ARM_CPU_EVENT_SECURE_INIT);
+    }
+  } else {
+    // The secondary cores need to wait until the Trustzone chipsets configuration is done
+    // before switching to Non Secure World
+
+    // Waiting for the Primary Core to have finished to initialize the Secure World
+    ArmCpuSynchronizeWait (ARM_CPU_EVENT_SECURE_INIT);
+  }
+
+  // Transfer the interrupt to Non-secure World
+  ArmGicSetupNonSecure (PcdGet32(PcdGicDistributorBase), PcdGet32(PcdGicInterruptInterfaceBase));
+
+  // Write to CP15 Non-secure Access Control Register
+  ArmWriteNsacr (PcdGet32 (PcdArmNsacr));
+
+  // CP15 Secure Configuration Register
+  ArmWriteScr (PcdGet32 (PcdArmScr));
+
+  NonTrustedWorldTransition (MpId);
+}
+
+VOID
+NonTrustedWorldTransition (
+  IN  UINTN                     MpId
+  )
+{
+  UINTN           JumpAddress;
 
   JumpAddress = PcdGet32 (PcdFvBaseAddress);
   ArmPlatformSecExtraAction (MpId, &JumpAddress);

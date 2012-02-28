@@ -1,7 +1,7 @@
 /** @file
 *  Main file supporting the SEC Phase on ARM PLatforms
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -27,9 +27,19 @@
 #define IS_ALIGNED(Address, Align) (((UINTN)Address & (Align-1)) == 0)
 
 VOID
+TrustedWorldInitialization (
+  IN  UINTN                 MpId
+  );
+
+VOID
+NonTrustedWorldTransition (
+  IN  UINTN                 MpId
+  );
+
+VOID
 ArmSetupGicNonSecure (
-  IN  INTN          GicDistributorBase,
-  IN  INTN          GicInterruptInterfaceBase
+  IN  INTN                  GicDistributorBase,
+  IN  INTN                  GicInterruptInterfaceBase
 );
 
 // Vector Table for Sec Phase
@@ -45,12 +55,14 @@ NonSecureWaitForFirmware (
 
 VOID
 enter_monitor_mode (
-  IN VOID* Stack
+  IN UINTN                  MonitorEntryPoint,
+  IN UINTN                  MpId,
+  IN VOID*                  Stack
   );
 
 VOID
 return_from_exception (
-  IN UINTN NonSecureBase
+  IN UINTN                  NonSecureBase
   );
 
 VOID
@@ -60,7 +72,7 @@ copy_cpsr_into_spsr (
 
 VOID
 set_non_secure_mode (
-  IN ARM_PROCESSOR_MODE              Mode
+  IN ARM_PROCESSOR_MODE     Mode
   );
 
 VOID
