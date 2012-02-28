@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -93,7 +93,6 @@ EditHIInputAscii (
   AsciiStrToUnicodeStr (CmdLine, Str);
 
   Status = EditHIInputStr (Str, MaxCmdLine);
-
   if (!EFI_ERROR(Status)) {
     UnicodeStrToAsciiStr (Str, CmdLine);
   }

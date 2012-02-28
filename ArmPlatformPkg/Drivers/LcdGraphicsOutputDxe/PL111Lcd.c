@@ -57,7 +57,7 @@ LcdInitialize (
   EFI_STATUS  Status = EFI_SUCCESS;
 
   // Check if the PL111 is fitted on this motherboard
-  Status = PL111Indentify();
+  Status = PL111Indentify ();
   if (EFI_ERROR( Status )) {
     return EFI_DEVICE_ERROR;
   }

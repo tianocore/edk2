@@ -53,7 +53,7 @@ IdentifyPL031 (
     goto EXIT;
   }
 
-  // Check if this PrimeCell Peripheral is the SP805 Watchdog Timer
+  // Check if this PrimeCell Peripheral is the PL031 Real Time Clock
   if (  (MmioRead8 (PL031_RTC_PERIPH_ID0) != 0x31)
       || (MmioRead8 (PL031_RTC_PERIPH_ID1) != 0x10)
       || ((MmioRead8 (PL031_RTC_PERIPH_ID2) & 0xF) != 0x04)

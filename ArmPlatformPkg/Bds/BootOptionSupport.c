@@ -390,7 +390,7 @@ BdsLoadOptionFileSystemUpdateDevicePath (
   FILEPATH_DEVICE_PATH* FilePathDevicePath;
   EFI_DEVICE_PATH*  DevicePath;
 
-  DevicePath = DuplicateDevicePath(OldDevicePath);
+  DevicePath = DuplicateDevicePath (OldDevicePath);
 
   EndingDevicePath = (FILEPATH_DEVICE_PATH*)GetLastDevicePathNode (DevicePath);
  

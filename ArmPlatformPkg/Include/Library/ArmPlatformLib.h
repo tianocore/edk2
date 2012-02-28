@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -29,7 +29,7 @@
 #include <Library/ArmLib.h>
 
 /**
-  This structure is used by ArmVExpressGetEfiMemoryMap to describes a region of the EFI memory map
+  This structure is used to describe a region of the EFI memory map
 
   Every EFI regions of the system memory described by their physical start address and their size
   can have different attributes. Some regions can be tested and other untested.
