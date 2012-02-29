@@ -549,9 +549,9 @@ PeiLoadImageLoadImage (
 
   DEBUG_CODE_BEGIN ();
     CHAR8                              *AsciiString;
-    CHAR8                              AsciiBuffer[512];
+    CHAR8                              EfiFileName[512];
     INT32                              Index;
-    INT32                              Index1;
+    INT32                              StartIndex;
 
     //
     // Print debug message: Loading PEIM at 0x12345678 EntryPoint=0x12345688 Driver.efi
@@ -571,19 +571,37 @@ PeiLoadImageLoadImage (
     AsciiString = PeCoffLoaderGetPdbPointer (Pe32Data);
 
     if (AsciiString != NULL) {
-      for (Index = (INT32) AsciiStrLen (AsciiString) - 1; Index >= 0; Index --) {
+      StartIndex = 0;
+      for (Index = 0; AsciiString[Index] != 0; Index++) {
         if (AsciiString[Index] == '\\' || AsciiString[Index] == '/') {
+          StartIndex = Index + 1;
+        }
+      }
+
+      //
+      // Copy the PDB file name to our temporary string, and replace .pdb with .efi
+      // The PDB file name is limited in the range of 0~511.
+      // If the length is bigger than 511, trim the redudant characters to avoid overflow in array boundary.
+      //
+      for (Index = 0; Index < sizeof (EfiFileName) - 4; Index++) {
+        EfiFileName[Index] = AsciiString[Index + StartIndex];
+        if (EfiFileName[Index] == 0) {
+          EfiFileName[Index] = '.';
+        }
+        if (EfiFileName[Index] == '.') {
+          EfiFileName[Index + 1] = 'e';
+          EfiFileName[Index + 2] = 'f';
+          EfiFileName[Index + 3] = 'i';
+          EfiFileName[Index + 4] = 0;
           break;
         }
       }
 
-      if (Index != 0) {
-        for (Index1 = 0; AsciiString[Index + 1 + Index1] != '.'; Index1 ++) {
-          AsciiBuffer [Index1] = AsciiString[Index + 1 + Index1];
-        }
-        AsciiBuffer [Index1] = '\0';
-        DEBUG ((EFI_D_INFO | EFI_D_LOAD, "%a.efi", AsciiBuffer));
+      if (Index == sizeof (EfiFileName) - 4) {
+        EfiFileName[Index] = 0;
       }
+
+      DEBUG ((EFI_D_INFO | EFI_D_LOAD, "%a", EfiFileName));
     }
 
   DEBUG_CODE_END ();
