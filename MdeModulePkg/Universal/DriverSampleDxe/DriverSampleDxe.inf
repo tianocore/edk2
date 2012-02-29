@@ -2,7 +2,7 @@
 # This is a sample driver which show how HII protocol, VFR and UNI files are used to
 # create a driver which can be dipslayed and configured by a UEFI HII Form Browser.
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -69,7 +69,7 @@
   gEfiFormBrowser2ProtocolGuid                  ## CONSUMES
   gEfiHiiDatabaseProtocolGuid                   ## CONSUMES
   gEfiSimpleTextInputExProtocolGuid             ## CONSUMES
-
+  gEfiFormBrowserExProtocolGuid                 ## CONSUMES
 
 [Depex]
   gEfiSimpleTextOutProtocolGuid AND gEfiHiiDatabaseProtocolGuid AND gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid

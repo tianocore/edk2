@@ -2,7 +2,7 @@
 This is an example of how a driver might export data to the HII protocol to be
 later utilized by the Setup Protocol
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1795,6 +1795,8 @@ DriverSampleInit (
   BOOLEAN                         ActionFlag;
   EFI_STRING                      ConfigRequestHdr;
   MY_EFI_VARSTORE_DATA            *VarStoreConfig;
+  EFI_INPUT_KEY                   HotKey;
+  EFI_FORM_BROWSER_EXTENSION_PROTOCOL *FormBrowserEx;
 
   //
   // Initialize the local variables.
@@ -2032,6 +2034,34 @@ DriverSampleInit (
         &mEvent
         );
   ASSERT_EFI_ERROR (Status);
+
+  //
+  // Example of how to use BrowserEx protocol to register HotKey.
+  // 
+  Status = gBS->LocateProtocol (&gEfiFormBrowserExProtocolGuid, NULL, (VOID **) &FormBrowserEx);
+  if (!EFI_ERROR (Status)) {
+    //
+    // First unregister the default hot key F9 and F10.
+    //
+    HotKey.UnicodeChar = CHAR_NULL;
+    HotKey.ScanCode    = SCAN_F9;
+    FormBrowserEx->RegisterHotKey (&HotKey, 0, 0, NULL);
+    HotKey.ScanCode    = SCAN_F10;
+    FormBrowserEx->RegisterHotKey (&HotKey, 0, 0, NULL);
+    
+    //
+    // Register the default HotKey F9 and F10 again.
+    //
+    HotKey.ScanCode   = SCAN_F10;
+    NewString         = HiiGetString (PrivateData->HiiHandle[0], STRING_TOKEN (FUNCTION_TEN_STRING), NULL);
+    ASSERT (NewString != NULL);
+    FormBrowserEx->RegisterHotKey (&HotKey, BROWSER_ACTION_SUBMIT, 0, NewString);
+    HotKey.ScanCode   = SCAN_F9;
+    NewString         = HiiGetString (PrivateData->HiiHandle[0], STRING_TOKEN (FUNCTION_NINE_STRING), NULL);
+    ASSERT (NewString != NULL);
+    FormBrowserEx->RegisterHotKey (&HotKey, BROWSER_ACTION_DEFAULT, EFI_HII_DEFAULT_CLASS_STANDARD, NewString);
+  }
+
   //
   // In default, this driver is built into Flash device image,
   // the following code doesn't run.
