@@ -710,3 +710,104 @@ AsciiPrintXY (
   return ReturnNum;
 }
 
+/** 
+  Appends a formatted Unicode string to a Null-terminated Unicode string
+ 
+  This function appends a formatted Unicode string to the Null-terminated 
+  Unicode string specified by String.   String is optional and may be NULL.
+  Storage for the formatted Unicode string returned is allocated using 
+  AllocatePool().  The pointer to the appended string is returned.  The caller
+  is responsible for freeing the returned string.
+ 
+  If String is not NULL and not aligned on a 16-bit boundary, then ASSERT().
+  If FormatString is NULL, then ASSERT().
+  If FormatString is not aligned on a 16-bit boundary, then ASSERT().
+ 
+  @param[in] String         A Null-terminated Unicode string.
+  @param[in] FormatString   A Null-terminated Unicode format string.
+  @param[in]  Marker        VA_LIST marker for the variable argument list.
+
+  @retval NULL    There was not enough available memory.
+  @return         Null-terminated Unicode string is that is the formatted 
+                  string appended to String.
+**/
+CHAR16*
+EFIAPI
+CatVSPrint (
+  IN  CHAR16  *String, OPTIONAL
+  IN  CONST CHAR16  *FormatString,
+  IN  VA_LIST       Marker
+  )
+{
+  UINTN   CharactersRequired;
+  UINTN   SizeRequired;
+  CHAR16  *BufferToReturn;
+  VA_LIST ExtraMarker;
+
+  VA_COPY (ExtraMarker, Marker);
+  CharactersRequired = SPrintLength(FormatString, ExtraMarker);
+  VA_END (ExtraMarker);
+
+  if (String != NULL) {
+    SizeRequired = StrSize(String) + (CharactersRequired * sizeof(CHAR16));
+  } else {
+    SizeRequired = sizeof(CHAR16) + (CharactersRequired * sizeof(CHAR16));
+  }
+
+  BufferToReturn = AllocateZeroPool(SizeRequired);
+
+  if (BufferToReturn == NULL) {
+    return NULL;
+  }
+
+  if (String != NULL) {
+    StrCpy(BufferToReturn, String);
+  }
+
+  UnicodeVSPrint(BufferToReturn + StrLen(BufferToReturn), (CharactersRequired+1) * sizeof(CHAR16), FormatString, Marker);
+
+  ASSERT(StrSize(BufferToReturn)==SizeRequired);
+
+  return (BufferToReturn);
+}
+
+/** 
+  Appends a formatted Unicode string to a Null-terminated Unicode string
+ 
+  This function appends a formatted Unicode string to the Null-terminated 
+  Unicode string specified by String.   String is optional and may be NULL.
+  Storage for the formatted Unicode string returned is allocated using 
+  AllocatePool().  The pointer to the appended string is returned.  The caller
+  is responsible for freeing the returned string.
+ 
+  If String is not NULL and not aligned on a 16-bit boundary, then ASSERT().
+  If FormatString is NULL, then ASSERT().
+  If FormatString is not aligned on a 16-bit boundary, then ASSERT().
+ 
+  @param[in] String         A Null-terminated Unicode string.
+  @param[in] FormatString   A Null-terminated Unicode format string.
+  @param[in] ...            The variable argument list whose contents are 
+                            accessed based on the format string specified by 
+                            FormatString.
+
+  @retval NULL    There was not enough available memory.
+  @return         Null-terminated Unicode string is that is the formatted 
+                  string appended to String.
+**/
+CHAR16 *
+EFIAPI
+CatSPrint (
+  IN  CHAR16  *String, OPTIONAL
+  IN  CONST CHAR16  *FormatString,
+  ...
+  )
+{
+  VA_LIST   Marker;
+  CHAR16    *NewString;
+
+  VA_START (Marker, FormatString);
+  NewString = CatVSPrint(String, FormatString, Marker);
+  VA_END (Marker);
+  return NewString;
+}
+
