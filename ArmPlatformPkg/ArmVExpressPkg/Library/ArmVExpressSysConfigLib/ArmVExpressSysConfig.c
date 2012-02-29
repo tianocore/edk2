@@ -1,6 +1,7 @@
-/** @file  SysCfgArmVExpress.c
+/** @file  ArmVExpressSysConfig.c
 
-  Copyright (c) 2011, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR>
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -11,7 +12,7 @@
 
 **/
 
-#include <PiDxe.h>
+#include <Base.h>
 #include <Library/IoLib.h>
 #include <Library/DebugLib.h>
 
@@ -42,12 +43,12 @@
  *
  ****************************************************************************/
 
-EFI_STATUS
+RETURN_STATUS
 ArmPlatformSysConfigInitialize (
   VOID
   )
 {
-  return EFI_SUCCESS;
+  return RETURN_SUCCESS;
 }
 
 /***************************************
@@ -59,7 +60,7 @@ ArmPlatformSysConfigInitialize (
  * for setting and for reading out values
  ***************************************/
 
-EFI_STATUS
+RETURN_STATUS
 AccessSysCfgRegister (
   IN     UINT32   ReadWrite,
   IN     UINT32   Function,
@@ -89,7 +90,7 @@ AccessSysCfgRegister (
 
   // Check for errors
   if(MmioRead32(ARM_VE_SYS_CFGSTAT_REG) & SYS_CFGSTAT_ERROR) {
-    return EFI_DEVICE_ERROR;
+    return RETURN_DEVICE_ERROR;
   }
 
   // If reading then get the data value
@@ -97,10 +98,10 @@ AccessSysCfgRegister (
     *Data = MmioRead32(ARM_VE_SYS_CFGDATA_REG);
   }
 
-  return EFI_SUCCESS;
+  return RETURN_SUCCESS;
 }
 
-EFI_STATUS
+RETURN_STATUS
 ArmPlatformSysConfigGet (
   IN  SYS_CONFIG_FUNCTION   Function,
   OUT UINT32*               Value
@@ -145,23 +146,23 @@ ArmPlatformSysConfigGet (
   case SYS_CFG_REBOOT:
   case SYS_CFG_RTC:
   default:
-    return EFI_UNSUPPORTED;
+    return RETURN_UNSUPPORTED;
   }
 
   return AccessSysCfgRegister (SYS_CFGCTRL_READ, Function, Site, Position, Device, Value);
 }
 
-EFI_STATUS
+RETURN_STATUS
 ArmPlatformSysConfigGetValues (
   IN  SYS_CONFIG_FUNCTION   Function,
   IN  UINTN                 Size,
   OUT UINT32*               Values
   )
 {
-  return EFI_UNSUPPORTED;
+  return RETURN_UNSUPPORTED;
 }
 
-EFI_STATUS
+RETURN_STATUS
 ArmPlatformSysConfigSet (
   IN  SYS_CONFIG_FUNCTION   Function,
   IN  UINT32                Value
@@ -206,13 +207,13 @@ ArmPlatformSysConfigSet (
   case SYS_CFG_TEMP:
   case SYS_CFG_RTC:
   default:
-    return(EFI_UNSUPPORTED);
+    return RETURN_UNSUPPORTED;
   }
 
   return AccessSysCfgRegister (SYS_CFGCTRL_WRITE, Function, Site, Position, Device, &Value);
 }
 
-EFI_STATUS
+RETURN_STATUS
 ArmPlatformSysConfigSetDevice (
   IN  SYS_CONFIG_FUNCTION   Function,
   IN  UINT32                Device,
@@ -229,10 +230,10 @@ ArmPlatformSysConfigSetDevice (
   case SYS_CFG_SCC:
 #ifdef ARM_VE_SCC_BASE
     MmioWrite32 ((ARM_VE_SCC_BASE + (Device * 4)),Value);
-    return EFI_SUCCESS;
+    return RETURN_SUCCESS;
 #else
     // There is no System Configuration Controller on the Model
-    return EFI_UNSUPPORTED;
+    return RETURN_UNSUPPORTED;
 #endif
 
   case SYS_CFG_OSC_SITE1:
@@ -250,7 +251,7 @@ ArmPlatformSysConfigSetDevice (
     break;
 
   case SYS_CFG_RTC:
-    return(EFI_UNSUPPORTED);
+    return RETURN_UNSUPPORTED;
     //break;
 
   case SYS_CFG_OSC:
@@ -265,7 +266,7 @@ ArmPlatformSysConfigSetDevice (
     Site = ARM_VE_MOTHERBOARD_SITE;
     break;
   default:
-    return EFI_UNSUPPORTED;
+    return RETURN_UNSUPPORTED;
   }
 
   return AccessSysCfgRegister (SYS_CFGCTRL_WRITE, Function, Site, Position, Device, &Value);

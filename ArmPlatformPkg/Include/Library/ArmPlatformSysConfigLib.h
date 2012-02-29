@@ -29,31 +29,31 @@ typedef UINT32  SYS_CONFIG_FUNCTION;
 //
 // Functions
 //
-EFI_STATUS
+RETURN_STATUS
 ArmPlatformSysConfigInitialize (
   VOID
   );
 
-EFI_STATUS
+RETURN_STATUS
 ArmPlatformSysConfigGet (
   IN  SYS_CONFIG_FUNCTION   Function,
   OUT UINT32*               Value
   );
 
-EFI_STATUS
+RETURN_STATUS
 ArmPlatformSysConfigGetValues (
   IN  SYS_CONFIG_FUNCTION   Function,
   IN  UINTN                 Size,
   OUT UINT32*               Values
   );
 
-EFI_STATUS
+RETURN_STATUS
 ArmPlatformSysConfigSet (
   IN  SYS_CONFIG_FUNCTION   Function,
   IN  UINT32                Value
   );
 
-EFI_STATUS
+RETURN_STATUS
 ArmPlatformSysConfigSetDevice (
   IN  SYS_CONFIG_FUNCTION   Function,
   IN  UINT32                Device,

@@ -1,6 +1,6 @@
-/** @file  SysCfgArmPlatform.c
+/** @file  SysConfigArmRealViewEb.c
 
-  Copyright (c) 2011, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -11,7 +11,7 @@
 
 **/
 
-#include <PiDxe.h>
+#include <Base.h>
 #include <Library/IoLib.h>
 #include <Library/DebugLib.h>
 
@@ -25,70 +25,70 @@
  *
  ****************************************************************************/
 
-EFI_STATUS
+RETURN_STATUS
 ArmPlatformSysConfigInitialize (
   VOID
   )
 {
-  return EFI_SUCCESS;
+  return RETURN_SUCCESS;
 }
 
-EFI_STATUS
+RETURN_STATUS
 ArmPlatformSysConfigGet (
   IN  SYS_CONFIG_FUNCTION   Function,
   OUT UINT32*               Value
   )
 {
-  EFI_STATUS Status;
+  RETURN_STATUS Status;
 
-  Status = EFI_SUCCESS;
+  Status = RETURN_SUCCESS;
 
   // Intercept some functions
   switch(Function) {
 
   default:
-    Status = EFI_UNSUPPORTED;
+    Status = RETURN_UNSUPPORTED;
   }
 
   return Status;
 }
 
-EFI_STATUS
+RETURN_STATUS
 ArmPlatformSysConfigSet (
   IN  SYS_CONFIG_FUNCTION   Function,
   IN  UINT32                Value
   )
 {
-  EFI_STATUS Status;
+  RETURN_STATUS Status;
 
-  Status = EFI_SUCCESS;
+  Status = RETURN_SUCCESS;
 
   // Intercept some functions
   switch(Function) {
 
   default:
-    Status = EFI_UNSUPPORTED;
+    Status = RETURN_UNSUPPORTED;
   }
 
   return Status;
 }
 
-EFI_STATUS
+RETURN_STATUS
 ArmPlatformSysConfigSetDevice (
   IN  SYS_CONFIG_FUNCTION   Function,
   IN  UINT32                Device,
   IN  UINT32                Value
   )
 {
-  EFI_STATUS Status;
+  RETURN_STATUS Status;
 
-  Status = EFI_SUCCESS;
+  Status = RETURN_SUCCESS;
 
   // Intercept some functions
   switch(Function) {
 
   default:
-    Status = EFI_UNSUPPORTED;
+    Status = RETURN_UNSUPPORTED;
   }
 
   return Status;
