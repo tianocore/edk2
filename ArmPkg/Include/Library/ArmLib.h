@@ -15,6 +15,8 @@
 #ifndef __ARM_LIB__
 #define __ARM_LIB__
 
+#include <Uefi/UefiBaseType.h>
+
 #ifdef ARM_CPU_ARMv6
 #include <Chipset/ARM1176JZ-S.h>
 #else
@@ -59,8 +61,8 @@ typedef enum {
 #define IS_ARM_MEMORY_REGION_ATTRIBUTES_SECURE(attr) ((UINT32)(attr) & 1)
 
 typedef struct {
-  UINTN                         PhysicalBase;
-  UINTN                         VirtualBase;
+  EFI_PHYSICAL_ADDRESS          PhysicalBase;
+  EFI_VIRTUAL_ADDRESS           VirtualBase;
   UINTN                         Length;
   ARM_MEMORY_REGION_ATTRIBUTES  Attributes;
 } ARM_MEMORY_REGION_DESCRIPTOR;
