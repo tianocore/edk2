@@ -26,11 +26,14 @@
   PL011Uart.c
 
 [LibraryClasses]
+  DebugLib
   IoLib
 
 [Packages]
   MdePkg/MdePkg.dec
-#  MdeModulePkg/MdeModulePkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
 
 [Pcd]
+  gArmPlatformTokenSpaceGuid.PL011UartClkInHz
+  gArmPlatformTokenSpaceGuid.PL011UartInteger
+  gArmPlatformTokenSpaceGuid.PL011UartFractional

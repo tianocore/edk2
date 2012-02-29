@@ -101,8 +101,9 @@
   gArmPlatformTokenSpaceGuid.PcdSP805WatchdogClockFrequencyInHz|32000|UINT32|0x00000021
 
   ## PL011 UART
-  gArmPlatformTokenSpaceGuid.PcdUartDefaultReceiveFifoDepth|0x00000000|UINT32|0x0000001F
-  gArmPlatformTokenSpaceGuid.PcdUartDefaultTimeout|0x00000000|UINT32|0x00000020
+  gArmPlatformTokenSpaceGuid.PL011UartClkInHz|24000000|UINT32|0x0000001F
+  gArmPlatformTokenSpaceGuid.PL011UartInteger|0|UINT32|0x00000020
+  gArmPlatformTokenSpaceGuid.PL011UartFractional|0|UINT32|0x0000002D
 
   ## PL031 RealTimeClock
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x0|UINT32|0x00000024

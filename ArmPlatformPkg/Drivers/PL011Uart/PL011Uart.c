@@ -1,8 +1,8 @@
 /** @file
   Serial I/O Port library functions with no library constructor/destructor
 
-
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2011 - 2012, ARM Ltd. All rights reserved.<BR>
   
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -14,42 +14,134 @@
 
 **/
 
-#include <Include/Uefi.h>
-
+#include <Library/DebugLib.h>
 #include <Library/IoLib.h>
+#include <Library/PcdLib.h>
 
 #include <Drivers/PL011Uart.h>
 
 /*
 
-  Programmed hardware of Serial port.
+  Initialise the serial port to the specified settings.
+  All unspecified settings will be set to the default values.
 
-  @return    Always return EFI_UNSUPPORTED.
+  @return    Always return EFI_SUCCESS or EFI_INVALID_PARAMETER.
 
 **/
 RETURN_STATUS
 EFIAPI
-PL011UartInitialize (
-  IN  UINTN       UartBase,
-  IN  UINTN       BaudRate,
-  IN  UINTN       LineControl
+PL011UartInitializePort (
+  IN UINTN               UartBase,
+  IN UINT64              BaudRate,
+  IN UINT32              ReceiveFifoDepth,
+  IN UINT32              Timeout,
+  IN EFI_PARITY_TYPE     Parity,
+  IN UINT8               DataBits,
+  IN EFI_STOP_BITS_TYPE  StopBits
   )
 {
-	if (BaudRate == 115200) {
-		// Initialize baud rate generator
-		MmioWrite32 (UartBase + UARTIBRD, UART_115200_IDIV);
-		MmioWrite32 (UartBase + UARTFBRD, UART_115200_FDIV);
-	} else if (BaudRate == 38400) {
-		// Initialize baud rate generator
-		MmioWrite32 (UartBase + UARTIBRD, UART_38400_IDIV);
-		MmioWrite32 (UartBase + UARTFBRD, UART_38400_FDIV);
-	} else if (BaudRate == 19200) {
-		// Initialize baud rate generator
-		MmioWrite32 (UartBase + UARTIBRD, UART_19200_IDIV);
-		MmioWrite32 (UartBase + UARTFBRD, UART_19200_FDIV);
-	} else {
-		return EFI_INVALID_PARAMETER;
-	}
+  UINT32      LineControl;
+  UINT32      Divisor;
+
+  // The BaudRate must be passed
+  if (BaudRate == 0) {
+    return RETURN_INVALID_PARAMETER;
+  }
+  
+  LineControl = 0;
+
+  // The PL011 supports a buffer of either 1 or 32 chars. Therefore we can accept
+  // 1 char buffer as the minimum fifo size. Because everything can be rounded down,
+  // there is no maximum fifo size.
+  if (ReceiveFifoDepth == 0) {
+    LineControl |= PL011_UARTLCR_H_FEN;
+  } else if (ReceiveFifoDepth < 32) {
+    // Nothing else to do. 1 byte fifo is default.
+  } else if (ReceiveFifoDepth >= 32) {
+    LineControl |= PL011_UARTLCR_H_FEN;
+  }
+
+  //
+  // Parity
+  //
+  switch (Parity) {
+  case DefaultParity:
+  case NoParity:
+    // Nothing to do. Parity is disabled by default.
+    break;
+  case EvenParity:
+    LineControl |= (PL011_UARTLCR_H_PEN | PL011_UARTLCR_H_EPS);
+    break;
+  case OddParity:
+    LineControl |= PL011_UARTLCR_H_PEN;
+    break;
+  case MarkParity:
+    LineControl |= (PL011_UARTLCR_H_PEN | PL011_UARTLCR_H_SPS | PL011_UARTLCR_H_EPS);
+    break;
+  case SpaceParity:
+    LineControl |= (PL011_UARTLCR_H_PEN | PL011_UARTLCR_H_SPS);
+    break;
+  default:
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  //
+  // Data Bits
+  //
+  switch (DataBits) {
+  case 0:
+  case 8:
+    LineControl |= PL011_UARTLCR_H_WLEN_8;
+    break;
+  case 7:
+    LineControl |= PL011_UARTLCR_H_WLEN_7;
+    break;
+  case 6:
+    LineControl |= PL011_UARTLCR_H_WLEN_6;
+    break;
+  case 5:
+    LineControl |= PL011_UARTLCR_H_WLEN_5;
+    break;
+  default:
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  //
+  // Stop Bits
+  //
+  switch (StopBits) {
+  case DefaultStopBits:
+  case OneStopBit:
+    // Nothing to do. One stop bit is enabled by default.
+    break;
+  case TwoStopBits:
+    LineControl |= PL011_UARTLCR_H_STP2;
+    break;
+  case OneFiveStopBits:
+    // Only 1 or 2 stops bits are supported
+  default:
+    return RETURN_INVALID_PARAMETER;
+  }
+    
+  // Don't send the LineControl value to the PL011 yet,
+  // wait until after the Baud Rate setting.
+  // This ensures we do not mess up the UART settings halfway through
+  // in the rare case when there is an error with the Baud Rate.
+
+  //
+  // Baud Rate
+  //
+  if (PcdGet32(PL011UartInteger) != 0) {
+    // Integer and Factional part must be different of 0
+    ASSERT(PcdGet32(PL011UartFractional) != 0);
+    
+    MmioWrite32 (UartBase + UARTIBRD, PcdGet32(PL011UartInteger));
+    MmioWrite32 (UartBase + UARTFBRD, PcdGet32(PL011UartFractional));
+  } else {
+    Divisor = (PcdGet32 (PL011UartClkInHz) * 4) / BaudRate;
+    MmioWrite32 (UartBase + UARTIBRD, Divisor >> 6);
+    MmioWrite32 (UartBase + UARTFBRD, Divisor & 0x3F);
+  }
 
   // No parity, 1 stop, no fifo, 8 data bits
   MmioWrite32 (UartBase + UARTLCR_H, LineControl);
@@ -60,7 +152,139 @@ PL011UartInitialize (
   // Enable tx, rx, and uart overall
   MmioWrite32 (UartBase + UARTCR, PL011_UARTCR_RXE | PL011_UARTCR_TXE | PL011_UARTCR_UARTEN);
 
-  return EFI_SUCCESS;
+  return RETURN_SUCCESS;
+}
+
+/**
+  Set the serial device control bits.
+
+  @param  UartBase                The base address of the PL011 UART.
+  @param  Control                 Control bits which are to be set on the serial device.
+
+  @retval EFI_SUCCESS             The new control bits were set on the serial device.
+  @retval EFI_UNSUPPORTED         The serial device does not support this operation.
+  @retval EFI_DEVICE_ERROR        The serial device is not functioning correctly.
+
+**/
+RETURN_STATUS
+EFIAPI
+PL011UartSetControl (
+    IN UINTN                    UartBase,
+    IN UINT32                   Control
+  )
+{
+  UINT32      Bits;
+  UINT32      ValidControlBits;
+
+  ValidControlBits = (  EFI_SERIAL_REQUEST_TO_SEND
+                      | EFI_SERIAL_DATA_TERMINAL_READY
+  //                  | EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE       // Not implemented yet.
+  //                  | EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE       // Not implemented yet.
+                      | EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE
+                     );
+
+  if (Control & (~ValidControlBits)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  Bits = MmioRead32 (UartBase + UARTCR);
+
+  if (Control & EFI_SERIAL_REQUEST_TO_SEND) {
+    Bits |= PL011_UARTCR_RTS;
+  }
+
+  if (Control & EFI_SERIAL_DATA_TERMINAL_READY) {
+    Bits |= PL011_UARTCR_DTR;
+  }
+
+  if (Control & EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE) {
+    Bits |= PL011_UARTCR_LBE;
+  }
+
+  if (Control & EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE) {
+    Bits |= (PL011_UARTCR_CTSEN & PL011_UARTCR_RTSEN);
+  }
+
+  MmioWrite32 (UartBase + UARTCR, Bits);
+
+  return RETURN_SUCCESS;
+}
+
+/**
+  Get the serial device control bits.
+
+  @param  UartBase                The base address of the PL011 UART.
+  @param  Control                 Control signals read from the serial device.
+
+  @retval EFI_SUCCESS             The control bits were read from the serial device.
+  @retval EFI_DEVICE_ERROR        The serial device is not functioning correctly.
+
+**/
+RETURN_STATUS
+EFIAPI
+PL011UartGetControl (
+    IN UINTN                    UartBase,
+    OUT UINT32                  *Control
+  )
+{
+  UINT32      FlagRegister;
+  UINT32      ControlRegister;
+
+
+  FlagRegister = MmioRead32 (UartBase + UARTFR);
+  ControlRegister = MmioRead32 (UartBase + UARTCR);
+
+  *Control = 0;
+
+  if ((FlagRegister & PL011_UARTFR_CTS) == PL011_UARTFR_CTS) {
+    *Control |= EFI_SERIAL_CLEAR_TO_SEND;
+  }
+
+  if ((FlagRegister & PL011_UARTFR_DSR) == PL011_UARTFR_DSR) {
+    *Control |= EFI_SERIAL_DATA_SET_READY;
+  }
+
+  if ((FlagRegister & PL011_UARTFR_RI) == PL011_UARTFR_RI) {
+    *Control |= EFI_SERIAL_RING_INDICATE;
+  }
+
+  if ((FlagRegister & PL011_UARTFR_DCD) == PL011_UARTFR_DCD) {
+    *Control |= EFI_SERIAL_CARRIER_DETECT;
+  }
+
+  if ((ControlRegister & PL011_UARTCR_RTS) == PL011_UARTCR_RTS) {
+    *Control |= EFI_SERIAL_REQUEST_TO_SEND;
+  }
+
+  if ((ControlRegister & PL011_UARTCR_DTR) == PL011_UARTCR_DTR) {
+    *Control |= EFI_SERIAL_DATA_TERMINAL_READY;
+  }
+
+  if ((FlagRegister & PL011_UARTFR_RXFE) == PL011_UARTFR_RXFE) {
+    *Control |= EFI_SERIAL_INPUT_BUFFER_EMPTY;
+  }
+
+  if ((FlagRegister & PL011_UARTFR_TXFE) == PL011_UARTFR_TXFE) {
+    *Control |= EFI_SERIAL_OUTPUT_BUFFER_EMPTY;
+  }
+
+  if ((ControlRegister & (PL011_UARTCR_CTSEN | PL011_UARTCR_RTSEN)) == (PL011_UARTCR_CTSEN | PL011_UARTCR_RTSEN)) {
+    *Control |= EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE;
+  }
+
+#ifdef NEVER
+  // ToDo: Implement EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE
+  if ((ControlRegister & PL011_UARTCR_LBE) == PL011_UARTCR_LBE) {
+    *Control |= EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE;
+  }
+
+  // ToDo: Implement EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE
+  if (SoftwareLoopbackEnable) {
+    *Control |= EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE;
+  }
+#endif
+
+  return RETURN_SUCCESS;
 }
 
 /**

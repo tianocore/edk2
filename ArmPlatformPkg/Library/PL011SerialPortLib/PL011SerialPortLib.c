@@ -1,8 +1,8 @@
 /** @file
   Serial I/O Port library functions with no library constructor/destructor
 
-
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2012, ARM Ltd. All rights reserved.<BR>
   
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -14,7 +14,7 @@
 
 **/
 
-#include <Include/Uefi.h>
+#include <Include/Base.h>
 
 #include <Library/IoLib.h>
 #include <Library/PcdLib.h>
@@ -27,7 +27,7 @@
 
   Programmed hardware of Serial port.
 
-  @return    Always return EFI_UNSUPPORTED.
+  @return    Always return RETURN_UNSUPPORTED.
 
 **/
 RETURN_STATUS
@@ -36,21 +36,24 @@ SerialPortInitialize (
   VOID
   )
 {
-  // No parity, 1 stop, no fifo, 8 data bits
-  return PL011UartInitialize (
+  return PL011UartInitializePort (
       (UINTN)PcdGet64 (PcdSerialRegisterBase),
       (UINTN)PcdGet64 (PcdUartDefaultBaudRate),
-      PL011_UARTLCR_H_WLEN_8);
+      0, // Use the default value for Fifo depth
+      0, // Use the default value for Timeout,
+      (EFI_PARITY_TYPE)PcdGet8 (PcdUartDefaultParity),
+      PcdGet8 (PcdUartDefaultDataBits),
+      (EFI_STOP_BITS_TYPE) PcdGet8 (PcdUartDefaultStopBits));
 }
 
 /**
   Write data to serial device.
 
-  @param  Buffer           Point of data buffer which need to be writed.
+  @param  Buffer           Point of data buffer which need to be written.
   @param  NumberOfBytes    Number of output bytes which are cached in Buffer.
 
   @retval 0                Write data failed.
-  @retval !0               Actual number of bytes writed to serial device.
+  @retval !0               Actual number of bytes written to serial device.
 
 **/
 UINTN
@@ -64,13 +67,13 @@ SerialPortWrite (
 }
 
 /**
-  Read data from serial device and save the datas in buffer.
+  Read data from serial device and save the data in buffer.
 
-  @param  Buffer           Point of data buffer which need to be writed.
+  @param  Buffer           Point of data buffer which need to be written.
   @param  NumberOfBytes    Number of output bytes which are cached in Buffer.
 
   @retval 0                Read data failed.
-  @retval !0               Aactual number of bytes read from serial device.
+  @retval !0               Actual number of bytes read from serial device.
 
 **/
 UINTN
@@ -84,10 +87,10 @@ SerialPortRead (
 }
 
 /**
-  Check to see if any data is avaiable to be read from the debug device.
+  Check to see if any data is available to be read from the debug device.
 
-  @retval EFI_SUCCESS       At least one byte of data is avaiable to be read
-  @retval EFI_NOT_READY     No data is avaiable to be read
+  @retval EFI_SUCCESS       At least one byte of data is available to be read
+  @retval EFI_NOT_READY     No data is available to be read
   @retval EFI_DEVICE_ERROR  The serial device is not functioning properly
 
 **/
