@@ -1572,6 +1572,11 @@ EslTcp4Receive (
   CopyMem ( pBuffer, pPacket->pBuffer, DataLength );
 
   //
+  //  Set the next buffer address
+  //
+  pBuffer += DataLength;
+
+  //
   //  Determine if the data is being read
   //
   if ( *pbConsumePacket ) {
