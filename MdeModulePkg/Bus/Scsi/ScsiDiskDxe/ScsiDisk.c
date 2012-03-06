@@ -1,7 +1,7 @@
 /** @file
   SCSI disk driver that layers on every SCSI IO protocol in the system.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -521,6 +521,8 @@ ScsiDiskReadBlocks (
             &ScsiDiskDevice->BlkIo,
             &ScsiDiskDevice->BlkIo
             );
+      Status = EFI_MEDIA_CHANGED;
+      goto Done;
     }
   }
   //
@@ -637,6 +639,8 @@ ScsiDiskWriteBlocks (
             &ScsiDiskDevice->BlkIo,
             &ScsiDiskDevice->BlkIo
             );
+      Status = EFI_MEDIA_CHANGED;
+      goto Done;
     }
   }
   //
