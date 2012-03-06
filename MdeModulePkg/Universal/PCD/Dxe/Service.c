@@ -1,7 +1,7 @@
 /** @file
     Help functions used by PCD DXE driver.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -55,7 +55,7 @@ GetWorker (
   EFI_STATUS          Status;
   UINT32              LocalTokenNumber;
   UINT32              Offset;
-  UINT16              StringTableIdx;      
+  STRING_HEAD         StringTableIdx;      
   BOOLEAN             IsPeiDb;
 
   //
@@ -139,7 +139,7 @@ GetWorker (
 		// If a HII type PCD's datum type is VOID*, the DefaultValueOffset is the index of 
 		// string array in string table.
 		//
-        StringTableIdx = *(UINT16*)((UINT8 *) PcdDb + VariableHead->DefaultValueOffset);   
+        StringTableIdx = *(STRING_HEAD*)((UINT8 *) PcdDb + VariableHead->DefaultValueOffset);   
         VaraiableDefaultBuffer = (VOID *) (StringTable + StringTableIdx);     
         Status = GetHiiVariable (Guid, Name, &Data, &DataSize);
         if (Status == EFI_SUCCESS) {
@@ -184,7 +184,7 @@ GetWorker (
       break;
 
     case PCD_TYPE_STRING:
-      StringTableIdx = *(UINT16*)((UINT8 *) PcdDb + Offset);
+      StringTableIdx = *(STRING_HEAD*)((UINT8 *) PcdDb + Offset);
       RetPtr = (VOID *) (StringTable + StringTableIdx);
       break;
 
@@ -815,7 +815,7 @@ SetWorker (
     
     case PCD_TYPE_STRING:
       if (SetPtrTypeSize (TmpTokenNumber, Size)) {
-        CopyMem (StringTable + *((UINT16 *)InternalData), Data, *Size);
+        CopyMem (StringTable + *((STRING_HEAD *)InternalData), Data, *Size);
         Status = EFI_SUCCESS;
       } else {
         Status = EFI_INVALID_PARAMETER;
@@ -847,7 +847,7 @@ SetWorker (
       if (EFI_NOT_FOUND == Status) {
         if ((LocalTokenNumber & PCD_TYPE_ALL_SET) == (PCD_TYPE_HII|PCD_TYPE_STRING))  {
           CopyMem (
-            StringTable + *(UINT16 *)(PcdDb + VariableHead->DefaultValueOffset),
+            StringTable + *(STRING_HEAD *)(PcdDb + VariableHead->DefaultValueOffset),
             Data,
             *Size
             );

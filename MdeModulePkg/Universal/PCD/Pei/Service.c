@@ -2,7 +2,7 @@
   The driver internal functions are implmented here.
   They build Pei PCD database, and provide access service to PCD database.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -360,7 +360,7 @@ SetWorker (
 {
   UINT32              LocalTokenNumber;
   PEI_PCD_DATABASE    *PeiPcdDb;
-  UINT16              StringTableIdx;
+  STRING_HEAD         StringTableIdx;
   UINTN               Offset;
   VOID                *InternalData;
   UINTN               MaxSize;
@@ -432,7 +432,7 @@ SetWorker (
 
     case PCD_TYPE_STRING:
       if (SetPtrTypeSize (TokenNumber, Size, PeiPcdDb)) {
-        StringTableIdx = *((UINT16 *)InternalData);
+        StringTableIdx = *((STRING_HEAD *)InternalData);
         CopyMem (&PeiPcdDb->Init.StringTable[StringTableIdx], Data, *Size);
         return EFI_SUCCESS;
       } else {
@@ -594,7 +594,7 @@ GetWorker (
   UINTN               DataSize;
   VOID                *Data;
   UINT8               *StringTable;
-  UINT16              StringTableIdx;
+  STRING_HEAD         StringTableIdx;
   PEI_PCD_DATABASE    *PeiPcdDb;
   UINT32              LocalTokenNumber;
   UINTN               MaxSize;
@@ -654,7 +654,7 @@ GetWorker (
         // Return the default value specified by Platform Integrator 
         //
         if ((LocalTokenNumber & PCD_TYPE_ALL_SET) == (PCD_TYPE_HII|PCD_TYPE_STRING)) {
-          return (VOID*)&StringTable[*(UINT16*)((UINT8*)PeiPcdDb + VariableHead->DefaultValueOffset)];
+          return (VOID*)&StringTable[*(STRING_HEAD*)((UINT8*)PeiPcdDb + VariableHead->DefaultValueOffset)];
         } else {
           return (VOID *) ((UINT8 *) PeiPcdDb + VariableHead->DefaultValueOffset);
         }
@@ -665,7 +665,7 @@ GetWorker (
       return (VOID *) ((UINT8 *)PeiPcdDb + Offset);
 
     case PCD_TYPE_STRING:
-      StringTableIdx = * (UINT16*) ((UINT8 *) PeiPcdDb + Offset);
+      StringTableIdx = * (STRING_HEAD*) ((UINT8 *) PeiPcdDb + Offset);
       return (VOID *) (&StringTable[StringTableIdx]);
 
     default:
