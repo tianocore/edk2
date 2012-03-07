@@ -2,7 +2,7 @@
 
   XHCI transfer scheduling routines.
 
-Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1489,8 +1489,8 @@ XhcSyncEventRing (
     // Some 3rd party XHCI external cards don't support single 64-bytes width register access,
     // So divide it to two 32-bytes width register access.
     //
-    XhcWriteRuntimeReg (Xhc, XHC_ERDP_OFFSET, Low | BIT3);
-    XhcWriteRuntimeReg (Xhc, XHC_ERDP_OFFSET + 4, High);
+    XhcWriteRuntimeReg (Xhc, XHC_ERDP_OFFSET, XHC_LOW_32BIT (EvtRing->EventRingDequeue) | BIT3);
+    XhcWriteRuntimeReg (Xhc, XHC_ERDP_OFFSET + 4, XHC_HIGH_32BIT (EvtRing->EventRingDequeue));
   }
 
   return EFI_SUCCESS;

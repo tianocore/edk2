@@ -2,7 +2,7 @@
 
     Usb bus enumeration support.
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -698,26 +698,23 @@ UsbEnumerateNewDev (
 
   DEBUG (( EFI_D_INFO, "UsbEnumerateNewDev: device is of %d speed\n", Child->Speed));
 
-  if (Child->Speed != EFI_USB_SPEED_HIGH) {
+  if (((Child->Speed == EFI_USB_SPEED_LOW) || (Child->Speed == EFI_USB_SPEED_FULL)) &&
+      (Parent->Speed == EFI_USB_SPEED_HIGH)) {
     //
-    // If the child isn't a high speed device, it is necessary to
+    // If the child is a low or full speed device, it is necessary to
     // set the transaction translator. Port TT is 1-based.
     // This is quite simple:
     //  1. if parent is of high speed, then parent is our translator
     //  2. otherwise use parent's translator.
     //
-    if (Parent->Speed == EFI_USB_SPEED_HIGH) {
-      Child->Translator.TranslatorHubAddress  = Parent->Address;
-      Child->Translator.TranslatorPortNumber  = (UINT8) (Port + 1);
-
-    } else {
-      Child->Translator = Parent->Translator;
-    }
-
-    DEBUG (( EFI_D_INFO, "UsbEnumerateNewDev: device uses translator (%d, %d)\n",
-                Child->Translator.TranslatorHubAddress,
-                Child->Translator.TranslatorPortNumber));
+    Child->Translator.TranslatorHubAddress  = Parent->Address;
+    Child->Translator.TranslatorPortNumber  = (UINT8) (Port + 1);
+  } else {
+    Child->Translator = Parent->Translator;
   }
+  DEBUG (( EFI_D_INFO, "UsbEnumerateNewDev: device uses translator (%d, %d)\n",
+           Child->Translator.TranslatorHubAddress,
+           Child->Translator.TranslatorPortNumber));
 
   //
   // After port is reset, hub establishes a signal path between

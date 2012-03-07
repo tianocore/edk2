@@ -1,7 +1,7 @@
 /** @file
   The XHCI controller driver.
 
-Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -873,10 +873,12 @@ XhcControlTransfer (
 
   if (*TransferResult == EFI_USB_NOERROR) {
     Status = EFI_SUCCESS;
-  } else if ((*TransferResult == EFI_USB_ERR_STALL) ||
-             (*TransferResult == EFI_USB_ERR_TIMEOUT)) {
+  } else if (*TransferResult == EFI_USB_ERR_STALL) {
     RecoveryStatus = XhcRecoverHaltedEndpoint(Xhc, Urb);
     ASSERT_EFI_ERROR (RecoveryStatus);
+    Status = EFI_DEVICE_ERROR;
+    goto FREE_URB;
+  } else {
     goto FREE_URB;
   }
 
@@ -886,7 +888,8 @@ XhcControlTransfer (
   // Hook Set_Config request from UsbBus as we need configure device endpoint.
   //
   if ((Request->Request     == USB_REQ_GET_DESCRIPTOR) &&
-      (Request->RequestType == USB_REQUEST_TYPE (EfiUsbDataIn, USB_REQ_TYPE_STANDARD, USB_TARGET_DEVICE))) {
+      ((Request->RequestType == USB_REQUEST_TYPE (EfiUsbDataIn, USB_REQ_TYPE_STANDARD, USB_TARGET_DEVICE)) || 
+      ((Request->RequestType == USB_REQUEST_TYPE (EfiUsbDataIn, USB_REQ_TYPE_CLASS, USB_TARGET_DEVICE))))) {
     DescriptorType = (UINT8)(Request->Value >> 8);
     if ((DescriptorType == USB_DESC_TYPE_DEVICE) && (*DataLength == sizeof (EFI_USB_DEVICE_DESCRIPTOR))) {
         ASSERT (Data != NULL);
@@ -920,10 +923,11 @@ XhcControlTransfer (
         Xhc->UsbDevContext[SlotId].ConfDesc[Index] = AllocateZeroPool(*DataLength);
         CopyMem (Xhc->UsbDevContext[SlotId].ConfDesc[Index], Data, *DataLength);
       }
-    } else if ((DescriptorType == USB_DESC_TYPE_HUB) ||
-               (DescriptorType == USB_DESC_TYPE_HUB_SUPER_SPEED)) {
+    } else if (((DescriptorType == USB_DESC_TYPE_HUB) ||
+               (DescriptorType == USB_DESC_TYPE_HUB_SUPER_SPEED)) && (*DataLength > 2)) {
       ASSERT (Data != NULL);
       HubDesc = (EFI_USB_HUB_DESCRIPTOR *)Data;
+      ASSERT (HubDesc->NumPorts <= 15);
       //
       // The bit 5,6 of HubCharacter field of Hub Descriptor is TTT.
       //
@@ -932,8 +936,8 @@ XhcControlTransfer (
         //
         // Don't support multi-TT feature for super speed hub now.
         //
-        MTT = 1;
-        ASSERT (FALSE);
+        MTT = 0;
+        DEBUG ((EFI_D_ERROR, "XHCI: Don't support multi-TT feature for Hub now. (force to disable MTT)\n"));
       } else {
         MTT = 0;
       }
@@ -1152,10 +1156,10 @@ XhcBulkTransfer (
 
   if (*TransferResult == EFI_USB_NOERROR) {
     Status = EFI_SUCCESS;
-  } else if ((*TransferResult == EFI_USB_ERR_STALL) ||
-             (*TransferResult == EFI_USB_ERR_TIMEOUT)) {
+  } else if (*TransferResult == EFI_USB_ERR_STALL) {
     RecoveryStatus = XhcRecoverHaltedEndpoint(Xhc, Urb);
     ASSERT_EFI_ERROR (RecoveryStatus);
+    Status = EFI_DEVICE_ERROR;
   }
 
   FreePool (Urb);
@@ -1451,10 +1455,10 @@ XhcSyncInterruptTransfer (
 
   if (*TransferResult == EFI_USB_NOERROR) {
     Status = EFI_SUCCESS;
-  } else if ((*TransferResult == EFI_USB_ERR_STALL) ||
-             (*TransferResult == EFI_USB_ERR_TIMEOUT)) {
+  } else if (*TransferResult == EFI_USB_ERR_STALL) {
     RecoveryStatus = XhcRecoverHaltedEndpoint(Xhc, Urb);
     ASSERT_EFI_ERROR (RecoveryStatus);
+    Status = EFI_DEVICE_ERROR;
   }
 
   FreePool (Urb);
