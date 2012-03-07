@@ -1,7 +1,7 @@
 /** @file
   Implementation of synchronization functions.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -28,8 +28,8 @@
   optimal spin lock performance.
 
   This function retrieves the spin lock alignment requirements for optimal
-  performance on a given CPU architecture. The spin lock alignment must be a
-  power of two and is returned by this function. If there are no alignment
+  performance on a given CPU architecture. The spin lock alignment is byte alignment. 
+  It must be a power of two and is returned by this function. If there are no alignment
   requirements, then 1 must be returned. The spin lock synchronization
   functions must function correctly if the spin lock size and alignment values
   returned by this function are not used at all. These values are hints to the
