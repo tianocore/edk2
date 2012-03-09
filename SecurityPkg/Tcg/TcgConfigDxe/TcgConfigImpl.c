@@ -1,7 +1,7 @@
 /** @file
   HII Config Access protocol implementation of TCG configuration module.
 
-Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -359,11 +359,6 @@ SavePpRequest (
     return Status;
   }
 
-  //
-  // Reset system.
-  //
-  gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
-
   return EFI_SUCCESS;
 }
 
@@ -409,8 +404,8 @@ TcgCallback (
   }
 
   SavePpRequest (Value->u8);
-  ASSERT (FALSE);
-
+  *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+  
   return EFI_SUCCESS;
 }
 
