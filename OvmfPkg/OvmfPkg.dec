@@ -45,3 +45,6 @@
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
 
+[PcdsFeatureFlag]
+  gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootEnable|FALSE|BOOLEAN|3
+

@@ -29,6 +29,12 @@
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = OvmfPkg/OvmfPkgIa32X64.fdf
 
+  #
+  # Defines for default states.  These can be changed on the command line.
+  # -D FLAG=VALUE
+  #
+  DEFINE SECURE_BOOT_ENABLE      = FALSE
+
 [BuildOptions]
   GCC:RELEASE_*_*_CC_FLAGS             = -DMDEPKG_NDEBUG
   INTEL:RELEASE_*_*_CC_FLAGS           = /D MDEPKG_NDEBUG
@@ -207,6 +213,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|FALSE
   gOptionRomPkgTokenSpaceGuid.PcdSupportGop|TRUE
   gOptionRomPkgTokenSpaceGuid.PcdSupportUga|FALSE
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootEnable|TRUE
+!endif
 
 [PcdsFixedAtBuild]
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
