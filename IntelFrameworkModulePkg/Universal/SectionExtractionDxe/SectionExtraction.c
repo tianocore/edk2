@@ -27,7 +27,7 @@
   3) A support protocol is not found, and the data is not available to be read
      without it.  This results in EFI_PROTOCOL_ERROR.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -667,8 +667,8 @@ CreateGuidedExtractionRpnEvent (
 EFI_STATUS
 CreateChildNode (
   IN     FRAMEWORK_SECTION_STREAM_NODE              *Stream,
-  IN     UINT32                                ChildOffset,
-     OUT FRAMEWORK_SECTION_CHILD_NODE               **ChildNode
+  IN     UINT32                                     ChildOffset,
+  OUT    FRAMEWORK_SECTION_CHILD_NODE               **ChildNode
   )
 {
   EFI_STATUS                                   Status;
@@ -723,8 +723,11 @@ CreateChildNode (
       //
       // Get the CompressionSectionHeader
       //
-      ASSERT (Node->Size >= sizeof (EFI_COMPRESSION_SECTION));
-      
+      if (Node->Size < sizeof (EFI_COMPRESSION_SECTION)) {
+        CoreFreePool (Node);
+        return EFI_NOT_FOUND;
+      }
+
       CompressionHeader = (EFI_COMPRESSION_SECTION *) SectionHeader;
 
       if (IS_SECTION2 (CompressionHeader)) {
@@ -774,8 +777,14 @@ CreateChildNode (
                                  (UINT32 *)&NewStreamBufferSize,
                                  &ScratchSize
                                  );
-          ASSERT_EFI_ERROR (Status);
-          ASSERT (NewStreamBufferSize == UncompressedLength);
+          if (EFI_ERROR (Status) || (NewStreamBufferSize != UncompressedLength)) {
+            CoreFreePool (Node);
+            CoreFreePool (NewStreamBuffer);
+            if (!EFI_ERROR (Status)) {
+              Status = EFI_BAD_BUFFER_SIZE;
+            }
+            return Status;
+          }
 
           ScratchBuffer = AllocatePool (ScratchSize);
           if (ScratchBuffer == NULL) {
@@ -793,8 +802,12 @@ CreateChildNode (
                                  ScratchBuffer,
                                  ScratchSize
                                  );
-          ASSERT_EFI_ERROR (Status);
-          FreePool (ScratchBuffer);                                           
+          FreePool (ScratchBuffer); 
+          if (EFI_ERROR (Status)) {
+            CoreFreePool (Node);
+            CoreFreePool (NewStreamBuffer);
+            return Status;
+          }
         }
       } else {
         NewStreamBuffer = NULL;
