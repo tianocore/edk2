@@ -724,7 +724,7 @@ CreateChildNode (
       // Get the CompressionSectionHeader
       //
       if (Node->Size < sizeof (EFI_COMPRESSION_SECTION)) {
-        CoreFreePool (Node);
+        FreePool (Node);
         return EFI_NOT_FOUND;
       }
 
@@ -778,8 +778,8 @@ CreateChildNode (
                                  &ScratchSize
                                  );
           if (EFI_ERROR (Status) || (NewStreamBufferSize != UncompressedLength)) {
-            CoreFreePool (Node);
-            CoreFreePool (NewStreamBuffer);
+            FreePool (Node);
+            FreePool (NewStreamBuffer);
             if (!EFI_ERROR (Status)) {
               Status = EFI_BAD_BUFFER_SIZE;
             }
@@ -804,8 +804,8 @@ CreateChildNode (
                                  );
           FreePool (ScratchBuffer); 
           if (EFI_ERROR (Status)) {
-            CoreFreePool (Node);
-            CoreFreePool (NewStreamBuffer);
+            FreePool (Node);
+            FreePool (NewStreamBuffer);
             return Status;
           }
         }
