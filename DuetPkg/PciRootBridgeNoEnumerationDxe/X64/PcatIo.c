@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -436,8 +436,10 @@ CheckForRom (
 
           Pcir.ImageLength = 0;
 
-          if (EfiRomHeader.Signature == 0xaa55) {
-
+          if (EfiRomHeader.Signature == PCI_EXPANSION_ROM_HEADER_SIGNATURE &&
+              EfiRomHeader.PcirOffset != 0 &&
+              (EfiRomHeader.PcirOffset & 3) == 0 &&
+              RomBarSize + EfiRomHeader.PcirOffset + sizeof (PCI_DATA_STRUCTURE) <= MaxRomSize) {
             ZeroMem (&Pcir, sizeof(Pcir));
             IoDev->Mem.Read (
               IoDev, 
@@ -447,6 +449,12 @@ CheckForRom (
               &Pcir
               );
 
+            if (Pcir.Signature != PCI_DATA_STRUCTURE_SIGNATURE) {
+              break;
+            }
+            if (RomBarSize + Pcir.ImageLength * 512 > MaxRomSize) {
+              break;
+            }
             if ((Pcir.Indicator & 0x80) == 0x00) {
               LastImage = FALSE;
             }

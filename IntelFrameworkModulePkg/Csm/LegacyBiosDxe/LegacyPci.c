@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -304,14 +304,24 @@ GetPciLegacyRom (
   BackupImage   = NULL;
   RomHeader.Raw = *Rom;
   while (RomHeader.Generic->Signature == PCI_EXPANSION_ROM_HEADER_SIGNATURE) {
-    if (*ImageSize < 
-        RomHeader.Raw - (UINT8 *) *Rom + RomHeader.Generic->PcirOffset + sizeof (PCI_DATA_STRUCTURE)
-        ) {
-      return EFI_NOT_FOUND;
+    if (RomHeader.Generic->PcirOffset == 0 ||
+        (RomHeader.Generic->PcirOffset & 3) !=0 ||
+        *ImageSize < RomHeader.Raw - (UINT8 *) *Rom + RomHeader.Generic->PcirOffset + sizeof (PCI_DATA_STRUCTURE)) {
+      break;
     }
 
     Pcir = (PCI_3_0_DATA_STRUCTURE *) (RomHeader.Raw + RomHeader.Generic->PcirOffset);
+    //
+    // Check signature in the PCI Data Structure.
+    //
+    if (Pcir->Signature != PCI_DATA_STRUCTURE_SIGNATURE) {
+      break;
+    }
 
+    if ((UINTN)(RomHeader.Raw - (UINT8 *) *Rom) + Pcir->ImageLength * 512 > *ImageSize) {
+      break;
+    }
+    
     if (Pcir->CodeType == PCI_CODE_TYPE_PCAT_IMAGE) {
       Match = FALSE;
       if (Pcir->VendorId == VendorId) {
@@ -2875,8 +2885,21 @@ LegacyBiosInstallPciRom (
     }
 
     LocalRomImage = *RomImage;
+    if (((PCI_EXPANSION_ROM_HEADER *) LocalRomImage)->Signature != PCI_EXPANSION_ROM_HEADER_SIGNATURE ||
+        ((PCI_EXPANSION_ROM_HEADER *) LocalRomImage)->PcirOffset == 0 ||
+        (((PCI_EXPANSION_ROM_HEADER *) LocalRomImage)->PcirOffset & 3 ) != 0) {
+      mVgaInstallationInProgress = FALSE;
+      return EFI_UNSUPPORTED;
+    }
+    
     Pcir = (PCI_3_0_DATA_STRUCTURE *)
            ((UINT8 *) LocalRomImage + ((PCI_EXPANSION_ROM_HEADER *) LocalRomImage)->PcirOffset);
+
+    if (Pcir->Signature != PCI_DATA_STRUCTURE_SIGNATURE) {
+      mVgaInstallationInProgress = FALSE;
+      return EFI_UNSUPPORTED;
+    }
+
     ImageSize = Pcir->ImageLength * 512;
     if (Pcir->Length >= 0x1C) {
       OpromRevision = Pcir->Revision;
