@@ -1,0 +1,57 @@
+## @file
+#  Component description file for DXE/SMM CPU Exception Handler Library instance.
+#
+#  This library instance supports DXE SMM module only.
+#
+#  Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeSmmCpuExceptionHandlerLib
+  FILE_GUID                      = EC629480-BD36-4e8e-8AB2-D28BF0D45864
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CpuExceptionHandlerLib|DXE_CORE DXE_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources.Ia32]
+  Ia32/ExceptionHandlerAsm.asm |MSFT
+  Ia32/ExceptionHandlerAsm.S   |GCC
+  Ia32/ArchExceptionHandler.c
+
+[Sources.X64]
+  X64/ExceptionHandlerAsm.asm   |MSFT
+  X64/ExceptionHandlerAsm.S     |GCC
+  X64/ArchExceptionHandler.c
+
+[Sources.common]
+  CpuExceptionCommon.h
+  CpuExceptionCommon.c
+  DxeSmmCpuException.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  SerialPortLib
+  PrintLib
+  SynchronizationLib
+  LocalApicLib
+  PeCoffGetEntryPointLib 
