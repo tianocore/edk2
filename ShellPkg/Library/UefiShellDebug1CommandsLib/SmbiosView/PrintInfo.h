@@ -1,7 +1,7 @@
 /** @file
   Module to clarify the element info of the smbios structure.
 
-  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,7 +15,7 @@
 #ifndef _SMBIOS_PRINT_INFO_H_
 #define _SMBIOS_PRINT_INFO_H_
 
-#include "LibSmbios.h"
+#include <IndustryStandard/SmBios.h>
 
 extern UINT8  SmbiosMajorVersion;
 extern UINT8  SmbiosMinorVersion;
@@ -42,8 +42,8 @@ extern UINT8  SmbiosMinorVersion;
 **/
 VOID
 SmbiosPrintEPSInfo (
-  IN  SMBIOS_STRUCTURE_TABLE  *SmbiosTable,
-  IN  UINT8                   Option
+  IN  SMBIOS_TABLE_ENTRY_POINT  *SmbiosTable,
+  IN  UINT8                     Option
   );
 
 /**
@@ -154,19 +154,19 @@ DisplayProcessorVoltage (
   Display processor information.
 
   @param[in] Status   The status.
-                        Bit 7 Reserved, must be 0
-                        Bit 6   CPU Socket Populated
-                         1 - CPU Socket Populated
-                         0 - CPU Socket UnpopulatedBits
-                         5:3  Reserved, must be zero
-                         Bits 2:0 CPU Status
-                          0h - Unknown
-                          1h - CPU Enabled
-                          2h - CPU Disabled by User via BIOS Setup
-                          3h - CPU Disabled By BIOS (POST Error)
-                          4h - CPU is Idle, waiting to be enabled.
-                          5-6h - Reserved
-                          7h - Other
+Bit 7 Reserved, must be 0
+Bit 6 CPU Socket Populated
+  1 - CPU Socket Populated
+  0 - CPU Socket Unpopulated
+Bits 5:3 Reserved, must be zero
+Bits 2:0 CPU Status
+  0h - Unknown
+  1h - CPU Enabled
+  2h - CPU Disabled by User via BIOS Setup
+  3h - CPU Disabled By BIOS (POST Error)
+  4h - CPU is Idle, waiting to be enabled.
+  5-6h - Reserved
+  7h - Other
 
   @param[in] Option   The option
 **/
@@ -233,6 +233,40 @@ DisplayMmBankConnections (
 VOID
 DisplayMmMemorySize (
   IN UINT8 Size,
+  IN UINT8 Option
+  );
+
+/**
+  Display Cache Configuration.
+
+  @param[in] CacheConfiguration   Cache Configuration.
+Bits 15:10 Reserved, must be 0
+Bits 9:8 Operational Mode
+  0h - Write Through
+  1h - Write Back
+  2h - Varies with Memory Address
+  3h - Unknown
+Bit 7 Enabled/Disabled
+  1 - Enabled
+  0 - Disabled
+Bits 6:5 Location
+  0h - Internal
+  1h - External
+  2h - Reserved
+  3h - Unknown
+Bit 4 Reserved, must be zero
+Bit 3 Cache Socketed
+  1 - Socketed
+  0 - Unsocketed
+Bits 2:0 Cache Level
+  1 through 8 (For example, an L1 cache would
+  use value 000b and an L3 cache would use 010b.)
+
+  @param[in] Option   The option
+**/
+VOID
+DisplayCacheConfiguration (
+  IN UINT16 CacheConfiguration,
   IN UINT8 Option
   );
 

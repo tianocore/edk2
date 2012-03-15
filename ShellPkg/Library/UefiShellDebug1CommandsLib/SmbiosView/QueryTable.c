@@ -2,7 +2,7 @@
   Build a table, each item is (Key, Info) pair.
   And give a interface of query a string out of a table.
 
-  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -52,10 +52,88 @@ TABLE_ITEM  SystemWakeupTypeTable[] = {
   }
 };
 
+TABLE_ITEM  BaseBoardFeatureFlagsTable[] = {
+  {
+    0,
+    L" Hosting board"
+  },
+  {
+    1,
+    L" Requires at least one daughter board or auxiliary card"
+  },
+  {
+    2,
+    L" Removable"
+  },
+  {
+    3,
+    L" Replaceable"
+  },
+  {
+    4,
+    L" Hot swappable"
+  }
+};
+
+TABLE_ITEM  BaseBoardBoardTypeTable[] = {
+  {
+    0x01,
+    L" Unknown"
+  },
+  {
+    0x02,
+    L" Other"
+  },
+  {
+    0x03,
+    L" Server Blade"
+  },
+  {
+    0x04,
+    L" Connectivity Switch"
+  },
+  {
+    0x05,
+    L" System Management Module"
+  },
+  {
+    0x06,
+    L" Processor Module"
+  },
+  {
+    0x07,
+    L" I/O Module"
+  },
+  {
+    0x08,
+    L" Memory Module"
+  },
+  {
+    0x09,
+    L" Daughter board"
+  },
+  {
+    0x0A,
+    L" Motherboard"
+  },
+  {
+    0x0B,
+    L" Processor/Memory Module"
+  },
+  {
+    0x0C,
+    L" Processor/IO Module"
+  },
+  {
+    0x0D,
+    L" Interconnect Board"
+  }
+};
+
 TABLE_ITEM  SystemEnclosureTypeTable[] = {
   {
     0x01,
-    L"  None"
+    L"  Other"
   },
   {
     0x02,
@@ -348,8 +426,108 @@ TABLE_ITEM  ProcessorUpgradeTable[] = {
   {
     0x19,
     L"Socket LGA1366"
-  }\
+  },
+  {
+    0x1A,
+    L"Socket G34"
+  },
+  {
+    0x1B,
+    L"Socket AM3"
+  },
+  {
+    0x1C,
+    L"Socket C32"
+  },
+  {
+    0x1D,
+    L"Socket LGA1156"
+  },
+  {
+    0x1E,
+    L"Socket LGA1567"
+  },
+  {
+    0x1F,
+    L"Socket PGA988A"
+  },
+  {
+    0x20,
+    L"Socket BGA1288"
+  },
+  {
+    0x21,
+    L"Socket rPGA988B"
+  },
+  {
+    0x22,
+    L"Socket BGA1023"
+  },
+  {
+    0x23,
+    L"Socket BGA1224"
+  },
+  {
+    0x24,
+    L"Socket BGA1155"
+  },
+  {
+    0x25,
+    L"Socket LGA1356"
+  },
+  {
+    0x26,
+    L"Socket LGA2011"
+  },
+  {
+    0x27,
+    L"Socket FS1"
+  },
+  {
+    0x28,
+    L"Socket FS2"
+  },
+  {
+    0x29,
+    L"Socket FM1"
+  },
+  {
+    0x2A,
+    L"Socket FM2"
+  }
 };
+
+TABLE_ITEM  ProcessorCharacteristicsTable[] = {
+  {
+    1,
+    L" Unknown"
+  },
+  {
+    2,
+    L" 64-bit Capable"
+  },
+  {
+    3,
+    L" Multi-Core"
+  },
+  {
+    4,
+    L" Hardware Thread"
+  },
+  {
+    5,
+    L" Execute Protection"
+  },
+  {
+    6,
+    L" Enhanced Virtualization"
+  },
+  {
+    7,
+    L" Power/Performance Control"
+  }
+};
+
 
 TABLE_ITEM  McErrorDetectMethodTable[] = {
   {
@@ -599,10 +777,6 @@ TABLE_ITEM  CacheErrCorrectingTypeTable[] = {
   {
     0x06,
     L"Multi-bit ECC"
-  },
-  {
-    0x07,
-    L"Sixteen Way Interleave"
   }
 };
 
@@ -681,6 +855,10 @@ TABLE_ITEM  CacheAssociativityTable[] = {
   {
     0x0D,
     L"64-way Set-Associative"
+  },
+  {
+    0x0E,
+    L"20-way Set-Associative"
   }
 };
 
@@ -1121,7 +1299,7 @@ TABLE_ITEM  SystemSlotTypeTable[] = {
   },
   {
     0xAB,
-    L"PCI Express Gen 26"
+    L"PCI Express Gen 2"
   },
   {
     0xAC,
@@ -1142,6 +1320,30 @@ TABLE_ITEM  SystemSlotTypeTable[] = {
   {
     0xB0,
     L"PCI Express Gen 2 X16"
+  },
+  {
+    0xB1,
+    L"PCI Express Gen 3"
+  },
+  {
+    0xB2,
+    L"PCI Express Gen 3 X1"
+  },
+  {
+    0xB3,
+    L"PCI Express Gen 3 X2"
+  },
+  {
+    0xB4,
+    L"PCI Express Gen 3 X4"
+  },
+  {
+    0xB5,
+    L"PCI Express Gen 3 X8"
+  },
+  {
+    0xB6,
+    L"PCI Express Gen 3 X16"
   }
 };
 
@@ -1174,6 +1376,34 @@ TABLE_ITEM  SystemSlotDataBusWidthTable[] = {
     0x07,
     L" 128 bit"
   },
+  {
+    0x08,
+    L" 1x or x1"
+  },
+  {
+    0x09,
+    L" 2x or x2"
+  },
+  {
+    0x0A,
+    L" 4x or x4"
+  },
+  {
+    0x0B,
+    L" 8x or x8"
+  },
+  {
+    0x0C,
+    L" 12x or x12"
+  },
+  {
+    0x0D,
+    L" 16x or x16"
+  },
+  {
+    0x0E,
+    L" 32x or x32"
+  }
 };
 
 TABLE_ITEM  SystemSlotCurrentUsageTable[] = {
@@ -2117,6 +2347,14 @@ TABLE_ITEM  MemoryDeviceTypeDetailTable[] = {
     12,
     L" Non-volatile"
   },
+  {
+    13,
+    L" Registered(Buffered)"
+  },
+  {
+    14,
+    L" Unbuffered(Unregistered)"
+  }
 };
 
 TABLE_ITEM  MemoryErrorTypeTable[] = {
@@ -2911,6 +3149,18 @@ TABLE_ITEM  StructureTypeInfoTable[] = {
     L" System Power Supply"
   },
   {
+    40,
+    L" Additional Information"
+  },
+  {
+    41,
+    L" Onboard Devices Extended Information"
+  },
+  {
+    42,
+    L" Management Controller Host Interface"
+  },
+  {
     0x7E,
     L" Inactive"
   },
@@ -3087,6 +3337,40 @@ DisplaySystemWakeupType (
 }
 
 /**
+  Display Base Board (Type 2) Feature Flags.
+
+  @param[in] FeatureFlags   The key of the structure.
+  @param[in] Option         The optional information.
+**/
+VOID
+DisplayBaseBoardFeatureFlags (
+  IN UINT8 FeatureFlags,
+  IN UINT8 Option
+  )
+{
+  ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_BASE_BOARD_FEATURE_FLAGS), gShellDebug1HiiHandle);
+  PRINT_INFO_OPTION (FeatureFlags, Option);
+  PRINT_BITS_INFO (BaseBoardFeatureFlagsTable, FeatureFlags);
+}
+
+/**
+  Display Base Board (Type 2) Board Type.
+
+  @param[in] Type           The key of the structure.
+  @param[in] Option         The optional information.
+**/
+VOID
+DisplayBaseBoardBoardType(
+  IN UINT8 Type,
+  IN UINT8 Option
+  )
+{
+  ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_BASE_BOARD_BOARD_TYPE), gShellDebug1HiiHandle);
+  PRINT_INFO_OPTION (Type, Option);
+  PRINT_TABLE_ITEM (BaseBoardBoardTypeTable, Type);
+}
+
+/**
   Display System Enclosure (Type 3) Enclosure Type.
 
   @param[in] Type           The key of the structure.
@@ -3176,6 +3460,23 @@ DisplayProcessorUpgrade (
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_PROC_UPDATE), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Upgrade, Option);
   PRINT_TABLE_ITEM (ProcessorUpgradeTable, Upgrade);
+}
+
+/**
+  Display Processor Information (Type 4) Characteristics.
+
+  @param[in] Type           The key of the structure.
+  @param[in] Option         The optional information.
+**/
+VOID
+DisplayProcessorCharacteristics (
+  IN UINT16 Type,
+  IN UINT8 Option
+  )
+{
+  ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_PROC_CHARACTERISTICS), gShellDebug1HiiHandle);
+  PRINT_INFO_OPTION (Type, Option);
+  PRINT_BITS_INFO (ProcessorCharacteristicsTable, Type);
 }
 
 /**
@@ -3988,7 +4289,7 @@ DisplayECPLoc (
 }
 
 /**
-  Display Management Device (Type 34) information.
+  Display Management Device (Type 34) Type.
 
   @param[in] Key      The key of the structure.
   @param[in] Option   The optional information.
@@ -4002,6 +4303,23 @@ DisplayMDType (
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MANAGEMENT_DEV_TYPE), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Key, Option);
   PRINT_TABLE_ITEM (MDTypeTable, Key);
+}
+
+/**
+  Display Management Device (Type 34) Address Type.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
+VOID
+DisplayMDAddressType (
+  IN UINT8 Key,
+  IN UINT8 Option
+  )
+{
+  ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MANAGEMENT_DEV_ADDR_TYPE), gShellDebug1HiiHandle);
+  PRINT_INFO_OPTION (Key, Option);
+  PRINT_TABLE_ITEM (MDAddressTypeTable, Key);
 }
 
 /**

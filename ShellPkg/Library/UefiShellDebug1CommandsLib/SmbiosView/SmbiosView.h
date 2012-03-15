@@ -1,7 +1,7 @@
 /** @file
   Tools of clarify the content of the smbios table.
 
-  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -17,8 +17,6 @@
 
 #define STRUCTURE_TYPE_RANDOM     (UINT8) 0xFE
 #define STRUCTURE_TYPE_INVALID    (UINT8) 0xFF
-
-#define STRUCTURE_HANDLE_INVALID  (UINT16) 0xFFFF
 
 typedef struct {
   UINT16  Index;

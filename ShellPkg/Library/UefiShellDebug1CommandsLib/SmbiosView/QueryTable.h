@@ -2,7 +2,7 @@
   Build a table, each item is (key, info) pair.
   and give a interface of query a string out of a table.
 
-  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -95,6 +95,30 @@ DisplaySystemWakeupType (
   );
 
 /**
+  Display Base Board (Type 2) Feature Flags.
+
+  @param[in] FeatureFlags   The key of the structure.
+  @param[in] Option         The optional information.
+**/
+VOID
+DisplayBaseBoardFeatureFlags (
+  IN UINT8 FeatureFlags,
+  IN UINT8 Option
+  );
+
+/**
+  Display Base Board (Type 2) Board Type.
+
+  @param[in] Type           The key of the structure.
+  @param[in] Option         The optional information.
+**/
+VOID
+DisplayBaseBoardBoardType(
+  IN UINT8 Type,
+  IN UINT8 Option
+  );
+
+/**
   Display System Enclosure (Type 3) Enclosure Type.
 
   @param[in] Type           The key of the structure.
@@ -152,6 +176,18 @@ DisplayProcessorType (
 VOID
 DisplayProcessorUpgrade (
   IN UINT8 Upgrade,
+  IN UINT8 Option
+  );
+
+/**
+  Display Processor Information (Type 4) Characteristics.
+
+  @param[in] Type           The key of the structure.
+  @param[in] Option         The optional information.
+**/
+VOID
+DisplayProcessorCharacteristics (
+  IN UINT16 Type,
   IN UINT8 Option
   );
 
@@ -696,13 +732,25 @@ DisplayECPLoc (
   );
 
 /**
-  Display Management Device (Type 34) information.
+  Display Management Device (Type 34) Type.
 
   @param[in] Key      The key of the structure.
   @param[in] Option   The optional information.
 **/
 VOID
 DisplayMDType (
+  IN UINT8 Key,
+  IN UINT8 Option
+  );
+
+/**
+  Display Management Device (Type 34) Address Type.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
+VOID
+DisplayMDAddressType (
   IN UINT8 Key,
   IN UINT8 Option
   );

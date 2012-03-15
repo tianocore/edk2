@@ -1,7 +1,7 @@
 /** @file
   Tools of clarify the content of the smbios table.
 
-  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -111,7 +111,7 @@ ShellCommandRunSmbiosView (
       //
       // Initialize the StructHandle to be the first handle
       //
-      StructHandle  = STRUCTURE_HANDLE_INVALID;
+      StructHandle  = INVALID_HANDLE;
       LibGetSmbiosStructure (&StructHandle, NULL, NULL);
 
       Temp          = ShellCommandLineGetValue(Package, L"-t");
@@ -188,23 +188,12 @@ SMBiosView (
   )
 {
   UINT16                    Handle;
-  UINT8                     Buffer[1024];
-  //
-  // bigger than SMBIOS_STRUCTURE_TABLE.MaxStructureSize
-  //
+  UINT8                     *Buffer;
   UINT16                    Length;
   UINTN                     Index;
-  UINT16                    Offset;
-  //
-  // address offset from structure table head.
-  //
-  UINT32                    TableHead;
-  //
-  // structure table head.
-  //
 
   SMBIOS_STRUCTURE_POINTER  SmbiosStruct;
-  SMBIOS_STRUCTURE_TABLE    *SMBiosTable;
+  SMBIOS_TABLE_ENTRY_POINT  *SMBiosTable;
 
   SMBiosTable = NULL;
   LibSmbiosGetEPS (&SMBiosTable);
@@ -215,7 +204,7 @@ SMBiosView (
 
   if (CompareMem (SMBiosTable->AnchorString, "_SM_", 4) == 0) {
     //
-    // Have get SMBIOS table
+    // Have got SMBIOS table
     //
     SmbiosPrintEPSInfo (SMBiosTable, Option);
 
@@ -259,22 +248,20 @@ SMBiosView (
     // Searching and display structure info
     //
     Handle    = QueryHandle;
-    TableHead = SMBiosTable->TableAddress;
-    Offset    = 0;
     for (Index = 0; Index < SMBiosTable->NumberOfSmbiosStructures; Index++) {
       //
       // if reach the end of table, break..
       //
-      if (Handle == STRUCTURE_HANDLE_INVALID) {
+      if (Handle == INVALID_HANDLE) {
         break;
       }
       //
       // handle then point to the next!
       //
-      if (LibGetSmbiosStructure (&Handle, Buffer, &Length) != DMI_SUCCESS) {
+      if (LibGetSmbiosStructure (&Handle, &Buffer, &Length) != DMI_SUCCESS) {
         break;
       }
-      Offset      = (UINT16) (Offset + Length);
+
       SmbiosStruct.Raw = Buffer;
 
       //
@@ -297,7 +284,7 @@ SMBiosView (
       //
       // Addr of structure in structure in table
       //
-      ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_ADDR), gShellDebug1HiiHandle, TableHead + Offset);
+      ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_ADDR), gShellDebug1HiiHandle, (UINTN) Buffer);
       DumpHex (0, 0, Length, Buffer);
 
 /*
@@ -315,11 +302,6 @@ SMBiosView (
 */
 
       if (gShowType != SHOW_NONE) {
-        //
-        // check structure legality
-        //
-        SmbiosCheckStructure (&SmbiosStruct);
-
         //
         // Print structure information
         //
@@ -364,13 +346,13 @@ InitSmbiosTableStatistics (
   )
 {
   UINT16                    Handle;
-  UINT8                     Buffer[1024];
+  UINT8                     *Buffer;
   UINT16                    Length;
   UINT16                    Offset;
   UINT16                    Index;
 
   SMBIOS_STRUCTURE_POINTER  SmbiosStruct;
-  SMBIOS_STRUCTURE_TABLE    *SMBiosTable;
+  SMBIOS_TABLE_ENTRY_POINT  *SMBiosTable;
   STRUCTURE_STATISTICS      *StatisticsPointer;
 
   SMBiosTable = NULL;
@@ -405,24 +387,23 @@ InitSmbiosTableStatistics (
   //
   // search from the first one
   //
-  Handle = STRUCTURE_HANDLE_INVALID;
+  Handle = INVALID_HANDLE;
   LibGetSmbiosStructure (&Handle, NULL, NULL);
   for (Index = 1; Index <= SMBiosTable->NumberOfSmbiosStructures; Index++) {
     //
     // If reach the end of table, break..
     //
-    if (Handle == STRUCTURE_HANDLE_INVALID) {
+    if (Handle == INVALID_HANDLE) {
       break;
     }
     //
     // After LibGetSmbiosStructure(), handle then point to the next!
     //
-    if (LibGetSmbiosStructure (&Handle, Buffer, &Length) != DMI_SUCCESS) {
+    if (LibGetSmbiosStructure (&Handle, &Buffer, &Length) != DMI_SUCCESS) {
       break;
     }
 
     SmbiosStruct.Raw = Buffer;
-    Offset      = (UINT16) (Offset + Length);
 
     //
     // general statistics
@@ -432,6 +413,8 @@ InitSmbiosTableStatistics (
     StatisticsPointer->Handle = SmbiosStruct.Hdr->Handle;
     StatisticsPointer->Length = Length;
     StatisticsPointer->Addr   = Offset;
+
+    Offset = (UINT16) (Offset + Length);
 
     StatisticsPointer         = &mStatisticsTable[Index];
   }
@@ -452,10 +435,10 @@ DisplayStatisticsTable (
   IN   UINT8   Option
   )
 {
-  UINTN                   Index;
-  UINTN                   Num;
-  STRUCTURE_STATISTICS    *StatisticsPointer;
-  SMBIOS_STRUCTURE_TABLE  *SMBiosTable;
+  UINTN                    Index;
+  UINTN                    Num;
+  STRUCTURE_STATISTICS     *StatisticsPointer;
+  SMBIOS_TABLE_ENTRY_POINT *SMBiosTable;
 
   SMBiosTable = NULL;
   if (Option < SHOW_OUTLINE) {
@@ -558,12 +541,3 @@ GetShowTypeString (
   }
 }
 
-/*
-EFI_STATUS
-InitializeSmbiosViewApplicationGetLineHelp (
-  OUT CHAR16              **Str
-  )
-{
-  return LibCmdGetStringByToken (STRING_ARRAY_NAME, &EfiSmbiosViewGuid, STRING_TOKEN (STR_SMBIOSVIEW_LINE_HELP), Str);
-}
-*/
