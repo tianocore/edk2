@@ -37,8 +37,8 @@ DEBUGPORT_DEVICE mDebugPortDevice = {
   (EFI_DEVICE_PATH_PROTOCOL *) NULL,
   {
     DebugPortReset,
-    DebugPortRead,
     DebugPortWrite,
+    DebugPortRead,
     DebugPortPoll
   },
   (EFI_HANDLE) 0,
