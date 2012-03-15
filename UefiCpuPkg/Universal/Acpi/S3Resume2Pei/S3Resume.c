@@ -4,7 +4,7 @@
   This module will excute the boot script saved during last boot and after that,
   control is passed to OS waking up handler.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -712,6 +712,12 @@ S3ResumeExecuteBootScript (
     // 
     IdtBuffer = AllocatePages (EFI_SIZE_TO_PAGES((IdtDescriptor->Limit + 1) + 16));
     ASSERT (IdtBuffer != NULL);
+    //
+    // Additional 16 bytes allocated to save IA32 IDT descriptor and Pei Service Table Pointer
+    // IA32 IDT descriptor will be used to setup IA32 IDT table for 32-bit Framework Boot Script code
+    // 
+    ZeroMem (IdtBuffer, 16);
+    AsmReadIdtr ((IA32_DESCRIPTOR *)IdtBuffer);
     CopyMem ((VOID*)((UINT8*)IdtBuffer + 16),(VOID*)(IdtDescriptor->Base), (IdtDescriptor->Limit + 1));
     IdtDescriptor->Base = (UINTN)((UINT8*)IdtBuffer + 16);
     *(UINTN*)(IdtDescriptor->Base - sizeof(UINTN)) = (UINTN)GetPeiServicesTablePointer ();

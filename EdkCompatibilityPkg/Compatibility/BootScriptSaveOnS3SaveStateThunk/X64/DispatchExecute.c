@@ -3,7 +3,7 @@
   Provide a thunk function to transition from long mode to compatibility mode to execute 32-bit code and then transit
   back to long mode.
   
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -34,7 +34,23 @@ typedef union {
   } Bits;
   UINT64  Uint64;
 } IA32_GDT;
+
+///
+/// Byte packed structure for an IA-32 Interrupt Gate Descriptor.
+///
+typedef union {
+  struct {
+    UINT32  OffsetLow:16;   ///< Offset bits 15..0.
+    UINT32  Selector:16;    ///< Selector.
+    UINT32  Reserved_0:8;   ///< Reserved.
+    UINT32  GateType:8;     ///< Gate Type.  See #defines above.
+    UINT32  OffsetHigh:16;  ///< Offset bits 31..16.
+  } Bits;
+  UINT64  Uint64;
+} IA32_IDT_ENTRY;
 #pragma pack()
+
+#define COMPATIBILITY_MODE_SELECTOR  8
 
 //
 // Global Descriptor Table (GDT)
@@ -92,7 +108,36 @@ Execute32BitCode (
   )
 {
   EFI_STATUS                 Status;
- 
+  IA32_DESCRIPTOR            *Ia32Idtr;
+  IA32_DESCRIPTOR            X64Idtr;
+  UINTN                      Ia32IdtEntryCount;
+  UINTN                      Index;
+  IA32_IDT_ENTRY             *Ia32IdtEntry;
+
+  //
+  // Save x64 IDT Descriptor
+  //
+  AsmReadIdtr ((IA32_DESCRIPTOR *) &X64Idtr);
+
+  //
+  // Get the IA32 IDT Descriptor saved in 16 bytes in front of X64 IDT table.
+  //
+  Ia32Idtr = (IA32_DESCRIPTOR *) (UINTN) (X64Idtr.Base - 16);
+  Ia32IdtEntryCount = (Ia32Idtr->Limit + 1) / sizeof (IA32_IDT_ENTRY);
+
+  Ia32IdtEntry = (IA32_IDT_ENTRY *)(Ia32Idtr->Base);
+  for (Index = 0; Index < Ia32IdtEntryCount; Index ++ ) {
+    //
+    // Use the new Code Selector value
+    //
+    Ia32IdtEntry[Index].Bits.Selector = COMPATIBILITY_MODE_SELECTOR;
+  }
+
+  //
+  // Setup IA32 IDT table for 32-bit framework Boot Script code
+  //
+  AsmWriteIdtr (Ia32Idtr);
+
   ASSERT (Function != 0);
  
   Status = AsmExecute32BitCode (
@@ -101,6 +146,12 @@ Execute32BitCode (
              Param2,
              &mGdt
              );
+
+  //
+  // Restore X64 IDT table
+  //
+  AsmWriteIdtr ((IA32_DESCRIPTOR *) &X64Idtr);
+
   return Status;
 }
 
