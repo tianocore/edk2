@@ -1,7 +1,7 @@
 /** @file
   The X64 entrypoint is used to process capsule in long mode.
 
-Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -13,7 +13,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include <Library/DebugLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/CpuExceptionHandlerLib.h>
 #include "CommonHeader.h"
+
+#define EXCEPTION_VECTOR_NUMBER     0x20
 
 /**
   The X64 entrypoint is used to process capsule in long mode then
@@ -32,7 +36,28 @@ _ModuleEntryPoint (
   SWITCH_64_TO_32_CONTEXT       *ReturnContext
 )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS                    Status;
+  IA32_DESCRIPTOR               Ia32Idtr;
+  IA32_DESCRIPTOR               X64Idtr;
+  IA32_IDT_GATE_DESCRIPTOR      IdtEntryTable[EXCEPTION_VECTOR_NUMBER];
+
+  //
+  // Save the IA32 IDT Descriptor
+  //
+  AsmReadIdtr ((IA32_DESCRIPTOR *) &Ia32Idtr); 
+
+  //
+  // Setup X64 IDT table
+  //
+  ZeroMem (IdtEntryTable, sizeof (IA32_IDT_GATE_DESCRIPTOR) * EXCEPTION_VECTOR_NUMBER);
+  X64Idtr.Base = (UINTN) IdtEntryTable;
+  X64Idtr.Limit = (UINT16) (sizeof (IA32_IDT_GATE_DESCRIPTOR) * EXCEPTION_VECTOR_NUMBER - 1);
+  AsmWriteIdtr ((IA32_DESCRIPTOR *) &X64Idtr);  
+
+  //
+  // Setup the default CPU exception handlers
+  //
+  SetupCpuExceptionHandlers ();                
 
   //
   // Call CapsuleDataCoalesce to process capsule.
@@ -46,6 +71,11 @@ _ModuleEntryPoint (
   
   ReturnContext->ReturnStatus = Status;
 
+  //
+  // Restore IA32 IDT table
+  //
+  AsmWriteIdtr ((IA32_DESCRIPTOR *) &Ia32Idtr);  
+  
   //
   // Finish to coalesce capsule, and return to 32-bit mode.
   //

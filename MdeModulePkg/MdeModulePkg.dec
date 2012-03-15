@@ -4,7 +4,7 @@
 # It also provides the defintions(including PPIs/PROTOCOLs/GUIDs and library classes)
 # and libraries instances, which are used for those modules.
 #
-# Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under 
 # the terms and conditions of the BSD License that accompanies this distribution.  
 # The full text of the license may be found at
@@ -93,6 +93,10 @@
   ##  @libraryclass  Provide capability to maintain the data integrity cross S3 phase.
   #
   LockBoxLib|Include/Library/LockBoxLib.h
+  
+  ##  @libraryclass  Provide the CPU exception handler.
+  #
+  CpuExceptionHandlerLib|Include/Library/CpuExceptionHandlerLib.h
   
 [Guids]
   ## MdeModule package token space guid

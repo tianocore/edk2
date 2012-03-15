@@ -3,7 +3,7 @@
 
   Set a IDT entry for interrupt vector 3 for debug purpose for x64 platform
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -52,6 +52,16 @@ SetIdtEntry (
   // Restore IDT for debug
   //
   IdtDescriptor = (IA32_DESCRIPTOR *) (UINTN) (AcpiS3Context->IdtrProfile);
+  AsmWriteIdtr (IdtDescriptor);
+
+  //
+  // Setup the default CPU exception handlers
+  //
+  SetupCpuExceptionHandlers ();
+
+  //
+  // Update IDT entry INT3
+  //
   IdtEntry = (INTERRUPT_GATE_DESCRIPTOR *)(IdtDescriptor->Base + (3 * sizeof (INTERRUPT_GATE_DESCRIPTOR)));
   S3DebugBuffer = (UINTN) (AcpiS3Context->S3DebugBufferAddress);
 
@@ -62,6 +72,5 @@ SetIdtEntry (
   IdtEntry->Offset63To32    = (UINT32)(S3DebugBuffer >> 32);
   IdtEntry->Reserved        = 0;
 
-  AsmWriteIdtr (IdtDescriptor);
 }
 
