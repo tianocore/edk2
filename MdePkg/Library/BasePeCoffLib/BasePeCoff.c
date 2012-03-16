@@ -2,7 +2,7 @@
   Base PE/COFF loader supports loading any PE32/PE32+ or TE image, but
   only supports relocating IA32, x64, IPF, and EBC images.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -355,7 +355,7 @@ PeCoffLoaderGetImageInfo (
           Size = sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);
           Status = ImageContext->ImageRead (
                                    ImageContext->Handle,
-                                   DebugDirectoryEntryFileOffset,
+                                   DebugDirectoryEntryFileOffset + Index,
                                    &Size,
                                    &DebugEntry
                                    );
@@ -442,7 +442,7 @@ PeCoffLoaderGetImageInfo (
         Size = sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);
         Status = ImageContext->ImageRead (
                                  ImageContext->Handle,
-                                 DebugDirectoryEntryFileOffset,
+                                 DebugDirectoryEntryFileOffset + Index,
                                  &Size,
                                  &DebugEntry
                                  );
