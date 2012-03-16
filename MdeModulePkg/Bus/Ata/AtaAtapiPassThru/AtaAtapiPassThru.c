@@ -1,8 +1,8 @@
 /** @file
   This file implements ATA_PASSTHRU_PROCTOCOL and EXT_SCSI_PASSTHRU_PROTOCOL interfaces
   for managed ATA controllers.
-    
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -46,14 +46,14 @@ ATA_ATAPI_PASS_THRU_INSTANCE gAtaAtapiPassThruInstanceTemplate = {
     sizeof (UINTN)
   },
   {                   // AtaPassThru
-    NULL,  
+    NULL,
     AtaPassThruPassThru,
     AtaPassThruGetNextPort,
     AtaPassThruGetNextDevice,
     AtaPassThruBuildDevicePath,
     AtaPassThruGetDevice,
     AtaPassThruResetPort,
-    AtaPassThruResetDevice  
+    AtaPassThruResetDevice
   },
   {                   // ExtScsiPassThruMode
     //
@@ -65,7 +65,7 @@ ATA_ATAPI_PASS_THRU_INSTANCE gAtaAtapiPassThruInstanceTemplate = {
     // both EFI_EXT_SCSI_PASS_THRU_ATTRIBUTES_PHYSICAL and EFI_EXT_SCSI_PASS_THRU_ATTRIBUTES_LOGICAL
     // bits.
     // Note that the driver doesn't support ExtScsiPassThru non blocking I/O.
-    // 
+    //
     EFI_EXT_SCSI_PASS_THRU_ATTRIBUTES_PHYSICAL | EFI_EXT_SCSI_PASS_THRU_ATTRIBUTES_LOGICAL,
     //
     // IoAlign
@@ -101,7 +101,7 @@ ATA_ATAPI_PASS_THRU_INSTANCE gAtaAtapiPassThruInstanceTemplate = {
   0,                  // PreviousLun
   NULL,               // Timer event
   {                   // NonBlocking TaskList
-    NULL,             
+    NULL,
     NULL
   }
 };
@@ -142,7 +142,7 @@ UINT8 mScsiId[TARGET_MAX_BYTES] = {
   supports both blocking I/O and non-blocking I/O. The blocking I/O functionality is required,
   and the non-blocking I/O functionality is optional.
 
-  @param[in]      Port               The port number of the ATA device to send the command. 
+  @param[in]      Port               The port number of the ATA device to send the command.
   @param[in]      PortMultiplierPort The port multiplier port number of the ATA device to send the command.
                                      If there is no port multiplier, then specify 0.
   @param[in, out] Packet             A pointer to the ATA command to send to the ATA device specified by Port
@@ -178,14 +178,14 @@ AtaPassThruPassThruExecute (
   IN     UINT16                           Port,
   IN     UINT16                           PortMultiplierPort,
   IN OUT EFI_ATA_PASS_THRU_COMMAND_PACKET *Packet,
-  IN     ATA_ATAPI_PASS_THRU_INSTANCE     *Instance, 
+  IN     ATA_ATAPI_PASS_THRU_INSTANCE     *Instance,
   IN     ATA_NONBLOCK_TASK                *Task OPTIONAL
   )
 {
   EFI_ATA_PASS_THRU_CMD_PROTOCOL  Protocol;
   EFI_ATA_HC_WORK_MODE            Mode;
   EFI_STATUS                      Status;
-  
+
   Protocol = Packet->Protocol;
 
   Mode = Instance->Mode;
@@ -195,11 +195,11 @@ AtaPassThruPassThruExecute (
       // Reassign IDE mode io port registers' base addresses
       //
       Status = GetIdeRegisterIoAddr (Instance->PciIo, Instance->IdeRegisters);
-      
+
       if (EFI_ERROR (Status)) {
         return Status;
       }
-      
+
       switch (Protocol) {
         case EFI_ATA_PASS_THRU_PROTOCOL_ATA_NON_DATA:
           Status = AtaNonDataCommandIn (
@@ -207,7 +207,7 @@ AtaPassThruPassThruExecute (
                      &Instance->IdeRegisters[Port],
                      Packet->Acb,
                      Packet->Asb,
-                     Packet->Timeout, 
+                     Packet->Timeout,
                      Task
                      );
           break;
@@ -313,7 +313,7 @@ AtaPassThruPassThruExecute (
                      Packet->Asb,
                      Packet->OutDataBuffer,
                      Packet->OutTransferLength,
-                     Packet->Timeout, 
+                     Packet->Timeout,
                      Task
                      );
           break;
@@ -360,7 +360,7 @@ AtaPassThruPassThruExecute (
       Status = EFI_DEVICE_ERROR;
       break;
   }
-  
+
   return Status;
 }
 
@@ -369,11 +369,11 @@ AtaPassThruPassThruExecute (
 
   @param[in]  Event     The Event this notify function registered to.
   @param[in]  Context   Pointer to the context data registered to the
-                        Event. 
- 
+                        Event.
+
 **/
 VOID
-EFIAPI 
+EFIAPI
 AsyncNonBlockingTransferRoutine (
   EFI_EVENT  Event,
   VOID*      Context
@@ -388,7 +388,7 @@ AsyncNonBlockingTransferRoutine (
   Instance   = (ATA_ATAPI_PASS_THRU_INSTANCE *) Context;
   EntryHeader = &Instance->NonBlockingTaskList;
   //
-  // Get the Taks from the Taks List and execute it, until there is 
+  // Get the Taks from the Taks List and execute it, until there is
   // no task in the list or the device is busy with task (EFI_NOT_READY).
   //
   while (TRUE) {
@@ -408,23 +408,24 @@ AsyncNonBlockingTransferRoutine (
                );
 
     //
-    // If the data transfer meet a error which is not dumped into the status block
-    // set the Status block related bit.
+    // If the data transfer meet a error, remove all tasks in the list since these tasks are
+    // associated with one task from Ata Bus and signal the event with error status.
     //
     if ((Status != EFI_NOT_READY) && (Status != EFI_SUCCESS)) {
-      Task->Packet->Asb->AtaStatus = 0x01;
+      DestroyAsynTaskList (Instance, TRUE);
+      break;
     }
+
     //
     // For Non blocking mode, the Status of EFI_NOT_READY means the operation
-    // is not finished yet. Other Status indicate the operation is either
-    // successful or failed. 
+    // is not finished yet. Otherwise the operation is successful.
     //
-    if (Status != EFI_NOT_READY) {
+    if (Status == EFI_NOT_READY) {
+      break;
+    } else {
       RemoveEntryList (&Task->Link);
       gBS->SignalEvent (Task->Event);
       FreePool (Task);
-    } else {
-      break;
     }
   }
 }
@@ -465,33 +466,33 @@ InitializeAtaAtapiPassThru (
 }
 
 /**
-  Tests to see if this driver supports a given controller. If a child device is provided, 
+  Tests to see if this driver supports a given controller. If a child device is provided,
   it further tests to see if this driver supports creating a handle for the specified child device.
 
-  This function checks to see if the driver specified by This supports the device specified by 
-  ControllerHandle. Drivers will typically use the device path attached to 
-  ControllerHandle and/or the services from the bus I/O abstraction attached to 
-  ControllerHandle to determine if the driver supports ControllerHandle. This function 
-  may be called many times during platform initialization. In order to reduce boot times, the tests 
-  performed by this function must be very small, and take as little time as possible to execute. This 
-  function must not change the state of any hardware devices, and this function must be aware that the 
-  device specified by ControllerHandle may already be managed by the same driver or a 
-  different driver. This function must match its calls to AllocatePages() with FreePages(), 
-  AllocatePool() with FreePool(), and OpenProtocol() with CloseProtocol().  
-  Because ControllerHandle may have been previously started by the same driver, if a protocol is 
-  already in the opened state, then it must not be closed with CloseProtocol(). This is required 
+  This function checks to see if the driver specified by This supports the device specified by
+  ControllerHandle. Drivers will typically use the device path attached to
+  ControllerHandle and/or the services from the bus I/O abstraction attached to
+  ControllerHandle to determine if the driver supports ControllerHandle. This function
+  may be called many times during platform initialization. In order to reduce boot times, the tests
+  performed by this function must be very small, and take as little time as possible to execute. This
+  function must not change the state of any hardware devices, and this function must be aware that the
+  device specified by ControllerHandle may already be managed by the same driver or a
+  different driver. This function must match its calls to AllocatePages() with FreePages(),
+  AllocatePool() with FreePool(), and OpenProtocol() with CloseProtocol().
+  Because ControllerHandle may have been previously started by the same driver, if a protocol is
+  already in the opened state, then it must not be closed with CloseProtocol(). This is required
   to guarantee the state of ControllerHandle is not modified by this function.
 
   @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in]  ControllerHandle     The handle of the controller to test. This handle 
-                                   must support a protocol interface that supplies 
+  @param[in]  ControllerHandle     The handle of the controller to test. This handle
+                                   must support a protocol interface that supplies
                                    an I/O abstraction to the driver.
-  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This 
-                                   parameter is ignored by device drivers, and is optional for bus 
-                                   drivers. For bus drivers, if this parameter is not NULL, then 
-                                   the bus driver must determine if the bus controller specified 
-                                   by ControllerHandle and the child controller specified 
-                                   by RemainingDevicePath are both supported by this 
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This
+                                   parameter is ignored by device drivers, and is optional for bus
+                                   drivers. For bus drivers, if this parameter is not NULL, then
+                                   the bus driver must determine if the bus controller specified
+                                   by ControllerHandle and the child controller specified
+                                   by RemainingDevicePath are both supported by this
                                    bus driver.
 
   @retval EFI_SUCCESS              The device specified by ControllerHandle and
@@ -614,8 +615,8 @@ AtaAtapiPassThruSupported (
   Starts a device controller or a bus controller.
 
   The Start() function is designed to be invoked from the EFI boot service ConnectController().
-  As a result, much of the error checking on the parameters to Start() has been moved into this 
-  common boot service. It is legal to call Start() from other locations, 
+  As a result, much of the error checking on the parameters to Start() has been moved into this
+  common boot service. It is legal to call Start() from other locations,
   but the following calling restrictions must be followed, or the system behavior will not be deterministic.
   1. ControllerHandle must be a valid EFI_HANDLE.
   2. If RemainingDevicePath is not NULL, then it must be a pointer to a naturally aligned
@@ -624,18 +625,18 @@ AtaAtapiPassThruSupported (
      have been called with the same calling parameters, and Supported() must have returned EFI_SUCCESS.
 
   @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in]  ControllerHandle     The handle of the controller to start. This handle 
-                                   must support a protocol interface that supplies 
+  @param[in]  ControllerHandle     The handle of the controller to start. This handle
+                                   must support a protocol interface that supplies
                                    an I/O abstraction to the driver.
-  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This 
-                                   parameter is ignored by device drivers, and is optional for bus 
-                                   drivers. For a bus driver, if this parameter is NULL, then handles 
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This
+                                   parameter is ignored by device drivers, and is optional for bus
+                                   drivers. For a bus driver, if this parameter is NULL, then handles
                                    for all the children of Controller are created by this driver.
-                                   If this parameter is not NULL and the first Device Path Node is 
-                                   not the End of Device Path Node, then only the handle for the 
-                                   child device specified by the first Device Path Node of 
+                                   If this parameter is not NULL and the first Device Path Node is
+                                   not the End of Device Path Node, then only the handle for the
+                                   child device specified by the first Device Path Node of
                                    RemainingDevicePath is created by this driver.
-                                   If the first Device Path Node of RemainingDevicePath is 
+                                   If the first Device Path Node of RemainingDevicePath is
                                    the End of Device Path Node, no child handle is created by this
                                    driver.
 
@@ -754,7 +755,7 @@ AtaAtapiPassThruStart (
   if (EFI_ERROR (Status)) {
     goto ErrorExit;
   }
-  
+
   //
   // Set 1ms timer.
   //
@@ -808,10 +809,10 @@ ErrorExit:
 
 /**
   Stops a device controller or a bus controller.
-  
-  The Stop() function is designed to be invoked from the EFI boot service DisconnectController(). 
-  As a result, much of the error checking on the parameters to Stop() has been moved 
-  into this common boot service. It is legal to call Stop() from other locations, 
+
+  The Stop() function is designed to be invoked from the EFI boot service DisconnectController().
+  As a result, much of the error checking on the parameters to Stop() has been moved
+  into this common boot service. It is legal to call Stop() from other locations,
   but the following calling restrictions must be followed, or the system behavior will not be deterministic.
   1. ControllerHandle must be a valid EFI_HANDLE that was used on a previous call to this
      same driver's Start() function.
@@ -819,13 +820,13 @@ ErrorExit:
      EFI_HANDLE. In addition, all of these handles must have been created in this driver's
      Start() function, and the Start() function must have called OpenProtocol() on
      ControllerHandle with an Attribute of EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER.
-  
+
   @param[in]  This              A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in]  ControllerHandle  A handle to the device being stopped. The handle must 
-                                support a bus specific I/O protocol for the driver 
+  @param[in]  ControllerHandle  A handle to the device being stopped. The handle must
+                                support a bus specific I/O protocol for the driver
                                 to use to stop the device.
   @param[in]  NumberOfChildren  The number of child device handles in ChildHandleBuffer.
-  @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL 
+  @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL
                                 if NumberOfChildren is 0.
 
   @retval EFI_SUCCESS           The device was stopped.
@@ -872,7 +873,7 @@ AtaAtapiPassThruStop (
     gBS->CloseEvent (Instance->TimerEvent);
     Instance->TimerEvent = NULL;
   }
-  DestroyAsynTaskList (Instance);
+  DestroyAsynTaskList (Instance, FALSE);
 
   //
   // Disable this ATA host controller.
@@ -968,13 +969,13 @@ AtaAtapiPassThruStop (
 
 /**
   Traverse the attached ATA devices list to find out the device to access.
-  
+
   @param[in]  Instance            A pointer to the ATA_ATAPI_PASS_THRU_INSTANCE instance.
-  @param[in]  Port                The port number of the ATA device to send the command. 
+  @param[in]  Port                The port number of the ATA device to send the command.
   @param[in]  PortMultiplierPort  The port multiplier port number of the ATA device to send the command.
                                   If there is no port multiplier, then specify 0.
   @param[in]  DeviceType          The device type of the ATA device.
-  
+
   @retval     The pointer to the data structure of the device info to access.
 
 **/
@@ -995,7 +996,7 @@ SearchDeviceInfoList (
     DeviceInfo = ATA_ATAPI_DEVICE_INFO_FROM_THIS (Node);
 
     if ((DeviceInfo->Type == DeviceType) &&
-        (Port == DeviceInfo->Port) && 
+        (Port == DeviceInfo->Port) &&
         (PortMultiplier == DeviceInfo->PortMultiplier)) {
       return Node;
     }
@@ -1009,9 +1010,9 @@ SearchDeviceInfoList (
 /**
   Allocate device info data structure to contain device info.
   And insert the data structure to the tail of device list for tracing.
-    
+
   @param[in]  Instance            A pointer to the ATA_ATAPI_PASS_THRU_INSTANCE instance.
-  @param[in]  Port                The port number of the ATA device to send the command. 
+  @param[in]  Port                The port number of the ATA device to send the command.
   @param[in]  PortMultiplierPort  The port multiplier port number of the ATA device to send the command.
                                   If there is no port multiplier, then specify 0.
   @param[in]  DeviceType          The device type of the ATA device.
@@ -1059,7 +1060,7 @@ CreateNewDeviceInfo (
 
 /**
   Destroy all attached ATA devices info.
-  
+
   @param[in]  Instance          A pointer to the ATA_ATAPI_PASS_THRU_INSTANCE instance.
 
 **/
@@ -1088,14 +1089,17 @@ DestroyDeviceInfoList (
 
 /**
   Destroy all pending non blocking tasks.
-  
-  @param[in]  Instance  A pointer to the ATA_ATAPI_PASS_THRU_INSTANCE instance.
+
+  @param[in]  Instance    A pointer to the ATA_ATAPI_PASS_THRU_INSTANCE instance.
+  @param[in]  IsSigEvent  Indicate whether signal the task event when remove the
+                          task.
 
 **/
 VOID
 EFIAPI
 DestroyAsynTaskList (
-  IN ATA_ATAPI_PASS_THRU_INSTANCE *Instance
+  IN ATA_ATAPI_PASS_THRU_INSTANCE *Instance,
+  IN BOOLEAN                       IsSigEvent
   )
 {
   LIST_ENTRY           *Entry;
@@ -1108,7 +1112,7 @@ DestroyAsynTaskList (
     //
     // Free the Subtask list.
     //
-    for (Entry = (&Instance->NonBlockingTaskList)->ForwardLink; 
+    for (Entry = (&Instance->NonBlockingTaskList)->ForwardLink;
         Entry != (&Instance->NonBlockingTaskList);
        ) {
       DelEntry = Entry;
@@ -1116,6 +1120,10 @@ DestroyAsynTaskList (
       Task     = ATA_NON_BLOCK_TASK_FROM_ENTRY (DelEntry);
 
       RemoveEntryList (DelEntry);
+      if (IsSigEvent) {
+        Task->Packet->Asb->AtaStatus = 0x01;
+        gBS->SignalEvent (Task->Event);
+      }
       FreePool (Task);
     }
   }
@@ -1124,9 +1132,9 @@ DestroyAsynTaskList (
 
 /**
   Enumerate all attached ATA devices at IDE mode or AHCI mode separately.
-  
-  The function is designed to enumerate all attached ATA devices. 
-  
+
+  The function is designed to enumerate all attached ATA devices.
+
   @param[in]  Instance          A pointer to the ATA_ATAPI_PASS_THRU_INSTANCE instance.
 
   @retval EFI_SUCCESS           Successfully enumerate attached ATA devices.
@@ -1196,8 +1204,8 @@ Done:
   supports both blocking I/O and non-blocking I/O. The blocking I/O functionality is required,
   and the non-blocking I/O functionality is optional.
 
-  @param[in]      This               A pointer to the EFI_ATA_PASS_THRU_PROTOCOL instance. 
-  @param[in]      Port               The port number of the ATA device to send the command. 
+  @param[in]      This               A pointer to the EFI_ATA_PASS_THRU_PROTOCOL instance.
+  @param[in]      Port               The port number of the ATA device to send the command.
   @param[in]      PortMultiplierPort The port multiplier port number of the ATA device to send the command.
                                      If there is no port multiplier, then specify 0.
   @param[in, out] Packet             A pointer to the ATA command to send to the ATA device specified by Port
@@ -1207,11 +1215,11 @@ Done:
                                      Event is not NULL and non blocking I/O is supported, then non-blocking
                                      I/O is performed, and Event will be signaled when the ATA command completes.
 
-  @retval EFI_SUCCESS                The ATA command was sent by the host. For bi-directional commands, 
+  @retval EFI_SUCCESS                The ATA command was sent by the host. For bi-directional commands,
                                      InTransferLength bytes were transferred from InDataBuffer. For write and
                                      bi-directional commands, OutTransferLength bytes were transferred by OutDataBuffer.
   @retval EFI_BAD_BUFFER_SIZE        The ATA command was not executed. The number of bytes that could be transferred
-                                     is returned in InTransferLength. For write and bi-directional commands, 
+                                     is returned in InTransferLength. For write and bi-directional commands,
                                      OutTransferLength bytes were transferred by OutDataBuffer.
   @retval EFI_NOT_READY              The ATA command could not be sent because there are too many ATA commands
                                      already queued. The caller may retry again later.
@@ -1256,7 +1264,7 @@ AtaPassThruPassThru (
   //
   // convert the transfer length from sector count to byte.
   //
-  if (((Packet->Length & EFI_ATA_PASS_THRU_LENGTH_BYTES) == 0) && 
+  if (((Packet->Length & EFI_ATA_PASS_THRU_LENGTH_BYTES) == 0) &&
        (Packet->InTransferLength != 0)) {
     Packet->InTransferLength = Packet->InTransferLength * 0x200;
   }
@@ -1278,7 +1286,7 @@ AtaPassThruPassThru (
   //
   // Check whether this device needs 48-bit addressing (ATAPI-6 ata device).
   // Per ATA-6 spec, word83: bit15 is zero and bit14 is one.
-  // If bit10 is one, it means the ata device support 48-bit addressing. 
+  // If bit10 is one, it means the ata device support 48-bit addressing.
   //
   DeviceInfo     = ATA_ATAPI_DEVICE_INFO_FROM_THIS (Node);
   IdentifyData   = DeviceInfo->IdentifyData;
@@ -1297,9 +1305,9 @@ AtaPassThruPassThru (
   //
   // If the data buffer described by InDataBuffer/OutDataBuffer and InTransferLength/OutTransferLength
   // is too big to be transferred in a single command, then no data is transferred and EFI_BAD_BUFFER_SIZE
-  // is returned. 
+  // is returned.
   //
-  if (((Packet->InTransferLength != 0) && (Packet->InTransferLength > MaxSectorCount * 0x200)) || 
+  if (((Packet->InTransferLength != 0) && (Packet->InTransferLength > MaxSectorCount * 0x200)) ||
       ((Packet->OutTransferLength != 0) && (Packet->OutTransferLength > MaxSectorCount * 0x200))) {
     return EFI_BAD_BUFFER_SIZE;
   }
@@ -1312,7 +1320,7 @@ AtaPassThruPassThru (
     if (Task == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
-    
+
     Task->Signature      = ATA_NONBLOCKING_TASK_SIGNATURE;
     Task->Port           = Port;
     Task->PortMultiplier = PortMultiplierPort;
@@ -1356,7 +1364,7 @@ AtaPassThruPassThru (
   If Port is the port number of the last port on the ATA controller, then EFI_NOT_FOUND is
   returned.
 
-  @param[in]      This          A pointer to the EFI_ATA_PASS_THRU_PROTOCOL instance. 
+  @param[in]      This          A pointer to the EFI_ATA_PASS_THRU_PROTOCOL instance.
   @param[in, out] Port          On input, a pointer to the port number on the ATA controller.
                                 On output, a pointer to the next port number on the ATA
                                 controller. An input value of 0xFFFF retrieves the first port
@@ -1436,36 +1444,36 @@ Exit:
 }
 
 /**
-  Used to retrieve the list of legal port multiplier port numbers for ATA devices on a port of an ATA 
-  controller. These can either be the list of port multiplier ports where ATA devices are actually 
-  present on port or the list of legal port multiplier ports on that port. Regardless, the caller of this 
-  function must probe the port number and port multiplier port number returned to see if an ATA 
+  Used to retrieve the list of legal port multiplier port numbers for ATA devices on a port of an ATA
+  controller. These can either be the list of port multiplier ports where ATA devices are actually
+  present on port or the list of legal port multiplier ports on that port. Regardless, the caller of this
+  function must probe the port number and port multiplier port number returned to see if an ATA
   device is actually present.
 
-  The GetNextDevice() function retrieves the port multiplier port number of an ATA device 
+  The GetNextDevice() function retrieves the port multiplier port number of an ATA device
   present on a port of an ATA controller.
 
-  If PortMultiplierPort points to a port multiplier port number value that was returned on a 
+  If PortMultiplierPort points to a port multiplier port number value that was returned on a
   previous call to GetNextDevice(), then the port multiplier port number of the next ATA device
   on the port of the ATA controller is returned in PortMultiplierPort, and EFI_SUCCESS is
   returned.
 
-  If PortMultiplierPort points to 0xFFFF, then the port multiplier port number of the first 
-  ATA device on port of the ATA controller is returned in PortMultiplierPort and 
+  If PortMultiplierPort points to 0xFFFF, then the port multiplier port number of the first
+  ATA device on port of the ATA controller is returned in PortMultiplierPort and
   EFI_SUCCESS is returned.
 
   If PortMultiplierPort is not 0xFFFF and the value pointed to by PortMultiplierPort
   was not returned on a previous call to GetNextDevice(), then EFI_INVALID_PARAMETER
   is returned.
 
-  If PortMultiplierPort is the port multiplier port number of the last ATA device on the port of 
+  If PortMultiplierPort is the port multiplier port number of the last ATA device on the port of
   the ATA controller, then EFI_NOT_FOUND is returned.
 
   @param[in]      This               A pointer to the EFI_ATA_PASS_THRU_PROTOCOL instance.
   @param[in]      Port               The port number present on the ATA controller.
   @param[in, out] PortMultiplierPort On input, a pointer to the port multiplier port number of an
-                                     ATA device present on the ATA controller. 
-                                     If on input a PortMultiplierPort of 0xFFFF is specified, 
+                                     ATA device present on the ATA controller.
+                                     If on input a PortMultiplierPort of 0xFFFF is specified,
                                      then the port multiplier port number of the first ATA device
                                      is returned. On output, a pointer to the port multiplier port
                                      number of the next ATA device present on an ATA controller.
@@ -1635,7 +1643,7 @@ AtaPassThruBuildDevicePath (
 
   The GetDevice() function determines the port and port multiplier port number associated with
   the ATA device described by DevicePath. If DevicePath is a device path node type that the
-  ATA Pass Thru driver supports, then the ATA Pass Thru driver will attempt to translate the contents 
+  ATA Pass Thru driver supports, then the ATA Pass Thru driver will attempt to translate the contents
   DevicePath into a port number and port multiplier port number.
 
   If this translation is successful, then that port number and port multiplier port number are returned
@@ -1643,11 +1651,11 @@ AtaPassThruBuildDevicePath (
 
   If DevicePath, Port, or PortMultiplierPort are NULL, then EFI_INVALID_PARAMETER is returned.
 
-  If DevicePath is not a device path node type that the ATA Pass Thru driver supports, then 
+  If DevicePath is not a device path node type that the ATA Pass Thru driver supports, then
   EFI_UNSUPPORTED is returned.
 
-  If DevicePath is a device path node type that the ATA Pass Thru driver supports, but there is not 
-  a valid translation from DevicePath to a port number and port multiplier port number, then 
+  If DevicePath is a device path node type that the ATA Pass Thru driver supports, but there is not
+  a valid translation from DevicePath to a port number and port multiplier port number, then
   EFI_NOT_FOUND is returned.
 
   @param[in]  This                A pointer to the EFI_ATA_PASS_THRU_PROTOCOL instance.
@@ -1759,7 +1767,7 @@ AtaPassThruResetPort (
   If this ATA controller does not support a device reset operation, then EFI_UNSUPPORTED is
   returned.
 
-  If Port or PortMultiplierPort are not in a valid range for this ATA controller, then 
+  If Port or PortMultiplierPort are not in a valid range for this ATA controller, then
   EFI_INVALID_PARAMETER is returned.
 
   If a device error occurs while executing that device reset operation, then EFI_DEVICE_ERROR
@@ -1795,9 +1803,9 @@ AtaPassThruResetDevice (
 }
 
 /**
-  Sends a SCSI Request Packet to a SCSI device that is attached to the SCSI channel. This function   
+  Sends a SCSI Request Packet to a SCSI device that is attached to the SCSI channel. This function
   supports both blocking I/O and nonblocking I/O. The blocking I/O functionality is required, and the
-  nonblocking I/O functionality is optional.                                                             
+  nonblocking I/O functionality is optional.
 
   @param  This    A pointer to the EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
   @param  Target  The Target is an array of size TARGET_MAX_BYTES and it represents
@@ -1866,7 +1874,7 @@ ExtScsiPassThruPassThru (
       (Packet->CdbLength != 12) && (Packet->CdbLength != 16)) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   if ((This->Mode->IoAlign > 1) && !IS_ALIGNED(Packet->InDataBuffer, This->Mode->IoAlign)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -1886,7 +1894,7 @@ ExtScsiPassThruPassThru (
     return EFI_INVALID_PARAMETER;
   }
 
-  // 
+  //
   // The layout of Target array:
   //  ________________________________________________________________________
   // |       Byte 0        |       Byte 1        | ... | TARGET_MAX_BYTES - 1 |
@@ -1943,10 +1951,10 @@ ExtScsiPassThruPassThru (
 }
 
 /**
-  Used to retrieve the list of legal Target IDs and LUNs for SCSI devices on a SCSI channel. These       
+  Used to retrieve the list of legal Target IDs and LUNs for SCSI devices on a SCSI channel. These
   can either be the list SCSI devices that are actually present on the SCSI channel, or the list of legal
-  Target Ids and LUNs for the SCSI channel. Regardless, the caller of this function must probe the       
-  Target ID and LUN returned to see if a SCSI device is actually present at that location on the SCSI    
+  Target Ids and LUNs for the SCSI channel. Regardless, the caller of this function must probe the
+  Target ID and LUN returned to see if a SCSI device is actually present at that location on the SCSI
   channel.
 
   @param  This   A pointer to the EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
@@ -2027,7 +2035,7 @@ ExtScsiPassThruGetNextTargetLun (
       DeviceInfo = ATA_ATAPI_DEVICE_INFO_FROM_THIS (Node);
 
       if ((DeviceInfo->Type == EfiIdeCdrom) &&
-         ((Target8[0] < DeviceInfo->Port) || 
+         ((Target8[0] < DeviceInfo->Port) ||
           ((Target8[0] == DeviceInfo->Port) &&
            (Target8[1] < DeviceInfo->PortMultiplier)))) {
         Target8[0] = (UINT8)DeviceInfo->Port;
@@ -2067,7 +2075,7 @@ Exit:
   //
   Instance->PreviousTargetId = *Target16;
   Instance->PreviousLun      = *Lun;
-  
+
   return EFI_SUCCESS;
 }
 
@@ -2134,7 +2142,7 @@ ExtScsiPassThruBuildDevicePath (
   if (SearchDeviceInfoList(Instance, Port, PortMultiplier, EfiIdeCdrom) == NULL) {
     return EFI_NOT_FOUND;
   }
-  
+
   if (Instance->Mode == EfiAtaIdeMode) {
     DevicePathNode = AllocateCopyPool (sizeof (ATAPI_DEVICE_PATH), &mAtapiDevicePathTemplate);
     if (DevicePathNode == NULL) {
@@ -2293,10 +2301,10 @@ ExtScsiPassThruResetTargetLun (
 }
 
 /**
-  Used to retrieve the list of legal Target IDs for SCSI devices on a SCSI channel. These can either     
+  Used to retrieve the list of legal Target IDs for SCSI devices on a SCSI channel. These can either
   be the list SCSI devices that are actually present on the SCSI channel, or the list of legal Target IDs
-  for the SCSI channel. Regardless, the caller of this function must probe the Target ID returned to     
-  see if a SCSI device is actually present at that location on the SCSI channel.                         
+  for the SCSI channel. Regardless, the caller of this function must probe the Target ID returned to
+  see if a SCSI device is actually present at that location on the SCSI channel.
 
   @param  This   A pointer to the EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
   @param  Target (TARGET_MAX_BYTES) of a SCSI device present on the SCSI channel.
@@ -2366,7 +2374,7 @@ ExtScsiPassThruGetNextTarget (
       DeviceInfo = ATA_ATAPI_DEVICE_INFO_FROM_THIS (Node);
 
       if ((DeviceInfo->Type == EfiIdeCdrom) &&
-         ((Target8[0] < DeviceInfo->Port) || 
+         ((Target8[0] < DeviceInfo->Port) ||
           ((Target8[0] == DeviceInfo->Port) &&
            (Target8[1] < DeviceInfo->PortMultiplier)))) {
         Target8[0] = (UINT8)DeviceInfo->Port;

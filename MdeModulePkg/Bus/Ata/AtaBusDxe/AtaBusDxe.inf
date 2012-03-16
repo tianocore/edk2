@@ -1,5 +1,5 @@
 ## @file
-#  ATA Bus driver to enumerate and identfy ATA devices. 
+#  ATA Bus driver to enumerate and identfy ATA devices.
 #
 #  This driver follows UEFI driver model and layers on ATA Pass Thru protocol defined
 #  in UEFI spec 2.2. It installs Block IO and Disk Info protocol for each ATA device
@@ -30,9 +30,9 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-#  DRIVER_BINDING                =  gAtaBusDriverBinding                         
+#  DRIVER_BINDING                =  gAtaBusDriverBinding
 #  COMPONENT_NAME                =  gAtaBusComponentName
-#  COMPONENT_NAME2               =  gAtaBusComponentName2                         
+#  COMPONENT_NAME2               =  gAtaBusComponentName2
 #
 #
 
@@ -41,7 +41,7 @@
   AtaBus.c
   AtaPassThruExecute.c
   ComponentName.c
-  
+
 [Packages]
   MdePkg/MdePkg.dec
 
@@ -54,7 +54,7 @@
   BaseLib
   UefiDriverEntryPoint
   DebugLib
-
+  TimerLib
 
 [Guids]
   gEfiDiskInfoIdeInterfaceGuid                  # CONSUMES  ## GUID
