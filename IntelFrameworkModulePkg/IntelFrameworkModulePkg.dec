@@ -2,7 +2,7 @@
 # Intel Framework Module Package contains the definitions and module implementation
 # which follows Intel EFI Framework Specification.
 #
-# Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -46,6 +46,7 @@
   ## GUID indicates the LZMA custom compress/decompress algorithm.
   #  Include/Guid/LzmaDecompress.h
   gLzmaCustomDecompressGuid      = { 0xEE4E5898, 0x3914, 0x4259, { 0x9D, 0x6E, 0xDC, 0x7B, 0xD7, 0x94, 0x03, 0xCF }}
+  gLzmaF86CustomDecompressGuid     = { 0xD42AE6BD, 0x1352, 0x4bfb, { 0x90, 0x9A, 0xCA, 0x72, 0xA6, 0xEA, 0xE8, 0x89 }}
 
   ## Include/Guid/AcpiVariable.h
   gEfiAcpiVariableCompatiblityGuid   = { 0xc020489e, 0x6db2, 0x4ef2, { 0x9a, 0xa5, 0xca, 0x6,  0xfc, 0x11, 0xd3, 0x6a }}
