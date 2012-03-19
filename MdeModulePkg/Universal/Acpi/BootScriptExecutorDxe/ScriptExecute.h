@@ -31,7 +31,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/PcdLib.h>
 #include <Library/CacheMaintenanceLib.h>
-#include <Library/PerformanceLib.h>
 #include <Library/TimerLib.h>
 #include <Library/UefiLib.h>
 #include <Library/DebugAgentLib.h>
@@ -41,7 +40,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/AcpiS3Context.h>
 #include <Guid/BootScriptExecutorVariable.h>
 #include <Guid/EventGroup.h>
-#include <Guid/Performance.h>
 #include <IndustryStandard/Acpi.h>
 /**
   a ASM function to transfer control to OS.

@@ -390,6 +390,8 @@ S3ResumeBootOs (
   //
   AsmWriteIdtr (&PeiS3ResumeState->Idtr);
 
+  PERF_END (NULL, "ScriptExec", NULL, 0);
+
   //
   // Install BootScriptDonePpi
   //
@@ -741,6 +743,8 @@ S3ResumeExecuteBootScript (
   // Save IDT
   //
   AsmReadIdtr (&PeiS3ResumeState->Idtr);
+
+  PERF_START (NULL, "ScriptExec", NULL, 0);
 
   if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
     //

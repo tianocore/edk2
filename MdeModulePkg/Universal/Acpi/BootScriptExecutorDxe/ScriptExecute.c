@@ -4,7 +4,7 @@
   This driver is dispatched by Dxe core and the driver will reload itself to ACPI NVS memory
   in the entry point. The functionality is to interpret and restore the S3 boot script
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -18,86 +18,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "ScriptExecute.h"
 
-EFI_PHYSICAL_ADDRESS  mPerfDataMemAddress;
-UINT64                mS3BootScriptEntryTick;
-UINT64                mScriptStartTick;
-UINT64                mScriptEndTick;
-
 EFI_GUID              mBootScriptExecutorImageGuid = {
   0x9a8d3433, 0x9fe8, 0x42b6, 0x87, 0xb, 0x1e, 0x31, 0xc8, 0x4e, 0xbe, 0x3b
 };
-
-/**
-  The event callback is used to get the base address of boot performance data structure on
-  LegacyBoot event and ExitBootServices event.
-
-  @param  Event    The event handle.
-  @param  Context  The event context.
-
-**/
-VOID
-EFIAPI
-OnBootEvent (
-  IN EFI_EVENT        Event,
-  IN VOID             *Context
-  )
-{
-  EFI_STATUS Status;
-  UINTN      VarSize;
-
-  VarSize = sizeof (EFI_PHYSICAL_ADDRESS);
-  Status = gRT->GetVariable (
-                  L"PerfDataMemAddr",
-                  &gPerformanceProtocolGuid,
-                  NULL,
-                  &VarSize,
-                  &mPerfDataMemAddress
-                  );
-  if (EFI_ERROR (Status)) {
-    mPerfDataMemAddress = 0;
-  }
-}
-
-/**
-  Record S3 Script execution time and adjust total S3 resume time for script running.
-**/
-VOID
-WriteToOsS3PerformanceData (
-  VOID
-  )
-{
-  UINT64               Ticker;
-  UINT64               StartValue;
-  UINT64               EndValue;
-  UINT64               Freq;
-  UINT64               ScriptExecuteTicks;
-  PERF_HEADER          *PerfHeader;
-  PERF_DATA            *PerfData;
-
-  Ticker = GetPerformanceCounter ();
-
-  PerfHeader = (PERF_HEADER *)(UINTN)mPerfDataMemAddress;
-  if (PerfHeader == NULL) {
-    return;
-  }
-
-  Freq   = GetPerformanceCounterProperties (&StartValue, &EndValue);
-  Freq   = DivU64x32 (Freq, 1000);
-
-  if (EndValue >= StartValue) {
-    ScriptExecuteTicks = mScriptEndTick - mScriptStartTick;
-    PerfHeader->S3Resume += Ticker - mS3BootScriptEntryTick;
-  } else {
-    ScriptExecuteTicks = mScriptStartTick - mScriptEndTick;
-    PerfHeader->S3Resume += mS3BootScriptEntryTick - Ticker;
-  }
-  if (PerfHeader->S3EntryNum < PERF_PEI_ENTRY_MAX_NUM) {
-    PerfData = &PerfHeader->S3Entry[PerfHeader->S3EntryNum];
-    PerfData->Duration = (UINT32) DivU64x32 (ScriptExecuteTicks, (UINT32) Freq);;
-    AsciiStrnCpy (PerfData->Token, "ScriptExec", PERF_TOKEN_LENGTH);
-    PerfHeader->S3EntryNum++;
-  }
-}
 
 /**
   Entry function of Boot script exector. This function will be executed in
@@ -123,10 +46,6 @@ S3BootScriptExecutorEntryFunction (
   UINTN                                         TempStack[0x10];
   UINTN                                         AsmTransferControl16Address;
 
-  PERF_CODE (
-    mS3BootScriptEntryTick = GetPerformanceCounter ();
-    );
-
   //
   // Disable interrupt of Debug timer, since new IDT table cannot handle it.
   //
@@ -146,13 +65,7 @@ S3BootScriptExecutorEntryFunction (
   // Because not install BootScriptExecute PPI(used just in this module), So just pass NULL
   // for that parameter.
   //
-  PERF_CODE (
-    mScriptStartTick = GetPerformanceCounter ();
-    );
   Status = S3BootScriptExecute ();
-  PERF_CODE (
-    mScriptEndTick = GetPerformanceCounter ();
-    );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -217,10 +130,6 @@ S3BootScriptExecutorEntryFunction (
     CpuDeadLoop();
     return EFI_UNSUPPORTED;
   }
-
-  PERF_CODE (
-    WriteToOsS3PerformanceData ();
-    );
 
   if (Facs->XFirmwareWakingVector != 0) {
     //
@@ -449,25 +358,6 @@ BootScriptExecutorEntryPoint (
       Status = SetLockBoxAttributes (&gEfiBootScriptExecutorContextGuid, LOCK_BOX_ATTRIBUTE_RESTORE_IN_PLACE);
       ASSERT_EFI_ERROR (Status);
 
-      PERF_CODE (
-        EFI_EVENT Event;
-
-        gBS->CreateEventEx (
-              EVT_NOTIFY_SIGNAL,
-              TPL_NOTIFY,
-              OnBootEvent,
-              NULL,
-              &gEfiEventExitBootServicesGuid,
-              &Event
-              );
-
-        EfiCreateEventLegacyBootEx(
-          TPL_NOTIFY,
-          OnBootEvent,
-          NULL,
-          &Event
-          );
-        );
     }
 
     return EFI_SUCCESS;

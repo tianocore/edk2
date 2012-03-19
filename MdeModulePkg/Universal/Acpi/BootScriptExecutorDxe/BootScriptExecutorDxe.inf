@@ -64,7 +64,6 @@
   UefiBootServicesTableLib
   UefiRuntimeServicesTableLib
   CacheMaintenanceLib
-  PerformanceLib
   UefiLib
   DebugAgentLib
   LockBoxLib
