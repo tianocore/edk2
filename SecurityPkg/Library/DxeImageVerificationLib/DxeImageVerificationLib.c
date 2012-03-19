@@ -1,7 +1,7 @@
 /** @file
   Implement image verification services for secure boot service in UEFI2.3.1.
 
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -486,7 +486,15 @@ HashPeImageByType (
     //            .... }
     //    The DigestAlgorithmIdentifiers can be used to determine the hash algorithm in PE/COFF hashing
     //    This field has the fixed offset (+32) in final Authenticode ASN.1 data.
+    //    Fixed offset (+32) is calculated based on two bytes of length encoding.
     //
+    if ((*(PkcsCertData->CertData + 1) & TWO_BYTE_ENCODE) != TWO_BYTE_ENCODE) {
+      //
+      // Only support two bytes of Long Form of Length Encoding.
+      //
+      continue;
+    }
+
     if (CompareMem (PkcsCertData->CertData + 32, mHash[Index].OidValue, mHash[Index].OidLength) == 0) {
       break;
     }
