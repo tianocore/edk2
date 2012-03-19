@@ -68,8 +68,8 @@ CommonExceptionHandler (
 
   This API will setups the CPU exception handler to display CPU contents and run into
   CpuDeadLoop(). 
-  @Note: Before invoking this API, caller must allocate memory for IDT table and load 
-         IDTR by AsmWriteIdtr().
+  Note: Before invoking this API, caller must allocate memory for IDT table and load 
+        IDTR by AsmWriteIdtr().
   
 **/
 VOID

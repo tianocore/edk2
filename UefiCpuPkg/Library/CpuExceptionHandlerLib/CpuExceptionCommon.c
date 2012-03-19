@@ -61,8 +61,11 @@ InternalPrintMessage (
 /**
   Find and display image base address and return image base and its entry point.
   
-  @return EFI_SUCCESS     Image base address.
-  @return 0               Image header cannot be found.
+  @param CurrentEip      Current instruction pointer.
+  @param EntryPoint      Return module entry point if module header is found.
+  
+  @return !0     Image base address.
+  @return 0      Image header cannot be found.
 **/
 UINTN 
 FindModuleImageBase (
