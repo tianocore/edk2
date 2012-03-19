@@ -4,7 +4,7 @@
   primitives (Hash Serials, HMAC, RSA, Diffie-Hellman, etc) for UEFI security
   functionality enabling.
 
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -82,7 +82,7 @@ Md4GetContextSize (
   Initializes user-supplied memory pointed by Md4Context as MD4 hash context for
   subsequent use.
 
-  If Md4Context is NULL, then ASSERT().
+  If Md4Context is NULL, then return FALSE.
 
   @param[out]  Md4Context  Pointer to MD4 context being initialized.
 
@@ -99,8 +99,8 @@ Md4Init (
 /**
   Makes a copy of an existing MD4 context.
 
-  If Md4Context is NULL, then ASSERT().
-  If NewMd4Context is NULL, then ASSERT().
+  If Md4Context is NULL, then return FALSE.
+  If NewMd4Context is NULL, then return FALSE.
 
   @param[in]  Md4Context     Pointer to MD4 context being copied.
   @param[out] NewMd4Context  Pointer to new MD4 context.
@@ -124,7 +124,7 @@ Md4Duplicate (
   MD4 context should be already correctly intialized by Md4Init(), and should not be finalized
   by Md4Final(). Behavior with invalid context is undefined.
 
-  If Md4Context is NULL, then ASSERT().
+  If Md4Context is NULL, then return FALSE.
 
   @param[in, out]  Md4Context  Pointer to the MD4 context.
   @param[in]       Data        Pointer to the buffer containing the data to be hashed.
@@ -151,8 +151,8 @@ Md4Update (
   MD4 context should be already correctly intialized by Md4Init(), and should not be
   finalized by Md4Final(). Behavior with invalid MD4 context is undefined.
 
-  If Md4Context is NULL, then ASSERT().
-  If HashValue is NULL, then ASSERT().
+  If Md4Context is NULL, then return FALSE.
+  If HashValue is NULL, then return FALSE.
 
   @param[in, out]  Md4Context  Pointer to the MD4 context.
   @param[out]      HashValue   Pointer to a buffer that receives the MD4 digest
@@ -185,7 +185,7 @@ Md5GetContextSize (
   Initializes user-supplied memory pointed by Md5Context as MD5 hash context for
   subsequent use.
 
-  If Md5Context is NULL, then ASSERT().
+  If Md5Context is NULL, then return FALSE.
 
   @param[out]  Md5Context  Pointer to MD5 context being initialized.
 
@@ -202,8 +202,8 @@ Md5Init (
 /**
   Makes a copy of an existing MD5 context.
 
-  If Md5Context is NULL, then ASSERT().
-  If NewMd5Context is NULL, then ASSERT().
+  If Md5Context is NULL, then return FALSE.
+  If NewMd5Context is NULL, then return FALSE.
 
   @param[in]  Md5Context     Pointer to MD5 context being copied.
   @param[out] NewMd5Context  Pointer to new MD5 context.
@@ -227,7 +227,7 @@ Md5Duplicate (
   MD5 context should be already correctly intialized by Md5Init(), and should not be finalized
   by Md5Final(). Behavior with invalid context is undefined.
 
-  If Md5Context is NULL, then ASSERT().
+  If Md5Context is NULL, then return FALSE.
 
   @param[in, out]  Md5Context  Pointer to the MD5 context.
   @param[in]       Data        Pointer to the buffer containing the data to be hashed.
@@ -254,8 +254,8 @@ Md5Update (
   MD5 context should be already correctly intialized by Md5Init(), and should not be
   finalized by Md5Final(). Behavior with invalid MD5 context is undefined.
 
-  If Md5Context is NULL, then ASSERT().
-  If HashValue is NULL, then ASSERT().
+  If Md5Context is NULL, then return FALSE.
+  If HashValue is NULL, then return FALSE.
 
   @param[in, out]  Md5Context  Pointer to the MD5 context.
   @param[out]      HashValue   Pointer to a buffer that receives the MD5 digest
@@ -288,7 +288,7 @@ Sha1GetContextSize (
   Initializes user-supplied memory pointed by Sha1Context as SHA-1 hash context for
   subsequent use.
 
-  If Sha1Context is NULL, then ASSERT().
+  If Sha1Context is NULL, then return FALSE.
 
   @param[out]  Sha1Context  Pointer to SHA-1 context being initialized.
 
@@ -305,8 +305,8 @@ Sha1Init (
 /**
   Makes a copy of an existing SHA-1 context.
 
-  If Sha1Context is NULL, then ASSERT().
-  If NewSha1Context is NULL, then ASSERT().
+  If Sha1Context is NULL, then return FALSE.
+  If NewSha1Context is NULL, then return FALSE.
 
   @param[in]  Sha1Context     Pointer to SHA-1 context being copied.
   @param[out] NewSha1Context  Pointer to new SHA-1 context.
@@ -330,7 +330,7 @@ Sha1Duplicate (
   SHA-1 context should be already correctly intialized by Sha1Init(), and should not be finalized
   by Sha1Final(). Behavior with invalid context is undefined.
 
-  If Sha1Context is NULL, then ASSERT().
+  If Sha1Context is NULL, then return FALSE.
 
   @param[in, out]  Sha1Context  Pointer to the SHA-1 context.
   @param[in]       Data         Pointer to the buffer containing the data to be hashed.
@@ -357,8 +357,8 @@ Sha1Update (
   SHA-1 context should be already correctly intialized by Sha1Init(), and should not be
   finalized by Sha1Final(). Behavior with invalid SHA-1 context is undefined.
 
-  If Sha1Context is NULL, then ASSERT().
-  If HashValue is NULL, then ASSERT().
+  If Sha1Context is NULL, then return FALSE.
+  If HashValue is NULL, then return FALSE.
 
   @param[in, out]  Sha1Context  Pointer to the SHA-1 context.
   @param[out]      HashValue    Pointer to a buffer that receives the SHA-1 digest
@@ -391,7 +391,7 @@ Sha256GetContextSize (
   Initializes user-supplied memory pointed by Sha256Context as SHA-256 hash context for
   subsequent use.
 
-  If Sha256Context is NULL, then ASSERT().
+  If Sha256Context is NULL, then return FALSE.
 
   @param[out]  Sha256Context  Pointer to SHA-256 context being initialized.
 
@@ -408,8 +408,8 @@ Sha256Init (
 /**
   Makes a copy of an existing SHA-256 context.
 
-  If Sha256Context is NULL, then ASSERT().
-  If NewSha256Context is NULL, then ASSERT().
+  If Sha256Context is NULL, then return FALSE.
+  If NewSha256Context is NULL, then return FALSE.
 
   @param[in]  Sha256Context     Pointer to SHA-256 context being copied.
   @param[out] NewSha256Context  Pointer to new SHA-256 context.
@@ -433,7 +433,7 @@ Sha256Duplicate (
   SHA-256 context should be already correctly intialized by Sha256Init(), and should not be finalized
   by Sha256Final(). Behavior with invalid context is undefined.
 
-  If Sha256Context is NULL, then ASSERT().
+  If Sha256Context is NULL, then return FALSE.
 
   @param[in, out]  Sha256Context  Pointer to the SHA-256 context.
   @param[in]       Data           Pointer to the buffer containing the data to be hashed.
@@ -460,8 +460,8 @@ Sha256Update (
   SHA-256 context should be already correctly intialized by Sha256Init(), and should not be
   finalized by Sha256Final(). Behavior with invalid SHA-256 context is undefined.
 
-  If Sha256Context is NULL, then ASSERT().
-  If HashValue is NULL, then ASSERT().
+  If Sha256Context is NULL, then return FALSE.
+  If HashValue is NULL, then return FALSE.
 
   @param[in, out]  Sha256Context  Pointer to the SHA-256 context.
   @param[out]      HashValue      Pointer to a buffer that receives the SHA-256 digest
@@ -499,7 +499,7 @@ HmacMd5GetContextSize (
   Initializes user-supplied memory pointed by HmacMd5Context as HMAC-MD5 context for
   subsequent use.
 
-  If HmacMd5Context is NULL, then ASSERT().
+  If HmacMd5Context is NULL, then return FALSE.
 
   @param[out]  HmacMd5Context  Pointer to HMAC-MD5 context being initialized.
   @param[in]   Key             Pointer to the user-supplied key.
@@ -520,8 +520,8 @@ HmacMd5Init (
 /**
   Makes a copy of an existing HMAC-MD5 context.
 
-  If HmacMd5Context is NULL, then ASSERT().
-  If NewHmacMd5Context is NULL, then ASSERT().
+  If HmacMd5Context is NULL, then return FALSE.
+  If NewHmacMd5Context is NULL, then return FALSE.
 
   @param[in]  HmacMd5Context     Pointer to HMAC-MD5 context being copied.
   @param[out] NewHmacMd5Context  Pointer to new HMAC-MD5 context.
@@ -545,7 +545,7 @@ HmacMd5Duplicate (
   HMAC-MD5 context should be already correctly intialized by HmacMd5Init(), and should not be
   finalized by HmacMd5Final(). Behavior with invalid context is undefined.
 
-  If HmacMd5Context is NULL, then ASSERT().
+  If HmacMd5Context is NULL, then return FALSE.
 
   @param[in, out]  HmacMd5Context  Pointer to the HMAC-MD5 context.
   @param[in]       Data            Pointer to the buffer containing the data to be digested.
@@ -572,8 +572,8 @@ HmacMd5Update (
   HMAC-MD5 context should be already correctly intialized by HmacMd5Init(), and should not be
   finalized by HmacMd5Final(). Behavior with invalid HMAC-MD5 context is undefined.
 
-  If HmacMd5Context is NULL, then ASSERT().
-  If HashValue is NULL, then ASSERT().
+  If HmacMd5Context is NULL, then return FALSE.
+  If HashValue is NULL, then return FALSE.
 
   @param[in, out]  HmacMd5Context  Pointer to the HMAC-MD5 context.
   @param[out]      HashValue       Pointer to a buffer that receives the HMAC-MD5 digest
@@ -606,7 +606,7 @@ HmacSha1GetContextSize (
   Initializes user-supplied memory pointed by HmacSha1Context as HMAC-SHA1 context for
   subsequent use.
 
-  If HmacSha1Context is NULL, then ASSERT().
+  If HmacSha1Context is NULL, then return FALSE.
 
   @param[out]  HmacSha1Context  Pointer to HMAC-SHA1 context being initialized.
   @param[in]   Key              Pointer to the user-supplied key.
@@ -627,8 +627,8 @@ HmacSha1Init (
 /**
   Makes a copy of an existing HMAC-SHA1 context.
 
-  If HmacSha1Context is NULL, then ASSERT().
-  If NewHmacSha1Context is NULL, then ASSERT().
+  If HmacSha1Context is NULL, then return FALSE.
+  If NewHmacSha1Context is NULL, then return FALSE.
 
   @param[in]  HmacSha1Context     Pointer to HMAC-SHA1 context being copied.
   @param[out] NewHmacSha1Context  Pointer to new HMAC-SHA1 context.
@@ -652,7 +652,7 @@ HmacSha1Duplicate (
   HMAC-SHA1 context should be already correctly intialized by HmacSha1Init(), and should not
   be finalized by HmacSha1Final(). Behavior with invalid context is undefined.
 
-  If HmacSha1Context is NULL, then ASSERT().
+  If HmacSha1Context is NULL, then return FALSE.
 
   @param[in, out]  HmacSha1Context Pointer to the HMAC-SHA1 context.
   @param[in]       Data            Pointer to the buffer containing the data to be digested.
@@ -679,8 +679,8 @@ HmacSha1Update (
   HMAC-SHA1 context should be already correctly intialized by HmacSha1Init(), and should
   not be finalized by HmacSha1Final(). Behavior with invalid HMAC-SHA1 context is undefined.
 
-  If HmacSha1Context is NULL, then ASSERT().
-  If HashValue is NULL, then ASSERT().
+  If HmacSha1Context is NULL, then return FALSE.
+  If HashValue is NULL, then return FALSE.
 
   @param[in, out]  HmacSha1Context  Pointer to the HMAC-SHA1 context.
   @param[out]      HashValue        Pointer to a buffer that receives the HMAC-SHA1 digest
@@ -725,9 +725,9 @@ TdesGetContextSize (
   KeyLength = 128, Keying option 2: K1 != K2 and K3 = K1 (Less Security)
   KeyLength = 192  Keying option 3: K1 != K2 != K3 (Strongest)
 
-  If TdesContext is NULL, then ASSERT().
-  If Key is NULL, then ASSERT().
-  If KeyLength is not valid, then ASSERT().
+  If TdesContext is NULL, then return FALSE.
+  If Key is NULL, then return FALSE.
+  If KeyLength is not valid, then return FALSE.
 
   @param[out]  TdesContext  Pointer to TDES context being initialized.
   @param[in]   Key          Pointer to the user-supplied TDES key.
@@ -755,10 +755,10 @@ TdesInit (
   TdesContext should be already correctly initialized by TdesInit(). Behavior with
   invalid TDES context is undefined.
 
-  If TdesContext is NULL, then ASSERT().
-  If Input is NULL, then ASSERT().
-  If InputSize is not multiple of block size (8 bytes), then ASSERT().
-  If Output is NULL, then ASSERT().
+  If TdesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If InputSize is not multiple of block size (8 bytes), then return FALSE.
+  If Output is NULL, then return FALSE.
 
   @param[in]   TdesContext  Pointer to the TDES context.
   @param[in]   Input        Pointer to the buffer containing the data to be encrypted.
@@ -788,10 +788,10 @@ TdesEcbEncrypt (
   TdesContext should be already correctly initialized by TdesInit(). Behavior with
   invalid TDES context is undefined.
 
-  If TdesContext is NULL, then ASSERT().
-  If Input is NULL, then ASSERT().
-  If InputSize is not multiple of block size (8 bytes), then ASSERT().
-  If Output is NULL, then ASSERT().
+  If TdesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If InputSize is not multiple of block size (8 bytes), then return FALSE.
+  If Output is NULL, then return FALSE.
 
   @param[in]   TdesContext  Pointer to the TDES context.
   @param[in]   Input        Pointer to the buffer containing the data to be decrypted.
@@ -822,11 +822,11 @@ TdesEcbDecrypt (
   TdesContext should be already correctly initialized by TdesInit(). Behavior with
   invalid TDES context is undefined.
 
-  If TdesContext is NULL, then ASSERT().
-  If Input is NULL, then ASSERT().
-  If InputSize is not multiple of block size (8 bytes), then ASSERT().
-  If Ivec is NULL, then ASSERT().
-  If Output is NULL, then ASSERT().
+  If TdesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If InputSize is not multiple of block size (8 bytes), then return FALSE.
+  If Ivec is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
 
   @param[in]   TdesContext  Pointer to the TDES context.
   @param[in]   Input        Pointer to the buffer containing the data to be encrypted.
@@ -859,11 +859,11 @@ TdesCbcEncrypt (
   TdesContext should be already correctly initialized by TdesInit(). Behavior with
   invalid TDES context is undefined.
 
-  If TdesContext is NULL, then ASSERT().
-  If Input is NULL, then ASSERT().
-  If InputSize is not multiple of block size (8 bytes), then ASSERT().
-  If Ivec is NULL, then ASSERT().
-  If Output is NULL, then ASSERT().
+  If TdesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If InputSize is not multiple of block size (8 bytes), then return FALSE.
+  If Ivec is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
 
   @param[in]   TdesContext  Pointer to the TDES context.
   @param[in]   Input        Pointer to the buffer containing the data to be encrypted.
@@ -905,9 +905,9 @@ AesGetContextSize (
   operations.
   There are 3 options for key length, 128 bits, 192 bits, and 256 bits.
 
-  If AesContext is NULL, then ASSERT().
-  If Key is NULL, then ASSERT().
-  If KeyLength is not valid, then ASSERT().
+  If AesContext is NULL, then return FALSE.
+  If Key is NULL, then return FALSE.
+  If KeyLength is not valid, then return FALSE.
 
   @param[out]  AesContext  Pointer to AES context being initialized.
   @param[in]   Key         Pointer to the user-supplied AES key.
@@ -935,10 +935,10 @@ AesInit (
   AesContext should be already correctly initialized by AesInit(). Behavior with
   invalid AES context is undefined.
 
-  If AesContext is NULL, then ASSERT().
-  If Input is NULL, then ASSERT().
-  If InputSize is not multiple of block size (16 bytes), then ASSERT().
-  If Output is NULL, then ASSERT().
+  If AesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If InputSize is not multiple of block size (16 bytes), then return FALSE.
+  If Output is NULL, then return FALSE.
 
   @param[in]   AesContext  Pointer to the AES context.
   @param[in]   Input       Pointer to the buffer containing the data to be encrypted.
@@ -968,10 +968,10 @@ AesEcbEncrypt (
   AesContext should be already correctly initialized by AesInit(). Behavior with
   invalid AES context is undefined.
 
-  If AesContext is NULL, then ASSERT().
-  If Input is NULL, then ASSERT().
-  If InputSize is not multiple of block size (16 bytes), then ASSERT().
-  If Output is NULL, then ASSERT().
+  If AesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If InputSize is not multiple of block size (16 bytes), then return FALSE.
+  If Output is NULL, then return FALSE.
 
   @param[in]   AesContext  Pointer to the AES context.
   @param[in]   Input       Pointer to the buffer containing the data to be decrypted.
@@ -1002,11 +1002,11 @@ AesEcbDecrypt (
   AesContext should be already correctly initialized by AesInit(). Behavior with
   invalid AES context is undefined.
 
-  If AesContext is NULL, then ASSERT().
-  If Input is NULL, then ASSERT().
-  If InputSize is not multiple of block size (16 bytes), then ASSERT().
-  If Ivec is NULL, then ASSERT().
-  If Output is NULL, then ASSERT().
+  If AesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If InputSize is not multiple of block size (16 bytes), then return FALSE.
+  If Ivec is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
 
   @param[in]   AesContext  Pointer to the AES context.
   @param[in]   Input       Pointer to the buffer containing the data to be encrypted.
@@ -1039,11 +1039,11 @@ AesCbcEncrypt (
   AesContext should be already correctly initialized by AesInit(). Behavior with
   invalid AES context is undefined.
 
-  If AesContext is NULL, then ASSERT().
-  If Input is NULL, then ASSERT().
-  If InputSize is not multiple of block size (16 bytes), then ASSERT().
-  If Ivec is NULL, then ASSERT().
-  If Output is NULL, then ASSERT().
+  If AesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If InputSize is not multiple of block size (16 bytes), then return FALSE.
+  If Ivec is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
 
   @param[in]   AesContext  Pointer to the AES context.
   @param[in]   Input       Pointer to the buffer containing the data to be encrypted.
@@ -1084,9 +1084,9 @@ Arc4GetContextSize (
   In addtion, it sets up all ARC4 key materials for subsequent encryption and decryption
   operations.
 
-  If Arc4Context is NULL, then ASSERT().
-  If Key is NULL, then ASSERT().
-  If KeySize does not in the range of [5, 256] bytes, then ASSERT().
+  If Arc4Context is NULL, then return FALSE.
+  If Key is NULL, then return FALSE.
+  If KeySize does not in the range of [5, 256] bytes, then return FALSE.
 
   @param[out]  Arc4Context  Pointer to ARC4 context being initialized.
   @param[in]   Key          Pointer to the user-supplied ARC4 key.
@@ -1112,9 +1112,9 @@ Arc4Init (
   Arc4Context should be already correctly initialized by Arc4Init(). Behavior with
   invalid ARC4 context is undefined.
 
-  If Arc4Context is NULL, then ASSERT().
-  If Input is NULL, then ASSERT().
-  If Output is NULL, then ASSERT().
+  If Arc4Context is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
 
   @param[in]   Arc4Context  Pointer to the ARC4 context.
   @param[in]   Input        Pointer to the buffer containing the data to be encrypted.
@@ -1142,9 +1142,9 @@ Arc4Encrypt (
   Arc4Context should be already correctly initialized by Arc4Init(). Behavior with
   invalid ARC4 context is undefined.
 
-  If Arc4Context is NULL, then ASSERT().
-  If Input is NULL, then ASSERT().
-  If Output is NULL, then ASSERT().
+  If Arc4Context is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
 
   @param[in]   Arc4Context  Pointer to the ARC4 context.
   @param[in]   Input        Pointer to the buffer containing the data to be decrypted.
@@ -1172,7 +1172,7 @@ Arc4Decrypt (
   Contrary to ARC4Init(), Arc4Reset() requires no secret key as input, but ARC4 context
   should be already correctly initialized by ARC4Init().
 
-  If Arc4Context is NULL, then ASSERT().
+  If Arc4Context is NULL, then return FALSE.
 
   @param[in, out]  Arc4Context  Pointer to the ARC4 context.
 
@@ -1206,7 +1206,7 @@ RsaNew (
 /**
   Release the specified RSA context.
 
-  If RsaContext is NULL, then ASSERT().
+  If RsaContext is NULL, then return FALSE.
 
   @param[in]  RsaContext  Pointer to the RSA context to be released.
 
@@ -1225,7 +1225,7 @@ RsaFree (
   represented in RSA PKCS#1).
   If BigNumber is NULL, then the specified key componenet in RSA context is cleared.
 
-  If RsaContext is NULL, then ASSERT().
+  If RsaContext is NULL, then return FALSE.
 
   @param[in, out]  RsaContext  Pointer to RSA context being set.
   @param[in]       KeyTag      Tag of RSA key component being set.
@@ -1259,9 +1259,9 @@ RsaSetKey (
   If the BigNumber buffer is too small to hold the contents of the key, FALSE
   is returned and BnSize is set to the required buffer size to obtain the key.
 
-  If RsaContext is NULL, then ASSERT().
-  If BnSize is NULL, then ASSERT().
-  If BnSize is large enough but BigNumber is NULL, then ASSERT().
+  If RsaContext is NULL, then return FALSE.
+  If BnSize is NULL, then return FALSE.
+  If BnSize is large enough but BigNumber is NULL, then return FALSE.
 
   @param[in, out]  RsaContext  Pointer to RSA context being set.
   @param[in]       KeyTag      Tag of RSA key component being set.
@@ -1293,7 +1293,7 @@ RsaGetKey (
   Before this function can be invoked, pseudorandom number generator must be correctly
   initialized by RandomSeed().
 
-  If RsaContext is NULL, then ASSERT().
+  If RsaContext is NULL, then return FALSE.
 
   @param[in, out]  RsaContext           Pointer to RSA context being set.
   @param[in]       ModulusLength        Length of RSA modulus N in bits.
@@ -1322,7 +1322,7 @@ RsaGenerateKey (
   - Whether n = p * q
   - Whether d*e = 1  mod lcm(p-1,q-1)
 
-  If RsaContext is NULL, then ASSERT().
+  If RsaContext is NULL, then return FALSE.
 
   @param[in]  RsaContext  Pointer to RSA context to check.
 
@@ -1344,10 +1344,10 @@ RsaCheckKey (
   If the Signature buffer is too small to hold the contents of signature, FALSE
   is returned and SigSize is set to the required buffer size to obtain the signature.
 
-  If RsaContext is NULL, then ASSERT().
-  If MessageHash is NULL, then ASSERT().
-  If HashSize is not equal to the size of MD5, SHA-1 or SHA-256 digest, then ASSERT().
-  If SigSize is large enough but Signature is NULL, then ASSERT().
+  If RsaContext is NULL, then return FALSE.
+  If MessageHash is NULL, then return FALSE.
+  If HashSize is not equal to the size of MD5, SHA-1 or SHA-256 digest, then return FALSE.
+  If SigSize is large enough but Signature is NULL, then return FALSE.
 
   @param[in]      RsaContext   Pointer to RSA context for signature generation.
   @param[in]      MessageHash  Pointer to octet message hash to be signed.
@@ -1375,10 +1375,10 @@ RsaPkcs1Sign (
   Verifies the RSA-SSA signature with EMSA-PKCS1-v1_5 encoding scheme defined in
   RSA PKCS#1.
 
-  If RsaContext is NULL, then ASSERT().
-  If MessageHash is NULL, then ASSERT().
-  If Signature is NULL, then ASSERT().
-  If HashSize is not equal to the size of MD5, SHA-1, SHA-256 digest, then ASSERT().
+  If RsaContext is NULL, then return FALSE.
+  If MessageHash is NULL, then return FALSE.
+  If Signature is NULL, then return FALSE.
+  If HashSize is not equal to the size of MD5, SHA-1, SHA-256 digest, then return FALSE.
 
   @param[in]  RsaContext   Pointer to RSA context for signature verification.
   @param[in]  MessageHash  Pointer to octet message hash to be checked.
@@ -1410,8 +1410,8 @@ RsaPkcs1Verify (
                            RSA private key component. Use RsaFree() function to free the
                            resource.
 
-  If PemData is NULL, then ASSERT().
-  If RsaContext is NULL, then ASSERT().
+  If PemData is NULL, then return FALSE.
+  If RsaContext is NULL, then return FALSE.
 
   @retval  TRUE   RSA Private Key was retrieved successfully.
   @retval  FALSE  Invalid PEM key data or incorrect password.
@@ -1435,8 +1435,8 @@ RsaGetPrivateKeyFromPem (
                            RSA public key component. Use RsaFree() function to free the
                            resource.
 
-  If Cert is NULL, then ASSERT().
-  If RsaContext is NULL, then ASSERT().
+  If Cert is NULL, then return FALSE.
+  If RsaContext is NULL, then return FALSE.
 
   @retval  TRUE   RSA Public Key was retrieved successfully.
   @retval  FALSE  Fail to retrieve RSA public key from X509 certificate.
@@ -1459,8 +1459,8 @@ RsaGetPublicKeyFromX509 (
   @param[in, out] SubjectSize  The size in bytes of the CertSubject buffer on input,
                                and the size of buffer returned CertSubject on output.
 
-  If Cert is NULL, then ASSERT().
-  If SubjectSize is NULL, then ASSERT().
+  If Cert is NULL, then return FALSE.
+  If SubjectSize is NULL, then return FALSE.
 
   @retval  TRUE   The certificate subject retrieved successfully.
   @retval  FALSE  Invalid certificate, or the SubjectSize is too small for the result.
@@ -1484,8 +1484,8 @@ X509GetSubjectName (
   @param[in]      CACert       Pointer to the DER-encoded trusted CA certificate.
   @param[in]      CACertSize   Size of the CA Certificate in bytes.
 
-  If Cert is NULL, then ASSERT().
-  If CACert is NULL, then ASSERT().
+  If Cert is NULL, then return FALSE.
+  If CACert is NULL, then return FALSE.
 
   @retval  TRUE   The certificate was issued by the trusted CA.
   @retval  FALSE  Invalid certificate or the certificate was not issued by the given
@@ -1504,8 +1504,8 @@ X509VerifyCert (
 /**
   Construct a X509 object from DER-encoded certificate data.
 
-  If Cert is NULL, then ASSERT().
-  If SingleX509Cert is NULL, then ASSERT().
+  If Cert is NULL, then return FALSE.
+  If SingleX509Cert is NULL, then return FALSE.
 
   @param[in]  Cert            Pointer to the DER-encoded certificate data.
   @param[in]  CertSize        The size of certificate data in bytes.
@@ -1526,7 +1526,7 @@ X509ConstructCertificate (
 /**
   Construct a X509 stack object from a list of DER-encoded certificate data.
 
-  If X509Stack is NULL, then ASSERT().
+  If X509Stack is NULL, then return FALSE.
 
   @param[in, out]  X509Stack  On input, pointer to an existing X509 stack object.
                               On output, pointer to the X509 stack object with new
@@ -1549,7 +1549,7 @@ X509ConstructCertificateStack (
 /**
   Release the specified X509 object.
 
-  If X509Cert is NULL, then ASSERT().
+  If X509Cert is NULL, then return FALSE.
 
   @param[in]  X509Cert  Pointer to the X509 object to be released.
 
@@ -1563,7 +1563,7 @@ X509Free (
 /**
   Release the specified X509 stack object.
 
-  If X509Stack is NULL, then ASSERT().
+  If X509Stack is NULL, then return FALSE.
 
   @param[in]  X509Stack  Pointer to the X509 stack object to be released.
 
@@ -1615,7 +1615,7 @@ Pkcs7Sign (
   Verifies the validility of a PKCS#7 signed data as described in "PKCS #7: Cryptographic
   Message Syntax Standard".
 
-  If P7Data is NULL, then ASSERT().
+  If P7Data is NULL, then return FALSE.
 
   @param[in]  P7Data       Pointer to the PKCS#7 message to verify.
   @param[in]  P7Size       Size of the PKCS#7 message in bytes.
@@ -1644,8 +1644,8 @@ Pkcs7Verify (
   Verifies the validility of a PE/COFF Authenticode Signature as described in "Windows
   Authenticode Portable Executable Signature Format".
 
-  If AuthData is NULL, then ASSERT().
-  If ImageHash is NULL, then ASSERT().
+  If AuthData is NULL, then return FALSE.
+  If ImageHash is NULL, then return FALSE.
 
   @param[in]  AuthData     Pointer to the Authenticode Signature retrieved from signed
                            PE/COFF image to be verified.
@@ -1693,7 +1693,7 @@ DhNew (
 /**
   Release the specified DH context.
 
-  If DhContext is NULL, then ASSERT().
+  If DhContext is NULL, then return FALSE.
 
   @param[in]  DhContext  Pointer to the DH context to be released.
 
@@ -1713,8 +1713,8 @@ DhFree (
   Before this function can be invoked, pseudorandom number generator must be correctly
   initialized by RandomSeed().
 
-  If DhContext is NULL, then ASSERT().
-  If Prime is NULL, then ASSERT().
+  If DhContext is NULL, then return FALSE.
+  If Prime is NULL, then return FALSE.
 
   @param[in, out]  DhContext    Pointer to the DH context.
   @param[in]       Generator    Value of generator.
@@ -1741,8 +1741,8 @@ DhGenerateParameter (
   Given generator g, and prime number p, this function and sets DH
   context accordingly.
 
-  If DhContext is NULL, then ASSERT().
-  If Prime is NULL, then ASSERT().
+  If DhContext is NULL, then return FALSE.
+  If Prime is NULL, then return FALSE.
 
   @param[in, out]  DhContext    Pointer to the DH context.
   @param[in]       Generator    Value of generator.
@@ -1773,9 +1773,9 @@ DhSetParameter (
   If the PublicKey buffer is too small to hold the public key, FALSE is returned and
   PublicKeySize is set to the required buffer size to obtain the public key.
 
-  If DhContext is NULL, then ASSERT().
-  If PublicKeySize is NULL, then ASSERT().
-  If PublicKeySize is large enough but PublicKey is NULL, then ASSERT().
+  If DhContext is NULL, then return FALSE.
+  If PublicKeySize is NULL, then return FALSE.
+  If PublicKeySize is large enough but PublicKey is NULL, then return FALSE.
 
   @param[in, out]  DhContext      Pointer to the DH context.
   @param[out]      PublicKey      Pointer to the buffer to receive generated public key.
@@ -1801,10 +1801,10 @@ DhGenerateKey (
   Given peer's public key, this function computes the exchanged common key, based on its own
   context including value of prime modulus and random secret exponent. 
 
-  If DhContext is NULL, then ASSERT().
-  If PeerPublicKey is NULL, then ASSERT().
-  If KeySize is NULL, then ASSERT().
-  If KeySize is large enough but Key is NULL, then ASSERT().
+  If DhContext is NULL, then return FALSE.
+  If PeerPublicKey is NULL, then return FALSE.
+  If KeySize is NULL, then return FALSE.
+  If KeySize is large enough but Key is NULL, then return FALSE.
 
   @param[in, out]  DhContext          Pointer to the DH context.
   @param[in]       PeerPublicKey      Pointer to the peer's public key.
@@ -1858,7 +1858,7 @@ RandomSeed (
 /**
   Generates a pseudorandom byte stream of the specified size.
 
-  If Output is NULL, then ASSERT().
+  If Output is NULL, then return FALSE.
 
   @param[out]  Output  Pointer to buffer to receive random value.
   @param[in]   Size    Size of randome bytes to generate.

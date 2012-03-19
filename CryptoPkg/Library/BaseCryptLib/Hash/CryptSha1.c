@@ -1,7 +1,7 @@
 /** @file
   SHA-1 Digest Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -38,7 +38,7 @@ Sha1GetContextSize (
   Initializes user-supplied memory pointed by Sha1Context as SHA-1 hash context for
   subsequent use.
 
-  If Sha1Context is NULL, then ASSERT().
+  If Sha1Context is NULL, then return FALSE.
 
   @param[out]  Sha1Context  Pointer to SHA-1 context being initialized.
 
@@ -53,9 +53,11 @@ Sha1Init (
   )
 {
   //
-  // ASSERT if Sha1Context is NULL
+  // Check input parameters.
   //
-  ASSERT (Sha1Context != NULL);
+  if (Sha1Context == NULL) {
+    return FALSE;
+  }
 
   //
   // OpenSSL SHA-1 Context Initialization
@@ -66,8 +68,8 @@ Sha1Init (
 /**
   Makes a copy of an existing SHA-1 context.
 
-  If Sha1Context is NULL, then ASSERT().
-  If NewSha1Context is NULL, then ASSERT().
+  If Sha1Context is NULL, then return FALSE.
+  If NewSha1Context is NULL, then return FALSE.
 
   @param[in]  Sha1Context     Pointer to SHA-1 context being copied.
   @param[out] NewSha1Context  Pointer to new SHA-1 context.
@@ -84,10 +86,11 @@ Sha1Duplicate (
   )
 {
   //
-  // ASSERT if Sha1Context or NewSha1Context is NULL.
+  // Check input parameters.
   //
-  ASSERT (Sha1Context    != NULL);
-  ASSERT (NewSha1Context != NULL);
+  if (Sha1Context == NULL || NewSha1Context == NULL) {
+    return FALSE;
+  }
 
   CopyMem (NewSha1Context, Sha1Context, sizeof (SHA_CTX));
 
@@ -102,7 +105,7 @@ Sha1Duplicate (
   SHA-1 context should be already correctly intialized by Sha1Init(), and should not be finalized
   by Sha1Final(). Behavior with invalid context is undefined.
 
-  If Sha1Context is NULL, then ASSERT().
+  If Sha1Context is NULL, then return FALSE.
 
   @param[in, out]  Sha1Context  Pointer to the SHA-1 context.
   @param[in]       Data         Pointer to the buffer containing the data to be hashed.
@@ -121,15 +124,17 @@ Sha1Update (
   )
 {
   //
-  // ASSERT if Sha1Context is NULL
+  // Check input parameters.
   //
-  ASSERT (Sha1Context != NULL);
+  if (Sha1Context == NULL) {
+    return FALSE;
+  }
 
   //
-  // ASSERT if invalid parameters, in case that only DataLength was checked in OpenSSL
+  // Check invalid parameters, in case that only DataLength was checked in OpenSSL
   //
-  if (Data == NULL) {
-    ASSERT (DataSize == 0);
+  if (Data == NULL && DataSize != 0) {
+    return FALSE;
   }
 
   //
@@ -147,8 +152,8 @@ Sha1Update (
   SHA-1 context should be already correctly intialized by Sha1Init(), and should not be
   finalized by Sha1Final(). Behavior with invalid SHA-1 context is undefined.
 
-  If Sha1Context is NULL, then ASSERT().
-  If HashValue is NULL, then ASSERT().
+  If Sha1Context is NULL, then return FALSE.
+  If HashValue is NULL, then return FALSE.
 
   @param[in, out]  Sha1Context  Pointer to the SHA-1 context.
   @param[out]      HashValue    Pointer to a buffer that receives the SHA-1 digest
@@ -166,10 +171,11 @@ Sha1Final (
   )
 {
   //
-  // ASSERT if Sha1Context is NULL or HashValue is NULL
+  // Check input parameters.
   //
-  ASSERT (Sha1Context != NULL);
-  ASSERT (HashValue   != NULL);
+  if (Sha1Context == NULL || HashValue == NULL) {
+    return FALSE;
+  }
 
   //
   // OpenSSL SHA-1 Hash Finalization

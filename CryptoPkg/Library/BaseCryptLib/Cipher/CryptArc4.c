@@ -1,7 +1,7 @@
 /** @file
   ARC4 Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -42,9 +42,9 @@ Arc4GetContextSize (
   In addtion, it sets up all ARC4 key materials for subsequent encryption and decryption
   operations.
 
-  If Arc4Context is NULL, then ASSERT().
-  If Key is NULL, then ASSERT().
-  If KeySize does not in the range of [5, 256] bytes, then ASSERT().
+  If Arc4Context is NULL, then return FALSE.
+  If Key is NULL, then return FALSE.
+  If KeySize does not in the range of [5, 256] bytes, then return FALSE.
 
   @param[out]  Arc4Context  Pointer to ARC4 context being initialized.
   @param[in]   Key          Pointer to the user-supplied ARC4 key.
@@ -64,9 +64,12 @@ Arc4Init (
 {
   RC4_KEY  *Rc4Key;
 
-  ASSERT (Arc4Context != NULL);
-  ASSERT (Key != NULL);
-  ASSERT ((KeySize >= 5) && (KeySize <= 256));
+  //
+  // Check input parameters.
+  //  
+  if (Arc4Context == NULL || Key == NULL || (KeySize < 5 || KeySize > 256)) {
+    return FALSE;
+  }
 
   Rc4Key = (RC4_KEY *) Arc4Context;
 
@@ -85,9 +88,9 @@ Arc4Init (
   Arc4Context should be already correctly initialized by Arc4Init(). Behavior with
   invalid ARC4 context is undefined.
 
-  If Arc4Context is NULL, then ASSERT().
-  If Input is NULL, then ASSERT().
-  If Output is NULL, then ASSERT().
+  If Arc4Context is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
 
   @param[in, out]  Arc4Context  Pointer to the ARC4 context.
   @param[in]       Input        Pointer to the buffer containing the data to be encrypted.
@@ -109,9 +112,12 @@ Arc4Encrypt (
 {
   RC4_KEY  *Rc4Key;
 
-  ASSERT (Arc4Context != NULL);
-  ASSERT (Input != NULL);
-  ASSERT (Output != NULL);
+  //
+  // Check input parameters.
+  //
+  if (Arc4Context == NULL || Input == NULL || Output == NULL) {
+    return FALSE;
+  }
 
   Rc4Key = (RC4_KEY *) Arc4Context;
 
@@ -128,9 +134,9 @@ Arc4Encrypt (
   Arc4Context should be already correctly initialized by Arc4Init(). Behavior with
   invalid ARC4 context is undefined.
 
-  If Arc4Context is NULL, then ASSERT().
-  If Input is NULL, then ASSERT().
-  If Output is NULL, then ASSERT().
+  If Arc4Context is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
 
   @param[in, out]  Arc4Context  Pointer to the ARC4 context.
   @param[in]       Input        Pointer to the buffer containing the data to be decrypted.
@@ -152,9 +158,12 @@ Arc4Decrypt (
 {
   RC4_KEY  *Rc4Key;
 
-  ASSERT (Arc4Context != NULL);
-  ASSERT (Input != NULL);
-  ASSERT (Output != NULL);
+  //
+  // Check input parameters.
+  //
+  if (Arc4Context == NULL || Input == NULL || Output == NULL) {
+    return FALSE;
+  }
 
   Rc4Key = (RC4_KEY *) Arc4Context;
 
@@ -171,7 +180,7 @@ Arc4Decrypt (
   Contrary to ARC4Init(), Arc4Reset() requires no secret key as input, but ARC4 context
   should be already correctly initialized by ARC4Init().
 
-  If Arc4Context is NULL, then ASSERT().
+  If Arc4Context is NULL, then return FALSE.
 
   @param[in, out]  Arc4Context  Pointer to the ARC4 context.
 
@@ -187,8 +196,13 @@ Arc4Reset (
 {
   RC4_KEY  *Rc4Key;
 
-  ASSERT (Arc4Context != NULL);
-
+  //
+  // Check input parameters.
+  //
+  if (Arc4Context == NULL) {
+    return FALSE;
+  }
+  
   Rc4Key = (RC4_KEY *) Arc4Context;
 
   CopyMem (Rc4Key, Rc4Key + 1, sizeof(RC4_KEY));

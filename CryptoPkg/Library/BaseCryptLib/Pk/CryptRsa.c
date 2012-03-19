@@ -1,7 +1,7 @@
 /** @file
   RSA Asymmetric Cipher Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -60,7 +60,7 @@ RsaNew (
 /**
   Release the specified RSA context.
 
-  If RsaContext is NULL, then ASSERT().
+  If RsaContext is NULL, then return FALSE.
 
   @param[in]  RsaContext  Pointer to the RSA context to be released.
 
@@ -71,8 +71,6 @@ RsaFree (
   IN  VOID  *RsaContext
   )
 {
-  ASSERT (RsaContext != NULL);
-
   //
   // Free OpenSSL RSA Context
   //
@@ -87,7 +85,7 @@ RsaFree (
   represented in RSA PKCS#1).
   If BigNumber is NULL, then the specified key componenet in RSA context is cleared.
 
-  If RsaContext is NULL, then ASSERT().
+  If RsaContext is NULL, then return FALSE.
 
   @param[in, out]  RsaContext  Pointer to RSA context being set.
   @param[in]       KeyTag      Tag of RSA key component being set.
@@ -113,10 +111,11 @@ RsaSetKey (
   RSA  *RsaKey;
 
   //
-  // ASSERT if RsaContext is NULL
+  // Check input parameters.
   //
-  ASSERT (RsaContext != NULL);
-
+  if (RsaContext == NULL) {
+    return FALSE;
+  }
 
   RsaKey = (RSA *)RsaContext;
   //
@@ -256,9 +255,9 @@ RsaSetKey (
   If the BigNumber buffer is too small to hold the contents of the key, FALSE
   is returned and BnSize is set to the required buffer size to obtain the key.
 
-  If RsaContext is NULL, then ASSERT().
-  If BnSize is NULL, then ASSERT().
-  If BnSize is large enough but BigNumber is NULL, then ASSERT().
+  If RsaContext is NULL, then return FALSE.
+  If BnSize is NULL, then return FALSE.
+  If BnSize is large enough but BigNumber is NULL, then return FALSE.
 
   @param[in, out]  RsaContext  Pointer to RSA context being set.
   @param[in]       KeyTag      Tag of RSA key component being set.
@@ -284,8 +283,12 @@ RsaGetKey (
   BIGNUM *BnKey;
   UINTN  Size;
 
-  ASSERT (RsaContext != NULL);
-  ASSERT (BnSize != NULL);
+  //
+  // Check input parameters.
+  //
+  if (RsaContext == NULL || BnSize == NULL) {
+    return FALSE;
+  }
 
   RsaKey  = (RSA *) RsaContext;
   Size    = *BnSize;
@@ -385,7 +388,9 @@ RsaGetKey (
     return FALSE;
   }
 
-  ASSERT (BigNumber != NULL);
+  if (BigNumber == NULL) {
+    return FALSE;
+  }
   *BnSize = BN_bn2bin (BnKey, BigNumber) ;
   
   return TRUE;
@@ -401,7 +406,7 @@ RsaGetKey (
   Before this function can be invoked, pseudorandom number generator must be correctly
   initialized by RandomSeed().
 
-  If RsaContext is NULL, then ASSERT().
+  If RsaContext is NULL, then return FALSE.
 
   @param[in, out]  RsaContext           Pointer to RSA context being set.
   @param[in]       ModulusLength        Length of RSA modulus N in bits.
@@ -424,8 +429,13 @@ RsaGenerateKey (
   BIGNUM   *KeyE;
   BOOLEAN  RetVal;
 
-  ASSERT (RsaContext != NULL);
-
+  //
+  // Check input parameters.
+  //
+  if (RsaContext == NULL) {
+    return FALSE;
+  }
+  
   KeyE = BN_new ();
   if (PublicExponent == NULL) {
     BN_set_word (KeyE, 0x10001);
@@ -451,7 +461,7 @@ RsaGenerateKey (
   - Whether n = p * q
   - Whether d*e = 1  mod lcm(p-1,q-1)
 
-  If RsaContext is NULL, then ASSERT().
+  If RsaContext is NULL, then return FALSE.
 
   @param[in]  RsaContext  Pointer to RSA context to check.
 
@@ -467,8 +477,13 @@ RsaCheckKey (
 {
   UINTN  Reason;
 
-  ASSERT (RsaContext != NULL);
-
+  //
+  // Check input parameters.
+  //
+  if (RsaContext == NULL) {
+    return FALSE;
+  }
+  
   if  (RSA_check_key ((RSA *) RsaContext) != 1) {
     Reason = ERR_GET_REASON (ERR_peek_last_error ());
     if (Reason == RSA_R_P_NOT_PRIME ||
@@ -502,8 +517,12 @@ DigestInfoEncoding (
   CONST UINT8  *HashDer;
   UINTN        DerSize;
 
-  ASSERT (Message != NULL);
-  ASSERT (DigestInfo != NULL);
+  //
+  // Check input parameters.
+  //
+  if (Message == NULL || DigestInfo == NULL) {
+    return FALSE;
+  }
 
   //
   // The original message length is used to determine the hash algorithm since
@@ -543,10 +562,10 @@ DigestInfoEncoding (
   If the Signature buffer is too small to hold the contents of signature, FALSE
   is returned and SigSize is set to the required buffer size to obtain the signature.
 
-  If RsaContext is NULL, then ASSERT().
-  If MessageHash is NULL, then ASSERT().
-  If HashSize is not equal to the size of MD5, SHA-1 or SHA-256 digest, then ASSERT().
-  If SigSize is large enough but Signature is NULL, then ASSERT().
+  If RsaContext is NULL, then return FALSE.
+  If MessageHash is NULL, then return FALSE.
+  If HashSize is not equal to the size of MD5, SHA-1 or SHA-256 digest, then return FALSE.
+  If SigSize is large enough but Signature is NULL, then return FALSE.
 
   @param[in]       RsaContext   Pointer to RSA context for signature generation.
   @param[in]       MessageHash  Pointer to octet message hash to be signed.
@@ -574,11 +593,13 @@ RsaPkcs1Sign (
   UINTN    Size;
   INTN     ReturnVal;
 
-  ASSERT (RsaContext != NULL);
-  ASSERT (MessageHash != NULL);
-  ASSERT ((HashSize == MD5_DIGEST_SIZE) ||
-          (HashSize == SHA1_DIGEST_SIZE) ||
-          (HashSize == SHA256_DIGEST_SIZE));
+  //
+  // Check input parameters.
+  //
+  if (RsaContext == NULL || MessageHash == NULL ||
+    (HashSize != MD5_DIGEST_SIZE && HashSize != SHA1_DIGEST_SIZE && HashSize != SHA256_DIGEST_SIZE)) {
+    return FALSE;
+  }
 
   Rsa = (RSA *) RsaContext;
   Size = BN_num_bytes (Rsa->n);
@@ -588,7 +609,9 @@ RsaPkcs1Sign (
     return FALSE;
   }
 
-  ASSERT (Signature != NULL);
+  if (Signature == NULL) {
+    return FALSE;
+  }
 
   Size = DigestInfoEncoding (MessageHash, HashSize, Signature);
 
@@ -612,10 +635,10 @@ RsaPkcs1Sign (
   Verifies the RSA-SSA signature with EMSA-PKCS1-v1_5 encoding scheme defined in
   RSA PKCS#1.
 
-  If RsaContext is NULL, then ASSERT().
-  If MessageHash is NULL, then ASSERT().
-  If Signature is NULL, then ASSERT().
-  If HashSize is not equal to the size of MD5, SHA-1 or SHA-256 digest, then ASSERT().
+  If RsaContext is NULL, then return FALSE.
+  If MessageHash is NULL, then return FALSE.
+  If Signature is NULL, then return FALSE.
+  If HashSize is not equal to the size of MD5, SHA-1 or SHA-256 digest, then return FALSE.
 
   @param[in]  RsaContext   Pointer to RSA context for signature verification.
   @param[in]  MessageHash  Pointer to octet message hash to be checked.
@@ -640,19 +663,21 @@ RsaPkcs1Verify (
   INTN     Length;
 
   //
-  // ASSERT if RsaContext, MessageHash or Signature is NULL
+  // Check input parameters.
   //
-  ASSERT (RsaContext  != NULL);
-  ASSERT (MessageHash != NULL);
-  ASSERT (Signature   != NULL);
+  if (RsaContext == NULL || MessageHash == NULL || Signature == NULL) {
+    return FALSE;
+  }
 
+  
   //
-  // ASSERT if unsupported hash size:
+  // Check for unsupported hash size:
   //    Only MD5, SHA-1 or SHA-256 digest size is supported
   //
-  ASSERT ((HashSize == MD5_DIGEST_SIZE) || (HashSize == SHA1_DIGEST_SIZE) ||
-          (HashSize == SHA256_DIGEST_SIZE));
-
+  if (HashSize != MD5_DIGEST_SIZE && HashSize != SHA1_DIGEST_SIZE && HashSize != SHA256_DIGEST_SIZE) {
+    return FALSE;
+  }
+  
   //
   // RSA PKCS#1 Signature Decoding using OpenSSL RSA Decryption with Public Key
   //

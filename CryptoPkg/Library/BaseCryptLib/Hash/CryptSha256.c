@@ -1,7 +1,7 @@
 /** @file
   SHA-256 Digest Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -37,7 +37,7 @@ Sha256GetContextSize (
   Initializes user-supplied memory pointed by Sha256Context as SHA-256 hash context for
   subsequent use.
 
-  If Sha256Context is NULL, then ASSERT().
+  If Sha256Context is NULL, then return FALSE.
 
   @param[out]  Sha256Context  Pointer to SHA-256 context being initialized.
 
@@ -52,9 +52,11 @@ Sha256Init (
   )
 {
   //
-  // ASSERT if Sha256Context is NULL
+  // Check input parameters.
   //
-  ASSERT (Sha256Context != NULL);
+  if (Sha256Context == NULL) {
+    return FALSE;
+  }
 
   //
   // OpenSSL SHA-256 Context Initialization
@@ -65,8 +67,8 @@ Sha256Init (
 /**
   Makes a copy of an existing SHA-256 context.
 
-  If Sha256Context is NULL, then ASSERT().
-  If NewSha256Context is NULL, then ASSERT().
+  If Sha256Context is NULL, then return FALSE.
+  If NewSha256Context is NULL, then return FALSE.
 
   @param[in]  Sha256Context     Pointer to SHA-256 context being copied.
   @param[out] NewSha256Context  Pointer to new SHA-256 context.
@@ -83,10 +85,11 @@ Sha256Duplicate (
   )
 {
   //
-  // ASSERT if Sha256Context or NewSha256Context is NULL.
+  // Check input parameters.
   //
-  ASSERT (Sha256Context    != NULL);
-  ASSERT (NewSha256Context != NULL);
+  if (Sha256Context == NULL || NewSha256Context == NULL) {
+    return FALSE;
+  }
 
   CopyMem (NewSha256Context, Sha256Context, sizeof (SHA256_CTX));
 
@@ -101,7 +104,7 @@ Sha256Duplicate (
   SHA-256 context should be already correctly intialized by Sha256Init(), and should not be finalized
   by Sha256Final(). Behavior with invalid context is undefined.
 
-  If Sha256Context is NULL, then ASSERT().
+  If Sha256Context is NULL, then return FALSE.
 
   @param[in, out]  Sha256Context  Pointer to the SHA-256 context.
   @param[in]       Data           Pointer to the buffer containing the data to be hashed.
@@ -120,15 +123,17 @@ Sha256Update (
   )
 {
   //
-  // ASSERT if Sha256Context is NULL
+  // Check input parameters.
   //
-  ASSERT (Sha256Context != NULL);
+  if (Sha256Context == NULL) {
+    return FALSE;
+  }
 
   //
-  // ASSERT if invalid parameters, in case that only DataLength was checked in OpenSSL
+  // Check invalid parameters, in case that only DataLength was checked in OpenSSL
   //
-  if (Data == NULL) {
-    ASSERT (DataSize == 0);
+  if (Data == NULL && DataSize != 0) {
+    return FALSE;
   }
 
   //
@@ -146,8 +151,8 @@ Sha256Update (
   SHA-256 context should be already correctly intialized by Sha256Init(), and should not be
   finalized by Sha256Final(). Behavior with invalid SHA-256 context is undefined.
 
-  If Sha256Context is NULL, then ASSERT().
-  If HashValue is NULL, then ASSERT().
+  If Sha256Context is NULL, then return FALSE.
+  If HashValue is NULL, then return FALSE.
 
   @param[in, out]  Sha256Context  Pointer to the SHA-256 context.
   @param[out]      HashValue      Pointer to a buffer that receives the SHA-256 digest
@@ -165,10 +170,11 @@ Sha256Final (
   )
 {
   //
-  // ASSERT if Sha256Context is NULL or HashValue is NULL
+  // Check input parameters.
   //
-  ASSERT (Sha256Context != NULL);
-  ASSERT (HashValue     != NULL);
+  if (Sha256Context == NULL || HashValue == NULL) {
+    return FALSE;
+  }
 
   //
   // OpenSSL SHA-256 Hash Finalization

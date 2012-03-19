@@ -1,7 +1,7 @@
 /** @file
   AES Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -42,9 +42,9 @@ AesGetContextSize (
   operations.
   There are 3 options for key length, 128 bits, 192 bits, and 256 bits.
 
-  If AesContext is NULL, then ASSERT().
-  If Key is NULL, then ASSERT().
-  If KeyLength is not valid, then ASSERT().
+  If AesContext is NULL, then return FALSE.
+  If Key is NULL, then return FALSE.
+  If KeyLength is not valid, then return FALSE.
 
   @param[out]  AesContext  Pointer to AES context being initialized.
   @param[in]   Key         Pointer to the user-supplied AES key.
@@ -64,12 +64,12 @@ AesInit (
 {
   AES_KEY  *AesKey;
 
-  ASSERT (AesContext != NULL);
   //
-  // AES Key Checking
+  // Check input parameters.
   //
-  ASSERT (Key != NULL);
-  ASSERT ((KeyLength == 128) || (KeyLength == 192) || (KeyLength == 256));
+  if (AesContext == NULL || Key == NULL || (KeyLength != 128 && KeyLength != 192 && KeyLength != 256)) {
+    return FALSE;
+  }
 
   //
   // Initialize AES encryption & decryption key schedule.
@@ -94,10 +94,10 @@ AesInit (
   AesContext should be already correctly initialized by AesInit(). Behavior with
   invalid AES context is undefined.
 
-  If AesContext is NULL, then ASSERT().
-  If Input is NULL, then ASSERT().
-  If InputSize is not multiple of block size (16 bytes), then ASSERT().
-  If Output is NULL, then ASSERT().
+  If AesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If InputSize is not multiple of block size (16 bytes), then return FALSE.
+  If Output is NULL, then return FALSE.
 
   @param[in]   AesContext  Pointer to the AES context.
   @param[in]   Input       Pointer to the buffer containing the data to be encrypted.
@@ -118,12 +118,14 @@ AesEcbEncrypt (
   )
 {
   AES_KEY  *AesKey;
-  
-  ASSERT (AesContext != NULL);
-  ASSERT (Input != NULL);
-  ASSERT ((InputSize % AES_BLOCK_SIZE) == 0);
-  ASSERT (Output != NULL);
 
+  //
+  // Check input parameters.
+  //
+  if (AesContext == NULL || Input == NULL || (InputSize % AES_BLOCK_SIZE) != 0 || Output == NULL) {
+    return FALSE;
+  }
+  
   AesKey = (AES_KEY *) AesContext;
 
   //
@@ -149,10 +151,10 @@ AesEcbEncrypt (
   AesContext should be already correctly initialized by AesInit(). Behavior with
   invalid AES context is undefined.
 
-  If AesContext is NULL, then ASSERT().
-  If Input is NULL, then ASSERT().
-  If InputSize is not multiple of block size (16 bytes), then ASSERT().
-  If Output is NULL, then ASSERT().
+  If AesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If InputSize is not multiple of block size (16 bytes), then return FALSE.
+  If Output is NULL, then return FALSE.
 
   @param[in]   AesContext  Pointer to the AES context.
   @param[in]   Input       Pointer to the buffer containing the data to be decrypted.
@@ -173,11 +175,13 @@ AesEcbDecrypt (
   )
 {
   AES_KEY  *AesKey;
-  
-  ASSERT (AesContext != NULL);
-  ASSERT (Input != NULL);
-  ASSERT ((InputSize % AES_BLOCK_SIZE) == 0);
-  ASSERT (Output != NULL);
+
+  //
+  // Check input parameters.
+  //
+  if (AesContext == NULL || Input == NULL || (InputSize % AES_BLOCK_SIZE) != 0 || Output == NULL) {
+    return FALSE;
+  }
 
   AesKey = (AES_KEY *) AesContext;
 
@@ -205,11 +209,11 @@ AesEcbDecrypt (
   AesContext should be already correctly initialized by AesInit(). Behavior with
   invalid AES context is undefined.
 
-  If AesContext is NULL, then ASSERT().
-  If Input is NULL, then ASSERT().
-  If InputSize is not multiple of block size (16 bytes), then ASSERT().
-  If Ivec is NULL, then ASSERT().
-  If Output is NULL, then ASSERT().
+  If AesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If InputSize is not multiple of block size (16 bytes), then return FALSE.
+  If Ivec is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
 
   @param[in]   AesContext  Pointer to the AES context.
   @param[in]   Input       Pointer to the buffer containing the data to be encrypted.
@@ -234,11 +238,12 @@ AesCbcEncrypt (
   AES_KEY  *AesKey;
   UINT8    IvecBuffer[AES_BLOCK_SIZE];
 
-  ASSERT (AesContext != NULL);
-  ASSERT (Input != NULL);
-  ASSERT ((InputSize % AES_BLOCK_SIZE) == 0);
-  ASSERT (Ivec != NULL);
-  ASSERT (Output != NULL);
+  //
+  // Check input parameters.
+  //
+  if (AesContext == NULL || Input == NULL || (InputSize % AES_BLOCK_SIZE) != 0 || Ivec == NULL || Output == NULL) {
+    return FALSE;
+  }
 
   AesKey = (AES_KEY *) AesContext;
   CopyMem (IvecBuffer, Ivec, AES_BLOCK_SIZE);
@@ -262,11 +267,11 @@ AesCbcEncrypt (
   AesContext should be already correctly initialized by AesInit(). Behavior with
   invalid AES context is undefined.
 
-  If AesContext is NULL, then ASSERT().
-  If Input is NULL, then ASSERT().
-  If InputSize is not multiple of block size (16 bytes), then ASSERT().
-  If Ivec is NULL, then ASSERT().
-  If Output is NULL, then ASSERT().
+  If AesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If InputSize is not multiple of block size (16 bytes), then return FALSE.
+  If Ivec is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
 
   @param[in]   AesContext  Pointer to the AES context.
   @param[in]   Input       Pointer to the buffer containing the data to be encrypted.
@@ -290,12 +295,13 @@ AesCbcDecrypt (
 {
   AES_KEY  *AesKey;
   UINT8    IvecBuffer[AES_BLOCK_SIZE];
-  
-  ASSERT (AesContext != NULL);
-  ASSERT (Input != NULL);
-  ASSERT ((InputSize % AES_BLOCK_SIZE) == 0);
-  ASSERT (Ivec != NULL);
-  ASSERT (Output != NULL);
+
+  //
+  // Check input parameters.
+  //
+  if (AesContext == NULL || Input == NULL || (InputSize % AES_BLOCK_SIZE) != 0 || Ivec == NULL || Output == NULL) {
+    return FALSE;
+  }
 
   AesKey = (AES_KEY *) AesContext;
   CopyMem (IvecBuffer, Ivec, AES_BLOCK_SIZE);

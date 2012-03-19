@@ -1,7 +1,7 @@
 /** @file
   PKCS#7 SignedData Verification Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -150,13 +150,10 @@ Pkcs7Sign (
   //
   // Check input parameters.
   //
-  ASSERT (PrivateKey     != NULL);
-  ASSERT (KeyPassword    != NULL);
-  ASSERT (InData         != NULL);
-  ASSERT (SignCert       != NULL);
-  ASSERT (SignedData     != NULL);
-  ASSERT (SignedDataSize != NULL);
-  ASSERT (InDataSize     <= INT_MAX);
+  if (PrivateKey == NULL || KeyPassword == NULL || InData == NULL ||
+    SignCert == NULL || SignedData == NULL || SignedDataSize == NULL || InDataSize > INT_MAX) {
+    return FALSE;
+  }
 
   RsaContext = NULL;
   Key        = NULL;
@@ -285,7 +282,8 @@ _Exit:
   Cryptographic Message Syntax Standard". The input signed data could be wrapped
   in a ContentInfo structure.
 
-  If P7Data is NULL, then ASSERT().
+  If P7Data, TrustedCert or InData is NULL, then return FALSE.
+  If P7Length, CertLength or DataLength overflow, then return FAlSE.
 
   @param[in]  P7Data       Pointer to the PKCS#7 message to verify.
   @param[in]  P7Length     Length of the PKCS#7 message in bytes.
@@ -322,15 +320,13 @@ Pkcs7Verify (
   BOOLEAN     Wrapped;
 
   //
-  // ASSERT if any input parameter is invalid.
+  // Check input parameters.
   //
-  ASSERT (P7Data      != NULL);
-  ASSERT (TrustedCert != NULL);
-  ASSERT (InData      != NULL);
-  ASSERT (P7Length    <= INT_MAX);
-  ASSERT (CertLength  <= INT_MAX);
-  ASSERT (DataLength  <= INT_MAX);
-
+  if (P7Data == NULL || TrustedCert == NULL || InData == NULL || 
+    P7Length > INT_MAX || CertLength > INT_MAX || DataLength > INT_MAX) {
+    return FALSE;
+  }
+  
   Status    = FALSE;
   Pkcs7     = NULL;
   CertBio   = NULL;

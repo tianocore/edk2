@@ -1,7 +1,7 @@
 /** @file
   PEM (Privacy Enhanced Mail) Format Handler Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -60,8 +60,8 @@ PasswordCallback (
                            RSA private key component. Use RsaFree() function to free the
                            resource.
 
-  If PemData is NULL, then ASSERT().
-  If RsaContext is NULL, then ASSERT().
+  If PemData is NULL, then return FALSE.
+  If RsaContext is NULL, then return FALSE.
 
   @retval  TRUE   RSA Private Key was retrieved successfully.
   @retval  FALSE  Invalid PEM key data or incorrect password.
@@ -80,11 +80,11 @@ RsaGetPrivateKeyFromPem (
   BIO      *PemBio;
 
   //
-  // ASSERT if PemData is NULL or RsaContext is NULL.
+  // Check input parameters.
   //
-  ASSERT (PemData    != NULL);
-  ASSERT (RsaContext != NULL);
-  ASSERT (PemSize    <= INT_MAX);
+  if (PemData == NULL || RsaContext == NULL || PemSize > INT_MAX) {
+    return FALSE;
+  }
 
   Status = FALSE;
   PemBio = NULL;

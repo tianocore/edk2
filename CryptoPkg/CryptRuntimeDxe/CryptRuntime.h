@@ -1,7 +1,7 @@
 /** @file
   Header file of Runtime Cryptographic Driver.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -41,7 +41,7 @@ RuntimeCryptSha256GetContextSize (
   Initializes user-supplied memory pointed by Sha256Context as SHA-256 hash context for
   subsequent use.
 
-  If Sha256Context is NULL, then ASSERT().
+  If Sha256Context is NULL, then return FALSE.
 
   @param[in, out]  Sha256Context  Pointer to SHA-256 Context being initialized.
 
@@ -60,7 +60,7 @@ RuntimeCryptSha256Init (
   Performs SHA-256 digest on a data buffer of the specified length. This function can
   be called multiple times to compute the digest of long or discontinuous data streams.
 
-  If Sha256Context is NULL, then ASSERT().
+  If Sha256Context is NULL, then return FALSE.
 
   @param[in, out]  Sha256Context  Pointer to the SHA-256 context.
   @param[in]       Data           Pointer to the buffer containing the data to be hashed.
@@ -84,8 +84,8 @@ RuntimeCryptSha256Update (
   Completes SHA-256 hash computation and retrieves the digest value into the specified
   memory. After this function has been called, the SHA-256 context cannot be used again.
 
-  If Sha256Context is NULL, then ASSERT().
-  If HashValue is NULL, then ASSERT().
+  If Sha256Context is NULL, then return FALSE.
+  If HashValue is NULL, then return FALSE.
 
   @param[in, out]  Sha256Context  Pointer to SHA-256 context
   @param[out]      HashValue      Pointer to a buffer that receives the SHA-256 digest
@@ -133,7 +133,7 @@ RuntimeCryptRsaFree (
   the user-specified nonnegative integer (octet string format represented in RSA
   PKCS#1).
 
-  If RsaContext is NULL, then ASSERT().
+  If RsaContext is NULL, then return FALSE.
 
   @param[in, out]  RsaContext  Pointer to RSA context being set.
   @param[in]       KeyTag      Tag of RSA key component being set.
@@ -158,10 +158,10 @@ RuntimeCryptRsaSetKey (
   Verifies the RSA-SSA signature with EMSA-PKCS1-v1_5 encoding scheme defined in
   RSA PKCS#1.
 
-  If RsaContext is NULL, then ASSERT().
-  If MessageHash is NULL, then ASSERT().
-  If Signature is NULL, then ASSERT().
-  If HashLength is not equal to the size of MD5, SHA-1 or SHA-256 digest, then ASSERT().
+  If RsaContext is NULL, then return FALSE.
+  If MessageHash is NULL, then return FALSE.
+  If Signature is NULL, then return FALSE.
+  If HashLength is not equal to the size of MD5, SHA-1 or SHA-256 digest, return FALSE.
 
   @param[in]  RsaContext   Pointer to RSA context for signature verification.
   @param[in]  MessageHash  Pointer to octet message hash to be checked.

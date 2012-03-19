@@ -1,7 +1,7 @@
 /** @file
   MD5 Digest Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -39,7 +39,7 @@ Md5GetContextSize (
   Initializes user-supplied memory pointed by Md5Context as MD5 hash context for
   subsequent use.
 
-  If Md5Context is NULL, then ASSERT().
+  If Md5Context is NULL, then return FALSE.
 
   @param[out]  Md5Context  Pointer to MD5 context being initialized.
 
@@ -54,9 +54,11 @@ Md5Init (
   )
 {
   //
-  // ASSERT if Md5Context is NULL.
+  // Check input parameters.
   //
-  ASSERT (Md5Context != NULL);
+  if ((Md5Context == NULL)) {
+    return FALSE;
+  }
 
   //
   // OpenSSL MD5 Context Initialization
@@ -67,8 +69,8 @@ Md5Init (
 /**
   Makes a copy of an existing MD5 context.
 
-  If Md5Context is NULL, then ASSERT().
-  If NewMd5Context is NULL, then ASSERT().
+  If Md5Context is NULL, then return FALSE.
+  If NewMd5Context is NULL, then return FALSE.
 
   @param[in]  Md5Context     Pointer to MD5 context being copied.
   @param[out] NewMd5Context  Pointer to new MD5 context.
@@ -85,10 +87,11 @@ Md5Duplicate (
   )
 {
   //
-  // ASSERT if Md5Context or NewMd5Context is NULL.
+  // Check input parameters.
   //
-  ASSERT (Md5Context    != NULL);
-  ASSERT (NewMd5Context != NULL);
+  if (Md5Context == NULL || NewMd5Context == NULL) {
+    return FALSE;
+  }
 
   CopyMem (NewMd5Context, Md5Context, sizeof (MD5_CTX));
 
@@ -103,7 +106,7 @@ Md5Duplicate (
   MD5 context should be already correctly intialized by Md5Init(), and should not be finalized
   by Md5Final(). Behavior with invalid context is undefined.
 
-  If Md5Context is NULL, then ASSERT().
+  If Md5Context is NULL, then return FALSE.
 
   @param[in, out]  Md5Context  Pointer to the MD5 context.
   @param[in]       Data        Pointer to the buffer containing the data to be hashed.
@@ -122,15 +125,17 @@ Md5Update (
   )
 {
   //
-  // ASSERT if Md5Context is NULL
+  // Check input parameters.
   //
-  ASSERT (Md5Context != NULL);
+  if (Md5Context == NULL) {
+    return FALSE;
+  }
 
   //
-  // ASSERT if invalid parameters, in case that only DataLength was checked in OpenSSL
+  // Check invalid parameters, in case that only DataLength was checked in OpenSSL
   //
-  if (Data == NULL) {
-    ASSERT (DataSize == 0);
+  if (Data == NULL && (DataSize != 0)) {
+    return FALSE;
   }
 
   //
@@ -148,8 +153,8 @@ Md5Update (
   MD5 context should be already correctly intialized by Md5Init(), and should not be
   finalized by Md5Final(). Behavior with invalid MD5 context is undefined.
 
-  If Md5Context is NULL, then ASSERT().
-  If HashValue is NULL, then ASSERT().
+  If Md5Context is NULL, then return FALSE.
+  If HashValue is NULL, then return FALSE.
 
   @param[in, out]  Md5Context  Pointer to the MD5 context.
   @param[out]      HashValue   Pointer to a buffer that receives the MD5 digest
@@ -167,10 +172,11 @@ Md5Final (
   )
 {
   //
-  // ASSERT if Md5Context is NULL or HashValue is NULL
+  // Check input parameters.
   //
-  ASSERT (Md5Context != NULL);
-  ASSERT (HashValue  != NULL);
+  if (Md5Context == NULL || HashValue == NULL) {
+    return FALSE;
+  }
 
   //
   // OpenSSL MD5 Hash Finalization

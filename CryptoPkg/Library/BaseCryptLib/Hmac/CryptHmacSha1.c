@@ -1,7 +1,7 @@
 /** @file
   HMAC-SHA1 Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -37,7 +37,7 @@ HmacSha1GetContextSize (
   Initializes user-supplied memory pointed by HmacSha1Context as HMAC-SHA1 context for
   subsequent use.
 
-  If HmacSha1Context is NULL, then ASSERT().
+  If HmacSha1Context is NULL, then return FALSE.
 
   @param[out]  HmacSha1Context  Pointer to HMAC-SHA1 context being initialized.
   @param[in]   Key              Pointer to the user-supplied key.
@@ -56,9 +56,11 @@ HmacSha1Init (
   )
 {
   //
-  // ASSERT if HmacSha1Context is NULL.
+  // Check input parameters.
   //
-  ASSERT (HmacSha1Context != NULL);
+  if (HmacSha1Context == NULL) {
+    return FALSE;
+  }
 
   //
   // OpenSSL HMAC-SHA1 Context Initialization
@@ -72,8 +74,8 @@ HmacSha1Init (
 /**
   Makes a copy of an existing HMAC-SHA1 context.
 
-  If HmacSha1Context is NULL, then ASSERT().
-  If NewHmacSha1Context is NULL, then ASSERT().
+  If HmacSha1Context is NULL, then return FALSE.
+  If NewHmacSha1Context is NULL, then return FALSE.
 
   @param[in]  HmacSha1Context     Pointer to HMAC-SHA1 context being copied.
   @param[out] NewHmacSha1Context  Pointer to new HMAC-SHA1 context.
@@ -90,10 +92,11 @@ HmacSha1Duplicate (
   )
 {
   //
-  // ASSERT if HmacSha1Context or NewHmacSha1Context is NULL.
+  // Check input parameters.
   //
-  ASSERT (HmacSha1Context    != NULL);
-  ASSERT (NewHmacSha1Context != NULL);
+  if (HmacSha1Context == NULL || NewHmacSha1Context == NULL) {
+    return FALSE;
+  }
 
   CopyMem (NewHmacSha1Context, HmacSha1Context, sizeof (HMAC_CTX));
 
@@ -108,7 +111,7 @@ HmacSha1Duplicate (
   HMAC-SHA1 context should be already correctly intialized by HmacSha1Init(), and should not
   be finalized by HmacSha1Final(). Behavior with invalid context is undefined.
 
-  If HmacSha1Context is NULL, then ASSERT().
+  If HmacSha1Context is NULL, then return FALSE.
 
   @param[in, out]  HmacSha1Context Pointer to the HMAC-SHA1 context.
   @param[in]       Data            Pointer to the buffer containing the data to be digested.
@@ -127,15 +130,17 @@ HmacSha1Update (
   )
 {
   //
-  // ASSERT if HmacSha1Context is NULL
+  // Check input parameters.
   //
-  ASSERT (HmacSha1Context != NULL);
+  if (HmacSha1Context == NULL) {
+    return FALSE;
+  }
 
   //
-  // ASSERT if invalid parameters, in case that only DataLength was checked in OpenSSL
+  // Check invalid parameters, in case that only DataLength was checked in OpenSSL
   //
-  if (Data == NULL) {
-    ASSERT (DataSize == 0);
+  if (Data == NULL && DataSize != 0) {
+    return FALSE;
   }
 
   //
@@ -155,8 +160,8 @@ HmacSha1Update (
   HMAC-SHA1 context should be already correctly intialized by HmacSha1Init(), and should
   not be finalized by HmacSha1Final(). Behavior with invalid HMAC-SHA1 context is undefined.
 
-  If HmacSha1Context is NULL, then ASSERT().
-  If HmacValue is NULL, then ASSERT().
+  If HmacSha1Context is NULL, then return FALSE.
+  If HmacValue is NULL, then return FALSE.
 
   @param[in, out]  HmacSha1Context  Pointer to the HMAC-SHA1 context.
   @param[out]      HmacValue        Pointer to a buffer that receives the HMAC-SHA1 digest
@@ -176,10 +181,11 @@ HmacSha1Final (
   UINT32  Length;
 
   //
-  // ASSERT if HmacSha1Context is NULL or HmacValue is NULL
+  // Check input parameters.
   //
-  ASSERT (HmacSha1Context != NULL);
-  ASSERT (HmacValue != NULL);
+  if (HmacSha1Context == NULL || HmacValue == NULL) {
+    return FALSE;
+  }
 
   //
   // OpenSSL HMAC-SHA1 digest finalization

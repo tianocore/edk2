@@ -1,7 +1,7 @@
 /** @file
   TDES Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -44,9 +44,9 @@ TdesGetContextSize (
   KeyLength = 128, Keying option 2: K1 != K2 and K3 = K1 (Less Security)
   KeyLength = 192  Keying option 3: K1 != K2 != K3 (Strongest)
 
-  If TdesContext is NULL, then ASSERT().
-  If Key is NULL, then ASSERT().
-  If KeyLength is not valid, then ASSERT().
+  If TdesContext is NULL, then return FALSE.
+  If Key is NULL, then return FALSE.
+  If KeyLength is not valid, then return FALSE.
 
   @param[out]  TdesContext  Pointer to TDES context being initialized.
   @param[in]   Key          Pointer to the user-supplied TDES key.
@@ -66,9 +66,12 @@ TdesInit (
 {
   DES_key_schedule  *KeySchedule;
 
-  ASSERT (TdesContext != NULL);
-  ASSERT (Key != NULL);
-  ASSERT ((KeyLength == 64) || (KeyLength == 128) || (KeyLength == 192));
+  //
+  // Check input parameters.
+  //
+  if (TdesContext == NULL || Key == NULL || (KeyLength != 64 && KeyLength != 128 && KeyLength != 192)) {
+    return FALSE;
+  }
 
   KeySchedule = (DES_key_schedule *) TdesContext;
 
@@ -117,10 +120,10 @@ TdesInit (
   TdesContext should be already correctly initialized by TdesInit(). Behavior with
   invalid TDES context is undefined.
 
-  If TdesContext is NULL, then ASSERT().
-  If Input is NULL, then ASSERT().
-  If InputSize is not multiple of block size (8 bytes), then ASSERT().
-  If Output is NULL, then ASSERT().
+  If TdesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If InputSize is not multiple of block size (8 bytes), then return FALSE.
+  If Output is NULL, then return FALSE.
 
   @param[in]   TdesContext  Pointer to the TDES context.
   @param[in]   Input        Pointer to the buffer containing the data to be encrypted.
@@ -142,10 +145,12 @@ TdesEcbEncrypt (
 {
   DES_key_schedule  *KeySchedule;
 
-  ASSERT (TdesContext != NULL);
-  ASSERT (Input != NULL);
-  ASSERT ((InputSize % TDES_BLOCK_SIZE) == 0);
-  ASSERT (Output != NULL);
+  //
+  // Check input parameters.
+  //
+  if (TdesContext == NULL || Input == NULL || (InputSize % TDES_BLOCK_SIZE) != 0 || Output == NULL) {
+    return FALSE;
+  }
 
   KeySchedule = (DES_key_schedule *) TdesContext;
 
@@ -176,10 +181,10 @@ TdesEcbEncrypt (
   TdesContext should be already correctly initialized by TdesInit(). Behavior with
   invalid TDES context is undefined.
 
-  If TdesContext is NULL, then ASSERT().
-  If Input is NULL, then ASSERT().
-  If InputSize is not multiple of block size (8 bytes), then ASSERT().
-  If Output is NULL, then ASSERT().
+  If TdesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If InputSize is not multiple of block size (8 bytes), then return FALSE.
+  If Output is NULL, then return FALSE.
 
   @param[in]   TdesContext  Pointer to the TDES context.
   @param[in]   Input        Pointer to the buffer containing the data to be decrypted.
@@ -201,10 +206,12 @@ TdesEcbDecrypt (
 {
   DES_key_schedule  *KeySchedule;
 
-  ASSERT (TdesContext != NULL);
-  ASSERT (Input != NULL);
-  ASSERT ((InputSize % TDES_BLOCK_SIZE) == 0);
-  ASSERT (Output != NULL);
+  //
+  // Check input parameters.
+  //
+  if (TdesContext == NULL || Input == NULL || (InputSize % TDES_BLOCK_SIZE) != 0 || Output == NULL) {
+    return FALSE;
+  }
 
   KeySchedule = (DES_key_schedule *) TdesContext;
 
@@ -236,11 +243,11 @@ TdesEcbDecrypt (
   TdesContext should be already correctly initialized by TdesInit(). Behavior with
   invalid TDES context is undefined.
 
-  If TdesContext is NULL, then ASSERT().
-  If Input is NULL, then ASSERT().
-  If InputSize is not multiple of block size (8 bytes), then ASSERT().
-  If Ivec is NULL, then ASSERT().
-  If Output is NULL, then ASSERT().
+  If TdesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If InputSize is not multiple of block size (8 bytes), then return FALSE.
+  If Ivec is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
 
   @param[in]   TdesContext  Pointer to the TDES context.
   @param[in]   Input        Pointer to the buffer containing the data to be encrypted.
@@ -265,11 +272,12 @@ TdesCbcEncrypt (
   DES_key_schedule  *KeySchedule;
   UINT8             IvecBuffer[TDES_BLOCK_SIZE];
 
-  ASSERT (TdesContext != NULL);
-  ASSERT (Input != NULL);
-  ASSERT ((InputSize % TDES_BLOCK_SIZE) == 0);
-  ASSERT (Ivec != NULL);
-  ASSERT (Output != NULL);
+  //
+  // Check input parameters.
+  //
+  if (TdesContext == NULL || Input == NULL || (InputSize % TDES_BLOCK_SIZE) != 0 || Ivec == NULL || Output == NULL) {
+    return FALSE;
+  }
 
   KeySchedule = (DES_key_schedule *) TdesContext;
   CopyMem (IvecBuffer, Ivec, TDES_BLOCK_SIZE);
@@ -299,11 +307,11 @@ TdesCbcEncrypt (
   TdesContext should be already correctly initialized by TdesInit(). Behavior with
   invalid TDES context is undefined.
 
-  If TdesContext is NULL, then ASSERT().
-  If Input is NULL, then ASSERT().
-  If InputSize is not multiple of block size (8 bytes), then ASSERT().
-  If Ivec is NULL, then ASSERT().
-  If Output is NULL, then ASSERT().
+  If TdesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If InputSize is not multiple of block size (8 bytes), then return FALSE.
+  If Ivec is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
 
   @param[in]   TdesContext  Pointer to the TDES context.
   @param[in]   Input        Pointer to the buffer containing the data to be encrypted.
@@ -328,11 +336,12 @@ TdesCbcDecrypt (
   DES_key_schedule  *KeySchedule;
   UINT8             IvecBuffer[TDES_BLOCK_SIZE];
 
-  ASSERT (TdesContext != NULL);
-  ASSERT (Input != NULL);
-  ASSERT ((InputSize % TDES_BLOCK_SIZE) == 0);
-  ASSERT (Ivec != NULL);
-  ASSERT (Output != NULL);
+  //
+  // Check input parameters.
+  //
+  if (TdesContext == NULL || Input == NULL || (InputSize % TDES_BLOCK_SIZE) != 0 || Ivec == NULL || Output == NULL) {
+    return FALSE;
+  }
 
   KeySchedule = (DES_key_schedule *) TdesContext;
   CopyMem (IvecBuffer, Ivec, TDES_BLOCK_SIZE);

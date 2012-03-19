@@ -1,7 +1,7 @@
 /** @file
   Authenticode Portable Executable Signature Verification over OpenSSL.
 
-Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -23,8 +23,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Verifies the validility of a PE/COFF Authenticode Signature as described in "Windows
   Authenticode Portable Executable Signature Format".
 
-  If AuthData is NULL, then ASSERT().
-  If ImageHash is NULL, then ASSERT().
+  If AuthData is NULL, then return FALSE.
+  If ImageHash is NULL, then return FALSE.
 
   @param[in]  AuthData     Pointer to the Authenticode Signature retrieved from signed
                            PE/COFF image to be verified.
@@ -60,11 +60,15 @@ AuthenticodeVerify (
   UINTN        ContentSize;
 
   //
-  // ASSERT if Authenticode Signature Data or PE Image Hash is NULL.
+  // Check input parameters.
   //
-  ASSERT (AuthData  != NULL);
-  ASSERT (ImageHash != NULL);
-  ASSERT (DataSize  <= INT_MAX);
+  if ((AuthData == NULL) || (TrustedCert == NULL) || (ImageHash == NULL)) {
+    return FALSE;
+  }
+
+  if ((DataSize > INT_MAX) || (CertSize > INT_MAX) || (HashSize > INT_MAX)) {
+    return FALSE;
+  }
 
   Status       = FALSE;
   Pkcs7        = NULL;
@@ -96,6 +100,7 @@ AuthenticodeVerify (
   // Retrieve the SEQUENCE data size from ASN.1-encoded SpcIndirectDataContent.
   //
   Asn1Byte = *(SpcIndirectDataContent + 1);
+
   if ((Asn1Byte & 0x80) == 0) {
     //
     // Short Form of Length Encoding
@@ -105,9 +110,9 @@ AuthenticodeVerify (
     // Skip the SEQUENCE Tag;
     //
     SpcIndirectDataContent += 2;
-  } else {
+  } else if ((Asn1Byte & 0x82) == 0x82) {
     //
-    // Long Form of Length Encoding (Assume Only two bytes here)
+    // Long Form of Length Encoding, only support two bytes.
     //
     ContentSize  = (UINTN) (*(SpcIndirectDataContent + 2));
     ContentSize = (ContentSize << 8) + (UINTN)(*(SpcIndirectDataContent + 3));
@@ -115,6 +120,8 @@ AuthenticodeVerify (
     // Skip the SEQUENCE Tag;
     //
     SpcIndirectDataContent += 4;
+  } else {
+    goto _Exit;
   }
 
   //
