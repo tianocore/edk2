@@ -183,7 +183,7 @@ LzmaArchGuidedSectionExtraction (
   if (!EFI_ERROR (Status)) {
     Status = LzmaUefiDecompressGetInfo (
              Source,
-             SourceSize,
+             (UINT32) SourceSize,
              &OutputBufferSize,
              &ScratchBufferSize
              );
