@@ -23,6 +23,11 @@
   AppPkg/Applications/Sockets/SetHostName/SetHostName.inf
   AppPkg/Applications/Sockets/SetSockOpt/SetSockOpt.inf
   AppPkg/Applications/Sockets/WebServer/WebServer.inf {
+    <LibraryClasses>
+      CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
+      DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
+      MtrrLib|UefiCpuPkg/Library/MtrrLib/MtrrLib.inf
+
     <PcdsFixedAtBuild>
       gAppPkgTokenSpaceGuid.WebServer_HttpPort|80
   }

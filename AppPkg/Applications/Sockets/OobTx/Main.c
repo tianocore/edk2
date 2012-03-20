@@ -1,7 +1,7 @@
 /** @file
   Out-of-band transmit test application
 
-  Copyright (c) 2011, Intel Corporation
+  Copyright (c) 2011-2012, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at

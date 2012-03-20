@@ -1,25 +1,15 @@
-/*++
-  This file contains an 'Intel UEFI Application' and is
-  licensed for Intel CPUs and chipsets under the terms of your
-  license agreement with Intel or your vendor.  This file may
-  be modified by the user, subject to additional terms of the
-  license agreement
---*/
-/*++
+/**
+  @file
+  Display the ACPI tables
 
-Copyright (c)  2011 Intel Corporation. All rights reserved
-This software and associated documentation (if any) is furnished
-under a license and may only be used or copied in accordance
-with the terms of the license. Except as permitted by such
-license, no part of this software or documentation may be
-reproduced, stored in a retrieval system, or transmitted in any
-form or by any means without the express written consent of
-Intel Corporation.
+  Copyright (c) 2011-2012, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
---*/
-
-/** @file
-  Display the runtime services table
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -138,6 +128,11 @@ typedef struct {
 } ACPI_RSDT;
 
 
+typedef struct {
+  UINT32 Signature;           //    0
+  UINT32 Length;              //    4
+} ACPI_UNKNOWN;
+
 #pragma pack()
 
 
@@ -149,8 +144,15 @@ typedef struct {
 
 
 CONST TABLE_SIGNATURE mTableId[] = {
+  { APIC_SIGNATURE, "APIC", PAGE_ACPI_APIC },
+  { BGRT_SIGNATURE, "BGRT", PAGE_ACPI_BGRT },
   { DSDT_SIGNATURE, "DSDT", PAGE_ACPI_DSDT },
-  { FADT_SIGNATURE, "FADT", PAGE_ACPI_FADT }
+  { FADT_SIGNATURE, "FADT", PAGE_ACPI_FADT },
+  { HPET_SIGNATURE, "HPET", PAGE_ACPI_HPET },
+  { MCFG_SIGNATURE, "MCFG", PAGE_ACPI_MCFG },
+  { SSDT_SIGNATURE, "SSDT", PAGE_ACPI_SSDT },
+  { TCPA_SIGNATURE, "TCPA", PAGE_ACPI_TCPA },
+  { UEFI_SIGNATURE, "UEFI", PAGE_ACPI_UEFI }
 };
 
 
@@ -812,6 +814,188 @@ SignatureLookup (
   //
   *ppTableName = (CONST CHAR8 *)pSignature;
   return NULL;
+}
+
+
+/**
+  Respond with the APIC table
+
+  @param [in] SocketFD      The socket's file descriptor to add to the list.
+  @param [in] pPort         The WSDT_PORT structure address
+  @param [out] pbDone       Address to receive the request completion status
+
+  @retval EFI_SUCCESS       The request was successfully processed
+
+**/
+EFI_STATUS
+AcpiApicPage (
+  IN int SocketFD,
+  IN WSDT_PORT * pPort,
+  OUT BOOLEAN * pbDone
+  )
+{
+  CONST ACPI_UNKNOWN * pApic;
+  EFI_STATUS Status;
+
+  DBG_ENTER ( );
+
+  //
+  //  Send the APIC page
+  //
+  for ( ; ; ) {
+    //
+    //  Locate the APIC
+    //
+    pApic = (ACPI_UNKNOWN *)LocateTable ( APIC_SIGNATURE );
+    if ( NULL == pApic ) {
+      Status = EFI_NOT_FOUND;
+      break;
+    }
+
+    //
+    //  Send the page and table header
+    //
+    Status = TableHeader ( SocketFD, pPort, L"APIC Table", pApic );
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+
+    //
+    //  Display the header
+    //
+    Status = RowAnsiArray ( SocketFD,
+                            pPort,
+                            "Signature",
+                            sizeof ( pApic->Signature ),
+                            (CHAR8 *)&pApic->Signature );
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+    Status = RowDecimalValue ( SocketFD,
+                               pPort,
+                               "Length",
+                               pApic->Length );
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+
+    //
+    //  Display the data from the table
+    //
+    Status = RowDump ( SocketFD,
+                       pPort,
+                       "Data",
+                       pApic->Length - sizeof ( *pApic ) + 1,
+                       (UINT8 *)( pApic + 1 ));
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+
+    //
+    //  Build the table trailer
+    //
+    Status = TableTrailer ( SocketFD,
+                            pPort,
+                            pbDone );
+    break;
+  }
+
+  //
+  //  Return the operation status
+  //
+  DBG_EXIT_STATUS ( Status );
+  return Status;
+}
+
+
+/**
+  Respond with the BGRT table
+
+  @param [in] SocketFD      The socket's file descriptor to add to the list.
+  @param [in] pPort         The WSDT_PORT structure address
+  @param [out] pbDone       Address to receive the request completion status
+
+  @retval EFI_SUCCESS       The request was successfully processed
+
+**/
+EFI_STATUS
+AcpiBgrtPage (
+  IN int SocketFD,
+  IN WSDT_PORT * pPort,
+  OUT BOOLEAN * pbDone
+  )
+{
+  CONST ACPI_UNKNOWN * pBgrt;
+  EFI_STATUS Status;
+
+  DBG_ENTER ( );
+
+  //
+  //  Send the BGRT page
+  //
+  for ( ; ; ) {
+    //
+    //  Locate the BGRT
+    //
+    pBgrt = (ACPI_UNKNOWN *)LocateTable ( BGRT_SIGNATURE );
+    if ( NULL == pBgrt ) {
+      Status = EFI_NOT_FOUND;
+      break;
+    }
+
+    //
+    //  Send the page and table header
+    //
+    Status = TableHeader ( SocketFD, pPort, L"BGRT Table", pBgrt );
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+
+    //
+    //  Display the header
+    //
+    Status = RowAnsiArray ( SocketFD,
+                            pPort,
+                            "Signature",
+                            sizeof ( pBgrt->Signature ),
+                            (CHAR8 *)&pBgrt->Signature );
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+    Status = RowDecimalValue ( SocketFD,
+                               pPort,
+                               "Length",
+                               pBgrt->Length );
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+
+    //
+    //  Display the data from the table
+    //
+    Status = RowDump ( SocketFD,
+                       pPort,
+                       "Data",
+                       pBgrt->Length - sizeof ( *pBgrt ) + 1,
+                       (UINT8 *)( pBgrt + 1 ));
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+
+    //
+    //  Build the table trailer
+    //
+    Status = TableTrailer ( SocketFD,
+                            pPort,
+                            pbDone );
+    break;
+  }
+
+  //
+  //  Return the operation status
+  //
+  DBG_EXIT_STATUS ( Status );
+  return Status;
 }
 
 
@@ -1514,6 +1698,188 @@ AcpiFadtPage (
 
 
 /**
+  Respond with the HPET table
+
+  @param [in] SocketFD      The socket's file descriptor to add to the list.
+  @param [in] pPort         The WSDT_PORT structure address
+  @param [out] pbDone       Address to receive the request completion status
+
+  @retval EFI_SUCCESS       The request was successfully processed
+
+**/
+EFI_STATUS
+AcpiHpetPage (
+  IN int SocketFD,
+  IN WSDT_PORT * pPort,
+  OUT BOOLEAN * pbDone
+  )
+{
+  CONST ACPI_UNKNOWN * pHpet;
+  EFI_STATUS Status;
+
+  DBG_ENTER ( );
+
+  //
+  //  Send the HPET page
+  //
+  for ( ; ; ) {
+    //
+    //  Locate the HPET
+    //
+    pHpet = (ACPI_UNKNOWN *)LocateTable ( HPET_SIGNATURE );
+    if ( NULL == pHpet ) {
+      Status = EFI_NOT_FOUND;
+      break;
+    }
+
+    //
+    //  Send the page and table header
+    //
+    Status = TableHeader ( SocketFD, pPort, L"HPET Table", pHpet );
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+
+    //
+    //  Display the header
+    //
+    Status = RowAnsiArray ( SocketFD,
+                            pPort,
+                            "Signature",
+                            sizeof ( pHpet->Signature ),
+                            (CHAR8 *)&pHpet->Signature );
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+    Status = RowDecimalValue ( SocketFD,
+                               pPort,
+                               "Length",
+                               pHpet->Length );
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+
+    //
+    //  Display the data from the table
+    //
+    Status = RowDump ( SocketFD,
+                       pPort,
+                       "Data",
+                       pHpet->Length - sizeof ( *pHpet ) + 1,
+                       (UINT8 *)( pHpet + 1 ));
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+
+    //
+    //  Build the table trailer
+    //
+    Status = TableTrailer ( SocketFD,
+                            pPort,
+                            pbDone );
+    break;
+  }
+
+  //
+  //  Return the operation status
+  //
+  DBG_EXIT_STATUS ( Status );
+  return Status;
+}
+
+
+/**
+  Respond with the MCFG table
+
+  @param [in] SocketFD      The socket's file descriptor to add to the list.
+  @param [in] pPort         The WSDT_PORT structure address
+  @param [out] pbDone       Address to receive the request completion status
+
+  @retval EFI_SUCCESS       The request was successfully processed
+
+**/
+EFI_STATUS
+AcpiMcfgPage (
+  IN int SocketFD,
+  IN WSDT_PORT * pPort,
+  OUT BOOLEAN * pbDone
+  )
+{
+  CONST ACPI_UNKNOWN * pMcfg;
+  EFI_STATUS Status;
+
+  DBG_ENTER ( );
+
+  //
+  //  Send the MCFG page
+  //
+  for ( ; ; ) {
+    //
+    //  Locate the MCFG
+    //
+    pMcfg = (ACPI_UNKNOWN *)LocateTable ( MCFG_SIGNATURE );
+    if ( NULL == pMcfg ) {
+      Status = EFI_NOT_FOUND;
+      break;
+    }
+
+    //
+    //  Send the page and table header
+    //
+    Status = TableHeader ( SocketFD, pPort, L"MCFG Table", pMcfg );
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+
+    //
+    //  Display the header
+    //
+    Status = RowAnsiArray ( SocketFD,
+                            pPort,
+                            "Signature",
+                            sizeof ( pMcfg->Signature ),
+                            (CHAR8 *)&pMcfg->Signature );
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+    Status = RowDecimalValue ( SocketFD,
+                               pPort,
+                               "Length",
+                               pMcfg->Length );
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+
+    //
+    //  Display the data from the table
+    //
+    Status = RowDump ( SocketFD,
+                       pPort,
+                       "Data",
+                       pMcfg->Length - sizeof ( *pMcfg ) + 1,
+                       (UINT8 *)( pMcfg + 1 ));
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+
+    //
+    //  Build the table trailer
+    //
+    Status = TableTrailer ( SocketFD,
+                            pPort,
+                            pbDone );
+    break;
+  }
+
+  //
+  //  Return the operation status
+  //
+  DBG_EXIT_STATUS ( Status );
+  return Status;
+}
+
+
+/**
   Respond with the ACPI RSDP 1.0b table
 
   @param [in] SocketFD      The socket's file descriptor to add to the list.
@@ -1918,3 +2284,274 @@ AcpiRsdtPage (
 }
 
 
+/**
+  Respond with the SSDT table
+
+  @param [in] SocketFD      The socket's file descriptor to add to the list.
+  @param [in] pPort         The WSDT_PORT structure address
+  @param [out] pbDone       Address to receive the request completion status
+
+  @retval EFI_SUCCESS       The request was successfully processed
+
+**/
+EFI_STATUS
+AcpiSsdtPage (
+  IN int SocketFD,
+  IN WSDT_PORT * pPort,
+  OUT BOOLEAN * pbDone
+  )
+{
+  CONST ACPI_UNKNOWN * pSsdt;
+  EFI_STATUS Status;
+
+  DBG_ENTER ( );
+
+  //
+  //  Send the SSDT page
+  //
+  for ( ; ; ) {
+    //
+    //  Locate the SSDT
+    //
+    pSsdt = (ACPI_UNKNOWN *)LocateTable ( SSDT_SIGNATURE );
+    if ( NULL == pSsdt ) {
+      Status = EFI_NOT_FOUND;
+      break;
+    }
+
+    //
+    //  Send the page and table header
+    //
+    Status = TableHeader ( SocketFD, pPort, L"SSDT Table", pSsdt );
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+
+    //
+    //  Display the header
+    //
+    Status = RowAnsiArray ( SocketFD,
+                            pPort,
+                            "Signature",
+                            sizeof ( pSsdt->Signature ),
+                            (CHAR8 *)&pSsdt->Signature );
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+    Status = RowDecimalValue ( SocketFD,
+                               pPort,
+                               "Length",
+                               pSsdt->Length );
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+
+    //
+    //  Display the data from the table
+    //
+    Status = RowDump ( SocketFD,
+                       pPort,
+                       "Data",
+                       pSsdt->Length - sizeof ( *pSsdt ) + 1,
+                       (UINT8 *)( pSsdt + 1 ));
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+
+    //
+    //  Build the table trailer
+    //
+    Status = TableTrailer ( SocketFD,
+                            pPort,
+                            pbDone );
+    break;
+  }
+
+  //
+  //  Return the operation status
+  //
+  DBG_EXIT_STATUS ( Status );
+  return Status;
+}
+
+
+/**
+  Respond with the TCPA table
+
+  @param [in] SocketFD      The socket's file descriptor to add to the list.
+  @param [in] pPort         The WSDT_PORT structure address
+  @param [out] pbDone       Address to receive the request completion status
+
+  @retval EFI_SUCCESS       The request was successfully processed
+
+**/
+EFI_STATUS
+AcpiTcpaPage (
+  IN int SocketFD,
+  IN WSDT_PORT * pPort,
+  OUT BOOLEAN * pbDone
+  )
+{
+  CONST ACPI_UNKNOWN * pTcpa;
+  EFI_STATUS Status;
+
+  DBG_ENTER ( );
+
+  //
+  //  Send the TCPA page
+  //
+  for ( ; ; ) {
+    //
+    //  Locate the TCPA
+    //
+    pTcpa = (ACPI_UNKNOWN *)LocateTable ( TCPA_SIGNATURE );
+    if ( NULL == pTcpa ) {
+      Status = EFI_NOT_FOUND;
+      break;
+    }
+
+    //
+    //  Send the page and table header
+    //
+    Status = TableHeader ( SocketFD, pPort, L"TCPA Table", pTcpa );
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+
+    //
+    //  Display the header
+    //
+    Status = RowAnsiArray ( SocketFD,
+                            pPort,
+                            "Signature",
+                            sizeof ( pTcpa->Signature ),
+                            (CHAR8 *)&pTcpa->Signature );
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+    Status = RowDecimalValue ( SocketFD,
+                               pPort,
+                               "Length",
+                               pTcpa->Length );
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+
+    //
+    //  Display the data from the table
+    //
+    Status = RowDump ( SocketFD,
+                       pPort,
+                       "Data",
+                       pTcpa->Length - sizeof ( *pTcpa ) + 1,
+                       (UINT8 *)( pTcpa + 1 ));
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+
+    //
+    //  Build the table trailer
+    //
+    Status = TableTrailer ( SocketFD,
+                            pPort,
+                            pbDone );
+    break;
+  }
+
+  //
+  //  Return the operation status
+  //
+  DBG_EXIT_STATUS ( Status );
+  return Status;
+}
+
+
+/**
+  Respond with the UEFI table
+
+  @param [in] SocketFD      The socket's file descriptor to add to the list.
+  @param [in] pPort         The WSDT_PORT structure address
+  @param [out] pbDone       Address to receive the request completion status
+
+  @retval EFI_SUCCESS       The request was successfully processed
+
+**/
+EFI_STATUS
+AcpiUefiPage (
+  IN int SocketFD,
+  IN WSDT_PORT * pPort,
+  OUT BOOLEAN * pbDone
+  )
+{
+  CONST ACPI_UNKNOWN * pUefi;
+  EFI_STATUS Status;
+
+  DBG_ENTER ( );
+
+  //
+  //  Send the UEFI page
+  //
+  for ( ; ; ) {
+    //
+    //  Locate the UEFI
+    //
+    pUefi = (ACPI_UNKNOWN *)LocateTable ( UEFI_SIGNATURE );
+    if ( NULL == pUefi ) {
+      Status = EFI_NOT_FOUND;
+      break;
+    }
+
+    //
+    //  Send the page and table header
+    //
+    Status = TableHeader ( SocketFD, pPort, L"UEFI Table", pUefi );
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+
+    //
+    //  Display the header
+    //
+    Status = RowAnsiArray ( SocketFD,
+                            pPort,
+                            "Signature",
+                            sizeof ( pUefi->Signature ),
+                            (CHAR8 *)&pUefi->Signature );
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+    Status = RowDecimalValue ( SocketFD,
+                               pPort,
+                               "Length",
+                               pUefi->Length );
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+
+    //
+    //  Display the data from the table
+    //
+    Status = RowDump ( SocketFD,
+                       pPort,
+                       "Data",
+                       pUefi->Length - sizeof ( *pUefi ) + 1,
+                       (UINT8 *)( pUefi + 1 ));
+    if ( EFI_ERROR ( Status )) {
+      break;
+    }
+
+    //
+    //  Build the table trailer
+    //
+    Status = TableTrailer ( SocketFD,
+                            pPort,
+                            pbDone );
+    break;
+  }
+
+  //
+  //  Return the operation status
+  //
+  DBG_EXIT_STATUS ( Status );
+  return Status;
+}

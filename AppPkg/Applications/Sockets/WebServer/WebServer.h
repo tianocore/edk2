@@ -1,7 +1,7 @@
 /** @file
   Definitions for the web server.
 
-  Copyright (c) 2011, Intel Corporation
+  Copyright (c) 2011-2012, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -22,6 +22,7 @@
 
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiApplicationEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -43,11 +44,18 @@
 //  Pages
 //------------------------------------------------------------------------------
 
+#define PAGE_ACPI_APIC                  L"/APIC"
+#define PAGE_ACPI_BGRT                  L"/BGRT"
 #define PAGE_ACPI_DSDT                  L"/DSDT"
 #define PAGE_ACPI_FADT                  L"/FADT"
+#define PAGE_ACPI_HPET                  L"/HPET"
+#define PAGE_ACPI_MCFG                  L"/MCFG"
 #define PAGE_ACPI_RSDP_10B              L"/RSDP1.0b"
 #define PAGE_ACPI_RSDP_30               L"/RSDP3.0"
 #define PAGE_ACPI_RSDT                  L"/RSDT"
+#define PAGE_ACPI_SSDT                  L"/SSDT"
+#define PAGE_ACPI_TCPA                  L"/TCPA"
+#define PAGE_ACPI_UEFI                  L"/UEFI"
 #define PAGE_BOOT_SERVICES_TABLE        L"/BootServicesTable"
 #define PAGE_CONFIGURATION_TABLE        L"/ConfigurationTable"
 #define PAGE_DXE_SERVICES_TABLE         L"/DxeServicesTable"
@@ -57,8 +65,15 @@
 //  Signatures
 //------------------------------------------------------------------------------
 
+#define APIC_SIGNATURE        0x43495041
+#define BGRT_SIGNATURE        0x54524742
 #define DSDT_SIGNATURE        0x54445344
 #define FADT_SIGNATURE        0x50434146
+#define HPET_SIGNATURE        0x54455048
+#define MCFG_SIGNATURE        0x4746434d
+#define SSDT_SIGNATURE        0x54445353
+#define TCPA_SIGNATURE        0x41504354
+#define UEFI_SIGNATURE        0x49464555
 
 //------------------------------------------------------------------------------
 //  Macros
@@ -228,6 +243,40 @@ extern CONST UINTN mPageCount;      ///<  Number of pages
 //------------------------------------------------------------------------------
 
 /**
+  Respond with the APIC table
+
+  @param [in] SocketFD      The socket's file descriptor to add to the list.
+  @param [in] pPort         The WSDT_PORT structure address
+  @param [out] pbDone       Address to receive the request completion status
+
+  @retval EFI_SUCCESS       The request was successfully processed
+
+**/
+EFI_STATUS
+AcpiApicPage (
+  IN int SocketFD,
+  IN WSDT_PORT * pPort,
+  OUT BOOLEAN * pbDone
+  );
+
+/**
+  Respond with the BGRT table
+
+  @param [in] SocketFD      The socket's file descriptor to add to the list.
+  @param [in] pPort         The WSDT_PORT structure address
+  @param [out] pbDone       Address to receive the request completion status
+
+  @retval EFI_SUCCESS       The request was successfully processed
+
+**/
+EFI_STATUS
+AcpiBgrtPage (
+  IN int SocketFD,
+  IN WSDT_PORT * pPort,
+  OUT BOOLEAN * pbDone
+  );
+
+/**
   Respond with the ACPI DSDT table
 
   @param [in] SocketFD      The socket's file descriptor to add to the list.
@@ -256,6 +305,40 @@ AcpiDsdtPage (
 **/
 EFI_STATUS
 AcpiFadtPage (
+  IN int SocketFD,
+  IN WSDT_PORT * pPort,
+  OUT BOOLEAN * pbDone
+  );
+
+/**
+  Respond with the HPET table
+
+  @param [in] SocketFD      The socket's file descriptor to add to the list.
+  @param [in] pPort         The WSDT_PORT structure address
+  @param [out] pbDone       Address to receive the request completion status
+
+  @retval EFI_SUCCESS       The request was successfully processed
+
+**/
+EFI_STATUS
+AcpiHpetPage (
+  IN int SocketFD,
+  IN WSDT_PORT * pPort,
+  OUT BOOLEAN * pbDone
+  );
+
+/**
+  Respond with the MCFG table
+
+  @param [in] SocketFD      The socket's file descriptor to add to the list.
+  @param [in] pPort         The WSDT_PORT structure address
+  @param [out] pbDone       Address to receive the request completion status
+
+  @retval EFI_SUCCESS       The request was successfully processed
+
+**/
+EFI_STATUS
+AcpiMcfgPage (
   IN int SocketFD,
   IN WSDT_PORT * pPort,
   OUT BOOLEAN * pbDone
@@ -307,6 +390,57 @@ AcpiRsdp30Page (
 **/
 EFI_STATUS
 AcpiRsdtPage (
+  IN int SocketFD,
+  IN WSDT_PORT * pPort,
+  OUT BOOLEAN * pbDone
+  );
+
+/**
+  Respond with the SSDT table
+
+  @param [in] SocketFD      The socket's file descriptor to add to the list.
+  @param [in] pPort         The WSDT_PORT structure address
+  @param [out] pbDone       Address to receive the request completion status
+
+  @retval EFI_SUCCESS       The request was successfully processed
+
+**/
+EFI_STATUS
+AcpiSsdtPage (
+  IN int SocketFD,
+  IN WSDT_PORT * pPort,
+  OUT BOOLEAN * pbDone
+  );
+
+/**
+  Respond with the TCPA table
+
+  @param [in] SocketFD      The socket's file descriptor to add to the list.
+  @param [in] pPort         The WSDT_PORT structure address
+  @param [out] pbDone       Address to receive the request completion status
+
+  @retval EFI_SUCCESS       The request was successfully processed
+
+**/
+EFI_STATUS
+AcpiTcpaPage (
+  IN int SocketFD,
+  IN WSDT_PORT * pPort,
+  OUT BOOLEAN * pbDone
+  );
+
+/**
+  Respond with the UEFI table
+
+  @param [in] SocketFD      The socket's file descriptor to add to the list.
+  @param [in] pPort         The WSDT_PORT structure address
+  @param [out] pbDone       Address to receive the request completion status
+
+  @retval EFI_SUCCESS       The request was successfully processed
+
+**/
+EFI_STATUS
+AcpiUefiPage (
   IN int SocketFD,
   IN WSDT_PORT * pPort,
   OUT BOOLEAN * pbDone
@@ -460,6 +594,40 @@ HelloPage (
 **/
 EFI_STATUS
 IndexPage (
+  IN int SocketFD,
+  IN WSDT_PORT * pPort,
+  OUT BOOLEAN * pbDone
+  );
+
+/**
+  Page to display the memory map
+
+  @param [in] SocketFD      The socket's file descriptor to add to the list.
+  @param [in] pPort         The WSDT_PORT structure address
+  @param [out] pbDone       Address to receive the request completion status
+
+  @retval EFI_SUCCESS       The request was successfully processed
+
+**/
+EFI_STATUS
+MemoryMapPage (
+  IN int SocketFD,
+  IN WSDT_PORT * pPort,
+  OUT BOOLEAN * pbDone
+  );
+
+/**
+  Display the memory type registers
+
+  @param [in] SocketFD      The socket's file descriptor to add to the list.
+  @param [in] pPort         The WSDT_PORT structure address
+  @param [out] pbDone       Address to receive the request completion status
+
+  @retval EFI_SUCCESS       The request was successfully processed
+
+**/
+EFI_STATUS
+MemoryTypeRegistersPage (
   IN int SocketFD,
   IN WSDT_PORT * pPort,
   OUT BOOLEAN * pbDone
