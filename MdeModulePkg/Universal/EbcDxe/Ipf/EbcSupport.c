@@ -2,7 +2,7 @@
   This module contains EBC support routines that are customized based on
   the target processor.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -134,6 +134,7 @@ EbcInterpret (
   Arg14     = VA_ARG (List, UINT64);
   Arg15     = VA_ARG (List, UINT64);
   Arg16     = VA_ARG (List, UINT64);
+  VA_END (List);
   //
   // Now clear out our context
   //

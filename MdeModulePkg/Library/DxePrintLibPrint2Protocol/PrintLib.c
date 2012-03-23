@@ -6,7 +6,7 @@
   protocol related to this implementation, not in the public spec. So, this 
   library instance is only for this code base.
 
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -366,9 +366,12 @@ UnicodeSPrint (
   )
 {
   VA_LIST Marker;
+  UINTN   NumberOfPrinted;
 
   VA_START (Marker, FormatString);
-  return UnicodeVSPrint (StartOfBuffer, BufferSize, FormatString, Marker);
+  NumberOfPrinted = UnicodeVSPrint (StartOfBuffer, BufferSize, FormatString, Marker);
+  VA_END (Marker);
+  return NumberOfPrinted;
 }
 
 /**
@@ -515,9 +518,12 @@ UnicodeSPrintAsciiFormat (
   )
 {
   VA_LIST Marker;
+  UINTN   NumberOfPrinted;
 
   VA_START (Marker, FormatString);
-  return UnicodeVSPrintAsciiFormat (StartOfBuffer, BufferSize, FormatString, Marker);
+  NumberOfPrinted = UnicodeVSPrintAsciiFormat (StartOfBuffer, BufferSize, FormatString, Marker);
+  VA_END (Marker);
+  return NumberOfPrinted;
 }
 
 /**
@@ -714,9 +720,12 @@ AsciiSPrint (
   )
 {
   VA_LIST Marker;
+  UINTN   NumberOfPrinted;
 
   VA_START (Marker, FormatString);
-  return AsciiVSPrint (StartOfBuffer, BufferSize, FormatString, Marker);
+  NumberOfPrinted = AsciiVSPrint (StartOfBuffer, BufferSize, FormatString, Marker);
+  VA_END (Marker);
+  return NumberOfPrinted;
 }
 
 /**
@@ -863,9 +872,12 @@ AsciiSPrintUnicodeFormat (
   )
 {
   VA_LIST Marker;
+  UINTN   NumberOfPrinted;
 
   VA_START (Marker, FormatString);
-  return AsciiVSPrintUnicodeFormat (StartOfBuffer, BufferSize, FormatString, Marker);
+  NumberOfPrinted = AsciiVSPrintUnicodeFormat (StartOfBuffer, BufferSize, FormatString, Marker);
+  VA_END (Marker);
+  return NumberOfPrinted;
 }
 
 
@@ -1056,9 +1068,12 @@ InternalPrintLibSPrint (
   )
 {
   VA_LIST  Marker;
+  UINTN    NumberOfPrinted;
 
   VA_START (Marker, FormatString);
-  return InternalPrintLibSPrintMarker (StartOfBuffer, BufferSize, Flags, FormatString, Marker, NULL);
+  NumberOfPrinted = InternalPrintLibSPrintMarker (StartOfBuffer, BufferSize, Flags, FormatString, Marker, NULL);
+  VA_END (Marker);
+  return NumberOfPrinted;
 }
 
 #define WARNING_STATUS_NUMBER         4

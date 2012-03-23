@@ -6,7 +6,7 @@
   environment. There are a set of base libraries in the Mde Package that can
   be used to implement base modules.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -393,6 +393,7 @@ struct _LIST_ENTRY {
 //  VA_END (VA_LIST Marker) - Clear Marker
 //  VA_ARG (VA_LIST Marker, var arg size) - Use Marker to get an argument from
 //    the ... list. You must know the size and pass it in this macro.
+//  VA_COPY (VA_LIST Dest, VA_LIST Start) - Initialize Dest as a copy of Start.
 //
 //  example:
 //
@@ -454,6 +455,8 @@ struct _LIST_ENTRY {
 
 #define VA_END(Marker)                ((void)0)
 
+#define VA_COPY(Dest, Start)          __va_copy (Dest, Start)
+
 #elif defined(__GNUC__) && !defined(NO_BUILTIN_VA_FUNCS)
 //
 // Use GCC built-in macros for variable argument lists.
@@ -470,6 +473,8 @@ typedef __builtin_va_list VA_LIST;
 #define VA_ARG(Marker, TYPE)         ((sizeof (TYPE) < sizeof (UINTN)) ? (TYPE)(__builtin_va_arg (Marker, UINTN)) : (TYPE)(__builtin_va_arg (Marker, TYPE)))
 
 #define VA_END(Marker)               __builtin_va_end (Marker)
+
+#define VA_COPY(Dest, Start)         __builtin_va_copy (Dest, Start)
 
 #else
 ///
@@ -525,6 +530,19 @@ typedef CHAR8 *VA_LIST;
 
 **/
 #define VA_END(Marker)      (Marker = (VA_LIST) 0)
+
+/**
+  Initializes a VA_LIST as a copy of an existing VA_LIST.
+
+  This macro initializes Dest as a copy of Start, as if the VA_START macro had been applied to Dest
+  followed by the same sequence of uses of the VA_ARG macro as had previously been used to reach
+  the present state of Start. 
+
+  @param   Dest   VA_LIST used to traverse the list of arguments.
+  @param   Start  VA_LIST used to traverse the list of arguments.
+
+**/
+#define VA_COPY(Dest, Start)  ((void)((Dest) = (Start)))
 
 #endif
 

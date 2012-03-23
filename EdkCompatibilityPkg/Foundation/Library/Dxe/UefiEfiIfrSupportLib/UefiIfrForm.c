@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -508,6 +508,7 @@ Returns:
     StackString = VA_ARG (Marker, CHAR16 *);
 
     if (StackString == NULL) {
+      VA_END (Marker);
       return EFI_INVALID_PARAMETER;
     }
 
@@ -517,6 +518,7 @@ Returns:
       LargestString = StringLen;
     }
   }
+  VA_END (Marker);
 
   if ((LargestString + 2) > DimensionsWidth) {
     LargestString = DimensionsWidth - 2;
@@ -682,6 +684,7 @@ ExtractDefault(
       BufferPos += Width;
 
       if ((UINTN)(Offset + Width) > *BufferSize) {
+        VA_END (Args);
         return EFI_BUFFER_TOO_SMALL;
       }
 
@@ -1025,6 +1028,7 @@ ConstructConfigAltResp (
     BufToHexString (StringPtr + 8, &StrBufferLen, (UINT8 *) &AltCfgId, sizeof (UINT16));
     Status = ExtractBlockConfig (DefaultValueArray, &AltCfg[Index]);
     if (EFI_ERROR (Status)) {
+      VA_END (Args);
       return Status;
     }
     AltRespLen += EfiStrLen (AltCfg[Index]);

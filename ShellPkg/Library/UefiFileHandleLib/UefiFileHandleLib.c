@@ -1,7 +1,7 @@
 /** @file
   Provides interface to EFI_FILE_HANDLE functionality.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1089,8 +1089,6 @@ FileHandlePrintLine(
   CHAR16            *Buffer;
   EFI_STATUS        Status;
 
-  VA_START (Marker, Format);
-
   //
   // Get a buffer to print into
   //
@@ -1100,7 +1098,9 @@ FileHandlePrintLine(
   //
   // Print into our buffer
   //
+  VA_START (Marker, Format);
   UnicodeVSPrint (Buffer, PcdGet16 (PcdShellPrintBufferSize), Format, Marker);
+  VA_END (Marker);
 
   //
   // Print buffer into file

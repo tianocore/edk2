@@ -2,7 +2,7 @@
   Mde UEFI library API implementation.
   Print to StdErr or ConOut defined in EFI_SYSTEM_TABLE
 
-  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -623,6 +623,8 @@ PrintXY (
 
   PrintNum = UnicodeVSPrint (Buffer, BufferSize, Format, Marker);
 
+  VA_END (Marker);
+
   ReturnNum = InternalPrintGraphic (PointX, PointY, ForeGround, BackGround, Buffer, PrintNum);
 
   FreePool (Buffer);
@@ -699,6 +701,8 @@ AsciiPrintXY (
 
   PrintNum = UnicodeSPrintAsciiFormat (Buffer, BufferSize, Format, Marker);
 
+  VA_END (Marker);
+
   ReturnNum = InternalPrintGraphic (PointX, PointY, ForeGround, BackGround, Buffer, PrintNum);
 
   FreePool (Buffer);
@@ -738,8 +742,11 @@ CatVSPrint (
   UINTN   CharactersRequired;
   UINTN   SizeRequired;
   CHAR16  *BufferToReturn;
+  VA_LIST ExtraMarker;
 
-  CharactersRequired = SPrintLength(FormatString, Marker);
+  VA_COPY (ExtraMarker, Marker);
+  CharactersRequired = SPrintLength(FormatString, ExtraMarker);
+  VA_END (ExtraMarker);
 
   if (String != NULL) {
     SizeRequired = StrSize(String) + (CharactersRequired * sizeof(CHAR16));
@@ -796,7 +803,11 @@ CatSPrint (
   )
 {
   VA_LIST   Marker;
+  CHAR16    *NewString;
+
   VA_START (Marker, FormatString);
-  return (CatVSPrint(String, FormatString, Marker));
+  NewString = CatVSPrint(String, FormatString, Marker);
+  VA_END (Marker);
+  return NewString;
 }
 
