@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -146,7 +146,7 @@ Abstract:
 #define EFI_D_FS          0x00000008          // EFI File system
 #define EFI_D_POOL        0x00000010          // Alloc & Free's
 #define EFI_D_PAGE        0x00000020          // Alloc & Free's
-#define EFI_D_INFO        0x00000040          // Verbose
+#define EFI_D_INFO        0x00000040          // Informational debug messages
 #define EFI_D_VARIABLE    0x00000100          // Variable
 #define EFI_D_BM          0x00000400          // Boot Manager (BDS)
 #define EFI_D_BLKIO       0x00001000          // BlkIo Driver
@@ -154,11 +154,11 @@ Abstract:
 #define EFI_D_UNDI        0x00010000          // UNDI Driver
 #define EFI_D_LOADFILE    0x00020000          // UNDI Driver
 #define EFI_D_EVENT       0x00080000          // Event messages
-
+#define EFI_D_VERBOSE     0x00400000          // Detailed debug messages that may significantly impact boot performance
 #define EFI_D_ERROR       0x80000000          // Error
 
 #define EFI_D_GENERIC (EFI_D_ERROR | EFI_D_INIT | EFI_D_WARN | EFI_D_INFO | \
-                        EFI_D_BLKIO | EFI_D_NET | EFI_D_UNDI )       
+                        EFI_D_BLKIO | EFI_D_NET | EFI_D_UNDI | EFI_D_VERBOSE)       
 
 #define EFI_D_INTRINSIC ( EFI_D_EVENT | EFI_D_POOL | EFI_D_PAGE | \
                           EFI_D_BM | EFI_D_LOAD | EFI_D_VARIABLE )        
