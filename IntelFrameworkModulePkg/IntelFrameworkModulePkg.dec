@@ -127,6 +127,9 @@
   ## This PCD specifies whether PS2 mouse does a extended verification during start.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPs2MouseExtendedVerification|TRUE|BOOLEAN|0x00010047
 
+  ## This PCD specifies whether only Boot logo is showed and all message output is disabled in BDS 
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBootlogoOnlyEnable|FALSE|BOOLEAN|0x00010048
+
 [PcdsFixedAtBuild]
   ## FFS filename to find the default BMP Logo file.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile |{ 0x99, 0x8b, 0xB2, 0x7B, 0xBB, 0x61, 0xD5, 0x11, 0x9A, 0x5D, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }|VOID*|0x40000003

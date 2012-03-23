@@ -2,7 +2,7 @@
   Provides a way for 3rd party applications to register themselves for launch by the
   Boot Manager based on hot key
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -302,46 +302,52 @@ UnregisterHotkey (
 
 /**
   Try to boot the boot option triggered by hotkey.
+  @retval  EFI_SUCCESS             There is HotkeyBootOption & it is processed
+  @retval  EFI_NOT_FOUND           There is no HotkeyBootOption
 **/
-VOID
+EFI_STATUS
 HotkeyBoot (
   VOID
   )
-{
+{ 
   EFI_STATUS           Status;
   UINTN                ExitDataSize;
   CHAR16               *ExitData;
+
+  if (mHotkeyBootOption == NULL) {
+    return EFI_NOT_FOUND;
+  } 
   
-  if (mHotkeyBootOption != NULL) {
-    BdsLibConnectDevicePath (mHotkeyBootOption->DevicePath);
+  BdsLibConnectDevicePath (mHotkeyBootOption->DevicePath);
 
+  //
+  // Clear the screen before launch this BootOption
+  //
+  gST->ConOut->Reset (gST->ConOut, FALSE);
+
+  Status = BdsLibBootViaBootOption (mHotkeyBootOption, mHotkeyBootOption->DevicePath, &ExitDataSize, &ExitData);
+
+  if (EFI_ERROR (Status)) {
     //
-    // Clear the screen before launch this BootOption
+    // Call platform action to indicate the boot fail
     //
-    gST->ConOut->Reset (gST->ConOut, FALSE);
-
-    Status = BdsLibBootViaBootOption (mHotkeyBootOption, mHotkeyBootOption->DevicePath, &ExitDataSize, &ExitData);
-
-    if (EFI_ERROR (Status)) {
-      //
-      // Call platform action to indicate the boot fail
-      //
-      mHotkeyBootOption->StatusString = GetStringById (STRING_TOKEN (STR_BOOT_FAILED));
-      PlatformBdsBootFail (mHotkeyBootOption, Status, ExitData, ExitDataSize);
-    } else {
-      //
-      // Call platform action to indicate the boot success
-      //
-      mHotkeyBootOption->StatusString = GetStringById (STRING_TOKEN (STR_BOOT_SUCCEEDED));
-      PlatformBdsBootSuccess (mHotkeyBootOption);
-    }
-    FreePool (mHotkeyBootOption->Description);
-    FreePool (mHotkeyBootOption->DevicePath);
-    FreePool (mHotkeyBootOption->LoadOptions);
-    FreePool (mHotkeyBootOption);
-
-    mHotkeyBootOption = NULL;
+    mHotkeyBootOption->StatusString = GetStringById (STRING_TOKEN (STR_BOOT_FAILED));
+    PlatformBdsBootFail (mHotkeyBootOption, Status, ExitData, ExitDataSize);
+  } else {
+    //
+    // Call platform action to indicate the boot success
+    //
+    mHotkeyBootOption->StatusString = GetStringById (STRING_TOKEN (STR_BOOT_SUCCEEDED));
+    PlatformBdsBootSuccess (mHotkeyBootOption);
   }
+  FreePool (mHotkeyBootOption->Description);
+  FreePool (mHotkeyBootOption->DevicePath);
+  FreePool (mHotkeyBootOption->LoadOptions);
+  FreePool (mHotkeyBootOption);
+
+  mHotkeyBootOption = NULL;
+
+  return EFI_SUCCESS;
 }
 
 /**

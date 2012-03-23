@@ -1,7 +1,7 @@
 /** @file
   Perform the platform memory test
 
-Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -280,14 +280,17 @@ BdsMemoryTest (
     FreePool (Pos);
     return EFI_SUCCESS;
   }
+  
+  if (!FeaturePcdGet(PcdBootlogoOnlyEnable)) {
+    TmpStr = GetStringById (STRING_TOKEN (STR_ESC_TO_SKIP_MEM_TEST));
 
-  TmpStr = GetStringById (STRING_TOKEN (STR_ESC_TO_SKIP_MEM_TEST));
-
-  if (TmpStr != NULL) {
-    PrintXY (10, 10, NULL, NULL, TmpStr);
-    FreePool (TmpStr);
+    if (TmpStr != NULL) {
+      PrintXY (10, 10, NULL, NULL, TmpStr);
+      FreePool (TmpStr);
+    }
+  } else {
+    DEBUG ((EFI_D_INFO, "Enter memory test.\n"));
   }
-
   do {
     Status = GenMemoryTest->PerformMemoryTest (
                               GenMemoryTest,
@@ -305,43 +308,25 @@ BdsMemoryTest (
 
       ASSERT (0);
     }
+    
+    if (!FeaturePcdGet(PcdBootlogoOnlyEnable)) {
+      TempData = (UINT32) DivU64x32 (TotalMemorySize, 16);
+      TestPercent = (UINTN) DivU64x32 (
+                              DivU64x32 (MultU64x32 (TestedMemorySize, 100), 16),
+                              TempData
+                              );
+      if (TestPercent != PreviousValue) {
+        UnicodeValueToString (StrPercent, 0, TestPercent, 0);
+        TmpStr = GetStringById (STRING_TOKEN (STR_MEMORY_TEST_PERCENT));
+        if (TmpStr != NULL) {
+          //
+          // TmpStr size is 64, StrPercent is reserved to 16.
+          //
+          StrCat (StrPercent, TmpStr);
+          PrintXY (10, 10, NULL, NULL, StrPercent);
+          FreePool (TmpStr);
+        }
 
-    TempData = (UINT32) DivU64x32 (TotalMemorySize, 16);
-    TestPercent = (UINTN) DivU64x32 (
-                            DivU64x32 (MultU64x32 (TestedMemorySize, 100), 16),
-                            TempData
-                            );
-    if (TestPercent != PreviousValue) {
-      UnicodeValueToString (StrPercent, 0, TestPercent, 0);
-      TmpStr = GetStringById (STRING_TOKEN (STR_MEMORY_TEST_PERCENT));
-      if (TmpStr != NULL) {
-        //
-        // TmpStr size is 64, StrPercent is reserved to 16.
-        //
-        StrCat (StrPercent, TmpStr);
-        PrintXY (10, 10, NULL, NULL, StrPercent);
-        FreePool (TmpStr);
-      }
-
-      TmpStr = GetStringById (STRING_TOKEN (STR_PERFORM_MEM_TEST));
-      if (TmpStr != NULL) {
-        PlatformBdsShowProgress (
-          Foreground,
-          Background,
-          TmpStr,
-          Color,
-          TestPercent,
-          (UINTN) PreviousValue
-          );
-        FreePool (TmpStr);
-      }
-    }
-
-    PreviousValue = TestPercent;
-
-    KeyStatus     = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-    if (!EFI_ERROR (KeyStatus) && (Key.ScanCode == SCAN_ESC)) {
-      if (!RequireSoftECCInit) {
         TmpStr = GetStringById (STRING_TOKEN (STR_PERFORM_MEM_TEST));
         if (TmpStr != NULL) {
           PlatformBdsShowProgress (
@@ -349,13 +334,37 @@ BdsMemoryTest (
             Background,
             TmpStr,
             Color,
-            100,
+            TestPercent,
             (UINTN) PreviousValue
             );
           FreePool (TmpStr);
         }
+      }
 
-        PrintXY (10, 10, NULL, NULL, L"100");
+      PreviousValue = TestPercent;
+    } else {
+      DEBUG ((EFI_D_INFO, "Perform memory test (ESC to skip).\n"));
+    }
+
+    KeyStatus     = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+    if (!EFI_ERROR (KeyStatus) && (Key.ScanCode == SCAN_ESC)) {
+      if (!RequireSoftECCInit) {
+        if (!FeaturePcdGet(PcdBootlogoOnlyEnable)) {
+          TmpStr = GetStringById (STRING_TOKEN (STR_PERFORM_MEM_TEST));
+          if (TmpStr != NULL) {
+            PlatformBdsShowProgress (
+              Foreground,
+              Background,
+              TmpStr,
+              Color,
+              100,
+              (UINTN) PreviousValue
+              );
+            FreePool (TmpStr);
+          }
+
+          PrintXY (10, 10, NULL, NULL, L"100");
+        }
         Status = GenMemoryTest->Finished (GenMemoryTest);
         goto Done;
       }
@@ -367,28 +376,34 @@ BdsMemoryTest (
   Status = GenMemoryTest->Finished (GenMemoryTest);
 
 Done:
-  UnicodeValueToString (StrTotalMemory, COMMA_TYPE, TotalMemorySize, 0);
-  if (StrTotalMemory[0] == L',') {
-    StrTotalMemory++;
+  if (!FeaturePcdGet(PcdBootlogoOnlyEnable)) {
+    UnicodeValueToString (StrTotalMemory, COMMA_TYPE, TotalMemorySize, 0);
+    if (StrTotalMemory[0] == L',') {
+      StrTotalMemory++;
+    }
+
+    TmpStr = GetStringById (STRING_TOKEN (STR_MEM_TEST_COMPLETED));
+    if (TmpStr != NULL) {
+      StrCat (StrTotalMemory, TmpStr);
+      FreePool (TmpStr);
+    }
+
+    PrintXY (10, 10, NULL, NULL, StrTotalMemory);
+    PlatformBdsShowProgress (
+      Foreground,
+      Background,
+      StrTotalMemory,
+      Color,
+      100,
+      (UINTN) PreviousValue
+      );
+    
+  } else {
+    DEBUG ((EFI_D_INFO, "%d bytes of system memory tested OK\r\n", TotalMemorySize));
   }
-
-  TmpStr = GetStringById (STRING_TOKEN (STR_MEM_TEST_COMPLETED));
-  if (TmpStr != NULL) {
-    StrCat (StrTotalMemory, TmpStr);
-    FreePool (TmpStr);
-  }
-
-  PrintXY (10, 10, NULL, NULL, StrTotalMemory);
-  PlatformBdsShowProgress (
-    Foreground,
-    Background,
-    StrTotalMemory,
-    Color,
-    100,
-    (UINTN) PreviousValue
-    );
-
+  
   FreePool (Pos);
+
 
   //
   // Use a DynamicHii type pcd to save the boot status, which is used to

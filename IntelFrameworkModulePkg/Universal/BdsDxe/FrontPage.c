@@ -1,7 +1,7 @@
 /** @file
   FrontPage routines to handle the callbacks and browser calls
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -17,14 +17,25 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Language.h"
 #include "Hotkey.h"
 
-BOOLEAN   mSetupModeInitialized = FALSE;
-UINT32    mSetupTextModeColumn;
-UINT32    mSetupTextModeRow;
-UINT32    mSetupHorizontalResolution;
-UINT32    mSetupVerticalResolution;
+BOOLEAN   mModeInitialized = FALSE;
 
 BOOLEAN   gConnectAllHappened = FALSE;
 UINTN     gCallbackKey;
+
+//
+// Boot video resolution and text mode.
+//
+UINT32    mBootHorizontalResolution    = 0;
+UINT32    mBootVerticalResolution      = 0;
+UINT32    mBootTextModeColumn          = 0;
+UINT32    mBootTextModeRow             = 0;
+//
+// BIOS setup video resolution and text mode.
+//
+UINT32    mSetupTextModeColumn         = 0;
+UINT32    mSetupTextModeRow            = 0;
+UINT32    mSetupHorizontalResolution   = 0;
+UINT32    mSetupVerticalResolution     = 0;
 
 EFI_FORM_BROWSER2_PROTOCOL      *gFormBrowser2;
 
@@ -891,20 +902,24 @@ ShowProgress (
   if (TimeoutDefault == 0) {
     return EFI_TIMEOUT;
   }
-
+  
   DEBUG ((EFI_D_INFO, "\n\nStart showing progress bar... Press any key to stop it! ...Zzz....\n"));
 
   SetMem (&Foreground, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0xff);
   SetMem (&Background, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0x0);
   SetMem (&Color, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0xff);
-
-  //
-  // Clear the progress status bar first
-  //
+  
   TmpStr = GetStringById (STRING_TOKEN (STR_START_BOOT_OPTION));
-  if (TmpStr != NULL) {
-    PlatformBdsShowProgress (Foreground, Background, TmpStr, Color, 0, 0);
+
+  if (!FeaturePcdGet(PcdBootlogoOnlyEnable)) {
+    //
+    // Clear the progress status bar first
+    //
+    if (TmpStr != NULL) {
+      PlatformBdsShowProgress (Foreground, Background, TmpStr, Color, 0, 0);
+    }
   }
+  
 
   TimeoutRemain = TimeoutDefault;
   while (TimeoutRemain != 0) {
@@ -915,22 +930,27 @@ ShowProgress (
       break;
     }
     TimeoutRemain--;
-
-    //
-    // Show progress
-    //
-    if (TmpStr != NULL) {
-      PlatformBdsShowProgress (
-        Foreground,
-        Background,
-        TmpStr,
-        Color,
-        ((TimeoutDefault - TimeoutRemain) * 100 / TimeoutDefault),
-        0
-        );
+    
+    if (!FeaturePcdGet(PcdBootlogoOnlyEnable)) {
+      //
+      // Show progress
+      //
+      if (TmpStr != NULL) {
+        PlatformBdsShowProgress (
+          Foreground,
+          Background,
+          TmpStr,
+          Color,
+          ((TimeoutDefault - TimeoutRemain) * 100 / TimeoutDefault),
+          0
+          );
+      }
     }
   }
-  gBS->FreePool (TmpStr);
+  
+  if (TmpStr != NULL) {
+    gBS->FreePool (TmpStr);
+  }
 
   //
   // Timeout expired
@@ -958,186 +978,6 @@ ShowProgress (
 }
 
 /**
-  This function will change video resolution and text mode for setup when setup is launched.
-
-  @param   None.
-
-  @retval  EFI_SUCCESS  Mode is changed successfully.
-  @retval  Others       Mode failed to changed.
-
-**/
-EFI_STATUS
-EFIAPI
-ChangeModeForSetup (
-  VOID
-  )
-{
-  EFI_GRAPHICS_OUTPUT_PROTOCOL          *GraphicsOutput;
-  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL       *SimpleTextOut;
-  UINTN                                 SizeOfInfo;
-  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  *Info;
-  UINT32                                MaxGopMode;
-  UINT32                                MaxTextMode;
-  UINT32                                ModeNumber;
-  UINTN                                 HandleCount;
-  EFI_HANDLE                            *HandleBuffer;
-  EFI_STATUS                            Status;
-  UINTN                                 Index;
-  UINTN                                 CurrentColumn;
-  UINTN                                 CurrentRow;  
-
-  Status = gBS->HandleProtocol (
-                  gST->ConsoleOutHandle,
-                  &gEfiGraphicsOutputProtocolGuid,
-                  (VOID**)&GraphicsOutput
-                  );
-  if (EFI_ERROR (Status)) {
-    GraphicsOutput = NULL;
-  }
-
-  Status = gBS->HandleProtocol (
-                  gST->ConsoleOutHandle,
-                  &gEfiSimpleTextOutProtocolGuid,
-                  (VOID**)&SimpleTextOut
-                  );
-  if (EFI_ERROR (Status)) {
-    SimpleTextOut = NULL;
-  }  
-
-  if ((GraphicsOutput == NULL) || (SimpleTextOut == NULL)) {
-    return EFI_UNSUPPORTED;
-  }
-
-  //
-  // Get user defined text mode for setup only once.
-  //  
-  if (!mSetupModeInitialized) {
-    mSetupHorizontalResolution = PcdGet32 (PcdSetupVideoHorizontalResolution);
-    mSetupVerticalResolution   = PcdGet32 (PcdSetupVideoVerticalResolution);      
-    mSetupTextModeColumn       = PcdGet32 (PcdSetupConOutColumn);
-    mSetupTextModeRow          = PcdGet32 (PcdSetupConOutRow);
-    mSetupModeInitialized     = TRUE;
-  }
-
-  MaxGopMode  = GraphicsOutput->Mode->MaxMode;
-  MaxTextMode = SimpleTextOut->Mode->MaxMode;
-
-  //
-  // 1. If current video resolution is same with setup video resolution,
-  //    video resolution need not be changed.
-  //    1.1. If current text mode is same with setup text mode, text mode need not be changed.
-  //    1.2. If current text mode is different with setup text mode, text mode need be changed to setup text mode.
-  // 2. If current video resolution is different with setup video resolution, we need restart whole console drivers.
-  //
-  for (ModeNumber = 0; ModeNumber < MaxGopMode; ModeNumber++) {
-    Status = GraphicsOutput->QueryMode (
-                       GraphicsOutput,
-                       ModeNumber,
-                       &SizeOfInfo,
-                       &Info
-                       );
-    if (!EFI_ERROR (Status)) {
-      if ((Info->HorizontalResolution == mSetupHorizontalResolution) &&
-          (Info->VerticalResolution == mSetupVerticalResolution)) {
-        if ((GraphicsOutput->Mode->Info->HorizontalResolution == mSetupHorizontalResolution) &&
-            (GraphicsOutput->Mode->Info->VerticalResolution == mSetupVerticalResolution)) {
-          //
-          // If current video resolution is same with setup video resolution, 
-          // then check if current text mode is same with setup text mode.
-          //
-          Status = SimpleTextOut->QueryMode (SimpleTextOut, SimpleTextOut->Mode->Mode, &CurrentColumn, &CurrentRow);
-          ASSERT_EFI_ERROR (Status);
-          if (CurrentColumn == mSetupTextModeColumn && CurrentRow == mSetupTextModeRow) {
-            //
-            // Current text mode is same with setup text mode, text mode need not be change.
-            //
-            FreePool (Info);
-            return EFI_SUCCESS;
-          } else {
-            //
-            // Current text mode is different with setup text mode, text mode need be change to new text mode.
-            //
-            for (Index = 0; Index < MaxTextMode; Index++) {
-              Status = SimpleTextOut->QueryMode (SimpleTextOut, Index, &CurrentColumn, &CurrentRow);
-              if (!EFI_ERROR(Status)) {
-                if ((CurrentColumn == mSetupTextModeColumn) && (CurrentRow == mSetupTextModeRow)) {
-                  //
-                  // setup text mode is supported, set it.
-                  //
-                  Status = SimpleTextOut->SetMode (SimpleTextOut, Index);
-                  ASSERT_EFI_ERROR (Status);
-                  //
-                  // Update text mode PCD.
-                  //
-                  PcdSet32 (PcdConOutColumn, mSetupTextModeColumn);
-                  PcdSet32 (PcdConOutRow, mSetupTextModeRow);
-                  FreePool (Info);
-                  return EFI_SUCCESS;
-                }
-              }
-            }
-            if (Index == MaxTextMode) {
-              //
-              // If setup text mode is not supported, return error.
-              //
-              FreePool (Info);
-              return EFI_UNSUPPORTED;
-            }
-          }
-        } else {
-          FreePool (Info);
-          //
-          // If current video resolution is not same with the setup video resolution, set new video resolution.
-          // In this case, the drivers which produce simple text out need be restarted.
-          //
-          Status = GraphicsOutput->SetMode (GraphicsOutput, ModeNumber);
-          if (!EFI_ERROR (Status)) {
-            //
-            // Set PCD to restart GraphicsConsole and Consplitter to change video resolution 
-            // and produce new text mode based on new resolution.
-            //
-            PcdSet32 (PcdVideoHorizontalResolution, mSetupHorizontalResolution);
-            PcdSet32 (PcdVideoVerticalResolution, mSetupVerticalResolution);
-            PcdSet32 (PcdConOutColumn, mSetupTextModeColumn);
-            PcdSet32 (PcdConOutRow, mSetupTextModeRow);
-            
-            Status = gBS->LocateHandleBuffer (
-                             ByProtocol,
-                             &gEfiSimpleTextOutProtocolGuid,
-                             NULL,
-                             &HandleCount,
-                             &HandleBuffer
-                             );
-            if (!EFI_ERROR (Status)) {
-              for (Index = 0; Index < HandleCount; Index++) {
-                gBS->DisconnectController (HandleBuffer[Index], NULL, NULL);
-              }
-              for (Index = 0; Index < HandleCount; Index++) {
-                gBS->ConnectController (HandleBuffer[Index], NULL, NULL, TRUE);
-              }
-              if (HandleBuffer != NULL) {
-                FreePool (HandleBuffer);
-              }
-              break;
-            }
-          }
-        }
-      }
-      FreePool (Info);
-    }
-  }
-
-  if (ModeNumber == MaxGopMode) {
-    //
-    // If the new resolution is not supported, return error.
-    //
-    return EFI_UNSUPPORTED;
-  }
-
-  return EFI_SUCCESS;
-}
-
-/**
   This function is the main entry of the platform setup entry.
   The function will present the main menu of the system setup,
   this is the platform reference part and can be customize.
@@ -1155,8 +995,16 @@ PlatformBdsEnterFrontPage (
   IN BOOLEAN                      ConnectAllHappened
   )
 {
-  EFI_STATUS                    Status;
-  EFI_BOOT_LOGO_PROTOCOL        *BootLogo;
+  EFI_STATUS                         Status;
+  EFI_STATUS                         StatusHotkey; 
+  EFI_BOOT_LOGO_PROTOCOL             *BootLogo;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL       *GraphicsOutput;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *SimpleTextOut;
+  UINTN                              BootTextColumn;
+  UINTN                              BootTextRow;
+  
+  GraphicsOutput = NULL;
+  SimpleTextOut = NULL;
 
   PERF_START (NULL, "BdsTimeOut", "BDS", 0);
   //
@@ -1165,17 +1013,75 @@ PlatformBdsEnterFrontPage (
   if (ConnectAllHappened) {
     gConnectAllHappened = TRUE;
   }
+  
+  if (!mModeInitialized) {
+    //
+    // After the console is ready, get current video resolution 
+    // and text mode before launching setup at first time.
+    //
+    Status = gBS->HandleProtocol (
+                    gST->ConsoleOutHandle,
+                    &gEfiGraphicsOutputProtocolGuid,
+                    (VOID**)&GraphicsOutput
+                    );
+    if (EFI_ERROR (Status)) {
+      GraphicsOutput = NULL;
+    }
+    
+    Status = gBS->HandleProtocol (
+                    gST->ConsoleOutHandle,
+                    &gEfiSimpleTextOutProtocolGuid,
+                    (VOID**)&SimpleTextOut
+                    );
+    if (EFI_ERROR (Status)) {
+      SimpleTextOut = NULL;
+    }  
+
+    if (GraphicsOutput != NULL) {
+      //
+      // Get current video resolution and text mode.
+      //
+      mBootHorizontalResolution = GraphicsOutput->Mode->Info->HorizontalResolution;
+      mBootVerticalResolution   = GraphicsOutput->Mode->Info->VerticalResolution;
+    }
+
+    if (SimpleTextOut != NULL) {
+      Status = SimpleTextOut->QueryMode (
+                                SimpleTextOut,
+                                SimpleTextOut->Mode->Mode,
+                                &BootTextColumn,
+                                &BootTextRow
+                                );
+      mBootTextModeColumn = (UINT32)BootTextColumn;
+      mBootTextModeRow    = (UINT32)BootTextRow;
+    }
+
+    //
+    // Get user defined text mode for setup.
+    //  
+    mSetupHorizontalResolution = PcdGet32 (PcdSetupVideoHorizontalResolution);
+    mSetupVerticalResolution   = PcdGet32 (PcdSetupVideoVerticalResolution);      
+    mSetupTextModeColumn       = PcdGet32 (PcdSetupConOutColumn);
+    mSetupTextModeRow          = PcdGet32 (PcdSetupConOutRow);
+
+    mModeInitialized           = TRUE;
+  }
+
+ 
 
   HotkeyBoot ();
   if (TimeoutDefault != 0xffff) {
     Status = ShowProgress (TimeoutDefault);
-    HotkeyBoot ();
+    StatusHotkey = HotkeyBoot ();
 
-    //
-    // Ensure screen is clear when switch Console from Graphics mode to Text mode
-    //
-    gST->ConOut->EnableCursor (gST->ConOut, TRUE);
-    gST->ConOut->ClearScreen (gST->ConOut);
+    if (!FeaturePcdGet(PcdBootlogoOnlyEnable) || !EFI_ERROR(StatusHotkey)){
+      //
+      // Ensure screen is clear when switch Console from Graphics mode to Text mode
+      // Skip it in normal boot 
+      //
+      gST->ConOut->EnableCursor (gST->ConOut, TRUE);
+      gST->ConOut->ClearScreen (gST->ConOut);
+    }
 
     if (EFI_ERROR (Status)) {
       //
@@ -1198,7 +1104,7 @@ PlatformBdsEnterFrontPage (
     //
     // Set proper video resolution and text mode for setup
     //
-    ChangeModeForSetup ();
+    BdsSetConsoleMode (TRUE);
     
     InitializeFrontPage (FALSE);
 
@@ -1286,3 +1192,213 @@ Exit:
   //
   PERF_END (NULL, "BdsTimeOut", "BDS", 0);
 }
+
+/**
+  This function will change video resolution and text mode
+  according to defined setup mode or defined boot mode  
+
+  @param  IsSetupMode   Indicate mode is changed to setup mode or boot mode. 
+
+  @retval  EFI_SUCCESS  Mode is changed successfully.
+  @retval  Others             Mode failed to be changed.
+
+**/
+EFI_STATUS
+EFIAPI
+BdsSetConsoleMode (
+  BOOLEAN  IsSetupMode
+  )
+{
+  EFI_GRAPHICS_OUTPUT_PROTOCOL          *GraphicsOutput;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL       *SimpleTextOut;
+  UINTN                                 SizeOfInfo;
+  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  *Info;
+  UINT32                                MaxGopMode;
+  UINT32                                MaxTextMode;
+  UINT32                                ModeNumber;
+  UINT32                                NewHorizontalResolution;
+  UINT32                                NewVerticalResolution;
+  UINT32                                NewColumns;
+  UINT32                                NewRows;
+  UINTN                                 HandleCount;
+  EFI_HANDLE                            *HandleBuffer;
+  EFI_STATUS                            Status;
+  UINTN                                 Index;
+  UINTN                                 CurrentColumn;
+  UINTN                                 CurrentRow;  
+
+  MaxGopMode  = 0;
+  MaxTextMode = 0;
+
+  //
+  // Get current video resolution and text mode 
+  //
+  Status = gBS->HandleProtocol (
+                  gST->ConsoleOutHandle,
+                  &gEfiGraphicsOutputProtocolGuid,
+                  (VOID**)&GraphicsOutput
+                  );
+  if (EFI_ERROR (Status)) {
+    GraphicsOutput = NULL;
+  }
+
+  Status = gBS->HandleProtocol (
+                  gST->ConsoleOutHandle,
+                  &gEfiSimpleTextOutProtocolGuid,
+                  (VOID**)&SimpleTextOut
+                  );
+  if (EFI_ERROR (Status)) {
+    SimpleTextOut = NULL;
+  }  
+
+  if ((GraphicsOutput == NULL) || (SimpleTextOut == NULL)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  if (IsSetupMode) {
+    //
+    // The requried resolution and text mode is setup mode.
+    //
+    NewHorizontalResolution = mSetupHorizontalResolution;
+    NewVerticalResolution   = mSetupVerticalResolution;
+    NewColumns              = mSetupTextModeColumn;
+    NewRows                 = mSetupTextModeRow;
+  } else {
+    //
+    // The required resolution and text mode is boot mode.
+    //
+    NewHorizontalResolution = mBootHorizontalResolution;
+    NewVerticalResolution   = mBootVerticalResolution;
+    NewColumns              = mBootTextModeColumn;
+    NewRows                 = mBootTextModeRow;   
+  }
+  
+  if (GraphicsOutput != NULL) {
+    MaxGopMode  = GraphicsOutput->Mode->MaxMode;
+  } 
+
+  if (SimpleTextOut != NULL) {
+    MaxTextMode = SimpleTextOut->Mode->MaxMode;
+  }
+
+  //
+  // 1. If current video resolution is same with required video resolution,
+  //    video resolution need not be changed.
+  //    1.1. If current text mode is same with required text mode, text mode need not be changed.
+  //    1.2. If current text mode is different from required text mode, text mode need be changed.
+  // 2. If current video resolution is different from required video resolution, we need restart whole console drivers.
+  //
+  for (ModeNumber = 0; ModeNumber < MaxGopMode; ModeNumber++) {
+    Status = GraphicsOutput->QueryMode (
+                       GraphicsOutput,
+                       ModeNumber,
+                       &SizeOfInfo,
+                       &Info
+                       );
+    if (!EFI_ERROR (Status)) {
+      if ((Info->HorizontalResolution == NewHorizontalResolution) &&
+          (Info->VerticalResolution == NewVerticalResolution)) {
+        if ((GraphicsOutput->Mode->Info->HorizontalResolution == NewHorizontalResolution) &&
+            (GraphicsOutput->Mode->Info->VerticalResolution == NewVerticalResolution)) {
+          //
+          // Current resolution is same with required resolution, check if text mode need be set
+          //
+          Status = SimpleTextOut->QueryMode (SimpleTextOut, SimpleTextOut->Mode->Mode, &CurrentColumn, &CurrentRow);
+          ASSERT_EFI_ERROR (Status);
+          if (CurrentColumn == NewColumns && CurrentRow == NewRows) {
+            //
+            // If current text mode is same with required text mode. Do nothing
+            //
+            FreePool (Info);
+            return EFI_SUCCESS;
+          } else {
+            //
+            // If current text mode is different from requried text mode.  Set new video mode
+            //
+            for (Index = 0; Index < MaxTextMode; Index++) {
+              Status = SimpleTextOut->QueryMode (SimpleTextOut, Index, &CurrentColumn, &CurrentRow);
+              if (!EFI_ERROR(Status)) {
+                if ((CurrentColumn == NewColumns) && (CurrentRow == NewRows)) {
+                  //
+                  // Required text mode is supported, set it.
+                  //
+                  Status = SimpleTextOut->SetMode (SimpleTextOut, Index);
+                  ASSERT_EFI_ERROR (Status);
+                  //
+                  // Update text mode PCD.
+                  //
+                  PcdSet32 (PcdConOutColumn, mSetupTextModeColumn);
+                  PcdSet32 (PcdConOutRow, mSetupTextModeRow);
+                  FreePool (Info);
+                  return EFI_SUCCESS;
+                }
+              }
+            }
+            if (Index == MaxTextMode) {
+              //
+              // If requried text mode is not supported, return error.
+              //
+              FreePool (Info);
+              return EFI_UNSUPPORTED;
+            }
+          }
+        } else {
+          //
+          // If current video resolution is not same with the new one, set new video resolution.
+          // In this case, the driver which produces simple text out need be restarted.
+          //
+          Status = GraphicsOutput->SetMode (GraphicsOutput, ModeNumber);
+          if (!EFI_ERROR (Status)) {
+            FreePool (Info);
+            break;
+          }
+        }
+      }
+      FreePool (Info);
+    }
+  }
+
+  if (ModeNumber == MaxGopMode) {
+    //
+    // If the resolution is not supported, return error.
+    //
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Set PCD to Inform GraphicsConsole to change video resolution.
+  // Set PCD to Inform Consplitter to change text mode.
+  //
+  PcdSet32 (PcdVideoHorizontalResolution, NewHorizontalResolution);
+  PcdSet32 (PcdVideoVerticalResolution, NewVerticalResolution);
+  PcdSet32 (PcdConOutColumn, NewColumns);
+  PcdSet32 (PcdConOutRow, NewRows);
+  
+  
+  //
+  // Video mode is changed, so restart graphics console driver and higher level driver.
+  // Reconnect graphics console driver and higher level driver.
+  // Locate all the handles with GOP protocol and reconnect it.
+  //
+  Status = gBS->LocateHandleBuffer (
+                   ByProtocol,
+                   &gEfiSimpleTextOutProtocolGuid,
+                   NULL,
+                   &HandleCount,
+                   &HandleBuffer
+                   );
+  if (!EFI_ERROR (Status)) {
+    for (Index = 0; Index < HandleCount; Index++) {
+      gBS->DisconnectController (HandleBuffer[Index], NULL, NULL);
+    }
+    for (Index = 0; Index < HandleCount; Index++) {
+      gBS->ConnectController (HandleBuffer[Index], NULL, NULL, TRUE);
+    }
+    if (HandleBuffer != NULL) {
+      FreePool (HandleBuffer);
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+

@@ -1,7 +1,7 @@
 /** @file
   BDS Lib functions which relate with create or process the boot option.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -614,6 +614,7 @@ BdsLibBootViaBootOption (
   )
 {
   EFI_STATUS                Status;
+  EFI_STATUS                StatusLogo;
   EFI_HANDLE                Handle;
   EFI_HANDLE                ImageHandle;
   EFI_DEVICE_PATH_PROTOCOL  *FilePath;
@@ -621,6 +622,7 @@ BdsLibBootViaBootOption (
   EFI_DEVICE_PATH_PROTOCOL  *WorkingDevicePath;
   EFI_ACPI_S3_SAVE_PROTOCOL *AcpiS3Save;
   LIST_ENTRY                TempBootLists;
+  EFI_BOOT_LOGO_PROTOCOL    *BootLogo;
 
   //
   // Record the performance data for End of BDS
@@ -837,6 +839,15 @@ BdsLibBootViaBootOption (
   gBS->SetWatchdogTimer (0x0000, 0x0000, 0x0000, NULL);
 
 Done:
+  //
+  // Set Logo status invalid after trying one boot option
+  //
+  BootLogo = NULL;
+  StatusLogo = gBS->LocateProtocol (&gEfiBootLogoProtocolGuid, NULL, (VOID **) &BootLogo);
+  if (!EFI_ERROR (StatusLogo) && (BootLogo != NULL)) {
+    BootLogo->SetBootLogo (BootLogo, NULL, 0, 0, 0, 0);
+  }
+
   //
   // Clear Boot Current
   //
