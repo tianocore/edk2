@@ -1,6 +1,6 @@
 /* zutil.h -- internal interface and configuration of the compression library
 
-    Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available under
     the terms and conditions of the BSD License that accompanies this distribution.
     The full text of the license may be found at
@@ -161,7 +161,7 @@ extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 #  define fdopen(fd,mode) NULL /* No fdopen() */
 #endif
 
-#if (defined(_MSC_VER) && (_MSC_VER > 600)) && !defined(UEFI_ENV)
+#if (defined(_MSC_VER) && (_MSC_VER > 600)) && !defined(UEFI_C_SOURCE)
 #  if defined(_WIN32_WCE)
 #    define fdopen(fd,mode) NULL /* No fdopen() */
 #    ifndef _PTRDIFF_T_DEFINED

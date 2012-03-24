@@ -1,7 +1,7 @@
 /** @file
     Manually generated Python Configuration file for EDK II.
 
-    Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available under
     the terms and conditions of the BSD License that accompanies this distribution.
     The full text of the license may be found at
@@ -15,10 +15,7 @@
 
 #include  <Uefi.h>
 
-/* Define to indicate that code is being built to run in the UEFI Environment. */
-#define UEFI_ENV    EFI_SYSTEM_TABLE_REVISION
-
-#define PLATFORM    "UEFI"
+#define PLATFORM    "uefi"
 
 /* Define if building universal (internal helper macro) */
 #undef AC_APPLE_UNIVERSAL_BUILD
@@ -813,6 +810,9 @@
 /* Define to 1 if you have the <sys/wait.h> header file. */
 #undef HAVE_SYS_WAIT_H
 
+/* Define to 1 if you have the system() command. */
+#define HAVE_SYSTEM       1
+
 /* Define to 1 if you have the `tcgetpgrp' function. */
 #undef HAVE_TCGETPGRP
 
@@ -938,7 +938,7 @@
 #define PACKAGE_NAME    "EDK II Python Package"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING  "EDK II Python Package V0.2"
+#define PACKAGE_STRING  "EDK II Python Package V0.8"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME   "EADK_Python"
@@ -947,7 +947,7 @@
 #define PACKAGE_URL   "http://edk2.tianocore.org/toolkit/python"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION  "V0.2"
+#define PACKAGE_VERSION  "V0.8"
 
 /* Define if POSIX semaphores aren't enabled on your system */
 #define POSIX_SEMAPHORES_NOT_ENABLED    1
@@ -1091,7 +1091,7 @@
 
 /* Define if you want wctype.h functions to be used instead of the one
    supplied by Python itself. (see Include/unicodectype.h). */
-#undef WANT_WCTYPE_FUNCTIONS
+#define WANT_WCTYPE_FUNCTIONS   1
 
 /* Define if WINDOW in curses.h offers a field _flags. */
 #undef WINDOW_HAS_FLAGS
@@ -1160,7 +1160,9 @@
 #undef _MINIX
 
 /* Define on NetBSD to activate all library features */
-#define _NETBSD_SOURCE
+#ifndef _NETBSD_SOURCE
+  #define _NETBSD_SOURCE  1
+#endif
 
 /* Define _OSF_SOURCE to get the makedev macro. */
 #undef _OSF_SOURCE

@@ -2,7 +2,7 @@
     OS-specific module implementation for EDK II and UEFI.
     Derived from posixmodule.c in Python 2.7.2.
 
-    Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available under
     the terms and conditions of the BSD License that accompanies this distribution.
     The full text of the license may be found at
@@ -155,7 +155,7 @@ corresponding Unix manual entries for more information on calls.");
 /* dummy version. _PyVerify_fd() is already defined in fileobject.h */
 #define _PyVerify_fd_dup2(A, B) (1)
 
-#ifndef UEFI_ENV
+#ifndef UEFI_C_SOURCE
 /* Return a dictionary corresponding to the POSIX environment table */
 extern char **environ;
 
@@ -196,7 +196,7 @@ convertenviron(void)
     }
     return d;
 }
-#endif  /* UEFI_ENV */
+#endif  /* UEFI_C_SOURCE */
 
 /* Set a POSIX-specific error from errno, and return NULL */
 
@@ -372,7 +372,7 @@ static PyStructSequence_Desc stat_result_desc = {
     10
 };
 
-#ifndef UEFI_ENV   /* Not in UEFI */
+#ifndef UEFI_C_SOURCE   /* Not in UEFI */
 PyDoc_STRVAR(statvfs_result__doc__,
 "statvfs_result: Result from statvfs or fstatvfs.\n\n\
 This object may be accessed either as a tuple of\n\
@@ -433,7 +433,7 @@ statresult_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 
 
 /* If true, st_?time is float. */
-#if defined(UEFI_ENV)
+#if defined(UEFI_C_SOURCE)
   static int _stat_float_times = 0;
 #else
   static int _stat_float_times = 1;
@@ -7349,14 +7349,14 @@ INITFUNC(void)
     if (m == NULL)
         return;
 
-#ifndef UEFI_ENV
+#ifndef UEFI_C_SOURCE
     /* Initialize environ dictionary */
     v = convertenviron();
     Py_XINCREF(v);
     if (v == NULL || PyModule_AddObject(m, "environ", v) != 0)
         return;
     Py_DECREF(v);
-#endif  /* UEFI_ENV */
+#endif  /* UEFI_C_SOURCE */
 
     if (all_ins(m))
         return;

@@ -75,43 +75,31 @@ extern void initselect(void);
 
 extern void PyMarshal_Init(void);
 extern void initimp(void);
+extern void initunicodedata(void);
+extern void init_ctypes(void);
 
 struct _inittab _PyImport_Inittab[] = {
 
     //{"_ast", init_ast},
-    //{"_bisect", init_bisect},
-    //{"_codecs", init_codecs},
-    //{"_collections", init_collections},
-    //{"_functools", init_functools},
-    //{"_heapq", init_heapq},
+    //{"_bisect", init_bisect},                   /* A fast version of bisect.py */
+    //{"_heapq", init_heapq},                     /* A fast version of heapq.py */
     //{"_io", init_io},
     //{"_json", init_json},
     //{"_md5", init_md5},
-    //{"_random", init_random},
     //{"_sha", init_sha},
     //{"_sha256", init_sha256},
     //{"_sha512", init_sha512},
     //{"_socket", init_socket},
-    //{"_sre", init_sre},
-    //{"_struct", init_struct},
-    //{"_weakref", init_weakref},
 
     //{"array", initarray},
-    //{"binascii", initbinascii},
     //{"cmath", initcmath},
     //{"cPickle", initcPickle},
-    //{"cStringIO", initcStringIO},
     //{"datetime", initdatetime},
     //{"future_builtins", initfuture_builtins},
-    //{"gc", initgc},
-    //{"itertools", inititertools},
-    //{"math", initmath},
-    //{"operator", initoperator},
     //{"parser", initparser},
     //{"select", initselect},
     //{"signal", initsignal},
-    //{"strop", initstrop},
-    //{"time", inittime},
+    //{"strop", initstrop},                       /* redefines some string operations that are 100-1000 times faster */
     //{"xxsubtype", initxxsubtype},
     //{"zipimport", initzipimport},
     //{"zlib", initzlib},
@@ -129,10 +117,24 @@ struct _inittab _PyImport_Inittab[] = {
     {"thread", initthread},
 #endif
 
-#if 0
-    {"_symtable", init_symtable},
-    {"_csv", init_csv},
-#endif
+    //{"_symtable", init_symtable},
+    //{"_csv", init_csv},
+
+    /* These modules are required for the full built-in help() facility provided by pydoc. */
+    {"_codecs", init_codecs},
+    {"_collections", init_collections},
+    {"_functools", init_functools},
+    {"_random", init_random},
+    {"_sre", init_sre},
+    {"_struct", init_struct},                   /* Required by the logging package. */
+    {"_weakref", init_weakref},
+    {"binascii", initbinascii},
+    {"cStringIO", initcStringIO},               /* Required by several modules, such as logging. */
+    {"gc", initgc},
+    {"itertools", inititertools},
+    {"math", initmath},
+    {"operator", initoperator},
+    {"time", inittime},
 
     /* These four modules should always be built in. */
     {"edk2", initedk2},

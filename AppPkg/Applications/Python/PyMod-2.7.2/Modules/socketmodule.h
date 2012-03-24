@@ -8,7 +8,7 @@
 #   include <sys/socket.h>
 # endif
 # include <netinet/in.h>
-# if !(defined(UEFI_ENV) || defined(__BEOS__) || defined(__CYGWIN__) || (defined(PYOS_OS2) && defined(PYCC_VACPP)))
+# if !(defined(UEFI_C_SOURCE) || defined(__BEOS__) || defined(__CYGWIN__) || (defined(PYOS_OS2) && defined(PYCC_VACPP)))
 #  include <netinet/tcp.h>
 # endif
 

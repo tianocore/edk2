@@ -7,7 +7,7 @@
 #   for important information about configuring this package for your
 #   environment.
 #
-#   Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+#   Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 #   This program and the accompanying materials
 #   are licensed and made available under the terms and conditions of the BSD License
 #   which accompanies this distribution. The full text of the license may be found at
@@ -30,8 +30,8 @@
 [PcdsFeatureFlag]
 
 [PcdsFixedAtBuild]
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0f
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x00
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000040
 
 [PcdsFixedAtBuild.IPF]
 
@@ -53,7 +53,13 @@
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
+  #
+  # To enable debugging:
+  #   Enable ONE of the following DebugLib instances, as appropriate for your platform.
+  #
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+#  DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
+
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
@@ -97,7 +103,7 @@
 #### Sample Applications.
   AppPkg/Applications/Hello/Hello.inf        # No LibC includes or functions.
   AppPkg/Applications/Main/Main.inf          # Simple invocation. No other LibC functions.
-  AppPkg/Applications/Enquire/Enquire.inf
+  AppPkg/Applications/Enquire/Enquire.inf    #
 
 #### After extracting the Python distribution, un-comment the following line to build Python.
 #  AppPkg/Applications/Python/PythonCore.inf

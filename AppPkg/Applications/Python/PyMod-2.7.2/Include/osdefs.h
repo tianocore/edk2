@@ -1,7 +1,7 @@
 /** @file
     Operating system dependencies.
 
-    Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available under
     the terms and conditions of the BSD License that accompanies this distribution.
     The full text of the license may be found at
@@ -18,7 +18,7 @@ extern "C" {
 
 
 /* Mod by chrish: QNX has WATCOM, but isn't DOS */
-#if !defined(__QNX__) && !defined(UEFI_ENV)
+#if !defined(__QNX__) && !defined(UEFI_C_SOURCE)
 #if defined(MS_WINDOWS) || defined(__BORLANDC__) || defined(__WATCOMC__) || defined(__DJGPP__) || defined(PYOS_OS2)
 #if defined(PYOS_OS2) && defined(PYCC_GCC)
 #define MAXPATHLEN 260
@@ -57,7 +57,7 @@ extern "C" {
 
 /* Search path entry delimiter */
 #ifndef DELIM
-  #ifdef  UEFI_ENV
+  #ifdef  UEFI_C_SOURCE
     #define DELIM   ';'
     #define DELIM_STR   ";"
   #else

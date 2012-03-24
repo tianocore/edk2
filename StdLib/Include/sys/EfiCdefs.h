@@ -22,7 +22,7 @@
     This file and its contents are inspired by the <sys/cdefs.h> files in Berkeley
     Unix.  They have been re-implemented to be specific to the EFI environment.
 
-    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available under
     the terms and conditions of the BSD License that accompanies this distribution.
     The full text of the license may be found at
@@ -330,6 +330,10 @@
   #error You must specify /Zc:wchar_t- to the compiler to turn off intrinsic wchar_t.
   #endif
 
+  /* Get rid of pre-defined macros that are misleading in this environment. */
+  #undef  _WIN32
+  #undef  _WIN64
+
   // Keep compiler quiet about casting from smaller to larger types
   #pragma warning ( disable : 4306 )
 #endif  /* defined(_MSC_VER) */
@@ -344,8 +348,8 @@ typedef UINT32  ULONG32;
 typedef  INT64   LONG64;
 typedef UINT64  ULONG64;
 
-typedef   INT32   EFI_LONG_T;
-typedef  UINT32   EFI_ULONG_T;
+typedef   INTN   EFI_LONG_T;
+typedef  UINTN   EFI_ULONG_T;
 
 /* These types reflect the compiler's size for long */
 #if defined(__GNUC__)
