@@ -34,4 +34,4 @@
 
 [FixedPcd.common]
   gArmTokenSpaceGuid.PcdGicNumInterrupts
-  
+  gArmTokenSpaceGuid.PcdGicSgiIntId

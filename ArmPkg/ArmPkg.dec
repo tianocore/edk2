@@ -83,6 +83,7 @@
   gArmTokenSpaceGuid.PcdGicDistributorBase|0|UINT32|0x0000000C
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0|UINT32|0x0000000D
   gArmTokenSpaceGuid.PcdGicNumInterrupts|96|UINT32|0x00000023
+  gArmTokenSpaceGuid.PcdGicSgiIntId|0|UINT32|0x00000025
 
   #
   # ARM Secure Firmware PCDs

@@ -15,6 +15,7 @@
 #include <Uefi.h>
 #include <Library/IoLib.h>
 #include <Library/ArmGicLib.h>
+#include <Library/PcdLib.h>
 
 VOID
 EFIAPI
@@ -24,7 +25,7 @@ ArmGicSendSgiTo (
   IN  INTN          CPUTargetList
   )
 {
-  MmioWrite32 (GicDistributorBase + ARM_GIC_ICDSGIR, ((TargetListFilter & 0x3) << 24) | ((CPUTargetList & 0xFF) << 16));
+  MmioWrite32 (GicDistributorBase + ARM_GIC_ICDSGIR, ((TargetListFilter & 0x3) << 24) | ((CPUTargetList & 0xFF) << 16) | PcdGet32(PcdGicSgiIntId));
 }
 
 UINT32
@@ -39,7 +40,7 @@ ArmGicAcknowledgeSgiFrom (
   InterruptId = MmioRead32 (GicInterruptInterfaceBase + ARM_GIC_ICCIAR);
 
   // Check if the Interrupt ID is valid, The read from Interrupt Ack register returns CPU ID and Interrupt ID
-  if (((CoreId & 0x7) << 10) == (InterruptId & 0x1C00)) {
+  if ((((CoreId & 0x7) << 10) | PcdGet32(PcdGicSgiIntId)) == InterruptId) {
     // Got SGI number 0 hence signal End of Interrupt by writing to ICCEOIR
     MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCEIOR, InterruptId);
     return 1;
