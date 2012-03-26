@@ -2,7 +2,7 @@
   The common variable operation routines shared by DXE_RINTIME variable
   module and DXE_SMM variable module.
 
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2163,8 +2163,8 @@ VariableServiceSetVariable (
     // Sanity check for EFI_VARIABLE_AUTHENTICATION_2 descriptor.
     //
     if (DataSize < OFFSET_OF_AUTHINFO2_CERT_DATA ||
-    	DataSize < AUTHINFO2_SIZE (Data) ||
-    	((EFI_VARIABLE_AUTHENTICATION_2 *) Data)->AuthInfo.Hdr.dwLength < OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData)) {
+      ((EFI_VARIABLE_AUTHENTICATION_2 *) Data)->AuthInfo.Hdr.dwLength > DataSize - (OFFSET_OF (EFI_VARIABLE_AUTHENTICATION_2, AuthInfo)) ||
+      ((EFI_VARIABLE_AUTHENTICATION_2 *) Data)->AuthInfo.Hdr.dwLength < OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData)) {
       return EFI_SECURITY_VIOLATION;
     }
     PayloadSize = DataSize - AUTHINFO2_SIZE (Data);
