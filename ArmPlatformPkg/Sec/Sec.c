@@ -144,14 +144,14 @@ TrustedWorldInitialization (
   // Set up Monitor World (Vector Table, etc)
   ArmSecureMonitorWorldInitialize ();
 
+  // Transfer the interrupt to Non-secure World
+  ArmGicSetupNonSecure (MpId, PcdGet32(PcdGicDistributorBase), PcdGet32(PcdGicInterruptInterfaceBase));
+
+  // Initialize platform specific security policy
+  ArmPlatformTrustzoneInit (MpId);
+
   // Setup the Trustzone Chipsets
   if (IS_PRIMARY_CORE(MpId)) {
-    // Transfer the interrupt to Non-secure World
-    ArmGicSetupNonSecure (PcdGet32(PcdGicDistributorBase), PcdGet32(PcdGicInterruptInterfaceBase));
-
-    // Initialize platform specific security policy
-    ArmPlatformTrustzoneInit ();
-
     if (ArmIsMpCore()) {
       // Waiting for the Primary Core to have finished to initialize the Secure World
       ArmCpuSynchronizeSignal (ARM_CPU_EVENT_SECURE_INIT);

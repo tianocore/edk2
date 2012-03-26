@@ -25,9 +25,14 @@
 **/
 VOID
 ArmPlatformTrustzoneInit (
-  VOID
+  IN  UINTN                     MpId
   )
 {
+  // Secondary cores might have to set the Secure SGIs into the GICD_IGROUPR0
+  if (!IS_PRIMARY_CORE(MpId)) {
+    return;
+  }
+
   ASSERT(FALSE);
 }
 

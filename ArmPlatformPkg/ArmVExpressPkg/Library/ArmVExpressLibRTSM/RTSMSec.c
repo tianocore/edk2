@@ -31,7 +31,7 @@
 **/
 VOID
 ArmPlatformTrustzoneInit (
-  VOID
+  IN  UINTN                     MpId
   )
 {
   // No TZPC or TZASC on RTSM to initialize

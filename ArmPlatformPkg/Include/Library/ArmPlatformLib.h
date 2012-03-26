@@ -140,7 +140,7 @@ ArmPlatformInitializeSystemMemory (
 **/
 VOID
 ArmPlatformTrustzoneInit (
-  VOID
+  IN  UINTN                     MpId
   );
 
 /**

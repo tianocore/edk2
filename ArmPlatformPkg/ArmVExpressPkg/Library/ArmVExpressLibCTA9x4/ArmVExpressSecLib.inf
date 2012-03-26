@@ -52,3 +52,6 @@
   gArmTokenSpaceGuid.PcdTrustzoneSupport
 
   gArmTokenSpaceGuid.PcdL2x0ControllerBase
+
+  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
+  gArmTokenSpaceGuid.PcdArmPrimaryCore

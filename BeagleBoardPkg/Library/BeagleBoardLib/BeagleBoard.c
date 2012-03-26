@@ -75,21 +75,6 @@ ArmPlatformTrustzoneSupported (
 }
 
 /**
-  Initialize the Secure peripherals and memory regions
-
-  If Trustzone is supported by your platform then this function makes the required initialization
-  of the secure peripherals and memory regions.
-
-**/
-VOID
-ArmPlatformTrustzoneInit (
-  VOID
-  )
-{
-	ASSERT(FALSE);
-}
-
-/**
   Remap the memory at 0x0
 
   Some platform requires or gives the ability to remap the memory at the address 0x0.

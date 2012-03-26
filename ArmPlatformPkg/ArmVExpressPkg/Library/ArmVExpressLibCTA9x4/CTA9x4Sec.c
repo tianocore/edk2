@@ -32,9 +32,14 @@
 **/
 VOID
 ArmPlatformTrustzoneInit (
-  VOID
+  IN  UINTN                     MpId
   )
 {
+  // Nothing to do
+  if (!IS_PRIMARY_CORE(MpId)) {
+    return;
+  }
+
   //
   // Setup TZ Protection Controller
   //
