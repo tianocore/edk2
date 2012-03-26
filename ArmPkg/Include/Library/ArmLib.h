@@ -82,12 +82,12 @@ typedef enum {
 } ARM_PROCESSOR_MODE;
 
 #define IS_PRIMARY_CORE(MpId) (((MpId) & PcdGet32(PcdArmPrimaryCoreMask)) == PcdGet32(PcdArmPrimaryCore))
-#define GET_CORE_ID(MpId)     ((MpId) & 0x3)
-#define GET_CLUSTER_ID(MpId)  (((MpId) >> 8) & 0x3C)
+#define GET_CORE_ID(MpId)     ((MpId) & 0xFF)
+#define GET_CLUSTER_ID(MpId)  (((MpId) >> 8) & 0xFF)
 // Get the position of the core for the Stack Offset (4 Core per Cluster)
 //   Position = (ClusterId * 4) + CoreId
-#define GET_CORE_POS(MpId)    ((((MpId) >> 6) & 0x3C) + ((MpId) & 0x3))
-#define PRIMARY_CORE_ID       (PcdGet32(PcdArmPrimaryCore) & 0x3)
+#define GET_CORE_POS(MpId)    ((((MpId) >> 6) & 0xFF) + ((MpId) & 0xFF))
+#define PRIMARY_CORE_ID       (PcdGet32(PcdArmPrimaryCore) & 0xFF)
 
 ARM_CACHE_TYPE
 EFIAPI
