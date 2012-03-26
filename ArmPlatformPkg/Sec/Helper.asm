@@ -22,13 +22,15 @@
 // r1: MpId
 // r2: Secure Monitor mode stack
 enter_monitor_mode
-    mrs     r4, cpsr                    // Save current mode (SVC) in r1
+    cmp     r2, #0                      // If a Secure Monitor stack base has not been defined then use the Secure stack
+    moveq   r2, sp
+
+    mrs     r4, cpsr                    // Save current mode (SVC) in r4
     bic     r3, r4, #0x1f               // Clear all mode bits
     orr     r3, r3, #0x16               // Set bits for Monitor mode
     msr     cpsr_cxsf, r3               // We are now in Monitor Mode
 
-    cmp     r2, #0                      // If a Secure Monitor stack base has been passed, used it
-    movne   sp, r2                      // Use the passed sp
+    mov     sp, r2                      // Set the stack of the Monitor Mode
 
     mov     lr, r0                      // Use the pass entrypoint as lr
     
