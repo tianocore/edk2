@@ -72,13 +72,21 @@
 
 
 //
-// GIC SEC interfaces
+// GIC Secure interfaces
 //
 VOID
 EFIAPI
 ArmGicSetupNonSecure (
   IN  INTN          GicDistributorBase,
   IN  INTN          GicInterruptInterfaceBase
+  );
+
+VOID
+EFIAPI
+ArmGicSetSecureInterrupts (
+  IN  UINTN         GicDistributorBase,
+  IN  UINTN*        GicSecureInterruptMask,
+  IN  UINTN         GicSecureInterruptMaskSize
   );
 
 VOID

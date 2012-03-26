@@ -26,3 +26,12 @@
 [Packages]
   ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  IoLib
+  PcdLib
+
+[FixedPcd.common]
+  gArmTokenSpaceGuid.PcdGicNumInterrupts
+  
