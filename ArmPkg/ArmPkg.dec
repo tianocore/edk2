@@ -100,7 +100,15 @@
   gArmTokenSpaceGuid.PcdFdSize|0|UINT32|0x0000002C
   gArmTokenSpaceGuid.PcdFvBaseAddress|0|UINT32|0x0000002D
   gArmTokenSpaceGuid.PcdFvSize|0|UINT32|0x0000002E
-  
+ 
+  #
+  # ARM Hypervisor Firmware PCDs
+  #  
+  gArmTokenSpaceGuid.PcdHypFdBaseAddress|0|UINT32|0x0000003A
+  gArmTokenSpaceGuid.PcdHypFdSize|0|UINT32|0x0000003B
+  gArmTokenSpaceGuid.PcdHypFvBaseAddress|0|UINT32|0x0000003C
+  gArmTokenSpaceGuid.PcdHypFvSize|0|UINT32|0x0000003D
+ 
   #
   # ARM Security Extension
   #
