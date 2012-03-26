@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -44,46 +44,5 @@
 #define SP805_WDOG_LOCK_IS_UNLOCKED     0x00000000
 #define SP805_WDOG_LOCK_IS_LOCKED       0x00000001
 #define SP805_WDOG_SPECIAL_UNLOCK_CODE  0x1ACCE551
-
-VOID
-EFIAPI
-ExitBootServicesEvent (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
-);
-
-EFI_STATUS
-EFIAPI
-SP805SetTimerPeriod (
-  IN CONST EFI_WATCHDOG_TIMER_ARCH_PROTOCOL   *This,
-  IN UINT64                                   TimerPeriod   // In 100ns units
-);
-
-EFI_STATUS
-EFIAPI
-SP805GetTimerPeriod (
-  IN CONST EFI_WATCHDOG_TIMER_ARCH_PROTOCOL   *This,
-  OUT UINT64                                  *TimerPeriod
-);
-
-EFI_STATUS
-EFIAPI
-SP805RegisterHandler (
-  IN CONST EFI_WATCHDOG_TIMER_ARCH_PROTOCOL   *This,
-  IN EFI_WATCHDOG_TIMER_NOTIFY                NotifyFunction
-);
-
-EFI_STATUS
-SP805Initialize (
-  VOID
-);
-
-EFI_STATUS
-EFIAPI
-SP805InstallProtocol (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
-);
-
 
 #endif  // __SP805_WATCHDOG_H__

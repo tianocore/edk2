@@ -27,44 +27,6 @@
 #include <Protocol/WatchdogTimer.h>
 #include <Drivers/SP805Watchdog.h>
 
-/**
-  Interface structure for the Watchdog Architectural Protocol.
-
-  @par Protocol Description:
-  This protocol provides a service to set the amount of time to wait
-  before firing the watchdog timer, and it also provides a service to
-  register a handler that is invoked when the watchdog timer fires.
-
-  @par When the watchdog timer fires, control will be passed to a handler
-  if one has been registered.  If no handler has been registered,
-  or the registered handler returns, then the system will be
-  reset by calling the Runtime Service ResetSystem().
-
-  @param RegisterHandler
-  Registers a handler that will be called each time the
-  watchdogtimer interrupt fires.  TimerPeriod defines the minimum
-  time between timer interrupts, so TimerPeriod will also
-  be the minimum time between calls to the registered
-  handler.
-  NOTE: If the watchdog resets the system in hardware, then
-        this function will not have any chance of executing.
-
-  @param SetTimerPeriod
-  Sets the period of the timer interrupt in 100 nS units.
-  This function is optional, and may return EFI_UNSUPPORTED.
-  If this function is supported, then the timer period will
-  be rounded up to the nearest supported timer period.
-
-  @param GetTimerPeriod
-  Retrieves the period of the timer interrupt in 100 nS units.
-
-**/
-EFI_WATCHDOG_TIMER_ARCH_PROTOCOL    gWatchdogTimer = {
-  (EFI_WATCHDOG_TIMER_REGISTER_HANDLER) SP805RegisterHandler,
-  (EFI_WATCHDOG_TIMER_SET_TIMER_PERIOD) SP805SetTimerPeriod,
-  (EFI_WATCHDOG_TIMER_GET_TIMER_PERIOD) SP805GetTimerPeriod
-};
-
 EFI_EVENT                           EfiExitBootServicesEvent = (EFI_EVENT)NULL;
 
 BOOLEAN                             mSP805Initialized = FALSE;
@@ -357,9 +319,46 @@ SP805GetTimerPeriod (
 
   *TimerPeriod = ReturnValue;
 
-  EXIT:
   return Status;
 }
+
+/**
+  Interface structure for the Watchdog Architectural Protocol.
+
+  @par Protocol Description:
+  This protocol provides a service to set the amount of time to wait
+  before firing the watchdog timer, and it also provides a service to
+  register a handler that is invoked when the watchdog timer fires.
+
+  @par When the watchdog timer fires, control will be passed to a handler
+  if one has been registered.  If no handler has been registered,
+  or the registered handler returns, then the system will be
+  reset by calling the Runtime Service ResetSystem().
+
+  @param RegisterHandler
+  Registers a handler that will be called each time the
+  watchdogtimer interrupt fires.  TimerPeriod defines the minimum
+  time between timer interrupts, so TimerPeriod will also
+  be the minimum time between calls to the registered
+  handler.
+  NOTE: If the watchdog resets the system in hardware, then
+        this function will not have any chance of executing.
+
+  @param SetTimerPeriod
+  Sets the period of the timer interrupt in 100 nS units.
+  This function is optional, and may return EFI_UNSUPPORTED.
+  If this function is supported, then the timer period will
+  be rounded up to the nearest supported timer period.
+
+  @param GetTimerPeriod
+  Retrieves the period of the timer interrupt in 100 nS units.
+
+**/
+EFI_WATCHDOG_TIMER_ARCH_PROTOCOL    gWatchdogTimer = {
+  (EFI_WATCHDOG_TIMER_REGISTER_HANDLER) SP805RegisterHandler,
+  (EFI_WATCHDOG_TIMER_SET_TIMER_PERIOD) SP805SetTimerPeriod,
+  (EFI_WATCHDOG_TIMER_GET_TIMER_PERIOD) SP805GetTimerPeriod
+};
 
 /**
   Initialize the state information for the Watchdog Timer Architectural Protocol.
@@ -381,20 +380,20 @@ SP805Initialize (
 
   // Check if the SP805 hardware watchdog module exists on board
   Status = SP805Identify();
-  if (EFI_ERROR( Status )) {
+  if (EFI_ERROR(Status)) {
     Status = EFI_DEVICE_ERROR;
     goto EXIT;
   }
 
   // Unlock access to the SP805 registers
-  SP805Unlock();
+  SP805Unlock ();
 
   // Stop the watchdog from triggering unexpectedly
-  SP805Stop();
+  SP805Stop ();
 
   // Set the watchdog to reset the board when triggered
-  if ( (MmioRead32(SP805_WDOG_CONTROL_REG) & SP805_WDOG_CTRL_RESEN) == 0 ) {
-    MmioOr32(SP805_WDOG_CONTROL_REG, SP805_WDOG_CTRL_RESEN);
+  if ((MmioRead32(SP805_WDOG_CONTROL_REG) & SP805_WDOG_CTRL_RESEN) == 0) {
+    MmioOr32 (SP805_WDOG_CONTROL_REG, SP805_WDOG_CTRL_RESEN);
   }
 
   // Prohibit any rogue access to SP805 registers
