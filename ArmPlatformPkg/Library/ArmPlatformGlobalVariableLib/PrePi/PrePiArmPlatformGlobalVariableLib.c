@@ -48,7 +48,7 @@ ArmPlatformGetGlobalVariable (
   if (VariableSize == 4) {
     *(UINT32*)Variable = ReadUnaligned32 ((CONST UINT32*)(GlobalVariableBase + VariableOffset));
   } else if (VariableSize == 8) {
-    *(UINT32*)Variable = ReadUnaligned64 ((CONST UINT64*)(GlobalVariableBase + VariableOffset));
+    *(UINT64*)Variable = ReadUnaligned64 ((CONST UINT64*)(GlobalVariableBase + VariableOffset));
   } else {
     CopyMem (Variable, (VOID*)(GlobalVariableBase + VariableOffset), VariableSize);
   }
