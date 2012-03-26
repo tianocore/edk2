@@ -35,6 +35,3 @@
 
 [Protocols]
   gEfiLoadedImageProtocolGuid
-  
-  #TODO: RemoveMe
-  gEfiDevicePathToTextProtocolGuid

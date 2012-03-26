@@ -14,9 +14,6 @@
 
 #include "LinuxInternal.h"
 
-//TODO: RemoveMe
-#include <Protocol/DevicePathToText.h>
-
 #define DEFAULT_BOOT_ENTRY_DESCRIPTION  L"Linux"
 #define MAX_STR_INPUT                   300
 #define MAX_ASCII_INPUT                 300
