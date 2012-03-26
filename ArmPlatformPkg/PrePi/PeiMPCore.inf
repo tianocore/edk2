@@ -68,6 +68,8 @@
   gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores
 
 [FixedPcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
+  
   gArmTokenSpaceGuid.PcdVFPEnabled
 
   gArmTokenSpaceGuid.PcdFdBaseAddress

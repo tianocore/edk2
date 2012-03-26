@@ -99,7 +99,8 @@ PrePiMain (
 
   // Initialize the Serial Port
   SerialPortInitialize ();
-  CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"UEFI firmware built at %a on %a\n\r",__TIME__, __DATE__);
+  CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"UEFI firmware (version %s built at %a on %a)\n\r",
+    (CHAR16*)PcdGetPtr(PcdFirmwareVersionString), __TIME__, __DATE__);
   SerialPortWrite ((UINT8 *) Buffer, CharCount);
 
   // Initialize the Debug Agent for Source Level Debugging
