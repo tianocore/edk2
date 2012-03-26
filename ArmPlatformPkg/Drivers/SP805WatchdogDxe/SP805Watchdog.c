@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -28,8 +28,6 @@
 #include <Drivers/SP805Watchdog.h>
 
 EFI_EVENT                           EfiExitBootServicesEvent = (EFI_EVENT)NULL;
-
-BOOLEAN                             mSP805Initialized = FALSE;
 
 EFI_STATUS
 SP805Identify (
@@ -217,14 +215,6 @@ SP805SetTimerPeriod (
   EFI_STATUS  Status = EFI_SUCCESS;
   UINT64      Ticks64bit;
 
-  // Initialize the hardware if not already done
-  if( !mSP805Initialized ) {
-    Status = SP805Initialize();
-    if (EFI_ERROR(Status)) {
-      goto EXIT;
-    }
-  }
-
   SP805Unlock();
 
   if( TimerPeriod == 0 ) {
@@ -298,14 +288,6 @@ SP805GetTimerPeriod (
     return EFI_INVALID_PARAMETER;
   }
 
-  // Initialize the hardware if not already done
-  if( !mSP805Initialized ) {
-    Status = SP805Initialize();
-    if (EFI_ERROR(Status)) {
-      goto EXIT;
-    }
-  }
-
   // Check if the watchdog is stopped
   if ( (MmioRead32(SP805_WDOG_CONTROL_REG) & SP805_WDOG_CTRL_INTEN) == 0 ) {
     // It is stopped, so return zero.
@@ -372,11 +354,14 @@ EFI_WATCHDOG_TIMER_ARCH_PROTOCOL    gWatchdogTimer = {
 
 **/
 EFI_STATUS
+EFIAPI
 SP805Initialize (
-  VOID
+  IN EFI_HANDLE         ImageHandle,
+  IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
   EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
 
   // Check if the SP805 hardware watchdog module exists on board
   Status = SP805Identify();
@@ -398,23 +383,7 @@ SP805Initialize (
 
   // Prohibit any rogue access to SP805 registers
   SP805Lock();
-
-  mSP805Initialized = TRUE;
-
-  EXIT:
-  return Status;
-}
-
-EFI_STATUS
-EFIAPI
-SP805InstallProtocol (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
-  )
-{
-  EFI_STATUS  Status;
-  EFI_HANDLE  Handle;
-
+  
   //
   // Make sure the Watchdog Timer Architectural Protocol has not been installed in the system yet.
   // This will avoid conflicts with the universal watchdog
