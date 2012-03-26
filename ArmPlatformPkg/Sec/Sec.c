@@ -146,6 +146,10 @@ TrustedWorldInitialization (
 
   // Setup the Trustzone Chipsets
   if (IS_PRIMARY_CORE(MpId)) {
+    // Transfer the interrupt to Non-secure World
+    ArmGicSetupNonSecure (PcdGet32(PcdGicDistributorBase), PcdGet32(PcdGicInterruptInterfaceBase));
+
+    // Initialize platform specific security policy
     ArmPlatformTrustzoneInit ();
 
     if (ArmIsMpCore()) {
@@ -159,9 +163,6 @@ TrustedWorldInitialization (
     // Waiting for the Primary Core to have finished to initialize the Secure World
     ArmCpuSynchronizeWait (ARM_CPU_EVENT_SECURE_INIT);
   }
-
-  // Transfer the interrupt to Non-secure World
-  ArmGicSetupNonSecure (PcdGet32(PcdGicDistributorBase), PcdGet32(PcdGicInterruptInterfaceBase));
 
   // Call the Platform specific fucntion to execute additional actions if required
   JumpAddress = PcdGet32 (PcdFvBaseAddress);
