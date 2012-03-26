@@ -52,7 +52,7 @@ _SetupStackPosition:
   LoadConstantToReg (FixedPcdGet32(PcdFdBaseAddress), r2)
   LoadConstantToReg (FixedPcdGet32(PcdFdSize), r3)
   sub   r3, r3, #1
-  add   r3, r3, r2      // r4 = FdTop = PcdFdBaseAddress + PcdFdSize
+  add   r3, r3, r2      // r3 = FdTop = PcdFdBaseAddress + PcdFdSize
 
   // UEFI Memory Size (stacks are allocated in this region)
   LoadConstantToReg (FixedPcdGet32(PcdSystemMemoryUefiRegionSize), r4)
