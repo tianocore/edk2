@@ -88,6 +88,7 @@ ASM_PFX(CPSRRead):
 
 ASM_PFX(ArmWriteCPACR):
   mcr     p15, 0, r0, c1, c0, 2
+  isb
   bx      lr
 
 ASM_PFX(ArmWriteAuxCr):

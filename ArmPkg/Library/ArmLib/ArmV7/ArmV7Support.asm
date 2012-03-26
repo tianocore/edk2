@@ -341,6 +341,7 @@ ArmEnableVFP
   orr     r0, r0, #0x00f00000
   // Write back CPACR (Coprocessor Access Control Register)
   mcr     p15, 0, r0, c1, c0, 2
+  isb
   // Set EN bit in FPEXC. The Advanced SIMD and VFP extensions are enabled and operate normally.
   mov     r0, #0x40000000
   mcr     p10,#0x7,r0,c8,c0,#0
