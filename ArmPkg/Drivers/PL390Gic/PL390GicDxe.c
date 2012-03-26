@@ -259,9 +259,10 @@ IrqInterruptHandler (
   HARDWARE_INTERRUPT_HANDLER  InterruptHandler;
 
   GicInterrupt = MmioRead32 (PcdGet32(PcdGicInterruptInterfaceBase) + ARM_GIC_ICCIAR);
-  //TODO: Comment me
+
+  // Special Interrupts (ID1020-ID1023) have an Interrupt ID greater than the number of interrupt (ie: Spurious interrupt).
   if (GicInterrupt >= PcdGet32(PcdGicNumInterrupts)) {
-    MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + ARM_GIC_ICCEIOR, GicInterrupt);
+    // The special interrupt do not need to be acknowledge
     return;
   }
   
