@@ -2,7 +2,7 @@
 #  This package includes the security drivers, defintions(including PPIs/PROTOCOLs/GUIDs  
 #  and library classes) and libraries instances.
 #
-# Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License which accompanies this distribution.
 # The full text of the license may be found at
@@ -37,6 +37,9 @@
 
   #  Include/Guid/AuthenticatedVariableFormat.h
   gEfiSecureBootEnableDisableGuid = { 0xf0a30bc7, 0xaf08, 0x4556, { 0x99, 0xc4, 0x0, 0x10, 0x9, 0xc9, 0x3a, 0x44 } }
+
+  #  Include/Guid/AuthenticatedVariableFormat.h
+  gEfiCustomModeEnableGuid           = { 0xc076ec0c, 0x7028, 0x4399, { 0xa0, 0x72, 0x71, 0xee, 0x5c, 0x44, 0x8b, 0x9f } }
   
   ## Include/Guid/TcgEventHob.h
   gTcgEventEntryHobGuid              = { 0x2e3044ac, 0x879f, 0x490f, {0x97, 0x60, 0xbb, 0xdf, 0xaf, 0x69, 0x5f, 0x50 }}

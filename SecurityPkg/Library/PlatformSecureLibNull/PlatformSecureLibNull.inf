@@ -1,5 +1,5 @@
 ## @file
-#  Provides a secure platform-specific method to clear PK(Platform Key).
+#  Provides a secure platform-specific method to detect physically present user.
 #
 # Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials

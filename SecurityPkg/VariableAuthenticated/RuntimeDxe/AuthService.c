@@ -2,7 +2,7 @@
   Implement authentication services for the authenticated variable
   service in UEFI2.2.
 
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -66,6 +66,53 @@ EFI_SIGNATURE_ITEM mSupportSigItem[] = {
 };
 
 /**
+  Determine whether this operation needs a physical present user.
+
+  @param[in]      VariableName            Name of the Variable.
+  @param[in]      VendorGuid              GUID of the Variable.
+
+  @retval TRUE      This variable is protected, only a physical present user could set this variable.
+  @retval FALSE     This variable is not protected.
+  
+**/
+BOOLEAN
+NeedPhysicallyPresent(
+  IN     CHAR16         *VariableName,
+  IN     EFI_GUID       *VendorGuid
+  )
+{
+  if ((CompareGuid (VendorGuid, &gEfiSecureBootEnableDisableGuid) && (StrCmp (VariableName, EFI_SECURE_BOOT_ENABLE_NAME) == 0))
+    || (CompareGuid (VendorGuid, &gEfiCustomModeEnableGuid) && (StrCmp (VariableName, EFI_CUSTOM_MODE_NAME) == 0))) {
+    return TRUE;
+  }
+  
+  return FALSE;
+}
+
+/**
+  Determine whether the platform is operating in Custom Secure Boot mode.
+
+  @retval TRUE           The platform is operating in Custom mode.
+  @retval FALSE          The platform is operating in Standard mode.
+
+**/
+BOOLEAN
+InCustomMode (
+  VOID
+  )
+{
+  VARIABLE_POINTER_TRACK  Variable;
+
+  FindVariable (EFI_CUSTOM_MODE_NAME, &gEfiCustomModeEnableGuid, &Variable, &mVariableModuleGlobal->VariableGlobal, FALSE);
+  if (Variable.CurrPtr != NULL && *(GetVariableDataPtr (Variable.CurrPtr)) == CUSTOM_SECURE_BOOT_MODE) {
+    return TRUE;
+  }
+  
+  return FALSE;
+}
+
+
+/**
   Internal function to delete a Variable given its name and GUID, no authentication
   required.
 
@@ -85,7 +132,7 @@ DeleteVariable (
   EFI_STATUS              Status;
   VARIABLE_POINTER_TRACK  Variable;
 
-  Status = FindVariable (VariableName, VendorGuid, &Variable, &mVariableModuleGlobal->VariableGlobal);
+  Status = FindVariable (VariableName, VendorGuid, &Variable, &mVariableModuleGlobal->VariableGlobal, FALSE);
   if (EFI_ERROR (Status)) {
     return EFI_SUCCESS;
   }
@@ -116,6 +163,7 @@ AutenticatedVariableServiceInitialize (
   UINTN                   CtxSize;
   UINT8                   SecureBootMode;
   UINT8                   SecureBootEnable;
+  UINT8                   CustomMode;
 
   //
   // Initialize hash context.
@@ -151,7 +199,8 @@ AutenticatedVariableServiceInitialize (
              AUTHVAR_KEYDB_NAME,
              &gEfiAuthenticatedVariableGuid,
              &Variable,
-             &mVariableModuleGlobal->VariableGlobal
+             &mVariableModuleGlobal->VariableGlobal,
+             FALSE
              );
 
   if (Variable.CurrPtr == NULL) {
@@ -183,7 +232,7 @@ AutenticatedVariableServiceInitialize (
     mPubKeyNumber = (UINT32) (DataSize / EFI_CERT_TYPE_RSA2048_SIZE);
   }
 
-  FindVariable (EFI_PLATFORM_KEY_NAME, &gEfiGlobalVariableGuid, &PkVariable, &mVariableModuleGlobal->VariableGlobal);
+  FindVariable (EFI_PLATFORM_KEY_NAME, &gEfiGlobalVariableGuid, &PkVariable, &mVariableModuleGlobal->VariableGlobal, FALSE);
   if (PkVariable.CurrPtr == NULL) {
     DEBUG ((EFI_D_INFO, "Variable %s does not exist.\n", EFI_PLATFORM_KEY_NAME));
   } else {
@@ -199,7 +248,8 @@ AutenticatedVariableServiceInitialize (
              EFI_SETUP_MODE_NAME,
              &gEfiGlobalVariableGuid,
              &Variable,
-             &mVariableModuleGlobal->VariableGlobal
+             &mVariableModuleGlobal->VariableGlobal,
+             FALSE
              );
 
   if (Variable.CurrPtr == NULL) {
@@ -235,7 +285,8 @@ AutenticatedVariableServiceInitialize (
              EFI_SIGNATURE_SUPPORT_NAME,
              &gEfiGlobalVariableGuid,
              &Variable,
-             &mVariableModuleGlobal->VariableGlobal
+             &mVariableModuleGlobal->VariableGlobal,
+             FALSE
              );
 
   if (Variable.CurrPtr == NULL) {
@@ -259,7 +310,7 @@ AutenticatedVariableServiceInitialize (
   // If "SecureBootEnable" variable is SECURE_BOOT_DISABLE, Set "SecureBoot" variable to SECURE_BOOT_MODE_DISABLE.
   //
   SecureBootEnable = SECURE_BOOT_MODE_DISABLE;
-  FindVariable (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, &Variable, &mVariableModuleGlobal->VariableGlobal);
+  FindVariable (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, &Variable, &mVariableModuleGlobal->VariableGlobal, FALSE);
   if (Variable.CurrPtr != NULL) {
     SecureBootEnable = *(GetVariableDataPtr (Variable.CurrPtr));
   } else if (mPlatformMode == USER_MODE) {
@@ -288,7 +339,7 @@ AutenticatedVariableServiceInitialize (
   } else {
     SecureBootMode = SECURE_BOOT_MODE_DISABLE;
   }
-  FindVariable (EFI_SECURE_BOOT_MODE_NAME, &gEfiGlobalVariableGuid, &Variable, &mVariableModuleGlobal->VariableGlobal);
+  FindVariable (EFI_SECURE_BOOT_MODE_NAME, &gEfiGlobalVariableGuid, &Variable, &mVariableModuleGlobal->VariableGlobal, FALSE);
   Status = UpdateVariable (
              EFI_SECURE_BOOT_MODE_NAME,
              &gEfiGlobalVariableGuid,
@@ -309,33 +360,33 @@ AutenticatedVariableServiceInitialize (
   DEBUG ((EFI_D_INFO, "Variable %s is %x\n", EFI_SECURE_BOOT_ENABLE_NAME, SecureBootEnable));
 
   //
-  // Detect whether a secure platform-specific method to clear PK(Platform Key)
-  // is configured by platform owner. This method is provided for users force to clear PK
-  // in case incorrect enrollment mis-haps.
+  // Check "CustomMode" variable's existence.
   //
-  if (ForceClearPK ()) {
-    DEBUG ((EFI_D_INFO, "Variable PK/KEK/DB/DBX will be cleared in clear PK mode.\n"));
-
+  FindVariable (EFI_CUSTOM_MODE_NAME, &gEfiCustomModeEnableGuid, &Variable, &mVariableModuleGlobal->VariableGlobal, FALSE);
+  if (Variable.CurrPtr != NULL) {
+    CustomMode = *(GetVariableDataPtr (Variable.CurrPtr));
+  } else {
     //
-    // 1. Clear PK.
+    // "CustomMode" not exist, initialize it in STANDARD_SECURE_BOOT_MODE.
     //
-    Status = DeleteVariable (EFI_PLATFORM_KEY_NAME, &gEfiGlobalVariableGuid);
+    CustomMode = STANDARD_SECURE_BOOT_MODE;
+    Status = UpdateVariable (
+               EFI_CUSTOM_MODE_NAME,
+               &gEfiCustomModeEnableGuid,
+               &CustomMode,
+               sizeof (UINT8),
+               EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+               0,
+               0,
+               &Variable,
+               NULL
+               );
     if (EFI_ERROR (Status)) {
       return Status;
     }
-
-    //
-    // 2. Update "SetupMode" variable to SETUP_MODE.
-    //
-    UpdatePlatformMode (SETUP_MODE);
-
-    //
-    // 3. Clear KEK, DB and DBX.
-    //
-    DeleteVariable (EFI_KEY_EXCHANGE_KEY_NAME, &gEfiGlobalVariableGuid);
-    DeleteVariable (EFI_IMAGE_SECURITY_DATABASE, &gEfiImageSecurityDatabaseGuid);
-    DeleteVariable (EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid);
   }
+  
+  DEBUG ((EFI_D_INFO, "Variable %s is %x\n", EFI_CUSTOM_MODE_NAME, CustomMode));
 
   return Status;
 }
@@ -367,7 +418,8 @@ AddPubKeyInStore (
              AUTHVAR_KEYDB_NAME,
              &gEfiAuthenticatedVariableGuid,
              &Variable,
-             &mVariableModuleGlobal->VariableGlobal
+             &mVariableModuleGlobal->VariableGlobal,
+             FALSE
              );
   ASSERT_EFI_ERROR (Status);
   //
@@ -551,7 +603,8 @@ UpdatePlatformMode (
              EFI_SETUP_MODE_NAME,
              &gEfiGlobalVariableGuid,
              &Variable,
-             &mVariableModuleGlobal->VariableGlobal
+             &mVariableModuleGlobal->VariableGlobal,
+             FALSE
              );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -592,7 +645,8 @@ UpdatePlatformMode (
              EFI_SECURE_BOOT_MODE_NAME,
              &gEfiGlobalVariableGuid,
              &Variable,
-             &mVariableModuleGlobal->VariableGlobal
+             &mVariableModuleGlobal->VariableGlobal,
+             FALSE
              );
   //
   // If "SecureBoot" variable exists, then check "SetupMode" variable update.
@@ -634,7 +688,8 @@ UpdatePlatformMode (
              EFI_SECURE_BOOT_ENABLE_NAME,
              &gEfiSecureBootEnableDisableGuid,
              &Variable,
-             &mVariableModuleGlobal->VariableGlobal
+             &mVariableModuleGlobal->VariableGlobal,
+             FALSE
              );
 
   if (SecureBootMode == SECURE_BOOT_MODE_ENABLE) {
@@ -811,7 +866,7 @@ ProcessVarWithPk (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (mPlatformMode == USER_MODE) {
+  if (mPlatformMode == USER_MODE && !(InCustomMode() && UserPhysicalPresent())) {
 
     if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
       //
@@ -860,7 +915,8 @@ ProcessVarWithPk (
                  EFI_PLATFORM_KEY_NAME,
                  &gEfiGlobalVariableGuid,
                  &PkVariable,
-                 &mVariableModuleGlobal->VariableGlobal
+                 &mVariableModuleGlobal->VariableGlobal,
+                 FALSE
                  );
       ASSERT_EFI_ERROR (Status);
 
@@ -901,7 +957,7 @@ ProcessVarWithPk (
     }
   } else {
     //
-    // Process PK or KEK in Setup mode.
+    // Process PK or KEK in Setup mode or Custom Secure Boot mode.
     //
     if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
       //
@@ -945,12 +1001,20 @@ ProcessVarWithPk (
                Variable,
                TimeStamp
                );
-    //
-    // If enroll PK in setup mode, need change to user mode.
-    //
-    if ((DataSize != 0) && IsPk) {
-      Status = UpdatePlatformMode (USER_MODE);
-    }
+
+    if (IsPk) {
+      if (PayloadSize != 0) {
+        //
+        // If enroll PK in setup mode, need change to user mode.
+        //
+        Status = UpdatePlatformMode (USER_MODE);
+      } else {
+        //
+        // If delete PK in custom mode, need change to setup mode.
+        //
+        UpdatePlatformMode (SETUP_MODE);
+      }
+    }   
   }
 
   return Status;
@@ -996,85 +1060,116 @@ ProcessVarWithKek (
   UINT8                           *Payload;
   UINTN                           PayloadSize;
   UINT64                          MonotonicCount;
+  EFI_TIME                        *TimeStamp;
 
-  if (mPlatformMode == USER_MODE) {
-    if ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) == 0) {
+  if ((Attributes & EFI_VARIABLE_NON_VOLATILE) == 0) {
+    //
+    // DB and DBX should set EFI_VARIABLE_NON_VOLATILE attribute.
+    //
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = EFI_SUCCESS;
+  if (mPlatformMode == USER_MODE && !(InCustomMode() && UserPhysicalPresent())) {
+    if (((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) == 0) &&
+        ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) == 0)){
       //
-      // In user mode, should set EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS attribute.
+      // In user mode, should set EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS or
+      // EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS attribute.
       //
       return EFI_INVALID_PARAMETER;
     }
 
-    CertData  = (EFI_VARIABLE_AUTHENTICATION *) Data;
-    CertBlock = (EFI_CERT_BLOCK_RSA_2048_SHA256 *) (CertData->AuthInfo.CertData);
-    if ((Variable->CurrPtr != NULL) && (CertData->MonotonicCount <= Variable->CurrPtr->MonotonicCount)) {
+    if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
       //
-      // Monotonic count check fail, suspicious replay attack, return EFI_SECURITY_VIOLATION.
+      // Time-based, verify against X509 Cert KEK.
       //
-      return EFI_SECURITY_VIOLATION;
-    }
-    //
-    // Get KEK database from variable.
-    //
-    Status = FindVariable (
-               EFI_KEY_EXCHANGE_KEY_NAME,
-               &gEfiGlobalVariableGuid,
-               &KekVariable,
-               &mVariableModuleGlobal->VariableGlobal
-               );
-    ASSERT_EFI_ERROR (Status);
-
-    KekDataSize = KekVariable.CurrPtr->DataSize;
-    KekList     = (EFI_SIGNATURE_LIST *) GetVariableDataPtr (KekVariable.CurrPtr);
-
-    //
-    // Enumerate all Kek items in this list to verify the variable certificate data.
-    // If anyone is authenticated successfully, it means the variable is correct!
-    //
-    IsFound   = FALSE;
-    while ((KekDataSize > 0) && (KekDataSize >= KekList->SignatureListSize)) {
-      if (CompareGuid (&KekList->SignatureType, &gEfiCertRsa2048Guid)) {
-        KekItem   = (EFI_SIGNATURE_DATA *) ((UINT8 *) KekList + sizeof (EFI_SIGNATURE_LIST) + KekList->SignatureHeaderSize);
-        KekCount  = (KekList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - KekList->SignatureHeaderSize) / KekList->SignatureSize;
-        for (Index = 0; Index < KekCount; Index++) {
-          if (CompareMem (KekItem->SignatureData, CertBlock->PublicKey, EFI_CERT_TYPE_RSA2048_SIZE) == 0) {
-            IsFound = TRUE;
-            break;
-          }
-          KekItem = (EFI_SIGNATURE_DATA *) ((UINT8 *) KekItem + KekList->SignatureSize);
-        }
+      return VerifyTimeBasedPayload (VariableName, VendorGuid, Data, DataSize, Variable, Attributes, FALSE, NULL);
+    } else if ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) {
+      //
+      // Counter-based, verify against RSA2048 Cert KEK.
+      //
+      CertData  = (EFI_VARIABLE_AUTHENTICATION *) Data;
+      CertBlock = (EFI_CERT_BLOCK_RSA_2048_SHA256 *) (CertData->AuthInfo.CertData);
+      if ((Variable->CurrPtr != NULL) && (CertData->MonotonicCount <= Variable->CurrPtr->MonotonicCount)) {
+        //
+        // Monotonic count check fail, suspicious replay attack, return EFI_SECURITY_VIOLATION.
+        //
+        return EFI_SECURITY_VIOLATION;
       }
-      KekDataSize -= KekList->SignatureListSize;
-      KekList = (EFI_SIGNATURE_LIST *) ((UINT8 *) KekList + KekList->SignatureListSize);
-    }
-
-    if (!IsFound) {
-      return EFI_SECURITY_VIOLATION;
-    }
-
-    Status = VerifyCounterBasedPayload (Data, DataSize, CertBlock->PublicKey);
-    if (!EFI_ERROR (Status)) {
-      Status = UpdateVariable (
-                 VariableName,
-                 VendorGuid,
-                 (UINT8*)Data + AUTHINFO_SIZE,
-                 DataSize - AUTHINFO_SIZE,
-                 Attributes,
-                 0,
-                 CertData->MonotonicCount,
-                 Variable,
-                 NULL
+      //
+      // Get KEK database from variable.
+      //
+      Status = FindVariable (
+                 EFI_KEY_EXCHANGE_KEY_NAME,
+                 &gEfiGlobalVariableGuid,
+                 &KekVariable,
+                 &mVariableModuleGlobal->VariableGlobal,
+                 FALSE
                  );
+      ASSERT_EFI_ERROR (Status);
+
+      KekDataSize = KekVariable.CurrPtr->DataSize;
+      KekList     = (EFI_SIGNATURE_LIST *) GetVariableDataPtr (KekVariable.CurrPtr);
+
+      //
+      // Enumerate all Kek items in this list to verify the variable certificate data.
+      // If anyone is authenticated successfully, it means the variable is correct!
+      //
+      IsFound   = FALSE;
+      while ((KekDataSize > 0) && (KekDataSize >= KekList->SignatureListSize)) {
+        if (CompareGuid (&KekList->SignatureType, &gEfiCertRsa2048Guid)) {
+          KekItem   = (EFI_SIGNATURE_DATA *) ((UINT8 *) KekList + sizeof (EFI_SIGNATURE_LIST) + KekList->SignatureHeaderSize);
+          KekCount  = (KekList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - KekList->SignatureHeaderSize) / KekList->SignatureSize;
+          for (Index = 0; Index < KekCount; Index++) {
+            if (CompareMem (KekItem->SignatureData, CertBlock->PublicKey, EFI_CERT_TYPE_RSA2048_SIZE) == 0) {
+              IsFound = TRUE;
+              break;
+            }
+            KekItem = (EFI_SIGNATURE_DATA *) ((UINT8 *) KekItem + KekList->SignatureSize);
+          }
+        }
+        KekDataSize -= KekList->SignatureListSize;
+        KekList = (EFI_SIGNATURE_LIST *) ((UINT8 *) KekList + KekList->SignatureListSize);
+      }
+
+      if (!IsFound) {
+        return EFI_SECURITY_VIOLATION;
+      }
+
+      Status = VerifyCounterBasedPayload (Data, DataSize, CertBlock->PublicKey);
+      if (!EFI_ERROR (Status)) {
+        Status = UpdateVariable (
+                   VariableName,
+                   VendorGuid,
+                   (UINT8*)Data + AUTHINFO_SIZE,
+                   DataSize - AUTHINFO_SIZE,
+                   Attributes,
+                   0,
+                   CertData->MonotonicCount,
+                   Variable,
+                   NULL
+                   );
+      }
     }
   } else {
     //
-    // If in setup mode, no authentication needed.
+    // If in setup mode or custom secure boot mode, no authentication needed.
     //
-    if ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) {
+    if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
+      //
+      // Time-based Authentication descriptor.
+      //
+      MonotonicCount = 0;
+      TimeStamp = &((EFI_VARIABLE_AUTHENTICATION_2 *) Data)->TimeStamp;
+      Payload = (UINT8 *) Data + AUTHINFO2_SIZE (Data);
+      PayloadSize = DataSize - AUTHINFO2_SIZE (Data);
+    } else if ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) {
       //
       // Counter-based Authentication descriptor.
       //
       MonotonicCount = ((EFI_VARIABLE_AUTHENTICATION *) Data)->MonotonicCount;
+      TimeStamp = NULL;
       Payload = (UINT8*) Data + AUTHINFO_SIZE;
       PayloadSize = DataSize - AUTHINFO_SIZE;
     } else {
@@ -1082,6 +1177,7 @@ ProcessVarWithKek (
       // No Authentication descriptor.
       //
       MonotonicCount = 0;
+      TimeStamp = NULL;
       Payload = Data;
       PayloadSize = DataSize;
     }
@@ -1095,7 +1191,7 @@ ProcessVarWithKek (
                0,
                MonotonicCount,
                Variable,
-               NULL
+               TimeStamp
                );
   }
 
@@ -1148,6 +1244,13 @@ ProcessVariable (
   PubKey      = NULL;
   IsDeletion  = FALSE;
 
+  if (NeedPhysicallyPresent(VariableName, VendorGuid) && !UserPhysicalPresent()) {
+    //
+    // This variable is protected, only physical present user could modify its value.
+    //
+    return EFI_SECURITY_VIOLATION;
+  }
+  
   //
   // Process Time-based Authenticated variable.
   //
@@ -1538,7 +1641,8 @@ VerifyTimeBasedPayload (
                EFI_PLATFORM_KEY_NAME,
                &gEfiGlobalVariableGuid,
                &PkVariable,
-               &mVariableModuleGlobal->VariableGlobal
+               &mVariableModuleGlobal->VariableGlobal,
+               FALSE
                );
     if (EFI_ERROR (Status)) {
       return Status;
@@ -1571,7 +1675,8 @@ VerifyTimeBasedPayload (
                EFI_KEY_EXCHANGE_KEY_NAME,
                &gEfiGlobalVariableGuid,
                &KekVariable,
-               &mVariableModuleGlobal->VariableGlobal
+               &mVariableModuleGlobal->VariableGlobal,
+               FALSE
                );
     if (EFI_ERROR (Status)) {
       return Status;

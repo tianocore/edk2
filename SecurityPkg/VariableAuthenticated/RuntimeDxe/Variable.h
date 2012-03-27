@@ -2,7 +2,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by Variable modules.
 
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -120,20 +120,23 @@ FtwVariableSpace (
   This code finds variable in storage blocks of volatile and non-volatile storage areas.
   If VariableName is an empty string, then we just return the first
   qualified variable without comparing VariableName and VendorGuid.
-  Otherwise, VariableName and VendorGuid are compared.
+  If IgnoreRtAttribute is TRUE, then we ignore the EFI_VARIABLE_RUNTIME_ACCESS Attribute
+  when searching existing variable, only VariableName and VendorGuid are compared.
+  Otherwise, variables with EFI_VARIABLE_RUNTIME_ACCESS are not visible at runtime.
 
-  @param  VariableName                Name of the variable to be found.
-  @param  VendorGuid                  Vendor GUID to be found.
-  @param  PtrTrack                    VARIABLE_POINTER_TRACK structure for output,
+  @param[in]   VariableName           Name of the variable to be found.
+  @param[in]   VendorGuid             Vendor GUID to be found.
+  @param[out]  PtrTrack               VARIABLE_POINTER_TRACK structure for output,
                                       including the range searched and the target position.
-  @param  Global                      Pointer to VARIABLE_GLOBAL structure, including
+  @param[in]   Global                 Pointer to VARIABLE_GLOBAL structure, including
                                       base of volatile variable storage area, base of
                                       NV variable storage area, and a lock.
+  @param[in]   IgnoreRtAttribute      Ignore RUNTIME_ACCESS attribute when searching variable.
 
   @retval EFI_INVALID_PARAMETER       If VariableName is not an empty string, while
                                       VendorGuid is NULL.
   @retval EFI_SUCCESS                 Variable successfully found.
-  @retval EFI_INVALID_PARAMETER       Variable not found.
+  @retval EFI_NOT_FOUND               Variable not found
 
 **/
 EFI_STATUS
@@ -141,7 +144,8 @@ FindVariable (
   IN  CHAR16                  *VariableName,
   IN  EFI_GUID                *VendorGuid,
   OUT VARIABLE_POINTER_TRACK  *PtrTrack,
-  IN  VARIABLE_GLOBAL         *Global
+  IN  VARIABLE_GLOBAL         *Global,
+  IN  BOOLEAN                 IgnoreRtAttribute
   );
 
 /**

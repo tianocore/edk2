@@ -4,7 +4,7 @@
   AuthenticatedVariableFormat.h defines variable data headers 
   and variable storage region headers.
 
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -34,6 +34,20 @@ extern EFI_GUID gEfiSecureBootEnableDisableGuid;
 #define EFI_SECURE_BOOT_ENABLE_NAME      L"SecureBootEnable"
 #define SECURE_BOOT_ENABLE               1
 #define SECURE_BOOT_DISABLE              0
+
+extern EFI_GUID gEfiCustomModeEnableGuid;
+
+///
+///  "CustomMode" variable for two Secure Boot modes feature: "Custom" and "Standard".
+///  Standard Secure Boot mode is the default mode as UEFI Spec's description.
+///  Custom Secure Boot mode allows for more flexibility as specified in the following:
+///    Can enroll or delete PK without existing PK's private key.
+///    Can enroll or delete KEK without existing PK's private key.
+///    Can enroll or delete signature from DB/DBX without KEK's private key.
+///
+#define EFI_CUSTOM_MODE_NAME          L"CustomMode"
+#define CUSTOM_SECURE_BOOT_MODE       1
+#define STANDARD_SECURE_BOOT_MODE     0
 
 ///
 /// Alignment of variable name and data, according to the architecture:
