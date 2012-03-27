@@ -2,7 +2,7 @@
 
   This file contains the definition for XHCI host controller schedule routines.
 
-Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -189,8 +189,11 @@ typedef struct _URB {
   TRB_TEMPLATE                    *TrbStart;
   TRB_TEMPLATE                    *TrbEnd;
   UINTN                           TrbNum;
-  EVENT_RING                      *EvtRing;
-  TRB_TEMPLATE                    *EvtTrbStart;
+  BOOLEAN                         StartDone;
+  BOOLEAN                         EndDone;
+  BOOLEAN                         Finished;
+
+  TRB_TEMPLATE                    *EvtTrb;
 } URB;
 
 //

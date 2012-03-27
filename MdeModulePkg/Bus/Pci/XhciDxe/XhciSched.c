@@ -47,10 +47,6 @@ XhcCreateCmdTrb (
   Urb->TrbStart->CycleBit = Urb->Ring->RingPCS & BIT0;
   Urb->TrbEnd             = Urb->TrbStart;
 
-  Urb->EvtRing     = &Xhc->EventRing;
-  XhcSyncEventRing (Xhc, Urb->EvtRing);
-  Urb->EvtTrbStart = Urb->EvtRing->EventRingEnqueue;
-
   return Urb;
 }
 
@@ -106,10 +102,8 @@ XhcCmdTransfer (
     goto ON_EXIT;
   }
 
-  ASSERT (Urb->EvtRing == &Xhc->EventRing);
-
   Status  = XhcExecTransfer (Xhc, TRUE, Urb, Timeout);
-  *EvtTrb = Urb->EvtTrbStart;
+  *EvtTrb = Urb->EvtTrb;
 
   if (Urb->Result == EFI_USB_NOERROR) {
     Status = EFI_SUCCESS;
@@ -216,6 +210,12 @@ XhcCreateTransferTrb (
     return EFI_DEVICE_ERROR;
   }
 
+  Urb->Finished  = FALSE;
+  Urb->StartDone = FALSE;
+  Urb->EndDone   = FALSE;
+  Urb->Completed = 0;
+  Urb->Result    = EFI_USB_NOERROR;
+
   Dci       = XhcEndpointToDci (Urb->Ep.EpAddr, (UINT8)(Urb->Ep.Direction));
   ASSERT (Dci < 32);
   EPRing    = (TRANSFER_RING *)(UINTN) Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1];
@@ -234,9 +234,6 @@ XhcCreateTransferTrb (
   Urb->TrbStart = EPRing->RingEnqueue;
   switch (EPType) {
     case ED_CONTROL_BIDIR:
-      Urb->EvtRing     = &Xhc->EventRing;
-      XhcSyncEventRing (Xhc, Urb->EvtRing);
-      Urb->EvtTrbStart = Urb->EvtRing->EventRingEnqueue;
       //
       // For control transfer, create SETUP_STAGE_TRB first.
       //
@@ -325,10 +322,6 @@ XhcCreateTransferTrb (
 
     case ED_BULK_OUT:
     case ED_BULK_IN:
-      Urb->EvtRing     = &Xhc->EventRing;
-      XhcSyncEventRing (Xhc, Urb->EvtRing);
-      Urb->EvtTrbStart = Urb->EvtRing->EventRingEnqueue;
-
       TotalLen = 0;
       Len      = 0;
       TrbNum   = 0;
@@ -364,10 +357,6 @@ XhcCreateTransferTrb (
 
     case ED_INTERRUPT_OUT:
     case ED_INTERRUPT_IN:
-      Urb->EvtRing = &Xhc->EventRing;
-      XhcSyncEventRing (Xhc, Urb->EvtRing);
-      Urb->EvtTrbStart = Urb->EvtRing->EventRingEnqueue;
-
       TotalLen = 0;
       Len      = 0;
       TrbNum   = 0;
@@ -829,39 +818,78 @@ XhcFreeSched (
 }
 
 /**
-  Check if it is ring TRB.
+  Check if the Trb is a transaction of the URBs in XHCI's asynchronous transfer list.
 
-  @param Ring   The transfer ring
-  @param Trb    The TRB to check if it's in the transfer ring
+  @param Xhc    The XHCI Instance.
+  @param Trb    The TRB to be checked.
+  @param Urb    The pointer to the matched Urb.
 
-  @retval TRUE  It is in the ring
-  @retval FALSE It is not in the ring
+  @retval TRUE  The Trb is matched with a transaction of the URBs in the async list.
+  @retval FALSE The Trb is not matched with any URBs in the async list.
+
+**/
+BOOLEAN
+IsAsyncIntTrb (
+  IN  USB_XHCI_INSTANCE   *Xhc,
+  IN  TRB_TEMPLATE        *Trb,
+  OUT URB                 **Urb
+  )
+{
+  LIST_ENTRY              *Entry;
+  LIST_ENTRY              *Next;
+  TRB_TEMPLATE            *CheckedTrb;
+  URB                     *CheckedUrb;
+  UINTN                   Index;
+
+  EFI_LIST_FOR_EACH_SAFE (Entry, Next, &Xhc->AsyncIntTransfers) {
+    CheckedUrb = EFI_LIST_CONTAINER (Entry, URB, UrbList);
+    CheckedTrb = CheckedUrb->TrbStart;
+    for (Index = 0; Index < CheckedUrb->TrbNum; Index++) {
+      if (Trb == CheckedTrb) {
+        *Urb = CheckedUrb;
+        return TRUE;
+      }
+      CheckedTrb++;
+      if ((UINTN)CheckedTrb >= ((UINTN) CheckedUrb->Ring->RingSeg0 + sizeof (TRB_TEMPLATE) * CheckedUrb->Ring->TrbNumber)) {
+        CheckedTrb = (TRB_TEMPLATE*) CheckedUrb->Ring->RingSeg0;
+      }
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+  Check if the Trb is a transaction of the URB.
+
+  @param Trb    The TRB to be checked
+  @param Urb    The transfer ring to be checked.
+
+  @retval TRUE  It is a transaction of the URB.
+  @retval FALSE It is not any transaction of the URB.
 
 **/
 BOOLEAN
 IsTransferRingTrb (
-  IN  TRANSFER_RING       *Ring,
-  IN  TRB_TEMPLATE        *Trb
+  IN  TRB_TEMPLATE        *Trb,
+  IN  URB                 *Urb
   )
 {
-  BOOLEAN       Flag;
-  TRB_TEMPLATE  *Trb1;
+  TRB_TEMPLATE  *CheckedTrb;
   UINTN         Index;
 
-  Trb1 = Ring->RingSeg0;
-  Flag = FALSE;
+  CheckedTrb = Urb->Ring->RingSeg0;
 
-  ASSERT (Ring->TrbNumber == CMD_RING_TRB_NUMBER || Ring->TrbNumber == TR_RING_TRB_NUMBER);
+  ASSERT (Urb->Ring->TrbNumber == CMD_RING_TRB_NUMBER || Urb->Ring->TrbNumber == TR_RING_TRB_NUMBER);
 
-  for (Index = 0; Index < Ring->TrbNumber; Index++) {
-    if (Trb == Trb1) {
-      Flag = TRUE;
-      break;
+  for (Index = 0; Index < Urb->Ring->TrbNumber; Index++) {
+    if (Trb == CheckedTrb) {
+      return TRUE;
     }
-    Trb1++;
+    CheckedTrb++;
   }
 
-  return Flag;
+  return FALSE;
 }
 
 /**
@@ -880,20 +908,26 @@ XhcCheckUrbResult (
   IN  URB                 *Urb
   )
 {
-  BOOLEAN                 StartDone;
-  BOOLEAN                 EndDone;
   EVT_TRB_TRANSFER        *EvtTrb;
   TRB_TEMPLATE            *TRBPtr;
   UINTN                   Index;
   UINT8                   TRBType;
   EFI_STATUS              Status;
+  URB                     *AsyncUrb;
+  URB                     *CheckedUrb;
+  UINT64                  XhcDequeue;
+  UINT32                  High;
+  UINT32                  Low;
 
   ASSERT ((Xhc != NULL) && (Urb != NULL));
 
-  Urb->Completed  = 0;
-  Urb->Result     = EFI_USB_NOERROR;
-  Status          = EFI_SUCCESS;
-  EvtTrb          = NULL;
+  Status = EFI_SUCCESS;
+
+  if (Urb->Finished) {
+    goto EXIT;
+  }
+
+  EvtTrb = NULL;
 
   if (XhcIsHalt (Xhc) || XhcIsSysError (Xhc)) {
     Urb->Result |= EFI_USB_ERR_SYSTEM;
@@ -902,16 +936,15 @@ XhcCheckUrbResult (
   }
 
   //
-  // Restore the EventRingDequeue and poll the transfer event ring from beginning
+  // Traverse the event ring to find out all new events from the previous check.
   //
-  StartDone = FALSE;
-  EndDone   = FALSE;
-  Urb->EvtRing->EventRingDequeue = Urb->EvtTrbStart;
-  for (Index = 0; Index < Urb->EvtRing->TrbNumber; Index++) {
-    XhcSyncEventRing (Xhc, Urb->EvtRing);
-    Status = XhcCheckNewEvent (Xhc, Urb->EvtRing, ((TRB_TEMPLATE **)&EvtTrb));
+  XhcSyncEventRing (Xhc, &Xhc->EventRing);
+  for (Index = 0; Index < Xhc->EventRing.TrbNumber; Index++) {
+    Status = XhcCheckNewEvent (Xhc, &Xhc->EventRing, ((TRB_TEMPLATE **)&EvtTrb));
     if (Status == EFI_NOT_READY) {
-      Urb->Result |= EFI_USB_ERR_TIMEOUT;
+      //
+      // All new events are handled, return directly.
+      //
       goto EXIT;
     }
 
@@ -923,78 +956,106 @@ XhcCheckUrbResult (
     }
 
     TRBPtr = (TRB_TEMPLATE *)(UINTN)(EvtTrb->TRBPtrLo | LShiftU64 ((UINT64) EvtTrb->TRBPtrHi, 32));
-    if (IsTransferRingTrb (Urb->Ring, TRBPtr)) {
-      switch (EvtTrb->Completecode) {
-        case TRB_COMPLETION_STALL_ERROR:
-          Urb->Result |= EFI_USB_ERR_STALL;
-          Status       = EFI_DEVICE_ERROR;
-          DEBUG ((EFI_D_ERROR, "XhcCheckUrbResult: STALL_ERROR! Completecode = %x\n",EvtTrb->Completecode));
-          goto EXIT;
-          break;
 
-        case TRB_COMPLETION_BABBLE_ERROR:
-          Urb->Result |= EFI_USB_ERR_BABBLE;
-          Status       = EFI_DEVICE_ERROR;
-          DEBUG ((EFI_D_ERROR, "XhcCheckUrbResult: BABBLE_ERROR! Completecode = %x\n",EvtTrb->Completecode));
-          goto EXIT;
-          break;
-
-        case TRB_COMPLETION_DATA_BUFFER_ERROR:
-          Urb->Result |= EFI_USB_ERR_BUFFER;
-          Status       = EFI_DEVICE_ERROR;
-          DEBUG ((EFI_D_ERROR, "XhcCheckUrbResult: ERR_BUFFER! Completecode = %x\n",EvtTrb->Completecode));
-          goto EXIT;
-          break;
-
-        case TRB_COMPLETION_USB_TRANSACTION_ERROR:
-          Urb->Result |= EFI_USB_ERR_TIMEOUT;
-          Status       = EFI_DEVICE_ERROR;
-          DEBUG ((EFI_D_ERROR, "XhcCheckUrbResult: TRANSACTION_ERROR! Completecode = %x\n",EvtTrb->Completecode));
-          goto EXIT;
-          break;
-
-        case TRB_COMPLETION_SHORT_PACKET:
-        case TRB_COMPLETION_SUCCESS:
-          if (EvtTrb->Completecode == TRB_COMPLETION_SHORT_PACKET) {
-            DEBUG ((EFI_D_ERROR, "XhcCheckUrbResult: short packet happens!\n"));
-          }
-
-          TRBType = (UINT8) (TRBPtr->Type);
-          if ((TRBType == TRB_TYPE_DATA_STAGE) ||
-              (TRBType == TRB_TYPE_NORMAL) ||
-              (TRBType == TRB_TYPE_ISOCH)) {
-            Urb->Completed += (Urb->DataLen - EvtTrb->Lenth);
-          }
-
-          Status = EFI_SUCCESS;
-          break;
-
-        default:
-          DEBUG ((EFI_D_ERROR, "Transfer Default Error Occur! Completecode = 0x%x!\n",EvtTrb->Completecode));
-          Urb->Result |= EFI_USB_ERR_TIMEOUT;
-          Status = EFI_DEVICE_ERROR;
-          goto EXIT;
-          break;
-      }
-
-      //
-      // Only check first and end Trb event address
-      //
-      if (TRBPtr == Urb->TrbStart) {
-        StartDone = TRUE;
-      }
-
-      if (TRBPtr == Urb->TrbEnd) {
-        EndDone = TRUE;
-      }
-
-      if (StartDone && EndDone) {
+    //
+    // Update the status of Urb according to the finished event regardless of whether
+    // the urb is current checked one or in the XHCI's async transfer list.
+    // This way is used to avoid that those completed async transfer events don't get
+    // handled in time and are flushed by newer coming events.
+    //
+    if (IsTransferRingTrb (TRBPtr, Urb)) {
+      CheckedUrb = Urb;
+    } else if (IsAsyncIntTrb (Xhc, TRBPtr, &AsyncUrb)) {    
+      CheckedUrb = AsyncUrb;
+    } else {
+      continue;
+    }
+  
+    switch (EvtTrb->Completecode) {
+      case TRB_COMPLETION_STALL_ERROR:
+        CheckedUrb->Result  |= EFI_USB_ERR_STALL;
+        CheckedUrb->Finished = TRUE;
+        DEBUG ((EFI_D_ERROR, "XhcCheckUrbResult: STALL_ERROR! Completecode = %x\n",EvtTrb->Completecode));
         break;
-      }
+
+      case TRB_COMPLETION_BABBLE_ERROR:
+        CheckedUrb->Result  |= EFI_USB_ERR_BABBLE;
+        CheckedUrb->Finished = TRUE;
+        DEBUG ((EFI_D_ERROR, "XhcCheckUrbResult: BABBLE_ERROR! Completecode = %x\n",EvtTrb->Completecode));
+        break;
+
+      case TRB_COMPLETION_DATA_BUFFER_ERROR:
+        CheckedUrb->Result  |= EFI_USB_ERR_BUFFER;
+        CheckedUrb->Finished = TRUE;
+        DEBUG ((EFI_D_ERROR, "XhcCheckUrbResult: ERR_BUFFER! Completecode = %x\n",EvtTrb->Completecode));
+        break;
+
+      case TRB_COMPLETION_USB_TRANSACTION_ERROR:
+        CheckedUrb->Result  |= EFI_USB_ERR_TIMEOUT;
+        CheckedUrb->Finished = TRUE;
+        DEBUG ((EFI_D_ERROR, "XhcCheckUrbResult: TRANSACTION_ERROR! Completecode = %x\n",EvtTrb->Completecode));
+        break;
+
+      case TRB_COMPLETION_SHORT_PACKET:
+      case TRB_COMPLETION_SUCCESS:
+        if (EvtTrb->Completecode == TRB_COMPLETION_SHORT_PACKET) {
+          DEBUG ((EFI_D_ERROR, "XhcCheckUrbResult: short packet happens!\n"));
+        }
+
+        TRBType = (UINT8) (TRBPtr->Type);
+        if ((TRBType == TRB_TYPE_DATA_STAGE) ||
+            (TRBType == TRB_TYPE_NORMAL) ||
+            (TRBType == TRB_TYPE_ISOCH)) {
+          CheckedUrb->Completed += (CheckedUrb->DataLen - EvtTrb->Lenth);
+        }
+
+        break;
+
+      default:
+        DEBUG ((EFI_D_ERROR, "Transfer Default Error Occur! Completecode = 0x%x!\n",EvtTrb->Completecode));
+        CheckedUrb->Result  |= EFI_USB_ERR_TIMEOUT;
+        CheckedUrb->Finished = TRUE;
+        break;
+    }
+
+    //
+    // Only check first and end Trb event address
+    //
+    if (TRBPtr == CheckedUrb->TrbStart) {
+      CheckedUrb->StartDone = TRUE;
+    }
+
+    if (TRBPtr == CheckedUrb->TrbEnd) {
+      CheckedUrb->EndDone = TRUE;
+    }
+
+    if (CheckedUrb->StartDone && CheckedUrb->EndDone) {
+      CheckedUrb->Finished = TRUE;
+      CheckedUrb->EvtTrb   = (TRB_TEMPLATE *)EvtTrb;
     }
   }
 
 EXIT:
+
+  //
+  // Advance event ring to last available entry
+  //
+  // Some 3rd party XHCI external cards don't support single 64-bytes width register access,
+  // So divide it to two 32-bytes width register access.
+  //
+  Low  = XhcReadRuntimeReg (Xhc, XHC_ERDP_OFFSET);
+  High = XhcReadRuntimeReg (Xhc, XHC_ERDP_OFFSET + 4);
+  XhcDequeue = (UINT64)(LShiftU64((UINT64)High, 32) | Low);
+
+  if ((XhcDequeue & (~0x0F)) != ((UINT64)(UINTN)Xhc->EventRing.EventRingDequeue & (~0x0F))) {
+    //
+    // Some 3rd party XHCI external cards don't support single 64-bytes width register access,
+    // So divide it to two 32-bytes width register access.
+    //
+    XhcWriteRuntimeReg (Xhc, XHC_ERDP_OFFSET, XHC_LOW_32BIT (Xhc->EventRing.EventRingDequeue) | BIT3);
+    XhcWriteRuntimeReg (Xhc, XHC_ERDP_OFFSET + 4, XHC_HIGH_32BIT (Xhc->EventRing.EventRingDequeue));
+  }
+
   return Status;
 }
 
@@ -1048,10 +1109,14 @@ XhcExecTransfer (
 
   for (Index = 0; Index < Loop; Index++) {
     Status = XhcCheckUrbResult (Xhc, Urb);
-    if ((Status != EFI_NOT_READY)) {
+    if (Urb->Finished) {
       break;
     }
     gBS->Stall (XHC_POLL_DELAY);
+  }
+
+  if (Index == Loop) {
+    Urb->Result = EFI_USB_ERR_TIMEOUT;
   }
 
   return Status;
@@ -1196,7 +1261,7 @@ XhcMonitorAsyncRequests (
     //
     Status = XhcCheckUrbResult (Xhc, Urb);
 
-    if (Status == EFI_NOT_READY) {
+    if (!Urb->Finished) {
       continue;
     }
 
@@ -1218,8 +1283,6 @@ XhcMonitorAsyncRequests (
 
       CopyMem (ProcBuf, Urb->Data, Urb->Completed);
     }
-
-    XhcUpdateAsyncRequest (Xhc, Urb);
 
     //
     // Leave error recovery to its related device driver. A
@@ -1244,6 +1307,8 @@ XhcMonitorAsyncRequests (
     if (ProcBuf != NULL) {
       gBS->FreePool (ProcBuf);
     }
+
+    XhcUpdateAsyncRequest (Xhc, Urb);
   }
   gBS->RestoreTPL (OldTpl);
 }
@@ -1445,10 +1510,6 @@ XhcSyncEventRing (
 {
   UINTN               Index;
   TRB_TEMPLATE        *EvtTrb1;
-  TRB_TEMPLATE        *EvtTrb2;
-  UINT64              XhcDequeue;
-  UINT32              High;
-  UINT32              Low;
 
   ASSERT (EvtRing != NULL);
 
@@ -1456,41 +1517,25 @@ XhcSyncEventRing (
   // Calculate the EventRingEnqueue and EventRingCCS.
   // Note: only support single Segment
   //
-  EvtTrb1 = EvtRing->EventRingSeg0;
-  EvtTrb2 = EvtRing->EventRingSeg0;
+  EvtTrb1 = EvtRing->EventRingDequeue;
 
   for (Index = 0; Index < EvtRing->TrbNumber; Index++) {
-    if (EvtTrb1->CycleBit != EvtTrb2->CycleBit) {
+    if (EvtTrb1->CycleBit != EvtRing->EventRingCCS) {
       break;
     }
+
     EvtTrb1++;
+
+    if ((UINTN)EvtTrb1 >= ((UINTN) EvtRing->EventRingSeg0 + sizeof (TRB_TEMPLATE) * EvtRing->TrbNumber)) {
+      EvtTrb1 = EvtRing->EventRingSeg0;
+      EvtRing->EventRingCCS = (EvtRing->EventRingCCS) ? 0 : 1;
+    }
   }
 
   if (Index < EvtRing->TrbNumber) {
     EvtRing->EventRingEnqueue = EvtTrb1;
-    EvtRing->EventRingCCS     = (EvtTrb2->CycleBit) ? 1 : 0;
   } else {
-    EvtRing->EventRingEnqueue = EvtTrb2;
-    EvtRing->EventRingCCS     = (EvtTrb2->CycleBit) ? 0 : 1;
-  }
-
-  //
-  // Apply the EventRingDequeue to Xhc
-  //
-  // Some 3rd party XHCI external cards don't support single 64-bytes width register access,
-  // So divide it to two 32-bytes width register access.
-  //
-  Low  = XhcReadRuntimeReg (Xhc, XHC_ERDP_OFFSET);
-  High = XhcReadRuntimeReg (Xhc, XHC_ERDP_OFFSET + 4);
-  XhcDequeue = (UINT64)(LShiftU64((UINT64)High, 32) | Low);
-
-  if ((XhcDequeue & (~0x0F)) != ((UINT64)(UINTN)EvtRing->EventRingDequeue & (~0x0F))) {
-    //
-    // Some 3rd party XHCI external cards don't support single 64-bytes width register access,
-    // So divide it to two 32-bytes width register access.
-    //
-    XhcWriteRuntimeReg (Xhc, XHC_ERDP_OFFSET, XHC_LOW_32BIT (EvtRing->EventRingDequeue) | BIT3);
-    XhcWriteRuntimeReg (Xhc, XHC_ERDP_OFFSET + 4, XHC_HIGH_32BIT (EvtRing->EventRingDequeue));
+    ASSERT (FALSE);
   }
 
   return EFI_SUCCESS;
@@ -1579,8 +1624,8 @@ XhcCheckNewEvent (
   OUT TRB_TEMPLATE            **NewEvtTrb
   )
 {
-  EFI_STATUS  Status;
-  TRB_TEMPLATE*EvtTrb;
+  EFI_STATUS          Status;
+  TRB_TEMPLATE        *EvtTrb;
 
   ASSERT (EvtRing != NULL);
 
@@ -1593,15 +1638,11 @@ XhcCheckNewEvent (
 
   Status = EFI_SUCCESS;
 
-  if (((EvtTrb->Status >> 24) & 0xFF) != TRB_COMPLETION_SUCCESS) {
-    Status = EFI_DEVICE_ERROR;
-  }
-
   EvtRing->EventRingDequeue++;
   //
   // If the dequeue pointer is beyond the ring, then roll-back it to the begining of the ring.
   //
-  if ((UINTN)EvtRing->EventRingDequeue >=  ((UINTN) EvtRing->EventRingSeg0 + sizeof (TRB_TEMPLATE) * EvtRing->TrbNumber)) {
+  if ((UINTN)EvtRing->EventRingDequeue >= ((UINTN) EvtRing->EventRingSeg0 + sizeof (TRB_TEMPLATE) * EvtRing->TrbNumber)) {
     EvtRing->EventRingDequeue = EvtRing->EventRingSeg0;
   }
 
@@ -1845,7 +1886,7 @@ XhcInitializeDeviceSlot (
   ASSERT (!EFI_ERROR(Status));
 
   DeviceAddress = (UINT8) ((DEVICE_CONTEXT *) OutputContext)->Slot.DeviceAddress;
-  DEBUG ((EFI_D_INFO, "    Address %d assigned succeefully\n", DeviceAddress));
+  DEBUG ((EFI_D_INFO, "    Address %d assigned successfully\n", DeviceAddress));
 
   Xhc->UsbDevContext[SlotId].XhciDevAddr = DeviceAddress;
 
@@ -2038,7 +2079,7 @@ XhcInitializeDeviceSlot64 (
   ASSERT (!EFI_ERROR(Status));
 
   DeviceAddress = (UINT8) ((DEVICE_CONTEXT_64 *) OutputContext)->Slot.DeviceAddress;
-  DEBUG ((EFI_D_INFO, "    Address %d assigned succeefully\n", DeviceAddress));
+  DEBUG ((EFI_D_INFO, "    Address %d assigned successfully\n", DeviceAddress));
 
   Xhc->UsbDevContext[SlotId].XhciDevAddr = DeviceAddress;
 

@@ -32,6 +32,20 @@ USB_PORT_STATE_MAP  mUsbPortChangeMap[] = {
   {XHC_PORTSC_PRC, USB_PORT_STAT_C_RESET}
 };
 
+USB_PORT_STATE_MAP  mUsbHubPortStateMap[] = {
+  {XHC_HUB_PORTSC_CCS,   USB_PORT_STAT_CONNECTION},
+  {XHC_HUB_PORTSC_PED,   USB_PORT_STAT_ENABLE},
+  {XHC_HUB_PORTSC_OCA,   USB_PORT_STAT_OVERCURRENT},
+  {XHC_HUB_PORTSC_RESET, USB_PORT_STAT_RESET}
+};
+
+USB_PORT_STATE_MAP  mUsbHubPortChangeMap[] = {
+  {XHC_HUB_PORTSC_CSC, USB_PORT_STAT_C_CONNECTION},
+  {XHC_HUB_PORTSC_PEC, USB_PORT_STAT_C_ENABLE},
+  {XHC_HUB_PORTSC_OCC, USB_PORT_STAT_C_OVERCURRENT},
+  {XHC_HUB_PORTSC_PRC, USB_PORT_STAT_C_RESET}
+};
+
 EFI_DRIVER_BINDING_PROTOCOL  gXhciDriverBinding = {
   XhcDriverBindingSupported,
   XhcDriverBindingStart,
@@ -861,7 +875,7 @@ XhcControlTransfer (
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
   }
-  ASSERT (Urb->EvtRing == &Xhc->EventRing);
+
   Status = XhcExecTransfer (Xhc, FALSE, Urb, Timeout);
 
   //
@@ -907,9 +921,9 @@ XhcControlTransfer (
         }
         Xhc->UsbDevContext[SlotId].ConfDesc = AllocateZeroPool (Xhc->UsbDevContext[SlotId].DevDesc.NumConfigurations * sizeof (EFI_USB_CONFIG_DESCRIPTOR *));
         if (Xhc->HcCParams.Data.Csz == 0) {
-          Status = XhcEvaluateContext (Xhc, SlotId, MaxPacket0);
+          Status = XhcEvaluateContext (Xhc, SlotId, MaxPacket0);
         } else {
-          Status = XhcEvaluateContext64 (Xhc, SlotId, MaxPacket0);
+          Status = XhcEvaluateContext64 (Xhc, SlotId, MaxPacket0);
         }
         ASSERT_EFI_ERROR (Status);
     } else if (DescriptorType == USB_DESC_TYPE_CONFIG) {
@@ -998,21 +1012,23 @@ XhcControlTransfer (
     //
     // Convert the XHCI port/port change state to UEFI status
     //
-    MapSize = sizeof (mUsbPortStateMap) / sizeof (USB_PORT_STATE_MAP);
+    MapSize = sizeof (mUsbHubPortStateMap) / sizeof (USB_PORT_STATE_MAP);
     for (Index = 0; Index < MapSize; Index++) {
-      if (XHC_BIT_IS_SET (State, mUsbPortStateMap[Index].HwState)) {
-        PortStatus.PortStatus = (UINT16) (PortStatus.PortStatus | mUsbPortStateMap[Index].UefiState);
+      if (XHC_BIT_IS_SET (State, mUsbHubPortStateMap[Index].HwState)) {
+        PortStatus.PortStatus = (UINT16) (PortStatus.PortStatus | mUsbHubPortStateMap[Index].UefiState);
       }
     }
-    MapSize = sizeof (mUsbPortChangeMap) / sizeof (USB_PORT_STATE_MAP);
 
+    MapSize = sizeof (mUsbHubPortChangeMap) / sizeof (USB_PORT_STATE_MAP);
     for (Index = 0; Index < MapSize; Index++) {
-      if (XHC_BIT_IS_SET (State, mUsbPortChangeMap[Index].HwState)) {
-      PortStatus.PortChangeStatus = (UINT16) (PortStatus.PortChangeStatus | mUsbPortChangeMap[Index].UefiState);
+      if (XHC_BIT_IS_SET (State, mUsbHubPortChangeMap[Index].HwState)) {
+        PortStatus.PortChangeStatus = (UINT16) (PortStatus.PortChangeStatus | mUsbHubPortChangeMap[Index].UefiState);
       }
     }
 
     XhcPollPortStatusChange (Xhc, Xhc->UsbDevContext[SlotId].RouteString, (UINT8)Request->Index, &PortStatus);
+
+    *(UINT32 *)Data = *(UINT32*)&PortStatus;
   }
 
 FREE_URB:
@@ -1147,8 +1163,6 @@ XhcBulkTransfer (
     goto ON_EXIT;
   }
 
-  ASSERT (Urb->EvtRing == &Xhc->EventRing);
-
   Status = XhcExecTransfer (Xhc, FALSE, Urb, Timeout);
 
   *TransferResult = Urb->Result;
@@ -1272,7 +1286,7 @@ XhcAsyncInterruptTransfer (
     }
 
     Status = XhciDelAsyncIntTransfer (Xhc, DeviceAddress, EndPointAddress);
-    DEBUG ((EFI_D_INFO, "XhcAsyncInterruptTransfer: remove old transfer, Status = %r\n", Status));
+    DEBUG ((EFI_D_INFO, "XhcAsyncInterruptTransfer: remove old transfer for addr %d, Status = %r\n", DeviceAddress, Status));
     goto ON_EXIT;
   }
 
@@ -1320,8 +1334,6 @@ XhcAsyncInterruptTransfer (
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
   }
-
-  ASSERT (Urb->EvtRing == &Xhc->EventRing);
 
   InsertHeadList (&Xhc->AsyncIntTransfers, &Urb->UrbList);
   //
