@@ -294,6 +294,7 @@ FvCheck (
   EFI_STATUS                            Status;
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *Fvb;
   EFI_FIRMWARE_VOLUME_HEADER            *FwVolHeader;
+  EFI_FIRMWARE_VOLUME_EXT_HEADER        *FwVolExtHeader;
   EFI_FVB_ATTRIBUTES_2                  FvbAttributes;
   EFI_FV_BLOCK_MAP_ENTRY                *BlockMap;
   FFS_FILE_LIST_ENTRY                   *FfsFileEntry;
@@ -410,7 +411,7 @@ FvCheck (
 
   //
   // go through the whole FV cache, check the consistence of the FV.
-  // Make a linked list off all the Ffs file headers
+  // Make a linked list of all the Ffs file headers
   //
   Status = EFI_SUCCESS;
   InitializeListHead (&FvDevice->FfsFileListHeader);
@@ -418,7 +419,16 @@ FvCheck (
   //
   // Build FFS list
   //
-  FfsHeader = (EFI_FFS_FILE_HEADER *) FvDevice->CachedFv;
+  if (FwVolHeader->ExtHeaderOffset != 0) {
+    //
+    // Searching for files starts on an 8 byte aligned boundary after the end of the Extended Header if it exists.
+    //
+    FwVolExtHeader = (EFI_FIRMWARE_VOLUME_EXT_HEADER *) (FvDevice->CachedFv + (FwVolHeader->ExtHeaderOffset - FwVolHeader->HeaderLength));
+    FfsHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FwVolExtHeader + FwVolExtHeader->ExtHeaderSize);
+    FfsHeader = (EFI_FFS_FILE_HEADER *) ALIGN_POINTER (FfsHeader, 8);
+  } else {
+    FfsHeader = (EFI_FFS_FILE_HEADER *) (FvDevice->CachedFv);
+  }
   TopFvAddress = FvDevice->EndOfCachedFv;
   while ((UINT8 *) FfsHeader < TopFvAddress) {
 
