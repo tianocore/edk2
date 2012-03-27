@@ -1,31 +1,28 @@
-/**
-  @file
-  Display the DHCP options
+/** @file
+    Display the DHCP options
 
-  Copyright (c) 2011-2012, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+    Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+    This program and the accompanying materials
+    are licensed and made available under the terms and conditions of the BSD License
+    which accompanies this distribution. The full text of the license may be found at
+    http://opensource.org/licenses/bsd-license.
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
+    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
-
 #include <WebServer.h>
 #include <Guid/DxeServices.h>
-#include <pi/PiDxeCis.h>
+#include <Pi/PiDxeCis.h>
 
-#include <protocol/Dhcp4.h>
-#include <protocol/ServiceBinding.h>
+#include <Protocol/Dhcp4.h>
+#include <Protocol/ServiceBinding.h>
 
 /**
   Respond with the DHCP options
 
-  @param [in] SocketFD      The socket's file descriptor to add to the list.
-  @param [in] pPort         The WSDT_PORT structure address
-  @param [out] pbDone       Address to receive the request completion status
+  @param[in]  SocketFD      The socket's file descriptor to add to the list.
+  @param[in]  pPort         The WSDT_PORT structure address
+  @param[out] pbDone        Address to receive the request completion status
 
   @retval EFI_SUCCESS       The request was successfully processed
 
@@ -48,7 +45,7 @@ DhcpOptionsPage (
   EFI_STATUS Status;
 
   DBG_ENTER ( );
-  
+
   //
   //  Send the DHCP options
   //
@@ -60,7 +57,7 @@ DhcpOptionsPage (
     if ( EFI_ERROR ( Status )) {
       break;
     }
-    
+
     //
     //  Build the header
     //
@@ -216,7 +213,7 @@ DhcpOptionsPage (
     Status = HttpPageTrailer ( SocketFD, pPort, pbDone );
     break;
   }
-    
+
   //
   //  Return the operation status
   //

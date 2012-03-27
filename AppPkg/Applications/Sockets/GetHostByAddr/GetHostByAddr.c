@@ -1,17 +1,15 @@
 /** @file
   Translate the port number into a service name
 
-  Copyright (c) 2011-2012, Intel Corporation
-  All rights reserved. This program and the accompanying materials
+  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
   http://opensource.org/licenses/bsd-license.php
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
 **/
-
 #include <errno.h>
 #include <netdb.h>
 #include <stdio.h>
@@ -19,8 +17,8 @@
 #include <Uefi.h>
 #include <unistd.h>
 
-#include <arpa\nameser.h>
-#include <arpa\nameser_compat.h>
+#include <arpa/nameser.h>
+#include <arpa/nameser_compat.h>
 
 #include <Library/DebugLib.h>
 #include <Library/UefiLib.h>
@@ -30,8 +28,8 @@
 /**
   Translate the IP address into a host name
 
-  @param [in] Argc  The number of arguments
-  @param [in] Argv  The argument value array
+  @param[in] Argc   The number of arguments
+  @param[in] Argv   The argument value array
 
   @retval  0        The application exited normally.
   @retval  Other    An error occurred.
