@@ -25,11 +25,11 @@
 extern "C" {
 #endif
 
-PyDoc_STRVAR(posix__doc__,
-"This module provides access to operating system functionality that is\n\
-standardized by the C Standard and the POSIX standard (a thinly\n\
-disguised Unix interface).  Refer to the library manual and\n\
-corresponding Unix manual entries for more information on calls.");
+PyDoc_STRVAR(edk2__doc__,
+             "This module provides access to UEFI firmware functionality that is\n\
+             standardized by the C Standard and the POSIX standard (a thinly\n\
+             disguised Unix interface).  Refer to the library manual and\n\
+             corresponding UEFI Specification entries for more information on calls.");
 
 #ifndef Py_USING_UNICODE
   /* This is used in signatures of functions. */
@@ -222,24 +222,26 @@ posix_error_with_allocated_filename(char* name)
 
 /* POSIX generic methods */
 
-static PyObject *
-posix_fildes(PyObject *fdobj, int (*func)(int))
-{
-    int fd;
-    int res;
-    fd = PyObject_AsFileDescriptor(fdobj);
-    if (fd < 0)
-        return NULL;
-    if (!_PyVerify_fd(fd))
-        return posix_error();
-    Py_BEGIN_ALLOW_THREADS
-    res = (*func)(fd);
-    Py_END_ALLOW_THREADS
-    if (res < 0)
-        return posix_error();
-    Py_INCREF(Py_None);
-    return Py_None;
-}
+#ifndef UEFI_C_SOURCE
+  static PyObject *
+  posix_fildes(PyObject *fdobj, int (*func)(int))
+  {
+      int fd;
+      int res;
+      fd = PyObject_AsFileDescriptor(fdobj);
+      if (fd < 0)
+          return NULL;
+      if (!_PyVerify_fd(fd))
+          return posix_error();
+      Py_BEGIN_ALLOW_THREADS
+      res = (*func)(fd);
+      Py_END_ALLOW_THREADS
+      if (res < 0)
+          return posix_error();
+      Py_INCREF(Py_None);
+      return Py_None;
+  }
+#endif  /* UEFI_C_SOURCE */
 
 static PyObject *
 posix_1str(PyObject *args, char *format, int (*func)(const char*))
@@ -401,11 +403,12 @@ static PyStructSequence_Desc statvfs_result_desc = {
     statvfs_result_fields,
     10
 };
+
+static PyTypeObject StatVFSResultType;
 #endif
 
 static int initialized;
 static PyTypeObject StatResultType;
-static PyTypeObject StatVFSResultType;
 static newfunc structseq_new;
 
 static PyObject *
@@ -437,7 +440,6 @@ statresult_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
   static int _stat_float_times = 0;
 #else
   static int _stat_float_times = 1;
-#endif
 
 PyDoc_STRVAR(stat_float_times__doc__,
 "stat_float_times([newval]) -> oldval\n\n\
@@ -460,6 +462,7 @@ stat_float_times(PyObject* self, PyObject *args)
     Py_INCREF(Py_None);
     return Py_None;
 }
+#endif  /* UEFI_C_SOURCE */
 
 static void
 fill_time(PyObject *v, int index, time_t sec, unsigned long nsec)
@@ -2539,6 +2542,7 @@ posix_getlogin(PyObject *self, PyObject *noargs)
 }
 #endif
 
+#ifndef UEFI_C_SOURCE
 PyDoc_STRVAR(posix_getuid__doc__,
 "getuid() -> uid\n\n\
 Return the current process's user id.");
@@ -2548,7 +2552,7 @@ posix_getuid(PyObject *self, PyObject *noargs)
 {
     return PyInt_FromLong((long)getuid());
 }
-
+#endif  /* UEFI_C_SOURCE */
 
 #ifdef HAVE_KILL
 PyDoc_STRVAR(posix_kill__doc__,
@@ -5743,6 +5747,7 @@ struct constdef {
     long value;
 };
 
+#ifndef UEFI_C_SOURCE
 static int
 conv_confname(PyObject *arg, int *valuep, struct constdef *table,
               size_t tablesize)
@@ -5777,7 +5782,7 @@ conv_confname(PyObject *arg, int *valuep, struct constdef *table,
                         "configuration names must be strings or integers");
     return 0;
 }
-
+#endif  /* UEFI_C_SOURCE */
 
 #if defined(HAVE_FPATHCONF) || defined(HAVE_PATHCONF)
 static struct constdef  posix_constants_pathconf[] = {
@@ -6629,6 +6634,7 @@ posix_sysconf(PyObject *self, PyObject *args)
 #endif
 
 
+#if defined(HAVE_FPATHCONF) || defined(HAVE_PATHCONF) || defined(HAVE_CONFSTR) || defined(HAVE_SYSCONF)
 /* This code is used to ensure that the tables of configuration value names
  * are in sorted order as required by conv_confname(), and also to build the
  * the exported dictionaries that are used to publish information about the
@@ -6673,6 +6679,7 @@ setup_confname_table(struct constdef *table, size_t tablesize,
     }
     return PyModule_AddObject(module, tablename, d);
 }
+#endif  /* HAVE_FPATHCONF || HAVE_PATHCONF || HAVE_CONFSTR || HAVE_SYSCONF */
 
 /* Return -1 on failure, 0 on success. */
 static int
@@ -7341,11 +7348,15 @@ all_ins(PyObject *d)
 PyMODINIT_FUNC
 INITFUNC(void)
 {
-    PyObject *m, *v;
+    PyObject *m;
+
+#ifndef UEFI_C_SOURCE
+  PyObject *v;
+#endif
 
     m = Py_InitModule3(MODNAME,
                        posix_methods,
-                       posix__doc__);
+                       edk2__doc__);
     if (m == NULL)
         return;
 

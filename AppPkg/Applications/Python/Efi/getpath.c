@@ -21,7 +21,7 @@
       /Efi/StdLib/lib/python.VERSION            The platform independent Python modules.
       /Efi/StdLib/lib/python.VERSION/dynalib    Dynamically loadable Python extension modules.
 
-    Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available under
     the terms and conditions of the BSD License that accompanies this distribution.
     The full text of the license may be found at
@@ -65,10 +65,12 @@
 #endif
 
 #ifndef PYTHONPATH
-//#define PYTHONPATH       PREFIX LIBPYTHON sDELIM \
-//                    EXEC_PREFIX LIBPYTHON "/lib-dynload"
-  #define PYTHONPATH  LIBPYTHON // sDELIM
-//                      LIBPYTHON "/lib-dynload"
+  #ifdef HAVE_ENVIRONMENT_OPS
+    #define PYTHONPATH  PREFIX LIBPYTHON sDELIM \
+                        EXEC_PREFIX LIBPYTHON "/lib-dynload"
+  #else
+    #define PYTHONPATH  LIBPYTHON
+  #endif
 #endif
 
 #ifndef LANDMARK
@@ -115,6 +117,7 @@ reduce(char *dir)
     dir[i] = '\0';
 }
 
+#ifndef UEFI_C_SOURCE
 /** Does filename point to a file and not directory?
 
     @param[in]    filename    The fully qualified path to the object to test.
@@ -183,6 +186,7 @@ isdir(char *filename)
 
     return 1;
 }
+#endif  /* UEFI_C_SOURCE */
 
 /** Determine if a path is absolute, or not.
     An absolute path consists of a volume name, "VOL:", followed by a rooted path,

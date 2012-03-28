@@ -20,7 +20,7 @@
     function accepting a varying number of arguments, if access to the varying
     arguments is desired.
 
-    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available under
     the terms and conditions of the BSD License that accompanies this distribution.
     The full text of the license may be found at
@@ -133,5 +133,14 @@ typedef __builtin_va_list   va_list;
 #define va_copy(s,d)      (s) = (d)
 #endif
 /*@}*/
+
+/** Provide a generic version of the compiler-dependent __va_copy macro.
+    Some software, such as Python 2.7.2, relies upon the existence of __va_copy.
+    If this macro is not defined, it just assigns one va_list item to another.
+    This breaks for compiler environments that define va_list as an array or structure.
+**/
+#ifndef __va_copy
+  #define __va_copy       va_copy
+#endif
 
 #endif  /* _STDARG_H */

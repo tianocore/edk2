@@ -201,8 +201,8 @@
   Python-$(PYTHON_VERSION)/Modules/zipimport.c                  #
   Python-$(PYTHON_VERSION)/Modules/zlibmodule.c                 #
 
-#  Python-$(PYTHON_VERSION)/Modules/_csv.c                      #
-#  Python-$(PYTHON_VERSION)/Modules/symtablemodule.c            #
+  Python-$(PYTHON_VERSION)/Modules/_csv.c                       #
+  Python-$(PYTHON_VERSION)/Modules/symtablemodule.c             #
 
 #Modules/cjkcodecs
   Python-$(PYTHON_VERSION)/Modules/cjkcodecs/multibytecodec.c   #
@@ -239,4 +239,6 @@
 [BuildOptions]
    MSFT:*_*_IA32_CC_FLAGS         = /Oi- /wd4018 /wd4054 /wd4055 /wd4101 /wd4131 /wd4152 /wd4204 /wd4210 /wd4244 /wd4267 /wd4305 /wd4310 /wd4389 /wd4701 /wd4702 /wd4706 /I$(WORKSPACE)\AppPkg\Applications\Python\Ia32 /I$(WORKSPACE)\AppPkg\Applications\Python\Efi /I$(WORKSPACE)\AppPkg\Applications\Python\Python-$(PYTHON_VERSION)\Include
    MSFT:*_*_X64_CC_FLAGS          = /Oi- /wd4018 /wd4054 /wd4055 /wd4101 /wd4131 /wd4152 /wd4204 /wd4210 /wd4244 /wd4267 /wd4305 /wd4310 /wd4389 /wd4701 /wd4702 /wd4706 /I$(WORKSPACE)\AppPkg\Applications\Python\X64 /I$(WORKSPACE)\AppPkg\Applications\Python\Efi /I$(WORKSPACE)\AppPkg\Applications\Python\Python-$(PYTHON_VERSION)\Include
+    GCC:*_*_IA32_CC_FLAGS         = -fno-builtin -Wno-format -I$(WORKSPACE)/AppPkg/Applications/Python/Ia32 -I$(WORKSPACE)/AppPkg/Applications/Python/Python-$(PYTHON_VERSION)/Include
+    GCC:*_*_X64_CC_FLAGS          = -Wno-format -I$(WORKSPACE)/AppPkg/Applications/Python/X64 -I$(WORKSPACE)/AppPkg/Applications/Python/Python-$(PYTHON_VERSION)/Include
     GCC:*_*_IPF_SYMRENAME_FLAGS   = --redefine-syms=$(WORKSPACE)/StdLib/GccSymRename.txt

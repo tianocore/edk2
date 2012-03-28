@@ -19,6 +19,8 @@ packages within that distribution.
   1)  There is no input line editing.  Backspace, ^C, etc. do not work.
   2)  All C extension modules must be statically linked (built in)
   3)  The site and os modules must exist as discrete files in ...\lib\python.27
+  4)  User-specific configurations are not supported.
+  5)  Environment variables are not supported.
 
 3. Getting and Building the latest version of Python
 ======================================================
