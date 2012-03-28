@@ -278,7 +278,7 @@ CreatePkX509SignatureList (
   PkCertData = NULL;
   X509DataSize = 0;  
   
-  Status = ReadFileContent (X509File, &X509Data, &X509DataSize, 0);
+  Status = ReadFileContent (X509File, (VOID**) &X509Data, &X509DataSize, 0);
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
@@ -483,7 +483,7 @@ EnrollRsa2048ToKek (
   //                
   Status = ReadFileContent (
              Private->FileContext->FHandle,
-             &KeyBlob,
+             (VOID**) &KeyBlob,
              &KeyBlobSize,
              0
              );
