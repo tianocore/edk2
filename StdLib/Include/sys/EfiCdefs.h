@@ -336,6 +336,11 @@
 
   // Keep compiler quiet about casting from smaller to larger types
   #pragma warning ( disable : 4306 )
+
+  #define __STDC__            1
+  #define __STDC_VERSION__    199409L
+  #define __STDC_HOSTED__     1
+
 #endif  /* defined(_MSC_VER) */
 extern int _fltused;    // VC++ requires this if you use floating point.  KEEP for all compilers.
 
