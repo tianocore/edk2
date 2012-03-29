@@ -1,7 +1,7 @@
 /** @file
   FrontPage routines to handle the callbacks and browser calls
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -30,6 +30,21 @@ extern EFI_FORM_BROWSER2_PROTOCOL      *gFormBrowser2;
 
 extern UINTN    gCallbackKey;
 extern BOOLEAN  gConnectAllHappened;
+
+//
+// Boot video resolution and text mode.
+//
+extern UINT32    mBootHorizontalResolution;
+extern UINT32    mBootVerticalResolution;
+extern UINT32    mBootTextModeColumn;
+extern UINT32    mBootTextModeRow;
+//
+// BIOS setup video resolution and text mode.
+//
+extern UINT32    mSetupTextModeColumn;
+extern UINT32    mSetupTextModeRow;
+extern UINT32    mSetupHorizontalResolution;
+extern UINT32    mSetupVerticalResolution;
 
 
 #define ONE_SECOND  10000000
@@ -237,18 +252,20 @@ PlatformBdsEnterFrontPage (
   );
 
 /**
-  This function will change video resolution and text mode for setup when setup is launched.
+  This function will change video resolution and text mode
+  according to defined setup mode or defined boot mode  
 
-  @param   None.
+  @param  IsSetupMode   Indicate mode is changed to setup mode or boot mode. 
 
   @retval  EFI_SUCCESS  Mode is changed successfully.
-  @retval  Others       Mode failed to changed.
+  @retval  Others             Mode failed to be changed.
 
 **/
+
 EFI_STATUS
 EFIAPI
-ChangeModeForSetup (
-  VOID
+BdsSetConsoleMode (
+  BOOLEAN  IsSetupMode
   );
 
 #endif // _FRONT_PAGE_H_

@@ -1,7 +1,7 @@
 /** @file
   BDS Lib functions which contain all the code to connect console device
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,7 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "InternalBdsLib.h"
 #include <IndustryStandard/Bmp.h>
 
-#include <Protocol/BootLogo.h>
 
 /**
   Check if we need to save the EFI variable with "ConVarName" as name
@@ -896,7 +895,11 @@ EnableQuietBoot (
 
       CoordinateX = 0;
       CoordinateY = 0;
-      Attribute   = EfiBadgingDisplayAttributeCenter;
+      if (!FeaturePcdGet(PcdBootlogoOnlyEnable)) {
+        Attribute   = EfiBadgingDisplayAttributeCenter;
+      } else {
+        Attribute   = EfiBadgingDisplayAttributeCustomized;
+      } 
     }
 
     if (Blt != NULL) {
@@ -968,6 +971,11 @@ EnableQuietBoot (
     case EfiBadgingDisplayAttributeCenter:
       DestX = (SizeOfX - Width) / 2;
       DestY = (SizeOfY - Height) / 2;
+      break;
+
+    case EfiBadgingDisplayAttributeCustomized:
+      DestX = (SizeOfX - Width) / 2;
+      DestY = ((SizeOfY * 382) / 1000) - Height / 2;
       break;
 
     default:
