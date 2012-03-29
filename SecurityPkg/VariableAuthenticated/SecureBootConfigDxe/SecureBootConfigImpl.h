@@ -223,7 +223,7 @@ extern SECUREBOOT_CONFIG_PRIVATE_DATA      mSecureBootConfigPrivateDateTemplate;
 //
 // Cryptograhpic Key Information
 //
-#pragma pack (push, 1)
+#pragma pack(1)
 typedef struct _CPL_KEY_INFO {
   UINT32        KeyLengthInBits;    // Key Length In Bits
   UINT32        BlockSize;          // Operation Block Size in Bytes
@@ -232,7 +232,7 @@ typedef struct _CPL_KEY_INFO {
   UINT32        CipherMode;         // Cipher Mode for Symmetric Algorithm
   UINT32        Flags;              // Additional Key Property Flags
 } CPL_KEY_INFO;
-#pragma pack (pop)
+#pragma pack()
 
 
 /**
