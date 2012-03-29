@@ -1,10 +1,10 @@
 /** @file
   This file implements protocol interfaces for ATA bus driver.
-  
+
   This file implements protocol interfaces: Driver Binding protocol,
   Block IO protocol and DiskInfo protocol.
-    
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -58,7 +58,7 @@ ATA_DEVICE gAtaDeviceTemplate = {
     FALSE,                     // LogicPartition
     FALSE,                     // ReadOnly
     FALSE,                     // WritingCache
-    0x200,                     // BlockSize 
+    0x200,                     // BlockSize
     0,                         // IoAlign
     0,                         // LastBlock
     0,                         // LowestAlignedLba
@@ -87,7 +87,8 @@ ATA_DEVICE gAtaDeviceTemplate = {
   NULL,                        // IdentifyData
   NULL,                        // ControllerNameTable
   {L'\0', },                   // ModelName
-  {NULL, NULL}                 // AtaTaskList
+  {NULL, NULL},                // AtaTaskList
+  {NULL, NULL}                 // AtaSubTaskList
 };
 
 /**
@@ -147,10 +148,11 @@ ReleaseAtaResources (
   IN ATA_DEVICE  *AtaDevice
   )
 {
-  ATA_BUS_ASYN_TASK *Task;
-  LIST_ENTRY        *Entry;
-  LIST_ENTRY        *DelEntry;
-  EFI_TPL           OldTpl;
+  ATA_BUS_ASYN_SUB_TASK *SubTask;
+  ATA_BUS_ASYN_TASK     *AtaTask;
+  LIST_ENTRY            *Entry;
+  LIST_ENTRY            *DelEntry;
+  EFI_TPL               OldTpl;
 
   FreeUnicodeStringTable (AtaDevice->ControllerNameTable);
   FreeAlignedBuffer (AtaDevice->Asb, sizeof (EFI_ATA_STATUS_BLOCK));
@@ -159,19 +161,34 @@ ReleaseAtaResources (
     FreePool (AtaDevice->DevicePath);
   }
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+  if (!IsListEmpty (&AtaDevice->AtaSubTaskList)) {
+    //
+    // Free the Subtask list.
+    //
+    for(Entry = AtaDevice->AtaSubTaskList.ForwardLink;
+        Entry != (&AtaDevice->AtaSubTaskList);
+       ) {
+      DelEntry = Entry;
+      Entry    = Entry->ForwardLink;
+      SubTask  = ATA_AYNS_SUB_TASK_FROM_ENTRY (DelEntry);
+
+      RemoveEntryList (DelEntry);
+      FreeAtaSubTask (SubTask);
+    }
+  }
   if (!IsListEmpty (&AtaDevice->AtaTaskList)) {
     //
     // Free the Subtask list.
     //
-    for(Entry = AtaDevice->AtaTaskList.ForwardLink; 
+    for(Entry = AtaDevice->AtaTaskList.ForwardLink;
         Entry != (&AtaDevice->AtaTaskList);
        ) {
       DelEntry = Entry;
       Entry    = Entry->ForwardLink;
-      Task     = ATA_AYNS_TASK_FROM_ENTRY (DelEntry);
-      
+      AtaTask     = ATA_AYNS_TASK_FROM_ENTRY (DelEntry);
+
       RemoveEntryList (DelEntry);
-      FreeAtaSubTask (Task);
+      FreePool (AtaTask);
     }
   }
   gBS->RestoreTPL (OldTpl);
@@ -183,7 +200,7 @@ ReleaseAtaResources (
   Registers an ATA device.
 
   This function allocates an ATA device structure for the ATA device specified by
-  Port and PortMultiplierPort if the ATA device is identified as a valid one. 
+  Port and PortMultiplierPort if the ATA device is identified as a valid one.
   Then it will create child handle and install Block IO and Disk Info protocol on
   it.
 
@@ -217,7 +234,7 @@ RegisterAtaDevice (
   RemainingDevicePath = NULL;
 
   //
-  // Build device path 
+  // Build device path
   //
   AtaPassThru = AtaBusDriverData->AtaPassThru;
   Status = AtaPassThru->BuildDevicePath (AtaPassThru, Port, PortMultiplierPort, &NewDevicePathNode);
@@ -273,9 +290,10 @@ RegisterAtaDevice (
   // Initial Ata Task List
   //
   InitializeListHead (&AtaDevice->AtaTaskList);
+  InitializeListHead (&AtaDevice->AtaSubTaskList);
 
   //
-  // Try to identify the ATA device via the ATA pass through command. 
+  // Try to identify the ATA device via the ATA pass through command.
   //
   Status = DiscoverAtaDevice (AtaDevice);
   if (EFI_ERROR (Status)) {
@@ -363,7 +381,7 @@ Done:
   }
 
   if (EFI_ERROR (Status) && (AtaDevice != NULL)) {
-    ReleaseAtaResources (AtaDevice);  
+    ReleaseAtaResources (AtaDevice);
     DEBUG ((EFI_D_ERROR | EFI_D_INIT, "Failed to initialize Port %x PortMultiplierPort %x, status = %r\n", Port, PortMultiplierPort, Status));
   }
   return Status;
@@ -373,8 +391,8 @@ Done:
 /**
   Unregisters an ATA device.
 
-  This function removes the protocols installed on the controller handle and 
-  frees the resources allocated for the ATA device. 
+  This function removes the protocols installed on the controller handle and
+  frees the resources allocated for the ATA device.
 
   @param  This                  The pointer to EFI_DRIVER_BINDING_PROTOCOL instance.
   @param  Controller            The controller handle of the ATA device.
@@ -433,7 +451,7 @@ UnregisterAtaDevice (
     AtaDevice = ATA_DEVICE_FROM_BLOCK_IO (BlockIo);
   } else {
     AtaDevice = ATA_DEVICE_FROM_BLOCK_IO2 (BlockIo2);
-  } 
+  }
 
   //
   // Close the child handle
@@ -512,33 +530,33 @@ UnregisterAtaDevice (
 
 
 /**
-  Tests to see if this driver supports a given controller. If a child device is provided, 
+  Tests to see if this driver supports a given controller. If a child device is provided,
   it further tests to see if this driver supports creating a handle for the specified child device.
 
-  This function checks to see if the driver specified by This supports the device specified by 
-  ControllerHandle. Drivers will typically use the device path attached to 
-  ControllerHandle and/or the services from the bus I/O abstraction attached to 
-  ControllerHandle to determine if the driver supports ControllerHandle. This function 
-  may be called many times during platform initialization. In order to reduce boot times, the tests 
-  performed by this function must be very small, and take as little time as possible to execute. This 
-  function must not change the state of any hardware devices, and this function must be aware that the 
-  device specified by ControllerHandle may already be managed by the same driver or a 
-  different driver. This function must match its calls to AllocatePages() with FreePages(), 
-  AllocatePool() with FreePool(), and OpenProtocol() with CloseProtocol().  
-  Since ControllerHandle may have been previously started by the same driver, if a protocol is 
-  already in the opened state, then it must not be closed with CloseProtocol(). This is required 
+  This function checks to see if the driver specified by This supports the device specified by
+  ControllerHandle. Drivers will typically use the device path attached to
+  ControllerHandle and/or the services from the bus I/O abstraction attached to
+  ControllerHandle to determine if the driver supports ControllerHandle. This function
+  may be called many times during platform initialization. In order to reduce boot times, the tests
+  performed by this function must be very small, and take as little time as possible to execute. This
+  function must not change the state of any hardware devices, and this function must be aware that the
+  device specified by ControllerHandle may already be managed by the same driver or a
+  different driver. This function must match its calls to AllocatePages() with FreePages(),
+  AllocatePool() with FreePool(), and OpenProtocol() with CloseProtocol().
+  Since ControllerHandle may have been previously started by the same driver, if a protocol is
+  already in the opened state, then it must not be closed with CloseProtocol(). This is required
   to guarantee the state of ControllerHandle is not modified by this function.
 
   @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in]  ControllerHandle     The handle of the controller to test. This handle 
-                                   must support a protocol interface that supplies 
+  @param[in]  ControllerHandle     The handle of the controller to test. This handle
+                                   must support a protocol interface that supplies
                                    an I/O abstraction to the driver.
-  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This 
-                                   parameter is ignored by device drivers, and is optional for bus 
-                                   drivers. For bus drivers, if this parameter is not NULL, then 
-                                   the bus driver must determine if the bus controller specified 
-                                   by ControllerHandle and the child controller specified 
-                                   by RemainingDevicePath are both supported by this 
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This
+                                   parameter is ignored by device drivers, and is optional for bus
+                                   drivers. For bus drivers, if this parameter is not NULL, then
+                                   the bus driver must determine if the bus controller specified
+                                   by ControllerHandle and the child controller specified
+                                   by RemainingDevicePath are both supported by this
                                    bus driver.
 
   @retval EFI_SUCCESS              The device specified by ControllerHandle and
@@ -626,28 +644,28 @@ AtaBusDriverBindingSupported (
   Starts a device controller or a bus controller.
 
   The Start() function is designed to be invoked from the EFI boot service ConnectController().
-  As a result, much of the error checking on the parameters to Start() has been moved into this 
-  common boot service. It is legal to call Start() from other locations, 
+  As a result, much of the error checking on the parameters to Start() has been moved into this
+  common boot service. It is legal to call Start() from other locations,
   but the following calling restrictions must be followed or the system behavior will not be deterministic.
   1. ControllerHandle must be a valid EFI_HANDLE.
   2. If RemainingDevicePath is not NULL, then it must be a pointer to a naturally aligned
      EFI_DEVICE_PATH_PROTOCOL.
   3. Prior to calling Start(), the Supported() function for the driver specified by This must
-     have been called with the same calling parameters, and Supported() must have returned EFI_SUCCESS.  
+     have been called with the same calling parameters, and Supported() must have returned EFI_SUCCESS.
 
   @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in]  ControllerHandle     The handle of the controller to start. This handle 
-                                   must support a protocol interface that supplies 
+  @param[in]  ControllerHandle     The handle of the controller to start. This handle
+                                   must support a protocol interface that supplies
                                    an I/O abstraction to the driver.
-  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This 
-                                   parameter is ignored by device drivers, and is optional for bus 
-                                   drivers. For a bus driver, if this parameter is NULL, then handles 
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This
+                                   parameter is ignored by device drivers, and is optional for bus
+                                   drivers. For a bus driver, if this parameter is NULL, then handles
                                    for all the children of Controller are created by this driver.
-                                   If this parameter is not NULL and the first Device Path Node is 
-                                   not the End of Device Path Node, then only the handle for the 
-                                   child device specified by the first Device Path Node of 
+                                   If this parameter is not NULL and the first Device Path Node is
+                                   not the End of Device Path Node, then only the handle for the
+                                   child device specified by the first Device Path Node of
                                    RemainingDevicePath is created by this driver.
-                                   If the first Device Path Node of RemainingDevicePath is 
+                                   If the first Device Path Node of RemainingDevicePath is
                                    the End of Device Path Node, no child handle is created by this
                                    driver.
 
@@ -798,10 +816,10 @@ ErrorExit:
 
 /**
   Stops a device controller or a bus controller.
-  
-  The Stop() function is designed to be invoked from the EFI boot service DisconnectController(). 
-  As a result, much of the error checking on the parameters to Stop() has been moved 
-  into this common boot service. It is legal to call Stop() from other locations, 
+
+  The Stop() function is designed to be invoked from the EFI boot service DisconnectController().
+  As a result, much of the error checking on the parameters to Stop() has been moved
+  into this common boot service. It is legal to call Stop() from other locations,
   but the following calling restrictions must be followed or the system behavior will not be deterministic.
   1. ControllerHandle must be a valid EFI_HANDLE that was used on a previous call to this
      same driver's Start() function.
@@ -809,13 +827,13 @@ ErrorExit:
      EFI_HANDLE. In addition, all of these handles must have been created in this driver's
      Start() function, and the Start() function must have called OpenProtocol() on
      ControllerHandle with an Attribute of EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER.
-  
+
   @param[in]  This              A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in]  ControllerHandle  A handle to the device being stopped. The handle must 
-                                support a bus specific I/O protocol for the driver 
+  @param[in]  ControllerHandle  A handle to the device being stopped. The handle must
+                                support a bus specific I/O protocol for the driver
                                 to use to stop the device.
   @param[in]  NumberOfChildren  The number of child device handles in ChildHandleBuffer.
-  @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL 
+  @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL
                                 if NumberOfChildren is 0.
 
   @retval EFI_SUCCESS           The device was stopped.
@@ -924,7 +942,7 @@ AtaBlockIoReset (
   Read/Write BufferSize bytes from Lba from/into Buffer.
 
   @param[in]       This       Indicates a pointer to the calling context. Either be
-                              block I/O or block I/O2. 
+                              block I/O or block I/O2.
   @param[in]       MediaId    The media ID that the read/write request is for.
   @param[in]       Lba        The starting logical block address to be read/written.
                               The caller is responsible for reading/writing to only
@@ -942,7 +960,7 @@ AtaBlockIoReset (
   @retval EFI_NO_MEDIA          There is no media in the device.
   @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
-  @retval EFI_INVALID_PARAMETER The read/write request contains LBAs that are not valid, 
+  @retval EFI_INVALID_PARAMETER The read/write request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
 
 **/
@@ -987,13 +1005,13 @@ BlockIoReadWrite (
 
   if (BufferSize == 0) {
     return EFI_SUCCESS;
-  }  
+  }
 
   BlockSize = Media->BlockSize;
   if ((BufferSize % BlockSize) != 0) {
     return EFI_BAD_BUFFER_SIZE;
   }
-  
+
   NumberOfBlocks  = BufferSize / BlockSize;
   if ((Lba + NumberOfBlocks - 1) > Media->LastBlock) {
     return EFI_INVALID_PARAMETER;
@@ -1005,12 +1023,12 @@ BlockIoReadWrite (
   }
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
-  
+
   //
   // Invoke low level AtaDevice Access Routine.
   //
   Status = AccessAtaDevice (AtaDevice, Buffer, Lba, NumberOfBlocks, IsWrite, Token);
- 
+
   gBS->RestoreTPL (OldTpl);
 
   return Status;
@@ -1032,7 +1050,7 @@ BlockIoReadWrite (
   @retval EFI_NO_MEDIA          There is no media in the device.
   @retval EFI_MEDIA_CHANGED     The MediaId does not matched the current device.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
-  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid, 
+  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
 
 **/
@@ -1066,7 +1084,7 @@ AtaBlockIoReadBlocks (
   @retval EFI_NO_MEDIA          There is no media in the device.
   @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
-  @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid, 
+  @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
 
 **/
@@ -1162,7 +1180,7 @@ AtaBlockIoResetEx (
   @retval EFI_MEDIA_CHANGED     The MediaId is not for the current media.
   @retval EFI_BAD_BUFFER_SIZE   The BufferSize parameter is not a multiple of the
                                 intrinsic block size of the device.
-  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid, 
+  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack
                                 of resources.
@@ -1201,7 +1219,7 @@ AtaBlockIoReadBlocksEx (
   @retval EFI_NO_MEDIA          There is no media in the device.
   @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
-  @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid, 
+  @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
 
 **/
@@ -1249,7 +1267,7 @@ AtaBlockIoFlushBlocksEx (
 }
 /**
   Provides inquiry information for the controller type.
-  
+
   This function is used by the IDE bus driver to get inquiry data.  Data format
   of Identify data is defined by the Interface GUID.
 
@@ -1258,9 +1276,9 @@ AtaBlockIoFlushBlocksEx (
   @param[in, out] InquiryDataSize  Pointer to the value for the inquiry data size.
 
   @retval EFI_SUCCESS            The command was accepted without any errors.
-  @retval EFI_NOT_FOUND          Device does not support this data class 
-  @retval EFI_DEVICE_ERROR       Error reading InquiryData from device 
-  @retval EFI_BUFFER_TOO_SMALL   InquiryDataSize not big enough 
+  @retval EFI_NOT_FOUND          Device does not support this data class
+  @retval EFI_DEVICE_ERROR       Error reading InquiryData from device
+  @retval EFI_BUFFER_TOO_SMALL   InquiryDataSize not big enough
 
 **/
 EFI_STATUS
@@ -1281,16 +1299,16 @@ AtaDiskInfoInquiry (
   This function is used by the IDE bus driver to get identify data.  Data format
   of Identify data is defined by the Interface GUID.
 
-  @param[in]      This              Pointer to the EFI_DISK_INFO_PROTOCOL 
+  @param[in]      This              Pointer to the EFI_DISK_INFO_PROTOCOL
                                     instance.
   @param[in, out] IdentifyData      Pointer to a buffer for the identify data.
   @param[in, out] IdentifyDataSize  Pointer to the value for the identify data
                                     size.
 
   @retval EFI_SUCCESS            The command was accepted without any errors.
-  @retval EFI_NOT_FOUND          Device does not support this data class 
-  @retval EFI_DEVICE_ERROR       Error reading IdentifyData from device 
-  @retval EFI_BUFFER_TOO_SMALL   IdentifyDataSize not big enough 
+  @retval EFI_NOT_FOUND          Device does not support this data class
+  @retval EFI_DEVICE_ERROR       Error reading IdentifyData from device
+  @retval EFI_BUFFER_TOO_SMALL   IdentifyDataSize not big enough
 
 **/
 EFI_STATUS
@@ -1319,8 +1337,8 @@ AtaDiskInfoIdentify (
 
 /**
   Provides sense data information for the controller type.
-  
-  This function is used by the IDE bus driver to get sense data. 
+
+  This function is used by the IDE bus driver to get sense data.
   Data format of Sense data is defined by the Interface GUID.
 
   @param[in]      This             Pointer to the EFI_DISK_INFO_PROTOCOL instance.
@@ -1350,7 +1368,7 @@ AtaDiskInfoSenseData (
 /**
   This function is used by the IDE bus driver to get controller information.
 
-  @param[in]  This         Pointer to the EFI_DISK_INFO_PROTOCOL instance. 
+  @param[in]  This         Pointer to the EFI_DISK_INFO_PROTOCOL instance.
   @param[out] IdeChannel   Pointer to the Ide Channel number.  Primary or secondary.
   @param[out] IdeDevice    Pointer to the Ide Device number.  Master or slave.
 
