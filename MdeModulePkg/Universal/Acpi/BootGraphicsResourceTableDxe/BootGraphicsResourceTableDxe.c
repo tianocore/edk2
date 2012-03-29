@@ -1,7 +1,7 @@
 /** @file
   This module install ACPI Boot Graphics Resource Table (BGRT).
 
-  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -71,6 +71,8 @@ BMP_IMAGE_HEADER  mBmpImageHeaderTemplate = {
 };
 
 BOOLEAN  mAcpiBgrtInstalled = FALSE;
+BOOLEAN  mAcpiBgrtStatusChanged = FALSE;
+BOOLEAN  mAcpiBgrtBufferChanged = FALSE;
 
 EFI_ACPI_5_0_BOOT_GRAPHICS_RESOURCE_TABLE mBootGraphicsResourceTableTemplate = {
   {
@@ -157,15 +159,18 @@ SetBootLogo (
 {
   if (BltBuffer == NULL) {
     mIsLogoValid = FALSE;
+    mAcpiBgrtStatusChanged = TRUE;
     return EFI_SUCCESS;
   }
 
   if (Width == 0 || Height == 0) {
     return EFI_INVALID_PARAMETER;
   }
-
+  
+  mAcpiBgrtBufferChanged = TRUE;
   if (mLogoBltBuffer != NULL) {
     FreePool (mLogoBltBuffer);
+    mLogoBltBuffer = NULL;
   }
 
   mLogoBltBuffer = AllocateCopyPool (
@@ -265,17 +270,11 @@ InstallBootGraphicsResourceTable (
   UINT8                         *ImageBuffer;
   UINTN                         PaddingSize;
   UINTN                         BmpSize;
+  UINTN                         OrigBmpSize;
   UINT8                         *Image;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL *BltPixel;
   UINTN                         Col;
   UINTN                         Row;
-
-  //
-  // Check whether Boot Graphics Resource Table is already installed.
-  //
-  if (mAcpiBgrtInstalled) {
-    return EFI_SUCCESS;
-  }
 
   //
   // Get ACPI Table protocol.
@@ -286,33 +285,68 @@ InstallBootGraphicsResourceTable (
   }
 
   //
-  // Check whether Logo exist.
+  // Check whether Boot Graphics Resource Table is already installed.
   //
-  if (mLogoBltBuffer == NULL) {
-    return EFI_NOT_FOUND;
+  if (mAcpiBgrtInstalled) {
+    if (!mAcpiBgrtStatusChanged && !mAcpiBgrtBufferChanged) {
+      //
+      // Nothing has changed
+      //
+      return EFI_SUCCESS;
+    } else {
+      //
+      // If BGRT data change happens. Uninstall Orignal AcpiTable first
+      //
+      Status = AcpiTableProtocol->UninstallAcpiTable (
+                                    AcpiTableProtocol,
+                                    mBootGraphicsResourceTableKey
+                                    );
+      if (EFI_ERROR (Status)) {
+        return Status;
+      } 
+    }
+  } else {
+    //
+    // Check whether Logo exist.
+    //
+    if ( mLogoBltBuffer == NULL) {
+      return EFI_NOT_FOUND;
+    }
   }
 
-  //
-  // Allocate memory for BMP file.
-  //
-  PaddingSize = mLogoWidth & 0x3;
-  BmpSize = (mLogoWidth * 3 + PaddingSize) * mLogoHeight + sizeof (BMP_IMAGE_HEADER);
-  ImageBuffer = BgrtAllocateReservedMemoryBelow4G (BmpSize);
-  if (ImageBuffer == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
+  if (mAcpiBgrtBufferChanged) {
+    //
+    // reserve original BGRT buffer size
+    //
+    OrigBmpSize = mBmpImageHeaderTemplate.ImageSize + sizeof (BMP_IMAGE_HEADER);
+    //
+    // Free orignal BMP memory 
+    // 
+    if (mBootGraphicsResourceTableTemplate.ImageAddress) {
+      gBS->FreePages(mBootGraphicsResourceTableTemplate.ImageAddress, EFI_SIZE_TO_PAGES(OrigBmpSize));
+    }
 
-  mBmpImageHeaderTemplate.Size = (UINT32) BmpSize;
-  mBmpImageHeaderTemplate.ImageSize = (UINT32) BmpSize - sizeof (BMP_IMAGE_HEADER);
-  mBmpImageHeaderTemplate.PixelWidth = (UINT32) mLogoWidth;
-  mBmpImageHeaderTemplate.PixelHeight = (UINT32) mLogoHeight;
-  CopyMem (ImageBuffer, &mBmpImageHeaderTemplate, sizeof (BMP_IMAGE_HEADER));
+    //
+    // Allocate memory for BMP file.
+    //
+    PaddingSize = mLogoWidth & 0x3;
+    BmpSize = (mLogoWidth * 3 + PaddingSize) * mLogoHeight + sizeof (BMP_IMAGE_HEADER);
+    ImageBuffer = BgrtAllocateReservedMemoryBelow4G (BmpSize);
+    if (ImageBuffer == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
 
-  //
-  // Convert BLT buffer to BMP file.
-  //
-  Image = ImageBuffer + sizeof (BMP_IMAGE_HEADER);
-  for (Row = 0; Row < mLogoHeight; Row++) {
+    mBmpImageHeaderTemplate.Size = (UINT32) BmpSize;
+    mBmpImageHeaderTemplate.ImageSize = (UINT32) BmpSize - sizeof (BMP_IMAGE_HEADER);
+    mBmpImageHeaderTemplate.PixelWidth = (UINT32) mLogoWidth;
+    mBmpImageHeaderTemplate.PixelHeight = (UINT32) mLogoHeight;
+    CopyMem (ImageBuffer, &mBmpImageHeaderTemplate, sizeof (BMP_IMAGE_HEADER));
+    
+    //
+    // Convert BLT buffer to BMP file.
+    //
+    Image = ImageBuffer + sizeof (BMP_IMAGE_HEADER);
+    for (Row = 0; Row < mLogoHeight; Row++) {
     BltPixel = &mLogoBltBuffer[(mLogoHeight - Row - 1) * mLogoWidth];
 
     for (Col = 0; Col < mLogoWidth; Col++) {
@@ -322,18 +356,20 @@ InstallBootGraphicsResourceTable (
       BltPixel++;
     }
 
-    //
-    // Padding for 4 byte alignment.
-    //
-    Image += PaddingSize;
+      //
+      // Padding for 4 byte alignment.
+      //
+      Image += PaddingSize;
+    }
+    FreePool (mLogoBltBuffer);
+    mLogoBltBuffer = NULL;
+
+    mBootGraphicsResourceTableTemplate.ImageAddress = (UINT64) (UINTN) ImageBuffer;
+    mBootGraphicsResourceTableTemplate.ImageOffsetX = (UINT32) mLogoDestX;
+    mBootGraphicsResourceTableTemplate.ImageOffsetY = (UINT32) mLogoDestY;
   }
-  FreePool (mLogoBltBuffer);
-  mLogoBltBuffer = NULL;
 
   mBootGraphicsResourceTableTemplate.Status = (UINT8) (mIsLogoValid ? EFI_ACPI_5_0_BGRT_STATUS_VALID : EFI_ACPI_5_0_BGRT_STATUS_INVALID);
-  mBootGraphicsResourceTableTemplate.ImageAddress = (UINT64) (UINTN) ImageBuffer;
-  mBootGraphicsResourceTableTemplate.ImageOffsetX = (UINT32) mLogoDestX;
-  mBootGraphicsResourceTableTemplate.ImageOffsetY = (UINT32) mLogoDestY;
 
   //
   // Update Checksum.
@@ -354,6 +390,9 @@ InstallBootGraphicsResourceTable (
   }
 
   mAcpiBgrtInstalled = TRUE;
+  mAcpiBgrtStatusChanged = FALSE;
+  mAcpiBgrtBufferChanged = FALSE;
+  
   return Status;
 }
 
