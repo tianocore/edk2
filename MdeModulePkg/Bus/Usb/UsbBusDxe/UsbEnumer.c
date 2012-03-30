@@ -680,7 +680,7 @@ UsbEnumerateNewDev (
   }
 
   if (!USB_BIT_IS_SET (PortState.PortStatus, USB_PORT_STAT_CONNECTION)) {
-    DEBUG ((EFI_D_ERROR, "UsbEnumerateNewDev: No device presented at port %d\n", Port));
+    DEBUG ((EFI_D_ERROR, "UsbEnumerateNewDev: No device present at port %d\n", Port));
     goto ON_ERROR;
   } else if (USB_BIT_IS_SET (PortState.PortStatus, USB_PORT_STAT_SUPER_SPEED)){
     Child->Speed      = EFI_USB_SPEED_SUPER;
@@ -907,7 +907,7 @@ UsbEnumeratePort (
     // Case4:
     //   Device connected or disconnected normally. 
     //
-    DEBUG ((EFI_D_ERROR, "UsbEnumeratePort: Device Connect/Discount Normally\n", Port));
+    DEBUG ((EFI_D_ERROR, "UsbEnumeratePort: Device Connect/Disconnect Normally\n", Port));
   }
 
   // 
