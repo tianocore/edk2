@@ -120,9 +120,9 @@ FtwVariableSpace (
   This code finds variable in storage blocks of volatile and non-volatile storage areas.
   If VariableName is an empty string, then we just return the first
   qualified variable without comparing VariableName and VendorGuid.
-  If IgnoreRtAttribute is TRUE, then we ignore the EFI_VARIABLE_RUNTIME_ACCESS Attribute
-  when searching existing variable, only VariableName and VendorGuid are compared.
-  Otherwise, variables with EFI_VARIABLE_RUNTIME_ACCESS are not visible at runtime.
+  If IgnoreRtCheck is TRUE, then we ignore the EFI_VARIABLE_RUNTIME_ACCESS attribute check
+  at runtime when searching existing variable, only VariableName and VendorGuid are compared.
+  Otherwise, variables without EFI_VARIABLE_RUNTIME_ACCESS are not visible at runtime.
 
   @param[in]   VariableName           Name of the variable to be found.
   @param[in]   VendorGuid             Vendor GUID to be found.
@@ -131,7 +131,8 @@ FtwVariableSpace (
   @param[in]   Global                 Pointer to VARIABLE_GLOBAL structure, including
                                       base of volatile variable storage area, base of
                                       NV variable storage area, and a lock.
-  @param[in]   IgnoreRtAttribute      Ignore RUNTIME_ACCESS attribute when searching variable.
+  @param[in]   IgnoreRtCheck          Ignore EFI_VARIABLE_RUNTIME_ACCESS attribute
+                                      check at runtime when searching variable.
 
   @retval EFI_INVALID_PARAMETER       If VariableName is not an empty string, while
                                       VendorGuid is NULL.
@@ -145,7 +146,7 @@ FindVariable (
   IN  EFI_GUID                *VendorGuid,
   OUT VARIABLE_POINTER_TRACK  *PtrTrack,
   IN  VARIABLE_GLOBAL         *Global,
-  IN  BOOLEAN                 IgnoreRtAttribute
+  IN  BOOLEAN                 IgnoreRtCheck
   );
 
 /**

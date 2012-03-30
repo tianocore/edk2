@@ -720,7 +720,8 @@ Reclaim (
 
   @param[in]       VariableName        Name of the variable to be found
   @param[in]       VendorGuid          Vendor GUID to be found.
-  @param[in]       IgnoreRtAttribute   Ignore RUNTIME_ACCESS attribute when searching variable.
+  @param[in]       IgnoreRtCheck       Ignore EFI_VARIABLE_RUNTIME_ACCESS attribute
+                                       check at runtime when searching variable.
   @param[in, out]  PtrTrack            Variable Track Pointer structure that contains Variable Information.
 
   @retval          EFI_SUCCESS         Variable found successfully
@@ -730,7 +731,7 @@ EFI_STATUS
 FindVariableEx (
   IN     CHAR16                  *VariableName,
   IN     EFI_GUID                *VendorGuid,
-  IN     BOOLEAN                 IgnoreRtAttribute,
+  IN     BOOLEAN                 IgnoreRtCheck,
   IN OUT VARIABLE_POINTER_TRACK  *PtrTrack
   )
 {
@@ -749,7 +750,7 @@ FindVariableEx (
     if (PtrTrack->CurrPtr->State == VAR_ADDED ||
         PtrTrack->CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)
        ) {
-      if (IgnoreRtAttribute || !AtRuntime () || ((PtrTrack->CurrPtr->Attributes & EFI_VARIABLE_RUNTIME_ACCESS) != 0)) {
+      if (IgnoreRtCheck || !AtRuntime () || ((PtrTrack->CurrPtr->Attributes & EFI_VARIABLE_RUNTIME_ACCESS) != 0)) {
         if (VariableName[0] == 0) {
           if (PtrTrack->CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
             InDeletedVariable   = PtrTrack->CurrPtr;
@@ -785,9 +786,9 @@ FindVariableEx (
   This code finds variable in storage blocks of volatile and non-volatile storage areas.
   If VariableName is an empty string, then we just return the first
   qualified variable without comparing VariableName and VendorGuid.
-  If IgnoreRtAttribute is TRUE, then we ignore the EFI_VARIABLE_RUNTIME_ACCESS Attribute
-  when searching existing variable, only VariableName and VendorGuid are compared.
-  Otherwise, variables with EFI_VARIABLE_RUNTIME_ACCESS are not visible at runtime.
+  If IgnoreRtCheck is TRUE, then we ignore the EFI_VARIABLE_RUNTIME_ACCESS attribute check
+  at runtime when searching existing variable, only VariableName and VendorGuid are compared.
+  Otherwise, variables without EFI_VARIABLE_RUNTIME_ACCESS are not visible at runtime.
 
   @param[in]   VariableName           Name of the variable to be found.
   @param[in]   VendorGuid             Vendor GUID to be found.
@@ -796,7 +797,8 @@ FindVariableEx (
   @param[in]   Global                 Pointer to VARIABLE_GLOBAL structure, including
                                       base of volatile variable storage area, base of
                                       NV variable storage area, and a lock.
-  @param[in]   IgnoreRtAttribute      Ignore RUNTIME_ACCESS attribute when searching variable.
+  @param[in]   IgnoreRtCheck          Ignore EFI_VARIABLE_RUNTIME_ACCESS attribute
+                                      check at runtime when searching variable.
 
   @retval EFI_INVALID_PARAMETER       If VariableName is not an empty string, while
                                       VendorGuid is NULL.
@@ -810,7 +812,7 @@ FindVariable (
   IN  EFI_GUID                *VendorGuid,
   OUT VARIABLE_POINTER_TRACK  *PtrTrack,
   IN  VARIABLE_GLOBAL         *Global,
-  IN  BOOLEAN                 IgnoreRtAttribute
+  IN  BOOLEAN                 IgnoreRtCheck
   )
 {
   EFI_STATUS              Status;
@@ -842,7 +844,7 @@ FindVariable (
     PtrTrack->EndPtr   = GetEndPointer   (VariableStoreHeader[Type]);
     PtrTrack->Volatile = (BOOLEAN) (Type == VariableStoreTypeVolatile);
 
-    Status = FindVariableEx (VariableName, VendorGuid, IgnoreRtAttribute, PtrTrack);
+    Status = FindVariableEx (VariableName, VendorGuid, IgnoreRtCheck, PtrTrack);
     if (!EFI_ERROR (Status)) {
       return Status;
     }
