@@ -1575,6 +1575,50 @@ X509StackFree (
   );
 
 /**
+  Get the signer's certificates from PKCS#7 signed data as described in "PKCS #7:
+  Cryptographic Message Syntax Standard". The input signed data could be wrapped
+  in a ContentInfo structure.
+
+  If P7Data, CertStack, StackLength, TrustedCert or CertLength is NULL, then
+  return FALSE. If P7Length overflow, then return FAlSE.
+
+  @param[in]  P7Data       Pointer to the PKCS#7 message to verify.
+  @param[in]  P7Length     Length of the PKCS#7 message in bytes.
+  @param[out] CertStack    Pointer to Signer's certificates retrieved from P7Data.
+                           It's caller's responsiblity to free the buffer.
+  @param[out] StackLength  Length of signer's certificates in bytes.
+  @param[out] TrustedCert  Pointer to a trusted certificate from Signer's certificates.
+                           It's caller's responsiblity to free the buffer.
+  @param[out] CertLength   Length of the trusted certificate in bytes.
+
+  @retval  TRUE            The operation is finished successfully.
+  @retval  FALSE           Error occurs during the operation.
+
+**/
+BOOLEAN
+EFIAPI
+Pkcs7GetSigners (
+  IN  CONST UINT8  *P7Data,
+  IN  UINTN        P7Length,
+  OUT UINT8        **CertStack,
+  OUT UINTN        *StackLength,
+  OUT UINT8        **TrustedCert,
+  OUT UINTN        *CertLength
+  );
+
+/**
+  Wrap function to use free() to free allocated memory for certificates.
+
+  @param[in]  Certs        Pointer to the certificates to be freed.
+
+**/
+VOID
+EFIAPI
+Pkcs7FreeSigners (
+  IN  UINT8        *Certs
+  );
+
+/**
   Creates a PKCS#7 signedData as described in "PKCS #7: Cryptographic Message
   Syntax Standard, version 1.5". This interface is only intended to be used for
   application to perform PKCS#7 functionality validation.
@@ -1612,18 +1656,20 @@ Pkcs7Sign (
   );
 
 /**
-  Verifies the validility of a PKCS#7 signed data as described in "PKCS #7: Cryptographic
-  Message Syntax Standard".
+  Verifies the validility of a PKCS#7 signed data as described in "PKCS #7:
+  Cryptographic Message Syntax Standard". The input signed data could be wrapped
+  in a ContentInfo structure.
 
-  If P7Data is NULL, then return FALSE.
+  If P7Data, TrustedCert or InData is NULL, then return FALSE.
+  If P7Length, CertLength or DataLength overflow, then return FAlSE.
 
   @param[in]  P7Data       Pointer to the PKCS#7 message to verify.
-  @param[in]  P7Size       Size of the PKCS#7 message in bytes.
+  @param[in]  P7Length     Length of the PKCS#7 message in bytes.
   @param[in]  TrustedCert  Pointer to a trusted/root certificate encoded in DER, which
                            is used for certificate chain verification.
-  @param[in]  CertSize     Size of the trusted certificate in bytes.
+  @param[in]  CertLength   Length of the trusted certificate in bytes.
   @param[in]  InData       Pointer to the content to be verified.
-  @param[in]  DataSize     Size of InData in bytes.
+  @param[in]  DataLength   Length of InData in bytes.
 
   @retval  TRUE  The specified PKCS#7 signed data is valid.
   @retval  FALSE Invalid PKCS#7 signed data.
@@ -1633,11 +1679,11 @@ BOOLEAN
 EFIAPI
 Pkcs7Verify (
   IN  CONST UINT8  *P7Data,
-  IN  UINTN        P7Size,
+  IN  UINTN        P7Length,
   IN  CONST UINT8  *TrustedCert,
-  IN  UINTN        CertSize,
+  IN  UINTN        CertLength,
   IN  CONST UINT8  *InData,
-  IN  UINTN        DataSize
+  IN  UINTN        DataLength
   );
 
 /**
