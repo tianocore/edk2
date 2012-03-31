@@ -50,6 +50,15 @@ extern EFI_GUID gEfiCustomModeEnableGuid;
 #define STANDARD_SECURE_BOOT_MODE     0
 
 ///
+/// "certdb" variable stores the signer's certificates for non PK/KEK/DB/DBX
+/// variables with EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set.
+/// 
+///
+#define EFI_CERT_DB_NAME L"certdb"
+
+extern EFI_GUID gEfiCertDbGuid;
+
+///
 /// Alignment of variable name and data, according to the architecture:
 /// * For IA-32 and Intel(R) 64 architectures: 1.
 /// * For IA-64 architecture: 8.

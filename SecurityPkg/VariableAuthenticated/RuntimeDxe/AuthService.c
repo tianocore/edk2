@@ -164,6 +164,7 @@ AutenticatedVariableServiceInitialize (
   UINT8                   SecureBootMode;
   UINT8                   SecureBootEnable;
   UINT8                   CustomMode;
+  UINT32                  ListSize;
 
   //
   // Initialize hash context.
@@ -387,6 +388,36 @@ AutenticatedVariableServiceInitialize (
   }
   
   DEBUG ((EFI_D_INFO, "Variable %s is %x\n", EFI_CUSTOM_MODE_NAME, CustomMode));
+
+  //
+  // Check "certdb" variable's existence.
+  // If it doesn't exist, then create a new one with 
+  // EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set.
+  //
+  Status = FindVariable (
+             EFI_CERT_DB_NAME,
+             &gEfiCertDbGuid,
+             &Variable,
+             &mVariableModuleGlobal->VariableGlobal,
+             FALSE
+             );
+
+  if (Variable.CurrPtr == NULL) {
+    VarAttr  = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
+    ListSize = 0;
+    Status   = UpdateVariable (
+                 EFI_CERT_DB_NAME,
+                 &gEfiCertDbGuid,
+                 &ListSize,
+                 sizeof (UINT32),
+                 VarAttr,
+                 0,
+                 0,
+                 &Variable,
+                 NULL
+                 );
+
+  }  
 
   return Status;
 }
@@ -887,7 +918,16 @@ ProcessVarWithPk (
       // Verify against X509 Cert PK.
       //
       Del    = FALSE;
-      Status = VerifyTimeBasedPayload (VariableName, VendorGuid, Data, DataSize, Variable, Attributes, TRUE, &Del);
+      Status = VerifyTimeBasedPayload (
+                 VariableName,
+                 VendorGuid,
+                 Data,
+                 DataSize,
+                 Variable,
+                 Attributes,
+                 AuthVarTypePk,
+                 &Del
+                 );
       if (!EFI_ERROR (Status)) {
         //
         // If delete PK in user mode, need change to setup mode.
@@ -1084,7 +1124,16 @@ ProcessVarWithKek (
       //
       // Time-based, verify against X509 Cert KEK.
       //
-      return VerifyTimeBasedPayload (VariableName, VendorGuid, Data, DataSize, Variable, Attributes, FALSE, NULL);
+      return VerifyTimeBasedPayload (
+               VariableName,
+               VendorGuid,
+               Data,
+               DataSize,
+               Variable,
+               Attributes,
+               AuthVarTypeKek,
+               NULL
+               );
     } else if ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) {
       //
       // Counter-based, verify against RSA2048 Cert KEK.
@@ -1255,7 +1304,16 @@ ProcessVariable (
   // Process Time-based Authenticated variable.
   //
   if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
-    return VerifyTimeBasedPayload (VariableName, VendorGuid, Data, DataSize, Variable, Attributes, FALSE, NULL);
+    return VerifyTimeBasedPayload (
+             VariableName,
+             VendorGuid,
+             Data,
+             DataSize,
+             Variable,
+             Attributes,
+             AuthVarTypePriv,
+             NULL
+             );
   }
 
   //
@@ -1490,6 +1548,470 @@ CompareTimeStamp (
 }
 
 /**
+  Find matching signer's certificates for common authenticated variable
+  by corresponding VariableName and VendorGuid from "certdb".
+
+  The data format of "certdb":
+  //
+  //     UINT32 CertDbListSize;
+  // /// AUTH_CERT_DB_DATA Certs1[];
+  // /// AUTH_CERT_DB_DATA Certs2[];
+  // /// ...
+  // /// AUTH_CERT_DB_DATA Certsn[];
+  //
+
+  @param[in]  VariableName   Name of authenticated Variable.
+  @param[in]  VendorGuid     Vendor GUID of authenticated Variable.
+  @param[in]  Data           Pointer to variable "certdb".
+  @param[in]  DataSize       Size of variable "certdb".
+  @param[out] CertOffset     Offset of matching CertData, from starting of Data.
+  @param[out] CertDataSize   Length of CertData in bytes.
+  @param[out] CertNodeOffset Offset of matching AUTH_CERT_DB_DATA , from
+                             starting of Data.
+  @param[out] CertNodeSize   Length of AUTH_CERT_DB_DATA in bytes.
+
+  @retval  EFI_INVALID_PARAMETER Any input parameter is invalid.
+  @retval  EFI_NOT_FOUND         Fail to find matching certs.
+  @retval  EFI_SUCCESS           Find matching certs and output parameters.
+
+**/
+EFI_STATUS
+FindCertsFromDb (
+  IN     CHAR16           *VariableName,
+  IN     EFI_GUID         *VendorGuid,
+  IN     UINT8            *Data,
+  IN     UINTN            DataSize,
+  OUT    UINT32           *CertOffset,    OPTIONAL
+  OUT    UINT32           *CertDataSize,  OPTIONAL
+  OUT    UINT32           *CertNodeOffset,OPTIONAL
+  OUT    UINT32           *CertNodeSize   OPTIONAL
+  )
+{
+  UINT32                  Offset;
+  AUTH_CERT_DB_DATA       *Ptr;
+  UINT32                  CertSize;
+  UINT32                  NameSize;
+  UINT32                  NodeSize;
+  UINT32                  CertDbListSize;
+
+  if ((VariableName == NULL) || (VendorGuid == NULL) || (Data == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check whether DataSize matches recorded CertDbListSize.
+  //
+  if (DataSize < sizeof (UINT32)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  CertDbListSize = ReadUnaligned32 ((UINT32 *) Data);
+
+  if (CertDbListSize != (UINT32) DataSize) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Offset = sizeof (UINT32);
+
+  //
+  // Get corresponding certificates by VendorGuid and VariableName.
+  //
+  while (Offset < (UINT32) DataSize) {
+    Ptr = (AUTH_CERT_DB_DATA *) (Data + Offset);
+    //
+    // Check whether VendorGuid matches.
+    //
+    if (CompareGuid (&Ptr->VendorGuid, VendorGuid)) {
+      NodeSize = ReadUnaligned32 (&Ptr->CertNodeSize);
+      NameSize = ReadUnaligned32 (&Ptr->NameSize);
+      CertSize = ReadUnaligned32 (&Ptr->CertDataSize);
+
+      if (NodeSize != sizeof (EFI_GUID) + sizeof (UINT32) * 3 + CertSize +
+          sizeof (CHAR16) * NameSize) {
+        return EFI_INVALID_PARAMETER;
+      }
+
+      Offset = Offset + sizeof (EFI_GUID) + sizeof (UINT32) * 3;
+      //
+      // Check whether VariableName matches.
+      //
+      if ((NameSize == StrLen (VariableName)) && 
+          (CompareMem (Data + Offset, VariableName, NameSize * sizeof (CHAR16)) == 0)) {
+        Offset = Offset + NameSize * sizeof (CHAR16);
+
+        if (CertOffset != NULL) {
+          *CertOffset = Offset;
+        }
+
+        if (CertDataSize != NULL) {
+          *CertDataSize = CertSize;        
+        }
+
+        if (CertNodeOffset != NULL) {
+          *CertNodeOffset = (UINT32) ((UINT8 *) Ptr - Data);
+        }
+
+        if (CertNodeSize != NULL) {
+          *CertNodeSize = NodeSize;
+        }
+
+        return EFI_SUCCESS;
+      } else {
+        Offset = Offset + NameSize * sizeof (CHAR16) + CertSize;
+      }
+    } else {
+      NodeSize = ReadUnaligned32 (&Ptr->CertNodeSize);
+      Offset   = Offset + NodeSize;
+    }
+  }
+
+  return EFI_NOT_FOUND;  
+}
+
+/**
+  Retrieve signer's certificates for common authenticated variable
+  by corresponding VariableName and VendorGuid from "certdb".
+
+  @param[in]  VariableName   Name of authenticated Variable.
+  @param[in]  VendorGuid     Vendor GUID of authenticated Variable.
+  @param[out] CertData       Pointer to signer's certificates.
+  @param[out] CertDataSize   Length of CertData in bytes.
+
+  @retval  EFI_INVALID_PARAMETER Any input parameter is invalid.
+  @retval  EFI_NOT_FOUND         Fail to find "certdb" or matching certs.
+  @retval  EFI_SUCCESS           Get signer's certificates successfully.
+
+**/
+EFI_STATUS
+GetCertsFromDb (
+  IN     CHAR16           *VariableName,
+  IN     EFI_GUID         *VendorGuid,
+  OUT    UINT8            **CertData,
+  OUT    UINT32           *CertDataSize
+  )
+{
+  VARIABLE_POINTER_TRACK  CertDbVariable;
+  EFI_STATUS              Status;
+  UINT8                   *Data;
+  UINTN                   DataSize;
+  UINT32                  CertOffset;
+
+  if ((VariableName == NULL) || (VendorGuid == NULL) || (CertData == NULL) || (CertDataSize == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  //
+  // Get variable "certdb".
+  //
+  Status = FindVariable (
+             EFI_CERT_DB_NAME,
+             &gEfiCertDbGuid,
+             &CertDbVariable,
+             &mVariableModuleGlobal->VariableGlobal,
+             FALSE
+             );      
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  DataSize  = DataSizeOfVariable (CertDbVariable.CurrPtr);
+  Data      = GetVariableDataPtr (CertDbVariable.CurrPtr);
+  if ((DataSize == 0) || (Data == NULL)) {
+    ASSERT (FALSE);
+    return EFI_NOT_FOUND;
+  }
+
+  Status = FindCertsFromDb (
+             VariableName,
+             VendorGuid,
+             Data,
+             DataSize,
+             &CertOffset,
+             CertDataSize,
+             NULL,
+             NULL
+             );
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  *CertData = Data + CertOffset;
+  return EFI_SUCCESS;
+}
+
+/**
+  Delete matching signer's certificates when deleting common authenticated
+  variable by corresponding VariableName and VendorGuid from "certdb".
+
+  @param[in]  VariableName   Name of authenticated Variable.
+  @param[in]  VendorGuid     Vendor GUID of authenticated Variable.
+
+  @retval  EFI_INVALID_PARAMETER Any input parameter is invalid.
+  @retval  EFI_NOT_FOUND         Fail to find "certdb" or matching certs.
+  @retval  EFI_OUT_OF_RESOURCES  The operation is failed due to lack of resources.
+  @retval  EFI_SUCCESS           The operation is completed successfully.
+
+**/
+EFI_STATUS
+DeleteCertsFromDb (
+  IN     CHAR16           *VariableName,
+  IN     EFI_GUID         *VendorGuid
+  )
+{
+  VARIABLE_POINTER_TRACK  CertDbVariable;
+  EFI_STATUS              Status;
+  UINT8                   *Data;
+  UINTN                   DataSize;
+  UINT32                  VarAttr;
+  UINT32                  CertNodeOffset;
+  UINT32                  CertNodeSize;
+  UINT8                   *NewCertDb;
+  UINT32                  NewCertDbSize;
+
+  if ((VariableName == NULL) || (VendorGuid == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  //
+  // Get variable "certdb".
+  //
+  Status = FindVariable (
+             EFI_CERT_DB_NAME,
+             &gEfiCertDbGuid,
+             &CertDbVariable,
+             &mVariableModuleGlobal->VariableGlobal,
+             FALSE
+             );      
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  DataSize  = DataSizeOfVariable (CertDbVariable.CurrPtr);
+  Data      = GetVariableDataPtr (CertDbVariable.CurrPtr);
+  if ((DataSize == 0) || (Data == NULL)) {
+    ASSERT (FALSE);
+    return EFI_NOT_FOUND;
+  }
+
+  if (DataSize == sizeof (UINT32)) {
+    //
+    // There is no certs in certdb.
+    //
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Get corresponding cert node from certdb.
+  //
+  Status = FindCertsFromDb (
+             VariableName,
+             VendorGuid,
+             Data,
+             DataSize,
+             NULL,
+             NULL,
+             &CertNodeOffset,
+             &CertNodeSize
+             );
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (DataSize < (CertNodeOffset + CertNodeSize)) {
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // Construct new data content of variable "certdb".
+  //
+  NewCertDbSize = (UINT32) DataSize - CertNodeSize;
+  NewCertDb     = AllocateZeroPool (NewCertDbSize);
+  if (NewCertDb == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Copy the DB entries before deleting node.
+  //
+  CopyMem (NewCertDb, Data, CertNodeOffset);
+  //
+  // Update CertDbListSize.
+  //
+  CopyMem (NewCertDb, &NewCertDbSize, sizeof (UINT32));
+  //
+  // Copy the DB entries after deleting node.
+  //
+  if (DataSize > (CertNodeOffset + CertNodeSize)) {
+    CopyMem (
+      NewCertDb + CertNodeOffset,
+      Data + CertNodeOffset + CertNodeSize,
+      DataSize - CertNodeOffset - CertNodeSize
+      );
+  }
+
+  //
+  // Set "certdb".
+  // 
+  VarAttr  = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;  
+  Status   = UpdateVariable (
+               EFI_CERT_DB_NAME,
+               &gEfiCertDbGuid,
+               NewCertDb,
+               NewCertDbSize,
+               VarAttr,
+               0,
+               0,
+               &CertDbVariable,
+               NULL
+               );
+
+  FreePool (NewCertDb);
+  return Status;
+}
+
+/**
+  Insert signer's certificates for common authenticated variable with VariableName
+  and VendorGuid in AUTH_CERT_DB_DATA to "certdb".
+
+  @param[in]  VariableName   Name of authenticated Variable.
+  @param[in]  VendorGuid     Vendor GUID of authenticated Variable.
+  @param[in]  CertData       Pointer to signer's certificates.
+  @param[in]  CertDataSize   Length of CertData in bytes.
+
+  @retval  EFI_INVALID_PARAMETER Any input parameter is invalid.
+  @retval  EFI_ACCESS_DENIED     An AUTH_CERT_DB_DATA entry with same VariableName
+                                 and VendorGuid already exists.
+  @retval  EFI_OUT_OF_RESOURCES  The operation is failed due to lack of resources.
+  @retval  EFI_SUCCESS           Insert an AUTH_CERT_DB_DATA entry to "certdb"
+
+**/
+EFI_STATUS
+InsertCertsToDb (
+  IN     CHAR16           *VariableName,
+  IN     EFI_GUID         *VendorGuid,
+  IN     UINT8            *CertData,
+  IN     UINTN            CertDataSize
+  )
+{
+  VARIABLE_POINTER_TRACK  CertDbVariable;
+  EFI_STATUS              Status;
+  UINT8                   *Data;
+  UINTN                   DataSize;
+  UINT32                  VarAttr;
+  UINT8                   *NewCertDb;
+  UINT32                  NewCertDbSize;
+  UINT32                  CertNodeSize;
+  UINT32                  NameSize;
+  AUTH_CERT_DB_DATA       *Ptr;
+
+  if ((VariableName == NULL) || (VendorGuid == NULL) || (CertData == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  //
+  // Get variable "certdb".
+  //
+  Status = FindVariable (
+             EFI_CERT_DB_NAME,
+             &gEfiCertDbGuid,
+             &CertDbVariable,
+             &mVariableModuleGlobal->VariableGlobal,
+             FALSE
+             );      
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  DataSize  = DataSizeOfVariable (CertDbVariable.CurrPtr);
+  Data      = GetVariableDataPtr (CertDbVariable.CurrPtr);
+  if ((DataSize == 0) || (Data == NULL)) {
+    ASSERT (FALSE);
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // Find whether matching cert node already exists in "certdb".
+  // If yes return error.
+  //
+  Status = FindCertsFromDb (
+             VariableName,
+             VendorGuid,
+             Data,
+             DataSize,
+             NULL,
+             NULL,
+             NULL,
+             NULL
+             );
+
+  if (!EFI_ERROR (Status)) {
+    ASSERT (FALSE);
+    return EFI_ACCESS_DENIED;
+  }
+
+  //
+  // Construct new data content of variable "certdb".
+  //
+  NameSize      = (UINT32) StrLen (VariableName);
+  CertNodeSize  = sizeof (AUTH_CERT_DB_DATA) + (UINT32) CertDataSize + NameSize * sizeof (CHAR16); 
+  NewCertDbSize = (UINT32) DataSize + CertNodeSize;                  
+  NewCertDb     = AllocateZeroPool (NewCertDbSize);
+  if (NewCertDb == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Copy the DB entries before deleting node.
+  //
+  CopyMem (NewCertDb, Data, DataSize);
+  //
+  // Update CertDbListSize.
+  //
+  CopyMem (NewCertDb, &NewCertDbSize, sizeof (UINT32));
+  //
+  // Construct new cert node.
+  //
+  Ptr = (AUTH_CERT_DB_DATA *) (NewCertDb + DataSize);
+  CopyGuid (&Ptr->VendorGuid, VendorGuid);
+  CopyMem (&Ptr->CertNodeSize, &CertNodeSize, sizeof (UINT32));
+  CopyMem (&Ptr->NameSize, &NameSize, sizeof (UINT32));
+  CopyMem (&Ptr->CertDataSize, &CertDataSize, sizeof (UINT32));
+  
+  CopyMem (
+    (UINT8 *) Ptr + sizeof (AUTH_CERT_DB_DATA),
+    VariableName,
+    NameSize * sizeof (CHAR16)
+    );
+
+  CopyMem (
+    (UINT8 *) Ptr +  sizeof (AUTH_CERT_DB_DATA) + NameSize * sizeof (CHAR16),
+    CertData,
+    CertDataSize
+    );
+  
+  //
+  // Set "certdb".
+  // 
+  VarAttr  = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;  
+  Status   = UpdateVariable (
+               EFI_CERT_DB_NAME,
+               &gEfiCertDbGuid,
+               NewCertDb,
+               NewCertDbSize,
+               VarAttr,
+               0,
+               0,
+               &CertDbVariable,
+               NULL
+               );
+
+  FreePool (NewCertDb);
+  return Status;
+}
+
+/**
   Process variable with EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set
 
   @param[in]  VariableName                Name of Variable to be found.
@@ -1499,7 +2021,7 @@ CompareTimeStamp (
                                           data, this value contains the required size.
   @param[in]  Variable                    The variable information which is used to keep track of variable usage.
   @param[in]  Attributes                  Attribute value of the variable.
-  @param[in]  Pk                          Verify against PK or KEK database.
+  @param[in]  AuthVarType                 Verify against PK or KEK database or private database.
   @param[out] VarDel                      Delete the variable or not.
 
   @retval EFI_INVALID_PARAMETER           Invalid parameter.
@@ -1518,7 +2040,7 @@ VerifyTimeBasedPayload (
   IN     UINTN                              DataSize,
   IN     VARIABLE_POINTER_TRACK             *Variable,
   IN     UINT32                             Attributes,
-  IN     BOOLEAN                            Pk,
+  IN     AUTHVAR_TYPE                       AuthVarType,
   OUT    BOOLEAN                            *VarDel
   )
 {
@@ -1532,7 +2054,6 @@ VerifyTimeBasedPayload (
   UINT32                           Attr;
   UINT32                           SigDataSize;
   UINT32                           KekDataSize;
-  BOOLEAN                          Result;
   BOOLEAN                          VerifyStatus;
   EFI_STATUS                       Status;
   EFI_SIGNATURE_LIST               *CertList;
@@ -1544,12 +2065,19 @@ VerifyTimeBasedPayload (
   VARIABLE_POINTER_TRACK           PkVariable;
   UINT8                            *Buffer;
   UINTN                            Length;
+  UINT8                            *SignerCerts;
+  UINT8                            *WrapSigData;
+  UINTN                            CertStackSize;
+  UINT8                            *CertsInCertDb;
+  UINT32                           CertsSizeinDb;
 
-  Result                 = FALSE;
   VerifyStatus           = FALSE;
   CertData               = NULL;
   NewData                = NULL;
   Attr                   = Attributes;
+  WrapSigData            = NULL;
+  SignerCerts            = NULL;
+  RootCert               = NULL;
 
   //
   // When the attribute EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS is
@@ -1633,7 +2161,7 @@ VerifyTimeBasedPayload (
 
   CopyMem (Buffer, PayloadPtr, PayloadSize);
 
-  if (Pk) {
+  if (AuthVarType == AuthVarTypePk) {
     //
     // Get platform key from variable.
     //
@@ -1666,7 +2194,7 @@ VerifyTimeBasedPayload (
                      NewDataSize
                      );
 
-  } else {
+  } else if (AuthVarType == AuthVarTypeKek) {
 
     //
     // Get KEK database from variable.
@@ -1718,9 +2246,84 @@ VerifyTimeBasedPayload (
       KekDataSize -= CertList->SignatureListSize;
       CertList = (EFI_SIGNATURE_LIST *) ((UINT8 *) CertList + CertList->SignatureListSize);
     }
+  } else if (AuthVarType == AuthVarTypePriv) {
+
+    //
+    // Process common authenticated variable except PK/KEK/DB/DBX.
+    // Get signer's certificates from SignedData.
+    //
+    VerifyStatus = Pkcs7GetSigners (
+                     SigData,
+                     SigDataSize,
+                     &SignerCerts,
+                     &CertStackSize,
+                     &RootCert,
+                     &RootCertSize
+                     );
+    if (!VerifyStatus) {
+      goto Exit;
+    }
+
+    //
+    // Get previously stored signer's certificates from certdb for existing
+    // variable. Check whether they are identical with signer's certificates
+    // in SignedData. If not, return error immediately.
+    //
+    if ((Variable->CurrPtr != NULL)) {
+      VerifyStatus = FALSE;
+
+      Status = GetCertsFromDb (VariableName, VendorGuid, &CertsInCertDb, &CertsSizeinDb);
+      if (EFI_ERROR (Status)) {
+        goto Exit;
+      }
+    
+      if ((CertStackSize != CertsSizeinDb) ||
+          (CompareMem (SignerCerts, CertsInCertDb, CertsSizeinDb) != 0)) {
+        goto Exit;
+      }
+    }
+
+    VerifyStatus = Pkcs7Verify (
+                     SigData,
+                     SigDataSize,
+                     RootCert,
+                     RootCertSize,
+                     NewData,
+                     NewDataSize
+                     );
+    if (!VerifyStatus) {
+      goto Exit;
+    }
+
+    //
+    // Delete signer's certificates when delete the common authenticated variable.
+    //
+    if ((PayloadSize == 0) && (Variable->CurrPtr != NULL)) {
+      Status = DeleteCertsFromDb (VariableName, VendorGuid);
+      if (EFI_ERROR (Status)) {
+        VerifyStatus = FALSE;
+        goto Exit;
+      }
+    } else if (Variable->CurrPtr == NULL) {
+      //
+      // Insert signer's certificates when adding a new common authenticated variable.
+      //
+      Status = InsertCertsToDb (VariableName, VendorGuid, SignerCerts, CertStackSize);
+      if (EFI_ERROR (Status)) {
+        VerifyStatus = FALSE;
+        goto Exit;
+      }
+    }
+  } else {
+    return EFI_SECURITY_VIOLATION;
   }
 
 Exit:
+
+  if (AuthVarType == AuthVarTypePriv) {
+    Pkcs7FreeSigners (RootCert);
+    Pkcs7FreeSigners (SignerCerts);
+  }
 
   if (!VerifyStatus) {
     return EFI_SECURITY_VIOLATION;
@@ -1738,15 +2341,16 @@ Exit:
   //
   // Final step: Update/Append Variable if it pass Pkcs7Verify
   //
-  return   UpdateVariable (
-             VariableName,
-             VendorGuid,
-             PayloadPtr,
-             PayloadSize,
-             Attributes,
-             0,
-             0,
-             Variable,
-             &CertData->TimeStamp
-             );
+  return UpdateVariable (
+           VariableName,
+           VendorGuid,
+           PayloadPtr,
+           PayloadSize,
+           Attributes,
+           0,
+           0,
+           Variable,
+           &CertData->TimeStamp
+           );
 }
+

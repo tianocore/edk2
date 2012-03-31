@@ -80,6 +80,7 @@
   gEfiSecureBootEnableDisableGuid
   gEfiCustomModeEnableGuid
   gEfiSystemNvDataFvGuid                        ## CONSUMES
+  gEfiCertDbGuid
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize

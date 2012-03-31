@@ -2,7 +2,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by AuthService module.
 
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -55,6 +55,23 @@ typedef struct {
   // Expected SignatureData size in Bytes.
   UINT32      SigDataSize;
 } EFI_SIGNATURE_ITEM;
+
+typedef enum {
+  AuthVarTypePk,
+  AuthVarTypeKek,
+  AuthVarTypePriv
+} AUTHVAR_TYPE;
+
+#pragma pack(1)
+typedef struct {
+  EFI_GUID    VendorGuid;
+  UINT32      CertNodeSize;
+  UINT32      NameSize;
+  UINT32      CertDataSize;
+  /// CHAR16  VariableName[NameSize];
+  /// UINT8   CertData[CertDataSize];
+} AUTH_CERT_DB_DATA;
+#pragma pack()
 
 /**
   Process variable with EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS/EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set.
@@ -247,7 +264,7 @@ CompareTimeStamp (
                                           data, this value contains the required size.
   @param[in]  Variable                    The variable information which is used to keep track of variable usage.
   @param[in]  Attributes                  Attribute value of the variable.
-  @param[in]  Pk                          Verify against PK or KEK database.
+  @param[in]  AuthVarType                 Verify against PK or KEK database or private database.
   @param[out] VarDel                      Delete the variable or not.
 
   @retval EFI_INVALID_PARAMETER           Invalid parameter.
@@ -266,7 +283,7 @@ VerifyTimeBasedPayload (
   IN     UINTN                              DataSize,
   IN     VARIABLE_POINTER_TRACK             *Variable,
   IN     UINT32                             Attributes,
-  IN     BOOLEAN                            Pk,
+  IN     AUTHVAR_TYPE                       AuthVarType,
   OUT    BOOLEAN                            *VarDel
   );
 
