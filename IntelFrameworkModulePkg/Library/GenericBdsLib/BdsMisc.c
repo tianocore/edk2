@@ -481,6 +481,30 @@ StrSizeEx (
 }
 
 /**
+  Convert a single character to number.
+  It assumes the input Char is in the scope of L'0' ~ L'9' and L'A' ~ L'F'
+  
+  @param Char    The input char which need to change to a hex number.
+  
+**/
+UINTN
+CharToUint (
+  IN CHAR16                           Char
+  )
+{
+  if ((Char >= L'0') && (Char <= L'9')) {
+    return (UINTN) (Char - L'0');
+  }
+
+  if ((Char >= L'A') && (Char <= L'F')) {
+    return (UINTN) (Char - L'A' + 0xA);
+  }
+
+  ASSERT (FALSE);
+  return 0;
+}
+
+/**
   Build the boot#### or driver#### option from the VariableName, the
   build boot#### or driver#### will also be linked to BdsCommonOptionList.
 
@@ -613,11 +637,11 @@ BdsLibVariableToOption (
   // Unicode stream to ASCII without any loss in meaning.
   //
   if (*VariableName == 'B') {
-    NumOff = (UINT8) (sizeof (L"Boot") / sizeof(CHAR16) - 1);
-    Option->BootCurrent = (UINT16) ((VariableName[NumOff]  -'0') * 0x1000);
-    Option->BootCurrent = (UINT16) (Option->BootCurrent + ((VariableName[NumOff+1]-'0') * 0x100));
-    Option->BootCurrent = (UINT16) (Option->BootCurrent +  ((VariableName[NumOff+2]-'0') * 0x10));
-    Option->BootCurrent = (UINT16) (Option->BootCurrent + ((VariableName[NumOff+3]-'0')));
+    NumOff = (UINT8) (sizeof (L"Boot") / sizeof (CHAR16) - 1);
+    Option->BootCurrent = (UINT16) (CharToUint (VariableName[NumOff+0]) * 0x1000) 
+               + (UINT16) (CharToUint (VariableName[NumOff+1]) * 0x100)
+               + (UINT16) (CharToUint (VariableName[NumOff+2]) * 0x10)
+               + (UINT16) (CharToUint (VariableName[NumOff+3]) * 0x1);
   }
   //
   // Insert active entry to BdsDeviceList
