@@ -197,6 +197,7 @@
   Python-$(PYTHON_VERSION)/Modules/socketmodule.c               #
   Python-$(PYTHON_VERSION)/Modules/stropmodule.c                #
   Python-$(PYTHON_VERSION)/Modules/timemodule.c                 #
+  Python-$(PYTHON_VERSION)/Modules/unicodedata.c                #
   Python-$(PYTHON_VERSION)/Modules/xxsubtype.c                  #
   Python-$(PYTHON_VERSION)/Modules/zipimport.c                  #
   Python-$(PYTHON_VERSION)/Modules/zlibmodule.c                 #

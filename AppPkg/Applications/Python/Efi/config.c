@@ -82,6 +82,7 @@ struct _inittab _PyImport_Inittab[] = {
 
     //{"_ast", init_ast},
     //{"_bisect", init_bisect},                   /* A fast version of bisect.py */
+    //{"_csv", init_csv},
     //{"_heapq", init_heapq},                     /* A fast version of heapq.py */
     //{"_io", init_io},
     //{"_json", init_json},
@@ -90,6 +91,7 @@ struct _inittab _PyImport_Inittab[] = {
     //{"_sha256", init_sha256},
     //{"_sha512", init_sha512},
     //{"_socket", init_socket},
+    //{"_symtable", init_symtable},
 
     //{"array", initarray},
     //{"cmath", initcmath},
@@ -100,6 +102,7 @@ struct _inittab _PyImport_Inittab[] = {
     //{"select", initselect},
     //{"signal", initsignal},
     //{"strop", initstrop},                       /* redefines some string operations that are 100-1000 times faster */
+    //{"unicodedata", initunicodedata},
     //{"xxsubtype", initxxsubtype},
     //{"zipimport", initzipimport},
     //{"zlib", initzlib},
@@ -116,9 +119,6 @@ struct _inittab _PyImport_Inittab[] = {
 #ifdef WITH_THREAD
     {"thread", initthread},
 #endif
-
-    //{"_symtable", init_symtable},
-    //{"_csv", init_csv},
 
     /* These modules are required for the full built-in help() facility provided by pydoc. */
     {"_codecs", init_codecs},

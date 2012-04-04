@@ -503,6 +503,7 @@ def execusercustomize():
 def main():
     abs__file__()
     known_paths = removeduppaths()
+    known_paths = addsitepackages(known_paths)
     setquit()
     setcopyright()
     sethelper()
