@@ -180,6 +180,7 @@ CreatePkRsaSignatureList (
     DEBUG ((EFI_D_ERROR, "Can't Open the file for PK enrolling.\n"));
     goto ON_EXIT;
   }
+  ASSERT (KeyBlob != NULL);
 
   KeyInfo = (CPL_KEY_INFO *)KeyBlob;
   if (KeyInfo->KeyLengthInBits/8 != WIN_CERT_UEFI_RSA2048_SIZE) {
@@ -282,6 +283,7 @@ CreatePkX509SignatureList (
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
+  ASSERT (X509Data != NULL);
 
   //
   // Allocate space for PK certificate list and initialize it.
@@ -385,6 +387,7 @@ EnrollPlatformKey (
       goto ON_EXIT;
     }
   }
+  ASSERT (PkCert != NULL);
                          
   //
   // Set Platform Key variable.
@@ -490,6 +493,7 @@ EnrollRsa2048ToKek (
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
+  ASSERT (KeyBlob != NULL);
   KeyInfo = (CPL_KEY_INFO *) KeyBlob;
   if (KeyInfo->KeyLengthInBits / 8 != WIN_CERT_UEFI_RSA2048_SIZE) {
     DEBUG ((DEBUG_ERROR, "Unsupported key length, Only RSA2048 is supported.\n"));
@@ -641,6 +645,7 @@ EnrollX509ToKek (
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
+  ASSERT (X509Data != NULL);
 
   KekSigListSize = sizeof(EFI_SIGNATURE_LIST) + sizeof(EFI_SIGNATURE_DATA) - 1 + X509DataSize;
   KekSigList = (EFI_SIGNATURE_LIST*) AllocateZeroPool (KekSigListSize);
@@ -792,6 +797,7 @@ EnrollX509toSigDB (
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
+  ASSERT (X509Data != NULL);
 
   SigDBSize = sizeof(EFI_SIGNATURE_LIST) + sizeof(EFI_SIGNATURE_DATA) - 1 + X509DataSize;
 
@@ -1299,6 +1305,7 @@ EnrollImageSignatureToSigDB (
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }  
+  ASSERT (mImageBase != NULL);
 
   Status = LoadPeImage ();
   if (EFI_ERROR (Status)) {
