@@ -3,7 +3,7 @@
   Layers on top of Firmware Block protocol to produce a file abstraction
   of FV based files.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -630,17 +630,24 @@ NotifyFwVolBlock (
       FvDevice->FwVolHeader     = FwVolHeader;
       FvDevice->Fv.ParentHandle = Fvb->ParentHandle;
       FvDevice->IsFfs3Fv        = CompareGuid (&FwVolHeader->FileSystemGuid, &gEfiFirmwareFileSystem3Guid);
-
-      //
-      // Install an New FV protocol on the existing handle
-      //
-      Status = CoreInstallProtocolInterface (
-                  &Handle,
-                  &gEfiFirmwareVolume2ProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &FvDevice->Fv
-                  );
-      ASSERT_EFI_ERROR (Status);
+      
+      if (!EFI_ERROR (FvCheck (FvDevice))) {
+        //
+        // Install an New FV protocol on the existing handle
+        //
+        Status = CoreInstallProtocolInterface (
+                    &Handle,
+                    &gEfiFirmwareVolume2ProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    &FvDevice->Fv
+                    );
+        ASSERT_EFI_ERROR (Status);
+      } else {
+        //
+        // Free FvDevice Buffer for the corrupt FV image.
+        //
+        CoreFreePool (FvDevice);
+      }
     }
   }
 
