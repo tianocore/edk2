@@ -1,7 +1,7 @@
 /** @file
   Main file for LoadPciRom shell Debug1 function.
 
-  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -221,6 +221,7 @@ LoadEfiDriversFromRomImage (
   VOID                          *DecompressedImageBuffer;
   UINT32                        ImageLength;
   EFI_DECOMPRESS_PROTOCOL       *Decompress;
+  UINT32                        InitializationSize;
 
   ImageIndex    = 0;
   ReturnStatus     = EFI_NOT_FOUND;
@@ -230,27 +231,46 @@ LoadEfiDriversFromRomImage (
 
     EfiRomHeader = (EFI_PCI_EXPANSION_ROM_HEADER *) (UINTN) RomBarOffset;
 
-    if (EfiRomHeader->Signature != 0xaa55) {
+    if (EfiRomHeader->Signature != PCI_EXPANSION_ROM_HEADER_SIGNATURE) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_LOADPCIROM_CORRUPT), gShellDebug1HiiHandle, FileName, ImageIndex);
 //      PrintToken (STRING_TOKEN (STR_LOADPCIROM_IMAGE_CORRUPT), HiiHandle, ImageIndex);
       return ReturnStatus;
     }
 
+    //
+    // If the pointer to the PCI Data Structure is invalid, no further images can be located. 
+    // The PCI Data Structure must be DWORD aligned. 
+    //
+    if (EfiRomHeader->PcirOffset == 0 ||
+        (EfiRomHeader->PcirOffset & 3) != 0 ||
+        RomBarOffset - (UINTN)RomBar + EfiRomHeader->PcirOffset + sizeof (PCI_DATA_STRUCTURE) > RomSize) {
+      break;
+    }
+
     Pcir      = (PCI_DATA_STRUCTURE *) (UINTN) (RomBarOffset + EfiRomHeader->PcirOffset);
+    //
+    // If a valid signature is not present in the PCI Data Structure, no further images can be located.
+    //
+    if (Pcir->Signature != PCI_DATA_STRUCTURE_SIGNATURE) {
+      break;
+    }
     ImageSize = Pcir->ImageLength * 512;
+    if (RomBarOffset - (UINTN)RomBar + ImageSize > RomSize) {
+      break;
+    }
 
     if ((Pcir->CodeType == PCI_CODE_TYPE_EFI_IMAGE) &&
-        (EfiRomHeader->EfiSignature == EFI_PCI_EXPANSION_ROM_HEADER_EFISIGNATURE)
-       ) {
+        (EfiRomHeader->EfiSignature == EFI_PCI_EXPANSION_ROM_HEADER_EFISIGNATURE) &&
+        ((EfiRomHeader->EfiSubsystem == EFI_IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER) ||
+         (EfiRomHeader->EfiSubsystem == EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER))) {
 
-      if ((EfiRomHeader->EfiSubsystem == EFI_IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER) ||
-          (EfiRomHeader->EfiSubsystem == EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER)
-         ) {
-        ImageOffset             = EfiRomHeader->EfiImageHeaderOffset;
-        ImageSize               = EfiRomHeader->InitializationSize * 512;
+      ImageOffset             = EfiRomHeader->EfiImageHeaderOffset;
+      InitializationSize      = EfiRomHeader->InitializationSize * 512;
+
+      if (InitializationSize <= ImageSize && ImageOffset < InitializationSize) {
 
         ImageBuffer             = (VOID *) (UINTN) (RomBarOffset + ImageOffset);
-        ImageLength             = ImageSize - ImageOffset;
+        ImageLength             = InitializationSize - ImageOffset;
         DecompressedImageBuffer = NULL;
 
         //

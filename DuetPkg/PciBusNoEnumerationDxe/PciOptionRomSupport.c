@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -155,6 +155,7 @@ Returns:
   PCI_DATA_STRUCTURE        *RomPcir;
   UINT64                    RomSize;
   UINT64                    RomImageSize;
+  UINT32                    LegacyImageLength;
   UINT8                     *RomInMemory;
   UINT8                     CodeType;
 
@@ -207,6 +208,7 @@ Returns:
   RomBarOffset  = RomBar;
   retStatus     = EFI_NOT_FOUND;
   FirstCheck    = TRUE;
+  LegacyImageLength = 0;
 
   do {
     PciDevice->PciRootBridgeIo->Mem.Read (
@@ -229,6 +231,15 @@ Returns:
 
     FirstCheck  = FALSE;
     OffsetPcir  = RomHeader->PcirOffset;
+    //
+    // If the pointer to the PCI Data Structure is invalid, no further images can be located. 
+    // The PCI Data Structure must be DWORD aligned. 
+    //
+    if (OffsetPcir == 0 ||
+       (OffsetPcir & 3) != 0 ||
+       RomImageSize + OffsetPcir + sizeof (PCI_DATA_STRUCTURE) > RomSize) {
+      break;
+    }
     PciDevice->PciRootBridgeIo->Mem.Read (
                                       PciDevice->PciRootBridgeIo,
                                       EfiPciWidthUint8,
@@ -236,8 +247,18 @@ Returns:
                                       sizeof (PCI_DATA_STRUCTURE),
                                       (UINT8 *) RomPcir
                                       );
+    //
+    // If a valid signature is not present in the PCI Data Structure, no further images can be located.
+    //
+    if (RomPcir->Signature != PCI_DATA_STRUCTURE_SIGNATURE) {
+      break;
+    }
+    if (RomImageSize + RomPcir->ImageLength * 512 > RomSize) {
+      break;
+    }
     if (RomPcir->CodeType == PCI_CODE_TYPE_PCAT_IMAGE) {
       CodeType = PCI_CODE_TYPE_PCAT_IMAGE;
+      LegacyImageLength = ((UINT32)((EFI_LEGACY_EXPANSION_ROM_HEADER *)RomHeader)->Size512) * 512;
     }
     Indicator     = RomPcir->Indicator;
     RomImageSize  = RomImageSize + RomPcir->ImageLength * 512;
@@ -249,7 +270,7 @@ Returns:
   // of the legacy length and the PCIR Image Length
   //
   if (CodeType == PCI_CODE_TYPE_PCAT_IMAGE) {
-    RomImageSize = MAX(RomImageSize, (((EFI_LEGACY_EXPANSION_ROM_HEADER *)RomHeader)->Size512 * 512));
+    RomImageSize = MAX (RomImageSize, LegacyImageLength);
   }
 
   if (RomImageSize > 0) {
@@ -399,7 +420,6 @@ Returns:
   EFI_HANDLE                    ImageHandle;
   EFI_STATUS                    Status;
   EFI_STATUS                    retStatus;
-  BOOLEAN                       FirstCheck;
   BOOLEAN                       SkipImage;
   UINT32                        DestinationSize;
   UINT32                        ScratchSize;
@@ -410,6 +430,7 @@ Returns:
   EFI_DECOMPRESS_PROTOCOL       *Decompress;
   EFI_PCI_EXPANSION_ROM_HEADER  *EfiRomHeader;
   PCI_DATA_STRUCTURE            *Pcir;
+  UINT32                        InitializationSize;
 
   Indicator = 0;
 
@@ -419,35 +440,36 @@ Returns:
   RomBar        = PciDevice->PciIo.RomImage;
   RomBarOffset  = (UINT8 *) RomBar;
   retStatus     = EFI_NOT_FOUND;
-  FirstCheck    = TRUE;
+
+  if (RomBarOffset == NULL) {
+    return retStatus;
+  }
+  ASSERT (((EFI_PCI_EXPANSION_ROM_HEADER *) RomBarOffset)->Signature == PCI_EXPANSION_ROM_HEADER_SIGNATURE);
 
   do {
     EfiRomHeader = (EFI_PCI_EXPANSION_ROM_HEADER *) RomBarOffset;
     if (EfiRomHeader->Signature != PCI_EXPANSION_ROM_HEADER_SIGNATURE) {
       RomBarOffset = RomBarOffset + 512;
-      if (FirstCheck) {
-        break;
-      } else {
-        continue;
-      }
+      continue;
     }
 
-    FirstCheck  = FALSE;
     Pcir        = (PCI_DATA_STRUCTURE *) (RomBarOffset + EfiRomHeader->PcirOffset);
+    ASSERT (Pcir->Signature == PCI_DATA_STRUCTURE_SIGNATURE);
     ImageSize   = (UINT32) (Pcir->ImageLength * 512);
     Indicator   = Pcir->Indicator;
 
-    if ((Pcir->CodeType == PCI_CODE_TYPE_EFI_IMAGE) && 
-        (EfiRomHeader->EfiSignature == EFI_PCI_EXPANSION_ROM_HEADER_EFISIGNATURE)) {
+    if ((Pcir->CodeType == PCI_CODE_TYPE_EFI_IMAGE) &&
+        (EfiRomHeader->EfiSignature == EFI_PCI_EXPANSION_ROM_HEADER_EFISIGNATURE) &&
+        ((EfiRomHeader->EfiSubsystem == EFI_IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER) ||
+         (EfiRomHeader->EfiSubsystem == EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER))) {
 
-      if ((EfiRomHeader->EfiSubsystem == EFI_IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER)  ||
-          (EfiRomHeader->EfiSubsystem == EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER)) {
+      ImageOffset             = EfiRomHeader->EfiImageHeaderOffset;
+      InitializationSize      = EfiRomHeader->InitializationSize * 512;
 
-        ImageOffset             = EfiRomHeader->EfiImageHeaderOffset;
-        ImageSize               = (UINT32) (EfiRomHeader->InitializationSize * 512);
+      if (InitializationSize <= ImageSize && ImageOffset < InitializationSize) {
 
         ImageBuffer             = (VOID *) (RomBarOffset + ImageOffset);
-        ImageLength             = ImageSize - (UINT32)ImageOffset;
+        ImageLength             =  InitializationSize - (UINT32)ImageOffset;
         DecompressedImageBuffer = NULL;
 
         //

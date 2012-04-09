@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 1999 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2012, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -1225,6 +1225,16 @@ Undi16SimpleNetworkLoadUndi (
     }
 
     DEBUG ((DEBUG_INIT, "Option ROM found at %X\n", RomAddress));
+
+    //
+    // If the pointer to the PCI Data Structure is invalid, no further images can be located. 
+    // The PCI Data Structure must be DWORD aligned. 
+    //
+    if (PciExpansionRomHeader->PcirOffset == 0 ||
+        (PciExpansionRomHeader->PcirOffset & 3) != 0 ||
+        RomAddress + PciExpansionRomHeader->PcirOffset + sizeof (PCI_DATA_STRUCTURE) > 0x100000) {
+      break;
+    }
 
     PciDataStructure = (PCI_DATA_STRUCTURE *) (RomAddress + PciExpansionRomHeader->PcirOffset);
 
