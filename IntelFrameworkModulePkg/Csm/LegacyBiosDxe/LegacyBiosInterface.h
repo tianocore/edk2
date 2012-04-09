@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -92,6 +92,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 #define PROTECTED_MODE_BASE_VECTOR_MASTER  0x68
 #define PROTECTED_MODE_BASE_VECTOR_SLAVE   0x70
+
+//
+// When we call CSM16 functions, some CSM16 use es:[offset + 0xabcd] to get data passed from CSM32, 
+// offset + 0xabcd could overflow which exceeds 0xFFFF which is invalid in real mode. 
+// So this will keep offset as small as possible to avoid offset overflow in real mode. 
+//
+#define NORMALIZE_EFI_SEGMENT(_Adr)      (UINT16) (((UINTN) (_Adr)) >> 4)
+#define NORMALIZE_EFI_OFFSET(_Adr)       (UINT16) (((UINT16) ((UINTN) (_Adr))) & 0xf)
 
 //
 // Trace defines

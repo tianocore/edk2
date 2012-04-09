@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -352,8 +352,8 @@ LegacyBiosGetBbsInfo (
     // Pass in handoff data
     //
     TempData  = (UINTN) EfiToLegacy16BootTable;
-    Regs.X.ES = EFI_SEGMENT ((UINT32) TempData);
-    Regs.X.BX = EFI_OFFSET ((UINT32) TempData);
+    Regs.X.ES = NORMALIZE_EFI_SEGMENT ((UINT32) TempData);
+    Regs.X.BX = NORMALIZE_EFI_OFFSET ((UINT32) TempData);
 
     Private->LegacyBios.FarCall86 (
       This,
