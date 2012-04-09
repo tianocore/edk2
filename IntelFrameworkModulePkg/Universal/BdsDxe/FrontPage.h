@@ -261,7 +261,6 @@ PlatformBdsEnterFrontPage (
   @retval  Others             Mode failed to be changed.
 
 **/
-
 EFI_STATUS
 EFIAPI
 BdsSetConsoleMode (
