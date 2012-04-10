@@ -1,7 +1,7 @@
 @REM @file
 @REM   Windows batch file to setup a WORKSPACE environment
 @REM
-@REM Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+@REM Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 @REM This program and the accompanying materials
 @REM are licensed and made available under the terms and conditions of the BSD License
 @REM which accompanies this distribution.  The full text of the license may be found at
@@ -61,18 +61,22 @@ set EDK_SOURCE=
 @REM and headers to interface with Windows.
 
 if not defined VCINSTALLDIR (
-  if defined VS71COMNTOOLS (
-    call "%VS71COMNTOOLS%\vsvars32.bat"
+  if defined VS100COMNTOOLS (
+    call "%VS100COMNTOOLS%\vsvars32.bat"
   ) else (
-    if defined VS80COMNTOOLS (
-      call "%VS80COMNTOOLS%\vsvars32.bat"
+    if defined VS90COMNTOOLS (
+      call "%VS90COMNTOOLS%\vsvars32.bat"
     ) else (
-      if defined VS90COMNTOOLS (
-        call "%VS90COMNTOOLS%\vsvars32.bat"
+      if defined VS80COMNTOOLS (
+        call "%VS80COMNTOOLS%\vsvars32.bat"
       ) else (
-        echo.
-        echo !!! WARNING !!! Cannot find Visual Studio !!!
-        echo.
+	if defined VS71COMNTOOLS (
+          call "%VS71COMNTOOLS%\vsvars32.bat"
+        ) else (
+          echo.
+          echo !!! WARNING !!! Cannot find Visual Studio !!!
+          echo.
+        )
       )
     )
   )
