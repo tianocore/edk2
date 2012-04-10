@@ -921,7 +921,8 @@ XhcCheckUrbResult (
 
   ASSERT ((Xhc != NULL) && (Urb != NULL));
 
-  Status = EFI_SUCCESS;
+  Status   = EFI_SUCCESS;
+  AsyncUrb = NULL;
 
   if (Urb->Finished) {
     goto EXIT;
