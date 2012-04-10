@@ -105,6 +105,10 @@
 #   Unicode-Text-File
 #
 
+## Build Rule Version Number
+#  build_rule_version=0.1
+#
+
 [C-Code-File]
     <InputFile>
         ?.c

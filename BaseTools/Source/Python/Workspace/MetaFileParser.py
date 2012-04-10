@@ -340,6 +340,7 @@ class MetaFileParser(object):
     ## [BuildOptions] section parser
     @ParseMacro
     def _BuildOptionParser(self):
+        self._CurrentLine = CleanString(self._CurrentLine, BuildOption=True)
         TokenList = GetSplitValueList(self._CurrentLine, TAB_EQUAL_SPLIT, 1)
         TokenList2 = GetSplitValueList(TokenList[0], ':', 1)
         if len(TokenList2) == 2:
@@ -913,6 +914,9 @@ class DscParser(MetaFileParser):
                             ExtraData=self._CurrentLine)
 
         ItemType = self.DataType[DirectiveName]
+        Scope = [['COMMON', 'COMMON']]
+        if ItemType == MODEL_META_DATA_INCLUDE:
+            Scope = self._Scope
         if ItemType == MODEL_META_DATA_CONDITIONAL_STATEMENT_ENDIF:
             # Remove all directives between !if and !endif, including themselves
             while self._DirectiveStack:
@@ -945,21 +949,22 @@ class DscParser(MetaFileParser):
         # Model, Value1, Value2, Value3, Arch, ModuleType, BelongsToItem=-1, BelongsToFile=-1,
         # LineBegin=-1, ColumnBegin=-1, LineEnd=-1, ColumnEnd=-1, Enabled=-1
         #
-        self._LastItem = self._Store(
-                                ItemType,
-                                self._ValueList[0],
-                                self._ValueList[1],
-                                self._ValueList[2],
-                                'COMMON',
-                                'COMMON',
-                                self._Owner[-1],
-                                self._From,
-                                self._LineIndex+1,
-                                -1,
-                                self._LineIndex+1,
-                                -1,
-                                0
-                                )
+        for Arch, ModuleType in Scope:
+            self._LastItem = self._Store(
+                                    ItemType,
+                                    self._ValueList[0],
+                                    self._ValueList[1],
+                                    self._ValueList[2],
+                                    Arch,
+                                    ModuleType,
+                                    self._Owner[-1],
+                                    self._From,
+                                    self._LineIndex+1,
+                                    -1,
+                                    self._LineIndex+1,
+                                    -1,
+                                    0
+                                    )
 
     ## [defines] section parser
     @ParseMacro
@@ -1065,6 +1070,7 @@ class DscParser(MetaFileParser):
     ## [BuildOptions] section parser
     @ParseMacro
     def _BuildOptionParser(self):
+        self._CurrentLine = CleanString(self._CurrentLine, BuildOption=True)
         TokenList = GetSplitValueList(self._CurrentLine, TAB_EQUAL_SPLIT, 1)
         TokenList2 = GetSplitValueList(TokenList[0], ':', 1)
         if len(TokenList2) == 2:
@@ -1154,6 +1160,21 @@ class DscParser(MetaFileParser):
             self._ContentIndex += 1
 
             self._Scope = [[S1, S2]]
+            #
+            # For !include directive, handle it specially,
+            # merge arch and module type in case of duplicate items
+            #
+            while self._ItemType == MODEL_META_DATA_INCLUDE:
+                if self._ContentIndex >= len(self._Content):
+                    break
+                Record = self._Content[self._ContentIndex]
+                if LineStart == Record[9] and LineEnd == Record[11]:
+                    if [Record[5], Record[6]] not in self._Scope:
+                        self._Scope.append([Record[5], Record[6]])
+                    self._ContentIndex += 1
+                else:
+                    break
+
             self._LineIndex = LineStart - 1
             self._ValueList = [V1, V2, V3]
 
@@ -1164,9 +1185,23 @@ class DscParser(MetaFileParser):
                 # Only catch expression evaluation error here. We need to report
                 # the precise number of line on which the error occurred
                 #
-                EdkLogger.error('Parser', FORMAT_INVALID, "Invalid expression: %s" % str(Excpt),
-                                File=self._FileWithError, ExtraData=' '.join(self._ValueList), 
-                                Line=self._LineIndex+1)
+                if hasattr(Excpt, 'Pcd'):
+                    if Excpt.Pcd in GlobalData.gPlatformOtherPcds:
+                        Info = GlobalData.gPlatformOtherPcds[Excpt.Pcd]
+                        EdkLogger.error('Parser', FORMAT_INVALID, "Cannot use this PCD (%s) in an expression as"
+                                        " it must be defined in a [PcdsFixedAtBuild] or [PcdsFeatureFlag] section"
+                                        " of the DSC file, and it is currently defined in this section:"
+                                        " %s, line #: %d." % (Excpt.Pcd, Info[0], Info[1]),
+                                    File=self._FileWithError, ExtraData=' '.join(self._ValueList), 
+                                    Line=self._LineIndex+1)
+                    else:
+                        EdkLogger.error('Parser', FORMAT_INVALID, "PCD (%s) is not defined in DSC file" % Excpt.Pcd,
+                                    File=self._FileWithError, ExtraData=' '.join(self._ValueList), 
+                                    Line=self._LineIndex+1)
+                else:
+                    EdkLogger.error('Parser', FORMAT_INVALID, "Invalid expression: %s" % str(Excpt),
+                                    File=self._FileWithError, ExtraData=' '.join(self._ValueList), 
+                                    Line=self._LineIndex+1)
             except MacroException, Excpt:
                 EdkLogger.error('Parser', FORMAT_INVALID, str(Excpt),
                                 File=self._FileWithError, ExtraData=' '.join(self._ValueList), 
@@ -1224,6 +1259,20 @@ class DscParser(MetaFileParser):
             Value, DatumType, MaxDatumSize = AnalyzePcdData(Value)
             Name = TokenSpaceGuid + '.' + PcdName
             self._Symbols[Name] = Value
+
+        Content = open(str(self.MetaFile), 'r').readlines()
+        GlobalData.gPlatformOtherPcds['DSCFILE'] = str(self.MetaFile)
+        for PcdType in (MODEL_PCD_PATCHABLE_IN_MODULE, MODEL_PCD_DYNAMIC_DEFAULT, MODEL_PCD_DYNAMIC_HII,
+                        MODEL_PCD_DYNAMIC_VPD, MODEL_PCD_DYNAMIC_EX_DEFAULT, MODEL_PCD_DYNAMIC_EX_HII,
+                        MODEL_PCD_DYNAMIC_EX_VPD):
+            Records = self._RawTable.Query(PcdType, BelongsToItem=-1.0)
+            for TokenSpaceGuid,PcdName,Value,Dummy2,Dummy3,ID,Line in Records:
+                Name = TokenSpaceGuid + '.' + PcdName
+                if Name not in GlobalData.gPlatformOtherPcds:
+                    PcdLine = Line
+                    while not Content[Line - 1].lstrip().startswith(TAB_SECTION_START):
+                        Line -= 1
+                    GlobalData.gPlatformOtherPcds[Name] = (CleanString(Content[Line - 1]), PcdLine, PcdType)
 
     def __ProcessDefine(self):
         if not self._Enabled:
@@ -1386,7 +1435,8 @@ class DscParser(MetaFileParser):
             try:
                 ValueList[0] = ValueExpression(PcdValue, self._Macros)(True)
             except WrnExpression, Value:
-                ValueList[0] = Value.result          
+                ValueList[0] = Value.result
+            PcdValue = ValueList[0]
         else:
             #
             # Int*/Boolean VPD PCD
@@ -1412,8 +1462,10 @@ class DscParser(MetaFileParser):
                 if ValueList[-1] == 'True':
                     ValueList[-1] = '1'
                 if ValueList[-1] == 'False':
-                    ValueList[-1] = '0'      
-
+                    ValueList[-1] = '0'
+                PcdValue = ValueList[-1]
+        if PcdValue and self._ItemType in [MODEL_PCD_FEATURE_FLAG, MODEL_PCD_FIXED_AT_BUILD]:
+            GlobalData.gPlatformPcds[TAB_SPLIT.join(self._ValueList[0:2])] = PcdValue
         self._ValueList[2] = '|'.join(ValueList)
 
     def __ProcessComponent(self):

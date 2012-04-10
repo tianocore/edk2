@@ -1162,8 +1162,9 @@ class DscParser(MetaFileParser):
             self._IdMapping[Id] = self._LastItem
 
         RecordList = self._Table.GetAll()
-        self._Table.Drop()
+        
         self._RawTable.Drop()
+        self._Table.Drop()
         for Record in RecordList:
             EccGlobalData.gDb.TblDsc.Insert(Record[1],Record[2],Record[3],Record[4],Record[5],Record[6],Record[7],Record[8],Record[9],Record[10],Record[11],Record[12],Record[13],Record[14])
         GlobalData.gPlatformDefines.update(self._FileLocalMacros)

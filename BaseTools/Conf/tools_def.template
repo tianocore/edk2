@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 #  Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
@@ -36,6 +36,16 @@ DEFINE VS2008x86_BIN    = C:\Program Files (x86)\Microsoft Visual Studio 9.0\Vc\
 DEFINE VS2008x86_DLL    = C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE;DEF(VS2008x86_BIN)
 DEFINE VS2008x86_BINX64 = DEF(VS2008x86_BIN)\x86_amd64
 DEFINE VS2008x86_BIN64  = DEF(VS2008x86_BIN)\x86_ia64
+
+DEFINE VS2010_BIN      = C:\Program Files\Microsoft Visual Studio 10.0\Vc\bin
+DEFINE VS2010_DLL      = C:\Program Files\Microsoft Visual Studio 10.0\Common7\IDE;DEF(VS2010_BIN)
+DEFINE VS2010_BINX64   = DEF(VS2010_BIN)\x86_amd64
+DEFINE VS2010_BIN64    = DEF(VS2010_BIN)\x86_ia64
+
+DEFINE VS2010x86_BIN    = C:\Program Files (x86)\Microsoft Visual Studio 10.0\Vc\bin
+DEFINE VS2010x86_DLL    = C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE;DEF(VS2010x86_BIN)
+DEFINE VS2010x86_BINX64 = DEF(VS2010x86_BIN)\x86_amd64
+DEFINE VS2010x86_BIN64  = DEF(VS2010x86_BIN)\x86_ia64
 
 DEFINE WINSDK_VERSION   = v6.0A
 DEFINE WINSDK_BIN       = c:\Program Files\Microsoft SDKs\Windows\DEF(WINSDK_VERSION)\bin
@@ -225,6 +235,15 @@ DEFINE CLANG_BIN = /usr/bin/
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
 #                               http://www.acpica.org/downloads/previous_releases.php
+#   VS2010      -win32-  Requires:
+#                             Microsoft Visual Studio 2010 Premium Edition
+#                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
+#                        Optional:
+#                             Required to build EBC drivers:
+#                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
+#                             Required to build platforms or ACPI tables:
+#                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
+#                               http://www.acpica.org/downloads/previous_releases.php
 #   DDK3790     -win32-  Requires:
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
 #                        Optional:
@@ -333,6 +352,15 @@ DEFINE CLANG_BIN = /usr/bin/
 #                             Required to build platforms or ACPI tables:
 #                               Microsoft ASL ACPI Compiler (asl.exe) v4.0.0 from
 #                               http://download.microsoft.com/download/2/c/1/2c16c7e0-96c1-40f5-81fc-3e4bf7b65496/microsoft_asl_compiler-v4-0-0.msi
+#   VS2010xASL  -win32-  Requires:
+#                             Microsoft Visual Studio 2010 Premium Edition
+#                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
+#                        Optional:
+#                             Required to build EBC drivers:
+#                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
+#                             Required to build platforms or ACPI tables:
+#                               Microsoft ASL ACPI Compiler (asl.exe) v4.0.0 from
+#                               http://download.microsoft.com/download/2/c/1/2c16c7e0-96c1-40f5-81fc-3e4bf7b65496/microsoft_asl_compiler-v4-0-0.msi
 #   DDK3790xASL -win32-  Requires:
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
 #                        Optional:
@@ -390,6 +418,13 @@ DEFINE CLANG_BIN = /usr/bin/
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
 #                               http://www.acpica.org/downloads/previous_releases.php 
+#   VS2010x86   -win64-  Requires:
+#                             Microsoft Visual Studio 2010 (x86) Premium Edition
+#                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
+#                        Optional:
+#                             Required to build platforms or ACPI tables:
+#                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
+#                               http://www.acpica.org/downloads/previous_releases.php 
 #   ICCx86      -win64-  Requires:
 #                             Intel C Compiler V9.1(x86)
 #                        Dependencies:
@@ -425,6 +460,13 @@ DEFINE CLANG_BIN = /usr/bin/
 #                               http://download.microsoft.com/download/2/c/1/2c16c7e0-96c1-40f5-81fc-3e4bf7b65496/microsoft_asl_compiler-v4-0-0.msi
 #  VS2008x86xASL -win64- Requires:
 #                             Microsoft Visual Studio 2008 (x86)
+#                             Microsoft Windows Server 2003 Driver Development Kit(Microsoft WINDDK) version 3790.1830 
+#                        Optional:
+#                             Required to build platforms or ACPI tables:
+#                               Microsoft ASL ACPI Compiler (asl.exe) v4.0.0 from
+#                               http://download.microsoft.com/download/2/c/1/2c16c7e0-96c1-40f5-81fc-3e4bf7b65496/microsoft_asl_compiler-v4-0-0.msi
+#  VS2010x86xASL -win64- Requires:
+#                             Microsoft Visual Studio 2010 (x86) Premium Edition
 #                             Microsoft Windows Server 2003 Driver Development Kit(Microsoft WINDDK) version 3790.1830 
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
@@ -727,9 +769,9 @@ NOOPT_VS2005_IA32_CC_FLAGS        = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE 
 RELEASE_VS2005_IA32_ASM_FLAGS     = /nologo /c /WX /W3 /Cx /coff /Zd
 NOOPT_VS2005_IA32_ASM_FLAGS       = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
 
-  DEBUG_VS2005_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:I386 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
-RELEASE_VS2005_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:I386 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
-NOOPT_VS2005_IA32_DLINK_FLAGS     = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:I386 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+  DEBUG_VS2005_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2005_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+NOOPT_VS2005_IA32_DLINK_FLAGS     = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
 
 ##################
 # X64 definitions
@@ -1724,6 +1766,513 @@ NOOPT_VS2008x86xASL_IPF_ASM_FLAGS      = -N us -X explicit -M ilp64 -N so -W4 -d
   DEBUG_VS2008x86xASL_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4001 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEBUG_DIR)/$(BASE_NAME).map /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb /DEBUG
 RELEASE_VS2008x86xASL_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4001 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEBUG_DIR)/$(BASE_NAME).map /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb
 NOOPT_VS2008x86xASL_IPF_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4001 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEBUG_DIR)/$(BASE_NAME).map /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb /DEBUG
+
+
+####################################################################################
+#
+# Microsoft Visual Studio 2010
+#
+#   VS2010  - Microsoft Visual Studio 2010 Premium Edition
+#   ASL     - Intel ACPI Source Language Compiler
+####################################################################################
+#   VS2010           - Microsoft Visual Studio 2010 Premium Edition
+*_VS2010_*_*_FAMILY               = MSFT
+
+*_VS2010_*_MAKE_PATH              = DEF(VS2010_BIN)\nmake.exe
+*_VS2010_*_MAKE_FLAGS             = /nologo
+*_VS2010_*_RC_PATH                = DEF(WINSDK_BIN)\rc.exe
+
+*_VS2010_*_SLINK_FLAGS            = /NOLOGO /LTCG
+*_VS2010_*_APP_FLAGS              = /nologo /E /TC
+*_VS2010_*_PP_FLAGS               = /nologo /E /TC /FIAutoGen.h
+*_VS2010_*_VFRPP_FLAGS            = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+
+*_VS2010_*_ASM16_PATH             = DEF(VS2010_BIN)\ml.exe
+
+##################
+# ASL definitions
+##################
+*_VS2010_*_ASL_PATH               = DEF(DEFAULT_WIN_ASL_BIN)
+*_VS2010_*_ASL_FLAGS              = DEF(DEFAULT_WIN_ASL_FLAGS)
+*_VS2010_*_ASL_OUTFLAGS           = DEF(DEFAULT_WIN_ASL_OUTFLAGS)
+*_VS2010_*_ASLCC_FLAGS            = DEF(MSFT_ASLCC_FLAGS)
+*_VS2010_*_ASLPP_FLAGS            = DEF(MSFT_ASLPP_FLAGS)
+*_VS2010_*_ASLDLINK_FLAGS         = DEF(MSFT_ASLDLINK_FLAGS)
+
+##################
+# IA32 definitions
+##################
+*_VS2010_IA32_*_DLL               = DEF(VS2010_DLL)
+
+*_VS2010_IA32_MAKE_PATH           = DEF(VS2010_BIN)\nmake.exe
+*_VS2010_IA32_CC_PATH             = DEF(VS2010_BIN)\cl.exe
+*_VS2010_IA32_VFRPP_PATH          = DEF(VS2010_BIN)\cl.exe
+*_VS2010_IA32_SLINK_PATH          = DEF(VS2010_BIN)\lib.exe
+*_VS2010_IA32_DLINK_PATH          = DEF(VS2010_BIN)\link.exe
+*_VS2010_IA32_APP_PATH            = DEF(VS2010_BIN)\cl.exe
+*_VS2010_IA32_PP_PATH             = DEF(VS2010_BIN)\cl.exe
+*_VS2010_IA32_ASM_PATH            = DEF(VS2010_BIN)\ml.exe
+*_VS2010_IA32_ASLCC_PATH          = DEF(VS2010_BIN)\cl.exe
+*_VS2010_IA32_ASLPP_PATH          = DEF(VS2010_BIN)\cl.exe
+*_VS2010_IA32_ASLDLINK_PATH       = DEF(VS2010_BIN)\link.exe
+
+      *_VS2010_IA32_MAKE_FLAGS    = /nologo
+  DEBUG_VS2010_IA32_CC_FLAGS      = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
+RELEASE_VS2010_IA32_CC_FLAGS      = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2010_IA32_CC_FLAGS        = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
+
+  DEBUG_VS2010_IA32_ASM_FLAGS     = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
+RELEASE_VS2010_IA32_ASM_FLAGS     = /nologo /c /WX /W3 /Cx /coff /Zd
+NOOPT_VS2010_IA32_ASM_FLAGS       = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
+
+  DEBUG_VS2010_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2010_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+NOOPT_VS2010_IA32_DLINK_FLAGS     = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+
+##################
+# X64 definitions
+##################
+*_VS2010_X64_*_DLL         = DEF(VS2010_DLL)
+
+*_VS2010_X64_CC_PATH       = DEF(VS2010_BINX64)\cl.exe
+*_VS2010_X64_PP_PATH       = DEF(VS2010_BINX64)\cl.exe
+*_VS2010_X64_APP_PATH      = DEF(VS2010_BINX64)\cl.exe
+*_VS2010_X64_VFRPP_PATH    = DEF(VS2010_BINX64)\cl.exe
+*_VS2010_X64_ASM_PATH      = DEF(VS2010_BINX64)\ml64.exe
+*_VS2010_X64_SLINK_PATH    = DEF(VS2010_BINX64)\lib.exe
+*_VS2010_X64_DLINK_PATH    = DEF(VS2010_BINX64)\link.exe
+*_VS2010_X64_ASLCC_PATH    = DEF(VS2010_BINX64)\cl.exe
+*_VS2010_X64_ASLPP_PATH    = DEF(VS2010_BINX64)\cl.exe
+*_VS2010_X64_ASLDLINK_PATH = DEF(VS2010_BINX64)\link.exe
+
+
+  DEBUG_VS2010_X64_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
+RELEASE_VS2010_X64_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2010_X64_CC_FLAGS       = /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Od
+
+  DEBUG_VS2010_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd /Zi
+RELEASE_VS2010_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd
+NOOPT_VS2010_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd /Zi
+
+  DEBUG_VS2010_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2010_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+NOOPT_VS2010_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+
+##################
+# IPF definitions
+##################
+*_VS2010_IPF_*_DLL         = DEF(VS2010_DLL)
+
+*_VS2010_IPF_PP_PATH       = DEF(VS2010_BIN64)\cl.exe
+*_VS2010_IPF_APP_PATH      = DEF(VS2010_BIN64)\cl.exe
+*_VS2010_IPF_VFRPP_PATH    = DEF(VS2010_BIN64)\cl.exe
+*_VS2010_IPF_CC_PATH       = DEF(VS2010_BIN64)\cl.exe
+*_VS2010_IPF_ASM_PATH      = DEF(VS2010_BIN64)\ias.exe
+*_VS2010_IPF_SLINK_PATH    = DEF(VS2010_BIN64)\lib.exe
+*_VS2010_IPF_DLINK_PATH    = DEF(VS2010_BIN64)\link.exe
+*_VS2010_IPF_ASLCC_PATH    = DEF(VS2010_BIN64)\cl.exe
+*_VS2010_IPF_ASLPP_PATH    = DEF(VS2010_BIN64)\cl.exe
+*_VS2010_IPF_ASLDLINK_PATH = DEF(VS2010_BIN64)\link.exe
+
+  DEBUG_VS2010_IPF_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /EHs-c- /GR- /Gy /Os /GL /FIAutoGen.h /QIPF_fr32 /Zi
+RELEASE_VS2010_IPF_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /EHs-c- /GR- /Gy /Os /GL /FIAutoGen.h /QIPF_fr32
+NOOPT_VS2010_IPF_CC_FLAGS       = /nologo /c /WX /GS- /X /W4 /EHs-c- /GR- /Gy /FIAutoGen.h /QIPF_fr32 /Zi /Od
+
+  DEBUG_VS2010_IPF_ASM_FLAGS    = -N us -X explicit -M ilp64 -N so -W4 -d debug
+RELEASE_VS2010_IPF_ASM_FLAGS    = -N us -X explicit -M ilp64 -N so -W4
+NOOPT_VS2010_IPF_ASM_FLAGS      = -N us -X explicit -M ilp64 -N so -W4 -d debug
+
+  DEBUG_VS2010_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4001 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEBUG_DIR)/$(BASE_NAME).map /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb /DEBUG
+RELEASE_VS2010_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4001 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEBUG_DIR)/$(BASE_NAME).map /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb
+NOOPT_VS2010_IPF_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4001 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEBUG_DIR)/$(BASE_NAME).map /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb /DEBUG
+
+##################
+# EBC definitions
+##################
+*_VS2010_EBC_*_FAMILY            = INTEL
+
+*_VS2010_EBC_MAKE_PATH           = DEF(VS2010_BIN)\nmake.exe
+*_VS2010_EBC_PP_PATH             = DEF(EBC_BIN)\iec.exe
+*_VS2010_EBC_VFRPP_PATH          = DEF(EBC_BIN)\iec.exe
+*_VS2010_EBC_CC_PATH             = DEF(EBC_BIN)\iec.exe
+*_VS2010_EBC_SLINK_PATH          = DEF(EBC_BIN)\link.exe
+*_VS2010_EBC_DLINK_PATH          = DEF(EBC_BIN)\link.exe
+
+*_VS2010_EBC_MAKE_FLAGS          = /nologo
+*_VS2010_EBC_PP_FLAGS            = /nologo /E /TC /FIAutoGen.h
+*_VS2010_EBC_CC_FLAGS            = /nologo /c /WX /W3 /FIAutoGen.h /D$(MODULE_ENTRY_POINT)=$(ARCH_ENTRY_POINT)
+*_VS2010_EBC_VFRPP_FLAGS         = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+*_VS2010_EBC_SLINK_FLAGS         = /lib /NOLOGO /MACHINE:EBC
+*_VS2010_EBC_DLINK_FLAGS         = "C:\Program Files\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /MAP /ALIGN:32 /DRIVER
+
+####################################################################################
+#
+# Microsoft Visual Studio 2010
+#
+#   VS2010  - Microsoft Visual Studio 2010 Premium Edition
+#   ASL     - Microsoft ACPI Source Language Compiler (asl.exe)
+####################################################################################
+#   VS2010xASL           - Microsoft Visual Studio 2010 Premium Edition
+*_VS2010xASL_*_*_FAMILY        = MSFT
+
+*_VS2010xASL_*_MAKE_PATH       = DEF(VS2010_BIN)\nmake.exe
+*_VS2010xASL_*_MAKE_FLAG       = /nologo
+*_VS2010xASL_*_RC_PATH         = DEF(WINSDK_BIN)\rc.exe
+
+*_VS2010xASL_*_SLINK_FLAGS     = /NOLOGO /LTCG
+*_VS2010xASL_*_APP_FLAGS       = /nologo /E /TC
+*_VS2010xASL_*_PP_FLAGS        = /nologo /E /TC /FIAutoGen.h
+*_VS2010xASL_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+
+*_VS2010xASL_*_ASM16_PATH      = DEF(VS2010_BIN)\ml.exe
+
+##################
+# ASL definitions
+##################
+*_VS2010xASL_*_ASL_PATH        = DEF(WIN_ASL_BIN)
+*_VS2010xASL_*_ASL_FLAGS       =
+*_VS2010xASL_*_ASL_OUTFLAGS    = DEF(MS_ASL_OUTFLAGS)
+*_VS2010xASL_*_ASLCC_FLAGS     = DEF(MSFT_ASLCC_FLAGS)
+*_VS2010xASL_*_ASLPP_FLAGS     = DEF(MSFT_ASLPP_FLAGS)
+*_VS2010xASL_*_ASLDLINK_FLAGS  = DEF(MSFT_ASLDLINK_FLAGS)
+
+##################
+# IA32 definitions
+##################
+*_VS2010xASL_IA32_*_DLL        = DEF(VS2010_DLL)
+
+*_VS2010xASL_IA32_MAKE_PATH    = DEF(VS2010_BIN)\nmake.exe
+*_VS2010xASL_IA32_CC_PATH      = DEF(VS2010_BIN)\cl.exe
+*_VS2010xASL_IA32_VFRPP_PATH   = DEF(VS2010_BIN)\cl.exe
+*_VS2010xASL_IA32_SLINK_PATH   = DEF(VS2010_BIN)\lib.exe
+*_VS2010xASL_IA32_DLINK_PATH   = DEF(VS2010_BIN)\link.exe
+*_VS2010xASL_IA32_APP_PATH     = DEF(VS2010_BIN)\cl.exe
+*_VS2010xASL_IA32_PP_PATH      = DEF(VS2010_BIN)\cl.exe
+*_VS2010xASL_IA32_ASM_PATH     = DEF(VS2010_BIN)\ml.exe
+*_VS2010xASL_IA32_ASLCC_PATH    = DEF(VS2010_BIN)\cl.exe
+*_VS2010xASL_IA32_ASLPP_PATH    = DEF(VS2010_BIN)\cl.exe
+*_VS2010xASL_IA32_ASLDLINK_PATH = DEF(VS2010_BIN)\link.exe
+
+      *_VS2010xASL_IA32_MAKE_FLAGS  = /nologo
+  DEBUG_VS2010xASL_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
+RELEASE_VS2010xASL_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2010xASL_IA32_CC_FLAGS      = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
+
+  DEBUG_VS2010xASL_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
+RELEASE_VS2010xASL_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd
+NOOPT_VS2010xASL_IA32_ASM_FLAGS     = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
+
+  DEBUG_VS2010xASL_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2010xASL_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+NOOPT_VS2010xASL_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+
+##################
+# X64 definitions
+##################
+*_VS2010xASL_X64_*_DLL         = DEF(VS2010_DLL)
+
+*_VS2010xASL_X64_CC_PATH       = DEF(VS2010_BINX64)\cl.exe
+*_VS2010xASL_X64_PP_PATH       = DEF(VS2010_BINX64)\cl.exe
+*_VS2010xASL_X64_APP_PATH      = DEF(VS2010_BINX64)\cl.exe
+*_VS2010xASL_X64_VFRPP_PATH    = DEF(VS2010_BINX64)\cl.exe
+*_VS2010xASL_X64_ASM_PATH      = DEF(VS2010_BINX64)\ml64.exe
+*_VS2010xASL_X64_SLINK_PATH    = DEF(VS2010_BINX64)\lib.exe
+*_VS2010xASL_X64_DLINK_PATH    = DEF(VS2010_BINX64)\link.exe
+*_VS2010xASL_X64_ASLCC_PATH    = DEF(VS2010_BINX64)\cl.exe
+*_VS2010xASL_X64_ASLPP_PATH    = DEF(VS2010_BINX64)\cl.exe
+*_VS2010xASL_X64_ASLDLINK_PATH = DEF(VS2010_BINX64)\link.exe
+
+
+  DEBUG_VS2010xASL_X64_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
+RELEASE_VS2010xASL_X64_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2010xASL_X64_CC_FLAGS       = /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Od
+
+  DEBUG_VS2010xASL_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd /Zi
+RELEASE_VS2010xASL_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd
+NOOPT_VS2010xASL_X64_ASM_FLAGS      = /nologo /c /WX /W3 /Cx /Zd /Zi
+
+  DEBUG_VS2010xASL_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2010xASL_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+NOOPT_VS2010xASL_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+
+##################
+# IPF definitions
+##################
+*_VS2010xASL_IPF_*_DLL         = DEF(VS2010_DLL)
+
+*_VS2010xASL_IPF_PP_PATH       = DEF(VS2010_BIN64)\cl.exe
+*_VS2010xASL_IPF_APP_PATH      = DEF(VS2010_BIN64)\cl.exe
+*_VS2010xASL_IPF_VFRPP_PATH    = DEF(VS2010_BIN64)\cl.exe
+*_VS2010xASL_IPF_CC_PATH       = DEF(VS2010_BIN64)\cl.exe
+*_VS2010xASL_IPF_ASM_PATH      = DEF(VS2010_BIN64)\ias.exe
+*_VS2010xASL_IPF_SLINK_PATH    = DEF(VS2010_BIN64)\lib.exe
+*_VS2010xASL_IPF_DLINK_PATH    = DEF(VS2010_BIN64)\link.exe
+*_VS2010xASL_IPF_ASLCC_PATH    = DEF(VS2010_BIN64)\cl.exe
+*_VS2010xASL_IPF_ASLPP_PATH    = DEF(VS2010_BIN64)\cl.exe
+*_VS2010xASL_IPF_ASLDLINK_PATH = DEF(VS2010_BIN64)\link.exe
+
+  DEBUG_VS2010xASL_IPF_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /EHs-c- /GR- /Gy /Os /GL /FIAutoGen.h /QIPF_fr32 /Zi
+RELEASE_VS2010xASL_IPF_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /EHs-c- /GR- /Gy /Os /GL /FIAutoGen.h /QIPF_fr32
+NOOPT_VS2010xASL_IPF_CC_FLAGS       = /nologo /c /WX /GS- /X /W4 /EHs-c- /GR- /Gy /FIAutoGen.h /QIPF_fr32 /Zi /Od
+
+  DEBUG_VS2010xASL_IPF_ASM_FLAGS    = -N us -X explicit -M ilp64 -N so -W4 -d debug
+RELEASE_VS2010xASL_IPF_ASM_FLAGS    = -N us -X explicit -M ilp64 -N so -W4
+NOOPT_VS2010xASL_IPF_ASM_FLAGS      = -N us -X explicit -M ilp64 -N so -W4 -d debug
+
+  DEBUG_VS2010xASL_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4001 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEBUG_DIR)/$(BASE_NAME).map /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb /DEBUG
+RELEASE_VS2010xASL_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4001 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEBUG_DIR)/$(BASE_NAME).map /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb
+NOOPT_VS2010xASL_IPF_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4001 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEBUG_DIR)/$(BASE_NAME).map /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb /DEBUG
+
+##################
+# EBC definitions
+##################
+*_VS2010xASL_EBC_*_FAMILY            = INTEL
+
+*_VS2010xASL_EBC_MAKE_PATH           = DEF(VS2010_BIN)\nmake.exe
+*_VS2010xASL_EBC_PP_PATH             = DEF(EBC_BIN)\iec.exe
+*_VS2010xASL_EBC_VFRPP_PATH          = DEF(EBC_BIN)\iec.exe
+*_VS2010xASL_EBC_CC_PATH             = DEF(EBC_BIN)\iec.exe
+*_VS2010xASL_EBC_SLINK_PATH          = DEF(EBC_BIN)\link.exe
+*_VS2010xASL_EBC_DLINK_PATH          = DEF(EBC_BIN)\link.exe
+
+*_VS2010xASL_EBC_MAKE_FLAGS          = /nologo
+*_VS2010xASL_EBC_PP_FLAGS            = /nologo /E /TC /FIAutoGen.h
+*_VS2010xASL_EBC_CC_FLAGS            = /nologo /c /WX /W3 /FIAutoGen.h /D$(MODULE_ENTRY_POINT)=$(ARCH_ENTRY_POINT)
+*_VS2010xASL_EBC_VFRPP_FLAGS         = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+*_VS2010xASL_EBC_SLINK_FLAGS         = /lib /NOLOGO /MACHINE:EBC
+*_VS2010xASL_EBC_DLINK_FLAGS         = "C:\Program Files\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /MAP /ALIGN:32 /DRIVER
+
+
+####################################################################################
+#   VS2010x86       - Microsoft Visual Studio 2010 (x86) with Intel ASL
+#   ASL  - Intel ACPI Source Language Compiler (iasl.exe)
+####################################################################################
+#   VS2010x86           - Microsoft Visual Studio 2010 (x86) ALL Edition with Intel ASL
+*_VS2010x86_*_*_FAMILY        = MSFT
+
+*_VS2010x86_*_MAKE_PATH       = DEF(VS2010x86_BIN)\nmake.exe
+*_VS2010x86_*_MAKE_FLAG       = /nologo
+*_VS2010x86_*_RC_PATH         = DEF(WINSDK_BIN)\rc.exe
+
+*_VS2010x86_*_MAKE_FLAGS      = /nologo
+*_VS2010x86_*_SLINK_FLAGS     = /NOLOGO /LTCG
+*_VS2010x86_*_APP_FLAGS       = /nologo /E /TC
+*_VS2010x86_*_PP_FLAGS        = /nologo /E /TC /FIAutoGen.h
+*_VS2010x86_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+
+*_VS2010x86_*_ASM16_PATH      = DEF(VS2010x86_BIN)\ml.exe
+
+##################
+# ASL definitions
+##################
+*_VS2010x86_*_ASL_PATH        = DEF(WIN_IASL_BIN)
+*_VS2010x86_*_ASL_FLAGS       = DEF(DEFAULT_WIN_ASL_FLAGS)
+*_VS2010x86_*_ASL_OUTFLAGS    = DEF(DEFAULT_WIN_ASL_OUTFLAGS)
+*_VS2010x86_*_ASLCC_FLAGS     = DEF(MSFT_ASLCC_FLAGS)
+*_VS2010x86_*_ASLPP_FLAGS     = DEF(MSFT_ASLPP_FLAGS)
+*_VS2010x86_*_ASLDLINK_FLAGS  = DEF(MSFT_ASLDLINK_FLAGS)
+
+##################
+# IA32 definitions
+##################
+*_VS2010x86_IA32_*_DLL        = DEF(VS2010x86_DLL)
+
+*_VS2010x86_IA32_MAKE_PATH    = DEF(VS2010x86_BIN)\nmake.exe
+*_VS2010x86_IA32_CC_PATH      = DEF(VS2010x86_BIN)\cl.exe
+*_VS2010x86_IA32_VFRPP_PATH   = DEF(VS2010x86_BIN)\cl.exe
+*_VS2010x86_IA32_ASLCC_PATH   = DEF(VS2010x86_BIN)\cl.exe
+*_VS2010x86_IA32_ASLPP_PATH   = DEF(VS2010x86_BIN)\cl.exe
+*_VS2010x86_IA32_SLINK_PATH   = DEF(VS2010x86_BIN)\lib.exe
+*_VS2010x86_IA32_DLINK_PATH   = DEF(VS2010x86_BIN)\link.exe
+*_VS2010x86_IA32_ASLDLINK_PATH= DEF(VS2010x86_BIN)\link.exe
+*_VS2010x86_IA32_APP_PATH     = DEF(VS2010x86_BIN)\cl.exe
+*_VS2010x86_IA32_PP_PATH      = DEF(VS2010x86_BIN)\cl.exe
+*_VS2010x86_IA32_ASM_PATH     = DEF(VS2010x86_BIN)\ml.exe
+
+      *_VS2010x86_IA32_MAKE_FLAGS  = /nologo
+  DEBUG_VS2010x86_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
+RELEASE_VS2010x86_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2010x86_IA32_CC_FLAGS      = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
+
+  DEBUG_VS2010x86_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
+RELEASE_VS2010x86_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd
+NOOPT_VS2010x86_IA32_ASM_FLAGS     = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
+
+  DEBUG_VS2010x86_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2010x86_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+NOOPT_VS2010x86_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+
+##################
+# X64 definitions
+##################
+*_VS2010x86_X64_*_DLL         = DEF(VS2010x86_DLL)
+
+*_VS2010x86_X64_CC_PATH       = DEF(VS2010x86_BINX64)\cl.exe
+*_VS2010x86_X64_PP_PATH       = DEF(VS2010x86_BINX64)\cl.exe
+*_VS2010x86_X64_APP_PATH      = DEF(VS2010x86_BINX64)\cl.exe
+*_VS2010x86_X64_VFRPP_PATH    = DEF(VS2010x86_BINX64)\cl.exe
+*_VS2010x86_X64_ASLCC_PATH    = DEF(VS2010x86_BINX64)\cl.exe
+*_VS2010x86_X64_ASLPP_PATH    = DEF(VS2010x86_BINX64)\cl.exe
+*_VS2010x86_X64_ASM_PATH      = DEF(VS2010x86_BINX64)\ml64.exe
+*_VS2010x86_X64_SLINK_PATH    = DEF(VS2010x86_BINX64)\lib.exe
+*_VS2010x86_X64_DLINK_PATH    = DEF(VS2010x86_BINX64)\link.exe
+*_VS2010x86_X64_ASLDLINK_PATH = DEF(VS2010x86_BINX64)\link.exe
+
+  DEBUG_VS2010x86_X64_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
+RELEASE_VS2010x86_X64_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2010x86_X64_CC_FLAGS       = /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Od
+
+  DEBUG_VS2010x86_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd /Zi
+RELEASE_VS2010x86_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd
+NOOPT_VS2010x86_X64_ASM_FLAGS      = /nologo /c /WX /W3 /Cx /Zd /Zi
+ 
+  DEBUG_VS2010x86_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2010x86_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+NOOPT_VS2010x86_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+
+
+##################
+# IPF definitions
+##################
+*_VS2010x86_IPF_*_DLL         = DEF(VS2010x86_DLL)
+
+*_VS2010x86_IPF_PP_PATH       = DEF(VS2010x86_BIN64)\cl.exe
+*_VS2010x86_IPF_APP_PATH      = DEF(VS2010x86_BIN64)\cl.exe
+*_VS2010x86_IPF_VFRPP_PATH    = DEF(VS2010x86_BIN64)\cl.exe
+*_VS2010x86_IPF_ASLCC_PATH    = DEF(VS2010x86_BIN64)\cl.exe
+*_VS2010x86_IPF_ASLPP_PATH    = DEF(VS2010x86_BIN64)\cl.exe
+*_VS2010x86_IPF_CC_PATH       = DEF(VS2010x86_BIN64)\cl.exe
+*_VS2010x86_IPF_ASM_PATH      = DEF(VS2010x86_BIN64)\ias.exe
+*_VS2010x86_IPF_SLINK_PATH    = DEF(VS2010x86_BIN64)\lib.exe
+*_VS2010x86_IPF_DLINK_PATH    = DEF(VS2010x86_BIN64)\link.exe
+*_VS2010x86_IPF_ASLDLINK_PATH = DEF(VS2010x86_BIN64)\link.exe
+
+  DEBUG_VS2010x86_IPF_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /EHs-c- /GR- /Gy /Os /GL /FIAutoGen.h /QIPF_fr32 /Zi
+RELEASE_VS2010x86_IPF_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /EHs-c- /GR- /Gy /Os /GL /FIAutoGen.h /QIPF_fr32
+NOOPT_VS2010x86_IPF_CC_FLAGS       = /nologo /c /WX /GS- /X /W4 /EHs-c- /GR- /Gy /FIAutoGen.h /QIPF_fr32 /Zi /Od
+
+  DEBUG_VS2010x86_IPF_ASM_FLAGS    = -N us -X explicit -M ilp64 -N so -W4 -d debug
+RELEASE_VS2010x86_IPF_ASM_FLAGS    = -N us -X explicit -M ilp64 -N so -W4
+NOOPT_VS2010x86_IPF_ASM_FLAGS      = -N us -X explicit -M ilp64 -N so -W4 -d debug
+
+  DEBUG_VS2010x86_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4001 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEBUG_DIR)/$(BASE_NAME).map /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb /DEBUG
+RELEASE_VS2010x86_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4001 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEBUG_DIR)/$(BASE_NAME).map /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb
+NOOPT_VS2010x86_IPF_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4001 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEBUG_DIR)/$(BASE_NAME).map /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb /DEBUG
+
+
+####################################################################################
+#   VS2010x86xASL     - Microsoft Visual Studio 2010 with Microsoft ASL
+#   ASL  - Microsoft ACPI Source Language Compiler (asl.exe)
+####################################################################################
+*_VS2010x86xASL_*_*_FAMILY        = MSFT
+
+*_VS2010x86xASL_*_MAKE_PATH       = DEF(VS2010x86_BIN)\nmake.exe
+*_VS2010x86xASL_*_MAKE_FLAG       = /nologo
+*_VS2010x86xASL_*_RC_PATH         = DEF(WINSDK_BIN)\rc.exe
+
+*_VS2010x86xASL_*_MAKE_FLAGS      = /nologo
+*_VS2010x86xASL_*_SLINK_FLAGS     = /NOLOGO /LTCG
+*_VS2010x86xASL_*_APP_FLAGS       = /nologo /E /TC
+*_VS2010x86xASL_*_PP_FLAGS        = /nologo /E /TC /FIAutoGen.h
+*_VS2010x86xASL_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+
+*_VS2010x86xASL_*_ASM16_PATH      = DEF(VS2010x86_BIN)\ml.exe
+
+##################
+# ASL definitions
+##################
+*_VS2010x86xASL_*_ASL_PATH        = DEF(WIN_ASL_BIN)
+*_VS2010x86xASL_*_ASL_FLAGS       = DEF(MS_ASL_FLAGS)
+*_VS2010x86xASL_*_ASL_OUTFLAGS    = DEF(MS_ASL_OUTFLAGS)
+*_VS2010x86xASL_*_ASLCC_FLAGS     = DEF(MSFT_ASLCC_FLAGS)
+*_VS2010x86xASL_*_ASLPP_FLAGS     = DEF(MSFT_ASLPP_FLAGS)
+*_VS2010x86xASL_*_ASLDLINK_FLAGS  = DEF(MSFT_ASLDLINK_FLAGS)
+
+##################
+# IA32 definitions
+##################
+*_VS2010x86xASL_IA32_*_DLL        = DEF(VS2010x86_DLL)
+
+*_VS2010x86xASL_IA32_MAKE_PATH    = DEF(VS2010x86_BIN)\nmake.exe
+*_VS2010x86xASL_IA32_CC_PATH      = DEF(VS2010x86_BIN)\cl.exe
+*_VS2010x86xASL_IA32_VFRPP_PATH   = DEF(VS2010x86_BIN)\cl.exe
+*_VS2010x86xASL_IA32_ASLCC_PATH   = DEF(VS2010x86_BIN)\cl.exe
+*_VS2010x86xASL_IA32_ASLPP_PATH   = DEF(VS2010x86_BIN)\cl.exe
+*_VS2010x86xASL_IA32_SLINK_PATH   = DEF(VS2010x86_BIN)\lib.exe
+*_VS2010x86xASL_IA32_DLINK_PATH   = DEF(VS2010x86_BIN)\link.exe
+*_VS2010x86xASL_IA32_ASLDLINK_PATH= DEF(VS2010x86_BIN)\link.exe
+*_VS2010x86xASL_IA32_APP_PATH     = DEF(VS2010x86_BIN)\cl.exe
+*_VS2010x86xASL_IA32_PP_PATH      = DEF(VS2010x86_BIN)\cl.exe
+*_VS2010x86xASL_IA32_ASM_PATH     = DEF(VS2010x86_BIN)\ml.exe
+
+      *_VS2010x86xASL_IA32_MAKE_FLAGS  = /nologo
+  DEBUG_VS2010x86xASL_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
+RELEASE_VS2010x86xASL_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2010x86xASL_IA32_CC_FLAGS      = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
+
+  DEBUG_VS2010x86xASL_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
+RELEASE_VS2010x86xASL_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd
+NOOPT_VS2010x86xASL_IA32_ASM_FLAGS     = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
+
+  DEBUG_VS2010x86xASL_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2010x86xASL_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+NOOPT_VS2010x86xASL_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+
+##################
+# X64 definitions
+##################
+*_VS2010x86xASL_X64_*_DLL         = DEF(VS2010x86_DLL)
+
+*_VS2010x86xASL_X64_CC_PATH       = DEF(VS2010x86_BINX64)\cl.exe
+*_VS2010x86xASL_X64_PP_PATH       = DEF(VS2010x86_BINX64)\cl.exe
+*_VS2010x86xASL_X64_APP_PATH      = DEF(VS2010x86_BINX64)\cl.exe
+*_VS2010x86xASL_X64_VFRPP_PATH    = DEF(VS2010x86_BINX64)\cl.exe
+*_VS2010x86xASL_X64_ASLCC_PATH    = DEF(VS2010x86_BINX64)\cl.exe
+*_VS2010x86xASL_X64_ASLPP_PATH    = DEF(VS2010x86_BINX64)\cl.exe
+*_VS2010x86xASL_X64_ASM_PATH      = DEF(VS2010x86_BINX64)\ml64.exe
+*_VS2010x86xASL_X64_SLINK_PATH    = DEF(VS2010x86_BINX64)\lib.exe
+*_VS2010x86xASL_X64_DLINK_PATH    = DEF(VS2010x86_BINX64)\link.exe
+*_VS2010x86xASL_X64_ASLDLINK_PATH = DEF(VS2010x86_BINX64)\link.exe
+
+  DEBUG_VS2010x86xASL_X64_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
+RELEASE_VS2010x86xASL_X64_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2010x86xASL_X64_CC_FLAGS       = /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Od
+
+  DEBUG_VS2010x86xASL_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd /Zi
+RELEASE_VS2010x86xASL_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd
+NOOPT_VS2010x86xASL_X64_ASM_FLAGS      = /nologo /c /WX /W3 /Cx /Zd /Zi
+
+  DEBUG_VS2010x86xASL_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2010x86xASL_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+NOOPT_VS2010x86xASL_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+
+##################
+# IPF definitions
+##################
+*_VS2010x86xASL_IPF_*_DLL         = DEF(VS2010x86_DLL)
+
+*_VS2010x86xASL_IPF_PP_PATH       = DEF(VS2010x86_BIN64)\cl.exe
+*_VS2010x86xASL_IPF_APP_PATH      = DEF(VS2010x86_BIN64)\cl.exe
+*_VS2010x86xASL_IPF_VFRPP_PATH    = DEF(VS2010x86_BIN64)\cl.exe
+*_VS2010x86xASL_IPF_ASLCC_PATH    = DEF(VS2010x86_BIN64)\cl.exe
+*_VS2010x86xASL_IPF_ASLPP_PATH    = DEF(VS2010x86_BIN64)\cl.exe
+*_VS2010x86xASL_IPF_CC_PATH       = DEF(VS2010x86_BIN64)\cl.exe
+*_VS2010x86xASL_IPF_ASM_PATH      = DEF(VS2010x86_BIN64)\ias.exe
+*_VS2010x86xASL_IPF_SLINK_PATH    = DEF(VS2010x86_BIN64)\lib.exe
+*_VS2010x86xASL_IPF_DLINK_PATH    = DEF(VS2010x86_BIN64)\link.exe
+*_VS2010x86xASL_IPF_ASLDLINK_PATH = DEF(VS2010x86_BIN64)\link.exe
+
+  DEBUG_VS2010x86xASL_IPF_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /EHs-c- /GR- /Gy /Os /GL /FIAutoGen.h /QIPF_fr32 /Zi
+RELEASE_VS2010x86xASL_IPF_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /EHs-c- /GR- /Gy /Os /GL /FIAutoGen.h /QIPF_fr32
+NOOPT_VS2010x86xASL_IPF_CC_FLAGS       = /nologo /c /WX /GS- /X /W4 /EHs-c- /GR- /Gy /FIAutoGen.h /QIPF_fr32 /Zi /Od
+
+  DEBUG_VS2010x86xASL_IPF_ASM_FLAGS    = -N us -X explicit -M ilp64 -N so -W4 -d debug
+RELEASE_VS2010x86xASL_IPF_ASM_FLAGS    = -N us -X explicit -M ilp64 -N so -W4
+NOOPT_VS2010x86xASL_IPF_ASM_FLAGS      = -N us -X explicit -M ilp64 -N so -W4 -d debug
+
+  DEBUG_VS2010x86xASL_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4001 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEBUG_DIR)/$(BASE_NAME).map /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb /DEBUG
+RELEASE_VS2010x86xASL_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4001 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEBUG_DIR)/$(BASE_NAME).map /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb
+NOOPT_VS2010x86xASL_IPF_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4001 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEBUG_DIR)/$(BASE_NAME).map /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb /DEBUG
 
 
 ####################################################################################
@@ -4368,6 +4917,14 @@ RELEASE_ARMLINUXGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARM
 ##################
 *_*_*_LZMA_PATH          = LzmaCompress
 *_*_*_LZMA_GUID          = EE4E5898-3914-4259-9D6E-DC7BD79403CF
+
+##################
+# LzmaF86Compress tool definitions with converter for x86 code.
+# It can improve the compression ratio if the input file is IA32 or X64 PE image.
+# Notes: If X64 PE image is built based on GCC44, it may not get the better compression.
+##################
+*_*_*_LZMAF86_PATH         = LzmaF86Compress
+*_*_*_LZMAF86_GUID         = D42AE6BD-1352-4bfb-909A-CA72A6EAE889
 
 ##################
 # TianoCompress tool definitions

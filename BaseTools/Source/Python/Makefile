@@ -21,7 +21,7 @@ MODULES=encodings.cp437,encodings.gbk,encodings.utf_16,encodings.utf_8,encodings
 
 BIN_DIR=$(EDK_TOOLS_PATH)\Bin\Win32
 
-APPLICATIONS=$(BIN_DIR)\build.exe $(BIN_DIR)\GenFds.exe $(BIN_DIR)\Trim.exe $(BIN_DIR)\MigrationMsa2Inf.exe $(BIN_DIR)\Fpd2Dsc.exe $(BIN_DIR)\TargetTool.exe $(BIN_DIR)\spd2dec.exe $(BIN_DIR)\GenDepex.exe $(BIN_DIR)\GenPatchPcdTable.exe $(BIN_DIR)\PatchPcdValue.exe $(BIN_DIR)\BPDG.exe $(BIN_DIR)\UPT.exe
+APPLICATIONS=$(BIN_DIR)\build.exe $(BIN_DIR)\GenFds.exe $(BIN_DIR)\Trim.exe $(BIN_DIR)\TargetTool.exe $(BIN_DIR)\GenDepex.exe $(BIN_DIR)\GenPatchPcdTable.exe $(BIN_DIR)\PatchPcdValue.exe $(BIN_DIR)\BPDG.exe $(BIN_DIR)\UPT.exe
 
 COMMON_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\Common\BuildToolError.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\Database.py \
@@ -76,15 +76,6 @@ $(BIN_DIR)\GenFds.exe: $(BASE_TOOLS_PATH)\Source\Python\GenFds\GenFds.py $(COMMO
 
 $(BIN_DIR)\Trim.exe: $(BASE_TOOLS_PATH)\Source\Python\Trim\Trim.py $(COMMON_PYTHON)
   @pushd . & @cd Trim & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) Trim.py & @popd
-
-$(BIN_DIR)\MigrationMsa2Inf.exe: $(BASE_TOOLS_PATH)\Source\Python\MigrationMsa2Inf\MigrationMsa2Inf.py $(COMMON_PYTHON)
-  @pushd . & @cd MigrationMsa2Inf & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) MigrationMsa2Inf.py & @popd 
-
-$(BIN_DIR)\Fpd2Dsc.exe: $(BASE_TOOLS_PATH)\Source\Python\Fpd2Dsc\Fpd2Dsc.py $(COMMON_PYTHON)
-  @pushd . & @cd Fpd2Dsc & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) Fpd2Dsc.py & @popd
-
-$(BIN_DIR)\spd2dec.exe: $(BASE_TOOLS_PATH)\Source\Python\spd2dec\Spd2Dec.py $(COMMON_PYTHON)
-  @pushd . & @cd Spd2Dec & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) Spd2Dec.py & @popd
 
 $(BIN_DIR)\GenDepex.exe: $(BASE_TOOLS_PATH)\Source\Python\AutoGen\GenDepex.py $(COMMON_PYTHON)
   @pushd . & @cd AutoGen & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) GenDepex.py & @popd

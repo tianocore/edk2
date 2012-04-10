@@ -5,7 +5,7 @@
     LzmaUtil.c -- Test application for LZMA compression
     2008-11-23 : Igor Pavlov : Public domain
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -27,7 +27,16 @@
 #include "Sdk/C/7zVersion.h"
 #include "Sdk/C/LzmaDec.h"
 #include "Sdk/C/LzmaEnc.h"
+#include "Sdk/C/Bra.h"
 #include "CommonLib.h"
+
+#define LZMA_HEADER_SIZE (LZMA_PROPS_SIZE + 8)
+
+typedef enum {
+  NoConverter, 
+  X86Converter,
+  MaxConverter
+} CONVERTER_TYPE;
 
 const char *kCantReadMessage = "Can not read input file";
 const char *kCantWriteMessage = "Can not write output file";
@@ -39,12 +48,13 @@ static void SzFree(void *p, void *address) { p = p; MyFree(address); }
 static ISzAlloc g_Alloc = { SzAlloc, SzFree };
 
 static Bool mQuietMode = False;
+static CONVERTER_TYPE mConType = NoConverter;
 
 #define UTILITY_NAME "LzmaCompress"
 #define UTILITY_MAJOR_VERSION 0
-#define UTILITY_MINOR_VERSION 1
+#define UTILITY_MINOR_VERSION 2
 #define INTEL_COPYRIGHT \
-  "Copyright (c) 2009, Intel Corporation. All rights reserved."
+  "Copyright (c) 2009-2012, Intel Corporation. All rights reserved."
 void PrintHelp(char *buffer)
 {
   strcat(buffer,
@@ -54,6 +64,7 @@ void PrintHelp(char *buffer)
              "  -e: encode file\n"
              "  -d: decode file\n"
              "  -o FileName, --output FileName: specify the output filename\n"
+             "  --f86: enable converter for x86 code\n"
              "  -v, --verbose: increase output messages\n"
              "  -q, --quiet: reduce output messages\n"
              "  --debug [0-9]: set debug level\n"
@@ -86,121 +97,151 @@ void PrintVersion(char *buffer)
   sprintf (buffer, "%s Version %d.%d %s ", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
 }
 
-#define IN_BUF_SIZE (1 << 16)
-#define OUT_BUF_SIZE (1 << 16)
-
-static SRes Decode2(CLzmaDec *state, ISeqOutStream *outStream, ISeqInStream *inStream,
-    UInt64 unpackSize)
+static SRes Encode(ISeqOutStream *outStream, ISeqInStream *inStream, UInt64 fileSize)
 {
-  int thereIsSize = (unpackSize != (UInt64)(Int64)-1);
-  Byte inBuf[IN_BUF_SIZE];
-  Byte outBuf[OUT_BUF_SIZE];
-  size_t inPos = 0, inSize = 0, outPos = 0;
-  LzmaDec_Init(state);
-  for (;;)
+  SRes res;
+  size_t inSize = (size_t)fileSize;
+  Byte *inBuffer = 0;
+  Byte *outBuffer = 0;
+  Byte *filteredStream = 0;
+  size_t outSize;
+  CLzmaEncProps props;
+
+  LzmaEncProps_Init(&props);
+  LzmaEncProps_Normalize(&props);
+
+  if (inSize != 0) {
+    inBuffer = (Byte *)MyAlloc(inSize);
+    if (inBuffer == 0)
+      return SZ_ERROR_MEM;
+  } else {
+    return SZ_ERROR_INPUT_EOF;
+  }
+  
+  if (SeqInStream_Read(inStream, inBuffer, inSize) != SZ_OK) {
+    res = SZ_ERROR_READ;
+    goto Done;
+  }
+
+  // we allocate 105% of original size + 64KB for output buffer
+  outSize = (size_t)fileSize / 20 * 21 + (1 << 16);
+  outBuffer = (Byte *)MyAlloc(outSize);
+  if (outBuffer == 0) {
+    res = SZ_ERROR_MEM;
+    goto Done;
+  }
+  
   {
-    if (inPos == inSize)
-    {
-      inSize = IN_BUF_SIZE;
-      RINOK(inStream->Read(inStream, inBuf, &inSize));
-      inPos = 0;
+    int i;
+    for (i = 0; i < 8; i++)
+      outBuffer[i + LZMA_PROPS_SIZE] = (Byte)(fileSize >> (8 * i));
+  }
+
+  if (mConType != NoConverter)
+  {
+    filteredStream = (Byte *)MyAlloc(inSize);
+    if (filteredStream == 0) {
+      res = SZ_ERROR_MEM;
+      goto Done;
     }
-    {
-      SRes res;
-      SizeT inProcessed = inSize - inPos;
-      SizeT outProcessed = OUT_BUF_SIZE - outPos;
-      ELzmaFinishMode finishMode = LZMA_FINISH_ANY;
-      ELzmaStatus status;
-      if (thereIsSize && outProcessed > unpackSize)
+    memcpy(filteredStream, inBuffer, inSize);
+    
+    if (mConType == X86Converter) {
       {
-        outProcessed = (SizeT)unpackSize;
-        finishMode = LZMA_FINISH_END;
-      }
-
-      res = LzmaDec_DecodeToBuf(state, outBuf + outPos, &outProcessed,
-        inBuf + inPos, &inProcessed, finishMode, &status);
-      inPos += inProcessed;
-      outPos += outProcessed;
-      unpackSize -= outProcessed;
-
-      if (outStream)
-        if (outStream->Write(outStream, outBuf, outPos) != outPos)
-          return SZ_ERROR_WRITE;
-
-      outPos = 0;
-
-      if (res != SZ_OK || (thereIsSize && unpackSize == 0))
-        return res;
-
-      if (inProcessed == 0 && outProcessed == 0)
-      {
-        if (thereIsSize || status != LZMA_STATUS_FINISHED_WITH_MARK)
-          return SZ_ERROR_DATA;
-        return res;
+        UInt32 x86State;
+        x86_Convert_Init(x86State);
+        x86_Convert(filteredStream, (SizeT) inSize, 0, &x86State, 1);
       }
     }
   }
-}
 
-static SRes Decode(ISeqOutStream *outStream, ISeqInStream *inStream)
-{
-  UInt64 unpackSize;
-  int i;
-  SRes res = 0;
+  {
+    size_t outSizeProcessed = outSize - LZMA_HEADER_SIZE;
+    size_t outPropsSize = LZMA_PROPS_SIZE;
+    
+    res = LzmaEncode(outBuffer + LZMA_HEADER_SIZE, &outSizeProcessed,
+        mConType != NoConverter ? filteredStream : inBuffer, inSize,
+        &props, outBuffer, &outPropsSize, 0,
+        NULL, &g_Alloc, &g_Alloc);
+    
+    if (res != SZ_OK)
+      goto Done;
 
-  CLzmaDec state;
+    outSize = LZMA_HEADER_SIZE + outSizeProcessed;
+  }
 
-  /* header: 5 bytes of LZMA properties and 8 bytes of uncompressed size */
-  unsigned char header[LZMA_PROPS_SIZE + 8];
+  if (outStream->Write(outStream, outBuffer, outSize) != outSize)
+    res = SZ_ERROR_WRITE;
 
-  /* Read and parse header */
+Done:
+  MyFree(outBuffer);
+  MyFree(inBuffer);
+  MyFree(filteredStream);
 
-  RINOK(SeqInStream_Read(inStream, header, sizeof(header)));
-
-  unpackSize = 0;
-  for (i = 0; i < 8; i++)
-    unpackSize += (UInt64)header[LZMA_PROPS_SIZE + i] << (i * 8);
-
-  LzmaDec_Construct(&state);
-  RINOK(LzmaDec_Allocate(&state, header, LZMA_PROPS_SIZE, &g_Alloc));
-  res = Decode2(&state, outStream, inStream, unpackSize);
-  LzmaDec_Free(&state, &g_Alloc);
   return res;
 }
 
-static SRes Encode(ISeqOutStream *outStream, ISeqInStream *inStream, UInt64 fileSize, char *rs)
+static SRes Decode(ISeqOutStream *outStream, ISeqInStream *inStream, UInt64 fileSize)
 {
-  CLzmaEncHandle enc;
   SRes res;
-  CLzmaEncProps props;
+  size_t inSize = (size_t)fileSize;
+  Byte *inBuffer = 0;
+  Byte *outBuffer = 0;
+  size_t outSize = 0;
+  size_t inSizePure;
+  ELzmaStatus status;
+  UInt64 outSize64 = 0;
 
-  rs = rs;
+  int i;
 
-  enc = LzmaEnc_Create(&g_Alloc);
-  if (enc == 0)
+  if (inSize < LZMA_HEADER_SIZE) 
+    return SZ_ERROR_INPUT_EOF;
+
+  inBuffer = (Byte *)MyAlloc(inSize);
+  if (inBuffer == 0)
     return SZ_ERROR_MEM;
-
-  LzmaEncProps_Init(&props);
-  res = LzmaEnc_SetProps(enc, &props);
-
-  if (res == SZ_OK)
-  {
-    Byte header[LZMA_PROPS_SIZE + 8];
-    size_t headerSize = LZMA_PROPS_SIZE;
-    int i;
-
-    res = LzmaEnc_WriteProperties(enc, header, &headerSize);
-    for (i = 0; i < 8; i++)
-      header[headerSize++] = (Byte)(fileSize >> (8 * i));
-    if (outStream->Write(outStream, header, headerSize) != headerSize)
-      res = SZ_ERROR_WRITE;
-    else
-    {
-      if (res == SZ_OK)
-        res = LzmaEnc_Encode(enc, outStream, inStream, NULL, &g_Alloc, &g_Alloc);
-    }
+  
+  if (SeqInStream_Read(inStream, inBuffer, inSize) != SZ_OK) {
+    res = SZ_ERROR_READ;
+    goto Done;
   }
-  LzmaEnc_Destroy(enc, &g_Alloc, &g_Alloc);
+
+  for (i = 0; i < 8; i++)
+    outSize64 += ((UInt64)inBuffer[LZMA_PROPS_SIZE + i]) << (i * 8);
+
+  outSize = (size_t)outSize64;
+  if (outSize != 0) {
+    outBuffer = (Byte *)MyAlloc(outSize);
+    if (outBuffer == 0) {
+      res = SZ_ERROR_MEM;
+      goto Done;
+    }
+  } else {
+    res = SZ_OK;
+    goto Done;
+  }
+
+  inSizePure = inSize - LZMA_HEADER_SIZE;
+  res = LzmaDecode(outBuffer, &outSize, inBuffer + LZMA_HEADER_SIZE, &inSizePure,
+      inBuffer, LZMA_PROPS_SIZE, LZMA_FINISH_END, &status, &g_Alloc);
+
+  if (res != SZ_OK)
+    goto Done;
+
+  if (mConType == X86Converter)
+  {
+    UInt32 x86State;
+    x86_Convert_Init(x86State);
+    x86_Convert(outBuffer, (SizeT) outSize, 0, &x86State, 0);
+  }
+
+  if (outStream->Write(outStream, outBuffer, outSize) != outSize)
+    res = SZ_ERROR_WRITE;
+
+Done:
+  MyFree(outBuffer);
+  MyFree(inBuffer);
+
   return res;
 }
 
@@ -214,6 +255,7 @@ int main2(int numArgs, const char *args[], char *rs)
   const char *inputFile = NULL;
   const char *outputFile = "file.tmp";
   int param;
+  UInt64 fileSize;
 
   FileSeqInStream_CreateVTable(&inStream);
   File_Construct(&inStream.file);
@@ -231,6 +273,8 @@ int main2(int numArgs, const char *args[], char *rs)
     if (strcmp(args[param], "-e") == 0 || strcmp(args[param], "-d") == 0) {
       encodeMode = (args[param][1] == 'e');
       modeWasSet = True;
+    } else if (strcmp(args[param], "--f86") == 0) {
+      mConType = X86Converter;
     } else if (strcmp(args[param], "-o") == 0 ||
                strcmp(args[param], "--output") == 0) {
       if (numArgs < (param + 2)) {
@@ -292,21 +336,21 @@ int main2(int numArgs, const char *args[], char *rs)
   if (OutFile_Open(&outStream.file, outputFile) != 0)
     return PrintError(rs, "Can not open output file");
 
+  File_GetLength(&inStream.file, &fileSize);
+
   if (encodeMode)
   {
-    UInt64 fileSize;
-    File_GetLength(&inStream.file, &fileSize);
     if (!mQuietMode) {
       printf("Encoding\n");
     }
-    res = Encode(&outStream.s, &inStream.s, fileSize, rs);
+    res = Encode(&outStream.s, &inStream.s, fileSize);
   }
   else
   {
     if (!mQuietMode) {
       printf("Decoding\n");
     }
-    res = Decode(&outStream.s, &inStream.s);
+    res = Decode(&outStream.s, &inStream.s, fileSize);
   }
 
   File_Close(&outStream.file);

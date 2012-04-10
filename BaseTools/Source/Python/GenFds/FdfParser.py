@@ -77,6 +77,7 @@ SEPERATOR_TUPLE = ('=', '|', ',', '{', '}')
 
 RegionSizePattern = re.compile("\s*(?P<base>(?:0x|0X)?[a-fA-F0-9]+)\s*\|\s*(?P<size>(?:0x|0X)?[a-fA-F0-9]+)\s*")
 RegionSizeGuidPattern = re.compile("\s*(?P<base>\w+\.\w+)\s*\|\s*(?P<size>\w+\.\w+)\s*")
+ShortcutPcdPattern = re.compile("\s*\w+\s*=\s*(?P<value>(?:0x|0X)?[a-fA-F0-9]+)\s*\|\s*(?P<name>\w+\.\w+)\s*")
 
 IncludeFileList = []
 
@@ -679,7 +680,7 @@ class FdfParser:
                     PreIndex = 0
                     StartPos = CurLine.find('$(', PreIndex)
                     EndPos = CurLine.find(')', StartPos+2)
-                    while StartPos != -1 and EndPos != -1 and not (self.__Token == '!ifdef' or self.__Token == '!ifndef'):
+                    while StartPos != -1 and EndPos != -1 and self.__Token not in ['!ifdef', '!ifndef', '!if', '!elseif']:
                         MacroName = CurLine[StartPos+2 : EndPos]
                         MacorValue = self.__GetMacroValue(MacroName)
                         if MacorValue != None:
@@ -711,6 +712,8 @@ class FdfParser:
                     self.__SetMacroValue(Macro, Value)
                     self.__WipeOffArea.append(((DefineLine, DefineOffset), (self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - 1)))
             elif self.__Token == 'SET':
+                SetLine = self.CurrentLineNumber - 1
+                SetOffset = self.CurrentOffsetWithinLine - len('SET')
                 PcdPair = self.__GetNextPcdName()
                 PcdName = "%s.%s" % (PcdPair[1], PcdPair[0])
                 if not self.__IsToken( "="):
@@ -720,6 +723,12 @@ class FdfParser:
                 Value = self.__EvaluateConditional(Value, self.CurrentLineNumber, 'eval', True)
 
                 self.__PcdDict[PcdName] = Value
+
+                self.Profile.PcdDict[PcdPair] = Value
+                FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
+                self.Profile.PcdFileLineDict[PcdPair] = FileLineTuple
+
+                self.__WipeOffArea.append(((SetLine, SetOffset), (self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - 1)))
             elif self.__Token in ('!ifdef', '!ifndef', '!if'):
                 IfStartPos = (self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - len(self.__Token))
                 IfList.append([IfStartPos, None, None])
@@ -773,6 +782,11 @@ class FdfParser:
                 if self.CurrentLineNumber <= RegionLayoutLine:
                     # Don't try the same line twice
                     continue
+                SetPcd = ShortcutPcdPattern.match(self.Profile.FileLinesList[self.CurrentLineNumber - 1])
+                if SetPcd:
+                    self.__PcdDict[SetPcd.group('name')] = SetPcd.group('value')
+                    RegionLayoutLine = self.CurrentLineNumber
+                    continue
                 RegionSize = RegionSizePattern.match(self.Profile.FileLinesList[self.CurrentLineNumber - 1])
                 if not RegionSize:
                     RegionLayoutLine = self.CurrentLineNumber
@@ -793,6 +807,7 @@ class FdfParser:
         MacroDict = {}
 
         # PCD macro
+        MacroDict.update(GlobalData.gPlatformPcds)
         MacroDict.update(self.__PcdDict)
 
         # Lowest priority
@@ -838,7 +853,19 @@ class FdfParser:
                                 Line=Line)
                 return Excpt.result
             except Exception, Excpt:
-                raise Warning("Invalid expression", *FileLineTuple)
+                if hasattr(Excpt, 'Pcd'):
+                    if Excpt.Pcd in GlobalData.gPlatformOtherPcds:
+                        Info = GlobalData.gPlatformOtherPcds[Excpt.Pcd]
+                        raise Warning("Cannot use this PCD (%s) in an expression as"
+                                      " it must be defined in a [PcdsFixedAtBuild] or [PcdsFeatureFlag] section"
+                                      " of the DSC file (%s), and it is currently defined in this section:"
+                                      " %s, line #: %d." % (Excpt.Pcd, GlobalData.gPlatformOtherPcds['DSCFILE'], Info[0], Info[1]),
+                                      *FileLineTuple)
+                    else:
+                        raise Warning("PCD (%s) is not defined in DSC file (%s)" % (Excpt.Pcd, GlobalData.gPlatformOtherPcds['DSCFILE']),
+                                      *FileLineTuple)
+                else:
+                    raise Warning(str(Excpt), *FileLineTuple)
         else:
             if Expression.startswith('$(') and Expression[-1] == ')':
                 Expression = Expression[2:-1]            
@@ -2287,6 +2314,10 @@ class FdfParser:
         if not self.__GetNextToken():
             raise Warning("expected INF file path", self.FileName, self.CurrentLineNumber)
         ffsInf.InfFileName = self.__Token
+
+        ffsInf.CurrentLineNum = self.CurrentLineNumber
+        ffsInf.CurrentLineContent = self.__CurrentLine()
+
         if ffsInf.InfFileName.replace('$(WORKSPACE)', '').find('$') == -1:
             #do case sensitive check for file path
             ErrorCode, ErrorInfo = PathClass(NormPath(ffsInf.InfFileName), GenFdsGlobalVariable.WorkSpaceDir).Validate()
@@ -2305,9 +2336,6 @@ class FdfParser:
                 ffsInf.KeepReloc = True
             else:
                 raise Warning("Unknown reloc strip flag '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
-        
-        ffsInf.CurrentLineNum = self.CurrentLineNumber
-        ffsInf.CurrentLineContent = self.__CurrentLine()
         
         if ForCapsule:
             capsuleFfs = CapsuleData.CapsuleFfs()
@@ -2419,9 +2447,6 @@ class FdfParser:
                 
         FfsFileObj.NameGuid = self.__Token
         
-        FfsFileObj.CurrentLineNum = self.CurrentLineNumber
-        FfsFileObj.CurrentLineContent = self.__CurrentLine()
-        
         self.__GetFilePart( FfsFileObj, MacroDict.copy())
 
         if ForCapsule:
@@ -2511,6 +2536,8 @@ class FdfParser:
             self.__UndoToken()
             self.__GetSectionData( FfsFileObj, MacroDict)
         else:
+            FfsFileObj.CurrentLineNum = self.CurrentLineNumber
+            FfsFileObj.CurrentLineContent = self.__CurrentLine()
             FfsFileObj.FileName = self.__Token
             if FfsFileObj.FileName.replace('$(WORKSPACE)', '').find('$') == -1:
                 #

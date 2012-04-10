@@ -1,7 +1,7 @@
 ## @file
 # Windows makefile for C tools build.
 #
-# Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -59,6 +59,7 @@ install: $(LIB_PATH) $(BIN_PATH)
 	@echo ######################
 	@-xcopy $(LIB_PATH)\*.lib $(SYS_LIB_PATH) /I /D /E /F /Y > NUL 2>&1
 	@-xcopy $(BIN_PATH)\*.exe $(SYS_BIN_PATH) /I /D /E /F /Y > NUL 2>&1
+  @-xcopy $(BIN_PATH)\*.bat $(SYS_BIN_PATH) /I /D /E /F /Y > NUL 2>&1
 
 .PHONY: clean
 clean:

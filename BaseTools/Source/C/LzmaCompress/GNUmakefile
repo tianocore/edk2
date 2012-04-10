@@ -1,7 +1,7 @@
 ## @file
 # Windows makefile for 'LzmaCompress' module build.
 #
-# Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -24,7 +24,8 @@ OBJECTS = \
   $(SDK_C)/LzmaDec.o \
   $(SDK_C)/LzmaEnc.o \
   $(SDK_C)/7zFile.o \
-  $(SDK_C)/7zStream.o
+  $(SDK_C)/7zStream.o \
+  $(SDK_C)/Bra86.o
 
 include $(MAKEROOT)/Makefiles/app.makefile
 

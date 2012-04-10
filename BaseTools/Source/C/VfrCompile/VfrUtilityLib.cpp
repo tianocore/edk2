@@ -2,7 +2,7 @@
   
   Vfr common library functions.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -3067,6 +3067,83 @@ CVfrStringDB::SetStringFileName(IN CHAR8 *StringFileName)
   mStringFileName[FileLen - 1] = '\0';
 }
 
+
+/**
+  Returns TRUE or FALSE whether SupportedLanguages contains the best matching language 
+  from a set of supported languages.
+
+  @param[in]  SupportedLanguages  A pointer to a Null-terminated ASCII string that
+                                  contains a set of language codes.
+  @param[in]  Language            A variable that contains pointers to Null-terminated
+                                  ASCII strings that contain one language codes.
+
+  @retval FALSE   The best matching language could not be found in SupportedLanguages.
+  @retval TRUE    The best matching language could be found in SupportedLanguages.
+
+**/
+BOOLEAN
+CVfrStringDB::GetBestLanguage (
+  IN CONST CHAR8  *SupportedLanguages,
+  IN CHAR8        *Language
+  )
+{
+  UINTN        CompareLength;
+  UINTN        LanguageLength;
+  CONST CHAR8  *Supported;
+
+  if (SupportedLanguages == NULL || Language == NULL){
+    return FALSE;
+  }
+
+  //
+  // Determine the length of the first RFC 4646 language code in Language
+  //
+  for (LanguageLength = 0; Language[LanguageLength] != 0 && Language[LanguageLength] != ';'; LanguageLength++);
+
+  //
+  // Trim back the length of Language used until it is empty
+  //
+  while (LanguageLength > 0) {
+    //
+    // Loop through all language codes in SupportedLanguages
+    //
+    for (Supported = SupportedLanguages; *Supported != '\0'; Supported += CompareLength) {
+      //
+      // Skip ';' characters in Supported
+      //
+      for (; *Supported != '\0' && *Supported == ';'; Supported++);
+      //
+      // Determine the length of the next language code in Supported
+      //
+      for (CompareLength = 0; Supported[CompareLength] != 0 && Supported[CompareLength] != ';'; CompareLength++);
+      //
+      // If Language is longer than the Supported, then skip to the next language
+      //
+      if (LanguageLength > CompareLength) {
+        continue;
+      }
+
+      //
+      // See if the first LanguageLength characters in Supported match Language
+      //
+      if (strncmp (Supported, Language, LanguageLength) == 0) {
+        return TRUE;
+      }
+    }
+
+    //
+    // Trim Language from the right to the next '-' character 
+    //
+    for (LanguageLength--; LanguageLength > 0 && Language[LanguageLength] != '-'; LanguageLength--);
+  }
+
+  //
+  // No matches were found 
+  //
+  return FALSE;
+}
+
+
 CHAR8 *
 CVfrStringDB::GetVarStoreNameFormStringId (
   IN EFI_STRING_ID StringId
@@ -3122,17 +3199,18 @@ CVfrStringDB::GetVarStoreNameFormStringId (
   }
 
   //
-  // Search the language, only search the "en-US".
+  // Search the language, get best language base on RFC 4647 matching algorithm.
   //
   Current = StringPtr;
-  while (strcmp (PkgHeader->Language, "en-US") != 0) {
+  while (!GetBestLanguage ("en", PkgHeader->Language)) {
     Current += PkgHeader->Header.Length;
     PkgHeader = (EFI_HII_STRING_PACKAGE_HDR *) Current;
     //
-    // If can't find "en-US" string package, just return the first string package.
+    // If can't find string package base on language, just return the first string package.
     //
     if (Current - StringPtr >= Length) {
       Current = StringPtr;
+      PkgHeader = (EFI_HII_STRING_PACKAGE_HDR *) StringPtr;
       break;
     }
   }

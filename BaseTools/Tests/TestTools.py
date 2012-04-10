@@ -1,7 +1,7 @@
 ## @file
 # Utility functions and classes for BaseTools unit tests
 #
-#  Copyright (c) 2008, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -41,21 +41,20 @@ def MakeTheTestSuite(localItems):
                 tests.append(item())
     return lambda: unittest.TestSuite(tests)
 
-def GetBaseToolsPath():
+def GetBaseToolsPaths():
     if sys.platform in ('win32', 'win64'):
-        return os.path.join(BaseToolsDir, 'Bin', sys.platform.title())
-    elif sys.platform in ('cygwin'):
-        uname = os.popen('uname -sm').read().strip()
-        for char in (' ', '/'):
-            uname = uname.replace(char, '-')
-        return os.path.join(BaseToolsDir, 'Bin', uname)
+        return [ os.path.join(BaseToolsDir, 'Bin', sys.platform.title()) ]
     else:
         uname = os.popen('uname -sm').read().strip()
         for char in (' ', '/'):
             uname = uname.replace(char, '-')
-        return os.path.join(BaseToolsDir, 'BinWrappers', uname)
+        return [
+                os.path.join(BaseToolsDir, 'Bin', uname),
+                os.path.join(BaseToolsDir, 'BinWrappers', uname),
+                os.path.join(BaseToolsDir, 'BinWrappers', 'PosixLike')
+            ]
 
-BaseToolsBinPath = GetBaseToolsPath()
+BaseToolsBinPaths = GetBaseToolsPaths()
 
 class BaseToolsTest(unittest.TestCase):
 
@@ -93,6 +92,14 @@ class BaseToolsTest(unittest.TestCase):
         sys.stdout.write(self.ReadTmpFile(fileName))
         sys.stdout.flush()
 
+    def FindToolBin(self, toolName):
+        for binPath in BaseToolsBinPaths:
+            bin = os.path.join(binPath, toolName)
+            if os.path.exists(bin):
+                break
+        assert os.path.exists(bin)
+        return bin
+
     def RunTool(self, *args, **kwd):
         if 'toolName' in kwd: toolName = kwd['toolName']
         else: toolName = None
@@ -100,7 +107,7 @@ class BaseToolsTest(unittest.TestCase):
         else: logFile = None
 
         if toolName is None: toolName = self.toolName
-        bin = os.path.join(self.baseToolsBins, toolName)
+        bin = self.FindToolBin(toolName)
         if logFile is not None:
             logFile = open(os.path.join(self.testDir, logFile), 'w')
             popenOut = logFile
@@ -154,9 +161,9 @@ class BaseToolsTest(unittest.TestCase):
         self.savedEnvPath = os.environ['PATH']
         self.savedSysPath = sys.path[:]
 
-        self.baseToolsBins = BaseToolsBinPath
-        os.environ['PATH'] = \
-            os.path.pathsep.join((os.environ['PATH'], self.baseToolsBins))
+        for binPath in BaseToolsBinPaths:
+            os.environ['PATH'] = \
+                os.path.pathsep.join((os.environ['PATH'], binPath))
 
         self.testDir = TestTempDir
         if not os.path.exists(self.testDir):

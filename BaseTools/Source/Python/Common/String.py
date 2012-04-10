@@ -319,7 +319,7 @@ def NormPath(Path, Defines={}):
 #
 # @retval Path Formatted path
 #
-def CleanString(Line, CommentCharacter=DataType.TAB_COMMENT_SPLIT, AllowCppStyleComment=False):
+def CleanString(Line, CommentCharacter=DataType.TAB_COMMENT_SPLIT, AllowCppStyleComment=False, BuildOption=False):
     #
     # remove whitespace
     #
@@ -343,7 +343,7 @@ def CleanString(Line, CommentCharacter=DataType.TAB_COMMENT_SPLIT, AllowCppStyle
             Line = Line[0: Index]
             break
 
-    if CommentInString:
+    if CommentInString and BuildOption:
         Line = Line.replace('"', '')
         ChIndex = Line.find('#')
         while ChIndex >= 0:

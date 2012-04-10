@@ -314,7 +314,7 @@ def myOptionParser():
     Parser.add_option("-r", "--rom_image", dest="uiFdName", help="Build the image using the [FD] section named by FdUiName.")
     Parser.add_option("-i", "--FvImage", dest="uiFvName", help="Build the FV image using the [FV] section named by UiFvName")
     Parser.add_option("-C", "--CapsuleImage", dest="uiCapName", help="Build the Capsule image using the [Capsule] section named by UiCapName")
-    Parser.add_option("-b", "--buildtarget", type="choice", choices=['DEBUG','RELEASE', 'NOOPT'], dest="BuildTarget", help="Build TARGET is one of list: DEBUG, RELEASE, NOOPT.",
+    Parser.add_option("-b", "--buildtarget", type="string", dest="BuildTarget", help="Set the build TARGET, overrides target.txt TARGET setting.",
                       action="callback", callback=SingleCheckCallback)
     Parser.add_option("-t", "--tagname", type="string", dest="ToolChain", help="Using the tools: TOOL_CHAIN_TAG name to build the platform.",
                       action="callback", callback=SingleCheckCallback)
@@ -516,10 +516,13 @@ class GenFds :
             for ModuleFile in PlatformDataBase.Modules:
                 Module = BuildDb.BuildObject[ModuleFile, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
                 GuidXRefFile.write("%s %s\n" % (Module.Guid, Module.BaseName))
-        SaveFileOnChange(GuidXRefFileName, GuidXRefFile.getvalue(), False)
+        if GuidXRefFile.getvalue():
+            SaveFileOnChange(GuidXRefFileName, GuidXRefFile.getvalue(), False)
+            GenFdsGlobalVariable.InfLogger("\nGUID cross reference file can be found at %s" % GuidXRefFileName)
+        elif os.path.exists(GuidXRefFileName):
+            os.remove(GuidXRefFileName)
         GuidXRefFile.close()
-        GenFdsGlobalVariable.InfLogger("\nGUID cross reference file can be found at %s" % GuidXRefFileName)
-        
+
     ##Define GenFd as static function
     GenFd = staticmethod(GenFd)
     GetFvBlockSize = staticmethod(GetFvBlockSize)

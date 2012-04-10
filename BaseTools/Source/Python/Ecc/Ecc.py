@@ -28,6 +28,7 @@ from Common.String import NormPath
 from Common.BuildVersion import gBUILD_VERSION
 from Common import BuildToolError
 from Common.Misc import PathClass
+from Common.Misc import DirCache
 from MetaFileWorkspace.MetaFileParser import DscParser
 from MetaFileWorkspace.MetaFileParser import DecParser
 from MetaFileWorkspace.MetaFileParser import InfParser
@@ -106,6 +107,11 @@ class Ecc(object):
         EccGlobalData.gDb = Database.Database(Database.DATABASE_PATH)
         EccGlobalData.gDb.InitDatabase(self.IsInit)
 
+        #
+        # Get files real name in workspace dir
+        #
+        GlobalData.gAllFiles = DirCache(GlobalData.gWorkspace)
+         
         # Build ECC database
         self.BuildDatabase()
 
@@ -137,13 +143,13 @@ class Ecc(object):
         EccGlobalData.gDb.TblReport.Create()
 
         # Build database
-        if self.IsInit:
-            if self.ScanSourceCode:
-                EdkLogger.quiet("Building database for source code ...")
-                c.CollectSourceCodeDataIntoDB(EccGlobalData.gTarget)
+        if self.IsInit:            
             if self.ScanMetaData:
-                EdkLogger.quiet("Building database for source code done!")
+                EdkLogger.quiet("Building database for Meta Data File ...")
                 self.BuildMetaDataFileDatabase()
+            if self.ScanSourceCode:
+                EdkLogger.quiet("Building database for Meta Data File Done!")
+                c.CollectSourceCodeDataIntoDB(EccGlobalData.gTarget)
 
         EccGlobalData.gIdentifierTableList = GetTableList((MODEL_FILE_C, MODEL_FILE_H), 'Identifier', EccGlobalData.gDb)
         EccGlobalData.gCFileList = GetFileList(MODEL_FILE_C, EccGlobalData.gDb)

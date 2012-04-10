@@ -262,7 +262,7 @@ class DscBuildData(PlatformBuildClassObject):
             if self._Header == None:
                 self._GetHeaderInfo()
             if self._Guid == None:
-                EdkLogger.error('build', ATTRIBUTE_NOT_AVAILABLE, "No FILE_GUID", File=self.MetaFile)
+                EdkLogger.error('build', ATTRIBUTE_NOT_AVAILABLE, "No PLATFORM_GUID", File=self.MetaFile)
         return self._Guid
 
     ## Retrieve platform version
@@ -271,7 +271,7 @@ class DscBuildData(PlatformBuildClassObject):
             if self._Header == None:
                 self._GetHeaderInfo()
             if self._Version == None:
-                self._Version = ''
+                EdkLogger.error('build', ATTRIBUTE_NOT_AVAILABLE, "No PLATFORM_VERSION", File=self.MetaFile)
         return self._Version
 
     ## Retrieve platform description file version
@@ -280,7 +280,7 @@ class DscBuildData(PlatformBuildClassObject):
             if self._Header == None:
                 self._GetHeaderInfo()
             if self._DscSpecification == None:
-                self._DscSpecification = ''
+                EdkLogger.error('build', ATTRIBUTE_NOT_AVAILABLE, "No DSC_SPECIFICATION", File=self.MetaFile)                
         return self._DscSpecification
 
     ## Retrieve OUTPUT_DIRECTORY
@@ -298,7 +298,7 @@ class DscBuildData(PlatformBuildClassObject):
             if self._Header == None:
                 self._GetHeaderInfo()
             if self._SupArchList == None:
-                self._SupArchList = ARCH_LIST
+                EdkLogger.error('build', ATTRIBUTE_NOT_AVAILABLE, "No SUPPORTED_ARCHITECTURES", File=self.MetaFile)
         return self._SupArchList
 
     ## Retrieve BUILD_TARGETS
@@ -307,7 +307,7 @@ class DscBuildData(PlatformBuildClassObject):
             if self._Header == None:
                 self._GetHeaderInfo()
             if self._BuildTargets == None:
-                self._BuildTargets = ['DEBUG', 'RELEASE', 'NOOPT']
+                EdkLogger.error('build', ATTRIBUTE_NOT_AVAILABLE, "No BUILD_TARGETS", File=self.MetaFile)
         return self._BuildTargets
 
     ## Retrieve SKUID_IDENTIFIER
@@ -463,7 +463,8 @@ class DscBuildData(PlatformBuildClassObject):
                 EdkLogger.error('build', ErrorCode, File=self.MetaFile, Line=LineNo,
                                 ExtraData=ErrorInfo)
             # Check duplication
-            if ModuleFile in self._Modules:
+            # If arch is COMMON, no duplicate module is checked since all modules in all component sections are selected
+            if self._Arch != 'COMMON' and ModuleFile in self._Modules:
                 EdkLogger.error('build', FILE_DUPLICATED, File=self.MetaFile, ExtraData=str(ModuleFile), Line=LineNo)
 
             Module = ModuleBuildClassObject()
@@ -840,6 +841,17 @@ class DscBuildData(PlatformBuildClassObject):
         if (Name, Guid) not in self.Pcds:
             self.Pcds[Name, Guid] = PcdClassObject(Name, Guid, '', '', '', '', '', {}, False, None)
         self.Pcds[Name, Guid].DefaultValue = Value
+
+    def IsPlatformPcdDeclared(self, DecPcds):
+        for PcdType in (MODEL_PCD_FIXED_AT_BUILD, MODEL_PCD_PATCHABLE_IN_MODULE, MODEL_PCD_FEATURE_FLAG,
+                        MODEL_PCD_DYNAMIC_DEFAULT, MODEL_PCD_DYNAMIC_HII, MODEL_PCD_DYNAMIC_VPD,
+                        MODEL_PCD_DYNAMIC_EX_DEFAULT, MODEL_PCD_DYNAMIC_EX_HII, MODEL_PCD_DYNAMIC_EX_VPD):
+            RecordList = self._RawData[PcdType, self._Arch]
+            for TokenSpaceGuid, PcdCName, Setting, Arch, SkuName, Dummy3, Dummy4 in RecordList:
+                if (PcdCName, TokenSpaceGuid) not in DecPcds:
+                    EdkLogger.error('build', PARSER_ERROR,
+                                    "Pcd (%s.%s) defined in DSC is not declared in DEC files." % (TokenSpaceGuid, PcdCName),
+                                    File=self.MetaFile, Line=Dummy4)
 
     _Macros             = property(_GetMacros)
     Arch                = property(_GetArch, _SetArch)

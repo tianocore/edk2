@@ -46,6 +46,9 @@ gMakeTypeMap = {"MSFT":"nmake", "GCC":"gmake"}
 ## Build rule configuration file
 gBuildRuleFile = 'Conf/build_rule.txt'
 
+## Build rule default version
+AutoGenReqBuildRuleVerNum = "0.1"
+
 ## default file name for AutoGen
 gAutoGenCodeFileName = "AutoGen.c"
 gAutoGenHeaderFileName = "AutoGen.h"
@@ -288,8 +291,25 @@ class WorkspaceAutoGen(AutoGen):
         # apply SKU and inject PCDs from Flash Definition file
         for Arch in self.ArchList:
             Platform = self.BuildDatabase[self.MetaFile, Arch, Target, Toolchain]
+
+            DecPcds = set()
+            PGen = PlatformAutoGen(self, self.MetaFile, Target, Toolchain, Arch)
+            Pkgs = PGen.PackageList
+            for Pkg in Pkgs:
+                for Pcd in Pkg.Pcds.keys():
+                    DecPcds.add((Pcd[0], Pcd[1]))
+            Platform.IsPlatformPcdDeclared(DecPcds)
+
             Platform.SkuName = self.SkuId
             for Name, Guid in PcdSet:
+                if (Name, Guid) not in DecPcds:
+                    EdkLogger.error(
+                        'build',
+                        PARSER_ERROR,
+                        "PCD (%s.%s) used in FDF is not declared in DEC files." % (Guid, Name),
+                        File = self.FdfProfile.PcdFileLineDict[Name, Guid][0],
+                        Line = self.FdfProfile.PcdFileLineDict[Name, Guid][1]
+                    )
                 Platform.AddPcd(Name, Guid, PcdSet[Name, Guid])
 
             Pa = PlatformAutoGen(self, self.MetaFile, Target, Toolchain, Arch)
@@ -334,11 +354,14 @@ class WorkspaceAutoGen(AutoGen):
                     #
                     InfFoundFlag = False                   
                     for Pa in self.AutoGenObjectList:
+                        if InfFoundFlag:
+                            break
                         for Module in Pa.ModuleAutoGenList:
                             if path.normpath(Module.MetaFile.File) == path.normpath(FfsFile.InfFileName):
                                 InfFoundFlag = True
                                 if not Module.Guid.upper() in _GuidDict.keys():
                                     _GuidDict[Module.Guid.upper()] = FfsFile
+                                    break
                                 else:
                                     EdkLogger.error("build", 
                                                     FORMAT_INVALID,
@@ -1230,6 +1253,15 @@ class PlatformAutoGen(AutoGen):
             if BuildRuleFile in [None, '']:
                 BuildRuleFile = gBuildRuleFile
             self._BuildRule = BuildRule(BuildRuleFile)
+            if self._BuildRule._FileVersion == "":
+                self._BuildRule._FileVersion = AutoGenReqBuildRuleVerNum
+            else:
+                if self._BuildRule._FileVersion < AutoGenReqBuildRuleVerNum :
+                    # If Build Rule's version is less than the version number required by the tools, halting the build.
+                    EdkLogger.error("build", AUTOGEN_ERROR, 
+                                    ExtraData="The version number [%s] of build_rule.txt is less than the version number required by the AutoGen.(the minimum required version number is [%s])"\
+                                     % (self._BuildRule._FileVersion, AutoGenReqBuildRuleVerNum))
+              
         return self._BuildRule
 
     ## Summarize the packages used by modules in this platform

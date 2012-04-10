@@ -1,7 +1,7 @@
 ## @file
 #  GNU Make makefile for C tools build.
 #
-#  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -22,10 +22,7 @@ ifndef ARCH
   ifeq ($(uname_m),x86_64)
     ARCH=X64
   endif
-  ifeq ($(uname_m),i386)
-    ARCH=IA32
-  endif
-  ifeq ($(uname_m),i686)
+  ifeq ($(patsubst i%86,IA32,$(uname_m)),IA32)
     ARCH=IA32
   endif
   ifndef ARCH

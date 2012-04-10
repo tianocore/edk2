@@ -3,7 +3,7 @@
 @REM   however it may be executed directly from the BaseTools project folder
 @REM   if the file is not executed within a WORKSPACE\BaseTools folder.
 @REM
-@REM Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+@REM Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 @REM
 @REM This program and the accompanying materials are licensed and made available
 @REM under the terms and conditions of the BSD Licensewhich accompanies this 
@@ -158,14 +158,6 @@ if NOT exist %WORKSPACE%\Conf (
   )
 )
 
-if NOT exist %WORKSPACE%\Conf\FrameworkDatabase.db (
-  echo copying ... FrameworkDatabase.template to %WORKSPACE%\Conf\FrameworkDatabase.db
-  copy %EDK_TOOLS_PATH%\Conf\FrameworkDatabase.template %WORKSPACE%\Conf\FrameworkDatabase.db > nul
-) else (
-  if defined RECONFIG echo over-write ... FrameworkDatabase.template to %WORKSPACE%\Conf\FrameworkDatabase.db
-  if defined RECONFIG copy /Y %EDK_TOOLS_PATH%\Conf\FrameworkDatabase.template %WORKSPACE%\Conf\FrameworkDatabase.db > nul
-)
-
 if NOT exist %WORKSPACE%\Conf\target.txt (
   echo copying ... target.template to %WORKSPACE%\Conf\target.txt
   if NOT exist %EDK_TOOLS_PATH%\Conf\target.template (
@@ -299,16 +291,24 @@ goto end
   echo.
 
   if defined VCINSTALLDIR goto VisualStudioAvailable
-  if defined VS71COMNTOOLS (
-    call "%VS71COMNTOOLS%\vsvars32.bat"
+  if defined VS100COMNTOOLS (
+    call "%VS100COMNTOOLS%\vsvars32.bat"
   ) else (
-    if defined VS80COMNTOOLS (
-      call "%VS80COMNTOOLS%\vsvars32.bat"
+    if defined VS90COMNTOOLS (
+      call "%VS90COMNTOOLS%\vsvars32.bat"
     ) else (
-      echo.
-      echo !!! ERROR !!!! Cannot find Visual Studio, required to build C tools !!!
-      echo.
-      goto end
+      if defined VS80COMNTOOLS (
+        call "%VS80COMNTOOLS%\vsvars32.bat"
+      ) else (
+        if defined VS71COMNTOOLS (
+          call "%VS71COMNTOOLS%\vsvars32.bat"
+        ) else (
+          echo.
+          echo !!! ERROR !!!! Cannot find Visual Studio, required to build C tools !!!
+          echo.
+          goto end
+        )
+      )
     )
   )
 

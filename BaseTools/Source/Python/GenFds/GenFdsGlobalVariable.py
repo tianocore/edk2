@@ -1,7 +1,7 @@
 ## @file
 # Global variables for GenFds
 #
-#  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -581,7 +581,7 @@ class GenFdsGlobalVariable:
                 sys.stdout.write('\n')
 
         try:
-            PopenObject = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr= subprocess.PIPE)
+            PopenObject = subprocess.Popen(' '.join(cmd), stdout=subprocess.PIPE, stderr= subprocess.PIPE, shell=True)
         except Exception, X:
             EdkLogger.error("GenFds", COMMAND_FAILURE, ExtraData="%s: %s" % (str(X), cmd[0]))
         (out, error) = PopenObject.communicate()

@@ -64,6 +64,7 @@ class Ffs(FDClassObject):
         'COMPAT16'             : '.com16',
         'RAW'                  : '.raw',
         'FREEFORM_SUBTYPE_GUID': '.guid',
+        'SUBTYPE_GUID'         : '.guid',        
         'FV_IMAGE'             : 'fv.sec',
         'COMPRESS'             : '.com',
         'GUIDED'               : '.guided',

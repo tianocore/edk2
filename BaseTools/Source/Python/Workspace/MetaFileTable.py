@@ -50,11 +50,13 @@ class MetaFileTable(Table):
 
     def IsIntegrity(self):
         try:
+            TimeStamp = self.MetaFile.TimeStamp
             Result = self.Cur.execute("select ID from %s where ID<0" % (self.Table)).fetchall()
             if not Result:
+                # update the timestamp in database
+                self._FileIndexTable.SetFileTimeStamp(self.IdBase, TimeStamp)                
                 return False
 
-            TimeStamp = self.MetaFile.TimeStamp
             if TimeStamp != self._FileIndexTable.GetFileTimeStamp(self.IdBase):
                 # update the timestamp in database
                 self._FileIndexTable.SetFileTimeStamp(self.IdBase, TimeStamp)

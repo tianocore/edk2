@@ -36,6 +36,7 @@ ERR_STRING_CMP          = 'Unicode string and general string cannot be compared:
 ERR_ARRAY_TOKEN         = 'Bad C array or C format GUID token: [%s].'
 ERR_ARRAY_ELE           = 'This must be HEX value for NList or Array: [%s].'
 ERR_EMPTY_EXPR          = 'Empty expression is not allowed.'
+ERR_IN_OPERAND          = 'Macro after IN operator can only be: $(FAMILY), $(ARCH), $(TOOL_CHAIN_TAG) and $(TARGET).'
 
 ## SplitString
 #  Split string to list according double quote
@@ -88,21 +89,28 @@ def ReplaceExprMacro(String, Macros, ExceptionList = None):
                 # If an undefined macro name appears in the constant-expression of
                 # !if or !elif, it is replaced by the integer constant 0.
                 RetStr += '0'
-            elif not InQuote and ExceptionList and Macro in ExceptionList:
+            elif not InQuote:
+                Tklst = RetStr.split()
+                if Tklst and Tklst[-1] in ['IN', 'in'] and ExceptionList and Macro not in ExceptionList:
+                    raise BadExpression(ERR_IN_OPERAND)
                 # Make sure the macro in exception list is encapsulated by double quote
                 # For example: DEFINE ARCH = IA32 X64
                 # $(ARCH) is replaced with "IA32 X64"
-                RetStr += '"' + Macros[Macro] + '"'
-            else:
-                if Macros[Macro].strip() != "":
+                if ExceptionList and Macro in ExceptionList:
+                    RetStr += '"' + Macros[Macro] + '"'
+                elif Macros[Macro].strip():
                     RetStr += Macros[Macro]
                 else:
                     RetStr += '""'
+            else:
+                RetStr += Macros[Macro]
             RetStr += String[MacroEndPos+1:]
             String = RetStr
             MacroStartPos = String.find('$(')
         StrList[i] = RetStr
     return ''.join(StrList)
+
+SupportedInMacroList = ['TARGET', 'TOOL_CHAIN_TAG', 'ARCH', 'FAMILY']
 
 class ValueExpression(object):
     # Logical operator mapping
@@ -213,7 +221,7 @@ class ValueExpression(object):
 
         self._Expr = ReplaceExprMacro(Expression.strip(),
                                   SymbolTable,
-                                  ['TARGET', 'TOOL_CHAIN_TAG', 'ARCH'])
+                                  SupportedInMacroList)
 
         if not self._Expr.strip():
             raise BadExpression(ERR_EMPTY_EXPR)
@@ -457,7 +465,9 @@ class ValueExpression(object):
         # PCD token
         if self.PcdPattern.match(self._Token):
             if self._Token not in self._Symb:
-                raise BadExpression(ERR_PCD_RESOLVE % self._Token)
+                Ex = BadExpression(ERR_PCD_RESOLVE % self._Token)
+                Ex.Pcd = self._Token
+                raise Ex
             self._Token = ValueExpression(self._Symb[self._Token], self._Symb)(True)
             if type(self._Token) != type(''):
                 self._LiteralToken = hex(self._Token)

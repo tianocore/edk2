@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -160,6 +160,14 @@ GetEdkToolsPathBinDirectory() {
   echo $EDK_TOOLS_PATH_BIN
 }
 
+AddDirToStartOfPath() {
+  DIRNAME=$1
+  PATH=$DIRNAME:$DIRNAME:$DIRNAME:$PATH
+  PATH=${PATH//$DIRNAME:/}
+  PATH=$DIRNAME:$PATH
+  export PATH
+}
+
 AddEdkToolsToPath() {
 
   #
@@ -172,18 +180,8 @@ AddEdkToolsToPath() {
 
   EDK_TOOLS_PATH_BIN=`GetEdkToolsPathBinDirectory`
 
-  if [ ! -e $EDK_TOOLS_PATH_BIN ]
-  then
-    echo "Unable to find expected bin path under \$EDK_TOOLS_PATH!"
-    echo "> $EDK_TOOLS_PATH_BIN"
-    return 1
-  fi
-
-  if [ "${PATH/$EDK_TOOLS_PATH_BIN/}" == "$PATH" ]
-  then
-    export PATH=$EDK_TOOLS_PATH_BIN:$PATH
-    return 0
-  fi
+  AddDirToStartOfPath $EDK_TOOLS_PATH/BinWrappers/PosixLike
+  AddDirToStartOfPath $EDK_TOOLS_PATH_BIN
 
 }
 
@@ -208,7 +206,6 @@ CopySingleTemplateFile() {
 CopyTemplateFiles() {
 
   CopySingleTemplateFile build_rule
-  CopySingleTemplateFile FrameworkDatabase
   CopySingleTemplateFile tools_def
   CopySingleTemplateFile target
 
