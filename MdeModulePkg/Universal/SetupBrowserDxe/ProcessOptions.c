@@ -981,7 +981,7 @@ ProcessOptions (
   @param  RowCount               TRUE: if Question is selected.
 
 **/
-VOID
+UINTN
 ProcessHelpString (
   IN  CHAR16  *StringPtr,
   OUT CHAR16  **FormattedString,
@@ -1182,4 +1182,6 @@ ProcessHelpString (
   }
 
   FreePool (IndexArray);
+
+  return LineCount;
 }

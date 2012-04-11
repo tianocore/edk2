@@ -2090,7 +2090,9 @@ UiDisplayMenu (
   CHAR16                          *StringPtr;
   CHAR16                          *OptionString;
   CHAR16                          *OutputString;
-  CHAR16                          *FormattedString;
+  CHAR16                          *HelpString;
+  CHAR16                          *HelpHeaderString;
+  CHAR16                          *HelpBottomString;
   BOOLEAN                         NewLine;
   BOOLEAN                         Repaint;
   BOOLEAN                         SavedValue;
@@ -2118,16 +2120,32 @@ UiDisplayMenu (
   UI_MENU_LIST                    *CurrentMenu;
   UINTN                           ModalSkipColumn;
   BROWSER_HOT_KEY                 *HotKey;
+  UINTN                           HelpPageIndex;
+  UINTN                           HelpPageCount;
+  UINTN                           RowCount;
+  UINTN                           HelpLine;
+  UINTN                           HelpHeaderLine;
+  UINTN                           HelpBottomLine;
+  BOOLEAN                         MultiHelpPage;
 
   CopyMem (&LocalScreen, &gScreenDimensions, sizeof (EFI_SCREEN_DESCRIPTOR));
 
   Status              = EFI_SUCCESS;
-  FormattedString     = NULL;
+  HelpString          = NULL;
+  HelpHeaderString    = NULL;
+  HelpBottomString    = NULL;
   OptionString        = NULL;
   ScreenOperation     = UiNoOperation;
   NewLine             = TRUE;
   MinRefreshInterval  = 0;
   DefaultId           = 0;
+  HelpPageCount       = 0;
+  HelpLine            = 0;
+  RowCount            = 0;
+  HelpBottomLine      = 0;
+  HelpHeaderLine      = 0;
+  HelpPageIndex       = 0;
+  MultiHelpPage       = FALSE;
 
   OutputString        = NULL;
   UpArrow             = FALSE;
@@ -2842,22 +2860,112 @@ UiDisplayMenu (
           StringPtr = GetToken (MenuOption->ThisTag->Help, MenuOption->Handle);
         }
 
-        ProcessHelpString (StringPtr, &FormattedString, BottomRow - TopRow);
-
-        gST->ConOut->SetAttribute (gST->ConOut, HELP_TEXT | FIELD_BACKGROUND);
-
-        for (Index = 0; Index < BottomRow - TopRow; Index++) {
+        RowCount      = BottomRow - TopRow;
+        HelpPageIndex = 0;
+        //
+        // 1.Calculate how many line the help string need to print.
+        //
+        HelpLine = ProcessHelpString (StringPtr, &HelpString, RowCount);
+        if (HelpLine > RowCount) {
+          MultiHelpPage   = TRUE;
+          StringPtr       = GetToken (STRING_TOKEN(ADJUST_HELP_PAGE_UP), gHiiHandle);
+          HelpHeaderLine  = ProcessHelpString (StringPtr, &HelpHeaderString, RowCount);
+          StringPtr       = GetToken (STRING_TOKEN(ADJUST_HELP_PAGE_DOWN), gHiiHandle);
+          HelpBottomLine  = ProcessHelpString (StringPtr, &HelpBottomString, RowCount);
           //
-          // Pad String with spaces to simulate a clearing of the previous line
+          // Calculate the help page count.
           //
-          for (; GetStringWidth (&FormattedString[Index * gHelpBlockWidth * 2]) / 2 < gHelpBlockWidth;) {
-            StrCat (&FormattedString[Index * gHelpBlockWidth * 2], L" ");
+          if (HelpLine > 2 * RowCount - 2) {
+            HelpPageCount = (HelpLine - RowCount + 1) / (RowCount - 2) + 1;
+            if ((HelpLine - RowCount + 1) % (RowCount - 2) > 1) {
+              HelpPageCount += 1;
+            }
+          } else {
+            HelpPageCount = 2;
           }
+        } else {
+          MultiHelpPage = FALSE;
+        }
+      }
 
+      //
+      // Clean the help field first.
+      //
+      ClearLines (
+        LocalScreen.RightColumn - gHelpBlockWidth,
+        LocalScreen.RightColumn,
+        TopRow,
+        BottomRow,
+        PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND
+        );
+
+      gST->ConOut->SetAttribute (gST->ConOut, INFO_TEXT | FIELD_BACKGROUND);
+      //
+      // Check whether need to show the 'More(U/u)' at the begin.
+      // Base on current direct info, here shows aligned to the right side of the column.
+      // If the direction is multi line and aligned to right side may have problem, so 
+      // add ASSERT code here.
+      //
+      if (HelpPageIndex > 0) {
+        for (Index = 0; Index < HelpHeaderLine; Index++) {
+          ASSERT (HelpHeaderLine == 1);
+          ASSERT (GetStringWidth (HelpHeaderString) / 2 < (UINTN) (gHelpBlockWidth - 1));
+          PrintStringAt (
+            LocalScreen.RightColumn - GetStringWidth (HelpHeaderString) / 2 - 1,
+            Index + TopRow,
+            &HelpHeaderString[Index * gHelpBlockWidth * 2]
+            );
+        }
+      }
+
+      gST->ConOut->SetAttribute (gST->ConOut, HELP_TEXT | FIELD_BACKGROUND);
+      //
+      // Print the help string info.
+      //
+      if (!MultiHelpPage) {
+        for (Index = 0; Index < RowCount; Index++) {
           PrintStringAt (
             LocalScreen.RightColumn - gHelpBlockWidth,
             Index + TopRow,
-            &FormattedString[Index * gHelpBlockWidth * 2]
+            &HelpString[Index * gHelpBlockWidth * 2]
+            );
+        }
+      } else  {
+        if (HelpPageIndex == 0) {
+          for (Index = 0; Index < RowCount - HelpBottomLine; Index++) {
+            PrintStringAt (
+              LocalScreen.RightColumn - gHelpBlockWidth,
+              Index + TopRow,
+              &HelpString[Index * gHelpBlockWidth * 2]
+              );
+          }
+        } else {
+          for (Index = 0; (Index < RowCount - HelpBottomLine - HelpHeaderLine) && 
+              (Index + HelpPageIndex * (RowCount - 2) + 1 < HelpLine); Index++) {
+            PrintStringAt (
+              LocalScreen.RightColumn - gHelpBlockWidth,
+              Index + TopRow + HelpHeaderLine,
+              &HelpString[(Index + HelpPageIndex * (RowCount - 2) + 1)* gHelpBlockWidth * 2]
+              );
+          }
+        } 
+      }
+
+      gST->ConOut->SetAttribute (gST->ConOut, INFO_TEXT | FIELD_BACKGROUND);
+      //
+      // Check whether need to print the 'More(D/d)' at the bottom.
+      // Base on current direct info, here shows aligned to the right side of the column.
+      // If the direction is multi line and aligned to right side may have problem, so 
+      // add ASSERT code here.
+      //
+      if (HelpPageIndex < HelpPageCount - 1 && MultiHelpPage) {
+        for (Index = 0; Index < HelpBottomLine; Index++) {
+          ASSERT (HelpBottomLine == 1);
+          ASSERT (GetStringWidth (HelpBottomString) / 2 < (UINTN) (gHelpBlockWidth - 1)); 
+          PrintStringAt (
+            LocalScreen.RightColumn - GetStringWidth (HelpBottomString) / 2 - 1,
+            Index + BottomRow - HelpBottomLine,
+            &HelpBottomString[Index * gHelpBlockWidth * 2]
             );
         }
       }
@@ -2979,6 +3087,26 @@ UiDisplayMenu (
             ScreenOperation = UiSelect;
           }
         }
+        break;
+
+      case 'D':
+      case 'd':
+        if (!MultiHelpPage) {
+          ControlFlag = CfReadKey;
+          break;
+        }
+        ControlFlag    = CfUpdateHelpString;
+        HelpPageIndex  = HelpPageIndex < HelpPageCount - 1 ? HelpPageIndex + 1 : HelpPageCount - 1;
+        break;
+
+      case 'U':
+      case 'u':
+        if (!MultiHelpPage) {
+          ControlFlag = CfReadKey;
+          break;
+        }
+        ControlFlag    = CfUpdateHelpString;
+        HelpPageIndex  = HelpPageIndex > 0 ? HelpPageIndex - 1 : 0;
         break;
 
       case CHAR_NULL:
