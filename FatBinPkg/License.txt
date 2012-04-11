@@ -31,7 +31,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 Additional terms: In addition to the forgoing, redistribution and use
 of the code is conditioned upon the FAT 32 File System Driver and all
 derivative works thereof being used for and designed only to read
-and/or write to a file system that is directly managed by an
-Extensible Firmware Interface (EFI) implementation or by an emulator
-of an EFI implementation.
+and/or write to a file system that is directly managed by Intel's
+Extensible Firmware Initiative (EFI) Specification v. 1.0 and later
+and/or the Unified Extensible Firmware Interface (UEFI) Forum's UEFI
+Specifications v.2.0 and later (together the "UEFI Specifications");
+only as necessary to emulate an implementation of the UEFI Specifications;
+and to create firmware, applications, utilities and/or drivers.
 
