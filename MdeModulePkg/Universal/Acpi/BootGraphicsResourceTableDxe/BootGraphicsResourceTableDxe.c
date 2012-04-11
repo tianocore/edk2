@@ -157,6 +157,8 @@ SetBootLogo (
   IN UINTN                             Height
   )
 {
+  UINT64                        BufferSize;
+
   if (BltBuffer == NULL) {
     mIsLogoValid = FALSE;
     mAcpiBgrtStatusChanged = TRUE;
@@ -172,9 +174,24 @@ SetBootLogo (
     FreePool (mLogoBltBuffer);
     mLogoBltBuffer = NULL;
   }
+  
+  //
+  // Ensure the Height * Width doesn't overflow
+  //
+  if (Height > DivU64x64Remainder ((UINTN) ~0, Width, NULL)) {
+    return EFI_UNSUPPORTED;
+  }
+  BufferSize = MultU64x64 (Width, Height);
+  
+  //
+  // Ensure the BufferSize * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) doesn't overflow
+  //
+  if (BufferSize > DivU64x32 ((UINTN) ~0, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL))) {
+    return EFI_UNSUPPORTED;
+  }
 
   mLogoBltBuffer = AllocateCopyPool (
-                     Width * Height * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL),
+                     (UINTN)BufferSize * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL),
                      BltBuffer
                      );
   if (mLogoBltBuffer == NULL) {
@@ -330,6 +347,21 @@ InstallBootGraphicsResourceTable (
     // Allocate memory for BMP file.
     //
     PaddingSize = mLogoWidth & 0x3;
+
+    //
+    // First check mLogoWidth * 3 + PaddingSize doesn't overflow
+    //
+    if (mLogoWidth > (((UINT32) ~0) - PaddingSize) / 3 ) {
+      return EFI_UNSUPPORTED;
+    }
+
+    //
+    // Second check (mLogoWidth * 3 + PaddingSize) * mLogoHeight + sizeof (BMP_IMAGE_HEADER) doesn't overflow
+    //
+    if (mLogoHeight > (((UINT32) ~0) - sizeof (BMP_IMAGE_HEADER)) / (mLogoWidth * 3 + PaddingSize)) {
+      return EFI_UNSUPPORTED;
+    }
+    
     BmpSize = (mLogoWidth * 3 + PaddingSize) * mLogoHeight + sizeof (BMP_IMAGE_HEADER);
     ImageBuffer = BgrtAllocateReservedMemoryBelow4G (BmpSize);
     if (ImageBuffer == NULL) {
