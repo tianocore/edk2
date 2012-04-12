@@ -16,7 +16,7 @@
   never removed. Such design ensures sytem function well during none console
   device situation.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -377,7 +377,7 @@ ConSplitterDriverEntry(
           FeaturePcdGet (PcdConOutUgaSupport));
 
   //
-  // The driver creates virtual handles for ConIn, ConOut.
+  // The driver creates virtual handles for ConIn, ConOut, StdErr.
   // The virtual handles will always exist even if no console exist in the
   // system. This is need to support hotplug devices like USB.
   //
@@ -465,6 +465,28 @@ ConSplitterDriverEntry(
     }
 
   }
+
+  //
+  // Create virtual device handle for StdErr Splitter
+  //
+  Status = ConSplitterTextOutConstructor (&mStdErr);
+  if (!EFI_ERROR (Status)) {
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &mStdErr.VirtualHandle,
+                    &gEfiSimpleTextOutProtocolGuid,
+                    &mStdErr.TextOut,
+                    NULL
+                    );
+    if (!EFI_ERROR (Status)) {  
+      //
+      // Update the EFI System Table with new virtual console
+      // and update the pointer to Text Output protocol.
+      //
+      gST->StandardErrorHandle  = mStdErr.VirtualHandle;
+      gST->StdErr               = &mStdErr.TextOut;
+    }
+  }
+  
   //
   // Update the CRC32 in the EFI System Table header
   //
@@ -1313,27 +1335,6 @@ ConSplitterStdErrDriverBindingStart (
   EFI_STATUS                       Status;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *TextOut;
 
-  if (mStdErr.CurrentNumberOfConsoles == 0) {
-    //
-    // Construct console output devices' private data
-    //
-    Status = ConSplitterTextOutConstructor (&mStdErr);
-    if (!EFI_ERROR (Status)) {
-      //
-      // Create virtual device handle for StdErr Splitter
-      //
-      Status = gBS->InstallMultipleProtocolInterfaces (
-                      &mStdErr.VirtualHandle,
-                      &gEfiSimpleTextOutProtocolGuid,
-                      &mStdErr.TextOut,
-                      NULL
-                      );
-    }
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-  }
-
   //
   // Start ConSplitter on ControllerHandle, and create the virtual
   // agrogated console device on first call Start for a StandardError handle.
@@ -1364,20 +1365,6 @@ ConSplitterStdErrDriverBindingStart (
   ConSplitterTextOutSetAttribute (&mStdErr.TextOut, EFI_TEXT_ATTR (EFI_MAGENTA, EFI_BLACK));
   if (EFI_ERROR (Status)) {
     return Status;
-  }
-
-  if (mStdErr.CurrentNumberOfConsoles == 1) {
-    gST->StandardErrorHandle  = mStdErr.VirtualHandle;
-    gST->StdErr               = &mStdErr.TextOut;
-    //
-    // Update the CRC32 in the EFI System Table header
-    //
-    gST->Hdr.CRC32 = 0;
-    gBS->CalculateCrc32 (
-          (UINT8 *) &gST->Hdr,
-          gST->Hdr.HeaderSize,
-          &gST->Hdr.CRC32
-          );
   }
 
   return Status;
@@ -1716,38 +1703,7 @@ ConSplitterStdErrDriverBindingStop (
   //
   // Delete this console error out device's data structures.
   //
-  Status = ConSplitterTextOutDeleteDevice (&mStdErr, TextOut);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  if (mStdErr.CurrentNumberOfConsoles == 0) {
-    mStdErr.VirtualHandle     = NULL;
-
-    gST->StandardErrorHandle  = NULL;
-    gST->StdErr               = NULL;
-    //
-    // Update the CRC32 in the EFI System Table header
-    //
-    gST->Hdr.CRC32 = 0;
-    gBS->CalculateCrc32 (
-          (UINT8 *) &gST->Hdr,
-          gST->Hdr.HeaderSize,
-          &gST->Hdr.CRC32
-          );
-
-    //
-    // Uninstall Simple Text Output protocol from StdErr Handle.
-    //
-    gBS->UninstallMultipleProtocolInterfaces (
-           mStdErr.VirtualHandle,
-           &gEfiSimpleTextOutProtocolGuid,
-           &mStdErr.TextOut,
-           NULL
-           );
-  }
-
-  return Status;
+  return ConSplitterTextOutDeleteDevice (&mStdErr, TextOut);
 }
 
 
@@ -4203,37 +4159,21 @@ ConSplitterTextOutOutputString (
   EFI_STATUS                      Status;
   TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private;
   UINTN                           Index;
-  UINTN                           BackSpaceCount;
   EFI_STATUS                      ReturnStatus;
-  CHAR16                          *TargetString;
+  UINTN                           MaxColumn;
+  UINTN                           MaxRow;
 
   This->SetAttribute (This, This->Mode->Attribute);
 
   Private         = TEXT_OUT_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
 
-  BackSpaceCount  = 0;
-
-  for (TargetString = WString; *TargetString != L'\0'; TargetString++) {
-    if (*TargetString == CHAR_BACKSPACE) {
-      BackSpaceCount++;
-    }
-  }
-
-  if (BackSpaceCount == 0) {
-    TargetString = WString;
-  } else {
-    TargetString = AllocatePool (sizeof (CHAR16) * (StrLen (WString) + BackSpaceCount + 1));
-    ASSERT (TargetString != NULL);
-
-    StrCpy (TargetString, WString);
-  }
   //
   // return the worst status met
   //
   for (Index = 0, ReturnStatus = EFI_SUCCESS; Index < Private->CurrentNumberOfConsoles; Index++) {
     Status = Private->TextOutList[Index].TextOut->OutputString (
                                                     Private->TextOutList[Index].TextOut,
-                                                    TargetString
+                                                    WString
                                                     );
     if (EFI_ERROR (Status)) {
       ReturnStatus = Status;
@@ -4243,10 +4183,50 @@ ConSplitterTextOutOutputString (
   if (Private->CurrentNumberOfConsoles > 0) {
     Private->TextOutMode.CursorColumn = Private->TextOutList[0].TextOut->Mode->CursorColumn;
     Private->TextOutMode.CursorRow    = Private->TextOutList[0].TextOut->Mode->CursorRow;
-  }
-
-  if (BackSpaceCount > 0) {
-    FreePool (TargetString);
+  } else {
+    //
+    // When there is no real console devices in system, 
+    // update cursor position for the virtual device in consplitter.
+    //
+    Private->TextOut.QueryMode (
+                       &Private->TextOut,
+                       Private->TextOutMode.Mode,
+                       &MaxColumn,
+                       &MaxRow
+                       );    
+    for (; *WString != CHAR_NULL; WString++) {
+      switch (*WString) {
+      case CHAR_BACKSPACE:
+        if (Private->TextOutMode.CursorColumn == 0 && Private->TextOutMode.CursorRow > 0) {
+          Private->TextOutMode.CursorRow--;
+          Private->TextOutMode.CursorColumn = (INT32) (MaxColumn - 1);          
+        } else if (Private->TextOutMode.CursorColumn > 0) {
+          Private->TextOutMode.CursorColumn--;
+        }
+        break;
+      
+      case CHAR_LINEFEED:
+        if (Private->TextOutMode.CursorRow < (INT32) (MaxRow - 1)) {
+          Private->TextOutMode.CursorRow++;
+        }
+        break;
+      
+      case CHAR_CARRIAGE_RETURN:
+        Private->TextOutMode.CursorColumn = 0;
+        break;
+      
+      default:
+        if (Private->TextOutMode.CursorColumn < (INT32) (MaxColumn - 1)) {
+          Private->TextOutMode.CursorColumn++;
+        } else {
+          Private->TextOutMode.CursorColumn = 0;
+          if (Private->TextOutMode.CursorRow < (INT32) (MaxRow - 1)) {
+            Private->TextOutMode.CursorRow++;
+          }
+        }
+        break;
+      }
+    }
   }
 
   return ReturnStatus;
