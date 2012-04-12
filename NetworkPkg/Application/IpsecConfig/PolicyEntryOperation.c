@@ -814,6 +814,7 @@ CreateSadEntry (
   if (ValueStr != NULL) {
     (*Data)->AlgoInfo.EspAlgoInfo.AuthKeyLength = AuthKeyLength;
     AsciiStr = AllocateZeroPool (AuthKeyLength + 1);
+    ASSERT (AsciiStr != NULL);
     UnicodeStrToAsciiStr (ValueStr, AsciiStr);
     CopyMem ((*Data)->AlgoInfo.EspAlgoInfo.AuthKey, AsciiStr, AuthKeyLength);
     FreePool (AsciiStr);
