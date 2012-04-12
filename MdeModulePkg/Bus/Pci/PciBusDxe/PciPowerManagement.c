@@ -1,7 +1,7 @@
 /** @file
   Power management support fucntions implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -50,19 +50,39 @@ ResetPowerManagementFeature (
   //
   // Turn off the PWE assertion and put the device into D0 State
   //
-  PowerManagementCSR = 0x8000;
 
   //
-  // Write PMCSR
+  // Read PMCSR
   //
-  PciIoDevice->PciIo.Pci.Write (
-                           &PciIoDevice->PciIo,
-                           EfiPciIoWidthUint16,
-                           PowerManagementRegBlock + 4,
-                           1,
-                           &PowerManagementCSR
-                           );
+  Status = PciIoDevice->PciIo.Pci.Read (
+                                    &PciIoDevice->PciIo,
+                                    EfiPciIoWidthUint16,
+                                    PowerManagementRegBlock + 4,
+                                    1,
+                                    &PowerManagementCSR
+                                    );
 
-  return EFI_SUCCESS;
+  if (!EFI_ERROR (Status)) {
+    //
+    // Clear PME_Status bit
+    //
+    PowerManagementCSR |= BIT15;
+    //
+    // Clear PME_En bit. PowerState = D0.
+    //
+    PowerManagementCSR &= ~(BIT8 | BIT1 | BIT0);
+
+    //
+    // Write PMCSR
+    //
+    Status = PciIoDevice->PciIo.Pci.Write (
+                                      &PciIoDevice->PciIo,
+                                      EfiPciIoWidthUint16,
+                                      PowerManagementRegBlock + 4,
+                                      1,
+                                      &PowerManagementCSR
+                                      );
+  }
+  return Status;
 }
 
