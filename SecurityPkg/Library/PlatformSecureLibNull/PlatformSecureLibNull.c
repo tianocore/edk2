@@ -35,5 +35,5 @@ UserPhysicalPresent (
   VOID
   )
 {
-  return FALSE;
+  return TRUE;
 }
