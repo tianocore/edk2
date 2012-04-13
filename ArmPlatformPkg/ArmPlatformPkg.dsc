@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2011, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 #  
 #  This program and the accompanying materials                          
 #  are licensed and made available under the terms and conditions of the BSD License         
@@ -227,7 +227,6 @@
   gEmbeddedTokenSpaceGuid.PcdEmbeddedHobCmd|TRUE
   gEmbeddedTokenSpaceGuid.PcdEmbeddedHwDebugCmd|TRUE
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPciDebugCmd|TRUE
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedUsbDebugCmd|TRUE
   gEmbeddedTokenSpaceGuid.PcdEmbeddedIoEnable|FALSE
   gEmbeddedTokenSpaceGuid.PcdEmbeddedScriptCmd|FALSE
 

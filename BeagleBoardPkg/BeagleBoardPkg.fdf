@@ -49,7 +49,7 @@ NumBlocks     = 0x80000
 #
 ################################################################################
 0x00000000|0x00080000
-gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvBaseSize
+gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = FVMAIN_COMPACT
 
 ################################################################################

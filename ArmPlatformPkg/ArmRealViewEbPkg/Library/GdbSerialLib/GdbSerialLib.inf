@@ -36,5 +36,4 @@
   IoLib   
 
 [FixedPcd]
-
   gArmRealViewEbPkgTokenSpaceGuid.PcdGdbUartBase

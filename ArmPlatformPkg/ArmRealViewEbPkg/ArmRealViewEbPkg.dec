@@ -2,6 +2,7 @@
 # Arm RealView EB package.
 #
 # Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
+# Copyright (c) 2011 - 2012, Arm Ltd. All rights reserved.<BR>
 #
 #    This program and the accompanying materials are licensed and made available under
 #    the terms and conditions of the BSD License which accompanies this distribution.
@@ -34,4 +35,5 @@
 [Guids.common]
   gArmRealViewEbPkgTokenSpaceGuid    =  { 0x44577A0D, 0x361A, 0x45B2, { 0xb3, 0x3d, 0xbb, 0x9e, 0xe6, 0x0d, 0x5a, 0x4f} } 
 
-[PcdsFeatureFlag.common]
+[PcdsFixedAtBuild.common]
+  gArmRealViewEbPkgTokenSpaceGuid.PcdGdbUartBase|0|UINT32|0x00000001

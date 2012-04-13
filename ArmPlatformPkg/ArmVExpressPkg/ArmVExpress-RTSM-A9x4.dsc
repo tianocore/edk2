@@ -125,7 +125,6 @@
   gArmPlatformTokenSpaceGuid.PcdSP804TimerPeriodicInterruptNum|34
   gArmPlatformTokenSpaceGuid.PcdSP804TimerPeriodicBase|0x1c110000
   gArmPlatformTokenSpaceGuid.PcdSP804TimerPerformanceBase|0x1c110020
-  gArmPlatformTokenSpaceGuid.PcdSP804TimerDebugAgentTimerBase|0x1c120000
   gArmPlatformTokenSpaceGuid.PcdSP804TimerMetronomeBase|0x1c120020
 
   ## SP805 Watchdog - Motherboard Watchdog
@@ -137,8 +136,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|1
-  gArmPlatformTokenSpaceGuid.PcdUartDefaultReceiveFifoDepth|32
-  gArmPlatformTokenSpaceGuid.PcdUartDefaultTimeout|1000000
 
   ## PL031 RealTimeClock
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x1C170000

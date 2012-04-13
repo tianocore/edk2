@@ -103,11 +103,6 @@
   gArmTokenSpaceGuid.PcdArmUncachedMemoryMask|0x0000000040000000
   
   #
-  # ARM EB PCDS
-  #
-  gArmRealViewEbPkgTokenSpaceGuid.PcdGdbUartBase|0x1000a000
-  
-  #
   # ARM PrimeCells
   #
   

@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2011, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 #  
 #  This program and the accompanying materials                          
 #  are licensed and made available under the terms and conditions of the BSD License         
@@ -98,11 +98,6 @@
   # ARM Pcds
   #
   gArmTokenSpaceGuid.PcdArmUncachedMemoryMask|0x0000000040000000
-  
-  #
-  # ARM EB PCDS
-  #
-  gArmRealViewEbPkgTokenSpaceGuid.PcdGdbUartBase|0x1000a000
   
   #
   # ARM PrimeCells
