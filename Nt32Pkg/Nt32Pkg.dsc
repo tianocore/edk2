@@ -194,7 +194,9 @@
   #
   # Runtime
   #
+!if $(SECURE_BOOT_ENABLE) == TRUE
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
+!endif
 
 ################################################################################
 #
