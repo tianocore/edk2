@@ -6,7 +6,7 @@
   performance data to the GUIDed HOB. Due to the limitation of temporary RAM, the maximum
   number of performance logging entry is specified by PcdMaxPeiPerformanceLogEntries.  
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -197,7 +197,6 @@ StartPerformanceMeasurement (
   then TimeStamp is added to the record as the end time.
   If the record is found and TimeStamp is zero, then this function reads
   the current time stamp and adds that time stamp value to the record as the end time.
-  If this function is called multiple times for the same record, then the end time is overwritten.
 
   @param  Handle                  Pointer to environment specific context used
                                   to identify the component being measured.
