@@ -2,7 +2,7 @@
   MDE DXE Services Library provides functions that simplify the development of DXE Drivers.  
   These functions help access data from sections of FFS files or from file path.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -235,7 +235,7 @@ GetSectionFromFfs (
   
   Allocate memory to store the found image. The caller is responsible to free memory.
 
-  If File is NULL, then NULL is returned.
+  If FilePath is NULL, then NULL is returned.
   If FileSize is NULL, then NULL is returned.
   If AuthenticationStatus is NULL, then NULL is returned.
 
@@ -248,10 +248,9 @@ GetSectionFromFfs (
   @param[in]       FilePath             Pointer to the device path of the file that is abstracted to
                                         the file buffer.
   @param[out]      FileSize             Pointer to the size of the abstracted file buffer.
-  @param[out]      AuthenticationStatus Pointer to a caller-allocated UINT32 in which the authentication
-                                        status is returned.
+  @param[out]      AuthenticationStatus Pointer to the authentication status.
 
-  @retval NULL   File is NULL, or FileSize is NULL, or the file can't be found.
+  @retval NULL   FilePath is NULL, or FileSize is NULL, or AuthenticationStatus is NULL, or the file can't be found.
   @retval other  The abstracted file buffer. The caller is responsible to free memory.
 **/
 VOID *
