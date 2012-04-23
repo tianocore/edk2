@@ -2893,7 +2893,6 @@ InternalEfiShellGetListAlias(
   UINTN             NameSize;
   CHAR16            *RetVal;
   UINTN             RetSize;
-  CHAR16            *Alias;
 
   Status = gRT->QueryVariableInfo(EFI_VARIABLE_NON_VOLATILE|EFI_VARIABLE_BOOTSERVICE_ACCESS, &MaxStorSize, &RemStorSize, &MaxVarSize);
   ASSERT_EFI_ERROR(Status);
@@ -2919,7 +2918,6 @@ InternalEfiShellGetListAlias(
       break;
     }
     if (CompareGuid(&Guid, &gShellAliasGuid)){
-      Alias = GetVariable(VariableName, &gShellAliasGuid);
       ASSERT((RetVal == NULL && RetSize == 0) || (RetVal != NULL));
       RetVal = StrnCatGrow(&RetVal, &RetSize, VariableName, 0);
       RetVal = StrnCatGrow(&RetVal, &RetSize, L";", 0);
