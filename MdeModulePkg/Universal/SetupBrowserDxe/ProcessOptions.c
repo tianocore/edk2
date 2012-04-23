@@ -988,200 +988,31 @@ ProcessHelpString (
   IN  UINTN   RowCount
   )
 {
-  UINTN BlockWidth;
-  UINTN AllocateSize;
-  //
-  // [PrevCurrIndex, CurrIndex) forms a range of a screen-line
-  //
-  UINTN CurrIndex;
-  UINTN PrevCurrIndex;
-  UINTN LineCount;
-  UINTN VirtualLineCount;
-  //
-  // GlyphOffset stores glyph width of current screen-line
-  //
-  UINTN GlyphOffset;
-  //
-  // GlyphWidth equals to 2 if we meet width directive
-  //
-  UINTN GlyphWidth;
-  //
-  // during scanning, we remember the position of last space character
-  // in case that if next word cannot put in current line, we could restore back to the position
-  // of last space character
-  // while we should also remmeber the glyph width of the last space character for restoring
-  //
-  UINTN LastSpaceIndex;
-  UINTN LastSpaceGlyphWidth;
-  //
-  // every time we begin to form a new screen-line, we should remember glyph width of single character
-  // of last line
-  //
-  UINTN LineStartGlyphWidth;
-  UINTN *IndexArray;
-  UINTN *OldIndexArray;
+  UINTN   Index;
+  CHAR16  *OutputString;
+  UINTN   TotalRowNum;
+  UINTN   CheckedNum;
 
-  BlockWidth = (UINTN) gHelpBlockWidth - 1;
+  TotalRowNum = 0;
+  CheckedNum  = 0;
 
   //
-  // every three elements of IndexArray form a screen-line of string:[ IndexArray[i*3], IndexArray[i*3+1] )
-  // IndexArray[i*3+2] stores the initial glyph width of single character. to save this is because we want
-  // to bring the width directive of the last line to current screen-line.
-  // e.g.: "\wideabcde ... fghi", if "fghi" also has width directive but is splitted to the next screen-line
-  // different from that of "\wideabcde", we should remember the width directive.
+  // Get row number of the String.
   //
-  AllocateSize  = 0x20;
-  IndexArray    = AllocatePool (AllocateSize * sizeof (UINTN) * 3);
-  ASSERT (IndexArray != NULL);
-
-  if (*FormattedString != NULL) {
-    FreePool (*FormattedString);
-    *FormattedString = NULL;
+  for (Index = 0; GetLineByWidth (StringPtr, (UINTN) gHelpBlockWidth - 1, &Index, &OutputString) != 0x0000; ) {
+    TotalRowNum ++;
+    FreePool (OutputString);
   }
-
-  for (PrevCurrIndex = 0, CurrIndex  = 0, LineCount   = 0, LastSpaceIndex = 0,
-       IndexArray[0] = 0, GlyphWidth = 1, GlyphOffset = 0, LastSpaceGlyphWidth = 1, LineStartGlyphWidth = 1;
-       (StringPtr[CurrIndex] != CHAR_NULL);
-       CurrIndex ++) {
-
-    if (LineCount == AllocateSize) {
-      AllocateSize += 0x10;
-      OldIndexArray  = IndexArray;
-      IndexArray = AllocatePool (AllocateSize * sizeof (UINTN) * 3);
-      ASSERT (IndexArray != NULL);
-
-      CopyMem (IndexArray, OldIndexArray, LineCount * sizeof (UINTN) * 3);
-      FreePool (OldIndexArray);
-    }
-    switch (StringPtr[CurrIndex]) {
-
-      case NARROW_CHAR:
-      case WIDE_CHAR:
-        GlyphWidth = ((StringPtr[CurrIndex] == WIDE_CHAR) ? 2 : 1);
-        if (CurrIndex == 0) {
-          LineStartGlyphWidth = GlyphWidth;
-        }
-        break;
-
-      //
-      // char is '\n'
-      // "\r\n" isn't handled here, handled by case CHAR_CARRIAGE_RETURN
-      //
-      case CHAR_LINEFEED:
-        //
-        // Store a range of string as a line
-        //
-        IndexArray[LineCount*3]   = PrevCurrIndex;
-        IndexArray[LineCount*3+1] = CurrIndex;
-        IndexArray[LineCount*3+2] = LineStartGlyphWidth;
-        LineCount ++;
-        //
-        // Reset offset and save begin position of line
-        //
-        GlyphOffset = 0;
-        LineStartGlyphWidth = GlyphWidth;
-        PrevCurrIndex = CurrIndex + 1;
-        break;
-
-      //
-      // char is '\r'
-      // "\r\n" and "\r" both are handled here
-      //
-      case CHAR_CARRIAGE_RETURN:
-        if (StringPtr[CurrIndex + 1] == CHAR_LINEFEED) {
-          //
-          // next char is '\n'
-          //
-          IndexArray[LineCount*3]   = PrevCurrIndex;
-          IndexArray[LineCount*3+1] = CurrIndex;
-          IndexArray[LineCount*3+2] = LineStartGlyphWidth;
-          LineCount ++;
-          CurrIndex ++;
-        }
-        GlyphOffset = 0;
-        LineStartGlyphWidth = GlyphWidth;
-        PrevCurrIndex = CurrIndex + 1;
-        break;
-
-      //
-      // char is space or other char
-      //
-      default:
-        GlyphOffset     += GlyphWidth;
-        if (GlyphOffset >= BlockWidth) {
-          if (LastSpaceIndex > PrevCurrIndex) {
-            //
-            // LastSpaceIndex points to space inside current screen-line,
-            // restore to LastSpaceIndex
-            // (Otherwise the word is too long to fit one screen-line, just cut it)
-            //
-            CurrIndex  = LastSpaceIndex;
-            GlyphWidth = LastSpaceGlyphWidth;
-          } else if (GlyphOffset > BlockWidth) {
-            //
-            // the word is too long to fit one screen-line and we don't get the chance
-            // of GlyphOffset == BlockWidth because GlyphWidth = 2
-            //
-            CurrIndex --;
-          }
-
-          IndexArray[LineCount*3]   = PrevCurrIndex;
-          IndexArray[LineCount*3+1] = CurrIndex + 1;
-          IndexArray[LineCount*3+2] = LineStartGlyphWidth;
-          LineStartGlyphWidth = GlyphWidth;
-          LineCount ++;
-          //
-          // Reset offset and save begin position of line
-          //
-          GlyphOffset                 = 0;
-          PrevCurrIndex               = CurrIndex + 1;
-        }
-
-        //
-        // LastSpaceIndex: remember position of last space
-        //
-        if (StringPtr[CurrIndex] == CHAR_SPACE) {
-          LastSpaceIndex      = CurrIndex;
-          LastSpaceGlyphWidth = GlyphWidth;
-        }
-        break;
-    }
-  }
-
-  if (GlyphOffset > 0) {
-    IndexArray[LineCount*3]   = PrevCurrIndex;
-    IndexArray[LineCount*3+1] = CurrIndex;
-    IndexArray[LineCount*3+2] = GlyphWidth;
-    LineCount ++;
-  }
-
-  if (LineCount == 0) {
-    //
-    // in case we meet null string
-    //
-    IndexArray[0] = 0;
-    IndexArray[1] = 1;
-    //
-    // we assume null string's glyph width is 1
-    //
-    IndexArray[1] = 1;
-    LineCount ++;
-  }
-
-  VirtualLineCount = RowCount * (LineCount / RowCount + (LineCount % RowCount > 0));
-  *FormattedString = AllocateZeroPool (VirtualLineCount * (BlockWidth + 1) * sizeof (CHAR16) * 2);
+  
+  *FormattedString = AllocateZeroPool (TotalRowNum * gHelpBlockWidth * sizeof (CHAR16) * 2);
   ASSERT (*FormattedString != NULL);
 
-  for (CurrIndex = 0; CurrIndex < LineCount; CurrIndex ++) {
-    *(*FormattedString + CurrIndex * 2 * (BlockWidth + 1)) = (CHAR16) ((IndexArray[CurrIndex*3+2] == 2) ? WIDE_CHAR : NARROW_CHAR);
-    StrnCpy (
-      *FormattedString + CurrIndex * 2 * (BlockWidth + 1) + 1,
-      StringPtr + IndexArray[CurrIndex*3],
-      IndexArray[CurrIndex*3+1]-IndexArray[CurrIndex*3]
-      );
+  for (Index = 0; GetLineByWidth (StringPtr, (UINTN) gHelpBlockWidth - 1, &Index, &OutputString) != 0x0000; CheckedNum ++) {
+    CopyMem (*FormattedString + CheckedNum * gHelpBlockWidth * sizeof (CHAR16), OutputString, gHelpBlockWidth * sizeof (CHAR16));
+    FreePool (OutputString);
   }
 
-  FreePool (IndexArray);
+  ASSERT (CheckedNum == TotalRowNum);
 
-  return LineCount;
+  return TotalRowNum; 
 }

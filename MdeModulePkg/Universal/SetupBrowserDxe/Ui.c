@@ -1308,6 +1308,7 @@ GetWidth (
 /**
   Will copy LineWidth amount of a string in the OutputString buffer and return the
   number of CHAR16 characters that were copied into the OutputString buffer.
+  In the code, it deals \r,\n,\r\n same as \n\r, also it not process the \r or \g.
 
   @param  InputString            String description for this option.
   @param  LineWidth              Width of the desired string to extract in CHAR16
@@ -1353,9 +1354,9 @@ GetLineByWidth (
    }
 
     //
-    // Fast-forward the string and see if there is a carriage-return in the string
+    // Fast-forward the string and see if there is a carriage-return or linefeed in the string
     //
-    for (; (InputString[*Index + Count2] != CHAR_CARRIAGE_RETURN) && (Count2 != LineWidth); Count2++)
+    for (; (InputString[*Index + Count2] != CHAR_LINEFEED) && (InputString[*Index + Count2] != CHAR_CARRIAGE_RETURN) && (Count2 != LineWidth); Count2++)
       ;
 
     //
@@ -1391,10 +1392,10 @@ GetLineByWidth (
     CopyMem (*OutputString, &InputString[*Index], LineWidth * 2);
 
     //
-    // If currently pointing to a space, increment the index to the first non-space character
+    // If currently pointing to a space or carriage-return or linefeed, increment the index to the first non-space character
     //
     for (;
-         (InputString[*Index + LineWidth] == CHAR_SPACE) || (InputString[*Index + LineWidth] == CHAR_CARRIAGE_RETURN);
+         (InputString[*Index + LineWidth] == CHAR_SPACE) || (InputString[*Index + LineWidth] == CHAR_CARRIAGE_RETURN)|| (InputString[*Index + LineWidth] == CHAR_LINEFEED);
          (*Index)++
         )
       ;
@@ -2923,7 +2924,7 @@ UiDisplayMenu (
       // Print the help string info.
       //
       if (!MultiHelpPage) {
-        for (Index = 0; Index < RowCount; Index++) {
+        for (Index = 0; Index < HelpLine; Index++) {
           PrintStringAt (
             LocalScreen.RightColumn - gHelpBlockWidth,
             Index + TopRow,
