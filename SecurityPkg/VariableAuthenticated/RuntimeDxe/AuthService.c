@@ -1337,9 +1337,9 @@ ProcessVariable (
       KeyIndex   = Variable->CurrPtr->PubKeyIndex;
       IsFirstTime = FALSE;
     }
-  } else if ((Variable->CurrPtr != NULL) &&
-           (Variable->CurrPtr->Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0
-          ) {
+  } else if ((Variable->CurrPtr != NULL) && 
+             ((Variable->CurrPtr->Attributes & (EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS)) != 0)
+            ) {
     //
     // If the variable is already write-protected, it always needs authentication before update.
     //
