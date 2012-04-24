@@ -36,6 +36,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 BOOLEAN                           mMeasureGptTableFlag = FALSE;
 EFI_GUID                          mZeroGuid = {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
 UINTN                             mMeasureGptCount = 0;
+VOID                              *mFileBuffer;
+UINTN                             mImageSize;
 
 /**
   Reads contents of a PE/COFF image in memory buffer.
@@ -57,7 +59,27 @@ ImageRead (
   OUT    VOID    *Buffer
   )
 {
+  UINTN               EndPosition;
+
+  if (FileHandle == NULL || ReadSize == NULL || Buffer == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (MAX_ADDRESS - FileOffset < *ReadSize) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  EndPosition = FileOffset + *ReadSize;
+  if (EndPosition > mImageSize) {
+    *ReadSize = (UINT32)(mImageSize - FileOffset);
+  }
+
+  if (FileOffset >= mImageSize) {
+    *ReadSize = 0;
+  }
+
   CopyMem (Buffer, (UINT8 *)((UINTN) FileHandle + FileOffset), *ReadSize);
+
   return EFI_SUCCESS;
 }
 
@@ -495,6 +517,10 @@ TcgMeasurePeImage (
   if (ImageSize > SumOfBytesHashed) {
     HashBase = (UINT8 *) (UINTN) ImageAddress + SumOfBytesHashed;
     if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+      if (ImageSize - SumOfBytesHashed < Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size) {
+        Status = EFI_INVALID_PARAMETER;
+        goto Finish;
+      }
       //
       // Use PE32 offset
       //
@@ -502,6 +528,10 @@ TcgMeasurePeImage (
                  Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size -
                  SumOfBytesHashed);
     } else {
+      if (ImageSize - SumOfBytesHashed < Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size) {
+        Status = EFI_INVALID_PARAMETER;
+        goto Finish;
+      }
       //
       // Use PE32+ offset
       //
@@ -734,6 +764,9 @@ DxeTpmMeasureBootHandler (
     Status = EFI_SECURITY_VIOLATION;
     goto Finish;
   }
+
+  mImageSize  = FileSize;
+  mFileBuffer = FileBuffer;
 
   //
   // Measure PE Image

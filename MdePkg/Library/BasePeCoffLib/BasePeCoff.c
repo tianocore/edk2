@@ -47,7 +47,9 @@ PeCoffLoaderGetPeHeaderMagicValue (
 
 
 /**
-  Retrieves the PE or TE Header from a PE/COFF or TE image.
+  Retrieves the PE or TE Header from a PE/COFF or TE image. 
+  Also done many checks in PE image to make sure PE image DosHeader, PeOptionHeader, 
+  SizeOfHeader, Section Data Region and Security Data Region be in PE image range. 
 
   @param  ImageContext    The context of the image being loaded.
   @param  Hdr             The buffer in which to return the PE32, PE32+, or TE header.
@@ -66,6 +68,10 @@ PeCoffLoaderGetPeHeader (
   EFI_IMAGE_DOS_HEADER  DosHdr;
   UINTN                 Size;
   UINT16                Magic;
+  UINT32                SectionHeaderOffset;
+  UINT32                Index;
+  CHAR8                 BufferData;
+  EFI_IMAGE_SECTION_HEADER  SectionHeader;
 
   //
   // Read the DOS image header to check for its existence
@@ -132,6 +138,74 @@ PeCoffLoaderGetPeHeader (
 
     if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
       //
+      // 1. Check FileHeader.SizeOfOptionalHeader filed.
+      //
+      if (EFI_IMAGE_NUMBER_OF_DIRECTORY_ENTRIES < Hdr.Pe32->OptionalHeader.NumberOfRvaAndSizes) {
+        return RETURN_UNSUPPORTED;
+      }
+
+      if (Hdr.Pe32->FileHeader.SizeOfOptionalHeader != sizeof (EFI_IMAGE_OPTIONAL_HEADER32) - (EFI_IMAGE_NUMBER_OF_DIRECTORY_ENTRIES - Hdr.Pe32->OptionalHeader.NumberOfRvaAndSizes) * sizeof (EFI_IMAGE_DATA_DIRECTORY)) {
+        return RETURN_UNSUPPORTED;
+      }
+
+      //
+      // 2. Check the OptionalHeader.SizeOfHeaders field.
+      // This field will be use like the following mode, so just compare the result.
+      // The DataDirectory array begin with 1, not 0, so here use < to compare not <=.
+      //
+      if (EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1 < Hdr.Pe32->OptionalHeader.NumberOfRvaAndSizes) {
+        if (Hdr.Pe32->OptionalHeader.SizeOfHeaders < (UINT32)((UINT8 *)(&Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1]) - (UINT8 *) &Hdr)) {
+          return RETURN_UNSUPPORTED;
+        }
+      }
+
+      //
+      // Read Hdr.Pe32.OptionalHeader.SizeOfHeaders data from file
+      //
+      Size = 1;
+      Status = ImageContext->ImageRead (
+                               ImageContext->Handle,
+                               Hdr.Pe32->OptionalHeader.SizeOfHeaders - 1,
+                               &Size,
+                               &BufferData
+                               );
+      if (RETURN_ERROR (Status)) {
+        return Status;
+      }
+
+      //
+      // Check the EFI_IMAGE_DIRECTORY_ENTRY_SECURITY data.
+      // Read the last byte to make sure the data is in the image region.
+      // The DataDirectory array begin with 1, not 0, so here use < to compare not <=.
+      //
+      if (EFI_IMAGE_DIRECTORY_ENTRY_SECURITY < Hdr.Pe32->OptionalHeader.NumberOfRvaAndSizes) {
+        if (Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size != 0) {
+          //
+          // Check the member data to avoid overflow.
+          //
+          if ((UINT32) (~0) - Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].VirtualAddress <
+              Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size) {
+            return RETURN_INVALID_PARAMETER;
+          }
+
+          //
+          // Read section header from file
+          //
+          Size = 1;
+          Status = ImageContext->ImageRead (
+                                   ImageContext->Handle,
+                                   Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].VirtualAddress +
+                                    Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size - 1,
+                                   &Size,
+                                   &BufferData
+                                   );
+          if (RETURN_ERROR (Status)) {
+            return Status;
+          }
+        }
+      }
+
+      //
       // Use PE32 offset
       //
       ImageContext->ImageType         = Hdr.Pe32->OptionalHeader.Subsystem;
@@ -140,6 +214,74 @@ PeCoffLoaderGetPeHeader (
       ImageContext->SizeOfHeaders     = Hdr.Pe32->OptionalHeader.SizeOfHeaders;
 
     } else if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
+      //
+      // 1. Check FileHeader.SizeOfOptionalHeader filed.
+      //
+      if (EFI_IMAGE_NUMBER_OF_DIRECTORY_ENTRIES < Hdr.Pe32Plus->OptionalHeader.NumberOfRvaAndSizes) {
+        return RETURN_UNSUPPORTED;
+      }
+
+      if (Hdr.Pe32Plus->FileHeader.SizeOfOptionalHeader != sizeof (EFI_IMAGE_OPTIONAL_HEADER32) - (EFI_IMAGE_NUMBER_OF_DIRECTORY_ENTRIES - Hdr.Pe32Plus->OptionalHeader.NumberOfRvaAndSizes) * sizeof (EFI_IMAGE_DATA_DIRECTORY)) {
+        return RETURN_UNSUPPORTED;
+      }
+
+      //
+      // 2. Check the OptionalHeader.SizeOfHeaders field.
+      // This field will be use like the following mode, so just compare the result.
+      // The DataDirectory array begin with 1, not 0, so here use < to compare not <=.
+      //
+      if (EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1 < Hdr.Pe32Plus->OptionalHeader.NumberOfRvaAndSizes) {
+        if (Hdr.Pe32Plus->OptionalHeader.SizeOfHeaders < (UINT32)((UINT8 *)(&Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1]) - (UINT8 *) &Hdr)) {
+          return RETURN_UNSUPPORTED;
+        }
+      }
+
+      //
+      // Read Hdr.Pe32.OptionalHeader.SizeOfHeaders data from file
+      //
+      Size = 1;
+      Status = ImageContext->ImageRead (
+                               ImageContext->Handle,
+                               Hdr.Pe32Plus->OptionalHeader.SizeOfHeaders - 1,
+                               &Size,
+                               &BufferData
+                               );
+      if (RETURN_ERROR (Status)) {
+        return Status;
+      }
+
+      //
+      // Check the EFI_IMAGE_DIRECTORY_ENTRY_SECURITY data.
+      // Read the last byte to make sure the data is in the image region.
+      // The DataDirectory array begin with 1, not 0, so here use < to compare not <=.
+      //
+      if (EFI_IMAGE_DIRECTORY_ENTRY_SECURITY < Hdr.Pe32Plus->OptionalHeader.NumberOfRvaAndSizes) {
+        if (Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size != 0) {
+          //
+          // Check the member data to avoid overflow.
+          //
+          if ((UINT32) (~0) - Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].VirtualAddress <
+              Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size) {
+            return RETURN_INVALID_PARAMETER;
+          }
+
+          //
+          // Read section header from file
+          //
+          Size = 1;
+          Status = ImageContext->ImageRead (
+                                   ImageContext->Handle,
+                                   Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].VirtualAddress +
+                                    Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size - 1,
+                                   &Size,
+                                   &BufferData
+                                   );
+          if (RETURN_ERROR (Status)) {
+            return Status;
+          }
+        }
+      }
+
       //
       // Use PE32+ offset
       //
@@ -166,6 +308,55 @@ PeCoffLoaderGetPeHeader (
     return RETURN_UNSUPPORTED;
   }
 
+  //
+  // Check each section field.
+  //
+  SectionHeaderOffset = ImageContext->PeCoffHeaderOffset + sizeof (UINT32) + sizeof (EFI_IMAGE_FILE_HEADER) + Hdr.Pe32->FileHeader.SizeOfOptionalHeader;
+  for (Index = 0; Index < Hdr.Pe32->FileHeader.NumberOfSections; Index++) {
+    //
+    // Read section header from file
+    //
+    Size = sizeof (EFI_IMAGE_SECTION_HEADER);
+    Status = ImageContext->ImageRead (
+                             ImageContext->Handle,
+                             SectionHeaderOffset,
+                             &Size,
+                             &SectionHeader
+                             );
+    if (RETURN_ERROR (Status)) {
+      return Status;
+    }
+
+    if (SectionHeader.SizeOfRawData > 0) {
+      //
+      // Check the member data to avoid overflow.
+      //
+      if ((UINT32) (~0) - SectionHeader.PointerToRawData < SectionHeader.SizeOfRawData) {
+        return RETURN_INVALID_PARAMETER;
+      }
+
+      //
+      // Base on the ImageRead function to check the section data field.
+      // Read the last byte to make sure the data is in the image region.
+      //
+      Size = 1;
+      Status = ImageContext->ImageRead (
+                               ImageContext->Handle,
+                               SectionHeader.PointerToRawData + SectionHeader.SizeOfRawData - 1,
+                               &Size,
+                               &BufferData
+                               );
+      if (RETURN_ERROR (Status)) {
+        return Status;
+      }
+    }
+
+    //
+    // Check next section.
+    //
+    SectionHeaderOffset += sizeof (EFI_IMAGE_SECTION_HEADER);
+  }
+
   return RETURN_SUCCESS;
 }
 
@@ -184,6 +375,9 @@ PeCoffLoaderGetPeHeader (
   If the image is a TE image, then SectionAlignment is set to 0.
   The ImageRead and Handle fields of ImageContext structure must be valid prior 
   to invoking this service.
+
+  Also done many checks in PE image to make sure PE image DosHeader, PeOptionHeader, 
+  SizeOfHeader, Section Data Region and Security Data Region be in PE image range. 
 
   @param  ImageContext              The pointer to the image context structure that describes the PE/COFF
                                     image that needs to be examined by this function.

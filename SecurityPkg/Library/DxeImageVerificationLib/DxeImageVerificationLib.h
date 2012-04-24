@@ -28,6 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/SecurityManagementLib.h>
+#include <Library/PeCoffLib.h>
 #include <Protocol/FirmwareVolume2.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/BlockIo.h>

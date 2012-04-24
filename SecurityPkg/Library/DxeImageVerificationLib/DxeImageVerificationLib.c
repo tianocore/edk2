@@ -54,6 +54,50 @@ HASH_TABLE mHash[] = {
   { L"SHA512", 64, &mHashOidValue[40], 9, NULL,                NULL,       NULL,          NULL       }
 };
 
+/**
+  Reads contents of a PE/COFF image in memory buffer.
+
+  @param  FileHandle      Pointer to the file handle to read the PE/COFF image.
+  @param  FileOffset      Offset into the PE/COFF image to begin the read operation.
+  @param  ReadSize        On input, the size in bytes of the requested read operation.  
+                          On output, the number of bytes actually read.
+  @param  Buffer          Output buffer that contains the data read from the PE/COFF image.
+  
+  @retval EFI_SUCCESS     The specified portion of the PE/COFF image was read and the size 
+**/
+EFI_STATUS
+EFIAPI
+ImageRead (
+  IN     VOID    *FileHandle,
+  IN     UINTN   FileOffset,
+  IN OUT UINTN   *ReadSize,
+  OUT    VOID    *Buffer
+  )
+{
+  UINTN               EndPosition;
+
+  if (FileHandle == NULL || ReadSize == NULL || Buffer == NULL) {
+    return EFI_INVALID_PARAMETER;    
+  }
+
+  if (MAX_ADDRESS - FileOffset < *ReadSize) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  EndPosition = FileOffset + *ReadSize;
+  if (EndPosition > mImageSize) {
+    *ReadSize = (UINT32)(mImageSize - FileOffset);
+  }
+
+  if (FileOffset >= mImageSize) {
+    *ReadSize = 0;
+  }
+
+  CopyMem (Buffer, (UINT8 *)((UINTN) FileHandle + FileOffset), *ReadSize);
+
+  return EFI_SUCCESS;
+}
+
 
 /**
   Get the image type.
@@ -422,6 +466,10 @@ HashPeImage (
   if (mImageSize > SumOfBytesHashed) {
     HashBase = mImageBase + SumOfBytesHashed;
     if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+      if (mImageSize - SumOfBytesHashed < mNtHeader.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size) {
+        Status = FALSE;
+        goto Done;
+      }
       //
       // Use PE32 offset.
       //
@@ -430,6 +478,10 @@ HashPeImage (
                  mNtHeader.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size -
                  SumOfBytesHashed);
     } else {
+      if (mImageSize - SumOfBytesHashed < mNtHeader.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size) {
+        Status = FALSE;
+        goto Done;
+      }
       //
       // Use PE32+ offset.
       //
@@ -1130,6 +1182,7 @@ DxeImageVerificationHandler (
   WIN_CERTIFICATE             *WinCertificate;
   UINT32                      Policy;
   UINT8                       *SecureBootEnable;
+  PE_COFF_LOADER_IMAGE_CONTEXT      ImageContext;
 
   if (File == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1216,6 +1269,22 @@ DxeImageVerificationHandler (
   }
   mImageBase  = (UINT8 *) FileBuffer;
   mImageSize  = FileSize;
+
+  ZeroMem (&ImageContext, sizeof (ImageContext));
+  ImageContext.Handle    = (VOID *) FileBuffer;
+  ImageContext.ImageRead = (PE_COFF_LOADER_READ_FILE) ImageRead;
+
+  //
+  // Get information about the image being loaded
+  //
+  Status = PeCoffLoaderGetImageInfo (&ImageContext);
+  if (EFI_ERROR (Status)) {
+    //
+    // The information can't be got from the invalid PeImage
+    //
+    goto Done;
+  }
+
   DosHdr      = (EFI_IMAGE_DOS_HEADER *) mImageBase;
   if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
     //
