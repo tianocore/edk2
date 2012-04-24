@@ -999,7 +999,7 @@ ProcessHelpString (
   //
   // Get row number of the String.
   //
-  for (Index = 0; GetLineByWidth (StringPtr, (UINTN) gHelpBlockWidth - 1, &Index, &OutputString) != 0x0000; ) {
+  for (Index = 0; GetLineByWidth (StringPtr, (UINT16) (gHelpBlockWidth - 1), &Index, &OutputString) != 0x0000; ) {
     TotalRowNum ++;
     FreePool (OutputString);
   }
@@ -1007,7 +1007,7 @@ ProcessHelpString (
   *FormattedString = AllocateZeroPool (TotalRowNum * gHelpBlockWidth * sizeof (CHAR16) * 2);
   ASSERT (*FormattedString != NULL);
 
-  for (Index = 0; GetLineByWidth (StringPtr, (UINTN) gHelpBlockWidth - 1, &Index, &OutputString) != 0x0000; CheckedNum ++) {
+  for (Index = 0; GetLineByWidth (StringPtr, (UINT16) (gHelpBlockWidth - 1), &Index, &OutputString) != 0x0000; CheckedNum ++) {
     CopyMem (*FormattedString + CheckedNum * gHelpBlockWidth * sizeof (CHAR16), OutputString, gHelpBlockWidth * sizeof (CHAR16));
     FreePool (OutputString);
   }
