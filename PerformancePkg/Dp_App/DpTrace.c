@@ -1,7 +1,7 @@
 /** @file
   Trace reporting for the Dp utility.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -54,13 +54,14 @@ GatherStatistics(
   INTN                      TIndex;
 
   LogEntryKey = 0;
-  while ((LogEntryKey = GetPerformanceMeasurement (
+  while ((LogEntryKey = GetPerformanceMeasurementEx (
                         LogEntryKey,
                         &Measurement.Handle,
                         &Measurement.Token,
                         &Measurement.Module,
                         &Measurement.StartTimeStamp,
-                        &Measurement.EndTimeStamp)) != 0)
+                        &Measurement.EndTimeStamp,
+                        &Measurement.Identifier)) != 0)
   {
     ++SummaryData.NumTrace;           // Count the number of TRACE Measurement records
     if (Measurement.EndTimeStamp == 0) {
@@ -168,27 +169,31 @@ DumpAllTrace(
     //    Display only records with Elapsed times >= mInterestThreshold
     //    Display driver names in Module field for records with Handles.
     //
-    PrintToken (STRING_TOKEN (STR_DP_ALL_HEADR) );
-    PrintToken (STRING_TOKEN (STR_DP_DASHES) );
+    if (mShowId) {
+      PrintToken (STRING_TOKEN (STR_DP_ALL_HEADR2) );
+      PrintToken (STRING_TOKEN (STR_DP_ALL_DASHES2) );
+    } else {
+      PrintToken (STRING_TOKEN (STR_DP_ALL_HEADR) );
+      PrintToken (STRING_TOKEN (STR_DP_DASHES) );
+    }
 
     LogEntryKey = 0;
     Count = 0;
     Index = 0;
     while ( WITHIN_LIMIT(Count, Limit) &&
-            ((LogEntryKey = GetPerformanceMeasurement (
+            ((LogEntryKey = GetPerformanceMeasurementEx (
                             LogEntryKey,
                             &Measurement.Handle,
                             &Measurement.Token,
                             &Measurement.Module,
                             &Measurement.StartTimeStamp,
-                            &Measurement.EndTimeStamp)) != 0)
+                            &Measurement.EndTimeStamp,
+                            &Measurement.Identifier)) != 0)
           )
     {
       ++Index;    // Count every record.  First record is 1.
       ElapsedTime = 0;
-      if (IncFlag != NULL) {
-        FreePool ((void *)IncFlag);
-      }
+      SafeFreePool ((VOID *) IncFlag);
       if (Measurement.EndTimeStamp != 0) {
         Duration = GetDuration (&Measurement);
         ElapsedTime = DurationInMicroSeconds ( Duration );
@@ -225,20 +230,32 @@ DumpAllTrace(
       mGaugeString[DP_GAUGE_STRING_LENGTH] = 0;
       mUnicodeToken[13] = 0;
 
-      PrintToken( STRING_TOKEN (STR_DP_ALL_VARS),
-        Index,      // 1 based, Which measurement record is being printed
-        IncFlag,
-        Measurement.Handle,
-        mGaugeString,
-        mUnicodeToken,
-        ElapsedTime
-      );
+      if (mShowId) {
+        PrintToken( STRING_TOKEN (STR_DP_ALL_VARS2),
+          Index,      // 1 based, Which measurement record is being printed
+          IncFlag,
+          Measurement.Handle,
+          mGaugeString,
+          mUnicodeToken,
+          ElapsedTime,
+          Measurement.Identifier
+        );
+      } else {
+        PrintToken( STRING_TOKEN (STR_DP_ALL_VARS),
+          Index,      // 1 based, Which measurement record is being printed
+          IncFlag,
+          Measurement.Handle,
+          mGaugeString,
+          mUnicodeToken,
+          ElapsedTime
+        );
+      }
     }
   }
   if (HandleBuffer != &TempHandle) {
     FreePool (HandleBuffer);
   }
-  FreePool ((void *)IncFlag);
+  SafeFreePool ((VOID *) IncFlag);
 }
 
 /** 
@@ -282,20 +299,26 @@ DumpRawTrace(
   FreePool (StringPtr);
   FreePool (StringPtrUnknown);
 
-  PrintToken (STRING_TOKEN (STR_DP_RAW_HEADR) );
-  PrintToken (STRING_TOKEN (STR_DP_RAW_DASHES) );
+  if (mShowId) {
+    PrintToken (STRING_TOKEN (STR_DP_RAW_HEADR2) );
+    PrintToken (STRING_TOKEN (STR_DP_RAW_DASHES2) );
+  } else {
+    PrintToken (STRING_TOKEN (STR_DP_RAW_HEADR) );
+    PrintToken (STRING_TOKEN (STR_DP_RAW_DASHES) );
+  }
 
   LogEntryKey = 0;
   Count = 0;
   Index = 0;
   while ( WITHIN_LIMIT(Count, Limit) &&
-          ((LogEntryKey = GetPerformanceMeasurement (
+          ((LogEntryKey = GetPerformanceMeasurementEx (
                           LogEntryKey,
                           &Measurement.Handle,
                           &Measurement.Token,
                           &Measurement.Module,
                           &Measurement.StartTimeStamp,
-                          &Measurement.EndTimeStamp)) != 0)
+                          &Measurement.EndTimeStamp,
+                          &Measurement.Identifier)) != 0)
         )
   {
     ++Index;    // Count every record.  First record is 1.
@@ -310,14 +333,27 @@ DumpRawTrace(
       continue;
     }
     ++Count;    // Count the number of records printed
-    PrintToken (STRING_TOKEN (STR_DP_RAW_VARS),
-      Index,      // 1 based, Which measurement record is being printed
-      Measurement.Handle,
-      Measurement.StartTimeStamp,
-      Measurement.EndTimeStamp,
-      Measurement.Token,
-      Measurement.Module
-    );
+
+    if (mShowId) {
+      PrintToken (STRING_TOKEN (STR_DP_RAW_VARS2),
+        Index,      // 1 based, Which measurement record is being printed
+        Measurement.Handle,
+        Measurement.StartTimeStamp,
+        Measurement.EndTimeStamp,
+        Measurement.Token,
+        Measurement.Module,
+        Measurement.Identifier
+      );
+    } else {
+      PrintToken (STRING_TOKEN (STR_DP_RAW_VARS),
+        Index,      // 1 based, Which measurement record is being printed
+        Measurement.Handle,
+        Measurement.StartTimeStamp,
+        Measurement.EndTimeStamp,
+        Measurement.Token,
+        Measurement.Module
+      );
+    }
   }
 }
 
@@ -363,13 +399,14 @@ ProcessPhases(
   FreePool (StringPtrUnknown);
 
   LogEntryKey = 0;
-  while ((LogEntryKey = GetPerformanceMeasurement (
+  while ((LogEntryKey = GetPerformanceMeasurementEx (
                           LogEntryKey,
                           &Measurement.Handle,
                           &Measurement.Token,
                           &Measurement.Module,
                           &Measurement.StartTimeStamp,
-                          &Measurement.EndTimeStamp)) != 0)
+                          &Measurement.EndTimeStamp,
+                          &Measurement.Identifier)) != 0)
   {
     if (AsciiStrnCmp (Measurement.Token, ALit_SHELL, PERF_TOKEN_LENGTH) == 0) {
       Measurement.EndTimeStamp = Ticker;
@@ -512,18 +549,23 @@ ProcessHandles(
     Print (L"There are %,d Handles defined.\n", (Size / sizeof(HandleBuffer[0])));
 #endif
 
-    PrintToken (STRING_TOKEN (STR_DP_HANDLE_SECTION) );
+    if (mShowId) {
+      PrintToken (STRING_TOKEN (STR_DP_HANDLE_SECTION2) );
+    } else {
+      PrintToken (STRING_TOKEN (STR_DP_HANDLE_SECTION) );
+    }
     PrintToken (STRING_TOKEN (STR_DP_DASHES) );
 
     LogEntryKey = 0;
     Count   = 0;
-    while ((LogEntryKey = GetPerformanceMeasurement (
+    while ((LogEntryKey = GetPerformanceMeasurementEx (
                             LogEntryKey,
                             &Measurement.Handle,
                             &Measurement.Token,
                             &Measurement.Module,
                             &Measurement.StartTimeStamp,
-                            &Measurement.EndTimeStamp)) != 0)
+                            &Measurement.EndTimeStamp,
+                            &Measurement.Identifier)) != 0)
     {
       Count++;
       Duration = GetDuration (&Measurement);
@@ -549,14 +591,26 @@ ProcessHandles(
       mUnicodeToken[11] = 0;
       if (mGaugeString[0] != 0) {
         // Display the record if it has a valid handle.
-        PrintToken (
-          STRING_TOKEN (STR_DP_HANDLE_VARS),
-          Count,      // 1 based, Which measurement record is being printed
-          Index + 1,  // 1 based, Which handle is being printed
-          mGaugeString,
-          mUnicodeToken,
-          ElapsedTime
-        );
+        if (mShowId) {
+          PrintToken (
+            STRING_TOKEN (STR_DP_HANDLE_VARS2),
+            Count,      // 1 based, Which measurement record is being printed
+            Index + 1,  // 1 based, Which handle is being printed
+            mGaugeString,
+            mUnicodeToken,
+            ElapsedTime,
+            Measurement.Identifier
+          );
+        } else {
+          PrintToken (
+            STRING_TOKEN (STR_DP_HANDLE_VARS),
+            Count,      // 1 based, Which measurement record is being printed
+            Index + 1,  // 1 based, Which handle is being printed
+            mGaugeString,
+            mUnicodeToken,
+            ElapsedTime
+          );
+        }
       }
     }
   }
@@ -592,17 +646,22 @@ ProcessPeims(
   FreePool (StringPtr);
   FreePool (StringPtrUnknown);
 
-  PrintToken (STRING_TOKEN (STR_DP_PEIM_SECTION));
+  if (mShowId) {
+    PrintToken (STRING_TOKEN (STR_DP_PEIM_SECTION2));
+  } else {
+    PrintToken (STRING_TOKEN (STR_DP_PEIM_SECTION));
+  }
   PrintToken (STRING_TOKEN (STR_DP_DASHES));
   TIndex  = 0;
   LogEntryKey = 0;
-  while ((LogEntryKey = GetPerformanceMeasurement (
+  while ((LogEntryKey = GetPerformanceMeasurementEx (
                           LogEntryKey,
                           &Measurement.Handle,
                           &Measurement.Token,
                           &Measurement.Module,
                           &Measurement.StartTimeStamp,
-                          &Measurement.EndTimeStamp)) != 0)
+                          &Measurement.EndTimeStamp,
+                          &Measurement.Identifier)) != 0)
   {
     TIndex++;
     if ((Measurement.EndTimeStamp == 0) ||
@@ -615,12 +674,22 @@ ProcessPeims(
     ElapsedTime = DurationInMicroSeconds ( Duration );  // Calculate elapsed time in microseconds
     if (ElapsedTime >= mInterestThreshold) {
       // PEIM FILE Handle is the start address of its FFS file that contains its file guid.
-      PrintToken (STRING_TOKEN (STR_DP_PEIM_VARS),
-            TIndex,   // 1 based, Which measurement record is being printed
-            Measurement.Handle,  // base address
-            Measurement.Handle,  // file guid
-            ElapsedTime
-      );
+      if (mShowId) {
+        PrintToken (STRING_TOKEN (STR_DP_PEIM_VARS2),
+              TIndex,   // 1 based, Which measurement record is being printed
+              Measurement.Handle,  // base address
+              Measurement.Handle,  // file guid
+              ElapsedTime,
+              Measurement.Identifier
+        );
+      } else {
+        PrintToken (STRING_TOKEN (STR_DP_PEIM_VARS),
+              TIndex,   // 1 based, Which measurement record is being printed
+              Measurement.Handle,  // base address
+              Measurement.Handle,  // file guid
+              ElapsedTime
+        );
+      }
     }
   }
 }
@@ -654,23 +723,28 @@ ProcessGlobal(
   FreePool (StringPtr);
   FreePool (StringPtrUnknown);
 
-  PrintToken (STRING_TOKEN (STR_DP_GLOBAL_SECTION));
+  if (mShowId) {
+    PrintToken (STRING_TOKEN (STR_DP_GLOBAL_SECTION2));
+  } else {
+    PrintToken (STRING_TOKEN (STR_DP_GLOBAL_SECTION));
+  }
   PrintToken (STRING_TOKEN (STR_DP_DASHES));
 
   Index = 1;
   LogEntryKey = 0;
 
-  while ((LogEntryKey = GetPerformanceMeasurement (
+  while ((LogEntryKey = GetPerformanceMeasurementEx (
                           LogEntryKey,
                           &Measurement.Handle,
                           &Measurement.Token,
                           &Measurement.Module,
                           &Measurement.StartTimeStamp,
-                          &Measurement.EndTimeStamp)) != 0)
+                          &Measurement.EndTimeStamp,
+                          &Measurement.Identifier)) != 0)
   {
     AsciiStrToUnicodeStr (Measurement.Module, mGaugeString);
     AsciiStrToUnicodeStr (Measurement.Token, mUnicodeToken);
-    mGaugeString[26] = 0;
+    mGaugeString[25] = 0;
     mUnicodeToken[31] = 0;
     if ( ! ( IsPhase( &Measurement)  ||
         (Measurement.Handle != NULL)      ||
@@ -680,13 +754,24 @@ ProcessGlobal(
       Duration = GetDuration (&Measurement);
       ElapsedTime = DurationInMicroSeconds ( Duration );
       if (ElapsedTime >= mInterestThreshold) {
-        PrintToken (
-          STRING_TOKEN (STR_DP_GLOBAL_VARS),
-          Index,
-          mGaugeString,
-          mUnicodeToken,
-          ElapsedTime
-          );
+        if (mShowId) {
+          PrintToken (
+            STRING_TOKEN (STR_DP_GLOBAL_VARS2),
+            Index,
+            mGaugeString,
+            mUnicodeToken,
+            ElapsedTime,
+            Measurement.Identifier
+            );
+        } else {
+           PrintToken (
+            STRING_TOKEN (STR_DP_GLOBAL_VARS),
+            Index,
+            mGaugeString,
+            mUnicodeToken,
+            ElapsedTime
+            );
+        }
       }
     }
     Index++;
