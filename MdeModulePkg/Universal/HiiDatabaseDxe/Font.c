@@ -2,7 +2,7 @@
 Implementation for EFI_HII_FONT_PROTOCOL.
 
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1819,7 +1819,13 @@ HiiStringToImage (
   //
   Image     = *Blt;
   BufferPtr = Image->Image.Bitmap + Image->Width * BltY + BltX;
-  ASSERT (Image->Height >= BltY);
+  if (Image->Height < BltY) {
+    //
+    // the top edge of the image should be in Image resolution scope.
+    //
+    Status = EFI_INVALID_PARAMETER;
+    goto Exit;
+  }
   MaxRowNum = (UINT16) ((Image->Height - BltY) / Height);
   if ((Image->Height - BltY) % Height != 0) {
     LastLineHeight = (Image->Height - BltY) % Height;
