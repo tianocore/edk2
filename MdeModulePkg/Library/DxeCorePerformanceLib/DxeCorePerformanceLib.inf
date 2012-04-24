@@ -4,12 +4,12 @@
 #  This library provides the performance measurement interfaces and initializes performance
 #  logging for DXE phase. It first initializes its private global data structure for
 #  performance logging and saves the performance GUIDed HOB passed from PEI phase. 
-#  It initializes DXE phase performance logging by publishing the Performance Protocol,
+#  It initializes DXE phase performance logging by publishing the Performance and PerformanceEx Protocol,
 #  which is consumed by DxePerformanceLib to logging performance data in DXE phase.
 #  This library is mainly used by DxeCore to start performance logging to ensure that
-#  Performance Protocol is installed at the very beginning of DXE phase.
+#  Performance and PerformanceEx Protocol are installed at the very beginning of DXE phase.
 #  
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -59,6 +59,8 @@
 [Guids]
   gPerformanceProtocolGuid                        ## CONSUMES ## HOB
   gPerformanceProtocolGuid                        ## PRODUCES ## PROTOCOL
+  gPerformanceExProtocolGuid                      ## CONSUMES ## HOB
+  gPerformanceExProtocolGuid                      ## PRODUCES ## PROTOCOL
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries

@@ -2,9 +2,10 @@
 #  Performance library instance used in DXE phase to dump SMM performance data.
 #  
 #  This library instance allows a DXE driver or UEFI application to dump the SMM performance data.
-#  StartPerformanceMeasurement() and EndPerformanceMeasurement() are not implemented.
+#  StartPerformanceMeasurement(), EndPerformanceMeasurement(), StartPerformanceMeasurementEx()
+#  and EndPerformanceMeasurementEx() are not implemented.
 #  
-#  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -48,7 +49,8 @@
   MemoryAllocationLib
 
 [Guids]
-  gSmmPerformanceProtocolGuid            ## CONSUMES
+  gSmmPerformanceProtocolGuid            ## SOMETIMES_CONSUMES
+  gSmmPerformanceExProtocolGuid          ## SOMETIMES_CONSUMES
 
 [Protocols]
   gEfiSmmCommunicationProtocolGuid       ## CONSUMES

@@ -2,8 +2,8 @@
   Performance Library used in SMM phase.
 
   This library instance provides infrastructure for SMM drivers to log performance
-  data. It consumes SMM Performance Protocol published by SmmCorePerformanceLib
-  to log performance data. If Performance Protocol is not available, it does not log any
+  data. It consumes SMM PerformanceEx or Performance Protocol published by SmmCorePerformanceLib
+  to log performance data. If both SMM PerformanceEx and Performance Protocol are not available, it does not log any
   performance information.
 
   Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
@@ -26,21 +26,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 #include <Library/BaseMemoryLib.h>
 
-#include <Protocol/SmmCommunication.h>
-
 //
-// The cached performance protocol interface.
+// The cached SMM Performance Protocol and SMM PerformanceEx Protocol interface.
 //
-PERFORMANCE_PROTOCOL  *mPerformance = NULL;
-BOOLEAN               mPerformanceMeasurementEnabled;
-
+PERFORMANCE_PROTOCOL        *mPerformance = NULL;
+PERFORMANCE_EX_PROTOCOL     *mPerformanceEx = NULL;
+BOOLEAN                     mPerformanceMeasurementEnabled;
 
 /**
-  The constructor function initializes Performance infrastructure for DXE phase.
-
-  The constructor function publishes Performance protocol, allocates memory to log DXE performance
-  and merges PEI performance data to DXE performance log.
-  It will ASSERT() if one of these operations fails and it will always return EFI_SUCCESS.
+  The constructor function initializes the Performance Measurement Enable flag
 
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
@@ -62,13 +56,12 @@ SmmPerformanceLibConstructor (
 }
 
 /**
-  The constructor function caches the pointer to Performance protocol.
+  The function caches the pointers to SMM PerformanceEx protocol and Performance Protocol.
 
-  The constructor function locates SMM erformance protocol from the SMM protocol database.
-  It will ASSERT() if that operation fails and it will always return EFI_SUCCESS.
+  The function locates SMM PerformanceEx protocol and Performance Protocol from protocol database.
 
-  @retval EFI_SUCCESS     Performance protocol is successfully located.
-  @retval Other           Performance protocol is not located to log performance.
+  @retval EFI_SUCCESS     SMM PerformanceEx protocol or Performance Protocol is successfully located.
+  @retval EFI_NOT_FOUND   Both SMM PerformanceEx protocol and Performance Protocol are not located to log performance.
 
 **/
 EFI_STATUS
@@ -76,10 +69,21 @@ GetPerformanceProtocol (
   VOID
   )
 {
-  EFI_STATUS            Status;
-  PERFORMANCE_PROTOCOL  *Performance;
+  EFI_STATUS                Status;
+  PERFORMANCE_PROTOCOL      *Performance;
+  PERFORMANCE_EX_PROTOCOL   *PerformanceEx;
 
-  if (mPerformance != NULL) {
+  if (mPerformanceEx != NULL || mPerformance != NULL) {
+    return EFI_SUCCESS;
+  }
+
+  Status = gSmst->SmmLocateProtocol (&gSmmPerformanceExProtocolGuid, NULL, (VOID **) &PerformanceEx);
+  if (!EFI_ERROR (Status)) {
+    ASSERT (PerformanceEx != NULL);
+    //
+    // Cache PerformanceEx Protocol.
+    //
+    mPerformanceEx = PerformanceEx;
     return EFI_SUCCESS;
   }
 
@@ -90,9 +94,219 @@ GetPerformanceProtocol (
     // Cache performance protocol.
     //
     mPerformance = Performance;
+    return EFI_SUCCESS;
   }
 
-  return Status;
+  return EFI_NOT_FOUND;
+}
+
+/**
+  Creates a record for the beginning of a performance measurement.
+
+  Creates a record that contains the Handle, Token, Module and Identifier.
+  If TimeStamp is not zero, then TimeStamp is added to the record as the start time.
+  If TimeStamp is zero, then this function reads the current time stamp
+  and adds that time stamp value to the record as the start time.
+
+  @param  Handle                  Pointer to environment specific context used
+                                  to identify the component being measured.
+  @param  Token                   Pointer to a Null-terminated ASCII string
+                                  that identifies the component being measured.
+  @param  Module                  Pointer to a Null-terminated ASCII string
+                                  that identifies the module being measured.
+  @param  TimeStamp               64-bit time stamp.
+  @param  Identifier              32-bit identifier. If the value is 0, the created record
+                                  is same as the one created by StartPerformanceMeasurement.
+
+  @retval RETURN_SUCCESS          The start of the measurement was recorded.
+  @retval RETURN_OUT_OF_RESOURCES There are not enough resources to record the measurement.
+
+**/
+RETURN_STATUS
+EFIAPI
+StartPerformanceMeasurementEx (
+  IN CONST VOID   *Handle,  OPTIONAL
+  IN CONST CHAR8  *Token,   OPTIONAL
+  IN CONST CHAR8  *Module,  OPTIONAL
+  IN UINT64       TimeStamp,
+  IN UINT32       Identifier
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = GetPerformanceProtocol ();
+  if (EFI_ERROR (Status)) {
+    return RETURN_OUT_OF_RESOURCES;
+  }
+
+  if (mPerformanceEx != NULL) {
+    Status = mPerformanceEx->StartGaugeEx (Handle, Token, Module, TimeStamp, Identifier);
+  } else if (mPerformance != NULL) {
+    Status = mPerformance->StartGauge (Handle, Token, Module, TimeStamp);
+  } else {
+    ASSERT (FALSE);
+  }
+
+  return (RETURN_STATUS) Status;
+}
+
+/**
+  Fills in the end time of a performance measurement.
+
+  Looks up the record that matches Handle, Token, Module and Identifier.
+  If the record can not be found then return RETURN_NOT_FOUND.
+  If the record is found and TimeStamp is not zero,
+  then TimeStamp is added to the record as the end time.
+  If the record is found and TimeStamp is zero, then this function reads
+  the current time stamp and adds that time stamp value to the record as the end time.
+
+  @param  Handle                  Pointer to environment specific context used
+                                  to identify the component being measured.
+  @param  Token                   Pointer to a Null-terminated ASCII string
+                                  that identifies the component being measured.
+  @param  Module                  Pointer to a Null-terminated ASCII string
+                                  that identifies the module being measured.
+  @param  TimeStamp               64-bit time stamp.
+  @param  Identifier              32-bit identifier. If the value is 0, the found record
+                                  is same as the one found by EndPerformanceMeasurement.
+
+  @retval RETURN_SUCCESS          The end of  the measurement was recorded.
+  @retval RETURN_NOT_FOUND        The specified measurement record could not be found.
+
+**/
+RETURN_STATUS
+EFIAPI
+EndPerformanceMeasurementEx (
+  IN CONST VOID   *Handle,  OPTIONAL
+  IN CONST CHAR8  *Token,   OPTIONAL
+  IN CONST CHAR8  *Module,  OPTIONAL
+  IN UINT64       TimeStamp,
+  IN UINT32       Identifier
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = GetPerformanceProtocol ();
+  if (EFI_ERROR (Status)) {
+    return RETURN_NOT_FOUND;
+  }
+
+  if (mPerformanceEx != NULL) {
+    Status = mPerformanceEx->EndGaugeEx (Handle, Token, Module, TimeStamp, Identifier);
+  } else if (mPerformance != NULL) {
+    Status = mPerformance->EndGauge (Handle, Token, Module, TimeStamp);
+  } else {
+    ASSERT (FALSE);
+  }
+
+  return (RETURN_STATUS) Status;
+}
+
+/**
+  Attempts to retrieve a performance measurement log entry from the performance measurement log.
+  It can also retrieve the log created by StartPerformanceMeasurement and EndPerformanceMeasurement,
+  and then assign the Identifier with 0.
+
+  Attempts to retrieve the performance log entry specified by LogEntryKey.  If LogEntryKey is
+  zero on entry, then an attempt is made to retrieve the first entry from the performance log,
+  and the key for the second entry in the log is returned.  If the performance log is empty,
+  then no entry is retrieved and zero is returned.  If LogEntryKey is not zero, then the performance
+  log entry associated with LogEntryKey is retrieved, and the key for the next entry in the log is
+  returned.  If LogEntryKey is the key for the last entry in the log, then the last log entry is
+  retrieved and an implementation specific non-zero key value that specifies the end of the performance
+  log is returned.  If LogEntryKey is equal this implementation specific non-zero key value, then no entry
+  is retrieved and zero is returned.  In the cases where a performance log entry can be returned,
+  the log entry is returned in Handle, Token, Module, StartTimeStamp, EndTimeStamp and Identifier.
+  If LogEntryKey is not a valid log entry key for the performance measurement log, then ASSERT().
+  If Handle is NULL, then ASSERT().
+  If Token is NULL, then ASSERT().
+  If Module is NULL, then ASSERT().
+  If StartTimeStamp is NULL, then ASSERT().
+  If EndTimeStamp is NULL, then ASSERT().
+  If Identifier is NULL, then ASSERT().
+
+  @param  LogEntryKey             On entry, the key of the performance measurement log entry to retrieve.
+                                  0, then the first performance measurement log entry is retrieved.
+                                  On exit, the key of the next performance log entry.
+  @param  Handle                  Pointer to environment specific context used to identify the component
+                                  being measured.
+  @param  Token                   Pointer to a Null-terminated ASCII string that identifies the component
+                                  being measured.
+  @param  Module                  Pointer to a Null-terminated ASCII string that identifies the module
+                                  being measured.
+  @param  StartTimeStamp          Pointer to the 64-bit time stamp that was recorded when the measurement
+                                  was started.
+  @param  EndTimeStamp            Pointer to the 64-bit time stamp that was recorded when the measurement
+                                  was ended.
+  @param  Identifier              Pointer to the 32-bit identifier that was recorded.
+
+  @return The key for the next performance log entry (in general case).
+
+**/
+UINTN
+EFIAPI
+GetPerformanceMeasurementEx (
+  IN  UINTN       LogEntryKey, 
+  OUT CONST VOID  **Handle,
+  OUT CONST CHAR8 **Token,
+  OUT CONST CHAR8 **Module,
+  OUT UINT64      *StartTimeStamp,
+  OUT UINT64      *EndTimeStamp,
+  OUT UINT32      *Identifier
+  )
+{
+  EFI_STATUS            Status;
+  GAUGE_DATA_ENTRY_EX   *GaugeData;
+
+  GaugeData = NULL;
+
+  ASSERT (Handle != NULL);
+  ASSERT (Token != NULL);
+  ASSERT (Module != NULL);
+  ASSERT (StartTimeStamp != NULL);
+  ASSERT (EndTimeStamp != NULL);
+  ASSERT (Identifier != NULL);
+
+  Status = GetPerformanceProtocol ();
+  if (EFI_ERROR (Status)) {
+    return 0;
+  }
+
+  if (mPerformanceEx != NULL) {
+    Status = mPerformanceEx->GetGaugeEx (LogEntryKey++, &GaugeData);
+  } else if (mPerformance != NULL) {
+    Status = mPerformance->GetGauge (LogEntryKey++, (GAUGE_DATA_ENTRY **) &GaugeData);
+  } else {
+    ASSERT (FALSE);
+    return 0;
+  }
+
+  //
+  // Make sure that LogEntryKey is a valid log entry key,
+  //
+  ASSERT (Status != EFI_INVALID_PARAMETER);
+
+  if (EFI_ERROR (Status)) {
+    //
+    // The LogEntryKey is the last entry (equals to the total entry number).
+    //
+    return 0;
+  }
+
+  ASSERT (GaugeData != NULL);
+
+  *Handle         = (VOID *) (UINTN) GaugeData->Handle;
+  *Token          = GaugeData->Token;
+  *Module         = GaugeData->Module;
+  *StartTimeStamp = GaugeData->StartTimeStamp;
+  *EndTimeStamp   = GaugeData->EndTimeStamp;
+  if (mPerformanceEx != NULL) {
+    *Identifier   = GaugeData->Identifier;
+  } else {
+    *Identifier   = 0;
+  }
+
+  return LogEntryKey;
 }
 
 /**
@@ -124,16 +338,7 @@ StartPerformanceMeasurement (
   IN UINT64       TimeStamp
   )
 {
-  EFI_STATUS  Status;
-
-  Status = GetPerformanceProtocol ();
-  if (EFI_ERROR (Status)) {
-    return RETURN_OUT_OF_RESOURCES;
-  }
-
-  Status = mPerformance->StartGauge (Handle, Token, Module, TimeStamp);
-
-  return (RETURN_STATUS) Status;
+  return StartPerformanceMeasurementEx (Handle, Token, Module, TimeStamp, 0);
 }
 
 /**
@@ -167,20 +372,13 @@ EndPerformanceMeasurement (
   IN UINT64       TimeStamp
   )
 {
-  EFI_STATUS  Status;
-
-  Status = GetPerformanceProtocol ();
-  if (EFI_ERROR (Status)) {
-    return RETURN_NOT_FOUND;
-  }
-
-  Status = mPerformance->EndGauge (Handle, Token, Module, TimeStamp);
-
-  return (RETURN_STATUS) Status;
+  return EndPerformanceMeasurementEx (Handle, Token, Module, TimeStamp, 0);
 }
 
 /**
   Attempts to retrieve a performance measurement log entry from the performance measurement log.
+  It can also retrieve the log created by StartPerformanceMeasurementEx and EndPerformanceMeasurementEx,
+  and then eliminate the Identifier.
 
   Attempts to retrieve the performance log entry specified by LogEntryKey.  If LogEntryKey is
   zero on entry, then an attempt is made to retrieve the first entry from the performance log,
@@ -227,45 +425,8 @@ GetPerformanceMeasurement (
   OUT UINT64      *EndTimeStamp
   )
 {
-  EFI_STATUS        Status;
-  GAUGE_DATA_ENTRY  *GaugeData;
-	
-  GaugeData = NULL;
-
-  ASSERT (Handle != NULL);
-  ASSERT (Token != NULL);
-  ASSERT (Module != NULL);
-  ASSERT (StartTimeStamp != NULL);
-  ASSERT (EndTimeStamp != NULL);
-
-  Status = GetPerformanceProtocol ();
-  if (EFI_ERROR (Status)) {
-    return 0;
-  }
-
-  Status = mPerformance->GetGauge (LogEntryKey++, &GaugeData);
-
-  //
-  // Make sure that LogEntryKey is a valid log entry key,
-  //
-  ASSERT (Status != EFI_INVALID_PARAMETER);
-
-  if (EFI_ERROR (Status)) {
-    //
-    // The LogEntryKey is the last entry (equals to the total entry number).
-    //
-    return 0;
-  }
-
-  ASSERT (GaugeData != NULL);
-
-  *Handle         = (VOID *) (UINTN) GaugeData->Handle;
-  *Token          = GaugeData->Token;
-  *Module         = GaugeData->Module;
-  *StartTimeStamp = GaugeData->StartTimeStamp;
-  *EndTimeStamp   = GaugeData->EndTimeStamp;
-
-  return LogEntryKey;
+  UINT32 Identifier;
+  return GetPerformanceMeasurementEx (LogEntryKey, Handle, Token, Module, StartTimeStamp, EndTimeStamp, &Identifier);
 }
 
 /**
