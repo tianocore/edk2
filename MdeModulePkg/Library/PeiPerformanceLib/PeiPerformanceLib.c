@@ -90,6 +90,7 @@ InternalGetPerformanceHobLog (
 
   @param  PeiPerformanceLog       Pointer to the data structure containing PEI 
                                   performance data.
+  @param  PeiPerformanceIdArray   Pointer to PEI performance identifier array.
   @param  Handle                  Pointer to environment specific context used
                                   to identify the component being measured.
   @param  Token                   Pointer to a Null-terminated ASCII string
