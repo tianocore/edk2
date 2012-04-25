@@ -408,6 +408,8 @@ GetGauge (
   EFI_STATUS          Status;
   GAUGE_DATA_ENTRY_EX *GaugeEntryEx;
 
+  GaugeEntryEx = NULL;
+
   Status = GetGaugeEx (LogEntryKey, &GaugeEntryEx);
   if (EFI_ERROR (Status)) {
     return Status;
