@@ -203,12 +203,14 @@ PciRootBridgeIoDumpInformation(
   }
 
   Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_PCIRB_DUMP_PH), NULL);
+  ASSERT (Temp != NULL);
   Temp2 = CatSPrint(L"\r\n", Temp, PciRootBridgeIo->ParentHandle);
   FreePool(Temp);
   RetVal = Temp2;
   Temp2 = NULL;
  
   Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_PCIRB_DUMP_SEG), NULL);
+  ASSERT (Temp != NULL);
   Temp2 = CatSPrint(RetVal, Temp, PciRootBridgeIo->SegmentNumber);
   FreePool(Temp);
   FreePool(RetVal);
@@ -220,6 +222,7 @@ PciRootBridgeIoDumpInformation(
   Status = PciRootBridgeIo->GetAttributes (PciRootBridgeIo, &Supports, &Attributes);
   if (!EFI_ERROR(Status)) {
     Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_PCIRB_DUMP_ATT), NULL);
+    ASSERT (Temp != NULL);    
     Temp2 = CatSPrint(RetVal, Temp, Attributes);
     FreePool(Temp);
     FreePool(RetVal);
@@ -227,6 +230,7 @@ PciRootBridgeIoDumpInformation(
     Temp2 = NULL;
     
     Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_PCIRB_DUMP_SUPPORTS), NULL);
+    ASSERT (Temp != NULL);
     Temp2 = CatSPrint(RetVal, Temp, Supports);
     FreePool(Temp);
     FreePool(RetVal);
@@ -238,6 +242,7 @@ PciRootBridgeIoDumpInformation(
   Status = PciRootBridgeIo->Configuration (PciRootBridgeIo, (VOID **) &Configuration);
   if (!EFI_ERROR(Status) && Configuration != NULL) {
     Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_PCIRB_DUMP_TITLE), NULL);
+    ASSERT (Temp != NULL);
     Temp2 = CatSPrint(RetVal, Temp, Supports);
     FreePool(Temp);
     FreePool(RetVal);

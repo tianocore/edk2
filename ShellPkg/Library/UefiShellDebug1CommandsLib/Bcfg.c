@@ -107,6 +107,7 @@ UpdateOptionalDataDebug1(
     //
     // Allocate new struct and discard old optional data.
     //
+    ASSERT (OriginalData != NULL);
     OriginalOptionDataSize  = sizeof(UINT32) + sizeof(UINT16) + StrSize(((CHAR16*)(OriginalData + sizeof(UINT32) + sizeof(UINT16))));
     OriginalOptionDataSize += (*(UINT16*)(OriginalData + sizeof(UINT32)));
     OriginalOptionDataSize -= OriginalSize;
@@ -139,8 +140,8 @@ UpdateOptionalDataDebug1(
 /**
   This function will get a CRC for a boot option.
 
-  @param[in, out] Crc     The CRC value to return.
-  @param[in]      Index   The boot option index to CRC.
+  @param[in, out] Crc         The CRC value to return.
+  @param[in]      BootIndex   The boot option index to CRC.
 
   @retval EFI_SUCCESS           The CRC was sucessfully returned.
   @retval other                 A error occured.
@@ -779,6 +780,11 @@ BcfgAddOptDebug1(
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       FileName = StrnCatGrow(&FileName, NULL, Walker+1, 0);
+      if (FileName == NULL) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle);
+        ShellStatus = SHELL_OUT_OF_RESOURCES;
+        return (ShellStatus);
+      }
       Temp2 = StrStr(FileName, L"\"");
       ASSERT(Temp2 != NULL);
       Temp2[0] = CHAR_NULL;
