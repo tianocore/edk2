@@ -67,7 +67,7 @@ HASH_TABLE mHash[] = {
 **/
 EFI_STATUS
 EFIAPI
-ImageRead (
+DxeImageVerificationLibImageRead (
   IN     VOID    *FileHandle,
   IN     UINTN   FileOffset,
   IN OUT UINTN   *ReadSize,
@@ -1272,7 +1272,7 @@ DxeImageVerificationHandler (
 
   ZeroMem (&ImageContext, sizeof (ImageContext));
   ImageContext.Handle    = (VOID *) FileBuffer;
-  ImageContext.ImageRead = (PE_COFF_LOADER_READ_FILE) ImageRead;
+  ImageContext.ImageRead = (PE_COFF_LOADER_READ_FILE) DxeImageVerificationLibImageRead;
 
   //
   // Get information about the image being loaded

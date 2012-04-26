@@ -52,7 +52,7 @@ UINTN                             mImageSize;
 **/
 EFI_STATUS
 EFIAPI
-ImageRead (
+DxeTpmMeasureBootLibImageRead (
   IN     VOID    *FileHandle,
   IN     UINTN   FileOffset,
   IN OUT UINTN   *ReadSize,
@@ -774,7 +774,7 @@ DxeTpmMeasureBootHandler (
   DevicePathNode = OrigDevicePathNode;
   ZeroMem (&ImageContext, sizeof (ImageContext));
   ImageContext.Handle    = (VOID *) FileBuffer;
-  ImageContext.ImageRead = (PE_COFF_LOADER_READ_FILE) ImageRead;
+  ImageContext.ImageRead = (PE_COFF_LOADER_READ_FILE) DxeTpmMeasureBootLibImageRead;
 
   //
   // Get information about the image being loaded

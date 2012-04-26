@@ -144,10 +144,6 @@ PeCoffLoaderGetPeHeader (
         return RETURN_UNSUPPORTED;
       }
 
-      if (Hdr.Pe32->FileHeader.SizeOfOptionalHeader != sizeof (EFI_IMAGE_OPTIONAL_HEADER32) - (EFI_IMAGE_NUMBER_OF_DIRECTORY_ENTRIES - Hdr.Pe32->OptionalHeader.NumberOfRvaAndSizes) * sizeof (EFI_IMAGE_DATA_DIRECTORY)) {
-        return RETURN_UNSUPPORTED;
-      }
-
       //
       // 2. Check the OptionalHeader.SizeOfHeaders field.
       // This field will be use like the following mode, so just compare the result.
@@ -218,10 +214,6 @@ PeCoffLoaderGetPeHeader (
       // 1. Check FileHeader.SizeOfOptionalHeader filed.
       //
       if (EFI_IMAGE_NUMBER_OF_DIRECTORY_ENTRIES < Hdr.Pe32Plus->OptionalHeader.NumberOfRvaAndSizes) {
-        return RETURN_UNSUPPORTED;
-      }
-
-      if (Hdr.Pe32Plus->FileHeader.SizeOfOptionalHeader != sizeof (EFI_IMAGE_OPTIONAL_HEADER32) - (EFI_IMAGE_NUMBER_OF_DIRECTORY_ENTRIES - Hdr.Pe32Plus->OptionalHeader.NumberOfRvaAndSizes) * sizeof (EFI_IMAGE_DATA_DIRECTORY)) {
         return RETURN_UNSUPPORTED;
       }
 
