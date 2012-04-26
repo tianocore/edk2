@@ -1,7 +1,7 @@
 /** @file
   UEFI Event support functions implemented in this file.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -277,7 +277,7 @@ CoreNotifySignalList (
 
 
 /**
-  Creates a general-purpose event structure.
+  Creates an event.
 
   @param  Type                   The type of event to create and its mode and
                                  attributes
@@ -310,7 +310,7 @@ CoreCreateEvent (
 
 
 /**
-  Creates a general-purpose event structure
+  Creates an event in a group.
 
   @param  Type                   The type of event to create and its mode and
                                  attributes
@@ -332,6 +332,51 @@ CoreCreateEvent (
 EFI_STATUS
 EFIAPI
 CoreCreateEventEx (
+  IN UINT32                   Type,
+  IN EFI_TPL                  NotifyTpl,
+  IN EFI_EVENT_NOTIFY         NotifyFunction, OPTIONAL
+  IN CONST VOID               *NotifyContext, OPTIONAL
+  IN CONST EFI_GUID           *EventGroup,    OPTIONAL
+  OUT EFI_EVENT               *Event
+  )
+{
+  //
+  // If it's a notify type of event, check for invalid NotifyTpl
+  //
+  if ((Type & (EVT_NOTIFY_WAIT | EVT_NOTIFY_SIGNAL)) != 0) {
+    if (NotifyTpl != TPL_APPLICATION &&
+        NotifyTpl != TPL_CALLBACK &&
+        NotifyTpl != TPL_NOTIFY) {
+      return EFI_INVALID_PARAMETER;
+    }
+  }
+
+  return CoreCreateEventInternal (Type, NotifyTpl, NotifyFunction, NotifyContext, EventGroup, Event);
+}
+
+/**
+  Creates a general-purpose event structure
+
+  @param  Type                   The type of event to create and its mode and
+                                 attributes
+  @param  NotifyTpl              The task priority level of event notifications
+  @param  NotifyFunction         Pointer to the events notification function
+  @param  NotifyContext          Pointer to the notification functions context;
+                                 corresponds to parameter "Context" in the
+                                 notification function
+  @param  EventGroup             GUID for EventGroup if NULL act the same as
+                                 gBS->CreateEvent().
+  @param  Event                  Pointer to the newly created event if the call
+                                 succeeds; undefined otherwise
+
+  @retval EFI_SUCCESS            The event structure was created
+  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value
+  @retval EFI_OUT_OF_RESOURCES   The event could not be allocated
+
+**/
+EFI_STATUS
+EFIAPI
+CoreCreateEventInternal (
   IN UINT32                   Type,
   IN EFI_TPL                  NotifyTpl,
   IN EFI_EVENT_NOTIFY         NotifyFunction, OPTIONAL
