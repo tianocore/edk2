@@ -1310,6 +1310,7 @@ RunCommand(
   )
 {
   EFI_STATUS                Status;
+  EFI_STATUS                StatusCode;
   CHAR16                    *CommandName;
   SHELL_STATUS              ShellStatus;
   UINTN                     Argc;
@@ -1557,11 +1558,26 @@ RunCommand(
               DevPath,
               PostVariableCmdLine,
               NULL,
-              NULL
+              &StatusCode
              );
+
+            //
+            // Updatet last error status.
+            //
+            UnicodeSPrint(LeString, sizeof(LeString)*sizeof(LeString[0]), L"0x%08x", StatusCode);
+            DEBUG_CODE(InternalEfiShellSetEnv(L"DebugLasterror", LeString, TRUE););
+            InternalEfiShellSetEnv(L"Lasterror", LeString, TRUE);
           }
         }
       }
+
+      //
+      // Print some error info.
+      //
+      if (EFI_ERROR(Status)) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_ERROR), ShellInfoObject.HiiHandle, (VOID*)(Status));
+      }
+
       CommandName = StrnCatGrow(&CommandName, NULL, ShellInfoObject.NewShellParametersProtocol->Argv[0], 0);
 
       RestoreArgcArgv(ShellInfoObject.NewShellParametersProtocol, &Argv, &Argc);
