@@ -1,7 +1,7 @@
 /** @file
   Main file for DmpStore shell Debug1 function.
 
-  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -242,7 +242,7 @@ ShellCommandRunDmpStore (
       }
       if (ShellStatus == SHELL_SUCCESS) {
         if (ShellCommandLineGetFlag(Package, L"-s") || ShellCommandLineGetFlag(Package, L"-l")) {
-          ///@todo fix this after Jordan makes lib...
+          ///@todo fix this after lib ready...
           ShellPrintEx(-1, -1, L"Not implemeneted yet.\r\n");
           ShellStatus = SHELL_UNSUPPORTED;
         } else {
