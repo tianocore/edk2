@@ -1247,7 +1247,7 @@ CoreGetMemoryMap (
   @param  Buffer                 The address to return a pointer to the allocated
                                  pool
 
-  @retval EFI_INVALID_PARAMETER  PoolType not valid
+  @retval EFI_INVALID_PARAMETER  PoolType not valid or Buffer is NULL
   @retval EFI_OUT_OF_RESOURCES   Size exceeds max pool size or allocation failed.
   @retval EFI_SUCCESS            Pool successfully allocated.
 

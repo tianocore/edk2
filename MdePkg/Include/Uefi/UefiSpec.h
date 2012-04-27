@@ -5,7 +5,7 @@
   If a code construct is defined in the UEFI 2.3 specification it must be included
   by this include file.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -127,6 +127,7 @@ typedef struct {
   @retval EFI_INVALID_PARAMETER 1) Type is not AllocateAnyPages or
                                 AllocateMaxAddress or AllocateAddress.
                                 2) MemoryType is in the range
+                                3) Memory is NULL.
                                 EfiMaxMemoryType..0x7FFFFFFF.
   @retval EFI_OUT_OF_RESOURCES  The pages could not be allocated.
   @retval EFI_NOT_FOUND         The requested pages could not be found.
@@ -205,7 +206,7 @@ EFI_STATUS
 
   @retval EFI_SUCCESS           The requested number of bytes was allocated.
   @retval EFI_OUT_OF_RESOURCES  The pool requested could not be allocated.
-  @retval EFI_INVALID_PARAMETER PoolType was invalid.
+  @retval EFI_INVALID_PARAMETER PoolType was invalid or Buffer is NULL.
 
 **/
 typedef
