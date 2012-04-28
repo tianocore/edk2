@@ -2,7 +2,7 @@
 
   Provides some data struct used by EHCI controller driver.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -71,10 +71,17 @@ typedef struct _USB2_HC_DEV  USB2_HC_DEV;
 #define EHC_ASYNC_POLL_INTERVAL      (50 * 10000U)
 
 //
+// EHCI debug port control status register bit definition
+//
+#define USB_DEBUG_PORT_IN_USE        BIT10
+#define USB_DEBUG_PORT_ENABLE        BIT28
+#define USB_DEBUG_PORT_OWNER         BIT30
+
+//
 // EHC raises TPL to TPL_NOTIFY to serialize all its operations
 // to protect shared data structures.
 //
-#define  EHC_TPL                TPL_NOTIFY
+#define  EHC_TPL                     TPL_NOTIFY
 
 //
 //Iterate through the doule linked list. NOT delete safe
@@ -157,6 +164,13 @@ struct _USB2_HC_DEV {
   // Misc
   //
   EFI_UNICODE_STRING_TABLE  *ControllerNameTable;
+
+  //
+  // EHCI debug port info
+  //
+  UINT16                    DebugPortOffset; // The offset of debug port mmio register
+  UINT8                     DebugPortBarNum; // The bar number of debug port mmio register
+  UINT8                     DebugPortNum;    // The port number of usb debug port
 };
 
 

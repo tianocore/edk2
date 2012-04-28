@@ -120,6 +120,7 @@ EhcReset (
   USB2_HC_DEV             *Ehc;
   EFI_TPL                 OldTpl;
   EFI_STATUS              Status;
+  UINT32                  DbgCtrlStatus;
 
   OldTpl  = gBS->RaiseTPL (EHC_TPL);
   Ehc     = EHC_FROM_THIS (This);
@@ -133,6 +134,14 @@ EhcReset (
     //
     // Host Controller must be Halt when Reset it
     //
+    if (Ehc->DebugPortNum != 0) {
+      DbgCtrlStatus = EhcReadDbgRegister(Ehc, 0);
+      if ((DbgCtrlStatus & (USB_DEBUG_PORT_IN_USE | USB_DEBUG_PORT_OWNER)) == (USB_DEBUG_PORT_IN_USE | USB_DEBUG_PORT_OWNER)) {
+        Status = EFI_SUCCESS;
+        goto ON_EXIT;
+      }
+    }
+
     if (!EhcIsHalt (Ehc)) {
       Status = EhcHaltHC (Ehc, EHC_GENERIC_TIMEOUT);
 
@@ -323,6 +332,7 @@ EhcGetRootHubPortStatus (
   UINTN                   Index;
   UINTN                   MapSize;
   EFI_STATUS              Status;
+  UINT32                  DbgCtrlStatus;
 
   if (PortStatus == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -343,6 +353,13 @@ EhcGetRootHubPortStatus (
   Offset                        = (UINT32) (EHC_PORT_STAT_OFFSET + (4 * PortNumber));
   PortStatus->PortStatus        = 0;
   PortStatus->PortChangeStatus  = 0;
+
+  if ((Ehc->DebugPortNum != 0) && (PortNumber == (Ehc->DebugPortNum - 1))) {
+    DbgCtrlStatus = EhcReadDbgRegister(Ehc, 0);
+    if ((DbgCtrlStatus & (USB_DEBUG_PORT_IN_USE | USB_DEBUG_PORT_OWNER)) == (USB_DEBUG_PORT_IN_USE | USB_DEBUG_PORT_OWNER)) {
+      goto ON_EXIT;
+    }
+  }
 
   State                         = EhcReadOpReg (Ehc, Offset);
 
@@ -1390,6 +1407,129 @@ ON_EXIT:
   return Status;
 }
 
+/**
+  Get the usb debug port related information.
+
+  @param  Ehc                The EHCI device.
+
+  @retval RETURN_SUCCESS     Get debug port number, bar and offset successfully.
+  @retval Others             The usb host controller does not supported usb debug port capability.
+
+**/
+EFI_STATUS
+EhcGetUsbDebugPortInfo (
+  IN  USB2_HC_DEV     *Ehc
+ )
+{
+  EFI_PCI_IO_PROTOCOL *PciIo;
+  UINT16              PciStatus;
+  UINT8               CapabilityPtr;
+  UINT8               CapabilityId;
+  UINT16              DebugPort;
+  EFI_STATUS          Status;
+
+  ASSERT (Ehc->PciIo != NULL);
+  PciIo = Ehc->PciIo;
+
+  //
+  // Detect if the EHCI host controller support Capaility Pointer.
+  //
+  Status = PciIo->Pci.Read (
+                        PciIo,
+                        EfiPciIoWidthUint8,
+                        PCI_PRIMARY_STATUS_OFFSET,
+                        sizeof (UINT16),
+                        &PciStatus
+                        );
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if ((PciStatus & EFI_PCI_STATUS_CAPABILITY) == 0) {
+    //
+    // The Pci Device Doesn't Support Capability Pointer.
+    //
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Get Pointer To Capability List
+  //
+  Status = PciIo->Pci.Read (
+                        PciIo,
+                        EfiPciIoWidthUint8,
+                        PCI_CAPBILITY_POINTER_OFFSET,
+                        1,
+                        &CapabilityPtr
+                        );
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Find Capability ID 0xA, Which Is For Debug Port
+  //
+  while (CapabilityPtr != 0) {
+    Status = PciIo->Pci.Read (
+                          PciIo,
+                          EfiPciIoWidthUint8,
+                          CapabilityPtr,
+                          1,
+                          &CapabilityId
+                          );
+
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    if (CapabilityId == EHC_DEBUG_PORT_CAP_ID) {
+      break;
+    }
+
+    Status = PciIo->Pci.Read (
+                          PciIo,
+                          EfiPciIoWidthUint8,
+                          CapabilityPtr + 1,
+                          1,
+                          &CapabilityPtr
+                          );
+
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  //
+  // No Debug Port Capability Found
+  //
+  if (CapabilityPtr == 0) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Get The Base Address Of Debug Port Register In Debug Port Capability Register
+  //
+  Status = PciIo->Pci.Read (
+                        Ehc->PciIo,
+                        EfiPciIoWidthUint8,
+                        CapabilityPtr + 2,
+                        sizeof (UINT16),
+                        &DebugPort
+                        );
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Ehc->DebugPortOffset = DebugPort & 0x1FFF;
+  Ehc->DebugPortBarNum = (DebugPort >> 13) - 1;
+  Ehc->DebugPortNum    = (UINT8)((Ehc->HcStructParams & 0x00F00000) >> 20);
+
+  return EFI_SUCCESS;
+}
+
 
 /**
   Create and initialize a USB2_HC_DEV.
@@ -1455,6 +1595,8 @@ EhcCreateUsb2Hc (
     gBS->FreePool (Ehc);
     return NULL;
   }
+  
+  EhcGetUsbDebugPortInfo (Ehc);
 
   //
   // Create AsyncRequest Polling Timer
@@ -1541,6 +1683,7 @@ EhcDriverBindingStart (
   UINTN                   EhciBusNumber;
   UINTN                   EhciDeviceNumber;
   UINTN                   EhciFunctionNumber;
+  UINT32                  State;
 
   //
   // Open the PciIo Protocol, then enable the USB host controller
@@ -1727,7 +1870,13 @@ EhcDriverBindingStart (
   if (FeaturePcdGet (PcdTurnOffUsbLegacySupport)) {
     EhcClearLegacySupport (Ehc);
   }
-  EhcResetHC (Ehc, EHC_RESET_TIMEOUT);
+
+  if (Ehc->DebugPortNum != 0) {
+    State = EhcReadDbgRegister(Ehc, 0);
+    if ((State & (USB_DEBUG_PORT_IN_USE | USB_DEBUG_PORT_OWNER)) != (USB_DEBUG_PORT_IN_USE | USB_DEBUG_PORT_OWNER)) {
+      EhcResetHC (Ehc, EHC_RESET_TIMEOUT);
+    }
+  }
 
   Status = EhcInitHC (Ehc);
 

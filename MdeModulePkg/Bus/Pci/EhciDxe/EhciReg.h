@@ -2,7 +2,7 @@
 
   This file contains the definination for host controller register operation routines.
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -89,6 +89,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 #define EHC_BAR_INDEX           0      // how many bytes away from USB_BASE to 0x10
 
+//
+// Debug port capability id
+//
+#define EHC_DEBUG_PORT_CAP_ID   0x0A
+
 #define EHC_LINK_TERMINATED(Link) (((Link) & 0x01) != 0)
 
 #define EHC_ADDR(High, QhHw32)   \
@@ -131,6 +136,21 @@ EhcReadCapRegister (
   IN  UINT32              Offset
   );
 
+/**
+  Read EHCI debug port register.
+
+  @param  Ehc          The EHCI device.
+  @param  Offset       Debug port register address.
+
+  @return The register content read.
+  @retval If err, return 0xffff.
+
+**/
+UINT32
+EhcReadDbgRegister (
+  IN  USB2_HC_DEV         *Ehc,
+  IN  UINT32              Offset
+  );
 
 /**
   Read EHCI Operation register.
