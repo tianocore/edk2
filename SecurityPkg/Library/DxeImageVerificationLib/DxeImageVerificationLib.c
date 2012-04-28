@@ -253,6 +253,8 @@ HashPeImage (
   UINTN                     Pos;
   UINTN                     SumOfSectionBytes;
   EFI_IMAGE_SECTION_HEADER  *SectionCache;
+  UINT32                    CertSize;
+  UINT32                    NumberOfRvaAndSizes;
 
   HashCtx       = NULL;
   SectionHeader = NULL;
@@ -292,6 +294,7 @@ HashPeImage (
   if (!Status) {
     goto Done;
   }
+
   //
   // Measuring PE/COFF Image Header;
   // But CheckSum field and SECURITY data directory (certificate) are excluded
@@ -307,11 +310,13 @@ HashPeImage (
     // Use PE32 offset.
     //
     HashSize = (UINTN) ((UINT8 *) (&mNtHeader.Pe32->OptionalHeader.CheckSum) - HashBase);
+    NumberOfRvaAndSizes = mNtHeader.Pe32->OptionalHeader.NumberOfRvaAndSizes;
   } else if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
     //
     // Use PE32+ offset.
     //
     HashSize = (UINTN) ((UINT8 *) (&mNtHeader.Pe32Plus->OptionalHeader.CheckSum) - HashBase);
+    NumberOfRvaAndSizes = mNtHeader.Pe32Plus->OptionalHeader.NumberOfRvaAndSizes;
   } else {
     //
     // Invalid header magic number.
@@ -324,51 +329,86 @@ HashPeImage (
   if (!Status) {
     goto Done;
   }
+
   //
   // 5.  Skip over the image checksum (it occupies a single ULONG).
-  // 6.  Get the address of the beginning of the Cert Directory.
-  // 7.  Hash everything from the end of the checksum to the start of the Cert Directory.
   //
-  if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+  if (NumberOfRvaAndSizes <= EFI_IMAGE_DIRECTORY_ENTRY_SECURITY) {
     //
-    // Use PE32 offset.
+    // 6.  Since there is no Cert Directory in optional header, hash everything
+    //     from the end of the checksum to the end of image header.
     //
-    HashBase = (UINT8 *) &mNtHeader.Pe32->OptionalHeader.CheckSum + sizeof (UINT32);
-    HashSize = (UINTN) ((UINT8 *) (&mNtHeader.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY]) - HashBase);
+    if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+      //
+      // Use PE32 offset.
+      //
+      HashBase = (UINT8 *) &mNtHeader.Pe32->OptionalHeader.CheckSum + sizeof (UINT32);
+      HashSize = mNtHeader.Pe32->OptionalHeader.SizeOfHeaders - (UINTN) (HashBase - mImageBase);
+    } else {
+      //
+      // Use PE32+ offset.
+      //
+      HashBase = (UINT8 *) &mNtHeader.Pe32Plus->OptionalHeader.CheckSum + sizeof (UINT32);
+      HashSize = mNtHeader.Pe32Plus->OptionalHeader.SizeOfHeaders - (UINTN) (HashBase - mImageBase);
+    }
+
+    if (HashSize != 0) {
+      Status  = mHash[HashAlg].HashUpdate(HashCtx, HashBase, HashSize);
+      if (!Status) {
+        goto Done;
+      }
+    }
   } else {
     //
-    // Use PE32+ offset.
+    // 7.  Hash everything from the end of the checksum to the start of the Cert Directory.
     //
-    HashBase = (UINT8 *) &mNtHeader.Pe32Plus->OptionalHeader.CheckSum + sizeof (UINT32);
-    HashSize = (UINTN) ((UINT8 *) (&mNtHeader.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY]) - HashBase);
+    if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+      //
+      // Use PE32 offset.
+      //
+      HashBase = (UINT8 *) &mNtHeader.Pe32->OptionalHeader.CheckSum + sizeof (UINT32);
+      HashSize = (UINTN) ((UINT8 *) (&mNtHeader.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY]) - HashBase);
+    } else {
+      //
+      // Use PE32+ offset.
+      //
+      HashBase = (UINT8 *) &mNtHeader.Pe32Plus->OptionalHeader.CheckSum + sizeof (UINT32);
+      HashSize = (UINTN) ((UINT8 *) (&mNtHeader.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY]) - HashBase);
+    }
+
+    if (HashSize != 0) {
+      Status  = mHash[HashAlg].HashUpdate(HashCtx, HashBase, HashSize);
+      if (!Status) {
+        goto Done;
+      }
+    }
+
+    //
+    // 8.  Skip over the Cert Directory. (It is sizeof(IMAGE_DATA_DIRECTORY) bytes.)
+    // 9.  Hash everything from the end of the Cert Directory to the end of image header.
+    //
+    if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+      //
+      // Use PE32 offset
+      //
+      HashBase = (UINT8 *) &mNtHeader.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1];
+      HashSize = mNtHeader.Pe32->OptionalHeader.SizeOfHeaders - (UINTN) (HashBase - mImageBase);
+    } else {
+      //
+      // Use PE32+ offset.
+      //
+      HashBase = (UINT8 *) &mNtHeader.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1];
+      HashSize = mNtHeader.Pe32Plus->OptionalHeader.SizeOfHeaders - (UINTN) (HashBase - mImageBase);
+    }
+
+    if (HashSize != 0) {
+      Status  = mHash[HashAlg].HashUpdate(HashCtx, HashBase, HashSize);
+      if (!Status) {
+        goto Done;
+      }
+    }    
   }
 
-  Status  = mHash[HashAlg].HashUpdate(HashCtx, HashBase, HashSize);
-  if (!Status) {
-    goto Done;
-  }
-  //
-  // 8.  Skip over the Cert Directory. (It is sizeof(IMAGE_DATA_DIRECTORY) bytes.)
-  // 9.  Hash everything from the end of the Cert Directory to the end of image header.
-  //
-  if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
-    //
-    // Use PE32 offset
-    //
-    HashBase = (UINT8 *) &mNtHeader.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1];
-    HashSize = mNtHeader.Pe32->OptionalHeader.SizeOfHeaders - (UINTN) ((UINT8 *) (&mNtHeader.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1]) - mImageBase);
-  } else {
-    //
-    // Use PE32+ offset.
-    //
-    HashBase = (UINT8 *) &mNtHeader.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1];
-    HashSize = mNtHeader.Pe32Plus->OptionalHeader.SizeOfHeaders - (UINTN) ((UINT8 *) (&mNtHeader.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1]) - mImageBase);
-  }
-
-  Status  = mHash[HashAlg].HashUpdate(HashCtx, HashBase, HashSize);
-  if (!Status) {
-    goto Done;
-  }
   //
   // 10. Set the SUM_OF_BYTES_HASHED to the size of the header.
   //
@@ -396,15 +436,6 @@ HashPeImage (
   SectionCache = Section;
   for (Index = 0, SumOfSectionBytes = 0; Index < mNtHeader.Pe32->FileHeader.NumberOfSections; Index++, SectionCache++) {
     SumOfSectionBytes += SectionCache->SizeOfRawData;
-  }
-
-  //
-  // Sanity check for file corruption. Sections raw data size should be smaller
-  // than Image Size.
-  //
-  if (SumOfSectionBytes >= mImageSize) {
-    Status = FALSE;
-    goto Done;
   }
 
   //
@@ -465,37 +496,36 @@ HashPeImage (
   //
   if (mImageSize > SumOfBytesHashed) {
     HashBase = mImageBase + SumOfBytesHashed;
-    if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
-      if (mImageSize - SumOfBytesHashed < mNtHeader.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size) {
-        Status = FALSE;
-        goto Done;
-      }
-      //
-      // Use PE32 offset.
-      //
-      HashSize = (UINTN)(
-                 mImageSize -
-                 mNtHeader.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size -
-                 SumOfBytesHashed);
+
+    if (NumberOfRvaAndSizes <= EFI_IMAGE_DIRECTORY_ENTRY_SECURITY) {
+      CertSize = 0;
     } else {
-      if (mImageSize - SumOfBytesHashed < mNtHeader.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size) {
-        Status = FALSE;
-        goto Done;
+      if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+        //
+        // Use PE32 offset.
+        //
+        CertSize = mNtHeader.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size;
+      } else {
+        //
+        // Use PE32+ offset.
+        //
+        CertSize = mNtHeader.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size;
       }
-      //
-      // Use PE32+ offset.
-      //
-      HashSize = (UINTN)(
-                 mImageSize -
-                 mNtHeader.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size -
-                 SumOfBytesHashed);
     }
 
-    Status  = mHash[HashAlg].HashUpdate(HashCtx, HashBase, HashSize);
-    if (!Status) {
+    if (mImageSize > CertSize + SumOfBytesHashed) {
+      HashSize = (UINTN) (mImageSize - CertSize - SumOfBytesHashed);
+
+      Status  = mHash[HashAlg].HashUpdate(HashCtx, HashBase, HashSize);
+      if (!Status) {
+        goto Done;
+      }
+    } else if (mImageSize < CertSize + SumOfBytesHashed) {
+      Status = FALSE;
       goto Done;
     }
   }
+
   Status  = mHash[HashAlg].HashFinal(HashCtx, mImageDigest);
 
 Done:
@@ -1170,19 +1200,20 @@ DxeImageVerificationHandler (
   IN  UINTN                            FileSize
   )
 {
-  EFI_STATUS                  Status;
-  UINT16                      Magic;
-  EFI_IMAGE_DOS_HEADER        *DosHdr;
-  EFI_STATUS                  VerifyStatus;
-  UINT8                       *SetupMode;
-  EFI_SIGNATURE_LIST          *SignatureList;
-  UINTN                       SignatureListSize;
-  EFI_SIGNATURE_DATA          *Signature;
-  EFI_IMAGE_EXECUTION_ACTION  Action;
-  WIN_CERTIFICATE             *WinCertificate;
-  UINT32                      Policy;
-  UINT8                       *SecureBootEnable;
-  PE_COFF_LOADER_IMAGE_CONTEXT      ImageContext;
+  EFI_STATUS                           Status;
+  UINT16                               Magic;
+  EFI_IMAGE_DOS_HEADER                 *DosHdr;
+  EFI_STATUS                           VerifyStatus;
+  UINT8                                *SetupMode;
+  EFI_SIGNATURE_LIST                   *SignatureList;
+  UINTN                                SignatureListSize;
+  EFI_SIGNATURE_DATA                   *Signature;
+  EFI_IMAGE_EXECUTION_ACTION           Action;
+  WIN_CERTIFICATE                      *WinCertificate;
+  UINT32                               Policy;
+  UINT8                                *SecureBootEnable;
+  PE_COFF_LOADER_IMAGE_CONTEXT         ImageContext;
+  UINT32                               NumberOfRvaAndSizes;
 
   if (File == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1243,6 +1274,8 @@ DxeImageVerificationHandler (
     return EFI_SUCCESS;
   }
 
+  FreePool (SecureBootEnable);
+
   SetupMode = GetEfiGlobalVariable (EFI_SETUP_MODE_NAME);
 
   //
@@ -1260,13 +1293,16 @@ DxeImageVerificationHandler (
     FreePool (SetupMode);
     return EFI_SUCCESS;
   }
+
+  FreePool (SetupMode);
+
   //
   // Read the Dos header.
   //
   if (FileBuffer == NULL) {
-    FreePool (SetupMode);
     return EFI_INVALID_PARAMETER;
   }
+
   mImageBase  = (UINT8 *) FileBuffer;
   mImageSize  = FileSize;
 
@@ -1303,7 +1339,8 @@ DxeImageVerificationHandler (
     //
     // It is not a valid Pe/Coff file.
     //
-    return EFI_ACCESS_DENIED;
+    Status = EFI_ACCESS_DENIED;
+    goto Done;
   }
 
   Magic = mNtHeader.Pe32->OptionalHeader.Magic;
@@ -1311,29 +1348,21 @@ DxeImageVerificationHandler (
     //
     // Use PE32 offset.
     //
-    mSecDataDir = (EFI_IMAGE_DATA_DIRECTORY *) &mNtHeader.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY];
-  } else if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
+    NumberOfRvaAndSizes = mNtHeader.Pe32->OptionalHeader.NumberOfRvaAndSizes;
+    if (NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_SECURITY) {
+      mSecDataDir = (EFI_IMAGE_DATA_DIRECTORY *) &mNtHeader.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY];
+    }        
+  } else {
     //
     // Use PE32+ offset.
     //
-    mSecDataDir = (EFI_IMAGE_DATA_DIRECTORY *) &mNtHeader.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY];
-  } else {
-    //
-    // Invalid header magic number.
-    //
-    Status       = EFI_INVALID_PARAMETER;
-    goto Done;
+    NumberOfRvaAndSizes = mNtHeader.Pe32Plus->OptionalHeader.NumberOfRvaAndSizes;
+    if (NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_SECURITY) {
+      mSecDataDir = (EFI_IMAGE_DATA_DIRECTORY *) &mNtHeader.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY];
+    }
   }
 
-  if (mSecDataDir->VirtualAddress >= mImageSize) {
-    //
-    // Sanity check to see if this file is corrupted.
-    //
-    Status       = EFI_INVALID_PARAMETER;
-    goto Done;
-  }
-
-  if (mSecDataDir->Size == 0) {
+  if ((mSecDataDir == NULL) || ((mSecDataDir != NULL) && (mSecDataDir->Size == 0))) {
     //
     // This image is not signed.
     //
@@ -1473,8 +1502,6 @@ Done:
   if (SignatureList != NULL) {
     FreePool (SignatureList);
   }
-
-  FreePool (SetupMode);
 
   return Status;
 }
