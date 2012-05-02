@@ -39,6 +39,7 @@
     EXPORT  ArmDataMemoryBarrier
     EXPORT  ArmDataSyncronizationBarrier
     EXPORT  ArmInstructionSynchronizationBarrier
+    EXPORT  ArmReadVBar
     EXPORT  ArmWriteVBar
     EXPORT  ArmEnableVFP
     EXPORT  ArmCallWFI
@@ -323,6 +324,11 @@ ArmDrainWriteBuffer
 ArmInstructionSynchronizationBarrier
   isb
   bx      LR
+
+ArmReadVBar
+  // Set the Address of the Vector Table in the VBAR register
+  mrc     p15, 0, r0, c12, c0, 0
+  bx      lr
 
 ArmWriteVBar
   // Set the Address of the Vector Table in the VBAR register

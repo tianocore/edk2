@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------ 
 //
 // Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-// Copyright (c) 2011, ARM Limited. All rights reserved.
+// Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 //
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -32,16 +32,21 @@
     EXPORT ArmSetDomainAccessControl
     EXPORT CPSRMaskInsert
     EXPORT CPSRRead
-    EXPORT ArmWriteCPACR
+    EXPORT ArmReadCpacr
+    EXPORT ArmWriteCpacr
     EXPORT ArmWriteAuxCr
     EXPORT ArmReadAuxCr
     EXPORT ArmInvalidateTlb
     EXPORT ArmUpdateTranslationTableEntry
+    EXPORT ArmReadNsacr
     EXPORT ArmWriteNsacr
+    EXPORT ArmReadScr
     EXPORT ArmWriteScr
-    EXPORT ArmWriteVMBar
+    EXPORT ArmReadMVBar
+    EXPORT ArmWriteMVBar
     EXPORT ArmCallWFE
     EXPORT ArmCallSEV
+    EXPORT ArmReadSctlr
 
     AREA ArmLibSupport, CODE, READONLY
 
@@ -88,7 +93,11 @@ CPSRRead
   mrs     r0, cpsr
   bx      lr
 
-ArmWriteCPACR
+ArmReadCpacr
+  mrc     p15, 0, r0, c1, c0, 2
+  bx      lr
+
+ArmWriteCpacr
   mcr     p15, 0, r0, c1, c0, 2
   isb
   bx      lr
@@ -136,15 +145,27 @@ ArmInvalidateTlb
   isb
   bx      lr
 
+ArmReadNsacr
+  mrc     p15, 0, r0, c1, c1, 2
+  bx      lr
+
 ArmWriteNsacr
   mcr     p15, 0, r0, c1, c1, 2
+  bx      lr
+
+ArmReadScr
+  mrc     p15, 0, r0, c1, c1, 0
   bx      lr
 
 ArmWriteScr
   mcr     p15, 0, r0, c1, c1, 0
   bx      lr
 
-ArmWriteVMBar
+ArmReadMVBar
+  mrc     p15, 0, r0, c12, c0, 1
+  bx      lr
+
+ArmWriteMVBar
   mcr     p15, 0, r0, c12, c0, 1
   bx      lr
   
@@ -155,5 +176,9 @@ ArmCallWFE
 ArmCallSEV
   sev
   blx   lr
+
+ArmReadSctlr
+  mrc     p15, 0, R0, c1, c0, 0      // Read SCTLR into R0 (Read control register configuration data)
+  bx	  lr
 
   END

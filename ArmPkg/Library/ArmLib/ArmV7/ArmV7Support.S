@@ -42,6 +42,7 @@ GCC_ASM_EXPORT (ArmV7PerformPoUDataCacheOperation)
 GCC_ASM_EXPORT (ArmDataMemoryBarrier)
 GCC_ASM_EXPORT (ArmDataSyncronizationBarrier)
 GCC_ASM_EXPORT (ArmInstructionSynchronizationBarrier)
+GCC_ASM_EXPORT (ArmReadVBar)
 GCC_ASM_EXPORT (ArmWriteVBar)
 GCC_ASM_EXPORT (ArmEnableVFP)
 GCC_ASM_EXPORT (ArmCallWFI)
@@ -329,6 +330,11 @@ ASM_PFX(ArmDrainWriteBuffer):
 ASM_PFX(ArmInstructionSynchronizationBarrier):
   isb
   bx      LR
+
+ASM_PFX(ArmReadVBar):
+  # Set the Address of the Vector Table in the VBAR register
+  mrc     p15, 0, r0, c12, c0, 0
+  bx      lr
 
 ASM_PFX(ArmWriteVBar):
   # Set the Address of the Vector Table in the VBAR register

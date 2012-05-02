@@ -445,6 +445,12 @@ ArmSetAuxCrBit (
 
 VOID
 EFIAPI
+ArmUnsetAuxCrBit (
+  IN  UINT32    Bits
+  );
+
+VOID
+EFIAPI
 ArmCallSEV (
   VOID
   );
@@ -455,6 +461,8 @@ ArmCallWFE (
   VOID
   );
 
+VOID
+EFIAPI
 ArmCallWFI (
   VOID
   );
@@ -465,9 +473,15 @@ ArmReadMpidr (
   VOID
   );
 
+UINT32
+EFIAPI
+ArmReadCpacr (
+  VOID
+  );
+
 VOID
 EFIAPI
-ArmWriteCPACR (
+ArmWriteCpacr (
   IN  UINT32   Access
   );
 
@@ -477,10 +491,22 @@ ArmEnableVFP (
   VOID
   );
 
+UINT32
+EFIAPI
+ArmReadNsacr (
+  VOID
+  );
+
 VOID
 EFIAPI
 ArmWriteNsacr (
   IN  UINT32   SetWayFormat
+  );
+
+UINT32
+EFIAPI
+ArmReadScr (
+  VOID
   );
 
 VOID
@@ -489,10 +515,22 @@ ArmWriteScr (
   IN  UINT32   SetWayFormat
   );
 
+UINT32
+EFIAPI
+ArmReadMVBar (
+  VOID
+  );
+
 VOID
 EFIAPI
-ArmWriteVMBar (
+ArmWriteMVBar (
   IN  UINT32   VectorMonitorBase
+  );
+
+UINT32
+EFIAPI
+ArmReadSctlr (
+  VOID
   );
 
 #endif // __ARM_LIB__

@@ -1,7 +1,7 @@
 /** @file
 *  Main file supporting the Monitor World on ARM PLatforms
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -33,5 +33,5 @@ ArmSecureMonitorWorldInitialize (
   ASSERT (IS_ALIGNED(MonitorVectorTable, BIT5));
 
   // Write the Monitor Mode Vector Table Address
-  ArmWriteVMBar ((UINT32) &MonitorVectorTable);
+  ArmWriteMVBar ((UINT32) &MonitorVectorTable);
 }

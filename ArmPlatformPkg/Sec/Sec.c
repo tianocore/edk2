@@ -91,7 +91,7 @@ CEntryPoint (
   }
 
   // Enable Full Access to CoProcessors
-  ArmWriteCPACR (CPACR_CP_FULL_ACCESS);
+  ArmWriteCpacr (CPACR_CP_FULL_ACCESS);
 
   if (IS_PRIMARY_CORE(MpId)) {
     // Initialize peripherals that must be done at the early stage
