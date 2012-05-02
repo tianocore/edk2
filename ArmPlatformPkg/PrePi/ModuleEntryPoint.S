@@ -107,6 +107,7 @@ _GetStackBaseMpCore:
   // Stack for the primary core = PrimaryCoreStack
   LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), r2)
   sub   r7, r1, r2
+
   // Stack for the secondary core = Number of Cluster * (4 Core per cluster) * SecondaryStackSize
   LoadConstantToReg (FixedPcdGet32(PcdClusterCount), r2)
   lsl   r2, r2, #2
@@ -118,7 +119,7 @@ _GetStackBaseMpCore:
   LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), r2)
   add   r1, r7, r2
 
-  // r7 = The base of the MpCore Stacks
+  // r7 = The base of the MpCore Stacks (primary stack + cluster_count * 4 * secondary stacks)
   // r1 = The base of the secondary Stacks = Top of the Primary stack
 
   // Is it the Primary Core ?
