@@ -167,7 +167,7 @@ SerialWrite (
 }
 
 /**
-  Writes data to a serial device.
+  Reads data from a serial device.
 
   @param  This              Protocol instance pointer.
   @param  BufferSize        On input, the size of the Buffer. On output, the amount of
@@ -189,15 +189,16 @@ SerialRead (
   )
 {
   UINTN Count = 0;
-  
+
   if (SerialPortPoll()) {
     Count = SerialPortRead (Buffer, *BufferSize);
-    *BufferSize = Count;
-    return (Count == 0) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
   }
-  
-  // No data to return
-  *BufferSize = 0;
+
+  if (Count != *BufferSize) {
+    *BufferSize = Count;
+    return EFI_TIMEOUT;
+  }
+
   return EFI_SUCCESS;
 }
 

@@ -3,7 +3,7 @@
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2011 - 2012, ARM Ltd. All rights reserved.<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -34,7 +34,6 @@ PL011UartInitializePort (
   IN UINTN               UartBase,
   IN UINT64              BaudRate,
   IN UINT32              ReceiveFifoDepth,
-  IN UINT32              Timeout,
   IN EFI_PARITY_TYPE     Parity,
   IN UINT8               DataBits,
   IN EFI_STOP_BITS_TYPE  StopBits
@@ -47,7 +46,7 @@ PL011UartInitializePort (
   if (BaudRate == 0) {
     return RETURN_INVALID_PARAMETER;
   }
-  
+
   LineControl = 0;
 
   // The PL011 supports a buffer of either 1 or 32 chars. Therefore we can accept
@@ -122,7 +121,7 @@ PL011UartInitializePort (
   default:
     return RETURN_INVALID_PARAMETER;
   }
-    
+
   // Don't send the LineControl value to the PL011 yet,
   // wait until after the Baud Rate setting.
   // This ensures we do not mess up the UART settings halfway through
@@ -134,7 +133,7 @@ PL011UartInitializePort (
   if (PcdGet32(PL011UartInteger) != 0) {
     // Integer and Factional part must be different of 0
     ASSERT(PcdGet32(PL011UartFractional) != 0);
-    
+
     MmioWrite32 (UartBase + UARTIBRD, PcdGet32(PL011UartInteger));
     MmioWrite32 (UartBase + UARTFBRD, PcdGet32(PL011UartFractional));
   } else {
@@ -305,14 +304,14 @@ PL011UartWrite (
   IN UINTN     NumberOfBytes
   )
 {
-	UINTN  Count;
+  UINTN  Count;
 
-	for (Count = 0; Count < NumberOfBytes; Count++, Buffer++) {
-		while ((MmioRead32 (UartBase + UARTFR) & UART_TX_EMPTY_FLAG_MASK) == 0);
-		MmioWrite8 (UartBase + UARTDR, *Buffer);
-	}
+  for (Count = 0; Count < NumberOfBytes; Count++, Buffer++) {
+    while ((MmioRead32 (UartBase + UARTFR) & UART_TX_EMPTY_FLAG_MASK) == 0);
+    MmioWrite8 (UartBase + UARTDR, *Buffer);
+  }
 
-	return NumberOfBytes;
+  return NumberOfBytes;
 }
 
 /**
@@ -335,12 +334,12 @@ PL011UartRead (
 {
   UINTN   Count;
 
-	for (Count = 0; Count < NumberOfBytes; Count++, Buffer++) {
-		while ((MmioRead32 (UartBase + UARTFR) & UART_RX_EMPTY_FLAG_MASK) != 0);
-		*Buffer = MmioRead8 (UartBase + UARTDR);
-	}
+  for (Count = 0; Count < NumberOfBytes; Count++, Buffer++) {
+    while ((MmioRead32 (UartBase + UARTFR) & UART_RX_EMPTY_FLAG_MASK) != 0);
+	*Buffer = MmioRead8 (UartBase + UARTDR);
+  }
 
-	return NumberOfBytes;
+  return NumberOfBytes;
 }
 
 /**

@@ -94,7 +94,6 @@ PL011UartInitializePort (
   IN UINTN               UartBase,
   IN UINT64              BaudRate,
   IN UINT32              ReceiveFifoDepth,
-  IN UINT32              Timeout,
   IN EFI_PARITY_TYPE     Parity,
   IN UINT8               DataBits,
   IN EFI_STOP_BITS_TYPE  StopBits

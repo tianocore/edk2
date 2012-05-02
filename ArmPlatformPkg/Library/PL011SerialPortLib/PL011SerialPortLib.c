@@ -14,7 +14,7 @@
 
 **/
 
-#include <Include/Base.h>
+#include <Base.h>
 
 #include <Library/IoLib.h>
 #include <Library/PcdLib.h>
@@ -40,7 +40,6 @@ SerialPortInitialize (
       (UINTN)PcdGet64 (PcdSerialRegisterBase),
       (UINTN)PcdGet64 (PcdUartDefaultBaudRate),
       0, // Use the default value for Fifo depth
-      0, // Use the default value for Timeout,
       (EFI_PARITY_TYPE)PcdGet8 (PcdUartDefaultParity),
       PcdGet8 (PcdUartDefaultDataBits),
       (EFI_STOP_BITS_TYPE) PcdGet8 (PcdUartDefaultStopBits));
