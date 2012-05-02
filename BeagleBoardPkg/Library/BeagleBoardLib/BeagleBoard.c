@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -110,9 +110,9 @@ ArmPlatformGetBootMode (
   For example, some L2x0 requires to be initialized in Secure World
 
 **/
-VOID
-ArmPlatformNormalInitialize (
-  VOID
+RETURN_STATUS
+ArmPlatformInitialize (
+  IN  UINTN                     MpId
   )
 {
   BEAGLEBOARD_REVISION Revision;
@@ -132,6 +132,8 @@ ArmPlatformNormalInitialize (
   // Clear IRQs
   MmioWrite32 (INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
   ArmDataSyncronizationBarrier ();
+
+  return RETURN_SUCCESS;
 }
 
 /**

@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -175,6 +175,9 @@ CEntryPoint (
 {
   UINT64   StartTimeStamp;
  
+  // Initialize the platform specific controllers
+  ArmPlatformInitialize (MpId);
+
   if (IS_PRIMARY_CORE(MpId) && PerformanceMeasurementEnabled ()) {
     // Initialize the Timer Library to setup the Timer HW controller
     TimerConstructor ();

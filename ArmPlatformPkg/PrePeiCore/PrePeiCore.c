@@ -100,6 +100,9 @@ CEntryPoint (
     InitializeDebugAgent (DEBUG_AGENT_INIT_POSTMEM_SEC, NULL, NULL);
     SaveAndSetDebugTimerInterrupt (TRUE);
 
+    // Initialize the platform specific controllers
+    ArmPlatformInitialize (MpId);
+
     // Goto primary Main.
     PrimaryMain (PeiCoreEntryPoint);
   } else {

@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -13,6 +13,7 @@
 **/
 
 #include <Library/IoLib.h>
+#include <Library/ArmLib.h>
 #include <Library/ArmPlatformLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
@@ -68,11 +69,15 @@ ArmPlatformGetBootMode (
   in the PEI phase.
 
 **/
-VOID
-ArmPlatformNormalInitialize (
-  VOID
+RETURN_STATUS
+ArmPlatformInitialize (
+  IN  UINTN                     MpId
   )
 {
+  if (!IS_PRIMARY_CORE(MpId)) {
+    return RETURN_SUCCESS;
+  }
+
   // Disable memory remapping and return to normal mapping
   MmioOr32 (ARM_EB_SYSCTRL, BIT8); //EB_SP810_CTRL_BASE
 
@@ -84,6 +89,8 @@ ArmPlatformNormalInitialize (
   MmioAndThenOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, ~SP810_SYS_CTRL_TIMER2_EN, SP810_SYS_CTRL_TIMER2_TIMCLK);
   // Configure SP810 to use 1MHz clock and disable
   MmioAndThenOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, ~SP810_SYS_CTRL_TIMER3_EN, SP810_SYS_CTRL_TIMER3_TIMCLK);
+
+  return RETURN_SUCCESS;
 }
 
 /**

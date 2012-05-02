@@ -115,9 +115,9 @@ ArmPlatformSecExtraAction (
   in the PEI phase.
 
 **/
-VOID
-ArmPlatformNormalInitialize (
-  VOID
+RETURN_STATUS
+ArmPlatformInitialize (
+  IN  UINTN                     MpId
   );
 
 /**

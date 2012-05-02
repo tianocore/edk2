@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -92,12 +92,18 @@ ArmPlatformGetBootMode (
   in the PEI phase.
 
 **/
-VOID
-ArmPlatformNormalInitialize (
-  VOID
+RETURN_STATUS
+ArmPlatformInitialize (
+  IN  UINTN                     MpId
   )
 {
+  if (!IS_PRIMARY_CORE(MpId)) {
+    return RETURN_SUCCESS;
+  }
+
   //TODO: Implement me
+
+  return RETURN_SUCCESS;
 }
 
 /**

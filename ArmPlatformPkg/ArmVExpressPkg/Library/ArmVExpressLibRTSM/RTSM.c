@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -92,13 +92,19 @@ ArmPlatformGetBootMode (
   in the PEI phase.
 
 **/
-VOID
-ArmPlatformNormalInitialize (
-  VOID
+RETURN_STATUS
+ArmPlatformInitialize (
+  IN  UINTN                     MpId
   )
 {
+  if (!IS_PRIMARY_CORE(MpId)) {
+    return RETURN_SUCCESS;
+  }
+
   // Disable memory remapping and return to normal mapping
   MmioOr32 (SP810_CTRL_BASE, BIT8);
+
+  return RETURN_SUCCESS;
 }
 
 /**
