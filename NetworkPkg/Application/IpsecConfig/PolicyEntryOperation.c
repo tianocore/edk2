@@ -1,7 +1,7 @@
 /** @file
   The implementation of policy entry operation function in IpSecConfig application.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -784,6 +784,7 @@ CreateSadEntry (
   if (ValueStr != NULL ) {
     (*Data)->AlgoInfo.EspAlgoInfo.EncKeyLength = EncKeyLength;
     AsciiStr = AllocateZeroPool (EncKeyLength + 1);
+    ASSERT (AsciiStr != NULL);
     UnicodeStrToAsciiStr (ValueStr, AsciiStr);
     CopyMem ((*Data)->AlgoInfo.EspAlgoInfo.EncKey,  AsciiStr, EncKeyLength);
     FreePool (AsciiStr);
@@ -813,6 +814,7 @@ CreateSadEntry (
   if (ValueStr != NULL) {
     (*Data)->AlgoInfo.EspAlgoInfo.AuthKeyLength = AuthKeyLength;
     AsciiStr = AllocateZeroPool (AuthKeyLength + 1);
+    ASSERT (AsciiStr != NULL);
     UnicodeStrToAsciiStr (ValueStr, AsciiStr);
     CopyMem ((*Data)->AlgoInfo.EspAlgoInfo.AuthKey, AsciiStr, AuthKeyLength);
     FreePool (AsciiStr);

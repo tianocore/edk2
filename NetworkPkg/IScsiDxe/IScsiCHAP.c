@@ -1,7 +1,7 @@
 /** @file
   This file is for Challenge-Handshake Authentication Protocol (CHAP) Configuration.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -374,6 +374,9 @@ IScsiCHAPToSendReq (
   Session     = Conn->Session;
   AuthData    = &Session->AuthData.CHAP;
   LoginReq    = (ISCSI_LOGIN_REQUEST *) NetbufGetByte (Pdu, 0, 0);
+  if (LoginReq == NULL) {
+    return EFI_PROTOCOL_ERROR;
+  }
   Status      = EFI_SUCCESS;
 
   RspLen      = 2 * ISCSI_CHAP_RSP_LEN + 3;

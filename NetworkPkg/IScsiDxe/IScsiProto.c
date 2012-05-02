@@ -1,7 +1,7 @@
 /** @file
   The implementation of iSCSI protocol based on RFC3720.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -514,6 +514,8 @@ IScsiReceiveLoginRsp (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+  ASSERT (Pdu != NULL);
+
   //
   // A Login Response is received; process it.
   //
@@ -539,6 +541,7 @@ IScsiReceiveLoginRsp (
                                the correspondence length fields are updated.
   @retval EFI_OUT_OF_RESOURCES There is not enough space in the PDU to add the key-value
                                pair.
+  @retval EFI_PROTOCOL_ERROR   There is no such data in the net buffer.
 **/
 EFI_STATUS
 IScsiAddKeyValuePair (
@@ -555,6 +558,9 @@ IScsiAddKeyValuePair (
   CHAR8               *Data;
 
   LoginReq    = (ISCSI_LOGIN_REQUEST *) NetbufGetByte (Pdu, 0, NULL);
+  if (LoginReq == NULL) {
+    return EFI_PROTOCOL_ERROR;
+  }
   DataSegLen  = NTOH24 (LoginReq->DataSegmentLength);
 
   KeyLen      = (UINT32) AsciiStrLen (Key);
@@ -741,6 +747,9 @@ IScsiProcessLoginRsp (
   Session   = Conn->Session;
 
   LoginRsp  = (ISCSI_LOGIN_RESPONSE *) NetbufGetByte (Pdu, 0, NULL);
+  if (LoginRsp == NULL) {
+    return EFI_PROTOCOL_ERROR;
+  }
   if (!ISCSI_CHECK_OPCODE (LoginRsp, ISCSI_OPCODE_LOGIN_RSP)) {
     //
     // It is not a Login Response.
@@ -2268,6 +2277,7 @@ IScsiGenerateDataOutPduSequence (
   NET_BUF             *DataOutPdu;
   ISCSI_CONNECTION    *Conn;
   ISCSI_XFER_CONTEXT  *XferContext;
+  UINT8               *DataOutPacket;
 
   PduList = AllocatePool (sizeof (LIST_ENTRY));
   if (PduList == NULL) {
@@ -2311,7 +2321,14 @@ IScsiGenerateDataOutPduSequence (
   //
   // Set the F bit for the last data out PDU in this sequence.
   //
-  ISCSI_SET_FLAG (NetbufGetByte (DataOutPdu, 0, NULL), ISCSI_BHS_FLAG_FINAL);
+  DataOutPacket = NetbufGetByte (DataOutPdu, 0, NULL);
+  if (DataOutPacket == NULL) {
+    IScsiFreeNbufList (PduList);
+    PduList = NULL;
+    goto ON_EXIT;
+  }
+
+  ISCSI_SET_FLAG (DataOutPacket, ISCSI_BHS_FLAG_FINAL);
 
 ON_EXIT:
 
@@ -2396,6 +2413,9 @@ IScsiOnDataInRcvd (
   EFI_STATUS          Status;
 
   DataInHdr                   = (ISCSI_SCSI_DATA_IN *) NetbufGetByte (Pdu, 0, NULL);
+  if (DataInHdr == NULL) {
+    return EFI_PROTOCOL_ERROR;
+  }
 
   DataInHdr->InitiatorTaskTag = NTOHL (DataInHdr->InitiatorTaskTag);
   DataInHdr->ExpCmdSN         = NTOHL (DataInHdr->ExpCmdSN);
@@ -2486,6 +2506,9 @@ IScsiOnR2TRcvd (
   UINT8                   *Data;
 
   R2THdr = (ISCSI_READY_TO_TRANSFER *) NetbufGetByte (Pdu, 0, NULL);
+  if (R2THdr == NULL) {
+    return EFI_PROTOCOL_ERROR;
+  }
 
   R2THdr->InitiatorTaskTag = NTOHL (R2THdr->InitiatorTaskTag);
   R2THdr->TargetTransferTag = NTOHL (R2THdr->TargetTransferTag);
@@ -2551,6 +2574,9 @@ IScsiOnScsiRspRcvd (
   UINT32            DataSegLen;
 
   ScsiRspHdr                    = (SCSI_RESPONSE *) NetbufGetByte (Pdu, 0, NULL);
+  if (ScsiRspHdr == NULL) {
+    return EFI_PROTOCOL_ERROR;
+  }
 
   ScsiRspHdr->InitiatorTaskTag  = NTOHL (ScsiRspHdr->InitiatorTaskTag);
   if (ScsiRspHdr->InitiatorTaskTag != Tcb->InitiatorTaskTag) {
@@ -2613,6 +2639,9 @@ IScsiOnScsiRspRcvd (
   DataSegLen = ISCSI_GET_DATASEG_LEN (ScsiRspHdr);
   if (DataSegLen != 0) {
     SenseData               = (ISCSI_SENSE_DATA *) NetbufGetByte (Pdu, sizeof (SCSI_RESPONSE), NULL);
+    if (SenseData == NULL) {
+      return EFI_PROTOCOL_ERROR;
+    }
 
     SenseData->Length       = NTOHS (SenseData->Length);
 
@@ -2649,6 +2678,9 @@ IScsiOnNopInRcvd (
   EFI_STATUS    Status;
 
   NopInHdr            = (ISCSI_NOP_IN *) NetbufGetByte (Pdu, 0, NULL);
+  if (NopInHdr == NULL) {
+    return EFI_PROTOCOL_ERROR;
+  }
 
   NopInHdr->StatSN    = NTOHL (NopInHdr->StatSN);
   NopInHdr->ExpCmdSN  = NTOHL (NopInHdr->ExpCmdSN);
@@ -2684,6 +2716,7 @@ IScsiOnNopInRcvd (
                                the Packet.
   @retval EFI_DEVICE_ERROR     Session state was not as required.
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
+  @retval EFI_PROTOCOL_ERROR   There is no such data in the net buffer.
   @retval Others               Other errors as indicated.
 
 **/
@@ -2745,6 +2778,11 @@ IScsiExecuteScsiCommand (
 
   XferContext         = &Tcb->XferContext;
   PduHdr              = NetbufGetByte (Pdu, 0, NULL);
+  if (PduHdr == NULL) {
+    Status = EFI_PROTOCOL_ERROR;
+    NetbufFree (Pdu);
+    goto ON_EXIT;
+  }
   XferContext->Offset = ISCSI_GET_DATASEG_LEN (PduHdr);
 
   //
@@ -2803,7 +2841,13 @@ IScsiExecuteScsiCommand (
       goto ON_EXIT;
     }
 
-    switch (ISCSI_GET_OPCODE (NetbufGetByte (Pdu, 0, NULL))) {
+    PduHdr = NetbufGetByte (Pdu, 0, NULL);
+    if (PduHdr == NULL) {
+      Status = EFI_PROTOCOL_ERROR;
+      NetbufFree (Pdu);
+      goto ON_EXIT;
+    }
+    switch (ISCSI_GET_OPCODE (PduHdr)) {
     case ISCSI_OPCODE_SCSI_DATA_IN:
       Status = IScsiOnDataInRcvd (Pdu, Tcb, Packet);
       break;
