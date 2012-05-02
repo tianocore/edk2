@@ -31,10 +31,11 @@ EFIAPI
 ArmGicSendSgiTo (
   IN  INTN          GicDistributorBase,
   IN  INTN          TargetListFilter,
-  IN  INTN          CPUTargetList
+  IN  INTN          CPUTargetList,
+  IN  INTN          SgiId
   )
 {
-  MmioWrite32 (GicDistributorBase + ARM_GIC_ICDSGIR, ((TargetListFilter & 0x3) << 24) | ((CPUTargetList & 0xFF) << 16) | PcdGet32(PcdGicSgiIntId));
+  MmioWrite32 (GicDistributorBase + ARM_GIC_ICDSGIR, ((TargetListFilter & 0x3) << 24) | ((CPUTargetList & 0xFF) << 16) | SgiId);
 }
 
 UINT32

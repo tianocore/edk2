@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -87,7 +87,7 @@ ArmPlatformSecExtraAction (
   } else if (FeaturePcdGet (PcdSystemMemoryInitializeInSec)) {
     if (IS_PRIMARY_CORE(MpId)) {
       // Signal the secondary cores they can jump to PEI phase
-      ArmGicSendSgiTo (PcdGet32(PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E);
+      ArmGicSendSgiTo (PcdGet32(PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E, PcdGet32 (PcdGicSgiIntId));
 
       // To enter into Non Secure state, we need to make a return from exception
       *JumpAddress = PcdGet32(PcdFvBaseAddress);

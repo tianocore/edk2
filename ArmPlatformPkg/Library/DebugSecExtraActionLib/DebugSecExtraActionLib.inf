@@ -36,7 +36,7 @@
 [LibraryClasses]
   DebugLib
   PcdLib
-  ArmGicSecLib
+  ArmGicLib
   PrintLib
   SerialPortLib
 
@@ -52,3 +52,4 @@
 
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
+  gArmTokenSpaceGuid.PcdGicSgiIntId

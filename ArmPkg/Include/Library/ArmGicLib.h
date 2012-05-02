@@ -113,7 +113,8 @@ EFIAPI
 ArmGicSendSgiTo (
   IN  INTN          GicDistributorBase,
   IN  INTN          TargetListFilter,
-  IN  INTN          CPUTargetList
+  IN  INTN          CPUTargetList,
+  IN  INTN          SgiId
   );
 
 UINT32

@@ -115,7 +115,7 @@ PrimaryMain (
   // If ArmVe has not been built as Standalone then we need to wake up the secondary cores
   if (FeaturePcdGet (PcdSendSgiToBringUpSecondaryCores)) {
     // Sending SGI to all the Secondary CPU interfaces
-    ArmGicSendSgiTo (PcdGet32(PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E);
+    ArmGicSendSgiTo (PcdGet32(PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E, PcdGet32 (PcdGicSgiIntId));
   }
 
   // Adjust the Temporary Ram as the new Ppi List (Common + Platform Ppi Lists) is created at
