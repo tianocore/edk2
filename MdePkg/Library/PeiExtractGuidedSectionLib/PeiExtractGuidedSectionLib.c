@@ -156,6 +156,7 @@ ExtractGuidedSectionGetGuidList (
   //
   // Get GuidTable and Table Number
   //
+  ASSERT (HandlerInfo != NULL);
   *ExtractHandlerGuidTable = HandlerInfo->ExtractHandlerGuidTable;
   return HandlerInfo->NumberOfExtractHandler;
 }
@@ -216,6 +217,7 @@ ExtractGuidedSectionRegisterHandlers (
   //
   // Search the match registered GetInfo handler for the input guided section.
   //
+  ASSERT (HandlerInfo != NULL);
   for (Index = 0; Index < HandlerInfo->NumberOfExtractHandler; Index ++) {
     if (CompareGuid (HandlerInfo->ExtractHandlerGuidTable + Index, SectionGuid)) {
       //
@@ -317,6 +319,7 @@ ExtractGuidedSectionGetInfo (
   //
   // Search the match registered GetInfo handler for the input guided section.
   //
+  ASSERT (HandlerInfo != NULL);
   for (Index = 0; Index < HandlerInfo->NumberOfExtractHandler; Index ++) {
     if (CompareGuid (HandlerInfo->ExtractHandlerGuidTable + Index, SectionDefinitionGuid)) {
       //
@@ -410,6 +413,7 @@ ExtractGuidedSectionDecode (
   //
   // Search the match registered Extract handler for the input guided section.
   //
+  ASSERT (HandlerInfo != NULL);
   for (Index = 0; Index < HandlerInfo->NumberOfExtractHandler; Index ++) {
     if (CompareGuid (HandlerInfo->ExtractHandlerGuidTable + Index, SectionDefinitionGuid)) {
       //
