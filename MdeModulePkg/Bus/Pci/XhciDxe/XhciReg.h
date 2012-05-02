@@ -2,7 +2,7 @@
 
   This file contains the register definition of XHCI host controller.
 
-Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -172,6 +172,15 @@ typedef union {
 #define XHC_PORTSC_CEC                     BIT23 // Port Config Error Change
 #define XHC_PORTSC_CAS                     BIT24 // Cold Attach Status
 
+#define XHC_HUB_PORTSC_CCS                 BIT0  // Hub's Current Connect Status
+#define XHC_HUB_PORTSC_PED                 BIT1  // Hub's Port Enabled/Disabled
+#define XHC_HUB_PORTSC_OCA                 BIT3  // Hub's Over-current Active
+#define XHC_HUB_PORTSC_RESET               BIT4  // Hub's Port Reset
+#define XHC_HUB_PORTSC_PP                  BIT9  // Hub's Port Power
+#define XHC_HUB_PORTSC_CSC                 BIT16 // Hub's Connect Status Change
+#define XHC_HUB_PORTSC_PEC                 BIT17 // Hub's Port Enabled/Disabled Change
+#define XHC_HUB_PORTSC_OCC                 BIT19 // Hub's Over-Current Change
+#define XHC_HUB_PORTSC_PRC                 BIT20 // Hub's Port Reset Change
 #define XHC_IMAN_IP                        BIT0  // Interrupt Pending
 #define XHC_IMAN_IE                        BIT1  // Interrupt Enable
 

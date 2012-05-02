@@ -2,7 +2,7 @@
 
   Provides some data structure definitions used by the XHCI host controller driver.
 
-Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -71,10 +71,10 @@ typedef struct _USB_DEV_CONTEXT      USB_DEV_CONTEXT;
 //
 #define XHC_TPL                      TPL_NOTIFY
 
-#define CMD_RING_TRB_NUMBER          0x40
-#define TR_RING_TRB_NUMBER           0x40
+#define CMD_RING_TRB_NUMBER          0x100
+#define TR_RING_TRB_NUMBER           0x100
 #define ERST_NUMBER                  0x01
-#define EVENT_RING_TRB_NUMBER        0x80
+#define EVENT_RING_TRB_NUMBER        0x200
 
 #define CMD_INTER                    0
 #define CTRL_INTER                   1

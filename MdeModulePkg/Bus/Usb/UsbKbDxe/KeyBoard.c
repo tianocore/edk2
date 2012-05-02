@@ -1,7 +1,7 @@
 /** @file
   Helper functions for USB Keyboard Driver.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -833,29 +833,28 @@ InitUSBKeyboard (
              );
   if (EFI_ERROR (Status)) {
     ConfigValue = 0x01;
-  }
-
-  //
-  // Uses default configuration to configure the USB Keyboard device.
-  //
-  Status = UsbSetConfiguration (
-             UsbKeyboardDevice->UsbIo,
-             ConfigValue,
-             &TransferResult
-             );
-  if (EFI_ERROR (Status)) {
     //
-    // If configuration could not be set here, it means
-    // the keyboard interface has some errors and could
-    // not be initialized
+    // Uses default configuration to configure the USB Keyboard device.
     //
-    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
-      EFI_ERROR_CODE | EFI_ERROR_MINOR,
-      (EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_INTERFACE_ERROR),
-      UsbKeyboardDevice->DevicePath
-      );
+    Status = UsbSetConfiguration (
+               UsbKeyboardDevice->UsbIo,
+               ConfigValue,
+               &TransferResult
+               );
+    if (EFI_ERROR (Status)) {
+      //
+      // If configuration could not be set here, it means
+      // the keyboard interface has some errors and could
+      // not be initialized
+      //
+      REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+        EFI_ERROR_CODE | EFI_ERROR_MINOR,
+        (EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_INTERFACE_ERROR),
+        UsbKeyboardDevice->DevicePath
+        );
 
-    return EFI_DEVICE_ERROR;
+      return EFI_DEVICE_ERROR;
+    }
   }
 
   UsbGetProtocolRequest (

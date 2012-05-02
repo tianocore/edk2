@@ -2,7 +2,7 @@
   Implementation of the command set of USB Mass Storage Specification
   for Bootability, Revision 1.0.
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -451,9 +451,6 @@ UsbBootReadCapacity (
     Media->BlockSize = BlockSize;
   }
 
-  DEBUG ((EFI_D_INFO, "UsbBootReadCapacity Success LBA=%ld BlockSize=%d\n",
-          Media->LastBlock, Media->BlockSize));
-
   return Status;
 }
 
@@ -734,7 +731,7 @@ UsbBootReadBlocks (
     if (EFI_ERROR (Status)) {
       return Status;
     }
-
+    DEBUG ((EFI_D_BLKIO, "UsbBootReadBlocks: LBA (0x%x), Blk (0x%x)\n", Lba, TotalBlock));
     Lba        += Count;
     Buffer     += Count * BlockSize;
     TotalBlock -= Count;
@@ -810,7 +807,7 @@ UsbBootWriteBlocks (
     if (EFI_ERROR (Status)) {
       return Status;
     }
-
+    DEBUG ((EFI_D_BLKIO, "UsbBootWriteBlocks: LBA (0x%x), Blk (0x%x)\n", Lba, TotalBlock));
     Lba        += Count;
     Buffer     += Count * BlockSize;
     TotalBlock -= Count;
