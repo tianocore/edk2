@@ -77,6 +77,9 @@ typedef struct {
 typedef VOID (*CACHE_OPERATION)(VOID);
 typedef VOID (*LINE_OPERATION)(UINTN);
 
+//
+// ARM Processor Mode
+//
 typedef enum {
   ARM_PROCESSOR_MODE_USER       = 0x10,
   ARM_PROCESSOR_MODE_FIQ        = 0x11,
@@ -89,6 +92,22 @@ typedef enum {
   ARM_PROCESSOR_MODE_MASK       = 0x1F
 } ARM_PROCESSOR_MODE;
 
+//
+// ARM Cpu IDs
+//
+#define ARM_CPU_IMPLEMENTER_MASK          (0xFF << 24)
+#define ARM_CPU_IMPLEMENTER_ARMLTD        (0x41 << 24)
+#define ARM_CPU_IMPLEMENTER_DEC           (0x44 << 24)
+#define ARM_CPU_IMPLEMENTER_MOT           (0x4D << 24)
+#define ARM_CPU_IMPLEMENTER_QUALCOMM      (0x51 << 24)
+#define ARM_CPU_IMPLEMENTER_MARVELL       (0x56 << 24)
+
+#define ARM_CPU_PRIMARY_PART_MASK         (0xFFF << 4)
+#define ARM_CPU_PRIMARY_PART_CORTEXA5     (0xC05 << 4)
+#define ARM_CPU_PRIMARY_PART_CORTEXA7     (0xC07 << 4)
+#define ARM_CPU_PRIMARY_PART_CORTEXA8     (0xC08 << 4)
+#define ARM_CPU_PRIMARY_PART_CORTEXA9     (0xC09 << 4)
+#define ARM_CPU_PRIMARY_PART_CORTEXA15    (0xC0F << 4)
 
 //
 // ARM MP Core IDs
