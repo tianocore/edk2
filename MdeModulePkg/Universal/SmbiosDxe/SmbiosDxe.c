@@ -2,7 +2,7 @@
   This code produces the Smbios protocol. It also responsible for constructing 
   SMBIOS table into system table.
   
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -127,7 +127,7 @@ GetSmbiosStructureSize (
   )
 {
   UINTN  FullSize;
-  UINT8  StrLen;
+  UINTN  StrLen;
   INT8*  CharInStr;
   
   if (Size == NULL || NumberOfStrings == NULL) {
