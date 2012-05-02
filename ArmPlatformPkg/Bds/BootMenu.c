@@ -354,7 +354,8 @@ BootMenuUpdateBootOption (
   ARM_BDS_LOADER_ARGUMENTS*     BootArguments;
   CHAR16                        BootDescription[BOOT_DEVICE_DESCRIPTION_MAX];
   CHAR8                         CmdLine[BOOT_DEVICE_OPTION_MAX];
-  EFI_DEVICE_PATH*              DevicePath;
+  EFI_DEVICE_PATH               *DevicePath;
+  EFI_DEVICE_PATH               *TempInitrdPath;
   ARM_BDS_LOADER_TYPE           BootType;
   ARM_BDS_LOADER_OPTIONAL_DATA* OptionalData;
   ARM_BDS_LINUX_ARGUMENTS*      LinuxArguments;
@@ -423,11 +424,13 @@ BootMenuUpdateBootOption (
 
         if (InitrdPathNode != NULL) {
           // Duplicate Linux kernel Device Path
-          DevicePath = DuplicateDevicePath (BootOption->FilePathList);
+          TempInitrdPath = DuplicateDevicePath (BootOption->FilePathList);
           // Replace Linux kernel Node by EndNode
-          SetDevicePathEndNode (GetLastDevicePathNode (DevicePath));
+          SetDevicePathEndNode (GetLastDevicePathNode (TempInitrdPath));
           // Append the Device Path node to the select device path
-          InitrdPath = AppendDevicePathNode (DevicePath, (CONST EFI_DEVICE_PATH_PROTOCOL *)InitrdPathNode);
+          InitrdPath = AppendDevicePathNode (TempInitrdPath, (CONST EFI_DEVICE_PATH_PROTOCOL *)InitrdPathNode);
+          FreePool (TempInitrdPath);
+          InitrdSize = GetDevicePathSize (InitrdPath);
         } else {
           InitrdPath = NULL;
         }
