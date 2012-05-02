@@ -557,6 +557,8 @@ ProcessCmdLine (
           // if any command fails stop processing CmdLine
           break;
         }
+      } else {
+        AsciiPrint ("The command '%a' is not supported.\n", Argv[0]);
       } 
     } 
   }
