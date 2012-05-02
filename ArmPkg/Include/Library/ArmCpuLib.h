@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2011, ARM Limited. All rights reserved.
+  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -14,24 +14,6 @@
 
 #ifndef __ARMCPU_LIB__
 #define __ARMCPU_LIB__
-
-// These are #define and not enum to be used in assembly files
-#define ARM_CPU_EVENT_DEFAULT         0
-#define ARM_CPU_EVENT_BOOT_MEM_INIT   1
-#define ARM_CPU_EVENT_SECURE_INIT     2
-
-typedef UINTN ARM_CPU_SYNCHRONIZE_EVENT;
-
-
-VOID
-ArmCpuSynchronizeWait (
-  IN ARM_CPU_SYNCHRONIZE_EVENT   Event
-  );
-
-VOID
-ArmCpuSynchronizeSignal (
-  IN ARM_CPU_SYNCHRONIZE_EVENT   Event
-  );
 
 VOID
 ArmCpuSetup (

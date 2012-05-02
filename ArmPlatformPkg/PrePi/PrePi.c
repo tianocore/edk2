@@ -14,7 +14,6 @@
 
 #include <PiPei.h>
 
-#include <Library/ArmCpuLib.h>
 #include <Library/DebugAgentLib.h>
 #include <Library/PrePiLib.h>
 #include <Library/PrintLib.h>
@@ -204,11 +203,12 @@ CEntryPoint (
     if (IS_PRIMARY_CORE(MpId)) {
       mGlobalVariableBase = GlobalVariableBase;
       if (ArmIsMpCore()) {
-        ArmCpuSynchronizeSignal (ARM_CPU_EVENT_DEFAULT);
+        // Signal the Global Variable Region is defined (event: ARM_CPU_EVENT_DEFAULT)
+        ArmCallSEV ();
       }
     } else {
-      // Wait the Primay core has defined the address of the Global Variable region
-      ArmCpuSynchronizeWait (ARM_CPU_EVENT_DEFAULT);
+      // Wait the Primay core has defined the address of the Global Variable region (event: ARM_CPU_EVENT_DEFAULT)
+      ArmCallWFE ();
     }
   }
   

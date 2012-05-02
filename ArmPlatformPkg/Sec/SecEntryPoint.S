@@ -26,7 +26,7 @@ GCC_ASM_IMPORT(ArmDisableCachesAndMmu)
 GCC_ASM_IMPORT(ArmWriteVBar)
 GCC_ASM_IMPORT(ArmReadMpidr)
 GCC_ASM_IMPORT(SecVectorTable)
-GCC_ASM_IMPORT(ArmCpuSynchronizeWait)
+GCC_ASM_IMPORT(ArmCallWFE)
 GCC_ASM_EXPORT(_ModuleEntryPoint)
 
 StartupAddr:        .word       ASM_PFX(CEntryPoint)
@@ -59,8 +59,8 @@ _IdentifyCpu:
   beq   _InitMem
   
 _WaitInitMem:
-  mov   r0, #ARM_CPU_EVENT_BOOT_MEM_INIT
-  bl    ASM_PFX(ArmCpuSynchronizeWait)
+  // Wait for the primary core to initialize the initial memory (event: BOOT_MEM_INIT)
+  bl    ASM_PFX(ArmCallWFE)
   // Now the Init Mem is initialized, we setup the secondary core stacks
   b     _SetupSecondaryCoreStack
   

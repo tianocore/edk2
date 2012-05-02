@@ -54,7 +54,8 @@ CEntryPoint (
   // Primary CPU clears out the SCU tag RAMs, secondaries wait
   if (IS_PRIMARY_CORE(MpId)) {
     if (ArmIsMpCore()) {
-      ArmCpuSynchronizeSignal (ARM_CPU_EVENT_BOOT_MEM_INIT);
+      // Signal for the initial memory is configured (event: BOOT_MEM_INIT)
+      ArmCallSEV ();
     }
 
     // SEC phase needs to run library constructors by hand. This assumes we are linked against the SerialLib
@@ -159,18 +160,18 @@ TrustedWorldInitialization (
   // Setup the Trustzone Chipsets
   if (IS_PRIMARY_CORE(MpId)) {
     if (ArmIsMpCore()) {
-      // Waiting for the Primary Core to have finished to initialize the Secure World
-      ArmCpuSynchronizeSignal (ARM_CPU_EVENT_SECURE_INIT);
+      // Signal the secondary core the Security settings is done (event: EVENT_SECURE_INIT)
+      ArmCallSEV ();
     }
   } else {
     // The secondary cores need to wait until the Trustzone chipsets configuration is done
     // before switching to Non Secure World
 
-    // Waiting for the Primary Core to have finished to initialize the Secure World
-    ArmCpuSynchronizeWait (ARM_CPU_EVENT_SECURE_INIT);
+    // Wait for the Primary Core to finish the initialization of the Secure World (event: EVENT_SECURE_INIT)
+    ArmCallWFE ();
   }
 
-  // Call the Platform specific fucntion to execute additional actions if required
+  // Call the Platform specific function to execute additional actions if required
   JumpAddress = PcdGet32 (PcdFvBaseAddress);
   ArmPlatformSecExtraAction (MpId, &JumpAddress);
 

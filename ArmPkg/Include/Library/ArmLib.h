@@ -438,6 +438,16 @@ ArmSetAuxCrBit (
 
 VOID
 EFIAPI
+ArmCallSEV (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmCallWFE (
+  VOID
+  );
+
 ArmCallWFI (
   VOID
   );

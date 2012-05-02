@@ -20,24 +20,6 @@
 #include <Chipset/ArmV7.h>
 
 VOID
-ArmCpuSynchronizeWait (
-  IN ARM_CPU_SYNCHRONIZE_EVENT   Event
-  )
-{
-  // The CortexA8 is a Unicore CPU. We must not use Synchronization functions
-  ASSERT(0);
-}
-
-VOID
-ArmCpuSynchronizeSignal (
-  IN ARM_CPU_SYNCHRONIZE_EVENT   Event
-  )
-{
-  // The CortexA8 is a Unicore CPU. We must not use Synchronization functions
-  ASSERT(0);
-}
-
-VOID
 ArmCpuSetup (
   IN  UINTN         MpId
   )

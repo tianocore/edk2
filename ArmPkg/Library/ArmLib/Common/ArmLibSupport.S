@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------ 
 #
 # Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2011, ARM Limited. All rights reserved.
+# Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -40,6 +40,8 @@ GCC_ASM_EXPORT(ArmUpdateTranslationTableEntry)
 GCC_ASM_EXPORT(ArmWriteNsacr)
 GCC_ASM_EXPORT(ArmWriteScr)
 GCC_ASM_EXPORT(ArmWriteVMBar)
+GCC_ASM_EXPORT(ArmCallWFE)
+GCC_ASM_EXPORT(ArmCallSEV)
 
 #------------------------------------------------------------------------------
 
@@ -144,6 +146,14 @@ ASM_PFX(ArmWriteScr):
 
 ASM_PFX(ArmWriteVMBar):
   mcr     p15, 0, r0, c12, c0, 1
+  bx      lr
+
+ASM_PFX(ArmCallWFE):
+  wfe
+  bx      lr
+
+ASM_PFX(ArmCallSEV):
+  sev
   bx      lr
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED

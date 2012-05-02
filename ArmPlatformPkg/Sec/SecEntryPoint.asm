@@ -24,8 +24,8 @@
   IMPORT  ArmDisableCachesAndMmu
   IMPORT  ArmWriteVBar
   IMPORT  ArmReadMpidr
+  IMPORT  ArmCallWFE
   IMPORT  SecVectorTable
-  IMPORT  ArmCpuSynchronizeWait
   EXPORT  _ModuleEntryPoint
 
   PRESERVE8
@@ -61,8 +61,8 @@ _IdentifyCpu
   beq   _InitMem
   
 _WaitInitMem
-  mov   r0, #ARM_CPU_EVENT_BOOT_MEM_INIT
-  bl    ArmCpuSynchronizeWait
+  // Wait for the primary core to initialize the initial memory (event: BOOT_MEM_INIT)
+  bl    ArmCallWFE
   // Now the Init Mem is initialized, we setup the secondary core stacks
   b     _SetupSecondaryCoreStack
   

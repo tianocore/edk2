@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2011, ARM Limited. All rights reserved.
+  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -15,38 +15,10 @@
 #include <Base.h>
 #include <Library/ArmLib.h>
 #include <Library/ArmCpuLib.h>
-#include <Library/ArmGicLib.h>
 #include <Library/IoLib.h>
 #include <Library/PcdLib.h>
 
 #include <Chipset/ArmCortexA9.h>
-
-VOID
-ArmCpuSynchronizeSignal (
-  IN ARM_CPU_SYNCHRONIZE_EVENT   Event
-  )
-{
-  if (Event == ARM_CPU_EVENT_BOOT_MEM_INIT) {
-    // Do nothing, Cortex A9 secondary cores are waiting for the SCU to be
-    // enabled (done by ArmCpuSetup()) as a way to know when the Init Boot
-    // Mem as been initialized
-  } else {
-    // Send SGI to all Secondary core to wake them up from WFI state.
-    ArmGicSendSgiTo (PcdGet32(PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E);
-  }
-}
-
-VOID
-CArmCpuSynchronizeWait (
-  IN ARM_CPU_SYNCHRONIZE_EVENT   Event
-  )
-{
-  // Waiting for the SGI from the primary core
-  ArmCallWFI ();
-
-  // Acknowledge the interrupt and send End of Interrupt signal.
-  ArmGicAcknowledgeSgiFrom (PcdGet32(PcdGicInterruptInterfaceBase), PRIMARY_CORE_ID);
-}
 
 VOID
 ArmEnableScu (

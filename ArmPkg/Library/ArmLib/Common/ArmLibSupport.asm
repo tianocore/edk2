@@ -40,6 +40,8 @@
     EXPORT ArmWriteNsacr
     EXPORT ArmWriteScr
     EXPORT ArmWriteVMBar
+    EXPORT ArmCallWFE
+    EXPORT ArmCallSEV
 
     AREA ArmLibSupport, CODE, READONLY
 
@@ -146,4 +148,12 @@ ArmWriteVMBar
   mcr     p15, 0, r0, c12, c0, 1
   bx      lr
   
+ArmCallWFE
+  wfe
+  blx   lr
+
+ArmCallSEV
+  sev
+  blx   lr
+
   END
