@@ -20,7 +20,7 @@
 #include <Library/IoLib.h>
 #include <Library/PcdLib.h>
 
-#include <Chipset/ArmV7.h>
+#include <Chipset/ArmCortexA15.h>
 
 VOID
 ArmCpuSetup (
@@ -41,10 +41,11 @@ ArmCpuSetup (
   // if security extensions are implemented.
   ArmArchTimerSetTimerFreq (PcdGet32 (PcdArmArchTimerFreqInHz));
 
-  /*// If MPCore then Enable the SCU
   if (ArmIsMpCore()) {
-    ArmEnableScu ();
-  }*/
+    // Turn on SMP coherency
+    ArmSetAuxCrBit (A15_FEATURE_SMP);
+  }
+
 }
 
 
@@ -53,8 +54,6 @@ ArmCpuSetupSmpNonSecure (
   IN  UINTN         MpId
   )
 {
-  //ArmSetAuxCrBit (A15_FEATURE_SMP);
-
   /*// Make the SCU accessible in Non Secure world
   if (IS_PRIMARY_CORE(MpId)) {
     ScuBase = ArmGetScuBaseAddress();

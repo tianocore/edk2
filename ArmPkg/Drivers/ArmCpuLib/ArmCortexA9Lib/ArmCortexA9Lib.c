@@ -48,6 +48,9 @@ ArmCpuSetup (
 
   // If MPCore then Enable the SCU
   if (ArmIsMpCore()) {
+    // Signals the Cortex-A9 processor is taking part in coherency
+    ArmSetAuxCrBit (A9_FEATURE_SMP);
+
     ArmEnableScu ();
   }
 }
@@ -59,8 +62,6 @@ ArmCpuSetupSmpNonSecure (
   )
 {
   INTN          ScuBase;
-
-  ArmSetAuxCrBit (A9_FEATURE_SMP);
 
   // Make the SCU accessible in Non Secure world
   if (IS_PRIMARY_CORE(MpId)) {
