@@ -64,6 +64,11 @@ ArmPlatformSecExtraAction (
   UINTN           CharCount;
 
   if (FeaturePcdGet (PcdStandalone) == FALSE) {
+
+    //
+    // Warning: This code assumes the DRAM has already been initialized by ArmPlatformSecLib
+    //
+
     if (IS_PRIMARY_CORE(MpId)) {
       UINTN*   StartAddress = (UINTN*)PcdGet32(PcdFvBaseAddress);
 
@@ -85,6 +90,11 @@ ArmPlatformSecExtraAction (
       *JumpAddress = (UINTN)NonSecureWaitForFirmware;
     }
   } else if (FeaturePcdGet (PcdSystemMemoryInitializeInSec)) {
+
+    //
+    // Warning: This code assumes the DRAM has already been initialized by ArmPlatformSecLib
+    //
+
     if (IS_PRIMARY_CORE(MpId)) {
       // Signal the secondary cores they can jump to PEI phase
       ArmGicSendSgiTo (PcdGet32(PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E, PcdGet32 (PcdGicSgiIntId));
