@@ -1,6 +1,7 @@
 /** @file  PL111Lcd.c
 
-  Copyright (c) 2011, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR>
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -26,42 +27,10 @@
  **********************************************************************/
 
 EFI_STATUS
-PL111Indentify (
-  VOID
-  )
-{
-  // Check if this is a PrimeCell Peripheral
-  if (    ( MmioRead8( PL111_REG_CLCD_P_CELL_ID_0 ) != 0x0D )
-       || ( MmioRead8( PL111_REG_CLCD_P_CELL_ID_1 ) != 0xF0 )
-       || ( MmioRead8( PL111_REG_CLCD_P_CELL_ID_2 ) != 0x05 )
-       || ( MmioRead8( PL111_REG_CLCD_P_CELL_ID_3 ) != 0xB1 ) ) {
-    return EFI_NOT_FOUND;
-  }
-
-  // Check if this PrimeCell Peripheral is the PL111 LCD
-  if (    ( MmioRead8( PL111_REG_CLCD_PERIPH_ID_0 ) != 0x11 )
-       || ( MmioRead8( PL111_REG_CLCD_PERIPH_ID_1 ) != 0x11 )
-       || ( (MmioRead8( PL111_REG_CLCD_PERIPH_ID_2 ) & 0xF) != 0x04 )
-       || ( MmioRead8( PL111_REG_CLCD_PERIPH_ID_3 ) != 0x00 ) ) {
-    return EFI_NOT_FOUND;
-  }
-
-  return EFI_SUCCESS;
-}
-
-EFI_STATUS
 LcdInitialize (
   IN EFI_PHYSICAL_ADDRESS   VramBaseAddress
   )
 {
-  EFI_STATUS  Status = EFI_SUCCESS;
-
-  // Check if the PL111 is fitted on this motherboard
-  Status = PL111Indentify ();
-  if (EFI_ERROR( Status )) {
-    return EFI_DEVICE_ERROR;
-  }
-
   // Define start of the VRAM. This never changes for any graphics mode
   MmioWrite32(PL111_REG_LCD_UP_BASE, (UINT32) VramBaseAddress);
   MmioWrite32(PL111_REG_LCD_LP_BASE, 0); // We are not using a double buffer

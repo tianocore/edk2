@@ -29,30 +29,6 @@
 
 EFI_EVENT                           EfiExitBootServicesEvent = (EFI_EVENT)NULL;
 
-EFI_STATUS
-SP805Identify (
-  VOID
-  )
-{
-  // Check if this is a PrimeCell Peripheral
-  if (    (MmioRead8 (SP805_WDOG_PCELL_ID0) != 0x0D)
-      ||  (MmioRead8 (SP805_WDOG_PCELL_ID1) != 0xF0)
-      ||  (MmioRead8 (SP805_WDOG_PCELL_ID2) != 0x05)
-      ||  (MmioRead8 (SP805_WDOG_PCELL_ID3) != 0xB1)) {
-    return EFI_NOT_FOUND;
-  }
-
-  // Check if this PrimeCell Peripheral is the SP805 Watchdog Timer
-  if (    (MmioRead8 (SP805_WDOG_PERIPH_ID0) != 0x05)
-      ||  (MmioRead8 (SP805_WDOG_PERIPH_ID1) != 0x18)
-      || ((MmioRead8 (SP805_WDOG_PERIPH_ID2) & 0x0000000F) != 0x04)
-      ||  (MmioRead8 (SP805_WDOG_PERIPH_ID3) != 0x00)) {
-    return EFI_NOT_FOUND;
-  }
-
-  return EFI_SUCCESS;
-}
-
 /**
   Make sure the SP805 registers are unlocked for writing.
 
@@ -363,13 +339,6 @@ SP805Initialize (
   EFI_STATUS  Status;
   EFI_HANDLE  Handle;
 
-  // Check if the SP805 hardware watchdog module exists on board
-  Status = SP805Identify();
-  if (EFI_ERROR(Status)) {
-    Status = EFI_DEVICE_ERROR;
-    goto EXIT;
-  }
-
   // Unlock access to the SP805 registers
   SP805Unlock ();
 
@@ -409,7 +378,7 @@ SP805Initialize (
     goto EXIT;
   }
 
-  EXIT:
+EXIT:
   if(EFI_ERROR(Status)) {
     // The watchdog failed to initialize
     ASSERT(FALSE);
