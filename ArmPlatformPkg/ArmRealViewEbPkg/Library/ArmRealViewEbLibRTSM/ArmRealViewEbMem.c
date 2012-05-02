@@ -74,13 +74,13 @@ ArmPlatformGetVirtualMemoryMap (
   VirtualMemoryTable[++Index].PhysicalBase = ARM_EB_SMB_MB_ON_CHIP_PERIPH_BASE;
   VirtualMemoryTable[Index].VirtualBase  = ARM_EB_SMB_MB_ON_CHIP_PERIPH_BASE;
   VirtualMemoryTable[Index].Length       = ARM_EB_SMB_MB_ON_CHIP_PERIPH_SZ;
-  VirtualMemoryTable[Index].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_SECURE_DEVICE;
+  VirtualMemoryTable[Index].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
 
   // SMB CS0-CS1 - NOR Flash 1 & 2
   VirtualMemoryTable[++Index].PhysicalBase = ARM_EB_SMB_NOR_BASE;
   VirtualMemoryTable[Index].VirtualBase  = ARM_EB_SMB_NOR_BASE;
   VirtualMemoryTable[Index].Length       = ARM_EB_SMB_NOR_SZ + ARM_EB_SMB_DOC_SZ;
-  VirtualMemoryTable[Index].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_SECURE_DEVICE;
+  VirtualMemoryTable[Index].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
 
   // SMB CS2 - SRAM
   VirtualMemoryTable[++Index].PhysicalBase = ARM_EB_SMB_SRAM_BASE;
@@ -92,14 +92,14 @@ ArmPlatformGetVirtualMemoryMap (
   VirtualMemoryTable[++Index].PhysicalBase = ARM_EB_SMB_PERIPH_BASE;
   VirtualMemoryTable[Index].VirtualBase  = ARM_EB_SMB_PERIPH_BASE;
   VirtualMemoryTable[Index].Length       = ARM_EB_SMB_PERIPH_SZ;
-  VirtualMemoryTable[Index].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_SECURE_DEVICE;
+  VirtualMemoryTable[Index].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
 
   // If a Logic Tile is connected to The ARM Versatile Express Motherboard
   if (MmioRead32(ARM_EB_SYS_PROCID1_REG) != 0) {
       VirtualMemoryTable[++Index].PhysicalBase = ARM_EB_LOGIC_TILE_BASE;
       VirtualMemoryTable[Index].VirtualBase  = ARM_EB_LOGIC_TILE_BASE;
       VirtualMemoryTable[Index].Length       = ARM_EB_LOGIC_TILE_SZ;
-      VirtualMemoryTable[Index].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_SECURE_DEVICE;
+      VirtualMemoryTable[Index].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
 
       ASSERT((Index + 1) == (MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS + 1));
   } else {

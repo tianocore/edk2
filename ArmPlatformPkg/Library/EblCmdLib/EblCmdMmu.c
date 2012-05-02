@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -27,7 +27,6 @@
 
 // Section
 #define TT_DESCRIPTOR_SECTION_STRONGLY_ORDER	   (TT_DESCRIPTOR_SECTION_TYPE_SECTION 													  | \
-													TT_DESCRIPTOR_SECTION_NS_NON_SECURE 											      | \
 													TT_DESCRIPTOR_SECTION_NG_GLOBAL 													  | \
 													TT_DESCRIPTOR_SECTION_S_NOT_SHARED 													  | \
 													TT_DESCRIPTOR_SECTION_DOMAIN(0) 													  | \

@@ -85,13 +85,13 @@ ArmPlatformGetVirtualMemoryMap (
   VirtualMemoryTable[++Index].PhysicalBase = ARM_VE_ON_CHIP_PERIPH_BASE;
   VirtualMemoryTable[Index].VirtualBase  = ARM_VE_ON_CHIP_PERIPH_BASE;
   VirtualMemoryTable[Index].Length       = ARM_VE_ON_CHIP_PERIPH_SZ;
-  VirtualMemoryTable[Index].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_SECURE_DEVICE;
+  VirtualMemoryTable[Index].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
 
   // SMB CS0-CS1 - NOR Flash 1 & 2
   VirtualMemoryTable[++Index].PhysicalBase = ARM_VE_SMB_NOR0_BASE;
   VirtualMemoryTable[Index].VirtualBase  = ARM_VE_SMB_NOR0_BASE;
   VirtualMemoryTable[Index].Length       = ARM_VE_SMB_NOR0_SZ + ARM_VE_SMB_NOR1_SZ;
-  VirtualMemoryTable[Index].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_SECURE_DEVICE;
+  VirtualMemoryTable[Index].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
 
   // SMB CS2 - SRAM
   VirtualMemoryTable[++Index].PhysicalBase = ARM_VE_SMB_SRAM_BASE;
@@ -103,7 +103,7 @@ ArmPlatformGetVirtualMemoryMap (
   VirtualMemoryTable[++Index].PhysicalBase = ARM_VE_SMB_PERIPH_BASE;
   VirtualMemoryTable[Index].VirtualBase  = ARM_VE_SMB_PERIPH_BASE;
   VirtualMemoryTable[Index].Length       = 2 * ARM_VE_SMB_PERIPH_SZ;
-  VirtualMemoryTable[Index].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_SECURE_DEVICE;
+  VirtualMemoryTable[Index].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
 
 //TODO:This should be enabled for final release. Right now, ARM VE RTSM crashes.
 //  // If a Logic Tile is connected to The ARM Versatile Express Motherboard
@@ -111,7 +111,7 @@ ArmPlatformGetVirtualMemoryMap (
 //      VirtualMemoryTable[++Index].PhysicalBase = ARM_VE_EXT_AXI_BASE;
 //      VirtualMemoryTable[Index].VirtualBase  = ARM_VE_EXT_AXI_BASE;
 //      VirtualMemoryTable[Index].Length       = ARM_VE_EXT_AXI_SZ;
-//      VirtualMemoryTable[Index].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_SECURE_DEVICE;
+//      VirtualMemoryTable[Index].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
 //
 //      ASSERT((Index + 1) == (MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS + 1));
 //  } else {

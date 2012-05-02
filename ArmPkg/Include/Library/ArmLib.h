@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2011 - 2012, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -47,15 +48,21 @@ typedef struct {
   UINTN                   InstructionCacheLineLength;
 } ARM_CACHE_INFO;
 
+/**
+ * The UEFI firmware must not use the ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_* attributes.
+ *
+ * The Non Secure memory attribute (ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_*) should only
+ * be used in Secure World to distinguished Secure to Non-Secure memory.
+ */
 typedef enum {
   ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED = 0,
-  ARM_MEMORY_REGION_ATTRIBUTE_SECURE_UNCACHED_UNBUFFERED,
+  ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_UNCACHED_UNBUFFERED,
   ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK,
-  ARM_MEMORY_REGION_ATTRIBUTE_SECURE_WRITE_BACK,
+  ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_BACK,
   ARM_MEMORY_REGION_ATTRIBUTE_WRITE_THROUGH,
-  ARM_MEMORY_REGION_ATTRIBUTE_SECURE_WRITE_THROUGH,
+  ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_THROUGH,
   ARM_MEMORY_REGION_ATTRIBUTE_DEVICE,
-  ARM_MEMORY_REGION_ATTRIBUTE_SECURE_DEVICE
+  ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_DEVICE
 } ARM_MEMORY_REGION_ATTRIBUTES;
 
 #define IS_ARM_MEMORY_REGION_ATTRIBUTES_SECURE(attr) ((UINT32)(attr) & 1)

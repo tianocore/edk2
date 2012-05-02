@@ -26,8 +26,6 @@
 // DDR attributes
 #define DDR_ATTRIBUTES_CACHED           ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK
 #define DDR_ATTRIBUTES_UNCACHED         ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED
-#define DDR_ATTRIBUTES_SECURE_CACHED    ARM_MEMORY_REGION_ATTRIBUTE_SECURE_WRITE_BACK
-#define DDR_ATTRIBUTES_SECURE_UNCACHED  ARM_MEMORY_REGION_ATTRIBUTE_SECURE_UNCACHED_UNBUFFERED
 
 /**
   Return the Virtual Memory Map of your platform
@@ -45,7 +43,6 @@ ArmPlatformGetVirtualMemoryMap (
   )
 {
   ARM_MEMORY_REGION_ATTRIBUTES  CacheAttributes;
-  BOOLEAN                       TrustzoneSupport;
   UINTN                         Index = 0;
   ARM_MEMORY_REGION_DESCRIPTOR  *VirtualMemoryTable;
 
@@ -56,14 +53,10 @@ ArmPlatformGetVirtualMemoryMap (
       return;
   }
 
-  // Check if SMC TZASC is enabled. If Trustzone not enabled then all the entries remain in Secure World.
-  // As this value can be changed in the Board Configuration file, the UEFI firmware needs to work for both case
-  TrustzoneSupport = PcdGetBool (PcdTrustzoneSupport);
-
   if (FeaturePcdGet(PcdCacheEnable) == TRUE) {
-      CacheAttributes = (TrustzoneSupport ? DDR_ATTRIBUTES_CACHED : DDR_ATTRIBUTES_SECURE_CACHED);
+      CacheAttributes = DDR_ATTRIBUTES_CACHED;
   } else {
-      CacheAttributes = (TrustzoneSupport ? DDR_ATTRIBUTES_UNCACHED : DDR_ATTRIBUTES_SECURE_UNCACHED);
+      CacheAttributes = DDR_ATTRIBUTES_UNCACHED;
   }
 
   if (FeaturePcdGet(PcdNorFlashRemapping) == FALSE) {
@@ -84,13 +77,13 @@ ArmPlatformGetVirtualMemoryMap (
   VirtualMemoryTable[++Index].PhysicalBase = ARM_VE_SMB_MB_ON_CHIP_PERIPH_BASE;
   VirtualMemoryTable[Index].VirtualBase  = ARM_VE_SMB_MB_ON_CHIP_PERIPH_BASE;
   VirtualMemoryTable[Index].Length       = ARM_VE_SMB_MB_ON_CHIP_PERIPH_SZ;
-  VirtualMemoryTable[Index].Attributes   = (TrustzoneSupport ? ARM_MEMORY_REGION_ATTRIBUTE_DEVICE : ARM_MEMORY_REGION_ATTRIBUTE_SECURE_DEVICE);
+  VirtualMemoryTable[Index].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
 
   // SMB CS0-CS1 - NOR Flash 1 & 2
   VirtualMemoryTable[++Index].PhysicalBase = ARM_VE_SMB_NOR0_BASE;
   VirtualMemoryTable[Index].VirtualBase  = ARM_VE_SMB_NOR0_BASE;
   VirtualMemoryTable[Index].Length       = ARM_VE_SMB_NOR0_SZ + ARM_VE_SMB_NOR1_SZ;
-  VirtualMemoryTable[Index].Attributes   = (TrustzoneSupport ? ARM_MEMORY_REGION_ATTRIBUTE_DEVICE : ARM_MEMORY_REGION_ATTRIBUTE_SECURE_DEVICE);
+  VirtualMemoryTable[Index].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
 
   // SMB CS2 - SRAM
   VirtualMemoryTable[++Index].PhysicalBase = ARM_VE_SMB_SRAM_BASE;
@@ -102,14 +95,14 @@ ArmPlatformGetVirtualMemoryMap (
   VirtualMemoryTable[++Index].PhysicalBase = ARM_VE_SMB_PERIPH_BASE;
   VirtualMemoryTable[Index].VirtualBase  = ARM_VE_SMB_PERIPH_BASE;
   VirtualMemoryTable[Index].Length       = ARM_VE_SMB_PERIPH_SZ;
-  VirtualMemoryTable[Index].Attributes   = (TrustzoneSupport ? ARM_MEMORY_REGION_ATTRIBUTE_DEVICE : ARM_MEMORY_REGION_ATTRIBUTE_SECURE_DEVICE);
+  VirtualMemoryTable[Index].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
 
   // If a Logic Tile is connected to The ARM Versatile Express Motherboard
   if (MmioRead32(ARM_VE_SYS_PROCID1_REG) != 0) {
       VirtualMemoryTable[++Index].PhysicalBase = ARM_VE_EXT_AXI_BASE;
       VirtualMemoryTable[Index].VirtualBase  = ARM_VE_EXT_AXI_BASE;
       VirtualMemoryTable[Index].Length       = ARM_VE_EXT_AXI_SZ;
-      VirtualMemoryTable[Index].Attributes   = (TrustzoneSupport ? ARM_MEMORY_REGION_ATTRIBUTE_DEVICE : ARM_MEMORY_REGION_ATTRIBUTE_SECURE_DEVICE);
+      VirtualMemoryTable[Index].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
 
       ASSERT((Index + 1) == (MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS + 1));
   } else {

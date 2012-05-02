@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -38,8 +39,7 @@
 #define TT_DESCRIPTOR_SECTION_SIZE                              (0x00100000)
 
 #define TT_DESCRIPTOR_SECTION_NS_MASK                           (1UL << 19)
-#define TT_DESCRIPTOR_SECTION_NS_SECURE                         (0UL << 19)
-#define TT_DESCRIPTOR_SECTION_NS_NON_SECURE                     (1UL << 19)
+#define TT_DESCRIPTOR_SECTION_NS                                (1UL << 19)
 
 #define TT_DESCRIPTOR_SECTION_NG_MASK                           (1UL << 17)
 #define TT_DESCRIPTOR_SECTION_NG_GLOBAL                         (0UL << 17)
@@ -86,27 +86,27 @@
 #define TT_DESCRIPTOR_SECTION_BASE_ADDRESS_MASK                 (0xFFF00000)
 #define TT_DESCRIPTOR_SECTION_BASE_ADDRESS(a)                   (a & TT_DESCRIPTOR_SECTION_BASE_ADDRESS_MASK)
 
-#define TT_DESCRIPTOR_SECTION_WRITE_BACK(Secure)       (TT_DESCRIPTOR_TYPE_SECTION                                                          | \
-                                                        (Secure ? TT_DESCRIPTOR_SECTION_NS_SECURE : TT_DESCRIPTOR_SECTION_NS_NON_SECURE )   | \
-                                                   TT_DESCRIPTOR_SECTION_NG_GLOBAL                         | \
-                                                   TT_DESCRIPTOR_SECTION_S_NOT_SHARED                      | \
-                                                   TT_DESCRIPTOR_SECTION_DOMAIN(0)                         | \
-                                                   TT_DESCRIPTOR_SECTION_AP_RW_RW                          | \
-                                                   TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_BACK_ALLOC)
-#define TT_DESCRIPTOR_SECTION_WRITE_THROUGH(Secure)    (TT_DESCRIPTOR_TYPE_SECTION                                                          | \
-                                                        (Secure ? TT_DESCRIPTOR_SECTION_NS_SECURE : TT_DESCRIPTOR_SECTION_NS_NON_SECURE )   | \
-                                                   TT_DESCRIPTOR_SECTION_NG_GLOBAL                         | \
-                                                   TT_DESCRIPTOR_SECTION_S_NOT_SHARED                      | \
-                                                   TT_DESCRIPTOR_SECTION_DOMAIN(0)                         | \
-                                                   TT_DESCRIPTOR_SECTION_AP_RW_RW                          | \
-                                                   TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_THROUGH_NO_ALLOC)
-#define TT_DESCRIPTOR_SECTION_UNCACHED(Secure)         (TT_DESCRIPTOR_TYPE_SECTION                                                          | \
-                                                        (Secure ? TT_DESCRIPTOR_SECTION_NS_SECURE : TT_DESCRIPTOR_SECTION_NS_NON_SECURE )   | \
-                                                   TT_DESCRIPTOR_SECTION_NG_GLOBAL                         | \
-                                                   TT_DESCRIPTOR_SECTION_S_NOT_SHARED                      | \
-                                                   TT_DESCRIPTOR_SECTION_DOMAIN(0)                         | \
-                                                   TT_DESCRIPTOR_SECTION_AP_RW_RW                          | \
-                                                   TT_DESCRIPTOR_SECTION_CACHE_POLICY_NON_CACHEABLE)
+#define TT_DESCRIPTOR_SECTION_WRITE_BACK(NonSecure)             (TT_DESCRIPTOR_TYPE_SECTION                                                          | \
+                                                                (NonSecure ? TT_DESCRIPTOR_SECTION_NS : 0)   | \
+                                                                TT_DESCRIPTOR_SECTION_NG_GLOBAL                         | \
+                                                                TT_DESCRIPTOR_SECTION_S_NOT_SHARED                      | \
+                                                                TT_DESCRIPTOR_SECTION_DOMAIN(0)                         | \
+                                                                TT_DESCRIPTOR_SECTION_AP_RW_RW                          | \
+                                                                TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_BACK_ALLOC)
+#define TT_DESCRIPTOR_SECTION_WRITE_THROUGH(NonSecure)          (TT_DESCRIPTOR_TYPE_SECTION                                                          | \
+                                                                (NonSecure ? TT_DESCRIPTOR_SECTION_NS : 0)   | \
+                                                                TT_DESCRIPTOR_SECTION_NG_GLOBAL                         | \
+                                                                TT_DESCRIPTOR_SECTION_S_NOT_SHARED                      | \
+                                                                TT_DESCRIPTOR_SECTION_DOMAIN(0)                         | \
+                                                                TT_DESCRIPTOR_SECTION_AP_RW_RW                          | \
+                                                                TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_THROUGH_NO_ALLOC)
+#define TT_DESCRIPTOR_SECTION_UNCACHED(NonSecure)               (TT_DESCRIPTOR_TYPE_SECTION                                                          | \
+                                                                (NonSecure ? TT_DESCRIPTOR_SECTION_NS : 0)   | \
+                                                                TT_DESCRIPTOR_SECTION_NG_GLOBAL                         | \
+                                                                TT_DESCRIPTOR_SECTION_S_NOT_SHARED                      | \
+                                                                TT_DESCRIPTOR_SECTION_DOMAIN(0)                         | \
+                                                                TT_DESCRIPTOR_SECTION_AP_RW_RW                          | \
+                                                                TT_DESCRIPTOR_SECTION_CACHE_POLICY_NON_CACHEABLE)
 
 #define CPACR_CP_FULL_ACCESS    0x0FFFFFFF
 
