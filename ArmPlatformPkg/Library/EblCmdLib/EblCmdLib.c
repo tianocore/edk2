@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -52,7 +52,7 @@ EblDumpMmu (
 
   @param  Argc   Number of command arguments in Argv
   @param  Argv   Array of strings that represent the parsed command line. 
-                 Argv[0] is the comamnd name
+                 Argv[0] is the command name
 
   @return EFI_SUCCESS
 
@@ -75,7 +75,11 @@ EblSymbolTable (
   
   // Need to add lots of error checking on the passed in string
   // Default string is for RealView debugger
+#if (__ARMCC_VERSION < 500000)
   Format = (Argc > 1) ? Argv[1] : "load /a /ni /np %a &0x%x";
+#else
+  Format = (Argc > 1) ? Argv[1] : "add-symbol-file %a 0x%x";
+#endif
   Elf = (Argc > 2) ? FALSE : TRUE;
   
   Status = EfiGetSystemConfigurationTable (&gEfiDebugImageInfoTableGuid, (VOID **)&DebugImageTableHeader);

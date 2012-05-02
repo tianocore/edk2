@@ -2,6 +2,8 @@
 
 Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+Portions copyright (c) 2011 - 2012, ARM Ltd. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -82,8 +84,13 @@ PeCoffLoaderRelocateImageExtraAction (
 #endif
 
 #ifdef __CC_ARM
+#if (__ARMCC_VERSION < 500000)
   // Print out the command for the RVD debugger to load symbols for this image
   DEBUG ((EFI_D_ERROR, "load /a /ni /np %a &0x%08x\n", DeCygwinPathIfNeeded (ImageContext->PdbPointer, Temp, sizeof (Temp)), (UINTN)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders)));
+#else
+  // Print out the command for the DS-5 to load symbols for this image
+  DEBUG ((EFI_D_ERROR, "add-symbol-file %a 0x%08x\n", DeCygwinPathIfNeeded (ImageContext->PdbPointer, Temp, sizeof (Temp)), (UINTN)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders)));
+#endif
 #elif __GNUC__
   // This may not work correctly if you generate PE/COFF directlyas then the Offset would not be required
   DEBUG ((EFI_D_ERROR, "add-symbol-file %a 0x%08x\n", DeCygwinPathIfNeeded (ImageContext->PdbPointer, Temp, sizeof (Temp)), (UINTN)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders)));

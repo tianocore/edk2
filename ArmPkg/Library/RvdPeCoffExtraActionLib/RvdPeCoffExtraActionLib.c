@@ -2,6 +2,8 @@
 
 Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+Portions copyright (c) 2011 - 2012, ARM Ltd. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -117,7 +119,11 @@ PeCoffLoaderRelocateImageExtraAction (
 {
   CHAR8 Buffer[256];
   
+#if (__ARMCC_VERSION < 500000)
   AsciiSPrint (Buffer, sizeof(Buffer), "load /a /ni /np \"%a\" &0x%08x\n", ImageContext->PdbPointer, (UINTN)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders));
+#else
+  AsciiSPrint (Buffer, sizeof(Buffer), "add-symbol-file %a 0x%08x\n", ImageContext->PdbPointer, (UINTN)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders));
+#endif
   DeCygwinPathIfNeeded (&Buffer[16]);
  
   WriteStringToFile (Buffer, AsciiStrSize (Buffer));
