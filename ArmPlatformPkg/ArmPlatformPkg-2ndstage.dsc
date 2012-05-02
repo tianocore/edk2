@@ -79,9 +79,6 @@
   CpuExceptionHandlerLib|MdeModulePkg/Library/CpuExceptionHandlerLibNull/CpuExceptionHandlerLibNull.inf
   ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
   DmaLib|ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
-
-  # ARM PL390 General Interrupt Driver in Secure and Non-secure
-  ArmGicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicSecLib.inf
   ArmGicLib|ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
 
   SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
@@ -114,8 +111,6 @@
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
 
 [LibraryClasses.common.SEC]
-  ArmGicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
-
   ArmPlatformGlobalVariableLib|ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/PrePi/PrePiArmPlatformGlobalVariableLib.inf
 
   ArmPlatformSecExtraActionLib|ArmPlatformPkg/Library/DebugSecExtraActionLib/DebugSecExtraActionLib.inf  

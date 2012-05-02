@@ -79,9 +79,6 @@
   CpuExceptionHandlerLib|MdeModulePkg/Library/CpuExceptionHandlerLibNull/CpuExceptionHandlerLibNull.inf
   ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
   DmaLib|ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
-
-  # ARM PL390 General Interrupt Driver in Secure and Non-secure
-  ArmGicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicSecLib.inf
   ArmGicLib|ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
 
   SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
@@ -336,15 +333,17 @@
   #
   # SEC
   #
-  ArmPlatformPkg/Sec/Sec.inf
+  ArmPlatformPkg/Sec/Sec.inf {
+    <LibraryClasses>
+      # Use the implementation which set the Secure bits
+      ArmGicLib|ArmPkg/Drivers/PL390Gic/PL390GicSecLib.inf
+  }
   
   #
   # PEI Phase modules
   #
   ArmPlatformPkg/PrePeiCore/PrePeiCoreUniCore.inf {
     <LibraryClasses>
-      ArmGicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
-
       ArmPlatformGlobalVariableLib|ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/Pei/PeiArmPlatformGlobalVariableLib.inf
   }
   MdeModulePkg/Core/Pei/PeiMain.inf

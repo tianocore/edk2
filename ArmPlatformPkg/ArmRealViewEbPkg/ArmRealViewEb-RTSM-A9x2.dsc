@@ -34,10 +34,6 @@
   ArmCpuLib|ArmPkg/Drivers/ArmCpuLib/ArmCortexA9Lib/ArmCortexA9Lib.inf
   ArmPlatformLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/ArmRealViewEbLibRTSM/ArmRealViewEbLib.inf
   
-  # ARM PL390 General Interrupt Driver in Secure and Non-secure
-  ArmGicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicSecLib.inf
-  ArmGicLib|ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
-
 [LibraryClasses.common.SEC]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
   ArmPlatformSecLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/ArmRealViewEbSecLibRTSM/ArmRealViewEbSecLib.inf
@@ -144,7 +140,11 @@
   #
   # SEC
   #
-  ArmPlatformPkg/Sec/Sec.inf
+  ArmPlatformPkg/Sec/Sec.inf {
+    <LibraryClasses>
+      # Use the implementation which set the Secure bits
+      ArmGicLib|ArmPkg/Drivers/PL390Gic/PL390GicSecLib.inf
+  }
   
   #
   # PEI Phase modules
@@ -152,16 +152,12 @@
 !ifdef $(EDK2_SKIP_PEICORE)
   ArmPlatformPkg/PrePi/PeiMPCore.inf {
     <LibraryClasses>
-      ArmGicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
       ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
       ArmPlatformLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/ArmRealViewEbLibRTSM/ArmRealViewEbLib.inf
       ArmPlatformGlobalVariableLib|ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/PrePi/PrePiArmPlatformGlobalVariableLib.inf
   }
 !else
-  ArmPlatformPkg/PrePeiCore/PrePeiCoreMPCore.inf {
-    <LibraryClasses>
-      ArmGicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
-  }
+  ArmPlatformPkg/PrePeiCore/PrePeiCoreMPCore.inf
   MdeModulePkg/Core/Pei/PeiMain.inf
   MdeModulePkg/Universal/PCD/Pei/Pcd.inf  {
     <LibraryClasses>

@@ -40,10 +40,6 @@
 
   #DebugAgentTimerLib|ArmPlatformPkg/ArmVExpressPkg/Library/DebugAgentTimerLib/DebugAgentTimerLib.inf
 
-  # ARM PL390 General Interrupt Driver in Secure and Non-secure
-  ArmGicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicSecLib.inf
-  ArmGicLib|ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
-
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf 
 
 [LibraryClasses.common.SEC]
@@ -180,7 +176,11 @@
   #
   # SEC
   #
-  ArmPlatformPkg/Sec/Sec.inf
+  ArmPlatformPkg/Sec/Sec.inf {
+    <LibraryClasses>
+      # Use the implementation which set the Secure bits
+      ArmGicLib|ArmPkg/Drivers/PL390Gic/PL390GicSecLib.inf
+  }
   
   #
   # PEI Phase modules

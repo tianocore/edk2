@@ -59,10 +59,6 @@
 
   # Uncomment to turn on GDB stub in SEC. 
   #DebugAgentLib|EmbeddedPkg/Library/GdbDebugAgent/GdbDebugAgent.inf
-  
-  # ARM PL390 General Interrupt Driver in Secure and Non-secure
-  ArmGicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicSecLib.inf
-  ArmGicLib|ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
 
 [BuildOptions]
   RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A9 -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include -I$(WORKSPACE)/ArmPlatformPkg/ArmVExpressPkg/Include/Platform/CTA9x4
@@ -196,7 +192,11 @@
   #
   # SEC
   #
-  ArmPlatformPkg/Sec/Sec.inf
+  ArmPlatformPkg/Sec/Sec.inf {
+    <LibraryClasses>
+      # Use the implementation which set the Secure bits
+      ArmGicLib|ArmPkg/Drivers/PL390Gic/PL390GicSecLib.inf
+  }
   
   #
   # PEI Phase modules
@@ -204,7 +204,6 @@
 !ifdef $(EDK2_SKIP_PEICORE)
   ArmPlatformPkg/PrePi/PeiMPCore.inf {
     <LibraryClasses>
-      ArmGicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
       ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
       ArmPlatformLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressLibCTA9x4/ArmVExpressLib.inf
       ArmPlatformGlobalVariableLib|ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/PrePi/PrePiArmPlatformGlobalVariableLib.inf
@@ -212,7 +211,6 @@
 !else
   ArmPlatformPkg/PrePeiCore/PrePeiCoreMPCore.inf {
     <LibraryClasses>
-      ArmGicSecLib|ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
       ArmPlatformGlobalVariableLib|ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/Pei/PeiArmPlatformGlobalVariableLib.inf
   }
   MdeModulePkg/Core/Pei/PeiMain.inf
