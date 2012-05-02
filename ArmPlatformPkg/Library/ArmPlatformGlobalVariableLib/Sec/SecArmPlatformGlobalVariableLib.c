@@ -65,3 +65,17 @@ ArmPlatformSetGlobalVariable (
   }
 }
 
+VOID*
+ArmPlatformGetGlobalVariableAddress (
+  IN  UINTN     VariableOffset
+  )
+{
+  UINTN  GlobalVariableBase;
+
+  // Ensure the Global Variable Size have been initialized
+  ASSERT (VariableOffset < PcdGet32 (PcdSecGlobalVariableSize));
+
+  GlobalVariableBase = PcdGet32 (PcdCPUCoresSecStackBase) + PcdGet32 (PcdCPUCoreSecPrimaryStackSize) - PcdGet32 (PcdSecGlobalVariableSize);
+
+  return (VOID*)(GlobalVariableBase + VariableOffset);
+}

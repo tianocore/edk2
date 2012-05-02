@@ -43,8 +43,6 @@ ArmPlatformGetGlobalVariable (
   } else {
     CopyMem (Variable, (VOID*)(GlobalVariableBase + VariableOffset), VariableSize);
   }
-
-  //DEBUG((EFI_D_ERROR,"++ GET Offset[%d] = 0x%x\n",VariableOffset,*(UINTN*)Variable));
 }
 
 VOID
@@ -68,7 +66,19 @@ ArmPlatformSetGlobalVariable (
   } else {
     CopyMem ((VOID*)(GlobalVariableBase + VariableOffset), Variable, VariableSize);
   }
-
-  //DEBUG((EFI_D_ERROR,"++ SET Offset[%d] = 0x%x\n",VariableOffset,*(UINTN*)Variable));
 }
 
+VOID*
+ArmPlatformGetGlobalVariableAddress (
+  IN  UINTN     VariableOffset
+  )
+{
+  UINTN  GlobalVariableBase;
+
+  // Ensure the Global Variable Size have been initialized
+  ASSERT (VariableOffset < PcdGet32 (PcdPeiGlobalVariableSize));
+
+  GlobalVariableBase = PcdGet32 (PcdCPUCoresStackBase) + PcdGet32 (PcdCPUCorePrimaryStackSize) - PcdGet32 (PcdPeiGlobalVariableSize);
+
+  return (VOID*)(GlobalVariableBase + VariableOffset);
+}
