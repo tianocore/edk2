@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2011, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 #  
 #  This program and the accompanying materials                          
 #  are licensed and made available under the terms and conditions of the BSD License         
@@ -130,7 +130,6 @@
   #
   gArmTokenSpaceGuid.PcdGicDistributorBase|0x10041000
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x10040000
-  gArmTokenSpaceGuid.PcdGicNumInterrupts|96
 
   #
   # ARM L2x0 PCDs

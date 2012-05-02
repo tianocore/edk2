@@ -3,6 +3,7 @@
 Copyright (c) 2009, Hewlett-Packard Company. All rights reserved.<BR>
 Portions copyright (c) 2010, Apple Inc. All rights reserved.<BR>
 Portions copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR> 
+
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -26,6 +27,7 @@ Abstract:
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Library/PcdLib.h>
@@ -34,18 +36,6 @@ Abstract:
 
 #include <Protocol/Cpu.h>
 #include <Protocol/HardwareInterrupt.h>
-
-// number of 32-bit registers needed to represent those interrupts as a bit
-// (used for enable set, enable clear, pending set, pending clear, and active regs)
-#define ARM_GIC_NUM_REG_PER_INT_BITS   (PcdGet32(PcdGicNumInterrupts) / 32)
-
-// number of 32-bit registers needed to represent those interrupts as two bits
-// (used for configuration reg)
-#define ARM_GIC_NUM_REG_PER_INT_CFG    (PcdGet32(PcdGicNumInterrupts) / 16)
-
-// number of 32-bit registers needed to represent interrupts as 8-bit priority field
-// (used for priority regs)
-#define ARM_GIC_NUM_REG_PER_INT_BYTES  (PcdGet32(PcdGicNumInterrupts) / 4)
 
 #define ARM_GIC_DEFAULT_PRIORITY  0x80
 
@@ -56,7 +46,10 @@ extern EFI_HARDWARE_INTERRUPT_PROTOCOL gHardwareInterruptProtocol;
 //
 EFI_EVENT EfiExitBootServicesEvent      = (EFI_EVENT)NULL;
 
-HARDWARE_INTERRUPT_HANDLER  gRegisteredInterruptHandlers[FixedPcdGet32(PcdGicNumInterrupts)];
+// Maximum Number of Interrupts
+UINTN mGicNumInterrupts                 = 0;
+
+HARDWARE_INTERRUPT_HANDLER  *gRegisteredInterruptHandlers = NULL;
 
 /**
   Register Handler for the specified interrupt source.
@@ -77,7 +70,7 @@ RegisterInterruptSource (
   IN HARDWARE_INTERRUPT_HANDLER         Handler
   )
 {
-  if (Source > PcdGet32(PcdGicNumInterrupts)) {
+  if (Source > mGicNumInterrupts) {
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
   }
@@ -120,7 +113,7 @@ EnableInterruptSource (
   UINT32    RegOffset;
   UINTN     RegShift;
   
-  if (Source > PcdGet32(PcdGicNumInterrupts)) {
+  if (Source > mGicNumInterrupts) {
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
   }
@@ -155,7 +148,7 @@ DisableInterruptSource (
   UINT32    RegOffset;
   UINTN     RegShift;
   
-  if (Source > PcdGet32(PcdGicNumInterrupts)) {
+  if (Source > mGicNumInterrupts) {
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
   }
@@ -192,7 +185,7 @@ GetInterruptSourceState (
   UINT32    RegOffset;
   UINTN     RegShift;
   
-  if (Source > PcdGet32(PcdGicNumInterrupts)) {
+  if (Source > mGicNumInterrupts) {
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
   }
@@ -228,7 +221,7 @@ EndOfInterrupt (
   IN HARDWARE_INTERRUPT_SOURCE          Source
   )
 {
-  if (Source > PcdGet32(PcdGicNumInterrupts)) {
+  if (Source > mGicNumInterrupts) {
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
   }
@@ -261,7 +254,7 @@ IrqInterruptHandler (
   GicInterrupt = MmioRead32 (PcdGet32(PcdGicInterruptInterfaceBase) + ARM_GIC_ICCIAR);
 
   // Special Interrupts (ID1020-ID1023) have an Interrupt ID greater than the number of interrupt (ie: Spurious interrupt).
-  if (GicInterrupt >= PcdGet32(PcdGicNumInterrupts)) {
+  if (GicInterrupt >= mGicNumInterrupts) {
     // The special interrupt do not need to be acknowledge
     return;
   }
@@ -312,11 +305,11 @@ ExitBootServicesEvent (
   UINTN    Index;
   
   // Acknowledge all pending interrupts
-  for (Index = 0; Index < PcdGet32(PcdGicNumInterrupts); Index++) {
+  for (Index = 0; Index < mGicNumInterrupts; Index++) {
     DisableInterruptSource (&gHardwareInterruptProtocol, Index);
   }
 
-  for (Index = 0; Index < PcdGet32(PcdGicNumInterrupts); Index++) {
+  for (Index = 0; Index < mGicNumInterrupts; Index++) {
     EndOfInterrupt (&gHardwareInterruptProtocol, Index);
   }
 
@@ -354,7 +347,9 @@ InterruptDxeInitialize (
   // Make sure the Interrupt Controller Protocol is not already installed in the system.
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gHardwareInterruptProtocolGuid);
 
-  for (Index = 0; Index < PcdGet32(PcdGicNumInterrupts); Index++) {
+  mGicNumInterrupts = ArmGicGetMaxNumInterrupts (PcdGet32(PcdGicDistributorBase));
+
+  for (Index = 0; Index < mGicNumInterrupts; Index++) {
     DisableInterruptSource (&gHardwareInterruptProtocol, Index);
     
     // Set Priority 
@@ -368,7 +363,7 @@ InterruptDxeInitialize (
   }
 
   // Configure interrupts for cpu 0
-  for (Index = 0; Index < ARM_GIC_NUM_REG_PER_INT_BYTES; Index++) {
+  for (Index = 0; Index < (mGicNumInterrupts / 4); Index++) {
     MmioWrite32 (PcdGet32(PcdGicDistributorBase) + ARM_GIC_ICDIPTR + (Index*4), 0x01010101);
   }
 
@@ -384,7 +379,8 @@ InterruptDxeInitialize (
   // Enable gic distributor
   MmioWrite32 (PcdGet32(PcdGicDistributorBase) + ARM_GIC_ICDDCR, 0x1);
   
-  ZeroMem (&gRegisteredInterruptHandlers, sizeof (gRegisteredInterruptHandlers));
+  // Initialize the array for the Interrupt Handlers
+  gRegisteredInterruptHandlers = (HARDWARE_INTERRUPT_HANDLER*)AllocateZeroPool (sizeof(HARDWARE_INTERRUPT_HANDLER) * mGicNumInterrupts);
   
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &gHardwareInterruptHandle,

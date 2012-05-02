@@ -34,7 +34,6 @@
   PcdLib
 
 [FixedPcd.common]
-  gArmTokenSpaceGuid.PcdGicNumInterrupts
   gArmTokenSpaceGuid.PcdGicSgiIntId
 
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask

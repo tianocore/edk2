@@ -102,6 +102,12 @@ ArmGicEnableDistributor (
   IN  INTN          GicDistributorBase
   );
 
+UINTN
+EFIAPI
+ArmGicGetMaxNumInterrupts (
+  IN  INTN          GicDistributorBase
+  );
+
 VOID
 EFIAPI
 ArmGicSendSgiTo (

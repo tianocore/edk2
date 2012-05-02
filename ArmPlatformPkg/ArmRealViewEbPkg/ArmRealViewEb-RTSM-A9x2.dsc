@@ -127,7 +127,6 @@
   #
   gArmTokenSpaceGuid.PcdGicDistributorBase|0x1F001000
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x1F000100
-  gArmTokenSpaceGuid.PcdGicNumInterrupts|96
 
   #
   # ARM L2x0 PCDs

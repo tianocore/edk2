@@ -52,7 +52,7 @@ ArmGicSetupNonSecure (
   // Only the primary core should set the Non Secure bit to the SPIs (Shared Peripheral Interrupt).
   if (IS_PRIMARY_CORE(MpId)) {
     // Ensure all GIC interrupts are Non-Secure
-    for (Index = 0; Index < (PcdGet32(PcdGicNumInterrupts) / 32); Index++) {
+    for (Index = 0; Index < (ArmGicGetMaxNumInterrupts (GicDistributorBase) / 32); Index++) {
       MmioWrite32 (GicDistributorBase + ARM_GIC_ICDISR + (Index * 4), 0xffffffff);
     }
   } else {
@@ -80,7 +80,7 @@ ArmGicSetSecureInterrupts (
   UINT32 InterruptStatus;
 
   // We must not have more interrupts defined by the mask than the number of available interrupts
-  ASSERT(GicSecureInterruptMaskSize <= (PcdGet32(PcdGicNumInterrupts) / 32));
+  ASSERT(GicSecureInterruptMaskSize <= (ArmGicGetMaxNumInterrupts (GicDistributorBase) / 32));
 
   // Set all the interrupts defined by the mask as Secure
   for (Index = 0; Index < GicSecureInterruptMaskSize; Index++) {

@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -16,6 +16,15 @@
 #include <Library/IoLib.h>
 #include <Library/ArmGicLib.h>
 #include <Library/PcdLib.h>
+
+UINTN
+EFIAPI
+ArmGicGetMaxNumInterrupts (
+  IN  INTN          GicDistributorBase
+  )
+{
+  return 32 * ((MmioRead32 (GicDistributorBase + ARM_GIC_ICDICTR) & 0x1F) + 1);
+}
 
 VOID
 EFIAPI
