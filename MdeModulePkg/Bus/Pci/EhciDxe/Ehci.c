@@ -10,7 +10,7 @@
   This way avoids the control transfer on a shared port between EHCI and companion host
   controller when UHCI gets attached earlier than EHCI and a USB 2.0 device inserts.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1524,7 +1524,7 @@ EhcGetUsbDebugPortInfo (
   }
 
   Ehc->DebugPortOffset = DebugPort & 0x1FFF;
-  Ehc->DebugPortBarNum = (DebugPort >> 13) - 1;
+  Ehc->DebugPortBarNum = (UINT8)((DebugPort >> 13) - 1);
   Ehc->DebugPortNum    = (UINT8)((Ehc->HcStructParams & 0x00F00000) >> 20);
 
   return EFI_SUCCESS;
