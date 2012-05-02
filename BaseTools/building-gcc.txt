@@ -1,0 +1,15 @@
+To use GCC with the BaseTools project for edk2 based development purposes,
+you will need to build a GCC based cross-compiler (in addition to binutils).
+
+Instructions for building GCC for this purpose can be found under the
+BaseTools source tree.  (In addition to the instructions, you will also
+find scripts to help automate the build process.)
+
+If you do not have a tianocore.org account, you can make use of the 'guest'
+account with an empty password.
+
+In a web browser, you can 'browse' the relavent source at this location:
+ https://buildtools.tianocore.org/source/browse/buildtools/trunk/BaseTools/gcc
+
+Or, with subversion, you can download the relavent source with this command:
+ svn co https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/gcc

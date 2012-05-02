@@ -1,0 +1,2887 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Filename: DistributionPackage.xsd
+
+Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.
+
+This program and the accompanying materials are licensed and made available 
+under the terms and conditions of the BSD License which may be found at 
+    http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+    targetNamespace="http://www.uefi.org/2011/1.1" xmlns="http://www.uefi.org/2011/1.1">
+    <xs:element name="DistributionPackage">
+        <xs:annotation>
+            <xs:documentation xml:lang="en-us"> This schema defines the UEFI/PI Distribution Package
+                description (PKG) file. It describes the content of:</xs:documentation>
+            <xs:documentation xml:lang="en-us"> 1) Package descriptions with definitions and
+                headers.</xs:documentation>
+            <xs:documentation xml:lang="en-us"> 2) Modules in either source or binary format. (Note
+                that Binary format is for FFS leaf section file types only, complete FFS files
+                cannot be distributed using this distribution format.) </xs:documentation>
+            <xs:documentation xml:lang="en-us"> 3) The distribution of custom tools used to modify
+                the binary images to create UEFI/PI compliant images. </xs:documentation>
+            <xs:documentation xml:lang="en-us"> 4) Finally, it can be used to distribute other
+                miscellaneous content that is not specific to UEFI/PI images. </xs:documentation>
+            <xs:documentation xml:lang="en-us"> The Package Surface Area describes the content of
+                packages, while the Module Surface Area provides information relevant to source
+                and/or binary distributions. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="DistributionHeader" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> This header contains (legal) information
+                            usually required for distributing both binary and/or source code.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="PackageSurfaceArea" minOccurs="0" maxOccurs="unbounded">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> The list of packages in this
+                            distribution. </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> Packages are groups of files and/or
+                            modules that are similar in nature.</xs:documentation>
+                        <xs:documentation xml:lang="en-us"> Packages are uniquely identified by a
+                            package GUID and a package version. </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> A package can declare public mappings of
+                            C names to GUID values. </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> A package can provide header files for
+                            library classes and/or other industry standard definitions. </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> A package can also declare public
+                            mappings of platform configuration database (PCD) &quot;knobs&quot; to
+                            control features and operation of modules within a platform. </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> Finally, a package lists the library
+                            instances and/or modules that are provided in a distribution package.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="ModuleSurfaceArea" minOccurs="0" maxOccurs="unbounded">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> The listing of UEFI/PI compliant modules
+                            in this distribution that are NOT part of a Package. Every module that
+                            is provided as part of a package needs to be described in a
+                            PackageSurfaceArea.Modules section. </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> The ModuleSurfaceArea section describes
+                            how each module in a distribution is coded, or, in the case of a binary
+                            module distribution, how it was built. </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> UEFI/PI compliant libraries and modules
+                            are uniquely identified by the Module's GUID and version number. </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> This section will typically be used for
+                            modules that don't require any additional files that would be included
+                            in a package. For example, the Enhanced FAT driver binary does not need
+                            to have a package description, as no additional files are provided.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="Tools" minOccurs="0" maxOccurs="unbounded">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> This section is for distributing vendor
+                            specific executable tools, tool source code and/or configuration files.
+                            These tools are primarily for manipulating code and/or binary images. </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> Tools in this section
+                            can:</xs:documentation>
+                        <xs:documentation xml:lang="en-us"> 1) Parse build meta-data files to create
+                            source code files and build scripts. </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> 2) Modify image files to conform to
+                            UEFI/PI specifications. </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> 3) Generate binary files from certain
+                            types of text/unicode files. </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> 4) Generate PCI Option Roms or Firmware
+                            Device images. </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> 5) Implement external
+                            encoding/decoding/signature/GUIDed tools. </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> 6) Distribution Package
+                            create/install/remove tools. </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="MiscellaneousFiles" minOccurs="0" maxOccurs="unbounded">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> The list of miscellaneous files in this
+                            distribution. Any files that are not listed in either the Package,
+                            Module or Tools sections can be listed here. This section can be used to
+                            distribute specifications for packages and modules that are not
+                            &quot;industry standards&quot; such as a specification for a chipset or
+                            a video device. </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="UserExtensions" minOccurs="0" maxOccurs="unbounded">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> The UserExtensions section is used to
+                            disseminate processing instructions that may be custom to the content
+                            provided by the distribution. This section contains information that is
+                            common to all aspects of this disribution. </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+
+        </xs:complexType>
+    </xs:element>
+    <!-- End of the DistributionPackage Description  -->
+
+    <xs:element name="DistributionHeader">
+        <xs:annotation>
+            <xs:documentation xml:lang="en-us"> This section defines the content of the UEIF/PI
+                compliant Distribution Package Header. This is the only required element of a
+                UEFI/PI compliant distribution package. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="1" maxOccurs="1" name="Name">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> This is the User Interface Name for this
+                            Distribution Package. </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> Each Distribution Package is uniquely
+                            identified by it's GUID and Version number. </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:simpleContent>
+                            <xs:extension base="xs:normalizedString">
+                                <xs:attribute name="BaseName" type="xs:NMTOKEN" use="optional">
+                                    <xs:annotation>
+                                        <xs:documentation xml:lang="en-us"> The reference name of
+                                            the Distribution Package file. This single word name can
+                                            be used by tools as a keyword or for directory and/or
+                                            file creation. </xs:documentation>
+                                        <xs:documentation xml:lang="en-us"> White space and special
+                                            characters (dash and underscore characters may be used)
+                                            are not permitted in this name. </xs:documentation>
+                                    </xs:annotation>
+                                </xs:attribute>
+                            </xs:extension>
+                        </xs:simpleContent>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element minOccurs="1" maxOccurs="1" name="GUID">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> This 128-bit GUID and the Version
+                            attribute uniquely identify this Distribution Package. </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> Backward compatible releases of a
+                            distribution package need only change the version number, while
+                            non-backward compatible changes require the GUID to change (resetting
+                            the version number to 1.0 is optional.) </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:simpleContent>
+                            <xs:extension base="RegistryFormatGuid">
+                                <xs:attribute name="Version" type="xs:decimal" use="required">
+                                    <xs:annotation>
+                                        <xs:documentation xml:lang="en-us"> This value, along with
+                                            the GUID, is used to uniquely identify this object. The
+                                            higher the number, the more recent the content.
+                                        </xs:documentation>
+                                    </xs:annotation>
+                                </xs:attribute>
+                            </xs:extension>
+                        </xs:simpleContent>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element minOccurs="1" maxOccurs="1" name="Vendor" type="xs:normalizedString">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> A string identifying who created this
+                            distribution package. </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element minOccurs="1" maxOccurs="1" name="Date" type="xs:dateTime">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> The date and time this distribution was
+                            created. The format is: YYYY-MM-DDThh:mm:ss, for example:
+                            2001-01-31T13:30:00 (note the T character separator between the calendar
+                            date and the time. </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element minOccurs="1" maxOccurs="1" name="Copyright" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> The copyright for this file that is
+                            generated by the creator of the distribution. If a derivative work is
+                            generated from an existing distribution, then the existing copyright
+                            must be maintained, and additional copyrights may be appended to the end
+                            of this element. It may also be the primary copyright for all code
+                            provided in the Distribution Package. </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element minOccurs="1" maxOccurs="1" name="License" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> A license that describes any
+                            restrictions on the use of this distribution. If a derivative work is
+                            allowed by the original license and a derivative work is generated from
+                            an existing distribution, then the existing license must be maintained,
+                            and additional licenses may be appended to the end of this element. It
+                            may also be the primary license for all code provided in the
+                            distribution file. Alternatively, this may point to a filename that
+                            contains the License. The file (included in the content zip file) will
+                            be stored in the same location as the distribution package's .pkg file.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element minOccurs="1" maxOccurs="1" name="Abstract" type="xs:normalizedString">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> A one line description of the
+                            Distribution Package. </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element minOccurs="0" maxOccurs="1" name="Description" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> A complete description of the
+                            Distribution Package. This description may include the release name of
+                            the file, the version of the file, and a complete description of the
+                            file contents and/or features including a description of the updates
+                            since the previous file release. </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element minOccurs="0" maxOccurs="1" name="Signature" type="Md5Sum">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> The packaging utilities will use this
+                            MD5 sum value of the included ZIP file containing files and/or code. If
+                            this element is not present, then installation tools should assume that
+                            the content is correct, or that other methods may be needed to verify
+                            content. </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element minOccurs="1" maxOccurs="1" name="XmlSpecification" type="xs:decimal"
+                    default="1.1">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> This version of this XML Schema is 1.1 </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> Changes to 1.1 from 1.0 </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> #1 Updated to present date and new
+                            version which is important to reflect the present state of the
+                            matter</xs:documentation>
+                        <xs:documentation xml:lang="en-us"> #2 Added definition/enumeration of
+                            UNDEFIND type 2 is important since there is a large body of legacy code
+                            for which the GUID’s and other code/data objects were not decorated with
+                            their usage. This document will allow for importing today’s source
+                            artifacts and producing decorations using the ‘Undefined’ versus having
+                            an error</xs:documentation>
+                        <xs:documentation xml:lang="en-us">#3 Allow for inclusion of ARM and future
+                            architecture types</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="ReadOnly" type="xs:boolean" default="false" use="optional">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> If set to true, all content within this
+                        Distribution Package should NOT be modified. The default permits
+                        modification of all content. </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="RePackage" type="xs:boolean" default="false" use="optional">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> If set to true, then the content can be
+                        repackaged into another distribution package. The default prohibits
+                        repackaging the Distribution content. </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <!-- End of the DistributionHeader element. -->
+
+    <xs:element name="PackageSurfaceArea">
+        <xs:annotation>
+            <xs:documentation xml:lang="en-us"> A package is a collection of related objects -
+                Includes, Libraries and Modules. </xs:documentation>
+            <xs:documentation xml:lang="en-us"> Each package is uniquely identified by it's GUID and
+                Version number. Backward compatible releases of a package need only change the
+                version number, while non-backward compatible changes require the GUID to change
+                (resetting the version number to 1.0 is optional.) </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+
+                <xs:element minOccurs="1" maxOccurs="1" name="Header">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="1" name="Name">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> This is the User Interface
+                                        Name for this package. </xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="xs:normalizedString">
+                                            <xs:attribute name="BaseName" type="xs:NMTOKEN"
+                                                use="required">
+                                                <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> This is a
+                                                  single word BaseName of the package. This BaseName
+                                                  can be used by tools as a keyword and for
+                                                  directory/file creation. </xs:documentation>
+                                                </xs:annotation>
+                                            </xs:attribute>
+                                        </xs:extension>
+                                    </xs:simpleContent>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element minOccurs="1" maxOccurs="1" name="GUID">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> This GUID and the Version
+                                        attribute uniquely identify a given package.
+                                    </xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="RegistryFormatGuid">
+                                            <xs:attribute name="Version" type="xs:decimal"
+                                                use="required">
+                                                <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> This value,
+                                                  along with the GUID, is used to uniquely identify
+                                                  this object. </xs:documentation>
+                                                  <xs:documentation xml:lang="en-us"> Backward
+                                                  compatible changes must make sure this number is
+                                                  incremented from the most recent version.
+                                                  Non-backward compatible changes require a new
+                                                  GUID, and the version can be reset.
+                                                  </xs:documentation>
+                                                </xs:annotation>
+                                            </xs:attribute>
+                                        </xs:extension>
+                                    </xs:simpleContent>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element minOccurs="0" maxOccurs="1" name="Copyright"
+                                type="xs:string">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> If the package requires a
+                                        different copyright than the distribution package, this
+                                        element can list one or more copyright lines.
+                                    </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="0" maxOccurs="1" name="License" type="xs:string">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> If the package requires
+                                        licenses that are different from the distribution package
+                                        license, this element can contain one or more license text
+                                        paragraphs (or license filenames.) </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="0" maxOccurs="1" name="Abstract"
+                                type="xs:normalizedString">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> A one line description of
+                                        this package. </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="0" maxOccurs="1" name="Description"
+                                type="xs:string">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> A complete description of a
+                                        package. This description may include the release name of
+                                        the package, the version of the package, and a complete
+                                        description of the package contents and/or features
+                                        including a description of the updates since the previous
+                                        package’s release. </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="1" maxOccurs="1" name="PackagePath"
+                                type="xs:anyURI">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> This element is the location
+                                        (in the ZIP file) for the root directory of a package.
+                                    </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of PackageSurfaceArea Header element.  -->
+
+                <xs:element minOccurs="0" maxOccurs="1" name="ClonedFrom">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> The term cloned is used here to indicate
+                            that this package as been copied and modified to a completely different
+                            package. An example might be for a new generation of chipsets that have
+                            few or no elements in common with the original. </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="1" name="GUID">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> This GUID and the Version
+                                        attribute uniquely identify the Package that this Package
+                                        was copied from. </xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="RegistryFormatGuid">
+                                            <xs:attribute name="Version" type="xs:decimal"
+                                                use="required">
+                                                <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> This value,
+                                                  along with the GUID, is used to uniquely identify
+                                                  the package that this package was cloned from.
+                                                  </xs:documentation>
+                                                </xs:annotation>
+                                            </xs:attribute>
+                                        </xs:extension>
+                                    </xs:simpleContent>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of PackageSurfaceArea ClonedFrom element.  -->
+
+                <xs:element minOccurs="0" maxOccurs="1" name="LibraryClassDeclarations">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> Library Classes are public interfaces
+                            that can be used by modules. One or more library instances can implement
+                            a library class, however only one library instance can be linked to an
+                            individual module. This provides the platform integrator with the
+                            flexibility of choosing one library instance's implementation over a
+                            different library instance. </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="unbounded" name="LibraryClass">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element minOccurs="1" maxOccurs="1" name="HeaderFile"
+                                            type="xs:anyURI">
+                                            <xs:annotation>
+                                                <xs:documentation xml:lang="en-us"> The header file
+                                                  provides definitions and function prototypes for a
+                                                  library class. Modules can be coded against these
+                                                  functions, using the definitions in this header,
+                                                  without concerning themselves about the libraries'
+                                                  implementation details. This is a PackagePath
+                                                  relative path and filename for the include file.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element minOccurs="0" maxOccurs="1"
+                                            name="RecommendedInstance">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                  <xs:element minOccurs="1" maxOccurs="1"
+                                                  name="GUID">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> This GUID and
+                                                  the Version attribute uniquely identify the
+                                                  Recommended Library Instance. </xs:documentation>
+                                                  </xs:annotation>
+                                                  <xs:complexType>
+                                                  <xs:simpleContent>
+                                                  <xs:extension base="RegistryFormatGuid">
+                                                  <xs:attribute name="Version" type="xs:decimal"
+                                                  use="optional">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> This value,
+                                                  along with the GUID, is used to uniquely identify
+                                                  this object. If this value is not specified, then
+                                                  any version of the library instance is
+                                                  recommended. </xs:documentation>
+                                                  </xs:annotation>
+                                                  </xs:attribute>
+                                                  </xs:extension>
+                                                  </xs:simpleContent>
+                                                  </xs:complexType>
+                                                  </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <xs:element ref="HelpText" minOccurs="0"
+                                            maxOccurs="unbounded"/>
+                                    </xs:sequence>
+                                    <xs:attribute name="Keyword" type="xs:NCName" use="required">
+                                        <xs:annotation>
+                                            <xs:documentation xml:lang="en-us"> The single word name
+                                                of the Library Class that module developers will use
+                                                to identify a library class dependency.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:attribute>
+                                    <xs:attributeGroup ref="SupportedArchMod"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of PackageSurfaceArea LibraryClassDeclarations element.  -->
+
+                <xs:element minOccurs="0" maxOccurs="1" name="IndustryStandardIncludes">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> This section is used to list header
+                            files for industry standards not under the auspices of UEFI.org. For
+                            example, headers that contain definitions and data structures for the
+                            USB specifications. </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="unbounded"
+                                name="IndustryStandardHeader">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element minOccurs="1" maxOccurs="1" name="HeaderFile"
+                                            type="xs:anyURI">
+                                            <xs:annotation>
+                                                <xs:documentation xml:lang="en-us"> The package
+                                                  relative path and filename (in the content zip
+                                                  file) of the industry standard include file.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element ref="HelpText" minOccurs="0"
+                                            maxOccurs="unbounded"/>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of PackageSurfaceArea IndustryStdIncludes element.  -->
+
+                <xs:element minOccurs="0" maxOccurs="1" name="PackageIncludes">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> All top level header files that are
+                            included by a package that are not listed above. They cannot
+                            be:</xs:documentation>
+                        <xs:documentation xml:lang="en-us"> 1) Local to a module (module specific.) </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> 2) An industry standard header. </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> 3) A library class header.
+                        </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="unbounded" name="PackageHeader">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element minOccurs="1" maxOccurs="1" name="HeaderFile">
+                                            <xs:annotation>
+                                                <xs:documentation xml:lang="en-us"> This is the
+                                                  Package relative path and filename location within
+                                                  the content ZIP file. </xs:documentation>
+                                            </xs:annotation>
+                                            <xs:complexType>
+                                                <xs:simpleContent>
+                                                  <xs:extension base="xs:anyURI">
+                                                  <xs:attributeGroup ref="SupportedArchMod"/>
+                                                  </xs:extension>
+                                                </xs:simpleContent>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <xs:element ref="HelpText" minOccurs="0"
+                                            maxOccurs="unbounded"/>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of PackageSurfaceArea PackageIncluces element.  -->
+
+                <xs:element minOccurs="0" maxOccurs="1" name="Modules">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element ref="ModuleSurfaceArea" minOccurs="1" maxOccurs="unbounded">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> This section lists the
+                                        Module Surface Area for all modules provided with this
+                                        package. </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of PackageSurfaceArea Modules element.  -->
+
+                <xs:element minOccurs="0" maxOccurs="1" name="GuidDeclarations">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> This section defines the mapping of GUID
+                            C names to GUID values as a Registry Format GUID. </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> Modules that use these GUIDs must
+                            specify their dependency on this package. </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="unbounded" name="Entry">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> Individual GUID Declarations
+                                    </xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element minOccurs="1" maxOccurs="1" name="CName"
+                                            type="xs:NCName"/>
+                                        <xs:element minOccurs="1" maxOccurs="1" name="GuidValue"
+                                            type="RegistryFormatGuid"/>
+                                        <xs:element ref="HelpText" minOccurs="0"
+                                            maxOccurs="unbounded"/>
+                                    </xs:sequence>
+                                    <xs:attribute name="UiName" type="xs:normalizedString"
+                                        use="optional"/>
+                                    <xs:attribute name="GuidTypes" type="GuidListType"
+                                        use="optional"/>
+                                    <xs:attributeGroup ref="SupportedArchMod"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of PackageSurfaceArea GuidDeclarations element.  -->
+
+                <xs:element minOccurs="0" maxOccurs="1" name="ProtocolDeclarations">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> This section defines the mapping of
+                            Protocol C names to GUID values as a Registry Format GUID. </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> Modules that use these Protocols must
+                            specify their dependency on this package. </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="unbounded" name="Entry">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> Individual Protocol
+                                        Declarations </xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element minOccurs="1" maxOccurs="1" name="CName"
+                                            type="xs:NCName"/>
+                                        <xs:element minOccurs="1" maxOccurs="1" name="GuidValue"
+                                            type="RegistryFormatGuid"/>
+                                        <xs:element ref="HelpText" minOccurs="0"
+                                            maxOccurs="unbounded"/>
+                                    </xs:sequence>
+                                    <xs:attribute name="UiName" type="xs:normalizedString"
+                                        use="optional"/>
+                                    <xs:attributeGroup ref="SupportedArchMod"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of PackageSurfaceArea ProtocolDeclarations element.  -->
+
+                <xs:element minOccurs="0" maxOccurs="1" name="PpiDeclarations">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> This section defines the mapping of Ppi
+                            C names to GUID values as a Registry Format GUID. </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> Modules that use these Ppis must specify
+                            their dependency on this package. </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="unbounded" name="Entry">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> Individual PPI Declarations
+                                    </xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element minOccurs="1" maxOccurs="1" name="CName"
+                                            type="xs:NCName"/>
+                                        <xs:element minOccurs="1" maxOccurs="1" name="GuidValue"
+                                            type="RegistryFormatGuid"/>
+                                        <xs:element ref="HelpText" minOccurs="0"
+                                            maxOccurs="unbounded"/>
+                                    </xs:sequence>
+                                    <xs:attribute name="UiName" type="xs:normalizedString"
+                                        use="optional"/>
+                                    <xs:attributeGroup ref="SupportedArchMod"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of PackageSurfaceArea PpiDeclarations element.  -->
+
+                <xs:element minOccurs="0" maxOccurs="1" name="PcdDeclarations">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> This section is used to declare platform
+                            configuration knobs that are defined by this package. </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> Modules that use these PCD values must
+                            specify their dependency on this package. </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="unbounded" name="PcdEntry">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element minOccurs="1" maxOccurs="1"
+                                            name="TokenSpaceGuidCname" type="xs:NCName">
+                                            <xs:annotation>
+                                                <xs:documentation xml:lang="en-us"> Specifies the C
+                                                  name of the Token Space GUID of which this PCD
+                                                  Entry is a member. This C name should also be
+                                                  listed in the GUIDs section, (specified above,)
+                                                  where the C name is assigned to a GUID value.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element minOccurs="1" maxOccurs="1" name="Token">
+                                            <xs:annotation>
+                                                <xs:documentation xml:lang="en-us"> Specifies the
+                                                  32-bit token value for this PCD Entry. The Token
+                                                  number must be unique to the Token Space that
+                                                  declares the PCD. </xs:documentation>
+                                                <xs:documentation xml:lang="en-us"> The minLength of
+                                                  3 is required to handle the "0x" prefix to the hex
+                                                  number. </xs:documentation>
+                                            </xs:annotation>
+                                            <xs:simpleType>
+                                                <xs:restriction base="HexNumber">
+                                                  <xs:minLength value="3"/>
+                                                  <xs:maxLength value="10"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element minOccurs="1" maxOccurs="1" name="CName"
+                                            type="xs:NCName"/>
+                                        <xs:element minOccurs="1" maxOccurs="1" name="DatumType"
+                                            type="PcdDatumTypes">
+                                            <xs:annotation>
+                                                <xs:documentation xml:lang="en-us"> A string that
+                                                  contains the data type of this PCD Entry. PCD data
+                                                  types are restricted to the following set:UINT8,
+                                                  UINT16, UINT32, UINT64, VOID*, BOOLEAN.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element minOccurs="1" maxOccurs="1" name="ValidUsage"
+                                            type="PcdItemListType">
+                                            <xs:annotation>
+                                                <xs:documentation xml:lang="en-us"> A string that
+                                                  contains one or more PCD Item types separated by
+                                                  spaces. The PCD Item types are restricted to
+                                                  FeaturePcd, FixedPcd, PatchPcd, Pcd and/or PcdEx.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element minOccurs="1" maxOccurs="1" name="DefaultValue"
+                                            type="xs:normalizedString"/>
+                                        <xs:element minOccurs="0" maxOccurs="1" name="MaxDatumSize">
+                                            <xs:annotation>
+                                                <xs:documentation xml:lang="en-us"> This is a
+                                                  recommended maximum data size for VOID* data
+                                                  types, the actual value should be defined by the
+                                                  Platform Integrator. It is not required for the
+                                                  other data types. </xs:documentation>
+                                                <xs:documentation xml:lang="en-us"> The minLength of
+                                                  3 is required to handle the "0x" prefix to the hex
+                                                  number. </xs:documentation>
+
+                                            </xs:annotation>
+                                            <xs:simpleType>
+                                                <xs:restriction base="HexNumber">
+                                                  <xs:minLength value="3"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element ref="HelpText" minOccurs="0"
+                                            maxOccurs="unbounded"/>
+
+                                        <xs:element minOccurs="0" maxOccurs="unbounded"
+                                            name="PcdError">
+                                            <xs:annotation>
+                                                <xs:documentation xml:lang="en-us"> Valid Error
+                                                  messages that may be implemented in a module for
+                                                  the PCD Entry. Only One Error Number per PcdError,
+                                                  (multiple ErrorMessage entries are permitted) and
+                                                  multiple PcdError elements are permitted.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                  <xs:choice minOccurs="1" maxOccurs="1">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> One of the
+                                                  following types of comparisons, which must be able
+                                                  to evaluate to either true or false.
+                                                  </xs:documentation>
+                                                  </xs:annotation>
+                                                  <xs:element minOccurs="0" maxOccurs="1"
+                                                  name="ValidValueList">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The PCD Value
+                                                  must be space separated list of values. Values are
+                                                  restricted to the data type of this PCD.
+                                                  </xs:documentation>
+                                                  </xs:annotation>
+                                                  <xs:complexType>
+                                                  <xs:simpleContent>
+                                                  <xs:extension base="xs:normalizedString">
+                                                  <xs:attribute name="Lang" type="xs:language"
+                                                  use="optional"/>
+                                                  </xs:extension>
+                                                  </xs:simpleContent>
+                                                  </xs:complexType>
+                                                  </xs:element>
+                                                  <xs:element minOccurs="0" maxOccurs="1"
+                                                  name="ValidValueRange" type="xs:normalizedString">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The PCD must
+                                                  be within a specifed range of numeric values.
+                                                  Restricted to C style Relational, Equality and
+                                                  Logicial Operators and parenthesis are valid. Only
+                                                  the CName for this PCD is permitted in the
+                                                  ValidValueRange expression. All other values must
+                                                  be numeric.</xs:documentation>
+                                                  <xs:documentation xml:lang="en-us"> LValue (op
+                                                  RValue)+ </xs:documentation>
+                                                  </xs:annotation>
+                                                  </xs:element>
+                                                  <xs:element minOccurs="0" maxOccurs="1"
+                                                  name="Expression" type="xs:normalizedString">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> A in-fix
+                                                  logical expression using C style logical
+                                                  operators. </xs:documentation>
+                                                  </xs:annotation>
+                                                  </xs:element>
+                                                  </xs:choice>
+                                                  <xs:element minOccurs="1" maxOccurs="1"
+                                                  name="ErrorNumber">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> A hexadecimal
+                                                  value for the error message as defined by
+                                                  specifications. </xs:documentation>
+                                                  <xs:documentation xml:lang="en-us"> The minLength
+                                                  of 3 is required to handle the "0x" prefix to the
+                                                  hex number. </xs:documentation>
+
+                                                  </xs:annotation>
+                                                  <xs:simpleType>
+                                                  <xs:restriction base="HexNumber">
+                                                  <xs:minLength value="3"/>
+                                                  </xs:restriction>
+                                                  </xs:simpleType>
+                                                  </xs:element>
+                                                  <xs:element minOccurs="1" maxOccurs="unbounded"
+                                                  name="ErrorMessage">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> This string
+                                                  should be defined by specifications. There are
+                                                  pre-defined error number ranges in the UEFI/PI
+                                                  specificaiton. </xs:documentation>
+                                                  </xs:annotation>
+                                                  <xs:complexType>
+                                                  <xs:simpleContent>
+                                                  <xs:extension base="xs:string">
+                                                  <xs:attribute name="Lang" type="xs:language"
+                                                  default="en-us" use="optional"/>
+                                                  </xs:extension>
+                                                  </xs:simpleContent>
+                                                  </xs:complexType>
+                                                  </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                    <xs:attributeGroup ref="SupportedArchMod"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of PackageSurfaceArea PcdDeclarations element.  -->
+
+                <xs:element minOccurs="0" maxOccurs="1" name="PcdRelationshipChecks">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> This section is used to describe any PCD
+                            interdependencies or relationships. </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="unbounded" name="PcdCheck"
+                                type="xs:normalizedString">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> This entry must used
+                                        TokenSpaceGuidCName.PcdCname for every named PCD. Restricted
+                                        to Relational, Equality and Logical Operators (NOT, AND, OR,
+                                        GT, GE, EQ, LE, LT and XOR) and parenthesis are valid. Only
+                                        the TokenSpaceGuidCName.PcdCname us permitted to name PCDs
+                                        in the expression. All other values must be numeric. </xs:documentation>
+                                    <xs:documentation xml:lang="en-us"> LValue (op RValue)+
+                                    </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="MiscellaneousFiles">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> This section contains files that are not
+                            part of the code distributed with this package. </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="0" maxOccurs="1" name="Copyright"
+                                type="xs:string">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> Only required if different
+                                        from the Package Copyright. </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="0" maxOccurs="1" name="License" type="xs:string">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> Only required if different
+                                        from the Package License. </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="0" maxOccurs="1" name="Abstract" type="xs:string">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> A one line description of
+                                        this section's content. </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="0" maxOccurs="unbounded" name="Description"
+                                type="xs:string">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> A complete description of
+                                        the files in this section. </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="1" maxOccurs="unbounded" name="Filename">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> This is the PackagePath
+                                        relative path and filename location within the ZIP file.
+                                    </xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="xs:anyURI">
+                                            <xs:attribute name="Executable" type="xs:boolean"
+                                                default="false" use="optional">
+                                                <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> If true, used
+                                                  by installation tools to ensure that a file that
+                                                  must be executable has the correct properties to
+                                                  permit execution. </xs:documentation>
+                                                </xs:annotation>
+                                            </xs:attribute>
+                                        </xs:extension>
+                                    </xs:simpleContent>
+                                </xs:complexType>
+                            </xs:element>
+
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of PackageSurfaceArea Misc element.  -->
+
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="UserExtensions">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> This section is used for any processing
+                            instructions that may be custom to the content provided by this package
+                            that are common to this package. </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType mixed="true">
+                        <xs:sequence>
+                            <xs:any processContents="lax" minOccurs="0" maxOccurs="1"/>
+                        </xs:sequence>
+                        <xs:attribute name="UserId" type="xs:NCName" use="required">
+                            <xs:annotation>
+                                <xs:documentation xml:lang="en-us"> This is a single word identifier
+                                    for grouping similar content that does not fit into previously
+                                    defined sections or other sections of the Distribution.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="Identifier" type="xs:string" use="required">
+                            <xs:annotation>
+                                <xs:documentation xml:lang="en-us"> This can be used to
+                                    differentiate multiple sections with a grouping. </xs:documentation>
+                                <xs:documentation xml:lang="en-us"> For example, a PRE_PROCESS
+                                    Identifier might indicate specific steps and tools required
+                                    before processing module content, while a different
+                                    UserExtensions section with a POST_PROCESS Identifier might
+                                    describe steps that need to be executed after operations on the
+                                    modules in this package. </xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:anyAttribute processContents="lax"/>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of PackageSurfaceArea UserExtensions element. -->
+
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <!-- End of the PackageSurfaceArea element. -->
+
+    <xs:element name="ModuleSurfaceArea">
+        <xs:annotation>
+            <xs:documentation xml:lang="en-us"> Each module is uniquely identified by it's GUID and
+                Version number. Backward compatible releases of a module need only change the
+                version number, while non-backward compatible changes require the GUID to change
+                (resetting the version number to 1.0 is optional.) </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+
+                <xs:element minOccurs="1" maxOccurs="1" name="Header">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="1" name="Name">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> This is the User Interface
+                                        Name for this Module. </xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="xs:normalizedString">
+                                            <xs:attribute name="BaseName" type="xs:NMTOKEN"
+                                                use="required">
+                                                <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> This is a
+                                                  single word BaseName that will be used to create a
+                                                  module meta-data file. </xs:documentation>
+                                                  <xs:documentation xml:lang="en-us"> This name
+                                                  should also be used to create output file names
+                                                  and directories. </xs:documentation>
+                                                </xs:annotation>
+                                            </xs:attribute>
+                                        </xs:extension>
+                                    </xs:simpleContent>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element minOccurs="1" maxOccurs="1" name="GUID">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> This GUID and the Version
+                                        attribute uniquely identify a given Module.
+                                    </xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="RegistryFormatGuid">
+                                            <xs:attribute name="Version" type="xs:decimal"
+                                                use="required">
+                                                <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> This value,
+                                                  along with the GUID, is used to uniquely identify
+                                                  this object. </xs:documentation>
+                                                  <xs:documentation xml:lang="en-us"> Backward
+                                                  compatible changes must make sure this number is
+                                                  incremented from the most recent version.
+                                                  Non-backward compatible changes require a new
+                                                  GUID, and the version can be reset.
+                                                  </xs:documentation>
+                                                </xs:annotation>
+                                            </xs:attribute>
+                                        </xs:extension>
+                                    </xs:simpleContent>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element minOccurs="0" maxOccurs="1" name="Copyright"
+                                type="xs:string">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> This is only required if the
+                                        Copyright is different from either the Package or
+                                        Distribution copyright. Multiple copyright lines are
+                                        permitted within this section. </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="0" maxOccurs="1" name="License" type="xs:string">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> This is only required if the
+                                        license is different from either the Package or Distribution
+                                        license. Multiple licenses are permitted within this
+                                        section. </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="0" maxOccurs="1" name="Abstract"
+                                type="xs:normalizedString">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> A brief text description of
+                                        the module. </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="0" maxOccurs="1" name="Description"
+                                type="xs:string">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> A complete description of
+                                        the module contents and/or features including a description
+                                        of the updates since the previous module release.
+                                    </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of Module Surface Area Header Section -->
+
+                <xs:element minOccurs="0" maxOccurs="1" name="ModuleProperties">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> List general information about a module,
+                            including the Supported Architectures, this module's type,
+                            specifications the module is coded against, and other informational
+                            content. </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="1" name="ModuleType"
+                                type="ModuleTypes">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> One of the Enumerated module
+                                        types that limit the use of a module. </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="1" maxOccurs="1" name="Path" type="xs:anyURI">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> For stand-alone modules that
+                                        are NOT part of any package, this is the path to the root of
+                                        the module as listed in the ZIP file. For modules included
+                                        in a package, this is the location, relative to the root of
+                                        the package (PackagePath) this module belongs to.
+                                    </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="0" maxOccurs="1" name="PcdIsDriver">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> This element is only
+                                        required for the PEIM that produces the PCD PPI or the DXE
+                                        Driver that produces the PCD Protocol. </xs:documentation>
+                                </xs:annotation>
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:NCName">
+                                        <xs:enumeration value="PEI_PCD_DRIVER"/>
+                                        <xs:enumeration value="DXE_PCD_DRIVER"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+
+                            <xs:element minOccurs="0" maxOccurs="1" name="UefiSpecificationVersion"
+                                type="xs:decimal"/>
+
+                            <xs:element minOccurs="0" maxOccurs="1" name="PiSpecificationVersion"
+                                type="xs:decimal"/>
+
+                            <xs:element minOccurs="0" maxOccurs="unbounded" name="Specification">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> This is a list of other
+                                        specifications that this module is written against. These
+                                        entries can be used in #define statements (depending on the
+                                        build system implementation, they may be autogenerated.)
+                                    </xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="xs:NCName">
+                                            <xs:attribute name="Version" type="xs:decimal"
+                                                use="required"/>
+                                        </xs:extension>
+                                    </xs:simpleContent>
+                                </xs:complexType>
+                            </xs:element>
+
+                            <xs:element minOccurs="0" maxOccurs="unbounded" name="BootMode">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> Different firmware execution
+                                        paths may be taken based on a given state of the hardware,
+                                        firmware, or through feature settings. A BootMode may be
+                                        declared (PRODUCES) or discovered (CONSUMES) based on these
+                                        states and feature settings. If the usage is UNDEFINE, it
+                                        implies that a Boot Mode is used, but the package creator
+                                        does not know how it is used. The supported boot modes map
+                                        to the PI specification Boot Modes. The boot modes listed
+                                        with Recovery are to indicate that the BootMode is valid
+                                        during a recovery boot. </xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:sequence minOccurs="0">
+                                        <xs:element minOccurs="1" maxOccurs="1"
+                                            name="SupportedBootModes">
+                                            <xs:simpleType>
+                                                <xs:list>
+                                                  <xs:simpleType>
+                                                  <xs:restriction base="xs:NCName">
+                                                  <xs:enumeration value="FULL"/>
+                                                  <xs:enumeration value="MINIMAL"/>
+                                                  <xs:enumeration value="NO_CHANGE"/>
+                                                  <xs:enumeration value="DIAGNOSTICS"/>
+                                                  <xs:enumeration value="DEFAULT"/>
+                                                  <xs:enumeration value="S2_RESUME"/>
+                                                  <xs:enumeration value="S3_RESUME"/>
+                                                  <xs:enumeration value="S4_RESUME"/>
+                                                  <xs:enumeration value="S5_RESUME"/>
+                                                  <xs:enumeration value="FLASH_UPDATE"/>
+                                                  <xs:enumeration value="RECOVERY_FULL"/>
+                                                  <xs:enumeration value="RECOVERY_MINIMAL"/>
+                                                  <xs:enumeration value="RECOVERY_NO_CHANGE"/>
+                                                  <xs:enumeration value="RECOVERY_DIAGNOSTICS"/>
+                                                  <xs:enumeration value="RECOVERY_DEFAULT"/>
+                                                  <xs:enumeration value="RECOVERY_S2_RESUME"/>
+                                                  <xs:enumeration value="RECOVERY_S3_RESUME"/>
+                                                  <xs:enumeration value="RECOVERY_S4_RESUME"/>
+                                                  <xs:enumeration value="RECOVERY_S5_RESUME"/>
+                                                  <xs:enumeration value="RECOVERY_FLASH_UPDATE"/>
+                                                  <xs:enumeration value="UNDEFINED"/>
+                                                  </xs:restriction>
+                                                  </xs:simpleType>
+                                                </xs:list>
+                                            </xs:simpleType>
+                                        </xs:element>
+
+                                        <xs:element ref="HelpText" minOccurs="0"
+                                            maxOccurs="unbounded"/>
+                                    </xs:sequence>
+                                    <xs:attribute name="Usage" use="required">
+                                        <xs:simpleType>
+                                            <xs:restriction base="xs:NCName">
+                                                <xs:enumeration value="CONSUMES">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The module
+                                                  always supports the given boot modes.
+                                                  </xs:documentation>
+                                                  </xs:annotation>
+                                                </xs:enumeration>
+                                                <xs:enumeration value="SOMETIMES_CONSUMES">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The module may
+                                                  support a given mode on some execution paths.
+                                                  </xs:documentation>
+                                                  </xs:annotation>
+                                                </xs:enumeration>
+                                                <xs:enumeration value="PRODUCES">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The module
+                                                  will change the boot mode. </xs:documentation>
+                                                  </xs:annotation>
+                                                </xs:enumeration>
+                                                <xs:enumeration value="SOMETIME_PRODUCES">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The module
+                                                  will change the boot mode on some exection paths.
+                                                  </xs:documentation>
+                                                  </xs:annotation>
+                                                </xs:enumeration>
+                                                <xs:enumeration value="UNDEFINED">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The package
+                                                  creator does not know how the boot mode is used.
+                                                  </xs:documentation>
+                                                  </xs:annotation>
+                                                </xs:enumeration>
+                                            </xs:restriction>
+                                        </xs:simpleType>
+                                    </xs:attribute>
+                                    <xs:attribute name="SupArchList" type="ArchListType"
+                                        use="optional"/>
+                                    <xs:attribute name="FeatureFlag" type="xs:normalizedString"
+                                        use="optional"/>
+                                </xs:complexType>
+                            </xs:element>
+
+                            <xs:element minOccurs="0" maxOccurs="unbounded" name="Event"
+                                nillable="true">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> The functions that make up
+                                        the Event, Timer, and Task Priority Services are used during
+                                        preboot to create, close, signal, and wait for events; to
+                                        set timers; and to raise and restore task priority levels as
+                                        defined in the UEFI specification. GUIDed events should be
+                                        listed in the Guids section. </xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element ref="HelpText" minOccurs="0"
+                                            maxOccurs="unbounded"/>
+                                    </xs:sequence>
+                                    <xs:attribute name="Usage" use="required">
+                                        <xs:simpleType>
+                                            <xs:restriction base="xs:NCName">
+                                                <xs:enumeration value="CONSUMES">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The module
+                                                  will register a notification function and calls
+                                                  the function when it is signaled.
+                                                  </xs:documentation>
+                                                  </xs:annotation>
+                                                </xs:enumeration>
+                                                <xs:enumeration value="SOMETIMES_CONSUMES">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The module
+                                                  will register a notification function and calls
+                                                  the function when it is signaled on some execution
+                                                  paths. </xs:documentation>
+                                                  </xs:annotation>
+                                                </xs:enumeration>
+                                                <xs:enumeration value="PRODUCES">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The module
+                                                  will signal all events in an event group.
+                                                  </xs:documentation>
+                                                  </xs:annotation>
+                                                </xs:enumeration>
+                                                <xs:enumeration value="SOMETIMES_PRODUCES">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The module
+                                                  will signal all events in an event group under
+                                                  some execution paths. </xs:documentation>
+                                                  </xs:annotation>
+                                                </xs:enumeration>
+                                                <xs:enumeration value="UNDEFINED">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The package
+                                                  creator does not know how an event is used.
+                                                  </xs:documentation>
+                                                  </xs:annotation>
+                                                </xs:enumeration>
+                                            </xs:restriction>
+                                        </xs:simpleType>
+                                    </xs:attribute>
+                                    <xs:attribute name="EventType" use="required">
+                                        <xs:simpleType>
+                                            <xs:restriction base="xs:NCName">
+                                                <xs:enumeration value="EVENT_TYPE_PERIODIC_TIMER"/>
+                                                <xs:enumeration value="EVENT_TYPE_RELATIVE_TIMER"/>
+                                                <xs:enumeration value="UNDEFINED"/>
+                                            </xs:restriction>
+                                        </xs:simpleType>
+
+
+                                    </xs:attribute>
+                                    <xs:attribute name="SupArchList" type="ArchListType"
+                                        use="optional"/>
+                                    <xs:attribute name="FeatureFlag" type="xs:normalizedString"
+                                        use="optional"/>
+                                </xs:complexType>
+                            </xs:element>
+
+                            <xs:element minOccurs="0" maxOccurs="unbounded" name="HOB"
+                                nillable="false">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> This is a list of non-GUIDed
+                                        Hand Off Blocks (HOBs) produced or consumed by this module.
+                                    </xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element ref="HelpText" minOccurs="0"
+                                            maxOccurs="unbounded"/>
+                                    </xs:sequence>
+                                    <xs:attribute name="HobType" use="required">
+                                        <xs:simpleType>
+                                            <xs:restriction base="xs:NCName">
+                                                <xs:enumeration value="PHIT"/>
+                                                <xs:enumeration value="MEMORY_ALLOCATION"/>
+                                                <xs:enumeration value="RESOURCE_DESCRIPTOR"/>
+                                                <xs:enumeration value="FIRMWARE_VOLUME"/>
+                                                <xs:enumeration value="LOAD_PEIM"/>
+                                                <xs:enumeration value="UNDEFINED"/>
+                                            </xs:restriction>
+                                        </xs:simpleType>
+                                    </xs:attribute>
+                                    <xs:attribute name="Usage" use="required">
+                                        <xs:simpleType>
+                                            <xs:restriction base="xs:NCName">
+                                                <xs:enumeration value="CONSUMES">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> A HOB must be
+                                                  present in the system. </xs:documentation>
+                                                  </xs:annotation>
+                                                </xs:enumeration>
+                                                <xs:enumeration value="SOMETIMES_CONSUMES">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> If present,
+                                                  the HOB will be used. </xs:documentation>
+                                                  </xs:annotation>
+                                                </xs:enumeration>
+                                                <xs:enumeration value="PRODUCES">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The HOB is
+                                                  always produced by the module. </xs:documentation>
+                                                  </xs:annotation>
+                                                </xs:enumeration>
+                                                <xs:enumeration value="SOMETIMES_PRODUCES">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The HOB may be
+                                                  produced by the module under some execution paths.
+                                                  </xs:documentation>
+                                                  </xs:annotation>
+                                                </xs:enumeration>
+                                                <xs:enumeration value="UNDEFINED">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The package
+                                                  creator knows that a HOB is used, but does not
+                                                  know how it is used. </xs:documentation>
+                                                  </xs:annotation>
+                                                </xs:enumeration>
+                                            </xs:restriction>
+                                        </xs:simpleType>
+                                    </xs:attribute>
+                                    <xs:attribute name="SupArchList" type="ArchListType"
+                                        use="optional"/>
+                                    <xs:attribute name="FeatureFlag" type="xs:normalizedString"
+                                        use="optional"/>
+                                </xs:complexType>
+                            </xs:element>
+
+                        </xs:sequence>
+                        <xs:attributeGroup ref="SupportedArchMod"/>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of ModuleProperties Section -->
+
+                <xs:element minOccurs="0" maxOccurs="1" name="ClonedFrom">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> This section may be included for Modules
+                            that are copied from a different module. </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="1" name="GUID">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> This GUID and the Version
+                                        attribute uniquely identify the Module that this Module was
+                                        copied from. </xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="RegistryFormatGuid">
+                                            <xs:attribute name="Version" type="xs:decimal"
+                                                use="required">
+                                                <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> This value,
+                                                  along with the GUID, is used to uniquely identify
+                                                  this object. </xs:documentation>
+                                                </xs:annotation>
+                                            </xs:attribute>
+                                        </xs:extension>
+                                    </xs:simpleContent>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <!--  End of ClonedFrom Section. -->
+
+                <xs:element minOccurs="0" maxOccurs="1" name="LibraryClassDefinitions">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> A list of the different Library Classes
+                            consumed by a driver, core and/or application module, or produced by a
+                            Library module. </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="unbounded" name="LibraryClass">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element minOccurs="1" maxOccurs="1" name="Keyword"
+                                            type="xs:NCName">
+                                            <xs:annotation>
+                                                <xs:documentation xml:lang="en-us "> Used by tools
+                                                  to identify different instances of libraries that
+                                                  provide the library class. This keyword identifies
+                                                  the library class this module needs to be linked
+                                                  against. </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element minOccurs="0" maxOccurs="1"
+                                            name="RecommendedInstance">
+                                            <xs:complexType>
+                                                <xs:all>
+                                                  <xs:element minOccurs="1" maxOccurs="1"
+                                                  name="GUID">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> This GUID and
+                                                  the Version attribute uniquely identify the
+                                                  recommended Library Instance for this module .
+                                                  </xs:documentation>
+                                                  </xs:annotation>
+                                                  <xs:complexType>
+                                                  <xs:simpleContent>
+                                                  <xs:extension base="RegistryFormatGuid">
+                                                  <xs:attribute name="Version" type="xs:decimal"
+                                                  use="optional">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> This value,
+                                                  along with the GUID, is used to uniquely identify
+                                                  this object. </xs:documentation>
+                                                  </xs:annotation>
+                                                  </xs:attribute>
+                                                  </xs:extension>
+                                                  </xs:simpleContent>
+                                                  </xs:complexType>
+                                                  </xs:element>
+                                                </xs:all>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <xs:element ref="HelpText" minOccurs="0"
+                                            maxOccurs="unbounded"/>
+                                    </xs:sequence>
+                                    <xs:attribute name="Usage" use="required">
+                                        <xs:simpleType>
+                                            <xs:annotation>
+                                                <xs:documentation xml:lang="en-us"> Library
+                                                  instances can provide code for a library class, or
+                                                  may require other library instances themselves.
+                                                  Since different execution paths in a library (or
+                                                  module) may need different library classes based
+                                                  on some setting, library classes may not alway be
+                                                  required. </xs:documentation>
+                                            </xs:annotation>
+                                            <xs:restriction base="xs:NCName">
+                                                <xs:enumeration value="PRODUCES"/>
+                                                <xs:enumeration value="CONSUMES"/>
+                                                <xs:enumeration value="SOMETIMES_CONSUMES"/>
+                                                <xs:enumeration value="UNDEFINED"/>
+                                            </xs:restriction>
+                                        </xs:simpleType>
+                                    </xs:attribute>
+
+                                    <xs:attributeGroup ref="SupportedArchMod"/>
+                                    <xs:attribute name="FeatureFlag" type="xs:normalizedString"
+                                        use="optional">
+                                        <xs:annotation>
+                                            <xs:documentation xml:lang="en-us"> A FeatureFlag
+                                                attribute must evaluate to either true or false - it
+                                                may be a fixed value of true or false, a C name or
+                                                an in-fix expression. </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:attribute>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of LibraryClassDefinitions Section -->
+
+                <xs:element minOccurs="0" maxOccurs="1" name="SourceFiles">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="unbounded" name="Filename">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> This is the module relative
+                                        (ModuleProperties.Path) path and filename location within
+                                        the ZIP file. </xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="xs:anyURI">
+                                            <xs:attribute name="Family" type="FamilyTypes"
+                                                use="optional">
+                                                <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The Family
+                                                  attribute is used to restrict usage to a given
+                                                  family of compilers, such as GCC or MSFT. Since
+                                                  not all code processing tools use the same syntax,
+                                                  especially for assembly, this field can be used to
+                                                  identify different syntax. </xs:documentation>
+                                                </xs:annotation>
+                                            </xs:attribute>
+                                            <xs:attribute name="SupArchList" type="ArchListType"
+                                                use="optional"/>
+                                            <xs:attribute name="SupModList" type="ModuleListType"
+                                                use="optional"/>
+                                            <xs:attribute name="FeatureFlag"
+                                                type="xs:normalizedString" use="optional"/>
+                                        </xs:extension>
+                                    </xs:simpleContent>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element ref="HelpText" minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of SourceFiles Section -->
+
+                <xs:element minOccurs="0" maxOccurs="1" name="BinaryFiles">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="unbounded" name="BinaryFile">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element minOccurs="1" maxOccurs="unbounded"
+                                            name="Filename">
+                                            <xs:annotation>
+                                                <xs:documentation xml:lang="en-us"> This is the
+                                                  module relative (ModuleProperties.Path) path and
+                                                  filename location within the ZIP file.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                            <xs:complexType>
+                                                <xs:simpleContent>
+                                                  <xs:extension base="xs:anyURI">
+                                                  <xs:attribute name="FileType" use="optional">
+                                                  <xs:simpleType>
+                                                  <xs:restriction base="xs:NCName">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> Binary file
+                                                  distribution is limited to UEFI/PI FFS leaf
+                                                  section file types. </xs:documentation>
+                                                  </xs:annotation>
+                                                  <xs:enumeration value="GUID"/>
+                                                  <xs:enumeration value="FREEFORM"/>
+                                                  <xs:enumeration value="UEFI_IMAGE"/>
+                                                  <xs:enumeration value="PE32">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> A UEFI/PI FFS
+                                                  Leaf section file type, not a raw PE32 file.
+                                                  </xs:documentation>
+                                                  </xs:annotation>
+                                                  </xs:enumeration>
+                                                  <xs:enumeration value="PIC"/>
+                                                  <xs:enumeration value="PEI_DEPEX"/>
+                                                  <xs:enumeration value="DXE_DEPEX"/>
+                                                  <xs:enumeration value="SMM_DEPEX"/>
+                                                  <xs:enumeration value="COMPAT16"/>
+                                                  <xs:enumeration value="DISPOSABLE"/>
+                                                  <xs:enumeration value="TE"/>
+                                                  <xs:enumeration value="VER"/>
+                                                  <xs:enumeration value="UI"/>
+                                                  <xs:enumeration value="BIN"/>
+                                                  <xs:enumeration value="FV"/>
+                                                  </xs:restriction>
+                                                  </xs:simpleType>
+                                                  </xs:attribute>
+                                                  <xs:attribute name="SupArchList"
+                                                  type="ArchListType" use="optional"/>
+                                                  <xs:attribute name="SupModList"
+                                                  type="ModuleListType" use="optional"/>
+                                                  <xs:attribute name="FeatureFlag"
+                                                  type="xs:normalizedString" use="optional"/>
+                                                  </xs:extension>
+                                                </xs:simpleContent>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <xs:element minOccurs="0" maxOccurs="unbounded"
+                                            name="AsBuilt">
+                                            <xs:annotation>
+                                                <xs:documentation xml:lang="en-us"> This section
+                                                  contains information about how the module was
+                                                  coded, such as Compiler Tools, Flags, PCDs (only
+                                                  PatchPcd and/or PcdEx) and Library Class Instances
+                                                  used to build the binary. </xs:documentation>
+                                            </xs:annotation>
+                                            <xs:complexType>
+                                                <xs:sequence>
+
+                                                  <xs:element minOccurs="0" maxOccurs="unbounded"
+                                                  name="PatchPcdValue">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The element is
+                                                  the Patchable PCD Value that was used during the
+                                                  build. </xs:documentation>
+                                                  </xs:annotation>
+                                                  <xs:complexType>
+                                                  <xs:sequence>
+                                                  <xs:element minOccurs="1" maxOccurs="1"
+                                                  name="TokenSpaceGuidValue"
+                                                  type="RegistryFormatGuid"/>
+                                                  <xs:element minOccurs="1" maxOccurs="1"
+                                                  name="PcdCName" type="xs:NCName"/>
+                                                  <xs:element minOccurs="1" maxOccurs="1"
+                                                  name="Token">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The minLength
+                                                  of 3 is required to handle the "0x" prefix to the
+                                                  hex number. </xs:documentation>
+                                                  </xs:annotation>
+                                                  <xs:simpleType>
+                                                  <xs:restriction base="HexNumber">
+                                                  <xs:minLength value="3"/>
+                                                  <xs:maxLength value="10"/>
+                                                  </xs:restriction>
+                                                  </xs:simpleType>
+                                                  </xs:element>
+                                                  <xs:element minOccurs="1" maxOccurs="1"
+                                                  name="DatumType" type="PcdDatumTypes"/>
+                                                  <xs:element minOccurs="0" maxOccurs="1"
+                                                  name="MaxDatumSize">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> This field is
+                                                  required if the Pcd Datum Type is VOID* </xs:documentation>
+                                                  <xs:documentation xml:lang="en-us"> The minLength
+                                                  of 3 is required to handle the "0x" prefix to the
+                                                  hex number. </xs:documentation>
+                                                  </xs:annotation>
+                                                  <xs:simpleType>
+                                                  <xs:restriction base="HexNumber">
+                                                  <xs:minLength value="3"/>
+                                                  </xs:restriction>
+                                                  </xs:simpleType>
+                                                  </xs:element>
+                                                  <xs:element minOccurs="1" maxOccurs="1"
+                                                  name="Value" type="xs:normalizedString"/>
+                                                  <xs:element minOccurs="1" maxOccurs="1"
+                                                  name="Offset">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The minLength
+                                                  of 3 is required to handle the "0x" prefix to the
+                                                  hex number. </xs:documentation>
+                                                  </xs:annotation>
+                                                  <xs:simpleType>
+                                                  <xs:restriction base="HexNumber">
+                                                  <xs:minLength value="3"/>
+                                                  </xs:restriction>
+                                                  </xs:simpleType>
+                                                  </xs:element>
+                                                  <xs:element ref="HelpText" minOccurs="0"
+                                                  maxOccurs="unbounded"/>
+                                                  <xs:element minOccurs="0" maxOccurs="unbounded"
+                                                  name="PcdError">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> Error
+                                                  information implemented by the module.
+                                                  </xs:documentation>
+                                                  </xs:annotation>
+                                                  <xs:complexType>
+                                                  <xs:sequence>
+                                                  <xs:element minOccurs="1" maxOccurs="1"
+                                                  name="ErrorNumber">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The minLength
+                                                  of 3 is required to handle the "0x" prefix to the
+                                                  hex number. </xs:documentation>
+                                                  </xs:annotation>
+                                                  <xs:simpleType>
+                                                  <xs:restriction base="HexNumber">
+                                                  <xs:minLength value="3"/>
+                                                  </xs:restriction>
+                                                  </xs:simpleType>
+                                                  </xs:element>
+                                                  <xs:element minOccurs="0" maxOccurs="unbounded"
+                                                  name="ErrorMessage">
+                                                  <xs:complexType>
+                                                  <xs:simpleContent>
+                                                  <xs:extension base="xs:string">
+                                                  <xs:attribute name="Lang" type="xs:language"
+                                                  default="en-us" use="optional"/>
+                                                  </xs:extension>
+                                                  </xs:simpleContent>
+                                                  </xs:complexType>
+                                                  </xs:element>
+                                                  </xs:sequence>
+                                                  </xs:complexType>
+                                                  </xs:element>
+                                                  </xs:sequence>
+                                                  </xs:complexType>
+                                                  </xs:element>
+
+                                                  <xs:element minOccurs="0" maxOccurs="unbounded"
+                                                  name="PcdExValue">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The element is
+                                                  the DynamicEx PCD Value that was used during the
+                                                  build. </xs:documentation>
+                                                  </xs:annotation>
+                                                  <xs:complexType>
+                                                  <xs:sequence>
+                                                  <xs:element minOccurs="1" maxOccurs="1"
+                                                  name="TokenSpaceGuidValue"
+                                                  type="RegistryFormatGuid"/>
+                                                  <xs:element minOccurs="1" maxOccurs="1"
+                                                  name="Token">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The minLength
+                                                  of 3 is required to handle the "0x" prefix to the
+                                                  hex number. </xs:documentation>
+                                                  </xs:annotation>
+                                                  <xs:simpleType>
+                                                  <xs:restriction base="HexNumber">
+                                                  <xs:minLength value="3"/>
+                                                  <xs:maxLength value="10"/>
+                                                  </xs:restriction>
+                                                  </xs:simpleType>
+                                                  </xs:element>
+                                                  <xs:element minOccurs="1" maxOccurs="1"
+                                                  name="DatumType" type="PcdDatumTypes"/>
+                                                  <xs:element minOccurs="0" maxOccurs="1"
+                                                  name="MaxDatumSize">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> This field is
+                                                  required if the Pcd Datum Type is VOID*
+                                                  </xs:documentation>
+                                                  </xs:annotation>
+                                                  <xs:simpleType>
+                                                  <xs:restriction base="HexNumber">
+                                                  <xs:minLength value="3"/>
+                                                  </xs:restriction>
+                                                  </xs:simpleType>
+                                                  </xs:element>
+                                                  <xs:element minOccurs="1" maxOccurs="1"
+                                                  name="Value" type="xs:normalizedString"/>
+                                                  <xs:element ref="HelpText" minOccurs="0"
+                                                  maxOccurs="unbounded"/>
+                                                  <xs:element minOccurs="0" maxOccurs="unbounded"
+                                                  name="PcdError">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> Error
+                                                  information implemented by the module.
+                                                  </xs:documentation>
+                                                  </xs:annotation>
+                                                  <xs:complexType>
+                                                  <xs:sequence>
+                                                  <xs:element minOccurs="1" maxOccurs="1"
+                                                  name="ErrorNumber">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The minLength
+                                                  of 3 is required to handle the "0x" prefix to the
+                                                  hex number. </xs:documentation>
+                                                  </xs:annotation>
+                                                  <xs:simpleType>
+                                                  <xs:restriction base="HexNumber">
+                                                  <xs:minLength value="3"/>
+                                                  </xs:restriction>
+                                                  </xs:simpleType>
+                                                  </xs:element>
+                                                  <xs:element minOccurs="0" maxOccurs="unbounded"
+                                                  name="ErrorMessage">
+                                                  <xs:complexType>
+                                                  <xs:simpleContent>
+                                                  <xs:extension base="xs:string">
+                                                  <xs:attribute name="Lang" type="xs:language"
+                                                  default="en-us" use="optional"/>
+                                                  </xs:extension>
+                                                  </xs:simpleContent>
+                                                  </xs:complexType>
+                                                  </xs:element>
+                                                  </xs:sequence>
+                                                  </xs:complexType>
+                                                  </xs:element>
+                                                  </xs:sequence>
+                                                  </xs:complexType>
+                                                  </xs:element>
+
+                                                  <xs:element minOccurs="0" maxOccurs="1"
+                                                  name="LibraryInstances">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> This is the
+                                                  actual library instance that was used to link
+                                                  against the module. </xs:documentation>
+                                                  </xs:annotation>
+                                                  <xs:complexType>
+                                                  <xs:sequence>
+                                                  <xs:element minOccurs="1" maxOccurs="unbounded"
+                                                  name="GUID">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> This GUID and
+                                                  the Version attribute uniquely identify the actual
+                                                  Library Instance linked in this module.
+                                                  </xs:documentation>
+                                                  </xs:annotation>
+                                                  <xs:complexType>
+                                                  <xs:simpleContent>
+                                                  <xs:extension base="RegistryFormatGuid">
+                                                  <xs:attribute name="Version" type="xs:decimal"
+                                                  use="required">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> This value,
+                                                  along with the GUID, is used to uniquely identify
+                                                  this object. </xs:documentation>
+                                                  </xs:annotation>
+                                                  </xs:attribute>
+                                                  </xs:extension>
+                                                  </xs:simpleContent>
+                                                  </xs:complexType>
+                                                  </xs:element>
+                                                  </xs:sequence>
+                                                  </xs:complexType>
+                                                  </xs:element>
+
+                                                  <xs:element minOccurs="0" maxOccurs="unbounded"
+                                                  name="BuildFlags">
+                                                  <xs:complexType mixed="true">
+                                                  <xs:simpleContent>
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> Any
+                                                  description of OS, Tool, and flags for the
+                                                  individual tool can go in this section.
+                                                  </xs:documentation>
+                                                  </xs:annotation>
+                                                  <xs:extension base="xs:string">
+                                                  <xs:anyAttribute processContents="lax"/>
+                                                  </xs:extension>
+                                                  </xs:simpleContent>
+                                                  </xs:complexType>
+                                                  </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <!-- End of AsBuilt -->
+                                        <xs:element ref="HelpText" minOccurs="0"
+                                            maxOccurs="unbounded"/>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of BinaryFiles Section -->
+
+                <xs:element minOccurs="0" maxOccurs="1" name="PackageDependencies">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="unbounded" name="Package">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element minOccurs="0" maxOccurs="unbounded"
+                                            name="Description">
+                                            <xs:complexType>
+                                                <xs:simpleContent>
+                                                  <xs:extension base="xs:string">
+                                                  <xs:attribute name="Lang" type="xs:language"
+                                                  default="en-us" use="optional"/>
+                                                  </xs:extension>
+                                                </xs:simpleContent>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <xs:element minOccurs="1" maxOccurs="1" name="GUID">
+                                            <xs:annotation>
+                                                <xs:documentation xml:lang="en-us"> This GUID and
+                                                  the Version attribute uniquely identify Package
+                                                  that this Module depends on. </xs:documentation>
+                                            </xs:annotation>
+                                            <xs:complexType>
+                                                <xs:simpleContent>
+                                                  <xs:extension base="RegistryFormatGuid">
+                                                  <xs:attribute name="Version" type="xs:decimal"
+                                                  use="optional">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> This value,
+                                                  along with the GUID, is used to uniquely identify
+                                                  this object. If the version attribute is not
+                                                  specified, the most recent version of the package
+                                                  can be used. </xs:documentation>
+                                                  </xs:annotation>
+                                                  </xs:attribute>
+                                                  </xs:extension>
+                                                </xs:simpleContent>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute name="SupArchList" type="ArchListType"
+                                        use="optional"/>
+                                    <xs:attribute name="SupModList" type="ModuleListType"
+                                        use="optional"/>
+                                    <xs:attribute name="FeatureFlag" type="xs:normalizedString"
+                                        use="optional"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of PackageDependencies -->
+
+                <xs:element minOccurs="0" maxOccurs="1" name="Guids">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="unbounded" name="GuidCName">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element minOccurs="1" maxOccurs="1" name="CName"
+                                            type="xs:NCName"/>
+                                        <xs:element minOccurs="0" maxOccurs="1" name="VariableName"
+                                            type="xs:normalizedString">
+                                            <xs:annotation>
+                                                <xs:documentation xml:lang="en-us"> Only valid for
+                                                  Variable GUID types. </xs:documentation>
+                                                <xs:documentation> This can be either a Hex Array or
+                                                  C string in unicode format: L"string" Data.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element ref="HelpText" minOccurs="0"
+                                            maxOccurs="unbounded"/>
+                                    </xs:sequence>
+                                    <xs:attribute name="Usage" use="required">
+                                        <xs:simpleType>
+                                            <xs:restriction base="xs:NCName">
+                                                <xs:enumeration value="CONSUMES">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us">The module does
+                                                  not install the GUID, and the GUID must be present
+                                                  for the module to execute. </xs:documentation>
+                                                  </xs:annotation>
+                                                </xs:enumeration>
+                                                <xs:enumeration value="SOMETIMES_CONSUMES">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The module
+                                                  does not install the GUID, however, the GUID will
+                                                  be used if it is present. </xs:documentation>
+                                                  </xs:annotation>
+                                                </xs:enumeration>
+                                                <xs:enumeration value="PRODUCES">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The module
+                                                  always installs the GUID. </xs:documentation>
+                                                  </xs:annotation>
+                                                </xs:enumeration>
+                                                <xs:enumeration value="SOMETIMES_PRODUCES">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The Module
+                                                  will install the GUID under certain execution
+                                                  paths. </xs:documentation>
+                                                  </xs:annotation>
+                                                </xs:enumeration>
+                                                <xs:enumeration value="UNDEFINED">
+                                                  <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> The package
+                                                  creator knows that a GUID is used, but does not
+                                                  know how it is used. </xs:documentation>
+                                                  </xs:annotation>
+                                                </xs:enumeration>
+                                            </xs:restriction>
+                                        </xs:simpleType>
+                                    </xs:attribute>
+                                    <xs:attribute name="GuidType" type="GuidListType" use="required"/>
+                                    <xs:attribute name="SupArchList" type="ArchListType"
+                                        use="optional"/>
+                                    <xs:attribute name="SupModList" type="ModuleListType"
+                                        use="optional"/>
+                                    <xs:attribute name="FeatureFlag" type="xs:normalizedString"
+                                        use="optional"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of Guids Section -->
+
+                <xs:element minOccurs="0" maxOccurs="1" name="Protocols">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> A listing of protocols required or
+                            produced by this module. </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="unbounded" name="Protocol"
+                                nillable="true">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element minOccurs="1" maxOccurs="1" name="CName"
+                                            type="xs:NCName"/>
+                                        <xs:element ref="HelpText" minOccurs="0"
+                                            maxOccurs="unbounded"/>
+                                    </xs:sequence>
+                                    <xs:attribute name="Usage" use="required">
+                                        <xs:simpleType>
+                                            <xs:restriction base="xs:NCName">
+                                                <xs:enumeration value="PRODUCES"/>
+                                                <xs:enumeration value="SOMETIMES_PRODUCES"/>
+                                                <xs:enumeration value="CONSUMES"/>
+                                                <xs:enumeration value="SOMETIMES_CONSUMES"/>
+                                                <xs:enumeration value="TO_START"/>
+                                                <xs:enumeration value="BY_START"/>
+                                                <xs:enumeration value="UNDEFINED"/>
+                                            </xs:restriction>
+                                        </xs:simpleType>
+                                    </xs:attribute>
+                                    <xs:attribute name="Notify" type="xs:boolean" use="optional"/>
+                                    <xs:attribute name="SupArchList" type="ArchListType"
+                                        use="optional"/>
+                                    <xs:attribute name="SupModList" type="ModuleListType"
+                                        use="optional"/>
+                                    <xs:attribute name="FeatureFlag" type="xs:normalizedString"
+                                        use="optional"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of Protocols Section -->
+
+                <xs:element minOccurs="0" maxOccurs="1" name="PPIs">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> A listing of PPIs required or produced
+                            by this module. </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="unbounded" name="Ppi"
+                                nillable="true">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element minOccurs="1" maxOccurs="1" name="CName"
+                                            type="xs:NCName"/>
+                                        <xs:element ref="HelpText" minOccurs="0"
+                                            maxOccurs="unbounded"/>
+                                    </xs:sequence>
+                                    <xs:attribute name="Usage" use="required">
+                                        <xs:simpleType>
+                                            <xs:restriction base="xs:NCName">
+                                                <xs:enumeration value="PRODUCES"/>
+                                                <xs:enumeration value="SOMETIMES_PRODUCES"/>
+                                                <xs:enumeration value="CONSUMES"/>
+                                                <xs:enumeration value="SOMETIMES_CONSUMES"/>
+                                                <xs:enumeration value="UNDEFINED"/>
+                                            </xs:restriction>
+                                        </xs:simpleType>
+                                    </xs:attribute>
+                                    <xs:attribute name="Notify" type="xs:boolean" use="optional"/>
+                                    <xs:attribute name="SupArchList" type="ArchListType"
+                                        use="optional"/>
+                                    <xs:attribute name="SupModList" type="ModuleListType"
+                                        use="optional"/>
+                                    <xs:attribute name="FeatureFlag" type="xs:normalizedString"
+                                        use="optional"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of PPIs Section -->
+
+                <xs:element minOccurs="0" maxOccurs="1" name="Externs">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> These elements specify additional
+                            information about the module. This area may be used by tools to generate
+                            code. </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="unbounded" name="Extern">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:choice minOccurs="1">
+                                            <xs:sequence>
+                                                <xs:element minOccurs="0" maxOccurs="1"
+                                                  name="EntryPoint" type="xs:NCName"/>
+                                                <xs:element minOccurs="0" maxOccurs="1"
+                                                  name="UnloadImage" type="xs:NCName"/>
+                                            </xs:sequence>
+                                            <xs:sequence>
+                                                <xs:element minOccurs="0" maxOccurs="1"
+                                                  name="Constructor" type="xs:NCName"/>
+                                                <xs:element minOccurs="0" maxOccurs="1"
+                                                  name="Destructor" type="xs:NCName"/>
+                                            </xs:sequence>
+                                        </xs:choice>
+                                        <xs:element ref="HelpText" minOccurs="0" maxOccurs="1"/>
+                                    </xs:sequence>
+                                    <xs:attribute name="SupArchList" type="ArchListType"
+                                        use="optional"/>
+                                    <xs:attribute name="SupModList" type="ModuleListType"
+                                        use="optional"/>
+                                    <xs:attribute name="FeatureFlag" type="xs:normalizedString"
+                                        use="optional"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of Externs Section -->
+
+                <xs:element minOccurs="0" maxOccurs="1" name="PcdCoded">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> This section describes how a platform is
+                            coded with respect to the platform configuration knobs.
+                        </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="unbounded" name="PcdEntry">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element minOccurs="1" maxOccurs="1" name="CName"
+                                            type="xs:NCName"/>
+                                        <xs:element minOccurs="1" maxOccurs="1"
+                                            name="TokenSpaceGuidCName" type="xs:NCName"/>
+                                        <xs:element minOccurs="0" maxOccurs="1" name="DefaultValue"
+                                            type="xs:normalizedString"/>
+                                        <xs:element ref="HelpText" minOccurs="0"
+                                            maxOccurs="unbounded"/>
+                                    </xs:sequence>
+                                    <xs:attribute name="PcdItemType" type="PcdItemTypes"
+                                        use="required"/>
+                                    <xs:attribute name="PcdUsage" use="required">
+                                        <xs:simpleType>
+                                            <xs:restriction base="xs:NCName">
+                                                <xs:enumeration value="PRODUCES"/>
+                                                <xs:enumeration value="SOMETIMES_PRODUCES"/>
+                                                <xs:enumeration value="CONSUMES"/>
+                                                <xs:enumeration value="SOMETIMES_CONSUMES"/>
+                                                <xs:enumeration value="UNDEFINED"/>
+                                            </xs:restriction>
+                                        </xs:simpleType>
+
+
+                                    </xs:attribute>
+                                    <xs:attribute name="SupArchList" type="ArchListType"
+                                        use="optional"/>
+                                    <xs:attribute name="SupModList" type="ModuleListType"
+                                        use="optional"/>
+                                    <xs:attribute name="FeatureFlag" type="xs:normalizedString"
+                                        use="optional"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of PcdCoded Section -->
+
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="PeiDepex">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> This is the PEI dependency expression
+                            for a Dependency Section. </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="Expression" type="xs:string" minOccurs="1"
+                                maxOccurs="1">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> An in-fix expression, of C
+                                        identifiers and TRUE, FALSE, AND, OR, NOT, BEFORE, and AFTER
+                                        as well as parenthesis () in the in-fix notation. The
+                                        operators are restricted to grammar defined in the PI
+                                        specification. </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element ref="HelpText" minOccurs="0" maxOccurs="1"/>
+                        </xs:sequence>
+                        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
+                        <xs:attribute name="SupModList" type="ModuleListType" use="optional"/>
+                        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of PeiDepex Section -->
+
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="DxeDepex">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> This is the DXE dependency expression
+                            for a Dependency Section. </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="Expression" type=" xs:string " minOccurs="1"
+                                maxOccurs="1">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> An in-fix expression, of C
+                                        identifiers and TRUE, FALSE, AND, OR, NOT, BEFORE, and AFTER
+                                        as well as parenthesis () in the in-fix notation. The
+                                        operators are restricted to grammar defined in the PI
+                                        specification. </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element ref="HelpText" minOccurs="0" maxOccurs="1"/>
+                        </xs:sequence>
+                        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
+                        <xs:attribute name="SupModList" type="ModuleListType" use="optional"/>
+                        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of DxeDepex Section -->
+
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="SmmDepex">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> This is the SMM dependency expression
+                            for a Dependency Section. </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="Expression" type=" xs:string " minOccurs="1"
+                                maxOccurs="1">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> An in-fix expression, of C
+                                        identifiers and TRUE, FALSE, AND, OR, NOT, BEFORE, and AFTER
+                                        as well as parenthesis () in the in-fix notation. The
+                                        operators are restricted to grammar defined in the PI
+                                        specification. </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element ref="HelpText" minOccurs="0" maxOccurs="1"/>
+                        </xs:sequence>
+                        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
+                        <xs:attribute name="SupModList" type="ModuleListType" use="optional"/>
+                        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of SmmDepex Section -->
+
+
+                <xs:element minOccurs="0" maxOccurs="1" name="MiscellaneousFiles">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> This section is used to provide comments
+                            and/or list auxiliary files, such as pdb or map files.
+                        </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="0" maxOccurs="unbounded" name="Description">
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="xs:string">
+                                            <xs:attribute name="Lang" type="xs:language"
+                                                default="en-us" use="optional"/>
+                                        </xs:extension>
+                                    </xs:simpleContent>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element minOccurs="1" maxOccurs="unbounded" name="Filename">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> This is the path and
+                                        filename location within the ZIP file. </xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="xs:anyURI">
+                                            <xs:attribute name="Executable" type="xs:boolean"
+                                                default="false" use="optional">
+                                                <xs:annotation>
+                                                  <xs:documentation xml:lang="en-us"> If true, used
+                                                  by installation tools to ensure that a file that
+                                                  must be executable has the correct properties to
+                                                  permit execution. </xs:documentation>
+                                                </xs:annotation>
+                                            </xs:attribute>
+                                        </xs:extension>
+                                    </xs:simpleContent>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of Module Surface Area Misc Section -->
+
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="UserExtensions">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> This section is used for any processing
+                            instructions that may be custom to the content provided by the
+                            distribution that are common to module. </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> The content is vendor specific. </xs:documentation>
+                        <xs:documentation xml:lang="en-us"> The content can be plain text as well as
+                            any user-defined, properly formatted XML structure. </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType mixed="true">
+                        <xs:attribute name="UserId" type="xs:NCName" use="required">
+                            <xs:annotation>
+                                <xs:documentation xml:lang="en-us"> This is a single word identifier
+                                    for grouping similar content. For example, ReferenceBuild might
+                                    be used to identify non-PI compliant build steps, with two
+                                    different UserExtensions sections, one with an Identifier of
+                                    Prebuild, and another of PostBuild. Both UserExtensions sections
+                                    would use the same UserId. </xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="Identifier" type="xs:string" use="required">
+                            <xs:annotation>
+                                <xs:documentation xml:lang="en-us"> This can be any string used to
+                                    differentiate or identify this section from other UserExtensions
+                                    sections. </xs:documentation>
+                                <xs:documentation xml:lang="en-us"> For example, a PRE_PROCESS
+                                    Identifier might indicate specific steps and tools required
+                                    before processing module content, while a different
+                                    UserExtensions section with a POST_PROCESS Identifier might
+                                    describe steps that need to be executed after operations on this
+                                    module. </xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:anyAttribute processContents="lax"/>
+                    </xs:complexType>
+                </xs:element>
+                <!-- End of Module Surface Area UserExtensions Section -->
+
+            </xs:sequence>
+            <xs:attribute name="BinaryModule" type="xs:boolean" default="false" use="optional">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> This attribute is used when the binaries are
+                        distributed for this module and no code generation from source files is
+                        required. If set, then the BinaryFiles section should be used, and any files
+                        listed in the SourceFiles section do not have to be built. Additionally, the
+                        AsBuilt section for each binary file must be included. </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+
+    </xs:element>
+    <!-- End of the ModuleSurfaceArea element. -->
+
+    <xs:element name="Tools">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="1" name="Header">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="1" name="Name"
+                                type="xs:normalizedString">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us">This is the User Interface
+                                        Name for this Tools Distribution.</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="0" maxOccurs="1" name="Copyright"
+                                type="xs:string">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> This is only required if the
+                                        Copyright is different from the Distribution Package
+                                        copyright. </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="0" maxOccurs="1" name="License" type="xs:string">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> This is only required if the
+                                        License is different from the Distribution Package license.
+                                    </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="0" maxOccurs="1" name="Abstract"
+                                type="xs:normalizedString">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> This is only required if the
+                                        Abstract is different from the Distribution Package
+                                        Abstract. </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="0" maxOccurs="1" name="Description"
+                                type="xs:string">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> This is only required if the
+                                        Description is different from the Distribution Package
+                                        Description. </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element minOccurs="1" maxOccurs="unbounded" name="Filename">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> This is the path and filename location
+                            within the ZIP file. </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:simpleContent>
+                            <xs:extension base="xs:anyURI">
+                                <xs:attribute name="OS" type="SupportedOs" use="optional">
+                                    <xs:annotation>
+                                        <xs:documentation xml:lang="en-us"> This is required for
+                                            tools that execute; it should not be used for
+                                            configuration files. </xs:documentation>
+                                    </xs:annotation>
+                                </xs:attribute>
+                                <xs:attribute name="Executable" type="xs:boolean" default="false"
+                                    use="optional">
+                                    <xs:annotation>
+                                        <xs:documentation xml:lang="en-us"> If true, used by
+                                            installation tools to ensure that a file that must be
+                                            executable has the correct properties to permit
+                                            execution. </xs:documentation>
+                                    </xs:annotation>
+                                </xs:attribute>
+                            </xs:extension>
+                        </xs:simpleContent>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <!-- End of the Tools element. -->
+
+    <xs:element name="MiscellaneousFiles">
+        <xs:annotation>
+            <xs:documentation xml:lang="en-us"> This section contains a list of files that are not
+                part of the code distributed with modules, packages or tools. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="1" name="Header">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="0" maxOccurs="1" name="Name"
+                                type="xs:normalizedString">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> The User interface name for
+                                        this content. </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="0" maxOccurs="1" name="Copyright"
+                                type="xs:string">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> This is only required if the
+                                        Copyright is different from the Distribution Package
+                                        Copyright. </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="0" maxOccurs="1" name="License" type="xs:string">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="en-us"> This is only required if the
+                                        License is different from the Distribution Package License.
+                                    </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element minOccurs="0" maxOccurs="1" name="Abstract"
+                                type="xs:normalizedString"/>
+                            <xs:element minOccurs="0" maxOccurs="unbounded" name="Description">
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="xs:string">
+                                            <xs:attribute name="Lang" type="xs:language"
+                                                default="en-us" use="optional"/>
+                                        </xs:extension>
+                                    </xs:simpleContent>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="Filename">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en-us"> This is the path and filename location
+                            within the ZIP file. </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:simpleContent>
+                            <xs:extension base="xs:anyURI">
+                                <xs:attribute name="Executable" type="xs:boolean" default="false"
+                                    use="optional">
+                                    <xs:annotation>
+                                        <xs:documentation xml:lang="en-us"> If true, used by
+                                            installation tools to ensure that a file that must be
+                                            executable has the correct properties to permit
+                                            execution. </xs:documentation>
+                                    </xs:annotation>
+                                </xs:attribute>
+                            </xs:extension>
+                        </xs:simpleContent>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <!-- End of the Misc element. -->
+
+    <xs:element name="UserExtensions">
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:any processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute name="UserId" type="xs:NCName" use="required">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> This is a single word identifier for
+                        grouping similar content. For example, ReferenceBuild might be used to
+                        identify non-PI compliant build steps, with two different UserExtensions
+                        sections, one with an Identifier of Prebuild, and another of PostBuild. Both
+                        UserExtensions sections would use the same UserId. </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="Identifier" type="xs:string" use="optional">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> This can be any string used to differentiate
+                        or identify this section from other UserExtensions sections. </xs:documentation>
+                    <xs:documentation xml:lang="en-us"> For example, a PRE_PROCESS Identifier might
+                        indicate specific steps and tools required before processing distribution
+                        package content, while a different UserExtensions section with a
+                        POST_PROCESS Identifier might describe steps that need to be executed after
+                        operations on this content. </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:anyAttribute processContents="lax"/>
+        </xs:complexType>
+    </xs:element>
+    <!-- The following elsements are common definitions used with the ref attribute for elements. -->
+
+    <xs:element name="HelpText">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:string">
+                    <xs:attribute name="Lang" type="xs:language" default="en-us" use="optional"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- The following attribute groups are used in various elements above. -->
+
+    <xs:attributeGroup name="SupportedArchMod">
+        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
+        <xs:attribute name="SupModList" type="ModuleListType" use="optional"/>
+    </xs:attributeGroup>
+
+    <!-- The following data types are used to restrict content. -->
+
+    <xs:simpleType name="ArchListType">
+        <xs:list itemType="ArchTypes"/>
+    </xs:simpleType>
+
+    <xs:simpleType name="ArchTypes">
+        <xs:restriction base="xs:NCName">
+            <xs:enumeration value="IA32"/>
+            <xs:enumeration value="X64"/>
+            <xs:enumeration value="IPF"/>
+            <xs:enumeration value="EBC"/>
+            <xs:pattern value="([A-Z])([a-zA-Z0-9])*">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> Any processor architecture not listed above.
+                        The Architecture must be a target architecture of one or more compiler tool
+                        chains. </xs:documentation>
+                </xs:annotation>
+            </xs:pattern>
+        </xs:restriction>
+    </xs:simpleType>
+
+
+    <xs:simpleType name="FamilyTypes">
+        <xs:restriction base="xs:NCName">
+            <xs:enumeration value="MSFT"/>
+            <xs:enumeration value="GCC"/>
+            <xs:pattern value="[A-Z][a-zA-Z0-9]*">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> Any other family of build utilities for
+                        which compiler tools exist. </xs:documentation>
+                </xs:annotation>
+            </xs:pattern>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="GuidListType">
+        <xs:list itemType="GuidTypes"/>
+    </xs:simpleType>
+
+    <xs:simpleType name="GuidTypes">
+        <xs:restriction base="xs:NCName">
+            <xs:enumeration value="Event"/>
+            <xs:enumeration value="File"/>
+            <xs:enumeration value="FV"/>
+            <xs:enumeration value="GUID"/>
+            <xs:enumeration value="Hii"/>
+            <xs:enumeration value="HOB"/>
+            <xs:enumeration value="SystemTable"/>
+            <xs:enumeration value="TokenSpaceGuid"/>
+            <xs:enumeration value="Variable"/>
+            <xs:enumeration value="UNDEFINED"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="HexNumber">
+        <xs:restriction base="xs:hexBinary">
+            <xs:pattern value="0x([a-fA-F0-9])+"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="Md5Sum">
+        <xs:restriction base="xs:normalizedString">
+            <xs:pattern value="[a-zA-Z0-9]{32}"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ModuleListType">
+        <xs:list itemType="ModuleTypes"/>
+    </xs:simpleType>
+
+    <xs:simpleType name="ModuleTypes">
+        <xs:annotation>
+            <xs:documentation xml:lang="en-us"> The following module types are defined by
+                specifications. </xs:documentation>
+            <xs:documentation xml:lang="en-us"> Module types for components and libraries defined
+                for this distribution mechanism. </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:NCName">
+            <xs:enumeration value="BASE ">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> Use of this module is not restricted.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DXE_CORE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> This module is only applicable to the DXE
+                        core. </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DXE_DRIVER">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> This module is only applicable to a DXE
+                        driver. </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DXE_RUNTIME_DRIVER">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> This module is only applicable to a DXE
+                        runtime driver. </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DXE_SAL_DRIVER">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> This module is only applicable to an IPF DXE
+                        runtime driver. </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DXE_SMM_DRIVER">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> This module is only applicable to a DXE SMM
+                        driver. </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PEI_CORE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> This module is only applicable to the PEI
+                        core. </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PEIM">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> This module is only valid for PEI modules.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SEC">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> This module is only applicable to Security
+                        phase. </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="UEFI_DRIVER">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> This module is only valid for UEFI drivers.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="UEFI_RUNTIME_DRIVER">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> This module is only valid for UEFI runtime
+                        drivers.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="UEFI_APPLICATION">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> This module is only valid for UEFI
+                        applications. </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SMM_CORE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> This module is only applicable to the SMM
+                        core.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="USER_DEFINED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> This content is restricted to a specific
+                        implementation. </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="UNDEFINED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> This enumeration is for use in a list that
+                        where the package creator does not know the what module types are supported
+                        by a module. </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:pattern value="([A-Z])([a-zA-Z0-9])*">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> This pattern has been added for use in a
+                        module lists - for future expansion. </xs:documentation>
+                </xs:annotation>
+            </xs:pattern>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PcdDatumTypes">
+        <xs:annotation>
+            <xs:documentation xml:lang="en-us"> The following data types are defined by the PCD
+                specification (or PCD section of the UEFI/PI specifications.) </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:normalizedString">
+            <xs:enumeration value="UINT8"/>
+            <xs:enumeration value="UINT16"/>
+            <xs:enumeration value="UINT32"/>
+            <xs:enumeration value="UINT64"/>
+            <xs:enumeration value="BOOLEAN"/>
+            <xs:enumeration value="VOID*"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PcdItemListType">
+        <xs:list itemType="PcdItemTypes"/>
+    </xs:simpleType>
+
+    <xs:simpleType name="PcdItemTypes">
+        <xs:restriction base="xs:NCName">
+            <xs:enumeration value="FeaturePcd">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> The Feature PCD is a binary, evaluating to
+                        either true or false. This is used during build to include/exclude content.
+                        It can also be used during execution to force execution paths within
+                        drivers, or to enable/disable features within a driver for a given platform.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="FixedPcd">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> The Fixed PCD is a #define value that is set
+                        at build time. </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PatchPcd">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> The Patch PCD is a #define that is set at
+                        build time, and that can be modified within a binary file. Additional
+                        information, such as the offset location of the value, along with it's
+                        length may need to be provided.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="Pcd">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> This PCD type has an overloaded definition.
+                        Prior to build, the platform integrator may choose to implement a PCD as
+                        Fixed, Patchable or a Dynamic PCD. If the platform integrator choose to use
+                        the PCD as dynamic, then a PCD driver is required in the platform
+                        (PEI/DXE/both) to track the PCD in some sort of 'database' of these items.
+                        For Dynamic PCDs, the PcdGet* must pass in the token space guid and the
+                        token number to retrieve data (PcdSet* also needs these values.)
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PcdEx">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> The PCD can only be used as Dynamic, and the
+                        platform firmware must contain a driver to maintain a 'database' of these
+                        items. For Dynamic PCDs, the PcdGet* must pass in the token space guid and
+                        the token number to retrieve data (PcdSet* also needs these values.)
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+
+
+    <xs:simpleType name="RegistryFormatGuid">
+        <xs:annotation>
+            <xs:documentation xml:lang="en-us"> A GUID must contain five different Hexadecimal
+                character sets that are separated by a dash (-) character. </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern
+                value="\s*[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}\s*"
+            />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="SupportedOs">
+        <xs:annotation>
+            <xs:documentation xml:lang="en-us"> The EDK II build system supports workstations
+                running one of the following supported operating systems. This is the OS for the
+                developer's workstation, not the target platform. </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Win32">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> For Windows 2003, Windows XP and Windows
+                        Vista. </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="Win64">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> For Windows 2003, Windows XP and Windows
+                        Vista. </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="Linux32"/>
+            <xs:enumeration value="Linux64"/>
+            <xs:enumeration value="OS/X32"/>
+            <xs:enumeration value="OS/X64"/>
+            <xs:enumeration value="GenericWin">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> Typically, this is used for Windows Batch
+                        files. </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="GenericNix">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en-us"> Typically use for shell scripts - valid for
+                        any Linux and Mac OS/X. </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:pattern value="[a-zA-Z]([a-zA-Z0-9])*"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>

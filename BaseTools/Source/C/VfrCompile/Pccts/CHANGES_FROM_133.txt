@@ -1,0 +1,2448 @@
+=======================================================================
+List of Implemented Fixes and Changes for Maintenance Releases of PCCTS
+=======================================================================
+
+                               DISCLAIMER
+
+ The software and these notes are provided "as is".  They may include
+ typographical or technical errors and their authors disclaims all
+ liability of any kind or nature for damages due to error, fault,
+ defect, or deficiency regardless of cause.  All warranties of any
+ kind, either express or implied, including, but not limited to, the
+ implied  warranties of merchantability and fitness for a particular
+ purpose are disclaimed.
+
+
+        -------------------------------------------------------
+        Note:  Items #153 to #1 are now in a separate file named
+                CHANGES_FROM_133_BEFORE_MR13.txt
+        -------------------------------------------------------
+        
+#312. (Changed in MR33) Bug caused by change #299.
+
+	In change #299 a warning message was suppressed when there was
+	no LT(1) in a semantic predicate and max(k,ck) was 1.  The 
+	changed caused the code which set a default predicate depth for
+	the semantic predicate to be left as 0 rather than set to 1.
+	
+	This manifested as an error at line #1559 of mrhost.c
+	
+	Reported by Peter Dulimov.
+	    
+#311. (Changed in MR33) Added sorcer/lib to Makefile.
+
+    Reported by Dale Martin.
+            
+#310. (Changed in MR32) In C mode zzastPush was spelled zzastpush in one case.
+
+    Reported by Jean-Claude Durand
+    
+#309. (Changed in MR32) Renamed baseName because of VMS name conflict
+
+    Renamed baseName to pcctsBaseName to avoid library name conflict with
+    VMS library routine.  Reported by Jean-François PIÉRONNE.
+    
+#308. (Changed in MR32) Used "template" as name of formal in C routine
+
+	In astlib.h routine ast_scan a formal was named "template".  This caused
+	problems when the C code was compiled with a C++ compiler.  Reported by
+	Sabyasachi Dey.
+            
+#307. (Changed in MR31) Compiler dependent bug in function prototype generation
+    
+    The code which generated function prototypes contained a bug which
+    was compiler/optimization dependent.  Under some circumstance an
+    extra character would be included in portions of a function prototype.
+    
+    Reported by David Cook.
+    
+#306. (Changed in MR30) Validating predicate following a token
+
+    A validating predicate which immediately followed a token match 
+    consumed the token after the predicate rather than before.  Prior
+    to this fix (in the following example) isValidTimeScaleValue() in
+    the predicate would test the text for TIMESCALE rather than for
+    NUMBER:
+     
+		time_scale :
+    		TIMESCALE
+    		<<isValidTimeScaleValue(LT(1)->getText())>>?
+    		ts:NUMBER
+    		( us:MICROSECOND << tVal = ...>>
+    		| ns:NANOSECOND << tVal = ...  >>
+    		)
+	
+	Reported by Adalbert Perbandt.
+	
+#305. (Changed in MR30) Alternatives with guess blocks inside (...)* blocks.
+
+	In MR14 change #175 fixed a bug in the prediction expressions for guess
+	blocks which were of the form (alpha)? beta.  Unfortunately, this
+	resulted in a new bug as exemplified by the example below, which computed
+	the first set for r as {B} rather than {B C}:
+	
+					r : ( (A)? B
+					    | C
+						)*
+  
+    This example doesn't make any sense as A is not a prefix of B, but it
+    illustrates the problem.  This bug did not appear for:
+    
+    				r : ( (A)?
+    				    | C
+    				    )*
+
+	because it does not use the (alpha)? beta form.
+
+	Item #175 fixed an asymmetry in ambiguity messages for the following
+	constructs which appear to have identical ambiguities (between repeating
+	the loop vs. exiting the loop).  MR30 retains this fix, but the implementation
+	is slightly different.
+	
+	          r_star : ( (A B)? )* A ;
+	          r_plus : ( (A B)? )+ A ;
+
+    Reported by Arpad Beszedes (beszedes inf.u-szeged.hu).
+    
+#304. (Changed in MR30) Crash when mismatch between output value counts.
+
+	For a rule such as:
+	
+		r1 : r2>[i,j];
+		r2 >[int i, int j] : A;
+		
+	If there were extra actuals for the reference to rule r2 from rule r1
+	there antlr would crash.  This bug was introduced by change #276.
+
+	Reported by Sinan Karasu.
+	
+#303. (Changed in MR30) DLGLexerBase::replchar
+
+	DLGLexerBase::replchar and the C mode routine zzreplchar did not work 
+	properly when the new character was 0.
+      
+    Reported with fix by Philippe Laporte
+
+#302. (Changed in MR28) Fix significant problems in initial release of MR27.
+
+#301. (Changed in MR27) Default tab stops set to 2 spaces.
+
+    To have antlr generate true tabs rather than spaces, use "antlr -tab 0".
+    To generate 4 spaces per tab stop use "antlr -tab 4"
+    
+#300. (Changed in MR27)
+
+	Consider the following methods of constructing an AST from ID:
+	
+        rule1!
+                : id:ID << #0 = #[id]; >> ;
+        
+        rule2!
+                : id:ID << #0 = #id; >> ;
+        
+        rule3
+                : ID ;
+        
+        rule4
+                : id:ID << #0 = #id; >> ;
+        
+    For rule_2, the AST corresponding to id would always be NULL.  This
+    is because the user explicitly suppressed AST construction using the
+    "!" operator on the rule.  In MR27 the use of an AST expression
+    such as #id overrides the "!" operator and forces construction of
+    the AST.
+    
+    This fix does not apply to C mode ASTs when the ASTs are referenced
+    using numbers rather than symbols.
+
+	For C mode, this requires that the (optional) function/macro zzmk_ast
+	be defined.  This functions copies information from an attribute into
+	a previously allocated AST.
+
+    Reported by Jan Langer (jan langernetz.de)
+
+#299. (Changed in MR27) Don't warn if k=1 and semantic predicate missing LT(i)
+
+    If a semantic does not have a reference to LT(i) or (C mode LATEXT(i))
+    then pccts doesn't know how many lookahead tokens to use for context.
+    However, if max(k,ck) is 1 then there is really only one choice and
+    the warning is unnecessary.
+    
+#298. (Changed in MR27) Removed "register" for lastpos in dlgauto.c zzgettok
+
+#297. (Changed in MR27) Incorrect prototypes when used with classic C
+
+    There were a number of errors in function headers when antlr was
+    built with compilers that do not have __STDC__ or __cplusplus set.
+    
+    The functions which have variable length argument lists now use
+    PCCTS_USE_STDARG rather than __USE_PROTOTYPES__ to determine
+    whether to use stdargs or varargs.
+
+#296. (Changed in MR27) Complex return types in rules.
+
+    The following return type was not properly handled when 
+    unpacking a struct with containing multiple return values:
+    
+      rule > [int i, IIR_Bool (IIR_Decl::*constraint)()] : ...    
+
+    Instead of using "constraint", the program got lost and used
+    an empty string.
+    
+    Reported by P.A. Wilsey.
+
+#295. (Changed in MR27) Extra ";" following zzGUESS_DONE sometimes.
+
+    Certain constructs with guess blocks in MR23 led to extra ";"
+    preceding the "else" clause of an "if".
+
+    Reported by P.A. Wilsey.
+    
+#294. (Changed in MR27) Infinite loop in antlr for nested blocks
+
+    An oversight in detecting an empty alternative sometimes led
+    to an infinite loop in antlr when it encountered a rule with
+    nested blocks and guess blocks.
+    
+    Reported by P.A. Wilsey.
+    
+#293. (Changed in MR27) Sorcerer optimization of _t->type()
+
+    Sorcerer generated code may contain many calls to _t->type() in a
+    single statement.  This change introduces a temporary variable
+    to eliminate unnnecesary function calls.
+
+    Change implemented by Tom Molteno (tim videoscript.com).
+
+#292. (Changed in MR27)
+
+    WARNING:  Item #267 changes the signature of methods in the AST class.
+
+    **** Be sure to revise your AST functions of the same name  ***
+
+#291. (Changed in MR24)
+
+    Fix to serious code generation error in MR23 for (...)+ block.
+
+#290. (Changed in MR23) 
+
+    Item #247 describes a change in the way {...} blocks handled
+    an error.  Consider:
+
+            r1 : {A} b ;
+            b  : B;
+                
+                with input "C".
+
+    Prior to change #247, the error would resemble "expected B -
+    found C".  This is correct but incomplete, and therefore
+    misleading.  In #247 it was changed to "expected A, B - found
+    C".  This was fine, except for users of parser exception
+    handling because the exception was generated in the epilogue 
+    for {...} block rather than in rule b.  This made it difficult
+    for users of parser exception handling because B was not
+    expected in that context. Those not using parser exception
+    handling didn't notice the difference.
+
+    The current change restores the behavior prior to #247 when
+    parser exceptions are present, but retains the revised behavior
+    otherwise.  This change should be visible only when exceptions
+    are in use and only for {...} blocks and sub-blocks of the form
+    (something|something | something | epsilon) where epsilon represents
+    an empty production and it is the last alternative of a sub-block.
+    In contrast, (something | epsilon | something) should generate the
+    same code as before, even when exceptions are used.
+    
+    Reported by Philippe Laporte (philippe at transvirtual.com).
+
+#289. (Changed in MR23) Bug in matching complement of a #tokclass
+
+    Prior to MR23 when a #tokclass was matched in both its complemented form
+    and uncomplemented form, the bit set generated for its first use was used
+    for both cases.  However, the prediction expression was correctly computed
+    in both cases.  This meant that the second case would never be matched
+    because, for the second appearance, the prediction expression and the 
+    set to be matched would be complements of each other.
+        
+    Consider:
+        
+                #token A "a"
+                #token B "b"
+                #token C "c"
+                #tokclass AB {A B}
+                
+                r1 : AB    /* alt 1x */
+                   | ~AB   /* alt 1y */
+                   ;
+        
+    Prior to MR23, this resulted in alternative 1y being unreachable.  Had it
+    been written:
+        
+                r2 : ~AB  /* alt 2x */
+                   : AB   /* alt 2y */
+                   
+    then alternative 2y would have become unreachable.        
+        
+    This bug was only for the case of complemented #tokclass.  For complemented
+    #token the proper code was generated.           
+        
+#288. (Changed in MR23) #errclass not restricted to choice points
+
+    The #errclass directive is supposed to allow a programmer to define
+    print strings which should appear in syntax error messages as a replacement
+    for some combinations of tokens. For instance:
+    
+            #errclass Operator {PLUS MINUS TIMES DIVIDE}
+            
+    If a syntax message includes all four of these tokens, and there is no
+    "better" choice of error class, the word "Operator" will be used rather
+    than a list of the four token names.
+        
+    Prior to MR23 the #errclass definitions were used only at choice points
+    (which call the FAIL macro). In other cases where there was no choice
+    (e.g. where a single token or token class were matched) the #errclass
+    information was not used.
+
+    With MR23 the #errclass declarations are used for syntax error messages
+    when matching a #tokclass, a wildcard (i.e. "*"), or the complement of a
+    #token or #tokclass (e.g. ~Operator).
+
+    Please note that #errclass may now be defined using #tokclass names 
+    (see Item #284).
+
+    Reported by Philip A. Wilsey.
+
+#287. (Changed in MR23) Print name for #tokclass
+
+    Item #148 describes how to give a print name to a #token so that,for
+    example, #token ID could have the expression "identifier" in syntax
+    error messages.  This has been extended to #tokclass:
+    
+            #token ID("identifier")  "[a-zA-Z]+"
+            #tokclass Primitive("primitive type") 
+                                    {INT, FLOAT, CHAR, FLOAT, DOUBLE, BOOL} 
+
+    This is really a cosmetic change, since #tokclass names do not appear
+    in any error messages.
+        
+#286. (Changed in MR23) Makefile change to use of cd
+
+    In cases where a pccts subdirectory name matched a directory identified
+    in a $CDPATH environment variable the build would fail.  All makefile
+    cd commands have been changed from "cd xyz" to "cd ./xyz" in order
+    to avoid this problem.
+        
+#285. (Changed in MR23) Check for null pointers in some dlg structures
+
+    An invalid regular expression can cause dlg to build an invalid
+    structure to represent the regular expression even while it issues 
+    error messages.  Additional pointer checks were added.
+
+    Reported by Robert Sherry.
+
+#284. (Changed in MR23) Allow #tokclass in #errclass definitions
+
+    Previously, a #tokclass reference in the definition of an
+    #errclass was not handled properly. Instead of being expanded
+    into the set of tokens represented by the #tokclass it was
+    treated somewhat like an #errclass.  However, in a later phase
+    when all #errclass were expanded into the corresponding tokens
+    the #tokclass reference was not expanded (because it wasn't an
+    #errclass).  In effect the reference was ignored.
+
+    This has been fixed.
+
+    Problem reported by Mike Dimmick (mike dimmick.demon.co.uk).
+
+#283. (Changed in MR23) Option -tmake invoke's parser's tmake 
+
+    When the string #(...) appears in an action antlr replaces it with
+    a call to ASTBase::tmake(...) to construct an AST.  It is sometimes
+    useful to change the tmake routine so that it has access to information
+    in the parser - something which is not possible with a static method
+    in an application where they may be multiple parsers active.
+
+    The antlr option -tmake replaces the call to ASTBase::tmake with a call
+    to a user supplied tmake routine.
+   
+#282. (Changed in MR23) Initialization error for DBG_REFCOUNTTOKEN
+
+    When the pre-processor symbol DBG_REFCOUNTTOKEN is defined 
+    incorrect code is generated to initialize ANTLRRefCountToken::ctor and
+    dtor.
+
+    Fix reported by Sven Kuehn (sven sevenkuehn.de).
+   
+#281. (Changed in MR23) Addition of -noctor option for Sorcerer
+
+    Added a -noctor option to suppress generation of the blank ctor
+    for users who wish to define their own ctor.
+
+    Contributed by Jan Langer (jan langernetz.de).
+
+#280. (Changed in MR23) Syntax error message for EOF token
+
+    The EOF token now receives special treatment in syntax error messages
+    because there is no text matched by the eof token.  The token name
+    of the eof token is used unless it is "@" - in which case the string
+    "<eof>" is used.
+
+    Problem reported by Erwin Achermann (erwin.achermann switzerland.org).
+
+#279. (Changed in MR23) Exception groups
+
+    There was a bug in the way that exception groups were attached to
+    alternatives which caused problems when there was a block contained
+    in an alternative.  For instance, in the following rule;
+
+        statement : IF S { ELSE S } 
+                        exception ....
+        ;
+
+    the exception would be attached to the {...} block instead of the 
+    entire alternative because it was attached, in error, to the last
+    alternative instead of the last OPEN alternative.
+
+    Reported by Ty Mordane (tymordane hotmail.com).
+    
+#278. (Changed in MR23) makefile changes
+
+    Contributed by Tomasz Babczynski (faster lab05-7.ict.pwr.wroc.pl).
+
+    The -cfile option is not absolutely needed: when extension of
+    source file is one of the well-known C/C++ extensions it is 
+    treated as C/C++ source
+
+    The gnu make defines the CXX variable as the default C++ compiler
+    name, so I added a line to copy this (if defined) to the CCC var.
+
+    Added a -sor option: after it any -class command defines the class
+    name for sorcerer, not for ANTLR.  A file extended with .sor is 
+    treated as sorcerer input.  Because sorcerer can be called multiple
+    times, -sor option can be repeated.  Any files and classes (one class
+    per group) after each -sor makes one tree parser.
+
+    Not implemented:
+
+        1. Generate dependences for user c/c++ files.
+        2. Support for -sor in c mode not.
+
+    I have left the old genmk program in the directory as genmk_old.c.
+
+#277. (Changed in MR23) Change in macro for failed semantic predicates
+
+    In the past, a semantic predicate that failed generated a call to
+    the macro zzfailed_pred:
+
+        #ifndef zzfailed_pred
+        #define zzfailed_pred(_p) \
+          if (guessing) { \
+            zzGUESS_FAIL; \
+          } else { \
+            something(_p)
+          }
+        #endif
+
+    If a user wished to use the failed action option for semantic predicates:
+
+        rule : <<my_predicate>>? [my_fail_action] A
+             | ...
+
+           
+    the code for my_fail_action would have to contain logic for handling
+    the guess part of the zzfailed_pred macro.  The user should not have
+    to be aware of the guess logic in writing the fail action.
+
+    The zzfailed_pred has been rewritten to have three arguments:
+
+            arg 1: the stringized predicate of the semantic predicate
+            arg 2: 0 => there is no user-defined fail action
+                   1 => there is a user-defined fail action
+            arg 3: the user-defined fail action (if defined)
+                   otherwise a no-operation
+
+    The zzfailed_pred macro is now defined as:
+
+        #ifndef zzfailed_pred
+        #define zzfailed_pred(_p,_hasuseraction,_useraction) \
+          if (guessing) { \
+            zzGUESS_FAIL; \
+          } else { \
+            zzfailed_pred_action(_p,_hasuseraction,_useraction) \
+          }
+        #endif
+
+
+    With zzfailed_pred_action defined as:
+
+        #ifndef zzfailed_pred_action
+        #define zzfailed_pred_action(_p,_hasuseraction,_useraction) \
+            if (_hasUserAction) { _useraction } else { failedSemanticPredicate(_p); }
+        #endif
+
+    In C++ mode failedSemanticPredicate() is a virtual function.
+    In C mode the default action is a fprintf statement.
+
+    Suggested by Erwin Achermann (erwin.achermann switzerland.org).
+
+#276. (Changed in MR23) Addition of return value initialization syntax
+
+    In an attempt to reduce the problems caused by the PURIFY macro I have
+    added new syntax for initializing the return value of rules and the
+    antlr option "-nopurify".
+
+    A rule with a single return argument:
+
+        r1 > [Foo f = expr] :
+
+    now generates code that resembles:
+
+        Foo r1(void) {
+          Foo _retv = expr;
+          ...
+        }
+  
+    A rule with more than one return argument:
+
+        r2 > [Foo f = expr1, Bar b = expr2 ] :
+
+    generates code that resembles:
+
+        struct _rv1 {
+            Foo f;
+            Bar b;
+        }
+
+        _rv1 r2(void) {
+          struct _rv1 _retv;
+          _retv.f = expr1;
+          _retv.b = expr2;
+          ...
+        }
+
+    C++ style comments appearing in the initialization list may cause problems.
+
+#275. (Changed in MR23) Addition of -nopurify option to antlr
+
+    A long time ago the PURIFY macro was introduced to initialize
+    return value arguments and get rid of annying messages from program
+    that checked for unitialized variables.
+
+    This has caused significant annoyance for C++ users that had
+    classes with virtual functions or non-trivial contructors because
+    it would zero the object, including the pointer to the virtual
+    function table.  This could be defeated by redefining
+    the PURIFY macro to be empty, but it was a constant surprise to
+    new C++ users of pccts.
+
+    I would like to remove it, but I fear that some existing programs
+    depend on it and would break.  My temporary solution is to add
+    an antlr option -nopurify which disables generation of the PURIFY
+    macro call.
+
+    The PURIFY macro should be avoided in favor of the new syntax
+    for initializing return arguments described in item #275.
+
+    To avoid name clash, the PURIFY macro has been renamed PCCTS_PURIFY.
+
+#274. (Changed in MR23) DLexer.cpp renamed to DLexer.h
+      (Changed in MR23) ATokPtr.cpp renamed to ATokPtrImpl.h
+
+    These two files had .cpp extensions but acted like .h files because
+    there were included in other files. This caused problems for many IDE.
+    I have renamed them.  The ATokPtrImpl.h was necessary because there was
+    already an ATokPtr.h.
+
+#273. (Changed in MR23) Default win32 library changed to multi-threaded DLL
+
+    The model used for building the Win32 debug and release libraries has changed
+    to multi-threaded DLL.
+
+    To make this change in your MSVC 6 project:
+
+        Project -> Settings
+        Select the C++ tab in the right pane of the dialog box
+        Select "Category: Code Generation"
+        Under "Use run-time library" select one of the following:
+
+            Multi-threaded DLL
+            Debug Multi-threaded DLL
+           
+    Suggested by Bill Menees (bill.menees gogallagher.com) 
+    
+#272. (Changed in MR23) Failed semantic predicate reported via virtual function
+
+    In the past, a failed semantic predicated reported the problem via a
+    macro which used fprintf().  The macro now expands into a call on 
+    the virtual function ANTLRParser::failedSemanticPredicate().
+
+#271. (Changed in MR23) Warning for LT(i), LATEXT(i) in token match actions
+
+    An bug (or at least an oddity) is that a reference to LT(1), LA(1),
+    or LATEXT(1) in an action which immediately follows a token match
+    in a rule refers to the token matched, not the token which is in
+    the lookahead buffer.  Consider:
+
+        r : abc <<action alpha>> D <<action beta>> E;
+
+    In this case LT(1) in action alpha will refer to the next token in
+    the lookahead buffer ("D"), but LT(1) in action beta will refer to
+    the token matched by D - the preceding token.
+
+    A warning has been added for users about this when an action
+    following a token match contains a reference to LT(1), LA(1), or LATEXT(1).
+
+    This behavior should be changed, but it appears in too many programs
+    now.  Another problem, perhaps more significant, is that the obvious
+    fix (moving the consume() call to before the action) could change the 
+    order in which input is requested and output appears in existing programs.
+
+    This problem was reported, along with a fix by Benjamin Mandel
+    (beny sd.co.il).  However, I felt that changing the behavior was too
+    dangerous for existing code.
+
+#270. (Changed in MR23) Removed static objects from PCCTSAST.cpp
+
+    There were some statically allocated objects in PCCTSAST.cpp
+    These were changed to non-static.
+
+#269. (Changed in MR23) dlg output for initializing static array
+
+    The output from dlg contains a construct similar to the
+    following:
+   
+        struct XXX {
+          static const int size;
+          static int array1[5];
+        };
+
+        const int XXX::size = 4;
+        int XXX::array1[size+1];
+
+    
+    The problem is that although the expression "size+1" used in
+    the definition of array1 is equal to 5 (the expression used to
+    declare array), it is not considered equivalent by some compilers.
+
+    Reported with fix by Volker H. Simonis (simonis informatik.uni-tuebingen.de)
+
+#268. (Changed in MR23) syn() routine output when k > 1
+
+    The syn() routine is supposed to print out the text of the
+    token causing the syntax error.  It appears that it always
+    used the text from the first lookahead token rather than the
+    appropriate one.  The appropriate one is computed by comparing
+    the token codes of lookahead token i (for i = 1 to k) with
+    the FIRST(i) set.
+    
+    This has been corrected in ANTLRParser::syn().
+
+    Reported by Bill Menees (bill.menees gogallagher.com) 
+
+#267. (Changed in MR23) AST traversal functions client data argument
+
+    The AST traversal functions now take an extra (optional) parameter
+    which can point to client data:
+
+        preorder_action(void* pData = NULL)
+        preorder_before_action(void* pData = NULL)
+        preorder_after_action(void* pData = NULL)
+
+    ****       Warning: this changes the AST signature.         ***
+    **** Be sure to revise your AST functions of the same name  ***
+
+    Bill Menees (bill.menees gogallagher.com) 
+    
+#266. (Changed in MR23) virtual function printMessage()
+
+    Bill Menees (bill.menees gogallagher.com) has completed the
+    tedious taks of replacing all calls to fprintf() with calls
+    to the virtual function printMessage().  For classes which
+    have a pointer to the parser it forwards the printMessage()
+    call to the parser's printMessage() routine.
+
+    This should make it significanly easier to redirect pccts
+    error and warning messages.
+
+#265. (Changed in MR23) Remove "labase++" in C++ mode
+
+    In C++ mode labase++ is called when a token is matched.
+    It appears that labase is not used in C++ mode at all, so
+    this code has been commented out.
+    
+#264. (Changed in MR23) Complete rewrite of ParserBlackBox.h
+
+    The parser black box (PBlackBox.h) was completely rewritten
+    by Chris Uzdavinis (chris atdesk.com) to improve its robustness.
+
+#263. (Changed in MR23) -preamble and -preamble_first rescinded
+
+    Changes for item #253 have been rescinded.
+
+#262. (Changed in MR23) Crash with -alpha option during traceback
+
+    Under some circumstances a -alpha traceback was started at the
+    "wrong" time.  As a result, internal data structures were not
+    initialized.
+
+    Reported by Arpad Beszedes (beszedes inf.u-szeged.hu).
+
+#261. (Changed in MR23) Defer token fetch for C++ mode
+
+    Item #216 has been revised to indicate that use of the defer fetch
+    option (ZZDEFER_FETCH) requires dlg option -i.
+
+#260. (MR22) Raise default lex buffer size from 8,000 to 32,000 bytes.
+
+    ZZLEXBUFSIZE is the size (in bytes) of the buffer used by dlg 
+    generated lexers.  The default value has been raised to 32,000 and
+    the value used by antlr, dlg, and sorcerer has also been raised to
+    32,000.
+
+#259. (MR22) Default function arguments in C++ mode.
+
+    If a rule is declared:
+
+            rr [int i = 0] : ....
+
+    then the declaration generated by pccts resembles:
+
+            void rr(int i = 0);
+
+    however, the definition must omit the default argument:
+
+            void rr(int i) {...}
+
+    In the past the default value was not omitted.  In MR22
+    the generated code resembles:
+
+            void rr(int i /* = 0 */ ) {...}
+
+    Implemented by Volker H. Simonis (simonis informatik.uni-tuebingen.de)
+
+
+    Note: In MR23 this was changed so that nested C style comments
+    ("/* ... */") would not cause problems.
+
+#258. (MR22)  Using a base class for your parser
+
+    In item #102 (MR10) the class statement was extended to allow one
+    to specify a base class other than ANTLRParser for the generated
+    parser.  It turned out that this was less than useful because
+    the constructor still specified ANTLRParser as the base class.
+
+    The class statement now uses the first identifier appearing after
+    the ":" as the name of the base class.  For example:
+
+        class MyParser : public FooParser {
+
+    Generates in MyParser.h:
+
+            class MyParser : public FooParser {
+
+    Generates in MyParser.cpp something that resembles:
+
+            MyParser::MyParser(ANTLRTokenBuffer *input) :
+                                         FooParser(input,1,0,0,4)
+            {
+                token_tbl = _token_tbl;
+                traceOptionValueDefault=1;    // MR10 turn trace ON
+            }
+
+    The base class constructor must have a signature similar to
+    that of ANTLRParser.
+
+#257. (MR21a) Removed dlg statement that -i has no effect in C++ mode.
+
+    This was incorrect.
+
+#256. (MR21a) Malformed syntax graph causes crash after error message.
+
+    In the past, certain kinds of errors in the very first grammar
+    element could cause the construction of a malformed graph 
+    representing the grammar.  This would eventually result in a
+    fatal internal error.  The code has been changed to be more
+    resistant to this particular error.
+
+#255. (MR21a) ParserBlackBox(FILE* f) 
+
+    This constructor set openByBlackBox to the wrong value.
+
+    Reported by Kees Bakker (kees_bakker tasking.nl).
+
+#254. (MR21a) Reporting syntax error at end-of-file
+
+    When there was a syntax error at the end-of-file the syntax
+    error routine would substitute "<eof>" for the programmer's
+    end-of-file symbol.  This substitution is now done only when
+    the programmer does not define his own end-of-file symbol
+    or the symbol begins with the character "@".
+
+    Reported by Kees Bakker (kees_bakker tasking.nl).
+
+#253. (MR21) Generation of block preamble (-preamble and -preamble_first)
+
+        *** This change was rescinded by item #263 ***
+
+    The antlr option -preamble causes antlr to insert the code
+    BLOCK_PREAMBLE at the start of each rule and block.  It does
+    not insert code before rules references, token references, or
+    actions.  By properly defining the macro BLOCK_PREAMBLE the
+    user can generate code which is specific to the start of blocks.
+
+    The antlr option -preamble_first is similar, but inserts the
+    code BLOCK_PREAMBLE_FIRST(PreambleFirst_123) where the symbol
+    PreambleFirst_123 is equivalent to the first set defined by
+    the #FirstSetSymbol described in Item #248.
+
+    I have not investigated how these options interact with guess
+    mode (syntactic predicates).
+
+#252. (MR21) Check for null pointer in trace routine
+
+    When some trace options are used when the parser is generated
+    without the trace enabled, the current rule name may be a
+    NULL pointer.  A guard was added to check for this in
+    restoreState.
+
+    Reported by Douglas E. Forester (dougf projtech.com).
+
+#251. (MR21) Changes to #define zzTRACE_RULES
+
+    The macro zzTRACE_RULES was being use to pass information to
+    AParser.h.  If this preprocessor symbol was not properly
+    set the first time AParser.h was #included, the declaration
+    of zzTRACEdata would be omitted (it is used by the -gd option).
+    Subsequent #includes of AParser.h would be skipped because of 
+    the #ifdef guard, so the declaration of zzTracePrevRuleName would
+    never be made.  The result was that proper compilation was very 
+    order dependent.
+
+    The declaration of zzTRACEdata was made unconditional and the
+    problem of removing unused declarations will be left to optimizers.
+    
+    Diagnosed by Douglas E. Forester (dougf projtech.com).
+
+#250. (MR21) Option for EXPERIMENTAL change to error sets for blocks
+
+    The antlr option -mrblkerr turns on an experimental feature
+    which is supposed to provide more accurate syntax error messages
+    for k=1, ck=1 grammars.  When used with k>1 or ck>1 grammars the
+    behavior should be no worse than the current behavior.
+
+    There is no problem with the matching of elements or the computation
+    of prediction expressions in pccts.  The task is only one of listing
+    the most appropriate tokens in the error message.  The error sets used
+    in pccts error messages are approximations of the exact error set when
+    optional elements in (...)* or (...)+ are involved.  While entirely
+    correct, the error messages are sometimes not 100% accurate.  
+
+    There is also a minor philosophical issue.  For example, suppose the
+    grammar expects the token to be an optional A followed by Z, and it 
+    is X.  X, of course, is neither A nor Z, so an error message is appropriate.
+    Is it appropriate to say "Expected Z" ?  It is correct, it is accurate,
+    but it is not complete.  
+
+    When k>1 or ck>1 the problem of providing the exactly correct
+    list of tokens for the syntax error messages ends up becoming
+    equivalent to evaluating the prediction expression for the
+    alternatives twice. However, for k=1 ck=1 grammars the prediction
+    expression can be computed easily and evaluated cheaply, so I
+    decided to try implementing it to satisfy a particular application.
+    This application uses the error set in an interactive command language
+    to provide prompts which list the alternatives available at that
+    point in the parser.  The user can then enter additional tokens to
+    complete the command line.  To do this required more accurate error 
+    sets then previously provided by pccts.
+
+    In some cases the default pccts behavior may lead to more robust error
+    recovery or clearer error messages then having the exact set of tokens.
+    This is because (a) features like -ge allow the use of symbolic names for
+    certain sets of tokens, so having extra tokens may simply obscure things
+    and (b) the error set is use to resynchronize the parser, so a good
+    choice is sometimes more important than having the exact set.
+
+    Consider the following example:
+
+            Note:  All examples code has been abbreviated
+            to the absolute minimum in order to make the
+            examples concise.
+
+        star1 : (A)* Z;
+
+    The generated code resembles:
+
+           old                new (with -mrblkerr)
+        --//-----------         --------------------
+        for (;;) {            for (;;) {
+            match(A);           match(A);
+        }                     }
+        match(Z);             if (! A and ! Z) then
+                                FAIL(...{A,Z}...);
+                              }
+                              match(Z);
+
+
+        With input X
+            old message: Found X, expected Z
+            new message: Found X, expected A, Z
+
+    For the example:
+
+        star2 : (A|B)* Z;
+
+           old                      new (with -mrblkerr)
+        -------------               --------------------
+        for (;;) {                  for (;;) {
+          if (!A and !B) break;       if (!A and !B) break;
+          if (...) {                  if (...) {
+            <same ...>                  <same ...>
+          }                           }
+          else {                      else {
+            FAIL(...{A,B,Z}...)         FAIL(...{A,B}...);
+          }                           }
+        }                           }
+        match(B);                   if (! A and ! B and !Z) then
+                                        FAIL(...{A,B,Z}...);
+                                    }
+                                    match(B);
+
+        With input X
+            old message: Found X, expected Z
+            new message: Found X, expected A, B, Z
+        With input A X
+            old message: Found X, expected Z
+            new message: Found X, expected A, B, Z
+
+            This includes the choice of looping back to the
+            star block.
+
+    The code for plus blocks:
+
+        plus1 : (A)+ Z;
+
+    The generated code resembles:
+
+           old                  new (with -mrblkerr)
+        -------------           --------------------
+        do {                    do {
+          match(A);               match(A);
+        } while (A)             } while (A)
+        match(Z);               if (! A and ! Z) then
+                                  FAIL(...{A,Z}...);
+                                }
+                                match(Z);
+
+        With input A X
+            old message: Found X, expected Z
+            new message: Found X, expected A, Z
+
+            This includes the choice of looping back to the
+            plus block.
+
+    For the example:
+
+        plus2 : (A|B)+ Z;
+
+           old                    new (with -mrblkerr)
+        -------------             --------------------
+        do {                        do {
+          if (A) {                    <same>
+            match(A);                 <same>
+          } else if (B) {             <same>
+            match(B);                 <same>
+          } else {                    <same>
+            if (cnt > 1) break;       <same>
+            FAIL(...{A,B,Z}...)         FAIL(...{A,B}...);
+          }                           }
+          cnt++;                      <same>
+        }                           }
+
+        match(Z);                   if (! A and ! B and !Z) then
+                                        FAIL(...{A,B,Z}...);
+                                    }
+                                    match(B);
+
+        With input X
+            old message: Found X, expected A, B, Z
+            new message: Found X, expected A, B
+        With input A X
+            old message: Found X, expected Z
+            new message: Found X, expected A, B, Z
+
+            This includes the choice of looping back to the
+            star block.
+    
+#249. (MR21) Changes for DEC/VMS systems
+
+    Jean-François Piéronne (jfp altavista.net) has updated some
+    VMS related command files and fixed some minor problems related
+    to building pccts under the DEC/VMS operating system.  For DEC/VMS
+    users the most important differences are:
+
+        a.  Revised makefile.vms
+        b.  Revised genMMS for genrating VMS style makefiles.
+
+#248. (MR21) Generate symbol for first set of an alternative
+
+    pccts can generate a symbol which represents the tokens which may
+    appear at the start of a block:
+
+        rr : #FirstSetSymbol(rr_FirstSet)  ( Foo | Bar ) ;
+
+    This will generate the symbol rr_FirstSet of type SetWordType with
+    elements Foo and Bar set. The bits can be tested using code similar 
+    to the following:
+
+        if (set_el(Foo, &rr_FirstSet)) { ...
+
+    This can be combined with the C array zztokens[] or the C++ routine
+    tokenName() to get the print name of the token in the first set.
+
+    The size of the set is given by the newly added enum SET_SIZE, a 
+    protected member of the generated parser's class.  The number of
+    elements in the generated set will not be exactly equal to the 
+    value of SET_SIZE because of synthetic tokens created by #tokclass,
+    #errclass, the -ge option, and meta-tokens such as epsilon, and
+    end-of-file.
+
+    The #FirstSetSymbol must appear immediately before a block
+    such as (...)+, (...)*, and {...}, and (...).  It may not appear
+    immediately before a token, a rule reference, or action.  However
+    a token or rule reference can be enclosed in a (...) in order to
+    make the use of #pragma FirstSetSymbol legal.
+
+            rr_bad : #FirstSetSymbol(rr_bad_FirstSet) Foo;   //  Illegal
+
+            rr_ok :  #FirstSetSymbol(rr_ok_FirstSet) (Foo);  //  Legal
+    
+    Do not confuse FirstSetSymbol sets with the sets used for testing
+    lookahead. The sets used for FirstSetSymbol have one element per bit,
+    so the number of bytes  is approximately the largest token number
+    divided by 8.  The sets used for testing lookahead store 8 lookahead 
+    sets per byte, so the length of the array is approximately the largest
+    token number.
+
+    If there is demand, a similar routine for follow sets can be added.
+
+#247. (MR21) Misleading error message on syntax error for optional elements.
+
+        ===================================================
+        The behavior has been revised when parser exception
+        handling is used.  See Item #290
+        ===================================================
+
+    Prior to MR21, tokens which were optional did not appear in syntax
+    error messages if the block which immediately followed detected a 
+    syntax error.
+
+    Consider the following grammar which accepts Number, Word, and Other:
+
+            rr : {Number} Word;
+
+    For this rule the code resembles:
+
+            if (LA(1) == Number) {
+                match(Number);
+                consume();
+            }
+            match(Word);
+
+    Prior to MR21, the error message for input "$ a" would be:
+
+            line 1: syntax error at "$" missing Word
+
+    With MR21 the message will be:
+
+            line 1: syntax error at "$" expecting Word, Number.
+
+    The generate code resembles:
+
+            if ( (LA(1)==Number) ) {
+                zzmatch(Number);
+                consume();
+            }
+            else {
+                if ( (LA(1)==Word) ) {
+                    /* nothing */
+                }
+                else {
+                    FAIL(... message for both Number and Word ...);
+                }
+            }
+            match(Word);
+        
+    The code generated for optional blocks in MR21 is slightly longer
+    than the previous versions, but it should give better error messages.
+
+    The code generated for:
+
+            { a | b | c }
+
+    should now be *identical* to:
+
+            ( a | b | c | )
+
+    which was not the case prior to MR21.
+
+    Reported by Sue Marvin (sue siara.com).
+
+#246. (Changed in MR21) Use of $(MAKE) for calls to make
+
+    Calls to make from the makefiles were replaced with $(MAKE)
+    because of problems when using gmake.
+
+    Reported with fix by Sunil K.Vallamkonda (sunil siara.com).
+
+#245. (Changed in MR21) Changes to genmk
+
+    The following command line options have been added to genmk:
+
+        -cfiles ... 
+            
+            To add a user's C or C++ files into makefile automatically.
+            The list of files must be enclosed in apostrophes.  This
+            option may be specified multiple times.
+
+        -compiler ...
+    
+            The name of the compiler to use for $(CCC) or $(CC).  The
+            default in C++ mode is "CC".  The default in C mode is "cc".
+
+        -pccts_path ...
+
+            The value for $(PCCTS), the pccts directory.  The default
+            is /usr/local/pccts.
+
+    Contributed by Tomasz Babczynski (t.babczynski ict.pwr.wroc.pl).
+
+#244. (Changed in MR21) Rename variable "not" in antlr.g
+
+    When antlr.g is compiled with a C++ compiler, a variable named
+    "not" causes problems.  Reported by Sinan Karasu
+    (sinan.karasu boeing.com).
+
+#243  (Changed in MR21) Replace recursion with iteration in zzfree_ast
+
+    Another refinement to zzfree_ast in ast.c to limit recursion.
+
+    NAKAJIMA Mutsuki (muc isr.co.jp).
+
+
+#242.  (Changed in MR21) LineInfoFormatStr
+
+    Added an #ifndef/#endif around LineInfoFormatStr in pcctscfg.h.
+
+#241. (Changed in MR21) Changed macro PURIFY to a no-op
+
+                ***********************
+                *** NOT IMPLEMENTED ***
+                ***********************
+
+        The PURIFY macro was changed to a no-op because it was causing 
+        problems when passing C++ objects.
+    
+        The old definition:
+    
+            #define PURIFY(r,s)     memset((char *) &(r),'\\0',(s));
+    
+        The new definition:
+    
+            #define PURIFY(r,s)     /* nothing */
+#endif
+
+#240. (Changed in MR21) sorcerer/h/sorcerer.h _MATCH and _MATCHRANGE
+
+    Added test for NULL token pointer.
+
+    Suggested by Peter Keller (keller ebi.ac.uk)
+
+#239. (Changed in MR21) C++ mode AParser::traceGuessFail
+
+    If tracing is turned on when the code has been generated
+    without trace code, a failed guess generates a trace report
+    even though there are no other trace reports.  This
+    make the behavior consistent with other parts of the
+    trace system.
+
+    Reported by David Wigg (wiggjd sbu.ac.uk).
+
+#238. (Changed in MR21) Namespace version #include files
+
+    Changed reference from CStdio to cstdio (and other
+    #include file names) in the namespace version of pccts.
+    Should have known better.
+
+#237. (Changed in MR21) ParserBlackBox(FILE*)
+    
+    In the past, ParserBlackBox would close the FILE in the dtor
+    even though it was not opened by ParserBlackBox.  The problem
+    is that there were two constructors, one which accepted a file   
+    name and did an fopen, the other which accepted a FILE and did
+    not do an fopen.  There is now an extra member variable which
+    remembers whether ParserBlackBox did the open or not.
+
+    Suggested by Mike Percy (mpercy scires.com).
+
+#236. (Changed in MR21) tmake now reports down pointer problem
+
+    When ASTBase::tmake attempts to update the down pointer of 
+    an AST it checks to see if the down pointer is NULL.  If it
+    is not NULL it does not do the update and returns NULL.
+    An attempt to update the down pointer is almost always a
+    result of a user error.  This can lead to difficult to find
+    problems during tree construction.
+
+    With this change, the routine calls a virtual function
+    reportOverwriteOfDownPointer() which calls panic to
+    report the problem.  Users who want the old behavior can
+    redefined the virtual function in their AST class.
+
+    Suggested by Sinan Karasu (sinan.karasu boeing.com)
+
+#235. (Changed in MR21) Made ANTLRParser::resynch() virtual
+
+    Suggested by Jerry Evans (jerry swsl.co.uk).
+
+#234. (Changed in MR21) Implicit int for function return value
+
+    ATokenBuffer:bufferSize() did not specify a type for the
+    return value.
+
+    Reported by Hai Vo-Ba (hai fc.hp.com).
+
+#233. (Changed in MR20) Converted to MSVC 6.0
+
+    Due to external circumstances I have had to convert to MSVC 6.0
+    The MSVC 5.0 project files (.dsw and .dsp) have been retained as
+    xxx50.dsp and xxx50.dsw.  The MSVC 6.0 files are named xxx60.dsp
+    and xxx60.dsw (where xxx is the related to the directory/project).
+
+#232. (Changed in MR20) Make setwd bit vectors protected in parser.h
+
+    The access for the setwd array in the parser header was not
+    specified.  As a result, it would depend on the code which 
+    preceded it.  In MR20 it will always have access "protected".
+
+    Reported by Piotr Eljasiak (eljasiak zt.gdansk.tpsa.pl).
+
+#231. (Changed in MR20) Error in token buffer debug code.
+
+    When token buffer debugging is selected via the pre-processor
+    symbol DEBUG_TOKENBUFFER there is an erroneous check in
+    AParser.cpp:
+
+        #ifdef DEBUG_TOKENBUFFER
+            if (i >= inputTokens->bufferSize() ||
+                inputTokens->minTokens() < LLk )     /* MR20 Was "<=" */
+        ...
+        #endif
+
+    Reported by David Wigg (wiggjd sbu.ac.uk).
+
+#230. (Changed in MR20) Fixed problem with #define for -gd option
+
+    There was an error in setting zzTRACE_RULES for the -gd (trace) option.
+
+    Reported by Gary Funck (gary intrepid.com).
+
+#229. (Changed in MR20) Additional "const" for literals
+
+    "const" was added to the token name literal table.
+    "const" was added to some panic() and similar routine
+
+#228. (Changed in MR20) dlg crashes on "()"
+
+    The following token defintion will cause DLG to crash.
+
+        #token "()"
+
+    When there is a syntax error in a regular expression
+    many of the dlg routines return a structure which has
+    null pointers.  When this is accessed by callers it
+    generates the crash.
+
+    I have attempted to fix the more common cases.
+
+    Reported by  Mengue Olivier (dolmen bigfoot.com).
+
+#227. (Changed in MR20) Array overwrite
+
+    Steveh Hand (sassth unx.sas.com) reported a problem which
+    was traced to a temporary array which was not properly
+    resized for deeply nested blocks.  This has been fixed.
+
+#226. (Changed in MR20) -pedantic conformance
+   
+    G. Hobbelt (i_a mbh.org) and THM made many, many minor 
+    changes to create prototypes for all the functions and
+    bring antlr, dlg, and sorcerer into conformance with
+    the gcc -pedantic option.
+
+    This may require uses to add pccts/h/pcctscfg.h to some
+    files or makefiles in order to have __USE_PROTOS defined.
+
+#225  (Changed in MR20) AST stack adjustment in C mode
+
+    The fix in #214 for AST stack adjustment in C mode missed 
+    some cases.
+
+    Reported with fix by Ger Hobbelt (i_a mbh.org).
+
+#224  (Changed in MR20) LL(1) and LL(2) with #pragma approx
+
+    This may take a record for the oldest, most trival, lexical
+    error in pccts.  The regular expressions for LL(1) and LL(2)
+    lacked an escape for the left and right parenthesis.
+
+    Reported by Ger Hobbelt (i_a mbh.org).
+
+#223  (Changed in MR20) Addition of IBM_VISUAL_AGE directory
+
+    Build files for antlr, dlg, and sorcerer under IBM Visual Age 
+    have been contributed by Anton Sergeev (ags mlc.ru).  They have
+    been placed in the pccts/IBM_VISUAL_AGE directory.
+
+#222  (Changed in MR20) Replace __STDC__ with __USE_PROTOS
+
+    Most occurrences of __STDC__ replaced with __USE_PROTOS due to
+    complaints from several users.
+
+#221  (Changed in MR20) Added #include for DLexerBase.h to PBlackBox.
+
+    Added #include for DLexerBase.h to PBlackBox.
+
+#220  (Changed in MR19) strcat arguments reversed in #pred parse
+
+    The arguments to strcat are reversed when creating a print
+    name for a hash table entry for use with #pred feature.
+
+    Problem diagnosed and fix reported by Scott Harrington 
+    (seh4 ix.netcom.com).
+
+#219. (Changed in MR19) C Mode routine zzfree_ast
+
+    Changes to reduce use of recursion for AST trees with only right
+    links or only left links in the C mode routine zzfree_ast.
+
+    Implemented by SAKAI Kiyotaka (ksakai isr.co.jp).
+
+#218. (Changed in MR19) Changes to support unsigned char in C mode
+
+    Changes to antlr.h and err.h to fix omissions in use of zzchar_t
+
+    Implemented by SAKAI Kiyotaka (ksakai isr.co.jp).
+
+#217. (Changed in MR19) Error message when dlg -i and -CC options selected
+    
+    *** This change was rescinded by item #257 ***
+
+    The parsers generated by pccts in C++ mode are not able to support the
+    interactive lexer option (except, perhaps, when using the deferred fetch
+    parser option.(Item #216).
+
+    DLG now warns when both -i and -CC are selected.
+
+    This warning was suggested by David Venditti (07751870267-0001 t-online.de).
+
+#216. (Changed in MR19) Defer token fetch for C++ mode
+
+    Implemented by Volker H. Simonis (simonis informatik.uni-tuebingen.de)
+
+    Normally, pccts keeps the lookahead token buffer completely filled.
+    This requires max(k,ck) tokens of lookahead.  For some applications
+    this can cause deadlock problems.  For example, there may be cases
+    when the parser can't tell when the input has been completely consumed
+    until the parse is complete, but the parse can't be completed because 
+    the input routines are waiting for additional tokens to fill the
+    lookahead buffer.
+    
+    When the ANTLRParser class is built with the pre-processor option 
+    ZZDEFER_FETCH defined, the fetch of new tokens by consume() is deferred
+    until LA(i) or LT(i) is called. 
+
+    To test whether this option has been built into the ANTLRParser class
+    use "isDeferFetchEnabled()".
+
+    Using the -gd trace option with the default tracein() and traceout()
+    routines will defeat the effort to defer the fetch because the
+    trace routines print out information about the lookahead token at
+    the start of the rule.
+    
+    Because the tracein and traceout routines are virtual it is 
+    easy to redefine them in your parser:
+
+        class MyParser {
+        <<
+            virtual void tracein(ANTLRChar * ruleName)
+                { fprintf(stderr,"Entering: %s\n", ruleName); }
+            virtual void traceout(ANTLRChar * ruleName)
+                { fprintf(stderr,"Leaving: %s\n", ruleName); }
+        >>
+ 
+    The originals for those routines are pccts/h/AParser.cpp
+ 
+    This requires use of the dlg option -i (interactive lexer).
+
+    This is implemented only for C++ mode.
+
+    This is experimental.  The interaction with guess mode (syntactic
+    predicates)is not known.
+
+#215. (Changed in MR19) Addition of reset() to DLGLexerBase
+
+    There was no obvious way to reset the lexer for reuse.  The
+    reset() method now does this.
+
+    Suggested by David Venditti (07751870267-0001 t-online.de).
+
+#214. (Changed in MR19)  C mode: Adjust AST stack pointer at exit
+
+    In C mode the AST stack pointer needs to be reset if there will
+    be multiple calls to the ANTLRx macros.
+
+    Reported with fix by Paul D. Smith (psmith baynetworks.com).
+
+#213. (Changed in MR18)  Fatal error with -mrhoistk (k>1 hoisting)
+
+    When rearranging code I forgot to un-comment a critical line of
+    code that handles hoisting of predicates with k>1 lookahead.  This
+    is now fixed.
+
+    Reported by Reinier van den Born (reinier vnet.ibm.com).
+
+#212. (Changed in MR17)  Mac related changes by Kenji Tanaka
+
+    Kenji Tanaka (kentar osa.att.ne.jp) has made a number of changes for
+    Macintosh users.
+
+    a.  The following Macintosh MPW files aid in installing pccts on Mac:
+
+            pccts/MPW_Read_Me
+
+            pccts/install68K.mpw
+            pccts/installPPC.mpw
+
+            pccts/antlr/antlr.r
+            pccts/antlr/antlr68K.make
+            pccts/antlr/antlrPPC.make
+
+            pccts/dlg/dlg.r
+            pccts/dlg/dlg68K.make
+            pccts/dlg/dlgPPC.make
+
+            pccts/sorcerer/sor.r
+            pccts/sorcerer/sor68K.make
+            pccts/sorcerer/sorPPC.make
+    
+       They completely replace the previous Mac installation files.
+            
+    b. The most significant is a change in the MAC_FILE_CREATOR symbol
+       in pcctscfg.h:
+
+        old: #define MAC_FILE_CREATOR 'MMCC'   /* Metrowerks C/C++ Text files */
+        new: #define MAC_FILE_CREATOR 'CWIE'   /* Metrowerks C/C++ Text files */
+
+    c.  Added calls to special_fopen_actions() where necessary.
+
+#211. (Changed in MR16a)  C++ style comment in dlg
+
+    This has been fixed.
+
+#210. (Changed in MR16a)  Sor accepts \r\n, \r, or \n for end-of-line
+
+    A user requested that Sorcerer be changed to accept other forms
+    of end-of-line.
+
+#209. (Changed in MR16) Name of files changed.
+
+        Old:  CHANGES_FROM_1.33
+        New:  CHANGES_FROM_133.txt
+
+        Old:  KNOWN_PROBLEMS
+        New:  KNOWN_PROBLEMS.txt
+
+#208. (Changed in MR16) Change in use of pccts #include files
+
+    There were problems with MS DevStudio when mixing Sorcerer and
+    PCCTS in the same source file.  The problem is caused by the
+    redefinition of setjmp in the MS header file setjmp.h.  In
+    setjmp.h the pre-processor symbol setjmp was redefined to be
+    _setjmp.  A later effort to execute #include <setjmp.h> resulted 
+    in an effort to #include <_setjmp.h>.  I'm not sure whether this
+    is a bug or a feature.  In any case, I decided to fix it by
+    avoiding the use of pre-processor symbols in #include statements
+    altogether.  This has the added benefit of making pre-compiled
+    headers work again.
+
+    I've replaced statements:
+
+        old: #include PCCTS_SETJMP_H
+        new: #include "pccts_setjmp.h"
+
+    Where pccts_setjmp.h contains:
+
+            #ifndef __PCCTS_SETJMP_H__
+            #define __PCCTS_SETJMP_H__
+    
+            #ifdef PCCTS_USE_NAMESPACE_STD
+            #include <Csetjmp>
+            #else
+            #include <setjmp.h>
+            #endif
+
+            #endif
+        
+    A similar change has been made for other standard header files
+    required by pccts and sorcerer: stdlib.h, stdarg.h, stdio.h, etc.
+
+    Reported by Jeff Vincent (JVincent novell.com) and Dale Davis
+    (DalDavis spectrace.com).
+
+#207. (Changed in MR16) dlg reports an invalid range for: [\0x00-\0xff]
+
+     -----------------------------------------------------------------
+     Note from MR23:  This fix does not work.  I am investigating why.
+     -----------------------------------------------------------------
+
+    dlg will report that this is an invalid range.
+
+    Diagnosed by Piotr Eljasiak (eljasiak no-spam.zt.gdansk.tpsa.pl):
+
+        I think this problem is not specific to unsigned chars
+        because dlg reports no error for the range [\0x00-\0xfe].
+
+        I've found that information on range is kept in field
+        letter (unsigned char) of Attrib struct. Unfortunately
+        the letter value internally is for some reasons increased
+        by 1, so \0xff is represented here as 0.
+
+        That's why dlg complains about the range [\0x00-\0xff] in
+        dlg_p.g:
+
+        if ($$.letter > $2.letter) {
+          error("invalid range  ", zzline);
+        } 
+
+    The fix is:
+
+        if ($$.letter > $2.letter && 255 != $$2.letter) {
+          error("invalid range  ", zzline);
+        } 
+
+#206. (Changed in MR16) Free zzFAILtext in ANTLRParser destructor
+
+    The ANTLRParser destructor now frees zzFAILtext.
+
+    Problem and fix reported by Manfred Kogler (km cast.uni-linz.ac.at).
+
+#205. (Changed in MR16) DLGStringReset argument now const
+
+    Changed: void DLGStringReset(DLGChar *s) {...}
+    To:      void DLGStringReset(const DLGChar *s) {...}
+
+    Suggested by Dale Davis (daldavis spectrace.com)
+
+#204. (Changed in MR15a) Change __WATCOM__ to __WATCOMC__ in pcctscfg.h
+    
+    Reported by Oleg Dashevskii (olegdash my-dejanews.com).
+
+#203. (Changed in MR15) Addition of sorcerer to distribution kit
+
+    I have finally caved in to popular demand.  The pccts 1.33mr15
+    kit will include sorcerer.  The separate sorcerer kit will be
+    discontinued.
+
+#202. (Changed) in MR15) Organization of MS Dev Studio Projects in Kit
+
+    Previously there was one workspace that contained projects for
+    all three parts of pccts: antlr, dlg, and sorcerer.  Now each
+    part (and directory) has its own workspace/project and there
+    is an additional workspace/project to build a library from the
+    .cpp files in the pccts/h directory.
+
+    The library build will create pccts_debug.lib or pccts_release.lib
+    according to the configuration selected.  
+
+    If you don't want to build pccts 1.33MR15 you can download a
+    ready-to-run kit for win32 from http://www.polhode.com/win32.zip.
+    The ready-to-run for win32 includes executables, a pre-built static
+    library for the .cpp files in the pccts/h directory, and a  sample
+    application
+
+    You will need to define the environment variable PCCTS to point to
+    the root of the pccts directory hierarchy.
+
+#201. (Changed in MR15) Several fixes by K.J. Cummings (cummings peritus.com)
+
+      Generation of SETJMP rather than SETJMP_H in gen.c.
+
+      (Sor B19) Declaration of ref_vars_inits for ref_var_inits in
+      pccts/sorcerer/sorcerer.h.
+
+#200. (Changed in MR15) Remove operator=() in AToken.h
+
+      User reported that WatCom couldn't handle use of
+      explicit operator =().  Replace with equivalent
+      using cast operator.
+
+#199. (Changed in MR15) Don't allow use of empty #tokclass
+
+      Change antlr.g to disallow empty #tokclass sets.
+
+      Reported by Manfred Kogler (km cast.uni-linz.ac.at).
+
+#198. Revised ANSI C grammar due to efforts by Manuel Kessler
+
+      Manuel Kessler (mlkessler cip.physik.uni-wuerzburg.de)
+
+          Allow trailing ... in function parameter lists.
+          Add bit fields.
+          Allow old-style function declarations.
+          Support cv-qualified pointers.
+          Better checking of combinations of type specifiers.
+          Release of memory for local symbols on scope exit.
+          Allow input file name on command line as well as by redirection.
+
+              and other miscellaneous tweaks.
+
+      This is not part of the pccts distribution kit. It must be
+      downloaded separately from:
+
+            http://www.polhode.com/ansi_mr15.zip
+
+#197. (Changed in MR14) Resetting the lookahead buffer of the parser
+
+      Explanation and fix by Sinan Karasu (sinan.karasu boeing.com)
+
+      Consider the code used to prime the lookahead buffer LA(i)
+      of the parser when init() is called:
+
+        void
+        ANTLRParser::
+        prime_lookahead()
+        {
+            int i;
+            for(i=1;i<=LLk; i++) consume();
+            dirty=0;
+            //lap = 0;      // MR14 - Sinan Karasu (sinan.karusu boeing.com)
+            //labase = 0;   // MR14
+            labase=lap;     // MR14
+        }
+
+      When the parser is instantiated, lap=0,labase=0 is set.
+
+      The "for" loop runs LLk times. In consume(), lap = lap +1 (mod LLk) is
+      computed.  Therefore, lap(before the loop) == lap (after the loop).
+
+      Now the only problem comes in when one does an init() of the parser
+      after an Eof has been seen. At that time, lap could be non zero.
+      Assume it was lap==1. Now we do a prime_lookahead(). If LLk is 2,
+      then
+
+        consume()
+        {
+            NLA = inputTokens->getToken()->getType();
+            dirty--;
+            lap = (lap+1)&(LLk-1);
+        }
+
+      or expanding NLA,
+
+        token_type[lap&(LLk-1)]) = inputTokens->getToken()->getType();
+        dirty--;
+        lap = (lap+1)&(LLk-1);
+
+      so now we prime locations 1 and 2.  In prime_lookahead it used to set
+      lap=0 and labase=0.  Now, the next token will be read from location 0,
+      NOT 1 as it should have been.
+
+      This was never caught before, because if a parser is just instantiated,
+      then lap and labase are 0, the offending assignment lines are
+      basically no-ops, since the for loop wraps around back to 0.
+
+#196. (Changed in MR14) Problems with "(alpha)? beta" guess
+
+    Consider the following syntactic predicate in a grammar
+    with 2 tokens of lookahead (k=2 or ck=2):
+
+        rule  : ( alpha )? beta ;
+        alpha : S t ;
+        t     : T U
+              | T
+              ;
+        beta  : S t Z ;
+
+    When antlr computes the prediction expression with one token
+    of lookahead for alts 1 and 2 of rule t it finds an ambiguity.
+
+    Because the grammar has a lookahead of 2 it tries to compute
+    two tokens of lookahead for alts 1 and 2 of t.  Alt 1 clearly
+    has a lookahead of (T U).  Alt 2 is one token long so antlr
+    tries to compute the follow set of alt 2, which means finding
+    the things which can follow rule t in the context of (alpha)?.
+    This cannot be computed, because alpha is only part of a rule,
+    and antlr can't tell what part of beta is matched by alpha and
+    what part remains to be matched.  Thus it impossible for antlr
+    to  properly determine the follow set of rule t.
+
+    Prior to 1.33MR14, the follow of (alpha)? was computed as
+    FIRST(beta) as a result of the internal representation of
+    guess blocks.
+
+    With MR14 the follow set will be the empty set for that context.
+
+    Normally, one expects a rule appearing in a guess block to also
+    appear elsewhere.  When the follow context for this other use
+    is "ored" with the empty set, the context from the other use
+    results, and a reasonable follow context results.  However if
+    there is *no* other use of the rule, or it is used in a different
+    manner then the follow context will be inaccurate - it was
+    inaccurate even before MR14, but it will be inaccurate in a
+    different way.
+
+    For the example given earlier, a reasonable way to rewrite the
+    grammar:
+
+        rule  : ( alpha )? beta
+        alpha : S t ;
+        t     : T U
+              | T
+              ;
+        beta  : alpha Z ;
+
+    If there are no other uses of the rule appearing in the guess
+    block it will generate a test for EOF - a workaround for
+    representing a null set in the lookahead tests.
+
+    If you encounter such a problem you can use the -alpha option
+    to get additional information:
+
+    line 2: error: not possible to compute follow set for alpha
+              in an "(alpha)? beta" block.
+
+    With the antlr -alpha command line option the following information
+    is inserted into the generated file:
+
+    #if 0
+
+      Trace of references leading to attempt to compute the follow set of
+      alpha in an "(alpha)? beta" block. It is not possible for antlr to
+      compute this follow set because it is not known what part of beta has
+      already been matched by alpha and what part remains to be matched.
+
+      Rules which make use of the incorrect follow set will also be incorrect
+
+         1 #token T              alpha/2   line 7     brief.g
+         2 end alpha             alpha/3   line 8     brief.g
+         2 end (...)? block at   start/1   line 2     brief.g
+
+    #endif
+
+    At the moment, with the -alpha option selected the program marks
+    any rules which appear in the trace back chain (above) as rules with
+    possible problems computing follow set.
+
+    Reported by Greg Knapen (gregory.knapen bell.ca).
+
+#195. (Changed in MR14) #line directive not at column 1
+
+      Under certain circunstances a predicate test could generate
+      a #line directive which was not at column 1.
+
+      Reported with fix by David Kågedal  (davidk lysator.liu.se)
+      (http://www.lysator.liu.se/~davidk/).
+
+#194. (Changed in MR14) (C Mode only) Demand lookahead with #tokclass
+
+      In C mode with the demand lookahead option there is a bug in the
+      code which handles matches for #tokclass (zzsetmatch and
+      zzsetmatch_wsig).
+
+      The bug causes the lookahead pointer to get out of synchronization
+      with the current token pointer.
+
+      The problem was reported with a fix by Ger Hobbelt (hobbelt axa.nl).
+
+#193. (Changed in MR14) Use of PCCTS_USE_NAMESPACE_STD
+
+      The pcctscfg.h now contains the following definitions:
+
+        #ifdef PCCTS_USE_NAMESPACE_STD
+        #define PCCTS_STDIO_H     <Cstdio>
+        #define PCCTS_STDLIB_H    <Cstdlib>
+        #define PCCTS_STDARG_H    <Cstdarg>
+        #define PCCTS_SETJMP_H    <Csetjmp>
+        #define PCCTS_STRING_H    <Cstring>
+        #define PCCTS_ASSERT_H    <Cassert>
+        #define PCCTS_ISTREAM_H   <istream>
+        #define PCCTS_IOSTREAM_H  <iostream>
+        #define PCCTS_NAMESPACE_STD     namespace std {}; using namespace std;
+        #else
+        #define PCCTS_STDIO_H     <stdio.h>
+        #define PCCTS_STDLIB_H    <stdlib.h>
+        #define PCCTS_STDARG_H    <stdarg.h>
+        #define PCCTS_SETJMP_H    <setjmp.h>
+        #define PCCTS_STRING_H    <string.h>
+        #define PCCTS_ASSERT_H    <assert.h>
+        #define PCCTS_ISTREAM_H   <istream.h>
+        #define PCCTS_IOSTREAM_H  <iostream.h>
+        #define PCCTS_NAMESPACE_STD
+        #endif
+
+      The runtime support in pccts/h uses these pre-processor symbols
+      consistently.
+
+      Also, antlr and dlg have been changed to generate code which uses
+      these pre-processor symbols rather than having the names of the
+      #include files hard-coded in the generated code.
+
+      This required the addition of "#include pcctscfg.h" to a number of
+      files in pccts/h.
+
+      It appears that this sometimes causes problems for MSVC 5 in
+      combination with the "automatic" option for pre-compiled headers.
+      In such cases disable the "automatic" pre-compiled headers option.
+
+      Suggested by Hubert Holin (Hubert.Holin Bigfoot.com).
+
+#192. (Changed in MR14) Change setText() to accept "const ANTLRChar *"
+
+      Changed ANTLRToken::setText(ANTLRChar *) to setText(const ANTLRChar *).
+      This allows literal strings to be used to initialize tokens.  Since
+      the usual token implementation (ANTLRCommonToken)  makes a copy of the
+      input string, this was an unnecessary limitation.
+
+      Suggested by Bob McWhirter (bob netwrench.com).
+
+#191. (Changed in MR14) HP/UX aCC compiler compatibility problem
+
+      Needed to explicitly declare zzINF_DEF_TOKEN_BUFFER_SIZE and
+      zzINF_BUFFER_TOKEN_CHUNK_SIZE as ints in pccts/h/AParser.cpp.
+
+      Reported by David Cook (dcook bmc.com).
+
+#190. (Changed in MR14) IBM OS/2 CSet compiler compatibility problem
+
+      Name conflict with "_cs" in pccts/h/ATokenBuffer.cpp
+
+      Reported by David Cook (dcook bmc.com).
+
+#189. (Changed in MR14) -gxt switch in C mode
+
+      The -gxt switch in C mode didn't work because of incorrect
+      initialization.
+
+      Reported by Sinan Karasu (sinan boeing.com).
+
+#188. (Changed in MR14) Added pccts/h/DLG_stream_input.h
+
+      This is a DLG stream class based on C++ istreams.
+
+      Contributed by Hubert Holin (Hubert.Holin Bigfoot.com).
+
+#187. (Changed in MR14) Rename config.h to pcctscfg.h
+
+      The PCCTS configuration file has been renamed from config.h to
+      pcctscfg.h.  The problem with the original name is that it led
+      to name collisions when pccts parsers were combined with other
+      software.
+
+      All of the runtime support routines in pccts/h/* have been
+      changed to use the new name.  Existing software can continue
+      to use pccts/h/config.h. The contents of pccts/h/config.h is
+      now just "#include "pcctscfg.h".
+
+      I don't have a record of the user who suggested this.
+
+#186. (Changed in MR14) Pre-processor symbol DllExportPCCTS class modifier
+
+      Classes in the C++ runtime support routines are now declared:
+
+        class DllExportPCCTS className ....
+
+      By default, the pre-processor symbol is defined as the empty
+      string.  This if for use by MSVC++ users to create DLL classes.
+
+      Suggested by Manfred Kogler (km cast.uni-linz.ac.at).
+
+#185. (Changed in MR14) Option to not use PCCTS_AST base class for ASTBase
+
+      Normally, the ASTBase class is derived from PCCTS_AST which contains
+      functions useful to Sorcerer.  If these are not necessary then the
+      user can define the pre-processor symbol "PCCTS_NOT_USING_SOR" which
+      will cause the ASTBase class to replace references to PCCTS_AST with
+      references to ASTBase where necessary.
+
+      The class ASTDoublyLinkedBase will contain a pure virtual function
+      shallowCopy() that was formerly defined in class PCCTS_AST.
+
+      Suggested by Bob McWhirter (bob netwrench.com).
+
+#184. (Changed in MR14) Grammars with no tokens generate invalid tokens.h
+
+      Reported by Hubert Holin (Hubert.Holin bigfoot.com).
+
+#183. (Changed in MR14) -f to specify file with names of grammar files
+
+      In DEC/VMS it is difficult to specify very long command lines.
+      The -f option allows one to place the names of the grammar files
+      in a data file in order to bypass limitations of the DEC/VMS
+      command language interpreter.
+
+      Addition supplied by Bernard Giroud (b_giroud decus.ch).
+
+#182. (Changed in MR14) Output directory option for DEC/VMS
+
+      Fix some problems with the -o option under DEC/VMS.
+
+      Fix supplied by Bernard Giroud (b_giroud decus.ch).
+
+#181. (Changed in MR14) Allow chars > 127 in DLGStringInput::nextChar()
+
+      Changed DLGStringInput to cast the character using (unsigned char)
+      so that languages with character codes greater than 127 work
+      without changes.
+
+      Suggested by Manfred Kogler (km cast.uni-linz.ac.at).
+
+#180. (Added in MR14) ANTLRParser::getEofToken()
+
+      Added "ANTLRToken ANTLRParser::getEofToken() const" to match the
+      setEofToken routine.
+
+      Requested by Manfred Kogler (km cast.uni-linz.ac.at).
+
+#179. (Fixed in MR14) Memory leak for BufFileInput subclass of DLGInputStream
+
+      The BufFileInput class described in Item #142 neglected to release
+      the allocated buffer when an instance was destroyed.
+
+      Reported by Manfred Kogler (km cast.uni-linz.ac.at).
+
+#178. (Fixed in MR14) Bug in "(alpha)? beta" guess blocks first sets
+
+      In 1.33 vanilla, and all maintenance releases prior to MR14
+      there is a bug in the handling of guess blocks which use the
+      "long" form:
+
+                  (alpha)? beta
+
+      inside a (...)*, (...)+, or {...} block.
+
+      This problem does *not* apply to the case where beta is omitted
+      or when the syntactic predicate is on the leading edge of an
+      alternative.
+
+      The problem is that both alpha and beta are stored in the
+      syntax diagram, and that some analysis routines would fail
+      to skip the alpha portion when it was not on the leading edge.
+      Consider the following grammar with -ck 2:
+
+                r : ( (A)? B )* C D
+
+                  | A B      /* forces -ck 2 computation for old antlr    */
+                             /*              reports ambig for alts 1 & 2 */
+
+                  | B C      /* forces -ck 2 computation for new antlr    */
+                             /*              reports ambig for alts 1 & 3 */
+                  ;
+
+      The prediction expression for the first alternative should be
+      LA(1)={B C} LA(2)={B C D}, but previous versions of antlr
+      would compute the prediction expression as LA(1)={A C} LA(2)={B D}
+
+      Reported by Arpad Beszedes (beszedes inf.u-szeged.hu) who provided
+      a very clear example of the problem and identified the probable cause.
+
+#177. (Changed in MR14) #tokdefs and #token with regular expression
+
+      In MR13 the change described by Item #162 caused an existing
+      feature of antlr to fail.  Prior to the change it was possible
+      to give regular expression definitions and actions to tokens
+      which were defined via the #tokdefs directive.
+
+      This now works again.
+
+      Reported by Manfred Kogler (km cast.uni-linz.ac.at).
+
+#176. (Changed in MR14) Support for #line in antlr source code
+
+      Note: this was implemented by Arpad Beszedes (beszedes inf.u-szeged.hu).
+
+      In 1.33MR14 it is possible for a pre-processor to generate #line
+      directives in the antlr source and have those line numbers and file
+      names used in antlr error messages and in the #line directives
+      generated by antlr.
+
+      The #line directive may appear in the following forms:
+
+            #line ll "sss" xx xx ...
+
+      where ll represents a line number, "sss" represents the name of a file
+      enclosed in quotation marks, and xxx are arbitrary integers.
+
+      The following form (without "line") is not supported at the moment:
+
+            # ll "sss" xx xx ...
+
+      The result:
+
+        zzline
+
+            is replaced with ll from the # or #line directive
+
+        FileStr[CurFile]
+
+            is updated with the contents of the string (if any)
+            following the line number
+
+      Note
+      ----
+      The file-name string following the line number can be a complete
+      name with a directory-path. Antlr generates the output files from
+      the input file name (by replacing the extension from the file-name
+      with .c or .cpp).
+
+      If the input file (or the file-name from the line-info) contains
+      a path:
+
+        "../grammar.g"
+
+      the generated source code will be placed in "../grammar.cpp" (i.e.
+      in the parent directory).  This is inconvenient in some cases
+      (even the -o switch can not be used) so the path information is
+      removed from the #line directive.  Thus, if the line-info was
+
+        #line 2 "../grammar.g"
+
+      then the current file-name will become "grammar.g"
+
+      In this way, the generated source code according to the grammar file
+      will always be in the current directory, except when the -o switch
+      is used.
+
+#175. (Changed in MR14) Bug when guess block appears at start of (...)*
+
+      In 1.33 vanilla and all maintenance releases prior to 1.33MR14
+      there is a bug when a guess block appears at the start of a (...)+.
+      Consider the following k=1 (ck=1) grammar:
+
+            rule :
+                  ( (STAR)? ZIP )* ID ;
+
+      Prior to 1.33MR14, the generated code resembled:
+
+        ...
+        zzGUESS_BLOCK
+        while ( 1 ) {
+            if ( ! LA(1)==STAR) break;
+            zzGUESS
+            if ( !zzrv ) {
+                zzmatch(STAR);
+                zzCONSUME;
+                zzGUESS_DONE
+                zzmatch(ZIP);
+                zzCONSUME;
+            ...
+
+      Note that the routine uses STAR for the prediction expression
+      rather than ZIP.  With 1.33MR14 the generated code resembles:
+
+        ...
+        while ( 1 ) {
+            if ( ! LA(1)==ZIP) break;
+        ...
+
+      This problem existed only with (...)* blocks and was caused
+      by the slightly more complicated graph which represents (...)*
+      blocks.  This caused the analysis routine to compute the first
+      set for the alpha part of the "(alpha)? beta" rather than the
+      beta part.
+
+      Both (...)+ and {...} blocks handled the guess block correctly.
+
+      Reported by Arpad Beszedes (beszedes inf.u-szeged.hu) who provided
+      a very clear example of the problem and identified the probable cause.
+
+#174. (Changed in MR14) Bug when action precedes syntactic predicate
+
+      In 1.33 vanilla, and all maintenance releases prior to MR14,
+      there was a bug when a syntactic predicate was immediately
+      preceded by an action.  Consider the following -ck 2 grammar:
+
+            rule :
+                   <<int i;>>
+                   (alpha)? beta C
+                 | A B
+                 ;
+
+            alpha : A ;
+            beta  : A B;
+
+      Prior to MR14, the code generated for the first alternative
+      resembled:
+
+        ...
+        zzGUESS
+        if ( !zzrv && LA(1)==A && LA(2)==A) {
+            alpha();
+            zzGUESS_DONE
+            beta();
+            zzmatch(C);
+            zzCONSUME;
+        } else {
+        ...
+
+      The prediction expression (i.e. LA(1)==A && LA(2)==A) is clearly
+      wrong because LA(2) should be matched to B (first[2] of beta is {B}).
+
+      With 1.33MR14 the prediction expression is:
+
+        ...
+        if ( !zzrv && LA(1)==A && LA(2)==B) {
+            alpha();
+            zzGUESS_DONE
+            beta();
+            zzmatch(C);
+            zzCONSUME;
+        } else {
+        ...
+
+      This will only affect users in which alpha is shorter than
+      than max(k,ck) and there is an action immediately preceding
+      the syntactic predicate.
+
+      This problem was reported by reported by Arpad Beszedes
+      (beszedes inf.u-szeged.hu) who provided a very clear example
+      of the problem and identified the presence of the init-action
+      as the likely culprit.
+
+#173. (Changed in MR13a) -glms for Microsoft style filenames with -gl
+
+      With the -gl option antlr generates #line directives using the
+      exact name of the input files specified on the command line.
+      An oddity of the Microsoft C and C++ compilers is that they
+      don't accept file names in #line directives containing "\"
+      even though these are names from the native file system.
+
+      With -glms option, the "\" in file names appearing in #line
+      directives is replaced with a "/" in order to conform to
+      Microsoft compiler requirements.
+
+      Reported by Erwin Achermann (erwin.achermann switzerland.org).
+
+#172. (Changed in MR13) \r\n in antlr source counted as one line
+
+      Some MS software uses \r\n to indicate a new line.  Antlr
+      now recognizes this in counting lines.
+
+      Reported by Edward L. Hepler (elh ece.vill.edu).
+
+#171. (Changed in MR13) #tokclass L..U now allowed
+
+      The following is now allowed:
+
+            #tokclass ABC { A..B C }
+
+      Reported by Dave Watola (dwatola amtsun.jpl.nasa.gov)
+
+#170. (Changed in MR13) Suppression for predicates with lookahead depth >1
+
+      In MR12 the capability for suppression of predicates with lookahead
+      depth=1 was introduced.  With MR13 this had been extended to
+      predicates with lookahead depth > 1 and released for use by users
+      on an experimental basis.
+
+      Consider the following grammar with -ck 2 and the predicate in rule
+      "a" with depth 2:
+
+            r1  : (ab)* "@"
+                ;
+
+            ab  : a
+                | b
+                ;
+
+            a   : (A B)? => <<p(LATEXT(2))>>? A B C
+                ;
+
+            b   : A B C
+                ;
+
+      Normally, the predicate would be hoisted into rule r1 in order to
+      determine whether to call rule "ab".  However it should *not* be
+      hoisted because, even if p is false, there is a valid alternative
+      in rule b.  With "-mrhoistk on" the predicate will be suppressed.
+
+      If "-info p" command line option is present the following information
+      will appear in the generated code:
+
+                while ( (LA(1)==A)
+        #if 0
+
+        Part (or all) of predicate with depth > 1 suppressed by alternative
+            without predicate
+
+        pred  <<  p(LATEXT(2))>>?
+                  depth=k=2  ("=>" guard)  rule a  line 8  t1.g
+          tree context:
+            (root = A
+               B
+            )
+
+        The token sequence which is suppressed: ( A B )
+        The sequence of references which generate that sequence of tokens:
+
+           1 to ab          r1/1       line 1     t1.g
+           2 ab             ab/1       line 4     t1.g
+           3 to b           ab/2       line 5     t1.g
+           4 b              b/1        line 11    t1.g
+           5 #token A       b/1        line 11    t1.g
+           6 #token B       b/1        line 11    t1.g
+
+        #endif
+
+      A slightly more complicated example:
+
+            r1  : (ab)* "@"
+                ;
+
+            ab  : a
+                | b
+                ;
+
+            a   : (A B)? => <<p(LATEXT(2))>>? (A  B | D E)
+                ;
+
+            b   : <<q(LATEXT(2))>>? D E
+                ;
+
+
+      In this case, the sequence (D E) in rule "a" which lies behind
+      the guard is used to suppress the predicate with context (D E)
+      in rule b.
+
+                while ( (LA(1)==A || LA(1)==D)
+            #if 0
+
+            Part (or all) of predicate with depth > 1 suppressed by alternative
+                without predicate
+
+            pred  <<  q(LATEXT(2))>>?
+                              depth=k=2  rule b  line 11  t2.g
+              tree context:
+                (root = D
+                   E
+                )
+
+            The token sequence which is suppressed: ( D E )
+            The sequence of references which generate that sequence of tokens:
+
+               1 to ab          r1/1       line 1     t2.g
+               2 ab             ab/1       line 4     t2.g
+               3 to a           ab/1       line 4     t2.g
+               4 a              a/1        line 8     t2.g
+               5 #token D       a/1        line 8     t2.g
+               6 #token E       a/1        line 8     t2.g
+
+            #endif
+            &&
+            #if 0
+
+            pred  <<  p(LATEXT(2))>>?
+                              depth=k=2  ("=>" guard)  rule a  line 8  t2.g
+              tree context:
+                (root = A
+                   B
+                )
+
+            #endif
+
+            (! ( LA(1)==A && LA(2)==B ) || p(LATEXT(2)) )  {
+                ab();
+                ...
+
+#169. (Changed in MR13) Predicate test optimization for depth=1 predicates
+
+      When the MR12 generated a test of a predicate which had depth 1
+      it would use the depth >1 routines, resulting in correct but
+      inefficient behavior.  In MR13, a bit test is used.
+
+#168. (Changed in MR13) Token expressions in context guards
+
+      The token expressions appearing in context guards such as:
+
+            (A B)? => <<test(LT(1))>>?  someRule
+
+      are computed during an early phase of antlr processing.  As
+      a result, prior to MR13, complex expressions such as:
+
+            ~B
+            L..U
+            ~L..U
+            TokClassName
+            ~TokClassName
+
+      were not computed properly.  This resulted in incorrect
+      context being computed for such expressions.
+
+      In MR13 these context guards are verified for proper semantics
+      in the initial phase and then re-evaluated after complex token
+      expressions have been computed in order to produce the correct
+      behavior.
+
+      Reported by Arpad Beszedes (beszedes inf.u-szeged.hu).
+
+#167. (Changed in MR13) ~L..U
+
+      Prior to MR13, the complement of a token range was
+      not properly computed.
+
+#166. (Changed in MR13) token expression L..U
+
+      The token U was represented as an unsigned char, restricting
+      the use of L..U to cases where U was assigned a token number
+      less than 256.  This is corrected in MR13.
+
+#165. (Changed in MR13) option -newAST
+
+      To create ASTs from an ANTLRTokenPtr antlr usually calls
+      "new AST(ANTLRTokenPtr)".  This option generates a call
+      to "newAST(ANTLRTokenPtr)" instead.  This allows a user
+      to define a parser member function to create an AST object.
+
+      Similar changes for ASTBase::tmake and ASTBase::link were not
+      thought necessary since they do not create AST objects, only
+      use existing ones.
+
+#164. (Changed in MR13) Unused variable _astp
+
+      For many compilations, we have lived with warnings about
+      the unused variable _astp.  It turns out that this varible
+      can *never* be used because the code which references it was
+      commented out.
+
+      This investigation was sparked by a note from Erwin Achermann
+      (erwin.achermann switzerland.org).
+
+#163. (Changed in MR13) Incorrect makefiles for testcpp examples
+
+      All the examples in pccts/testcpp/* had incorrect definitions
+      in the makefiles for the symbol "CCC".  Instead of CCC=CC they
+      had CC=$(CCC).
+
+      There was an additional problem in testcpp/1/test.g due to the
+      change in ANTLRToken::getText() to a const member function
+      (Item #137).
+
+      Reported by Maurice Mass (maas cuci.nl).
+
+#162. (Changed in MR13) Combining #token with #tokdefs
+
+      When it became possible to change the print-name of a
+      #token (Item #148) it became useful to give a #token
+      statement whose only purpose was to giving a print name
+      to the #token.  Prior to this change this could not be
+      combined with the #tokdefs feature.
+
+#161. (Changed in MR13) Switch -gxt inhibits generation of tokens.h
+
+#160. (Changed in MR13) Omissions in list of names for remap.h
+
+      When a user selects the -gp option antlr creates a list
+      of macros in remap.h to rename some of the standard
+      antlr routines from zzXXX to userprefixXXX.
+
+      There were number of omissions from the remap.h name
+      list related to the new trace facility.  This was reported,
+      along with a fix, by Bernie Solomon (bernard ug.eds.com).
+
+#159. (Changed in MR13) Violations of classic C rules
+
+      There were a number of violations of classic C style in
+      the distribution kit.  This was reported, along with fixes,
+      by Bernie Solomon (bernard ug.eds.com).
+
+#158. (Changed in MR13) #header causes problem for pre-processors
+
+      A user who runs the C pre-processor on antlr source suggested
+      that another syntax be allowed.  With MR13 such directives
+      such as #header, #pragma, etc. may be written as "\#header",
+      "\#pragma", etc.  For escaping pre-processor directives inside
+      a #header use something like the following:
+
+            \#header
+            <<
+                \#include <stdio.h>
+            >>
+
+#157. (Fixed in MR13) empty error sets for rules with infinite recursion
+
+      When the first set for a rule cannot be computed due to infinite
+      left recursion and it is the only alternative for a block then
+      the error set for the block would be empty.  This would result
+      in a fatal error.
+
+      Reported by Darin Creason (creason genedax.com)
+
+#156. (Changed in MR13) DLGLexerBase::getToken() now public
+
+#155. (Changed in MR13) Context behind predicates can suppress
+
+      With -mrhoist enabled the context behind a guarded predicate can
+      be used to suppress other predicates.  Consider the following grammar:
+
+        r0 : (r1)+;
+
+        r1  : rp
+            | rq
+            ;
+        rp  : <<p LATEXT(1)>>? B ;
+        rq : (A)? => <<q LATEXT(1)>>? (A|B);
+
+      In earlier versions both predicates "p" and "q" would be hoisted into
+      rule r0. With MR12c predicate p is suppressed because the context which
+      follows predicate q includes "B" which can "cover" predicate "p".  In
+      other words, in trying to decide in r0 whether to call r1, it doesn't
+      really matter whether p is false or true because, either way, there is
+      a valid choice within r1.
+
+#154. (Changed in MR13) Making hoist suppression explicit using <<nohoist>>
+
+      A common error, even among experienced pccts users, is to code
+      an init-action to inhibit hoisting rather than a leading action.
+      An init-action does not inhibit hoisting.
+
+      This was coded:
+
+        rule1 : <<;>> rule2
+
+      This is what was meant:
+
+        rule1 : <<;>> <<;>> rule2
+
+      With MR13, the user can code:
+
+        rule1 : <<;>> <<nohoist>> rule2
+
+      The following will give an error message:
+
+        rule1 : <<nohoist>> rule2
+
+      If the <<nohoist>> appears as an init-action rather than a leading
+      action an error message is issued.  The meaning of an init-action
+      containing "nohoist" is unclear: does it apply to just one
+      alternative or to all alternatives ?
+
+
+
+
+
+
+
+
+        -------------------------------------------------------
+        Note:  Items #153 to #1 are now in a separate file named
+                CHANGES_FROM_133_BEFORE_MR13.txt
+        -------------------------------------------------------
