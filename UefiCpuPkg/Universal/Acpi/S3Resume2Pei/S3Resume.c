@@ -696,10 +696,6 @@ S3ResumeExecuteBootScript (
   }
 
   if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
-    //
-    // Need reconstruct page table here, since we do not trust ACPINvs.
-    //
-    RestoreS3PageTables ((UINTN)AcpiS3Context->S3NvsPageTableAddress);
     AsmWriteCr3 ((UINTN)AcpiS3Context->S3NvsPageTableAddress);
   }
 
@@ -904,6 +900,13 @@ S3RestoreConfig2 (
   if (EFI_ERROR (Status)) {
     // Something wrong
     CpuDeadLoop ();
+  }
+
+  if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
+    //
+    // Need reconstruct page table here, since we do not trust ACPINvs.
+    //
+    RestoreS3PageTables ((UINTN)AcpiS3Context->S3NvsPageTableAddress);
   }
 
   //
