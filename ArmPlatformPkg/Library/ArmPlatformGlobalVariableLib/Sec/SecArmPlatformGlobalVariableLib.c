@@ -31,7 +31,7 @@ ArmPlatformGetGlobalVariable (
   // Ensure the Global Variable Size have been initialized
   ASSERT (VariableOffset < PcdGet32 (PcdSecGlobalVariableSize));
 
-  GlobalVariableBase = PcdGet32 (PcdCPUCoresSecStackBase) + PcdGet32 (PcdCPUCoreSecPrimaryStackSize) - PcdGet32 (PcdSecGlobalVariableSize) + VariableOffset;
+  GlobalVariableBase = PcdGet32 (PcdCPUCoresSecStackBase) + PcdGet32 (PcdCPUCoreSecPrimaryStackSize) - PcdGet32 (PcdSecGlobalVariableSize);
   
   if (VariableSize == 4) {
     *(UINT32*)Variable = ReadUnaligned32 ((CONST UINT32*)(GlobalVariableBase + VariableOffset));
@@ -54,7 +54,7 @@ ArmPlatformSetGlobalVariable (
   // Ensure the Global Variable Size have been initialized
   ASSERT (VariableOffset < PcdGet32 (PcdSecGlobalVariableSize));
 
-  GlobalVariableBase = PcdGet32 (PcdCPUCoresSecStackBase) + PcdGet32 (PcdCPUCoreSecPrimaryStackSize) - PcdGet32 (PcdSecGlobalVariableSize) + VariableOffset;
+  GlobalVariableBase = PcdGet32 (PcdCPUCoresSecStackBase) + PcdGet32 (PcdCPUCoreSecPrimaryStackSize) - PcdGet32 (PcdSecGlobalVariableSize);
 
   if (VariableSize == 4) {
     WriteUnaligned32 ((UINT32*)(GlobalVariableBase + VariableOffset), *(UINT32*)Variable);
