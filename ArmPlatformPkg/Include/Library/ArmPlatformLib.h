@@ -42,21 +42,6 @@ typedef struct {
 } ARM_SYSTEM_MEMORY_REGION_DESCRIPTOR;
 
 /**
-  Initialize the memory where the initial stacks will reside
-
-  This memory can contain the initial stacks (Secure and Secure Monitor stacks).
-  In some platform, this region is already initialized and the implementation of this function can
-  do nothing. This memory can also represent the Secure RAM.
-  This function is called before the satck has been set up. Its implementation must ensure the stack
-  pointer is not used (probably required to use assembly language)
-
-**/
-VOID
-ArmPlatformInitializeBootMemory (
-  VOID
-  );
-
-/**
   Return the current Boot Mode
 
   This function returns the boot reason on the platform
@@ -67,45 +52,6 @@ ArmPlatformInitializeBootMemory (
 EFI_BOOT_MODE
 ArmPlatformGetBootMode (
   VOID
-  );
-
-/**
-  Call at the beginning of the platform boot up
-
-  This function allows the firmware platform to do extra actions at the early
-  stage of the platform power up.
-
-  Note: This function must be implemented in assembler as there is no stack set up yet
-
-**/
-VOID
-ArmPlatformSecBootAction (
-  VOID
-  );
-
-/**
-  Initialize controllers that must setup at the early stage
-
-  Some peripherals must be initialized in Secure World.
-  For example, some L2x0 requires to be initialized in Secure World
-
-**/
-VOID
-ArmPlatformSecInitialize (
-  VOID
-  );
-
-/**
-  Call before jumping to Normal World
-
-  This function allows the firmware platform to do extra actions before
-  jumping to the Normal World
-
-**/
-VOID
-ArmPlatformSecExtraAction (
-  IN  UINTN         MpId,
-  OUT UINTN*        JumpAddress
   );
 
 /**
@@ -129,18 +75,6 @@ ArmPlatformInitialize (
 VOID
 ArmPlatformInitializeSystemMemory (
   VOID
-  );
-
-/**
-  Initialize the Secure peripherals and memory regions
-
-  If Trustzone is supported by your platform then this function makes the required initialization
-  of the secure peripherals and memory regions.
-
-**/
-VOID
-ArmPlatformTrustzoneInit (
-  IN  UINTN                     MpId
   );
 
 /**

@@ -13,8 +13,8 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = ArmPlatformLibSecNull
-  FILE_GUID                      = 83333d9e-b00d-44cb-819c-e154c7efe79a
+  BASE_NAME                      = RTSMArmVExpressLibSec
+  FILE_GUID                      = a79eed97-4b98-4974-9690-37b32d6a5b56
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ArmPlatformLib
@@ -22,20 +22,28 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
 
 [LibraryClasses]
+  IoLib
   ArmLib
-  DebugLib
+  SerialPortLib
 
 [Sources.common]
-  ArmPlatformLibNull.c
-  ArmPlatformLibNullSec.c
-  ArmPlatformLibNullBoot.asm     | RVCT
-  ArmPlatformLibNullBoot.S       | GCC
+  RTSM.c
+  RTSMHelper.asm    | RVCT
+  RTSMHelper.S      | GCC
+
+[FeaturePcd]
+  gEmbeddedTokenSpaceGuid.PcdCacheEnable
+  gArmPlatformTokenSpaceGuid.PcdNorFlashRemapping
+  gArmPlatformTokenSpaceGuid.PcdStandalone
 
 [FixedPcd]
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmTokenSpaceGuid.PcdSystemMemorySize
   gArmTokenSpaceGuid.PcdFvBaseAddress
 
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask

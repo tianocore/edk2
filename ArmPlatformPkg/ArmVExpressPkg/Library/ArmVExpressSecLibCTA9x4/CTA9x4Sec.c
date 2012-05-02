@@ -31,7 +31,7 @@
 
 **/
 VOID
-ArmPlatformTrustzoneInit (
+ArmPlatformSecTrustzoneInit (
   IN  UINTN                     MpId
   )
 {
@@ -114,10 +114,16 @@ ArmPlatformTrustzoneInit (
   For example, some L2x0 requires to be initialized in Secure World
 
 **/
-VOID
+RETURN_STATUS
 ArmPlatformSecInitialize (
-  VOID
-  ) {
+  IN  UINTN                     MpId
+  )
+{
+  // If it is not the primary core then there is nothing to do
+  if (!IS_PRIMARY_CORE(MpId)) {
+    return RETURN_SUCCESS;
+  }
+
   // The L2x0 controller must be intialize in Secure World
   L2x0CacheInit(PcdGet32(PcdL2x0ControllerBase),
       PL310_TAG_LATENCIES(L2x0_LATENCY_8_CYCLES,L2x0_LATENCY_8_CYCLES,L2x0_LATENCY_8_CYCLES),
@@ -127,4 +133,16 @@ ArmPlatformSecInitialize (
 
   // Initialize the System Configuration
   ArmPlatformSysConfigInitialize ();
+
+  // If we skip the PEI Core we could want to initialize the DRAM in the SEC phase.
+  // If we are in standalone, we need the initialization to copy the UEFI firmware into DRAM
+  if ((FeaturePcdGet (PcdSystemMemoryInitializeInSec)) || (FeaturePcdGet (PcdStandalone) == FALSE)) {
+    // If it is not a standalone build ensure the PcdSystemMemoryInitializeInSec has been set
+    ASSERT(FeaturePcdGet (PcdSystemMemoryInitializeInSec) == TRUE);
+
+    // Initialize system memory (DRAM)
+    ArmPlatformInitializeSystemMemory ();
+  }
+
+  return RETURN_SUCCESS;
 }

@@ -19,7 +19,7 @@
   
   IMPORT  CEntryPoint
   IMPORT  ArmPlatformSecBootAction
-  IMPORT  ArmPlatformInitializeBootMemory
+  IMPORT  ArmPlatformSecBootMemoryInit
   IMPORT  ArmDisableInterrupts
   IMPORT  ArmDisableCachesAndMmu
   IMPORT  ArmWriteVBar
@@ -68,7 +68,7 @@ _WaitInitMem
   
 _InitMem
   // Initialize Init Boot Memory
-  bl    ArmPlatformInitializeBootMemory
+  bl    ArmPlatformSecBootMemoryInit
   
   // Only Primary CPU could run this line (the secondary cores have jumped from _IdentifyCpu to _SetupStack)
   LoadConstantToReg (FixedPcdGet32(PcdArmPrimaryCore), r5)

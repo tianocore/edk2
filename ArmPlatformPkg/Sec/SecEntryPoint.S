@@ -20,7 +20,7 @@
 
 GCC_ASM_IMPORT(CEntryPoint)
 GCC_ASM_IMPORT(ArmPlatformSecBootAction)
-GCC_ASM_IMPORT(ArmPlatformInitializeBootMemory)
+GCC_ASM_IMPORT(ArmPlatformSecBootMemoryInit)
 GCC_ASM_IMPORT(ArmDisableInterrupts)
 GCC_ASM_IMPORT(ArmDisableCachesAndMmu)
 GCC_ASM_IMPORT(ArmWriteVBar)
@@ -66,7 +66,7 @@ _WaitInitMem:
   
 _InitMem:
   // Initialize Init Boot Memory
-  bl    ASM_PFX(ArmPlatformInitializeBootMemory)
+  bl    ASM_PFX(ArmPlatformSecBootMemoryInit)
   
   // Only Primary CPU could run this line (the secondary cores have jumped from _IdentifyCpu to _SetupStack)
   LoadConstantToReg (FixedPcdGet32(PcdArmPrimaryCore), r5)

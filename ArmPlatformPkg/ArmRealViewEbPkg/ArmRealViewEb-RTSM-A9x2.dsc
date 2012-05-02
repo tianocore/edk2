@@ -40,7 +40,8 @@
 
 [LibraryClasses.common.SEC]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
-  ArmPlatformLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/ArmRealViewEbLibRTSM/ArmRealViewEbSecLib.inf
+  ArmPlatformSecLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/ArmRealViewEbSecLibRTSM/ArmRealViewEbSecLib.inf
+  ArmPlatformLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/ArmRealViewEbLibRTSM/ArmRealViewEbLibSec.inf
 
 [BuildOptions]
   RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A9 --fpu=softvfp -I$(WORKSPACE)/ArmPlatformPkg/ArmRealViewEbPkg/Include/Platform

@@ -38,7 +38,7 @@
 [LibraryClasses]
   ArmCpuLib
   ArmLib
-  ArmPlatformLib
+  ArmPlatformSecLib
   ArmTrustedMonitorLib
   BaseLib
   DebugLib

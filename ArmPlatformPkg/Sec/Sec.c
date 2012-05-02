@@ -19,7 +19,6 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/SerialPortLib.h>
 #include <Library/ArmGicLib.h>
-#include <Library/ArmCpuLib.h>
 
 #include "SecInternal.h"
 
@@ -50,7 +49,11 @@ CEntryPoint (
   if (FixedPcdGet32 (PcdVFPEnabled)) {
     ArmEnableVFP();
   }
-	
+
+  // Initialize peripherals that must be done at the early stage
+  // Example: Some L2 controller, interconnect, clock, DMC, etc
+  ArmPlatformSecInitialize (MpId);
+
   // Primary CPU clears out the SCU tag RAMs, secondaries wait
   if (IS_PRIMARY_CORE(MpId)) {
     if (ArmIsMpCore()) {
@@ -92,19 +95,6 @@ CEntryPoint (
 
   // Enable Full Access to CoProcessors
   ArmWriteCpacr (CPACR_CP_FULL_ACCESS);
-
-  if (IS_PRIMARY_CORE(MpId)) {
-    // Initialize peripherals that must be done at the early stage
-    // Example: Some L2x0 controllers must be initialized in Secure World
-    ArmPlatformSecInitialize ();
-
-    // If we skip the PEI Core we could want to initialize the DRAM in the SEC phase.
-    // If we are in standalone, we need the initialization to copy the UEFI firmware into DRAM
-    if (FeaturePcdGet (PcdSystemMemoryInitializeInSec)) {
-      // Initialize system memory (DRAM)
-      ArmPlatformInitializeSystemMemory ();
-    }
-  }
 
   // Test if Trustzone is supported on this platform
   if (FixedPcdGetBool (PcdTrustzoneSupport)) {
@@ -155,7 +145,7 @@ TrustedWorldInitialization (
   ArmGicSetupNonSecure (MpId, PcdGet32(PcdGicDistributorBase), PcdGet32(PcdGicInterruptInterfaceBase));
 
   // Initialize platform specific security policy
-  ArmPlatformTrustzoneInit (MpId);
+  ArmPlatformSecTrustzoneInit (MpId);
 
   // Setup the Trustzone Chipsets
   if (IS_PRIMARY_CORE(MpId)) {

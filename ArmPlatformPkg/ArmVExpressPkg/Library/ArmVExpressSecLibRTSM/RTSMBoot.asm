@@ -11,14 +11,19 @@
 //
 //
 
+#include <AsmMacroIoLib.h>
 #include <Base.h>
+#include <Library/ArmPlatformLib.h>
 #include <AutoGen.h>
+#include <ArmPlatform.h>
+
+  INCLUDE AsmMacroIoLib.inc
 
   EXPORT  ArmPlatformSecBootAction
-  EXPORT  ArmPlatformInitializeBootMemory
+  EXPORT  ArmPlatformSecBootMemoryInit
 
   PRESERVE8
-  AREA    ArmPlatformLibBoot, CODE, READONLY
+  AREA    RTSMVExpressBootMode, CODE, READONLY
 
 /**
   Call at the beginning of the platform boot up
@@ -30,7 +35,7 @@
 
 **/
 ArmPlatformSecBootAction
-  bx    lr
+  bx  lr
 
 /**
   Initialize the memory where the initial stacks will reside
@@ -42,6 +47,6 @@ ArmPlatformSecBootAction
   pointer is not used (probably required to use assembly language)
 
 **/
-ArmPlatformInitializeBootMemory
+ArmPlatformSecBootMemoryInit
   // The SMC does not need to be initialized for RTSM
   bx    lr

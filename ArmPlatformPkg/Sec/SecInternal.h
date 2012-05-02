@@ -19,7 +19,7 @@
 #include <Base.h>
 #include <Library/ArmLib.h>
 #include <Library/ArmCpuLib.h>
-#include <Library/ArmPlatformLib.h>
+#include <Library/ArmPlatformSecLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
@@ -46,11 +46,6 @@ ArmSetupGicNonSecure (
 // Vector Table for Sec Phase
 VOID
 SecVectorTable (
-  VOID
-  );
-
-VOID
-NonSecureWaitForFirmware (
   VOID
   );
 

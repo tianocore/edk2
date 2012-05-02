@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2011, ARM Limited. All rights reserved.
+//  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 //
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
@@ -18,7 +18,7 @@
 .align 3
 
 GCC_ASM_EXPORT(ArmPlatformSecBootAction)
-GCC_ASM_EXPORT(ArmPlatformInitializeBootMemory)
+GCC_ASM_EXPORT(ArmPlatformSecBootMemoryInit)
 
 /**
   Call at the beginning of the platform boot up
@@ -42,6 +42,6 @@ ASM_PFX(ArmPlatformSecBootAction):
   pointer is not used (probably required to use assembly language)
 
 **/
-ASM_PFX(ArmPlatformInitializeBootMemory):
+ASM_PFX(ArmPlatformSecBootMemoryInit):
   // The SMC does not need to be initialized for RTSM
   bx    lr

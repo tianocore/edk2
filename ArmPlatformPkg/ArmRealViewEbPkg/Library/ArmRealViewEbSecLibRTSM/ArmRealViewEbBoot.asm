@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2011, ARM Limited. All rights reserved.
+//  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 //
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
@@ -13,15 +13,17 @@
 
 #include <AsmMacroIoLib.h>
 #include <Base.h>
-#include <Library/ArmPlatformLib.h>
+#include <Library/ArmPlatformSecLib.h>
 #include <ArmPlatform.h>
 #include <AutoGen.h>
 
-.text
-.align 3
+  INCLUDE AsmMacroIoLib.inc
 
-GCC_ASM_EXPORT(ArmPlatformSecBootAction)
-GCC_ASM_EXPORT(ArmPlatformInitializeBootMemory)
+  EXPORT  ArmPlatformSecBootAction
+  EXPORT  ArmPlatformSecBootMemoryInit
+
+  PRESERVE8
+  AREA    ArmRealviewEbBootMode, CODE, READONLY
 
 /**
   Call at the beginning of the platform boot up
@@ -32,8 +34,12 @@ GCC_ASM_EXPORT(ArmPlatformInitializeBootMemory)
   Note: This function must be implemented in assembler as there is no stack set up yet
 
 **/
-ASM_PFX(ArmPlatformSecBootAction):
-  bx  lr
+ArmPlatformSecBootAction
+  LoadConstantToReg (ARM_EB_SYS_FLAGS_NV_REG, r0)
+  ldr   r0, [r0]
+  cmp   r0, #0
+  bxeq  lr
+  bxne  r0
 
 /**
   Initialize the memory where the initial stacks will reside
@@ -45,6 +51,6 @@ ASM_PFX(ArmPlatformSecBootAction):
   pointer is not used (probably required to use assembly language)
 
 **/
-ASM_PFX(ArmPlatformInitializeBootMemory):
+ArmPlatformSecBootMemoryInit
   // The SMC does not need to be initialized for RTSM
   bx    lr

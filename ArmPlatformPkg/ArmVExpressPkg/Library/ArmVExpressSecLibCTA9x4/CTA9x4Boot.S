@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2011, ARM Limited. All rights reserved.
+//  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 //
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
@@ -22,7 +22,7 @@
 .align 3
 
 GCC_ASM_EXPORT(ArmPlatformSecBootAction)
-GCC_ASM_EXPORT(ArmPlatformInitializeBootMemory)
+GCC_ASM_EXPORT(ArmPlatformSecBootMemoryInit)
 GCC_ASM_IMPORT(PL35xSmcInitialize)
 
 //
@@ -82,7 +82,7 @@ ASM_PFX(ArmPlatformSecBootAction):
   pointer is not used (probably required to use assembly language)
 
 **/
-ASM_PFX(ArmPlatformInitializeBootMemory):
+ASM_PFX(ArmPlatformSecBootMemoryInit):
   mov   r5, lr
 
   //

@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -13,7 +13,8 @@
 **/
 
 #include <Library/IoLib.h>
-#include <Library/ArmPlatformLib.h>
+#include <Library/ArmLib.h>
+#include <Library/ArmPlatformSecLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 
@@ -30,7 +31,7 @@
 
 **/
 VOID
-ArmPlatformTrustzoneInit (
+ArmPlatformSecTrustzoneInit (
   IN  UINTN                     MpId
   )
 {
@@ -44,12 +45,18 @@ ArmPlatformTrustzoneInit (
   For example, some L2x0 requires to be initialized in Secure World
 
 **/
-VOID
+RETURN_STATUS
 ArmPlatformSecInitialize (
-  VOID
+  IN  UINTN                     MpId
   )
 {
+  // If it is not the primary core then there is nothing to do
+  if (!IS_PRIMARY_CORE(MpId)) {
+    return RETURN_SUCCESS;
+  }
+
   // Do nothing yet
+  return RETURN_SUCCESS;
 }
 
 /**

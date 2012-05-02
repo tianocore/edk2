@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2011, ARM Limited. All rights reserved.
+//  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 //
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
@@ -17,13 +17,11 @@
 #include <AutoGen.h>
 #include <ArmPlatform.h>
 
-  INCLUDE AsmMacroIoLib.inc
+.text
+.align 3
 
-  EXPORT  ArmPlatformSecBootAction
-  EXPORT  ArmPlatformInitializeBootMemory
-
-  PRESERVE8
-  AREA    RTSMVExpressBootMode, CODE, READONLY
+GCC_ASM_EXPORT(ArmPlatformSecBootAction)
+GCC_ASM_EXPORT(ArmPlatformSecBootMemoryInit)
 
 /**
   Call at the beginning of the platform boot up
@@ -34,7 +32,7 @@
   Note: This function must be implemented in assembler as there is no stack set up yet
 
 **/
-ArmPlatformSecBootAction
+ASM_PFX(ArmPlatformSecBootAction):
   bx  lr
 
 /**
@@ -47,6 +45,6 @@ ArmPlatformSecBootAction
   pointer is not used (probably required to use assembly language)
 
 **/
-ArmPlatformInitializeBootMemory
+ASM_PFX(ArmPlatformSecBootMemoryInit):
   // The SMC does not need to be initialized for RTSM
   bx    lr

@@ -115,6 +115,7 @@
 
 [LibraryClasses.common.SEC]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
+  ArmPlatformSecLib|ArmPlatformPkg/Library/ArmPlatformSecLibNull/ArmPlatformLibNullSec.inf
   ArmPlatformLib|ArmPlatformPkg/Library/ArmPlatformLibNull/ArmPlatformLibNullSec.inf
   ArmTrustedMonitorLib|ArmPlatformPkg/Library/ArmTrustedMonitorLibNull/ArmTrustedMonitorLibNull.inf
 

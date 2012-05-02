@@ -12,15 +12,9 @@
 *
 **/
 
-#include <Library/IoLib.h>
 #include <Library/ArmPlatformLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
-
-#include <Drivers/PL310L2Cache.h>
-#include <Drivers/SP804Timer.h>
-
-#include <ArmPlatform.h>
 
 /**
   Initialize the Secure peripherals and memory regions
@@ -30,11 +24,16 @@
 
 **/
 VOID
-ArmPlatformTrustzoneInit (
+ArmPlatformSecTrustzoneInit (
   IN  UINTN                     MpId
   )
 {
-  // No TZPC or TZASC on RTSM to initialize
+  // Secondary cores might have to set the Secure SGIs into the GICD_IGROUPR0
+  if (!IS_PRIMARY_CORE(MpId)) {
+    return;
+  }
+
+  ASSERT(FALSE);
 }
 
 /**
@@ -44,19 +43,18 @@ ArmPlatformTrustzoneInit (
   For example, some L2x0 requires to be initialized in Secure World
 
 **/
-VOID
+RETURN_STATUS
 ArmPlatformSecInitialize (
-  VOID
+  IN  UINTN                     MpId
   )
 {
-  // Configure periodic timer (TIMER0) for 1MHz operation
-  MmioOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, SP810_SYS_CTRL_TIMER0_TIMCLK);
-  // Configure 1MHz clock
-  MmioOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, SP810_SYS_CTRL_TIMER1_TIMCLK);
-  // Configure SP810 to use 1MHz clock and disable
-  MmioAndThenOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, ~SP810_SYS_CTRL_TIMER2_EN, SP810_SYS_CTRL_TIMER2_TIMCLK);
-  // Configure SP810 to use 1MHz clock and disable
-  MmioAndThenOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, ~SP810_SYS_CTRL_TIMER3_EN, SP810_SYS_CTRL_TIMER3_TIMCLK);
+  // If it is not the primary core then there is nothing to do
+  if (!IS_PRIMARY_CORE(MpId)) {
+    return RETURN_SUCCESS;
+  }
+
+  // Do nothing yet
+  return RETURN_SUCCESS;
 }
 
 /**
