@@ -1,10 +1,10 @@
 #
-#  Copyright (c) 2011, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 #  
 #  This program and the accompanying materials                          
 #  are licensed and made available under the terms and conditions of the BSD License         
 #  which accompanies this distribution.  The full text of the license may be found at        
-#  http:#opensource.org/licenses/bsd-license.php                                            
+#  http://opensource.org/licenses/bsd-license.php                                            
 #
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
@@ -22,6 +22,7 @@
 .align 3
 
 GCC_ASM_EXPORT(PL35xSmcInitialize)
+GCC_ASM_EXPORT(PL35xSmcSetRefresh)
 
 // IN r1 Smc Base Address
 // IN r2 Smc Configuration Start Address
@@ -50,4 +51,10 @@ ASM_PFX(PL35xSmcInitialize):
   add   r2, #0xC
   b     ASM_PFX(PL35xSmcInitialize)
 
-ASM_FUNCTION_REMOVE_IF_UNREFERENCED
+// IN r1 Smc Base Address
+// IN r2 Smc Refresh Period 0
+// IN r3 Smc Refresh Period 1
+ASM_PFX(PL35xSmcSetRefresh):
+  str   r2, [r1, #PL350_SMC_REFRESH_0_OFFSET]
+  str   r3, [r1, #PL350_SMC_REFRESH_1_OFFSET]
+  blx lr

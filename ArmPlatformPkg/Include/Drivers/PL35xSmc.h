@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -15,9 +15,11 @@
 #ifndef PL35xSMC_H_
 #define PL35xSMC_H_
 
-#define PL350_SMC_DIRECT_CMD_OFFSET  0x10
-#define PL350_SMC_SET_CYCLES_OFFSET  0x14
-#define PL350_SMC_SET_OPMODE_OFFSET  0x18
+#define PL350_SMC_DIRECT_CMD_OFFSET   0x10
+#define PL350_SMC_SET_CYCLES_OFFSET   0x14
+#define PL350_SMC_SET_OPMODE_OFFSET   0x18
+#define PL350_SMC_REFRESH_0_OFFSET    0x20
+#define PL350_SMC_REFRESH_1_OFFSET    0x24
 
 #define PL350_SMC_DIRECT_CMD_ADDR(addr)                 ((addr) & 0xFFFFF)
 #define PL350_SMC_DIRECT_CMD_ADDR_SET_CRE               (1 << 20)

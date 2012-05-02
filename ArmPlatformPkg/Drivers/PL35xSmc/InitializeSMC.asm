@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2011, ARM Limited. All rights reserved.
+//  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 //  
 //  This program and the accompanying materials                          
 //  are licensed and made available under the terms and conditions of the BSD License         
@@ -19,6 +19,7 @@
   INCLUDE AsmMacroIoLib.inc
   
   EXPORT  PL35xSmcInitialize
+  EXPORT  PL35xSmcSetRefresh
 
   PRESERVE8
   AREA    ModuleInitializeSMC, CODE, READONLY
@@ -50,3 +51,10 @@ PL35xSmcInitialize
   add   r2, #0xC
   b     PL35xSmcInitialize
 
+// IN r1 Smc Base Address
+// IN r2 Smc Refresh Period 0
+// IN r3 Smc Refresh Period 1
+PL35xSmcSetRefresh
+  str   r2, [r1, #PL350_SMC_REFRESH_0_OFFSET]
+  str   r3, [r1, #PL350_SMC_REFRESH_1_OFFSET]
+  blx lr
