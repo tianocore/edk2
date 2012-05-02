@@ -19,8 +19,8 @@ ECHO OFF
 @REM Setup Build environment. Sets WORKSPACE and puts build in path
 CALL ..\edksetup.bat
 
-@REM Set for tools chain. Currently RVCT31
-SET TARGET_TOOLS=RVCT31
+@REM Set for tools chain. Currently RVCT
+SET TARGET_TOOLS=RVCT
 SET TARGET=DEBUG
 
 @if /I "%1"=="RELEASE" (
