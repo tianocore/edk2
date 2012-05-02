@@ -403,6 +403,7 @@ IScsiReceiveLoginRsp (
   //
   // A Login Response is received, process it.
   //
+  ASSERT (Pdu != NULL);
   Status = IScsiProcessLoginRsp (Conn, Pdu);
 
   NetbufFree (Pdu);

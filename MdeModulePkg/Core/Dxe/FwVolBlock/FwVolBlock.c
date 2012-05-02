@@ -640,6 +640,7 @@ CoreProcessFirmwareVolume (
   // somehow.
   //
   if (!EFI_ERROR(Status)) {
+    ASSERT (*FVProtocolHandle != NULL);
     Ptr = NULL;
     Status = CoreHandleProtocol (*FVProtocolHandle, &gEfiFirmwareVolume2ProtocolGuid, (VOID **) &Ptr);
     if (EFI_ERROR(Status) || (Ptr == NULL)) {

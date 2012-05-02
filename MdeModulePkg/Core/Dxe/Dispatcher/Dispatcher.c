@@ -544,6 +544,7 @@ CoreDispatcher (
           &DriverEntry->ImageHandle,
           sizeof (DriverEntry->ImageHandle)
           );
+        ASSERT (DriverEntry->ImageHandle != NULL);
   
         Status = CoreStartImage (DriverEntry->ImageHandle, NULL, NULL);
   
