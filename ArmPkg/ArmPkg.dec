@@ -146,6 +146,10 @@
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask|0xF03|UINT32|0x00000031
   # The Primary Core is ClusterId[0] & CoreId[0] 
   gArmTokenSpaceGuid.PcdArmPrimaryCore|0|UINT32|0x00000037
+  # Number of the CPU Interface for the Primary Core (eg: The number for the CPU0 of
+  # Cluster1 might be 4 if the implementer had followed the convention: Cpu Interface
+  # = 4 * Cluster)
+  gArmTokenSpaceGuid.PcdGicPrimaryCoreId|0|UINT32|0x00000043
 
   #
   # ARM L2x0 PCDs

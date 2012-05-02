@@ -38,7 +38,7 @@ NonSecureWaitForFirmware (
   ArmCallWFI();
 
   // Acknowledge the interrupt and send End of Interrupt signal.
-  ArmGicAcknowledgeSgiFrom (PcdGet32(PcdGicInterruptInterfaceBase), PRIMARY_CORE_ID);
+  ArmGicAcknowledgeInterrupt (PcdGet32(PcdGicDistributorBase), PcdGet32(PcdGicInterruptInterfaceBase), NULL, NULL);
 
   // Jump to secondary core entry point.
   secondary_start ();

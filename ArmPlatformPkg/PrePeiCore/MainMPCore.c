@@ -45,6 +45,7 @@ SecondaryMain (
   UINT32                  CoreId;
   VOID                    (*SecondaryStart)(VOID);
   UINTN                   SecondaryEntryAddr;
+  UINTN                   AcknowledgedCoreId;
 
   ClusterId = GET_CLUSTER_ID(MpId);
   CoreId    = GET_CORE_ID(MpId);
@@ -80,12 +81,15 @@ SecondaryMain (
   // Clear Secondary cores MailBox
   MmioWrite32 (ArmCoreInfoTable[Index].MailboxClearAddress, ArmCoreInfoTable[Index].MailboxClearValue);
 
-  SecondaryEntryAddr = 0;
-  while (SecondaryEntryAddr = MmioRead32 (ArmCoreInfoTable[Index].MailboxGetAddress), SecondaryEntryAddr == 0) {
+  do {
     ArmCallWFI ();
+
+    // Read the Mailbox
+    SecondaryEntryAddr = MmioRead32 (ArmCoreInfoTable[Index].MailboxGetAddress);
+
     // Acknowledge the interrupt and send End of Interrupt signal.
-    ArmGicAcknowledgeSgiFrom (PcdGet32(PcdGicInterruptInterfaceBase), PRIMARY_CORE_ID);
-  }
+    ArmGicAcknowledgeInterrupt (PcdGet32(PcdGicDistributorBase), PcdGet32(PcdGicInterruptInterfaceBase), &AcknowledgedCoreId, NULL);
+  } while ((SecondaryEntryAddr == 0) && (AcknowledgedCoreId != PcdGet32 (PcdGicPrimaryCoreId)));
 
   // Jump to secondary core entry point.
   SecondaryStart = (VOID (*)())SecondaryEntryAddr;
@@ -106,6 +110,13 @@ PrimaryMain (
   EFI_PEI_PPI_DESCRIPTOR      *PpiList;
   UINTN                       TemporaryRamBase;
   UINTN                       TemporaryRamSize;
+
+  // Check PcdGicPrimaryCoreId has been set in case the Primary Core is not the core 0 of Cluster 0
+  DEBUG_CODE_BEGIN();
+  if ((PcdGet32(PcdArmPrimaryCore) != 0) && (PcdGet32 (PcdGicPrimaryCoreId) == 0)) {
+    DEBUG((EFI_D_WARN,"Warning: the PCD PcdGicPrimaryCoreId does not seem to be set up for the configuration.\n"));
+  }
+  DEBUG_CODE_END();
 
   CreatePpiList (&PpiListSize, &PpiList);
 

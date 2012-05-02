@@ -38,45 +38,33 @@ ArmGicSendSgiTo (
   MmioWrite32 (GicDistributorBase + ARM_GIC_ICDSGIR, ((TargetListFilter & 0x3) << 24) | ((CPUTargetList & 0xFF) << 16) | SgiId);
 }
 
-UINT32
+RETURN_STATUS
 EFIAPI
-ArmGicAcknowledgeSgiFrom (
-  IN  INTN          GicInterruptInterfaceBase,
-  IN  INTN          CoreId
+ArmGicAcknowledgeInterrupt (
+  IN  UINTN          GicDistributorBase,
+  IN  UINTN          GicInterruptInterfaceBase,
+  OUT UINTN          *CoreId,
+  OUT UINTN          *InterruptId
   )
 {
-  INTN            InterruptId;
+  UINT32            Interrupt;
 
-  InterruptId = MmioRead32 (GicInterruptInterfaceBase + ARM_GIC_ICCIAR);
+  // Read the Interrupt Acknowledge Register
+  Interrupt = MmioRead32 (GicInterruptInterfaceBase + ARM_GIC_ICCIAR);
 
-  // Check if the Interrupt ID is valid, The read from Interrupt Ack register returns CPU ID and Interrupt ID
-  if ((((CoreId & 0x7) << 10) | PcdGet32(PcdGicSgiIntId)) == InterruptId) {
-    // Got SGI number 0 hence signal End of Interrupt by writing to ICCEOIR
-    MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCEIOR, InterruptId);
-    return 1;
+  // Check if it is a valid interrupt ID
+  if ((Interrupt & 0x3FF) < ArmGicGetMaxNumInterrupts (GicDistributorBase)) {
+    // Got a valid SGI number hence signal End of Interrupt by writing to ICCEOIR
+    MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCEIOR, Interrupt);
+
+    if (CoreId) {
+      *CoreId = (Interrupt >> 10) & 0x7;
+    }
+    if (InterruptId) {
+      *InterruptId = Interrupt & 0x3FF;
+    }
+    return RETURN_SUCCESS;
   } else {
-    return 0;
-  }
-}
-
-UINT32
-EFIAPI
-ArmGicAcknowledgeSgi2From (
-  IN  INTN          GicInterruptInterfaceBase,
-  IN  INTN          CoreId,
-  IN  INTN          SgiId
-  )
-{
-  INTN            InterruptId;
-
-  InterruptId = MmioRead32(GicInterruptInterfaceBase + ARM_GIC_ICCIAR);
-
-  // Check if the Interrupt ID is valid, The read from Interrupt Ack register returns CPU ID and Interrupt ID
-  if((((CoreId & 0x7) << 10) | (SgiId & 0x3FF)) == (InterruptId & 0x1FFF)) {
-    // Got SGI number 0 hence signal End of Interrupt by writing to ICCEOIR
-    MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCEIOR, InterruptId);
-    return 1;
-  } else {
-    return 0;
+    return RETURN_INVALID_PARAMETER;
   }
 }

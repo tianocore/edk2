@@ -117,19 +117,13 @@ ArmGicSendSgiTo (
   IN  INTN          SgiId
   );
 
-UINT32
+RETURN_STATUS
 EFIAPI
-ArmGicAcknowledgeSgiFrom (
-  IN  INTN          GicInterruptInterfaceBase,
-  IN  INTN          CoreId
-  );
-
-UINT32
-EFIAPI
-ArmGicAcknowledgeSgi2From (
-  IN  INTN          GicInterruptInterfaceBase,
-  IN  INTN          CoreId,
-  IN  INTN          SgiId
+ArmGicAcknowledgeInterrupt (
+  IN  UINTN          GicDistributorBase,
+  IN  UINTN          GicInterruptInterfaceBase,
+  OUT UINTN          *CoreId,
+  OUT UINTN          *InterruptId
   );
 
 UINTN
