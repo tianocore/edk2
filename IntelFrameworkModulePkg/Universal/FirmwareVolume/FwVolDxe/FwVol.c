@@ -4,7 +4,7 @@
   Layers on top of Firmware Block protocol to produce a file abstraction
   of FV based files.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -194,6 +194,7 @@ FvCheck (
   EFI_FVB_ATTRIBUTES_2                FvbAttributes;
   EFI_FV_BLOCK_MAP_ENTRY              *BlockMap;
   EFI_FIRMWARE_VOLUME_HEADER          *FwVolHeader;
+  EFI_FIRMWARE_VOLUME_EXT_HEADER      *FwVolExtHeader;
   UINT8                               *FwCache;
   LBA_ENTRY                           *LbaEntry;
   FREE_SPACE_ENTRY                    *FreeSpaceEntry;
@@ -349,14 +350,23 @@ FvCheck (
   //
   // go through the whole FV cache, check the consistence of the FV
   //
-  Ptr           = (UINT8 *) (UINTN) (FvDevice->CachedFv + FvDevice->FwVolHeader->HeaderLength);
-  TopFvAddress  = (UINT8 *) (UINTN) (FvDevice->CachedFv + FvDevice->FwVolHeader->FvLength - 1);
+  if (FvDevice->FwVolHeader->ExtHeaderOffset != 0) {
+    //
+    // Searching for files starts on an 8 byte aligned boundary after the end of the Extended Header if it exists.
+    //
+    FwVolExtHeader = (EFI_FIRMWARE_VOLUME_EXT_HEADER *) (UINTN) (FvDevice->CachedFv + FvDevice->FwVolHeader->ExtHeaderOffset);
+    Ptr = (UINT8 *) FwVolExtHeader + FwVolExtHeader->ExtHeaderSize;
+    Ptr = (UINT8 *) ALIGN_POINTER (Ptr, 8);
+  } else {
+    Ptr = (UINT8 *) (UINTN) (FvDevice->CachedFv + FvDevice->FwVolHeader->HeaderLength);
+  }
+  TopFvAddress = (UINT8 *) (UINTN) (FvDevice->CachedFv + FvDevice->FwVolHeader->FvLength);
 
   //
   // Build FFS list & Free Space List here
   //
-  while (Ptr <= TopFvAddress) {
-    TestLength = TopFvAddress - Ptr + 1;
+  while (Ptr < TopFvAddress) {
+    TestLength = TopFvAddress - Ptr;
 
     if (TestLength > sizeof (EFI_FFS_FILE_HEADER)) {
       TestLength = sizeof (EFI_FFS_FILE_HEADER);
@@ -370,7 +380,7 @@ FvCheck (
       FreeSize  = 0;
 
       do {
-        TestLength = TopFvAddress - Ptr + 1;
+        TestLength = TopFvAddress - Ptr;
 
         if (TestLength > sizeof (EFI_FFS_FILE_HEADER)) {
           TestLength = sizeof (EFI_FFS_FILE_HEADER);
@@ -382,7 +392,7 @@ FvCheck (
 
         FreeSize += TestLength;
         Ptr += TestLength;
-      } while (Ptr <= TopFvAddress);
+      } while (Ptr < TopFvAddress);
 
       FreeSpaceEntry = AllocateZeroPool (sizeof (FREE_SPACE_ENTRY));
       if (FreeSpaceEntry == NULL) {

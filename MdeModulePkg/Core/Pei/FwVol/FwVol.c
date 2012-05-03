@@ -1,7 +1,7 @@
 /** @file
   Pei Core Firmware File System service routines.
   
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -229,7 +229,8 @@ FindFileEx (
   IN OUT    EFI_PEI_FV_HANDLE        *AprioriFile  OPTIONAL
   )
 {
-  EFI_FIRMWARE_VOLUME_HEADER           *FwVolHeader;
+  EFI_FIRMWARE_VOLUME_HEADER            *FwVolHeader;
+  EFI_FIRMWARE_VOLUME_EXT_HEADER        *FwVolExtHeader;
   EFI_FFS_FILE_HEADER                   **FileHeader;
   EFI_FFS_FILE_HEADER                   *FfsFileHeader;
   UINT32                                FileLength;
@@ -262,7 +263,16 @@ FindFileEx (
   // start from the FileHeader.
   //
   if ((*FileHeader == NULL) || (FileName != NULL)) {
-    FfsFileHeader = (EFI_FFS_FILE_HEADER *)((UINT8 *)FwVolHeader + FwVolHeader->HeaderLength);
+    if (FwVolHeader->ExtHeaderOffset != 0) {
+      //
+      // Searching for files starts on an 8 byte aligned boundary after the end of the Extended Header if it exists.
+      //
+      FwVolExtHeader = (EFI_FIRMWARE_VOLUME_EXT_HEADER *) ((UINT8 *) FwVolHeader + FwVolHeader->ExtHeaderOffset);
+      FfsFileHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FwVolExtHeader + FwVolExtHeader->ExtHeaderSize);
+      FfsFileHeader = (EFI_FFS_FILE_HEADER *) ALIGN_POINTER (FfsFileHeader, 8);
+    } else {
+      FfsFileHeader = (EFI_FFS_FILE_HEADER *)((UINT8 *) FwVolHeader + FwVolHeader->HeaderLength);
+    }
   } else {
     if (IS_FFS_FILE2 (*FileHeader)) {
       if (!IsFfs3Fv) {
