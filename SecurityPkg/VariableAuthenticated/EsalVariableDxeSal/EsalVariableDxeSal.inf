@@ -1,0 +1,86 @@
+## @file
+#  Component description file for Extended SAL authentication variable 
+#  service module.
+#
+# Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution. The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EsalVariableDxeSal
+  FILE_GUID                      = 14610837-4E97-4427-96E0-21D9B2956996
+  MODULE_TYPE                    = DXE_SAL_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = VariableServiceInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IPF
+#
+#  VIRTUAL_ADDRESS_MAP_CALLBACK  =  VariableClassAddressChangeEvent              
+#
+
+[Sources.common]
+  InitVariable.c
+  Reclaim.c
+  Variable.c
+  Variable.h
+  AuthService.c
+  AuthService.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  CryptoPkg/CryptoPkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  SynchronizationLib
+  UefiLib
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  UefiRuntimeLib
+  DxeServicesTableLib
+  UefiDriverEntryPoint
+  PcdLib
+  ExtendedSalLib
+  BaseCryptLib
+  HobLib
+
+[Protocols]
+  gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL SOMETIMES_CONSUMED
+  gEfiFaultTolerantWriteProtocolGuid            # PROTOCOL SOMETIMES_CONSUMED
+
+[Guids]
+  gEfiGlobalVariableGuid
+  gEfiAuthenticatedVariableGuid
+  gEfiEventVirtualAddressChangeGuid
+  gEfiCertRsa2048Sha256Guid
+  gEfiImageSecurityDatabaseGuid
+
+[Pcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize
+
+[FeaturePcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics
+
+[Depex]
+  gEfiExtendedSalFvBlockServicesProtocolGuid AND gEfiFaultTolerantWriteProtocolGuid
+  

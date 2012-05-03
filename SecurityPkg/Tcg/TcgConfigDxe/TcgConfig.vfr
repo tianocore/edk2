@@ -1,0 +1,114 @@
+/** @file
+  VFR file used by the TCG configuration component.
+
+Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials 
+are licensed and made available under the terms and conditions of the BSD License 
+which accompanies this distribution.  The full text of the license may be found at 
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
+
+#include "TcgConfigNvData.h"
+
+formset
+  guid      = TCG_CONFIG_FORM_SET_GUID,
+  title     = STRING_TOKEN(STR_TPM_TITLE),
+  help      = STRING_TOKEN(STR_TPM_HELP),
+  classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
+
+  varstore TCG_CONFIGURATION,
+    varid = TCG_CONFIGURATION_VARSTORE_ID,
+    name  = TCG_CONFIGURATION,
+    guid  = TCG_CONFIG_FORM_SET_GUID;
+
+  form formid = TCG_CONFIGURATION_FORM_ID,
+    title = STRING_TOKEN(STR_TPM_TITLE);
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    suppressif TRUE;
+      checkbox varid   = TCG_CONFIGURATION.TpmEnable,
+              prompt   = STRING_TOKEN(STR_NULL),
+              help     = STRING_TOKEN(STR_NULL),
+      endcheckbox;
+    endif;
+
+    suppressif TRUE;
+      checkbox varid   = TCG_CONFIGURATION.TpmActivate,
+              prompt   = STRING_TOKEN(STR_NULL),
+              help     = STRING_TOKEN(STR_NULL),
+      endcheckbox;
+    endif;
+
+    suppressif TRUE;
+      checkbox varid   = TCG_CONFIGURATION.OriginalHideTpm,
+              prompt   = STRING_TOKEN(STR_NULL),
+              help     = STRING_TOKEN(STR_NULL),
+      endcheckbox;
+    endif;
+
+    text
+      help   = STRING_TOKEN(STR_TPM_STATE_HELP),
+      text   = STRING_TOKEN(STR_TPM_STATE_PROMPT),
+        text   = STRING_TOKEN(STR_TPM_STATE_CONTENT);
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    label LABEL_TCG_CONFIGURATION_HIDETPM;
+
+    checkbox varid = TCG_CONFIGURATION.HideTpm,
+          questionid  = KEY_HIDE_TPM,
+          prompt      = STRING_TOKEN(STR_HIDE_TPM_PROMPT),
+          help        = STRING_TOKEN(STR_HIDE_TPM_HELP),
+          flags       = RESET_REQUIRED,
+    endcheckbox;
+
+    label LABEL_END;
+
+    grayoutif ideqval TCG_CONFIGURATION.OriginalHideTpm == 1;
+    oneof varid  = TCG_CONFIGURATION.TpmOperation,
+          questionid = KEY_TPM_ACTION,
+          prompt = STRING_TOKEN(STR_TPM_OPERATION),
+          help   = STRING_TOKEN(STR_TPM_OPERATION_HELP),
+          flags  = INTERACTIVE,
+          //
+          // Disable (TPM_ORD_PhysicalDisable) command is not available when disabled.
+          // Activate/deactivate (TPM_ORD_physicalSetDeactivated) command is not available when disabled.
+          //
+          suppressif ideqval TCG_CONFIGURATION.TpmEnable == 0;
+            option text = STRING_TOKEN(STR_DISABLE), value = PHYSICAL_PRESENCE_DISABLE, flags = RESET_REQUIRED;
+            option text = STRING_TOKEN(STR_TPM_ACTIVATE), value = PHYSICAL_PRESENCE_ACTIVATE, flags = RESET_REQUIRED;
+            option text = STRING_TOKEN(STR_TPM_DEACTIVATE), value = PHYSICAL_PRESENCE_DEACTIVATE, flags = RESET_REQUIRED;
+            option text = STRING_TOKEN(STR_TPM_DEACTIVATE_DISABLE), value = PHYSICAL_PRESENCE_DEACTIVATE_DISABLE, flags = RESET_REQUIRED;
+          endif
+          //
+          // Clear (TPM_ORD_ForceClear) command is not available when disabled or deactivated. 
+          //
+          suppressif ideqval TCG_CONFIGURATION.TpmEnable == 0 OR
+                     ideqval TCG_CONFIGURATION.TpmActivate == 0;
+            option text = STRING_TOKEN(STR_TPM_CLEAR), value = PHYSICAL_PRESENCE_CLEAR, flags = RESET_REQUIRED;
+            option text = STRING_TOKEN(STR_TPM_CLEAR_ENABLE_ACTIVATE), value = PHYSICAL_PRESENCE_CLEAR_ENABLE_ACTIVATE, flags = RESET_REQUIRED;
+          endif
+
+          option text = STRING_TOKEN(STR_ENABLE), value = PHYSICAL_PRESENCE_ENABLE, flags = RESET_REQUIRED;
+          option text = STRING_TOKEN(STR_TPM_ENABLE_ACTIVATE), value = PHYSICAL_PRESENCE_ENABLE_ACTIVATE, flags = RESET_REQUIRED;          
+          option text = STRING_TOKEN(STR_TPM_ENABLE_ACTIVATE_CLEAR), value = PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR, flags = RESET_REQUIRED;
+          option text = STRING_TOKEN(STR_TPM_ENABLE_ACTIVATE_CLEAR_E_A), value = PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR_ENABLE_ACTIVATE, flags = RESET_REQUIRED;
+    endoneof;
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    checkbox varid = TCG_CONFIGURATION.MorState,
+          questionid = KEY_TPM_MOR_ENABLE,
+          prompt = STRING_TOKEN(STR_MOR_PROMPT),
+          help   = STRING_TOKEN(STR_MOR_HELP),
+    endcheckbox; 
+    endif;
+
+  endform;
+
+endformset;

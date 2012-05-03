@@ -1,0 +1,54 @@
+## @file
+#  This is a shell application that will display statistical information 
+#  about variable usage.
+#  Note that if Variable Dxe driver doesn't enable the feature by setting 
+#  PcdVariableCollectStatistics as TRUE, The application will not display 
+#  variable statistical information.
+#
+# Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution. The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VariableInfo
+  FILE_GUID                      = B9EF901F-A2A2-4fc8-8D2B-3A2E07B301CC
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = UefiMain
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  VariableInfo.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  UefiLib
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  MemoryAllocationLib
+
+[Protocols]
+  gEfiSmmCommunicationProtocolGuid
+  gEfiSmmVariableProtocolGuid
+  
+[Guids]
+  gEfiAuthenticatedVariableGuid        ## CONSUMES ## Configuration Table Guid
+  gEfiVariableGuid                     ## CONSUMES ## Configuration Table Guid

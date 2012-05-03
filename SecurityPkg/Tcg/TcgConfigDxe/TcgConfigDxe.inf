@@ -1,0 +1,76 @@
+## @file
+#  Component name for Tcg configuration module.
+#
+# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution. The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TcgConfigDxe
+  FILE_GUID                      = 1FA4DAFE-FA5D-4d75-BEA6-5863862C520A
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = TcgConfigDriverEntryPoint
+  UNLOAD_IMAGE                   = TcgConfigDriverUnload
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  TcgConfigDriver.c
+  TcgConfigImpl.c
+  TcgConfigImpl.h
+  TcgConfig.vfr
+  TcgConfigStrings.uni
+  TcgConfigNvData.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiDriverEntryPoint
+  UefiHiiServicesLib
+  DebugLib
+  HiiLib
+  PcdLib
+  PrintLib
+  TpmCommLib
+
+[Guids]
+  gEfiPhysicalPresenceGuid
+  gEfiIfrTianoGuid
+  gTcgConfigFormSetGuid
+
+[Protocols]
+  gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
+  gEfiHiiConfigRoutingProtocolGuid              ## CONSUMES
+  gEfiTcgProtocolGuid                           ## CONSUMES
+
+[FixedPcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdHideTpmSupport
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdMorEnable
+  gEfiSecurityPkgTokenSpaceGuid.PcdHideTpm
+
+[Depex]
+  gEfiHiiConfigRoutingProtocolGuid  AND
+  gEfiHiiDatabaseProtocolGuid       AND
+  gEfiVariableArchProtocolGuid      AND
+  gEfiVariableWriteArchProtocolGuid

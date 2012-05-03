@@ -1,0 +1,64 @@
+## @file
+#  Component description file for user identify manager driver.
+# 
+# Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution. The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UserIdentifyManager
+  FILE_GUID                      = C5D3191B-27D5-4873-8DF2-628136991A21
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = UserIdentifyManagerInit
+
+[sources]
+  UserIdentifyManager.c
+  LoadDeferredImage.c
+  UserIdentifyManager.h
+  UserIdentifyManagerData.h
+  UserIdentifyManagerStrings.uni
+  UserIdentifyManagerVfr.Vfr
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  MemoryAllocationLib
+  BaseMemoryLib
+  DebugLib
+  HiiLib
+  UefiLib
+
+[Guids]
+  gEfiIfrTianoGuid                              ## CONSUMES ## Guid
+  gEfiEventUserProfileChangedGuid               ## CONSUMES ## Guid 
+  gUserIdentifyManagerGuid                      ## PRODUCES ## Guid
+
+[Protocols]
+  gEfiFormBrowser2ProtocolGuid                  ## CONSUMES
+  gEfiHiiDatabaseProtocolGuid                   ## CONSUMES
+  gEfiUserCredential2ProtocolGuid               ## CONSUMES
+  gEfiDeferredImageLoadProtocolGuid             ## CONSUMES
+  gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
+  gEfiUserManagerProtocolGuid                   ## PRODUCES
+  gEfiSimpleTextOutProtocolGuid
+  gEfiSimpleTextInProtocolGuid
+  gEfiSimpleTextInputExProtocolGuid
+
+[Depex]
+  gEfiHiiDatabaseProtocolGuid   AND 
+  gEfiHiiStringProtocolGuid     AND 
+  gEfiFormBrowser2ProtocolGuid 

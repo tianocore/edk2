@@ -1,0 +1,100 @@
+## @file
+#  Component description file for SMM Authenticated Variable module.
+#
+#  This module installs SMM variable protocol into SMM protocol database,
+#  which can be used by SMM driver, and installs SMM variable protocol
+#  into BS protocol database, which can be used to notify the SMM Runtime
+#  Dxe driver that the SMM variable service is ready.
+#  This module should be used with SMM Runtime DXE module together. The
+#  SMM Runtime DXE module would install variable arch protocol and variable
+#  write arch protocol based on SMM variable module.
+#
+# Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution. The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VariableSmm
+  FILE_GUID                      = D34BDC5E-968A-40f5-A48C-E594F45AE211
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  ENTRY_POINT                    = VariableServiceInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+
+[Sources]
+  Reclaim.c
+  Variable.c
+  VariableSmm.c
+  AuthService.c
+  Variable.h
+  AuthService.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  CryptoPkg/CryptoPkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  MemoryAllocationLib
+  BaseLib
+  SynchronizationLib
+  UefiLib
+  SmmServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  DxeServicesTableLib
+  BaseCryptLib
+  PlatformSecureLib
+  HobLib
+
+[Protocols]
+  gEfiSmmFirmwareVolumeBlockProtocolGuid        ## SOMETIMES_CONSUMES
+  gEfiSmmVariableProtocolGuid                   ## ALWAYS_PRODUCES
+  gEfiSmmFaultTolerantWriteProtocolGuid         ## SOMETIMES_CONSUMES
+
+[Guids]
+  gEfiAuthenticatedVariableGuid                 ## PRODUCES ## Configuration Table Guid
+  gEfiGlobalVariableGuid                        ## PRODUCES ## Variable Guid
+  gSmmVariableWriteGuid                         ## PRODUCES ## SMM Variable Write Guid
+  gEfiCertTypeRsa2048Sha256Guid
+  gEfiImageSecurityDatabaseGuid
+  gEfiCertX509Guid
+  gEfiCertPkcs7Guid
+  gEfiCertRsa2048Guid
+  gEfiSecureBootEnableDisableGuid
+  gEfiCustomModeEnableGuid
+  gEfiSystemNvDataFvGuid                        ## CONSUMES
+  gEfiCertDbGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics  ## SOMETIME_CONSUMES (statistic the information of variable.)
+
+[Depex]
+  TRUE
+
+

@@ -1,0 +1,149 @@
+## @file  SecurityPkg.dec
+#  This package includes the security drivers, defintions(including PPIs/PROTOCOLs/GUIDs  
+#  and library classes) and libraries instances.
+#
+# Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License which accompanies this distribution.
+# The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = SecurityPkg
+  PACKAGE_GUID                   = 24369CAC-6AA6-4fb8-88DB-90BF061668AD
+  PACKAGE_VERSION                = 0.92
+
+[Includes]
+  Include
+
+[LibraryClasses]
+  ##  @libraryclass  Definitions for common TPM commands as library API for TPM
+  #                  module use.
+  TpmCommLib|Include/Library/TpmCommLib.h
+
+[Guids]
+  ## Security package token space guid
+  # Include/Guid/SecurityPkgTokenSpace.h
+  gEfiSecurityPkgTokenSpaceGuid      = { 0xd3fb176, 0x9569, 0x4d51, { 0xa3, 0xef, 0x7d, 0x61, 0xc6, 0x4f, 0xea, 0xba }}
+  ## Guid acted as the authenticated variable store header's signature, and to specify the variable list entries put in the EFI system table.
+  #  Include/Guid/AuthenticatedVariableFormat.h
+  gEfiAuthenticatedVariableGuid      = { 0xaaf32c78, 0x947b, 0x439a, { 0xa1, 0x80, 0x2e, 0x14, 0x4e, 0xc3, 0x77, 0x92 } }
+
+  #  Include/Guid/AuthenticatedVariableFormat.h
+  gEfiSecureBootEnableDisableGuid    = { 0xf0a30bc7, 0xaf08, 0x4556, { 0x99, 0xc4, 0x0, 0x10, 0x9, 0xc9, 0x3a, 0x44 } }
+
+  #  Include/Guid/AuthenticatedVariableFormat.h
+  gEfiCustomModeEnableGuid           = { 0xc076ec0c, 0x7028, 0x4399, { 0xa0, 0x72, 0x71, 0xee, 0x5c, 0x44, 0x8b, 0x9f } }
+
+  #  Include/Guid/AuthenticatedVariableFormat.h
+  gEfiCertDbGuid                     = { 0xd9bee56e, 0x75dc, 0x49d9, { 0xb4, 0xd7, 0xb5, 0x34, 0x21, 0xf, 0x63, 0x7a } }
+  
+  ## Include/Guid/TcgEventHob.h
+  gTcgEventEntryHobGuid              = { 0x2e3044ac, 0x879f, 0x490f, {0x97, 0x60, 0xbb, 0xdf, 0xaf, 0x69, 0x5f, 0x50 }}
+
+  ## Include/Guid/PhysicalPresenceData.h
+  gEfiPhysicalPresenceGuid           = { 0xf6499b1, 0xe9ad, 0x493d, { 0xb9, 0xc2, 0x2f, 0x90, 0x81, 0x5c, 0x6c, 0xbc }}
+  
+  ## Include/Guid/PwdCredentialProviderHii.h
+  gPwdCredentialProviderGuid         = { 0x78b9ec8b, 0xc000, 0x46c5, { 0xac, 0x93, 0x24, 0xa0, 0xc1, 0xbb, 0x0, 0xce }}
+
+  ## Include/Guid/UsbCredentialProviderHii.h
+  gUsbCredentialProviderGuid         = { 0xd0849ed1, 0xa88c, 0x4ba6, { 0xb1, 0xd6, 0xab, 0x50, 0xe2, 0x80, 0xb7, 0xa9 }}
+
+  ## Include/Guid/UserIdentifyManagerHii.h
+  gUserIdentifyManagerGuid           = { 0x3ccd3dd8, 0x8d45, 0x4fed, { 0x96, 0x2d, 0x2b, 0x38, 0xcd, 0x82, 0xb3, 0xc4 }}
+
+  ## Include/Guid/UserProfileManagerHii.h
+  gUserProfileManagerGuid            = { 0xc35f272c, 0x97c2, 0x465a, { 0xa2, 0x16, 0x69, 0x6b, 0x66, 0x8a, 0x8c, 0xfe }}
+
+  ## Include/Guid/TcgConfigHii.h
+  gTcgConfigFormSetGuid              = { 0xb0f901e4, 0xc424, 0x45de, { 0x90, 0x81, 0x95, 0xe2, 0xb, 0xde, 0x6f, 0xb5 }}
+  
+  ## Include/Guid/SecureBootConfigHii.h
+  gSecureBootConfigFormSetGuid       = { 0x5daf50a5, 0xea81, 0x4de2, {0x8f, 0x9b, 0xca, 0xbd, 0xa9, 0xcf, 0x5c, 0x14}}
+                                      
+[Ppis]
+  ## Include/Ppi/LockPhysicalPresence.h
+  gPeiLockPhysicalPresencePpiGuid    = { 0xef9aefe5, 0x2bd3, 0x4031, { 0xaf, 0x7d, 0x5e, 0xfe, 0x5a, 0xbb, 0x9a, 0xd } }
+
+  ## Include/Ppi/TpmInitialized.h
+  gPeiTpmInitializedPpiGuid      = { 0xe9db0d58, 0xd48d, 0x47f6, { 0x9c, 0x6e, 0x6f, 0x40, 0xe8, 0x6c, 0x7b, 0x41 }}
+
+[PcdsFixedAtBuild]
+  ## Pcd for OptionRom.
+  #  Image verification policy settings:
+  #  ALWAYS_EXECUTE                         0x00000000
+  #  NEVER_EXECUTE                          0x00000001
+  #  ALLOW_EXECUTE_ON_SECURITY_VIOLATION    0x00000002
+  #  DEFER_EXECUTE_ON_SECURITY_VIOLATION    0x00000003
+  #  DENY_EXECUTE_ON_SECURITY_VIOLATION     0x00000004
+  #  QUERY_USER_ON_SECURITY_VIOLATION       0x00000005 
+  gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x00|UINT32|0x00000001
+  
+  ## Pcd for removable media.
+  #  Removable media include CD-ROM, Floppy, USB and network.
+  #  Image verification policy settings:
+  #  ALWAYS_EXECUTE                         0x00000000
+  #  NEVER_EXECUTE                          0x00000001
+  #  ALLOW_EXECUTE_ON_SECURITY_VIOLATION    0x00000002
+  #  DEFER_EXECUTE_ON_SECURITY_VIOLATION    0x00000003
+  #  DENY_EXECUTE_ON_SECURITY_VIOLATION     0x00000004
+  #  QUERY_USER_ON_SECURITY_VIOLATION       0x00000005
+  gEfiSecurityPkgTokenSpaceGuid.PcdRemovableMediaImageVerificationPolicy|0x05|UINT32|0x00000002
+  
+  ## Pcd for fixed media.
+  #  Fixed media include hard disk.
+  #  Image verification policy settings:
+  #  ALWAYS_EXECUTE                         0x00000000
+  #  NEVER_EXECUTE                          0x00000001
+  #  ALLOW_EXECUTE_ON_SECURITY_VIOLATION    0x00000002
+  #  DEFER_EXECUTE_ON_SECURITY_VIOLATION    0x00000003
+  #  DENY_EXECUTE_ON_SECURITY_VIOLATION     0x00000004
+  #  QUERY_USER_ON_SECURITY_VIOLATION       0x00000005  
+  gEfiSecurityPkgTokenSpaceGuid.PcdFixedMediaImageVerificationPolicy|0x05|UINT32|0x00000003
+  
+  ## Defer Image Load policy settings.
+  #  The policy is bitwise. 
+  #  If bit is set, the image from corresponding device will be trust when loading.
+  #
+  # IMAGE_UNKNOWN                         0x00000001
+  # IMAGE_FROM_FV                         0x00000002
+  # IMAGE_FROM_OPTION_ROM                 0x00000004
+  # IMAGE_FROM_REMOVABLE_MEDIA            0x00000008
+  # IMAGE_FROM_FIXED_MEDIA                0x00000010
+  gEfiSecurityPkgTokenSpaceGuid.PcdDeferImageLoadPolicy|0x0000001F|UINT32|0x0000004
+  
+  ## The token file name used to save credential in USB credential provider driver.
+  #  The specified file should be saved at the root directory of USB storage disk.
+  gEfiSecurityPkgTokenSpaceGuid.PcdFixedUsbCredentialProviderTokenFileName|L"Token.bin"|VOID*|0x00000005
+
+  ## The size of Append variable buffer. This buffer is reserved for runtime use, OS can append data into one existing variable.
+  gEfiSecurityPkgTokenSpaceGuid.PcdMaxAppendVariableSize|0x2000|UINT32|0x30000005  
+
+  ## This PCD specifies the type of TCG platform that contains TPM chip. 
+  #  This PCD is only avaiable when PcdTpmPhysicalPresence is TRUE.
+  #  If 0, TCG platform type is PC client.
+  #  If 1, TCG platform type is server.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmPlatformClass|0|UINT8|0x00000006
+
+  ## The PCD is used to control whether to support hiding the TPM.
+  #  If TRUE, PcdHideTpm controls whether to hide the TPM.
+  gEfiSecurityPkgTokenSpaceGuid.PcdHideTpmSupport|FALSE|BOOLEAN|0x00000007
+  
+[PcdsDynamic, PcdsDynamicEx]
+  ## The PCD is used to control whether to hide the TPM.
+  gEfiSecurityPkgTokenSpaceGuid.PcdHideTpm|FALSE|BOOLEAN|0x00010002
+
+  ## The PCD is used to specify whether or not MOR (MemoryOverwriteControl) feature is enabled.
+  gEfiSecurityPkgTokenSpaceGuid.PcdMorEnable|FALSE|BOOLEAN|0x00010000
+
+[PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+  ## This PCD indicates the presence or absence of the platform operator.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmPhysicalPresence|TRUE|BOOLEAN|0x00010001
+

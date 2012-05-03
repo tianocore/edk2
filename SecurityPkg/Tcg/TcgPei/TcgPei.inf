@@ -1,0 +1,67 @@
+## @file
+#  This module will initialize TPM device and measure FVs in PEI phase.
+#
+# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution. The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TcgPei
+  FILE_GUID                      = 2BE1E4A6-6505-43b3-9FFC-A3C8330E0432
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PeimEntryMA
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  TcgPei.c
+  TisPei.c
+  TpmComm.c
+  TpmComm.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  HobLib
+  PeimEntryPoint
+  PeiServicesLib
+  BaseMemoryLib
+  DebugLib
+  TpmCommLib
+  TimerLib
+  IoLib
+  PeiServicesTablePointerLib
+
+[Guids]
+  gTcgEventEntryHobGuid
+
+[Ppis]
+  gPeiLockPhysicalPresencePpiGuid
+  gEfiPeiFirmwareVolumeInfoPpiGuid
+  gPeiTpmInitializedPpiGuid
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdHideTpm
+
+[FixedPcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdHideTpmSupport
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported             ## CONSUMES
+
+[Depex]
+  gEfiPeiMasterBootModePpiGuid AND
+  gEfiPeiReadOnlyVariable2PpiGuid

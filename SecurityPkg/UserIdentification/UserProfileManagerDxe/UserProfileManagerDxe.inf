@@ -1,0 +1,64 @@
+## @file
+#  Component description file for user profile manager driver.
+#
+# Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution. The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UserProfileManager
+  FILE_GUID                      = E38CB52D-A74D-45db-A8D0-290C9B21BBF2
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = UserProfileManagerInit
+
+[Sources]
+  UserProfileManager.c
+  UserProfileManager.h
+  UserProfileAdd.c
+  UserProfileDelete.c
+  UserProfileModify.c
+  ModifyIdentityPolicy.c
+  ModifyAccessPolicy.c
+  UserProfileManagerData.h
+  UserProfileManagerStrings.uni
+  UserProfileManagerVfr.Vfr
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  MemoryAllocationLib
+  BaseMemoryLib
+  DebugLib
+  HiiLib
+  UefiLib
+  
+  [Guids]
+  gEfiIfrTianoGuid                              ## CONSUMES ## Guid
+  gEfiUserInfoAccessSetupAdminGuid              ## CONSUMES ## Guid
+  gEfiUserInfoAccessSetupNormalGuid             ## CONSUMES ## Guid
+  gEfiUserInfoAccessSetupRestrictedGuid         ## CONSUMES ## Guid
+  gUserProfileManagerGuid                       ## PRODUCES ## Guid
+
+[Protocols]
+  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+  gEfiHiiConfigAccessProtocolGuid
+  gEfiUserCredential2ProtocolGuid
+  gEfiUserManagerProtocolGuid
+  gEfiDevicePathToTextProtocolGuid
+
+[Depex]
+  gEfiUserManagerProtocolGuid
