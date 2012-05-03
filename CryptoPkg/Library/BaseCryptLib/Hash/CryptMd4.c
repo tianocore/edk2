@@ -1,7 +1,7 @@
 /** @file
   MD4 Digest Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -37,7 +37,7 @@ Md4GetContextSize (
   Initializes user-supplied memory pointed by Md4Context as MD4 hash context for
   subsequent use.
 
-  If Md4Context is NULL, then ASSERT().
+  If Md4Context is NULL, then return FALSE.
 
   @param[out]  Md4Context  Pointer to MD4 context being initialized.
 
@@ -52,9 +52,11 @@ Md4Init (
   )
 {
   //
-  // ASSERT if Md4Context is NULL.
+  // Check input parameters.
   //
-  ASSERT (Md4Context != NULL);
+  if (Md4Context == NULL) {
+    return FALSE;
+  }
 
   //
   // OpenSSL MD4 Context Initialization
@@ -65,8 +67,8 @@ Md4Init (
 /**
   Makes a copy of an existing MD4 context.
 
-  If Md4Context is NULL, then ASSERT().
-  If NewMd4Context is NULL, then ASSERT().
+  If Md4Context is NULL, then return FALSE.
+  If NewMd4Context is NULL, then return FALSE.
 
   @param[in]  Md4Context     Pointer to MD4 context being copied.
   @param[out] NewMd4Context  Pointer to new MD4 context.
@@ -83,10 +85,11 @@ Md4Duplicate (
   )
 {
   //
-  // ASSERT if Md4Context or NewMd4Context is NULL.
+  // Check input parameters.
   //
-  ASSERT (Md4Context    != NULL);
-  ASSERT (NewMd4Context != NULL);
+  if (Md4Context == NULL || NewMd4Context == NULL) {
+    return FALSE;
+  }
 
   CopyMem (NewMd4Context, Md4Context, sizeof (MD4_CTX));
 
@@ -101,7 +104,7 @@ Md4Duplicate (
   MD4 context should be already correctly intialized by Md4Init(), and should not be finalized
   by Md4Final(). Behavior with invalid context is undefined.
 
-  If Md4Context is NULL, then ASSERT().
+  If Md4Context is NULL, then return FALSE.
 
   @param[in, out]  Md4Context  Pointer to the MD4 context.
   @param[in]       Data        Pointer to the buffer containing the data to be hashed.
@@ -120,15 +123,17 @@ Md4Update (
   )
 {
   //
-  // ASSERT if Md4Context is NULL
+  // Check input parameters.
   //
-  ASSERT (Md4Context != NULL);
+  if (Md4Context == NULL) {
+    return FALSE;
+  }
 
   //
-  // ASSERT if invalid parameters, in case that only DataLength was checked in OpenSSL
+  // Check invalid parameters, in case that only DataLength was checked in OpenSSL
   //
-  if (Data == NULL) {
-    ASSERT (DataSize == 0);
+  if (Data == NULL && DataSize != 0) {
+    return FALSE;
   }
 
   //
@@ -146,8 +151,8 @@ Md4Update (
   MD4 context should be already correctly intialized by Md4Init(), and should not be
   finalized by Md4Final(). Behavior with invalid MD4 context is undefined.
 
-  If Md4Context is NULL, then ASSERT().
-  If HashValue is NULL, then ASSERT().
+  If Md4Context is NULL, then return FALSE.
+  If HashValue is NULL, then return FALSE.
 
   @param[in, out]  Md4Context  Pointer to the MD4 context.
   @param[out]      HashValue   Pointer to a buffer that receives the MD4 digest
@@ -165,10 +170,11 @@ Md4Final (
   )
 {
   //
-  // ASSERT if Md4Context is NULL or HashValue is NULL
+  // Check input parameters.
   //
-  ASSERT (Md4Context != NULL);
-  ASSERT (HashValue  != NULL);
+  if (Md4Context == NULL || HashValue == NULL) {
+    return FALSE;
+  }
 
   //
   // OpenSSL MD4 Hash Finalization

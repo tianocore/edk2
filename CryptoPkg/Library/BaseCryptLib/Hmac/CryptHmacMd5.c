@@ -1,7 +1,7 @@
 /** @file
   HMAC-MD5 Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -37,7 +37,7 @@ HmacMd5GetContextSize (
   Initializes user-supplied memory pointed by HmacMd5Context as HMAC-MD5 context for
   subsequent use.
 
-  If HmacMd5Context is NULL, then ASSERT().
+  If HmacMd5Context is NULL, then return FALSE.
 
   @param[out]  HmacMd5Context  Pointer to HMAC-MD5 context being initialized.
   @param[in]   Key             Pointer to the user-supplied key.
@@ -56,9 +56,11 @@ HmacMd5Init (
   )
 {
   //
-  // ASSERT if HmacMd5Context is NULL.
+  // Check input parameters.
   //
-  ASSERT (HmacMd5Context != NULL);
+  if (HmacMd5Context == NULL) {
+    return FALSE;
+  }
 
   //
   // OpenSSL HMAC-MD5 Context Initialization
@@ -72,8 +74,8 @@ HmacMd5Init (
 /**
   Makes a copy of an existing HMAC-MD5 context.
 
-  If HmacMd5Context is NULL, then ASSERT().
-  If NewHmacMd5Context is NULL, then ASSERT().
+  If HmacMd5Context is NULL, then return FALSE.
+  If NewHmacMd5Context is NULL, then return FALSE.
 
   @param[in]  HmacMd5Context     Pointer to HMAC-MD5 context being copied.
   @param[out] NewHmacMd5Context  Pointer to new HMAC-MD5 context.
@@ -90,10 +92,11 @@ HmacMd5Duplicate (
   )
 {
   //
-  // ASSERT if HmacMd5Context or NewHmacMd5Context is NULL.
+  // Check input parameters.
   //
-  ASSERT (HmacMd5Context    != NULL);
-  ASSERT (NewHmacMd5Context != NULL);
+  if (HmacMd5Context == NULL || NewHmacMd5Context == NULL) {
+    return FALSE;
+  }
   
   CopyMem (NewHmacMd5Context, HmacMd5Context, sizeof (HMAC_CTX));
 
@@ -108,7 +111,7 @@ HmacMd5Duplicate (
   HMAC-MD5 context should be already correctly intialized by HmacMd5Init(), and should not be
   finalized by HmacMd5Final(). Behavior with invalid context is undefined.
 
-  If HmacMd5Context is NULL, then ASSERT().
+  If HmacMd5Context is NULL, then return FALSE.
 
   @param[in, out]  HmacMd5Context  Pointer to the HMAC-MD5 context.
   @param[in]       Data            Pointer to the buffer containing the data to be digested.
@@ -127,15 +130,17 @@ HmacMd5Update (
   )
 {
   //
-  // ASSERT if HmacMd5Context is NULL
+  // Check input parameters.
   //
-  ASSERT (HmacMd5Context != NULL);
+  if (HmacMd5Context == NULL) {
+    return FALSE;
+  }
 
   //
-  // ASSERT if invalid parameters, in case that only DataLength was checked in OpenSSL
+  // Check invalid parameters, in case that only DataLength was checked in OpenSSL
   //
-  if (Data == NULL) {
-    ASSERT (DataSize == 0);
+  if (Data == NULL && DataSize != 0) {
+    return FALSE;
   }
 
   //
@@ -155,8 +160,8 @@ HmacMd5Update (
   HMAC-MD5 context should be already correctly intialized by HmacMd5Init(), and should not be
   finalized by HmacMd5Final(). Behavior with invalid HMAC-MD5 context is undefined.
 
-  If HmacMd5Context is NULL, then ASSERT().
-  If HmacValue is NULL, then ASSERT().
+  If HmacMd5Context is NULL, then return FALSE.
+  If HmacValue is NULL, then return FALSE.
 
   @param[in, out]  HmacMd5Context  Pointer to the HMAC-MD5 context.
   @param[out]      HmacValue       Pointer to a buffer that receives the HMAC-MD5 digest
@@ -176,10 +181,11 @@ HmacMd5Final (
   UINT32  Length;
 
   //
-  // ASSERT if HmacMd5Context is NULL or HmacValue is NULL
+  // Check input parameters.
   //
-  ASSERT (HmacMd5Context != NULL);
-  ASSERT (HmacValue != NULL);
+  if (HmacMd5Context == NULL || HmacValue == NULL) {
+    return FALSE;
+  }
 
   //
   // OpenSSL HMAC-MD5 digest finalization

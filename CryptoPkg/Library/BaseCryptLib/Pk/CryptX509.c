@@ -1,7 +1,7 @@
 /** @file
   X.509 Certificate Handler Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -19,8 +19,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Construct a X509 object from DER-encoded certificate data.
 
-  If Cert is NULL, then ASSERT().
-  If SingleX509Cert is NULL, then ASSERT().
+  If Cert is NULL, then return FALSE.
+  If SingleX509Cert is NULL, then return FALSE.
 
   @param[in]  Cert            Pointer to the DER-encoded certificate data.
   @param[in]  CertSize        The size of certificate data in bytes.
@@ -43,11 +43,11 @@ X509ConstructCertificate (
   BOOLEAN  Status;
 
   //
-  // ASSERT if Cert is NULL or SingleX509Cert is NULL.
+  // Check input parameters.
   //
-  ASSERT (Cert           != NULL);
-  ASSERT (SingleX509Cert != NULL);
-  ASSERT (CertSize       <= INT_MAX);
+  if (Cert == NULL || SingleX509Cert == NULL || CertSize > INT_MAX) {
+    return FALSE;
+  }
 
   Status = FALSE;
 
@@ -79,7 +79,7 @@ _Exit:
 /**
   Construct a X509 stack object from a list of DER-encoded certificate data.
 
-  If X509Stack is NULL, then ASSERT().
+  If X509Stack is NULL, then return FALSE.
 
   @param[in, out]  X509Stack  On input, pointer to an existing X509 stack object.
                               On output, pointer to the X509 stack object with new
@@ -108,9 +108,11 @@ X509ConstructCertificateStack (
   UINTN           Index;
 
   //
-  // ASSERT if input X509Stack is NULL.
+  // Check input parameters.
   //
-  ASSERT (X509Stack != NULL);
+  if (X509Stack == NULL) {
+    return FALSE;
+  }
 
   Status = FALSE;
 
@@ -171,7 +173,7 @@ X509ConstructCertificateStack (
 /**
   Release the specified X509 object.
 
-  If X509Cert is NULL, then ASSERT().
+  If X509Cert is NULL, then return FALSE.
 
   @param[in]  X509Cert  Pointer to the X509 object to be released.
 
@@ -181,9 +183,14 @@ EFIAPI
 X509Free (
   IN  VOID  *X509Cert
   )
-{
-  ASSERT (X509Cert != NULL);
-
+{ 
+  //
+  // Check input parameters.
+  //
+  if (X509Cert == NULL) {
+    return;
+  }
+  
   //
   // Free OpenSSL X509 object.
   //
@@ -193,7 +200,7 @@ X509Free (
 /**
   Release the specified X509 stack object.
 
-  If X509Stack is NULL, then ASSERT().
+  If X509Stack is NULL, then return FALSE.
 
   @param[in]  X509Stack  Pointer to the X509 stack object to be released.
 
@@ -204,12 +211,102 @@ X509StackFree (
   IN  VOID  *X509Stack
   )
 {
-  ASSERT (X509Stack != NULL);
-
+  //
+  // Check input parameters.
+  //
+  if (X509Stack == NULL) {
+    return;
+  }
+  
   //
   // Free OpenSSL X509 stack object.
   //
   sk_X509_pop_free ((STACK_OF(X509) *) X509Stack, X509_free);
+}
+
+/**
+  Pop single certificate from STACK_OF(X509).
+
+  If X509Stack, Cert, or CertSize is NULL, then return FALSE.
+
+  @param[in]  X509Stack       Pointer to a X509 stack object.
+  @param[out] Cert            Pointer to a X509 certificate.
+  @param[out] CertSize        Length of output X509 certificate in bytes.
+                                 
+  @retval     TRUE            The X509 stack pop succeeded.
+  @retval     FALSE           The pop operation failed.
+
+**/
+BOOLEAN
+X509PopCertificate (
+  IN  VOID  *X509Stack,
+  OUT UINT8 **Cert,
+  OUT UINTN *CertSize
+  )
+{
+  BIO             *CertBio;
+  X509            *X509Cert;
+  STACK_OF(X509)  *CertStack;
+  BOOLEAN         Status;
+  int             Result;
+  int             Length;
+  VOID            *Buffer;
+
+  Status = FALSE;
+
+  if ((X509Stack == NULL) || (Cert == NULL) || (CertSize == NULL)) {
+    return Status;
+  }
+
+  CertStack = (STACK_OF(X509) *) X509Stack;
+
+  X509Cert = sk_X509_pop (CertStack);
+
+  if (X509Cert == NULL) {
+    return Status;
+  }
+
+  Buffer = NULL;
+
+  CertBio = BIO_new (BIO_s_mem ());
+  if (CertBio == NULL) {
+    return Status;
+  }
+
+  Result = i2d_X509_bio (CertBio, X509Cert);
+  if (Result == 0) {
+    goto _Exit;
+  }
+
+  Length = ((BUF_MEM *) CertBio->ptr)->length;
+  if (Length <= 0) {
+    goto _Exit;
+  }
+
+  Buffer = malloc (Length);
+  if (Buffer == NULL) {
+    goto _Exit;
+  }
+
+  Result = BIO_read (CertBio, Buffer, Length);
+  if (Result != Length) {
+    goto _Exit;
+  }
+
+  *Cert     = Buffer;
+  *CertSize = Length;
+
+  Status = TRUE;
+
+_Exit:
+
+  BIO_free (CertBio);
+
+  if (!Status && (Buffer != NULL)) {
+    free (Buffer);
+  }
+
+  return Status;
 }
 
 /**
@@ -221,8 +318,8 @@ X509StackFree (
   @param[in, out] SubjectSize  The size in bytes of the CertSubject buffer on input,
                                and the size of buffer returned CertSubject on output.
 
-  If Cert is NULL, then ASSERT().
-  If SubjectSize is NULL, then ASSERT().
+  If Cert is NULL, then return FALSE.
+  If SubjectSize is NULL, then return FALSE.
 
   @retval  TRUE   The certificate subject retrieved successfully.
   @retval  FALSE  Invalid certificate, or the SubjectSize is too small for the result.
@@ -243,10 +340,11 @@ X509GetSubjectName (
   X509_NAME  *X509Name;
 
   //
-  // ASSERT if Cert is NULL or SubjectSize is NULL.
+  // Check input parameters.
   //
-  ASSERT (Cert        != NULL);
-  ASSERT (SubjectSize != NULL);
+  if (Cert == NULL || SubjectSize == NULL) {
+    return FALSE;
+  }
 
   Status   = FALSE;
   X509Cert = NULL;
@@ -291,8 +389,8 @@ _Exit:
                            RSA public key component. Use RsaFree() function to free the
                            resource.
 
-  If Cert is NULL, then ASSERT().
-  If RsaContext is NULL, then ASSERT().
+  If Cert is NULL, then return FALSE.
+  If RsaContext is NULL, then return FALSE.
 
   @retval  TRUE   RSA Public Key was retrieved successfully.
   @retval  FALSE  Fail to retrieve RSA public key from X509 certificate.
@@ -309,12 +407,13 @@ RsaGetPublicKeyFromX509 (
   BOOLEAN   Status;
   EVP_PKEY  *Pkey;
   X509      *X509Cert;
-
+  
   //
-  // ASSERT if Cert is NULL or RsaContext is NULL.
+  // Check input parameters.
   //
-  ASSERT (Cert       != NULL);
-  ASSERT (RsaContext != NULL);
+  if (Cert == NULL || RsaContext == NULL) {
+    return FALSE;
+  }
 
   Status   = FALSE;
   Pkey     = NULL;
@@ -361,8 +460,8 @@ _Exit:
   @param[in]      CACert       Pointer to the DER-encoded trusted CA certificate.
   @param[in]      CACertSize   Size of the CA Certificate in bytes.
 
-  If Cert is NULL, then ASSERT().
-  If CACert is NULL, then ASSERT().
+  If Cert is NULL, then return FALSE.
+  If CACert is NULL, then return FALSE.
 
   @retval  TRUE   The certificate was issued by the trusted CA.
   @retval  FALSE  Invalid certificate or the certificate was not issued by the given
@@ -383,12 +482,13 @@ X509VerifyCert (
   X509            *X509CACert;
   X509_STORE      *CertStore;
   X509_STORE_CTX  CertCtx;
-
+  
   //
-  // ASSERT if Cert is NULL or CACert is NULL.
+  // Check input parameters.
   //
-  ASSERT (Cert   != NULL);
-  ASSERT (CACert != NULL);
+  if (Cert == NULL || CACert == NULL) {
+    return FALSE;
+  }
 
   Status     = FALSE;
   X509Cert   = NULL;

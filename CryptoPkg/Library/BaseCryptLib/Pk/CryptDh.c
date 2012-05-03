@@ -1,7 +1,7 @@
 /** @file
   Diffie-Hellman Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -38,7 +38,7 @@ DhNew (
 /**
   Release the specified DH context.
 
-  If DhContext is NULL, then ASSERT().
+  If DhContext is NULL, then return FALSE.
 
   @param[in]  DhContext  Pointer to the DH context to be released.
 
@@ -64,8 +64,8 @@ DhFree (
   Before this function can be invoked, pseudorandom number generator must be correctly
   initialized by RandomSeed().
 
-  If DhContext is NULL, then ASSERT().
-  If Prime is NULL, then ASSERT().
+  If DhContext is NULL, then return FALSE.
+  If Prime is NULL, then return FALSE.
 
   @param[in, out]  DhContext    Pointer to the DH context.
   @param[in]       Generator    Value of generator.
@@ -88,6 +88,13 @@ DhGenerateParameter (
 {
   BOOLEAN RetVal;
 
+  //
+  // Check input parameters.
+  //
+  if (DhContext == NULL || Prime == NULL) {
+    return FALSE;
+  }
+
   if (Generator != DH_GENERATOR_2 && Generator != DH_GENERATOR_5) {
     return FALSE;
   }
@@ -108,8 +115,8 @@ DhGenerateParameter (
   Given generator g, and prime number p, this function and sets DH
   context accordingly.
 
-  If DhContext is NULL, then ASSERT().
-  If Prime is NULL, then ASSERT().
+  If DhContext is NULL, then return FALSE.
+  If Prime is NULL, then return FALSE.
 
   @param[in, out]  DhContext    Pointer to the DH context.
   @param[in]       Generator    Value of generator.
@@ -134,6 +141,13 @@ DhSetParameter (
 {
   DH  *Dh;
 
+  //
+  // Check input parameters.
+  //
+  if (DhContext == NULL || Prime == NULL) {
+    return FALSE;
+  }
+  
   if (Generator != DH_GENERATOR_2 && Generator != DH_GENERATOR_5) {
     return FALSE;
   }
@@ -156,9 +170,9 @@ DhSetParameter (
   If the PublicKey buffer is too small to hold the public key, FALSE is returned and
   PublicKeySize is set to the required buffer size to obtain the public key.
 
-  If DhContext is NULL, then ASSERT().
-  If PublicKeySize is NULL, then ASSERT().
-  If PublicKeySize is large enough but PublicKey is NULL, then ASSERT().
+  If DhContext is NULL, then return FALSE.
+  If PublicKeySize is NULL, then return FALSE.
+  If PublicKeySize is large enough but PublicKey is NULL, then return FALSE.
 
   @param[in, out]  DhContext      Pointer to the DH context.
   @param[out]      PublicKey      Pointer to the buffer to receive generated public key.
@@ -181,6 +195,17 @@ DhGenerateKey (
   BOOLEAN RetVal;
   DH      *Dh;
 
+  //
+  // Check input parameters.
+  //
+  if (DhContext == NULL || PublicKeySize == NULL) {
+    return FALSE;
+  }
+
+  if (PublicKey == NULL && *PublicKeySize != 0) {
+    return FALSE;
+  }
+  
   Dh = (DH *) DhContext;
   *PublicKeySize = 0;
 
@@ -199,10 +224,10 @@ DhGenerateKey (
   Given peer's public key, this function computes the exchanged common key, based on its own
   context including value of prime modulus and random secret exponent. 
 
-  If DhContext is NULL, then ASSERT().
-  If PeerPublicKey is NULL, then ASSERT().
-  If KeySize is NULL, then ASSERT().
-  If KeySize is large enough but Key is NULL, then ASSERT().
+  If DhContext is NULL, then return FALSE.
+  If PeerPublicKey is NULL, then return FALSE.
+  If KeySize is NULL, then return FALSE.
+  If KeySize is large enough but Key is NULL, then return FALSE.
 
   @param[in, out]  DhContext          Pointer to the DH context.
   @param[in]       PeerPublicKey      Pointer to the peer's public key.
@@ -228,6 +253,17 @@ DhComputeKey (
 {
   BIGNUM  *Bn;
 
+  //
+  // Check input parameters.
+  //
+  if (DhContext == NULL || PeerPublicKey == NULL || KeySize == NULL) {
+    return FALSE;
+  }
+
+  if (Key == NULL && *KeySize != 0) {
+    return FALSE;
+  }
+  
   Bn = BN_bin2bn (PeerPublicKey, (UINT32) PeerPublicKeySize, NULL);
 
   *KeySize = (BOOLEAN) DH_compute_key (Key, Bn, DhContext);

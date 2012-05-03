@@ -1,7 +1,7 @@
 /** @file
   Pseudorandom Number Generator Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -59,7 +59,7 @@ RandomSeed (
 /**
   Generates a pseudorandom byte stream of the specified size.
 
-  If Output is NULL, then ASSERT().
+  If Output is NULL, then return FALSE.
 
   @param[out]  Output  Pointer to buffer to receive random value.
   @param[in]   Size    Size of randome bytes to generate.
@@ -75,7 +75,12 @@ RandomBytes (
   IN   UINTN  Size
   )
 {
-  ASSERT (Output != NULL);
+  //
+  // Check input parameters.
+  //
+  if (Output == NULL) {
+    return FALSE;
+  }
 
   //
   // Generate random data.
