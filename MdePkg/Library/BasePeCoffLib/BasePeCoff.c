@@ -71,6 +71,7 @@ PeCoffLoaderGetPeHeader (
   UINT32                SectionHeaderOffset;
   UINT32                Index;
   CHAR8                 BufferData;
+  UINTN                 NumberOfSections;
   EFI_IMAGE_SECTION_HEADER  SectionHeader;
 
   //
@@ -303,8 +304,15 @@ PeCoffLoaderGetPeHeader (
   //
   // Check each section field.
   //
-  SectionHeaderOffset = ImageContext->PeCoffHeaderOffset + sizeof (UINT32) + sizeof (EFI_IMAGE_FILE_HEADER) + Hdr.Pe32->FileHeader.SizeOfOptionalHeader;
-  for (Index = 0; Index < Hdr.Pe32->FileHeader.NumberOfSections; Index++) {
+  if (ImageContext->IsTeImage) {
+    SectionHeaderOffset = sizeof(EFI_TE_IMAGE_HEADER);
+    NumberOfSections    = (UINTN) (Hdr.Te->NumberOfSections);
+  } else {
+    SectionHeaderOffset = ImageContext->PeCoffHeaderOffset + sizeof (UINT32) + sizeof (EFI_IMAGE_FILE_HEADER) + Hdr.Pe32->FileHeader.SizeOfOptionalHeader;
+    NumberOfSections    = (UINTN) (Hdr.Pe32->FileHeader.NumberOfSections);
+  }
+
+  for (Index = 0; Index < NumberOfSections; Index++) {
     //
     // Read section header from file
     //
