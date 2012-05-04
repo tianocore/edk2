@@ -773,6 +773,18 @@ PciInitialization (
 }
 
 
+VOID
+AcpiInitialization (
+  VOID
+  )
+{
+  //
+  // Set ACPI SCI_EN bit in PMCNTRL
+  //
+  IoOr16 ((PciRead32 (PCI_LIB_ADDRESS (0, 1, 3, 0x40)) & ~BIT0) + 4, BIT0);
+}
+
+
 EFI_STATUS
 EFIAPI
 ConnectRecursivelyIfPciMassStorage (
@@ -933,6 +945,7 @@ Returns:
   BdsLibConnectAll ();
 
   PciInitialization ();
+  AcpiInitialization ();
 
   //
   // Clear the logo after all devices are connected.
