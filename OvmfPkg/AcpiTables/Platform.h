@@ -39,7 +39,7 @@
 #define PM1b_CNT_BLK    0x00000000
 #define PM2_CNT_BLK     0x00000022
 #define PM_TMR_BLK      0x00000408
-#define GPE0_BLK        0x0000040C
+#define GPE0_BLK        0x0000afe0
 #define GPE1_BLK        0x00000000
 #define PM1_EVT_LEN     0x04
 #define PM1_CNT_LEN     0x02

@@ -368,6 +368,7 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
             IO (Decode16, 0x440, 0x440, 0x00, 0x10)
             IO (Decode16, 0x678, 0x678, 0x00, 0x08)
             IO (Decode16, 0x778, 0x778, 0x00, 0x08)
+            IO (Decode16, 0xafe0, 0xafe0, 0x00, 0x04)     // QEMU GPE0 BLK
             Memory32Fixed (ReadOnly, 0xFEC00000, 0x1000)  // IO APIC
             Memory32Fixed (ReadOnly, 0xFEE00000, 0x1000)
           })
