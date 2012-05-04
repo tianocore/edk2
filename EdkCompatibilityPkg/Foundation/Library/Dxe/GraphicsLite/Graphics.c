@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -163,15 +163,48 @@ Returns:
   UINTN                         Height;
   UINTN                         Width;
   UINTN                         ImageIndex;
+  UINTN                         DataSizePerLine;
   BOOLEAN                       IsAllocated;
+  UINT32                        ColorMapNum;
+
+  if (sizeof (BMP_IMAGE_HEADER) > BmpImageSize) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   BmpHeader = (BMP_IMAGE_HEADER *) BmpImage;
+
   if (BmpHeader->CharB != 'B' || BmpHeader->CharM != 'M') {
     return EFI_UNSUPPORTED;
   }
 
+  //
+  // Doesn't support compress.
+  //
   if (BmpHeader->CompressionType != 0) {
     return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Only support BITMAPINFOHEADER format.
+  // BITMAPFILEHEADER + BITMAPINFOHEADER = BMP_IMAGE_HEADER
+  //
+  if (BmpHeader->HeaderSize != sizeof (BMP_IMAGE_HEADER) - ((UINTN) &(((BMP_IMAGE_HEADER *)0)->HeaderSize))) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // The data size in each line must be 4 byte alignment.
+  //
+  DataSizePerLine = ((BmpHeader->PixelWidth * BmpHeader->BitPerPixel + 31) >> 3) & (~0x3);
+  BltBufferSize = MultU64x32 (DataSizePerLine, BmpHeader->PixelHeight);
+  if (BltBufferSize > (UINT32) ~0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((BmpHeader->Size != BmpImageSize) || 
+      (BmpHeader->Size < BmpHeader->ImageOffset) ||
+      (BmpHeader->Size - BmpHeader->ImageOffset !=  BmpHeader->PixelHeight * DataSizePerLine)) {
+    return EFI_INVALID_PARAMETER;
   }
 
   //
@@ -179,6 +212,29 @@ Returns:
   //
   Image       = BmpImage;
   BmpColorMap = (BMP_COLOR_MAP *) (Image + sizeof (BMP_IMAGE_HEADER));
+  if (BmpHeader->ImageOffset < sizeof (BMP_IMAGE_HEADER)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (BmpHeader->ImageOffset > sizeof (BMP_IMAGE_HEADER)) {
+    switch (BmpHeader->BitPerPixel) {
+      case 1:
+        ColorMapNum = 2;
+        break;
+      case 4:
+        ColorMapNum = 16;
+        break;
+      case 8:
+        ColorMapNum = 256;
+        break;
+      default:
+        ColorMapNum = 0;
+        break;
+      }
+    if (BmpHeader->ImageOffset - sizeof (BMP_IMAGE_HEADER) != sizeof (BMP_COLOR_MAP) * ColorMapNum) {
+      return EFI_INVALID_PARAMETER;
+    }
+  }
 
   //
   // Calculate graphics image data address in the image

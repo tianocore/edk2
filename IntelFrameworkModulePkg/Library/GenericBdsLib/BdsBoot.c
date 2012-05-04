@@ -1238,6 +1238,13 @@ BdsLibDeleteOptionFromHandle (
       return EFI_OUT_OF_RESOURCES;
     }
 
+    if (!ValidateOption(BootOptionVar, BootOptionSize)) {
+      BdsDeleteBootOption (BootOrder[Index], BootOrder, &BootOrderSize);
+      FreePool (BootOptionVar);
+      Index++;
+      continue;
+    }
+
     TempPtr = BootOptionVar;
     TempPtr += sizeof (UINT32) + sizeof (UINT16);
     TempPtr += StrSize ((CHAR16 *) TempPtr);
@@ -1300,10 +1307,14 @@ BdsDeleteAllInvalidEfiBootOption (
   EFI_DEVICE_PATH_PROTOCOL  *OptionDevicePath;
   UINT8                     *TempPtr;
   CHAR16                    *Description;
+  BOOLEAN                   Corrupted;
 
-  Status        = EFI_SUCCESS;
-  BootOrder     = NULL;
-  BootOrderSize = 0;
+  Status           = EFI_SUCCESS;
+  BootOrder        = NULL;
+  Description      = NULL;
+  OptionDevicePath = NULL;
+  BootOrderSize    = 0;
+  Corrupted        = FALSE;
 
   //
   // Check "BootOrder" variable firstly, this variable hold the number of boot options
@@ -1330,23 +1341,27 @@ BdsDeleteAllInvalidEfiBootOption (
       return EFI_OUT_OF_RESOURCES;
     }
 
-    TempPtr = BootOptionVar;
-    TempPtr += sizeof (UINT32) + sizeof (UINT16);
-    Description = (CHAR16 *) TempPtr;
-    TempPtr += StrSize ((CHAR16 *) TempPtr);
-    OptionDevicePath = (EFI_DEVICE_PATH_PROTOCOL *) TempPtr;
+    if (!ValidateOption(BootOptionVar, BootOptionSize)) {
+      Corrupted = TRUE;
+    } else {
+      TempPtr = BootOptionVar;
+      TempPtr += sizeof (UINT32) + sizeof (UINT16);
+      Description = (CHAR16 *) TempPtr;
+      TempPtr += StrSize ((CHAR16 *) TempPtr);
+      OptionDevicePath = (EFI_DEVICE_PATH_PROTOCOL *) TempPtr;
 
-    //
-    // Skip legacy boot option (BBS boot device)
-    //
-    if ((DevicePathType (OptionDevicePath) == BBS_DEVICE_PATH) &&
-        (DevicePathSubType (OptionDevicePath) == BBS_BBS_DP)) {
-      FreePool (BootOptionVar);
-      Index++;
-      continue;
+      //
+      // Skip legacy boot option (BBS boot device)
+      //
+      if ((DevicePathType (OptionDevicePath) == BBS_DEVICE_PATH) &&
+          (DevicePathSubType (OptionDevicePath) == BBS_BBS_DP)) {
+        FreePool (BootOptionVar);
+        Index++;
+        continue;
+      }
     }
 
-    if (!BdsLibIsValidEFIBootOptDevicePathExt (OptionDevicePath, FALSE, Description)) {
+    if (Corrupted || !BdsLibIsValidEFIBootOptDevicePathExt (OptionDevicePath, FALSE, Description)) {
       //
       // Delete this invalid boot option "Boot####"
       //
@@ -1361,6 +1376,7 @@ BdsDeleteAllInvalidEfiBootOption (
       // Mark this boot option in boot order as deleted
       //
       BootOrder[Index] = 0xffff;
+      Corrupted        = FALSE;
     }
 
     FreePool (BootOptionVar);

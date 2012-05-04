@@ -257,6 +257,14 @@ BdsLibRegisterNewOption (
     if (OptionPtr == NULL) {
       continue;
     }
+
+    //
+    // Validate the variable.
+    //
+    if (!ValidateOption(OptionPtr, OptionSize)) {
+      continue;
+    }
+
     TempPtr         =   OptionPtr;
     TempPtr         +=  sizeof (UINT32) + sizeof (UINT16);
     Description     =   (CHAR16 *) TempPtr;
@@ -425,7 +433,7 @@ GetDevicePathSizeEx (
   Size = 0;
   while (!IsDevicePathEnd (DevicePath)) {
     NodeSize = DevicePathNodeLength (DevicePath);
-    if (NodeSize == 0) {
+    if (NodeSize < END_DEVICE_PATH_LENGTH) {
       return 0;
     }
     Size += NodeSize;
@@ -481,6 +489,100 @@ StrSizeEx (
 }
 
 /**
+  Validate the EFI Boot#### variable (VendorGuid/Name)
+
+  @param  Variable              Boot#### variable data.
+  @param  VariableSize          Returns the size of the EFI variable that was read
+
+  @retval TRUE                  The variable data is correct.
+  @retval FALSE                 The variable data is corrupted.
+
+**/
+BOOLEAN 
+ValidateOption (
+  UINT8                     *Variable,
+  UINTN                     VariableSize
+  )
+{
+  UINT16                    FilePathSize;
+  UINT8                     *TempPtr;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *TempPath;
+  UINTN                     TempSize;
+
+  //
+  // Skip the option attribute
+  //
+  TempPtr    = Variable;
+  TempPtr   += sizeof (UINT32);
+
+  //
+  // Get the option's device path size
+  //
+  FilePathSize  = *(UINT16 *) TempPtr;
+  TempPtr      += sizeof (UINT16);
+
+  //
+  // Get the option's description string size
+  //
+  TempSize = StrSizeEx ((CHAR16 *) TempPtr, VariableSize);
+  TempPtr += TempSize;
+
+  //
+  // Get the option's device path
+  //
+  DevicePath =  (EFI_DEVICE_PATH_PROTOCOL *) TempPtr;
+  TempPtr    += FilePathSize;
+
+  //
+  // Validation boot option variable.
+  //
+  if ((FilePathSize == 0) || (TempSize == 0)) {
+    return FALSE;
+  }
+
+  if (TempSize + FilePathSize + sizeof (UINT16) + sizeof (UINT16) > VariableSize) {
+    return FALSE;
+  }
+
+  TempPath = DevicePath;
+  while (FilePathSize > 0) {
+    TempSize = GetDevicePathSizeEx (TempPath, FilePathSize);
+    if (TempSize == 0) {
+      return FALSE;
+    }
+    FilePathSize = (UINT16) (FilePathSize - TempSize);
+    TempPath    += TempSize;
+  }
+
+  return TRUE;
+}
+
+/**
+  Convert a single character to number.
+  It assumes the input Char is in the scope of L'0' ~ L'9' and L'A' ~ L'F'
+  
+  @param Char    The input char which need to change to a hex number.
+  
+**/
+UINTN
+CharToUint (
+  IN CHAR16                           Char
+  )
+{
+  if ((Char >= L'0') && (Char <= L'9')) {
+    return (UINTN) (Char - L'0');
+  }
+
+  if ((Char >= L'A') && (Char <= L'F')) {
+    return (UINTN) (Char - L'A' + 0xA);
+  }
+
+  ASSERT (FALSE);
+  return 0;
+}
+
+/**
   Build the boot#### or driver#### option from the VariableName, the
   build boot#### or driver#### will also be linked to BdsCommonOptionList.
 
@@ -524,6 +626,14 @@ BdsLibVariableToOption (
   if (Variable == NULL) {
     return NULL;
   }
+
+  //
+  // Validate Boot#### variable data.
+  //
+  if (!ValidateOption(Variable, VariableSize)) {
+    return NULL;
+  }
+
   //
   // Notes: careful defined the variable of Boot#### or
   // Driver####, consider use some macro to abstract the code
@@ -613,11 +723,11 @@ BdsLibVariableToOption (
   // Unicode stream to ASCII without any loss in meaning.
   //
   if (*VariableName == 'B') {
-    NumOff = (UINT8) (sizeof (L"Boot") / sizeof(CHAR16) - 1);
-    Option->BootCurrent = (UINT16) ((VariableName[NumOff]  -'0') * 0x1000);
-    Option->BootCurrent = (UINT16) (Option->BootCurrent + ((VariableName[NumOff+1]-'0') * 0x100));
-    Option->BootCurrent = (UINT16) (Option->BootCurrent +  ((VariableName[NumOff+2]-'0') * 0x10));
-    Option->BootCurrent = (UINT16) (Option->BootCurrent + ((VariableName[NumOff+3]-'0')));
+    NumOff = (UINT8) (sizeof (L"Boot") / sizeof (CHAR16) - 1);
+    Option->BootCurrent = (UINT16) (CharToUint (VariableName[NumOff+0]) * 0x1000) 
+               + (UINT16) (CharToUint (VariableName[NumOff+1]) * 0x100)
+               + (UINT16) (CharToUint (VariableName[NumOff+2]) * 0x10)
+               + (UINT16) (CharToUint (VariableName[NumOff+3]) * 0x1);
   }
   //
   // Insert active entry to BdsDeviceList

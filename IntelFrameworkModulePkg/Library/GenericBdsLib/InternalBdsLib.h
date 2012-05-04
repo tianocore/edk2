@@ -126,4 +126,20 @@ BdsSetMemoryTypeInformationVariable (
   VOID
   );
 
+/**
+  Validate the EFI Boot#### or Driver#### variable (VendorGuid/Name)
+
+  @param  Variable              Boot#### variable data.
+  @param  VariableSize          Returns the size of the EFI variable that was read
+
+  @retval TRUE                  The variable data is correct.
+  @retval FALSE                 The variable data is corrupted.
+
+**/
+BOOLEAN 
+ValidateOption (
+  UINT8                     *Variable,
+  UINTN                     VariableSize
+  );
+
 #endif // _BDS_LIB_H_
