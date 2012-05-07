@@ -1,5 +1,8 @@
 ## @file
-#  Provides a secure platform-specific method to detect physically present user.
+#  NULL PlatformSecureLib instance does NOT really detect whether a physical present 
+#  user exists but return TRUE directly. This instance can be used to verify security
+#  related features during platform enabling and development. It should be replaced
+#  by a platform-specific method(e.g. Button pressed) in a real platform for product.
 #
 # Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials

@@ -36,6 +36,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 BOOLEAN                           mMeasureGptTableFlag = FALSE;
 EFI_GUID                          mZeroGuid = {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
 UINTN                             mMeasureGptCount = 0;
+VOID                              *mFileBuffer;
+UINTN                             mImageSize;
 
 /**
   Reads contents of a PE/COFF image in memory buffer.
@@ -50,14 +52,34 @@ UINTN                             mMeasureGptCount = 0;
 **/
 EFI_STATUS
 EFIAPI
-ImageRead (
+DxeTpmMeasureBootLibImageRead (
   IN     VOID    *FileHandle,
   IN     UINTN   FileOffset,
   IN OUT UINTN   *ReadSize,
   OUT    VOID    *Buffer
   )
 {
+  UINTN               EndPosition;
+
+  if (FileHandle == NULL || ReadSize == NULL || Buffer == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (MAX_ADDRESS - FileOffset < *ReadSize) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  EndPosition = FileOffset + *ReadSize;
+  if (EndPosition > mImageSize) {
+    *ReadSize = (UINT32)(mImageSize - FileOffset);
+  }
+
+  if (FileOffset >= mImageSize) {
+    *ReadSize = 0;
+  }
+
   CopyMem (Buffer, (UINT8 *)((UINTN) FileHandle + FileOffset), *ReadSize);
+
   return EFI_SUCCESS;
 }
 
@@ -495,6 +517,10 @@ TcgMeasurePeImage (
   if (ImageSize > SumOfBytesHashed) {
     HashBase = (UINT8 *) (UINTN) ImageAddress + SumOfBytesHashed;
     if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+      if (ImageSize - SumOfBytesHashed < Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size) {
+        Status = EFI_INVALID_PARAMETER;
+        goto Finish;
+      }
       //
       // Use PE32 offset
       //
@@ -502,6 +528,10 @@ TcgMeasurePeImage (
                  Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size -
                  SumOfBytesHashed);
     } else {
+      if (ImageSize - SumOfBytesHashed < Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size) {
+        Status = EFI_INVALID_PARAMETER;
+        goto Finish;
+      }
       //
       // Use PE32+ offset
       //
@@ -735,13 +765,16 @@ DxeTpmMeasureBootHandler (
     goto Finish;
   }
 
+  mImageSize  = FileSize;
+  mFileBuffer = FileBuffer;
+
   //
   // Measure PE Image
   //
   DevicePathNode = OrigDevicePathNode;
   ZeroMem (&ImageContext, sizeof (ImageContext));
   ImageContext.Handle    = (VOID *) FileBuffer;
-  ImageContext.ImageRead = (PE_COFF_LOADER_READ_FILE) ImageRead;
+  ImageContext.ImageRead = (PE_COFF_LOADER_READ_FILE) DxeTpmMeasureBootLibImageRead;
 
   //
   // Get information about the image being loaded
