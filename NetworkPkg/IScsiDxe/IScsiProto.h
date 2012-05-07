@@ -1,7 +1,7 @@
 /** @file
   The header file of iSCSI Protocol that defines many specific data structures.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -866,7 +866,7 @@ IScsiReceivePdu (
   );
 
 /**
-  Check and get the result of the prameter negotiation.
+  Check and get the result of the parameter negotiation.
 
   @param[in, out]  Conn          The connection in iSCSI login.
 
@@ -881,7 +881,7 @@ IScsiCheckOpParams (
   );
 
 /**
-  Fill the oprational prameters.
+  Fill the operational parameters.
 
   @param[in]       Conn    The connection in iSCSI login.
   @param[in, out]  Pdu     The iSCSI login request PDU to fill the parameters.

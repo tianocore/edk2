@@ -1291,7 +1291,7 @@ ON_EXIT:
 
 
 /**
-  Check and get the result of the prameter negotiation.
+  Check and get the result of the parameter negotiation.
 
   @param[in, out]  Conn          The connection in iSCSI login.
 
@@ -1539,6 +1539,12 @@ IScsiCheckOpParams (
   IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_DATA_PDU_IN_ORDER);
   IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_DATA_SEQUENCE_IN_ORDER);
 
+  //
+  // Remove irrelevant parameter, if any.
+  //
+  if (Session->InitialR2T && !Session->ImmediateData) {
+    IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_FIRST_BURST_LENGTH);
+  }
 
   if (IsListEmpty (KeyValueList)) {
     //
@@ -1558,7 +1564,7 @@ ON_ERROR:
 
 
 /**
-  Fill the oprational parameters.
+  Fill the operational parameters.
 
   @param[in]       Conn    The connection in iSCSI login.
   @param[in, out]  Pdu     The iSCSI login request PDU to fill the parameters.
