@@ -758,6 +758,7 @@ CheckModeSupported (
           //
           // If video device has been set to this mode, we do not need to SetMode again
           //
+          FreePool (Info);
           break;
         } else {
           Status = GraphicsOutput->SetMode (GraphicsOutput, ModeNumber);
