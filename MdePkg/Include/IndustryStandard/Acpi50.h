@@ -1,7 +1,7 @@
 /** @file   
   ACPI 5.0 definitions from the ACPI Specification Revision 5.0 December 6, 2011
 
-  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -1834,6 +1834,9 @@ typedef struct {
   EFI_ACPI_5_0_GENERIC_ADDRESS_STRUCTURE   DoorbellRegister;
   UINT64                                   DoorbellPreserve;
   UINT64                                   DoorbellWrite;
+  UINT32                                   NominalLatency;
+  UINT32                                   MaximumPeriodicAccessRate;
+  UINT16                                   MinimumRequestTurnaroundTime;
 } EFI_ACPI_5_0_PCCT_SUBSPACE_GENERIC;
 
 ///
