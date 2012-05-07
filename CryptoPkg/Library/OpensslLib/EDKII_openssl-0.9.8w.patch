@@ -1,6 +1,8 @@
---- crypto/bio/bss_file.c	Thu Jan 15 17:14:12 1970
-+++ crypto/bio/bss_file.c	Thu Jan 15 17:14:12 1970
-@@ -421,6 +421,23 @@
+Index: crypto/bio/bss_file.c
+===================================================================
+--- crypto/bio/bss_file.c	(revision 1)
++++ crypto/bio/bss_file.c	(working copy)
+@@ -428,6 +428,23 @@
  	return(ret);
  	}
  
@@ -24,8 +26,10 @@
  #endif /* OPENSSL_NO_STDIO */
  
  #endif /* HEADER_BSS_FILE_C */
---- crypto/err/err.c
-+++ crypto/err/err.c
+Index: crypto/err/err.c
+===================================================================
+--- crypto/err/err.c	(revision 1)
++++ crypto/err/err.c	(working copy)
 @@ -313,7 +313,12 @@
  	es->err_data_flags[i]=flags;
  	}
@@ -39,8 +43,10 @@
  	{
  	va_list args;
  	int i,n,s;
---- crypto/err/err.h
-+++ crypto/err/err.h
+Index: crypto/err/err.h
+===================================================================
+--- crypto/err/err.h	(revision 1)
++++ crypto/err/err.h	(working copy)
 @@ -286,8 +286,14 @@
  #endif
  #ifndef OPENSSL_NO_BIO
@@ -56,8 +62,10 @@
  void ERR_load_strings(int lib,ERR_STRING_DATA str[]);
  void ERR_unload_strings(int lib,ERR_STRING_DATA str[]);
  void ERR_load_ERR_strings(void);
---- crypto/opensslconf.h
-+++ crypto/opensslconf.h
+Index: crypto/opensslconf.h
+===================================================================
+--- crypto/opensslconf.h	(revision 1)
++++ crypto/opensslconf.h	(working copy)
 @@ -162,6 +162,9 @@
  /* The prime number generation stuff may not work when
   * EIGHT_BIT but I don't care since I've only used this mode
@@ -77,8 +85,10 @@
  #if defined(HEADER_RC4_LOCL_H) && !defined(CONFIG_HEADER_RC4_LOCL_H)
  #define CONFIG_HEADER_RC4_LOCL_H
  /* if this is defined data[i] is used instead of *data, this is a %20
---- crypto/pkcs7/pk7_smime.c	2009-03-15 21:36:02.000000000 +0800
-+++ crypto/pkcs7/pk7_smime.c	2011-09-13 14:11:36.019454700 +0800
+Index: crypto/pkcs7/pk7_smime.c
+===================================================================
+--- crypto/pkcs7/pk7_smime.c	(revision 1)
++++ crypto/pkcs7/pk7_smime.c	(working copy)
 @@ -88,7 +88,10 @@
  	if (!PKCS7_content_new(p7, NID_pkcs7_data))
  		goto err;
@@ -91,8 +101,10 @@
  		PKCS7err(PKCS7_F_PKCS7_SIGN,PKCS7_R_PKCS7_ADD_SIGNATURE_ERROR);
  		goto err;
  	}
---- crypto/rand/rand_egd.c	Thu Jan 15 17:14:12 1970
-+++ crypto/rand/rand_egd.c	Thu Jan 15 17:14:12 1970
+Index: crypto/rand/rand_egd.c
+===================================================================
+--- crypto/rand/rand_egd.c	(revision 1)
++++ crypto/rand/rand_egd.c	(working copy)
 @@ -95,7 +95,7 @@
   *   RAND_egd() is a wrapper for RAND_egd_bytes() with numbytes=255.
   */
@@ -102,8 +114,10 @@
  int RAND_query_egd_bytes(const char *path, unsigned char *buf, int bytes)
  	{
  	return(-1);
---- crypto/rand/rand_unix.c	Thu Jan 15 17:14:12 1970
-+++ crypto/rand/rand_unix.c	Thu Jan 15 17:14:12 1970
+Index: crypto/rand/rand_unix.c
+===================================================================
+--- crypto/rand/rand_unix.c	(revision 1)
++++ crypto/rand/rand_unix.c	(working copy)
 @@ -116,7 +116,7 @@
  #include <openssl/rand.h>
  #include "rand_lcl.h"
@@ -122,14 +136,15 @@
  int RAND_poll(void)
  	{
  	return 0;
---- crypto/x509/x509_vfy.c	Thu Jan 15 17:14:12 1970
-+++ crypto/x509/x509_vfy.c	Thu Jan 15 17:14:12 1970
-@@ -391,7 +391,12 @@
+Index: crypto/x509/x509_vfy.c
+===================================================================
+--- crypto/x509/x509_vfy.c	(revision 1)
++++ crypto/x509/x509_vfy.c	(working copy)
+@@ -386,7 +386,11 @@
  
  static int check_chain_extensions(X509_STORE_CTX *ctx)
  {
 -#ifdef OPENSSL_NO_CHAIN_VERIFY
-+//#ifdef OPENSSL_NO_CHAIN_VERIFY
 +#if defined(OPENSSL_NO_CHAIN_VERIFY) || defined(OPENSSL_SYS_UEFI)
 +  /* 
 +    NOTE: Bypass KU Flags Checking for UEFI version. There are incorrect KU flag setting
@@ -138,7 +153,7 @@
  	return 1;
  #else
  	int i, ok=0, must_be_ca, plen = 0;
-@@ -904,6 +909,10 @@
+@@ -899,6 +903,10 @@
  
  static int check_cert_time(X509_STORE_CTX *ctx, X509 *x)
  	{
@@ -149,11 +164,11 @@
  	time_t *ptime;
  	int i;
  
-@@ -947,6 +956,7 @@
+@@ -942,6 +950,7 @@
  		}
  
  	return 1;
-+#endif  
++#endif	
  	}
  
  static int internal_verify(X509_STORE_CTX *ctx)

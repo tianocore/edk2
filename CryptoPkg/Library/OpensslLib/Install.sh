@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd openssl-0.9.8l
+cd openssl-0.9.8w
 cp e_os2.h ../../../Include/openssl
 cp crypto/crypto.h ../../../Include/openssl
 cp crypto/tmdiff.h ../../../Include/openssl

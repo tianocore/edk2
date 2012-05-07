@@ -1,4 +1,4 @@
-cd openssl-0.9.8l
+cd openssl-0.9.8w
 copy e_os2.h              ..\..\..\Include\openssl
 copy crypto\crypto.h  ..\..\..\Include\openssl
 copy crypto\tmdiff.h  ..\..\..\Include\openssl

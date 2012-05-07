@@ -1,7 +1,7 @@
 ## @file
 # OpenSSL Library implementation.
 # 
-#  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -19,7 +19,7 @@
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = OpensslLib
-  DEFINE OPENSSL_PATH            = openssl-0.9.8l
+  DEFINE OPENSSL_PATH            = openssl-0.9.8w
   DEFINE OPENSSL_FLAGS           = -DOPENSSL_SYSNAME_UWIN -DOPENSSL_SYS_UEFI -DL_ENDIAN -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -DOPENSSL_NO_CAMELLIA -DOPENSSL_NO_SEED -DOPENSSL_NO_RC5 -DOPENSSL_NO_MDC2 -DOPENSSL_NO_SOCK -DOPENSSL_NO_CMS -DOPENSSL_NO_JPAKE -DOPENSSL_NO_CAPIENG -DOPENSSL_NO_ERR -DOPENSSL_NO_KRB5 -DOPENSSL_NO_DYNAMIC_ENGINE -DGETPID_IS_MEANINGLESS -DOPENSSL_NO_STDIO -DOPENSSL_NO_FP_API -DOPENSSL_NO_DGRAM -DOPENSSL_NO_ASM
   DEFINE OPENSSL_EXFLAGS         = -DOPENSSL_SMALL_FOOTPRINT -DOPENSSL_NO_SHA0 -DOPENSSL_NO_SHA512 -DOPENSSL_NO_LHASH -DOPENSSL_NO_HW -DOPENSSL_NO_OCSP -DOPENSSL_NO_LOCKING -DOPENSSL_NO_DEPRECATED
   
