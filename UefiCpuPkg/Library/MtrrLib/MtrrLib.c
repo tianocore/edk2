@@ -1,7 +1,7 @@
 /** @file
   MTRR setting library
 
-  Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -203,26 +203,20 @@ PreMtrrChange (
   return Value;
 }
 
-
 /**
   Cleaning up after programming MTRRs.
 
   This function will do some clean up after programming MTRRs:
-  enable MTRR caching functionality, and enable cache
+  Flush all TLBs,  re-enable caching, restore CR4.
 
   @param  Cr4  CR4 value to restore
 
 **/
 VOID
-PostMtrrChange (
-  UINTN Cr4
+PostMtrrChangeEnableCache (
+  IN UINTN  Cr4
   )
 {
-  //
-  // Enable Cache MTRR
-  //
-  AsmMsrBitFieldWrite64 (MTRR_LIB_IA32_MTRR_DEF_TYPE, 10, 11, 3);
-
   //
   // Flush all TLBs 
   //
@@ -237,6 +231,28 @@ PostMtrrChange (
   // Restore original CR4 value
   //
   AsmWriteCr4 (Cr4);
+}
+
+/**
+  Cleaning up after programming MTRRs.
+
+  This function will do some clean up after programming MTRRs:
+  enable MTRR caching functionality, and enable cache
+
+  @param  Cr4  CR4 value to restore
+
+**/
+VOID
+PostMtrrChange (
+  IN UINTN  Cr4
+  )
+{
+  //
+  // Enable Cache MTRR
+  //
+  AsmMsrBitFieldWrite64 (MTRR_LIB_IA32_MTRR_DEF_TYPE, 10, 11, 3);
+
+  PostMtrrChangeEnableCache (Cr4);
 }
 
 
@@ -1502,7 +1518,7 @@ MtrrSetAllMtrrs (
   //
   AsmWriteMsr64 (MTRR_LIB_IA32_MTRR_DEF_TYPE, MtrrSetting->MtrrDefType);
 
-  PostMtrrChange (Cr4);
+  PostMtrrChangeEnableCache (Cr4);
 
   return MtrrSetting;
 }
