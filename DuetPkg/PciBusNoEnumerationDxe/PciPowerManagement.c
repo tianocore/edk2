@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -46,7 +46,7 @@ Returns:
 {
   EFI_STATUS  Status;
   UINT8       PowerManagementRegBlock;
-  UINT16      PMCSR;
+  UINT16      PowerManagementCSR;
 
   PowerManagementRegBlock = 0;
 
@@ -64,18 +64,37 @@ Returns:
   //
   // Turn off the PWE assertion and put the device into D0 State
   //
-  PMCSR = 0x8000;
 
   //
-  // Write PMCSR
+  // Read PMCSR
   //
-  PciIoDevice->PciIo.Pci.Write (
-                          &PciIoDevice->PciIo,
-                          EfiPciIoWidthUint16,
-                          PowerManagementRegBlock + 4,
-                          1,
-                          &PMCSR
-                          );
+  Status = PciIoDevice->PciIo.Pci.Read (
+                                    &PciIoDevice->PciIo,
+                                    EfiPciIoWidthUint16,
+                                    PowerManagementRegBlock + 4,
+                                    1,
+                                    &PowerManagementCSR
+                                    );
+  if (!EFI_ERROR (Status)) {
+    //
+    // Clear PME_Status bit
+    //
+    PowerManagementCSR |= BIT15;
+    //
+    // Clear PME_En bit. PowerState = D0.
+    //
+    PowerManagementCSR &= ~(BIT8 | BIT1 | BIT0);
 
-  return EFI_SUCCESS;
+    //
+    // Write PMCSR
+    //
+    Status = PciIoDevice->PciIo.Pci.Write (
+                                      &PciIoDevice->PciIo,
+                                      EfiPciIoWidthUint16,
+                                      PowerManagementRegBlock + 4,
+                                      1,
+                                      &PowerManagementCSR
+                                      );
+  }
+  return Status;
 }
