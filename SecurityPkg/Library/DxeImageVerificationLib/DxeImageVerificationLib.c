@@ -251,8 +251,6 @@ HashPeImage (
   EFI_IMAGE_SECTION_HEADER  *SectionHeader;
   UINTN                     Index;
   UINTN                     Pos;
-  UINTN                     SumOfSectionBytes;
-  EFI_IMAGE_SECTION_HEADER  *SectionCache;
   UINT32                    CertSize;
   UINT32                    NumberOfRvaAndSizes;
 
@@ -433,11 +431,6 @@ HashPeImage (
                mNtHeader.Pe32->FileHeader.SizeOfOptionalHeader
                );
 
-  SectionCache = Section;
-  for (Index = 0, SumOfSectionBytes = 0; Index < mNtHeader.Pe32->FileHeader.NumberOfSections; Index++, SectionCache++) {
-    SumOfSectionBytes += SectionCache->SizeOfRawData;
-  }
-
   //
   // 11. Build a temporary table of pointers to all the IMAGE_SECTION_HEADER
   //     structures in the image. The 'NumberOfSections' field of the image
@@ -557,6 +550,10 @@ HashPeImageByType (
 
   PkcsCertData = (WIN_CERTIFICATE_EFI_PKCS *) (mImageBase + mSecDataDir->VirtualAddress);
 
+  if (PkcsCertData->Hdr.dwLength < sizeof (WIN_CERTIFICATE_EFI_PKCS) + 32) {
+    return EFI_UNSUPPORTED;
+  }
+
   for (Index = 0; Index < HASHALG_MAX; Index++) {
     //
     // Check the Hash algorithm in PE/COFF Authenticode.
@@ -575,6 +572,10 @@ HashPeImageByType (
       // Only support two bytes of Long Form of Length Encoding.
       //
       continue;
+    }
+
+    if (PkcsCertData->Hdr.dwLength < sizeof (WIN_CERTIFICATE_EFI_PKCS) + 32 + mHash[Index].OidLength) {
+      return EFI_UNSUPPORTED;
     }
 
     if (CompareMem (PkcsCertData->CertData + 32, mHash[Index].OidValue, mHash[Index].OidLength) == 0) {
@@ -1214,6 +1215,7 @@ DxeImageVerificationHandler (
   UINT8                                *SecureBootEnable;
   PE_COFF_LOADER_IMAGE_CONTEXT         ImageContext;
   UINT32                               NumberOfRvaAndSizes;
+  UINT32                               CertSize;
 
   if (File == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1321,7 +1323,9 @@ DxeImageVerificationHandler (
     goto Done;
   }
 
-  DosHdr      = (EFI_IMAGE_DOS_HEADER *) mImageBase;
+  Status = EFI_ACCESS_DENIED;
+
+  DosHdr = (EFI_IMAGE_DOS_HEADER *) mImageBase;
   if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
     //
     // DOS image header is present,
@@ -1339,7 +1343,6 @@ DxeImageVerificationHandler (
     //
     // It is not a valid Pe/Coff file.
     //
-    Status = EFI_ACCESS_DENIED;
     goto Done;
   }
 
@@ -1374,8 +1377,6 @@ DxeImageVerificationHandler (
       //
       // Image Hash is in forbidden database (DBX).
       //
-      Action = EFI_IMAGE_EXECUTION_AUTH_UNTESTED;
-      Status = EFI_ACCESS_DENIED;
       goto Done;
     }
 
@@ -1389,8 +1390,6 @@ DxeImageVerificationHandler (
     //
     // Image Hash is not found in both forbidden and allowed database.
     //
-    Action = EFI_IMAGE_EXECUTION_AUTH_UNTESTED;
-    Status = EFI_ACCESS_DENIED;
     goto Done;
   }
 
@@ -1399,9 +1398,20 @@ DxeImageVerificationHandler (
   //
   WinCertificate = (WIN_CERTIFICATE *) (mImageBase + mSecDataDir->VirtualAddress);
 
+  CertSize = sizeof (WIN_CERTIFICATE);
+
+  if ((mSecDataDir->Size <= CertSize) || (mSecDataDir->Size < WinCertificate->dwLength)) {
+    goto Done;
+  }
+
   switch (WinCertificate->wCertificateType) {
 
   case WIN_CERT_TYPE_EFI_GUID:
+    CertSize = sizeof (WIN_CERTIFICATE_UEFI_GUID) + sizeof (EFI_CERT_BLOCK_RSA_2048_SHA256) - sizeof (UINT8);
+    if (WinCertificate->dwLength < CertSize) {
+      goto Done;
+    }
+
     //
     // Verify UEFI GUID type.
     //
@@ -1416,7 +1426,7 @@ DxeImageVerificationHandler (
     //
     // Verify Pkcs signed data type.
     //
-    Status    = HashPeImageByType();
+    Status = HashPeImageByType();
     if (EFI_ERROR (Status)) {
       goto Done;
     }
@@ -1435,7 +1445,6 @@ DxeImageVerificationHandler (
     break;
 
   default:
-    Status = EFI_ACCESS_DENIED;
     goto Done;
   }
   //
