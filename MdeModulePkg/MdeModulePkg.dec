@@ -813,6 +813,10 @@
 [PcdsPatchableInModule]
   ## Specify  memory size with page number for PEI code when 
   #  the feature of Loading Module at Fixed Address is enabled
+  ## This PCD specifies the additional pad size in FPDT Basic Boot Performance Table for 
+  #  the extension FPDT boot records got after ReadyToBoot and before ExitBootService.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdExtFpdtBootRecordPadSize|0x0|UINT32|0x0001005F
+
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressPeiCodePageNumber|0|UINT32|0x00000029
   
   ## Specify  memory size with page number for DXE boot time code when 
