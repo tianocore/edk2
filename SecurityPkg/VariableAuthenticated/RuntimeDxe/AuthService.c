@@ -1399,6 +1399,9 @@ ProcessVariable (
     // Update public key database variable if need.
     //
     KeyIndex = AddPubKeyInStore (PubKey);
+    if (KeyIndex == 0) {
+      return EFI_SECURITY_VIOLATION;
+    }
   }
 
   //
@@ -2179,7 +2182,7 @@ VerifyTimeBasedPayload (
     CertList = (EFI_SIGNATURE_LIST *) GetVariableDataPtr (PkVariable.CurrPtr);
     Cert     = (EFI_SIGNATURE_DATA *) ((UINT8 *) CertList + sizeof (EFI_SIGNATURE_LIST) + CertList->SignatureHeaderSize);
     RootCert      = Cert->SignatureData;
-    RootCertSize  = CertList->SignatureSize;
+    RootCertSize  = CertList->SignatureSize - (sizeof (EFI_SIGNATURE_DATA) - 1);
 
 
     //
@@ -2224,7 +2227,7 @@ VerifyTimeBasedPayload (
           // Iterate each Signature Data Node within this CertList for a verify
           //
           RootCert      = Cert->SignatureData;
-          RootCertSize  = CertList->SignatureSize;
+          RootCertSize  = CertList->SignatureSize - (sizeof (EFI_SIGNATURE_DATA) - 1);
 
           //
           // Verify Pkcs7 SignedData via Pkcs7Verify library.
