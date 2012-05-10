@@ -2,11 +2,11 @@
 #  Performance library instance used in DXE phase.
 #  
 #  This library instance provides infrastructure for DXE phase drivers to log performance
-#  data. It consumes Performance Protocol published by DxeCorePerformanceLib
-#  to log performance data. If Performance Protocol is not available, it does not log any
+#  data. It consumes PerformanceEx or Performance Protocol published by DxeCorePerformanceLib
+#  to log performance data. If both PerformanceEx and Performance Protocol are not available, it does not log any
 #  performance information.
 #  
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -47,7 +47,8 @@
 
 
 [Guids]
-  gPerformanceProtocolGuid  ## CONSUMES ## PROTOCOL
+  gPerformanceProtocolGuid      ## SOMETIMES_CONSUMES ## PROTOCOL
+  gPerformanceExProtocolGuid    ## SOMETIMES_CONSUMES ## PROTOCOL
 
 
 [Pcd]

@@ -1,10 +1,11 @@
 ## @file
-#  This module install ACPI Firmware Performance Data Table (FPDT).
+#  This module installs ACPI Firmware Performance Data Table (FPDT).
 #
-#  This module register report status code listener to collect performance data
-#  for Firmware Basic Boot Performance Record and install FPDT to ACPI table.
+#  This module registers report status code listener to collect performance data
+#  for Firmware Basic Boot Performance Record and other boot performance records, 
+#  and install FPDT to ACPI table.
 #
-#  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -52,6 +53,7 @@
 [Protocols]
   gEfiAcpiTableProtocolGuid                     ## SOMETIMES_CONSUMES
   gEfiRscHandlerProtocolGuid                    ## CONSUMES
+  gEfiSmmCommunicationProtocolGuid              ## SOMETIMES_CONSUMES
 
 [Guids]
   gEfiEventExitBootServicesGuid                 ## CONSUMES
@@ -60,11 +62,15 @@
   gEfiAcpiTableGuid                             ## SOMETIMES_CONSUMES
   gEfiAcpi10TableGuid                           ## SOMETIMES_CONSUMES
   gEfiAcpi20TableGuid                           ## SOMETIMES_CONSUMES
-  gEfiFirmwarePerformanceGuid                   ## CONSUMES
+  gEfiFirmwarePerformanceGuid                   ## PRODUCES  ## Variable:L"FirmwarePerformance"
+  gEfiFirmwarePerformanceGuid                   ## SOMETIMES_CONSUMES ## Hob
+  gEfiFirmwarePerformanceGuid                   ## SOMETIMES_CONSUMES ## SmiHandler
+  gEfiFirmwarePerformanceGuid                   ## SOMETIMES_CONSUMES ## StatusCode Data
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderLoad
   gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderStart
+  gEfiMdeModulePkgTokenSpaceGuid.PcdExtFpdtBootRecordPadSize
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwarePerformanceDataTableS3Support

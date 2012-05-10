@@ -13,7 +13,7 @@
   Dp uses this information to group records in different ways.  It also uses
   timer information to calculate elapsed time for each measurement.
  
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -49,6 +49,7 @@ CHAR16           *mPrintTokenBuffer = NULL;
 CHAR16           mGaugeString[DP_GAUGE_STRING_LENGTH + 1];
 CHAR16           mUnicodeToken[DXE_PERFORMANCE_STRING_SIZE];
 UINT64           mInterestThreshold;
+BOOLEAN          mShowId = FALSE;
 
 PERF_SUMMARY_DATA SummaryData = { 0 };    ///< Create the SummaryData structure and init. to ZERO.
 
@@ -79,6 +80,7 @@ PARAM_ITEM_LIST  ParamList[] = {
   {STRING_TOKEN (STR_DP_OPTION_UT), TypeFlag},   // -T   Dump Trace Data
 #endif
   {STRING_TOKEN (STR_DP_OPTION_LX), TypeFlag},   // -x   eXclude Cumulative Items
+  {STRING_TOKEN (STR_DP_OPTION_LI), TypeFlag},   // -i   Display Identifier
   {STRING_TOKEN (STR_DP_OPTION_LN), TypeValue},  // -n # Number of records to display for A and R
   {STRING_TOKEN (STR_DP_OPTION_LT), TypeValue}   // -t # Threshold of interest
   };
@@ -135,6 +137,7 @@ ShowHelp( void )
 #endif // PROFILING_IMPLEMENTED
   PrintToken (STRING_TOKEN (STR_DP_HELP_THRESHOLD));
   PrintToken (STRING_TOKEN (STR_DP_HELP_COUNT));
+  PrintToken (STRING_TOKEN (STR_DP_HELP_ID));
   PrintToken (STRING_TOKEN (STR_DP_HELP_HELP));
   Print(L"\n");
 }
@@ -214,6 +217,7 @@ InitializeDp (
   EFI_STRING                StringDpOptionLx;
   EFI_STRING                StringDpOptionLn;
   EFI_STRING                StringDpOptionLt;
+  EFI_STRING                StringDpOptionLi;
   
   SummaryMode     = FALSE;
   VerboseMode     = FALSE;
@@ -236,6 +240,7 @@ InitializeDp (
   StringDpOptionLx = NULL;
   StringDpOptionLn = NULL;
   StringDpOptionLt = NULL;
+  StringDpOptionLi = NULL;
   StringPtr        = NULL;
 
   // Get DP's entry time as soon as possible.
@@ -283,6 +288,7 @@ InitializeDp (
       StringDpOptionLx = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_OPTION_LX), NULL);
       StringDpOptionLn = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_OPTION_LN), NULL);
       StringDpOptionLt = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_OPTION_LT), NULL);
+      StringDpOptionLi = HiiGetString (gHiiHandle, STRING_TOKEN (STR_DP_OPTION_LI), NULL);
       
       // Boolean Options
       // 
@@ -296,6 +302,7 @@ InitializeDp (
       ProfileMode = ShellCommandLineGetFlag (ParamPackage, StringDpOptionUp);
 #endif  // PROFILING_IMPLEMENTED
       ExcludeMode = ShellCommandLineGetFlag (ParamPackage, StringDpOptionLx);
+      mShowId     =  ShellCommandLineGetFlag (ParamPackage, StringDpOptionLi);
 
       // Options with Values
       CmdLineArg  = ShellCommandLineGetValue (ParamPackage, StringDpOptionLn);
@@ -447,6 +454,7 @@ InitializeDp (
   SafeFreePool (StringDpOptionLx);
   SafeFreePool (StringDpOptionLn);
   SafeFreePool (StringDpOptionLt);
+  SafeFreePool (StringDpOptionLi);
   SafeFreePool (StringPtr);
   SafeFreePool (mPrintTokenBuffer);
 

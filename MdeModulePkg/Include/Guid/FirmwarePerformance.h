@@ -1,7 +1,7 @@
 /** @file
   ACPI Firmware Performance Data Table (FPDT) implementation specific definitions.
 
-  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -34,6 +34,14 @@
 /// Hob:
 ///   GUID - gEfiFirmwarePerformanceGuid
 ///   Data - FIRMWARE_SEC_PERFORMANCE (defined in <Ppi/SecPerformance.h>)
+///
+/// SMI:
+///   GUID - gEfiFirmwarePerformanceGuid
+///   Data - SMM_BOOT_RECORD_COMMUNICATE
+///
+/// StatusCodeData:
+///   Type - gEfiFirmwarePerformanceGuid
+///   Data - One or more boot record
 ///
 #define EFI_FIRMWARE_PERFORMANCE_GUID \
   { \
@@ -72,6 +80,9 @@ typedef struct {
 typedef struct {
   EFI_ACPI_5_0_FPDT_PERFORMANCE_TABLE_HEADER   Header;     ///< Common ACPI table header.
   EFI_ACPI_5_0_FPDT_FIRMWARE_BASIC_BOOT_RECORD BasicBoot;  ///< Basic Boot Resume performance record.
+  //
+  // one or more boot performance records.
+  //
 } BOOT_PERFORMANCE_TABLE;
 
 ///
@@ -92,6 +103,19 @@ typedef struct {
 } FIRMWARE_PERFORMANCE_VARIABLE;
 
 #pragma pack()
+
+//
+// Log BOOT RECORD from SMM driver on boot time.
+//
+#define SMM_FPDT_FUNCTION_GET_BOOT_RECORD_SIZE          1
+#define SMM_FPDT_FUNCTION_GET_BOOT_RECORD_DATA          2
+
+typedef struct {
+  UINTN             Function;
+  EFI_STATUS        ReturnStatus;
+  UINTN             BootRecordSize;
+  VOID              *BootRecordData;
+} SMM_BOOT_RECORD_COMMUNICATE;
 
 extern EFI_GUID gEfiFirmwarePerformanceGuid;
 

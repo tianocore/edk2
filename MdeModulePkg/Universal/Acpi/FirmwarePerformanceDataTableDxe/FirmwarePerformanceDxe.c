@@ -2,9 +2,10 @@
   This module install ACPI Firmware Performance Data Table (FPDT).
 
   This module register report status code listener to collect performance data
-  for Firmware Basic Boot Performance Record and install FPDT to ACPI table.
+  for Firmware Basic Boot Performance Record and other boot performance records, 
+  and install FPDT to ACPI table.
 
-  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -21,6 +22,7 @@
 
 #include <Protocol/ReportStatusCodeHandler.h>
 #include <Protocol/AcpiTable.h>
+#include <Protocol/SmmCommunication.h>
 
 #include <Guid/Acpi.h>
 #include <Guid/FirmwarePerformance.h>
@@ -46,6 +48,8 @@
 #define EFI_ACPI_OEM_REVISION     0x00000001
 #define EFI_ACPI_CREATOR_ID       0x5446534D            // TBD "MSFT"
 #define EFI_ACPI_CREATOR_REVISION 0x01000013            // TBD
+#define EXTENSION_RECORD_SIZE     0x10000
+#define SMM_BOOT_RECORD_COMM_SIZE OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data) + sizeof(SMM_BOOT_RECORD_COMMUNICATE)
 
 EFI_RSC_HANDLER_PROTOCOL    *mRscHandlerProtocol = NULL;
 
@@ -53,8 +57,10 @@ EFI_EVENT                   mReadyToBootEvent;
 EFI_EVENT                   mLegacyBootEvent;
 EFI_EVENT                   mExitBootServicesEvent;
 UINTN                       mFirmwarePerformanceTableTemplateKey  = 0;
+UINT32                      mBootRecordSize = 0;
+UINT32                      mBootRecordMaxSize = 0;
+UINT8                       *mBootRecordBuffer = NULL;
 
-FIRMWARE_PERFORMANCE_RUNTIME_DATA           *mPerformanceRuntimeData   = NULL;
 BOOT_PERFORMANCE_TABLE                      *mAcpiBootPerformanceTable = NULL;
 S3_PERFORMANCE_TABLE                        *mAcpiS3PerformanceTable   = NULL;
 
@@ -232,9 +238,17 @@ InstallFirmwarePerformanceDataTable (
 {
   EFI_STATUS                    Status;
   EFI_ACPI_TABLE_PROTOCOL       *AcpiTableProtocol;
-  FIRMWARE_PERFORMANCE_VARIABLE PerformanceVariable;
   EFI_PHYSICAL_ADDRESS          Address;
   UINTN                         Size;
+  UINT8                         SmmBootRecordCommBuffer[SMM_BOOT_RECORD_COMM_SIZE];
+  EFI_SMM_COMMUNICATE_HEADER    *SmmCommBufferHeader;
+  SMM_BOOT_RECORD_COMMUNICATE   *SmmCommData;
+  UINTN                         CommSize;
+  UINTN                         PerformanceRuntimeDataSize;
+  UINT8                         *PerformanceRuntimeData; 
+  UINT8                         *PerformanceRuntimeDataHead; 
+  EFI_SMM_COMMUNICATION_PROTOCOL  *Communication;
+  FIRMWARE_PERFORMANCE_VARIABLE PerformanceVariable;
 
   //
   // Get AcpiTable Protocol.
@@ -245,14 +259,61 @@ InstallFirmwarePerformanceDataTable (
   }
 
   //
-  // Prepare memory for runtime Performance Record.
+  // Collect boot records from SMM drivers.
   //
-  mPerformanceRuntimeData = NULL;
-  ZeroMem (&PerformanceVariable, sizeof (PerformanceVariable));
+  SmmCommData = NULL;
+  Status = gBS->LocateProtocol (&gEfiSmmCommunicationProtocolGuid, NULL, (VOID **) &Communication);
+  if (!EFI_ERROR (Status)) {
+    //
+    // Initialize communicate buffer 
+    //
+    SmmCommBufferHeader = (EFI_SMM_COMMUNICATE_HEADER*)SmmBootRecordCommBuffer;
+    SmmCommData = (SMM_BOOT_RECORD_COMMUNICATE*)SmmCommBufferHeader->Data;
+    ZeroMem((UINT8*)SmmCommData, sizeof(SMM_BOOT_RECORD_COMMUNICATE));
+
+    CopyGuid (&SmmCommBufferHeader->HeaderGuid, &gEfiFirmwarePerformanceGuid);
+    SmmCommBufferHeader->MessageLength = sizeof(SMM_BOOT_RECORD_COMMUNICATE);
+    CommSize = SMM_BOOT_RECORD_COMM_SIZE;
+  
+    //
+    // Get the size of boot records.
+    //
+    SmmCommData->Function       = SMM_FPDT_FUNCTION_GET_BOOT_RECORD_SIZE;
+    SmmCommData->BootRecordData = NULL;
+    Status = Communication->Communicate (Communication, SmmBootRecordCommBuffer, &CommSize);
+    ASSERT_EFI_ERROR (Status);
+  
+    if (!EFI_ERROR (SmmCommData->ReturnStatus) && SmmCommData->BootRecordSize != 0) {
+      //
+      // Get all boot records
+      //
+      SmmCommData->Function       = SMM_FPDT_FUNCTION_GET_BOOT_RECORD_DATA;
+      SmmCommData->BootRecordData = AllocateZeroPool(SmmCommData->BootRecordSize);
+      ASSERT (SmmCommData->BootRecordData != NULL);
+      
+      Status = Communication->Communicate (Communication, SmmBootRecordCommBuffer, &CommSize);
+      ASSERT_EFI_ERROR (Status);
+      ASSERT_EFI_ERROR(SmmCommData->ReturnStatus);
+    }
+  }
+
+  //
+  // Prepare memory for runtime Performance Record. 
+  // Runtime performance records includes two tables S3 performance table and Boot performance table. 
+  // S3 Performance table includes S3Resume and S3Suspend records. 
+  // Boot Performance table includes BasicBoot record, and one or more appended Boot Records. 
+  //
+  PerformanceRuntimeData = NULL;
+  PerformanceRuntimeDataSize = sizeof (S3_PERFORMANCE_TABLE) + sizeof (BOOT_PERFORMANCE_TABLE) + mBootRecordSize + PcdGet32 (PcdExtFpdtBootRecordPadSize);
+  if (SmmCommData != NULL) {
+    PerformanceRuntimeDataSize += SmmCommData->BootRecordSize;
+  }
+
   //
   // Try to allocate the same runtime buffer as last time boot.
   //
-  Size = sizeof (FIRMWARE_PERFORMANCE_VARIABLE);
+  ZeroMem (&PerformanceVariable, sizeof (PerformanceVariable));
+  Size = sizeof (PerformanceVariable);
   Status = gRT->GetVariable (
                   EFI_FIRMWARE_PERFORMANCE_VARIABLE_NAME,
                   &gEfiFirmwarePerformanceGuid,
@@ -261,35 +322,86 @@ InstallFirmwarePerformanceDataTable (
                   &PerformanceVariable
                   );
   if (!EFI_ERROR (Status)) {
-    Address = PerformanceVariable.BootPerformanceTablePointer;
+    Address = PerformanceVariable.S3PerformanceTablePointer;
     Status = gBS->AllocatePages (
                     AllocateAddress,
                     EfiReservedMemoryType,
-                    EFI_SIZE_TO_PAGES (sizeof (FIRMWARE_PERFORMANCE_RUNTIME_DATA)),
+                    EFI_SIZE_TO_PAGES (PerformanceRuntimeDataSize),
                     &Address
                     );
     if (!EFI_ERROR (Status)) {
-      mPerformanceRuntimeData = (FIRMWARE_PERFORMANCE_RUNTIME_DATA *) (UINTN) Address;
+      PerformanceRuntimeData = (UINT8 *) (UINTN) Address;
     }
   }
 
-  if (mPerformanceRuntimeData == NULL) {
+  if (PerformanceRuntimeData == NULL) {
     //
     // Fail to allocate at specified address, continue to allocate at any address.
     //
-    mPerformanceRuntimeData = FpdtAllocateReservedMemoryBelow4G (sizeof (FIRMWARE_PERFORMANCE_RUNTIME_DATA));
+    PerformanceRuntimeData = FpdtAllocateReservedMemoryBelow4G (PerformanceRuntimeDataSize);
   }
-  DEBUG ((EFI_D_INFO, "FPDT: Performance Runtime Data address = 0x%x\n", mPerformanceRuntimeData));
+  DEBUG ((EFI_D_INFO, "FPDT: Performance Runtime Data address = 0x%x\n", PerformanceRuntimeData));
 
-  if (mPerformanceRuntimeData == NULL) {
+  if (PerformanceRuntimeData == NULL) {
+    if (SmmCommData != NULL && SmmCommData->BootRecordData != NULL) {
+      FreePool (SmmCommData->BootRecordData);
+    }
     return EFI_OUT_OF_RESOURCES;
+  }
+  
+  PerformanceRuntimeDataHead = PerformanceRuntimeData;
+
+  if (FeaturePcdGet (PcdFirmwarePerformanceDataTableS3Support)) {
+    //
+    // Prepare S3 Performance Table.
+    //
+    mAcpiS3PerformanceTable = (S3_PERFORMANCE_TABLE *) PerformanceRuntimeData;
+    CopyMem (mAcpiS3PerformanceTable, &mS3PerformanceTableTemplate, sizeof (mS3PerformanceTableTemplate));
+    PerformanceRuntimeData  = PerformanceRuntimeData + mAcpiS3PerformanceTable->Header.Length;
+    DEBUG ((EFI_D_INFO, "FPDT: ACPI S3 Performance Table address = 0x%x\n", mAcpiS3PerformanceTable));
+    //
+    // Save S3 Performance Table address to Variable for use in Firmware Performance PEIM.
+    //
+    PerformanceVariable.S3PerformanceTablePointer = (EFI_PHYSICAL_ADDRESS) (UINTN) mAcpiS3PerformanceTable;
+    //
+    // Update S3 Performance Table Pointer in template.
+    //
+    mFirmwarePerformanceTableTemplate.S3PointerRecord.S3PerformanceTablePointer = (UINT64) PerformanceVariable.S3PerformanceTablePointer;
+  } else {
+    //
+    // Exclude S3 Performance Table Pointer from FPDT table template.
+    //
+    mFirmwarePerformanceTableTemplate.Header.Length -= sizeof (EFI_ACPI_5_0_FPDT_S3_PERFORMANCE_TABLE_POINTER_RECORD);
   }
 
   //
   // Prepare Boot Performance Table.
   //
-  mAcpiBootPerformanceTable = &mPerformanceRuntimeData->BootPerformance;
-  CopyMem (mAcpiBootPerformanceTable, &mBootPerformanceTableTemplate, sizeof (mBootPerformanceTableTemplate));
+  mAcpiBootPerformanceTable = (BOOT_PERFORMANCE_TABLE *) PerformanceRuntimeData;
+  //
+  // Fill Basic Boot record to Boot Performance Table.
+  //
+  CopyMem (PerformanceRuntimeData, &mBootPerformanceTableTemplate, sizeof (mBootPerformanceTableTemplate));
+  PerformanceRuntimeData = PerformanceRuntimeData + mAcpiBootPerformanceTable->Header.Length;
+  //
+  // Fill Boot records from boot drivers.
+  //
+  CopyMem (PerformanceRuntimeData, mBootRecordBuffer, mBootRecordSize);
+  mAcpiBootPerformanceTable->Header.Length += mBootRecordSize;
+  PerformanceRuntimeData = PerformanceRuntimeData + mBootRecordSize;
+  if (SmmCommData != NULL && SmmCommData->BootRecordData != NULL) {
+    //
+    // Fill Boot records from SMM drivers.
+    //
+    CopyMem (PerformanceRuntimeData, SmmCommData->BootRecordData, SmmCommData->BootRecordSize);
+    FreePool (SmmCommData->BootRecordData);
+    mAcpiBootPerformanceTable->Header.Length = (UINT32) (mAcpiBootPerformanceTable->Header.Length + SmmCommData->BootRecordSize);
+    PerformanceRuntimeData = PerformanceRuntimeData + SmmCommData->BootRecordSize;
+  }
+  //
+  // Reserve space for boot records after ReadyToBoot.
+  //
+  PerformanceRuntimeData = PerformanceRuntimeData + PcdGet32 (PcdExtFpdtBootRecordPadSize);
   DEBUG ((EFI_D_INFO, "FPDT: ACPI Boot Performance Table address = 0x%x\n", mAcpiBootPerformanceTable));
   //
   // Save Boot Performance Table address to Variable for use in S4 resume.
@@ -300,30 +412,6 @@ InstallFirmwarePerformanceDataTable (
   //
   mFirmwarePerformanceTableTemplate.BootPointerRecord.BootPerformanceTablePointer = (UINT64) (UINTN) mAcpiBootPerformanceTable;
 
-  if (FeaturePcdGet (PcdFirmwarePerformanceDataTableS3Support)) {
-    //
-    // Prepare S3 Performance Table.
-    //
-    mAcpiS3PerformanceTable = &mPerformanceRuntimeData->S3Performance;
-    CopyMem (mAcpiS3PerformanceTable, &mS3PerformanceTableTemplate, sizeof (mS3PerformanceTableTemplate));
-    DEBUG ((EFI_D_INFO, "FPDT: ACPI S3 Performance Table address = 0x%x\n", mAcpiS3PerformanceTable));
-
-    //
-    // Save S3 Performance Table address to Variable for use in Firmware Performance PEIM.
-    //
-    PerformanceVariable.S3PerformanceTablePointer = (EFI_PHYSICAL_ADDRESS) (UINTN) mAcpiS3PerformanceTable;
-
-    //
-    // Update S3 Performance Table Pointer in template.
-    //
-    mFirmwarePerformanceTableTemplate.S3PointerRecord.S3PerformanceTablePointer = (UINT64) PerformanceVariable.S3PerformanceTablePointer;
-  } else {
-    //
-    // Exclude S3 Performance Table Pointer from FPDT table template.
-    //
-    mFirmwarePerformanceTableTemplate.Header.Length -= sizeof (EFI_ACPI_5_0_FPDT_S3_SUSPEND_RECORD);
-  }
-
   //
   // Save Runtime Performance Table pointers to Variable.
   //
@@ -331,7 +419,7 @@ InstallFirmwarePerformanceDataTable (
                   EFI_FIRMWARE_PERFORMANCE_VARIABLE_NAME,
                   &gEfiFirmwarePerformanceGuid,
                   EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                  sizeof (FIRMWARE_PERFORMANCE_VARIABLE),
+                  sizeof (PerformanceVariable),
                   &PerformanceVariable
                   );
   ASSERT_EFI_ERROR (Status);
@@ -347,12 +435,22 @@ InstallFirmwarePerformanceDataTable (
                                 &mFirmwarePerformanceTableTemplateKey
                                 );
   if (EFI_ERROR (Status)) {
-    FreePool (mPerformanceRuntimeData);
+    FreePool (PerformanceRuntimeDataHead);
     mAcpiBootPerformanceTable = NULL;
     mAcpiS3PerformanceTable = NULL;
     return Status;
   }
-
+  
+  //
+  // Free temp Boot record, and update Boot Record to point to Basic Boot performance table.
+  //
+  if (mBootRecordBuffer != NULL) {
+    FreePool (mBootRecordBuffer);
+  }
+  mBootRecordBuffer  = (UINT8 *) mAcpiBootPerformanceTable;
+  mBootRecordSize    = mAcpiBootPerformanceTable->Header.Length;
+  mBootRecordMaxSize = mBootRecordSize + PcdGet32 (PcdExtFpdtBootRecordPadSize);
+  
   return EFI_SUCCESS;
 }
 
@@ -538,6 +636,42 @@ FpdtStatusCodeListenerDxe (
     // Unregister boot time report status code listener.
     //
     mRscHandlerProtocol->Unregister (FpdtStatusCodeListenerDxe);
+  } else if (Data != NULL && CompareGuid (&Data->Type, &gEfiFirmwarePerformanceGuid)) {
+    //
+    // Append one or more Boot records
+    //
+    if (mAcpiBootPerformanceTable == NULL) {
+      //
+      // Append Boot records before FPDT ACPI table is installed. 
+      //
+      if (mBootRecordSize + Data->Size > mBootRecordMaxSize) {
+        mBootRecordBuffer = ReallocatePool (mBootRecordSize, mBootRecordSize + Data->Size + EXTENSION_RECORD_SIZE, mBootRecordBuffer);
+        ASSERT (mBootRecordBuffer != NULL);
+        mBootRecordMaxSize = mBootRecordSize + Data->Size + EXTENSION_RECORD_SIZE;
+      }
+      //
+      // Save boot record into the temp memory space.
+      //
+      CopyMem (mBootRecordBuffer + mBootRecordSize, Data + 1, Data->Size);
+      mBootRecordSize += Data->Size;
+    } else {
+      //
+      // Append Boot records after FPDT ACPI table is installed. 
+      //
+      if (mBootRecordSize + Data->Size > mBootRecordMaxSize) {
+        //
+        // No enough space to save boot record.
+        //
+        Status = EFI_OUT_OF_RESOURCES;
+      } else {
+        //
+        // Save boot record into BootPerformance table
+        //
+        CopyMem (mBootRecordBuffer + mBootRecordSize, Data + 1, Data->Size);
+        mBootRecordSize += Data->Size;
+        mAcpiBootPerformanceTable->Header.Length = mBootRecordSize;
+      }
+    }
   } else {
     //
     // Ignore else progress code.

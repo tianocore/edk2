@@ -1,7 +1,7 @@
 /** @file
   Common declarations for the Dp Performance Reporting Utility.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -83,6 +83,7 @@ typedef struct {
   CONST CHAR8           *Module;          ///< Module string name.
   UINT64                StartTimeStamp;   ///< Start time point.
   UINT64                EndTimeStamp;     ///< End time point.
+  UINT32                Identifier;       ///< Identifier.
 } MEASUREMENT_RECORD;
 
 typedef struct {

@@ -1,10 +1,10 @@
 ## @file
-#  This module update S3 Suspend Performance Record in ACPI Firmware Performance Data Table.
+#  This module collects performance data for SMM driver boot records and S3 Suspend Performance Record.
 #
-#  This module register report status code listener to collect performance data
-#  for S3 Suspend Performance Record.
+#  This module registers report status code listener to collect performance data
+#  for SMM boot performance records and S3 Suspend Performance Record.
 #
-#  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -45,15 +45,19 @@
   TimerLib
   LockBoxLib
   PcdLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  SynchronizationLib
 
 [Protocols]
   gEfiSmmRscHandlerProtocolGuid                 ## CONSUMES
+  gEfiSmmAccess2ProtocolGuid                    ## CONSUMES
 
 [Guids]
-  gEfiFirmwarePerformanceGuid                   ## CONSUMES
-
-[FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwarePerformanceDataTableS3Support
+  gEfiFirmwarePerformanceGuid                   ## CONSUMES  ## LockBox
+  gEfiFirmwarePerformanceGuid                   ## PRODUCES  ## SmiHandler
+  gEfiFirmwarePerformanceGuid                   ## SOMETIMES_CONSUMES ## StatusCode Data
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeS3SuspendStart
