@@ -1,7 +1,7 @@
 ## @file
 #  Cryptographic Library Instance for DXE_DRIVER.
 #
-#  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -37,7 +37,6 @@
   Cipher/CryptAes.c
   Cipher/CryptTdes.c
   Cipher/CryptArc4.c
-  Rand/CryptRand.c
   Pk/CryptRsa.c
   Pk/CryptPkcs7.c
   Pk/CryptDh.c
@@ -68,6 +67,17 @@
   SysCall/Ia32/MathLShiftS64.S      | GCC
   SysCall/Ia32/MathRShiftU64.S      | GCC
 
+  Rand/CryptRandTsc.c
+
+[Sources.X64]
+  Rand/CryptRandTsc.c
+
+[Sources.IPF]
+  Rand/CryptRandItc.c
+
+[Sources.ARM]
+  Rand/CryptRand.c
+
 [Packages]
   MdePkg/MdePkg.dec
   CryptoPkg/CryptoPkg.dec
@@ -79,6 +89,7 @@
   DebugLib
   OpensslLib
   IntrinsicLib
+  PrintLib
 
 #
 # Remove these [BuildOptions] after this library is cleaned up
