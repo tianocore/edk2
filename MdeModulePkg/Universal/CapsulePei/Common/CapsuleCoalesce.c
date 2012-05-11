@@ -720,32 +720,26 @@ BuildCapsuleDescriptors (
   Index             = 0;
 
   while (BlockListBuffer[Index] != 0) {
-    if (Index == 0) {
-      //
-      // For the first Capsule Image, test integrity of descriptors.
-      //
-      LastBlock = ValidateCapsuleIntegrity ((EFI_CAPSULE_BLOCK_DESCRIPTOR *)(UINTN)BlockListBuffer[Index]);
+    //
+    // Test integrity of descriptors.
+    //
+    TempBlock = ValidateCapsuleIntegrity ((EFI_CAPSULE_BLOCK_DESCRIPTOR *)(UINTN)BlockListBuffer[Index]);
+    if (TempBlock != NULL) {
       if (LastBlock == NULL) {
-        return EFI_NOT_FOUND;
+        LastBlock = TempBlock;
+
+        //
+        // Return the base of the block descriptors
+        //
+        HeadBlock = (EFI_CAPSULE_BLOCK_DESCRIPTOR *)(UINTN)BlockListBuffer[Index];
+      } else {
+        //
+        // Combine the different BlockList into single BlockList.
+        //
+        LastBlock->Union.DataBlock = (EFI_PHYSICAL_ADDRESS)(UINTN)BlockListBuffer[Index];
+        LastBlock->Length          = 0;
+        LastBlock                  = TempBlock;
       }
-      //
-      // Return the base of the block descriptors
-      //
-      HeadBlock = (EFI_CAPSULE_BLOCK_DESCRIPTOR *)(UINTN)BlockListBuffer[Index];
-    } else {        
-      //
-      // Test integrity of descriptors.
-      //
-      TempBlock = ValidateCapsuleIntegrity ((EFI_CAPSULE_BLOCK_DESCRIPTOR *)(UINTN)BlockListBuffer[Index]);
-      if (TempBlock == NULL) {
-        return EFI_NOT_FOUND;
-      }
-      //
-      // Combine the different BlockList into single BlockList.
-      //
-      LastBlock->Union.DataBlock = (EFI_PHYSICAL_ADDRESS)(UINTN)BlockListBuffer[Index];
-      LastBlock->Length          = 0;
-      LastBlock                  = TempBlock;
     }
     Index ++;
   }
