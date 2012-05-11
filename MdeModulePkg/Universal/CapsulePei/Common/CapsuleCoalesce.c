@@ -408,12 +408,11 @@ RelocateBlockDescriptors (
         }
 
         CopyMem ((VOID *) RelocBuffer, (VOID *) (UINTN) TempBlockDesc->Union.DataBlock, (UINTN) TempBlockDesc->Length);
-        TempBlockDesc->Union.DataBlock = (EFI_PHYSICAL_ADDRESS) (UINTN) RelocBuffer;
-
         DEBUG ((EFI_D_INFO, "Capsule relocate descriptors from/to/size  0x%X 0x%X 0x%X\n", (UINT32)(UINTN)TempBlockDesc->Union.DataBlock, (UINT32)(UINTN)RelocBuffer, (UINT32)(UINTN)TempBlockDesc->Length));
+        TempBlockDesc->Union.DataBlock = (EFI_PHYSICAL_ADDRESS) (UINTN) RelocBuffer;
       }
+      TempBlockDesc++;
     }
-    TempBlockDesc++;
   }
   //
   // Now go through all the block descriptors to make sure that they're not
