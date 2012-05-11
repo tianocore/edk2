@@ -2,7 +2,7 @@
   The TPM definition block in ACPI table for physical presence  
   and MemoryClear.
 
-Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -64,9 +64,9 @@ DefinitionBlock (
 
       //
       // Operational region for TPM support, TPM Physical Presence and TPM Memory Clear
-      // Region Offset to be fixed at runtime
+      // Region Offset 0xFFFF0000 and Length 0xF0 will be fixed in C code.
       //
-      OperationRegion (TNVS, SystemMemory, 0xFFFF0000, 0x1E)
+      OperationRegion (TNVS, SystemMemory, 0xFFFF0000, 0xF0)
       Field (TNVS, AnyAcc, NoLock, Preserve)
       {
         PPIN,   8,  //   Software SMI for Physical Presence Interface
@@ -77,7 +77,8 @@ DefinitionBlock (
         FRET,   32, //   Physical Presence function return code
         MCIN,   8,  //   Software SMI for Memory Clear Interface
         MCIP,   32, //   Used for save the Mor paramter
-        MORD,   32  //   Memory Overwrite Request Data
+        MORD,   32, //   Memory Overwrite Request Data
+        MRET,   32  //   Memory Overwrite function return code
       }
 
       Method (PTS, 1, Serialized)
@@ -313,7 +314,7 @@ DefinitionBlock (
             // Triggle the SMI interrupt
             //
             Store (MCIN, IOB2)
-            Return (0)
+            Return (MRET)
           }
           Default {BreakPoint}
         }
