@@ -945,7 +945,7 @@ CapsuleDataCoalesce (
   DestPtr         = FreeMemBase + FreeMemSize - CapsuleSize;
   DestPtr         = (UINT8 *) ((UINTN) DestPtr &~ (UINTN) (sizeof (UINTN) - 1));
   FreeMemBase     = (UINT8 *) BlockList + DescriptorsSize;
-  FreeMemSize     = FreeMemSize - DescriptorsSize - CapsuleSize;
+  FreeMemSize     = (UINTN) DestPtr - (UINTN) FreeMemBase;
   NewCapsuleBase  = (VOID *) DestPtr;
 
   //
