@@ -300,13 +300,14 @@ ValidateCapsuleIntegrity (
         }
         CapsuleCount ++;
         CapsuleSize = CapsuleHeader->CapsuleImageSize;
-      } else {
-        if (CapsuleSize >= Ptr->Length) {
-          CapsuleSize = CapsuleSize - Ptr->Length;
-        } else {
-          CapsuleSize = 0;
-        }
       }
+
+      if (CapsuleSize >= Ptr->Length) {
+        CapsuleSize = CapsuleSize - Ptr->Length;
+      } else {
+        CapsuleSize = 0;
+      }
+
       //
       // Move to next BLOCK descriptor
       //
@@ -314,9 +315,9 @@ ValidateCapsuleIntegrity (
     }
   }
 
-  if (CapsuleCount == 0) {
+  if ((CapsuleCount == 0) || (CapsuleSize != 0)) {
     //
-    // No any capsule is found in BlockList.
+    // No any capsule is found in BlockList or capsule data is corrupted.
     //
     return NULL;
   }
@@ -1017,58 +1018,37 @@ CapsuleDataCoalesce (
           //
           IsCorrupted  = FALSE;
           CapsuleImageSize += SizeLeft;
-          CopyMem ((VOID *) DestPtr, (VOID *) (UINTN) CurrentBlockDesc->Union.DataBlock, (UINTN) CurrentBlockDesc->Length);
-          DEBUG ((EFI_D_INFO, "Capsule coalesce block no.0x%8X from 0x%8lX to 0x%8lX with size 0x%8X\n",CapsuleTimes,
-                 (UINTN)CurrentBlockDesc->Union.DataBlock, (UINTN)DestPtr, (UINTN)CurrentBlockDesc->Length));
           //
           // Cache the begin offset of this capsule
           //
           CapsuleOffset[CapsuleIndex++] = (UINT32) (UINTN) DestPtr - (UINT32)(UINTN)NewCapsuleBase - (UINT32)sizeof(EFI_CAPSULE_PEIM_PRIVATE_DATA);
+        }
+      }
+
+      if (CurrentBlockDesc->Length < SizeLeft) {
+        if (!IsCorrupted) {
+          CopyMem ((VOID *) DestPtr, (VOID *) (UINTN) (CurrentBlockDesc->Union.DataBlock), (UINTN)CurrentBlockDesc->Length);
+          DEBUG ((EFI_D_INFO, "Capsule coalesce block no.0x%8X from 0x%8lX to 0x%8lX with size 0x%8X\n",CapsuleTimes,
+                 (UINTN)CurrentBlockDesc->Union.DataBlock, (UINTN)DestPtr, (UINTN)CurrentBlockDesc->Length));
           DestPtr += CurrentBlockDesc->Length;
         }
-        //
-        // If the current block length is greater than or equal to SizeLeft, this is the 
-        // start of the next capsule
-        //
-        if (CurrentBlockDesc->Length < SizeLeft) {
-          SizeLeft -= CurrentBlockDesc->Length;
-        } else {
-          //
-          // Start the next cycle
-          //
-          SizeLeft         = 0;
-          IsCorrupted      = TRUE;
-          CapsuleBeginFlag = TRUE;          
-        }
+        SizeLeft -= CurrentBlockDesc->Length;
       } else {
         //
-        //Go on relocating the current capule image.
+        //Here is the end of the current capsule image.
         //
-        if (CurrentBlockDesc->Length < SizeLeft) {
-          if (!IsCorrupted) {
-            CopyMem ((VOID *) DestPtr, (VOID *) (UINTN) (CurrentBlockDesc->Union.DataBlock), (UINTN)CurrentBlockDesc->Length);
-            DEBUG ((EFI_D_INFO, "Capsule coalesce block no.0x%8X from 0x%8lX to 0x%8lX with size 0x%8X\n",CapsuleTimes,
-                   (UINTN)CurrentBlockDesc->Union.DataBlock, (UINTN)DestPtr, (UINTN)CurrentBlockDesc->Length));
-            DestPtr += CurrentBlockDesc->Length;
-          }
-          SizeLeft -= CurrentBlockDesc->Length;
-        } else {
-          //
-          //Here is the end of the current capsule image.
-          //
-          if (!IsCorrupted) {
-            CopyMem ((VOID *) DestPtr, (VOID *)(UINTN)(CurrentBlockDesc->Union.DataBlock), (UINTN)CurrentBlockDesc->Length);
-            DEBUG ((EFI_D_INFO, "Capsule coalesce block no.0x%8X from 0x%8lX to 0x%8lX with size 0x%8X\n",CapsuleTimes,
-                   (UINTN)CurrentBlockDesc->Union.DataBlock, (UINTN)DestPtr, (UINTN)CurrentBlockDesc->Length));
-            DestPtr += CurrentBlockDesc->Length;
-          }
-          //
-          // Start the next cycle
-          //
-          SizeLeft = 0;
-          IsCorrupted = TRUE;
-          CapsuleBeginFlag = TRUE; 
+        if (!IsCorrupted) {
+          CopyMem ((VOID *) DestPtr, (VOID *)(UINTN)(CurrentBlockDesc->Union.DataBlock), (UINTN) SizeLeft);
+          DEBUG ((EFI_D_INFO, "Capsule coalesce block no.0x%8X from 0x%8lX to 0x%8lX with size 0x%8X\n",CapsuleTimes,
+                 (UINTN)CurrentBlockDesc->Union.DataBlock, (UINTN)DestPtr, (UINTN) SizeLeft));
+          DestPtr += SizeLeft;
         }
+        //
+        // Start the next cycle
+        //
+        SizeLeft = 0;
+        IsCorrupted = TRUE;
+        CapsuleBeginFlag = TRUE; 
       }
     } else {
       //
