@@ -727,6 +727,16 @@ EnterCarriageReturn:
 
     case CHAR_CARRIAGE_RETURN:
       //
+      // Validate input value with Minimum value.
+      //
+      if (EditValue < Minimum) {
+        UpdateStatusBar (Selection, INPUT_ERROR, Question->QuestionFlags, TRUE);
+        break;
+      } else {
+        UpdateStatusBar (Selection, INPUT_ERROR, Question->QuestionFlags, FALSE);
+      }
+
+      //
       // Store Edit value back to Question
       //
       if (Question->Operand == EFI_IFR_DATE_OP) {
