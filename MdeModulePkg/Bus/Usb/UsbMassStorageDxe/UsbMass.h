@@ -2,7 +2,7 @@
   Definition of USB Mass Storage Class and its value, USB Mass Transport Protocol, 
   and other common definitions.
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -18,7 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 #include <Uefi.h>
-
+#include <IndustryStandard/Scsi.h>
 #include <Protocol/BlockIo.h>
 #include <Protocol/UsbIo.h>
 #include <Protocol/DevicePath.h>
@@ -209,6 +209,7 @@ struct _USB_MASS_DEVICE {
   VOID                      *Context;
   EFI_DISK_INFO_PROTOCOL    DiskInfo;
   USB_BOOT_INQUIRY_DATA     InquiryData;
+  BOOLEAN                   Cdb16Byte;
 };
 
 #endif

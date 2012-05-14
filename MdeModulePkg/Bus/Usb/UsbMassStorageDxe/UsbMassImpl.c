@@ -171,7 +171,12 @@ UsbMassReadBlocks (
     goto ON_EXIT;
   }
 
-  Status = UsbBootReadBlocks (UsbMass, (UINT32) Lba, TotalBlock, Buffer);
+  if (UsbMass->Cdb16Byte) {
+    Status = UsbBootReadBlocks16 (UsbMass, Lba, TotalBlock, Buffer);
+  } else {
+    Status = UsbBootReadBlocks (UsbMass, (UINT32) Lba, TotalBlock, Buffer);
+  }
+
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "UsbMassReadBlocks: UsbBootReadBlocks (%r) -> Reset\n", Status));
     UsbMassReset (This, TRUE);
@@ -286,7 +291,12 @@ UsbMassWriteBlocks (
   // Try to write the data even the device is marked as ReadOnly,
   // and clear the status should the write succeed.
   //
-  Status = UsbBootWriteBlocks (UsbMass, (UINT32) Lba, TotalBlock, Buffer);
+  if (UsbMass->Cdb16Byte) {
+    Status = UsbBootWriteBlocks16 (UsbMass, Lba, TotalBlock, Buffer);
+  } else {
+    Status = UsbBootWriteBlocks (UsbMass, (UINT32) Lba, TotalBlock, Buffer);
+  }  
+
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "UsbMassWriteBlocks: UsbBootWriteBlocks (%r) -> Reset\n", Status));
     UsbMassReset (This, TRUE);
