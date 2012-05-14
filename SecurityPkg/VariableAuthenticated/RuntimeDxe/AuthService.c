@@ -879,151 +879,49 @@ ProcessVarWithPk (
   )
 {
   EFI_STATUS                  Status;
-  VARIABLE_POINTER_TRACK      PkVariable;
-  EFI_SIGNATURE_LIST          *OldPkList;
-  EFI_SIGNATURE_DATA          *OldPkData;
-  EFI_VARIABLE_AUTHENTICATION *CertData;
-  BOOLEAN                     TimeBase;
   BOOLEAN                     Del;
   UINT8                       *Payload;
   UINTN                       PayloadSize;
-  UINT64                      MonotonicCount;
-  EFI_TIME                    *TimeStamp;
 
-  if ((Attributes & EFI_VARIABLE_NON_VOLATILE) == 0) {
+  if ((Attributes & EFI_VARIABLE_NON_VOLATILE) == 0 || 
+      (Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) == 0) {
     //
-    // PK and KEK should set EFI_VARIABLE_NON_VOLATILE attribute.
+    // PK and KEK should set EFI_VARIABLE_NON_VOLATILE attribute and should be a time-based
+    // authenticated variable.
     //
     return EFI_INVALID_PARAMETER;
   }
 
   if (mPlatformMode == USER_MODE && !(InCustomMode() && UserPhysicalPresent())) {
-
-    if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
+    //
+    // Verify against X509 Cert PK.
+    //
+    Del    = FALSE;
+    Status = VerifyTimeBasedPayload (
+               VariableName,
+               VendorGuid,
+               Data,
+               DataSize,
+               Variable,
+               Attributes,
+               AuthVarTypePk,
+               &Del
+               );
+    if (!EFI_ERROR (Status)) {
       //
-      // EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS attribute means time-based X509 Cert PK.
+      // If delete PK in user mode, need change to setup mode.
       //
-      TimeBase = TRUE;
-    } else if ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) {
-      //
-      // EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS attribute means counter-based RSA-2048 Cert PK.
-      //
-      TimeBase = FALSE;
-    } else {
-      return EFI_INVALID_PARAMETER;
-    }
-
-    if (TimeBase) {
-      //
-      // Verify against X509 Cert PK.
-      //
-      Del    = FALSE;
-      Status = VerifyTimeBasedPayload (
-                 VariableName,
-                 VendorGuid,
-                 Data,
-                 DataSize,
-                 Variable,
-                 Attributes,
-                 AuthVarTypePk,
-                 &Del
-                 );
-      if (!EFI_ERROR (Status)) {
-        //
-        // If delete PK in user mode, need change to setup mode.
-        //
-        if (Del && IsPk) {
-          Status = UpdatePlatformMode (SETUP_MODE);
-        }
-      }
-      return Status;
-    } else {
-      //
-      // Verify against RSA2048 Cert PK.
-      //
-      CertData = (EFI_VARIABLE_AUTHENTICATION *) Data;
-      if ((Variable->CurrPtr != NULL) && (CertData->MonotonicCount <= Variable->CurrPtr->MonotonicCount)) {
-        //
-        // Monotonic count check fail, suspicious replay attack, return EFI_SECURITY_VIOLATION.
-        //
-        return EFI_SECURITY_VIOLATION;
-      }
-      //
-      // Get platform key from variable.
-      //
-      Status = FindVariable (
-                 EFI_PLATFORM_KEY_NAME,
-                 &gEfiGlobalVariableGuid,
-                 &PkVariable,
-                 &mVariableModuleGlobal->VariableGlobal,
-                 FALSE
-                 );
-      ASSERT_EFI_ERROR (Status);
-
-      OldPkList = (EFI_SIGNATURE_LIST *) GetVariableDataPtr (PkVariable.CurrPtr);
-      OldPkData = (EFI_SIGNATURE_DATA *) ((UINT8 *) OldPkList + sizeof (EFI_SIGNATURE_LIST) + OldPkList->SignatureHeaderSize);
-      Status    = VerifyCounterBasedPayload (Data, DataSize, OldPkData->SignatureData);
-      if (!EFI_ERROR (Status)) {
-        Status = CheckSignatureListFormat(
-                   VariableName,
-                   VendorGuid,
-                   (UINT8*)Data + AUTHINFO_SIZE,
-                   DataSize - AUTHINFO_SIZE);
-        if (EFI_ERROR (Status)) {
-          return Status;
-        }
-        
-        Status = UpdateVariable (
-                   VariableName,
-                   VendorGuid,
-                   (UINT8*)Data + AUTHINFO_SIZE,
-                   DataSize - AUTHINFO_SIZE,
-                   Attributes,
-                   0,
-                   CertData->MonotonicCount,
-                   Variable,
-                   NULL
-                   );
-
-        if (!EFI_ERROR (Status)) {
-          //
-          // If delete PK in user mode, need change to setup mode.
-          //
-          if ((DataSize == AUTHINFO_SIZE) && IsPk) {
-            Status = UpdatePlatformMode (SETUP_MODE);
-          }
-        }
+      if (Del && IsPk) {
+        Status = UpdatePlatformMode (SETUP_MODE);
       }
     }
+    return Status;
   } else {
     //
     // Process PK or KEK in Setup mode or Custom Secure Boot mode.
     //
-    if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
-      //
-      // Time-based Authentication descriptor.
-      //
-      MonotonicCount = 0;
-      TimeStamp = &((EFI_VARIABLE_AUTHENTICATION_2 *) Data)->TimeStamp;
-      Payload = (UINT8 *) Data + AUTHINFO2_SIZE (Data);
-      PayloadSize = DataSize - AUTHINFO2_SIZE (Data);
-    } else if ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) {
-      //
-      // Counter-based Authentication descriptor.
-      //
-      MonotonicCount = ((EFI_VARIABLE_AUTHENTICATION *) Data)->MonotonicCount;
-      TimeStamp = NULL;
-      Payload = (UINT8*) Data + AUTHINFO_SIZE;
-      PayloadSize = DataSize - AUTHINFO_SIZE;
-    } else {
-      //
-      // No Authentication descriptor.
-      //
-      MonotonicCount = 0;
-      TimeStamp = NULL;
-      Payload = Data;
-      PayloadSize = DataSize;
-    }
+    Payload = (UINT8 *) Data + AUTHINFO2_SIZE (Data);
+    PayloadSize = DataSize - AUTHINFO2_SIZE (Data);
 
     Status = CheckSignatureListFormat(VariableName, VendorGuid, Payload, PayloadSize);
     if (EFI_ERROR (Status)) {
@@ -1037,9 +935,9 @@ ProcessVarWithPk (
                PayloadSize,
                Attributes,
                0,
-               MonotonicCount,
+               0,
                Variable,
-               TimeStamp
+               &((EFI_VARIABLE_AUTHENTICATION_2 *) Data)->TimeStamp
                );
 
     if (IsPk) {
@@ -1088,148 +986,39 @@ ProcessVarWithKek (
   )
 {
   EFI_STATUS                      Status;
-  VARIABLE_POINTER_TRACK          KekVariable;
-  EFI_SIGNATURE_LIST              *KekList;
-  EFI_SIGNATURE_DATA              *KekItem;
-  UINT32                          KekCount;
-  EFI_VARIABLE_AUTHENTICATION     *CertData;
-  EFI_CERT_BLOCK_RSA_2048_SHA256  *CertBlock;
-  BOOLEAN                         IsFound;
-  UINT32                          Index;
-  UINT32                          KekDataSize;
   UINT8                           *Payload;
   UINTN                           PayloadSize;
-  UINT64                          MonotonicCount;
-  EFI_TIME                        *TimeStamp;
 
-  if ((Attributes & EFI_VARIABLE_NON_VOLATILE) == 0) {
+  if ((Attributes & EFI_VARIABLE_NON_VOLATILE) == 0 ||
+      (Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) == 0) {
     //
-    // DB and DBX should set EFI_VARIABLE_NON_VOLATILE attribute.
+    // DB and DBX should set EFI_VARIABLE_NON_VOLATILE attribute and should be a time-based
+    // authenticated variable.
     //
     return EFI_INVALID_PARAMETER;
   }
 
   Status = EFI_SUCCESS;
   if (mPlatformMode == USER_MODE && !(InCustomMode() && UserPhysicalPresent())) {
-    if (((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) == 0) &&
-        ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) == 0)){
-      //
-      // In user mode, should set EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS or
-      // EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS attribute.
-      //
-      return EFI_INVALID_PARAMETER;
-    }
-
-    if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
-      //
-      // Time-based, verify against X509 Cert KEK.
-      //
-      return VerifyTimeBasedPayload (
-               VariableName,
-               VendorGuid,
-               Data,
-               DataSize,
-               Variable,
-               Attributes,
-               AuthVarTypeKek,
-               NULL
-               );
-    } else if ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) {
-      //
-      // Counter-based, verify against RSA2048 Cert KEK.
-      //
-      CertData  = (EFI_VARIABLE_AUTHENTICATION *) Data;
-      CertBlock = (EFI_CERT_BLOCK_RSA_2048_SHA256 *) (CertData->AuthInfo.CertData);
-      if ((Variable->CurrPtr != NULL) && (CertData->MonotonicCount <= Variable->CurrPtr->MonotonicCount)) {
-        //
-        // Monotonic count check fail, suspicious replay attack, return EFI_SECURITY_VIOLATION.
-        //
-        return EFI_SECURITY_VIOLATION;
-      }
-      //
-      // Get KEK database from variable.
-      //
-      Status = FindVariable (
-                 EFI_KEY_EXCHANGE_KEY_NAME,
-                 &gEfiGlobalVariableGuid,
-                 &KekVariable,
-                 &mVariableModuleGlobal->VariableGlobal,
-                 FALSE
-                 );
-      ASSERT_EFI_ERROR (Status);
-
-      KekDataSize = KekVariable.CurrPtr->DataSize;
-      KekList     = (EFI_SIGNATURE_LIST *) GetVariableDataPtr (KekVariable.CurrPtr);
-
-      //
-      // Enumerate all Kek items in this list to verify the variable certificate data.
-      // If anyone is authenticated successfully, it means the variable is correct!
-      //
-      IsFound   = FALSE;
-      while ((KekDataSize > 0) && (KekDataSize >= KekList->SignatureListSize)) {
-        if (CompareGuid (&KekList->SignatureType, &gEfiCertRsa2048Guid)) {
-          KekItem   = (EFI_SIGNATURE_DATA *) ((UINT8 *) KekList + sizeof (EFI_SIGNATURE_LIST) + KekList->SignatureHeaderSize);
-          KekCount  = (KekList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - KekList->SignatureHeaderSize) / KekList->SignatureSize;
-          for (Index = 0; Index < KekCount; Index++) {
-            if (CompareMem (KekItem->SignatureData, CertBlock->PublicKey, EFI_CERT_TYPE_RSA2048_SIZE) == 0) {
-              IsFound = TRUE;
-              break;
-            }
-            KekItem = (EFI_SIGNATURE_DATA *) ((UINT8 *) KekItem + KekList->SignatureSize);
-          }
-        }
-        KekDataSize -= KekList->SignatureListSize;
-        KekList = (EFI_SIGNATURE_LIST *) ((UINT8 *) KekList + KekList->SignatureListSize);
-      }
-
-      if (!IsFound) {
-        return EFI_SECURITY_VIOLATION;
-      }
-
-      Status = VerifyCounterBasedPayload (Data, DataSize, CertBlock->PublicKey);
-      if (!EFI_ERROR (Status)) {
-        Status = UpdateVariable (
-                   VariableName,
-                   VendorGuid,
-                   (UINT8*)Data + AUTHINFO_SIZE,
-                   DataSize - AUTHINFO_SIZE,
-                   Attributes,
-                   0,
-                   CertData->MonotonicCount,
-                   Variable,
-                   NULL
-                   );
-      }
-    }
+    //
+    // Time-based, verify against X509 Cert KEK.
+    //
+    return VerifyTimeBasedPayload (
+             VariableName,
+             VendorGuid,
+             Data,
+             DataSize,
+             Variable,
+             Attributes,
+             AuthVarTypeKek,
+             NULL
+             );
   } else {
     //
     // If in setup mode or custom secure boot mode, no authentication needed.
     //
-    if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
-      //
-      // Time-based Authentication descriptor.
-      //
-      MonotonicCount = 0;
-      TimeStamp = &((EFI_VARIABLE_AUTHENTICATION_2 *) Data)->TimeStamp;
-      Payload = (UINT8 *) Data + AUTHINFO2_SIZE (Data);
-      PayloadSize = DataSize - AUTHINFO2_SIZE (Data);
-    } else if ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) {
-      //
-      // Counter-based Authentication descriptor.
-      //
-      MonotonicCount = ((EFI_VARIABLE_AUTHENTICATION *) Data)->MonotonicCount;
-      TimeStamp = NULL;
-      Payload = (UINT8*) Data + AUTHINFO_SIZE;
-      PayloadSize = DataSize - AUTHINFO_SIZE;
-    } else {
-      //
-      // No Authentication descriptor.
-      //
-      MonotonicCount = 0;
-      TimeStamp = NULL;
-      Payload = Data;
-      PayloadSize = DataSize;
-    }
+    Payload = (UINT8 *) Data + AUTHINFO2_SIZE (Data);
+    PayloadSize = DataSize - AUTHINFO2_SIZE (Data);
 
     Status = UpdateVariable (
                VariableName,
@@ -1238,9 +1027,9 @@ ProcessVarWithKek (
                PayloadSize,
                Attributes,
                0,
-               MonotonicCount,
+               0,
                Variable,
-               TimeStamp
+               &((EFI_VARIABLE_AUTHENTICATION_2 *) Data)->TimeStamp
                );
   }
 
