@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -186,7 +186,7 @@ Abstract:
   typedef unsigned short      uint16_t;
   typedef short               int16_t;
   typedef unsigned char       uint8_t;
-  typedef char                int8_t;
+  typedef signed char         int8_t;
 #else  
   typedef unsigned long long  uint64_t;
   typedef long long           int64_t;
@@ -195,7 +195,7 @@ Abstract:
   typedef unsigned short      uint16_t;
   typedef short               int16_t;
   typedef unsigned char       uint8_t;
-  typedef char                int8_t;
+  typedef signed char         int8_t;
 #endif
 
 //

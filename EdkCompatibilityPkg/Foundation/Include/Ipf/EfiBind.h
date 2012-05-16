@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -162,7 +162,7 @@ Abstract:
     typedef unsigned short      uint16_t;
     typedef short               int16_t;
     typedef unsigned char       uint8_t;
-    typedef char                int8_t;
+    typedef signed char         int8_t;
   #else
     #ifdef _EFI_P64 
       //
@@ -176,7 +176,7 @@ Abstract:
       typedef unsigned short      uint16_t;
       typedef short               int16_t;
       typedef unsigned char       uint8_t;
-      typedef char                int8_t;
+      typedef signed char         int8_t;
     #else
       //
       // Assume LP64 - longs and pointers are 64-bit. Ints are 32-bit.
@@ -188,7 +188,7 @@ Abstract:
       typedef unsigned short  uint16_t;
       typedef short           int16_t;
       typedef unsigned char   uint8_t;
-      typedef char            int8_t;
+      typedef signed char     int8_t;
     #endif
   #endif
 #else
