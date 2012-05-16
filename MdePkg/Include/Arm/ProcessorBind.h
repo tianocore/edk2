@@ -1,7 +1,7 @@
 /** @file
   Processor or Compiler specific defines and types for ARM.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
@@ -42,7 +42,7 @@
   typedef unsigned char       BOOLEAN;
   typedef unsigned char       UINT8;
   typedef char                CHAR8;
-  typedef char                INT8;
+  typedef signed char         INT8;
 #else
   //
   // Assume standard ARM alignment. 
@@ -58,7 +58,7 @@
   typedef unsigned char       BOOLEAN;
   typedef unsigned char       UINT8;
   typedef char                CHAR8;
-  typedef char                INT8;
+  typedef signed char         INT8;
 #endif
 
 ///
