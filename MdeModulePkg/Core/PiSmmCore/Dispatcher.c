@@ -320,6 +320,12 @@ SmmLoadImage (
   EFI_DEVICE_PATH_PROTOCOL       *HandleFilePath;
   EFI_FIRMWARE_VOLUME2_PROTOCOL  *Fv;
   PE_COFF_LOADER_IMAGE_CONTEXT   ImageContext;
+  UINT64                         Tick;
+
+  Tick = 0;
+  PERF_CODE (
+    Tick = GetPerformanceCounter ();
+  );
    
   Buffer               = NULL;
   Size                 = 0;
@@ -574,6 +580,9 @@ SmmLoadImage (
                   &gEfiLoadedImageProtocolGuid, DriverEntry->LoadedImage,
                   NULL
                   );
+
+  PERF_START (DriverEntry->ImageHandle, "LoadImage:", NULL, Tick);
+  PERF_END (DriverEntry->ImageHandle, "LoadImage:", NULL, 0);
 
   //
   // Print the load address and the PDB file name if it is available
@@ -836,7 +845,9 @@ SmmDispatcher (
       //
       // For each SMM driver, pass NULL as ImageHandle
       //
+      PERF_START (DriverEntry->ImageHandle, "StartImage:", NULL, 0);
       Status = ((EFI_IMAGE_ENTRY_POINT)(UINTN)DriverEntry->ImageEntryPoint)(DriverEntry->ImageHandle, gST);
+      PERF_END (DriverEntry->ImageHandle, "StartImage:", NULL, 0);
       if (EFI_ERROR(Status)){
         SmmFreePages(DriverEntry->ImageBuffer, DriverEntry->NumberOfPage);
       }
