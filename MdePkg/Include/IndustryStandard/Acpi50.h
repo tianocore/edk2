@@ -1795,8 +1795,7 @@ typedef struct {
 typedef struct {
   EFI_ACPI_DESCRIPTION_HEADER Header;
   UINT32                      Flags;
-  UINT32                      NominalLatency;
-  UINT32                      Reserved;
+  UINT64                      Reserved;
 } EFI_ACPI_5_0_PLATFORM_COMMUNICATION_CHANNEL_TABLE_HEADER;
 
 ///
