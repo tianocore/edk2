@@ -1,7 +1,7 @@
 /** @file
   Helper functions for configuring or obtaining the parameters relating to IP6.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -928,11 +928,11 @@ Ip6ConvertConfigNvDataToIfrNvData (
   IN     IP6_CONFIG_INSTANCE         *Instance
   )
 {
+  IP6_CONFIG_NVDATA                          *Ip6NvData;
   EFI_IP6_CONFIG_PROTOCOL                    *Ip6Config;
   UINTN                                      DataSize;
   VOID                                       *Data;
   EFI_STATUS                                 Status;
-  EFI_IP6_CONFIG_INTERFACE_ID                InterfaceId;
   EFI_IP6_CONFIG_POLICY                      Policy;
   EFI_IP6_CONFIG_DUP_ADDR_DETECT_TRANSMITS   DadXmits;
   EFI_HII_HANDLE                             HiiHandle;
@@ -944,6 +944,7 @@ Ip6ConvertConfigNvDataToIfrNvData (
   NET_CHECK_SIGNATURE (Instance, IP6_CONFIG_INSTANCE_SIGNATURE);
 
   Ip6Config = &Instance->Ip6Config;
+  Ip6NvData = &Instance->Ip6NvData;
   Data      = NULL;
   DataSize  = 0;
   HiiHandle = Instance->CallbackInfo.RegisteredHandle;
@@ -977,18 +978,18 @@ Ip6ConvertConfigNvDataToIfrNvData (
   // Get the interface id.
   //
   DataSize = sizeof (EFI_IP6_CONFIG_INTERFACE_ID);
-  ZeroMem (&InterfaceId, DataSize);
+  ZeroMem (&Ip6NvData->InterfaceId, DataSize);
   Status = Ip6Config->GetData (
                         Ip6Config,
                         Ip6ConfigDataTypeAltInterfaceId,
                         &DataSize,
-                        &InterfaceId
+                        &Ip6NvData->InterfaceId
                         );
   if (EFI_ERROR (Status)) {
     goto Exit;
   }
 
-  Ip6ConvertInterfaceIdToString (IfrNvData->InterfaceId, &InterfaceId);
+  Ip6ConvertInterfaceIdToString (IfrNvData->InterfaceId, &Ip6NvData->InterfaceId);
 
   //
   // Get current policy.
@@ -1627,7 +1628,6 @@ Ip6FormCallback (
   IP6_FORM_CALLBACK_INFO        *Private;
   UINTN                         BufferSize;
   IP6_CONFIG_IFR_NVDATA         *IfrNvData;
-  IP6_CONFIG_IFR_NVDATA         OldIfrNvData;
   EFI_STATUS                    Status;
   EFI_INPUT_KEY                 Key;
   IP6_CONFIG_INSTANCE           *Instance;
@@ -1671,11 +1671,7 @@ Ip6FormCallback (
 
   Status = EFI_SUCCESS;
 
-  ZeroMem (&OldIfrNvData, BufferSize);
-
   HiiGetBrowserData (NULL, NULL, BufferSize, (UINT8 *) IfrNvData);
-
-  CopyMem (&OldIfrNvData, IfrNvData, BufferSize);
 
   if (Action == EFI_BROWSER_ACTION_CHANGING) {
     switch (QuestionId) {
@@ -1817,12 +1813,18 @@ Ip6FormCallback (
   } else if (Action == EFI_BROWSER_ACTION_CHANGED) {
     switch (QuestionId) {
     case KEY_SAVE_CONFIG_CHANGES:
-      CopyMem (&OldIfrNvData, IfrNvData, sizeof (IP6_CONFIG_IFR_NVDATA));
       *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_SUBMIT_EXIT;
       break;
 
     case KEY_IGNORE_CONFIG_CHANGES:
-      CopyMem (IfrNvData, &OldIfrNvData, sizeof (IP6_CONFIG_IFR_NVDATA));
+      Ip6FreeAddressInfoList (&Ip6NvData->ManualAddress);
+      Ip6FreeAddressInfoList (&Ip6NvData->GatewayAddress);
+      Ip6FreeAddressInfoList (&Ip6NvData->DnsAddress);
+
+      Ip6NvData->ManualAddressCount  = 0;
+      Ip6NvData->GatewayAddressCount = 0;
+      Ip6NvData->DnsAddressCount     = 0;
+
       *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD_EXIT;
       break;
 
