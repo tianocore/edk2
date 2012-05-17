@@ -2028,6 +2028,8 @@ HiiCompareLanguage (
       //
       // Return FALSE if any characters are different.
       //
+      FreePool (Lan1);
+      FreePool (Lan2);
       return FALSE;
     }
   }
