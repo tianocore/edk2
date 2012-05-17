@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -88,10 +88,6 @@ typedef struct {
   //
   EFI_PCI_IO_PROTOCOL                         *PciIo;
   EFI_LEGACY_BIOS_PROTOCOL                    *LegacyBios;
-  //
-  // Original PCI attributes
-  //
-  UINT64                                      OriginalPciAttributes;
 
   //
   // Produced Protocols
@@ -484,7 +480,6 @@ BiosVideoNotifyExitBootServices (
   @param  ParentLegacyBios       Parent LegacyBios interface
   @param  ParentDevicePath       Parent Device Path
   @param  RemainingDevicePath    Remaining Device Path
-  @param  OriginalPciAttributes  Original PCI Attributes
 
   @retval EFI_SUCCESS            If a child handle was added
   @retval other                  A child handle was not added
@@ -497,8 +492,7 @@ BiosVideoChildHandleInstall (
   IN  EFI_PCI_IO_PROTOCOL          *ParentPciIo,
   IN  EFI_LEGACY_BIOS_PROTOCOL     *ParentLegacyBios,
   IN  EFI_DEVICE_PATH_PROTOCOL     *ParentDevicePath,
-  IN  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath,
-  IN  UINT64                       OriginalPciAttributes
+  IN  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   );
 
 /**
@@ -529,4 +523,17 @@ BiosVideoDeviceReleaseResource (
   BIOS_VIDEO_DEV  *BiosVideoPrivate
   );
 
+/**
+  Check if all video child handles have been uninstalled.
+
+  @param  Controller             Video controller handle
+
+  @return TRUE                   Child handles exist.
+  @return FALSE                  All video child handles have been uninstalled.
+
+**/
+BOOLEAN
+HasChildHandle (
+  IN EFI_HANDLE  Controller
+  );
 #endif
