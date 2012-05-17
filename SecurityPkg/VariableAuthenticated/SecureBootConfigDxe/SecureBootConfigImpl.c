@@ -109,6 +109,90 @@ SaveSecureBootVariable (
 }
 
 /**
+  Create a time based data payload by concatenating the EFI_VARIABLE_AUTHENTICATION_2
+  descriptor with the input data. NO authentication is required in this function.
+  
+  @param[in, out]   DataSize       On input, the size of Data buffer in bytes.
+                                   On output, the size of data returned in Data
+                                   buffer in bytes.
+  @param[in, out]   Data           On input, Pointer to data buffer to be wrapped or 
+                                   pointer to NULL to wrap an empty payload.
+                                   On output, Pointer to the new payload date buffer allocated from pool,
+                                   it's caller's responsibility to free the memory when finish using it. 
+
+  @retval EFI_SUCCESS              Create time based payload successfully.
+  @retval EFI_OUT_OF_RESOURCES     There are not enough memory resourses to create time based payload.
+  @retval EFI_INVALID_PARAMETER    The parameter is invalid.
+  @retval Others                   Unexpected error happens.
+
+**/
+EFI_STATUS
+CreateTimeBasedPayload (
+  IN OUT UINTN            *DataSize,
+  IN OUT UINT8            **Data
+  )
+{
+  EFI_STATUS                       Status;
+  UINT8                            *NewData;
+  UINT8                            *Payload;
+  UINTN                            PayloadSize;
+  EFI_VARIABLE_AUTHENTICATION_2    *DescriptorData;
+  UINTN                            DescriptorSize;
+  EFI_TIME                         Time;
+  
+  if (Data == NULL || DataSize == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  //
+  // In Setup mode or Custom mode, the variable does not need to be signed but the 
+  // parameters to the SetVariable() call still need to be prepared as authenticated
+  // variable. So we create EFI_VARIABLE_AUTHENTICATED_2 descriptor without certificate
+  // data in it.
+  //
+  Payload     = *Data;
+  PayloadSize = *DataSize;
+  
+  DescriptorSize    = OFFSET_OF (EFI_VARIABLE_AUTHENTICATION_2, AuthInfo) + OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData);
+  NewData = (UINT8*) AllocateZeroPool (DescriptorSize + PayloadSize);
+  if (NewData == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  if ((Payload != NULL) && (PayloadSize != 0)) {
+    CopyMem (NewData + DescriptorSize, Payload, PayloadSize);
+  }
+
+  DescriptorData = (EFI_VARIABLE_AUTHENTICATION_2 *) (NewData);
+
+  ZeroMem (&Time, sizeof (EFI_TIME));
+  Status = gRT->GetTime (&Time, NULL);
+  if (EFI_ERROR (Status)) {
+    FreePool(NewData);
+    return Status;
+  }
+  Time.Pad1       = 0;
+  Time.Nanosecond = 0;
+  Time.TimeZone   = 0;
+  Time.Daylight   = 0;
+  Time.Pad2       = 0;
+  CopyMem (&DescriptorData->TimeStamp, &Time, sizeof (EFI_TIME));
+ 
+  DescriptorData->AuthInfo.Hdr.dwLength         = OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData);
+  DescriptorData->AuthInfo.Hdr.wRevision        = 0x0200;
+  DescriptorData->AuthInfo.Hdr.wCertificateType = WIN_CERT_TYPE_EFI_GUID;
+  CopyGuid (&DescriptorData->AuthInfo.CertType, &gEfiCertPkcs7Guid);
+  
+  if (Payload != NULL) {
+    FreePool(Payload);
+  }
+  
+  *DataSize = DescriptorSize + PayloadSize;
+  *Data     = NewData;
+  return EFI_SUCCESS;
+}
+
+/**
   Internal helper function to delete a Variable given its name and GUID, NO authentication
   required.
 
@@ -127,130 +211,36 @@ DeleteVariable (
 {
   EFI_STATUS              Status;
   VOID*                   Variable;
+  UINT8                   *Data;
+  UINTN                   DataSize;
+  UINT32                  Attr;
 
   Variable = GetVariable (VariableName, VendorGuid);
   if (Variable == NULL) {
     return EFI_SUCCESS;
   }
 
-  Status =   gRT->SetVariable (
-                    VariableName,
-                    VendorGuid,
-                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                    0,
-                    NULL
-                    );
-  return Status;
-}
+  Data     = NULL;
+  DataSize = 0;
+  Attr     = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS
+             | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
 
-/**
-  Generate a PK signature list from the public key storing file (*.pbk).
-
-  @param[in]   PkKeyFile             FileHandle of the public key storing file.
-  @param[out]  PkCert                Point to the data buffer to store the signature list.
-  
-  @return EFI_UNSUPPORTED            Unsupported Key Length.
-  @return EFI_OUT_OF_RESOURCES       There are not enough memory resourses to form the signature list.
-  
-**/
-EFI_STATUS
-CreatePkRsaSignatureList (
-  IN    EFI_FILE_HANDLE             PkKeyFile, 
-  OUT   EFI_SIGNATURE_LIST          **PkCert 
-  )
-{
-  EFI_STATUS                      Status;  
-  UINTN                           KeyBlobSize;
-  VOID                            *KeyBlob;
-  CPL_KEY_INFO                    *KeyInfo;
-  EFI_SIGNATURE_DATA              *PkCertData;
-  VOID                            *KeyBuffer;  
-  UINTN                           KeyLenInBytes;
-
-  PkCertData = NULL;
-  KeyBlob = NULL;
-  KeyBuffer = NULL;
-  Status = EFI_SUCCESS;
-
-  //
-  // Get key from PK key file
-  //                           
-  Status = ReadFileContent (PkKeyFile, &KeyBlob, &KeyBlobSize, 0);
-  if (EFI_ERROR(Status)) {
-    DEBUG ((EFI_D_ERROR, "Can't Open the file for PK enrolling.\n"));
-    goto ON_EXIT;
-  }
-  ASSERT (KeyBlob != NULL);
-
-  KeyInfo = (CPL_KEY_INFO *)KeyBlob;
-  if (KeyInfo->KeyLengthInBits/8 != WIN_CERT_UEFI_RSA2048_SIZE) {
-    Status = EFI_UNSUPPORTED;
-    goto ON_EXIT;
+  Status = CreateTimeBasedPayload (&DataSize, &Data);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "Fail to create time-based data payload: %r", Status));
+    return Status;
   }
 
-  //
-  // Convert the Public key to fix octet string format represented in RSA PKCS#1.
-  // 
-  KeyLenInBytes = KeyInfo->KeyLengthInBits / 8;
-  KeyBuffer = AllocateZeroPool(KeyLenInBytes);
-  if (KeyBuffer == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto ON_EXIT;
+  Status = gRT->SetVariable (
+                  VariableName,
+                  VendorGuid,
+                  Attr,
+                  DataSize,
+                  Data
+                  );
+  if (Data != NULL) {
+    FreePool (Data);
   }
-  Status = Int2OctStr (
-              (UINTN*) ((UINTN)KeyBlob + sizeof(CPL_KEY_INFO)), 
-              KeyLenInBytes / sizeof (UINTN), 
-              (UINT8*)KeyBuffer, 
-              KeyLenInBytes
-              );
-  if (EFI_ERROR(Status)) {
-    goto ON_EXIT;
-  }
-
-  // Allocate space for PK certificate list and initialize the list.
-  // Create PK database entry with SignatureHeaderSize equals 0.
-  //
-  *PkCert = (EFI_SIGNATURE_LIST*)AllocateZeroPool(
-            sizeof(EFI_SIGNATURE_LIST) + sizeof(EFI_SIGNATURE_DATA) - 1
-            + WIN_CERT_UEFI_RSA2048_SIZE
-            );
-  
-  if (*PkCert == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto ON_EXIT;
-  }
-
-  (*PkCert)->SignatureListSize   = sizeof(EFI_SIGNATURE_LIST) 
-                                  + sizeof(EFI_SIGNATURE_DATA) - 1
-                                  + WIN_CERT_UEFI_RSA2048_SIZE;
-  (*PkCert)->SignatureSize       = sizeof(EFI_SIGNATURE_DATA) - 1 + WIN_CERT_UEFI_RSA2048_SIZE;
-  (*PkCert)->SignatureHeaderSize = 0;
-  CopyGuid (&(*PkCert)->SignatureType, &gEfiCertRsa2048Guid);
-
-  PkCertData                    = (EFI_SIGNATURE_DATA*)((UINTN)(*PkCert) 
-                                                          + sizeof(EFI_SIGNATURE_LIST)
-                                                          + (*PkCert)->SignatureHeaderSize);
-  CopyGuid (&PkCertData->SignatureOwner, &gEfiGlobalVariableGuid);
-  //
-  // Fill the PK database with PKpub data from PKKeyFile.
-  //               
-  CopyMem (&(PkCertData->SignatureData[0]), KeyBuffer, WIN_CERT_UEFI_RSA2048_SIZE);
-
-ON_EXIT:
-  
-  if (KeyBlob != NULL) {
-    FreePool (KeyBlob);
-  }
-  
-  if (EFI_ERROR(Status) && *PkCert != NULL) {
-    FreePool (*PkCert);
-    *PkCert = NULL;
-  }
-  
-  if (KeyBuffer != NULL) {
-    FreePool (KeyBuffer);
-  }
-  
   return Status;
 }
 
@@ -357,11 +347,11 @@ EnrollPlatformKey (
   PkCert = NULL;
 
   //
-  // Parse the file's postfix. Only support *.pbk(RSA2048) and *.cer(X509) files.
+  // Parse the file's postfix. Only support *.cer(X509) files.
   //
   FilePostFix = Private->FileContext->FileName + StrLen (Private->FileContext->FileName) - 4;
-  if (CompareMem (FilePostFix, L".pbk",4) && CompareMem (FilePostFix, L".cer",4)) {
-    DEBUG ((EFI_D_ERROR, "Don't support the file, only *.pbk or *.cer.\n is supported."));
+  if (CompareMem (FilePostFix, L".cer",4)) {
+    DEBUG ((EFI_D_ERROR, "Don't support the file, only *.cer is supported."));
     return EFI_INVALID_PARAMETER;
   }
   DEBUG ((EFI_D_INFO, "FileName= %s\n", Private->FileContext->FileName));
@@ -370,22 +360,12 @@ EnrollPlatformKey (
   //
   // Prase the selected PK file and generature PK certificate list.
   //
-  if (!CompareMem (FilePostFix, L".pbk",4)) {
-    Status = CreatePkRsaSignatureList (
-              Private->FileContext->FHandle, 
-              &PkCert 
-              );
-    if (EFI_ERROR (Status)) {
-      goto ON_EXIT;
-    }
-  } else if (!CompareMem (FilePostFix, L".cer",4)) {
-    Status = CreatePkX509SignatureList (
-              Private->FileContext->FHandle, 
-              &PkCert 
-              );
-    if (EFI_ERROR (Status)) {
-      goto ON_EXIT;
-    }
+  Status = CreatePkX509SignatureList (
+            Private->FileContext->FHandle, 
+            &PkCert 
+            );
+  if (EFI_ERROR (Status)) {
+    goto ON_EXIT;
   }
   ASSERT (PkCert != NULL);
                          
@@ -393,8 +373,14 @@ EnrollPlatformKey (
   // Set Platform Key variable.
   // 
   Attr = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS 
-          | EFI_VARIABLE_BOOTSERVICE_ACCESS;
+          | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
   DataSize = PkCert->SignatureListSize;
+  Status = CreateTimeBasedPayload (&DataSize, (UINT8**) &PkCert);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "Fail to create time-based data payload: %r", Status));
+    goto ON_EXIT;
+  }
+  
   Status = gRT->SetVariable(
                   EFI_PLATFORM_KEY_NAME, 
                   &gEfiGlobalVariableGuid, 
@@ -437,8 +423,10 @@ DeletePlatformKey (
 {
   EFI_STATUS Status;
 
-  Status = DeleteVariable (EFI_PLATFORM_KEY_NAME, &gEfiGlobalVariableGuid);
-  
+  Status = DeleteVariable (
+             EFI_PLATFORM_KEY_NAME,
+             &gEfiGlobalVariableGuid
+             );
   return Status;
 }
 
@@ -551,8 +539,14 @@ EnrollRsa2048ToKek (
   // If true, use EFI_VARIABLE_APPEND_WRITE attribute to append the 
   // new KEK to original variable.
   //            
-  Attr |= EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS;
-  DataSize = 0;
+  Attr = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS 
+         | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
+  Status = CreateTimeBasedPayload (&KekSigListSize, (UINT8**) &KekSigList);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "Fail to create time-based data payload: %r", Status));
+    goto ON_EXIT;
+  }
+
   Status = gRT->GetVariable(
                   EFI_KEY_EXCHANGE_KEY_NAME, 
                   &gEfiGlobalVariableGuid, 
@@ -672,8 +666,13 @@ EnrollX509ToKek (
   // new kek to original variable
   //    
   Attr = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS 
-          | EFI_VARIABLE_BOOTSERVICE_ACCESS;
-
+          | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
+  Status = CreateTimeBasedPayload (&KekSigListSize, (UINT8**) &KekSigList);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "Fail to create time-based data payload: %r", Status));
+    goto ON_EXIT;
+  }
+  
   Status = gRT->GetVariable(
                   EFI_KEY_EXCHANGE_KEY_NAME, 
                   &gEfiGlobalVariableGuid, 
@@ -826,7 +825,12 @@ EnrollX509toSigDB (
   // new signature data to original variable
   //    
   Attr = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS 
-          | EFI_VARIABLE_BOOTSERVICE_ACCESS;
+          | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
+  Status = CreateTimeBasedPayload (&SigDBSize, (UINT8**) &Data);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "Fail to create time-based data payload: %r", Status));
+    goto ON_EXIT;
+  }
 
   Status = gRT->GetVariable(
                   VariableName, 
@@ -1281,8 +1285,6 @@ EnrollImageSignatureToSigDB (
 
   Data = NULL;
   GuidCertData = NULL;
-  Attr = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS 
-          | EFI_VARIABLE_BOOTSERVICE_ACCESS;
 
   //
   // Form the SigDB certificate list.
@@ -1374,6 +1376,14 @@ EnrollImageSignatureToSigDB (
   CopyGuid (&SigDBCertData->SignatureOwner, Private->SignatureGUID);
   CopyMem (SigDBCertData->SignatureData, mImageDigest, mImageDigestSize);
 
+  Attr = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS 
+          | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
+  Status = CreateTimeBasedPayload (&SigDBSize, (UINT8**) &Data);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "Fail to create time-based data payload: %r", Status));
+    goto ON_EXIT;
+  }
+  
   //
   // Check if SigDB variable has been already existed. 
   // If true, use EFI_VARIABLE_APPEND_WRITE attribute to append the 
@@ -1799,8 +1809,14 @@ DeleteKeyExchangeKey (
     CertList = (EFI_SIGNATURE_LIST *) ((UINT8 *) CertList + CertList->SignatureListSize);
   }
 
-  CertList = (EFI_SIGNATURE_LIST*) OldData;
   DataSize = Offset;
+  if ((Attr & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
+    Status = CreateTimeBasedPayload (&DataSize, &OldData);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "Fail to create time-based data payload: %r", Status));
+      goto ON_EXIT;
+    }
+  }
 
   Status = gRT->SetVariable(
                   EFI_KEY_EXCHANGE_KEY_NAME, 
@@ -1986,8 +2002,14 @@ DeleteSignature (
     CertList = (EFI_SIGNATURE_LIST *) ((UINT8 *) CertList + CertList->SignatureListSize);
   }
 
-  CertList = (EFI_SIGNATURE_LIST*) OldData;
   DataSize = Offset;
+  if ((Attr & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
+    Status = CreateTimeBasedPayload (&DataSize, &OldData);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "Fail to create time-based data payload: %r", Status));
+      goto ON_EXIT;
+    }
+  }
 
   Status = gRT->SetVariable(
                   VariableName, 
@@ -2465,7 +2487,7 @@ SecureBootCallback (
         CreatePopUp (
           EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
           &Key,
-          L"ERROR: The File Type is neither *.cer nor *.pbk!",
+          L"ERROR: Unsupported file type, only *.cer is supported!",
           NULL
           );
       } else {

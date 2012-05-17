@@ -60,6 +60,7 @@
   gEfiCustomModeEnableGuid
   gEfiSecureBootEnableDisableGuid
   gSecureBootConfigFormSetGuid
+  gEfiCertPkcs7Guid
   gEfiCertRsa2048Guid                           ## CONSUMES
   gEfiCertX509Guid                              ## CONSUMES
   gEfiCertSha1Guid                              ## CONSUMES

@@ -2,7 +2,7 @@
 
   Execute pending TPM requests from OS or BIOS and Lock TPM.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -936,6 +936,23 @@ ExecutePendingTpmRequest (
     case PHYSICAL_PRESENCE_SET_NO_PPI_MAINTENANCE_FALSE:
       RequestConfirmed = TRUE;
       break;
+      
+    default:
+      //
+      // Invalid operation request.
+      //
+      TcgPpData->PPResponse = TPM_PP_BIOS_FAILURE;
+      TcgPpData->LastPPRequest = TcgPpData->PPRequest;
+      TcgPpData->PPRequest = PHYSICAL_PRESENCE_NO_ACTION;
+      DataSize = sizeof (EFI_PHYSICAL_PRESENCE);
+      Status = gRT->SetVariable (
+                      PHYSICAL_PRESENCE_VARIABLE,
+                      &gEfiPhysicalPresenceGuid,
+                      EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                      DataSize,
+                      TcgPpData
+                      );
+      return;
   }
 
   if ((Flags & FLAG_RESET_TRACK) != 0) {
@@ -965,7 +982,7 @@ ExecutePendingTpmRequest (
   //
   if ((TcgPpData->Flags & FLAG_RESET_TRACK) == 0) {
     TcgPpData->LastPPRequest = TcgPpData->PPRequest;
-    TcgPpData->PPRequest = 0;    
+    TcgPpData->PPRequest = PHYSICAL_PRESENCE_NO_ACTION;    
   }
 
   //
@@ -1004,7 +1021,7 @@ ExecutePendingTpmRequest (
     case PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR_ENABLE_ACTIVATE:      
       break;
     default:
-      if (TcgPpData->PPRequest != 0) {
+      if (TcgPpData->PPRequest != PHYSICAL_PRESENCE_NO_ACTION) {
         break;
       }
       return;

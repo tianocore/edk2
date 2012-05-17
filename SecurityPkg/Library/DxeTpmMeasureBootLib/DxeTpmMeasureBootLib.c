@@ -256,7 +256,9 @@ TcgMeasureGptTable (
 
   @retval EFI_SUCCESS            Successfully measure image.
   @retval EFI_OUT_OF_RESOURCES   No enough resource to measure image.
+  @retval EFI_UNSUPPORTED        ImageType is unsupported or PE image is mal-format.  
   @retval other error value
+
 **/
 EFI_STATUS
 EFIAPI
@@ -269,27 +271,31 @@ TcgMeasurePeImage (
   IN  EFI_DEVICE_PATH_PROTOCOL  *FilePath
   )
 {
-  EFI_STATUS                        Status;
-  TCG_PCR_EVENT                     *TcgEvent;
-  EFI_IMAGE_LOAD_EVENT              *ImageLoad;
-  UINT32                            FilePathSize;
-  VOID                              *Sha1Ctx;
-  UINTN                             CtxSize;
-  EFI_IMAGE_DOS_HEADER              *DosHdr;
-  UINT32                            PeCoffHeaderOffset;
-  EFI_IMAGE_SECTION_HEADER          *Section;
-  UINT8                             *HashBase;
-  UINTN                             HashSize;
-  UINTN                             SumOfBytesHashed;
-  EFI_IMAGE_SECTION_HEADER          *SectionHeader;
-  UINTN                             Index, Pos;
-  UINT16                            Magic;
-  UINT32                            EventSize;
-  UINT32                            EventNumber;
-  EFI_PHYSICAL_ADDRESS              EventLogLastEntry;
+  EFI_STATUS                           Status;
+  TCG_PCR_EVENT                        *TcgEvent;
+  EFI_IMAGE_LOAD_EVENT                 *ImageLoad;
+  UINT32                               FilePathSize;
+  VOID                                 *Sha1Ctx;
+  UINTN                                CtxSize;
+  EFI_IMAGE_DOS_HEADER                 *DosHdr;
+  UINT32                               PeCoffHeaderOffset;
+  EFI_IMAGE_SECTION_HEADER             *Section;
+  UINT8                                *HashBase;
+  UINTN                                HashSize;
+  UINTN                                SumOfBytesHashed;
+  EFI_IMAGE_SECTION_HEADER             *SectionHeader;
+  UINTN                                Index;
+  UINTN                                Pos;
+  UINT16                               Magic;
+  UINT32                               EventSize;
+  UINT32                               EventNumber;
+  EFI_PHYSICAL_ADDRESS                 EventLogLastEntry;
   EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION  Hdr;
+  UINT32                               NumberOfRvaAndSizes;
+  BOOLEAN                              HashStatus;
+  UINT32                               CertSize;
 
-  Status        = EFI_SUCCESS;
+  Status        = EFI_UNSUPPORTED;
   ImageLoad     = NULL;
   SectionHeader = NULL;
   Sha1Ctx       = NULL;
@@ -326,7 +332,6 @@ TcgMeasurePeImage (
         "TcgMeasurePeImage: Unknown subsystem type %d",
         ImageType
         ));
-      Status = EFI_UNSUPPORTED;
       goto Finish;
   }
 
@@ -344,8 +349,9 @@ TcgMeasurePeImage (
   if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
     PeCoffHeaderOffset = DosHdr->e_lfanew;
   }
-  if (((EFI_TE_IMAGE_HEADER *)((UINT8 *) (UINTN) ImageAddress + PeCoffHeaderOffset))->Signature
-       == EFI_TE_IMAGE_HEADER_SIGNATURE) {
+
+  Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)((UINT8 *) (UINTN) ImageAddress + PeCoffHeaderOffset);
+  if (Hdr.Pe32->Signature != EFI_IMAGE_NT_SIGNATURE) {
     goto Finish;
   }
 
@@ -367,14 +373,16 @@ TcgMeasurePeImage (
     goto Finish;
   }
 
-  Sha1Init (Sha1Ctx);
+  HashStatus = Sha1Init (Sha1Ctx);
+  if (!HashStatus) {
+    goto Finish;
+  }
 
   //
   // Measuring PE/COFF Image Header;
   // But CheckSum field and SECURITY data directory (certificate) are excluded
   //
-  Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)((UINT8 *) (UINTN) ImageAddress + PeCoffHeaderOffset);
-  Magic    = Hdr.Pe32->OptionalHeader.Magic;
+  Magic = Hdr.Pe32->OptionalHeader.Magic;
   
   //
   // 3.  Calculate the distance from the base of the image header to the image checksum address.
@@ -385,58 +393,99 @@ TcgMeasurePeImage (
     //
     // Use PE32 offset
     //
+    NumberOfRvaAndSizes = Hdr.Pe32->OptionalHeader.NumberOfRvaAndSizes;
     HashSize = (UINTN) ((UINT8 *)(&Hdr.Pe32->OptionalHeader.CheckSum) - HashBase);
   } else {
     //
     // Use PE32+ offset
     //
+    NumberOfRvaAndSizes = Hdr.Pe32Plus->OptionalHeader.NumberOfRvaAndSizes;
     HashSize = (UINTN) ((UINT8 *)(&Hdr.Pe32Plus->OptionalHeader.CheckSum) - HashBase);
   }
 
-  Sha1Update (Sha1Ctx, HashBase, HashSize);
+  HashStatus = Sha1Update (Sha1Ctx, HashBase, HashSize);
+  if (!HashStatus) {
+    goto Finish;
+  }  
 
   //
   // 5.  Skip over the image checksum (it occupies a single ULONG).
-  // 6.  Get the address of the beginning of the Cert Directory.
-  // 7.  Hash everything from the end of the checksum to the start of the Cert Directory.
   //
-  if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+  if (NumberOfRvaAndSizes <= EFI_IMAGE_DIRECTORY_ENTRY_SECURITY) {
     //
-    // Use PE32 offset
+    // 6.  Since there is no Cert Directory in optional header, hash everything
+    //     from the end of the checksum to the end of image header.
     //
-    HashBase = (UINT8 *) &Hdr.Pe32->OptionalHeader.CheckSum + sizeof (UINT32);
-    HashSize = (UINTN) ((UINT8 *)(&Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY]) - HashBase);
+    if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+      //
+      // Use PE32 offset.
+      //
+      HashBase = (UINT8 *) &Hdr.Pe32->OptionalHeader.CheckSum + sizeof (UINT32);
+      HashSize = Hdr.Pe32->OptionalHeader.SizeOfHeaders - (UINTN) (HashBase - ImageAddress);
+    } else {
+      //
+      // Use PE32+ offset.
+      //
+      HashBase = (UINT8 *) &Hdr.Pe32Plus->OptionalHeader.CheckSum + sizeof (UINT32);
+      HashSize = Hdr.Pe32Plus->OptionalHeader.SizeOfHeaders - (UINTN) (HashBase - ImageAddress);
+    }
+
+    if (HashSize != 0) {
+      HashStatus  = Sha1Update (Sha1Ctx, HashBase, HashSize);
+      if (!HashStatus) {
+        goto Finish;
+      }
+    }    
   } else {
     //
-    // Use PE32+ offset
-    //    
-    HashBase = (UINT8 *) &Hdr.Pe32Plus->OptionalHeader.CheckSum + sizeof (UINT32);
-    HashSize = (UINTN) ((UINT8 *)(&Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY]) - HashBase);
-  }
+    // 7.  Hash everything from the end of the checksum to the start of the Cert Directory.
+    //
+    if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+      //
+      // Use PE32 offset
+      //
+      HashBase = (UINT8 *) &Hdr.Pe32->OptionalHeader.CheckSum + sizeof (UINT32);
+      HashSize = (UINTN) ((UINT8 *)(&Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY]) - HashBase);
+    } else {
+      //
+      // Use PE32+ offset
+      //    
+      HashBase = (UINT8 *) &Hdr.Pe32Plus->OptionalHeader.CheckSum + sizeof (UINT32);
+      HashSize = (UINTN) ((UINT8 *)(&Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY]) - HashBase);
+    }
 
-  Sha1Update (Sha1Ctx, HashBase, HashSize);
+    if (HashSize != 0) {
+      HashStatus  = Sha1Update (Sha1Ctx, HashBase, HashSize);
+      if (!HashStatus) {
+        goto Finish;
+      }
+    }
 
-  //
-  // 8.  Skip over the Cert Directory. (It is sizeof(IMAGE_DATA_DIRECTORY) bytes.)
-  // 9.  Hash everything from the end of the Cert Directory to the end of image header.
-  //
-  if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
     //
-    // Use PE32 offset
+    // 8.  Skip over the Cert Directory. (It is sizeof(IMAGE_DATA_DIRECTORY) bytes.)
+    // 9.  Hash everything from the end of the Cert Directory to the end of image header.
     //
-    HashBase = (UINT8 *) &Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1];
-    HashSize = Hdr.Pe32->OptionalHeader.SizeOfHeaders -
-             (UINTN) ((UINT8 *)(&Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1]) - (UINT8 *) (UINTN) ImageAddress);
-  } else {
-    //
-    // Use PE32+ offset
-    //
-    HashBase = (UINT8 *) &Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1];
-    HashSize = Hdr.Pe32Plus->OptionalHeader.SizeOfHeaders -
-             (UINTN) ((UINT8 *)(&Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1]) - (UINT8 *) (UINTN) ImageAddress);
+    if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+      //
+      // Use PE32 offset
+      //
+      HashBase = (UINT8 *) &Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1];
+      HashSize = Hdr.Pe32->OptionalHeader.SizeOfHeaders - (UINTN) (HashBase - ImageAddress);
+    } else {
+      //
+      // Use PE32+ offset
+      //
+      HashBase = (UINT8 *) &Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1];
+      HashSize = Hdr.Pe32Plus->OptionalHeader.SizeOfHeaders - (UINTN) (HashBase - ImageAddress);
+    }
+    
+    if (HashSize != 0) {
+      HashStatus  = Sha1Update (Sha1Ctx, HashBase, HashSize);
+      if (!HashStatus) {
+        goto Finish;
+      }
+    }
   }
-  
-  Sha1Update (Sha1Ctx, HashBase, HashSize);
 
   //
   // 10. Set the SUM_OF_BYTES_HASHED to the size of the header
@@ -459,7 +508,7 @@ TcgMeasurePeImage (
   //     header indicates how big the table should be. Do not include any
   //     IMAGE_SECTION_HEADERs in the table whose 'SizeOfRawData' field is zero.
   //
-  SectionHeader = (EFI_IMAGE_SECTION_HEADER *)AllocateZeroPool (sizeof (EFI_IMAGE_SECTION_HEADER) * Hdr.Pe32->FileHeader.NumberOfSections);
+  SectionHeader = (EFI_IMAGE_SECTION_HEADER *) AllocateZeroPool (sizeof (EFI_IMAGE_SECTION_HEADER) * Hdr.Pe32->FileHeader.NumberOfSections);
   if (SectionHeader == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Finish;
@@ -503,7 +552,10 @@ TcgMeasurePeImage (
     HashBase = (UINT8 *) (UINTN) ImageAddress + Section->PointerToRawData;
     HashSize = (UINTN) Section->SizeOfRawData;
 
-    Sha1Update (Sha1Ctx, HashBase, HashSize);
+    HashStatus = Sha1Update (Sha1Ctx, HashBase, HashSize);
+    if (!HashStatus) {
+      goto Finish;
+    }
 
     SumOfBytesHashed += HashSize;
   }
@@ -516,37 +568,42 @@ TcgMeasurePeImage (
   //
   if (ImageSize > SumOfBytesHashed) {
     HashBase = (UINT8 *) (UINTN) ImageAddress + SumOfBytesHashed;
-    if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
-      if (ImageSize - SumOfBytesHashed < Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size) {
-        Status = EFI_INVALID_PARAMETER;
-        goto Finish;
-      }
-      //
-      // Use PE32 offset
-      //
-      HashSize = (UINTN)(ImageSize -
-                 Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size -
-                 SumOfBytesHashed);
+
+    if (NumberOfRvaAndSizes <= EFI_IMAGE_DIRECTORY_ENTRY_SECURITY) {
+      CertSize = 0;
     } else {
-      if (ImageSize - SumOfBytesHashed < Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size) {
-        Status = EFI_INVALID_PARAMETER;
-        goto Finish;
+      if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+        //
+        // Use PE32 offset.
+        //
+        CertSize = Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size;
+      } else {
+        //
+        // Use PE32+ offset.
+        //
+        CertSize = Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size;
       }
-      //
-      // Use PE32+ offset
-      //
-      HashSize = (UINTN)(ImageSize -
-                 Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size -
-                 SumOfBytesHashed);      
     }
 
-    Sha1Update (Sha1Ctx, HashBase, HashSize);
+    if (ImageSize > CertSize + SumOfBytesHashed) {
+      HashSize = (UINTN) (ImageSize - CertSize - SumOfBytesHashed);
+
+      HashStatus = Sha1Update (Sha1Ctx, HashBase, HashSize);
+      if (!HashStatus) {
+        goto Finish;
+      }
+    } else if (ImageSize < CertSize + SumOfBytesHashed) {
+      goto Finish;
+    }
   }
 
   //
   // 17.  Finalize the SHA hash.
   //
-  Sha1Final (Sha1Ctx, (UINT8 *)&TcgEvent->Digest);
+  HashStatus = Sha1Final (Sha1Ctx, (UINT8 *) &TcgEvent->Digest);
+  if (!HashStatus) {
+    goto Finish;
+  }
 
   //
   // Log the PE data
