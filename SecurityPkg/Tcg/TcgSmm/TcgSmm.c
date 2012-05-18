@@ -2,7 +2,7 @@
   It updates TPM items in ACPI table and registers SMI callback
   functions for physical presence and ClearMemory.
 
-Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -13,54 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-
-#include <PiDxe.h>
-#include <IndustryStandard/Acpi.h>
-#include <Guid/PhysicalPresenceData.h>
-#include <Guid/MemoryOverwriteControl.h>
-#include <Protocol/SmmSwDispatch2.h>
-#include <Protocol/AcpiTable.h>
-#include <Protocol/SmmVariable.h>
-
-#include <Library/BaseLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/DebugLib.h>
-#include <Library/SmmServicesTableLib.h>
-#include <Library/UefiDriverEntryPoint.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/DxeServicesLib.h>
-
-#pragma pack(1)
-typedef struct {
-  UINT8                  SoftwareSmi;
-  UINT32                 Parameter;
-  UINT32                 Response;
-  UINT32                 Request;
-  UINT32                 LastRequest;
-  UINT32                 ReturnCode;
-} PHYSICAL_PRESENCE_NVS;
-
-typedef struct {
-  UINT8                  SoftwareSmi;
-  UINT32                 Parameter;
-  UINT32                 Request;
-} MEMORY_CLEAR_NVS;
-
-typedef struct {
-  PHYSICAL_PRESENCE_NVS  PhysicalPresence;
-  MEMORY_CLEAR_NVS       MemoryClear;
-} TCG_NVS;
-
-typedef struct {
-  UINT8                  OpRegionOp;
-  UINT32                 NameString;
-  UINT8                  RegionSpace;
-  UINT8                  DWordPrefix;
-  UINT32                 RegionOffset;
-  UINT8                  BytePrefix;
-  UINT8                  RegionLen;
-} AML_OP_REGION_32_8;
-#pragma pack()
+#include "TcgSmm.h"
 
 EFI_SMM_VARIABLE_PROTOCOL  *mSmmVariable;
 TCG_NVS                    *mTcgNvs;
@@ -109,23 +62,16 @@ PhysicalPresenceCallback (
   }
 
   DEBUG ((EFI_D_INFO, "[TPM] PP callback, Parameter = %x\n", mTcgNvs->PhysicalPresence.Parameter));
-  if (mTcgNvs->PhysicalPresence.Parameter == 5) {
-    //
-    // Return TPM Operation Response to OS Environment
-    //
+  if (mTcgNvs->PhysicalPresence.Parameter == ACPI_FUNCTION_RETURN_REQUEST_RESPONSE_TO_OS) {
     mTcgNvs->PhysicalPresence.LastRequest = PpData.LastPPRequest;
     mTcgNvs->PhysicalPresence.Response    = PpData.PPResponse;
-
-  } else if ((mTcgNvs->PhysicalPresence.Parameter == 2) || (mTcgNvs->PhysicalPresence.Parameter == 7)) {
-    //
-    // Submit TPM Operation Request to Pre-OS Environment
-    //
-
+  } else if ((mTcgNvs->PhysicalPresence.Parameter == ACPI_FUNCTION_SUBMIT_REQUEST_TO_BIOS) 
+          || (mTcgNvs->PhysicalPresence.Parameter == ACPI_FUNCTION_SUBMIT_REQUEST_TO_BIOS_2)) {
     if (mTcgNvs->PhysicalPresence.Request == PHYSICAL_PRESENCE_SET_OPERATOR_AUTH) {
       //
-      // This command requires UI to prompt user for Auth data, NOT implemented.
+      // This command requires UI to prompt user for Auth data.
       //
-      mTcgNvs->PhysicalPresence.ReturnCode = 1;
+      mTcgNvs->PhysicalPresence.ReturnCode = PP_SUBMIT_REQUEST_NOT_IMPLEMENTED;
       return EFI_SUCCESS;
     }
 
@@ -142,17 +88,11 @@ PhysicalPresenceCallback (
     }
 
     if (EFI_ERROR (Status)) { 
-      //
-      // General failure.
-      //
-      mTcgNvs->PhysicalPresence.ReturnCode = 2;
+      mTcgNvs->PhysicalPresence.ReturnCode = PP_SUBMIT_REQUEST_GENERAL_FAILURE;
       return EFI_SUCCESS;
     }
-    mTcgNvs->PhysicalPresence.ReturnCode = 0;
-  } else if (mTcgNvs->PhysicalPresence.Parameter == 8) {
-    // 
-    // Get User Confirmation Status for Operation
-    //
+    mTcgNvs->PhysicalPresence.ReturnCode = PP_SUBMIT_REQUEST_SUCCESS;
+  } else if (mTcgNvs->PhysicalPresence.Parameter == ACPI_FUNCTION_GET_USER_CONFIRMATION_STATUS_FOR_REQUEST) {
     Flags = PpData.Flags;  
     RequestConfirmed = FALSE;
 
@@ -202,22 +142,15 @@ PhysicalPresenceCallback (
       case PHYSICAL_PRESENCE_SET_OPERATOR_AUTH:
         //
         // This command requires UI to prompt user for Auth data
-        // Here it is NOT implemented
         //
-        mTcgNvs->PhysicalPresence.ReturnCode = 0; 
+        mTcgNvs->PhysicalPresence.ReturnCode = PP_REQUEST_NOT_IMPLEMENTED; 
         return EFI_SUCCESS;
     }
 
     if (RequestConfirmed) {
-      //
-      // Allowed and physically present user not required 
-      //
-      mTcgNvs->PhysicalPresence.ReturnCode = 4;
+      mTcgNvs->PhysicalPresence.ReturnCode = PP_REQUEST_ALLOWED_AND_PPUSER_NOT_REQUIRED;
     } else {
-      //
-      // Allowed and physically present user required 
-      //
-      mTcgNvs->PhysicalPresence.ReturnCode = 3;
+      mTcgNvs->PhysicalPresence.ReturnCode = PP_REQUEST_ALLOWED_AND_PPUSER_REQUIRED;
     }    
   } 
 
@@ -251,15 +184,10 @@ MemoryClearCallback (
   UINTN                          DataSize;
   UINT8                          MorControl;
 
-  if (mTcgNvs->MemoryClear.Parameter == 1) {
-    //
-    // Called from ACPI _DSM method, save the MOR data to variable.
-    //
+  mTcgNvs->MemoryClear.ReturnCode = MOR_REQUEST_SUCCESS;
+  if (mTcgNvs->MemoryClear.Parameter == ACPI_FUNCTION_DSM_MEMORY_CLEAR_INTERFACE) {
     MorControl = (UINT8) mTcgNvs->MemoryClear.Request;
-  } else if (mTcgNvs->MemoryClear.Parameter == 2) {
-    //
-    // Called from ACPI _PTS method, setup ClearMemory flags if needed.
-    //
+  } else if (mTcgNvs->MemoryClear.Parameter == ACPI_FUNCTION_PTS_CLEAR_MOR_BIT) {
     DataSize = sizeof (UINT8);
     Status = mSmmVariable->SmmGetVariable (
                              MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME,
@@ -269,7 +197,6 @@ MemoryClearCallback (
                              &MorControl
                              );
     if (EFI_ERROR (Status)) {
-      ASSERT (Status == EFI_NOT_FOUND);
       return EFI_SUCCESS;
     }
 
@@ -287,7 +214,9 @@ MemoryClearCallback (
                            DataSize,
                            &MorControl
                            );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) { 
+    mTcgNvs->MemoryClear.ReturnCode = MOR_REQUEST_GENERAL_FAILURE;
+  }
 
   return EFI_SUCCESS;
 }
@@ -324,7 +253,6 @@ AssignOpRegion (
        OpRegion  = (AML_OP_REGION_32_8 *) ((UINT8 *) OpRegion + 1)) {
     if ((OpRegion->OpRegionOp  == AML_EXT_REGION_OP) && 
         (OpRegion->NameString  == Name) &&
-        (OpRegion->RegionLen   == Size) &&
         (OpRegion->DWordPrefix == AML_DWORD_PREFIX) &&
         (OpRegion->BytePrefix  == AML_BYTE_PREFIX)) {
 
@@ -332,6 +260,7 @@ AssignOpRegion (
       ASSERT_EFI_ERROR (Status);
       ZeroMem ((VOID *)(UINTN)MemoryAddress, Size);
       OpRegion->RegionOffset = (UINT32) (UINTN) MemoryAddress;
+      OpRegion->RegionLen    = (UINT8) Size;
       break;
     }
   }
