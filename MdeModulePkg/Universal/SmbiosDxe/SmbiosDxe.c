@@ -22,6 +22,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 SMBIOS_INSTANCE mPrivateData;
 
+UINTN mPreAllocatedPages = 0;
+
 //
 // Chassis for SMBIOS entry point structure that is to be installed into EFI system config table.
 //
@@ -128,6 +130,7 @@ GetSmbiosStructureSize (
 {
   UINTN  FullSize;
   UINTN  StrLen;
+  UINTN  MaxLen;
   INT8*  CharInStr;
   
   if (Size == NULL || NumberOfStrings == NULL) {
@@ -149,24 +152,25 @@ GetSmbiosStructureSize (
     }
 
     if (This->MajorVersion < 2 || (This->MajorVersion == 2 && This->MinorVersion < 7)){
-      for (StrLen = 0 ; StrLen < SMBIOS_STRING_MAX_LENGTH; StrLen++) {
-        if (*(CharInStr+StrLen) == 0) {
-          break;
-        }
-      }
-
-      if (StrLen == SMBIOS_STRING_MAX_LENGTH) {
-        return EFI_INVALID_PARAMETER;
-      }
+      MaxLen = SMBIOS_STRING_MAX_LENGTH;
     } else {
       //
-      // Reference SMBIOS 2.7, chapter 6.1.3, it will have no limit on the length of each individual text string
+      // Reference SMBIOS 2.7, chapter 6.1.3, it will have no limit on the length of each individual text string.
+      // However, the length of the entire structure table (including all strings) must be reported
+      // in the Structure Table Length field of the SMBIOS Structure Table Entry Point,
+      // which is a WORD field limited to 65,535 bytes.
       //
-      for (StrLen = 0 ;; StrLen++) {
-        if (*(CharInStr+StrLen) == 0) {
-          break;
-        }
+      MaxLen = SMBIOS_TABLE_MAX_LENGTH;
+    }
+
+    for (StrLen = 0 ; StrLen < MaxLen; StrLen++) {
+      if (*(CharInStr+StrLen) == 0) {
+        break;
       }
+    }
+
+    if (StrLen == MaxLen) {
+      return EFI_INVALID_PARAMETER;
     }
 
     //
@@ -355,6 +359,15 @@ SmbiosAdd (
     return Status;
   }
 
+  if (EntryPointStructure->TableLength + StructureSize > SMBIOS_TABLE_MAX_LENGTH) {
+    //
+    // The length of the entire structure table (including all strings) must be reported
+    // in the Structure Table Length field of the SMBIOS Structure Table Entry Point,
+    // which is a WORD field limited to 65,535 bytes.
+    //
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   //
   // Enter into critical section
   //  
@@ -483,11 +496,18 @@ SmbiosUpdateString (
 
   InputStrLen = AsciiStrLen(String);
 
-  //
-  // Reference SMBIOS 2.7, chapter 6.1.3, it will have no limit on the length of each individual text string
-  //
   if (This->MajorVersion < 2 || (This->MajorVersion == 2 && This->MinorVersion < 7)) {
     if (InputStrLen > SMBIOS_STRING_MAX_LENGTH) {
+      return EFI_UNSUPPORTED;
+    }
+  } else {
+    //
+    // Reference SMBIOS 2.7, chapter 6.1.3, it will have no limit on the length of each individual text string.
+    // However, the length of the entire structure table (including all strings) must be reported 
+    // in the Structure Table Length field of the SMBIOS Structure Table Entry Point,
+    // which is a WORD field limited to 65,535 bytes.
+    //
+    if (InputStrLen > SMBIOS_TABLE_MAX_LENGTH) {
       return EFI_UNSUPPORTED;
     }
   }
@@ -556,6 +576,15 @@ SmbiosUpdateString (
         SmbiosTableConstruction ();
         EfiReleaseLock (&Private->DataLock);
         return EFI_SUCCESS;
+      }
+
+      if (EntryPointStructure->TableLength + InputStrLen - TargetStrLen > SMBIOS_TABLE_MAX_LENGTH) {
+        //
+        // The length of the entire structure table (including all strings) must be reported
+        // in the Structure Table Length field of the SMBIOS Structure Table Entry Point,
+        // which is a WORD field limited to 65,535 bytes.
+        //
+        return EFI_UNSUPPORTED;
       }
 
       //
@@ -880,7 +909,6 @@ SmbiosCreateTable (
   EFI_SMBIOS_TABLE_HEADER         *SmbiosRecord;
   EFI_SMBIOS_TABLE_END_STRUCTURE  EndStructure;
   EFI_SMBIOS_ENTRY                *CurrentSmbiosEntry;
-  UINTN                           PreAllocatedPages;
   
   Status            = EFI_SUCCESS;
   BufferPointer     = NULL;
@@ -889,12 +917,6 @@ SmbiosCreateTable (
   // Get Smbios protocol to traverse SMBIOS records.
   //
   SmbiosProtocol = &mPrivateData.Smbios;
-
-  if (EntryPointStructure->TableAddress == 0) {
-    PreAllocatedPages = 0;
-  } else {
-    PreAllocatedPages = EFI_SIZE_TO_PAGES (EntryPointStructure->TableLength);
-  }
 
   //
   // Make some statistics about all the structures
@@ -938,7 +960,7 @@ SmbiosCreateTable (
     EntryPointStructure->MaxStructureSize = (UINT16) sizeof (EndStructure);
   }
 
-  if ((UINTN) EFI_SIZE_TO_PAGES (EntryPointStructure->TableLength) > PreAllocatedPages) {
+  if ((UINTN) EFI_SIZE_TO_PAGES (EntryPointStructure->TableLength) > mPreAllocatedPages) {
     //
     // If new SMBIOS talbe size exceeds the original pre-allocated page, 
     // it is time to re-allocate memory (below 4GB).
@@ -949,9 +971,10 @@ SmbiosCreateTable (
       //      
       FreePages (
             (VOID*)(UINTN)EntryPointStructure->TableAddress,
-            PreAllocatedPages
+            mPreAllocatedPages
             );
       EntryPointStructure->TableAddress = 0;
+      mPreAllocatedPages = 0;
     }
     
     PhysicalAddress = 0xffffffff;
@@ -967,6 +990,7 @@ SmbiosCreateTable (
       return EFI_OUT_OF_RESOURCES;
     } else {
       EntryPointStructure->TableAddress = (UINT32) PhysicalAddress;
+      mPreAllocatedPages = EFI_SIZE_TO_PAGES (EntryPointStructure->TableLength);
     }
   }
   
@@ -1109,11 +1133,16 @@ SmbiosDriverEntryPoint (
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "SmbiosDriverEntryPoint() could not allocate SMBIOS table < 4GB\n"));
     EntryPointStructure->TableAddress = 0;
-    EntryPointStructure->TableLength  = 0;
   } else {
     EntryPointStructure->TableAddress = (UINT32) PhysicalAddress;
-    EntryPointStructure->TableLength  = EFI_PAGES_TO_SIZE (1);
+    mPreAllocatedPages = 1;
   }
+
+  //
+  // Init TableLength to the length of End-Of-Table structure for SmbiosAdd() called at the first time
+  // to check the TableLength limitation.
+  //
+  EntryPointStructure->TableLength  = sizeof (EFI_SMBIOS_TABLE_END_STRUCTURE);
   
   //
   // Make a new handle and install the protocol
