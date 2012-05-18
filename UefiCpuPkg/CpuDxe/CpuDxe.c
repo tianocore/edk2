@@ -1,7 +1,7 @@
 /** @file
   CPU DXE Module.
 
-  Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -969,7 +969,7 @@ RefreshGcdMemoryAttributes (
   // Go for variable MTRRs with the attribute except for WB and UC attributes
   //
   for (Index = 0; Index < FirmwareVariableMtrrCount; Index++) {
-    if (VariableMtrr[Index].Valid &&                          
+    if (VariableMtrr[Index].Valid &&
         VariableMtrr[Index].Type != MTRR_CACHE_WRITE_BACK &&
         VariableMtrr[Index].Type != MTRR_CACHE_UNCACHEABLE) {
       Attributes = GetMemorySpaceAttributeFromMtrrType ((UINT8) VariableMtrr[Index].Type);
@@ -1161,7 +1161,7 @@ InitInterruptDescriptorTable (
     // preserve it.
     //
     if (Index < OldIdtSize) {
-      IntHandler = 
+      IntHandler =
         (VOID*) (
           OldIdt[Index].Bits.OffsetLow +
           (OldIdt[Index].Bits.OffsetHigh << 16)
@@ -1209,7 +1209,7 @@ InitInterruptDescriptorTable (
 
 /**
   Callback function for idle events.
- 
+
   @param  Event                 Event whose notification function is being invoked.
   @param  Context               The pointer to the notification function's context,
                                 which is implementation-dependent.
@@ -1261,6 +1261,11 @@ InitializeCpu (
   // Setup IDT pointer, IDT and interrupt entry points
   //
   InitInterruptDescriptorTable ();
+
+  //
+  // Enable the local APIC for Virtual Wire Mode.
+  //
+  ProgramVirtualWireMode ();
 
   //
   // Install CPU Architectural Protocol
