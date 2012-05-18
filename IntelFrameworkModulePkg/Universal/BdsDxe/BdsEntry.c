@@ -275,6 +275,112 @@ BdsBootDeviceSelect (
 }
 
 /**
+  Validate the device path instance. 
+
+  Only base on the length filed in the device path node to validate the device path. 
+
+  @param  DevicePath         A pointer to a device path data structure.
+  @param  MaxSize            Max valid device path size. If big than this size, 
+                             return error.
+  
+  @retval TRUE               An valid device path.
+  @retval FALSE              An invalid device path.
+
+**/
+BOOLEAN
+IsValidDevicePath (
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
+  IN UINTN                     MaxSize
+  )
+{
+  UINTN  Size;
+  UINTN  NodeSize;
+
+  if (DevicePath == NULL) {
+    return TRUE;
+  }
+
+  Size = 0;
+
+  while (!IsDevicePathEnd (DevicePath)) {
+    NodeSize = DevicePathNodeLength (DevicePath);
+    if (NodeSize < END_DEVICE_PATH_LENGTH) {
+      return FALSE;
+    }
+
+    Size += NodeSize;
+    if (Size > MaxSize) {
+      return FALSE;
+    }
+
+    DevicePath = NextDevicePathNode (DevicePath);
+  }
+
+  Size += DevicePathNodeLength (DevicePath);
+  if (Size > MaxSize) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+
+  Validate input console variable data. 
+
+  If found the device path is not a valid device path, remove the variable.
+  
+  @param VariableName             Input console variable name.
+
+**/
+
+VOID
+BdsFormalizeConsoleVariable (
+  IN  CHAR16          *VariableName
+  )
+{
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  UINTN                     VariableSize;
+  EFI_STATUS                Status;
+
+  DevicePath = BdsLibGetVariableAndSize (
+                      VariableName,
+                      &gEfiGlobalVariableGuid,
+                      &VariableSize
+                      );
+  if (!IsValidDevicePath (DevicePath, VariableSize)) { 
+    Status = gRT->SetVariable (
+                    VariableName,
+                    &gEfiGlobalVariableGuid,
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                    0,
+                    NULL
+                    );
+    ASSERT_EFI_ERROR (Status);
+  }
+}
+
+/**
+
+  Validate variables. 
+
+  If found the device path is not a valid device path, remove the variable.
+
+**/
+VOID 
+BdsFormalizeEfiGlobalVariable (
+  VOID
+  )
+{
+  //
+  // Validate Console variable.
+  //
+  BdsFormalizeConsoleVariable (L"ConIn");
+  BdsFormalizeConsoleVariable (L"ConOut");
+  BdsFormalizeConsoleVariable (L"ErrOut");
+}
+
+/**
 
   Service routine for BdsInstance->Entry(). Devices are connected, the
   consoles are initialized, and the boot options are tried.
@@ -322,6 +428,11 @@ BdsEntry (
   // Fixup Tasble CRC after we updated Firmware Vendor and Revision
   //
   gBS->CalculateCrc32 ((VOID *)gST, sizeof(EFI_SYSTEM_TABLE), &gST->Hdr.CRC32);
+
+  //
+  // Validate Variable.
+  //
+  BdsFormalizeEfiGlobalVariable();
 
   //
   // Do the platform init, can be customized by OEM/IBV
