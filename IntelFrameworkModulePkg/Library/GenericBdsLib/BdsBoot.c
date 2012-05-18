@@ -812,6 +812,12 @@ BdsLibBootViaBootOption (
     ImageInfo->LoadOptionsSize  = Option->LoadOptionsSize;
     ImageInfo->LoadOptions      = Option->LoadOptions;
   }
+
+  //
+  // Clean to NULL because the image is loaded directly from the firmwares boot manager.
+  //
+  ImageInfo->ParentHandle = NULL;
+
   //
   // Before calling the image, enable the Watchdog Timer for
   // the 5 Minute period
