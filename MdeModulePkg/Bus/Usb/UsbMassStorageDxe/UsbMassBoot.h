@@ -2,7 +2,7 @@
   Definition of the command set of USB Mass Storage Specification
   for Bootability, Revision 1.0.
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -309,6 +309,47 @@ UsbBootWriteBlocks (
   IN  UINTN                   TotalBlock,
   IN  UINT8                   *Buffer
   );
+
+/**
+  Read some blocks from the device by SCSI 16 byte cmd.
+
+  @param  UsbMass                The USB mass storage device to read from
+  @param  Lba                    The start block number
+  @param  TotalBlock             Total block number to read
+  @param  Buffer                 The buffer to read to
+
+  @retval EFI_SUCCESS            Data are read into the buffer
+  @retval Others                 Failed to read all the data
+
+**/
+EFI_STATUS
+UsbBootReadBlocks16 (
+  IN  USB_MASS_DEVICE       *UsbMass,
+  IN  UINT64                Lba,
+  IN  UINTN                 TotalBlock,
+  OUT UINT8                 *Buffer
+  );
+
+/**
+  Write some blocks to the device by SCSI 16 byte cmd.
+
+  @param  UsbMass                The USB mass storage device to write to
+  @param  Lba                    The start block number
+  @param  TotalBlock             Total block number to write
+  @param  Buffer                 Pointer to the source buffer for the data.
+
+  @retval EFI_SUCCESS            Data are written into the buffer
+  @retval Others                 Failed to write all the data
+
+**/
+EFI_STATUS
+UsbBootWriteBlocks16 (
+  IN  USB_MASS_DEVICE         *UsbMass,
+  IN  UINT64                  Lba,
+  IN  UINTN                   TotalBlock,
+  IN  UINT8                   *Buffer
+  );
+
 
 /**
   Use the USB clear feature control transfer to clear the endpoint stall condition.
