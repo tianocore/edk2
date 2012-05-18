@@ -1,7 +1,7 @@
 /** @file
 Private MACRO, structure and function definitions for Setup Browser module.
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -299,6 +299,14 @@ typedef struct {
 
 #define FORM_EXPRESSION_FROM_LINK(a)  CR (a, FORM_EXPRESSION, Link, FORM_EXPRESSION_SIGNATURE)
 
+#define FORM_EXPRESSION_LIST_SIGNATURE  SIGNATURE_32 ('F', 'E', 'X', 'R')
+
+typedef struct {
+    UINTN               Signature;
+    UINTN               Count;
+    FORM_EXPRESSION    *Expression[1];   // Array[Count] of expressions
+} FORM_EXPRESSION_LIST;
+
 #define QUESTION_DEFAULT_SIGNATURE  SIGNATURE_32 ('Q', 'D', 'F', 'T')
 
 typedef struct {
@@ -316,18 +324,32 @@ typedef struct {
 #define QUESTION_OPTION_SIGNATURE  SIGNATURE_32 ('Q', 'O', 'P', 'T')
 
 typedef struct {
-  UINTN               Signature;
-  LIST_ENTRY          Link;
+  UINTN                Signature;
+  LIST_ENTRY           Link;
 
-  EFI_STRING_ID       Text;
-  UINT8               Flags;
-  EFI_HII_VALUE       Value;
-  EFI_IMAGE_ID        ImageId;
+  EFI_STRING_ID        Text;
+  UINT8                Flags;
+  EFI_HII_VALUE        Value;
+  EFI_IMAGE_ID         ImageId;
 
-  FORM_EXPRESSION     *SuppressExpression; // Non-NULL indicates nested inside of SuppressIf
+  FORM_EXPRESSION_LIST *SuppressExpression; // Non-NULL indicates nested inside of SuppressIf
 } QUESTION_OPTION;
 
 #define QUESTION_OPTION_FROM_LINK(a)  CR (a, QUESTION_OPTION, Link, QUESTION_OPTION_SIGNATURE)
+
+typedef enum {
+  ExpressFalse = 0,
+  ExpressGrayOut,  
+  ExpressSuppress,
+  ExpressDisable
+} EXPRESS_RESULT;
+
+typedef enum {
+  ExpressNone = 0,
+  ExpressForm,  
+  ExpressStatement,
+  ExpressOption
+} EXPRESS_LEVEL;
 
 #define FORM_BROWSER_STATEMENT_SIGNATURE  SIGNATURE_32 ('F', 'S', 'T', 'A')
 
@@ -390,9 +412,7 @@ typedef struct {
 
   LIST_ENTRY            InconsistentListHead;// nested inconsistent expression list (FORM_EXPRESSION)
   LIST_ENTRY            NoSubmitListHead;    // nested nosubmit expression list (FORM_EXPRESSION)
-  FORM_EXPRESSION       *GrayOutExpression;  // nesting inside of GrayOutIf
-  FORM_EXPRESSION       *SuppressExpression; // nesting inside of SuppressIf
-  FORM_EXPRESSION       *DisableExpression;  // nesting inside of DisableIf
+  FORM_EXPRESSION_LIST  *Expression;         // nesting inside of GrayOutIf/DisableIf/SuppressIf
 
   FORM_EXPRESSION       *ReadExpression;     // nested EFI_IFR_READ, provide this question value by read expression.
   FORM_EXPRESSION       *WriteExpression;    // nested EFI_IFR_WRITE, evaluate write expression after this question value is set.
@@ -417,24 +437,24 @@ typedef struct {
 #define STANDARD_MAP_FORM_TYPE 0x01
 
 typedef struct {
-  UINTN             Signature;
-  LIST_ENTRY        Link;
+  UINTN                Signature;
+  LIST_ENTRY           Link;
 
-  UINT16            FormId;               // FormId of normal form or formmap form.
-  EFI_STRING_ID     FormTitle;            // FormTile of normal form, or FormMapMethod title of formmap form.
-  UINT16            FormType;             // Specific form type for the different form.
+  UINT16               FormId;               // FormId of normal form or formmap form.
+  EFI_STRING_ID        FormTitle;            // FormTile of normal form, or FormMapMethod title of formmap form.
+  UINT16               FormType;             // Specific form type for the different form.
 
-  EFI_IMAGE_ID      ImageId;
+  EFI_IMAGE_ID         ImageId;
 
-  BOOLEAN           ModalForm;            // Whether this is a modal form.
-  BOOLEAN           Locked;               // Whether this form is locked.
+  BOOLEAN              ModalForm;            // Whether this is a modal form.
+  BOOLEAN              Locked;               // Whether this form is locked.
 
-  BOOLEAN           NvUpdateRequired;     // Whether this form has NV update request.
+  BOOLEAN              NvUpdateRequired;     // Whether this form has NV update request.
 
-  LIST_ENTRY        ExpressionListHead;   // List of Expressions (FORM_EXPRESSION)
-  LIST_ENTRY        StatementListHead;    // List of Statements and Questions (FORM_BROWSER_STATEMENT)
-  LIST_ENTRY        ConfigRequestHead;    // List of configreques for all storage.
-  FORM_EXPRESSION   *SuppressExpression;  // nesting inside of SuppressIf
+  LIST_ENTRY           ExpressionListHead;   // List of Expressions (FORM_EXPRESSION)
+  LIST_ENTRY           StatementListHead;    // List of Statements and Questions (FORM_BROWSER_STATEMENT)
+  LIST_ENTRY           ConfigRequestHead;    // List of configreques for all storage.
+  FORM_EXPRESSION_LIST *SuppressExpression;  // nesting inside of SuppressIf
 } FORM_BROWSER_FORM;
 
 #define FORM_BROWSER_FORM_FROM_LINK(a)  CR (a, FORM_BROWSER_FORM, Link, FORM_BROWSER_FORM_SIGNATURE)

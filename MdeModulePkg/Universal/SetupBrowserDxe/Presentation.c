@@ -1,7 +1,7 @@
 /** @file
 Utility functions for UI presentation.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -468,7 +468,6 @@ DisplayForm (
   CHAR16                 *StringPtr;
   UINT16                 MenuItemCount;
   EFI_HII_HANDLE         Handle;
-  BOOLEAN                Suppress;
   EFI_SCREEN_DESCRIPTOR  LocalScreen;
   UINT16                 Width;
   UINTN                  ArrayEntry;
@@ -521,17 +520,7 @@ DisplayForm (
   while (!IsNull (&Selection->Form->StatementListHead, Link)) {
     Statement = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
 
-    if (Statement->SuppressExpression != NULL) {
-      Suppress = Statement->SuppressExpression->Result.Value.b;
-    } else {
-      Suppress = FALSE;
-    }
-
-    if (Statement->DisableExpression != NULL) {
-      Suppress = (BOOLEAN) (Suppress || Statement->DisableExpression->Result.Value.b);
-    }
-
-    if (!Suppress) {
+    if (EvaluateExpressionList(Statement->Expression, FALSE, NULL, NULL) <= ExpressGrayOut) {
       StringPtr = GetToken (Statement->Prompt, Handle);
       ASSERT (StringPtr != NULL);
 
@@ -1220,11 +1209,8 @@ ProcessCallBackFunction (
     //
     // Check whether Statement is disabled.
     //
-    if (Statement->DisableExpression != NULL) {
-      Status = EvaluateExpression (Selection->FormSet, Selection->Form, Statement->DisableExpression);
-      if (!EFI_ERROR (Status) && 
-          (Statement->DisableExpression->Result.Type == EFI_IFR_TYPE_BOOLEAN) && 
-          (Statement->DisableExpression->Result.Value.b)) {
+    if (Statement->Expression != NULL) {
+      if (EvaluateExpressionList(Statement->Expression, TRUE, Selection->FormSet, Selection->Form) == ExpressDisable) {
         continue;
       }
     }
@@ -1424,13 +1410,7 @@ SetupBrowser (
     // Check Form is suppressed.
     //
     if (Selection->Form->SuppressExpression != NULL) {
-      Status = EvaluateExpression (Selection->FormSet, Selection->Form, Selection->Form->SuppressExpression);
-      if (EFI_ERROR (Status) || (Selection->Form->SuppressExpression->Result.Type != EFI_IFR_TYPE_BOOLEAN)) {
-        Status = EFI_INVALID_PARAMETER;
-        goto Done;
-      }
-
-      if (Selection->Form->SuppressExpression->Result.Value.b) {
+      if (EvaluateExpressionList(Selection->Form->SuppressExpression, TRUE, Selection->FormSet, Selection->Form) == ExpressSuppress) {
         //
         // Form is suppressed. 
         //
