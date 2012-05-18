@@ -3,7 +3,7 @@
   by HII Thunk Modules. These Config access Protocols are used to thunk UEFI Config 
   Access Callback to Framework HII Callback and EFI Variable Set/Get operations.
   
-Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -74,9 +74,12 @@ GetFirstStorageOfFormSet (
 
   StorageList = GetFirstNode (&FormSet->StorageListHead);
 
-  if (!IsNull (&FormSet->StorageListHead, StorageList)) {
+  while (!IsNull (&FormSet->StorageListHead, StorageList)) {
     Storage = FORMSET_STORAGE_FROM_LINK (StorageList);
-    return Storage;
+    if (Storage->Type == EFI_HII_VARSTORE_BUFFER) {
+      return Storage;
+    }
+    StorageList = GetNextNode (&FormSet->StorageListHead, StorageList);
   }
   
   return NULL;
@@ -155,6 +158,10 @@ GetStorageFromConfigString (
 
   while (!IsNull (&FormSet->StorageListHead, StorageList)) {
     Storage = FORMSET_STORAGE_FROM_LINK (StorageList);
+    StorageList = GetNextNode (&FormSet->StorageListHead, StorageList);
+    if (Storage->Type != EFI_HII_VARSTORE_BUFFER) {
+      continue;
+    }
 
     if ((Storage->VarStoreId == FormSet->DefaultVarStoreId) && (FormSet->OriginalDefaultVarStoreName != NULL)) {
       Name = FormSet->OriginalDefaultVarStoreName;
@@ -165,8 +172,6 @@ GetStorageFromConfigString (
     if (HiiIsConfigHdrMatch (ConfigString, &Storage->Guid, Name)) {
       return Storage;
     }
-
-    StorageList = GetNextNode (&FormSet->StorageListHead, StorageList);
   }
 
   return NULL;
@@ -474,6 +479,12 @@ ThunkExtractConfig (
       }
       BufferStorage = FORMSET_STORAGE_FROM_LINK (StorageList);
       StorageList = GetNextNode (&FormSetContext->StorageListHead, StorageList);
+      if (BufferStorage->Type != EFI_HII_VARSTORE_BUFFER) {
+        //
+        // BufferStorage type should be EFI_HII_VARSTORE_BUFFER
+        //
+        continue;
+      }
     }
   
     VarStoreName     = NULL;
