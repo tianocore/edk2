@@ -1,7 +1,7 @@
 /** @file
   The logic to process capsule.
 
-Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -300,13 +300,14 @@ ValidateCapsuleIntegrity (
         }
         CapsuleCount ++;
         CapsuleSize = CapsuleHeader->CapsuleImageSize;
-      } else {
-        if (CapsuleSize >= Ptr->Length) {
-          CapsuleSize = CapsuleSize - Ptr->Length;
-        } else {
-          CapsuleSize = 0;
-        }
       }
+
+      if (CapsuleSize >= Ptr->Length) {
+        CapsuleSize = CapsuleSize - Ptr->Length;
+      } else {
+        CapsuleSize = 0;
+      }
+
       //
       // Move to next BLOCK descriptor
       //
@@ -314,9 +315,9 @@ ValidateCapsuleIntegrity (
     }
   }
 
-  if (CapsuleCount == 0) {
+  if ((CapsuleCount == 0) || (CapsuleSize != 0)) {
     //
-    // No any capsule is found in BlockList.
+    // No any capsule is found in BlockList or capsule data is corrupted.
     //
     return NULL;
   }
@@ -407,12 +408,11 @@ RelocateBlockDescriptors (
         }
 
         CopyMem ((VOID *) RelocBuffer, (VOID *) (UINTN) TempBlockDesc->Union.DataBlock, (UINTN) TempBlockDesc->Length);
-        TempBlockDesc->Union.DataBlock = (EFI_PHYSICAL_ADDRESS) (UINTN) RelocBuffer;
-
         DEBUG ((EFI_D_INFO, "Capsule relocate descriptors from/to/size  0x%X 0x%X 0x%X\n", (UINT32)(UINTN)TempBlockDesc->Union.DataBlock, (UINT32)(UINTN)RelocBuffer, (UINT32)(UINTN)TempBlockDesc->Length));
+        TempBlockDesc->Union.DataBlock = (EFI_PHYSICAL_ADDRESS) (UINTN) RelocBuffer;
       }
+      TempBlockDesc++;
     }
-    TempBlockDesc++;
   }
   //
   // Now go through all the block descriptors to make sure that they're not
@@ -719,32 +719,26 @@ BuildCapsuleDescriptors (
   Index             = 0;
 
   while (BlockListBuffer[Index] != 0) {
-    if (Index == 0) {
-      //
-      // For the first Capsule Image, test integrity of descriptors.
-      //
-      LastBlock = ValidateCapsuleIntegrity ((EFI_CAPSULE_BLOCK_DESCRIPTOR *)(UINTN)BlockListBuffer[Index]);
+    //
+    // Test integrity of descriptors.
+    //
+    TempBlock = ValidateCapsuleIntegrity ((EFI_CAPSULE_BLOCK_DESCRIPTOR *)(UINTN)BlockListBuffer[Index]);
+    if (TempBlock != NULL) {
       if (LastBlock == NULL) {
-        return EFI_NOT_FOUND;
+        LastBlock = TempBlock;
+
+        //
+        // Return the base of the block descriptors
+        //
+        HeadBlock = (EFI_CAPSULE_BLOCK_DESCRIPTOR *)(UINTN)BlockListBuffer[Index];
+      } else {
+        //
+        // Combine the different BlockList into single BlockList.
+        //
+        LastBlock->Union.DataBlock = (EFI_PHYSICAL_ADDRESS)(UINTN)BlockListBuffer[Index];
+        LastBlock->Length          = 0;
+        LastBlock                  = TempBlock;
       }
-      //
-      // Return the base of the block descriptors
-      //
-      HeadBlock = (EFI_CAPSULE_BLOCK_DESCRIPTOR *)(UINTN)BlockListBuffer[Index];
-    } else {        
-      //
-      // Test integrity of descriptors.
-      //
-      TempBlock = ValidateCapsuleIntegrity ((EFI_CAPSULE_BLOCK_DESCRIPTOR *)(UINTN)BlockListBuffer[Index]);
-      if (TempBlock == NULL) {
-        return EFI_NOT_FOUND;
-      }
-      //
-      // Combine the different BlockList into single BlockList.
-      //
-      LastBlock->Union.DataBlock = (EFI_PHYSICAL_ADDRESS)(UINTN)BlockListBuffer[Index];
-      LastBlock->Length          = 0;
-      LastBlock                  = TempBlock;
     }
     Index ++;
   }
@@ -945,7 +939,7 @@ CapsuleDataCoalesce (
   DestPtr         = FreeMemBase + FreeMemSize - CapsuleSize;
   DestPtr         = (UINT8 *) ((UINTN) DestPtr &~ (UINTN) (sizeof (UINTN) - 1));
   FreeMemBase     = (UINT8 *) BlockList + DescriptorsSize;
-  FreeMemSize     = FreeMemSize - DescriptorsSize - CapsuleSize;
+  FreeMemSize     = (UINTN) DestPtr - (UINTN) FreeMemBase;
   NewCapsuleBase  = (VOID *) DestPtr;
 
   //
@@ -1017,58 +1011,37 @@ CapsuleDataCoalesce (
           //
           IsCorrupted  = FALSE;
           CapsuleImageSize += SizeLeft;
-          CopyMem ((VOID *) DestPtr, (VOID *) (UINTN) CurrentBlockDesc->Union.DataBlock, (UINTN) CurrentBlockDesc->Length);
-          DEBUG ((EFI_D_INFO, "Capsule coalesce block no.0x%8X from 0x%8lX to 0x%8lX with size 0x%8X\n",CapsuleTimes,
-                 (UINTN)CurrentBlockDesc->Union.DataBlock, (UINTN)DestPtr, (UINTN)CurrentBlockDesc->Length));
           //
           // Cache the begin offset of this capsule
           //
           CapsuleOffset[CapsuleIndex++] = (UINT32) (UINTN) DestPtr - (UINT32)(UINTN)NewCapsuleBase - (UINT32)sizeof(EFI_CAPSULE_PEIM_PRIVATE_DATA);
+        }
+      }
+
+      if (CurrentBlockDesc->Length < SizeLeft) {
+        if (!IsCorrupted) {
+          CopyMem ((VOID *) DestPtr, (VOID *) (UINTN) (CurrentBlockDesc->Union.DataBlock), (UINTN)CurrentBlockDesc->Length);
+          DEBUG ((EFI_D_INFO, "Capsule coalesce block no.0x%8X from 0x%8lX to 0x%8lX with size 0x%8X\n",CapsuleTimes,
+                 (UINTN)CurrentBlockDesc->Union.DataBlock, (UINTN)DestPtr, (UINTN)CurrentBlockDesc->Length));
           DestPtr += CurrentBlockDesc->Length;
         }
-        //
-        // If the current block length is greater than or equal to SizeLeft, this is the 
-        // start of the next capsule
-        //
-        if (CurrentBlockDesc->Length < SizeLeft) {
-          SizeLeft -= CurrentBlockDesc->Length;
-        } else {
-          //
-          // Start the next cycle
-          //
-          SizeLeft         = 0;
-          IsCorrupted      = TRUE;
-          CapsuleBeginFlag = TRUE;          
-        }
+        SizeLeft -= CurrentBlockDesc->Length;
       } else {
         //
-        //Go on relocating the current capule image.
+        //Here is the end of the current capsule image.
         //
-        if (CurrentBlockDesc->Length < SizeLeft) {
-          if (!IsCorrupted) {
-            CopyMem ((VOID *) DestPtr, (VOID *) (UINTN) (CurrentBlockDesc->Union.DataBlock), (UINTN)CurrentBlockDesc->Length);
-            DEBUG ((EFI_D_INFO, "Capsule coalesce block no.0x%8X from 0x%8lX to 0x%8lX with size 0x%8X\n",CapsuleTimes,
-                   (UINTN)CurrentBlockDesc->Union.DataBlock, (UINTN)DestPtr, (UINTN)CurrentBlockDesc->Length));
-            DestPtr += CurrentBlockDesc->Length;
-          }
-          SizeLeft -= CurrentBlockDesc->Length;
-        } else {
-          //
-          //Here is the end of the current capsule image.
-          //
-          if (!IsCorrupted) {
-            CopyMem ((VOID *) DestPtr, (VOID *)(UINTN)(CurrentBlockDesc->Union.DataBlock), (UINTN)CurrentBlockDesc->Length);
-            DEBUG ((EFI_D_INFO, "Capsule coalesce block no.0x%8X from 0x%8lX to 0x%8lX with size 0x%8X\n",CapsuleTimes,
-                   (UINTN)CurrentBlockDesc->Union.DataBlock, (UINTN)DestPtr, (UINTN)CurrentBlockDesc->Length));
-            DestPtr += CurrentBlockDesc->Length;
-          }
-          //
-          // Start the next cycle
-          //
-          SizeLeft = 0;
-          IsCorrupted = TRUE;
-          CapsuleBeginFlag = TRUE; 
+        if (!IsCorrupted) {
+          CopyMem ((VOID *) DestPtr, (VOID *)(UINTN)(CurrentBlockDesc->Union.DataBlock), (UINTN) SizeLeft);
+          DEBUG ((EFI_D_INFO, "Capsule coalesce block no.0x%8X from 0x%8lX to 0x%8lX with size 0x%8X\n",CapsuleTimes,
+                 (UINTN)CurrentBlockDesc->Union.DataBlock, (UINTN)DestPtr, (UINTN) SizeLeft));
+          DestPtr += SizeLeft;
         }
+        //
+        // Start the next cycle
+        //
+        SizeLeft = 0;
+        IsCorrupted = TRUE;
+        CapsuleBeginFlag = TRUE; 
       }
     } else {
       //
@@ -1086,7 +1059,7 @@ CapsuleDataCoalesce (
   // We return the base of memory we want reserved, and the size.
   // The memory peim should handle it appropriately from there.
   //
-  *MemorySize = (UINTN) CapsuleImageSize;
+  *MemorySize = (UINTN) CapsuleSize;
   *MemoryBase = (VOID *) NewCapsuleBase;
 
   //
