@@ -125,6 +125,53 @@ PeimInitializeDxeIpl (
 }
 
 /**
+   Validate variable data for the MemoryTypeInformation. 
+
+   @param MemoryData       Variable data.
+   @param MemoryDataSize   Variable data length.
+
+   @return TRUE            The variable data is valid.
+   @return FALSE           The variable data is invalid.
+
+**/
+BOOLEAN
+ValidateMemoryTypeInfoVariable (
+  IN EFI_MEMORY_TYPE_INFORMATION      *MemoryData,
+  IN UINTN                            MemoryDataSize
+  )
+{
+  UINTN                       Count;
+  UINTN                       Index;
+
+  // Check the input parameter.
+  if (MemoryData == NULL) {
+    return FALSE;
+  }
+
+  // Get Count
+  Count = MemoryDataSize / sizeof (*MemoryData);
+
+  // Check Size
+  if (Count * sizeof(*MemoryData) != MemoryDataSize) {
+    return FALSE;
+  }
+
+  // Check last entry type filed.
+  if (MemoryData[Count - 1].Type != EfiMaxMemoryType) {
+    return FALSE;
+  }
+
+  // Check the type filed.
+  for (Index = 0; Index < Count - 1; Index++) {
+    if (MemoryData[Index].Type >= EfiMaxMemoryType) {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+/**
    Main entry point to last PEIM. 
 
    This function finds DXE Core in the firmware volume and transfer the control to
@@ -214,7 +261,7 @@ DxeLoadCore (
                          &DataSize,
                          &MemoryData
                          );
-    if (!EFI_ERROR (Status)) {
+    if (!EFI_ERROR (Status) && ValidateMemoryTypeInfoVariable(MemoryData, DataSize)) {
       //
       // Build the GUID'd HOB for DXE
       //
