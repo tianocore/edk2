@@ -1,7 +1,7 @@
 /** @file
   UEFI Memory pool management functions.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -167,7 +167,7 @@ LookupPoolHead (
   @param  Buffer                 The address to return a pointer to the allocated
                                  pool
 
-  @retval EFI_INVALID_PARAMETER  PoolType not valid
+  @retval EFI_INVALID_PARAMETER  PoolType not valid or Buffer is NULL. 
   @retval EFI_OUT_OF_RESOURCES   Size exceeds max pool size or allocation failed.
   @retval EFI_SUCCESS            Pool successfully allocated.
 
@@ -187,6 +187,10 @@ CoreAllocatePool (
   //
   if ((PoolType >= EfiMaxMemoryType && PoolType <= 0x7fffffff) ||
        PoolType == EfiConventionalMemory) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 

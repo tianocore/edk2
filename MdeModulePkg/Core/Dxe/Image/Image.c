@@ -1353,6 +1353,7 @@ CoreLoadImage (
 {
   EFI_STATUS    Status;
   UINT64        Tick;
+  EFI_HANDLE    Handle;
 
   Tick = 0;
   PERF_CODE (
@@ -1372,8 +1373,16 @@ CoreLoadImage (
              EFI_LOAD_PE_IMAGE_ATTRIBUTE_RUNTIME_REGISTRATION | EFI_LOAD_PE_IMAGE_ATTRIBUTE_DEBUG_IMAGE_INFO_TABLE_REGISTRATION
              );
 
-  PERF_START (*ImageHandle, "LoadImage:", NULL, Tick);
-  PERF_END (*ImageHandle, "LoadImage:", NULL, 0);
+  Handle = NULL; 
+  if (!EFI_ERROR (Status)) {
+    //
+    // ImageHandle will be valid only Status is success. 
+    //
+    Handle = *ImageHandle;
+  }
+
+  PERF_START (Handle, "LoadImage:", NULL, Tick);
+  PERF_END (Handle, "LoadImage:", NULL, 0);
 
   return Status;
 }
