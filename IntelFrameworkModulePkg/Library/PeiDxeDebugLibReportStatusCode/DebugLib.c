@@ -258,44 +258,71 @@ DebugAssert (
 {
   UINT64                 Buffer[EFI_STATUS_CODE_DATA_MAX_SIZE / sizeof(UINT64)];
   EFI_DEBUG_ASSERT_DATA  *AssertData;
+  UINTN                  HeaderSize;
   UINTN                  TotalSize;
   CHAR8                  *Temp;
   UINTN                  FileNameSize;
   UINTN                  DescriptionSize;
 
   //
-  // Make sure it will all fit in the passed in buffer
+  // Get string size
   //
-  FileNameSize    = AsciiStrSize (FileName);
-  DescriptionSize = AsciiStrSize (Description);
-  TotalSize = sizeof (EFI_DEBUG_ASSERT_DATA) + FileNameSize + DescriptionSize;
-  if (TotalSize <= sizeof (Buffer)) {
-    //
-    // Fill in EFI_DEBUG_ASSERT_DATA
-    //
-    AssertData = (EFI_DEBUG_ASSERT_DATA *)Buffer;
-    AssertData->LineNumber = (UINT32)LineNumber;
+  HeaderSize       = sizeof (EFI_DEBUG_ASSERT_DATA);
+  FileNameSize     = AsciiStrSize (FileName);
+  DescriptionSize  = AsciiStrSize (Description);
 
+  //
+  // Make sure it will all fit in the passed in buffer.
+  //
+  if (HeaderSize + FileNameSize + DescriptionSize > sizeof (Buffer)) {
     //
-    // Copy Ascii FileName including NULL.
+    // FileName + Description is too long to be filled into buffer. 
     //
-    Temp = AsciiStrCpy ((CHAR8 *)(AssertData + 1), FileName);
-
-    //
-    // Copy Ascii Description
-    //
-    AsciiStrCpy (Temp + FileNameSize, Description);
-
-    REPORT_STATUS_CODE_EX (
-      (EFI_ERROR_CODE | EFI_ERROR_UNRECOVERED),
-      (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_EC_ILLEGAL_SOFTWARE_STATE),
-      0,
-      NULL,
-      NULL,
-      AssertData,
-      TotalSize
-      );
+    if (HeaderSize + FileNameSize < sizeof (Buffer)) {
+      //
+      // Description has enough buffer to be truncated. 
+      //
+      DescriptionSize = sizeof (Buffer) - HeaderSize - FileNameSize;
+    } else {
+      //
+      // FileName is too long to be filled into buffer.
+      // FileName will be truncated. Reserved one byte for Description NULL terminator.
+      //
+      DescriptionSize = 1;
+      FileNameSize    = sizeof (Buffer) - HeaderSize - DescriptionSize;
+    }
   }
+ 
+  //
+  // Fill in EFI_DEBUG_ASSERT_DATA
+  //
+  AssertData = (EFI_DEBUG_ASSERT_DATA *)Buffer;
+  AssertData->LineNumber = (UINT32)LineNumber;
+  TotalSize  = sizeof (EFI_DEBUG_ASSERT_DATA);
+
+  //
+  // Copy Ascii FileName including NULL terminator.
+  //
+  Temp = AsciiStrnCpy ((CHAR8 *)(AssertData + 1), FileName, FileNameSize);
+  Temp[FileNameSize - 1] = 0;
+  TotalSize += FileNameSize;
+
+  //
+  // Copy Ascii Description include NULL terminator.
+  //
+  Temp = AsciiStrnCpy (Temp + FileNameSize, Description, DescriptionSize);
+  Temp[DescriptionSize - 1] = 0;
+  TotalSize += DescriptionSize;
+
+  REPORT_STATUS_CODE_EX (
+    (EFI_ERROR_CODE | EFI_ERROR_UNRECOVERED),
+    (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_EC_ILLEGAL_SOFTWARE_STATE),
+    0,
+    NULL,
+    NULL,
+    AssertData,
+    TotalSize
+    );
 
   //
   // Generate a Breakpoint, DeadLoop, or NOP based on PCD settings
