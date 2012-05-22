@@ -2,7 +2,7 @@
   This file contains just some basic definitions that are needed by drivers
   that dealing with ATA/ATAPI interface.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -472,6 +472,18 @@ typedef union {
 #define ATA_CMD_READ_CAPACITY               0x25   ///< defined in ATAPI Removable Rewritable Media Devcies
 #define ATA_CMD_READ_10                     0x28   ///< defined in ATAPI Removable Rewritable Media Devcies
 #define ATA_CMD_WRITE_10                    0x2A   ///< defined in ATAPI Removable Rewritable Media Devcies
+#define ATA_CMD_READ_12                     0xA8   ///< defined in ATAPI Removable Rewritable Media Devcies
+#define ATA_CMD_WRITE_12                    0xAA   ///< defined in ATAPI Removable Rewritable Media Devcies
+#define ATA_CMD_START_STOP_UNIT             0x1B   ///< defined in ATAPI Removable Rewritable Media Devcies
+///
+/// Start/Stop and Eject Operations
+///
+///@{
+#define   ATA_CMD_SUBOP_STOP_DISC           0x00   ///< Stop the Disc
+#define   ATA_CMD_SUBOP_START_DISC          0x01   ///< Start the Disc and acquire the format type
+#define   ATA_CMD_SUBOP_EJECT_DISC          0x02   ///< Eject the Disc if possible
+#define   ATA_CMD_SUBOP_CLOSE_TRAY          0x03   ///< Load the Disc (Close Tray)
+///@}
 
 //
 // ATA Commands Code
