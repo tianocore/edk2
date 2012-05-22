@@ -1,0 +1,20 @@
+## @file
+# This package provides binary device drivers to support the FAT32 file system. This package is separated from other packages because it uses a different license. 
+#
+# This package provides FAT drivers which are not licensed under BSD.
+# Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+#
+#    This program and the accompanying materials are licensed and made available 
+#    under the terms and conditions of the BSD License which accompanies this distribution.
+#    The full text of the license may be found at http://opensource.org/licenses/bsd-license.php
+#    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES
+#    OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = FatBinPkg
+  PACKAGE_GUID                   = EEAC1173-A27D-4c1a-958F-0A7F21C0FFA0
+  PACKAGE_VERSION                = 0.2
+
