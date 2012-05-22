@@ -3335,8 +3335,9 @@ NotificationFunction(
   )
 {
   EFI_INPUT_KEY Key;
-  if ((KeyData->Key.UnicodeChar == L'c' || KeyData->Key.UnicodeChar == 3) &&
-      (KeyData->KeyState.KeyShiftState == (EFI_SHIFT_STATE_VALID|EFI_LEFT_CONTROL_PRESSED) || KeyData->KeyState.KeyShiftState  == (EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED))
+  if ( ((KeyData->Key.UnicodeChar == L'c') &&
+        (KeyData->KeyState.KeyShiftState == (EFI_SHIFT_STATE_VALID|EFI_LEFT_CONTROL_PRESSED) || KeyData->KeyState.KeyShiftState  == (EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED))) ||
+      (KeyData->Key.UnicodeChar == 3)
       ){ 
     if (ShellInfoObject.NewEfiShellProtocol->ExecutionBreak == NULL) {
       return (EFI_UNSUPPORTED);
