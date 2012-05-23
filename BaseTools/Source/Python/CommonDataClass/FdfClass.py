@@ -249,6 +249,7 @@ class GuidSectionClassObject (SectionClassObject) :
         self.SectionType = None
         self.ProcessRequired = False
         self.AuthStatusValid = False
+        self.ExtraHeaderSize = -1
         self.FvAddr = []
         self.FvParentAddr = None
         self.IncludeFvSection = False

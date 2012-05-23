@@ -852,6 +852,21 @@ class DscBuildData(PlatformBuildClassObject):
                     EdkLogger.error('build', PARSER_ERROR,
                                     "Pcd (%s.%s) defined in DSC is not declared in DEC files." % (TokenSpaceGuid, PcdCName),
                                     File=self.MetaFile, Line=Dummy4)
+                PcdValue = ''
+                if PcdType in (MODEL_PCD_DYNAMIC_VPD, MODEL_PCD_DYNAMIC_EX_VPD):
+                    if DecPcds[PcdCName, TokenSpaceGuid].DatumType == "VOID*":
+                        PcdValue = AnalyzeVpdPcdData(Setting)[2]
+                    else:
+                        PcdValue = AnalyzeVpdPcdData(Setting)[1]
+                elif PcdType in (MODEL_PCD_DYNAMIC_HII, MODEL_PCD_DYNAMIC_EX_HII):
+                    PcdValue = AnalyzeHiiPcdData(Setting)[3]
+                else:
+                    PcdValue = AnalyzePcdData(Setting)[0]
+                if PcdValue:
+                    Valid, ErrStr = CheckPcdDatum(DecPcds[PcdCName, TokenSpaceGuid].DatumType, PcdValue)
+                    if not Valid:
+                        EdkLogger.error('build', FORMAT_INVALID, ErrStr, File=self.MetaFile, Line=Dummy4,
+                                    ExtraData="%s.%s" % (TokenSpaceGuid, PcdCName))
 
     _Macros             = property(_GetMacros)
     Arch                = property(_GetArch, _SetArch)

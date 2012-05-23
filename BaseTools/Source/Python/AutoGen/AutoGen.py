@@ -292,12 +292,12 @@ class WorkspaceAutoGen(AutoGen):
         for Arch in self.ArchList:
             Platform = self.BuildDatabase[self.MetaFile, Arch, Target, Toolchain]
 
-            DecPcds = set()
+            DecPcds = {}
             PGen = PlatformAutoGen(self, self.MetaFile, Target, Toolchain, Arch)
             Pkgs = PGen.PackageList
             for Pkg in Pkgs:
-                for Pcd in Pkg.Pcds.keys():
-                    DecPcds.add((Pcd[0], Pcd[1]))
+                for Pcd in Pkg.Pcds:
+                    DecPcds[Pcd[0], Pcd[1]] = Pkg.Pcds[Pcd]
             Platform.IsPlatformPcdDeclared(DecPcds)
 
             Platform.SkuName = self.SkuId

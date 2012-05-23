@@ -256,9 +256,12 @@ class ValueExpression(object):
             if self.__IsNumberToken():
                 return self._Expr
 
-            Token = self._GetToken()
-            if type(Token) == type('') and Token.startswith('{') and Token.endswith('}') and self._Idx >= self._Len:
-                return self._Expr
+            try:
+                Token = self._GetToken()
+                if type(Token) == type('') and Token.startswith('{') and Token.endswith('}') and self._Idx >= self._Len:
+                    return self._Expr
+            except BadExpression:
+                pass
 
             self._Idx = 0
             self._Token = ''

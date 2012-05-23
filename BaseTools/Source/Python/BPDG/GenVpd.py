@@ -226,7 +226,7 @@ class PcdEntry:
         
         for Index in xrange(len(ValueList)):
             Value = None
-            if ValueList[Index].startswith('0x'):
+            if ValueList[Index].lower().startswith('0x'):
                 # translate hex value
                 try:
                     Value = int(ValueList[Index], 16)

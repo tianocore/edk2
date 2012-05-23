@@ -2867,6 +2867,7 @@ class FdfParser:
             GuidSectionObj.SectionType = "GUIDED"
             GuidSectionObj.ProcessRequired = AttribDict["PROCESSING_REQUIRED"]
             GuidSectionObj.AuthStatusValid = AttribDict["AUTH_STATUS_VALID"]
+            GuidSectionObj.ExtraHeaderSize = AttribDict["EXTRA_HEADER_SIZE"]
             # Recursive sections...
             while True:
                 IsLeafSection = self.__GetLeafSection(GuidSectionObj)
@@ -2894,23 +2895,26 @@ class FdfParser:
         AttribDict = {}
         AttribDict["PROCESSING_REQUIRED"] = "NONE"
         AttribDict["AUTH_STATUS_VALID"] = "NONE"
-        if self.__IsKeyword("PROCESSING_REQUIRED") or self.__IsKeyword("AUTH_STATUS_VALID"):
+        AttribDict["EXTRA_HEADER_SIZE"] = -1
+        while self.__IsKeyword("PROCESSING_REQUIRED") or self.__IsKeyword("AUTH_STATUS_VALID") \
+            or self.__IsKeyword("EXTRA_HEADER_SIZE"):
             AttribKey = self.__Token
 
             if not self.__IsToken("="):
                 raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
 
-            if not self.__GetNextToken() or self.__Token.upper() not in ("TRUE", "FALSE", "1", "0"):
-                raise Warning("expected TRUE/FALSE (1/0)", self.FileName, self.CurrentLineNumber)
-            AttribDict[AttribKey] = self.__Token
-
-        if self.__IsKeyword("PROCESSING_REQUIRED") or self.__IsKeyword("AUTH_STATUS_VALID"):
-            AttribKey = self.__Token
-
-            if not self.__IsToken("="):
-                raise Warning("expected '='")
-
-            if not self.__GetNextToken() or self.__Token.upper() not in ("TRUE", "FALSE", "1", "0"):
+            if not self.__GetNextToken():
+                raise Warning("expected TRUE(1)/FALSE(0)/Number", self.FileName, self.CurrentLineNumber)
+            elif AttribKey == "EXTRA_HEADER_SIZE":
+                Base = 10
+                if self.__Token[0:2].upper() == "0X":
+                    Base = 16
+                try:
+                    AttribDict[AttribKey] = int(self.__Token, Base)
+                    continue
+                except ValueError:
+                    raise Warning("expected Number", self.FileName, self.CurrentLineNumber)
+            elif self.__Token.upper() not in ("TRUE", "FALSE", "1", "0"):
                 raise Warning("expected TRUE/FALSE (1/0)", self.FileName, self.CurrentLineNumber)
             AttribDict[AttribKey] = self.__Token
 
@@ -3712,6 +3716,7 @@ class FdfParser:
             GuidSectionObj.SectionType = "GUIDED"
             GuidSectionObj.ProcessRequired = AttribDict["PROCESSING_REQUIRED"]
             GuidSectionObj.AuthStatusValid = AttribDict["AUTH_STATUS_VALID"]
+            GuidSectionObj.ExtraHeaderSize = AttribDict["EXTRA_HEADER_SIZE"]
 
             # Efi sections...
             while True:

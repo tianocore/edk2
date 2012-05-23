@@ -785,7 +785,7 @@ Returns:
   Offset      = 0;
   FileBuffer  = NULL;
 
-  if (CompareGuid (VendorGuid, &mEfiCrc32SectionGuid) == 0) {
+  if (CompareGuid (VendorGuid, &mZeroGuid) == 0) {
     Offset = sizeof (CRC32_SECTION_HEADER);
   } else {
     Offset = sizeof (EFI_GUID_DEFINED_SECTION);
@@ -837,7 +837,7 @@ Returns:
   //
   // Now data is in FileBuffer + Offset
   //
-  if (CompareGuid (VendorGuid, &mEfiCrc32SectionGuid) == 0) {
+  if (CompareGuid (VendorGuid, &mZeroGuid) == 0) {
     //
     // Default Guid section is CRC32.
     //
@@ -1222,10 +1222,6 @@ Returns:
     VerboseMsg ("Compress method is %s", mCompressionTypeName [SectCompSubType]);
   } else if (stricmp (SectionName, mSectionTypeName[EFI_SECTION_GUID_DEFINED]) == 0) {
     SectType     = EFI_SECTION_GUID_DEFINED;
-
-    if (CompareGuid (&VendorGuid, &mZeroGuid) == 0) {
-      memcpy (&VendorGuid, &mEfiCrc32SectionGuid, sizeof (EFI_GUID));
-    }
     
     if ((SectGuidAttribute & EFI_GUIDED_SECTION_NONE) != 0) {
       //
@@ -1349,7 +1345,7 @@ Returns:
     break;
 
   case EFI_SECTION_GUID_DEFINED:
-    if (InputFileAlign != NULL && (CompareGuid (&VendorGuid, &mEfiCrc32SectionGuid) != 0)) {
+    if (InputFileAlign != NULL && (CompareGuid (&VendorGuid, &mZeroGuid) != 0)) {
       //
       // Only process alignment for the default known CRC32 guided section.
       // For the unknown guided section, the alignment is processed when the dummy all section (EFI_SECTION_ALL) is generated.

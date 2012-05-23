@@ -4506,12 +4506,12 @@ RELEASE_XCODE32_IA32_CC_FLAGS   = -arch i386 -Oz -combine -mms-bitfields  -fshor
 # X64 definitions - still a work in progress. This tool chain does not produce
 # the correct ABI, it is just used to compile the code....
 ##################
-*_XCODE32_X64_CC_PATH       = gcc-4.2
+*_XCODE32_X64_CC_PATH       = gcc
 *_XCODE32_X64_SLINK_PATH    = libtool
 *_XCODE32_X64_DLINK_PATH    = ld
 *_XCODE32_X64_ASM_PATH      = as
-*_XCODE32_X64_PP_PATH       = gcc-4.2
-*_XCODE32_X64_VFRPP_PATH    = gcc-4.2
+*_XCODE32_X64_PP_PATH       = gcc
+*_XCODE32_X64_VFRPP_PATH    = gcc
 *_XCODE32_X64_ASL_PATH     = iasl
 *_XCODE32_X64_ASLCC_PATH   = gcc
 *_XCODE32_X64_ASLPP_PATH   = gcc

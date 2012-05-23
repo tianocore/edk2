@@ -39,6 +39,7 @@ from Common.DataType import TAB_SLASH
 from Common.DataType import TAB_SPACE_SPLIT
 from Common.DataType import TAB_BRG_PCD
 from Common.DataType import TAB_BRG_LIBRARY
+from Common.DataType import TAB_BACK_SLASH
 
 ## Pattern to extract contents in EDK DXS files
 gDxsDependencyPattern = re.compile(r"DEPENDENCY_START(.+)DEPENDENCY_END", re.DOTALL)
@@ -191,11 +192,11 @@ def FileLinesSplit(Content=None, MaxLength=None):
         while len(Line.rstrip()) > MaxLength:
             LineSpaceIndex = Line.rfind(TAB_SPACE_SPLIT, 0, MaxLength)
             LineSlashIndex = Line.rfind(TAB_SLASH, 0, MaxLength)
-            LineBreakIndex = MaxLength
-            if LineSpaceIndex > LineSlashIndex:
-                LineBreakIndex = LineSpaceIndex
-            elif LineSlashIndex > LineSpaceIndex:
-                LineBreakIndex = LineSlashIndex
+            LineBackSlashIndex = Line.rfind(TAB_BACK_SLASH, 0, MaxLength)
+            if max(LineSpaceIndex, LineSlashIndex, LineBackSlashIndex) > 0:
+                LineBreakIndex = max(LineSpaceIndex, LineSlashIndex, LineBackSlashIndex)
+            else:
+                LineBreakIndex = MaxLength
             NewContentList.append(Line[:LineBreakIndex])
             Line = Line[LineBreakIndex:]
         if Line:

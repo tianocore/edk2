@@ -193,7 +193,10 @@ class GuidSection(GuidSectionClassObject) :
 
             Attribute = []
             HeaderLength = None
-            if self.ProcessRequired == "NONE":
+            if self.ExtraHeaderSize != -1:
+                HeaderLength = str(self.ExtraHeaderSize)
+
+            if self.ProcessRequired == "NONE" and HeaderLength == None:
                 if TempFileSize > InputFileSize and TempFileSize % 4 == 0:
                     FileHandleIn.seek(0)
                     BufferIn  = FileHandleIn.read()
@@ -218,7 +221,7 @@ class GuidSection(GuidSectionClassObject) :
             if self.ProcessRequired in ("TRUE", "1"):
                 if 'PROCESSING_REQUIRED' not in Attribute:
                     Attribute.append('PROCESSING_REQUIRED')
-                HeaderLength = None
+  
             if self.AuthStatusValid in ("TRUE", "1"):
                 Attribute.append('AUTH_STATUS_VALID')
             GenFdsGlobalVariable.GenerateSection(OutputFile, [TempFile], Section.Section.SectionType['GUIDED'],
