@@ -1,0 +1,473 @@
+%!PS-Adobe-3.0
+%%Creator: groff version 1.06
+%%DocumentNeededResources: font Times-Roman
+%%+ font Times-Italic
+%%+ font Courier
+%%DocumentSuppliedResources: procset grops 1.06 0
+%%Pages: 3
+%%PageOrder: Ascend
+%%Orientation: Portrait
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset grops 1.06 0
+
+/setpacking where {
+	pop
+	currentpacking
+	true setpacking
+} if
+
+/grops 120 dict dup begin 
+
+% The ASCII code of the space character.
+/SC 32 def
+
+/A /show load def
+/B { 0 SC 3 -1 roll widthshow } bind def
+/C { 0 exch ashow } bind def
+/D { 0 exch 0 SC 5 2 roll awidthshow } bind def
+/E { 0 rmoveto show } bind def
+/F { 0 rmoveto 0 SC 3 -1 roll widthshow } bind def
+/G { 0 rmoveto 0 exch ashow } bind def
+/H { 0 rmoveto 0 exch 0 SC 5 2 roll awidthshow } bind def
+/I { 0 exch rmoveto show } bind def
+/J { 0 exch rmoveto 0 SC 3 -1 roll widthshow } bind def
+/K { 0 exch rmoveto 0 exch ashow } bind def
+/L { 0 exch rmoveto 0 exch 0 SC 5 2 roll awidthshow } bind def
+/M { rmoveto show } bind def
+/N { rmoveto 0 SC 3 -1 roll widthshow } bind def
+/O { rmoveto 0 exch ashow } bind def
+/P { rmoveto 0 exch 0 SC 5 2 roll awidthshow } bind def
+/Q { moveto show } bind def 
+/R { moveto 0 SC 3 -1 roll widthshow } bind def
+/S { moveto 0 exch ashow } bind def
+/T { moveto 0 exch 0 SC 5 2 roll awidthshow } bind def
+
+% name size font SF -
+
+/SF {
+	findfont exch
+	[ exch dup 0 exch 0 exch neg 0 0 ] makefont
+	dup setfont
+	[ exch /setfont cvx ] cvx bind def
+} bind def
+
+% name a c d font MF -
+
+/MF {
+	findfont
+	[ 5 2 roll
+	0 3 1 roll % b
+	neg 0 0 ] makefont
+	dup setfont
+	[ exch /setfont cvx ] cvx bind def
+} bind def
+
+/level0 0 def
+/RES 0 def
+/PL 0 def
+/LS 0 def
+
+% Guess the page length.
+% This assumes that the imageable area is vertically centered on the page.
+% PLG - length
+
+/PLG {
+	gsave newpath clippath pathbbox grestore
+	exch pop add exch pop
+} bind def
+
+% BP -
+
+/BP {
+	/level0 save def
+	1 setlinecap
+	1 setlinejoin
+	72 RES div dup scale
+	LS {
+		90 rotate
+	} {
+		0 PL translate
+	} ifelse
+	1 -1 scale
+} bind def
+
+/EP {
+	level0 restore
+	showpage
+} bind def
+
+
+% centerx centery radius startangle endangle DA -
+
+/DA {
+	newpath arcn stroke
+} bind def
+
+% x y SN - x' y'
+% round a position to nearest (pixel + (.25,.25))
+
+/SN {
+	transform 
+	.25 sub exch .25 sub exch
+	round .25 add exch round .25 add exch
+	itransform
+} bind def
+	
+% endx endy startx starty DL -
+% we round the endpoints of the line, so that parallel horizontal
+% and vertical lines will appear even
+
+/DL {
+	SN
+	moveto
+	SN
+	lineto stroke
+} bind def
+
+% centerx centery radius DC -
+
+/DC {
+	newpath 0 360 arc closepath
+} bind def
+
+
+/TM matrix def
+
+%  width height centerx centery DE -
+
+/DE {
+	TM currentmatrix pop
+	translate scale newpath 0 0 .5 0 360 arc closepath
+	TM setmatrix
+} bind def
+
+% these are for splines
+
+/RC /rcurveto load def
+/RL /rlineto load def
+/ST /stroke load def
+/MT /moveto load def
+/CL /closepath load def
+
+% fill the last path
+
+% amount FL -
+
+/FL {
+	currentgray exch setgray fill setgray
+} bind def
+
+% fill with the ``current color''
+
+/BL /fill load def
+
+/LW /setlinewidth load def
+% new_font_name encoding_vector old_font_name RE -
+
+/RE {
+	findfont
+	dup maxlength dict begin
+	{
+		1 index /FID ne { def } { pop pop } ifelse
+	} forall
+	/Encoding exch def
+	dup /FontName exch def
+	currentdict end definefont pop
+} bind def
+
+/DEFS 0 def
+
+% hpos vpos EBEGIN -
+
+/EBEGIN {
+	moveto
+	DEFS begin
+} bind def
+
+/EEND /end load def
+
+/CNT 0 def
+/level1 0 def
+
+% llx lly newwid wid newht ht newllx newlly PBEGIN -
+
+/PBEGIN {
+	/level1 save def
+	translate
+	div 3 1 roll div exch scale
+	neg exch neg exch translate
+	% set the graphics state to default values
+	0 setgray
+	0 setlinecap
+	1 setlinewidth
+	0 setlinejoin
+	10 setmiterlimit
+	[] 0 setdash
+	/setstrokeadjust where {
+		pop
+		false setstrokeadjust
+	} if
+	/setoverprint where {
+		pop
+		false setoverprint
+	} if
+	newpath
+	/CNT countdictstack def
+	userdict begin
+	/showpage {} def
+} bind def
+
+/PEND {
+	clear
+	countdictstack CNT sub { end } repeat
+	level1 restore
+} bind def
+
+end def
+
+/setpacking where {
+	pop
+	setpacking
+} if
+%%EndResource
+%%IncludeResource: font Times-Roman
+%%IncludeResource: font Times-Italic
+%%IncludeResource: font Courier
+grops begin/DEFS 1 dict def DEFS begin/u{.001 mul}bind def end/RES 72 def/PL
+792 def/LS false def/ENC0[/asciicircum/asciitilde/Scaron/Zcaron/scaron/zcaron
+/Ydieresis/trademark/quotesingle/.notdef/.notdef/.notdef/.notdef/.notdef
+/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef
+/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/space
+/exclam/quotedbl/numbersign/dollar/percent/ampersand/quoteright/parenleft
+/parenright/asterisk/plus/comma/hyphen/period/slash/zero/one/two/three/four
+/five/six/seven/eight/nine/colon/semicolon/less/equal/greater/question/at/A/B/C
+/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W/X/Y/Z/bracketleft/backslash
+/bracketright/circumflex/underscore/quoteleft/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q
+/r/s/t/u/v/w/x/y/z/braceleft/bar/braceright/tilde/.notdef/quotesinglbase
+/guillemotleft/guillemotright/bullet/florin/fraction/perthousand/dagger
+/daggerdbl/endash/emdash/ff/fi/fl/ffi/ffl/dotlessi/dotlessj/grave/hungarumlaut
+/dotaccent/breve/caron/ring/ogonek/quotedblleft/quotedblright/oe/lslash
+/quotedblbase/OE/Lslash/.notdef/exclamdown/cent/sterling/currency/yen/brokenbar
+/section/dieresis/copyright/ordfeminine/guilsinglleft/logicalnot/minus
+/registered/macron/degree/plusminus/twosuperior/threesuperior/acute/mu
+/paragraph/periodcentered/cedilla/onesuperior/ordmasculine/guilsinglright
+/onequarter/onehalf/threequarters/questiondown/Agrave/Aacute/Acircumflex/Atilde
+/Adieresis/Aring/AE/Ccedilla/Egrave/Eacute/Ecircumflex/Edieresis/Igrave/Iacute
+/Icircumflex/Idieresis/Eth/Ntilde/Ograve/Oacute/Ocircumflex/Otilde/Odieresis
+/multiply/Oslash/Ugrave/Uacute/Ucircumflex/Udieresis/Yacute/Thorn/germandbls
+/agrave/aacute/acircumflex/atilde/adieresis/aring/ae/ccedilla/egrave/eacute
+/ecircumflex/edieresis/igrave/iacute/icircumflex/idieresis/eth/ntilde/ograve
+/oacute/ocircumflex/otilde/odieresis/divide/oslash/ugrave/uacute/ucircumflex
+/udieresis/yacute/thorn/ydieresis]def/Courier@0 ENC0/Courier RE/Times-Italic@0
+ENC0/Times-Italic RE/Times-Roman@0 ENC0/Times-Roman RE
+%%EndProlog
+%%Page: 1 1
+%%BeginPageSetup
+BP
+%%EndPageSetup
+/F0 13/Times-Roman@0 SF(The History of PCCTS)228.232 84 Q/F1 11/Times-Roman@0
+SF(The Purdue Compiler)190.468 108 Q(-Construction T)-.22 E(ool Set)-.88 E/F2
+10/Times-Italic@0 SF -.92(Te)262.245 144 S -.37(re).92 G(nce P).37 E(arr)-.8 E
+/F3 10/Times-Roman@0 SF -.15(Pa)234.755 156 S(rr Research Corporation).15 E
+(Minneapolis, Minnesota)239.39 168 Q(and)280.78 180 Q(Uni)239.315 192 Q -.15
+(ve)-.25 G(rsity of Minnesota).15 E
+(Army High Performance Computing Research Center)180.38 204 Q F2
+([Updated 8-7-94])252.31 228 Q F1 .084(The PCCTS project be)97 259.6 R -.055
+(ga)-.165 G 2.834(na).055 G 2.833(sap)220.547 259.6 S(arser)240.876 259.6 Q
+.083(-generator project for a graduate course at Purdue Uni-)-.22 F -.165(ve)72
+275.6 S 1.085(rsity in the F).165 F 1.086
+(all of 1988 taught by Hank Dietz\212 translator)-.165 F 1.086
+(-writing systems.)-.22 F 1.086(Under the guid-)6.586 F .627
+(ance of Professor Dietz, the parser generator)72 291.6 R 3.377(,A)-.44 G .626
+(NTLR \(originally called YUCC\), continued after)285.18 291.6 R .253
+(the termination of the course and e)72 307.6 R -.165(ve)-.275 G .254
+(ntually became the subject of T).165 F .254(erence P)-.77 F(arr')-.165 E 3.004
+(sM)-.605 G(aster')445.083 307.6 Q 3.004(st)-.605 G(hesis.)479.25 307.6 Q
+(Originally)72 323.6 Q 4.092(,l)-.715 G -.165(ex)126.406 323.6 S 1.342
+(ical analysis w).165 F 1.342(as performed via ALX which w)-.11 F 1.342
+(as soon replaced by W)-.11 F 1.341(ill Cohen')-.44 F(s)-.605 E .594
+(DLG in the F)72 339.6 R .594(all of 1989 \(DF)-.165 F .595(A-based le)-.814 F
+.595(xical-analyzer generator)-.165 F 3.345(,a)-.44 G .595(lso an of)367.188
+339.6 R .595(fshoot of the graduate)-.275 F(translation course\).)72 355.6 Q
+.877(The alpha v)97 375.2 R .877(ersion of ANTLR w)-.165 F .877(as totally re)
+-.11 F .876(written resulting in 1.00B.)-.275 F -1.221(Ve)6.376 G .876
+(rsion 1.00B w)1.221 F(as)-.11 E 1.577(released via an internet ne)72 391.2 R
+1.577(wsgroup \(comp.compilers\) posting in February of 1990 and quickly)-.275
+F -.055(ga)72 407.2 S .356(thered a lar).055 F .356(ge follo)-.198 F 3.106
+(wing. 1.00B)-.275 F .356(generated only LL\(1\) parsers, b)3.106 F .356
+(ut allo)-.22 F .356(wed the mer)-.275 F .356(ged descrip-)-.198 F 1.859
+(tion of le)72 423.2 R 1.859(xical and syntactic analysis.)-.165 F 1.86
+(It had rudimentary attrib)7.359 F 1.86(ute handling similar to that of)-.22 F
+-.55 -1.32(YA C)72 439.2 T 3.549(Ca)1.32 G .799
+(nd did not incorporate rule parameters or return v)109.231 439.2 R .798
+(alues; do)-.275 F(wnw)-.275 E .798(ard inheritance w)-.11 F .798(as v)-.11 F
+(ery)-.165 E -.165(aw)72 455.2 S(kw).165 E 6.433(ard. 1.00B-generated)-.11 F
+3.684(parsers terminated upon the \214rst syntax error)6.433 F 9.184(.L)-.605 G
+-.165(ex)440.916 455.2 S 3.684(ical classes).165 F(\(modes\) were not allo)72
+471.2 Q(wed and DLG did not ha)-.275 E .33 -.165(ve a)-.22 H 2.75(ni).165 G
+(nteracti)305.959 471.2 Q .33 -.165(ve m)-.275 H(ode.).165 E .831
+(Upon starting his Ph.D. at Purdue in the F)97 490.8 R .83(all of 1990, T)-.165
+F .83(erence P)-.77 F .83(arr be)-.165 F -.055(ga)-.165 G 3.58(nt).055 G .83
+(he second total)436.351 490.8 R(re)72 506.8 Q 1.646(write of ANTLR.)-.275 F
+1.646(The method by which grammars may be practically analyzed to generate)
+7.146 F/F4 11/Times-Italic@0 SF(LL)72.638 522.8 Q F1(\().583 E F4(k).396 E F1
+3.849(\)l).737 G 1.099(ookahead information w)105.703 522.8 R 1.099(as disco)
+-.11 F -.165(ve)-.165 G 1.099(red in August of 1990 just before his return.)
+.165 F -1.221(Ve)6.598 G(rsion)1.221 E .626
+(1.00 incorporated this algorithm and included the AST mechanism, le)72 538.8 R
+.626(xical classes, error classes,)-.165 F .354(and automatic error reco)72
+554.8 R -.165(ve)-.165 G .353(ry; code quality and portability were higher).165
+F 5.853(.I)-.605 G 3.103(nF)395.965 554.8 S .353(ebruary of 1992 1.00)410.684
+554.8 R -.11(wa)72 570.8 S 2.76(sr).11 G .01
+(eleased via an article in SIGPLAN Notices.)95.418 570.8 R .01
+(Peter Dahl, Ph.D. candidate, and Professor Matt)5.51 F(O'K)72 586.8 Q 2.074
+(eefe \(both at the Uni)-.275 F -.165(ve)-.275 G 2.073
+(rsity of Minnesota\) tested this v).165 F 2.073(ersion e)-.165 F(xtensi)-.165
+E -.165(ve)-.275 G(ly).165 E 7.573(.D)-.715 G 2.073(ana Hogg)448.522 586.8 R
+(att)-.055 E .078(\(Micro Data Base Systems, Inc.\) came up with the idea of e\
+rror grouping \(strings attached to non-)72 602.8 R
+(terminals\) and tested 1.00 hea)72 618.8 Q(vily)-.22 E(.)-.715 E -1.221(Ve)97
+638.4 S .878(rsion 1.06 w)1.221 F .877
+(as released in December 1992 and represented a lar)-.11 F .877
+(ge feature enhancement)-.198 F -.165(ove)72 654.4 S 3.648(r1).165 G 3.648
+(.00. F)100.365 654.4 R .898(or e)-.165 F .899
+(xample, rudimentary semantic predicates were introduced, error messages were)
+-.165 F 2.281(signi\214cantly impro)72 670.4 R -.165(ve)-.165 G 5.031(df).165 G
+(or)181.953 670.4 Q F4(k)5.427 E F1 2.281
+(>1 lookahead and ANTLR parsers could indicate that lookahead).737 F 1.381
+(fetches were to occur only when necessary for the parse \(normally)72 686.4 R
+4.131(,t)-.715 G 1.381(he lookahead `)387.051 686.4 R(`pipe')-.814 E 4.132('w)
+-.814 G(as)494.837 686.4 Q 1.182(constantly full\).)72 702.4 R 1.182
+(Russell Quong joined the project in the Spring of 1992 to aid in the semantic)
+6.682 F .681(predicate design.)72 718.4 R(Be)6.181 E .681(ginning and adv)-.165
+F .682(anced tutorials were created and released as well.)-.275 F 3.432(Am)
+6.182 G(ak)485.179 718.4 Q(e-)-.11 E .993(\214le generator w)72 734.4 R .993
+(as included that sets up dependencies and such correctly for ANTLR and DLG.)
+-.11 F EP
+%%Page: 2 2
+%%BeginPageSetup
+BP
+%%EndPageSetup
+/F0 11/Times-Roman@0 SF 2.75(-2-)278.837 52 S -1.221(Ve)72 88 S 1.414(ry fe)
+1.221 F 4.164(w1)-.275 G 1.414(.00 incompatibilities were introduced \(1.00 w)
+122.81 88 R 1.415(as quite dif)-.11 F 1.415(ferent from 1.00B in some)-.275 F
+(areas\).)72 104 Q 1.089(1.10 w)97 123.6 R 1.088
+(as released on August 31, 1993 and incorporated b)-.11 F 1.088(ug \214x)-.22 F
+1.088(es, a fe)-.165 F 3.838(wf)-.275 G 1.088(eature enhance-)433.59 123.6 R
+3.112(ments and a major ne)72 139.6 R 5.863(wc)-.275 G(apability \212)196.957
+139.6 Q 3.113(an arbitrary lookahead operator \(syntactic predicate\),)5.863 F
+/F1 11/Courier@0 SF(\(alpha\)?beta)72 155.6 Q F0 6.754(.T)C 1.254
+(his feature w)167.425 155.6 R 1.254
+(as co-designed with Professor Russell Quong also at Purdue.)-.11 F 3.297 -.88
+(To s)72 171.6 T 1.537
+(upport in\214nite lookahead, a preprocessor \215ag, ZZINF_LOOK, w).88 F 1.537
+(as created that forced the)-.11 F .21(ANTLR\(\) macro to tok)72 187.6 R .21
+(enize all input prior to parsing.)-.11 F .209(Hence, at an)5.709 F 2.959(ym)
+-.165 G .209(oment, an action or predi-)389.215 187.6 R .936
+(cate can see the entire input sentence.)72 203.6 R .936
+(The predicate mechanism of 1.06 w)6.436 F .937(as e)-.11 F .937
+(xtended to allo)-.165 F(w)-.275 E .55
+(multiple predicates to be hoisted; the syntactic conte)72 219.6 R .55
+(xt of a predicate w)-.165 F .55(as also mo)-.11 F -.165(ve)-.165 G 3.299(da)
+.165 G .549(long with)461.585 219.6 R(the predicate.)72 235.6 Q .754
+(In February of 1994, SORCERER \(a simple tree-parser generator\) w)97 255.2 R
+.755(as released.)-.11 F .755(This tool)6.255 F(allo)72 271.2 Q .6(ws the user\
+ to parse child-sibling trees by specifying a grammar rather than b)-.275 F
+.599(uilding a recur)-.22 F(-)-.22 E(si)72 287.2 Q -.165(ve)-.275 G 1.39
+(-descent tree w).165 F(alk)-.11 E 1.391(er by hand.)-.11 F -.88(Wo)6.891 G
+1.391(rk to).88 F -.11(wa)-.275 G 1.391
+(rds a library of tree transformations is underw).11 F(ay)-.11 E(.)-.715 E .581
+(Aaron Sa)72 303.2 R(wde)-.165 E 3.331(ya)-.165 G 3.331(tT)145.531 303.2 S .581
+(he Uni)158.641 303.2 R -.165(ve)-.275 G .58
+(rsity of Minnesota became a second author of SORCERER after the).165 F
+(initial release.)72 319.2 Q .627(On April 1, 1994, PCCTS 1.20 w)97 338.8 R
+.627(as released.)-.11 F .627(This w)6.127 F .627(as the \214rst v)-.11 F .627
+(ersion to acti)-.165 F -.165(ve)-.275 G .627(ly support).165 F 1.664
+(C++ output.)72 354.8 R 1.664(It also included important \214x)7.164 F 1.663
+(es re)-.165 F -.055(ga)-.165 G 1.663
+(rding semantic predicates and \(..\)+ subrules.).055 F(This v)72 370.8 Q
+(ersion also introduced tok)-.165 E(en classes, the `)-.11 E(`)-.814 E/F2 11
+/Times-Italic@0 SF(not)A F0 1.628 -.814('' o)D(perator).814 E 2.75(,a)-.44 G
+(nd tok)355.294 370.8 Q(en ranges.)-.11 E .764
+(On June 19, 1994, SORCERER 1.00B9 w)97 390.4 R .765(as released.)-.11 F .765
+(Gary Funck of Intrepid T)6.265 F(echnology)-.77 E .807
+(joined the SORCERER team and pro)72 406.4 R .807(vided v)-.165 F .807(ery v)
+-.165 F .807(aluable suggestions re)-.275 F -.055(ga)-.165 G .806(rding the `)
+.055 F(`transform')-.814 E(')-.814 E(mode of SORCERER.)72 422.4 Q 1.137
+(On August 8, 1994, PCCTS 1.21 w)97 442 R 1.137(as released.)-.11 F 1.138
+(It mainly cleaned up the C++ output and)6.637 F(included a number of b)72 458
+Q(ug \214x)-.22 E(es.)-.165 E .316(From the 1.21 release forw)97 477.6 R .316
+(ard, the maintenance and support of all PCCTS tools will be pri-)-.11 F 1.557
+(marily pro)72 493.6 R 1.557(vided by P)-.165 F 1.557
+(arr Research Corporation, Minneapolis MN---an or)-.165 F -.055(ga)-.198 G
+1.558(nization founded on).055 F 1.616(the principles of e)72 509.6 R 1.616
+(xcellence in research and inte)-.165 F 1.616(grity in b)-.165 F 1.616
+(usiness; we are de)-.22 F -.22(vo)-.275 G 1.616(ted to pro).22 F(viding)-.165
+E 1.202(really cool softw)72 525.6 R 1.202(are tools.)-.11 F 1.202
+(Please see \214le PCCTS.FUTURE for more information.)6.702 F 1.203(All PCCTS)
+6.703 F(tools currently in the public domain will continue to be in the public\
+ domain.)72 541.6 Q 1.198(Looking to)97 561.2 R -.11(wa)-.275 G 1.198
+(rds the future, a graphical user).11 F(-interf)-.22 E 1.197
+(ace is in the design phase.)-.11 F 1.197(This w)6.697 F(ould)-.11 E(allo)72
+577.2 Q 2.753(wu)-.275 G .003(sers to vie)104.42 577.2 R 2.753(wt)-.275 G .004
+(he syntax diagram representation of their grammars and w)162.509 577.2 R .004
+(ould highlight non-)-.11 F 1.181(deterministic productions.)72 593.2 R -.165
+(Pa)6.681 G 1.18(rsing can be traced graphically as well.).165 F 1.18
+(This system will be b)6.68 F(uilt)-.22 E .167(using a multiplatform windo)72
+609.2 R 2.917(wl)-.275 G(ibrary)211.73 609.2 Q 5.667(.W)-.715 G 2.917(ea)
+255.204 609.2 S .168(lso anticipate the introduction of a sophisticated error)
+267.889 609.2 R(handling mechanism called `)72 625.2 Q(`parser e)-.814 E
+(xception handling')-.165 E 2.75('i)-.814 G 2.75(nan)327.431 625.2 S
+(ear future release.)348.815 625.2 Q(Currently)97 644.8 Q 3.019(,P)-.715 G .269
+(CCTS is used at o)150.333 644.8 R -.165(ve)-.165 G 3.019(r1).165 G .269
+(000 kno)253.098 644.8 R .268(wn academic, go)-.275 F -.165(ve)-.165 G .268
+(rnment, and commercial sites).165 F .859(in 37 countries.)72 660.8 R .859
+(Of course, the true number of users is unkno)6.359 F .859(wn due to the lar)
+-.275 F .859(ge number of ftp)-.198 F(sites.)72 676.8 Q EP
+%%Page: 3 3
+%%BeginPageSetup
+BP
+%%EndPageSetup
+/F0 11/Times-Roman@0 SF 2.75(-3-)278.837 52 S(Credits)272.11 88 Q .44 LW
+472.162 103.75 103.838 103.75 DL(Idea/T)134.236 117 Q 52.987(ool Coder)-.88 F
+(Co-designer\(s\))345.436 117 Q 281.334 103.75 281.334 124.75 DL 209.273 103.75
+209.273 124.75 DL 209.273 124.75 103.838 124.75 DL 103.838 126.75 209.273
+126.75 DL 281.334 124.75 209.273 124.75 DL 209.273 126.75 281.334 126.75 DL
+472.162 124.75 281.334 124.75 DL 281.334 126.75 472.162 126.75 DL(ANTLR 1.00A)
+109.338 140 Q -.77(Te)217.523 140 S(rence P).77 E 13.75(arr Hank)-.165 F(Dietz)
+2.75 E 82.83(ALX T)109.338 156 R(erence P)-.77 E 13.75(arr Hank)-.165 F(Dietz)
+2.75 E(ANTLR 1.00B)109.338 172 Q -.77(Te)217.523 172 S(rence P).77 E 13.75
+(arr Hank)-.165 F(Dietz, W)2.75 E(ill Cohen)-.44 E(DLG 1.00B)109.338 188 Q -.44
+(Wi)217.523 188 S(ll Cohen).44 E -.77(Te)289.584 188 S(rence P).77 E(arr)-.165
+E 2.75(,H)-.44 G(ank Dietz)358.147 188 Q(NF)109.338 204 Q 2.75(AR)-.814 G
+30.778(elabelling W)140.611 204 R(ill Cohen)-.44 E/F1 11/Times-Italic@0 SF(LL)
+109.976 220 Q F0(\().583 E F1(k).396 E F0 2.75(\)a).737 G 40.447(nalysis T)
+143.768 220 R(erence P)-.77 E 13.75(arr Hank)-.165 F(Dietz)2.75 E(ANTLR 1.00)
+109.338 236 Q -.77(Te)217.523 236 S(rence P).77 E 13.75(arr Hank)-.165 F
+(Dietz, W)2.75 E(ill Cohen)-.44 E(DLG 1.00)109.338 252 Q -.44(Wi)217.523 252 S
+(ll Cohen).44 E -.77(Te)289.584 252 S(rence P).77 E(arr)-.165 E 2.75(,H)-.44 G
+(ank Dietz)358.147 252 Q(ANTLR 1.06)109.338 268 Q -.77(Te)217.523 268 S
+(rence P).77 E 13.75(arr W)-.165 F(ill Cohen, Russell Quong, Hank Dietz)-.44 E
+(DLG 1.06)109.338 284 Q -.44(Wi)217.523 284 S(ll Cohen).44 E -.77(Te)289.584
+284 S(rence P).77 E(arr)-.165 E 2.75(,H)-.44 G(ank Dietz)358.147 284 Q
+(ANTLR 1.10)109.338 300 Q -.77(Te)217.523 300 S(rence P).77 E 13.75(arr W)-.165
+F(ill Cohen, Russell Quong)-.44 E(ANTLR 1.20)109.338 316 Q -.77(Te)217.523 316
+S(rence P).77 E 13.75(arr W)-.165 F(ill Cohen, Russell Quong)-.44 E(ANTLR 1.21)
+109.338 332 Q -.77(Te)217.523 332 S(rence P).77 E 13.75(arr Russell)-.165 F
+(Quong)2.75 E(DLG 1.10)109.338 348 Q -.44(Wi)217.523 348 S(ll Cohen).44 E -.77
+(Te)289.584 348 S(rence P).77 E(arr)-.165 E(DLG 1.20)109.338 364 Q -.44(Wi)
+217.523 364 S(ll Cohen).44 E -.77(Te)289.584 364 S(rence P).77 E(arr)-.165 E
+(DLG 1.21)109.338 380 Q -.77(Te)217.523 380 S(rence P).77 E(arr)-.165 E
+(Semantic predicates)109.338 396 Q -.77(Te)217.523 396 S(rence P).77 E 13.75
+(arr Russell)-.165 F(Quonq)2.75 E(Syntactic predicates)109.338 412 Q -.77(Te)
+217.523 412 S(rence P).77 E 13.75(arr Russell)-.165 F(Quonq)2.75 E
+(SORCERER 1.00A)109.338 428 Q -.77(Te)217.523 428 S(rence P).77 E(arr)-.165 E
+(SORCERER 1.00B)109.338 444 Q -.77(Te)217.523 444 S(rence P).77 E 13.75
+(arr Aaron)-.165 F(Sa)2.75 E(wde)-.165 E(y)-.165 E(SORCERER 1.00B9)109.338 460
+Q -.77(Te)217.523 460 S(rence P).77 E 13.75(arr Aaron)-.165 F(Sa)2.75 E(wde)
+-.165 E 1.43 -.715(y, G)-.165 H(ary Funck).715 E 472.162 467.75 103.838 467.75
+DL 472.162 103.75 472.162 467.75 DL 103.838 103.75 103.838 467.75 DL EP
+%%Trailer
+end
+%%EOF

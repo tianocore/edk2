@@ -1,0 +1,21 @@
+
+1. You can control the creator type of generated files by changing a value of
+   #if control statement.
+
+
+   pccts:h:pcctscfg.h
+
+   line 225-231
+
+	#if 0
+	#define MAC_FILE_CREATOR 'MPS '   /* MPW Text files */
+	#endif
+	#if 0
+	#define MAC_FILE_CREATOR 'KAHL'   /* THINK C/Symantec C++ Text files */
+	#endif
+	#if 0
+	#define MAC_FILE_CREATOR 'CWIE'   /* Metrowerks C/C++ Text files */
+	#endif
+
+2.  If you want to build 68K version. You must convert all source files to Macintosh
+    format before compile.

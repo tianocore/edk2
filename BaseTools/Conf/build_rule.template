@@ -1,0 +1,542 @@
+#
+#  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Portions copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+
+## Syntax
+#
+# "*" is used to indicate that the source files will be processed at the same time.
+# "?" is used to indicate that the source files will be processed one by one.
+#
+# "[" <File-Type>[.<Build-Type>][.<Arch>][, <File-Type>[.<Build-Type>][.<Arch>]] "]" <EOL>
+#   <InputFile[.<ToolChainFamily>]> <EOL>
+#       (?|*).<File-Extension> [(\n|,) (?|*).<File-Extension>]
+#
+#   <OutputFile[.<ToolChainFamily>]> <EOL>
+#       <FileFullPath>
+#
+#   <ExtraDependency>
+#       <FileFullPath>
+#
+#   <Command[.<ToolChainFamily>]> <EOL>
+#       <Command1>
+#       [<Command2>]
+#
+# <Build-Type> is the MODULE_TYPE in EDK2 or COMPONENT_TYPE  in EDK.
+# Missing <InputFile> will cause an exception and break build.
+# Missing <Command> will cause that related build target won't be generated but
+#   won't break build.
+#
+
+## Placeholders for string substitution
+#
+#   ${src}      Source file(s) to be built (full path)
+#   ${s_path}   Source file directory (absolute path)
+#   ${s_dir}    Source file relative directory within a module
+#               (Note: ${s_dir} is always equals to "." if source file is given in absolute path.)
+#   ${s_name}   Source file name without path
+#   ${s_base}   Source file name without extension and path
+#   ${s_ext}    Source file extension
+#
+#   ${dst}      Destination file(s) built from ${src} (full path)
+#   ${d_path}   Destination file directory (absolute path)
+#   ${d_name}   Destination file name without path
+#   ${d_base}   Destination file name without extension and path
+#   ${d_ext}    Destination file extension
+#
+#   (+)         Directory separator
+#
+
+## Macro
+#   $(WORKSPACE)        Workspace directory
+#   $(OUTPUT_DIR)       Directory for intermediate files for building a module
+#   $(DEBUG_DIR)        Directory for files used to debug a module
+#   $(BUILD_DIR)        All files for building a platform will be put in this directory
+#   $(BIN_DIR)          Common directory for executable files
+#   $(FV_DIR)           Directory to store flash image files
+#   $(INC)              Search path of current module
+#   $(INC_LIST)         A file containing search pathes of current module
+#   $(LIBS)             Static library files of current module
+#   $(<tool>_FLAGS)     Tools flags of current module
+#   $(MODULE_NAME)      Current module name
+#   $(MODULE_TYPE)      Current module type
+#   $(MODULE_GUID)      Current module guid
+#   $(ARCH)             Architecture of current module
+#   $(TOOLCHAIN)        Toolchain used to build current module
+#   $(TARGET)           Target of current module (DEBUG/RELEASE)
+#   $(<tool>)           Path of tool
+#   $(EDK_TOOLS_PATH)   Path of build tools
+#   $(<FILE_TYPES>)     File list of each file type
+#                       (Note: The macro name is derived from file type name. For example,
+#                        C-Code-File will have C_CODE_FILES macro.)
+#   $(<FILE_TYPES_LIST>) Macro point to a file containing list of files of a file type
+#                       (
+#                        Note: The macro and file name are derived from file type name.
+#                        For example, C-Code-File will have C_CODE_FILES_LIST macro pointing
+#                        to $(OUTPUT_DIR)/c_code_files.lst. The list file and macro name
+#                        will be generated only when this macro is used in command line.
+#                        This is intended to get over the long command line limitation.
+#                       )
+#
+#   $(CP)     copy command
+#   $(MV)     move command
+#   $(RM)     delete command
+#   $(MD)     create dir command
+#   $(RD)     remove dir command
+#
+
+## Reserved File-Type
+#
+# Don't change following names of file types and their associated files,
+# which are also used in tools' code
+#
+#   C-Code-File
+#   C-Header-File
+#   Dynamic-Library-File
+#   Static-Library-File
+#   Visual-Form-Representation-File
+#   Unicode-Text-File
+#
+
+## Build Rule Version Number
+#  build_rule_version=0.1
+#
+
+[C-Code-File]
+    <InputFile>
+        ?.c
+        ?.C
+        ?.cc
+        ?.CC
+        ?.cpp
+        ?.Cpp
+        ?.CPP
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+
+    <Command.MSFT, Command.INTEL>
+        "$(CC)" /Fo${dst} $(CC_FLAGS) $(INC) ${src}
+
+    <Command.GCC, Command.RVCT>
+        # For RVCTCYGWIN CC_FLAGS must be first to work around pathing issues
+        "$(CC)" $(CC_FLAGS) -o ${dst} $(INC) ${src}
+        "$(SYMRENAME)" $(SYMRENAME_FLAGS) ${dst}
+
+    <Command.ARMGCC, Command.ARMLINUXGCC>
+        "$(CC)" $(CC_FLAGS) -o ${dst} $(INC) ${src}
+
+
+[C-Header-File]
+    <InputFile>
+        *.h, *.H
+
+    <OutputFile>
+
+    <Command>
+
+
+[Assembly-Code-File.COMMON.COMMON]
+    <InputFile.MSFT, InputFile.INTEL, InputFile.RVCT>
+        ?.asm, ?.Asm, ?.ASM
+
+    <InputFile.GCC>
+        ?.S, ?.s
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+
+    <Command.MSFT, Command.INTEL>
+        "$(PP)" $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
+        Trim --source-code --convert-hex -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
+        "$(ASM)" /Fo${dst} $(ASM_FLAGS) /I${s_path} $(INC) ${d_path}(+)${s_base}.iii
+
+    <Command.GCC, Command.RVCT>
+        "$(PP)" $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
+        Trim --source-code -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
+        # For RVCTCYGWIN ASM_FLAGS must be first to work around pathing issues
+        "$(ASM)" $(ASM_FLAGS) -o ${dst} $(INC) ${d_path}(+)${s_base}.iii
+
+[Assembly-Code-File.COMMON.IPF]
+    <InputFile>
+        ?.s
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+
+    <Command.MSFT, Command.INTEL>
+        "$(PP)" $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
+        Trim --source-code -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
+        # For RVCTCYGWIN ASM_FLAGS must be first to work around pathing issues
+        "$(ASM)" $(ASM_FLAGS) -o ${dst} ${d_path}(+)${s_base}.iii
+
+[Visual-Form-Representation-File]
+    <InputFile>
+        ?.vfr
+        ?.Vfr
+        ?.VFR
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(DEBUG_DIR)(+)${s_dir}(+)${s_base}.c
+
+    <Command>
+        "$(VFRPP)" $(VFRPP_FLAGS) $(INC) ${src} > $(OUTPUT_DIR)(+)${s_base}.i
+        "$(VFR)" $(VFR_FLAGS) --string-db $(OUTPUT_DIR)(+)$(MODULE_NAME)StrDefs.hpk --output-directory ${d_path} $(OUTPUT_DIR)(+)${s_base}.i
+
+[Object-File]
+    <InputFile>
+        *.obj
+        *.o
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)$(MODULE_NAME).lib
+
+    <Command.MSFT, Command.INTEL>
+        "$(SLINK)" $(SLINK_FLAGS) /OUT:${dst} @$(OBJECT_FILES_LIST)
+
+    <Command.GCC>
+        "$(SLINK)" -cr ${dst} $(SLINK_FLAGS) @$(OBJECT_FILES_LIST)
+    
+    <Command.RVCT>
+        "$(SLINK)" $(SLINK_FLAGS) ${dst} --via $(OBJECT_FILES_LIST)
+    
+    <Command.RVCTCYGWIN, Command.ARMGCC, Command.ARMLINUXGCC>
+        # $(OBJECT_FILES_LIST) has wrong paths for cygwin
+        "$(SLINK)" $(SLINK_FLAGS) ${dst} $(OBJECT_FILES)
+
+    <Command.XCODE>
+        "$(SLINK)" $(SLINK_FLAGS) ${dst} -filelist $(OBJECT_FILES_LIST)
+
+[Static-Library-File]
+    <InputFile>
+        *.lib
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(DEBUG_DIR)(+)$(MODULE_NAME).dll
+
+    <Command.MSFT, Command.INTEL>
+        "$(DLINK)" /OUT:${dst} $(DLINK_FLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST)
+
+    <Command.GCC>
+        "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -\( $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST) -\) $(DLINK2_FLAGS)
+        "$(OBJCOPY)" $(OBJCOPY_FLAGS) ${dst}
+
+    <Command.ARMGCC, Command.ARMLINUXGCC>
+        "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -\( $(DLINK_SPATH) $(STATIC_LIBRARY_FILES) -\) $(DLINK2_FLAGS)
+
+    <Command.RVCT>
+        "$(DLINK)" $(DLINK_FLAGS) -o ${dst} $(DLINK_SPATH) --via $(STATIC_LIBRARY_FILES_LIST) $(DLINK2_FLAGS)
+
+    <Command.RVCTCYGWIN>
+        #$(STATIC_LIBRARY_FILES_LIST) has wrong paths for cygwin
+        "$(DLINK)" $(DLINK_FLAGS) -o ${dst} $(DLINK_SPATH) $(STATIC_LIBRARY_FILES) $(DLINK2_FLAGS)
+
+    <Command.XCODE>
+        "$(DLINK)" $(DLINK_FLAGS) -o ${dst} $(DLINK_SPATH) -filelist $(STATIC_LIBRARY_FILES_LIST)  $(DLINK2_FLAGS)
+    
+    
+[Static-Library-File.USER_DEFINED]
+    <InputFile>
+        *.lib
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(DEBUG_DIR)(+)$(MODULE_NAME)
+
+    <Command.MSFT, Command.INTEL>
+        "$(DLINK)" $(DLINK_FLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST)
+
+    <Command.GCC>
+        "$(DLINK)" $(DLINK_FLAGS) -\( $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST) -\) $(DLINK2_FLAGS)
+
+    <Command.ARMGCC, Command.ARMLINUXGCC>
+        "$(DLINK)" $(DLINK_FLAGS) -\( $(DLINK_SPATH) $(STATIC_LIBRARY_FILES) -\) $(DLINK2_FLAGS)
+
+    <Command.RVCT>
+        "$(DLINK)" $(DLINK_FLAGS) -o ${dst} $(DLINK_SPATH) --via $(STATIC_LIBRARY_FILES_LIST) $(DLINK2_FLAGS)
+
+    <Command.RVCTCYGWIN>
+        #$(STATIC_LIBRARY_FILES_LIST) has the wrong paths for cygwin
+        "$(DLINK)" $(DLINK_FLAGS) -o ${dst} $(DLINK_SPATH) $(STATIC_LIBRARY_FILES) $(DLINK2_FLAGS)
+
+    <Command.XCODE>
+        "$(DLINK)" -o ${dst} $(DLINK_FLAGS)  $(DLINK_SPATH) -filelist $(STATIC_LIBRARY_FILES_LIST)  $(DLINK2_FLAGS)
+      
+      
+[Dynamic-Library-File]
+    <InputFile>
+        ?.dll
+
+    <OutputFile>
+        $(DEBUG_DIR)(+)$(MODULE_NAME).efi
+
+    <Command.MSFT, Command.INTEL, Command.RVCT, Command.ARMGCC, Command.ARMLINUXGCC>  
+        "$(GENFW)" -e $(MODULE_TYPE) -o ${dst} ${src} $(GENFW_FLAGS)
+        $(CP) ${dst} $(OUTPUT_DIR)
+        $(CP) ${dst} $(BIN_DIR)
+        -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
+
+    <Command.GCC>
+        $(OBJCOPY) --only-keep-debug ${src} $(DEBUG_DIR)(+)$(MODULE_NAME).debug
+        $(OBJCOPY) --strip-unneeded ${src}
+
+        #
+        #The below 2 lines are only needed for UNIXGCC tool chain, which genereates PE image directly
+        #
+        -$(OBJCOPY) $(OBJCOPY_ADDDEBUGFLAG) ${src}
+        -$(CP) $(DEBUG_DIR)(+)$(MODULE_NAME).debug $(BIN_DIR)
+
+        "$(GENFW)" -e $(MODULE_TYPE) -o ${dst} ${src} $(GENFW_FLAGS)
+        $(CP) ${dst} $(OUTPUT_DIR)
+        $(CP) ${dst} $(BIN_DIR)
+        -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
+        
+    <Command.XCODE>
+        # tool to convert Mach-O to PE/COFF
+        "$(MTOC)" -subsystem $(MODULE_TYPE)  $(MTOC_FLAGS)  ${src}  $(DEBUG_DIR)(+)$(MODULE_NAME).pecoff
+        # create symbol file for GDB debug
+        -$(DSYMUTIL) ${src}
+        "$(GENFW)" -e $(MODULE_TYPE) -o ${dst} $(DEBUG_DIR)(+)$(MODULE_NAME).pecoff $(GENFW_FLAGS)
+        $(CP) ${dst} $(OUTPUT_DIR)
+        $(CP) ${dst} $(BIN_DIR)
+        -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
+
+[Dependency-Expression-File]
+    <InputFile>
+        ?.dxs, ?.Dxs, ?.DXS
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)$(MODULE_NAME).depex
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <Command>
+        "$(PP)" $(APP_FLAGS) $(INC) ${src} > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
+        Trim --source-code -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
+        GenDepex -t $(MODULE_TYPE) -o ${dst} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
+
+[Acpi-Source-Language-File]
+    <InputFile>
+        ?.asl, ?.Asl, ?.ASL
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.aml
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <Command.MSFT, Command.INTEL>
+        Trim --asl-file -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i -i $(INC_LIST) ${src}
+        "$(ASLPP)" $(ASLPP_FLAGS) $(INC) /I${s_path} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
+        Trim --source-code -l -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iiii $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii 
+        "$(ASL)" $(ASL_FLAGS) $(ASL_OUTFLAGS)${dst} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iiii
+
+    <Command.GCC>
+        Trim --asl-file -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i -i $(INC_LIST) ${src}
+        "$(ASLPP)" $(ASLPP_FLAGS) $(INC) -I${s_path} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
+        "$(ASL)" $(ASL_FLAGS) $(ASL_OUTFLAGS)${dst} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
+
+[C-Code-File.AcpiTable]
+    <InputFile>
+        ?.c
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.acpi
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <Command.MSFT, Command.INTEL>
+        "$(ASLCC)" /Fo$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(ASLCC_FLAGS) $(INC) ${src}
+        "$(ASLDLINK)" /OUT:$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(ASLDLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+        "$(GENFW)" -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(GENFW_FLAGS)
+
+    <Command.GCC>
+        "$(ASLCC)" -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(CC_FLAGS) $(ASLCC_FLAGS) $(INC) ${src}
+        "$(ASLDLINK)" -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(ASLDLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+        "$(GENFW)" -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(GENFW_FLAGS)
+
+[Acpi-Table-Code-File]
+    <InputFile>
+        ?.aslc, ?.act
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.acpi
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <Command.MSFT, Command.INTEL>
+        "$(ASLCC)" /Fo$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(ASLCC_FLAGS) $(INC) ${src}
+        "$(ASLDLINK)" /OUT:$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(ASLDLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+        "$(GENFW)" -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(GENFW_FLAGS)
+
+    <Command.GCC>
+        "$(ASLCC)" -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(CC_FLAGS) $(ASLCC_FLAGS) $(INC) ${src}
+        "$(ASLDLINK)" -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(ASLDLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+        "$(GENFW)" -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(GENFW_FLAGS)
+        
+    <Command.XCODE>        
+        "$(ASLCC)" -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj  $(ASLCC_FLAGS) $(INC) ${src}
+        "$(ASLDLINK)" -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(ASLDLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+        "$(MTOC)" -subsystem $(MODULE_TYPE)  $(MTOC_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.efi
+        "$(GENFW)" -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.efi $(GENFW_FLAGS)
+      
+      
+[Masm16-Code-File]
+    <InputFile>
+        ?.asm16, ?.Asm16, ?.ASM16
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_base}.com
+
+    <Command.MSFT, Command.INTEL>
+        "$(PP)" $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
+        Trim --source-code --convert-hex -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
+        cd $(OUTPUT_DIR)(+)${s_dir}
+        "$(ASM16)" /nologo /c /omf $(INC) /Fo$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj ${d_path}(+)${s_base}.iii
+        "$(ASMLINK)" $(ASMLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj,${dst},,,,
+
+    <Command.GCC>
+      "$(PP)" $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
+      Trim --source-code -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
+      "$(ASM)" -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(ASM_FLAGS) $(INC) ${d_path}(+)${s_base}.iii
+      "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -\( $(DLINK_SPATH) $(LIBS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj -\)
+     
+    <Command.XCODE>
+      "$(PP)" $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
+      Trim --source-code -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
+      "$(ASM)" -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(ASM_FLAGS) $(INC) ${d_path}(+)${s_base}.iii
+      "$(SLINK)" $(SLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.slib $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+      otool -t $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.slib | hex2bin.py ${dst}
+      
+
+[Microcode-File.USER_DEFINED, Microcode-File.Microcode]
+    <InputFile>
+        ?.txt, ?.TXT, ?.Txt, ?.mut, ?.inc
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_base}.mcb
+
+    <Command>
+        "$(GENFW)" -o ${dst} -m ${src} $(GENFW_FLAGS)
+
+[Microcode-Binary-File]
+    <InputFile>
+        *.mcb
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)$(MODULE_NAME).bin
+
+    <Command>
+        "$(GENFW)" -o ${dst} -j $(MICROCODE_BINARY_FILES) $(GENFW_FLAGS)
+        -$(CP) ${dst} $(BIN_DIR)
+
+[EFI-Image-File]
+    <InputFile>
+        ?.efi, ?.Efi, ?.EFI
+
+    <OutputFile>
+
+    <Command>
+
+[Unicode-Text-File]
+    <InputFile>
+        *.uni, *.Uni, *.UNI
+
+    <OutputFile>
+        $(DEBUG_DIR)(+)AutoGen.c
+        $(DEBUG_DIR)(+)$(MODULE_NAME)StrDefs.h
+        $(OUTPUT_DIR)(+)$(MODULE_NAME)StrDefs.hpk
+
+    <Command>
+
+[Efi-Image.UEFI_OPTIONROM]
+    <InputFile>
+        ?.efi, ?.EFI, ?.Efi
+
+    <OutputFile>
+        $(BIN_DIR)(+)$(MODULE_NAME).rom
+
+    <Command>
+        $(OPTROM) -i $(PCI_DEVICE_ID) -f $(PCI_VENDOR_ID) -l $(PCI_CLASS_CODE) -r $(PCI_REVISION) -o $dst $(OPTROM_FLAGS) $src
+
+[Unicode-Text-File.UEFI_HII]
+    <InputFile>
+        *.uni, *.Uni, *.UNI
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)$(MODULE_NAME)StrDefs.hpk
+        $(DEBUG_DIR)(+)$(MODULE_NAME)StrDefs.h
+
+    <Command>
+
+[Visual-Form-Representation-File.UEFI_HII]
+    <InputFile>
+        ?.vfr
+        ?.Vfr
+        ?.VFR
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.hpk
+
+    <Command>
+        "$(VFRPP)" $(VFRPP_FLAGS) $(INC) ${src} > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
+        "$(VFR)" $(VFR_FLAGS) --create-ifr-package --string-db $(OUTPUT_DIR)(+)$(MODULE_NAME)StrDefs.hpk --output-directory $(OUTPUT_DIR)(+)${s_dir} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
+
+[Hii-Binary-Package.UEFI_HII]
+    <InputFile>
+        *.hpk
+
+    <OutputFile.MSFT, OutputFile.INTEL, OutputFile.GCC>
+        $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.lib
+
+    <OutputFile.XCODE, OutputFile.RVCT, OutputFile.ARMGCC>
+        $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc
+
+    <Command.MSFT, Command.INTEL>
+        "$(GENFW)" -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) --hiipackage $(HII_BINARY_PACKAGES) $(GENFW_FLAGS)
+        "$(RC)" /Fo${dst} $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc
+
+    <Command.GCC>
+        "$(GENFW)" -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) --hiibinpackage $(HII_BINARY_PACKAGES) $(GENFW_FLAGS)
+        "$(RC)" $(RC_FLAGS) $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc ${dst}
+        
+    <Command.XCODE, Command.RVCT, Command.ARMGCC, Command.ARMLINUXGCC>  
+        GenFw -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) --hiibinpackage $(HII_BINARY_PACKAGES)
+        
+        
