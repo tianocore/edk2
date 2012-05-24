@@ -2,7 +2,7 @@
   Routines implements SIMPLE_TEXT_IN protocol's interfaces based on 8042 interfaces
   provided by Ps2KbdCtrller.c.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -641,10 +641,6 @@ KeyboardUnregisterKeyNotify (
   KEYBOARD_CONSOLE_IN_EX_NOTIFY         *CurrentNotify;
 
   if (NotificationHandle == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (((KEYBOARD_CONSOLE_IN_EX_NOTIFY *) NotificationHandle)->Signature != KEYBOARD_CONSOLE_IN_EX_NOTIFY_SIGNATURE) {
     return EFI_INVALID_PARAMETER;
   }
 
