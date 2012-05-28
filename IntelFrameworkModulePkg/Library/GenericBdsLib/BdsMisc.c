@@ -548,7 +548,7 @@ ValidateOption (
     return FALSE;
   }
 
-  return GetDevicePathSizeEx (DevicePath, FilePathSize) != 0;
+  return (BOOLEAN) (GetDevicePathSizeEx (DevicePath, FilePathSize) != 0);
 }
 
 /**
