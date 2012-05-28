@@ -946,7 +946,7 @@ IsPkcsSignedDataVerifiedBySignatureList (
           //
           VerifyStatus = AuthenticodeVerify (
                            PkcsCertData->CertData,
-                           mSecDataDir->Size - sizeof(PkcsCertData->Hdr),
+                           PkcsCertData->Hdr.dwLength - sizeof(PkcsCertData->Hdr),
                            RootCert,
                            RootCertSize,
                            mImageDigest,
