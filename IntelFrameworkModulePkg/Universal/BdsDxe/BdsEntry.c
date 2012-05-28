@@ -333,7 +333,6 @@ IsValidDevicePath (
   @param VariableName             Input console variable name.
 
 **/
-
 VOID
 BdsFormalizeConsoleVariable (
   IN  CHAR16          *VariableName
