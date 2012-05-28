@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -227,7 +227,7 @@ def create_zip(arch):
         'FV'
         )
     zipf.write(os.path.join(FV_DIR, 'OVMF.fd'), 'OVMF.fd')
-    zipf.write(os.path.join(FV_DIR, 'CirrusLogic5446.rom'), 'CirrusLogic5446.rom')
+    zipf.write(os.path.join(FV_DIR, 'OvmfVideo.rom'), 'OvmfVideo.rom')
     zipf.close()
     print '[done]'
 

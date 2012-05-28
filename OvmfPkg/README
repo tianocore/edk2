@@ -50,7 +50,7 @@ depend on how your build is configured.  You can expect to find
 these binary outputs:
 * OVMF.FD
   - Please note!  This filename has changed.  Older releases used OVMF.Fv.
-* CirrusLogic5446.rom
+* OvmfVideo.rom
 
 More information on building OVMF can be found at:
 
@@ -60,7 +60,7 @@ http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=How_to_build_OVM
 
 * QEMU 0.9.1 or later is required.
 * Either copy, rename or symlink OVMF.FD => bios.bin
-* Either copy, rename or symlink CirrusLogic5446.rom => vgabios-cirrus.bin
+* Either copy, rename or symlink OvmfVideo.rom => vgabios-cirrus.bin
 * Be sure to use qemu-system-x86_64, if you are using and X64 firmware.
   (qemu-system-x86_64 works for the IA32 firmware as well, of course.)
 * Use the QEMU -L parameter to specify the directory where the bios.bin
