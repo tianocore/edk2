@@ -2429,6 +2429,19 @@ FwVolBlockDriverInit (
   IN EFI_SYSTEM_TABLE           *SystemTable
   );
 
+/**
+
+  Get FVB authentication status
+
+  @param FvbProtocol    FVB protocol.
+
+  @return Authentication status.
+
+**/
+UINT32
+GetFvbAuthenticationStatus (
+  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL     *FvbProtocol
+  );
 
 /**
   This routine produces a firmware volume block protocol on a given
@@ -2437,8 +2450,10 @@ FwVolBlockDriverInit (
   @param  BaseAddress            base address of the firmware volume image
   @param  Length                 length of the firmware volume image
   @param  ParentHandle           handle of parent firmware volume, if this image
-                                 came from an FV image file in another firmware
+                                 came from an FV image file and section in another firmware
                                  volume (ala capsules)
+  @param  AuthenticationStatus   Authentication status inherited, if this image
+                                 came from an FV image file and section in another firmware volume.
   @param  FvProtocol             Firmware volume block protocol produced.
 
   @retval EFI_VOLUME_CORRUPTED   Volume corrupted.
@@ -2452,6 +2467,7 @@ ProduceFVBProtocolOnBuffer (
   IN EFI_PHYSICAL_ADDRESS   BaseAddress,
   IN UINT64                 Length,
   IN EFI_HANDLE             ParentHandle,
+  IN UINT32                 AuthenticationStatus,
   OUT EFI_HANDLE            *FvProtocol  OPTIONAL
   );
 

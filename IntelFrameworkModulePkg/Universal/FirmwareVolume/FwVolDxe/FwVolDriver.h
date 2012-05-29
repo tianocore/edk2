@@ -1,7 +1,7 @@
 /** @file
   Common defines and definitions for a FwVolDxe driver.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -94,6 +94,7 @@ typedef struct {
 
   FFS_FILE_LIST_ENTRY                 *CurrentFfsFile;
   BOOLEAN                             IsFfs3Fv;
+  UINT32                              AuthenticationStatus;
 } FV_DEVICE;
 
 #define FV_DEVICE_FROM_THIS(a)  CR (a, FV_DEVICE, Fv, FV_DEVICE_SIGNATURE)

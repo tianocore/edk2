@@ -1,7 +1,7 @@
 /** @file
   Implements functions to read firmware file
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -483,6 +483,13 @@ FvReadFileSection (
              AuthenticationStatus,
              FvDevice->IsFfs3Fv
              );
+
+  if (!EFI_ERROR (Status)) {
+    //
+    // Inherit the authentication status.
+    //
+    *AuthenticationStatus |= FvDevice->AuthenticationStatus;
+  }
 
   //
   // Close of stream defered to close of FfsHeader list to allow SEP to cache data
