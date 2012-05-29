@@ -113,6 +113,7 @@ InternalSearchForLogEntry (
   )
 {
   UINT32                    Index;
+  UINT32                    Index2;
   UINT32                    NumberOfEntries;
   PEI_PERFORMANCE_LOG_ENTRY *LogEntryArray;
 
@@ -126,13 +127,16 @@ InternalSearchForLogEntry (
   NumberOfEntries = PeiPerformanceLog->NumberOfEntries;
   LogEntryArray   = (PEI_PERFORMANCE_LOG_ENTRY *) (PeiPerformanceLog + 1);
 
+  Index2 = 0;
+
   for (Index = 0; Index < NumberOfEntries; Index++) {
-    if ((LogEntryArray[Index].Handle == (EFI_PHYSICAL_ADDRESS) (UINTN) Handle) &&
-         AsciiStrnCmp (LogEntryArray[Index].Token, Token, PEI_PERFORMANCE_STRING_LENGTH) == 0 &&
-         AsciiStrnCmp (LogEntryArray[Index].Module, Module, PEI_PERFORMANCE_STRING_LENGTH) == 0 &&
-         (PeiPerformanceIdArray[Index] == Identifier) &&
-         LogEntryArray[Index].EndTimeStamp == 0
-       ) {
+    Index2 = NumberOfEntries - 1 - Index;
+    if (LogEntryArray[Index2].EndTimeStamp == 0 &&
+        (LogEntryArray[Index2].Handle == (EFI_PHYSICAL_ADDRESS) (UINTN) Handle) &&
+        AsciiStrnCmp (LogEntryArray[Index2].Token, Token, PEI_PERFORMANCE_STRING_LENGTH) == 0 &&
+        AsciiStrnCmp (LogEntryArray[Index2].Module, Module, PEI_PERFORMANCE_STRING_LENGTH) == 0 &&
+        (PeiPerformanceIdArray[Index2] == Identifier)) {
+      Index = Index2;
       break;
     }
   }

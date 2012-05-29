@@ -88,6 +88,7 @@ InternalSearchForGaugeEntry (
   )
 {
   UINT32                    Index;
+  UINT32                    Index2;
   UINT32                    NumberOfEntries;
   GAUGE_DATA_ENTRY_EX       *GaugeEntryExArray;
 
@@ -101,13 +102,16 @@ InternalSearchForGaugeEntry (
   NumberOfEntries = mGaugeData->NumberOfEntries;
   GaugeEntryExArray = (GAUGE_DATA_ENTRY_EX *) (mGaugeData + 1);
 
+  Index2 = 0;
+
   for (Index = 0; Index < NumberOfEntries; Index++) {
-    if ((GaugeEntryExArray[Index].Handle == (EFI_PHYSICAL_ADDRESS) (UINTN) Handle) &&
-         AsciiStrnCmp (GaugeEntryExArray[Index].Token, Token, DXE_PERFORMANCE_STRING_LENGTH) == 0 &&
-         AsciiStrnCmp (GaugeEntryExArray[Index].Module, Module, DXE_PERFORMANCE_STRING_LENGTH) == 0 &&
-         (GaugeEntryExArray[Index].Identifier == Identifier) &&
-         GaugeEntryExArray[Index].EndTimeStamp == 0
-       ) {
+    Index2 = NumberOfEntries - 1 - Index;
+    if (GaugeEntryExArray[Index2].EndTimeStamp == 0 &&
+        (GaugeEntryExArray[Index2].Handle == (EFI_PHYSICAL_ADDRESS) (UINTN) Handle) &&
+        AsciiStrnCmp (GaugeEntryExArray[Index2].Token, Token, DXE_PERFORMANCE_STRING_LENGTH) == 0 &&
+        AsciiStrnCmp (GaugeEntryExArray[Index2].Module, Module, DXE_PERFORMANCE_STRING_LENGTH) == 0 &&
+        (GaugeEntryExArray[Index2].Identifier == Identifier)) {
+      Index = Index2;
       break;
     }
   }
