@@ -2278,7 +2278,10 @@ AhciModeInitialization (
       if (PhyDetectDelay == 0) {
         //
         // No device detected at this port.
+        // Clear PxCMD.SUD for those ports at which there are no device present.
         //
+        Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_CMD;
+        AhciAndReg (PciIo, Offset, (UINT32) ~(EFI_AHCI_PORT_CMD_SUD));
         continue;
       }
 
