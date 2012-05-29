@@ -604,14 +604,16 @@ ProcessOptions (
 
   @param  StringPtr              The entire help string.
   @param  FormattedString        The oupput formatted string.
+  @param  EachLineWidth          The string length of each line in the formatted string.
   @param  RowCount               TRUE: if Question is selected.
 
 **/
 UINTN
 ProcessHelpString (
-  IN  CHAR16                      *StringPtr,
-  OUT CHAR16                      **FormattedString,
-  IN  UINTN                       RowCount
+  IN  CHAR16  *StringPtr,
+  OUT CHAR16  **FormattedString,
+  OUT UINT16  *EachLineWidth,
+  IN  UINTN   RowCount
   );
 
 /**
@@ -672,10 +674,12 @@ GetStringWidth (
 /**
   Will copy LineWidth amount of a string in the OutputString buffer and return the
   number of CHAR16 characters that were copied into the OutputString buffer.
+  In the code, it deals \r,\n,\r\n same as \n\r, also it not process the \r or \g.
 
   @param  InputString            String description for this option.
   @param  LineWidth              Width of the desired string to extract in CHAR16
                                  characters
+  @param  GlyphWidth             The glyph width of the beging char in the string.
   @param  Index                  Where in InputString to start the copy process
   @param  OutputString           Buffer to copy the string into
 
@@ -686,6 +690,7 @@ UINT16
 GetLineByWidth (
   IN      CHAR16                      *InputString,
   IN      UINT16                      LineWidth,
+  IN OUT  UINT16                      *GlyphWidth,
   IN OUT  UINTN                       *Index,
   OUT     CHAR16                      **OutputString
   );

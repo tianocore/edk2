@@ -477,6 +477,7 @@ DisplayForm (
   UINT16                 NumberOfLines;
   EFI_STATUS             Status;
   UI_MENU_OPTION         *MenuOption;
+  UINT16                 GlyphWidth;
 
   Handle        = Selection->Handle;
   MenuItemCount = 0;
@@ -528,7 +529,8 @@ DisplayForm (
 
       NumberOfLines = 1;
       ArrayEntry = 0;
-      for (; GetLineByWidth (StringPtr, Width, &ArrayEntry, &OutputString) != 0x0000;) {
+      GlyphWidth = 1;
+      for (; GetLineByWidth (StringPtr, Width, &GlyphWidth,&ArrayEntry, &OutputString) != 0x0000;) {
         //
         // If there is more string to process print on the next row and increment the Skip value
         //
