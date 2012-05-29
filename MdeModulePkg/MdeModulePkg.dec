@@ -462,6 +462,9 @@
   ## If TRUE, S3 performance data will be supported in ACPI FPDT table.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwarePerformanceDataTableS3Support|TRUE|BOOLEAN|0x00010064
 
+  ## This PCD specified whether the S.M.A.R.T feature of attached ATA hard disks are enabled.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAtaSmartEnable|TRUE|BOOLEAN|0x00010065
+
 [PcdsFeatureFlag.IA32, PcdsFeatureFlag.X64]
   ##
   # This feature flag specifies whether DxeIpl switches to long mode to enter DXE phase.
