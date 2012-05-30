@@ -210,7 +210,7 @@ INF  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
 INF  OvmfPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
 
 INF  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
-INF  MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
+INF  OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
 INF  RuleOverride=ACPITABLE OvmfPkg/AcpiTables/AcpiTables.inf
 
 INF  RuleOverride = BINARY USE = X64 FatBinPkg/EnhancedFatDxe/Fat.inf

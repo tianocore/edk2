@@ -422,7 +422,7 @@
   # ACPI Support
   #
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
-  MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
+  OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
   OvmfPkg/AcpiTables/AcpiTables.inf
 
   #

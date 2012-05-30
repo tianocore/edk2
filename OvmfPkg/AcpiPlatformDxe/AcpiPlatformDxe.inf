@@ -1,0 +1,53 @@
+## @file
+#  Sample ACPI Platform Driver
+#
+#  Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AcpiPlatform
+  FILE_GUID                      = cb933912-df8f-4305-b1f9-7b44fa11395c
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = AcpiPlatformEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  AcpiPlatform.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiLib
+  DxeServicesLib
+  PcdLib
+  BaseMemoryLib
+  DebugLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiTableStorageFile
+
+[Depex]
+  gEfiAcpiTableProtocolGuid
+
