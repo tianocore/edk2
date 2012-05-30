@@ -46,6 +46,7 @@
   UefiDriverEntryPoint
   HobLib
   QemuFwCfgLib
+  MemoryAllocationLib
 
 [Protocols]
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED

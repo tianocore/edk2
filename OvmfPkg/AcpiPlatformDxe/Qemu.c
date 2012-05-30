@@ -13,6 +13,8 @@
 **/ 
 
 #include "AcpiPlatform.h"
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/QemuFwCfgLib.h>
 
 
@@ -29,6 +31,73 @@ QemuDetected (
 }
 
 
+STATIC
+EFI_STATUS
+EFIAPI
+QemuInstallAcpiMadtTable (
+  IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol,
+  IN   VOID                          *AcpiTableBuffer,
+  IN   UINTN                         AcpiTableBufferSize,
+  OUT  UINTN                         *TableKey
+  )
+{
+  EFI_STATUS                                   Status;
+  UINTN                                        Count;
+  UINTN                                        Loop;
+  EFI_ACPI_DESCRIPTION_HEADER                  *Hdr;
+  UINTN                                        NewBufferSize;
+  EFI_ACPI_1_0_PROCESSOR_LOCAL_APIC_STRUCTURE  *LocalApic;
+
+  QemuFwCfgSelectItem (QemuFwCfgItemSmpCpuCount);
+  Count = (UINTN) QemuFwCfgRead16 ();
+  ASSERT (Count >= 1);
+
+  if (Count == 1) {
+    //
+    // The pre-built MADT table covers the single CPU case
+    //
+    return InstallAcpiTable (
+             AcpiProtocol,
+             AcpiTableBuffer,
+             AcpiTableBufferSize,
+             TableKey
+             );
+  }
+
+  //
+  // We need to add additional Local APIC entries to the MADT
+  //
+  NewBufferSize = AcpiTableBufferSize + ((Count - 1) * sizeof (*LocalApic));
+  Hdr = (EFI_ACPI_DESCRIPTION_HEADER*) AllocatePool (NewBufferSize);
+  ASSERT (Hdr != NULL);
+
+  CopyMem (Hdr, AcpiTableBuffer, AcpiTableBufferSize);
+
+  LocalApic = (EFI_ACPI_1_0_PROCESSOR_LOCAL_APIC_STRUCTURE*)
+                (((UINT8*) Hdr) + AcpiTableBufferSize);
+
+  //
+  // Add Local APIC entries for the APs to the MADT
+  //
+  for (Loop = 1; Loop < Count; Loop++) {
+    LocalApic->Type = EFI_ACPI_1_0_PROCESSOR_LOCAL_APIC;
+    LocalApic->Length = sizeof (*LocalApic);
+    LocalApic->AcpiProcessorId = Loop;
+    LocalApic->ApicId = Loop;
+    LocalApic->Flags = 1;
+    LocalApic++;
+  }
+
+  Hdr->Length = NewBufferSize;
+
+  Status = InstallAcpiTable (AcpiProtocol, Hdr, NewBufferSize, TableKey);
+
+  FreePool (Hdr);
+
+  return Status;
+}
+
+
 EFI_STATUS
 EFIAPI
 QemuInstallAcpiTable (
@@ -38,7 +107,19 @@ QemuInstallAcpiTable (
   OUT  UINTN                         *TableKey
   )
 {
-  return InstallAcpiTable(
+  EFI_ACPI_DESCRIPTION_HEADER        *Hdr;
+  EFI_ACPI_TABLE_INSTALL_ACPI_TABLE  TableInstallFunction;
+
+  Hdr = (EFI_ACPI_DESCRIPTION_HEADER*) AcpiTableBuffer;
+  switch (Hdr->Signature) {
+  case EFI_ACPI_1_0_APIC_SIGNATURE:
+    TableInstallFunction = QemuInstallAcpiMadtTable;
+    break;
+  default:
+    TableInstallFunction = InstallAcpiTable;
+  }
+
+  return TableInstallFunction (
            AcpiProtocol,
            AcpiTableBuffer,
            AcpiTableBufferSize,
