@@ -1885,6 +1885,63 @@ Done:
 }
 
 /**
+  Check if a Unicode character is a hexadecimal character.
+
+  This function checks if a Unicode character is a 
+  hexadecimal character.  The valid hexadecimal character is 
+  L'0' to L'9', L'a' to L'f', or L'A' to L'F'.
+
+
+  @param Char           The character to check against.
+
+  @retval TRUE          If the Char is a hexadecmial character.
+  @retval FALSE         If the Char is not a hexadecmial character.
+
+**/
+BOOLEAN
+EFIAPI
+IsHexaDecimalDigitCharacter (
+  IN CHAR16             Char
+  )
+{
+  return (BOOLEAN) ((Char >= L'0' && Char <= L'9') || (Char >= L'A' && Char <= L'F') || (Char >= L'a' && Char <= L'f'));
+}
+
+/**
+
+  This code checks if variable is hardware error record variable or not.
+
+  According to UEFI spec, hardware error record variable should use the EFI_HARDWARE_ERROR_VARIABLE VendorGuid
+  and have the L"HwErrRec####" name convention, #### is a printed hex value and no 0x or h is included in the hex value.
+
+  @param VariableName   Pointer to variable name.
+  @param VendorGuid     Variable Vendor Guid.
+
+  @retval TRUE          Variable is hardware error record variable.
+  @retval FALSE         Variable is not hardware error record variable.
+
+**/
+BOOLEAN
+EFIAPI
+IsHwErrRecVariable (
+  IN CHAR16             *VariableName,
+  IN EFI_GUID           *VendorGuid
+  )
+{
+  if (!CompareGuid (VendorGuid, &gEfiHardwareErrorVariableGuid) ||
+      (StrLen (VariableName) != StrLen (L"HwErrRec####")) ||
+      (StrnCmp(VariableName, L"HwErrRec", StrLen (L"HwErrRec")) != 0) ||
+      !IsHexaDecimalDigitCharacter (VariableName[0x8]) ||
+      !IsHexaDecimalDigitCharacter (VariableName[0x9]) ||
+      !IsHexaDecimalDigitCharacter (VariableName[0xA]) ||
+      !IsHexaDecimalDigitCharacter (VariableName[0xB])) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
 
   This code finds variable in storage blocks (Volatile or Non-Volatile).
 
@@ -2199,10 +2256,7 @@ VariableServiceSetVariable (
         (sizeof (VARIABLE_HEADER) + StrSize (VariableName) + PayloadSize > PcdGet32 (PcdMaxHardwareErrorVariableSize))) {
       return EFI_INVALID_PARAMETER;
     }
-    //
-    // According to UEFI spec, HARDWARE_ERROR_RECORD variable name convention should be L"HwErrRecXXXX".
-    //
-    if (StrnCmp(VariableName, L"HwErrRec", StrLen(L"HwErrRec")) != 0) {
+    if (!IsHwErrRecVariable(VariableName, VendorGuid)) {
       return EFI_INVALID_PARAMETER;
     }
   } else {

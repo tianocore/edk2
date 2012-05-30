@@ -76,6 +76,7 @@
   gEfiCustomModeEnableGuid
   gEfiSystemNvDataFvGuid                        ## CONSUMES
   gEfiCertDbGuid
+  gEfiHardwareErrorVariableGuid                 ## SOMETIMES_CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
