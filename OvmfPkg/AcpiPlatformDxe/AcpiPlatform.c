@@ -1,7 +1,7 @@
 /** @file
-  Sample ACPI Platform Driver
+  OVMF ACPI Platform Driver
 
-  Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -10,19 +10,27 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-**/ 
+**/
 
-#include <PiDxe.h>
+#include "AcpiPlatform.h"
 
-#include <Protocol/AcpiTable.h>
-#include <Protocol/FirmwareVolume2.h>
+EFI_STATUS
+EFIAPI
+InstallAcpiTable (
+  IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol,
+  IN   VOID                          *AcpiTableBuffer,
+  IN   UINTN                         AcpiTableBufferSize,
+  OUT  UINTN                         *TableKey
+  )
+{
+  return AcpiProtocol->InstallAcpiTable (
+                         AcpiProtocol,
+                         AcpiTableBuffer,
+                         AcpiTableBufferSize,
+                         TableKey
+                         );
+}
 
-#include <Library/BaseLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/DebugLib.h>
-#include <Library/PcdLib.h>
-
-#include <IndustryStandard/Acpi.h>
 
 /**
   Locate the first instance of a protocol.  If the protocol requested is an
@@ -171,15 +179,16 @@ AcpiPlatformEntryPoint (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-  EFI_STATUS                     Status;
-  EFI_ACPI_TABLE_PROTOCOL        *AcpiTable;
-  EFI_FIRMWARE_VOLUME2_PROTOCOL  *FwVol;
-  INTN                           Instance;
-  EFI_ACPI_COMMON_HEADER         *CurrentTable;
-  UINTN                          TableHandle;
-  UINT32                         FvStatus;
-  UINTN                          TableSize;
-  UINTN                          Size;
+  EFI_STATUS                         Status;
+  EFI_ACPI_TABLE_PROTOCOL            *AcpiTable;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL      *FwVol;
+  INTN                               Instance;
+  EFI_ACPI_COMMON_HEADER             *CurrentTable;
+  UINTN                              TableHandle;
+  UINT32                             FvStatus;
+  UINTN                              TableSize;
+  UINTN                              Size;
+  EFI_ACPI_TABLE_INSTALL_ACPI_TABLE  TableInstallFunction;
 
   Instance     = 0;
   CurrentTable = NULL;
@@ -191,6 +200,14 @@ AcpiPlatformEntryPoint (
   Status = gBS->LocateProtocol (&gEfiAcpiTableProtocolGuid, NULL, (VOID**)&AcpiTable);
   if (EFI_ERROR (Status)) {
     return EFI_ABORTED;
+  }
+
+  if (QemuDetected ()) {
+    TableInstallFunction = QemuInstallAcpiTable;
+  } else if (XenDetected ()) {
+    TableInstallFunction = XenInstallAcpiTable;
+  } else {
+    TableInstallFunction = InstallAcpiTable;
   }
 
   //
@@ -231,19 +248,19 @@ AcpiPlatformEntryPoint (
       //
       // Install ACPI table
       //
-      Status = AcpiTable->InstallAcpiTable (
-                            AcpiTable,
-                            CurrentTable,
-                            TableSize,
-                            &TableHandle
-                            );
+      Status = TableInstallFunction (
+                 AcpiTable,
+                 CurrentTable,
+                 TableSize,
+                 &TableHandle
+                 );
 
       //
       // Free memory allocated by ReadSection
       //
       gBS->FreePool (CurrentTable);
 
-      if (EFI_ERROR(Status)) {
+      if (EFI_ERROR (Status)) {
         return EFI_ABORTED;
       }
 
