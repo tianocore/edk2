@@ -1,5 +1,5 @@
 /** @file
-  The common variable operation routines shared by DXE_RINTIME variable
+  The common variable operation routines shared by DXE_RUNTIME variable
   module and DXE_SMM variable module.
 
 Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
@@ -2213,6 +2213,16 @@ VariableServiceSetVariable (
     if ((PayloadSize > PcdGet32 (PcdMaxVariableSize)) ||
         (sizeof (VARIABLE_HEADER) + StrSize (VariableName) + PayloadSize > PcdGet32 (PcdMaxVariableSize))) {
       return EFI_INVALID_PARAMETER;
+    }
+  }
+
+  if (AtRuntime ()) {
+    //
+    // HwErrRecSupport Global Variable identifies the level of hardware error record persistence
+    // support implemented by the platform. This variable is only modified by firmware and is read-only to the OS.
+    //
+    if (CompareGuid (VendorGuid, &gEfiGlobalVariableGuid) && (StrCmp (VariableName, L"HwErrRecSupport") == 0)) {
+      return EFI_WRITE_PROTECTED;
     }
   }
 
