@@ -289,7 +289,7 @@ GetNameFromHandle (
                   &gEfiLoadedImageDevicePathProtocolGuid,
                   (VOID **) &LoadedImageDevicePath
                   );
-  if (!EFI_ERROR (Status)) {
+  if (!EFI_ERROR (Status) && (LoadedImageDevicePath != NULL)) {
     DevicePath = LoadedImageDevicePath;
 
     //
