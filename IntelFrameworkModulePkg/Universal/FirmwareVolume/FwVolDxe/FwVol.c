@@ -259,7 +259,7 @@ FwVolInheritAuthenticationStatus (
               //
               // Both FVs don't contain extension header, then compare their whole FV Image.
               //
-              if (CompareMem ((VOID *) FvHeader, (VOID *) CachedFvHeader, FvHeader->FvLength) == 0) {
+              if (CompareMem ((VOID *) FvHeader, (VOID *) CachedFvHeader, (UINTN) FvHeader->FvLength) == 0) {
                 //
                 // Found the FV image section where the firmware volume came from
                 // and then inherit authentication status from it.
