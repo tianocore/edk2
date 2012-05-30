@@ -19,7 +19,7 @@
   FILE_GUID                      = 449D0F00-2148-4a43-9836-F10B3980ECF5
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = ShellLib|UEFI_APPLICATION UEFI_DRIVER
+  LIBRARY_CLASS                  = ShellLib|UEFI_APPLICATION UEFI_DRIVER DXE_RUNTIME_DRIVER
   CONSTRUCTOR                    = ShellLibConstructor
   DESTRUCTOR                     = ShellLibDestructor
 

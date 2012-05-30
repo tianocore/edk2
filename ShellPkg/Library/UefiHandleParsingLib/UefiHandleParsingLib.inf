@@ -18,7 +18,7 @@
   FILE_GUID                      = 3CDC7177-CC2A-4678-BA8F-1A936A093FA4
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = HandleParsingLib|UEFI_APPLICATION UEFI_DRIVER
+  LIBRARY_CLASS                  = HandleParsingLib|UEFI_APPLICATION UEFI_DRIVER DXE_RUNTIME_DRIVER
   CONSTRUCTOR                    = HandleParsingLibConstructor
   DESTRUCTOR                     = HandleParsingLibDestructor
 
