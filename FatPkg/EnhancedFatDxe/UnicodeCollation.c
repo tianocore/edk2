@@ -2,7 +2,7 @@
   Unicode Collation Support component that hides the trivial difference of Unicode Collation
   and Unicode collation 2 Protocol.
 
-  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
 distribution. The full text of the license may be found at
@@ -61,7 +61,7 @@ InitializeUnicodeCollationSupportWorker (
   }
 
   Iso639Language = (BOOLEAN) (ProtocolGuid == &gEfiUnicodeCollationProtocolGuid);
-  Language = GetEfiGlobalVariable(VariableName);
+  GetEfiGlobalVariable2(VariableName, &Language, NULL);
 
   Status = EFI_UNSUPPORTED;
   for (Index = 0; Index < NumHandles; Index++) {
