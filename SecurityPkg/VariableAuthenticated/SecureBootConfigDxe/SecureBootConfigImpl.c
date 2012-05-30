@@ -215,7 +215,7 @@ DeleteVariable (
   UINTN                   DataSize;
   UINT32                  Attr;
 
-  Variable = GetVariable (VariableName, VendorGuid);
+  GetVariable2 (VariableName, VendorGuid, &Variable, NULL);
   if (Variable == NULL) {
     return EFI_SUCCESS;
   }
@@ -2064,7 +2064,7 @@ SecureBootExtractConfigFromVariable (
   //
   // Get the SecureBootEnable Variable
   //
-  SecureBootEnable = GetVariable (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid);
+  GetVariable2 (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, &SecureBootEnable, NULL);
 
   //
   // If the SecureBootEnable Variable doesn't exist, hide the SecureBoot Enable/Disable
@@ -2088,7 +2088,7 @@ SecureBootExtractConfigFromVariable (
   //
   // If there is no PK then the Delete Pk button will be gray.
   //
-  SetupMode = GetVariable (EFI_SETUP_MODE_NAME, &gEfiGlobalVariableGuid);
+  GetVariable2 (EFI_SETUP_MODE_NAME, &gEfiGlobalVariableGuid, &SetupMode, NULL);
   if (SetupMode == NULL || (*SetupMode) == 1) {
     ConfigData->HasPk = FALSE;
   } else  {
@@ -2098,7 +2098,7 @@ SecureBootExtractConfigFromVariable (
   //
   // Get the SecureBootMode from CustomMode variable.
   //
-  SecureBootMode = GetVariable (EFI_CUSTOM_MODE_NAME, &gEfiCustomModeEnableGuid);
+  GetVariable2 (EFI_CUSTOM_MODE_NAME, &gEfiCustomModeEnableGuid, &SecureBootMode, NULL);
   if (SecureBootMode == NULL) {
     ConfigData->SecureBootMode = STANDARD_SECURE_BOOT_MODE;
   } else {
@@ -2298,6 +2298,9 @@ SecureBootCallback (
   UINTN                           BufferSize;
   SECUREBOOT_CONFIGURATION        *IfrNvData;
   UINT16                          LabelId;
+  UINT8                           *SecureBootEnable;
+
+  SecureBootEnable = NULL;
 
   if ((This == NULL) || (Value == NULL) || (ActionRequest == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -2326,7 +2329,8 @@ SecureBootCallback (
 
     switch (QuestionId) {
     case KEY_SECURE_BOOT_ENABLE:
-      if (NULL != GetVariable (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid)) {
+      GetVariable2 (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, &SecureBootEnable, NULL);
+      if (NULL != SecureBootEnable) {
         if (EFI_ERROR (SaveSecureBootVariable (Value->u8))) {
           CreatePopUp (
             EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
@@ -2513,7 +2517,8 @@ SecureBootCallback (
       break;
       
     case KEY_SECURE_BOOT_MODE:
-      if (NULL != GetVariable (EFI_CUSTOM_MODE_NAME, &gEfiCustomModeEnableGuid)) {
+      GetVariable2 (EFI_CUSTOM_MODE_NAME, &gEfiCustomModeEnableGuid, &SecureBootEnable, NULL);
+      if (NULL != SecureBootEnable) {
         Status = gRT->SetVariable (                          
                         EFI_CUSTOM_MODE_NAME,
                         &gEfiCustomModeEnableGuid,

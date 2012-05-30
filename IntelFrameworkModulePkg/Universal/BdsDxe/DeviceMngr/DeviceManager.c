@@ -1,7 +1,7 @@
 /** @file
   The platform device manager reference implementation
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2167,7 +2167,7 @@ DriverHealthSelectBestLanguage (
   CHAR8           *LanguageVariable;
   CHAR8           *BestLanguage;
 
-  LanguageVariable =  GetEfiGlobalVariable (Iso639Language ? L"Lang" : L"PlatformLang");
+  GetEfiGlobalVariable2 (Iso639Language ? L"Lang" : L"PlatformLang", &LanguageVariable, NULL);
 
   BestLanguage = GetBestLanguage(
                    SupportedLanguages,

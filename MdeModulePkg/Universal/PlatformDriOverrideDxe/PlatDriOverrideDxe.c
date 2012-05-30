@@ -13,7 +13,7 @@
   4. It save all the mapping info in NV variables which will be consumed
      by platform override protocol driver to publish the platform override protocol.
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -185,7 +185,7 @@ GetComponentNameWorker (
   //
   // Find the best matching language.
   //
-  Language = GetEfiGlobalVariable (VariableName);
+  GetEfiGlobalVariable2 (VariableName, &Language, NULL);
   BestLanguage = GetBestLanguage (
                    ComponentName->SupportedLanguages,
                    (BOOLEAN) (ProtocolGuid == &gEfiComponentNameProtocolGuid),

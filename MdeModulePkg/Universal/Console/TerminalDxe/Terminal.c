@@ -2,7 +2,7 @@
   Produces Simple Text Input Protocol, Simple Text Input Extended Protocol and
   Simple Text Output Protocol upon Serial IO Protocol.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -358,7 +358,7 @@ IsTerminalInConsoleVariable (
   //
   // Get global variable and its size according to the name given.
   //
-  Variable = GetEfiGlobalVariable (VariableName);
+  GetEfiGlobalVariable2 (VariableName, &Variable, NULL);
   if (Variable == NULL) {
     return FALSE;
   }
@@ -1431,7 +1431,7 @@ TerminalUpdateConsoleDevVariable (
   //
   // Get global variable and its size according to the name given.
   //
-  Variable = GetEfiGlobalVariable (VariableName);
+  GetEfiGlobalVariable2 (VariableName, &Variable, NULL);
   if (Variable == NULL) {
     return;
   }
@@ -1500,7 +1500,7 @@ TerminalRemoveConsoleDevVariable (
   //
   // Get global variable and its size according to the name given.
   //
-  Variable = GetEfiGlobalVariable (VariableName);
+  GetEfiGlobalVariable2 (VariableName, &Variable, NULL);
   if (Variable == NULL) {
     return ;
   }
