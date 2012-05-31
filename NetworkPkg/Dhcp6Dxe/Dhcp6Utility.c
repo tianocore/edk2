@@ -1,7 +1,7 @@
 /** @file
   Dhcp6 support functions implementation.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -41,7 +41,7 @@ Dhcp6GenerateClientId (
   // Attempt to get client Id from variable to keep it constant.
   // See details in section-9 of rfc-3315.
   //
-  Duid = GetVariable (L"ClientId", &gEfiDhcp6ServiceBindingProtocolGuid);
+  GetVariable2 (L"ClientId", &gEfiDhcp6ServiceBindingProtocolGuid, &Duid, NULL);
   if (Duid != NULL) {
     return Duid;
   }

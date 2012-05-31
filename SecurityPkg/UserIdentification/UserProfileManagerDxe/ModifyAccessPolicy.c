@@ -410,7 +410,7 @@ DisplayLoadPermit(
     // Get driver device path.
     //
     UnicodeSPrint (VarName, sizeof (VarName), L"Driver%04x", Order[Index]);
-    Var = GetEfiGlobalVariable (VarName);
+    GetEfiGlobalVariable2 (VarName, &Var, NULL);
     if (Var == NULL) {
       continue;
     }
@@ -655,7 +655,7 @@ AddToForbidLoad (
   // Get loadable driver device path.
   //
   UnicodeSPrint  (VarName, sizeof (VarName), L"Driver%04x", DriverIndex);
-  Var = GetEfiGlobalVariable (VarName);
+  GetEfiGlobalVariable2 (VarName, &Var, NULL);
   if (Var == NULL) {
     return;
   }

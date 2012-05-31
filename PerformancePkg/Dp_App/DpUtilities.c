@@ -270,7 +270,7 @@ GetNameFromHandle (
     //
     // Get the current platform language setting
     //
-    PlatformLanguage = GetEfiGlobalVariable (L"PlatformLang");
+    GetEfiGlobalVariable2 (L"PlatformLang", &PlatformLanguage, NULL);
     Status = ComponentName2->GetDriverName (
                                ComponentName2,
                                PlatformLanguage != NULL ? PlatformLanguage : "en-US",

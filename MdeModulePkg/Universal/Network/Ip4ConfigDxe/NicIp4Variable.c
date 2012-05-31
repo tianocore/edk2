@@ -1,7 +1,7 @@
 /** @file
   Routines used to operate the Ip4 configure variable.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -91,7 +91,7 @@ Ip4ConfigReadVariable (
 {
   NIC_IP4_CONFIG_INFO *NicConfig;
 
-  NicConfig = GetVariable (Instance->MacString, &gEfiNicIp4ConfigVariableGuid);
+  GetVariable2 (Instance->MacString, &gEfiNicIp4ConfigVariableGuid, &NicConfig, NULL);
   if (NicConfig != NULL) {
     Ip4ConfigFixRouteTablePointer (&NicConfig->Ip4Info);
   }
@@ -255,7 +255,7 @@ Check:
       continue;
     }
 
-    NicConfig = GetVariable (VariableName, &gEfiNicIp4ConfigVariableGuid);
+    GetVariable2 (VariableName, &gEfiNicIp4ConfigVariableGuid, &NicConfig, NULL);
     if (NicConfig == NULL) {
       break;
     }

@@ -5,7 +5,7 @@
   EFI Driver Model related protocols, manage Unicode string tables for UEFI Drivers, 
   and print messages on the console output and standard error devices.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1212,7 +1212,11 @@ FreeUnicodeStringTable (
   return EFI_SUCCESS;
 }
 
+#ifndef DISABLE_NEW_DEPRECATED_INTERFACES
+
 /**
+  [ATTENTION] This function will be deprecated for security reason.
+
   Returns a pointer to an allocated buffer that contains the contents of a 
   variable retrieved through the UEFI Runtime Service GetVariable().  The 
   returned buffer is allocated using AllocatePool().  The caller is responsible
@@ -1273,8 +1277,9 @@ GetVariable (
   return Value;
 }
 
-
 /**
+  [ATTENTION] This function will be deprecated for security reason.
+
   Returns a pointer to an allocated buffer that contains the contents of a 
   variable retrieved through the UEFI Runtime Service GetVariable().  This 
   function always uses the EFI_GLOBAL_VARIABLE GUID to retrieve variables.
@@ -1298,7 +1303,110 @@ GetEfiGlobalVariable (
 {
   return GetVariable (Name, &gEfiGlobalVariableGuid);
 }
+#endif
 
+/**
+  Returns the status whether get the variable success. The function retrieves 
+  variable  through the UEFI Runtime Service GetVariable().  The 
+  returned buffer is allocated using AllocatePool().  The caller is responsible
+  for freeing this buffer with FreePool().
+
+  If Name  is NULL, then ASSERT().
+  If Guid  is NULL, then ASSERT().
+  If Value is NULL, then ASSERT().
+
+  @param[in]  Name  The pointer to a Null-terminated Unicode string.
+  @param[in]  Guid  The pointer to an EFI_GUID structure
+  @param[out] Value The buffer point saved the variable info.
+  @param[out] Size  The buffer size of the variable.
+
+  @return EFI_OUT_OF_RESOURCES      Allocate buffer failed.
+  @return EFI_SUCCESS               Find the specified variable.
+  @return Others Errors             Return errors from call to gRT->GetVariable.
+
+**/
+EFI_STATUS
+EFIAPI
+GetVariable2 (
+  IN CONST CHAR16    *Name,
+  IN CONST EFI_GUID  *Guid,
+  OUT VOID           **Value,
+  OUT UINTN          *Size OPTIONAL
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       BufferSize;
+
+  ASSERT (Name != NULL && Guid != NULL && Value != NULL);
+
+  //
+  // Try to get the variable size.
+  //
+  BufferSize = 0;
+  *Value     = NULL;
+  if (Size != NULL) {
+    *Size  = 0;
+  }
+  
+  Status = gRT->GetVariable ((CHAR16 *) Name, (EFI_GUID *) Guid, NULL, &BufferSize, *Value);
+  if (Status != EFI_BUFFER_TOO_SMALL) {
+    return Status;
+  }
+
+  //
+  // Allocate buffer to get the variable.
+  //
+  *Value = AllocatePool (BufferSize);
+  ASSERT (*Value != NULL);
+  if (*Value == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Get the variable data.
+  //
+  Status = gRT->GetVariable ((CHAR16 *) Name, (EFI_GUID *) Guid, NULL, &BufferSize, *Value);
+  if (EFI_ERROR (Status)) {
+    FreePool(*Value);
+    *Value = NULL;
+  }
+
+  if (Size != NULL) {
+    *Size = BufferSize;
+  }
+
+  return Status;
+}
+
+/**
+  Returns a pointer to an allocated buffer that contains the contents of a 
+  variable retrieved through the UEFI Runtime Service GetVariable().  This 
+  function always uses the EFI_GLOBAL_VARIABLE GUID to retrieve variables.
+  The returned buffer is allocated using AllocatePool().  The caller is 
+  responsible for freeing this buffer with FreePool().
+
+  If Name is NULL, then ASSERT().
+  If Value is NULL, then ASSERT().
+
+  @param[in]  Name  The pointer to a Null-terminated Unicode string.
+  @param[out] Value The buffer point saved the variable info.
+  @param[out] Size  The buffer size of the variable.
+
+  @return EFI_OUT_OF_RESOURCES      Allocate buffer failed.
+  @return EFI_SUCCESS               Find the specified variable.
+  @return Others Errors             Return errors from call to gRT->GetVariable.
+
+**/
+EFI_STATUS
+EFIAPI
+GetEfiGlobalVariable2 (
+  IN CONST CHAR16    *Name,
+  OUT VOID           **Value,
+  OUT UINTN          *Size OPTIONAL
+  )
+{
+  return GetVariable2 (Name, &gEfiGlobalVariableGuid, Value, Size);
+}
 
 /**
   Returns a pointer to an allocated buffer that contains the best matching language 

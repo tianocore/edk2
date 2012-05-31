@@ -2368,7 +2368,7 @@ HiiStringIdToImage (
   if (Language == NULL) {
     Language = "";
   }
-  CurrentLanguage = GetEfiGlobalVariable (L"PlatformLang");
+  GetEfiGlobalVariable2 (L"PlatformLang", &CurrentLanguage, NULL);
   BestLanguage = GetBestLanguage (
                    SupportedLanguages,
                    FALSE,

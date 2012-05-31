@@ -1,7 +1,7 @@
 /** @file
   This file implements the protocol functions related to string package.
   
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -349,7 +349,7 @@ HiiThunkGetString (
   //
   // Get the current platform language setting
   //
-  PlatformLanguage = GetEfiGlobalVariable (L"PlatformLang");
+  GetEfiGlobalVariable2 (L"PlatformLang", &PlatformLanguage, NULL);
 
   //
   // Get the best matching language from SupportedLanguages

@@ -1,7 +1,7 @@
 /** @file
   Implement defer image load services for user identification in UEFI2.2.
 
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -532,7 +532,7 @@ IsBootOption (
     // Try to find the DevicePath in BootOption
     //
     UnicodeSPrint (StrTemp, sizeof (StrTemp), L"Boot%04x", Index);
-    OptionBuffer = GetEfiGlobalVariable (StrTemp);
+    GetEfiGlobalVariable2 (StrTemp, &OptionBuffer, NULL);
     if (OptionBuffer == NULL) {
       continue;
     }
