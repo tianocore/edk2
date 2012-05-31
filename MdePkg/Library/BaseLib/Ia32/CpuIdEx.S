@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -53,13 +53,13 @@ L1:
     jecxz   L2
     movl    %ebx, (%ecx)
 L2:
-    movl    28(%ebp), %ecx
+    movl    32(%ebp), %ecx
     jecxz   L3
-    popl    (%ecx)
-L3:
-    movl    32(%ebp), %edx
-    jecxz   L4
     movl    %edx, (%ecx)
+L3:
+    movl    28(%ebp), %ecx
+    jecxz   L4
+    popl    (%ecx)
 L4:
     movl    12(%ebp), %eax
     leave
