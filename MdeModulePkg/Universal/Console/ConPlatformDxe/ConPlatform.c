@@ -2,7 +2,7 @@
   Console Platform DXE Driver, install Console Device Guids and update Console
   Environment Variables.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -772,6 +772,53 @@ ConPlatformGetVariable (
 }
 
 /**
+  Function returns TRUE when the two input device paths point to the two
+  GOP child handles that have the same parent.
+
+  @param Left    A pointer to a device path data structure.
+  @param Right   A pointer to a device path data structure.
+
+  @retval TRUE  Left and Right share the same parent.
+  @retval FALSE Left and Right don't share the same parent or either of them is not
+                a GOP device path.
+**/
+BOOLEAN
+IsGopSibling (
+  IN EFI_DEVICE_PATH_PROTOCOL  *Left,
+  IN EFI_DEVICE_PATH_PROTOCOL  *Right
+  )
+{
+  EFI_DEVICE_PATH_PROTOCOL  *NodeLeft;
+  EFI_DEVICE_PATH_PROTOCOL  *NodeRight;
+
+  for (NodeLeft = Left; !IsDevicePathEndType (NodeLeft); NodeLeft = NextDevicePathNode (NodeLeft)) {
+    if (DevicePathType (NodeLeft) == ACPI_DEVICE_PATH && DevicePathSubType (NodeLeft) == ACPI_ADR_DP) {
+      break;
+    }
+  }
+
+  if (IsDevicePathEndType (NodeLeft)) {
+    return FALSE;
+  }
+
+  for (NodeRight = Right; !IsDevicePathEndType (NodeRight); NodeRight = NextDevicePathNode (NodeRight)) {
+    if (DevicePathType (NodeRight) == ACPI_DEVICE_PATH && DevicePathSubType (NodeRight) == ACPI_ADR_DP) {
+      break;
+    }
+  }
+
+  if (IsDevicePathEndType (NodeRight)) {
+    return FALSE;
+  }
+
+  if (((UINTN) NodeLeft - (UINTN) Left) != ((UINTN) NodeRight - (UINTN) Right)) {
+    return FALSE;
+  }
+
+  return (BOOLEAN) (CompareMem (Left, Right, (UINTN) NodeLeft - (UINTN) Left) == 0);
+}
+
+/**
   Function compares a device path data structure to that of all the nodes of a
   second device path instance.
 
@@ -830,7 +877,7 @@ ConPlatformMatchDevicePaths (
   // Search for the match of 'Single' in 'Multi'
   //
   while (DevicePathInst != NULL) {
-    if (CompareMem (Single, DevicePathInst, Size) == 0) {
+    if ((CompareMem (Single, DevicePathInst, Size) == 0) || IsGopSibling (Single, DevicePathInst)) {
       if (!Delete) {
         //
         // If Delete is FALSE, return EFI_SUCCESS if Single is found in Multi.

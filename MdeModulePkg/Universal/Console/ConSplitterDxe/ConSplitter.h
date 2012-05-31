@@ -1,7 +1,7 @@
 /** @file
   Private data structures for the Console Splitter driver
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -74,8 +74,7 @@ extern EFI_COMPONENT_NAME2_PROTOCOL gConSplitterStdErrComponentName2;
 //
 // Private Data Structures
 //
-#define CONSOLE_SPLITTER_CONSOLES_ALLOC_UNIT  32
-#define CONSOLE_SPLITTER_MODES_ALLOC_UNIT     32
+#define CONSOLE_SPLITTER_ALLOC_UNIT  32
 
 
 typedef struct {
@@ -1732,12 +1731,12 @@ ConSplitterTextOutEnableCursor (
   );
 
 /**
-  Take the passed in Buffer of size SizeOfCount and grow the buffer
-  by MAX (CONSOLE_SPLITTER_CONSOLES_ALLOC_UNIT, MaxGrow) * SizeOfCount
-  bytes. Copy the current data in Buffer to the new version of Buffer
-  and free the old version of buffer.
+  Take the passed in Buffer of size ElementSize and grow the buffer
+  by CONSOLE_SPLITTER_ALLOC_UNIT * ElementSize bytes.
+  Copy the current data in Buffer to the new version of Buffer and
+  free the old version of buffer.
 
-  @param  SizeOfCount              Size of element in array.
+  @param  ElementSize              Size of element in array.
   @param  Count                    Current number of elements in array.
   @param  Buffer                   Bigger version of passed in Buffer with all the
                                    data.
@@ -1748,7 +1747,7 @@ ConSplitterTextOutEnableCursor (
 **/
 EFI_STATUS
 ConSplitterGrowBuffer (
-  IN      UINTN                       SizeOfCount,
+  IN      UINTN                       ElementSize,
   IN OUT  UINTN                       *Count,
   IN OUT  VOID                        **Buffer
   );

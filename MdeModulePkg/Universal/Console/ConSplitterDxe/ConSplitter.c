@@ -1708,12 +1708,12 @@ ConSplitterStdErrDriverBindingStop (
 
 
 /**
-  Take the passed in Buffer of size SizeOfCount and grow the buffer
-  by MAX (CONSOLE_SPLITTER_CONSOLES_ALLOC_UNIT, MaxGrow) * SizeOfCount
-  bytes. Copy the current data in Buffer to the new version of Buffer
-  and free the old version of buffer.
+  Take the passed in Buffer of size ElementSize and grow the buffer
+  by CONSOLE_SPLITTER_ALLOC_UNIT * ElementSize bytes.
+  Copy the current data in Buffer to the new version of Buffer and
+  free the old version of buffer.
 
-  @param  SizeOfCount              Size of element in array.
+  @param  ElementSize              Size of element in array.
   @param  Count                    Current number of elements in array.
   @param  Buffer                   Bigger version of passed in Buffer with all the
                                    data.
@@ -1724,7 +1724,7 @@ ConSplitterStdErrDriverBindingStop (
 **/
 EFI_STATUS
 ConSplitterGrowBuffer (
-  IN      UINTN                       SizeOfCount,
+  IN      UINTN                       ElementSize,
   IN OUT  UINTN                       *Count,
   IN OUT  VOID                        **Buffer
   )
@@ -1736,15 +1736,15 @@ ConSplitterGrowBuffer (
   // copy the old buffer's content to the new-size buffer,
   // then free the old buffer.
   //
-  *Count += CONSOLE_SPLITTER_CONSOLES_ALLOC_UNIT;
   Ptr = ReallocatePool (
-          SizeOfCount * ((*Count) - CONSOLE_SPLITTER_CONSOLES_ALLOC_UNIT),
-          SizeOfCount * (*Count),
+          ElementSize * (*Count),
+          ElementSize * ((*Count) + CONSOLE_SPLITTER_ALLOC_UNIT),
           *Buffer
           );
   if (Ptr == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+  *Count += CONSOLE_SPLITTER_ALLOC_UNIT;
   *Buffer = Ptr;
   return EFI_SUCCESS;
 }
@@ -1847,12 +1847,28 @@ ConSplitterTextInExAddDevice (
   IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL     *TextInEx
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS                  Status;
+  LIST_ENTRY                  *Link;
+  TEXT_IN_EX_SPLITTER_NOTIFY  *CurrentNotify;
+  UINTN                       TextInExListCount;
 
   //
-  // If the Text Input Ex List is full, enlarge it by calling ConSplitterGrowBuffer().
+  // Enlarge the NotifyHandleList and the TextInExList
   //
   if (Private->CurrentNumberOfExConsoles >= Private->TextInExListCount) {
+    for (Link = Private->NotifyList.ForwardLink; Link != &Private->NotifyList; Link = Link->ForwardLink) {
+      CurrentNotify     = TEXT_IN_EX_SPLITTER_NOTIFY_FROM_THIS (Link);
+      TextInExListCount = Private->TextInExListCount;
+
+      Status = ConSplitterGrowBuffer (
+                 sizeof (EFI_HANDLE),
+                 &TextInExListCount,
+                 (VOID **) &CurrentNotify->NotifyHandleList
+                 );
+      if (EFI_ERROR (Status)) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+    }
     Status = ConSplitterGrowBuffer (
               sizeof (EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *),
               &Private->TextInExListCount,
@@ -1862,6 +1878,30 @@ ConSplitterTextInExAddDevice (
       return EFI_OUT_OF_RESOURCES;
     }
   }
+
+  //
+  // Register the key notify in the new text-in device
+  //
+  for (Link = Private->NotifyList.ForwardLink; Link != &Private->NotifyList; Link = Link->ForwardLink) {
+    CurrentNotify = TEXT_IN_EX_SPLITTER_NOTIFY_FROM_THIS (Link);
+    Status = TextInEx->RegisterKeyNotify (
+                         TextInEx,
+                         &CurrentNotify->KeyData,
+                         CurrentNotify->KeyNotificationFn,
+                         &CurrentNotify->NotifyHandleList[Private->CurrentNumberOfExConsoles]
+                         );
+    if (EFI_ERROR (Status)) {
+      for (Link = Link->BackLink; Link != &Private->NotifyList; Link = Link->BackLink) {
+        CurrentNotify = TEXT_IN_EX_SPLITTER_NOTIFY_FROM_THIS (Link);
+        TextInEx->UnregisterKeyNotify (
+                    TextInEx,
+                    CurrentNotify->NotifyHandleList[Private->CurrentNumberOfExConsoles]
+                    );
+      }
+      return Status;
+    }
+  }
+
   //
   // Add the new text-in device data structure into the Text Input Ex List.
   //
@@ -3584,14 +3624,6 @@ ConSplitterTextInRegisterKeyNotify (
   Private = TEXT_IN_EX_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
 
   //
-  // If no physical console input device exists,
-  // return EFI_SUCCESS directly.
-  //
-  if (Private->CurrentNumberOfExConsoles <= 0) {
-    return EFI_SUCCESS;
-  }
-
-  //
   // Return EFI_SUCCESS if the (KeyData, NotificationFunction) is already registered.
   //
   for (Link = Private->NotifyList.ForwardLink; Link != &Private->NotifyList; Link = Link->ForwardLink) {
@@ -3611,7 +3643,7 @@ ConSplitterTextInRegisterKeyNotify (
   if (NewNotify == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  NewNotify->NotifyHandleList = (EFI_HANDLE *) AllocateZeroPool (sizeof (EFI_HANDLE) * Private->CurrentNumberOfExConsoles);
+  NewNotify->NotifyHandleList = (EFI_HANDLE *) AllocateZeroPool (sizeof (EFI_HANDLE) *  Private->TextInExListCount);
   if (NewNotify->NotifyHandleList == NULL) {
     gBS->FreePool (NewNotify);
     return EFI_OUT_OF_RESOURCES;
@@ -3633,6 +3665,15 @@ ConSplitterTextInRegisterKeyNotify (
                                              &NewNotify->NotifyHandleList[Index]
                                              );
     if (EFI_ERROR (Status)) {
+      //
+      // Un-register the key notify on all physical console input devices
+      //
+      while (Index-- != 0) {
+        Private->TextInExList[Index]->UnregisterKeyNotify (
+                                        Private->TextInExList[Index],
+                                        NewNotify->NotifyHandleList[Index]
+                                        );
+      }
       gBS->FreePool (NewNotify->NotifyHandleList);
       gBS->FreePool (NewNotify);
       return Status;
@@ -3668,7 +3709,6 @@ ConSplitterTextInUnregisterKeyNotify (
   )
 {
   TEXT_IN_SPLITTER_PRIVATE_DATA *Private;
-  EFI_STATUS                    Status;
   UINTN                         Index;
   TEXT_IN_EX_SPLITTER_NOTIFY    *CurrentNotify;
   LIST_ENTRY                    *Link;
@@ -3677,31 +3717,16 @@ ConSplitterTextInUnregisterKeyNotify (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (((TEXT_IN_EX_SPLITTER_NOTIFY *) NotificationHandle)->Signature != TEXT_IN_EX_SPLITTER_NOTIFY_SIGNATURE) {
-    return EFI_INVALID_PARAMETER;
-  }
-
   Private = TEXT_IN_EX_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
-
-  //
-  // if no physical console input device exists,
-  // return EFI_SUCCESS directly.
-  //
-  if (Private->CurrentNumberOfExConsoles <= 0) {
-    return EFI_SUCCESS;
-  }
 
   for (Link = Private->NotifyList.ForwardLink; Link != &Private->NotifyList; Link = Link->ForwardLink) {
     CurrentNotify = TEXT_IN_EX_SPLITTER_NOTIFY_FROM_THIS (Link);
     if (CurrentNotify->NotifyHandle == NotificationHandle) {
       for (Index = 0; Index < Private->CurrentNumberOfExConsoles; Index++) {
-        Status = Private->TextInExList[Index]->UnregisterKeyNotify (
-                                                 Private->TextInExList[Index],
-                                                 CurrentNotify->NotifyHandleList[Index]
-                                                 );
-        if (EFI_ERROR (Status)) {
-          return Status;
-        }
+        Private->TextInExList[Index]->UnregisterKeyNotify (
+                                        Private->TextInExList[Index],
+                                        CurrentNotify->NotifyHandleList[Index]
+                                        );
       }
       RemoveEntryList (&CurrentNotify->NotifyEntry);
 
