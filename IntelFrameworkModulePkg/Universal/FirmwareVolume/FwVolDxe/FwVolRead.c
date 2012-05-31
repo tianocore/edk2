@@ -1,7 +1,7 @@
 /** @file
   Implements functions to read firmware file.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -510,6 +510,7 @@ FvReadFileSection (
   )
 {
   EFI_STATUS                      Status;
+  FV_DEVICE                       *FvDevice;
   EFI_FV_ATTRIBUTES               FvAttributes;
   EFI_FV_FILETYPE                 FileType;
   EFI_FV_FILE_ATTRIBUTES          FileAttributes;
@@ -521,6 +522,8 @@ FvReadFileSection (
   if (NULL == This || NULL == NameGuid || Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
+  FvDevice  = FV_DEVICE_FROM_THIS (This);
 
   Status    = This->GetVolumeAttributes (This, &FvAttributes);
   if (EFI_ERROR (Status)) {
@@ -607,6 +610,14 @@ FvReadFileSection (
                     AuthenticationStatus
                     );
   }
+
+  if (!EFI_ERROR (Status)) {
+    //
+    // Inherit the authentication status.
+    //
+    *AuthenticationStatus |= FvDevice->AuthenticationStatus;
+  }
+
   //
   // Handle AuthenticationStatus if necessary
   //

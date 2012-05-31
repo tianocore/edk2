@@ -45,6 +45,8 @@ FV_DEVICE mFvDevice = {
   NULL,
   NULL,
   { NULL, NULL },
+  0,
+  FALSE,
   0
 };
 
@@ -638,8 +640,15 @@ NotifyFwVolBlock (
       FvDevice->Fvb             = Fvb;
       FvDevice->Handle          = Handle;
       FvDevice->FwVolHeader     = FwVolHeader;
-      FvDevice->Fv.ParentHandle = Fvb->ParentHandle;
       FvDevice->IsFfs3Fv        = CompareGuid (&FwVolHeader->FileSystemGuid, &gEfiFirmwareFileSystem3Guid);
+      FvDevice->Fv.ParentHandle = Fvb->ParentHandle;
+
+      if (Fvb->ParentHandle != NULL) {
+        //
+        // Inherit the authentication status from FVB.
+        //
+        FvDevice->AuthenticationStatus = GetFvbAuthenticationStatus (Fvb);
+      }
       
       if (!EFI_ERROR (FvCheck (FvDevice))) {
         //

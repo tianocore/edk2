@@ -44,6 +44,7 @@ typedef struct {
 
   UINT8                                   ErasePolarity;
   BOOLEAN                                 IsFfs3Fv;
+  UINT32                                  AuthenticationStatus;
 } FV_DEVICE;
 
 #define FV_DEVICE_FROM_THIS(a) CR(a, FV_DEVICE, Fv, FV2_DEVICE_SIGNATURE)

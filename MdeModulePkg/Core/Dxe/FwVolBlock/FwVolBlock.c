@@ -4,7 +4,7 @@
   It consumes FV HOBs and creates read-only Firmare Volume Block protocol
   instances for each of them.
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -80,6 +80,7 @@ EFI_FW_VOL_BLOCK_DEVICE  mFwVolBlock = {
   },
   0,
   NULL,
+  0,
   0,
   0
 };
@@ -402,7 +403,31 @@ FwVolBlockGetBlockSize (
   return EFI_SUCCESS;
 }
 
+/**
 
+  Get FVB authentication status
+
+  @param FvbProtocol    FVB protocol.
+
+  @return Authentication status.
+
+**/
+UINT32
+GetFvbAuthenticationStatus (
+  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL     *FvbProtocol
+  )
+{
+  EFI_FW_VOL_BLOCK_DEVICE   *FvbDevice;
+  UINT32                    AuthenticationStatus;
+
+  AuthenticationStatus = 0;
+  FvbDevice = BASE_CR (FvbProtocol, EFI_FW_VOL_BLOCK_DEVICE, FwVolBlockInstance);
+  if (FvbDevice->Signature == FVB_DEVICE_SIGNATURE) {
+    AuthenticationStatus = FvbDevice->AuthenticationStatus;
+  }
+
+  return AuthenticationStatus;
+}
 
 /**
   This routine produces a firmware volume block protocol on a given
@@ -411,8 +436,10 @@ FwVolBlockGetBlockSize (
   @param  BaseAddress            base address of the firmware volume image
   @param  Length                 length of the firmware volume image
   @param  ParentHandle           handle of parent firmware volume, if this image
-                                 came from an FV image file in another firmware
+                                 came from an FV image file and section in another firmware
                                  volume (ala capsules)
+  @param  AuthenticationStatus   Authentication status inherited, if this image
+                                 came from an FV image file and section in another firmware volume.
   @param  FvProtocol             Firmware volume block protocol produced.
 
   @retval EFI_VOLUME_CORRUPTED   Volume corrupted.
@@ -426,6 +453,7 @@ ProduceFVBProtocolOnBuffer (
   IN EFI_PHYSICAL_ADDRESS   BaseAddress,
   IN UINT64                 Length,
   IN EFI_HANDLE             ParentHandle,
+  IN UINT32                 AuthenticationStatus,
   OUT EFI_HANDLE            *FvProtocol  OPTIONAL
   )
 {
@@ -473,6 +501,9 @@ ProduceFVBProtocolOnBuffer (
   FvbDev->BaseAddress   = BaseAddress;
   FvbDev->FvbAttributes = FwVolHeader->Attributes;
   FvbDev->FwVolBlockInstance.ParentHandle = ParentHandle;
+  if (ParentHandle != NULL) {
+    FvbDev->AuthenticationStatus = AuthenticationStatus;
+  }
 
   //
   // Init the block caching fields of the device
@@ -587,7 +618,7 @@ FwVolBlockDriverInit (
     //
     // Produce an FVB protocol for it
     //
-    ProduceFVBProtocolOnBuffer (FvHob.FirmwareVolume->BaseAddress, FvHob.FirmwareVolume->Length, NULL, NULL);
+    ProduceFVBProtocolOnBuffer (FvHob.FirmwareVolume->BaseAddress, FvHob.FirmwareVolume->Length, NULL, 0, NULL);
     FvHob.Raw = GET_NEXT_HOB (FvHob);
   }
 
@@ -629,6 +660,7 @@ CoreProcessFirmwareVolume (
             (EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader,
             (UINT64)Size,
             NULL,
+            0,
             FVProtocolHandle
             );
   //

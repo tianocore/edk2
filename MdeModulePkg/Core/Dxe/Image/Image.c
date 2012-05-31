@@ -1441,7 +1441,16 @@ CoreLoadImageEx (
   IN  UINT32                           Attribute
   )
 {
-  return CoreLoadImageCommon (
+  EFI_STATUS    Status;
+  UINT64        Tick;
+  EFI_HANDLE    Handle;
+
+  Tick = 0;
+  PERF_CODE (
+    Tick = GetPerformanceCounter ();
+  );
+
+  Status = CoreLoadImageCommon (
            TRUE,
            ParentImageHandle,
            FilePath,
@@ -1453,6 +1462,19 @@ CoreLoadImageEx (
            EntryPoint,
            Attribute
            );
+
+  Handle = NULL; 
+  if (!EFI_ERROR (Status)) {
+    //
+    // ImageHandle will be valid only Status is success. 
+    //
+    Handle = *ImageHandle;
+  }
+
+  PERF_START (Handle, "LoadImage:", NULL, Tick);
+  PERF_END (Handle, "LoadImage:", NULL, 0);
+
+  return Status;
 }
 
 
@@ -1487,6 +1509,11 @@ CoreStartImage (
   LOADED_IMAGE_PRIVATE_DATA     *LastImage;
   UINT64                        HandleDatabaseKey;
   UINTN                         SetJumpFlag;
+  UINT64                        Tick;
+  EFI_HANDLE                    Handle;
+
+  Tick = 0;
+  Handle = ImageHandle;
 
   Image = CoreLoadedImageInfo (ImageHandle);
   if (Image == NULL  ||  Image->Started) {
@@ -1506,10 +1533,9 @@ CoreStartImage (
     return EFI_UNSUPPORTED;
   }
 
-  //
-  // Don't profile Objects or invalid start requests
-  //
-  PERF_START (ImageHandle, "StartImage:", NULL, 0);
+  PERF_CODE (
+    Tick = GetPerformanceCounter ();
+  );
 
 
   //
@@ -1529,7 +1555,12 @@ CoreStartImage (
   //
   Image->JumpBuffer = AllocatePool (sizeof (BASE_LIBRARY_JUMP_BUFFER) + BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT);
   if (Image->JumpBuffer == NULL) {
-    PERF_END (ImageHandle, "StartImage:", NULL, 0);
+    //
+    // Image may be unloaded after return with failure,
+    // then ImageHandle may be invalid, so use NULL handle to record perf log.
+    //
+    PERF_START (NULL, "StartImage:", NULL, Tick);
+    PERF_END (NULL, "StartImage:", NULL, 0);
     return EFI_OUT_OF_RESOURCES;
   }
   Image->JumpContext = ALIGN_POINTER (Image->JumpBuffer, BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT);
@@ -1620,12 +1651,17 @@ CoreStartImage (
   //
   if (EFI_ERROR (Image->Status) || Image->Type == EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION) {
     CoreUnloadAndCloseImage (Image, TRUE);
+    //
+    // ImageHandle may be invalid after the image is unloaded, so use NULL handle to record perf log.
+    //
+    Handle = NULL;
   }
 
   //
   // Done
   //
-  PERF_END (ImageHandle, "StartImage:", NULL, 0);
+  PERF_START (Handle, "StartImage:", NULL, Tick);
+  PERF_END (Handle, "StartImage:", NULL, 0);
   return Status;
 }
 

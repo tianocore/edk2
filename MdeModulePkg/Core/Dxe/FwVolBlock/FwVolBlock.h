@@ -2,7 +2,7 @@
   Firmware Volume Block protocol functions.
   Consumes FV hobs and creates appropriate block protocols.
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -47,6 +47,7 @@ typedef struct {
   LBA_CACHE                             *LbaCache;
   UINT32                                FvbAttributes;
   EFI_PHYSICAL_ADDRESS                  BaseAddress;
+  UINT32                                AuthenticationStatus;
 } EFI_FW_VOL_BLOCK_DEVICE;
 
 
