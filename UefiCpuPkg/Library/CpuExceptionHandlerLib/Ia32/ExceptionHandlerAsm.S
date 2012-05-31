@@ -213,13 +213,6 @@ HasErrorCode:
     #
     xchgl   (%esp), %ecx 
 
-    #
-    # Fall through to join main routine code
-    # at ErrorCodeAndVectorOnStack
-    #
-CommonInterruptEntry_al_0000:
-    jmp CommonInterruptEntry_al_0000
-
 ErrorCodeAndVectorOnStack:
     pushl   %ebp
     movl    %esp, %ebp

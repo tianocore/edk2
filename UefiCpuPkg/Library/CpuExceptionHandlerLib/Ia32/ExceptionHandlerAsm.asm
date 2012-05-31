@@ -218,13 +218,6 @@ HasErrorCode:
     ;
     xchg    ecx, [esp]
 
-    ;
-    ; Fall through to join main routine code
-    ; at ErrorCodeAndVectorOnStack
-    ;
-@@:
-    jmp @B
-
 ErrorCodeAndVectorOnStack:
     push    ebp
     mov     ebp, esp
