@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -922,21 +922,32 @@ LegacyBiosInstall (
   EfiToLegacy16InitTable->LowPmmMemory            = (UINT32) MemoryAddressUnder1MB;
   EfiToLegacy16InitTable->LowPmmMemorySizeInBytes = MemorySize;
 
+  MemorySize = PcdGet32 (PcdHighPmmMemorySize);
+  ASSERT ((MemorySize & 0xFFF) == 0);
   //
   // Allocate high PMM Memory under 16 MB
-  //
-  MemorySize = PcdGet32 (PcdHighPmmMemorySize);
-  ASSERT ((MemorySize & 0xFFF) == 0);    
+  //   
   Status = AllocateLegacyMemory (
              AllocateMaxAddress,
              0x1000000,
              EFI_SIZE_TO_PAGES (MemorySize),
              &MemoryAddress
              );
+  if (EFI_ERROR (Status)) {
+    //
+    // If it fails, allocate high PMM Memory under 4GB
+    //   
+    Status = AllocateLegacyMemory (
+               AllocateMaxAddress,
+               0xFFFFFFFF,
+               EFI_SIZE_TO_PAGES (MemorySize),
+               &MemoryAddress
+               );    
+  }
   if (!EFI_ERROR (Status)) {
     EfiToLegacy16InitTable->HiPmmMemory            = (UINT32) (EFI_PHYSICAL_ADDRESS) (UINTN) MemoryAddress;
     EfiToLegacy16InitTable->HiPmmMemorySizeInBytes = MemorySize;
-  }
+  } 
 
   //
   //  ShutdownAPs();
