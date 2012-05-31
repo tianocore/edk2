@@ -1,7 +1,7 @@
 /** @file
   SMI management.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -109,10 +109,10 @@ SmmCoreFindSmiEntry (
   @param  CommBuffer     Points to the optional communication buffer.
   @param  CommBufferSize Points to the size of the optional communication buffer.
 
-  @retval EFI_SUCCESS                        Interrupt source was processed successfully but not quiesced.
+  @retval EFI_WARN_INTERRUPT_SOURCE_PENDING  Interrupt source was processed successfully but not quiesced.
   @retval EFI_INTERRUPT_PENDING              One or more SMI sources could not be quiesced.
-  @retval EFI_WARN_INTERRUPT_SOURCE_PENDING  Interrupt source was not handled or quiesced.
-  @retval EFI_WARN_INTERRUPT_SOURCE_QUIESCED Interrupt source was handled and quiesced.
+  @retval EFI_NOT_FOUND                      Interrupt source was not handled or quiesced.
+  @retval EFI_SUCCESS                        Interrupt source was handled and quiesced.
 
 **/
 EFI_STATUS
@@ -131,42 +131,29 @@ SmiManage (
   BOOLEAN      InterruptQuiesced;
   EFI_STATUS   Status;
   
+  Status = EFI_NOT_FOUND;
+  InterruptQuiesced = FALSE;
   if (HandlerType == NULL) {
     //
     // Root SMI handler
     //
-    Status = EFI_WARN_INTERRUPT_SOURCE_PENDING;
 
     Head = &mRootSmiHandlerList;
-    for (Link = Head->ForwardLink; Link != Head; Link = Link->ForwardLink) {
-      SmiHandler = CR (Link, SMI_HANDLER, Link, SMI_HANDLER_SIGNATURE);
-
-      Status = SmiHandler->Handler (
-                 (EFI_HANDLE) SmiHandler,
-                 Context,
-                 CommBuffer,
-                 CommBufferSize
-                 );
-      if (Status == EFI_SUCCESS || Status == EFI_INTERRUPT_PENDING) {
-        return Status;
-      }
+  } else {
+    //
+    // Non-root SMI handler
+    //
+    SmiEntry = SmmCoreFindSmiEntry ((EFI_GUID *) HandlerType, FALSE);
+    if (SmiEntry == NULL) {
+      //
+      // There is no handler registered for this interrupt source
+      //
+      return Status;
     }
-    return Status;
+
+    Head = &SmiEntry->SmiHandlers;
   }
 
-  //
-  // Non-root SMI handler
-  //
-  SmiEntry = SmmCoreFindSmiEntry ((EFI_GUID *) HandlerType, FALSE);
-  if (SmiEntry == NULL) {
-    //
-    // There is no handler registered for this interrupt source
-    //
-    return EFI_WARN_INTERRUPT_SOURCE_PENDING;
-  }
-
-  InterruptQuiesced = FALSE;
-  Head = &SmiEntry->SmiHandlers;
   for (Link = Head->ForwardLink; Link != Head; Link = Link->ForwardLink) {
     SmiHandler = CR (Link, SMI_HANDLER, Link, SMI_HANDLER_SIGNATURE);
 
@@ -180,42 +167,46 @@ SmiManage (
     switch (Status) {
     case EFI_INTERRUPT_PENDING:
       //
-      // If a handler returns EFI_INTERRUPT_PENDING, the interrupt could not be
-      // quiesced, then no additional handlers will be processed,
-      // and EFI_INTERRUPT_PENDING will be returned
+      // If a handler returns EFI_INTERRUPT_PENDING then no additional handlers 
+      // will be processed and EFI_INTERRUPT_PENDING will be returned.
       //
       return EFI_INTERRUPT_PENDING;
 
     case EFI_SUCCESS:
       //
-      // If handler return EFI_SUCCESS, the interrupt was handled and quiesced,
-      // no other handlers should still be called,
-      // and EFI_WARN_INTERRUPT_SOURCE_QUIESCED will be returned
+      // If a handler returns EFI_SUCCESS then no additional handlers will be processed.
+      // then the function will return EFI_SUCCESS.
       //
-      return EFI_WARN_INTERRUPT_SOURCE_QUIESCED;
+      return EFI_SUCCESS;
 
     case EFI_WARN_INTERRUPT_SOURCE_QUIESCED:
       //
-      // If at least one of the handlers report EFI_WARN_INTERRUPT_SOURCE_QUIESCED,
-      // then this function will return EFI_WARN_INTERRUPT_SOURCE_QUIESCED
+      // If at least one of the handlers returns EFI_WARN_INTERRUPT_SOURCE_QUIESCED
+      // then the function will return EFI_SUCCESS. 
       //
       InterruptQuiesced = TRUE;
       break;
 
+    case EFI_WARN_INTERRUPT_SOURCE_PENDING:
+      //
+      // If all the handlers returned EFI_WARN_INTERRUPT_SOURCE_PENDING
+      // then EFI_WARN_INTERRUPT_SOURCE_PENDING will be returned.
+      //
+      break;
+
     default:
+      //
+      // Unexpected status code returned.
+      //
+      ASSERT (FALSE);
       break;
     }
   }
 
   if (InterruptQuiesced) {
-    Status = EFI_WARN_INTERRUPT_SOURCE_QUIESCED;
-  } else {
-    //
-    // If no handler report EFI_WARN_INTERRUPT_SOURCE_QUIESCED, then this
-    // function will return EFI_INTERRUPT_PENDING
-    //
-    Status = EFI_INTERRUPT_PENDING;
+    Status = EFI_SUCCESS;
   }
+
   return Status;
 }
 

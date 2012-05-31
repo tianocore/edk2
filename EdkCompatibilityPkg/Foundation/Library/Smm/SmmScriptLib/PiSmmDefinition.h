@@ -5,7 +5,7 @@
   runtime s3 boot Script. This header file is to definied PI SMM related definition to locate 
   SmmSaveState Protocol  
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -192,10 +192,10 @@ EFI_STATUS
   @param[in,out] CommBuffer      Points to the optional communication buffer.
   @param[in,out] CommBufferSize  Points to the size of the optional communication buffer.
 
-  @retval EFI_SUCCESS                        Interrupt source was processed successfully but not quiesced.
+  @retval EFI_WARN_INTERRUPT_SOURCE_PENDING  Interrupt source was processed successfully but not quiesced.
   @retval EFI_INTERRUPT_PENDING              One or more SMI sources could not be quiesced.
-  @retval EFI_WARN_INTERRUPT_SOURCE_PENDING  Interrupt source was not handled or quiesced.
-  @retval EFI_WARN_INTERRUPT_SOURCE_QUIESCED Interrupt source was handled and quiesced.
+  @retval EFI_NOT_FOUND                      Interrupt source was not handled or quiesced.
+  @retval EFI_SUCCESS                        Interrupt source was handled and quiesced.
 **/
 typedef
 EFI_STATUS
