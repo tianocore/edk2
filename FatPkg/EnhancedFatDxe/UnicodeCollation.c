@@ -61,7 +61,7 @@ InitializeUnicodeCollationSupportWorker (
   }
 
   Iso639Language = (BOOLEAN) (ProtocolGuid == &gEfiUnicodeCollationProtocolGuid);
-  GetEfiGlobalVariable2(VariableName, &Language, NULL);
+  GetEfiGlobalVariable2 (VariableName, (VOID**) &Language, NULL);
 
   Status = EFI_UNSUPPORTED;
   for (Index = 0; Index < NumHandles; Index++) {
