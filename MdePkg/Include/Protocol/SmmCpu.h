@@ -6,7 +6,7 @@
   but not in the same format. These so-called pseudo-registers provide this information in a standard 
   format.  
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -106,7 +106,8 @@ typedef enum {
   /// Pseudo-Registers
   ///
   EFI_SMM_SAVE_STATE_REGISTER_IO            = 512,
-  EFI_SMM_SAVE_STATE_REGISTER_LMA           = 513
+  EFI_SMM_SAVE_STATE_REGISTER_LMA           = 513,
+  EFI_SMM_SAVE_STATE_REGISTER_PROCESSOR_ID  = 514
 } EFI_SMM_SAVE_STATE_REGISTER;  
 
 ///
