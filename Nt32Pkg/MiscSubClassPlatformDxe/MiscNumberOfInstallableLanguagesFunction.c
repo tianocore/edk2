@@ -43,7 +43,7 @@ CurrentLanguageMatch (
     return;
   }
 
-  GetEfiGlobalVariable2 (L"PlatformLang", &CurrentLang, NULL);
+  GetEfiGlobalVariable2 (L"PlatformLang", (VOID**)&CurrentLang, NULL);
   DefaultLang  = (CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLang);
   BestLanguage = GetBestLanguage (
                    Languages,

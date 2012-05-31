@@ -2064,7 +2064,7 @@ SecureBootExtractConfigFromVariable (
   //
   // Get the SecureBootEnable Variable
   //
-  GetVariable2 (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, &SecureBootEnable, NULL);
+  GetVariable2 (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, (VOID**)&SecureBootEnable, NULL);
 
   //
   // If the SecureBootEnable Variable doesn't exist, hide the SecureBoot Enable/Disable
@@ -2088,7 +2088,7 @@ SecureBootExtractConfigFromVariable (
   //
   // If there is no PK then the Delete Pk button will be gray.
   //
-  GetVariable2 (EFI_SETUP_MODE_NAME, &gEfiGlobalVariableGuid, &SetupMode, NULL);
+  GetVariable2 (EFI_SETUP_MODE_NAME, &gEfiGlobalVariableGuid, (VOID**)&SetupMode, NULL);
   if (SetupMode == NULL || (*SetupMode) == 1) {
     ConfigData->HasPk = FALSE;
   } else  {
@@ -2098,7 +2098,7 @@ SecureBootExtractConfigFromVariable (
   //
   // Get the SecureBootMode from CustomMode variable.
   //
-  GetVariable2 (EFI_CUSTOM_MODE_NAME, &gEfiCustomModeEnableGuid, &SecureBootMode, NULL);
+  GetVariable2 (EFI_CUSTOM_MODE_NAME, &gEfiCustomModeEnableGuid, (VOID**)&SecureBootMode, NULL);
   if (SecureBootMode == NULL) {
     ConfigData->SecureBootMode = STANDARD_SECURE_BOOT_MODE;
   } else {
@@ -2329,7 +2329,7 @@ SecureBootCallback (
 
     switch (QuestionId) {
     case KEY_SECURE_BOOT_ENABLE:
-      GetVariable2 (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, &SecureBootEnable, NULL);
+      GetVariable2 (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, (VOID**)&SecureBootEnable, NULL);
       if (NULL != SecureBootEnable) {
         if (EFI_ERROR (SaveSecureBootVariable (Value->u8))) {
           CreatePopUp (
@@ -2517,7 +2517,7 @@ SecureBootCallback (
       break;
       
     case KEY_SECURE_BOOT_MODE:
-      GetVariable2 (EFI_CUSTOM_MODE_NAME, &gEfiCustomModeEnableGuid, &SecureBootEnable, NULL);
+      GetVariable2 (EFI_CUSTOM_MODE_NAME, &gEfiCustomModeEnableGuid, (VOID**)&SecureBootEnable, NULL);
       if (NULL != SecureBootEnable) {
         Status = gRT->SetVariable (                          
                         EFI_CUSTOM_MODE_NAME,

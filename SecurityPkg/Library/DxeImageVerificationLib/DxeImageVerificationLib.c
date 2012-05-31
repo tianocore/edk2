@@ -1065,7 +1065,7 @@ VerifyCertUefiGuid (
   //
   // Get KEK database variable.
   //
-  GetEfiGlobalVariable2 (EFI_KEY_EXCHANGE_KEY_NAME, &KekList, NULL);
+  GetEfiGlobalVariable2 (EFI_KEY_EXCHANGE_KEY_NAME, (VOID**)&KekList, NULL);
   if (KekList == NULL) {
     return EFI_SECURITY_VIOLATION;
   }
@@ -1260,7 +1260,7 @@ DxeImageVerificationHandler (
     return EFI_ACCESS_DENIED;
   }
 
-  GetVariable2 (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, &SecureBootEnable, NULL);
+  GetVariable2 (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, (VOID**)&SecureBootEnable, NULL);
   //
   // Skip verification if SecureBootEnable variable doesn't exist.
   //
@@ -1278,7 +1278,7 @@ DxeImageVerificationHandler (
 
   FreePool (SecureBootEnable);
 
-  GetEfiGlobalVariable2 (EFI_SETUP_MODE_NAME, &SetupMode, NULL);
+  GetEfiGlobalVariable2 (EFI_SETUP_MODE_NAME, (VOID**)&SetupMode, NULL);
 
   //
   // SetupMode doesn't exist means no AuthVar driver is dispatched,
@@ -1544,7 +1544,7 @@ VariableWriteCallBack (
   // If this library is built-in, it means firmware has capability to perform
   // driver signing verification.
   //
-  GetEfiGlobalVariable2 (EFI_SECURE_BOOT_MODE_NAME, &SecureBootModePtr, NULL);
+  GetEfiGlobalVariable2 (EFI_SECURE_BOOT_MODE_NAME, (VOID**)&SecureBootModePtr, NULL);
   if (SecureBootModePtr == NULL) {
     SecureBootMode   = SECURE_BOOT_MODE_DISABLE;
     //

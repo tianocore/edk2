@@ -532,7 +532,7 @@ IsBootOption (
     // Try to find the DevicePath in BootOption
     //
     UnicodeSPrint (StrTemp, sizeof (StrTemp), L"Boot%04x", Index);
-    GetEfiGlobalVariable2 (StrTemp, &OptionBuffer, NULL);
+    GetEfiGlobalVariable2 (StrTemp, (VOID**)&OptionBuffer, NULL);
     if (OptionBuffer == NULL) {
       continue;
     }

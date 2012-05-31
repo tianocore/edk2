@@ -185,7 +185,7 @@ GetComponentNameWorker (
   //
   // Find the best matching language.
   //
-  GetEfiGlobalVariable2 (VariableName, &Language, NULL);
+  GetEfiGlobalVariable2 (VariableName, (VOID**)&Language, NULL);
   BestLanguage = GetBestLanguage (
                    ComponentName->SupportedLanguages,
                    (BOOLEAN) (ProtocolGuid == &gEfiComponentNameProtocolGuid),

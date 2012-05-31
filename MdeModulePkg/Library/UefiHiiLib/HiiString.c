@@ -250,7 +250,7 @@ HiiGetString (
   //
   // Get the current platform language setting
   //
-  GetEfiGlobalVariable2 (L"PlatformLang", &PlatformLanguage, NULL);
+  GetEfiGlobalVariable2 (L"PlatformLang", (VOID**)&PlatformLanguage, NULL);
 
   //
   // If Languag is NULL, then set it to an empty string, so it will be 
