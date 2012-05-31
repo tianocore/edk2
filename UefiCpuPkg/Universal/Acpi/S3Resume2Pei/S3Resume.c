@@ -4,7 +4,7 @@
   This module will excute the boot script saved during last boot and after that,
   control is passed to OS waking up handler.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -390,6 +390,8 @@ S3ResumeBootOs (
   //
   AsmWriteIdtr (&PeiS3ResumeState->Idtr);
 
+  PERF_END (NULL, "ScriptExec", NULL, 0);
+
   //
   // Install BootScriptDonePpi
   //
@@ -731,6 +733,8 @@ S3ResumeExecuteBootScript (
   // Save IDT
   //
   AsmReadIdtr (&PeiS3ResumeState->Idtr);
+
+  PERF_START (NULL, "ScriptExec", NULL, 0);
 
   if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
     //
