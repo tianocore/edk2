@@ -177,15 +177,15 @@ TcgMeasureGptTable (
     if (!CompareGuid (&PartitionEntry->PartitionTypeGUID, &mZeroGuid)) {
       NumberOfPartition++;  
     }
-    PartitionEntry++;
+    PartitionEntry = (EFI_PARTITION_ENTRY *)((UINT8 *)PartitionEntry + PrimaryHeader->SizeOfPartitionEntry);
   }
 
   //
-  // Parepare Data for Measurement
+  // Prepare Data for Measurement
   // 
   EventSize = (UINT32)(sizeof (EFI_GPT_DATA) - sizeof (GptData->Partitions) 
                         + NumberOfPartition * PrimaryHeader->SizeOfPartitionEntry);
-  TcgEvent = (TCG_PCR_EVENT *) AllocateZeroPool (EventSize + sizeof (TCG_PCR_EVENT));
+  TcgEvent = (TCG_PCR_EVENT *) AllocateZeroPool (EventSize + sizeof (TCG_PCR_EVENT_HDR));
   if (TcgEvent == NULL) {
     FreePool (PrimaryHeader);
     FreePool (EntryPtr);
@@ -210,13 +210,13 @@ TcgMeasureGptTable (
   for (Index = 0; Index < PrimaryHeader->NumberOfPartitionEntries; Index++) {
     if (!CompareGuid (&PartitionEntry->PartitionTypeGUID, &mZeroGuid)) {
       CopyMem (
-        (UINT8 *)&GptData->Partitions + NumberOfPartition * sizeof (EFI_PARTITION_ENTRY),
+        (UINT8 *)&GptData->Partitions + NumberOfPartition * PrimaryHeader->SizeOfPartitionEntry,
         (UINT8 *)PartitionEntry,
-        sizeof (EFI_PARTITION_ENTRY)
+        PrimaryHeader->SizeOfPartitionEntry
         );
       NumberOfPartition++;
     }
-    PartitionEntry++;
+    PartitionEntry =(EFI_PARTITION_ENTRY *)((UINT8 *)PartitionEntry + PrimaryHeader->SizeOfPartitionEntry);
   }
 
   //
