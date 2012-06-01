@@ -1,7 +1,7 @@
 /** @file
   Header file for boot maintenance module.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -38,11 +38,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define STR_CDROM_HELP    L"Select ATAPI CDROM Drive #%02x"
 #define STR_NET_HELP      L"NET Drive #%02x"
 #define STR_BEV_HELP      L"BEV Drive #%02x"
-
-//
-// Variable created with this flag will be "Efi:...."
-//
-#define VAR_FLAG  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE
 
 extern CHAR16   mFileExplorerStorageName[];
 extern CHAR16   mBootMaintStorageName[];
@@ -237,18 +232,6 @@ typedef struct {
   UINTN   Value;
   UINT16  StringToken;
 } COM_ATTR;
-
-#pragma pack(1)
-///
-/// For each legacy boot option in BBS table, a corresponding Boot#### variables is created.
-/// The structure saves the mapping relationship between #### and the index in the BBS table.
-///
-typedef struct {
-  UINT16    BootOptionNumber;
-  UINT16    BbsIndex;
-  UINT16    BbsType;
-} BOOT_OPTION_BBS_MAPPING;
-#pragma pack()
 
 typedef struct {
   UINT64                    BaudRate;
@@ -1158,23 +1141,6 @@ EfiLibFileSystemVolumeLabelInfo (
 EFI_FILE_INFO *
 EfiLibFileInfo (
   IN EFI_FILE_HANDLE      FHand
-  );
-
-/**
-  Find the first instance of this Protocol in the system and return it's interface.
-
-  @param ProtocolGuid    Provides the protocol to search for
-  @param Interface       On return, a pointer to the first interface
-                         that matches ProtocolGuid
-
-  @retval  EFI_SUCCESS      A protocol instance matching ProtocolGuid was found
-  @retval  EFI_NOT_FOUND    No protocol instances were found that match ProtocolGuid
-
-**/
-EFI_STATUS
-EfiLibLocateProtocol (
-  IN  EFI_GUID        *ProtocolGuid,
-  OUT VOID            **Interface
   );
 
 /**

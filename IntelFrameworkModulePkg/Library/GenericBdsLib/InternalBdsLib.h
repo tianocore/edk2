@@ -51,6 +51,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/BdsLibHii.h>
 #include <Guid/HdBootVariable.h>
 #include <Guid/LastEnumLang.h>
+#include <Guid/LegacyDevOrder.h>
 
 #include <Library/PrintLib.h>
 #include <Library/DebugLib.h>

@@ -1,7 +1,7 @@
 /** @file
   Variable operation that will be used by bootmaint
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -161,7 +161,7 @@ Var_ChangeBootOrder (
     Status = gRT->SetVariable (
                     L"BootOrder",
                     &gEfiGlobalVariableGuid,
-                    VAR_FLAG,
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                     BootOrderListSize * sizeof (UINT16),
                     BootOrderList
                     );
@@ -299,7 +299,7 @@ Var_ChangeDriverOrder (
     Status = gRT->SetVariable (
                     L"DriverOrder",
                     &gEfiGlobalVariableGuid,
-                    VAR_FLAG,
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                     DriverOrderListSize * sizeof (UINT16),
                     DriverOrderList
                     );
@@ -334,7 +334,7 @@ Var_UpdateAllConsoleOption (
     Status = gRT->SetVariable (
                     L"ConOut",
                     &gEfiGlobalVariableGuid,
-                    VAR_FLAG,
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                     GetDevicePathSize (OutDevicePath),
                     OutDevicePath
                     );
@@ -346,7 +346,7 @@ Var_UpdateAllConsoleOption (
     Status = gRT->SetVariable (
                     L"ConIn",
                     &gEfiGlobalVariableGuid,
-                    VAR_FLAG,
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                     GetDevicePathSize (InpDevicePath),
                     InpDevicePath
                     );
@@ -358,7 +358,7 @@ Var_UpdateAllConsoleOption (
     Status = gRT->SetVariable (
                     L"ErrOut",
                     &gEfiGlobalVariableGuid,
-                    VAR_FLAG,
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                     GetDevicePathSize (ErrDevicePath),
                     ErrDevicePath
                     );
@@ -461,7 +461,7 @@ Var_UpdateConsoleOption (
     Status = gRT->SetVariable (
                     ConsoleName,
                     &gEfiGlobalVariableGuid,
-                    VAR_FLAG,
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                     GetDevicePathSize (ConDevicePath),
                     ConDevicePath
                     );
@@ -663,7 +663,7 @@ Var_UpdateDriverOption (
   Status = gRT->SetVariable (
                   DriverString,
                   &gEfiGlobalVariableGuid,
-                  VAR_FLAG,
+                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                   BufferSize,
                   Buffer
                   );
@@ -684,7 +684,7 @@ Var_UpdateDriverOption (
   Status = gRT->SetVariable (
                   L"DriverOrder",
                   &gEfiGlobalVariableGuid,
-                  VAR_FLAG,
+                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                   DriverOrderListSize + sizeof (UINT16),
                   NewDriverOrderList
                   );
@@ -831,7 +831,7 @@ Var_UpdateBootOption (
   Status = gRT->SetVariable (
                   BootString,
                   &gEfiGlobalVariableGuid,
-                  VAR_FLAG,
+                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                   BufferSize,
                   Buffer
                   );
@@ -855,7 +855,7 @@ Var_UpdateBootOption (
   Status = gRT->SetVariable (
                   L"BootOrder",
                   &gEfiGlobalVariableGuid,
-                  VAR_FLAG,
+                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                   BootOrderListSize + sizeof (UINT16),
                   NewBootOrderList
                   );
@@ -920,7 +920,7 @@ Var_UpdateBootNext (
   Status = gRT->SetVariable (
                   L"BootNext",
                   &gEfiGlobalVariableGuid,
-                  VAR_FLAG,
+                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                   sizeof (UINT16),
                   &NewMenuEntry->OptionNumber
                   );
@@ -980,19 +980,16 @@ Var_UpdateBootOrder (
     }
   }
 
-  GroupMultipleLegacyBootOption4SameType (
-    BootOrderList,
-    BootOrderListSize / sizeof (UINT16)
-    );
-
   Status = gRT->SetVariable (
                   L"BootOrder",
                   &gEfiGlobalVariableGuid,
-                  VAR_FLAG,
+                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                   BootOrderListSize,
                   BootOrderList
                   );
   FreePool (BootOrderList);
+
+  GroupMultipleLegacyBootOption4SameType ();
 
   BOpt_FreeMenu (&BootOptionMenu);
   BOpt_GetBootOptions (CallbackData);
@@ -1057,7 +1054,7 @@ Var_UpdateDriverOrder (
   Status = gRT->SetVariable (
                   L"DriverOrder",
                   &gEfiGlobalVariableGuid,
-                  VAR_FLAG,
+                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                   DriverOrderListSize,
                   NewDriverOrderList
                   );
@@ -1108,7 +1105,6 @@ Var_UpdateBBSOption (
   UINTN                       EnBootOptionCount;
   UINT16                      *DisBootOption;
   UINTN                       DisBootOptionCount;
-  UINT16                      *BootOrder;
 
   DisMap              = NULL;
   NewOrder            = NULL;
@@ -1219,7 +1215,7 @@ Var_UpdateBBSOption (
   Status = gRT->SetVariable (
                   VAR_LEGACY_DEV_ORDER,
                   &gEfiLegacyDevOrderVariableGuid,
-                  VAR_FLAG,
+                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                   VarSize,
                   OriginalPtr
                   );
@@ -1231,39 +1227,15 @@ Var_UpdateBBSOption (
   // 1. Re-order the Option Number in BootOrder according to Legacy Dev Order
   //
   ASSERT (OptionMenu->MenuNumber == DevOrder->Length / sizeof (UINT16) - 1);
-  BootOrder = BdsLibGetVariableAndSize (
-                L"BootOrder",
-                &gEfiGlobalVariableGuid,
-                &VarSize
-                );
-  ASSERT (BootOrder != NULL);
 
-  DisBootOption = AllocatePool (VarSize);
-  ASSERT (DisBootOption != NULL);
-  EnBootOption  = AllocatePool (VarSize);
-  ASSERT (EnBootOption  != NULL);
-  
   OrderLegacyBootOption4SameType (
-    BootOrder,
-    VarSize / sizeof (UINT16),
     DevOrder->Data,
     DevOrder->Length / sizeof (UINT16) - 1,
-    EnBootOption,
+    &EnBootOption,
     &EnBootOptionCount,
-    DisBootOption,
+    &DisBootOption,
     &DisBootOptionCount
     );
-  
-  Status = gRT->SetVariable (
-                    L"BootOrder",
-                    &gEfiGlobalVariableGuid,
-                    VAR_FLAG,
-                    VarSize,
-                    BootOrder
-                    );
-  ASSERT_EFI_ERROR (Status);
-
-  FreePool (BootOrder);
 
   //
   // 2. Deactivate the DisBootOption and activate the EnBootOption
@@ -1282,7 +1254,7 @@ Var_UpdateBBSOption (
       Status = gRT->SetVariable (
                       VarName,
                       &gEfiGlobalVariableGuid,
-                      VAR_FLAG,
+                      EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                       OptionSize,
                       BootOptionVar
                       );
@@ -1305,7 +1277,7 @@ Var_UpdateBBSOption (
       Status = gRT->SetVariable (
                       VarName,
                       &gEfiGlobalVariableGuid,
-                      VAR_FLAG,
+                      EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                       OptionSize,
                       BootOptionVar
                       );

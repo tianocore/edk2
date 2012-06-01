@@ -701,21 +701,9 @@ BdsLibVariableToOption (
                + (UINT16) (CharToUint (VariableName[NumOff+2]) * 0x10)
                + (UINT16) (CharToUint (VariableName[NumOff+3]) * 0x1);
   }
-  //
-  // Insert active entry to BdsDeviceList
-  //
-  if ((Option->Attribute & LOAD_OPTION_ACTIVE) == LOAD_OPTION_ACTIVE) {
-    InsertTailList (BdsCommonOptionList, &Option->Link);
-    FreePool (Variable);
-    return Option;
-  }
-
+  InsertTailList (BdsCommonOptionList, &Option->Link);
   FreePool (Variable);
-  FreePool (Option->Description);
-  FreePool (Option->DevicePath);
-  FreePool (Option->LoadOptions);
-  FreePool (Option);
-  return NULL;
+  return Option;
 }
 
 /**

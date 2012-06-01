@@ -1,7 +1,7 @@
 /** @file
   The functions for Boot Maintainence Main menu.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1016,7 +1016,7 @@ InitializeBM (
     UpdateTerminalPage (BmmCallbackInfo);
   }
 
-  Status = EfiLibLocateProtocol (&gEfiLegacyBiosProtocolGuid, (VOID **) &LegacyBios);
+  Status = gBS->LocateProtocol (&gEfiLegacyBiosProtocolGuid, NULL, (VOID **) &LegacyBios);
   if (!EFI_ERROR (Status)) {
     RefreshUpdateData ();
     mStartLabel->Number = FORM_BOOT_LEGACY_DEVICE_ID;
@@ -1328,6 +1328,11 @@ BdsStartBootMaint (
   BdsLibEnumerateAllBootOption (&BdsBootOptionList);
 
   //
+  // Group the legacy boot options for the same device type
+  //
+  GroupMultipleLegacyBootOption4SameType ();
+
+  //
   // Init the BMM
   //
   Status = InitializeBM ();
@@ -1403,61 +1408,4 @@ FormSetDispatcher (
 
   return Status;
 }
-
-
-/**
-  Deletete the Boot Option from EFI Variable. The Boot Order Arrray
-  is also updated.
-
-  @param OptionNumber    The number of Boot option want to be deleted.
-  @param BootOrder       The Boot Order array.
-  @param BootOrderSize   The size of the Boot Order Array.
-
-  @retval  EFI_SUCCESS           The Boot Option Variable was found and removed
-  @retval  EFI_UNSUPPORTED       The Boot Option Variable store was inaccessible
-  @retval  EFI_NOT_FOUND         The Boot Option Variable was not found
-**/
-EFI_STATUS
-EFIAPI
-BdsDeleteBootOption (
-  IN UINTN                       OptionNumber,
-  IN OUT UINT16                  *BootOrder,
-  IN OUT UINTN                   *BootOrderSize
-  )
-{
-  UINT16      BootOption[100];
-  UINTN       Index;
-  EFI_STATUS  Status;
-  UINTN       Index2Del;
-
-  Status    = EFI_SUCCESS;
-  Index2Del = 0;
-
-  UnicodeSPrint (BootOption, sizeof (BootOption), L"Boot%04x", OptionNumber);
-  Status = EfiLibDeleteVariable (BootOption, &gEfiGlobalVariableGuid);
-  
-  //
-  // adjust boot order array
-  //
-  for (Index = 0; Index < *BootOrderSize / sizeof (UINT16); Index++) {
-    if (BootOrder[Index] == OptionNumber) {
-      Index2Del = Index;
-      break;
-    }
-  }
-
-  if (Index != *BootOrderSize / sizeof (UINT16)) {
-    for (Index = 0; Index < *BootOrderSize / sizeof (UINT16) - 1; Index++) {
-      if (Index >= Index2Del) {
-        BootOrder[Index] = BootOrder[Index + 1];
-      }
-    }
-
-    *BootOrderSize -= sizeof (UINT16);
-  }
-
-  return Status;
-
-}
-
 

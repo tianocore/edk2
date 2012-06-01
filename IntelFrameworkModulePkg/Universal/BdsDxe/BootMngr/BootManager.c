@@ -232,6 +232,14 @@ CallBootManager (
 
   BdsLibEnumerateAllBootOption (&mBootOptionsList);
 
+  //
+  // Group the legacy boot options for the same device type
+  //
+  GroupMultipleLegacyBootOption4SameType ();
+
+  InitializeListHead (&mBootOptionsList);
+  BdsLibBuildOptionFromVar (&mBootOptionsList, L"BootOrder");
+
   HiiHandle = gBootManagerPrivate.HiiHandle;
 
   //
@@ -268,9 +276,9 @@ CallBootManager (
     mKeyInput++;
 
     //
-    // Don't display the boot option marked as LOAD_OPTION_HIDDEN
+    // Don't display the hidden/inactive boot option
     //
-    if ((Option->Attribute & LOAD_OPTION_HIDDEN) != 0) {
+    if (((Option->Attribute & LOAD_OPTION_HIDDEN) != 0) || ((Option->Attribute & LOAD_OPTION_ACTIVE) == 0)) {
       continue;
     }
 
