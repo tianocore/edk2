@@ -1,6 +1,15 @@
 ## @file
 #  Cryptographic Library Instance for SMM driver.
 #
+#  This library instance uses ConstantTimeClock.c thus does not provide
+#  functionality for following APIs which need system time support:
+#  1) RsaGenerateKey
+#  2) RsaCheckKey
+#  3) RsaPkcs1Sign
+#  4) Pkcs7Sign
+#  5) DhGenerateParameter
+#  6) DhGenerateKey
+#
 #  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -37,7 +46,7 @@
   Pem/CryptPem.c
 
   SysCall/CrtWrapper.c
-  SysCall/RealTimeClock.c
+  SysCall/ConstantTimeClock.c
   SysCall/BaseMemAllocation.c
 
 [Sources.Ia32]
