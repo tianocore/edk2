@@ -82,13 +82,13 @@ QemuInstallAcpiMadtTable (
   for (Loop = 1; Loop < Count; Loop++) {
     LocalApic->Type = EFI_ACPI_1_0_PROCESSOR_LOCAL_APIC;
     LocalApic->Length = sizeof (*LocalApic);
-    LocalApic->AcpiProcessorId = Loop;
-    LocalApic->ApicId = Loop;
+    LocalApic->AcpiProcessorId = (UINT8) Loop;
+    LocalApic->ApicId = (UINT8) Loop;
     LocalApic->Flags = 1;
     LocalApic++;
   }
 
-  Hdr->Length = NewBufferSize;
+  Hdr->Length = (UINT32) NewBufferSize;
 
   Status = InstallAcpiTable (AcpiProtocol, Hdr, NewBufferSize, TableKey);
 
