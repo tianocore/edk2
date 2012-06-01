@@ -393,16 +393,23 @@ ExecutePhysicalPresence (
       return 0;
   
     case PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR:
-      TpmResponse = ExecutePhysicalPresence (TcgProtocol, PHYSICAL_PRESENCE_ENABLE_ACTIVATE, PpiFlags);
-      if (TpmResponse == 0) {
+      //
+      // PHYSICAL_PRESENCE_ENABLE_ACTIVATE + PHYSICAL_PRESENCE_CLEAR
+      // PHYSICAL_PRESENCE_CLEAR will be executed after reboot.
+      //
+      if ((*PpiFlags & FLAG_RESET_TRACK) == 0) {
+        TpmResponse = ExecutePhysicalPresence (TcgProtocol, PHYSICAL_PRESENCE_ENABLE_ACTIVATE, PpiFlags);
+        *PpiFlags |= FLAG_RESET_TRACK;
+      } else {
         TpmResponse = ExecutePhysicalPresence (TcgProtocol, PHYSICAL_PRESENCE_CLEAR, PpiFlags);
+        *PpiFlags &= ~FLAG_RESET_TRACK;
       }
       return TpmResponse;
 
     case PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR_ENABLE_ACTIVATE:
       //
       // PHYSICAL_PRESENCE_ENABLE_ACTIVATE + PHYSICAL_PRESENCE_CLEAR_ENABLE_ACTIVATE
-      // PHYSICAL_PRESENCE_CLEAR_ENABLE_ACTIVATE will be executed atfer reboot.
+      // PHYSICAL_PRESENCE_CLEAR_ENABLE_ACTIVATE will be executed after reboot.
       //
       if ((*PpiFlags & FLAG_RESET_TRACK) == 0) {
         TpmResponse = ExecutePhysicalPresence (TcgProtocol, PHYSICAL_PRESENCE_ENABLE_ACTIVATE, PpiFlags);
