@@ -29,7 +29,8 @@
   @param [in] Controller       Handle of device to work with.
 
   @retval EFI_SUCCESS          This driver is added to Controller.
-  @retval other                This driver does not support this device.
+  @retval EFI_OUT_OF_RESOURCES No more memory available.
+  @retval EFI_UNSUPPORTED      This driver does not support this device.
 
 **/
 EFI_STATUS
@@ -40,6 +41,7 @@ EslServiceConnect (
   )
 {
   BOOLEAN bInUse;
+  EFI_STATUS ExitStatus;
   UINTN LengthInBytes;
   UINT8 * pBuffer;
   CONST ESL_SOCKET_BINDING * pEnd;
@@ -56,7 +58,7 @@ EslServiceConnect (
   //
   //  Assume the list is empty
   //
-  Status = EFI_UNSUPPORTED;
+  ExitStatus = EFI_UNSUPPORTED;
   bInUse = FALSE;
 
   //
@@ -171,28 +173,9 @@ EslServiceConnect (
               RESTORE_TPL ( TplPrevious );
 
               //
-              //  Determine if the initialization was successful
+              //  At least one service was made available
               //
-              if ( EFI_ERROR ( Status )) {
-                DEBUG (( DEBUG_ERROR | DEBUG_POOL | DEBUG_INIT,
-                          "ERROR - Failed to initialize service %s on 0x%08x, Status: %r\r\n",
-                          pSocketBinding->pName,
-                          Controller,
-                          Status ));
-
-                //
-                //  Free the network service binding if necessary
-                //
-                gBS->UninstallMultipleProtocolInterfaces (
-                          Controller,
-                          pSocketBinding->pTagGuid,
-                          pService,
-                          NULL );
-                DEBUG (( DEBUG_POOL | DEBUG_INIT | DEBUG_INFO,
-                            "Removed:   %s TagGuid from 0x%08x\r\n",
-                            pSocketBinding->pName,
-                            Controller ));
-              }
+              ExitStatus = EFI_SUCCESS;
             }
             else {
               DEBUG (( DEBUG_ERROR | DEBUG_POOL | DEBUG_INIT,
@@ -241,6 +224,8 @@ EslServiceConnect (
           DEBUG (( DEBUG_ERROR | DEBUG_INIT,
                     "ERROR - Failed service allocation, Status: %r\r\n",
                     Status ));
+          ExitStatus = EFI_OUT_OF_RESOURCES;
+          break;
         }
       }
     }
@@ -254,8 +239,8 @@ EslServiceConnect (
   //
   //  Display the driver start status
   //
-  DBG_EXIT_STATUS ( Status );
-  return Status;
+  DBG_EXIT_STATUS ( ExitStatus );
+  return ExitStatus;
 }
 
 

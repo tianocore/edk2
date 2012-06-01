@@ -196,10 +196,17 @@ EslServiceNetworkConnect (
         for ( Index = 0; HandleCount > Index; Index++ ) {
           Status = EslServiceConnect ( gImageHandle,
                                        pHandles[ Index ]);
-          if ( EFI_ERROR ( Status )) {
-            break;
+          if ( !EFI_ERROR ( Status )) {
+            bSomethingFound = TRUE;
           }
-          bSomethingFound = TRUE;
+          else {
+            if ( EFI_OUT_OF_RESOURCES == Status ) {
+              //
+              //  Pointless to continue without memory
+              //
+              break;
+            }
+          }
         }
 
         //
