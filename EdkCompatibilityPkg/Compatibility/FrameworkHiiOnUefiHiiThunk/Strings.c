@@ -349,7 +349,7 @@ HiiThunkGetString (
   //
   // Get the current platform language setting
   //
-  GetEfiGlobalVariable2 (L"PlatformLang", &PlatformLanguage, NULL);
+  GetEfiGlobalVariable2 (L"PlatformLang", (VOID**)&PlatformLanguage, NULL);
 
   //
   // Get the best matching language from SupportedLanguages

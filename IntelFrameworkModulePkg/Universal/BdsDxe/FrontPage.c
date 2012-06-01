@@ -232,7 +232,7 @@ FrontPageCallback (
         Index++;
       }
 
-      GetEfiGlobalVariable2 (L"PlatformLangCodes", &PlatformSupportedLanguages, NULL);
+      GetEfiGlobalVariable2 (L"PlatformLangCodes", (VOID**)&PlatformSupportedLanguages, NULL);
       if (PlatformSupportedLanguages == NULL) {
         PlatformSupportedLanguages = AllocateCopyPool (
                                        AsciiStrSize ((CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLangCodes)),
@@ -430,7 +430,7 @@ InitializeFrontPage (
   Lang = AllocatePool (AsciiStrSize (LanguageString));
   ASSERT (Lang != NULL);
 
-  GetEfiGlobalVariable2 (L"PlatformLang", &CurrentLang, NULL);
+  GetEfiGlobalVariable2 (L"PlatformLang", (VOID**)&CurrentLang, NULL);
   //
   // Select the best language in LanguageString as the default one.
   //

@@ -1513,8 +1513,8 @@ BdsLibEnumerateAllBootOption (
   // device from the boot order variable
   //
   if (mEnumBootDevice) {
-    GetVariable2 (LAST_ENUM_LANGUAGE_VARIABLE_NAME, &gLastEnumLangGuid, &LastLang, NULL);
-    GetEfiGlobalVariable2 (L"PlatformLang", &PlatLang, NULL);
+    GetVariable2 (LAST_ENUM_LANGUAGE_VARIABLE_NAME, &gLastEnumLangGuid, (VOID**)&LastLang, NULL);
+    GetEfiGlobalVariable2 (L"PlatformLang", (VOID**)&PlatLang, NULL);
     ASSERT (PlatLang != NULL);
     if ((LastLang != NULL) && (AsciiStrCmp (LastLang, PlatLang) == 0)) {
       Status = BdsLibBuildOptionFromVar (BdsBootOptionList, L"BootOrder");

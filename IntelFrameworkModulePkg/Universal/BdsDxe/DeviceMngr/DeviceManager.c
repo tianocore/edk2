@@ -2167,7 +2167,7 @@ DriverHealthSelectBestLanguage (
   CHAR8           *LanguageVariable;
   CHAR8           *BestLanguage;
 
-  GetEfiGlobalVariable2 (Iso639Language ? L"Lang" : L"PlatformLang", &LanguageVariable, NULL);
+  GetEfiGlobalVariable2 (Iso639Language ? L"Lang" : L"PlatformLang", (VOID**)&LanguageVariable, NULL);
 
   BestLanguage = GetBestLanguage(
                    SupportedLanguages,

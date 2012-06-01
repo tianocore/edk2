@@ -41,7 +41,7 @@ Dhcp6GenerateClientId (
   // Attempt to get client Id from variable to keep it constant.
   // See details in section-9 of rfc-3315.
   //
-  GetVariable2 (L"ClientId", &gEfiDhcp6ServiceBindingProtocolGuid, &Duid, NULL);
+  GetVariable2 (L"ClientId", &gEfiDhcp6ServiceBindingProtocolGuid, (VOID**)&Duid, NULL);
   if (Duid != NULL) {
     return Duid;
   }

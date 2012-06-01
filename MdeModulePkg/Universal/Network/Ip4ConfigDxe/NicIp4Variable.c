@@ -91,7 +91,7 @@ Ip4ConfigReadVariable (
 {
   NIC_IP4_CONFIG_INFO *NicConfig;
 
-  GetVariable2 (Instance->MacString, &gEfiNicIp4ConfigVariableGuid, &NicConfig, NULL);
+  GetVariable2 (Instance->MacString, &gEfiNicIp4ConfigVariableGuid, (VOID**)&NicConfig, NULL);
   if (NicConfig != NULL) {
     Ip4ConfigFixRouteTablePointer (&NicConfig->Ip4Info);
   }
@@ -255,7 +255,7 @@ Check:
       continue;
     }
 
-    GetVariable2 (VariableName, &gEfiNicIp4ConfigVariableGuid, &NicConfig, NULL);
+    GetVariable2 (VariableName, &gEfiNicIp4ConfigVariableGuid, (VOID**)&NicConfig, NULL);
     if (NicConfig == NULL) {
       break;
     }

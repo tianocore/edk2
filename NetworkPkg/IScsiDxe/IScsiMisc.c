@@ -1079,7 +1079,7 @@ IScsiGetConfigData (
     GetVariable2 (
                  mPrivate->PortString,
                  &gEfiIScsiInitiatorNameProtocolGuid,
-                 &AttemptConfigData,
+                 (VOID**)&AttemptConfigData,
                  NULL
                  );
 

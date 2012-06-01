@@ -358,7 +358,7 @@ IsTerminalInConsoleVariable (
   //
   // Get global variable and its size according to the name given.
   //
-  GetEfiGlobalVariable2 (VariableName, &Variable, NULL);
+  GetEfiGlobalVariable2 (VariableName, (VOID**)&Variable, NULL);
   if (Variable == NULL) {
     return FALSE;
   }
@@ -1431,7 +1431,7 @@ TerminalUpdateConsoleDevVariable (
   //
   // Get global variable and its size according to the name given.
   //
-  GetEfiGlobalVariable2 (VariableName, &Variable, NULL);
+  GetEfiGlobalVariable2 (VariableName, (VOID**)&Variable, NULL);
   if (Variable == NULL) {
     return;
   }
@@ -1500,7 +1500,7 @@ TerminalRemoveConsoleDevVariable (
   //
   // Get global variable and its size according to the name given.
   //
-  GetEfiGlobalVariable2 (VariableName, &Variable, NULL);
+  GetEfiGlobalVariable2 (VariableName, (VOID**)&Variable, NULL);
   if (Variable == NULL) {
     return ;
   }
