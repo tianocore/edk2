@@ -1,0 +1,110 @@
+##  @file
+#  This is the shell application
+#
+#  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = Shell
+  FILE_GUID                      = 7C04A583-9E3E-4f1c-AD65-E05268D0B4D1
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = UefiMain
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  Shell.c
+  Shell.h
+  ShellParametersProtocol.c
+  ShellParametersProtocol.h
+  ShellProtocol.c
+  ShellProtocol.h
+  FileHandleWrappers.c
+  FileHandleWrappers.h
+  FileHandleInternal.h
+  ShellEnvVar.c
+  ShellEnvVar.h
+  ShellManParser.c
+  ShellManParser.h
+  Shell.uni
+  ConsoleLogger.c
+  ConsoleLogger.h
+  ConsoleWrappers.c
+  ConsoleWrappers.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  UefiApplicationEntryPoint
+  UefiLib
+  DebugLib
+  MemoryAllocationLib
+  ShellCommandLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  DevicePathLib
+  BaseMemoryLib
+  PcdLib
+  FileHandleLib
+  PrintLib
+  HiiLib
+  SortLib
+  HandleParsingLib
+  PathLib
+
+[Guids]
+  gShellVariableGuid                                      # ALWAYS_CONSUMED
+  gShellMapGuid                                           # ALWAYS_CONSUMED
+  gShellAliasGuid                                         # ALWAYS_CONSUMED
+
+[Protocols]
+  gEfiShellProtocolGuid                                   # ALWAYS_PRODUCED
+                                                          # SOMETIMES_CONSUMED
+  gEfiShellParametersProtocolGuid                         # ALWAYS_PRODUCED
+                                                          # SOMETIMES_CONSUMED
+
+#  gEfiShellEnvironment2Guid                               # SOMETIMES_PRODUCED
+#  gEfiShellInterfaceGuid                                  # SOMETIMES_PRODUCED
+
+  gEfiSimpleTextInputExProtocolGuid                       # ALWAYS_CONSUMED
+  gEfiSimpleTextInProtocolGuid                            # ALWAYS_CONSUMED
+  gEfiSimpleTextOutProtocolGuid                           # ALWAYS_CONSUMED
+  gEfiSimpleFileSystemProtocolGuid                        # ALWAYS_CONSUMED
+  gEfiLoadedImageProtocolGuid                             # ALWAYS_CONSUMED
+  gEfiComponentName2ProtocolGuid                          # ALWAYS_CONSUMED
+  gEfiUnicodeCollation2ProtocolGuid                       # ALWAYS_CONSUMED
+  gEfiDevicePathProtocolGuid                              # ALWAYS_CONSUMED
+  gEfiDevicePathToTextProtocolGuid                        # ALWAYS_CONSUMED
+
+[Pcd]
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupportLevel         # ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupportOldProtocols  # ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellRequireHiiPlatform   # ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupportFrameworkHii  # ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellPageBreakDefault     # ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize    # ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellInsertModeDefault    # ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellScreenLogCount       # ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellMapNameLength        # ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize      # ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellForceConsole         # ALWAYS_CONSUMED
+

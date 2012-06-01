@@ -1,0 +1,190 @@
+##  @file
+#  Provides interface to advanced shell functionality for parsing both handle and protocol database.
+#  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved. <BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = UefiHandleParsingLib
+  FILE_GUID                      = 3CDC7177-CC2A-4678-BA8F-1A936A093FA4
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = HandleParsingLib|UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = HandleParsingLibConstructor
+  DESTRUCTOR                     = HandleParsingLibDestructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources.common]
+  UefiHandleParsingLib.c
+  UefiHandleParsingLib.h
+  UefiHandleParsingLib.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ShellPkg/ShellPkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  DevicePathLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  FileHandleLib
+  PrintLib
+  UefiLib
+  HiiLib
+
+[Protocols]
+  gEfiSimpleFileSystemProtocolGuid                        ##CONSUMES
+
+  # shell 2.0
+  gEfiShellProtocolGuid                                   ##SOMETIMES_CONSUMED
+  gEfiShellParametersProtocolGuid                         ##SOMETIMES_CONSUMED
+
+  # 'old' shell
+  gEfiShellEnvironment2Guid                               ##SOMETIMES_CONSUMED
+  gEfiShellInterfaceGuid                                  ##SOMETIMES_CONSUMED
+
+  gEfiUnicodeCollation2ProtocolGuid                       ##CONSUMES
+  gEfiDevicePathToTextProtocolGuid                        ##CONSUMES
+  gEfiBusSpecificDriverOverrideProtocolGuid               ##CONSUMES
+  gEfiDevicePathUtilitiesProtocolGuid                     ##CONSUMES
+  gEfiDevicePathFromTextProtocolGuid                      ##CONSUMES
+  gEfiPlatformDriverOverrideProtocolGuid                  ##CONSUMES
+  gEfiSimpleTextInProtocolGuid                            ##CONSUMES
+  gEfiPlatformToDriverConfigurationProtocolGuid           ##CONSUMES
+  gEfiDriverSupportedEfiVersionProtocolGuid               ##CONSUMES
+  gEfiLoadedImageProtocolGuid                             ##CONSUMES
+  gEfiDevicePathProtocolGuid                              ##CONSUMES
+  gEfiLoadedImageDevicePathProtocolGuid                   ##CONSUMES
+  gEfiSimpleTextOutProtocolGuid                           ##UNDEFINED
+  gEfiSimplePointerProtocolGuid                           ##UNDEFINED
+  gEfiAbsolutePointerProtocolGuid                         ##UNDEFINED
+  gEfiSerialIoProtocolGuid                                ##UNDEFINED
+  gEfiEdidDiscoveredProtocolGuid                          ##UNDEFINED
+  gEfiEdidActiveProtocolGuid                              ##UNDEFINED
+  gEfiEdidOverrideProtocolGuid                            ##UNDEFINED
+  gEfiLoadFileProtocolGuid                                ##UNDEFINED
+  gEfiLoadFile2ProtocolGuid                               ##UNDEFINED
+  gEfiTapeIoProtocolGuid                                  ##UNDEFINED
+  gEfiDiskIoProtocolGuid                                  ##UNDEFINED
+  gEfiBlockIoProtocolGuid                                 ##UNDEFINED
+  gEfiUnicodeCollationProtocolGuid                        ##UNDEFINED
+  gEfiPciRootBridgeIoProtocolGuid                         ##UNDEFINED
+  gEfiPciIoProtocolGuid                                   ##UNDEFINED
+  gEfiScsiPassThruProtocolGuid                            ##UNDEFINED
+  gEfiScsiIoProtocolGuid                                  ##UNDEFINED
+  gEfiExtScsiPassThruProtocolGuid                         ##UNDEFINED
+  gEfiIScsiInitiatorNameProtocolGuid                      ##UNDEFINED
+  gEfiUsbIoProtocolGuid                                   ##UNDEFINED
+  gEfiUsbHcProtocolGuid                                   ##UNDEFINED
+  gEfiUsb2HcProtocolGuid                                  ##UNDEFINED
+  gEfiDebugSupportProtocolGuid                            ##UNDEFINED
+  gEfiDebugPortProtocolGuid                               ##UNDEFINED
+  gEfiDecompressProtocolGuid                              ##UNDEFINED
+  gEfiAcpiTableProtocolGuid                               ##UNDEFINED
+  gEfiEbcProtocolGuid                                     ##UNDEFINED
+  gEfiSimpleNetworkProtocolGuid                           ##UNDEFINED
+  gEfiNetworkInterfaceIdentifierProtocolGuid              ##UNDEFINED
+  gEfiNetworkInterfaceIdentifierProtocolGuid_31           ##UNDEFINED
+  gEfiPxeBaseCodeProtocolGuid                             ##UNDEFINED
+  gEfiPxeBaseCodeCallbackProtocolGuid                     ##UNDEFINED
+  gEfiBisProtocolGuid                                     ##UNDEFINED
+  gEfiManagedNetworkServiceBindingProtocolGuid            ##UNDEFINED
+  gEfiManagedNetworkProtocolGuid                          ##UNDEFINED
+  gEfiArpServiceBindingProtocolGuid                       ##UNDEFINED
+  gEfiArpProtocolGuid                                     ##UNDEFINED
+  gEfiDhcp4ServiceBindingProtocolGuid                     ##UNDEFINED
+  gEfiDhcp4ProtocolGuid                                   ##UNDEFINED
+  gEfiTcp4ServiceBindingProtocolGuid                      ##UNDEFINED
+  gEfiTcp4ProtocolGuid                                    ##UNDEFINED
+  gEfiIp4ServiceBindingProtocolGuid                       ##UNDEFINED
+  gEfiIp4ProtocolGuid                                     ##UNDEFINED
+  gEfiIp4ConfigProtocolGuid                               ##UNDEFINED
+  gEfiUdp4ServiceBindingProtocolGuid                      ##UNDEFINED
+  gEfiUdp4ProtocolGuid                                    ##UNDEFINED
+  gEfiMtftp4ServiceBindingProtocolGuid                    ##UNDEFINED
+  gEfiMtftp4ProtocolGuid                                  ##UNDEFINED
+  gEfiAuthenticationInfoProtocolGuid                      ##UNDEFINED
+  gEfiHashServiceBindingProtocolGuid                      ##UNDEFINED
+  gEfiHashProtocolGuid                                    ##UNDEFINED
+  gEfiHiiFontProtocolGuid                                 ##UNDEFINED
+  gEfiHiiStringProtocolGuid                               ##UNDEFINED
+  gEfiHiiImageProtocolGuid                                ##UNDEFINED
+  gEfiHiiConfigRoutingProtocolGuid                        ##UNDEFINED
+  gEfiHiiConfigAccessProtocolGuid                         ##UNDEFINED
+  gEfiFormBrowser2ProtocolGuid                            ##UNDEFINED
+  gEfiDeviceIoProtocolGuid                                ##UNDEFINED
+  gEfiUgaDrawProtocolGuid                                 ##UNDEFINED
+  gEfiUgaIoProtocolGuid                                   ##UNDEFINED
+  gEfiDriverConfigurationProtocolGuid                     ##UNDEFINED
+  gEfiDriverConfiguration2ProtocolGuid                    ##UNDEFINED
+  gEfiSimpleTextInputExProtocolGuid                       ##UNDEFINED
+  gEfiIp6ServiceBindingProtocolGuid                       ##UNDEFINED
+  gEfiIp6ProtocolGuid                                     ##UNDEFINED
+  gEfiIp6ConfigProtocolGuid                               ##UNDEFINED
+  gEfiMtftp6ServiceBindingProtocolGuid                    ##UNDEFINED
+  gEfiMtftp6ProtocolGuid                                  ##UNDEFINED
+  gEfiDhcp6ServiceBindingProtocolGuid                     ##UNDEFINED
+  gEfiDhcp6ProtocolGuid                                   ##UNDEFINED
+  gEfiUdp6ServiceBindingProtocolGuid                      ##UNDEFINED
+  gEfiUdp6ProtocolGuid                                    ##UNDEFINED
+  gEfiTcp6ServiceBindingProtocolGuid                      ##UNDEFINED
+  gEfiTcp6ProtocolGuid                                    ##UNDEFINED
+  gEfiVlanConfigProtocolGuid                              ##UNDEFINED
+  gEfiEapProtocolGuid                                     ##UNDEFINED
+  gEfiEapManagementProtocolGuid                           ##UNDEFINED
+  gEfiFtp4ServiceBindingProtocolGuid                      ##UNDEFINED
+  gEfiFtp4ProtocolGuid                                    ##UNDEFINED
+  gEfiIpSecConfigProtocolGuid                             ##UNDEFINED
+  gEfiDriverHealthProtocolGuid                            ##UNDEFINED
+  gEfiDeferredImageLoadProtocolGuid                       ##UNDEFINED
+  gEfiUserCredentialProtocolGuid                          ##UNDEFINED
+  gEfiUserManagerProtocolGuid                             ##UNDEFINED
+  gEfiAtaPassThruProtocolGuid                             ##UNDEFINED
+  gEfiFirmwareManagementProtocolGuid                      ##UNDEFINED
+  gEfiIpSecProtocolGuid                                   ##UNDEFINED
+  gEfiIpSec2ProtocolGuid                                  ##UNDEFINED
+  gEfiKmsProtocolGuid                                     ##UNDEFINED
+  gEfiBlockIo2ProtocolGuid                                ##UNDEFINED
+  gEfiStorageSecurityCommandProtocolGuid                  ##UNDEFINED
+  gEfiUserCredential2ProtocolGuid                         ##UNDEFINED
+  gPcdProtocolGuid                                        ##UNDEFINED
+  gEfiTcgProtocolGuid                                     ##UNDEFINED
+  gEfiHiiPackageListProtocolGuid                          ##UNDEFINED
+  gEfiDriverFamilyOverrideProtocolGuid                    ##UNDEFINED
+
+[Guids]
+  gEfiFileInfoGuid                                        ##CONSUMES
+  gEfiShellEnvironment2ExtGuid                            ##CONSUMES
+  gEfiPcAnsiGuid                                          ##UNDEFINED
+  gEfiVT100Guid                                           ##UNDEFINED
+  gEfiVT100PlusGuid                                       ##UNDEFINED
+  gEfiVTUTF8Guid                                          ##UNDEFINED
+  gEfiStandardErrorDeviceGuid                             ##UNDEFINED
+  gEfiConsoleInDeviceGuid                                 ##UNDEFINED
+  gEfiConsoleOutDeviceGuid                                ##UNDEFINED
+  gEfiFileSystemInfoGuid                                  ##UNDEFINED
+  gEfiGlobalVariableGuid                                  ##UNDEFINED
+  gEfiPartTypeSystemPartGuid                              ##UNDEFINED
+  gEfiPartTypeLegacyMbrGuid                               ##UNDEFINED
+  gHandleParsingHiiGuid                                   ##UNDEFINED
+
+[Pcd.common]
+  gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize    ##CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize      ##CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellIncludeNtGuids       ##CONSUMES

@@ -1,0 +1,121 @@
+## @file ShellPkg.dec
+#
+# This Package provides all definitions for EFI and UEFI Shell
+#
+# Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License which accompanies this distribution.
+# The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = ShellPkg
+  PACKAGE_GUID                   = 9FB7587C-93F7-40a7-9C04-FD7BA94EE646
+  PACKAGE_VERSION                = 0.50
+
+[Includes]
+  Include
+
+[LibraryClasses]
+  ##  @libraryclass  Provides most Shell APIs. Only available for Shell applications
+  ShellLib|Include/Library/ShellLib.h
+
+  ##  @libraryclass  Provides shell internal support Only available for shell internal commands
+  ShellCommandLib|Include/Library/ShellCommandLib.h
+
+  ##  @libraryclass  provides EFI_FILE_HANDLE services used by Shell and ShellLib
+  FileHandleLib|Include/Library/FileHandleLib.h
+
+  ## @libraryclass   Allows for a shell application to have a C style entry point
+  ShellCEntryLib|Include/Library/ShellCEntryLib.h
+
+  ## @libraryclass   Provides sorting functions
+  SortLib|Include/Library/SortLib.h
+
+  ## @libraryclass   Provides advanced parsing functions
+  HandleParsingLib|Include/Library/HandleParsingLib.h
+
+  ## @libraryclass   Provides path manipulation functions
+  PathLib|Include/Library/PathLib.h
+
+[Guids]
+  gEfiShellEnvironment2ExtGuid    = {0xd2c18636, 0x40e5, 0x4eb5, {0xa3, 0x1b, 0x36, 0x69, 0x5f, 0xd4, 0x2c, 0x87}}
+  gEfiShellPkgTokenSpaceGuid	    = {0x171e9188, 0x31d3, 0x40f5, {0xb1, 0x0c, 0x53, 0x9b, 0x2d, 0xb9, 0x40, 0xcd}}
+  gShellVariableGuid              = {0x158def5a, 0xf656, 0x419c, {0xb0, 0x27, 0x7a, 0x31, 0x92, 0xc0, 0x79, 0xd2}}
+  gShellMapGuid                   = {0x51271e13, 0x7de3, 0x43af, {0x8b, 0xc2, 0x71, 0xad, 0x3b, 0x82, 0x43, 0x25}}
+  gShellAliasGuid                 = {0x0053d9d6, 0x2659, 0x4599, {0xa2, 0x6b, 0xef, 0x45, 0x36, 0xe6, 0x31, 0xa9}}
+  gHandleParsingHiiGuid           = {0xb8969637, 0x81de, 0x43af, {0xbc, 0x9a, 0x24, 0xd9, 0x89, 0x13, 0xf2, 0xf6}}
+  gShellDebug1HiiGuid             = {0x25f200aa, 0xd3cb, 0x470a, {0xbf, 0x51, 0xe7, 0xd1, 0x62, 0xd2, 0x2e, 0x6f}}
+  gShellDriver1HiiGuid            = {0xaf0b742, 0x63ec, 0x45bd, {0x8d, 0xb6, 0x71, 0xad, 0x7f, 0x2f, 0xe8, 0xe8}}
+  gShellInstall1HiiGuid           = {0x7d574d54, 0xd364, 0x4d4a, {0x95, 0xe3, 0x49, 0x45, 0xdb, 0x7a, 0xd3, 0xee}}
+  gShellLevel1HiiGuid             = {0xdec5daa4, 0x6781, 0x4820, {0x9c, 0x63, 0xa7, 0xb0, 0xe4, 0xf1, 0xdb, 0x31}}
+  gShellLevel2HiiGuid             = {0xf95a7ccc, 0x4c55, 0x4426, {0xa7, 0xb4, 0xdc, 0x89, 0x61, 0x95, 0xb, 0xae}}
+  gShellLevel3HiiGuid             = {0x4344558d, 0x4ef9, 0x4725, {0xb1, 0xe4, 0x33, 0x76, 0xe8, 0xd6, 0x97, 0x4f}}
+  gShellNetwork1HiiGuid           = {0xf3d301bb, 0xf4a5, 0x45a8, {0xb0, 0xb7, 0xfa, 0x99, 0x9c, 0x62, 0x37, 0xae}}
+
+[Protocols]
+  gEfiShellProtocolGuid           = {0x6302d008, 0x7f9b, 0x4f30, {0x87, 0xac, 0x60, 0xc9, 0xfe, 0xf5, 0xda, 0x4e}}
+  gEfiShellParametersProtocolGuid = {0x752f3136, 0x4e16, 0x4fdc, {0xa2, 0x2a, 0xe5, 0xf4, 0x68, 0x12, 0xf4, 0xca}}
+  gEfiShellEnvironment2Guid       = {0x47c7b221, 0xc42a, 0x11d2, {0x8e, 0x57, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}}
+  gEfiShellInterfaceGuid          = {0x47c7b223, 0xc42a, 0x11d2, {0x8e, 0x57, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}}
+
+[PcdsFeatureFlag]
+  ## This flag is used to control whether the shell includes NT32 platform Guids
+  #  and thereby prevents dependancy on that Pkg
+  gEfiShellPkgTokenSpaceGuid.PcdShellIncludeNtGuids|TRUE|BOOLEAN|0x0000000E
+
+  ## This flag is used to control HII required by the shell
+  gEfiShellPkgTokenSpaceGuid.PcdShellRequireHiiPlatform|TRUE|BOOLEAN|0x00000003
+
+  ## This flag is used to control HII required by the shell
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupportFrameworkHii|FALSE|BOOLEAN|0x00000004
+
+  ## This flag forces the shell to present a user console.  Allows for earlier debugging of platforms.
+  gEfiShellPkgTokenSpaceGuid.PcdShellForceConsole|FALSE|BOOLEAN|0x0000000F
+
+[PcdsFixedAtBuild]
+  ## This flag is used to control initialization of the shell library
+  #  This should be FALSE for compiling the shell application itself only.
+  gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|TRUE|BOOLEAN|0x00000005
+
+  ## This is the max buffer for ShellLib, FileHandleLib, and internal Shell printings.
+  gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize|16000|UINT16|0x0000000C
+
+  ## This flag is used to control the commands available in the shell
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupportLevel|3|UINT8|0x00000001
+
+  ## This flag is used to control the profiles available in the shell
+  #  don't forget to update the text file if you change this.
+  #  bit 0 = Drivers1
+  #  bit 1 = Debug1
+  #  bit 2 = Install1
+  #  bit 3 = Network1
+  gEfiShellPkgTokenSpaceGuid.PcdShellProfileMask|0xFF|UINT8|0x0000000D
+
+  ## This is the character count for allocation for consistent mappings
+  gEfiShellPkgTokenSpaceGuid.PcdShellMapNameLength|50|UINT8|0x00000009
+
+  ## This determins how many bytes are read out of files at a time for file operations (type, copy, etc...)
+  gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize|1000|UINT16|0x0000000A
+
+[PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+  ## This flag is used to control the protocols produced by the shell
+  #  If TRUE the shell will produce EFI_SHELL_ENVIRONMENT2 and EFI_SHELL_INTERFACE
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupportOldProtocols|FALSE|BOOLEAN|0x00000002
+
+  ## this flag determins whether Page Break (-b) defaults to on or off in the shell
+  gEfiShellPkgTokenSpaceGuid.PcdShellPageBreakDefault|FALSE|BOOLEAN|0x00000006
+
+  ## this flag determins whether insert mode for typing is default (FALSE means typeover)
+  gEfiShellPkgTokenSpaceGuid.PcdShellInsertModeDefault|TRUE|BOOLEAN|0x00000007
+
+  ## this flag determins the default number of screens kept for history log.
+  #  the spec defines 3 as the minimum
+  gEfiShellPkgTokenSpaceGuid.PcdShellScreenLogCount|3|UINT8|0x00000008

@@ -1,0 +1,61 @@
+##  @file
+#  Provides interface to shell internal functions for shell commands.
+#
+#  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved. <BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = UefiShellCommandLib
+  FILE_GUID                      = 5C12F31F-EBAC-466e-A400-FCA8C9EA3A05
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ShellCommandLib|UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = ShellCommandLibConstructor
+  DESTRUCTOR                     = ShellCommandLibDestructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources.common]
+  UefiShellCommandLib.c
+  UefiShellCommandLib.h
+  ConsistMapping.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  PrintLib
+  UefiBootServicesTableLib
+  ShellLib
+  HiiLib
+
+[Protocols]
+  gEfiUnicodeCollation2ProtocolGuid                       # ALWAYS_CONSUMED
+  gEfiShellProtocolGuid                                   # ALWAYS_CONSUMED
+  gEfiShellParametersProtocolGuid                         # ALWAYS_CONSUMED
+  gEfiDevicePathToTextProtocolGuid                        # ALWAYS_CONSUMED
+
+[Guids]
+  gEfiSasDevicePathGuid                                   # ALWAYS_CONSUMED
+
+[Pcd.common]
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupportLevel         ## ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellMapNameLength        ## ALWAYS_CONSUMED

@@ -1,0 +1,69 @@
+##  @file
+# Provides interface to shell functionality for shell commands and applications.
+#
+# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved. <BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = UefiShellLib
+  FILE_GUID                      = 449D0F00-2148-4a43-9836-F10B3980ECF5
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ShellLib|UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = ShellLibConstructor
+  DESTRUCTOR                     = ShellLibDestructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources.common]
+  UefiShellLib.c
+  UefiShellLib.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ShellPkg/ShellPkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  DevicePathLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  FileHandleLib
+  PrintLib
+  UefiLib
+  HiiLib
+  SortLib
+
+[Protocols]
+  gEfiSimpleFileSystemProtocolGuid              # ALWAYS_CONSUMED
+
+  # shell 2.0
+  gEfiShellProtocolGuid                         # SOMETIMES_CONSUMED
+  gEfiShellParametersProtocolGuid               # SOMETIMES_CONSUMED
+
+  # 'old' shell
+  gEfiShellEnvironment2Guid                     # SOMETIMES_CONSUMED
+  gEfiShellInterfaceGuid                        # SOMETIMES_CONSUMED
+
+[Guids]
+  gEfiFileInfoGuid                              # ALWAYS_CONSUMED
+  gEfiShellEnvironment2ExtGuid                  # ALWAYS_CONSUMED
+
+[Pcd.common]
+  gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize     # ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize       # ALWAYS_CONSUMED
