@@ -43,6 +43,14 @@
   PciRootBridgeIo.c
   PciHostBridge.h
 
+[Sources.IA32]
+  Ia32/IoFifo.asm
+  Ia32/IoFifo.S
+
+[Sources.X64]
+  X64/IoFifo.asm
+  X64/IoFifo.S
+
 [Protocols]
   gEfiPciHostBridgeResourceAllocationProtocolGuid
   gEfiPciRootBridgeIoProtocolGuid

@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/ 
 
 #include "PciHostBridge.h"
+#include "IoFifo.h"
 
 typedef struct {
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR     SpaceDesp[TypeMax];
@@ -994,6 +995,51 @@ RootBridgeIoIoRW (
   InStride = mInStride[Width];
   OutStride = mOutStride[Width];
   OperationWidth = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) (Width & 0x03);
+
+#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
+  if (InStride == 0) {
+    if (Write) {
+      switch (OperationWidth) {
+        case EfiPciWidthUint8:
+          IoWriteFifo8 ((UINTN) Address, Count, Buffer);
+          return EFI_SUCCESS;
+        case EfiPciWidthUint16:
+          IoWriteFifo16 ((UINTN) Address, Count, Buffer);
+          return EFI_SUCCESS;
+        case EfiPciWidthUint32:
+          IoWriteFifo32 ((UINTN) Address, Count, Buffer);
+          return EFI_SUCCESS;
+        default:
+          //
+          // The RootBridgeIoCheckParameter call above will ensure that this
+          // path is not taken.
+          //
+          ASSERT (FALSE);
+          break;
+      }
+    } else {
+      switch (OperationWidth) {
+        case EfiPciWidthUint8:
+          IoReadFifo8 ((UINTN) Address, Count, Buffer);
+          return EFI_SUCCESS;
+        case EfiPciWidthUint16:
+          IoReadFifo16 ((UINTN) Address, Count, Buffer);
+          return EFI_SUCCESS;
+        case EfiPciWidthUint32:
+          IoReadFifo32 ((UINTN) Address, Count, Buffer);
+          return EFI_SUCCESS;
+        default:
+          //
+          // The RootBridgeIoCheckParameter call above will ensure that this
+          // path is not taken.
+          //
+          ASSERT (FALSE);
+          break;
+      }
+    }
+  }
+#endif
+
   for (Uint8Buffer = Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
     if (Write) {
       switch (OperationWidth) {
