@@ -453,6 +453,7 @@ EslTcp4ConnectStart (
   ESL_PORT * pPort;
   ESL_TCP4_CONTEXT * pTcp4;
   EFI_TCP4_PROTOCOL * pTcp4Protocol;
+  EFI_SIMPLE_NETWORK_MODE SnpModeData;
   EFI_STATUS Status;
 
   DBG_ENTER ( );
@@ -509,10 +510,31 @@ EslTcp4ConnectStart (
       pPort->bConfigured = TRUE;
 
       //
-      //  Attempt the connection to the remote system
+      //  Verify the port connection
       //
-      Status = pTcp4Protocol->Connect ( pTcp4Protocol,
-                                        &pTcp4->ConnectToken );
+      pTcp4Protocol = pPort->pProtocol.TCPv4;
+      Status = pTcp4Protocol->GetModeData ( pTcp4Protocol,
+                                            NULL,
+                                            NULL,
+                                            NULL,
+                                            NULL,
+                                            &SnpModeData );
+      if ( !EFI_ERROR ( Status )) {
+        if ( SnpModeData.MediaPresentSupported
+          && ( !SnpModeData.MediaPresent )) {
+          //
+          //  Port is not connected to the network
+          //
+          Status = EFI_NO_MEDIA;
+        }
+        else {
+          //
+          //  Attempt the connection to the remote system
+          //
+          Status = pTcp4Protocol->Connect ( pTcp4Protocol,
+                                            &pTcp4->ConnectToken );
+        }
+      }
       if ( !EFI_ERROR ( Status )) {
         //
         //  Connection in progress
@@ -552,6 +574,7 @@ EslTcp4ConnectStart (
           pSocket->errno = ETIMEDOUT;
           break;
 
+        case EFI_NO_MEDIA:
         case EFI_NETWORK_UNREACHABLE:
           pSocket->errno = ENETDOWN;
           break;
