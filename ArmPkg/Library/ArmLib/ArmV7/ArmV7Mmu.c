@@ -214,7 +214,7 @@ ArmConfigureMmu (
     *TranslationTableBase = (VOID *)TranslationTable;
   }
   
-  if (TranslationTableBase != NULL) {
+  if (TranslationTableSize != NULL) {
     *TranslationTableSize = TRANSLATION_TABLE_SECTION_SIZE;
   }
 
