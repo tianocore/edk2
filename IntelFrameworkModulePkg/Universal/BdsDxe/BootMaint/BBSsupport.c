@@ -76,6 +76,8 @@ OrderLegacyBootOption4SameType (
   *EnBootOptionCount  = 0;
   Index               = 0;
 
+  ASSERT (BbsIndexArray != NULL);
+  ASSERT (DeviceTypeArray != NULL);
   ASSERT (*EnBootOption != NULL);
   ASSERT (*DisBootOption != NULL);
 
@@ -84,7 +86,7 @@ OrderLegacyBootOption4SameType (
     UnicodeSPrint (OptionName, sizeof (OptionName), L"Boot%04x", BootOrder[Index]);
     InitializeListHead (&List);
     BootOption = BdsLibVariableToOption (&List, OptionName);
-    ASSERT_EFI_ERROR (BootOption != NULL);
+    ASSERT (BootOption != NULL);
     
     if ((DevicePathType (BootOption->DevicePath) == BBS_DEVICE_PATH) &&
         (DevicePathSubType (BootOption->DevicePath) == BBS_BBS_DP)) {
@@ -111,6 +113,7 @@ OrderLegacyBootOption4SameType (
   //
   StartPosition = BootOrderSize / sizeof (UINT16);
   NewBootOption = AllocatePool (DevOrderCount * sizeof (UINT16));
+  ASSERT (NewBootOption != NULL);
   while (DevOrderCount-- != 0) {
     for (Index = 0; Index < BootOrderSize / sizeof (UINT16); Index++) {
       if (BbsIndexArray[Index] == (DevOrder[DevOrderCount] & 0xFF)) {
@@ -191,7 +194,7 @@ GroupMultipleLegacyBootOption4SameType (
     UnicodeSPrint (OptionName, sizeof (OptionName), L"Boot%04x", BootOrder[Index]);
     InitializeListHead (&List);
     BootOption = BdsLibVariableToOption (&List, OptionName);
-    ASSERT_EFI_ERROR (BootOption != NULL);
+    ASSERT (BootOption != NULL);
 
     if ((DevicePathType (BootOption->DevicePath) == BBS_DEVICE_PATH) &&
         (DevicePathSubType (BootOption->DevicePath) == BBS_BBS_DP)) {

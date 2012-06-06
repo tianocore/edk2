@@ -825,6 +825,7 @@ BdsLibGetVariableAndSize (
     //
     Buffer = AllocateZeroPool (BufferSize);
     if (Buffer == NULL) {
+      *VariableSize = 0;
       return NULL;
     }
     //
@@ -832,10 +833,15 @@ BdsLibGetVariableAndSize (
     //
     Status = gRT->GetVariable (Name, VendorGuid, NULL, &BufferSize, Buffer);
     if (EFI_ERROR (Status)) {
+      FreePool (Buffer);
       BufferSize = 0;
+      Buffer     = NULL;
     }
   }
 
+  ASSERT (((Buffer == NULL) && (BufferSize == 0)) ||
+          ((Buffer != NULL) && (BufferSize != 0))
+          );
   *VariableSize = BufferSize;
   return Buffer;
 }
