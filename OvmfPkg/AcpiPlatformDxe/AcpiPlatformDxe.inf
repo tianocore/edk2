@@ -15,7 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = AcpiPlatform
-  FILE_GUID                      = cb933912-df8f-4305-b1f9-7b44fa11395c
+  FILE_GUID                      = 49970331-E3FA-4637-9ABC-3B7868676970
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = AcpiPlatformEntryPoint
