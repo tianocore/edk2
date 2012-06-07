@@ -471,6 +471,7 @@ EslTcp6ConnectStart (
   ESL_PORT * pPort;
   ESL_TCP6_CONTEXT * pTcp6;
   EFI_TCP6_PROTOCOL * pTcp6Protocol;
+  EFI_SIMPLE_NETWORK_MODE SnpModeData;
   EFI_STATUS Status;
 
   DBG_ENTER ( );
@@ -528,10 +529,41 @@ EslTcp6ConnectStart (
       pPort->bConfigured = TRUE;
 
       //
-      //  Attempt the connection to the remote system
+      //  Verify the port connection
       //
-      Status = pTcp6Protocol->Connect ( pTcp6Protocol,
-                                        &pTcp6->ConnectToken );
+      Status = pTcp6Protocol->GetModeData ( pTcp6Protocol,
+                                            NULL,
+                                            NULL,
+                                            NULL,
+                                            NULL,
+                                            &SnpModeData );
+      if ( !EFI_ERROR ( Status )) {
+        if ( SnpModeData.MediaPresentSupported
+          && ( !SnpModeData.MediaPresent )) {
+          //
+          //  Port is not connected to the network
+          //
+          pTcp6->ConnectToken.CompletionToken.Status = EFI_NO_MEDIA;
+
+          //
+          //  Continue with the next port
+          //
+          gBS->CheckEvent ( pTcp6->ConnectToken.CompletionToken.Event );
+          gBS->SignalEvent ( pTcp6->ConnectToken.CompletionToken.Event );
+
+          //
+          //  Connection in progress
+          //
+          Status = EFI_SUCCESS;
+        }
+        else {
+          //
+          //  Attempt the connection to the remote system
+          //
+          Status = pTcp6Protocol->Connect ( pTcp6Protocol,
+                                            &pTcp6->ConnectToken );
+        }
+      }
       if ( !EFI_ERROR ( Status )) {
         //
         //  Connection in progress
@@ -583,6 +615,7 @@ EslTcp6ConnectStart (
           pSocket->errno = ETIMEDOUT;
           break;
 
+        case EFI_NO_MEDIA:
         case EFI_NETWORK_UNREACHABLE:
           pSocket->errno = ENETDOWN;
           break;

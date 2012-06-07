@@ -512,7 +512,6 @@ EslTcp4ConnectStart (
       //
       //  Verify the port connection
       //
-      pTcp4Protocol = pPort->pProtocol.TCPv4;
       Status = pTcp4Protocol->GetModeData ( pTcp4Protocol,
                                             NULL,
                                             NULL,
@@ -525,7 +524,18 @@ EslTcp4ConnectStart (
           //
           //  Port is not connected to the network
           //
-          Status = EFI_NO_MEDIA;
+          pTcp4->ConnectToken.CompletionToken.Status = EFI_NO_MEDIA;
+
+          //
+          //  Continue with the next port
+          //
+          gBS->CheckEvent ( pTcp4->ConnectToken.CompletionToken.Event );
+          gBS->SignalEvent ( pTcp4->ConnectToken.CompletionToken.Event );
+
+          //
+          //  Connection in progress
+          //
+          Status = EFI_SUCCESS;
         }
         else {
           //
