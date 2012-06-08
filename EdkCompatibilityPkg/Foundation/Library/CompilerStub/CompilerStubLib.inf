@@ -45,6 +45,9 @@ COMPONENT_TYPE  = LIBRARY
   memcpy.c
   memset.c
   
+[sources.ARM]
+  Dummy.c
+  
 [includes.common]
   $(EDK_SOURCE)/Foundation
   $(EDK_SOURCE)/Foundation/Framework
@@ -62,6 +65,9 @@ COMPONENT_TYPE  = LIBRARY
   $(EDK_SOURCE)/Foundation/Framework
 
 [libraries.common]
+
+[libraries.ARM]
+  CompilerIntrinsicsLib
 
 [nmake.common]
 
