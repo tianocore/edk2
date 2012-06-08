@@ -86,6 +86,9 @@ DEFINE GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x0002000A -DPI_S
 [Libraries.IPF]
   EdkCompatibilityPkg/Foundation/Cpu/Itanium/CpuIa64Lib/CpuIA64Lib.inf
 
+[Libraries.ARM]
+  EdkCompatibilityPkg/Foundation/Library/CompilerStub/CompilerStubLib.inf
+  ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
 ###################################################################################################
 #
