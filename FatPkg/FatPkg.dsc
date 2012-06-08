@@ -21,7 +21,7 @@
   PLATFORM_GUID                  = 25b55dbc-9d0b-4a32-80da-46e1273d622c
   PLATFORM_VERSION               = 0.2
   DSC_SPECIFICATION              = 0x00010005
-  SUPPORTED_ARCHITECTURES        = IA32|X64|IPF|EBC
+  SUPPORTED_ARCHITECTURES        = IA32|X64|IPF|EBC|ARM
   OUTPUT_DIRECTORY               = Build/Fat
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
@@ -30,6 +30,7 @@
   GCC:RELEASE_*_*_CC_FLAGS             = -DMDEPKG_NDEBUG
   INTEL:RELEASE_*_*_CC_FLAGS           = /D MDEPKG_NDEBUG
   MSFT:RELEASE_*_*_CC_FLAGS            = /D MDEPKG_NDEBUG
+  RVCT:RELEASE_*_*_CC_FLAGS            = -DMDEPKG_NDEBUG
 
 [LibraryClasses]
   #
@@ -57,6 +58,9 @@
   PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
   MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
+
+[LibraryClasses.ARM]
+  NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
 ###################################################################################################
 #
