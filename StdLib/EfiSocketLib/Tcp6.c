@@ -247,27 +247,29 @@ EslTcp6ConnectComplete (
     //
     //  The connection failed
     //
-    DEBUG (( DEBUG_CONNECT,
-              "0x%08x: Port connection to [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d failed, Status: %r\r\n",
-              pPort,
-              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[0],
-              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[1],
-              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[2],
-              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[3],
-              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[4],
-              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[5],
-              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[6],
-              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[7],
-              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[8],
-              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[9],
-              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[10],
-              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[11],
-              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[12],
-              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[13],
-              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[14],
-              pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[15],
-              pTcp6->ConfigData.AccessPoint.RemotePort,
-              Status ));
+    if ( pPort->bConfigured ) {
+      DEBUG (( DEBUG_CONNECT,
+                "0x%08x: Port connection to [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d failed, Status: %r\r\n",
+                pPort,
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[0],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[1],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[2],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[3],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[4],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[5],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[6],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[7],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[8],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[9],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[10],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[11],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[12],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[13],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[14],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[15],
+                pTcp6->ConfigData.AccessPoint.RemotePort,
+                Status ));
+    }
 
     //
     //  Close the current port
@@ -290,7 +292,6 @@ EslTcp6ConnectComplete (
     //
     Status = EslTcp6ConnectStart ( pSocket );
     if ( EFI_NOT_READY != Status ) {
-      pSocket->ConnectStatus = Status;
       bRemoveFirstPort = TRUE;
     }
   }
@@ -386,49 +387,72 @@ EslTcp6ConnectPoll (
     //
     Status = pSocket->ConnectStatus;
     switch ( Status ) {
-    default:
-    case EFI_DEVICE_ERROR:
-      pSocket->errno = EIO;
-      break;
-
-    case EFI_ABORTED:
-      pSocket->errno = ECONNREFUSED;
-      break;
-
-    case EFI_INVALID_PARAMETER:
-      pSocket->errno = EINVAL;
-      break;
-
-    case EFI_NO_MAPPING:
-    case EFI_NO_RESPONSE:
-      pSocket->errno = EHOSTUNREACH;
-      break;
-
-    case EFI_NO_MEDIA:
-      pSocket->errno = ENETDOWN;
-      break;
-
-    case EFI_OUT_OF_RESOURCES:
-      pSocket->errno = ENOMEM;
-      break;
-
-    case EFI_SUCCESS:
-      pSocket->errno = 0;
-      pSocket->bConfigured = TRUE;
-      break;
-
-    case EFI_TIMEOUT:
-      pSocket->errno = ETIMEDOUT;
-      break;
-
-    case EFI_UNSUPPORTED:
-      pSocket->errno = ENOTSUP;
-      break;
-
-    case 0x80000069:
-      pSocket->errno = ECONNRESET;
-      break;
+      default:
+      case EFI_DEVICE_ERROR:
+        pSocket->errno = EIO;
+        break;
+      
+      case EFI_ABORTED:
+        pSocket->errno = ECONNABORTED;
+        break;
+      
+      case EFI_ACCESS_DENIED:
+        pSocket->errno = EACCES;
+        break;
+      
+      case EFI_CONNECTION_RESET:
+        pSocket->errno = ECONNRESET;
+        break;
+      
+      case EFI_INVALID_PARAMETER:
+        pSocket->errno = EADDRNOTAVAIL;
+        break;
+      
+      case EFI_HOST_UNREACHABLE:
+      case EFI_NO_RESPONSE:
+        pSocket->errno = EHOSTUNREACH;
+        break;
+      
+      case EFI_NO_MAPPING:
+        pSocket->errno = EAFNOSUPPORT;
+        break;
+      
+      case EFI_NO_MEDIA:
+      case EFI_NETWORK_UNREACHABLE:
+        pSocket->errno = ENETDOWN;
+        break;
+      
+      case EFI_OUT_OF_RESOURCES:
+        pSocket->errno = ENOBUFS;
+        break;
+      
+      case EFI_PORT_UNREACHABLE:
+      case EFI_PROTOCOL_UNREACHABLE:
+      case EFI_CONNECTION_REFUSED:
+        pSocket->errno = ECONNREFUSED;
+        break;
+      
+      case EFI_SUCCESS:
+        pSocket->errno = 0;
+        pSocket->bConfigured = TRUE;
+        break;
+      
+      case EFI_TIMEOUT:
+        pSocket->errno = ETIMEDOUT;
+        break;
+      
+      case EFI_UNSUPPORTED:
+        pSocket->errno = EOPNOTSUPP;
+        break;
     }
+
+    //
+    //  Display the translation
+    //
+    DEBUG (( DEBUG_CONNECT,
+              "ERROR - errno: %d, Status: %r\r\n",
+              pSocket->errno,
+              Status ));
   }
 
   //
@@ -495,32 +519,6 @@ EslTcp6ConnectStart (
       DEBUG (( DEBUG_CONNECT,
                 "ERROR - Failed to configure the Tcp6 port, Status: %r\r\n",
                 Status ));
-      switch ( Status ) {
-      case EFI_ACCESS_DENIED:
-        pSocket->errno = EACCES;
-        break;
-    
-      default:
-      case EFI_DEVICE_ERROR:
-        pSocket->errno = EIO;
-        break;
-    
-      case EFI_INVALID_PARAMETER:
-        pSocket->errno = EADDRNOTAVAIL;
-        break;
-    
-      case EFI_NO_MAPPING:
-        pSocket->errno = EAFNOSUPPORT;
-        break;
-    
-      case EFI_OUT_OF_RESOURCES:
-        pSocket->errno = ENOBUFS;
-        break;
-    
-      case EFI_UNSUPPORTED:
-        pSocket->errno = EOPNOTSUPP;
-        break;
-      }
     }
     else {
       DEBUG (( DEBUG_CONNECT,
@@ -543,18 +541,7 @@ EslTcp6ConnectStart (
           //
           //  Port is not connected to the network
           //
-          pTcp6->ConnectToken.CompletionToken.Status = EFI_NO_MEDIA;
-
-          //
-          //  Continue with the next port
-          //
-          gBS->CheckEvent ( pTcp6->ConnectToken.CompletionToken.Event );
-          gBS->SignalEvent ( pTcp6->ConnectToken.CompletionToken.Event );
-
-          //
-          //  Connection in progress
-          //
-          Status = EFI_SUCCESS;
+          Status = EFI_NO_MEDIA;
         }
         else {
           //
@@ -564,34 +551,7 @@ EslTcp6ConnectStart (
                                             &pTcp6->ConnectToken );
         }
       }
-      if ( !EFI_ERROR ( Status )) {
-        //
-        //  Connection in progress
-        //
-        pSocket->errno = EINPROGRESS;
-        Status = EFI_NOT_READY;
-        DEBUG (( DEBUG_CONNECT,
-                  "0x%08x: Port attempting connection to [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d\r\n",
-                  pPort,
-                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[0],
-                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[1],
-                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[2],
-                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[3],
-                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[4],
-                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[5],
-                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[6],
-                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[7],
-                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[8],
-                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[9],
-                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[10],
-                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[11],
-                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[12],
-                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[13],
-                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[14],
-                  pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[15],
-                  pTcp6->ConfigData.AccessPoint.RemotePort ));
-      }
-      else {
+      if ( EFI_ERROR ( Status )) {
         //
         //  Connection error
         //
@@ -599,43 +559,50 @@ EslTcp6ConnectStart (
                   "ERROR - Port 0x%08x not connected, Status: %r\r\n",
                   pPort,
                   Status ));
-        //
-        //  Determine the errno value
-        //
-        switch ( Status ) {
-        default:
-          pSocket->errno = EIO;
-          break;
-
-        case EFI_OUT_OF_RESOURCES:
-          pSocket->errno = ENOBUFS;
-          break;
-
-        case EFI_TIMEOUT:
-          pSocket->errno = ETIMEDOUT;
-          break;
-
-        case EFI_NO_MEDIA:
-        case EFI_NETWORK_UNREACHABLE:
-          pSocket->errno = ENETDOWN;
-          break;
-
-        case EFI_HOST_UNREACHABLE:
-          pSocket->errno = EHOSTUNREACH;
-          break;
-
-        case EFI_PORT_UNREACHABLE:
-        case EFI_PROTOCOL_UNREACHABLE:
-        case EFI_CONNECTION_REFUSED:
-          pSocket->errno = ECONNREFUSED;
-          break;
-
-        case EFI_CONNECTION_RESET:
-          pSocket->errno = ECONNRESET;
-          break;
-        }
       }
     }
+    if ( !EFI_ERROR ( Status )) {
+      //
+      //  Connection in progress
+      //
+      pSocket->errno = EINPROGRESS;
+      DEBUG (( DEBUG_CONNECT,
+                "0x%08x: Port attempting connection to [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d\r\n",
+                pPort,
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[0],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[1],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[2],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[3],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[4],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[5],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[6],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[7],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[8],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[9],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[10],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[11],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[12],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[13],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[14],
+                pTcp6->ConfigData.AccessPoint.RemoteAddress.Addr[15],
+                pTcp6->ConfigData.AccessPoint.RemotePort ));
+    }
+    else {
+      //
+      //  Error return path is through EslTcp6ConnectComplete to
+      //  enable retry on other ports
+      //
+      //  Status to errno translation gets done in EslTcp4ConnectPoll
+      //
+      pTcp6->ConnectToken.CompletionToken.Status = Status;
+      
+      //
+      //  Continue with the next port
+      //
+      gBS->CheckEvent ( pTcp6->ConnectToken.CompletionToken.Event );
+      gBS->SignalEvent ( pTcp6->ConnectToken.CompletionToken.Event );
+    }
+    Status = EFI_NOT_READY;
   }
   else {
     //

@@ -241,15 +241,17 @@ EslTcp4ConnectComplete (
     //
     //  The connection failed
     //
-    DEBUG (( DEBUG_CONNECT,
-              "0x%08x: Port connection to %d.%d.%d.%d:%d failed, Status: %r\r\n",
-              pPort,
-              pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[0],
-              pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[1],
-              pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[2],
-              pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[3],
-              pTcp4->ConfigData.AccessPoint.RemotePort,
-              Status ));
+    if ( pPort->bConfigured ) {
+      DEBUG (( DEBUG_CONNECT,
+                "0x%08x: Port connection to %d.%d.%d.%d:%d failed, Status: %r\r\n",
+                pPort,
+                pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[0],
+                pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[1],
+                pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[2],
+                pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[3],
+                pTcp4->ConfigData.AccessPoint.RemotePort,
+                Status ));
+    }
 
     //
     //  Close the current port
@@ -272,7 +274,6 @@ EslTcp4ConnectComplete (
     //
     Status = EslTcp4ConnectStart ( pSocket );
     if ( EFI_NOT_READY != Status ) {
-      pSocket->ConnectStatus = Status;
       bRemoveFirstPort = TRUE;
     }
   }
@@ -374,24 +375,43 @@ EslTcp4ConnectPoll (
       break;
 
     case EFI_ABORTED:
-      pSocket->errno = ECONNREFUSED;
+      pSocket->errno = ECONNABORTED;
+      break;
+
+    case EFI_ACCESS_DENIED:
+      pSocket->errno = EACCES;
+      break;
+
+    case EFI_CONNECTION_RESET:
+      pSocket->errno = ECONNRESET;
       break;
 
     case EFI_INVALID_PARAMETER:
-      pSocket->errno = EINVAL;
+      pSocket->errno = EADDRNOTAVAIL;
       break;
 
-    case EFI_NO_MAPPING:
+    case EFI_HOST_UNREACHABLE:
     case EFI_NO_RESPONSE:
       pSocket->errno = EHOSTUNREACH;
       break;
 
+    case EFI_NO_MAPPING:
+      pSocket->errno = EAFNOSUPPORT;
+      break;
+
     case EFI_NO_MEDIA:
+    case EFI_NETWORK_UNREACHABLE:
       pSocket->errno = ENETDOWN;
       break;
 
     case EFI_OUT_OF_RESOURCES:
-      pSocket->errno = ENOMEM;
+      pSocket->errno = ENOBUFS;
+      break;
+
+    case EFI_PORT_UNREACHABLE:
+    case EFI_PROTOCOL_UNREACHABLE:
+    case EFI_CONNECTION_REFUSED:
+      pSocket->errno = ECONNREFUSED;
       break;
 
     case EFI_SUCCESS:
@@ -404,13 +424,17 @@ EslTcp4ConnectPoll (
       break;
 
     case EFI_UNSUPPORTED:
-      pSocket->errno = ENOTSUP;
-      break;
-
-    case 0x80000069:
-      pSocket->errno = ECONNRESET;
+      pSocket->errno = EOPNOTSUPP;
       break;
     }
+
+    //
+    //  Display the translation
+    //
+    DEBUG (( DEBUG_CONNECT,
+              "ERROR - errno: %d, Status: %r\r\n",
+              pSocket->errno,
+              Status ));
   }
 
   //
@@ -476,32 +500,6 @@ EslTcp4ConnectStart (
       DEBUG (( DEBUG_CONNECT,
                 "ERROR - Failed to configure the Tcp4 port, Status: %r\r\n",
                 Status ));
-      switch ( Status ) {
-      case EFI_ACCESS_DENIED:
-        pSocket->errno = EACCES;
-        break;
-    
-      default:
-      case EFI_DEVICE_ERROR:
-        pSocket->errno = EIO;
-        break;
-    
-      case EFI_INVALID_PARAMETER:
-        pSocket->errno = EADDRNOTAVAIL;
-        break;
-    
-      case EFI_NO_MAPPING:
-        pSocket->errno = EAFNOSUPPORT;
-        break;
-    
-      case EFI_OUT_OF_RESOURCES:
-        pSocket->errno = ENOBUFS;
-        break;
-    
-      case EFI_UNSUPPORTED:
-        pSocket->errno = EOPNOTSUPP;
-        break;
-      }
     }
     else {
       DEBUG (( DEBUG_CONNECT,
@@ -524,18 +522,7 @@ EslTcp4ConnectStart (
           //
           //  Port is not connected to the network
           //
-          pTcp4->ConnectToken.CompletionToken.Status = EFI_NO_MEDIA;
-
-          //
-          //  Continue with the next port
-          //
-          gBS->CheckEvent ( pTcp4->ConnectToken.CompletionToken.Event );
-          gBS->SignalEvent ( pTcp4->ConnectToken.CompletionToken.Event );
-
-          //
-          //  Connection in progress
-          //
-          Status = EFI_SUCCESS;
+          Status = EFI_NO_MEDIA;
         }
         else {
           //
@@ -545,22 +532,7 @@ EslTcp4ConnectStart (
                                             &pTcp4->ConnectToken );
         }
       }
-      if ( !EFI_ERROR ( Status )) {
-        //
-        //  Connection in progress
-        //
-        pSocket->errno = EINPROGRESS;
-        Status = EFI_NOT_READY;
-        DEBUG (( DEBUG_CONNECT,
-                  "0x%08x: Port attempting connection to %d.%d.%d.%d:%d\r\n",
-                  pPort,
-                  pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[0],
-                  pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[1],
-                  pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[2],
-                  pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[3],
-                  pTcp4->ConfigData.AccessPoint.RemotePort ));
-      }
-      else {
+      if ( EFI_ERROR ( Status )) {
         //
         //  Connection error
         //
@@ -568,43 +540,38 @@ EslTcp4ConnectStart (
                   "ERROR - Port 0x%08x not connected, Status: %r\r\n",
                   pPort,
                   Status ));
-        //
-        //  Determine the errno value
-        //
-        switch ( Status ) {
-        default:
-          pSocket->errno = EIO;
-          break;
-
-        case EFI_OUT_OF_RESOURCES:
-          pSocket->errno = ENOBUFS;
-          break;
-
-        case EFI_TIMEOUT:
-          pSocket->errno = ETIMEDOUT;
-          break;
-
-        case EFI_NO_MEDIA:
-        case EFI_NETWORK_UNREACHABLE:
-          pSocket->errno = ENETDOWN;
-          break;
-
-        case EFI_HOST_UNREACHABLE:
-          pSocket->errno = EHOSTUNREACH;
-          break;
-
-        case EFI_PORT_UNREACHABLE:
-        case EFI_PROTOCOL_UNREACHABLE:
-        case EFI_CONNECTION_REFUSED:
-          pSocket->errno = ECONNREFUSED;
-          break;
-
-        case EFI_CONNECTION_RESET:
-          pSocket->errno = ECONNRESET;
-          break;
-        }
       }
     }
+    if ( !EFI_ERROR ( Status )) {
+      //
+      //  Connection in progress
+      //
+      pSocket->errno = EINPROGRESS;
+      DEBUG (( DEBUG_CONNECT,
+                "0x%08x: Port attempting connection to %d.%d.%d.%d:%d\r\n",
+                pPort,
+                pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[0],
+                pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[1],
+                pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[2],
+                pTcp4->ConfigData.AccessPoint.RemoteAddress.Addr[3],
+                pTcp4->ConfigData.AccessPoint.RemotePort ));
+    }
+    else {
+      //
+      //  Error return path is through EslTcp4ConnectComplete to
+      //  enable retry on other ports
+      //
+      //  Status to errno translation gets done in EslTcp4ConnectPoll
+      //
+      pTcp4->ConnectToken.CompletionToken.Status = Status;
+
+      //
+      //  Continue with the next port
+      //
+      gBS->CheckEvent ( pTcp4->ConnectToken.CompletionToken.Event );
+      gBS->SignalEvent ( pTcp4->ConnectToken.CompletionToken.Event );
+    }
+    Status = EFI_NOT_READY;
   }
   else {
     //
