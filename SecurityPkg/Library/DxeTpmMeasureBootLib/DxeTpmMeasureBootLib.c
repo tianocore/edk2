@@ -382,7 +382,20 @@ TcgMeasurePeImage (
   // Measuring PE/COFF Image Header;
   // But CheckSum field and SECURITY data directory (certificate) are excluded
   //
-  Magic = Hdr.Pe32->OptionalHeader.Magic;
+  if (Hdr.Pe32->FileHeader.Machine == IMAGE_FILE_MACHINE_IA64 && Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+    //
+    // NOTE: Some versions of Linux ELILO for Itanium have an incorrect magic value 
+    //       in the PE/COFF Header. If the MachineType is Itanium(IA64) and the 
+    //       Magic value in the OptionalHeader is EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC
+    //       then override the magic value to EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC
+    //
+    Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
+  } else {
+    //
+    // Get the magic value from the PE/COFF Optional Header
+    //
+    Magic = Hdr.Pe32->OptionalHeader.Magic;
+  }
   
   //
   // 3.  Calculate the distance from the base of the image header to the image checksum address.
