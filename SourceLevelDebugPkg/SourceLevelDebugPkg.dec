@@ -1,0 +1,74 @@
+## @file  SourceLevelDebugPkg.dec
+#
+# This package provides target side modules to support source level debug.
+# The target side components includes the Debug Agent Library instance
+# to communicate with host side modules, Debug Communication Library and
+# instances to provide the communication I/O functions between Debug Agent
+# and host, PeCoffExtraActionLib instance to report symbol path information,
+# etc.
+#
+# Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials are licensed and made available under 
+# the terms and conditions of the BSD License that accompanies this distribution.  
+# The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php.                                                                          
+# 
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.  
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = SourceLevelDebugPkg
+  PACKAGE_GUID                   = DBF00C27-D8D7-443d-918B-4E85CDA1373B
+  PACKAGE_VERSION                = 0.80
+
+[Includes]
+  Include
+
+[Includes.IA32]
+  Include/Ia32
+
+[Includes.X64]
+  Include/Ia32
+
+[LibraryClasses]
+  ##  @libraryclass  Provides communication I/O functions between Debug Agent and HOST.
+  ##
+  DebugCommunicationLib|Include/Library/DebugCommunicationLib.h
+
+[Guids]
+  ## MdeModule package token space guid
+  # Include/Guid/DebugAgentGuid.h
+  gEfiDebugAgentGuid       = {0x865a5a9b, 0xb85d, 0x474c, { 0x84, 0x55, 0x65, 0xd1, 0xbe, 0x84, 0x4b, 0xe2 }}
+  gEfiSourceLevelDebugPkgTokenSpaceGuid = {0x865a5aab, 0xb85d, 0x474c, { 0x84, 0x55, 0x65, 0xd1, 0xbe, 0x84, 0x4b, 0xe2 }}
+
+[PcdsFixedAtBuild, PcdsPatchableInModule]
+  ## The memory BAR of usb debug port, it may be different with the memory bar of ehci host controller.
+  ## Note that the memory BAR address is only used before Pci bus resource allocation.
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbDebugPortMemorySpaceBase|0xd0000000|UINT32|0x00000001
+
+  ## The memory BAR of ehci host controller, in which usb debug feature is enabled.
+  ## Note that the memory BAR address is only used before Pci bus resource allocation.
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbEhciMemorySpaceBase|0xd0000000|UINT32|0x00000002
+
+  ## The pci address of ehci host controller, in which usb debug feature is enabled.
+  ## The format of pci address is :            
+  ##     -----------------------------------------------------------------------
+  ##     | Bits 28..31 | Bits 20..27 | Bits 15..19 | Bits 12..14 | Bits 00..11 |
+  ##     -----------------------------------------------------------------------
+  ##     |      0      |     Bus     |   Device    |   Function  |      0      |
+  ##     -----------------------------------------------------------------------
+  ##
+  ## For the value below, it means the pci address at bus 0x0, device 0x1D, function 0x7.
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbEhciPciAddress|0x000EF000|UINT32|0x00000003
+
+  ## The mask of exception numbers whose handlers would be ignored and cannot be replaced or 
+  ## hooked by Debug Agent Library.
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdExceptionsIgnoredByDebugger|0x00000000|UINT32|0x00000004
+
+  ## The method to issue break point to Debug Agent Library when Loading/UnLoading image.  
+  ## 1: Use I/O Port 84 to issue hardware break point
+  ## 2: Use INT3 to issue software break point
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugLoadImageMethod|0x1|UINT8|0x00000005

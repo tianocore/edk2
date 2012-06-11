@@ -1,0 +1,79 @@
+## @file
+#  Debug Agent library instance for SMM modules.
+#
+#  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php.
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SecDebugAgentLib
+  FILE_GUID                      = CB07D74C-598F-4268-A5D1-644FB4A481E8
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 0.7
+  LIBRARY_CLASS                  = DebugAgentLib|DXE_SMM_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources.common]
+  SmmDebugAgent/SmmDebugAgentLib.c
+  SmmDebugAgent/SmmDebugAgentLib.h
+  DebugAgentCommon/DebugAgent.c
+  DebugAgentCommon/DebugAgent.h
+  DebugAgentCommon/DebugTimer.c
+  DebugAgentCommon/DebugTimer.h
+  DebugAgentCommon/DebugMp.c
+  DebugAgentCommon/DebugMp.h
+
+[Sources.Ia32]
+  DebugAgentCommon/Ia32/AsmFuncs.S     | GCC
+  DebugAgentCommon/Ia32/AsmFuncs.asm   | MSFT
+  DebugAgentCommon/Ia32/ArchDebugSupport.h
+  DebugAgentCommon/Ia32/ArchDebugSupport.c
+  DebugAgentCommon/Ia32/DebugException.h
+
+[Sources.X64]
+  DebugAgentCommon/X64/AsmFuncs.S      | GCC
+  DebugAgentCommon/X64/AsmFuncs.asm    | MSFT
+  DebugAgentCommon/X64/ArchDebugSupport.h
+  DebugAgentCommon/X64/ArchDebugSupport.c
+  DebugAgentCommon/X64/DebugException.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  SourceLevelDebugPkg/SourceLevelDebugPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  ResetSystemLib
+  IoLib
+  DebugCommunicationLib
+  UefiLib
+  PcdLib
+  SynchronizationLib
+  LocalApicLib
+  TimerLib
+  PrintLib
+
+[Guids]
+  gEfiDebugAgentGuid                            ## CONSUMES ## Configuration Table
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdFSBClock                                  ## CONSUMES
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdExceptionsIgnoredByDebugger  ## CONSUMES
+

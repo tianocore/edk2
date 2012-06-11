@@ -1,0 +1,95 @@
+## @file
+#  Debug Agent library instance for Dxe Core and Dxe modules.
+#
+#  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php.
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeDebugAgentLib
+  FILE_GUID                      = BA6BAD25-B814-4747-B0B0-0FBB61D40B90
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 0.7
+  LIBRARY_CLASS                  = DebugAgentLib|DXE_CORE DXE_DRIVER
+
+  CONSTRUCTOR                    = DxeDebugAgentLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources.common]
+  DxeDebugAgent/DxeDebugAgentLib.c
+  DxeDebugAgent/DxeDebugAgentLib.h
+  DxeDebugAgent/SerialIo.c
+  DebugAgentCommon/DebugAgent.c
+  DebugAgentCommon/DebugAgent.h
+  DebugAgentCommon/DebugTimer.c
+  DebugAgentCommon/DebugTimer.h
+  DebugAgentCommon/DebugMp.c
+  DebugAgentCommon/DebugMp.h
+
+[Sources.Ia32]
+  DebugAgentCommon/Ia32/AsmFuncs.S     | GCC
+  DebugAgentCommon/Ia32/AsmFuncs.asm   | MSFT
+  DebugAgentCommon/Ia32/ArchDebugSupport.h
+  DebugAgentCommon/Ia32/ArchDebugSupport.c
+  DebugAgentCommon/Ia32/DebugException.h
+
+[Sources.X64]
+  DebugAgentCommon/X64/AsmFuncs.S      | GCC
+  DebugAgentCommon/X64/AsmFuncs.asm    | MSFT
+  DebugAgentCommon/X64/ArchDebugSupport.h
+  DebugAgentCommon/X64/ArchDebugSupport.c
+  DebugAgentCommon/X64/DebugException.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  SourceLevelDebugPkg/SourceLevelDebugPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  ResetSystemLib
+  IoLib
+  HobLib
+  DebugCommunicationLib
+  UefiBootServicesTableLib
+  UefiLib
+  PcdLib
+  SynchronizationLib
+  MemoryAllocationLib
+  LocalApicLib
+  TimerLib
+  PrintLib
+
+[Guids]
+  gEfiDebugAgentGuid                            ## PRODUCES ## Configuration Table
+  gEfiDebugAgentGuid                            ## CONSUMES ## HOB
+
+[Protocols]
+  gEfiSerialIoProtocolGuid                      ## PRODUCES
+  gEfiDevicePathProtocolGuid                    ## PRODUCES 
+  gEfiPcdProtocolGuid                           ## NOTIFY
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdFSBClock                                  ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate                       ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits                       ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity                         ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits                       ## CONSUMES
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdExceptionsIgnoredByDebugger  ## CONSUMES
+
