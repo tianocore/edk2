@@ -32,6 +32,7 @@
 [Sources.common]
   DxeDebugAgent/DxeDebugAgentLib.c
   DxeDebugAgent/DxeDebugAgentLib.h
+  DxeDebugAgent/SerialIo.c
   DebugAgentCommon/DebugAgent.c
   DebugAgentCommon/DebugAgent.h
   DebugAgentCommon/DebugTimer.c
@@ -44,8 +45,6 @@
   DebugAgentCommon/Ia32/AsmFuncs.asm   | MSFT
   DebugAgentCommon/Ia32/ArchDebugSupport.h
   DebugAgentCommon/Ia32/ArchDebugSupport.c
-  DebugAgentCommon/Ia32/ArchReadGroupRegister.c
-  DebugAgentCommon/Ia32/ArchRegisters.h
   DebugAgentCommon/Ia32/DebugException.h
 
 [Sources.X64]
@@ -53,8 +52,6 @@
   DebugAgentCommon/X64/AsmFuncs.asm    | MSFT
   DebugAgentCommon/X64/ArchDebugSupport.h
   DebugAgentCommon/X64/ArchDebugSupport.c
-  DebugAgentCommon/X64/ArchReadGroupRegister.c
-  DebugAgentCommon/X64/ArchRegisters.h
   DebugAgentCommon/X64/DebugException.h
 
 [Packages]
@@ -77,12 +74,22 @@
   MemoryAllocationLib
   LocalApicLib
   TimerLib
+  PrintLib
 
 [Guids]
   gEfiDebugAgentGuid                            ## PRODUCES ## Configuration Table
   gEfiDebugAgentGuid                            ## CONSUMES ## HOB
 
+[Protocols]
+  gEfiSerialIoProtocolGuid                      ## PRODUCES
+  gEfiDevicePathProtocolGuid                    ## PRODUCES 
+  gEfiPcdProtocolGuid                           ## NOTIFY
+
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock                                  ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate                       ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits                       ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity                         ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits                       ## CONSUMES
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdExceptionsIgnoredByDebugger  ## CONSUMES
 

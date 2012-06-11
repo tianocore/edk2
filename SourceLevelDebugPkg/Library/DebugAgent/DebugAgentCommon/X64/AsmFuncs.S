@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -302,6 +302,9 @@ NoExtrPush:
    movq    %rsp, %rdi
    .byte   0x0f, 0xae, 0b00000111
 
+## save the exception data;
+   pushq   16(%rbp)
+
 ## Clear Direction Flag
   cld
 
@@ -313,9 +316,12 @@ NoExtrPush:
   # Per X64 calling convention, allocate maximum parameter stack space
   # and make sure RSP is 16-byte aligned
   #
-   subq    $(4 * 8), %rsp
+   subq    $(32 + 8), %rsp
    call    ASM_PFX(InterruptProcess)
-   addq    $(4 * 8), %rsp
+   addq    $(32 + 8), %rsp
+
+## skip the exception data;
+   addq    $8, %rsp
 
 ## FX_SAVE_STATE_X64 FxSaveState;
 

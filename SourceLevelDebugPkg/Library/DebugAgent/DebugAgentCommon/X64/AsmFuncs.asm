@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -263,8 +263,11 @@ NoExtrPush:
     push    rax
 
     sub     rsp, 512
-    mov rdi, rsp
+    mov     rdi, rsp
     db 0fh, 0aeh, 00000111y ;fxsave [rdi]
+
+    ;; save the exception data
+    push    qword ptr [rbp + 16]
 
     ;; Clear Direction Flag
     cld
@@ -273,9 +276,16 @@ NoExtrPush:
     mov     rdx, rsp      ; Structure
     mov     r15, rcx      ; save vector in r15
     
-    sub     rsp, 32
+    ;
+    ; Per X64 calling convention, allocate maximum parameter stack space
+    ; and make sure RSP is 16-byte aligned
+    ;
+    sub     rsp, 32 + 8
     call    InterruptProcess
-    add     rsp, 32
+    add     rsp, 32 + 8
+
+    ;; skip the exception data
+    add     rsp, 8
     
     mov     rsi, rsp
     db 0fh, 0aeh, 00001110y ; fxrstor [rsi]

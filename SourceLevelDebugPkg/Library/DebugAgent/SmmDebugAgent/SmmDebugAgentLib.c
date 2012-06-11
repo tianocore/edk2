@@ -1,7 +1,7 @@
 /** @file
   Debug Agent library implementition.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +19,27 @@ DEBUG_AGENT_MAILBOX         mLocalMailbox;
 UINTN                       mSavedDebugRegisters[6];
 CONST BOOLEAN               MultiProcessorDebugSupport = FALSE;
 
+/**
+  Read the Attach/Break-in symbols from the debug port.
+
+  @param[in]  Handle         Pointer to Debug Port handle.
+  @param[out] BreakSymbol    Returned break symbol.
+
+  @retval EFI_SUCCESS        Read the symbol in BreakSymbol.
+  @retval EFI_NOT_FOUND      No read the break symbol.
+
+**/
+EFI_STATUS
+DebugReadBreakSymbol (
+  IN  DEBUG_PORT_HANDLE      Handle,
+  OUT UINT8                  *BreakSymbol
+  )
+{
+  //
+  // Smm instance has no debug timer to poll break symbol.
+  //
+  return EFI_NOT_FOUND;
+}
 
 /**
   Get Debug Agent Mailbox pointer.
@@ -137,7 +158,7 @@ InitializeDebugAgent (
       DebugPortHandle = (UINT64) (UINTN)DebugPortInitialize ((DEBUG_PORT_HANDLE) (UINTN)mMailboxPointer->DebugPortHandle, NULL);
       mMailboxPointer->DebugPortHandle = DebugPortHandle;
 
-      if (mMailboxPointer->DebugFlag.Bits.BreakOnNextSmi == 1) {
+      if (mMailboxPointer->DebugFlag.BreakOnNextSmi == 1) {
         //
         // If SMM entry break is set, SMM code will be break at here.
         //

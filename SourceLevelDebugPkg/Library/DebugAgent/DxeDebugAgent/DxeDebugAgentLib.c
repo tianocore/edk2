@@ -1,7 +1,7 @@
 /** @file
   Debug Agent library implementition for Dxe Core and Dxr modules.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,13 +15,9 @@
 #include "DxeDebugAgentLib.h"
 
 DEBUG_AGENT_MAILBOX          mMailbox;
-
 DEBUG_AGENT_MAILBOX          *mMailboxPointer;
-
 IA32_IDT_GATE_DESCRIPTOR     mIdtEntryTable[33];
-
-BOOLEAN                      mConfigurationTableNeeded = FALSE;
-
+BOOLEAN                      mDxeCoreFlag               = FALSE;
 CONST BOOLEAN                MultiProcessorDebugSupport = TRUE;
 
 /**
@@ -31,8 +27,7 @@ CONST BOOLEAN                MultiProcessorDebugSupport = TRUE;
   @param[in]  ImageHandle   The firmware allocated handle for the EFI image.
   @param[in]  SystemTable   A pointer to the EFI System Table.
 
-  @retval  RETURN_SUCCESS            Allocate the global memory space to store guid and function tables.
-  @retval  RETURN_OUT_OF_RESOURCES   No enough memory to allocated.
+  @retval  RETURN_SUCCESS   Allocate the global memory space to store guid and function tables.
 
 **/
 RETURN_STATUS
@@ -44,10 +39,33 @@ DxeDebugAgentLibConstructor (
 {
   EFI_STATUS                  Status;
   EFI_PHYSICAL_ADDRESS        Address;
+  EFI_EVENT                   Event;
+  VOID                        *EventRegistration;
 
-  if (!mConfigurationTableNeeded) {
+  if (!mDxeCoreFlag) {
     return RETURN_SUCCESS;
   }
+
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  InstallSerialIoNotification,
+                  NULL,
+                  &Event
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Register for protocol notifications on this event
+  //
+
+  Status = gBS->RegisterProtocolNotify (
+                  &gEfiPcdProtocolGuid,
+                  Event,
+                  &EventRegistration
+                  );
+
+  ASSERT_EFI_ERROR (Status);
 
   Address = 0;
   Status = gBS->AllocatePages (
@@ -56,9 +74,7 @@ DxeDebugAgentLibConstructor (
                   EFI_SIZE_TO_PAGES (sizeof (DEBUG_AGENT_MAILBOX)),
                   &Address
                   );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+  ASSERT_EFI_ERROR (Status);
 
   CopyMem (
     (UINT8 *) (UINTN) Address,
@@ -68,7 +84,10 @@ DxeDebugAgentLibConstructor (
 
   mMailboxPointer = (DEBUG_AGENT_MAILBOX *) (UINTN) Address;
 
-  return gBS->InstallConfigurationTable (&gEfiDebugAgentGuid, (VOID *) mMailboxPointer);
+  Status = gBS->InstallConfigurationTable (&gEfiDebugAgentGuid, (VOID *) mMailboxPointer);
+  ASSERT_EFI_ERROR (Status);
+  
+  return Status;
 }
 
 /**
@@ -168,8 +187,13 @@ InitializeDebugAgent (
     //
     // Try to get Mailbox from GUIDed HOB.
     //
-    mConfigurationTableNeeded = TRUE;
+    mDxeCoreFlag = TRUE;
     Mailbox = GetMailboxFromHob (Context);
+    
+    //
+    // Clear Break CPU index value
+    //
+    mDebugMpContext.BreakAtCpuIndex = (UINT32) -1;
 
   } else if (InitFlag == DEBUG_AGENT_INIT_DXE_AP) {
 
@@ -189,7 +213,6 @@ InitializeDebugAgent (
     // If Mailbox exists, copy it into one global variable.
     //
     CopyMem (&mMailbox, Mailbox, sizeof (DEBUG_AGENT_MAILBOX));
-    mMailbox.DebugPortHandle = 0;
   } else {
     //
     // If Mailbox not exists, used the local Mailbox.
@@ -207,6 +230,7 @@ InitializeDebugAgent (
   if (IdtEntryCount < 33) {
     Idtr.Limit = (UINT16) (sizeof (IA32_IDT_GATE_DESCRIPTOR) * 33 - 1);
     Idtr.Base  = (UINTN) &mIdtEntryTable;
+    ZeroMem (&mIdtEntryTable, Idtr.Limit + 1);
     AsmWriteIdtr ((IA32_DESCRIPTOR *) &Idtr);
   }
 
@@ -218,7 +242,7 @@ InitializeDebugAgent (
   //
   // Initialize debug communication port
   //
-  mMailboxPointer->DebugPortHandle = (UINT64) (UINTN)DebugPortInitialize (NULL, NULL);
+  mMailboxPointer->DebugPortHandle = (UINT64) (UINTN)DebugPortInitialize ((VOID *)(UINTN)mMailbox.DebugPortHandle, NULL);
 
   InitializeSpinLock (&mDebugMpContext.MpContextSpinLock);
   InitializeSpinLock (&mDebugMpContext.DebugPortSpinLock);

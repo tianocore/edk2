@@ -42,8 +42,6 @@
   DebugAgentCommon/Ia32/AsmFuncs.asm   | MSFT
   DebugAgentCommon/Ia32/ArchDebugSupport.h
   DebugAgentCommon/Ia32/ArchDebugSupport.c
-  DebugAgentCommon/Ia32/ArchReadGroupRegister.c
-  DebugAgentCommon/Ia32/ArchRegisters.h
   DebugAgentCommon/Ia32/DebugException.h
 
 [Sources.X64]
@@ -51,8 +49,6 @@
   DebugAgentCommon/X64/AsmFuncs.asm    | MSFT
   DebugAgentCommon/X64/ArchDebugSupport.h
   DebugAgentCommon/X64/ArchDebugSupport.c
-  DebugAgentCommon/X64/ArchReadGroupRegister.c
-  DebugAgentCommon/X64/ArchRegisters.h
   DebugAgentCommon/X64/DebugException.h
 
 [Packages]
@@ -73,6 +69,7 @@
   LocalApicLib
   DebugLib
   TimerLib
+  PrintLib
 
 [Guids]
   gEfiDebugAgentGuid                            ## PRODUCES ## HOB

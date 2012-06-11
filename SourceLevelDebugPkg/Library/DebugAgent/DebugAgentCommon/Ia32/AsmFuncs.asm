@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -283,6 +283,9 @@ NoExtrPush:
     mov edi, esp
     db 0fh, 0aeh, 00000111y ;fxsave [edi]
 
+    ;; save the exception data    
+    push    dword ptr [ebp + 8]
+
     ;; Clear Direction Flag
     cld
     	
@@ -291,6 +294,9 @@ NoExtrPush:
     push    ebx     ; vector
     call    InterruptProcess
     add     esp, 8
+
+    ; skip the exception data
+    add     esp, 4
 
     ;; FX_SAVE_STATE_IA32 FxSaveState;
     mov esi, esp

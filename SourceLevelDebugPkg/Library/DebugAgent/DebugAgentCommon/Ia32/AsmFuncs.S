@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -281,6 +281,9 @@ NoExtrPush:
   movl    %esp,%edi
   .byte 0x0f, 0xae, 0x07   # fxsave [edi]
 
+## save the exception data
+  pushl   8(%esp)
+
 ## Clear Direction Flag
   cld
 	
@@ -289,6 +292,9 @@ NoExtrPush:
   pushl   %ebx
   call    ASM_PFX(InterruptProcess)
   addl    $8,%esp
+
+## skip the exception data
+  addl    $4,%esp
 
 ## FX_SAVE_STATE_IA32 FxSaveState;
   movl    %esp,%esi

@@ -1,7 +1,7 @@
 /** @file
   SEC Core Debug Agent Library instance implementition.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,6 +15,36 @@
 #include "SecPeiDebugAgentLib.h"
 
 CONST BOOLEAN                MultiProcessorDebugSupport = FALSE;
+
+/**
+  Read the Attach/Break-in symbols from the debug port.
+
+  @param[in]  Handle         Pointer to Debug Port handle.
+  @param[out] BreakSymbol    Returned break symbol.
+
+  @retval EFI_SUCCESS        Read the symbol in BreakSymbol.
+  @retval EFI_NOT_FOUND      No read the break symbol.
+
+**/
+EFI_STATUS
+DebugReadBreakSymbol (
+  IN  DEBUG_PORT_HANDLE      Handle,
+  OUT UINT8                  *BreakSymbol
+  )
+{
+  *BreakSymbol = 0;
+  //
+  // If Debug Port buffer has data, read it till it was break symbol or Debug Port buffer emty.
+  //
+  while (DebugPortPollBuffer (Handle)) {
+    DebugPortReadBuffer (Handle, BreakSymbol, 1, 0);
+    if (*BreakSymbol == DEBUG_STARTING_SYMBOL_ATTACH || *BreakSymbol == DEBUG_STARTING_SYMBOL_BREAK) {
+      return EFI_SUCCESS;
+    }
+  }
+  
+  return EFI_NOT_FOUND;
+}
 
 /**
   Get pointer to Mailbox from IDT entry before memory is ready.
@@ -230,7 +260,7 @@ InitializeDebugAgent (
     //
     // Memory has been ready
     //
-    if (IsHostConnected()) {
+    if (IsHostAttached()) {
       //
       // Trigger one software interrupt to inform HOST
       //
@@ -240,7 +270,8 @@ InitializeDebugAgent (
     DebugAgentContext = (DEBUG_AGENT_CONTEXT_POSTMEM_SEC *) Context;
 
     Mailbox = (DEBUG_AGENT_MAILBOX *) GetMailboxPointerInIdtEntry ();
-    Mailbox->DebugPortHandle = Mailbox->DebugPortHandle + DebugAgentContext->StackMigrateOffset;
+    Mailbox->DebugPortHandle = (UINT64)(UINT32)(Mailbox->DebugPortHandle + DebugAgentContext->StackMigrateOffset);
+    Mailbox->DebugFlag.MemoryReady = 1;
 
     Mailbox = BuildMailboxHob ();
     Mailbox = (DEBUG_AGENT_MAILBOX *) ((UINTN) Mailbox + DebugAgentContext->HeapMigrateOffset);
@@ -305,7 +336,7 @@ InitializeDebugAgentPhase2 (
   //
   Phase2Context = (DEBUG_AGENT_PHASE2_CONTEXT *) Context;
   SecCoreData = (EFI_SEC_PEI_HAND_OFF *)Phase2Context->Context;
-  if ((UINTN)SecCoreData->TemporaryRamBase < BASE_128MB && IsHostConnected ()) {
+  if ((UINTN)SecCoreData->TemporaryRamBase < BASE_128MB && IsHostAttached ()) {
     TriggerSoftInterrupt (MEMORY_READY_SIGNATURE);
   }
 

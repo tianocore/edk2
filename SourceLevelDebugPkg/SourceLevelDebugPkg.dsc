@@ -22,7 +22,7 @@
 [Defines]
   PLATFORM_NAME                  = SourceLevelDebugPkg
   PLATFORM_GUID                  = 38C85805-883F-4ee8-A854-95B966ED73AA
-  PLATFORM_VERSION               = 0.71
+  PLATFORM_VERSION               = 0.80
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/SourceLevelDebugPkg
   SUPPORTED_ARCHITECTURES        = IA32|X64

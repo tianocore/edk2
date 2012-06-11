@@ -1,7 +1,7 @@
 /** @file
   Multi-Processor support functions implementation.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -101,7 +101,7 @@ HaltOtherProcessors (
   IN UINT32             CurrentProcessorIndex
   )
 {
-
+  DebugAgentMsgPrint (DEBUG_AGENT_INFO, "processor[%x]:Try to halt other processors.\n", CurrentProcessorIndex);
   if (!IsBsp (CurrentProcessorIndex)) {
     SetIpiSentByApFlag (TRUE);;
   }
@@ -305,7 +305,7 @@ SetDebugViewPoint (
 }
 
 /**
-  Initialize debug timer.
+  Set the IPI send by BPS/AP flag.
 
   @param[in] IpiSentByApFlag   TRUE means this IPI is sent by AP.
                                FALSE means this IPI is sent by BSP.
@@ -324,7 +324,7 @@ SetIpiSentByApFlag (
 }
 
 /**
-  Check if any processor breaks.
+  Check the next pending breaking CPU.
 
   @retval others      There is at least one processor broken, the minimum
                       index number of Processor returned.
@@ -332,7 +332,7 @@ SetIpiSentByApFlag (
 
 **/
 UINT32
-FindCpuNotRunning (
+FindNextPendingBreakCpu (
   VOID
   )
 {
@@ -367,4 +367,38 @@ IsAllCpuRunning (
   }
   return TRUE;
 }
+
+/**
+  Check if the current processor is the first breaking processor.
+
+  If yes, halt other processors.  
+  
+  @param[in] ProcessorIndex   Processor index value.
+  
+  @return TRUE       This processor is the first breaking processor.
+  @return FALSE      This processor is not the first breaking processor.
+                            
+**/
+BOOLEAN
+IsFirstBreakProcessor (
+  IN UINT32              ProcessorIndex
+  )
+{
+  if (MultiProcessorDebugSupport) {
+    if (mDebugMpContext.BreakAtCpuIndex != (UINT32) -1) {
+      //
+      // The current processor is not the first breaking one.
+      //
+      SetCpuBreakFlagByIndex (ProcessorIndex, TRUE);
+      return FALSE;
+    } else {
+      //
+      // If no any processor breaks, try to halt other processors
+      //
+      HaltOtherProcessors (ProcessorIndex);
+      return TRUE;
+    }
+  }
+  return TRUE;
+} 
 

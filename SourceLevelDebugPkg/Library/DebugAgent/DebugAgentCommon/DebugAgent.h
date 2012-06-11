@@ -31,6 +31,7 @@
 #include <Library/LocalApicLib.h>
 #include <Library/DebugLib.h>
 #include <Library/TimerLib.h>
+#include <Library/PrintLib.h>
 
 #include <TransferProtocol.h>
 #include <ImageDebugSupport.h>
@@ -38,9 +39,6 @@
 #include "DebugMp.h"
 #include "DebugTimer.h"
 #include "ArchDebugSupport.h"
-
-#define DEBUG_AGENT_REVISION            ((0 << 16) | 01)
-#define DEBUG_AGENT_CAPABILITIES        0
 
 #define DEBUG_INT1_VECTOR               1
 #define DEBUG_INT3_VECTOR               3
@@ -55,19 +53,46 @@ extern UINTN  Exception0Handle;
 extern UINTN  TimerInterruptHandle;
 extern UINT16 ExceptionStubHeaderSize;
 
-typedef union {
-  struct {
-    UINT32  HostPresent      : 1;
-    UINT32  BreakOnNextSmi   : 1;
-    UINT32  Reserved         : 30;
-  } Bits;
-  UINT32  Uint32;
-} DEBUG_AGENT_FLAG;
+//
+// CPU exception information issued by debug agent
+//
+typedef struct {
+  //
+  // This field is used to save CPU content before executing HOST command
+  //
+  BASE_LIBRARY_JUMP_BUFFER            JumpBuffer;
+  //
+  // This filed returens the exception information issued by HOST command
+  //
+  DEBUG_DATA_RESPONSE_GET_EXCEPTION   ExceptionContent;
+} DEBUG_AGENT_EXCEPTION_BUFFER;
 
 #pragma pack(1)
 typedef struct {
+  //
+  // Lower 32 bits to store the status of DebugAgent
+  //
+  UINT32  HostAttached    : 1;   // 1: HOST is attached
+  UINT32  AgentInProgress : 1;   // 1: Debug Agent is communicating with HOST
+  UINT32  MemoryReady     : 1;   // 1: Memory is ready
+  UINT32  SteppingFlag    : 1;   // 1: Agent is running stepping command
+  UINT32  Reserved1       : 28;
+
+  //
+  // Higher 32bits to control the behavior of DebugAgent
+  //
+  UINT32  BreakOnNextSmi  : 1;   // 1: Break on next SMI
+  UINT32  PrintErrorLevel : 8;   // Bitmask of print error level for debug message
+  UINT32  Reserved2       : 23;
+} DEBUG_AGENT_FLAG;
+
+typedef struct {
   DEBUG_AGENT_FLAG           DebugFlag;
   UINT64                     DebugPortHandle;
+  //
+  // Pointer to DEBUG_AGENT_EXCEPTION_BUFFER
+  //
+  UINT64                     ExceptionBufferPointer;
 } DEBUG_AGENT_MAILBOX;
 #pragma pack()
 
@@ -116,30 +141,10 @@ InitializeDebugIdt (
   );
 
 /**
-  Write specified register into save CPU context.
-
-  @param[in] CpuContext         Pointer to saved CPU context.
-  @param[in] Index              Register index value.
-  @param[in] Offset             Offset in register address range
-  @param[in] Width              Data width to read.
-  @param[in] RegisterBuffer     Pointer to input buffer with data.
-
-**/
-VOID
-ArchWriteRegisterBuffer (
-  IN DEBUG_CPU_CONTEXT               *CpuContext,
-  IN UINT8                           Index,
-  IN UINT8                           Offset,
-  IN UINT8                           Width,
-  IN UINT8                           *RegisterBuffer
-  );
-
-/**
   Read register value from saved CPU context.
 
   @param[in] CpuContext         Pointer to saved CPU context.
   @param[in] Index              Register index value.
-  @param[in] Offset             Offset in register address range
   @param[in] Width              Data width to read.
 
   @return The address of register value.
@@ -149,14 +154,12 @@ UINT8 *
 ArchReadRegisterBuffer (
   IN DEBUG_CPU_CONTEXT               *CpuContext,
   IN UINT8                           Index,
-  IN UINT8                           Offset,
   IN UINT8                           *Width
   );
 
 /**
   Send packet with response data to HOST.
 
-  @param[in] CpuContext  Pointer to saved CPU context.
   @param[in] Data        Pointer to response data buffer.
   @param[in] DataSize    Size of response data in byte.
 
@@ -166,121 +169,19 @@ ArchReadRegisterBuffer (
 **/
 RETURN_STATUS
 SendDataResponsePacket (
-  IN DEBUG_CPU_CONTEXT    *CpuContext,
   IN UINT8                *Data,
   IN UINT16               DataSize
   );
 
 /**
-  Read segment selector by register index.
+  Check if HOST is attached based on Mailbox.
 
-  @param[in] CpuContext           Pointer to saved CPU context.
-  @param[in] RegisterIndex        Register Index.
-
-  @return Value of segment selector.
-
-**/
-UINT64
-ReadRegisterSelectorByIndex (
-  IN DEBUG_CPU_CONTEXT                       *CpuContext,
-  IN UINT8                                   RegisterIndex
-  );
-
-/**
-  Read group register of common registers.
-
-  @param[in] CpuContext           Pointer to saved CPU context.
-  @param[in] RegisterGroup        Pointer to Group registers.
-
-**/
-VOID
-ReadRegisterGroup (
-  IN DEBUG_CPU_CONTEXT                       *CpuContext,
-  IN DEBUG_DATA_REPONSE_READ_REGISTER_GROUP  *RegisterGroup
-  );
-
-/**
-  Read group register of Segment Base.
-
-  @param[in] CpuContext           Pointer to saved CPU context.
-  @param[in] RegisterGroupSegBase Pointer to Group registers.
-
-**/
-VOID
-ReadRegisterGroupSegBase (
-  IN DEBUG_CPU_CONTEXT                              *CpuContext,
-  IN DEBUG_DATA_REPONSE_READ_REGISTER_GROUP_SEGBASE *RegisterGroupSegBase
-  );
-
-/**
-  Read gourp register of Segment Limit.
-
-  @param[in] CpuContext           Pointer to saved CPU context.
-  @param[in] RegisterGroupSegLim  Pointer to Group registers.
-
-**/
-VOID
-ReadRegisterGroupSegLim (
-  IN DEBUG_CPU_CONTEXT                             *CpuContext,
-  IN DEBUG_DATA_REPONSE_READ_REGISTER_GROUP_SEGLIM *RegisterGroupSegLim
-  );
-
-/**
-  Read group register by group index.
-
-  @param[in] CpuContext           Pointer to saved CPU context.
-  @param[in] GroupIndex           Group Index.
-
-  @retval RETURN_SUCCESS         Read successfully.
-  @retval RETURN_NOT_SUPPORTED   Group index cannot be supported.
-
-**/
-RETURN_STATUS
-ArchReadRegisterGroup (
-  IN DEBUG_CPU_CONTEXT                             *CpuContext,
-  IN UINT8                                         GroupIndex
-  );
-
-/**
-  Send acknowledge packet to HOST.
-
-  @param AckCommand    Type of Acknowledge packet.
-
-**/
-VOID
-SendAckPacket (
-  IN UINT8                AckCommand
-  );
-
-/**
-  Receive acknowledge packet OK from HOST in specified time.
-
-  @param[in]  Timeout       Time out value to wait for acknowlege from HOST.
-                            The unit is microsecond.
-  @param[out] BreakReceived If BreakReceived is not NULL,
-                            TRUE is retured if break-in symbol received.
-                            FALSE is retured if break-in symbol not received.
-
-  @retval  RETRUEN_SUCCESS  Succeed to receive acknowlege packet from HOST,
-                            the type of acknowlege packet saved in Ack.
-  @retval  RETURN_TIMEOUT   Specified timeout value was up.
-
-**/
-RETURN_STATUS
-WaitForAckPacketOK (
-  IN  UINTN                     Timeout,
-  OUT BOOLEAN                   *BreakReceived OPTIONAL
-  );
-
-/**
-  Check if HOST is connected based on Mailbox.
-
-  @retval TRUE        HOST is connected.
-  @retval FALSE       HOST is not connected.
+  @retval TRUE        HOST is attached.
+  @retval FALSE       HOST is not attached.
 
 **/
 BOOLEAN
-IsHostConnected (
+IsHostAttached (
   VOID
   );
 
@@ -306,5 +207,40 @@ GetDebugPortHandle (
   VOID
   );
 
+/**
+  Read the Attach/Break-in symbols from the debug port.
+
+  @param[in]  Handle         Pointer to Debug Port handle.
+  @param[out] BreakSymbol    Returned break symbol.
+
+  @retval EFI_SUCCESS        Read the symbol in BreakSymbol.
+  @retval EFI_NOT_FOUND      No read the break symbol.
+
+**/
+EFI_STATUS
+DebugReadBreakSymbol (
+  IN  DEBUG_PORT_HANDLE      Handle,
+  OUT UINT8                  *BreakSymbol
+  );
+
+/**
+  Prints a debug message to the debug port if the specified error level is enabled.
+
+  If any bit in ErrorLevel is also set in Mainbox, then print the message specified
+  by Format and the associated variable argument list to the debug port.
+
+  @param[in] ErrorLevel  The error level of the debug message.
+  @param[in] Format      Format string for the debug message to print.
+  @param[in] ...         Variable argument list whose contents are accessed 
+                         based on the format string specified by Format.
+
+**/
+VOID
+EFIAPI
+DebugAgentMsgPrint (
+  IN UINT8         ErrorLevel,
+  IN CHAR8         *Format,
+  ...
+  );
 #endif
 

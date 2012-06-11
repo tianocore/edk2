@@ -1,7 +1,7 @@
 /** @file
   X64 specific defintions for debug agent library instance.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,17 +15,13 @@
 #ifndef _ARCH_DEBUG_SUPPORT_H_
 #define _ARCH_DEBUG_SUPPORT_H_
 
-#include "ArchRegisters.h"
+#include "ProcessorContext.h"
 #include "TransferProtocol.h"
 
-typedef DEBUG_DATA_REPONSE_READ_REGISTER_GROUP_X64          DEBUG_DATA_REPONSE_READ_REGISTER_GROUP;
-typedef DEBUG_DATA_REPONSE_READ_REGISTER_GROUP_SEGLIM_X64   DEBUG_DATA_REPONSE_READ_REGISTER_GROUP_SEGLIM;
-typedef DEBUG_DATA_REPONSE_READ_REGISTER_GROUP_SEGBASE_X64  DEBUG_DATA_REPONSE_READ_REGISTER_GROUP_SEGBASE;
-
 #define DEBUG_SW_BREAKPOINT_SYMBOL       0xcc
-
 #define DEBUG_ARCH_SYMBOL                DEBUG_DATA_BREAK_CPU_ARCH_X64
 
+typedef DEBUG_DATA_X64_FX_SAVE_STATE     DEBUG_DATA_FX_SAVE_STATE;
 typedef DEBUG_DATA_X64_SYSTEM_CONTEXT    DEBUG_CPU_CONTEXT;
 
 #endif
