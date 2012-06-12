@@ -1,7 +1,7 @@
 /** @file
   API implementation for instance of Report Status Code Library.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -26,6 +26,12 @@
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Guid/StatusCodeDataTypeDebug.h>
 #include <Guid/EventGroup.h>
+
+
+//
+// Define the maximum extended data size that is supported when a status code is reported.
+//
+#define MAX_EXTENDED_DATA_SIZE  0x200
 
 EFI_STATUS_CODE_PROTOCOL  *mReportStatusCodeLibStatusCodeProtocol = NULL;
 EFI_EVENT                 mReportStatusCodeLibVirtualAddressChangeEvent;
@@ -621,13 +627,13 @@ ReportStatusCodeEx (
 {
   EFI_STATUS            Status;
   EFI_STATUS_CODE_DATA  *StatusCodeData;
-  UINT8                 StatusCodeBuffer[EFI_STATUS_CODE_DATA_MAX_SIZE];
+  UINT64                StatusCodeBuffer[(MAX_EXTENDED_DATA_SIZE / sizeof (UINT64)) + 1];
 
   ASSERT (!((ExtendedData == NULL) && (ExtendedDataSize != 0)));
   ASSERT (!((ExtendedData != NULL) && (ExtendedDataSize == 0)));
 
   if (mHaveExitedBootServices) {
-    if (sizeof (EFI_STATUS_CODE_DATA) + ExtendedDataSize > EFI_STATUS_CODE_DATA_MAX_SIZE) {
+    if (sizeof (EFI_STATUS_CODE_DATA) + ExtendedDataSize > MAX_EXTENDED_DATA_SIZE) {
       return EFI_OUT_OF_RESOURCES;
     }
     StatusCodeData = (EFI_STATUS_CODE_DATA *) StatusCodeBuffer;
