@@ -2,6 +2,19 @@
   Base PE/COFF loader supports loading any PE32/PE32+ or TE image, but
   only supports relocating IA32, x64, IPF, and EBC images.
 
+  Caution: This file requires additional review when modified.
+  This library will have external input - PE/COFF image.
+  This external input must be validated carefully to avoid security issue like
+  buffer overflow, integer overflow.
+
+  The basic guideline is that caller need provide ImageContext->ImageRead () with the
+  necessary data range check, to make sure when this library reads PE/COFF image, the
+  PE image buffer is always in valid range.
+  This library will also do some additional check for PE header fields.
+
+  PeCoffLoaderGetPeHeader() routine will do basic check for PE/COFF header.
+  PeCoffLoaderGetImageInfo() routine will do basic check for whole PE/COFF image.
+
   Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   This program and the accompanying materials
@@ -48,7 +61,10 @@ PeCoffLoaderGetPeHeaderMagicValue (
 
 /**
   Retrieves the PE or TE Header from a PE/COFF or TE image. 
-  Also done many checks in PE image to make sure PE image DosHeader, PeOptionHeader, 
+
+  Caution: This function may receive untrusted input.
+  PE/COFF image is external input, so this routine will 
+  also done many checks in PE image to make sure PE image DosHeader, PeOptionHeader, 
   SizeOfHeader, Section Data Region and Security Data Region be in PE image range. 
 
   @param  ImageContext    The context of the image being loaded.
@@ -376,7 +392,9 @@ PeCoffLoaderGetPeHeader (
   The ImageRead and Handle fields of ImageContext structure must be valid prior 
   to invoking this service.
 
-  Also done many checks in PE image to make sure PE image DosHeader, PeOptionHeader, 
+  Caution: This function may receive untrusted input.
+  PE/COFF image is external input, so this routine will 
+  also done many checks in PE image to make sure PE image DosHeader, PeOptionHeader, 
   SizeOfHeader, Section Data Region and Security Data Region be in PE image range. 
 
   @param  ImageContext              The pointer to the image context structure that describes the PE/COFF

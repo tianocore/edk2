@@ -1,6 +1,20 @@
 /** @file
   The library instance provides security service of TPM measure boot.  
 
+  Caution: This file requires additional review when modified.
+  This library will have external input - PE/COFF image and GPT partition.
+  This external input must be validated carefully to avoid security issue like
+  buffer overflow, integer overflow.
+
+  DxeTpmMeasureBootLibImageRead() function will make sure the PE/COFF image content
+  read is within the image buffer.
+
+  TcgMeasurePeImage() function will accept untrusted PE/COFF image and validate its
+  data structure within this image buffer before use.
+
+  TcgMeasureGptTable() function will receive untrusted GPT partition table, and parse
+  partition data carefully.
+
 Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
@@ -41,6 +55,10 @@ UINTN                             mImageSize;
 
 /**
   Reads contents of a PE/COFF image in memory buffer.
+
+  Caution: This function may receive untrusted input.
+  PE/COFF image is external input, so this function will make sure the PE/COFF image content
+  read is within the image buffer.
 
   @param  FileHandle      Pointer to the file handle to read the PE/COFF image.
   @param  FileOffset      Offset into the PE/COFF image to begin the read operation.
@@ -85,6 +103,9 @@ DxeTpmMeasureBootLibImageRead (
 
 /**
   Measure GPT table data into TPM log.
+
+  Caution: This function may receive untrusted input.
+  The GPT partition table is external input, so this function should parse partition data carefully.
 
   @param TcgProtocol             Pointer to the located TCG protocol instance.
   @param GptHandle               Handle that GPT partition was installed.
@@ -246,6 +267,10 @@ TcgMeasureGptTable (
 /**
   Measure PE image into TPM log based on the authenticode image hashing in
   PE/COFF Specification 8.0 Appendix A.
+
+  Caution: This function may receive untrusted input.
+  PE/COFF image is external input, so this function will validate its data structure
+  within this image buffer before use.
 
   @param[in] TcgProtocol    Pointer to the located TCG protocol instance.
   @param[in] ImageAddress   Start address of image buffer.

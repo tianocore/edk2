@@ -3,7 +3,18 @@
   implements an SMI handler to communicate with the DXE runtime driver 
   to provide variable services.
 
-Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Caution: This module requires additional review when modified.
+  This driver will have external input - variable data and communicate buffer in SMM mode.
+  This external input must be validated carefully to avoid security issue like
+  buffer overflow, integer overflow.
+
+  SmmVariableHandler() will receive untrusted input and do basic validation.
+
+  Each sub function VariableServiceGetVariable(), VariableServiceGetNextVariableName(), 
+  VariableServiceSetVariable(), VariableServiceQueryVariableInfo(), ReclaimForOS(), 
+  SmmVariableGetStatistics() should also do validation based on its own knowledge.
+
+Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -241,6 +252,9 @@ GetFvbCountAndBuffer (
 /**
   Get the variable statistics information from the information buffer pointed by gVariableInfo.
 
+  Caution: This function may be invoked at SMM runtime.
+  InfoEntry and InfoSize are external input. Care must be taken to make sure not security issue at runtime.
+
   @param[in, out]  InfoEntry    A pointer to the buffer of variable information entry.
                                 On input, point to the variable information returned last time. if 
                                 InfoEntry->VendorGuid is zero, return the first information.
@@ -337,6 +351,12 @@ SmmVariableGetStatistics (
   Communication service SMI Handler entry.
 
   This SMI handler provides services for the variable wrapper driver.
+
+  Caution: This function may receive untrusted input.
+  This variable data and communicate buffer are external input, so this function will do basic validation.
+  Each sub function VariableServiceGetVariable(), VariableServiceGetNextVariableName(), 
+  VariableServiceSetVariable(), VariableServiceQueryVariableInfo(), ReclaimForOS(), 
+  SmmVariableGetStatistics() should also do validation based on its own knowledge.
 
   @param[in]     DispatchHandle  The unique handle assigned to this handler by SmiHandlerRegister().
   @param[in]     RegisterContext Points to an optional handler context which was specified when the

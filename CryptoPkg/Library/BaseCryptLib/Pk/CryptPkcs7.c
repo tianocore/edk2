@@ -1,6 +1,15 @@
 /** @file
   PKCS#7 SignedData Verification Wrapper Implementation over OpenSSL.
 
+  Caution: This module requires additional review when modified.
+  This library will have external input - signature (e.g. UEFI Authenticated
+  Variable). It may by input in SMM mode.
+  This external input must be validated carefully to avoid security issue like
+  buffer overflow, integer overflow.
+
+  WrapPkcs7Data(), Pkcs7GetSigners(), Pkcs7Verify() will get UEFI Authenticated
+  Variable and will do basic check for data structure.
+
 Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -281,6 +290,10 @@ _Exit:
   Check input P7Data is a wrapped ContentInfo structure or not. If not construct
   a new structure to wrap P7Data.
 
+  Caution: This function may receive untrusted input.
+  UEFI Authenticated Variable is external input, so this function will do basic
+  check for PKCS#7 data structure.
+
   @param[in]  P7Data       Pointer to the PKCS#7 message to verify.
   @param[in]  P7Length     Length of the PKCS#7 message in bytes.
   @param[out] WrapFlag     If TRUE P7Data is a ContentInfo structure, otherwise
@@ -388,6 +401,10 @@ WrapPkcs7Data (
 
   If P7Data, CertStack, StackLength, TrustedCert or CertLength is NULL, then
   return FALSE. If P7Length overflow, then return FAlSE.
+
+  Caution: This function may receive untrusted input.
+  UEFI Authenticated Variable is external input, so this function will do basic
+  check for PKCS#7 data structure.
 
   @param[in]  P7Data       Pointer to the PKCS#7 message to verify.
   @param[in]  P7Length     Length of the PKCS#7 message in bytes.
@@ -588,6 +605,10 @@ Pkcs7FreeSigners (
 
   If P7Data, TrustedCert or InData is NULL, then return FALSE.
   If P7Length, CertLength or DataLength overflow, then return FAlSE.
+
+  Caution: This function may receive untrusted input.
+  UEFI Authenticated Variable is external input, so this function will do basic
+  check for PKCS#7 data structure.
 
   @param[in]  P7Data       Pointer to the PKCS#7 message to verify.
   @param[in]  P7Length     Length of the PKCS#7 message in bytes.

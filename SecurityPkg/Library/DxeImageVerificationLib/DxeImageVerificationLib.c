@@ -1,6 +1,17 @@
 /** @file
   Implement image verification services for secure boot service in UEFI2.3.1.
 
+  Caution: This file requires additional review when modified.
+  This library will have external input - PE/COFF image.
+  This external input must be validated carefully to avoid security issue like
+  buffer overflow, integer overflow.
+
+  DxeImageVerificationLibImageRead() function will make sure the PE/COFF image content
+  read is within the image buffer.
+
+  DxeImageVerificationHandler(), HashPeImageByType(), HashPeImage() function will accept
+  untrusted PE/COFF image and validate its data structure within this image buffer before use.
+
 Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -14,14 +25,22 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "DxeImageVerificationLib.h"
 
+//
+// Caution: This is used by a function which may receive untrusted input.
+// These global variables hold PE/COFF image data, and they should be validated before use.
+//
 EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION mNtHeader;
-UINTN                               mImageSize;
 UINT32                              mPeCoffHeaderOffset;
+EFI_IMAGE_DATA_DIRECTORY            *mSecDataDir      = NULL;
+EFI_GUID                            mCertType;
+
+//
+// Information on current PE/COFF image
+//
+UINTN                               mImageSize;
+UINT8                               *mImageBase       = NULL;
 UINT8                               mImageDigest[MAX_DIGEST_SIZE];
 UINTN                               mImageDigestSize;
-EFI_IMAGE_DATA_DIRECTORY            *mSecDataDir      = NULL;
-UINT8                               *mImageBase       = NULL;
-EFI_GUID                            mCertType;
 
 //
 // Notify string for authorization UI.
@@ -56,6 +75,10 @@ HASH_TABLE mHash[] = {
 
 /**
   Reads contents of a PE/COFF image in memory buffer.
+
+  Caution: This function may receive untrusted input.
+  PE/COFF image is external input, so this function will make sure the PE/COFF image content
+  read is within the image buffer.
 
   @param  FileHandle      Pointer to the file handle to read the PE/COFF image.
   @param  FileOffset      Offset into the PE/COFF image to begin the read operation.
@@ -228,6 +251,10 @@ GetImageType (
 /**
   Caculate hash of Pe/Coff image based on the authenticode image hashing in
   PE/COFF Specification 8.0 Appendix A
+
+  Caution: This function may receive untrusted input.
+  PE/COFF image is external input, so this function will validate its data structure
+  within this image buffer before use.
 
   @param[in]    HashAlg   Hash algorithm type.
 
@@ -549,6 +576,10 @@ Done:
   Recognize the Hash algorithm in PE/COFF Authenticode and caculate hash of
   Pe/Coff image based on the authenticode image hashing in PE/COFF Specification
   8.0 Appendix A
+
+  Caution: This function may receive untrusted input.
+  PE/COFF image is external input, so this function will validate its data structure
+  within this image buffer before use.
 
   @retval EFI_UNSUPPORTED             Hash algorithm is not supported.
   @retval EFI_SUCCESS                 Hash successfully.
@@ -1183,6 +1214,10 @@ Done:
             Run it
           If no,
             Error out
+
+  Caution: This function may receive untrusted input.
+  PE/COFF image is external input, so this function will validate its data structure
+  within this image buffer before use.
 
   @param[in]    AuthenticationStatus
                            This is the authentication status returned from the security

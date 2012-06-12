@@ -2,6 +2,19 @@
   Implement authentication services for the authenticated variable
   service in UEFI2.2.
 
+  Caution: This module requires additional review when modified.
+  This driver will have external input - variable data. It may be input in SMM mode.
+  This external input must be validated carefully to avoid security issue like
+  buffer overflow, integer overflow.
+  Variable attribute should also be checked to avoid authentication bypass.
+
+  ProcessVarWithPk(), ProcessVarWithKek() and ProcessVariable() are the function to do
+  variable authentication.
+
+  VerifyTimeBasedPayload() and VerifyCounterBasedPayload() are sub function to do verification.
+  They will do basic validation for authentication data structure, then call crypto library
+  to verify the signature.
+
 Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -502,6 +515,12 @@ AddPubKeyInStore (
   Verify data payload with AuthInfo in EFI_CERT_TYPE_RSA2048_SHA256_GUID type.
   Follow the steps in UEFI2.2.
 
+  Caution: This function may receive untrusted input.
+  This function may be invoked in SMM mode, and datasize and data are external input.
+  This function will do basic validation, before parse the data.
+  This function will parse the authentication carefully to avoid security issues, like
+  buffer overflow, integer overflow.
+
   @param[in]      Data                    Pointer to data with AuthInfo.
   @param[in]      DataSize                Size of Data.
   @param[in]      PubKey                  Public key used for verification.
@@ -852,6 +871,13 @@ CheckSignatureListFormat(
 /**
   Process variable with platform key for verification.
 
+  Caution: This function may receive untrusted input.
+  This function may be invoked in SMM mode, and datasize and data are external input.
+  This function will do basic validation, before parse the data.
+  This function will parse the authentication carefully to avoid security issues, like
+  buffer overflow, integer overflow.
+  This function will check attribute carefully to avoid authentication bypass.
+
   @param[in]  VariableName                Name of Variable to be found.
   @param[in]  VendorGuid                  Variable vendor GUID.
   @param[in]  Data                        Data pointer.
@@ -961,6 +987,13 @@ ProcessVarWithPk (
 /**
   Process variable with key exchange key for verification.
 
+  Caution: This function may receive untrusted input.
+  This function may be invoked in SMM mode, and datasize and data are external input.
+  This function will do basic validation, before parse the data.
+  This function will parse the authentication carefully to avoid security issues, like
+  buffer overflow, integer overflow.
+  This function will check attribute carefully to avoid authentication bypass.
+
   @param[in]  VariableName                Name of Variable to be found.
   @param[in]  VendorGuid                  Variable vendor GUID.
   @param[in]  Data                        Data pointer.
@@ -1038,6 +1071,13 @@ ProcessVarWithKek (
 
 /**
   Process variable with EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS/EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set
+
+  Caution: This function may receive untrusted input.
+  This function may be invoked in SMM mode, and datasize and data are external input.
+  This function will do basic validation, before parse the data.
+  This function will parse the authentication carefully to avoid security issues, like
+  buffer overflow, integer overflow.
+  This function will check attribute carefully to avoid authentication bypass.
 
   @param[in]  VariableName                Name of Variable to be found.
   @param[in]  VendorGuid                  Variable vendor GUID.
@@ -1805,6 +1845,12 @@ InsertCertsToDb (
 
 /**
   Process variable with EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set
+
+  Caution: This function may receive untrusted input.
+  This function may be invoked in SMM mode, and datasize and data are external input.
+  This function will do basic validation, before parse the data.
+  This function will parse the authentication carefully to avoid security issues, like
+  buffer overflow, integer overflow.
 
   @param[in]  VariableName                Name of Variable to be found.
   @param[in]  VendorGuid                  Variable vendor GUID.

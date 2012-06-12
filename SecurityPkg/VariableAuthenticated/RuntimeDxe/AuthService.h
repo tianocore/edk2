@@ -76,6 +76,13 @@ typedef struct {
 /**
   Process variable with EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS/EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set.
 
+  Caution: This function may receive untrusted input.
+  This function may be invoked in SMM mode, and datasize and data are external input.
+  This function will do basic validation, before parse the data.
+  This function will parse the authentication carefully to avoid security issues, like
+  buffer overflow, integer overflow.
+  This function will check attribute carefully to avoid authentication bypass.
+
   @param[in]  VariableName                Name of Variable to be found.
   @param[in]  VendorGuid                  Variable vendor GUID.
 
@@ -162,6 +169,13 @@ CheckSignatureListFormat(
 /**
   Process variable with platform key for verification.
 
+  Caution: This function may receive untrusted input.
+  This function may be invoked in SMM mode, and datasize and data are external input.
+  This function will do basic validation, before parse the data.
+  This function will parse the authentication carefully to avoid security issues, like
+  buffer overflow, integer overflow.
+  This function will check attribute carefully to avoid authentication bypass.
+
   @param[in]  VariableName                Name of Variable to be found.
   @param[in]  VendorGuid                  Variable vendor GUID.
   @param[in]  Data                        Data pointer.
@@ -190,6 +204,13 @@ ProcessVarWithPk (
 
 /**
   Process variable with key exchange key for verification.
+
+  Caution: This function may receive untrusted input.
+  This function may be invoked in SMM mode, and datasize and data are external input.
+  This function will do basic validation, before parse the data.
+  This function will parse the authentication carefully to avoid security issues, like
+  buffer overflow, integer overflow.
+  This function will check attribute carefully to avoid authentication bypass.
 
   @param[in]  VariableName                Name of Variable to be found.
   @param[in]  VendorGuid                  Variable vendor GUID.
@@ -256,6 +277,12 @@ CompareTimeStamp (
 
 /**
   Process variable with EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set
+
+  Caution: This function may receive untrusted input.
+  This function may be invoked in SMM mode, and datasize and data are external input.
+  This function will do basic validation, before parse the data.
+  This function will parse the authentication carefully to avoid security issues, like
+  buffer overflow, integer overflow.
 
   @param[in]  VariableName                Name of Variable to be found.
   @param[in]  VendorGuid                  Variable vendor GUID.

@@ -1,6 +1,14 @@
 /** @file
   Authenticode Portable Executable Signature Verification over OpenSSL.
 
+  Caution: This module requires additional review when modified.
+  This library will have external input - signature (e.g. PE/COFF Authenticode).
+  This external input must be validated carefully to avoid security issue like
+  buffer overflow, integer overflow.
+
+  AuthenticodeVerify() will get PE/COFF Authenticode and will do basic check for
+  data structure.
+
 Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -25,6 +33,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   If AuthData is NULL, then return FALSE.
   If ImageHash is NULL, then return FALSE.
+
+  Caution: This function may receive untrusted input.
+  PE/COFF Authenticode is external input, so this function will do basic check for
+  Authenticode data structure.
 
   @param[in]  AuthData     Pointer to the Authenticode Signature retrieved from signed
                            PE/COFF image to be verified.
