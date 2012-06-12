@@ -2,6 +2,12 @@
 
   Execute pending TPM requests from OS or BIOS and Lock TPM.
 
+  Caution: This module requires additional review when modified.
+  This driver will have external input - variable.
+  This external input must be validated carefully to avoid security issue.
+
+  ExecutePendingTpmRequest() will receive untrusted input and do validation.
+
 Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
@@ -881,6 +887,10 @@ UserConfirm (
 
 /**
   Check and execute the requested physical presence command.
+
+  Caution: This function may receive untrusted input.
+  TcgPpData variable is external input, so this function will validate
+  its data structure to be valid value.
 
   @param[in] TcgProtocol          EFI TCG Protocol instance. 
   @param[in] TcgPpData            Point to the physical presence NV variable.

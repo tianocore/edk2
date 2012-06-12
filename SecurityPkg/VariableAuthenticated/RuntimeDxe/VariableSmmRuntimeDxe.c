@@ -3,7 +3,17 @@
   and volatile storage space and install variable architecture protocol
   based on SMM variable module.
 
-Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Caution: This module requires additional review when modified.
+  This driver will have external input - variable data.
+  This external input must be validated carefully to avoid security issue like
+  buffer overflow, integer overflow.
+
+  RuntimeServiceGetVariable() and RuntimeServiceSetVariable() are external API
+  to receive data buffer. The size should be checked carefully.
+
+  InitCommunicateBuffer() is really function to check the variable data size.
+
+Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -49,6 +59,9 @@ UINTN                            mVariableBufferSize;
 
   The communicate size is: SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE +
   DataSize.
+
+  Caution: This function may receive untrusted input.
+  The data size external input, so this function will validate it carefully to avoid buffer overflow.
 
   @param[out]      DataPtr          Points to the data in the communicate buffer.
   @param[in]       DataSize         The data size to send to SMM.
@@ -118,6 +131,9 @@ SendCommunicateBuffer (
 
 /**
   This code finds variable in storage blocks (Volatile or Non-Volatile).
+
+  Caution: This function may receive untrusted input.
+  The data size is external input, so this function will validate it carefully to avoid buffer overflow.
 
   @param[in]      VariableName       Name of Variable to be found.
   @param[in]      VendorGuid         Variable vendor GUID.
@@ -263,6 +279,9 @@ RuntimeServiceGetNextVariableName (
 
 /**
   This code sets variable in storage blocks (Volatile or Non-Volatile).
+
+  Caution: This function may receive untrusted input.
+  The data size and data are external input, so this function will validate it carefully to avoid buffer overflow.
 
   @param[in] VariableName                 Name of Variable to be found.
   @param[in] VendorGuid                   Variable vendor GUID.

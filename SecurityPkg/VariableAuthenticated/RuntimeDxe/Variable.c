@@ -2,6 +2,20 @@
   The common variable operation routines shared by DXE_RUNTIME variable
   module and DXE_SMM variable module.
 
+  Caution: This module requires additional review when modified.
+  This driver will have external input - variable data. They may be input in SMM mode.
+  This external input must be validated carefully to avoid security issue like
+  buffer overflow, integer overflow.
+
+  VariableServiceGetNextVariableName () and VariableServiceQueryVariableInfo() are external API.
+  They need check input parameter.
+
+  VariableServiceGetVariable() and VariableServiceSetVariable() are external API
+  to receive datasize and data buffer. The size should be checked carefully.
+
+  VariableServiceSetVariable() should also check authenticate data to avoid buffer overflow,
+  integer overflow. It should also check attribute to avoid authentication bypass.
+
 Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -1945,6 +1959,10 @@ IsHwErrRecVariable (
 
   This code finds variable in storage blocks (Volatile or Non-Volatile).
 
+  Caution: This function may receive untrusted input.
+  This function may be invoked in SMM mode, and datasize is external input.
+  This function will do basic validation, before parse the data.
+
   @param VariableName               Name of Variable to be found.
   @param VendorGuid                 Variable vendor GUID.
   @param Attributes                 Attribute value of the variable found.
@@ -2021,6 +2039,9 @@ Done:
 /**
 
   This code Finds the Next available variable.
+
+  Caution: This function may receive untrusted input.
+  This function may be invoked in SMM mode. This function will do basic validation, before parse the data.
 
   @param VariableNameSize           Size of the variable name.
   @param VariableName               Pointer to variable name.
@@ -2166,6 +2187,13 @@ Done:
 /**
 
   This code sets variable in storage blocks (Volatile or Non-Volatile).
+
+  Caution: This function may receive untrusted input.
+  This function may be invoked in SMM mode, and datasize and data are external input.
+  This function will do basic validation, before parse the data.
+  This function will parse the authentication carefully to avoid security issues, like
+  buffer overflow, integer overflow.
+  This function will check attribute carefully to avoid authentication bypass.
 
   @param VariableName                     Name of Variable to be found.
   @param VendorGuid                       Variable vendor GUID.
@@ -2336,6 +2364,9 @@ VariableServiceSetVariable (
 
   This code returns information about the EFI variables.
 
+  Caution: This function may receive untrusted input.
+  This function may be invoked in SMM mode. This function will do basic validation, before parse the data.
+
   @param Attributes                     Attributes bitmask to specify the type of variables
                                         on which to return information.
   @param MaximumVariableStorageSize     Pointer to the maximum size of the storage space available
@@ -2496,6 +2527,9 @@ VariableServiceQueryVariableInfo (
 
 /**
   This function reclaims variable storage if free size is below the threshold.
+
+  Caution: This function may be invoked at SMM runtime.
+  Care must be taken to make sure not security issue at runtime.
 
 **/
 VOID

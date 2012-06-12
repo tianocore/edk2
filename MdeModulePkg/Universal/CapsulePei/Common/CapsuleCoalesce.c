@@ -1,6 +1,14 @@
 /** @file
   The logic to process capsule.
 
+  Caution: This module requires additional review when modified.
+  This driver will have external input - capsule image.
+  This external input must be validated carefully to avoid security issue like
+  buffer overflow, integer overflow.
+
+  CapsuleDataCoalesce() will do basic validation before coalesce capsule data
+  into memory.
+
 Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -791,6 +799,10 @@ BuildCapsuleDescriptors (
                    +---------------------------+
                    |    PrivateDataDesc 0      |
       MemBase ---->+---------------------------+<----- BlockList
+
+  Caution: This function may receive untrusted input.
+  The capsule data is external input, so this routine will do basic validation before
+  coalesce capsule data into memory.
 
   @param PeiServices        General purpose services available to every PEIM.
   @param BlockListBuffer    Point to the buffer of Capsule Descriptor Variables.
