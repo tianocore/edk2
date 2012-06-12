@@ -1,7 +1,7 @@
 /** @file
   Serial I/O status code reporting worker.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -50,7 +50,7 @@ SerialStatusCodeReportWorker (
   CHAR8           *Filename;
   CHAR8           *Description;
   CHAR8           *Format;
-  CHAR8           Buffer[EFI_STATUS_CODE_DATA_MAX_SIZE];
+  CHAR8           Buffer[MAX_DEBUG_MESSAGE_LENGTH];
   UINT32          ErrorLevel;
   UINT32          LineNumber;
   UINTN           CharCount;
