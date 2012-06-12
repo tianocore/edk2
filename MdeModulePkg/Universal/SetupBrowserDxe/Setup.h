@@ -1067,6 +1067,7 @@ InitializeFormSet (
   @param  Form                   Form data structure.
   @param  DefaultId              The Class of the default.
   @param  SettingScope           Setting Scope for Default action.
+  @param  Storage                Get default value only for this storage.
 
   @retval EFI_SUCCESS            The function completed successfully.
   @retval EFI_UNSUPPORTED        Unsupport SettingScope.
@@ -1077,7 +1078,8 @@ ExtractDefault (
   IN FORM_BROWSER_FORMSET             *FormSet,
   IN FORM_BROWSER_FORM                *Form,
   IN UINT16                           DefaultId,
-  IN BROWSER_SETTING_SCOPE            SettingScope
+  IN BROWSER_SETTING_SCOPE            SettingScope,
+  IN FORMSET_STORAGE                  *Storage OPTIONAL
   );
 
 /**

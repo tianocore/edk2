@@ -2974,6 +2974,7 @@ GetQuestionDefault (
   @param  Form                   Form data structure.
   @param  DefaultId              The Class of the default.
   @param  SettingScope           Setting Scope for Default action.
+  @param  Storage                Get default value only for this storage.
 
   @retval EFI_SUCCESS            The function completed successfully.
   @retval EFI_UNSUPPORTED        Unsupport SettingScope.
@@ -2984,7 +2985,8 @@ ExtractDefault (
   IN FORM_BROWSER_FORMSET             *FormSet,
   IN FORM_BROWSER_FORM                *Form,
   IN UINT16                           DefaultId,
-  IN BROWSER_SETTING_SCOPE            SettingScope
+  IN BROWSER_SETTING_SCOPE            SettingScope,
+  IN FORMSET_STORAGE                  *Storage OPTIONAL
   )
 {
   EFI_STATUS              Status;
@@ -3012,7 +3014,14 @@ ExtractDefault (
     while (!IsNull (&Form->StatementListHead, Link)) {
       Question = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
       Link = GetNextNode (&Form->StatementListHead, Link);
-  
+
+      //
+      // If get default value only for this storage, check the storage first.
+      //
+      if ((Storage != NULL) && (Question->Storage != Storage)) {
+        continue;
+      }
+
       //
       // If Question is disabled, don't reset it to default
       //
@@ -3046,7 +3055,7 @@ ExtractDefault (
     FormLink = GetFirstNode (&FormSet->FormListHead);
     while (!IsNull (&FormSet->FormListHead, FormLink)) {
       Form = FORM_BROWSER_FORM_FROM_LINK (FormLink);
-      ExtractDefault (FormSet, Form, DefaultId, FormLevel);
+      ExtractDefault (FormSet, Form, DefaultId, FormLevel, Storage);
       FormLink = GetNextNode (&FormSet->FormListHead, FormLink);
     }
   } else if (SettingScope == SystemLevel) {
@@ -3117,7 +3126,7 @@ ExtractDefault (
     Link = GetFirstNode (&gBrowserFormSetList);
     while (!IsNull (&gBrowserFormSetList, Link)) {
       LocalFormSet = FORM_BROWSER_FORMSET_FROM_LINK (Link);
-      ExtractDefault (LocalFormSet, NULL, DefaultId, FormSetLevel);
+      ExtractDefault (LocalFormSet, NULL, DefaultId, FormSetLevel, Storage);
       Link = GetNextNode (&gBrowserFormSetList, Link);
     }
   }
@@ -3403,12 +3412,6 @@ InitializeCurrentSetting (
   EFI_STATUS              Status;
 
   //
-  // Extract default from IFR binary
-  //
-  ExtractDefault (FormSet, NULL, EFI_HII_DEFAULT_CLASS_STANDARD, FormSetLevel);
-  UpdateNvInfoInForm (FormSet, FALSE);
-
-  //
   // Request current settings from Configuration Driver
   //
   Link = GetFirstNode (&FormSet->StorageListHead);
@@ -3438,13 +3441,24 @@ InitializeCurrentSetting (
       // Storage is not found in backup formset, request it from ConfigDriver
       //
       Status = LoadStorage (FormSet, Storage);
+
+      if (EFI_ERROR (Status)) {
+        //
+        // If get last time changed value failed, extract default from IFR binary
+        //
+        ExtractDefault (FormSet, NULL, EFI_HII_DEFAULT_CLASS_STANDARD, FormSetLevel, Storage);
+        //
+        // ExtractDefault will set the NV flag to TRUE, so need this function to clean the flag
+        // in current situation.
+        //
+        UpdateNvInfoInForm (FormSet, FALSE);
+      }
+
       //
-      // Now Edit Buffer is filled with default values(lower priority) and current
+      // Now Edit Buffer is filled with default values(lower priority) or current
       // settings(higher priority), sychronize it to shadow Buffer
       //
-      if (!EFI_ERROR (Status)) {
-        SynchronizeStorage (Storage, TRUE);
-      }
+      SynchronizeStorage (Storage, TRUE);
     } else {
       //
       // Storage found in backup formset, use it
