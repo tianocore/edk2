@@ -303,14 +303,14 @@ DebugAssert (
   //
   // Copy Ascii FileName including NULL terminator.
   //
-  Temp = AsciiStrnCpy ((CHAR8 *)(AssertData + 1), FileName, FileNameSize);
+  Temp = CopyMem (AssertData + 1, FileName, FileNameSize);
   Temp[FileNameSize - 1] = 0;
   TotalSize += FileNameSize;
 
   //
   // Copy Ascii Description include NULL terminator.
   //
-  Temp = AsciiStrnCpy (Temp + FileNameSize, Description, DescriptionSize);
+  Temp = CopyMem (Temp + FileNameSize, Description, DescriptionSize);
   Temp[DescriptionSize - 1] = 0;
   TotalSize += DescriptionSize;
 
