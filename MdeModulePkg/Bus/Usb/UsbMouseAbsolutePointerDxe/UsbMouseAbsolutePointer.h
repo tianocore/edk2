@@ -1,7 +1,7 @@
 /** @file
   Helper routine and corresponding data struct used by USB Mouse Absolute Pointer Driver.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -41,6 +41,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define REPORT_PROTOCOL         1
 
 #define USB_MOUSE_ABSOLUTE_POINTER_DEV_SIGNATURE SIGNATURE_32 ('u', 'm', 's', 't')
+
+//
+// A common header for usb standard descriptor.
+// Each stand descriptor has a length and type.
+//
+#pragma pack(1)
+typedef struct {
+  UINT8                   Len;
+  UINT8                   Type;
+} USB_DESC_HEAD;
+#pragma pack()
 
 ///
 /// Button range and status
