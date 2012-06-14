@@ -57,6 +57,11 @@
   inet_net_pton.c
   inet_neta.c
   inet_pton.c
+  Ip6Addr_Any.c
+  Ip6Addr_Loopback.c
+  Ip6Addr_NodeLocal_AllNodes.c
+  Ip6Addr_LinkLocal_AllNodes.c
+  Ip6Addr_LinkLocal_AllRouters.c
   listen.c
   map_v4v6.c
   ns_addr.c
