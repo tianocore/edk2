@@ -2846,26 +2846,26 @@ diff --ignore-file-name-case -Naur ShellR33/Library/EfiShellLib.inf GccShellR33/
 -  ipf\initplat.c
 -  ipf\palproc.s
 -  ipf\salpal.c
-+  ipf/math.c
-+  ipf/initplat.c
-+  ipf/palproc.s
-+  ipf/salpal.c
++  IPF/math.c
++  IPF/initplat.c
++  IPF/palproc.s
++  IPF/salpal.c
  
  [sources.EBC]
 -  EBC\math.c
 -  EBC\initplat.c
-+  EBC/math.c
-+  EBC/initplat.c
++  Ebc/math.c
++  Ebc/initplat.c
    
  [sources.x64]
 -  ipf\math.c
 -  ia32\initplat.c
-+  ipf/math.c
-+  ia32/initplat.c
++  IPF/math.c
++  IA32/initplat.c
 +
 +[sources.ARM]
-+  ipf/math.c
-+  ia32/initplat.c
++  IPF/math.c
++  IA32/initplat.c
  
  [includes.common]
    .
