@@ -594,8 +594,8 @@ InitializeUsbMouseDevice (
       MouseHidDesc = (EFI_USB_HID_DESCRIPTOR *)Head;
       break;
     }
-    Total += (UINT16)Head->Len;
-    Head   = (USB_DESC_HEAD*)((UINT8 *)Buf + Total);
+    Total = Total + (UINT16)Head->Len;
+    Head  = (USB_DESC_HEAD*)((UINT8 *)Buf + Total);
   }
 
   if (MouseHidDesc == NULL) {
