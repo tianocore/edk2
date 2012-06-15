@@ -1,7 +1,7 @@
 /** @file
   Declarations and macros for the console abstraction.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
   distribution.  The full text of the license may be found at
@@ -18,16 +18,6 @@
 #include  <kfile.h>
 #include  <Device/Device.h>
 
-typedef struct {
-  UINT32    Column;
-  UINT32    Row;
-} CursorXY;
-
-typedef union {
-  UINT64      Offset;
-  CursorXY    XYpos;
-} XYoffset;
-
 /*  The members Cookie through Abstraction, inclusive, are the same type and order
     for all instance structures.
 
@@ -43,7 +33,7 @@ typedef struct {
   UINT64                      NumRead;      ///< Number of characters Read.
   UINT64                      NumWritten;   ///< Number of characters Written.
   EFI_INPUT_KEY               UnGetKey;     ///< One-key pushback, for poll().
-  UINT32                      Reserved_2;   // Force the struct to be a multiple of 8-bytes long
+  __mbstate_t                 CharState;    ///< Character state for the byte stream passing through this device
 } ConInstance;
 
 __BEGIN_DECLS

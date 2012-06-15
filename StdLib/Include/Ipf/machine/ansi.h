@@ -1,6 +1,15 @@
-/*  $NetBSD: ansi.h,v 1.3 2006/10/04 13:52:00 tnozaki Exp $ */
+/** @file
+    Machine dependent ANSI type definitions.
 
-/*-
+    Copyright (c) 2010-2012, Intel Corporation. All rights reserved.<BR>
+    This program and the accompanying materials are licensed and made available
+    under the terms and conditions of the BSD License that accompanies this
+    distribution.  The full text of the license may be found at
+    http://opensource.org/licenses/bsd-license.php.
+
+    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
  * Copyright (c) 1990, 1993
  *  The Regents of the University of California.  All rights reserved.
  *
@@ -29,8 +38,8 @@
  * SUCH DAMAGE.
  *
  *  @(#)ansi.h  8.2 (Berkeley) 1/4/94
+    NetBSD: ansi.h,v 1.3 2006/10/04 13:52:00 tnozaki Exp
  */
-
 #ifndef _ANSI_H_
 #define _ANSI_H_
 
@@ -86,9 +95,12 @@
  * mbstate_t is an opaque object to keep conversion state, during multibyte
  * stream conversions.  The content must not be referenced by user programs.
  */
-typedef union {
-  __int64_t __mbstateL; /* for alignment */
-  char __mbstate8[128];
+typedef struct {
+  UINT32  A;      // Np;
+  UINT32  B;      // U;
+  UINT32  E;      // L
+  UINT8   C[4];   // n[4]
+  UINT16  D[2];   // w[2]
 } __mbstate_t;
 #define _BSD_MBSTATE_T_   __mbstate_t /* mbstate_t */
 

@@ -1,7 +1,7 @@
 /** @file
   EFI versions of NetBSD system calls.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at
@@ -557,16 +557,38 @@ mkdir (const char *path, __mode_t perms)
 }
 
 /** Open a file.
+    The open() function establishes the connection between a file and a file
+    descriptor.  It creates an open file description that refers to a file
+    and a file descriptor that refers to that open file description. The file
+    descriptor is used by other I/O functions to refer to that file.
+
+    The open() function returns a file descriptor for the named file that is
+    the lowest file descriptor not currently open for that process. The open
+    file description is new, and therefore the file descriptor shall not
+    share it with any other process in the system.
+
+    The file offset used to mark the current position within the file is set
+    to the beginning of the file.
 
     The EFI ShellOpenFileByName() function is used to perform the low-level
     file open operation.  The primary task of open() is to translate from the
     flags used in the <stdio.h> environment to those used by the EFI function.
+
+    The file status flags and file access modes of the open file description
+    are set according to the value of oflags.
+
+    Values for oflags are constructed by a bitwise-inclusive OR of flags from
+    the following list, defined in <fcntl.h>. Applications shall specify
+    exactly one of { O_RDONLY, O_RDWR, O_WRONLY } in the value of oflags.
+    Any combination of { O_NONBLOCK, O_APPEND, O_CREAT, O_TRUNC, O_EXCL } may
+    also be specified in oflags.
 
     The only valid flag combinations for ShellOpenFileByName() are:
       - Read
       - Read/Write
       - Create/Read/Write
 
+    Values for mode specify the access permissions for newly created files.
     The mode value is saved in the FD to indicate permissions for further operations.
 
     O_RDONLY      -- flags = EFI_FILE_MODE_READ -- this is always done
@@ -578,6 +600,25 @@ mkdir (const char *path, __mode_t perms)
     O_CREAT       -- flags |= EFI_FILE_MODE_CREATE
     O_TRUNC       -- delete first then create new
     O_EXCL        -- if O_CREAT is also set, open will fail if the file already exists.
+
+    @param[in]    Path      The path argument points to a pathname naming the
+                            object to be opened.
+    @param[in]    oflags    File status flags and file access modes of the
+                            open file description.
+    @param[in]    mode      File access permission bits as defined in
+                            <sys/stat.h>.
+
+    @return     Upon successful completion, open() opens the file and returns
+                a non-negative integer representing the lowest numbered
+                unused file descriptor. Otherwise, open returns -1 and sets
+                errno to indicate the error. If a negative value is
+                returned, no files are created or modified.
+
+    @retval   EMFILE      No file descriptors available -- Max number already open.
+    @retval   EINVAL      Bad value specified for oflags or mode.
+    @retval   ENOMEM      Failure allocating memory for internal buffers.
+    @retval   EEXIST      File exists and open attempted with (O_EXCL | O_CREAT) set.
+    @retval   EIO         UEFI failure.  Check value in EFIerrno.
 **/
 int
 open(

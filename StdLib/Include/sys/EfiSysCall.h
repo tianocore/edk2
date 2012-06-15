@@ -53,7 +53,7 @@
       BOOLEAN   ValidateFD    (int fd, int IsOpen);
 @endverbatim
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at
@@ -332,5 +332,19 @@ __BEGIN_DECLS
 /* These system calls don't YET have EFI implementations. */
   int       reboot    (int, char *);
 __END_DECLS
+
+/*  The console output stream, stdout, supports cursor positioning via the
+    lseek() function call.  The following entities facilitate packing the
+    X and Y coordinates into the offset parameter of the lseek call.
+*/
+typedef struct {
+  UINT32    Column;
+  UINT32    Row;
+} CURSOR_XY;
+
+typedef union {
+  UINT64      Offset;
+  CURSOR_XY   XYpos;
+} XY_OFFSET;
 
 #endif  /* _EFI_SYS_CALL_H */

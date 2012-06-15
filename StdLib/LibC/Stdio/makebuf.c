@@ -1,7 +1,7 @@
 /** @file
     Implementation of internal file buffer allocation functions.
 
-    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available
     under the terms and conditions of the BSD License that accompanies this
     distribution.  The full text of the license may be found at
@@ -77,11 +77,12 @@ __smakebuf(FILE *fp)
   if (fp != NULL) {
   if (fp->_flags & __SNBF) {
     fp->_bf._base = fp->_p = fp->_nbuf;
-    fp->_bf._size = 1;
+    fp->_bf._size = MB_LEN_MAX;
     return;
   }
   flags = __swhatbuf(fp, &size, &couldbetty);
   if ((p = malloc(size)) == NULL) {
+    // malloc failed, act unbuffered.
     fp->_flags |= __SNBF;
     fp->_bf._base = fp->_p = fp->_nbuf;
     fp->_bf._size = 1;

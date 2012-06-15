@@ -1,8 +1,17 @@
-/*	$NetBSD: ansi.h,v 1.19 2006/10/04 13:52:00 tnozaki Exp $	*/
+/** @file
+    Machine dependent ANSI type definitions.
 
-/*-
+    Copyright (c) 2010-2012, Intel Corporation. All rights reserved.<BR>
+    This program and the accompanying materials are licensed and made available
+    under the terms and conditions of the BSD License that accompanies this
+    distribution.  The full text of the license may be found at
+    http://opensource.org/licenses/bsd-license.php.
+
+    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
  * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -28,11 +37,11 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)ansi.h	8.2 (Berkeley) 1/4/94
+ *  @(#)ansi.h  8.2 (Berkeley) 1/4/94
+    NetBSD: ansi.h,v 1.19 2006/10/04 13:52:00 tnozaki Exp
  */
-
-#ifndef	_ANSI_H_
-#define	_ANSI_H_
+#ifndef _ANSI_H_
+#define _ANSI_H_
 
 #include  <sys/EfiCdefs.h>
 
@@ -42,10 +51,10 @@
  * Types which are fundamental to the implementation and may appear in
  * more than one standard header are defined here.  Standard headers
  * then use:
- *	#ifdef	_BSD_SIZE_T_
- *	typedef	_BSD_SIZE_T_ size_t;
- *	#undef	_BSD_SIZE_T_
- *	#endif
+ *  #ifdef  _BSD_SIZE_T_
+ *  typedef _BSD_SIZE_T_ size_t;
+ *  #undef  _BSD_SIZE_T_
+ *  #endif
  */
 #define _BSD_CLOCK_T_     _EFI_CLOCK_T      /* clock() */
 #define _BSD_PTRDIFF_T_   _EFI_PTRDIFF_T_   /* ptr1 - ptr2 */
@@ -70,7 +79,7 @@
  * chosen over a long is that the is*() and to*() routines take ints (says
  * ANSI C), but they use _RUNE_T_ instead of int.  By changing it here, you
  * lose a bit of ANSI conformance, but your programs will still work.
- *    
+ *
  * Note that _WCHAR_T_ and _RUNE_T_ must be of the same type.  When wchar_t
  * and rune_t are typedef'd, _WCHAR_T_ will be undef'd, but _RUNE_T remains
  * defined for ctype.h.
@@ -78,17 +87,20 @@
 #define _BSD_WCHAR_T_     _EFI_WCHAR_T    /* wchar_t */
 #define _BSD_WINT_T_      _EFI_WINT_T     /* wint_t */
 #define _BSD_RUNE_T_      _EFI_WCHAR_T    /* rune_t */
-#define _BSD_WCTRANS_T_		void *		/* wctrans_t */
+#define _BSD_WCTRANS_T_   void *    /* wctrans_t */
 #define _BSD_WCTYPE_T_    unsigned int    /* wctype_t */
 
 /*
  * mbstate_t is an opaque object to keep conversion state, during multibyte
  * stream conversions.  The content must not be referenced by user programs.
  */
-typedef union {
-	__int64_t __mbstateL;	/* for alignment */
-	char __mbstate8[128];
+typedef struct {
+  UINT32  A;      // Np;
+  UINT32  B;      // U;
+  UINT32  E;      // L
+  UINT8   C[4];   // n[4]
+  UINT16  D[2];   // w[2]
 } __mbstate_t;
-#define	_BSD_MBSTATE_T_		__mbstate_t	/* mbstate_t */
+#define _BSD_MBSTATE_T_   __mbstate_t /* mbstate_t */
 
-#endif	/* _ANSI_H_ */
+#endif  /* _ANSI_H_ */

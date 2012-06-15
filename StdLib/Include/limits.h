@@ -8,7 +8,7 @@
   type as would an expression that is an object of the corresponding type
   converted according to the integer promotions.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at
@@ -28,7 +28,7 @@
 /* Define the values required by the ISO/IEC 9899 Specification. */
 
 /** Maximum number of bytes in a multibyte character, for any supported locale. **/
-#define MB_LEN_MAX  2               /* 16-bit UTC-2 */
+#define MB_LEN_MAX  4               /* UTF-8 can require up to 4 bytes */
 
 /** Number of bits comprising the smallest object that is not a bit-field (byte). **/
 #define CHAR_BIT    __CHAR_BIT

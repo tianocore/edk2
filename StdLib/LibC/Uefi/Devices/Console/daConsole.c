@@ -3,7 +3,7 @@
 
   Manipulates abstractions for stdin, stdout, stderr.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at
@@ -52,27 +52,45 @@ static wchar_t       *ConReadBuf;
 static BOOLEAN        TtyCooked;
 static BOOLEAN        TtyEcho;
 
-ssize_t
-WideTtyCvt( CHAR16 *dest, const char *buf, size_t n)
-{
-  UINTN   i;
-  wint_t  wc;
+/** Convert string from MBCS to WCS and translate \n to \r\n.
 
-  for(i = 0; i < n; ++i) {
-    wc = btowc(*buf++);
-    if( wc == 0) {
+    It is the caller's responsibility to ensure that dest is
+    large enough to hold the converted results.  It is guaranteed
+    that there will be fewer than n characters placed in dest.
+
+    @param  dest    WCS buffer to receive the converted string.
+    @param  buf     MBCS string to convert to WCS.
+    @param  n       Number of BYTES contained in buf.
+    @param  Cs      Pointer to the character state object for this stream
+
+    @return   The number of BYTES consumed from buf.
+**/
+ssize_t
+WideTtyCvt( CHAR16 *dest, const char *buf, ssize_t n, mbstate_t *Cs)
+{
+  ssize_t i     = 0;
+  int     numB  = 0;
+  wchar_t wc[2];
+
+  while(n > 0) {
+    numB = (int)mbrtowc(wc, buf, MIN(MB_LEN_MAX,n), Cs);
+    if( numB == 0) {
       break;
     };
-    if(wc < 0) {
-      wc = BLOCKELEMENT_LIGHT_SHADE;
+    if(numB < 0) {
+      wc[0] = BLOCKELEMENT_LIGHT_SHADE;
     }
-    if(wc == L'\n') {
+    if(wc[0] == L'\n') {
       *dest++ = L'\r';
+      ++i;
     }
-    *dest++ = (CHAR16)wc;
+    *dest++ = (CHAR16)wc[0];
+    i += numB;
+    n -= numB;
+    buf += numB;
   }
   *dest = 0;
-  return (ssize_t)i;
+  return i;
 }
 
 static
@@ -105,7 +123,7 @@ da_ConSeek(
 {
   ConInstance                       *Stream;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   *Proto;
-  XYoffset                           CursorPos;
+  XY_OFFSET                          CursorPos;
 
   Stream = BASE_CR(filp->f_ops, ConInstance, Abstraction);
   // Quick check to see if Stream looks reasonable
@@ -140,7 +158,7 @@ da_ConSeek(
                               the string couldn't be displayed.
   @param[in]      Buffer      The WCS string to be displayed
 
-  @return   The number of characters written.
+  @return   The number of BYTES written.  Because of MBCS, this may be more than number of characters.
 */
 static
 ssize_t
@@ -155,8 +173,7 @@ da_ConWrite(
   EFI_STATUS                          Status;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *Proto;
   ConInstance                        *Stream;
-  ssize_t                             NumChar;
-  //XYoffset                            CursorPos;
+  ssize_t                             NumBytes;
 
   Stream = BASE_CR(filp->f_ops, ConInstance, Abstraction);
   // Quick check to see if Stream looks reasonable
@@ -173,34 +190,21 @@ da_ConWrite(
   Proto = (EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *)Stream->Dev;
 
   // Convert string from MBCS to WCS and translate \n to \r\n.
-  NumChar = WideTtyCvt(gMD->UString, (const char *)Buffer, BufferSize);
-  //if(NumChar > 0) {
-  //  BufferSize = (size_t)(NumChar * sizeof(CHAR16));
-  //}
-  BufferSize = NumChar;
+  NumBytes = WideTtyCvt(gMD->UString, (const char *)Buffer, (ssize_t)BufferSize, &Stream->CharState);
+  BufferSize = NumBytes;
 
-  //if( Position != NULL) {
-  //  CursorPos.Offset = (UINT64)*Position;
-
-  //  Status = Proto->SetCursorPosition(Proto,
-  //                                    (INTN)CursorPos.XYpos.Column,
-  //                                    (INTN)CursorPos.XYpos.Row);
-  //  if(RETURN_ERROR(Status)) {
-  //    return -1;
-  //  }
-  //}
 
   // Send the Unicode buffer to the console
   Status = Proto->OutputString( Proto, gMD->UString);
   // Depending on status, update BufferSize and return
   if(RETURN_ERROR(Status)) {
-    BufferSize = 0;    // We don't really know how many characters made it out
+    BufferSize = 0;     // We don't really know how many characters made it out
   }
   else {
-    //BufferSize = NumChar;
-    Stream->NumWritten += NumChar;
+    //BufferSize = NumBytes;
+    Stream->NumWritten += NumBytes;
   }
-  EFIerrno = Status;
+  EFIerrno = Status;      // Make error reason available to caller
   return BufferSize;
 }
 
@@ -342,7 +346,8 @@ da_ConStat(
     return -1;
   }
   // All of our parameters are correct, so fill in the information.
-  Buffer->st_blksize = 1;
+  Buffer->st_blksize  = 0;   // Character device, not a block device
+  Buffer->st_mode     = filp->f_iflags;
 
 // ConGetPosition
   if(Stream->InstanceNum == STDIN_FILENO) {
@@ -504,6 +509,7 @@ __Cons_construct(
 
     Stream->Cookie      = CON_COOKIE;
     Stream->InstanceNum = i;
+    Stream->CharState.A = 0;    // Start in the initial state
 
     switch(i) {
       case STDIN_FILENO:

@@ -25,6 +25,12 @@
   UseSocketDxe|StdLib/UseSocketDxe/UseSocketDxe.inf
 
 [LibraryClasses.Common.UEFI_APPLICATION]
+  ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
+  FileHandleLib|ShellPkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
+  SortLib|ShellPkg/Library/UefiSortLib/UefiSortLib.inf
+  PathLib|ShellPkg/Library/BasePathLib/BasePathLib.inf
+  ShellCEntryLib|ShellPkg/Library/UefiShellCEntryLib/UefiShellCEntryLib.inf
+
   #
   # C Standard Libraries
   #
