@@ -587,10 +587,10 @@ InitializeUsbMouseDevice (
         Start = TRUE;
       }
     }
-    if ((Start == TRUE) && (Head->Type == USB_DESC_TYPE_ENDPOINT)) {
+    if (Start && (Head->Type == USB_DESC_TYPE_ENDPOINT)) {
       break;
     }
-    if ((Start == TRUE) && (Head->Type == USB_DESC_TYPE_HID)) {
+    if (Start && (Head->Type == USB_DESC_TYPE_HID)) {
       MouseHidDesc = (EFI_USB_HID_DESCRIPTOR *)Head;
       break;
     }
