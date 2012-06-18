@@ -101,14 +101,15 @@ FpdtStatusCodeListenerSmm (
       // Try to allocate big SMRAM data to store Boot record. 
       //
       if (mSmramIsOutOfResource) {
+        ReleaseSpinLock (&mSmmFpdtLock);
         return EFI_OUT_OF_RESOURCES;
       }
-      NewRecordBuffer = AllocatePool (mBootRecordSize + Data->Size + EXTENSION_RECORD_SIZE); 
+      NewRecordBuffer = ReallocatePool (mBootRecordSize, mBootRecordSize + Data->Size + EXTENSION_RECORD_SIZE, mBootRecordBuffer); 
       if (NewRecordBuffer == NULL) {
+        ReleaseSpinLock (&mSmmFpdtLock);
         mSmramIsOutOfResource = TRUE;
         return EFI_OUT_OF_RESOURCES;
       }
-      CopyMem (NewRecordBuffer, mBootRecordBuffer, mBootRecordSize);
       mBootRecordBuffer  = NewRecordBuffer;
       mBootRecordMaxSize = mBootRecordSize + Data->Size + EXTENSION_RECORD_SIZE;
     }
