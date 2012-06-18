@@ -2,7 +2,7 @@
 PEIM to produce gPeiUsb2HostControllerPpiGuid based on gPeiUsbControllerPpiGuid
 which is used to enable recovery function from USB Drivers.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -401,6 +401,26 @@ EhcRunHC (
 }
 
 /**
+  Power On All EHCI Ports.
+  
+  @param  Ehc             The EHCI device.
+
+**/
+VOID
+EhcPowerOnAllPorts (
+  IN PEI_USB2_HC_DEV          *Ehc
+  )
+{
+  UINT8 PortNumber;
+  UINT8 Index;
+
+  PortNumber = (UINT8)(Ehc->HcStructParams & HCSP_NPORTS);
+  for (Index = 0; Index < PortNumber; Index++) {
+    EhcSetOpRegBit (Ehc, EHC_PORT_STAT_OFFSET + 4 * Index, PORTSC_POWER);
+  }
+}
+
+/**
   Initialize the HC hardware. 
   EHCI spec lists the five things to do to initialize the hardware.
   1. Program CTRLDSSEGMENT.
@@ -443,6 +463,9 @@ EhcInitHC (
   if (Ehc->Urb  == NULL) {
     return Status;
   }
+
+  EhcPowerOnAllPorts (Ehc);  
+  MicroSecondDelay (EHC_ROOT_PORT_RECOVERY_STALL);
   
   Status = EhcInitSched (Ehc);
 
