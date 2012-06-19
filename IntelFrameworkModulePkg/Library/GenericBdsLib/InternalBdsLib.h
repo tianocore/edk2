@@ -87,13 +87,28 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
 
-  Allocates a block of memory and writes performance data of booting into it.
-  OS can processing these record.
-  
+  Allocates a block of memory to store performance data.
+
 **/
 VOID
-WriteBootToOsPerformanceData (
+AllocateMemoryForPerformanceData (
   VOID
+  );
+
+/**
+
+  Writes performance data of booting into the allocated memory.
+  OS can process these records.
+
+  @param  Event                 The triggered event.
+  @param  Context               Context for this event.
+
+**/
+VOID
+EFIAPI
+WriteBootToOsPerformanceData (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
 
 /**

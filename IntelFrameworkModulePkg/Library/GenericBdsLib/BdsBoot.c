@@ -1664,6 +1664,7 @@ BdsLibDoLegacyBoot (
 {
   EFI_STATUS                Status;
   EFI_LEGACY_BIOS_PROTOCOL  *LegacyBios;
+  EFI_EVENT                 LegacyBootEvent;
 
   Status = gBS->LocateProtocol (&gEfiLegacyBiosProtocolGuid, NULL, (VOID **) &LegacyBios);
   if (EFI_ERROR (Status)) {
@@ -1681,7 +1682,16 @@ BdsLibDoLegacyBoot (
   // Write boot to OS performance data for legacy boot.
   //
   PERF_CODE (
-    WriteBootToOsPerformanceData ();
+    //
+    // Create an event to be signalled when Legacy Boot occurs to write performance data.
+    //
+    Status = EfiCreateEventLegacyBootEx(
+               TPL_NOTIFY,
+               WriteBootToOsPerformanceData,
+               NULL, 
+               &LegacyBootEvent
+               );
+    ASSERT_EFI_ERROR (Status);
   );
 
   DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Legacy Boot: %S\n", Option->Description));
@@ -2219,10 +2229,9 @@ BdsLibBootViaBootOption (
   LIST_ENTRY                TempBootLists;
   EFI_BOOT_LOGO_PROTOCOL    *BootLogo;
 
-  //
-  // Record the performance data for End of BDS
-  //
-  PERF_END(NULL, "BDS", NULL, 0);
+  PERF_CODE (
+    AllocateMemoryForPerformanceData ();
+  );
 
   *ExitDataSize = 0;
   *ExitData     = NULL;
@@ -2423,7 +2432,7 @@ BdsLibBootViaBootOption (
   // Write boot to OS performance data for UEFI boot
   //
   PERF_CODE (
-    WriteBootToOsPerformanceData ();
+    WriteBootToOsPerformanceData (NULL, NULL);
   );
 
   //
