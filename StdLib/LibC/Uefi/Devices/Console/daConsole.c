@@ -331,7 +331,7 @@ da_ConStat(
 {
   ConInstance                        *Stream;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *Proto;
-  XYoffset                            CursorPos;
+  XY_OFFSET                           CursorPos;
   INT32                               OutMode;
   UINTN                               ModeCol;
   UINTN                               ModeRow;
