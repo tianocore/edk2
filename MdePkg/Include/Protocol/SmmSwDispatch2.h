@@ -4,7 +4,7 @@
 
   This protocol provides the parent dispatch service for a given SMI source generator.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -64,10 +64,6 @@ typedef struct _EFI_SMM_SW_DISPATCH2_PROTOCOL  EFI_SMM_SW_DISPATCH2_PROTOCOL;
   SMI source specified by RegisterContext->SwSmiCpuIndex is detected. On return, 
   DispatchHandle contains a unique handle which may be used later to unregister the function 
   using UnRegister().
-
-  Note that the modifiers for the parameter RegisterContext are IN, OUT, while they are IN, CONST
-  in the PI 1.2 errta B spec. This in-consistency is for support for the case where SwSmiInputValue
-  is set to -1, a unique value will be returned in the RegisterContext structure.
 
   @param[in]  This                 Pointer to the EFI_SMM_SW_DISPATCH2_PROTOCOL instance.
   @param[in]  DispatchFunction     Function to register for handler when the specified software 
