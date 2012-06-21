@@ -30,7 +30,7 @@
 
 #if _MSC_EXTENSIONS 
   //
-  // use Microsoft* C complier dependent interger width types 
+  // use Microsoft* C complier dependent integer width types 
   //
   typedef unsigned __int64    UINT64;
   typedef __int64             INT64;

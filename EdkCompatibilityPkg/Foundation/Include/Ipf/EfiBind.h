@@ -153,7 +153,7 @@ Abstract:
     
 
     //
-    // use Microsoft C complier dependent interger width types 
+    // use Microsoft C complier dependent integer width types 
     //
     typedef unsigned __int64    uint64_t;
     typedef __int64             int64_t;

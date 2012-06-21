@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -147,7 +147,7 @@ Arguments:
 
 Returns:
   Return a positive integer if String is lexicall greater than String2; Zero if 
-  the two strings are identical; and a negative interger if String is lexically 
+  the two strings are identical; and a negative integer if String is lexically 
   less than String2.
 
 --*/
@@ -374,7 +374,7 @@ Arguments:
 
 Returns:
   Return a positive integer if String is lexicall greater than String2; Zero if 
-  the two strings are identical; and a negative interger if String is lexically 
+  the two strings are identical; and a negative integer if String is lexically 
   less than String2.
 --*/
 {
