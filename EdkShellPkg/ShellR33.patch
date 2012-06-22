@@ -3274,9 +3274,9 @@ diff --ignore-file-name-case -Naur ShellR33/Library/IA32/math.c GccShellR33/Libr
 -
 -  return Dividend;
 -}
-diff --ignore-file-name-case -Naur ShellR33/Library/Ia32/DivU64x32Remainder.S GccShellR33/Library/Ia32/DivU64x32Remainder.S
---- ShellR33/Library/Ia32/DivU64x32Remainder.S	1969-12-31 16:00:00.000000000 -0800
-+++ GccShellR33/Library/Ia32/DivU64x32Remainder.S	2009-10-13 20:18:23.000000000 -0700
+diff --ignore-file-name-case -Naur ShellR33/Library/IA32/DivU64x32Remainder.S GccShellR33/Library/IA32/DivU64x32Remainder.S
+--- ShellR33/Library/IA32/DivU64x32Remainder.S	1969-12-31 16:00:00.000000000 -0800
++++ GccShellR33/Library/IA32/DivU64x32Remainder.S	2009-10-13 20:18:23.000000000 -0700
 @@ -0,0 +1,58 @@
 +#------------------------------------------------------------------------------
 +#
@@ -3336,9 +3336,9 @@ diff --ignore-file-name-case -Naur ShellR33/Library/Ia32/DivU64x32Remainder.S Gc
 +L1:
 +    pop     %edx
 +    ret
-diff --ignore-file-name-case -Naur ShellR33/Library/Ia32/EfiLibPlat.h GccShellR33/Library/Ia32/EfiLibPlat.h
---- ShellR33/Library/Ia32/EfiLibPlat.h	1969-12-31 16:00:00.000000000 -0800
-+++ GccShellR33/Library/Ia32/EfiLibPlat.h	2009-11-10 11:17:48.000000000 -0800
+diff --ignore-file-name-case -Naur ShellR33/Library/IA32/EfiLibPlat.h GccShellR33/Library/IA32/EfiLibPlat.h
+--- ShellR33/Library/IA32/EfiLibPlat.h	1969-12-31 16:00:00.000000000 -0800
++++ GccShellR33/Library/IA32/EfiLibPlat.h	2009-11-10 11:17:48.000000000 -0800
 @@ -0,0 +1,37 @@
 +/*++
 +
@@ -3378,9 +3378,9 @@ diff --ignore-file-name-case -Naur ShellR33/Library/Ia32/EfiLibPlat.h GccShellR3
 +
 +#endif
 \ No newline at end of file
-diff --ignore-file-name-case -Naur ShellR33/Library/Ia32/initplat.c GccShellR33/Library/Ia32/initplat.c
---- ShellR33/Library/Ia32/initplat.c	1969-12-31 16:00:00.000000000 -0800
-+++ GccShellR33/Library/Ia32/initplat.c	2009-09-22 15:37:05.000000000 -0700
+diff --ignore-file-name-case -Naur ShellR33/Library/IA32/initplat.c GccShellR33/Library/IA32/initplat.c
+--- ShellR33/Library/IA32/initplat.c	1969-12-31 16:00:00.000000000 -0800
++++ GccShellR33/Library/IA32/initplat.c	2009-09-22 15:37:05.000000000 -0700
 @@ -0,0 +1,35 @@
 +/*++
 +
@@ -3417,9 +3417,9 @@ diff --ignore-file-name-case -Naur ShellR33/Library/Ia32/initplat.c GccShellR33/
 +{
 +  return;
 +}
-diff --ignore-file-name-case -Naur ShellR33/Library/Ia32/LShiftU64.S GccShellR33/Library/Ia32/LShiftU64.S
---- ShellR33/Library/Ia32/LShiftU64.S	1969-12-31 16:00:00.000000000 -0800
-+++ GccShellR33/Library/Ia32/LShiftU64.S	2009-09-22 15:37:05.000000000 -0700
+diff --ignore-file-name-case -Naur ShellR33/Library/IA32/LShiftU64.S GccShellR33/Library/IA32/LShiftU64.S
+--- ShellR33/Library/IA32/LShiftU64.S	1969-12-31 16:00:00.000000000 -0800
++++ GccShellR33/Library/IA32/LShiftU64.S	2009-09-22 15:37:05.000000000 -0700
 @@ -0,0 +1,53 @@
 +#------------------------------------------------------------------------------
 +#
@@ -3474,9 +3474,9 @@ diff --ignore-file-name-case -Naur ShellR33/Library/Ia32/LShiftU64.S GccShellR33
 +    shld    %cl, %eax, %edx
 +    shl     %cl, %eax
 +    ret
-diff --ignore-file-name-case -Naur ShellR33/Library/Ia32/math.c GccShellR33/Library/Ia32/math.c
---- ShellR33/Library/Ia32/math.c	1969-12-31 16:00:00.000000000 -0800
-+++ GccShellR33/Library/Ia32/math.c	2009-10-10 13:58:07.000000000 -0700
+diff --ignore-file-name-case -Naur ShellR33/Library/IA32/math.c GccShellR33/Library/IA32/math.c
+--- ShellR33/Library/IA32/math.c	1969-12-31 16:00:00.000000000 -0800
++++ GccShellR33/Library/IA32/math.c	2009-10-10 13:58:07.000000000 -0700
 @@ -0,0 +1,267 @@
 +/*++
 +
@@ -3745,9 +3745,9 @@ diff --ignore-file-name-case -Naur ShellR33/Library/Ia32/math.c GccShellR33/Libr
 +#endif
 +}
 +
-diff --ignore-file-name-case -Naur ShellR33/Library/Ia32/MultU64x32.S GccShellR33/Library/Ia32/MultU64x32.S
---- ShellR33/Library/Ia32/MultU64x32.S	1969-12-31 16:00:00.000000000 -0800
-+++ GccShellR33/Library/Ia32/MultU64x32.S	2009-09-22 15:37:05.000000000 -0700
+diff --ignore-file-name-case -Naur ShellR33/Library/IA32/MultU64x32.S GccShellR33/Library/IA32/MultU64x32.S
+--- ShellR33/Library/IA32/MultU64x32.S	1969-12-31 16:00:00.000000000 -0800
++++ GccShellR33/Library/IA32/MultU64x32.S	2009-09-22 15:37:05.000000000 -0700
 @@ -0,0 +1,53 @@
 +#------------------------------------------------------------------------------
 +#
@@ -3802,9 +3802,9 @@ diff --ignore-file-name-case -Naur ShellR33/Library/Ia32/MultU64x32.S GccShellR3
 +    mull    0x4(%esp)
 +    addl    %ecx, %edx
 +    ret
-diff --ignore-file-name-case -Naur ShellR33/Library/Ia32/RShiftU64.S GccShellR33/Library/Ia32/RShiftU64.S
---- ShellR33/Library/Ia32/RShiftU64.S	1969-12-31 16:00:00.000000000 -0800
-+++ GccShellR33/Library/Ia32/RShiftU64.S	2009-09-22 15:37:05.000000000 -0700
+diff --ignore-file-name-case -Naur ShellR33/Library/IA32/RShiftU64.S GccShellR33/Library/IA32/RShiftU64.S
+--- ShellR33/Library/IA32/RShiftU64.S	1969-12-31 16:00:00.000000000 -0800
++++ GccShellR33/Library/IA32/RShiftU64.S	2009-09-22 15:37:05.000000000 -0700
 @@ -0,0 +1,56 @@
 +#------------------------------------------------------------------------------
 +#
@@ -7046,7 +7046,7 @@ diff --ignore-file-name-case -Naur ShellR33/Ping/Ping.inf GccShellR33/Ping/Ping.
 -  EfiDriverLib
 +#  EfiDriverLib
  
- [libraries.Ia32]
+ [libraries.IA32]
    CpuIA32Lib
 diff --ignore-file-name-case -Naur ShellR33/reset/reset.inf GccShellR33/reset/reset.inf
 --- ShellR33/reset/reset.inf	2007-03-15 20:07:49.000000000 -0700
@@ -7474,13 +7474,13 @@ diff --ignore-file-name-case -Naur ShellR33/Shell.inf GccShellR33/Shell.inf
 -  ver\ia32\ver32.c
 -  Library\ia32\math.c
 -  Library\ia32\initplat.c
-+  ver/Ia32/ver32.c
-+  Library/Ia32/math.c
-+  Library/Ia32/initplat.c
-+  Library/Ia32/DivU64x32Remainder.S  | GCC
-+  Library/Ia32/LShiftU64.S           | GCC
-+  Library/Ia32/RShiftU64.S           | GCC
-+  Library/Ia32/MultU64x32.S          | GCC
++  ver/IA32/ver32.c
++  Library/IA32/math.c
++  Library/IA32/initplat.c
++  Library/IA32/DivU64x32Remainder.S  | GCC
++  Library/IA32/LShiftU64.S           | GCC
++  Library/IA32/RShiftU64.S           | GCC
++  Library/IA32/MultU64x32.S          | GCC
  
  
  [sources.ipf]
