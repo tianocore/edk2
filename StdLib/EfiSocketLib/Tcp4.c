@@ -790,6 +790,8 @@ EslTcp4Listen (
     //  Mark the socket as configured
     //
     pSocket->bConfigured = TRUE;
+    Status = EFI_SUCCESS;
+    pSocket->errno = 0;
 
     //
     //  All done
