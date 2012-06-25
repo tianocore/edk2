@@ -808,8 +808,6 @@ InitUSBKeyboard (
 {
   UINT16              ConfigValue;
   UINT8               Protocol;
-  UINT8               ReportId;
-  UINT8               Duration;
   EFI_STATUS          Status;
   UINT32              TransferResult;
 
@@ -873,23 +871,6 @@ InitUSBKeyboard (
       BOOT_PROTOCOL
       );
   }
-
-  //
-  // ReportId is zero, which means the idle rate applies to all input reports.
-  //
-  ReportId = 0;
-  //
-  // Duration is zero, which means the duration is infinite.
-  // so the endpoint will inhibit reporting forever,
-  // and only reporting when a change is detected in the report data.
-  //
-  Duration = 0;
-  UsbSetIdleRequest (
-    UsbKeyboardDevice->UsbIo,
-    UsbKeyboardDevice->InterfaceDescriptor.InterfaceNumber,
-    ReportId,
-    Duration
-    );
 
   UsbKeyboardDevice->CtrlOn     = FALSE;
   UsbKeyboardDevice->AltOn      = FALSE;

@@ -526,8 +526,6 @@ InitializeUsbMouseDevice (
   EFI_STATUS                Status;
   EFI_USB_HID_DESCRIPTOR    *MouseHidDesc;
   UINT8                     *ReportDesc;
-  UINT8                     ReportId;
-  UINT8                     Duration;
   EFI_USB_CONFIG_DESCRIPTOR ConfigDesc;
   VOID                      *Buf;
   UINT32                    TransferResult;
@@ -678,23 +676,6 @@ InitializeUsbMouseDevice (
       return Status;
     }
   }
-
-  //
-  // ReportId is zero, which means the idle rate applies to all input reports.
-  //
-  ReportId = 0;
-  //
-  // Duration is zero, which means the duration is infinite.
-  // so the endpoint will inhibit reporting forever,
-  // and only reporting when a change is detected in the report data.
-  //
-  Duration = 0;
-  UsbSetIdleRequest (
-    UsbIo,
-    UsbMouseDev->InterfaceDescriptor.InterfaceNumber,
-    ReportId,
-    Duration
-    );
 
   FreePool (Buf);
   FreePool (ReportDesc);
