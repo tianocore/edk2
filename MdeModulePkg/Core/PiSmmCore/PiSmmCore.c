@@ -76,7 +76,7 @@ BOOLEAN  mInLegacyBoot = FALSE;
 //
 SMM_CORE_SMI_HANDLERS  mSmmCoreSmiHandlers[] = {
   { SmmDriverDispatchHandler, &gEfiEventDxeDispatchGuid,          NULL, TRUE  },
-  { SmmReadyToLockHandler,    &gEfiDxeSmmReadyToLockProtocolGuid, NULL, FALSE }, 
+  { SmmReadyToLockHandler,    &gEfiDxeSmmReadyToLockProtocolGuid, NULL, TRUE }, 
   { SmmLegacyBootHandler,     &gEfiEventLegacyBootGuid,           NULL, FALSE },
   { NULL,                     NULL,                               NULL, FALSE }
 };
