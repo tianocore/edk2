@@ -670,6 +670,8 @@ Pkcs7Verify (
   if (!Status) {
     return Status;
   }
+
+  Status = FALSE;
   
   //
   // Retrieve PKCS#7 Data (DER encoding)
