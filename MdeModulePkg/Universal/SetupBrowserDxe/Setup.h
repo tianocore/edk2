@@ -574,6 +574,16 @@ typedef struct {
 
 #define BROWSER_HOT_KEY_FROM_LINK(a)  CR (a, BROWSER_HOT_KEY, Link, BROWSER_HOT_KEY_SIGNATURE)
 
+//
+// Scope for get defaut value. It may be GetDefaultForNoStorage, GetDefaultForStorage or GetDefaultForAll.
+//
+typedef enum {
+  GetDefaultForNoStorage,       // Get default value for question which not has storage.
+  GetDefaultForStorage,         // Get default value for question which has storage.
+  GetDefaultForAll,             // Get default value for all questions.
+  GetDefaultForMax              // Invalid value.
+} BROWSER_GET_DEFAULT_VALUE;
+
 extern EFI_HII_DATABASE_PROTOCOL         *mHiiDatabase;
 extern EFI_HII_STRING_PROTOCOL           *mHiiString;
 extern EFI_HII_CONFIG_ROUTING_PROTOCOL   *mHiiConfigRouting;
@@ -1063,10 +1073,14 @@ InitializeFormSet (
 /**
   Reset Questions to their default value in a Form, Formset or System.
 
+  GetDefaultValueScope parameter decides which questions will reset 
+  to its default value.
+
   @param  FormSet                FormSet data structure.
   @param  Form                   Form data structure.
   @param  DefaultId              The Class of the default.
   @param  SettingScope           Setting Scope for Default action.
+  @param  GetDefaultValueScope   Get default value scope.
   @param  Storage                Get default value only for this storage.
 
   @retval EFI_SUCCESS            The function completed successfully.
@@ -1079,6 +1093,7 @@ ExtractDefault (
   IN FORM_BROWSER_FORM                *Form,
   IN UINT16                           DefaultId,
   IN BROWSER_SETTING_SCOPE            SettingScope,
+  IN BROWSER_GET_DEFAULT_VALUE        GetDefaultValueScope,
   IN FORMSET_STORAGE                  *Storage OPTIONAL
   );
 

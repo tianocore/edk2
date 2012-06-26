@@ -2970,10 +2970,14 @@ GetQuestionDefault (
 /**
   Reset Questions to their default value in a Form, Formset or System.
 
+  GetDefaultValueScope parameter decides which questions will reset 
+  to its default value.
+
   @param  FormSet                FormSet data structure.
   @param  Form                   Form data structure.
   @param  DefaultId              The Class of the default.
   @param  SettingScope           Setting Scope for Default action.
+  @param  GetDefaultValueScope   Get default value scope.
   @param  Storage                Get default value only for this storage.
 
   @retval EFI_SUCCESS            The function completed successfully.
@@ -2986,6 +2990,7 @@ ExtractDefault (
   IN FORM_BROWSER_FORM                *Form,
   IN UINT16                           DefaultId,
   IN BROWSER_SETTING_SCOPE            SettingScope,
+  IN BROWSER_GET_DEFAULT_VALUE        GetDefaultValueScope,
   IN FORMSET_STORAGE                  *Storage OPTIONAL
   )
 {
@@ -3002,7 +3007,11 @@ ExtractDefault (
   //
   // Check the supported setting level.
   //
-  if (SettingScope >= MaxLevel) {
+  if (SettingScope >= MaxLevel || GetDefaultValueScope >= GetDefaultForMax) {
+    return EFI_UNSUPPORTED;
+  }
+
+  if (GetDefaultValueScope == GetDefaultForStorage && Storage == NULL) {
     return EFI_UNSUPPORTED;
   }
   
@@ -3018,7 +3027,14 @@ ExtractDefault (
       //
       // If get default value only for this storage, check the storage first.
       //
-      if ((Storage != NULL) && (Question->Storage != Storage)) {
+      if ((GetDefaultValueScope == GetDefaultForStorage) && (Question->Storage != Storage)) {
+        continue;
+      }
+
+      //
+      // If get default value only for no storage question, just skip the question which has storage.
+      //
+      if ((GetDefaultValueScope == GetDefaultForNoStorage) && (Question->Storage != NULL)) {
         continue;
       }
 
@@ -3055,7 +3071,7 @@ ExtractDefault (
     FormLink = GetFirstNode (&FormSet->FormListHead);
     while (!IsNull (&FormSet->FormListHead, FormLink)) {
       Form = FORM_BROWSER_FORM_FROM_LINK (FormLink);
-      ExtractDefault (FormSet, Form, DefaultId, FormLevel, Storage);
+      ExtractDefault (FormSet, Form, DefaultId, FormLevel, GetDefaultValueScope, Storage);
       FormLink = GetNextNode (&FormSet->FormListHead, FormLink);
     }
   } else if (SettingScope == SystemLevel) {
@@ -3126,7 +3142,7 @@ ExtractDefault (
     Link = GetFirstNode (&gBrowserFormSetList);
     while (!IsNull (&gBrowserFormSetList, Link)) {
       LocalFormSet = FORM_BROWSER_FORMSET_FROM_LINK (Link);
-      ExtractDefault (LocalFormSet, NULL, DefaultId, FormSetLevel, Storage);
+      ExtractDefault (LocalFormSet, NULL, DefaultId, FormSetLevel, GetDefaultValueScope, Storage);
       Link = GetNextNode (&gBrowserFormSetList, Link);
     }
   }
@@ -3412,6 +3428,11 @@ InitializeCurrentSetting (
   EFI_STATUS              Status;
 
   //
+  // Extract default from IFR binary for no storage questions.
+  //
+  ExtractDefault (FormSet, NULL, EFI_HII_DEFAULT_CLASS_STANDARD, FormSetLevel, GetDefaultForNoStorage, NULL);
+
+  //
   // Request current settings from Configuration Driver
   //
   Link = GetFirstNode (&FormSet->StorageListHead);
@@ -3446,7 +3467,7 @@ InitializeCurrentSetting (
         //
         // If get last time changed value failed, extract default from IFR binary
         //
-        ExtractDefault (FormSet, NULL, EFI_HII_DEFAULT_CLASS_STANDARD, FormSetLevel, Storage);
+        ExtractDefault (FormSet, NULL, EFI_HII_DEFAULT_CLASS_STANDARD, FormSetLevel, GetDefaultForStorage, Storage);
         //
         // ExtractDefault will set the NV flag to TRUE, so need this function to clean the flag
         // in current situation.

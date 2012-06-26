@@ -3787,7 +3787,7 @@ UiDisplayMenu (
       // Reterieve default setting. After it. NV flag will be showed.
       //
       if ((HotKey->Action & BROWSER_ACTION_DEFAULT) == BROWSER_ACTION_DEFAULT) {
-        Status = ExtractDefault (Selection->FormSet, Selection->Form, HotKey->DefaultId, gBrowserSettingScope, NULL);
+        Status = ExtractDefault (Selection->FormSet, Selection->Form, HotKey->DefaultId, gBrowserSettingScope, GetDefaultForAll, NULL);
         if (!EFI_ERROR (Status)) {
           Selection->Action = UI_ACTION_REFRESH_FORM;
           Selection->Statement = NULL;
@@ -3865,7 +3865,7 @@ UiDisplayMenu (
       //
       // Reset to default value for all forms in the whole system.
       //
-      Status = ExtractDefault (Selection->FormSet, NULL, DefaultId, FormSetLevel, NULL);
+      Status = ExtractDefault (Selection->FormSet, NULL, DefaultId, FormSetLevel, GetDefaultForAll, NULL);
 
       if (!EFI_ERROR (Status)) {
         Selection->Action = UI_ACTION_REFRESH_FORM;
