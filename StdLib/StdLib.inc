@@ -62,7 +62,7 @@
   DevShell|StdLib/LibC/Uefi/Devices/daShell.inf
   DevUtility|StdLib/LibC/Uefi/Devices/daUtility.inf
 
-[LibraryClasses.ARM.UEFI_APPLICATION]
+[LibraryClasses.ARM]
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
 [Components]
