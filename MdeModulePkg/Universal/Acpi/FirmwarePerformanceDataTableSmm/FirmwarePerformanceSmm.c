@@ -4,6 +4,13 @@
   This module registers report status code listener to collect performance data
   for SMM driver boot records and S3 Suspend Performance Record.
 
+  Caution: This module requires additional review when modified.
+  This driver will have external input - communicate buffer in SMM mode.
+  This external input must be validated carefully to avoid security issue like
+  buffer overflow, integer overflow.
+
+  FpdtSmiHandler() will receive untrusted input and do basic validation.
+
   Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -204,6 +211,9 @@ InternalIsAddressInSmram (
 
   This SMI handler provides services for report SMM boot records. 
 
+  Caution: This function may receive untrusted input.
+  Communicate buffer and buffer size are external input, so this function will do basic validation.
+
   @param[in]     DispatchHandle  The unique handle assigned to this handler by SmiHandlerRegister().
   @param[in]     RegisterContext Points to an optional handler context which was specified when the
                                  handler was registered.
@@ -211,10 +221,14 @@ InternalIsAddressInSmram (
                                  be conveyed from a non-SMM environment into an SMM environment.
   @param[in, out] CommBufferSize The size of the CommBuffer.
 
-  @retval EFI_SUCCESS            The interrupt was handled and quiesced. No other handlers should still be called.
-  @retval EFI_INVALID_PARAMETER  The interrupt parameter is not valid. 
-  @retval EFI_ACCESS_DENIED      The interrupt buffer can't be written. 
-  @retval EFI_UNSUPPORTED        The interrupt is not supported. 
+  @retval EFI_SUCCESS                         The interrupt was handled and quiesced. No other handlers 
+                                              should still be called.
+  @retval EFI_WARN_INTERRUPT_SOURCE_QUIESCED  The interrupt has been quiesced but other handlers should 
+                                              still be called.
+  @retval EFI_WARN_INTERRUPT_SOURCE_PENDING   The interrupt is still pending and other handlers should still 
+                                              be called.
+  @retval EFI_INTERRUPT_PENDING               The interrupt could not be quiesced.
+
 **/
 EFI_STATUS
 EFIAPI
@@ -227,14 +241,26 @@ FpdtSmiHandler (
 {
   EFI_STATUS                   Status;
   SMM_BOOT_RECORD_COMMUNICATE  *SmmCommData;
-  
-  ASSERT (CommBuffer != NULL);
-  if (CommBuffer == NULL || *CommBufferSize < sizeof (SMM_BOOT_RECORD_COMMUNICATE)) {
-    return EFI_INVALID_PARAMETER;
+
+  //
+  // If input is invalid, stop processing this SMI
+  //
+  if (CommBuffer == NULL || CommBufferSize == NULL) {
+    return EFI_SUCCESS;
   }
 
-  Status = EFI_SUCCESS;
+  if(*CommBufferSize < sizeof (SMM_BOOT_RECORD_COMMUNICATE)) {
+    return EFI_SUCCESS;
+  }
+  
+  if (InternalIsAddressInSmram ((EFI_PHYSICAL_ADDRESS)(UINTN)CommBuffer, *CommBufferSize)) {
+    DEBUG ((EFI_D_ERROR, "SMM communication data buffer is in SMRAM!\n"));
+    return EFI_SUCCESS;
+  }
+
   SmmCommData = (SMM_BOOT_RECORD_COMMUNICATE*)CommBuffer;
+
+  Status = EFI_SUCCESS;
 
   switch (SmmCommData->Function) {
     case SMM_FPDT_FUNCTION_GET_BOOT_RECORD_SIZE :
@@ -246,13 +272,13 @@ FpdtSmiHandler (
          Status = EFI_INVALID_PARAMETER;
          break;
        } 
-	   
+
        //
        // Sanity check
        //
        SmmCommData->BootRecordSize = mBootRecordSize;
        if (InternalIsAddressInSmram ((EFI_PHYSICAL_ADDRESS)(UINTN)SmmCommData->BootRecordData, mBootRecordSize)) {
-         DEBUG ((EFI_D_ERROR, "Smm Data buffer is in SMRAM!\n"));
+         DEBUG ((EFI_D_ERROR, "SMM Data buffer is in SMRAM!\n"));
          Status = EFI_ACCESS_DENIED;
          break;
        }
@@ -265,11 +291,11 @@ FpdtSmiHandler (
        break;
 
     default:
-       ASSERT (FALSE);
        Status = EFI_UNSUPPORTED;
   }
 
   SmmCommData->ReturnStatus = Status;
+  
   return EFI_SUCCESS;
 }
 
