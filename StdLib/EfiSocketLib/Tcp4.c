@@ -1157,9 +1157,9 @@ EslTcp4LocalAddressSet (
     }
     else {
       pAccessPoint->SubnetMask.Addr[0] = 0xff;
-      pAccessPoint->SubnetMask.Addr[1] = 0xff;
-      pAccessPoint->SubnetMask.Addr[2] = 0xff;
-      pAccessPoint->SubnetMask.Addr[3] = 0xff;
+      pAccessPoint->SubnetMask.Addr[1] = ( 128 <= pAccessPoint->StationAddress.Addr[0]) ? 0xff : 0;
+      pAccessPoint->SubnetMask.Addr[2] = ( 192 <= pAccessPoint->StationAddress.Addr[0]) ? 0xff : 0;
+      pAccessPoint->SubnetMask.Addr[3] = ( 224 <= pAccessPoint->StationAddress.Addr[0]) ? 0xff : 0;
     }
 
     //

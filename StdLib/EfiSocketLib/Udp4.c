@@ -131,9 +131,9 @@ EslUdp4LocalAddressSet (
     }
     else {
       pConfig->SubnetMask.Addr[0] = 0xff;
-      pConfig->SubnetMask.Addr[1] = 0xff;
-      pConfig->SubnetMask.Addr[2] = 0xff;
-      pConfig->SubnetMask.Addr[3] = 0xff;
+      pConfig->SubnetMask.Addr[1] = ( 128 <= pConfig->StationAddress.Addr[0]) ? 0xff : 0;
+      pConfig->SubnetMask.Addr[2] = ( 192 <= pConfig->StationAddress.Addr[0]) ? 0xff : 0;
+      pConfig->SubnetMask.Addr[3] = ( 224 <= pConfig->StationAddress.Addr[0]) ? 0xff : 0;
     }
 
     //
