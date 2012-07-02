@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # X64 assembly file for AP startup vector.
 #
-# Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -134,11 +134,21 @@ LongModeStart:
         #
         movl        $0x1b, %ecx
         rdmsr
+
+        btl         $10, %eax         # Check for x2apic mode
+        jnc         LegacyApicMode
+        movl        $0x802, %ecx      # Read APIC_ID
+        rdmsr
+        movl        %eax, %ebx        # ebx == apicid
+        jmp         GetCpuNumber
+
+LegacyApicMode:
         andl        $0xfffff000, %eax
         addl        $0x20, %eax
         movl        (%eax), %ebx
-        shrl        $24, %ebx
+        shrl        $24, %ebx         # ebx == apicid
         
+GetCpuNumber:        
         xorq        %rcx, %rcx
         movl        %esi,%edi
         addl        $ProcessorNumberLocation, %edi
