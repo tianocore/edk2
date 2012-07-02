@@ -1074,7 +1074,7 @@ PlatformBdsEnterFrontPage (
     Status = ShowProgress (TimeoutDefault);
     StatusHotkey = HotkeyBoot ();
 
-    if (!FeaturePcdGet(PcdBootlogoOnlyEnable) || !EFI_ERROR(StatusHotkey)){
+    if (!FeaturePcdGet(PcdBootlogoOnlyEnable) || !EFI_ERROR(Status) || !EFI_ERROR(StatusHotkey)){
       //
       // Ensure screen is clear when switch Console from Graphics mode to Text mode
       // Skip it in normal boot 
