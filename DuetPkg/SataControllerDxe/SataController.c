@@ -920,6 +920,7 @@ IdeInitCalculateMode (
 
   *SupportedModes = AllocateZeroPool (sizeof (EFI_ATA_COLLECTIVE_MODE));
   if (*SupportedModes == NULL) {
+    ASSERT (*SupportedModes != NULL);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -931,6 +932,7 @@ IdeInitCalculateMode (
   // Make sure we've got the valid identify data of the device from SubmitData()
   //
   if (!IdentifyValid) {
+    FreePool (*SupportedModes);
     return EFI_NOT_READY;
   }
 
