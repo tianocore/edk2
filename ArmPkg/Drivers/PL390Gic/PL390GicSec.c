@@ -109,6 +109,19 @@ ArmGicEnableInterruptInterface (
 
 VOID
 EFIAPI
+ArmGicDisableInterruptInterface (
+  IN  INTN          GicInterruptInterfaceBase
+  )
+{
+  UINT32    ControlValue;
+
+  // Disable CPU interface in Secure world and Non-secure World
+  ControlValue = MmioRead32 (GicInterruptInterfaceBase + ARM_GIC_ICCICR);
+  MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCICR, ControlValue & ~(ARM_GIC_ICCICR_ENABLE_SECURE | ARM_GIC_ICCICR_ENABLE_NS));
+}
+
+VOID
+EFIAPI
 ArmGicEnableDistributor (
   IN  INTN          GicDistributorBase
   )
