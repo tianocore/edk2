@@ -38,6 +38,9 @@ ASM_PFX(_ModuleEntryPoint):
   // Ensure that the MMU and caches are off
   bl    ASM_PFX(ArmDisableCachesAndMmu)
 
+  // By default, we are doing a cold boot
+  mov   r10, #ARM_SEC_COLD_BOOT
+
   // Jump to Platform Specific Boot Action function
   blx   ASM_PFX(ArmPlatformSecBootAction)
 
@@ -59,6 +62,11 @@ _IdentifyCpu:
   beq   _InitMem
   
 _WaitInitMem:
+  // If we are not doing a cold boot in this case we should assume the Initial Memory to be already initialized
+  // Otherwise we have to wait the Primary Core to finish the initialization
+  cmp   r10, #ARM_SEC_COLD_BOOT
+  bne   _SetupSecondaryCoreStack
+
   // Wait for the primary core to initialize the initial memory (event: BOOT_MEM_INIT)
   bl    ASM_PFX(ArmCallWFE)
   // Now the Init Mem is initialized, we setup the secondary core stacks
@@ -108,7 +116,9 @@ _PrepareArguments:
   
   // Jump to SEC C code
   //    r0 = mp_id
+  //    r1 = Boot Mode
   mov   r0, r5
+  mov   r1, r10
   blx   r3
   
 _NeverReturn:

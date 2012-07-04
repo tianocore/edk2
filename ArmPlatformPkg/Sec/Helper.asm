@@ -20,17 +20,18 @@
 
 // r0: Monitor World EntryPoint
 // r1: MpId
-// r2: Secure Monitor mode stack
-enter_monitor_mode
-    cmp     r2, #0                      // If a Secure Monitor stack base has not been defined then use the Secure stack
-    moveq   r2, sp
+// r2: SecBootMode
+// r3: Secure Monitor mode stack
+enter_monitor_mode FUNCTION
+    cmp     r3, #0                      // If a Secure Monitor stack base has not been defined then use the Secure stack
+    moveq   r3, sp
 
     mrs     r4, cpsr                    // Save current mode (SVC) in r4
-    bic     r3, r4, #0x1f               // Clear all mode bits
-    orr     r3, r3, #0x16               // Set bits for Monitor mode
-    msr     cpsr_cxsf, r3               // We are now in Monitor Mode
+    bic     r5, r4, #0x1f               // Clear all mode bits
+    orr     r5, r5, #0x16               // Set bits for Monitor mode
+    msr     cpsr_cxsf, r5               // We are now in Monitor Mode
 
-    mov     sp, r2                      // Set the stack of the Monitor Mode
+    mov     sp, r3                      // Set the stack of the Monitor Mode
 
     mov     lr, r0                      // Use the pass entrypoint as lr
     
@@ -38,8 +39,11 @@ enter_monitor_mode
 
     mov     r4, r0                      // Swap EntryPoint and MpId registers
     mov     r0, r1
+    mov     r1, r2
+    mov     r2, r3
 
     bx      r4
+    ENDFUNC
 
 // We cannot use the instruction 'movs pc, lr' because the caller can be written either in ARM or Thumb2 assembler.
 // When we will jump into this function, we will set the CPSR flag to ARM assembler. By copying directly 'lr' into

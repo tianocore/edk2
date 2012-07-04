@@ -15,6 +15,10 @@
 #ifndef _ARMPLATFORMSECLIB_H_
 #define _ARMPLATFORMSECLIB_H_
 
+#define ARM_SEC_BOOT_MASK                 ~0
+#define ARM_SEC_COLD_BOOT                 (1 << 0)
+#define ARM_SEC_SECONDARY_COLD_BOOT       (1 << 1)
+
 /**
   Initialize the memory where the initial stacks will reside
 

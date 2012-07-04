@@ -28,7 +28,8 @@
 
 VOID
 TrustedWorldInitialization (
-  IN  UINTN                 MpId
+  IN  UINTN                     MpId,
+  IN  UINTN                     SecBootMode
   );
 
 VOID
@@ -53,7 +54,8 @@ VOID
 enter_monitor_mode (
   IN UINTN                  MonitorEntryPoint,
   IN UINTN                  MpId,
-  IN VOID*                  Stack
+  IN UINTN                  SecBootMode,
+  IN VOID*                  MonitorStackBase
   );
 
 VOID
