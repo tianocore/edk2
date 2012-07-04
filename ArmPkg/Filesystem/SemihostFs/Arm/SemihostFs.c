@@ -263,18 +263,22 @@ FileDelete (
 
   Fcb = SEMIHOST_FCB_FROM_THIS(File);
 
-  // Get the filename from the Fcb
-  NameSize = AsciiStrLen (Fcb->FileName);
-  FileName = AllocatePool (NameSize + 1);
+  if (!Fcb->IsRoot) {
+    // Get the filename from the Fcb
+    NameSize = AsciiStrLen (Fcb->FileName);
+    FileName = AllocatePool (NameSize + 1);
 
-  AsciiStrCpy (FileName, Fcb->FileName);
+    AsciiStrCpy (FileName, Fcb->FileName);
 
-  // Close the file if it's open.  Disregard return status,
-  // since it might give an error if the file isn't open.
-  File->Close (File);
-    
-  // Call the semihost interface to delete the file.
-  Status = SemihostFileRemove (FileName);
+    // Close the file if it's open.  Disregard return status,
+    // since it might give an error if the file isn't open.
+    File->Close (File);
+
+    // Call the semihost interface to delete the file.
+    Status = SemihostFileRemove (FileName);
+  } else {
+    Status = EFI_UNSUPPORTED;
+  }
 
   return Status;
 }
@@ -358,14 +362,19 @@ FileSetPosition (
 
   Fcb = SEMIHOST_FCB_FROM_THIS(File);
 
-  Status = SemihostFileLength (Fcb->SemihostHandle, &Length);
-  if (!EFI_ERROR(Status) && (Length < Position)) {
-    Position = Length;
-  }
+  if (!Fcb->IsRoot) {
+    Status = SemihostFileLength (Fcb->SemihostHandle, &Length);
+    if (!EFI_ERROR(Status) && (Length < Position)) {
+      Position = Length;
+    }
 
-  Status = SemihostFileSeek (Fcb->SemihostHandle, (UINT32)Position);
-  if (!EFI_ERROR(Status)) {
+    Status = SemihostFileSeek (Fcb->SemihostHandle, (UINT32)Position);
+    if (!EFI_ERROR(Status)) {
+      Fcb->Position = Position;
+    }
+  } else {
     Fcb->Position = Position;
+    Status = EFI_SUCCESS;
   }
 
   return Status;
