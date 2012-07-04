@@ -23,6 +23,7 @@
 #include <Library/PerformanceLib.h>
 
 #include <Ppi/GuidedSectionExtraction.h>
+#include <Ppi/ArmMpCoreInfo.h>
 #include <Guid/LzmaDecompress.h>
 #include <Guid/ArmGlobalVariableHob.h>
 
@@ -70,6 +71,30 @@ BuildGlobalVariableHob (
   Hob->GlobalVariableSize = GlobalVariableSize;
 }
 
+EFI_STATUS
+GetPlatformPpi (
+  IN  EFI_GUID  *PpiGuid,
+  OUT VOID      **Ppi
+  )
+{
+  UINTN                   PpiListSize;
+  UINTN                   PpiListCount;
+  EFI_PEI_PPI_DESCRIPTOR  *PpiList;
+  UINTN                   Index;
+
+  PpiListSize = 0;
+  ArmPlatformGetPlatformPpiList (&PpiListSize, &PpiList);
+  PpiListCount = PpiListSize / sizeof(EFI_PEI_PPI_DESCRIPTOR);
+  for (Index = 0; Index < PpiListCount; Index++, PpiList++) {
+    if (CompareGuid (PpiList->Guid, PpiGuid) == TRUE) {
+      *Ppi = PpiList->Ppi;
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_NOT_FOUND;
+}
+
 VOID
 PrePiMain (
   IN  UINTN                     UefiMemoryBase,
@@ -79,6 +104,9 @@ PrePiMain (
   )
 {
   EFI_HOB_HANDOFF_INFO_TABLE*   HobList;
+  ARM_MP_CORE_INFO_PPI*         ArmMpCoreInfoPpi;
+  UINTN                         ArmCoreCount;
+  ARM_CORE_INFO*                ArmCoreInfoTable;
   EFI_STATUS                    Status;
   CHAR8                         Buffer[100];
   UINTN                         CharCount;
@@ -132,6 +160,22 @@ PrePiMain (
 
   //TODO: Call CpuPei as a library
   BuildCpuHob (PcdGet8 (PcdPrePiCpuMemorySize), PcdGet8 (PcdPrePiCpuIoSize));
+
+  if (ArmIsMpCore ()) {
+    // Only MP Core platform need to produce gArmMpCoreInfoPpiGuid
+    Status = GetPlatformPpi (&gArmMpCoreInfoPpiGuid, (VOID**)&ArmMpCoreInfoPpi);
+
+    // On MP Core Platform we must implement the ARM MP Core Info PPI (gArmMpCoreInfoPpiGuid)
+    ASSERT_EFI_ERROR (Status);
+
+    // Build the MP Core Info Table
+    ArmCoreCount = 0;
+    Status = ArmMpCoreInfoPpi->GetMpCoreInfo (&ArmCoreCount, &ArmCoreInfoTable);
+    if (!EFI_ERROR(Status) && (ArmCoreCount > 0)) {
+      // Build MPCore Info HOB
+      BuildGuidDataHob (&gArmMpCoreInfoGuid, ArmCoreInfoTable, sizeof (ARM_CORE_INFO) * ArmCoreCount);
+    }
+  }
 
   // Set the Boot Mode
   SetBootMode (ArmPlatformGetBootMode ());

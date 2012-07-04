@@ -18,30 +18,6 @@
 
 #include <Ppi/ArmMpCoreInfo.h>
 
-EFI_STATUS
-GetPlatformPpi (
-  IN  EFI_GUID  *PpiGuid,
-  OUT VOID      **Ppi
-  )
-{
-  UINTN                   PpiListSize;
-  UINTN                   PpiListCount;
-  EFI_PEI_PPI_DESCRIPTOR  *PpiList;
-  UINTN                   Index;
-
-  PpiListSize = 0;
-  ArmPlatformGetPlatformPpiList (&PpiListSize, &PpiList);
-  PpiListCount = PpiListSize / sizeof(EFI_PEI_PPI_DESCRIPTOR);
-  for (Index = 0; Index < PpiListCount; Index++, PpiList++) {
-    if (CompareGuid (PpiList->Guid, PpiGuid) == TRUE) {
-      *Ppi = PpiList->Ppi;
-      return EFI_SUCCESS;
-    }
-  }
-
-  return EFI_NOT_FOUND;
-}
-
 VOID
 PrimaryMain (
   IN  UINTN                     UefiMemoryBase,
@@ -50,15 +26,6 @@ PrimaryMain (
   IN  UINT64                    StartTimeStamp
   )
 {
-  // On MP Core Platform we must implement the ARM MP Core Info PPI (gArmMpCoreInfoPpiGuid)
-  DEBUG_CODE_BEGIN();
-    EFI_STATUS              Status;
-    ARM_MP_CORE_INFO_PPI    *ArmMpCoreInfoPpi;
-
-    Status = GetPlatformPpi (&gArmMpCoreInfoPpiGuid, (VOID**)&ArmMpCoreInfoPpi);
-    ASSERT_EFI_ERROR (Status);
-  DEBUG_CODE_END();
-
   // Check PcdGicPrimaryCoreId has been set in case the Primary Core is not the core 0 of Cluster 0
   DEBUG_CODE_BEGIN();
   if ((PcdGet32(PcdArmPrimaryCore) != 0) && (PcdGet32 (PcdGicPrimaryCoreId) == 0)) {
@@ -69,7 +36,7 @@ PrimaryMain (
   // Enable the GIC Distributor
   ArmGicEnableDistributor(PcdGet32(PcdGicDistributorBase));
 
-  // In some cases, the secondary cores are waiting for an SGI from the next stage boot loader toresume their initialization
+  // In some cases, the secondary cores are waiting for an SGI from the next stage boot loader to resume their initialization
   if (!FixedPcdGet32(PcdSendSgiToBringUpSecondaryCores)) {
     // Sending SGI to all the Secondary CPU interfaces
     ArmGicSendSgiTo (PcdGet32(PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E, PcdGet32 (PcdGicSgiIntId));

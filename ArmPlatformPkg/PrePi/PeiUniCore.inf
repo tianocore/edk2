@@ -55,11 +55,12 @@
   PlatformPeiLib
   MemoryInitPeiLib
 
-[Guids]
-  gArmGlobalVariableGuid
+[Ppis]
+  gArmMpCoreInfoPpiGuid
 
 [Guids]
   gArmGlobalVariableGuid
+  gArmMpCoreInfoGuid
 
 [FeaturePcd]  
   gEmbeddedTokenSpaceGuid.PcdCacheEnable

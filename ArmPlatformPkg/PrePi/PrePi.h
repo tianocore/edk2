@@ -81,4 +81,10 @@ BuildMemoryTypeInformationHob (
   VOID
   );
 
+EFI_STATUS
+GetPlatformPpi (
+  IN  EFI_GUID  *PpiGuid,
+  OUT VOID      **Ppi
+  );
+
 #endif /* _PREPI_H_ */

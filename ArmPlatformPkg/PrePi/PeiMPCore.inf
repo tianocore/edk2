@@ -61,6 +61,7 @@
 
 [Guids]
   gArmGlobalVariableGuid
+  gArmMpCoreInfoGuid
 
 [FeaturePcd]  
   gEmbeddedTokenSpaceGuid.PcdCacheEnable
