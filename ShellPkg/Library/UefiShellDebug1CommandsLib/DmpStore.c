@@ -145,6 +145,7 @@ ProcessVariables (
         STRING_TOKEN(STR_DMPSTORE_DELETE_DONE),
         gShellDebug1HiiHandle,
         gRT->SetVariable(FoundVarName, &FoundVarGuid, Atts, 0, NULL));
+        FoundVarName[0] = CHAR_NULL;
     }
   }
 
