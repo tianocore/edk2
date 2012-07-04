@@ -49,6 +49,9 @@
 [FixedPcd.common]
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
+  
+  gArmTokenSpaceGuid.PcdArmPrimaryCore
+  gArmTokenSpaceGuid.PcdGicPrimaryCoreId
 
 [Depex]
   gEfiCpuArchProtocolGuid
