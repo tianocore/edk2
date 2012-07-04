@@ -56,7 +56,7 @@ CEntryPoint (
   ArmPlatformSecInitialize (MpId);
 
   // Primary CPU clears out the SCU tag RAMs, secondaries wait
-  if (IS_PRIMARY_CORE(MpId)) {
+  if (IS_PRIMARY_CORE(MpId) && (SecBootMode == ARM_SEC_COLD_BOOT)) {
     if (ArmIsMpCore()) {
       // Signal for the initial memory is configured (event: BOOT_MEM_INIT)
       ArmCallSEV ();
@@ -150,17 +150,19 @@ TrustedWorldInitialization (
   ArmPlatformSecTrustzoneInit (MpId);
 
   // Setup the Trustzone Chipsets
-  if (IS_PRIMARY_CORE(MpId)) {
-    if (ArmIsMpCore()) {
-      // Signal the secondary core the Security settings is done (event: EVENT_SECURE_INIT)
-      ArmCallSEV ();
-    }
-  } else if ((SecBootMode & ARM_SEC_BOOT_MASK) == ARM_SEC_COLD_BOOT) {
-    // The secondary cores need to wait until the Trustzone chipsets configuration is done
-    // before switching to Non Secure World
+  if (SecBootMode == ARM_SEC_COLD_BOOT) {
+    if (IS_PRIMARY_CORE(MpId)) {
+      if (ArmIsMpCore()) {
+        // Signal the secondary core the Security settings is done (event: EVENT_SECURE_INIT)
+        ArmCallSEV ();
+      }
+    } else {
+      // The secondary cores need to wait until the Trustzone chipsets configuration is done
+      // before switching to Non Secure World
 
-    // Wait for the Primary Core to finish the initialization of the Secure World (event: EVENT_SECURE_INIT)
-    ArmCallWFE ();
+      // Wait for the Primary Core to finish the initialization of the Secure World (event: EVENT_SECURE_INIT)
+      ArmCallWFE ();
+    }
   }
 
   // Call the Platform specific function to execute additional actions if required

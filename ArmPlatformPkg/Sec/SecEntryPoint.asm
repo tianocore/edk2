@@ -75,6 +75,10 @@ _WaitInitMem
   b     _SetupSecondaryCoreStack
   
 _InitMem
+  // If we are not doing a cold boot in this case we should assume the Initial Memory to be already initialized
+  cmp   r10, #ARM_SEC_COLD_BOOT
+  bne   _SetupPrimaryCoreStack
+
   // Initialize Init Boot Memory
   bl    ArmPlatformSecBootMemoryInit
   
