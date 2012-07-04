@@ -58,3 +58,5 @@ PL35xSmcSetRefresh
   str   r2, [r1, #PL350_SMC_REFRESH_0_OFFSET]
   str   r3, [r1, #PL350_SMC_REFRESH_1_OFFSET]
   blx lr
+
+  END

@@ -54,3 +54,5 @@ ArmPlatformSecBootAction
 ArmPlatformSecBootMemoryInit
   // The SMC does not need to be initialized for RTSM
   bx    lr
+
+  END

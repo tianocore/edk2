@@ -36,7 +36,7 @@ _ModuleEntryPoint
 
 _SetSVCMode
   // Enter SVC mode, Disable FIQ and IRQ
-  mov     r1, #0x13|0x80|0x40
+  mov     r1, #0x13 :OR: 0x80 :OR: 0x40
   msr     CPSR_c, r1
 
 // Check if we can install the stack at the top of the System Memory or if we need

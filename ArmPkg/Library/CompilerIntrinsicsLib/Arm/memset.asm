@@ -55,3 +55,5 @@ __aeabi_memclr4
   mov   r2, r1
   mov   r1, #0
   b     __aeabi_memset
+
+  END

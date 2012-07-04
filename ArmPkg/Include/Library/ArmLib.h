@@ -95,12 +95,12 @@ typedef enum {
 //
 // ARM Cpu IDs
 //
-#define ARM_CPU_IMPLEMENTER_MASK          (0xFF << 24)
-#define ARM_CPU_IMPLEMENTER_ARMLTD        (0x41 << 24)
-#define ARM_CPU_IMPLEMENTER_DEC           (0x44 << 24)
-#define ARM_CPU_IMPLEMENTER_MOT           (0x4D << 24)
-#define ARM_CPU_IMPLEMENTER_QUALCOMM      (0x51 << 24)
-#define ARM_CPU_IMPLEMENTER_MARVELL       (0x56 << 24)
+#define ARM_CPU_IMPLEMENTER_MASK          (0xFFU << 24)
+#define ARM_CPU_IMPLEMENTER_ARMLTD        (0x41U << 24)
+#define ARM_CPU_IMPLEMENTER_DEC           (0x44U << 24)
+#define ARM_CPU_IMPLEMENTER_MOT           (0x4DU << 24)
+#define ARM_CPU_IMPLEMENTER_QUALCOMM      (0x51U << 24)
+#define ARM_CPU_IMPLEMENTER_MARVELL       (0x56U << 24)
 
 #define ARM_CPU_PRIMARY_PART_MASK         (0xFFF << 4)
 #define ARM_CPU_PRIMARY_PART_CORTEXA5     (0xC05 << 4)
