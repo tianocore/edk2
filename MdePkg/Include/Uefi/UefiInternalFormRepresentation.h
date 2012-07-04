@@ -675,7 +675,7 @@ typedef union {
   EFI_HII_DATE    date;
   EFI_STRING_ID   string; ///< EFI_IFR_TYPE_STRING, EFI_IFR_TYPE_ACTION
   EFI_HII_REF     ref;    ///< EFI_IFR_TYPE_REF
-  // UINT8 buffer[];      ///< EFI_IFR_TYPE_ORDERED_LIST
+  // UINT8 buffer[];      ///< EFI_IFR_TYPE_BUFFER
 } EFI_IFR_TYPE_VALUE;
 
 //
