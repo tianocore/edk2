@@ -99,7 +99,7 @@ _SetupSecondaryCoreStack:
   add   r1, r1, r2
 
   // Get the Core Position (ClusterId * 4) + CoreId
-  GetCorePositionInStack(r0, r5, r2)
+  GetCorePositionFromMpId(r0, r5, r2)
   // The stack starts at the top of the stack region. Add '1' to the Core Position to get the top of the stack
   add   r0, r0, #1
 

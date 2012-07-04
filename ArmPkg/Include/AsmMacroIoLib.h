@@ -122,7 +122,7 @@
 
 // Convert the (ClusterId,CoreId) into a Core Position
 // We assume there are 4 cores per cluster
-#define GetCorePositionInStack(Pos, MpId, Tmp) \
+#define GetCorePositionFromMpId(Pos, MpId, Tmp) \
   lsr   Pos, MpId, #6 ;                        \
   and   Tmp, MpId, #3 ;                        \
   add   Pos, Pos, Tmp
@@ -193,7 +193,7 @@ _SetPrimaryStackEnd:
 #define LoadConstantToReg(Data, Reg) \
   ldr  Reg, =Data
   
-#define GetCorePositionInStack(Pos, MpId, Tmp) \
+#define GetCorePositionFromMpId(Pos, MpId, Tmp) \
   lsr   Pos, MpId, #6 ;                        \
   and   Tmp, MpId, #3 ;                        \
   add   Pos, Pos, Tmp
@@ -274,7 +274,7 @@ _SetPrimaryStackEnd:
 // conditional load testing eq flag
 #define LoadConstantToRegIfEq(Data, Reg)  LoadConstantToRegIfEqMacro Data, Reg
 
-#define GetCorePositionInStack(Pos, MpId, Tmp)  GetCorePositionInStack Pos, MpId, Tmp
+#define GetCorePositionFromMpId(Pos, MpId, Tmp)  GetCorePositionFromMpId Pos, MpId, Tmp
 
 #define SetPrimaryStack(StackTop,GlobalSize,Tmp) SetPrimaryStack StackTop, GlobalSize, Tmp
 

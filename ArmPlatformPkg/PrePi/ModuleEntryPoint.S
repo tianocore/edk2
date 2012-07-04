@@ -131,7 +131,7 @@ _SetupSecondaryCoreStack:
   // r1 = The base of the secondary Stacks
 
   // Get the position of the cores (ClusterId * 4) + CoreId
-  GetCorePositionInStack(r0, r5, r4)
+  GetCorePositionFromMpId(r0, r5, r4)
   // The stack starts at the top of the stack region. Add '1' to the Core Position to get the top of the stack
   add   r0, r0, #1
   // Get the offset for the Secondary Stack
