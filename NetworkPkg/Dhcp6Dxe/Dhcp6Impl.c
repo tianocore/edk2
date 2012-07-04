@@ -1,7 +1,7 @@
 /** @file
   This EFI_DHCP6_PROTOCOL interface implementation.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -200,13 +200,13 @@ EfiDhcp6Stop (
   ASSERT (Instance->IaCb.Ia != NULL);
 
   //
-  // The instance has already been stopped.
+  // No valid REPLY message received yet, cleanup this instance directly.
   //
   if (Instance->IaCb.Ia->State == Dhcp6Init ||
       Instance->IaCb.Ia->State == Dhcp6Selecting ||
       Instance->IaCb.Ia->State == Dhcp6Requesting
       ) {
-    return Status;
+    goto ON_EXIT;
   }
 
   //
@@ -215,7 +215,10 @@ EfiDhcp6Stop (
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   Instance->UdpSts = EFI_ALREADY_STARTED;
-  Dhcp6SendReleaseMsg (Instance, Instance->IaCb.Ia);
+  Status = Dhcp6SendReleaseMsg (Instance, Instance->IaCb.Ia);
+  if (EFI_ERROR (Status)) {
+    goto ON_EXIT;
+  }
 
   gBS->RestoreTPL (OldTpl);
 
@@ -229,7 +232,8 @@ EfiDhcp6Stop (
     }
     Status = Instance->UdpSts;
   }
-
+  
+ON_EXIT:
   //
   // Clean up the session data for the released Ia.
   //

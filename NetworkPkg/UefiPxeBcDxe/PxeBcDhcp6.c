@@ -1260,6 +1260,8 @@ PxeBcRegisterIp6Address (
   EFI_EVENT                        TimeOutEvt;
   EFI_EVENT                        MappedEvt;
   EFI_STATUS                       Status;
+  UINT64                           DadTriggerTime;
+  EFI_IP6_CONFIG_DUP_ADDR_DETECT_TRANSMITS    DadXmits;
 
   Status     = EFI_SUCCESS;
   TimeOutEvt = NULL;
@@ -1300,6 +1302,20 @@ PxeBcRegisterIp6Address (
     // There is no need to recover later.
     //
     Private->Ip6Policy = PXEBC_IP6_POLICY_MAX;
+    goto ON_EXIT;
+  }
+
+  //
+  // Get Duplicate Address Detection Transmits count.
+  //
+  DataSize = sizeof (EFI_IP6_CONFIG_DUP_ADDR_DETECT_TRANSMITS);
+  Status = Ip6Cfg->GetData (
+                     Ip6Cfg,
+                     Ip6ConfigDataTypeDupAddrDetectTransmits,
+                     &DataSize,
+                     &DadXmits
+                     );
+  if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
 
@@ -1354,7 +1370,8 @@ PxeBcRegisterIp6Address (
   // Start the 5 secondes timer to wait for setting address.
   //
   Status = EFI_NO_MAPPING;
-  gBS->SetTimer (TimeOutEvt, TimerRelative, PXEBC_DHCP6_MAPPING_TIMEOUT);
+  DadTriggerTime = TICKS_PER_SECOND * DadXmits.DupAddrDetectTransmits + PXEBC_DAD_ADDITIONAL_DELAY;
+  gBS->SetTimer (TimeOutEvt, TimerRelative, DadTriggerTime);
 
   while (EFI_ERROR (gBS->CheckEvent (TimeOutEvt))) {
     Ip6->Poll (Ip6);
@@ -1698,9 +1715,17 @@ PxeBcDhcp6Sarr (
   UINT8                            Buffer[PXEBC_DHCP6_OPTION_MAX_SIZE];
   UINT32                           OptCount;
   EFI_STATUS                       Status;
+  EFI_IP6_CONFIG_PROTOCOL          *Ip6Cfg;
+  EFI_STATUS                       TimerStatus;
+  EFI_EVENT                        Timer;
+  UINT64                           GetMappingTimeOut;
+  UINTN                            DataSize;
+  EFI_IP6_CONFIG_DUP_ADDR_DETECT_TRANSMITS    DadXmits;
 
   Status     = EFI_SUCCESS;
   PxeMode    = Private->PxeBc.Mode;
+  Ip6Cfg     = Private->Ip6Cfg;
+  Timer      = NULL;
 
   //
   // Build option list for the request packet.
@@ -1735,8 +1760,8 @@ PxeBcDhcp6Sarr (
   // Configure the DHCPv6 instance for PXE boot.
   //
   Status = Dhcp6->Configure (Dhcp6, &Config);
+  FreePool (Retransmit);
   if (EFI_ERROR (Status)) {
-    FreePool (Retransmit);
     return Status;
   }
 
@@ -1754,6 +1779,52 @@ PxeBcDhcp6Sarr (
   // Start DHCPv6 S.A.R.R. process to acquire IPv6 address.
   //
   Status = Dhcp6->Start (Dhcp6);
+  if (Status == EFI_NO_MAPPING) {
+    //
+    // IP6 Linklocal address is not available for use, so stop current Dhcp process
+    // and wait for duplicate address detection to finish.
+    //
+    Dhcp6->Stop (Dhcp6);
+
+    //
+    // Get Duplicate Address Detection Transmits count.
+    //
+    DataSize = sizeof (EFI_IP6_CONFIG_DUP_ADDR_DETECT_TRANSMITS);
+    Status = Ip6Cfg->GetData (
+                       Ip6Cfg,
+                       Ip6ConfigDataTypeDupAddrDetectTransmits,
+                       &DataSize,
+                       &DadXmits
+                       );
+    if (EFI_ERROR (Status)) {
+      Dhcp6->Configure (Dhcp6, NULL);
+      return Status;
+    }
+
+    Status = gBS->CreateEvent (EVT_TIMER, TPL_CALLBACK, NULL, NULL, &Timer);
+    if (EFI_ERROR (Status)) {
+      Dhcp6->Configure (Dhcp6, NULL);
+      return Status;
+    }
+
+    GetMappingTimeOut = TICKS_PER_SECOND * DadXmits.DupAddrDetectTransmits + PXEBC_DAD_ADDITIONAL_DELAY;
+    Status = gBS->SetTimer (Timer, TimerRelative, GetMappingTimeOut);
+    if (EFI_ERROR (Status)) {
+      gBS->CloseEvent (Timer);
+      Dhcp6->Configure (Dhcp6, NULL);
+      return Status;
+    }
+
+    do {
+      
+      TimerStatus = gBS->CheckEvent (Timer);
+      if (!EFI_ERROR (TimerStatus)) {
+        Status = Dhcp6->Start (Dhcp6);
+      }
+    } while (TimerStatus == EFI_NOT_READY);
+    
+    gBS->CloseEvent (Timer);
+  }
   if (EFI_ERROR (Status)) {
     if (Status == EFI_ICMP_ERROR) {
       PxeMode->IcmpErrorReceived = TRUE;

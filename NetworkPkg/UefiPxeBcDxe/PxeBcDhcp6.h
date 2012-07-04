@@ -1,7 +1,7 @@
 /** @file
   Functions declaration related with DHCPv6 for UefiPxeBc Driver.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -19,7 +19,6 @@
 #define PXEBC_DHCP6_OPTION_MAX_NUM        16
 #define PXEBC_DHCP6_OPTION_MAX_SIZE       312
 #define PXEBC_DHCP6_PACKET_MAX_SIZE       1472
-#define PXEBC_DHCP6_MAPPING_TIMEOUT       50000000   // 5 seconds, unit is 10nanosecond.
 #define PXEBC_IP6_POLICY_MAX              0xff
 
 #define PXEBC_DHCP6_S_PORT                547
