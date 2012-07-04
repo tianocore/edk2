@@ -83,7 +83,7 @@ ArmArchTimerReadReg (
     case CnthpTval:
     case CnthpCtl:
     case CnthpCval:
-    DEBUG ((EFI_D_ERROR, "The register is related to Hyperviser Mode. Can't perform requested operation\n "));
+    DEBUG ((EFI_D_ERROR, "The register is related to Hypervisor Mode. Can't perform requested operation\n "));
       break;
 
     default:

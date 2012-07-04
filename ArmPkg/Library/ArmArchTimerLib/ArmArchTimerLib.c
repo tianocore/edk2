@@ -54,7 +54,7 @@ TimerConstructor (
     ASSERT (TimerFreq);
 
   } else {
-    DEBUG ((EFI_D_ERROR, "ARM Architectural Timer is not available in the CPU, Hence cann't use this library \n"));
+    DEBUG ((EFI_D_ERROR, "ARM Architectural Timer is not available in the CPU, hence this library can not be used.\n"));
     ASSERT (0);
   }
 
@@ -79,7 +79,7 @@ MicroSecondDelay (
   UINT64 TimerTicks64;
   UINT64 SystemCounterVal;
 
-  // Calculate counter ticks that can represent requsted delay
+  // Calculate counter ticks that can represent requested delay
   TimerTicks64 = MultU64x32 (MicroSeconds, TICKS_PER_MICRO_SEC);
 
   // Read System Counter value
@@ -106,7 +106,7 @@ MicroSecondDelay (
 
   @param  NanoSeconds The minimum number of nanoseconds to delay.
 
-  @return The value of NanoSeconds inputted.
+  @return The value of NanoSeconds inputed.
 
 **/
 UINTN

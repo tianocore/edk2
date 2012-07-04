@@ -99,7 +99,7 @@ ArmGicEnableInterruptInterface (
   MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCPMR, 0x000000FF);
 
   // Enable CPU interface in Secure world
-  // Enable CPU inteface in Non-secure World
+  // Enable CPU interface in Non-secure World
   // Signal Secure Interrupts to CPU using FIQ line *
   MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCICR,
       ARM_GIC_ICCICR_ENABLE_SECURE |

@@ -784,7 +784,7 @@ ConvertSectionToPages (
   // formulate page table entry, Domain=0, NS=0
   PageTableDescriptor = (((UINTN)PageTableAddr) & TT_DESCRIPTOR_SECTION_PAGETABLE_ADDRESS_MASK) | TT_DESCRIPTOR_SECTION_TYPE_PAGE_TABLE;
 
-  // write the page table entry out, repalcing section entry
+  // write the page table entry out, replacing section entry
   FirstLevelTable[FirstLevelIdx] = PageTableDescriptor;
 
   return EFI_SUCCESS;
