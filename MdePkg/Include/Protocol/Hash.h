@@ -5,7 +5,7 @@
   provided by a driver and to create and destroy instances of the EFI Hash Protocol 
   so that a multiple drivers can use the underlying hashing services.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -59,6 +59,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     0xaf7c79c, 0x65b5, 0x4319, {0xb0, 0xae, 0x44, 0xec, 0x48, 0x4e, 0x4a, 0xd7 } \
   }
 
+#define EFI_HASH_ALGORITHM_SHA1_NOPAD_GUID \
+  { \
+    0x24c5dc2f, 0x53e2, 0x40ca, {0x9e, 0xd6, 0xa5, 0xd9, 0xa4, 0x9f, 0x46, 0x3b } \
+  }
+
+#define EFI_HASH_ALGORITHM_SHA256_NOPAD_GUID \
+  { \
+    0x8628752a, 0x6cb7, 0x4814, {0x96, 0xfc, 0x24, 0xa8, 0x15, 0xac, 0x22, 0x26 } \
+  }
+
 typedef struct _EFI_HASH_PROTOCOL EFI_HASH_PROTOCOL;
 
 typedef UINT8  EFI_MD5_HASH[16];
@@ -99,7 +109,7 @@ EFI_STATUS
   );      
 
 /**
-  Returns the size of the hash which results from a specific algorithm.
+  Creates a hash for the specified message text.
 
   @param[in]  This          Points to this instance of EFI_HASH_PROTOCOL.
   @param[in]  HashAlgorithm Points to the EFI_GUID which identifies the algorithm to use.
@@ -107,9 +117,13 @@ EFI_STATUS
                             existing hash (TRUE).
   @param[in]  Message       Points to the start of the message.
   @param[in]  MessageSize   The size of Message, in bytes.
-  @param[in,out]  Hash      On input, if Extend is TRUE, then this holds the hash to extend. On
-                            output, holds the resulting hash computed from the message.
-
+  @param[in,out]  Hash      On input, if Extend is TRUE, then this parameter holds a pointer 
+                            to a pointer to an array containing the hash to extend. If Extend 
+                            is FALSE, then this parameter holds a pointer to a pointer to a 
+                            caller-allocated array that will receive the result of the hash 
+                            computation. On output (regardless of the value of Extend), the 
+                            array will contain the result of the hash computation.
+  
   @retval EFI_SUCCESS           Hash returned successfully.
   @retval EFI_INVALID_PARAMETER Message or Hash is NULL
   @retval EFI_UNSUPPORTED       The algorithm specified by HashAlgorithm is not supported by this
@@ -144,5 +158,7 @@ extern EFI_GUID gEfiHashAlgorithmSha256Guid;
 extern EFI_GUID gEfiHashAlgorithmSha384Guid;
 extern EFI_GUID gEfiHashAlgorithmSha512Guid;
 extern EFI_GUID gEfiHashAlgorithmMD5Guid;
+extern EFI_GUID gEfiHashAlgorithmSha1NoPadGuid;
+extern EFI_GUID gEfiHashAlgorithmSha256NoPadGuid;
 
 #endif

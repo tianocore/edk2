@@ -2,10 +2,10 @@
   EFI EAP(Extended Authenticaton Protocol) Protocol Definition
   The EFI EAP Protocol is used to abstract the ability to configure and extend the
   EAP framework. 
-  The definitions in this file are defined in UEFI Specification 2.3, which have
+  The definitions in this file are defined in UEFI Specification 2.3.1B, which have
   not been verified by one implementation yet.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -37,13 +37,17 @@ typedef struct _EFI_EAP_PROTOCOL EFI_EAP_PROTOCOL;
 typedef VOID *  EFI_PORT_HANDLE;
 
 ///
-/// EAP Authentication Method Type (RFC 2284 Section 3)
+/// EAP Authentication Method Type (RFC 3748)
 ///@{
-#define EFI_EAP_TYPE_MD5                0x4   ///< REQUIRED
-#define EFI_EAP_TYPE_OTP                0x5   ///< OPTIONAL
-#define EFI_EAP_TYPE_TOKEN_CARD         0x6   ///< OPTIONAL
+#define EFI_EAP_TYPE_TLS 13 ///< REQUIRED - RFC 5216
 ///@}
 
+//
+// EAP_TYPE MD5, OTP and TOEKN_CARD has been removed from UEFI2.3.1B.
+//
+#define EFI_EAP_TYPE_MD5                0x4
+#define EFI_EAP_TYPE_OTP                0x5
+#define EFI_EAP_TYPE_TOKEN_CARD         0x6
 
 /**
   One user provided EAP authentication method.
@@ -85,7 +89,9 @@ EFI_STATUS
   returned.
   If the EAP authentication method of EapAuthType is unsupported by the Ports, then it will
   return EFI_UNSUPPORTED.
-
+  The cryptographic strength of EFI_EAP_TYPE_TLS shall be at least of hash strength 
+  SHA-256 and RSA key length of at least 2048 bits.
+  
   @param[in] This                A pointer to the EFI_EAP_PROTOCOL instance that indicates 
                                  the calling context.
   @param[in] EapAuthType         The type of the EAP authentication method to register. It should 

@@ -2,7 +2,7 @@
   The file provides services that allow information about an
   absolute pointer device to be retrieved.
   
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -116,7 +116,7 @@ typedef struct {
   UINT64 CurrentX;
   
   ///
-  /// The unsigned position of the activation on the x axis. If the AboluteMinY 
+  /// The unsigned position of the activation on the y axis. If the AboluteMinY 
   /// and the AboluteMaxY fields of the EFI_ABSOLUTE_POINTER_MODE structure are 
   /// both 0, then this pointer device does not support an y-axis, and this field
   /// must be ignored.  
@@ -124,7 +124,7 @@ typedef struct {
   UINT64 CurrentY;
   
   ///
-  /// The unsigned position of the activation on the x axis, or the pressure 
+  /// The unsigned position of the activation on the z axis, or the pressure 
   /// measurement. If the AboluteMinZ and the AboluteMaxZ fields of the 
   /// EFI_ABSOLUTE_POINTER_MODE structure are both 0, then this pointer device 
   /// does not support an z-axis, and this field must be ignored.  
