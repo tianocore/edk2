@@ -160,23 +160,16 @@ AcpiPlatformChecksum (
   Buffer[ChecksumOffset] = CalculateCheckSum8(Buffer, Size);
 }
 
-
 /**
-  Entrypoint of Acpi Platform driver.
+  Find ACPI tables in an FV and parses them. This function is useful for QEMU and KVM.
 
-  @param  ImageHandle
-  @param  SystemTable
-
-  @return EFI_SUCCESS
-  @return EFI_LOAD_ERROR
-  @return EFI_OUT_OF_RESOURCES
+  @param  TableInstallFunction     A callback function to install ACPI tables    
 
 **/
 EFI_STATUS
 EFIAPI
-AcpiPlatformEntryPoint (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+FindAcpiTablesInFv (
+  IN  EFI_ACPI_TABLE_INSTALL_ACPI_TABLE  TableInstallFunction
   )
 {
   EFI_STATUS                         Status;
@@ -188,7 +181,6 @@ AcpiPlatformEntryPoint (
   UINT32                             FvStatus;
   UINTN                              TableSize;
   UINTN                              Size;
-  EFI_ACPI_TABLE_INSTALL_ACPI_TABLE  TableInstallFunction;
 
   Instance     = 0;
   CurrentTable = NULL;
@@ -200,14 +192,6 @@ AcpiPlatformEntryPoint (
   Status = gBS->LocateProtocol (&gEfiAcpiTableProtocolGuid, NULL, (VOID**)&AcpiTable);
   if (EFI_ERROR (Status)) {
     return EFI_ABORTED;
-  }
-
-  if (QemuDetected ()) {
-    TableInstallFunction = QemuInstallAcpiTable;
-  } else if (XenDetected ()) {
-    TableInstallFunction = XenInstallAcpiTable;
-  } else {
-    TableInstallFunction = InstallAcpiTable;
   }
 
   //
@@ -270,6 +254,88 @@ AcpiPlatformEntryPoint (
       Instance++;
       CurrentTable = NULL;
     }
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Find ACPI tables. This function is only for Xen.
+
+  @param  TableInstallFunction     A callback function to install Xen ACPI tables    
+
+**/
+EFI_STATUS
+EFIAPI
+FindAcpiTablesInXen (
+  IN  EFI_ACPI_TABLE_INSTALL_ACPI_TABLE  TableInstallFunction
+  )
+{
+  EFI_STATUS                         Status;
+  EFI_ACPI_TABLE_PROTOCOL            *AcpiTable;
+  EFI_ACPI_COMMON_HEADER             *CurrentTable;
+  UINTN                              TableHandle;
+  UINTN                              TableSize;
+
+  CurrentTable = NULL;
+  TableSize    = 0;
+  TableHandle  = 0;
+
+  //
+  // Find the AcpiTable protocol
+  //
+  Status = gBS->LocateProtocol (&gEfiAcpiTableProtocolGuid, NULL, (VOID**)&AcpiTable);
+  if (EFI_ERROR (Status)) {
+    return EFI_ABORTED;
+  }
+
+  //
+  // Install ACPI table
+  //
+  Status = TableInstallFunction (
+             AcpiTable,
+             CurrentTable,
+             TableSize,
+             &TableHandle
+             );
+
+  if (EFI_ERROR (Status)) {
+    return EFI_ABORTED;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Entrypoint of Acpi Platform driver.
+
+  @param  ImageHandle
+  @param  SystemTable
+
+  @return EFI_SUCCESS
+  @return EFI_LOAD_ERROR
+  @return EFI_OUT_OF_RESOURCES
+
+**/
+EFI_STATUS
+EFIAPI
+AcpiPlatformEntryPoint (
+  IN EFI_HANDLE         ImageHandle,
+  IN EFI_SYSTEM_TABLE   *SystemTable
+  )
+{
+  EFI_STATUS                         Status;
+
+  if (QemuDetected ()) {
+    Status = FindAcpiTablesInFv (QemuInstallAcpiTable);
+  } else if (XenDetected ()) {
+    Status = FindAcpiTablesInXen (XenInstallAcpiTable);
+  } else {
+    Status = FindAcpiTablesInFv (InstallAcpiTable);
+  }
+
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   return EFI_SUCCESS;
