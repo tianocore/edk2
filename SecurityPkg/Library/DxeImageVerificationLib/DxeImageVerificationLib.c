@@ -1254,14 +1254,13 @@ DxeImageVerificationHandler (
   UINT16                               Magic;
   EFI_IMAGE_DOS_HEADER                 *DosHdr;
   EFI_STATUS                           VerifyStatus;
-  UINT8                                *SetupMode;
   EFI_SIGNATURE_LIST                   *SignatureList;
   UINTN                                SignatureListSize;
   EFI_SIGNATURE_DATA                   *Signature;
   EFI_IMAGE_EXECUTION_ACTION           Action;
   WIN_CERTIFICATE                      *WinCertificate;
   UINT32                               Policy;
-  UINT8                                *SecureBootEnable;
+  UINT8                                *SecureBoot;
   PE_COFF_LOADER_IMAGE_CONTEXT         ImageContext;
   UINT32                               NumberOfRvaAndSizes;
   UINT32                               CertSize;
@@ -1309,43 +1308,22 @@ DxeImageVerificationHandler (
     return EFI_ACCESS_DENIED;
   }
 
-  GetVariable2 (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, (VOID**)&SecureBootEnable, NULL);
+  GetEfiGlobalVariable2 (EFI_SECURE_BOOT_MODE_NAME, (VOID**)&SecureBoot, NULL);
   //
-  // Skip verification if SecureBootEnable variable doesn't exist.
+  // Skip verification if SecureBoot variable doesn't exist.
   //
-  if (SecureBootEnable == NULL) {
+  if (SecureBoot == NULL) {
     return EFI_SUCCESS;
   }
 
   //
-  // Skip verification if SecureBootEnable is disabled.
+  // Skip verification if SecureBoot is disabled.
   //
-  if (*SecureBootEnable == SECURE_BOOT_DISABLE) {
-    FreePool (SecureBootEnable);
+  if (*SecureBoot == SECURE_BOOT_MODE_DISABLE) {
+    FreePool (SecureBoot);
     return EFI_SUCCESS;
   }
-
-  FreePool (SecureBootEnable);
-
-  GetEfiGlobalVariable2 (EFI_SETUP_MODE_NAME, (VOID**)&SetupMode, NULL);
-
-  //
-  // SetupMode doesn't exist means no AuthVar driver is dispatched,
-  // skip verification.
-  //
-  if (SetupMode == NULL) {
-    return EFI_SUCCESS;
-  }
-
-  //
-  // If platform is in SETUP MODE, skip verification.
-  //
-  if (*SetupMode == SETUP_MODE) {
-    FreePool (SetupMode);
-    return EFI_SUCCESS;
-  }
-
-  FreePool (SetupMode);
+  FreePool (SecureBoot);
 
   //
   // Read the Dos header.

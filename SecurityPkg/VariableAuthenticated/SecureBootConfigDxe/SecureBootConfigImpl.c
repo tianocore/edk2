@@ -2069,27 +2069,25 @@ SecureBootExtractConfigFromVariable (
 {
   UINT8   *SecureBootEnable;
   UINT8   *SetupMode;
+  UINT8   *SecureBoot;
   UINT8   *SecureBootMode;
 
   SecureBootEnable = NULL;
   SetupMode        = NULL;
+  SecureBoot       = NULL;
   SecureBootMode   = NULL;
   
-  //
-  // Get the SecureBootEnable Variable
-  //
-  GetVariable2 (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, (VOID**)&SecureBootEnable, NULL);
-
   //
   // If the SecureBootEnable Variable doesn't exist, hide the SecureBoot Enable/Disable
   // Checkbox.
   //
+  GetVariable2 (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, (VOID**)&SecureBootEnable, NULL);
   if (SecureBootEnable == NULL) {
     ConfigData->HideSecureBoot = TRUE;
   } else {
     ConfigData->HideSecureBoot = FALSE;
-    ConfigData->SecureBootState = *SecureBootEnable;
   }
+  
   //
   // If it is Physical Presence User, set the PhysicalPresent to true.
   //
@@ -2103,10 +2101,20 @@ SecureBootExtractConfigFromVariable (
   // If there is no PK then the Delete Pk button will be gray.
   //
   GetVariable2 (EFI_SETUP_MODE_NAME, &gEfiGlobalVariableGuid, (VOID**)&SetupMode, NULL);
-  if (SetupMode == NULL || (*SetupMode) == 1) {
+  if (SetupMode == NULL || (*SetupMode) == SETUP_MODE) {
     ConfigData->HasPk = FALSE;
   } else  {
     ConfigData->HasPk = TRUE;
+  }
+  
+  //
+  // If the value of SecureBoot variable is 1, the platform is operating in secure boot mode.
+  //
+  GetVariable2 (EFI_SECURE_BOOT_MODE_NAME, &gEfiGlobalVariableGuid, (VOID**)&SecureBoot, NULL);
+  if (SecureBoot != NULL && *SecureBoot == SECURE_BOOT_MODE_ENABLE) {
+    ConfigData->SecureBootState = TRUE;
+  } else {
+    ConfigData->SecureBootState = FALSE;
   }
 
   //

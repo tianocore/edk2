@@ -51,7 +51,7 @@ formset
           questionid = KEY_SECURE_BOOT_ENABLE,
           prompt = STRING_TOKEN(STR_SECURE_BOOT_PROMPT),
           help   = STRING_TOKEN(STR_SECURE_BOOT_HELP),
-          flags  = INTERACTIVE,
+          flags  = INTERACTIVE | RESET_REQUIRED,
     endcheckbox;
     endif;
     

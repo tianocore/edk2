@@ -29,7 +29,9 @@ extern EFI_GUID gEfiAuthenticatedVariableGuid;
 extern EFI_GUID gEfiSecureBootEnableDisableGuid;
 
 ///
-/// "SecureBootEnable" variable for the Secure boot feature enable/disable.
+/// "SecureBootEnable" variable for the Secure Boot feature enable/disable.
+/// This variable is used for allowing a physically present user to disable
+/// Secure Boot via firmware setup without the possession of PKpriv.
 ///
 #define EFI_SECURE_BOOT_ENABLE_NAME      L"SecureBootEnable"
 #define SECURE_BOOT_ENABLE               1
