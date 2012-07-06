@@ -1124,7 +1124,7 @@ SetupResetReminder (
       ASSERT (StringBuffer1 != NULL);
       StringBuffer2 = AllocateZeroPool (MAX_STRING_LEN * sizeof (CHAR16));
       ASSERT (StringBuffer2 != NULL);
-      StrCpy (StringBuffer1, L"Configuration changed. Reset to apply it Now");
+      StrCpy (StringBuffer1, L"Configuration changed. Reset to apply it Now.");
       StrCpy (StringBuffer2, L"Press ENTER to reset");
       //
       // Popup a menu to notice user
