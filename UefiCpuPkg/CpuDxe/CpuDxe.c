@@ -1247,6 +1247,8 @@ InitializeCpu (
   EFI_STATUS  Status;
   EFI_EVENT   IdleLoopEvent;
 
+  InitializeFloatingPointUnits ();
+
   //
   // Make sure interrupts are disabled
   //
