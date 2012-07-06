@@ -462,9 +462,6 @@
   ## If TRUE, S3 performance data will be supported in ACPI FPDT table.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwarePerformanceDataTableS3Support|TRUE|BOOLEAN|0x00010064
 
-  ## This PCD specified whether the S.M.A.R.T feature of attached ATA hard disks are enabled.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAtaSmartEnable|TRUE|BOOLEAN|0x00010065
-
 [PcdsFeatureFlag.IA32, PcdsFeatureFlag.X64]
   ##
   # This feature flag specifies whether DxeIpl switches to long mode to enter DXE phase.
@@ -816,6 +813,9 @@
   ## This PCD specifies the additional pad size in FPDT Basic Boot Performance Table for 
   #  the extension FPDT boot records got after ReadyToBoot and before ExitBootService.
   gEfiMdeModulePkgTokenSpaceGuid.PcdExtFpdtBootRecordPadSize|0x0|UINT32|0x0001005F
+
+  ## This PCD specified whether the S.M.A.R.T feature of attached ATA hard disks are enabled.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAtaSmartEnable|TRUE|BOOLEAN|0x00010065
 
 [PcdsPatchableInModule]
   ## Specify  memory size with page number for PEI code when 
