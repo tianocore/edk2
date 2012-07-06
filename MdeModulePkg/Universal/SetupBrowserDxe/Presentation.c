@@ -1287,7 +1287,7 @@ ProcessCallBackFunction (
       // "retrieve" should update to the question's temp buffer.
       //
       if (Action == EFI_BROWSER_ACTION_CHANGING || Action == EFI_BROWSER_ACTION_RETRIEVE) {
-        SetQuestionValue(Selection->FormSet, Selection->Form, Statement, TRUE);
+        SetQuestionValue(Selection->FormSet, Selection->Form, Statement, GetSetValueWithEditBuffer);
       }
     } else {
       //
@@ -1295,7 +1295,7 @@ ProcessCallBackFunction (
       // "retrieve", should restore the question's value.
       //
       if (Action  == EFI_BROWSER_ACTION_CHANGING || Action == EFI_BROWSER_ACTION_RETRIEVE) {
-        GetQuestionValue(Selection->FormSet, Selection->Form, Statement, TRUE);
+        GetQuestionValue(Selection->FormSet, Selection->Form, Statement, GetSetValueWithEditBuffer);
       }
 
       if (Status == EFI_UNSUPPORTED) {

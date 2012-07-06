@@ -799,9 +799,9 @@ EnterCarriageReturn:
         //
         // Input value is not valid, restore Question Value
         //
-        GetQuestionValue (FormSet, Form, Question, TRUE);
+        GetQuestionValue (FormSet, Form, Question, GetSetValueWithEditBuffer);
       } else {
-        SetQuestionValue (FormSet, Form, Question, TRUE);
+        SetQuestionValue (FormSet, Form, Question, GetSetValueWithEditBuffer);
         if (!DateOrTime || (Question->Storage != NULL)) {
           //
           // NV flag is unnecessary for RTC type of Date/Time
@@ -1351,9 +1351,9 @@ TheKey:
         //
         // Input value is not valid, restore Question Value
         //
-        GetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);
+        GetQuestionValue (Selection->FormSet, Selection->Form, Question, GetSetValueWithEditBuffer);
       } else {
-        SetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);
+        SetQuestionValue (Selection->FormSet, Selection->Form, Question, GetSetValueWithEditBuffer);
         UpdateStatusBar (Selection, NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
       }
 
