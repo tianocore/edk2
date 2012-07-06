@@ -1124,24 +1124,19 @@ SetupResetReminder (
       ASSERT (StringBuffer1 != NULL);
       StringBuffer2 = AllocateZeroPool (MAX_STRING_LEN * sizeof (CHAR16));
       ASSERT (StringBuffer2 != NULL);
-      StrCpy (StringBuffer1, L"Configuration changed. Reset to apply it Now ? ");
-      StrCpy (StringBuffer2, L"Enter (YES)  /   Esc (NO)");
+      StrCpy (StringBuffer1, L"Configuration changed. Reset to apply it Now");
+      StrCpy (StringBuffer2, L"Press ENTER to reset");
       //
       // Popup a menu to notice user
       //
       do {
         CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, StringBuffer1, StringBuffer2, NULL);
-      } while ((Key.ScanCode != SCAN_ESC) && (Key.UnicodeChar != CHAR_CARRIAGE_RETURN));
+      } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
 
       FreePool (StringBuffer1);
       FreePool (StringBuffer2);
-      //
-      // If the user hits the YES Response key, reset
-      //
-      if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
-        gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
-      }
-      gST->ConOut->ClearScreen (gST->ConOut);
+
+      gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
     }
   }
 }
