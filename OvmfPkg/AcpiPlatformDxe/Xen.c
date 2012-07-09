@@ -15,8 +15,6 @@
 **/ 
 
 #include "AcpiPlatform.h"
-#include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
 #include <Library/HobLib.h>
 #include <Guid/XenInfo.h>
 
