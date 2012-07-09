@@ -2517,7 +2517,7 @@ SecureBootCallback (
           NULL
           );
       } else {
-        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT; 
+        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_RESET; 
       }        
       break;
 

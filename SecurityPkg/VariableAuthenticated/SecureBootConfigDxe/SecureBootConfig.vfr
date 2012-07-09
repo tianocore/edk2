@@ -158,7 +158,7 @@ formset
           questionid = KEY_SECURE_BOOT_DELETE_PK,
           prompt = STRING_TOKEN(STR_DELETE_PK),          
           help   = STRING_TOKEN(STR_DELETE_PK_HELP),
-          flags  = INTERACTIVE,
+          flags  = INTERACTIVE | RESET_REQUIRED,
     endcheckbox;
     endif;
   endform;
