@@ -108,6 +108,8 @@
   gEmbeddedTokenSpaceGuid.PcdTimerVector|7|UINT32|0x0000001d
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000|UINT32|0x0000001e
   gEmbeddedTokenSpaceGuid.PcdInterruptBaseAddress|0x38e00000|UINT32|0x0000001f
+
+  gEmbeddedTokenSpaceGuid.PcdMetronomeTickPeriod|100|UINT32|0x00000020
   
   gEmbeddedTokenSpaceGuid.PcdEmbeddedFdBaseAddress|0xffff0000|UINT32|0x00000030
   gEmbeddedTokenSpaceGuid.PcdEmbeddedFdSize|0x0000000|UINT32|0x00000031
