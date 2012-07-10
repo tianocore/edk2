@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -191,7 +191,6 @@ if [[ "$RUN_QEMU" == "yes" ]]; then
     mkdir $QEMU_FIRMWARE_DIR
   fi
   ln -sf $FV_DIR/OVMF.fd $QEMU_FIRMWARE_DIR/bios.bin
-  ln -sf $FV_DIR/OvmfVideo.rom $QEMU_FIRMWARE_DIR/vgabios-cirrus.bin
   if [[ "$ADD_QEMU_HDA" == "yes" ]]; then
     AUTO_QEMU_HDA="-hda fat:$BUILD_ROOT_ARCH"
   else

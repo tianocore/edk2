@@ -266,6 +266,8 @@ INF  IntelFrameworkModulePkg/Csm/LegacyBiosDxe/LegacyBiosDxe.inf
 INF  RuleOverride=CSM OvmfPkg/Csm/Csm16/Csm16.inf
 !endif
 
+INF  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
+
 ################################################################################
 
 [FV.FVMAIN_COMPACT]
@@ -383,9 +385,4 @@ FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
 [Rule.Common.SEC.RESET_VECTOR]
   FILE RAW = $(NAMED_GUID) {
     RAW RAW                |.raw
-  }
-
-[OptionRom.OvmfVideo]
-INF  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf {
-    PCI_DEVICE_ID  = 0x00B8
   }
