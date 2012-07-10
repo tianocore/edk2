@@ -45,6 +45,7 @@ PROCESSOR=X64
 BUILDTARGET=DEBUG
 BUILD_OPTIONS=
 PLATFORMFILE=
+THREADNUMBER=1
 LAST_ARG=
 RUN_QEMU=no
 
@@ -89,7 +90,7 @@ for arg in "$@"
 do
   if [ -z "$LAST_ARG" ]; then
     case $arg in
-      -a|-b|-t|-p)
+      -a|-b|-t|-p|-n)
         LAST_ARG=$arg
         ;;
       qemu)
@@ -114,6 +115,9 @@ do
         ;;
       -t)
         TARGET_TOOLS=$arg
+        ;;
+      -n)
+        THREADNUMBER=$arg
         ;;
       *)
         BUILD_OPTIONS="$BUILD_OPTIONS $arg"
@@ -206,6 +210,6 @@ fi
 # Build the edk2 OvmfPkg
 #
 echo Running edk2 build for OvmfPkg$Processor
-build -p $PLATFORMFILE $BUILD_OPTIONS -a $PROCESSOR -b $BUILDTARGET -t $TARGET_TOOLS
+build -p $PLATFORMFILE $BUILD_OPTIONS -a $PROCESSOR -b $BUILDTARGET -t $TARGET_TOOLS -n $THREADNUMBER
 exit $?
 
