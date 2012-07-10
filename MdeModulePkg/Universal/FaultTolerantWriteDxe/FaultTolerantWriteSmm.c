@@ -40,7 +40,10 @@
   If one of them is not satisfied, FtwWrite may fail.
   Usually, Spare area only takes one block. That's SpareAreaLength = BlockSize, NumberOfSpareBlock = 1.
 
-Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Caution: This module requires additional review when modified.
+  This driver need to make sure the CommBuffer is not in the SMRAM range. 
+
+Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -56,9 +59,41 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SmmSwapAddressRange.h>
 #include "FaultTolerantWrite.h"
 #include "FaultTolerantWriteSmmCommon.h"
+#include <Protocol/SmmAccess2.h>
 
 EFI_EVENT                                 mFvbRegistration = NULL;
 EFI_FTW_DEVICE                            *mFtwDevice      = NULL;
+EFI_SMRAM_DESCRIPTOR                      *mSmramRanges;
+UINTN                                     mSmramRangeCount;
+
+
+/**
+  This function check if the address is in SMRAM.
+
+  @param Buffer  the buffer address to be checked.
+  @param Length  the buffer length to be checked.
+
+  @retval TRUE  this address is in SMRAM.
+  @retval FALSE this address is NOT in SMRAM.
+**/
+BOOLEAN
+InternalIsAddressInSmram (
+  IN EFI_PHYSICAL_ADDRESS  Buffer,
+  IN UINT64                Length
+  )
+{
+  UINTN  Index;
+
+  for (Index = 0; Index < mSmramRangeCount; Index ++) {
+    if (((Buffer >= mSmramRanges[Index].CpuStart) && (Buffer < mSmramRanges[Index].CpuStart + mSmramRanges[Index].PhysicalSize)) ||
+        ((mSmramRanges[Index].CpuStart >= Buffer) && (mSmramRanges[Index].CpuStart < Buffer + Length))) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
 
 /**
   Retrive the SMM FVB protocol interface by HANDLE.
@@ -261,6 +296,11 @@ GetFvbByAddressAndAttribute (
 
   This SMI handler provides services for the fault tolerant write wrapper driver.
 
+  Caution: This function requires additional review when modified.
+  This driver need to make sure the CommBuffer is not in the SMRAM range. 
+  Also in FTW_FUNCTION_GET_LAST_WRITE case, check SmmFtwGetLastWriteHeader->Data + 
+  SmmFtwGetLastWriteHeader->PrivateDataSize within communication buffer.
+
   @param[in]     DispatchHandle  The unique handle assigned to this handler by SmiHandlerRegister().
   @param[in]     RegisterContext Points to an optional handler context which was specified when the
                                  handler was registered.
@@ -298,6 +338,11 @@ SmmFaultTolerantWriteHandler (
 
   ASSERT (CommBuffer != NULL);
   ASSERT (CommBufferSize != NULL);
+
+  if (InternalIsAddressInSmram ((EFI_PHYSICAL_ADDRESS)(UINTN)CommBuffer, *CommBufferSize)) {
+    DEBUG ((EFI_D_ERROR, "SMM communication buffer size is in SMRAM!\n"));
+    return EFI_SUCCESS;
+  }
 
   SmmFtwFunctionHeader = (SMM_FTW_COMMUNICATE_FUNCTION_HEADER *)CommBuffer;
   switch (SmmFtwFunctionHeader->Function) {
@@ -362,20 +407,24 @@ SmmFaultTolerantWriteHandler (
       
     case FTW_FUNCTION_GET_LAST_WRITE:
       SmmFtwGetLastWriteHeader = (SMM_FTW_GET_LAST_WRITE_HEADER *) SmmFtwFunctionHeader->Data;
-      Status = FtwGetLastWrite (
-                 &mFtwDevice->FtwInstance,
-                 &SmmFtwGetLastWriteHeader->CallerId,
-                 &SmmFtwGetLastWriteHeader->Lba,
-                 &SmmFtwGetLastWriteHeader->Offset,
-                 &SmmFtwGetLastWriteHeader->Length,
-                 &SmmFtwGetLastWriteHeader->PrivateDataSize,
-                 (VOID *)SmmFtwGetLastWriteHeader->Data,
-                 &SmmFtwGetLastWriteHeader->Complete
-                 );
+      if (((UINT8*)SmmFtwGetLastWriteHeader->Data > (UINT8*)CommBuffer) &&  
+          ((UINT8*)SmmFtwGetLastWriteHeader->Data + SmmFtwGetLastWriteHeader->PrivateDataSize <= (UINT8*)CommBuffer + (*CommBufferSize))) {
+        Status = FtwGetLastWrite (
+                   &mFtwDevice->FtwInstance,
+                   &SmmFtwGetLastWriteHeader->CallerId,
+                   &SmmFtwGetLastWriteHeader->Lba,
+                   &SmmFtwGetLastWriteHeader->Offset,
+                   &SmmFtwGetLastWriteHeader->Length,
+                   &SmmFtwGetLastWriteHeader->PrivateDataSize,
+                   (VOID *)SmmFtwGetLastWriteHeader->Data,
+                   &SmmFtwGetLastWriteHeader->Complete
+                   );
+      } else  {
+        Status = EFI_INVALID_PARAMETER;
+      }
       break;
 
     default:
-      ASSERT (FALSE);
       Status = EFI_UNSUPPORTED;
   }
 
@@ -475,6 +524,8 @@ SmmFaultTolerantWriteInitialize (
 {
   EFI_STATUS                              Status;
   EFI_HANDLE                              FtwHandle;
+  EFI_SMM_ACCESS2_PROTOCOL                *SmmAccess;
+  UINTN                                   Size;
   
   //
   // Allocate private data structure for SMM FTW protocol and do some initialization
@@ -483,7 +534,29 @@ SmmFaultTolerantWriteInitialize (
   if (EFI_ERROR(Status)) {
     return Status;
   }
-  
+
+  //
+  // Get SMRAM information
+  //
+  Status = gBS->LocateProtocol (&gEfiSmmAccess2ProtocolGuid, NULL, (VOID **)&SmmAccess);
+  ASSERT_EFI_ERROR (Status);
+
+  Size = 0;
+  Status = SmmAccess->GetCapabilities (SmmAccess, &Size, NULL);
+  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
+
+  Status = gSmst->SmmAllocatePool (
+                    EfiRuntimeServicesData,
+                    Size,
+                    (VOID **)&mSmramRanges
+                    );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = SmmAccess->GetCapabilities (SmmAccess, &Size, mSmramRanges);
+  ASSERT_EFI_ERROR (Status);
+
+  mSmramRangeCount = Size / sizeof (EFI_SMRAM_DESCRIPTOR);
+
   //
   // Register FvbNotificationEvent () notify function.
   // 
