@@ -78,8 +78,6 @@ LocateFvInstanceWithTables (
     return Status;
   }
 
-
-
   //
   // Looking for FV with ACPI storage file
   //
@@ -163,35 +161,33 @@ AcpiPlatformChecksum (
 /**
   Find ACPI tables in an FV and parses them. This function is useful for QEMU and KVM.
 
-  @param  TableInstallFunction     A callback function to install ACPI tables    
+  @param  AcpiTable     Protocol instance pointer    
 
 **/
 EFI_STATUS
 EFIAPI
 FindAcpiTablesInFv (
-  IN  EFI_ACPI_TABLE_INSTALL_ACPI_TABLE  TableInstallFunction
+  IN  EFI_ACPI_TABLE_PROTOCOL     *AcpiTable
   )
 {
-  EFI_STATUS                         Status;
-  EFI_ACPI_TABLE_PROTOCOL            *AcpiTable;
-  EFI_FIRMWARE_VOLUME2_PROTOCOL      *FwVol;
-  INTN                               Instance;
-  EFI_ACPI_COMMON_HEADER             *CurrentTable;
-  UINTN                              TableHandle;
-  UINT32                             FvStatus;
-  UINTN                              TableSize;
-  UINTN                              Size;
+  EFI_STATUS                           Status;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL        *FwVol;
+  INTN                                 Instance;
+  EFI_ACPI_COMMON_HEADER               *CurrentTable;
+  UINTN                                TableHandle;
+  UINT32                               FvStatus;
+  UINTN                                TableSize;
+  UINTN                                Size;
+  EFI_ACPI_TABLE_INSTALL_ACPI_TABLE    TableInstallFunction;
 
   Instance     = 0;
   CurrentTable = NULL;
   TableHandle  = 0;
 
-  //
-  // Find the AcpiTable protocol
-  //
-  Status = gBS->LocateProtocol (&gEfiAcpiTableProtocolGuid, NULL, (VOID**)&AcpiTable);
-  if (EFI_ERROR (Status)) {
-    return EFI_ABORTED;
+  if (QemuDetected ()) {
+    TableInstallFunction = QemuInstallAcpiTable;
+  } else {
+    TableInstallFunction = InstallAcpiTable;
   }
 
   //
@@ -260,53 +256,6 @@ FindAcpiTablesInFv (
 }
 
 /**
-  Find ACPI tables. This function is only for Xen.
-
-  @param  TableInstallFunction     A callback function to install Xen ACPI tables    
-
-**/
-EFI_STATUS
-EFIAPI
-FindAcpiTablesInXen (
-  IN  EFI_ACPI_TABLE_INSTALL_ACPI_TABLE  TableInstallFunction
-  )
-{
-  EFI_STATUS                         Status;
-  EFI_ACPI_TABLE_PROTOCOL            *AcpiTable;
-  EFI_ACPI_COMMON_HEADER             *CurrentTable;
-  UINTN                              TableHandle;
-  UINTN                              TableSize;
-
-  CurrentTable = NULL;
-  TableSize    = 0;
-  TableHandle  = 0;
-
-  //
-  // Find the AcpiTable protocol
-  //
-  Status = gBS->LocateProtocol (&gEfiAcpiTableProtocolGuid, NULL, (VOID**)&AcpiTable);
-  if (EFI_ERROR (Status)) {
-    return EFI_ABORTED;
-  }
-
-  //
-  // Install ACPI table
-  //
-  Status = TableInstallFunction (
-             AcpiTable,
-             CurrentTable,
-             TableSize,
-             &TableHandle
-             );
-
-  if (EFI_ERROR (Status)) {
-    return EFI_ABORTED;
-  }
-
-  return EFI_SUCCESS;
-}
-
-/**
   Entrypoint of Acpi Platform driver.
 
   @param  ImageHandle
@@ -325,15 +274,24 @@ AcpiPlatformEntryPoint (
   )
 {
   EFI_STATUS                         Status;
+  EFI_ACPI_TABLE_PROTOCOL            *AcpiTable;
 
-  if (QemuDetected ()) {
-    Status = FindAcpiTablesInFv (QemuInstallAcpiTable);
-  } else if (XenDetected ()) {
-    Status = FindAcpiTablesInXen (XenInstallAcpiTable);
-  } else {
-    Status = FindAcpiTablesInFv (InstallAcpiTable);
+  //
+  // Find the AcpiTable protocol
+  //
+  Status = gBS->LocateProtocol (&gEfiAcpiTableProtocolGuid, NULL, (VOID**)&AcpiTable);
+  if (EFI_ERROR (Status)) {
+    return EFI_ABORTED;
   }
 
+  if (XenDetected ()) {
+    Status = InstallXenTables (AcpiTable);
+    if (EFI_ERROR (Status)) {
+      Status = FindAcpiTablesInFv (AcpiTable);
+    }
+  } else {
+    Status = FindAcpiTablesInFv (AcpiTable);
+  }
   if (EFI_ERROR (Status)) {
     return Status;
   }

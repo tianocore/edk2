@@ -136,10 +136,7 @@ GetXenAcpiRsdp (
   Get Xen Acpi tables from the RSDP structure. And installs Xen ACPI tables into the RSDT/XSDT using InstallAcpiTable.
   Some signature of the installed ACPI tables are: FACP, APIC, HPET, WAET, SSDT, FACS, DSDT.
 
-  @param  This                 Protocol instance pointer.
-  @param  AcpiTableBuffer      A pointer to a buffer containing the ACPI table to be installed.
-  @param  AcpiTableBufferSize  Specifies the size, in bytes, of the AcpiTableBuffer buffer.
-  @param  TableKey             Reurns a key to refer to the ACPI table.
+  @param  AcpiProtocol           Protocol instance pointer.
 
   @return EFI_SUCCESS            The table was successfully inserted.
   @return EFI_INVALID_PARAMETER  Either AcpiTableBuffer is NULL, TableKey is NULL, or AcpiTableBufferSize 
@@ -150,14 +147,13 @@ GetXenAcpiRsdp (
 **/
 EFI_STATUS
 EFIAPI
-XenInstallAcpiTableFunc (
-  IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol,
-  IN   VOID                          *AcpiTableBuffer,
-  IN   UINTN                         AcpiTableBufferSize,
-  OUT  UINTN                         *TableKey
+InstallXenTables (
+  IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol
   )
 {
   EFI_STATUS                                       Status;
+  UINTN                                            *TableKey;
+
   EFI_ACPI_DESCRIPTION_HEADER                      *Rsdt;
   EFI_ACPI_DESCRIPTION_HEADER                      *Xsdt;
   VOID                                             *CurrentTableEntry;
@@ -171,12 +167,21 @@ XenInstallAcpiTableFunc (
   EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE     *Facs1Table;
   EFI_ACPI_DESCRIPTION_HEADER                      *DsdtTable;
 
+  TableKey   = NULL;
   Fadt2Table = NULL;
   Fadt1Table = NULL;
   Facs2Table = NULL;
   Facs1Table = NULL;
-  DsdtTable = NULL;
+  DsdtTable  = NULL;
   NumberOfTableEntries = 0;
+
+  //
+  // Try to find Xen ACPI tables
+  //
+  Status = GetXenAcpiRsdp (&XenAcpiRsdpStructurePtr);
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
 
   //
   // If XSDT table is find, just install its tables. Otherwise, try to find and install the RSDT tables.
@@ -292,37 +297,5 @@ XenInstallAcpiTableFunc (
   }
 
   return EFI_SUCCESS;
-}
-
-EFI_STATUS
-EFIAPI
-XenInstallAcpiTable (
-  IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol,
-  IN   VOID                          *AcpiTableBuffer,
-  IN   UINTN                         AcpiTableBufferSize,
-  OUT  UINTN                         *TableKey
-  )
-{
-  EFI_STATUS                             Status;
-  EFI_ACPI_TABLE_INSTALL_ACPI_TABLE      TableInstallFunction;
-
-  //
-  // Try to find Xen ACPI tables
-  //
-  Status = GetXenAcpiRsdp (&XenAcpiRsdpStructurePtr);
-
-  if (Status == EFI_SUCCESS) {
-    TableInstallFunction = XenInstallAcpiTableFunc;
-  }
-  else {
-    TableInstallFunction = InstallAcpiTable;
-  }
-
-  return TableInstallFunction(
-           AcpiProtocol,
-           AcpiTableBuffer,
-           AcpiTableBufferSize,
-           TableKey
-           );
 }
 
