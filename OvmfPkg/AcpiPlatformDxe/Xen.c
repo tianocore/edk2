@@ -21,7 +21,7 @@
 #define XEN_ACPI_PHYSICAL_ADDRESS         0x000EA020
 #define XEN_BIOS_PHYSICAL_END             0x000FFFFF
 
-EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER   *XenAcpiRsdpStructurePtr = NULL;
+EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER  *XenAcpiRsdpStructurePtr = NULL;
 
 /**
   Calculates the checksum of the ACPI tables.
@@ -78,13 +78,14 @@ XenDetected (
 }
 
 /**
-  Get the address of Xen ACPI Root System Description Pointer (RSDP) structure.
+  Get the address of Xen ACPI Root System Description Pointer (RSDP)
+  structure.
 
-  @param  RsdpStructurePtr          Return pointer to RSDP structure
+  @param  RsdpStructurePtr   Return pointer to RSDP structure
 
-  @return EFI_SUCCESS               Find Xen RSDP structure successfully.
-  @return EFI_NOT_FOUND             Don't find Xen RSDP structure.
-  @return EFI_ABORTED               Find Xen RSDP structure, but it's not integrated.
+  @return EFI_SUCCESS        Find Xen RSDP structure successfully.
+  @return EFI_NOT_FOUND      Don't find Xen RSDP structure.
+  @return EFI_ABORTED        Find Xen RSDP structure, but it's not integrated.
 
 **/
 EFI_STATUS
@@ -104,13 +105,18 @@ GetXenAcpiRsdp (
        XenAcpiPtr < (UINT8*)(UINTN) XEN_BIOS_PHYSICAL_END;
        XenAcpiPtr += 0x10) {
 
-    RsdpStructurePtr = (EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER *) (UINTN) XenAcpiPtr;
+    RsdpStructurePtr = (EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER *)
+                         (UINTN) XenAcpiPtr;
 
     if (!AsciiStrnCmp ((CHAR8 *) &RsdpStructurePtr->Signature, "RSD PTR ", 8)) {
       //
-      // RSDP ACPI 1.0 checksum for 1.0/2.0/3.0 table.  This is only the first 20 bytes of the structure
+      // RSDP ACPI 1.0 checksum for 1.0/2.0/3.0 table.
+      // This is only the first 20 bytes of the structure
       //
-      Sum = CalculateTableChecksum (RsdpStructurePtr, sizeof (EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER));
+      Sum = CalculateTableChecksum (
+              RsdpStructurePtr,
+              sizeof (EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER)
+              );
       if (Sum != 0) {
         return EFI_ABORTED;
       }
@@ -119,7 +125,10 @@ GetXenAcpiRsdp (
         //
         // RSDP ACPI 2.0/3.0 checksum, this is the entire table
         //
-        Sum = CalculateTableChecksum (RsdpStructurePtr, sizeof (EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER));
+        Sum = CalculateTableChecksum (
+                RsdpStructurePtr,
+                sizeof (EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER)
+                );
         if (Sum != 0) {
           return EFI_ABORTED;
         }
@@ -133,15 +142,17 @@ GetXenAcpiRsdp (
 }
 
 /**
-  Get Xen Acpi tables from the RSDP structure. And installs Xen ACPI tables into the RSDT/XSDT using InstallAcpiTable.
-  Some signature of the installed ACPI tables are: FACP, APIC, HPET, WAET, SSDT, FACS, DSDT.
+  Get Xen Acpi tables from the RSDP structure. And installs Xen ACPI tables
+  into the RSDT/XSDT using InstallAcpiTable. Some signature of the installed
+  ACPI tables are: FACP, APIC, HPET, WAET, SSDT, FACS, DSDT.
 
   @param  AcpiProtocol           Protocol instance pointer.
 
   @return EFI_SUCCESS            The table was successfully inserted.
-  @return EFI_INVALID_PARAMETER  Either AcpiTableBuffer is NULL, TableKey is NULL, or AcpiTableBufferSize 
-                                 and the size field embedded in the ACPI table pointed to by AcpiTableBuffer
-                                 are not in sync.
+  @return EFI_INVALID_PARAMETER  Either AcpiTableBuffer is NULL, TableHandle is
+                                 NULL, or AcpiTableBufferSize and the size
+                                 field embedded in the ACPI table pointed to
+                                 by AcpiTableBuffer are not in sync.
   @return EFI_OUT_OF_RESOURCES   Insufficient resources exist to complete the request.
 
 **/
@@ -152,7 +163,7 @@ InstallXenTables (
   )
 {
   EFI_STATUS                                       Status;
-  UINTN                                            *TableKey;
+  UINTN                                            TableHandle;
 
   EFI_ACPI_DESCRIPTION_HEADER                      *Rsdt;
   EFI_ACPI_DESCRIPTION_HEADER                      *Xsdt;
@@ -167,31 +178,36 @@ InstallXenTables (
   EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE     *Facs1Table;
   EFI_ACPI_DESCRIPTION_HEADER                      *DsdtTable;
 
-  TableKey   = NULL;
-  Fadt2Table = NULL;
-  Fadt1Table = NULL;
-  Facs2Table = NULL;
-  Facs1Table = NULL;
-  DsdtTable  = NULL;
+  Fadt2Table  = NULL;
+  Fadt1Table  = NULL;
+  Facs2Table  = NULL;
+  Facs1Table  = NULL;
+  DsdtTable   = NULL;
+  TableHandle = 0;
   NumberOfTableEntries = 0;
 
   //
   // Try to find Xen ACPI tables
   //
   Status = GetXenAcpiRsdp (&XenAcpiRsdpStructurePtr);
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
   //
-  // If XSDT table is find, just install its tables. Otherwise, try to find and install the RSDT tables.
+  // If XSDT table is find, just install its tables. 
+  // Otherwise, try to find and install the RSDT tables.
   //
   if (XenAcpiRsdpStructurePtr->XsdtAddress) {
     //
-    // Retrieve the addresses of XSDT and calculate the number of its table entries.
+    // Retrieve the addresses of XSDT and 
+    // calculate the number of its table entries.
     //
-    Xsdt = (EFI_ACPI_DESCRIPTION_HEADER *) (UINTN) XenAcpiRsdpStructurePtr->XsdtAddress;
-    NumberOfTableEntries = (Xsdt->Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) / sizeof (UINT64);
+    Xsdt = (EFI_ACPI_DESCRIPTION_HEADER *) (UINTN)
+             XenAcpiRsdpStructurePtr->XsdtAddress;
+    NumberOfTableEntries = (Xsdt->Length -
+                             sizeof (EFI_ACPI_DESCRIPTION_HEADER)) /
+                             sizeof (UINT64);
 
     //
     // Install ACPI tables found in XSDT.
@@ -200,17 +216,23 @@ InstallXenTables (
       //
       // Get the table entry from XSDT
       //
-      CurrentTableEntry = (VOID *) ((UINT8 *) Xsdt + sizeof (EFI_ACPI_DESCRIPTION_HEADER) + Index * sizeof (UINT64));
+      CurrentTableEntry = (VOID *) ((UINT8 *) Xsdt +
+                            sizeof (EFI_ACPI_DESCRIPTION_HEADER) +
+                            Index * sizeof (UINT64));
       CurrentTablePointer = *(UINT64 *)CurrentTableEntry;
       CurrentTable = (EFI_ACPI_DESCRIPTION_HEADER *) CurrentTablePointer;
 
       //
       // Install the XSDT tables
       //
-      Status = InstallAcpiTable (AcpiProtocol, CurrentTable, CurrentTable->Length, TableKey);
+      Status = InstallAcpiTable (
+                 AcpiProtocol,
+                 CurrentTable,
+                 CurrentTable->Length,
+                 &TableHandle
+                 );
 
-      if (EFI_ERROR(Status)) {
-        DEBUG ((EFI_D_INFO, "[XSDT]InstallAcpiTable->%r\n",Status));
+      if (EFI_ERROR (Status)) {
         return Status;
       }
 
@@ -218,18 +240,24 @@ InstallXenTables (
       // Get the FACS and DSDT table address from the table FADT
       //
       if (!AsciiStrnCmp ((CHAR8 *) &CurrentTable->Signature, "FACP", 4)) {
-        Fadt2Table = (EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE *) (UINTN) CurrentTablePointer;
-        Facs2Table = (EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *) (UINTN) Fadt2Table->FirmwareCtrl;
+        Fadt2Table = (EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE *)
+                       (UINTN) CurrentTablePointer;
+        Facs2Table = (EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *)
+                       (UINTN) Fadt2Table->FirmwareCtrl;
         DsdtTable  = (EFI_ACPI_DESCRIPTION_HEADER *) (UINTN) Fadt2Table->Dsdt;
       }
     }
   }
   else if (XenAcpiRsdpStructurePtr->RsdtAddress) {
     //
-    // Retrieve the addresses of RSDT and calculate the number of its table entries.
+    // Retrieve the addresses of RSDT and
+    // calculate the number of its table entries.
     //
-    Rsdt = (EFI_ACPI_DESCRIPTION_HEADER *) (UINTN) XenAcpiRsdpStructurePtr->RsdtAddress;
-    NumberOfTableEntries = (Rsdt->Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) / sizeof (UINT32);
+    Rsdt = (EFI_ACPI_DESCRIPTION_HEADER *) (UINTN)
+             XenAcpiRsdpStructurePtr->RsdtAddress;
+    NumberOfTableEntries = (Rsdt->Length -
+                             sizeof (EFI_ACPI_DESCRIPTION_HEADER)) / 
+                             sizeof (UINT32);
 
     //
     // Install ACPI tables found in XSDT.
@@ -238,17 +266,23 @@ InstallXenTables (
       //
       // Get the table entry from RSDT
       //
-      CurrentTableEntry = (UINT32 *) ((UINT8 *) Rsdt + sizeof (EFI_ACPI_DESCRIPTION_HEADER) + Index * sizeof (UINT32));
+      CurrentTableEntry = (UINT32 *) ((UINT8 *) Rsdt +
+                            sizeof (EFI_ACPI_DESCRIPTION_HEADER) +
+                            Index * sizeof (UINT32));
       CurrentTablePointer = *(UINT32 *)CurrentTableEntry;
       CurrentTable = (EFI_ACPI_DESCRIPTION_HEADER *) CurrentTablePointer;
 
       //
       // Install the RSDT tables
       //
-      Status = InstallAcpiTable (AcpiProtocol, CurrentTable, CurrentTable->Length, TableKey);
+      Status = InstallAcpiTable (
+                 AcpiProtocol,
+                 CurrentTable,
+                 CurrentTable->Length,
+                 &TableHandle
+                 );
 
-      if (EFI_ERROR(Status)) {
-        DEBUG ((EFI_D_INFO, "[RSDT]InstallAcpiTable->%r\n",Status));
+      if (EFI_ERROR (Status)) {
         return Status;
       }
 
@@ -256,8 +290,10 @@ InstallXenTables (
       // Get the FACS and DSDT table address from the table FADT
       //
       if (!AsciiStrnCmp ((CHAR8 *) &CurrentTable->Signature, "FACP", 4)) {
-        Fadt1Table = (EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE *) (UINTN) CurrentTablePointer;
-        Facs1Table = (EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *) (UINTN) Fadt1Table->FirmwareCtrl;
+        Fadt1Table = (EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE *)
+                       (UINTN) CurrentTablePointer;
+        Facs1Table = (EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *)
+                       (UINTN) Fadt1Table->FirmwareCtrl;
         DsdtTable  = (EFI_ACPI_DESCRIPTION_HEADER *) (UINTN) Fadt1Table->Dsdt;
       }
     }
@@ -270,9 +306,13 @@ InstallXenTables (
     //
     // FACS 2.0
     //
-    Status = InstallAcpiTable (AcpiProtocol, Facs2Table, Facs2Table->Length, TableKey);
-    if (EFI_ERROR(Status)) {
-      DEBUG ((EFI_D_INFO, "[FACS2]InstallAcpiTable->%r\n",Status));
+    Status = InstallAcpiTable (
+               AcpiProtocol,
+               Facs2Table,
+               Facs2Table->Length,
+               &TableHandle
+               );
+    if (EFI_ERROR (Status)) {
       return Status;
     }
   }
@@ -280,9 +320,13 @@ InstallXenTables (
     //
     // FACS 1.0
     //
-    Status = InstallAcpiTable (AcpiProtocol, Facs1Table, Facs1Table->Length, TableKey);
-    if (EFI_ERROR(Status)) {
-      DEBUG ((EFI_D_INFO, "[FACS1]InstallAcpiTable->%r\n",Status));
+    Status = InstallAcpiTable (
+               AcpiProtocol,
+               Facs1Table,
+               Facs1Table->Length,
+               &TableHandle
+               );
+    if (EFI_ERROR (Status)) {
       return Status;
     }
   }
@@ -290,9 +334,13 @@ InstallXenTables (
   //
   // Install DSDT table.
   //
-  Status = InstallAcpiTable (AcpiProtocol, DsdtTable, DsdtTable->Length, TableKey);
-  if (EFI_ERROR(Status)) {
-    DEBUG ((EFI_D_INFO, "[DSDT]InstallAcpiTable->%r\n",Status));
+  Status = InstallAcpiTable (
+             AcpiProtocol,
+             DsdtTable,
+             DsdtTable->Length,
+             &TableHandle
+             );
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 

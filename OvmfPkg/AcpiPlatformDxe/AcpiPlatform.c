@@ -81,7 +81,6 @@ LocateFvInstanceWithTables (
   //
   // Looking for FV with ACPI storage file
   //
-
   for (Index = 0; Index < NumberOfHandles; Index++) {
     //
     // Get the protocol on this handle
@@ -211,7 +210,7 @@ FindAcpiTablesInFv (
                       &Size,
                       &FvStatus
                       );
-    if (!EFI_ERROR(Status)) {
+    if (!EFI_ERROR (Status)) {
       //
       // Add the table
       //
@@ -279,7 +278,11 @@ AcpiPlatformEntryPoint (
   //
   // Find the AcpiTable protocol
   //
-  Status = gBS->LocateProtocol (&gEfiAcpiTableProtocolGuid, NULL, (VOID**)&AcpiTable);
+  Status = gBS->LocateProtocol (
+                  &gEfiAcpiTableProtocolGuid,
+                  NULL,
+                  (VOID**)&AcpiTable
+                  );
   if (EFI_ERROR (Status)) {
     return EFI_ABORTED;
   }

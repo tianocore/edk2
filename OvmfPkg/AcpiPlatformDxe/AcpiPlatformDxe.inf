@@ -40,11 +40,13 @@
   UefiLib
   DxeServicesLib
   PcdLib
+  BaseMemoryLib
   DebugLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   HobLib
   QemuFwCfgLib
+  MemoryAllocationLib
 
 [Protocols]
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
