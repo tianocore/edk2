@@ -984,7 +984,7 @@ IsPkcsSignedDataVerifiedBySignatureList (
           // Iterate each Signature Data Node within this CertList for verify.
           //
           RootCert      = Cert->SignatureData;
-          RootCertSize  = CertList->SignatureSize;
+          RootCertSize  = CertList->SignatureSize - sizeof (EFI_GUID);
 
           //
           // Call AuthenticodeVerify library to Verify Authenticode struct.
