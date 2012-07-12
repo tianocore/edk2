@@ -15,6 +15,7 @@
 
 
     EXPORT  __aeabi_uread4
+    EXPORT  __aeabi_uread8
 
     AREA  Uread4, CODE, READONLY
 
@@ -35,4 +36,31 @@ __aeabi_uread4
     orr     r0, r1, r0, lsl #24
     bx      lr
 
+;
+;UINT64
+;EFIAPI
+;__aeabi_uread8 (
+;  IN VOID   *Pointer
+;  );
+;
+__aeabi_uread8
+    mov	    r3, r0
+
+    ldrb    r1, [r3]
+    ldrb    r2, [r3, #1]
+    orr     r1, r1, r2, lsl #8
+    ldrb    r2, [r3, #2]
+    orr     r1, r1, r2, lsl #16
+    ldrb    r0, [r3, #3]
+    orr     r0, r1, r0, lsl #24
+
+    ldrb    r1, [r3, #4]
+    ldrb    r2, [r3, #5]
+    orr     r1, r1, r2, lsl #8
+    ldrb    r2, [r3, #6]
+    orr     r1, r1, r2, lsl #16
+    ldrb    r2, [r3, #7]
+    orr     r1, r1, r2, lsl #24
+
+    bx      lr
     END

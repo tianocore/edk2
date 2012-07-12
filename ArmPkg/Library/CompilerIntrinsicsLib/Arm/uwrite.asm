@@ -14,6 +14,7 @@
 
 
     EXPORT  __aeabi_uwrite4
+    EXPORT  __aeabi_uwrite8
 
     AREA  Uwrite4, CODE, READONLY
 
@@ -35,6 +36,31 @@ __aeabi_uwrite4
     mov     r2, r0, lsr #24
     strb    r2, [r1, #3]
     bx      lr
- 
+
+;
+;UINT64
+;EFIAPI
+;__aeabi_uwrite8 (
+;  IN UINT64 Data,    //r0-r1
+;  IN VOID   *Pointer //r2
+;  );
+;
+;
+__aeabi_uwrite8
+    mov     r3, r0, lsr #8
+    strb    r0, [r2]
+    strb    r3, [r2, #1]
+    mov     r3, r0, lsr #16
+    strb    r3, [r2, #2]
+    mov     r3, r0, lsr #24
+    strb    r3, [r2, #3]
+
+    mov     r3, r1, lsr #8
+    strb    r1, [r2, #4]
+    strb    r3, [r2, #5]
+    mov     r3, r1, lsr #16
+    strb    r3, [r2, #6]
+    mov     r3, r1, lsr #24
+    strb    r3, [r2, #7]
     END
 
