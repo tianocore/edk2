@@ -347,11 +347,11 @@ EnrollPlatformKey (
   PkCert = NULL;
 
   //
-  // Parse the file's postfix. Only support *.cer(X509) files.
+  // Parse the file's postfix. Only support DER encoded X.509 certificate files (*.cer or *.der).
   //
   FilePostFix = Private->FileContext->FileName + StrLen (Private->FileContext->FileName) - 4;
-  if (CompareMem (FilePostFix, L".cer",4)) {
-    DEBUG ((EFI_D_ERROR, "Don't support the file, only *.cer is supported."));
+  if ((CompareMem (FilePostFix, L".cer",4) != 0) && (CompareMem (FilePostFix, L".der",4) != 0)) {
+    DEBUG ((EFI_D_ERROR, "Unsupported file type, only DER encoded certificate file (*.cer or *.der) is supported."));
     return EFI_INVALID_PARAMETER;
   }
   DEBUG ((EFI_D_INFO, "FileName= %s\n", Private->FileContext->FileName));
@@ -2513,7 +2513,7 @@ SecureBootCallback (
         CreatePopUp (
           EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
           &Key,
-          L"ERROR: Unsupported file type, only *.cer is supported!",
+          L"ERROR: Unsupported file type, only DER encoded certificate file (*.cer or *.der) is supported!",
           NULL
           );
       } else {
