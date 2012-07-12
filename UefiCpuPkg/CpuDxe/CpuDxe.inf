@@ -38,6 +38,7 @@
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   LocalApicLib
+  UefiCpuLib
 
 [Sources]
   CpuDxe.c

@@ -1,7 +1,7 @@
 /** @file  
   This module implements TCG EFI Protocol.
   
-Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -1176,11 +1176,6 @@ DriverEntry (
                   EFI_NATIVE_INTERFACE,
                   &mTcgDxeData.TcgProtocol
                   );
-  //
-  // Install ACPI Table
-  //
-  EfiCreateProtocolNotifyEvent (&gEfiAcpiTableProtocolGuid, TPL_CALLBACK, InstallAcpiTable, NULL, &Registration);
-    
   if (!EFI_ERROR (Status) && !mTcgDxeData.BsCap.TPMDeactivatedFlag) {
     //
     // Setup the log area and copy event log from hob list to it
@@ -1208,5 +1203,10 @@ DriverEntry (
                     );
   }
 
+  //
+  // Install ACPI Table
+  //
+  EfiCreateProtocolNotifyEvent (&gEfiAcpiTableProtocolGuid, TPL_CALLBACK, InstallAcpiTable, NULL, &Registration);
+  
   return Status;
 }

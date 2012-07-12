@@ -2464,13 +2464,11 @@ PciFindProtocolInterface (
 {
   UINTN                             Index;
   EFI_STATUS                        Status;
-  BOOLEAN                           FoundInterface;
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Descriptors;
   UINT16                            MinBus;
   UINT16                            MaxBus;
   BOOLEAN                           IsEnd;
 
-  FoundInterface = FALSE;
   //
   // Go through all handles, until the one meets the criteria is found
   //
@@ -2502,17 +2500,12 @@ PciFindProtocolInterface (
       }
 
       if (MinBus <= Bus && MaxBus >= Bus) {
-        FoundInterface = TRUE;
-        break;
+        return EFI_SUCCESS;
       }
     }
   }
 
-  if (FoundInterface) {
-    return EFI_SUCCESS;
-  } else {
-    return EFI_INVALID_PARAMETER;
-  }
+  return EFI_NOT_FOUND;
 }
 
 /**

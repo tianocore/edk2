@@ -98,6 +98,12 @@ ArmGicEnableInterruptInterface (
 
 VOID
 EFIAPI
+ArmGicDisableInterruptInterface (
+  IN  INTN          GicInterruptInterfaceBase
+  );
+
+VOID
+EFIAPI
 ArmGicEnableDistributor (
   IN  INTN          GicDistributorBase
   );

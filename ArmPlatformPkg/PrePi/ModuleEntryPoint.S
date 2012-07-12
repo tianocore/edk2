@@ -108,7 +108,7 @@ _GetStackBaseMpCore:
   LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), r2)
   sub   r7, r1, r2
 
-  // Stack for the secondary core = Number of Cluster * (4 Core per cluster) * SecondaryStackSize
+  // Stack for the secondary core = Number of Clusters * (4 Cores per cluster) * SecondaryStackSize
   LoadConstantToReg (FixedPcdGet32(PcdClusterCount), r2)
   lsl   r2, r2, #2
   LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecondaryStackSize), r3)
@@ -131,7 +131,7 @@ _SetupSecondaryCoreStack:
   // r1 = The base of the secondary Stacks
 
   // Get the position of the cores (ClusterId * 4) + CoreId
-  GetCorePositionInStack(r0, r5, r4)
+  GetCorePositionFromMpId(r0, r5, r4)
   // The stack starts at the top of the stack region. Add '1' to the Core Position to get the top of the stack
   add   r0, r0, #1
   // Get the offset for the Secondary Stack

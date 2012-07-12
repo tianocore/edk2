@@ -75,5 +75,3 @@ DebugAgentTimerEndOfInterrupt (
 {
   // EOI Timer interrupt for FIQ
 }
-  
-  

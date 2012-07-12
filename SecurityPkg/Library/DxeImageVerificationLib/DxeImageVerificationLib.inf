@@ -68,13 +68,8 @@
   gEfiCertSha256Guid
   gEfiCertX509Guid
   gEfiCertRsa2048Guid
-  gEfiSecureBootEnableDisableGuid
   
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy
   gEfiSecurityPkgTokenSpaceGuid.PcdRemovableMediaImageVerificationPolicy
   gEfiSecurityPkgTokenSpaceGuid.PcdFixedMediaImageVerificationPolicy
-
-  
-
-

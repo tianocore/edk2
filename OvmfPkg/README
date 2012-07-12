@@ -60,11 +60,10 @@ http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=How_to_build_OVM
 
 * QEMU 0.9.1 or later is required.
 * Either copy, rename or symlink OVMF.FD => bios.bin
-* Either copy, rename or symlink OvmfVideo.rom => vgabios-cirrus.bin
 * Be sure to use qemu-system-x86_64, if you are using and X64 firmware.
   (qemu-system-x86_64 works for the IA32 firmware as well, of course.)
 * Use the QEMU -L parameter to specify the directory where the bios.bin
-  and vgabios-cirrus.bin files are located.
+  file is located.
 * Optionally you can use the QEMU -serial command to capture the
   OVMF debug messages.  For example: -serial file:serial.log
 * The EFI shell is built into OVMF builds at this time, so it should

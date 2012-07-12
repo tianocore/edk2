@@ -97,4 +97,4 @@ ReadCLIDR
   mrc p15,1,r0,c0,c0,1 ; Read CP15 Cache Level ID Register
   bx  lr
   
-END
+  END

@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -45,6 +45,7 @@ PROCESSOR=X64
 BUILDTARGET=DEBUG
 BUILD_OPTIONS=
 PLATFORMFILE=
+THREADNUMBER=1
 LAST_ARG=
 RUN_QEMU=no
 
@@ -89,7 +90,7 @@ for arg in "$@"
 do
   if [ -z "$LAST_ARG" ]; then
     case $arg in
-      -a|-b|-t|-p)
+      -a|-b|-t|-p|-n)
         LAST_ARG=$arg
         ;;
       qemu)
@@ -114,6 +115,9 @@ do
         ;;
       -t)
         TARGET_TOOLS=$arg
+        ;;
+      -n)
+        THREADNUMBER=$arg
         ;;
       *)
         BUILD_OPTIONS="$BUILD_OPTIONS $arg"
@@ -191,7 +195,6 @@ if [[ "$RUN_QEMU" == "yes" ]]; then
     mkdir $QEMU_FIRMWARE_DIR
   fi
   ln -sf $FV_DIR/OVMF.fd $QEMU_FIRMWARE_DIR/bios.bin
-  ln -sf $FV_DIR/OvmfVideo.rom $QEMU_FIRMWARE_DIR/vgabios-cirrus.bin
   if [[ "$ADD_QEMU_HDA" == "yes" ]]; then
     AUTO_QEMU_HDA="-hda fat:$BUILD_ROOT_ARCH"
   else
@@ -207,6 +210,6 @@ fi
 # Build the edk2 OvmfPkg
 #
 echo Running edk2 build for OvmfPkg$Processor
-build -p $PLATFORMFILE $BUILD_OPTIONS -a $PROCESSOR -b $BUILDTARGET -t $TARGET_TOOLS
+build -p $PLATFORMFILE $BUILD_OPTIONS -a $PROCESSOR -b $BUILDTARGET -t $TARGET_TOOLS -n $THREADNUMBER
 exit $?
 

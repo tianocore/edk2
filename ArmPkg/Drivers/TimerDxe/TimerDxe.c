@@ -144,7 +144,7 @@ TimerDriverSetTimerPeriod (
     // Convert TimerPeriod to micro sec units
     TimerTicks = DivU64x32 (TimerPeriod, 10);
 
-    TimerTicks = MultU64x32 (TimerPeriod, (PcdGet32(PcdArmArchTimerFreqInHz)/1000000));
+    TimerTicks = MultU64x32 (TimerTicks, (PcdGet32(PcdArmArchTimerFreqInHz)/1000000));
 
     ArmArchTimerSetTimerVal((UINTN)TimerTicks);
 

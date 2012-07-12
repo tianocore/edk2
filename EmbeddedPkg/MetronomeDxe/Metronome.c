@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2012, ARM Ltd. All rights reserved.
   
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -89,7 +90,7 @@ WaitForTick (
 **/
 EFI_METRONOME_ARCH_PROTOCOL gMetronome = {
   WaitForTick,
-  100              
+  FixedPcdGet32 (PcdMetronomeTickPeriod)
 };
 
 

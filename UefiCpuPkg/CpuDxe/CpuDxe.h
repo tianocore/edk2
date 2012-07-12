@@ -29,6 +29,7 @@
 #include <Library/DebugLib.h>
 #include <Library/MtrrLib.h>
 #include <Library/LocalApicLib.h>
+#include <Library/UefiCpuLib.h>
 #include <Guid/IdleLoopEvent.h>
 
 //

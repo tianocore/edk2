@@ -584,6 +584,16 @@ typedef enum {
   GetDefaultForMax              // Invalid value.
 } BROWSER_GET_DEFAULT_VALUE;
 
+//
+// Get/set question value from/to.
+//
+typedef enum {
+  GetSetValueWithEditBuffer,       // Get/Set question value from/to editbuffer in the storage.
+  GetSetValueWithBuffer,           // Get/Set question value from/to buffer in the storage.
+  GetSetValueWithHiiDriver,        // Get/Set question value from/to hii driver.
+  GetSetValueWithMax               // Invalid value.
+} GET_SET_QUESTION_VALUE_WITH;
+
 extern EFI_HII_DATABASE_PROTOCOL         *mHiiDatabase;
 extern EFI_HII_STRING_PROTOCOL           *mHiiString;
 extern EFI_HII_CONFIG_ROUTING_PROTOCOL   *mHiiConfigRouting;
@@ -887,6 +897,7 @@ CreateDialog (
   @param  Storage                The NameValue Storage.
   @param  Name                   The Name.
   @param  Value                  The retured Value.
+  @param  GetValueFrom           Where to get source value, from EditValue or Value.
 
   @retval EFI_SUCCESS            Value found for given Name.
   @retval EFI_NOT_FOUND          No such Name found in NameValue storage.
@@ -894,9 +905,10 @@ CreateDialog (
 **/
 EFI_STATUS
 GetValueByName (
-  IN FORMSET_STORAGE         *Storage,
-  IN CHAR16                  *Name,
-  IN OUT CHAR16              **Value
+  IN FORMSET_STORAGE             *Storage,
+  IN CHAR16                      *Name,
+  IN OUT CHAR16                  **Value,
+  IN GET_SET_QUESTION_VALUE_WITH GetValueFrom
   );
 
 /**
@@ -905,7 +917,7 @@ GetValueByName (
   @param  Storage                The NameValue Storage.
   @param  Name                   The Name.
   @param  Value                  The Value to set.
-  @param  Edit                   Whether update editValue or Value.
+  @param  SetValueTo             Whether update editValue or Value.
 
   @retval EFI_SUCCESS            Value found for given Name.
   @retval EFI_NOT_FOUND          No such Name found in NameValue storage.
@@ -913,10 +925,10 @@ GetValueByName (
 **/
 EFI_STATUS
 SetValueByName (
-  IN FORMSET_STORAGE         *Storage,
-  IN CHAR16                  *Name,
-  IN CHAR16                  *Value,
-  IN BOOLEAN                 Edit
+  IN FORMSET_STORAGE             *Storage,
+  IN CHAR16                      *Name,
+  IN CHAR16                      *Value,
+  IN GET_SET_QUESTION_VALUE_WITH SetValueTo
   );
 
 /**
@@ -925,8 +937,7 @@ SetValueByName (
   @param  FormSet                FormSet data structure.
   @param  Form                   Form data structure.
   @param  Question               Question to be initialized.
-  @param  Cached                 TRUE:  get from Edit copy FALSE: get from original
-                                 Storage
+  @param  GetValueFrom           Where to get value, may from editbuffer, buffer or hii driver.
 
   @retval EFI_SUCCESS            The function completed successfully.
 
@@ -936,7 +947,7 @@ GetQuestionValue (
   IN FORM_BROWSER_FORMSET             *FormSet,
   IN FORM_BROWSER_FORM                *Form,
   IN OUT FORM_BROWSER_STATEMENT       *Question,
-  IN BOOLEAN                          Cached
+  IN GET_SET_QUESTION_VALUE_WITH      GetValueFrom
   );
 
 /**
@@ -945,8 +956,7 @@ GetQuestionValue (
   @param  FormSet                FormSet data structure.
   @param  Form                   Form data structure.
   @param  Question               Pointer to the Question.
-  @param  Cached                 TRUE:  set to Edit copy FALSE: set to original
-                                 Storage
+  @param  SetValueTo             Update the question value to editbuffer , buffer or hii driver.
 
   @retval EFI_SUCCESS            The function completed successfully.
 
@@ -956,7 +966,7 @@ SetQuestionValue (
   IN FORM_BROWSER_FORMSET             *FormSet,
   IN FORM_BROWSER_FORM                *Form,
   IN OUT FORM_BROWSER_STATEMENT       *Question,
-  IN BOOLEAN                          Cached
+  IN GET_SET_QUESTION_VALUE_WITH      SetValueTo
   );
 
 /**

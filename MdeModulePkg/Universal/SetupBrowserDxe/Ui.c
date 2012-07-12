@@ -439,7 +439,7 @@ RefreshQuestion (
   Selection = MenuRefreshEntry->Selection;
   Question = MenuRefreshEntry->MenuOption->ThisTag;
 
-  Status = GetQuestionValue (Selection->FormSet, Selection->Form, Question, FALSE);
+  Status = GetQuestionValue (Selection->FormSet, Selection->Form, Question, GetSetValueWithHiiDriver);
   if (EFI_ERROR (Status)) {
     return Status;
   }

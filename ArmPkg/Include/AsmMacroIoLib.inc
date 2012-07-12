@@ -81,7 +81,7 @@
   MEND 
   
   MACRO
-  GetCorePositionInStack $Pos, $MpId, $Tmp
+  GetCorePositionFromMpId $Pos, $MpId, $Tmp
   lsr   $Pos, $MpId, #6
   and   $Tmp, $MpId, #3
   add   $Pos, $Pos, $Tmp

@@ -104,9 +104,9 @@
 // L2x0 Cache Controller Base Address
 //#define ARM_EB_L2x0_CTLR_BASE                   0x1E00A000*/
 
-#define ARM_EB_SYS_PROC_ID_MASK                  (0xFF << 24)
-#define ARM_EB_SYS_PROC_ID_CORTEX_A8             (0x0E << 24)
-#define ARM_EB_SYS_PROC_ID_CORTEX_A9             (0x0C << 24)
+#define ARM_EB_SYS_PROC_ID_MASK                  (UINT32)(0xFFU << 24)
+#define ARM_EB_SYS_PROC_ID_CORTEX_A8             (UINT32)(0x0EU << 24)
+#define ARM_EB_SYS_PROC_ID_CORTEX_A9             (UINT32)(0x0CU << 24)
 
 /*******************************************
 // System Configuration Control

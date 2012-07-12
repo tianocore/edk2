@@ -156,12 +156,6 @@
   #
   gArmTokenSpaceGuid.PcdL2x0ControllerBase|0|UINT32|0x0000001B
   
-  #
-  # ARM PL390 General Interrupt Controller
-  #
-  gArmTokenSpaceGuid.PcdGicDistributorBase|0|UINT32|0x0000001C
-  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0|UINT32|0x0000001D
-  
   # 
   # BdsLib
   #

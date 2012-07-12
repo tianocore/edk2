@@ -26,7 +26,8 @@
 
 VOID
 CEntryPoint (
-  IN  UINTN                     MpId
+  IN  UINTN                     MpId,
+  IN  UINTN                     SecBootMode
   )
 {
   CHAR8           Buffer[100];
@@ -55,7 +56,7 @@ CEntryPoint (
   ArmPlatformSecInitialize (MpId);
 
   // Primary CPU clears out the SCU tag RAMs, secondaries wait
-  if (IS_PRIMARY_CORE(MpId)) {
+  if (IS_PRIMARY_CORE(MpId) && (SecBootMode == ARM_SEC_COLD_BOOT)) {
     if (ArmIsMpCore()) {
       // Signal for the initial memory is configured (event: BOOT_MEM_INIT)
       ArmCallSEV ();
@@ -109,7 +110,7 @@ CEntryPoint (
             ((PcdGet32(PcdCPUCoresSecMonStackBase) != 0) && (PcdGet32(PcdCPUCoreSecMonStackSize) != 0)));
 
     // Enter Monitor Mode
-    enter_monitor_mode ((UINTN)TrustedWorldInitialization, MpId, (VOID*)(PcdGet32(PcdCPUCoresSecMonStackBase) + (PcdGet32(PcdCPUCoreSecMonStackSize) * (GET_CORE_POS(MpId) + 1))));
+    enter_monitor_mode ((UINTN)TrustedWorldInitialization, MpId, SecBootMode, (VOID*)(PcdGet32(PcdCPUCoresSecMonStackBase) + (PcdGet32(PcdCPUCoreSecMonStackSize) * (GET_CORE_POS(MpId) + 1))));
   } else {
     if (IS_PRIMARY_CORE(MpId)) {
       SerialPrint ("Trust Zone Configuration is disabled\n\r");
@@ -131,7 +132,8 @@ CEntryPoint (
 
 VOID
 TrustedWorldInitialization (
-  IN  UINTN                     MpId
+  IN  UINTN                     MpId,
+  IN  UINTN                     SecBootMode
   )
 {
   UINTN   JumpAddress;
@@ -148,17 +150,19 @@ TrustedWorldInitialization (
   ArmPlatformSecTrustzoneInit (MpId);
 
   // Setup the Trustzone Chipsets
-  if (IS_PRIMARY_CORE(MpId)) {
-    if (ArmIsMpCore()) {
-      // Signal the secondary core the Security settings is done (event: EVENT_SECURE_INIT)
-      ArmCallSEV ();
-    }
-  } else {
-    // The secondary cores need to wait until the Trustzone chipsets configuration is done
-    // before switching to Non Secure World
+  if (SecBootMode == ARM_SEC_COLD_BOOT) {
+    if (IS_PRIMARY_CORE(MpId)) {
+      if (ArmIsMpCore()) {
+        // Signal the secondary core the Security settings is done (event: EVENT_SECURE_INIT)
+        ArmCallSEV ();
+      }
+    } else {
+      // The secondary cores need to wait until the Trustzone chipsets configuration is done
+      // before switching to Non Secure World
 
-    // Wait for the Primary Core to finish the initialization of the Secure World (event: EVENT_SECURE_INIT)
-    ArmCallWFE ();
+      // Wait for the Primary Core to finish the initialization of the Secure World (event: EVENT_SECURE_INIT)
+      ArmCallWFE ();
+    }
   }
 
   // Call the Platform specific function to execute additional actions if required

@@ -933,6 +933,7 @@ SynchronizeStorage (
   @param  Storage                The NameValue Storage.
   @param  Name                   The Name.
   @param  Value                  The retured Value.
+  @param  GetValueFrom           Where to get source value, from EditValue or Value.
 
   @retval EFI_SUCCESS            Value found for given Name.
   @retval EFI_NOT_FOUND          No such Name found in NameValue storage.
@@ -940,13 +941,18 @@ SynchronizeStorage (
 **/
 EFI_STATUS
 GetValueByName (
-  IN FORMSET_STORAGE         *Storage,
-  IN CHAR16                  *Name,
-  IN OUT CHAR16              **Value
+  IN FORMSET_STORAGE             *Storage,
+  IN CHAR16                      *Name,
+  IN OUT CHAR16                  **Value,
+  IN GET_SET_QUESTION_VALUE_WITH GetValueFrom
   )
 {
   LIST_ENTRY              *Link;
   NAME_VALUE_NODE         *Node;
+
+  if (GetValueFrom != GetSetValueWithEditBuffer && GetValueFrom != GetSetValueWithBuffer) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   *Value = NULL;
 
@@ -955,7 +961,11 @@ GetValueByName (
     Node = NAME_VALUE_NODE_FROM_LINK (Link);
 
     if (StrCmp (Name, Node->Name) == 0) {
-      NewStringCpy (Value, Node->EditValue);
+      if (GetValueFrom == GetSetValueWithEditBuffer) {
+        NewStringCpy (Value, Node->EditValue);
+      } else {
+        NewStringCpy (Value, Node->Value);
+      }
       return EFI_SUCCESS;
     }
 
@@ -972,7 +982,7 @@ GetValueByName (
   @param  Storage                The NameValue Storage.
   @param  Name                   The Name.
   @param  Value                  The Value to set.
-  @param  Edit                   Whether update editValue or Value.
+  @param  SetValueTo             Whether update editValue or Value.
 
   @retval EFI_SUCCESS            Value found for given Name.
   @retval EFI_NOT_FOUND          No such Name found in NameValue storage.
@@ -983,19 +993,23 @@ SetValueByName (
   IN FORMSET_STORAGE         *Storage,
   IN CHAR16                  *Name,
   IN CHAR16                  *Value,
-  IN BOOLEAN                 Edit
+  IN GET_SET_QUESTION_VALUE_WITH SetValueTo
   )
 {
   LIST_ENTRY              *Link;
   NAME_VALUE_NODE         *Node;
   CHAR16                  *Buffer;
 
+  if (SetValueTo != GetSetValueWithEditBuffer && SetValueTo != GetSetValueWithBuffer) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   Link = GetFirstNode (&Storage->NameValueListHead);
   while (!IsNull (&Storage->NameValueListHead, Link)) {
     Node = NAME_VALUE_NODE_FROM_LINK (Link);
 
     if (StrCmp (Name, Node->Name) == 0) {
-      if (Edit) {
+      if (SetValueTo == GetSetValueWithEditBuffer) {
         Buffer = Node->EditValue;
       } else {
         Buffer = Node->Value;
@@ -1005,7 +1019,7 @@ SetValueByName (
       }
       Buffer = AllocateCopyPool (StrSize (Value), Value);
       ASSERT (Buffer != NULL);
-      if (Edit) {
+      if (SetValueTo == GetSetValueWithEditBuffer) {
         Node->EditValue = Buffer;
       } else {
         Node->Value = Buffer;
@@ -1162,7 +1176,7 @@ ConfigRespToStorage (
       if (StrPtr != NULL) {
         *StrPtr = 0;
       }
-      SetValueByName (Storage, Name, Value, TRUE);
+      SetValueByName (Storage, Name, Value, GetSetValueWithEditBuffer);
     }
     break;
 
@@ -1182,8 +1196,7 @@ ConfigRespToStorage (
   @param  FormSet                FormSet data structure.
   @param  Form                   Form data structure.
   @param  Question               Question to be initialized.
-  @param  Cached                 TRUE:  get from Edit copy FALSE: get from original
-                                 Storage
+  @param  GetValueFrom           Where to get value, may from editbuffer, buffer or hii driver.
 
   @retval EFI_SUCCESS            The function completed successfully.
 
@@ -1193,7 +1206,7 @@ GetQuestionValue (
   IN FORM_BROWSER_FORMSET             *FormSet,
   IN FORM_BROWSER_FORM                *Form,
   IN OUT FORM_BROWSER_STATEMENT       *Question,
-  IN BOOLEAN                          Cached
+  IN GET_SET_QUESTION_VALUE_WITH      GetValueFrom
   )
 {
   EFI_STATUS          Status;
@@ -1221,6 +1234,10 @@ GetQuestionValue (
   Status = EFI_SUCCESS;
   Value  = NULL;
   Result = NULL;
+
+  if (GetValueFrom >= GetSetValueWithMax) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   //
   // Statement don't have storage, skip them
@@ -1373,15 +1390,22 @@ GetQuestionValue (
     IsBufferStorage = FALSE;
   }
   IsString = (BOOLEAN) ((Question->HiiValue.Type == EFI_IFR_TYPE_STRING) ?  TRUE : FALSE);
-  if (Cached) {
+  if (GetValueFrom == GetSetValueWithEditBuffer || GetValueFrom == GetSetValueWithBuffer ) {
     if (IsBufferStorage) {
-      //
-      // Copy from storage Edit buffer
-      //
-      CopyMem (Dst, Storage->EditBuffer + Question->VarStoreInfo.VarOffset, StorageWidth);
+      if (GetValueFrom == GetSetValueWithEditBuffer) {
+        //
+        // Copy from storage Edit buffer
+        //
+        CopyMem (Dst, Storage->EditBuffer + Question->VarStoreInfo.VarOffset, StorageWidth);
+      } else {
+        //
+        // Copy from storage Edit buffer
+        //
+        CopyMem (Dst, Storage->Buffer + Question->VarStoreInfo.VarOffset, StorageWidth);
+      }
     } else {
       Value = NULL;
-      Status = GetValueByName (Storage, Question->VariableName, &Value);
+      Status = GetValueByName (Storage, Question->VariableName, &Value, GetValueFrom);
       if (EFI_ERROR (Status)) {
         return Status;
       }
@@ -1578,7 +1602,7 @@ GetQuestionValue (
     if (IsBufferStorage) {
       CopyMem (Storage->EditBuffer + Question->VarStoreInfo.VarOffset, Dst, StorageWidth);
     } else {
-      SetValueByName (Storage, Question->VariableName, Value, TRUE);
+      SetValueByName (Storage, Question->VariableName, Value, GetSetValueWithEditBuffer);
     }
 
     if (Result != NULL) {
@@ -1596,8 +1620,7 @@ GetQuestionValue (
   @param  FormSet                FormSet data structure.
   @param  Form                   Form data structure.
   @param  Question               Pointer to the Question.
-  @param  Cached                 TRUE:  set to Edit copy FALSE: set to original
-                                 Storage
+  @param  SetValueTo             Update the question value to editbuffer , buffer or hii driver.
 
   @retval EFI_SUCCESS            The function completed successfully.
 
@@ -1607,7 +1630,7 @@ SetQuestionValue (
   IN FORM_BROWSER_FORMSET             *FormSet,
   IN FORM_BROWSER_FORM                *Form,
   IN OUT FORM_BROWSER_STATEMENT       *Question,
-  IN BOOLEAN                          Cached
+  IN GET_SET_QUESTION_VALUE_WITH      SetValueTo
   )
 {
   EFI_STATUS          Status;
@@ -1631,6 +1654,10 @@ SetQuestionValue (
   UINTN               Index;
 
   Status = EFI_SUCCESS;
+
+  if (SetValueTo >= GetSetValueWithMax) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   //
   // Statement don't have storage, skip them
@@ -1747,47 +1774,55 @@ SetQuestionValue (
     IsBufferStorage = FALSE;
   }
   IsString = (BOOLEAN) ((Question->HiiValue.Type == EFI_IFR_TYPE_STRING) ?  TRUE : FALSE);
-  if (IsBufferStorage) {
-    //
-    // Copy to storage edit buffer
-    //
-    CopyMem (Storage->EditBuffer + Question->VarStoreInfo.VarOffset, Src, StorageWidth);
-  } else {
-    if (IsString) {
-      //
-      // Allocate enough string buffer.
-      //
-      Value = NULL;
-      BufferLen = ((StrLen ((CHAR16 *) Src) * 4) + 1) * sizeof (CHAR16);
-      Value = AllocateZeroPool (BufferLen);
-      ASSERT (Value != NULL);
-      //
-      // Convert Unicode String to Config String, e.g. "ABCD" => "0041004200430044"
-      //
-      TemName = (CHAR16 *) Src;
-      TemString = Value;
-      for (; *TemName != L'\0'; TemName++) {
-        TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemName, 4);
+
+  if (SetValueTo == GetSetValueWithEditBuffer || SetValueTo == GetSetValueWithBuffer) {
+    if (IsBufferStorage) {
+      if (SetValueTo == GetSetValueWithEditBuffer) {
+        //
+        // Copy to storage edit buffer
+        //      
+        CopyMem (Storage->EditBuffer + Question->VarStoreInfo.VarOffset, Src, StorageWidth);
+      } else if (SetValueTo == GetSetValueWithBuffer) {
+        //
+        // Copy to storage edit buffer
+        //     
+        CopyMem (Storage->Buffer + Question->VarStoreInfo.VarOffset, Src, StorageWidth);
       }
     } else {
-      BufferLen = StorageWidth * 2 + 1;
-      Value = AllocateZeroPool (BufferLen * sizeof (CHAR16));
-      ASSERT (Value != NULL);
-      //
-      // Convert Buffer to Hex String
-      //
-      TemBuffer = Src + StorageWidth - 1;
-      TemString = Value;
-      for (Index = 0; Index < StorageWidth; Index ++, TemBuffer --) {
-        TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemBuffer, 2);
+      if (IsString) {
+        //
+        // Allocate enough string buffer.
+        //
+        Value = NULL;
+        BufferLen = ((StrLen ((CHAR16 *) Src) * 4) + 1) * sizeof (CHAR16);
+        Value = AllocateZeroPool (BufferLen);
+        ASSERT (Value != NULL);
+        //
+        // Convert Unicode String to Config String, e.g. "ABCD" => "0041004200430044"
+        //
+        TemName = (CHAR16 *) Src;
+        TemString = Value;
+        for (; *TemName != L'\0'; TemName++) {
+          TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemName, 4);
+        }
+      } else {
+        BufferLen = StorageWidth * 2 + 1;
+        Value = AllocateZeroPool (BufferLen * sizeof (CHAR16));
+        ASSERT (Value != NULL);
+        //
+        // Convert Buffer to Hex String
+        //
+        TemBuffer = Src + StorageWidth - 1;
+        TemString = Value;
+        for (Index = 0; Index < StorageWidth; Index ++, TemBuffer --) {
+          TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemBuffer, 2);
+        }
       }
+
+      Status = SetValueByName (Storage, Question->VariableName, Value, SetValueTo);
+      FreePool (Value);
     }
-
-    Status = SetValueByName (Storage, Question->VariableName, Value, TRUE);
-    FreePool (Value);
-  }
-
-  if (!Cached) {
+  } else if (SetValueTo == GetSetValueWithHiiDriver) {
     if (Storage->Type == EFI_HII_VARSTORE_BUFFER || Storage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
       //
       // <ConfigResp> ::= <ConfigHdr> + <BlockName> + "&VALUE=" + "<HexCh>StorageWidth * 2" ||
@@ -2115,6 +2150,105 @@ SynchronizeStorageForForm (
   return Status;
 }
 
+/**
+  When discard the question value, call the callback function with Changed type
+  to inform the hii driver.
+
+  @param  FormSet                FormSet data structure.
+  @param  Form                   Form data structure.
+
+**/
+VOID
+SendDiscardInfoToDriver (
+  IN FORM_BROWSER_FORMSET             *FormSet,
+  IN FORM_BROWSER_FORM                *Form
+  )
+{
+  LIST_ENTRY                  *Link;
+  FORM_BROWSER_STATEMENT      *Question;
+  EFI_STATUS                  Status;
+  EFI_HII_VALUE               HiiValue;
+  UINT8                       *BufferValue;
+  BOOLEAN                     ValueChanged;
+  EFI_IFR_TYPE_VALUE          *TypeValue;
+  EFI_BROWSER_ACTION_REQUEST  ActionRequest;
+
+  ValueChanged = FALSE;
+  BufferValue  = NULL;
+
+  if(!Form->NvUpdateRequired) {
+    return;
+  }
+
+  Link = GetFirstNode (&Form->StatementListHead);
+  while (!IsNull (&Form->StatementListHead, Link)) {
+    Question = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
+    Link = GetNextNode (&Form->StatementListHead, Link);
+
+    if (Question->Storage == NULL || Question->Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE) {
+      continue;
+    }
+
+    if (Question->Operand == EFI_IFR_PASSWORD_OP) {
+      continue;
+    }
+
+    if (Question->BufferValue != NULL) {
+      BufferValue = AllocateZeroPool (Question->StorageWidth);
+      ASSERT (BufferValue != NULL);
+      CopyMem (BufferValue, Question->BufferValue, Question->StorageWidth);
+    } else {
+      HiiValue.Type = Question->HiiValue.Type;
+      CopyMem (&HiiValue.Value, &Question->HiiValue.Value, sizeof (EFI_IFR_TYPE_VALUE));
+    }
+
+    Status = GetQuestionValue (FormSet, Form, Question, GetSetValueWithBuffer);
+    if (EFI_ERROR (Status)) {
+      if (BufferValue != NULL) {
+        FreePool (BufferValue);
+        BufferValue = NULL;
+      }
+      continue;
+    }
+
+    if (Question->BufferValue != NULL) {
+      if (CompareMem (BufferValue, Question->BufferValue, Question->StorageWidth)) {
+        ValueChanged = TRUE;
+      }
+    } else {
+      if (CompareMem (&HiiValue.Value, &Question->HiiValue.Value, sizeof (EFI_IFR_TYPE_VALUE))) {
+        ValueChanged = TRUE;
+      }
+    }
+
+    if (BufferValue != NULL) {
+      FreePool (BufferValue);
+      BufferValue = NULL;
+    }
+
+    if (!ValueChanged) {
+      continue;
+    }
+
+    ValueChanged = FALSE;
+
+    if (Question->HiiValue.Type == EFI_IFR_TYPE_BUFFER) {
+      TypeValue = (EFI_IFR_TYPE_VALUE *) Question->BufferValue;
+    } else {
+      TypeValue = &Question->HiiValue.Value;
+    }
+
+    ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
+    FormSet->ConfigAccess->Callback (
+                             FormSet->ConfigAccess,
+                             EFI_BROWSER_ACTION_CHANGED,
+                             Question->QuestionId,
+                             Question->HiiValue.Type,
+                             TypeValue,
+                             &ActionRequest
+                             );
+  }
+}
 
 /**
   Discard data based on the input setting scope (Form, FormSet or System).
@@ -2165,6 +2299,11 @@ DiscardForm (
       }
 
       //
+      // Call callback with Changed type to inform the driver.
+      //
+      SendDiscardInfoToDriver (FormSet, Form);
+
+      //
       // Prepare <ConfigResp>
       //
       SynchronizeStorageForForm(FormSet, ConfigInfo, FALSE);
@@ -2172,6 +2311,18 @@ DiscardForm (
 
     Form->NvUpdateRequired = FALSE;
   } else if (SettingScope == FormSetLevel && IsNvUpdateRequired(FormSet)) {
+
+    Link = GetFirstNode (&FormSet->FormListHead);
+    while (!IsNull (&FormSet->FormListHead, Link)) {
+      Form = FORM_BROWSER_FORM_FROM_LINK (Link);
+      Link = GetNextNode (&FormSet->FormListHead, Link);
+      
+      //
+      // Call callback with Changed type to inform the driver.
+      //
+      SendDiscardInfoToDriver (FormSet, Form);
+    }
+
     //
     // Discard Buffer storage or Name/Value storage
     //
@@ -3060,7 +3211,7 @@ ExtractDefault (
       //
       if ((Question->Storage != NULL) &&
           (Question->Storage->Type != EFI_HII_VARSTORE_EFI_VARIABLE)) {
-        SetQuestionValue (FormSet, Form, Question, TRUE);
+        SetQuestionValue (FormSet, Form, Question, GetSetValueWithEditBuffer);
         //
         // Update Form NV flag.
         //
@@ -3183,7 +3334,7 @@ LoadFormConfig (
     //
     // Initialize local copy of Value for each Question
     //
-    Status = GetQuestionValue (FormSet, Form, Question, TRUE);
+    Status = GetQuestionValue (FormSet, Form, Question, GetSetValueWithEditBuffer);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -3389,8 +3540,8 @@ CopyStorage (
     while (!IsNull (&Src->NameValueListHead, Link)) {
       Node = NAME_VALUE_NODE_FROM_LINK (Link);
 
-      SetValueByName (Dst, Node->Name, Node->EditValue, TRUE);
-      SetValueByName (Dst, Node->Name, Node->Value, FALSE);
+      SetValueByName (Dst, Node->Name, Node->EditValue, GetSetValueWithEditBuffer);
+      SetValueByName (Dst, Node->Name, Node->Value, GetSetValueWithBuffer);
 
       Link = GetNextNode (&Src->NameValueListHead, Link);
     }

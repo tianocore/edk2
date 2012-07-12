@@ -123,3 +123,5 @@ ArmPlatformSecBootMemoryInit
   ldr     r0, [r2, #0]
 
   bx    r5
+
+  END

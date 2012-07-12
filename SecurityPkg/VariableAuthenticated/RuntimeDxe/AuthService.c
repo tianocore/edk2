@@ -323,7 +323,7 @@ AutenticatedVariableServiceInitialize (
   // If "SecureBootEnable" variable is SECURE_BOOT_ENABLE and in USER_MODE, Set "SecureBoot" variable to SECURE_BOOT_MODE_ENABLE.
   // If "SecureBootEnable" variable is SECURE_BOOT_DISABLE, Set "SecureBoot" variable to SECURE_BOOT_MODE_DISABLE.
   //
-  SecureBootEnable = SECURE_BOOT_MODE_DISABLE;
+  SecureBootEnable = SECURE_BOOT_DISABLE;
   FindVariable (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, &Variable, &mVariableModuleGlobal->VariableGlobal, FALSE);
   if (Variable.CurrPtr != NULL) {
     SecureBootEnable = *(GetVariableDataPtr (Variable.CurrPtr));
@@ -331,7 +331,7 @@ AutenticatedVariableServiceInitialize (
     //
     // "SecureBootEnable" not exist, initialize it in USER_MODE.
     //
-    SecureBootEnable = SECURE_BOOT_MODE_ENABLE;
+    SecureBootEnable = SECURE_BOOT_ENABLE;
     Status = UpdateVariable (
                EFI_SECURE_BOOT_ENABLE_NAME,
                &gEfiSecureBootEnableDisableGuid,

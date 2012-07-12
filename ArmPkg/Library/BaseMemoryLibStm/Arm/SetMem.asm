@@ -57,7 +57,6 @@ L31
   orr   r4, r4, r4, LSL #8
   orr   r4, r4, r4, LSL #16  
   mov   r5, r4
-  mov   r5, r4
   mov   r6, r4
   mov   r7, r4 
   mov   r8, r4 
@@ -80,4 +79,3 @@ L43
   ldmfd    sp!, {r4-r11, pc}
   
   END
-  

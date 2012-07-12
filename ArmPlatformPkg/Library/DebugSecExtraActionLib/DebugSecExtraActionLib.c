@@ -16,6 +16,7 @@
 
 #include <Library/ArmLib.h>
 #include <Library/ArmGicLib.h>
+#include <Library/ArmPlatformSecLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PrintLib.h>

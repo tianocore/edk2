@@ -482,7 +482,7 @@ ProcessOptions (
           }
           SetArrayData (ValueArray, ValueType, Index2, 0);
 
-          Status = SetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);
+          Status = SetQuestionValue (Selection->FormSet, Selection->Form, Question, GetSetValueWithEditBuffer);
           UpdateStatusBar (Selection, NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
 
           FreePool (*OptionString);
@@ -551,7 +551,7 @@ ProcessOptions (
           if ((Option->SuppressExpression == NULL) ||
               (EvaluateExpressionList(Option->SuppressExpression, FALSE, NULL, NULL) == ExpressFalse)) {
             CopyMem (QuestionValue, &Option->Value, sizeof (EFI_HII_VALUE));
-            SetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);
+            SetQuestionValue (Selection->FormSet, Selection->Form, Question, GetSetValueWithEditBuffer);
             UpdateStatusBar (Selection, NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
             break;
           }
@@ -587,7 +587,7 @@ ProcessOptions (
               (EvaluateExpressionList(OneOfOption->SuppressExpression, FALSE, NULL, NULL) == ExpressFalse)) {
             Suppress = FALSE;
             CopyMem (QuestionValue, &OneOfOption->Value, sizeof (EFI_HII_VALUE));
-            SetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);
+            SetQuestionValue (Selection->FormSet, Selection->Form, Question, GetSetValueWithEditBuffer);
             UpdateStatusBar (Selection, NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
             gST->ConOut->SetAttribute (gST->ConOut, PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND);
             break;
@@ -640,7 +640,7 @@ ProcessOptions (
       //
       // Save Question value
       //
-      Status = SetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);
+      Status = SetQuestionValue (Selection->FormSet, Selection->Form, Question, GetSetValueWithEditBuffer);
       UpdateStatusBar (Selection, NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
     }
 
@@ -753,7 +753,7 @@ ProcessOptions (
           HiiSetString(Selection->FormSet->HiiHandle, Question->HiiValue.Value.string, (CHAR16*)Question->BufferValue, NULL);
         } else {
           CopyMem (Question->BufferValue, StringPtr, Maximum * sizeof (CHAR16));
-          SetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);
+          SetQuestionValue (Selection->FormSet, Selection->Form, Question, GetSetValueWithEditBuffer);
 
           UpdateStatusBar (Selection, NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
         }
@@ -940,7 +940,7 @@ ProcessOptions (
             PasswordCallback (Selection, MenuOption, StringPtr);
           } else {
             CopyMem (Question->BufferValue, StringPtr, Maximum * sizeof (CHAR16));
-            SetQuestionValue (Selection->FormSet, Selection->Form, Question, FALSE);
+            SetQuestionValue (Selection->FormSet, Selection->Form, Question, GetSetValueWithHiiDriver);
           }
         }
       } else {
