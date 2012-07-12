@@ -13,7 +13,7 @@
 
 #include <Uefi.h>
 
-#include <IndustryStandard/Acpi50.h>
+#include <IndustryStandard/Acpi.h>
 #include <IndustryStandard/Bmp.h>
 
 #include <Protocol/AcpiTable.h>

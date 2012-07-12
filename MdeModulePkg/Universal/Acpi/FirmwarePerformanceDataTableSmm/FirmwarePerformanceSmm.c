@@ -24,8 +24,6 @@
 
 #include <PiSmm.h>
 
-#include <IndustryStandard/Acpi50.h>
-
 #include <Protocol/SmmReportStatusCodeHandler.h>
 #include <Protocol/SmmAccess2.h>
 

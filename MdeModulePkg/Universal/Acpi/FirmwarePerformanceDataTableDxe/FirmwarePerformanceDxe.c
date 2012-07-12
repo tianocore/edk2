@@ -18,8 +18,6 @@
 
 #include <PiDxe.h>
 
-#include <IndustryStandard/Acpi50.h>
-
 #include <Protocol/ReportStatusCodeHandler.h>
 #include <Protocol/AcpiTable.h>
 #include <Protocol/SmmCommunication.h>

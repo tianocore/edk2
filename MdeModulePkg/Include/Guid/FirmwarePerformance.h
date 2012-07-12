@@ -15,8 +15,8 @@
 #ifndef _FIRMWARE_PERFORMANCE_GUID_H_
 #define _FIRMWARE_PERFORMANCE_GUID_H_
 
-#include <IndustryStandard/Acpi50.h>
 #include <PiPei.h>
+#include <IndustryStandard/Acpi.h>
 #include <Ppi/SecPerformance.h>
 
 ///
