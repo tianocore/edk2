@@ -918,36 +918,13 @@ ProcessVarWithPk (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (mPlatformMode == USER_MODE && !(InCustomMode() && UserPhysicalPresent())) {
-    //
-    // Verify against X509 Cert PK.
-    //
-    Del    = FALSE;
-    Status = VerifyTimeBasedPayload (
-               VariableName,
-               VendorGuid,
-               Data,
-               DataSize,
-               Variable,
-               Attributes,
-               AuthVarTypePk,
-               &Del
-               );
-    if (!EFI_ERROR (Status)) {
-      //
-      // If delete PK in user mode, need change to setup mode.
-      //
-      if (Del && IsPk) {
-        Status = UpdatePlatformMode (SETUP_MODE);
-      }
-    }
-    return Status;
-  } else {
-    //
-    // Process PK or KEK in Setup mode or Custom Secure Boot mode.
-    //
+  Del = FALSE;
+  if ((InCustomMode() && UserPhysicalPresent()) || (mPlatformMode == SETUP_MODE && !IsPk)) {
     Payload = (UINT8 *) Data + AUTHINFO2_SIZE (Data);
     PayloadSize = DataSize - AUTHINFO2_SIZE (Data);
+    if (PayloadSize == 0) {
+      Del = TRUE;
+    }
 
     Status = CheckSignatureListFormat(VariableName, VendorGuid, Payload, PayloadSize);
     if (EFI_ERROR (Status)) {
@@ -965,20 +942,48 @@ ProcessVarWithPk (
                Variable,
                &((EFI_VARIABLE_AUTHENTICATION_2 *) Data)->TimeStamp
                );
+  } else if (mPlatformMode == USER_MODE) {
+    //
+    // Verify against X509 Cert in PK database.
+    //
+    Status = VerifyTimeBasedPayload (
+               VariableName,
+               VendorGuid,
+               Data,
+               DataSize,
+               Variable,
+               Attributes,
+               AuthVarTypePk,
+               &Del
+               );
+  } else {
+    //
+    // Verify against the certificate in data payload.
+    //
+    Status = VerifyTimeBasedPayload (
+               VariableName,
+               VendorGuid,
+               Data,
+               DataSize,
+               Variable,
+               Attributes,
+               AuthVarTypePayload,
+               &Del
+               );
+  }
 
-    if (IsPk) {
-      if (PayloadSize != 0) {
-        //
-        // If enroll PK in setup mode, need change to user mode.
-        //
-        Status = UpdatePlatformMode (USER_MODE);
-      } else {
-        //
-        // If delete PK in custom mode, need change to setup mode.
-        //
-        UpdatePlatformMode (SETUP_MODE);
-      }
-    }   
+  if (!EFI_ERROR(Status) && IsPk) {
+    if (mPlatformMode == SETUP_MODE && !Del) {
+      //
+      // If enroll PK in setup mode, need change to user mode.
+      //
+      Status = UpdatePlatformMode (USER_MODE);
+    } else if (mPlatformMode == USER_MODE && Del){
+      //
+      // If delete PK in user mode, need change to setup mode.
+      //
+      Status = UpdatePlatformMode (SETUP_MODE);
+    }
   }
 
   return Status;
@@ -1859,7 +1864,7 @@ InsertCertsToDb (
                                           data, this value contains the required size.
   @param[in]  Variable                    The variable information which is used to keep track of variable usage.
   @param[in]  Attributes                  Attribute value of the variable.
-  @param[in]  AuthVarType                 Verify against PK or KEK database or private database.
+  @param[in]  AuthVarType                 Verify against PK, KEK database, private database or certificate in data payload.
   @param[out] VarDel                      Delete the variable or not.
 
   @retval EFI_INVALID_PARAMETER           Invalid parameter.
@@ -2152,6 +2157,22 @@ VerifyTimeBasedPayload (
         goto Exit;
       }
     }
+  } else if (AuthVarType == AuthVarTypePayload) {
+    CertList = (EFI_SIGNATURE_LIST *) PayloadPtr;
+    Cert     = (EFI_SIGNATURE_DATA *) ((UINT8 *) CertList + sizeof (EFI_SIGNATURE_LIST) + CertList->SignatureHeaderSize);
+    RootCert      = Cert->SignatureData;
+    RootCertSize  = CertList->SignatureSize - (sizeof (EFI_SIGNATURE_DATA) - 1);
+    
+    // Verify Pkcs7 SignedData via Pkcs7Verify library.
+    //
+    VerifyStatus = Pkcs7Verify (
+                     SigData,
+                     SigDataSize,
+                     RootCert,
+                     RootCertSize,
+                     NewData,
+                     NewDataSize
+                     );
   } else {
     return EFI_SECURITY_VIOLATION;
   }

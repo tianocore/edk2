@@ -59,7 +59,8 @@ typedef struct {
 typedef enum {
   AuthVarTypePk,
   AuthVarTypeKek,
-  AuthVarTypePriv
+  AuthVarTypePriv,
+  AuthVarTypePayload
 } AUTHVAR_TYPE;
 
 #pragma pack(1)
