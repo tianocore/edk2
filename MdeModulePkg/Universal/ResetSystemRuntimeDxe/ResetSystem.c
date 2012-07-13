@@ -1,7 +1,7 @@
 /** @file
   Reset Architectural Protocol implementation
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -63,37 +63,6 @@ InitializeResetSystem (
   ASSERT_EFI_ERROR (Status);
 
   return Status;
-}
-
-/**
-  Reset system for capsule update.
-
-  @param[in] CapsuleDataPtr  Pointer to the capsule block descriptors.
-                            
-**/
-VOID
-CapsuleReset (
-  IN UINTN   CapsuleDataPtr
-  )
-{
-  //
-  // This implementation assumes that we're using a variable
-  // to indicate capsule updates.
-  //
-  gRT->SetVariable (
-         EFI_CAPSULE_VARIABLE_NAME,
-         &gEfiCapsuleVendorGuid,
-         EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-         sizeof (UINTN),
-         (VOID *) &CapsuleDataPtr
-         );
-
-  EnterS3WithImmediateWake ();
-
-  //
-  // Should not return
-  //
-  CpuDeadLoop ();
 }
 
 /**
