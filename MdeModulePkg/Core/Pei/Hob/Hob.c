@@ -1,7 +1,7 @@
 /** @file
   This module provide Hand-Off Block manupulation.
   
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -89,6 +89,12 @@ PeiCreateHob (
 
   HandOffHob = *Hob;
 
+  //
+  // Check Length to avoid data overflow. 
+  //
+  if (0x10000 - Length <= 0x7) {
+    return EFI_INVALID_PARAMETER;
+  }
   Length     = (UINT16)((Length + 0x7) & (~0x7));
 
   FreeMemory = HandOffHob->EfiFreeMemoryTop -
