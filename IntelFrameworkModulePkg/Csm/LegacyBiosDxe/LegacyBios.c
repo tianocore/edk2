@@ -695,6 +695,7 @@ LegacyBiosInstall (
   UINT32                             MemorySize;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR    Descriptor;
   UINT64                             Length;
+  UINT8                              *SecureBoot;
 
   //
   // Load this driver's image to memory
@@ -702,6 +703,20 @@ LegacyBiosInstall (
   Status = RelocateImageUnder4GIfNeeded (ImageHandle, SystemTable);
   if (EFI_ERROR (Status)) {
     return Status;
+  }
+
+  //
+  // When UEFI Secure Boot is enabled, CSM module will not start any more.
+  //
+  SecureBoot = NULL;
+  GetEfiGlobalVariable2 (EFI_SECURE_BOOT_MODE_NAME, (VOID**)&SecureBoot, NULL);
+  if ((SecureBoot != NULL) && (*SecureBoot == SECURE_BOOT_MODE_ENABLE)) {
+    FreePool (SecureBoot);
+    return EFI_SECURITY_VIOLATION;
+  }
+  
+  if (SecureBoot != NULL) {
+    FreePool (SecureBoot);
   }
 
   Private = &mPrivateData;

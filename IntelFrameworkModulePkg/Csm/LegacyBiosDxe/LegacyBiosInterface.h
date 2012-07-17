@@ -24,6 +24,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/DxeServices.h>
 #include <Guid/LegacyBios.h>
 #include <Guid/StatusCodeDataTypeId.h>
+#include <Guid/ImageAuthentication.h>
 
 #include <Protocol/BlockIo.h>
 #include <Protocol/LoadedImage.h>
