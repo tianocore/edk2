@@ -254,68 +254,46 @@ AutenticatedVariableServiceInitialize (
   }
   
   //
-  // Check "SetupMode" variable's existence.
-  // If it doesn't exist, check PK database's existence to determine the value.
-  // Then create a new one with EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS set.
+  // Create "SetupMode" varable with BS+RT attribute set.
   //
-  Status = FindVariable (
+  FindVariable (EFI_SETUP_MODE_NAME, &gEfiGlobalVariableGuid, &Variable, &mVariableModuleGlobal->VariableGlobal, FALSE);
+  if (PkVariable.CurrPtr == NULL) {
+    mPlatformMode = SETUP_MODE;
+  } else {
+    mPlatformMode = USER_MODE;
+  }
+  Status = UpdateVariable (
              EFI_SETUP_MODE_NAME,
              &gEfiGlobalVariableGuid,
+             &mPlatformMode,
+             sizeof(UINT8),
+             EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+             0,
+             0,
              &Variable,
-             &mVariableModuleGlobal->VariableGlobal,
-             FALSE
+             NULL
              );
-
-  if (Variable.CurrPtr == NULL) {
-    if (PkVariable.CurrPtr == NULL) {
-      mPlatformMode = SETUP_MODE;
-    } else {
-      mPlatformMode = USER_MODE;
-    }
-
-    VarAttr = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS;
-    Status  = UpdateVariable (
-                EFI_SETUP_MODE_NAME,
-                &gEfiGlobalVariableGuid,
-                &mPlatformMode,
-                sizeof(UINT8),
-                VarAttr,
-                0,
-                0,
-                &Variable,
-                NULL
-                );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-  } else {
-    mPlatformMode = *(GetVariableDataPtr (Variable.CurrPtr));
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
+  
   //
-  // Check "SignatureSupport" variable's existence.
-  // If it doesn't exist, then create a new one with EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS set.
+  // Create "SignatureSupport" varable with BS+RT attribute set.
   //
-  Status = FindVariable (
-             EFI_SIGNATURE_SUPPORT_NAME,
-             &gEfiGlobalVariableGuid,
-             &Variable,
-             &mVariableModuleGlobal->VariableGlobal,
-             FALSE
-             );
-
-  if (Variable.CurrPtr == NULL) {
-    VarAttr = EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS;
-    Status  = UpdateVariable (
-                EFI_SIGNATURE_SUPPORT_NAME,
-                &gEfiGlobalVariableGuid,
-                mSignatureSupport,
-                sizeof(mSignatureSupport),
-                VarAttr,
-                0,
-                0,
-                &Variable,
-                NULL
-                );
+  FindVariable (EFI_SIGNATURE_SUPPORT_NAME, &gEfiGlobalVariableGuid, &Variable, &mVariableModuleGlobal->VariableGlobal, FALSE);
+  Status  = UpdateVariable (
+              EFI_SIGNATURE_SUPPORT_NAME,
+              &gEfiGlobalVariableGuid,
+              mSignatureSupport,
+              sizeof(mSignatureSupport),
+              EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+              0,
+              0,
+              &Variable,
+              NULL
+              );
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   //
@@ -348,6 +326,9 @@ AutenticatedVariableServiceInitialize (
     }
   }
 
+  //
+  // Create "SecureBoot" varable with BS+RT attribute set.
+  //
   if (SecureBootEnable == SECURE_BOOT_ENABLE && mPlatformMode == USER_MODE) {
     SecureBootMode = SECURE_BOOT_MODE_ENABLE;
   } else {
@@ -359,7 +340,7 @@ AutenticatedVariableServiceInitialize (
              &gEfiGlobalVariableGuid,
              &SecureBootMode,
              sizeof (UINT8),
-             EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS,
+             EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS,
              0,
              0,
              &Variable,
@@ -660,22 +641,12 @@ UpdatePlatformMode (
     return Status;
   }
 
-  mPlatformMode  = Mode;
-  VarAttr        = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS;
-  Status         = UpdateVariable (
-                     EFI_SETUP_MODE_NAME,
-                     &gEfiGlobalVariableGuid,
-                     &mPlatformMode,
-                     sizeof(UINT8),
-                     VarAttr,
-                     0,
-                     0,
-                     &Variable,
-                     NULL
-                     );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+  //
+  // Update the value of SetupMode variable by a simple mem copy, this could avoid possible
+  // variable storage reclaim at runtime.
+  //
+  mPlatformMode = (UINT8) Mode;
+  CopyMem (GetVariableDataPtr (Variable.CurrPtr), &mPlatformMode, sizeof(UINT8));
 
   if (AtRuntime ()) {
     //
@@ -912,7 +883,7 @@ ProcessVarWithPk (
   if ((Attributes & EFI_VARIABLE_NON_VOLATILE) == 0 || 
       (Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) == 0) {
     //
-    // PK and KEK should set EFI_VARIABLE_NON_VOLATILE attribute and should be a time-based
+    // PK, KEK and db/dbx should set EFI_VARIABLE_NON_VOLATILE attribute and should be a time-based
     // authenticated variable.
     //
     return EFI_INVALID_PARAMETER;

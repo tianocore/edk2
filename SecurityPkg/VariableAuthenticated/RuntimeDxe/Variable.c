@@ -1956,6 +1956,33 @@ IsHwErrRecVariable (
 }
 
 /**
+  This code checks if variable should be treated as read-only variable.
+
+  @param[in]      VariableName            Name of the Variable.
+  @param[in]      VendorGuid              GUID of the Variable.
+
+  @retval TRUE      This variable is read-only variable.
+  @retval FALSE     This variable is NOT read-only variable.
+  
+**/
+BOOLEAN
+IsReadOnlyVariable (
+  IN     CHAR16         *VariableName,
+  IN     EFI_GUID       *VendorGuid
+  )
+{
+  if (CompareGuid (VendorGuid, &gEfiGlobalVariableGuid)) {
+    if ((StrCmp (VariableName, EFI_SETUP_MODE_NAME) == 0) ||
+        (StrCmp (VariableName, EFI_SIGNATURE_SUPPORT_NAME) == 0) ||
+        (StrCmp (VariableName, EFI_SECURE_BOOT_MODE_NAME) == 0)) {
+      return TRUE;
+    }
+  }
+  
+  return FALSE;
+}
+
+/**
 
   This code finds variable in storage blocks (Volatile or Non-Volatile).
 
@@ -2232,6 +2259,10 @@ VariableServiceSetVariable (
     return EFI_INVALID_PARAMETER;
   }
 
+  if (IsReadOnlyVariable (VariableName, VendorGuid)) {
+    return EFI_WRITE_PROTECTED;
+  }
+
   if (DataSize != 0 && Data == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -2349,7 +2380,10 @@ VariableServiceSetVariable (
     Status = ProcessVarWithPk (VariableName, VendorGuid, Data, DataSize, &Variable, Attributes, FALSE);
   } else if (CompareGuid (VendorGuid, &gEfiImageSecurityDatabaseGuid) && 
           ((StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE) == 0) || (StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE1) == 0))) {
-    Status = ProcessVarWithKek (VariableName, VendorGuid, Data, DataSize, &Variable, Attributes);
+    Status = ProcessVarWithPk (VariableName, VendorGuid, Data, DataSize, &Variable, Attributes, FALSE);
+    if (EFI_ERROR (Status)) {
+      Status = ProcessVarWithKek (VariableName, VendorGuid, Data, DataSize, &Variable, Attributes);
+    }
   } else {
     Status = ProcessVariable (VariableName, VendorGuid, Data, DataSize, &Variable, Attributes);
   }
