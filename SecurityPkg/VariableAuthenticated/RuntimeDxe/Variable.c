@@ -2528,8 +2528,8 @@ VariableServiceQueryVariableInfo (
 /**
   This function reclaims variable storage if free size is below the threshold.
 
-  Caution: This function may be invoked at SMM runtime.
-  Care must be taken to make sure not security issue at runtime.
+  Caution: This function may be invoked at SMM mode.
+  Care must be taken to make sure not security issue.
 
 **/
 VOID

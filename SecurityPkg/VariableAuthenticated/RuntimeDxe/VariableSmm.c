@@ -519,6 +519,10 @@ SmmVariableHandler (
       break;
 
     case SMM_VARIABLE_FUNCTION_READY_TO_BOOT:
+      if (AtRuntime()) {
+        Status = EFI_UNSUPPORTED;
+        break;
+      }
       ReclaimForOS ();
       Status = EFI_SUCCESS;
       break;
