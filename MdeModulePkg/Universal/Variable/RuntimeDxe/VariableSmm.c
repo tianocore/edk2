@@ -319,7 +319,7 @@ SmmVariableGetStatistics (
   }
 
   StatisticsInfoSize = sizeof (VARIABLE_INFO_ENTRY) + StrSize (VariableInfo->Name);
-  if (*InfoSize < sizeof (VARIABLE_INFO_ENTRY)) {
+  if (*InfoSize < StatisticsInfoSize) {
     *InfoSize = StatisticsInfoSize;
     return EFI_BUFFER_TOO_SMALL;
   }
