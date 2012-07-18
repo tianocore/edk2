@@ -17,43 +17,12 @@
 #include "AcpiPlatform.h"
 #include <Library/HobLib.h>
 #include <Guid/XenInfo.h>
+#include <Library/BaseLib.h>
 
 #define XEN_ACPI_PHYSICAL_ADDRESS         0x000EA020
 #define XEN_BIOS_PHYSICAL_END             0x000FFFFF
 
 EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER  *XenAcpiRsdpStructurePtr = NULL;
-
-/**
-  Calculates the checksum of the ACPI tables.
-
-  @param  Buffer    Address of the ACPI table.
-  @param  Size      Size of the ACPI table need to check.
-
-**/
-UINT8
-CalculateTableChecksum (
-  IN VOID       *Buffer,
-  IN UINTN      Size
-  )
-{
-  UINT8 Sum;
-  UINT8 *Ptr;
-
-  Sum = 0;
-  //
-  // Initialize pointer
-  //
-  Ptr = Buffer;
-
-  //
-  // Add all content of buffer
-  //
-  while ((Size--) != 0) {
-    Sum = (UINT8) (Sum + (*Ptr++));
-  }
-
-  return Sum;
-}
 
 /**
   This function detects if OVMF is running on Xen.
@@ -113,8 +82,8 @@ GetXenAcpiRsdp (
       // RSDP ACPI 1.0 checksum for 1.0/2.0/3.0 table.
       // This is only the first 20 bytes of the structure
       //
-      Sum = CalculateTableChecksum (
-              RsdpStructurePtr,
+      Sum = CalculateSum8 (
+              (CONST UINT8 *)RsdpStructurePtr,
               sizeof (EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER)
               );
       if (Sum != 0) {
@@ -125,8 +94,8 @@ GetXenAcpiRsdp (
         //
         // RSDP ACPI 2.0/3.0 checksum, this is the entire table
         //
-        Sum = CalculateTableChecksum (
-                RsdpStructurePtr,
+        Sum = CalculateSum8 (
+                (CONST UINT8 *)RsdpStructurePtr,
                 sizeof (EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER)
                 );
         if (Sum != 0) {

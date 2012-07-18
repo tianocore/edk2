@@ -47,6 +47,7 @@
   HobLib
   QemuFwCfgLib
   MemoryAllocationLib
+  BaseLib
 
 [Protocols]
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
