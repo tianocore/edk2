@@ -77,8 +77,9 @@ WideTtyCvt( CHAR16 *dest, const char *buf, ssize_t n, mbstate_t *Cs)
     if( numB == 0) {
       break;
     };
-    if(numB < 0) {
+    if(numB < 0) {    // If an unconvertable character, replace it.
       wc[0] = BLOCKELEMENT_LIGHT_SHADE;
+      numB = 1;
     }
     if(wc[0] == L'\n') {
       *dest++ = L'\r';
