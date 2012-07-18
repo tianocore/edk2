@@ -6,6 +6,11 @@
 #  This external input must be validated carefully to avoid security issue like
 #  buffer overflow, integer overflow.
 #
+#  Note: MD4 Digest functions, HMAC-MD5 functions, HMAC-SHA1 functions, AES/
+#  TDES/ARC4 functions, RSA external functions, PKCS#7 SignedData sign functions,
+#  Diffie-Hellman functions, authenticode signature verification functions are
+#  not supported in this instance.
+#
 #  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -23,7 +28,7 @@
   FILE_GUID                      = 78189cc0-727d-46a4-84ea-f7dd860de64a
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = BaseCryptLib
+  LIBRARY_CLASS                  = BaseCryptLib|DXE_RUNTIME_DRIVER
   CONSTRUCTOR                    = RuntimeCryptLibConstructor
 
 #
@@ -33,12 +38,22 @@
 #
 
 [Sources]
+  Hash/CryptMd4Null.c
   Hash/CryptMd5.c
   Hash/CryptSha1.c
   Hash/CryptSha256.c
-  Pk/CryptRsa.c
-  Pk/CryptPkcs7.c
+  Hmac/CryptHmacMd5Null.c
+  Hmac/CryptHmacSha1Null.c
+  Cipher/CryptAesNull.c
+  Cipher/CryptTdesNull.c
+  Cipher/CryptArc4Null.c
+  Pk/CryptRsaBasic.c
+  Pk/CryptRsaExtNull.c
+  Pk/CryptPkcs7SignNull.c
+  Pk/CryptPkcs7Verify.c 
+  Pk/CryptDhNull.c
   Pk/CryptX509.c
+  Pk/CryptAuthenticodeNull.c
   Pem/CryptPem.c
 
   SysCall/CrtWrapper.c

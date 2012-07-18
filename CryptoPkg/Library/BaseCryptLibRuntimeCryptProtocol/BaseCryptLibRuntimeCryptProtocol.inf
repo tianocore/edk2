@@ -2,7 +2,14 @@
 #  Cryptographic Library Instance based on Runtime Crypt Protocol.
 #  This instance will be only used by the Authenticated Variable driver for IPF.
 #
-#  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+#  Note: MD4/MD5/SHA1 Digest functions, HMAC-MD5 functions, HMAC-SHA1 functions, 
+#  AES/TDES/ARC4 functions, RSA external functions, PKCS#7 SignedData sign/verify
+#  functions, Diffie-Hellman functions, X.509 certificate handler functions,
+#  authenticode signature verification functions, PEM handler functions,
+#  pseudorandom number generator functions, Sha256Duplicate() are not supported
+#  in this instance.
+#
+#  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -30,6 +37,23 @@
 
 [Sources]
   RuntimeDxeIpfCryptLib.c
+
+  Hash/CryptMd4Null.c
+  Hash/CryptMd5Null.c
+  Hash/CryptSha1Null.c
+  Hmac/CryptHmacMd5Null.c
+  Hmac/CryptHmacSha1Null.c
+  Cipher/CryptAesNull.c
+  Cipher/CryptTdesNull.c
+  Cipher/CryptArc4Null.c
+  Pk/CryptRsaExtNull.c
+  Pk/CryptPkcs7SignNull.c
+  Pk/CryptPkcs7VerifyNull.c
+  Pk/CryptDhNull.c
+  Pk/CryptX509Null.c
+  Pk/CryptAuthenticodeNull.c
+  Pem/CryptPemNull.c
+  Rand/CryptRandNull.c
 
 [Packages]
   MdePkg/MdePkg.dec

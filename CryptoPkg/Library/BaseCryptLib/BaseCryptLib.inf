@@ -21,9 +21,9 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BaseCryptLib
   FILE_GUID                      = be3bb803-91b6-4da0-bd91-a8b21c18ca5d
-  MODULE_TYPE                    = BASE
+  MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = BaseCryptLib
+  LIBRARY_CLASS                  = BaseCryptLib|DXE_DRIVER DXE_CORE UEFI_APPLICATION UEFI_DRIVER
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -42,8 +42,10 @@
   Cipher/CryptAes.c
   Cipher/CryptTdes.c
   Cipher/CryptArc4.c
-  Pk/CryptRsa.c
-  Pk/CryptPkcs7.c
+  Pk/CryptRsaBasic.c
+  Pk/CryptRsaExt.c
+  Pk/CryptPkcs7Sign.c
+  Pk/CryptPkcs7Verify.c
   Pk/CryptDh.c
   Pk/CryptX509.c
   Pk/CryptAuthenticode.c
