@@ -57,11 +57,8 @@ XenDetected (
 
 EFI_STATUS
 EFIAPI
-XenInstallAcpiTable (
-  IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol,
-  IN   VOID                          *AcpiTableBuffer,
-  IN   UINTN                         AcpiTableBufferSize,
-  OUT  UINTN                         *TableKey
+InstallXenTables (
+  IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol
   );
 
 #endif
