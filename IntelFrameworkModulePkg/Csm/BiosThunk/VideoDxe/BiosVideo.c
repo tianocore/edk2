@@ -198,7 +198,7 @@ BiosVideoDriverBindingSupported (
         //
         if (Node->DevPath.Type != ACPI_DEVICE_PATH ||
             Node->DevPath.SubType != ACPI_ADR_DP ||
-            DevicePathNodeLength(&Node->DevPath) != sizeof(ACPI_ADR_DEVICE_PATH)) {
+            DevicePathNodeLength(&Node->DevPath) < sizeof(ACPI_ADR_DEVICE_PATH)) {
           Status = EFI_UNSUPPORTED;
         }
       }
