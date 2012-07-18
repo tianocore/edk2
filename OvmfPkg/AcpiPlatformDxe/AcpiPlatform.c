@@ -130,34 +130,6 @@ LocateFvInstanceWithTables (
 
 
 /**
-  This function calculates and updates an UINT8 checksum.
-
-  @param  Buffer          Pointer to buffer to checksum
-  @param  Size            Number of bytes to checksum
-
-**/
-VOID
-AcpiPlatformChecksum (
-  IN UINT8      *Buffer,
-  IN UINTN      Size
-  )
-{
-  UINTN ChecksumOffset;
-
-  ChecksumOffset = OFFSET_OF (EFI_ACPI_DESCRIPTION_HEADER, Checksum);
-
-  //
-  // Set checksum to 0 first
-  //
-  Buffer[ChecksumOffset] = 0;
-
-  //
-  // Update checksum value
-  //
-  Buffer[ChecksumOffset] = CalculateCheckSum8(Buffer, Size);
-}
-
-/**
   Find ACPI tables in an FV and parses them. This function is useful for QEMU and KVM.
 
   @param  AcpiTable     Protocol instance pointer    
@@ -218,11 +190,6 @@ FindAcpiTablesInFv (
 
       TableSize = ((EFI_ACPI_DESCRIPTION_HEADER *) CurrentTable)->Length;
       ASSERT (Size >= TableSize);
-
-      //
-      // Checksum ACPI table
-      //
-      AcpiPlatformChecksum ((UINT8*)CurrentTable, TableSize);
 
       //
       // Install ACPI table
