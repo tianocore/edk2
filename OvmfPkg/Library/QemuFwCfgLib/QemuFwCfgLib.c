@@ -244,3 +244,56 @@ QemuFwCfgInitialize (
   DEBUG ((EFI_D_INFO, "QemuFwCfg interface is supported.\n"));
   return RETURN_SUCCESS;
 }
+
+
+/**
+  Find the configuration item corresponding to the firmware configuration file.
+
+  @param[in]  Name - Name of file to look up.
+  @param[out] Item - Configuration item corresponding to the file, to be passed
+                     to QemuFwCfgSelectItem ().
+  @param[out] Size - Number of bytes in the file.
+
+  @return    RETURN_SUCCESS       If file is found.
+             RETURN_NOT_FOUND     If file is not found.
+             RETURN_UNSUPPORTED   If firmware configuration is unavailable.
+
+**/
+RETURN_STATUS
+EFIAPI
+QemuFwCfgFindFile (
+  IN   CONST CHAR8           *Name,
+  OUT  FIRMWARE_CONFIG_ITEM  *Item,
+  OUT  UINTN                 *Size
+  )
+{
+  UINT32 Count;
+  UINT32 Idx;
+
+  if (!mQemuFwCfgSupported) {
+    return RETURN_UNSUPPORTED;
+  }
+
+  QemuFwCfgSelectItem (QemuFwCfgItemFileDir);
+  Count = SwapBytes32 (QemuFwCfgRead32 ());
+
+  for (Idx = 0; Idx < Count; ++Idx) {
+    UINT32 FileSize;
+    UINT16 FileSelect;
+    UINT16 FileReserved;
+    CHAR8  FName[56];
+
+    FileSize     = QemuFwCfgRead32 ();
+    FileSelect   = QemuFwCfgRead16 ();
+    FileReserved = QemuFwCfgRead16 ();
+    InternalQemuFwCfgReadBytes (sizeof (FName), FName);
+
+    if (AsciiStrCmp (Name, FName) == 0) {
+      *Item = SwapBytes16 (FileSelect);
+      *Size = SwapBytes32 (FileSize);
+      return RETURN_SUCCESS;
+    }
+  }
+
+  return RETURN_NOT_FOUND;
+}

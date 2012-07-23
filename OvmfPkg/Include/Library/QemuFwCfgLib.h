@@ -41,6 +41,7 @@ typedef enum {
   QemuFwCfgItemKernelSetupAddress   = 0x0016,
   QemuFwCfgItemKernelSetupSize      = 0x0017,
   QemuFwCfgItemKernelSetupData      = 0x0018,
+  QemuFwCfgItemFileDir              = 0x0019,
 
   QemuFwCfgItemX86AcpiTables        = 0x8000,
   QemuFwCfgItemX86SmbiosTables      = 0x8001,
@@ -153,5 +154,25 @@ QemuFwCfgRead64 (
   );
 
 
+/**
+  Find the configuration item corresponding to the firmware configuration file.
+
+  @param[in]  Name - Name of file to look up.
+  @param[out] Item - Configuration item corresponding to the file, to be passed
+                     to QemuFwCfgSelectItem ().
+  @param[out] Size - Number of bytes in the file.
+
+  @return    RETURN_SUCCESS       If file is found.
+             RETURN_NOT_FOUND     If file is not found.
+             RETURN_UNSUPPORTED   If firmware configuration is unavailable.
+
+**/
+RETURN_STATUS
+EFIAPI
+QemuFwCfgFindFile (
+  IN   CONST CHAR8           *Name,
+  OUT  FIRMWARE_CONFIG_ITEM  *Item,
+  OUT  UINTN                 *Size
+  );
 #endif
 
