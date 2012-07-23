@@ -1,7 +1,12 @@
 ## @file
 #  Component description file for LockBox SMM driver.
 #
-#  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+#
+#  Caution: This module requires additional review when modified.
+#  This driver will have external input - communicate buffer in SMM mode.
+#  This external input must be validated carefully to avoid security issue like
+#  buffer overflow, integer overflow.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions
