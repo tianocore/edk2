@@ -1874,6 +1874,9 @@ RunScriptFileHandle (
           Status = EFI_SUCCESS;
           break;
         }
+        if (ShellGetExecutionBreakFlag()) {
+          break;
+        }
         if (EFI_ERROR(Status)) {
           break;
         }
