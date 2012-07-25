@@ -746,7 +746,7 @@ UpdatePlatformMode (
 }
 
 /**
-  Check input data form to make sure it is a valid EFI_SIGNATURE_LIST for PK/KEK variable.
+  Check input data form to make sure it is a valid EFI_SIGNATURE_LIST for PK/KEK/db/dbx variable.
 
   @param[in]  VariableName                Name of Variable to be check.
   @param[in]  VendorGuid                  Variable vendor GUID.
@@ -770,6 +770,9 @@ CheckSignatureListFormat(
   UINT32                 Index;
   UINT32                 SigCount;
   BOOLEAN                IsPk;
+  VOID                   *RsaContext;
+  EFI_SIGNATURE_DATA     *CertData;
+  UINTN                  CertLen;
 
   if (DataSize == 0) {
     return EFI_SUCCESS;
@@ -779,7 +782,9 @@ CheckSignatureListFormat(
 
   if (CompareGuid (VendorGuid, &gEfiGlobalVariableGuid) && (StrCmp (VariableName, EFI_PLATFORM_KEY_NAME) == 0)){
     IsPk = TRUE;
-  } else if (CompareGuid (VendorGuid, &gEfiGlobalVariableGuid) && (StrCmp (VariableName, EFI_KEY_EXCHANGE_KEY_NAME) == 0)) {
+  } else if ((CompareGuid (VendorGuid, &gEfiGlobalVariableGuid) && StrCmp (VariableName, EFI_KEY_EXCHANGE_KEY_NAME) == 0) ||
+             (CompareGuid (VendorGuid, &gEfiImageSecurityDatabaseGuid) && 
+              (StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE) == 0 || StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE1) == 0))){
     IsPk = FALSE;
   } else {
     return EFI_SUCCESS;
@@ -788,6 +793,7 @@ CheckSignatureListFormat(
   SigCount = 0;
   SigList  = (EFI_SIGNATURE_LIST *) Data;
   SigDataSize  = DataSize;
+  RsaContext = NULL;
 
   //
   // Walk throuth the input signature list and check the data format.
@@ -817,6 +823,24 @@ CheckSignatureListFormat(
       // Undefined signature type.
       //
       return EFI_INVALID_PARAMETER;
+    }
+
+    if (CompareGuid (&SigList->SignatureType, &gEfiCertX509Guid)) {
+      //
+      // Try to retrieve the RSA public key from the X.509 certificate.
+      // If this operation fails, it's not a valid certificate.
+      //
+      RsaContext = RsaNew ();
+      if (RsaContext == NULL) {
+        return EFI_INVALID_PARAMETER;
+      }
+      CertData = (EFI_SIGNATURE_DATA *) ((UINT8 *) SigList + sizeof (EFI_SIGNATURE_LIST) + SigList->SignatureHeaderSize);
+      CertLen = SigList->SignatureSize - sizeof (EFI_GUID);
+      if (!RsaGetPublicKeyFromX509 (CertData->SignatureData, CertLen, &RsaContext)) {
+        RsaFree (RsaContext);
+        return EFI_INVALID_PARAMETER;
+      }
+      RsaFree (RsaContext);
     }
 
     if ((SigList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - SigList->SignatureHeaderSize) % SigList->SignatureSize != 0) {
@@ -1029,6 +1053,11 @@ ProcessVarWithKek (
     Payload = (UINT8 *) Data + AUTHINFO2_SIZE (Data);
     PayloadSize = DataSize - AUTHINFO2_SIZE (Data);
 
+    Status = CheckSignatureListFormat(VariableName, VendorGuid, Payload, PayloadSize);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    
     Status = UpdateVariable (
                VariableName,
                VendorGuid,
