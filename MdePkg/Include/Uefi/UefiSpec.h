@@ -1136,8 +1136,8 @@ EFI_STATUS
 /**
   Installs one or more protocol interfaces into the boot services environment.
 
-  @param  Handle                The handle to install the new protocol interfaces on, or NULL if a new
-                                handle is to be allocated.
+  @param  Handle                The pointer to a handle to install the new protocol interfaces on,
+                                or a pointer to NULL if a new handle is to be allocated.
   @param  ...                   A variable argument list containing pairs of protocol GUIDs and protocol
                                 interfaces.
 
