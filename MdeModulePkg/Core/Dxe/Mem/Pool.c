@@ -128,7 +128,7 @@ LookupPoolHead (
   // MemoryType values in the range 0x80000000..0xFFFFFFFF are reserved for use by UEFI 
   // OS loaders that are provided by operating system vendors
   //
-  if (MemoryType >= (INT32)0x80000000 && MemoryType <= (INT32)0xffffffff) {
+  if ((INT32)MemoryType < 0) {
 
     for (Link = mPoolHeadList.ForwardLink; Link != &mPoolHeadList; Link = Link->ForwardLink) {
       Pool = CR(Link, POOL, Link, POOL_SIGNATURE);
