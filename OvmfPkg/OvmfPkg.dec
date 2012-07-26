@@ -46,6 +46,9 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvBase|0x0|UINT32|0
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvSize|0x0|UINT32|1
 
+  ## This flag is used to control the destination port for PlatformDebugLibIoPort
+  gUefiOvmfPkgTokenSpaceGuid.PcdDebugIoPort|0x402|UINT16|4
+
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
 
