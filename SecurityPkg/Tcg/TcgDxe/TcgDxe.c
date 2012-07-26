@@ -262,6 +262,10 @@ TcgDxeHashAll (
       }
       *HashedDataLen = sizeof (TPM_DIGEST);
 
+	  if (*HashedDataResult == NULL) {
+	  	*HashedDataResult = AllocatePool ((UINTN) *HashedDataLen);
+	  } 
+
       return TpmCommHashAll (
                HashData,
                (UINTN) HashDataLen,
