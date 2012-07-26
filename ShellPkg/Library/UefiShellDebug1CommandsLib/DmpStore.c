@@ -14,16 +14,47 @@
 
 #include "UefiShellDebug1CommandsLib.h"
 
-STATIC CHAR16   *AttrType[] = {
-  L"invalid",   // 000
-  L"invalid",   // 001
-  L"BS",        // 010
-  L"NV+BS",     // 011
-  L"RT+BS",     // 100
-  L"NV+RT+BS",  // 101
-  L"RT+BS",     // 110
-  L"NV+RT+BS",  // 111
-};
+
+#define INIT_NAME_BUFFER_SIZE  128
+#define INIT_DATA_BUFFER_SIZE  1024
+#define INIT_ATTS_BUFFER_SIZE  64
+
+CONST CHAR16 *
+EFIAPI
+GetAttrType (
+  IN CONST UINT32 Atts,
+  IN OUT   CHAR16 *RetString
+  )
+{
+  StrCpy(RetString, L"");
+
+  if (Atts & EFI_VARIABLE_NON_VOLATILE) {
+    StrCat(RetString, L"+NV");
+  }
+  if (Atts & EFI_VARIABLE_RUNTIME_ACCESS) {
+    StrCat(RetString, L"+RS+BS");
+  } else if (Atts & EFI_VARIABLE_BOOTSERVICE_ACCESS) {
+    StrCat(RetString, L"+BS");
+  }
+  if (Atts & EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
+    StrCat(RetString, L"+HR");
+  }
+  if (Atts & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) {
+    StrCat(RetString, L"+AW");
+  }
+  if (Atts & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) {
+    StrCat(RetString, L"+AT");
+  }
+
+  if (RetString[0] == L'+') {
+    return (RetString+1);
+  }
+  if (RetString[0] == CHAR_NULL) {
+    StrCpy(RetString, L"invalid");
+    return (RetString);
+  }
+  return (RetString);
+}
 
 /**
   Function to display or delete variables.
@@ -47,38 +78,32 @@ ProcessVariables (
   )
 {
   EFI_STATUS                Status;
-  UINT64                    MaxStorSize;
-  UINT64                    RemStorSize;
-  UINT64                    MaxVarSize;
   CHAR16                    *FoundVarName;
-  UINTN                     Size;
   EFI_GUID                  FoundVarGuid;
   UINT8                     *DataBuffer;
   UINTN                     DataSize;
   UINT32                    Atts;
   SHELL_STATUS              ShellStatus;
   BOOLEAN                   Found;
-
-  Status = gRT->QueryVariableInfo(EFI_VARIABLE_BOOTSERVICE_ACCESS|EFI_VARIABLE_RUNTIME_ACCESS|EFI_VARIABLE_NON_VOLATILE, &MaxStorSize, &RemStorSize, &MaxVarSize);
-  if (EFI_ERROR(Status)) {
-    return (SHELL_DEVICE_ERROR);
-  }
+  UINTN                     NameBufferSize; // Allocated Name buffer size
+  UINTN                     NameSize;
+  CHAR16                    *OldName;
+  UINTN                     OldNameBufferSize;
+  UINTN                     DataBufferSize; // Allocated data buffer size
+  CHAR16                    RetString[INIT_ATTS_BUFFER_SIZE];
 
   Found         = FALSE;
   ShellStatus   = SHELL_SUCCESS;
-  Size          = PcdGet16(PcdShellFileOperationSize);
-  FoundVarName  = AllocateZeroPool(Size);
 
+  NameBufferSize = INIT_NAME_BUFFER_SIZE;
+  DataBufferSize = INIT_DATA_BUFFER_SIZE;
+  FoundVarName   = AllocateZeroPool (NameBufferSize);
   if (FoundVarName == NULL) {
     return (SHELL_OUT_OF_RESOURCES);
-  }
-  FoundVarName[0] = CHAR_NULL;
-
-
-  DataSize = (UINTN)MaxVarSize;
-  DataBuffer = AllocateZeroPool(DataSize);
+  }  
+  DataBuffer     = AllocatePool (DataBufferSize);
   if (DataBuffer == NULL) {
-    FreePool(FoundVarName);
+    FreePool (FoundVarName);
     return (SHELL_OUT_OF_RESOURCES);
   }
 
@@ -87,16 +112,33 @@ ProcessVariables (
       ShellStatus = SHELL_ABORTED;
       break;
     }
-    Size      = (UINTN)PcdGet16(PcdShellFileOperationSize);
-    DataSize  = (UINTN)MaxVarSize;
 
-    Status = gRT->GetNextVariableName(&Size, FoundVarName, &FoundVarGuid);
+    NameSize  = NameBufferSize;
+    Status    = gRT->GetNextVariableName (&NameSize, FoundVarName, &FoundVarGuid);
+    if (Status == EFI_BUFFER_TOO_SMALL) {
+      OldName           = FoundVarName;
+      OldNameBufferSize = NameBufferSize;
+      //
+      // Expand at least twice to avoid reallocate many times
+      //
+      NameBufferSize = NameSize > NameBufferSize * 2 ? NameSize : NameBufferSize * 2;
+      FoundVarName           = AllocateZeroPool (NameBufferSize);
+      if (FoundVarName == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        FreePool (OldName);
+        break;
+      }
+      //
+      // Preserve the original content to get correct iteration for GetNextVariableName() call
+      //
+      CopyMem (FoundVarName, OldName, OldNameBufferSize);
+      FreePool (OldName);
+      NameSize = NameBufferSize;
+      Status = gRT->GetNextVariableName (&NameSize, FoundVarName, &FoundVarGuid);
+    }
     if (Status == EFI_NOT_FOUND) {
       break;
     }
-    ASSERT_EFI_ERROR(Status);
-
-    Status = gRT->GetVariable(FoundVarName, &FoundVarGuid, &Atts, &DataSize, DataBuffer);
     ASSERT_EFI_ERROR(Status);
 
     //
@@ -113,6 +155,24 @@ ProcessVariables (
       }
     }
 
+    DataSize  = DataBufferSize;
+    Status    = gRT->GetVariable (FoundVarName, &FoundVarGuid, &Atts, &DataSize, DataBuffer);
+    if (Status == EFI_BUFFER_TOO_SMALL) {
+      //
+      // Expand at least twice to avoid reallocate many times
+      //
+      FreePool (DataBuffer);
+      DataBufferSize = DataSize > DataBufferSize * 2 ? DataSize : DataBufferSize * 2;
+      DataBuffer           = AllocatePool (DataBufferSize);
+      if (DataBuffer == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        break;
+      }
+      DataSize = DataBufferSize;
+      Status   = gRT->GetVariable (FoundVarName, &FoundVarGuid, &Atts, &DataSize, DataBuffer);
+    }    
+    ASSERT_EFI_ERROR(Status);
+
     //
     // do the print or delete
     //
@@ -124,7 +184,7 @@ ProcessVariables (
         NULL,
         STRING_TOKEN(STR_DMPSTORE_HEADER_LINE),
         gShellDebug1HiiHandle,
-        AttrType[Atts & 7],
+        GetAttrType(Atts, RetString),
         &FoundVarGuid,
         FoundVarName,
         DataSize);
@@ -156,6 +216,11 @@ ProcessVariables (
     FreePool(DataBuffer);
   }
   if (!Found) {
+    if (Status == EFI_OUT_OF_RESOURCES) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle);
+      return SHELL_OUT_OF_RESOURCES;
+    }
+
     if (VariableName != NULL && Guid == NULL) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_DMPSTORE_NO_VAR_FOUND_N), gShellDebug1HiiHandle, VariableName);
     } else if (VariableName != NULL && Guid != NULL) {
