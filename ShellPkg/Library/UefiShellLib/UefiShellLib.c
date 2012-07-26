@@ -3650,10 +3650,10 @@ InternalShellStrHexToUint64 (
   Result = 0;
 
   //
-  // stop at spaces if requested
+  // Skip spaces if requested
   //
-  if (StopAtSpace && *String == L' ') {
-    break;
+  while (StopAtSpace && *String == L' ') {
+    String++;
   }
 
   while (ShellIsHexaDecimalDigitCharacter (*String)) {
