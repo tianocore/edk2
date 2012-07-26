@@ -94,6 +94,7 @@ ProcessVariables (
 
   Found         = FALSE;
   ShellStatus   = SHELL_SUCCESS;
+  Status        = EFI_SUCCESS;
 
   NameBufferSize = INIT_NAME_BUFFER_SIZE;
   DataBufferSize = INIT_DATA_BUFFER_SIZE;
