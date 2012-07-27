@@ -75,6 +75,11 @@ typedef struct {
   //
   UINTN                       EncapsulatedStreamHandle;
   EFI_GUID                    *EncapsulationGuid;
+  //
+  // If the section REQUIRES an extraction protocol, register for RPN 
+  // when the required GUIDed extraction protocol becomes available.
+  //
+  EFI_EVENT                   Event;
 } FRAMEWORK_SECTION_CHILD_NODE;
 
 #define FRAMEWORK_SECTION_STREAM_SIGNATURE SIGNATURE_32('S','X','S','S')
@@ -100,7 +105,6 @@ typedef struct {
   FRAMEWORK_SECTION_CHILD_NODE     *ChildNode;
   FRAMEWORK_SECTION_STREAM_NODE    *ParentStream;
   VOID                             *Registration;
-  EFI_EVENT                        Event;
 } RPN_EVENT_CONTEXT;
 
 /**
@@ -602,12 +606,13 @@ NotifyGuidedExtraction (
   }
 
   //
-  //  If above, the stream  did not close successfully, it indicates it's
-  //  alread been closed by someone, so just destroy the event and be done with
+  //  If above, the stream did not close successfully, it indicates it's
+  //  already been closed by someone, so just destroy the event and be done with
   //  it.
   //
   
   gBS->CloseEvent (Event);
+  Context->ChildNode->Event = NULL;
   FreePool (Context);
 }  
 
@@ -636,14 +641,14 @@ CreateGuidedExtractionRpnEvent (
   Context->ChildNode = ChildNode;
   Context->ParentStream = ParentStream;
  
-  Context->Event = CreateProtocolNotifyEvent (
-                    Context->ChildNode->EncapsulationGuid,
-                    TPL_NOTIFY,
-                    NotifyGuidedExtraction,
-                    Context,
-                    &Context->Registration,
-                    FALSE
-                    );
+  Context->ChildNode->Event = CreateProtocolNotifyEvent (
+                                Context->ChildNode->EncapsulationGuid,
+                                TPL_NOTIFY,
+                                NotifyGuidedExtraction,
+                                Context,
+                                &Context->Registration,
+                                FALSE
+                                );
 }
 
 /**
@@ -695,7 +700,7 @@ CreateChildNode (
   //
   // Allocate a new node
   //
-  *ChildNode = AllocatePool (sizeof (FRAMEWORK_SECTION_CHILD_NODE));
+  *ChildNode = AllocateZeroPool (sizeof (FRAMEWORK_SECTION_CHILD_NODE));
   Node = *ChildNode;
   if (Node == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -1045,6 +1050,7 @@ FindChildNode (
   CurrentChildNode = CHILD_SECTION_NODE_FROM_LINK (GetFirstNode(&SourceStream->Children));
 
   for (;;) {
+    ASSERT (CurrentChildNode != NULL);
     if (ChildIsType (SourceStream, CurrentChildNode, SearchType, SectionDefinitionGuid)) {
       //
       // The type matches, so check the instance count to see if it's the one we want
@@ -1061,7 +1067,6 @@ FindChildNode (
       }
     }
     
-    ASSERT (CurrentChildNode != NULL);
     if (CurrentChildNode->EncapsulatedStreamHandle != NULL_STREAM_HANDLE) {
       //
       // If the current node is an encapsulating node, recurse into it...
@@ -1339,6 +1344,11 @@ FreeChildNode (
     //
     CloseSectionStream (&mSectionExtraction, ChildNode->EncapsulatedStreamHandle);
   }
+
+  if (ChildNode->Event != NULL) {
+    gBS->CloseEvent (ChildNode->Event);
+  }
+
   //
   // Last, free the child node itself
   //
