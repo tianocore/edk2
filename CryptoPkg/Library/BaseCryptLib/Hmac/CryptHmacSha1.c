@@ -30,7 +30,7 @@ HmacSha1GetContextSize (
   //
   // Retrieves the OpenSSL HMAC-SHA1 Context Size
   //
-  return (UINTN)(sizeof (HMAC_CTX));
+  return (UINTN) (sizeof (HMAC_CTX));
 }
 
 /**

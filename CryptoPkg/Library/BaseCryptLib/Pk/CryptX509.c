@@ -367,7 +367,7 @@ X509GetSubjectName (
   }
   *SubjectSize = (UINTN) X509Name->bytes->length;
   if (CertSubject != NULL) {
-    CopyMem (CertSubject, (UINT8 *)X509Name->bytes->data, *SubjectSize);
+    CopyMem (CertSubject, (UINT8 *) X509Name->bytes->data, *SubjectSize);
     Status = TRUE;
   }
 

@@ -30,7 +30,7 @@ Md4GetContextSize (
   //
   // Retrieves the OpenSSL MD4 Context Size
   //
-  return (UINTN)(sizeof (MD4_CTX));
+  return (UINTN) (sizeof (MD4_CTX));
 }
 
 /**
@@ -61,7 +61,7 @@ Md4Init (
   //
   // OpenSSL MD4 Context Initialization
   //
-  return (BOOLEAN) (MD4_Init ((MD4_CTX *)Md4Context));
+  return (BOOLEAN) (MD4_Init ((MD4_CTX *) Md4Context));
 }
 
 /**
@@ -139,7 +139,7 @@ Md4Update (
   //
   // OpenSSL MD4 Hash Update
   //
-  return (BOOLEAN) (MD4_Update ((MD4_CTX *)Md4Context, Data, DataSize));
+  return (BOOLEAN) (MD4_Update ((MD4_CTX *) Md4Context, Data, DataSize));
 }
 
 /**
@@ -179,5 +179,5 @@ Md4Final (
   //
   // OpenSSL MD4 Hash Finalization
   //
-  return (BOOLEAN) (MD4_Final (HashValue, (MD4_CTX *)Md4Context));
+  return (BOOLEAN) (MD4_Final (HashValue, (MD4_CTX *) Md4Context));
 }

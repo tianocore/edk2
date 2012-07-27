@@ -37,7 +37,7 @@
 
 [Sources]
   RuntimeDxeIpfCryptLib.c
-
+  InternalCryptLib.h
   Hash/CryptMd4Null.c
   Hash/CryptMd5Null.c
   Hash/CryptSha1Null.c

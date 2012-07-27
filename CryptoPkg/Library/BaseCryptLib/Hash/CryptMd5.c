@@ -31,7 +31,7 @@ Md5GetContextSize (
   //
   // Retrieves the OpenSSL MD5 Context Size
   //
-  return (UINTN)(sizeof (MD5_CTX));
+  return (UINTN) (sizeof (MD5_CTX));
 }
 
 
@@ -63,7 +63,7 @@ Md5Init (
   //
   // OpenSSL MD5 Context Initialization
   //
-  return (BOOLEAN) (MD5_Init ((MD5_CTX *)Md5Context));
+  return (BOOLEAN) (MD5_Init ((MD5_CTX *) Md5Context));
 }
 
 /**
@@ -141,7 +141,7 @@ Md5Update (
   //
   // OpenSSL MD5 Hash Update
   //
-  return (BOOLEAN) (MD5_Update ((MD5_CTX *)Md5Context, Data, DataSize));
+  return (BOOLEAN) (MD5_Update ((MD5_CTX *) Md5Context, Data, DataSize));
 }
 
 /**
@@ -181,5 +181,5 @@ Md5Final (
   //
   // OpenSSL MD5 Hash Finalization
   //
-  return (BOOLEAN) (MD5_Final (HashValue, (MD5_CTX *)Md5Context));
+  return (BOOLEAN) (MD5_Final (HashValue, (MD5_CTX *) Md5Context));
 }

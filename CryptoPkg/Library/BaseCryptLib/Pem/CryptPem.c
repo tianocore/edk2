@@ -36,7 +36,7 @@ PasswordCallback (
 {
   INTN  KeyLength;
 
-  ZeroMem ((VOID *)Buf, (UINTN)Size);
+  ZeroMem ((VOID *) Buf, (UINTN) Size);
   if (Key != NULL) {
     //
     // Duplicate key phrase directly.
@@ -93,16 +93,16 @@ RsaGetPrivateKeyFromPem (
   // Add possible block-cipher descriptor for PEM data decryption.
   // NOTE: Only support most popular ciphers (3DES, AES) for the encrypted PEM.
   //
-  EVP_add_cipher (EVP_des_ede3_cbc());
-  EVP_add_cipher (EVP_aes_128_cbc());
-  EVP_add_cipher (EVP_aes_192_cbc());
-  EVP_add_cipher (EVP_aes_256_cbc());
+  EVP_add_cipher (EVP_des_ede3_cbc ());
+  EVP_add_cipher (EVP_aes_128_cbc ());
+  EVP_add_cipher (EVP_aes_192_cbc ());
+  EVP_add_cipher (EVP_aes_256_cbc ());
 
   //
   // Read encrypted PEM Data.
   //
   PemBio = BIO_new (BIO_s_mem ());
-  BIO_write (PemBio, PemData, (int)PemSize);
+  BIO_write (PemBio, PemData, (int) PemSize);
   if (PemBio == NULL) {
     goto _Exit;
   }
@@ -110,7 +110,7 @@ RsaGetPrivateKeyFromPem (
   //
   // Retrieve RSA Private Key from encrypted PEM data.
   //
-  *RsaContext = PEM_read_bio_RSAPrivateKey (PemBio, NULL, (pem_password_cb *)&PasswordCallback, (void *)Password);
+  *RsaContext = PEM_read_bio_RSAPrivateKey (PemBio, NULL, (pem_password_cb *) &PasswordCallback, (void *) Password);
   if (*RsaContext != NULL) {
     Status = TRUE;
   }

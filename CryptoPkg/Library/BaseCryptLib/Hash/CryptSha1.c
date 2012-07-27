@@ -31,7 +31,7 @@ Sha1GetContextSize (
   //
   // Retrieves OpenSSL SHA Context Size
   //
-  return (UINTN)(sizeof (SHA_CTX));
+  return (UINTN) (sizeof (SHA_CTX));
 }
 
 /**
@@ -62,7 +62,7 @@ Sha1Init (
   //
   // OpenSSL SHA-1 Context Initialization
   //
-  return (BOOLEAN) (SHA1_Init ((SHA_CTX *)Sha1Context));
+  return (BOOLEAN) (SHA1_Init ((SHA_CTX *) Sha1Context));
 }
 
 /**
@@ -140,7 +140,7 @@ Sha1Update (
   //
   // OpenSSL SHA-1 Hash Update
   //
-  return (BOOLEAN) (SHA1_Update ((SHA_CTX *)Sha1Context, Data, DataSize));
+  return (BOOLEAN) (SHA1_Update ((SHA_CTX *) Sha1Context, Data, DataSize));
 }
 
 /**
@@ -180,5 +180,5 @@ Sha1Final (
   //
   // OpenSSL SHA-1 Hash Finalization
   //
-  return (BOOLEAN) (SHA1_Final (HashValue, (SHA_CTX *)Sha1Context));
+  return (BOOLEAN) (SHA1_Final (HashValue, (SHA_CTX *) Sha1Context));
 }

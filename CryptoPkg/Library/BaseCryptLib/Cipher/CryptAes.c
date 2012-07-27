@@ -38,7 +38,7 @@ AesGetContextSize (
   Initializes user-supplied memory as AES context for subsequent use.
 
   This function initializes user-supplied memory pointed by AesContext as AES context.
-  In addtion, it sets up all AES key materials for subsequent encryption and decryption
+  In addition, it sets up all AES key materials for subsequent encryption and decryption
   operations.
   There are 3 options for key length, 128 bits, 192 bits, and 256 bits.
 

@@ -32,7 +32,7 @@ DhNew (
   //
   // Allocates & Initializes DH Context by OpenSSL DH_new()
   //
-  return (VOID *)DH_new ();
+  return (VOID *) DH_new ();
 }
 
 /**
@@ -52,7 +52,7 @@ DhFree (
   //
   // Free OpenSSL DH Context
   //
-  DH_free ((DH *)DhContext);
+  DH_free ((DH *) DhContext);
 }
 
 /**

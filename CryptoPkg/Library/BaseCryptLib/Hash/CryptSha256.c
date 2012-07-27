@@ -30,7 +30,7 @@ Sha256GetContextSize (
   //
   // Retrieves OpenSSL SHA-256 Context Size
   //
-  return (UINTN)(sizeof (SHA256_CTX));
+  return (UINTN) (sizeof (SHA256_CTX));
 }
 
 /**
@@ -61,7 +61,7 @@ Sha256Init (
   //
   // OpenSSL SHA-256 Context Initialization
   //
-  return (BOOLEAN) (SHA256_Init ((SHA256_CTX *)Sha256Context));
+  return (BOOLEAN) (SHA256_Init ((SHA256_CTX *) Sha256Context));
 }
 
 /**
@@ -139,7 +139,7 @@ Sha256Update (
   //
   // OpenSSL SHA-256 Hash Update
   //
-  return (BOOLEAN) (SHA256_Update ((SHA256_CTX *)Sha256Context, Data, DataSize));
+  return (BOOLEAN) (SHA256_Update ((SHA256_CTX *) Sha256Context, Data, DataSize));
 }
 
 /**
@@ -179,5 +179,5 @@ Sha256Final (
   //
   // OpenSSL SHA-256 Hash Finalization
   //
-  return (BOOLEAN) (SHA256_Final (HashValue, (SHA256_CTX *)Sha256Context));
+  return (BOOLEAN) (SHA256_Final (HashValue, (SHA256_CTX *) Sha256Context));
 }

@@ -40,7 +40,7 @@ RsaNew (
   //
   // Allocates & Initializes RSA Context by OpenSSL RSA_new()
   //
-  return (VOID *)RSA_new ();
+  return (VOID *) RSA_new ();
 }
 
 /**
@@ -58,7 +58,7 @@ RsaFree (
   //
   // Free OpenSSL RSA Context
   //
-  RSA_free ((RSA *)RsaContext);
+  RSA_free ((RSA *) RsaContext);
 }
 
 /**
@@ -101,7 +101,7 @@ RsaSetKey (
     return FALSE;
   }
 
-  RsaKey = (RSA *)RsaContext;
+  RsaKey = (RSA *) RsaContext;
   //
   // Set RSA Key Components by converting octet string to OpenSSL BN representation.
   // NOTE: For RSA public key (used in signature verification), only public components

@@ -32,14 +32,14 @@ Arc4GetContextSize (
   // for backup copy. When Arc4Reset() is called, we can use the backup copy to restore
   // the working copy to the initial state.
   //
-  return (UINTN) (2 * sizeof(RC4_KEY));
+  return (UINTN) (2 * sizeof (RC4_KEY));
 }
 
 /**
   Initializes user-supplied memory as ARC4 context for subsequent use.
 
   This function initializes user-supplied memory pointed by Arc4Context as ARC4 context.
-  In addtion, it sets up all ARC4 key materials for subsequent encryption and decryption
+  In addition, it sets up all ARC4 key materials for subsequent encryption and decryption
   operations.
 
   If Arc4Context is NULL, then return FALSE.
@@ -75,7 +75,7 @@ Arc4Init (
 
   RC4_set_key (Rc4Key, (UINT32) KeySize, Key);
 
-  CopyMem (Rc4Key +  1, Rc4Key, sizeof(RC4_KEY));
+  CopyMem (Rc4Key +  1, Rc4Key, sizeof (RC4_KEY));
 
   return TRUE;
 }
@@ -205,7 +205,7 @@ Arc4Reset (
   
   Rc4Key = (RC4_KEY *) Arc4Context;
 
-  CopyMem (Rc4Key, Rc4Key + 1, sizeof(RC4_KEY));
+  CopyMem (Rc4Key, Rc4Key + 1, sizeof (RC4_KEY));
 
   return TRUE;
 }

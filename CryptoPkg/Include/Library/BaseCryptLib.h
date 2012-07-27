@@ -778,7 +778,7 @@ TdesGetContextSize (
   Initializes user-supplied memory as TDES context for subsequent use.
 
   This function initializes user-supplied memory pointed by TdesContext as TDES context.
-  In addtion, it sets up all TDES key materials for subsequent encryption and decryption
+  In addition, it sets up all TDES key materials for subsequent encryption and decryption
   operations.
   There are 3 key options as follows:
   KeyLength = 64,  Keying option 1: K1 == K2 == K3 (Backward compatibility with DES)
@@ -974,7 +974,7 @@ AesGetContextSize (
   Initializes user-supplied memory as AES context for subsequent use.
 
   This function initializes user-supplied memory pointed by AesContext as AES context.
-  In addtion, it sets up all AES key materials for subsequent encryption and decryption
+  In addition, it sets up all AES key materials for subsequent encryption and decryption
   operations.
   There are 3 options for key length, 128 bits, 192 bits, and 256 bits.
 
@@ -1167,7 +1167,7 @@ Arc4GetContextSize (
   Initializes user-supplied memory as ARC4 context for subsequent use.
 
   This function initializes user-supplied memory pointed by Arc4Context as ARC4 context.
-  In addtion, it sets up all ARC4 key materials for subsequent encryption and decryption
+  In addition, it sets up all ARC4 key materials for subsequent encryption and decryption
   operations.
 
   If Arc4Context is NULL, then return FALSE.
