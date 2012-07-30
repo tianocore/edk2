@@ -902,7 +902,7 @@ ShowProgress (
   if (TimeoutDefault == 0) {
     return EFI_TIMEOUT;
   }
-  
+
   DEBUG ((EFI_D_INFO, "\n\nStart showing progress bar... Press any key to stop it! ...Zzz....\n"));
 
   SetMem (&Foreground, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0xff);
@@ -962,16 +962,18 @@ ShowProgress (
   //
   // User pressed some key
   //
-  Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+  if (!PcdGetBool (PcdConInConnectOnDemand)) {
+    Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
 
-  if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
-    //
-    // User pressed enter, equivalent to select "continue"
-    //
-    return EFI_TIMEOUT;
+    if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
+      //
+      // User pressed enter, equivalent to select "continue"
+      //
+      return EFI_TIMEOUT;
+    }
   }
 
   return EFI_SUCCESS;
@@ -1002,7 +1004,10 @@ PlatformBdsEnterFrontPage (
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *SimpleTextOut;
   UINTN                              BootTextColumn;
   UINTN                              BootTextRow;
-  
+  UINT64                             OsIndication;
+  UINTN                              DataSize;
+  EFI_INPUT_KEY                      Key;
+
   GraphicsOutput = NULL;
   SimpleTextOut = NULL;
 
@@ -1013,7 +1018,7 @@ PlatformBdsEnterFrontPage (
   if (ConnectAllHappened) {
     gConnectAllHappened = TRUE;
   }
-  
+
   if (!mModeInitialized) {
     //
     // After the console is ready, get current video resolution 
@@ -1067,27 +1072,72 @@ PlatformBdsEnterFrontPage (
     mModeInitialized           = TRUE;
   }
 
- 
 
-  HotkeyBoot ();
-  if (TimeoutDefault != 0xffff) {
-    Status = ShowProgress (TimeoutDefault);
-    StatusHotkey = HotkeyBoot ();
+  //
+  // goto FrontPage directly when EFI_OS_INDICATIONS_BOOT_TO_FW_UI is set
+  //
+  OsIndication = 0;
+  DataSize = sizeof(UINT64);
+  Status = gRT->GetVariable (
+                  L"OsIndications",
+                  &gEfiGlobalVariableGuid,
+                  NULL,
+                  &DataSize,
+                  &OsIndication
+                  );
 
-    if (!FeaturePcdGet(PcdBootlogoOnlyEnable) || !EFI_ERROR(Status) || !EFI_ERROR(StatusHotkey)){
-      //
-      // Ensure screen is clear when switch Console from Graphics mode to Text mode
-      // Skip it in normal boot 
-      //
-      gST->ConOut->EnableCursor (gST->ConOut, TRUE);
-      gST->ConOut->ClearScreen (gST->ConOut);
+  //
+  // goto FrontPage directly when EFI_OS_INDICATIONS_BOOT_TO_FW_UI is set. Skip HotkeyBoot
+  //
+  if (!EFI_ERROR(Status) && (OsIndication & EFI_OS_INDICATIONS_BOOT_TO_FW_UI)) {
+    //
+    // Clear EFI_OS_INDICATIONS_BOOT_TO_FW_UI to acknowledge OS
+    // 
+    OsIndication &= ~EFI_OS_INDICATIONS_BOOT_TO_FW_UI;
+    Status = gRT->SetVariable (
+                    L"OsIndications",
+                    &gEfiGlobalVariableGuid,
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                    sizeof(UINT64),
+                    &OsIndication
+                    );
+    ASSERT_EFI_ERROR (Status);
+
+    //
+    // Follow generic rule, Call ReadKeyStroke to connect ConIn before enter UI
+    //
+    if (PcdGetBool (PcdConInConnectOnDemand)) {
+      gST->ConIn->ReadKeyStroke(gST->ConIn, &Key);
     }
 
-    if (EFI_ERROR (Status)) {
-      //
-      // Timeout or user press enter to continue
-      //
-      goto Exit;
+    //
+    // Ensure screen is clear when switch Console from Graphics mode to Text mode
+    //
+    gST->ConOut->EnableCursor (gST->ConOut, TRUE);
+    gST->ConOut->ClearScreen (gST->ConOut);
+
+  } else {
+
+    HotkeyBoot ();
+    if (TimeoutDefault != 0xffff) {
+      Status = ShowProgress (TimeoutDefault);
+      StatusHotkey = HotkeyBoot ();
+
+      if (!FeaturePcdGet(PcdBootlogoOnlyEnable) || !EFI_ERROR(Status) || !EFI_ERROR(StatusHotkey)){
+        //
+        // Ensure screen is clear when switch Console from Graphics mode to Text mode
+        // Skip it in normal boot 
+        //
+        gST->ConOut->EnableCursor (gST->ConOut, TRUE);
+        gST->ConOut->ClearScreen (gST->ConOut);
+      }
+
+      if (EFI_ERROR (Status)) {
+        //
+        // Timeout or user press enter to continue
+        //
+        goto Exit;
+      }
     }
   }
 

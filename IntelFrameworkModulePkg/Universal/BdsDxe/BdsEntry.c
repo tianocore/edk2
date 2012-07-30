@@ -361,22 +361,80 @@ BdsFormalizeConsoleVariable (
 
 /**
 
-  Validate variables. 
+  Formalize Bds global variables. 
 
-  If found the device path is not a valid device path, remove the variable.
-
+ 1. For ConIn/ConOut/ConErr, if found the device path is not a valid device path, remove the variable.
+ 2. For OsIndicationsSupported, Create a BS/RT/UINT64 variable to report caps 
+ 3. Delete OsIndications variable if it is not NV/BS/RT UINT64
+ Item 3 is used to solve case when OS corrupts OsIndications. Here simply delete this NV variable.
+ 
 **/
 VOID 
 BdsFormalizeEfiGlobalVariable (
   VOID
   )
 {
+  EFI_STATUS Status;
+  UINT64     OsIndicationSupport;
+  UINT64     OsIndication;
+  UINTN      DataSize;
+  UINT32     Attributes;
+  
   //
   // Validate Console variable.
   //
   BdsFormalizeConsoleVariable (L"ConIn");
   BdsFormalizeConsoleVariable (L"ConOut");
   BdsFormalizeConsoleVariable (L"ErrOut");
+
+  //
+  // OS indicater support variable
+  //
+  OsIndicationSupport = EFI_OS_INDICATIONS_BOOT_TO_FW_UI;
+  Status = gRT->SetVariable (
+                  L"OsIndicationsSupported",
+                  &gEfiGlobalVariableGuid,
+                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                  sizeof(UINT64),
+                  &OsIndicationSupport
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // If OsIndications is invalid, remove it.
+  // Invalid case
+  //   1. Data size != UINT64
+  //   2. OsIndication value inconsistence
+  //   3. OsIndication attribute inconsistence
+  //
+  OsIndication = 0;
+  Attributes = 0;
+  DataSize = sizeof(UINT64);
+  Status = gRT->GetVariable (
+                  L"OsIndications",
+                  &gEfiGlobalVariableGuid,
+                  &Attributes,
+                  &DataSize,
+                  &OsIndication
+                  );
+
+  if (!EFI_ERROR(Status)) {
+    if (DataSize != sizeof(UINT64) ||
+        (OsIndication & ~OsIndicationSupport) != 0 ||
+        Attributes != (EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE)){
+
+      DEBUG ((EFI_D_ERROR, "Unformalized OsIndications variable exists. Delete it\n"));
+      Status = gRT->SetVariable (
+                      L"OsIndications",
+                      &gEfiGlobalVariableGuid,
+                      Attributes,
+                      0,
+                      &OsIndication
+                      );
+      ASSERT_EFI_ERROR (Status);
+    }
+  }
+
 }
 
 /**

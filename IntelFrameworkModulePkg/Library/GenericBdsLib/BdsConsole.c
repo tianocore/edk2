@@ -562,6 +562,75 @@ BdsLibConnectAllDefaultConsoles (
 }
 
 /**
+  This function will connect console device except ConIn base on the console
+  device variable  ConOut and ErrOut.
+
+  @retval EFI_SUCCESS              At least one of the ConOut device have
+                                   been connected success.
+  @retval EFI_STATUS               Return the status of BdsLibConnectConsoleVariable ().
+
+**/
+EFI_STATUS
+EFIAPI
+BdsLibConnectAllDefaultConsolesWithOutConIn (
+  VOID
+  )
+{
+  EFI_STATUS                Status;
+  BOOLEAN                   SystemTableUpdated;
+
+  //
+  // Connect all default console variables except ConIn
+  //
+
+  //
+  // It seems impossible not to have any ConOut device on platform,
+  // so we check the status here.
+  //
+  Status = BdsLibConnectConsoleVariable (L"ConOut");
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Insert the performance probe for Console Out
+  //
+  PERF_START (NULL, "ConOut", "BDS", 1);
+  PERF_END (NULL, "ConOut", "BDS", 0);
+
+  //
+  // The _ModuleEntryPoint err out var is legal.
+  //
+  BdsLibConnectConsoleVariable (L"ErrOut");
+
+  SystemTableUpdated = FALSE;
+  //
+  // Fill console handles in System Table if no console device assignd.
+  //
+  if (UpdateSystemTableConsole (L"ConOut", &gEfiSimpleTextOutProtocolGuid, &gST->ConsoleOutHandle, (VOID **) &gST->ConOut)) {
+    SystemTableUpdated = TRUE;
+  }
+  if (UpdateSystemTableConsole (L"ErrOut", &gEfiSimpleTextOutProtocolGuid, &gST->StandardErrorHandle, (VOID **) &gST->StdErr)) {
+    SystemTableUpdated = TRUE;
+  }
+
+  if (SystemTableUpdated) {
+    //
+    // Update the CRC32 in the EFI System Table header
+    //
+    gST->Hdr.CRC32 = 0;
+    gBS->CalculateCrc32 (
+          (UINT8 *) &gST->Hdr,
+          gST->Hdr.HeaderSize,
+          &gST->Hdr.CRC32
+          );
+  }
+
+  return EFI_SUCCESS;
+
+}
+
+/**
   Convert a *.BMP graphics image to a GOP blt buffer. If a NULL Blt buffer
   is passed in a GopBlt buffer will be allocated by this routine. If a GopBlt
   buffer is passed in it will be used if it is big enough.

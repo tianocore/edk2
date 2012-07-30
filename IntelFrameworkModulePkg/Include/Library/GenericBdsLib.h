@@ -4,7 +4,7 @@
     2) BDS boot device connect interface.
     3) BDS Misc interfaces for mainting boot variable, ouput string.
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -464,6 +464,23 @@ EFIAPI
 BdsLibConnectAllDefaultConsoles (
   VOID
   );
+
+
+/**
+  This function will connect console device except ConIn base on the console
+  device variable ConOut and ErrOut.
+
+  @retval EFI_SUCCESS              At least one of the ConOut device have
+                                   been connected success.
+  @retval EFI_STATUS               Return the status of BdsLibConnectConsoleVariable ().
+
+**/
+EFI_STATUS
+EFIAPI
+BdsLibConnectAllDefaultConsolesWithOutConIn (
+  VOID
+  );
+
 
 /**
   This function updates the console variable based on ConVarName. It can

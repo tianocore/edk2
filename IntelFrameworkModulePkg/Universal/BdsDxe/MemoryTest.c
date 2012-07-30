@@ -346,30 +346,32 @@ BdsMemoryTest (
       DEBUG ((EFI_D_INFO, "Perform memory test (ESC to skip).\n"));
     }
 
-    KeyStatus     = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-    if (!EFI_ERROR (KeyStatus) && (Key.ScanCode == SCAN_ESC)) {
-      if (!RequireSoftECCInit) {
-        if (!FeaturePcdGet(PcdBootlogoOnlyEnable)) {
-          TmpStr = GetStringById (STRING_TOKEN (STR_PERFORM_MEM_TEST));
-          if (TmpStr != NULL) {
-            PlatformBdsShowProgress (
-              Foreground,
-              Background,
-              TmpStr,
-              Color,
-              100,
-              (UINTN) PreviousValue
-              );
-            FreePool (TmpStr);
+    if (!PcdGetBool (PcdConInConnectOnDemand)) {
+      KeyStatus     = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+      if (!EFI_ERROR (KeyStatus) && (Key.ScanCode == SCAN_ESC)) {
+        if (!RequireSoftECCInit) {
+          if (!FeaturePcdGet(PcdBootlogoOnlyEnable)) {
+            TmpStr = GetStringById (STRING_TOKEN (STR_PERFORM_MEM_TEST));
+            if (TmpStr != NULL) {
+              PlatformBdsShowProgress (
+                Foreground,
+                Background,
+                TmpStr,
+                Color,
+                100,
+                (UINTN) PreviousValue
+                );
+              FreePool (TmpStr);
+            }
+
+            PrintXY (10, 10, NULL, NULL, L"100");
           }
-
-          PrintXY (10, 10, NULL, NULL, L"100");
+          Status = GenMemoryTest->Finished (GenMemoryTest);
+          goto Done;
         }
-        Status = GenMemoryTest->Finished (GenMemoryTest);
-        goto Done;
-      }
 
-      TestAbort = TRUE;
+        TestAbort = TRUE;
+      }
     }
   } while (Status != EFI_NOT_FOUND);
 

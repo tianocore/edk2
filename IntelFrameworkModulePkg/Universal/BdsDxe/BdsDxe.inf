@@ -180,6 +180,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareRevision
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupConOutColumn
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupConOutRow
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution
