@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2010, Apple, Inc. All rights reserved.<BR>
 Portions copyright (c) 2010, Apple Inc. All rights reserved.<BR>
 This program and the accompanying materials
@@ -499,7 +499,7 @@ UnixGopSimpleTextInExRegisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_KEY_DATA                       *KeyData,
   IN EFI_KEY_NOTIFY_FUNCTION            KeyNotificationFunction,
-  OUT EFI_HANDLE                        *NotifyHandle
+  OUT VOID                              **NotifyHandle
   )
 {
   EFI_STATUS                          Status;
@@ -526,7 +526,7 @@ UnixGopSimpleTextInExRegisterKeyNotify (
                       );
     if (GopPrivateIsKeyRegistered (&CurrentNotify->KeyData, KeyData)) { 
       if (CurrentNotify->KeyNotificationFn == KeyNotificationFunction) {
-        *NotifyHandle = CurrentNotify->NotifyHandle;
+        *NotifyHandle = CurrentNotify;
         return EFI_SUCCESS;
       }
     }
@@ -542,7 +542,6 @@ UnixGopSimpleTextInExRegisterKeyNotify (
 
   NewNotify->Signature         = UNIX_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE;     
   NewNotify->KeyNotificationFn = KeyNotificationFunction;
-  NewNotify->NotifyHandle      = (EFI_HANDLE) NewNotify;
   CopyMem (&NewNotify->KeyData, KeyData, sizeof (KeyData));
   InsertTailList (&Private->NotifyList, &NewNotify->NotifyEntry);
   
@@ -556,7 +555,7 @@ UnixGopSimpleTextInExRegisterKeyNotify (
   ASSERT_EFI_ERROR (Status);
 
 
-  *NotifyHandle = NewNotify->NotifyHandle;  
+  *NotifyHandle = NewNotify;  
   
   return EFI_SUCCESS;
   
@@ -582,7 +581,7 @@ EFI_STATUS
 EFIAPI
 UnixGopSimpleTextInExUnregisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
-  IN EFI_HANDLE                         NotificationHandle
+  IN VOID                               *NotificationHandle
   )
 /*++
 
@@ -620,7 +619,7 @@ UnixGopSimpleTextInExUnregisterKeyNotify (
                       NotifyEntry, 
                       UNIX_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE
                       );       
-    if (CurrentNotify->NotifyHandle == NotificationHandle) {
+    if (CurrentNotify == NotificationHandle) {
       //
       // Remove the notification function from NotifyList and free resources
       //

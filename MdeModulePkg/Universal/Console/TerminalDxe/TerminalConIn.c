@@ -324,7 +324,7 @@ TerminalConInRegisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_KEY_DATA                       *KeyData,
   IN EFI_KEY_NOTIFY_FUNCTION            KeyNotificationFunction,
-  OUT EFI_HANDLE                        *NotifyHandle
+  OUT VOID                              **NotifyHandle
   )
 {
   TERMINAL_DEV                    *TerminalDevice;
@@ -352,7 +352,7 @@ TerminalConInRegisterKeyNotify (
                       );
     if (IsKeyRegistered (&CurrentNotify->KeyData, KeyData)) {
       if (CurrentNotify->KeyNotificationFn == KeyNotificationFunction) {
-        *NotifyHandle = CurrentNotify->NotifyHandle;
+        *NotifyHandle = CurrentNotify;
         return EFI_SUCCESS;
       }
     }
@@ -368,11 +368,10 @@ TerminalConInRegisterKeyNotify (
 
   NewNotify->Signature         = TERMINAL_CONSOLE_IN_EX_NOTIFY_SIGNATURE;
   NewNotify->KeyNotificationFn = KeyNotificationFunction;
-  NewNotify->NotifyHandle      = (EFI_HANDLE) NewNotify;
   CopyMem (&NewNotify->KeyData, KeyData, sizeof (KeyData));
   InsertTailList (&TerminalDevice->NotifyList, &NewNotify->NotifyEntry);
 
-  *NotifyHandle                = NewNotify->NotifyHandle;
+  *NotifyHandle                = NewNotify;
 
   return EFI_SUCCESS;
 }
@@ -394,7 +393,7 @@ EFI_STATUS
 EFIAPI
 TerminalConInUnregisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
-  IN EFI_HANDLE                         NotificationHandle
+  IN VOID                               *NotificationHandle
   )
 {
   TERMINAL_DEV                    *TerminalDevice;
@@ -416,7 +415,7 @@ TerminalConInUnregisterKeyNotify (
                       NotifyEntry,
                       TERMINAL_CONSOLE_IN_EX_NOTIFY_SIGNATURE
                       );
-    if (CurrentNotify->NotifyHandle == NotificationHandle) {
+    if (CurrentNotify == NotificationHandle) {
       //
       // Remove the notification function from NotifyList and free resources
       //

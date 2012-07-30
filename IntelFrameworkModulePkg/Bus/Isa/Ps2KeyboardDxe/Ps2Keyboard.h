@@ -1,7 +1,7 @@
 /** @file
   PS/2 keyboard driver header file
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -50,7 +50,6 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gPs2KeyboardComponentName2;
 
 typedef struct _KEYBOARD_CONSOLE_IN_EX_NOTIFY {
   UINTN                               Signature;
-  EFI_HANDLE                          NotifyHandle;
   EFI_KEY_DATA                        KeyData;
   EFI_KEY_NOTIFY_FUNCTION             KeyNotificationFn;
   LIST_ENTRY                          NotifyEntry;
@@ -496,7 +495,7 @@ KeyboardRegisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_KEY_DATA                       *KeyData,
   IN EFI_KEY_NOTIFY_FUNCTION            KeyNotificationFunction,
-  OUT EFI_HANDLE                        *NotifyHandle
+  OUT VOID                              **NotifyHandle
   );
 
 /**
@@ -515,7 +514,7 @@ EFI_STATUS
 EFIAPI
 KeyboardUnregisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
-  IN EFI_HANDLE                         NotificationHandle
+  IN VOID                               *NotificationHandle
   );
 
 /**

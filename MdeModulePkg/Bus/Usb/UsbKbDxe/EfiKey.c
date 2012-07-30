@@ -1042,7 +1042,7 @@ USBKeyboardRegisterKeyNotify (
   IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN  EFI_KEY_DATA                       *KeyData,
   IN  EFI_KEY_NOTIFY_FUNCTION            KeyNotificationFunction,
-  OUT EFI_HANDLE                         *NotifyHandle
+  OUT VOID                               **NotifyHandle
   )
 {
   USB_KB_DEV                        *UsbKeyboardDevice;
@@ -1073,7 +1073,7 @@ USBKeyboardRegisterKeyNotify (
                       );
     if (IsKeyRegistered (&CurrentNotify->KeyData, KeyData)) {
       if (CurrentNotify->KeyNotificationFn == KeyNotificationFunction) {
-        *NotifyHandle = CurrentNotify->NotifyHandle;
+        *NotifyHandle = CurrentNotify;
         return EFI_SUCCESS;
       }
     }
@@ -1089,12 +1089,11 @@ USBKeyboardRegisterKeyNotify (
 
   NewNotify->Signature         = USB_KB_CONSOLE_IN_EX_NOTIFY_SIGNATURE;
   NewNotify->KeyNotificationFn = KeyNotificationFunction;
-  NewNotify->NotifyHandle      = (EFI_HANDLE) NewNotify;
   CopyMem (&NewNotify->KeyData, KeyData, sizeof (EFI_KEY_DATA));
   InsertTailList (&UsbKeyboardDevice->NotifyList, &NewNotify->NotifyEntry);
 
 
-  *NotifyHandle = NewNotify->NotifyHandle;
+  *NotifyHandle = NewNotify;
 
   return EFI_SUCCESS;
 
@@ -1114,7 +1113,7 @@ EFI_STATUS
 EFIAPI
 USBKeyboardUnregisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
-  IN EFI_HANDLE                         NotificationHandle
+  IN VOID                               *NotificationHandle
   )
 {
   USB_KB_DEV                        *UsbKeyboardDevice;
@@ -1141,7 +1140,7 @@ USBKeyboardUnregisterKeyNotify (
                       NotifyEntry,
                       USB_KB_CONSOLE_IN_EX_NOTIFY_SIGNATURE
                       );
-    if (CurrentNotify->NotifyHandle == NotificationHandle) {
+    if (CurrentNotify == NotificationHandle) {
       //
       // Remove the notification function from NotifyList and free resources
       //

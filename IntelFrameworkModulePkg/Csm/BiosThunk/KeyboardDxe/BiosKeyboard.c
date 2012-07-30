@@ -1,7 +1,7 @@
 /** @file
   ConsoleOut Routines that speak VGA.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -2244,7 +2244,7 @@ BiosKeyboardRegisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_KEY_DATA                       *KeyData,
   IN EFI_KEY_NOTIFY_FUNCTION            KeyNotificationFunction,
-  OUT EFI_HANDLE                        *NotifyHandle
+  OUT VOID                              **NotifyHandle
   )
 {
   EFI_STATUS                            Status;
@@ -2277,7 +2277,7 @@ BiosKeyboardRegisterKeyNotify (
                       );
     if (IsKeyRegistered (&CurrentNotify->KeyData, KeyData)) { 
       if (CurrentNotify->KeyNotificationFn == KeyNotificationFunction) {
-        *NotifyHandle = CurrentNotify->NotifyHandle;        
+        *NotifyHandle = CurrentNotify;
         Status = EFI_SUCCESS;
         goto Exit;
       }
@@ -2296,11 +2296,10 @@ BiosKeyboardRegisterKeyNotify (
 
   NewNotify->Signature         = BIOS_KEYBOARD_CONSOLE_IN_EX_NOTIFY_SIGNATURE;
   NewNotify->KeyNotificationFn = KeyNotificationFunction;
-  NewNotify->NotifyHandle      = (EFI_HANDLE) NewNotify;
   CopyMem (&NewNotify->KeyData, KeyData, sizeof (EFI_KEY_DATA));
   InsertTailList (&BiosKeyboardPrivate->NotifyList, &NewNotify->NotifyEntry);
 
-  *NotifyHandle                = NewNotify->NotifyHandle;  
+  *NotifyHandle                = NewNotify;
   Status                       = EFI_SUCCESS;
   
 Exit:
@@ -2325,7 +2324,7 @@ EFI_STATUS
 EFIAPI
 BiosKeyboardUnregisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
-  IN EFI_HANDLE                         NotificationHandle
+  IN VOID                               *NotificationHandle
   )
 {
   EFI_STATUS                            Status;
@@ -2350,7 +2349,7 @@ BiosKeyboardUnregisterKeyNotify (
   //
   // Enter critical section
   //
-  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);  
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
   for (Link = BiosKeyboardPrivate->NotifyList.ForwardLink; Link != &BiosKeyboardPrivate->NotifyList; Link = Link->ForwardLink) {
     CurrentNotify = CR (
@@ -2359,7 +2358,7 @@ BiosKeyboardUnregisterKeyNotify (
                       NotifyEntry, 
                       BIOS_KEYBOARD_CONSOLE_IN_EX_NOTIFY_SIGNATURE
                       );    
-    if (CurrentNotify->NotifyHandle == NotificationHandle) {
+    if (CurrentNotify == NotificationHandle) {
       //
       // Remove the notification function from NotifyList and free resources
       //

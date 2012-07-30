@@ -1,7 +1,7 @@
 /** @file
   function definitions for internal to shell functions.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -107,14 +107,14 @@ typedef struct {
   EFI_SHELL_PARAMETERS_PROTOCOL *OldShellParameters;  ///< old shell parameters to reinstall upon exiting.
   SHELL_PROTOCOL_HANDLE_LIST    OldShellList;         ///< List of other instances to reinstall when closing.
   SPLIT_LIST                    SplitList;            ///< List of Splits in FILO stack.
-  EFI_HANDLE                    CtrlCNotifyHandle1;   ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
-  EFI_HANDLE                    CtrlCNotifyHandle2;   ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
-  EFI_HANDLE                    CtrlCNotifyHandle3;   ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
-  EFI_HANDLE                    CtrlCNotifyHandle4;   ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
-  EFI_HANDLE                    CtrlSNotifyHandle1;   ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
-  EFI_HANDLE                    CtrlSNotifyHandle2;   ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
-  EFI_HANDLE                    CtrlSNotifyHandle3;   ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
-  EFI_HANDLE                    CtrlSNotifyHandle4;   ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                          *CtrlCNotifyHandle1;  ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                          *CtrlCNotifyHandle2;  ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                          *CtrlCNotifyHandle3;  ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                          *CtrlCNotifyHandle4;  ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                          *CtrlSNotifyHandle1;  ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                          *CtrlSNotifyHandle2;  ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                          *CtrlSNotifyHandle3;  ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                          *CtrlSNotifyHandle4;  ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
   BOOLEAN                       HaltOutput;           ///< TRUE to start a CTRL-S halt.
 } SHELL_INFO;
 

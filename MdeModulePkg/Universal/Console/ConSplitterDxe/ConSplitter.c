@@ -3606,7 +3606,7 @@ ConSplitterTextInRegisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_KEY_DATA                       *KeyData,
   IN EFI_KEY_NOTIFY_FUNCTION            KeyNotificationFunction,
-  OUT EFI_HANDLE                        *NotifyHandle
+  OUT VOID                              **NotifyHandle
   )
 {
   TEXT_IN_SPLITTER_PRIVATE_DATA *Private;
@@ -3630,7 +3630,7 @@ ConSplitterTextInRegisterKeyNotify (
     CurrentNotify = TEXT_IN_EX_SPLITTER_NOTIFY_FROM_THIS (Link);
     if (IsKeyRegistered (&CurrentNotify->KeyData, KeyData)) {
       if (CurrentNotify->KeyNotificationFn == KeyNotificationFunction) {
-        *NotifyHandle = CurrentNotify->NotifyHandle;
+        *NotifyHandle = CurrentNotify;
         return EFI_SUCCESS;
       }
     }
@@ -3650,7 +3650,6 @@ ConSplitterTextInRegisterKeyNotify (
   }
   NewNotify->Signature         = TEXT_IN_EX_SPLITTER_NOTIFY_SIGNATURE;
   NewNotify->KeyNotificationFn = KeyNotificationFunction;
-  NewNotify->NotifyHandle      = (EFI_HANDLE) NewNotify;
   CopyMem (&NewNotify->KeyData, KeyData, sizeof (EFI_KEY_DATA));
 
   //
@@ -3682,7 +3681,7 @@ ConSplitterTextInRegisterKeyNotify (
 
   InsertTailList (&mConIn.NotifyList, &NewNotify->NotifyEntry);
 
-  *NotifyHandle                = NewNotify->NotifyHandle;
+  *NotifyHandle                = NewNotify;
 
   return EFI_SUCCESS;
 
@@ -3705,7 +3704,7 @@ EFI_STATUS
 EFIAPI
 ConSplitterTextInUnregisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
-  IN EFI_HANDLE                         NotificationHandle
+  IN VOID                               *NotificationHandle
   )
 {
   TEXT_IN_SPLITTER_PRIVATE_DATA *Private;
@@ -3721,7 +3720,7 @@ ConSplitterTextInUnregisterKeyNotify (
 
   for (Link = Private->NotifyList.ForwardLink; Link != &Private->NotifyList; Link = Link->ForwardLink) {
     CurrentNotify = TEXT_IN_EX_SPLITTER_NOTIFY_FROM_THIS (Link);
-    if (CurrentNotify->NotifyHandle == NotificationHandle) {
+    if (CurrentNotify == NotificationHandle) {
       for (Index = 0; Index < Private->CurrentNumberOfExConsoles; Index++) {
         Private->TextInExList[Index]->UnregisterKeyNotify (
                                         Private->TextInExList[Index],

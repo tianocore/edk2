@@ -5,7 +5,7 @@
   which exposes much more state and modifier information from the input device,
   also allows one to register a notification for a particular keystroke.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -274,7 +274,7 @@ EFI_STATUS
   IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
   IN  EFI_KEY_DATA                      *KeyData,
   IN  EFI_KEY_NOTIFY_FUNCTION           KeyNotificationFunction,
-  OUT EFI_HANDLE                        *NotifyHandle
+  OUT VOID                              **NotifyHandle
 );
 
 /**
@@ -296,7 +296,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_UNREGISTER_KEYSTROKE_NOTIFY)(
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
-  IN EFI_HANDLE                         NotificationHandle
+  IN VOID                               *NotificationHandle
 );
 
 

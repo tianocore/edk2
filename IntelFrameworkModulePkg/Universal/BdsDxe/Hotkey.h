@@ -31,7 +31,7 @@ typedef struct {
   UINTN                     Signature;
   LIST_ENTRY                Link;
 
-  EFI_HANDLE                NotifyHandle;
+  VOID                      *NotifyHandle;
   UINT16                    BootOptionNumber;
   UINT8                     CodeCount;
   UINT8                     WaitingKey;

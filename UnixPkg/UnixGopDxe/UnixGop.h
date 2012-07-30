@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2010, Apple, Inc. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -55,7 +55,6 @@ typedef struct {
 #define UNIX_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE SIGNATURE_32 ('U', 'g', 'S', 'n')
 typedef struct _UNIX_GOP_SIMPLE_TEXTIN_EX_NOTIFY {
   UINTN                                 Signature;
-  EFI_HANDLE                            NotifyHandle;
   EFI_KEY_DATA                          KeyData;
   EFI_KEY_NOTIFY_FUNCTION               KeyNotificationFn;
   EFI_EVENT                             Event;
