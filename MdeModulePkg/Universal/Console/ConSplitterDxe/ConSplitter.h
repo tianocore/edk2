@@ -16,6 +16,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _CON_SPLITTER_H_
 
 #include <Uefi.h>
+#include <PiDxe.h>
+
+#include <IndustryStandard/Pci.h>
 
 #include <Protocol/DevicePath.h>
 #include <Protocol/ComponentName.h>
@@ -27,6 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SimpleTextInEx.h>
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/UgaDraw.h>
+#include <Protocol/PciIo.h>
 
 #include <Guid/ConsoleInDevice.h>
 #include <Guid/StandardErrorDevice.h>
@@ -41,6 +45,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/DevicePathLib.h>
+#include <Library/DxeServicesTableLib.h>
 
 
 //
