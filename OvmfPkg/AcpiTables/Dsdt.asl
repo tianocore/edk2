@@ -1,16 +1,16 @@
 /** @file
   Contains root level name space objects for the platform
-  
+
   Copyright (c) 2008, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are
   licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
   http://opensource.org/licenses/bsd-license.php
-  
+
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-**/ 
+**/
 
 DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
   //
@@ -55,7 +55,7 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
           ResourceProducer,      // bit 0 of general flags is 0
           MinFixed,              // Range is fixed
           MaxFixed,              // Range is fixed
-          PosDecode,             
+          PosDecode,
           EntireRange,
           0x0000,                // Granularity
           0x0000,                // Min
@@ -68,7 +68,7 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
           ResourceProducer,      // bit 0 of general flags is 0
           MinFixed,              // Range is fixed
           MaxFixed,              // Range is fixed
-          PosDecode,             
+          PosDecode,
           EntireRange,
           0x0000,                // Granularity
           0x0D00,                // Min
@@ -186,7 +186,7 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
           // Shift 1 by value in register 70
           //
           ShiftLeft (Local0, And (Arg0, 0x0F), IRQW)   // Save in buffer
-          Return (BUF0)                                // Return Buf0 
+          Return (BUF0)                                // Return Buf0
         }
 
         //
@@ -222,7 +222,7 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
           Method (_DIS, 0, NotSerialized) { PDIS (PIRA)  }
           Method (_CRS, 0, NotSerialized) { Return (PCRS (PIRA)) }
           Method (_PRS, 0, NotSerialized) { Return (PPRS) }
-          Method (_SRS, 1, NotSerialized) { PSRS (PIRA, Arg0) } 
+          Method (_SRS, 1, NotSerialized) { PSRS (PIRA, Arg0) }
         }
 
         //
@@ -236,7 +236,7 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
           Method (_DIS, 0, NotSerialized) { PDIS (PIRB) }
           Method (_CRS, 0, NotSerialized) { Return (PCRS (PIRB)) }
           Method (_PRS, 0, NotSerialized) { Return (PPRS) }
-          Method (_SRS, 1, NotSerialized) { PSRS (PIRB, Arg0) } 
+          Method (_SRS, 1, NotSerialized) { PSRS (PIRB, Arg0) }
         }
 
         //
@@ -250,7 +250,7 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
           Method (_DIS, 0, NotSerialized) { PDIS (PIRC) }
           Method (_CRS, 0, NotSerialized) { Return (PCRS (PIRC)) }
           Method (_PRS, 0, NotSerialized) { Return (PPRS) }
-          Method (_SRS, 1, NotSerialized) { PSRS (PIRC, Arg0) } 
+          Method (_SRS, 1, NotSerialized) { PSRS (PIRC, Arg0) }
         }
 
         //
@@ -264,9 +264,9 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
           Method (_DIS, 0, NotSerialized) { PDIS (PIRD) }
           Method (_CRS, 0, NotSerialized) { Return (PCRS (PIRD)) }
           Method (_PRS, 0, NotSerialized) { Return (PPRS) }
-          Method (_SRS, 1, NotSerialized) { PSRS (PIRD, Arg0) } 
+          Method (_SRS, 1, NotSerialized) { PSRS (PIRD, Arg0) }
         }
-        
+
         //
         // Programmable Interrupt Controller (PIC)
         //
@@ -281,10 +281,10 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
         }
 
         //
-        // ISA DMA 
+        // ISA DMA
         //
         Device (DMAC) {
-          Name (_HID, EISAID ("PNP0200")) 
+          Name (_HID, EISAID ("PNP0200"))
           Name (_CRS, ResourceTemplate () {
             IO (Decode16, 0x00, 0x00, 0, 0x10)
             IO (Decode16, 0x81, 0x81, 0, 0x03)
@@ -377,7 +377,7 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
         //
         // PS/2 Keyboard and PC/AT Enhanced Keyboard 101/102
         //
-        Device (PS2K) {  
+        Device (PS2K) {
           Name (_HID, EISAID ("PNP0303"))
           Name (_CID, EISAID ("PNP030B"))
           Name(_CRS,ResourceTemplate() {
