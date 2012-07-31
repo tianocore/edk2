@@ -16,6 +16,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/QemuFwCfgLib.h>
+#include <Library/DxeServicesTableLib.h>
 
 
 BOOLEAN
@@ -121,7 +122,92 @@ PopulateFwData(
   OUT  FIRMWARE_DATA *FwData
   )
 {
-  return EFI_SUCCESS;
+  EFI_STATUS                      Status;
+  UINTN                           NumDesc;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR *AllDesc;
+
+  Status = gDS->GetMemorySpaceMap (&NumDesc, &AllDesc);
+  if (Status == EFI_SUCCESS) {
+    UINT64 NonMmio32MaxExclTop;
+    UINT64 Mmio32MinBase;
+    UINT64 Mmio32MaxExclTop;
+    UINTN CurDesc;
+
+    Status = EFI_UNSUPPORTED;
+
+    NonMmio32MaxExclTop = 0;
+    Mmio32MinBase = BASE_4GB;
+    Mmio32MaxExclTop = 0;
+
+    for (CurDesc = 0; CurDesc < NumDesc; ++CurDesc) {
+      CONST EFI_GCD_MEMORY_SPACE_DESCRIPTOR *Desc;
+      UINT64 ExclTop;
+
+      Desc = &AllDesc[CurDesc];
+      ExclTop = Desc->BaseAddress + Desc->Length;
+
+      if (ExclTop <= BASE_4GB) {
+        switch (Desc->GcdMemoryType) {
+          case EfiGcdMemoryTypeNonExistent:
+            break;
+
+          case EfiGcdMemoryTypeReserved:
+          case EfiGcdMemoryTypeSystemMemory:
+            if (NonMmio32MaxExclTop < ExclTop) {
+              NonMmio32MaxExclTop = ExclTop;
+            }
+            break;
+
+          case EfiGcdMemoryTypeMemoryMappedIo:
+            if (Mmio32MinBase > Desc->BaseAddress) {
+              Mmio32MinBase = Desc->BaseAddress;
+            }
+            if (Mmio32MaxExclTop < ExclTop) {
+              Mmio32MaxExclTop = ExclTop;
+            }
+            break;
+
+          default:
+            ASSERT(0);
+        }
+      }
+    }
+
+    if (Mmio32MinBase < NonMmio32MaxExclTop) {
+      Mmio32MinBase = NonMmio32MaxExclTop;
+    }
+
+    if (Mmio32MinBase < Mmio32MaxExclTop) {
+      FwData->PciWindow32.Base   = Mmio32MinBase;
+      FwData->PciWindow32.End    = Mmio32MaxExclTop - 1;
+      FwData->PciWindow32.Length = Mmio32MaxExclTop - Mmio32MinBase;
+
+      FwData->PciWindow64.Base   = 0;
+      FwData->PciWindow64.End    = 0;
+      FwData->PciWindow64.Length = 0;
+
+      Status = EFI_SUCCESS;
+    }
+
+    FreePool (AllDesc);
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "ACPI PciWindow32: Base=0x%08lx End=0x%08lx Length=0x%08lx\n",
+    FwData->PciWindow32.Base,
+    FwData->PciWindow32.End,
+    FwData->PciWindow32.Length
+    ));
+  DEBUG ((
+    DEBUG_INFO,
+    "ACPI PciWindow64: Base=0x%08lx End=0x%08lx Length=0x%08lx\n",
+    FwData->PciWindow64.Base,
+    FwData->PciWindow64.End,
+    FwData->PciWindow64.Length
+    ));
+
+  return Status;
 }
 
 

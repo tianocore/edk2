@@ -48,6 +48,7 @@
   QemuFwCfgLib
   MemoryAllocationLib
   BaseLib
+  DxeServicesTableLib
 
 [Protocols]
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
