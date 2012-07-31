@@ -33,6 +33,7 @@
   Facp.aslc
   Facs.aslc
   Dsdt.asl
+  Ssdt.asl
 
 [Packages]
   MdePkg/MdePkg.dec

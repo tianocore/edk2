@@ -10,7 +10,7 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-**/ 
+**/
 
 #include "AcpiPlatform.h"
 #include <Library/BaseMemoryLib.h>
@@ -98,6 +98,107 @@ QemuInstallAcpiMadtTable (
 }
 
 
+#pragma pack(1)
+
+typedef struct {
+  UINT64 Base;
+  UINT64 End;
+  UINT64 Length;
+} PCI_WINDOW;
+
+typedef struct {
+  PCI_WINDOW PciWindow32;
+  PCI_WINDOW PciWindow64;
+} FIRMWARE_DATA;
+
+#pragma pack()
+
+
+STATIC
+EFI_STATUS
+EFIAPI
+PopulateFwData(
+  OUT  FIRMWARE_DATA *FwData
+  )
+{
+  return EFI_SUCCESS;
+}
+
+
+STATIC
+EFI_STATUS
+EFIAPI
+QemuInstallAcpiSsdtTable (
+  IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol,
+  IN   VOID                          *AcpiTableBuffer,
+  IN   UINTN                         AcpiTableBufferSize,
+  OUT  UINTN                         *TableKey
+  )
+{
+  EFI_STATUS    Status;
+  FIRMWARE_DATA *FwData;
+
+  Status = EFI_OUT_OF_RESOURCES;
+
+  FwData = AllocateReservedPool (sizeof (*FwData));
+  if (FwData != NULL) {
+    UINTN SsdtSize;
+    UINT8 *Ssdt;
+
+    SsdtSize = AcpiTableBufferSize + 17;
+    Ssdt = AllocatePool (SsdtSize);
+
+    if (Ssdt != NULL) {
+      Status = PopulateFwData (FwData);
+
+      if (Status == EFI_SUCCESS) {
+        UINT8 *SsdtPtr;
+
+        SsdtPtr = Ssdt;
+
+        CopyMem (SsdtPtr, AcpiTableBuffer, AcpiTableBufferSize);
+        SsdtPtr += AcpiTableBufferSize;
+
+        //
+        // build "OperationRegion(FWDT, SystemMemory, 0x12345678, 0x87654321)"
+        //
+        *(SsdtPtr++) = 0x5B; // ExtOpPrefix
+        *(SsdtPtr++) = 0x80; // OpRegionOp
+        *(SsdtPtr++) = 'F';
+        *(SsdtPtr++) = 'W';
+        *(SsdtPtr++) = 'D';
+        *(SsdtPtr++) = 'T';
+        *(SsdtPtr++) = 0x00; // SystemMemory
+        *(SsdtPtr++) = 0x0C; // DWordPrefix
+
+        //
+        // no virtual addressing yet, take the four least significant bytes
+        //
+        CopyMem(SsdtPtr, &FwData, 4);
+        SsdtPtr += 4;
+
+        *(SsdtPtr++) = 0x0C; // DWordPrefix
+
+        *(UINT32*) SsdtPtr = sizeof (*FwData);
+        SsdtPtr += 4;
+
+        ASSERT(SsdtPtr - Ssdt == SsdtSize);
+        ((EFI_ACPI_DESCRIPTION_HEADER *) Ssdt)->Length = SsdtSize;
+        Status = InstallAcpiTable (AcpiProtocol, Ssdt, SsdtSize, TableKey);
+      }
+
+      FreePool(Ssdt);
+    }
+
+    if (Status != EFI_SUCCESS) {
+      FreePool(FwData);
+    }
+  }
+
+  return Status;
+}
+
+
 EFI_STATUS
 EFIAPI
 QemuInstallAcpiTable (
@@ -114,6 +215,9 @@ QemuInstallAcpiTable (
   switch (Hdr->Signature) {
   case EFI_ACPI_1_0_APIC_SIGNATURE:
     TableInstallFunction = QemuInstallAcpiMadtTable;
+    break;
+  case EFI_ACPI_1_0_SECONDARY_SYSTEM_DESCRIPTION_TABLE_SIGNATURE:
+    TableInstallFunction = QemuInstallAcpiSsdtTable;
     break;
   default:
     TableInstallFunction = InstallAcpiTable;
