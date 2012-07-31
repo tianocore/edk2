@@ -36,7 +36,7 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
       //
       // BUS, I/O, and MMIO resources
       //
-      Name (_CRS, ResourceTemplate () {
+      Name (CRES, ResourceTemplate () {
         WORDBusNumber (          // Bus number resource (0); the bridge produces bus numbers for its subsequent buses
           ResourceProducer,      // bit 0 of general flags is 1
           MinFixed,              // Range is fixed
@@ -91,20 +91,101 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
           0x00020000             // Range Length
           )
 
-        DWORDMEMORY (            // Descriptor for linear frame buffer video RAM
+        DWORDMEMORY (            // Descriptor for 32-bit MMIO
           ResourceProducer,      // bit 0 of general flags is 0
           PosDecode,
           MinFixed,              // Range is fixed
           MaxFixed,              // Range is Fixed
-          Cacheable,
+          NonCacheable,
           ReadWrite,
           0x00000000,            // Granularity
           0xF8000000,            // Min
           0xFFFBFFFF,            // Max
           0x00000000,            // Translation
-          0x07FC0000             // Range Length
+          0x07FC0000,            // Range Length
+          ,                      // ResourceSourceIndex
+          ,                      // ResourceSource
+          PW32                   // DescriptorName
           )
       })
+
+      Name (CR64, ResourceTemplate () {
+        QWordMemory (            // Descriptor for 64-bit MMIO
+            ResourceProducer,    // bit 0 of general flags is 0
+            PosDecode,
+            MinFixed,            // Range is fixed
+            MaxFixed,            // Range is Fixed
+            Cacheable,
+            ReadWrite,
+            0x00000000,          // Granularity
+            0x8000000000,        // Min
+            0xFFFFFFFFFF,        // Max
+            0x00000000,          // Translation
+            0x8000000000,        // Range Length
+            ,                    // ResourceSourceIndex
+            ,                    // ResourceSource
+            PW64                 // DescriptorName
+            )
+      })
+
+      Method (_CRS, 0) {
+        //
+        // see the FIRMWARE_DATA structure in "OvmfPkg/AcpiPlatformDxe/Qemu.c"
+        //
+        External (FWDT, OpRegionObj)
+        Field(FWDT, QWordAcc, NoLock, Preserve) {
+          P0S, 64,               // PciWindow32.Base
+          P0E, 64,               // PciWindow32.End
+          P0L, 64,               // PciWindow32.Length
+          P1S, 64,               // PciWindow64.Base
+          P1E, 64,               // PciWindow64.End
+          P1L, 64                // PciWindow64.Length
+        }
+        Field(FWDT, DWordAcc, NoLock, Preserve) {
+          P0SL, 32,              // PciWindow32.Base,   low  32 bits
+          P0SH, 32,              // PciWindow32.Base,   high 32 bits
+          P0EL, 32,              // PciWindow32.End,    low  32 bits
+          P0EH, 32,              // PciWindow32.End,    high 32 bits
+          P0LL, 32,              // PciWindow32.Length, low  32 bits
+          P0LH, 32,              // PciWindow32.Length, high 32 bits
+          P1SL, 32,              // PciWindow64.Base,   low  32 bits
+          P1SH, 32,              // PciWindow64.Base,   high 32 bits
+          P1EL, 32,              // PciWindow64.End,    low  32 bits
+          P1EH, 32,              // PciWindow64.End,    high 32 bits
+          P1LL, 32,              // PciWindow64.Length, low  32 bits
+          P1LH, 32               // PciWindow64.Length, high 32 bits
+        }
+
+        //
+        // fixup 32-bit PCI IO window
+        //
+        CreateDWordField (CRES, \_SB.PCI0.PW32._MIN, PS32)
+        CreateDWordField (CRES, \_SB.PCI0.PW32._MAX, PE32)
+        CreateDWordField (CRES, \_SB.PCI0.PW32._LEN, PL32)
+        Store (P0SL, PS32)
+        Store (P0EL, PE32)
+        Store (P0LL, PL32)
+
+        If (LAnd (LEqual (P1SL, 0x00), LEqual (P1SH, 0x00))) {
+          Return (CRES)
+        } Else {
+          //
+          // fixup 64-bit PCI IO window
+          //
+          CreateQWordField (CR64, \_SB.PCI0.PW64._MIN, PS64)
+          CreateQWordField (CR64, \_SB.PCI0.PW64._MAX, PE64)
+          CreateQWordField (CR64, \_SB.PCI0.PW64._LEN, PL64)
+          Store (P1S, PS64)
+          Store (P1E, PE64)
+          Store (P1L, PL64)
+
+          //
+          // add window and return result
+          //
+          ConcatenateResTemplate (CRES, CR64, Local0)
+          Return (Local0)
+        }
+      }
 
       //
       // PCI Interrupt Routing Table - PIC Mode Only
