@@ -662,11 +662,16 @@ InitializeHotkeyService (
   EFI_KEY_OPTION  *KeyOption;
 
   //
-  // Export our capability - EFI_BOOT_OPTION_SUPPORT_KEY and EFI_BOOT_OPTION_SUPPORT_APP
+  // Export our capability - EFI_BOOT_OPTION_SUPPORT_KEY and EFI_BOOT_OPTION_SUPPORT_APP.
   // with maximum number of key presses of 3
+  // Do not report the hotkey capability if PcdConInConnectOnDemand is enabled.
   //
-  BootOptionSupport = EFI_BOOT_OPTION_SUPPORT_KEY | EFI_BOOT_OPTION_SUPPORT_APP;
-  SET_BOOT_OPTION_SUPPORT_KEY_COUNT (BootOptionSupport, 3);
+  BootOptionSupport = EFI_BOOT_OPTION_SUPPORT_APP;
+  if (!PcdGetBool (PcdConInConnectOnDemand)) {
+    BootOptionSupport |= EFI_BOOT_OPTION_SUPPORT_KEY;
+    SET_BOOT_OPTION_SUPPORT_KEY_COUNT (BootOptionSupport, 3);
+  }
+
   Status = gRT->SetVariable (
                   L"BootOptionSupport",
                   &gEfiGlobalVariableGuid,
