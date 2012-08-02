@@ -63,6 +63,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/MemoryAllocationHob.h>
 #include <Guid/EventLegacyBios.h>
 #include <Guid/EventGroup.h>
+#include <Guid/EventExitBootServiceFailed.h>
 #include <Guid/LoadModuleAtFixedAddress.h>
 #include <Guid/IdleLoopEvent.h>
 

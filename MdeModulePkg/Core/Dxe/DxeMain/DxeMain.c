@@ -690,6 +690,10 @@ CoreExitBootServices (
   //
   Status = CoreTerminateMemoryMap (MapKey);
   if (EFI_ERROR (Status)) {
+    //
+    // Notify other drivers that ExitBootServices fail 
+    //
+    CoreNotifySignalList (&gEventExitBootServicesFailedGuid);
     return Status;
   }
 
