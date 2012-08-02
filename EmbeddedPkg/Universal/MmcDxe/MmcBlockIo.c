@@ -628,7 +628,10 @@ MmcIoBlocks (
     while(!(Response[0] & MMC_R0_READY_FOR_DATA) && (MMC_R0_CURRENTSTATE(Response) != MMC_R0_STATE_TRAN) && Timeout--) {
       Status = MmcHost->SendCommand (MmcHost, MMC_CMD13, CmdArg);
       if (!EFI_ERROR(Status)) {
-        MmcHost->ReceiveResponse (MmcHost, MMC_RESPONSE_TYPE_R1,Response);
+        MmcHost->ReceiveResponse (MmcHost, MMC_RESPONSE_TYPE_R1, Response);
+        if ((Response[0] & MMC_R0_READY_FOR_DATA)) {
+          break;  // Prevents delay once finished
+        }
       }
       NanoSecondDelay(100);
       Timeout--;
