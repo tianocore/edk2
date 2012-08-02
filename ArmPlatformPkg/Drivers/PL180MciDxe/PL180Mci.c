@@ -118,6 +118,7 @@ MciSendCommand (
   UINT32  Cmd;
   UINTN   RetVal;
   UINTN   CmdCtrlReg;
+  UINT32  DoneMask;
 
   RetVal = EFI_SUCCESS;
 
@@ -146,54 +147,29 @@ MciSendCommand (
   // Write to command register
   MmioWrite32 (MCI_COMMAND_REG, Cmd);
 
-  if (Cmd & MCI_CPSM_WAIT_RESPONSE) {
+  DoneMask  = (Cmd & MCI_CPSM_WAIT_RESPONSE)
+                ? (MCI_STATUS_CMD_RESPEND | MCI_STATUS_CMD_ERROR)
+                : (MCI_STATUS_CMD_SENT    | MCI_STATUS_CMD_ERROR);
+  do {
     Status = MmioRead32 (MCI_STATUS_REG);
-    while (!(Status & (MCI_STATUS_CMD_RESPEND | MCI_STATUS_CMD_CMDCRCFAIL | MCI_STATUS_CMD_CMDTIMEOUT | MCI_STATUS_CMD_START_BIT_ERROR))) {
-      Status = MmioRead32(MCI_STATUS_REG);
-    }
+  } while (! (Status & DoneMask));
 
+  if ((Status & MCI_STATUS_CMD_ERROR)) {
+    // Clear Status register error flags
+    MmioWrite32 (MCI_CLEAR_STATUS_REG, MCI_STATUS_CMD_ERROR);
+      
     if ((Status & MCI_STATUS_CMD_START_BIT_ERROR)) {
       DEBUG ((EFI_D_ERROR, "MciSendCommand(CmdIndex:%d) Start bit Error! Response:0x%X Status:0x%x\n", (Cmd & 0x3F), MmioRead32 (MCI_RESPONSE0_REG), Status));
       RetVal = EFI_NO_RESPONSE;
-      goto Exit;
     } else if ((Status & MCI_STATUS_CMD_CMDTIMEOUT)) {
       //DEBUG ((EFI_D_ERROR, "MciSendCommand(CmdIndex:%d) TIMEOUT! Response:0x%X Status:0x%x\n", (Cmd & 0x3F), MmioRead32 (MCI_RESPONSE0_REG), Status));
       RetVal = EFI_TIMEOUT;
-      goto Exit;
-    } else if ((! (MmcCmd & MMC_CMD_NO_CRC_RESPONSE)) && (Status & MCI_STATUS_CMD_CMDCRCFAIL)) {
+    } else if ((!(MmcCmd & MMC_CMD_NO_CRC_RESPONSE)) && (Status & MCI_STATUS_CMD_CMDCRCFAIL)) {
       // The CMD1 and response type R3 do not contain CRC. We should ignore the CRC failed Status.
       RetVal = EFI_CRC_ERROR;
-      goto Exit;
-    } else {
-      RetVal =  EFI_SUCCESS;
-      goto Exit;
-    }
-  } else {
-    Status = MmioRead32(MCI_STATUS_REG);
-    while (!(Status & (MCI_STATUS_CMD_SENT | MCI_STATUS_CMD_CMDCRCFAIL | MCI_STATUS_CMD_CMDTIMEOUT| MCI_STATUS_CMD_START_BIT_ERROR))) {
-      Status = MmioRead32(MCI_STATUS_REG);
-    }
-
-    if ((Status & MCI_STATUS_CMD_START_BIT_ERROR)) {
-      DEBUG ((EFI_D_ERROR, "MciSendCommand(CmdIndex:%d) Start bit Error! Response:0x%X Status:0x%x\n",(Cmd & 0x3F),MmioRead32(MCI_RESPONSE0_REG),Status));
-      RetVal = EFI_NO_RESPONSE;
-      goto Exit;
-    } else if ((Status & MCI_STATUS_CMD_CMDTIMEOUT)) {
-        //DEBUG ((EFI_D_ERROR, "MciSendCommand(CmdIndex:%d) TIMEOUT! Response:0x%X Status:0x%x\n",(Cmd & 0x3F),MmioRead32(MCI_RESPONSE0_REG),Status));
-      RetVal = EFI_TIMEOUT;
-      goto Exit;
-    } else
-    if ((!(MmcCmd & MMC_CMD_NO_CRC_RESPONSE)) && (Status & MCI_STATUS_CMD_CMDCRCFAIL)) {
-        // The CMD1 does not contain CRC. We should ignore the CRC failed Status.
-      RetVal = EFI_CRC_ERROR;
-      goto Exit;
-    } else {
-      RetVal = EFI_SUCCESS;
-      goto Exit;
     }
   }
 
-Exit:
   // Disable Command Path
   CmdCtrlReg = MmioRead32 (MCI_COMMAND_REG);
   MmioWrite32 (MCI_COMMAND_REG, (CmdCtrlReg & ~MCI_CPSM_ENABLE));
@@ -384,15 +360,11 @@ MciWriteBlockData (
     Timer--;
   }
 
-  if (Timer == 0) {
-    DEBUG ((EFI_D_ERROR, "MciWriteBlockData(): Data End timeout Number of bytes written 0x%x\n",Loop));
-    ASSERT (Timer > 0);
-    return EFI_TIMEOUT;
-  }
-
   // Clear Status flags
   MmioWrite32 (MCI_CLEAR_STATUS_REG, MCI_CLR_ALL_STATUS);
+
   if (Timer == 0) {
+    DEBUG ((EFI_D_ERROR, "MciWriteBlockData(): Data End timeout Number of words written 0x%x\n", Loop));
     RetVal = EFI_TIMEOUT;
   }
 
@@ -431,7 +403,6 @@ MciNotifyState (
     // Setup clock
     //  - 0x1D = 29 => should be the clock divider to be less than 400kHz at MCLK = 24Mhz
     MmioWrite32 (MCI_CLOCK_CONTROL_REG, 0x1D | MCI_CLOCK_ENABLE | MCI_CLOCK_POWERSAVE);
-    //MmioWrite32(MCI_CLOCK_CONTROL_REG,0x1D | MCI_CLOCK_ENABLE);
 
     // Set the voltage
     MmioWrite32 (MCI_POWER_CONTROL_REG, MCI_POWER_OPENDRAIN | (15<<2));
