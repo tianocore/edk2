@@ -69,7 +69,7 @@ typedef struct {
   UINT32  V270_V360:   9; // 2.70V - 3.60V
   UINT32  RESERVED_1:  5; // Reserved
   UINT32  AccessMode:  2; // 00b (byte mode), 10b (sector mode) 
-  UINT32  Busy:        1; // This bit is set to LOW if the card has not finished the power up routine
+  UINT32  PowerUp:     1; // This bit is set to LOW if the card has not finished the power up routine
 } OCR;
 
 typedef struct {

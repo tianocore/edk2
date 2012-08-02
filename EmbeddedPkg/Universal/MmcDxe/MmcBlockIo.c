@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -252,7 +252,7 @@ MmcIdentificationMode (
     DEBUG ((EFI_D_ERROR, "Not a SD2.0 Card\n"));
   }
 
-  // We need to wait for the MMC or SD card is ready => (gCardInfo.OCRData.Busy == 1)
+  // We need to wait for the MMC or SD card is ready => (gCardInfo.OCRData.PowerUp == 1)
   Timeout = MAX_RETRY_COUNT;
   while (Timeout > 0) {
     // SD Card or MMC Card ? CMD55 indicates to the card that the next command is an application specific command
@@ -287,7 +287,7 @@ MmcIdentificationMode (
     }
 
     if (!EFI_ERROR(Status)) {
-      if (MmcHostInstance->CardInfo.OCRData.Busy == 0) {
+      if (!MmcHostInstance->CardInfo.OCRData.PowerUp) {
           MicroSecondDelay(1);
           Timeout--;
       } else {
