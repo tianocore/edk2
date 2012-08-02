@@ -23,6 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/HobList.h>
 #include <Guid/TcgEventHob.h>
 #include <Guid/EventGroup.h>
+#include <Guid/EventExitBootServiceFailed.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/TcgService.h>
 #include <Protocol/AcpiTable.h>
@@ -1104,6 +1105,34 @@ OnExitBootServices (
 }
 
 /**
+  Exit Boot Services Failed Event notification handler.
+
+  Measure Failure of ExitBootServices.
+
+  @param[in]  Event     Event whose notification function is being invoked
+  @param[in]  Context   Pointer to the notification function's context
+
+**/
+VOID
+EFIAPI
+OnExitBootServicesFailed (
+  IN      EFI_EVENT                 Event,
+  IN      VOID                      *Context
+  )
+{
+  EFI_STATUS    Status;
+
+  //
+  // Measure Failure of ExitBootServices,
+  //
+  Status = TcgMeasureAction (
+             EFI_EXIT_BOOT_SERVICES_FAILED
+             );
+  ASSERT_EFI_ERROR (Status);
+
+}
+
+/**
   Get TPM Deactivated state.
 
   @param[out] TPMDeactivatedFlag   Returns TPM Deactivated state.  
@@ -1203,6 +1232,18 @@ DriverEntry (
                     OnExitBootServices,
                     NULL,
                     &gEfiEventExitBootServicesGuid,
+                    &Event
+                    );
+
+    //
+    // Measure Exit Boot Service failed 
+    //
+    Status = gBS->CreateEventEx (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_NOTIFY,
+                    OnExitBootServicesFailed,
+                    NULL,
+                    &gEventExitBootServicesFailedGuid,
                     &Event
                     );
   }
