@@ -62,5 +62,7 @@ __aeabi_uwrite8
     strb    r3, [r2, #6]
     mov     r3, r1, lsr #24
     strb    r3, [r2, #7]
+    bx      lr
+
     END
 
