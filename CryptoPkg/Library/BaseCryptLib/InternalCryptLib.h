@@ -21,6 +21,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DebugLib.h>
 #include <Library/BaseCryptLib.h>
 
+#include "OpenSslSupport.h"
+
 //
 // Environment Setting for OpenSSL-based UEFI Crypto Library.
 //

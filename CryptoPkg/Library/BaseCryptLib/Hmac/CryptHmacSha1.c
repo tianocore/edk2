@@ -58,7 +58,7 @@ HmacSha1Init (
   //
   // Check input parameters.
   //
-  if (HmacSha1Context == NULL) {
+  if (HmacSha1Context == NULL || KeySize > INT_MAX) {
     return FALSE;
   }
 

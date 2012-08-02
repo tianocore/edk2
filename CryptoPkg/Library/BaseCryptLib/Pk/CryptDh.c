@@ -91,7 +91,7 @@ DhGenerateParameter (
   //
   // Check input parameters.
   //
-  if (DhContext == NULL || Prime == NULL) {
+  if (DhContext == NULL || Prime == NULL || PrimeLength > INT_MAX) {
     return FALSE;
   }
 
@@ -139,12 +139,13 @@ DhSetParameter (
   IN      CONST UINT8  *Prime
   )
 {
-  DH  *Dh;
+  DH      *Dh;
+  BIGNUM  *Bn;
 
   //
   // Check input parameters.
   //
-  if (DhContext == NULL || Prime == NULL) {
+  if (DhContext == NULL || Prime == NULL || PrimeLength > INT_MAX) {
     return FALSE;
   }
   
@@ -152,14 +153,46 @@ DhSetParameter (
     return FALSE;
   }
 
-  Dh = (DH *) DhContext;
-  Dh->p = BN_new();
-  Dh->g = BN_new();
+  Bn = NULL;
 
-  BN_bin2bn (Prime, (UINT32) (PrimeLength / 8), Dh->p);
-  BN_set_word (Dh->g, (UINT32) Generator);
+  Dh = (DH *) DhContext;
+  Dh->g = NULL;
+  Dh->p = BN_new ();
+  if (Dh->p == NULL) {
+    goto Error;
+  }
+  
+  Dh->g = BN_new ();
+  if (Dh->g == NULL) {
+    goto Error;
+  }
+
+  Bn = BN_bin2bn (Prime, (UINT32) (PrimeLength / 8), Dh->p);
+  if (Bn == NULL) {
+    goto Error;
+  }
+
+  if (BN_set_word (Dh->g, (UINT32) Generator) == 0) {
+    goto Error;
+  }
 
   return TRUE;
+
+Error:
+
+  if (Dh->p != NULL) {
+    BN_free (Dh->p);
+  }
+
+  if (Dh->g != NULL) {
+    BN_free (Dh->g);
+  }
+
+  if (Bn != NULL) {
+    BN_free (Bn);
+  }
+  
+  return FALSE;
 }
 
 /**
@@ -194,6 +227,7 @@ DhGenerateKey (
 {
   BOOLEAN RetVal;
   DH      *Dh;
+  INTN    Size;
 
   //
   // Check input parameters.
@@ -207,12 +241,17 @@ DhGenerateKey (
   }
   
   Dh = (DH *) DhContext;
-  *PublicKeySize = 0;
 
   RetVal = (BOOLEAN) DH_generate_key (DhContext);
   if (RetVal) {
+    Size = BN_num_bytes (Dh->pub_key);
+    if ((Size > 0) && (*PublicKeySize < (UINTN) Size)) {
+      *PublicKeySize = Size;
+      return FALSE;
+    }
+    
     BN_bn2bin (Dh->pub_key, PublicKey);
-    *PublicKeySize  = BN_num_bytes (Dh->pub_key);
+    *PublicKeySize = Size;
   }
 
   return RetVal;
@@ -227,7 +266,8 @@ DhGenerateKey (
   If DhContext is NULL, then return FALSE.
   If PeerPublicKey is NULL, then return FALSE.
   If KeySize is NULL, then return FALSE.
-  If KeySize is large enough but Key is NULL, then return FALSE.
+  If Key is NULL, then return FALSE.
+  If KeySize is not large enough, then return FALSE.
 
   @param[in, out]  DhContext          Pointer to the DH context.
   @param[in]       PeerPublicKey      Pointer to the peer's public key.
@@ -252,23 +292,37 @@ DhComputeKey (
   )
 {
   BIGNUM  *Bn;
+  INTN    Size;
 
   //
   // Check input parameters.
   //
-  if (DhContext == NULL || PeerPublicKey == NULL || KeySize == NULL) {
+  if (DhContext == NULL || PeerPublicKey == NULL || KeySize == NULL || Key == NULL) {
     return FALSE;
   }
 
-  if (Key == NULL && *KeySize != 0) {
+  if (PeerPublicKeySize > INT_MAX) {
     return FALSE;
   }
   
   Bn = BN_bin2bn (PeerPublicKey, (UINT32) PeerPublicKeySize, NULL);
+  if (Bn == NULL) {
+    return FALSE;
+  }
 
-  *KeySize = (BOOLEAN) DH_compute_key (Key, Bn, DhContext);
+  Size = DH_compute_key (Key, Bn, DhContext);
+  if (Size < 0) {
+    BN_free (Bn);
+    return FALSE;
+  }
 
+  if (*KeySize < (UINTN) Size) {
+    *KeySize = Size;
+    BN_free (Bn);
+    return FALSE;
+  }
+
+  *KeySize = Size;
   BN_free (Bn);
-
   return TRUE;
 }

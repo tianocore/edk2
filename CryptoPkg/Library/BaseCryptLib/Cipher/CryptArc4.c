@@ -115,7 +115,7 @@ Arc4Encrypt (
   //
   // Check input parameters.
   //
-  if (Arc4Context == NULL || Input == NULL || Output == NULL) {
+  if (Arc4Context == NULL || Input == NULL || Output == NULL || InputSize > INT_MAX) {
     return FALSE;
   }
 
@@ -161,7 +161,7 @@ Arc4Decrypt (
   //
   // Check input parameters.
   //
-  if (Arc4Context == NULL || Input == NULL || Output == NULL) {
+  if (Arc4Context == NULL || Input == NULL || Output == NULL || InputSize > INT_MAX) {
     return FALSE;
   }
 

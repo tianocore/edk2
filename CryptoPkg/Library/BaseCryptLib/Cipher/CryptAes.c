@@ -241,7 +241,11 @@ AesCbcEncrypt (
   //
   // Check input parameters.
   //
-  if (AesContext == NULL || Input == NULL || (InputSize % AES_BLOCK_SIZE) != 0 || Ivec == NULL || Output == NULL) {
+  if (AesContext == NULL || Input == NULL || (InputSize % AES_BLOCK_SIZE) != 0) {
+    return FALSE;
+  }
+
+  if (Ivec == NULL || Output == NULL || InputSize > INT_MAX) {
     return FALSE;
   }
 
@@ -299,7 +303,11 @@ AesCbcDecrypt (
   //
   // Check input parameters.
   //
-  if (AesContext == NULL || Input == NULL || (InputSize % AES_BLOCK_SIZE) != 0 || Ivec == NULL || Output == NULL) {
+  if (AesContext == NULL || Input == NULL || (InputSize % AES_BLOCK_SIZE) != 0) {
+    return FALSE;
+  }
+
+  if (Ivec == NULL || Output == NULL || InputSize > INT_MAX) {
     return FALSE;
   }
 

@@ -93,6 +93,7 @@
   BaseLib
   BaseMemoryLib
   MemoryAllocationLib
+  UefiRuntimeServicesTableLib
   DebugLib
   OpensslLib
   IntrinsicLib

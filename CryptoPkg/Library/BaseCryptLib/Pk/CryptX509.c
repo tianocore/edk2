@@ -346,7 +346,6 @@ X509GetSubjectName (
     return FALSE;
   }
 
-  Status   = FALSE;
   X509Cert = NULL;
 
   //
@@ -354,13 +353,20 @@ X509GetSubjectName (
   //
   Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **) &X509Cert);
   if ((X509Cert == NULL) || (!Status)) {
+    Status = FALSE;
     goto _Exit;
   }
+
+  Status = FALSE;
 
   //
   // Retrieve subject name from certificate object.
   //
   X509Name = X509_get_subject_name (X509Cert);
+  if (X509Name == NULL) {
+    goto _Exit;
+  }
+
   if (*SubjectSize < (UINTN) X509Name->bytes->length) {
     *SubjectSize = (UINTN) X509Name->bytes->length;
     goto _Exit;
@@ -375,7 +381,9 @@ _Exit:
   //
   // Release Resources.
   //
-  X509_free (X509Cert);
+  if (X509Cert != NULL) {
+    X509_free (X509Cert);
+  }
 
   return Status;
 }
@@ -415,7 +423,6 @@ RsaGetPublicKeyFromX509 (
     return FALSE;
   }
 
-  Status   = FALSE;
   Pkey     = NULL;
   X509Cert = NULL;
 
@@ -424,8 +431,11 @@ RsaGetPublicKeyFromX509 (
   //
   Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **) &X509Cert);
   if ((X509Cert == NULL) || (!Status)) {
+    Status = FALSE;
     goto _Exit;
   }
+
+  Status = FALSE;
 
   //
   // Retrieve and check EVP_PKEY data from X509 Certificate.
@@ -446,8 +456,13 @@ _Exit:
   //
   // Release Resources.
   //
-  X509_free (X509Cert);
-  EVP_PKEY_free (Pkey);
+  if (X509Cert != NULL) {
+    X509_free (X509Cert);
+  }
+
+  if (Pkey != NULL) {
+    EVP_PKEY_free (Pkey);
+  }  
 
   return Status;
 }
@@ -498,15 +513,22 @@ X509VerifyCert (
   //
   // Register & Initialize necessary digest algorithms for certificate verification.
   //
-  EVP_add_digest (EVP_md5());
-  EVP_add_digest (EVP_sha1());
-  EVP_add_digest (EVP_sha256());
+  if (EVP_add_digest (EVP_md5 ()) == 0) {
+    goto _Exit;
+  }
+  if (EVP_add_digest (EVP_sha1 ()) == 0) {
+    goto _Exit;
+  }
+  if (EVP_add_digest (EVP_sha256 ()) == 0) {
+    goto _Exit;
+  }
 
   //
   // Read DER-encoded certificate to be verified and Construct X509 object.
   //
   Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **) &X509Cert);
   if ((X509Cert == NULL) || (!Status)) {
+    Status = FALSE;
     goto _Exit;
   }
 
@@ -515,8 +537,11 @@ X509VerifyCert (
   //
   Status = X509ConstructCertificate (CACert, CACertSize, (UINT8 **) &X509CACert);
   if ((X509CACert == NULL) || (!Status)) {
+    Status = FALSE;
     goto _Exit;
   }
+
+  Status = FALSE;
 
   //
   // Set up X509 Store for trusted certificate.
@@ -546,9 +571,17 @@ _Exit:
   //
   // Release Resources.
   //
-  X509_free (X509Cert);
-  X509_free (X509CACert);
-  X509_STORE_free (CertStore);
+  if (X509Cert != NULL) {
+    X509_free (X509Cert);
+  }
 
+  if (X509CACert != NULL) {
+    X509_free (X509CACert);
+  }
+
+  if (CertStore != NULL) {
+    X509_STORE_free (CertStore);
+  }
+  
   return Status;
 }

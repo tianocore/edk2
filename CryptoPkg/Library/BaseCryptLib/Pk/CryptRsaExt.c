@@ -231,22 +231,32 @@ RsaGenerateKey (
   //
   // Check input parameters.
   //
-  if (RsaContext == NULL) {
+  if (RsaContext == NULL || ModulusLength > INT_MAX || PublicExponentSize > INT_MAX) {
     return FALSE;
   }
   
   KeyE = BN_new ();
-  if (PublicExponent == NULL) {
-    BN_set_word (KeyE, 0x10001);
-  } else {
-    BN_bin2bn (PublicExponent, (UINT32) PublicExponentSize, KeyE);
+  if (KeyE == NULL) {
+    return FALSE;
   }
 
   RetVal = FALSE;
+  
+  if (PublicExponent == NULL) {
+    if (BN_set_word (KeyE, 0x10001) == 0) {
+      goto _Exit;
+    }
+  } else {
+    if (BN_bin2bn (PublicExponent, (UINT32) PublicExponentSize, KeyE) == NULL) {
+      goto _Exit;
+    }
+  }
+
   if (RSA_generate_key_ex ((RSA *) RsaContext, (UINT32) ModulusLength, KeyE, NULL) == 1) {
    RetVal = TRUE;
   }
 
+_Exit:
   BN_free (KeyE);
   return RetVal;
 }
@@ -299,18 +309,24 @@ RsaCheckKey (
 /**
   Performs the PKCS1-v1_5 encoding methods defined in RSA PKCS #1.
 
-  @param  Message      Message buffer to be encoded.
-  @param  MessageSize  Size of message buffer in bytes.
-  @param  DigestInfo   Pointer to buffer of digest info for output.
+  @param[in]     Message        Message buffer to be encoded.
+  @param[in]     MessageSize    Size of message buffer in bytes.
+  @param[out]    DigestInfo     Pointer to buffer of digest info for output.
+  @param[in,out] DigestInfoSize On input, the size of DigestInfo buffer in bytes.
+                                On output, the size of data returned in DigestInfo
+                                buffer in bytes.
 
-  @return  Size of DigestInfo in bytes.
+  @retval TRUE   PKCS1-v1_5 encoding finished successfully.
+  @retval FALSE  Any input parameter is invalid.
+  @retval FALSE  DigestInfo buffer is not large enough.
 
 **/  
-UINTN
+BOOLEAN
 DigestInfoEncoding (
-  IN   CONST UINT8  *Message,
-  IN   UINTN        MessageSize,
-  OUT  UINT8        *DigestInfo
+  IN CONST UINT8  *Message,
+  IN       UINTN  MessageSize,
+  OUT      UINT8  *DigestInfo,
+  IN OUT   UINTN  *DigestInfoSize
   )
 {
   CONST UINT8  *HashDer;
@@ -319,7 +335,7 @@ DigestInfoEncoding (
   //
   // Check input parameters.
   //
-  if (Message == NULL || DigestInfo == NULL) {
+  if (Message == NULL || DigestInfo == NULL || DigestInfoSize == NULL) {
     return FALSE;
   }
 
@@ -347,10 +363,16 @@ DigestInfoEncoding (
     return FALSE;
   }
 
+  if (*DigestInfoSize < DerSize + MessageSize) {
+    *DigestInfoSize = DerSize + MessageSize;
+    return FALSE;
+  }
+
   CopyMem (DigestInfo, HashDer, DerSize);
   CopyMem (DigestInfo + DerSize, Message, MessageSize);
 
-  return (DerSize + MessageSize);
+  *DigestInfoSize = DerSize + MessageSize;
+  return TRUE;
 }
 
 /**
@@ -412,21 +434,23 @@ RsaPkcs1Sign (
     return FALSE;
   }
 
-  Size = DigestInfoEncoding (MessageHash, HashSize, Signature);
+  if (!DigestInfoEncoding (MessageHash, HashSize, Signature, SigSize)) {
+    return FALSE;
+  }
 
   ReturnVal = RSA_private_encrypt (
-                (UINT32) Size,
+                (UINT32) *SigSize,
                 Signature,
                 Signature,
                 Rsa,
                 RSA_PKCS1_PADDING
                 );
 
-  if (ReturnVal < (INTN) Size) {
+  if (ReturnVal < (INTN) *SigSize) {
     return FALSE;
   }
 
-  *SigSize = (UINTN)ReturnVal;
+  *SigSize = (UINTN) ReturnVal;
   return TRUE;
 }
 

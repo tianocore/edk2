@@ -43,6 +43,10 @@ RandomSeed (
   IN  UINTN         SeedSize
   )
 {
+  if (SeedSize > INT_MAX) {
+    return FALSE;
+  }
+
   //
   // Seed the pseudorandom number generator with user-supplied value.
   // NOTE: A cryptographic PRNG must be seeded with unpredictable data.
@@ -78,7 +82,7 @@ RandomBytes (
   //
   // Check input parameters.
   //
-  if (Output == NULL) {
+  if (Output == NULL || Size > INT_MAX) {
     return FALSE;
   }
 

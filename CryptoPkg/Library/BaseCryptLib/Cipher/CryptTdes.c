@@ -275,7 +275,11 @@ TdesCbcEncrypt (
   //
   // Check input parameters.
   //
-  if (TdesContext == NULL || Input == NULL || (InputSize % TDES_BLOCK_SIZE) != 0 || Ivec == NULL || Output == NULL) {
+  if (TdesContext == NULL || Input == NULL || (InputSize % TDES_BLOCK_SIZE) != 0) {
+    return FALSE;
+  }
+
+  if (Ivec == NULL || Output == NULL || InputSize > INT_MAX) {
     return FALSE;
   }
 
@@ -339,7 +343,11 @@ TdesCbcDecrypt (
   //
   // Check input parameters.
   //
-  if (TdesContext == NULL || Input == NULL || (InputSize % TDES_BLOCK_SIZE) != 0 || Ivec == NULL || Output == NULL) {
+  if (TdesContext == NULL || Input == NULL || (InputSize % TDES_BLOCK_SIZE) != 0) {
+    return FALSE;
+  }
+
+  if (Ivec == NULL || Output == NULL || InputSize > INT_MAX) {
     return FALSE;
   }
 

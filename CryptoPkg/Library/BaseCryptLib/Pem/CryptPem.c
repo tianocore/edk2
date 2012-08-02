@@ -86,17 +86,24 @@ RsaGetPrivateKeyFromPem (
     return FALSE;
   }
 
-  Status = FALSE;
-  PemBio = NULL;
-
   //
   // Add possible block-cipher descriptor for PEM data decryption.
   // NOTE: Only support most popular ciphers (3DES, AES) for the encrypted PEM.
   //
-  EVP_add_cipher (EVP_des_ede3_cbc ());
-  EVP_add_cipher (EVP_aes_128_cbc ());
-  EVP_add_cipher (EVP_aes_192_cbc ());
-  EVP_add_cipher (EVP_aes_256_cbc ());
+  if (EVP_add_cipher (EVP_des_ede3_cbc ()) == 0) {
+    return FALSE;
+  }
+  if (EVP_add_cipher (EVP_aes_128_cbc ()) == 0) {
+    return FALSE;
+  }
+  if (EVP_add_cipher (EVP_aes_192_cbc ()) == 0) {
+    return FALSE;
+  }
+  if (EVP_add_cipher (EVP_aes_256_cbc ()) == 0) {
+    return FALSE;
+  }
+
+  Status = FALSE;
 
   //
   // Read encrypted PEM Data.

@@ -485,10 +485,19 @@ Pkcs7Verify (
   //
   // Register & Initialize necessary digest algorithms for PKCS#7 Handling
   //
-  EVP_add_digest (EVP_md5());
-  EVP_add_digest (EVP_sha1());
-  EVP_add_digest_alias (SN_sha1WithRSAEncryption, SN_sha1WithRSA);
-  EVP_add_digest (EVP_sha256());
+  if (EVP_add_digest (EVP_md5 ()) == 0) {
+    return FALSE;
+  }
+  if (EVP_add_digest (EVP_sha1 ()) == 0) {
+    return FALSE;
+  }
+  if (EVP_add_digest (EVP_sha256 ()) == 0) {
+    return FALSE;
+  }
+  if (EVP_add_digest_alias (SN_sha1WithRSAEncryption, SN_sha1WithRSA) == 0) {
+    return FALSE;
+  }
+
 
   Status = WrapPkcs7Data (P7Data, P7Length, &Wrapped, &SignedData, &SignedDataSize);
   if (!Status) {

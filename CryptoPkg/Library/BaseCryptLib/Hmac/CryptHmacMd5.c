@@ -58,7 +58,7 @@ HmacMd5Init (
   //
   // Check input parameters.
   //
-  if (HmacMd5Context == NULL) {
+  if (HmacMd5Context == NULL || KeySize > INT_MAX) {
     return FALSE;
   }
 

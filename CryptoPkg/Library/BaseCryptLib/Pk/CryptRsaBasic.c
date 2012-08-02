@@ -97,7 +97,7 @@ RsaSetKey (
   //
   // Check input parameters.
   //
-  if (RsaContext == NULL) {
+  if (RsaContext == NULL || BnSize > INT_MAX) {
     return FALSE;
   }
 
@@ -121,6 +121,10 @@ RsaSetKey (
       break;
     }
     RsaKey->n = BN_bin2bn (BigNumber, (UINT32) BnSize, RsaKey->n);
+    if (RsaKey->n == NULL) {
+      return FALSE;
+    }
+
     break;
 
   //
@@ -135,6 +139,10 @@ RsaSetKey (
       break;
     }
     RsaKey->e = BN_bin2bn (BigNumber, (UINT32) BnSize, RsaKey->e);
+    if (RsaKey->e == NULL) {
+      return FALSE;
+    }
+
     break;
 
   //
@@ -149,6 +157,10 @@ RsaSetKey (
       break;
     }
     RsaKey->d = BN_bin2bn (BigNumber, (UINT32) BnSize, RsaKey->d);
+    if (RsaKey->d == NULL) {
+      return FALSE;
+    }
+
     break;
 
   //
@@ -163,6 +175,10 @@ RsaSetKey (
       break;
     }
     RsaKey->p = BN_bin2bn (BigNumber, (UINT32) BnSize, RsaKey->p);
+    if (RsaKey->p == NULL) {
+      return FALSE;
+    }
+
     break;
 
   //
@@ -177,6 +193,10 @@ RsaSetKey (
       break;
     }
     RsaKey->q = BN_bin2bn (BigNumber, (UINT32) BnSize, RsaKey->q);
+    if (RsaKey->q == NULL) {
+      return FALSE;
+    }
+
     break;
 
   //
@@ -191,6 +211,10 @@ RsaSetKey (
       break;
     }
     RsaKey->dmp1 = BN_bin2bn (BigNumber, (UINT32) BnSize, RsaKey->dmp1);
+    if (RsaKey->dmp1 == NULL) {
+      return FALSE;
+    }
+
     break;
 
   //
@@ -205,6 +229,10 @@ RsaSetKey (
       break;
     }
     RsaKey->dmq1 = BN_bin2bn (BigNumber, (UINT32) BnSize, RsaKey->dmq1);
+    if (RsaKey->dmq1 == NULL) {
+      return FALSE;
+    }
+
     break;
 
   //
@@ -219,6 +247,10 @@ RsaSetKey (
       break;
     }
     RsaKey->iqmp = BN_bin2bn (BigNumber, (UINT32) BnSize, RsaKey->iqmp);
+    if (RsaKey->iqmp == NULL) {
+      return FALSE;
+    }
+
     break;
 
   default:
@@ -262,7 +294,7 @@ RsaPkcs1Verify (
   //
   // Check input parameters.
   //
-  if (RsaContext == NULL || MessageHash == NULL || Signature == NULL) {
+  if (RsaContext == NULL || MessageHash == NULL || Signature == NULL || SigSize > INT_MAX) {
     return FALSE;
   }
 

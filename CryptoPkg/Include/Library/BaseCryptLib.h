@@ -1978,12 +1978,13 @@ DhGenerateKey (
   Computes exchanged common key.
 
   Given peer's public key, this function computes the exchanged common key, based on its own
-  context including value of prime modulus and random secret exponent. 
+  context including value of prime modulus and random secret exponent.
 
   If DhContext is NULL, then return FALSE.
   If PeerPublicKey is NULL, then return FALSE.
   If KeySize is NULL, then return FALSE.
-  If KeySize is large enough but Key is NULL, then return FALSE.
+  If Key is NULL, then return FALSE.
+  If KeySize is not large enough, then return FALSE.
   If this interface is not supported, then return FALSE.
 
   @param[in, out]  DhContext          Pointer to the DH context.

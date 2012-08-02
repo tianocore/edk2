@@ -92,12 +92,21 @@ Pkcs7Sign (
     return Status;
   }
 
+  Status = FALSE;
+
   //
   // Register & Initialize necessary digest algorithms and PRNG for PKCS#7 Handling
   //
-  EVP_add_digest (EVP_md5());
-  EVP_add_digest (EVP_sha1());
-  EVP_add_digest (EVP_sha256());
+  if (EVP_add_digest (EVP_md5 ()) == 0) {
+    goto _Exit;
+  }
+  if (EVP_add_digest (EVP_sha1 ()) == 0) {
+    goto _Exit;
+  }
+  if (EVP_add_digest (EVP_sha256 ()) == 0) {
+    goto _Exit;
+  }
+
   RandomSeed (NULL, 0);
 
   //
@@ -105,7 +114,6 @@ Pkcs7Sign (
   //
   Key = EVP_PKEY_new ();
   if (Key == NULL) {
-    Status = FALSE;
     goto _Exit;
   }
   Key->save_type = EVP_PKEY_RSA;
@@ -129,7 +137,6 @@ Pkcs7Sign (
             PKCS7_BINARY | PKCS7_NOATTR | PKCS7_DETACHED
             );
   if (Pkcs7 == NULL) {
-    Status = FALSE;
     goto _Exit;
   }
 
@@ -138,13 +145,11 @@ Pkcs7Sign (
   //
   P7DataSize = i2d_PKCS7 (Pkcs7, NULL);
   if (P7DataSize <= 19) {
-    Status = FALSE;
     goto _Exit;
   }
 
   P7Data     = malloc (P7DataSize);
   if (P7Data == NULL) {
-    Status = FALSE;
     goto _Exit;
   }
 
@@ -158,7 +163,6 @@ Pkcs7Sign (
   *SignedDataSize = P7DataSize - 19;
   *SignedData     = malloc (*SignedDataSize);
   if (*SignedData == NULL) {
-    Status = FALSE;
     OPENSSL_free (P7Data);
     goto _Exit;
   }
