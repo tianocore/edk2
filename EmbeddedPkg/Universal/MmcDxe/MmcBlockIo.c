@@ -40,7 +40,9 @@ PrintOCR (
   IN UINT32 Ocr
   )
 {
-  UINTN minv, maxv, volts;
+  UINTN minv;
+  UINTN maxv;
+  UINTN volts;
   UINTN loop;
 
   minv  = 36;  // 3.6
@@ -135,7 +137,7 @@ PrintResponseR1 (
   )
 {
   DEBUG((EFI_D_INFO, "Response: 0x%X\n",Response));
-  if (Response & (1 << 8))                  DEBUG((EFI_D_INFO, "\t- READY_FOR_DATA\n"));
+  if (Response & MMC_R0_READY_FOR_DATA)     DEBUG((EFI_D_INFO, "\t- READY_FOR_DATA\n"));
 
   if (((Response >> 9) & 0xF) == 0)         DEBUG((EFI_D_INFO, "\t- State: Idle\n"));
   else if (((Response >> 9) & 0xF) == 1)    DEBUG((EFI_D_INFO, "\t- State: Ready\n"));
@@ -544,7 +546,9 @@ MmcIoBlocks (
     CmdArg = MmcHostInstance->CardInfo.RCA << 16;
     Response[0] = 0;
     Timeout = 20;
-    while(!(Response[0] & MMC_R0_READY_FOR_DATA) && (MMC_R0_CURRENTSTATE(Response) != MMC_R0_STATE_TRAN) && Timeout--) {
+    while(   (!(Response[0] & MMC_R0_READY_FOR_DATA))
+          && (MMC_R0_CURRENTSTATE(Response) != MMC_R0_STATE_TRAN)
+          && Timeout--) {
       Status = MmcHost->SendCommand (MmcHost, MMC_CMD13, CmdArg);
       if (!EFI_ERROR(Status)) {
         MmcHost->ReceiveResponse (MmcHost, MMC_RESPONSE_TYPE_R1,Response);
@@ -580,7 +584,7 @@ MmcIoBlocks (
     }
     Status = MmcHost->SendCommand (MmcHost, Cmd, CmdArg);
     if (EFI_ERROR(Status)) {
-      DEBUG((EFI_D_ERROR, "MmcIdentificationMode(MMC_CMD%d): Error %r\n",Cmd, Status));
+      DEBUG((EFI_D_ERROR, "MmcIoBlocks(MMC_CMD%d): Error %r\n",Cmd, Status));
       return Status;
     }
 
@@ -589,16 +593,16 @@ MmcIoBlocks (
       // Read one block of Data
       Status = MmcHost->ReadBlockData (MmcHost, Lba,This->Media->BlockSize,Buffer);
       if (EFI_ERROR(Status)) {
-        DEBUG((EFI_D_BLKIO, "MmcIdentificationMode(): Error Read Block Data and Status = %r\n", Status));
+        DEBUG((EFI_D_BLKIO, "MmcIoBlocks(): Error Read Block Data and Status = %r\n", Status));
         return Status;
       }
 #else
-      //TODO: Read a steam
+      //TODO: Read a stream
       ASSERT(0);
 #endif
       Status = MmcNotifyState (MmcHostInstance, MmcProgrammingState);
       if (EFI_ERROR(Status)) {
-        DEBUG((EFI_D_ERROR, "MmcIdentificationMode() : Error MmcProgrammingState\n"));
+        DEBUG((EFI_D_ERROR, "MmcIoBlocks() : Error MmcProgrammingState\n"));
         return Status;
       }
     } else {
@@ -606,11 +610,11 @@ MmcIoBlocks (
       // Write one block of Data
       Status = MmcHost->WriteBlockData (MmcHost, Lba,This->Media->BlockSize,Buffer);
       if (EFI_ERROR(Status)) {
-        DEBUG((EFI_D_BLKIO, "MmcIdentificationMode(): Error Write Block Data and Status = %r\n", Status));
+        DEBUG((EFI_D_BLKIO, "MmcIoBlocks(): Error Write Block Data and Status = %r\n", Status));
         return Status;
       }
 #else
-      //TODO: Write a steam
+      //TODO: Write a stream
       ASSERT(0);
 #endif
     }
@@ -625,7 +629,9 @@ MmcIoBlocks (
     Timeout = MMCI0_TIMEOUT;
     CmdArg = MmcHostInstance->CardInfo.RCA << 16;
     Response[0] = 0;
-    while(!(Response[0] & MMC_R0_READY_FOR_DATA) && (MMC_R0_CURRENTSTATE(Response) != MMC_R0_STATE_TRAN) && Timeout--) {
+    while(   (!(Response[0] & MMC_R0_READY_FOR_DATA))
+          && (MMC_R0_CURRENTSTATE(Response) != MMC_R0_STATE_TRAN)
+          && Timeout--) {
       Status = MmcHost->SendCommand (MmcHost, MMC_CMD13, CmdArg);
       if (!EFI_ERROR(Status)) {
         MmcHost->ReceiveResponse (MmcHost, MMC_RESPONSE_TYPE_R1, Response);
@@ -639,7 +645,7 @@ MmcIoBlocks (
 
     Status = MmcNotifyState (MmcHostInstance, MmcTransferState);
     if (EFI_ERROR(Status)) {
-      DEBUG((EFI_D_ERROR, "MmcIdentificationMode() : Error MmcTransferState\n"));
+      DEBUG((EFI_D_ERROR, "MmcIoBlocks() : Error MmcTransferState\n"));
       return Status;
     }
 
