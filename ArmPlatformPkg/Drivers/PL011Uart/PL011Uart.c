@@ -310,7 +310,7 @@ PL011UartWrite (
     // Wait until UART able to accept another char
     while ((MmioRead32 (UartBase + UARTFR) & UART_TX_FULL_FLAG_MASK));
     
-    MmioWrite8 (UartBase + UARTDR, *Buffer);
+    MmioWrite8 (UartBase + UARTDR, *Buffer++);
   }
 
   return NumberOfBytes;
@@ -338,7 +338,7 @@ PL011UartRead (
 
   for (Count = 0; Count < NumberOfBytes; Count++, Buffer++) {
     while ((MmioRead32 (UartBase + UARTFR) & UART_RX_EMPTY_FLAG_MASK) != 0);
-	*Buffer = MmioRead8 (UartBase + UARTDR);
+    *Buffer = MmioRead8 (UartBase + UARTDR);
   }
 
   return NumberOfBytes;
