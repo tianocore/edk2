@@ -284,7 +284,9 @@ WriteToOsS3PerformanceData (
              NULL,
              (VOID **) &VariableServices
              );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    return;
+  }
 
   VarSize   = sizeof (EFI_PHYSICAL_ADDRESS);
   Status = VariableServices->GetVariable (
@@ -681,17 +683,18 @@ S3ResumeExecuteBootScript (
                               NULL,
                               (VOID **) &SmmAccess
                               );
+    if (!EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "Close all SMRAM regions before executing boot script\n"));
+  
+      for (Index = 0, Status = EFI_SUCCESS; !EFI_ERROR (Status); Index++) {
+        Status = SmmAccess->Close ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), SmmAccess, Index);
+      }
 
-    DEBUG ((EFI_D_ERROR, "Close all SMRAM regions before executing boot script\n"));
-
-    for (Index = 0, Status = EFI_SUCCESS; !EFI_ERROR (Status); Index++) {
-      Status = SmmAccess->Close ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), SmmAccess, Index);
-    }
-
-    DEBUG ((EFI_D_ERROR, "Lock all SMRAM regions before executing boot script\n"));
-
-    for (Index = 0, Status = EFI_SUCCESS; !EFI_ERROR (Status); Index++) {
-      Status = SmmAccess->Lock ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), SmmAccess, Index);
+      DEBUG ((EFI_D_ERROR, "Lock all SMRAM regions before executing boot script\n"));
+  
+      for (Index = 0, Status = EFI_SUCCESS; !EFI_ERROR (Status); Index++) {
+        Status = SmmAccess->Lock ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), SmmAccess, Index);
+      }
     }
   }
 
@@ -817,7 +820,6 @@ S3RestoreConfig2 (
   PEI_SMM_ACCESS_PPI                            *SmmAccess;
   UINTN                                         Index;
   ACPI_S3_CONTEXT                               *AcpiS3Context;
-  EFI_PEI_READ_ONLY_VARIABLE2_PPI               *VariableServices;
   EFI_PHYSICAL_ADDRESS                          TempEfiBootScriptExecutorVariable;
   EFI_PHYSICAL_ADDRESS                          TempAcpiS3Context;
   BOOT_SCRIPT_EXECUTOR_VARIABLE                 *EfiBootScriptExecutorVariable;
@@ -827,26 +829,6 @@ S3RestoreConfig2 (
   VOID                                          *GuidHob;
 
   DEBUG ((EFI_D_ERROR, "Enter S3 PEIM\r\n"));
-
-  Status = PeiServicesLocatePpi (
-                            &gPeiSmmAccessPpiGuid,
-                            0,
-                            NULL,
-                            (VOID **) &SmmAccess
-                            );
-  for (Index = 0; !EFI_ERROR (Status); Index++) {
-    Status = SmmAccess->Open ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), SmmAccess, Index);
-  }
-
-  Status = PeiServicesLocatePpi (
-                            &gEfiPeiReadOnlyVariable2PpiGuid,
-                            0,
-                            NULL,
-                            (VOID **) &VariableServices
-                            );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
 
   VarSize = sizeof (EFI_PHYSICAL_ADDRESS);
   Status = RestoreLockBox (
@@ -914,6 +896,16 @@ S3RestoreConfig2 (
   //
   GuidHob = GetFirstGuidHob (&gEfiAcpiVariableGuid);
   if (GuidHob != NULL) {
+    Status = PeiServicesLocatePpi (
+                              &gPeiSmmAccessPpiGuid,
+                              0,
+                              NULL,
+                              (VOID **) &SmmAccess
+                              );
+    for (Index = 0; !EFI_ERROR (Status); Index++) {
+      Status = SmmAccess->Open ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), SmmAccess, Index);
+    }
+
     SmramDescriptor = (EFI_SMRAM_DESCRIPTOR *) GET_GUID_HOB_DATA (GuidHob);
     SmmS3ResumeState = (SMM_S3_RESUME_STATE *)(UINTN)SmramDescriptor->CpuStart;
 
