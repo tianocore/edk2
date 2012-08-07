@@ -19,6 +19,14 @@
 #define INIT_DATA_BUFFER_SIZE  1024
 #define INIT_ATTS_BUFFER_SIZE  64
 
+/**
+  Base on the input attribute value to return the attribute string.
+
+  @param[in]     Atts           The input attribute value
+  @param[in,out] RetString      The buffer to save the attribute string.
+
+  @retval The attribute string info.
+**/
 CONST CHAR16 *
 EFIAPI
 GetAttrType (
@@ -28,21 +36,21 @@ GetAttrType (
 {
   StrCpy(RetString, L"");
 
-  if (Atts & EFI_VARIABLE_NON_VOLATILE) {
+  if ((Atts & EFI_VARIABLE_NON_VOLATILE) != 0) {
     StrCat(RetString, L"+NV");
   }
-  if (Atts & EFI_VARIABLE_RUNTIME_ACCESS) {
+  if ((Atts & EFI_VARIABLE_RUNTIME_ACCESS) != 0) {
     StrCat(RetString, L"+RS+BS");
-  } else if (Atts & EFI_VARIABLE_BOOTSERVICE_ACCESS) {
+  } else if ((Atts & EFI_VARIABLE_BOOTSERVICE_ACCESS) != 0) {
     StrCat(RetString, L"+BS");
   }
-  if (Atts & EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
+  if ((Atts & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != 0) {
     StrCat(RetString, L"+HR");
   }
-  if (Atts & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) {
+  if ((Atts & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) {
     StrCat(RetString, L"+AW");
   }
-  if (Atts & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) {
+  if ((Atts & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
     StrCat(RetString, L"+AT");
   }
 
