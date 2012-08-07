@@ -509,11 +509,11 @@ ShellCommandRunMm (
 
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_ADDRESS), gShellDebug1HiiHandle, Address);
       if (Size == 1) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_BUF2), gShellDebug1HiiHandle, Buffer);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_BUF2), gShellDebug1HiiHandle, (UINTN)Buffer);
       } else if (Size == 2) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_BUF4), gShellDebug1HiiHandle, Buffer);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_BUF4), gShellDebug1HiiHandle, (UINTN)Buffer);
       } else if (Size == 4) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_BUF8), gShellDebug1HiiHandle, Buffer);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_BUF8), gShellDebug1HiiHandle, (UINTN)Buffer);
       } else if (Size == 8) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_BUF16), gShellDebug1HiiHandle, Buffer);
       }
@@ -554,11 +554,11 @@ ShellCommandRunMm (
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_ADDRESS), gShellDebug1HiiHandle, Address);
 
       if (Size == 1) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_BUF2), gShellDebug1HiiHandle, Buffer);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_BUF2), gShellDebug1HiiHandle, (UINTN)Buffer);
       } else if (Size == 2) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_BUF4), gShellDebug1HiiHandle, Buffer);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_BUF4), gShellDebug1HiiHandle, (UINTN)Buffer);
       } else if (Size == 4) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_BUF8), gShellDebug1HiiHandle, Buffer);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_BUF8), gShellDebug1HiiHandle, (UINTN)Buffer);
       } else if (Size == 8) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_BUF16), gShellDebug1HiiHandle, Buffer);
       }
