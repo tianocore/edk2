@@ -3,7 +3,7 @@
 
   Abstraction of a very simple graphics device.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -101,11 +101,9 @@ typedef struct {
   @param  SizeOfInfo            A pointer to the size, in bytes, of the Info buffer.
   @param  Info                  A pointer to callee allocated buffer that returns information about ModeNumber.
 
-  @retval EFI_SUCCESS           Mode information returned.
-  @retval EFI_BUFFER_TOO_SMALL  The Info buffer was too small.
+  @retval EFI_SUCCESS           Valid mode information was returned.
   @retval EFI_DEVICE_ERROR      A hardware error occurred trying to retrieve the video mode.
-  @retval EFI_NOT_STARTED       Video display is not initialized. Call SetMode ()
-  @retval EFI_INVALID_PARAMETER One of the input args was NULL.
+  @retval EFI_INVALID_PARAMETER ModeNumber is not valid.
 
 **/
 typedef
@@ -153,7 +151,7 @@ typedef union {
 ///
 typedef enum {
   ///
-  /// Write data from the  BltBuffer pixel (SourceX, SourceY) 
+  /// Write data from the BltBuffer pixel (0, 0) 
   /// directly to every pixel of the video display rectangle 
   /// (DestinationX, DestinationY) (DestinationX + Width, DestinationY + Height). 
   /// Only one pixel will be used from the BltBuffer. Delta is NOT used.  
@@ -171,7 +169,7 @@ typedef enum {
   EfiBltVideoToBltBuffer,
   
   ///
-  /// Write data from the  BltBuffer rectangle 
+  /// Write data from the BltBuffer rectangle 
   /// (SourceX, SourceY) (SourceX + Width, SourceY + Height) directly to the 
   /// video display rectangle (DestinationX, DestinationY) 
   /// (DestinationX + Width, DestinationY + Height). If SourceX or SourceY is 
@@ -182,10 +180,9 @@ typedef enum {
   
   ///
   /// Copy from the video display rectangle (SourceX, SourceY)
-  /// (SourceX + Width, SourceY + Height) .to the video display rectangle 
+  /// (SourceX + Width, SourceY + Height) to the video display rectangle 
   /// (DestinationX, DestinationY) (DestinationX + Width, DestinationY + Height). 
-  /// The BltBuffer and Delta  are not used in this mode.
-  /// EfiBltVideoToVideo,
+  /// The BltBuffer and Delta are not used in this mode.
   ///
   EfiBltVideoToVideo,
   
@@ -196,20 +193,23 @@ typedef enum {
   Blt a rectangle of pixels on the graphics screen. Blt stands for BLock Transfer.
   
   @param  This         Protocol instance pointer.
-  @param  BltBuffer    Buffer containing data to blit into video buffer. This
-                       buffer has a size of Width*Height*sizeof(EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
-  @param  BltOperation Operation to perform on BlitBuffer and video memory
-  @param  SourceX      X coordinate of source for the BltBuffer.
-  @param  SourceY      Y coordinate of source for the BltBuffer.
-  @param  DestinationX X coordinate of destination for the BltBuffer.
-  @param  DestinationY Y coordinate of destination for the BltBuffer.
-  @param  Width        Width of rectangle in BltBuffer in pixels.
-  @param  Height       Hight of rectangle in BltBuffer in pixels.
-  @param  Delta        OPTIONAL
+  @param  BltBuffer    The data to transfer to the graphics screen.
+                       Size is at least Width*Height*sizeof(EFI_GRAPHICS_OUTPUT_BLT_PIXEL).
+  @param  BltOperation The operation to perform when copying BltBuffer on to the graphics screen.
+  @param  SourceX      The X coordinate of source for the BltOperation.
+  @param  SourceY      The Y coordinate of source for the BltOperation.
+  @param  DestinationX The X coordinate of destination for the BltOperation.
+  @param  DestinationY The Y coordinate of destination for the BltOperation.
+  @param  Width        The width of a rectangle in the blt rectangle in pixels.
+  @param  Height       The height of a rectangle in the blt rectangle in pixels.
+  @param  Delta        Not used for EfiBltVideoFill or the EfiBltVideoToVideo operation.
+                       If a Delta of zero is used, the entire BltBuffer is being operated on.
+                       If a subrectangle of the BltBuffer is being used then Delta
+                       represents the number of bytes in a row of the BltBuffer.
 
-  @retval EFI_SUCCESS           The Blt operation completed.
+  @retval EFI_SUCCESS           BltBuffer was drawn to the graphics screen.
   @retval EFI_INVALID_PARAMETER BltOperation is not valid.
-  @retval EFI_DEVICE_ERROR      A hardware error occured writting to the video buffer.
+  @retval EFI_DEVICE_ERROR      The device had an error and could not complete the request.
 
 **/
 typedef
@@ -250,7 +250,8 @@ typedef struct {
   ///
   EFI_PHYSICAL_ADDRESS                   FrameBufferBase;
   ///
-  /// Size of the frame buffer represented by FrameBufferBase in bytes.
+  /// Amount of frame buffer needed to support the active mode as defined by 
+  /// PixelsPerScanLine xVerticalResolution x PixelElementSize.
   ///
   UINTN                                  FrameBufferSize;
 } EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE;
