@@ -1,7 +1,7 @@
 /** @file
   This is the main routine for initializing the Graphics Console support routines.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -35,7 +35,7 @@ GRAPHICS_CONSOLE_DEV    mGraphicsConsoleDevTemplate = {
   },
   {
     0,
-    0,
+    -1,
     EFI_TEXT_ATTR(EFI_LIGHTGRAY, EFI_BLACK),
     0,
     0,
@@ -559,16 +559,15 @@ GraphicsConsoleControllerDriverStart (
   //
   Private->SimpleTextOutputMode.MaxMode = (INT32) MaxMode;
 
-  //
-  // Determine the number of text modes that this protocol can support
-  //
-  Status = GraphicsConsoleConOutSetMode (&Private->SimpleTextOutput, 0);
-  if (EFI_ERROR (Status)) {
-    goto Error;
-  }
-
   DEBUG_CODE_BEGIN ();
-    GraphicsConsoleConOutOutputString (&Private->SimpleTextOutput, (CHAR16 *)L"Graphics Console Started\n\r");
+    Status = GraphicsConsoleConOutSetMode (&Private->SimpleTextOutput, 0);
+    if (EFI_ERROR (Status)) {
+      goto Error;
+    }
+    Status = GraphicsConsoleConOutOutputString (&Private->SimpleTextOutput, (CHAR16 *)L"Graphics Console Started\n\r");
+    if (EFI_ERROR (Status)) {
+      goto Error;
+    }  
   DEBUG_CODE_END ();
 
   //
@@ -863,8 +862,13 @@ GraphicsConsoleConOutReset (
   IN  BOOLEAN                          ExtendedVerification
   )
 {
-  This->SetAttribute (This, EFI_TEXT_ATTR (This->Mode->Attribute & 0x0F, EFI_BACKGROUND_BLACK));
-  return This->SetMode (This, 0);
+  EFI_STATUS    Status;
+  Status = This->SetMode (This, 0);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  Status = This->SetAttribute (This, EFI_TEXT_ATTR (This->Mode->Attribute & 0x0F, EFI_BACKGROUND_BLACK));
+  return Status;
 }
 
 
@@ -917,8 +921,15 @@ GraphicsConsoleConOutOutputString (
   INT32                 OriginAttribute;
   EFI_TPL               OldTpl;
 
-  Status = EFI_SUCCESS;
+  if (This->Mode->Mode == -1) {
+    //
+    // If current mode is not valid, return error.
+    //
+    return EFI_UNSUPPORTED;
+  }
 
+  Status = EFI_SUCCESS;
+  
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   //
   // Current mode
@@ -1300,7 +1311,6 @@ GraphicsConsoleConOutSetMode (
   Private   = GRAPHICS_CONSOLE_CON_OUT_DEV_FROM_THIS (This);
   GraphicsOutput = Private->GraphicsOutput;
   UgaDraw   = Private->UgaDraw;
-  ModeData  = &(Private->ModeData[ModeNumber]);
 
   //
   // Make sure the requested mode number is supported
@@ -1309,11 +1319,38 @@ GraphicsConsoleConOutSetMode (
     Status = EFI_UNSUPPORTED;
     goto Done;
   }
+  
+  ModeData  = &(Private->ModeData[ModeNumber]);
 
   if (ModeData->Columns <= 0 && ModeData->Rows <= 0) {
     Status = EFI_UNSUPPORTED;
     goto Done;
   }
+
+  //
+  // If the mode has been set at least one other time, then LineBuffer will not be NULL
+  //
+  if (Private->LineBuffer != NULL) {
+    //
+    // If the new mode is the same as the old mode, then just return EFI_SUCCESS
+    //
+    if ((INT32) ModeNumber == This->Mode->Mode) {
+      //
+      // Clear the current text window on the current graphics console
+      //
+      This->ClearScreen (This);
+      Status = EFI_SUCCESS;
+      goto Done;
+    }
+    //
+    // Otherwise, the size of the text console and/or the GOP/UGA mode will be changed,
+    // so erase the cursor, and free the LineBuffer for the current mode
+    //
+    FlushCursor (This);
+
+    FreePool (Private->LineBuffer);
+  }
+
   //
   // Attempt to allocate a line buffer for the requested mode number
   //
@@ -1327,31 +1364,7 @@ GraphicsConsoleConOutSetMode (
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
-  //
-  // If the mode has been set at least one other time, then LineBuffer will not be NULL
-  //
-  if (Private->LineBuffer != NULL) {
-    //
-    // Clear the current text window on the current graphics console
-    //
-    This->ClearScreen (This);
 
-    //
-    // If the new mode is the same as the old mode, then just return EFI_SUCCESS
-    //
-    if ((INT32) ModeNumber == This->Mode->Mode) {
-      FreePool (NewLineBuffer);
-      Status = EFI_SUCCESS;
-      goto Done;
-    }
-    //
-    // Otherwise, the size of the text console and/or the GOP/UGA mode will be changed,
-    // so erase the cursor, and free the LineBuffer for the current mode
-    //
-    FlushCursor (This);
-
-    FreePool (Private->LineBuffer);
-  }
   //
   // Assign the current line buffer to the newly allocated line buffer
   //
@@ -1483,6 +1496,13 @@ GraphicsConsoleConOutSetAttribute (
     return EFI_UNSUPPORTED;
   }
 
+  if (This->Mode->Mode == -1) {
+    //
+    // If current mode is not valid, return error.
+    //
+    return EFI_UNSUPPORTED;
+  }
+
   if ((INT32) Attribute == This->Mode->Attribute) {
     return EFI_SUCCESS;
   }
@@ -1528,6 +1548,13 @@ GraphicsConsoleConOutClearScreen (
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL Foreground;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL Background;
   EFI_TPL                       OldTpl;
+  
+  if (This->Mode->Mode == -1) {
+    //
+    // If current mode is not valid, return error.
+    //
+    return EFI_UNSUPPORTED;
+  }
 
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
@@ -1610,6 +1637,13 @@ GraphicsConsoleConOutSetCursorPosition (
   EFI_STATUS                  Status;
   EFI_TPL                     OldTpl;
 
+  if (This->Mode->Mode == -1) {
+    //
+    // If current mode is not valid, return error.
+    //
+    return EFI_UNSUPPORTED;
+  }
+
   Status = EFI_SUCCESS;
 
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
@@ -1651,6 +1685,8 @@ Done:
                                 the cursor is set to be invisible.
 
   @retval EFI_SUCCESS           The operation completed successfully.
+  @retval EFI_UNSUPPORTED       The output device's mode is not currently in a
+                                defined text mode.
 
 **/
 EFI_STATUS
@@ -1661,6 +1697,13 @@ GraphicsConsoleConOutEnableCursor (
   )
 {
   EFI_TPL               OldTpl;
+
+  if (This->Mode->Mode == -1) {
+    //
+    // If current mode is not valid, return error.
+    //
+    return EFI_UNSUPPORTED;
+  }
 
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
