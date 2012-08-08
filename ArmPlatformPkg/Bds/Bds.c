@@ -181,7 +181,7 @@ InitializeConsole (
   ASSERT_EFI_ERROR (Status);
   Status = GetConsoleDevicePathFromVariable (L"ConIn", (CHAR16*)PcdGetPtr(PcdDefaultConInPaths), &ConInDevicePaths);
   ASSERT_EFI_ERROR (Status);
-  Status = GetConsoleDevicePathFromVariable (L"ConErr", (CHAR16*)PcdGetPtr(PcdDefaultConOutPaths), &ConErrDevicePaths);
+  Status = GetConsoleDevicePathFromVariable (L"ErrOut", (CHAR16*)PcdGetPtr(PcdDefaultConOutPaths), &ConErrDevicePaths);
   ASSERT_EFI_ERROR (Status);
 
   // Initialize the Consoles
