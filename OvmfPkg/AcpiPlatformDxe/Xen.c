@@ -188,7 +188,7 @@ InstallXenTables (
       CurrentTableEntry = (VOID *) ((UINT8 *) Xsdt +
                             sizeof (EFI_ACPI_DESCRIPTION_HEADER) +
                             Index * sizeof (UINT64));
-      CurrentTablePointer = *(UINT64 *)CurrentTableEntry;
+      CurrentTablePointer = (UINTN) *(UINT64 *)CurrentTableEntry;
       CurrentTable = (EFI_ACPI_DESCRIPTION_HEADER *) CurrentTablePointer;
 
       //

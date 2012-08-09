@@ -268,8 +268,8 @@ QemuInstallAcpiSsdtTable (
         *(UINT32*) SsdtPtr = sizeof (*FwData);
         SsdtPtr += 4;
 
-        ASSERT(SsdtPtr - Ssdt == SsdtSize);
-        ((EFI_ACPI_DESCRIPTION_HEADER *) Ssdt)->Length = SsdtSize;
+        ASSERT((UINTN) (SsdtPtr - Ssdt) == SsdtSize);
+        ((EFI_ACPI_DESCRIPTION_HEADER *) Ssdt)->Length = (UINT32) SsdtSize;
         Status = InstallAcpiTable (AcpiProtocol, Ssdt, SsdtSize, TableKey);
       }
 
