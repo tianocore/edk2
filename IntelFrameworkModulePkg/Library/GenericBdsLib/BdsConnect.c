@@ -410,6 +410,10 @@ BdsLibConnectUsbDevByShortFormDP(
       }
     }
 
+    if (HandleArray != NULL) {
+      FreePool (HandleArray);
+    }
+
     if (AtLeastOneConnected) {
       return EFI_SUCCESS;
     }
