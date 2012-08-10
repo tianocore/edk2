@@ -1089,7 +1089,7 @@ PlatformBdsEnterFrontPage (
   //
   // goto FrontPage directly when EFI_OS_INDICATIONS_BOOT_TO_FW_UI is set. Skip HotkeyBoot
   //
-  if (!EFI_ERROR(Status) && (OsIndication & EFI_OS_INDICATIONS_BOOT_TO_FW_UI)) {
+  if (!EFI_ERROR(Status) && ((OsIndication & EFI_OS_INDICATIONS_BOOT_TO_FW_UI) != 0)) {
     //
     // Clear EFI_OS_INDICATIONS_BOOT_TO_FW_UI to acknowledge OS
     // 
