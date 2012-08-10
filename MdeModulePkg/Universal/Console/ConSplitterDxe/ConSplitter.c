@@ -3310,7 +3310,7 @@ ConSplitterTextInPrivateReadKeyStroke (
   return EFI_NOT_READY;
 }
 
-/*
+/**
   Connect the specific Usb device which match the short form device path,
   and whose bus is determined by Host Controller.
 
