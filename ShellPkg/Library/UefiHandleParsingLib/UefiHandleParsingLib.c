@@ -780,6 +780,44 @@ GetGuidFromStringName(
 }
 
 /**
+  Get best support language for this driver.
+  
+  First base on the current platform used language to search,Second base on the 
+  default language to search. The caller need to free the buffer of the best 
+  language.
+
+  @param[in] SupportedLanguages      The support languages for this driver.
+  @param[in] Iso639Language          Whether get language for ISO639.
+
+  @return                            The best support language for this driver.
+**/
+CHAR8 *
+GetBestLanguageForDriver (
+  IN CONST CHAR8  *SupportedLanguages, 
+  IN BOOLEAN      Iso639Language
+  )
+{
+  CHAR8                         *LanguageVariable;
+  CHAR8                         *BestLanguage;
+
+  LanguageVariable = GetVariable (Iso639Language ? L"Lang" : L"PlatformLang", &gEfiGlobalVariableGuid);
+
+  BestLanguage = GetBestLanguage(
+                   SupportedLanguages,
+                   Iso639Language,
+                   (LanguageVariable != NULL) ? LanguageVariable : "",
+                   Iso639Language ? "en" : "en-US",
+                   NULL
+                   );
+
+  if (LanguageVariable != NULL) {
+    FreePool (LanguageVariable);
+  }
+
+  return BestLanguage;
+}
+
+/**
   Function to retrieve the driver name (if possible) from the ComponentName or
   ComponentName2 protocol
 
@@ -799,6 +837,9 @@ GetStringNameFromHandle(
   EFI_COMPONENT_NAME2_PROTOCOL  *CompNameStruct;
   EFI_STATUS                    Status;
   CHAR16                        *RetVal;
+  CHAR8                         *BestLang;
+
+  BestLang = NULL;
 
   Status = gBS->OpenProtocol(
     TheHandle,
@@ -808,7 +849,16 @@ GetStringNameFromHandle(
     NULL,
     EFI_OPEN_PROTOCOL_GET_PROTOCOL);
   if (!EFI_ERROR(Status)) {
+    if (Language == NULL) {
+      BestLang = GetBestLanguageForDriver (CompNameStruct->SupportedLanguages, FALSE);
+      Language = BestLang;
+    }
     Status = CompNameStruct->GetDriverName(CompNameStruct, (CHAR8*)Language, &RetVal);
+
+    if (BestLang != NULL) {
+      FreePool (BestLang);
+      BestLang = NULL;
+    }
     if (!EFI_ERROR(Status)) {
       return (RetVal);
     }
@@ -821,7 +871,15 @@ GetStringNameFromHandle(
     NULL,
     EFI_OPEN_PROTOCOL_GET_PROTOCOL);
   if (!EFI_ERROR(Status)) {
+    if (Language == NULL) {
+      BestLang = GetBestLanguageForDriver (CompNameStruct->SupportedLanguages, FALSE);
+      Language = BestLang;
+    }
     Status = CompNameStruct->GetDriverName(CompNameStruct, (CHAR8*)Language, &RetVal);
+    
+    if (BestLang != NULL) {
+      FreePool (BestLang);
+    }
     if (!EFI_ERROR(Status)) {
       return (RetVal);
     }

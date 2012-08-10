@@ -221,19 +221,17 @@ ShellCommandRunDrivers (
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
-      Lang = ShellCommandLineGetValue(Package, L"-l");
-      if (Lang != NULL) {
-        Language = AllocateZeroPool(StrSize(Lang));
-        AsciiSPrint(Language, StrSize(Lang), "%S", Lang);
-      } else if (!ShellCommandLineGetFlag(Package, L"-l")){
-        ASSERT(Language == NULL);
-  //      Language = AllocateZeroPool(10);
-  //      AsciiSPrint(Language, 10, "en-us");
-      } else {
-        ASSERT(Language == NULL);
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"-l");
-        ShellCommandLineFreeVarList (Package);
-        return (SHELL_INVALID_PARAMETER);
+      if (ShellCommandLineGetFlag(Package, L"-l")){
+        Lang = ShellCommandLineGetValue(Package, L"-l");
+        if (Lang != NULL) {
+          Language = AllocateZeroPool(StrSize(Lang));
+          AsciiSPrint(Language, StrSize(Lang), "%S", Lang);
+        } else {
+          ASSERT(Language == NULL);
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"-l");
+          ShellCommandLineFreeVarList (Package);
+          return (SHELL_INVALID_PARAMETER);
+        }
       }
 
       if (ShellCommandLineGetFlag(Package, L"-sfo")) {
@@ -261,7 +259,7 @@ ShellCommandRunDrivers (
         DriverVersion = ReturnDriverVersion(*HandleWalker);
         DriverConfig  = ReturnDriverConfig(*HandleWalker);
         DriverDiag    = ReturnDriverDiag  (*HandleWalker);
-        Lang          = GetStringNameFromHandle(*HandleWalker, Language==NULL?"en":Language);
+        Lang          = GetStringNameFromHandle(*HandleWalker, Language);
 
         ShellPrintEx(
           -1,
