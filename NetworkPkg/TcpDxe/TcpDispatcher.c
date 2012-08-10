@@ -1,7 +1,7 @@
 /** @file
   The implementation of a dispatch routine for processing TCP requests.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -334,6 +334,7 @@ TcpFlushPcb (
   NetbufFreeList (&Tcb->SndQue);
   NetbufFreeList (&Tcb->RcvQue);
   Tcb->State = TCP_CLOSED;
+  Tcb->RemoteIpZero = FALSE;
 }
 
 /**
@@ -711,6 +712,10 @@ TcpConfigurePcb (
 
   if (Sk->IpVersion == IP_VERSION_6) {
     Tcb->Tick          = TCP6_REFRESH_NEIGHBOR_TICK;
+
+    if (NetIp6IsUnspecifiedAddr (&Tcb->RemoteEnd.Ip.v6)) {
+      Tcb->RemoteIpZero = TRUE;
+    }
   }
 
   TcpInsertTcb (Tcb);

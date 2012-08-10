@@ -1,7 +1,7 @@
 /** @file
   TCP protocol header file.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -335,6 +335,8 @@ struct _TCP_CONTROL_BLOCK {
   UINT8             Ttl;
   EFI_IPv4_ADDRESS  SubnetMask;
 
+
+  BOOLEAN           RemoteIpZero;   ///< RemoteEnd.Ip is ZERO when configured.
   IP_IO_IP_INFO     *IpInfo;        ///< Pointer reference to Ip used to send pkt
   UINT32            Tick;           ///< 1 tick = 200ms
 };

@@ -1,7 +1,7 @@
 /** @file
   Implementation of I/O interfaces between TCP and IpIoLib.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -112,7 +112,9 @@ TcpSendIpPacket (
       // It's IPv6 and this TCP segment belongs to a solid TCB, in such case
       // the destination address can't be overridden, so reset the Dest to NULL.
       //
-      Dest = NULL;
+      if (!Tcb->RemoteIpZero) {
+        Dest = NULL;
+      }
     }
   }
 
