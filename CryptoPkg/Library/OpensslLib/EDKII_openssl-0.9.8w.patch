@@ -26,6 +26,87 @@ Index: crypto/bio/bss_file.c
  #endif /* OPENSSL_NO_STDIO */
  
  #endif /* HEADER_BSS_FILE_C */
+Index: crypto/crypto.h
+===================================================================
+--- crypto/crypto.h	(revision 1)
++++ crypto/crypto.h	(working copy)
+@@ -235,15 +235,15 @@
+ #ifndef OPENSSL_NO_LOCKING
+ #ifndef CRYPTO_w_lock
+ #define CRYPTO_w_lock(type)	\
+-	CRYPTO_lock(CRYPTO_LOCK|CRYPTO_WRITE,type,__FILE__,__LINE__)
++	CRYPTO_lock(CRYPTO_LOCK|CRYPTO_WRITE,type,NULL,0)
+ #define CRYPTO_w_unlock(type)	\
+-	CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_WRITE,type,__FILE__,__LINE__)
++	CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_WRITE,type,NULL,0)
+ #define CRYPTO_r_lock(type)	\
+-	CRYPTO_lock(CRYPTO_LOCK|CRYPTO_READ,type,__FILE__,__LINE__)
++	CRYPTO_lock(CRYPTO_LOCK|CRYPTO_READ,type,NULL,0)
+ #define CRYPTO_r_unlock(type)	\
+-	CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_READ,type,__FILE__,__LINE__)
++	CRYPTO_lock(CRYPTO_UNLOCK|CRYPTO_READ,type,NULL,0)
+ #define CRYPTO_add(addr,amount,type)	\
+-	CRYPTO_add_lock(addr,amount,type,__FILE__,__LINE__)
++	CRYPTO_add_lock(addr,amount,type,NULL,0)
+ #endif
+ #else
+ #define CRYPTO_w_lock(a)
+@@ -361,19 +361,19 @@
+ #define MemCheck_off()	CRYPTO_mem_ctrl(CRYPTO_MEM_CHECK_DISABLE)
+ #define is_MemCheck_on() CRYPTO_is_mem_check_on()
+ 
+-#define OPENSSL_malloc(num)	CRYPTO_malloc((int)num,__FILE__,__LINE__)
+-#define OPENSSL_strdup(str)	CRYPTO_strdup((str),__FILE__,__LINE__)
++#define OPENSSL_malloc(num)	CRYPTO_malloc((int)num,NULL,0)
++#define OPENSSL_strdup(str)	CRYPTO_strdup((str),NULL,0)
+ #define OPENSSL_realloc(addr,num) \
+-	CRYPTO_realloc((char *)addr,(int)num,__FILE__,__LINE__)
++	CRYPTO_realloc((char *)addr,(int)num,NULL,0)
+ #define OPENSSL_realloc_clean(addr,old_num,num) \
+-	CRYPTO_realloc_clean(addr,old_num,num,__FILE__,__LINE__)
++	CRYPTO_realloc_clean(addr,old_num,num,NULL,0)
+ #define OPENSSL_remalloc(addr,num) \
+-	CRYPTO_remalloc((char **)addr,(int)num,__FILE__,__LINE__)
++	CRYPTO_remalloc((char **)addr,(int)num,NULL,0)
+ #define OPENSSL_freeFunc	CRYPTO_free
+ #define OPENSSL_free(addr)	CRYPTO_free(addr)
+ 
+ #define OPENSSL_malloc_locked(num) \
+-	CRYPTO_malloc_locked((int)num,__FILE__,__LINE__)
++	CRYPTO_malloc_locked((int)num,NULL,0)
+ #define OPENSSL_free_locked(addr) CRYPTO_free_locked(addr)
+ 
+ 
+@@ -487,7 +487,7 @@
+ long CRYPTO_get_mem_debug_options(void);
+ 
+ #define CRYPTO_push_info(info) \
+-        CRYPTO_push_info_(info, __FILE__, __LINE__);
++        CRYPTO_push_info_(info, NULL, 0);
+ int CRYPTO_push_info_(const char *info, const char *file, int line);
+ int CRYPTO_pop_info(void);
+ int CRYPTO_remove_all_info(void);
+@@ -528,17 +528,17 @@
+ 
+ /* die if we have to */
+ void OpenSSLDie(const char *file,int line,const char *assertion);
+-#define OPENSSL_assert(e)       (void)((e) ? 0 : (OpenSSLDie(__FILE__, __LINE__, #e),1))
++#define OPENSSL_assert(e)       (void)((e) ? 0 : (OpenSSLDie(NULL, 0, #e),1))
+ 
+ unsigned long *OPENSSL_ia32cap_loc(void);
+ #define OPENSSL_ia32cap (*(OPENSSL_ia32cap_loc()))
+ int OPENSSL_isservice(void);
+ 
+ #ifdef OPENSSL_FIPS
+-#define FIPS_ERROR_IGNORED(alg) OpenSSLDie(__FILE__, __LINE__, \
++#define FIPS_ERROR_IGNORED(alg) OpenSSLDie(NULL, 0, \
+ 		alg " previous FIPS forbidden algorithm error ignored");
+ 
+-#define FIPS_BAD_ABORT(alg) OpenSSLDie(__FILE__, __LINE__, \
++#define FIPS_BAD_ABORT(alg) OpenSSLDie(NULL, 0, \
+ 		#alg " Algorithm forbidden in FIPS mode");
+ 
+ #ifdef OPENSSL_FIPS_STRICT
 Index: crypto/err/err.c
 ===================================================================
 --- crypto/err/err.c	(revision 1)
