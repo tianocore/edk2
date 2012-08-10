@@ -585,6 +585,7 @@ EslUdp6RxComplete (
     //
     //  Fill in the port list if necessary
     //
+    pSocket->errno = ENETDOWN;
     if ( NULL == pSocket->pPortList ) {
       ZeroMem ( &LocalAddress, sizeof ( LocalAddress ));
       LocalAddress.sin6_len = sizeof ( LocalAddress );
@@ -657,34 +658,36 @@ EslUdp6RxComplete (
                                               NULL );
       }
       if ( EFI_ERROR ( Status )) {
-        DEBUG (( DEBUG_LISTEN,
-                  "ERROR - Failed to configure the Udp6 port, Status: %r\r\n",
-                  Status ));
-        switch ( Status ) {
-        case EFI_ACCESS_DENIED:
-          pSocket->errno = EACCES;
-          break;
+        if ( !pSocket->bConfigured ) {
+          DEBUG (( DEBUG_LISTEN,
+                    "ERROR - Failed to configure the Udp6 port, Status: %r\r\n",
+                    Status ));
+          switch ( Status ) {
+          case EFI_ACCESS_DENIED:
+            pSocket->errno = EACCES;
+            break;
 
-        default:
-        case EFI_DEVICE_ERROR:
-          pSocket->errno = EIO;
-          break;
+          default:
+          case EFI_DEVICE_ERROR:
+            pSocket->errno = EIO;
+            break;
 
-        case EFI_INVALID_PARAMETER:
-          pSocket->errno = EADDRNOTAVAIL;
-          break;
+          case EFI_INVALID_PARAMETER:
+            pSocket->errno = EADDRNOTAVAIL;
+            break;
 
-        case EFI_NO_MAPPING:
-          pSocket->errno = EAFNOSUPPORT;
-          break;
+          case EFI_NO_MAPPING:
+            pSocket->errno = EAFNOSUPPORT;
+            break;
 
-        case EFI_OUT_OF_RESOURCES:
-          pSocket->errno = ENOBUFS;
-          break;
+          case EFI_OUT_OF_RESOURCES:
+            pSocket->errno = ENOBUFS;
+            break;
 
-        case EFI_UNSUPPORTED:
-          pSocket->errno = EOPNOTSUPP;
-          break;
+          case EFI_UNSUPPORTED:
+            pSocket->errno = EOPNOTSUPP;
+            break;
+          }
         }
       }
       else {
@@ -726,6 +729,7 @@ EslUdp6RxComplete (
                   pConfigData->RemoteAddress.Addr[15],
                   pConfigData->RemotePort ));
         pPort->bConfigured = TRUE;
+        pSocket->bConfigured = TRUE;
 
         //
         //  Start the first read on the port
@@ -736,6 +740,7 @@ EslUdp6RxComplete (
         //  The socket is connected
         //
         pSocket->State = SOCKET_STATE_CONNECTED;
+        pSocket->errno = 0;
       }
 
       //
@@ -743,21 +748,12 @@ EslUdp6RxComplete (
       //
       pPort = pNextPort;
     }
-
-    //
-    //  Determine the configuration status
-    //
-    if ( NULL != pSocket->pPortList ) {
-      pSocket->bConfigured = TRUE;
-    }
   }
 
   //
   //  Determine the socket configuration status
   //
-  if ( !EFI_ERROR ( Status )) {
-    Status = pSocket->bConfigured ? EFI_SUCCESS : EFI_NOT_STARTED;
-  }
+  Status = pSocket->bConfigured ? EFI_SUCCESS : EFI_NOT_STARTED;
   
   //
   //  Return the port connected state.

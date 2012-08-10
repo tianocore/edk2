@@ -749,6 +749,7 @@ EslIp4RxComplete (
     //
     //  Fill in the port list if necessary
     //
+    pSocket->errno = ENETDOWN;
     if ( NULL == pSocket->pPortList ) {
       LocalAddress.sin_len = sizeof ( LocalAddress );
       LocalAddress.sin_family = AF_INET;
@@ -804,34 +805,36 @@ EslIp4RxComplete (
                                              NULL );
       }
       if ( EFI_ERROR ( Status )) {
-        DEBUG (( DEBUG_LISTEN,
-                  "ERROR - Failed to configure the Ip4 port, Status: %r\r\n",
-                  Status ));
-        switch ( Status ) {
-        case EFI_ACCESS_DENIED:
-          pSocket->errno = EACCES;
-          break;
+        if ( !pSocket->bConfigured ) {
+          DEBUG (( DEBUG_LISTEN,
+                    "ERROR - Failed to configure the Ip4 port, Status: %r\r\n",
+                    Status ));
+          switch ( Status ) {
+          case EFI_ACCESS_DENIED:
+            pSocket->errno = EACCES;
+            break;
 
-        default:
-        case EFI_DEVICE_ERROR:
-          pSocket->errno = EIO;
-          break;
+          default:
+          case EFI_DEVICE_ERROR:
+            pSocket->errno = EIO;
+            break;
 
-        case EFI_INVALID_PARAMETER:
-          pSocket->errno = EADDRNOTAVAIL;
-          break;
+          case EFI_INVALID_PARAMETER:
+            pSocket->errno = EADDRNOTAVAIL;
+            break;
 
-        case EFI_NO_MAPPING:
-          pSocket->errno = EAFNOSUPPORT;
-          break;
+          case EFI_NO_MAPPING:
+            pSocket->errno = EAFNOSUPPORT;
+            break;
 
-        case EFI_OUT_OF_RESOURCES:
-          pSocket->errno = ENOBUFS;
-          break;
+          case EFI_OUT_OF_RESOURCES:
+            pSocket->errno = ENOBUFS;
+            break;
 
-        case EFI_UNSUPPORTED:
-          pSocket->errno = EOPNOTSUPP;
-          break;
+          case EFI_UNSUPPORTED:
+            pSocket->errno = EOPNOTSUPP;
+            break;
+          }
         }
       }
       else {
@@ -876,6 +879,7 @@ EslIp4RxComplete (
                     pIp4->ModeData.RouteTable[Index].GatewayAddress.Addr[3]));
         }
         pPort->bConfigured = TRUE;
+        pSocket->bConfigured = TRUE;
 
         //
         //  Start the first read on the port
@@ -886,6 +890,7 @@ EslIp4RxComplete (
         //  The socket is connected
         //
         pSocket->State = SOCKET_STATE_CONNECTED;
+        pSocket->errno = 0;
       }
 
       //
@@ -893,21 +898,12 @@ EslIp4RxComplete (
       //
       pPort = pNextPort;
     }
-
-    //
-    //  Determine the configuration status
-    //
-    if ( NULL != pSocket->pPortList ) {
-      pSocket->bConfigured = TRUE;
-    }
   }
 
   //
   //  Determine the socket configuration status
   //
-  if ( !EFI_ERROR ( Status )) {
-    Status = pSocket->bConfigured ? EFI_SUCCESS : EFI_NOT_STARTED;
-  }
+  Status = pSocket->bConfigured ? EFI_SUCCESS : EFI_NOT_STARTED;
   
   //
   //  Return the port connected state.
