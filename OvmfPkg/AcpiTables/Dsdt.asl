@@ -240,13 +240,6 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
         }
 
         //
-        // _DIS method for LNKA, LNKB, LNKC, LNKD
-        //
-        Method (PDIS, 1, NotSerialized) {
-          Or (Arg0, 0x80, Arg0)
-        }
-
-        //
         // _CRS method for LNKA, LNKB, LNKC, LNKD
         //
         Method (PCRS, 1, NotSerialized) {
@@ -285,14 +278,6 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
         })
 
         //
-        // _SRS method for LNKA, LNKB, LNKC, LNKD
-        //
-        Method (PSRS, 2, NotSerialized) {
-          CreateDWordField (Arg1, 0x05, IRQW)
-          Store (IRQW, Arg0)
-        }
-
-        //
         // PCI IRQ Link A
         //
         Device (LNKA) {
@@ -300,10 +285,15 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
           Name (_UID, 1)
 
           Method (_STA, 0, NotSerialized) { Return (PSTA (PIRA)) }
-          Method (_DIS, 0, NotSerialized) { PDIS (PIRA)  }
+          Method (_DIS, 0, NotSerialized) {
+            Or (PIRA, 0x80, PIRA) // set disable-bit
+          }
           Method (_CRS, 0, NotSerialized) { Return (PCRS (PIRA)) }
           Method (_PRS, 0, NotSerialized) { Return (PPRS) }
-          Method (_SRS, 1, NotSerialized) { PSRS (PIRA, Arg0) }
+          Method (_SRS, 1, NotSerialized) {
+            CreateDWordField (Arg0, 0x05, IRQW)
+            Store (IRQW, PIRA)
+          }
         }
 
         //
@@ -314,10 +304,15 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
           Name (_UID, 2)
 
           Method (_STA, 0, NotSerialized) { Return (PSTA (PIRB)) }
-          Method (_DIS, 0, NotSerialized) { PDIS (PIRB) }
+          Method (_DIS, 0, NotSerialized) {
+            Or (PIRB, 0x80, PIRB) // set disable-bit
+          }
           Method (_CRS, 0, NotSerialized) { Return (PCRS (PIRB)) }
           Method (_PRS, 0, NotSerialized) { Return (PPRS) }
-          Method (_SRS, 1, NotSerialized) { PSRS (PIRB, Arg0) }
+          Method (_SRS, 1, NotSerialized) {
+            CreateDWordField (Arg0, 0x05, IRQW)
+            Store (IRQW, PIRB)
+          }
         }
 
         //
@@ -328,10 +323,15 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
           Name (_UID, 3)
 
           Method (_STA, 0, NotSerialized) { Return (PSTA (PIRC)) }
-          Method (_DIS, 0, NotSerialized) { PDIS (PIRC) }
+          Method (_DIS, 0, NotSerialized) {
+            Or (PIRC, 0x80, PIRC) // set disable-bit
+          }
           Method (_CRS, 0, NotSerialized) { Return (PCRS (PIRC)) }
           Method (_PRS, 0, NotSerialized) { Return (PPRS) }
-          Method (_SRS, 1, NotSerialized) { PSRS (PIRC, Arg0) }
+          Method (_SRS, 1, NotSerialized) {
+            CreateDWordField (Arg0, 0x05, IRQW)
+            Store (IRQW, PIRC)
+          }
         }
 
         //
@@ -342,10 +342,15 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
           Name (_UID, 1)
 
           Method (_STA, 0, NotSerialized) { Return (PSTA (PIRD)) }
-          Method (_DIS, 0, NotSerialized) { PDIS (PIRD) }
+          Method (_DIS, 0, NotSerialized) {
+            Or (PIRD, 0x80, PIRD) // set disable-bit
+          }
           Method (_CRS, 0, NotSerialized) { Return (PCRS (PIRD)) }
           Method (_PRS, 0, NotSerialized) { Return (PPRS) }
-          Method (_SRS, 1, NotSerialized) { PSRS (PIRD, Arg0) }
+          Method (_SRS, 1, NotSerialized) {
+            CreateDWordField (Arg0, 0x05, IRQW)
+            Store (IRQW, PIRD)
+          }
         }
 
         //
