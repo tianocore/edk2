@@ -342,7 +342,7 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
         //
         Device (LNKD) {
           Name (_HID, EISAID("PNP0C0F"))
-          Name (_UID, 1)
+          Name (_UID, 4)
 
           Method (_STA, 0, NotSerialized) { Return (PSTA (PIRD)) }
           Method (_DIS, 0, NotSerialized) {
