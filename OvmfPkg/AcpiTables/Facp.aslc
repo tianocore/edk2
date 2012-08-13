@@ -59,7 +59,7 @@ EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE FACP = {
   DAY_ALRM,         // index to day-of-month alarm in RTC CMOS RAM
   MON_ALRM,         // index to month-of-year alarm in RTC CMOS RAM
   CENTURY,          // index to century in RTC CMOS RAM
-  0x03,             // Boot architecture flag
+  0x00,             // Boot architecture flag
   0x00,             // Boot architecture flag
   RESERVED,         // reserved
   FLAG
