@@ -17,7 +17,8 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Library/DxeServicesTableLib.h>
-
+#include <Library/PcdLib.h>
+#include <IndustryStandard/Acpi.h>
 
 BOOLEAN
 QemuDetected (
@@ -33,6 +34,27 @@ QemuDetected (
 
 
 STATIC
+UINTN
+CountBits16 (
+  UINT16 Mask
+  )
+{
+  //
+  // For all N >= 1, N bits are enough to represent the number of bits set
+  // among N bits. It's true for N == 1. When adding a new bit (N := N+1),
+  // the maximum number of possibly set bits increases by one, while the
+  // representable maximum doubles.
+  //
+  Mask = ((Mask & 0xAAAA) >> 1) + (Mask & 0x5555);
+  Mask = ((Mask & 0xCCCC) >> 2) + (Mask & 0x3333);
+  Mask = ((Mask & 0xF0F0) >> 4) + (Mask & 0x0F0F);
+  Mask = ((Mask & 0xFF00) >> 8) + (Mask & 0x00FF);
+
+  return Mask;
+}
+
+
+STATIC
 EFI_STATUS
 EFIAPI
 QemuInstallAcpiMadtTable (
@@ -42,58 +64,120 @@ QemuInstallAcpiMadtTable (
   OUT  UINTN                         *TableKey
   )
 {
-  EFI_STATUS                                   Status;
-  UINTN                                        Count;
-  UINTN                                        Loop;
-  EFI_ACPI_DESCRIPTION_HEADER                  *Hdr;
-  UINTN                                        NewBufferSize;
-  EFI_ACPI_1_0_PROCESSOR_LOCAL_APIC_STRUCTURE  *LocalApic;
+  UINTN                                               CpuCount;
+  UINTN                                               PciLinkIsoCount;
+  UINTN                                               NewBufferSize;
+  EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER *Madt;
+  EFI_ACPI_1_0_PROCESSOR_LOCAL_APIC_STRUCTURE         *LocalApic;
+  EFI_ACPI_1_0_IO_APIC_STRUCTURE                      *IoApic;
+  EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE    *Iso;
+  EFI_ACPI_1_0_LOCAL_APIC_NMI_STRUCTURE               *LocalApicNmi;
+  VOID                                                *Ptr;
+  UINTN                                               Loop;
+  EFI_STATUS                                          Status;
+
+  ASSERT (AcpiTableBufferSize >= sizeof (EFI_ACPI_DESCRIPTION_HEADER));
 
   QemuFwCfgSelectItem (QemuFwCfgItemSmpCpuCount);
-  Count = (UINTN) QemuFwCfgRead16 ();
-  ASSERT (Count >= 1);
+  CpuCount = QemuFwCfgRead16 ();
+  ASSERT (CpuCount >= 1);
 
-  if (Count == 1) {
-    //
-    // The pre-built MADT table covers the single CPU case
-    //
-    return InstallAcpiTable (
-             AcpiProtocol,
-             AcpiTableBuffer,
-             AcpiTableBufferSize,
-             TableKey
-             );
+  //
+  // Set Level-tiggered, Active High for these identity mapped IRQs. The bitset
+  // corresponds to the union of all possible interrupt assignments for the LNKA,
+  // LNKB, LNKC, LNKD PCI interrupt lines. See the DSDT.
+  //
+  PciLinkIsoCount = CountBits16 (PcdGet16 (Pcd8259LegacyModeEdgeLevel));
+
+  NewBufferSize = 1                     * sizeof (*Madt) +
+                  CpuCount              * sizeof (*LocalApic) +
+                  1                     * sizeof (*IoApic) +
+                  (1 + PciLinkIsoCount) * sizeof (*Iso) +
+                  1                     * sizeof (*LocalApicNmi);
+
+  Madt = AllocatePool (NewBufferSize);
+  if (Madt == NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
 
-  //
-  // We need to add additional Local APIC entries to the MADT
-  //
-  NewBufferSize = AcpiTableBufferSize + ((Count - 1) * sizeof (*LocalApic));
-  Hdr = (EFI_ACPI_DESCRIPTION_HEADER*) AllocatePool (NewBufferSize);
-  ASSERT (Hdr != NULL);
+  Madt->Header           = *(EFI_ACPI_DESCRIPTION_HEADER *) AcpiTableBuffer;
+  Madt->Header.Length    = NewBufferSize;
+  Madt->LocalApicAddress = PcdGet32 (PcdCpuLocalApicBaseAddress);
+  Madt->Flags            = EFI_ACPI_1_0_PCAT_COMPAT;
+  Ptr = Madt + 1;
 
-  CopyMem (Hdr, AcpiTableBuffer, AcpiTableBufferSize);
-
-  LocalApic = (EFI_ACPI_1_0_PROCESSOR_LOCAL_APIC_STRUCTURE*)
-                (((UINT8*) Hdr) + AcpiTableBufferSize);
-
-  //
-  // Add Local APIC entries for the APs to the MADT
-  //
-  for (Loop = 1; Loop < Count; Loop++) {
-    LocalApic->Type = EFI_ACPI_1_0_PROCESSOR_LOCAL_APIC;
-    LocalApic->Length = sizeof (*LocalApic);
-    LocalApic->AcpiProcessorId = (UINT8) Loop;
-    LocalApic->ApicId = (UINT8) Loop;
-    LocalApic->Flags = 1;
-    LocalApic++;
+  LocalApic = Ptr;
+  for (Loop = 0; Loop < CpuCount; ++Loop) {
+    LocalApic->Type            = EFI_ACPI_1_0_PROCESSOR_LOCAL_APIC;
+    LocalApic->Length          = sizeof (*LocalApic);
+    LocalApic->AcpiProcessorId = Loop;
+    LocalApic->ApicId          = Loop;
+    LocalApic->Flags           = 1; // enabled
+    ++LocalApic;
   }
+  Ptr = LocalApic;
 
-  Hdr->Length = (UINT32) NewBufferSize;
+  IoApic = Ptr;
+  IoApic->Type             = EFI_ACPI_1_0_IO_APIC;
+  IoApic->Length           = sizeof (*IoApic);
+  IoApic->IoApicId         = CpuCount;
+  IoApic->Reserved         = EFI_ACPI_RESERVED_BYTE;
+  IoApic->IoApicAddress    = 0xFEC00000;
+  IoApic->SystemVectorBase = 0x00000000;
+  Ptr = IoApic + 1;
 
-  Status = InstallAcpiTable (AcpiProtocol, Hdr, NewBufferSize, TableKey);
+  //
+  // IRQ0 (8254 Timer) => IRQ2 (PIC) Interrupt Source Override Structure
+  //
+  Iso = Ptr;
+  Iso->Type                        = EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE;
+  Iso->Length                      = sizeof (*Iso);
+  Iso->Bus                         = 0x00; // ISA
+  Iso->Source                      = 0x00; // IRQ0
+  Iso->GlobalSystemInterruptVector = 0x00000002;
+  Iso->Flags                       = 0x0000; // Conforms to specs of the bus
+  ++Iso;
 
-  FreePool (Hdr);
+  //
+  // Set Level-tiggered, Active High for all possible PCI link targets.
+  //
+  for (Loop = 0; Loop < 16; ++Loop) {
+    if ((PcdGet16 (Pcd8259LegacyModeEdgeLevel) & (1 << Loop)) == 0) {
+      continue;
+    }
+    Iso->Type                        = EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE;
+    Iso->Length                      = sizeof (*Iso);
+    Iso->Bus                         = 0x00; // ISA
+    Iso->Source                      = Loop;
+    Iso->GlobalSystemInterruptVector = Loop;
+    Iso->Flags                       = 0x000D; // Level-tiggered, Active High
+    ++Iso;
+  }
+  ASSERT (
+    Iso - (EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE *)Ptr ==
+      1 + PciLinkIsoCount
+    );
+  Ptr = Iso;
+
+  LocalApicNmi = Ptr;
+  LocalApicNmi->Type            = EFI_ACPI_1_0_LOCAL_APIC_NMI;
+  LocalApicNmi->Length          = sizeof (*LocalApicNmi);
+  LocalApicNmi->AcpiProcessorId = 0xFF; // applies to all processors
+  //
+  // polarity and trigger mode of the APIC I/O input signals conform to the
+  // specifications of the bus
+  //
+  LocalApicNmi->Flags           = 0x0000;
+  //
+  // Local APIC interrupt input LINTn to which NMI is connected.
+  //
+  LocalApicNmi->LocalApicInti   = 0x01;
+  Ptr = LocalApicNmi + 1;
+
+  ASSERT ((UINT8 *)Ptr - (UINT8 *)Madt == NewBufferSize);
+  Status = InstallAcpiTable (AcpiProtocol, Madt, NewBufferSize, TableKey);
+
+  FreePool (Madt);
 
   return Status;
 }

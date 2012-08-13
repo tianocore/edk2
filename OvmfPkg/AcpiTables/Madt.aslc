@@ -16,11 +16,7 @@
 **/
 
 #include <IndustryStandard/Acpi.h>
-
-//
-// MADT Definitions
-//
-#define EFI_ACPI_OEM_MADT_REVISION 0x00000000 // TBD
+#include <Platform.h>
 
 //
 // Local APIC address
@@ -74,21 +70,12 @@ EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE Madt = {
   EFI_ACPI_1_0_APIC_SIGNATURE,
   sizeof (EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE),
   EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION,
-
-  //
-  // Checksum will be updated at runtime
-  //
-  0x00,
-
-  //
-  // It is expected that these values will be programmed at runtime
-  //
-  ' ', ' ', ' ', ' ', ' ', ' ',
-
-  0,
-  EFI_ACPI_OEM_MADT_REVISION,
-  0,
-  0,
+  0x00,                                                     // Checksum will be updated at runtime
+  EFI_ACPI_OEM_ID,
+  EFI_ACPI_OEM_TABLE_ID,
+  EFI_ACPI_OEM_REVISION,
+  EFI_ACPI_CREATOR_ID,
+  EFI_ACPI_CREATOR_REVISION,
 
   //
   // MADT specific fields

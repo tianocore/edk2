@@ -23,9 +23,9 @@
 //
 #define EFI_ACPI_OEM_ID           'O','V','M','F',' ',' '   // OEMID 6 bytes long
 #define EFI_ACPI_OEM_TABLE_ID     SIGNATURE_64('O','V','M','F','E','D','K','2') // OEM table id 8 bytes long
-#define EFI_ACPI_OEM_REVISION     0x02000820
+#define EFI_ACPI_OEM_REVISION     0x20120804
 #define EFI_ACPI_CREATOR_ID       SIGNATURE_32('O','V','M','F')
-#define EFI_ACPI_CREATOR_REVISION 0x00000097
+#define EFI_ACPI_CREATOR_REVISION 0x00000098
 
 #define INT_MODEL       0x01
 #define SCI_INT_VECTOR  0x0009
