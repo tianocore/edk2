@@ -255,7 +255,7 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
           // whose single vector defaults to zero
           //
           Name (BUF0, ResourceTemplate () {
-              Interrupt (ResourceConsumer, Level, ActiveLow, Shared){0}
+              Interrupt (ResourceConsumer, Level, ActiveHigh, Shared){0}
             }
           )
 
@@ -279,7 +279,7 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
         // _PRS resource for LNKA, LNKB, LNKC, LNKD
         //
         Name (PPRS, ResourceTemplate () {
-          Interrupt (ResourceConsumer, Level, ActiveLow, Shared) {
+          Interrupt (ResourceConsumer, Level, ActiveHigh, Shared) {
             3, 4, 5, 7, 9, 10, 11, 12, 14, 15
           }
         })
