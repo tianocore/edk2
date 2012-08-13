@@ -51,8 +51,8 @@
 #define RESERVED        0x00
 #define P_LVL2_LAT      0x0065
 #define P_LVL3_LAT      0x03E9
-#define FLUSH_SIZE      0x0400
-#define FLUSH_STRIDE    0x0010
+#define FLUSH_SIZE      0x0000
+#define FLUSH_STRIDE    0x0000
 #define DUTY_OFFSET     0x00
 #define DUTY_WIDTH      0x00
 #define DAY_ALRM        0x0D
