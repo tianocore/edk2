@@ -752,10 +752,10 @@ PciInitialization (
   PciWrite8 (PCI_LIB_ADDRESS (0, 3, 0, 0x3d), 0x01);
 
   //
-  // Bus 0, Device 4, Function 0 - RAM Memory
+  // Bus 0, Device 5, Function 0 - RAM Memory
   //
-  PciWrite8 (PCI_LIB_ADDRESS (0, 4, 0, 0x3c), 0x09);
-  PciWrite8 (PCI_LIB_ADDRESS (0, 4, 0, 0x3d), 0x01);
+  PciWrite8 (PCI_LIB_ADDRESS (0, 5, 0, 0x3c), 0x09);
+  PciWrite8 (PCI_LIB_ADDRESS (0, 5, 0, 0x3d), 0x01);
 }
 
 
