@@ -213,12 +213,13 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
 
       //
       // PCI to ISA Bridge (Bus 0, Device 1, Function 0)
+      // "Low Pin Count"
       //
       Device (LPC) {
         Name (_ADR, 0x00010000)
 
         //
-        // PCI Interrupt Routing Configuration Registers
+        // PCI Interrupt Routing Configuration Registers, PIRQRC[A:D]
         //
         OperationRegion (PRR0, PCI_Config, 0x60, 0x04)
         Field (PRR0, ANYACC, NOLOCK, PRESERVE) {
@@ -230,17 +231,19 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
 
         //
         // _STA method for LNKA, LNKB, LNKC, LNKD
+        // Arg0[in]: value of PIRA / PIRB / PIRC / PIRD
         //
         Method (PSTA, 1, NotSerialized) {
-          If (And (Arg0, 0x80)) {
-            Return (0x9)
+          If (And (Arg0, 0x80)) { // disable-bit set?
+            Return (0x9)          // "device present" | "functioning properly"
           } Else {
-            Return (0xB)
+            Return (0xB)          // same | "enabled and decoding resources"
           }
         }
 
         //
         // _CRS method for LNKA, LNKB, LNKC, LNKD
+        // Arg0[in]: value of PIRA / PIRB / PIRC / PIRD
         //
         Method (PCRS, 1, NotSerialized) {
           //
@@ -527,4 +530,3 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
     }
   }
 }
-
