@@ -37,13 +37,13 @@
 #define PM1b_EVT_BLK    0x00000000
 #define PM1a_CNT_BLK    0x0000b004
 #define PM1b_CNT_BLK    0x00000000
-#define PM2_CNT_BLK     0x00000022
+#define PM2_CNT_BLK     0x00000000
 #define PM_TMR_BLK      0x0000b008
 #define GPE0_BLK        0x0000afe0
 #define GPE1_BLK        0x00000000
 #define PM1_EVT_LEN     0x04
 #define PM1_CNT_LEN     0x02
-#define PM2_CNT_LEN     0x01
+#define PM2_CNT_LEN     0x00
 #define PM_TM_LEN       0x04
 #define GPE0_BLK_LEN    0x04
 #define GPE1_BLK_LEN    0x00
