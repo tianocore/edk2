@@ -33,7 +33,7 @@ EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE FACP = {
   ACPI_ENABLE,      // value to write to port smi_cmd to enable ACPI
   ACPI_DISABLE,     // value to write to port smi_cmd to disable ACPI
   S4BIOS_REQ,       // Value to write to SMI CMD port to enter the S4BIOS state
-  0xE2,             // PState control
+  0,                // PState control
   PM1a_EVT_BLK,     // Port address of Power Mgt 1a Event Reg Blk
   PM1b_EVT_BLK,     // Port address of Power Mgt 1b Event Reg Blk
   PM1a_CNT_BLK,     // Port address of Power Mgt 1a Ctrl Reg Blk
@@ -49,7 +49,7 @@ EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE FACP = {
   GPE0_BLK_LEN,     // Byte Length of ports at gpe0_blk
   GPE1_BLK_LEN,     // Byte Length of ports at gpe1_blk
   GPE1_BASE,        // offset in gpe model where gpe1 events start
-  0xE3,             // _CST support
+  0,                // _CST support
   P_LVL2_LAT,       // worst case HW latency to enter/exit C2 state
   P_LVL3_LAT,       // worst case HW latency to enter/exit C3 state
   FLUSH_SIZE,       // Size of area read to flush caches

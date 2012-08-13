@@ -29,9 +29,9 @@
 
 #define INT_MODEL       0x01
 #define SCI_INT_VECTOR  0x0009
-#define SMI_CMD_IO_PORT 0 // If SMM was supported, then this would be 0xB2
-#define ACPI_ENABLE     0
-#define ACPI_DISABLE    0
+#define SMI_CMD_IO_PORT 0xB2
+#define ACPI_ENABLE     0xF1
+#define ACPI_DISABLE    0xF0
 #define S4BIOS_REQ      0x00
 #define PM1a_EVT_BLK    0x0000b000
 #define PM1b_EVT_BLK    0x00000000
