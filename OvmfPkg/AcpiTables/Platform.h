@@ -55,7 +55,7 @@
 #define FLUSH_STRIDE    0x0000
 #define DUTY_OFFSET     0x00
 #define DUTY_WIDTH      0x00
-#define DAY_ALRM        0x0D
+#define DAY_ALRM        0x00
 #define MON_ALRM        0x00
 #define CENTURY         0x00
 #define FLAG            EFI_ACPI_1_0_WBINVD | EFI_ACPI_1_0_PROC_C1 | EFI_ACPI_1_0_SLP_BUTTON | EFI_ACPI_1_0_RTC_S4 | EFI_ACPI_1_0_TMR_VAL_EXT
