@@ -1,17 +1,17 @@
 /** @file
   FACP Table
-  
+
   Copyright (c) 2008 - 2009, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are
   licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
   http://opensource.org/licenses/bsd-license.php
-  
+
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-**/ 
- 
+**/
+
 #include "Platform.h"
 
 EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE FACP = {
@@ -61,7 +61,7 @@ EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE FACP = {
   CENTURY,          // index to century in RTC CMOS RAM
   0x03,             // Boot architecture flag
   0x00,             // Boot architecture flag
-  RESERVED,         // reserved 
+  RESERVED,         // reserved
   FLAG
 };
 
@@ -72,7 +72,7 @@ ReferenceAcpiTable (
   )
 {
   //
-  // Reference the table being generated to prevent the optimizer from removing the 
+  // Reference the table being generated to prevent the optimizer from removing the
   // data structure from the exeutable
   //
   return (VOID*)&FACP;

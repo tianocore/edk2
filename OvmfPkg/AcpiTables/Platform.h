@@ -6,16 +6,16 @@
   licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
   http://opensource.org/licenses/bsd-license.php
-  
+
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-**/ 
+**/
 
 #ifndef _Platform_h_INCLUDED_
 #define _Platform_h_INCLUDED_
 
-#include <PiDxe.h> 
+#include <PiDxe.h>
 #include <IndustryStandard/Acpi.h>
 
 //
@@ -28,7 +28,7 @@
 #define EFI_ACPI_CREATOR_REVISION 0x00000097
 
 #define INT_MODEL       0x01
-#define SCI_INT_VECTOR  0x0009 
+#define SCI_INT_VECTOR  0x0009
 #define SMI_CMD_IO_PORT 0 // If SMM was supported, then this would be 0xB2
 #define ACPI_ENABLE     0
 #define ACPI_DISABLE    0
