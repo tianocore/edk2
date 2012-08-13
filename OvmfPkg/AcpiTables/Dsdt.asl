@@ -250,46 +250,46 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
         // _CRS method for LNKA, LNKB, LNKC, LNKD
         //
         Method (PCRS, 1, NotSerialized) {
-          Name (BUF0, ResourceTemplate () {IRQ (Level, ActiveLow, Shared){0}})
           //
-          // Define references to buffer elements
+          // create temporary buffer with an Extended Interrupt Descriptor
+          // whose single vector defaults to zero
           //
-          CreateWordField (BUF0, 0x01, IRQW)  // IRQ low
+          Name (BUF0, ResourceTemplate () {
+              Interrupt (ResourceConsumer, Level, ActiveLow, Shared){0}
+            }
+          )
+
           //
-          // Write current settings into IRQ descriptor
+          // define reference to first interrupt vector in buffer
           //
-          If (And (Arg0, 0x80)) {
-            Store (Zero, Local0)
-          } Else {
-            Store (One, Local0)
+          CreateDWordField (BUF0, 0x05, IRQW)
+
+          //
+          // If the disable-bit is clear, overwrite the default zero vector
+          // with the value in Arg0 (ie. PIRQRC[A:D]). Reserved bits are read
+          // as 0.
+          //
+          If (LNot (And (Arg0, 0x80))) {
+            Store (Arg0, IRQW)
           }
-          //
-          // Shift 1 by value in register 70
-          //
-          ShiftLeft (Local0, And (Arg0, 0x0F), IRQW)   // Save in buffer
-          Return (BUF0)                                // Return Buf0
+          Return (BUF0)
         }
 
         //
         // _PRS resource for LNKA, LNKB, LNKC, LNKD
         //
         Name (PPRS, ResourceTemplate () {
-          IRQ (Level, ActiveLow, Shared) {3, 4, 5, 7, 9, 10, 11, 12, 14, 15}
+          Interrupt (ResourceConsumer, Level, ActiveLow, Shared) {
+            3, 4, 5, 7, 9, 10, 11, 12, 14, 15
+          }
         })
 
         //
         // _SRS method for LNKA, LNKB, LNKC, LNKD
         //
         Method (PSRS, 2, NotSerialized) {
-          CreateWordField (Arg1, 0x01, IRQW)      // IRQ low
-          FindSetRightBit (IRQW, Local0)          // Set IRQ
-          If (LNotEqual (IRQW, Zero)) {
-            And (Local0, 0x7F, Local0)
-            Decrement (Local0)
-          } Else {
-            Or (Local0, 0x80, Local0)
-          }
-          Store (Local0, Arg0)
+          CreateDWordField (Arg1, 0x05, IRQW)
+          Store (IRQW, Arg0)
         }
 
         //
