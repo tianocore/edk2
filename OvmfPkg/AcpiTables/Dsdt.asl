@@ -526,6 +526,19 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
             DMA (Compatibility, NotBusMaster, Transfer8) {2}
           })
         }
+
+        //
+        // parallel port -- no DMA for now
+        //
+        Device (PAR1) {
+          Name (_HID, EISAID ("PNP0400"))
+          Name (_DDN, "LPT1")
+          Name (_UID, 0x01)
+          Name(_CRS, ResourceTemplate() {
+            IO (Decode16, 0x0378, 0x0378, 0x00, 0x08)
+            IRQNoFlags () {7}
+          })
+        }
       }
     }
   }
