@@ -12,7 +12,7 @@
 
 **/
 
-DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
+DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 4) {
   //
   // System Sleep States
   //
@@ -194,19 +194,90 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
         Return (
           Package () {
             //
-            // Bus 0, Device 1
+            // Bus 0; Devices 0 to 15
             //
-            Package () {0x0001FFFF, 0x00, \_SB.PCI0.LPC.LNKA, 0x00},
+            Package () {0x0000FFFF, 0x00, \_SB.PCI0.LPC.LNKD, 0x00},
+            Package () {0x0000FFFF, 0x01, \_SB.PCI0.LPC.LNKA, 0x00},
+            Package () {0x0000FFFF, 0x02, \_SB.PCI0.LPC.LNKB, 0x00},
+            Package () {0x0000FFFF, 0x03, \_SB.PCI0.LPC.LNKC, 0x00},
+
+            Package () {0x0001FFFF, 0x00, 0x00, 0x09},
+            //
+            // list of IRQs occupied thus far: 9
+            //
             Package () {0x0001FFFF, 0x01, \_SB.PCI0.LPC.LNKB, 0x00},
             Package () {0x0001FFFF, 0x02, \_SB.PCI0.LPC.LNKC, 0x00},
             Package () {0x0001FFFF, 0x03, \_SB.PCI0.LPC.LNKD, 0x00},
-            //
-            // Bus 0, Device 3
-            //
-            Package () {0x0003FFFF, 0x00, \_SB.PCI0.LPC.LNKA, 0x00},
-            Package () {0x0003FFFF, 0x01, \_SB.PCI0.LPC.LNKB, 0x00},
-            Package () {0x0003FFFF, 0x02, \_SB.PCI0.LPC.LNKC, 0x00},
-            Package () {0x0003FFFF, 0x03, \_SB.PCI0.LPC.LNKD, 0x00},
+
+            Package () {0x0002FFFF, 0x00, \_SB.PCI0.LPC.LNKB, 0x00},
+            Package () {0x0002FFFF, 0x01, \_SB.PCI0.LPC.LNKC, 0x00},
+            Package () {0x0002FFFF, 0x02, \_SB.PCI0.LPC.LNKD, 0x00},
+            Package () {0x0002FFFF, 0x03, \_SB.PCI0.LPC.LNKA, 0x00},
+
+            Package () {0x0003FFFF, 0x00, \_SB.PCI0.LPC.LNKC, 0x00},
+            Package () {0x0003FFFF, 0x01, \_SB.PCI0.LPC.LNKD, 0x00},
+            Package () {0x0003FFFF, 0x02, \_SB.PCI0.LPC.LNKA, 0x00},
+            Package () {0x0003FFFF, 0x03, \_SB.PCI0.LPC.LNKB, 0x00},
+
+            Package () {0x0004FFFF, 0x00, \_SB.PCI0.LPC.LNKD, 0x00},
+            Package () {0x0004FFFF, 0x01, \_SB.PCI0.LPC.LNKA, 0x00},
+            Package () {0x0004FFFF, 0x02, \_SB.PCI0.LPC.LNKB, 0x00},
+            Package () {0x0004FFFF, 0x03, \_SB.PCI0.LPC.LNKC, 0x00},
+
+            Package () {0x0005FFFF, 0x00, \_SB.PCI0.LPC.LNKA, 0x00},
+            Package () {0x0005FFFF, 0x01, \_SB.PCI0.LPC.LNKB, 0x00},
+            Package () {0x0005FFFF, 0x02, \_SB.PCI0.LPC.LNKC, 0x00},
+            Package () {0x0005FFFF, 0x03, \_SB.PCI0.LPC.LNKD, 0x00},
+
+            Package () {0x0006FFFF, 0x00, \_SB.PCI0.LPC.LNKB, 0x00},
+            Package () {0x0006FFFF, 0x01, \_SB.PCI0.LPC.LNKC, 0x00},
+            Package () {0x0006FFFF, 0x02, \_SB.PCI0.LPC.LNKD, 0x00},
+            Package () {0x0006FFFF, 0x03, \_SB.PCI0.LPC.LNKA, 0x00},
+
+            Package () {0x0007FFFF, 0x00, \_SB.PCI0.LPC.LNKC, 0x00},
+            Package () {0x0007FFFF, 0x01, \_SB.PCI0.LPC.LNKD, 0x00},
+            Package () {0x0007FFFF, 0x02, \_SB.PCI0.LPC.LNKA, 0x00},
+            Package () {0x0007FFFF, 0x03, \_SB.PCI0.LPC.LNKB, 0x00},
+
+            Package () {0x0008FFFF, 0x00, \_SB.PCI0.LPC.LNKD, 0x00},
+            Package () {0x0008FFFF, 0x01, \_SB.PCI0.LPC.LNKA, 0x00},
+            Package () {0x0008FFFF, 0x02, \_SB.PCI0.LPC.LNKB, 0x00},
+            Package () {0x0008FFFF, 0x03, \_SB.PCI0.LPC.LNKC, 0x00},
+
+            Package () {0x0009FFFF, 0x00, \_SB.PCI0.LPC.LNKA, 0x00},
+            Package () {0x0009FFFF, 0x01, \_SB.PCI0.LPC.LNKB, 0x00},
+            Package () {0x0009FFFF, 0x02, \_SB.PCI0.LPC.LNKC, 0x00},
+            Package () {0x0009FFFF, 0x03, \_SB.PCI0.LPC.LNKD, 0x00},
+
+            Package () {0x000AFFFF, 0x00, \_SB.PCI0.LPC.LNKB, 0x00},
+            Package () {0x000AFFFF, 0x01, \_SB.PCI0.LPC.LNKC, 0x00},
+            Package () {0x000AFFFF, 0x02, \_SB.PCI0.LPC.LNKD, 0x00},
+            Package () {0x000AFFFF, 0x03, \_SB.PCI0.LPC.LNKA, 0x00},
+
+            Package () {0x000BFFFF, 0x00, \_SB.PCI0.LPC.LNKC, 0x00},
+            Package () {0x000BFFFF, 0x01, \_SB.PCI0.LPC.LNKD, 0x00},
+            Package () {0x000BFFFF, 0x02, \_SB.PCI0.LPC.LNKA, 0x00},
+            Package () {0x000BFFFF, 0x03, \_SB.PCI0.LPC.LNKB, 0x00},
+
+            Package () {0x000CFFFF, 0x00, \_SB.PCI0.LPC.LNKD, 0x00},
+            Package () {0x000CFFFF, 0x01, \_SB.PCI0.LPC.LNKA, 0x00},
+            Package () {0x000CFFFF, 0x02, \_SB.PCI0.LPC.LNKB, 0x00},
+            Package () {0x000CFFFF, 0x03, \_SB.PCI0.LPC.LNKC, 0x00},
+
+            Package () {0x000DFFFF, 0x00, \_SB.PCI0.LPC.LNKA, 0x00},
+            Package () {0x000DFFFF, 0x01, \_SB.PCI0.LPC.LNKB, 0x00},
+            Package () {0x000DFFFF, 0x02, \_SB.PCI0.LPC.LNKC, 0x00},
+            Package () {0x000DFFFF, 0x03, \_SB.PCI0.LPC.LNKD, 0x00},
+
+            Package () {0x000EFFFF, 0x00, \_SB.PCI0.LPC.LNKB, 0x00},
+            Package () {0x000EFFFF, 0x01, \_SB.PCI0.LPC.LNKC, 0x00},
+            Package () {0x000EFFFF, 0x02, \_SB.PCI0.LPC.LNKD, 0x00},
+            Package () {0x000EFFFF, 0x03, \_SB.PCI0.LPC.LNKA, 0x00},
+
+            Package () {0x000FFFFF, 0x00, \_SB.PCI0.LPC.LNKC, 0x00},
+            Package () {0x000FFFFF, 0x01, \_SB.PCI0.LPC.LNKD, 0x00},
+            Package () {0x000FFFFF, 0x02, \_SB.PCI0.LPC.LNKA, 0x00},
+            Package () {0x000FFFFF, 0x03, \_SB.PCI0.LPC.LNKB, 0x00}
           }
         )
       }
@@ -275,9 +346,10 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
         // _PRS resource for LNKA, LNKB, LNKC, LNKD
         //
         Name (PPRS, ResourceTemplate () {
-          Interrupt (ResourceConsumer, Level, ActiveHigh, Shared) {
-            3, 4, 5, 7, 9, 10, 11, 12, 14, 15
-          }
+          Interrupt (ResourceConsumer, Level, ActiveHigh, Shared) {5, 10, 11}
+          //
+          // list of IRQs occupied thus far: 9, 5, 10, 11
+          //
         })
 
         //
@@ -366,6 +438,9 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
             IO (Decode16, 0x0A0, 0x0A0, 0x00, 0x02)
             IO (Decode16, 0x4D0, 0x4D0, 0x00, 0x02)
             IRQNoFlags () {2}
+            //
+            // list of IRQs occupied thus far: 9, 5, 10, 11, 2
+            //
           })
         }
 
@@ -393,6 +468,9 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
           Name(_CRS, ResourceTemplate () {
             IO (Decode16, 0x40, 0x40, 0x00, 0x04)
             IRQNoFlags () {0}
+            //
+            // list of IRQs occupied thus far: 9, 5, 10, 11, 2, 0
+            //
           })
         }
 
@@ -404,6 +482,9 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
           Name (_CRS, ResourceTemplate () {
             IO (Decode16, 0x70, 0x70, 0x00, 0x02)
             IRQNoFlags () {8}
+            //
+            // list of IRQs occupied thus far: 9, 5, 10, 11, 2, 0, 8
+            //
           })
         }
 
@@ -425,6 +506,9 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
           Name (_CRS, ResourceTemplate () {
             IO (Decode16, 0xF0, 0xF0, 0x00, 0x10)
             IRQNoFlags () {13}
+            //
+            // list of IRQs occupied thus far: 9, 5, 10, 11, 2, 0, 8, 13
+            //
           })
         }
 
@@ -474,6 +558,9 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
             IO (Decode16, 0x60, 0x60, 0x00, 0x01)
             IO (Decode16, 0x64, 0x64, 0x00, 0x01)
             IRQNoFlags () {1}
+            //
+            // list of IRQs occupied thus far: 9, 5, 10, 11, 2, 0, 8, 13, 1
+            //
           })
         }
 
@@ -485,6 +572,10 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
           Name (_CID, EISAID ("PNP0F13"))
           Name (_CRS, ResourceTemplate() {
             IRQNoFlags () {12}
+            //
+            // list of IRQs occupied thus far:
+            // 9, 5, 10, 11, 2, 0, 8, 13, 1, 12
+            //
           })
         }
 
@@ -498,6 +589,10 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
           Name(_CRS,ResourceTemplate() {
             IO (Decode16, 0x3F8, 0x3F8, 0x01, 0x08)
             IRQ (Edge, ActiveHigh, Exclusive, ) {4}
+            //
+            // list of IRQs occupied thus far:
+            // 9, 5, 10, 11, 2, 0, 8, 13, 1, 12, 4
+            //
           })
         }
 
@@ -511,6 +606,10 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
           Name(_CRS,ResourceTemplate() {
             IO (Decode16, 0x2F8, 0x2F8, 0x01, 0x08)
             IRQ (Edge, ActiveHigh, Exclusive, ) {3}
+            //
+            // list of IRQs occupied thus far:
+            // 9, 5, 10, 11, 2, 0, 8, 13, 1, 12, 4, 3
+            //
           })
         }
 
@@ -523,6 +622,10 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
             IO (Decode16, 0x3F0, 0x3F0, 0x01, 0x06)
             IO (Decode16, 0x3F7, 0x3F7, 0x01, 0x01)
             IRQNoFlags () {6}
+            //
+            // list of IRQs occupied thus far:
+            // 9, 5, 10, 11, 2, 0, 8, 13, 1, 12, 4, 3, 6
+            //
             DMA (Compatibility, NotBusMaster, Transfer8) {2}
           })
         }
@@ -537,6 +640,12 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 3) {
           Name(_CRS, ResourceTemplate() {
             IO (Decode16, 0x0378, 0x0378, 0x00, 0x08)
             IRQNoFlags () {7}
+            //
+            // list of IRQs occupied thus far:
+            // 9, 5, 10, 11, 2, 0, 8, 13, 1, 12, 4, 3, 6, 7
+            // in order:
+            // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
+            //
           })
         }
       }
