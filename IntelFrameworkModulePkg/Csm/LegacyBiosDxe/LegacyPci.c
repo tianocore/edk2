@@ -2380,7 +2380,7 @@ LegacyBiosInstallRom (
     //
     // Store current mode settings since PrepareToScanRom may change mode.
     //
-    VideoMode = *(UINT8 *) ((UINTN) 0x449);
+    VideoMode = *(UINT8 *) ((UINTN) (0x400 + BDA_VIDEO_MODE));
   }
   //
   // Notify the platform that we are about to scan the ROM
@@ -2520,9 +2520,14 @@ LegacyBiosInstallRom (
     //
     // Set mode settings since PrepareToScanRom may change mode
     //
-    Regs.H.AH = 0x00;
-    Regs.H.AL = VideoMode;
-    Private->LegacyBios.Int86 (&Private->LegacyBios, 0x10, &Regs);
+    if (VideoMode != *(UINT8 *) ((UINTN) (0x400 + BDA_VIDEO_MODE))) {
+      //
+      // The active video mode is changed, restore it to original mode.
+      //
+      Regs.H.AH = 0x00;
+      Regs.H.AL = VideoMode;
+      Private->LegacyBios.Int86 (&Private->LegacyBios, 0x10, &Regs);
+    }
   }
   //
   // Regs.X.AX from the adapter initializion is ignored since some adapters
