@@ -1028,4 +1028,17 @@ EvaluateExpressionList (
   IN FORM_BROWSER_FORM    *Form OPTIONAL
   );
 
+/**
+  Transfer the device path string to binary format.
+
+  @param   StringPtr     The device path string info.
+
+  @retval  Device path binary info.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+ConvertDevicePathFromText (
+  IN CHAR16  *StringPtr
+  );
+
 #endif // _UI_H

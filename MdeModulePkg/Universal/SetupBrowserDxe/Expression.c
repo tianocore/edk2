@@ -2210,6 +2210,7 @@ EvaluateExpression (
   UINT8                   *TempBuffer;
   EFI_TIME                EfiTime;
   EFI_HII_VALUE           QuestionVal;
+  EFI_DEVICE_PATH_PROTOCOL *DevicePath;
 
   //
   // Save current stack offset.
@@ -2475,11 +2476,17 @@ EvaluateExpression (
           break;
         }
 
-        if (!GetQuestionValueFromForm((EFI_DEVICE_PATH_PROTOCOL*)StrPtr, NULL, &OpCode->Guid, Value->Value.u16, &QuestionVal)){
+        DevicePath = ConvertDevicePathFromText(StrPtr);
+
+        if (!GetQuestionValueFromForm(DevicePath, NULL, &OpCode->Guid, Value->Value.u16, &QuestionVal)){
           Value->Type = EFI_IFR_TYPE_UNDEFINED;
-          break;
+        } else {
+          Value = &QuestionVal;
         }
-        Value = &QuestionVal;
+
+        if (DevicePath != NULL) {
+          FreePool (DevicePath);
+        }
       } else if (CompareGuid (&OpCode->Guid, &gZeroGuid) != 0) {
         if (!GetQuestionValueFromForm(NULL, FormSet->HiiHandle, &OpCode->Guid, Value->Value.u16, &QuestionVal)){
           Value->Type = EFI_IFR_TYPE_UNDEFINED;

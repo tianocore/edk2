@@ -1949,6 +1949,55 @@ FormSetGuidToHiiHandle (
 }
 
 /**
+  Transfer the device path string to binary format.
+
+  @param   StringPtr     The device path string info.
+
+  @retval  Device path binary info.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+ConvertDevicePathFromText (
+  IN CHAR16  *StringPtr
+  )
+{
+  UINTN                           BufferSize;
+  EFI_DEVICE_PATH_PROTOCOL        *DevicePath;
+  CHAR16                          TemStr[2];
+  UINT8                           *DevicePathBuffer;
+  UINTN                           Index;
+  UINT8                           DigitUint8;
+
+  ASSERT (StringPtr != NULL);
+
+  BufferSize = StrLen (StringPtr) / 2;
+  DevicePath = AllocatePool (BufferSize);
+  ASSERT (DevicePath != NULL);
+  
+  //
+  // Convert from Device Path String to DevicePath Buffer in the reverse order.
+  //
+  DevicePathBuffer = (UINT8 *) DevicePath;
+  for (Index = 0; StringPtr[Index] != L'\0'; Index ++) {
+    TemStr[0] = StringPtr[Index];
+    DigitUint8 = (UINT8) StrHexToUint64 (TemStr);
+    if (DigitUint8 == 0 && TemStr[0] != L'0') {
+      //
+      // Invalid Hex Char as the tail.
+      //
+      break;
+    }
+    if ((Index & 1) == 0) {
+      DevicePathBuffer [Index/2] = DigitUint8;
+    } else {
+      DevicePathBuffer [Index/2] = (UINT8) ((DevicePathBuffer [Index/2] << 4) + DigitUint8);
+    }
+  }
+
+  return DevicePath;
+}
+
+/**
   Process the goto op code, update the info in the selection structure.
 
   @param Statement    The statement belong to goto op code.
@@ -1968,13 +2017,7 @@ ProcessGotoOpCode (
   )
 {
   CHAR16                          *StringPtr;
-  UINTN                           StringLen;
-  UINTN                           BufferSize;
   EFI_DEVICE_PATH_PROTOCOL        *DevicePath;
-  CHAR16                          TemStr[2];
-  UINT8                           *DevicePathBuffer;
-  UINTN                           Index;
-  UINT8                           DigitUint8;
   FORM_BROWSER_FORM               *RefForm;
   EFI_INPUT_KEY                   Key;
   EFI_STATUS                      Status;
@@ -1984,22 +2027,18 @@ ProcessGotoOpCode (
   Status = EFI_SUCCESS;
   UpdateFormInfo = TRUE;
   StringPtr = NULL;
-  StringLen = 0;
 
   //
   // Prepare the device path check, get the device path info first.
   //
   if (Statement->HiiValue.Value.ref.DevicePath != 0) {
     StringPtr = GetToken (Statement->HiiValue.Value.ref.DevicePath, Selection->FormSet->HiiHandle);
-    if (StringPtr != NULL) {
-      StringLen = StrLen (StringPtr);
-    }
   }
 
   //
   // Check whether the device path string is a valid string.
   //
-  if (Statement->HiiValue.Value.ref.DevicePath != 0 && StringPtr != NULL && StringLen != 0) {
+  if (Statement->HiiValue.Value.ref.DevicePath != 0 && StringPtr != NULL) {
     if (Selection->Form->ModalForm) {
       return Status;
     }
@@ -2007,33 +2046,11 @@ ProcessGotoOpCode (
     // Goto another Hii Package list
     //
     Selection->Action = UI_ACTION_REFRESH_FORMSET;
-    BufferSize = StrLen (StringPtr) / 2;
-    DevicePath = AllocatePool (BufferSize);
-    ASSERT (DevicePath != NULL);
-
-    //
-    // Convert from Device Path String to DevicePath Buffer in the reverse order.
-    //
-    DevicePathBuffer = (UINT8 *) DevicePath;
-    for (Index = 0; StringPtr[Index] != L'\0'; Index ++) {
-      TemStr[0] = StringPtr[Index];
-      DigitUint8 = (UINT8) StrHexToUint64 (TemStr);
-      if (DigitUint8 == 0 && TemStr[0] != L'0') {
-        //
-        // Invalid Hex Char as the tail.
-        //
-        break;
-      }
-      if ((Index & 1) == 0) {
-        DevicePathBuffer [Index/2] = DigitUint8;
-      } else {
-        DevicePathBuffer [Index/2] = (UINT8) ((DevicePathBuffer [Index/2] << 4) + DigitUint8);
-      }
-    }
-    FreePool (StringPtr);
+    DevicePath = ConvertDevicePathFromText (StringPtr);
 
     Selection->Handle = DevicePathToHiiHandle (DevicePath);
     FreePool (DevicePath);
+    FreePool (StringPtr);
 
     if (Selection->Handle == NULL) {
       //

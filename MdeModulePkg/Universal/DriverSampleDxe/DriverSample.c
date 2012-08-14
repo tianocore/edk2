@@ -1766,6 +1766,44 @@ DriverCallback (
   return Status;
 }
 
+
+/**
+  Transfer the binary device path to string.
+
+  @param   DevicePath     The device path info.
+
+  @retval  Device path string info.
+
+**/
+CHAR16  *
+GenerateDevicePathString (
+  EFI_DEVICE_PATH_PROTOCOL *DevicePath
+  )
+{
+  CHAR16                    *String;
+  CHAR16                    *TmpBuf;
+  UINTN                     Index;
+  UINT8                     *Buffer;
+  UINTN                     DevicePathSize;
+
+  //
+  // Compute the size of the device path in bytes
+  //
+  DevicePathSize = GetDevicePathSize (DevicePath);
+  
+  String = AllocateZeroPool ((DevicePathSize * 2 + 1) * sizeof (CHAR16));
+  if (String == NULL) {
+    return NULL;
+  }
+
+  TmpBuf = String;
+  for (Index = 0, Buffer = (UINT8 *)DevicePath; Index < DevicePathSize; Index++) {
+    TmpBuf += UnicodeValueToString (TmpBuf, PREFIX_ZERO | RADIX_HEX, *(Buffer++), 2);
+  }
+
+  return String;
+}
+
 /**
   Main entry for this driver.
 
@@ -1802,6 +1840,8 @@ DriverSampleInit (
   // Initialize the local variables.
   //
   ConfigRequestHdr = NULL;
+  NewString        = NULL;
+
   //
   // Initialize screen dimensions for SendForm().
   // Remove 3 characters from top and bottom
@@ -1921,11 +1961,15 @@ DriverSampleInit (
   //
   // Update the device path string.
   //
-  if (HiiSetString (HiiHandle[0], STRING_TOKEN (STR_DEVICE_PATH), (EFI_STRING) &mHiiVendorDevicePath0, NULL) == 0) {
+  NewString = GenerateDevicePathString((EFI_DEVICE_PATH_PROTOCOL*)&mHiiVendorDevicePath0);
+  if (HiiSetString (HiiHandle[0], STRING_TOKEN (STR_DEVICE_PATH), NewString, NULL) == 0) {
     DriverSampleUnload (ImageHandle);
     return EFI_OUT_OF_RESOURCES;
   }
-  
+  if (NewString != NULL) {
+    FreePool (NewString);
+  }
+
   //
   // Very simple example of how one would update a string that is already
   // in the HII database
