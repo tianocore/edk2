@@ -368,6 +368,41 @@ WriteToOsS3PerformanceData (
 }
 
 /**
+  The function will check if current waking vector is long mode.
+
+  @param  AcpiS3Context                 a pointer to a structure of ACPI_S3_CONTEXT
+
+  @retval TRUE   Current context need long mode waking vector.
+  @retval FALSE  Current context need not long mode waking vector.
+**/
+BOOLEAN
+IsLongModeWakingVector (
+  IN ACPI_S3_CONTEXT                *AcpiS3Context
+  )
+{
+  EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE  *Facs;
+
+  Facs = (EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *) ((UINTN) (AcpiS3Context->AcpiFacsTable));
+  if ((Facs == NULL) ||
+      (Facs->Signature != EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE) ||
+      ((Facs->FirmwareWakingVector == 0) && (Facs->XFirmwareWakingVector == 0)) ) {
+    // Something wrong with FACS
+    return FALSE;
+  }
+  if (Facs->XFirmwareWakingVector != 0) {
+    if ((Facs->Version == EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION) &&
+        ((Facs->Flags & EFI_ACPI_4_0_64BIT_WAKE_SUPPORTED_F) != 0) &&
+        ((Facs->Flags & EFI_ACPI_4_0_OSPM_64BIT_WAKE__F) != 0)) {
+      // Both BIOS and OS wants 64bit vector
+      if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
+        return TRUE;
+      }
+    }
+  }
+  return FALSE;
+}
+
+/**
   Jump to OS waking vector.
   The function will install boot script done PPI, report S3 resume status code, and then jump to OS waking vector.
 
@@ -483,10 +518,12 @@ S3ResumeBootOs (
   If BootScriptExector driver will not run in 64-bit mode, this function will do nothing. 
 
   @param S3NvsPageTableAddress   PageTableAddress in ACPINvs
+  @param Build4GPageTableOnly    If BIOS just build 4G page table only
 **/
 VOID
 RestoreS3PageTables (
-  IN UINTN                                         S3NvsPageTableAddress
+  IN UINTN                                         S3NvsPageTableAddress,
+  IN BOOLEAN                                       Build4GPageTableOnly
   )
 {
   if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
@@ -513,7 +550,7 @@ RestoreS3PageTables (
     //
     // The assumption is : whole page table is allocated in CONTINOUS memory and CR3 points to TOP page.
     //
-    DEBUG ((EFI_D_ERROR, "S3NvsPageTableAddress - %x\n", S3NvsPageTableAddress));
+    DEBUG ((EFI_D_ERROR, "S3NvsPageTableAddress - %x (%x)\n", (UINTN)S3NvsPageTableAddress, (UINTN)Build4GPageTableOnly));
 
     //
     // By architecture only one PageMapLevel4 exists - so lets allocate storgage for it.
@@ -556,6 +593,14 @@ RestoreS3PageTables (
       PhysicalAddressBits = 48;
     }
 
+    //
+    // NOTE: In order to save time to create full page table, we just create 4G page table by default.
+    // And let PF handler in BootScript driver to create more on request.
+    //
+    if (Build4GPageTableOnly) {
+      PhysicalAddressBits = 32;
+      ZeroMem (PageMap, EFI_PAGES_TO_SIZE(2));
+    }
     //
     // Calculate the table entries needed.
     //
@@ -827,6 +872,7 @@ S3RestoreConfig2 (
   EFI_SMRAM_DESCRIPTOR                          *SmramDescriptor;
   SMM_S3_RESUME_STATE                           *SmmS3ResumeState;
   VOID                                          *GuidHob;
+  BOOLEAN                                       Build4GPageTableOnly;
 
   DEBUG ((EFI_D_ERROR, "Enter S3 PEIM\r\n"));
 
@@ -888,7 +934,12 @@ S3RestoreConfig2 (
     //
     // Need reconstruct page table here, since we do not trust ACPINvs.
     //
-    RestoreS3PageTables ((UINTN)AcpiS3Context->S3NvsPageTableAddress);
+    if (IsLongModeWakingVector (AcpiS3Context)) {
+      Build4GPageTableOnly = FALSE;
+    } else {
+      Build4GPageTableOnly = TRUE;
+    }
+    RestoreS3PageTables ((UINTN)AcpiS3Context->S3NvsPageTableAddress, Build4GPageTableOnly);
   }
 
   //

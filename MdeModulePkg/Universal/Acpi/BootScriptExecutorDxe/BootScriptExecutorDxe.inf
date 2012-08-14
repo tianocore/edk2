@@ -78,6 +78,9 @@
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
 
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable
+
 [Depex]
   gEfiLockBoxProtocolGuid
 

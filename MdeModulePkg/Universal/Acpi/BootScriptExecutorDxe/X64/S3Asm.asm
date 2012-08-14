@@ -2,7 +2,7 @@
 ;   This is the assembly code for transferring to control to OS S3 waking vector
 ;   for X64 platform
 ;
-; Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 ;
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
@@ -13,6 +13,9 @@
 ; WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ;
 ;;
+
+EXTERN mOriginalHandler:QWORD
+EXTERN PageFaultHandler:PROC
 
     .code
     
@@ -80,5 +83,53 @@ AsmTransferControl16  PROC
     DB    0eah              ; jmp far AsmJmpAddr32
 AsmJmpAddr32 DD  ?
 AsmTransferControl16  ENDP
+
+PageFaultHandlerHook PROC
+    push    rax                         ; save all volatile registers
+    push    rcx
+    push    rdx
+    push    r8
+    push    r9
+    push    r10
+    push    r11
+    ; save volatile fp registers
+    add     rsp, -68h
+    stmxcsr [rsp + 60h]
+    movdqa  [rsp + 0h], xmm0
+    movdqa  [rsp + 10h], xmm1
+    movdqa  [rsp + 20h], xmm2
+    movdqa  [rsp + 30h], xmm3
+    movdqa  [rsp + 40h], xmm4
+    movdqa  [rsp + 50h], xmm5
+
+    add     rsp, -20h
+    call    PageFaultHandler
+    add     rsp, 20h
+    
+    ; load volatile fp registers
+    ldmxcsr [rsp + 60h]
+    movdqa  xmm0,  [rsp + 0h]
+    movdqa  xmm1,  [rsp + 10h]
+    movdqa  xmm2,  [rsp + 20h]
+    movdqa  xmm3,  [rsp + 30h]
+    movdqa  xmm4,  [rsp + 40h]
+    movdqa  xmm5,  [rsp + 50h]
+    add     rsp, 68h
+
+    test    al, al
+    
+    pop     r11
+    pop     r10
+    pop     r9
+    pop     r8
+    pop     rdx
+    pop     rcx
+    pop     rax                         ; restore all volatile registers
+    jnz     @F
+    jmp     mOriginalHandler
+@@:
+    add     rsp, 08h                    ; skip error code for PF
+    iretq
+PageFaultHandlerHook ENDP
 
     END
