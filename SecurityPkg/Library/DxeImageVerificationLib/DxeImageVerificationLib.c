@@ -783,60 +783,6 @@ AddImageExeInfo (
 }
 
 /**
-  Discover if the UEFI image is authorized by user's policy setting.
-
-  @param[in]    Policy            Specify platform's policy setting.
-
-  @retval EFI_ACCESS_DENIED       Image is not allowed to run.
-  @retval EFI_SECURITY_VIOLATION  Image is deferred.
-  @retval EFI_SUCCESS             Image is authorized to run.
-
-**/
-EFI_STATUS
-ImageAuthorization (
-  IN UINT32     Policy
-  )
-{
-  EFI_STATUS    Status;
-  EFI_INPUT_KEY Key;
-
-  Status = EFI_ACCESS_DENIED;
-
-  switch (Policy) {
-
-  case QUERY_USER_ON_SECURITY_VIOLATION:
-    do {
-      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, mNotifyString1, mNotifyString2, NULL);
-      if (Key.UnicodeChar == L'Y' || Key.UnicodeChar == L'y') {
-        Status = EFI_SUCCESS;
-        break;
-      } else if (Key.UnicodeChar == L'N' || Key.UnicodeChar == L'n') {
-        Status = EFI_ACCESS_DENIED;
-        break;
-      } else if (Key.UnicodeChar == L'D' || Key.UnicodeChar == L'd') {
-        Status = EFI_SECURITY_VIOLATION;
-        break;
-      }
-    } while (TRUE);
-    break;
-
-  case ALLOW_EXECUTE_ON_SECURITY_VIOLATION:
-    Status = EFI_SUCCESS;
-    break;
-
-  case DEFER_EXECUTE_ON_SECURITY_VIOLATION:
-    Status = EFI_SECURITY_VIOLATION;
-    break;
-
-  case DENY_EXECUTE_ON_SECURITY_VIOLATION:
-    Status = EFI_ACCESS_DENIED;
-    break;
-  }
-
-  return Status;
-}
-
-/**
   Check whether signature is in specified database.
 
   @param[in]  VariableName        Name of database variable that is searched in.
@@ -1040,149 +986,9 @@ VerifyCertPkcsSignedData (
   }
 
   //
-  // 2: Find certificate from KEK database and try to verify authenticode struct.
-  //
-  if (IsPkcsSignedDataVerifiedBySignatureList (EFI_KEY_EXCHANGE_KEY_NAME, &gEfiGlobalVariableGuid)) {
-    return EFI_SUCCESS;
-  }
-
-  //
-  // 3: Find certificate from DB database and try to verify authenticode struct.
+  // 2: Find certificate from DB database and try to verify authenticode struct.
   //
   if (IsPkcsSignedDataVerifiedBySignatureList (EFI_IMAGE_SECURITY_DATABASE, &gEfiImageSecurityDatabaseGuid)) {
-    return EFI_SUCCESS;
-  } else {
-    return EFI_SECURITY_VIOLATION;
-  }
-}
-
-/**
-  Verify certificate in WIN_CERTIFICATE_UEFI_GUID format.
-
-  @retval EFI_SUCCESS                 Image pass verification.
-  @retval EFI_SECURITY_VIOLATION      Image fail verification.
-  @retval other error value
-
-**/
-EFI_STATUS
-VerifyCertUefiGuid (
-  VOID
-  )
-{
-  BOOLEAN                         Status;
-  WIN_CERTIFICATE_UEFI_GUID       *EfiCert;
-  EFI_SIGNATURE_LIST              *KekList;
-  EFI_SIGNATURE_DATA              *KekItem;
-  EFI_CERT_BLOCK_RSA_2048_SHA256  *CertBlock;
-  VOID                            *Rsa;
-  UINTN                           KekCount;
-  UINTN                           Index;
-  UINTN                           KekDataSize;
-  BOOLEAN                         IsFound;
-  EFI_STATUS                      Result;
-
-  EfiCert   = NULL;
-  KekList   = NULL;
-  KekItem   = NULL;
-  CertBlock = NULL;
-  Rsa       = NULL;
-  Status    = FALSE;
-  IsFound   = FALSE;
-  KekDataSize = 0;
-
-  EfiCert   = (WIN_CERTIFICATE_UEFI_GUID *) (mImageBase + mSecDataDir->VirtualAddress);
-  CertBlock = (EFI_CERT_BLOCK_RSA_2048_SHA256 *) EfiCert->CertData;
-  if (!CompareGuid (&EfiCert->CertType, &gEfiCertTypeRsa2048Sha256Guid)) {
-    //
-    // Invalid Certificate Data Type.
-    //
-    return EFI_SECURITY_VIOLATION;
-  }
-
-  //
-  // Get KEK database variable data size
-  //
-  Result = gRT->GetVariable (EFI_KEY_EXCHANGE_KEY_NAME, &gEfiGlobalVariableGuid, NULL, &KekDataSize, NULL);
-  if (Result != EFI_BUFFER_TOO_SMALL) {
-    return EFI_SECURITY_VIOLATION;
-  }
-
-  //
-  // Get KEK database variable.
-  //
-  GetEfiGlobalVariable2 (EFI_KEY_EXCHANGE_KEY_NAME, (VOID**)&KekList, NULL);
-  if (KekList == NULL) {
-    return EFI_SECURITY_VIOLATION;
-  }
-
-  //
-  // Enumerate all Kek items in this list to verify the variable certificate data.
-  // If anyone is authenticated successfully, it means the variable is correct!
-  //
-  while ((KekDataSize > 0) && (KekDataSize >= KekList->SignatureListSize)) {
-    if (CompareGuid (&KekList->SignatureType, &gEfiCertRsa2048Guid)) {
-      KekItem   = (EFI_SIGNATURE_DATA *) ((UINT8 *) KekList + sizeof (EFI_SIGNATURE_LIST) + KekList->SignatureHeaderSize);
-      KekCount  = (KekList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - KekList->SignatureHeaderSize) / KekList->SignatureSize;
-      for (Index = 0; Index < KekCount; Index++) {
-        if (CompareMem (KekItem->SignatureData, CertBlock->PublicKey, EFI_CERT_TYPE_RSA2048_SIZE) == 0) {
-          IsFound = TRUE;
-          break;
-        }
-        KekItem = (EFI_SIGNATURE_DATA *) ((UINT8 *) KekItem + KekList->SignatureSize);
-      }
-    }
-    KekDataSize -= KekList->SignatureListSize;
-    KekList = (EFI_SIGNATURE_LIST *) ((UINT8 *) KekList + KekList->SignatureListSize);
-  }
-
-  if (!IsFound) {
-    //
-    // Signed key is not a trust one.
-    //
-    goto Done;
-  }
-
-  //
-  // Now, we found the corresponding security policy.
-  // Verify the data payload.
-  //
-  Rsa = RsaNew ();
-  if (Rsa == NULL) {
-    Status = FALSE;
-    goto Done;
-  }
-
-  //
-  // Set RSA Key Components.
-  // NOTE: Only N and E are needed to be set as RSA public key for signature verification.
-  //
-  Status = RsaSetKey (Rsa, RsaKeyN, CertBlock->PublicKey, EFI_CERT_TYPE_RSA2048_SIZE);
-  if (!Status) {
-    goto Done;
-  }
-  Status = RsaSetKey (Rsa, RsaKeyE, mRsaE, sizeof (mRsaE));
-  if (!Status) {
-    goto Done;
-  }
-  //
-  // Verify the signature.
-  //
-  Status = RsaPkcs1Verify (
-             Rsa,
-             mImageDigest,
-             mImageDigestSize,
-             CertBlock->Signature,
-             EFI_CERT_TYPE_RSA2048_SHA256_SIZE
-             );
-
-Done:
-  if (KekList != NULL) {
-    FreePool (KekList);
-  }
-  if (Rsa != NULL ) {
-    RsaFree (Rsa);
-  }
-  if (Status) {
     return EFI_SUCCESS;
   } else {
     return EFI_SECURITY_VIOLATION;
@@ -1198,22 +1004,24 @@ Done:
   Executables from FV is bypass, so pass in AuthenticationStatus is ignored.
 
   The image verification process is:
-    Is the Image signed?
-      If yes,
-        Does the image verify against a certificate (root or intermediate) in the allowed db?
-          Run it
-        Image verification fail
-          Is the Image's Hash not in forbidden database and the Image's Hash in allowed db?
-            Run it
-      If no,
-        Is the Image's Hash in the forbidden database (DBX)?
-          if yes,
-            Error out
-        Is the Image's Hash in the allowed database (DB)?
-          If yes,
-            Run it
-          If no,
-            Error out
+    If the image is signed,
+      If the image's certificate verifies against a certificate (root or intermediate) in the allowed 
+      database (DB) and not in the forbidden database (DBX), the certificate verification is passed.
+        If the image's hash digest is in DBX,
+          deny execution.
+        If not,
+          run it.
+      If the Image's certificate verification failed.
+        If the Image's Hash is in DB and not in DBX,
+          run it.
+        Otherwise,
+          deny execution.
+    Otherwise, the image is not signed,
+      Is the Image's Hash in DBX?
+        If yes, deny execution.
+        If not, is the Image's Hash in DB?
+          If yes, run it.
+          If not, deny execution.
 
   Caution: This function may receive untrusted input.
   PE/COFF image is external input, so this function will validate its data structure
@@ -1445,25 +1253,7 @@ DxeImageVerificationHandler (
     goto Done;
   }
 
-  switch (WinCertificate->wCertificateType) {
-
-  case WIN_CERT_TYPE_EFI_GUID:
-    CertSize = sizeof (WIN_CERTIFICATE_UEFI_GUID) + sizeof (EFI_CERT_BLOCK_RSA_2048_SHA256) - sizeof (UINT8);
-    if (WinCertificate->dwLength < CertSize) {
-      goto Done;
-    }
-
-    //
-    // Verify UEFI GUID type.
-    //
-    if (!HashPeImage (HASHALG_SHA256)) {
-      goto Done;
-    }
-
-    VerifyStatus = VerifyCertUefiGuid ();
-    break;
-
-  case WIN_CERT_TYPE_PKCS_SIGNED_DATA:
+  if (WinCertificate->wCertificateType == WIN_CERT_TYPE_PKCS_SIGNED_DATA) {
     //
     // Verify Pkcs signed data type.
     //
@@ -1471,42 +1261,31 @@ DxeImageVerificationHandler (
     if (EFI_ERROR (Status)) {
       goto Done;
     }
-
+    
     VerifyStatus = VerifyCertPkcsSignedData ();
+  } else {
+    goto Done;
+  }
 
+  if (!EFI_ERROR (VerifyStatus)) {
     //
-    // For image verification against enrolled certificate(root or intermediate),
-    // no need to check image's hash in the allowed database.
+    // Verification is passed.
+    // Continue to check the image digest in signature database.
     //
-    if (!EFI_ERROR (VerifyStatus)) {
-      if (!IsSignatureFoundInDatabase (EFI_IMAGE_SECURITY_DATABASE1, mImageDigest, &mCertType, mImageDigestSize)) {
-        return EFI_SUCCESS;
-      }
+    if (IsSignatureFoundInDatabase (EFI_IMAGE_SECURITY_DATABASE1, mImageDigest, &mCertType, mImageDigestSize)) {
+      //
+      // Executable signature verification passes, but is found in forbidden signature database.
+      //
+      Action = EFI_IMAGE_EXECUTION_AUTH_SIG_FOUND;
+      Status = EFI_ACCESS_DENIED;
+    } else {
+      //
+      // For image verification against enrolled X.509 certificate(root or intermediate),
+      // no need to check image's hash in the allowed database.
+      //
+      return EFI_SUCCESS;
     }
-    break;
-
-  default:
-    goto Done;
-  }
-  //
-  // Get image hash value as executable's signature.
-  //
-  SignatureListSize = sizeof (EFI_SIGNATURE_LIST) + sizeof (EFI_SIGNATURE_DATA) - 1 + mImageDigestSize;
-  SignatureList     = (EFI_SIGNATURE_LIST *) AllocateZeroPool (SignatureListSize);
-  if (SignatureList == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto Done;
-  }
-  SignatureList->SignatureHeaderSize  = 0;
-  SignatureList->SignatureListSize    = (UINT32) SignatureListSize;
-  SignatureList->SignatureSize        = (UINT32) mImageDigestSize;
-  CopyMem (&SignatureList->SignatureType, &mCertType, sizeof (EFI_GUID));
-  Signature = (EFI_SIGNATURE_DATA *) ((UINT8 *) SignatureList + sizeof (EFI_SIGNATURE_LIST));
-  CopyMem (Signature->SignatureData, mImageDigest, mImageDigestSize);
-  //
-  // Signature database check after verification.
-  //
-  if (EFI_ERROR (VerifyStatus)) {
+  } else {
     //
     // Verification failure.
     //
@@ -1521,24 +1300,24 @@ DxeImageVerificationHandler (
       Action = EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED;
       Status = EFI_ACCESS_DENIED;
     }
-  } else if (IsSignatureFoundInDatabase (EFI_IMAGE_SECURITY_DATABASE1, Signature->SignatureData, &mCertType, mImageDigestSize)) {
+  }
+
+  if (EFI_ERROR (Status)) {
     //
-    // Executable signature verification passes, but is found in forbidden signature database.
+    // Get image hash value as executable's signature.
     //
-    Action = EFI_IMAGE_EXECUTION_AUTH_SIG_FOUND;
-    Status = EFI_ACCESS_DENIED;
-  } else if (IsSignatureFoundInDatabase (EFI_IMAGE_SECURITY_DATABASE, Signature->SignatureData, &mCertType, mImageDigestSize)) {
-    //
-    // Executable signature is found in authorized signature database.
-    //
-    Status = EFI_SUCCESS;
-  } else {
-    //
-    // Executable signature verification passes, but cannot be found in authorized signature database.
-    // Get platform policy to determine the action.
-    //
-    Action = EFI_IMAGE_EXECUTION_AUTH_SIG_PASSED;
-    Status = ImageAuthorization (Policy);
+    SignatureListSize = sizeof (EFI_SIGNATURE_LIST) + sizeof (EFI_SIGNATURE_DATA) - 1 + mImageDigestSize;
+    SignatureList     = (EFI_SIGNATURE_LIST *) AllocateZeroPool (SignatureListSize);
+    if (SignatureList == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Done;
+    }
+    SignatureList->SignatureHeaderSize  = 0;
+    SignatureList->SignatureListSize    = (UINT32) SignatureListSize;
+    SignatureList->SignatureSize        = (UINT32) mImageDigestSize;
+    CopyMem (&SignatureList->SignatureType, &mCertType, sizeof (EFI_GUID));
+    Signature = (EFI_SIGNATURE_DATA *) ((UINT8 *) SignatureList + sizeof (EFI_SIGNATURE_LIST));
+    CopyMem (Signature->SignatureData, mImageDigest, mImageDigestSize);
   }
 
 Done:
