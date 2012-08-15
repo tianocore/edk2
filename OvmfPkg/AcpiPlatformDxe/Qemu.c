@@ -100,8 +100,8 @@ QemuInstallAcpiMadtTable (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Madt->Header           = *(EFI_ACPI_DESCRIPTION_HEADER *) AcpiTableBuffer;
-  Madt->Header.Length    = NewBufferSize;
+  CopyMem (&(Madt->Header), AcpiTableBuffer, sizeof (EFI_ACPI_DESCRIPTION_HEADER));
+  Madt->Header.Length    = (UINT32) NewBufferSize;
   Madt->LocalApicAddress = PcdGet32 (PcdCpuLocalApicBaseAddress);
   Madt->Flags            = EFI_ACPI_1_0_PCAT_COMPAT;
   Ptr = Madt + 1;
@@ -110,8 +110,8 @@ QemuInstallAcpiMadtTable (
   for (Loop = 0; Loop < CpuCount; ++Loop) {
     LocalApic->Type            = EFI_ACPI_1_0_PROCESSOR_LOCAL_APIC;
     LocalApic->Length          = sizeof (*LocalApic);
-    LocalApic->AcpiProcessorId = Loop;
-    LocalApic->ApicId          = Loop;
+    LocalApic->AcpiProcessorId = (UINT8) Loop;
+    LocalApic->ApicId          = (UINT8) Loop;
     LocalApic->Flags           = 1; // enabled
     ++LocalApic;
   }
@@ -120,7 +120,7 @@ QemuInstallAcpiMadtTable (
   IoApic = Ptr;
   IoApic->Type             = EFI_ACPI_1_0_IO_APIC;
   IoApic->Length           = sizeof (*IoApic);
-  IoApic->IoApicId         = CpuCount;
+  IoApic->IoApicId         = (UINT8) CpuCount;
   IoApic->Reserved         = EFI_ACPI_RESERVED_BYTE;
   IoApic->IoApicAddress    = 0xFEC00000;
   IoApic->SystemVectorBase = 0x00000000;
@@ -148,13 +148,13 @@ QemuInstallAcpiMadtTable (
     Iso->Type                        = EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE;
     Iso->Length                      = sizeof (*Iso);
     Iso->Bus                         = 0x00; // ISA
-    Iso->Source                      = Loop;
-    Iso->GlobalSystemInterruptVector = Loop;
+    Iso->Source                      = (UINT8) Loop;
+    Iso->GlobalSystemInterruptVector = (UINT32) Loop;
     Iso->Flags                       = 0x000D; // Level-tiggered, Active High
     ++Iso;
   }
   ASSERT (
-    Iso - (EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE *)Ptr ==
+    (UINTN) (Iso - (EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE *)Ptr) ==
       1 + PciLinkIsoCount
     );
   Ptr = Iso;
@@ -174,7 +174,7 @@ QemuInstallAcpiMadtTable (
   LocalApicNmi->LocalApicInti   = 0x01;
   Ptr = LocalApicNmi + 1;
 
-  ASSERT ((UINT8 *)Ptr - (UINT8 *)Madt == NewBufferSize);
+  ASSERT ((UINTN) ((UINT8 *)Ptr - (UINT8 *)Madt) == NewBufferSize);
   Status = InstallAcpiTable (AcpiProtocol, Madt, NewBufferSize, TableKey);
 
   FreePool (Madt);
