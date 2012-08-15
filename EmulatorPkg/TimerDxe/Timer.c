@@ -5,7 +5,7 @@
   timer service.  In the future, the Thread creation should possibly be
   abstracted by the CPU architectural protocol
 
-Copyright (c) 2004, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2010 - 2011, Apple Inc. All rights reserved.
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -74,7 +74,7 @@ TimerCallback (UINT64 DeltaMs)
     // registered. Assume all other handlers are legal.
     //
     if (CallbackFunction != NULL) {
-      CallbackFunction ((UINT64) (DeltaMs * 10000));
+      CallbackFunction (MultU64x32 (DeltaMs, 10000));
     }
   }
 
@@ -246,7 +246,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  *TimerPeriod = mTimerPeriodMs * 10000;
+  *TimerPeriod = MultU64x32 (mTimerPeriodMs, 10000);
 
   return EFI_SUCCESS;
 }

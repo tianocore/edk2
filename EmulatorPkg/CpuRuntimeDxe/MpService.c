@@ -28,7 +28,7 @@
   APs to help test system memory in parallel with other device initialization.
   Diagnostics applications may also use this protocol for multi-processor.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 Portitions Copyright (c) 2011, Apple Inc. All rights reserved.
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
@@ -1158,7 +1158,7 @@ FillInProcessorInformation (
     gMPSystem.ProcessorData[ProcessorNumber].Info.StatusFlag |= PROCESSOR_AS_BSP_BIT;
   }
 
-  gMPSystem.ProcessorData[ProcessorNumber].Info.Location.Package = ProcessorNumber;
+  gMPSystem.ProcessorData[ProcessorNumber].Info.Location.Package = (UINT32) ProcessorNumber;
   gMPSystem.ProcessorData[ProcessorNumber].Info.Location.Core    = 0;
   gMPSystem.ProcessorData[ProcessorNumber].Info.Location.Thread  = 0;
   gMPSystem.ProcessorData[ProcessorNumber].State = BSP ? CPU_STATE_BUSY : CPU_STATE_IDLE;
@@ -1332,7 +1332,7 @@ CpuMpServicesInit (
     return EFI_SUCCESS;
   }
 
-  gPollInterval = PcdGet64 (PcdEmuMpServicesPollingInterval);
+  gPollInterval = (UINTN) PcdGet64 (PcdEmuMpServicesPollingInterval);
 
   Status  = InitializeMpSystemData (*MaxCpus);
   if (EFI_ERROR (Status)) {

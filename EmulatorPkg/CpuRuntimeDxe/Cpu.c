@@ -1,7 +1,7 @@
 /*++ @file
   Emu driver to produce CPU Architectural Protocol.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2011 - 2012, Apple Inc. All rights reserved.
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -241,9 +241,9 @@ CpuUpdateSmbios (
   IN UINTN  MaxCpus
   )
 {
-  mCpuSmbiosType4.CoreCount        = MaxCpus;
-  mCpuSmbiosType4.EnabledCoreCount = MaxCpus;
-  mCpuSmbiosType4.ThreadCount      = MaxCpus;
+  mCpuSmbiosType4.CoreCount        = (UINT8) MaxCpus;
+  mCpuSmbiosType4.EnabledCoreCount = (UINT8) MaxCpus;
+  mCpuSmbiosType4.ThreadCount      = (UINT8) MaxCpus;
 
   LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mCpuSmbiosType4, mCpuSmbiosType4Strings);
 }

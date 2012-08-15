@@ -4,7 +4,7 @@
 
 
 Copyright (c) 2012, Apple Inc. All rights reserved.
-Portitions Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Portitions Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -50,10 +50,12 @@ SmbiosLibInitializeFromTemplate (
     return EFI_INVALID_PARAMETER;
   }
 
+  Status = EFI_SUCCESS;
+
   for (Index = 0; Template[Index].Entry != NULL; Index++) {
     Status = SmbiosLibCreateEntry (Template[Index].Entry, Template[Index].StringArray);
   }
-  
+
   return Status;
 }
 

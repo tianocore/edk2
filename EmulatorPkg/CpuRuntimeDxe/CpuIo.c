@@ -6,7 +6,7 @@
   Bridge I/O Protocol.
 
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2011, Apple Inc. All rights reserved.
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -315,7 +315,7 @@ CpuIoCheckAddressRange (
   }
 
   Width = Width & 0x03;
-  if (Address - 1 + (1 << Width) * Count > Limit) {
+  if ((Address - 1 + LShiftU64 (Count, Width)) > Limit) {
     return EFI_UNSUPPORTED;
   }
 
