@@ -50,14 +50,25 @@ SetIdtEntry (
   // Restore IDT for debug
   //
   IdtDescriptor = (IA32_DESCRIPTOR *) (UINTN) (AcpiS3Context->IdtrProfile);
-  IdtEntry = (INTERRUPT_GATE_DESCRIPTOR *)(IdtDescriptor->Base + (3 * sizeof (INTERRUPT_GATE_DESCRIPTOR)));
-  S3DebugBuffer = (UINTN) (AcpiS3Context->S3DebugBufferAddress);
-
-  IdtEntry->OffsetLow       = (UINT16)S3DebugBuffer;
-  IdtEntry->SegmentSelector = (UINT16)AsmReadCs ();
-  IdtEntry->Attributes      = (UINT16)INTERRUPT_GATE_ATTRIBUTE;
-  IdtEntry->OffsetHigh      = (UINT16)(S3DebugBuffer >> 16);
-
   AsmWriteIdtr (IdtDescriptor);
+
+  //
+  // Setup the default CPU exception handlers
+  //
+  SetupCpuExceptionHandlers ();
+
+  DEBUG_CODE (
+    //
+    // Update IDT entry INT3 if the instruction is valid in it
+    //
+    S3DebugBuffer = (UINTN) (AcpiS3Context->S3DebugBufferAddress);
+    if (*(UINTN *)S3DebugBuffer != (UINTN) -1) {
+      IdtEntry = (INTERRUPT_GATE_DESCRIPTOR *)(IdtDescriptor->Base + (3 * sizeof (INTERRUPT_GATE_DESCRIPTOR)));
+      IdtEntry->OffsetLow       = (UINT16)S3DebugBuffer;
+      IdtEntry->SegmentSelector = (UINT16)AsmReadCs ();;
+      IdtEntry->Attributes      = (UINT16)INTERRUPT_GATE_ATTRIBUTE;
+      IdtEntry->OffsetHigh      = (UINT16)(S3DebugBuffer >> 16);
+    }
+  );
 }
 

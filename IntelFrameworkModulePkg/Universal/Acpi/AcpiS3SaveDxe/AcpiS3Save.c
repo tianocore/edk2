@@ -2,7 +2,7 @@
   This is an implementation of the ACPI S3 Save protocol.  This is defined in
   S3 boot path specification 0.9.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -453,9 +453,10 @@ S3Ready (
   ASSERT (AcpiS3Context->BootScriptStackBase != 0);
 
   //
-  // Allocate a code buffer < 4G for S3 debug to load external code
+  // Allocate a code buffer < 4G for S3 debug to load external code, set invalid code instructions in it.
   //
   AcpiS3Context->S3DebugBufferAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateAcpiNvsMemoryBelow4G (EFI_PAGE_SIZE);
+  SetMem ((VOID *)(UINTN)AcpiS3Context->S3DebugBufferAddress, EFI_PAGE_SIZE, 0xff);
 
   DEBUG((EFI_D_INFO, "AcpiS3Context: AcpiFacsTable is 0x%8x\n", AcpiS3Context->AcpiFacsTable));
   DEBUG((EFI_D_INFO, "AcpiS3Context: IdtrProfile is 0x%8x\n", AcpiS3Context->IdtrProfile));

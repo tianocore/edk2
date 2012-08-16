@@ -126,23 +126,24 @@ SetIdtEntry (
   //
   SetupCpuExceptionHandlers ();
 
-  //
-  // Update IDT entry INT3
-  //
-  IdtEntry = (INTERRUPT_GATE_DESCRIPTOR *)(IdtDescriptor->Base + (3 * sizeof (INTERRUPT_GATE_DESCRIPTOR)));
-  S3DebugBuffer = (UINTN) (AcpiS3Context->S3DebugBufferAddress);
-
-  IdtEntry->Offset15To0     = (UINT16)S3DebugBuffer;
-  IdtEntry->SegmentSelector = (UINT16)AsmReadCs ();
-  IdtEntry->Attributes      = (UINT16)INTERRUPT_GATE_ATTRIBUTE;
-  IdtEntry->Offset31To16    = (UINT16)(S3DebugBuffer >> 16);
-  IdtEntry->Offset63To32    = (UINT32)(S3DebugBuffer >> 32);
-  IdtEntry->Reserved        = 0;
+  DEBUG_CODE (
+    //
+    // Update IDT entry INT3 if the instruction is valid in it
+    //
+    S3DebugBuffer = (UINTN) (AcpiS3Context->S3DebugBufferAddress);
+    if (*(UINTN *)S3DebugBuffer != (UINTN) -1) {
+      IdtEntry = (INTERRUPT_GATE_DESCRIPTOR *)(IdtDescriptor->Base + (3 * sizeof (INTERRUPT_GATE_DESCRIPTOR)));
+      IdtEntry->Offset15To0     = (UINT16)S3DebugBuffer;
+      IdtEntry->SegmentSelector = (UINT16)AsmReadCs ();
+      IdtEntry->Attributes      = (UINT16)INTERRUPT_GATE_ATTRIBUTE;
+      IdtEntry->Offset31To16    = (UINT16)(S3DebugBuffer >> 16);
+      IdtEntry->Offset63To32    = (UINT32)(S3DebugBuffer >> 32);
+      IdtEntry->Reserved        = 0;
+    }
+  );
 
   IdtEntry = (INTERRUPT_GATE_DESCRIPTOR *)(IdtDescriptor->Base + (14 * sizeof (INTERRUPT_GATE_DESCRIPTOR)));
   HookPageFaultHandler (IdtEntry);
-
-  AsmWriteIdtr (IdtDescriptor);
 }
 
 /**
