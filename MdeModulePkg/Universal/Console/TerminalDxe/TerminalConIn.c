@@ -368,7 +368,7 @@ TerminalConInRegisterKeyNotify (
 
   NewNotify->Signature         = TERMINAL_CONSOLE_IN_EX_NOTIFY_SIGNATURE;
   NewNotify->KeyNotificationFn = KeyNotificationFunction;
-  CopyMem (&NewNotify->KeyData, KeyData, sizeof (KeyData));
+  CopyMem (&NewNotify->KeyData, KeyData, sizeof (EFI_KEY_DATA));
   InsertTailList (&TerminalDevice->NotifyList, &NewNotify->NotifyEntry);
 
   *NotifyHandle                = NewNotify;
