@@ -43,12 +43,22 @@ BOOLEAN                            mPage1GSupport;
 VOID                               *mOriginalHandler;
 UINTN                              mS3NvsPageTableAddress;
 
+/**
+  Page fault handler.
+
+**/
 VOID
 EFIAPI
 PageFaultHandlerHook (
   VOID
   );
 
+/**
+  Hook IDT with our page fault handler so that the on-demand paging works on page fault.
+
+  @param  IdtEntry  a pointer to IDT entry
+
+**/
 VOID
 HookPageFaultHandler (
   IN INTERRUPT_GATE_DESCRIPTOR                     *IdtEntry
@@ -135,6 +145,13 @@ SetIdtEntry (
   AsmWriteIdtr (IdtDescriptor);
 }
 
+/**
+  Get new page address.
+
+  @param  PageNum  new page number needed
+
+  @return new page address
+**/
 UINTN
 GetNewPage (
   IN UINTN  PageNum
@@ -147,6 +164,13 @@ GetNewPage (
   return NewPage;
 }
 
+/**
+  The page fault handler that on-demand read >4G memory/MMIO.
+  
+  @retval TRUE     The page fault is correctly handled.
+  @retval FALSE    The page fault is not handled and is passed through to original handler.
+
+**/
 BOOLEAN
 EFIAPI
 PageFaultHandler (
