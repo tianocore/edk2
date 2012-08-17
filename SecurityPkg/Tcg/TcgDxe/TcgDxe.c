@@ -1,6 +1,13 @@
 /** @file  
   This module implements TCG EFI Protocol.
-  
+ 
+Caution: This module requires additional review when modified.
+This driver will have external input - TcgDxePassThroughToTpm
+This external input must be validated carefully to avoid security issue like
+buffer overflow, integer overflow.
+
+TcgDxePassThroughToTpm() will receive untrusted input and do basic validation.
+
 Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
@@ -383,6 +390,13 @@ TcgDxePassThroughToTpm (
   )
 {
   TCG_DXE_DATA                      *TcgData;
+
+  if (TpmInputParameterBlock == NULL || 
+      TpmOutputParameterBlock == NULL || 
+      TpmInputParameterBlockSize == 0 ||
+      TpmOutputParameterBlockSize == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   TcgData = TCG_DXE_DATA_FROM_THIS (This);
 

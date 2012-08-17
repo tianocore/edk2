@@ -233,6 +233,13 @@ TisPcSendV (
       return EFI_INVALID_PARAMETER;
   }
 
+  //
+  // Check input to avoid overflow.
+  //
+  if ((UINT32) (~0)- *DataLength < (UINT32)Size) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   if(*DataLength + (UINT32) Size > TPMCMDBUFLENGTH) {
     return EFI_BUFFER_TOO_SMALL;
   }
@@ -291,9 +298,16 @@ TisPcReceiveV (
 
     case 'r':
       Size = VA_ARG (*ap, UINTN);
-      if(*DataIndex + (UINT32) Size <= RespSize) {
-        break;
+      //
+      // If overflowed, which means Size is big enough for Response data. 
+      // skip this check. Copy the whole data 
+      //
+      if ((UINT32) (~0)- *DataIndex >= (UINT32)Size) {
+        if(*DataIndex + (UINT32) Size <= RespSize) {
+          break;
+        }
       }
+
       *DataFinished = TRUE;
       if (*DataIndex >= RespSize) {
         return EFI_SUCCESS;
