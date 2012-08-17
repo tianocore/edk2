@@ -620,6 +620,18 @@ ConSplitterTextInConstructor (
                   ConInPrivate,
                   &ConInPrivate->SimplePointer.WaitForInput
                   );
+  ASSERT_EFI_ERROR (Status);
+  //
+  // Create Event to signal ConIn connection request
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  ConSplitterEmptyCallbackFunction,
+                  NULL,
+                  &gConnectConInEventGuid,
+                  &ConInPrivate->ConnectConIn
+                  );
 
   return Status;
 }
@@ -3310,245 +3322,6 @@ ConSplitterTextInPrivateReadKeyStroke (
   return EFI_NOT_READY;
 }
 
-/**
-  Connect the specific Usb device which match the short form device path,
-  and whose bus is determined by Host Controller.
-
-  @param  DevicePath             A short-form device path that starts with the first
-                                 element being a USB WWID or a USB Class device
-                                 path
-
-  @return EFI_INVALID_PARAMETER  DevicePath is NULL pointer.
-                                 DevicePath is not a USB device path.
-
-  @return EFI_SUCCESS            Success to connect USB device
-  @return EFI_NOT_FOUND          Fail to find handle for USB controller to connect.
-
-**/
-EFI_STATUS
-EFIAPI
-ConSplitterConnectUsbShortFormDevicePath (
-  IN EFI_DEVICE_PATH_PROTOCOL   *DevicePath
-  )
-{
-  EFI_STATUS                            Status;
-  EFI_HANDLE                            *Handles;
-  UINTN                                 HandleCount;
-  UINTN                                 Index;
-  EFI_PCI_IO_PROTOCOL                   *PciIo;
-  UINT8                                 Class[3];
-  BOOLEAN                               AtLeastOneConnected;
-
-  //
-  // Check the passed in parameters
-  //
-  if (DevicePath == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if ((DevicePathType (DevicePath) != MESSAGING_DEVICE_PATH) ||
-      ((DevicePathSubType (DevicePath) != MSG_USB_CLASS_DP) && (DevicePathSubType (DevicePath) != MSG_USB_WWID_DP))
-     ) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Find the usb host controller firstly, then connect with the remaining device path
-  //
-  AtLeastOneConnected = FALSE;
-  Status = gBS->LocateHandleBuffer (
-                  ByProtocol,
-                  &gEfiPciIoProtocolGuid,
-                  NULL,
-                  &HandleCount,
-                  &Handles
-                  );
-  for (Index = 0; Index < HandleCount; Index++) {
-    Status = gBS->HandleProtocol (
-                    Handles[Index],
-                    &gEfiPciIoProtocolGuid,
-                    (VOID **) &PciIo
-                    );
-    if (!EFI_ERROR (Status)) {
-      //
-      // Check whether the Pci device is the wanted usb host controller
-      //
-      Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, 0x09, 3, &Class);
-      if (!EFI_ERROR (Status) &&
-          ((PCI_CLASS_SERIAL == Class[2]) && (PCI_CLASS_SERIAL_USB == Class[1]))
-         ) {
-        Status = gBS->ConnectController (
-                        Handles[Index],
-                        NULL,
-                        DevicePath,
-                        FALSE
-                        );
-        if (!EFI_ERROR(Status)) {
-          AtLeastOneConnected = TRUE;
-        }
-      }
-    }
-  }
-
-  return AtLeastOneConnected ? EFI_SUCCESS : EFI_NOT_FOUND;
-}
-
-
-/**
-  This function will create all handles associate with every device
-  path node. If the handle associate with one device path node can not
-  be created successfully, then still give one chance to do the dispatch,
-  which load the missing drivers if possible.
-
-  @param  DevicePathToConnect   The device path which will be connected, it CANNOT be
-                                a multi-instance device path
-  @param  MatchingHandle        Return the controller handle closest to the DevicePathToConnect
-
-  @retval EFI_INVALID_PARAMETER DevicePathToConnect is NULL.
-  @retval EFI_NOT_FOUND         Failed to create all handles associate with every device path node.
-  @retval EFI_SUCCESS           Successful to create all handles associate with every device path node.
-
-**/
-EFI_STATUS
-EFIAPI
-ConSplitterConnectDevicePath (
-  IN  EFI_DEVICE_PATH_PROTOCOL  *DevicePathToConnect,
-  OUT EFI_HANDLE                *MatchingHandle          OPTIONAL
-  )
-{
-  EFI_STATUS                Status;
-  EFI_DEVICE_PATH_PROTOCOL  *RemainingDevicePath;
-  EFI_HANDLE                Handle;
-  EFI_HANDLE                PreviousHandle;
-
-  if (DevicePathToConnect == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Start the real work of connect with RemainingDevicePath
-  //
-  PreviousHandle = NULL;
-  do {
-    //
-    // Find the handle that best matches the Device Path. If it is only a
-    // partial match the remaining part of the device path is returned in
-    // RemainingDevicePath.
-    //
-    RemainingDevicePath = DevicePathToConnect;
-    Status              = gBS->LocateDevicePath (&gEfiDevicePathProtocolGuid, &RemainingDevicePath, &Handle);
-    if (!EFI_ERROR (Status)) {
-      if (Handle == PreviousHandle) {
-        //
-        // If no forward progress is made try invoking the Dispatcher.
-        // A new FV may have been added to the system an new drivers
-        // may now be found.
-        // Status == EFI_SUCCESS means a driver was dispatched
-        // Status == EFI_NOT_FOUND means no new drivers were dispatched
-        //
-        Status = gDS->Dispatch ();
-      }
-
-      if (!EFI_ERROR (Status)) {
-        PreviousHandle = Handle;
-        //
-        // Connect all drivers that apply to Handle and RemainingDevicePath,
-        // the Recursive flag is FALSE so only one level will be expanded.
-        //
-        // Do not check the connect status here, if the connect controller fail,
-        // then still give the chance to do dispatch, because partial
-        // RemainingDevicepath may be in the new FV
-        //
-        // 1. If the connect fail, RemainingDevicepath and handle will not
-        //    change, so next time will do the dispatch, then dispatch's status
-        //    will take effect
-        // 2. If the connect success, the RemainingDevicepath and handle will
-        //    change, then avoid the dispatch, we have chance to continue the
-        //    next connection
-        //
-        gBS->ConnectController (Handle, NULL, RemainingDevicePath, FALSE);
-        if (MatchingHandle != NULL) {
-          *MatchingHandle = Handle;
-        }
-      }
-    }
-    //
-    // Loop until RemainingDevicePath is an empty device path
-    //
-  } while (!EFI_ERROR (Status) && !IsDevicePathEnd (RemainingDevicePath));
-
-  ASSERT (EFI_ERROR (Status) || IsDevicePathEnd (RemainingDevicePath));
-
-  return Status;
-}
-
-
-/**
-  Connect to all ConIn device which is in the ConIn variable.
-
-  @param  DevicePath             A short-form device path that starts with the first
-                                 element being a USB WWID or a USB Class device
-                                 path
-
-  @return EFI_INVALID_PARAMETER  DevicePath is NULL pointer.
-                                 DevicePath is not a USB device path.
-
-  @return EFI_SUCCESS            Success to connect USB device
-  @return EFI_NOT_FOUND          Fail to find handle for USB controller to connect.
-
-**/
-EFI_STATUS
-EFIAPI
-ConSplitterConnectConInDevicePath (
-  
-  )
-{
-  EFI_DEVICE_PATH_PROTOCOL              *DevicePath;
-  EFI_DEVICE_PATH_PROTOCOL              *DevicePathInst;
-  EFI_DEVICE_PATH_PROTOCOL              *CopyDevicePath;
-  UINTN                                 Size;
-  EFI_DEVICE_PATH_PROTOCOL              *Next;
-
-  DevicePath = GetEfiGlobalVariable (L"ConIn");
-
-  //
-  // Check the passed in parameters
-  //
-  if (DevicePath == NULL) {
-    return EFI_NOT_FOUND;
-  }
-
-  CopyDevicePath = DevicePath;
-
-  DevicePathInst  = GetNextDevicePathInstance (&DevicePath, &Size);
-  while (DevicePathInst != NULL) {
-
-    Next      = DevicePathInst;
-    while (!IsDevicePathEndType (Next)) {
-      Next = NextDevicePathNode (Next);
-    }
-
-    SetDevicePathEndNode (Next);
-    
-    //
-    // Connect the USB console
-    // USB console device path is a short-form device path that 
-    //  starts with the first element being a USB WWID
-    //  or a USB Class device path
-    //
-    if ((DevicePathType (DevicePathInst) == MESSAGING_DEVICE_PATH) &&
-       ((DevicePathSubType (DevicePathInst) == MSG_USB_CLASS_DP)
-       || (DevicePathSubType (DevicePathInst) == MSG_USB_WWID_DP)
-       )) {
-      ConSplitterConnectUsbShortFormDevicePath (DevicePathInst);
-    } else {
-      ConSplitterConnectDevicePath (DevicePathInst, NULL);
-    }    
-    DevicePathInst  = GetNextDevicePathInstance (&DevicePath, &Size);
-  }
-  return EFI_SUCCESS;
-}
-
 
 
 /**
@@ -3578,11 +3351,11 @@ ConSplitterTextInReadKeyStroke (
   Private->KeyEventSignalState = FALSE;
 
   //
-  // Connect ConIn when first call in Lazy ConIn mode
+  // Signal ConnectConIn event on first call in Lazy ConIn mode
   //
   if (!mConInIsConnect && PcdGetBool (PcdConInConnectOnDemand)) {
     DEBUG ((EFI_D_INFO, "Connect ConIn in first ReadKeyStoke in Lazy ConIn mode.\n"));    
-    ConSplitterConnectConInDevicePath ();
+    gBS->SignalEvent (Private->ConnectConIn);
     mConInIsConnect = TRUE;
   }
 
@@ -3758,21 +3531,21 @@ ConSplitterTextInReadKeyStrokeEx (
     return EFI_INVALID_PARAMETER;
   }
 
-  //
-  // Connect ConIn when first call in Lazy ConIn mode
-  //
-  if (!mConInIsConnect && PcdGetBool (PcdConInConnectOnDemand)) {
-    DEBUG ((EFI_D_INFO, "Connect ConIn in first ReadKeyStoke in Lazy ConIn mode.\n"));    
-    ConSplitterConnectConInDevicePath ();
-    mConInIsConnect = TRUE;
-  }
-
   Private = TEXT_IN_EX_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
 
   Private->KeyEventSignalState = FALSE;
 
   KeyData->Key.UnicodeChar  = 0;
   KeyData->Key.ScanCode     = SCAN_NULL;
+
+  //
+  // Signal ConnectConIn event on first call in Lazy ConIn mode
+  //
+  if (!mConInIsConnect && PcdGetBool (PcdConInConnectOnDemand)) {
+    DEBUG ((EFI_D_INFO, "Connect ConIn in first ReadKeyStoke in Lazy ConIn mode.\n"));    
+    gBS->SignalEvent (Private->ConnectConIn);
+    mConInIsConnect = TRUE;
+  }
 
   //
   // if no physical console input device exists, return EFI_NOT_READY;
@@ -4938,3 +4711,21 @@ ConSplitterTextOutEnableCursor (
   return ReturnStatus;
 }
 
+
+/**
+  An empty function to pass error checking of CreateEventEx ().
+
+  @param  Event                 Event whose notification function is being invoked.
+  @param  Context               Pointer to the notification function's context,
+                                which is implementation-dependent.
+
+**/
+VOID
+EFIAPI
+ConSplitterEmptyCallbackFunction (
+  IN EFI_EVENT                Event,
+  IN VOID                     *Context
+  )
+{
+  return;
+}

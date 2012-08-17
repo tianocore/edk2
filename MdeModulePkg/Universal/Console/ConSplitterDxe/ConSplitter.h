@@ -18,8 +18,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Uefi.h>
 #include <PiDxe.h>
 
-#include <IndustryStandard/Pci.h>
-
 #include <Protocol/DevicePath.h>
 #include <Protocol/ComponentName.h>
 #include <Protocol/DriverBinding.h>
@@ -30,11 +28,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SimpleTextInEx.h>
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/UgaDraw.h>
-#include <Protocol/PciIo.h>
 
 #include <Guid/ConsoleInDevice.h>
 #include <Guid/StandardErrorDevice.h>
 #include <Guid/ConsoleOutDevice.h>
+#include <Guid/ConnectConInEvent.h>
 
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
@@ -45,9 +43,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/DevicePathLib.h>
-#include <Library/DxeServicesTableLib.h>
-
 
 //
 // Driver Binding Externs
@@ -150,6 +145,7 @@ typedef struct {
 
   BOOLEAN                            KeyEventSignalState;
   BOOLEAN                            InputEventSignalState;
+  EFI_EVENT                          ConnectConIn;
 } TEXT_IN_SPLITTER_PRIVATE_DATA;
 
 #define TEXT_IN_SPLITTER_PRIVATE_DATA_FROM_THIS(a)  \
@@ -1987,6 +1983,21 @@ VOID
 TextOutSetMode (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
   IN  UINTN                           ModeNumber
+  );
+
+/**
+  An empty function to pass error checking of CreateEventEx ().
+
+  @param  Event                 Event whose notification function is being invoked.
+  @param  Context               Pointer to the notification function's context,
+                                which is implementation-dependent.
+
+**/
+VOID
+EFIAPI
+ConSplitterEmptyCallbackFunction (
+  IN EFI_EVENT                Event,
+  IN VOID                     *Context
   );
 
 
