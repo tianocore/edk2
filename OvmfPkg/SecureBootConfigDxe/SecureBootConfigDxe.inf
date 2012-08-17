@@ -17,7 +17,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = SecureBootConfigDxe
-  FILE_GUID                      = F0E6A44F-7195-41c3-AC64-54F202CD0A21
+  FILE_GUID                      = 68E2BC17-198D-41f1-8213-065E3A2A7C12
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = SecureBootConfigDriverEntryPoint
