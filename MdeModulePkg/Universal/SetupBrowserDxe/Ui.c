@@ -767,7 +767,9 @@ UiAddMenuOption (
         //
         MenuOption->GrayOut = TRUE;
       }
-
+      //
+      // break skipped on purpose
+      //
     default:
       MenuOption->IsQuestion = FALSE;
       break;

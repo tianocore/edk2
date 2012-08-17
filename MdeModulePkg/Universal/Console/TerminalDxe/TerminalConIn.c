@@ -1457,6 +1457,7 @@ UnicodeToEfiKey (
           if (TerminalDevice->TerminalType == PCANSITYPE) {
             Key.ScanCode = SCAN_F10;
           }
+          break;
         case '?':
           if (TerminalDevice->TerminalType == VT100TYPE) {
             Key.ScanCode = SCAN_PAGE_UP;
@@ -1471,6 +1472,7 @@ UnicodeToEfiKey (
           if (TerminalDevice->TerminalType == PCANSITYPE) {
             Key.ScanCode = SCAN_F9;
           }
+          break;
         case '/':
           if (TerminalDevice->TerminalType == VT100TYPE) {
             Key.ScanCode = SCAN_PAGE_DOWN;
