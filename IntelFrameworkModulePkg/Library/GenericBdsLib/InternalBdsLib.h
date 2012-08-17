@@ -158,4 +158,28 @@ ValidateOption (
   UINTN                     VariableSize
   );
 
+/**
+  This function will create all handles associate with every device
+  path node. If the handle associate with one device path node can not
+  be created successfully, Dispatch service which load the missing drivers
+  is called basing on input parameter, since in some cases no driver 
+  dependency is assumed exist, so may need not to call this service.
+
+  @param  DevicePathToConnect   The device path which will be connected, it can be
+                                a multi-instance device path
+  @param  NeedDispatch          Whether requires dispatch service during connection 
+
+  @retval EFI_SUCCESS           All handles associate with every device path  node
+                                have been created
+  @retval EFI_OUT_OF_RESOURCES  There is no resource to create new handles
+  @retval EFI_NOT_FOUND         Create the handle associate with one device  path
+                                node failed
+
+**/
+EFI_STATUS
+ConnectDevicePathInternal (
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePathToConnect,
+  IN BOOLEAN                   NeedDispatch
+  );
+
 #endif // _BDS_LIB_H_

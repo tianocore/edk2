@@ -172,6 +172,114 @@ UpdateSystemTableConsole (
 }
 
 /**
+  Connect the console device base on the variable ConVarName, if
+  device path of the ConVarName is multi-instance device path and
+  anyone of the instances is connected success, this function will
+  return success. 
+  Dispatch service is called basing on input when the handle associate
+  with one device path node can not be created successfully. Since in
+  some cases we assume driver dependency does not exist and do not 
+  need to call this service.
+
+  @param  ConVarName               Console related variable name, ConIn, ConOut,
+                                   ErrOut.
+  @param  NeedDispatch              Whether requires dispatch service during connection 
+
+  @retval EFI_NOT_FOUND            There is not any console devices connected
+                                   success
+  @retval EFI_SUCCESS              Success connect any one instance of the console
+                                   device path base on the variable ConVarName.
+
+**/
+EFI_STATUS
+ConnectConsoleVariableInternal (
+  IN  CHAR16                 *ConVarName,
+  IN  BOOLEAN                NeedDispatch
+  )
+{
+  EFI_STATUS                Status;
+  EFI_DEVICE_PATH_PROTOCOL  *StartDevicePath;
+  UINTN                     VariableSize;
+  EFI_DEVICE_PATH_PROTOCOL  *Instance;
+  EFI_DEVICE_PATH_PROTOCOL  *Next;
+  EFI_DEVICE_PATH_PROTOCOL  *CopyOfDevicePath;
+  UINTN                     Size;
+  BOOLEAN                   DeviceExist;
+
+  Status      = EFI_SUCCESS;
+  DeviceExist = FALSE;
+
+  //
+  // Check if the console variable exist
+  //
+  StartDevicePath = BdsLibGetVariableAndSize (
+                      ConVarName,
+                      &gEfiGlobalVariableGuid,
+                      &VariableSize
+                      );
+  if (StartDevicePath == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+
+  CopyOfDevicePath = StartDevicePath;
+  do {
+    //
+    // Check every instance of the console variable
+    //
+    Instance  = GetNextDevicePathInstance (&CopyOfDevicePath, &Size);
+    if (Instance == NULL) {
+      FreePool (StartDevicePath);
+      return EFI_UNSUPPORTED;
+    }
+    
+    Next      = Instance;
+    while (!IsDevicePathEndType (Next)) {
+      Next = NextDevicePathNode (Next);
+    }
+
+    SetDevicePathEndNode (Next);
+    //
+    // Connect the USB console
+    // USB console device path is a short-form device path that 
+    //  starts with the first element being a USB WWID
+    //  or a USB Class device path
+    //
+    if ((DevicePathType (Instance) == MESSAGING_DEVICE_PATH) &&
+       ((DevicePathSubType (Instance) == MSG_USB_CLASS_DP)
+       || (DevicePathSubType (Instance) == MSG_USB_WWID_DP)
+       )) {
+      Status = BdsLibConnectUsbDevByShortFormDP (0xFF, Instance);
+      if (!EFI_ERROR (Status)) {
+        DeviceExist = TRUE;
+      }
+    } else {
+      //
+      // Connect the instance device path
+      //
+      Status = ConnectDevicePathInternal (Instance, NeedDispatch);
+
+      if (EFI_ERROR (Status)) {
+        //
+        // Delete the instance from the console varialbe
+        //
+        BdsLibUpdateConsoleVariable (ConVarName, NULL, Instance);
+      } else {
+        DeviceExist = TRUE;
+      }
+    }
+    FreePool(Instance);
+  } while (CopyOfDevicePath != NULL);
+
+  FreePool (StartDevicePath);
+
+  if (!DeviceExist) {
+    return EFI_NOT_FOUND;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   This function update console variable based on ConVarName, it can
   add or remove one specific console device path from the variable
 
@@ -307,9 +415,12 @@ BdsLibUpdateConsoleVariable (
 
 /**
   Connect the console device base on the variable ConVarName, if
-  device path of the ConVarName is multi-instance device path, if
+  device path of the ConVarName is multi-instance device path and
   anyone of the instances is connected success, then this function
   will return success.
+  If the handle associate with one device path node can not
+  be created successfully, then still give chance to do the dispatch,
+  which load the missing drivers if possible..
 
   @param  ConVarName               Console related variable name, ConIn, ConOut,
                                    ErrOut.
@@ -326,87 +437,36 @@ BdsLibConnectConsoleVariable (
   IN  CHAR16                 *ConVarName
   )
 {
-  EFI_STATUS                Status;
-  EFI_DEVICE_PATH_PROTOCOL  *StartDevicePath;
-  UINTN                     VariableSize;
-  EFI_DEVICE_PATH_PROTOCOL  *Instance;
-  EFI_DEVICE_PATH_PROTOCOL  *Next;
-  EFI_DEVICE_PATH_PROTOCOL  *CopyOfDevicePath;
-  UINTN                     Size;
-  BOOLEAN                   DeviceExist;
-
-  Status      = EFI_SUCCESS;
-  DeviceExist = FALSE;
-
-  //
-  // Check if the console variable exist
-  //
-  StartDevicePath = BdsLibGetVariableAndSize (
-                      ConVarName,
-                      &gEfiGlobalVariableGuid,
-                      &VariableSize
-                      );
-  if (StartDevicePath == NULL) {
-    return EFI_UNSUPPORTED;
-  }
-
-  CopyOfDevicePath = StartDevicePath;
-  do {
-    //
-    // Check every instance of the console variable
-    //
-    Instance  = GetNextDevicePathInstance (&CopyOfDevicePath, &Size);
-    if (Instance == NULL) {
-      FreePool (StartDevicePath);
-      return EFI_UNSUPPORTED;
-    }
-    
-    Next      = Instance;
-    while (!IsDevicePathEndType (Next)) {
-      Next = NextDevicePathNode (Next);
-    }
-
-    SetDevicePathEndNode (Next);
-    //
-    // Connect the USB console
-    // USB console device path is a short-form device path that 
-    //  starts with the first element being a USB WWID
-    //  or a USB Class device path
-    //
-    if ((DevicePathType (Instance) == MESSAGING_DEVICE_PATH) &&
-       ((DevicePathSubType (Instance) == MSG_USB_CLASS_DP)
-       || (DevicePathSubType (Instance) == MSG_USB_WWID_DP)
-       )) {
-      Status = BdsLibConnectUsbDevByShortFormDP (0xFF, Instance);
-      if (!EFI_ERROR (Status)) {
-        DeviceExist = TRUE;
-      }
-    } else {
-      //
-      // Connect the instance device path
-      //
-      Status = BdsLibConnectDevicePath (Instance);
-      if (EFI_ERROR (Status)) {
-        //
-        // Delete the instance from the console varialbe
-        //
-        BdsLibUpdateConsoleVariable (ConVarName, NULL, Instance);
-      } else {
-        DeviceExist = TRUE;
-      }
-    }
-    FreePool(Instance);
-  } while (CopyOfDevicePath != NULL);
-
-  FreePool (StartDevicePath);
-
-  if (!DeviceExist) {
-    return EFI_NOT_FOUND;
-  }
-
-  return EFI_SUCCESS;
+  return ConnectConsoleVariableInternal(ConVarName, TRUE);
 }
 
+/**
+  Connect the console device base on the variable ConVarName, if
+  device path of the ConVarName is multi-instance device path and
+  anyone of the instances is connected success, then this function
+  will return success.
+  Dispatch service is not called when the handle associate with one 
+  device path node can not be created successfully. Here no driver 
+  dependency is assumed exist, so need not to call this service.
+
+
+  @param  ConVarName               Console related variable name, ConIn, ConOut,
+                                   ErrOut.
+
+  @retval EFI_NOT_FOUND            There is not any console devices connected
+                                   success
+  @retval EFI_SUCCESS              Success connect any one instance of the console
+                                   device path base on the variable ConVarName.
+
+**/
+EFI_STATUS
+EFIAPI
+BdsLibConnectConsoleVariableWithOutDispatch (
+  IN  CHAR16                 *ConVarName
+  )
+{
+  return ConnectConsoleVariableInternal(ConVarName, FALSE);
+}
 
 /**
   This function will search every simpletext device in current system,
