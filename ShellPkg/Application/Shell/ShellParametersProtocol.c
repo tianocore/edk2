@@ -609,8 +609,8 @@ UpdateStdInStdOutStdErr(
   SystemTableInfo->ConInHandle    = gST->ConsoleInHandle;
   SystemTableInfo->ConOut         = gST->ConOut;
   SystemTableInfo->ConOutHandle   = gST->ConsoleOutHandle;
-  SystemTableInfo->ConErr         = gST->StdErr;
-  SystemTableInfo->ConErrHandle   = gST->StandardErrorHandle;
+  SystemTableInfo->ErrOut         = gST->StdErr;
+  SystemTableInfo->ErrOutHandle   = gST->StandardErrorHandle;
   *OldStdIn                       = ShellParameters->StdIn;
   *OldStdOut                      = ShellParameters->StdOut;
   *OldStdErr                      = ShellParameters->StdErr;
@@ -1200,10 +1200,10 @@ RestoreStdInStdOutStdErr (
     gST->ConOut               = SystemTableInfo->ConOut;
     gST->ConsoleOutHandle     = SystemTableInfo->ConOutHandle;
   }
-  if (gST->StdErr != SystemTableInfo->ConErr) {
+  if (gST->StdErr != SystemTableInfo->ErrOut) {
     CloseSimpleTextOutOnFile(gST->StdErr);
-    gST->StdErr               = SystemTableInfo->ConErr;
-    gST->StandardErrorHandle  = SystemTableInfo->ConErrHandle;
+    gST->StdErr               = SystemTableInfo->ErrOut;
+    gST->StandardErrorHandle  = SystemTableInfo->ErrOutHandle;
   }
 
   CalculateEfiHdrCrc(&gST->Hdr);

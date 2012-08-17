@@ -2,7 +2,7 @@
   Member functions of EFI_SHELL_PARAMETERS_PROTOCOL and functions for creation,
   manipulation, and initialization of EFI_SHELL_PARAMETERS_PROTOCOL.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -123,8 +123,8 @@ typedef struct {
   EFI_HANDLE                            ConInHandle;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL       *ConOut;
   EFI_HANDLE                            ConOutHandle;
-  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL       *ConErr;
-  EFI_HANDLE                            ConErrHandle;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL       *ErrOut;
+  EFI_HANDLE                            ErrOutHandle;
 } SYSTEM_TABLE_INFO;
 
 /**

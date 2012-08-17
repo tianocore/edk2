@@ -1,7 +1,7 @@
 /** @file
   Main file for connect shell Driver1 function.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -149,9 +149,9 @@ ConnectFromDevPaths (
         Status = ConnectControllers(NULL, Handle, FALSE, TRUE, FALSE);
       }
     } else if ((StrCmp(Key, L"ConOutDev") == 0) 
-            || (StrCmp(Key, L"ConErrDev") == 0) 
+            || (StrCmp(Key, L"ErrOutDev") == 0) 
             || (StrCmp(Key, L"ConOut")    == 0) 
-            || (StrCmp(Key, L"ConErr")    == 0)
+            || (StrCmp(Key, L"ErrOut")    == 0)
             ){
       Status = gBS->LocateDevicePath((EFI_GUID*)&gEfiConsoleOutDeviceGuid, &DevPathWalker, &Handle);
       if (!EFI_ERROR(Status)) {
@@ -299,14 +299,14 @@ ShellCommandRunConnect (
         Status = ConnectFromDevPaths(L"ConOutDev");
       }
       if (EFI_ERROR(Status)) {
-        ConnectFromDevPaths(L"ConErrDev");
+        ConnectFromDevPaths(L"ErrOutDev");
       } else {
-        Status = ConnectFromDevPaths(L"ConErrDev");
+        Status = ConnectFromDevPaths(L"ErrOutDev");
       }
       if (EFI_ERROR(Status)) {
-        ConnectFromDevPaths(L"ConErr");
+        ConnectFromDevPaths(L"ErrOut");
       } else {
-        Status = ConnectFromDevPaths(L"ConErr");
+        Status = ConnectFromDevPaths(L"ErrOut");
       }
       if (EFI_ERROR(Status)) {
         ConnectFromDevPaths(L"ConIn");
