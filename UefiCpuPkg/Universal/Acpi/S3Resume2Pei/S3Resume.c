@@ -874,6 +874,9 @@ S3RestoreConfig2 (
   VOID                                          *GuidHob;
   BOOLEAN                                       Build4GPageTableOnly;
 
+  TempAcpiS3Context = 0;
+  TempEfiBootScriptExecutorVariable = 0;
+
   DEBUG ((EFI_D_ERROR, "Enter S3 PEIM\r\n"));
 
   VarSize = sizeof (EFI_PHYSICAL_ADDRESS);
@@ -884,9 +887,6 @@ S3RestoreConfig2 (
              );
   ASSERT_EFI_ERROR (Status);
 
-  AcpiS3Context = (ACPI_S3_CONTEXT *)(UINTN)TempAcpiS3Context;
-  ASSERT (AcpiS3Context != NULL);
-
   Status = RestoreLockBox (
              &gEfiAcpiS3ContextGuid,
              NULL,
@@ -894,7 +894,10 @@ S3RestoreConfig2 (
              );
   ASSERT_EFI_ERROR (Status);
 
-  VarSize   = sizeof (TempEfiBootScriptExecutorVariable);
+  AcpiS3Context = (ACPI_S3_CONTEXT *)(UINTN)TempAcpiS3Context;
+  ASSERT (AcpiS3Context != NULL);
+
+  VarSize   = sizeof (EFI_PHYSICAL_ADDRESS);
   Status = RestoreLockBox (
              &gEfiBootScriptExecutorVariableGuid,
              &TempEfiBootScriptExecutorVariable,
@@ -910,6 +913,7 @@ S3RestoreConfig2 (
   ASSERT_EFI_ERROR (Status);
 
   EfiBootScriptExecutorVariable = (BOOT_SCRIPT_EXECUTOR_VARIABLE *) (UINTN) TempEfiBootScriptExecutorVariable;
+  ASSERT (EfiBootScriptExecutorVariable != NULL);
 
   DEBUG (( EFI_D_ERROR, "AcpiS3Context = %x\n", AcpiS3Context));
   DEBUG (( EFI_D_ERROR, "Waking Vector = %x\n", ((EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *) ((UINTN) (AcpiS3Context->AcpiFacsTable)))->FirmwareWakingVector));
