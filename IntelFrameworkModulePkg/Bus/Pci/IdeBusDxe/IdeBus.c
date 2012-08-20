@@ -1473,7 +1473,7 @@ ClearInterrupt (
   // Reset IDE device to force it de-assert interrupt pin
   // Note: this will reset all devices on this IDE channel
   //
-  AtaSoftReset (IdeDev);
+  Status = AtaSoftReset (IdeDev);
   if (EFI_ERROR (Status)) {
     return;
   }
