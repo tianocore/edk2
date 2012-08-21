@@ -1,6 +1,6 @@
 /** @file
-  GUID is the name of events used with CreateEventEx in order to be notified
-  when the requires ConIn connection.
+  GUID for an event that is signaled on the first attempt to check for a keystroke 
+  from the ConIn device.
 
   Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials

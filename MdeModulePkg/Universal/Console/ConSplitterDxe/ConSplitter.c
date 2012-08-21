@@ -630,7 +630,7 @@ ConSplitterTextInConstructor (
                   ConSplitterEmptyCallbackFunction,
                   NULL,
                   &gConnectConInEventGuid,
-                  &ConInPrivate->ConnectConIn
+                  &ConInPrivate->ConnectConInEvent
                   );
 
   return Status;
@@ -3355,7 +3355,7 @@ ConSplitterTextInReadKeyStroke (
   //
   if (!mConInIsConnect && PcdGetBool (PcdConInConnectOnDemand)) {
     DEBUG ((EFI_D_INFO, "Connect ConIn in first ReadKeyStoke in Lazy ConIn mode.\n"));    
-    gBS->SignalEvent (Private->ConnectConIn);
+    gBS->SignalEvent (Private->ConnectConInEvent);
     mConInIsConnect = TRUE;
   }
 
@@ -3543,7 +3543,7 @@ ConSplitterTextInReadKeyStrokeEx (
   //
   if (!mConInIsConnect && PcdGetBool (PcdConInConnectOnDemand)) {
     DEBUG ((EFI_D_INFO, "Connect ConIn in first ReadKeyStoke in Lazy ConIn mode.\n"));    
-    gBS->SignalEvent (Private->ConnectConIn);
+    gBS->SignalEvent (Private->ConnectConInEvent);
     mConInIsConnect = TRUE;
   }
 
@@ -4727,5 +4727,4 @@ ConSplitterEmptyCallbackFunction (
   IN VOID                     *Context
   )
 {
-  return;
 }
