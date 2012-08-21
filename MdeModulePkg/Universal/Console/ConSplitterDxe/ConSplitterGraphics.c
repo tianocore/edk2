@@ -44,6 +44,9 @@ ConSplitterGraphicsOutputQueryMode (
   )
 {
   TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL    *GraphicsOutput;
+  EFI_STATUS                      Status;
+  UINTN                           Index;
 
   if (This == NULL || Info == NULL || SizeOfInfo == NULL || ModeNumber >= This->Mode->MaxMode) {
     return EFI_INVALID_PARAMETER;
@@ -54,14 +57,38 @@ ConSplitterGraphicsOutputQueryMode (
   //
   Private = GRAPHICS_OUTPUT_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
 
-  *Info = AllocatePool (sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION));
-  if (*Info == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+  GraphicsOutput = NULL;
+  
+  if (Private->CurrentNumberOfGraphicsOutput == 1) {
+    //
+    // Find the only one GraphicsOutput.
+    //
+    for (Index = 0; Index < Private->CurrentNumberOfConsoles; Index++) {
+      GraphicsOutput = Private->TextOutList[Index].GraphicsOutput;
+      if (GraphicsOutput != NULL) {
+        break;
+      }
+    }
   }
-
-  *SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
-
-  CopyMem (*Info, &Private->GraphicsOutputModeBuffer[ModeNumber], *SizeOfInfo);
+  
+  if (GraphicsOutput != NULL) {
+    //
+    // If only one physical GOP device exist, return its information.
+    //
+    Status = GraphicsOutput->QueryMode (GraphicsOutput, (UINT32) ModeNumber, SizeOfInfo, Info);
+    return Status;
+  } else {
+    //
+    // If 2 more phyiscal GOP device exist or GOP protocol does not exist, 
+    // return GOP information (PixelFormat is PixelBltOnly) created in ConSplitterAddGraphicsOutputMode ().
+    //
+    *Info = AllocatePool (sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION));
+    if (*Info == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    *SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
+    CopyMem (*Info, &Private->GraphicsOutputModeBuffer[ModeNumber], *SizeOfInfo);
+  }
 
   return EFI_SUCCESS;
 }
@@ -106,6 +133,7 @@ ConSplitterGraphicsOutputSetMode (
   Mode = &Private->GraphicsOutputModeBuffer[ModeNumber];
 
   ReturnStatus = EFI_SUCCESS;
+  GraphicsOutput = NULL;
   //
   // return the worst status met
   //
@@ -150,14 +178,21 @@ ConSplitterGraphicsOutputSetMode (
 
   This->Mode->Mode = ModeNumber;
 
-  CopyMem (This->Mode->Info, &Private->GraphicsOutputModeBuffer[ModeNumber], This->Mode->SizeOfInfo);
-
-  //
-  // Information is not enough here, so the following items remain unchanged:
-  //  GraphicsOutputMode->Info->Version, GraphicsOutputMode->Info->PixelFormat
-  //  GraphicsOutputMode->SizeOfInfo, GraphicsOutputMode->FrameBufferBase, GraphicsOutputMode->FrameBufferSize
-  // These items will be initialized/updated when a new GOP device is added into ConsoleSplitter.
-  //
+  if ((Private->CurrentNumberOfGraphicsOutput == 1) && (GraphicsOutput != NULL)) {
+    //
+    // If only one physical GOP device exist, copy physical information to consplitter.
+    //
+    CopyMem (This->Mode->Info, GraphicsOutput->Mode->Info, GraphicsOutput->Mode->SizeOfInfo);
+    This->Mode->SizeOfInfo = GraphicsOutput->Mode->SizeOfInfo;
+    This->Mode->FrameBufferBase = GraphicsOutput->Mode->FrameBufferBase;
+    This->Mode->FrameBufferSize = GraphicsOutput->Mode->FrameBufferSize;
+  } else {
+    //
+    // If 2 more phyiscal GOP device exist or GOP protocol does not exist, 
+    // return GOP information (PixelFormat is PixelBltOnly) created in ConSplitterAddGraphicsOutputMode ().
+    //
+    CopyMem (This->Mode->Info, &Private->GraphicsOutputModeBuffer[ModeNumber], This->Mode->SizeOfInfo);
+  }
 
   return ReturnStatus;
 }
