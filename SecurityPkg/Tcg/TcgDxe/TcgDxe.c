@@ -352,6 +352,10 @@ TcgDxeLogEvent (
 {
   TCG_DXE_DATA  *TcgData;
 
+  if (TCGLogData == NULL){
+    return EFI_INVALID_PARAMETER;
+  }
+
   TcgData = TCG_DXE_DATA_FROM_THIS (This);
   
   if (TcgData->BsCap.TPMDeactivatedFlag) {
@@ -438,7 +442,11 @@ TcgDxeHashLogExtendEventI (
 {
   EFI_STATUS                        Status;
 
-  if (HashDataLen > 0) {
+  if (HashData == NULL && HashDataLen > 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (HashDataLen > 0 || HashData != NULL) {
     Status = TpmCommHashAll (
                HashData,
                (UINTN) HashDataLen,
@@ -497,6 +505,10 @@ TcgDxeHashLogExtendEvent (
   )
 {
   TCG_DXE_DATA  *TcgData;
+
+  if (TCGLogData == NULL || EventLogLastEntry == NULL){
+    return EFI_INVALID_PARAMETER;
+  }
 
   TcgData = TCG_DXE_DATA_FROM_THIS (This);
   
