@@ -83,6 +83,7 @@ PeCoffLoaderGetPeHeader (
   RETURN_STATUS         Status;
   EFI_IMAGE_DOS_HEADER  DosHdr;
   UINTN                 Size;
+  UINTN                 ReadSize;
   UINT16                Magic;
   UINT32                SectionHeaderOffset;
   UINT32                Index;
@@ -94,13 +95,14 @@ PeCoffLoaderGetPeHeader (
   // Read the DOS image header to check for its existence
   //
   Size = sizeof (EFI_IMAGE_DOS_HEADER);
+  ReadSize = Size;
   Status = ImageContext->ImageRead (
                            ImageContext->Handle,
                            0,
                            &Size,
                            &DosHdr
                            );
-  if (RETURN_ERROR (Status)) {
+  if (RETURN_ERROR (Status) || (Size != ReadSize)) {
     ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
     return Status;
   }
@@ -121,13 +123,14 @@ PeCoffLoaderGetPeHeader (
   // location in both images.
   //
   Size = sizeof (EFI_IMAGE_OPTIONAL_HEADER_UNION);
+  ReadSize = Size;
   Status = ImageContext->ImageRead (
                            ImageContext->Handle,
                            ImageContext->PeCoffHeaderOffset,
                            &Size,
                            Hdr.Pe32
                            );
-  if (RETURN_ERROR (Status)) {
+  if (RETURN_ERROR (Status) || (Size != ReadSize)) {
     ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
     return Status;
   }
@@ -173,16 +176,17 @@ PeCoffLoaderGetPeHeader (
       }
 
       //
-      // Read Hdr.Pe32.OptionalHeader.SizeOfHeaders data from file
+      // 2.2 Read last byte of Hdr.Pe32.OptionalHeader.SizeOfHeaders from the file.
       //
       Size = 1;
+      ReadSize = Size;
       Status = ImageContext->ImageRead (
                                ImageContext->Handle,
                                Hdr.Pe32->OptionalHeader.SizeOfHeaders - 1,
                                &Size,
                                &BufferData
                                );
-      if (RETURN_ERROR (Status)) {
+      if (RETURN_ERROR (Status) || (Size != ReadSize)) {
         return Status;
       }
 
@@ -202,9 +206,10 @@ PeCoffLoaderGetPeHeader (
           }
 
           //
-          // Read section header from file
+          // Read last byte of section header from file
           //
           Size = 1;
+          ReadSize = Size;
           Status = ImageContext->ImageRead (
                                    ImageContext->Handle,
                                    Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].VirtualAddress +
@@ -212,7 +217,7 @@ PeCoffLoaderGetPeHeader (
                                    &Size,
                                    &BufferData
                                    );
-          if (RETURN_ERROR (Status)) {
+          if (RETURN_ERROR (Status) || (Size != ReadSize)) {
             return Status;
           }
         }
@@ -246,16 +251,17 @@ PeCoffLoaderGetPeHeader (
       }
 
       //
-      // Read Hdr.Pe32.OptionalHeader.SizeOfHeaders data from file
+      // 2.2 Read last byte of Hdr.Pe32Plus.OptionalHeader.SizeOfHeaders from the file.
       //
       Size = 1;
+      ReadSize = Size;
       Status = ImageContext->ImageRead (
                                ImageContext->Handle,
                                Hdr.Pe32Plus->OptionalHeader.SizeOfHeaders - 1,
                                &Size,
                                &BufferData
                                );
-      if (RETURN_ERROR (Status)) {
+      if (RETURN_ERROR (Status) || (Size != ReadSize)) {
         return Status;
       }
 
@@ -275,9 +281,10 @@ PeCoffLoaderGetPeHeader (
           }
 
           //
-          // Read section header from file
+          // Read last byte of section header from file
           //
           Size = 1;
+          ReadSize = Size;
           Status = ImageContext->ImageRead (
                                    ImageContext->Handle,
                                    Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].VirtualAddress +
@@ -285,7 +292,7 @@ PeCoffLoaderGetPeHeader (
                                    &Size,
                                    &BufferData
                                    );
-          if (RETURN_ERROR (Status)) {
+          if (RETURN_ERROR (Status) || (Size != ReadSize)) {
             return Status;
           }
         }
@@ -333,13 +340,14 @@ PeCoffLoaderGetPeHeader (
     // Read section header from file
     //
     Size = sizeof (EFI_IMAGE_SECTION_HEADER);
+    ReadSize = Size;
     Status = ImageContext->ImageRead (
                              ImageContext->Handle,
                              SectionHeaderOffset,
                              &Size,
                              &SectionHeader
                              );
-    if (RETURN_ERROR (Status)) {
+    if (RETURN_ERROR (Status) || (Size != ReadSize)) {
       return Status;
     }
 
@@ -356,13 +364,14 @@ PeCoffLoaderGetPeHeader (
       // Read the last byte to make sure the data is in the image region.
       //
       Size = 1;
+      ReadSize = Size;
       Status = ImageContext->ImageRead (
                                ImageContext->Handle,
                                SectionHeader.PointerToRawData + SectionHeader.SizeOfRawData - 1,
                                &Size,
                                &BufferData
                                );
-      if (RETURN_ERROR (Status)) {
+      if (RETURN_ERROR (Status) || (Size != ReadSize)) {
         return Status;
       }
     }
@@ -416,6 +425,7 @@ PeCoffLoaderGetImageInfo (
   EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION   Hdr;
   EFI_IMAGE_DATA_DIRECTORY              *DebugDirectoryEntry;
   UINTN                                 Size;
+  UINTN                                 ReadSize;
   UINTN                                 Index;
   UINTN                                 DebugDirectoryEntryRva;
   UINTN                                 DebugDirectoryEntryFileOffset;
@@ -538,13 +548,14 @@ PeCoffLoaderGetImageInfo (
         // Read section header from file
         //
         Size = sizeof (EFI_IMAGE_SECTION_HEADER);
+        ReadSize = Size;
         Status = ImageContext->ImageRead (
                                  ImageContext->Handle,
                                  SectionHeaderOffset,
                                  &Size,
                                  &SectionHeader
                                  );
-        if (RETURN_ERROR (Status)) {
+        if (RETURN_ERROR (Status) || (Size != ReadSize)) {
           ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
           return Status;
         }
@@ -565,13 +576,14 @@ PeCoffLoaderGetImageInfo (
           // Read next debug directory entry
           //
           Size = sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);
+          ReadSize = Size;
           Status = ImageContext->ImageRead (
                                    ImageContext->Handle,
                                    DebugDirectoryEntryFileOffset + Index,
                                    &Size,
                                    &DebugEntry
                                    );
-          if (RETURN_ERROR (Status)) {
+          if (RETURN_ERROR (Status) || (Size != ReadSize)) {
             ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
             return Status;
           }
@@ -599,13 +611,14 @@ PeCoffLoaderGetImageInfo (
       // Read section header from file
       //
       Size   = sizeof (EFI_IMAGE_SECTION_HEADER);
+      ReadSize = Size;
       Status = ImageContext->ImageRead (
                                ImageContext->Handle,
                                SectionHeaderOffset,
                                &Size,
                                &SectionHeader
                                );
-      if (RETURN_ERROR (Status)) {
+      if (RETURN_ERROR (Status) || (Size != ReadSize)) {
         ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
         return Status;
       }
@@ -652,13 +665,14 @@ PeCoffLoaderGetImageInfo (
         // Read next debug directory entry
         //
         Size = sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);
+        ReadSize = Size;
         Status = ImageContext->ImageRead (
                                  ImageContext->Handle,
                                  DebugDirectoryEntryFileOffset + Index,
                                  &Size,
                                  &DebugEntry
                                  );
-        if (RETURN_ERROR (Status)) {
+        if (RETURN_ERROR (Status) || (Size != ReadSize)) {
           ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
           return Status;
         }
