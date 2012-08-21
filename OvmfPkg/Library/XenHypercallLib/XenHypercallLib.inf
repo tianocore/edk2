@@ -1,0 +1,55 @@
+## @file
+#  Component description file for Xen Hypercall Library module.
+#
+#  Copyright (c) 2011, Bei Guan <gbtju85@gmail.com>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = XenHypercallLib
+  FILE_GUID                      = 0a5baf88-b6ec-4338-b1a7-f1496f605359
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+  LIBRARY_CLASS                  = XenHypercallLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER UEFI_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  GasketHypercall.h
+  XenHypercallLib.c
+
+[Sources.X64]
+  X64/GasketHypercall.S   		# call Xen hypercall page through the interface ABI
+  X64/Hypercall.c
+
+[Sources.IA32]
+  Ia32/GasketHypercall.S  		# call Xen hypercall page through the interface ABI
+  Ia32/Hypercall.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  HobLib
+
+[Guids]
+  gEfiXenInfoGuid                      # PROTOCOL ALWAYS_CONSUMED
+
+[Depex]
+  TRUE

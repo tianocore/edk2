@@ -1,0 +1,44 @@
+## @file
+#  Component description file for Xenbus Library module.
+#
+#  Copyright (c) 2011, Bei Guan <gbtju85@gmail.com>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = XenLib
+  FILE_GUID                      = 62c85c20-5b0e-4937-9fc3-448370a60d04
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = XenLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER UEFI_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  XenLib.c
+  XenBus.c
+  XenEventChannel.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
+  DebugLib
+
