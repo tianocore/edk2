@@ -1081,7 +1081,7 @@ InitializeFormSet (
   );
 
 /**
-  Reset Questions to their default value in a Form, Formset or System.
+  Reset Questions to their initial value or default value in a Form, Formset or System.
 
   GetDefaultValueScope parameter decides which questions will reset 
   to its default value.
@@ -1092,6 +1092,9 @@ InitializeFormSet (
   @param  SettingScope           Setting Scope for Default action.
   @param  GetDefaultValueScope   Get default value scope.
   @param  Storage                Get default value only for this storage.
+  @param  RetrieveValueFirst     Whether call the retrieve call back to
+                                 get the initial value before get default
+                                 value.
 
   @retval EFI_SUCCESS            The function completed successfully.
   @retval EFI_UNSUPPORTED        Unsupport SettingScope.
@@ -1104,7 +1107,8 @@ ExtractDefault (
   IN UINT16                           DefaultId,
   IN BROWSER_SETTING_SCOPE            SettingScope,
   IN BROWSER_GET_DEFAULT_VALUE        GetDefaultValueScope,
-  IN FORMSET_STORAGE                  *Storage OPTIONAL
+  IN FORMSET_STORAGE                  *Storage,
+  IN BOOLEAN                          RetrieveValueFirst
   );
 
 /**
@@ -1383,6 +1387,24 @@ ProcessCallBackFunction (
   IN     FORM_BROWSER_STATEMENT          *Question,
   IN     EFI_BROWSER_ACTION              Action,
   IN     BOOLEAN                         SkipSaveOrDiscard
+  );
+  
+/**
+  Call the retrieve type call back function for one question to get the initialize data.
+  
+  This function only used when in the initialize stage, because in this stage, the 
+  Selection->Form is not ready. For other case, use the ProcessCallBackFunction instead.
+
+  @param ConfigAccess          The config access protocol produced by the hii driver.
+  @param Statement             The Question which need to call.
+
+  @retval EFI_SUCCESS          The call back function excutes successfully.
+  @return Other value if the call back function failed to excute.  
+**/
+EFI_STATUS 
+ProcessRetrieveForQuestion (
+  IN     EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess,
+  IN     FORM_BROWSER_STATEMENT          *Statement
   );
 
 /**

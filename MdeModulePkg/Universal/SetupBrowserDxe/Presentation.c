@@ -1323,6 +1323,57 @@ ProcessCallBackFunction (
 }
 
 /**
+  Call the retrieve type call back function for one question to get the initialize data.
+  
+  This function only used when in the initialize stage, because in this stage, the 
+  Selection->Form is not ready. For other case, use the ProcessCallBackFunction instead.
+
+  @param ConfigAccess          The config access protocol produced by the hii driver.
+  @param Statement             The Question which need to call.
+
+  @retval EFI_SUCCESS          The call back function excutes successfully.
+  @return Other value if the call back function failed to excute.  
+**/
+EFI_STATUS 
+ProcessRetrieveForQuestion (
+  IN     EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess,
+  IN     FORM_BROWSER_STATEMENT          *Statement
+  )
+{
+  EFI_STATUS                      Status;
+  EFI_BROWSER_ACTION_REQUEST      ActionRequest;
+  EFI_HII_VALUE                   *HiiValue;
+  EFI_IFR_TYPE_VALUE              *TypeValue;
+
+  Status                = EFI_SUCCESS;
+  ActionRequest         = EFI_BROWSER_ACTION_REQUEST_NONE;
+    
+  if ((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != EFI_IFR_FLAG_CALLBACK) {
+    return EFI_UNSUPPORTED;
+  }
+
+  HiiValue  = &Statement->HiiValue;
+  TypeValue = &HiiValue->Value;
+  if (HiiValue->Type == EFI_IFR_TYPE_BUFFER) {
+    //
+    // For OrderedList, passing in the value buffer to Callback()
+    //
+    TypeValue = (EFI_IFR_TYPE_VALUE *) Statement->BufferValue;
+  }
+    
+  ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
+  Status = ConfigAccess->Callback (
+                           ConfigAccess,
+                           EFI_BROWSER_ACTION_RETRIEVE,
+                           Statement->QuestionId,
+                           HiiValue->Type,
+                           TypeValue,
+                           &ActionRequest
+                           );
+  return Status;
+}
+
+/**
   The worker function that send the displays to the screen. On output,
   the selection made by user is returned.
 

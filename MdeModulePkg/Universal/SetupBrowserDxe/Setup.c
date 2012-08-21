@@ -3119,7 +3119,7 @@ GetQuestionDefault (
 
 
 /**
-  Reset Questions to their default value in a Form, Formset or System.
+  Reset Questions to their initial value or default value in a Form, Formset or System.
 
   GetDefaultValueScope parameter decides which questions will reset 
   to its default value.
@@ -3130,6 +3130,9 @@ GetQuestionDefault (
   @param  SettingScope           Setting Scope for Default action.
   @param  GetDefaultValueScope   Get default value scope.
   @param  Storage                Get default value only for this storage.
+  @param  RetrieveValueFirst     Whether call the retrieve call back to
+                                 get the initial value before get default
+                                 value.
 
   @retval EFI_SUCCESS            The function completed successfully.
   @retval EFI_UNSUPPORTED        Unsupport SettingScope.
@@ -3142,7 +3145,8 @@ ExtractDefault (
   IN UINT16                           DefaultId,
   IN BROWSER_SETTING_SCOPE            SettingScope,
   IN BROWSER_GET_DEFAULT_VALUE        GetDefaultValueScope,
-  IN FORMSET_STORAGE                  *Storage OPTIONAL
+  IN FORMSET_STORAGE                  *Storage OPTIONAL,
+  IN BOOLEAN                          RetrieveValueFirst
   )
 {
   EFI_STATUS              Status;
@@ -3154,6 +3158,8 @@ ExtractDefault (
   EFI_HII_HANDLE          *HiiHandles;
   UINTN                   Index;
   EFI_GUID                ZeroGuid;
+
+  Status = EFI_SUCCESS;
 
   //
   // Check the supported setting level.
@@ -3197,15 +3203,24 @@ ExtractDefault (
           continue;
         }
       }
-  
-      //
-      // Reset Question to its default value
-      //
-      Status = GetQuestionDefault (FormSet, Form, Question, DefaultId);
-      if (EFI_ERROR (Status)) {
-        continue;
+
+      if (RetrieveValueFirst) {
+        //
+        // Call the Retrieve call back to get the initial question value.
+        //
+        Status = ProcessRetrieveForQuestion(FormSet->ConfigAccess, Question);
       }
-  
+
+      //
+      // If not request to get the initial value or get initial value fail, then get default value.
+      //
+      if (!RetrieveValueFirst || EFI_ERROR (Status)) {
+        Status = GetQuestionDefault (FormSet, Form, Question, DefaultId);
+        if (EFI_ERROR (Status)) {
+          continue;
+        }
+      }
+
       //
       // Synchronize Buffer storage's Edit buffer
       //
@@ -3222,7 +3237,7 @@ ExtractDefault (
     FormLink = GetFirstNode (&FormSet->FormListHead);
     while (!IsNull (&FormSet->FormListHead, FormLink)) {
       Form = FORM_BROWSER_FORM_FROM_LINK (FormLink);
-      ExtractDefault (FormSet, Form, DefaultId, FormLevel, GetDefaultValueScope, Storage);
+      ExtractDefault (FormSet, Form, DefaultId, FormLevel, GetDefaultValueScope, Storage, RetrieveValueFirst);
       FormLink = GetNextNode (&FormSet->FormListHead, FormLink);
     }
   } else if (SettingScope == SystemLevel) {
@@ -3293,7 +3308,7 @@ ExtractDefault (
     Link = GetFirstNode (&gBrowserFormSetList);
     while (!IsNull (&gBrowserFormSetList, Link)) {
       LocalFormSet = FORM_BROWSER_FORMSET_FROM_LINK (Link);
-      ExtractDefault (LocalFormSet, NULL, DefaultId, FormSetLevel, GetDefaultValueScope, Storage);
+      ExtractDefault (LocalFormSet, NULL, DefaultId, FormSetLevel, GetDefaultValueScope, Storage, RetrieveValueFirst);
       Link = GetNextNode (&gBrowserFormSetList, Link);
     }
   }
@@ -3344,26 +3359,10 @@ LoadFormConfig (
     }
 
     //
-    // According the spec, ref opcode try to get value from call back with "retrieve" type.
+    // Call the Retrieve call back function for all questions.
     //
-    if ((Question->Operand == EFI_IFR_REF_OP) && (FormSet->ConfigAccess != NULL) && (Selection != NULL)) {
-      Status = ProcessCallBackFunction(Selection, Question, EFI_BROWSER_ACTION_RETRIEVE, TRUE);
-      if (EFI_ERROR (Status)) {
-        return Status;
-      }
-    }
-
-    //
-    // Check whether EfiVarstore with CallBack can be got.
-    //
-    if ((FormSet->ConfigAccess != NULL) &&
-        (Selection != NULL) &&
-        (Selection->Action != UI_ACTION_REFRESH_FORMSET) &&
-        (Question->QuestionId != 0) && 
-        (Question->Storage != NULL) &&
-        (Question->Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE) && 
+    if ((FormSet->ConfigAccess != NULL) && (Selection != NULL) &&
         ((Question->QuestionFlags & EFI_IFR_FLAG_CALLBACK) == EFI_IFR_FLAG_CALLBACK)) {
-
       //
       // Check QuestionValue does exist.
       //
@@ -3373,17 +3372,21 @@ LoadFormConfig (
       } else {
         BufferValue = (UINT8 *) &Question->HiiValue.Value;
       }
-      Status = gRT->GetVariable (
-                       Question->VariableName,
-                       &Question->Storage->Guid,
-                       NULL,
-                       &StorageWidth,
-                       BufferValue
-                       );
 
-      if (!EFI_ERROR (Status)) {
-        Status = ProcessCallBackFunction(Selection, Question, EFI_BROWSER_ACTION_RETRIEVE, TRUE);
+      //
+      // For efivarstore storage, initial question value first.
+      //
+      if ((Question->Storage != NULL) && (Question->Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE)) {
+        Status = gRT->GetVariable (
+                         Question->VariableName,
+                         &Question->Storage->Guid,
+                         NULL,
+                         &StorageWidth,
+                         BufferValue
+                         );
       }
+
+      Status = ProcessCallBackFunction(Selection, Question, EFI_BROWSER_ACTION_RETRIEVE, TRUE);
     }
 
     Link = GetNextNode (&Form->StatementListHead, Link);
@@ -3555,6 +3558,79 @@ CopyStorage (
   return EFI_SUCCESS;
 }
 
+/**
+  Get old question value from the saved formset.
+
+  @param  Statement              The question which need to get old question value.
+  @param  OldFormSet             FormSet data structure saved in the list.
+
+**/
+VOID 
+GetOldQuestionValue (
+  IN OUT FORM_BROWSER_STATEMENT  *Statement,
+  IN     FORM_BROWSER_FORMSET    *OldFormSet
+  )
+{
+  LIST_ENTRY              *FormLink;
+  LIST_ENTRY              *Link;
+  FORM_BROWSER_STATEMENT  *Question;
+  FORM_BROWSER_FORM       *Form;
+
+  FormLink = GetFirstNode (&OldFormSet->FormListHead);
+  while (!IsNull (&OldFormSet->FormListHead, FormLink)) {
+    Form = FORM_BROWSER_FORM_FROM_LINK (FormLink);
+    FormLink = GetNextNode (&OldFormSet->FormListHead, FormLink);
+
+    Link = GetFirstNode (&Form->StatementListHead);
+    while (!IsNull (&Form->StatementListHead, Link)) {
+      Question = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
+      Link = GetNextNode (&Form->StatementListHead, Link);
+
+      if (Question->QuestionId != Statement->QuestionId) {
+        continue;
+      }
+
+      CopyMem (&Statement->HiiValue, &Question->HiiValue, sizeof (EFI_HII_VALUE));
+      return;
+    }
+  }
+}
+
+/**
+  Get old question value from the saved formset, all these questions not have
+  storage.
+
+  @param  FormSet                FormSet data structure which is used now.
+  @param  OldFormSet             FormSet data structure saved in the list.
+
+**/
+VOID
+CopyOldValueForNoStorageQst (
+  IN OUT FORM_BROWSER_FORMSET             *FormSet,
+  IN     FORM_BROWSER_FORMSET             *OldFormSet
+  )
+{
+  LIST_ENTRY              *FormLink;
+  LIST_ENTRY              *Link;
+  FORM_BROWSER_STATEMENT  *Question;
+  FORM_BROWSER_FORM       *Form;
+
+  FormLink = GetFirstNode (&FormSet->FormListHead);
+  while (!IsNull (&FormSet->FormListHead, FormLink)) {
+    Form = FORM_BROWSER_FORM_FROM_LINK (FormLink);
+    FormLink = GetNextNode (&FormSet->FormListHead, FormLink);
+
+    Link = GetFirstNode (&Form->StatementListHead);
+    while (!IsNull (&Form->StatementListHead, Link)) {
+      Question = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
+      Link = GetNextNode (&Form->StatementListHead, Link);
+
+      if (Question->Storage == NULL) {
+        GetOldQuestionValue (Question, OldFormSet);
+      }
+    }
+  }
+}
 
 /**
   Get current setting of Questions.
@@ -3577,11 +3653,6 @@ InitializeCurrentSetting (
   FORM_BROWSER_FORM       *Form;
   FORM_BROWSER_FORM       *Form2;
   EFI_STATUS              Status;
-
-  //
-  // Extract default from IFR binary for no storage questions.
-  //
-  ExtractDefault (FormSet, NULL, EFI_HII_DEFAULT_CLASS_STANDARD, FormSetLevel, GetDefaultForNoStorage, NULL);
 
   //
   // Request current settings from Configuration Driver
@@ -3618,7 +3689,7 @@ InitializeCurrentSetting (
         //
         // If get last time changed value failed, extract default from IFR binary
         //
-        ExtractDefault (FormSet, NULL, EFI_HII_DEFAULT_CLASS_STANDARD, FormSetLevel, GetDefaultForStorage, Storage);
+        ExtractDefault (FormSet, NULL, EFI_HII_DEFAULT_CLASS_STANDARD, FormSetLevel, GetDefaultForStorage, Storage, TRUE);
         //
         // ExtractDefault will set the NV flag to TRUE, so need this function to clean the flag
         // in current situation.
@@ -3645,23 +3716,33 @@ InitializeCurrentSetting (
   // If has old formset, get the old nv update status.
   //
   if (gOldFormSet != NULL) {
-      Link = GetFirstNode (&FormSet->FormListHead);
-      while (!IsNull (&FormSet->FormListHead, Link)) {
-        Form = FORM_BROWSER_FORM_FROM_LINK (Link);
+    //
+    // Restore question value for questions without storage.
+    //
+    CopyOldValueForNoStorageQst (FormSet, gOldFormSet);
 
-        Link2 = GetFirstNode (&gOldFormSet->FormListHead);
-        while (!IsNull (&gOldFormSet->FormListHead, Link2)) {
-          Form2 = FORM_BROWSER_FORM_FROM_LINK (Link2);
+    Link = GetFirstNode (&FormSet->FormListHead);
+    while (!IsNull (&FormSet->FormListHead, Link)) {
+      Form = FORM_BROWSER_FORM_FROM_LINK (Link);
 
-          if (Form->FormId == Form2->FormId) {
-            Form->NvUpdateRequired = Form2->NvUpdateRequired;
-            break;
-          }
+      Link2 = GetFirstNode (&gOldFormSet->FormListHead);
+      while (!IsNull (&gOldFormSet->FormListHead, Link2)) {
+        Form2 = FORM_BROWSER_FORM_FROM_LINK (Link2);
 
-          Link2 = GetNextNode (&gOldFormSet->FormListHead, Link2);
+        if (Form->FormId == Form2->FormId) {
+          Form->NvUpdateRequired = Form2->NvUpdateRequired;
+          break;
         }
-          Link = GetNextNode (&FormSet->FormListHead, Link);
+
+        Link2 = GetNextNode (&gOldFormSet->FormListHead, Link2);
       }
+      Link = GetNextNode (&FormSet->FormListHead, Link);
+    }
+  } else {
+    //
+    // Extract default from IFR binary for no storage questions.
+    //  
+    ExtractDefault (FormSet, NULL, EFI_HII_DEFAULT_CLASS_STANDARD, FormSetLevel, GetDefaultForNoStorage, NULL, TRUE);
   }
 
   return EFI_SUCCESS;
