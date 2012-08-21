@@ -815,7 +815,7 @@ GetToken (
 
   String = HiiGetString (HiiHandle, Token, NULL);
   if (String == NULL) {
-    String = AllocateCopyPool (sizeof (mUnknownString), mUnknownString);
+    String = AllocateCopyPool (StrSize (mUnknownString), mUnknownString);
     ASSERT (String != NULL);
   }
   return (CHAR16 *) String;
@@ -3269,7 +3269,7 @@ ExtractDefault (
       //
       // Initilize Questions' Value
       //
-      LoadFormSetConfig (NULL, LocalFormSet);
+      Status = LoadFormSetConfig (NULL, LocalFormSet);
       if (EFI_ERROR (Status)) {
         DestroyFormSet (LocalFormSet);
         continue;

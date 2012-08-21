@@ -957,6 +957,9 @@ CreateDialog (
           TempString[Index - 1] = CHAR_NULL;
           StrCpy (StringBuffer, TempString);
         }
+        //
+        // break skipped on purpose
+        //
 
       default:
         //
