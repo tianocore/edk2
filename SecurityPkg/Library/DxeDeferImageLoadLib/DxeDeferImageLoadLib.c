@@ -714,18 +714,22 @@ GetDefferedImageInfo (
                                     logging.
   @param[in]  FileBuffer            File buffer matches the input file device path.
   @param[in]  FileSize              Size of File buffer matches the input file device path.
+  @param[in]  BootPolicy            A boot policy that was used to call LoadImage() UEFI service.
 
-  @retval EFI_SUCCESS               The file specified by File did authenticate, and the
-                                    platform policy dictates that the DXE Core may use File.
-  @retval EFI_INVALID_PARAMETER     File is NULL.
-  @retval EFI_SECURITY_VIOLATION    The file specified by File did not authenticate, and
-                                    the platform policy dictates that File should be placed
-                                    in the untrusted state. A file may be promoted from
-                                    the untrusted to the trusted state at a future time
-                                    with a call to the Trust() DXE Service.
-  @retval EFI_ACCESS_DENIED         The file specified by File did not authenticate, and
-                                    the platform policy dictates that File should not be
-                                    used for any purpose.
+  @retval EFI_SUCCESS               FileBuffer is NULL and current user has permission to start
+                                    UEFI device drivers on the device path specified by DevicePath.
+  @retval EFI_SUCCESS               The file specified by DevicePath and non-NULL
+                                    FileBuffer did authenticate, and the platform policy dictates
+                                    that the DXE Foundation may use the file.
+  @retval EFI_SECURITY_VIOLATION    FileBuffer is NULL and the user has no
+                                    permission to start UEFI device drivers on the device path specified
+                                    by DevicePath.
+  @retval EFI_SECURITY_VIOLATION    FileBuffer is not NULL and the user has no permission to load
+                                    drivers from the device path specified by DevicePath. The
+                                    image has been added into the list of the deferred images.
+  @retval EFI_ACCESS_DENIED         The file specified by File and FileBuffer did not
+                                    authenticate, and the platform policy dictates that the DXE
+                                    Foundation many not use File.
 
 **/
 EFI_STATUS
@@ -734,17 +738,20 @@ DxeDeferImageLoadHandler (
   IN  UINT32                           AuthenticationStatus,
   IN  CONST EFI_DEVICE_PATH_PROTOCOL   *File,
   IN  VOID                             *FileBuffer,
-  IN  UINTN                            FileSize
+  IN  UINTN                            FileSize,
+  IN  BOOLEAN                          BootPolicy
   )
-
 {
   EFI_STATUS                           Status;
   EFI_USER_PROFILE_HANDLE              CurrentUser;
   UINT32                               Policy;
   UINT32                               FileType;
 
+  //
+  // Ignore if File is NULL.
+  //
   if (File == NULL) {
-    return EFI_INVALID_PARAMETER;
+    return EFI_SUCCESS;
   }
 
   //
@@ -759,7 +766,7 @@ DxeDeferImageLoadHandler (
       //
       if (!VerifyDevicePath (File)) {
         DEBUG ((EFI_D_ERROR, "[Security] The image is forbidden to load!\n"));
-        return EFI_ACCESS_DENIED;
+        return EFI_SECURITY_VIOLATION;
       }
       return EFI_SUCCESS;
     }
@@ -779,7 +786,7 @@ DxeDeferImageLoadHandler (
   }
  
   DEBUG ((EFI_D_ERROR, "[Security] No user identified, the image is deferred to load!\n"));
-  PutDefferedImageInfo (File, NULL, 0);
+  PutDefferedImageInfo (File, FileBuffer, FileSize);
 
   //
   // Install the Deferred Image Load Protocol onto a new handle.
@@ -849,7 +856,7 @@ DxeDeferImageLoadLibConstructor (
     &Registration
     );
   
-  return RegisterSecurityHandler (
+  return RegisterSecurity2Handler (
            DxeDeferImageLoadHandler,
            EFI_AUTH_OPERATION_DEFER_IMAGE_LOAD 
            );      

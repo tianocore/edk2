@@ -141,6 +141,10 @@ GetImageType (
   EFI_DEVICE_PATH_PROTOCOL          *TempDevicePath;
   EFI_BLOCK_IO_PROTOCOL             *BlockIo;
 
+  if (File == NULL) {
+    return IMAGE_UNKNOWN;
+  }
+
   //
   // First check to see if File is from a Firmware Volume
   //
@@ -1034,19 +1038,23 @@ VerifyCertPkcsSignedData (
                            being dispatched. This will optionally be used for logging.
   @param[in]    FileBuffer File buffer matches the input file device path.
   @param[in]    FileSize   Size of File buffer matches the input file device path.
+  @param[in]    BootPolicy A boot policy that was used to call LoadImage() UEFI service.
 
-  @retval EFI_SUCCESS            The file specified by File did authenticate, and the
-                                 platform policy dictates that the DXE Core may use File.
-  @retval EFI_INVALID_PARAMETER  Input argument is incorrect.
+  @retval EFI_SUCCESS            The file specified by DevicePath and non-NULL
+                                 FileBuffer did authenticate, and the platform policy dictates
+                                 that the DXE Foundation may use the file.
+  @retval EFI_SUCCESS            The device path specified by NULL device path DevicePath
+                                 and non-NULL FileBuffer did authenticate, and the platform
+                                 policy dictates that the DXE Foundation may execute the image in
+                                 FileBuffer.
   @retval EFI_OUT_RESOURCE       Fail to allocate memory.
   @retval EFI_SECURITY_VIOLATION The file specified by File did not authenticate, and
                                  the platform policy dictates that File should be placed
-                                 in the untrusted state. A file may be promoted from
-                                 the untrusted to the trusted state at a future time
-                                 with a call to the Trust() DXE Service.
-  @retval EFI_ACCESS_DENIED      The file specified by File did not authenticate, and
-                                 the platform policy dictates that File should not be
-                                 used for any purpose.
+                                 in the untrusted state. The image has been added to the file
+                                 execution table.
+  @retval EFI_ACCESS_DENIED      The file specified by File and FileBuffer did not
+                                 authenticate, and the platform policy dictates that the DXE
+                                 Foundation many not use File.
 
 **/
 EFI_STATUS
@@ -1055,7 +1063,8 @@ DxeImageVerificationHandler (
   IN  UINT32                           AuthenticationStatus,
   IN  CONST EFI_DEVICE_PATH_PROTOCOL   *File,
   IN  VOID                             *FileBuffer,
-  IN  UINTN                            FileSize
+  IN  UINTN                            FileSize,
+  IN  BOOLEAN                          BootPolicy
   )
 {
   EFI_STATUS                           Status;
@@ -1072,10 +1081,6 @@ DxeImageVerificationHandler (
   PE_COFF_LOADER_IMAGE_CONTEXT         ImageContext;
   UINT32                               NumberOfRvaAndSizes;
   UINT32                               CertSize;
-
-  if (File == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
 
   SignatureList     = NULL;
   SignatureListSize = 0;
@@ -1326,6 +1331,7 @@ Done:
     // Policy decides to defer or reject the image; add its information in image executable information table.
     //
     AddImageExeInfo (Action, NULL, File, SignatureList, SignatureListSize);
+    Status = EFI_SECURITY_VIOLATION;
   }
 
   if (SignatureList != NULL) {
@@ -1410,7 +1416,7 @@ DxeImageVerificationLibConstructor (
     &Registration
     );
 
-  return RegisterSecurityHandler (
+  return RegisterSecurity2Handler (
           DxeImageVerificationHandler,
           EFI_AUTH_OPERATION_VERIFY_IMAGE | EFI_AUTH_OPERATION_IMAGE_REQUIRED
           );
