@@ -1435,6 +1435,12 @@ PeCoffLoaderLoadImage (
 
         for (Index = 0; Index < ResourceDirectory->NumberOfNamedEntries; Index++) {
           if (ResourceDirectoryEntry->u1.s.NameIsString) {
+            //
+            // Check the ResourceDirectoryEntry->u1.s.NameOffset before use it.
+            //
+            if (ResourceDirectoryEntry->u1.s.NameOffset >= DirectoryEntry->Size) {
+              continue;
+            }
             ResourceDirectoryString = (EFI_IMAGE_RESOURCE_DIRECTORY_STRING *) (Base + ResourceDirectoryEntry->u1.s.NameOffset);
             String = &ResourceDirectoryString->String[0];
 
@@ -1610,6 +1616,15 @@ PeCoffLoaderRelocateImageForRuntime (
   //
   FixupData = RelocationData;
   while (RelocBase < RelocBaseEnd) {
+    //
+    // Add check for RelocBase->SizeOfBlock field.
+    //
+    if ((RelocBase->SizeOfBlock == 0) || (RelocBase->SizeOfBlock > RelocDir->Size)) {
+      //
+      // Data invalid, cannot continue to relocate the image, just return.
+      //
+      return;
+    }
 
     Reloc     = (UINT16 *) ((UINT8 *) RelocBase + sizeof (EFI_IMAGE_BASE_RELOCATION));
     RelocEnd  = (UINT16 *) ((UINT8 *) RelocBase + RelocBase->SizeOfBlock);
