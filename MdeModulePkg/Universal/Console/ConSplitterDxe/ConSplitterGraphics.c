@@ -120,6 +120,7 @@ ConSplitterGraphicsOutputSetMode (
   EFI_STATUS                             ReturnStatus;
   EFI_GRAPHICS_OUTPUT_MODE_INFORMATION   *Mode;
   EFI_GRAPHICS_OUTPUT_PROTOCOL           *GraphicsOutput;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL           *PhysicalGraphicsOutput;
   UINTN                                  NumberIndex;
   UINTN                                  SizeOfInfo;
   EFI_GRAPHICS_OUTPUT_MODE_INFORMATION   *Info;
@@ -134,12 +135,14 @@ ConSplitterGraphicsOutputSetMode (
 
   ReturnStatus = EFI_SUCCESS;
   GraphicsOutput = NULL;
+  PhysicalGraphicsOutput = NULL;
   //
   // return the worst status met
   //
   for (Index = 0; Index < Private->CurrentNumberOfConsoles; Index++) {
     GraphicsOutput = Private->TextOutList[Index].GraphicsOutput;
     if (GraphicsOutput != NULL) {
+      PhysicalGraphicsOutput = GraphicsOutput;
       //
       // Find corresponding ModeNumber of this GraphicsOutput instance
       //
@@ -178,14 +181,14 @@ ConSplitterGraphicsOutputSetMode (
 
   This->Mode->Mode = ModeNumber;
 
-  if ((Private->CurrentNumberOfGraphicsOutput == 1) && (GraphicsOutput != NULL)) {
+  if ((Private->CurrentNumberOfGraphicsOutput == 1) && (PhysicalGraphicsOutput != NULL)) {
     //
     // If only one physical GOP device exist, copy physical information to consplitter.
     //
-    CopyMem (This->Mode->Info, GraphicsOutput->Mode->Info, GraphicsOutput->Mode->SizeOfInfo);
-    This->Mode->SizeOfInfo = GraphicsOutput->Mode->SizeOfInfo;
-    This->Mode->FrameBufferBase = GraphicsOutput->Mode->FrameBufferBase;
-    This->Mode->FrameBufferSize = GraphicsOutput->Mode->FrameBufferSize;
+    CopyMem (This->Mode->Info, PhysicalGraphicsOutput->Mode->Info, PhysicalGraphicsOutput->Mode->SizeOfInfo);
+    This->Mode->SizeOfInfo = PhysicalGraphicsOutput->Mode->SizeOfInfo;
+    This->Mode->FrameBufferBase = PhysicalGraphicsOutput->Mode->FrameBufferBase;
+    This->Mode->FrameBufferSize = PhysicalGraphicsOutput->Mode->FrameBufferSize;
   } else {
     //
     // If 2 more phyiscal GOP device exist or GOP protocol does not exist, 
