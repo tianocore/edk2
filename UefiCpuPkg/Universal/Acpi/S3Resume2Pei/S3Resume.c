@@ -193,6 +193,18 @@ S3RestoreConfig2 (
   IN EFI_PEI_S3_RESUME2_PPI  *This
   );
 
+/**
+  Set data segment selectors value including DS/ES/FS/GS/SS.
+
+  @param[in]  SelectorValue      Segment selector value to be set.
+
+**/
+VOID
+EFIAPI
+AsmSetDataSelectors (
+  IN UINT16   SelectorValue
+  );
+
 //
 // Globals
 //
@@ -231,6 +243,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED IA32_GDT mGdtEntries[] = {
 /* 0x38 */  {{0xFFFF, 0,  0,  0xB,  1,  0,  1,  0xF,  0,  1, 0,  1,  0}},
 /* 0x40 */  {{0,      0,  0,  0,    0,  0,  0,  0,    0,  0, 0,  0,  0}},
 };
+
+#define DATA_SEGEMENT_SELECTOR        0x18
 
 //
 // IA32 Gdt register
@@ -701,6 +715,7 @@ S3ResumeExecuteBootScript (
   IA32_DESCRIPTOR            *IdtDescriptor;
   VOID                       *IdtBuffer;
   PEI_S3_RESUME_STATE        *PeiS3ResumeState;
+  BOOLEAN                    InterruptStatus;
 
   DEBUG ((EFI_D_ERROR, "S3ResumeExecuteBootScript()\n"));
 
@@ -769,10 +784,19 @@ S3ResumeExecuteBootScript (
     *(UINTN*)(IdtDescriptor->Base - sizeof(UINTN)) = (UINTN)GetPeiServicesTablePointer ();
   }
 
+  InterruptStatus = SaveAndDisableInterrupts ();
   //
   // Need to make sure the GDT is loaded with values that support long mode and real mode.
   //
   AsmWriteGdtr (&mGdt);
+  //
+  // update segment selectors per the new GDT.
+  //
+  AsmSetDataSelectors (DATA_SEGEMENT_SELECTOR);
+  //
+  // Restore interrupt state.
+  //
+  SetInterruptState (InterruptStatus);
 
   //
   // Prepare data for return back
@@ -873,6 +897,7 @@ S3RestoreConfig2 (
   SMM_S3_RESUME_STATE                           *SmmS3ResumeState;
   VOID                                          *GuidHob;
   BOOLEAN                                       Build4GPageTableOnly;
+  BOOLEAN                                       InterruptStatus;
 
   TempAcpiS3Context = 0;
   TempEfiBootScriptExecutorVariable = 0;
@@ -1002,10 +1027,20 @@ S3RestoreConfig2 (
       // Switch to long mode to complete resume.
       //
 
+      InterruptStatus = SaveAndDisableInterrupts ();
       //
       // Need to make sure the GDT is loaded with values that support long mode and real mode.
       //
       AsmWriteGdtr (&mGdt);
+      //
+      // update segment selectors per the new GDT.
+      //      
+      AsmSetDataSelectors (DATA_SEGEMENT_SELECTOR);
+      //
+      // Restore interrupt state.
+      //
+      SetInterruptState (InterruptStatus);
+
       AsmWriteCr3 ((UINTN)SmmS3ResumeState->SmmS3Cr3);
       AsmEnablePaging64 (
         0x38,
