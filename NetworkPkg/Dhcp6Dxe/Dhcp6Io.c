@@ -1,7 +1,7 @@
 /** @file
   Dhcp6 internal functions implementation.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1626,6 +1626,106 @@ Dhcp6SendRenewRebindMsg (
   return Dhcp6EnqueueRetry (Instance, Packet, Elapsed, NULL);
 }
 
+/**
+  Start the information request process.
+
+  @param[in]  Instance          The pointer to the Dhcp6 instance.
+  @param[in]  SendClientId      If TRUE, the client identifier option will be included in
+                                information request message. Otherwise, the client identifier
+                                option will not be included.
+  @param[in]  OptionRequest     The pointer to the option request option.
+  @param[in]  OptionCount       The number options in the OptionList.
+  @param[in]  OptionList        The array pointers to the appended options.
+  @param[in]  Retransmission    The pointer to the retransmission control.
+  @param[in]  TimeoutEvent      The event of timeout.
+  @param[in]  ReplyCallback     The callback function when the reply was received.
+  @param[in]  CallbackContext   The pointer to the parameter passed to the callback.
+
+  @retval EFI_SUCCESS           Start the info-request process successfully.
+  @retval EFI_OUT_OF_RESOURCES  Required system resources could not be allocated.
+  @retval EFI_NO_MAPPING        No source address is available for use.
+  @retval Others                Failed to start the info-request process.
+
+**/
+EFI_STATUS
+Dhcp6StartInfoRequest (
+  IN DHCP6_INSTANCE            *Instance,
+  IN BOOLEAN                   SendClientId,
+  IN EFI_DHCP6_PACKET_OPTION   *OptionRequest,
+  IN UINT32                    OptionCount,
+  IN EFI_DHCP6_PACKET_OPTION   *OptionList[]    OPTIONAL,
+  IN EFI_DHCP6_RETRANSMISSION  *Retransmission,
+  IN EFI_EVENT                 TimeoutEvent     OPTIONAL,
+  IN EFI_DHCP6_INFO_CALLBACK   ReplyCallback,
+  IN VOID                      *CallbackContext OPTIONAL
+  )
+{
+  EFI_STATUS                   Status;
+  DHCP6_INF_CB                 *InfCb;
+  DHCP6_SERVICE                *Service;
+  EFI_TPL                      OldTpl;
+
+  Service  = Instance->Service;
+
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+  Instance->UdpSts = EFI_ALREADY_STARTED;
+  //
+  // Create and initialize the control block for the info-request.
+  //
+  InfCb = AllocateZeroPool (sizeof(DHCP6_INF_CB));
+
+  if (InfCb == NULL) {
+    gBS->RestoreTPL (OldTpl);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  InfCb->ReplyCallback   = ReplyCallback;
+  InfCb->CallbackContext = CallbackContext;
+  InfCb->TimeoutEvent    = TimeoutEvent;
+
+  InsertTailList (&Instance->InfList, &InfCb->Link);
+
+  //
+  // Send the info-request message to start exchange process.
+  //
+  Status = Dhcp6SendInfoRequestMsg (
+             Instance,
+             InfCb,
+             SendClientId,
+             OptionRequest,
+             OptionCount,
+             OptionList,
+             Retransmission
+             );
+
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
+
+  //
+  // Register receive callback for the stateless exchange process.
+  //
+  Status = UdpIoRecvDatagram(
+             Service->UdpIo,
+             Dhcp6ReceivePacket,
+             Service,
+             0
+             );
+
+  if (EFI_ERROR (Status) && (Status != EFI_ALREADY_STARTED)) {
+    goto ON_ERROR;
+  }
+  
+  gBS->RestoreTPL (OldTpl);
+  return EFI_SUCCESS;
+  
+ON_ERROR:
+  gBS->RestoreTPL (OldTpl); 
+  RemoveEntryList (&InfCb->Link);
+  FreePool (InfCb);
+
+  return Status;
+}
 
 /**
   Create the information request message and send it.

@@ -1,7 +1,7 @@
 /** @file
   Dhcp6 internal data structure and definition declaration.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -21,6 +21,7 @@
 
 #include <Protocol/Dhcp6.h>
 #include <Protocol/Udp6.h>
+#include <Protocol/Ip6Config.h>
 #include <Protocol/ServiceBinding.h>
 #include <Protocol/DriverBinding.h>
 
@@ -259,6 +260,7 @@ struct _DHCP6_SERVICE {
   EFI_HANDLE                    Image;
   EFI_SERVICE_BINDING_PROTOCOL  ServiceBinding;
   EFI_SIMPLE_NETWORK_PROTOCOL   *Snp;
+  EFI_IP6_CONFIG_PROTOCOL       *Ip6Cfg;
   EFI_DHCP6_DUID                *ClientId;
   UDP_IO                        *UdpIo;
   UINT32                        Xid;

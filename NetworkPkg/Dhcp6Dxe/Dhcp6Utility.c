@@ -1189,3 +1189,42 @@ Dhcp6AppendCacheIa (
     Instance->IaCb.Ia  = NewIa;
   }
 }
+
+/**
+  Calculate the Dhcp6 get mapping timeout by adding additinal delay to the IP6 DAD transmits count.
+
+  @param[in]   Ip6Cfg              The pointer to Ip6 config protocol.
+  @param[out]  TimeOut             The time out value in 100ns units.
+
+  @retval   EFI_INVALID_PARAMETER  Input parameters are invalid.
+  @retval   EFI_SUCCESS            Calculate the time out value successfully.
+**/
+EFI_STATUS
+Dhcp6GetMappingTimeOut (
+  IN  EFI_IP6_CONFIG_PROTOCOL       *Ip6Cfg,
+  OUT UINTN                         *TimeOut
+  ) 
+{
+  EFI_STATUS            Status;
+  UINTN                 DataSize;
+  EFI_IP6_CONFIG_DUP_ADDR_DETECT_TRANSMITS    DadXmits;
+
+  if (Ip6Cfg == NULL || TimeOut == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  DataSize = sizeof (EFI_IP6_CONFIG_DUP_ADDR_DETECT_TRANSMITS);
+  Status = Ip6Cfg->GetData (
+                     Ip6Cfg,
+                     Ip6ConfigDataTypeDupAddrDetectTransmits,
+                     &DataSize,
+                     &DadXmits
+                     );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  *TimeOut = TICKS_PER_SECOND * DadXmits.DupAddrDetectTransmits + DHCP6_DAD_ADDITIONAL_DELAY;
+  
+  return EFI_SUCCESS;
+}

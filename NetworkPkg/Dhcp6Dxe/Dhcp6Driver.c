@@ -2,7 +2,7 @@
   Driver Binding functions and Service Binding functions
   implementationfor for Dhcp6 Driver.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -132,6 +132,7 @@ Dhcp6CreateService (
   )
 {
   DHCP6_SERVICE             *Dhcp6Srv;
+  EFI_STATUS                Status;
 
   *Service = NULL;
   Dhcp6Srv = AllocateZeroPool (sizeof (DHCP6_SERVICE));
@@ -164,6 +165,19 @@ Dhcp6CreateService (
     &gDhcp6ServiceBindingTemplate,
     sizeof (EFI_SERVICE_BINDING_PROTOCOL)
     );
+
+  //
+  // Locate Ip6->Ip6Config and store it for get IP6 Duplicate Address Detection transmits.
+  //
+  Status = gBS->HandleProtocol (
+                  Controller,
+                  &gEfiIp6ConfigProtocolGuid,
+                  (VOID **) &Dhcp6Srv->Ip6Cfg
+                  );
+  if (EFI_ERROR (Status)) {
+    FreePool (Dhcp6Srv);
+    return Status;
+  }
 
   //
   // Generate client Duid: If SMBIOS system UUID is located, generate DUID in DUID-UUID format.

@@ -1,7 +1,7 @@
 /** @file
   Dhcp6 support functions declaration.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -17,7 +17,8 @@
 #define __EFI_DHCP6_UTILITY_H__
 
 
-#define  DHCP6_10_BIT_MASK     0x3ff
+#define  DHCP6_10_BIT_MASK             0x3ff
+#define  DHCP6_DAD_ADDITIONAL_DELAY    30000000 // 3 seconds
 
 /**
   Generate client Duid in the format of Duid-llt.
@@ -337,4 +338,18 @@ Dhcp6AppendCacheIa (
   IN DHCP6_INSTANCE           *Instance
   );
 
+/**
+  Calculate the Dhcp6 get mapping timeout by adding additinal delay to the IP6 DAD transmits count.
+
+  @param[in]   Ip6Cfg              The pointer to Ip6 config protocol.
+  @param[out]  TimeOut             The time out value in 100ns units.
+
+  @retval   EFI_INVALID_PARAMETER  Input parameters are invalid.
+  @retval   EFI_SUCCESS            Calculate the time out value successfully.
+**/
+EFI_STATUS
+Dhcp6GetMappingTimeOut (
+  IN  EFI_IP6_CONFIG_PROTOCOL       *Ip6Cfg,
+  OUT UINTN                         *TimeOut
+  );
 #endif
