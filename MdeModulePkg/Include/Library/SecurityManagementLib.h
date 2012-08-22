@@ -3,7 +3,7 @@
   security measurement by managing the different security measurement services.
   The library instances can be implemented according to the different security policy.
 
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -17,10 +17,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __SECURITY_MANAGEMENT_LIB_H__
 #define __SECURITY_MANAGEMENT_LIB_H__
 
+//
+// Authentication Operation defintions for User Identity (UID), Measured and Secure boot.
+//
 #define EFI_AUTH_OPERATION_NONE                0x00
 #define EFI_AUTH_OPERATION_VERIFY_IMAGE        0x01
 #define EFI_AUTH_OPERATION_DEFER_IMAGE_LOAD    0x02
 #define EFI_AUTH_OPERATION_MEASURE_IMAGE       0x04
+#define EFI_AUTH_OPERATION_CONNECT_POLICY      0x08
+//
+// Authentication State Operation will check the authentication status of a file.
+//
+#define EFI_AUTH_OPERATION_AUTHENTICATION_STATE  0x10
 
 ///
 /// Image buffer is required by the security handler.
@@ -141,6 +149,128 @@ EFIAPI
 ExecuteSecurityHandlers (
   IN  UINT32                            AuthenticationStatus,
   IN  CONST EFI_DEVICE_PATH_PROTOCOL    *FilePath
+  );
+
+/**
+  The security handler is used to abstracts security-specific functions from the DXE 
+  Foundation of UEFI Image Verification, Trusted Computing Group (TCG) measured boot, 
+  User Identity policy for image loading and consoles, and for purposes of 
+  handling GUIDed section encapsulations. 
+  
+  @param[in]    AuthenticationStatus 
+                           The authentication status for the input file. 
+  @param[in]    File       The pointer to the device path of the file that is
+                           being dispatched. This will optionally be used for logging.
+  @param[in]    FileBuffer A pointer to the buffer with the UEFI file image
+  @param[in]    FileSize   The size of File buffer.
+  @param[in]    BootPolicy A boot policy that was used to call LoadImage() UEFI service.
+
+  @retval EFI_SUCCESS             The file specified by DevicePath and non-NULL
+                                  FileBuffer did authenticate, and the platform policy dictates
+                                  that the DXE Foundation may use the file.
+  @retval EFI_SUCCESS             The device path specified by NULL device path DevicePath
+                                  and non-NULL FileBuffer did authenticate, and the platform
+                                  policy dictates that the DXE Foundation may execute the image in
+                                  FileBuffer.
+  @retval EFI_SUCCESS             FileBuffer is NULL and current user has permission to start
+                                  UEFI device drivers on the device path specified by DevicePath.
+  @retval EFI_SECURITY_VIOLATION  The file specified by DevicePath and FileBuffer did not
+                                  authenticate, and the platform policy dictates that the file should be
+                                  placed in the untrusted state. The image has been added to the file
+                                  execution table.
+  @retval EFI_ACCESS_DENIED       The file specified by File and FileBuffer did not
+                                  authenticate, and the platform policy dictates that the DXE
+                                  Foundation may not use File.
+  @retval EFI_SECURITY_VIOLATION  FileBuffer is NULL and the user has no
+                                  permission to start UEFI device drivers on the device path specified
+                                  by DevicePath.
+  @retval EFI_SECURITY_VIOLATION  FileBuffer is not NULL and the user has no permission to load
+                                  drivers from the device path specified by DevicePath. The
+                                  image has been added into the list of the deferred images.
+**/
+typedef 
+EFI_STATUS
+(EFIAPI *SECURITY2_FILE_AUTHENTICATION_HANDLER) (
+  IN  UINT32                           AuthenticationStatus,
+  IN  CONST EFI_DEVICE_PATH_PROTOCOL   *File,
+  IN  VOID                             *FileBuffer,
+  IN  UINTN                            FileSize,
+  IN  BOOLEAN                          BootPolicy
+  );
+
+/**
+  Register security measurement handler with its operation type. Different
+  handlers with the same operation can all be registered.
+
+  If SecurityHandler is NULL, then ASSERT().
+  If no enough resources available to register new handler, then ASSERT().
+  If AuthenticationOperation is not recongnized, then ASSERT().
+  If AuthenticationOperation is EFI_AUTH_OPERATION_NONE, then ASSERT().
+  If the previous register handler can't be executed before the later register handler, then ASSERT().
+
+  @param[in]  Security2Handler          The security measurement service handler to be registered.
+  @param[in]  AuthenticationOperation   The operation type is specified for the registered handler.
+
+  @retval EFI_SUCCESS              The handlers were registered successfully.
+**/
+EFI_STATUS
+EFIAPI
+RegisterSecurity2Handler (
+  IN  SECURITY2_FILE_AUTHENTICATION_HANDLER       Security2Handler,
+  IN  UINT32                                      AuthenticationOperation
+  );
+
+/**
+  Execute registered handlers based on input AuthenticationOperation until 
+  one returns an error and that error is returned. 
+  
+  If none of the handlers return an error, then EFI_SUCCESS is returned.
+  The handlers those satisfy AuthenticationOperation will only be executed.
+  The handlers are executed in same order to their registered order.
+
+  @param[in]  AuthenticationOperation   
+                           The operation type specifies which handlers will be executed.
+  @param[in]  AuthenticationStatus 
+                           The authentication status for the input file.
+  @param[in]  File         This is a pointer to the device path of the file that is
+                           being dispatched. This will optionally be used for logging.
+  @param[in]  FileBuffer   A pointer to the buffer with the UEFI file image
+  @param[in]  FileSize     The size of File buffer.
+  @param[in]  BootPolicy   A boot policy that was used to call LoadImage() UEFI service.
+
+  @retval EFI_SUCCESS             The file specified by DevicePath and non-NULL
+                                  FileBuffer did authenticate, and the platform policy dictates
+                                  that the DXE Foundation may use the file.
+  @retval EFI_SUCCESS             The device path specified by NULL device path DevicePath
+                                  and non-NULL FileBuffer did authenticate, and the platform
+                                  policy dictates that the DXE Foundation may execute the image in
+                                  FileBuffer.
+  @retval EFI_SUCCESS             FileBuffer is NULL and current user has permission to start
+                                  UEFI device drivers on the device path specified by DevicePath.
+  @retval EFI_SECURITY_VIOLATION  The file specified by DevicePath and FileBuffer did not
+                                  authenticate, and the platform policy dictates that the file should be
+                                  placed in the untrusted state. The image has been added to the file
+                                  execution table.
+  @retval EFI_ACCESS_DENIED       The file specified by File and FileBuffer did not
+                                  authenticate, and the platform policy dictates that the DXE
+                                  Foundation may not use File.
+  @retval EFI_SECURITY_VIOLATION  FileBuffer is NULL and the user has no
+                                  permission to start UEFI device drivers on the device path specified
+                                  by DevicePath.
+  @retval EFI_SECURITY_VIOLATION  FileBuffer is not NULL and the user has no permission to load
+                                  drivers from the device path specified by DevicePath. The
+                                  image has been added into the list of the deferred images.
+  @retval EFI_INVALID_PARAMETER   File and FileBuffer are both NULL. 
+**/
+EFI_STATUS
+EFIAPI
+ExecuteSecurity2Handlers (
+  IN  UINT32                           AuthenticationOperation,
+  IN  UINT32                           AuthenticationStatus,
+  IN  CONST EFI_DEVICE_PATH_PROTOCOL   *File,
+  IN  VOID                             *FileBuffer,
+  IN  UINTN                            FileSize,
+  IN  BOOLEAN                          BootPolicy
   );
 
 #endif

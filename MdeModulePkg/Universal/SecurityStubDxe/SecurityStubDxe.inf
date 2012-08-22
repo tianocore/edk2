@@ -1,7 +1,8 @@
 ## @file
-#  This driver produces security architectural protocol based on SecurityManagementLib.
+#  This driver produces security2 and security architectural protocol 
+#  based on SecurityManagementLib.
 #
-#  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -40,7 +41,8 @@
   SecurityManagementLib
 
 [Protocols]
-  gEfiSecurityArchProtocolGuid                  ## PRODUCED
+  gEfiSecurityArchProtocolGuid                  ## PRODUCES
+  gEfiSecurity2ArchProtocolGuid                 ## PRODUCES
 
 [Depex]
   TRUE

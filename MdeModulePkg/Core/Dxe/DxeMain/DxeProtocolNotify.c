@@ -45,6 +45,7 @@ EFI_CORE_PROTOCOL_NOTIFY_ENTRY  mArchProtocols[] = {
 // Optional protocols that the DXE Core will use if they are present
 //
 EFI_CORE_PROTOCOL_NOTIFY_ENTRY  mOptionalProtocols[] = {
+  { &gEfiSecurity2ArchProtocolGuid,        (VOID **)&gSecurity2,     NULL, NULL, FALSE },
   { &gEfiSmmBase2ProtocolGuid,             (VOID **)&gSmmBase2,      NULL, NULL, FALSE },
   { NULL,                                  (VOID **)NULL,            NULL, NULL, FALSE }
 };

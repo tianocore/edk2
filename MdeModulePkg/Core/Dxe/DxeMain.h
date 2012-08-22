@@ -41,6 +41,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/Decompress.h>
 #include <Protocol/LoadPe32Image.h>
 #include <Protocol/Security.h>
+#include <Protocol/Security2.h>
 #include <Protocol/Ebc.h>
 #include <Protocol/Reset.h>
 #include <Protocol/Cpu.h>
@@ -204,6 +205,7 @@ extern EFI_WATCHDOG_TIMER_ARCH_PROTOCOL         *gWatchdogTimer;
 extern EFI_METRONOME_ARCH_PROTOCOL              *gMetronome;
 extern EFI_TIMER_ARCH_PROTOCOL                  *gTimer;
 extern EFI_SECURITY_ARCH_PROTOCOL               *gSecurity;
+extern EFI_SECURITY2_ARCH_PROTOCOL              *gSecurity2;
 extern EFI_BDS_ARCH_PROTOCOL                    *gBds;
 extern EFI_SMM_BASE2_PROTOCOL                   *gSmmBase2;
 
@@ -1081,19 +1083,27 @@ CoreConnectHandlesByKey (
 /**
   Connects one or more drivers to a controller.
 
-  @param  ControllerHandle                      Handle of the controller to be
-                                                connected.
-  @param  DriverImageHandle                     DriverImageHandle A pointer to an
-                                                ordered list of driver image
-                                                handles.
-  @param  RemainingDevicePath                   RemainingDevicePath A pointer to
-                                                the device path that specifies a
-                                                child of the controller specified
-                                                by ControllerHandle.
-  @param  Recursive                             Whether the function would be
-                                                called recursively or not.
+  @param  ControllerHandle      The handle of the controller to which driver(s) are to be connected.
+  @param  DriverImageHandle     A pointer to an ordered list handles that support the
+                                EFI_DRIVER_BINDING_PROTOCOL.
+  @param  RemainingDevicePath   A pointer to the device path that specifies a child of the
+                                controller specified by ControllerHandle.
+  @param  Recursive             If TRUE, then ConnectController() is called recursively
+                                until the entire tree of controllers below the controller specified
+                                by ControllerHandle have been created. If FALSE, then
+                                the tree of controllers is only expanded one level.
 
-  @return Status code.
+  @retval EFI_SUCCESS           1) One or more drivers were connected to ControllerHandle.
+                                2) No drivers were connected to ControllerHandle, but
+                                RemainingDevicePath is not NULL, and it is an End Device
+                                Path Node.
+  @retval EFI_INVALID_PARAMETER ControllerHandle is NULL.
+  @retval EFI_NOT_FOUND         1) There are no EFI_DRIVER_BINDING_PROTOCOL instances
+                                present in the system.
+                                2) No drivers were connected to ControllerHandle.
+  @retval EFI_SECURITY_VIOLATION 
+                                The user has no permission to start UEFI device drivers on the device path 
+                                associated with the ControllerHandle or specified by the RemainingDevicePath.
 
 **/
 EFI_STATUS
@@ -1361,6 +1371,7 @@ CoreUnloadImage (
 
   @retval EFI_INVALID_PARAMETER   Invalid parameter
   @retval EFI_OUT_OF_RESOURCES    No enough buffer to allocate
+  @retval EFI_SECURITY_VIOLATION  The current platform policy specifies that the image should not be started.
   @retval EFI_SUCCESS             Successfully transfer control to the image's
                                   entry point.
 

@@ -120,6 +120,7 @@ FV_FILEPATH_DEVICE_PATH  mFvDevicePath;
 // DXE Architecture Protocols
 //
 EFI_SECURITY_ARCH_PROTOCOL  *mSecurity = NULL;
+EFI_SECURITY2_ARCH_PROTOCOL *mSecurity2 = NULL;
 
 //
 // The global variable is defined for Loading modules at fixed address feature to track the SMM code
@@ -349,27 +350,19 @@ SmmLoadImage (
   }
 
   //
-  // If the Security Architectural Protocol has not been located yet, then attempt to locate it
+  // If the Security2 and Security Architectural Protocol has not been located yet, then attempt to locate it
   //
+  if (mSecurity2 == NULL) {
+    gBS->LocateProtocol (&gEfiSecurity2ArchProtocolGuid, NULL, (VOID**)&mSecurity2);
+  }
   if (mSecurity == NULL) {
     gBS->LocateProtocol (&gEfiSecurityArchProtocolGuid, NULL, (VOID**)&mSecurity);
   }
+  //
+  // When Security2 is installed, Security Architectural Protocol must be published.
+  //
+  ASSERT (mSecurity2 == NULL || mSecurity != NULL);
 
-  //
-  // Verify the Authentication Status through the Security Architectural Protocol
-  //
-  if ((mSecurity != NULL) && (OriginalFilePath != NULL)) {
-    SecurityStatus = mSecurity->FileAuthenticationState (
-                                  mSecurity,
-                                  AuthenticationStatus,
-                                  OriginalFilePath
-                                  );
-    if (EFI_ERROR (SecurityStatus) && SecurityStatus != EFI_SECURITY_VIOLATION) {
-      Status = SecurityStatus;
-      return Status;
-    }
-  }
-  
   //
   // Pull out just the file portion of the DevicePath for the LoadedImage FilePath
   //
@@ -417,6 +410,37 @@ SmmLoadImage (
     return Status;
   }
 
+  //
+  // Verify File Authentication through the Security2 Architectural Protocol
+  //
+  if (mSecurity2 != NULL) {
+    SecurityStatus = mSecurity2->FileAuthentication (
+                                  mSecurity2,
+                                  OriginalFilePath,
+                                  Buffer,
+                                  Size,
+                                  FALSE
+                                  );
+  }
+
+  //
+  // Verify the Authentication Status through the Security Architectural Protocol
+  // Only on images that have been read using Firmware Volume protocol.
+  // All SMM images are from FV protocol. 
+  //
+  if (!EFI_ERROR (SecurityStatus) && (mSecurity != NULL)) {
+    SecurityStatus = mSecurity->FileAuthenticationState (
+                                  mSecurity,
+                                  AuthenticationStatus,
+                                  OriginalFilePath
+                                  );
+  }
+
+  if (EFI_ERROR (SecurityStatus) && SecurityStatus != EFI_SECURITY_VIOLATION) {
+    Status = SecurityStatus;
+    return Status;
+  }
+  
   //
   // Initialize ImageContext
   //

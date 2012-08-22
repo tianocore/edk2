@@ -1,7 +1,7 @@
 /** @file
   Support functions to connect/disconnect UEFI Driver model Protocol
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -22,19 +22,27 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Connects one or more drivers to a controller.
 
-  @param  ControllerHandle                      Handle of the controller to be
-                                                connected.
-  @param  DriverImageHandle                     DriverImageHandle A pointer to an
-                                                ordered list of driver image
-                                                handles.
-  @param  RemainingDevicePath                   RemainingDevicePath A pointer to
-                                                the device path that specifies a
-                                                child of the controller specified
-                                                by ControllerHandle.
-  @param  Recursive                             Whether the function would be
-                                                called recursively or not.
+  @param  ControllerHandle      The handle of the controller to which driver(s) are to be connected.
+  @param  DriverImageHandle     A pointer to an ordered list handles that support the
+                                EFI_DRIVER_BINDING_PROTOCOL.
+  @param  RemainingDevicePath   A pointer to the device path that specifies a child of the
+                                controller specified by ControllerHandle.
+  @param  Recursive             If TRUE, then ConnectController() is called recursively
+                                until the entire tree of controllers below the controller specified
+                                by ControllerHandle have been created. If FALSE, then
+                                the tree of controllers is only expanded one level.
 
-  @return Status code.
+  @retval EFI_SUCCESS           1) One or more drivers were connected to ControllerHandle.
+                                2) No drivers were connected to ControllerHandle, but
+                                RemainingDevicePath is not NULL, and it is an End Device
+                                Path Node.
+  @retval EFI_INVALID_PARAMETER ControllerHandle is NULL.
+  @retval EFI_NOT_FOUND         1) There are no EFI_DRIVER_BINDING_PROTOCOL instances
+                                present in the system.
+                                2) No drivers were connected to ControllerHandle.
+  @retval EFI_SECURITY_VIOLATION 
+                                The user has no permission to start UEFI device drivers on the device path 
+                                associated with the ControllerHandle or specified by the RemainingDevicePath.
 
 **/
 EFI_STATUS
@@ -57,6 +65,11 @@ CoreConnectController (
   EFI_HANDLE                           *ChildHandleBuffer;
   UINTN                                ChildHandleCount;
   UINTN                                Index;
+  UINTN                                HandleFilePathSize;
+  UINTN                                RemainingDevicePathSize;
+  EFI_DEVICE_PATH_PROTOCOL             *HandleFilePath;
+  EFI_DEVICE_PATH_PROTOCOL             *FilePath;
+  EFI_DEVICE_PATH_PROTOCOL             *TempFilePath;
 
   //
   // Make sure ControllerHandle is valid
@@ -66,6 +79,39 @@ CoreConnectController (
     return Status;
   }
 
+  if (gSecurity2 != NULL) {
+    //
+    // Check whether the user has permission to start UEFI device drivers.
+    //
+    Status = CoreHandleProtocol (ControllerHandle, &gEfiDevicePathProtocolGuid, (VOID **)&HandleFilePath);
+    if (!EFI_ERROR (Status)) {
+      FilePath     = HandleFilePath;
+      TempFilePath = NULL;
+      if (RemainingDevicePath != NULL && !Recursive) {
+        HandleFilePathSize      = GetDevicePathSize (HandleFilePath) - sizeof (EFI_DEVICE_PATH_PROTOCOL);
+        RemainingDevicePathSize = GetDevicePathSize (RemainingDevicePath);
+        TempFilePath = AllocateZeroPool (HandleFilePathSize + RemainingDevicePathSize);
+        ASSERT (TempFilePath != NULL);
+        CopyMem (TempFilePath, HandleFilePath, HandleFilePathSize);
+        CopyMem ((UINT8 *) TempFilePath + HandleFilePathSize, RemainingDevicePath, RemainingDevicePathSize);
+        FilePath = TempFilePath;
+      }
+      Status = gSecurity2->FileAuthentication (
+                            gSecurity2,
+                            FilePath,
+                            NULL,
+                            0,
+                            FALSE
+                            );
+      if (TempFilePath != NULL) {
+        FreePool (TempFilePath);
+      }
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+    }
+  }
+  
   Handle = ControllerHandle;
 
   //

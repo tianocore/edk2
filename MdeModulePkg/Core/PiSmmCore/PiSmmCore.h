@@ -27,6 +27,7 @@
 #include <Protocol/LoadedImage.h>       
 #include <Protocol/DevicePath.h>        
 #include <Protocol/Security.h>          
+#include <Protocol/Security2.h>
 
 #include <Guid/Apriori.h>
 #include <Guid/EventGroup.h>

@@ -23,6 +23,7 @@ EFI_HANDLE                                mDecompressHandle = NULL;
 // DXE Core globals for Architecture Protocols
 //
 EFI_SECURITY_ARCH_PROTOCOL        *gSecurity      = NULL;
+EFI_SECURITY2_ARCH_PROTOCOL       *gSecurity2     = NULL;
 EFI_CPU_ARCH_PROTOCOL             *gCpu           = NULL;
 EFI_METRONOME_ARCH_PROTOCOL       *gMetronome     = NULL;
 EFI_TIMER_ARCH_PROTOCOL           *gTimer         = NULL;

@@ -58,7 +58,8 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL    *LoadedImageDevicePath;  
   /// PeCoffLoader ImageContext
   PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext; 
-
+  /// Status returned by LoadImage() service.
+  EFI_STATUS                  LoadImageStatus;
 } LOADED_IMAGE_PRIVATE_DATA;
 
 #define LOADED_IMAGE_PRIVATE_DATA_FROM_THIS(a) \

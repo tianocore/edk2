@@ -125,6 +125,7 @@
   gEfiRuntimeArchProtocolGuid                   ## CONSUMES
   gEfiWatchdogTimerArchProtocolGuid             ## CONSUMES
   gEfiSecurityArchProtocolGuid                  ## CONSUMES
+  gEfiSecurity2ArchProtocolGuid                 ## CONSUMES
   gEfiVariableArchProtocolGuid                  ## CONSUMES
   gEfiBdsArchProtocolGuid                       ## CONSUMES
   gEfiVariableWriteArchProtocolGuid             ## CONSUMES

@@ -89,9 +89,18 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL            End;
 } FV_FILEPATH_DEVICE_PATH;
 
-FV_FILEPATH_DEVICE_PATH mFvDevicePath;
-
-
+FV_FILEPATH_DEVICE_PATH mFvDevicePath = {
+  {
+    0
+  },
+  {
+    END_DEVICE_PATH_TYPE,
+    END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    {
+      END_DEVICE_PATH_LENGTH
+    }
+  }
+};
 //
 // Function Prototypes
 //
