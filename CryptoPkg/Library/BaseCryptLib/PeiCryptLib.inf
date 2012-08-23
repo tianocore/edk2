@@ -61,6 +61,7 @@
   Rand/CryptRandNull.c
 
   SysCall/CrtWrapper.c
+  SysCall/ConstantTimeClock.c
   SysCall/BaseMemAllocation.c
 
 
