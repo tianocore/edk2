@@ -68,6 +68,7 @@
   gEfiCertSha256Guid
   gEfiCertX509Guid
   gEfiCertRsa2048Guid
+  gEfiCertPkcs7Guid
   
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy

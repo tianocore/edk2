@@ -31,7 +31,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION mNtHeader;
 UINT32                              mPeCoffHeaderOffset;
-EFI_IMAGE_DATA_DIRECTORY            *mSecDataDir      = NULL;
 EFI_GUID                            mCertType;
 
 //
@@ -585,23 +584,20 @@ Done:
   PE/COFF image is external input, so this function will validate its data structure
   within this image buffer before use.
 
+  @param[in]  AuthData            Pointer to the Authenticode Signature retrieved from signed image.
+  @param[in]  AuthDataSize        Size of the Authenticode Signature in bytes.
+  
   @retval EFI_UNSUPPORTED             Hash algorithm is not supported.
   @retval EFI_SUCCESS                 Hash successfully.
 
 **/
 EFI_STATUS
 HashPeImageByType (
-  VOID
+  IN UINT8              *AuthData,
+  IN UINTN              AuthDataSize
   )
 {
   UINT8                     Index;
-  WIN_CERTIFICATE_EFI_PKCS  *PkcsCertData;
-
-  PkcsCertData = (WIN_CERTIFICATE_EFI_PKCS *) (mImageBase + mSecDataDir->VirtualAddress);
-
-  if (PkcsCertData->Hdr.dwLength < sizeof (WIN_CERTIFICATE_EFI_PKCS) + 32) {
-    return EFI_UNSUPPORTED;
-  }
 
   for (Index = 0; Index < HASHALG_MAX; Index++) {
     //
@@ -616,18 +612,18 @@ HashPeImageByType (
     //    This field has the fixed offset (+32) in final Authenticode ASN.1 data.
     //    Fixed offset (+32) is calculated based on two bytes of length encoding.
     //
-    if ((*(PkcsCertData->CertData + 1) & TWO_BYTE_ENCODE) != TWO_BYTE_ENCODE) {
+    if ((*(AuthData + 1) & TWO_BYTE_ENCODE) != TWO_BYTE_ENCODE) {
       //
       // Only support two bytes of Long Form of Length Encoding.
       //
       continue;
     }
 
-    if (PkcsCertData->Hdr.dwLength < sizeof (WIN_CERTIFICATE_EFI_PKCS) + 32 + mHash[Index].OidLength) {
+    if (AuthDataSize < 32 + mHash[Index].OidLength) {
       return EFI_UNSUPPORTED;
     }
 
-    if (CompareMem (PkcsCertData->CertData + 32, mHash[Index].OidValue, mHash[Index].OidLength) == 0) {
+    if (CompareMem (AuthData + 32, mHash[Index].OidValue, mHash[Index].OidLength) == 0) {
       break;
     }
   }
@@ -875,8 +871,10 @@ Done:
   Verify PKCS#7 SignedData using certificate found in Variable which formatted
   as EFI_SIGNATURE_LIST. The Variable may be PK, KEK, DB or DBX.
 
-  @param VariableName  Name of Variable to search for Certificate.
-  @param VendorGuid    Variable vendor GUID.
+  @param[in]  AuthData      Pointer to the Authenticode Signature retrieved from signed image.
+  @param[in]  AuthDataSize  Size of the Authenticode Signature in bytes.
+  @param[in]  VariableName  Name of Variable to search for Certificate.
+  @param[in]  VendorGuid    Variable vendor GUID.
 
   @retval TRUE         Image pass verification.
   @retval FALSE        Image fail verification.
@@ -884,13 +882,14 @@ Done:
 **/
 BOOLEAN
 IsPkcsSignedDataVerifiedBySignatureList (
+  IN UINT8              *AuthData,
+  IN UINTN              AuthDataSize,
   IN CHAR16             *VariableName,
   IN EFI_GUID           *VendorGuid
   )
 {
   EFI_STATUS                Status;
   BOOLEAN                   VerifyStatus;
-  WIN_CERTIFICATE_EFI_PKCS  *PkcsCertData;
   EFI_SIGNATURE_LIST        *CertList;
   EFI_SIGNATURE_DATA        *Cert;
   UINTN                     DataSize;
@@ -906,7 +905,6 @@ IsPkcsSignedDataVerifiedBySignatureList (
   RootCert     = NULL;
   RootCertSize = 0;
   VerifyStatus = FALSE;
-  PkcsCertData = (WIN_CERTIFICATE_EFI_PKCS *) (mImageBase + mSecDataDir->VirtualAddress);
 
   DataSize = 0;
   Status   = gRT->GetVariable (VariableName, VendorGuid, NULL, &DataSize, NULL);
@@ -940,8 +938,8 @@ IsPkcsSignedDataVerifiedBySignatureList (
           // Call AuthenticodeVerify library to Verify Authenticode struct.
           //
           VerifyStatus = AuthenticodeVerify (
-                           PkcsCertData->CertData,
-                           PkcsCertData->Hdr.dwLength - sizeof(PkcsCertData->Hdr),
+                           AuthData,
+                           AuthDataSize,
                            RootCert,
                            RootCertSize,
                            mImageDigest,
@@ -969,19 +967,23 @@ Done:
 /**
   Verify certificate in WIN_CERT_TYPE_PKCS_SIGNED_DATA format.
 
+  @param[in]  AuthData      Pointer to the Authenticode Signature retrieved from signed image.
+  @param[in]  AuthDataSize  Size of the Authenticode Signature in bytes.
+
   @retval EFI_SUCCESS                 Image pass verification.
   @retval EFI_SECURITY_VIOLATION      Image fail verification.
 
 **/
 EFI_STATUS
 VerifyCertPkcsSignedData (
-  VOID
+  IN UINT8              *AuthData,
+  IN UINTN              AuthDataSize
   )
 {
   //
   // 1: Find certificate from DBX forbidden database for revoked certificate.
   //
-  if (IsPkcsSignedDataVerifiedBySignatureList (EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid)) {
+  if (IsPkcsSignedDataVerifiedBySignatureList (AuthData, AuthDataSize, EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid)) {
     //
     // DBX is forbidden database, if Authenticode verification pass with
     // one of the certificate in DBX, this image should be rejected.
@@ -992,7 +994,7 @@ VerifyCertPkcsSignedData (
   //
   // 2: Find certificate from DB database and try to verify authenticode struct.
   //
-  if (IsPkcsSignedDataVerifiedBySignatureList (EFI_IMAGE_SECURITY_DATABASE, &gEfiImageSecurityDatabaseGuid)) {
+  if (IsPkcsSignedDataVerifiedBySignatureList (AuthData, AuthDataSize, EFI_IMAGE_SECURITY_DATABASE, &gEfiImageSecurityDatabaseGuid)) {
     return EFI_SUCCESS;
   } else {
     return EFI_SECURITY_VIOLATION;
@@ -1081,10 +1083,17 @@ DxeImageVerificationHandler (
   PE_COFF_LOADER_IMAGE_CONTEXT         ImageContext;
   UINT32                               NumberOfRvaAndSizes;
   UINT32                               CertSize;
+  WIN_CERTIFICATE_EFI_PKCS             *PkcsCertData;
+  WIN_CERTIFICATE_UEFI_GUID            *WinCertUefiGuid;
+  UINT8                                *AuthData;
+  UINTN                                AuthDataSize;
+  EFI_IMAGE_DATA_DIRECTORY             *SecDataDir;
 
   SignatureList     = NULL;
   SignatureListSize = 0;
   WinCertificate    = NULL;
+  SecDataDir        = NULL;
+  PkcsCertData      = NULL;
   Action            = EFI_IMAGE_EXECUTION_AUTH_UNTESTED;
   Status            = EFI_ACCESS_DENIED;
   //
@@ -1207,7 +1216,7 @@ DxeImageVerificationHandler (
     //
     NumberOfRvaAndSizes = mNtHeader.Pe32->OptionalHeader.NumberOfRvaAndSizes;
     if (NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_SECURITY) {
-      mSecDataDir = (EFI_IMAGE_DATA_DIRECTORY *) &mNtHeader.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY];
+      SecDataDir = (EFI_IMAGE_DATA_DIRECTORY *) &mNtHeader.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY];
     }        
   } else {
     //
@@ -1215,11 +1224,11 @@ DxeImageVerificationHandler (
     //
     NumberOfRvaAndSizes = mNtHeader.Pe32Plus->OptionalHeader.NumberOfRvaAndSizes;
     if (NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_SECURITY) {
-      mSecDataDir = (EFI_IMAGE_DATA_DIRECTORY *) &mNtHeader.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY];
+      SecDataDir = (EFI_IMAGE_DATA_DIRECTORY *) &mNtHeader.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY];
     }
   }
 
-  if ((mSecDataDir == NULL) || ((mSecDataDir != NULL) && (mSecDataDir->Size == 0))) {
+  if ((SecDataDir == NULL) || ((SecDataDir != NULL) && (SecDataDir->Size == 0))) {
     //
     // This image is not signed.
     //
@@ -1250,24 +1259,48 @@ DxeImageVerificationHandler (
   //
   // Verify signature of executables.
   //
-  WinCertificate = (WIN_CERTIFICATE *) (mImageBase + mSecDataDir->VirtualAddress);
+  WinCertificate = (WIN_CERTIFICATE *) (mImageBase + SecDataDir->VirtualAddress);
 
   CertSize = sizeof (WIN_CERTIFICATE);
 
-  if ((mSecDataDir->Size <= CertSize) || (mSecDataDir->Size < WinCertificate->dwLength)) {
+  if ((SecDataDir->Size <= CertSize) || (SecDataDir->Size < WinCertificate->dwLength)) {
     goto Done;
   }
 
+  //
+  // Verify the image's Authenticode signature, only DER-encoded PKCS#7 signed data is supported.
+  //
   if (WinCertificate->wCertificateType == WIN_CERT_TYPE_PKCS_SIGNED_DATA) {
     //
-    // Verify Pkcs signed data type.
+    // The certificate is formatted as WIN_CERTIFICATE_EFI_PKCS which is described in the 
+    // Authenticode specification.
     //
-    Status = HashPeImageByType();
+    PkcsCertData = (WIN_CERTIFICATE_EFI_PKCS *) WinCertificate;
+    AuthData   = PkcsCertData->CertData;
+    AuthDataSize = PkcsCertData->Hdr.dwLength - sizeof(PkcsCertData->Hdr);
+    
+    Status = HashPeImageByType (AuthData, AuthDataSize);
     if (EFI_ERROR (Status)) {
       goto Done;
     }
+
+    VerifyStatus = VerifyCertPkcsSignedData (AuthData, AuthDataSize);
+  } else if (WinCertificate->wCertificateType == WIN_CERT_TYPE_EFI_GUID) {
+    //
+    // The certificate is formatted as WIN_CERTIFICATE_UEFI_GUID which is described in UEFI Spec.
+    //
+    WinCertUefiGuid = (WIN_CERTIFICATE_UEFI_GUID *) WinCertificate;
+    if (!CompareGuid(&WinCertUefiGuid->CertType, &gEfiCertPkcs7Guid)) {
+      goto Done;
+    }
+    AuthData = WinCertUefiGuid->CertData;
+    AuthDataSize = WinCertUefiGuid->Hdr.dwLength - OFFSET_OF(WIN_CERTIFICATE_UEFI_GUID, CertData);
     
-    VerifyStatus = VerifyCertPkcsSignedData ();
+    Status = HashPeImageByType (AuthData, AuthDataSize);
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+    VerifyStatus = VerifyCertPkcsSignedData (AuthData, AuthDataSize);
   } else {
     goto Done;
   }
