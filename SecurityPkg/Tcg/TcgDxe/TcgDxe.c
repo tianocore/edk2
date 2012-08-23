@@ -505,6 +505,7 @@ TcgDxeHashLogExtendEvent (
   )
 {
   TCG_DXE_DATA  *TcgData;
+  EFI_STATUS    Status;
 
   if (TCGLogData == NULL || EventLogLastEntry == NULL){
     return EFI_INVALID_PARAMETER;
@@ -520,13 +521,19 @@ TcgDxeHashLogExtendEvent (
     return EFI_UNSUPPORTED;
   }
 
-  return TcgDxeHashLogExtendEventI (
-           TcgData,
-           (UINT8 *) (UINTN) HashData,
-           HashDataLen,
-           (TCG_PCR_EVENT_HDR*)TCGLogData,
-           TCGLogData->Event
-           );
+  Status = TcgDxeHashLogExtendEventI (
+             TcgData,
+             (UINT8 *) (UINTN) HashData,
+             HashDataLen,
+             (TCG_PCR_EVENT_HDR*)TCGLogData,
+             TCGLogData->Event
+             );
+
+  if (!EFI_ERROR(Status)){
+    *EventLogLastEntry = (EFI_PHYSICAL_ADDRESS)(UINTN) TcgData->LastEvent;
+  }
+
+  return Status;
 }
 
 TCG_DXE_DATA                 mTcgDxeData = {
