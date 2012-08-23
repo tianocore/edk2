@@ -34,6 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///
 UINT8    mPubKeyStore[MAX_KEYDB_SIZE];
 UINT32   mPubKeyNumber;
+UINT8    mCertDbStore[MAX_CERTDB_SIZE];
 UINT32   mPlatformMode;
 EFI_GUID mSignatureSupport[] = {EFI_CERT_SHA1_GUID, EFI_CERT_SHA256_GUID, EFI_CERT_RSA2048_GUID, EFI_CERT_X509_GUID};
 //
@@ -398,7 +399,7 @@ AutenticatedVariableServiceInitialize (
 
   if (Variable.CurrPtr == NULL) {
     VarAttr  = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
-    ListSize = 0;
+    ListSize = sizeof (UINT32);
     Status   = UpdateVariable (
                  EFI_CERT_DB_NAME,
                  &gEfiCertDbGuid,
@@ -410,7 +411,9 @@ AutenticatedVariableServiceInitialize (
                  &Variable,
                  NULL
                  );
-
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
   }  
 
   return Status;
@@ -1664,10 +1667,7 @@ DeleteCertsFromDb (
   // Construct new data content of variable "certdb".
   //
   NewCertDbSize = (UINT32) DataSize - CertNodeSize;
-  NewCertDb     = AllocateZeroPool (NewCertDbSize);
-  if (NewCertDb == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
+  NewCertDb     = (UINT8*) mCertDbStore;
 
   //
   // Copy the DB entries before deleting node.
@@ -1704,7 +1704,6 @@ DeleteCertsFromDb (
                NULL
                );
 
-  FreePool (NewCertDb);
   return Status;
 }
 
@@ -1793,11 +1792,11 @@ InsertCertsToDb (
   //
   NameSize      = (UINT32) StrLen (VariableName);
   CertNodeSize  = sizeof (AUTH_CERT_DB_DATA) + (UINT32) CertDataSize + NameSize * sizeof (CHAR16); 
-  NewCertDbSize = (UINT32) DataSize + CertNodeSize;                  
-  NewCertDb     = AllocateZeroPool (NewCertDbSize);
-  if (NewCertDb == NULL) {
+  NewCertDbSize = (UINT32) DataSize + CertNodeSize;
+  if (NewCertDbSize > MAX_CERTDB_SIZE) {
     return EFI_OUT_OF_RESOURCES;
   }
+  NewCertDb     = (UINT8*) mCertDbStore;
 
   //
   // Copy the DB entries before deleting node.
@@ -1844,7 +1843,6 @@ InsertCertsToDb (
                NULL
                );
 
-  FreePool (NewCertDb);
   return Status;
 }
 
