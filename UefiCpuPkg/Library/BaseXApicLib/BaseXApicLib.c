@@ -3,7 +3,7 @@
 
   This local APIC library instance supports xAPIC mode only.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -21,11 +21,56 @@
 #include <Library/LocalApicLib.h>
 #include <Library/IoLib.h>
 #include <Library/TimerLib.h>
-#include <Library/PcdLib.h>
 
 //
 // Library internal functions
 //
+
+/**
+  Retrieve the base address of local APIC.
+
+  @return The base address of local APIC.
+
+**/
+UINTN
+EFIAPI
+GetLocalApicBaseAddress (
+  VOID
+  )
+{
+  MSR_IA32_APIC_BASE ApicBaseMsr;
+  
+  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE_ADDRESS);
+  
+  return (UINTN)(LShiftU64 ((UINT64) ApicBaseMsr.Bits.ApicBaseHigh, 32)) +
+           (((UINTN)ApicBaseMsr.Bits.ApicBaseLow) << 12);
+}
+
+/**
+  Set the base address of local APIC.
+
+  If BaseAddress is not aligned on a 4KB boundary, then ASSERT().
+
+  @param[in] BaseAddress   Local APIC base address to be set.
+
+**/
+VOID
+EFIAPI
+SetLocalApicBaseAddress (
+  IN UINTN                BaseAddress
+  )
+{
+  MSR_IA32_APIC_BASE ApicBaseMsr;
+
+  ASSERT ((BaseAddress & (SIZE_4KB - 1)) == 0);
+
+  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE_ADDRESS);
+
+  ApicBaseMsr.Bits.ApicBaseLow  = (UINT32) (BaseAddress >> 12);
+  ApicBaseMsr.Bits.ApicBaseHigh = (UINT32) (RShiftU64((UINT64) BaseAddress, 32));
+
+  AsmWriteMsr64 (MSR_IA32_APIC_BASE_ADDRESS, ApicBaseMsr.Uint64);
+}
 
 /**
   Read from a local APIC register.
@@ -49,7 +94,7 @@ ReadLocalApicReg (
   ASSERT ((MmioOffset & 0xf) == 0);
   ASSERT (GetApicMode () == LOCAL_APIC_MODE_XAPIC);
 
-  return MmioRead32 (PcdGet32 (PcdCpuLocalApicBaseAddress) + MmioOffset);
+  return MmioRead32 (GetLocalApicBaseAddress() + MmioOffset);
 }
 
 /**
@@ -76,7 +121,7 @@ WriteLocalApicReg (
   ASSERT ((MmioOffset & 0xf) == 0);
   ASSERT (GetApicMode () == LOCAL_APIC_MODE_XAPIC);
 
-  MmioWrite32 (PcdGet32 (PcdCpuLocalApicBaseAddress) + MmioOffset, Value);
+  MmioWrite32 (GetLocalApicBaseAddress() + MmioOffset, Value);
 }
 
 /**
