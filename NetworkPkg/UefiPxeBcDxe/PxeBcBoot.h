@@ -1,7 +1,7 @@
 /** @file
   Boot functions declaration for UefiPxeBc Driver.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -29,7 +29,7 @@
 
   @param[in]      Private      Pointer to PxeBc private data.
   @param[in]      Type         The type of bootstrap to perform.
-  @param[in, out] Info         Pointer to EFI_PXE_BASE_CODE_DISCOVER_INFO.
+  @param[in, out] DiscoverInfo Pointer to EFI_PXE_BASE_CODE_DISCOVER_INFO.
   @param[out]     BootEntry    Pointer to PXEBC_BOOT_SVR_ENTRY.
   @param[out]     SrvList      Pointer to EFI_PXE_BASE_CODE_SRVLIST.
 
@@ -41,7 +41,7 @@ EFI_STATUS
 PxeBcExtractDiscoverInfo (
   IN     PXEBC_PRIVATE_DATA               *Private,
   IN     UINT16                           Type,
-  IN OUT EFI_PXE_BASE_CODE_DISCOVER_INFO  *Info,
+  IN OUT EFI_PXE_BASE_CODE_DISCOVER_INFO  **DiscoverInfo,
      OUT PXEBC_BOOT_SVR_ENTRY             **BootEntry,
      OUT EFI_PXE_BASE_CODE_SRVLIST        **SrvList
   );

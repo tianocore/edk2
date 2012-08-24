@@ -1,7 +1,7 @@
 /** @file
   Boot functions implementation for UefiPxeBc Driver.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -86,9 +86,9 @@ PxeBcSelectBootPrompt (
   OfferType    = Mode->UsingIpv6 ? Cache->Dhcp6.OfferType : Cache->Dhcp4.OfferType;
 
   //
-  // Only ProxyPxe10 offer needs boot prompt.
+  // Only DhcpPxe10 and ProxyPxe10 offer needs boot prompt.
   //
-  if (OfferType != PxeOfferTypeProxyPxe10) {
+  if (OfferType != PxeOfferTypeProxyPxe10 && OfferType != PxeOfferTypeDhcpPxe10) {
     return EFI_NOT_FOUND;
   }
 
@@ -99,7 +99,7 @@ PxeBcSelectBootPrompt (
 
   VendorOpt = &Cache->Dhcp4.VendorOpt;
   if (!IS_VALID_BOOT_PROMPT (VendorOpt->BitMap)) {
-    return EFI_SUCCESS;
+    return EFI_TIMEOUT;
   }
 
   Timeout   = VendorOpt->MenuPrompt->Timeout;
@@ -110,10 +110,10 @@ PxeBcSelectBootPrompt (
   // The valid scope of Timeout refers to PXE2.1 spec.
   //
   if (Timeout == 0) {
-    return EFI_SUCCESS;
+    return EFI_TIMEOUT;
   }
   if (Timeout == 255) {
-    return EFI_TIMEOUT;
+    return EFI_SUCCESS;
   }
 
   //
@@ -173,6 +173,7 @@ PxeBcSelectBootPrompt (
   gST->ConOut->SetCursorPosition (gST->ConOut, SecCol + PromptLen, SecRow);
   AsciiPrint ("(%d) ", Timeout--);
 
+  Status = EFI_TIMEOUT;
   while (EFI_ERROR (gBS->CheckEvent (TimeoutEvent))) {
     if (!EFI_ERROR (gBS->CheckEvent (DescendEvent))) {
       gST->ConOut->SetCursorPosition (gST->ConOut, SecCol + PromptLen, SecRow);
@@ -184,6 +185,7 @@ PxeBcSelectBootPrompt (
     }
     //
     // Parse the input key by user.
+    // If <F8> or <Ctrl> + <M> is pressed, return success to display the boot menu.
     //
     if (InputKey.ScanCode == 0) {
 
@@ -196,7 +198,7 @@ PxeBcSelectBootPrompt (
       case CTRL ('m'):
       case 'm':
       case 'M':
-        Status = EFI_TIMEOUT;
+        Status = EFI_SUCCESS;
         break;
 
       default:
@@ -208,7 +210,7 @@ PxeBcSelectBootPrompt (
       switch (InputKey.ScanCode) {
 
       case SCAN_F8:
-        Status = EFI_TIMEOUT;
+        Status = EFI_SUCCESS;
         break;
 
       case SCAN_ESC:
@@ -284,10 +286,10 @@ PxeBcSelectBootMenu (
   OfferType = Mode->UsingIpv6 ? Cache->Dhcp6.OfferType : Cache->Dhcp4.OfferType;
 
   //
-  // There is no specified ProxyPxe10 for IPv6 in PXE and UEFI spec.
+  // There is no specified DhcpPxe10/ProxyPxe10 for IPv6 in PXE and UEFI spec.
   //
   ASSERT (!Mode->UsingIpv6);
-  ASSERT (OfferType == PxeOfferTypeProxyPxe10);
+  ASSERT (OfferType == PxeOfferTypeProxyPxe10 || OfferType == PxeOfferTypeDhcpPxe10);
 
   VendorOpt = &Cache->Dhcp4.VendorOpt;
   if (!IS_VALID_BOOT_MENU (VendorOpt->BitMap)) {
@@ -351,7 +353,7 @@ PxeBcSelectBootMenu (
       gBS->Stall (10 * TICKS_PER_MS);
     }
 
-    if (InputKey.ScanCode != 0) {
+    if (InputKey.ScanCode == 0) {
       switch (InputKey.UnicodeChar) {
       case CTRL ('c'):
         InputKey.ScanCode = SCAN_ESC;
@@ -651,7 +653,7 @@ PxeBcDhcp6BootInfo (
 
   @param[in]      Private      Pointer to PxeBc private data.
   @param[in]      Type         The type of bootstrap to perform.
-  @param[in, out] Info         Pointer to EFI_PXE_BASE_CODE_DISCOVER_INFO.
+  @param[in, out] DiscoverInfo Pointer to EFI_PXE_BASE_CODE_DISCOVER_INFO.
   @param[out]     BootEntry    Pointer to PXEBC_BOOT_SVR_ENTRY.
   @param[out]     SrvList      Pointer to EFI_PXE_BASE_CODE_SRVLIST.
 
@@ -663,7 +665,7 @@ EFI_STATUS
 PxeBcExtractDiscoverInfo (
   IN     PXEBC_PRIVATE_DATA               *Private,
   IN     UINT16                           Type,
-  IN OUT EFI_PXE_BASE_CODE_DISCOVER_INFO  *Info,
+  IN OUT EFI_PXE_BASE_CODE_DISCOVER_INFO  **DiscoverInfo,
      OUT PXEBC_BOOT_SVR_ENTRY             **BootEntry,
      OUT EFI_PXE_BASE_CODE_SRVLIST        **SrvList
   )
@@ -673,8 +675,11 @@ PxeBcExtractDiscoverInfo (
   PXEBC_VENDOR_OPTION             *VendorOpt;
   PXEBC_BOOT_SVR_ENTRY            *Entry;
   BOOLEAN                         IsFound;
+  EFI_PXE_BASE_CODE_DISCOVER_INFO *Info;
+  UINT16                          Index;
 
   Mode = Private->PxeBc.Mode;
+  Info = *DiscoverInfo;
 
   if (Mode->UsingIpv6) {
     Info->IpCnt    = 1;
@@ -708,7 +713,7 @@ PxeBcExtractDiscoverInfo (
     Info->UseMCast    = (BOOLEAN) !IS_DISABLE_MCAST_DISCOVER (VendorOpt->DiscoverCtrl);
     Info->UseBCast    = (BOOLEAN) !IS_DISABLE_BCAST_DISCOVER (VendorOpt->DiscoverCtrl);
     Info->MustUseList = (BOOLEAN) IS_ENABLE_USE_SERVER_LIST (VendorOpt->DiscoverCtrl);
-    Info->UseUCast    = Info->MustUseList;
+    Info->UseUCast    = (BOOLEAN) IS_VALID_BOOT_SERVERS (VendorOpt->BitMap);
 
     if (Info->UseMCast) {
       //
@@ -719,7 +724,7 @@ PxeBcExtractDiscoverInfo (
 
     Info->IpCnt = 0;
 
-    if (Info->MustUseList) {
+    if (Info->UseUCast) {
       Entry = VendorOpt->BootSvr;
 
       while (((UINT8) (Entry - VendorOpt->BootSvr)) < VendorOpt->BootSvrLen) {
@@ -735,9 +740,24 @@ PxeBcExtractDiscoverInfo (
       }
 
       Info->IpCnt = Entry->IpCnt;
+      if (Info->IpCnt >= 1) {
+        *DiscoverInfo = AllocatePool (sizeof (*Info) + (Info->IpCnt - 1) * sizeof (**SrvList));
+        if (*DiscoverInfo == NULL) {
+          return EFI_OUT_OF_RESOURCES;       
+        }     
+        CopyMem (*DiscoverInfo, Info, sizeof (*Info));
+        Info = *DiscoverInfo;
+      }
+
+      for (Index = 0; Index < Info->IpCnt; Index++) {
+        CopyMem (&Info->SrvList[Index].IpAddr, &Entry->IpAddr[Index], sizeof (EFI_IPv4_ADDRESS));
+        Info->SrvList[Index].AcceptAnyResponse = !Info->MustUseList;
+        Info->SrvList[Index].Type = NTOHS (Entry->Type);
+      }
     }
 
     *BootEntry = Entry;
+    *SrvList   = Info->SrvList;
   }
 
   return EFI_SUCCESS;
@@ -842,12 +862,12 @@ PxeBcDiscoverBootFile (
     //
     // Choose by user's input.
     //
-    Status = PxeBcSelectBootMenu (Private, &Type, TRUE);
+    Status = PxeBcSelectBootMenu (Private, &Type, FALSE);
   } else if (Status == EFI_TIMEOUT) {
     //
     // Choose by default item.
     //
-    Status = PxeBcSelectBootMenu (Private, &Type, FALSE);
+    Status = PxeBcSelectBootMenu (Private, &Type, TRUE);
   }
 
   if (!EFI_ERROR (Status)) {
@@ -867,6 +887,27 @@ PxeBcDiscoverBootFile (
     Status = PxeBc->Discover (PxeBc, Type, &Layer, UseBis, NULL);
     if (EFI_ERROR (Status)) {
       return Status;
+    }
+
+    if (Mode->PxeReplyReceived && !Mode->ProxyOfferReceived) {
+      //
+      // Some network boot loader only search the packet in Mode.ProxyOffer to get its server
+      // IP address, so we need to store a copy of Mode.PxeReply packet into Mode.ProxyOffer.
+      //
+      if (Mode->UsingIpv6) {
+        CopyMem (
+          &Mode->ProxyOffer.Dhcpv6,
+          &Mode->PxeReply.Dhcpv6,
+          Private->PxeReply.Dhcp6.Packet.Ack.Length
+          );
+      } else {
+        CopyMem (
+          &Mode->ProxyOffer.Dhcpv4,
+          &Mode->PxeReply.Dhcpv4,
+          Private->PxeReply.Dhcp4.Packet.Ack.Length
+          );      
+      }
+      Mode->ProxyOfferReceived = TRUE;
     }
   }
 

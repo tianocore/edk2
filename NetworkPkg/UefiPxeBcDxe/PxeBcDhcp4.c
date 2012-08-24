@@ -1,7 +1,7 @@
 /** @file
   Functions implementation related with DHCPv4 for UefiPxeBc Driver.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1443,7 +1443,7 @@ PxeBcDhcp4Discover (
           break;
         }
         if ((SrvList[SrvIndex].Type == Type) &&
-            EFI_IP4_EQUAL (&Response->Dhcp4.Header.ServerAddr, &Private->ServerIp)) {
+            EFI_IP4_EQUAL (&Response->Dhcp4.Header.ServerAddr, &SrvList[SrvIndex].IpAddr)) {
           break;
         }
         SrvIndex++;
@@ -1587,6 +1587,7 @@ PxeBcDhcp4Dora (
   AsciiPrint ("\n  Station IP address is ");
 
   PxeBcShowIp4Addr (&Private->StationIp.v4);
+  AsciiPrint ("\n");
 
 ON_EXIT:
   if (EFI_ERROR (Status)) {

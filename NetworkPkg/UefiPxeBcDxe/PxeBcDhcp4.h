@@ -1,7 +1,7 @@
 /** @file
   Functions declaration related with DHCPv4 for UefiPxeBc Driver.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -146,6 +146,10 @@ typedef enum {
    BIT (PXEBC_VENDOR_TAG_BOOT_MENU) | \
    BIT (PXEBC_VENDOR_TAG_MENU_PROMPT))
 
+#define IS_VALID_BOOT_SERVERS(x) \
+  ((((x)[0]) & BIT (PXEBC_VENDOR_TAG_BOOT_SERVERS)) \
+   == BIT (PXEBC_VENDOR_TAG_BOOT_SERVERS))  
+
 #define IS_VALID_BOOT_PROMPT(x) \
   ((((x)[0]) & BIT (PXEBC_VENDOR_TAG_MENU_PROMPT)) \
    == BIT (PXEBC_VENDOR_TAG_MENU_PROMPT))
@@ -256,6 +260,7 @@ typedef union {
   PXEBC_DHCP4_OPTION_MAX_MESG_SIZE  *MaxMesgSize;
 } PXEBC_DHCP4_OPTION_ENTRY;
 
+#pragma pack(1)
 typedef struct {
   UINT16            Type;
   UINT8             IpCnt;
@@ -272,6 +277,7 @@ typedef struct {
   UINT8             Timeout;
   UINT8             Prompt[1];
 } PXEBC_MENU_PROMPT;
+#pragma pack()
 
 typedef struct {
   UINT32                BitMap[8];

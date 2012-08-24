@@ -529,6 +529,7 @@ EfiPxeBcDiscover (
   UINT16                          Index;
   EFI_STATUS                      Status;
   EFI_PXE_BASE_CODE_IP_FILTER     IpFilter;
+  EFI_PXE_BASE_CODE_DISCOVER_INFO *NewCreatedInfo;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -541,6 +542,7 @@ EfiPxeBcDiscover (
   SrvList                 = NULL;
   Status                  = EFI_DEVICE_ERROR;
   Private->Function       = EFI_PXE_BASE_CODE_FUNCTION_DISCOVER;
+  NewCreatedInfo          = NULL;
 
   if (!Mode->Started) {
     return EFI_NOT_STARTED;
@@ -594,12 +596,12 @@ EfiPxeBcDiscover (
     //
     // 2. Extract the discover information from the cached packets if unspecified.
     //
-    Info   = &DefaultInfo;
-    Status = PxeBcExtractDiscoverInfo (Private, Type, Info, &BootSvrEntry, &SrvList);
+    NewCreatedInfo = &DefaultInfo;
+    Status = PxeBcExtractDiscoverInfo (Private, Type, &NewCreatedInfo, &BootSvrEntry, &SrvList);
     if (EFI_ERROR (Status)) {
       goto ON_EXIT;
     }
-
+    Info = NewCreatedInfo;
   } else {
     //
     // 3. Take the pass-in information as the discover info, and validate the server list.
@@ -634,7 +636,36 @@ EfiPxeBcDiscover (
 
   Private->IsDoDiscover = TRUE;
 
-  if (Info->UseUCast) {
+  if (Info->UseMCast) {
+    //
+    // Do discover by multicast.
+    //
+    Status = PxeBcDiscoverBootServer (
+               Private,
+               Type,
+               Layer,
+               UseBis,
+               &Info->ServerMCastIp,
+               Info->IpCnt,
+               SrvList
+               );
+
+  } else if (Info->UseBCast) {
+    //
+    // Do discover by broadcast, but only valid for IPv4.
+    //
+    ASSERT (!Mode->UsingIpv6);
+    Status = PxeBcDiscoverBootServer (
+               Private,
+               Type,
+               Layer,
+               UseBis,
+               NULL,
+               Info->IpCnt,
+               SrvList
+               );
+
+  } else if (Info->UseUCast) {
     //
     // Do discover by unicast.
     //
@@ -652,39 +683,11 @@ EfiPxeBcDiscover (
                  Type,
                  Layer,
                  UseBis,
-                 &SrvList[Index].IpAddr,
-                 0,
-                 NULL
+                 &Private->ServerIp,
+                 Info->IpCnt,
+                 SrvList
                  );
-    }
-  } else if (Info->UseMCast) {
-    //
-    // Do discover by multicast.
-    //
-    Status = PxeBcDiscoverBootServer (
-               Private,
-               Type,
-               Layer,
-               UseBis,
-               &Info->ServerMCastIp,
-               0,
-               NULL
-               );
-
-  } else if (Info->UseBCast) {
-    //
-    // Do discover by broadcast, but only valid for IPv4.
-    //
-    ASSERT (!Mode->UsingIpv6);
-    Status = PxeBcDiscoverBootServer (
-               Private,
-               Type,
-               Layer,
-               UseBis,
-               NULL,
-               Info->IpCnt,
-               SrvList
-               );
+      }
   }
 
   if (EFI_ERROR (Status)) {
@@ -698,8 +701,8 @@ EfiPxeBcDiscover (
       if (!EFI_ERROR (Status)) {
         CopyMem (
           &Mode->PxeReply.Dhcpv6,
-          &Private->PxeReply.Dhcp6.Packet.Offer,
-          Private->PxeReply.Dhcp6.Packet.Offer.Length
+          &Private->PxeReply.Dhcp6.Packet.Ack.Dhcp6,
+          Private->PxeReply.Dhcp6.Packet.Ack.Length
           );
         Mode->PxeReplyReceived = TRUE;
         Mode->PxeDiscoverValid = TRUE;
@@ -709,8 +712,8 @@ EfiPxeBcDiscover (
       if (!EFI_ERROR (Status)) {
         CopyMem (
           &Mode->PxeReply.Dhcpv4,
-          &Private->PxeReply.Dhcp4.Packet.Offer,
-          Private->PxeReply.Dhcp4.Packet.Offer.Length
+          &Private->PxeReply.Dhcp4.Packet.Ack.Dhcp4,
+          Private->PxeReply.Dhcp4.Packet.Ack.Length
           );
         Mode->PxeReplyReceived = TRUE;
         Mode->PxeDiscoverValid = TRUE;
@@ -720,6 +723,10 @@ EfiPxeBcDiscover (
 
 ON_EXIT:
 
+  if (NewCreatedInfo != NULL && NewCreatedInfo != &DefaultInfo) {
+    FreePool (NewCreatedInfo);
+  }
+  
   if (Mode->UsingIpv6) {
     Private->Udp6Read->Configure (Private->Udp6Read, &Private->Udp6CfgData);
   } else {
