@@ -140,9 +140,6 @@
   ## The PCD is used to control whether to hide the TPM.
   gEfiSecurityPkgTokenSpaceGuid.PcdHideTpm|FALSE|BOOLEAN|0x00010002
 
-  ## The PCD is used to specify whether or not MOR (MemoryOverwriteControl) feature is enabled.
-  gEfiSecurityPkgTokenSpaceGuid.PcdMorEnable|FALSE|BOOLEAN|0x00010000
-
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD indicates the presence or absence of the platform operator.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmPhysicalPresence|TRUE|BOOLEAN|0x00010001

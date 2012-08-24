@@ -102,11 +102,6 @@ formset
 
     subtitle text = STRING_TOKEN(STR_NULL);
 
-    checkbox varid = TCG_CONFIGURATION.MorState,
-          questionid = KEY_TPM_MOR_ENABLE,
-          prompt = STRING_TOKEN(STR_MOR_PROMPT),
-          help   = STRING_TOKEN(STR_MOR_HELP),
-    endcheckbox; 
     endif;
 
   endform;

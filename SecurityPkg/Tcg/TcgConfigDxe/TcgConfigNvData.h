@@ -35,7 +35,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 typedef struct {
   BOOLEAN HideTpm;
   BOOLEAN OriginalHideTpm;
-  BOOLEAN MorState;
   UINT8   TpmOperation;
   BOOLEAN TpmEnable;
   BOOLEAN TpmActivate;

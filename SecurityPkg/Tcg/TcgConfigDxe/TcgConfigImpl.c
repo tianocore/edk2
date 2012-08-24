@@ -181,7 +181,6 @@ TcgExtractConfig (
   //  
   ZeroMem (&Configuration, sizeof (TCG_CONFIGURATION));
 
-  Configuration.MorState        = PcdGetBool (PcdMorEnable);
   Configuration.TpmOperation    = PHYSICAL_PRESENCE_ENABLE;
   Configuration.HideTpm         = (BOOLEAN) (PcdGetBool (PcdHideTpmSupport) && PcdGetBool (PcdHideTpm));
   //
@@ -308,7 +307,6 @@ TcgRouteConfig (
     return Status;
   }
 
-  PcdSetBool (PcdMorEnable,  TcgConfiguration.MorState);
   PcdSetBool (PcdHideTpm,    TcgConfiguration.HideTpm);
 
   return EFI_SUCCESS;
