@@ -196,14 +196,15 @@ MemMapInitialization (
   //
   // address       purpose   size
   // ------------  --------  -------------------------
-  // max(top, 2g)  PCI MMIO  0xFEC00000 - max(top, 2g)
+  // max(top, 2g)  PCI MMIO  0xFC000000 - max(top, 2g)
+  // 0xFC000000    gap                           44 MB
   // 0xFEC00000    IO-APIC                        4 KB
   // 0xFEC01000    gap                         1020 KB
   // 0xFED00000    HPET                           1 KB
   // 0xFED00400    gap                         1023 KB
   // 0xFEE00000    LAPIC                          1 MB
   //
-  AddIoMemoryRangeHob (TopOfMemory < BASE_2GB ? BASE_2GB : TopOfMemory, 0xFEC00000);
+  AddIoMemoryRangeHob (TopOfMemory < BASE_2GB ? BASE_2GB : TopOfMemory, 0xFC000000);
   AddIoMemoryBaseSizeHob (0xFEC00000, SIZE_4KB);
   AddIoMemoryBaseSizeHob (0xFED00000, SIZE_1KB);
   AddIoMemoryBaseSizeHob (PcdGet32(PcdCpuLocalApicBaseAddress), SIZE_1MB);
