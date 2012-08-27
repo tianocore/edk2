@@ -255,6 +255,13 @@ KbdControllerDriverStart (
 
   //
   // Fix for random hangs in System waiting for the Key if no KBC is present in BIOS.
+  // When KBC decode (IO port 0x60/0x64 decode) is not enabled, 
+  // KeyboardRead will read back as 0xFF and return status is EFI_SUCCESS.
+  // So instead we read status register to detect after read if KBC decode is enabled.
+  //
+  
+  //
+  // Return code is ignored on purpose.
   //
   KeyboardRead (ConsoleIn, &Data);
   if ((KeyReadStatusRegister (ConsoleIn) & (KBC_PARE | KBC_TIM)) == (KBC_PARE | KBC_TIM)) {
