@@ -46,6 +46,8 @@
   TimerLib
   IoLib
   PeiServicesTablePointerLib
+  BaseLib
+  PcdLib
 
 [Guids]
   gTcgEventEntryHobGuid
@@ -64,6 +66,7 @@
 [FixedPcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdHideTpmSupport
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported             ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString             ## CONSUMES
 
 [Depex]
   gEfiPeiMasterBootModePpiGuid AND

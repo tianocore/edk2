@@ -29,6 +29,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
+#include <Library/BaseLib.h>
 
 #include "TpmComm.h"
 
@@ -89,8 +90,6 @@ EFI_PEI_NOTIFY_DESCRIPTOR           mNotifyList[] = {
     FirmwareVolmeInfoPpiNotifyCallback 
   }
 };
-
-CHAR8 mSCrtmVersion[] = "{D20BC7C6-A1A5-415c-AE85-38290AB6BE04}";
 
 EFI_PLATFORM_FIRMWARE_BLOB mMeasuredFvInfo[FixedPcdGet32 (PcdPeiCoreMaxFvSupported)];
 UINT32 mMeasuredFvIndex = 0;
@@ -180,20 +179,21 @@ MeasureCRTMVersion (
   TCG_PCR_EVENT_HDR                 TcgEventHdr;
 
   //
-  // Here, only a static GUID is measured instead of real CRTM version.
+  // Use FirmwareVersion string to represent CRTM version.
   // OEMs should get real CRTM version string and measure it.
   //
 
   TcgEventHdr.PCRIndex  = 0;
   TcgEventHdr.EventType = EV_S_CRTM_VERSION;
-  TcgEventHdr.EventSize = sizeof (mSCrtmVersion);
+  TcgEventHdr.EventSize = StrSize((CHAR16*)PcdGetPtr (PcdFirmwareVersionString));
+
   return HashLogExtendEvent (
            PeiServices,
-           (UINT8*)&mSCrtmVersion,
+           (UINT8*)PcdGetPtr (PcdFirmwareVersionString),
            TcgEventHdr.EventSize,
            TpmHandle,
            &TcgEventHdr,
-           (UINT8*)&mSCrtmVersion
+           (UINT8*)PcdGetPtr (PcdFirmwareVersionString)
            );
 }
 
