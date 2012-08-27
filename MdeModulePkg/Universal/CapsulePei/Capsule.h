@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -35,6 +35,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/PcdLib.h>
 #include <Library/ReportStatusCodeLib.h>
+#include <Library/DebugAgentLib.h>
 #include <IndustryStandard/PeImage.h>
 #include "Common/CommonHeader.h"
 

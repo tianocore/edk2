@@ -15,9 +15,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/CpuExceptionHandlerLib.h>
+#include <Library/DebugAgentLib.h>
 #include "CommonHeader.h"
 
-#define EXCEPTION_VECTOR_NUMBER     0x20
+#define EXCEPTION_VECTOR_NUMBER     0x22
 
 /**
   The X64 entrypoint is used to process capsule in long mode then
@@ -58,6 +59,11 @@ _ModuleEntryPoint (
   // Setup the default CPU exception handlers
   //
   SetupCpuExceptionHandlers ();                
+  
+  //
+  // Initialize Debug Agent to support source level debug
+  //
+  InitializeDebugAgent (DEBUG_AGENT_INIT_THUNK_PEI_IA32TOX64, (VOID *) &Ia32Idtr, NULL);
 
   //
   // Call CapsuleDataCoalesce to process capsule.
@@ -71,6 +77,10 @@ _ModuleEntryPoint (
   
   ReturnContext->ReturnStatus = Status;
 
+  //
+  // Disable interrupt of Debug timer, since the new IDT table cannot work in long mode
+  //
+  SaveAndSetDebugTimerInterrupt (FALSE);
   //
   // Restore IA32 IDT table
   //

@@ -47,6 +47,7 @@
   BaseLib
   DebugLib
   CpuExceptionHandlerLib
+  DebugAgentLib
 
 [Depex]
   FALSE
