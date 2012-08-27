@@ -13,6 +13,7 @@
 **/
 
 #include "BdsPlatform.h"
+#include "QemuBootOrder.h"
 
 
 //
@@ -1137,6 +1138,8 @@ Returns:
   DEBUG ((EFI_D_INFO, "BdsLibConnectAll\n"));
   BdsLibConnectAll ();
   BdsLibEnumerateAllBootOption (BootOptionList);
+
+  SetBootOrderFromQemu (BootOptionList);
 
   //
   // Please uncomment above ConnectAll and EnumerateAll code and remove following first boot

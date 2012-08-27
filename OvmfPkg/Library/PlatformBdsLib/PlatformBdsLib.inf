@@ -29,7 +29,9 @@
 [Sources]
   BdsPlatform.c
   PlatformData.c
+  QemuBootOrder.c
   BdsPlatform.h
+  QemuBootOrder.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -47,6 +49,7 @@
   GenericBdsLib
   PciLib
   NvVarsFileLib
+  QemuFwCfgLib
 
 [Pcd]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut
