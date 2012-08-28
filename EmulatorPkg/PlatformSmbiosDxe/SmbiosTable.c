@@ -357,7 +357,7 @@ SMBIOS_TABLE_TYPE16 gSmbiosType16Template = {
   0x80000000,                     // MaximumCapacity;
   0xFFFE,                         // MemoryErrorInformationHandle;
   1,                              // NumberOfMemoryDevices;
-  0x3fffffffffffffff,             // ExtendedMaximumCapacity;
+  0x3fffffffffffffffULL,          // ExtendedMaximumCapacity;
 };
 
 SMBIOS_TABLE_TYPE17 gSmbiosType17Template = {
