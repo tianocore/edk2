@@ -1,7 +1,7 @@
 /** @file
   The implementation for EFI_ISA_IO_PROTOCOL. 
   
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -439,8 +439,7 @@ IsaIoVerifyAccess (
   EFI_ISA_ACPI_RESOURCE *Item;
   EFI_STATUS            Status;
 
-  if (Width < EfiIsaIoWidthUint8 ||
-      Width >= EfiIsaIoWidthMaximum ||
+  if ((UINT32)Width >= EfiIsaIoWidthMaximum ||
       Width == EfiIsaIoWidthReserved ||
       Width == EfiIsaIoWidthFifoReserved ||
       Width == EfiIsaIoWidthFillReserved
@@ -1000,7 +999,7 @@ IsaIoMapFullSupport (
   //
   // Make sure the Operation parameter is valid
   //
-  if (Operation < 0 || Operation >= EfiIsaIoOperationMaximum) {
+  if ((UINT32)Operation >= EfiIsaIoOperationMaximum) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1378,7 +1377,7 @@ IsaIoAllocateBuffer (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Type < AllocateAnyPages || Type >= MaxAllocateType) {
+  if ((UINT32)Type >= MaxAllocateType) {
     return EFI_INVALID_PARAMETER;
   }
   //

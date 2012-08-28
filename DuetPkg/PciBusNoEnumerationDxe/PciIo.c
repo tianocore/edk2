@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -343,7 +343,7 @@ Returns:
 
 --*/
 {
-  if (Width < 0 || Width >= EfiPciIoWidthMaximum) {
+  if ((UINT32)Width >= EfiPciIoWidthMaximum) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -404,7 +404,7 @@ Returns:
 {
   UINT64  ExtendOffset;
 
-  if (Width < 0 || Width >= EfiPciIoWidthMaximum) {
+  if ((UINT32)Width >= EfiPciIoWidthMaximum) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -465,7 +465,7 @@ Returns:
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
 
-  if (Width < 0 || Width >= EfiPciIoWidthMaximum) {
+  if ((UINT32)Width >= EfiPciIoWidthMaximum) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -521,7 +521,7 @@ Returns:
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
 
-  if (Width < 0 || Width > EfiPciIoWidthUint64) {
+  if ((UINT32)Width > EfiPciIoWidthUint64) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -576,7 +576,7 @@ Returns:
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
 
-  if (Width < 0 || Width >= EfiPciIoWidthMaximum) {
+  if ((UINT32)Width >= EfiPciIoWidthMaximum) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -629,7 +629,7 @@ Returns:
   
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
 
-  if (Width < 0 || Width >= EfiPciIoWidthMaximum) {
+  if ((UINT32)Width >= EfiPciIoWidthMaximum) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -682,7 +682,7 @@ Returns:
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
 
-  if (Width < 0 || Width >= EfiPciIoWidthMaximum) {
+  if ((UINT32)Width >= EfiPciIoWidthMaximum) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -735,7 +735,7 @@ Returns:
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
 
-  if (Width < 0 || Width >= EfiPciIoWidthMaximum) {
+  if ((UINT32)Width >= EfiPciIoWidthMaximum) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -877,7 +877,7 @@ Returns:
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
 
-  if (Width < 0 || Width >= EfiPciIoWidthMaximum) {
+  if ((UINT32)Width >= EfiPciIoWidthMaximum) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -942,7 +942,7 @@ Returns:
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
 
-  if (Operation < 0 || Operation >= EfiPciIoOperationMaximum) {
+  if ((UINT32)Operation >= EfiPciIoOperationMaximum) {
     return EFI_INVALID_PARAMETER;
   }
 

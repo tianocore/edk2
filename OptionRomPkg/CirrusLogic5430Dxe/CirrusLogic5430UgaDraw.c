@@ -3,7 +3,7 @@
   CirrusLogic5430.c file which deals with the EFI 1.1 driver model.
   This file just does graphics.
 
-  Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -136,7 +136,7 @@ CirrusLogic5430UgaDrawBlt (
 
   Private = CIRRUS_LOGIC_5430_PRIVATE_DATA_FROM_UGA_DRAW_THIS (This);
 
-  if ((BltOperation < 0) || (BltOperation >= EfiUgaBltMax)) {
+  if ((UINT32)BltOperation >= EfiUgaBltMax) {
     return EFI_INVALID_PARAMETER;
   }
 

@@ -120,7 +120,7 @@ LookupPoolHead (
   POOL            *Pool;
   UINTN           Index;
 
-  if (MemoryType >= 0 && MemoryType < EfiMaxMemoryType) {
+  if ((UINT32)MemoryType < EfiMaxMemoryType) {
     return &mPoolHead[MemoryType];
   }
 
@@ -550,7 +550,7 @@ CoreFreePoolI (
   // portion of that memory type has been freed.  If it has, then free the
   // list entry for that memory type
   //
-  if (Pool->MemoryType < 0 && Pool->Used == 0) {
+  if ((INT32)Pool->MemoryType < 0 && Pool->Used == 0) {
     RemoveEntryList (&Pool->Link);
     CoreFreePoolI (Pool);
   }

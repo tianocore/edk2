@@ -1,7 +1,7 @@
 /** @file
   EFI PCI IO protocol functions implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -85,7 +85,7 @@ PciIoVerifyBarAccess (
   IN UINT64                          *Offset
   )
 {
-  if (Width < 0 || Width >= EfiPciIoWidthMaximum) {
+  if ((UINT32)Width >= EfiPciIoWidthMaximum) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -146,7 +146,7 @@ PciIoVerifyConfigAccess (
 {
   UINT64  ExtendOffset;
 
-  if (Width < 0 || Width >= EfiPciIoWidthMaximum) {
+  if ((UINT32)Width >= EfiPciIoWidthMaximum) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -215,7 +215,7 @@ PciIoPollMem (
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
 
-  if (Width < 0 || Width >= EfiPciIoWidthMaximum) {
+  if ((UINT32)Width >= EfiPciIoWidthMaximum) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -322,7 +322,7 @@ PciIoPollIo (
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
 
-  if (Width < 0 || Width > EfiPciIoWidthUint64) {
+  if ((UINT32)Width > EfiPciIoWidthUint64) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -421,7 +421,7 @@ PciIoMemRead (
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
 
-  if (Width < 0 || Width >= EfiPciIoWidthMaximum) {
+  if ((UINT32)Width >= EfiPciIoWidthMaximum) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -500,7 +500,7 @@ PciIoMemWrite (
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
 
-  if (Width < 0 || Width >= EfiPciIoWidthMaximum) {
+  if ((UINT32)Width >= EfiPciIoWidthMaximum) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -578,7 +578,7 @@ PciIoIoRead (
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
 
-  if (Width < 0 || Width >= EfiPciIoWidthMaximum) {
+  if ((UINT32)Width >= EfiPciIoWidthMaximum) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -656,7 +656,7 @@ PciIoIoWrite (
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
 
-  if (Width < 0 || Width >= EfiPciIoWidthMaximum) {
+  if ((UINT32)Width >= EfiPciIoWidthMaximum) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -881,7 +881,7 @@ PciIoCopyMem (
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
 
-  if (Width < 0 || Width >= EfiPciIoWidthMaximum) {
+  if ((UINT32)Width >= EfiPciIoWidthMaximum) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -970,7 +970,7 @@ PciIoMap (
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
 
-  if (Operation < 0 || Operation >= EfiPciIoOperationMaximum) {
+  if ((UINT32)Operation >= EfiPciIoOperationMaximum) {
     return EFI_INVALID_PARAMETER;
   }
 

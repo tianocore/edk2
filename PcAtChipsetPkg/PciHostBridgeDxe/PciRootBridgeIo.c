@@ -1,7 +1,7 @@
 /** @file
   PCI Root Bridge Io Protocol implementation
 
-Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are
 licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -770,7 +770,7 @@ RootBridgeIoCheckParameter (
   //
   // Check to see if Width is in the valid range
   //
-  if (Width < EfiPciWidthUint8 || Width >= EfiPciWidthMaximum) {
+  if ((UINT32)Width >= EfiPciWidthMaximum) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1233,7 +1233,7 @@ RootBridgeIoPollMem (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Width < 0 || Width > EfiPciWidthUint64) {
+  if ((UINT32)Width > EfiPciWidthUint64) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1340,7 +1340,7 @@ RootBridgeIoPollIo (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Width < 0 || Width > EfiPciWidthUint64) {
+  if ((UINT32)Width > EfiPciWidthUint64) {
     return EFI_INVALID_PARAMETER;
   }
   
@@ -1561,7 +1561,7 @@ RootBridgeIoCopyMem (
   UINTN       Index;
   UINT64      Result;
 
-  if (Width < 0 || Width > EfiPciWidthUint64) {
+  if ((UINT32)Width > EfiPciWidthUint64) {
     return EFI_INVALID_PARAMETER;
   }    
 
@@ -1735,7 +1735,7 @@ RootBridgeIoMap (
   //
   // Make sure that Operation is valid
   //
-  if (Operation < 0 || Operation >= EfiPciOperationMaximum) {
+  if ((UINT32)Operation >= EfiPciOperationMaximum) {
     return EFI_INVALID_PARAMETER;
   }
 

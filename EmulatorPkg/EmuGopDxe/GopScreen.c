@@ -1,6 +1,6 @@
 /*++ @file
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2010 - 2011, Apple Inc. All rights reserved.
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -208,7 +208,7 @@ EmuGopBlt (
 
   Private = GOP_PRIVATE_DATA_FROM_THIS (This);
 
-  if ((BltOperation < 0) || (BltOperation >= EfiGraphicsOutputBltOperationMax)) {
+  if ((UINT32)BltOperation >= EfiGraphicsOutputBltOperationMax) {
     return EFI_INVALID_PARAMETER;
   }
 

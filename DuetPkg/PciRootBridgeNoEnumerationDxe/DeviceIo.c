@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -363,7 +363,7 @@ Returns:
 
   Private = DEVICE_IO_PRIVATE_DATA_FROM_THIS (This);
 
-  if (Width < 0 || Width >= MMIO_COPY_UINT8) {
+  if ((UINT32)Width >= MMIO_COPY_UINT8) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -415,7 +415,7 @@ Returns:
 
   Private = DEVICE_IO_PRIVATE_DATA_FROM_THIS (This);
 
-  if (Width < 0 || Width >= MMIO_COPY_UINT8) {
+  if ((UINT32)Width >= MMIO_COPY_UINT8) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -648,7 +648,7 @@ Returns:
 
   Private = DEVICE_IO_PRIVATE_DATA_FROM_THIS (This);
 
-  if (Operation < 0 || Operation > EfiBusMasterCommonBuffer) {
+  if ((UINT32)Operation > EfiBusMasterCommonBuffer) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -748,7 +748,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((Type >= MaxAllocateType) || (Type < AllocateAnyPages)) {
+  if ((UINT32)Type >= MaxAllocateType) {
     return EFI_INVALID_PARAMETER;
   }
 

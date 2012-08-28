@@ -1,5 +1,5 @@
 /** @file
-Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -240,7 +240,7 @@ Returns:
 
   Private = CIRRUS_LOGIC_5430_PRIVATE_DATA_FROM_GRAPHICS_OUTPUT_THIS (This);
 
-  if ((BltOperation < 0) || (BltOperation >= EfiGraphicsOutputBltOperationMax)) {
+  if ((UINT32)BltOperation >= EfiGraphicsOutputBltOperationMax) {
     return EFI_INVALID_PARAMETER;
   }
 

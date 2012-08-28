@@ -12,7 +12,7 @@ This module module layers Device I/O on top of PCI Root Bridge I/O (Segment 0)
    Platform required to support EFI drivers that consume Device I/O
    Platform required to support EFI applications that consume Device I/O
 
-Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -758,7 +758,7 @@ DeviceIoPciRead (
 
   Private = DEVICE_IO_PRIVATE_DATA_FROM_THIS (This);
 
-  if (Width < 0 || Width >= MMIO_COPY_UINT8) {
+  if ((UINT32)Width >= MMIO_COPY_UINT8) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -805,7 +805,7 @@ DeviceIoPciWrite (
 
   Private = DEVICE_IO_PRIVATE_DATA_FROM_THIS (This);
 
-  if (Width < 0 || Width >= MMIO_COPY_UINT8) {
+  if ((UINT32)Width >= MMIO_COPY_UINT8) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1029,7 +1029,7 @@ DeviceIoMap (
 
   Private = DEVICE_IO_PRIVATE_DATA_FROM_THIS (This);
 
-  if (Operation < 0 || Operation > EfiBusMasterCommonBuffer) {
+  if ((UINT32)Operation > EfiBusMasterCommonBuffer) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1123,7 +1123,7 @@ DeviceIoAllocateBuffer (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((Type >= MaxAllocateType) || (Type < AllocateAnyPages)) {
+  if ((UINT32)Type >= MaxAllocateType) {
     return EFI_INVALID_PARAMETER;
   }
 

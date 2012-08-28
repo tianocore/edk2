@@ -557,7 +557,7 @@ CoreAddMemoryDescriptor (
     // Make sure the memory type in the gMemoryTypeInformation[] array is valid
     //
     Type = (EFI_MEMORY_TYPE) (gMemoryTypeInformation[Index].Type);
-    if (Type < 0 || Type > EfiMaxMemoryType) {
+    if ((UINT32)Type > EfiMaxMemoryType) {
       continue;
     }
     if (gMemoryTypeInformation[Index].NumberOfPages != 0) {
@@ -581,7 +581,7 @@ CoreAddMemoryDescriptor (
           // Make sure the memory type in the gMemoryTypeInformation[] array is valid
           //
           Type = (EFI_MEMORY_TYPE) (gMemoryTypeInformation[FreeIndex].Type);
-          if (Type < 0 || Type > EfiMaxMemoryType) {
+          if ((UINT32)Type > EfiMaxMemoryType) {
             continue;
           }
 
@@ -624,7 +624,7 @@ CoreAddMemoryDescriptor (
     // Make sure the memory type in the gMemoryTypeInformation[] array is valid
     //
     Type = (EFI_MEMORY_TYPE) (gMemoryTypeInformation[Index].Type);
-    if (Type < 0 || Type > EfiMaxMemoryType) {
+    if ((UINT32)Type > EfiMaxMemoryType) {
       continue;
     }
     if (gMemoryTypeInformation[Index].NumberOfPages != 0) {
@@ -747,7 +747,7 @@ CoreConvertPages (
     //
     // Update counters for the number of pages allocated to each memory type
     //
-    if (Entry->Type >= 0 && Entry->Type < EfiMaxMemoryType) {
+    if ((UINT32)Entry->Type < EfiMaxMemoryType) {
       if ((Start >= mMemoryTypeStatistics[Entry->Type].BaseAddress && Start <= mMemoryTypeStatistics[Entry->Type].MaximumAddress) ||
           (Start >= mDefaultBaseAddress && Start <= mDefaultMaximumAddress)                                                          ) {
         if (NumberOfPages > mMemoryTypeStatistics[Entry->Type].CurrentNumberOfPages) {
@@ -758,7 +758,7 @@ CoreConvertPages (
       }
     }
 
-    if (NewType >= 0 && NewType < EfiMaxMemoryType) {
+    if ((UINT32)NewType < EfiMaxMemoryType) {
       if ((Start >= mMemoryTypeStatistics[NewType].BaseAddress && Start <= mMemoryTypeStatistics[NewType].MaximumAddress) ||
           (Start >= mDefaultBaseAddress && Start <= mDefaultMaximumAddress)                                                  ) {
         mMemoryTypeStatistics[NewType].CurrentNumberOfPages += NumberOfPages;
@@ -1011,7 +1011,7 @@ FindFreePages (
   //
   // Attempt to find free pages in the preferred bin based on the requested memory type
   //
-  if (NewType >= 0 && NewType < EfiMaxMemoryType && MaxAddress >= mMemoryTypeStatistics[NewType].MaximumAddress) {
+  if ((UINT32)NewType < EfiMaxMemoryType && MaxAddress >= mMemoryTypeStatistics[NewType].MaximumAddress) {
     Start = CoreFindFreePagesI (
               mMemoryTypeStatistics[NewType].MaximumAddress, 
               mMemoryTypeStatistics[NewType].BaseAddress, 
@@ -1094,7 +1094,7 @@ CoreAllocatePages (
   UINT64          MaxAddress;
   UINTN           Alignment;
 
-  if (Type < AllocateAnyPages || Type >= (UINTN) MaxAllocateType) {
+  if ((UINT32)Type >= MaxAllocateType) {
     return EFI_INVALID_PARAMETER;
   }
 

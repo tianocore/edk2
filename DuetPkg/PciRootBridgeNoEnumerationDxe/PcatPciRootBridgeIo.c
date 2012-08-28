@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -256,7 +256,7 @@ PcatRootBridgeIoPollMem (
   }
 
 
-  if (Width < 0 || Width > EfiPciWidthUint64) {
+  if ((UINT32)Width > EfiPciWidthUint64) {
     return EFI_INVALID_PARAMETER;
   }
   //
@@ -319,7 +319,7 @@ PcatRootBridgeIoPollIo (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Width < 0 || Width > EfiPciWidthUint64) {
+  if ((UINT32)Width > EfiPciWidthUint64) {
     return EFI_INVALID_PARAMETER;
   }
   //
@@ -412,7 +412,7 @@ PcatRootBridgeIoMemRead (
 
   In.buf  = Buffer;
   Out.buf = (VOID *)(UINTN) Address;
-  if (Width >= EfiPciWidthUint8 && Width <= EfiPciWidthUint64) {
+  if ((UINT32)Width <= EfiPciWidthUint64) {
     return PcatRootBridgeIoMemRW (Width, Count, TRUE, In, TRUE, Out);
   }
   if (Width >= EfiPciWidthFifoUint8 && Width <= EfiPciWidthFifoUint64) {
@@ -459,7 +459,7 @@ PcatRootBridgeIoMemWrite (
 
   In.buf  = (VOID *)(UINTN) Address;
   Out.buf = Buffer;
-  if (Width >= EfiPciWidthUint8 && Width <= EfiPciWidthUint64) {
+  if ((UINT32)Width <= EfiPciWidthUint64) {
     return PcatRootBridgeIoMemRW (Width, Count, TRUE, In, TRUE, Out);
   }
   if (Width >= EfiPciWidthFifoUint8 && Width <= EfiPciWidthFifoUint64) {
@@ -489,7 +489,7 @@ PcatRootBridgeIoCopyMem (
   UINTN       Index;
   UINT64      Result;
 
-  if (Width < 0 || Width > EfiPciWidthUint64) {
+  if ((UINT32)Width > EfiPciWidthUint64) {
     return EFI_INVALID_PARAMETER;
   }       
 
@@ -609,7 +609,7 @@ PcatRootBridgeIoMap (
   //
   // Make sure that Operation is valid
   //
-  if (Operation < 0 || Operation >= EfiPciOperationMaximum) {
+  if ((UINT32)Operation >= EfiPciOperationMaximum) {
     return EFI_INVALID_PARAMETER;
   }
 

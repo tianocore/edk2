@@ -1,7 +1,7 @@
 /** @file
   Produces the CPU I/O 2 Protocol.
 
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -116,7 +116,7 @@ CpuIoCheckParameter (
   //
   // Check to see if Width is in the valid range
   //
-  if (Width < 0 || Width >= EfiCpuIoWidthMaximum) {
+  if ((UINT32)Width >= EfiCpuIoWidthMaximum) {
     return EFI_INVALID_PARAMETER;
   }
 

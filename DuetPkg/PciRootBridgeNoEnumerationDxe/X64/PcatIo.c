@@ -102,7 +102,7 @@ PcatRootBridgeIoPciRW (
   UINT64                            PciExpressRegAddr;
   BOOLEAN                           UsePciExpressAccess;
 
-  if (Width < 0 || Width >= EfiPciWidthMaximum) {
+  if ((UINT32)Width >= EfiPciWidthMaximum) {
     return EFI_INVALID_PARAMETER;
   }
   
