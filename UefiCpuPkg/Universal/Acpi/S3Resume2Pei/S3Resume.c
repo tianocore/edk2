@@ -441,6 +441,12 @@ S3ResumeBootOs (
   //
   AsmWriteIdtr (&PeiS3ResumeState->Idtr);
 
+  //
+  // NOTE: Because Debug Timer interrupt and system interrupts will be disabled 
+  // in BootScriptExecuteDxe, the rest code in S3ResumeBootOs() cannot be halted
+  // by soft debugger.
+  //
+
   PERF_END (NULL, "ScriptExec", NULL, 0);
 
   //
@@ -1009,11 +1015,6 @@ S3RestoreConfig2 (
     DEBUG (( EFI_D_ERROR, "SMM S3 Return Stack Pointer     = %x\n", SmmS3ResumeState->ReturnStackPointer));
     DEBUG (( EFI_D_ERROR, "SMM S3 Smst                     = %x\n", SmmS3ResumeState->Smst));
 
-    //
-    // Disable interrupt of Debug timer.
-    //
-    SaveAndSetDebugTimerInterrupt (FALSE);
-
     if (SmmS3ResumeState->Signature == SMM_S3_RESUME_SMM_32) {
       SwitchStack (
         (SWITCH_STACK_ENTRY_POINT)(UINTN)SmmS3ResumeState->SmmS3ResumeEntryPoint,
@@ -1042,6 +1043,14 @@ S3RestoreConfig2 (
       SetInterruptState (InterruptStatus);
 
       AsmWriteCr3 ((UINTN)SmmS3ResumeState->SmmS3Cr3);
+
+      //
+      // Disable interrupt of Debug timer, since IDT table cannot work in long mode.
+      // NOTE: On x64 platforms, because DisablePaging64() will disable interrupts,
+      // the code in S3ResumeExecuteBootScript() cannot be halted by soft debugger.
+      //
+      SaveAndSetDebugTimerInterrupt (FALSE);
+
       AsmEnablePaging64 (
         0x38,
         SmmS3ResumeState->SmmS3ResumeEntryPoint,
