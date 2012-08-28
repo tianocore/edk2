@@ -2,7 +2,7 @@
   The driver wrappers BlockMmio protocol instances to produce
   Block I/O Protocol instances.
 
-  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -287,7 +287,7 @@ BlockIoInit (
   BLOCK_MMIO_TO_BLOCK_IO_DEVICE  *Private;
   BLOCK_MMIO_PROTOCOL            *BlockMmio;
 
-  Private = (BLOCK_MMIO_TO_BLOCK_IO_DEVICE*) AllocateZeroPool (sizeof (Private));
+  Private = (BLOCK_MMIO_TO_BLOCK_IO_DEVICE*) AllocateZeroPool (sizeof (*Private));
   ASSERT (Private != NULL);
 
   Status = gBS->LocateProtocol (
