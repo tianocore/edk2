@@ -583,20 +583,25 @@ PeimEntryMA (
     return EFI_UNSUPPORTED;
   }
 
-  Status = (**PeiServices).RegisterForShadow(FileHandle);
-  if (Status == EFI_ALREADY_STARTED) {
-    mImageInMemory = TRUE;
-  } else if (Status == EFI_NOT_FOUND) {
-    ASSERT_EFI_ERROR (Status);
+  //
+  // Initialize TPM device
+  //
+  Status = PeiServicesGetBootMode (&BootMode);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // In S3 path, skip shadow logic. no measurement is required
+  //
+  if (BootMode != BOOT_ON_S3_RESUME) {
+    Status = (**PeiServices).RegisterForShadow(FileHandle);
+    if (Status == EFI_ALREADY_STARTED) {
+      mImageInMemory = TRUE;
+    } else if (Status == EFI_NOT_FOUND) {
+      ASSERT_EFI_ERROR (Status);
+    }
   }
 
   if (!mImageInMemory) {
-    //
-    // Initialize TPM device
-    //
-    Status = PeiServicesGetBootMode (&BootMode);
-    ASSERT_EFI_ERROR (Status);
-
     TpmHandle = (TIS_TPM_HANDLE)(UINTN)TPM_BASE_ADDRESS;
     Status = TisPcRequestUseTpm ((TIS_PC_REGISTERS_PTR)TpmHandle);
     if (EFI_ERROR (Status)) {
