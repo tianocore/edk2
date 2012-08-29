@@ -1,7 +1,7 @@
 /** @file
   UEFI Debug Library that sends messages to the Console Output Device in the EFI System Table.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -120,7 +120,7 @@ DebugAssert (
   //
   UnicodeSPrintAsciiFormat (
     Buffer, 
-    MAX_DEBUG_MESSAGE_LENGTH, 
+    sizeof (Buffer), 
     "ASSERT %a(%d): %a\n", 
     FileName, 
     LineNumber, 
