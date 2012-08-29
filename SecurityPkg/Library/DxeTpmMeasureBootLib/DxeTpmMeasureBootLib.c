@@ -770,6 +770,7 @@ DxeTpmMeasureBootHandler (
     // Find the gpt partion on the given devicepath
     //
     DevicePathNode = OrigDevicePathNode;
+    ASSERT (DevicePathNode != NULL);
     while (!IsDevicePathEnd (DevicePathNode)) {
       //
       // Find the Gpt partition
