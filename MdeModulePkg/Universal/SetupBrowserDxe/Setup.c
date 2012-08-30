@@ -2299,29 +2299,18 @@ DiscardForm (
       }
 
       //
-      // Call callback with Changed type to inform the driver.
-      //
-      SendDiscardInfoToDriver (FormSet, Form);
-
-      //
       // Prepare <ConfigResp>
       //
       SynchronizeStorageForForm(FormSet, ConfigInfo, FALSE);
+
+      //
+      // Call callback with Changed type to inform the driver.
+      //
+      SendDiscardInfoToDriver (FormSet, Form);
     }
 
     Form->NvUpdateRequired = FALSE;
   } else if (SettingScope == FormSetLevel && IsNvUpdateRequired(FormSet)) {
-
-    Link = GetFirstNode (&FormSet->FormListHead);
-    while (!IsNull (&FormSet->FormListHead, Link)) {
-      Form = FORM_BROWSER_FORM_FROM_LINK (Link);
-      Link = GetNextNode (&FormSet->FormListHead, Link);
-      
-      //
-      // Call callback with Changed type to inform the driver.
-      //
-      SendDiscardInfoToDriver (FormSet, Form);
-    }
 
     //
     // Discard Buffer storage or Name/Value storage
@@ -2343,6 +2332,17 @@ DiscardForm (
       }
 
       SynchronizeStorage(Storage, FALSE);
+    }
+
+    Link = GetFirstNode (&FormSet->FormListHead);
+    while (!IsNull (&FormSet->FormListHead, Link)) {
+      Form = FORM_BROWSER_FORM_FROM_LINK (Link);
+      Link = GetNextNode (&FormSet->FormListHead, Link);
+      
+      //
+      // Call callback with Changed type to inform the driver.
+      //
+      SendDiscardInfoToDriver (FormSet, Form);
     }
 
     UpdateNvInfoInForm (FormSet, FALSE);   
