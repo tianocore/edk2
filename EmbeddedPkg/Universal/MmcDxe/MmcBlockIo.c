@@ -640,7 +640,6 @@ MmcIoBlocks (
         }
       }
       NanoSecondDelay(100);
-      Timeout--;
     }
 
     Status = MmcNotifyState (MmcHostInstance, MmcTransferState);
