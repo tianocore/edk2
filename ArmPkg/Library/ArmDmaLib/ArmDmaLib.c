@@ -102,7 +102,9 @@ DmaMap (
     }
 
     // If the mapped buffer is not an uncached buffer
-    if (GcdDescriptor.Attributes != EFI_MEMORY_UC) {
+    if ( (GcdDescriptor.Attributes != EFI_MEMORY_WC) &&
+         (GcdDescriptor.Attributes != EFI_MEMORY_UC) )
+    {
       //
       // If the buffer does not fill entire cache lines we must double buffer into
       // uncached memory. Device (PCI) address becomes uncached page.
@@ -129,7 +131,7 @@ DmaMap (
 
     if ((Operation == MapOperationBusMasterRead) || (Operation == MapOperationBusMasterCommonBuffer)) {
       // In case the buffer is used for instance to send command to a PCI controller, we must ensure the memory is uncached
-      Status = gDS->SetMemorySpaceAttributes (ALIGN_VALUE(*DeviceAddress - BASE_4KB - 1,BASE_4KB), ALIGN_VALUE(*NumberOfBytes,BASE_4KB), EFI_MEMORY_UC);
+      Status = gDS->SetMemorySpaceAttributes (ALIGN_VALUE(*DeviceAddress - BASE_4KB - 1,BASE_4KB), ALIGN_VALUE(*NumberOfBytes,BASE_4KB), EFI_MEMORY_WC);
       ASSERT_EFI_ERROR (Status);
     }
   }

@@ -245,7 +245,7 @@ UncachedInternalAllocateAlignedPages (
     gAttributes = Descriptor.Attributes;
   }
   
-  Status = gDS->SetMemorySpaceAttributes (Memory, EFI_PAGES_TO_SIZE (Pages), EFI_MEMORY_UC);
+  Status = gDS->SetMemorySpaceAttributes (Memory, EFI_PAGES_TO_SIZE (Pages), EFI_MEMORY_WC);
   ASSERT_EFI_ERROR (Status);
   
   return (VOID *)(UINTN)Memory;
