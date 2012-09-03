@@ -17,7 +17,6 @@
 
 #define INIT_NAME_BUFFER_SIZE  128
 #define INIT_DATA_BUFFER_SIZE  1024
-#define INIT_ATTS_BUFFER_SIZE  64
 
 /**
   Base on the input attribute value to return the attribute string.
@@ -27,41 +26,45 @@
 
   @retval The attribute string info.
 **/
-CONST CHAR16 *
+CHAR16 *
 EFIAPI
 GetAttrType (
-  IN CONST UINT32 Atts,
-  IN OUT   CHAR16 *RetString
+  IN CONST UINT32 Atts
   )
 {
-  StrCpy(RetString, L"");
+  UINT32 BufLen;
+  CHAR16 *RetString;
 
+  BufLen      = 0;
+  RetString   = NULL;
+ 
   if ((Atts & EFI_VARIABLE_NON_VOLATILE) != 0) {
-    StrCat(RetString, L"+NV");
+    StrnCatGrow (&RetString, &BufLen, L"+NV", 0);
   }
   if ((Atts & EFI_VARIABLE_RUNTIME_ACCESS) != 0) {
-    StrCat(RetString, L"+RS+BS");
+    StrnCatGrow (&RetString, &BufLen, L"+RS+BS", 0);
   } else if ((Atts & EFI_VARIABLE_BOOTSERVICE_ACCESS) != 0) {
-    StrCat(RetString, L"+BS");
+    StrnCatGrow (&RetString, &BufLen, L"+BS", 0);
   }
   if ((Atts & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != 0) {
-    StrCat(RetString, L"+HR");
+    StrnCatGrow (&RetString, &BufLen, L"+HR", 0);
   }
   if ((Atts & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) {
-    StrCat(RetString, L"+AW");
+    StrnCatGrow (&RetString, &BufLen, L"+AW", 0);
   }
   if ((Atts & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
-    StrCat(RetString, L"+AT");
+    StrnCatGrow (&RetString, &BufLen, L"+AT", 0);
+  }
+
+  if (RetString == NULL) {
+    RetString = StrnCatGrow(&RetString, &BufLen, L"Invalid", 0);
   }
 
   if (RetString[0] == L'+') {
-    return (RetString+1);
+    CopyMem(RetString, RetString + 1, StrSize(RetString + 1));
   }
-  if (RetString[0] == CHAR_NULL) {
-    StrCpy(RetString, L"invalid");
-    return (RetString);
-  }
-  return (RetString);
+
+  return RetString;
 }
 
 /**
@@ -98,7 +101,7 @@ ProcessVariables (
   CHAR16                    *OldName;
   UINTN                     OldNameBufferSize;
   UINTN                     DataBufferSize; // Allocated data buffer size
-  CHAR16                    RetString[INIT_ATTS_BUFFER_SIZE];
+  CHAR16                    *RetString;
 
   Found         = FALSE;
   ShellStatus   = SHELL_SUCCESS;
@@ -186,6 +189,7 @@ ProcessVariables (
     // do the print or delete
     //
     Found = TRUE;
+    RetString = GetAttrType(Atts);
     if (!Delete) {
       ShellPrintHiiEx(
         -1,
@@ -193,7 +197,7 @@ ProcessVariables (
         NULL,
         STRING_TOKEN(STR_DMPSTORE_HEADER_LINE),
         gShellDebug1HiiHandle,
-        GetAttrType(Atts, RetString),
+        RetString,
         &FoundVarGuid,
         FoundVarName,
         DataSize);
@@ -215,6 +219,10 @@ ProcessVariables (
         gShellDebug1HiiHandle,
         gRT->SetVariable(FoundVarName, &FoundVarGuid, Atts, 0, NULL));
         FoundVarName[0] = CHAR_NULL;
+    }
+
+    if (RetString != NULL) {
+      FreePool (RetString);
     }
   }
 
