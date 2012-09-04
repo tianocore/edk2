@@ -32,7 +32,7 @@ GetAttrType (
   IN CONST UINT32 Atts
   )
 {
-  UINT32 BufLen;
+  UINTN  BufLen;
   CHAR16 *RetString;
 
   BufLen      = 0;
