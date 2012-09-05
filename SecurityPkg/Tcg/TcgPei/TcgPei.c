@@ -185,7 +185,7 @@ MeasureCRTMVersion (
 
   TcgEventHdr.PCRIndex  = 0;
   TcgEventHdr.EventType = EV_S_CRTM_VERSION;
-  TcgEventHdr.EventSize = StrSize((CHAR16*)PcdGetPtr (PcdFirmwareVersionString));
+  TcgEventHdr.EventSize = (UINT32) StrSize((CHAR16*)PcdGetPtr (PcdFirmwareVersionString));
 
   return HashLogExtendEvent (
            PeiServices,
