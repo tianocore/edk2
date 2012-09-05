@@ -22,7 +22,6 @@
   Base on the input attribute value to return the attribute string.
 
   @param[in]     Atts           The input attribute value
-  @param[in,out] RetString      The buffer to save the attribute string.
 
   @retval The attribute string info.
 **/
