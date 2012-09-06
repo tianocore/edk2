@@ -1276,6 +1276,9 @@ DxeImageVerificationHandler (
     // Authenticode specification.
     //
     PkcsCertData = (WIN_CERTIFICATE_EFI_PKCS *) WinCertificate;
+    if (PkcsCertData->Hdr.dwLength <= sizeof (PkcsCertData->Hdr)) {
+      goto Done;
+    }
     AuthData   = PkcsCertData->CertData;
     AuthDataSize = PkcsCertData->Hdr.dwLength - sizeof(PkcsCertData->Hdr);
     
@@ -1290,7 +1293,8 @@ DxeImageVerificationHandler (
     // The certificate is formatted as WIN_CERTIFICATE_UEFI_GUID which is described in UEFI Spec.
     //
     WinCertUefiGuid = (WIN_CERTIFICATE_UEFI_GUID *) WinCertificate;
-    if (!CompareGuid(&WinCertUefiGuid->CertType, &gEfiCertPkcs7Guid)) {
+    if (!CompareGuid(&WinCertUefiGuid->CertType, &gEfiCertPkcs7Guid) ||
+        (WinCertUefiGuid->Hdr.dwLength <= OFFSET_OF(WIN_CERTIFICATE_UEFI_GUID, CertData))) {
       goto Done;
     }
     AuthData = WinCertUefiGuid->CertData;
