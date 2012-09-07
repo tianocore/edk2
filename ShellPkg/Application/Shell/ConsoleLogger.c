@@ -473,7 +473,7 @@ AppendStringToHistory(
             ; Index < ConsoleInfo->ColsPerScreen
             ; Index++
            ){
-          *(ConsoleInfo->Attributes + (CopySize/sizeof(ConsoleInfo->Attributes)) + Index) = ConsoleInfo->HistoryMode.Attribute;
+          *(ConsoleInfo->Attributes + (CopySize/sizeof(ConsoleInfo->Attributes[0])) + Index) = ConsoleInfo->HistoryMode.Attribute;
         }
 
         //
