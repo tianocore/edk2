@@ -310,51 +310,6 @@ GetOpRomInfo (
 }
 
 /**
-  Check if the RomImage contains EFI Images.
-
-  @param  RomImage  The ROM address of Image for check.
-  @param  RomSize   Size of ROM for check.
-
-  @retval TRUE     ROM contain EFI Image.
-  @retval FALSE    ROM not contain EFI Image.
-
-**/
-BOOLEAN
-ContainEfiImage (
-  IN VOID            *RomImage,
-  IN UINT64          RomSize
-  )
-{
-  PCI_EXPANSION_ROM_HEADER  *RomHeader;
-  PCI_DATA_STRUCTURE        *RomPcir;
-
-  RomHeader = RomImage;
-  if (RomHeader == NULL) {
-    return FALSE;
-  }
-  ASSERT (RomHeader->Signature == PCI_EXPANSION_ROM_HEADER_SIGNATURE);
-
-  while ((UINT8 *) RomHeader < (UINT8 *) RomImage + RomSize) {
-    if (RomHeader->Signature != PCI_EXPANSION_ROM_HEADER_SIGNATURE) {
-      RomHeader = (PCI_EXPANSION_ROM_HEADER *) ((UINT8 *) RomHeader + 512);
-      continue;
-    }
-
-    RomPcir    = (PCI_DATA_STRUCTURE *) ((UINT8 *) RomHeader + RomHeader->PcirOffset);
-    ASSERT (RomPcir->Signature == PCI_DATA_STRUCTURE_SIGNATURE);
-
-    if (RomPcir->CodeType == PCI_CODE_TYPE_EFI_IMAGE) {
-      return TRUE;
-    }
-
-    RomHeader = (PCI_EXPANSION_ROM_HEADER *) ((UINT8 *) RomHeader + RomPcir->Length * 512);
-  }
-
-  return FALSE;
-}
-
-
-/**
   Load Option Rom image for specified PCI device.
 
   @param PciDevice Pci device instance.
@@ -385,6 +340,7 @@ LoadOpRomImage (
   UINT32                    LegacyImageLength;
   UINT8                     *RomInMemory;
   UINT8                     CodeType;
+  BOOLEAN                   HasEfiOpRom;
 
   RomSize       = PciDevice->RomSize;
 
@@ -436,6 +392,7 @@ LoadOpRomImage (
   RetStatus     = EFI_NOT_FOUND;
   FirstCheck    = TRUE;
   LegacyImageLength = 0;
+  HasEfiOpRom   = FALSE;
 
   do {
     PciDevice->PciRootBridgeIo->Mem.Read (
@@ -486,6 +443,8 @@ LoadOpRomImage (
     if (RomPcir->CodeType == PCI_CODE_TYPE_PCAT_IMAGE) {
       CodeType = PCI_CODE_TYPE_PCAT_IMAGE;
       LegacyImageLength = ((UINT32)((EFI_LEGACY_EXPANSION_ROM_HEADER *)RomHeader)->Size512) * 512;
+    } else if (RomPcir->CodeType == PCI_CODE_TYPE_EFI_IMAGE) {
+      HasEfiOpRom = TRUE;
     }
     Indicator     = RomPcir->Indicator;
     RomImageSize  = RomImageSize + RomPcir->ImageLength * 512;
@@ -525,6 +484,7 @@ LoadOpRomImage (
 
   RomDecode (PciDevice, RomBarIndex, RomBar, FALSE);
 
+  PciDevice->HasEfiOpRom    = HasEfiOpRom;
   PciDevice->EmbeddedRom    = TRUE;
   PciDevice->PciIo.RomSize  = RomImageSize;
   PciDevice->PciIo.RomImage = RomInMemory;

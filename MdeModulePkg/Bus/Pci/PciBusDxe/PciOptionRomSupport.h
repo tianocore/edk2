@@ -1,7 +1,7 @@
 /** @file
   PCI Rom supporting funtions declaration for PCI Bus module.
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -59,23 +59,6 @@ LoadFile2 (
   IN OUT UINTN                *BufferSize,
   IN VOID                     *Buffer      OPTIONAL
   );
-
-/**
-  Check if the RomImage contains EFI Images.
-
-  @param  RomImage  The ROM address of Image for check.
-  @param  RomSize   Size of ROM for check.
-
-  @retval TRUE     ROM contain EFI Image.
-  @retval FALSE    ROM not contain EFI Image.
-
-**/
-BOOLEAN
-ContainEfiImage (
-  IN VOID            *RomImage,
-  IN UINT64          RomSize
-  );
-
 
 /**
   Get Pci device's oprom information.
