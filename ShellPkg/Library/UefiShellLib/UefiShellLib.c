@@ -3142,11 +3142,13 @@ StrnCatGrow (
   //
   if (CurrentSize != NULL) {
     NewSize = *CurrentSize;
-    while (NewSize < (DestinationStartSize + (Count*sizeof(CHAR16)))) {
-      NewSize += 2 * Count * sizeof(CHAR16);
+    if (NewSize < DestinationStartSize + (Count * sizeof(CHAR16))) {
+      while (NewSize < (DestinationStartSize + (Count*sizeof(CHAR16)))) {
+        NewSize += 2 * Count * sizeof(CHAR16);
+      }
+      *Destination = ReallocatePool(*CurrentSize, NewSize, *Destination);
+      *CurrentSize = NewSize;
     }
-    *Destination = ReallocatePool(*CurrentSize, NewSize, *Destination);
-    *CurrentSize = NewSize;
   } else {
     *Destination = AllocateZeroPool((Count+1)*sizeof(CHAR16));
   }
