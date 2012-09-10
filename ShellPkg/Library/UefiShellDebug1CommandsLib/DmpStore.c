@@ -59,7 +59,7 @@ GetAttrType (
     RetString = StrnCatGrow(&RetString, &BufLen, L"Invalid", 0);
   }
 
-  if (RetString[0] == L'+') {
+  if ((RetString != NULL) && (RetString[0] == L'+')) {
     CopyMem(RetString, RetString + 1, StrSize(RetString + 1));
   }
 
