@@ -3655,6 +3655,11 @@ InitializeCurrentSetting (
   EFI_STATUS              Status;
 
   //
+  // Extract default from IFR binary for no storage questions.
+  //  
+  ExtractDefault (FormSet, NULL, EFI_HII_DEFAULT_CLASS_STANDARD, FormSetLevel, GetDefaultForNoStorage, NULL, TRUE);
+
+  //
   // Request current settings from Configuration Driver
   //
   Link = GetFirstNode (&FormSet->StorageListHead);
@@ -3716,11 +3721,6 @@ InitializeCurrentSetting (
   // If has old formset, get the old nv update status.
   //
   if (gOldFormSet != NULL) {
-    //
-    // Restore question value for questions without storage.
-    //
-    CopyOldValueForNoStorageQst (FormSet, gOldFormSet);
-
     Link = GetFirstNode (&FormSet->FormListHead);
     while (!IsNull (&FormSet->FormListHead, Link)) {
       Form = FORM_BROWSER_FORM_FROM_LINK (Link);
@@ -3738,11 +3738,6 @@ InitializeCurrentSetting (
       }
       Link = GetNextNode (&FormSet->FormListHead, Link);
     }
-  } else {
-    //
-    // Extract default from IFR binary for no storage questions.
-    //  
-    ExtractDefault (FormSet, NULL, EFI_HII_DEFAULT_CLASS_STANDARD, FormSetLevel, GetDefaultForNoStorage, NULL, TRUE);
   }
 
   return EFI_SUCCESS;
