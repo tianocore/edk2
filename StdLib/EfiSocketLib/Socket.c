@@ -3191,7 +3191,7 @@ EslSocketPacketFree (
   DBG_ENTER ( );
 
   //
-  //  Allocate a packet structure
+  //  Free a packet structure
   //
   LengthInBytes = pPacket->PacketSize;
   Status = gBS->FreePool ( pPacket );

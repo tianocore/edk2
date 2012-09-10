@@ -835,21 +835,21 @@ EslUdp6TxBuffer (
   //
   if ( SOCKET_STATE_CONNECTED == pSocket->State ) {
     //
-    //  Locate the port
+    //  Verify that there is enough room to buffer another
+    //  transmit operation
     //
-    pPort = pSocket->pPortList;
-    if ( NULL != pPort ) {
+    pTxBytes = &pSocket->TxBytes;
+    if ( pSocket->MaxTxBuf > *pTxBytes ) {
       //
-      //  Determine the queue head
+      //  Locate the port
       //
-      pUdp6 = &pPort->Context.Udp6;
-      pTxBytes = &pSocket->TxBytes;
+      pPort = pSocket->pPortList;
+      while ( NULL != pPort ) {
+        //
+        //  Determine the queue head
+        //
+        pUdp6 = &pPort->Context.Udp6;
 
-      //
-      //  Verify that there is enough room to buffer another
-      //  transmit operation
-      //
-      if ( pSocket->MaxTxBuf > *pTxBytes ) {
         //
         //  Attempt to allocate the packet
         //
@@ -960,6 +960,7 @@ EslUdp6TxBuffer (
             //  Free the packet
             //
             EslSocketPacketFree ( pPacket, DEBUG_TX );
+            break;
           }
 
           //
@@ -972,15 +973,21 @@ EslUdp6TxBuffer (
           //  Packet allocation failed
           //
           pSocket->errno = ENOMEM;
+          break;
         }
-      }
-      else {
+
         //
-        //  Not enough buffer space available
+        //  Set the next port
         //
-        pSocket->errno = EAGAIN;
-        Status = EFI_NOT_READY;
+        pPort = pPort->pLinkSocket;
       }
+    }
+    else {
+      //
+      //  Not enough buffer space available
+      //
+      pSocket->errno = EAGAIN;
+      Status = EFI_NOT_READY;
     }
   }
 
