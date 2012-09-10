@@ -987,47 +987,48 @@ GetSelectionInputPopUp (
   }
 
   //
-  // Prepare HiiValue array
-  //
-  HiiValueArray = AllocateZeroPool (OptionCount * sizeof (EFI_HII_VALUE));
-  ASSERT (HiiValueArray != NULL);
-  Link = GetFirstNode (&Question->OptionListHead);
-  for (Index = 0; Index < OptionCount; Index++) {
-    if (OrderedList) {
-      HiiValueArray[Index].Type = ValueType;
-      HiiValueArray[Index].Value.u64 = GetArrayData (ValueArray, ValueType, Index);
-    } else {
-      OneOfOption = QUESTION_OPTION_FROM_LINK (Link);
-      CopyMem (&HiiValueArray[Index], &OneOfOption->Value, sizeof (EFI_HII_VALUE));
-      Link = GetNextNode (&Question->OptionListHead, Link);
-    }
-  }
-
-  //
-  // Move Suppressed Option to list tail
+  // Move valid Option to list head.
   //
   PopUpMenuLines = 0;
-  for (Index = 0; Index < OptionCount; Index++) {
-    OneOfOption = ValueToOption (Question, &HiiValueArray[OptionCount - Index - 1]);
-    if (OneOfOption == NULL) {
-      return EFI_NOT_FOUND;
+  if (OrderedList) {
+    //
+    // Prepare HiiValue array
+    //  
+    HiiValueArray = AllocateZeroPool (OptionCount * sizeof (EFI_HII_VALUE));
+    ASSERT (HiiValueArray != NULL);
+    for (Index = 0; Index < OptionCount; Index++) {
+      HiiValueArray[Index].Type = ValueType;
+      HiiValueArray[Index].Value.u64 = GetArrayData (ValueArray, ValueType, Index);
     }
 
-    RemoveEntryList (&OneOfOption->Link);
+    for (Index = 0; Index < OptionCount; Index++) {
+      OneOfOption = ValueToOption (Question, &HiiValueArray[OptionCount - Index - 1]);
+      if (OneOfOption == NULL) {
+        return EFI_NOT_FOUND;
+      }
 
-    if ((OneOfOption->SuppressExpression != NULL) &&
-        EvaluateExpressionList(OneOfOption->SuppressExpression, FALSE, NULL, NULL) != ExpressFalse) {
+      RemoveEntryList (&OneOfOption->Link);
+
       //
-      // This option is suppressed, insert to tail
-      //
-      InsertTailList (&Question->OptionListHead, &OneOfOption->Link);
-    } else {
-      //
-      // Insert to head
+      // Insert to head.
       //
       InsertHeadList (&Question->OptionListHead, &OneOfOption->Link);
 
       PopUpMenuLines++;
+    }
+
+    FreePool (HiiValueArray);
+  } else {
+    Link = GetFirstNode (&Question->OptionListHead);
+    for (Index = 0; Index < OptionCount; Index++) {
+      OneOfOption = QUESTION_OPTION_FROM_LINK (Link);
+      Link = GetNextNode (&Question->OptionListHead, Link);
+      if ((OneOfOption->SuppressExpression == NULL) ||
+            EvaluateExpressionList(OneOfOption->SuppressExpression, FALSE, NULL, NULL) == ExpressFalse) {
+        RemoveEntryList (&OneOfOption->Link);
+        InsertHeadList (&Question->OptionListHead, &OneOfOption->Link);
+        PopUpMenuLines++;
+      }
     }
   }
 
@@ -1310,7 +1311,6 @@ TheKey:
           }
         }
 
-        FreePool (HiiValueArray);
         return EFI_DEVICE_ERROR;
 
       default:
@@ -1328,6 +1328,12 @@ TheKey:
         Link = GetFirstNode (&Question->OptionListHead);
         while (!IsNull (&Question->OptionListHead, Link)) {
           OneOfOption = QUESTION_OPTION_FROM_LINK (Link);
+          Link = GetNextNode (&Question->OptionListHead, Link);
+
+          if ((OneOfOption->SuppressExpression != NULL) &&
+              EvaluateExpressionList(OneOfOption->SuppressExpression, FALSE, NULL, NULL) != ExpressFalse) {
+            continue;
+          }
 
           SetArrayData (ValueArray, ValueType, Index, OneOfOption->Value.Value.u64);
 
@@ -1335,8 +1341,6 @@ TheKey:
           if (Index > Question->MaxContainers) {
             break;
           }
-
-          Link = GetNextNode (&Question->OptionListHead, Link);
         }
       } else {
         ASSERT (CurrentOption != NULL);
@@ -1344,7 +1348,6 @@ TheKey:
       }
 
       gST->ConOut->SetAttribute (gST->ConOut, SavedAttribute);
-      FreePool (HiiValueArray);
 
       Status = ValidateQuestion (Selection->FormSet, Selection->Form, Question, EFI_HII_EXPRESSION_INCONSISTENT_IF);
       if (EFI_ERROR (Status)) {

@@ -91,7 +91,13 @@ ValueToOption (
     Option = QUESTION_OPTION_FROM_LINK (Link);
 
     if ((CompareHiiValue (&Option->Value, OptionValue, &Result, NULL) == EFI_SUCCESS) && (Result == 0)) {
-      return Option;
+      //
+      // Check the suppressif condition, only a valid option can be return.
+      //
+      if ((Option->SuppressExpression == NULL) ||
+          ((EvaluateExpressionList(Option->SuppressExpression, FALSE, NULL, NULL) == ExpressFalse))) {
+        return Option;
+      }
     }
 
     Link = GetNextNode (&Question->OptionListHead, Link);
@@ -190,6 +196,47 @@ SetArrayData (
   }
 }
 
+/**
+  Check whether this value already in the array, if yes, return the index.
+
+  @param  Array                  The data array.
+  @param  Type                   Type of the data in this array.
+  @param  Value                  The value to be find.
+  @param  Index                  The index in the array which has same value with Value.
+  
+  @retval   TRUE Found the value in the array.
+  @retval   FALSE Not found the value.
+
+**/
+BOOLEAN 
+FindArrayData (
+  IN VOID                     *Array,
+  IN UINT8                    Type,
+  IN UINT64                   Value,
+  OUT UINTN                   *Index OPTIONAL
+  )
+{
+  UINTN  Count;
+  UINT64 TmpValue;
+  
+  ASSERT (Array != NULL);
+
+  Count    = 0;
+  TmpValue = 0;
+
+  while ((TmpValue = GetArrayData (Array, Type, Count)) != 0) {
+    if (Value == TmpValue) {
+      if (Index != NULL) {
+        *Index = Count;
+      }
+      return TRUE;
+    }
+
+    Count ++;
+  }
+
+  return FALSE;
+}
 
 /**
   Print Question Value according to it's storage width and display attributes.
@@ -396,7 +443,6 @@ ProcessOptions (
   LIST_ENTRY                      *Link;
   EFI_HII_VALUE                   HiiValue;
   EFI_HII_VALUE                   *QuestionValue;
-  BOOLEAN                         Suppress;
   UINT16                          Maximum;
   QUESTION_OPTION                 *Option;
   UINTN                           Index2;
@@ -476,9 +522,13 @@ ProcessOptions (
           Index2 = 0;
           while (!IsNull (&Question->OptionListHead, Link) && Index2 < Question->MaxContainers) {
             Option = QUESTION_OPTION_FROM_LINK (Link);
+            Link = GetNextNode (&Question->OptionListHead, Link);
+            if ((Option->SuppressExpression != NULL) &&
+                ((EvaluateExpressionList(Option->SuppressExpression, FALSE, NULL, NULL) == ExpressSuppress))) {
+              continue;
+            }
             SetArrayData (ValueArray, ValueType, Index2, Option->Value.Value.u64);
             Index2++;
-            Link = GetNextNode (&Question->OptionListHead, Link);
           }
           SetArrayData (ValueArray, ValueType, Index2, 0);
 
@@ -490,28 +540,46 @@ ProcessOptions (
           return EFI_NOT_FOUND;
         }
 
-        Suppress = FALSE;
+        Character[0] = LEFT_ONEOF_DELIMITER;
+        NewStrCat (OptionString[0], Character);
+        StringPtr = GetToken (OneOfOption->Text, Selection->Handle);
+        ASSERT (StringPtr != NULL);
+        NewStrCat (OptionString[0], StringPtr);
+        Character[0] = RIGHT_ONEOF_DELIMITER;
+        NewStrCat (OptionString[0], Character);
+        Character[0] = CHAR_CARRIAGE_RETURN;
+        NewStrCat (OptionString[0], Character);
+        FreePool (StringPtr);
+      }
+
+      //
+      // Search the other options, try to find the one not in the container.
+      //
+      Link = GetFirstNode (&Question->OptionListHead);
+      while (!IsNull (&Question->OptionListHead, Link)) {
+        OneOfOption = QUESTION_OPTION_FROM_LINK (Link);
+        Link = GetNextNode (&Question->OptionListHead, Link);
         if ((OneOfOption->SuppressExpression != NULL) &&
-            (EvaluateExpressionList(OneOfOption->SuppressExpression, FALSE, NULL, NULL) == ExpressSuppress)) {
-          //
-          // This option is suppressed
-          //
-          Suppress = TRUE;
+            ((EvaluateExpressionList(OneOfOption->SuppressExpression, FALSE, NULL, NULL) == ExpressSuppress))) {
+          continue;
         }
 
-        if (!Suppress) {
-          Character[0] = LEFT_ONEOF_DELIMITER;
-          NewStrCat (OptionString[0], Character);
-          StringPtr = GetToken (OneOfOption->Text, Selection->Handle);
-          ASSERT (StringPtr != NULL);
-          NewStrCat (OptionString[0], StringPtr);
-          Character[0] = RIGHT_ONEOF_DELIMITER;
-          NewStrCat (OptionString[0], Character);
-          Character[0] = CHAR_CARRIAGE_RETURN;
-          NewStrCat (OptionString[0], Character);
-
-          FreePool (StringPtr);
+        if (FindArrayData (ValueArray, ValueType, OneOfOption->Value.Value.u64, NULL)) {
+          continue;
         }
+
+        SetArrayData (ValueArray, ValueType, Index++, OneOfOption->Value.Value.u64);
+
+        Character[0] = LEFT_ONEOF_DELIMITER;
+        NewStrCat (OptionString[0], Character);
+        StringPtr = GetToken (OneOfOption->Text, Selection->Handle);
+        ASSERT (StringPtr != NULL);
+        NewStrCat (OptionString[0], StringPtr);
+        Character[0] = RIGHT_ONEOF_DELIMITER;
+        NewStrCat (OptionString[0], Character);
+        Character[0] = CHAR_CARRIAGE_RETURN;
+        NewStrCat (OptionString[0], Character);
+        FreePool (StringPtr);
       }
     }
     break;
@@ -564,50 +632,15 @@ ProcessOptions (
         return EFI_NOT_FOUND;
       }
 
-      if ((OneOfOption->SuppressExpression != NULL) &&
-          ((EvaluateExpressionList(OneOfOption->SuppressExpression, FALSE, NULL, NULL) == ExpressSuppress))) {
-        //
-        // This option is suppressed
-        //
-        Suppress = TRUE;
-      } else {
-        Suppress = FALSE;
-      }
+      Character[0] = LEFT_ONEOF_DELIMITER;
+      NewStrCat (OptionString[0], Character);
+      StringPtr = GetToken (OneOfOption->Text, Selection->Handle);
+      ASSERT (StringPtr != NULL);
+      NewStrCat (OptionString[0], StringPtr);
+      Character[0] = RIGHT_ONEOF_DELIMITER;
+      NewStrCat (OptionString[0], Character);
 
-      if (Suppress) {
-        //
-        // Current selected option happen to be suppressed,
-        // enforce to select on a non-suppressed option
-        //
-        Link = GetFirstNode (&Question->OptionListHead);
-        while (!IsNull (&Question->OptionListHead, Link)) {
-          OneOfOption = QUESTION_OPTION_FROM_LINK (Link);
-
-          if ((OneOfOption->SuppressExpression == NULL) ||
-              (EvaluateExpressionList(OneOfOption->SuppressExpression, FALSE, NULL, NULL) == ExpressFalse)) {
-            Suppress = FALSE;
-            CopyMem (QuestionValue, &OneOfOption->Value, sizeof (EFI_HII_VALUE));
-            SetQuestionValue (Selection->FormSet, Selection->Form, Question, GetSetValueWithEditBuffer);
-            UpdateStatusBar (Selection, NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
-            gST->ConOut->SetAttribute (gST->ConOut, PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND);
-            break;
-          }
-
-          Link = GetNextNode (&Question->OptionListHead, Link);
-        }
-      }
-
-      if (!Suppress) {
-        Character[0] = LEFT_ONEOF_DELIMITER;
-        NewStrCat (OptionString[0], Character);
-        StringPtr = GetToken (OneOfOption->Text, Selection->Handle);
-        ASSERT (StringPtr != NULL);
-        NewStrCat (OptionString[0], StringPtr);
-        Character[0] = RIGHT_ONEOF_DELIMITER;
-        NewStrCat (OptionString[0], Character);
-
-        FreePool (StringPtr);
-      }
+      FreePool (StringPtr);
     }
     break;
 

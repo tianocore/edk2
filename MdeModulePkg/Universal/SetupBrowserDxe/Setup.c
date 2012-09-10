@@ -3026,6 +3026,12 @@ GetQuestionDefault (
       Link = GetFirstNode (&Question->OptionListHead);
       while (!IsNull (&Question->OptionListHead, Link)) {
         Option = QUESTION_OPTION_FROM_LINK (Link);
+        Link = GetNextNode (&Question->OptionListHead, Link);
+
+        if ((Option->SuppressExpression != NULL) &&
+            EvaluateExpressionList(Option->SuppressExpression, FALSE, NULL, NULL) != ExpressFalse) {
+          continue;
+        }
 
         if (((DefaultId == EFI_HII_DEFAULT_CLASS_STANDARD) && ((Option->Flags & EFI_IFR_OPTION_DEFAULT) != 0)) ||
             ((DefaultId == EFI_HII_DEFAULT_CLASS_MANUFACTURING) && ((Option->Flags & EFI_IFR_OPTION_DEFAULT_MFG) != 0))
@@ -3034,8 +3040,6 @@ GetQuestionDefault (
 
           return EFI_SUCCESS;
         }
-
-        Link = GetNextNode (&Question->OptionListHead, Link);
       }
     }
   }
@@ -3081,10 +3085,18 @@ GetQuestionDefault (
     //
     if (ValueToOption (Question, HiiValue) == NULL) {
       Link = GetFirstNode (&Question->OptionListHead);
-      if (!IsNull (&Question->OptionListHead, Link)) {
+      while (!IsNull (&Question->OptionListHead, Link)) {
         Option = QUESTION_OPTION_FROM_LINK (Link);
+        Link = GetNextNode (&Question->OptionListHead, Link);
+
+        if ((Option->SuppressExpression != NULL) &&
+            EvaluateExpressionList(Option->SuppressExpression, FALSE, NULL, NULL) != ExpressFalse) {
+          continue;
+        }
+
         CopyMem (HiiValue, &Option->Value, sizeof (EFI_HII_VALUE));
         Status = EFI_SUCCESS;
+        break;
       }
     }
     break;
@@ -3098,6 +3110,12 @@ GetQuestionDefault (
     while (!IsNull (&Question->OptionListHead, Link)) {
       Status = EFI_SUCCESS;
       Option = QUESTION_OPTION_FROM_LINK (Link);
+      Link = GetNextNode (&Question->OptionListHead, Link);
+
+      if ((Option->SuppressExpression != NULL) &&
+          EvaluateExpressionList(Option->SuppressExpression, FALSE, NULL, NULL) != ExpressFalse) {
+        continue;
+      }
 
       SetArrayData (Question->BufferValue, Question->ValueType, Index, Option->Value.Value.u64);
 
@@ -3105,8 +3123,6 @@ GetQuestionDefault (
       if (Index >= Question->MaxContainers) {
         break;
       }
-
-      Link = GetNextNode (&Question->OptionListHead, Link);
     }
     break;
 
