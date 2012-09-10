@@ -1164,7 +1164,7 @@ InitInterruptDescriptorTable (
       IntHandler =
         (VOID*) (
           OldIdt[Index].Bits.OffsetLow +
-          (OldIdt[Index].Bits.OffsetHigh << 16)
+          (((UINTN) OldIdt[Index].Bits.OffsetHigh) << 16)
 #if defined (MDE_CPU_X64)
             + (((UINTN) OldIdt[Index].Bits.OffsetUpper) << 32)
 #endif
