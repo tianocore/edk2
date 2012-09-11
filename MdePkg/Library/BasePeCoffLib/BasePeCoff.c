@@ -104,6 +104,9 @@ PeCoffLoaderGetPeHeader (
                            );
   if (RETURN_ERROR (Status) || (Size != ReadSize)) {
     ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
+    if (Size != ReadSize) {
+      Status = RETURN_UNSUPPORTED;
+    }
     return Status;
   }
 
@@ -132,6 +135,9 @@ PeCoffLoaderGetPeHeader (
                            );
   if (RETURN_ERROR (Status) || (Size != ReadSize)) {
     ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
+    if (Size != ReadSize) {
+      Status = RETURN_UNSUPPORTED;
+    }
     return Status;
   }
 
@@ -161,6 +167,7 @@ PeCoffLoaderGetPeHeader (
       // 1. Check FileHeader.SizeOfOptionalHeader filed.
       //
       if (EFI_IMAGE_NUMBER_OF_DIRECTORY_ENTRIES < Hdr.Pe32->OptionalHeader.NumberOfRvaAndSizes) {
+        ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
         return RETURN_UNSUPPORTED;
       }
 
@@ -171,6 +178,7 @@ PeCoffLoaderGetPeHeader (
       //
       if (EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1 < Hdr.Pe32->OptionalHeader.NumberOfRvaAndSizes) {
         if (Hdr.Pe32->OptionalHeader.SizeOfHeaders < (UINT32)((UINT8 *)(&Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1]) - (UINT8 *) &Hdr)) {
+          ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
           return RETURN_UNSUPPORTED;
         }
       }
@@ -187,6 +195,10 @@ PeCoffLoaderGetPeHeader (
                                &BufferData
                                );
       if (RETURN_ERROR (Status) || (Size != ReadSize)) {
+        ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
+        if (Size != ReadSize) {
+          Status = RETURN_UNSUPPORTED;
+        }
         return Status;
       }
 
@@ -202,7 +214,8 @@ PeCoffLoaderGetPeHeader (
           //
           if ((UINT32) (~0) - Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].VirtualAddress <
               Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size) {
-            return RETURN_INVALID_PARAMETER;
+            ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+            return RETURN_UNSUPPORTED;
           }
 
           //
@@ -218,6 +231,10 @@ PeCoffLoaderGetPeHeader (
                                    &BufferData
                                    );
           if (RETURN_ERROR (Status) || (Size != ReadSize)) {
+            ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
+            if (Size != ReadSize) {
+              Status = RETURN_UNSUPPORTED;
+            }
             return Status;
           }
         }
@@ -236,6 +253,7 @@ PeCoffLoaderGetPeHeader (
       // 1. Check FileHeader.SizeOfOptionalHeader filed.
       //
       if (EFI_IMAGE_NUMBER_OF_DIRECTORY_ENTRIES < Hdr.Pe32Plus->OptionalHeader.NumberOfRvaAndSizes) {
+        ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
         return RETURN_UNSUPPORTED;
       }
 
@@ -246,6 +264,7 @@ PeCoffLoaderGetPeHeader (
       //
       if (EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1 < Hdr.Pe32Plus->OptionalHeader.NumberOfRvaAndSizes) {
         if (Hdr.Pe32Plus->OptionalHeader.SizeOfHeaders < (UINT32)((UINT8 *)(&Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1]) - (UINT8 *) &Hdr)) {
+          ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
           return RETURN_UNSUPPORTED;
         }
       }
@@ -262,6 +281,10 @@ PeCoffLoaderGetPeHeader (
                                &BufferData
                                );
       if (RETURN_ERROR (Status) || (Size != ReadSize)) {
+        ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
+        if (Size != ReadSize) {
+          Status = RETURN_UNSUPPORTED;
+        }
         return Status;
       }
 
@@ -277,7 +300,8 @@ PeCoffLoaderGetPeHeader (
           //
           if ((UINT32) (~0) - Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].VirtualAddress <
               Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY].Size) {
-            return RETURN_INVALID_PARAMETER;
+            ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+            return RETURN_UNSUPPORTED;
           }
 
           //
@@ -293,6 +317,10 @@ PeCoffLoaderGetPeHeader (
                                    &BufferData
                                    );
           if (RETURN_ERROR (Status) || (Size != ReadSize)) {
+            ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
+            if (Size != ReadSize) {
+              Status = RETURN_UNSUPPORTED;
+            }
             return Status;
           }
         }
@@ -348,6 +376,10 @@ PeCoffLoaderGetPeHeader (
                              &SectionHeader
                              );
     if (RETURN_ERROR (Status) || (Size != ReadSize)) {
+      ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
+      if (Size != ReadSize) {
+        Status = RETURN_UNSUPPORTED;
+      }
       return Status;
     }
 
@@ -356,7 +388,8 @@ PeCoffLoaderGetPeHeader (
       // Check the member data to avoid overflow.
       //
       if ((UINT32) (~0) - SectionHeader.PointerToRawData < SectionHeader.SizeOfRawData) {
-        return RETURN_INVALID_PARAMETER;
+        ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+        return RETURN_UNSUPPORTED;
       }
 
       //
@@ -372,6 +405,10 @@ PeCoffLoaderGetPeHeader (
                                &BufferData
                                );
       if (RETURN_ERROR (Status) || (Size != ReadSize)) {
+        ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
+        if (Size != ReadSize) {
+          Status = RETURN_UNSUPPORTED;
+        }
         return Status;
       }
     }
@@ -507,7 +544,8 @@ PeCoffLoaderGetImageInfo (
   // This case is not a valid TE image. 
   //
   if ((ImageContext->IsTeImage) && (Hdr.Te->DataDirectory[0].Size != 0) && (Hdr.Te->DataDirectory[0].VirtualAddress == 0)) {
-    return RETURN_INVALID_PARAMETER;
+    ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+    return RETURN_UNSUPPORTED;
   }
 
   if (!(ImageContext->IsTeImage)) {
@@ -557,6 +595,9 @@ PeCoffLoaderGetImageInfo (
                                  );
         if (RETURN_ERROR (Status) || (Size != ReadSize)) {
           ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
+          if (Size != ReadSize) {
+            Status = RETURN_UNSUPPORTED;
+          }
           return Status;
         }
 
@@ -585,6 +626,9 @@ PeCoffLoaderGetImageInfo (
                                    );
           if (RETURN_ERROR (Status) || (Size != ReadSize)) {
             ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
+            if (Size != ReadSize) {
+              Status = RETURN_UNSUPPORTED;
+            }
             return Status;
           }
           if (DebugEntry.Type == EFI_IMAGE_DEBUG_TYPE_CODEVIEW) {
@@ -620,6 +664,9 @@ PeCoffLoaderGetImageInfo (
                                );
       if (RETURN_ERROR (Status) || (Size != ReadSize)) {
         ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
+        if (Size != ReadSize) {
+          Status = RETURN_UNSUPPORTED;
+        }
         return Status;
       }
 
@@ -674,6 +721,9 @@ PeCoffLoaderGetImageInfo (
                                  );
         if (RETURN_ERROR (Status) || (Size != ReadSize)) {
           ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
+          if (Size != ReadSize) {
+            Status = RETURN_UNSUPPORTED;
+          }
           return Status;
         }
 
