@@ -1718,6 +1718,8 @@ PeCoffLoaderRelocateImageForRuntime (
   PE/COFF image starting at byte offset FileOffset into the buffer specified by Buffer.  
   The size of the buffer actually read is returned in ReadSize.
   
+  The caller must make sure the FileOffset and ReadSize within the file scope.
+
   If FileHandle is NULL, then ASSERT().
   If ReadSize is NULL, then ASSERT().
   If Buffer is NULL, then ASSERT().
