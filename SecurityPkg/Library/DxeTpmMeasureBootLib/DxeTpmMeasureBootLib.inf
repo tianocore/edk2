@@ -50,10 +50,14 @@
   PeCoffLib
   BaseLib
   SecurityManagementLib
+  HobLib
+
+[Guids]
+  gTrustedFvHobGuid
 
 [Protocols]
   gEfiTcgProtocolGuid                   ## CONSUMES
-  gEfiFirmwareVolume2ProtocolGuid       ## CONSUMES
+  gEfiFirmwareVolumeBlockProtocolGuid   ## CONSUMES
   gEfiBlockIoProtocolGuid               ## CONSUMES
   gEfiDiskIoProtocolGuid                ## CONSUMES
   gEfiDevicePathToTextProtocolGuid      ## SOMETIMES_CONSUMES (Only used in debug mode)

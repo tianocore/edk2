@@ -29,10 +29,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <PiDxe.h>
 
 #include <Protocol/TcgService.h>
-#include <Protocol/FirmwareVolume2.h>
 #include <Protocol/BlockIo.h>
 #include <Protocol/DiskIo.h>
 #include <Protocol/DevicePathToText.h>
+#include <Protocol/FirmwareVolumeBlock.h>
+
+#include <Guid/TrustedFvHob.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -43,6 +45,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseCryptLib.h>
 #include <Library/PeCoffLib.h>
 #include <Library/SecurityManagementLib.h>
+#include <Library/HobLib.h>
 
 //
 // Flag to check GPT partition. It only need be measured once.
@@ -52,6 +55,11 @@ EFI_GUID                          mZeroGuid = {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}
 UINTN                             mMeasureGptCount = 0;
 VOID                              *mFileBuffer;
 UINTN                             mImageSize;
+//
+// Measured FV handle cache
+//
+EFI_HANDLE                        mCacheMeasuredHandle  = NULL;
+UINT32                            *mGuidHobData         = NULL;
 
 /**
   Reads contents of a PE/COFF image in memory buffer.
@@ -718,17 +726,22 @@ DxeTpmMeasureBootHandler (
   IN  BOOLEAN                          BootPolicy
   )
 {
-  EFI_TCG_PROTOCOL                  *TcgProtocol;
-  EFI_STATUS                        Status;
-  TCG_EFI_BOOT_SERVICE_CAPABILITY   ProtocolCapability;
-  UINT32                            TCGFeatureFlags;
-  EFI_PHYSICAL_ADDRESS              EventLogLocation;
-  EFI_PHYSICAL_ADDRESS              EventLogLastEntry;
-  EFI_DEVICE_PATH_PROTOCOL          *DevicePathNode;
-  EFI_DEVICE_PATH_PROTOCOL          *OrigDevicePathNode;
-  EFI_HANDLE                        Handle;
-  BOOLEAN                           ApplicationRequired;
-  PE_COFF_LOADER_IMAGE_CONTEXT      ImageContext;
+  EFI_TCG_PROTOCOL                    *TcgProtocol;
+  EFI_STATUS                          Status;
+  TCG_EFI_BOOT_SERVICE_CAPABILITY     ProtocolCapability;
+  UINT32                              TCGFeatureFlags;
+  EFI_PHYSICAL_ADDRESS                EventLogLocation;
+  EFI_PHYSICAL_ADDRESS                EventLogLastEntry;
+  EFI_DEVICE_PATH_PROTOCOL            *DevicePathNode;
+  EFI_DEVICE_PATH_PROTOCOL            *OrigDevicePathNode;
+  EFI_HANDLE                          Handle;
+  EFI_HANDLE                          TempHandle;
+  BOOLEAN                             ApplicationRequired;
+  PE_COFF_LOADER_IMAGE_CONTEXT        ImageContext;
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *FvbProtocol;
+  EFI_PHYSICAL_ADDRESS                FvAddress;
+  EFI_PLATFORM_FIRMWARE_BLOB          *TrustedFvBuf;
+  UINT32                              Index;
 
   Status = gBS->LocateProtocol (&gEfiTcgProtocolGuid, NULL, (VOID **) &TcgProtocol);
   if (EFI_ERROR (Status)) {
@@ -822,10 +835,10 @@ DxeTpmMeasureBootHandler (
   ApplicationRequired = FALSE;
 
   //
-  // Check whether this device path support FV2 protocol.
+  // Check whether this device path support FVB protocol.
   //
   DevicePathNode = OrigDevicePathNode;
-  Status = gBS->LocateDevicePath (&gEfiFirmwareVolume2ProtocolGuid, &DevicePathNode, &Handle);
+  Status = gBS->LocateDevicePath (&gEfiFirmwareVolumeBlockProtocolGuid, &DevicePathNode, &Handle);
   if (!EFI_ERROR (Status)) {
     //
     // Don't check FV image, and directly return EFI_SUCCESS.
@@ -835,13 +848,51 @@ DxeTpmMeasureBootHandler (
       return EFI_SUCCESS;
     }
     //
-    // The image from Firmware image will not be mearsured.
-    // Current policy doesn't measure PeImage from Firmware if it is driver
-    // If the got PeImage is application, it will be still be measured.
+    // The PE image from untrusted Firmware volume need be measured
+    // The PE image from trusted Firmware volume will be mearsured according to policy below.
+    //   if it is driver, do not measure
+    //   If it is application, still measure.
     //
     ApplicationRequired = TRUE;
+
+    if (mCacheMeasuredHandle != Handle && mGuidHobData != NULL) {
+      //
+      // Search for Root FV of this PE image
+      //
+      TempHandle = Handle;
+      do {
+        Status = gBS->HandleProtocol(
+                        TempHandle, 
+                        &gEfiFirmwareVolumeBlockProtocolGuid,
+                        &FvbProtocol
+                        );
+        TempHandle = FvbProtocol->ParentHandle;
+      } while (!EFI_ERROR(Status) && FvbProtocol->ParentHandle != NULL);
+
+      //
+      // Search in measured FV Hob
+      //
+      Status = FvbProtocol->GetPhysicalAddress(FvbProtocol, &FvAddress);
+      if (EFI_ERROR(Status)){
+        return Status;
+      }
+
+      TrustedFvBuf        = (EFI_PLATFORM_FIRMWARE_BLOB *)(mGuidHobData + 1);
+      ApplicationRequired = FALSE;
+
+      for (Index = 0; Index < *mGuidHobData; Index++) {
+        if(TrustedFvBuf[Index].BlobBase == FvAddress) {
+          //
+          // Cache measured FV for next measurement
+          //
+          mCacheMeasuredHandle = Handle;
+          ApplicationRequired  = TRUE;
+          break;
+        }
+      }
+    }
   }
-  
+
   //
   // File is not found.
   //
@@ -941,6 +992,16 @@ DxeTpmMeasureBootLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
+  EFI_HOB_GUID_TYPE  *GuidHob;
+
+  GuidHob = NULL;
+
+  GuidHob = GetFirstGuidHob (&gTrustedFvHobGuid);
+
+  if (GuidHob != NULL) {
+    mGuidHobData = GET_GUID_HOB_DATA (GuidHob);
+  }
+
   return RegisterSecurity2Handler (
           DxeTpmMeasureBootHandler,
           EFI_AUTH_OPERATION_MEASURE_IMAGE | EFI_AUTH_OPERATION_IMAGE_REQUIRED

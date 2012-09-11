@@ -20,7 +20,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Ppi/LockPhysicalPresence.h>
 #include <Ppi/TpmInitialized.h>
 #include <Ppi/FirmwareVolume.h>
+#include <Ppi/EndOfPeiPhase.h>
+
 #include <Guid/TcgEventHob.h>
+#include <Guid/TrustedFvHob.h>
+
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/PeiServicesLib.h>
@@ -40,6 +44,12 @@ EFI_PEI_PPI_DESCRIPTOR  mTpmInitializedPpiList = {
   &gPeiTpmInitializedPpiGuid,
   NULL
 };
+
+EFI_PLATFORM_FIRMWARE_BLOB mMeasuredBaseFvInfo[FixedPcdGet32 (PcdPeiCoreMaxFvSupported)];
+UINT32 mMeasuredBaseFvIndex = 0;
+
+EFI_PLATFORM_FIRMWARE_BLOB mMeasuredChildFvInfo[FixedPcdGet32 (PcdPeiCoreMaxFvSupported)];
+UINT32 mMeasuredChildFvIndex = 0;
 
 /**
   Lock physical presence if needed.
@@ -78,6 +88,25 @@ FirmwareVolmeInfoPpiNotifyCallback (
   IN VOID                          *Ppi
   );
 
+/**
+  Record all measured Firmware Volum Information into a Guid Hob
+
+  @param[in] PeiServices       An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param[in] NotifyDescriptor  Address of the notification descriptor data structure.
+  @param[in] Ppi               Address of the PPI that was installed.
+
+  @retval EFI_SUCCESS          The FV Info is measured and recorded to TPM.
+  @return Others               Fail to measure FV.
+
+**/
+EFI_STATUS
+EFIAPI
+EndofPeiSignalNotifyCallBack (
+  IN EFI_PEI_SERVICES              **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR     *NotifyDescriptor,
+  IN VOID                          *Ppi
+  );
+
 EFI_PEI_NOTIFY_DESCRIPTOR           mNotifyList[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK,
@@ -85,14 +114,73 @@ EFI_PEI_NOTIFY_DESCRIPTOR           mNotifyList[] = {
     PhysicalPresencePpiNotifyCallback
   },
   {
-    (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+    EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK,
     &gEfiPeiFirmwareVolumeInfoPpiGuid,
     FirmwareVolmeInfoPpiNotifyCallback 
+  },
+  {
+    (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+    &gEfiEndOfPeiSignalPpiGuid,
+    EndofPeiSignalNotifyCallBack
   }
 };
 
-EFI_PLATFORM_FIRMWARE_BLOB mMeasuredFvInfo[FixedPcdGet32 (PcdPeiCoreMaxFvSupported)];
-UINT32 mMeasuredFvIndex = 0;
+/**
+  Record all measured Firmware Volum Information into a Guid Hob
+  Guid Hob payload layout is 
+
+     UINT32 *************************** FIRMWARE_BLOB number
+     EFI_PLATFORM_FIRMWARE_BLOB******** BLOB Array
+
+  @param[in] PeiServices       An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param[in] NotifyDescriptor  Address of the notification descriptor data structure.
+  @param[in] Ppi               Address of the PPI that was installed.
+
+  @retval EFI_SUCCESS          The FV Info is measured and recorded to TPM.
+  @return Others               Fail to measure FV.
+
+**/
+EFI_STATUS
+EFIAPI
+EndofPeiSignalNotifyCallBack (
+  IN EFI_PEI_SERVICES              **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR     *NotifyDescriptor,
+  IN VOID                          *Ppi
+  )
+{  
+  UINT8 *HobData;
+
+  HobData = NULL;
+
+  //
+  // Create a Guid hob to save all trusted Fv 
+  //
+  HobData = BuildGuidHob(
+              &gTrustedFvHobGuid,
+              sizeof(UINTN) + sizeof(EFI_PLATFORM_FIRMWARE_BLOB) * (mMeasuredBaseFvIndex + mMeasuredChildFvIndex)
+              );
+
+  if (HobData != NULL){
+    //
+    // Save measured FV info enty number
+    //
+    *(UINT32 *)HobData = mMeasuredBaseFvIndex + mMeasuredChildFvIndex;
+
+    HobData += sizeof(UINT32);
+    //
+    // Save measured base Fv info
+    //
+    CopyMem (HobData, mMeasuredBaseFvInfo, sizeof(EFI_PLATFORM_FIRMWARE_BLOB) * (mMeasuredBaseFvIndex));
+
+    HobData += sizeof(EFI_PLATFORM_FIRMWARE_BLOB) * (mMeasuredBaseFvIndex);
+    //
+    // Save measured child Fv info
+    //
+    CopyMem (HobData, mMeasuredChildFvInfo, sizeof(EFI_PLATFORM_FIRMWARE_BLOB) * (mMeasuredChildFvIndex));
+  }
+
+  return EFI_SUCCESS;
+}
 
 /**
   Do a hash operation on a data buffer, extend a specific TPM PCR with the hash result,
@@ -228,8 +316,8 @@ MeasureFvImage (
   //
   // Check whether FV is in the measured FV list.
   //
-  for (Index = 0; Index < mMeasuredFvIndex; Index ++) {
-    if (mMeasuredFvInfo[Index].BlobBase == FvBase) {
+  for (Index = 0; Index < mMeasuredBaseFvIndex; Index ++) {
+    if (mMeasuredBaseFvInfo[Index].BlobBase == FvBase) {
       return EFI_SUCCESS;
     }
   }
@@ -260,10 +348,11 @@ MeasureFvImage (
   //
   // Add new FV into the measured FV list.
   //
-  ASSERT (mMeasuredFvIndex < FixedPcdGet32 (PcdPeiCoreMaxFvSupported));
-  if (mMeasuredFvIndex < FixedPcdGet32 (PcdPeiCoreMaxFvSupported)) {
-    mMeasuredFvInfo[mMeasuredFvIndex].BlobBase   = FvBase;
-    mMeasuredFvInfo[mMeasuredFvIndex++].BlobLength = FvLength;
+  ASSERT (mMeasuredBaseFvIndex < FixedPcdGet32 (PcdPeiCoreMaxFvSupported));
+  if (mMeasuredBaseFvIndex < FixedPcdGet32 (PcdPeiCoreMaxFvSupported)) {
+    mMeasuredBaseFvInfo[mMeasuredBaseFvIndex].BlobBase   = FvBase;
+    mMeasuredBaseFvInfo[mMeasuredBaseFvIndex].BlobLength = FvLength;
+    mMeasuredBaseFvIndex++;
   }
 
   return Status;
@@ -369,9 +458,16 @@ FirmwareVolmeInfoPpiNotifyCallback (
   
   //
   // This is an FV from an FFS file, and the parent FV must have already been measured,
-  // No need to measure twice, so just returns
+  // No need to measure twice, so just record the FV and return
   //
   if (Fv->ParentFvName != NULL || Fv->ParentFileName != NULL ) {
+    
+    ASSERT (mMeasuredChildFvIndex < FixedPcdGet32 (PcdPeiCoreMaxFvSupported));
+    if (mMeasuredChildFvIndex < FixedPcdGet32 (PcdPeiCoreMaxFvSupported)) {
+      mMeasuredChildFvInfo[mMeasuredChildFvIndex].BlobBase   = (EFI_PHYSICAL_ADDRESS) (UINTN) Fv->FvInfo;
+      mMeasuredChildFvInfo[mMeasuredChildFvIndex].BlobLength = Fv->FvInfoSize;
+      mMeasuredChildFvIndex++;
+    }
     return EFI_SUCCESS;
   }
 
