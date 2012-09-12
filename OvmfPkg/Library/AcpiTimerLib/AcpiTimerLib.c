@@ -21,6 +21,7 @@
 #include <Library/PciLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
+#include <IndustryStandard/Pci22.h>
 
 //
 // PIIX4 Power Management Base Address
@@ -61,7 +62,10 @@ AcpiTimerLibConstructor (
 
     PciAndThenOr32 (PCI_LIB_ADDRESS (0,Device,3,0x40),
                     (UINT32) ~0xFFC0, mPmba);
-    PciOr8         (PCI_LIB_ADDRESS (0,Device,3,0x04), 0x01);
+    PciOr8 (
+      PCI_LIB_ADDRESS (0, Device, 3, PCI_COMMAND_OFFSET),
+      EFI_PCI_COMMAND_IO_SPACE
+      );
   }
 
   //
