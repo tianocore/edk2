@@ -426,7 +426,7 @@ SmmVariableHandler (
     return EFI_SUCCESS;
   }
 
-  if (*CommBufferSize < sizeof(SMM_VARIABLE_COMMUNICATE_HEADER) - 1) {
+  if (*CommBufferSize < SMM_VARIABLE_COMMUNICATE_HEADER_SIZE) {
     return EFI_SUCCESS;
   }
 
