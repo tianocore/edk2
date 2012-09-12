@@ -20,6 +20,7 @@
 
 #include <Uefi.h>
 
+#include <Guid/MemoryOverwriteControl.h>
 #include <Protocol/AtaPassThru.h>
 #include <Protocol/BlockIo.h>
 #include <Protocol/BlockIo2.h>
@@ -35,6 +36,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/TimerLib.h>
 
 #include <IndustryStandard/Atapi.h>
@@ -81,6 +83,21 @@
 #define ATA_DEVICE_SIGNATURE              SIGNATURE_32 ('A', 'B', 'I', 'D')
 #define ATA_SUB_TASK_SIGNATURE            SIGNATURE_32 ('A', 'S', 'T', 'S')
 #define IS_ALIGNED(addr, size)            (((UINTN) (addr) & (size - 1)) == 0)
+
+#define ROUNDUP512(x) (((x) % 512 == 0) ? (x) : ((x) / 512 + 1) * 512)
+
+#define SECURITY_PROTOCOL_TCG      0x02
+#define SECURITY_PROTOCOL_IEEE1667 0xEE
+
+//
+// ATA Supported Security Protocols List Description.
+// Refer to ATA8-ACS Spec 7.57.6.2 Table 69.
+//
+typedef struct  {
+  UINT8                            Reserved1[6];
+  UINT8                            SupportedSecurityListLength[2];
+  UINT8                            SupportedSecurityProtocol[1];
+} SUPPORTED_SECURITY_PROTOCOLS_PARAMETER_DATA;
 
 //
 // ATA bus data structure for ATA controller
@@ -1040,6 +1057,22 @@ AtaStorageSecuritySendData (
   IN UINT16                                   SecurityProtocolSpecificData,
   IN UINTN                                    PayloadBufferSize,
   IN VOID                                     *PayloadBuffer
+  );
+
+/**
+  Send TPer Reset command to reset eDrive to lock all protected bands.
+  Typically, there are 2 mechanism for resetting eDrive. They are:
+  1. TPer Reset through IEEE 1667 protocol.
+  2. TPer Reset through native TCG protocol.
+  This routine will detect what protocol the attached eDrive comform to, TCG or
+  IEEE 1667 protocol. Then send out TPer Reset command separately.
+
+  @param[in] AtaDevice    ATA_DEVICE pointer.
+
+**/
+VOID
+InitiateTPerReset (
+  IN   ATA_DEVICE       *AtaDevice
   );
 
 #endif

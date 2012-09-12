@@ -5,7 +5,7 @@
 #  in UEFI spec 2.2. It installs Block IO and Disk Info protocol for each ATA device
 #  it enumerates and identifies successfully.
 #
-#  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -48,6 +48,7 @@
 [LibraryClasses]
   DevicePathLib
   UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
   MemoryAllocationLib
   BaseMemoryLib
   UefiLib
@@ -59,6 +60,7 @@
 [Guids]
   gEfiDiskInfoIdeInterfaceGuid                  # CONSUMES  ## GUID
   gEfiDiskInfoAhciInterfaceGuid                 # CONSUMES  ## GUID
+  gEfiMemoryOverwriteControlDataGuid            # CONSUMES  ## GUID
 
 [Protocols]
   gEfiDiskInfoProtocolGuid                      # BY_START
