@@ -49,6 +49,10 @@
   ## This flag is used to control the destination port for PlatformDebugLibIoPort
   gUefiOvmfPkgTokenSpaceGuid.PcdDebugIoPort|0x402|UINT16|4
 
+  ## This flag determines the Power Management Base Address of choice, written
+  #  to PIIX4 function 3 offset 0x40-0x43 bits [15:6].
+  gUefiOvmfPkgTokenSpaceGuid.PcdAcpiPmBaseAddress|0xB000|UINT16|5
+
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
 

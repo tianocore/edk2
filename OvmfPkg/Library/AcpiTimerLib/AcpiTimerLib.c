@@ -20,11 +20,12 @@
 #include <Library/IoLib.h>
 #include <Library/PciLib.h>
 #include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
 
 //
 // PIIX4 Power Management Base Address
 //
-UINT32 mPmba = 0xb000;
+STATIC UINT32 mPmba;
 
 #define PCI_BAR_IO             0x1
 #define ACPI_TIMER_FREQUENCY   3579545
@@ -56,6 +57,8 @@ AcpiTimerLibConstructor (
     ASSERT (mPmba & PCI_BAR_IO);
     mPmba &= ~PCI_BAR_IO;
   } else {
+    mPmba = PcdGet16 (PcdAcpiPmBaseAddress);
+
     PciAndThenOr32 (PCI_LIB_ADDRESS (0,Device,3,0x40),
                     (UINT32) ~0xfc0, mPmba);
     PciOr8         (PCI_LIB_ADDRESS (0,Device,3,0x04), 0x01);
