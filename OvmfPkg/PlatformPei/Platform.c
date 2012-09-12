@@ -230,7 +230,7 @@ MiscInitialization (
     //
     // Set the PM I/O base address to 0x400
     //
-    PciAndThenOr32 (PCI_LIB_ADDRESS (0, 1, 3, 0x40), (UINT32) ~0xfc0, 0x400);
+    PciAndThenOr32 (PCI_LIB_ADDRESS (0, 1, 3, 0x40), (UINT32) ~0xFFC0, 0x400);
   }
 }
 

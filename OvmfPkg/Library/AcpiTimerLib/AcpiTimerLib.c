@@ -60,7 +60,7 @@ AcpiTimerLibConstructor (
     mPmba = PcdGet16 (PcdAcpiPmBaseAddress);
 
     PciAndThenOr32 (PCI_LIB_ADDRESS (0,Device,3,0x40),
-                    (UINT32) ~0xfc0, mPmba);
+                    (UINT32) ~0xFFC0, mPmba);
     PciOr8         (PCI_LIB_ADDRESS (0,Device,3,0x04), 0x01);
   }
 
