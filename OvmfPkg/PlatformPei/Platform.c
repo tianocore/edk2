@@ -214,7 +214,7 @@ MemMapInitialization (
 
 VOID
 MiscInitialization (
-  BOOLEAN Xen
+  VOID
   )
 {
   //
@@ -227,7 +227,12 @@ MiscInitialization (
   //
   BuildCpuHob (36, 16);
 
-  if (!Xen) {
+  //
+  // If PMREGMISC/PMIOSE is set, assume the ACPI PMBA has been configured (for
+  // example by Xen) and skip the setup here. This matches the logic in
+  // AcpiTimerLibConstructor ().
+  //
+  if ((PciRead8 (PCI_LIB_ADDRESS (0, 1, 3, 0x80)) & 0x01) == 0) {
     //
     // The PEI phase should be exited with fully accessibe PIIX4 IO space:
     // 1. set PMBA
@@ -331,9 +336,7 @@ InitializePlatform (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_STATUS            Status;
   EFI_PHYSICAL_ADDRESS  TopOfMemory;
-  BOOLEAN               Xen;
 
   DEBUG ((EFI_D_ERROR, "Platform PEIM Loaded\n"));
 
@@ -341,8 +344,7 @@ InitializePlatform (
 
   TopOfMemory = MemDetect ();
 
-  Status = InitializeXen ();
-  Xen = EFI_ERROR (Status) ? FALSE : TRUE;
+  InitializeXen ();
 
   ReserveEmuVariableNvStore ();
 
@@ -350,7 +352,7 @@ InitializePlatform (
 
   MemMapInitialization (TopOfMemory);
 
-  MiscInitialization (Xen);
+  MiscInitialization ();
 
   BootModeInitialization ();
 
