@@ -864,7 +864,7 @@ DxeTpmMeasureBootHandler (
         Status = gBS->HandleProtocol(
                         TempHandle, 
                         &gEfiFirmwareVolumeBlockProtocolGuid,
-                        &FvbProtocol
+                        (VOID**)&FvbProtocol
                         );
         TempHandle = FvbProtocol->ParentHandle;
       } while (!EFI_ERROR(Status) && FvbProtocol->ParentHandle != NULL);
