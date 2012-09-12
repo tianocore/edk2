@@ -33,6 +33,7 @@
 #include <Library/ResourcePublicationLib.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <Ppi/MasterBootMode.h>
+#include <IndustryStandard/Pci22.h>
 
 #include "Platform.h"
 #include "Cmos.h"
@@ -228,9 +229,27 @@ MiscInitialization (
 
   if (!Xen) {
     //
-    // Set the PM I/O base address to 0x400
+    // The PEI phase should be exited with fully accessibe PIIX4 IO space:
+    // 1. set PMBA
     //
-    PciAndThenOr32 (PCI_LIB_ADDRESS (0, 1, 3, 0x40), (UINT32) ~0xFFC0, 0x400);
+    PciAndThenOr32 (
+      PCI_LIB_ADDRESS (0, 1, 3, 0x40),
+      (UINT32) ~0xFFC0,
+      PcdGet16 (PcdAcpiPmBaseAddress)
+      );
+
+    //
+    // 2. set PCICMD/IOSE
+    //
+    PciOr8 (
+      PCI_LIB_ADDRESS (0, 1, 3, PCI_COMMAND_OFFSET),
+      EFI_PCI_COMMAND_IO_SPACE
+      );
+
+    //
+    // 3. set PMREGMISC/PMIOSE
+    //
+    PciOr8 (PCI_LIB_ADDRESS (0, 1, 3, 0x80), 0x01);
   }
 }
 
