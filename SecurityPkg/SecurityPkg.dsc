@@ -88,6 +88,7 @@
   SecurityPkg/VariableAuthenticated/Pei/VariablePei.inf
   SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
   SecurityPkg/Library/DxeDeferImageLoadLib/DxeDeferImageLoadLib.inf
+  SecurityPkg/Library/DxeImageAuthenticationStatusLib/DxeImageAuthenticationStatusLib.inf
   SecurityPkg/UserIdentification/UserIdentifyManagerDxe/UserIdentifyManagerDxe.inf
   SecurityPkg/UserIdentification/UserProfileManagerDxe/UserProfileManagerDxe.inf
   SecurityPkg/UserIdentification/PwdCredentialProviderDxe/PwdCredentialProviderDxe.inf
