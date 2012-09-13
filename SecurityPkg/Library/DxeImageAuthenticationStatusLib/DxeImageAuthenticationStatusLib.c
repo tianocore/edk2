@@ -44,8 +44,8 @@ DxeImageAuthenticationStatusHandler (
   IN  BOOLEAN                          BootPolicy
   )
 {
-  if (AuthenticationStatus & EFI_AUTH_STATUS_IMAGE_SIGNED) {
-    if (AuthenticationStatus & (EFI_AUTH_STATUS_TEST_FAILED | EFI_AUTH_STATUS_NOT_TESTED)) {
+  if ((AuthenticationStatus & EFI_AUTH_STATUS_IMAGE_SIGNED) != 0) {
+    if ((AuthenticationStatus & (EFI_AUTH_STATUS_TEST_FAILED | EFI_AUTH_STATUS_NOT_TESTED)) != 0) {
       return EFI_ACCESS_DENIED;
     }
   }
