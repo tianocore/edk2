@@ -1381,7 +1381,7 @@ CompareTimeStamp (
   } else if (FirstTime->Hour != SecondTime->Hour) {
     return (BOOLEAN) (FirstTime->Hour < SecondTime->Hour);
   } else if (FirstTime->Minute != SecondTime->Minute) {
-    return (BOOLEAN) (FirstTime->Minute < FirstTime->Minute);
+    return (BOOLEAN) (FirstTime->Minute < SecondTime->Minute);
   }
 
   return (BOOLEAN) (FirstTime->Second <= SecondTime->Second);
