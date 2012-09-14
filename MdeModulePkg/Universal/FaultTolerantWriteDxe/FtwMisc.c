@@ -572,6 +572,9 @@ FlushSpareBlockToWorkingBlock (
   if (Buffer == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
+  WorkSpaceLbaOffset = FtwDevice->FtwWorkSpaceLba - FtwDevice->FtwWorkBlockLba;
+
   //
   // To guarantee that the WorkingBlockValid is set on spare block
   //
@@ -581,7 +584,7 @@ FlushSpareBlockToWorkingBlock (
   //
   FtwUpdateFvState (
     FtwDevice->FtwBackupFvb,
-    FtwDevice->FtwWorkSpaceLba,
+    FtwDevice->FtwSpareLba + WorkSpaceLbaOffset,
     FtwDevice->FtwWorkSpaceBase + sizeof (EFI_GUID) + sizeof (UINT32),
     WORKING_BLOCK_VALID
     );
@@ -608,7 +611,6 @@ FlushSpareBlockToWorkingBlock (
   //
   // Clear the CRC and STATE, copy data from spare to working block.
   //
-  WorkSpaceLbaOffset = FtwDevice->FtwWorkSpaceLba - FtwDevice->FtwWorkBlockLba;
   WorkingBlockHeader = (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *) (Buffer + (UINTN) WorkSpaceLbaOffset * FtwDevice->BlockSize + FtwDevice->FtwWorkSpaceBase);
   InitWorkSpaceHeader (WorkingBlockHeader);
   WorkingBlockHeader->WorkingBlockValid   = FTW_ERASE_POLARITY;

@@ -209,6 +209,8 @@ GetFvbCountAndBuffer (
   *NumberHandles = BufferSize / sizeof(EFI_HANDLE);
   if (EFI_ERROR(Status)) {
     *NumberHandles = 0;
+    FreePool (*Buffer);
+    *Buffer = NULL;
   }
 
   return Status;
