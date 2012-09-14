@@ -2396,6 +2396,13 @@ SecureBootCallback (
             NULL
             );
           Status = EFI_UNSUPPORTED;
+        } else {
+          CreatePopUp (
+            EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+            &Key,
+            L"Secure boot configuration is changed, please reset the platform to take effect!",
+            NULL
+            );
         }
         *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY; 
       }
