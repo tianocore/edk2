@@ -19,7 +19,6 @@
 #include "AtaBus.h"
 
 UINT8   mMorControl;
-BOOLEAN mHasMor;
 
 //
 // ATA Bus Driver Binding Protocol Instance
@@ -370,16 +369,15 @@ RegisterAtaDevice (
     DEBUG ((EFI_D_INFO, "Successfully Install Storage Security Protocol on the ATA device\n"));
   }
 
-  if (mHasMor) {
-    if (((mMorControl & 0x01) == 0x01) && ((AtaDevice->IdentifyData->trusted_computing_support & BIT0) != 0)) {
-      DEBUG ((EFI_D_INFO,
-              "mMorControl = %x, AtaDevice->IdentifyData->trusted_computing_support & BIT0 = %x\n",
-              mMorControl,
-              (AtaDevice->IdentifyData->trusted_computing_support & BIT0)
-              ));
-      DEBUG ((EFI_D_INFO, "Try to lock device by sending TPer Reset command...\n"));
-      InitiateTPerReset(AtaDevice);
-    }
+
+  if (((mMorControl & 0x01) == 0x01) && ((AtaDevice->IdentifyData->trusted_computing_support & BIT0) != 0)) {
+    DEBUG ((EFI_D_INFO,
+            "mMorControl = %x, AtaDevice->IdentifyData->trusted_computing_support & BIT0 = %x\n",
+            mMorControl,
+            (AtaDevice->IdentifyData->trusted_computing_support & BIT0)
+            ));
+    DEBUG ((EFI_D_INFO, "Try to lock device by sending TPer Reset command...\n"));
+    InitiateTPerReset(AtaDevice);
   }
 
   gBS->OpenProtocol (
@@ -1683,12 +1681,10 @@ InitializeAtaBus(
 
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_INFO, "AtaBus:gEfiMemoryOverwriteControlDataGuid doesn't exist!!***\n"));
-    mHasMor     = FALSE;
     mMorControl = 0;
     Status      = EFI_SUCCESS;
   } else {
     DEBUG ((EFI_D_INFO, "AtaBus:Get the gEfiMemoryOverwriteControlDataGuid = %x!!***\n", mMorControl));
-    mHasMor     = TRUE;
   }
 
   return Status;
