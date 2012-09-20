@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available
     under the terms and conditions of the BSD License that accompanies this
     distribution.  The full text of the license may be found at
@@ -41,9 +41,6 @@
     NetBSD: refill.c,v 1.13 2003/08/07 16:43:30 agc Exp
     refill.c  8.1 (Berkeley) 6/4/93
 */
-#include <Uefi.h>               // REMOVE, For DEBUG only
-#include <Library/UefiLib.h>    // REMOVE, For DEBUG only
-
 #include  <LibConfig.h>
 #include <sys/EfiCdefs.h>
 
@@ -93,28 +90,23 @@ __srefill(FILE *fp)
   if (!__sdidinit)
     __sinit();
 
-//Print(L"%a( %d)\n", __func__, fp->_file);
   fp->_r = 0;   /* largely a convenience for callers */
 
   /* SysV does not make this test; take it out for compatibility */
   if (fp->_flags & __SEOF) {
-//Print(L"%a: %d\n", __func__, __LINE__);
     return (EOF);
   }
 
   /* if not already reading, have to be reading and writing */
   if ((fp->_flags & __SRD) == 0) {
-//Print(L"%a: %d\n", __func__, __LINE__);
     if ((fp->_flags & __SRW) == 0) {
       errno = EBADF;
       fp->_flags |= __SERR;   //<dvm> Allows differentiation between errors and EOF
-//Print(L"%a: %d\n", __func__, __LINE__);
       return (EOF);
     }
     /* switch to reading */
     if (fp->_flags & __SWR) {
       if (__sflush(fp)) {
-//Print(L"%a: %d\n", __func__, __LINE__);
         return (EOF);
       }
       fp->_flags &= ~__SWR;
@@ -123,7 +115,6 @@ __srefill(FILE *fp)
     }
     fp->_flags |= __SRD;
   } else {
-//Print(L"%a: %d\n", __func__, __LINE__);
     /*
      * We were reading.  If there is an ungetc buffer,
      * we must have been reading from that.  Drop it,
@@ -134,7 +125,6 @@ __srefill(FILE *fp)
       FREEUB(fp);
       if ((fp->_r = fp->_ur) != 0) {
         fp->_p = fp->_up;
-//Print(L"%a: %d\n", __func__, __LINE__);
         return (0);
       }
     }
@@ -143,7 +133,6 @@ __srefill(FILE *fp)
   if (fp->_bf._base == NULL)
     __smakebuf(fp);
 
-//Print(L"%a: %d\n", __func__, __LINE__);
   /*
    * Before reading from a line buffered or unbuffered file,
    * flush all line buffered output files, per the ANSI C
@@ -153,7 +142,6 @@ __srefill(FILE *fp)
     rwlock_rdlock(&__sfp_lock);
     (void) _fwalk(lflush);
     rwlock_unlock(&__sfp_lock);
-//Print(L"%a: %d\n", __func__, __LINE__);
   }
   fp->_p = fp->_bf._base;
   fp->_r = (*fp->_read)(fp->_cookie, (char *)fp->_p, fp->_bf._size);
@@ -165,9 +153,7 @@ __srefill(FILE *fp)
       fp->_r = 0;
       fp->_flags |= __SERR;
     }
-//Print(L"%a: %d\n", __func__, __LINE__);
     return (EOF);
   }
-//Print(L"%a: %d\n", __func__, __LINE__);
   return (0);
 }

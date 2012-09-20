@@ -1,7 +1,7 @@
 /** @file
   The EFI kernel's interpretation of a "file".
 
-  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
   distribution.  The full text of the license may be found at
@@ -82,8 +82,16 @@ struct _Device_Node;
 struct __filedes {
   off_t                   f_offset;     /* current position in file */
   const struct fileops   *f_ops;
+
+  /*  The devdata member has different meanings depending upon whether
+      a block oriented or character oriented device is being accessed.
+      For block devices, devdata holds an EFI handle to the open file or directory.
+      For character devices, devdata points to the device's IIO structure,
+      if it has one.  It may be NULL indicating a non-interactive character
+      device.
+  */
   void                   *devdata;      /* Device-specific data */
-  int                     Oflags;       // From the open call
+  int                     Oflags;       // From the open call, see fcntl.h
   int                     Omode;        // From the open call
   int                     RefCount;     // Reference count of opens
   UINT32                  f_flag;       /* see fcntl.h */

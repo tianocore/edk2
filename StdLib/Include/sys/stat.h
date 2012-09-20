@@ -1,6 +1,6 @@
 /** @file
 
-    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made
     available under  the terms and conditions of the BSD License that
     accompanies this distribution. The full text of the license may be found at
@@ -90,16 +90,18 @@ struct stat {
 /*  The Octal access modes, above, fall into the Hex mask 0x00000FFF.
     Traditionally, the remainder of the flags are specified in Octal
     but they are expressed in Hex here for modern clarity.
+
+    The basic file types, specified within 0x0000F000, are mutually exclusive.
 */
 #define _S_IFMT       0x000FF000   ///< type-of-file mask
 #define _S_IFIFO      0x00001000   ///< named pipe (fifo)
-#define _S_IFCHR      0x00002000   ///< character special
+#define _S_IFCHR      0x00002000   ///< character special device
 #define _S_IFDIR      0x00004000   ///< directory
-#define _S_IFBLK      0x00006000   ///< block special
+#define _S_IFBLK      0x00006000   ///< block special device
 #define _S_IFREG      0x00008000   ///< regular
 #define _S_IFSOCK     0x0000C000   ///< socket
 #define _S_ITTY       0x00010000   ///< File connects to a TTY device
-#define _S_IWTTY      0x00020000   ///< TTY receives Wide characters
+#define _S_IWTTY      0x00020000   ///< TTY sends and receives Wide characters
 #define _S_ICONSOLE   0x00030000   ///< UEFI Console Device
 
 /*  UEFI specific (FAT file system) File attributes.
