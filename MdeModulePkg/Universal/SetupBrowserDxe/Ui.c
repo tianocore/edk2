@@ -1455,7 +1455,7 @@ GetLineByWidth (
     // Skip the space info at the begin of next line.
     //  
     *Index = (UINT16) (*Index + StrOffset + 1);
-  } else if ((InputString[*Index + StrOffset] == CHAR_LINEFEED)) {
+  } else if (InputString[*Index + StrOffset] == CHAR_LINEFEED) {
     //
     // Skip the /n or /n/r info.
     //
@@ -1464,7 +1464,7 @@ GetLineByWidth (
     } else {
       *Index = (UINT16) (*Index + StrOffset + 1);
     }
-  } else if ((InputString[*Index + StrOffset] == CHAR_CARRIAGE_RETURN)) {
+  } else if (InputString[*Index + StrOffset] == CHAR_CARRIAGE_RETURN) {
     //
     // Skip the /r or /r/n info.
     //  
