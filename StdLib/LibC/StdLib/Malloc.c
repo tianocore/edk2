@@ -137,7 +137,9 @@ calloc(size_t Num, size_t Size)
 void
 free(void *Ptr)
 {
-  (void) gBS->FreePool (Ptr);
+  if(Ptr != NULL) {
+    (void) gBS->FreePool (Ptr);
+  }
 }
 
 /** The realloc function changes the size of the object pointed to by Ptr to
