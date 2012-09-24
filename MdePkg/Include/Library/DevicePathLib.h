@@ -4,7 +4,7 @@
   This library provides defines, macros, and functions to help create and parse 
   EFI_DEVICE_PATH_PROTOCOL structures.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -19,6 +19,28 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __DEVICE_PATH_LIB_H__
 
 #define END_DEVICE_PATH_LENGTH               (sizeof (EFI_DEVICE_PATH_PROTOCOL))
+
+/**
+  Determine whether a given device path is valid.
+  If DevicePath is NULL, then ASSERT().
+
+  @param  DevicePath  A pointer to a device path data structure.
+  @param  MaxSize     The maximum size of the device path data structure.
+
+  @retval TRUE        DevicePath is valid.
+  @retval FALSE       The length of any node node in the DevicePath is less
+                      than sizeof (EFI_DEVICE_PATH_PROTOCOL).
+  @retval FALSE       If MaxSize is not zero, the size of the DevicePath
+                      exceeds MaxSize.
+  @retval FALSE       If PcdMaximumDevicePathNodeCount is not zero, the node
+                      count of the DevicePath exceeds PcdMaximumDevicePathNodeCount.
+**/
+BOOLEAN
+EFIAPI
+IsDevicePathValid (
+  IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath,
+  IN       UINTN                    MaxSize
+  );
 
 /**
   Returns the Type field of a device path node.
@@ -123,7 +145,8 @@ IsDevicePathEndType (
   Determines if a device path node is an end node of an entire device path.
 
   Determines if a device path node specified by Node is an end node of an entire device path.
-  If Node represents the end of an entire device path, then TRUE is returned.  Otherwise, FALSE is returned.
+  If Node represents the end of an entire device path, then TRUE is returned.
+  Otherwise, FALSE is returned.
 
   If Node is NULL, then ASSERT().
 
@@ -143,7 +166,8 @@ IsDevicePathEnd (
   Determines if a device path node is an end node of a device path instance.
 
   Determines if a device path node specified by Node is an end node of a device path instance.
-  If Node represents the end of a device path instance, then TRUE is returned.  Otherwise, FALSE is returned.
+  If Node represents the end of a device path instance, then TRUE is returned.
+  Otherwise, FALSE is returned.
 
   If Node is NULL, then ASSERT().
 
@@ -169,6 +193,7 @@ IsDevicePathEndInstance (
 
   If Node is NULL, then ASSERT().
   If NodeLength >= 0x10000, then ASSERT().
+  If NodeLength < sizeof (EFI_DEVICE_PATH_PROTOCOL), then ASSERT().
 
   @param  Node      A pointer to a device path node data structure.
   @param  Length    The length, in bytes, of the device path node.
@@ -208,13 +233,14 @@ SetDevicePathEndNode (
 /**
   Returns the size of a device path in bytes.
 
-  This function returns the size, in bytes, of the device path data structure specified by
-  DevicePath including the end of device path node.  If DevicePath is NULL, then 0 is returned.
+  This function returns the size, in bytes, of the device path data structure 
+  specified by DevicePath including the end of device path node.
+  If DevicePath is NULL or invalid, then 0 is returned.
 
-  @param  DevicePath                 A pointer to a device path data structure.
-  
-  @retval 0       DevicePath is NULL.
-  @retval Others  The size of a device path in bytes.
+  @param  DevicePath  A pointer to a device path data structure.
+
+  @retval 0           If DevicePath is NULL or invalid.
+  @retval Others      The size of a device path in bytes.
 
 **/
 UINTN
@@ -235,7 +261,7 @@ GetDevicePathSize (
   
   @param  DevicePath                 A pointer to a device path data structure.
 
-  @retval NULL    DevicePath is NULL.
+  @retval NULL    DevicePath is NULL or invalid.
   @retval Others  A pointer to the duplicated device path.
   
 **/
@@ -263,6 +289,7 @@ DuplicateDevicePath (
   @param  SecondDevicePath           A pointer to a device path data structure.
   
   @retval NULL      If there is not enough memory for the newly allocated buffer.
+  @retval NULL      If FirstDevicePath or SecondDevicePath is invalid.
   @retval Others    A pointer to the new device path if success.
                     Or a copy an end-of-device-path if both FirstDevicePath and SecondDevicePath are NULL.
 
@@ -316,6 +343,7 @@ AppendDevicePathNode (
   and a new end-of-device-path-instance node is inserted between. 
   If DevicePath is NULL, then a copy if DevicePathInstance is returned.
   If DevicePathInstance is NULL, then NULL is returned.
+  If DevicePath or DevicePathInstance is invalid, then NULL is returned.
   If there is not enough memory to allocate space for the new device path, then NULL is returned.  
   The memory is allocated from EFI boot services memory. It is the responsibility of the caller to
   free the memory allocated.
@@ -341,6 +369,7 @@ AppendDevicePathInstance (
   point to the next device path instance in the device path (or NULL if no more) and updates Size
   to hold the size of the device path instance copy.
   If DevicePath is NULL, then NULL is returned.
+  If DevicePath points to a invalid device path, then NULL is returned.
   If there is not enough memory to allocate space for the new device path, then NULL is returned.  
   The memory is allocated from EFI boot services memory. It is the responsibility of the caller to
   free the memory allocated.
@@ -394,12 +423,13 @@ CreateDeviceNode (
   Determines if a device path is single or multi-instance.
 
   This function returns TRUE if the device path specified by DevicePath is multi-instance.
-  Otherwise, FALSE is returned.  If DevicePath is NULL, then FALSE is returned.
+  Otherwise, FALSE is returned.
+  If DevicePath is NULL or invalid, then FALSE is returned.
 
   @param  DevicePath                 A pointer to a device path data structure.
 
   @retval  TRUE                      DevicePath is multi-instance.
-  @retval  FALSE                     DevicePath is not multi-instance, or DevicePath is NULL.
+  @retval  FALSE                     DevicePath is not multi-instance, or DevicePath is NULL or invalid.
 
 **/
 BOOLEAN
