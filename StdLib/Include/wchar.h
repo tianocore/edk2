@@ -1415,10 +1415,16 @@ int mbsinit(const mbstate_t *ps);
     where internal is the mbstate_t object for the mbrlen function, except that
     the expression designated by ps is evaluated only once.
 
-    @return   The mbrlen function returns a value between zero and n,
-              inclusive, (size_t)(-2), or (size_t)(-1).
+    @param[in]  s     Pointer to a multibyte character sequence.
+    @param[in]  n     Maximum number of bytes to examine.
+    @param[in]  pS    Pointer to the conversion state object.
+
+    @retval   0       The next n or fewer characters complete a NUL.
+    @retval   1..n    The number of bytes that complete the multibyte character.
+    @retval   -2      The next n bytes contribute to an incomplete (but potentially valid) multibyte character.
+    @retval   -1      An encoding error occurred.
 **/
-size_t mbrlen(const char * __restrict S, size_t n, mbstate_t * __restrict ps);
+size_t mbrlen(const char * __restrict S, size_t n, mbstate_t * __restrict pS);
 
 /** Restartable Multibyte to Wide character conversion.
 If S is a null pointer, the mbrtowc function is equivalent to the call:<BR>

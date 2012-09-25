@@ -101,7 +101,7 @@
                                      char ** __restrict endptr);
   @endverbatim
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at
@@ -166,8 +166,11 @@ typedef struct {
     maximum number of bytes in a multibyte character for the extended character
     set specified by the current locale (category LC_CTYPE), which is never
     greater than MB_LEN_MAX.
+
+    Since UEFI only supports the Unicode Base Multilingual Plane (BMP),
+    correctly formed characters will only produce 1, 2, or 3-byte UTF-8 characters.
 **/
-#define MB_CUR_MAX  2
+#define MB_CUR_MAX  3
 
 /** Maximum number of functions that can be registered by atexit.
 
@@ -845,7 +848,7 @@ size_t  mbstowcs(wchar_t * __restrict Dest, const char * __restrict Src, size_t 
 
     @param[out]   Dest    Pointer to the array to receive the converted string.
     @param[in]    Src     Pointer to the string to be converted.
-    @param[in]    Limit   Maximum number of elements to be written to Dest.
+    @param[in]    Limit   Maximum number of bytes to be written to Dest.
 
     @return   If a wide character is encountered that does not correspond to a
               valid multibyte character, the wcstombs function returns
@@ -855,7 +858,7 @@ size_t  mbstowcs(wchar_t * __restrict Dest, const char * __restrict Src, size_t 
 **/
 size_t  wcstombs(char * __restrict Dest, const wchar_t * __restrict Src, size_t Limit);
 
-/* ################  Miscelaneous functions for *nix compatibility  ########## */
+/* ##############  Miscelaneous functions for *nix compatibility  ########## */
 
 /** The realpath() function shall derive, from the pathname pointed to by
     file_name, an absolute pathname that names the same file, whose resolution
@@ -889,6 +892,59 @@ const char * getprogname(void);
                           called.
 **/
 void setprogname(const char *progname);
+
+/* ###############  Functions specific to this implementation  ############# */
+
+/*  Determine the number of bytes needed to represent a Wide character
+    as a MBCS character.
+
+    A single wide character may convert into a one, two, three, or four byte
+    narrow (MBCS or UTF-8) character.  The number of MBCS bytes can be determined
+    as follows.
+
+    If WCS char      < 0x00000080      One Byte
+    Else if WCS char < 0x0000D800      Two Bytes
+    Else                               Three Bytes
+
+    Since UEFI only supports the Unicode Base Multilingual Plane (BMP),
+    Four-byte characters are not supported.
+
+    @param[in]    InCh      Wide character to test.
+
+    @retval     -1      Improperly formed character
+    @retval      0      InCh is 0x0000
+    @retval     >0      Number of bytes needed for the MBCS character
+*/
+int
+EFIAPI
+OneWcToMcLen(const wchar_t InCh);
+
+/*  Determine the number of bytes needed to represent a Wide character string
+    as a MBCS string of given maximum length.  Will optionally return the number
+    of wide characters that would be consumed.
+
+    @param[in]    Src       Pointer to a wide character string.
+    @param[in]    Limit     Maximum number of bytes the converted string may occupy.
+    @param[out]   NumChar   Pointer to where to store the number of wide characters, or NULL.
+
+    @return     The number of bytes required to convert Src to MBCS,
+                not including the terminating NUL.  If NumChar is not NULL, the number
+                of characters represented by the return value will be written to
+                where it points.
+**/
+size_t
+EFIAPI
+EstimateWtoM(const wchar_t * Src, size_t Limit, size_t *NumChar);
+
+/** Determine the number of characters in a MBCS string.
+
+    @param[in]    Src     The string to examine
+
+    @return   The number of characters represented by the MBCS string.
+**/
+size_t
+EFIAPI
+CountMbcsChars(const char *Src);
 
 __END_DECLS
 

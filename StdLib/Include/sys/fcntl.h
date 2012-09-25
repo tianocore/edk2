@@ -2,7 +2,7 @@
     This file includes the definitions for open and fcntl described by POSIX
     for <fcntl.h>; it also includes related kernel definitions.
 
-    Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made
     available under the terms and conditions of the BSD License which
     accompanies this distribution.  The full text of the license may be found
@@ -72,13 +72,15 @@
 #define O_TRUNC     0x00000400  ///< truncate to zero length
 #define O_EXCL      0x00000800  ///< error if already exists
 
+#define O_DIRECTORY 0x00001000  ///< error if path is not a directory
+#define O_NOCTTY    0x00002000  ///< Don't make this the controlling TTY
+#define O_TTY_INIT  0x00004000  ///< Initialize TTY to "sane" values on open
+
 /* UEFI-specific open-only flags. */
 #define O_HIDDEN    0x00010000  ///< Hidden file attribute
 #define O_SYSTEM    0x00020000  ///< System file attribute
 #define O_ARCHIVE   0x00040000  ///< Archive file attribute
 /// @}
-
-//#define O_DIRECT    0x00080000  /* direct I/O hint */
 
 #define O_SETMASK     0x0000000F  ///< Flags modifiable by F_SETFD (fcntl)
 
