@@ -275,56 +275,6 @@ BdsBootDeviceSelect (
 }
 
 /**
-  Validate the device path instance. 
-
-  Only base on the length filed in the device path node to validate the device path. 
-
-  @param  DevicePath         A pointer to a device path data structure.
-  @param  MaxSize            Max valid device path size. If big than this size, 
-                             return error.
-  
-  @retval TRUE               An valid device path.
-  @retval FALSE              An invalid device path.
-
-**/
-BOOLEAN
-IsValidDevicePath (
-  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
-  IN UINTN                     MaxSize
-  )
-{
-  UINTN  Size;
-  UINTN  NodeSize;
-
-  if (DevicePath == NULL) {
-    return TRUE;
-  }
-
-  Size = 0;
-
-  while (!IsDevicePathEnd (DevicePath)) {
-    NodeSize = DevicePathNodeLength (DevicePath);
-    if (NodeSize < END_DEVICE_PATH_LENGTH) {
-      return FALSE;
-    }
-
-    Size += NodeSize;
-    if (Size > MaxSize) {
-      return FALSE;
-    }
-
-    DevicePath = NextDevicePathNode (DevicePath);
-  }
-
-  Size += DevicePathNodeLength (DevicePath);
-  if (Size > MaxSize) {
-    return FALSE;
-  }
-
-  return TRUE;
-}
-
-/**
 
   Validate input console variable data. 
 
@@ -347,7 +297,7 @@ BdsFormalizeConsoleVariable (
                       &gEfiGlobalVariableGuid,
                       &VariableSize
                       );
-  if (!IsValidDevicePath (DevicePath, VariableSize)) { 
+  if ((DevicePath != NULL) && !IsDevicePathValid (DevicePath, VariableSize)) { 
     Status = gRT->SetVariable (
                     VariableName,
                     &gEfiGlobalVariableGuid,
