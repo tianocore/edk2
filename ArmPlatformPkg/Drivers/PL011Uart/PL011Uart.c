@@ -131,9 +131,6 @@ PL011UartInitializePort (
   // Baud Rate
   //
   if (PcdGet32(PL011UartInteger) != 0) {
-    // Integer and Factional part must be different of 0
-    ASSERT(PcdGet32(PL011UartFractional) != 0);
-
     MmioWrite32 (UartBase + UARTIBRD, PcdGet32(PL011UartInteger));
     MmioWrite32 (UartBase + UARTFBRD, PcdGet32(PL011UartFractional));
   } else {
