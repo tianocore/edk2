@@ -24,6 +24,7 @@
 
 // Define MotherBoard SYS flags offsets (from ARM_VE_BOARD_PERIPH_BASE)
 #define ARM_VE_SYS_ID_REG                         (ARM_VE_BOARD_PERIPH_BASE + 0x00000)
+#define ARM_VE_SYS_SW_REG                         (ARM_VE_BOARD_PERIPH_BASE + 0x00004)
 #define ARM_VE_SYS_LED_REG                        (ARM_VE_BOARD_PERIPH_BASE + 0x00008)
 #define ARM_VE_SYS_FLAGS_REG                      (ARM_VE_BOARD_PERIPH_BASE + 0x00030)
 #define ARM_VE_SYS_FLAGS_SET_REG                  (ARM_VE_BOARD_PERIPH_BASE + 0x00030)
@@ -32,6 +33,8 @@
 #define ARM_VE_SYS_FLAGS_NV_SET_REG               (ARM_VE_BOARD_PERIPH_BASE + 0x00038)
 #define ARM_VE_SYS_FLAGS_NV_CLR_REG               (ARM_VE_BOARD_PERIPH_BASE + 0x0003C)
 #define ARM_VE_SYS_FLASH                          (ARM_VE_BOARD_PERIPH_BASE + 0x0004C)
+#define ARM_VE_SYS_CFGSWR_REG                     (ARM_VE_BOARD_PERIPH_BASE + 0x00058)
+#define ARM_VE_SYS_MISC                           (ARM_VE_BOARD_PERIPH_BASE + 0x00060)
 #define ARM_VE_SYS_PROCID0_REG                    (ARM_VE_BOARD_PERIPH_BASE + 0x00084)
 #define ARM_VE_SYS_PROCID1_REG                    (ARM_VE_BOARD_PERIPH_BASE + 0x00088)
 #define ARM_VE_SYS_CFGDATA_REG                    (ARM_VE_BOARD_PERIPH_BASE + 0x000A0)
@@ -39,7 +42,9 @@
 #define ARM_VE_SYS_CFGSTAT_REG                    (ARM_VE_BOARD_PERIPH_BASE + 0x000A8)
 
 // SP810 Controller
+#ifndef SP810_CTRL_BASE
 #define SP810_CTRL_BASE                           (ARM_VE_BOARD_PERIPH_BASE + 0x01000)
+#endif
 
 // PL111 Colour LCD Controller - motherboard
 #define PL111_CLCD_MOTHERBOARD_BASE               (ARM_VE_BOARD_PERIPH_BASE + 0x1F000)
@@ -48,12 +53,17 @@
 // VRAM offset for the PL111 Colour LCD Controller on the motherboard
 #define VRAM_MOTHERBOARD_BASE                     (ARM_VE_SMB_PERIPH_BASE   + 0x00000)
 
+#define ARM_VE_SYS_PROC_ID_HBI                    0xFFF
 #define ARM_VE_SYS_PROC_ID_MASK                   (UINT32)(0xFFU << 24)
 #define ARM_VE_SYS_PROC_ID_UNSUPPORTED            (UINT32)(0xFFU << 24)
 #define ARM_VE_SYS_PROC_ID_CORTEX_A9              (UINT32)(0x0CU << 24)
 #define ARM_VE_SYS_PROC_ID_CORTEX_A5              (UINT32)(0x12U << 24)
 #define ARM_VE_SYS_PROC_ID_CORTEX_A15             (UINT32)(0x14U << 24)
 
+// Boot Master Select:
+// 0 = Site 1 boot master
+// 1 = Site 2 boot master
+#define ARM_VE_SYS_MISC_MASTERSITE                (1 << 14)
 //
 // Sites where the peripheral is fitted
 //
