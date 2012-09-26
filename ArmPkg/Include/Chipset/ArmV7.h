@@ -57,6 +57,8 @@
 #define ARM_CPU_TYPE_A9         0xC09
 #define ARM_CPU_TYPE_A5         0xC05
 
+#define ARM_VECTOR_TABLE_ALIGNMENT ((1 << 5)-1)
+
 VOID
 EFIAPI
 ArmEnableSWPInstruction (
