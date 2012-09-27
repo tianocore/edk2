@@ -905,6 +905,12 @@ typedef struct _EFI_IFR_DEFAULT {
   EFI_IFR_TYPE_VALUE       Value;
 } EFI_IFR_DEFAULT;
 
+typedef struct _EFI_IFR_DEFAULT_2 {
+  EFI_IFR_OP_HEADER        Header;
+  UINT16                   DefaultId;
+  UINT8                    Type;
+} EFI_IFR_DEFAULT_2;
+
 typedef struct _EFI_IFR_VALUE {
   EFI_IFR_OP_HEADER        Header;
 } EFI_IFR_VALUE;

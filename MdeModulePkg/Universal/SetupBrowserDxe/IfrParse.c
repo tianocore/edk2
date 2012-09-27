@@ -1779,8 +1779,10 @@ ParseOpCodes (
 
       CurrentDefault->Value.Type = ((EFI_IFR_DEFAULT *) OpCodeData)->Type;
       CopyMem (&CurrentDefault->DefaultId, &((EFI_IFR_DEFAULT *) OpCodeData)->DefaultId, sizeof (UINT16));
-      CopyMem (&CurrentDefault->Value.Value, &((EFI_IFR_DEFAULT *) OpCodeData)->Value, sizeof (EFI_IFR_TYPE_VALUE));
-      ExtendValueToU64 (&CurrentDefault->Value);
+      if (OpCodeLength == sizeof (EFI_IFR_DEFAULT)) {
+        CopyMem (&CurrentDefault->Value.Value, &((EFI_IFR_DEFAULT *) OpCodeData)->Value, sizeof (EFI_IFR_TYPE_VALUE));
+        ExtendValueToU64 (&CurrentDefault->Value);
+      }
 
       //
       // Insert to Default Value list of current Question
