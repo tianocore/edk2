@@ -27,3 +27,6 @@
 [Binaries.X64]
   PE32|X64/Shell.efi|*
 
+[Binaries.ARM]
+  PE32|Arm/Shell.efi|*
+
