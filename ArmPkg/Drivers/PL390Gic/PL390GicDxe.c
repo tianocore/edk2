@@ -118,11 +118,11 @@ EnableInterruptSource (
     return EFI_UNSUPPORTED;
   }
   
-  // calculate enable register offset and bit position
+  // Calculate enable register offset and bit position
   RegOffset = Source / 32;
   RegShift = Source % 32;
 
-  // write set-enable register
+  // Write set-enable register
   MmioWrite32 (PcdGet32(PcdGicDistributorBase) + ARM_GIC_ICDISER + (4*RegOffset), 1 << RegShift);
   
   return EFI_SUCCESS;

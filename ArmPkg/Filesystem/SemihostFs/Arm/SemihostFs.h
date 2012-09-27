@@ -17,35 +17,13 @@
 #define __SEMIHOST_FS_H__
 
 EFI_STATUS
-SemihostFsSupported(
-  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                   Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
-  );
-
-EFI_STATUS
-SemihostFsStart(
-  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                   Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
-  );
-
-EFI_STATUS
-SemihostFsStop(
-  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                   Controller,
-  IN UINTN                        NumberOfChildren,
-  IN EFI_HANDLE                   *ChildHandleBuffer
-  );
-
-EFI_STATUS
-VolumeOpen(
+VolumeOpen (
   IN  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *This,
   OUT EFI_FILE                        **Root
   );
 
 EFI_STATUS
-FileOpen(
+FileOpen (
   IN  EFI_FILE  *File,
   OUT EFI_FILE  **NewHandle,
   IN  CHAR16    *FileName,
@@ -54,7 +32,7 @@ FileOpen(
   );
 
 EFI_STATUS
-FileClose(
+FileClose (
   IN EFI_FILE *File
   );
 
@@ -64,33 +42,33 @@ FileDelete(
   );
 
 EFI_STATUS
-FileRead(
+FileRead (
   IN     EFI_FILE *File,
   IN OUT UINTN    *BufferSize,
   OUT    VOID     *Buffer
   );
 
 EFI_STATUS
-FileWrite(
+FileWrite (
   IN     EFI_FILE *File,
   IN OUT UINTN    *BufferSize,
   IN     VOID     *Buffer
   );
 
 EFI_STATUS
-FileGetPosition(
+FileGetPosition (
   IN  EFI_FILE  *File,
   OUT UINT64    *Position
   );
 
 EFI_STATUS
-FileSetPosition(
+FileSetPosition (
   IN EFI_FILE *File,
   IN UINT64   Position
   );
 
 EFI_STATUS
-FileGetInfo(
+FileGetInfo (
   IN     EFI_FILE *File,
   IN     EFI_GUID *InformationType,
   IN OUT UINTN    *BufferSize,
@@ -98,7 +76,7 @@ FileGetInfo(
   );
 
 EFI_STATUS
-FileSetInfo(
+FileSetInfo (
   IN EFI_FILE *File,
   IN EFI_GUID *InformationType,
   IN UINTN    BufferSize,
@@ -106,7 +84,7 @@ FileSetInfo(
   );
 
 EFI_STATUS
-FileFlush(
+FileFlush (
   IN EFI_FILE *File
   );
 

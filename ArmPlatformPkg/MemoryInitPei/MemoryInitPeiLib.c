@@ -35,7 +35,7 @@ InitMmu (
   UINTN                         TranslationTableSize;
 
   // Get Virtual Memory Map from the Platform Library
-  ArmPlatformGetVirtualMemoryMap(&MemoryTable);
+  ArmPlatformGetVirtualMemoryMap (&MemoryTable);
 
   //Note: Because we called PeiServicesInstallPeiMemory() before to call InitMmu() the MMU Page Table resides in
   //      DRAM (even at the top of DRAM as it is the first permanent memory allocation)

@@ -307,8 +307,8 @@ StartDefaultBootOnTimeout (
   UINTN               BootOrderSize;
   UINTN               Index;
   CHAR16              BootVariableName[9];
-  EFI_STATUS           Status;
-  EFI_INPUT_KEY   Key;
+  EFI_STATUS          Status;
+  EFI_INPUT_KEY       Key;
 
   Size = sizeof(UINT16);
   Timeout = (UINT16)PcdGet16 (PcdPlatformBootTimeOut);

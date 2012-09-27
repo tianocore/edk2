@@ -13,6 +13,7 @@
 **/
 
 #include "BdsInternal.h"
+#include "BdsLinuxLoader.h"
 
 #define ALIGN32_BELOW(addr)   ALIGN_POINTER(addr - 32,32)
 
@@ -122,7 +123,7 @@ Exit:
   Start a Linux kernel from a Device Path
 
   @param  LinuxKernel           Device Path to the Linux Kernel
-  @param  Parameters            Linux kernel agruments
+  @param  Parameters            Linux kernel arguments
   @param  Fdt                   Device Path to the Flat Device Tree
 
   @retval EFI_SUCCESS           All drivers have been connected
@@ -193,7 +194,7 @@ BdsBootLinuxAtag (
   Start a Linux kernel from a Device Path
 
   @param  LinuxKernel           Device Path to the Linux Kernel
-  @param  Parameters            Linux kernel agruments
+  @param  Parameters            Linux kernel arguments
   @param  Fdt                   Device Path to the Flat Device Tree
 
   @retval EFI_SUCCESS           All drivers have been connected

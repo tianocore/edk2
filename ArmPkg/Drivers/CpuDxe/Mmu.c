@@ -749,14 +749,14 @@ ConvertSectionToPages (
 
   DEBUG ((EFI_D_PAGE, "Converting section at 0x%x to pages\n", (UINTN)BaseAddress));
 
-  // obtain page table base
+  // Obtain page table base
   FirstLevelTable = (ARM_FIRST_LEVEL_DESCRIPTOR *)ArmGetTTBR0BaseAddress ();
 
-  // calculate index into first level translation table for start of modification
+  // Calculate index into first level translation table for start of modification
   FirstLevelIdx = TT_DESCRIPTOR_SECTION_BASE_ADDRESS(BaseAddress) >> TT_DESCRIPTOR_SECTION_BASE_SHIFT;
   ASSERT (FirstLevelIdx < TRANSLATION_TABLE_SECTION_COUNT);
 
-  // get section attributes and convert to page attributes
+  // Get section attributes and convert to page attributes
   SectionDescriptor = FirstLevelTable[FirstLevelIdx];
   PageDescriptor = TT_DESCRIPTOR_PAGE_TYPE_PAGE;
   PageDescriptor |= TT_DESCRIPTOR_CONVERT_TO_PAGE_CACHE_POLICY(SectionDescriptor,0);
@@ -765,7 +765,7 @@ ConvertSectionToPages (
   PageDescriptor |= TT_DESCRIPTOR_CONVERT_TO_PAGE_NG(SectionDescriptor);
   PageDescriptor |= TT_DESCRIPTOR_CONVERT_TO_PAGE_S(SectionDescriptor);
 
-  // allocate a page table for the 4KB entries (we use up a full page even though we only need 1KB)
+  // Allocate a page table for the 4KB entries (we use up a full page even though we only need 1KB)
   Status = gBS->AllocatePages (AllocateAnyPages, EfiBootServicesData, 1, &PageTableAddr);
   if (EFI_ERROR(Status)) {
     return Status;
@@ -773,18 +773,18 @@ ConvertSectionToPages (
 
   PageTable = (volatile ARM_PAGE_TABLE_ENTRY *)(UINTN)PageTableAddr;
 
-  // write the page table entries out
+  // Write the page table entries out
   for (Index = 0; Index < TRANSLATION_TABLE_PAGE_COUNT; Index++) {
     PageTable[Index] = TT_DESCRIPTOR_PAGE_BASE_ADDRESS(BaseAddress + (Index << 12)) | PageDescriptor;
   }
 
-  // flush d-cache so descriptors make it back to uncached memory for subsequent table walks
+  // Flush d-cache so descriptors make it back to uncached memory for subsequent table walks
   WriteBackInvalidateDataCacheRange ((VOID *)(UINTN)PageTableAddr, TT_DESCRIPTOR_PAGE_SIZE);
 
-  // formulate page table entry, Domain=0, NS=0
+  // Formulate page table entry, Domain=0, NS=0
   PageTableDescriptor = (((UINTN)PageTableAddr) & TT_DESCRIPTOR_SECTION_PAGETABLE_ADDRESS_MASK) | TT_DESCRIPTOR_SECTION_TYPE_PAGE_TABLE;
 
-  // write the page table entry out, replacing section entry
+  // Write the page table entry out, replacing section entry
   FirstLevelTable[FirstLevelIdx] = PageTableDescriptor;
 
   return EFI_SUCCESS;

@@ -778,7 +778,7 @@ BdsLoadOptionTftpList (
         Status = GenerateDeviceDescriptionName (HandleBuffer[Index], DeviceDescription);
         ASSERT_EFI_ERROR (Status);
       }
-      UnicodeSPrint (SupportedDevice->Description,BOOT_DEVICE_DESCRIPTION_MAX,L"TFP on %s",DeviceDescription);
+      UnicodeSPrint (SupportedDevice->Description,BOOT_DEVICE_DESCRIPTION_MAX,L"TFTP on %s",DeviceDescription);
 
       SupportedDevice->DevicePathProtocol = DevicePathProtocol;
       SupportedDevice->Support = &BdsLoadOptionSupportList[BDS_DEVICE_TFTP];

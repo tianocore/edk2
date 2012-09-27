@@ -137,7 +137,7 @@ TimerDriverSetTimerPeriod (
 {
   UINT64      TimerTicks;
   
-  // always disable the timer
+  // Always disable the timer
   ArmArchTimerDisableTimer ();
 
   if (TimerPeriod != 0) {
