@@ -268,9 +268,10 @@
   ArmPlatformPkg/Drivers/SP805WatchdogDxe/SP805WatchdogDxe.inf
 
   #
-  # Semi-hosting filesystem
+  # Filesystems
   #
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
+  ArmPlatformPkg/FileSystem/BootMonFs/BootMonFs.inf
   
   #
   # Multimedia Card Interface
@@ -283,13 +284,7 @@
   #
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
-  FatPkg/EnhancedFatDxe/Fat.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
-
-  #
-  # Application
-  #  
-  EmbeddedPkg/Ebl/Ebl.inf
 
   #
   # Bds

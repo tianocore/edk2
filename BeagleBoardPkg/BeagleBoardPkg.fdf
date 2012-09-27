@@ -28,10 +28,10 @@
 
 [FD.BeagleBoard_EFI]
 BaseAddress   = 0x80008000|gArmTokenSpaceGuid.PcdFdBaseAddress  #The base address of the FLASH Device.
-Size          = 0x00080000|gArmTokenSpaceGuid.PcdFdSize         #The size in bytes of the FLASH Device
+Size          = 0x000A0000|gArmTokenSpaceGuid.PcdFdSize         #The size in bytes of the FLASH Device
 ErasePolarity = 1
 BlockSize     = 0x1
-NumBlocks     = 0x80000
+NumBlocks     = 0xA0000
 
 ################################################################################
 #
@@ -48,7 +48,7 @@ NumBlocks     = 0x80000
 # RegionType <FV, DATA, or FILE>
 #
 ################################################################################
-0x00000000|0x00080000
+0x00000000|0x000A0000
 gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = FVMAIN_COMPACT
 
@@ -148,7 +148,7 @@ READ_LOCK_STATUS   = TRUE
   #
   INF MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   INF MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
-  INF FatPkg/EnhancedFatDxe/Fat.inf
+  INF FatBinPkg/EnhancedFatDxe/Fat.inf
   INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 
   #
@@ -164,7 +164,7 @@ READ_LOCK_STATUS   = TRUE
   #
   # UEFI application (Shell Embedded Boot Loader) 
   #  
-  INF EmbeddedPkg/Ebl/Ebl.inf
+  INF ShellBinPkg/UefiShell/UefiShell.inf 
 
   #
   # Bds
@@ -284,9 +284,23 @@ READ_LOCK_STATUS   = TRUE
     UI           STRING="$(MODULE_NAME)" Optional
   }
 
-
 [Rule.Common.UEFI_APPLICATION]
   FILE APPLICATION = $(NAMED_GUID) {
     UI     STRING ="$(MODULE_NAME)" Optional         
     PE32   PE32                         $(INF_OUTPUT)/$(MODULE_NAME).efi
+  }
+
+[Rule.Common.UEFI_DRIVER.BINARY]
+  FILE DRIVER = $(NAMED_GUID) {
+    DXE_DEPEX DXE_DEPEX Optional      |.depex
+    PE32      PE32                    |.efi
+    UI        STRING="$(MODULE_NAME)" Optional
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.UEFI_APPLICATION.BINARY]
+  FILE APPLICATION = $(NAMED_GUID) {
+    PE32      PE32                    |.efi
+    UI        STRING="$(MODULE_NAME)" Optional
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }

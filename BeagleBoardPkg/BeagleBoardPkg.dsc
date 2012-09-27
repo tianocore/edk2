@@ -59,8 +59,6 @@
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
   
-  EblCmdLib|ArmPlatformPkg/Library/EblCmdLib/EblCmdLib.inf
-  
   EfiFileLib|EmbeddedPkg/Library/EfiFileLib/EfiFileLib.inf
   
   
@@ -108,15 +106,12 @@
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   
   UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
-  EblAddExternalCommandLib|EmbeddedPkg/Library/EblAddExternalCommandLib/EblAddExternalCommandLib.inf
-  
 
   CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
 
   TimerLib|Omap35xxPkg/Library/Omap35xxTimerLib/Omap35xxTimerLib.inf  
   OmapLib|Omap35xxPkg/Library/OmapLib/OmapLib.inf
   OmapDmaLib|Omap35xxPkg/Library/OmapDmaLib/OmapDmaLib.inf
-  EblNetworkLib|EmbeddedPkg/Library/EblNetworkLib/EblNetworkLib.inf
   DebugAgentTimerLib|Omap35xxPkg/Library/DebugAgentTimerLib/DebugAgentTimerLib.inf
 
   GdbSerialLib|Omap35xxPkg/Library/GdbSerialLib/GdbSerialLib.inf
@@ -426,7 +421,6 @@
   #
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
-  FatPkg/EnhancedFatDxe/Fat.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 
   #
@@ -472,11 +466,6 @@
   # Power IC
   #
   Omap35xxPkg/TPS65950Dxe/TPS65950.inf
-  
-  #
-  # Application
-  #  
-  EmbeddedPkg/Ebl/Ebl.inf
   
   #
   # Bds
