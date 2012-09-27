@@ -37,4 +37,7 @@
  
 [Binaries.IPF]
   PE32|Ipf/Shell.efi|*
- 
+
+[Binaries.ARM]
+  PE32|Arm/Shell.efi|*
+
