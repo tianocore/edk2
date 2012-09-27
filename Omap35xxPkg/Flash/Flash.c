@@ -411,6 +411,7 @@ NandWritePage (
   NandSendCommand(PROGRAM_PAGE_CONFIRM_CMD);
 
   //Poll till device is busy.
+  NandStatus = 0;
   while (Timeout) {
     NandStatus = NandReadStatus();
     if ((NandStatus & NAND_READY) == NAND_READY) {
@@ -462,6 +463,7 @@ NandEraseBlock (
   NandSendCommand(BLOCK_ERASE_CONFIRM_CMD);
 
   //Poll till device is busy.
+  NandStatus = 0;
   while (Timeout) {
     NandStatus = NandReadStatus();
     if ((NandStatus & NAND_READY) == NAND_READY) {
