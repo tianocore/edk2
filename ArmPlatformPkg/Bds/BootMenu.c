@@ -571,14 +571,14 @@ BootMenuManager (
 }
 
 EFI_STATUS
-BootEBL (
+BootShell (
   IN LIST_ENTRY *BootOptionsList
   )
 {
   EFI_STATUS Status;
 
   // Start EFI Shell
-  Status = BdsLoadApplication (mImageHandle, L"Ebl", 0, NULL);
+  Status = BdsLoadApplication (mImageHandle, L"Shell", 0, NULL);
   if (Status == EFI_NOT_FOUND) {
     Print (L"Error: EFI Application not found.\n");
   } else if (EFI_ERROR(Status)) {
@@ -592,7 +592,7 @@ struct BOOT_MAIN_ENTRY {
   CONST CHAR16* Description;
   EFI_STATUS (*Callback) (IN LIST_ENTRY *BootOptionsList);
 } BootMainEntries[] = {
-    { L"EBL", BootEBL },
+    { L"Shell", BootShell },
     { L"Boot Manager", BootMenuManager },
 };
 
