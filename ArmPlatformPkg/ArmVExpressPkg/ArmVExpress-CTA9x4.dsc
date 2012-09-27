@@ -271,7 +271,6 @@
   # Filesystems
   #
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
-  ArmPlatformPkg/FileSystem/BootMonFs/BootMonFs.inf
   
   #
   # Multimedia Card Interface
