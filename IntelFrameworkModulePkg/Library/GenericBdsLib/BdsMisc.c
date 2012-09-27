@@ -1283,10 +1283,8 @@ BdsLibGetImageHeader (
 }
 
 /**
-  This routine adjusts the memory information for different memory type and 
-  saves them into the variables for next boot. It conditionally resets the
-  system when the memory information changes. Platform can reserve memory 
-  large enough (125% of actual requirement) to avoid the reset in the first boot.
+  This routine adjust the memory information for different memory type and 
+  save them into the variables for next boot.
 **/
 VOID
 BdsSetMemoryTypeInformationVariable (
@@ -1392,13 +1390,14 @@ BdsSetMemoryTypeInformationVariable (
     Next     = Previous;
 
     //
-    // Write next varible to 125% * current and Inconsistent Memory Reserved across bootings may lead to S4 fail
+    // Inconsistent Memory Reserved across bootings may lead to S4 fail
+    // Write next varible to 125% * current when the pre-allocated memory is:
+    //  1. More than 150% of needed memory and boot mode is BOOT_WITH_DEFAULT_SETTING
+    //  2. Less than the needed memory
     //
-    if (Current < Previous) {
+    if ((Current + (Current >> 1)) < Previous) {
       if (BootMode == BOOT_WITH_DEFAULT_SETTINGS) {
         Next = Current + (Current >> 2);
-      } else if (!MemoryTypeInformationVariableExists) {
-        Next = MAX (Current + (Current >> 2), Previous);
       }
     } else if (Current > Previous) {
       Next = Current + (Current >> 2);
