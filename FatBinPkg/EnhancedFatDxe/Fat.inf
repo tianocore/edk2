@@ -44,3 +44,5 @@
 [Binaries.EBC]
   PE32|Ebc/Fat.efi|*
 
+[Binaries.ARM]
+  PE32|Arm/Fat.efi|*
