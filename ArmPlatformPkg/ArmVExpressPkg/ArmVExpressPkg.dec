@@ -49,3 +49,4 @@
   #
   gArmVExpressTokenSpaceGuid.PcdPL111LcdMaxMode|3|UINT32|0x00000003
   gArmVExpressTokenSpaceGuid.PcdPL111LcdVideoModeOscId|1|UINT32|0x00000004
+  gArmVExpressTokenSpaceGuid.PcdHdLcdVideoModeOscId|0|UINT32|0x00000009
