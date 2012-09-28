@@ -23,9 +23,34 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
 #include <Library/SerialPortLib.h>
+#include <Library/SerialPortExtLib.h>
 #include <Library/PcdLib.h>
 
 #include <Protocol/SerialIo.h>
+
+typedef struct {
+  VENDOR_DEVICE_PATH        Guid;
+  UART_DEVICE_PATH          Uart;
+  EFI_DEVICE_PATH_PROTOCOL  End;
+} SIMPLE_TEXT_OUT_DEVICE_PATH;
+
+SIMPLE_TEXT_OUT_DEVICE_PATH mDevicePath = {
+  {
+    { HARDWARE_DEVICE_PATH, HW_VENDOR_DP, sizeof (VENDOR_DEVICE_PATH), 0},
+    EFI_CALLER_ID_GUID // Use the drivers GUID
+  },
+  {
+    { MESSAGING_DEVICE_PATH, MSG_UART_DP, sizeof (UART_DEVICE_PATH), 0},
+    0,        // Reserved
+    FixedPcdGet64 (PcdUartDefaultBaudRate),   // BaudRate
+    FixedPcdGet8 (PcdUartDefaultDataBits),    // DataBits
+    FixedPcdGet8 (PcdUartDefaultParity),      // Parity (N)
+    FixedPcdGet8 (PcdUartDefaultStopBits)     // StopBits
+  },
+  { END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE, sizeof (EFI_DEVICE_PATH_PROTOCOL), 0}
+};
+
+EFI_HANDLE  gHandle = NULL;
 
 /**
   Reset the serial device.
@@ -42,8 +67,60 @@ SerialReset (
   IN EFI_SERIAL_IO_PROTOCOL  *This
   )
 {
-  SerialPortInitialize ();
-  return EFI_SUCCESS;
+  EFI_STATUS  Status;
+  EFI_TPL     Tpl;
+
+  Status = SerialPortInitialize ();
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
+
+  //
+  // Set the Serial I/O mode and update the device path
+  //
+
+  Tpl = gBS->RaiseTPL (TPL_NOTIFY);
+
+  //
+  // Set the Serial I/O mode
+  //
+  This->Mode->ReceiveFifoDepth  = 0;
+  This->Mode->Timeout           = 1000000;
+  This->Mode->BaudRate          = PcdGet64 (PcdUartDefaultBaudRate);
+  This->Mode->DataBits          = (UINT32)PcdGet8 (PcdUartDefaultDataBits);
+  This->Mode->Parity            = (UINT32)PcdGet8 (PcdUartDefaultParity);
+  This->Mode->StopBits          = (UINT32)PcdGet8 (PcdUartDefaultStopBits);
+
+  //
+  // Check if the device path has actually changed
+  //
+  if (mDevicePath.Uart.BaudRate == This->Mode->BaudRate &&
+      mDevicePath.Uart.DataBits == (UINT8)This->Mode->DataBits &&
+      mDevicePath.Uart.Parity   == (UINT8)This->Mode->Parity &&
+      mDevicePath.Uart.StopBits == (UINT8)This->Mode->StopBits
+     ) {
+    gBS->RestoreTPL (Tpl);
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Update the device path
+  //
+  mDevicePath.Uart.BaudRate = This->Mode->BaudRate;
+  mDevicePath.Uart.DataBits = (UINT8)This->Mode->DataBits;
+  mDevicePath.Uart.Parity   = (UINT8)This->Mode->Parity;
+  mDevicePath.Uart.StopBits = (UINT8)This->Mode->StopBits;
+
+  Status = gBS->ReinstallProtocolInterface (
+                  gHandle,
+                  &gEfiDevicePathProtocolGuid,
+                  &mDevicePath,
+                  &mDevicePath
+                  );
+
+  gBS->RestoreTPL (Tpl);
+
+  return Status;
 }
 
 
@@ -85,7 +162,60 @@ SerialSetAttributes (
   IN EFI_STOP_BITS_TYPE      StopBits
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_STATUS  Status;
+  EFI_TPL     Tpl;
+
+  Status = SerialPortSetAttributes (BaudRate, ReceiveFifoDepth, Timeout, Parity, DataBits, StopBits);
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
+
+  //
+  // Set the Serial I/O mode and update the device path
+  //
+
+  Tpl = gBS->RaiseTPL (TPL_NOTIFY);
+
+  //
+  // Set the Serial I/O mode
+  //
+  This->Mode->BaudRate          = BaudRate;
+  This->Mode->ReceiveFifoDepth  = ReceiveFifoDepth;
+  This->Mode->Timeout           = Timeout;
+  This->Mode->Parity            = (UINT32)Parity;
+  This->Mode->DataBits          = (UINT32)DataBits;
+  This->Mode->StopBits          = (UINT32)StopBits;
+
+  //
+  // Check if the device path has actually changed
+  //
+  if (mDevicePath.Uart.BaudRate == BaudRate &&
+      mDevicePath.Uart.Parity   == (UINT8)Parity &&
+      mDevicePath.Uart.DataBits == DataBits &&
+      mDevicePath.Uart.StopBits == (UINT8)StopBits
+     ) {
+    gBS->RestoreTPL (Tpl);
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Update the device path
+  //
+  mDevicePath.Uart.BaudRate = BaudRate;
+  mDevicePath.Uart.DataBits = DataBits;
+  mDevicePath.Uart.Parity   = (UINT8) Parity;
+  mDevicePath.Uart.StopBits = (UINT8) StopBits;
+
+  Status = gBS->ReinstallProtocolInterface (
+                  gHandle,
+                  &gEfiDevicePathProtocolGuid,
+                  &mDevicePath,
+                  &mDevicePath
+                  );
+
+  gBS->RestoreTPL (Tpl);
+
+  return Status;
 }
 
 
@@ -107,7 +237,7 @@ SerialSetControl (
   IN UINT32                  Control
   )
 {
-  return EFI_UNSUPPORTED;
+  return SerialPortSetControl(Control);
 }
 
 
@@ -128,13 +258,7 @@ SerialGetControl (
   OUT UINT32                 *Control
   )
 {
-  if (SerialPortPoll ()) {
-    // If a character is pending don't set EFI_SERIAL_INPUT_BUFFER_EMPTY
-    *Control = EFI_SERIAL_OUTPUT_BUFFER_EMPTY;
-  } else {
-    *Control = EFI_SERIAL_INPUT_BUFFER_EMPTY | EFI_SERIAL_OUTPUT_BUFFER_EMPTY;
-  }
-  return EFI_SUCCESS;
+  return SerialPortGetControl(Control);
 }
 
 
@@ -162,8 +286,13 @@ SerialWrite (
   UINTN Count;
   
   Count = SerialPortWrite (Buffer, *BufferSize);
-  *BufferSize = Count;
-  return (Count == 0) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
+
+  if (Count != *BufferSize) {
+    *BufferSize = Count;
+    return EFI_TIMEOUT;
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -202,9 +331,6 @@ SerialRead (
   return EFI_SUCCESS;
 }
 
-
-EFI_HANDLE  gHandle = NULL;
-
 // 
 // Template used to initialize the GDB Serial IO protocols
 //
@@ -229,29 +355,6 @@ EFI_SERIAL_IO_PROTOCOL gSerialIoTemplate = {
   SerialRead,
   &gSerialIoMode
 };
-  
-typedef struct {
-  VENDOR_DEVICE_PATH        Guid;
-  UART_DEVICE_PATH          Uart;
-  EFI_DEVICE_PATH_PROTOCOL  End;
-} SIMPLE_TEXT_OUT_DEVICE_PATH;
-
-SIMPLE_TEXT_OUT_DEVICE_PATH mDevicePath = {
-  {
-    { HARDWARE_DEVICE_PATH, HW_VENDOR_DP, sizeof (VENDOR_DEVICE_PATH), 0},
-    EFI_CALLER_ID_GUID // Use the drivers GUID
-  },
-  {
-    { MESSAGING_DEVICE_PATH, MSG_UART_DP, sizeof (UART_DEVICE_PATH), 0},
-    0,        // Reserved
-    FixedPcdGet64 (PcdUartDefaultBaudRate),   // BaudRate
-    FixedPcdGet8 (PcdUartDefaultDataBits),    // DataBits
-    FixedPcdGet8 (PcdUartDefaultParity),      // Parity (N)
-    FixedPcdGet8 (PcdUartDefaultStopBits)     // StopBits
-  },
-  { END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE, sizeof (EFI_DEVICE_PATH_PROTOCOL), 0}
-};
-
 
 /**
   Initialize the state information for the Serial Io Protocol
@@ -272,7 +375,6 @@ SerialDxeInitialize (
   )
 {
   EFI_STATUS      Status;
-
 
   // Make a new handle with Serial IO protocol and its device path on it.
   Status = gBS->InstallMultipleProtocolInterfaces (

@@ -22,13 +22,12 @@
 
   ENTRY_POINT                    = SerialDxeInitialize
 
-
 [Sources.common]
   SerialIo.c
 
-
 [Packages]
   MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -41,9 +40,6 @@
   UefiDriverEntryPoint
   SerialPortLib
 
-[Guids]
-  
-
 [Protocols]
   gEfiSerialIoProtocolGuid    
   gEfiDevicePathProtocolGuid
@@ -54,6 +50,5 @@
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits
 
-  
 [Depex] 
   TRUE

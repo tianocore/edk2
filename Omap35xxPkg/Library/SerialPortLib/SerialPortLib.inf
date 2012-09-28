@@ -35,6 +35,7 @@
   OmapLib
 
 [Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
   Omap35xxPkg/Omap35xxPkg.dec
   

@@ -17,6 +17,7 @@
 #include <Base.h>
 #include <Library/DebugLib.h>
 #include <Library/SerialPortLib.h>
+#include <Library/SerialPortExtLib.h>
 #include <Library/PcdLib.h>
 #include <Library/IoLib.h>
 #include <Library/OmapLib.h>
@@ -120,5 +121,59 @@ SerialPortPoll (
   } else {
     return FALSE;
   }
+}
+
+/**
+  Set the serial device control bits.
+
+  @return    Always return EFI_UNSUPPORTED.
+
+**/
+RETURN_STATUS
+EFIAPI
+SerialPortSetControl (
+  IN UINT32                   Control
+  )
+{
+  return RETURN_SUCCESS;
+}
+
+/**
+  Get the serial device control bits.
+
+  @param  Control                 Control signals read from the serial device.
+
+  @retval EFI_SUCCESS             The control bits were read from the serial device.
+  @retval EFI_DEVICE_ERROR        The serial device is not functioning correctly.
+
+**/
+RETURN_STATUS
+EFIAPI
+SerialPortGetControl (
+  OUT UINT32                  *Control
+  )
+{
+  return RETURN_SUCCESS;
+}
+
+
+/**
+  Set the serial device attributes.
+
+  @return    Always return EFI_UNSUPPORTED.
+
+**/
+RETURN_STATUS
+EFIAPI
+SerialPortSetAttributes (
+  IN UINT64              BaudRate,
+  IN UINT32              ReceiveFifoDepth,
+  IN UINT32              Timeout,
+  IN EFI_PARITY_TYPE     Parity,
+  IN UINT8               DataBits,
+  IN EFI_STOP_BITS_TYPE  StopBits
+  )
+{
+  return RETURN_SUCCESS;
 }
 

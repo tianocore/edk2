@@ -2,6 +2,7 @@
   Serial I/O Port library functions with no library constructor/destructor
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2012, ARM Ltd. All rights reserved.
   
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -17,8 +18,9 @@
 
 
 #include <Library/SerialPortLib.h>
+#include <Library/SerialPortExtLib.h>
 
-/*
+/**
 
   Programmed hardware of Serial port.
 
@@ -29,6 +31,65 @@ RETURN_STATUS
 EFIAPI
 SerialPortInitialize (
   VOID
+  )
+{
+  return RETURN_UNSUPPORTED;
+}
+
+/**
+  Set the serial device control bits.
+
+  @return    Always return EFI_UNSUPPORTED.
+
+**/
+RETURN_STATUS
+EFIAPI
+SerialPortSetControl (
+    IN UINT32                   Control
+  )
+{
+  return RETURN_UNSUPPORTED;
+}
+
+/**
+  Get the serial device control bits.
+
+  @param  Control                 Control signals read from the serial device.
+
+  @retval EFI_SUCCESS             The control bits were read from the serial device.
+  @retval EFI_DEVICE_ERROR        The serial device is not functioning correctly.
+
+**/
+RETURN_STATUS
+EFIAPI
+SerialPortGetControl (
+  OUT UINT32                  *Control
+  )
+{
+  if (SerialPortPoll ()) {
+    // If a character is pending don't set EFI_SERIAL_INPUT_BUFFER_EMPTY
+    *Control = EFI_SERIAL_OUTPUT_BUFFER_EMPTY;
+  } else {
+    *Control = EFI_SERIAL_INPUT_BUFFER_EMPTY | EFI_SERIAL_OUTPUT_BUFFER_EMPTY;
+  }
+  return EFI_SUCCESS;
+}
+
+/**
+  Set the serial device attributes.
+
+  @return    Always return EFI_UNSUPPORTED.
+
+**/
+RETURN_STATUS
+EFIAPI
+SerialPortSetAttributes (
+  IN OUT  UINT64              *BaudRate,
+  IN OUT  UINT32              *ReceiveFifoDepth,
+  IN OUT  UINT32              *Timeout,
+  IN OUT  EFI_PARITY_TYPE     *Parity,
+  IN OUT  UINT8               *DataBits,
+  IN OUT  EFI_STOP_BITS_TYPE  *StopBits
   )
 {
   return RETURN_UNSUPPORTED;
@@ -49,7 +110,7 @@ EFIAPI
 SerialPortWrite (
   IN UINT8     *Buffer,
   IN UINTN     NumberOfBytes
-)
+  )
 {
   return 0;
 }
@@ -70,7 +131,7 @@ EFIAPI
 SerialPortRead (
   OUT UINT8     *Buffer,
   IN  UINTN     NumberOfBytes
-)
+  )
 {
   return 0;
 }
