@@ -41,6 +41,11 @@ typedef struct {
   UINT64                       NumberOfBytes;
 } ARM_SYSTEM_MEMORY_REGION_DESCRIPTOR;
 
+UINTN
+ArmPlatformGetCorePosition (
+  IN UINTN MpId
+  );
+
 /**
   Return the current Boot Mode
 

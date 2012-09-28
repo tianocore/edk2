@@ -124,3 +124,12 @@ ArmPlatformGetPlatformPpiList (
   *PpiListSize = 0;
   *PpiList = NULL;
 }
+
+UINTN
+ArmPlatformGetCorePosition (
+  IN UINTN MpId
+  )
+{
+  return 1;
+}
+
