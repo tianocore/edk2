@@ -34,9 +34,11 @@
 
 [Sources.common]
   RTSM.c
-  RTSMMem.c  
-  RTSMHelper.asm    | RVCT
-  RTSMHelper.S      | GCC
+  RTSMMem.c
+
+[Sources.ARM]
+  Arm/RTSMHelper.asm    | RVCT
+  Arm/RTSMHelper.S      | GCC
 
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdCacheEnable

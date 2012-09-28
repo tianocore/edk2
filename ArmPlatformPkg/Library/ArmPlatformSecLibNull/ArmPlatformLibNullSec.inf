@@ -31,6 +31,8 @@
 
 [Sources.common]
   ArmPlatformLibNullSec.c
+
+[Sources.ARM]
   ArmPlatformLibNullBoot.asm     | RVCT
   ArmPlatformLibNullBoot.S       | GCC
 

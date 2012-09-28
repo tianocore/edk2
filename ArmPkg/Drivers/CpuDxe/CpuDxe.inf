@@ -3,7 +3,7 @@
 #  DXE CPU driver
 #  
 #  Copyright (c) 2009, Apple Inc. All rights reserved.<BR>
-#  Copyright (c) 2011, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -24,24 +24,26 @@
 
   ENTRY_POINT                    = CpuDxeInitialize
 
-[Sources.ARM]
+[Sources.Common]
   CpuDxe.c
   CpuDxe.h
   CpuMpCore.c
-  Exception.c
 
 #
 # Prior to ARMv6 we have multiple stacks, one per mode
 #
-#  ExceptionSupport.asm | RVCT
-#  ExceptionSupport.S   | GCC
+#  ArmV4/ExceptionSupport.asm | RVCT
+#  ArmV4/ExceptionSupport.S   | GCC
 
 #
 # ARMv6 or later uses a single stack via srs/stm instructions
 #
-  ExceptionSupport.ARMv6.asm | RVCT
-  ExceptionSupport.ARMv6.S   | GCC
-  Mmu.c  
+
+[Sources.ARM]
+  Mmu.c
+  Exception.c
+  ArmV6/ExceptionSupport.asm | RVCT
+  ArmV6/ExceptionSupport.S   | GCC
 
 
 [Packages]

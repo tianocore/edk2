@@ -21,7 +21,6 @@
 
   ENTRY_POINT                    = SemihostFsEntryPoint
 
-
 [Sources.ARM]
   Arm/SemihostFs.c
   

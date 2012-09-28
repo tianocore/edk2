@@ -59,9 +59,7 @@ This is the stack constructed by the exception handler (low address to high addr
   IMPORT  CommonCExceptionHandler
 
   PRESERVE8
-  AREA  DxeExceptionHandlers, CODE, READONLY
-  
-  ALIGN   32
+  AREA  DxeExceptionHandlers, CODE, READONLY, CODEALIGN, ALIGN=5
   
 //
 // This code gets copied to the ARM vector table

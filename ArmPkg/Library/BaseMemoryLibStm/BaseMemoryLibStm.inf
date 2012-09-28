@@ -32,7 +32,7 @@
 #
 
 
-[Sources.ARM]
+[Sources.Common]
   ScanMem64Wrapper.c
   ScanMem32Wrapper.c
   ScanMem16Wrapper.c
@@ -47,6 +47,8 @@
   MemLibGeneric.c
   MemLibGuid.c  
   MemLibInternals.h
+
+[Sources.ARM]
   Arm/CopyMem.asm
   Arm/CopyMem.S
   Arm/SetMem.asm
