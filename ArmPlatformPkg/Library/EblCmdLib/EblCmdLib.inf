@@ -1,6 +1,6 @@
 #/** @file
 #  
-#  Copyright (c) 2011, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -14,7 +14,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = ArmVeEblCmdLib
+  BASE_NAME                      = ArmPlatformEblCmdLib
   FILE_GUID                      = 6085e1ca-0d2d-4ba4-9872-c59b36ffd6ad
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
@@ -30,12 +30,14 @@
 [Sources.common]
   EblCmdLib.c
   EblCmdMmu.c
+  EblCmdFdt.c
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -45,6 +47,7 @@
   PerformanceLib
   TimerLib
   BdsLib
+  FdtLib
   
 [Protocols]
   gEfiDebugSupportProtocolGuid
@@ -53,3 +56,6 @@
   
 [Guids]
   gEfiDebugImageInfoTableGuid
+
+[Pcd]
+  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath

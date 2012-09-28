@@ -42,6 +42,12 @@ EblDumpMmu (
   IN UINTN  Argc,
   IN CHAR8  **Argv
   );
+  
+EFI_STATUS
+EblDumpFdt (
+  IN UINTN  Argc,
+  IN CHAR8  **Argv
+  );
 
 /**
   Simple arm disassembler via a library
@@ -426,6 +432,12 @@ GLOBAL_REMOVE_IF_UNREFERENCED const EBL_COMMAND_TABLE mLibCmdTemplate[] =
     " list all the Device Paths",
     NULL,
     EblDevicePaths
+  },
+  {
+    "dumpfdt",
+    " dump the current fdt or the one defined in the arguments",
+    NULL,
+    EblDumpFdt
   }
 };
 
