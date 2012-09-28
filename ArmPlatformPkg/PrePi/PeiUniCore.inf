@@ -23,8 +23,6 @@
   PrePi.c
   ModuleEntryPoint.S   | GCC
   ModuleEntryPoint.asm | RVCT
-  Exception.asm | RVCT
-  Exception.S | GCC
   MainUniCore.c
   
 [Packages]

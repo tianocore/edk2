@@ -23,8 +23,6 @@
   PrePi.c
   ModuleEntryPoint.S   | GCC
   ModuleEntryPoint.asm | RVCT
-  Exception.S | GCC
-  Exception.asm | RVCT
   MainMPCore.c
   
 [Packages]

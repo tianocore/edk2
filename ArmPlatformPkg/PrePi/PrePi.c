@@ -36,12 +36,6 @@
 // Not used when PrePi in run in XIP mode
 UINTN mGlobalVariableBase = 0;
 
-VOID
-PrePiCommonExceptionEntry (
-  IN UINT32 Entry,
-  IN UINT32 LR
-  );
-
 EFI_STATUS
 EFIAPI
 ExtractGuidedSectionLibConstructor (
@@ -256,10 +250,6 @@ CEntryPoint (
     }
   }
   
-  // Write VBAR - The Vector table must be 32-byte aligned
-  ASSERT (((UINT32)PrePiVectorTable & ((1 << 5)-1)) == 0);
-  ArmWriteVBar ((UINT32)PrePiVectorTable);
-
   // If not primary Jump to Secondary Main
   if (IS_PRIMARY_CORE(MpId)) {
     // Goto primary Main.
@@ -272,44 +262,3 @@ CEntryPoint (
   ASSERT (FALSE);
 }
 
-VOID
-PrePiCommonExceptionEntry (
-  IN UINT32 Entry,
-  IN UINT32 LR
-  )
-{
-  CHAR8           Buffer[100];
-  UINTN           CharCount;
-
-  switch (Entry) {
-  case 0:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"Reset Exception at 0x%X\n\r",LR);
-    break;
-  case 1:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"Undefined Exception at 0x%X\n\r",LR);
-    break;
-  case 2:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"SWI Exception at 0x%X\n\r",LR);
-    break;
-  case 3:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"PrefetchAbort Exception at 0x%X\n\r",LR);
-    break;
-  case 4:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"DataAbort Exception at 0x%X\n\r",LR);
-    break;
-  case 5:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"Reserved Exception at 0x%X\n\r",LR);
-    break;
-  case 6:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"IRQ Exception at 0x%X\n\r",LR);
-    break;
-  case 7:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"FIQ Exception at 0x%X\n\r",LR);
-    break;
-  default:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"Unknown Exception at 0x%X\n\r",LR);
-    break;
-  }
-  SerialPortWrite ((UINT8 *) Buffer, CharCount);
-  while(1);
-}
