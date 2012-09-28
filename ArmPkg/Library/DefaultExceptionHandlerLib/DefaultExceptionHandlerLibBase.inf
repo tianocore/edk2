@@ -1,6 +1,6 @@
 #/** @file
 #
-# Copyright (c) 2008, Apple Inc. All rights reserved.<BR>
+# Copyright (c) 2012, ARM Ltd. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -14,24 +14,21 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DefaultExceptionHandlerLib
-  FILE_GUID                      = EACDB354-DF1A-4AF9-A171-499737ED818F
-  MODULE_TYPE                    = UEFI_DRIVER
+  BASE_NAME                      = DefaultExceptionHandlerBaseLib
+  FILE_GUID                      = 3d5261d5-5eb7-4559-98e7-475aa9d0dc42
+  MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = DefaultExceptionHandlerLib
-  CONSTRUCTOR                    = DefaultExceptionHandlerConstructor
-
 
 [Sources.common]
   DefaultExceptionHandler.c
-  DefaultExceptionHandlerUefi.c
+  DefaultExceptionHandlerBase.c
 
 [Packages]
   MdePkg/MdePkg.dec
   ArmPkg/ArmPkg.dec
 
 [LibraryClasses]
-  UefiLib
   BaseLib
   PrintLib
   DebugLib

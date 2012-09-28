@@ -31,7 +31,6 @@
   ArmPkg/ArmPkg.dec
 
 [LibraryClasses]
-  UefiLib
   BaseLib
   PrintLib
   DebugLib
