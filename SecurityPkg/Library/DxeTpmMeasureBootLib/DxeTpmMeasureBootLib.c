@@ -34,7 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/DevicePathToText.h>
 #include <Protocol/FirmwareVolumeBlock.h>
 
-#include <Guid/TrustedFvHob.h>
+#include <Guid/MeasuredFvHob.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -59,7 +59,7 @@ UINTN                             mImageSize;
 // Measured FV handle cache
 //
 EFI_HANDLE                        mCacheMeasuredHandle  = NULL;
-UINT32                            *mGuidHobData         = NULL;
+MEASURED_HOB_DATA                 *mMeasuredHobData     = NULL;
 
 /**
   Reads contents of a PE/COFF image in memory buffer.
@@ -740,7 +740,6 @@ DxeTpmMeasureBootHandler (
   PE_COFF_LOADER_IMAGE_CONTEXT        ImageContext;
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *FvbProtocol;
   EFI_PHYSICAL_ADDRESS                FvAddress;
-  EFI_PLATFORM_FIRMWARE_BLOB          *TrustedFvBuf;
   UINT32                              Index;
 
   Status = gBS->LocateProtocol (&gEfiTcgProtocolGuid, NULL, (VOID **) &TcgProtocol);
@@ -848,14 +847,14 @@ DxeTpmMeasureBootHandler (
       return EFI_SUCCESS;
     }
     //
-    // The PE image from untrusted Firmware volume need be measured
-    // The PE image from trusted Firmware volume will be mearsured according to policy below.
-    //   if it is driver, do not measure
+    // The PE image from unmeasured Firmware volume need be measured
+    // The PE image from measured Firmware volume will be mearsured according to policy below.
+    //   If it is driver, do not measure
     //   If it is application, still measure.
     //
     ApplicationRequired = TRUE;
 
-    if (mCacheMeasuredHandle != Handle && mGuidHobData != NULL) {
+    if (mCacheMeasuredHandle != Handle && mMeasuredHobData != NULL) {
       //
       // Search for Root FV of this PE image
       //
@@ -877,11 +876,10 @@ DxeTpmMeasureBootHandler (
         return Status;
       }
 
-      TrustedFvBuf        = (EFI_PLATFORM_FIRMWARE_BLOB *)(mGuidHobData + 1);
       ApplicationRequired = FALSE;
 
-      for (Index = 0; Index < *mGuidHobData; Index++) {
-        if(TrustedFvBuf[Index].BlobBase == FvAddress) {
+      for (Index = 0; Index < mMeasuredHobData->Num; Index++) {
+        if(mMeasuredHobData->MeasuredFvBuf[Index].BlobBase == FvAddress) {
           //
           // Cache measured FV for next measurement
           //
@@ -996,10 +994,10 @@ DxeTpmMeasureBootLibConstructor (
 
   GuidHob = NULL;
 
-  GuidHob = GetFirstGuidHob (&gTrustedFvHobGuid);
+  GuidHob = GetFirstGuidHob (&gMeasuredFvHobGuid);
 
   if (GuidHob != NULL) {
-    mGuidHobData = GET_GUID_HOB_DATA (GuidHob);
+    mMeasuredHobData = GET_GUID_HOB_DATA (GuidHob);
   }
 
   return RegisterSecurity2Handler (

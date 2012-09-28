@@ -23,7 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Ppi/EndOfPeiPhase.h>
 
 #include <Guid/TcgEventHob.h>
-#include <Guid/TrustedFvHob.h>
+#include <Guid/MeasuredFvHob.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -148,35 +148,33 @@ EndofPeiSignalNotifyCallBack (
   IN VOID                          *Ppi
   )
 {  
-  UINT8 *HobData;
+  MEASURED_HOB_DATA *MeasuredHobData;
 
-  HobData = NULL;
+  MeasuredHobData = NULL;
 
   //
-  // Create a Guid hob to save all trusted Fv 
+  // Create a Guid hob to save all measured Fv 
   //
-  HobData = BuildGuidHob(
-              &gTrustedFvHobGuid,
-              sizeof(UINTN) + sizeof(EFI_PLATFORM_FIRMWARE_BLOB) * (mMeasuredBaseFvIndex + mMeasuredChildFvIndex)
-              );
+  MeasuredHobData = BuildGuidHob(
+                      &gMeasuredFvHobGuid,
+                      sizeof(UINTN) + sizeof(EFI_PLATFORM_FIRMWARE_BLOB) * (mMeasuredBaseFvIndex + mMeasuredChildFvIndex)
+                      );
 
-  if (HobData != NULL){
+  if (MeasuredHobData != NULL){
     //
     // Save measured FV info enty number
     //
-    *(UINT32 *)HobData = mMeasuredBaseFvIndex + mMeasuredChildFvIndex;
+    MeasuredHobData->Num = mMeasuredBaseFvIndex + mMeasuredChildFvIndex;
 
-    HobData += sizeof(UINT32);
     //
     // Save measured base Fv info
     //
-    CopyMem (HobData, mMeasuredBaseFvInfo, sizeof(EFI_PLATFORM_FIRMWARE_BLOB) * (mMeasuredBaseFvIndex));
+    CopyMem (MeasuredHobData->MeasuredFvBuf, mMeasuredBaseFvInfo, sizeof(EFI_PLATFORM_FIRMWARE_BLOB) * (mMeasuredBaseFvIndex));
 
-    HobData += sizeof(EFI_PLATFORM_FIRMWARE_BLOB) * (mMeasuredBaseFvIndex);
     //
     // Save measured child Fv info
     //
-    CopyMem (HobData, mMeasuredChildFvInfo, sizeof(EFI_PLATFORM_FIRMWARE_BLOB) * (mMeasuredChildFvIndex));
+    CopyMem (&MeasuredHobData->MeasuredFvBuf[mMeasuredBaseFvIndex] , mMeasuredChildFvInfo, sizeof(EFI_PLATFORM_FIRMWARE_BLOB) * (mMeasuredChildFvIndex));
   }
 
   return EFI_SUCCESS;

@@ -53,7 +53,7 @@
   HobLib
 
 [Guids]
-  gTrustedFvHobGuid
+  gMeasuredFvHobGuid
 
 [Protocols]
   gEfiTcgProtocolGuid                   ## CONSUMES
