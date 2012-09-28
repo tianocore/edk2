@@ -64,9 +64,15 @@ StartLinux (
   // This is necessary because the ARM Linux kernel requires
   // the FTD / ATAG List to reside entirely inside the first 1MB of
   // physical memory.
-  if ((UINTN)KernelParamsAddress > LINUX_ATAG_MAX_OFFSET) {
-    //Note: There is no requirement on the alignment
-    KernelParamsAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)CopyMem (ALIGN32_BELOW(LINUX_ATAG_MAX_OFFSET - KernelParamsSize), (VOID*)(UINTN)KernelParamsAddress, KernelParamsSize);
+  //Note: There is no requirement on the alignment
+  if (MachineType != ARM_FDT_MACHINE_TYPE) {
+    if (((UINTN)KernelParamsAddress > LINUX_ATAG_MAX_OFFSET) && (KernelParamsSize < PcdGet32(PcdArmLinuxAtagMaxOffset))) {
+      KernelParamsAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)CopyMem (ALIGN32_BELOW(LINUX_ATAG_MAX_OFFSET - KernelParamsSize), (VOID*)(UINTN)KernelParamsAddress, KernelParamsSize);
+    }
+  } else {
+    if (((UINTN)KernelParamsAddress > LINUX_FDT_MAX_OFFSET) && (KernelParamsSize < PcdGet32(PcdArmLinuxFdtMaxOffset))) {
+      KernelParamsAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)CopyMem (ALIGN32_BELOW(LINUX_FDT_MAX_OFFSET - KernelParamsSize), (VOID*)(UINTN)KernelParamsAddress, KernelParamsSize);
+    }
   }
 
   if ((UINTN)LinuxImage > LINUX_KERNEL_MAX_OFFSET) {
@@ -135,14 +141,14 @@ EFI_STATUS
 BdsBootLinuxAtag (
   IN  EFI_DEVICE_PATH_PROTOCOL* LinuxKernelDevicePath,
   IN  EFI_DEVICE_PATH_PROTOCOL* InitrdDevicePath,
-  IN  CONST CHAR8*              Arguments
+  IN  CONST CHAR8*              CommandLineArguments
   )
 {
   EFI_STATUS            Status;
   UINT32                LinuxImageSize;
   UINT32                InitrdImageSize = 0;
-  UINT32                KernelParamsSize;
-  EFI_PHYSICAL_ADDRESS  KernelParamsAddress;
+  UINT32                AtagSize;
+  EFI_PHYSICAL_ADDRESS  AtagBase;
   EFI_PHYSICAL_ADDRESS  LinuxImage;
   EFI_PHYSICAL_ADDRESS  InitrdImage;
 
@@ -181,13 +187,13 @@ BdsBootLinuxAtag (
   //
  
   // By setting address=0 we leave the memory allocation to the function
-  Status = PrepareAtagList (Arguments, InitrdImage, InitrdImageSize, &KernelParamsAddress, &KernelParamsSize);
+  Status = PrepareAtagList (CommandLineArguments, InitrdImage, InitrdImageSize, &AtagBase, &AtagSize);
   if (EFI_ERROR(Status)) {
     Print(L"ERROR: Can not prepare ATAG list. Status=0x%X\n", Status);
     return Status;
   }
 
-  return StartLinux (LinuxImage, LinuxImageSize, KernelParamsAddress, KernelParamsSize, PcdGet32(PcdArmMachineType));
+  return StartLinux (LinuxImage, LinuxImageSize, AtagBase, AtagSize, PcdGet32(PcdArmMachineType));
 }
 
 /**
@@ -206,20 +212,17 @@ EFI_STATUS
 BdsBootLinuxFdt (
   IN  EFI_DEVICE_PATH_PROTOCOL* LinuxKernelDevicePath,
   IN  EFI_DEVICE_PATH_PROTOCOL* InitrdDevicePath,
-  IN  CONST CHAR8*              Arguments,
+  IN  CONST CHAR8*              CommandLineArguments,
   IN  EFI_DEVICE_PATH_PROTOCOL* FdtDevicePath
   )
 {
   EFI_STATUS            Status;
   UINT32                LinuxImageSize;
   UINT32                InitrdImageSize = 0;
-  UINT32                KernelParamsSize;
-  EFI_PHYSICAL_ADDRESS  KernelParamsAddress;
-  UINT32                FdtMachineType;
+  UINT32                FdtBlobSize;
+  EFI_PHYSICAL_ADDRESS  FdtBlobBase;
   EFI_PHYSICAL_ADDRESS  LinuxImage;
   EFI_PHYSICAL_ADDRESS  InitrdImage;
-
-  FdtMachineType = 0xFFFFFFFF;
 
   PERF_START (NULL, "BDS", NULL, 0);
 
@@ -250,13 +253,22 @@ BdsBootLinuxFdt (
     }
   }
 
-  // Load the FDT binary from a device path
-  KernelParamsAddress = LINUX_ATAG_MAX_OFFSET;
-  Status = BdsLoadImage (FdtDevicePath, AllocateMaxAddress, &KernelParamsAddress, &KernelParamsSize);
+  // Load the FDT binary from a device path. The FDT will be reloaded later to a more appropriate location for the Linux kernel.
+  FdtBlobBase = 0;
+  Status = BdsLoadImage (FdtDevicePath, AllocateAnyPages, &FdtBlobBase, &FdtBlobSize);
   if (EFI_ERROR(Status)) {
     Print (L"ERROR: Did not find Device Tree blob.\n");
     return Status;
   }
-  return StartLinux (LinuxImage, LinuxImageSize, KernelParamsAddress, KernelParamsSize, FdtMachineType);
+
+  // Update the Fdt with the Initrd information. The FDT will increase in size.
+  // By setting address=0 we leave the memory allocation to the function
+  Status = PrepareFdt (CommandLineArguments, InitrdImage, InitrdImageSize, &FdtBlobBase, &FdtBlobSize);
+  if (EFI_ERROR(Status)) {
+    Print(L"ERROR: Can not load kernel with FDT. Status=%r\n", Status);
+    return Status;
+  }
+
+  return StartLinux (LinuxImage, LinuxImageSize, FdtBlobBase, FdtBlobSize, ARM_FDT_MACHINE_TYPE);
 }
 

@@ -16,11 +16,24 @@
 #define __BDSLINUXLOADER_H
 
 #define LINUX_UIMAGE_SIGNATURE    0x56190527
-
-#define LINUX_ATAG_MAX_OFFSET     (PcdGet32(PcdSystemMemoryBase) + PcdGet32(PcdArmLinuxAtagMaxOffset))
 #define LINUX_KERNEL_MAX_OFFSET   (PcdGet32(PcdSystemMemoryBase) + PcdGet32(PcdArmLinuxKernelMaxOffset))
+#define LINUX_ATAG_MAX_OFFSET     (PcdGet32(PcdSystemMemoryBase) + PcdGet32(PcdArmLinuxAtagMaxOffset))
+#define LINUX_FDT_MAX_OFFSET      (PcdGet32(PcdSystemMemoryBase) + PcdGet32(PcdArmLinuxFdtMaxOffset))
 
-#define ATAG_MAX_SIZE       0x3000
+// Additional size that could be used for FDT entries added by the UEFI OS Loader
+// Estimation based on: EDID (300bytes) + bootargs (200bytes) + initrd region (20bytes)
+//                      + system memory region (20bytes) + mp_core entries (200 bytes)
+#define FDT_ADDITIONAL_ENTRIES_SIZE     0x300
+
+#define ARM_FDT_MACHINE_TYPE            0xFFFFFFFF
+
+typedef VOID (*LINUX_KERNEL)(UINT32 Zero, UINT32 Arch, UINTN ParametersBase);
+
+//
+// ATAG Definitions
+//
+
+#define ATAG_MAX_SIZE        0x3000
 
 /* ATAG : list of possible tags */
 #define ATAG_NONE            0x00000000
@@ -35,7 +48,9 @@
 #define ATAG_CMDLINE         0x54410009
 #define ATAG_ARM_MP_CORE     0x5441000A
 
-/* structures for each atag */
+#define next_tag_address(t)  ((LINUX_ATAG*)((UINT32)(t) + (((t)->header.size) << 2) ))
+#define tag_size(type)       ((UINT32)((sizeof(LINUX_ATAG_HEADER) + sizeof(type)) >> 2))
+
 typedef struct {
   UINT32  size; /* length of tag in words including this header */
   UINT32  type;  /* tag type */
@@ -120,9 +135,22 @@ typedef struct {
   } body;
 } LINUX_ATAG;
 
-typedef VOID (*LINUX_KERNEL)(UINT32 Zero, UINT32 Arch, UINTN ParametersBase);
+EFI_STATUS
+PrepareAtagList (
+  IN  CONST CHAR8*          CommandLineString,
+  IN  EFI_PHYSICAL_ADDRESS  InitrdImage,
+  IN  UINTN                 InitrdImageSize,
+  OUT EFI_PHYSICAL_ADDRESS  *AtagBase,
+  OUT UINT32                *AtagSize
+  );
 
-#define next_tag_address(t)     ((LINUX_ATAG*)((UINT32)(t) + (((t)->header.size) << 2) ))
-#define tag_size(type)          ((UINT32)((sizeof(LINUX_ATAG_HEADER) + sizeof(type)) >> 2))
+EFI_STATUS
+PrepareFdt (
+  IN     CONST CHAR8*         CommandLineArguments,
+  IN     EFI_PHYSICAL_ADDRESS InitrdImage,
+  IN     UINTN                InitrdImageSize,
+  IN OUT EFI_PHYSICAL_ADDRESS *FdtBlobBase,
+  IN OUT UINT32               *FdtBlobSize
+  );
 
 #endif

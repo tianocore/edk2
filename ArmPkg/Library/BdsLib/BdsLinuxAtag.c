@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -13,6 +13,7 @@
 **/
 
 #include "BdsInternal.h"
+#include "BdsLinuxLoader.h"
 
 // Point to the current ATAG
 STATIC LINUX_ATAG *mLinuxKernelCurrentAtag;
@@ -80,6 +81,22 @@ SetupCmdlineTag (
 
 STATIC
 VOID
+SetupInitrdTag (
+  IN UINT32 InitrdImage,
+  IN UINT32 InitrdImageSize
+  )
+{
+  mLinuxKernelCurrentAtag->header.size = tag_size(LINUX_ATAG_INITRD2);
+  mLinuxKernelCurrentAtag->header.type = ATAG_INITRD2;
+
+  mLinuxKernelCurrentAtag->body.initrd2_tag.start = InitrdImage;
+  mLinuxKernelCurrentAtag->body.initrd2_tag.size = InitrdImageSize;
+
+  // Move pointer to next tag
+  mLinuxKernelCurrentAtag = next_tag_address(mLinuxKernelCurrentAtag);
+}
+STATIC
+VOID
 SetupEndTag (
   VOID
   )
@@ -114,7 +131,7 @@ PrepareAtagList (
   AtagStartAddress = LINUX_ATAG_MAX_OFFSET;
   Status = gBS->AllocatePages (AllocateMaxAddress, EfiBootServicesData, EFI_SIZE_TO_PAGES(ATAG_MAX_SIZE), &AtagStartAddress);
   if (EFI_ERROR(Status)) {
-    DEBUG ((EFI_D_ERROR,"Failed to allocate Atag at 0x%lX (%r)\n",AtagStartAddress,Status));
+    DEBUG ((EFI_D_WARN, "Warning: Failed to allocate Atag at 0x%lX (%r). The Atag will be allocated somewhere else in System Memory.\n", AtagStartAddress, Status));
     Status = gBS->AllocatePages (AllocateAnyPages, EfiBootServicesData, EFI_SIZE_TO_PAGES(ATAG_MAX_SIZE), &AtagStartAddress);
     ASSERT_EFI_ERROR(Status);
   }
@@ -141,14 +158,7 @@ PrepareAtagList (
   }
 
   if (InitrdImageSize > 0 && InitrdImage != 0) {
-    mLinuxKernelCurrentAtag->header.size = tag_size(LINUX_ATAG_INITRD2);
-    mLinuxKernelCurrentAtag->header.type = ATAG_INITRD2;
-
-    mLinuxKernelCurrentAtag->body.initrd2_tag.start = (UINT32)InitrdImage;
-    mLinuxKernelCurrentAtag->body.initrd2_tag.size = (UINT32)InitrdImageSize;
-
-    // Move pointer to next tag
-    mLinuxKernelCurrentAtag = next_tag_address(mLinuxKernelCurrentAtag);
+    SetupInitrdTag ((UINT32)InitrdImage, (UINT32)InitrdImageSize);
   }
 
   // End of tags

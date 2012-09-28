@@ -120,6 +120,7 @@
   DmaLib|ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
 
   BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
+  FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
 
 [LibraryClasses.common.SEC]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7LibPrePi.inf

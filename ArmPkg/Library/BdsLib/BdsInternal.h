@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -31,6 +31,7 @@
 #include <Library/PrintLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 
+#include <Guid/ArmMpCoreInfo.h>
 #include <Guid/GlobalVariable.h>
 #include <Guid/FileInfo.h>
 
@@ -41,7 +42,7 @@
 #include <Protocol/LoadFile.h>
 #include <Protocol/PxeBaseCode.h>
 
-#include "BdsLinuxLoader.h"
+#include <Uefi.h>
 
 typedef BOOLEAN (*BDS_FILE_LOADER_SUPPORT) (
   IN EFI_DEVICE_PATH            *DevicePath,
@@ -92,15 +93,6 @@ BdsLoadImage (
   IN     EFI_ALLOCATE_TYPE     Type,
   IN OUT EFI_PHYSICAL_ADDRESS* Image,
   OUT    UINTN                 *FileSize
-  );
-
-EFI_STATUS
-PrepareAtagList (
-  IN  CONST CHAR8*          CommandLineString,
-  IN  EFI_PHYSICAL_ADDRESS  InitrdImage,
-  IN  UINTN                 InitrdImageSize,
-  OUT EFI_PHYSICAL_ADDRESS  *AtagBase,
-  OUT UINT32                *AtagSize
   );
 
 #endif
