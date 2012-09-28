@@ -85,6 +85,7 @@
   gArmTokenSpaceGuid.PcdSystemMemorySize
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize
   
+  gArmPlatformTokenSpaceGuid.PcdCoreCount
   gArmPlatformTokenSpaceGuid.PcdClusterCount
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
   gArmTokenSpaceGuid.PcdArmPrimaryCore

@@ -55,6 +55,7 @@
   gArmPlatformTokenSpaceGuid.PcdNorFlashCheckBlockLocked|FALSE|BOOLEAN|0x0000003C
   
 [PcdsFixedAtBuild.common]
+  gArmPlatformTokenSpaceGuid.PcdCoreCount|1|UINT32|0x00000039
   gArmPlatformTokenSpaceGuid.PcdClusterCount|1|UINT32|0x00000038
     
   # Stack for CPU Cores in Secure Mode

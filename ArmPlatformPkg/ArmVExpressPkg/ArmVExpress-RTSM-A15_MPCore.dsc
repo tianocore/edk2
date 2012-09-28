@@ -72,8 +72,9 @@
   
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Versatile Express"
-  
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ArmVExpress-RTSM"
+
+  gArmPlatformTokenSpaceGuid.PcdCoreCount|2
 
   #
   # NV Storage PCDs. Use base of 0x0C000000 for NOR1

@@ -20,7 +20,8 @@
   
   IMPORT  CEntryPoint
   IMPORT  ArmReadMpidr
-  IMPORT  ArmIsMpCore
+  IMPORT  ArmPlatformStackSet
+  
   EXPORT  _ModuleEntryPoint
 
   PRESERVE8
@@ -107,11 +108,20 @@ _GetStackBaseMpCore
   // r1 = The top of the Mpcore Stacks
   // Stack for the primary core = PrimaryCoreStack
   LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), r2)
-  sub   r7, r1, r2
+  sub   r8, r1, r2
 
-  // Stack for the secondary core = Number of Clusters * (4 Cores per cluster) * SecondaryStackSize
-  LoadConstantToReg (FixedPcdGet32(PcdClusterCount), r2)
-  lsl   r2, r2, #2
+  // Stack for the secondary core = Number of Cores - 1
+  LoadConstantToReg (FixedPcdGet32(PcdCoreCount), r0)
+  sub	r0, r0, #1
+  LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecondaryStackSize), r1)
+  mul   r1, r1, r0
+  sub   r8, r8, r1
+
+  // r8 = The base of the MpCore Stacks (primary stack & secondary stacks)
+  mov	r0, r8
+  mov	r1, r6
+  //ArmPlatformStackSet(StackBase, MpId, PrimaryStackSize, SecondaryStackSize)
+  LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), r2)
   LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecondaryStackSize), r3)
   mul   r2, r2, r3
   sub   r7, r7, r2

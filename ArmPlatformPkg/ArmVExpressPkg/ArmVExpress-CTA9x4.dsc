@@ -95,6 +95,8 @@
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Versatile Express"  
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ArmVExpress"
 
+  gArmPlatformTokenSpaceGuid.PcdCoreCount|4
+
   #
   # NV Storage PCDs. Use base of 0x43FC0000 for NOR0 or 0x47FC0000 for NOR1 on Versatile Express
   #
