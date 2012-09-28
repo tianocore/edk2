@@ -337,9 +337,19 @@ SmmFaultTolerantWriteHandler (
   SMM_FTW_GET_LAST_WRITE_HEADER                    *SmmFtwGetLastWriteHeader;
   VOID                                             *PrivateData;
   EFI_HANDLE                                       SmmFvbHandle;
+  UINTN                                            InfoSize;
 
-  ASSERT (CommBuffer != NULL);
-  ASSERT (CommBufferSize != NULL);
+
+  //
+  // If input is invalid, stop processing this SMI
+  //
+  if (CommBuffer == NULL || CommBufferSize == NULL) {
+    return EFI_SUCCESS;
+  }
+
+  if (*CommBufferSize < SMM_FTW_COMMUNICATE_HEADER_SIZE) {
+    return EFI_SUCCESS;
+  }
 
   if (InternalIsAddressInSmram ((EFI_PHYSICAL_ADDRESS)(UINTN)CommBuffer, *CommBufferSize)) {
     DEBUG ((EFI_D_ERROR, "SMM communication buffer size is in SMRAM!\n"));
@@ -349,7 +359,18 @@ SmmFaultTolerantWriteHandler (
   SmmFtwFunctionHeader = (SMM_FTW_COMMUNICATE_FUNCTION_HEADER *)CommBuffer;
   switch (SmmFtwFunctionHeader->Function) {
     case FTW_FUNCTION_GET_MAX_BLOCK_SIZE:
-      SmmGetMaxBlockSizeHeader = (SMM_FTW_GET_MAX_BLOCK_SIZE_HEADER *) SmmFtwFunctionHeader->Data;     
+      SmmGetMaxBlockSizeHeader = (SMM_FTW_GET_MAX_BLOCK_SIZE_HEADER *) SmmFtwFunctionHeader->Data;
+      InfoSize = sizeof (SMM_FTW_GET_MAX_BLOCK_SIZE_HEADER);
+
+      //
+      // SMRAM range check already covered before
+      //
+      if (InfoSize > *CommBufferSize - SMM_FTW_COMMUNICATE_HEADER_SIZE) {
+        DEBUG ((EFI_D_ERROR, "Data size exceed communication buffer size limit!\n"));
+        Status = EFI_ACCESS_DENIED;
+        break;
+      }
+
       Status = FtwGetMaxBlockSize (
                  &mFtwDevice->FtwInstance,
                  &SmmGetMaxBlockSizeHeader->BlockSize
@@ -409,21 +430,27 @@ SmmFaultTolerantWriteHandler (
       
     case FTW_FUNCTION_GET_LAST_WRITE:
       SmmFtwGetLastWriteHeader = (SMM_FTW_GET_LAST_WRITE_HEADER *) SmmFtwFunctionHeader->Data;
-      if (((UINT8*)SmmFtwGetLastWriteHeader->Data > (UINT8*)CommBuffer) &&  
-          ((UINT8*)SmmFtwGetLastWriteHeader->Data + SmmFtwGetLastWriteHeader->PrivateDataSize <= (UINT8*)CommBuffer + (*CommBufferSize))) {
-        Status = FtwGetLastWrite (
-                   &mFtwDevice->FtwInstance,
-                   &SmmFtwGetLastWriteHeader->CallerId,
-                   &SmmFtwGetLastWriteHeader->Lba,
-                   &SmmFtwGetLastWriteHeader->Offset,
-                   &SmmFtwGetLastWriteHeader->Length,
-                   &SmmFtwGetLastWriteHeader->PrivateDataSize,
-                   (VOID *)SmmFtwGetLastWriteHeader->Data,
-                   &SmmFtwGetLastWriteHeader->Complete
-                   );
-      } else  {
-        Status = EFI_INVALID_PARAMETER;
+      InfoSize = OFFSET_OF (SMM_FTW_GET_LAST_WRITE_HEADER, Data) + SmmFtwGetLastWriteHeader->PrivateDataSize;
+
+      //
+      // SMRAM range check already covered before
+      //
+      if (InfoSize > *CommBufferSize - SMM_FTW_COMMUNICATE_HEADER_SIZE) {
+        DEBUG ((EFI_D_ERROR, "Data size exceed communication buffer size limit!\n"));
+        Status = EFI_ACCESS_DENIED;
+        break;
       }
+
+      Status = FtwGetLastWrite (
+                 &mFtwDevice->FtwInstance,
+                 &SmmFtwGetLastWriteHeader->CallerId,
+                 &SmmFtwGetLastWriteHeader->Lba,
+                 &SmmFtwGetLastWriteHeader->Offset,
+                 &SmmFtwGetLastWriteHeader->Length,
+                 &SmmFtwGetLastWriteHeader->PrivateDataSize,
+                 (VOID *)SmmFtwGetLastWriteHeader->Data,
+                 &SmmFtwGetLastWriteHeader->Complete
+                 );
       break;
 
     default:
