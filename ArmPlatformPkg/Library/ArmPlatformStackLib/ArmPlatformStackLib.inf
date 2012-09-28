@@ -1,0 +1,39 @@
+#/* @file
+#
+#  Copyright (c) 2012, ARM Limited. All rights reserved.
+#  
+#  This program and the accompanying materials                          
+#  are licensed and made available under the terms and conditions of the BSD License         
+#  which accompanies this distribution.  The full text of the license may be found at        
+#  http://opensource.org/licenses/bsd-license.php                                            
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+#
+#*/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmPlatformStackLib
+  FILE_GUID                      = 5e2e44af-53c1-44c2-a801-9c149f3d6ba0
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmPlatformStackLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+
+[Sources.common]
+  ArmPlatformStackLib.asm     | RVCT
+  ArmPlatformStackLib.S       | GCC
+
+[FixedPcd]
+  gArmPlatformTokenSpaceGuid.PcdCoreCount
+
+  gArmPlatformTokenSpaceGuid.PcdCoreCount
+
+  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
+  gArmTokenSpaceGuid.PcdArmPrimaryCore

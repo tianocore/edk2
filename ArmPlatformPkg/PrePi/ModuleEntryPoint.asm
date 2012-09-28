@@ -33,10 +33,11 @@ _ModuleEntryPoint
   // Get ID of this CPU in Multicore system
   bl    ArmReadMpidr
   LoadConstantToReg (FixedPcdGet32(PcdArmPrimaryCoreMask), r1)
-  and   r5, r0, r1
+  and   r6, r0, r1
 
 _SetSVCMode
   // Enter SVC mode, Disable FIQ and IRQ
+  //TODO: remove hardcoded values
   mov     r1, #0x13 :OR: 0x80 :OR: 0x40
   msr     CPSR_c, r1
 
@@ -78,33 +79,25 @@ _SetupStack
   // Because the 'push' instruction is equivalent to 'stmdb' (decrement before), we need to increment
   // one to the top of the stack. We check if incrementing one does not overflow (case of DRAM at the
   // top of the memory space)
-  adds  r6, r1, #1
+  adds  r7, r1, #1
   bcs   _SetupOverflowStack
 
 _SetupAlignedStack
-  mov   r1, r6
+  mov   r1, r7
   b     _GetBaseUefiMemory
 
 _SetupOverflowStack
   // Case memory at the top of the address space. Ensure the top of the stack is EFI_PAGE_SIZE
   // aligned (4KB)
-  LoadConstantToReg (EFI_PAGE_MASK, r6)
-  and   r6, r6, r1
-  sub   r1, r1, r6
+  LoadConstantToReg (EFI_PAGE_MASK, r7)
+  and   r7, r7, r1
+  sub   r1, r1, r7
 
 _GetBaseUefiMemory
   // Calculate the Base of the UEFI Memory
-  sub   r6, r1, r4
+  sub   r7, r1, r4
 
 _GetStackBase
-  // Compute Base of Normal stacks for CPU Cores
-  // Is it MpCore system
-  bl    ArmIsMpCore
-  cmp   r0, #0
-  // Case it is not an MP Core system. Just setup the primary core
-  beq   _SetupUnicoreStack
-
-_GetStackBaseMpCore
   // r1 = The top of the Mpcore Stacks
   // Stack for the primary core = PrimaryCoreStack
   LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), r2)
@@ -123,56 +116,22 @@ _GetStackBaseMpCore
   //ArmPlatformStackSet(StackBase, MpId, PrimaryStackSize, SecondaryStackSize)
   LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), r2)
   LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecondaryStackSize), r3)
-  mul   r2, r2, r3
-  sub   r7, r7, r2
-
-  // The base of the secondary Stacks = Top of Primary stack
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), r2)
-  add   r1, r7, r2
-
-  // r7 = The base of the MpCore Stacks (primary stack + cluster_count * 4 * secondary stacks)
-  // r1 = The base of the secondary Stacks = Top of the Primary stack
+  bl	ArmPlatformStackSet
 
   // Is it the Primary Core ?
   LoadConstantToReg (FixedPcdGet32(PcdArmPrimaryCore), r4)
-  cmp   r5, r4
-  beq   _SetupPrimaryCoreStack
-
-_SetupSecondaryCoreStack
-  // r1 = The base of the secondary Stacks
-
-  // Get the position of the cores (ClusterId * 4) + CoreId
-  GetCorePositionFromMpId(r0, r5, r4)
-  // The stack starts at the top of the stack region. Add '1' to the Core Position to get the top of the stack
-  add   r0, r0, #1
-  // Get the offset for the Secondary Stack
-  mul   r0, r0, r3
-  add   sp, r1, r0
-
+  cmp   r6, r4
   bne   _PrepareArguments
 
-_SetupPrimaryCoreStack
-  // r1 = Top of the primary stack
-  LoadConstantToReg (FixedPcdGet32(PcdPeiGlobalVariableSize), r2)
-  b     _PreparePrimaryStack
-
-_SetupUnicoreStack
-  // The top of the Unicore Stack is in r1
-  LoadConstantToReg (FixedPcdGet32(PcdPeiGlobalVariableSize), r2)
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), r3)
-
-  // Calculate the bottom of the primary stack (StackBase)
-  sub   r7, r1, r3
-
-_PreparePrimaryStack
-  // The reserved space for global variable must be 8-bytes aligned for pushing
-  // 64-bit variable on the stack
-  SetPrimaryStack (r1, r2, r3)
+_ReserveGlobalVariable
+  LoadConstantToReg (FixedPcdGet32(PcdPeiGlobalVariableSize), r0)
+  // InitializePrimaryStack($GlobalVariableSize, $Tmp1)
+  InitializePrimaryStack r0, r1
 
 _PrepareArguments
-  mov   r0, r5
-  mov   r1, r6
-  mov   r2, r7
+  mov   r0, r6
+  mov   r1, r7
+  mov   r2, r8
   mov   r3, sp
 
   // Move sec startup address into a data register

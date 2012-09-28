@@ -47,6 +47,7 @@
   DebugAgentLib
   PrePiLib
   ArmPlatformLib
+  ArmPlatformStackLib
   MemoryAllocationLib
   HobLib
   PrePiHobListPointerLib

@@ -34,6 +34,7 @@
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
   ArmPlatformLib|BeagleBoardPkg/Library/BeagleBoardLib/BeagleBoardLib.inf
   ArmCpuLib|ArmPkg/Drivers/ArmCpuLib/ArmCortexA8Lib/ArmCortexA8Lib.inf
+  ArmPlatformStackLib|ArmPlatformPkg/Library/ArmPlatformStackLib/ArmPlatformStackLib.inf
   
   HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
   UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf

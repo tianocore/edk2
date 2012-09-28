@@ -48,6 +48,7 @@
   DebugAgentLib
   PrePiLib
   ArmPlatformLib
+  ArmPlatformStackLib
   MemoryAllocationLib
   HobLib
   PrePiHobListPointerLib
@@ -77,7 +78,6 @@
   gArmTokenSpaceGuid.PcdFvBaseAddress
   gArmTokenSpaceGuid.PcdFvSize
 
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize
 

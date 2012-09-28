@@ -144,6 +144,21 @@ _SetPrimaryStackInitGlobals:          ;             \
   b       _SetPrimaryStackInitGlobals ;             \
 _SetPrimaryStackEnd:
 
+// Initialize the Global Variable with '0'
+#define InitializePrimaryStack(GlobalSize, Tmp1)    \
+  and     Tmp1, GlobalSize, #7        ;             \
+  rsbne   Tmp1, Tmp1, #8              ;             \
+  add     GlobalSize, GlobalSize, Tmp1 ;            \
+                                      ;             \
+  mov     Tmp1, sp                    ;             \
+  sub     sp, GlobalSize              ;             \
+  mov     GlobalSize, #0x0            ;             \
+_InitializePrimaryStackLoop:          ;             \
+  cmp     Tmp1, sp                    ;             \
+  bls     _InitializePrimaryStackEnd  ;             \
+  str     GlobalSize, [Tmp1], #-4     ;             \
+  b       _InitializePrimaryStackLoop ;             \
+_InitializePrimaryStackEnd:
 
 #elif defined (__GNUC__)
 
@@ -213,6 +228,22 @@ _SetPrimaryStackInitGlobals:          ;             \
   b       _SetPrimaryStackInitGlobals ;             \
 _SetPrimaryStackEnd:
 
+// Initialize the Global Variable with '0'
+#define InitializePrimaryStack(GlobalSize, Tmp1)    \
+  and     Tmp1, GlobalSize, #7        ;             \
+  rsbne   Tmp1, Tmp1, #8              ;             \
+  add     GlobalSize, GlobalSize, Tmp1 ;            \
+                                      ;             \
+  mov     Tmp1, sp                    ;             \
+  sub     sp, GlobalSize              ;             \
+  mov     GlobalSize, #0x0            ;             \
+_InitializePrimaryStackLoop:          ;             \
+  cmp     Tmp1, sp                    ;             \
+  bls     _InitializePrimaryStackEnd  ;             \
+  str     GlobalSize, [Tmp1], #-4     ;             \
+  b       _InitializePrimaryStackLoop ;             \
+_InitializePrimaryStackEnd:
+
 #else
 
 //
@@ -277,6 +308,9 @@ _SetPrimaryStackEnd:
 #define GetCorePositionFromMpId(Pos, MpId, Tmp)  GetCorePositionFromMpId Pos, MpId, Tmp
 
 #define SetPrimaryStack(StackTop,GlobalSize,Tmp) SetPrimaryStack StackTop, GlobalSize, Tmp
+
+// Initialize the Global Variable with '0'
+#define InitializePrimaryStack(GlobalSize, Tmp1) InitializePrimaryStack GlobalSize, Tmp1
 
 #endif
 
