@@ -124,9 +124,9 @@
 //
 #define HD_H_RES_PIXELS                   1920
 #define HD_V_RES_PIXELS                   1080
-#define HD_OSC_FREQUENCY                  173000000  /* 0x0A4FC540 */
+#define HD_OSC_FREQUENCY                  165000000  /* 0x09D5B340 */
 
-#define HD_H_SYNC                         (200 - 1)
+#define HD_H_SYNC                         ( 79 - 1)
 #define HD_H_FRONT_PORCH                  (128 - 1)
 #define HD_H_BACK_PORCH                   (328 - 1)
 
