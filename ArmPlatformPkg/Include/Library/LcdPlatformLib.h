@@ -25,8 +25,9 @@
 #define SVGA                              1
 #define XGA                               2
 #define SXGA                              3
-#define UXGA                              4
-#define HD                                5
+#define WSXGA                             4
+#define UXGA                              5
+#define HD                                6
 
 //
 // VGA Mode: 640 x 480
@@ -87,6 +88,21 @@
 #define SXGA_V_SYNC                       (  7 - 1)
 #define SXGA_V_FRONT_PORCH                (  3 - 1)
 #define SXGA_V_BACK_PORCH                 ( 29 - 1)
+
+//
+// WSXGA+ Mode: 1680 x 1050
+//
+#define WSXGA_H_RES_PIXELS                1680
+#define WSXGA_V_RES_PIXELS                1050
+#define WSXGA_OSC_FREQUENCY               147000000  /* 0x08C30AC0 */
+
+#define WSXGA_H_SYNC                      (170 - 1)
+#define WSXGA_H_FRONT_PORCH               (104 - 1)
+#define WSXGA_H_BACK_PORCH                (274 - 1)
+
+#define WSXGA_V_SYNC                      (  5 - 1)
+#define WSXGA_V_FRONT_PORCH               (  4 - 1)
+#define WSXGA_V_BACK_PORCH                ( 41 - 1)
 
 //
 // UXGA Mode: 1600 x 1200
