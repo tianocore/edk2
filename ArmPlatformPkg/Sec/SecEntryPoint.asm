@@ -22,10 +22,8 @@
   IMPORT  ArmPlatformSecBootMemoryInit
   IMPORT  ArmDisableInterrupts
   IMPORT  ArmDisableCachesAndMmu
-  IMPORT  ArmWriteVBar
   IMPORT  ArmReadMpidr
   IMPORT  ArmCallWFE
-  IMPORT  SecVectorTable
   EXPORT  _ModuleEntryPoint
 
   PRESERVE8
@@ -45,10 +43,6 @@ _ModuleEntryPoint FUNCTION
 
   // Jump to Platform Specific Boot Action function
   blx   ArmPlatformSecBootAction
-
-  // Set VBAR to the start of the exception vectors in Secure Mode
-  ldr   r0, =SecVectorTable
-  blx   ArmWriteVBar
 
 _IdentifyCpu 
   // Identify CPU ID

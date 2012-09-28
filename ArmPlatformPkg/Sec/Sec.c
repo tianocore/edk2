@@ -80,10 +80,6 @@ CEntryPoint (
     InitializeDebugAgent (DEBUG_AGENT_INIT_PREMEM_SEC, NULL, NULL);
     SaveAndSetDebugTimerInterrupt (TRUE);
 
-    // Now we've got UART, make the check:
-    // - The Vector table must be 32-byte aligned
-    ASSERT(((UINT32)SecVectorTable & ((1 << 5)-1)) == 0);
-
     // Enable the GIC distributor and CPU Interface
     // - no other Interrupts are enabled,  doesn't have to worry about the priority.
     // - all the cores are in secure state, use secure SGI's
@@ -197,44 +193,3 @@ NonTrustedWorldTransition (
   ASSERT (FALSE);
 }
 
-VOID
-SecCommonExceptionEntry (
-  IN UINT32 Entry,
-  IN UINT32 LR
-  )
-{
-  CHAR8           Buffer[100];
-  UINTN           CharCount;
-
-  switch (Entry) {
-  case 0:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"Reset Exception at 0x%X\n\r",LR);
-    break;
-  case 1:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"Undefined Exception at 0x%X\n\r",LR);
-    break;
-  case 2:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"SWI Exception at 0x%X\n\r",LR);
-    break;
-  case 3:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"PrefetchAbort Exception at 0x%X\n\r",LR);
-    break;
-  case 4:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"DataAbort Exception at 0x%X\n\r",LR);
-    break;
-  case 5:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"Reserved Exception at 0x%X\n\r",LR);
-    break;
-  case 6:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"IRQ Exception at 0x%X\n\r",LR);
-    break;
-  case 7:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"FIQ Exception at 0x%X\n\r",LR);
-    break;
-  default:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"Unknown Exception at 0x%X\n\r",LR);
-    break;
-  }
-  SerialPortWrite ((UINT8 *) Buffer, CharCount);
-  while(1);
-}

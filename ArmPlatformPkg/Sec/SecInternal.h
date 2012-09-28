@@ -44,12 +44,6 @@ ArmSetupGicNonSecure (
   IN  INTN                  GicInterruptInterfaceBase
 );
 
-// Vector Table for Sec Phase
-VOID
-SecVectorTable (
-  VOID
-  );
-
 VOID
 enter_monitor_mode (
   IN UINTN                  MonitorEntryPoint,

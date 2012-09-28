@@ -1,7 +1,7 @@
 /** @file
 *  Main file supporting the SEC Phase for Versatile Express
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -14,6 +14,7 @@
 **/
 
 #include <Uefi.h>
+#include <Library/ArmLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
@@ -27,6 +28,13 @@
 
 #define GET_OCCUPIED_SIZE(ActualSize, Alignment) \
   (ActualSize) + (((Alignment) - ((ActualSize) & ((Alignment) - 1))) & ((Alignment) - 1))
+
+
+// Vector Table for Sec Phase
+VOID
+DebugAgentVectorTable (
+  VOID
+  );
 
 /**
   Returns the highest bit set of the State field
@@ -274,6 +282,12 @@ InitializeDebugAgent (
   EFI_STATUS            Status;
   EFI_FFS_FILE_HEADER   *FfsHeader;
   PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext;
+
+  // Now we've got UART, make the check:
+  // - The Vector table must be 32-byte aligned
+  //TODO: Define a macro for the ARM Exception Table
+  ASSERT(((UINT32)DebugAgentVectorTable & ARM_VECTOR_TABLE_ALIGNMENT) == 0);
+  ArmWriteVBar (DebugAgentVectorTable);
 
   // We use InitFlag to know if DebugAgent has been intialized from
   // Sec (DEBUG_AGENT_INIT_PREMEM_SEC) or PrePi (DEBUG_AGENT_INIT_POSTMEM_SEC)

@@ -26,8 +26,6 @@
   Sec.c
   SecEntryPoint.S      | GCC
   SecEntryPoint.asm    | RVCT
-  Exception.asm        | RVCT
-  Exception.S          | GCC
   
 [Packages]
   MdePkg/MdePkg.dec

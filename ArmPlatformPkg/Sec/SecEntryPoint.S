@@ -23,9 +23,7 @@ GCC_ASM_IMPORT(ArmPlatformSecBootAction)
 GCC_ASM_IMPORT(ArmPlatformSecBootMemoryInit)
 GCC_ASM_IMPORT(ArmDisableInterrupts)
 GCC_ASM_IMPORT(ArmDisableCachesAndMmu)
-GCC_ASM_IMPORT(ArmWriteVBar)
 GCC_ASM_IMPORT(ArmReadMpidr)
-GCC_ASM_IMPORT(SecVectorTable)
 GCC_ASM_IMPORT(ArmCallWFE)
 GCC_ASM_EXPORT(_ModuleEntryPoint)
 
@@ -43,10 +41,6 @@ ASM_PFX(_ModuleEntryPoint):
 
   // Jump to Platform Specific Boot Action function
   blx   ASM_PFX(ArmPlatformSecBootAction)
-
-  // Set VBAR to the start of the exception vectors in Secure Mode
-  LoadConstantToReg (ASM_PFX(SecVectorTable), r0)
-  bl    ASM_PFX(ArmWriteVBar)
 
 _IdentifyCpu:
   // Identify CPU ID
