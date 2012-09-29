@@ -478,7 +478,6 @@ TcpDeliverData (
         //
         NetbufFree (Nbuf);
         return -1;
-        break;
       default:
         break;
       }

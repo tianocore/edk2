@@ -662,8 +662,6 @@ Tcp4Dispatcher (
 
     return Tcp4AttachPcb (Sock);
 
-    break;
-
   case SOCK_FLUSH:
 
     Tcp4FlushPcb (Tcb);
@@ -683,15 +681,11 @@ Tcp4Dispatcher (
             (EFI_TCP4_CONFIG_DATA *) Data
             );
 
-    break;
-
   case SOCK_MODE:
 
     ASSERT ((Data != NULL) && (Tcb != NULL));
 
     return Tcp4GetMode (Tcb, (TCP4_MODE_DATA *) Data);
-
-    break;
 
   case SOCK_ROUTE:
 

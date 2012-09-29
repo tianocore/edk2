@@ -196,7 +196,6 @@ PeimDispatchReadiness (
         }
         DEBUG ((DEBUG_DISPATCH, "  RESULT = %a\n", IsPpiInstalled (PeiServices, StackPtr) ? "TRUE" : "FALSE"));
         return IsPpiInstalled (PeiServices, StackPtr);
-        break;
 
       case (EFI_DEP_NOT):    
         DEBUG ((DEBUG_DISPATCH, "  NOT\n"));

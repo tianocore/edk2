@@ -794,7 +794,6 @@ InternalHiiGetBufferFromString (
 
   default:
     return EFI_INVALID_PARAMETER;
-    break;
   }
 
   return EFI_SUCCESS;

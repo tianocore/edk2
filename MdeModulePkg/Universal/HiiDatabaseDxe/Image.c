@@ -882,7 +882,6 @@ HiiGetImage (
     // BUGBUG: need to be supported as soon as image tool is designed.
     //
     return EFI_UNSUPPORTED;
-    break;
 
   case EFI_HII_IIBT_IMAGE_1BIT_TRANS:
   case EFI_HII_IIBT_IMAGE_4BIT_TRANS:
@@ -942,7 +941,6 @@ HiiGetImage (
     }
 
     return EFI_SUCCESS;
-    break;
 
   case EFI_HII_IIBT_IMAGE_24BIT_TRANS:
     Flag = TRUE;
@@ -976,11 +974,9 @@ HiiGetImage (
       (EFI_HII_RGB_PIXEL *) (ImageBlock + sizeof (EFI_HII_IIBT_IMAGE_24BIT_BLOCK) - sizeof (EFI_HII_RGB_PIXEL))
       );
     return EFI_SUCCESS;
-    break;
 
   default:
     return EFI_NOT_FOUND;
-    break;
   }
 }
 
@@ -1087,7 +1083,6 @@ HiiSetImage (
     // BUGBUG: need to be supported as soon as image tool is designed.
     //
     return EFI_UNSUPPORTED;
-    break;
 
   case EFI_HII_IIBT_IMAGE_1BIT:
   case EFI_HII_IIBT_IMAGE_1BIT_TRANS:
@@ -1120,7 +1115,6 @@ HiiSetImage (
     break;
   default:
     return EFI_NOT_FOUND;
-    break;
   }
 
   //
