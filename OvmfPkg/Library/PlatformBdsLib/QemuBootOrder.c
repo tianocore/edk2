@@ -118,7 +118,7 @@ SubstringEq (
     ++Chr;
   }
 
-  return (Pos == Substring.Len && *Chr == '\0');
+  return (BOOLEAN)(Pos == Substring.Len && *Chr == '\0');
 }
 
 
@@ -782,7 +782,7 @@ Match (
   //
   // Is Translated a prefix of Converted?
   //
-  Result = (StrnCmp (Converted, Translated, TranslatedLength) == 0);
+  Result = (BOOLEAN)(StrnCmp (Converted, Translated, TranslatedLength) == 0);
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: against \"%s\": %a\n",
