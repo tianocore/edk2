@@ -41,6 +41,11 @@
   INTEL:RELEASE_*_*_CC_FLAGS           = /D MDEPKG_NDEBUG
   MSFT:RELEASE_*_*_CC_FLAGS            = /D MDEPKG_NDEBUG
   GCC:*_*_*_CC_FLAGS                   = -mno-mmx -mno-sse
+!ifdef $(SOURCE_DEBUG_ENABLE)
+  MSFT:*_*_X64_GENFW_FLAGS  = --keepexceptiontable
+  GCC:*_*_X64_GENFW_FLAGS   = --keepexceptiontable
+  INTEL:*_*_X64_GENFW_FLAGS = --keepexceptiontable
+!endif
 
 ################################################################################
 #
