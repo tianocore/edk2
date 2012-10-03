@@ -1,7 +1,7 @@
 /** @file
   Initialization functions for EFI UNDI32 driver.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -616,38 +616,38 @@ UndiDriverStop (
 
       UNDI32Device = UNDI_DEV_FROM_THIS (NIIProtocol);
 
-      Status = gBS->UninstallMultipleProtocolInterfaces (
-                      ChildHandleBuffer[Index],
-                      &gEfiDevicePathProtocolGuid,
-                      UNDI32Device->Undi32DevPath,
-                      &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
-                      &UNDI32Device->NIIProtocol_31,
-                      NULL
+      Status = gBS->CloseProtocol (
+                      Controller,
+                      &gEfiPciIoProtocolGuid,
+                      This->DriverBindingHandle,
+                      ChildHandleBuffer[Index]
                       );
       if (!EFI_ERROR (Status)) {
-        //
-        // Restore original PCI attributes
-        //
-        Status = UNDI32Device->NicInfo.Io_Function->Attributes (
-                                                      UNDI32Device->NicInfo.Io_Function,
-                                                      EfiPciIoAttributeOperationSet,
-                                                      UNDI32Device->NicInfo.OriginalPciAttributes,
-                                                      NULL
-                                                      );
-        ASSERT_EFI_ERROR (Status);
-
-        Status = gBS->CloseProtocol (
-                        Controller,
-                        &gEfiPciIoProtocolGuid,
-                        This->DriverBindingHandle,
-                        ChildHandleBuffer[Index]
+        Status = gBS->UninstallMultipleProtocolInterfaces (
+                        ChildHandleBuffer[Index],
+                        &gEfiDevicePathProtocolGuid,
+                        UNDI32Device->Undi32DevPath,
+                        &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
+                        &UNDI32Device->NIIProtocol_31,
+                        NULL
                         );
+        if (!EFI_ERROR (Status)) {
+          //
+          // Restore original PCI attributes
+          //
+          Status = UNDI32Device->NicInfo.Io_Function->Attributes (
+                                                        UNDI32Device->NicInfo.Io_Function,
+                                                        EfiPciIoAttributeOperationSet,
+                                                        UNDI32Device->NicInfo.OriginalPciAttributes,
+                                                        NULL
+                                                        );
 
-        ASSERT_EFI_ERROR (Status);
+          ASSERT_EFI_ERROR (Status);
 
-        gBS->FreePool (UNDI32Device->Undi32DevPath);
-        gBS->FreePool (UNDI32Device);
+          gBS->FreePool (UNDI32Device->Undi32DevPath);
+          gBS->FreePool (UNDI32Device);
 
+        }
       }
     }
 
