@@ -1,7 +1,7 @@
 /** @file
   ACPI Timer implements one instance of Timer Library.
 
-  Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2011, Andrei Warkentin <andreiw@motorola.com>
 
   This program and the accompanying materials are
@@ -22,15 +22,42 @@
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 #include <IndustryStandard/Pci22.h>
+#include <IndustryStandard/Acpi.h>
 
 //
-// PIIX4 Power Management Base Address
+// PCI Location of PIIX4 Power Management PCI Configuration Registers
 //
-STATIC UINT32 mPmba;
+#define PIIX4_POWER_MANAGEMENT_BUS       0x00
+#define PIIX4_POWER_MANAGEMENT_DEVICE    0x01
+#define PIIX4_POWER_MANAGEMENT_FUNCTION  0x03
 
-#define PCI_BAR_IO             0x1
-#define ACPI_TIMER_FREQUENCY   3579545
-#define ACPI_TIMER_COUNT_SIZE  0x01000000
+//
+// Macro to access PIIX4 Power Management PCI Configuration Registers
+//
+#define PIIX4_PCI_POWER_MANAGEMENT_REGISTER(Register) \
+  PCI_LIB_ADDRESS (                                   \
+    PIIX4_POWER_MANAGEMENT_BUS,                       \
+    PIIX4_POWER_MANAGEMENT_DEVICE,                    \
+    PIIX4_POWER_MANAGEMENT_FUNCTION,                  \
+    Register                                          \
+    )
+
+//
+// PIIX4 Power Management PCI Configuration Registers
+//
+#define PMBA                PIIX4_PCI_POWER_MANAGEMENT_REGISTER (0x40)
+#define   PMBA_RTE          BIT0
+#define PMREGMISC           PIIX4_PCI_POWER_MANAGEMENT_REGISTER (0x80)
+#define   PMIOSE            BIT0
+
+//
+// The ACPI Time in the PIIX4 is a 24-bit counter
+//
+#define ACPI_TIMER_COUNT_SIZE  BIT24
+
+//
+// Offset in the PIIX4 Power Management Base Address to the ACPI Timer 
+//
 #define ACPI_TIMER_OFFSET      0x8
 
 /**
@@ -48,30 +75,22 @@ AcpiTimerLibConstructor (
   VOID
   )
 {
-  UINT8 Device;
+  //
+  // Check to see if the PIIX4 Power Management Base Address is already enabled
+  //
+  if ((PciRead8 (PMREGMISC) & PMIOSE) == 0) {
+    //
+    // If the PIIX4 Power Management Base Address is not programmed, 
+    // then program the PIIX4 Power Management Base Address from a PCD.
+    //
+    PciAndThenOr32 (PMBA, (UINT32)(~0x0000FFC0), PcdGet16 (PcdAcpiPmBaseAddress));
 
-  Device = 1;
-  // Device = 7;
-
-  if (PciRead8 (PCI_LIB_ADDRESS (0,Device,3,0x80)) & 1) {
-    mPmba = PciRead32 (PCI_LIB_ADDRESS (0,Device,3,0x40));
-    ASSERT (mPmba & PCI_BAR_IO);
-    mPmba &= ~PCI_BAR_IO;
-  } else {
-    mPmba = PcdGet16 (PcdAcpiPmBaseAddress);
-
-    PciAndThenOr32 (PCI_LIB_ADDRESS (0,Device,3,0x40),
-                    (UINT32) ~0xFFC0, mPmba);
-    PciOr8 (
-      PCI_LIB_ADDRESS (0, Device, 3, PCI_COMMAND_OFFSET),
-      EFI_PCI_COMMAND_IO_SPACE
-      );
+    //
+    // Enable PMBA I/O port decodes in PMREGMISC
+    //
+    PciOr8 (PMREGMISC, PMIOSE);
   }
-
-  //
-  // ACPI Timer enable is in Bus 0, Device ?, Function 3
-  //
-  PciOr8         (PCI_LIB_ADDRESS (0,Device,3,0x80), 0x01);
+  
   return RETURN_SUCCESS;
 }
 
@@ -83,13 +102,15 @@ AcpiTimerLibConstructor (
   @return The tick counter read.
 
 **/
-STATIC
 UINT32
 InternalAcpiGetTimerTick (
   VOID
   )
 {
-  return IoRead32 (mPmba + ACPI_TIMER_OFFSET);
+  //
+  //   Read PMBA to read and return the current ACPI timer value.
+  //
+  return IoRead32 ((PciRead32 (PMBA) & ~PMBA_RTE) + ACPI_TIMER_OFFSET);
 }
 
 /**
@@ -101,7 +122,6 @@ InternalAcpiGetTimerTick (
   @param  Delay     A period of time to delay in ticks.
 
 **/
-STATIC
 VOID
 InternalAcpiDelay (
   IN      UINT32                    Delay
