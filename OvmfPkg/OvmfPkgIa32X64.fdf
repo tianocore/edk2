@@ -14,6 +14,7 @@
 ##
 
 ################################################################################
+!ifndef $(FD_SIZE_2MB)
 [FD.OVMF]
 BaseAddress   = 0xFFF00000
 Size          = 0x00100000
@@ -26,6 +27,20 @@ FV = FVMAIN_COMPACT
 
 0x000EC000|0x14000
 FV = SECFV
+!else
+[FD.OVMF]
+BaseAddress   = 0xFFE00000
+Size          = 0x00200000
+ErasePolarity = 1
+BlockSize     = 0x1000
+NumBlocks     = 0x200
+
+0x00000000|0x001CC000
+FV = FVMAIN_COMPACT
+
+0x001CC000|0x34000
+FV = SECFV
+!endif
 
 ################################################################################
 
