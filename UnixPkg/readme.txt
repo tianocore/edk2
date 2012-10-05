@@ -1,3 +1,7 @@
+Deprecation Notice
+==================
+UnixPkg is deprecated. Please see UnixPkg/Deprecated.txt for more information.
+
 Unix Simulation Platform
 ========================
 

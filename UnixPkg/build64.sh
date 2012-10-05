@@ -124,5 +124,6 @@ echo `which build`
 build -p $WORKSPACE/UnixPkg/UnixPkgX64.dsc      -a X64 -t $TARGET_TOOLS -D SEC_ONLY -n 3 $1 $2 $3 $4 $5 $6 $7 $8  modules
 build -p $WORKSPACE/UnixPkg/UnixPkgX64.dsc      -a X64 -t $UNIXPKG_TOOLS $NETWORK_SUPPORT -n 3 $1 $2 $3 $4 $5 $6 $7 $8
 cp $WORKSPACE/Build/UnixX64/DEBUG_"$TARGET_TOOLS"/X64/SecMain $WORKSPACE/Build/UnixX64/DEBUG_"$UNIXPKG_TOOLS"/X64
+echo NOTE: UnixPkg is deprecated. Please see UnixPkg/Deprecated.txt for more information.
 exit $?
 

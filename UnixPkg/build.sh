@@ -118,5 +118,6 @@ done
 echo $PATH
 echo `which build`
 build -p $WORKSPACE/UnixPkg/UnixPkg.dsc         -a IA32 -t $TARGET_TOOLS $NETWORK_SUPPORT -n 3 $1 $2 $3 $4 $5 $6 $7 $8
+echo NOTE: UnixPkg is deprecated. Please see UnixPkg/Deprecated.txt for more information.
 exit $?
 

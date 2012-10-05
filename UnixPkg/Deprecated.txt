@@ -1,0 +1,5 @@
+UnixPkg is deprecated.
+
+The same functionality is supported using the EmulatorPkg.
+Please see EmulatorPkg/README for more information about EmulatorPkg.
+
