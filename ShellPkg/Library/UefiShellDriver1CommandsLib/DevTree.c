@@ -1,7 +1,7 @@
 /** @file
   Main file for DevTree shell Driver1 function.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -84,23 +84,6 @@ DoDevTreeForHandle(
     return SHELL_SUCCESS;
   }
 
-  //
-  // If we are at the begining then we want root handles they have no parents and do have device path.
-  //
-  if (IndentCharCount == 0) {
-    Status = gBS->OpenProtocol (
-                  TheHandle,
-                  &gEfiDevicePathProtocolGuid,
-                  NULL,
-                  NULL,
-                  NULL,
-                  EFI_OPEN_PROTOCOL_TEST_PROTOCOL
-                 );
-    if (EFI_ERROR (Status)) {
-      return SHELL_SUCCESS;
-    }
-  }
-
   FormatString        = AllocateZeroPool(StrSize(HiiString) + (10)*sizeof(FormatString[0]));
 
   ASSERT(HiiString    != NULL);
@@ -169,6 +152,8 @@ ShellCommandRunDevTree (
   EFI_HANDLE          TheHandle;
   BOOLEAN             FlagD;
   UINT64              Intermediate;
+  UINTN               ParentControllerHandleCount;
+  EFI_HANDLE          *ParentControllerHandleBuffer;
 
   ShellStatus         = SHELL_SUCCESS;
   Status              = EFI_SUCCESS;
@@ -226,6 +211,39 @@ ShellCommandRunDevTree (
         if (TheHandle == NULL){
           break;
         }
+
+        //
+        // Skip handles that do not have device path protocol
+        //
+        Status = gBS->OpenProtocol (
+                      TheHandle,
+                      &gEfiDevicePathProtocolGuid,
+                      NULL,
+                      NULL,
+                      NULL,
+                      EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+                     );
+        if (EFI_ERROR (Status)) {
+          continue;
+        }
+
+        //
+        // Skip handles that do have parents
+        //
+        ParentControllerHandleBuffer = NULL;
+        Status = PARSE_HANDLE_DATABASE_PARENTS (
+                   TheHandle,
+                   &ParentControllerHandleCount,
+                   &ParentControllerHandleBuffer
+                   );
+        SHELL_FREE_NON_NULL (ParentControllerHandleBuffer);
+        if (ParentControllerHandleCount > 0) {
+          continue;
+        }
+
+        //
+        // Start a devtree from TheHandle that has a device path and no parents
+        //
         ShellStatus = DoDevTreeForHandle(TheHandle, Language, FlagD, 0, HiiString);
       }
     } else {

@@ -1,7 +1,7 @@
 /** @file
   Main file for Dh shell Driver1 function.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -394,11 +394,14 @@ DisplayDriverModelHandle (
                   Language,
                   &DriverName
                   );
-        if (DriverName == NULL) {
+        if (EFI_ERROR (Status)) {
           Status = GetDriverImageName (
                     DriverBindingHandleBuffer[Index],
                     &DriverName
                     );
+          if (EFI_ERROR (Status)) {
+            DriverName = NULL;
+          }
         }
 
         if (Image) {
@@ -537,6 +540,9 @@ DisplayDriverModelHandle (
   }
 
   Status = GetDriverName (Handle, Language, &DriverName);
+  if (EFI_ERROR (Status)) {
+    DriverName = NULL;
+  }
 
   ShellPrintHiiEx(
     -1, 
@@ -548,11 +554,13 @@ DisplayDriverModelHandle (
     DriverName!=NULL?DriverName:L"<Unknown>"
     );
   SHELL_FREE_NON_NULL(DriverName);
-  DriverName = NULL;
   Status = GetDriverImageName (
             Handle,
             &DriverName
             );
+  if (EFI_ERROR (Status)) {
+    DriverName = NULL;
+  }
   ShellPrintHiiEx(
     -1, 
     -1, 
