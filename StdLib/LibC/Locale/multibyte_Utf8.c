@@ -15,9 +15,9 @@
 #include  <wchar.h>
 #include  <sys/types.h>
 
-typedef      int  ch_UCS4;
+typedef      int      ch_UCS4;
 
-static  mbstate_t         LocalConvState = {0};
+static  mbstate_t     LocalConvState = {0};
 
 /** Map a UTF-8 encoded prefix byte to a sequence length.
     Zero means illegal prefix, but valid surrogate if < 0xC0.
@@ -59,12 +59,12 @@ UINT8 utf8_code_length[256] = {
 
 /** Process one byte of a multibyte character.
 
-    @param  ch
-    @param  ps
+    @param[in]      ch    One byte of a multibyte character.
+    @param[in,out]  ps    Pointer to a conversion state object.
 
-    @retval   -2
-    @retval   -1
-    @retval   1:4
+    @retval   -2      ch is an incomplete but potentially valid character.
+    @retval   -1      ch is not valid in this context.
+    @retval   1:4     The length, in bytes, of the character ch just completed.
 **/
 static
 int
@@ -174,10 +174,10 @@ ProcessOneByte(unsigned char ch, mbstate_t *ps)
 
 /** Convert one Multibyte sequence.
 
-    @param  Dest
-    @param  Src
-    @param  Len
-    @param  pS
+    @param[out]   Dest      Pointer to output location, or NULL
+    @param[in]    Src       Multibyte Source (UTF8)
+    @param[in]    Len       Max Number of bytes to convert
+    @param[in]    pS        Pointer to State struct., or NULL
 
     @retval   -2      Bytes processed comprise an incomplete, but potentially valid, character.
     @retval   -1      An encoding error was encountered.  ps->E indicates the number of bytes consumed.
@@ -219,93 +219,220 @@ DecodeOneStateful(
   return NumConv;
 }
 
-/** Convert wide characters (UTF16) into multibyte characters (UTF8)
+/*  Determine the number of bytes needed to represent a Wide character
+    as a MBCS character.
+
+    A single wide character may convert into a one, two, three, or four byte
+    narrow (MBCS or UTF-8) character.  The number of MBCS bytes can be determined
+    as follows.
+
+    If WCS char      < 0x00000080      One Byte
+    Else if WCS char < 0x0000D800      Two Bytes
+    Else                               Three Bytes
+
+    Since UEFI only supports the Unicode Base Multilingual Plane (BMP),
+    Four-byte characters are not supported.
+
+    @param[in]    InCh      Wide character to test.
+
+    @retval     -1      Improperly formed character
+    @retval      0      InCh is 0x0000
+    @retval     >0      Number of bytes needed for the MBCS character
+*/
+int
+EFIAPI
+OneWcToMcLen(const wchar_t InCh)
+{
+  ssize_t   NumBytes;
+
+  if(InCh == 0) {             //    Is this a NUL, 0x0000 ?
+    NumBytes = 0;
+  }
+  else if(InCh < 0x0080) {    //    Is this a 1-byte character?
+    NumBytes = 1;
+  }
+  else if(InCh < 0x0800) {    //    Is this a 2-byte character?
+    NumBytes = 2;
+  }
+  else if((InCh >= 0xD800) && (InCh < 0xE000)) {    //    Is this a surrogate?
+    NumBytes = -1;
+  }
+  else {
+    NumBytes = 3;             //    Otherwise, it must be a 3-byte character.
+  }
+  return (int)NumBytes;      // Return extimate of required bytes.
+}
+
+/*  Determine the number of bytes needed to represent a Wide character string
+    as a MBCS string of given maximum length.  Will optionally return the number
+    of wide characters that would be consumed.
+
+    A single wide character may convert into a one, two, three, or four byte
+    narrow (MBCS or UTF-8) character.  The number of MBCS bytes can be determined
+    as follows.
+
+    If WCS char      < 0x00000080      One Byte
+    Else if WCS char < 0x00000800      Two Bytes
+    Else if WCS char < 0x00010000      Three Bytes
+    Else                               Four Bytes
+
+    Since UEFI only supports the Unicode Base Multilingual Plane (BMP),
+    Four-byte characters should not be encountered.
+
+    @param[in]    Src       Pointer to a wide character string.
+    @param[in]    Limit     Maximum number of bytes the converted string may occupy.
+    @param[out]   NumChar   Pointer to where to store the number of wide characters, or NULL.
+
+    @return     The number of bytes required to convert Src to MBCS,
+                not including the terminating NUL.  If NumChar is not NULL, the number
+                of characters represented by the return value will be written to
+                where it points.
+*/
+size_t
+EFIAPI
+EstimateWtoM(const wchar_t * Src, size_t Limit, size_t *NumChar)
+{
+  ssize_t    Estimate;
+  size_t    CharCount;
+  ssize_t   NumBytes;
+  wchar_t   EChar;
+
+  Estimate  = 0;
+  CharCount = 0;
+  EChar = *Src++;               // Get the initial character and point to next
+  while(((NumBytes = OneWcToMcLen(EChar)) > 0)  &&
+        ((size_t)(Estimate + NumBytes) < Limit))
+  {                             // Until one of the source characters is NUL
+    ++CharCount;                //    Count this character.
+    Estimate += NumBytes;       //    Count the Bytes for this character
+    EChar = *Src++;             //    Get the next source character and point to the next.
+  }
+  if(NumChar != NULL) {
+    *NumChar = CharCount;
+  }
+  return (size_t)Estimate;      // Return esimate of required bytes.
+}
+
+/*  Determine the number of characters in a MBCS string.
+    MBCS characters are one to four bytes long.  By examining the first byte
+    of a MBCS character, one can determine the number of bytes comprising the
+    character.
+
+    0x00 - 0x7F     One
+    0xC0 - 0xDF     Two
+    0xE0 - 0xEF     Three
+    0xF0 - 0xF7     Four
+
+    Since UEFI only supports the Unicode Base Multilingual Plane (BMP),
+    Four-byte characters should not be encountered.
+
+    @param[in]    Src     The string to examine
+
+    @return   The number of characters represented by the MBCS string.
+**/
+size_t
+EFIAPI
+CountMbcsChars(const char *Src)
+{
+  size_t      Count;
+  char        EChar;
+
+  Count = 0;
+  EChar = *Src++;
+  while(EChar != 0) {
+    if(EChar < 0x80) {
+      ++Count;
+    }
+    else if(EChar < 0xE0) {
+      Count += 2;
+      ++Src;
+    }
+    else if(EChar < 0xF0) {
+      Count += 3;
+      Src += 2;
+    }
+    else {
+      // Ill-formed character
+      break;
+    }
+  }
+  return Count;
+}
+
+/** Convert a wide character (UTF16) into a multibyte character (UTF8)
+
+    Converts a wide character into a corresponding multibyte character that
+    begins in the conversion state described by the object pointed to by ps.
+    If dst is not a null pointer, the converted character is then stored into
+    the array pointed to by dst.
+
+    It is the caller's responsibility to ensure that Dest is large enough to
+    hold the resulting MBCS sequence.
 
     @param  s       Pointer to the wide-character string to convert
-    @param  size    Number of wide characters in s.  size <= wcslen(s);
+    @param  Dest    Pointer to the buffer in which to place the converted sequence, or NULL.
 
-    @return A newly allocated buffer containing the converted string is returned,
-            or NULL if an error occurred.  Global variable errno contains more
-            information if NULL is returned.
+    @retval   -1    An error occurred.  The error reason is in errno.
+    @retval   >=0   The number of bytes stored into Dest.
 **/
 ssize_t
-EncodeUtf8(char *Dest, wchar_t *s, ssize_t size)
+EncodeUtf8(char *Dest, wchar_t ch)
 {
   char       *p;              /* next free byte in build buffer */
-  char       *v;              /* next free byte in destination */
-  ssize_t     nneeded;        /* number of result bytes needed */
-  int         i;              /* index into s of next input byte */
   int         NumInBuff;      // number of bytes in Buff
   char        Buff[4];        // Buffer into which each character is built
 
-  assert(s != NULL);
-  assert(size >= 0);
-
-  v = Dest;
-  nneeded = 0;
-  if((size * MB_LEN_MAX) / MB_LEN_MAX != size) {
-    // size is too large and resulted in overflow when multiplied by MB_LEN_MAX
-    errno = EINVAL;
-    return (ssize_t)-1;
-  }
-
- for (i = 0; i < size;) {
-    ch_UCS4 ch = s[i++];
     p = Buff;
 
-    if (ch < 0x80) {
-      /* Encode ASCII -- One Byte */
-      *p++ = (char) ch;
-    }
-    else if (ch < 0x0800) {
-      /* Encode Latin-1 -- Two Byte */
-      *p++ = (char)(0xc0 | (ch >> 6));
-      *p++ = (char)(0x80 | (ch & 0x3f));
-    }
-    else {
+  NumInBuff = 0;
+  if (ch < 0x80) {
+    /* Encode ASCII -- One Byte */
+    *p++ = (char) ch;
+    NumInBuff = 1;
+  }
+  else if (ch < 0x0800) {
+    /* Encode Latin-1 -- Two Byte */
+    *p++ = (char)(0xc0 | (ch >> 6));
+    *p++ = (char)(0x80 | (ch & 0x3f));
+    NumInBuff = 2;
+  }
+  else {
       /* Encode UCS2 Unicode ordinals -- Three Byte */
-      /* Special case: check for high surrogate -- Shouldn't happen in UEFI */
-      if (0xD800 <= ch && ch <= 0xDBFF && i < size) {
-        ch_UCS4 ch2 = s[i];
-        /* Check for low surrogate and combine the two to
-           form a UCS4 value */
-        if (0xDC00 <= ch2 && ch2 <= 0xDFFF) {
-          ch = ((ch - 0xD800) << 10 | (ch2 - 0xDC00)) + 0x10000;
-          i++;
-          /* Encode UCS4 Unicode ordinals -- Four Byte */
-          *p++ = (char)(0xf0 | (ch >> 18));
-          *p++ = (char)(0x80 | ((ch >> 12) & 0x3f));
-          *p++ = (char)(0x80 | ((ch >> 6) & 0x3f));
-          *p++ = (char)(0x80 | (ch & 0x3f));
-          continue;
-        }
-        /* Fall through: handles isolated high surrogates */
+    /* Special case: check for surrogate -- Shouldn't happen in UEFI */
+    if (0xD800 <= ch && ch < 0xE000) {
+      errno = EILSEQ;
+      return -1;
       }
+    else {
       *p++ = (char)(0xe0 | (ch >> 12));
       *p++ = (char)(0x80 | ((ch >> 6) & 0x3f));
       *p++ = (char)(0x80 | (ch & 0x3f));
+      NumInBuff = 3;
     }
-    /*  At this point, Buff holds the converted character which is NumInBuff bytes long.
-        NumInBuff is the value 1, 2, 3, or 4
-    */
-    NumInBuff = (int)(p - Buff);     // Number of bytes in Buff
-    if(Dest != NULL) {        // Save character if Dest is not NULL
-      memcpy(v, Buff, NumInBuff);
-      v += NumInBuff;
+  }
+  /*  At this point, Buff holds the converted character which is NumInBuff bytes long.
+      NumInBuff is the value 1, 2, 3, or 4
+  */
+  if(Dest != NULL) {        // Save character if Dest is not NULL
+    memcpy(Dest, Buff, NumInBuff);
+
+    if(ch != 0) {
+      // Terminate the destination string.
+      Dest[NumInBuff] = '\0';
     }
-    nneeded += NumInBuff;     // Keep track of the number of bytes put into Dest
+    else {
+      NumInBuff = 0;
+    }
   }
-  if(Dest != NULL) {
-    // Terminate the destination string.
-    *v = '\0';
-  }
-  return nneeded;             // Tell the caller
+  return NumInBuff;             // Tell the caller
 }
 
 // ########################  Narrow to Wide Conversions #######################
 
 /** If ps is not a null pointer, the mbsinit function determines whether the
     pointed-to mbstate_t object describes an initial conversion state.
+
+    @param[in]  ps    Pointer to the conversion state object to test.
 
     @return     The mbsinit function returns nonzero if ps is a null pointer
                 or if the pointed-to object describes an initial conversion
@@ -329,8 +456,14 @@ mbsinit(const mbstate_t *ps)
     where internal is the mbstate_t object for the mbrlen function, except that
     the expression designated by ps is evaluated only once.
 
-    @return   The mbrlen function returns a value between zero and n,
-              inclusive, (size_t)(-2), or (size_t)(-1).
+    @param[in]  s     Pointer to a multibyte character sequence.
+    @param[in]  n     Maximum number of bytes to examine.
+    @param[in]  pS    Pointer to the conversion state object.
+
+    @retval   0       The next n or fewer characters complete a NUL.
+    @retval   1..n    The number of bytes that complete the multibyte character.
+    @retval   -2      The next n bytes contribute to an incomplete (but potentially valid) multibyte character.
+    @retval   -1      An encoding error occurred.
 
     Declared in: wchar.h
 **/
@@ -338,10 +471,10 @@ size_t
 mbrlen(
   const char *s,
   size_t n,
-  mbstate_t *ps
+  mbstate_t *pS
   )
 {
-  return mbrtowc(NULL, s, n, ps);
+  return mbrtowc(NULL, s, n, pS);
 }
 
 /** Determine the number of bytes comprising a multibyte character.
@@ -391,6 +524,11 @@ next multibyte character is complete and valid, it determines the value of the
 corresponding wide character and then, if pwc is not a null pointer, stores that value in
 the object pointed to by pwc. If the corresponding wide character is the null wide
 character, the resulting state described is the initial conversion state.
+
+    @param[out]   pwc   Pointer to where the resulting wide character is to be stored.
+    @param[in]     s    Pointer to a multibyte character "string".
+    @param[in]     n    The maximum number of bytes to inspect.
+    @param[in]     ps   Pointer to a conversion state object.
 
     @retval   0             if the next n or fewer bytes complete the multibyte
                             character that corresponds to the null wide
@@ -480,6 +618,11 @@ just past the last multibyte character converted (if any). If conversion stopped
 reaching a terminating null character and if dst is not a null pointer, the resulting state
 described is the initial conversion state.
 
+    @param[out]   dst   Pointer to where the resulting wide character sequence is stored.
+    @param[in]    src   Pointer to a pointer to the multibyte character sequence to convert.
+    @param[in]    len   Maximum number of wide characters to be stored into dst.
+    @param[in]    ps    Pointer to a conversion state object.
+
     @return   If the input conversion encounters a sequence of bytes that do
               not form a valid multibyte character, an encoding error occurs:
               the mbsrtowcs function stores the value of the macro EILSEQ in
@@ -564,20 +707,22 @@ mbsrtowcs(
 **/
 size_t
 mbstowcs(
-  wchar_t *pwcs,
-  const char *s,
-  size_t n
+  wchar_t *Dest,
+  const char *Src,
+  size_t Limit
   )
 {
 
-  /* pwcs may be NULL */
-  /* s may be NULL */
+  /* Dest may be NULL */
+  /* Src may be NULL */
 
-  return mbsrtowcs(pwcs, &s, n, NULL);
+  return mbsrtowcs(Dest, &Src, Limit, NULL);
 }
 
 /** The btowc function determines whether C constitutes a valid single-byte
     character in the initial shift state.
+
+    @param[in]    C   A narrow character to test or convert to wide.
 
     @return   The btowc function returns WEOF if c has the value EOF or if
               (unsigned char)C does not constitute a valid single-byte
@@ -621,6 +766,12 @@ array whose first element is pointed to by S. At most MB_CUR_MAX bytes are store
 wc is a null wide character, a null byte is stored, preceded by any shift sequence needed
 to restore the initial shift state; the resulting state described is the initial conversion state.
 
+    @param[out]     Dest    Pointer to the location in which to store the resulting
+                            multibyte character.  Otherwise, NULL to reset the
+                            conversion state.
+    @param[in]      wchar   The wide character to convert.
+    @param[in,out]  pS      Pointer to a conversion state object, or NULL.
+
     @return   The wcrtomb function returns the number of bytes stored in the
               array object (including any shift sequences). When wc is not a
               valid wide character, an encoding error occurs: the function
@@ -631,26 +782,31 @@ to restore the initial shift state; the resulting state described is the initial
 **/
 size_t
 wcrtomb(
-  char *s,
+  char *Dest,
   wchar_t wchar,
-  mbstate_t *ps
+  mbstate_t *pS
   )
 {
   size_t    RetVal;
 
-  /* s may be NULL */
-  if (s == NULL) {
+  /* Dest may be NULL */
+  if (Dest == NULL) {
     RetVal = 1;
   }
   else {
     if (wchar == L'\0') {
-      *s = '\0';
+      *Dest = '\0';
       RetVal = 1;
     }
     else {
-      RetVal = EncodeUtf8(s, &wchar, 1);
+      RetVal = EncodeUtf8(Dest, wchar);
     }
   }
+  if(pS == NULL) {
+    pS = &LocalConvState;
+  }
+  pS->A = 0;      // Set ps to the initial conversion state
+
   return RetVal;
 }
 
@@ -698,26 +854,30 @@ wctomb(
 }
 
 /** The wcsrtombs function converts a sequence of wide characters from the array
-    indirectly pointed to by S into a sequence of corresponding multibyte
+    indirectly pointed to by Dest into a sequence of corresponding multibyte
     characters that begins in the conversion state described by the object
     pointed to by ps.
 
-    If S is not a null pointer, the converted characters
-    are then stored into the array pointed to by S.  Conversion continues
-    up to and including a terminating null wide character, which is also
-    stored. Conversion stops earlier in two cases: when a wide character is
-    reached that does not correspond to a valid multibyte character, or
-    (if S is not a null pointer) when the next multibyte character would
-    exceed the limit of N total bytes to be stored into the array pointed
-    to by S. Each conversion takes place as if by a call to the wcrtomb
-    function.)
+    If Dest is not a null pointer, the converted characters are stored into the
+    array pointed to by Dest.  Conversion continues up to and including a
+    terminating null wide character, which is also stored. Conversion stops
+    earlier in two cases: when a wide character is reached that does not
+    correspond to a valid multibyte character, or (if Dest is not a null
+    pointer) when the next multibyte character would exceed the limit of Limit
+    total bytes to be stored into the array pointed to by Dest. Each conversion
+    takes place as if by a call to the wcrtomb function.)
 
-    If S is not a null pointer, the pointer object pointed to by pwcs is
+    If Dest is not a null pointer, the pointer object pointed to by Src is
     assigned either a null pointer (if conversion stopped due to reaching
     a terminating null wide character) or the address just past the last wide
     character converted (if any). If conversion stopped due to reaching a
     terminating null wide character, the resulting state described is the
     initial conversion state.
+
+    @param[in]      Dest
+    @param[in,out]  Src
+    @param[in]      Limit   Max number of bytes to store in Dest.
+    @param[in,out]  ps
 
     @return     If conversion stops because a wide character is reached that
                 does not correspond to a valid multibyte character, an
@@ -731,38 +891,50 @@ wctomb(
 **/
 size_t
 wcsrtombs(
-  char *s,
-  const wchar_t **pwcs,
-  size_t n,
-  mbstate_t *ps
+  char           *Dest,
+  const wchar_t **Src,
+  size_t          Limit,
+  mbstate_t      *ps
 )
 {
-  int count = 0;
+  size_t  NumStored;
+  ssize_t MaxBytes;
+  int     count;
+  wchar_t InCh;
 
-  /* s may be NULL */
-  /* pwcs may be NULL */
+  NumStored = 0;
+  MaxBytes  = (ssize_t)Limit;
+
+  /* Dest may be NULL */
+  /* Src may be NULL */
   /* ps appears to be unused */
 
-  if (pwcs == NULL || *pwcs == NULL)
+  if (Src == NULL || *Src == NULL)
     return (0);
 
-  if (s == NULL) {
-    while (*(*pwcs)++ != 0)
-      count++;
-    return(count);
+  if (Dest == NULL) {
+    NumStored = EstimateWtoM(*Src, MaxBytes, NULL);
   }
-
-  if (n != 0) {
-    do {
-      if ((*s++ = (char) *(*pwcs)++) == 0) {
-        *pwcs = NULL;
+  else {
+    while (OneWcToMcLen(InCh = *(*Src)++) <= MaxBytes) {
+      if(InCh == 0) {
+        *Src = NULL;
         break;
       }
-      count++;
-    } while (--n != 0);
+      count = (int)wcrtomb(Dest, InCh, NULL);
+      if(count >= 0) {
+        Dest += count;
+        MaxBytes -= count;
+        NumStored += count;
+      }
+      else {
+        NumStored = (size_t)(-1);
+      }
+    }
   }
 
-  return count;
+
+  return NumStored;
 }
 
 /** Convert a wide-character string into a multibyte character string.
@@ -794,18 +966,22 @@ wcsrtombs(
 **/
 size_t
 wcstombs(
-  char *s,
-  const wchar_t *pwcs,
-  size_t n
+  char           *Dest,
+  const wchar_t  *Src,
+  size_t          Limit
 )
 {
-  /* s may be NULL */
-  return wcsrtombs(s, &pwcs, n, NULL);
+  /* Dest may be NULL */
+  return wcsrtombs(Dest, &Src, Limit, NULL);
 }
 
 /** The wctob function determines whether C corresponds to a member of the extended
     character set whose multibyte character representation is a single byte when in the initial
     shift state.
+
+    wctob needs to be consistent with wcrtomb.
+    If wcrtomb says that a character is representable in 1 byte,
+    then wctob needs to also represent the character as 1 byte.
 
     @return     The wctob function returns EOF if C does not correspond to a multibyte
                 character with length one in the initial shift state. Otherwise, it
@@ -817,13 +993,14 @@ wcstombs(
 int
 wctob(wint_t c)
 {
-  /*  wctob needs to be consistent with wcrtomb.
-      if wcrtomb says that a character is representable in 1 byte,
-      which this implementation always says, then wctob needs to
-      also represent the character as 1 byte.
-  */
-  if (c == WEOF) {
-    return EOF;
+  int   RetVal;
+
+  RetVal = EOF;
+  if(c == 0) {
+    RetVal = 0;
   }
-  return (int)(c & 0xFF);
+  else if (OneWcToMcLen((const wchar_t)c) == 1) {
+    RetVal = (int)(c & 0xFF);
+  }
+  return RetVal;
 }

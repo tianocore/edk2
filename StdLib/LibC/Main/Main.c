@@ -113,10 +113,9 @@ DEBUG_CODE_END();
   for(count = 0; count < Argc; ++count) {
     nArgv[count] = string;
     AVsz = wcstombs(string, Argv[count], nArgvSize);
-    string[AVsz] = 0;   /* NULL terminate the argument */
     DEBUG((DEBUG_INFO, "Cvt[%d] %d \"%s\" --> \"%a\"\n", (INT32)count, (INT32)AVsz, Argv[count], nArgv[count]));
-    string += AVsz + 1;
-    nArgvSize -= AVsz + 1;
+    string += AVsz;
+    nArgvSize -= AVsz;
     if(nArgvSize < 0) {
       Print(L"ABORTING: Internal Argv[%d] conversion error.\n", count);
       exit(EXIT_FAILURE);
