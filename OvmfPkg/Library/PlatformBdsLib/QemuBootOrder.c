@@ -606,6 +606,32 @@ TranslateOfwNodes (
       PciDevFun[1],
       AcpiUid
       );
+  } else if (NumNodes >= 3 &&
+             SubstringEq (OfwNode[1].DriverName, "scsi") &&
+             SubstringEq (OfwNode[2].DriverName, "disk")
+             ) {
+    //
+    // OpenFirmware device path (virtio-blk disk):
+    //
+    //   /pci@i0cf8/scsi@6[,3]/disk@0,0
+    //        ^          ^  ^       ^ ^
+    //        |          |  |       fixed
+    //        |          |  PCI function corresponding to disk (optional)
+    //        |          PCI slot holding disk
+    //        PCI root at system bus port, PIO
+    //
+    // UEFI device path prefix:
+    //
+    //   PciRoot(0x0)/Pci(0x6,0x0)/HD( -- if PCI function is 0 or absent
+    //   PciRoot(0x0)/Pci(0x6,0x3)/HD( -- if PCI function is present and nonzero
+    //
+    Written = UnicodeSPrintAsciiFormat (
+      Translated,
+      *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
+      "PciRoot(0x0)/Pci(0x%x,0x%x)/HD(",
+      PciDevFun[0],
+      PciDevFun[1]
+      );
   } else {
     return RETURN_UNSUPPORTED;
   }
