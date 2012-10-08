@@ -3,7 +3,7 @@
   performance, all the function will only include if the performance
   switch is set.
 
-Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 PERF_HEADER               mPerfHeader;
 PERF_DATA                 mPerfData;
 EFI_PHYSICAL_ADDRESS      mAcpiLowMemoryBase = 0x0FFFFFFFFULL;
+UINT32                    mAcpiLowMemoryLength = 0x4000;
 
 /**
   Get the short verion of PDB file name to be
@@ -135,17 +136,55 @@ GetNameFromHandle (
 
 /**
 
-  Allocates a block of memory and writes performance data of booting into it.
-  OS can processing these record.
-  
+  Allocates a block of memory to store performance data.
+
 **/
 VOID
-WriteBootToOsPerformanceData (
+AllocateMemoryForPerformanceData (
   VOID
   )
 {
+  EFI_STATUS    Status;
+
+  if (mAcpiLowMemoryBase == 0x0FFFFFFFF) {
+    //
+    // Allocate a block of memory that contain performance data to OS
+    //
+    Status = gBS->AllocatePages (
+                    AllocateMaxAddress,
+                    EfiReservedMemoryType,
+                    EFI_SIZE_TO_PAGES (mAcpiLowMemoryLength),
+                    &mAcpiLowMemoryBase
+                    );
+    if (!EFI_ERROR (Status)) {
+      gRT->SetVariable (
+             L"PerfDataMemAddr",
+             &gPerformanceProtocolGuid,
+             EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+             sizeof (EFI_PHYSICAL_ADDRESS),
+             &mAcpiLowMemoryBase
+             );
+    }
+  }
+}
+
+/**
+
+  Writes performance data of booting into the allocated memory.
+  OS can process these records.
+
+  @param  Event                 The triggered event.
+  @param  Context               Context for this event.
+
+**/
+VOID
+EFIAPI
+WriteBootToOsPerformanceData (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
   EFI_STATUS                Status;
-  UINT32                    AcpiLowMemoryLength;
   UINT32                    LimitCount;
   EFI_HANDLE                *Handles;
   UINTN                     NoHandles;
@@ -170,6 +209,15 @@ WriteBootToOsPerformanceData (
   // List of flags indicating PerfEntry contains DXE handle
   //
   BOOLEAN                   *PerfEntriesAsDxeHandle;
+
+  //
+  // Record the performance data for End of BDS
+  //
+  PERF_END(NULL, "BDS", NULL, 0);
+
+  if (mAcpiLowMemoryBase == 0x0FFFFFFFF) {
+    return;
+  }
 
   //
   // Retrieve time stamp count as early as possible
@@ -208,27 +256,8 @@ WriteBootToOsPerformanceData (
     return ;
   }
 
-
-  AcpiLowMemoryLength = 0x4000;
-  if (mAcpiLowMemoryBase == 0x0FFFFFFFF) {
-    //
-    // Allocate a block of memory that contain performance data to OS
-    //
-    Status = gBS->AllocatePages (
-                    AllocateMaxAddress,
-                    EfiReservedMemoryType,
-                    EFI_SIZE_TO_PAGES (AcpiLowMemoryLength),
-                    &mAcpiLowMemoryBase
-                    );
-    if (EFI_ERROR (Status)) {
-      FreePool (Handles);
-      return ;
-    }
-  }
-
-
   Ptr        = (UINT8 *) ((UINT32) mAcpiLowMemoryBase + sizeof (PERF_HEADER));
-  LimitCount = (AcpiLowMemoryLength - sizeof (PERF_HEADER)) / sizeof (PERF_DATA);
+  LimitCount = (mAcpiLowMemoryLength - sizeof (PERF_HEADER)) / sizeof (PERF_DATA);
 
   NumPerfEntries = 0;
   LogEntryKey    = 0;
@@ -345,14 +374,6 @@ Done:
     &mPerfHeader,
     sizeof (PERF_HEADER)
     );
-
-  gRT->SetVariable (
-        L"PerfDataMemAddr",
-        &gPerformanceProtocolGuid,
-        EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-        sizeof (EFI_PHYSICAL_ADDRESS),
-        &mAcpiLowMemoryBase
-        );
 
   return ;
 }

@@ -411,15 +411,15 @@ S3ResumeBootOs (
   }
 
   //
-  // report status code on S3 resume
-  //
-  REPORT_STATUS_CODE (EFI_PROGRESS_CODE, EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_PC_OS_WAKE);
-
-  //
   // Install EndOfPeiPpi
   //
   Status = PeiServicesInstallPpi (&mPpiListEndOfPeiTable);
   ASSERT_EFI_ERROR (Status);
+
+  //
+  // report status code on S3 resume
+  //
+  REPORT_STATUS_CODE (EFI_PROGRESS_CODE, EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_PC_OS_WAKE);
 
   PERF_CODE (
     WriteToOsS3PerformanceData ();
