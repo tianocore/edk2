@@ -1946,6 +1946,168 @@ EslSocketCopyFragmentedBuffer (
 
 
 /**
+  Free the socket.
+
+  This routine frees the socket structure and handle resources.
+
+  The ::close routine calls EslServiceFreeProtocol which then calls
+  this routine to free the socket context structure and close the
+  handle.
+
+  @param [in] pSocketProtocol Address of an ::EFI_SOCKET_PROTOCOL structure.
+  
+  @param [out] pErrno         Address to receive the errno value upon completion.
+
+  @retval EFI_SUCCESS   The socket resources were returned successfully.
+
+ **/
+EFI_STATUS
+EslSocketFree (
+  IN EFI_SOCKET_PROTOCOL * pSocketProtocol,
+  IN int * pErrno
+  )
+{
+  EFI_HANDLE ChildHandle;
+  int errno;
+  ESL_LAYER * pLayer;
+  ESL_SOCKET * pSocket;
+  ESL_SOCKET * pSocketPrevious;
+  EFI_STATUS Status;
+  EFI_TPL TplPrevious;
+
+  DBG_ENTER ( );
+
+  //
+  //  Assume failure
+  //
+  errno = EIO;
+  pSocket = NULL;
+  Status = EFI_INVALID_PARAMETER;
+
+  //
+  //  Validate the socket
+  //
+  pLayer = &mEslLayer;
+  if ( NULL != pSocketProtocol ) {
+    pSocket = SOCKET_FROM_PROTOCOL ( pSocketProtocol );
+
+    //
+    //  Synchronize with the socket layer
+    //
+    RAISE_TPL ( TplPrevious, TPL_SOCKETS );
+
+    //
+    //  Walk the socket list
+    //
+    pSocketPrevious = pLayer->pSocketList;
+    if ( NULL != pSocketPrevious ) {
+      if ( pSocket == pSocketPrevious ) {
+        //
+        //  Remove the socket from the head of the list
+        //
+        pLayer->pSocketList = pSocket->pNext;
+      }
+      else {
+        //
+        //  Find the socket in the middle of the list
+        //
+        while (( NULL != pSocketPrevious )
+          && ( pSocket != pSocketPrevious->pNext )) {
+          //
+          //  Set the next socket
+          //
+          pSocketPrevious = pSocketPrevious->pNext;
+        }
+        if ( NULL != pSocketPrevious ) {
+          //
+          //  Remove the socket from the middle of the list
+          //
+          pSocketPrevious = pSocket->pNext;
+        }
+      }
+    }
+    else {
+      DEBUG (( DEBUG_ERROR | DEBUG_POOL,
+                "ERROR - Socket list is empty!\r\n" ));
+    }
+
+    //
+    //  Release the socket layer synchronization
+    //
+    RESTORE_TPL ( TplPrevious );
+
+    //
+    //  Determine if the socket was found
+    //
+    if ( NULL != pSocketPrevious ) {
+      pSocket->pNext = NULL;
+
+      //
+      //  Remove the socket protocol
+      //
+      ChildHandle = pSocket->SocketProtocol.SocketHandle;
+      Status = gBS->UninstallMultipleProtocolInterfaces (
+                ChildHandle,
+                &gEfiSocketProtocolGuid,
+                &pSocket->SocketProtocol,
+                NULL );
+      if ( !EFI_ERROR ( Status )) {
+        DEBUG (( DEBUG_POOL | DEBUG_INFO,
+                    "Removed:   gEfiSocketProtocolGuid from 0x%08x\r\n",
+                    ChildHandle ));
+
+        //
+        //  Free the socket structure
+        //
+        Status = gBS->FreePool ( pSocket );
+        if ( !EFI_ERROR ( Status )) {
+          DEBUG (( DEBUG_POOL,
+                    "0x%08x: Free pSocket, %d bytes\r\n",
+                    pSocket,
+                    sizeof ( *pSocket )));
+          errno = 0;
+        }
+        else {
+          DEBUG (( DEBUG_ERROR | DEBUG_POOL,
+                    "ERROR - Failed to free pSocket 0x%08x, Status: %r\r\n",
+                    pSocket,
+                    Status ));
+        }
+      }
+      else {
+        DEBUG (( DEBUG_ERROR | DEBUG_POOL | DEBUG_INFO,
+                    "ERROR - Failed to remove gEfiSocketProtocolGuid from 0x%08x, Status: %r\r\n",
+                    ChildHandle,
+                    Status ));
+      }
+    }
+    else {
+      DEBUG (( DEBUG_ERROR | DEBUG_INFO,
+                "ERROR - The socket was not in the socket list!\r\n" ));
+      Status = EFI_NOT_FOUND;
+    }
+  }
+  else {
+    DEBUG (( DEBUG_ERROR,
+              "ERROR - Invalid parameter pSocketProtocol is NULL\r\n" ));
+  }
+
+  //
+  //  Return the errno value if possible
+  //
+  if ( NULL != pErrno ) {
+    *pErrno = errno;
+  }
+
+  //
+  //  Return the operation status
+  //
+  DBG_EXIT_STATUS ( Status );
+  return Status;
+}
+
+
+/**
   Get the local address.
 
   This routine calls the network specific layer to get the network

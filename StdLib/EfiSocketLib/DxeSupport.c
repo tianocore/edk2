@@ -91,11 +91,8 @@ EslDxeDestroyChild (
   )
 {
   ESL_LAYER * pLayer;
-  ESL_SOCKET * pSocket;
-  ESL_SOCKET * pSocketPrevious;
   EFI_SOCKET_PROTOCOL * pSocketProtocol;
   EFI_STATUS Status;
-  EFI_TPL TplPrevious;
 
   DBG_ENTER ( );
 
@@ -112,101 +109,10 @@ EslDxeDestroyChild (
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if ( !EFI_ERROR ( Status )) {
-    pSocket = SOCKET_FROM_PROTOCOL ( pSocketProtocol );
-
     //
-    //  Synchronize with the socket layer
+    //  Free the socket resources
     //
-    RAISE_TPL ( TplPrevious, TPL_SOCKETS );
-
-    //
-    //  Walk the socket list
-    //
-    pSocketPrevious = pLayer->pSocketList;
-    if ( NULL != pSocketPrevious ) {
-      if ( pSocket == pSocketPrevious ) {
-        //
-        //  Remove the socket from the head of the list
-        //
-        pLayer->pSocketList = pSocket->pNext;
-      }
-      else {
-        //
-        //  Find the socket in the middle of the list
-        //
-        while (( NULL != pSocketPrevious )
-          && ( pSocket != pSocketPrevious->pNext )) {
-          //
-          //  Set the next socket
-          //
-          pSocketPrevious = pSocketPrevious->pNext;
-        }
-        if ( NULL != pSocketPrevious ) {
-          //
-          //  Remove the socket from the middle of the list
-          //
-          pSocketPrevious = pSocket->pNext;
-        }
-      }
-    }
-    else {
-      DEBUG (( DEBUG_ERROR | DEBUG_POOL,
-                "ERROR - Socket list is empty!\r\n" ));
-    }
-
-    //
-    //  Release the socket layer synchronization
-    //
-    RESTORE_TPL ( TplPrevious );
-
-    //
-    //  Determine if the socket was found
-    //
-    if ( NULL != pSocketPrevious ) {
-      pSocket->pNext = NULL;
-
-      //
-      //  Remove the socket protocol
-      //
-      Status = gBS->UninstallMultipleProtocolInterfaces (
-                ChildHandle,
-                &gEfiSocketProtocolGuid,
-                &pSocket->SocketProtocol,
-                NULL );
-      if ( !EFI_ERROR ( Status )) {
-        DEBUG (( DEBUG_POOL | DEBUG_INFO,
-                    "Removed:   gEfiSocketProtocolGuid from 0x%08x\r\n",
-                    ChildHandle ));
-
-        //
-        //  Free the socket structure
-        //
-        Status = gBS->FreePool ( pSocket );
-        if ( !EFI_ERROR ( Status )) {
-          DEBUG (( DEBUG_POOL,
-                    "0x%08x: Free pSocket, %d bytes\r\n",
-                    pSocket,
-                    sizeof ( *pSocket )));
-        }
-        else {
-          DEBUG (( DEBUG_ERROR | DEBUG_POOL,
-                    "ERROR - Failed to free pSocket 0x%08x, Status: %r\r\n",
-                    pSocket,
-                    Status ));
-        }
-      }
-      else {
-        DEBUG (( DEBUG_ERROR | DEBUG_POOL | DEBUG_INFO,
-                    "ERROR - Failed to remove gEfiSocketProtocolGuid from 0x%08x, Status: %r\r\n",
-                    ChildHandle,
-                    Status ));
-      }
-    }
-    else {
-      DEBUG (( DEBUG_ERROR | DEBUG_INFO,
-                "ERROR - The socket was not in the socket list!\r\n" ));
-      Status = EFI_NOT_FOUND;
-    }
+    Status = EslSocketFree ( pSocketProtocol, NULL );
   }
   else {
     DEBUG (( DEBUG_ERROR,

@@ -1188,6 +1188,28 @@ EslSocketCopyFragmentedBuffer (
   );
 
 /**
+  Free the socket.
+
+  This routine frees the socket structure and handle resources.
+
+  The ::close routine calls EslServiceFreeProtocol which then calls
+  this routine to free the socket context structure and close the
+  handle.
+
+  @param [in] pSocketProtocol Address of an ::EFI_SOCKET_PROTOCOL structure.
+  
+  @param [out] pErrno         Address to receive the errno value upon completion.
+
+  @retval EFI_SUCCESS   The socket resources were returned successfully.
+
+ **/
+EFI_STATUS
+EslSocketFree (
+  IN EFI_SOCKET_PROTOCOL * pSocketProtocol,
+  IN int * pErrno
+  );
+
+/**
   Free the ESL_IO_MGMT event and structure
 
   This support routine walks the free list to close the event in

@@ -613,6 +613,26 @@ AcceptNB (
   );
 
 /**
+  Free the socket resources
+
+  This releases the socket resources allocated by calling
+  EslServiceGetProtocol.
+
+  This routine is called from the ::close routine in BsdSocketLib
+  to release the socket resources.
+
+  @param [in] pSocketProtocol   Address of an ::EFI_SOCKET_PROTOCOL
+                                structure
+
+  @return       Value for ::errno, zero (0) indicates success.
+
+ **/
+int
+EslServiceFreeProtocol (
+  IN EFI_SOCKET_PROTOCOL * pSocketProtocol
+  );
+
+/**
   Connect to the EFI socket library
 
   @param [in] ppSocketProtocol  Address to receive the socket protocol address

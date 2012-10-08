@@ -23,6 +23,59 @@
 
 
 /**
+  Free the socket resources
+
+  This releases the socket resources allocated by calling
+  EslServiceGetProtocol.
+
+  This routine is called from the ::close routine in BsdSocketLib
+  to release the socket resources.
+
+  @param [in] pSocketProtocol   Address of an ::EFI_SOCKET_PROTOCOL
+                                structure
+
+  @return       Value for ::errno, zero (0) indicates success.
+
+ **/
+int
+EslServiceFreeProtocol (
+  IN EFI_SOCKET_PROTOCOL * pSocketProtocol
+  )
+{
+  EFI_SERVICE_BINDING_PROTOCOL * pServiceBinding;
+  int RetVal;
+  EFI_STATUS Status;
+
+  //
+  //  Assume success
+  //
+  RetVal = 0;
+
+  //
+  //  Locate the socket protocol
+  //
+  Status = gBS->LocateProtocol ( &gEfiSocketServiceBindingProtocolGuid,
+                                 NULL,
+                                 (VOID **) &pServiceBinding );
+  if ( !EFI_ERROR ( Status )) {
+    //
+    //  Release the handle
+    //
+    Status = pServiceBinding->DestroyChild ( pServiceBinding,
+                                             pSocketProtocol->SocketHandle );
+  }
+  if ( EFI_ERROR ( Status )) {
+    RetVal = EIO;
+  }
+
+  //
+  //  Return the operation status
+  //
+  return RetVal;
+}
+
+
+/**
   Connect to the EFI socket library
 
   This routine establishes a connection to the socket driver

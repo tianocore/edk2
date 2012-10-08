@@ -31,7 +31,6 @@ BslSocketCloseWork (
   IN int * pErrno
   )
 {
-  EFI_SERVICE_BINDING_PROTOCOL * pServiceBinding;
   EFI_STATUS Status;
 
   //
@@ -50,21 +49,9 @@ BslSocketCloseWork (
   }
   if ( !EFI_ERROR ( Status )) {
     //
-    //  Locate the socket protocol
+    //  Release the socket resources
     //
-    Status = gBS->LocateProtocol ( &gEfiSocketServiceBindingProtocolGuid,
-                                   NULL,
-                                   (VOID **) &pServiceBinding );
-    if ( !EFI_ERROR ( Status )) {
-      //
-      //  Release the handle
-      //
-      Status = pServiceBinding->DestroyChild ( pServiceBinding,
-                                               pSocketProtocol->SocketHandle );
-    }
-    if ( EFI_ERROR ( Status )) {
-      *pErrno = EIO;
-    }
+    *pErrno = EslServiceFreeProtocol ( pSocketProtocol );
   }
   else {
     DEBUG (( DEBUG_ERROR,

@@ -69,6 +69,40 @@ CONST EFI_GUID mEslUdp6ServiceGuid __attribute__((weak)) = {
 
 
 /**
+  Free the socket resources
+
+  This releases the socket resources allocated by calling
+  EslServiceGetProtocol.
+
+  This routine is called from the ::close routine in BsdSocketLib
+  to release the socket resources.
+
+  @param [in] pSocketProtocol   Address of an ::EFI_SOCKET_PROTOCOL
+                                structure
+
+  @return       Value for ::errno, zero (0) indicates success.
+
+ **/
+int
+EslServiceFreeProtocol (
+  IN EFI_SOCKET_PROTOCOL * pSocketProtocol
+  )
+{
+  int RetVal;
+
+  //
+  //  Release the socket resources
+  //
+  EslSocketFree ( pSocketProtocol, &RetVal );
+
+  //
+  //  Return the operation status
+  //
+  return RetVal;
+}
+
+
+/**
   Connect to the EFI socket library
 
   This routine creates the ::ESL_SOCKET structure and returns
