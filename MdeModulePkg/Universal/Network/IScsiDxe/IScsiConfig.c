@@ -719,6 +719,7 @@ IScsiFormCallback (
         CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid iSCSI Name!", NULL);
       }
 
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
       break;
 
     case KEY_LOCAL_IP:
