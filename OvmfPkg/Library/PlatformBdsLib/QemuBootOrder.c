@@ -603,9 +603,9 @@ TranslateOfwNodes (
       PciDevFun[1],
       AcpiUid
       );
-   } else {
-     return RETURN_UNSUPPORTED;
-   }
+  } else {
+    return RETURN_UNSUPPORTED;
+  }
 
   //
   // There's no way to differentiate between "completely used up without
