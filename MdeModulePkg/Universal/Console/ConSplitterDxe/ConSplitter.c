@@ -418,49 +418,12 @@ ConSplitterDriverEntry(
   //
   Status = ConSplitterTextOutConstructor (&mConOut);
   if (!EFI_ERROR (Status)) {
-    if (!FeaturePcdGet (PcdConOutGopSupport)) {
-      //
-      // If Graphics Outpurt protocol not supported, UGA Draw protocol is installed
-      // on the virtual handle.
-      //
-      Status = gBS->InstallMultipleProtocolInterfaces (
-                      &mConOut.VirtualHandle,
-                      &gEfiSimpleTextOutProtocolGuid,
-                      &mConOut.TextOut,
-                      &gEfiUgaDrawProtocolGuid,
-                      &mConOut.UgaDraw,
-                      NULL
-                      );
-    } else if (!FeaturePcdGet (PcdConOutUgaSupport)) {
-      //
-      // If UGA Draw protocol not supported, Graphics Output Protocol is installed
-      // on virtual handle.
-      //
-      Status = gBS->InstallMultipleProtocolInterfaces (
-                      &mConOut.VirtualHandle,
-                      &gEfiSimpleTextOutProtocolGuid,
-                      &mConOut.TextOut,
-                      &gEfiGraphicsOutputProtocolGuid,
-                      &mConOut.GraphicsOutput,
-                      NULL
-                      );
-    } else {
-      //
-      // Boot Graphics Output protocol and UGA Draw protocol are supported,
-      // both they will be installed on virtual handle.
-      //
-      Status = gBS->InstallMultipleProtocolInterfaces (
-                      &mConOut.VirtualHandle,
-                      &gEfiSimpleTextOutProtocolGuid,
-                      &mConOut.TextOut,
-                      &gEfiGraphicsOutputProtocolGuid,
-                      &mConOut.GraphicsOutput,
-                      &gEfiUgaDrawProtocolGuid,
-                      &mConOut.UgaDraw,
-                      NULL
-                      );
-    }
-
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &mConOut.VirtualHandle,
+                    &gEfiSimpleTextOutProtocolGuid,
+                    &mConOut.TextOut,
+                    NULL
+                    );
     if (!EFI_ERROR (Status)) {
       //
       // Update the EFI System Table with new virtual console
@@ -1315,7 +1278,7 @@ ConSplitterConOutDriverBindingStart (
 
       FreePool (Info);
 
-    } else if (UgaDraw != NULL  && FeaturePcdGet (PcdUgaConsumeSupport)) {
+    } else if (UgaDraw != NULL) {
       Status = UgaDraw->GetMode (
                  UgaDraw,
                  &mConOut.UgaHorizontalResolution,
@@ -2798,7 +2761,7 @@ ConSplitterAddGraphicsOutputMode (
         }
       }
     }
-  } else if (UgaDraw != NULL && FeaturePcdGet (PcdUgaConsumeSupport)) {
+  } else if (UgaDraw != NULL) {
     //
     // Graphics console driver can ensure the same mode for all GOP devices
     // so we can get the current mode from this video device
@@ -2838,7 +2801,7 @@ Done:
   if (GraphicsOutput != NULL) {
     Private->CurrentNumberOfGraphicsOutput++;
   }
-  if (UgaDraw != NULL && FeaturePcdGet (PcdUgaConsumeSupport)) {
+  if (UgaDraw != NULL) {
     Private->CurrentNumberOfUgaDraw++;
   }
 
@@ -3061,13 +3024,13 @@ ConSplitterTextOutAddDevice (
   ASSERT (MaxMode >= 1);
 
   DeviceStatus = EFI_DEVICE_ERROR;
-  if (FeaturePcdGet (PcdConOutGopSupport)) {
-    //
-    // If GOP is produced by Consplitter, this device display mode will be added into Graphics Ouput modes.
-    //
-    if ((GraphicsOutput != NULL) || (UgaDraw != NULL && FeaturePcdGet (PcdUgaConsumeSupport))) {
-      DeviceStatus = ConSplitterAddGraphicsOutputMode (Private, GraphicsOutput, UgaDraw);
-    }
+  Status       = EFI_DEVICE_ERROR;
+  
+  //
+  // This device display mode will be added into Graphics Ouput modes.
+  //
+  if ((GraphicsOutput != NULL) || (UgaDraw != NULL)) {
+    DeviceStatus = ConSplitterAddGraphicsOutputMode (Private, GraphicsOutput, UgaDraw);
   }
 
   if (FeaturePcdGet (PcdConOutUgaSupport)) {
@@ -3086,7 +3049,7 @@ ConSplitterTextOutAddDevice (
 
       FreePool (Info);
 
-    } else if (UgaDraw != NULL && FeaturePcdGet (PcdUgaConsumeSupport)) {
+    } else if (UgaDraw != NULL) {
       Status = UgaDraw->GetMode (
                     UgaDraw,
                     &UgaHorizontalResolution,
@@ -3118,6 +3081,46 @@ ConSplitterTextOutAddDevice (
                     60
                     );
       }
+    }
+  }
+
+  if (((!EFI_ERROR (DeviceStatus)) || (!EFI_ERROR (Status))) &&
+      ((Private->CurrentNumberOfGraphicsOutput + Private->CurrentNumberOfUgaDraw) == 1)) {
+    if (!FeaturePcdGet (PcdConOutGopSupport)) {
+      //
+      // If Graphics Outpurt protocol not supported, UGA Draw protocol is installed
+      // on the virtual handle.
+      //
+      Status = gBS->InstallMultipleProtocolInterfaces (
+                      &mConOut.VirtualHandle,
+                      &gEfiUgaDrawProtocolGuid,
+                      &mConOut.UgaDraw,
+                      NULL
+                      );
+    } else if (!FeaturePcdGet (PcdConOutUgaSupport)) {
+      //
+      // If UGA Draw protocol not supported, Graphics Output Protocol is installed
+      // on virtual handle.
+      //
+      Status = gBS->InstallMultipleProtocolInterfaces (
+                      &mConOut.VirtualHandle,
+                      &gEfiGraphicsOutputProtocolGuid,
+                      &mConOut.GraphicsOutput,
+                      NULL
+                      );
+    } else {
+      //
+      // Boot Graphics Output protocol and UGA Draw protocol are supported,
+      // both they will be installed on virtual handle.
+      //
+      Status = gBS->InstallMultipleProtocolInterfaces (
+                      &mConOut.VirtualHandle,
+                      &gEfiGraphicsOutputProtocolGuid,
+                      &mConOut.GraphicsOutput,
+                      &gEfiUgaDrawProtocolGuid,
+                      &mConOut.UgaDraw,
+                      NULL
+                      );
     }
   }
 
@@ -3161,7 +3164,7 @@ ConSplitterTextOutDeleteDevice (
   TextOutList           = Private->TextOutList;
   while (Index >= 0) {
     if (TextOutList->TextOut == TextOut) {
-      if (TextOutList->UgaDraw != NULL && FeaturePcdGet (PcdUgaConsumeSupport)) {
+      if (TextOutList->UgaDraw != NULL) {
         Private->CurrentNumberOfUgaDraw--;
       }
       if (TextOutList->GraphicsOutput != NULL) {
