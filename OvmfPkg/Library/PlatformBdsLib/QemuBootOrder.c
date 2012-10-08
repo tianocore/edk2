@@ -31,9 +31,10 @@
 
 
 /**
-  Number of nodes in OpenFirmware device paths that is required and examined.
+  Numbers of nodes in OpenFirmware device paths that are required and examined.
 **/
-#define FIXED_OFW_NODES 4
+#define REQUIRED_OFW_NODES 2
+#define EXAMINED_OFW_NODES 4
 
 
 /**
@@ -497,7 +498,7 @@ TranslateOfwNodes (
   //
   // Get PCI device and optional PCI function. Assume a single PCI root.
   //
-  if (NumNodes < FIXED_OFW_NODES ||
+  if (NumNodes < REQUIRED_OFW_NODES ||
       !SubstringEq (OfwNode[0].DriverName, "pci")
       ) {
     return RETURN_UNSUPPORTED;
@@ -513,7 +514,8 @@ TranslateOfwNodes (
     return RETURN_UNSUPPORTED;
   }
 
-  if (SubstringEq (OfwNode[1].DriverName, "ide") &&
+  if (NumNodes >= 4 &&
+      SubstringEq (OfwNode[1].DriverName, "ide") &&
       SubstringEq (OfwNode[2].DriverName, "drive") &&
       SubstringEq (OfwNode[3].DriverName, "disk")
       ) {
@@ -562,7 +564,8 @@ TranslateOfwNodes (
       Secondary ? "Secondary" : "Primary",
       Slave ? "Slave" : "Master"
       );
-  } else if (SubstringEq (OfwNode[1].DriverName, "isa") &&
+  } else if (NumNodes >= 4 &&
+             SubstringEq (OfwNode[1].DriverName, "isa") &&
              SubstringEq (OfwNode[2].DriverName, "fdc") &&
              SubstringEq (OfwNode[3].DriverName, "floppy")
              ) {
@@ -676,7 +679,7 @@ TranslateOfwPath (
 {
   UINTN         NumNodes;
   RETURN_STATUS Status;
-  OFW_NODE      Node[FIXED_OFW_NODES];
+  OFW_NODE      Node[EXAMINED_OFW_NODES];
   BOOLEAN       IsFinal;
   OFW_NODE      Skip;
 
@@ -692,7 +695,7 @@ TranslateOfwPath (
     ++NumNodes;
     Status = ParseOfwNode (
                Ptr,
-               (NumNodes < FIXED_OFW_NODES) ? &Node[NumNodes] : &Skip,
+               (NumNodes < EXAMINED_OFW_NODES) ? &Node[NumNodes] : &Skip,
                &IsFinal
                );
   }
@@ -712,7 +715,7 @@ TranslateOfwPath (
 
   Status = TranslateOfwNodes (
              Node,
-             NumNodes < FIXED_OFW_NODES ? NumNodes : FIXED_OFW_NODES,
+             NumNodes < EXAMINED_OFW_NODES ? NumNodes : EXAMINED_OFW_NODES,
              Translated,
              TranslatedSize);
   switch (Status) {
