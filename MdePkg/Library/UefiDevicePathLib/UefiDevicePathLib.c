@@ -8,7 +8,7 @@
   environment varibles. Multi-instance device paths should never be placed
   on a Handle.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -28,6 +28,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseLib.h>
+#include <Library/PcdLib.h>
 
 //
 // Template for an end-of-device path node.
@@ -40,6 +41,61 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST EFI_DEVICE_PATH_PROTOCOL  mUefiDevicePathLib
     0
   }
 };
+
+/**
+  Determine whether a given device path is valid.
+  If DevicePath is NULL, then ASSERT().
+
+  @param  DevicePath  A pointer to a device path data structure.
+  @param  MaxSize     The maximum size of the device path data structure.
+
+  @retval TRUE        DevicePath is valid.
+  @retval FALSE       The length of any node node in the DevicePath is less
+                      than sizeof (EFI_DEVICE_PATH_PROTOCOL).
+  @retval FALSE       If MaxSize is not zero, the size of the DevicePath
+                      exceeds MaxSize.
+  @retval FALSE       If PcdMaximumDevicePathNodeCount is not zero, the node
+                      count of the DevicePath exceeds PcdMaximumDevicePathNodeCount.
+**/
+BOOLEAN
+EFIAPI
+IsDevicePathValid (
+  IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath,
+  IN       UINTN                    MaxSize
+  )
+{
+  UINTN Count;
+  UINTN Size;
+  UINTN NodeLength;
+
+  ASSERT (DevicePath != NULL);
+
+  for (Count = 0, Size = 0; !IsDevicePathEnd (DevicePath); DevicePath = NextDevicePathNode (DevicePath)) {
+    NodeLength = DevicePathNodeLength (DevicePath);
+    if (NodeLength < sizeof (EFI_DEVICE_PATH_PROTOCOL)) {
+      return FALSE;
+    }
+
+    if (MaxSize > 0) {
+      Size += NodeLength;
+      if (Size + END_DEVICE_PATH_LENGTH > MaxSize) {
+        return FALSE;
+      }
+    }
+
+    if (PcdGet32 (PcdMaximumDevicePathNodeCount) > 0) {
+      Count++;
+      if (Count >= PcdGet32 (PcdMaximumDevicePathNodeCount)) {
+        return FALSE;
+      }
+    }
+  }
+
+  //
+  // Only return TRUE when the End Device Path node is valid.
+  //
+  return (BOOLEAN) (DevicePathNodeLength (DevicePath) == END_DEVICE_PATH_LENGTH);
+}
 
 /**
   Returns the Type field of a device path node.
@@ -106,8 +162,12 @@ DevicePathNodeLength (
   IN CONST VOID  *Node
   )
 {
+  UINTN Length;
+
   ASSERT (Node != NULL);
-  return ReadUnaligned16 ((UINT16 *)&((EFI_DEVICE_PATH_PROTOCOL *)(Node))->Length[0]);
+  Length = ReadUnaligned16 ((UINT16 *)&((EFI_DEVICE_PATH_PROTOCOL *)(Node))->Length[0]);
+  ASSERT (Length >= sizeof (EFI_DEVICE_PATH_PROTOCOL));
+  return Length;
 }
 
 /**
@@ -227,7 +287,8 @@ IsDevicePathEndInstance (
   be used to set the contents of the Length field.
 
   If Node is NULL, then ASSERT().
-  If NodeLength >= 0x10000, then ASSERT().
+  If NodeLength >= SIZE_64KB, then ASSERT().
+  If NodeLength < sizeof (EFI_DEVICE_PATH_PROTOCOL), then ASSERT().
 
   @param  Node      A pointer to a device path node data structure.
   @param  Length    The length, in bytes, of the device path node.
@@ -243,7 +304,7 @@ SetDevicePathNodeLength (
   )
 {
   ASSERT (Node != NULL);
-  ASSERT (Length < 0x10000);
+  ASSERT ((Length >= sizeof (EFI_DEVICE_PATH_PROTOCOL)) && (Length < SIZE_64KB));
   return WriteUnaligned16 ((UINT16 *)&((EFI_DEVICE_PATH_PROTOCOL *)(Node))->Length[0], (UINT16)(Length));
 }
 
@@ -277,12 +338,12 @@ SetDevicePathEndNode (
   Returns the size of a device path in bytes.
 
   This function returns the size, in bytes, of the device path data structure 
-  specified by DevicePath including the end of device path node.  If DevicePath 
-  is NULL, then 0 is returned.
+  specified by DevicePath including the end of device path node.
+  If DevicePath is NULL or invalid, then 0 is returned.
 
   @param  DevicePath  A pointer to a device path data structure.
-  
-  @retval 0           If DevicePath is NULL.
+
+  @retval 0           If DevicePath is NULL or invalid.
   @retval Others      The size of a device path in bytes.
 
 **/
@@ -295,6 +356,10 @@ GetDevicePathSize (
   CONST EFI_DEVICE_PATH_PROTOCOL  *Start;
 
   if (DevicePath == NULL) {
+    return 0;
+  }
+
+  if (!IsDevicePathValid (DevicePath, 0)) {
     return 0;
   }
 
@@ -324,7 +389,7 @@ GetDevicePathSize (
   
   @param  DevicePath    A pointer to a device path data structure.
 
-  @retval NULL          If DevicePath is NULL.
+  @retval NULL          DevicePath is NULL or invalid.
   @retval Others        A pointer to the duplicated device path.
   
 **/
@@ -370,6 +435,7 @@ DuplicateDevicePath (
   @param  SecondDevicePath           A pointer to a device path data structure.
   
   @retval NULL      If there is not enough memory for the newly allocated buffer.
+  @retval NULL      If FirstDevicePath or SecondDevicePath is invalid.
   @retval Others    A pointer to the new device path if success.
                     Or a copy an end-of-device-path if both FirstDevicePath and SecondDevicePath are NULL.
 
@@ -396,6 +462,10 @@ AppendDevicePath (
 
   if (SecondDevicePath == NULL) {
     return DuplicateDevicePath (FirstDevicePath);
+  }
+
+  if (!IsDevicePathValid (FirstDevicePath, 0) || !IsDevicePathValid (SecondDevicePath, 0)) {
+    return NULL;
   }
 
   //
@@ -500,6 +570,7 @@ AppendDevicePathNode (
   path instance and a new end-of-device-path-instance node is inserted between. 
   If DevicePath is NULL, then a copy if DevicePathInstance is returned.
   If DevicePathInstance is NULL, then NULL is returned.
+  If DevicePath or DevicePathInstance is invalid, then NULL is returned.
   If there is not enough memory to allocate space for the new device path, then 
   NULL is returned.  
   The memory is allocated from EFI boot services memory. It is the responsibility 
@@ -531,6 +602,10 @@ AppendDevicePathInstance (
     return NULL;
   }
 
+  if (!IsDevicePathValid (DevicePath, 0) || !IsDevicePathValid (DevicePathInstance, 0)) {
+    return NULL;
+  }
+
   SrcSize       = GetDevicePathSize (DevicePath);
   InstanceSize  = GetDevicePathSize (DevicePathInstance);
 
@@ -559,6 +634,7 @@ AppendDevicePathInstance (
   DevicePath to point to the next device path instance in the device path (or NULL 
   if no more) and updates Size to hold the size of the device path instance copy.
   If DevicePath is NULL, then NULL is returned.
+  If DevicePath points to a invalid device path, then NULL is returned.
   If there is not enough memory to allocate space for the new device path, then 
   NULL is returned.  
   The memory is allocated from EFI boot services memory. It is the responsibility 
@@ -593,6 +669,10 @@ GetNextDevicePathInstance (
 
   if (DevicePath == NULL || *DevicePath == NULL) {
     *Size = 0;
+    return NULL;
+  }
+
+  if (!IsDevicePathValid (*DevicePath, 0)) {
     return NULL;
   }
 
@@ -681,13 +761,14 @@ CreateDeviceNode (
 
   This function returns TRUE if the device path specified by DevicePath is
   multi-instance.
-  Otherwise, FALSE is returned.  If DevicePath is NULL, then FALSE is returned.
+  Otherwise, FALSE is returned.
+  If DevicePath is NULL or invalid, then FALSE is returned.
 
   @param  DevicePath                 A pointer to a device path data structure.
 
   @retval  TRUE                      DevicePath is multi-instance.
-  @retval  FALSE                     DevicePath is not multi-instance or DevicePath 
-                                     is NULL.
+  @retval  FALSE                     DevicePath is not multi-instance, or DevicePath 
+                                     is NULL or invalid.
 
 **/
 BOOLEAN
@@ -699,6 +780,10 @@ IsDevicePathMultiInstance (
   CONST EFI_DEVICE_PATH_PROTOCOL     *Node;
 
   if (DevicePath == NULL) {
+    return FALSE;
+  }
+
+  if (!IsDevicePathValid (DevicePath, 0)) {
     return FALSE;
   }
 
@@ -776,15 +861,14 @@ FileDevicePath (
   IN CONST CHAR16                    *FileName
   )
 {
-  UINT16                    Size;
+  UINTN                     Size;
   FILEPATH_DEVICE_PATH      *FilePath;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *FileDevicePath;
 
   DevicePath = NULL;
 
-  Size = (UINT16) StrSize (FileName);
-  
+  Size = StrSize (FileName);
   FileDevicePath = AllocatePool (Size + SIZE_OF_FILEPATH_DEVICE_PATH + END_DEVICE_PATH_LENGTH);
   if (FileDevicePath != NULL) {
     FilePath = (FILEPATH_DEVICE_PATH *) FileDevicePath;

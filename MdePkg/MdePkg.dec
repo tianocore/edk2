@@ -1277,6 +1277,9 @@
   ## Indicates the maximum node number of linked list
   gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|1000000|UINT32|0x00000003
 
+  ## Indicates the maximum node number of device path
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumDevicePathNodeCount|0|UINT32|0x00000029
+
   ## Indicates the timeout tick of holding spin lock
   gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout|10000000|UINT32|0x00000004
 
