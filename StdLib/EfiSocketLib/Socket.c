@@ -1791,6 +1791,11 @@ EslSocketConnect (
 
       case SOCKET_STATE_CONNECTING:
         //
+        //  Poll the network adapter
+        //
+        EslSocketRxPoll ( pSocket );
+
+        //
         //  Poll for connection completion
         //
         if ( NULL == pSocket->pApi->pfnConnectPoll ) {
