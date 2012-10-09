@@ -1008,6 +1008,8 @@ typedef struct {
 ///
 typedef struct {
   EFI_ACPI_5_0_PMMT_COMMON_MEMORY_AGGREGATOR_DEVICE_STRUCTURE  Header;
+  UINT16                                                       SocketIdentifier;
+  UINT16                                                       Reserved;
 //EFI_ACPI_5_0_PMMT_MEMORY_CONTROLLER_MEMORY_AGGREGATOR_DEVICE_STRUCTURE  MemoryController[];
 } EFI_ACPI_5_0_PMMT_SOCKET_MEMORY_AGGREGATOR_DEVICE_STRUCTURE;
 
