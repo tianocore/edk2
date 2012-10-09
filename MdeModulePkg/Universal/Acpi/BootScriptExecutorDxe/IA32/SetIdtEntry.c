@@ -3,7 +3,7 @@
 
   Set a IDT entry for interrupt vector 3 for debug purpose for IA32 platform
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -54,7 +54,7 @@ SetIdtEntry (
   S3DebugBuffer = (UINTN) (AcpiS3Context->S3DebugBufferAddress);
 
   IdtEntry->OffsetLow       = (UINT16)S3DebugBuffer;
-  IdtEntry->SegmentSelector = (UINT16)AsmReadCs ();;
+  IdtEntry->SegmentSelector = (UINT16)AsmReadCs ();
   IdtEntry->Attributes      = (UINT16)INTERRUPT_GATE_ATTRIBUTE;
   IdtEntry->OffsetHigh      = (UINT16)(S3DebugBuffer >> 16);
 
