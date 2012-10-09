@@ -216,7 +216,7 @@ typedef struct _EFI_SMM_ENTRY_CONTEXT {
   ///
   UINTN                    CurrentlyExecutingCpu;
   ///
-  /// The number of current operational processors in the platform.  This is a 1 based 
+  /// The number of possible processors in the platform.  This is a 1 based 
   /// counter.  This does not indicate the number of processors that entered SMM.
   ///
   UINTN                    NumberOfCpus;
@@ -297,7 +297,7 @@ struct _EFI_SMM_SYSTEM_TABLE2 {
   ///
   UINTN                                CurrentlyExecutingCpu;
   ///
-  /// The number of current operational processors in the platform.  This is a 1 based counter.
+  /// The number of possible processors in the platform.  This is a 1 based counter.
   ///
   UINTN                                NumberOfCpus;
   ///
