@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #*
-#*   Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+#*   Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 #*   This program and the accompanying materials
 #*   are licensed and made available under the terms and conditions of the BSD License
 #*   which accompanies this distribution.  The full text of the license may be found at
@@ -15,8 +15,8 @@
 #
 # Initializes floating point units for requirement of UEFI specification.
 #
-# This function initializes floating-point control word to 0x027F (all exceptions
-# masked,double-precision, round-to-nearest) and multimedia-extensions control word
+# This function initializes floating-point control word to 0x037F (all exceptions
+# masked,double-extended-precision, round-to-nearest) and multimedia-extensions control word
 # (if supported) to 0x1F80 (all exceptions masked, round-to-nearest, flush to zero
 # for masked underflow).
 #
@@ -32,7 +32,7 @@ ASM_PFX(InitializeFloatingPointUnits):
     # Float control word initial value: 
     # all exceptions masked, double-precision, round-to-nearest
     #
-    pushq   $0x027F
+    pushq   $0x037F
     lea     (%rsp), %rax 
     fldcw   (%rax)
     popq    %rax

@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;*
-;*   Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+;*   Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 ;*   This program and the accompanying materials
 ;*   are licensed and made available under the terms and conditions of the BSD License
 ;*   which accompanies this distribution.  The full text of the license may be found at
@@ -16,9 +16,9 @@
 .const
 ;
 ; Float control word initial value: 
-; all exceptions masked, double-precision, round-to-nearest
+; all exceptions masked, double-extended-precision, round-to-nearest
 ;
-mFpuControlWord       DW      027Fh
+mFpuControlWord       DW      037Fh
 ;
 ; Multimedia-extensions control word:
 ; all exceptions masked, round-to-nearest, flush to zero for masked underflow

@@ -4,7 +4,7 @@
   Local APIC library assumes local APIC is enabled. It does not
   handles cases where local APIC is disabled.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -20,6 +20,32 @@
 
 #define LOCAL_APIC_MODE_XAPIC   0x1  ///< xAPIC mode.
 #define LOCAL_APIC_MODE_X2APIC  0x2  ///< x2APIC mode.
+
+/**
+  Retrieve the base address of local APIC.
+
+  @return The base address of local APIC.
+
+**/
+UINTN
+EFIAPI
+GetLocalApicBaseAddress (
+  VOID
+  );
+
+/**
+  Set the base address of local APIC.
+
+  If BaseAddress is not aligned on a 4KB boundary, then ASSERT().
+
+  @param[in] BaseAddress   Local APIC base address to be set.
+
+**/
+VOID
+EFIAPI
+SetLocalApicBaseAddress (
+  IN UINTN                BaseAddress
+  );
 
 /**
   Get the current local APIC mode.
