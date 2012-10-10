@@ -72,6 +72,24 @@ BdsInitialize (
   return Status;
 }
 
+
+/**
+  An empty function to pass error checking of CreateEventEx ().
+
+  @param  Event                 Event whose notification function is being invoked.
+  @param  Context               Pointer to the notification function's context,
+                                which is implementation-dependent.
+
+**/
+VOID
+EFIAPI
+BdsEmptyCallbackFunction (
+  IN EFI_EVENT                Event,
+  IN VOID                     *Context
+  )
+{
+}
+
 /**
 
   This function attempts to boot for the boot order specified
@@ -93,18 +111,37 @@ BdsBootDeviceSelect (
   CHAR16            Buffer[20];
   BOOLEAN           BootNextExist;
   LIST_ENTRY        *LinkBootNext;
+  EFI_EVENT         ConnectConInEvent;
 
   //
   // Got the latest boot option
   //
   BootNextExist = FALSE;
   LinkBootNext  = NULL;
+  ConnectConInEvent = NULL;
   InitializeListHead (&BootLists);
 
   //
   // First check the boot next option
   //
   ZeroMem (Buffer, sizeof (Buffer));
+
+  //
+  // Create Event to signal ConIn connection request
+  //
+  if (PcdGetBool (PcdConInConnectOnDemand)) {
+    Status = gBS->CreateEventEx (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_CALLBACK,
+                    BdsEmptyCallbackFunction,
+                    NULL,
+                    &gConnectConInEventGuid,
+                    &ConnectConInEvent
+                    );
+    if (EFI_ERROR(Status)) {
+      ConnectConInEvent = NULL;
+    }
+  }
 
   if (mBootNext != NULL) {
     //
@@ -171,6 +208,13 @@ BdsBootDeviceSelect (
     // Check the boot option list first
     //
     if (Link == &BootLists) {
+      //
+      // When LazyConIn enabled, signal connect ConIn event before enter UI
+      //
+      if (PcdGetBool (PcdConInConnectOnDemand) && ConnectConInEvent != NULL) {
+        gBS->SignalEvent (ConnectConInEvent);
+      }
+
       //
       // There are two ways to enter here:
       // 1. There is no active boot option, give user chance to
@@ -248,6 +292,14 @@ BdsBootDeviceSelect (
       // Boot success, then stop process the boot order, and
       // present the boot manager menu, front page
       //
+
+      //
+      // When LazyConIn enabled, signal connect ConIn Event before enter UI
+      //
+      if (PcdGetBool (PcdConInConnectOnDemand) && ConnectConInEvent != NULL) {
+        gBS->SignalEvent (ConnectConInEvent);
+      }
+
       Timeout = 0xffff;
       PlatformBdsEnterFrontPage (Timeout, FALSE);
 
