@@ -1,7 +1,7 @@
 /** @file
   Initialize TPM device and measure FVs before handing off control to DXE.
 
-Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -379,7 +379,8 @@ FirmwareVolmeInfoPpiNotifyCallback (
 }
 
 /**
-  Lock physical presence if needed.
+  Set physicalPresenceLifetimeLock, physicalPresenceHWEnable and physicalPresenceCMDEnable bit by corresponding PCDs.
+  And lock physical presence if needed.
 
   @param[in] PeiServices        An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation
   @param[in] NotifyDescriptor   Address of the notification descriptor data structure.
@@ -403,21 +404,54 @@ PhysicalPresencePpiNotifyCallback (
   BOOLEAN                           LifetimeLock;
   BOOLEAN                           CmdEnable;
   TIS_TPM_HANDLE                    TpmHandle;
+  TPM_PHYSICAL_PRESENCE             PhysicalPresenceValue;
 
   TpmHandle        = (TIS_TPM_HANDLE) (UINTN) TPM_BASE_ADDRESS;
-  LockPhysicalPresencePpi = (PEI_LOCK_PHYSICAL_PRESENCE_PPI *) Ppi;
-
-  if (!LockPhysicalPresencePpi->LockPhysicalPresence ((CONST EFI_PEI_SERVICES**) PeiServices)) {
-    return EFI_SUCCESS;
-  }
-
-  //
-  // Lock TPM physical presence.
-  //
 
   Status = TpmCommGetCapability (PeiServices, TpmHandle, NULL, &LifetimeLock, &CmdEnable);
   if (EFI_ERROR (Status)) {
     return Status;
+  }
+
+  //
+  // 1. Set physicalPresenceLifetimeLock, physicalPresenceHWEnable and physicalPresenceCMDEnable bit by PCDs.
+  //
+  if (PcdGetBool (PcdPhysicalPresenceLifetimeLock) && !LifetimeLock) {
+    //
+    // Lock TPM LifetimeLock is required, and LifetimeLock is not locked yet. 
+    //
+    PhysicalPresenceValue = TPM_PHYSICAL_PRESENCE_LIFETIME_LOCK;
+
+    if (PcdGetBool (PcdPhysicalPresenceCmdEnable)) {
+      PhysicalPresenceValue |= TPM_PHYSICAL_PRESENCE_CMD_ENABLE;
+      CmdEnable = TRUE;
+    } else {
+      PhysicalPresenceValue |= TPM_PHYSICAL_PRESENCE_CMD_DISABLE;
+      CmdEnable = FALSE;
+    }
+
+    if (PcdGetBool (PcdPhysicalPresenceHwEnable)) {
+      PhysicalPresenceValue |= TPM_PHYSICAL_PRESENCE_HW_ENABLE;
+    } else {
+      PhysicalPresenceValue |= TPM_PHYSICAL_PRESENCE_HW_DISABLE;
+    }      
+     
+    Status = TpmCommPhysicalPresence (
+               PeiServices,
+               TpmHandle,
+               PhysicalPresenceValue
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+  
+  //
+  // 2. Lock physical presence if it is required.
+  //
+  LockPhysicalPresencePpi = (PEI_LOCK_PHYSICAL_PRESENCE_PPI *) Ppi;
+  if (!LockPhysicalPresencePpi->LockPhysicalPresence ((CONST EFI_PEI_SERVICES**) PeiServices)) {
+    return EFI_SUCCESS;
   }
 
   if (!CmdEnable) {

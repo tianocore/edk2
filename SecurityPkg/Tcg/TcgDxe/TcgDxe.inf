@@ -56,6 +56,7 @@
   gTcgEventEntryHobGuid
   gEfiEventReadyToBootGuid
   gEfiEventExitBootServicesGuid
+  gEventExitBootServicesFailedGuid              # ALWAYS_CONSUMED
 
 [Protocols]
   gEfiTcgProtocolGuid                           ## PRODUCES

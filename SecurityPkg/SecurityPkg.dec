@@ -147,3 +147,17 @@
   ## This PCD indicates the presence or absence of the platform operator.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmPhysicalPresence|TRUE|BOOLEAN|0x00010001
 
+[PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+  ## This PCD indicates whether to set TPM physicalPresenceLifetimeLock bit.
+  ## Once this bit is set, it can not be cleared (It is locked for TPM life time).
+  gEfiSecurityPkgTokenSpaceGuid.PcdPhysicalPresenceLifetimeLock|FALSE|BOOLEAN|0x00010003
+  
+[PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+  ## This PCD is used to specify the default value for physicalPresenceCMDEnable bit when setting physicalPresenceLifetimeLock bit.
+  ## If PcdPhysicalPresenceCmdEnable is set to TRUE, physicalPresenceCMDEnable bit will be set, else this bit will be cleared.
+  gEfiSecurityPkgTokenSpaceGuid.PcdPhysicalPresenceCmdEnable|TRUE|BOOLEAN|0x00010004
+  
+[PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+  ## This PCD is used to specify the default value for physicalPresenceHWEnable bit when setting physicalPresenceLifetimeLock bit.
+  ## If PcdPhysicalPresenceHwEnable is set to TRUE, physicalPresenceHWEnable bit will be set, else this bit will be cleared.
+  gEfiSecurityPkgTokenSpaceGuid.PcdPhysicalPresenceHwEnable|TRUE|BOOLEAN|0x00010005

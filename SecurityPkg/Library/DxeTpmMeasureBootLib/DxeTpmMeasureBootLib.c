@@ -681,34 +681,28 @@ Finish:
   might be possible to use it at a future time, then EFI_SECURITY_VIOLATION is 
   returned.
 
-  @param[in, out] AuthenticationStatus  This is the authentication status returned
+  @param[in]      AuthenticationStatus  This is the authentication status returned
                                         from the securitymeasurement services for the
                                         input file.
   @param[in]      File       This is a pointer to the device path of the file that is
                              being dispatched. This will optionally be used for logging.
   @param[in]      FileBuffer File buffer matches the input file device path.
   @param[in]      FileSize   Size of File buffer matches the input file device path.
+  @param[in]      BootPolicy A boot policy that was used to call LoadImage() UEFI service.
 
-  @retval EFI_SUCCESS            The file specified by File did authenticate, and the
-                                 platform policy dictates that the DXE Core may use File.
-  @retval EFI_INVALID_PARAMETER  File is NULL.
-  @retval EFI_SECURITY_VIOLATION The file specified by File did not authenticate, and
-                                 the platform policy dictates that File should be placed
-                                 in the untrusted state. A file may be promoted from
-                                 the untrusted to the trusted state at a future time
-                                 with a call to the Trust() DXE Service.
-  @retval EFI_ACCESS_DENIED      The file specified by File did not authenticate, and
-                                 the platform policy dictates that File should not be
-                                 used for any purpose.
-
+  @retval EFI_SUCCESS             The file specified by DevicePath and non-NULL
+                                  FileBuffer did authenticate, and the platform policy dictates
+                                  that the DXE Foundation may use the file.
+  @retval other error value
 **/
 EFI_STATUS
 EFIAPI
 DxeTpmMeasureBootHandler (
-  IN  OUT   UINT32                     AuthenticationStatus,
+  IN  UINT32                           AuthenticationStatus,
   IN  CONST EFI_DEVICE_PATH_PROTOCOL   *File,
-  IN  VOID                             *FileBuffer OPTIONAL,
-  IN  UINTN                            FileSize OPTIONAL
+  IN  VOID                             *FileBuffer,
+  IN  UINTN                            FileSize,
+  IN  BOOLEAN                          BootPolicy
   )
 {
   EFI_TCG_PROTOCOL                  *TcgProtocol;
@@ -722,10 +716,6 @@ DxeTpmMeasureBootHandler (
   EFI_HANDLE                        Handle;
   BOOLEAN                           ApplicationRequired;
   PE_COFF_LOADER_IMAGE_CONTEXT      ImageContext;
-
-  if (File == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
 
   Status = gBS->LocateProtocol (&gEfiTcgProtocolGuid, NULL, (VOID **) &TcgProtocol);
   if (EFI_ERROR (Status)) {
@@ -755,7 +745,6 @@ DxeTpmMeasureBootHandler (
   // Copy File Device Path
   //
   OrigDevicePathNode = DuplicateDevicePath (File);
-  ASSERT (OrigDevicePathNode != NULL);
   
   //
   // 1. Check whether this device path support BlockIo protocol.
@@ -768,6 +757,7 @@ DxeTpmMeasureBootHandler (
     // Find the gpt partion on the given devicepath
     //
     DevicePathNode = OrigDevicePathNode;
+    ASSERT (DevicePathNode != NULL);
     while (!IsDevicePathEnd (DevicePathNode)) {
       //
       // Find the Gpt partition
@@ -915,7 +905,9 @@ DxeTpmMeasureBootHandler (
   // Done, free the allocated resource.
   //
 Finish:
-  FreePool (OrigDevicePathNode);
+  if (OrigDevicePathNode != NULL) {
+    FreePool (OrigDevicePathNode);
+  }
 
   return Status;
 }
@@ -936,7 +928,7 @@ DxeTpmMeasureBootLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  return RegisterSecurityHandler (
+  return RegisterSecurity2Handler (
           DxeTpmMeasureBootHandler,
           EFI_AUTH_OPERATION_MEASURE_IMAGE | EFI_AUTH_OPERATION_IMAGE_REQUIRED
           );

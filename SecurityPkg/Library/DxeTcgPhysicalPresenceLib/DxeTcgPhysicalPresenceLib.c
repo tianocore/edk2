@@ -954,6 +954,11 @@ ExecutePendingTpmRequest (
       RequestConfirmed = TRUE;
       break;
       
+    case PHYSICAL_PRESENCE_SET_NO_PPI_PROVISION_TRUE:
+    case PHYSICAL_PRESENCE_SET_NO_PPI_CLEAR_TRUE:
+    case PHYSICAL_PRESENCE_SET_NO_PPI_MAINTENANCE_TRUE:
+      break;
+      
     default:
       //
       // Invalid operation request.
