@@ -174,7 +174,7 @@ MtrrGetDefaultMemoryType (
   This function will do some preparation for programming MTRRs:
   disable cache, invalid cache and disable MTRR caching functionality
 
-  @param[out]  Pointer to context to save
+  @param[out] MtrrContext  Pointer to context to save
 
 **/
 VOID
@@ -215,7 +215,7 @@ PreMtrrChange (
   This function will do some clean up after programming MTRRs:
   Flush all TLBs,  re-enable caching, restore CR4.
 
-  @param[in]  Pointer to context to restore
+  @param[in] MtrrContext  Pointer to context to restore
 
 **/
 VOID
@@ -250,7 +250,7 @@ PostMtrrChangeEnableCache (
   This function will do some clean up after programming MTRRs:
   enable MTRR caching functionality, and enable cache
 
-  @param[in]  Pointer to context to restore
+  @param[in] MtrrContext  Pointer to context to restore
 
 **/
 VOID
