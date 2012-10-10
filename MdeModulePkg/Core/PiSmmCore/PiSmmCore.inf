@@ -64,6 +64,7 @@
   gEfiSmmCpuIo2ProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
   gEfiFirmwareVolume2ProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
   gEfiSecurityArchProtocolGuid                  # PROTOCOL SOMETIMES_CONSUMED
+  gEfiSecurity2ArchProtocolGuid                 # PROTOCOL SOMETIMES_CONSUMED
   gEfiLoadedImageProtocolGuid                   # PROTOCOL SOMETIMES_PRODUCED
   gEfiDevicePathProtocolGuid                    # PROTOCOL SOMETIMES_CONSUMED
 

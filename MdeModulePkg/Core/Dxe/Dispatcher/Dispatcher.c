@@ -91,7 +91,6 @@ typedef struct {
 
 FV_FILEPATH_DEVICE_PATH mFvDevicePath;
 
-
 //
 // Function Prototypes
 //

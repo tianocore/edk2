@@ -1,7 +1,7 @@
 /** @file
   DXE Core Main Entry Point
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -23,6 +23,7 @@ EFI_HANDLE                                mDecompressHandle = NULL;
 // DXE Core globals for Architecture Protocols
 //
 EFI_SECURITY_ARCH_PROTOCOL        *gSecurity      = NULL;
+EFI_SECURITY2_ARCH_PROTOCOL       *gSecurity2     = NULL;
 EFI_CPU_ARCH_PROTOCOL             *gCpu           = NULL;
 EFI_METRONOME_ARCH_PROTOCOL       *gMetronome     = NULL;
 EFI_TIMER_ARCH_PROTOCOL           *gTimer         = NULL;
@@ -685,6 +686,10 @@ CoreExitBootServices (
   //
   Status = CoreTerminateMemoryMap (MapKey);
   if (EFI_ERROR (Status)) {
+    //
+    // Notify other drivers that ExitBootServices fail 
+    //
+    CoreNotifySignalList (&gEventExitBootServicesFailedGuid);
     return Status;
   }
 

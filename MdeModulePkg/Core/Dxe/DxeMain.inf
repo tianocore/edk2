@@ -2,7 +2,7 @@
 #  This is core module in DXE phase. It provides an implementation of DXE Core that is
 #  compliant with DXE CIS.  
 #  
-#  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -109,6 +109,7 @@
   gEfiEventDxeDispatchGuid                      ## CONSUMES ## GUID
   gLoadFixedAddressConfigurationTableGuid       ## SOMETIMES_CONSUMES
   gIdleLoopEventGuid                            ## CONSUMES ## GUID
+  gEventExitBootServicesFailedGuid              ## CONSUMES ## GUID
 
 [Protocols]
   gEfiStatusCodeRuntimeProtocolGuid             ## SOMETIMES_CONSUMES
@@ -123,6 +124,7 @@
   gEfiRuntimeArchProtocolGuid                   ## CONSUMES
   gEfiWatchdogTimerArchProtocolGuid             ## CONSUMES
   gEfiSecurityArchProtocolGuid                  ## CONSUMES
+  gEfiSecurity2ArchProtocolGuid                 ## CONSUMES
   gEfiVariableArchProtocolGuid                  ## CONSUMES
   gEfiBdsArchProtocolGuid                       ## CONSUMES
   gEfiVariableWriteArchProtocolGuid             ## CONSUMES

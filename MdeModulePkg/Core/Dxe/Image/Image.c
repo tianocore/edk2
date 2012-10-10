@@ -1044,6 +1044,7 @@ CoreLoadImageCommon (
   EFI_DEVICE_PATH_PROTOCOL   *OriginalFilePath;
   EFI_DEVICE_PATH_PROTOCOL   *HandleFilePath;
   UINTN                      FilePathSize;
+  BOOLEAN                    ImageIsFromFv;
 
   SecurityStatus = EFI_SUCCESS;
 
@@ -1070,6 +1071,8 @@ CoreLoadImageCommon (
   DeviceHandle     = NULL;
   Status           = EFI_SUCCESS;
   AuthenticationStatus = 0;
+  ImageIsFromFv    = FALSE;
+
   //
   // If the caller passed a copy of the file, then just use it
   //
@@ -1103,7 +1106,9 @@ CoreLoadImageCommon (
       //
       FHand.FreeBuffer = TRUE;
       Status = CoreLocateDevicePath (&gEfiFirmwareVolume2ProtocolGuid, &HandleFilePath, &DeviceHandle);
-      if (EFI_ERROR (Status)) {
+      if (!EFI_ERROR (Status)) {
+        ImageIsFromFv = TRUE;
+      } else {
         HandleFilePath = FilePath;
         Status = CoreLocateDevicePath (&gEfiSimpleFileSystemProtocolGuid, &HandleFilePath, &DeviceHandle);
         if (EFI_ERROR (Status)) {
@@ -1127,29 +1132,59 @@ CoreLoadImageCommon (
     return Status;
   }
 
-  //
-  // Verify the Authentication Status through the Security Architectural Protocol
-  //
-  if ((gSecurity != NULL) && (OriginalFilePath != NULL)) {
+  if (gSecurity2 != NULL) {
+    //
+    // Verify File Authentication through the Security2 Architectural Protocol
+    //
+    SecurityStatus = gSecurity2->FileAuthentication (
+                                  gSecurity2,
+                                  OriginalFilePath,
+                                  FHand.Source,
+                                  FHand.SourceSize,
+                                  BootPolicy
+                                  );
+    if (!EFI_ERROR (SecurityStatus) && ImageIsFromFv) {
+      //
+      // When Security2 is installed, Security Architectural Protocol must be published.
+      //
+      ASSERT (gSecurity != NULL);
+
+      //
+      // Verify the Authentication Status through the Security Architectural Protocol
+      // Only on images that have been read using Firmware Volume protocol.
+      //
+      SecurityStatus = gSecurity->FileAuthenticationState (
+                                    gSecurity,
+                                    AuthenticationStatus,
+                                    OriginalFilePath
+                                    );
+    }
+  } else if ((gSecurity != NULL) && (OriginalFilePath != NULL)) {
+    //
+    // Verify the Authentication Status through the Security Architectural Protocol
+    //
     SecurityStatus = gSecurity->FileAuthenticationState (
                                   gSecurity,
                                   AuthenticationStatus,
                                   OriginalFilePath
                                   );
-    if (EFI_ERROR (SecurityStatus) && SecurityStatus != EFI_SECURITY_VIOLATION) {
-      if (SecurityStatus == EFI_ACCESS_DENIED) {
-        //
-        // Image was not loaded because the platform policy prohibits the image from being loaded.
-        // It's the only place we could meet EFI_ACCESS_DENIED.
-        //
-        *ImageHandle = NULL;
-      }
-      Status = SecurityStatus;
-      Image = NULL;
-      goto Done;
-    }
   }
 
+  //
+  // Check Security Status.
+  //
+  if (EFI_ERROR (SecurityStatus) && SecurityStatus != EFI_SECURITY_VIOLATION) {
+    if (SecurityStatus == EFI_ACCESS_DENIED) {
+      //
+      // Image was not loaded because the platform policy prohibits the image from being loaded.
+      // It's the only place we could meet EFI_ACCESS_DENIED.
+      //
+      *ImageHandle = NULL;
+    }
+    Status = SecurityStatus;
+    Image = NULL;
+    goto Done;
+  }
 
   //
   // Allocate a new image structure
@@ -1295,9 +1330,17 @@ Done:
   if (EFI_ERROR (Status)) {
     if (Image != NULL) {
       CoreUnloadAndCloseImage (Image, (BOOLEAN)(DstBuffer == 0));
+      Image = NULL;
     }
   } else if (EFI_ERROR (SecurityStatus)) {
     Status = SecurityStatus;
+  }
+
+  //
+  // Track the return status from LoadImage.
+  //
+  if (Image != NULL) {
+    Image->LoadImageStatus = Status;
   }
 
   return Status;
@@ -1492,6 +1535,7 @@ CoreLoadImageEx (
 
   @retval EFI_INVALID_PARAMETER   Invalid parameter
   @retval EFI_OUT_OF_RESOURCES    No enough buffer to allocate
+  @retval EFI_SECURITY_VIOLATION  The current platform policy specifies that the image should not be started.
   @retval EFI_SUCCESS             Successfully transfer control to the image's
                                   entry point.
 
@@ -1518,6 +1562,9 @@ CoreStartImage (
   Image = CoreLoadedImageInfo (ImageHandle);
   if (Image == NULL  ||  Image->Started) {
     return EFI_INVALID_PARAMETER;
+  }
+  if (EFI_ERROR (Image->LoadImageStatus)) {
+    return Image->LoadImageStatus;
   }
 
   //
