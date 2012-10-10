@@ -60,10 +60,10 @@ typedef struct _USB_HUB_API    USB_HUB_API;
 
 //
 // Roothub and hub's polling interval, set by experience,
-// The unit of roothub is 100us, means 1s as interval, and
+// The unit of roothub is 100us, means 100ms as interval, and
 // the unit of hub is 1ms, means 64ms as interval.
 //
-#define USB_ROOTHUB_POLL_INTERVAL (1000 * 10000U)
+#define USB_ROOTHUB_POLL_INTERVAL (100 * 10000U)
 #define USB_HUB_POLL_INTERVAL     64
 
 //
@@ -75,13 +75,13 @@ typedef struct _USB_HUB_API    USB_HUB_API;
 //
 // Wait for port statue reg change, set by experience
 //
-#define USB_WAIT_PORT_STS_CHANGE_STALL (5 * USB_BUS_1_MILLISECOND)
+#define USB_WAIT_PORT_STS_CHANGE_STALL (100)
 
 //
 // Wait for set device address, refers to specification
 // [USB20-9.2.6.3, it says 2ms]
 //
-#define USB_SET_DEVICE_ADDRESS_STALL   (20 * USB_BUS_1_MILLISECOND)
+#define USB_SET_DEVICE_ADDRESS_STALL   (2 * USB_BUS_1_MILLISECOND)
 
 //
 // Wait for retry max packet size, set by experience
@@ -99,7 +99,7 @@ typedef struct _USB_HUB_API    USB_HUB_API;
 // [USB20-7.1.7.5, it says 10ms for hub and 50ms for
 // root hub]
 //
-#define USB_SET_PORT_RESET_STALL       (20 * USB_BUS_1_MILLISECOND)
+#define USB_SET_PORT_RESET_STALL       (10 * USB_BUS_1_MILLISECOND)
 #define USB_SET_ROOT_PORT_RESET_STALL  (50 * USB_BUS_1_MILLISECOND)
 
 //

@@ -763,7 +763,12 @@ UsbHubInit (
       UsbHubCtrlSetPortFeature (HubIf->Device, Index, (EFI_USB_PORT_FEATURE) USB_HUB_PORT_POWER);
     }
 
-    gBS->Stall (HubDesc.PwrOn2PwrGood * USB_SET_PORT_POWER_STALL);
+    //
+    // Update for the usb hub has no power on delay requirement
+    //
+    if (HubDesc.PwrOn2PwrGood > 0) {
+      gBS->Stall (HubDesc.PwrOn2PwrGood * USB_SET_PORT_POWER_STALL);
+    }
     UsbHubAckHubStatus (HubIf->Device);
   }
 
