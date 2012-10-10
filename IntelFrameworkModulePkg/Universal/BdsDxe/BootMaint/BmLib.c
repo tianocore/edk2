@@ -1,7 +1,7 @@
 /** @file
   Utility routines used by boot maintenance modules.
 
-Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -379,40 +379,6 @@ EfiReallocatePool (
   }
 
   return NewPool;
-}
-
-/**
-  Compare two EFI_TIME data.
-
-
-  @param FirstTime       - A pointer to the first EFI_TIME data.
-  @param SecondTime      - A pointer to the second EFI_TIME data.
-
-  @retval  TRUE              The FirstTime is not later than the SecondTime.
-  @retval  FALSE             The FirstTime is later than the SecondTime.
-
-**/
-BOOLEAN
-TimeCompare (
-  IN EFI_TIME               *FirstTime,
-  IN EFI_TIME               *SecondTime
-  )
-{
-  if (FirstTime->Year != SecondTime->Year) {
-    return (BOOLEAN) (FirstTime->Year < SecondTime->Year);
-  } else if (FirstTime->Month != SecondTime->Month) {
-    return (BOOLEAN) (FirstTime->Month < SecondTime->Month);
-  } else if (FirstTime->Day != SecondTime->Day) {
-    return (BOOLEAN) (FirstTime->Day < SecondTime->Day);
-  } else if (FirstTime->Hour != SecondTime->Hour) {
-    return (BOOLEAN) (FirstTime->Hour < SecondTime->Hour);
-  } else if (FirstTime->Minute != SecondTime->Minute) {
-    return (BOOLEAN) (FirstTime->Minute < FirstTime->Minute);
-  } else if (FirstTime->Second != SecondTime->Second) {
-    return (BOOLEAN) (FirstTime->Second < SecondTime->Second);
-  }
-
-  return (BOOLEAN) (FirstTime->Nanosecond <= SecondTime->Nanosecond);
 }
 
 /**

@@ -537,15 +537,13 @@ Reclaim (
   EFI_STATUS            Status;
   CHAR16                *VariableNamePtr;
   CHAR16                *UpdatingVariableNamePtr;
+  UINTN                 CommonVariableTotalSize;
+  UINTN                 HwErrVariableTotalSize;
 
   VariableStoreHeader = (VARIABLE_STORE_HEADER *) ((UINTN) VariableBase);
-  //
-  // Recalculate the total size of Common/HwErr type variables in non-volatile area.
-  //
-  if (!IsVolatile) {
-    mVariableModuleGlobal->CommonVariableTotalSize = 0;
-    mVariableModuleGlobal->HwErrVariableTotalSize  = 0;
-  }
+
+  CommonVariableTotalSize = 0;
+  HwErrVariableTotalSize  = 0;
 
   //
   // Start Pointers for the variable.
@@ -612,9 +610,9 @@ Reclaim (
       CopyMem (CurrPtr, (UINT8 *) Variable, VariableSize);
       CurrPtr += VariableSize;
       if ((!IsVolatile) && ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
-        mVariableModuleGlobal->HwErrVariableTotalSize += VariableSize;
+        HwErrVariableTotalSize += VariableSize;
       } else if ((!IsVolatile) && ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
-        mVariableModuleGlobal->CommonVariableTotalSize += VariableSize;
+        CommonVariableTotalSize += VariableSize;
       }
     }
     Variable = NextVariable;
@@ -628,9 +626,9 @@ Reclaim (
     CopyMem (CurrPtr, (UINT8 *) UpdatingVariable, VariableSize);
     CurrPtr += VariableSize;
     if ((!IsVolatile) && ((UpdatingVariable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
-        mVariableModuleGlobal->HwErrVariableTotalSize += VariableSize;
+        HwErrVariableTotalSize += VariableSize;
     } else if ((!IsVolatile) && ((UpdatingVariable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
-        mVariableModuleGlobal->CommonVariableTotalSize += VariableSize;
+        CommonVariableTotalSize += VariableSize;
     }
   }
 
@@ -674,9 +672,9 @@ Reclaim (
         ((VARIABLE_HEADER *) CurrPtr)->State = VAR_ADDED;
         CurrPtr += VariableSize;
         if ((!IsVolatile) && ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
-          mVariableModuleGlobal->HwErrVariableTotalSize += VariableSize;
+          HwErrVariableTotalSize += VariableSize;
         } else if ((!IsVolatile) && ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
-          mVariableModuleGlobal->CommonVariableTotalSize += VariableSize;
+          CommonVariableTotalSize += VariableSize;
         }
       }
     }
@@ -704,8 +702,23 @@ Reclaim (
   }
   if (!EFI_ERROR (Status)) {
     *LastVariableOffset = (UINTN) (CurrPtr - (UINT8 *) ValidBuffer);
+    if (!IsVolatile) {
+      mVariableModuleGlobal->HwErrVariableTotalSize = HwErrVariableTotalSize;
+      mVariableModuleGlobal->CommonVariableTotalSize = CommonVariableTotalSize;
+    }
   } else {
-    *LastVariableOffset = 0;
+    NextVariable  = GetStartPointer ((VARIABLE_STORE_HEADER *)(UINTN)VariableBase);
+    while (IsValidVariableHeader (NextVariable)) {
+      VariableSize = NextVariable->NameSize + NextVariable->DataSize + sizeof (VARIABLE_HEADER);
+      if ((!IsVolatile) && ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
+        mVariableModuleGlobal->HwErrVariableTotalSize += HEADER_ALIGN (VariableSize);
+      } else if ((!IsVolatile) && ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
+        mVariableModuleGlobal->CommonVariableTotalSize += HEADER_ALIGN (VariableSize);
+      }
+
+      NextVariable = GetNextVariablePtr (NextVariable);
+    }
+    *LastVariableOffset = (UINTN) NextVariable - (UINTN) VariableBase;
   }
 
   FreePool (ValidBuffer);

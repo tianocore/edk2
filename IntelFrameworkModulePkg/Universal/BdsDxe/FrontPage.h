@@ -217,23 +217,6 @@ GetProducerString (
   );
 
 /**
-  Compare two EFI_TIME data.
-
-
-  @param FirstTime       - A pointer to the first EFI_TIME data.
-  @param SecondTime      - A pointer to the second EFI_TIME data.
-
-  @retval  TRUE              The FirstTime is not later than the SecondTime.
-  @retval  FALSE             The FirstTime is later than the SecondTime.
-
-**/
-BOOLEAN
-TimeCompare (
-  IN EFI_TIME               *FirstTime,
-  IN EFI_TIME               *SecondTime
-  );
-
-/**
   This function is the main entry of the platform setup entry.
   The function will present the main menu of the system setup,
   this is the platform reference part and can be customize.
