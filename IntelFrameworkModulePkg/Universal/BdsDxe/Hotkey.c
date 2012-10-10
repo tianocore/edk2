@@ -101,7 +101,7 @@ RegisterHotkey (
     return EFI_INVALID_PARAMETER;
   }
 
-  KeyOptionSize = sizeof (EFI_KEY_OPTION) + KeyOption->KeyData.Options.InputKeyCount * sizeof (EFI_INPUT_KEY);
+  KeyOptionSize = sizeof (EFI_KEY_OPTION) + KEY_OPTION_INPUT_KEY_COUNT (KeyOption) * sizeof (EFI_INPUT_KEY);
   UpdateBootOption = FALSE;
 
   //
@@ -143,9 +143,8 @@ RegisterHotkey (
       return EFI_SUCCESS;
     }
 
-    if (KeyOption->KeyData.PackedValue == TempOption->KeyData.PackedValue) {
-      if (KeyOption->KeyData.Options.InputKeyCount == 0 ||
-          CompareMem (
+    if (KeyOption->KeyData == TempOption->KeyData) {
+      if (CompareMem (
             ((UINT8 *) TempOption) + sizeof (EFI_KEY_OPTION),
             ((UINT8 *) KeyOption) + sizeof (EFI_KEY_OPTION),
             KeyOptionSize - sizeof (EFI_KEY_OPTION)
@@ -551,7 +550,6 @@ HotkeyInsertList (
   BDS_HOTKEY_OPTION  *HotkeyLeft;
   BDS_HOTKEY_OPTION  *HotkeyRight;
   UINTN              Index;
-  EFI_BOOT_KEY_DATA  KeyOptions;
   UINT32             KeyShiftStateLeft;
   UINT32             KeyShiftStateRight;
   EFI_INPUT_KEY      *InputKey;
@@ -564,34 +562,30 @@ HotkeyInsertList (
 
   HotkeyLeft->Signature = BDS_HOTKEY_OPTION_SIGNATURE;
   HotkeyLeft->BootOptionNumber = KeyOption->BootOption;
-
-  KeyOptions = KeyOption->KeyData;
-
-  HotkeyLeft->CodeCount = (UINT8) KeyOptions.Options.InputKeyCount;
+  HotkeyLeft->CodeCount = (UINT8) KEY_OPTION_INPUT_KEY_COUNT (KeyOption);
 
   //
   // Map key shift state from KeyOptions to EFI_KEY_DATA.KeyState
   //
   KeyShiftStateRight = EFI_SHIFT_STATE_VALID;
-  if (KeyOptions.Options.ShiftPressed) {
+  if (KEY_OPTION_SHIFT_PRESSED (KeyOption)) {
     KeyShiftStateRight |= EFI_RIGHT_SHIFT_PRESSED;
   }
-  if (KeyOptions.Options.ControlPressed) {
+  if (KEY_OPTION_CONTROL_PRESSED (KeyOption)) {
     KeyShiftStateRight |= EFI_RIGHT_CONTROL_PRESSED;
   }
-  if (KeyOptions.Options.AltPressed) {
+  if (KEY_OPTION_ALT_PRESSED (KeyOption)) {
     KeyShiftStateRight |= EFI_RIGHT_ALT_PRESSED;
   }
-  if (KeyOptions.Options.LogoPressed) {
+  if (KEY_OPTION_LOGO_PRESSED (KeyOption)) {
     KeyShiftStateRight |= EFI_RIGHT_LOGO_PRESSED;
   }
-  if (KeyOptions.Options.MenuPressed) {
+  if (KEY_OPTION_MENU_PRESSED (KeyOption)) {
     KeyShiftStateRight |= EFI_MENU_KEY_PRESSED;
   }
-  if (KeyOptions.Options.SysReqPressed) {
+  if (KEY_OPTION_SYS_REQ_PRESSED (KeyOption)) {
     KeyShiftStateRight |= EFI_SYS_REQ_PRESSED;
   }
-
 
   KeyShiftStateLeft = (KeyShiftStateRight & 0xffffff00) | ((KeyShiftStateRight & 0xff) << 1);
 
