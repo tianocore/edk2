@@ -281,7 +281,9 @@ EFI_STATUS
   @retval EFI_NOT_FOUND         1) There are no EFI_DRIVER_BINDING_PROTOCOL instances
                                 present in the system.
                                 2) No drivers were connected to ControllerHandle.
-
+  @retval EFI_SECURITY_VIOLATION 
+                                The user has no permission to start UEFI device drivers on the device path 
+                                associated with the ControllerHandle or specified by the RemainingDevicePath.
 **/
 typedef
 EFI_STATUS
@@ -848,8 +850,9 @@ EFI_STATUS
   @param  ExitData              The pointer to a pointer to a data buffer that includes a Null-terminated
                                 string, optionally followed by additional binary data.
 
-  @retval EFI_INVALID_PARAMETER ImageHandle is either an invalid image handle or the image
-                                has already been initialized with StartImage.
+  @retval EFI_INVALID_PARAMETER  ImageHandle is either an invalid image handle or the image
+                                 has already been initialized with StartImage.
+  @retval EFI_SECURITY_VIOLATION The current platform policy specifies that the image should not be started.
   @return Exit code from image
 
 **/
