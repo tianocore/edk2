@@ -598,19 +598,15 @@ SendCommandAndWaitForAckOK (
     SendPacketWithoutData (Command);
     while (TRUE) {
       Status = ReceiveAckPacket (&Ack, Timeout, BreakReceived, CheckSumStatus);
-      if (Status == RETURN_SUCCESS && Ack == DEBUG_COMMAND_RESEND) {
-        //
-        // Resend the last command
-        //
-        break;
-      } 
-      if ((Status == RETURN_SUCCESS && Ack == DEBUG_COMMAND_OK) ||
-           Status == RETURN_TIMEOUT) {
+      if (Status == RETURN_SUCCESS && Ack == DEBUG_COMMAND_OK) {
         //
         // Received Ack OK or timeout
         //
         return Status;
-      }  
+      }
+      if (Status == RETURN_TIMEOUT) {
+        break;
+      }
     }
   }
 }
