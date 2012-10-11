@@ -1,14 +1,15 @@
 /** @file
-
-Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
-
+  LockBox SMM driver.
+  
   Caution: This module requires additional review when modified.
   This driver will have external input - communicate buffer in SMM mode.
   This external input must be validated carefully to avoid security issue like
   buffer overflow, integer overflow.
-
+  
   SmmLockBoxHandler(), SmmLockBoxRestore(), SmmLockBoxUpdate(), SmmLockBoxSave()
   will receive untrusted input and do basic validation.
+
+Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
