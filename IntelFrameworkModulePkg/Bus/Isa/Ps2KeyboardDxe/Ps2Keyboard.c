@@ -263,15 +263,17 @@ KbdControllerDriverStart (
   //
   // Return code is ignored on purpose.
   //
-  KeyboardRead (ConsoleIn, &Data);
-  if ((KeyReadStatusRegister (ConsoleIn) & (KBC_PARE | KBC_TIM)) == (KBC_PARE | KBC_TIM)) {
-    //
-    // If nobody decodes KBC I/O port, it will read back as 0xFF.
-    // Check the Time-Out and Parity bit to see if it has an active KBC in system
-    //
-    Status      = EFI_DEVICE_ERROR;
-    StatusCode  = EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_NOT_DETECTED;
-    goto ErrorExit;
+  if (!PcdGetBool (PcdFastPS2Detection)) {
+    KeyboardRead (ConsoleIn, &Data);
+    if ((KeyReadStatusRegister (ConsoleIn) & (KBC_PARE | KBC_TIM)) == (KBC_PARE | KBC_TIM)) {
+      //
+      // If nobody decodes KBC I/O port, it will read back as 0xFF.
+      // Check the Time-Out and Parity bit to see if it has an active KBC in system
+      //
+      Status      = EFI_DEVICE_ERROR;
+      StatusCode  = EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_NOT_DETECTED;
+      goto ErrorExit;
+    }
   }
   
   //

@@ -219,4 +219,7 @@
   ## The PCD is used to specify the high PMM (Post Memory Manager) size with bytes above 1MB.
   #  The value should be a multiple of 4KB.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHighPmmMemorySize|0x400000|UINT32|0x3000000a
-  
+
+  ## This PCD specifies whether to use the optimized timing for best PS2 detection performance.
+  #  Note this PCD could be set to TRUE for best boot performance and set to FALSE for best device compatibility.
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdFastPS2Detection|FALSE|BOOLEAN|0x3000000b
