@@ -1130,24 +1130,19 @@ SetupResetReminder (
       ASSERT (StringBuffer1 != NULL);
       StringBuffer2 = AllocateZeroPool (MAX_STRING_LEN * sizeof (CHAR16));
       ASSERT (StringBuffer2 != NULL);
-      StrCpy (StringBuffer1, L"Configuration changed. Reset to apply it Now ? ");
-      StrCpy (StringBuffer2, L"Enter (YES)  /   Esc (NO)");
+      StrCpy (StringBuffer1, L"Configuration changed. Reset to apply it Now.");
+      StrCpy (StringBuffer2, L"Press ENTER to reset");
       //
       // Popup a menu to notice user
       //
       do {
         CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, StringBuffer1, StringBuffer2, NULL);
-      } while ((Key.ScanCode != SCAN_ESC) && (Key.UnicodeChar != CHAR_CARRIAGE_RETURN));
+      } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
 
       FreePool (StringBuffer1);
       FreePool (StringBuffer2);
-      //
-      // If the user hits the YES Response key, reset
-      //
-      if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
-        gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
-      }
-      gST->ConOut->ClearScreen (gST->ConOut);
+
+      gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
     }
   }
 }
@@ -1294,10 +1289,8 @@ BdsLibGetImageHeader (
 }
 
 /**
-  This routine adjusts the memory information for different memory type and 
-  saves them into the variables for next boot. It conditionally resets the
-  system when the memory information changes. Platform can reserve memory 
-  large enough (125% of actual requirement) to avoid the reset in the first boot.
+  This routine adjust the memory information for different memory type and 
+  save them into the variables for next boot.
 **/
 VOID
 BdsSetMemoryTypeInformationVariable (
@@ -1403,13 +1396,14 @@ BdsSetMemoryTypeInformationVariable (
     Next     = Previous;
 
     //
-    // Write next varible to 125% * current and Inconsistent Memory Reserved across bootings may lead to S4 fail
+    // Inconsistent Memory Reserved across bootings may lead to S4 fail
+    // Write next varible to 125% * current when the pre-allocated memory is:
+    //  1. More than 150% of needed memory and boot mode is BOOT_WITH_DEFAULT_SETTING
+    //  2. Less than the needed memory
     //
-    if (Current < Previous) {
+    if ((Current + (Current >> 1)) < Previous) {
       if (BootMode == BOOT_WITH_DEFAULT_SETTINGS) {
         Next = Current + (Current >> 2);
-      } else if (!MemoryTypeInformationVariableExists) {
-        Next = MAX (Current + (Current >> 2), Previous);
       }
     } else if (Current > Previous) {
       Next = Current + (Current >> 2);
