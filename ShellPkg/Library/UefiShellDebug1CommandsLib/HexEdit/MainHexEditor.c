@@ -4,7 +4,7 @@
      - Instances of the other objects of the editor
      - Main Interfaces
   
-  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -50,8 +50,7 @@ HEFI_EDITOR_GLOBAL_EDITOR       HMainEditorBackupVar;
 HEFI_EDITOR_GLOBAL_EDITOR       HMainEditorConst = {
   &HBufferImage,
   {
-    0,
-    0
+    {0, 0}
   },
   {
     0,

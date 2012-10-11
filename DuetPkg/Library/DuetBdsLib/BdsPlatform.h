@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -73,11 +73,13 @@ extern VENDOR_DEVICE_PATH         gTerminalTypeDeviceNode;
 
 #define PCI_DEVICE_PATH_NODE(Func, Dev) \
   { \
-    HARDWARE_DEVICE_PATH, \
-    HW_PCI_DP, \
     { \
-      (UINT8) (sizeof (PCI_DEVICE_PATH)), \
-      (UINT8) ((sizeof (PCI_DEVICE_PATH)) >> 8) \
+      HARDWARE_DEVICE_PATH, \
+      HW_PCI_DP, \
+      { \
+        (UINT8) (sizeof (PCI_DEVICE_PATH)), \
+        (UINT8) ((sizeof (PCI_DEVICE_PATH)) >> 8) \
+      } \
     }, \
     (Func), \
     (Dev) \

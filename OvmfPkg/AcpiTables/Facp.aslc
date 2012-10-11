@@ -1,7 +1,7 @@
 /** @file
   FACP Table
 
-  Copyright (c) 2008 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are
   licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,15 +15,17 @@
 #include "Platform.h"
 
 EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE FACP = {
-  EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
-  sizeof (EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE),
-  EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION,
-  0,                // to make sum of entire table == 0
-  EFI_ACPI_OEM_ID,         // OEMID is a 6 bytes long field
-  EFI_ACPI_OEM_TABLE_ID,      // OEM table identification(8 bytes long)
-  EFI_ACPI_OEM_REVISION,      // OEM revision number
-  EFI_ACPI_CREATOR_ID,        // ASL compiler vendor ID
-  EFI_ACPI_CREATOR_REVISION,  // ASL compiler revision number
+  {
+    EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
+    sizeof (EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE),
+    EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION,
+    0,                          // to make sum of entire table == 0
+    {EFI_ACPI_OEM_ID},          // OEMID is a 6 bytes long field
+    EFI_ACPI_OEM_TABLE_ID,      // OEM table identification(8 bytes long)
+    EFI_ACPI_OEM_REVISION,      // OEM revision number
+    EFI_ACPI_CREATOR_ID,        // ASL compiler vendor ID
+    EFI_ACPI_CREATOR_REVISION   // ASL compiler revision number
+  },
   0,                // Physical addesss of FACS
   0,                // Physical address of DSDT
   INT_MODEL,        // System Interrupt Model

@@ -187,8 +187,10 @@ SERIAL_IO_DEVICE_PATH mSerialIoDevicePath = {
     {
       HARDWARE_DEVICE_PATH,
       HW_VENDOR_DP,
-      (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
-      (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+      {
+        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+      }
     },
     EFI_DEBUG_AGENT_GUID,
   },
@@ -196,8 +198,10 @@ SERIAL_IO_DEVICE_PATH mSerialIoDevicePath = {
     {
       MESSAGING_DEVICE_PATH,
       MSG_UART_DP,
-      (UINT8) (sizeof (UART_DEVICE_PATH)),
-      (UINT8) ((sizeof (UART_DEVICE_PATH)) >> 8)
+      {
+        (UINT8) (sizeof (UART_DEVICE_PATH)),
+        (UINT8) ((sizeof (UART_DEVICE_PATH)) >> 8)
+      }
     },
     0,
     0,  // BaudRate

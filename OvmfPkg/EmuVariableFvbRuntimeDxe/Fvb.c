@@ -655,14 +655,17 @@ InitializeFvAndVariableStoreHeaders (
       0,
 
       // UINT8                     Reserved[1];
-      0,
+      {0},
 
       // UINT8                     Revision;
       EFI_FVH_REVISION,
 
       // EFI_FV_BLOCK_MAP_ENTRY    BlockMap[1];
-      { 2, // UINT32 NumBlocks;
-        EMU_FVB_BLOCK_SIZE  // UINT32 Length;
+      { 
+        {
+          2, // UINT32 NumBlocks;
+          EMU_FVB_BLOCK_SIZE  // UINT32 Length;
+        }
       }
     },
     // EFI_FV_BLOCK_MAP_ENTRY     EndBlockMap;
@@ -721,14 +724,17 @@ InitializeFvAndVariableStoreHeaders (
       0,
 
       // UINT8                     Reserved[1];
-      0,
+      {0},
 
       // UINT8                     Revision;
       EFI_FVH_REVISION,
 
       // EFI_FV_BLOCK_MAP_ENTRY    BlockMap[1];
-      { 2, // UINT32 NumBlocks;
-        EMU_FVB_BLOCK_SIZE  // UINT32 Length;
+      {
+        {
+          2, // UINT32 NumBlocks;
+          EMU_FVB_BLOCK_SIZE  // UINT32 Length;
+        }
       }
     },
     // EFI_FV_BLOCK_MAP_ENTRY     EndBlockMap;

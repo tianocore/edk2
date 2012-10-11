@@ -1,7 +1,7 @@
 /** @file
   handles console redirection from boot manager
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -14,12 +14,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "BootMaint.h"
 
-UART_FLOW_CONTROL_DEVICE_PATH mFlowControlDevicePath =
-{ 
-  MESSAGING_DEVICE_PATH,
-  MSG_VENDOR_DP,
-  (UINT8)(sizeof(UART_FLOW_CONTROL_DEVICE_PATH)),
-  (UINT8)((sizeof(UART_FLOW_CONTROL_DEVICE_PATH)) >> 8),
+UART_FLOW_CONTROL_DEVICE_PATH mFlowControlDevicePath =
+{
+  {
+    MESSAGING_DEVICE_PATH,
+    MSG_VENDOR_DP,
+    {
+      (UINT8)(sizeof(UART_FLOW_CONTROL_DEVICE_PATH)),
+      (UINT8)((sizeof(UART_FLOW_CONTROL_DEVICE_PATH)) >> 8)
+    }
+  },
   DEVICE_PATH_MESSAGING_UART_FLOW_CONTROL,
   UART_FLOW_CONTROL_HARDWARE
 };

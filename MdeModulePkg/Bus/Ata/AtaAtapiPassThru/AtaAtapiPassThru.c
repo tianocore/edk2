@@ -110,8 +110,10 @@ ATAPI_DEVICE_PATH    mAtapiDevicePathTemplate = {
   {
     MESSAGING_DEVICE_PATH,
     MSG_ATAPI_DP,
-    (UINT8) (sizeof (ATAPI_DEVICE_PATH)),
-    (UINT8) ((sizeof (ATAPI_DEVICE_PATH)) >> 8),
+    {
+      (UINT8) (sizeof (ATAPI_DEVICE_PATH)),
+      (UINT8) ((sizeof (ATAPI_DEVICE_PATH)) >> 8)
+    }
   },
   0,
   0,
@@ -122,8 +124,10 @@ SATA_DEVICE_PATH    mSataDevicePathTemplate = {
   {
     MESSAGING_DEVICE_PATH,
     MSG_SATA_DP,
-    (UINT8) (sizeof (SATA_DEVICE_PATH)),
-    (UINT8) ((sizeof (SATA_DEVICE_PATH)) >> 8),
+    {
+      (UINT8) (sizeof (SATA_DEVICE_PATH)),
+      (UINT8) ((sizeof (SATA_DEVICE_PATH)) >> 8)
+    }
   },
   0,
   0,

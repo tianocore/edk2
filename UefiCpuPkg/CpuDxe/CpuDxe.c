@@ -17,7 +17,7 @@
 //
 // Global Variables
 //
-IA32_IDT_GATE_DESCRIPTOR  gIdtTable[INTERRUPT_VECTOR_NUMBER] = { 0 };
+IA32_IDT_GATE_DESCRIPTOR  gIdtTable[INTERRUPT_VECTOR_NUMBER] = { { { 0 } } };
 
 EFI_CPU_INTERRUPT_HANDLER ExternalVectorTable[0x100];
 BOOLEAN                   InterruptState = FALSE;

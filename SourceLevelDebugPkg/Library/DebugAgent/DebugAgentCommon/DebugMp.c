@@ -14,7 +14,7 @@
 
 #include "DebugAgent.h"
 
-DEBUG_MP_CONTEXT volatile  mDebugMpContext = {0,0,0,0,0,0,0,0,FALSE,FALSE};
+DEBUG_MP_CONTEXT volatile  mDebugMpContext = {0,0,{0},{0},0,0,0,0,FALSE,FALSE};
 
 DEBUG_CPU_DATA volatile  mDebugCpuData = {0};
 

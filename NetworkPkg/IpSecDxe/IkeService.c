@@ -1,7 +1,7 @@
 /** @file
   Provide IPsec Key Exchange (IKE) service general interfaces.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -36,10 +36,10 @@ EFI_UDP4_CONFIG_DATA    mUdp4Conf = {
   0,
   1000000,
   FALSE,
-  {0,0,0,0},
-  {0,0,0,0},
+  {{0,0,0,0}},
+  {{0,0,0,0}},
   IKE_DEFAULT_PORT,
-  {0,0,0,0},
+  {{0,0,0,0}},
   0
 };
 
@@ -55,9 +55,9 @@ EFI_UDP6_CONFIG_DATA    mUdp6Conf = {
   0,
   1000000,
   //Access Point
-  {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+  {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}},
   IKE_DEFAULT_PORT,
-  {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+  {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}},
   0
 };
 
