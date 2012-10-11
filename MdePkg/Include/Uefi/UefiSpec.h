@@ -1723,6 +1723,10 @@ EFI_STATUS
   OUT UINT64            *MaximumVariableSize
   );
 
+//
+// Firmware should stop at a firmware user interface on next boot
+//
+#define EFI_OS_INDICATIONS_BOOT_TO_FW_UI    0x0000000000000001
 
 //
 // EFI Runtime Services Table

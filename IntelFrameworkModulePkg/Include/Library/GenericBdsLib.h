@@ -4,7 +4,7 @@
     2) BDS boot device connect interface.
     3) BDS Misc interfaces for mainting boot variable, ouput string.
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -386,9 +386,10 @@ BdsLibConnectAll (
   );
 
 /**
-  This function creates all handles associated with the given device
-  path node. If the handle associated with one device path node cannot
-  be created, then it tries to execute the dispatch to load the missing drivers.  
+  This function will create all handles associate with every device
+  path node. If the handle associate with one device path node can not
+  be created successfully, then still give chance to do the dispatch,
+  which load the missing drivers if possible.
 
   @param  DevicePathToConnect   The device path to be connected. Can be
                                 a multi-instance device path.
@@ -465,6 +466,23 @@ BdsLibConnectAllDefaultConsoles (
   VOID
   );
 
+
+/**
+  This function will connect console device except ConIn base on the console
+  device variable ConOut and ErrOut.
+
+  @retval EFI_SUCCESS              At least one of the ConOut device have
+                                   been connected success.
+  @retval EFI_STATUS               Return the status of BdsLibConnectConsoleVariable ().
+
+**/
+EFI_STATUS
+EFIAPI
+BdsLibConnectAllDefaultConsolesWithOutConIn (
+  VOID
+  );
+
+
 /**
   This function updates the console variable based on ConVarName. It can
   add or remove one specific console device path from the variable
@@ -490,22 +508,50 @@ BdsLibUpdateConsoleVariable (
   );
 
 /**
-  Connect the console device base on the variable ConVarName. If
-  ConVarName is a multi-instance device path, and at least one
-  instance connects successfully, then this function
+  Connect the console device base on the variable ConVarName, if
+  device path of the ConVarName is multi-instance device path and
+  anyone of the instances is connected success, then this function
   will return success.
+  If the handle associate with one device path node can not
+  be created successfully, then still give chance to do the dispatch,
+  which load the missing drivers if possible.
 
-  @param  ConVarName               The console related variable name: ConIn, ConOut,
+  @param  ConVarName               Console related variable name, ConIn, ConOut,
                                    ErrOut.
 
-  @retval EFI_NOT_FOUND            No console devices were connected successfully
-  @retval EFI_SUCCESS              Connected at least one instance of the console
-                                   device path based on the variable ConVarName.
+  @retval EFI_NOT_FOUND            There is not any console devices connected
+                                   success
+  @retval EFI_SUCCESS              Success connect any one instance of the console
+                                   device path base on the variable ConVarName.
 
 **/
 EFI_STATUS
 EFIAPI
 BdsLibConnectConsoleVariable (
+  IN  CHAR16                 *ConVarName
+  );
+
+/**
+  Connect the console device base on the variable ConVarName, if
+  device path of the ConVarName is multi-instance device path and
+  anyone of the instances is connected success, then this function
+  will return success. 
+  Dispatch service is not called when the handle associate with one 
+  device path node can not be created successfully. Here no driver 
+  dependency is assumed exist, so need not to call this service.
+
+  @param  ConVarName               Console related variable name, ConIn, ConOut,
+                                   ErrOut.
+
+  @retval EFI_NOT_FOUND            There is not any console devices connected
+                                   success
+  @retval EFI_SUCCESS              Success connect any one instance of the console
+                                   device path base on the variable ConVarName.
+
+**/
+EFI_STATUS
+EFIAPI
+BdsLibConnectConsoleVariableWithOutDispatch (
   IN  CHAR16                 *ConVarName
   );
 

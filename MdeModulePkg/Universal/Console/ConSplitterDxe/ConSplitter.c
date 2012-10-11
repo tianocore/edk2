@@ -30,6 +30,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "ConSplitter.h"
 
 //
+// Identify if ConIn is connected in PcdConInConnectOnDemand enabled mode. 
+// default not connect
+//
+BOOLEAN  mConInIsConnect = FALSE;
+
+//
 // Text In Splitter Private Data template
 //
 GLOBAL_REMOVE_IF_UNREFERENCED TEXT_IN_SPLITTER_PRIVATE_DATA  mConIn = {
@@ -613,6 +619,18 @@ ConSplitterTextInConstructor (
                   ConSplitterSimplePointerWaitForInput,
                   ConInPrivate,
                   &ConInPrivate->SimplePointer.WaitForInput
+                  );
+  ASSERT_EFI_ERROR (Status);
+  //
+  // Create Event to signal ConIn connection request
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  ConSplitterEmptyCallbackFunction,
+                  NULL,
+                  &gConnectConInEventGuid,
+                  &ConInPrivate->ConnectConInEvent
                   );
 
   return Status;
@@ -3331,6 +3349,15 @@ ConSplitterTextInReadKeyStroke (
 
   Private->KeyEventSignalState = FALSE;
 
+  //
+  // Signal ConnectConIn event on first call in Lazy ConIn mode
+  //
+  if (!mConInIsConnect && PcdGetBool (PcdConInConnectOnDemand)) {
+    DEBUG ((EFI_D_INFO, "Connect ConIn in first ReadKeyStoke in Lazy ConIn mode.\n"));    
+    gBS->SignalEvent (Private->ConnectConInEvent);
+    mConInIsConnect = TRUE;
+  }
+
   return ConSplitterTextInPrivateReadKeyStroke (Private, Key);
 }
 
@@ -3509,6 +3536,15 @@ ConSplitterTextInReadKeyStrokeEx (
 
   KeyData->Key.UnicodeChar  = 0;
   KeyData->Key.ScanCode     = SCAN_NULL;
+
+  //
+  // Signal ConnectConIn event on first call in Lazy ConIn mode
+  //
+  if (!mConInIsConnect && PcdGetBool (PcdConInConnectOnDemand)) {
+    DEBUG ((EFI_D_INFO, "Connect ConIn in first ReadKeyStoke in Lazy ConIn mode.\n"));    
+    gBS->SignalEvent (Private->ConnectConInEvent);
+    mConInIsConnect = TRUE;
+  }
 
   //
   // if no physical console input device exists, return EFI_NOT_READY;
@@ -4675,3 +4711,20 @@ ConSplitterTextOutEnableCursor (
   return ReturnStatus;
 }
 
+
+/**
+  An empty function to pass error checking of CreateEventEx ().
+
+  @param  Event                 Event whose notification function is being invoked.
+  @param  Context               Pointer to the notification function's context,
+                                which is implementation-dependent.
+
+**/
+VOID
+EFIAPI
+ConSplitterEmptyCallbackFunction (
+  IN EFI_EVENT                Event,
+  IN VOID                     *Context
+  )
+{
+}

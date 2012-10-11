@@ -10,7 +10,7 @@
 # Note: If only UGA Draw protocol is installed in system table, PcdUgaConsumeSupport
 # should be set to TRUE.
 #
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -73,7 +73,7 @@
   gEfiConsoleInDeviceGuid                       ## SOMETIMES_CONSUMES
   gEfiStandardErrorDeviceGuid                   ## SOMETIMES_CONSUMES
   gEfiConsoleOutDeviceGuid                      ## SOMETIMES_CONSUMES
-
+  gConnectConInEventGuid                        ## ALWAYS_CONSUMES
 
 [Protocols]
   gEfiSimplePointerProtocolGuid                 ## BY_START
@@ -93,4 +93,4 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
-
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand
