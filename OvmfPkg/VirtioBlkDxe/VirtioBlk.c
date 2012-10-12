@@ -23,6 +23,7 @@
 **/
 
 #include <IndustryStandard/Pci.h>
+#include <IndustryStandard/VirtioBlk.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
