@@ -15,9 +15,11 @@
 **/
 
 #include <IndustryStandard/Pci22.h>
+#include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
 #include <Library/VirtioLib.h>
 
@@ -276,6 +278,39 @@ VirtioRingUninit (
 
 /**
 
+  Turn off interrupt notifications from the host, and prepare for appending
+  multiple descriptors to the virtio ring.
+
+  The calling driver must be in VSTAT_DRIVER_OK state.
+
+  @param[in out] Ring  The virtio ring we intend to append descriptors to.
+
+  @param[out] Indices  The DESC_INDICES structure to initialize.
+
+**/
+VOID
+EFIAPI
+VirtioPrepare (
+  IN OUT VRING        *Ring,
+  OUT    DESC_INDICES *Indices
+  )
+{
+  //
+  // Prepare for virtio-0.9.5, 2.4.2 Receiving Used Buffers From the Device.
+  // We're going to poll the answer, the host should not send an interrupt.
+  //
+  *Ring->Avail.Flags = (UINT16) VRING_AVAIL_F_NO_INTERRUPT;
+
+  //
+  // Prepare for virtio-0.9.5, 2.4.1 Supplying Buffers to the Device.
+  //
+  Indices->HeadIdx = *Ring->Avail.Idx;
+  Indices->NextAvailIdx = Indices->HeadIdx;
+}
+
+
+/**
+
   Append a contiguous buffer for transmission / reception via the virtio ring.
 
   This function implements the following sections from virtio-0.9.5:
@@ -286,6 +321,9 @@ VirtioRingUninit (
   synchronous requests and host side status is processed in lock-step with
   request submission. It is the calling driver's responsibility to verify the
   ring size in advance.
+
+  The caller is responsible for initializing *Indices with VirtioPrepare()
+  first.
 
   @param[in out] Ring           The virtio ring to append the buffer to, as a
                                 descriptor.
@@ -303,6 +341,8 @@ VirtioRingUninit (
                                 host only interprets it dependent on
                                 VRING_DESC_F_NEXT.
 
+  In *Indices:
+
   @param [in] HeadIdx           The index identifying the head buffer (first
                                 buffer appended) belonging to this same
                                 request.
@@ -315,21 +355,96 @@ VirtioRingUninit (
 VOID
 EFIAPI
 VirtioAppendDesc (
-  IN OUT VRING  *Ring,
-  IN     UINTN  BufferPhysAddr,
-  IN     UINT32 BufferSize,
-  IN     UINT16 Flags,
-  IN     UINT16 HeadIdx,
-  IN OUT UINT16 *NextAvailIdx
+  IN OUT VRING        *Ring,
+  IN     UINTN        BufferPhysAddr,
+  IN     UINT32       BufferSize,
+  IN     UINT16       Flags,
+  IN OUT DESC_INDICES *Indices
   )
 {
   volatile VRING_DESC *Desc;
 
-  Desc        = &Ring->Desc[*NextAvailIdx % Ring->QueueSize];
+  Desc        = &Ring->Desc[Indices->NextAvailIdx % Ring->QueueSize];
   Desc->Addr  = BufferPhysAddr;
   Desc->Len   = BufferSize;
   Desc->Flags = Flags;
-  Ring->Avail.Ring[(*NextAvailIdx)++ % Ring->QueueSize] =
-    HeadIdx % Ring->QueueSize;
-  Desc->Next  = *NextAvailIdx % Ring->QueueSize;
+  Ring->Avail.Ring[Indices->NextAvailIdx++ % Ring->QueueSize] =
+    Indices->HeadIdx % Ring->QueueSize;
+  Desc->Next  = Indices->NextAvailIdx % Ring->QueueSize;
+}
+
+
+/**
+
+  Notify the host about appended descriptors and wait until it processes the
+  last one (ie. all of them).
+
+  @param[in] PciIo        The target virtio PCI device to notify.
+
+  @param[in] VirtQueueId  Identifies the queue for the target device.
+
+  @param[in out] Ring     The virtio ring with descriptors to submit.
+
+  @param[in] Indices      The function waits until the host processes
+                          descriptors up to Indices->NextAvailIdx.
+
+
+  @return              Error code from VirtioWrite() if it fails.
+
+  @retval EFI_SUCCESS  Otherwise, the host processed all descriptors.
+
+**/
+EFI_STATUS
+EFIAPI
+VirtioFlush (
+  IN     EFI_PCI_IO_PROTOCOL *PciIo,
+  IN     UINT16              VirtQueueId,
+  IN OUT VRING               *Ring,
+  IN     DESC_INDICES        *Indices
+  )
+{
+  EFI_STATUS Status;
+  UINTN      PollPeriodUsecs;
+
+  //
+  // virtio-0.9.5, 2.4.1.3 Updating the Index Field
+  //
+  MemoryFence();
+  *Ring->Avail.Idx = Indices->NextAvailIdx;
+
+  //
+  // virtio-0.9.5, 2.4.1.4 Notifying the Device -- gratuitous notifications are
+  // OK.
+  //
+  MemoryFence();
+  Status = VirtioWrite (
+             PciIo,
+             OFFSET_OF (VIRTIO_HDR, VhdrQueueNotify),
+             sizeof (UINT16),
+             VirtQueueId
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // virtio-0.9.5, 2.4.2 Receiving Used Buffers From the Device
+  // Wait until the host processes and acknowledges our descriptor chain. The
+  // condition we use for polling is greatly simplified and relies on the
+  // synchronous, lock-step progress.
+  //
+  // Keep slowing down until we reach a poll period of slightly above 1 ms.
+  //
+  PollPeriodUsecs = 1;
+  MemoryFence();
+  while (*Ring->Used.Idx != Indices->NextAvailIdx) {
+    gBS->Stall (PollPeriodUsecs); // calls AcpiTimerLib::MicroSecondDelay
+
+    if (PollPeriodUsecs < 1024) {
+      PollPeriodUsecs *= 2;
+    }
+    MemoryFence();
+  }
+
+  return EFI_SUCCESS;
 }

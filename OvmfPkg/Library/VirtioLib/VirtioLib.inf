@@ -29,6 +29,8 @@
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  BaseLib
   BaseMemoryLib
   DebugLib
   MemoryAllocationLib
+  UefiBootServicesTableLib

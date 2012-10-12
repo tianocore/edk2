@@ -135,6 +135,36 @@ VirtioRingUninit (
   );
 
 
+//
+// Internal use structure for tracking the submission of a multi-descriptor
+// request.
+//
+typedef struct {
+  UINT16 HeadIdx;
+  UINT16 NextAvailIdx;
+} DESC_INDICES;
+
+
+/**
+
+  Turn off interrupt notifications from the host, and prepare for appending
+  multiple descriptors to the virtio ring.
+
+  The calling driver must be in VSTAT_DRIVER_OK state.
+
+  @param[in out] Ring  The virtio ring we intend to append descriptors to.
+
+  @param[out] Indices  The DESC_INDICES structure to initialize.
+
+**/
+VOID
+EFIAPI
+VirtioPrepare (
+  IN OUT VRING        *Ring,
+  OUT    DESC_INDICES *Indices
+  );
+
+
 /**
 
   Append a contiguous buffer for transmission / reception via the virtio ring.
@@ -147,6 +177,9 @@ VirtioRingUninit (
   synchronous requests and host side status is processed in lock-step with
   request submission. It is the calling driver's responsibility to verify the
   ring size in advance.
+
+  The caller is responsible for initializing *Indices with VirtioPrepare()
+  first.
 
   @param[in out] Ring           The virtio ring to append the buffer to, as a
                                 descriptor.
@@ -164,6 +197,8 @@ VirtioRingUninit (
                                 host only interprets it dependent on
                                 VRING_DESC_F_NEXT.
 
+  In *Indices:
+
   @param [in] HeadIdx           The index identifying the head buffer (first
                                 buffer appended) belonging to this same
                                 request.
@@ -176,12 +211,41 @@ VirtioRingUninit (
 VOID
 EFIAPI
 VirtioAppendDesc (
-  IN OUT VRING  *Ring,
-  IN     UINTN  BufferPhysAddr,
-  IN     UINT32 BufferSize,
-  IN     UINT16 Flags,
-  IN     UINT16 HeadIdx,
-  IN OUT UINT16 *NextAvailIdx
+  IN OUT VRING        *Ring,
+  IN     UINTN        BufferPhysAddr,
+  IN     UINT32       BufferSize,
+  IN     UINT16       Flags,
+  IN OUT DESC_INDICES *Indices
+  );
+
+
+/**
+
+  Notify the host about appended descriptors and wait until it processes the
+  last one (ie. all of them).
+
+  @param[in] PciIo        The target virtio PCI device to notify.
+
+  @param[in] VirtQueueId  Identifies the queue for the target device.
+
+  @param[in out] Ring     The virtio ring with descriptors to submit.
+
+  @param[in] Indices      The function waits until the host processes
+                          descriptors up to Indices->NextAvailIdx.
+
+
+  @return              Error code from VirtioWrite() if it fails.
+
+  @retval EFI_SUCCESS  Otherwise, the host processed all descriptors.
+
+**/
+EFI_STATUS
+EFIAPI
+VirtioFlush (
+  IN     EFI_PCI_IO_PROTOCOL *PciIo,
+  IN     UINT16              VirtQueueId,
+  IN OUT VRING               *Ring,
+  IN     DESC_INDICES        *Indices
   );
 
 #endif // _VIRTIO_LIB_H_

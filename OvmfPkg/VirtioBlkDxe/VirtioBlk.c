@@ -248,9 +248,7 @@ SynchronousRequest (
   UINT32                  BlockSize;
   volatile VIRTIO_BLK_REQ Request;
   volatile UINT8          HostStatus;
-  UINT16                  FirstAvailIdx;
-  UINT16                  NextAvailIdx;
-  UINTN                   PollPeriodUsecs;
+  DESC_INDICES            Indices;
 
   BlockSize = Dev->BlockIoMedia.BlockSize;
 
@@ -275,11 +273,7 @@ SynchronousRequest (
   Request.IoPrio = 0;
   Request.Sector = Lba * (BlockSize / 512);
 
-  //
-  // Prepare for virtio-0.9.5, 2.4.2 Receiving Used Buffers From the Device.
-  // We're going to poll the answer, the host should not send an interrupt.
-  //
-  *Dev->Ring.Avail.Flags = (UINT16) VRING_AVAIL_F_NO_INTERRUPT;
+  VirtioPrepare (&Dev->Ring, &Indices);
 
   //
   // preset a host status for ourselves that we do not accept as success
@@ -293,16 +287,10 @@ SynchronousRequest (
   ASSERT (Dev->Ring.QueueSize >= 3);
 
   //
-  // Implement virtio-0.9.5, 2.4.1 Supplying Buffers to the Device.
-  //
-  FirstAvailIdx = *Dev->Ring.Avail.Idx;
-  NextAvailIdx  = FirstAvailIdx;
-
-  //
   // virtio-blk header in first desc
   //
   VirtioAppendDesc (&Dev->Ring, (UINTN) &Request, sizeof Request,
-    VRING_DESC_F_NEXT, FirstAvailIdx, &NextAvailIdx);
+    VRING_DESC_F_NEXT, &Indices);
 
   //
   // data buffer for read/write in second desc
@@ -323,50 +311,20 @@ SynchronousRequest (
     //
     VirtioAppendDesc (&Dev->Ring, (UINTN) Buffer, (UINT32) BufferSize,
       VRING_DESC_F_NEXT | (RequestIsWrite ? 0 : VRING_DESC_F_WRITE),
-      FirstAvailIdx, &NextAvailIdx);
+      &Indices);
   }
 
   //
   // host status in last (second or third) desc
   //
   VirtioAppendDesc (&Dev->Ring, (UINTN) &HostStatus, sizeof HostStatus,
-    VRING_DESC_F_WRITE, FirstAvailIdx, &NextAvailIdx);
+    VRING_DESC_F_WRITE, &Indices);
 
   //
-  // virtio-0.9.5, 2.4.1.3 Updating the Index Field
+  // virtio-blk's only virtqueue is #0, called "requestq" (see Appendix D).
   //
-  MemoryFence();
-  *Dev->Ring.Avail.Idx = NextAvailIdx;
-
-  //
-  // virtio-0.9.5, 2.4.1.4 Notifying the Device -- gratuitous notifications are
-  // OK. virtio-blk's only virtqueue is #0, called "requestq" (see Appendix D).
-  //
-  MemoryFence();
-  if (EFI_ERROR (VIRTIO_CFG_WRITE (Dev, Generic.VhdrQueueNotify, 0))) {
-    return EFI_DEVICE_ERROR;
-  }
-
-  //
-  // virtio-0.9.5, 2.4.2 Receiving Used Buffers From the Device
-  // Wait until the host processes and acknowledges our 3-part descriptor
-  // chain. The condition we use for polling is greatly simplified and relies
-  // on synchronous, the lock-step progress.
-  //
-  // Keep slowing down until we reach a poll period of slightly above 1 ms.
-  //
-  PollPeriodUsecs = 1;
-  MemoryFence();
-  while (*Dev->Ring.Used.Idx != NextAvailIdx) {
-    gBS->Stall (PollPeriodUsecs); // calls AcpiTimerLib::MicroSecondDelay
-
-    if (PollPeriodUsecs < 1024) {
-      PollPeriodUsecs *= 2;
-    }
-    MemoryFence();
-  }
-
-  if (HostStatus == VIRTIO_BLK_S_OK) {
+  if (VirtioFlush (Dev->PciIo, 0, &Dev->Ring, &Indices) == EFI_SUCCESS &&
+      HostStatus == VIRTIO_BLK_S_OK) {
     return EFI_SUCCESS;
   }
 
