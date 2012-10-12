@@ -1,7 +1,7 @@
 /** @file
 Utility functions for expression evaluation.
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -891,7 +891,7 @@ IdToQuestion (
       // to keep synchronous, always reload the Question Value.
       //
       if (Question->Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE) {
-        GetQuestionValue (FormSet, Form, Question, FALSE);
+        GetQuestionValue (FormSet, Form, Question, GetSetValueWithHiiDriver);
       }
 
       return Question;
@@ -2142,7 +2142,7 @@ GetQuestionValueFromForm (
   //
   // Get the question value.
   //
-  Status = GetQuestionValue(FormSet, Form, Question, FALSE);
+  Status = GetQuestionValue(FormSet, Form, Question, GetSetValueWithHiiDriver);
   if (EFI_ERROR (Status)) {
     GetTheVal = FALSE;
     goto Done;
@@ -2343,7 +2343,7 @@ EvaluateExpression (
             //
             // Get value from string except for STRING value.
             //
-            Status = GetValueByName (OpCode->VarStorage, OpCode->ValueName, &StrPtr);
+            Status = GetValueByName (OpCode->VarStorage, OpCode->ValueName, &StrPtr, GetSetValueWithEditBuffer);
             if (!EFI_ERROR (Status)) {
               ASSERT (StrPtr != NULL);
               TempLength = StrLen (StrPtr);
@@ -2796,7 +2796,7 @@ EvaluateExpression (
             for (Index = 0; Index < OpCode->ValueWidth; Index ++, TempBuffer --) {
               StrPtr += UnicodeValueToString (StrPtr, PREFIX_ZERO | RADIX_HEX, *TempBuffer, 2);
             }
-            Status = SetValueByName (OpCode->VarStorage, OpCode->ValueName, NameValue, TRUE);
+            Status = SetValueByName (OpCode->VarStorage, OpCode->ValueName, NameValue, GetSetValueWithEditBuffer);
             FreePool (NameValue);
             if (!EFI_ERROR (Status)) {
               Data1.Value.b = TRUE;

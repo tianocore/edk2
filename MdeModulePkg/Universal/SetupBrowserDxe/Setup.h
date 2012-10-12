@@ -574,6 +574,26 @@ typedef struct {
 
 #define BROWSER_HOT_KEY_FROM_LINK(a)  CR (a, BROWSER_HOT_KEY, Link, BROWSER_HOT_KEY_SIGNATURE)
 
+//
+// Scope for get defaut value. It may be GetDefaultForNoStorage, GetDefaultForStorage or GetDefaultForAll.
+//
+typedef enum {
+  GetDefaultForNoStorage,       // Get default value for question which not has storage.
+  GetDefaultForStorage,         // Get default value for question which has storage.
+  GetDefaultForAll,             // Get default value for all questions.
+  GetDefaultForMax              // Invalid value.
+} BROWSER_GET_DEFAULT_VALUE;
+
+//
+// Get/set question value from/to.
+//
+typedef enum {
+  GetSetValueWithEditBuffer,       // Get/Set question value from/to editbuffer in the storage.
+  GetSetValueWithBuffer,           // Get/Set question value from/to buffer in the storage.
+  GetSetValueWithHiiDriver,        // Get/Set question value from/to hii driver.
+  GetSetValueWithMax               // Invalid value.
+} GET_SET_QUESTION_VALUE_WITH;
+
 extern EFI_HII_DATABASE_PROTOCOL         *mHiiDatabase;
 extern EFI_HII_STRING_PROTOCOL           *mHiiString;
 extern EFI_HII_CONFIG_ROUTING_PROTOCOL   *mHiiConfigRouting;
@@ -877,6 +897,7 @@ CreateDialog (
   @param  Storage                The NameValue Storage.
   @param  Name                   The Name.
   @param  Value                  The retured Value.
+  @param  GetValueFrom           Where to get source value, from EditValue or Value.
 
   @retval EFI_SUCCESS            Value found for given Name.
   @retval EFI_NOT_FOUND          No such Name found in NameValue storage.
@@ -884,9 +905,10 @@ CreateDialog (
 **/
 EFI_STATUS
 GetValueByName (
-  IN FORMSET_STORAGE         *Storage,
-  IN CHAR16                  *Name,
-  IN OUT CHAR16              **Value
+  IN FORMSET_STORAGE             *Storage,
+  IN CHAR16                      *Name,
+  IN OUT CHAR16                  **Value,
+  IN GET_SET_QUESTION_VALUE_WITH GetValueFrom
   );
 
 /**
@@ -895,7 +917,7 @@ GetValueByName (
   @param  Storage                The NameValue Storage.
   @param  Name                   The Name.
   @param  Value                  The Value to set.
-  @param  Edit                   Whether update editValue or Value.
+  @param  SetValueTo             Whether update editValue or Value.
 
   @retval EFI_SUCCESS            Value found for given Name.
   @retval EFI_NOT_FOUND          No such Name found in NameValue storage.
@@ -903,10 +925,10 @@ GetValueByName (
 **/
 EFI_STATUS
 SetValueByName (
-  IN FORMSET_STORAGE         *Storage,
-  IN CHAR16                  *Name,
-  IN CHAR16                  *Value,
-  IN BOOLEAN                 Edit
+  IN FORMSET_STORAGE             *Storage,
+  IN CHAR16                      *Name,
+  IN CHAR16                      *Value,
+  IN GET_SET_QUESTION_VALUE_WITH SetValueTo
   );
 
 /**
@@ -915,8 +937,7 @@ SetValueByName (
   @param  FormSet                FormSet data structure.
   @param  Form                   Form data structure.
   @param  Question               Question to be initialized.
-  @param  Cached                 TRUE:  get from Edit copy FALSE: get from original
-                                 Storage
+  @param  GetValueFrom           Where to get value, may from editbuffer, buffer or hii driver.
 
   @retval EFI_SUCCESS            The function completed successfully.
 
@@ -926,7 +947,7 @@ GetQuestionValue (
   IN FORM_BROWSER_FORMSET             *FormSet,
   IN FORM_BROWSER_FORM                *Form,
   IN OUT FORM_BROWSER_STATEMENT       *Question,
-  IN BOOLEAN                          Cached
+  IN GET_SET_QUESTION_VALUE_WITH      GetValueFrom
   );
 
 /**
@@ -935,8 +956,7 @@ GetQuestionValue (
   @param  FormSet                FormSet data structure.
   @param  Form                   Form data structure.
   @param  Question               Pointer to the Question.
-  @param  Cached                 TRUE:  set to Edit copy FALSE: set to original
-                                 Storage
+  @param  SetValueTo             Update the question value to editbuffer , buffer or hii driver.
 
   @retval EFI_SUCCESS            The function completed successfully.
 
@@ -946,7 +966,7 @@ SetQuestionValue (
   IN FORM_BROWSER_FORMSET             *FormSet,
   IN FORM_BROWSER_FORM                *Form,
   IN OUT FORM_BROWSER_STATEMENT       *Question,
-  IN BOOLEAN                          Cached
+  IN GET_SET_QUESTION_VALUE_WITH      SetValueTo
   );
 
 /**
@@ -1061,12 +1081,20 @@ InitializeFormSet (
   );
 
 /**
-  Reset Questions to their default value in a Form, Formset or System.
+  Reset Questions to their initial value or default value in a Form, Formset or System.
+
+  GetDefaultValueScope parameter decides which questions will reset 
+  to its default value.
 
   @param  FormSet                FormSet data structure.
   @param  Form                   Form data structure.
   @param  DefaultId              The Class of the default.
   @param  SettingScope           Setting Scope for Default action.
+  @param  GetDefaultValueScope   Get default value scope.
+  @param  Storage                Get default value only for this storage.
+  @param  RetrieveValueFirst     Whether call the retrieve call back to
+                                 get the initial value before get default
+                                 value.
 
   @retval EFI_SUCCESS            The function completed successfully.
   @retval EFI_UNSUPPORTED        Unsupport SettingScope.
@@ -1077,7 +1105,10 @@ ExtractDefault (
   IN FORM_BROWSER_FORMSET             *FormSet,
   IN FORM_BROWSER_FORM                *Form,
   IN UINT16                           DefaultId,
-  IN BROWSER_SETTING_SCOPE            SettingScope
+  IN BROWSER_SETTING_SCOPE            SettingScope,
+  IN BROWSER_GET_DEFAULT_VALUE        GetDefaultValueScope,
+  IN FORMSET_STORAGE                  *Storage,
+  IN BOOLEAN                          RetrieveValueFirst
   );
 
 /**
@@ -1356,6 +1387,24 @@ ProcessCallBackFunction (
   IN     FORM_BROWSER_STATEMENT          *Question,
   IN     EFI_BROWSER_ACTION              Action,
   IN     BOOLEAN                         SkipSaveOrDiscard
+  );
+  
+/**
+  Call the retrieve type call back function for one question to get the initialize data.
+  
+  This function only used when in the initialize stage, because in this stage, the 
+  Selection->Form is not ready. For other case, use the ProcessCallBackFunction instead.
+
+  @param ConfigAccess          The config access protocol produced by the hii driver.
+  @param Statement             The Question which need to call.
+
+  @retval EFI_SUCCESS          The call back function excutes successfully.
+  @return Other value if the call back function failed to excute.  
+**/
+EFI_STATUS 
+ProcessRetrieveForQuestion (
+  IN     EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess,
+  IN     FORM_BROWSER_STATEMENT          *Statement
   );
 
 /**
