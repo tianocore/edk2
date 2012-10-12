@@ -1,7 +1,7 @@
 /** @file
   Main PAL API's defined in Intel Itanium Architecture Software Developer's Manual.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -991,7 +991,7 @@ typedef struct {
                                             ///< enabled.
   UINT64  ThreadsPerCore:8;                 ///< Number of threads per core.
   UINT64  Reserved1:8;
-  UINT64  CoresPerProcessor;                ///< Total number of cores on this
+  UINT64  CoresPerProcessor:8;              ///< Total number of cores on this
                                             ///< physical processor package.
   UINT64  Reserved2:8;
   UINT64  PhysicalProcessorPackageId:8;     ///< Physical processor package
@@ -2708,9 +2708,10 @@ typedef struct {
                                     ///<  structure hierarchy level-3 4 -
                                     ///<  Error structure hierarchy level-4
                                     ///<  All other values are reserved.
-                                    ///<  Reserved 63:16 Reserved
 
-  UINT64  Reserved:48;
+  UINT64  Reserved:32;              ///< Reserved 47:16 Reserved
+
+  UINT64  ImplSpec:16;              ///< Bit63:48, Processor specific error injection capabilities.
 } PAL_MC_ERROR_TYPE_INFO;
 
 typedef struct {
