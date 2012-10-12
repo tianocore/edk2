@@ -538,7 +538,7 @@ SynchronousRequest (
   // OK. virtio-blk's only virtqueue is #0, called "requestq" (see Appendix D).
   //
   MemoryFence();
-  if (EFI_ERROR (VIRTIO_CFG_WRITE (Dev, VhdrQueueNotify, 0))) {
+  if (EFI_ERROR (VIRTIO_CFG_WRITE (Dev, Generic.VhdrQueueNotify, 0))) {
     return EFI_DEVICE_ERROR;
   }
 
@@ -984,19 +984,19 @@ VirtioBlkInit (
   // Execute virtio-0.9.5, 2.2.1 Device Initialization Sequence.
   //
   NextDevStat = 0;             // step 1 -- reset device
-  Status = VIRTIO_CFG_WRITE (Dev, VhdrDeviceStatus, NextDevStat);
+  Status = VIRTIO_CFG_WRITE (Dev, Generic.VhdrDeviceStatus, NextDevStat);
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
 
   NextDevStat |= VSTAT_ACK;    // step 2 -- acknowledge device presence
-  Status = VIRTIO_CFG_WRITE (Dev, VhdrDeviceStatus, NextDevStat);
+  Status = VIRTIO_CFG_WRITE (Dev, Generic.VhdrDeviceStatus, NextDevStat);
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
 
   NextDevStat |= VSTAT_DRIVER; // step 3 -- we know how to drive it
-  Status = VIRTIO_CFG_WRITE (Dev, VhdrDeviceStatus, NextDevStat);
+  Status = VIRTIO_CFG_WRITE (Dev, Generic.VhdrDeviceStatus, NextDevStat);
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
@@ -1004,7 +1004,7 @@ VirtioBlkInit (
   //
   // step 4a -- retrieve and validate features
   //
-  Status = VIRTIO_CFG_READ (Dev, VhdrDeviceFeatureBits, &Features);
+  Status = VIRTIO_CFG_READ (Dev, Generic.VhdrDeviceFeatureBits, &Features);
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
@@ -1039,11 +1039,11 @@ VirtioBlkInit (
   //
   // step 4b -- allocate virtqueue
   //
-  Status = VIRTIO_CFG_WRITE (Dev, VhdrQueueSelect, 0);
+  Status = VIRTIO_CFG_WRITE (Dev, Generic.VhdrQueueSelect, 0);
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
-  Status = VIRTIO_CFG_READ (Dev, VhdrQueueSize, &QueueSize);
+  Status = VIRTIO_CFG_READ (Dev, Generic.VhdrQueueSize, &QueueSize);
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
@@ -1061,7 +1061,7 @@ VirtioBlkInit (
   // step 4c -- Report GPFN (guest-physical frame number) of queue. If anything
   // fails from here on, we must release the ring resources.
   //
-  Status = VIRTIO_CFG_WRITE (Dev, VhdrQueueAddress,
+  Status = VIRTIO_CFG_WRITE (Dev, Generic.VhdrQueueAddress,
              (UINTN) Dev->Ring.Base >> EFI_PAGE_SHIFT);
   if (EFI_ERROR (Status)) {
     goto ReleaseQueue;
@@ -1073,7 +1073,7 @@ VirtioBlkInit (
   // device-independent (known or unknown) VIRTIO_F_* capabilities (see
   // Appendix B).
   //
-  Status = VIRTIO_CFG_WRITE (Dev, VhdrGuestFeatureBits, 0);
+  Status = VIRTIO_CFG_WRITE (Dev, Generic.VhdrGuestFeatureBits, 0);
   if (EFI_ERROR (Status)) {
     goto ReleaseQueue;
   }
@@ -1082,7 +1082,7 @@ VirtioBlkInit (
   // step 6 -- initialization complete
   //
   NextDevStat |= VSTAT_DRIVER_OK;
-  Status = VIRTIO_CFG_WRITE (Dev, VhdrDeviceStatus, NextDevStat);
+  Status = VIRTIO_CFG_WRITE (Dev, Generic.VhdrDeviceStatus, NextDevStat);
   if (EFI_ERROR (Status)) {
     goto ReleaseQueue;
   }
@@ -1118,7 +1118,7 @@ Failed:
   // Status. PCI IO access failure here should not mask the original error.
   //
   NextDevStat |= VSTAT_FAILED;
-  VIRTIO_CFG_WRITE (Dev, VhdrDeviceStatus, NextDevStat);
+  VIRTIO_CFG_WRITE (Dev, Generic.VhdrDeviceStatus, NextDevStat);
 
   return Status; // reached only via Failed above
 }
@@ -1145,7 +1145,7 @@ VirtioBlkUninit (
   // VIRTIO_CFG_WRITE() returns, the host will have learned to stay away from
   // the old comms area.
   //
-  VIRTIO_CFG_WRITE (Dev, VhdrDeviceStatus, 0);
+  VIRTIO_CFG_WRITE (Dev, Generic.VhdrDeviceStatus, 0);
 
   VirtioRingUninit (&Dev->Ring);
 

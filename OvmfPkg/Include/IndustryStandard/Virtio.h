@@ -96,7 +96,6 @@ typedef struct {
 
 //
 // virtio-0.9.5, 2.2.2 Virtio Header -- no MSI-X
-// virtio-0.9.5, Appendix D
 //
 #pragma pack(1)
 typedef struct {
@@ -108,13 +107,20 @@ typedef struct {
   UINT16 VhdrQueueNotify;
   UINT8  VhdrDeviceStatus;
   UINT8  VhdrISR;
-  UINT64 VhdrCapacity;
-  UINT32 VhdrSizeMax;
-  UINT32 VhdrSegMax;
-  UINT16 VhdrCylinders;
-  UINT8  VhdrHeads;
-  UINT8  VhdrSectors;
-  UINT32 VhdrBlkSize;
+} VIRTIO_HDR;
+
+//
+// virtio-0.9.5, Appendix D: Block Device
+//
+typedef struct {
+  VIRTIO_HDR Generic;
+  UINT64     VhdrCapacity;
+  UINT32     VhdrSizeMax;
+  UINT32     VhdrSegMax;
+  UINT16     VhdrCylinders;
+  UINT8      VhdrHeads;
+  UINT8      VhdrSectors;
+  UINT32     VhdrBlkSize;
 } VBLK_HDR;
 #pragma pack()
 
