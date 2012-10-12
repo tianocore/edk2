@@ -112,7 +112,7 @@ DEBUG_CODE_END();
   string  = gMD->NCmdLine;
   for(count = 0; count < Argc; ++count) {
     nArgv[count] = string;
-    AVsz = wcstombs(string, Argv[count], nArgvSize);
+    AVsz = wcstombs(string, Argv[count], nArgvSize) + 1;
     DEBUG((DEBUG_INFO, "Cvt[%d] %d \"%s\" --> \"%a\"\n", (INT32)count, (INT32)AVsz, Argv[count], nArgv[count]));
     string += AVsz;
     nArgvSize -= AVsz;
