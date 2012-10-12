@@ -1473,8 +1473,6 @@ PciIovParseVfBar (
   UINT32      Value;
   UINT32      OriginalValue;
   UINT32      Mask;
-  UINT32      Data;
-  UINT8       Index;
   EFI_STATUS  Status;
 
   //
@@ -1592,12 +1590,7 @@ PciIovParseVfBar (
       //
       // Fix the length to support some spefic 64 bit BAR
       //
-      Data  = Value;
-      Index = 0;
-      for (Data = Value; Data != 0; Data >>= 1) {
-      	Index ++;
-      }
-      Value |= ((UINT32)(-1) << Index); 
+      Value |= ((UINT32) -1 << HighBitSet32 (Value));
 
       //
       // Calculate the size of 64bit bar
@@ -1672,8 +1665,6 @@ PciParseBar (
   UINT32      Value;
   UINT32      OriginalValue;
   UINT32      Mask;
-  UINT32      Data;
-  UINT8       Index;
   EFI_STATUS  Status;
 
   OriginalValue = 0;
@@ -1810,12 +1801,7 @@ PciParseBar (
       //
       // Fix the length to support some spefic 64 bit BAR
       //
-      Data  = Value;
-      Index = 0;
-      for (Data = Value; Data != 0; Data >>= 1) {
-        Index ++;
-      }
-      Value |= ((UINT32)(-1) << Index);
+      Value |= ((UINT32)(-1) << HighBitSet32 (Value));
 
       //
       // Calculate the size of 64bit bar

@@ -1,7 +1,7 @@
 /** @file
   Supporting functions implementaion for PCI devices management.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -214,7 +214,6 @@ RegisterPciDevice (
   UINT8               PciExpressCapRegOffset;
   EFI_PCI_IO_PROTOCOL *PciIo;
   UINT8               Data8;
-  BOOLEAN             HasEfiImage;
 
   //
   // Install the pciio protocol, device path protocol
@@ -315,12 +314,7 @@ RegisterPciDevice (
     }
   }
 
-  //
-  // Determine if there are EFI images in the option rom
-  //
-  HasEfiImage = ContainEfiImage (PciIoDevice->PciIo.RomImage, PciIoDevice->PciIo.RomSize);
-
-  if (HasEfiImage) {
+  if (PciIoDevice->HasEfiOpRom) {
     Status = gBS->InstallMultipleProtocolInterfaces (
                     &PciIoDevice->Handle,
                     &gEfiLoadFile2ProtocolGuid,
@@ -350,7 +344,7 @@ RegisterPciDevice (
     // The OpRom is got from platform in the above code
     // or loaded from device in the previous round of bus enumeration
     //
-    if (HasEfiImage) {
+    if (PciIoDevice->HasEfiOpRom) {
       ProcessOpRomImage (PciIoDevice);
     }
   }
@@ -374,7 +368,7 @@ RegisterPciDevice (
              &PciIoDevice->PciIo,
              NULL
              );
-      if (HasEfiImage) {
+      if (PciIoDevice->HasEfiOpRom) {
         gBS->UninstallMultipleProtocolInterfaces (
                &PciIoDevice->Handle,
                &gEfiLoadFile2ProtocolGuid,
