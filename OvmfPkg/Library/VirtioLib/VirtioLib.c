@@ -44,8 +44,8 @@
   @return  Status code returned by PciIo->Io.Write().
 
 **/
-EFIAPI
 EFI_STATUS
+EFIAPI
 VirtioWrite (
   IN EFI_PCI_IO_PROTOCOL *PciIo,
   IN UINTN               FieldOffset,
@@ -76,6 +76,7 @@ VirtioWrite (
 
     default:
       ASSERT (FALSE);
+      return EFI_INVALID_PARAMETER;
   }
 
   return PciIo->Io.Write (
@@ -111,8 +112,8 @@ VirtioWrite (
   @return  Status code returned by PciIo->Io.Read().
 
 **/
-EFIAPI
 EFI_STATUS
+EFIAPI
 VirtioRead (
   IN  EFI_PCI_IO_PROTOCOL *PciIo,
   IN  UINTN               FieldOffset,
@@ -146,6 +147,7 @@ VirtioRead (
 
     default:
       ASSERT (FALSE);
+      return EFI_INVALID_PARAMETER;
   }
 
   return PciIo->Io.Read (

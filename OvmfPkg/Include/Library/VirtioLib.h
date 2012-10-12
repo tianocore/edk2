@@ -40,8 +40,8 @@
   @return  Status code returned by PciIo->Io.Write().
 
 **/
-EFIAPI
 EFI_STATUS
+EFIAPI
 VirtioWrite (
   IN EFI_PCI_IO_PROTOCOL *PciIo,
   IN UINTN               FieldOffset,
@@ -72,8 +72,8 @@ VirtioWrite (
   @return  Status code returned by PciIo->Io.Read().
 
 **/
-EFIAPI
 EFI_STATUS
+EFIAPI
 VirtioRead (
   IN  EFI_PCI_IO_PROTOCOL *PciIo,
   IN  UINTN               FieldOffset,

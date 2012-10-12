@@ -997,13 +997,13 @@ STATIC EFI_DRIVER_BINDING_PROTOCOL gDriverBinding = {
 // for unambiguous identification.
 //
 
-STATIC GLOBAL_REMOVE_IF_UNREFERENCED
+STATIC
 EFI_UNICODE_STRING_TABLE mDriverNameTable[] = {
   { "eng;en", L"Virtio Block Driver" },
   { NULL,     NULL                   }
 };
 
-STATIC GLOBAL_REMOVE_IF_UNREFERENCED
+STATIC
 EFI_COMPONENT_NAME_PROTOCOL gComponentName;
 
 EFI_STATUS
@@ -1036,14 +1036,14 @@ VirtioBlkGetDeviceName (
   return EFI_UNSUPPORTED;
 }
 
-STATIC GLOBAL_REMOVE_IF_UNREFERENCED
+STATIC
 EFI_COMPONENT_NAME_PROTOCOL gComponentName = {
   &VirtioBlkGetDriverName,
   &VirtioBlkGetDeviceName,
   "eng" // SupportedLanguages, ISO 639-2 language codes
 };
 
-STATIC GLOBAL_REMOVE_IF_UNREFERENCED
+STATIC
 EFI_COMPONENT_NAME2_PROTOCOL gComponentName2 = {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)     &VirtioBlkGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) &VirtioBlkGetDeviceName,
