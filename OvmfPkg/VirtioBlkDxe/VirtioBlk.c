@@ -197,15 +197,15 @@ VirtioRead (
 
 #define VIRTIO_CFG_WRITE(Dev, Field, Value)  (VirtioWrite (             \
                                                 (Dev)->PciIo,           \
-                                                OFFSET_OF_VHDR (Field), \
-                                                SIZE_OF_VHDR (Field),   \
+                                                OFFSET_OF_VBLK (Field), \
+                                                SIZE_OF_VBLK (Field),   \
                                                 (Value)                 \
                                                 ))
 
 #define VIRTIO_CFG_READ(Dev, Field, Pointer) (VirtioRead (              \
                                                 (Dev)->PciIo,           \
-                                                OFFSET_OF_VHDR (Field), \
-                                                SIZE_OF_VHDR (Field),   \
+                                                OFFSET_OF_VBLK (Field), \
+                                                SIZE_OF_VBLK (Field),   \
                                                 sizeof *(Pointer),      \
                                                 (Pointer)               \
                                                 ))

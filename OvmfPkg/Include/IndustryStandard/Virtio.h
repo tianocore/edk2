@@ -124,8 +124,8 @@ typedef struct {
 } VBLK_HDR;
 #pragma pack()
 
-#define OFFSET_OF_VHDR(Field) OFFSET_OF (VBLK_HDR, Field)
-#define SIZE_OF_VHDR(Field)   (sizeof ((VBLK_HDR *) 0)->Field)
+#define OFFSET_OF_VBLK(Field) OFFSET_OF (VBLK_HDR, Field)
+#define SIZE_OF_VBLK(Field)   (sizeof ((VBLK_HDR *) 0)->Field)
 
 
 //
