@@ -1519,16 +1519,18 @@ InitKeyboard (
   // Perform a read to cleanup the Status Register's
   // output buffer full bits within MAX TRY times
   //
-  while (!EFI_ERROR (Status) && TryTime < KEYBOARD_MAX_TRY) {
-    Status = KeyboardRead (ConsoleIn, &CommandByte);
-    TryTime ++;
-  }
-  //
-  // Exceed the max try times. The device may be error.
-  //
-  if (TryTime == KEYBOARD_MAX_TRY) {
-  	Status = EFI_DEVICE_ERROR;
-  	goto Done;
+  if ((KeyReadStatusRegister (ConsoleIn) & KEYBOARD_STATUS_REGISTER_HAS_OUTPUT_DATA)) {
+    while (!EFI_ERROR (Status) && TryTime < KEYBOARD_MAX_TRY) {
+      Status = KeyboardRead (ConsoleIn, &CommandByte);
+      TryTime ++;
+    }
+    //
+    // Exceed the max try times. The device may be error.
+    //
+    if (TryTime == KEYBOARD_MAX_TRY) {
+    	Status = EFI_DEVICE_ERROR;
+    	goto Done;
+    }
   }
   //
   // We should disable mouse interface during the initialization process
@@ -1543,34 +1545,37 @@ InitKeyboard (
   // time initialization
   //
   if ((KeyReadStatusRegister (ConsoleIn) & KEYBOARD_STATUS_REGISTER_SYSTEM_FLAG) != 0) {
-    //
-    // 8042 controller is already setup (by myself or by mouse driver):
-    //   See whether mouse interface is already enabled
-    //   which determines whether we should enable it later
-    //
-    //
-    // Read the command byte of 8042 controller
-    //
-    Status = KeyboardCommand (ConsoleIn, KEYBOARD_8042_COMMAND_READ);
-    if (EFI_ERROR (Status)) {
-      KeyboardError (ConsoleIn, L"\n\r");
-      goto Done;
-    }
-
-    Status = KeyboardRead (ConsoleIn, &CommandByte);
-    if (EFI_ERROR (Status)) {
-      KeyboardError (ConsoleIn, L"\n\r");
-      goto Done;
-    }
-    //
-    // Test the mouse enabling bit
-    //
-    if ((CommandByte & 0x20) != 0) {
-      mEnableMouseInterface = FALSE;
+    if (!PcdGetBool (PcdFastPS2Detection)) {
+      //
+      // 8042 controller is already setup (by myself or by mouse driver):
+      //   See whether mouse interface is already enabled
+      //   which determines whether we should enable it later
+      //
+      //
+      // Read the command byte of 8042 controller
+      //
+      Status = KeyboardCommand (ConsoleIn, KEYBOARD_8042_COMMAND_READ);
+      if (EFI_ERROR (Status)) {
+        KeyboardError (ConsoleIn, L"\n\r");
+        goto Done;
+      }
+      
+      Status = KeyboardRead (ConsoleIn, &CommandByte);
+      if (EFI_ERROR (Status)) {
+        KeyboardError (ConsoleIn, L"\n\r");
+        goto Done;
+      }
+      //
+      // Test the mouse enabling bit
+      //
+      if ((CommandByte & 0x20) != 0) {
+        mEnableMouseInterface = FALSE;
+      } else {
+        mEnableMouseInterface = TRUE;
+      }
     } else {
-      mEnableMouseInterface = TRUE;
-    }
-
+      mEnableMouseInterface = FALSE;
+    } 
   } else {
     //
     // 8042 controller is not setup yet:
@@ -1580,36 +1585,38 @@ InitKeyboard (
     //
     // Disable keyboard and mouse interfaces
     //
-    Status = KeyboardCommand (ConsoleIn, KEYBOARD_8042_COMMAND_DISABLE_KEYBOARD_INTERFACE);
-    if (EFI_ERROR (Status)) {
-      KeyboardError (ConsoleIn, L"\n\r");
-      goto Done;
-    }
-
-    Status = KeyboardCommand (ConsoleIn, KEYBOARD_8042_COMMAND_DISABLE_MOUSE_INTERFACE);
-    if (EFI_ERROR (Status)) {
-      KeyboardError (ConsoleIn, L"\n\r");
-      goto Done;
-    }
-
-    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
-      EFI_PROGRESS_CODE,
-      EFI_PERIPHERAL_KEYBOARD | EFI_P_KEYBOARD_PC_SELF_TEST,
-      ConsoleIn->DevicePath
-      );
-    //
-    // 8042 Controller Self Test
-    //
-    Status = KeyboardCommand (ConsoleIn, KEYBOARD_8042_COMMAND_CONTROLLER_SELF_TEST);
-    if (EFI_ERROR (Status)) {
-      KeyboardError (ConsoleIn, L"8042 controller command write error!\n\r");
-      goto Done;
-    }
-
-    Status = KeyboardWaitForValue (ConsoleIn, 0x55);
-    if (EFI_ERROR (Status)) {
-      KeyboardError (ConsoleIn, L"8042 controller self test failed!\n\r");
-      goto Done;
+    if (!PcdGetBool (PcdFastPS2Detection)) {
+      Status = KeyboardCommand (ConsoleIn, KEYBOARD_8042_COMMAND_DISABLE_KEYBOARD_INTERFACE);
+      if (EFI_ERROR (Status)) {
+        KeyboardError (ConsoleIn, L"\n\r");
+        goto Done;
+      }
+      
+      Status = KeyboardCommand (ConsoleIn, KEYBOARD_8042_COMMAND_DISABLE_MOUSE_INTERFACE);
+      if (EFI_ERROR (Status)) {
+        KeyboardError (ConsoleIn, L"\n\r");
+        goto Done;
+      }
+      
+      REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+        EFI_PROGRESS_CODE,
+        EFI_PERIPHERAL_KEYBOARD | EFI_P_KEYBOARD_PC_SELF_TEST,
+        ConsoleIn->DevicePath
+        );
+      //
+      // 8042 Controller Self Test
+      //
+      Status = KeyboardCommand (ConsoleIn, KEYBOARD_8042_COMMAND_CONTROLLER_SELF_TEST);
+      if (EFI_ERROR (Status)) {
+        KeyboardError (ConsoleIn, L"8042 controller command write error!\n\r");
+        goto Done;
+      }
+      
+      Status = KeyboardWaitForValue (ConsoleIn, 0x55);
+      if (EFI_ERROR (Status)) {
+        KeyboardError (ConsoleIn, L"8042 controller self test failed!\n\r");
+        goto Done;
+      }
     }
     //
     // Don't enable mouse interface later
@@ -1865,34 +1872,37 @@ CheckKeyboardConnect (
   EFI_STATUS     Status;
   UINTN          WaitForValueTimeOutBcakup;
 
-  Status = EFI_SUCCESS;
   //
   // enable keyboard itself and wait for its ack
   // If can't receive ack, Keyboard should not be connected.
   //
-  Status = KeyboardWrite (
-             ConsoleIn,
-             KEYBOARD_KBEN
-             );
-
-  if (EFI_ERROR (Status)) {
-    return FALSE;
+  if (!PcdGetBool (PcdFastPS2Detection)) {
+    Status = KeyboardWrite (
+               ConsoleIn,
+               KEYBOARD_KBEN
+               );
+    
+    if (EFI_ERROR (Status)) {
+      return FALSE;
+    }
+    //
+    // wait for 1s
+    //
+    WaitForValueTimeOutBcakup = mWaitForValueTimeOut;
+    mWaitForValueTimeOut = KEYBOARD_WAITFORVALUE_TIMEOUT;
+    Status = KeyboardWaitForValue (
+               ConsoleIn,
+               KEYBOARD_CMDECHO_ACK
+               );
+    mWaitForValueTimeOut = WaitForValueTimeOutBcakup;
+    
+    if (EFI_ERROR (Status)) {
+      return FALSE;
+    }
+    
+    return TRUE;
+  } else {
+    return TRUE;
   }
-  //
-  // wait for 1s
-  //
-  WaitForValueTimeOutBcakup = mWaitForValueTimeOut;
-  mWaitForValueTimeOut = KEYBOARD_WAITFORVALUE_TIMEOUT;
-  Status = KeyboardWaitForValue (
-             ConsoleIn,
-             KEYBOARD_CMDECHO_ACK
-             );
-  mWaitForValueTimeOut = WaitForValueTimeOutBcakup;
-
-  if (EFI_ERROR (Status)) {
-    return FALSE;
-  }
-
-  return TRUE;
 }
 

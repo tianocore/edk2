@@ -69,3 +69,6 @@
 
 [FeaturePcd]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPs2KbdExtendedVerification|FALSE
+
+[Pcd]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdFastPS2Detection

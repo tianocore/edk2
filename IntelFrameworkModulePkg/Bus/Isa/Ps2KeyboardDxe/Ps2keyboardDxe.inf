@@ -68,6 +68,9 @@
 [FeaturePcd]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPs2KbdExtendedVerification
 
+[Pcd]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdFastPS2Detection
+
 # [Event]
 #   ##
 #   # Event will be signaled for WaitForKey event.

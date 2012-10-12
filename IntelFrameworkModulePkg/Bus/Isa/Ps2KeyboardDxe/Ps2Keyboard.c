@@ -255,16 +255,25 @@ KbdControllerDriverStart (
 
   //
   // Fix for random hangs in System waiting for the Key if no KBC is present in BIOS.
+  // When KBC decode (IO port 0x60/0x64 decode) is not enabled, 
+  // KeyboardRead will read back as 0xFF and return status is EFI_SUCCESS.
+  // So instead we read status register to detect after read if KBC decode is enabled.
   //
-  KeyboardRead (ConsoleIn, &Data);
-  if ((KeyReadStatusRegister (ConsoleIn) & (KBC_PARE | KBC_TIM)) == (KBC_PARE | KBC_TIM)) {
-    //
-    // If nobody decodes KBC I/O port, it will read back as 0xFF.
-    // Check the Time-Out and Parity bit to see if it has an active KBC in system
-    //
-    Status      = EFI_DEVICE_ERROR;
-    StatusCode  = EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_NOT_DETECTED;
-    goto ErrorExit;
+  
+  //
+  // Return code is ignored on purpose.
+  //
+  if (!PcdGetBool (PcdFastPS2Detection)) {
+    KeyboardRead (ConsoleIn, &Data);
+    if ((KeyReadStatusRegister (ConsoleIn) & (KBC_PARE | KBC_TIM)) == (KBC_PARE | KBC_TIM)) {
+      //
+      // If nobody decodes KBC I/O port, it will read back as 0xFF.
+      // Check the Time-Out and Parity bit to see if it has an active KBC in system
+      //
+      Status      = EFI_DEVICE_ERROR;
+      StatusCode  = EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_NOT_DETECTED;
+      goto ErrorExit;
+    }
   }
   
   //
