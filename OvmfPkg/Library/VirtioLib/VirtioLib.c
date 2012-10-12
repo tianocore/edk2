@@ -314,7 +314,7 @@ VirtioRingUninit (
 **/
 VOID
 EFIAPI
-AppendDesc (
+VirtioAppendDesc (
   IN OUT VRING  *Ring,
   IN     UINTN  BufferPhysAddr,
   IN     UINT32 BufferSize,

@@ -301,8 +301,8 @@ SynchronousRequest (
   //
   // virtio-blk header in first desc
   //
-  AppendDesc (&Dev->Ring, (UINTN) &Request, sizeof Request, VRING_DESC_F_NEXT,
-    FirstAvailIdx, &NextAvailIdx);
+  VirtioAppendDesc (&Dev->Ring, (UINTN) &Request, sizeof Request,
+    VRING_DESC_F_NEXT, FirstAvailIdx, &NextAvailIdx);
 
   //
   // data buffer for read/write in second desc
@@ -321,7 +321,7 @@ SynchronousRequest (
     //
     // VRING_DESC_F_WRITE is interpreted from the host's point of view.
     //
-    AppendDesc (&Dev->Ring, (UINTN) Buffer, (UINT32) BufferSize,
+    VirtioAppendDesc (&Dev->Ring, (UINTN) Buffer, (UINT32) BufferSize,
       VRING_DESC_F_NEXT | (RequestIsWrite ? 0 : VRING_DESC_F_WRITE),
       FirstAvailIdx, &NextAvailIdx);
   }
@@ -329,7 +329,7 @@ SynchronousRequest (
   //
   // host status in last (second or third) desc
   //
-  AppendDesc (&Dev->Ring, (UINTN) &HostStatus, sizeof HostStatus,
+  VirtioAppendDesc (&Dev->Ring, (UINTN) &HostStatus, sizeof HostStatus,
     VRING_DESC_F_WRITE, FirstAvailIdx, &NextAvailIdx);
 
   //
