@@ -97,6 +97,7 @@
   UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
   SerializeVariablesLib|OvmfPkg/Library/SerializeVariablesLib/SerializeVariablesLib.inf
   QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgLib.inf
+  VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
   LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
 
 !ifdef $(SOURCE_DEBUG_ENABLE)

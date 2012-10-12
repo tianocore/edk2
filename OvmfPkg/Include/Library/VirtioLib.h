@@ -1,0 +1,187 @@
+/** @file
+
+  Declarations of utility functions used by virtio device drivers.
+
+  Copyright (C) 2012, Red Hat, Inc.
+
+  This program and the accompanying materials are licensed and made available
+  under the terms and conditions of the BSD License which accompanies this
+  distribution. The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
+  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
+
+#ifndef _VIRTIO_LIB_H_
+#define _VIRTIO_LIB_H_
+
+#include <Protocol/PciIo.h>
+#include <IndustryStandard/Virtio.h>
+
+/**
+
+  Write a word into Region 0 of the device specified by PciIo.
+
+  Region 0 must be an iomem region. This is an internal function for the
+  driver-specific VIRTIO_CFG_WRITE() macros.
+
+  @param[in] PciIo        Target PCI device.
+
+  @param[in] FieldOffset  Destination offset.
+
+  @param[in] FieldSize    Destination field size, must be in { 1, 2, 4, 8 }.
+
+  @param[in] Value        Little endian value to write, converted to UINT64.
+                          The least significant FieldSize bytes will be used.
+
+
+  @return  Status code returned by PciIo->Io.Write().
+
+**/
+EFIAPI
+EFI_STATUS
+VirtioWrite (
+  IN EFI_PCI_IO_PROTOCOL *PciIo,
+  IN UINTN               FieldOffset,
+  IN UINTN               FieldSize,
+  IN UINT64              Value
+  );
+
+
+/**
+
+  Read a word from Region 0 of the device specified by PciIo.
+
+  Region 0 must be an iomem region. This is an internal function for the
+  driver-specific VIRTIO_CFG_READ() macros.
+
+  @param[in] PciIo        Source PCI device.
+
+  @param[in] FieldOffset  Source offset.
+
+  @param[in] FieldSize    Source field size, must be in { 1, 2, 4, 8 }.
+
+  @param[in] BufferSize   Number of bytes available in the target buffer. Must
+                          equal FieldSize.
+
+  @param[out] Buffer      Target buffer.
+
+
+  @return  Status code returned by PciIo->Io.Read().
+
+**/
+EFIAPI
+EFI_STATUS
+VirtioRead (
+  IN  EFI_PCI_IO_PROTOCOL *PciIo,
+  IN  UINTN               FieldOffset,
+  IN  UINTN               FieldSize,
+  IN  UINTN               BufferSize,
+  OUT VOID                *Buffer
+  );
+
+
+/**
+
+  Configure a virtio ring.
+
+  This function sets up internal storage (the guest-host communication area)
+  and lays out several "navigation" (ie. no-ownership) pointers to parts of
+  that storage.
+
+  Relevant sections from the virtio-0.9.5 spec:
+  - 1.1 Virtqueues,
+  - 2.3 Virtqueue Configuration.
+
+  @param[in]                    The number of descriptors to allocate for the
+                                virtio ring, as requested by the host.
+
+  @param[out] Ring              The virtio ring to set up.
+
+  @retval EFI_OUT_OF_RESOURCES  AllocatePages() failed to allocate contiguous
+                                pages for the requested QueueSize. Fields of
+                                Ring have indeterminate value.
+
+  @retval EFI_SUCCESS           Allocation and setup successful. Ring->Base
+                                (and nothing else) is responsible for
+                                deallocation.
+
+**/
+EFI_STATUS
+EFIAPI
+VirtioRingInit (
+  IN  UINT16 QueueSize,
+  OUT VRING  *Ring
+  );
+
+
+/**
+
+  Tear down the internal resources of a configured virtio ring.
+
+  The caller is responsible to stop the host from using this ring before
+  invoking this function: the VSTAT_DRIVER_OK bit must be clear in
+  VhdrDeviceStatus.
+
+  @param[out] Ring  The virtio ring to clean up.
+
+**/
+VOID
+EFIAPI
+VirtioRingUninit (
+  IN OUT VRING *Ring
+  );
+
+
+/**
+
+  Append a contiguous buffer for transmission / reception via the virtio ring.
+
+  This function implements the following sections from virtio-0.9.5:
+  - 2.4.1.1 Placing Buffers into the Descriptor Table
+  - 2.4.1.2 Updating the Available Ring
+
+  Free space is taken as granted, since the individual drivers support only
+  synchronous requests and host side status is processed in lock-step with
+  request submission. It is the calling driver's responsibility to verify the
+  ring size in advance.
+
+  @param[in out] Ring           The virtio ring to append the buffer to, as a
+                                descriptor.
+
+  @param [in] BufferPhysAddr    (Guest pseudo-physical) start address of the
+                                transmit / receive buffer.
+
+  @param [in] BufferSize        Number of bytes to transmit or receive.
+
+  @param [in] Flags             A bitmask of VRING_DESC_F_* flags. The caller
+                                computes this mask dependent on further buffers
+                                to append and transfer direction.
+                                VRING_DESC_F_INDIRECT is unsupported. The
+                                VRING_DESC.Next field is always set, but the
+                                host only interprets it dependent on
+                                VRING_DESC_F_NEXT.
+
+  @param [in] HeadIdx           The index identifying the head buffer (first
+                                buffer appended) belonging to this same
+                                request.
+
+  @param [in out] NextAvailIdx  On input, the index identifying the next
+                                descriptor available to carry the buffer. On
+                                output, incremented by one, modulo 2^16.
+
+**/
+VOID
+EFIAPI
+AppendDesc (
+  IN OUT VRING  *Ring,
+  IN     UINTN  BufferPhysAddr,
+  IN     UINT32 BufferSize,
+  IN     UINT16 Flags,
+  IN     UINT16 HeadIdx,
+  IN OUT UINT16 *NextAvailIdx
+  );
+
+#endif // _VIRTIO_LIB_H_

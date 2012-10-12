@@ -1,5 +1,5 @@
 ## @file
-# This driver produces Block I/O Protocol instances for virtio-blk devices.
+# Library of virtio utility functions.
 #
 # Copyright (C) 2012, Red Hat, Inc.
 #
@@ -15,14 +15,14 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = VirtioBlkDxe
-  FILE_GUID                      = 11D92DFB-3CA9-4F93-BA2E-4780ED3E03B5
+  BASE_NAME                      = VirtioLib
+  FILE_GUID                      = 90CED1D9-18F2-47CC-BF24-41EC29406637
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  ENTRY_POINT                    = VirtioBlkEntryPoint
+  LIBRARY_CLASS                  = VirtioLib
 
 [Sources]
-  VirtioBlk.c
+  VirtioLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -32,11 +32,3 @@
   BaseMemoryLib
   DebugLib
   MemoryAllocationLib
-  UefiBootServicesTableLib
-  UefiDriverEntryPoint
-  UefiLib
-  VirtioLib
-
-[Protocols]
-  gEfiBlockIoProtocolGuid  ## BY_START
-  gEfiPciIoProtocolGuid    ## TO_START
