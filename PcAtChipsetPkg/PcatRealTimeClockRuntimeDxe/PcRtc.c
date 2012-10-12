@@ -514,6 +514,7 @@ PcRtcGetWakeupTime (
   //
   // Get the alarm info from variable
   //
+  DataSize = sizeof (EFI_TIME);
   Status = EfiGetVariable (
               L"RTCALARM",
               &gEfiCallerIdGuid,
