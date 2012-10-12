@@ -23,7 +23,7 @@
 #include <Protocol/DriverBinding.h>
 #include <Protocol/PciIo.h>
 
-#include "Virtio.h"
+#include <IndustryStandard/Virtio.h>
 
 
 #define VBLK_SIG SIGNATURE_32 ('V', 'B', 'L', 'K')
