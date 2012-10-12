@@ -2,7 +2,7 @@
 
    Internal functions to operate Working Block Space.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -22,8 +22,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @param WorkingHeader   Pointer of working block header
 
-  @retval  EFI_SUCCESS    The function completed successfully
-  @retval  EFI_ABORTED    The function could not complete successfully.
+  @retval TRUE          The work space is valid.
+  @retval FALSE         The work space is invalid.
 
 **/
 BOOLEAN
@@ -166,8 +166,6 @@ WorkSpaceRefresh (
 {
   EFI_STATUS                      Status;
   UINTN                           Length;
-  UINTN                           Offset;
-  EFI_FAULT_TOLERANT_WRITE_HEADER *FtwHeader;
 
   //
   // Initialize WorkSpace as FTW_ERASED_BYTE
@@ -200,14 +198,7 @@ WorkSpaceRefresh (
             FtwDevice->FtwWorkSpaceSize,
             &FtwDevice->FtwLastWriteHeader
             );
-
-  FtwHeader = FtwDevice->FtwLastWriteHeader;
-  Offset    = (UINTN) (UINT8 *) FtwHeader - (UINTN) FtwDevice->FtwWorkSpace;
-
-  //
-  // if the Header is out of the workspace limit, call reclaim.
-  //
-  if (EFI_ERROR (Status) && (Offset >= FtwDevice->FtwWorkSpaceSize)) {
+  if (EFI_ERROR (Status)) {
     //
     // reclaim work space in working block.
     //
@@ -236,6 +227,9 @@ WorkSpaceRefresh (
               FtwDevice->FtwWorkSpaceSize,
               &FtwDevice->FtwLastWriteHeader
               );
+    if (EFI_ERROR (Status)) {
+      return EFI_ABORTED;
+    }
   }
   //
   // Refresh the FtwLastWriteRecord
@@ -278,8 +272,11 @@ FtwReclaimWorkSpace (
   EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *WorkingBlockHeader;
   UINTN                                   Index;
   UINT8                                   *Ptr;
+  EFI_LBA                                 WorkSpaceLbaOffset;
 
   DEBUG ((EFI_D_ERROR, "Ftw: start to reclaim work space\n"));
+
+  WorkSpaceLbaOffset = FtwDevice->FtwWorkSpaceLba - FtwDevice->FtwWorkBlockLba;
 
   //
   // Read all original data from working block to a memory buffer
@@ -311,7 +308,7 @@ FtwReclaimWorkSpace (
   // Clean up the workspace, remove all the completed records.
   //
   Ptr = TempBuffer +
-        ((UINTN) (FtwDevice->FtwWorkSpaceLba - FtwDevice->FtwWorkBlockLba)) * FtwDevice->BlockSize + 
+        (UINTN) WorkSpaceLbaOffset * FtwDevice->BlockSize +
         FtwDevice->FtwWorkSpaceBase;
 
   //
@@ -358,10 +355,17 @@ FtwReclaimWorkSpace (
     &FtwDevice->FtwLastWriteHeader
     );
 
+  FtwGetLastWriteRecord (
+    FtwDevice->FtwLastWriteHeader,
+    &FtwDevice->FtwLastWriteRecord
+    );
+
   //
   // Set the WorkingBlockValid and WorkingBlockInvalid as INVALID
   //
-  WorkingBlockHeader                      = (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *) (TempBuffer + FtwDevice->FtwWorkSpaceBase);
+  WorkingBlockHeader                      = (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *) (TempBuffer +
+                                            (UINTN) WorkSpaceLbaOffset * FtwDevice->BlockSize +
+                                            FtwDevice->FtwWorkSpaceBase);
   WorkingBlockHeader->WorkingBlockValid   = FTW_INVALID_STATE;
   WorkingBlockHeader->WorkingBlockInvalid = FTW_INVALID_STATE;
 
@@ -426,7 +430,7 @@ FtwReclaimWorkSpace (
   //
   Status = FtwUpdateFvState (
             FtwDevice->FtwBackupFvb,
-            FtwDevice->FtwWorkSpaceLba,
+            FtwDevice->FtwSpareLba + WorkSpaceLbaOffset,
             FtwDevice->FtwWorkSpaceBase + sizeof (EFI_GUID) + sizeof (UINT32),
             WORKING_BLOCK_VALID
             );

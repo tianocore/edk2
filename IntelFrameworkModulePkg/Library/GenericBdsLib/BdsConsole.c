@@ -88,6 +88,7 @@ UpdateSystemTableConsole (
   EFI_DEVICE_PATH_PROTOCOL  *Instance;
   VOID                      *Interface;
   EFI_HANDLE                NewHandle;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *TextOut;
 
   ASSERT (VarName != NULL);
   ASSERT (ConsoleHandle != NULL);
@@ -159,6 +160,15 @@ UpdateSystemTableConsole (
         //
         *ConsoleHandle     = NewHandle;
         *ProtocolInterface = Interface;
+        if (CompareGuid (ConsoleGuid, &gEfiSimpleTextOutProtocolGuid)) {
+          //
+          // If it is console out device, set console mode 80x25 if current mode is invalid.
+          //
+          TextOut = (EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *) Interface;
+          if (TextOut->Mode->Mode == -1) {
+            TextOut->SetMode (TextOut, 0);
+          }
+        }
         return TRUE;
       }
     }

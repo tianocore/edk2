@@ -3,7 +3,7 @@
   These are the common Fault Tolerant Write (FTW) functions that are shared 
   by DXE FTW driver and SMM FTW driver.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -193,8 +193,11 @@ FtwWriteRecord (
   EFI_FAULT_TOLERANT_WRITE_HEADER *Header;
   EFI_FAULT_TOLERANT_WRITE_RECORD *Record;
   UINTN                           Offset;
+  EFI_LBA                         WorkSpaceLbaOffset;
 
   FtwDevice = FTW_CONTEXT_FROM_THIS (This);
+
+  WorkSpaceLbaOffset = FtwDevice->FtwWorkSpaceLba - FtwDevice->FtwWorkBlockLba;
 
   //
   // Spare Complete but Destination not complete,
@@ -215,7 +218,7 @@ FtwWriteRecord (
     Offset = (UINT8 *) Record - FtwDevice->FtwWorkSpace;
     Status = FtwUpdateFvState (
               FtwDevice->FtwBackupFvb,
-              FtwDevice->FtwWorkSpaceLba,
+              FtwDevice->FtwSpareLba + WorkSpaceLbaOffset,
               FtwDevice->FtwWorkSpaceBase + Offset,
               SPARE_COMPLETED
               );
