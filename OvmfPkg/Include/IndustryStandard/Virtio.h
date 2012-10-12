@@ -14,6 +14,9 @@
 
 **/
 
+#ifndef _VIRTIO_H_
+#define _VIRTIO_H_
+
 #include <Base.h>
 
 
@@ -174,3 +177,5 @@ typedef struct {
 #define VIRTIO_BLK_S_OK           0x00
 #define VIRTIO_BLK_S_IOERR        0x01
 #define VIRTIO_BLK_S_UNSUPP       0x02
+
+#endif // _VIRTIO_H_
