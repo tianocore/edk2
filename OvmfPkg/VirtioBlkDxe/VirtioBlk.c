@@ -664,7 +664,7 @@ VirtioBlkInit (
       goto Failed;
     }
     if (BlockSize == 0 || BlockSize % 512 != 0 ||
-        NumSectors % (BlockSize / 512) != 0) {
+        ModU64x32 (NumSectors, BlockSize / 512) != 0) {
       //
       // We can only handle a logical block consisting of whole sectors,
       // and only a disk composed of whole logical blocks.
@@ -747,7 +747,8 @@ VirtioBlkInit (
   Dev->BlockIoMedia.WriteCaching     = !!(Features & VIRTIO_BLK_F_FLUSH);
   Dev->BlockIoMedia.BlockSize        = BlockSize;
   Dev->BlockIoMedia.IoAlign          = 0;
-  Dev->BlockIoMedia.LastBlock        = NumSectors / (BlockSize / 512) - 1;
+  Dev->BlockIoMedia.LastBlock        = DivU64x32 (NumSectors,
+                                         BlockSize / 512) - 1;
   return EFI_SUCCESS;
 
 ReleaseQueue:
