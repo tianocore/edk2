@@ -11,6 +11,7 @@
     synchronous requests and EFI_BLOCK_IO_PROTOCOL for now.
 
   Copyright (C) 2012, Red Hat, Inc.
+  Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -271,7 +272,7 @@ SynchronousRequest (
                    (BufferSize == 0 ? VIRTIO_BLK_T_FLUSH : VIRTIO_BLK_T_OUT) :
                    VIRTIO_BLK_T_IN;
   Request.IoPrio = 0;
-  Request.Sector = Lba * (BlockSize / 512);
+  Request.Sector = MultU64x32(Lba, BlockSize / 512);
 
   VirtioPrepare (&Dev->Ring, &Indices);
 
