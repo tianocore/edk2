@@ -1138,6 +1138,22 @@ ProcessVariable (
   }
   
   //
+  // A time-based authenticated variable and a count-based authenticated variable
+  // can't be updated by each other.
+  // 
+  if (Variable->CurrPtr != NULL) {    
+    if (((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) &&
+        ((Variable->CurrPtr->Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0)) {
+      return EFI_SECURITY_VIOLATION;      
+    }
+    
+    if (((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) && 
+        ((Variable->CurrPtr->Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0)) {
+      return EFI_SECURITY_VIOLATION;      
+    }
+  }
+    
+  //
   // Process Time-based Authenticated variable.
   //
   if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
