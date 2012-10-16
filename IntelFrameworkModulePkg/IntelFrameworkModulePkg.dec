@@ -144,8 +144,9 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportedFeatures|0x05|UINT8|0x00010040
 
 [PcdsDynamic, PcdsDynamicEx]
-  ## PCD is used to mark if the machine has complete one boot cycle before.
-  #  After the complete boot, the variable BootState will be set to TRUE.
+  ## The PCD is used to mark whether the machine is in first boot cycle.
+  #  TRUE means the machine is in first boot cycle. After completing the first boot,
+  #  the PCD's value will be updated to FALSE.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBootState|TRUE|BOOLEAN|0x0001002f
 
   ## Timeout value for displaying progressing bar in before boot OS.
