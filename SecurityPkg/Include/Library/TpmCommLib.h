@@ -2,7 +2,7 @@
   Ihis library is only intended to be used by TPM modules.
   It provides basic TPM Interface Specification (TIS) and Command functions.
 
-Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -185,6 +185,7 @@ typedef TIS_PC_REGISTERS  *TIS_PC_REGISTERS_PTR;
 //
 // Default TimeOut value
 //
+#define TIS_TIMEOUT_A               750 * 1000   // 750ms
 #define TIS_TIMEOUT_B               2000 * 1000  // 2s
 #define TIS_TIMEOUT_C               750 * 1000   // 750ms
 #define TIS_TIMEOUT_D               750 * 1000   // 750ms

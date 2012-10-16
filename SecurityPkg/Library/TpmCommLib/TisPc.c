@@ -1,7 +1,7 @@
 /** @file
   Basic TIS (TPM Interface Specification) functions.
 
-Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -144,7 +144,7 @@ TisPcPrepareCommand (
 
 /**
   Get the control of TPM chip by sending requestUse command TIS_PC_ACC_RQUUSE 
-  to ACCESS Register in the time of default TIS_TIMEOUT_D.
+  to ACCESS Register in the time of default TIS_TIMEOUT_A.
 
   @param[in] TisReg                Pointer to TIS register.
 
@@ -170,11 +170,14 @@ TisPcRequestUseTpm (
   }
 
   MmioWrite8((UINTN)&TisReg->Access, TIS_PC_ACC_RQUUSE);
+  //
+  // No locality set before, ACCESS_X.activeLocality MUST be valid within TIMEOUT_A
+  //
   Status = TisPcWaitRegisterBits (
              &TisReg->Access,
              (UINT8)(TIS_PC_ACC_ACTIVE |TIS_PC_VALID),
              0,
-             TIS_TIMEOUT_D
+             TIS_TIMEOUT_A
              );
   return Status;
 }
