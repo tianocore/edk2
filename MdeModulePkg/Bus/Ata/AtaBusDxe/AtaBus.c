@@ -464,6 +464,7 @@ UnregisterAtaDevice (
   if (BlockIo != NULL) {
     AtaDevice = ATA_DEVICE_FROM_BLOCK_IO (BlockIo);
   } else {
+    ASSERT (BlockIo2 != NULL);
     AtaDevice = ATA_DEVICE_FROM_BLOCK_IO2 (BlockIo2);
   }
 

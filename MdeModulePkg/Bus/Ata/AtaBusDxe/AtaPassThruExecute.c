@@ -133,6 +133,10 @@ AtaDevicePassThru (
   if (TaskPacket != NULL) {
     Packet = TaskPacket;
     Packet->Asb = AllocateAlignedBuffer (AtaDevice, sizeof (EFI_ATA_STATUS_BLOCK));
+    if (Packet->Asb == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     CopyMem (Packet->Asb, AtaDevice->Asb, sizeof (EFI_ATA_STATUS_BLOCK));
     Packet->Acb = AllocateCopyPool (sizeof (EFI_ATA_COMMAND_BLOCK), &AtaDevice->Acb);
   } else {
@@ -939,6 +943,10 @@ TrustTransferAtaDevice (
     AtaPassThru = AtaDevice->AtaBusDriverData->AtaPassThru;
     if ((AtaPassThru->Mode->IoAlign > 1) && !IS_ALIGNED (Buffer, AtaPassThru->Mode->IoAlign)) {
       NewBuffer = AllocateAlignedBuffer (AtaDevice, TransferLength);
+      if (NewBuffer == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+
       CopyMem (NewBuffer, Buffer, TransferLength);
       FreePool (Buffer);
       Buffer = NewBuffer;
