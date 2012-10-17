@@ -1,7 +1,7 @@
 /** @file
   Miscellaneous definitions for iSCSI driver.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -23,14 +23,15 @@ typedef struct _ISCSI_SESSION_CONFIG_NVDATA {
   UINT8             Enabled;
   UINT8             IpMode;
 
-  EFI_IPv4_ADDRESS  LocalIp;
+  EFI_IP_ADDRESS    LocalIp;
   EFI_IPv4_ADDRESS  SubnetMask;
-  EFI_IPv4_ADDRESS  Gateway;
+  EFI_IP_ADDRESS    Gateway;
 
   BOOLEAN           InitiatorInfoFromDhcp;
   BOOLEAN           TargetInfoFromDhcp;
   CHAR8             TargetName[ISCSI_NAME_MAX_SIZE];
   EFI_IP_ADDRESS    TargetIp;
+  UINT8             PrefixLength;
   UINT8             BootLun[8];
 
   UINT16            ConnectTimeout; ///< timout value in milliseconds

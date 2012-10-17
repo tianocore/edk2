@@ -1748,7 +1748,7 @@ PxeBcDhcp6Sarr (
   Config.IaInfoEvent           = NULL;
   Config.RapidCommit           = FALSE;
   Config.ReconfigureAccept     = FALSE;
-  Config.IaDescriptor.IaId     = 1;
+  Config.IaDescriptor.IaId     = Private->IaId;
   Config.IaDescriptor.Type     = EFI_DHCP6_IA_TYPE_NA;
   Config.SolicitRetransmission = Retransmit;
   Retransmit->Irt              = 4;

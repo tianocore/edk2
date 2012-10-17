@@ -8,7 +8,7 @@
    RFC2348 - TFTP Blocksize Option
    RFC2349 - TFTP Timeout Interval and Transfer Size Options
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -189,13 +189,15 @@ EfiMtftp6Configure (
     // Don't configure the udpio here because each operation might override
     // the configuration, so delay udpio configuration in each operation.
     //
-    Instance->UdpIo = UdpIoCreateIo (
-                        Service->Controller,
-                        Service->Image,
-                        Mtftp6ConfigDummyUdpIo,
-                        UDP_IO_UDP6_VERSION,
-                        NULL
-                        );
+    if (Instance->UdpIo == NULL) {
+      Instance->UdpIo = UdpIoCreateIo (
+                          Service->Controller,
+                          Service->Image,
+                          Mtftp6ConfigDummyUdpIo,
+                          UDP_IO_UDP6_VERSION,
+                          NULL
+                          );
+    }
 
     if (Instance->UdpIo == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
@@ -620,11 +622,11 @@ EfiMtftp6Poll (
   Instance = MTFTP6_INSTANCE_FROM_THIS (This);
 
   //
-  // Check the instance whether configured or in destory.
+  // Check the instance whether configured or in destroy.
   //
   if (Instance->Config == NULL) {
     return EFI_NOT_STARTED;
-  } else if (Instance->InDestory) {
+  } else if (Instance->InDestroy) {
     return EFI_DEVICE_ERROR;
   }
 

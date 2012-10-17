@@ -1,7 +1,7 @@
 /** @file
   Driver Binding functions implementationfor for UefiPxeBc Driver.
 
-  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -779,6 +779,7 @@ PxeBcCreateIp6Children (
   EFI_IP6_MODE_DATA               Ip6ModeData;
   PXEBC_PRIVATE_PROTOCOL          *Id;
   EFI_SIMPLE_NETWORK_PROTOCOL     *Snp;
+  UINTN                           Index;
 
   if (Private->Ip6Nic != NULL) {
     //
@@ -819,6 +820,16 @@ PxeBcCreateIp6Children (
                   );
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
+  }
+
+  //
+  // Generate a random IAID for the Dhcp6 assigned address.
+  //
+  Private->IaId = NET_RANDOM (NetRandomInitSeed ());
+  if (Private->Snp != NULL) {
+    for (Index = 0; Index < Private->Snp->Mode->HwAddressSize; Index++) {
+      Private->IaId |= (Private->Snp->Mode->CurrentAddress.Addr[Index] << ((Index << 3) & 31));
+    }  
   }
 
   //

@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -146,11 +146,11 @@ DhcpConfigUdpIo (
 
 
 /**
-  Destory the DHCP service. The Dhcp4 service may be partly initialized,
+  Destroy the DHCP service. The Dhcp4 service may be partly initialized,
   or partly destroyed. If a resource is destroyed, it is marked as so in
   case the destroy failed and being called again later.
 
-  @param[in]  DhcpSb                 The DHCP service instance to destory.
+  @param[in]  DhcpSb                 The DHCP service instance to destroy.
 
   @retval EFI_SUCCESS            Always return success.
 
@@ -212,7 +212,7 @@ Dhcp4CreateService (
 
   DhcpSb->Signature       = DHCP_SERVICE_SIGNATURE;
   DhcpSb->ServiceState    = DHCP_UNCONFIGED;
-  DhcpSb->InDestory       = FALSE;
+  DhcpSb->InDestroy       = FALSE;
   DhcpSb->Controller      = Controller;
   DhcpSb->Image           = ImageHandle;
   InitializeListHead (&DhcpSb->Children);
@@ -414,7 +414,7 @@ Dhcp4DriverBindingStop (
 
   DhcpSb = DHCP_SERVICE_FROM_THIS (ServiceBinding);
 
-  if (DhcpSb->InDestory) {
+  if (DhcpSb->InDestroy) {
     return EFI_SUCCESS;
   }
 
@@ -422,8 +422,8 @@ Dhcp4DriverBindingStop (
 
   if (NumberOfChildren == 0) {
 
-    DhcpSb->InDestory    = TRUE;
-    DhcpSb->ServiceState = DHCP_DESTORY;
+    DhcpSb->InDestroy    = TRUE;
+    DhcpSb->ServiceState = DHCP_DESTROY;
 
     gBS->UninstallProtocolInterface (
            NicHandle,
@@ -436,7 +436,7 @@ Dhcp4DriverBindingStop (
     FreePool (DhcpSb);
   } else {
     //
-    // Don't use NET_LIST_FOR_EACH_SAFE here, Dhcp4ServiceBindingDestoryChild
+    // Don't use NET_LIST_FOR_EACH_SAFE here, Dhcp4ServiceBindingDestroyChild
     // may cause other child to be deleted.
     //
     while (!IsListEmpty (&DhcpSb->Children)) {
@@ -473,7 +473,7 @@ DhcpInitProtocol (
   InitializeListHead (&Instance->Link);
   Instance->Handle            = NULL;
   Instance->Service           = DhcpSb;
-  Instance->InDestory         = FALSE;
+  Instance->InDestroy         = FALSE;
   Instance->CompletionEvent   = NULL;
   Instance->RenewRebindEvent  = NULL;
   Instance->Token             = NULL;
@@ -640,15 +640,15 @@ Dhcp4ServiceBindingDestroyChild (
   //
   // A child can be destroyed more than once. For example,
   // Dhcp4DriverBindingStop will destroy all of its children.
-  // when caller driver is being stopped, it will destory the
+  // when caller driver is being stopped, it will destroy the
   // dhcp child it opens.
   //
-  if (Instance->InDestory) {
+  if (Instance->InDestroy) {
     return EFI_SUCCESS;
   }
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
-  Instance->InDestory = TRUE;
+  Instance->InDestroy = TRUE;
 
   //
   // Close the Udp4 protocol.
@@ -670,7 +670,7 @@ Dhcp4ServiceBindingDestroyChild (
                   );
 
   if (EFI_ERROR (Status)) {
-    Instance->InDestory = FALSE;
+    Instance->InDestroy = FALSE;
 
     gBS->RestoreTPL (OldTpl);
     return Status;

@@ -1,7 +1,7 @@
 /** @file
   The implementation for Ping6 application.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -802,13 +802,13 @@ ON_ERROR:
 }
 
 /**
-  Destory the IP6 instance.
+  Destroy the IP6 instance.
 
   @param[in]    Private    The pointer of PING6_PRIVATE_DATA.
 
 **/
 VOID
-Ping6DestoryIp6Instance (
+Ping6DestroyIp6Instance (
   IN PING6_PRIVATE_DATA    *Private
   )
 {
@@ -1019,7 +1019,7 @@ ON_EXIT:
     }
 
     if (Private->Ip6ChildHandle != NULL) {
-      Ping6DestoryIp6Instance (Private);
+      Ping6DestroyIp6Instance (Private);
     }
 
     FreePool (Private);

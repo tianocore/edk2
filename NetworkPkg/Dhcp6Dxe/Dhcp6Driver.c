@@ -82,7 +82,7 @@ Dhcp6ConfigureUdpIo (
 
 
 /**
-  Destory the Dhcp6 service. The Dhcp6 service may be partly initialized,
+  Destroy the Dhcp6 service. The Dhcp6 service may be partly initialized,
   or partly destroyed. If a resource is destroyed, it is marked as such in
   case the destroy failed and being called again later.
 
@@ -95,7 +95,7 @@ Dhcp6DestroyService (
   )
 {
   //
-  // All children instances should have been already destoryed here.
+  // All children instances should have been already destroyed here.
   //
   ASSERT (Service->NumOfChild == 0);
 
@@ -155,7 +155,7 @@ Dhcp6CreateService (
   // Initialize the fields of the new Dhcp6 service.
   //
   Dhcp6Srv->Signature       = DHCP6_SERVICE_SIGNATURE;
-  Dhcp6Srv->InDestory       = FALSE;
+  Dhcp6Srv->InDestroy       = FALSE;
   Dhcp6Srv->Controller      = Controller;
   Dhcp6Srv->Image           = ImageHandle;
   Dhcp6Srv->Xid             = (0xffffff & NET_RANDOM (NetRandomInitSeed ()));
@@ -294,7 +294,7 @@ Dhcp6CreateInstance (
   Dhcp6Ins->Signature       = DHCP6_INSTANCE_SIGNATURE;
   Dhcp6Ins->UdpSts          = EFI_ALREADY_STARTED;
   Dhcp6Ins->Service         = Service;
-  Dhcp6Ins->InDestory       = FALSE;
+  Dhcp6Ins->InDestroy       = FALSE;
   Dhcp6Ins->MediaPresent    = TRUE;
 
   CopyMem (
@@ -528,7 +528,7 @@ Dhcp6DriverBindingStop (
 
   Service = DHCP6_SERVICE_FROM_THIS (ServiceBinding);
 
-  if (Service->InDestory) {
+  if (Service->InDestroy) {
     return EFI_SUCCESS;
   }
 
@@ -536,9 +536,9 @@ Dhcp6DriverBindingStop (
 
   if (NumberOfChildren == 0) {
     //
-    // Destory the service itself if no child instance left.
+    // Destroy the service itself if no child instance left.
     //
-    Service->InDestory = TRUE;
+    Service->InDestroy = TRUE;
 
     Status = gBS->UninstallProtocolInterface (
                     NicHandle,
@@ -547,7 +547,7 @@ Dhcp6DriverBindingStop (
                     );
 
     if (EFI_ERROR (Status)) {
-      Service->InDestory = FALSE;
+      Service->InDestroy = FALSE;
       goto ON_EXIT;
     }
 
@@ -555,7 +555,7 @@ Dhcp6DriverBindingStop (
 
   } else {
     //
-    // Destory all the children instances before destory the service.
+    // Destroy all the children instances before destroy the service.
     //
     while (!IsListEmpty (&Service->Child)) {
       Instance = NET_LIST_HEAD (&Service->Child, DHCP6_INSTANCE, Link);
@@ -747,13 +747,13 @@ Dhcp6ServiceBindingDestroyChild (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Instance->InDestory) {
+  if (Instance->InDestroy) {
     return EFI_SUCCESS;
   }
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-  Instance->InDestory = TRUE;
+  Instance->InDestroy = TRUE;
 
   Status = gBS->CloseProtocol (
                   Service->UdpIo->UdpHandle,
@@ -763,7 +763,7 @@ Dhcp6ServiceBindingDestroyChild (
                   );
 
   if (EFI_ERROR (Status)) {
-    Instance->InDestory = FALSE;
+    Instance->InDestroy = FALSE;
     gBS->RestoreTPL (OldTpl);
     return Status;
   }
@@ -778,7 +778,7 @@ Dhcp6ServiceBindingDestroyChild (
                   );
 
   if (EFI_ERROR (Status)) {
-    Instance->InDestory = FALSE;
+    Instance->InDestroy = FALSE;
     gBS->RestoreTPL (OldTpl);
     return Status;
   }

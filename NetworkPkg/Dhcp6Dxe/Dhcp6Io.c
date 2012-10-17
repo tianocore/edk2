@@ -52,7 +52,7 @@ Dhcp6EnqueueRetry (
   }
 
   //
-  // Save tx packet pointer, and it will be destoryed when reply received.
+  // Save tx packet pointer, and it will be destroyed when reply received.
   //
   TxCb->TxPacket = Packet;
   TxCb->Xid      = Packet->Dhcp6.Header.TransactionId;
@@ -2510,7 +2510,7 @@ Dhcp6HandleStateful (
   ClientId = Service->ClientId;
   Status   = EFI_SUCCESS;
 
-  if (Instance->InDestory || Instance->Config == NULL) {
+  if (Instance->InDestroy || Instance->Config == NULL) {
     goto ON_CONTINUE;
   }
 
@@ -2624,7 +2624,7 @@ Dhcp6HandleStateless (
   IsMatched = FALSE;
   InfCb     = NULL;
 
-  if (Instance->InDestory) {
+  if (Instance->InDestroy) {
     goto ON_EXIT;
   }
 

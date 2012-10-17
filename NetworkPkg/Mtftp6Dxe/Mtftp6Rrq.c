@@ -547,13 +547,15 @@ Mtftp6RrqHandleOack (
         );
 
       Instance->McastPort  = ExtInfo.McastPort;
-      Instance->McastUdpIo = UdpIoCreateIo (
-                               Instance->Service->Controller,
-                               Instance->Service->Image,
-                               Mtftp6RrqConfigMcastUdpIo,
-                               UDP_IO_UDP6_VERSION,
-                               Instance
-                               );
+      if (Instance->McastUdpIo == NULL) {
+        Instance->McastUdpIo = UdpIoCreateIo (
+                                 Instance->Service->Controller,
+                                 Instance->Service->Image,
+                                 Mtftp6RrqConfigMcastUdpIo,
+                                 UDP_IO_UDP6_VERSION,
+                                 Instance
+                                 );
+      }
 
       if (Instance->McastUdpIo == NULL) {
         return EFI_DEVICE_ERROR;

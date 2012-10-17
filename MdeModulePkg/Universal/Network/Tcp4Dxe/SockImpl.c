@@ -1,7 +1,7 @@
 /** @file
   Implementation of the Socket.
 
-Copyright (c) 2005 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -739,7 +739,7 @@ SockDestroy (
 
   }
   //
-  // Destory the RcvBuffer Queue and SendBuffer Queue
+  // Destroy the RcvBuffer Queue and SendBuffer Queue
   //
   NetbufQueFree (Sock->RcvBuffer.DataQueue);
   NetbufQueFree (Sock->SndBuffer.DataQueue);
@@ -754,7 +754,7 @@ SockDestroy (
 
     DEBUG (
       (EFI_D_INFO,
-      "SockDestory: Delete a unaccepted socket from parent"
+      "SockDestroy: Delete a unaccepted socket from parent"
       "now conncnt is %d\n",
       Sock->Parent->ConnCnt)
       );

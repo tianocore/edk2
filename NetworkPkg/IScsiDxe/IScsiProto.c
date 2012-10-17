@@ -308,6 +308,98 @@ IScsiDestroyConnection (
   FreePool (Conn);
 }
 
+/**
+  Retrieve the IPv6 Address/Prefix/Gateway from the established TCP connection, these informations
+  will be filled in the iSCSI Boot Firmware Table.
+
+  @param[in]  Conn             The connection used in the iSCSI login phase.
+
+  @retval     EFI_SUCCESS      Get the NIC information successfully.
+  @retval     Others           Other errors as indicated.
+  
+**/
+EFI_STATUS
+IScsiGetIp6NicInfo (
+  IN ISCSI_CONNECTION  *Conn
+  )
+{
+  ISCSI_SESSION_CONFIG_NVDATA  *NvData;
+  EFI_TCP6_PROTOCOL            *Tcp6;
+  EFI_IP6_MODE_DATA            Ip6ModeData;
+  EFI_STATUS                   Status;
+  EFI_IPv6_ADDRESS             *TargetIp;
+  UINTN                        Index;
+  UINT8                        SubnetPrefixLength;
+  UINTN                        RouteEntry;
+
+  NvData   = &Conn->Session->ConfigData->SessionConfigData;
+  TargetIp = &NvData->TargetIp.v6;
+  Tcp6     = Conn->TcpIo.Tcp.Tcp6;
+
+  ZeroMem (&Ip6ModeData, sizeof (EFI_IP6_MODE_DATA));
+  Status = Tcp6->GetModeData (
+                   Tcp6,
+                   NULL,
+                   NULL,
+                   &Ip6ModeData,
+                   NULL,
+                   NULL
+                   );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (!Ip6ModeData.IsConfigured) {
+    Status = EFI_ABORTED;
+    goto ON_EXIT;
+  }
+
+  IP6_COPY_ADDRESS (&NvData->LocalIp, &Ip6ModeData.ConfigData.StationAddress);
+
+  NvData->PrefixLength = 0;
+  for (Index = 0; Index < Ip6ModeData.AddressCount; Index++) {
+    if (EFI_IP6_EQUAL (&NvData->LocalIp.v6, &Ip6ModeData.AddressList[Index].Address)) {
+      NvData->PrefixLength = Ip6ModeData.AddressList[Index].PrefixLength;
+      break;
+    }
+  }
+
+  SubnetPrefixLength = 0;
+  RouteEntry = Ip6ModeData.RouteCount;
+  for (Index = 0; Index < Ip6ModeData.RouteCount; Index++) {
+    if (NetIp6IsNetEqual (TargetIp, &Ip6ModeData.RouteTable[Index].Destination, Ip6ModeData.RouteTable[Index].PrefixLength)) {
+      if (SubnetPrefixLength < Ip6ModeData.RouteTable[Index].PrefixLength) {
+        SubnetPrefixLength = Ip6ModeData.RouteTable[Index].PrefixLength;
+        RouteEntry = Index;
+      }
+    }
+  }
+  if (RouteEntry != Ip6ModeData.RouteCount) {
+    IP6_COPY_ADDRESS (&NvData->Gateway, &Ip6ModeData.RouteTable[RouteEntry].Gateway);
+  }
+
+ON_EXIT:
+  if (Ip6ModeData.AddressList != NULL) {
+    FreePool (Ip6ModeData.AddressList);
+  }
+  if (Ip6ModeData.GroupTable!= NULL) {
+    FreePool (Ip6ModeData.GroupTable);
+  }
+  if (Ip6ModeData.RouteTable!= NULL) {
+    FreePool (Ip6ModeData.RouteTable);
+  }
+  if (Ip6ModeData.NeighborCache!= NULL) {
+    FreePool (Ip6ModeData.NeighborCache);
+  }
+  if (Ip6ModeData.PrefixTable!= NULL) {
+    FreePool (Ip6ModeData.PrefixTable);
+  }
+  if (Ip6ModeData.IcmpTypeList!= NULL) {
+    FreePool (Ip6ModeData.IcmpTypeList);
+  }
+
+  return Status;
+}
 
 /**
   Login the iSCSI session.
@@ -395,6 +487,10 @@ IScsiSessionLogin (
                     );
 
     ASSERT_EFI_ERROR (Status);
+
+    if (mPrivate->Ipv6Flag) {
+      Status = IScsiGetIp6NicInfo (Conn);
+    }
   }
 
   return Status;

@@ -1,7 +1,7 @@
 /** @file
   Implementation of EFI_IP6_PROTOCOL protocol interfaces.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -689,7 +689,7 @@ EfiIp6Configure (
     Status = Ip6CleanProtocol (IpInstance);
 
     //
-    // Don't change the state if it is DESTORY, consider the following
+    // Don't change the state if it is DESTROY, consider the following
     // valid sequence: Mnp is unloaded-->Ip Stopped-->Udp Stopped,
     // Configure (ThisIp, NULL). If the state is changed to UNCONFIGED,
     // the unload fails miserably.

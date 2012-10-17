@@ -2348,6 +2348,15 @@ EfiPxeLoadFile (
   // Start Pxe Base Code to initialize PXE boot.
   //
   Status = PxeBc->Start (PxeBc, UsingIpv6);
+  if (Status == EFI_ALREADY_STARTED && UsingIpv6 != PxeBc->Mode->UsingIpv6) {
+    //
+    // PxeBc protocol has already been started but not on the required IP version, restart it.
+    //
+    Status = PxeBc->Stop (PxeBc);
+    if (!EFI_ERROR (Status)) {
+      Status = PxeBc->Start (PxeBc, UsingIpv6);
+    }
+  }
   if (Status == EFI_SUCCESS || Status == EFI_ALREADY_STARTED) {
     Status = PxeBcLoadBootFile (Private, BufferSize, Buffer);
   }

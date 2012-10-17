@@ -1829,7 +1829,7 @@ NetLibCreateServiceChild (
 
 
 /**
-  Destory a child of the service that is identified by ServiceBindingGuid.
+  Destroy a child of the service that is identified by ServiceBindingGuid.
 
   Get the ServiceBinding Protocol first, then use it to destroy a child.
 
@@ -1838,10 +1838,10 @@ NetLibCreateServiceChild (
   @param[in]   Controller            The controller which has the service installed.
   @param[in]   Image                 The image handle used to open service.
   @param[in]   ServiceBindingGuid    The service's Guid.
-  @param[in]   ChildHandle           The child to destory.
+  @param[in]   ChildHandle           The child to destroy.
 
-  @retval EFI_SUCCESS           The child is successfully destoried.
-  @retval Others                Failed to destory the child.
+  @retval EFI_SUCCESS           The child is successfully destroyed.
+  @retval Others                Failed to destroy the child.
 
 **/
 EFI_STATUS
@@ -1875,7 +1875,7 @@ NetLibDestroyServiceChild (
   }
 
   //
-  // destory the child
+  // destroy the child
   //
   Status = Service->DestroyChild (Service, ChildHandle);
   return Status;

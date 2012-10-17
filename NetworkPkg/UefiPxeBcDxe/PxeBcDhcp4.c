@@ -532,7 +532,7 @@ PxeBcParseDhcp4Packet (
             (Offer->Dhcp4.Header.BootFileName[0] != 0)) {
     //
     // If the bootfile is not present and bootfilename is present in DHCPv4 packet, just parse it.
-    // Do not count dhcp option header here, or else will destory the serverhostname.
+    // Do not count dhcp option header here, or else will destroy the serverhostname.
     //
     Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] = (EFI_DHCP4_PACKET_OPTION *)
                                                 (&Offer->Dhcp4.Header.BootFileName[0] -

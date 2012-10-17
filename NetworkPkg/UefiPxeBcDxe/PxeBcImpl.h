@@ -165,6 +165,7 @@ struct _PXEBC_PRIVATE_DATA {
   EFI_IP_ADDRESS                            GatewayIp;
   EFI_IP_ADDRESS                            ServerIp;
   UINT16                                    CurSrcPort;
+  UINT32                                    IaId;
 
   UINT32                                    Ip4MaxPacketSize;
   UINT32                                    Ip6MaxPacketSize;

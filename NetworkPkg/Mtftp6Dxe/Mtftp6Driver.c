@@ -2,7 +2,7 @@
   Driver Binding functions and Service Binding functions
   implementation for Mtftp6 Driver.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -33,7 +33,7 @@ EFI_SERVICE_BINDING_PROTOCOL  gMtftp6ServiceBindingTemplate = {
 
 
 /**
-  Destory the MTFTP6 service. The MTFTP6 service may be partly initialized,
+  Destroy the MTFTP6 service. The MTFTP6 service may be partly initialized,
   or partly destroyed. If a resource is destroyed, it is marked as such in
   case the destroy failed and is called again later.
 
@@ -46,7 +46,7 @@ Mtftp6DestroyService (
   )
 {
   //
-  // Make sure all children instances have been already destoryed.
+  // Make sure all children instances have been already destroyed.
   //
   ASSERT (Service->ChildrenNum == 0);
 
@@ -98,7 +98,7 @@ Mtftp6CreateService (
   Mtftp6Srv->Signature      = MTFTP6_SERVICE_SIGNATURE;
   Mtftp6Srv->Controller     = Controller;
   Mtftp6Srv->Image          = Image;
-  Mtftp6Srv->InDestory      = FALSE;
+  Mtftp6Srv->InDestroy      = FALSE;
   Mtftp6Srv->ChildrenNum    = 0;
 
   CopyMem (
@@ -219,7 +219,7 @@ Mtftp6CreateInstance (
   }
 
   Mtftp6Ins->Signature = MTFTP6_INSTANCE_SIGNATURE;
-  Mtftp6Ins->InDestory = FALSE;
+  Mtftp6Ins->InDestroy = FALSE;
   Mtftp6Ins->Service   = Service;
 
   CopyMem (
@@ -460,7 +460,7 @@ Mtftp6DriverBindingStop (
 
   Service = MTFTP6_SERVICE_FROM_THIS (ServiceBinding);
 
-  if (Service->InDestory) {
+  if (Service->InDestroy) {
     return EFI_SUCCESS;
   }
 
@@ -468,9 +468,9 @@ Mtftp6DriverBindingStop (
 
   if (NumberOfChildren == 0) {
     //
-    // Destory the Mtftp6 service if there is no Mtftp6 child instance left.
+    // Destroy the Mtftp6 service if there is no Mtftp6 child instance left.
     //
-    Service->InDestory = TRUE;
+    Service->InDestroy = TRUE;
 
     gBS->UninstallProtocolInterface (
            NicHandle,
@@ -482,7 +482,7 @@ Mtftp6DriverBindingStop (
 
   } else {
     //
-    // Destory the Mtftp6 child instance one by one.
+    // Destroy the Mtftp6 child instance one by one.
     //
     while (!IsListEmpty (&Service->Children)) {
       Instance = NET_LIST_HEAD (&Service->Children, MTFTP6_INSTANCE, Link);
@@ -657,15 +657,15 @@ Mtftp6ServiceBindingDestroyChild (
   }
 
   //
-  // Check whether the instance already in destory state.
+  // Check whether the instance already in Destroy state.
   //
-  if (Instance->InDestory) {
+  if (Instance->InDestroy) {
     return EFI_SUCCESS;
   }
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-  Instance->InDestory = TRUE;
+  Instance->InDestroy = TRUE;
 
   gBS->CloseProtocol (
          Service->DummyUdpIo->UdpHandle,
@@ -684,7 +684,7 @@ Mtftp6ServiceBindingDestroyChild (
                   );
 
   if (EFI_ERROR (Status)) {
-    Instance->InDestory = FALSE;
+    Instance->InDestroy = FALSE;
     gBS->RestoreTPL (OldTpl);
     return Status;
   }

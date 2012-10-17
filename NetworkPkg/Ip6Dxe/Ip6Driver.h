@@ -1,7 +1,7 @@
 /** @file
   The driver binding and service binding protocol for IP6 driver.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -24,7 +24,7 @@ extern EFI_COMPONENT_NAME2_PROTOCOL gIp6ComponentName2;
   Clean up an IP6 service binding instance. It releases all
   the resource allocated by the instance. The instance may be
   partly initialized, or partly destroyed. If a resource is
-  destroyed, it is marked as that in case the destory failed and
+  destroyed, it is marked as that in case the destroy failed and
   being called again later.
 
   @param[in]  IpSb               The IP6 service binding instance to clean up.

@@ -1,7 +1,7 @@
 /** @file
   Interface function of the Socket.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -129,7 +129,7 @@ SockBufferToken (
 }
 
 /**
-  Destory the socket Sock and its associated protocol control block.
+  Destroy the socket Sock and its associated protocol control block.
 
   @param[in, out]  Sock                 The socket to be destroyed.
 

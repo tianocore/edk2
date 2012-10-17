@@ -1,7 +1,7 @@
 /** @file
   Support for PxeBc dhcp functions.
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -203,7 +203,7 @@ PxeBcParseCachedDhcpPacket (
             (Offer->Dhcp4.Header.BootFileName[0] != 0)) {
     //
     // If the bootfile is not present and bootfilename is present in dhcp packet, just parse it.
-    // And do not count dhcp option header, or else will destory the serverhostname.
+    // And do not count dhcp option header, or else will destroy the serverhostname.
     //
     Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] = (EFI_DHCP4_PACKET_OPTION *) (&Offer->Dhcp4.Header.BootFileName[0] -
                                             OFFSET_OF (EFI_DHCP4_PACKET_OPTION, Data[0]));

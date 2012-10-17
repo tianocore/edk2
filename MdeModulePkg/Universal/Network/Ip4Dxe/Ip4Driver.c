@@ -1,7 +1,7 @@
 /** @file
   The driver binding and service binding protocol for IP4 driver.
 
-Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -118,7 +118,7 @@ Ip4DriverBindingSupported (
   Clean up a IP4 service binding instance. It will release all
   the resource allocated by the instance. The instance may be
   partly initialized, or partly destroyed. If a resource is
-  destroyed, it is marked as that in case the destory failed and
+  destroyed, it is marked as that in case the destroy failed and
   being called again later.
 
   @param[in]  IpSb               The IP4 serviceing binding instance to clean up
@@ -176,7 +176,7 @@ Ip4CreateService (
   IpSb->ServiceBinding.CreateChild  = Ip4ServiceBindingCreateChild;
   IpSb->ServiceBinding.DestroyChild = Ip4ServiceBindingDestroyChild;
   IpSb->State                       = IP4_SERVICE_UNSTARTED;
-  IpSb->InDestory                   = FALSE;
+  IpSb->InDestroy                   = FALSE;
 
   IpSb->NumChildren                 = 0;
   InitializeListHead (&IpSb->Children);
@@ -315,7 +315,7 @@ ON_ERROR:
   Clean up a IP4 service binding instance. It will release all
   the resource allocated by the instance. The instance may be
   partly initialized, or partly destroyed. If a resource is
-  destroyed, it is marked as that in case the destory failed and
+  destroyed, it is marked as that in case the destroy failed and
   being called again later.
 
   @param[in]  IpSb               The IP4 serviceing binding instance to clean up
@@ -581,7 +581,7 @@ Ip4DriverBindingStop (
 
     OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-    if (IpSb->Ip4Config != NULL && (IpSb->State != IP4_SERVICE_DESTORY)) {
+    if (IpSb->Ip4Config != NULL && (IpSb->State != IP4_SERVICE_DESTROY)) {
 
       IpSb->Ip4Config->Stop (IpSb->Ip4Config);
 
@@ -651,7 +651,7 @@ Ip4DriverBindingStop (
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-  if (IpSb->InDestory) {
+  if (IpSb->InDestroy) {
     gBS->RestoreTPL (OldTpl);
     return EFI_SUCCESS;
   }
@@ -668,10 +668,10 @@ Ip4DriverBindingStop (
       goto ON_ERROR;
     }
 
-    IpSb->InDestory = TRUE;
+    IpSb->InDestroy = TRUE;
 
     State           = IpSb->State;
-    IpSb->State     = IP4_SERVICE_DESTORY;
+    IpSb->State     = IP4_SERVICE_DESTROY;
 
     //
     // Clear the variable data.
@@ -696,10 +696,10 @@ Ip4DriverBindingStop (
 
     FreePool (IpSb);
   } else if (NumberOfChildren == 0) {
-    IpSb->InDestory = TRUE;
+    IpSb->InDestroy = TRUE;
 
     State           = IpSb->State;
-    IpSb->State     = IP4_SERVICE_DESTORY;
+    IpSb->State     = IP4_SERVICE_DESTROY;
 
     //
     // Clear the variable data.
@@ -912,18 +912,18 @@ Ip4ServiceBindingDestroyChild (
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
-  // A child can be destoried more than once. For example,
-  // Ip4DriverBindingStop will destory all of its children.
-  // when UDP driver is being stopped, it will destory all
+  // A child can be destroyed more than once. For example,
+  // Ip4DriverBindingStop will destroy all of its children.
+  // when UDP driver is being stopped, it will destroy all
   // the IP child it opens.
   //
-  if (IpInstance->State == IP4_STATE_DESTORY) {
+  if (IpInstance->State == IP4_STATE_DESTROY) {
     gBS->RestoreTPL (OldTpl);
     return EFI_SUCCESS;
   }
 
   State             = IpInstance->State;
-  IpInstance->State = IP4_STATE_DESTORY;
+  IpInstance->State = IP4_STATE_DESTROY;
 
   //
   // Close the Managed Network protocol.

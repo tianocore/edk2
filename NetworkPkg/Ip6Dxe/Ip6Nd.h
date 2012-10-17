@@ -1,7 +1,7 @@
 /** @file
   Definition of Neighbor Discovery support routines.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -336,7 +336,7 @@ Ip6CreatePrefixListEntry (
   );
 
 /**
-  Destory a IP6 prefix list entry.
+  Destroy a IP6 prefix list entry.
 
   @param[in]  IpSb              The pointer to IP6_SERVICE instance.
   @param[in]  PrefixEntry       The to be destroyed prefix list entry.

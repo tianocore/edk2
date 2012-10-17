@@ -1,7 +1,7 @@
 /** @file
   Implementation of Mtftp drivers.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -159,7 +159,7 @@ Mtftp4CreateService (
 
   MtftpSb->Signature      = MTFTP4_SERVICE_SIGNATURE;
   MtftpSb->ServiceBinding = gMtftp4ServiceBindingTemplete;
-  MtftpSb->InDestory      = FALSE;
+  MtftpSb->InDestroy      = FALSE;
   MtftpSb->ChildrenNum    = 0;
   InitializeListHead (&MtftpSb->Children);
 
@@ -374,7 +374,7 @@ Mtftp4DriverBindingStop (
 
   MtftpSb = MTFTP4_SERVICE_FROM_THIS (ServiceBinding);
 
-  if (MtftpSb->InDestory) {
+  if (MtftpSb->InDestroy) {
     return EFI_SUCCESS;
   }
 
@@ -382,7 +382,7 @@ Mtftp4DriverBindingStop (
 
   if (NumberOfChildren == 0) {
 
-    MtftpSb->InDestory = TRUE;
+    MtftpSb->InDestroy = TRUE;
 
     gBS->UninstallProtocolInterface (
            NicHandle,
@@ -429,7 +429,7 @@ Mtftp4InitProtocol (
   InitializeListHead (&Instance->Link);
   CopyMem (&Instance->Mtftp4, &gMtftp4ProtocolTemplate, sizeof (Instance->Mtftp4));
   Instance->State     = MTFTP4_STATE_UNCONFIGED;
-  Instance->InDestory = FALSE;
+  Instance->InDestroy = FALSE;
   Instance->Service   = MtftpSb;
 
   InitializeListHead (&Instance->Blocks);
@@ -548,14 +548,14 @@ ON_ERROR:
 
 
 /**
-  Destory one of the service binding's child.
+  Destroy one of the service binding's child.
 
   @param  This                   The service binding instance
-  @param  ChildHandle            The child handle to destory
+  @param  ChildHandle            The child handle to destroy
 
   @retval EFI_INVALID_PARAMETER  The parameter is invaid.
-  @retval EFI_UNSUPPORTED        The child may have already been destoried.
-  @retval EFI_SUCCESS            The child is destoried and removed from the
+  @retval EFI_UNSUPPORTED        The child may have already been destroyed.
+  @retval EFI_SUCCESS            The child is destroyed and removed from the
                                  parent's child list.
 
 **/
@@ -599,11 +599,11 @@ Mtftp4ServiceBindingDestroyChild (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Instance->InDestory) {
+  if (Instance->InDestroy) {
     return EFI_SUCCESS;
   }
 
-  Instance->InDestory = TRUE;
+  Instance->InDestroy = TRUE;
 
   //
   // Close the Udp4 protocol.
@@ -625,7 +625,7 @@ Mtftp4ServiceBindingDestroyChild (
                   );
 
   if (EFI_ERROR (Status)) {
-    Instance->InDestory = FALSE;
+    Instance->InDestroy = FALSE;
     return Status;
   }
 
