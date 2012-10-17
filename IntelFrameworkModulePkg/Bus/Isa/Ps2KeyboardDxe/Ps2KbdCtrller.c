@@ -1519,7 +1519,7 @@ InitKeyboard (
   // Perform a read to cleanup the Status Register's
   // output buffer full bits within MAX TRY times
   //
-  if ((KeyReadStatusRegister (ConsoleIn) & KEYBOARD_STATUS_REGISTER_HAS_OUTPUT_DATA)) {
+  if ((KeyReadStatusRegister (ConsoleIn) & KEYBOARD_STATUS_REGISTER_HAS_OUTPUT_DATA) != 0) {
     while (!EFI_ERROR (Status) && TryTime < KEYBOARD_MAX_TRY) {
       Status = KeyboardRead (ConsoleIn, &CommandByte);
       TryTime ++;
