@@ -182,6 +182,45 @@ Index: crypto/pkcs7/pk7_smime.c
  		PKCS7err(PKCS7_F_PKCS7_SIGN,PKCS7_R_PKCS7_ADD_SIGNATURE_ERROR);
  		goto err;
  	}
+@@ -173,7 +176,8 @@
+ 	STACK_OF(PKCS7_SIGNER_INFO) *sinfos;
+ 	PKCS7_SIGNER_INFO *si;
+ 	X509_STORE_CTX cert_ctx;
+-	char buf[4096];
++	char *buf = NULL;
++	int bufsiz;
+ 	int i, j=0, k, ret = 0;
+ 	BIO *p7bio;
+ 	BIO *tmpin, *tmpout;
+@@ -284,10 +288,16 @@
+ 		BIO_set_mem_eof_return(tmpout, 0);
+ 	} else tmpout = out;
+ 
++	bufsiz = 4096;
++	buf = OPENSSL_malloc (bufsiz);
++		if (buf == NULL) {
++			goto err;
++	}
++
+ 	/* We now have to 'read' from p7bio to calculate digests etc. */
+ 	for (;;)
+ 	{
+-		i=BIO_read(p7bio,buf,sizeof(buf));
++		i=BIO_read(p7bio,buf,bufsiz);
+ 		if (i <= 0) break;
+ 		if (tmpout) BIO_write(tmpout, buf, i);
+ 	}
+@@ -326,6 +336,10 @@
+ 
+ 	sk_X509_free(signers);
+ 
++	if (buf != NULL) {
++		OPENSSL_free (buf);
++	}
++
+ 	return ret;
+ }
+ 
 Index: crypto/rand/rand_egd.c
 ===================================================================
 --- crypto/rand/rand_egd.c	(revision 1)
