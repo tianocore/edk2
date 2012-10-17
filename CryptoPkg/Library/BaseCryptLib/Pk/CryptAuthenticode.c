@@ -26,6 +26,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <openssl/x509.h>
 #include <openssl/pkcs7.h>
 
+//
+// OID ASN.1 Value for SPC_INDIRECT_DATA_OBJID
+//
+UINT8 mSpcIndirectOidValue[] = {
+  0x2B, 0x06, 0x01, 0x04, 0x01, 0x82, 0x37, 0x02, 0x01, 0x04
+  };
 
 /**
   Verifies the validility of a PE/COFF Authenticode Signature as described in "Windows
@@ -70,6 +76,7 @@ AuthenticodeVerify (
   UINT8        *SpcIndirectDataContent;
   UINT8        Asn1Byte;
   UINTN        ContentSize;
+  UINT8        *SpcIndirectDataOid;
 
   //
   // Check input parameters.
@@ -106,6 +113,19 @@ AuthenticodeVerify (
   //       some authenticode-specific structure. Use opaque ASN.1 string to retrieve
   //       PKCS#7 ContentInfo here.
   //
+  SpcIndirectDataOid = (UINT8 *)(Pkcs7->d.sign->contents->type->data);
+  if (CompareMem (
+        SpcIndirectDataOid,
+        mSpcIndirectOidValue,
+        sizeof (mSpcIndirectOidValue)
+        ) != 0) {
+    //
+    // Un-matched SPC_INDIRECT_DATA_OBJID.
+    //
+    goto _Exit;
+  }  
+
+
   SpcIndirectDataContent = (UINT8 *)(Pkcs7->d.sign->contents->d.other->value.asn1_string->data);
 
   //
