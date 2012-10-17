@@ -19,7 +19,7 @@
 //
 // The print title for IKEv1 variety phase.
 //
-CHAR8 *mIkev1StateStr[] = {
+CHAR8 *mIkev1StateStr[IKE_STATE_NUM] = {
   "IKEv1_MAIN_1",
   "IKEv1_MAIN_2",
   "IKEv1_MAIN_3",
@@ -32,7 +32,7 @@ CHAR8 *mIkev1StateStr[] = {
 //
 // The print title for IKEv2 variety phase.
 //
-CHAR8 *mIkev2StateStr[] = {
+CHAR8 *mIkev2StateStr[IKE_STATE_NUM] = {
   "IKEv2_STATE_INIT",
   "IKEv2_STATE_AUTH",
   "IKEv2_STATE_SA_ESTABLISH",
@@ -166,23 +166,23 @@ IkeDumpState (
   IN UINT8               IkeVersion
   )
 {
+  if (Previous >= IKE_STATE_NUM || Current >= IKE_STATE_NUM) {
+    return; 
+  }
   
   if (Previous == Current) {
     if (IkeVersion == 1) {
       DEBUG ((DEBUG_INFO, "\n****Current state is %a\n", mIkev1StateStr[Previous]));
     } else if (IkeVersion == 2) {
       DEBUG ((DEBUG_INFO, "\n****Current state is %a\n", mIkev2StateStr[Previous]));
-    }
-    
+    }    
   } else {
     if (IkeVersion == 1) {
       DEBUG ((DEBUG_INFO, "\n****Change state from %a to %a\n", mIkev1StateStr[Previous], mIkev1StateStr[Current]));
     } else {
       DEBUG ((DEBUG_INFO, "\n****Change state from %a to %a\n", mIkev2StateStr[Previous], mIkev2StateStr[Current]));
-    }
-    
+    }    
   }
-
 }
 
 /**
