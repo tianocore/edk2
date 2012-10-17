@@ -472,6 +472,18 @@ Ip6CreateService (
                 );
   }
 
+  //
+  // If there is any gateway address, set it.
+  //
+  DataItem = &IpSb->Ip6ConfigInstance.DataItem[Ip6ConfigDataTypeGateway];
+  if (DataItem->Data.Ptr != NULL) {
+    DataItem->SetData (
+                &IpSb->Ip6ConfigInstance,
+                DataItem->DataSize,
+                DataItem->Data.Ptr
+                );
+  }
+
   InsertHeadList (&IpSb->Interfaces, &IpSb->DefaultInterface->Link);
 
   *Service = IpSb;
