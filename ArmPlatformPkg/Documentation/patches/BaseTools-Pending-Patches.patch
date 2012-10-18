@@ -1,158 +1,93 @@
-From c23ebebbcd3ee992017d4aad70e523ea7252c884 Mon Sep 17 00:00:00 2001
-From: Olivier Martin <olivier.martin@arm.com>
-Date: Tue, 6 Dec 2011 16:26:30 +0000
-Subject: [PATCH] BaseTools: Pending patches update
-
-Add patch:
-- ARMLINUXGCC: Set the linked base address at 0x0 (0x8000 by default)
----
- BaseTools/Conf/tools_def.template           |    2 +-
- BaseTools/Source/C/GenFv/GenFv.c            |    7 +---
- BaseTools/Source/C/GenFv/GenFvInternalLib.c |   48 +++++++++++---------------
- 3 files changed, 22 insertions(+), 35 deletions(-)
- mode change 100644 => 100755 BaseTools/Conf/tools_def.template
-
-diff --git a/BaseTools/Conf/tools_def.template b/BaseTools/Conf/tools_def.template
-old mode 100644
-new mode 100755
-index ee7e23e..68caf86
---- a/BaseTools/Conf/tools_def.template
-+++ b/BaseTools/Conf/tools_def.template
-@@ -4320,7 +4320,7 @@ RELEASE_ARMLINUXGCC_ARM_ASM_FLAGS   = $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) -mlittl
- *_ARMLINUXGCC_ARM_VFRPP_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -x c -E -P -DVFRCOMPILE --include $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
+Index: BaseTools/Conf/tools_def.template
+===================================================================
+--- BaseTools/Conf/tools_def.template	(revision 13864)
++++ BaseTools/Conf/tools_def.template	(working copy)
+@@ -2541,7 +2541,7 @@
+ DEFINE GCC_IA32_CC_FLAGS           = DEF(GCC_ALL_CC_FLAGS) -m32 -malign-double -freorder-blocks -freorder-blocks-and-partition -O2 -mno-stack-arg-probe
+ DEFINE GCC_X64_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -mno-red-zone -Wno-address -mno-stack-arg-probe
+ DEFINE GCC_IPF_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -minline-int-divide-min-latency
+-DEFINE GCC_ARMGCC_CC_FLAGS         = DEF(GCC_ALL_CC_FLAGS) -mword-relocations -mlittle-endian -mabi=aapcs -mapcs -fno-short-enums -save-temps -fsigned-char  -ffunction-sections -fdata-sections -fomit-frame-pointer
++DEFINE GCC_ARMGCC_CC_FLAGS         = DEF(GCC_ALL_CC_FLAGS) -mword-relocations -mlittle-endian -mabi=aapcs -mapcs -fno-short-enums -save-temps -fsigned-char  -ffunction-sections -fdata-sections -fomit-frame-pointer -Wno-address
+ DEFINE GCC_DLINK_FLAGS_COMMON      = -nostdlib --pie
+ DEFINE GCC_IA32_X64_DLINK_COMMON   = DEF(GCC_DLINK_FLAGS_COMMON) --gc-sections
+ DEFINE GCC_IA32_X64_ASLDLINK_FLAGS = DEF(GCC_IA32_X64_DLINK_COMMON) --entry _ReferenceAcpiTable -u $(IMAGE_ENTRY_POINT)
+@@ -4628,7 +4628,8 @@
+ #
+ ####################################################################################
  
+-DEFINE RVCT_ALL_CC_FLAGS   = --c90 -c --no_autoinline --asm --gnu --apcs /interwork --signed_chars --no_unaligned_access --split_sections --enum_is_int --preinclude AutoGen.h --diag_warning 167 --diag_style=ide
++DEFINE RVCT_ALL_ASM_FLAGS   = --diag_suppress=1786 --diag_error=warning --apcs /interwork
++DEFINE RVCT_ALL_CC_FLAGS   = --c90 -c --no_autoinline --asm --gnu --apcs /interwork --signed_chars --no_unaligned_access --split_sections --enum_is_int --preinclude AutoGen.h --diag_suppress=186 --diag_warning 167 --diag_error=warning --diag_style=ide
+ DEFINE RVCT_ALL_DLINK_FLAGS   = --ro-base 0 --no_scanlib --reloc --no_exceptions --datacompressor off --strict --symbols --diag_style=ide
+ 
+ ####################################################################################
+@@ -4652,13 +4653,13 @@
+ RELEASE_RVCT_ARM_DLINK_FLAGS     = $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list $(DEST_DIR_DEBUG)/$(BASE_NAME).map 
+ 
+ 
+-*_RVCT_ARM_ASM_FLAGS       = $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) --apcs /interwork
++*_RVCT_ARM_ASM_FLAGS       = $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_ASM_FLAGS)
+ *_RVCT_ARM_PP_FLAGS        = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E
+ *_RVCT_ARM_VFRPP_FLAGS     = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E  -DVFRCOMPILE --preinclude $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
+ *_RVCT_ARM_MAKE_PATH       = nmake /NOLOGO
+ *_RVCT_ARM_SLINK_FLAGS     = --partial -o
+   DEBUG_RVCT_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_CC_FLAGS) -O1 -g
+-RELEASE_RVCT_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_CC_FLAGS) -O2
++RELEASE_RVCT_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --diag_suppress=550 DEF(RVCT_ALL_CC_FLAGS) -O2
+ 
+ ##################
+ # ARM definitions
+@@ -4691,13 +4692,13 @@
+ DEBUG_RVCTLINUX_ARM_DLINK_FLAGS     = $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list $(DEST_DIR_DEBUG)/$(BASE_NAME).map 
+ RELEASE_RVCTLINUX_ARM_DLINK_FLAGS   = $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+ 
+-*_RVCTLINUX_ARM_ASM_FLAGS       = $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) --apcs /interwork
++*_RVCTLINUX_ARM_ASM_FLAGS       = $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_ASM_FLAGS)
+ *_RVCTLINUX_ARM_PP_FLAGS        = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E
+ *_RVCTLINUX_ARM_VFRPP_FLAGS     = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E  -DVFRCOMPILE --preinclude $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
+ *_RVCTLINUX_ARM_MAKE_PATH       = make
+ *_RVCTLINUX_ARM_SLINK_FLAGS     = --partial -o
+   DEBUG_RVCTLINUX_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_CC_FLAGS) -O1 -g
+-RELEASE_RVCTLINUX_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_CC_FLAGS) -O2
++RELEASE_RVCTLINUX_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --diag_suppress=550 DEF(RVCT_ALL_CC_FLAGS) -O2
+ 
+ ##################
+ # ARM definitions
+@@ -4739,13 +4740,13 @@
+   DEBUG_RVCTCYGWIN_ARM_DLINK_FLAGS     = "$(DLINKPATH_FLAG)" $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list `cygpath -m $(DEST_DIR_DEBUG)/$(BASE_NAME).map` 
+ RELEASE_RVCTCYGWIN_ARM_DLINK_FLAGS     = "$(DLINKPATH_FLAG)" $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list `cygpath -m $(DEST_DIR_DEBUG)/$(BASE_NAME).map` 
+  
+-*_RVCTCYGWIN_ARM_ASM_FLAGS       = "$(ASMPATH_FLAG)" $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) --apcs /interwork
++*_RVCTCYGWIN_ARM_ASM_FLAGS       = "$(ASMPATH_FLAG)" $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_ASM_FLAGS)
+ *_RVCTCYGWIN_ARM_PP_FLAGS        = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E
+ *_RVCTCYGWIN_ARM_VFRPP_FLAGS     = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E  -DVFRCOMPILE --preinclude `cygpath -m $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h`
+ *_RVCTCYGWIN_ARM_MAKE_PATH       = make
+ *_RVCTCYGWIN_ARM_SLINK_FLAGS     = "$(SLINKPATH_FLAG)" --partial -o
+   DEBUG_RVCTCYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_CC_FLAGS) -O1 -g
+-RELEASE_RVCTCYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_CC_FLAGS) -O2
++RELEASE_RVCTCYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --diag_suppress=550 DEF(RVCT_ALL_CC_FLAGS) -O2
+ 
+ ##################
+ # ARM definitions
+@@ -4813,8 +4814,8 @@
+ *_ARMGCC_ARM_SLINK_FLAGS =  -rc
+ *_ARMGCC_ARM_DLINK_FLAGS =  $(ARCHDLINK_FLAGS) -Ttext=0x0 --oformat=elf32-littlearm --emit-relocs -nostdlib -u $(IMAGE_ENTRY_POINT) -e $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+ 
+-  DEBUG_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARMGCC_CC_FLAGS) -combine -O0
+-RELEASE_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARMGCC_CC_FLAGS) -combine -Wno-unused
++  DEBUG_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARMGCC_CC_FLAGS) -O0
++RELEASE_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARMGCC_CC_FLAGS) -Wno-unused
+ 
+ ####################################################################################
+ #
+@@ -4871,8 +4872,8 @@
  *_ARMLINUXGCC_ARM_SLINK_FLAGS =  -rc
--*_ARMLINUXGCC_ARM_DLINK_FLAGS =  $(ARCHDLINK_FLAGS)  --oformat=elf32-littlearm --emit-relocs -nostdlib -u $(IMAGE_ENTRY_POINT) -e $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
-+*_ARMLINUXGCC_ARM_DLINK_FLAGS =  $(ARCHDLINK_FLAGS) -Ttext=0x0 --oformat=elf32-littlearm --emit-relocs -nostdlib -u $(IMAGE_ENTRY_POINT) -e $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+ *_ARMLINUXGCC_ARM_DLINK_FLAGS =  $(ARCHDLINK_FLAGS) -Ttext=0x0 --oformat=elf32-littlearm --emit-relocs -nostdlib -u $(IMAGE_ENTRY_POINT) -e $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
  
-   DEBUG_ARMLINUXGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARMGCC_CC_FLAGS) -Wno-address -O0
- RELEASE_ARMLINUXGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARMGCC_CC_FLAGS) -Wno-address -Wno-unused-but-set-variable
-diff --git a/BaseTools/Source/C/GenFv/GenFv.c b/BaseTools/Source/C/GenFv/GenFv.c
-index fa86d00..27bd2af 100644
---- a/BaseTools/Source/C/GenFv/GenFv.c
-+++ b/BaseTools/Source/C/GenFv/GenFv.c
-@@ -623,12 +623,7 @@ Returns:
-               );
-   } else {
-     VerboseMsg ("Create Fv image and its map file");
--    //
--    // Will take rebase action at below situation:
--    // 1. ForceRebase Flag specified to TRUE;
--    // 2. ForceRebase Flag not specified, BaseAddress greater than zero.
--    //
--    if (((mFvDataInfo.BaseAddress > 0) && (mFvDataInfo.ForceRebase == -1)) || (mFvDataInfo.ForceRebase == 1)) {
-+    if (mFvDataInfo.BaseAddressSet) {
-       VerboseMsg ("FvImage Rebase Address is 0x%llX", (unsigned long long) mFvDataInfo.BaseAddress);
-     }
-     //
-diff --git a/BaseTools/Source/C/GenFv/GenFvInternalLib.c b/BaseTools/Source/C/GenFv/GenFvInternalLib.c
-index 684933f..aabba5b 100644
---- a/BaseTools/Source/C/GenFv/GenFvInternalLib.c
-+++ b/BaseTools/Source/C/GenFv/GenFvInternalLib.c
-@@ -506,6 +506,7 @@ Returns:
+-  DEBUG_ARMLINUXGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARMGCC_CC_FLAGS) -Wno-address -O0
+-RELEASE_ARMLINUXGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARMGCC_CC_FLAGS) -Wno-address -Wno-unused-but-set-variable
++  DEBUG_ARMLINUXGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARMGCC_CC_FLAGS) -fno-stack-protector -mno-unaligned-access -O0
++RELEASE_ARMLINUXGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARMGCC_CC_FLAGS) -fno-stack-protector  -mno-unaligned-access -Wno-unused-but-set-variable
  
- EFI_STATUS
- AddPadFile (
-+  IN FV_INFO          *FvInfo,
-   IN OUT MEMORY_FILE  *FvImage,
-   IN UINT32           DataAlignment,
-   IN VOID             *FvEnd,
-@@ -537,6 +538,8 @@ Returns:
- {
-   EFI_FFS_FILE_HEADER *PadFile;
-   UINTN               PadFileSize;
-+  UINTN               PadFileOffset;
-+  UINTN               ExtHeaderSize;
- 
-   //
-   // Verify input parameters.
-@@ -559,32 +562,29 @@ Returns:
-   // This is the earliest possible valid offset (current plus pad file header
-   // plus the next file header)
-   //
--  PadFileSize = (UINTN) FvImage->CurrentFilePointer - (UINTN) FvImage->FileImage + (sizeof (EFI_FFS_FILE_HEADER) * 2);
-+  // The padding is added into its own FFS file (which requires a header) added before the aligned file:
-+  // | ... FV data before AlignedFile ... | Pad File FFS Header | Padding | AlignedFile FFS Header (+ ExtHeader) | AlignedData
- 
-   //
--  // Add whatever it takes to get to the next aligned address
-+  // Calculate the Offset of the Pad File from the beginning of the FV file
-   //
--  while ((PadFileSize % DataAlignment) != 0) {
--    PadFileSize++;
--  }
--  //
--  // Subtract the next file header size
--  //
--  PadFileSize -= sizeof (EFI_FFS_FILE_HEADER);
--
--  //
--  // Subtract the starting offset to get size
--  //
--  PadFileSize -= (UINTN) FvImage->CurrentFilePointer - (UINTN) FvImage->FileImage;
-+  PadFileOffset = (UINTN) FvImage->CurrentFilePointer - (UINTN) FvImage->FileImage;
-   
-   //
--  // Append extension header size
-+  // Get the size of the extension header if exists
-   //
-   if (ExtHeader != NULL) {
--    PadFileSize = PadFileSize + ExtHeader->ExtHeaderSize;
-+    ExtHeaderSize = ExtHeader->ExtHeaderSize;
-+  } else {
-+    ExtHeaderSize = 0;
-   }
- 
-   //
-+  // Calculate the Size of the Padding to ensure the alignment of the data of the Next file
-+  //
-+  PadFileSize = DataAlignment - ((FvInfo->BaseAddress + PadFileOffset + sizeof (EFI_FFS_FILE_HEADER) + ExtHeaderSize) & (DataAlignment - 1));
-+
-+  //
-   // Verify that we have enough space for the file header
-   //
-   if (((UINTN) FvImage->CurrentFilePointer + PadFileSize) > (UINTN) FvEnd) {
-@@ -1115,7 +1115,7 @@ Returns:
-   //
-   // Add pad file if necessary
-   //
--  Status = AddPadFile (FvImage, 1 << CurrentFileAlignment, *VtfFileImage, NULL);
-+  Status = AddPadFile (FvInfo, FvImage, 1 << CurrentFileAlignment, *VtfFileImage, NULL);
-   if (EFI_ERROR (Status)) {
-     Error (NULL, 0, 4002, "Resource", "FV space is full, could not add pad file for data alignment property.");
-     free (FileBuffer);
-@@ -2304,7 +2304,7 @@ Returns:
-     //
-     // Add FV Extended Header contents to the FV as a PAD file
-     //
--    AddPadFile (&FvImageMemoryFile, 4, VtfFileImage, FvExtHeader);
-+    AddPadFile (&mFvDataInfo, &FvImageMemoryFile, 4, VtfFileImage, FvExtHeader);
- 
-     //
-     // Fv Extension header change update Fv Header Check sum
-@@ -2825,20 +2825,12 @@ Returns:
-   PeFileBuffer       = NULL;
- 
-   //
--  // Don't need to relocate image when BaseAddress is zero and no ForceRebase Flag specified.
--  //
--  if ((FvInfo->BaseAddress == 0) && (FvInfo->ForceRebase == -1)) {
--    return EFI_SUCCESS;
--  }
--  
--  //
--  // If ForceRebase Flag specified to FALSE, will always not take rebase action.
-+  // Don't need to relocate image when BaseAddress is not set.
-   //
--  if (FvInfo->ForceRebase == 0) {
-+  if (FvInfo->BaseAddressSet == FALSE) {
-     return EFI_SUCCESS;
-   }
- 
--
-   XipBase = FvInfo->BaseAddress + XipOffset;
- 
-   //
--- 
-1.7.0.4
-
+ #################
+ # ASM 16 linker defintions
