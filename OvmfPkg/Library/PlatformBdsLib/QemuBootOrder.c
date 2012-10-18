@@ -632,6 +632,51 @@ TranslateOfwNodes (
       PciDevFun[0],
       PciDevFun[1]
       );
+  } else if (NumNodes >= 4 &&
+             SubstringEq (OfwNode[1].DriverName, "scsi") &&
+             SubstringEq (OfwNode[2].DriverName, "channel") &&
+             SubstringEq (OfwNode[3].DriverName, "disk")
+             ) {
+    //
+    // OpenFirmware device path (virtio-scsi disk):
+    //
+    //   /pci@i0cf8/scsi@7[,3]/channel@0/disk@2,3
+    //        ^          ^             ^      ^ ^
+    //        |          |             |      | LUN
+    //        |          |             |      target
+    //        |          |             channel (unused, fixed 0)
+    //        |          PCI slot[, function] holding SCSI controller
+    //        PCI root at system bus port, PIO
+    //
+    // UEFI device path prefix:
+    //
+    //   PciRoot(0x0)/Pci(0x7,0x0)/Scsi(0x2,0x3)
+    //                                        -- if PCI function is 0 or absent
+    //   PciRoot(0x0)/Pci(0x7,0x3)/Scsi(0x2,0x3)
+    //                                -- if PCI function is present and nonzero
+    //
+    UINT32 TargetLun[2];
+
+    TargetLun[1] = 0;
+    NumEntries = sizeof (TargetLun) / sizeof (TargetLun[0]);
+    if (ParseUnitAddressHexList (
+          OfwNode[3].UnitAddress,
+          TargetLun,
+          &NumEntries
+          ) != RETURN_SUCCESS
+        ) {
+      return RETURN_UNSUPPORTED;
+    }
+
+    Written = UnicodeSPrintAsciiFormat (
+      Translated,
+      *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
+      "PciRoot(0x0)/Pci(0x%x,0x%x)/Scsi(0x%x,0x%x)",
+      PciDevFun[0],
+      PciDevFun[1],
+      TargetLun[0],
+      TargetLun[1]
+      );
   } else {
     return RETURN_UNSUPPORTED;
   }
