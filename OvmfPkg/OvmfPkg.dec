@@ -53,6 +53,17 @@
   #  to PIIX4 function 3 offset 0x40-0x43 bits [15:6].
   gUefiOvmfPkgTokenSpaceGuid.PcdAcpiPmBaseAddress|0xB000|UINT16|5
 
+  ## When VirtioScsiDxe is instantiated for a HBA, the numbers of targets and
+  #  LUNs are retrieved from the host during virtio-scsi setup.
+  #  MdeModulePkg/Bus/Scsi/ScsiBusDxe then scans all MaxTarget * MaxLun
+  #  possible devices. This can take extremely long, for example with
+  #  MaxTarget=255 and MaxLun=16383. The *inclusive* constants below limit
+  #  MaxTarget and MaxLun, independently, should the host report higher values,
+  #  so that scanning the number of devices given by their product is still
+  #  acceptably fast.
+  gUefiOvmfPkgTokenSpaceGuid.PcdVirtioScsiMaxTargetLimit|31|UINT16|6
+  gUefiOvmfPkgTokenSpaceGuid.PcdVirtioScsiMaxLunLimit|7|UINT32|7
+
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
 
