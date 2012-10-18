@@ -242,8 +242,8 @@ X509PopCertificate (
   X509            *X509Cert;
   STACK_OF(X509)  *CertStack;
   BOOLEAN         Status;
-  int             Result;
-  int             Length;
+  INT32           Result;
+  INT32           Length;
   VOID            *Buffer;
 
   Status = FALSE;
