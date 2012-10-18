@@ -944,18 +944,32 @@ VirtioBlkDriverBindingStop (
   IN EFI_HANDLE                  *ChildHandleBuffer
   )
 {
-  VBLK_DEV   *Dev;
-  EFI_STATUS Status;
+  EFI_STATUS            Status;
+  EFI_BLOCK_IO_PROTOCOL *BlockIo;
+  VBLK_DEV              *Dev;
 
-  Dev = VIRTIO_BLK_FROM_BLOCK_IO (This);
+  Status = gBS->OpenProtocol (
+                  DeviceHandle,                  // candidate device
+                  &gEfiBlockIoProtocolGuid,      // retrieve the BlockIo iface
+                  (VOID **)&BlockIo,             // target pointer
+                  This->DriverBindingHandle,     // requestor driver identity
+                  DeviceHandle,                  // requesting lookup for dev.
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL // lookup only, no ref. added
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Dev = VIRTIO_BLK_FROM_BLOCK_IO (BlockIo);
 
   //
-  // If DriverBindingStop() is called with the driver instance still in use,
-  // or any of the parameters are invalid, we've caught a bug.
+  // Handle Stop() requests for in-use driver instances gracefully.
   //
   Status = gBS->UninstallProtocolInterface (DeviceHandle,
                   &gEfiBlockIoProtocolGuid, &Dev->BlockIo);
-  ASSERT (Status == EFI_SUCCESS);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   VirtioBlkUninit (Dev);
 
