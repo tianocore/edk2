@@ -1,7 +1,7 @@
 /** @file
   Internal library implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -182,7 +182,7 @@ DumpBridgeResource (
 
   if ((BridgeResource != NULL) && (BridgeResource->Length != 0)) {
     DEBUG ((
-      EFI_D_INFO, "Type = %s; Base = 0x%x;\tLength = 0x%x;\tAlignment = 0x%x\n",
+      EFI_D_INFO, "Type = %s; Base = 0x%lx;\tLength = 0x%lx;\tAlignment = 0x%lx\n",
       mBarTypeStr[MIN (BridgeResource->ResType, PciBarTypeMaxType)],
       BridgeResource->PciDev->PciBar[BridgeResource->Bar].BaseAddress,
       BridgeResource->Length, BridgeResource->Alignment
@@ -195,7 +195,7 @@ DumpBridgeResource (
       if (Resource->ResourceUsage == PciResUsageTypical) {
         Bar = Resource->Virtual ? Resource->PciDev->VfPciBar : Resource->PciDev->PciBar;
         DEBUG ((
-          EFI_D_INFO, " Base = 0x%x;\tLength = 0x%x;\tAlignment = 0x%x;\tOwner = %s ",
+          EFI_D_INFO, " Base = 0x%lx;\tLength = 0x%lx;\tAlignment = 0x%lx;\tOwner = %s ",
           Bar[Resource->Bar].BaseAddress, Resource->Length, Resource->Alignment,
           IS_PCI_BRIDGE (&Resource->PciDev->Pci)     ? L"PPB" :
           IS_CARDBUS_BRIDGE (&Resource->PciDev->Pci) ? L"P2C" :
@@ -225,7 +225,7 @@ DumpBridgeResource (
             ));
         }
       } else {
-        DEBUG ((EFI_D_INFO, " Padding:Length = 0x%x;\tAlignment = 0x%x\n", Resource->Length, Resource->Alignment));
+        DEBUG ((EFI_D_INFO, " Padding:Length = 0x%lx;\tAlignment = 0x%lx\n", Resource->Length, Resource->Alignment));
       }
     }
   }
