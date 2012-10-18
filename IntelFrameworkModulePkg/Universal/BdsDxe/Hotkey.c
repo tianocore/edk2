@@ -419,7 +419,7 @@ IsKeyOptionVariable (
   UINTN         Index;
   
   if (!CompareGuid (Guid, &gEfiGlobalVariableGuid) ||
-      (StrSize (Name) != sizeof (L"Key####")) &&
+      (StrSize (Name) != sizeof (L"Key####")) ||
       (StrnCmp (Name, L"Key", 3) != 0)
      ) {
     return FALSE;
