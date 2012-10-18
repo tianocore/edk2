@@ -857,7 +857,7 @@ BcfgAddOptInstall1(
         // Now we know how many EFI_INPUT_KEY structs we need to attach to the end of the EFI_KEY_OPTION struct.  
         // Re-allocate with the added information.
         //
-        KeyOptionBuffer = AllocateCopyPool(sizeof(EFI_KEY_OPTION) + (sizeof(EFI_KEY_DATA) * KEY_OPTION_INPUT_KEY_COUNT (&NewKeyOption)), &NewKeyOption);
+        KeyOptionBuffer = AllocateCopyPool(sizeof(EFI_KEY_OPTION) + (sizeof(EFI_INPUT_KEY) * KEY_OPTION_INPUT_KEY_COUNT (&NewKeyOption)), &NewKeyOption);
         if (KeyOptionBuffer == NULL) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_MEM), gShellInstall1HiiHandle);
           ShellStatus = SHELL_OUT_OF_RESOURCES;
@@ -929,7 +929,7 @@ BcfgAddOptInstall1(
           VariableName,
           (EFI_GUID*)&gEfiGlobalVariableGuid,
           EFI_VARIABLE_NON_VOLATILE|EFI_VARIABLE_BOOTSERVICE_ACCESS|EFI_VARIABLE_RUNTIME_ACCESS,
-          sizeof(EFI_KEY_OPTION) + (sizeof(EFI_KEY_DATA) * KEY_OPTION_INPUT_KEY_COUNT (&NewKeyOption)),
+          sizeof(EFI_KEY_OPTION) + (sizeof(EFI_INPUT_KEY) * KEY_OPTION_INPUT_KEY_COUNT (&NewKeyOption)),
           KeyOptionBuffer);
         if (EFI_ERROR(Status)) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_SET_VAR_FAIL), gShellInstall1HiiHandle, VariableName, Status);
