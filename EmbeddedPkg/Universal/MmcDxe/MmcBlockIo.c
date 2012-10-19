@@ -215,13 +215,12 @@ MmcIdentificationMode (
       DEBUG((EFI_D_ERROR, "MmcIdentificationMode() : Error MmcHwInitializationState\n"));
       return Status;
     }
-  } else {
-    //Note: Could even be used in all cases. But it looks this command could put the state machine into inactive for some cards
-    Status = MmcHost->SendCommand (MmcHost, MMC_CMD0, 0);
-    if (EFI_ERROR(Status)) {
-      DEBUG((EFI_D_ERROR, "MmcIdentificationMode(MMC_CMD0): Error\n"));
-      return Status;
-    }
+  }
+
+  Status = MmcHost->SendCommand (MmcHost, MMC_CMD0, 0);
+  if (EFI_ERROR(Status)) {
+    DEBUG((EFI_D_ERROR, "MmcIdentificationMode(MMC_CMD0): Error\n"));
+    return Status;
   }
 
   Status = MmcNotifyState (MmcHostInstance, MmcIdleState);
