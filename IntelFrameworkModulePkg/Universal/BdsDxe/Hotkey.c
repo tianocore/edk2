@@ -548,7 +548,7 @@ InitializeHotkeyService (
   KeyOptionNumbers = HotkeyGetOptionNumbers (&KeyOptionCount);
   for (Index = 0; Index < KeyOptionCount; Index ++) {
     UnicodeSPrint (KeyOptionName, sizeof (KeyOptionName), L"Key%04x", KeyOptionNumbers[Index]);
-    GetEfiGlobalVariable2 (KeyOptionName, &KeyOption, NULL);
+    GetEfiGlobalVariable2 (KeyOptionName, (VOID **) &KeyOption, NULL);
     ASSERT (KeyOption != NULL);
     if (IsKeyOptionValid (KeyOption)) {
       HotkeyInsertList (KeyOption);
