@@ -707,10 +707,17 @@ PeimEntryMA (
     if (EFI_ERROR (Status) ) {
       return Status;
     }
-    Status = TpmCommContinueSelfTest ((EFI_PEI_SERVICES**)PeiServices, TpmHandle);
-    if (EFI_ERROR (Status)) {
-      return Status;
+
+    //
+    // TpmSelfTest is optional on S3 path, skip it to save S3 time
+    //
+    if (BootMode != BOOT_ON_S3_RESUME) {
+      Status = TpmCommContinueSelfTest ((EFI_PEI_SERVICES**)PeiServices, TpmHandle);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
     }
+
     Status = PeiServicesInstallPpi (&mTpmInitializedPpiList);
     ASSERT_EFI_ERROR (Status);
   }
