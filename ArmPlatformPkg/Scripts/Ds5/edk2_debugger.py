@@ -55,10 +55,15 @@ def dump_system_table(ec, mem_base, mem_size):
 
 def load_symbol_from_file(ec, filename, address):
     try:
-        ec.executeDSCommand("discard-symbol-file \'%s\'" % filename)
+        ec.getImageService().addSymbols(filename, address)
     except:
-        pass
-    ec.executeDSCommand("add-symbol-file \'%s\' 0x%X" % (filename, address))
+        try:
+            # We could get an exception if the symbols are already loaded
+            ec.getImageService().unloadSymbols(filename)
+            ec.getImageService().addSymbols(filename, address)
+        except:
+            print "Warning: not possible to load symbols from %s" % filename
+            pass
 
 class ArmPlatform:
     def __init__(self, sysmembase=None, sysmemsize=None, fvs={}):
