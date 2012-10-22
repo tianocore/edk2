@@ -14,6 +14,8 @@ from arm_ds.debugger_v1 import DebugException
 
 import struct
 import string
+
+import edk2_debugger
     
 class EfiFileSection(object):
     EFI_SECTION_PE32                  = 0x10

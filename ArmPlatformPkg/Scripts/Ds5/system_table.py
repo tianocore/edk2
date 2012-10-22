@@ -12,8 +12,10 @@
 
 from arm_ds.debugger_v1 import DebugException
 
-import firmware_volume
 import struct
+
+import edk2_debugger
+import firmware_volume
 
 class DebugInfoTable:
     CONST_DEBUG_INFO_TABLE_GUID = ( 0x49152E77L, 0x47641ADAL, 0xFE7AA2B7L, 0x8B5ED9FEL)
