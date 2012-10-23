@@ -470,11 +470,13 @@ HotkeyGetOptionNumbers (
 
   NameSize = sizeof (CHAR16);
   Name     = AllocateZeroPool (NameSize);
+  ASSERT (Name != NULL);
   while (TRUE) {
     NewNameSize = NameSize;
     Status = gRT->GetNextVariableName (&NewNameSize, Name, &Guid);
     if (Status == EFI_BUFFER_TOO_SMALL) {
       Name = ReallocatePool (NameSize, NewNameSize, Name);
+      ASSERT (Name != NULL);
       Status = gRT->GetNextVariableName (&NewNameSize, Name, &Guid);
       NameSize = NewNameSize;
     }
@@ -490,6 +492,7 @@ HotkeyGetOptionNumbers (
                         (*Count + 1) * sizeof (UINT16),
                         OptionNumbers
                         );
+      ASSERT (OptionNumbers != NULL);
       for (Index = 0; Index < *Count; Index++) {
         if (OptionNumber < OptionNumbers[Index]) {
           break;
