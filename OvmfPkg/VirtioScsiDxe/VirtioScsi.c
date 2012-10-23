@@ -413,19 +413,8 @@ VirtioScsiPassThru (
   volatile VIRTIO_SCSI_RESP Response;
   DESC_INDICES              Indices;
 
-  //
-  // Zero-initialization of Request & Response with "= { 0 };" doesn't build
-  // with gcc-4.4: "undefined reference to `memset'". Direct SetMem() is not
-  // allowed as it would cast away the volatile qualifier. Work it around.
-  //
-  union {
-    VIRTIO_SCSI_REQ  Request;
-    VIRTIO_SCSI_RESP Response;
-  } Zero;
-
-  SetMem (&Zero, sizeof Zero, 0x00);
-  Request  = Zero.Request;
-  Response = Zero.Response;
+  ZeroMem ((VOID*) &Request, sizeof (Request));
+  ZeroMem ((VOID*) &Response, sizeof (Response));
 
   Dev = VIRTIO_SCSI_FROM_PASS_THRU (This);
   CopyMem (&TargetValue, Target, sizeof TargetValue);
