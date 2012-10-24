@@ -1262,6 +1262,7 @@ BiosVideoCheckForVbe (
   EFI_STATUS                             Status;
   EFI_IA32_REGISTER_SET                  Regs;
   UINT16                                 *ModeNumberPtr;
+  UINT16                                 VbeModeNumber;
   BOOLEAN                                ModeFound;
   BOOLEAN                                EdidFound;
   BIOS_VIDEO_MODE_DATA                   *ModeBuffer;
@@ -1477,12 +1478,17 @@ BiosVideoCheckForVbe (
 
   PreferMode = 0;
   ModeNumber = 0;
-
-  for (; *ModeNumberPtr != VESA_BIOS_EXTENSIONS_END_OF_MODE_LIST; ModeNumberPtr++) {
+  
+  //
+  // ModeNumberPtr may be not 16-byte aligned, so ReadUnaligned16 is used to access the buffer pointed by ModeNumberPtr.
+  //
+  for (VbeModeNumber = ReadUnaligned16 (ModeNumberPtr);
+       VbeModeNumber != VESA_BIOS_EXTENSIONS_END_OF_MODE_LIST;
+       VbeModeNumber = ReadUnaligned16 (++ModeNumberPtr)) {
     //
     // Make sure this is a mode number defined by the VESA VBE specification.  If it isn'tm then skip this mode number.
     //
-    if ((*ModeNumberPtr & VESA_BIOS_EXTENSIONS_MODE_NUMBER_VESA) == 0) {
+    if ((VbeModeNumber & VESA_BIOS_EXTENSIONS_MODE_NUMBER_VESA) == 0) {
       continue;
     }
     //
@@ -1490,7 +1496,7 @@ BiosVideoCheckForVbe (
     //
     gBS->SetMem (&Regs, sizeof (Regs), 0);
     Regs.X.AX = VESA_BIOS_EXTENSIONS_RETURN_MODE_INFORMATION;
-    Regs.X.CX = *ModeNumberPtr;
+    Regs.X.CX = VbeModeNumber;
     gBS->SetMem (BiosVideoPrivate->VbeModeInformationBlock, sizeof (VESA_BIOS_EXTENSIONS_MODE_INFORMATION_BLOCK), 0);
     Regs.X.ES = EFI_SEGMENT ((UINTN) BiosVideoPrivate->VbeModeInformationBlock);
     Regs.X.DI = EFI_OFFSET ((UINTN) BiosVideoPrivate->VbeModeInformationBlock);
@@ -1619,7 +1625,7 @@ BiosVideoCheckForVbe (
     }
 
     CurrentModeData = &ModeBuffer[ModeNumber - 1];
-    CurrentModeData->VbeModeNumber = *ModeNumberPtr;
+    CurrentModeData->VbeModeNumber = VbeModeNumber;
     if (BiosVideoPrivate->VbeInformationBlock->VESAVersion >= VESA_BIOS_EXTENSIONS_VERSION_3_0) {
       CurrentModeData->BytesPerScanLine = BiosVideoPrivate->VbeModeInformationBlock->LinBytesPerScanLine;
       CurrentModeData->Red.Position = BiosVideoPrivate->VbeModeInformationBlock->LinRedFieldPosition;
