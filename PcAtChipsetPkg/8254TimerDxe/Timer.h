@@ -1,7 +1,7 @@
 /** @file
   Private data structures
 
-Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -33,6 +33,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //   65536 counts
 // ---------------- * 1,000,000 uS/S = 54925.4 uS = 549254 * 100 ns
 //   1,193,182 Hz
+//
+
+//
+// The maximum tick duration for 8254 timer
+//
+#define MAX_TIMER_TICK_DURATION     549254
 //
 // The default timer tick duration is set to 10 ms = 100000 100 ns units
 //
