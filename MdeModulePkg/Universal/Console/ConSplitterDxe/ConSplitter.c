@@ -3199,6 +3199,35 @@ ConSplitterTextOutDeleteDevice (
     return EFI_NOT_FOUND;
   }
 
+  if ((Private->CurrentNumberOfGraphicsOutput == 0) && (Private->CurrentNumberOfUgaDraw == 0)) {
+    //
+    // If there is not any physical GOP and UGA device in system,
+    // Consplitter GOP or UGA protocol will be uninstalled
+    //
+    if (!FeaturePcdGet (PcdConOutGopSupport)) {
+      Status = gBS->UninstallProtocolInterface (
+                      Private->VirtualHandle,
+                      &gEfiUgaDrawProtocolGuid,
+                      &Private->UgaDraw
+                      );      
+    } else if (!FeaturePcdGet (PcdConOutUgaSupport)) {
+      Status = gBS->UninstallProtocolInterface (
+                      Private->VirtualHandle,
+                      &gEfiGraphicsOutputProtocolGuid,
+                      &Private->GraphicsOutput
+                      );
+    } else {
+      Status = gBS->UninstallMultipleProtocolInterfaces (
+             Private->VirtualHandle,
+             &gEfiUgaDrawProtocolGuid,
+             &Private->UgaDraw,
+             &gEfiGraphicsOutputProtocolGuid,
+             &Private->GraphicsOutput,
+             NULL
+             );
+    }
+  }
+
   if (CurrentNumOfConsoles == 0) {
     //
     // If the number of consoles is zero, reset all parameters
