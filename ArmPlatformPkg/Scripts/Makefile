@@ -25,8 +25,8 @@ ifeq ($(EDK2_DSC),"")
 endif
 
 ifeq ("$(OS)","Windows_NT")
-WORKSPACE?=$(PWD)
-EDK_TOOLS_PATH ?= $(WORKSPACE)\BaseTools
+export WORKSPACE?=$(PWD)
+export EDK_TOOLS_PATH ?= $(WORKSPACE)\BaseTools
 endif
 
 SHELL := /bin/bash
@@ -41,8 +41,7 @@ EDK2_CONF = Conf/BuildEnv.sh Conf/build_rule.txt Conf/target.txt Conf/tools_def.
 
 all: $(EDK2_CONF)
 ifeq ("$(OS)","Windows_NT")
-	echo %PATH%
-	build -a $(EDK2_ARCH) -p $(EDK2_PKG) -t $(EDK2_TOOLCHAIN) -b $(EDK2_BUILD) $(EDK2_MACROS)
+	build -a $(EDK2_ARCH) -p $(EDK2_DSC) -t $(EDK2_TOOLCHAIN) -b $(EDK2_BUILD) $(EDK2_MACROS)
 else
 	. ./edksetup.sh `pwd`/BaseTools; build -a $(EDK2_ARCH) -p $(EDK2_DSC) -t $(EDK2_TOOLCHAIN) -b $(EDK2_BUILD) $(EDK2_MACROS)
 endif
@@ -59,7 +58,7 @@ endif
 
 clean:
 ifeq ("$(OS)","Windows_NT")
-	build -a $(EDK2_ARCH) -p $(EDK2_PKG) -t $(EDK2_TOOLCHAIN) -b $(EDK2_BUILD) $(EDK2_MACROS) cleanall
+	build -a $(EDK2_ARCH) -p $(EDK2_DSC) -t $(EDK2_TOOLCHAIN) -b $(EDK2_BUILD) $(EDK2_MACROS) cleanall
 else
 	. ./edksetup.sh `pwd`/BaseTools; build -a $(EDK2_ARCH) -p $(EDK2_DSC) -t $(EDK2_TOOLCHAIN) -b $(EDK2_BUILD) $(EDK2_MACROS) cleanall; \
 	rm -Rf $(EDK2_CONF) Conf/.cache
