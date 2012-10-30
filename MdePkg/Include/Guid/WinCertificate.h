@@ -1,7 +1,7 @@
 /** @file
   GUID for UEFI WIN_CERTIFICATE structure. 
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -74,7 +74,7 @@ typedef struct {
 typedef struct {
   ///
   /// This is the standard WIN_CERTIFICATE header, where
-  /// wCertificateType is set to WIN_CERT_TYPE_UEFI_GUID. 
+  /// wCertificateType is set to WIN_CERT_TYPE_EFI_GUID. 
   ///                         
   WIN_CERTIFICATE   Hdr;
   ///
