@@ -441,6 +441,16 @@ S3ResumeBootOs (
   //
   AsmWriteIdtr (&PeiS3ResumeState->Idtr);
 
+  if (PeiS3ResumeState->ReturnStatus != EFI_SUCCESS) {
+    //
+    // Report Status code that boot script execution is failed
+    //
+    REPORT_STATUS_CODE (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      (EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_EC_S3_BOOT_SCRIPT_ERROR)
+      );
+  }
+
   //
   // NOTE: Because Debug Timer interrupt and system interrupts will be disabled 
   // in BootScriptExecuteDxe, the rest code in S3ResumeBootOs() cannot be halted
@@ -463,6 +473,13 @@ S3ResumeBootOs (
   if ((Facs == NULL) ||
       (Facs->Signature != EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE) ||
       ((Facs->FirmwareWakingVector == 0) && (Facs->XFirmwareWakingVector == 0)) ) {
+    //
+    // Report Status code that no valid vector is found
+    //
+    REPORT_STATUS_CODE (
+      EFI_ERROR_CODE | EFI_ERROR_MAJOR,
+      (EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_EC_S3_OS_WAKE_ERROR)
+      );
     CpuDeadLoop ();
     return ;
   }
@@ -504,8 +521,17 @@ S3ResumeBootOs (
           (UINT64)(UINTN)TempStackTop
           );
       } else {
+        //
+        // Report Status code that no valid waking vector is found
+        //
+        REPORT_STATUS_CODE (
+          EFI_ERROR_CODE | EFI_ERROR_MAJOR,
+          (EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_EC_S3_OS_WAKE_ERROR)
+          );
         DEBUG (( EFI_D_ERROR, "Unsupported for 32bit DXE transfer to 64bit OS waking vector!\r\n"));
         ASSERT (FALSE);
+        CpuDeadLoop ();
+        return ;
       }
     } else {
       //
@@ -526,6 +552,14 @@ S3ResumeBootOs (
     DEBUG (( EFI_D_ERROR, "Transfer to 16bit OS waking vector - %x\r\n", (UINTN)Facs->FirmwareWakingVector));
     AsmTransferControl (Facs->FirmwareWakingVector, 0x0);
   }
+
+  //
+  // Report Status code the failure of S3Resume
+  //
+  REPORT_STATUS_CODE (
+    EFI_ERROR_CODE | EFI_ERROR_MAJOR,
+    (EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_EC_S3_OS_WAKE_ERROR)
+    );
 
   //
   // Never run to here
@@ -817,6 +851,11 @@ S3ResumeExecuteBootScript (
   // Save IDT
   //
   AsmReadIdtr (&PeiS3ResumeState->Idtr);
+  
+  //
+  // Report Status Code to indicate S3 boot script execution
+  //
+  REPORT_STATUS_CODE (EFI_PROGRESS_CODE, EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_PC_S3_BOOT_SCRIPT);
 
   PERF_START (NULL, "ScriptExec", NULL, 0);
 
