@@ -188,6 +188,16 @@ USBMouseDriverBindingStart (
   if (EFI_ERROR (Status)) {
     goto ErrorExit;
   }
+
+  //
+  // Report Status Code here since USB mouse will be detected next.
+  //
+  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+    EFI_PROGRESS_CODE,
+    (EFI_PERIPHERAL_MOUSE | EFI_P_PC_PRESENCE_DETECT),
+    UsbMouseDevice->DevicePath
+    );
+
   //
   // Get interface & endpoint descriptor
   //
@@ -221,11 +231,27 @@ USBMouseDriverBindingStart (
 
   if (!Found) {
     //
+    // Report Status Code to indicate that there is no USB mouse
+    //
+    REPORT_STATUS_CODE (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      (EFI_PERIPHERAL_MOUSE | EFI_P_EC_NOT_DETECTED)
+      );
+    //
     // No interrupt endpoint found, then return unsupported.
     //
     Status = EFI_UNSUPPORTED;
     goto ErrorExit;
   }
+
+  //
+  // Report Status Code here since USB mouse has be detected.
+  //
+  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+    EFI_PROGRESS_CODE,
+    (EFI_PERIPHERAL_MOUSE | EFI_P_PC_DETECTED),
+    UsbMouseDevice->DevicePath
+    );
 
   Status = InitializeUsbMouseDevice (UsbMouseDevice);
   if (EFI_ERROR (Status)) {

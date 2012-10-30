@@ -30,6 +30,7 @@
 #include <Library/UefiRuntimeLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/ResetSystemLib.h>
+#include <Library/ReportStatusCodeLib.h>
 
 /**
   The driver's entry point.

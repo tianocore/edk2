@@ -104,6 +104,11 @@ ResetSystem (
   EFI_STATUS    Status;
   UINTN         Size;
   UINTN         CapsuleDataPtr;
+  
+  //
+  // Indicate reset system runtime service is called.
+  //
+  REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_EFI_RUNTIME_SERVICE | EFI_SW_RS_PC_RESET_SYSTEM));
 
   switch (ResetType) {
   case EfiResetWarm:

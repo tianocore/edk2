@@ -122,8 +122,20 @@ EhcReset (
   EFI_STATUS              Status;
   UINT32                  DbgCtrlStatus;
 
+  Ehc = EHC_FROM_THIS (This);
+
+  if (Ehc->DevicePath != NULL) {
+    //
+    // Report Status Code to indicate reset happens
+    //
+    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+      EFI_PROGRESS_CODE,
+      (EFI_IO_BUS_USB | EFI_IOB_PC_RESET),
+      Ehc->DevicePath
+      );
+  }
+
   OldTpl  = gBS->RaiseTPL (EHC_TPL);
-  Ehc     = EHC_FROM_THIS (This);
 
   switch (Attributes) {
   case EFI_USB_HC_RESET_GLOBAL:
@@ -1543,8 +1555,9 @@ EhcGetUsbDebugPortInfo (
 **/
 USB2_HC_DEV *
 EhcCreateUsb2Hc (
-  IN EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN UINT64               OriginalPciAttributes
+  IN EFI_PCI_IO_PROTOCOL       *PciIo,
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
+  IN UINT64                    OriginalPciAttributes
   )
 {
   USB2_HC_DEV             *Ehc;
@@ -1578,6 +1591,7 @@ EhcCreateUsb2Hc (
   Ehc->Usb2Hc.MinorRevision             = 0x0;
 
   Ehc->PciIo                 = PciIo;
+  Ehc->DevicePath            = DevicePath;
   Ehc->OriginalPciAttributes = OriginalPciAttributes;
 
   InitializeListHead (&Ehc->AsyncIntTransfers);
@@ -1684,6 +1698,7 @@ EhcDriverBindingStart (
   UINTN                   EhciDeviceNumber;
   UINTN                   EhciFunctionNumber;
   UINT32                  State;
+  EFI_DEVICE_PATH_PROTOCOL  *HcDevicePath;
 
   //
   // Open the PciIo Protocol, then enable the USB host controller
@@ -1700,6 +1715,19 @@ EhcDriverBindingStart (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
+  //
+  // Open Device Path Protocol for on USB host controller
+  //
+  HcDevicePath = NULL;
+  Status = gBS->OpenProtocol (
+                  Controller,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **) &HcDevicePath,
+                  This->DriverBindingHandle,
+                  Controller,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
 
   PciAttributesSaved = FALSE;
   //
@@ -1842,7 +1870,7 @@ EhcDriverBindingStart (
   //
   // Create then install USB2_HC_PROTOCOL
   //
-  Ehc = EhcCreateUsb2Hc (PciIo, OriginalPciAttributes);
+  Ehc = EhcCreateUsb2Hc (PciIo, HcDevicePath, OriginalPciAttributes);
 
   if (Ehc == NULL) {
     DEBUG ((EFI_D_ERROR, "EhcDriverBindingStart: failed to create USB2_HC\n"));

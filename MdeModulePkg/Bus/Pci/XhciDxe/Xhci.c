@@ -143,9 +143,20 @@ XhcReset (
   EFI_STATUS         Status;
   EFI_TPL            OldTpl;
 
-  OldTpl = gBS->RaiseTPL (XHC_TPL);
+  Xhc = XHC_FROM_THIS (This);
+  
+  if (Xhc->DevicePath != NULL) {
+    //
+    // Report Status Code to indicate reset happens
+    //
+    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+      EFI_PROGRESS_CODE,
+      (EFI_IO_BUS_USB | EFI_IOB_PC_RESET),
+      Xhc->DevicePath
+      );
+  }  
 
-  Xhc    = XHC_FROM_THIS (This);
+  OldTpl = gBS->RaiseTPL (XHC_TPL);
 
   switch (Attributes) {
   case EFI_USB_HC_RESET_GLOBAL:
@@ -1681,8 +1692,9 @@ ON_EXIT:
 **/
 USB_XHCI_INSTANCE*
 XhcCreateUsbHc (
-  IN EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN UINT64               OriginalPciAttributes
+  IN EFI_PCI_IO_PROTOCOL       *PciIo,
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
+  IN UINT64                    OriginalPciAttributes
   )
 {
   USB_XHCI_INSTANCE       *Xhc;
@@ -1701,6 +1713,7 @@ XhcCreateUsbHc (
   //
   Xhc->Signature             = XHCI_INSTANCE_SIG;
   Xhc->PciIo                 = PciIo;
+  Xhc->DevicePath            = DevicePath;
   Xhc->OriginalPciAttributes = OriginalPciAttributes;
   CopyMem (&Xhc->Usb2Hc, &gXhciUsb2HcTemplate, sizeof (EFI_USB2_HC_PROTOCOL));
 
@@ -1830,6 +1843,7 @@ XhcDriverBindingStart (
   UINT64                  OriginalPciAttributes;
   BOOLEAN                 PciAttributesSaved;
   USB_XHCI_INSTANCE       *Xhc;
+  EFI_DEVICE_PATH_PROTOCOL  *HcDevicePath;
 
   //
   // Open the PciIo Protocol, then enable the USB host controller
@@ -1846,6 +1860,19 @@ XhcDriverBindingStart (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
+  //
+  // Open Device Path Protocol for on USB host controller
+  //
+  HcDevicePath = NULL;
+  Status = gBS->OpenProtocol (
+                  Controller,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **) &HcDevicePath,
+                  This->DriverBindingHandle,
+                  Controller,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
 
   PciAttributesSaved = FALSE;
   //
@@ -1887,7 +1914,7 @@ XhcDriverBindingStart (
   //
   // Create then install USB2_HC_PROTOCOL
   //
-  Xhc = XhcCreateUsbHc (PciIo, OriginalPciAttributes);
+  Xhc = XhcCreateUsbHc (PciIo, HcDevicePath, OriginalPciAttributes);
 
   if (Xhc == NULL) {
     DEBUG ((EFI_D_ERROR, "XhcDriverBindingStart: failed to create USB2_HC\n"));

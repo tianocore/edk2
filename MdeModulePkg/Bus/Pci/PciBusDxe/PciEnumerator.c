@@ -1,7 +1,7 @@
 /** @file
   PCI eunmeration implementation on entire PCI bus system for PCI Bus module.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2095,6 +2095,14 @@ PciHotPlugRequestNotify (
   RootBridgeHandle = Temp->Handle;
 
   if (Operation == EfiPciHotPlugRequestAdd) {
+    //
+    // Report Status Code to indicate hot plug happens
+    //
+    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+      EFI_PROGRESS_CODE,
+      (EFI_IO_BUS_PCI | EFI_IOB_PC_HOTPLUG),
+      Temp->DevicePath
+      );
 
     if (NumberOfChildren != NULL) {
       *NumberOfChildren = 0;

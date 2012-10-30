@@ -295,6 +295,15 @@ RegisterAtaDevice (
   InitializeListHead (&AtaDevice->AtaSubTaskList);
 
   //
+  // Report Status Code to indicate the ATA device will be enabled
+  //
+  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+    EFI_PROGRESS_CODE,
+    (EFI_IO_BUS_ATA_ATAPI | EFI_IOB_PC_ENABLE),
+    AtaBusDriverData->ParentDevicePath
+    );
+
+  //
   // Try to identify the ATA device via the ATA pass through command.
   //
   Status = DiscoverAtaDevice (AtaDevice);
@@ -719,6 +728,15 @@ AtaBusDriverBindingStart (
     return Status;
   }
 
+  //
+  // Report Status Code to indicate ATA bus starts
+  //
+  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+    EFI_PROGRESS_CODE,
+    (EFI_IO_BUS_ATA_ATAPI | EFI_IOB_PC_INIT),
+    ParentDevicePath
+    );
+
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiAtaPassThruProtocolGuid,
@@ -770,6 +788,15 @@ AtaBusDriverBindingStart (
       goto ErrorExit;
     }
   }
+
+  //
+  // Report Status Code to indicate detecting devices on bus
+  //
+  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+    EFI_PROGRESS_CODE,
+    (EFI_IO_BUS_ATA_ATAPI | EFI_IOB_PC_DETECT),
+    ParentDevicePath
+    );
 
   if (RemainingDevicePath == NULL) {
     Port = 0xFFFF;

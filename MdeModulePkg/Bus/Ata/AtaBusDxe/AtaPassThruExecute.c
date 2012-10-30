@@ -185,6 +185,15 @@ ResetAtaDevice (
 
   AtaPassThru = AtaDevice->AtaBusDriverData->AtaPassThru;
 
+  //
+  // Report Status Code to indicate reset happens
+  //
+  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+    EFI_PROGRESS_CODE,
+    (EFI_IO_BUS_ATA_ATAPI | EFI_IOB_PC_RESET),
+    AtaDevice->AtaBusDriverData->ParentDevicePath
+    );
+
   return AtaPassThru->ResetDevice (
                         AtaPassThru,
                         AtaDevice->Port,

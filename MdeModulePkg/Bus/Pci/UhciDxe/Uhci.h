@@ -2,7 +2,7 @@
 
   The definition for UHCI driver model and HC protocol routines.
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -33,6 +33,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
+#include <Library/ReportStatusCodeLib.h>
 
 #include <IndustryStandard/Pci.h>
 
@@ -112,6 +113,7 @@ struct _USB_HC_DEV {
   UINT32                    Signature;
   EFI_USB2_HC_PROTOCOL      Usb2Hc;
   EFI_PCI_IO_PROTOCOL       *PciIo;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   UINT64                    OriginalPciAttributes;
 
   //

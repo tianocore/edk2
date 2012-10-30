@@ -2,7 +2,7 @@
 
     Usb Bus Driver Binding and Bus IO Protocol.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1018,7 +1018,16 @@ UsbBusBuildProtocol (
   RootIf->Signature       = USB_INTERFACE_SIGNATURE;
   RootIf->Device          = RootHub;
   RootIf->DevicePath      = UsbBus->DevicePath;
-
+  
+  //
+  // Report Status Code here since we will enumerate the USB devices
+  //
+  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+    EFI_PROGRESS_CODE,
+    (EFI_IO_BUS_USB | EFI_IOB_PC_DETECT),
+    UsbBus->DevicePath
+    );
+  
   Status                  = mUsbRootHubApi.Init (RootIf);
 
   if (EFI_ERROR (Status)) {
@@ -1265,6 +1274,26 @@ UsbBusControllerDriverStart (
 {
   EFI_USB_BUS_PROTOCOL          *UsbBusId;
   EFI_STATUS                    Status;
+  EFI_DEVICE_PATH_PROTOCOL      *ParentDevicePath;
+
+  Status = gBS->OpenProtocol (
+                  Controller,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **) &ParentDevicePath,
+                  This->DriverBindingHandle,
+                  Controller,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Report Status Code here since we will initialize the host controller
+  //
+  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+    EFI_PROGRESS_CODE,
+    (EFI_IO_BUS_USB | EFI_IOB_PC_INIT),
+    ParentDevicePath
+    );
 
   //
   // Locate the USB bus protocol, if it is found, USB bus

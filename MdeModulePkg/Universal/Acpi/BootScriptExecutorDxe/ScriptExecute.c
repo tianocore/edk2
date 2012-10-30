@@ -68,9 +68,12 @@ S3BootScriptExecutorEntryFunction (
   // for that parameter.
   //
   Status = S3BootScriptExecute ();
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+
+  //
+  // Need report status back to S3ResumePeim. 
+  // If boot script execution is failed, S3ResumePeim wil report the error status code.
+  //
+  PeiS3ResumeState->ReturnStatus = (UINT64)(UINTN)Status;
 
   AsmWbinvd ();
 
@@ -78,13 +81,6 @@ S3BootScriptExecutorEntryFunction (
   // Get ACPI Table Address
   //
   Facs = (EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *) ((UINTN) (AcpiS3Context->AcpiFacsTable));
-
-  if ((Facs == NULL) ||
-      (Facs->Signature != EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE) ||
-      ((Facs->FirmwareWakingVector == 0) && (Facs->XFirmwareWakingVector == 0)) ) {
-    CpuDeadLoop();
-    return EFI_INVALID_PARAMETER;
-  }
 
   //
   // We need turn back to S3Resume - install boot script done ppi and report status code on S3resume.
@@ -97,12 +93,16 @@ S3BootScriptExecutorEntryFunction (
       DEBUG ((EFI_D_ERROR, "Call AsmDisablePaging64() to return to S3 Resume in PEI Phase\n"));
       PeiS3ResumeState->AsmTransferControl = (EFI_PHYSICAL_ADDRESS)(UINTN)AsmTransferControl32;
 
-      //
-      // more step needed - because relative address is handled differently between X64 and IA32.
-      //
-      AsmTransferControl16Address = (UINTN)AsmTransferControl16;
-      AsmFixAddress16 = (UINT32)AsmTransferControl16Address;
-      AsmJmpAddr32 = (UINT32)((Facs->FirmwareWakingVector & 0xF) | ((Facs->FirmwareWakingVector & 0xFFFF0) << 12));
+      if ((Facs != NULL) &&
+          (Facs->Signature == EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE) &&
+          (Facs->FirmwareWakingVector != 0) ) {
+        //
+        // more step needed - because relative address is handled differently between X64 and IA32.
+        //
+        AsmTransferControl16Address = (UINTN)AsmTransferControl16;
+        AsmFixAddress16 = (UINT32)AsmTransferControl16Address;
+        AsmJmpAddr32 = (UINT32)((Facs->FirmwareWakingVector & 0xF) | ((Facs->FirmwareWakingVector & 0xFFFF0) << 12));
+      }
 
       AsmDisablePaging64 (
         PeiS3ResumeState->ReturnCs,
@@ -132,7 +132,10 @@ S3BootScriptExecutorEntryFunction (
     CpuDeadLoop();
     return EFI_UNSUPPORTED;
   }
-
+  
+  //
+  // S3ResumePeim does not provide a way to jump back to itself, so resume to OS here directly
+  //
   if (Facs->XFirmwareWakingVector != 0) {
     //
     // Switch to native waking vector
