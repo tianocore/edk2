@@ -2279,6 +2279,11 @@ BdsLibBootViaBootOption (
   }
 
   //
+  // Report Status Code to indicate ReadyToBoot event will be signalled
+  //
+  REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_PC_READY_TO_BOOT_EVENT));
+
+  //
   // Signal the EVT_SIGNAL_READY_TO_BOOT event
   //
   EfiSignalEventReadyToBoot();
@@ -2368,47 +2373,40 @@ BdsLibBootViaBootOption (
       // and get the bootable media handle
       //
       Handle = BdsLibGetBootableHandle(DevicePath);
-      if (Handle == NULL) {
-        goto Done;
-      }
-      //
-      // Load the default boot file \EFI\BOOT\boot{machinename}.EFI from removable Media
-      //  machinename is ia32, ia64, x64, ...
-      //
-      FilePath = FileDevicePath (Handle, EFI_REMOVABLE_MEDIA_FILE_NAME);
-      if (FilePath != NULL) {
-        REPORT_STATUS_CODE (EFI_PROGRESS_CODE, PcdGet32 (PcdProgressCodeOsLoaderLoad));
-        Status = gBS->LoadImage (
-                        TRUE,
-                        gImageHandle,
-                        FilePath,
-                        NULL,
-                        0,
-                        &ImageHandle
-                        );
-       if (EFI_ERROR (Status)) {
-          //
-          // The DevicePath failed, and it's not a valid
-          // removable media device.
-          //
-          goto Done;
+      if (Handle != NULL) {
+        //
+        // Load the default boot file \EFI\BOOT\boot{machinename}.EFI from removable Media
+        //  machinename is ia32, ia64, x64, ...
+        //
+        FilePath = FileDevicePath (Handle, EFI_REMOVABLE_MEDIA_FILE_NAME);
+        if (FilePath != NULL) {
+          REPORT_STATUS_CODE (EFI_PROGRESS_CODE, PcdGet32 (PcdProgressCodeOsLoaderLoad));
+          Status = gBS->LoadImage (
+                          TRUE,
+                          gImageHandle,
+                          FilePath,
+                          NULL,
+                          0,
+                          &ImageHandle
+                          );
         }
       }
-    }
-
-    if (EFI_ERROR (Status)) {
-      //
-      // It there is any error from the Boot attempt exit now.
-      //
-      goto Done;
     }
   }
   //
   // Provide the image with it's load options
   //
-  if (ImageHandle == NULL) {
+  if ((ImageHandle == NULL) || (EFI_ERROR(Status))) {
+    //
+    // Report Status Code to indicate that the failure to load boot option
+    //
+    REPORT_STATUS_CODE (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_EC_BOOT_OPTION_LOAD_ERROR)
+      );    
     goto Done;
   }
+
   Status = gBS->HandleProtocol (ImageHandle, &gEfiLoadedImageProtocolGuid, (VOID **) &ImageInfo);
   ASSERT_EFI_ERROR (Status);
 
@@ -2442,6 +2440,15 @@ BdsLibBootViaBootOption (
 
   Status = gBS->StartImage (ImageHandle, ExitDataSize, ExitData);
   DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Image Return Status = %r\n", Status));
+  if (EFI_ERROR (Status)) {
+    //
+    // Report Status Code to indicate that boot failure
+    //
+    REPORT_STATUS_CODE (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_EC_BOOT_OPTION_FAILED)
+      );
+  }
 
   //
   // Clear the Watchdog Timer after the image returns

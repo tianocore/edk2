@@ -2304,6 +2304,13 @@ LegacyBiosInstallRom (
         
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "return LegacyBiosInstallRom(%d): EFI_OUT_OF_RESOURCES (no more space for OpROM)\n", __LINE__));
+      //
+      // Report Status Code to indicate that there is no enough space for OpROM
+      //
+      REPORT_STATUS_CODE (
+        EFI_ERROR_CODE | EFI_ERROR_MINOR,
+        (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_EC_LEGACY_OPROM_NO_SPACE)
+        );
       return EFI_OUT_OF_RESOURCES;
     }
     InitAddress = (UINTN) PhysicalAddress;
@@ -2314,6 +2321,13 @@ LegacyBiosInstallRom (
     if (RuntimeAddress + *RuntimeImageLength > PcdGet32 (PcdEndOpromShadowAddress)) {
       DEBUG ((EFI_D_ERROR, "return LegacyBiosInstallRom(%d): EFI_OUT_OF_RESOURCES (no more space for OpROM)\n", __LINE__));
       gBS->FreePages (PhysicalAddress, EFI_SIZE_TO_PAGES (ImageSize));
+      //
+      // Report Status Code to indicate that there is no enough space for OpROM
+      //
+      REPORT_STATUS_CODE (
+        EFI_ERROR_CODE | EFI_ERROR_MINOR,
+        (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_EC_LEGACY_OPROM_NO_SPACE)
+        );
       return EFI_OUT_OF_RESOURCES;
     }
   } else {
@@ -2324,6 +2338,13 @@ LegacyBiosInstallRom (
     InitAddress    = PCI_START_ADDRESS (Private->OptionRom);
     if (InitAddress + ImageSize > PcdGet32 (PcdEndOpromShadowAddress)) {
       DEBUG ((EFI_D_ERROR, "return LegacyBiosInstallRom(%d): EFI_OUT_OF_RESOURCES (no more space for OpROM)\n", __LINE__));
+      //
+      // Report Status Code to indicate that there is no enough space for OpROM
+      //
+      REPORT_STATUS_CODE (
+        EFI_ERROR_CODE | EFI_ERROR_MINOR,
+        (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_EC_LEGACY_OPROM_NO_SPACE)
+        );
       return EFI_OUT_OF_RESOURCES;
     }
 

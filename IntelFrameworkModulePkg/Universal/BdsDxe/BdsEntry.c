@@ -494,6 +494,14 @@ BdsEntry (
   BdsFormalizeEfiGlobalVariable();
 
   //
+  // Report Status Code to indicate connecting drivers will happen
+  //
+  REPORT_STATUS_CODE (
+    EFI_PROGRESS_CODE,
+    (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_PC_BEGIN_CONNECTING_DRIVERS)
+    );
+
+  //
   // Do the platform init, can be customized by OEM/IBV
   //
   PERF_START (NULL, "PlatformBds", "BDS", 0);
