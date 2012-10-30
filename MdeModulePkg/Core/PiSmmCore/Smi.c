@@ -170,14 +170,20 @@ SmiManage (
       // If a handler returns EFI_INTERRUPT_PENDING then no additional handlers 
       // will be processed and EFI_INTERRUPT_PENDING will be returned.
       //
-      return EFI_INTERRUPT_PENDING;
+      if (HandlerType != NULL) {
+        return EFI_INTERRUPT_PENDING;
+      }
+      break;
 
     case EFI_SUCCESS:
       //
       // If a handler returns EFI_SUCCESS then no additional handlers will be processed.
       // then the function will return EFI_SUCCESS.
       //
-      return EFI_SUCCESS;
+      if (HandlerType != NULL) {
+        return EFI_SUCCESS;
+      }
+      break;
 
     case EFI_WARN_INTERRUPT_SOURCE_QUIESCED:
       //
