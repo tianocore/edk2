@@ -433,9 +433,7 @@ DiscoverAtaDevice (
       // The command is issued successfully
       //
       Status = IdentifyAtaDevice (AtaDevice);
-      if (!EFI_ERROR (Status)) {
-        return Status;
-      }
+      return Status;
     }
   } while (Retry-- > 0);
 
