@@ -195,7 +195,7 @@ USBMouseAbsolutePointerDriverBindingStart (
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
     (EFI_PERIPHERAL_MOUSE | EFI_P_PC_PRESENCE_DETECT),
-    UsbMouseDevice->DevicePath
+    UsbMouseAbsolutePointerDevice->DevicePath
     );
 
   //
@@ -234,7 +234,7 @@ USBMouseAbsolutePointerDriverBindingStart (
     // Report Status Code to indicate that there is no USB mouse
     //
     REPORT_STATUS_CODE (
-      EFI_ERROR_CODE | EFI_ERROR_MINOR,,
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
       (EFI_PERIPHERAL_MOUSE | EFI_P_EC_NOT_DETECTED)
       );
     //
@@ -250,7 +250,7 @@ USBMouseAbsolutePointerDriverBindingStart (
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
     (EFI_PERIPHERAL_MOUSE | EFI_P_PC_DETECTED),
-    UsbMouseDevice->DevicePath
+    UsbMouseAbsolutePointerDevice->DevicePath
     );
 
   Status = InitializeUsbMouseDevice (UsbMouseAbsolutePointerDevice);
