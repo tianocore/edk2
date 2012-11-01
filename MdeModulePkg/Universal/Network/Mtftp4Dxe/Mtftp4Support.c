@@ -465,6 +465,7 @@ Mtftp4SendPacket (
   // to the connected port
   //
   Value = *((UINT16 *) NetbufGetByte (Packet, 0, NULL));
+  ASSERT (Value != NULL);
   OpCode = NTOHS (Value);
 
   if ((OpCode == EFI_MTFTP4_OPCODE_RRQ) || 
@@ -522,6 +523,7 @@ Mtftp4Retransmit (
   // Set the requests to the listening port, other packets to the connected port
   //
   Value = *(UINT16 *) NetbufGetByte (Instance->LastPacket, 0, NULL);
+  ASSERT (Value != NULL);
   OpCode = NTOHS (Value);
 
   if ((OpCode == EFI_MTFTP4_OPCODE_RRQ) || (OpCode == EFI_MTFTP4_OPCODE_DIR) ||

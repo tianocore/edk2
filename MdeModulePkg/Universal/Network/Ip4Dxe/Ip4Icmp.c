@@ -240,6 +240,7 @@ Ip4IcmpReplyEcho (
   // update is omitted.
   //
   Icmp                = (IP4_ICMP_QUERY_HEAD *) NetbufGetByte (Data, 0, NULL);
+  ASSERT (Icmp != NULL);
   Icmp->Head.Type     = ICMP_ECHO_REPLY;
   Icmp->Head.Checksum = 0;
   Icmp->Head.Checksum = (UINT16) (~NetblockChecksum ((UINT8 *) Icmp, Data->TotalSize));

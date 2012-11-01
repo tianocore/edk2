@@ -849,7 +849,8 @@ Ip4AccpetFrame (
     goto DROP;
   }
 
-  Head      = (IP4_HEAD *) NetbufGetByte (Packet, 0, NULL); 
+  Head      = (IP4_HEAD *) NetbufGetByte (Packet, 0, NULL);
+  ASSERT (Head != NULL);
   OptionLen = (Head->HeadLen << 2) - IP4_MIN_HEADLEN;
   if (OptionLen > 0) {
     Option = (UINT8 *) (Head + 1);
@@ -899,6 +900,7 @@ Ip4AccpetFrame (
   // is transfered to the packet process logic.
   //
     Head = (IP4_HEAD *) NetbufGetByte (Packet, 0, NULL);
+    ASSERT (Head != NULL);
     Status = Ip4PreProcessPacket (
                IpSb,
                &Packet,
