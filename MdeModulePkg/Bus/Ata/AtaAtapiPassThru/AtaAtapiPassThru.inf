@@ -58,6 +58,7 @@
   DebugLib
   TimerLib
   ReportStatusCodeLib
+  PcdLib
 
 [Protocols]
   gEfiAtaPassThruProtocolGuid                   # BY_START

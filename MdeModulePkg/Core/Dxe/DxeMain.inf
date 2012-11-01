@@ -93,6 +93,7 @@
   DxeServicesLib
   DebugAgentLib
   CpuExceptionHandlerLib
+  PcdLib
 
 [Guids]
   gEfiEventMemoryMapChangeGuid                  ## CONSUMES ## Event

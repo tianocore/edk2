@@ -26,7 +26,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseLib.h>
-#include <Library/PcdLib.h>
 
 #define NUM_IDT_ENTRIES                 0x78
 #define SYSTEM_TIMER_VECTOR             0x68

@@ -48,7 +48,6 @@
   MemoryAllocationLib
   PcdLib
   HobLib
-  PcdLib
 
 [Protocols]
   gEfiAcpiTableProtocolGuid                     ## SOMETIMES_CONSUMES
