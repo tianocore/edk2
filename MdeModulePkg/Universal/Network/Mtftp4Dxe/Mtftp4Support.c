@@ -443,7 +443,7 @@ Mtftp4SendPacket (
   UDP_END_POINT             UdpPoint;
   EFI_STATUS                Status;
   UINT16                    OpCode;
-  UINT16                    Value;
+  UINT8                     *Buffer;
 
   //
   // Save the packet for retransmission
@@ -464,9 +464,9 @@ Mtftp4SendPacket (
   // Send the requests to the listening port, other packets
   // to the connected port
   //
-  Value = *((UINT16 *) NetbufGetByte (Packet, 0, NULL));
-  ASSERT (Value != NULL);
-  OpCode = NTOHS (Value);
+  Buffer = NetbufGetByte (Packet, 0, NULL);
+  ASSERT (Buffer != NULL);
+  OpCode = NTOHS (*(UINT16 *)Buffer);
 
   if ((OpCode == EFI_MTFTP4_OPCODE_RRQ) || 
       (OpCode == EFI_MTFTP4_OPCODE_DIR) ||
@@ -512,7 +512,7 @@ Mtftp4Retransmit (
   UDP_END_POINT             UdpPoint;
   EFI_STATUS                Status;
   UINT16                    OpCode;
-  UINT16                    Value;
+  UINT8                     *Buffer;
 
   ASSERT (Instance->LastPacket != NULL);
 
@@ -522,9 +522,9 @@ Mtftp4Retransmit (
   //
   // Set the requests to the listening port, other packets to the connected port
   //
-  Value = *(UINT16 *) NetbufGetByte (Instance->LastPacket, 0, NULL);
-  ASSERT (Value != NULL);
-  OpCode = NTOHS (Value);
+  Buffer = NetbufGetByte (Instance->LastPacket, 0, NULL);
+  ASSERT (Buffer != NULL);
+  OpCode = NTOHS (*(UINT16 *) Buffer);
 
   if ((OpCode == EFI_MTFTP4_OPCODE_RRQ) || (OpCode == EFI_MTFTP4_OPCODE_DIR) ||
       (OpCode == EFI_MTFTP4_OPCODE_WRQ)) {
