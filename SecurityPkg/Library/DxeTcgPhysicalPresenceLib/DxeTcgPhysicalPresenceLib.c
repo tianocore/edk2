@@ -440,7 +440,7 @@ ExecutePhysicalPresence (
                           If false, F10 is used as confirm key.
 
   @retval     TRUE        User confirmed the changes by input.
-  @retval     FALSE       User discarded the changes.
+  @retval     FALSE       User discarded the changes or device error.
 
 **/
 BOOLEAN
@@ -451,22 +451,29 @@ ReadUserKey (
   EFI_STATUS                        Status;
   EFI_INPUT_KEY                     Key;
   UINT16                            InputKey;
-      
+  UINTN                             Index;
+
   InputKey = 0; 
   do {
-    Status = gBS->CheckEvent (gST->ConIn->WaitForKey);
-    if (!EFI_ERROR (Status)) {
-      Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-      if (Key.ScanCode == SCAN_ESC) {
-        InputKey = Key.ScanCode;
-      }
-      if ((Key.ScanCode == SCAN_F10) && !CautionKey) {
-        InputKey = Key.ScanCode;
-      }
-      if ((Key.ScanCode == SCAN_F12) && CautionKey) {
-        InputKey = Key.ScanCode;
-      }
-    }      
+    Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+    if (Status == EFI_NOT_READY) {
+      gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &Index);
+      continue;
+    }
+
+    if (Status == EFI_DEVICE_ERROR) {
+      return FALSE;
+    }
+
+    if (Key.ScanCode == SCAN_ESC) {
+      InputKey = Key.ScanCode;
+    }
+    if ((Key.ScanCode == SCAN_F10) && !CautionKey) {
+      InputKey = Key.ScanCode;
+    }
+    if ((Key.ScanCode == SCAN_F12) && CautionKey) {
+      InputKey = Key.ScanCode;
+    }
   } while (InputKey == 0);
 
   if (InputKey != SCAN_ESC) {
@@ -886,6 +893,103 @@ UserConfirm (
 }
 
 /**
+  Check if there is a valid physical presence command request. Also updates parameter value 
+  to whether the requested physical presence command already confirmed by user
+ 
+   @param[in]  TcgProtocol                 EFI TCG Protocol instance. 
+   @param[out] RequestConfirmed            If the physical presence operation command required user confirm from UI.
+                                             True, it indicates the command doesn't require user confirm, or already confirmed 
+                                                   in last boot cycle by user.
+                                             False, it indicates the command need user confirm from UI.
+
+   @retval  TRUE        Physical Presence operation command is valid.
+   @retval  FALSE       Physical Presence operation command is invalid.
+
+**/
+BOOLEAN
+HaveValidTpmRequest  (
+  IN      EFI_PHYSICAL_PRESENCE     *TcgPpData,
+  OUT     BOOLEAN                   *RequestConfirmed
+  )
+{
+  UINT8                             Flags;
+  
+  Flags = TcgPpData->Flags;
+  *RequestConfirmed = FALSE;
+
+  switch (TcgPpData->PPRequest) {
+    case PHYSICAL_PRESENCE_NO_ACTION:
+      *RequestConfirmed = TRUE;
+      return TRUE;
+    case PHYSICAL_PRESENCE_ENABLE:
+    case PHYSICAL_PRESENCE_DISABLE:
+    case PHYSICAL_PRESENCE_ACTIVATE:
+    case PHYSICAL_PRESENCE_DEACTIVATE:
+    case PHYSICAL_PRESENCE_ENABLE_ACTIVATE:
+    case PHYSICAL_PRESENCE_DEACTIVATE_DISABLE:
+    case PHYSICAL_PRESENCE_SET_OWNER_INSTALL_TRUE:
+    case PHYSICAL_PRESENCE_SET_OWNER_INSTALL_FALSE:
+    case PHYSICAL_PRESENCE_ENABLE_ACTIVATE_OWNER_TRUE:
+    case PHYSICAL_PRESENCE_DEACTIVATE_DISABLE_OWNER_FALSE:
+    case PHYSICAL_PRESENCE_SET_OPERATOR_AUTH:
+      if ((Flags & FLAG_NO_PPI_PROVISION) != 0) {
+        *RequestConfirmed = TRUE;
+      }
+      break;
+
+    case PHYSICAL_PRESENCE_CLEAR:
+    case PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR:
+      if ((Flags & FLAG_NO_PPI_CLEAR) != 0) {
+        *RequestConfirmed = TRUE;
+      }
+      break;
+
+    case PHYSICAL_PRESENCE_DEFERRED_PP_UNOWNERED_FIELD_UPGRADE:
+      if ((Flags & FLAG_NO_PPI_MAINTENANCE) != 0) {
+        *RequestConfirmed = TRUE;
+      }
+      break;
+
+    case PHYSICAL_PRESENCE_CLEAR_ENABLE_ACTIVATE:
+    case PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR_ENABLE_ACTIVATE:
+      if ((Flags & FLAG_NO_PPI_CLEAR) != 0 && (Flags & FLAG_NO_PPI_PROVISION) != 0) {
+        *RequestConfirmed = TRUE;
+      }
+      break;
+
+    case PHYSICAL_PRESENCE_SET_NO_PPI_PROVISION_FALSE:
+    case PHYSICAL_PRESENCE_SET_NO_PPI_CLEAR_FALSE:
+    case PHYSICAL_PRESENCE_SET_NO_PPI_MAINTENANCE_FALSE:
+      *RequestConfirmed = TRUE;
+      break;
+
+    case PHYSICAL_PRESENCE_SET_NO_PPI_PROVISION_TRUE:
+    case PHYSICAL_PRESENCE_SET_NO_PPI_CLEAR_TRUE:
+    case PHYSICAL_PRESENCE_SET_NO_PPI_MAINTENANCE_TRUE:
+      break;
+
+    default:
+      //
+      // Wrong Physical Presence command
+      //
+      return FALSE;
+  }
+
+  if ((Flags & FLAG_RESET_TRACK) != 0) {
+    //
+    // It had been confirmed in last boot, it doesn't need confirm again.
+    //
+    *RequestConfirmed = TRUE;
+  }
+
+  //
+  // Physical Presence command is correct
+  //
+  return TRUE;
+}
+
+
+/**
   Check and execute the requested physical presence command.
 
   Caution: This function may receive untrusted input.
@@ -904,84 +1008,31 @@ ExecutePendingTpmRequest (
 {
   EFI_STATUS                        Status;
   UINTN                             DataSize;
-  UINT8                             Flags;
   BOOLEAN                           RequestConfirmed;
 
-  Flags            = TcgPpData->Flags;
-  RequestConfirmed = FALSE;  
-  switch (TcgPpData->PPRequest) {
-    case PHYSICAL_PRESENCE_NO_ACTION:
-      return;
-    case PHYSICAL_PRESENCE_ENABLE:
-    case PHYSICAL_PRESENCE_DISABLE:
-    case PHYSICAL_PRESENCE_ACTIVATE:
-    case PHYSICAL_PRESENCE_DEACTIVATE:
-    case PHYSICAL_PRESENCE_ENABLE_ACTIVATE:
-    case PHYSICAL_PRESENCE_DEACTIVATE_DISABLE:
-    case PHYSICAL_PRESENCE_SET_OWNER_INSTALL_TRUE:
-    case PHYSICAL_PRESENCE_SET_OWNER_INSTALL_FALSE:
-    case PHYSICAL_PRESENCE_ENABLE_ACTIVATE_OWNER_TRUE:
-    case PHYSICAL_PRESENCE_DEACTIVATE_DISABLE_OWNER_FALSE:
-    case PHYSICAL_PRESENCE_SET_OPERATOR_AUTH:
-      if ((Flags & FLAG_NO_PPI_PROVISION) != 0) {
-        RequestConfirmed = TRUE;
-      }
-      break;
-
-    case PHYSICAL_PRESENCE_CLEAR:
-    case PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR:
-      if ((Flags & FLAG_NO_PPI_CLEAR) != 0) {
-        RequestConfirmed = TRUE;
-      }
-      break;
-
-    case PHYSICAL_PRESENCE_DEFERRED_PP_UNOWNERED_FIELD_UPGRADE:
-      if ((Flags & FLAG_NO_PPI_MAINTENANCE) != 0) {
-        RequestConfirmed = TRUE;
-      }
-      break;
-
-    case PHYSICAL_PRESENCE_CLEAR_ENABLE_ACTIVATE:
-    case PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR_ENABLE_ACTIVATE:
-      if ((Flags & FLAG_NO_PPI_CLEAR) != 0 && (Flags & FLAG_NO_PPI_PROVISION) != 0) {
-        RequestConfirmed = TRUE;
-      }
-      break;  
-
-    case PHYSICAL_PRESENCE_SET_NO_PPI_PROVISION_FALSE:
-    case PHYSICAL_PRESENCE_SET_NO_PPI_CLEAR_FALSE:
-    case PHYSICAL_PRESENCE_SET_NO_PPI_MAINTENANCE_FALSE:
-      RequestConfirmed = TRUE;
-      break;
-      
-    case PHYSICAL_PRESENCE_SET_NO_PPI_PROVISION_TRUE:
-    case PHYSICAL_PRESENCE_SET_NO_PPI_CLEAR_TRUE:
-    case PHYSICAL_PRESENCE_SET_NO_PPI_MAINTENANCE_TRUE:
-      break;
-      
-    default:
-      //
-      // Invalid operation request.
-      //
-      TcgPpData->PPResponse = TPM_PP_BIOS_FAILURE;
-      TcgPpData->LastPPRequest = TcgPpData->PPRequest;
-      TcgPpData->PPRequest = PHYSICAL_PRESENCE_NO_ACTION;
-      DataSize = sizeof (EFI_PHYSICAL_PRESENCE);
-      Status = gRT->SetVariable (
-                      PHYSICAL_PRESENCE_VARIABLE,
-                      &gEfiPhysicalPresenceGuid,
-                      EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                      DataSize,
-                      TcgPpData
-                      );
-      return;
+  if (TcgPpData->PPRequest == PHYSICAL_PRESENCE_NO_ACTION) {
+    //
+    // No operation request
+    //
+    return;
   }
 
-  if ((Flags & FLAG_RESET_TRACK) != 0) {
+  if (!HaveValidTpmRequest(TcgPpData, &RequestConfirmed)) {
     //
-    // It had been confirmed in last boot, it doesn't need confirm again.
+    // Invalid operation request.
     //
-    RequestConfirmed = TRUE;
+    TcgPpData->PPResponse = TPM_PP_BIOS_FAILURE;
+    TcgPpData->LastPPRequest = TcgPpData->PPRequest;
+    TcgPpData->PPRequest = PHYSICAL_PRESENCE_NO_ACTION;
+    DataSize = sizeof (EFI_PHYSICAL_PRESENCE);
+    Status = gRT->SetVariable (
+                    PHYSICAL_PRESENCE_VARIABLE,
+                    &gEfiPhysicalPresenceGuid,
+                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                    DataSize,
+                    TcgPpData
+                    );
+    return;
   }
 
   if (!RequestConfirmed) {
@@ -1147,5 +1198,90 @@ TcgPhysicalPresenceLibProcessRequest (
   // Lock physical presence.
   //
   TpmPhysicalPresence (TcgProtocol, TPM_PHYSICAL_PRESENCE_NOTPRESENT | TPM_PHYSICAL_PRESENCE_LOCK);
+}
+
+/**
+  Check if the pending TPM request needs user input to confirm.
+
+  The TPM request may come from OS. This API will check if TPM request exists and need user
+  input to confirmation.
+  
+  @retval    TRUE        TPM needs input to confirm user physical presence.
+  @retval    FALSE       TPM doesn't need input to confirm user physical presence.
+
+**/
+BOOLEAN
+EFIAPI
+TcgPhysicalPresenceLibNeedUserConfirm(
+  VOID
+  )
+{
+  EFI_STATUS              Status;
+  EFI_PHYSICAL_PRESENCE   TcgPpData;
+  UINTN                   DataSize;
+  BOOLEAN                 RequestConfirmed;
+  BOOLEAN                 LifetimeLock;
+  BOOLEAN                 CmdEnable;
+  EFI_TCG_PROTOCOL        *TcgProtocol;
+
+  Status = gBS->LocateProtocol (&gEfiTcgProtocolGuid, NULL, (VOID **)&TcgProtocol);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  //
+  // Check Tpm requests
+  //
+  DataSize = sizeof (EFI_PHYSICAL_PRESENCE);
+  Status = gRT->GetVariable (
+                  PHYSICAL_PRESENCE_VARIABLE,
+                  &gEfiPhysicalPresenceGuid,
+                  NULL,
+                  &DataSize,
+                  &TcgPpData
+                  );
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  if (TcgPpData.PPRequest == PHYSICAL_PRESENCE_NO_ACTION) {
+    //
+    // No operation request
+    //
+    return FALSE;
+  }
+
+  if (!HaveValidTpmRequest(&TcgPpData, &RequestConfirmed)) {
+    //
+    // Invalid operation request.
+    //
+    return FALSE;
+  }
+
+  //
+  // Check Tpm Capability
+  //
+  Status = GetTpmCapability (TcgProtocol, &LifetimeLock, &CmdEnable);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  if (!CmdEnable) {
+    if (LifetimeLock) {
+      //
+      // physicalPresenceCMDEnable is locked, can't execute physical presence command.
+      //
+      return FALSE;
+    }
+  }
+
+  if (!RequestConfirmed) {
+    //
+    // Need UI to confirm
+    //
+    return TRUE;
+  }
+
+  return FALSE;
 }
 
