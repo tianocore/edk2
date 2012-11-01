@@ -116,7 +116,6 @@
                                                 ## SOMETIMES_PRODUCES ## Variable:L"BootXX" (Boot option variable)
                                                 ## SOMETIMES_PRODUCES ## Variable:L"PlatformLang" (Platform supported languange in Rfc4646 format)
                                                 ## SOMETIMES_PRODUCES ## Variable:L"Lang" (Platform supported languange in Iso639 format)
-                                                ## SOMETIMES_PRODUCES ## Variable:L"KeyOrder" (Number of hotkey)
                                                 ## SOMETIMES_PRODUCES ## Variable:L"KeyXX" (Hotkey option variable)
                                                 ## PRODUCES           ## Variable:L"HwErrRecSupport" (The level of platform supported hardware Error Record Persistence)
                                                 ## SOMETIMES_PRODUCES ## Variable:L"BootOptionSupport" (The feature supported in boot option menu, value could be: EFI_BOOT_OPTION_SUPPORT_KEY, EFI_BOOT_OPTION_SUPPORT_APP
