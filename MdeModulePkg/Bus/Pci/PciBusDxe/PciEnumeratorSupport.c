@@ -334,7 +334,7 @@ DumpPciBars (
 
     DEBUG ((
       EFI_D_INFO,
-      "   BAR[%d]: Type = %s; Alignment = 0x%x;\tLength = 0x%x;\tOffset = 0x%02x\n",
+      "   BAR[%d]: Type = %s; Alignment = 0x%lx;\tLength = 0x%lx;\tOffset = 0x%02x\n",
       Index, mBarTypeStr[MIN (PciIoDevice->PciBar[Index].BarType, PciBarTypeMaxType)],
       PciIoDevice->PciBar[Index].Alignment, PciIoDevice->PciBar[Index].Length, PciIoDevice->PciBar[Index].Offset
       ));
@@ -347,7 +347,7 @@ DumpPciBars (
 
     DEBUG ((
       EFI_D_INFO,
-      " VFBAR[%d]: Type = %s; Alignment = 0x%x;\tLength = 0x%x;\tOffset = 0x%02x\n",
+      " VFBAR[%d]: Type = %s; Alignment = 0x%lx;\tLength = 0x%lx;\tOffset = 0x%02x\n",
       Index, mBarTypeStr[MIN (PciIoDevice->VfPciBar[Index].BarType, PciBarTypeMaxType)],
       PciIoDevice->VfPciBar[Index].Alignment, PciIoDevice->VfPciBar[Index].Length, PciIoDevice->VfPciBar[Index].Offset
       ));
@@ -980,8 +980,8 @@ PciSetDeviceAttribute (
 
     if (IS_PCI_LPC (&PciIoDevice->Pci)) {
         Attributes |= EFI_PCI_IO_ATTRIBUTE_ISA_MOTHERBOARD_IO;
-        Attributes |= (mReserveIsaAliases ? EFI_PCI_IO_ATTRIBUTE_ISA_IO : \
-                                            EFI_PCI_IO_ATTRIBUTE_ISA_IO_16);
+        Attributes |= (mReserveIsaAliases ? (UINT64) EFI_PCI_IO_ATTRIBUTE_ISA_IO : \
+                                            (UINT64) EFI_PCI_IO_ATTRIBUTE_ISA_IO_16);
     }
 
     if (IS_PCI_BRIDGE (&PciIoDevice->Pci) || IS_CARDBUS_BRIDGE (&PciIoDevice->Pci)) {
@@ -1007,8 +1007,8 @@ PciSetDeviceAttribute (
 
       if (IS_PCI_VGA (&PciIoDevice->Pci)) {
         Attributes |= EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY;
-        Attributes |= (mReserveVgaAliases ? EFI_PCI_IO_ATTRIBUTE_VGA_IO : \
-                                            EFI_PCI_IO_ATTRIBUTE_VGA_IO_16);
+        Attributes |= (mReserveVgaAliases ? (UINT64) EFI_PCI_IO_ATTRIBUTE_VGA_IO : \
+                                            (UINT64) EFI_PCI_IO_ATTRIBUTE_VGA_IO_16);
       }
     }
 
