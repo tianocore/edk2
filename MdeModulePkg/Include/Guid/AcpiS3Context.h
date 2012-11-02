@@ -1,7 +1,7 @@
 /** @file
   Definitions for data structures used in S3 resume.
 
-Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -21,6 +21,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define SMM_S3_RESUME_SMM_32 SIGNATURE_64 ('S','M','M','S','3','_','3','2')
 #define SMM_S3_RESUME_SMM_64 SIGNATURE_64 ('S','M','M','S','3','_','6','4')
+
+#pragma pack(1)
 
 typedef struct {
   UINT64                Signature;
@@ -50,11 +52,14 @@ typedef struct {
 
 typedef struct {
   UINT16                ReturnCs;
+  UINT64                ReturnStatus;
   EFI_PHYSICAL_ADDRESS  ReturnEntryPoint;
   EFI_PHYSICAL_ADDRESS  ReturnStackPointer;
   EFI_PHYSICAL_ADDRESS  AsmTransferControl;
   IA32_DESCRIPTOR       Idtr;
 } PEI_S3_RESUME_STATE;
+
+#pragma pack()
 
 #define EFI_ACPI_S3_CONTEXT_GUID \
   { \

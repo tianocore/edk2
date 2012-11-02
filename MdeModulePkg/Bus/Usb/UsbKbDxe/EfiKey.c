@@ -244,11 +244,24 @@ USBKeyboardDriverBindingStart (
 
   if (!Found) {
     //
+    // Report Status Code to indicate that there is no USB keyboard
+    //
+    REPORT_STATUS_CODE (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      (EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_NOT_DETECTED)
+      );
+    //
     // No interrupt endpoint found, then return unsupported.
     //
     Status = EFI_UNSUPPORTED;
     goto ErrorExit;
   }
+
+  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+    EFI_PROGRESS_CODE,
+    (EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_DETECTED),
+    UsbKeyboardDevice->DevicePath
+    );
 
   UsbKeyboardDevice->Signature                  = USB_KB_DEV_SIGNATURE;
   UsbKeyboardDevice->SimpleInput.Reset          = USBKeyboardReset;

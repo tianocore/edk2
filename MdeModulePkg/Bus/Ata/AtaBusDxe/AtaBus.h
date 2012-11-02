@@ -38,6 +38,7 @@
 #include <Library/DevicePathLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/TimerLib.h>
+#include <Library/ReportStatusCodeLib.h>
 
 #include <IndustryStandard/Atapi.h>
 

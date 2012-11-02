@@ -2,7 +2,7 @@
   SCSI Bus driver that layers on every SCSI Pass Thru and
   Extended SCSI Pass Thru protocol in the system.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -342,6 +342,15 @@ SCSIBusDriverBindingStart (
   }
 
   //
+  // Report Status Code to indicate SCSI bus starts
+  //
+  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+    EFI_PROGRESS_CODE,
+    (EFI_IO_BUS_SCSI | EFI_IOB_PC_INIT),
+    ParentDevicePath
+    );  
+
+  //
   // To keep backward compatibility, UEFI ExtPassThru Protocol is supported as well as 
   // EFI PassThru Protocol. From priority perspective, ExtPassThru Protocol is firstly
   // tried to open on host controller handle. If fails, then PassThru Protocol is tried instead.
@@ -450,6 +459,15 @@ SCSIBusDriverBindingStart (
     }
     ScsiBusDev = SCSI_BUS_CONTROLLER_DEVICE_FROM_THIS (BusIdentify);
   }
+
+  //
+  // Report Status Code to indicate detecting devices on bus
+  //
+  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+    EFI_PROGRESS_CODE,
+    (EFI_IO_BUS_SCSI | EFI_IOB_PC_DETECT),
+    ParentDevicePath
+    );
 
   Lun  = 0;
   if (RemainingDevicePath == NULL) {
@@ -828,6 +846,15 @@ ScsiResetBus (
 
   ScsiIoDevice = SCSI_IO_DEV_FROM_THIS (This);
 
+  //
+  // Report Status Code to indicate reset happens
+  //
+  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+    EFI_PROGRESS_CODE,
+    (EFI_IO_BUS_ATA_ATAPI | EFI_IOB_PC_RESET),
+    ScsiIoDevice->ScsiBusDeviceData->DevicePath
+    );
+
   if (ScsiIoDevice->ExtScsiSupport){
     return ScsiIoDevice->ExtScsiPassThru->ResetChannel (ScsiIoDevice->ExtScsiPassThru);
   } else {
@@ -857,6 +884,16 @@ ScsiResetDevice (
   UINT8        Target[TARGET_MAX_BYTES];
 
   ScsiIoDevice = SCSI_IO_DEV_FROM_THIS (This);
+
+  //
+  // Report Status Code to indicate reset happens
+  //
+  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+    EFI_PROGRESS_CODE,
+    (EFI_IO_BUS_ATA_ATAPI | EFI_IOB_PC_RESET),
+    ScsiIoDevice->ScsiBusDeviceData->DevicePath
+    );
+  
   CopyMem (Target,&ScsiIoDevice->Pun, TARGET_MAX_BYTES);
 
 
@@ -1121,6 +1158,7 @@ ScsiScanCreateDevice (
   }
 
   ScsiIoDevice->Signature                 = SCSI_IO_DEV_SIGNATURE;
+  ScsiIoDevice->ScsiBusDeviceData         = ScsiBusDev;
   CopyMem(&ScsiIoDevice->Pun, TargetId, TARGET_MAX_BYTES);
   ScsiIoDevice->Lun                       = Lun;
 
@@ -1140,6 +1178,15 @@ ScsiScanCreateDevice (
   ScsiIoDevice->ScsiIo.ResetBus           = ScsiResetBus;
   ScsiIoDevice->ScsiIo.ResetDevice        = ScsiResetDevice;
   ScsiIoDevice->ScsiIo.ExecuteScsiCommand = ScsiExecuteSCSICommand;
+
+  //
+  // Report Status Code here since the new SCSI device will be discovered
+  //
+  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+    EFI_PROGRESS_CODE,
+    (EFI_IO_BUS_SCSI | EFI_IOB_PC_ENABLE),
+    ScsiBusDev->DevicePath
+    );
 
   if (!DiscoverScsiDevice (ScsiIoDevice)) {
     Status = EFI_OUT_OF_RESOURCES;

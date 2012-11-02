@@ -803,6 +803,14 @@ UsbEnumerateNewDev (
     goto ON_ERROR;
   }
 
+  //
+  // Report Status Code to indicate USB device has been detected by hotplug
+  //
+  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+    EFI_PROGRESS_CODE,
+    (EFI_IO_BUS_USB | EFI_IOB_PC_HOTPLUG),
+    Bus->DevicePath
+    );
   return EFI_SUCCESS;
 
 ON_ERROR:

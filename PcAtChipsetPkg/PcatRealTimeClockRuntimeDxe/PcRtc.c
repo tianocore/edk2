@@ -204,6 +204,13 @@ PcRtcInit (
     Status = RtcTimeFieldsValid (&Time);
   }
   if (EFI_ERROR (Status)) {
+    //
+    // Report Status Code to indicate that the RTC has bad date and time
+    //
+    REPORT_STATUS_CODE (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      (EFI_SOFTWARE_DXE_RT_DRIVER | EFI_SW_EC_BAD_DATE_TIME)
+      );
     Time.Second = RTC_INIT_SECOND;
     Time.Minute = RTC_INIT_MINUTE;
     Time.Hour   = RTC_INIT_HOUR;

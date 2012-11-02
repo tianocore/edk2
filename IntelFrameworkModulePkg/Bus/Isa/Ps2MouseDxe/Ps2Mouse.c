@@ -2,7 +2,7 @@
   PS/2 Mouse driver. Routines that interacts with callers,
   conforming to EFI driver model.
   
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -278,6 +278,13 @@ PS2MouseDriverStart (
     StatusCode  = EFI_PERIPHERAL_MOUSE | EFI_P_EC_NOT_DETECTED;
     goto ErrorExit;
   }
+
+  REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+    EFI_PROGRESS_CODE,
+    EFI_PERIPHERAL_MOUSE | EFI_P_PC_DETECTED,
+    ParentDevicePath
+    );
+
   //
   // Setup the WaitForKey event
   //

@@ -48,6 +48,13 @@ PeiResetSystem (
   if (!EFI_ERROR (Status)) {
     return ResetPpi->ResetSystem (PeiServices);
   } 
+  //
+  // Report Status Code that Reset PPI is not available
+  //
+  REPORT_STATUS_CODE (
+    EFI_ERROR_CODE | EFI_ERROR_MINOR,
+    (EFI_SOFTWARE_PEI_CORE | EFI_SW_PS_EC_RESET_NOT_AVAILABLE)
+    );
   return  EFI_NOT_AVAILABLE_YET;
 }
 

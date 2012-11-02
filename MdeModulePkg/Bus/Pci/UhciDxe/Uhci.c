@@ -2,7 +2,7 @@
 
   The UHCI driver model and HC protocol routines.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -53,7 +53,18 @@ Uhci2Reset (
     return EFI_UNSUPPORTED;
   }
 
-  Uhc     = UHC_FROM_USB2_HC_PROTO (This);
+  Uhc = UHC_FROM_USB2_HC_PROTO (This);
+
+  if (Uhc->DevicePath != NULL) {
+    //
+    // Report Status Code to indicate reset happens
+    //
+    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+      EFI_PROGRESS_CODE,
+      (EFI_IO_BUS_USB | EFI_IOB_PC_RESET),
+      Uhc->DevicePath
+      );
+  }
 
   OldTpl  = gBS->RaiseTPL (UHCI_TPL);
 
@@ -1425,8 +1436,9 @@ ON_EXIT:
 **/
 USB_HC_DEV *
 UhciAllocateDev (
-  IN EFI_PCI_IO_PROTOCOL    *PciIo,
-  IN UINT64                 OriginalPciAttributes
+  IN EFI_PCI_IO_PROTOCOL       *PciIo,
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
+  IN UINT64                    OriginalPciAttributes
   )
 {
   USB_HC_DEV  *Uhc;
@@ -1460,6 +1472,7 @@ UhciAllocateDev (
   Uhc->Usb2Hc.MinorRevision             = 0x1;
 
   Uhc->PciIo                 = PciIo;
+  Uhc->DevicePath            = DevicePath;
   Uhc->OriginalPciAttributes = OriginalPciAttributes;
   Uhc->MemPool               = UsbHcInitMemPool (PciIo, TRUE, 0);
 
@@ -1622,6 +1635,7 @@ UhciDriverBindingStart (
   UINT64              Supports;
   UINT64              OriginalPciAttributes;
   BOOLEAN             PciAttributesSaved;
+  EFI_DEVICE_PATH_PROTOCOL  *HcDevicePath;
 
   //
   // Open PCIIO, then enable the EHC device and turn off emulation
@@ -1639,6 +1653,19 @@ UhciDriverBindingStart (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
+  //
+  // Open Device Path Protocol for on USB host controller
+  //
+  HcDevicePath = NULL;
+  Status = gBS->OpenProtocol (
+                  Controller,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **) &HcDevicePath,
+                  This->DriverBindingHandle,
+                  Controller,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
 
   PciAttributesSaved = FALSE;
   //
@@ -1684,7 +1711,7 @@ UhciDriverBindingStart (
     goto CLOSE_PCIIO;
   }
 
-  Uhc = UhciAllocateDev (PciIo, OriginalPciAttributes);
+  Uhc = UhciAllocateDev (PciIo, HcDevicePath, OriginalPciAttributes);
 
   if (Uhc == NULL) {
     Status = EFI_OUT_OF_RESOURCES;

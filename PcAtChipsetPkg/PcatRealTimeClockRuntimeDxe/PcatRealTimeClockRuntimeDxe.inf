@@ -51,6 +51,7 @@
   DebugLib
   BaseLib
   PcdLib
+  ReportStatusCodeLib
 
 [Protocols]
   gEfiRealTimeClockArchProtocolGuid             ## PRODUCES

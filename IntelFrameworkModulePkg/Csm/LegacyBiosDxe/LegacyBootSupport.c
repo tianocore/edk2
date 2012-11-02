@@ -1200,6 +1200,14 @@ GenericLegacyBoot (
   EnableAllControllers (Private);
   if ((mBootMode == BOOT_LEGACY_OS) || (mBootMode == BOOT_UNCONVENTIONAL_DEVICE)) {
     //
+    // Report Status Code to indicate legacy boot event will be signalled
+    //
+    REPORT_STATUS_CODE (
+      EFI_PROGRESS_CODE,
+      (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_PC_LEGACY_BOOT_EVENT)
+      );
+
+    //
     // Signal all the events that are waiting on EVT_SIGNAL_LEGACY_BOOT
     //
     EfiSignalEventLegacyBoot ();

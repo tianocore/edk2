@@ -1,7 +1,7 @@
 /** @file
   Header file for SCSI Bus Driver.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -33,6 +33,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiScsiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/ReportStatusCodeLib.h>
 
 #include <IndustryStandard/Scsi.h>
 
@@ -54,27 +55,10 @@ typedef struct {
    VOID   *Data2;
 } SCSI_EVENT_DATA;
 
-
-typedef struct {
-  UINT32                             Signature;
-  EFI_HANDLE                         Handle;
-  EFI_SCSI_IO_PROTOCOL               ScsiIo;
-  EFI_DEVICE_PATH_PROTOCOL           *DevicePath;
-  BOOLEAN                            ExtScsiSupport; 
-  EFI_SCSI_PASS_THRU_PROTOCOL        *ScsiPassThru;
-  EFI_EXT_SCSI_PASS_THRU_PROTOCOL    *ExtScsiPassThru;
-  SCSI_TARGET_ID                     Pun;
-  UINT64                             Lun;
-  UINT8                              ScsiDeviceType;
-  UINT8                              ScsiVersion;
-  BOOLEAN                            RemovableDevice;
-} SCSI_IO_DEV;
-
-#define SCSI_IO_DEV_FROM_THIS(a)  CR (a, SCSI_IO_DEV, ScsiIo, SCSI_IO_DEV_SIGNATURE)
-
 //
 // SCSI Bus Controller device strcuture
 //
+#define SCSI_BUS_DEVICE_SIGNATURE  SIGNATURE_32 ('s', 'c', 's', 'i')
 
 //
 // The ScsiBusProtocol is just used to locate ScsiBusDev
@@ -87,9 +71,6 @@ typedef struct _EFI_SCSI_BUS_PROTOCOL {
   UINT64  Reserved;
 } EFI_SCSI_BUS_PROTOCOL;
 
-#define SCSI_BUS_DEVICE_SIGNATURE  SIGNATURE_32 ('s', 'c', 's', 'i')
-
-
 typedef struct _SCSI_BUS_DEVICE {
   UINTN                                 Signature;
   EFI_SCSI_BUS_PROTOCOL                 BusIdentify;
@@ -100,6 +81,24 @@ typedef struct _SCSI_BUS_DEVICE {
 } SCSI_BUS_DEVICE;
 
 #define SCSI_BUS_CONTROLLER_DEVICE_FROM_THIS(a)  CR (a, SCSI_BUS_DEVICE, BusIdentify, SCSI_BUS_DEVICE_SIGNATURE)
+
+typedef struct {
+  UINT32                             Signature;
+  EFI_HANDLE                         Handle;
+  EFI_SCSI_IO_PROTOCOL               ScsiIo;
+  EFI_DEVICE_PATH_PROTOCOL           *DevicePath;
+  BOOLEAN                            ExtScsiSupport; 
+  EFI_SCSI_PASS_THRU_PROTOCOL        *ScsiPassThru;
+  EFI_EXT_SCSI_PASS_THRU_PROTOCOL    *ExtScsiPassThru;
+  SCSI_BUS_DEVICE                    *ScsiBusDeviceData;
+  SCSI_TARGET_ID                     Pun;
+  UINT64                             Lun;
+  UINT8                              ScsiDeviceType;
+  UINT8                              ScsiVersion;
+  BOOLEAN                            RemovableDevice;
+} SCSI_IO_DEV;
+
+#define SCSI_IO_DEV_FROM_THIS(a)  CR (a, SCSI_IO_DEV, ScsiIo, SCSI_IO_DEV_SIGNATURE)
 
 //
 // Global Variables
