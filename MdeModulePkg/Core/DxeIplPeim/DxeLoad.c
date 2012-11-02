@@ -2,7 +2,7 @@
   Last PEIM.
   Responsibility of this module is to load the DXE Core from a Firmware Volume.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -92,27 +92,26 @@ PeimInitializeDxeIpl (
     // Ensure that DXE IPL is shadowed to permanent memory.
     //
     ASSERT (Status == EFI_ALREADY_STARTED);
+  }
      
-    //
-    // Get custom extract guided section method guid list 
-    //
-    ExtractHandlerNumber = ExtractGuidedSectionGetGuidList (&ExtractHandlerGuidTable);
-    
-    //
-    // Install custom extraction guid PPI
-    //
-    if (ExtractHandlerNumber > 0) {
-      GuidPpi = (EFI_PEI_PPI_DESCRIPTOR *) AllocatePool (ExtractHandlerNumber * sizeof (EFI_PEI_PPI_DESCRIPTOR));
-      ASSERT (GuidPpi != NULL);
-      while (ExtractHandlerNumber-- > 0) {
-        GuidPpi->Flags = EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
-        GuidPpi->Ppi   = (VOID *) &mCustomGuidedSectionExtractionPpi;
-        GuidPpi->Guid  = &ExtractHandlerGuidTable[ExtractHandlerNumber];
-        Status = PeiServicesInstallPpi (GuidPpi++);
-        ASSERT_EFI_ERROR(Status);
-      }
+  //
+  // Get custom extract guided section method guid list 
+  //
+  ExtractHandlerNumber = ExtractGuidedSectionGetGuidList (&ExtractHandlerGuidTable);
+  
+  //
+  // Install custom extraction guid PPI
+  //
+  if (ExtractHandlerNumber > 0) {
+    GuidPpi = (EFI_PEI_PPI_DESCRIPTOR *) AllocatePool (ExtractHandlerNumber * sizeof (EFI_PEI_PPI_DESCRIPTOR));
+    ASSERT (GuidPpi != NULL);
+    while (ExtractHandlerNumber-- > 0) {
+      GuidPpi->Flags = EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
+      GuidPpi->Ppi   = (VOID *) &mCustomGuidedSectionExtractionPpi;
+      GuidPpi->Guid  = &ExtractHandlerGuidTable[ExtractHandlerNumber];
+      Status = PeiServicesInstallPpi (GuidPpi++);
+      ASSERT_EFI_ERROR(Status);
     }
-    
   }
   
   //
