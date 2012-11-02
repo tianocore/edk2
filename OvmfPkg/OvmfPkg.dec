@@ -23,6 +23,10 @@
   Include
 
 [LibraryClasses]
+  ##  @libraryclass  Loads and boots a Linux kernel image
+  #
+  LoadLinuxLib|Include/Library/LoadLinuxLib.h
+
   ##  @libraryclass  Save and restore variables using a file
   #
   NvVarsFileLib|Include/Library/NvVarsFileLib.h
