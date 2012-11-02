@@ -1429,6 +1429,7 @@ ON_EXIT:
   Allocate and initialize the empty UHCI device.
 
   @param  PciIo                  The PCIIO to use.
+  @param  DevicePath             The device path of host controller.
   @param  OriginalPciAttributes  The original PCI attributes.
 
   @return Allocated UHCI device. If err, return NULL.
