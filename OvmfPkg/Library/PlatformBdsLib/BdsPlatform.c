@@ -1128,6 +1128,11 @@ Returns:
   PlatformBdsConnectSequence ();
 
   //
+  // Process QEMU's -kernel command line option
+  //
+  TryRunningQemuKernel ();
+
+  //
   // Give one chance to enter the setup if we
   // have the time out
   //

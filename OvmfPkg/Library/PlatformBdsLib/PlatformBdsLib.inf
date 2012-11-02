@@ -18,7 +18,7 @@
   FILE_GUID                      = F844172E-9985-44f2-BADE-0DD783462E95
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PlatformBdsLib|DXE_DRIVER   
+  LIBRARY_CLASS                  = PlatformBdsLib|DXE_DRIVER
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -30,6 +30,7 @@
   BdsPlatform.c
   PlatformData.c
   QemuBootOrder.c
+  QemuKernel.c
   BdsPlatform.h
   QemuBootOrder.h
 
@@ -50,6 +51,7 @@
   PciLib
   NvVarsFileLib
   QemuFwCfgLib
+  LoadLinuxLib
 
 [Pcd]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut
