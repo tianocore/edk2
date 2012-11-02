@@ -1,7 +1,7 @@
 /** @file
   IA-32/x64 AsmFxSave()
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -44,5 +44,5 @@ AsmFxSave (
   //
   // Mark one flag at end of Buffer, it will be check by AsmFxRestor()
   //
-  *(UINT32 *) (&Buffer[sizeof (IA32_FX_BUFFER) - 4]) = 0xAA5555AA;
+  *(UINT32 *) (&Buffer->Buffer[sizeof (Buffer->Buffer) - 4]) = 0xAA5555AA;
 }
