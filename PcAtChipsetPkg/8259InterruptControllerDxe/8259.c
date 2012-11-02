@@ -1,7 +1,7 @@
 /** @file
   This contains the installation function for the driver.
 
-Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -123,8 +123,10 @@ Interrupt8259SetVectorBase (
   IN UINT8                     SlaveBase
   )
 {
-  UINT8 Mask;
+  UINT8   Mask;
+  EFI_TPL OriginalTpl;
 
+  OriginalTpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
   //
   // Set vector base for slave PIC
   //
@@ -211,6 +213,8 @@ Interrupt8259SetVectorBase (
 
   IoWrite8 (LEGACY_8259_CONTROL_REGISTER_SLAVE, LEGACY_8259_EOI);
   IoWrite8 (LEGACY_8259_CONTROL_REGISTER_MASTER, LEGACY_8259_EOI);
+  
+  gBS->RestoreTPL (OriginalTpl);
 
   return EFI_SUCCESS;
 }
