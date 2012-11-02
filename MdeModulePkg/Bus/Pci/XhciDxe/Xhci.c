@@ -1684,6 +1684,7 @@ ON_EXIT:
   Create and initialize a USB_XHCI_INSTANCE structure.
 
   @param  PciIo                  The PciIo on this device.
+  @param  DevicePath             The device path of host controller.
   @param  OriginalPciAttributes  Original PCI attributes.
 
   @return The allocated and initialized USB_XHCI_INSTANCE structure if created,

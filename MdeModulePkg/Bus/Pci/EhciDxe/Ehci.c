@@ -1547,6 +1547,7 @@ EhcGetUsbDebugPortInfo (
   Create and initialize a USB2_HC_DEV.
 
   @param  PciIo                  The PciIo on this device.
+  @param  DevicePath             The device path of host controller.
   @param  OriginalPciAttributes  Original PCI attributes.
 
   @return  The allocated and initialized USB2_HC_DEV structure if created,
