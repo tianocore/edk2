@@ -6,7 +6,7 @@
     PCI-to-PCI Bridge Architecture Specification, Revision 1.2
     PC Card Standard, 8.0
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -219,7 +219,7 @@ typedef struct {
 #define     PCI_IF_16550_MODEM            0x02
 #define     PCI_IF_16650_MODEM            0x03
 #define     PCI_IF_16750_MODEM            0x04
-#define   PCI_SUBCLASS_SCC_OTHER          0x80
+#define   PCI_SUBCLASS_SCC_OTHER        0x80
 
 #define PCI_CLASS_SYSTEM_PERIPHERAL   0x08
 #define   PCI_SUBCLASS_PIC              0x00
@@ -238,7 +238,7 @@ typedef struct {
 #define     PCI_IF_EISA_TIMER             0x02
 #define   PCI_SUBCLASS_RTC              0x03
 #define     PCI_IF_GENERIC_RTC            0x00
-#define     PCI_IF_ISA_RTC                0x00
+#define     PCI_IF_ISA_RTC                0x01
 #define   PCI_SUBCLASS_PNP_CONTROLLER   0x04    ///< HotPlug Controller
 #define   PCI_SUBCLASS_PERIPHERAL_OTHER 0x80
 
@@ -249,10 +249,12 @@ typedef struct {
 #define   PCI_SUBCLASS_SCAN_CONTROLLER  0x03
 #define   PCI_SUBCLASS_GAMEPORT         0x04
 #define     PCI_IF_GAMEPORT               0x00
-#define     PCI_IF_GAMEPORT1              0x01
+#define     PCI_IF_GAMEPORT1              0x10
 #define   PCI_SUBCLASS_INPUT_OTHER      0x80
 
 #define PCI_CLASS_DOCKING_STATION     0x0A
+#define   PCI_SUBCLASS_DOCKING_GENERIC  0x00
+#define   PCI_SUBCLASS_DOCKING_OTHER    0x80
 
 #define PCI_CLASS_PROCESSOR           0x0B
 #define   PCI_SUBCLASS_PROC_386         0x00
@@ -280,7 +282,7 @@ typedef struct {
 #define PCI_CLASS_WIRELESS            0x0D
 #define   PCI_SUBCLASS_IRDA             0x00
 #define   PCI_SUBCLASS_IR               0x01
-#define   PCI_SUBCLASS_RF               0x02
+#define   PCI_SUBCLASS_RF               0x10
 #define   PCI_SUBCLASS_WIRELESS_OTHER   0x80
 
 #define PCI_CLASS_INTELLIGENT_IO      0x0E
