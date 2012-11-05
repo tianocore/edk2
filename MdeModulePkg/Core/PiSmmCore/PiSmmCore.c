@@ -245,6 +245,7 @@ SmmEntryPoint (
 {
   EFI_STATUS                  Status;
   EFI_SMM_COMMUNICATE_HEADER  *CommunicateHeader;
+  BOOLEAN                     InLegacyBoot;
 
   PERF_START (NULL, "SMM", NULL, 0) ;
 
@@ -261,7 +262,8 @@ SmmEntryPoint (
   //
   // If a legacy boot has occured, then make sure gSmmCorePrivate is not accessed
   //
-  if (!mInLegacyBoot) {
+  InLegacyBoot = mInLegacyBoot;
+  if (!InLegacyBoot) {
     //
     // Mark the InSmm flag as TRUE, it will be used by SmmBase2 protocol
     //
@@ -307,7 +309,7 @@ SmmEntryPoint (
   //
   // If a legacy boot has occured, then make sure gSmmCorePrivate is not accessed
   //
-  if (!mInLegacyBoot) {
+  if (!InLegacyBoot) {
     //
     // Clear the InSmm flag as we are going to leave SMM
     //
