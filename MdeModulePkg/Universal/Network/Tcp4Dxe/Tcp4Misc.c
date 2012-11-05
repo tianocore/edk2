@@ -592,6 +592,7 @@ TcpFormatNetbuf (
 
   Seg       = TCPSEG_NETBUF (Nbuf);
   Head      = (TCP_HEAD *) NetbufGetByte (Nbuf, 0, NULL);
+  ASSERT (Head != NULL);
   Nbuf->Tcp = Head;
 
   Seg->Seq  = NTOHL (Head->Seq);

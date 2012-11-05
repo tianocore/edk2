@@ -148,7 +148,7 @@ CoreDumpGcdMemorySpaceMap (
     UINTN                            Index;
    
     Status = CoreGetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
-    ASSERT_EFI_ERROR (Status);
+    ASSERT (Status == EFI_SUCCESS && MemorySpaceMap != NULL);
 
     if (InitialMap) {
       DEBUG ((DEBUG_GCD, "GCD:Initial GCD Memory Space Map\n"));
@@ -190,7 +190,7 @@ CoreDumpGcdIoSpaceMap (
     UINTN                        Index;
     
     Status = CoreGetIoSpaceMap (&NumberOfDescriptors, &IoSpaceMap);
-    ASSERT_EFI_ERROR (Status);
+    ASSERT (Status == EFI_SUCCESS && IoSpaceMap != NULL);
     
     if (InitialMap) {
       DEBUG ((DEBUG_GCD, "GCD:Initial GCD I/O Space Map\n"));

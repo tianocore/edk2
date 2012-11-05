@@ -27,6 +27,8 @@
 #define IPSEC_DUMP_BUF(Title, Data, DataSize)            IpSecDumpBuf (Title, Data, DataSize)
 
 #define IPSEC_DEBUG_BYTE_PER_LINE                       8
+#define IKE_STATE_NUM                                   7
+
 
 
 /**

@@ -1612,6 +1612,7 @@ Udp4Demultiplex (
   // Get the datagram header from the packet buffer.
   //
   Udp4Header = (EFI_UDP_HEADER *) NetbufGetByte (Packet, 0, NULL);
+  ASSERT (Udp4Header != NULL);
 
   if (Udp4Header->Checksum != 0) {
     //
@@ -1799,6 +1800,7 @@ Udp4IcmpHandler (
   UDP4_INSTANCE_DATA     *Instance;
 
   Udp4Header = (EFI_UDP_HEADER *) NetbufGetByte (Packet, 0, NULL);
+  ASSERT (Udp4Header != NULL);
 
   CopyMem (&Udp4Session.SourceAddress, &NetSession->Source, sizeof (EFI_IPv4_ADDRESS));
   CopyMem (&Udp4Session.DestinationAddress, &NetSession->Dest, sizeof (EFI_IPv4_ADDRESS));
