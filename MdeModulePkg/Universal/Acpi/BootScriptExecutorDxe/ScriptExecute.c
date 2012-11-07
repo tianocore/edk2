@@ -69,12 +69,6 @@ S3BootScriptExecutorEntryFunction (
   //
   Status = S3BootScriptExecute ();
 
-  //
-  // Need report status back to S3ResumePeim. 
-  // If boot script execution is failed, S3ResumePeim wil report the error status code.
-  //
-  PeiS3ResumeState->ReturnStatus = (UINT64)(UINTN)Status;
-
   AsmWbinvd ();
 
   //
@@ -86,6 +80,11 @@ S3BootScriptExecutorEntryFunction (
   // We need turn back to S3Resume - install boot script done ppi and report status code on S3resume.
   //
   if (PeiS3ResumeState != 0) {
+    //
+    // Need report status back to S3ResumePeim. 
+    // If boot script execution is failed, S3ResumePeim wil report the error status code.
+    //
+    PeiS3ResumeState->ReturnStatus = (UINT64)(UINTN)Status;
     if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
       //
       // X64 S3 Resume
