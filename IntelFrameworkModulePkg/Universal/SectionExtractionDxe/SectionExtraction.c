@@ -45,6 +45,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/UefiLib.h>
 #include <Protocol/Decompress.h>
 #include <Protocol/GuidedSectionExtraction.h>
 #include <Protocol/SectionExtraction.h>
@@ -540,6 +541,53 @@ CreateProtocolNotifyEvent (
 }
 
 /**
+  Verify the Guided Section GUID by checking if there is the Guided Section GUID configuration table recorded the GUID itself.
+
+  @param GuidedSectionGuid          The Guided Section GUID.
+  @param GuidedSectionExtraction    A pointer to the pointer to the supported Guided Section Extraction Protocol
+                                    for the Guided Section.
+
+  @return TRUE      The GuidedSectionGuid could be identified, and the pointer to
+                    the Guided Section Extraction Protocol will be returned to *GuidedSectionExtraction.
+  @return FALSE     The GuidedSectionGuid could not be identified, or 
+                    the Guided Section Extraction Protocol has not been installed yet.
+
+**/
+BOOLEAN
+VerifyGuidedSectionGuid (
+  IN  EFI_GUID                                  *GuidedSectionGuid,
+  OUT EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL    **GuidedSectionExtraction
+  )
+{
+  EFI_GUID              *GuidRecorded;
+  VOID                  *Interface;
+  EFI_STATUS            Status;
+
+  //
+  // Check if there is the Guided Section GUID configuration table recorded the GUID itself.
+  //
+  Status = EfiGetSystemConfigurationTable (GuidedSectionGuid, (VOID **) &GuidRecorded);
+  if (Status == EFI_SUCCESS) {
+    if (CompareGuid (GuidRecorded, GuidedSectionGuid)) {
+      //
+      // Found the recorded GuidedSectionGuid.
+      //
+      Status = gBS->LocateProtocol (GuidedSectionGuid, NULL, (VOID **) &Interface);
+      if (!EFI_ERROR (Status) && Interface != NULL) {
+        //
+        // Found the supported Guided Section Extraction Porotocol for the Guided Section.
+        //
+        *GuidedSectionExtraction = (EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL *) Interface;
+        return TRUE;
+      }
+      return FALSE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
   RPN callback function.  
   1. Initialize the section stream when the GUIDED_SECTION_EXTRACTION_PROTOCOL is installed.
   2. Removes a stale section stream and re-initializes it with an updated AuthenticationStatus.
@@ -579,10 +627,10 @@ NotifyGuidedExtraction (
       (Context->ParentStream->StreamBuffer + Context->ChildNode->OffsetInStream);
     ASSERT (GuidedHeader->CommonHeader.Type == EFI_SECTION_GUID_DEFINED);
     
-    Status = gBS->LocateProtocol (Context->ChildNode->EncapsulationGuid, NULL, (VOID **)&GuidedExtraction);
-    ASSERT_EFI_ERROR (Status);
+    if (!VerifyGuidedSectionGuid (Context->ChildNode->EncapsulationGuid, &GuidedExtraction)) {
+      return;
+    }
 
-    
     Status = GuidedExtraction->ExtractSection (
                                  GuidedExtraction,
                                  GuidedHeader,
@@ -842,8 +890,7 @@ CreateChildNode (
         Node->EncapsulationGuid = &GuidedHeader->SectionDefinitionGuid;
         GuidedSectionAttributes = GuidedHeader->Attributes;
       }
-      Status = gBS->LocateProtocol (Node->EncapsulationGuid, NULL, (VOID **)&GuidedExtraction);
-      if (!EFI_ERROR (Status)) {
+      if (VerifyGuidedSectionGuid (Node->EncapsulationGuid, &GuidedExtraction)) {
         //
         // NewStreamBuffer is always allocated by ExtractSection... No caller
         // allocation here.
