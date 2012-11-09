@@ -26,6 +26,8 @@
 #define EFI_AHCI_IS_OFFSET                     0x0008
 #define EFI_AHCI_PI_OFFSET                     0x000C
 
+#define EFI_AHCI_MAX_PORTS                     32
+
 typedef struct {
   UINT32  Lower32;
   UINT32  Upper32;

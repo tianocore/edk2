@@ -2202,8 +2202,19 @@ AhciModeInitialization (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  for (Port = 0; Port < MaxPortNumber; Port ++) {
+  for (Port = 0; Port < EFI_AHCI_MAX_PORTS; Port ++) {
     if ((PortImplementBitMap & (BIT0 << Port)) != 0) {
+      //
+      // According to AHCI spec, MaxPortNumber should be equal or greater than the number of implemented ports.
+      //
+      if ((MaxPortNumber--) == 0) {
+        //
+        // Should never be here.
+        //
+        ASSERT (FALSE);
+        return EFI_SUCCESS;
+      }
+
       IdeInit->NotifyPhase (IdeInit, EfiIdeBeforeChannelEnumeration, Port);
 
       //
