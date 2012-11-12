@@ -1,9 +1,9 @@
 /** @file
   Boot Script Helper SMM driver.
 
-  This driver is responsible to restoer BootScriptThunk from SMRAM to AcpiNvs for security considertion.
+  This driver is responsible to store BootScriptThunk from ReservedMemory to SMRAM for security consideration.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions

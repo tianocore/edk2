@@ -827,7 +827,7 @@ InitializeScriptSaveOnS3SaveState (
   Status = gBS->LocateProtocol (&gEfiCallerIdGuid, NULL, &DevicePath);
   if (EFI_ERROR (Status)) {
     //
-    // This is the first-time loaded by DXE core. reload itself to NVS mem
+    // This is the first-time loaded by DXE core. reload itself to RESERVED mem
     //
     //
     // A workaround: Here we install a dummy handle
@@ -861,7 +861,7 @@ InitializeScriptSaveOnS3SaveState (
     PageNumber    = EFI_SIZE_TO_PAGES (BufferSize + ImageContext.SectionAlignment);
     Status  = gBS->AllocatePages (
                      AllocateMaxAddress,
-                     EfiACPIMemoryNVS,
+                     EfiReservedMemoryType,
                      PageNumber,
                      &MemoryAddress
                      );
@@ -915,7 +915,7 @@ InitializeScriptSaveOnS3SaveState (
     return EFI_SUCCESS;
   } else {
     //
-    // the entry point is invoked after reloading. following code only run in  ACPI NVS
+    // the entry point is invoked after reloading. following code only run in RESERVED mem
     //
 
     //
