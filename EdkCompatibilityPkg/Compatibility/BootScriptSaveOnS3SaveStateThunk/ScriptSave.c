@@ -2,7 +2,7 @@
   Implementation for S3 Boot Script Save thunk driver.
   This thunk driver consumes PI S3SaveState protocol to produce framework S3BootScriptSave Protocol 
   
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -830,7 +830,7 @@ InitializeScriptSaveOnS3SaveState (
     // This is the first-time loaded by DXE core. reload itself to NVS mem
     //
     //
-    // A workarouond: Here we install a dummy handle
+    // A workaround: Here we install a dummy handle
     //
     NewImageHandle = NULL;
     Status = gBS->InstallProtocolInterface (
@@ -839,6 +839,7 @@ InitializeScriptSaveOnS3SaveState (
                     EFI_NATIVE_INTERFACE,
                     NULL
                     );
+    ASSERT_EFI_ERROR (Status);
 
     Status = GetSectionFromAnyFv  (
                &gEfiCallerIdGuid,
@@ -847,15 +848,14 @@ InitializeScriptSaveOnS3SaveState (
                (VOID **) &Buffer,
                &BufferSize
                );
+    ASSERT_EFI_ERROR (Status);
     ImageContext.Handle    = Buffer;
     ImageContext.ImageRead = PeCoffLoaderImageReadFromMemory;
     //
     // Get information about the image being loaded
     //
     Status = PeCoffLoaderGetImageInfo (&ImageContext);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+    ASSERT_EFI_ERROR (Status);
 
     MemoryAddress = SIZE_4GB - 1;
     PageNumber    = EFI_SIZE_TO_PAGES (BufferSize + ImageContext.SectionAlignment);
@@ -865,9 +865,7 @@ InitializeScriptSaveOnS3SaveState (
                      PageNumber,
                      &MemoryAddress
                      );
-    if (EFI_ERROR (Status)) {
-      return EFI_OUT_OF_RESOURCES;
-    }
+    ASSERT_EFI_ERROR (Status);
     ImageContext.ImageAddress = (PHYSICAL_ADDRESS)(UINTN)MemoryAddress;
     //
     // Align buffer on section boundry
@@ -878,30 +876,26 @@ InitializeScriptSaveOnS3SaveState (
     // Load the image to our new buffer
     //
     Status = PeCoffLoaderLoadImage (&ImageContext);
-    if (EFI_ERROR (Status)) {
-      gBS->FreePages (MemoryAddress, PageNumber);
-      return Status;
-    }
+    ASSERT_EFI_ERROR (Status);
 
     //
     // Relocate the image in our new buffer
     //
     Status = PeCoffLoaderRelocateImage (&ImageContext);
+    ASSERT_EFI_ERROR (Status);
 
-    if (EFI_ERROR (Status)) {
-      PeCoffLoaderUnloadImage (&ImageContext);
-      gBS->FreePages (MemoryAddress, PageNumber);
-      return Status;
-    }
+    //
+    // Free the buffer allocated by ReadSection since the image has been relocated in the new buffer
+    //
+    gBS->FreePool (Buffer);
+
     //
     // Flush the instruction cache so the image data is written before we execute it
     //
     InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
     Status = ((EFI_IMAGE_ENTRY_POINT)(UINTN)(ImageContext.EntryPoint)) (NewImageHandle, SystemTable);
-    if (EFI_ERROR (Status)) {
-      gBS->FreePages (MemoryAddress, PageNumber);
-      return Status;
-    }
+    ASSERT_EFI_ERROR (Status);
+
     //
     // Additional step for BootScriptThunk integrity
     //
@@ -910,9 +904,7 @@ InitializeScriptSaveOnS3SaveState (
     // Allocate BootScriptThunkData
     //
     BootScriptThunkData = AllocatePool (sizeof (BOOT_SCRIPT_THUNK_DATA));
-    if (BootScriptThunkData == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
+    ASSERT (BootScriptThunkData != NULL);
 
     BootScriptThunkData->BootScriptThunkBase   = ImageContext.ImageAddress;
     BootScriptThunkData->BootScriptThunkLength = ImageContext.ImageSize;

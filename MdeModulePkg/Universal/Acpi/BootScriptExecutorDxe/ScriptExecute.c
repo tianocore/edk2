@@ -235,7 +235,7 @@ BootScriptExecutorEntryPoint (
       // This is the first-time loaded by DXE core. reload itself to NVS mem
       //
       //
-      // A workarouond: Here we install a dummy handle
+      // A workaround: Here we install a dummy handle
       //
       NewImageHandle = NULL;
       Status = gBS->InstallProtocolInterface (
@@ -244,6 +244,7 @@ BootScriptExecutorEntryPoint (
                   EFI_NATIVE_INTERFACE,
                   NULL
                   );
+      ASSERT_EFI_ERROR (Status);
 
       Status = GetSectionFromAnyFv  (
                  &gEfiCallerIdGuid,
@@ -252,15 +253,14 @@ BootScriptExecutorEntryPoint (
                  (VOID **) &Buffer,
                  &BufferSize
                  );
+      ASSERT_EFI_ERROR (Status);
       ImageContext.Handle    = Buffer;
       ImageContext.ImageRead = PeCoffLoaderImageReadFromMemory;
       //
       // Get information about the image being loaded
       //
       Status = PeCoffLoaderGetImageInfo (&ImageContext);
-      if (EFI_ERROR (Status)) {
-        return Status;
-      }
+      ASSERT_EFI_ERROR (Status);
       Pages = EFI_SIZE_TO_PAGES(BufferSize + ImageContext.SectionAlignment);
       FfsBuffer = 0xFFFFFFFF;
       Status = gBS->AllocatePages (
@@ -269,9 +269,7 @@ BootScriptExecutorEntryPoint (
                     Pages,
                     &FfsBuffer
                     );
-      if (EFI_ERROR (Status)) {
-        return EFI_OUT_OF_RESOURCES;
-      }
+      ASSERT_EFI_ERROR (Status);
       ImageContext.ImageAddress = (PHYSICAL_ADDRESS)(UINTN)FfsBuffer;
       //
       // Align buffer on section boundry
@@ -282,30 +280,26 @@ BootScriptExecutorEntryPoint (
       // Load the image to our new buffer
       //
       Status = PeCoffLoaderLoadImage (&ImageContext);
-      if (EFI_ERROR (Status)) {
-        gBS->FreePages (FfsBuffer, Pages);
-        return Status;
-      }
+      ASSERT_EFI_ERROR (Status);
 
       //
       // Relocate the image in our new buffer
       //
       Status = PeCoffLoaderRelocateImage (&ImageContext);
+      ASSERT_EFI_ERROR (Status);
 
-      if (EFI_ERROR (Status)) {
-        PeCoffLoaderUnloadImage (&ImageContext);
-        gBS->FreePages (FfsBuffer, Pages);
-        return Status;
-      }
+      //
+      // Free the buffer allocated by ReadSection since the image has been relocated in the new buffer
+      //
+      gBS->FreePool (Buffer);
+
       //
       // Flush the instruction cache so the image data is written before we execute it
       //
       InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
       Status = ((EFI_IMAGE_ENTRY_POINT)(UINTN)(ImageContext.EntryPoint)) (NewImageHandle, SystemTable);
-      if (EFI_ERROR (Status)) {
-        gBS->FreePages (FfsBuffer, Pages);
-        return Status;
-      }
+      ASSERT_EFI_ERROR (Status);
+
       //
       // Additional step for BootScript integrity
       // Save BootScriptExecutor image
@@ -334,9 +328,7 @@ BootScriptExecutorEntryPoint (
                       Pages,
                       &BootScriptExecutorBuffer
                       );
-      if (EFI_ERROR (Status)) {
-        return EFI_OUT_OF_RESOURCES;
-      }
+      ASSERT_EFI_ERROR (Status);
 
       EfiBootScriptExecutorVariable = (BOOT_SCRIPT_EXECUTOR_VARIABLE *)(UINTN)BootScriptExecutorBuffer;
       EfiBootScriptExecutorVariable->BootScriptExecutorEntrypoint = (UINTN) S3BootScriptExecutorEntryFunction ;
