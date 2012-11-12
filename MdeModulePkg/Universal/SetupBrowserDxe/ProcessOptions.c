@@ -587,7 +587,7 @@ ProcessOptions (
               (EvaluateExpressionList(OneOfOption->SuppressExpression, FALSE, NULL, NULL) == ExpressFalse)) {
             Suppress = FALSE;
             CopyMem (QuestionValue, &OneOfOption->Value, sizeof (EFI_HII_VALUE));
-            SetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);
+            SetQuestionValue (Selection->FormSet, Selection->Form, Question, GetSetValueWithEditBuffer);
             UpdateStatusBar (Selection, NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
             gST->ConOut->SetAttribute (gST->ConOut, PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND);
             break;
