@@ -332,6 +332,9 @@ IScsiCHAPToSendReq (
   Session     = Conn->Session;
   AuthData    = &Session->AuthData;
   LoginReq    = (ISCSI_LOGIN_REQUEST *) NetbufGetByte (Pdu, 0, 0);
+  if (LoginReq == NULL) {
+    return EFI_PROTOCOL_ERROR;
+  }
   Status      = EFI_SUCCESS;
 
   RspLen      = 2 * ISCSI_CHAP_RSP_LEN + 3;
