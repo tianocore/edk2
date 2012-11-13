@@ -16,40 +16,7 @@
 #ifndef _SHELL_PROTOCOL_HEADER_
 #define _SHELL_PROTOCOL_HEADER_
 
-#include <Uefi.h>
-#include <ShellBase.h>
-
-#include <Guid/ShellVariableGuid.h>
-#include <Guid/ShellMapGuid.h>
-#include <Guid/ShellAliasGuid.h>
-
-#include <Protocol/EfiShell.h>
-#include <Protocol/EfiShellParameters.h>
-#include <Protocol/SimpleFileSystem.h>
-#include <Protocol/DevicePathToText.h>
-#include <Protocol/ComponentName2.h>
-#include <Protocol/LoadedImage.h>
-#include <Protocol/UnicodeCollation.h>
-#include <Protocol/DevicePath.h>
-#include <Protocol/SimpleTextInEx.h>
-
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/BaseLib.h>
-#include <Library/ShellCommandLib.h>
-#include <Library/PrintLib.h>
-#include <Library/DevicePathLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/DebugLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/UefiLib.h>
-#include <Library/SortLib.h>
-#include <Library/PcdLib.h>
-#include <Library/ShellLib.h>
-
-#include "FileHandleWrappers.h"
-#include "ShellEnvVar.h"
-#include "ShellManParser.h"
+#include "Shell.h"
 
 typedef struct {
   LIST_ENTRY                Link;

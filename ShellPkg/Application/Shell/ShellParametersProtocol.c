@@ -13,8 +13,7 @@
 
 **/
 
-#include "ShellParametersProtocol.h"
-#include "ConsoleWrappers.h"
+#include "Shell.h"
 
 /**
   return the next parameter from a command line string;

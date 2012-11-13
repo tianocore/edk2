@@ -14,7 +14,6 @@
 **/
 
 #include "Shell.h"
-#include <Library/FileHandleLib.h>
 
 /**
   Close an open file handle.

@@ -14,19 +14,7 @@
 #ifndef _CONSOLE_LOGGER_HEADER_
 #define _CONSOLE_LOGGER_HEADER_
 
-#include <Uefi.h>
-
-#include <Protocol/SimpleTextOut.h>
-#include <Protocol/EfiShell.h>
-#include <Protocol/EfiShellParameters.h>
-
-#include <Library/DebugLib.h>
-#include <Library/BaseLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/HiiLib.h>
-#include <Library/ShellLib.h>
+#include "Shell.h"
 
 #define CONSOLE_LOGGER_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('c', 'o', 'P', 'D')
 

@@ -19,6 +19,7 @@
 #include <ShellBase.h>
 
 #include <Guid/ShellVariableGuid.h>
+#include <Guid/ShellAliasGuid.h>
 
 #include <Protocol/LoadedImage.h>
 #include <Protocol/SimpleTextOut.h>
@@ -45,6 +46,7 @@
 #include <Library/PrintLib.h>
 #include <Library/HandleParsingLib.h>
 #include <Library/PathLib.h>
+#include <Library/FileHandleLib.h>
 
 #include "ShellParametersProtocol.h"
 #include "ShellProtocol.h"
@@ -52,6 +54,7 @@
 #include "ConsoleLogger.h"
 #include "ShellManParser.h"
 #include "ConsoleWrappers.h"
+#include "FileHandleWrappers.h"
 
 typedef struct {
   LIST_ENTRY        Link;           ///< Standard linked list handler.

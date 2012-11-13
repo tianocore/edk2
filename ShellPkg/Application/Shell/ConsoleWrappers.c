@@ -12,10 +12,6 @@
 
 **/
 
-#include <Uefi.h>
-#include <ShellBase.h>
-
-#include "ConsoleWrappers.h"
 #include "Shell.h"
 
 typedef struct {

@@ -16,26 +16,6 @@
 #ifndef _SHELL_PARAMETERS_PROTOCOL_PROVIDER_HEADER_
 #define _SHELL_PARAMETERS_PROTOCOL_PROVIDER_HEADER_
 
-#include <Uefi.h>
-
-#include <Protocol/SimpleFileSystem.h>
-#include <Protocol/EfiShellParameters.h>
-#include <Protocol/LoadedImage.h>
-#include <Protocol/SimpleTextOut.h>
-#include <Protocol/SimpleTextIn.h>
-
-#include <Guid/ShellVariableGuid.h>
-
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/UefiLib.h>
-#include <Library/DebugLib.h>
-#include <Library/ShellLib.h>
-#include <Library/FileHandleLib.h>
-
-#include "ShellEnvVar.h"
-#include "FileHandleWrappers.h"
 #include "Shell.h"
 
 /**
