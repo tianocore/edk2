@@ -192,6 +192,7 @@ ParseCommandLineToArgs(
   //
   (*Argv) = AllocateZeroPool((Count)*sizeof(CHAR16*));
   if (*Argv == NULL) {
+    SHELL_FREE_NON_NULL(TempParameter);
     return (EFI_OUT_OF_RESOURCES);
   }
 
@@ -207,6 +208,7 @@ ParseCommandLineToArgs(
     (*Argc)++;
   }
   ASSERT(Count >= (*Argc));
+  SHELL_FREE_NON_NULL(TempParameter);
   return (EFI_SUCCESS);
 }
 

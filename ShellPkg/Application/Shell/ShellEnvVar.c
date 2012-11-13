@@ -105,7 +105,7 @@ FreeEnvironmentVariableList(
   }
 
   for ( Node = (ENV_VAR_LIST*)GetFirstNode(List)
-      ; IsListEmpty(List)
+      ; !IsListEmpty(List)
       ; Node = (ENV_VAR_LIST*)GetFirstNode(List)
      ){
     ASSERT(Node != NULL);

@@ -129,7 +129,7 @@ ShellCommandLibDestructor (
   )
 {
   SHELL_COMMAND_INTERNAL_LIST_ENTRY *Node;
-  COMMAND_LIST                      *Node2;
+  ALIAS_LIST                        *Node2;
   SCRIPT_FILE_LIST                  *Node3;
   SHELL_MAP_LIST                    *MapNode;
   //
@@ -144,13 +144,14 @@ ShellCommandLibDestructor (
   }
 
   //
-  // enumerate through the init command list and free all memory
+  // enumerate through the alias list and free all memory
   //
   while (!IsListEmpty (&mAliasList.Link)) {
-    Node2 = (COMMAND_LIST *)GetFirstNode(&mAliasList.Link);
+    Node2 = (ALIAS_LIST *)GetFirstNode(&mAliasList.Link);
     RemoveEntryList(&Node2->Link);
     SHELL_FREE_NON_NULL(Node2->CommandString);
-    FreePool(Node2);
+    SHELL_FREE_NON_NULL(Node2->Alias);
+    SHELL_FREE_NON_NULL(Node2);
     DEBUG_CODE(Node2 = NULL;);
   }
 
