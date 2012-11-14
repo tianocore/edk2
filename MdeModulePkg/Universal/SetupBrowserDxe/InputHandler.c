@@ -1384,10 +1384,17 @@ WaitForKeyStroke (
 {
   EFI_STATUS  Status;
 
-  do {
-    UiWaitForSingleEvent (gST->ConIn->WaitForKey, 0, 0);
+  while (TRUE) {
     Status = gST->ConIn->ReadKeyStroke (gST->ConIn, Key);
-  } while (EFI_ERROR(Status));
+    if (!EFI_ERROR (Status)) {
+      break;
+    }
 
+    if (Status != EFI_NOT_READY) {
+      continue;
+    }
+
+    UiWaitForSingleEvent (gST->ConIn->WaitForKey, 0, 0);
+  }
   return Status;
 }

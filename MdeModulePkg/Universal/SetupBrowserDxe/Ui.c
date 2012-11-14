@@ -3110,25 +3110,33 @@ UiDisplayMenu (
       //
       // Wait for user's selection
       //
-      do {
-        Status = UiWaitForSingleEvent (gST->ConIn->WaitForKey, 0, MinRefreshInterval);
-      } while (Status == EFI_TIMEOUT);
+      while (TRUE) {
+        Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+        if (!EFI_ERROR (Status)) {
+          break;
+        }
 
-      if (Selection->Action == UI_ACTION_REFRESH_FORMSET) {
         //
-        // IFR is updated in Callback of refresh opcode, re-parse it
+        // If we encounter error, continue to read another key in.
         //
-        ControlFlag = CfCheckSelection;
-        Selection->Statement = NULL;
-        break;
+        if (Status != EFI_NOT_READY) {
+          continue;
+        }
+
+        Status = UiWaitForSingleEvent (gST->ConIn->WaitForKey, 0, MinRefreshInterval);
+        ASSERT_EFI_ERROR (Status);
+
+        if (Selection->Action == UI_ACTION_REFRESH_FORMSET) {
+          //
+          // IFR is updated in Callback of refresh opcode, re-parse it
+          //
+          ControlFlag = CfCheckSelection;
+          Selection->Statement = NULL;
+          break;
+        }
       }
 
-      Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-      //
-      // If we encounter error, continue to read another key in.
-      //
-      if (EFI_ERROR (Status)) {
-        ControlFlag = CfReadKey;
+      if (ControlFlag == CfCheckSelection) {
         break;
       }
 
