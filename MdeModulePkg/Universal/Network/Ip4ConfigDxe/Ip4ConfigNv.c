@@ -215,7 +215,7 @@ Ip4ConfigConvertIfrNvDataToDeviceConfigData (
     //
     ZeroMem (&Ip4ConfigInstance->Ip4ConfigCallbackInfo, sizeof (IP4_SETTING_INFO));
 
-    Status = EfiNicIp4ConfigSetInfo (Ip4ConfigInstance, NULL, FALSE);
+    Status = EfiNicIp4ConfigSetInfo (Ip4ConfigInstance, NULL, TRUE);
     if (Status == EFI_NOT_FOUND) {
       return EFI_SUCCESS;
     }
@@ -629,7 +629,7 @@ Ip4DeviceRouteConfig (
         FreePool (NicInfo);
       } else {
         ZeroMem (&Ip4ConfigInstance->Ip4ConfigCallbackInfo, sizeof (IP4_SETTING_INFO));
-        Status = EfiNicIp4ConfigSetInfo (Ip4ConfigInstance, NULL, FALSE);
+        Status = EfiNicIp4ConfigSetInfo (Ip4ConfigInstance, NULL, TRUE);
       }
     }
 

@@ -87,7 +87,8 @@ IP4_CONFIG_INSTANCE        mIp4ConfigTemplate = {
   NULL,
   NULL,
   NULL,
-  TRUE
+  TRUE,
+  FALSE
 };
 
 /**
