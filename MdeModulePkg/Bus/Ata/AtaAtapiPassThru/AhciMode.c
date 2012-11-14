@@ -1908,6 +1908,7 @@ AhciCreateTransferDescriptor (
   VOID                  *Buffer;
 
   UINT32                Capability;
+  UINT32                PortImplementBitMap;
   UINT8                 MaxPortNumber;
   UINT8                 MaxCommandSlotNumber;
   BOOLEAN               Support64Bit;
@@ -1923,12 +1924,20 @@ AhciCreateTransferDescriptor (
   // Collect AHCI controller information
   //
   Capability           = AhciReadReg(PciIo, EFI_AHCI_CAPABILITY_OFFSET);
-  MaxPortNumber        = (UINT8) ((Capability & 0x1F) + 1);
   //
   // Get the number of command slots per port supported by this HBA.
   //
   MaxCommandSlotNumber = (UINT8) (((Capability & 0x1F00) >> 8) + 1);
   Support64Bit         = (BOOLEAN) (((Capability & BIT31) != 0) ? TRUE : FALSE);
+  
+  PortImplementBitMap  = AhciReadReg(PciIo, EFI_AHCI_PI_OFFSET);
+  //
+  // Get the highest bit of implemented ports which decides how many bytes are allocated for recived FIS.
+  //
+  MaxPortNumber        = (UINT8)(UINTN)(HighBitSet32(PortImplementBitMap) + 1);
+  if (MaxPortNumber == 0) {
+    return EFI_DEVICE_ERROR;
+  }
 
   MaxReceiveFisSize    = MaxPortNumber * sizeof (EFI_AHCI_RECEIVED_FIS);
   Status = PciIo->AllocateBuffer (
