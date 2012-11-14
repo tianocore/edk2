@@ -441,7 +441,7 @@ UefiMain (
   }
   if (ShellInfoObject.NewEfiShellProtocol != NULL){
     if (ShellInfoObject.NewEfiShellProtocol->IsRootShell()){
-      ShellInfoObject.NewEfiShellProtocol->SetEnv(L"cwd", L"", TRUE);
+      InternalEfiShellSetEnv(L"cwd", NULL, TRUE);
     }
     CleanUpShellProtocol(ShellInfoObject.NewEfiShellProtocol);
     DEBUG_CODE(ShellInfoObject.NewEfiShellProtocol = NULL;);
