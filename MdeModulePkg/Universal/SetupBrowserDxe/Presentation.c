@@ -1437,6 +1437,15 @@ SetupBrowser (
 
   do {
     //
+    // IFR is updated, force to reparse the IFR binary
+    //
+    if (mHiiPackageListUpdated) {
+      Selection->Action = UI_ACTION_REFRESH_FORMSET;
+      mHiiPackageListUpdated = FALSE;
+      break;
+    }
+
+    //
     // Initialize Selection->Form
     //
     if (Selection->FormId == 0) {
@@ -1475,11 +1484,6 @@ SetupBrowser (
         goto Done;
       }
     }
-
-    //
-    // Reset FormPackage update flag
-    //
-    mHiiPackageListUpdated = FALSE;
 
     //
     // Before display new form, invoke ConfigAccess.Callback() with EFI_BROWSER_ACTION_FORM_OPEN
@@ -1564,11 +1568,6 @@ SetupBrowser (
         gResetRequired = TRUE;
       }
 
-      //
-      // Reset FormPackage update flag
-      //
-      mHiiPackageListUpdated = FALSE;
-
       if ((ConfigAccess != NULL) && 
           ((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) == EFI_IFR_FLAG_CALLBACK) && 
           (Statement->Operand != EFI_IFR_PASSWORD_OP)) {
@@ -1596,17 +1595,6 @@ SetupBrowser (
         if (!EFI_ERROR (Status) && Statement->Operand != EFI_IFR_REF_OP) {
           ProcessCallBackFunction(Selection, Statement, EFI_BROWSER_ACTION_CHANGED, FALSE);
         }
-      }
-
-      //
-      // Check whether Form Package has been updated during Callback
-      //
-      if (mHiiPackageListUpdated && (Selection->Action == UI_ACTION_REFRESH_FORM)) {
-        //
-        // Force to reparse IFR binary of target Formset
-        //
-        mHiiPackageListUpdated = FALSE;
-        Selection->Action = UI_ACTION_REFRESH_FORMSET;
       }
     }
 
