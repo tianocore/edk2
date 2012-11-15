@@ -1,7 +1,7 @@
 /** @file
   This module provide help function for displaying unicode string.
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -314,6 +314,7 @@ CreatePopUp (
   ...
   )
 {
+  EFI_STATUS                       Status;
   VA_LIST                          Args;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *ConOut;
   EFI_SIMPLE_TEXT_OUTPUT_MODE      SavedConsoleMode;
@@ -457,7 +458,19 @@ CreatePopUp (
   // Wait for a keystroke
   //
   if (Key != NULL) {
-    gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
-    gST->ConIn->ReadKeyStroke (gST->ConIn, Key);
+    while (TRUE) {
+      Status = gST->ConIn->ReadKeyStroke (gST->ConIn, Key);
+      if (!EFI_ERROR (Status)) {
+        break;
+      }
+
+      //
+      // If we encounter error, continue to read another key in.
+      //
+      if (Status != EFI_NOT_READY) {
+        continue;
+      }
+      gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
+    }
   }
 }
