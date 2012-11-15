@@ -406,6 +406,7 @@ CreatePopUp (
   ...
   )
 {
+  EFI_STATUS                       Status;
   VA_LIST                          Args;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *ConOut;
   EFI_SIMPLE_TEXT_OUTPUT_MODE      SavedConsoleMode;
@@ -554,7 +555,19 @@ CreatePopUp (
   // Wait for a keystroke
   //
   if (Key != NULL) {
-    gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
-    gST->ConIn->ReadKeyStroke (gST->ConIn, Key);
+    while (TRUE) {
+      Status = gST->ConIn->ReadKeyStroke (gST->ConIn, Key);
+      if (!EFI_ERROR (Status)) {
+        break;
+      }
+
+      //
+      // If we encounter error, continue to read another key in.
+      //
+      if (Status != EFI_NOT_READY) {
+        continue;
+      }
+      gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
+    }
   }
 }
