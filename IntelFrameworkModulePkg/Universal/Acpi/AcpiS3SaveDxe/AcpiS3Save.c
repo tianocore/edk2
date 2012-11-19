@@ -62,18 +62,20 @@ EFI_GUID              mAcpiS3IdtrProfileGuid = {
 };
 
 /**
-  Allocate EfiACPIMemoryNVS below 4G memory address.
+  Allocate memory below 4G memory address.
 
-  This function allocates EfiACPIMemoryNVS below 4G memory address.
+  This function allocates memory below 4G memory address.
 
+  @param  MemoryType   Memory type of memory to allocate.
   @param  Size         Size of memory to allocate.
   
   @return Allocated address for output.
 
 **/
 VOID*
-AllocateAcpiNvsMemoryBelow4G (
-  IN   UINTN   Size
+AllocateMemoryBelow4G (
+  IN UINTN      MemoryType,
+  IN UINTN      Size
   )
 {
   UINTN                 Pages;
@@ -86,7 +88,7 @@ AllocateAcpiNvsMemoryBelow4G (
 
   Status  = gBS->AllocatePages (
                    AllocateMaxAddress,
-                   EfiACPIMemoryNVS,
+                   MemoryType,
                    Pages,
                    &Address
                    );
@@ -204,21 +206,12 @@ S3CreateIdentityMappingPageTables (
     UINT32                                        RegEax;
     UINT32                                        RegEdx;
     UINT8                                         PhysicalAddressBits;
-    EFI_PHYSICAL_ADDRESS                          PageAddress;
-    UINTN                                         IndexOfPml4Entries;
-    UINTN                                         IndexOfPdpEntries;
-    UINTN                                         IndexOfPageDirectoryEntries;
     UINT32                                        NumberOfPml4EntriesNeeded;
     UINT32                                        NumberOfPdpEntriesNeeded;
-    PAGE_MAP_AND_DIRECTORY_POINTER                *PageMapLevel4Entry;
-    PAGE_MAP_AND_DIRECTORY_POINTER                *PageMap;
-    PAGE_MAP_AND_DIRECTORY_POINTER                *PageDirectoryPointerEntry;
-    PAGE_TABLE_ENTRY                              *PageDirectoryEntry;
     EFI_PHYSICAL_ADDRESS                          S3NvsPageTableAddress;
     UINTN                                         TotalPageTableSize;
     VOID                                          *Hob;
     BOOLEAN                                       Page1GSupport;
-    PAGE_TABLE_1G_ENTRY                           *PageDirectory1GEntry;
 
     Page1GSupport = FALSE;
     if (PcdGetBool(PcdUse1GPageTable)) {
@@ -277,70 +270,11 @@ S3CreateIdentityMappingPageTables (
     DEBUG ((EFI_D_ERROR, "TotalPageTableSize - %x pages\n", TotalPageTableSize));
 
     //
-    // By architecture only one PageMapLevel4 exists - so lets allocate storgage for it.
+    // By architecture only one PageMapLevel4 exists - so lets allocate storage for it.
     //
-    S3NvsPageTableAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateAcpiNvsMemoryBelow4G (EFI_PAGES_TO_SIZE(TotalPageTableSize));
+    S3NvsPageTableAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateMemoryBelow4G (EfiReservedMemoryType, EFI_PAGES_TO_SIZE(TotalPageTableSize));
     ASSERT (S3NvsPageTableAddress != 0);
-    PageMap = (PAGE_MAP_AND_DIRECTORY_POINTER *)(UINTN)S3NvsPageTableAddress;
-    S3NvsPageTableAddress += SIZE_4KB;
-
-    PageMapLevel4Entry = PageMap;
-    PageAddress        = 0;
-    for (IndexOfPml4Entries = 0; IndexOfPml4Entries < NumberOfPml4EntriesNeeded; IndexOfPml4Entries++, PageMapLevel4Entry++) {
-      //
-      // Each PML4 entry points to a page of Page Directory Pointer entires.
-      // So lets allocate space for them and fill them in in the IndexOfPdpEntries loop.
-      //
-      PageDirectoryPointerEntry = (PAGE_MAP_AND_DIRECTORY_POINTER *)(UINTN)S3NvsPageTableAddress;
-      S3NvsPageTableAddress += SIZE_4KB;
-      //
-      // Make a PML4 Entry
-      //
-      PageMapLevel4Entry->Uint64 = (UINT64)(UINTN)PageDirectoryPointerEntry;
-      PageMapLevel4Entry->Bits.ReadWrite = 1;
-      PageMapLevel4Entry->Bits.Present = 1;
-    
-      if (Page1GSupport) {
-        PageDirectory1GEntry = (PAGE_TABLE_1G_ENTRY *)(UINTN)PageDirectoryPointerEntry;
-    
-        for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectory1GEntry++, PageAddress += SIZE_1GB) {
-          //
-          // Fill in the Page Directory entries
-          //
-          PageDirectory1GEntry->Uint64 = (UINT64)PageAddress;
-          PageDirectory1GEntry->Bits.ReadWrite = 1;
-          PageDirectory1GEntry->Bits.Present = 1;
-          PageDirectory1GEntry->Bits.MustBe1 = 1;
-        }
-      } else {
-        for (IndexOfPdpEntries = 0; IndexOfPdpEntries < NumberOfPdpEntriesNeeded; IndexOfPdpEntries++, PageDirectoryPointerEntry++) {
-          //
-          // Each Directory Pointer entries points to a page of Page Directory entires.
-          // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
-          //       
-          PageDirectoryEntry = (PAGE_TABLE_ENTRY *)(UINTN)S3NvsPageTableAddress;
-          S3NvsPageTableAddress += SIZE_4KB;
-      
-          //
-          // Fill in a Page Directory Pointer Entries
-          //
-          PageDirectoryPointerEntry->Uint64 = (UINT64)(UINTN)PageDirectoryEntry;
-          PageDirectoryPointerEntry->Bits.ReadWrite = 1;
-          PageDirectoryPointerEntry->Bits.Present = 1;
-      
-          for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PageAddress += SIZE_2MB) {
-            //
-            // Fill in the Page Directory entries
-            //
-            PageDirectoryEntry->Uint64 = (UINT64)PageAddress;
-            PageDirectoryEntry->Bits.ReadWrite = 1;
-            PageDirectoryEntry->Bits.Present = 1;
-            PageDirectoryEntry->Bits.MustBe1 = 1;
-          }
-        }
-      }
-    }
-    return (EFI_PHYSICAL_ADDRESS) (UINTN) PageMap;
+    return S3NvsPageTableAddress;
   } else {
     //
     // If DXE is running 32-bit mode, no need to establish page table.
@@ -414,7 +348,7 @@ S3Ready (
   }
   AlreadyEntered = TRUE;
 
-  AcpiS3Context = AllocateAcpiNvsMemoryBelow4G (sizeof(*AcpiS3Context));
+  AcpiS3Context = AllocateMemoryBelow4G (EfiReservedMemoryType, sizeof(*AcpiS3Context));
   ASSERT (AcpiS3Context != NULL);
   AcpiS3ContextBuffer = (EFI_PHYSICAL_ADDRESS)(UINTN)AcpiS3Context;
 
@@ -424,7 +358,7 @@ S3Ready (
   AcpiS3Context->AcpiFacsTable = (EFI_PHYSICAL_ADDRESS)(UINTN)FindAcpiFacsTable ();
   ASSERT (AcpiS3Context->AcpiFacsTable != 0);
 
-  IdtGate = AllocateAcpiNvsMemoryBelow4G (sizeof(IA32_IDT_GATE_DESCRIPTOR) * 0x100 + sizeof(IA32_DESCRIPTOR));
+  IdtGate = AllocateMemoryBelow4G (EfiReservedMemoryType, sizeof(IA32_IDT_GATE_DESCRIPTOR) * 0x100 + sizeof(IA32_DESCRIPTOR));
   Idtr = (IA32_DESCRIPTOR *)(IdtGate + 0x100);
   Idtr->Base  = (UINTN)IdtGate;
   Idtr->Limit = (UINT16)(sizeof(IA32_IDT_GATE_DESCRIPTOR) * 0x100 - 1);
@@ -449,13 +383,13 @@ S3Ready (
   // Allocate stack
   //
   AcpiS3Context->BootScriptStackSize = PcdGet32 (PcdS3BootScriptStackSize);
-  AcpiS3Context->BootScriptStackBase = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateAcpiNvsMemoryBelow4G (PcdGet32 (PcdS3BootScriptStackSize));
+  AcpiS3Context->BootScriptStackBase = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateMemoryBelow4G (EfiReservedMemoryType, PcdGet32 (PcdS3BootScriptStackSize));
   ASSERT (AcpiS3Context->BootScriptStackBase != 0);
 
   //
   // Allocate a code buffer < 4G for S3 debug to load external code, set invalid code instructions in it.
   //
-  AcpiS3Context->S3DebugBufferAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateAcpiNvsMemoryBelow4G (EFI_PAGE_SIZE);
+  AcpiS3Context->S3DebugBufferAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateMemoryBelow4G (EfiReservedMemoryType, EFI_PAGE_SIZE);
   SetMem ((VOID *)(UINTN)AcpiS3Context->S3DebugBufferAddress, EFI_PAGE_SIZE, 0xff);
 
   DEBUG((EFI_D_INFO, "AcpiS3Context: AcpiFacsTable is 0x%8x\n", AcpiS3Context->AcpiFacsTable));

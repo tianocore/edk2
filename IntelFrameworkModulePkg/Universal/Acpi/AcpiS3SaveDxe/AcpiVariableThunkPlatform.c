@@ -1,7 +1,7 @@
 /** @file
   This is an implementation of the AcpiVariable platform field for ECP platform.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -47,18 +47,20 @@ GLOBAL_REMOVE_IF_UNREFERENCED
 ACPI_VARIABLE_SET_COMPATIBILITY               *mAcpiVariableSetCompatibility = NULL;
 
 /**
-  Allocate EfiACPIMemoryNVS below 4G memory address.
+  Allocate memory below 4G memory address.
 
-  This function allocates EfiACPIMemoryNVS below 4G memory address.
+  This function allocates memory below 4G memory address.
 
+  @param  MemoryType   Memory type of memory to allocate.
   @param  Size         Size of memory to allocate.
   
   @return Allocated address for output.
 
 **/
 VOID*
-AllocateAcpiNvsMemoryBelow4G (
-  IN   UINTN   Size
+AllocateMemoryBelow4G (
+  IN UINTN      MemoryType,
+  IN UINTN      Size
   );
 
 /**
@@ -81,7 +83,7 @@ S3ReadyThunkPlatform (
   //
   // Allocate ACPI reserved memory under 4G
   //
-  AcpiMemoryBase = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateAcpiNvsMemoryBelow4G (PcdGet32 (PcdS3AcpiReservedMemorySize));
+  AcpiMemoryBase = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateMemoryBelow4G (EfiReservedMemoryType, PcdGet32 (PcdS3AcpiReservedMemorySize));
   ASSERT (AcpiMemoryBase != 0);
   AcpiMemorySize = PcdGet32 (PcdS3AcpiReservedMemorySize);
 
@@ -151,7 +153,7 @@ InstallAcpiS3SaveThunk (
     // Allocate/initialize the compatible version of Acpi Variable Set since Framework chipset/platform 
     // driver need this variable
     //
-    mAcpiVariableSetCompatibility = AllocateAcpiNvsMemoryBelow4G (sizeof(ACPI_VARIABLE_SET_COMPATIBILITY));
+    mAcpiVariableSetCompatibility = AllocateMemoryBelow4G (EfiACPIMemoryNVS, sizeof(ACPI_VARIABLE_SET_COMPATIBILITY));
     Status = gRT->SetVariable (
                     ACPI_GLOBAL_VARIABLE,
                     &gEfiAcpiVariableCompatiblityGuid,
