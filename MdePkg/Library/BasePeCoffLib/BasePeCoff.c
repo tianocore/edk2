@@ -1094,7 +1094,6 @@ PeCoffLoaderLoadImage (
   UINTN                                 Index;
   CHAR8                                 *Base;
   CHAR8                                 *End;
-  CHAR8                                 *MaxEnd;
   EFI_IMAGE_DATA_DIRECTORY              *DirectoryEntry;
   EFI_IMAGE_DEBUG_DIRECTORY_ENTRY       *DebugEntry;
   UINTN                                 Size;
@@ -1220,7 +1219,7 @@ PeCoffLoaderLoadImage (
   // Load each section of the image
   //
   Section = FirstSection;
-  for (Index = 0, MaxEnd = NULL; Index < NumberOfSections; Index++) {
+  for (Index = 0; Index < NumberOfSections; Index++) {
     //
     // Read the section
     //
@@ -1249,10 +1248,6 @@ PeCoffLoaderLoadImage (
     if (ImageContext->IsTeImage) {
       Base = (CHAR8 *)((UINTN) Base + sizeof (EFI_TE_IMAGE_HEADER) - (UINTN)Hdr.Te->StrippedSize);
       End  = (CHAR8 *)((UINTN) End +  sizeof (EFI_TE_IMAGE_HEADER) - (UINTN)Hdr.Te->StrippedSize);
-    }
-
-    if (End > MaxEnd) {
-      MaxEnd = End;
     }
 
     if (Section->SizeOfRawData > 0) {
