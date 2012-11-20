@@ -18,6 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 #include <FrameworkDxe.h>
+#include <IndustryStandard\Pci.h>
 
 #include <Guid/SmBios.h>
 #include <Guid/Acpi.h>
@@ -133,6 +134,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define LEGACY_PCI_TRACE_00F LEGACY_PCI_TRACE + 0x0F
 
 #define BDA_VIDEO_MODE      0x49
+
+#define IDE_PI_REGISTER_PNE     BIT0
+#define IDE_PI_REGISTER_SNE     BIT2
 
 typedef struct {
   UINTN   PciSegment;

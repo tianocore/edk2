@@ -268,9 +268,9 @@ InitLegacyIdeController (
   )
 {
   EFI_PCI_IO_PROTOCOL               *PciIo;
-  UINT8                             Pi;
   UINT32                            IOBarClear;
   EFI_STATUS                        Status;
+  PCI_TYPE00                        PciData;
 
   //
   // If the IDE channel is in compatibility (legacy) mode, remove all
@@ -279,21 +279,38 @@ InitLegacyIdeController (
   // and has PCI I/O resources allocated
   //
   Status = gBS->HandleProtocol (
-                  IdeController,
-                  &gEfiPciIoProtocolGuid,
-                  (VOID **) &PciIo
+                  IdeController, 
+                  &gEfiPciIoProtocolGuid, 
+                  &PciIo
                   );
-  if (!EFI_ERROR (Status)) {
-    IOBarClear = 0x00;
-    PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, 0x09, 1, &Pi);
-    if ((Pi & 0x01) == 0) {
-      PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, 0x10, 1, &IOBarClear);
-      PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, 0x14, 1, &IOBarClear);
-    }
-    if ((Pi & 0x04) == 0) {
-      PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, 0x18, 1, &IOBarClear);
-      PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, 0x1C, 1, &IOBarClear);
-    }
+  if (EFI_ERROR (Status)) {
+    return ;
+  }
+
+  Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, 0, sizeof (PciData), &PciData);
+  if (EFI_ERROR (Status)) {
+    return ;
+  }
+
+  //
+  // Check whether this is IDE
+  //
+  if ((PciData.Hdr.ClassCode[2] != PCI_CLASS_MASS_STORAGE) ||
+      (PciData.Hdr.ClassCode[1] != PCI_CLASS_MASS_STORAGE_IDE)) {
+    return ;
+  }
+
+  //
+  // Clear bar for legacy IDE
+  //
+  IOBarClear = 0x00;
+  if ((PciData.Hdr.ClassCode[0] & IDE_PI_REGISTER_PNE) == 0) {
+    PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, 0x10, 1, &IOBarClear);
+    PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, 0x14, 1, &IOBarClear);
+  }
+  if ((PciData.Hdr.ClassCode[0] & IDE_PI_REGISTER_SNE) == 0) {
+    PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, 0x18, 1, &IOBarClear);
+    PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, 0x1C, 1, &IOBarClear);
   }
 
   return ;
