@@ -1,7 +1,7 @@
 /** @file
   GUIDs and definitions used for Common Platform Error Record.
 
-  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -20,7 +20,7 @@
 
 #pragma pack(1)
 
-#define EFI_ERROR_RECORD_SIGNATURE_START   EFI_SIGNATURE_32('C', 'P', 'E', 'R')
+#define EFI_ERROR_RECORD_SIGNATURE_START   SIGNATURE_32('C', 'P', 'E', 'R')
 #define EFI_ERROR_RECORD_SIGNATURE_END     0xFFFFFFFF
 
 ///
