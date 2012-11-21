@@ -526,7 +526,9 @@ VerifyCounterBasedPayload (
   EFI_CERT_BLOCK_RSA_2048_SHA256  *CertBlock;
   UINT8                           Digest[SHA256_DIGEST_SIZE];
   VOID                            *Rsa;
-
+  UINTN                           PayloadSize;
+  
+  PayloadSize = DataSize - AUTHINFO_SIZE;
   Rsa         = NULL;
   CertData    = NULL;
   CertBlock   = NULL;
@@ -558,7 +560,14 @@ VerifyCounterBasedPayload (
   if (!Status) {
     goto Done;
   }
-  Status  = Sha256Update (mHashCtx, Data + AUTHINFO_SIZE, (UINTN) (DataSize - AUTHINFO_SIZE));
+  Status  = Sha256Update (mHashCtx, Data + AUTHINFO_SIZE, PayloadSize);
+  if (!Status) {
+    goto Done;
+  }
+  //
+  // Hash Size.
+  //
+  Status  = Sha256Update (mHashCtx, &PayloadSize, sizeof (UINTN));
   if (!Status) {
     goto Done;
   }
@@ -1099,6 +1108,7 @@ ProcessVarWithKek (
   @return EFI_INVALID_PARAMETER           Invalid parameter.
   @return EFI_WRITE_PROTECTED             Variable is write-protected and needs authentication with
                                           EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS set.
+  @return EFI_OUT_OF_RESOURCES            The Database to save the public key is full.
   @return EFI_SECURITY_VIOLATION          The variable is with EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS
                                           set, but the AuthInfo does NOT pass the validation
                                           check carried out by the firmware.
@@ -1253,7 +1263,7 @@ ProcessVariable (
     //
     KeyIndex = AddPubKeyInStore (PubKey);
     if (KeyIndex == 0) {
-      return EFI_SECURITY_VIOLATION;
+      return EFI_OUT_OF_RESOURCES;
     }
   }
 
@@ -2155,13 +2165,13 @@ VerifyTimeBasedPayload (
     //
     // Delete signer's certificates when delete the common authenticated variable.
     //
-    if ((PayloadSize == 0) && (Variable->CurrPtr != NULL)) {
+    if ((PayloadSize == 0) && (Variable->CurrPtr != NULL) && ((Attributes & EFI_VARIABLE_APPEND_WRITE) == 0)) {
       Status = DeleteCertsFromDb (VariableName, VendorGuid);
       if (EFI_ERROR (Status)) {
         VerifyStatus = FALSE;
         goto Exit;
       }
-    } else if (Variable->CurrPtr == NULL) {
+    } else if (Variable->CurrPtr == NULL && PayloadSize != 0) {
       //
       // Insert signer's certificates when adding a new common authenticated variable.
       //
