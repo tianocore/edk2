@@ -281,7 +281,7 @@ InitLegacyIdeController (
   Status = gBS->HandleProtocol (
                   IdeController, 
                   &gEfiPciIoProtocolGuid, 
-                  &PciIo
+                  (VOID **)&PciIo
                   );
   if (EFI_ERROR (Status)) {
     return ;
