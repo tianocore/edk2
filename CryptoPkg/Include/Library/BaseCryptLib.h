@@ -1498,7 +1498,7 @@ RsaPkcs1Verify (
   IN  VOID         *RsaContext,
   IN  CONST UINT8  *MessageHash,
   IN  UINTN        HashSize,
-  IN  UINT8        *Signature,
+  IN  CONST UINT8  *Signature,
   IN  UINTN        SigSize
   );
 

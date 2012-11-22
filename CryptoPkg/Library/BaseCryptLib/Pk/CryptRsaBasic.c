@@ -285,19 +285,23 @@ RsaPkcs1Verify (
   IN  VOID         *RsaContext,
   IN  CONST UINT8  *MessageHash,
   IN  UINTN        HashSize,
-  IN  UINT8        *Signature,
+  IN  CONST UINT8  *Signature,
   IN  UINTN        SigSize
   )
 {
   INTN     Length;
+  UINT8    *DecryptedSigature;
 
   //
   // Check input parameters.
   //
-  if (RsaContext == NULL || MessageHash == NULL || Signature == NULL || SigSize > INT_MAX) {
+  if (RsaContext == NULL || MessageHash == NULL || Signature == NULL) {
     return FALSE;
   }
 
+  if (SigSize > INT_MAX || SigSize == 0) {
+    return FALSE;
+  }
   
   //
   // Check for unsupported hash size:
@@ -306,14 +310,22 @@ RsaPkcs1Verify (
   if (HashSize != MD5_DIGEST_SIZE && HashSize != SHA1_DIGEST_SIZE && HashSize != SHA256_DIGEST_SIZE) {
     return FALSE;
   }
-  
+
+  //
+  // Prepare buffer to store decrypted signature.
+  //
+  DecryptedSigature = (UINT8 *) malloc (SigSize);
+  if (DecryptedSigature == NULL) {
+    return FALSE;
+  }
+
   //
   // RSA PKCS#1 Signature Decoding using OpenSSL RSA Decryption with Public Key
   //
   Length = RSA_public_decrypt (
              (UINT32) SigSize,
              Signature,
-             Signature,
+             DecryptedSigature,
              RsaContext,
              RSA_PKCS1_PADDING
              );
@@ -324,6 +336,7 @@ RsaPkcs1Verify (
   //       Ignore more strict length checking here.
   //
   if (Length < (INTN) HashSize) {
+    free (DecryptedSigature);
     return FALSE;
   }
 
@@ -337,15 +350,17 @@ RsaPkcs1Verify (
   //       Then Memory Comparing should skip the DER value of the underlying SEQUENCE
   //       type and AlgorithmIdentifier.
   //
-  if (CompareMem (MessageHash, Signature + Length - HashSize, HashSize) == 0) {
+  if (CompareMem (MessageHash, DecryptedSigature + Length - HashSize, HashSize) == 0) {
     //
     // Valid RSA PKCS#1 Signature
     //
+    free (DecryptedSigature);
     return TRUE;
   } else {
     //
     // Failed to verification
     //
+    free (DecryptedSigature);
     return FALSE;
   }
 }
