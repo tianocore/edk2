@@ -1662,14 +1662,18 @@ BiosVideoCheckForVbe (
     CurrentModeData->PixelBitMask.GreenMask = ((UINT32) CurrentModeData->Green.Mask) << CurrentModeData->Green.Position;
     CurrentModeData->PixelBitMask.BlueMask = ((UINT32) CurrentModeData->Blue.Mask) << CurrentModeData->Blue.Position;
     CurrentModeData->PixelBitMask.ReservedMask = ((UINT32) CurrentModeData->Reserved.Mask) << CurrentModeData->Reserved.Position;
-    CurrentModeData->FrameBufferSize = BiosVideoPrivate->VbeInformationBlock->TotalMemory * 64 * 1024;
 
     CurrentModeData->LinearFrameBuffer = (VOID *) (UINTN)BiosVideoPrivate->VbeModeInformationBlock->PhysBasePtr;
     CurrentModeData->HorizontalResolution = BiosVideoPrivate->VbeModeInformationBlock->XResolution;
     CurrentModeData->VerticalResolution = BiosVideoPrivate->VbeModeInformationBlock->YResolution;
 
     CurrentModeData->BitsPerPixel  = BiosVideoPrivate->VbeModeInformationBlock->BitsPerPixel;
-
+    CurrentModeData->FrameBufferSize = CurrentModeData->BytesPerScanLine * CurrentModeData->VerticalResolution;
+    //
+    // Make sure the FrameBufferSize does not exceed the max available frame buffer size reported by VEB.
+    //
+    ASSERT (CurrentModeData->FrameBufferSize <= BiosVideoPrivate->VbeInformationBlock->TotalMemory * 64 * 1024);
+    
     BiosVideoPrivate->ModeData = ModeBuffer;
   }
   //
@@ -2067,12 +2071,8 @@ BiosVideoGraphicsOutputSetMode (
   CopyMem (&(This->Mode->Info->PixelInformation), &(ModeData->PixelBitMask), sizeof (ModeData->PixelBitMask));
   This->Mode->Info->PixelsPerScanLine =  (ModeData->BytesPerScanLine * 8) / ModeData->BitsPerPixel;
   This->Mode->SizeOfInfo = sizeof(EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
-
-  //
-  // Frame BufferSize remain unchanged
-  //
-  This->Mode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS) (UINTN) ModeData->LinearFrameBuffer;
   This->Mode->FrameBufferSize = ModeData->FrameBufferSize;
+  This->Mode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS) (UINTN) ModeData->LinearFrameBuffer;
 
   BiosVideoPrivate->HardwareNeedsStarting = FALSE;
 
