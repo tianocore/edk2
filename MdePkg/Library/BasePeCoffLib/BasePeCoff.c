@@ -1111,6 +1111,7 @@ PeCoffLoaderLoadImage (
   EFI_IMAGE_RESOURCE_DIRECTORY_STRING   *ResourceDirectoryString;
   EFI_IMAGE_RESOURCE_DATA_ENTRY         *ResourceDataEntry;
   CHAR16                                *String;
+  UINT32                                Offset;
 
 
   ASSERT (ImageContext != NULL);
@@ -1482,18 +1483,26 @@ PeCoffLoaderLoadImage (
       //
       // Use PE32 offset
       //
+      NumberOfRvaAndSizes = Hdr.Pe32->OptionalHeader.NumberOfRvaAndSizes;
       DirectoryEntry = (EFI_IMAGE_DATA_DIRECTORY *)&Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_RESOURCE];
     } else {
       //
       // Use PE32+ offset
       //
+      NumberOfRvaAndSizes = Hdr.Pe32Plus->OptionalHeader.NumberOfRvaAndSizes;
       DirectoryEntry = (EFI_IMAGE_DATA_DIRECTORY *)&Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_RESOURCE];
     }
 
-    if (DirectoryEntry->Size != 0) {
+    if (NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_RESOURCE && DirectoryEntry->Size != 0) {
       Base = PeCoffLoaderImageAddress (ImageContext, DirectoryEntry->VirtualAddress);
       if (Base != NULL) {
         ResourceDirectory = (EFI_IMAGE_RESOURCE_DIRECTORY *) Base;
+        Offset = sizeof (EFI_IMAGE_RESOURCE_DIRECTORY) + sizeof (EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY) * 
+               (ResourceDirectory->NumberOfNamedEntries + ResourceDirectory->NumberOfIdEntries);
+        if (Offset > DirectoryEntry->Size) {
+          ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+          return RETURN_UNSUPPORTED;
+        }
         ResourceDirectoryEntry = (EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY *) (ResourceDirectory + 1);
 
         for (Index = 0; Index < ResourceDirectory->NumberOfNamedEntries; Index++) {
@@ -1502,7 +1511,8 @@ PeCoffLoaderLoadImage (
             // Check the ResourceDirectoryEntry->u1.s.NameOffset before use it.
             //
             if (ResourceDirectoryEntry->u1.s.NameOffset >= DirectoryEntry->Size) {
-              continue;
+              ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+              return RETURN_UNSUPPORTED;
             }
             ResourceDirectoryString = (EFI_IMAGE_RESOURCE_DIRECTORY_STRING *) (Base + ResourceDirectoryEntry->u1.s.NameOffset);
             String = &ResourceDirectoryString->String[0];
@@ -1518,14 +1528,34 @@ PeCoffLoaderLoadImage (
                 //
                 // Move to next level - resource Name
                 //
+                if (ResourceDirectoryEntry->u2.s.OffsetToDirectory >= DirectoryEntry->Size) {
+                  ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+                  return RETURN_UNSUPPORTED;
+                }
                 ResourceDirectory = (EFI_IMAGE_RESOURCE_DIRECTORY *) (Base + ResourceDirectoryEntry->u2.s.OffsetToDirectory);
+                Offset = ResourceDirectoryEntry->u2.s.OffsetToDirectory + sizeof (EFI_IMAGE_RESOURCE_DIRECTORY) + 
+                         sizeof (EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY) * (ResourceDirectory->NumberOfNamedEntries + ResourceDirectory->NumberOfIdEntries);
+                if (Offset > DirectoryEntry->Size) {
+                  ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+                  return RETURN_UNSUPPORTED;
+                }
                 ResourceDirectoryEntry = (EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY *) (ResourceDirectory + 1);
 
                 if (ResourceDirectoryEntry->u2.s.DataIsDirectory) {
                   //
                   // Move to next level - resource Language
                   //
+                  if (ResourceDirectoryEntry->u2.s.OffsetToDirectory >= DirectoryEntry->Size) {
+                    ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+                    return RETURN_UNSUPPORTED;
+                  }
                   ResourceDirectory = (EFI_IMAGE_RESOURCE_DIRECTORY *) (Base + ResourceDirectoryEntry->u2.s.OffsetToDirectory);
+                  Offset = ResourceDirectoryEntry->u2.s.OffsetToDirectory + sizeof (EFI_IMAGE_RESOURCE_DIRECTORY) + 
+                           sizeof (EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY) * (ResourceDirectory->NumberOfNamedEntries + ResourceDirectory->NumberOfIdEntries);
+                  if (Offset > DirectoryEntry->Size) {
+                    ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+                    return RETURN_UNSUPPORTED;
+                  }
                   ResourceDirectoryEntry = (EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY *) (ResourceDirectory + 1);
                 }
               }
@@ -1534,6 +1564,10 @@ PeCoffLoaderLoadImage (
               // Now it ought to be resource Data
               //
               if (!ResourceDirectoryEntry->u2.s.DataIsDirectory) {
+                if (ResourceDirectoryEntry->u2.OffsetToData >= DirectoryEntry->Size) {
+                  ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+                  return RETURN_UNSUPPORTED;
+                }
                 ResourceDataEntry = (EFI_IMAGE_RESOURCE_DATA_ENTRY *) (Base + ResourceDirectoryEntry->u2.OffsetToData);
                 ImageContext->HiiResourceData = (PHYSICAL_ADDRESS) (UINTN) PeCoffLoaderImageAddress (ImageContext, ResourceDataEntry->OffsetToData);
                 break;
