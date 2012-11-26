@@ -1672,7 +1672,7 @@ BiosVideoCheckForVbe (
     //
     // Make sure the FrameBufferSize does not exceed the max available frame buffer size reported by VEB.
     //
-    ASSERT (CurrentModeData->FrameBufferSize <= BiosVideoPrivate->VbeInformationBlock->TotalMemory * 64 * 1024);
+    ASSERT (CurrentModeData->FrameBufferSize <= (UINTN)(BiosVideoPrivate->VbeInformationBlock->TotalMemory * 64 * 1024));
     
     BiosVideoPrivate->ModeData = ModeBuffer;
   }
