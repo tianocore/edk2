@@ -42,6 +42,16 @@ QEMU_VIDEO_CARD gQemuVideoCardList[] = {
         QEMU_VIDEO_CIRRUS_5446,
         L"Cirrus 5446"
     },{
+        0x1234,
+        0x1111,
+        QEMU_VIDEO_BOCHS,
+        L"QEMU Standard VGA"
+    },{
+        0x1b36,
+        0x0100,
+        QEMU_VIDEO_BOCHS,
+        L"QEMU QXL VGA"
+    },{
         0 /* end of list */
     }
 };
@@ -197,7 +207,7 @@ QemuVideoControllerDriverStart (
   ACPI_ADR_DEVICE_PATH            AcpiDeviceNode;
   PCI_TYPE00                      Pci;
   QEMU_VIDEO_CARD                 *Card;
-  
+
   PciAttributesSaved = FALSE;
   //
   // Allocate Private context data for GOP inteface.
@@ -276,6 +286,19 @@ QemuVideoControllerDriverStart (
   }
 
   //
+  // Check if accessing the bochs interface works.
+  //
+  if (Private->Variant == QEMU_VIDEO_BOCHS) {
+    UINT16 BochsId;
+    BochsId = BochsRead(Private, VBE_DISPI_INDEX_ID);
+    if ((BochsId & 0xFFF0) != VBE_DISPI_ID0) {
+      DEBUG ((EFI_D_INFO, "QemuVideo: BochsID mismatch (got 0x%x)\n", BochsId));
+      Status = EFI_DEVICE_ERROR;
+      goto Error;
+    }
+  }
+
+  //
   // Get ParentDevicePath
   //
   Status = gBS->HandleProtocol (
@@ -335,6 +358,9 @@ QemuVideoControllerDriverStart (
   case QEMU_VIDEO_CIRRUS_5430:
   case QEMU_VIDEO_CIRRUS_5446:
     Status = QemuVideoCirrusModeSetup (Private);
+    break;
+  case QEMU_VIDEO_BOCHS:
+    Status = QemuVideoBochsModeSetup (Private);
     break;
   default:
     ASSERT (FALSE);
@@ -753,6 +779,60 @@ InitializeCirrusGraphicsMode (
   outw (Private, GRAPH_ADDRESS_REGISTER, 0x000a);
   outw (Private, GRAPH_ADDRESS_REGISTER, 0x000b);
   outb (Private, DAC_PIXEL_MASK_REGISTER, 0xff);
+
+  SetDefaultPalette (Private);
+  ClearScreen (Private);
+}
+
+VOID
+BochsWrite (
+  QEMU_VIDEO_PRIVATE_DATA  *Private,
+  UINT16                   Reg,
+  UINT16                   Data
+  )
+{
+  outw (Private, VBE_DISPI_IOPORT_INDEX, Reg);
+  outw (Private, VBE_DISPI_IOPORT_DATA,  Data);
+}
+
+UINT16
+BochsRead (
+  QEMU_VIDEO_PRIVATE_DATA  *Private,
+  UINT16                   Reg
+  )
+{
+  UINT16 Data;
+
+  outw (Private, VBE_DISPI_IOPORT_INDEX, Reg);
+  Data = inw (Private, VBE_DISPI_IOPORT_DATA);
+  return Data;
+}
+
+VOID
+InitializeBochsGraphicsMode (
+  QEMU_VIDEO_PRIVATE_DATA  *Private,
+  QEMU_VIDEO_BOCHS_MODES  *ModeData
+  )
+{
+  DEBUG ((EFI_D_INFO, "InitializeBochsGraphicsMode: %dx%d @ %d\n",
+          ModeData->Width, ModeData->Height, ModeData->ColorDepth));
+
+  /* unblank */
+  outb (Private, ATT_ADDRESS_REGISTER, 0x20);
+
+  BochsWrite (Private, VBE_DISPI_INDEX_ENABLE,      0);
+  BochsWrite (Private, VBE_DISPI_INDEX_BANK,        0);
+  BochsWrite (Private, VBE_DISPI_INDEX_X_OFFSET,    0);
+  BochsWrite (Private, VBE_DISPI_INDEX_Y_OFFSET,    0);
+
+  BochsWrite (Private, VBE_DISPI_INDEX_BPP,         (UINT16) ModeData->ColorDepth);
+  BochsWrite (Private, VBE_DISPI_INDEX_XRES,        (UINT16) ModeData->Width);
+  BochsWrite (Private, VBE_DISPI_INDEX_VIRT_WIDTH,  (UINT16) ModeData->Width);
+  BochsWrite (Private, VBE_DISPI_INDEX_YRES,        (UINT16) ModeData->Height);
+  BochsWrite (Private, VBE_DISPI_INDEX_VIRT_HEIGHT, (UINT16) ModeData->Height);
+
+  BochsWrite (Private, VBE_DISPI_INDEX_ENABLE,
+              VBE_DISPI_ENABLED | VBE_DISPI_LFB_ENABLED);
 
   SetDefaultPalette (Private);
   ClearScreen (Private);

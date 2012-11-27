@@ -186,6 +186,9 @@ Routine Description:
   case QEMU_VIDEO_CIRRUS_5446:
     InitializeCirrusGraphicsMode (Private, &QemuVideoCirrusModes[ModeData->ModeNumber]);
     break;
+  case QEMU_VIDEO_BOCHS:
+    InitializeBochsGraphicsMode (Private, &QemuVideoBochsModes[ModeData->ModeNumber]);
+    break;
   default:
     ASSERT (FALSE);
     gBS->FreePool (Private->LineBuffer);

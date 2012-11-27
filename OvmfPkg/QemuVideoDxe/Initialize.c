@@ -201,3 +201,55 @@ QemuVideoCirrusModeSetup (
   return EFI_SUCCESS;
 }
 
+///
+/// Table of supported video modes
+///
+QEMU_VIDEO_BOCHS_MODES  QemuVideoBochsModes[] = {
+  {  640, 480, 32 },
+  {  800, 600, 32 },
+  { 1024, 768, 24 },
+};
+
+#define QEMU_VIDEO_BOCHS_MODE_COUNT \
+  (sizeof (QemuVideoBochsModes) / sizeof (QemuVideoBochsModes[0]))
+
+EFI_STATUS
+QemuVideoBochsModeSetup (
+  QEMU_VIDEO_PRIVATE_DATA  *Private
+  )
+{
+  UINT32                                 Index;
+  QEMU_VIDEO_MODE_DATA                   *ModeData;
+  QEMU_VIDEO_BOCHS_MODES                 *VideoMode;
+
+  //
+  // Setup Video Modes
+  //
+  Private->ModeData = AllocatePool (
+                        sizeof (Private->ModeData[0]) * QEMU_VIDEO_BOCHS_MODE_COUNT
+                        );
+  ModeData = Private->ModeData;
+  VideoMode = &QemuVideoBochsModes[0];
+  for (Index = 0; Index < QEMU_VIDEO_BOCHS_MODE_COUNT; Index ++) {
+    ModeData->ModeNumber = Index;
+    ModeData->HorizontalResolution          = VideoMode->Width;
+    ModeData->VerticalResolution            = VideoMode->Height;
+    ModeData->ColorDepth                    = VideoMode->ColorDepth;
+    ModeData->RefreshRate                   = 60;
+    DEBUG ((EFI_D_INFO,
+      "Adding Bochs Video Mode %d: %dx%d, %d-bit, %d Hz\n",
+      ModeData->ModeNumber,
+      ModeData->HorizontalResolution,
+      ModeData->VerticalResolution,
+      ModeData->ColorDepth,
+      ModeData->RefreshRate
+      ));
+
+    ModeData ++ ;
+    VideoMode ++;
+  }
+  Private->MaxMode = QEMU_VIDEO_BOCHS_MODE_COUNT;
+
+  return EFI_SUCCESS;
+}
+
