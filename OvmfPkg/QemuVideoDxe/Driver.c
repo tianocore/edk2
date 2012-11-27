@@ -15,6 +15,7 @@
 **/
 
 #include "Qemu.h"
+#include <IndustryStandard/Acpi.h>
 
 EFI_DRIVER_BINDING_PROTOCOL gQemuVideoDriverBinding = {
   QemuVideoControllerDriverSupported,
@@ -44,7 +45,7 @@ QEMU_VIDEO_CARD gQemuVideoCardList[] = {
     },{
         0x1234,
         0x1111,
-        QEMU_VIDEO_BOCHS,
+        QEMU_VIDEO_BOCHS_MMIO,
         L"QEMU Standard VGA"
     },{
         0x1b36,
@@ -200,13 +201,14 @@ QemuVideoControllerDriverStart (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
 {
-  EFI_STATUS                      Status;
-  QEMU_VIDEO_PRIVATE_DATA  *Private;
-  BOOLEAN                         PciAttributesSaved;
-  EFI_DEVICE_PATH_PROTOCOL        *ParentDevicePath;
-  ACPI_ADR_DEVICE_PATH            AcpiDeviceNode;
-  PCI_TYPE00                      Pci;
-  QEMU_VIDEO_CARD                 *Card;
+  EFI_STATUS                        Status;
+  QEMU_VIDEO_PRIVATE_DATA           *Private;
+  BOOLEAN                           PciAttributesSaved;
+  EFI_DEVICE_PATH_PROTOCOL          *ParentDevicePath;
+  ACPI_ADR_DEVICE_PATH              AcpiDeviceNode;
+  PCI_TYPE00                        Pci;
+  QEMU_VIDEO_CARD                   *Card;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *MmioDesc;
 
   PciAttributesSaved = FALSE;
   //
@@ -286,9 +288,30 @@ QemuVideoControllerDriverStart (
   }
 
   //
+  // Check whenever the qemu stdvga mmio bar is present (qemu 1.3+).
+  //
+  if (Private->Variant == QEMU_VIDEO_BOCHS_MMIO) {
+    Status = Private->PciIo->GetBarAttributes (
+                        Private->PciIo,
+                        PCI_BAR_IDX2,
+                        NULL,
+                        (VOID**) &MmioDesc
+                        );
+    if (EFI_ERROR (Status) ||
+        MmioDesc->ResType != ACPI_ADDRESS_SPACE_TYPE_MEM) {
+      DEBUG ((EFI_D_INFO, "QemuVideo: No mmio bar, fallback to port io\n"));
+      Private->Variant = QEMU_VIDEO_BOCHS;
+    } else {
+      DEBUG ((EFI_D_INFO, "QemuVideo: Using mmio bar @ 0x%lx\n",
+              MmioDesc->AddrRangeMin));
+    }
+  }
+
+  //
   // Check if accessing the bochs interface works.
   //
-  if (Private->Variant == QEMU_VIDEO_BOCHS) {
+  if (Private->Variant == QEMU_VIDEO_BOCHS_MMIO ||
+      Private->Variant == QEMU_VIDEO_BOCHS) {
     UINT16 BochsId;
     BochsId = BochsRead(Private, VBE_DISPI_INDEX_ID);
     if ((BochsId & 0xFFF0) != VBE_DISPI_ID0) {
@@ -359,6 +382,7 @@ QemuVideoControllerDriverStart (
   case QEMU_VIDEO_CIRRUS_5446:
     Status = QemuVideoCirrusModeSetup (Private);
     break;
+  case QEMU_VIDEO_BOCHS_MMIO:
   case QEMU_VIDEO_BOCHS:
     Status = QemuVideoBochsModeSetup (Private);
     break;
@@ -644,10 +668,10 @@ SetPaletteColor (
   UINT8                           Blue
   )
 {
-  outb (Private, PALETTE_INDEX_REGISTER, (UINT8) Index);
-  outb (Private, PALETTE_DATA_REGISTER, (UINT8) (Red >> 2));
-  outb (Private, PALETTE_DATA_REGISTER, (UINT8) (Green >> 2));
-  outb (Private, PALETTE_DATA_REGISTER, (UINT8) (Blue >> 2));
+  VgaOutb (Private, PALETTE_INDEX_REGISTER, (UINT8) Index);
+  VgaOutb (Private, PALETTE_DATA_REGISTER, (UINT8) (Red >> 2));
+  VgaOutb (Private, PALETTE_DATA_REGISTER, (UINT8) (Green >> 2));
+  VgaOutb (Private, PALETTE_DATA_REGISTER, (UINT8) (Blue >> 2));
 }
 
 /**
@@ -791,8 +815,22 @@ BochsWrite (
   UINT16                   Data
   )
 {
-  outw (Private, VBE_DISPI_IOPORT_INDEX, Reg);
-  outw (Private, VBE_DISPI_IOPORT_DATA,  Data);
+  EFI_STATUS   Status;
+
+  if (Private->Variant == QEMU_VIDEO_BOCHS_MMIO) {
+    Status = Private->PciIo->Mem.Write (
+        Private->PciIo,
+        EfiPciIoWidthUint16,
+        PCI_BAR_IDX2,
+        0x500 + (Reg << 1),
+        1,
+        &Data
+        );
+    ASSERT_EFI_ERROR (Status);
+  } else {
+    outw (Private, VBE_DISPI_IOPORT_INDEX, Reg);
+    outw (Private, VBE_DISPI_IOPORT_DATA,  Data);
+  }
 }
 
 UINT16
@@ -801,11 +839,48 @@ BochsRead (
   UINT16                   Reg
   )
 {
-  UINT16 Data;
+  EFI_STATUS   Status;
+  UINT16       Data;
 
-  outw (Private, VBE_DISPI_IOPORT_INDEX, Reg);
-  Data = inw (Private, VBE_DISPI_IOPORT_DATA);
+  if (Private->Variant == QEMU_VIDEO_BOCHS_MMIO) {
+    Status = Private->PciIo->Mem.Read (
+        Private->PciIo,
+        EfiPciIoWidthUint16,
+        PCI_BAR_IDX2,
+        0x500 + (Reg << 1),
+        1,
+        &Data
+        );
+    ASSERT_EFI_ERROR (Status);
+  } else {
+    outw (Private, VBE_DISPI_IOPORT_INDEX, Reg);
+    Data = inw (Private, VBE_DISPI_IOPORT_DATA);
+  }
   return Data;
+}
+
+VOID
+VgaOutb (
+  QEMU_VIDEO_PRIVATE_DATA  *Private,
+  UINTN                    Reg,
+  UINT8                    Data
+  )
+{
+  EFI_STATUS   Status;
+
+  if (Private->Variant == QEMU_VIDEO_BOCHS_MMIO) {
+    Status = Private->PciIo->Mem.Write (
+        Private->PciIo,
+        EfiPciIoWidthUint8,
+        PCI_BAR_IDX2,
+        0x400 - 0x3c0 + Reg,
+        1,
+        &Data
+        );
+    ASSERT_EFI_ERROR (Status);
+  } else {
+    outb (Private, Reg, Data);
+  }
 }
 
 VOID
@@ -818,7 +893,7 @@ InitializeBochsGraphicsMode (
           ModeData->Width, ModeData->Height, ModeData->ColorDepth));
 
   /* unblank */
-  outb (Private, ATT_ADDRESS_REGISTER, 0x20);
+  VgaOutb (Private, ATT_ADDRESS_REGISTER, 0x20);
 
   BochsWrite (Private, VBE_DISPI_INDEX_ENABLE,      0);
   BochsWrite (Private, VBE_DISPI_INDEX_BANK,        0);

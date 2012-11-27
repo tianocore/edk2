@@ -90,6 +90,7 @@ typedef enum {
   QEMU_VIDEO_CIRRUS_5430 = 1,
   QEMU_VIDEO_CIRRUS_5446,
   QEMU_VIDEO_BOCHS,
+  QEMU_VIDEO_BOCHS_MMIO,
 } QEMU_VIDEO_VARIANT;
 
 typedef struct {
@@ -476,6 +477,13 @@ UINT16
 BochsRead (
   QEMU_VIDEO_PRIVATE_DATA  *Private,
   UINT16                   Reg
+  );
+
+VOID
+VgaOutb (
+  QEMU_VIDEO_PRIVATE_DATA  *Private,
+  UINTN                    Reg,
+  UINT8                    Data
   );
 
 EFI_STATUS
