@@ -309,6 +309,20 @@ PublishAcpiTable (
              );
   ASSERT_EFI_ERROR (Status);
 
+
+  //
+  // Measure to PCR[0] with event EV_POST_CODE ACPI DATA
+  //
+  TpmMeasureAndLogData(
+    0,
+    EV_POST_CODE,
+    EV_POSTCODE_INFO_ACPI_DATA,
+    ACPI_DATA_LEN,
+    Table,
+    TableSize
+    );
+
+
   ASSERT (Table->OemTableId == SIGNATURE_64 ('T', 'c', 'g', 'T', 'a', 'b', 'l', 'e'));
   mTcgNvs = AssignOpRegion (Table, SIGNATURE_32 ('T', 'N', 'V', 'S'), (UINT16) sizeof (TCG_NVS));
   ASSERT (mTcgNvs != NULL);

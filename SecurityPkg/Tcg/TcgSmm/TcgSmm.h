@@ -17,8 +17,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <PiDxe.h>
 #include <IndustryStandard/Acpi.h>
+#include <IndustryStandard/UefiTcgPlatform.h>
+
 #include <Guid/PhysicalPresenceData.h>
 #include <Guid/MemoryOverwriteControl.h>
+
 #include <Protocol/SmmSwDispatch2.h>
 #include <Protocol/AcpiTable.h>
 #include <Protocol/SmmVariable.h>
@@ -30,6 +33,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DxeServicesLib.h>
+#include <Library/TpmMeasurementLib.h>
 
 #pragma pack(1)
 typedef struct {
