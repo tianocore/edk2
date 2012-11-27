@@ -1,7 +1,7 @@
 /** @file
   Interpret and execute the S3 data in S3 boot script. 
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -415,7 +415,7 @@ ScriptIoWrite (
         IoWrite8 ((UINTN) OriginalAddress, *In.Uint8);
         break;       
       case S3BootScriptWidthFillUint8:
-        DEBUG ((EFI_D_INFO, "S3BootScriptWidthFillUint8 - 0x%08x (0x%02x)\n", (UINTN)Address, (UINTN)*In.Uint8));
+        DEBUG ((EFI_D_INFO, "S3BootScriptWidthFillUint8 - 0x%08x (0x%02x)\n", (UINTN)Address, (UINTN)*OriginalIn.Uint8));
         IoWrite8 ((UINTN) Address, *OriginalIn.Uint8);
         break;
       case S3BootScriptWidthUint16:
@@ -427,7 +427,7 @@ ScriptIoWrite (
         IoWrite16 ((UINTN) OriginalAddress, *In.Uint16);
         break;      
       case S3BootScriptWidthFillUint16:
-        DEBUG ((EFI_D_INFO, "S3BootScriptWidthFillUint16 - 0x%08x (0x%04x)\n", (UINTN)Address, (UINTN)*In.Uint16));
+        DEBUG ((EFI_D_INFO, "S3BootScriptWidthFillUint16 - 0x%08x (0x%04x)\n", (UINTN)Address, (UINTN)*OriginalIn.Uint16));
         IoWrite16 ((UINTN) Address, *OriginalIn.Uint16);
         break;
       case S3BootScriptWidthUint32:
@@ -439,7 +439,7 @@ ScriptIoWrite (
         IoWrite32 ((UINTN) OriginalAddress, *In.Uint32);
         break;
       case S3BootScriptWidthFillUint32:
-        DEBUG ((EFI_D_INFO, "S3BootScriptWidthFillUint32 - 0x%08x (0x%08x)\n", (UINTN)Address, (UINTN)*In.Uint32));
+        DEBUG ((EFI_D_INFO, "S3BootScriptWidthFillUint32 - 0x%08x (0x%08x)\n", (UINTN)Address, (UINTN)*OriginalIn.Uint32));
         IoWrite32 ((UINTN) Address, *OriginalIn.Uint32);
         break;
       case S3BootScriptWidthUint64:
@@ -447,11 +447,11 @@ ScriptIoWrite (
         IoWrite64 ((UINTN) Address, *In.Uint64);
         break;      
       case S3BootScriptWidthFifoUint64:
-        DEBUG ((EFI_D_INFO, "S3BootScriptWidthFifoUint64 - 0x%08x (0x%016lx)\n", (UINTN)Address, *In.Uint64));
+        DEBUG ((EFI_D_INFO, "S3BootScriptWidthFifoUint64 - 0x%08x (0x%016lx)\n", (UINTN)OriginalAddress, *In.Uint64));
         IoWrite64 ((UINTN) OriginalAddress, *In.Uint64);
         break;      
       case S3BootScriptWidthFillUint64:
-        DEBUG ((EFI_D_INFO, "S3BootScriptWidthFillUint64 - 0x%08x (0x%016lx)\n", (UINTN)Address, *In.Uint64));
+        DEBUG ((EFI_D_INFO, "S3BootScriptWidthFillUint64 - 0x%08x (0x%016lx)\n", (UINTN)Address, *OriginalIn.Uint64));
         IoWrite64 ((UINTN) Address, *OriginalIn.Uint64);
         break;
       default:
@@ -621,7 +621,7 @@ ScriptMemoryWrite (
         MmioWrite8 ((UINTN) OriginalAddress, *In.Uint8);
         break;      
       case S3BootScriptWidthFillUint8:
-        DEBUG ((EFI_D_INFO, "S3BootScriptWidthFillUint8 - 0x%08x (0x%02x)\n", (UINTN)Address, (UINTN)*In.Uint8));
+        DEBUG ((EFI_D_INFO, "S3BootScriptWidthFillUint8 - 0x%08x (0x%02x)\n", (UINTN)Address, (UINTN)*OriginalIn.Uint8));
         MmioWrite8 ((UINTN) Address, *OriginalIn.Uint8);
         break;
       case S3BootScriptWidthUint16:
@@ -633,7 +633,7 @@ ScriptMemoryWrite (
         MmioWrite16 ((UINTN) OriginalAddress, *In.Uint16);
         break;      
       case S3BootScriptWidthFillUint16:
-        DEBUG ((EFI_D_INFO, "S3BootScriptWidthFillUint16 - 0x%08x (0x%04x)\n", (UINTN)Address, (UINTN)*In.Uint16));
+        DEBUG ((EFI_D_INFO, "S3BootScriptWidthFillUint16 - 0x%08x (0x%04x)\n", (UINTN)Address, (UINTN)*OriginalIn.Uint16));
         MmioWrite16 ((UINTN) Address, *OriginalIn.Uint16);
         break;
       case S3BootScriptWidthUint32:
@@ -645,7 +645,7 @@ ScriptMemoryWrite (
         MmioWrite32 ((UINTN) OriginalAddress, *In.Uint32);
         break;      
       case S3BootScriptWidthFillUint32:
-        DEBUG ((EFI_D_INFO, "S3BootScriptWidthFillUint32 - 0x%08x (0x%08x)\n", (UINTN)Address, (UINTN)*In.Uint32));
+        DEBUG ((EFI_D_INFO, "S3BootScriptWidthFillUint32 - 0x%08x (0x%08x)\n", (UINTN)Address, (UINTN)*OriginalIn.Uint32));
         MmioWrite32 ((UINTN) Address, *OriginalIn.Uint32);
         break;
       case S3BootScriptWidthUint64:
@@ -657,7 +657,7 @@ ScriptMemoryWrite (
         MmioWrite64 ((UINTN) OriginalAddress, *In.Uint64);
         break;      
       case S3BootScriptWidthFillUint64:
-        DEBUG ((EFI_D_INFO, "S3BootScriptWidthFillUint64 - 0x%08x (0x%016lx)\n", (UINTN)Address, *In.Uint64));
+        DEBUG ((EFI_D_INFO, "S3BootScriptWidthFillUint64 - 0x%08x (0x%016lx)\n", (UINTN)Address, *OriginalIn.Uint64));
         MmioWrite64 ((UINTN) Address, *OriginalIn.Uint64);
         break;
       default:
@@ -1212,6 +1212,33 @@ BootScriptExecuteInformation (
   }
   DEBUG ((EFI_D_INFO, "\n"));
 }
+
+/**
+  Execute the boot script to interpret the Label information. 
+
+  @param Script       The pointer of node in boot script table 
+ 
+**/
+VOID
+BootScriptExecuteLabel (
+  IN UINT8       *Script
+  )
+
+{
+  UINT32                        Index;
+  EFI_BOOT_SCRIPT_INFORMATION   Information;
+
+  CopyMem ((VOID*)&Information, (VOID*)Script, sizeof(Information));
+
+  DEBUG ((EFI_D_INFO, "BootScriptExecuteLabel - 0x%08x\n", (UINTN)Information.Information));
+
+  DEBUG ((EFI_D_INFO, "BootScriptLabel: "));
+  for (Index = 0; Index < Information.InformationLength; Index++) {
+    DEBUG ((EFI_D_INFO, "%02x ", *(UINT8 *)(UINTN)(Information.Information + Index)));
+  }
+  DEBUG ((EFI_D_INFO, "\n"));
+}
+
 /**
   calculate the mask value for 'and' and 'or' operation
   @param ScriptHeader   The pointer of header of node in boot script table 
@@ -1690,6 +1717,7 @@ S3BootScriptExecute (
 
     case S3_BOOT_SCRIPT_LIB_TERMINATE_OPCODE:
       DEBUG ((EFI_D_INFO, "S3_BOOT_SCRIPT_LIB_TERMINATE_OPCODE\n"));
+      DEBUG ((EFI_D_INFO, "S3BootScriptDone - %r\n", EFI_SUCCESS));
       return EFI_SUCCESS;
 
     case EFI_BOOT_SCRIPT_IO_READ_WRITE_OPCODE:
@@ -1742,6 +1770,7 @@ S3BootScriptExecute (
       // For label
       //
       DEBUG ((EFI_D_INFO, "S3_BOOT_SCRIPT_LIB_LABEL_OPCODE\n"));
+      BootScriptExecuteLabel (Script);
       break;
     default:
       DEBUG ((EFI_D_INFO, "S3BootScriptDone - %r\n", EFI_UNSUPPORTED));
