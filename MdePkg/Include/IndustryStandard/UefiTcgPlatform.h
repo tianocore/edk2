@@ -52,6 +52,25 @@
 #define EFI_EXIT_BOOT_SERVICES_SUCCEEDED    \
   "Exit Boot Services Returned with Success"
 
+
+#define EV_POSTCODE_INFO_POST_CODE    "POST CODE"
+#define POST_CODE_STR_LEN             (sizeof(EV_POSTCODE_INFO_POST_CODE) - 1)
+
+#define EV_POSTCODE_INFO_SMM_CODE     "SMM CODE"
+#define SMM_CODE_STR_LEN              (sizeof(EV_POSTCODE_INFO_SMM_CODE) - 1)
+
+#define EV_POSTCODE_INFO_ACPI_DATA    "ACPI DATA"
+#define ACPI_DATA_LEN                 (sizeof(EV_POSTCODE_INFO_ACPI_DATA) - 1)
+
+#define EV_POSTCODE_INFO_BIS_CODE     "BIS CODE"
+#define BIS_CODE_LEN                  (sizeof(EV_POSTCODE_INFO_BIS_CODE) - 1)
+
+#define EV_POSTCODE_INFO_UEFI_PI      "UEFI PI"
+#define UEFI_PI_LEN                   (sizeof(EV_POSTCODE_INFO_UEFI_PI) - 1)
+
+#define EV_POSTCODE_INFO_OPROM        "Embedded Option ROM"
+#define OPROM_LEN                     (sizeof(EV_POSTCODE_INFO_OPROM) - 1)
+
 //
 // Set structure alignment to 1-byte
 //
