@@ -542,7 +542,7 @@ S3BootScriptGetBootTimeEntryAddAddress (
    // Here we do not count the reserved memory for runtime script table.
    PageNumber   = (UINT16)(mS3BootScriptTablePtr->TableMemoryPageNumber - PcdGet16(PcdS3BootScriptRuntimeTableReservePageNumber));   
    TableLength =  mS3BootScriptTablePtr->TableLength;
-   if ((UINT32)(PageNumber * EFI_PAGE_SIZE) < (TableLength + EntryLength)) {
+   if ((UINT32)(PageNumber * EFI_PAGE_SIZE) < (TableLength + EntryLength + sizeof (EFI_BOOT_SCRIPT_TERMINATE))) {
      // 
      // The buffer is too small to hold the table, Reallocate the buffer
      //
