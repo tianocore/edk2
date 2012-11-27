@@ -86,6 +86,18 @@ typedef struct {
 //
 #define QEMU_VIDEO_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('Q', 'V', 'I', 'D')
 
+typedef enum {
+  QEMU_VIDEO_CIRRUS_5430 = 1,
+  QEMU_VIDEO_CIRRUS_5446,
+} QEMU_VIDEO_VARIANT;
+
+typedef struct {
+  UINT16                                VendorId;
+  UINT16                                DeviceId;
+  QEMU_VIDEO_VARIANT                    Variant;
+  CHAR16                                *Name;
+} QEMU_VIDEO_CARD;
+
 typedef struct {
   UINT64                                Signature;
   EFI_HANDLE                            Handle;
@@ -98,6 +110,7 @@ typedef struct {
   QEMU_VIDEO_MODE_DATA                  *ModeData;
   UINT8                                 *LineBuffer;
   BOOLEAN                               HardwareNeedsStarting;
+  QEMU_VIDEO_VARIANT                    Variant;
 } QEMU_VIDEO_PRIVATE_DATA;
 
 ///
@@ -111,7 +124,7 @@ typedef struct {
   UINT8   *CrtcSettings;
   UINT16  *SeqSettings;
   UINT8   MiscSetting;
-} QEMU_VIDEO_VIDEO_MODES;
+} QEMU_VIDEO_CIRRUS_MODES;
 
 #define QEMU_VIDEO_PRIVATE_DATA_FROM_GRAPHICS_OUTPUT_THIS(a) \
   CR(a, QEMU_VIDEO_PRIVATE_DATA, GraphicsOutput, QEMU_VIDEO_PRIVATE_DATA_SIGNATURE)
@@ -128,7 +141,7 @@ extern UINT8                                      Crtc_800_600_256_60[];
 extern UINT16                                     Seq_800_600_256_60[];
 extern UINT8                                      Crtc_1024_768_256_60[];
 extern UINT16                                     Seq_1024_768_256_60[];
-extern QEMU_VIDEO_VIDEO_MODES              QemuVideoVideoModes[];
+extern QEMU_VIDEO_CIRRUS_MODES                    QemuVideoCirrusModes[];
 extern EFI_DRIVER_BINDING_PROTOCOL                gQemuVideoDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL                gQemuVideoComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL               gQemuVideoComponentName2;
@@ -358,9 +371,9 @@ QemuVideoComponentNameGetControllerName (
 // Local Function Prototypes
 //
 VOID
-InitializeGraphicsMode (
+InitializeCirrusGraphicsMode (
   QEMU_VIDEO_PRIVATE_DATA  *Private,
-  QEMU_VIDEO_VIDEO_MODES   *ModeData
+  QEMU_VIDEO_CIRRUS_MODES  *ModeData
   );
 
 VOID
@@ -411,7 +424,7 @@ inw (
   );
 
 EFI_STATUS
-QemuVideoVideoModeSetup (
+QemuVideoCirrusModeSetup (
   QEMU_VIDEO_PRIVATE_DATA  *Private
   );
 

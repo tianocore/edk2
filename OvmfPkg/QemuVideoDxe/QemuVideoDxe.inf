@@ -23,12 +23,6 @@
 
   ENTRY_POINT                    = InitializeQemuVideo
 
-  PCI_VENDOR_ID  = 0x1013
-  PCI_DEVICE_ID  = 0x00A8
-  PCI_CLASS_CODE = 0x030000
-  PCI_REVISION   = 0x00
-  PCI_COMPRESS   = TRUE
-
 #
 # The following information is for reference only and not required by the build tools.
 #

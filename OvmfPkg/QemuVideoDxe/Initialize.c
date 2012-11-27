@@ -143,7 +143,7 @@ UINT16 Seq_1024_768_32bpp_60[15] = {
 ///
 /// Table of supported video modes
 ///
-QEMU_VIDEO_VIDEO_MODES  QemuVideoVideoModes[] = {
+QEMU_VIDEO_CIRRUS_MODES  QemuVideoCirrusModes[] = {
 //  {  640, 480, 8, 60, Crtc_640_480_256_60,  Seq_640_480_256_60,  0xe3 },
 //  {  800, 600, 8, 60, Crtc_800_600_256_60,  Seq_800_600_256_60,  0xef },
   {  640, 480, 32, 60, Crtc_640_480_32bpp_60,  Seq_640_480_32bpp_60,  0xef },
@@ -154,38 +154,38 @@ QEMU_VIDEO_VIDEO_MODES  QemuVideoVideoModes[] = {
 //  { 960, 720, 32, 60, Crtc_960_720_32bpp_60, Seq_1024_768_32bpp_60, 0xef }
 };
 
-#define QEMU_VIDEO_MODE_COUNT \
-  (sizeof (QemuVideoVideoModes) / sizeof (QemuVideoVideoModes[0]))
+#define QEMU_VIDEO_CIRRUS_MODE_COUNT \
+  (sizeof (QemuVideoCirrusModes) / sizeof (QemuVideoCirrusModes[0]))
 
 /**
   Construct the valid video modes for QemuVideo.
 
 **/
 EFI_STATUS
-QemuVideoVideoModeSetup (
+QemuVideoCirrusModeSetup (
   QEMU_VIDEO_PRIVATE_DATA  *Private
   )
 {
   UINT32                                 Index;
   QEMU_VIDEO_MODE_DATA                   *ModeData;
-  QEMU_VIDEO_VIDEO_MODES                 *VideoMode;
+  QEMU_VIDEO_CIRRUS_MODES                *VideoMode;
 
   //
   // Setup Video Modes
   //
   Private->ModeData = AllocatePool (
-                        sizeof (Private->ModeData[0]) * QEMU_VIDEO_MODE_COUNT
+                        sizeof (Private->ModeData[0]) * QEMU_VIDEO_CIRRUS_MODE_COUNT
                         );
   ModeData = Private->ModeData;
-  VideoMode = &QemuVideoVideoModes[0];
-  for (Index = 0; Index < QEMU_VIDEO_MODE_COUNT; Index ++) {
+  VideoMode = &QemuVideoCirrusModes[0];
+  for (Index = 0; Index < QEMU_VIDEO_CIRRUS_MODE_COUNT; Index ++) {
     ModeData->ModeNumber = Index;
     ModeData->HorizontalResolution          = VideoMode->Width;
     ModeData->VerticalResolution            = VideoMode->Height;
     ModeData->ColorDepth                    = VideoMode->ColorDepth;
     ModeData->RefreshRate                   = VideoMode->RefreshRate;
     DEBUG ((EFI_D_INFO,
-      "Adding Video Mode %d: %dx%d, %d-bit, %d Hz\n",
+      "Adding Cirrus Video Mode %d: %dx%d, %d-bit, %d Hz\n",
       ModeData->ModeNumber,
       ModeData->HorizontalResolution,
       ModeData->VerticalResolution,
@@ -196,7 +196,7 @@ QemuVideoVideoModeSetup (
     ModeData ++ ;
     VideoMode ++;
   }
-  Private->MaxMode = QEMU_VIDEO_MODE_COUNT;
+  Private->MaxMode = QEMU_VIDEO_CIRRUS_MODE_COUNT;
 
   return EFI_SUCCESS;
 }

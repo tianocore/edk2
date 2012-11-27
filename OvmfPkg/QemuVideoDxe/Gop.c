@@ -181,7 +181,17 @@ Routine Description:
     return EFI_OUT_OF_RESOURCES;
   }
 
-  InitializeGraphicsMode (Private, &QemuVideoVideoModes[ModeData->ModeNumber]);
+  switch (Private->Variant) {
+  case QEMU_VIDEO_CIRRUS_5430:
+  case QEMU_VIDEO_CIRRUS_5446:
+    InitializeCirrusGraphicsMode (Private, &QemuVideoCirrusModes[ModeData->ModeNumber]);
+    break;
+  default:
+    ASSERT (FALSE);
+    gBS->FreePool (Private->LineBuffer);
+    Private->LineBuffer = NULL;
+    return EFI_DEVICE_ERROR;
+  }
 
   This->Mode->Mode = ModeNumber;
   This->Mode->Info->HorizontalResolution = ModeData->HorizontalResolution;

@@ -25,6 +25,45 @@ EFI_DRIVER_BINDING_PROTOCOL gQemuVideoDriverBinding = {
   NULL
 };
 
+QEMU_VIDEO_CARD gQemuVideoCardList[] = {
+    {
+        CIRRUS_LOGIC_VENDOR_ID,
+        CIRRUS_LOGIC_5430_DEVICE_ID,
+        QEMU_VIDEO_CIRRUS_5430,
+        L"Cirrus 5430"
+    },{
+        CIRRUS_LOGIC_VENDOR_ID,
+        CIRRUS_LOGIC_5430_ALTERNATE_DEVICE_ID,
+        QEMU_VIDEO_CIRRUS_5430,
+        L"Cirrus 5430"
+    },{
+        CIRRUS_LOGIC_VENDOR_ID,
+        CIRRUS_LOGIC_5446_DEVICE_ID,
+        QEMU_VIDEO_CIRRUS_5446,
+        L"Cirrus 5446"
+    },{
+        0 /* end of list */
+    }
+};
+
+static QEMU_VIDEO_CARD*
+QemuVideoDetect(
+  IN UINT16 VendorId,
+  IN UINT16 DeviceId
+  )
+{
+  UINTN Index = 0;
+
+  while (gQemuVideoCardList[Index].VendorId != 0) {
+    if (gQemuVideoCardList[Index].VendorId == VendorId &&
+        gQemuVideoCardList[Index].DeviceId == DeviceId) {
+      return gQemuVideoCardList + Index;
+    }
+    Index++;
+  }
+  return NULL;
+}
+
 /**
   Check if this device is supported.
 
@@ -48,6 +87,7 @@ QemuVideoControllerDriverSupported (
   EFI_PCI_IO_PROTOCOL *PciIo;
   PCI_TYPE00          Pci;
   EFI_DEV_PATH        *Node;
+  QEMU_VIDEO_CARD     *Card;
 
   //
   // Open the PCI I/O Protocol
@@ -87,35 +127,29 @@ QemuVideoControllerDriverSupported (
   //
   // See if this is a Cirrus Logic PCI controller
   //
-  if (Pci.Hdr.VendorId == CIRRUS_LOGIC_VENDOR_ID) {
+  Card = QemuVideoDetect(Pci.Hdr.VendorId, Pci.Hdr.DeviceId);
+  if (Card != NULL) {
+    DEBUG ((EFI_D_INFO, "QemuVideo: %s detected\n", Card->Name));
+    Status = EFI_SUCCESS;
     //
-    // See if this is a 5430 or a 5446 PCI controller
+    // If this is an Intel 945 graphics controller,
+    // go further check RemainingDevicePath validation
     //
-    if (Pci.Hdr.DeviceId == CIRRUS_LOGIC_5430_DEVICE_ID || 
-        Pci.Hdr.DeviceId == CIRRUS_LOGIC_5430_ALTERNATE_DEVICE_ID ||
-        Pci.Hdr.DeviceId == CIRRUS_LOGIC_5446_DEVICE_ID) {
-        
-      Status = EFI_SUCCESS;
+    if (RemainingDevicePath != NULL) {
+      Node = (EFI_DEV_PATH *) RemainingDevicePath;
       //
-      // If this is an Intel 945 graphics controller,
-      // go further check RemainingDevicePath validation
+      // Check if RemainingDevicePath is the End of Device Path Node, 
+      // if yes, return EFI_SUCCESS
       //
-      if (RemainingDevicePath != NULL) {
-        Node = (EFI_DEV_PATH *) RemainingDevicePath;
+      if (!IsDevicePathEnd (Node)) {
         //
-        // Check if RemainingDevicePath is the End of Device Path Node, 
-        // if yes, return EFI_SUCCESS
+        // If RemainingDevicePath isn't the End of Device Path Node,
+        // check its validation
         //
-        if (!IsDevicePathEnd (Node)) {
-          //
-          // If RemainingDevicePath isn't the End of Device Path Node,
-          // check its validation
-          //
-          if (Node->DevPath.Type != ACPI_DEVICE_PATH ||
-              Node->DevPath.SubType != ACPI_ADR_DP ||
-              DevicePathNodeLength(&Node->DevPath) != sizeof(ACPI_ADR_DEVICE_PATH)) {
-            Status = EFI_UNSUPPORTED;
-          }
+        if (Node->DevPath.Type != ACPI_DEVICE_PATH ||
+            Node->DevPath.SubType != ACPI_ADR_DP ||
+            DevicePathNodeLength(&Node->DevPath) != sizeof(ACPI_ADR_DEVICE_PATH)) {
+          Status = EFI_UNSUPPORTED;
         }
       }
     }
@@ -161,7 +195,9 @@ QemuVideoControllerDriverStart (
   BOOLEAN                         PciAttributesSaved;
   EFI_DEVICE_PATH_PROTOCOL        *ParentDevicePath;
   ACPI_ADR_DEVICE_PATH            AcpiDeviceNode;
-
+  PCI_TYPE00                      Pci;
+  QEMU_VIDEO_CARD                 *Card;
+  
   PciAttributesSaved = FALSE;
   //
   // Allocate Private context data for GOP inteface.
@@ -192,6 +228,27 @@ QemuVideoControllerDriverStart (
   if (EFI_ERROR (Status)) {
     goto Error;
   }
+
+  //
+  // Read the PCI Configuration Header from the PCI Device
+  //
+  Status = Private->PciIo->Pci.Read (
+                        Private->PciIo,
+                        EfiPciIoWidthUint32,
+                        0,
+                        sizeof (Pci) / sizeof (UINT32),
+                        &Pci
+                        );
+  if (EFI_ERROR (Status)) {
+    goto Error;
+  }
+
+  Card = QemuVideoDetect(Pci.Hdr.VendorId, Pci.Hdr.DeviceId);
+  if (Card == NULL) {
+    Status = EFI_DEVICE_ERROR;
+    goto Error;
+  }
+  Private->Variant = Card->Variant;
 
   //
   // Save original PCI attributes
@@ -274,7 +331,16 @@ QemuVideoControllerDriverStart (
   //
   // Construct video mode buffer
   //
-  Status = QemuVideoVideoModeSetup (Private);
+  switch (Private->Variant) {
+  case QEMU_VIDEO_CIRRUS_5430:
+  case QEMU_VIDEO_CIRRUS_5446:
+    Status = QemuVideoCirrusModeSetup (Private);
+    break;
+  default:
+    ASSERT (FALSE);
+    Status = EFI_DEVICE_ERROR;
+    break;
+  }
   if (EFI_ERROR (Status)) {
     goto Error;
   }
@@ -640,27 +706,13 @@ DrawLogo (
 
 **/
 VOID
-InitializeGraphicsMode (
+InitializeCirrusGraphicsMode (
   QEMU_VIDEO_PRIVATE_DATA  *Private,
-  QEMU_VIDEO_VIDEO_MODES   *ModeData
+  QEMU_VIDEO_CIRRUS_MODES  *ModeData
   )
 {
   UINT8 Byte;
   UINTN Index;
-  UINT16 DeviceId;
-  EFI_STATUS Status;
-
-  Status = Private->PciIo->Pci.Read (
-             Private->PciIo,
-             EfiPciIoWidthUint16,
-             PCI_DEVICE_ID_OFFSET,
-             1,
-             &DeviceId
-             );
-  //
-  // Read the PCI Configuration Header from the PCI Device
-  //
-  ASSERT_EFI_ERROR (Status);
 
   outw (Private, SEQ_ADDRESS_REGISTER, 0x1206);
   outw (Private, SEQ_ADDRESS_REGISTER, 0x0012);
@@ -669,7 +721,7 @@ InitializeGraphicsMode (
     outw (Private, SEQ_ADDRESS_REGISTER, ModeData->SeqSettings[Index]);
   }
 
-  if (DeviceId != CIRRUS_LOGIC_5446_DEVICE_ID) {
+  if (Private->Variant == QEMU_VIDEO_CIRRUS_5430) {
     outb (Private, SEQ_ADDRESS_REGISTER, 0x0f);
     Byte = (UINT8) ((inb (Private, SEQ_DATA_REGISTER) & 0xc7) ^ 0x30);
     outb (Private, SEQ_DATA_REGISTER, Byte);
