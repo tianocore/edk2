@@ -26,6 +26,7 @@
 #define EV_S_CRTM_CONTENTS          ((TCG_EVENTTYPE) 0x00000007)
 #define EV_S_CRTM_VERSION           ((TCG_EVENTTYPE) 0x00000008)
 #define EV_CPU_MICROCODE            ((TCG_EVENTTYPE) 0x00000009)
+#define EV_TABLE_OF_DEVICES         ((TCG_EVENTTYPE) 0x0000000B)
 
 //
 // EFI specific event types
