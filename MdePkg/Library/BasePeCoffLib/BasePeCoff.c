@@ -87,6 +87,7 @@ PeCoffLoaderGetPeHeader (
   UINT16                Magic;
   UINT32                SectionHeaderOffset;
   UINT32                Index;
+  UINT32                HeaderWithoutDataDir;
   CHAR8                 BufferData;
   UINTN                 NumberOfSections;
   EFI_IMAGE_SECTION_HEADER  SectionHeader;
@@ -164,7 +165,7 @@ PeCoffLoaderGetPeHeader (
 
     if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
       //
-      // 1. Check FileHeader.SizeOfOptionalHeader filed.
+      // 1. Check OptionalHeader.NumberOfRvaAndSizes filed.
       //
       if (EFI_IMAGE_NUMBER_OF_DIRECTORY_ENTRIES < Hdr.Pe32->OptionalHeader.NumberOfRvaAndSizes) {
         ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
@@ -172,19 +173,36 @@ PeCoffLoaderGetPeHeader (
       }
 
       //
-      // 2. Check the OptionalHeader.SizeOfHeaders field.
-      // This field will be use like the following mode, so just compare the result.
-      // The DataDirectory array begin with 1, not 0, so here use < to compare not <=.
+      // 2. Check the FileHeader.SizeOfOptionalHeader field.
+      // OptionalHeader.NumberOfRvaAndSizes is not bigger than 16, so 
+      // OptionalHeader.NumberOfRvaAndSizes * sizeof (EFI_IMAGE_DATA_DIRECTORY) will not overflow.
       //
-      if (EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1 < Hdr.Pe32->OptionalHeader.NumberOfRvaAndSizes) {
-        if (Hdr.Pe32->OptionalHeader.SizeOfHeaders < (UINT32)((UINT8 *)(&Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1]) - (UINT8 *) &Hdr)) {
-          ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
-          return RETURN_UNSUPPORTED;
-        }
+      HeaderWithoutDataDir = sizeof (EFI_IMAGE_OPTIONAL_HEADER32) - sizeof (EFI_IMAGE_DATA_DIRECTORY) * EFI_IMAGE_NUMBER_OF_DIRECTORY_ENTRIES;
+      if (((UINT32)Hdr.Pe32->FileHeader.SizeOfOptionalHeader - HeaderWithoutDataDir) !=
+          Hdr.Pe32->OptionalHeader.NumberOfRvaAndSizes * sizeof (EFI_IMAGE_DATA_DIRECTORY)) {
+        ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+        return RETURN_UNSUPPORTED;
+      }
+
+      SectionHeaderOffset = ImageContext->PeCoffHeaderOffset + sizeof (UINT32) + sizeof (EFI_IMAGE_FILE_HEADER) + Hdr.Pe32->FileHeader.SizeOfOptionalHeader;
+      //
+      // 3. Check the FileHeader.NumberOfSections field.
+      //
+      if ((Hdr.Pe32->OptionalHeader.SizeOfImage - SectionHeaderOffset) / EFI_IMAGE_SIZEOF_SECTION_HEADER <= Hdr.Pe32->FileHeader.NumberOfSections) {
+        ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+        return RETURN_UNSUPPORTED;
       }
 
       //
-      // 2.2 Read last byte of Hdr.Pe32.OptionalHeader.SizeOfHeaders from the file.
+      // 4. Check the OptionalHeader.SizeOfHeaders field.
+      //
+      if ((Hdr.Pe32->OptionalHeader.SizeOfHeaders - SectionHeaderOffset) / EFI_IMAGE_SIZEOF_SECTION_HEADER < (UINT32)Hdr.Pe32->FileHeader.NumberOfSections) {
+        ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+        return RETURN_UNSUPPORTED;
+      }
+
+      //
+      // 4.2 Read last byte of Hdr.Pe32.OptionalHeader.SizeOfHeaders from the file.
       //
       Size = 1;
       ReadSize = Size;
@@ -250,27 +268,43 @@ PeCoffLoaderGetPeHeader (
 
     } else if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
       //
-      // 1. Check FileHeader.SizeOfOptionalHeader filed.
+      // 1. Check FileHeader.NumberOfRvaAndSizes filed.
       //
       if (EFI_IMAGE_NUMBER_OF_DIRECTORY_ENTRIES < Hdr.Pe32Plus->OptionalHeader.NumberOfRvaAndSizes) {
         ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
         return RETURN_UNSUPPORTED;
       }
+      //
+      // 2. Check the FileHeader.SizeOfOptionalHeader field.
+      // OptionalHeader.NumberOfRvaAndSizes is not bigger than 16, so 
+      // OptionalHeader.NumberOfRvaAndSizes * sizeof (EFI_IMAGE_DATA_DIRECTORY) will not overflow.
+      //
+      HeaderWithoutDataDir = sizeof (EFI_IMAGE_OPTIONAL_HEADER64) - sizeof (EFI_IMAGE_DATA_DIRECTORY) * EFI_IMAGE_NUMBER_OF_DIRECTORY_ENTRIES;
+      if (((UINT32)Hdr.Pe32Plus->FileHeader.SizeOfOptionalHeader - HeaderWithoutDataDir) !=
+          Hdr.Pe32Plus->OptionalHeader.NumberOfRvaAndSizes * sizeof (EFI_IMAGE_DATA_DIRECTORY)) {
+        ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+        return RETURN_UNSUPPORTED;
+      }
 
+      SectionHeaderOffset = ImageContext->PeCoffHeaderOffset + sizeof (UINT32) + sizeof (EFI_IMAGE_FILE_HEADER) + Hdr.Pe32Plus->FileHeader.SizeOfOptionalHeader;
       //
-      // 2. Check the OptionalHeader.SizeOfHeaders field.
-      // This field will be use like the following mode, so just compare the result.
-      // The DataDirectory array begin with 1, not 0, so here use < to compare not <=.
+      // 3. Check the FileHeader.NumberOfSections field.
       //
-      if (EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1 < Hdr.Pe32Plus->OptionalHeader.NumberOfRvaAndSizes) {
-        if (Hdr.Pe32Plus->OptionalHeader.SizeOfHeaders < (UINT32)((UINT8 *)(&Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1]) - (UINT8 *) &Hdr)) {
-          ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
-          return RETURN_UNSUPPORTED;
-        }
+      if ((Hdr.Pe32Plus->OptionalHeader.SizeOfImage - SectionHeaderOffset) / EFI_IMAGE_SIZEOF_SECTION_HEADER <= Hdr.Pe32Plus->FileHeader.NumberOfSections) {
+        ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+        return RETURN_UNSUPPORTED;
       }
 
       //
-      // 2.2 Read last byte of Hdr.Pe32Plus.OptionalHeader.SizeOfHeaders from the file.
+      // 4. Check the OptionalHeader.SizeOfHeaders field.
+      //
+      if ((Hdr.Pe32Plus->OptionalHeader.SizeOfHeaders - SectionHeaderOffset) / EFI_IMAGE_SIZEOF_SECTION_HEADER < (UINT32)Hdr.Pe32Plus->FileHeader.NumberOfSections) {
+        ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+        return RETURN_UNSUPPORTED;
+      }
+
+      //
+      // 4.2 Read last byte of Hdr.Pe32Plus.OptionalHeader.SizeOfHeaders from the file.
       //
       Size = 1;
       ReadSize = Size;
@@ -384,6 +418,15 @@ PeCoffLoaderGetPeHeader (
     }
 
     if (SectionHeader.SizeOfRawData > 0) {
+      //
+      // Section data should bigger than the Pe header.
+      //
+      if (SectionHeader.VirtualAddress < ImageContext->SizeOfHeaders || 
+          SectionHeader.PointerToRawData < ImageContext->SizeOfHeaders) {
+        ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+        return RETURN_UNSUPPORTED;
+      }
+
       //
       // Check the member data to avoid overflow.
       //
