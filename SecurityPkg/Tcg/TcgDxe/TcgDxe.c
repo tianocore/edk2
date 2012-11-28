@@ -34,6 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/DevicePath.h>
 #include <Protocol/TcgService.h>
 #include <Protocol/AcpiTable.h>
+#include <Protocol/MpService.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -157,6 +158,87 @@ EFI_TCG_SERVER_ACPI_TABLE           mTcgServerAcpiTemplate = {
 
 UINTN  mBootAttempts  = 0;
 CHAR16 mBootVarName[] = L"BootOrder";
+
+/**
+  Get All processors EFI_CPU_LOCATION in system. LocationBuf is allocated inside the function
+  Caller is responsible to free LocationBuf.
+
+  @param[out] LocationBuf          Returns Processor Location Buffer.
+  @param[out] Num                  Returns processor number.
+
+  @retval EFI_SUCCESS              Operation completed successfully.
+  @retval EFI_UNSUPPORTED       MpService protocol not found.
+
+**/
+EFI_STATUS
+GetProcessorsCpuLocation (
+    OUT  EFI_CPU_PHYSICAL_LOCATION   **LocationBuf,
+    OUT  UINTN                       *Num
+  )
+{
+  EFI_STATUS                        Status;
+  EFI_MP_SERVICES_PROTOCOL          *MpProtocol;
+  UINTN                             ProcessorNum;
+  UINTN                             EnabledProcessorNum;
+  EFI_PROCESSOR_INFORMATION         ProcessorInfo;
+  EFI_CPU_PHYSICAL_LOCATION         *ProcessorLocBuf;
+  UINTN                             Index;
+
+  Status = gBS->LocateProtocol (&gEfiMpServiceProtocolGuid, NULL, (VOID **) &MpProtocol);
+  if (EFI_ERROR (Status)) {
+    //
+    // MP protocol is not installed
+    //
+    return EFI_UNSUPPORTED;
+  }
+
+  Status = MpProtocol->GetNumberOfProcessors(
+                         MpProtocol,
+                         &ProcessorNum,
+                         &EnabledProcessorNum
+                         );
+  if (EFI_ERROR(Status)){
+    return Status;
+  }
+
+  Status = gBS->AllocatePool(
+                  EfiBootServicesData,
+                  sizeof(EFI_CPU_PHYSICAL_LOCATION) * ProcessorNum,
+                  &ProcessorLocBuf
+                  );
+  if (EFI_ERROR(Status)){
+    return Status;
+  }
+
+  //
+  // Get each processor Location info
+  //
+  for (Index = 0; Index < ProcessorNum; Index++) {
+    Status = MpProtocol->GetProcessorInfo(
+                           MpProtocol,
+                           Index,
+                           &ProcessorInfo
+                           );
+    if (EFI_ERROR(Status)){
+      FreePool(ProcessorLocBuf);
+      return Status;
+    }
+
+    //
+    // Get all Processor Location info & measure
+    //
+    CopyMem(
+      &ProcessorLocBuf[Index],
+      &ProcessorInfo.Location,
+      sizeof(EFI_CPU_PHYSICAL_LOCATION)
+      );
+  }
+
+  *LocationBuf = ProcessorLocBuf;
+  *Num = ProcessorNum;
+
+  return Status;
+}
 
 /**
   This service provides EFI protocol capability information, state information 
@@ -679,7 +761,12 @@ MeasureHandoffTables (
   SMBIOS_TABLE_ENTRY_POINT          *SmbiosTable;
   TCG_PCR_EVENT_HDR                 TcgEvent;
   EFI_HANDOFF_TABLE_POINTERS        HandoffTables;
+  UINTN                             ProcessorNum;
+  EFI_CPU_PHYSICAL_LOCATION         *ProcessorLocBuf;
 
+  //
+  // Measure SMBIOS with EV_EFI_HANDOFF_TABLES to PCR[1]
+  //
   Status = EfiGetSystemConfigurationTable (
              &gEfiSmbiosTableGuid,
              (VOID **) &SmbiosTable
@@ -706,6 +793,34 @@ MeasureHandoffTables (
                &TcgEvent,
                (UINT8*)&HandoffTables
                );
+  }
+
+  if (PcdGet8 (PcdTpmPlatformClass) == TCG_PLATFORM_TYPE_SERVER) {
+    //
+    // Tcg Server spec. 
+    // Measure each processor EFI_CPU_PHYSICAL_LOCATION with EV_TABLE_OF_DEVICES to PCR[1]
+    //
+    Status = GetProcessorsCpuLocation(&ProcessorLocBuf, &ProcessorNum);
+
+    if (!EFI_ERROR(Status)){
+      TcgEvent.PCRIndex  = 1;
+      TcgEvent.EventType = EV_TABLE_OF_DEVICES;
+      TcgEvent.EventSize = sizeof (HandoffTables);
+
+      HandoffTables.NumberOfTables = 1;
+      HandoffTables.TableEntry[0].VendorGuid  = gEfiMpServiceProtocolGuid;
+      HandoffTables.TableEntry[0].VendorTable = ProcessorLocBuf;
+
+      Status = TcgDxeHashLogExtendEventI (
+                 &mTcgDxeData,
+                 (UINT8*)(UINTN)ProcessorLocBuf,
+                 sizeof(EFI_CPU_PHYSICAL_LOCATION) * ProcessorNum,
+                 &TcgEvent,
+                 (UINT8*)&HandoffTables
+                 );
+
+      FreePool(ProcessorLocBuf);
+    }
   }
 
   return Status;
