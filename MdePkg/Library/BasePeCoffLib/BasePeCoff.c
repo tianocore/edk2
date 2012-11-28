@@ -984,16 +984,15 @@ PeCoffLoaderRelocateImage (
     while (RelocBase < RelocBaseEnd) {
 
       Reloc     = (UINT16 *) ((CHAR8 *) RelocBase + sizeof (EFI_IMAGE_BASE_RELOCATION));
-      RelocEnd  = (UINT16 *) ((CHAR8 *) RelocBase + RelocBase->SizeOfBlock);
-      
       //
-      // Make sure RelocEnd is in the Image range.
+      // Add check for RelocBase->SizeOfBlock field.
       //
-      if ((CHAR8 *) RelocEnd < (CHAR8 *)((UINTN) ImageContext->ImageAddress) ||
-          (CHAR8 *) RelocEnd > (CHAR8 *)((UINTN)ImageContext->ImageAddress + (UINTN)ImageContext->ImageSize)) {
+      if ((RelocBase->SizeOfBlock == 0) || (RelocBase->SizeOfBlock > RelocDir->Size)) {
         ImageContext->ImageError = IMAGE_ERROR_FAILED_RELOCATION;
         return RETURN_LOAD_ERROR;
       }
+
+      RelocEnd  = (UINT16 *) ((CHAR8 *) RelocBase + RelocBase->SizeOfBlock);
 
       if (!(ImageContext->IsTeImage)) {
         FixupBase = PeCoffLoaderImageAddress (ImageContext, RelocBase->VirtualAddress);
