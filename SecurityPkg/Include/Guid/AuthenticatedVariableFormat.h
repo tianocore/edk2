@@ -27,6 +27,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 extern EFI_GUID gEfiAuthenticatedVariableGuid;
 extern EFI_GUID gEfiSecureBootEnableDisableGuid;
+extern EFI_GUID gEfiCertDbGuid;
+extern EFI_GUID gEfiCustomModeEnableGuid;
 
 ///
 /// "SecureBootEnable" variable for the Secure Boot feature enable/disable.
@@ -36,8 +38,6 @@ extern EFI_GUID gEfiSecureBootEnableDisableGuid;
 #define EFI_SECURE_BOOT_ENABLE_NAME      L"SecureBootEnable"
 #define SECURE_BOOT_ENABLE               1
 #define SECURE_BOOT_DISABLE              0
-
-extern EFI_GUID gEfiCustomModeEnableGuid;
 
 ///
 ///  "CustomMode" variable for two Secure Boot modes feature: "Custom" and "Standard".

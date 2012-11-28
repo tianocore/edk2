@@ -51,8 +51,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define EFI_CERT_DB_NAME        L"certdb"
 #define MAX_CERTDB_SIZE (FixedPcdGet32 (PcdMaxVariableSize) - sizeof (VARIABLE_HEADER) - sizeof (EFI_CERT_DB_NAME))
 
-extern  EFI_GUID gEfiCertDbGuid;
-
 ///
 /// Struct to record signature requirement defined by UEFI spec.
 /// For SigHeaderSize and SigDataSize, ((UINT32) ~0) means NO exact length requirement for this field.
