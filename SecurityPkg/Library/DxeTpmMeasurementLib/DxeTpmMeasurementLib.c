@@ -42,7 +42,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @retval EFI_OUT_OF_RESOURCES  Out of memory.
   @retval EFI_DEVICE_ERROR      The operation was unsuccessful.
 **/
-
 EFI_STATUS
 Tpm12MeasureAndLogData (
   IN UINT32             PcrIndex,
@@ -109,7 +108,6 @@ Tpm12MeasureAndLogData (
   @retval EFI_OUT_OF_RESOURCES  Out of memory.
   @retval EFI_DEVICE_ERROR      The operation was unsuccessful.
 **/
-
 EFI_STATUS
 EFIAPI 
 TpmMeasureAndLogData (
