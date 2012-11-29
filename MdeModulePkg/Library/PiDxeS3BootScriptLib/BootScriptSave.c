@@ -1989,13 +1989,10 @@ S3BootScriptCompare (
   if (RelativePosition == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  TableLength = ((EFI_BOOT_SCRIPT_TABLE_HEADER*)Script)->TableLength;
   //
-  // If in boot time, TableLength does not include the termination node. so add it up 
+  // mS3BootScriptTablePtr->TableLength does not include the termination node, so add it up
   //
-  if (!mS3BootScriptTablePtr->AtRuntime) {
-    TableLength += sizeof(EFI_BOOT_SCRIPT_TERMINATE);
-  }
+  TableLength = mS3BootScriptTablePtr->TableLength + sizeof (EFI_BOOT_SCRIPT_TERMINATE);
   if (Position1 < Script || Position1 > Script+TableLength) {
     return EFI_INVALID_PARAMETER;
   }
