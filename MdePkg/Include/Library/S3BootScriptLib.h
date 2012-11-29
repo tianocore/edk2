@@ -5,7 +5,7 @@
   be provided in the Framework version library instance, which means some of these 
   APIs cannot be used if the underlying firmware is Framework and not PI.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -348,7 +348,6 @@ S3BootScriptSaveMemPoll (
   @param[in] InformationLength   Length of the data in bytes
   @param[in] Information        Information to be logged in the boot scrpit
  
-  @retval RETURN_UNSUPPORTED        In runtime, this method is not supported.
   @retval RETURN_OUT_OF_RESOURCES   Not enough memory for the table to perform 
                                     the operation.
   @retval RETURN_SUCCESS            The opcode was added.
@@ -461,7 +460,6 @@ S3BootScriptSavePci2Poll (
   @param[in] String   The Null-terminated ASCII string to store into the S3 boot 
                       script table.
 
-  @retval RETURN_UNSUPPORTED        In runtime, this method is not supported.
   @retval RETURN_OUT_OF_RESOURCES   Not enough memory for the table to perform 
                                     the operation.
   @retval RETURN_SUCCESS            The opcode was added.

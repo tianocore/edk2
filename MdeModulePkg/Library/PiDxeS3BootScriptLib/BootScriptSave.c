@@ -54,10 +54,6 @@ EFI_GUID                         mBootScriptHeaderDataGuid = {
   0x1810ab4a, 0x2314, 0x4df6, { 0x81, 0xeb, 0x67, 0xc6, 0xec, 0x5, 0x85, 0x91 }
 };
 
-EFI_GUID                         mBootScriptInformationGuid = {
-  0x2c680508, 0x2b87, 0x46ab, { 0xb9, 0x8a, 0x49, 0xfc, 0x23, 0xf9, 0xf5, 0x95 }
-};
-
 /**
   This is an internal function to add a terminate node the entry, recalculate the table 
   length and fill into the table. 
@@ -104,113 +100,6 @@ S3BootScriptInternalCloseTable (
 }  
 
 /**
-  This function return the total size of INFORMATION OPCODE in boot script table.
-
-  @return InformationBufferSize The total size of INFORMATION OPCODE in boot script table.
-**/
-UINTN
-GetBootScriptInformationBufferSize (
-  VOID
-  )
-{
-  UINT8                          *S3TableBase;
-  UINT8                          *Script;
-  UINTN                          TableLength;
-  EFI_BOOT_SCRIPT_COMMON_HEADER  ScriptHeader;
-  EFI_BOOT_SCRIPT_TABLE_HEADER   TableHeader;
-  EFI_BOOT_SCRIPT_INFORMATION    Information;
-  UINTN                          InformationBufferSize;
-
-  InformationBufferSize = 0;
-
-  S3TableBase   = mS3BootScriptTablePtr->TableBase;
-  Script        = S3TableBase;
-  CopyMem ((VOID*)&TableHeader, Script, sizeof(EFI_BOOT_SCRIPT_TABLE_HEADER));
-  TableLength   = TableHeader.TableLength;
-
-  //
-  // Go through the ScriptTable
-  //
-  while ((UINTN) Script < (UINTN) (S3TableBase + TableLength)) {
-    CopyMem ((VOID*)&ScriptHeader, Script, sizeof(EFI_BOOT_SCRIPT_COMMON_HEADER));
-    switch (ScriptHeader.OpCode) {
-    case EFI_BOOT_SCRIPT_INFORMATION_OPCODE:
-      CopyMem ((VOID*)&Information, (VOID*)Script, sizeof(Information));
-      InformationBufferSize += Information.InformationLength;
-      break;
-    default:
-      break;
-    }
-    Script  = Script + ScriptHeader.Length;
-  }
-
-  return InformationBufferSize;
-}
-
-/**
-  This function fix INFORMATION OPCODE in boot script table.
-  Originally, the Information buffer is pointer to EfiRuntimeServicesCode,
-  EfiRuntimeServicesData, or EfiACPIMemoryNVS. They are seperated.
-  Now, in order to save it to LockBox, we allocate a big EfiACPIMemoryNVS,
-  and fix the pointer for INFORMATION opcode InformationBuffer.
-
-  @param InformationBuffer     The address of new Information buffer.
-  @param InformationBufferSize The size of new Information buffer.
-**/
-VOID
-FixBootScriptInformation (
-  IN VOID  *InformationBuffer,
-  IN UINTN InformationBufferSize
-  )
-{
-  UINT8                          *S3TableBase;
-  UINT8                          *Script;
-  UINTN                          TableLength;
-  EFI_BOOT_SCRIPT_COMMON_HEADER  ScriptHeader;
-  EFI_BOOT_SCRIPT_TABLE_HEADER   TableHeader;
-  EFI_BOOT_SCRIPT_INFORMATION    Information;
-  UINTN                          FixedInformationBufferSize;
-
-  FixedInformationBufferSize = 0;
-
-  S3TableBase   = mS3BootScriptTablePtr->TableBase;
-  Script        = S3TableBase;
-  CopyMem ((VOID*)&TableHeader, Script, sizeof(EFI_BOOT_SCRIPT_TABLE_HEADER));
-  TableLength   = TableHeader.TableLength;
-
-  //
-  // Go through the ScriptTable
-  //
-  while ((UINTN) Script < (UINTN) (S3TableBase + TableLength)) {
-    CopyMem ((VOID*)&ScriptHeader, Script, sizeof(EFI_BOOT_SCRIPT_COMMON_HEADER));
-    switch (ScriptHeader.OpCode) {
-    case EFI_BOOT_SCRIPT_INFORMATION_OPCODE:
-      CopyMem ((VOID*)&Information, (VOID*)Script, sizeof(Information));
-
-      CopyMem (
-        (VOID *)((UINTN)InformationBuffer + FixedInformationBufferSize),
-        (VOID *)(UINTN)Information.Information,
-        Information.InformationLength
-        );
-      gBS->FreePool ((VOID *)(UINTN)Information.Information);
-      Information.Information = (EFI_PHYSICAL_ADDRESS)((UINTN)InformationBuffer + FixedInformationBufferSize);
-
-      CopyMem ((VOID*)Script, (VOID*)&Information, sizeof(Information));
-
-      FixedInformationBufferSize += Information.InformationLength;
-      break;
-    default:
-      break;
-    }
-    Script  = Script + ScriptHeader.Length;
-  }
-
-  ASSERT (FixedInformationBufferSize == InformationBufferSize);
-
-  return ;
-}
-
-/**
   This function save boot script data to LockBox.
   1. BootSriptPrivate data, BootScript data - Image and DispatchContext are handled by platform.
   2. BootScriptExecutor, BootScriptExecutor context
@@ -223,43 +112,6 @@ SaveBootScriptDataToLockBox (
   )
 {
   EFI_STATUS            Status;
-  EFI_PHYSICAL_ADDRESS  InformationBuffer;
-  UINTN                 InformationBufferSize;
-
-  //
-  // We need save BootScriptInformation to LockBox, because it is in
-  // EfiRuntimeServicesCode, EfiRuntimeServicesData, or EfiACPIMemoryNVS.
-  // 
-  //
-  InformationBufferSize = GetBootScriptInformationBufferSize ();
-  if (InformationBufferSize != 0) {
-    InformationBuffer = 0xFFFFFFFF;
-    Status = gBS->AllocatePages (
-                    AllocateMaxAddress,
-                    EfiACPIMemoryNVS,
-                    EFI_SIZE_TO_PAGES(InformationBufferSize),
-                    &InformationBuffer
-                    );
-    ASSERT_EFI_ERROR (Status);
-
-    //
-    // Fix BootScript information pointer
-    //
-    FixBootScriptInformation ((VOID *)(UINTN)InformationBuffer, InformationBufferSize);
-
-    //
-    // Save BootScript information to lockbox
-    //
-    Status = SaveLockBox (
-               &mBootScriptInformationGuid,
-               (VOID *)(UINTN)InformationBuffer,
-               InformationBufferSize
-               );
-    ASSERT_EFI_ERROR (Status);
-
-    Status = SetLockBoxAttributes (&mBootScriptInformationGuid, LOCK_BOX_ATTRIBUTE_RESTORE_IN_PLACE);
-    ASSERT_EFI_ERROR (Status);
-  }
 
   //
   // mS3BootScriptTablePtr->TableLength does not include EFI_BOOT_SCRIPT_TERMINATE, because we need add entry at runtime.
@@ -1371,7 +1223,6 @@ S3BootScriptSaveMemPoll (
   @param InformationLength   Length of the data in bytes
   @param Information       Information to be logged in the boot scrpit
  
-  @retval RETURN_UNSUPPORTED       If  entering runtime, this method will not support.
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
   @retval RETURN_SUCCESS           Opcode is added.
 
@@ -1383,30 +1234,12 @@ S3BootScriptSaveInformation (
   IN  VOID                                 *Information
   )
 {
-  RETURN_STATUS         Status;
   UINT8                 Length;
   UINT8                 *Script;
-  VOID                  *Buffer;
   EFI_BOOT_SCRIPT_INFORMATION  ScriptInformation;
 
-  if (mS3BootScriptTablePtr->AtRuntime) {
-    return RETURN_UNSUPPORTED;
-  }
-  Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_INFORMATION));
-  
-  //
-  // Use BootServicesData to hold the data, just in case caller free it.
-  // It will be copied into ACPINvs later.
-  //
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  InformationLength,
-                  &Buffer
-                  );
-  if (EFI_ERROR (Status)) {
-    return RETURN_OUT_OF_RESOURCES;
-  }
-  
+  Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_INFORMATION) + InformationLength);
+
   Script = S3BootScriptGetEntryAddAddress (Length);
   if (Script == NULL) {
     return RETURN_OUT_OF_RESOURCES;
@@ -1420,10 +1253,11 @@ S3BootScriptSaveInformation (
 
   ScriptInformation.InformationLength = InformationLength;  
 
-  CopyMem ((VOID *)(UINTN)Buffer, Information,(UINTN) InformationLength);  
-  ScriptInformation.Information = (EFI_PHYSICAL_ADDRESS) (UINTN) Buffer;
-  
-  CopyMem ((VOID*)Script, (VOID*)&ScriptInformation, sizeof (EFI_BOOT_SCRIPT_INFORMATION));  
+  CopyMem ((VOID*)Script, (VOID*)&ScriptInformation, sizeof (EFI_BOOT_SCRIPT_INFORMATION));
+  CopyMem ((VOID*)(Script + sizeof (EFI_BOOT_SCRIPT_INFORMATION)), (VOID *) Information, (UINTN) InformationLength);
+
+  SyncBootScript ();
+
   return RETURN_SUCCESS;
 
 }
@@ -1840,7 +1674,6 @@ S3BootScriptLabelInternal (
 {
   UINT8                 Length;
   UINT8                 *Script;
-  VOID                  *Buffer;
   EFI_BOOT_SCRIPT_INFORMATION  ScriptInformation;
  
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_INFORMATION) + InformationLength);
@@ -1849,7 +1682,6 @@ S3BootScriptLabelInternal (
   if (Script == NULL) {
     return RETURN_OUT_OF_RESOURCES;
   }
-  Buffer =  Script + sizeof (EFI_BOOT_SCRIPT_INFORMATION);
   //
   // Build script data
   //
@@ -1859,11 +1691,9 @@ S3BootScriptLabelInternal (
 
   ScriptInformation.InformationLength = InformationLength;  
 
-  AsciiStrnCpy (Buffer, Information,(UINTN) InformationLength);  
-  ScriptInformation.Information = (EFI_PHYSICAL_ADDRESS) (UINTN) Buffer;
-  
-  CopyMem ((VOID*)Script, (VOID*)&ScriptInformation, sizeof (EFI_BOOT_SCRIPT_INFORMATION));  
-  
+  CopyMem ((VOID*)Script, (VOID*)&ScriptInformation, sizeof (EFI_BOOT_SCRIPT_INFORMATION));
+  CopyMem ((VOID*)(Script + sizeof (EFI_BOOT_SCRIPT_INFORMATION)), (VOID *) Information, (UINTN) InformationLength);
+
   return S3BootScriptMoveLastOpcode (BeforeOrAfter, Position);
 
 }

@@ -1201,14 +1201,16 @@ BootScriptExecuteInformation (
 {
   UINT32                        Index;
   EFI_BOOT_SCRIPT_INFORMATION   Information;
+  UINT8                         *InformationData;
 
-  CopyMem ((VOID*)&Information, (VOID*)Script, sizeof(Information));
+  CopyMem ((VOID*)&Information, (VOID*)Script, sizeof(EFI_BOOT_SCRIPT_INFORMATION));
 
-  DEBUG ((EFI_D_INFO, "BootScriptExecuteInformation - 0x%08x\n", (UINTN)Information.Information));
+  InformationData = Script + sizeof (EFI_BOOT_SCRIPT_INFORMATION);
+  DEBUG ((EFI_D_INFO, "BootScriptExecuteInformation - 0x%08x\n", (UINTN) InformationData));
 
   DEBUG ((EFI_D_INFO, "BootScriptInformation: "));
   for (Index = 0; Index < Information.InformationLength; Index++) {
-    DEBUG ((EFI_D_INFO, "%02x ", *(UINT8 *)(UINTN)(Information.Information + Index)));
+    DEBUG ((EFI_D_INFO, "%02x ", InformationData[Index]));
   }
   DEBUG ((EFI_D_INFO, "\n"));
 }
@@ -1227,14 +1229,16 @@ BootScriptExecuteLabel (
 {
   UINT32                        Index;
   EFI_BOOT_SCRIPT_INFORMATION   Information;
+  UINT8                         *InformationData;
 
-  CopyMem ((VOID*)&Information, (VOID*)Script, sizeof(Information));
+  CopyMem ((VOID*)&Information, (VOID*)Script, sizeof(EFI_BOOT_SCRIPT_INFORMATION));
 
-  DEBUG ((EFI_D_INFO, "BootScriptExecuteLabel - 0x%08x\n", (UINTN)Information.Information));
+  InformationData = Script + sizeof (EFI_BOOT_SCRIPT_INFORMATION);
+  DEBUG ((EFI_D_INFO, "BootScriptExecuteLabel - 0x%08x\n", (UINTN) InformationData));
 
   DEBUG ((EFI_D_INFO, "BootScriptLabel: "));
   for (Index = 0; Index < Information.InformationLength; Index++) {
-    DEBUG ((EFI_D_INFO, "%02x ", *(UINT8 *)(UINTN)(Information.Information + Index)));
+    DEBUG ((EFI_D_INFO, "%02x ", InformationData[Index]));
   }
   DEBUG ((EFI_D_INFO, "\n"));
 }
