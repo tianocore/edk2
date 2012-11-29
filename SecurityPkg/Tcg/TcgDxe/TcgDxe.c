@@ -204,7 +204,7 @@ GetProcessorsCpuLocation (
   Status = gBS->AllocatePool(
                   EfiBootServicesData,
                   sizeof(EFI_CPU_PHYSICAL_LOCATION) * ProcessorNum,
-                  &ProcessorLocBuf
+                  (VOID **) &ProcessorLocBuf
                   );
   if (EFI_ERROR(Status)){
     return Status;
