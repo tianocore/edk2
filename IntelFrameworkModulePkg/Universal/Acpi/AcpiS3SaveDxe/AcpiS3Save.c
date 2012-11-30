@@ -101,6 +101,116 @@ AllocateMemoryBelow4G (
 }
 
 /**
+
+  This function scan ACPI table in RSDT.
+
+  @param Rsdt      ACPI RSDT
+  @param Signature ACPI table signature
+
+  @return ACPI table
+
+**/
+VOID *
+ScanTableInRSDT (
+  IN EFI_ACPI_DESCRIPTION_HEADER    *Rsdt,
+  IN UINT32                         Signature
+  )
+{
+  UINTN                              Index;
+  UINT32                             EntryCount;
+  UINT32                             *EntryPtr;
+  EFI_ACPI_DESCRIPTION_HEADER        *Table;
+
+  if (Rsdt == NULL) {
+    return NULL;
+  }
+
+  EntryCount = (Rsdt->Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) / sizeof(UINT32);
+  
+  EntryPtr = (UINT32 *)(Rsdt + 1);
+  for (Index = 0; Index < EntryCount; Index ++, EntryPtr ++) {
+    Table = (EFI_ACPI_DESCRIPTION_HEADER *)((UINTN)(*EntryPtr));
+    if (Table->Signature == Signature) {
+      return Table;
+    }
+  }
+  
+  return NULL;
+}
+
+/**
+
+  This function scan ACPI table in XSDT.
+
+  @param Xsdt      ACPI XSDT
+  @param Signature ACPI table signature
+
+  @return ACPI table
+
+**/
+VOID *
+ScanTableInXSDT (
+  IN EFI_ACPI_DESCRIPTION_HEADER    *Xsdt,
+  IN UINT32                         Signature
+  )
+{
+  UINTN                          Index;
+  UINT32                         EntryCount;
+  UINT64                         EntryPtr;
+  UINTN                          BasePtr;
+  EFI_ACPI_DESCRIPTION_HEADER    *Table;
+
+  if (Xsdt == NULL) {
+    return NULL;
+  }
+
+  EntryCount = (Xsdt->Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) / sizeof(UINT64);
+  
+  BasePtr = (UINTN)(Xsdt + 1);
+  for (Index = 0; Index < EntryCount; Index ++) {
+    CopyMem (&EntryPtr, (VOID *)(BasePtr + Index * sizeof(UINT64)), sizeof(UINT64));
+    Table = (EFI_ACPI_DESCRIPTION_HEADER *)((UINTN)(EntryPtr));
+    if (Table->Signature == Signature) {
+      return Table;
+    }
+  }
+  
+  return NULL;
+}
+
+/**
+  To find Facs in FADT.
+
+  @param Fadt   FADT table pointer
+  
+  @return  Facs table pointer.
+**/
+EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE  *
+FindAcpiFacsFromFadt (
+  IN EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE     *Fadt
+  )
+{
+  EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE  *Facs;
+  UINT64                                        Data64;
+
+  if (Fadt == NULL) {
+    return NULL;
+  }
+
+  if (Fadt->Header.Revision < EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION) {
+    Facs = (EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *)(UINTN)Fadt->FirmwareCtrl;
+  } else {
+    if (Fadt->FirmwareCtrl != 0) {
+      Facs = (EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *)(UINTN)Fadt->FirmwareCtrl;
+    } else {
+      CopyMem (&Data64, &Fadt->XFirmwareCtrl, sizeof(UINT64));
+      Facs = (EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *)(UINTN)Data64;
+    }
+  }
+  return Facs;
+}
+
+/**
   To find Facs in Acpi tables.
  
   To find Firmware ACPI control strutcure in Acpi Tables since the S3 waking vector is stored 
@@ -117,13 +227,12 @@ FindAcpiFacsTableByAcpiGuid (
 {
   EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER  *Rsdp;
   EFI_ACPI_DESCRIPTION_HEADER                   *Rsdt;
+  EFI_ACPI_DESCRIPTION_HEADER                   *Xsdt;
   EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE     *Fadt;
   EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE  *Facs;
   UINTN                                         Index;
-  UINT32                                        Data32;
+
   Rsdp  = NULL;
-  Rsdt  = NULL;
-  Fadt  = NULL;
   //
   // found ACPI table RSD_PTR from system table
   //
@@ -141,27 +250,33 @@ FindAcpiFacsTableByAcpiGuid (
     return NULL;
   }
 
-  Rsdt = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN) Rsdp->RsdtAddress;
-  if (Rsdt == NULL || Rsdt->Signature != EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_TABLE_SIGNATURE) {
-    return NULL;
-  }
-
-  for (Index = sizeof (EFI_ACPI_DESCRIPTION_HEADER); Index < Rsdt->Length; Index = Index + sizeof (UINT32)) {
-
-    Data32  = *(UINT32 *) ((UINT8 *) Rsdt + Index);
-    Fadt    = (EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE *) (UINT32 *) (UINTN) Data32;
-    if (Fadt->Header.Signature == EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) {
-      break;
+  //
+  // Search XSDT
+  //
+  if (Rsdp->Revision >= EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER_REVISION) {
+    Xsdt = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN) Rsdp->XsdtAddress;
+    Fadt = ScanTableInXSDT (Xsdt, EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE);
+    if (Fadt != NULL) {
+      Facs = FindAcpiFacsFromFadt (Fadt);
+      if (Facs != NULL) {
+        return Facs;
+      }
     }
   }
 
-  if (Fadt == NULL || Fadt->Header.Signature != EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) {
-    return NULL;
+  //
+  // Search RSDT
+  //
+  Rsdt = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN) Rsdp->RsdtAddress;
+  Fadt = ScanTableInRSDT (Rsdt, EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE);
+  if (Fadt != NULL) {
+    Facs = FindAcpiFacsFromFadt (Fadt);
+    if (Facs != NULL) {
+      return Facs;
+    }
   }
 
-  Facs = (EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *)(UINTN)Fadt->FirmwareCtrl;
-
-  return Facs;
+  return NULL;
 }
 
 /**

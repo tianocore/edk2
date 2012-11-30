@@ -1,7 +1,7 @@
 /** @file
   ACPI Table Protocol Implementation
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -717,14 +717,19 @@ AddTableToList (
 
       //
       // Update pointers in FADT.  If tables don't exist this will put NULL pointers there.
+      // Note: If the FIRMWARE_CTRL is non-zero, then X_FIRMWARE_CTRL must be zero, and 
+      // vice-versa.
       //
-      AcpiTableInstance->Fadt3->FirmwareCtrl  = (UINT32) (UINTN) AcpiTableInstance->Facs3;
-      Buffer64 = (UINT64) (UINTN) AcpiTableInstance->Facs3;
-      CopyMem (
-        &AcpiTableInstance->Fadt3->XFirmwareCtrl,
-        &Buffer64,
-        sizeof (UINT64)
-        );
+      if ((UINT64)(UINTN)AcpiSupportInstance->Facs3 < BASE_4GB) {
+        AcpiTableInstance->Fadt3->FirmwareCtrl  = (UINT32) (UINTN) AcpiTableInstance->Facs3;
+      } else {
+        Buffer64 = (UINT64) (UINTN) AcpiTableInstance->Facs3;
+        CopyMem (
+          &AcpiTableInstance->Fadt3->XFirmwareCtrl,
+          &Buffer64,
+          sizeof (UINT64)
+          );
+      }
       AcpiTableInstance->Fadt3->Dsdt  = (UINT32) (UINTN) AcpiTableInstance->Dsdt3;
       Buffer64                          = (UINT64) (UINTN) AcpiTableInstance->Dsdt3;
       CopyMem (
@@ -840,13 +845,20 @@ AddTableToList (
       // If FADT already exists, update table pointers.
       //
       if (AcpiTableInstance->Fadt3 != NULL) {
-        AcpiTableInstance->Fadt3->FirmwareCtrl  = (UINT32) (UINTN) AcpiTableInstance->Facs3;
-        Buffer64 = (UINT64) (UINTN) AcpiTableInstance->Facs3;
-        CopyMem (
-          &AcpiTableInstance->Fadt3->XFirmwareCtrl,
-          &Buffer64,
-          sizeof (UINT64)
-          );
+        //
+        // Note: If the FIRMWARE_CTRL is non-zero, then X_FIRMWARE_CTRL must be zero, and 
+        // vice-versa.
+        //
+        if ((UINT64)(UINTN)AcpiSupportInstance->Facs3 < BASE_4GB) {
+          AcpiTableInstance->Fadt3->FirmwareCtrl  = (UINT32) (UINTN) AcpiTableInstance->Facs3;
+        } else {
+          Buffer64 = (UINT64) (UINTN) AcpiTableInstance->Facs3;
+          CopyMem (
+            &AcpiTableInstance->Fadt3->XFirmwareCtrl,
+            &Buffer64,
+            sizeof (UINT64)
+            );
+        }
 
         //
         // Checksum FADT table
