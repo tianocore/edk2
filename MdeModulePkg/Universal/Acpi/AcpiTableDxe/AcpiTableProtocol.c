@@ -720,7 +720,7 @@ AddTableToList (
       // Note: If the FIRMWARE_CTRL is non-zero, then X_FIRMWARE_CTRL must be zero, and 
       // vice-versa.
       //
-      if ((UINT64)(UINTN)AcpiSupportInstance->Facs3 < BASE_4GB) {
+      if ((UINT64)(UINTN)AcpiTableInstance->Facs3 < BASE_4GB) {
         AcpiTableInstance->Fadt3->FirmwareCtrl  = (UINT32) (UINTN) AcpiTableInstance->Facs3;
       } else {
         Buffer64 = (UINT64) (UINTN) AcpiTableInstance->Facs3;
@@ -849,7 +849,7 @@ AddTableToList (
         // Note: If the FIRMWARE_CTRL is non-zero, then X_FIRMWARE_CTRL must be zero, and 
         // vice-versa.
         //
-        if ((UINT64)(UINTN)AcpiSupportInstance->Facs3 < BASE_4GB) {
+        if ((UINT64)(UINTN)AcpiTableInstance->Facs3 < BASE_4GB) {
           AcpiTableInstance->Fadt3->FirmwareCtrl  = (UINT32) (UINTN) AcpiTableInstance->Facs3;
         } else {
           Buffer64 = (UINT64) (UINTN) AcpiTableInstance->Facs3;
