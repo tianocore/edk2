@@ -3513,7 +3513,7 @@ LoadStorage (
   //
   // Convert Result from <ConfigAltResp> to <ConfigResp>
   //
-  StrPtr = StrStr (Result, L"ALTCFG");
+  StrPtr = StrStr (Result, L"&GUID=");
   if (StrPtr != NULL) {
     *StrPtr = L'\0';
   }
