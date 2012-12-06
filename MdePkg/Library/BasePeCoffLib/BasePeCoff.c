@@ -1818,13 +1818,6 @@ PeCoffLoaderRelocateImageForRuntime (
         FixupData = FixupData + sizeof (UINT64);
         break;
 
-      case EFI_IMAGE_REL_BASED_HIGHADJ:
-        //
-        // Not valid Relocation type for UEFI image, ASSERT
-        //
-        ASSERT (FALSE);
-        break;
-
       default:
         //
         // Only Itanium requires ConvertPeImage_Ex
