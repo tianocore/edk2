@@ -852,3 +852,9 @@
   #  default value is set to Zero. And the PCD is assumed ONLY to be accessed in DxeS3BootScriptLib Library.
   gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptTablePrivateDataPtr|0x0|UINT64|0x00030000
 
+  ## This dynamic PCD hold an address to point to private data structure SMM copy used in DxeS3BootScriptLib library
+  #  instance which records the S3 boot script table start address, length, etc. To introduce this PCD is
+  #  only for DxeS3BootScriptLib instance implementation purpose. The platform developer should make sure the
+  #  default value is set to Zero. And the PCD is assumed ONLY to be accessed in DxeS3BootScriptLib Library.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptTablePrivateSmmDataPtr|0x0|UINT64|0x00030001
+

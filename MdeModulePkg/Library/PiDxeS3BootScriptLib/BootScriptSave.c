@@ -41,9 +41,9 @@
 SCRIPT_TABLE_PRIVATE_DATA        *mS3BootScriptTablePtr;
 EFI_EVENT                        mEnterRuntimeEvent;
 //
-// Allocate local copy in SMM because we can not use mS3BootScriptTablePtr when we AtRuntime in InSmm.
+// Allocate SMM copy because we can not use mS3BootScriptTablePtr when we AtRuntime in InSmm.
 //
-SCRIPT_TABLE_PRIVATE_DATA        mS3BootScriptTable;
+SCRIPT_TABLE_PRIVATE_DATA        *mS3BootScriptTableSmmPtr;
 UINTN                            mLockBoxLength;
 
 EFI_GUID                         mBootScriptDataGuid = {
@@ -212,7 +212,7 @@ S3BootScriptSmmEventCallBack (
   //
   // Check if it is already done
   //
-  if (mS3BootScriptTablePtr == &mS3BootScriptTable) {
+  if (mS3BootScriptTablePtr == mS3BootScriptTableSmmPtr) {
     return EFI_SUCCESS;
   }
 
@@ -222,13 +222,15 @@ S3BootScriptSmmEventCallBack (
   S3BootScriptEventCallBack (NULL, NULL);
 
   //
-  // Save a local copy
+  // Save a SMM copy. If TableBase is NOT null, it means SMM copy has been ready, skip copy mem.
   //
-  CopyMem (&mS3BootScriptTable, mS3BootScriptTablePtr, sizeof(*mS3BootScriptTablePtr));
+  if (mS3BootScriptTableSmmPtr->TableBase == NULL) {
+    CopyMem (mS3BootScriptTableSmmPtr, mS3BootScriptTablePtr, sizeof(*mS3BootScriptTablePtr));
+  }
   //
   // We should not use ACPINvs copy, because it is not safe.
   //
-  mS3BootScriptTablePtr = &mS3BootScriptTable;
+  mS3BootScriptTablePtr = mS3BootScriptTableSmmPtr;
 
   //
   // Set InSmm, we allow boot script update when InSmm, but not allow boot script outside SMM.
@@ -239,7 +241,7 @@ S3BootScriptSmmEventCallBack (
   //
   // Record LockBoxLength
   //
-  mLockBoxLength = mS3BootScriptTable.TableLength + sizeof(EFI_BOOT_SCRIPT_TERMINATE);
+  mLockBoxLength = mS3BootScriptTableSmmPtr->TableLength + sizeof(EFI_BOOT_SCRIPT_TERMINATE);
 
   return EFI_SUCCESS;
 }
@@ -264,6 +266,7 @@ S3BootScriptLibInitialize (
 {
   EFI_STATUS                      Status;
   SCRIPT_TABLE_PRIVATE_DATA      *S3TablePtr;
+  SCRIPT_TABLE_PRIVATE_DATA      *S3TableSmmPtr;
   VOID                           *Registration;
   EFI_SMM_BASE2_PROTOCOL         *SmmBase2;
   BOOLEAN                        InSmm;
@@ -324,6 +327,25 @@ S3BootScriptLibInitialize (
   if (EFI_ERROR (Status)) {
     return RETURN_SUCCESS;
   }
+
+  S3TableSmmPtr = (SCRIPT_TABLE_PRIVATE_DATA*)(UINTN)PcdGet64(PcdS3BootScriptTablePrivateSmmDataPtr);
+  //
+  // The Boot script private data in SMM is not be initialized. create it
+  //
+  if (S3TableSmmPtr == 0) {
+    Status = Smst->SmmAllocatePool (
+                     EfiRuntimeServicesData,
+                     sizeof(SCRIPT_TABLE_PRIVATE_DATA),
+                     (VOID **) &S3TableSmmPtr
+                     );
+    if (EFI_ERROR (Status)) {
+      return RETURN_OUT_OF_RESOURCES;
+    }
+
+    PcdSet64 (PcdS3BootScriptTablePrivateSmmDataPtr, (UINT64) (UINTN)S3TableSmmPtr);
+    ZeroMem (S3TableSmmPtr, sizeof(SCRIPT_TABLE_PRIVATE_DATA));
+  }
+  mS3BootScriptTableSmmPtr = S3TableSmmPtr;
 
   //
   // Then register event after lock
@@ -495,12 +517,12 @@ S3BootScriptGetEntryAddAddress (
     }
 
     //
-    // NOTE: OS will restore ACPINvs data. After S3, the table length in mS3BootScriptTable (SMM) is different with
+    // NOTE: OS will restore ACPINvs data. After S3, the table length in mS3BootScriptTableSmmPtr (SMM) is different with
     // table length in BootScriptTable header (ACPINvs).
     // So here we need sync them. We choose ACPINvs table length, because we want to override the boot script saved
     // in SMM every time.
     //
-    ASSERT (mS3BootScriptTablePtr == &mS3BootScriptTable);
+    ASSERT (mS3BootScriptTablePtr == mS3BootScriptTableSmmPtr);
     CopyMem ((VOID*)&TableHeader, (VOID*)mS3BootScriptTablePtr->TableBase, sizeof(EFI_BOOT_SCRIPT_TABLE_HEADER));
     if (mS3BootScriptTablePtr->TableLength + sizeof(EFI_BOOT_SCRIPT_TERMINATE) != TableHeader.TableLength) {
       //
