@@ -113,11 +113,15 @@
   StdLib/LibC/Uefi/Devices/daConsole.inf
   StdLib/LibC/Uefi/Devices/daShell.inf
 
+# Additional, non-standard, libraries
+  StdLib/LibC/Containers/ContainerLib.inf
+
 # Additional libraries for POSIX functionality.
   StdLib/PosixLib/Err/LibErr.inf
   StdLib/PosixLib/Gen/LibGen.inf
   StdLib/PosixLib/Glob/LibGlob.inf
   StdLib/PosixLib/Stringlist/LibStringlist.inf
+  StdLib/LibC/Uefi/InteractiveIO/IIO.inf
 
 #    Socket Libraries - LibC based
   StdLib/BsdSocketLib/BsdSocketLib.inf

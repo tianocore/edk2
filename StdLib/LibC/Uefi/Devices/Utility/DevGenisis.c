@@ -1,7 +1,7 @@
 /** @file
     Device Abstraction: device creation utility functions.
 
-    Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available under
     the terms and conditions of the BSD License that accompanies this distribution.
     The full text of the license may be found at
@@ -44,22 +44,40 @@ int     EFIAPI fnullop_flush (struct __filedes *filp)
 { return 0; }
 
 int     EFIAPI fbadop_stat   (struct __filedes *filp, struct stat *StatBuf, void *Buf)
-{ return -EPERM;  }
+{
+  errno = EPERM;
+  return -1;
+}
 
 int     EFIAPI fbadop_ioctl  (struct __filedes *filp, ULONGN Cmd, va_list argp)
-{ return -EPERM;  }
+{
+  errno = EPERM;
+  return -1;
+}
 
 int     EFIAPI fbadop_delete (struct __filedes *filp)
-{ return -EPERM;  }
+{
+  errno = EPERM;
+  return -1;
+}
 
 int     EFIAPI fbadop_mkdir  (const char *path, __mode_t perms)
-{ return -EPERM;  }
+{
+  errno = EPERM;
+  return -1;
+}
 
 int     EFIAPI fbadop_rename   (const char *from, const char *to)
-{ return -EPERM;  }
+{
+  errno = EPERM;
+  return -1;
+}
 
 int     EFIAPI fbadop_rmdir    (struct __filedes *filp)
-{ return -EPERM;  }
+{
+  errno = EPERM;
+  return -1;
+}
 
 /** Add a new device to the device list.
     If both DevName and DevProto are NULL, register this as the Default device.

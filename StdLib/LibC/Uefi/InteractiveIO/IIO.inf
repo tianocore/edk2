@@ -1,7 +1,7 @@
 ## @file
-#  Standard C library: Console Device Abstraction.
+#  Interactive I/O Library.
 #
-#  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials are licensed and made available
 #  under the terms and conditions of the BSD License which accompanies this
 #  distribution.  The full text of the license may be found at
@@ -10,43 +10,42 @@
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#
 ##
 
 [Defines]
   INF_VERSION                   = 0x00010005
-  BASE_NAME                     = DevConsole
-  FILE_GUID                     = f6937495-1f44-4a8a-8a1b-5a669f9396f6
+  BASE_NAME                     = LibIIO
+  FILE_GUID                     = c1e9fffb-5557-4cb5-a5f5-1fbd902a74ed
   MODULE_TYPE                   = UEFI_APPLICATION
   VERSION_STRING                = 1.0
-  LIBRARY_CLASS                 = DevConsole
-  CONSTRUCTOR                   = __Cons_construct
-  DESTRUCTOR                    = __Cons_deconstruct
+  LIBRARY_CLASS                 = LibIIO
 
 #
-#  VALID_ARCHITECTURES          = IA32 X64 IPF
+#  VALID_ARCHITECTURES          = IA32 X64
 #
 
 [Sources]
-  Console/daConsole.c
+  IIO.c
+  NonCanonRead.c
+  CanonRead.c
+  TerminalFunctions.c
+  IIOutilities.c
+  IIOwrite.c
+  IIOecho.c
 
 [Packages]
+  MdePkg/MdePkg.dec
   StdLib/StdLib.dec
   StdLibPrivateInternalFiles/DoNotUse.dec
-  MdePkg/MdePkg.dec
-  ShellPkg/ShellPkg.dec
 
 [LibraryClasses]
   BaseLib
   BaseMemoryLib
   MemoryAllocationLib
-  UefiBootServicesTableLib
   LibC
   LibWchar
-  LibUefi
-  LibIIO
-  DevUtility
+  LibContainer
 
 [Protocols]
-  gEfiSimpleTextInProtocolGuid        ## CONSUMED
-  gEfiSimpleTextOutProtocolGuid       ## CONSUMED
+  gEfiSimpleTextInProtocolGuid          ## CONSUMES
+  gEfiSimpleTextOutProtocolGuid         ## CONSUMES

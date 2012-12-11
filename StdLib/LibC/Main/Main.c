@@ -158,9 +158,9 @@ ShellAppMain (
       mfd[i].MyFD = (UINT16)i;
     }
 
-    i = open("stdin:", O_RDONLY, 0444);
+    i = open("stdin:", (O_RDONLY | O_TTY_INIT), 0444);
     if(i == 0) {
-      i = open("stdout:", O_WRONLY, 0222);
+      i = open("stdout:", (O_WRONLY | O_TTY_INIT), 0222);
       if(i == 1) {
         i = open("stderr:", O_WRONLY, 0222);
       }

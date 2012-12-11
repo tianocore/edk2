@@ -1,0 +1,46 @@
+## @file
+# INF file for building the Container library.
+#
+# Various types of containers are implemented within this library.
+# Types of containers may be Queues (FIFO, LIFO, etc.), hash tables, etc.
+#
+# Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THIS PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = LibContainer
+  FILE_GUID                      = 92f7436e-7395-4da1-a7be-f352f0bcd79c
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = LibContainer
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  Queues/Fifo.c
+  Common/ModuloUtil.c
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  LibC
+  LibWchar
+
+[Packages]
+  MdePkg/MdePkg.dec
+  StdLib/StdLib.dec
+  StdLibPrivateInternalFiles/DoNotUse.dec
