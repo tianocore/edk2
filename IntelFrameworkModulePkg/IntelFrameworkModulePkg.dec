@@ -202,6 +202,7 @@
   ## The PCD is used to specify memory base address for OPROM to find free memory.
   # Some OPROMs do not use EBDA or PMM to allocate memory for its usage, 
   # instead they find the memory filled with zero from 0x20000.
+  # The value should be a multiple of 4KB.
   # The range should be below the EBDA reserved range from 
   # (CONVENTIONAL_MEMORY_TOP - PcdEbdaReservedMemorySize) to CONVENTIONAL_MEMORY_TOP.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdOpromReservedMemoryBase|0x60000|UINT32|0x3000000c
