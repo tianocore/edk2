@@ -445,7 +445,7 @@ SmmVariableHandler (
       //
       // SMRAM range check already covered before
       //
-      if (InfoSize > *CommBufferSize - OFFSET_OF (SMM_VARIABLE_COMMUNICATE_HEADER, Data)) {
+      if (InfoSize > *CommBufferSize - SMM_VARIABLE_COMMUNICATE_HEADER_SIZE) {
         DEBUG ((EFI_D_ERROR, "Data size exceed communication buffer size limit!\n"));
         Status = EFI_ACCESS_DENIED;
         goto EXIT;
@@ -467,7 +467,7 @@ SmmVariableHandler (
       //
       // SMRAM range check already covered before
       //
-      if (InfoSize > *CommBufferSize - OFFSET_OF (SMM_VARIABLE_COMMUNICATE_HEADER, Data)) {
+      if (InfoSize > *CommBufferSize - SMM_VARIABLE_COMMUNICATE_HEADER_SIZE) {
         DEBUG ((EFI_D_ERROR, "Data size exceed communication buffer size limit!\n"));
         Status = EFI_ACCESS_DENIED;
         goto EXIT;
@@ -498,7 +498,7 @@ SmmVariableHandler (
       //
       // SMRAM range check already covered before
       //
-      if (InfoSize > *CommBufferSize - OFFSET_OF (SMM_VARIABLE_COMMUNICATE_HEADER, Data)) {
+      if (InfoSize > *CommBufferSize - SMM_VARIABLE_COMMUNICATE_HEADER_SIZE) {
         DEBUG ((EFI_D_ERROR, "Data size exceed communication buffer size limit!\n"));
         Status = EFI_ACCESS_DENIED;
         goto EXIT;
@@ -528,7 +528,7 @@ SmmVariableHandler (
 
     case SMM_VARIABLE_FUNCTION_GET_STATISTICS:
       VariableInfo = (VARIABLE_INFO_ENTRY *) SmmVariableFunctionHeader->Data;
-      InfoSize = *CommBufferSize - OFFSET_OF (SMM_VARIABLE_COMMUNICATE_HEADER, Data);
+      InfoSize = *CommBufferSize - SMM_VARIABLE_COMMUNICATE_HEADER_SIZE;
 
       //
       // Do not need to check SmmVariableFunctionHeader->Data in SMRAM here. 
@@ -542,7 +542,7 @@ SmmVariableHandler (
       }  
 
       Status = SmmVariableGetStatistics (VariableInfo, &InfoSize);
-      *CommBufferSize = InfoSize + OFFSET_OF (SMM_VARIABLE_COMMUNICATE_HEADER, Data);
+      *CommBufferSize = InfoSize + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE;
       break;
 
     default:
