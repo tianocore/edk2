@@ -2,7 +2,7 @@
 # Component description file for Undi module.
 #
 # This module provides support for Universal Network Driver Interface
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -33,7 +33,7 @@
   E100b.c
   Decode.c
   Init.c
-
+  ComponentName.c
 
 [Packages]
   MdePkg/MdePkg.dec
