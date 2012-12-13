@@ -48,7 +48,9 @@ ShellCommandRunHelp (
   CHAR16              *SectionToGetHelpOn;
   CHAR16              *HiiString;
   BOOLEAN             Found;
+  BOOLEAN             HelpPage;
 
+  HelpPage            = FALSE;
   ProblemParam        = NULL;
   ShellStatus         = SHELL_SUCCESS;
   OutText             = NULL;
@@ -109,6 +111,7 @@ ShellCommandRunHelp (
         ASSERT(SectionToGetHelpOn == NULL);
         StrnCatGrow(&SectionToGetHelpOn, NULL, L"NAME", 0);
       } else {
+        HelpPage = TRUE;
         ASSERT(SectionToGetHelpOn == NULL);
         //
         // Get the section name for the given command name
@@ -119,7 +122,10 @@ ShellCommandRunHelp (
           StrnCatGrow(&SectionToGetHelpOn, NULL, L"NAME,SYNOPSIS", 0);
         } else if (ShellCommandLineGetFlag(Package, L"-verbose") || ShellCommandLineGetFlag(Package, L"-v")) {
         } else {
-          StrnCatGrow(&SectionToGetHelpOn, NULL, L"NAME", 0);
+          //
+          // The output of help <command> will display NAME, SYNOPSIS, OPTIONS, DESCRIPTION, and EXAMPLES sections.
+          //
+          StrnCatGrow (&SectionToGetHelpOn, NULL, L"NAME,SYNOPSIS,OPTIONS,DESCRIPTION,EXAMPLES", 0);
         }
       }
 
@@ -139,6 +145,12 @@ ShellCommandRunHelp (
             ; CommandList != NULL && !IsListEmpty(&CommandList->Link) && !IsNull(&CommandList->Link, &Node->Link)
             ; Node = (COMMAND_LIST*)GetNextNode(&CommandList->Link, &Node->Link)
            ){
+          //
+          // Checking execution break flag when print multiple command help information.
+          //
+          if (ShellGetExecutionBreakFlag ()) {
+            break;
+          } 
           if ((gUnicodeCollation->MetaiMatch(gUnicodeCollation, Node->CommandString, CommandToGetHelpOn)) ||
              (gEfiShellProtocol->GetAlias(CommandToGetHelpOn, NULL) != NULL && (gUnicodeCollation->MetaiMatch(gUnicodeCollation, Node->CommandString, (CHAR16*)(gEfiShellProtocol->GetAlias(CommandToGetHelpOn, NULL)))))) {
             //
@@ -153,14 +165,42 @@ ShellCommandRunHelp (
               }
               ShellStatus = SHELL_NOT_FOUND;
             } else {
-              while (OutText[StrLen(OutText)-1] == L'\r' || OutText[StrLen(OutText)-1] == L'\n' || OutText[StrLen(OutText)-1] == L' ') {
-                OutText[StrLen(OutText)-1] = CHAR_NULL;
+              if (HelpPage == TRUE) {
+                 ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HELP_PAGE_COMMAND), gShellLevel3HiiHandle, OutText);
+              } else {
+                while (OutText[StrLen(OutText)-1] == L'\r' || OutText[StrLen(OutText)-1] == L'\n' || OutText[StrLen(OutText)-1] == L' ') {
+                  OutText[StrLen(OutText)-1] = CHAR_NULL;
+                }
+                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HELP_COMMAND), gShellLevel3HiiHandle, Node->CommandString, OutText);
               }
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HELP_COMMAND), gShellLevel3HiiHandle, Node->CommandString, OutText);
               FreePool(OutText);
               OutText = NULL;
               Found = TRUE;
             }
+          }
+        }
+        //
+        // Search the .man file for Shell applications (Shell external commands).
+        //
+        if (!Found) {
+          Status = gEfiShellProtocol->GetHelpText (CommandToGetHelpOn, SectionToGetHelpOn, &OutText);
+          if (EFI_ERROR(Status) || OutText == NULL) {
+            if (Status == EFI_DEVICE_ERROR) {
+              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_HELP_INV), gShellLevel3HiiHandle, CommandToGetHelpOn);
+            } else {
+              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_HELP_NF), gShellLevel3HiiHandle, CommandToGetHelpOn);
+            }
+            ShellStatus = SHELL_NOT_FOUND;
+          } else {
+            while (OutText[StrLen (OutText) - 1] == L'\r' || OutText[StrLen (OutText) - 1] == L'\n' || OutText[StrLen (OutText) - 1] == L' ') {
+              OutText[StrLen (OutText)-1] = CHAR_NULL;
+            }
+            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_HELP_COMMAND), gShellLevel3HiiHandle, CommandToGetHelpOn, OutText);
+            if (OutText != NULL) {
+              FreePool (OutText);
+              OutText = NULL;
+            }
+            Found = TRUE;
           }
         }
       }
