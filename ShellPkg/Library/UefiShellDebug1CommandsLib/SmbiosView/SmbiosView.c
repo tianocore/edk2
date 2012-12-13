@@ -325,6 +325,12 @@ SMBiosView (
       if (!RandomView) {
         break;
       }
+      //
+      // Support Execution Interrupt.
+      //
+      if (ShellGetExecutionBreakFlag ()) {
+        return EFI_ABORTED;
+      }
     }
 
     ShellPrintEx(-1,-1,L"\n=========================================================\n");
