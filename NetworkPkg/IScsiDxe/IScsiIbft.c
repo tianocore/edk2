@@ -321,14 +321,10 @@ IScsiFillNICAndTargetSections (
       Nic->SubnetMaskPrefixLength = NvData->PrefixLength;
       CopyMem (&Nic->Ip, &NvData->LocalIp, sizeof (EFI_IPv6_ADDRESS));
       CopyMem (&Nic->Gateway, &NvData->Gateway, sizeof (EFI_IPv6_ADDRESS));
-      
       CopyMem (&Nic->PrimaryDns, &Attempt->PrimaryDns, sizeof (EFI_IPv6_ADDRESS));
       CopyMem (&Nic->SecondaryDns, &Attempt->SecondaryDns, sizeof (EFI_IPv6_ADDRESS));
-      //
-      // TODO: DHCP server address cannot be retrieved by DHCPv6 process since 
-      // DHCP server option is removed.
-      //CopyMem (&Nic->DhcpServer, &Attempt->DhcpServer, sizeof (EFI_IPv6_ADDRESS));
-      //
+      CopyMem (&Nic->DhcpServer, &Attempt->DhcpServer, sizeof (EFI_IPv6_ADDRESS));
+
     } else {
       ASSERT (FALSE);
     }

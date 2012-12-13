@@ -146,11 +146,11 @@ SockDestroyChild (
 
   ASSERT ((Sock != NULL) && (Sock->ProtoHandler != NULL));
 
-  if (Sock->IsDestroyed) {
+  if (Sock->InDestroy) {
     return EFI_SUCCESS;
   }
 
-  Sock->IsDestroyed = TRUE;
+  Sock->InDestroy = TRUE;
 
   Status            = EfiAcquireLockOrFail (&(Sock->Lock));
   if (EFI_ERROR (Status)) {
@@ -177,7 +177,7 @@ SockDestroyChild (
       Status)
       );
 
-    Sock->IsDestroyed = FALSE;
+    Sock->InDestroy = FALSE;
   } else if (SOCK_IS_CONFIGURED (Sock)) {
 
     SockConnFlush (Sock);

@@ -1,7 +1,7 @@
 /** @file
   ARP driver functions.
   
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -242,6 +242,35 @@ ArpCleanService (
 }
 
 /**
+  Callback function which provided by user to remove one node in NetDestroyLinkList process.
+  
+  @param[in]    Entry           The entry to be removed.
+  @param[in]    Context         Pointer to the callback context corresponds to the Context in NetDestroyLinkList.
+
+  @retval EFI_SUCCESS           The entry has been removed successfully.
+  @retval Others                Fail to remove the entry.
+
+**/
+EFI_STATUS
+ArpDestroyChildEntryInHandleBuffer (
+  IN LIST_ENTRY         *Entry,
+  IN VOID               *Context
+)
+{
+  ARP_INSTANCE_DATA             *Instance;
+  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
+  
+  if (Entry == NULL || Context == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Instance = NET_LIST_USER_STRUCT_S (Entry, ARP_INSTANCE_DATA, List, ARP_INSTANCE_DATA_SIGNATURE);
+  ServiceBinding    = (EFI_SERVICE_BINDING_PROTOCOL *) Context;
+
+  return ServiceBinding->DestroyChild (ServiceBinding, Instance->Handle);
+}
+
+/**
   Tests to see if this driver supports a given controller. 
   
   If a child device is provided, it further tests to see if this driver supports 
@@ -446,14 +475,14 @@ ArpDriverBindingStop (
   EFI_HANDLE                    NicHandle;
   EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
   ARP_SERVICE_DATA              *ArpService;
-  ARP_INSTANCE_DATA             *Instance;
+  LIST_ENTRY                    *List;
 
   //
   // Get the NicHandle which the arp servicebinding is installed on.
   //
   NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiManagedNetworkProtocolGuid);
   if (NicHandle == NULL) {
-    return EFI_DEVICE_ERROR;
+    return EFI_SUCCESS;
   }
 
   //
@@ -474,7 +503,21 @@ ArpDriverBindingStop (
 
   ArpService = ARP_SERVICE_DATA_FROM_THIS (ServiceBinding);
 
-  if (NumberOfChildren == 0) {
+  if (NumberOfChildren != 0) {
+    //
+    // NumberOfChildren is not zero, destroy all the ARP children instances.
+    //
+    List = &ArpService->ChildrenList;
+    Status = NetDestroyLinkList (
+               List,
+               ArpDestroyChildEntryInHandleBuffer,
+               ServiceBinding,
+               NULL
+               );
+    ASSERT (IsListEmpty (&ArpService->PendingRequestTable));
+    ASSERT (IsListEmpty (&ArpService->DeniedCacheTable));
+    ASSERT (IsListEmpty (&ArpService->ResolvedCacheTable));
+  } else if (IsListEmpty (&ArpService->ChildrenList)) {
     //
     // Uninstall the ARP ServiceBinding protocol.
     //
@@ -491,17 +534,6 @@ ArpDriverBindingStop (
     ArpCleanService (ArpService);
 
     FreePool (ArpService);
-  } else {
-
-    while (!IsListEmpty (&ArpService->ChildrenList)) {
-      Instance = NET_LIST_HEAD (&ArpService->ChildrenList, ARP_INSTANCE_DATA, List);
-
-      ServiceBinding->DestroyChild (ServiceBinding, Instance->Handle);
-    }
-
-    ASSERT (IsListEmpty (&ArpService->PendingRequestTable));
-    ASSERT (IsListEmpty (&ArpService->DeniedCacheTable));
-    ASSERT (IsListEmpty (&ArpService->ResolvedCacheTable));
   }
 
   return EFI_SUCCESS;
@@ -690,14 +722,14 @@ ArpServiceBindingDestroyChild (
 
   Instance = ARP_INSTANCE_DATA_FROM_THIS (Arp);
 
-  if (Instance->Destroyed) {
+  if (Instance->InDestroy) {
     return EFI_SUCCESS;
   }
 
   //
-  // Use the Destroyed as a flag to avoid re-entrance.
+  // Use the InDestroy as a flag to avoid re-entrance.
   //
-  Instance->Destroyed = TRUE;
+  Instance->InDestroy = TRUE;
 
   //
   // Close the Managed Network protocol.
@@ -722,7 +754,7 @@ ArpServiceBindingDestroyChild (
     DEBUG ((EFI_D_ERROR, "ArpSBDestroyChild: Failed to uninstall the arp protocol, %r.\n",
       Status));
 
-    Instance->Destroyed = FALSE;
+    Instance->InDestroy = FALSE;
     return Status;
   }
 

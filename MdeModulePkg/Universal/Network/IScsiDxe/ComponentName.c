@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name(2) protocol implementation for iSCSI.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -34,6 +34,11 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL    gIScsiComponentNam
 
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mIScsiDriverNameTable[] = {
   {"eng;en", L"iSCSI Driver"}, 
+  {NULL, NULL}
+};
+
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mIScsiControllerNameTable[] = {
+  {"eng;en", L"iSCSI (IPv4)"},
   {NULL, NULL}
 };
 
@@ -131,5 +136,36 @@ IScsiComponentNameGetControllerName (
   OUT CHAR16                        **ControllerName
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_HANDLE                      IScsiController;
+  ISCSI_PRIVATE_PROTOCOL          *IScsiIdentifier;
+  EFI_STATUS                      Status;
+  
+  //
+  // Get the handle of the controller we are controling.
+  //
+  IScsiController = NetLibGetNicHandle (ControllerHandle, &gEfiTcp4ProtocolGuid);
+  if (IScsiController == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+
+  Status = gBS->OpenProtocol (
+                  IScsiController,
+                  &gEfiCallerIdGuid,
+                  (VOID **)&IScsiIdentifier,
+                  NULL,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  return LookupUnicodeString2 (
+           Language,
+           This->SupportedLanguages,
+           mIScsiControllerNameTable,
+           ControllerName,
+           (BOOLEAN)(This == &gIScsiComponentName)
+           );
 }
+

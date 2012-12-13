@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -174,6 +174,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mUdpDriverNameTable[] = {
   }
 };
 
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE *gUdpControllerNameTable = NULL;
+  
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 
@@ -227,6 +229,75 @@ UdpComponentNameGetDriverName (
            mUdpDriverNameTable,
            DriverName,
            (BOOLEAN)(This == &gUdp4ComponentName)
+           );
+}
+
+/**
+  Update the component name for the Udp4 child handle.
+
+  @param  Udp4[in]                   A pointer to the EFI_UDP4_PROTOCOL.
+
+  
+  @retval EFI_SUCCESS                Update the ControllerNameTable of this instance successfully.
+  @retval EFI_INVALID_PARAMETER      The input parameter is invalid.
+  
+**/
+EFI_STATUS
+UpdateName (
+  EFI_UDP4_PROTOCOL             *Udp4
+  )
+{
+  EFI_STATUS                       Status;
+  CHAR16                           HandleName[64];
+  EFI_UDP4_CONFIG_DATA             Udp4ConfigData;
+
+  if (Udp4 == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Format the child name into the string buffer as:
+  // UDPv4 (SrcPort=59, DestPort=60)
+  //
+  Status = Udp4->GetModeData (Udp4, &Udp4ConfigData, NULL, NULL, NULL);
+  if (!EFI_ERROR (Status)) {
+    UnicodeSPrint (HandleName, sizeof (HandleName),
+      L"UDPv4 (SrcPort=%d, DestPort=%d)",
+      Udp4ConfigData.StationPort,
+      Udp4ConfigData.RemotePort
+      );
+  } else if (Status == EFI_NOT_STARTED) {
+    UnicodeSPrint (
+      HandleName,
+      sizeof (HandleName),
+      L"UDPv4 (Not started)"
+      );
+  } else {
+    return Status;
+  }
+
+  if (gUdpControllerNameTable != NULL) {
+    FreeUnicodeStringTable (gUdpControllerNameTable);
+    gUdpControllerNameTable = NULL;
+  }
+  
+  Status = AddUnicodeString2 (
+             "eng",
+             gUdp4ComponentName.SupportedLanguages,
+             &gUdpControllerNameTable,
+             HandleName,
+             TRUE
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  return AddUnicodeString2 (
+           "en",
+           gUdp4ComponentName2.SupportedLanguages,
+           &gUdpControllerNameTable,
+           HandleName,
+           FALSE
            );
 }
 
@@ -308,6 +379,57 @@ UdpComponentNameGetControllerName (
   OUT CHAR16                                          **ControllerName
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_STATUS                    Status;
+  EFI_UDP4_PROTOCOL             *Udp4;
+
+  //
+  // Only provide names for child handles.
+  //
+  if (ChildHandle == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+  
+  //
+  // Make sure this driver produced ChildHandle
+  //
+  Status = EfiTestChildHandle (
+             ControllerHandle,
+             ChildHandle,
+             &gEfiIp4ProtocolGuid
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Retrieve an instance of a produced protocol from ChildHandle
+  //
+  Status = gBS->OpenProtocol (
+                  ChildHandle,
+                  &gEfiUdp4ProtocolGuid,
+                  (VOID **)&Udp4,
+                  NULL,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Update the component name for this child handle.
+  //
+  Status = UpdateName (Udp4);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return LookupUnicodeString2 (
+           Language,
+           This->SupportedLanguages,
+           gUdpControllerNameTable,
+           ControllerName,
+           (BOOLEAN)(This == &gUdp4ComponentName)
+           );
 }
 

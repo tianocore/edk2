@@ -1398,7 +1398,7 @@ PxeBcDriverBindingStop (
     if (NicHandle == NULL) {
       NicHandle = PxeBcGetNicByIp6Children (ControllerHandle);
       if (NicHandle == NULL) {
-        return EFI_DEVICE_ERROR;
+        return EFI_SUCCESS;
       } else {
         IsIpv6 = TRUE;
       }

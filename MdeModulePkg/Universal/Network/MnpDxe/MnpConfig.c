@@ -1,7 +1,7 @@
 /** @file
   Implementation of Managed Network Protocol private services.
 
-Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -44,7 +44,6 @@ EFI_MANAGED_NETWORK_CONFIG_DATA mMnpDefaultConfigData = {
   FALSE,
   FALSE
 };
-
 
 /**
   Add Count of net buffers to MnpDeviceData->FreeNbufQue. The length of the net
@@ -687,6 +686,30 @@ MnpDestroyServiceData (
 }
 
 /**
+  Callback function which provided by user to remove one node in NetDestroyLinkList process.
+  
+  @param[in]    Entry           The entry to be removed.
+  @param[in]    Context         Pointer to the callback context corresponds to the Context in NetDestroyLinkList.
+
+  @retval EFI_SUCCESS           The entry has been removed successfully.
+  @retval Others                Fail to remove the entry.
+
+**/
+EFI_STATUS
+MnpDestoryChildEntry (
+  IN LIST_ENTRY         *Entry,
+  IN VOID               *Context
+)
+{
+  MNP_INSTANCE_DATA             *Instance;
+  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
+
+  ServiceBinding = (EFI_SERVICE_BINDING_PROTOCOL *) Context;
+  Instance = CR (Entry, MNP_INSTANCE_DATA, InstEntry, MNP_INSTANCE_DATA_SIGNATURE);
+  return ServiceBinding->DestroyChild (ServiceBinding, Instance->Handle);
+}
+
+/**
   Destroy all child of the MNP service data.
 
   @param[in, out]  MnpServiceData    Pointer to the mnp service context data.
@@ -700,26 +723,20 @@ MnpDestroyServiceChild (
   IN OUT MNP_SERVICE_DATA    *MnpServiceData
   )
 {
-  EFI_STATUS                    Status;
-  MNP_INSTANCE_DATA             *Instance;
-  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
-
-  ServiceBinding = &MnpServiceData->ServiceBinding;
-  while (!IsListEmpty (&MnpServiceData->ChildrenList)) {
-    //
-    // Don't use NetListRemoveHead here, the remove opreration will be done
-    // in ServiceBindingDestroyChild.
-    //
-    Instance = NET_LIST_HEAD (
-                 &MnpServiceData->ChildrenList,
-                 MNP_INSTANCE_DATA,
-                 InstEntry
-                 );
-
-    Status = ServiceBinding->DestroyChild (ServiceBinding, Instance->Handle);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+  LIST_ENTRY                         *List;
+  EFI_STATUS                         Status;
+  UINTN                              ListLength;
+  
+  List = &MnpServiceData->ChildrenList;
+  
+  Status = NetDestroyLinkList (
+             List,
+             MnpDestoryChildEntry,
+             &MnpServiceData->ServiceBinding,
+             &ListLength
+             );
+  if (EFI_ERROR (Status) || ListLength != 0) {
+    return EFI_DEVICE_ERROR;
   }
 
   return EFI_SUCCESS;

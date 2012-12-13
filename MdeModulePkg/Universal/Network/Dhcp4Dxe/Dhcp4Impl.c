@@ -1,7 +1,7 @@
 /** @file
   This file implement the EFI_DHCP4_PROTOCOL interface.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1234,6 +1234,8 @@ Dhcp4InstanceCreateUdpIo (
   )
 {
   DHCP_SERVICE  *DhcpSb;
+  EFI_STATUS    Status;
+  VOID          *Udp4;
 
   ASSERT (Instance->Token != NULL);
 
@@ -1248,7 +1250,19 @@ Dhcp4InstanceCreateUdpIo (
   if (Instance->UdpIo == NULL) {
     return EFI_OUT_OF_RESOURCES;
   } else {
-    return EFI_SUCCESS;
+    Status = gBS->OpenProtocol (
+                    Instance->UdpIo->UdpHandle,
+                    &gEfiUdp4ProtocolGuid,
+                    (VOID **) &Udp4,
+                    Instance->Service->Image,
+                    Instance->Handle,
+                    EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+                    );
+    if (EFI_ERROR (Status)) {
+      UdpIoFreeIo (Instance->UdpIo);
+      Instance->UdpIo = NULL;
+    }
+    return Status;
   }
 }
 
@@ -1416,6 +1430,12 @@ SIGNAL_USER:
   //
   NetbufQueFlush (&Instance->ResponseQueue);
   UdpIoCleanIo (Instance->UdpIo);
+  gBS->CloseProtocol (
+         Instance->UdpIo->UdpHandle,
+         &gEfiUdp4ProtocolGuid,
+         Instance->Service->Image,
+         Instance->Handle
+         );
   UdpIoFreeIo (Instance->UdpIo);
   Instance->UdpIo = NULL;
   Instance->Token = NULL;
@@ -1581,6 +1601,12 @@ ON_ERROR:
 
   if (EFI_ERROR (Status) && (Instance->UdpIo != NULL)) {
     UdpIoCleanIo (Instance->UdpIo);
+    gBS->CloseProtocol (
+           Instance->UdpIo->UdpHandle,
+           &gEfiUdp4ProtocolGuid,
+           Instance->Service->Image,
+           Instance->Handle
+           );
     UdpIoFreeIo (Instance->UdpIo);
     Instance->UdpIo = NULL;
     Instance->Token = NULL;

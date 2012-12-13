@@ -2,7 +2,7 @@
   Implementation of protocols EFI_COMPONENT_NAME_PROTOCOL and
   EFI_COMPONENT_NAME2_PROTOCOL.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -170,6 +170,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE        mTcpDriverNameTabl
   }
 };
 
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE        *gTcpControllerNameTable = NULL;
+
 /**
   Retrieves a Unicode string that is the user-readable name of the driver.
 
@@ -221,6 +223,142 @@ TcpComponentNameGetDriverName (
            mTcpDriverNameTable,
            DriverName,
            (BOOLEAN) (This == &gTcpComponentName)
+           );
+}
+
+/**
+  Update the component name for the Tcp4 child handle.
+
+  @param  Tcp4[in]                   A pointer to the EFI_TCP4_PROTOCOL.
+
+  
+  @retval EFI_SUCCESS                Update the ControllerNameTable of this instance successfully.
+  @retval EFI_INVALID_PARAMETER      The input parameter is invalid.
+  
+**/
+EFI_STATUS
+UpdateTcp4Name (
+  IN    EFI_TCP4_PROTOCOL             *Tcp4
+  )
+{
+  EFI_STATUS                       Status;
+  CHAR16                           HandleName[80];
+  EFI_TCP4_CONFIG_DATA             Tcp4ConfigData;
+
+  if (Tcp4 == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Format the child name into the string buffer as:
+  // TCPv4 (SrcPort=59, DestPort=60, ActiveFlag=TRUE)
+  //
+  Status = Tcp4->GetModeData (Tcp4, NULL, &Tcp4ConfigData, NULL, NULL, NULL);
+  if (!EFI_ERROR (Status)) {
+    UnicodeSPrint (HandleName, sizeof (HandleName),
+      L"TCPv4 (SrcPort=%d, DestPort=&d, ActiveFlag=%s)",
+      Tcp4ConfigData.AccessPoint.StationPort,
+      Tcp4ConfigData.AccessPoint.RemotePort,
+      (Tcp4ConfigData.AccessPoint.ActiveFlag ? L"TRUE" : L"FALSE")
+      );
+  } if (Status == EFI_NOT_STARTED) {
+    UnicodeSPrint (
+      HandleName,
+      sizeof (HandleName),
+      L"TCPv4 (Not started)"
+      );
+  } else {
+    return Status;
+  }
+
+  if (gTcpControllerNameTable != NULL) {
+    FreeUnicodeStringTable (gTcpControllerNameTable);
+    gTcpControllerNameTable = NULL;
+  }
+  
+  Status = AddUnicodeString2 (
+             "eng",
+             gTcpComponentName.SupportedLanguages,
+             &gTcpControllerNameTable,
+             HandleName,
+             TRUE
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  return AddUnicodeString2 (
+           "en",
+           gTcpComponentName2.SupportedLanguages,
+           &gTcpControllerNameTable,
+           HandleName,
+           FALSE
+           );
+}
+
+/**
+  Update the component name for the Tcp6 child handle.
+
+  @param  Tcp6[in]                   A pointer to the EFI_TCP6_PROTOCOL.
+
+  
+  @retval EFI_SUCCESS                Update the ControllerNameTable of this instance successfully.
+  @retval EFI_INVALID_PARAMETER      The input parameter is invalid.
+  
+**/
+EFI_STATUS
+UpdateTcp6Name (
+  IN    EFI_TCP6_PROTOCOL             *Tcp6
+  )
+{
+  EFI_STATUS                       Status;
+  CHAR16                           HandleName[80];
+  EFI_TCP6_CONFIG_DATA             Tcp6ConfigData;
+
+  if (Tcp6 == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Format the child name into the string buffer.
+  //
+  Status = Tcp6->GetModeData (Tcp6, NULL, &Tcp6ConfigData, NULL, NULL, NULL);
+  if (!EFI_ERROR (Status)) {
+    UnicodeSPrint (HandleName, sizeof (HandleName),
+      L"TCPv6(SrcPort=%d, DestPort=%d, ActiveFlag=%d)",
+      Tcp6ConfigData.AccessPoint.StationPort,
+      Tcp6ConfigData.AccessPoint.RemotePort,
+      Tcp6ConfigData.AccessPoint.ActiveFlag
+      );
+  } else if (Status == EFI_NOT_STARTED) {
+    UnicodeSPrint (HandleName, sizeof (HandleName), L"TCPv6(Not started)");
+  } else {
+    return Status;
+  }
+
+
+  if (gTcpControllerNameTable != NULL) {
+    FreeUnicodeStringTable (gTcpControllerNameTable);
+    gTcpControllerNameTable = NULL;
+  }
+  
+  Status = AddUnicodeString2 (
+             "eng",
+             gTcpComponentName.SupportedLanguages,
+             &gTcpControllerNameTable,
+             HandleName,
+             TRUE
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  return AddUnicodeString2 (
+           "en",
+           gTcpComponentName2.SupportedLanguages,
+           &gTcpControllerNameTable,
+           HandleName,
+           FALSE
            );
 }
 
@@ -300,5 +438,89 @@ TcpComponentNameGetControllerName (
   OUT CHAR16                       **ControllerName
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_STATUS                    Status;
+  EFI_TCP4_PROTOCOL             *Tcp4;
+  EFI_TCP6_PROTOCOL             *Tcp6;
+
+  //
+  // Only provide names for child handles.
+  //
+  if (ChildHandle == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Make sure this driver produced ChildHandle
+  //
+  Status = EfiTestChildHandle (
+             ControllerHandle,
+             ChildHandle,
+             &gEfiIp6ProtocolGuid
+             );
+  if (!EFI_ERROR (Status)) {
+    //
+    // Retrieve an instance of a produced protocol from ChildHandle
+    //
+    Status = gBS->OpenProtocol (
+                    ChildHandle,
+                    &gEfiTcp6ProtocolGuid,
+                   (VOID **)&Tcp6,
+                    NULL,
+                    NULL,
+                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // Update the component name for this child handle.
+    //
+    Status = UpdateTcp6Name (Tcp6);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  //
+  // Make sure this driver is currently managing ControllHandle
+  //
+  Status = EfiTestChildHandle (
+             ControllerHandle,
+             ChildHandle,
+             &gEfiIp4ProtocolGuid
+             );
+  if (!EFI_ERROR (Status)) {
+    //
+    // Retrieve an instance of a produced protocol from ChildHandle
+    //
+    Status = gBS->OpenProtocol (
+               ChildHandle,
+               &gEfiTcp4ProtocolGuid,
+              (VOID **)&Tcp4,
+               NULL,
+               NULL,
+               EFI_OPEN_PROTOCOL_GET_PROTOCOL
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // Update the component name for this child handle.
+    //
+    Status = UpdateTcp4Name (Tcp4);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  return LookupUnicodeString2 (
+           Language,
+           This->SupportedLanguages,
+           gTcpControllerNameTable,
+           ControllerName,
+           (BOOLEAN)(This == &gTcpComponentName)
+           );
 }
+

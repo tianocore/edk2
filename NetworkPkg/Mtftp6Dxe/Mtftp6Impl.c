@@ -197,6 +197,19 @@ EfiMtftp6Configure (
                           UDP_IO_UDP6_VERSION,
                           NULL
                           );
+      if (Instance->UdpIo != NULL) {
+        Status = gBS->OpenProtocol (
+                        Instance->UdpIo->UdpHandle,
+                        &gEfiUdp6ProtocolGuid,
+                        (VOID **) &Udp6,
+                        Service->Image,
+                        Instance->Handle,
+                        EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+                        );
+        if (EFI_ERROR (Status)) {
+          goto ON_EXIT;
+        }
+      }
     }
 
     if (Instance->UdpIo == NULL) {
@@ -626,8 +639,6 @@ EfiMtftp6Poll (
   //
   if (Instance->Config == NULL) {
     return EFI_NOT_STARTED;
-  } else if (Instance->InDestroy) {
-    return EFI_DEVICE_ERROR;
   }
 
   Udp6 = Instance->UdpIo->Protocol.Udp6;

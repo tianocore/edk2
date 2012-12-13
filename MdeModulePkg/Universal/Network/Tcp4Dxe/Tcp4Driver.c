@@ -1,7 +1,7 @@
 /** @file
   Tcp driver function.
 
-Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -18,6 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 UINT16                                mTcp4RandomPort;
 extern EFI_COMPONENT_NAME_PROTOCOL    gTcp4ComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL   gTcp4ComponentName2;
+extern EFI_UNICODE_STRING_TABLE       *gTcpControllerNameTable;
 
 TCP4_HEARTBEAT_TIMER  mTcp4Timer = {
   NULL,
@@ -133,6 +134,43 @@ Tcp4DestroyTimer (
   gBS->SetTimer (mTcp4Timer.TimerEvent, TimerCancel, 0);
   gBS->CloseEvent (mTcp4Timer.TimerEvent);
   mTcp4Timer.TimerEvent = NULL;
+}
+
+/**
+  Callback function which provided by user to remove one node in NetDestroyLinkList process.
+  
+  @param[in]    Entry           The entry to be removed.
+  @param[in]    Context         Pointer to the callback context corresponds to the Context in NetDestroyLinkList.
+
+  @retval EFI_SUCCESS           The entry has been removed successfully.
+  @retval Others                Fail to remove the entry.
+
+**/
+EFI_STATUS
+Tcp4DestroyChildEntryInHandleBuffer (
+  IN LIST_ENTRY         *Entry,
+  IN VOID               *Context
+)
+{
+  SOCKET                        *Sock;
+  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
+  UINTN                         NumberOfChildren;
+  EFI_HANDLE                    *ChildHandleBuffer;
+
+  if (Entry == NULL || Context == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Sock = NET_LIST_USER_STRUCT_S (Entry, SOCKET, Link, SOCK_SIGNATURE);
+  ServiceBinding    = ((TCP4_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *) Context)->ServiceBinding;
+  NumberOfChildren  = ((TCP4_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *) Context)->NumberOfChildren;
+  ChildHandleBuffer = ((TCP4_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *) Context)->ChildHandleBuffer;
+
+  if (!NetIsInHandleBuffer (Sock->SockHandle, NumberOfChildren, ChildHandleBuffer)) {
+    return EFI_SUCCESS;
+  }
+
+  return ServiceBinding->DestroyChild (ServiceBinding, Sock->SockHandle);
 }
 
 /**
@@ -387,6 +425,7 @@ ON_ERROR:
 
   if (TcpServiceData->IpIo != NULL) {
     IpIoDestroy (TcpServiceData->IpIo);
+    TcpServiceData->IpIo = NULL;
   }
 
   FreePool (TcpServiceData);
@@ -431,17 +470,18 @@ Tcp4DriverBindingStop (
   IN  EFI_HANDLE                   *ChildHandleBuffer
   )
 {
-  EFI_STATUS                          Status;
-  EFI_HANDLE                          NicHandle;
-  EFI_SERVICE_BINDING_PROTOCOL        *ServiceBinding;
-  TCP4_SERVICE_DATA                   *TcpServiceData;
-  SOCKET                              *Sock;
+  EFI_STATUS                                Status;
+  EFI_HANDLE                                NicHandle;
+  EFI_SERVICE_BINDING_PROTOCOL              *ServiceBinding;
+  TCP4_SERVICE_DATA                         *TcpServiceData;
+  LIST_ENTRY                                *List;
+  TCP4_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT  Context;
 
   // Find the NicHandle where Tcp4 ServiceBinding Protocol is installed.
   //
   NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiIp4ProtocolGuid);
   if (NicHandle == NULL) {
-    return EFI_DEVICE_ERROR;
+    return EFI_SUCCESS;
   }
 
   //
@@ -465,7 +505,18 @@ Tcp4DriverBindingStop (
 
   TcpServiceData = TCP4_FROM_THIS (ServiceBinding);
 
-  if (NumberOfChildren == 0) {
+  if (NumberOfChildren != 0) {
+    List = &TcpServiceData->SocketList; 
+    Context.ServiceBinding = ServiceBinding;
+    Context.NumberOfChildren = NumberOfChildren;
+    Context.ChildHandleBuffer = ChildHandleBuffer;
+    Status = NetDestroyLinkList (
+               List,
+               Tcp4DestroyChildEntryInHandleBuffer,
+               &Context,
+               NULL
+               );
+  } else if (IsListEmpty (&TcpServiceData->SocketList)) {
     //
     // Uninstall TCP servicebinding protocol
     //
@@ -480,6 +531,7 @@ Tcp4DriverBindingStop (
     // Destroy the IpIO consumed by TCP driver
     //
     IpIoDestroy (TcpServiceData->IpIo);
+    TcpServiceData->IpIo = NULL;
 
     //
     // Destroy the heartbeat timer.
@@ -491,17 +543,17 @@ Tcp4DriverBindingStop (
     //
     TcpClearVariableData (TcpServiceData);
 
+    if (gTcpControllerNameTable != NULL) {
+      FreeUnicodeStringTable (gTcpControllerNameTable);
+      gTcpControllerNameTable = NULL;
+    }
+    
     //
     // Release the TCP service data
     //
     FreePool (TcpServiceData);
-  } else {
 
-    while (!IsListEmpty (&TcpServiceData->SocketList)) {
-      Sock = NET_LIST_HEAD (&TcpServiceData->SocketList, SOCKET, Link);
-
-      ServiceBinding->DestroyChild (ServiceBinding, Sock->SockHandle);
-    }
+    Status = EFI_SUCCESS;
   }
 
   return Status;
@@ -713,13 +765,10 @@ Tcp4ServiceBindingDestroyChild (
   EFI_STATUS         Status;
   EFI_TCP4_PROTOCOL  *Tcp4;
   SOCKET             *Sock;
-  EFI_TPL            OldTpl;
 
   if (NULL == This || NULL == ChildHandle) {
     return EFI_INVALID_PARAMETER;
   }
-
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
   // retrieve the Tcp4 protocol from ChildHandle
@@ -744,7 +793,6 @@ Tcp4ServiceBindingDestroyChild (
     SockDestroyChild (Sock);
   }
 
-  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 

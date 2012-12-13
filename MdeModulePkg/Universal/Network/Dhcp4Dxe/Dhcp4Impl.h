@@ -84,7 +84,6 @@ struct _DHCP_SERVICE {
   EFI_SERVICE_BINDING_PROTOCOL  ServiceBinding;
 
   INTN                          ServiceState; // CONFIGED, UNCONFIGED, and DESTROY
-  BOOLEAN                       InDestroy;
 
   EFI_HANDLE                    Controller;
   EFI_HANDLE                    Image;

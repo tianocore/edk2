@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name(2) protocol implementation for MnpDxe driver.
 
-Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include  "MnpDriver.h"
+#include  "MnpImpl.h"
 
 //
 // EFI Component Name Protocol
@@ -43,6 +43,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE      mMnpDriverNameTable[
     NULL
   }
 };
+
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE    *gMnpControllerNameTable = NULL;
 
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
@@ -97,6 +99,106 @@ MnpComponentNameGetDriverName (
            mMnpDriverNameTable,
            DriverName,
            (BOOLEAN) (This == &gMnpComponentName)
+           );
+}
+
+/**
+  Update the component name for the MNP child handle.
+
+  @param  Mnp[in]                 A pointer to the EFI_MANAGED_NETWORK_PROTOCOL.
+
+  
+  @retval EFI_SUCCESS             Update the ControllerNameTable of this instance successfully.
+  @retval EFI_INVALID_PARAMETER   The input parameter is invalid.
+  
+**/
+EFI_STATUS
+UpdateName (
+  IN   EFI_MANAGED_NETWORK_PROTOCOL     *Mnp
+  )
+{
+  EFI_STATUS                       Status;
+  MNP_INSTANCE_DATA                *Instance;
+  CHAR16                           HandleName[80];
+  EFI_MANAGED_NETWORK_CONFIG_DATA  MnpConfigData;
+  EFI_SIMPLE_NETWORK_MODE          SnpModeData;
+  UINTN                            OffSet;
+  UINTN                            Index;
+
+  if (Mnp == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Instance = MNP_INSTANCE_DATA_FROM_THIS (Mnp);
+  //
+  // Format the child name into the string buffer as:
+  // MNP (MAC=FF-FF-FF-FF-FF-FF, ProtocolType=0x0800, VlanId=0)
+  //
+  Status = Mnp->GetModeData (Mnp, &MnpConfigData, &SnpModeData);
+  if (!EFI_ERROR (Status)) {
+    OffSet = 0;
+    //
+    // Print the MAC address.
+    //
+    OffSet += UnicodeSPrint (
+                HandleName,
+                sizeof (HandleName),
+                L"MNP (MAC="
+                );
+    for (Index = 0; Index < SnpModeData.HwAddressSize; Index++) {
+      OffSet += UnicodeSPrint (
+                  HandleName + OffSet,
+                  sizeof (HandleName) - OffSet,
+                  L"%02X-",
+                  SnpModeData.CurrentAddress.Addr[Index]
+                  );
+    }
+    //
+    // Remove the last '-'
+    //
+    OffSet--;  
+    //
+    // Print the ProtocolType and VLAN ID for this instance.
+    //
+    OffSet += UnicodeSPrint (
+                HandleName + OffSet,
+                sizeof (HandleName) - OffSet,
+                L", ProtocolType=0x%X, VlanId=%d)",
+                MnpConfigData.ProtocolTypeFilter,
+                Instance->MnpServiceData->VlanId
+                );
+  } else if (Status == EFI_NOT_STARTED) {
+    UnicodeSPrint (
+      HandleName,
+      sizeof (HandleName),
+      L"MNP (Not started)"
+      );
+  } else {
+    return Status;
+  }
+  
+  if (gMnpControllerNameTable != NULL) {
+    FreeUnicodeStringTable (gMnpControllerNameTable);
+    gMnpControllerNameTable = NULL;
+  }
+  
+  Status = AddUnicodeString2 (
+             "eng",
+             gMnpComponentName.SupportedLanguages,
+             &gMnpControllerNameTable,
+             HandleName,
+             TRUE
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  return AddUnicodeString2 (
+           "en",
+           gMnpComponentName2.SupportedLanguages,
+           &gMnpControllerNameTable,
+           HandleName,
+           FALSE
            );
 }
 
@@ -178,5 +280,68 @@ MnpComponentNameGetControllerName (
      OUT CHAR16                        **ControllerName
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_STATUS                    Status;
+  EFI_MANAGED_NETWORK_PROTOCOL  *Mnp;
+
+  //
+  // Only provide names for MNP child handles.
+  //
+  if (ChildHandle == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+ 
+  // 
+  // Make sure this driver is currently managing ControllerHandle  
+  // 
+  Status = EfiTestManagedDevice (
+             ControllerHandle,
+             gMnpDriverBinding.DriverBindingHandle,
+             &gEfiSimpleNetworkProtocolGuid
+             );
+  if (EFI_ERROR (Status)) { 
+    return Status;
+  }
+  
+  // 
+  // Make sure this driver produced ChildHandle 
+  // 
+  Status = EfiTestChildHandle (
+             ControllerHandle,
+             ChildHandle,
+             &gEfiManagedNetworkServiceBindingProtocolGuid
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // 
+  // Retrieve an instance of a produced protocol from ChildHandle  
+  // 
+  Status = gBS->OpenProtocol (
+                  ChildHandle,
+                  &gEfiManagedNetworkProtocolGuid,
+                  (VOID **)&Mnp,
+                  NULL,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Update the component name for this child handle.
+  //
+  Status = UpdateName (Mnp);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return LookupUnicodeString2 (
+           Language,
+           This->SupportedLanguages,
+           gMnpControllerNameTable,
+           ControllerName,
+           (BOOLEAN)(This == &gMnpComponentName)
+           );
 }

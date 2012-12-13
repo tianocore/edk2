@@ -2510,7 +2510,7 @@ Dhcp6HandleStateful (
   ClientId = Service->ClientId;
   Status   = EFI_SUCCESS;
 
-  if (Instance->InDestroy || Instance->Config == NULL) {
+  if (Instance->Config == NULL) {
     goto ON_CONTINUE;
   }
 
@@ -2623,10 +2623,6 @@ Dhcp6HandleStateless (
   Status    = EFI_SUCCESS;
   IsMatched = FALSE;
   InfCb     = NULL;
-
-  if (Instance->InDestroy) {
-    goto ON_EXIT;
-  }
 
   if (Packet->Dhcp6.Header.MessageType != Dhcp6MsgReply) {
     goto ON_EXIT;

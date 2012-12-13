@@ -1,7 +1,7 @@
 /** @file
   HII Config Access protocol implementation of VLAN configuration module.
 
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -489,6 +489,7 @@ InstallVlanConfigForm (
   CHAR16                          *MacString;
   EFI_DEVICE_PATH_PROTOCOL        *ChildDevicePath;
   EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
+  EFI_VLAN_CONFIG_PROTOCOL        *VlanConfig;
 
   //
   // Create child handle and install HII Config Access Protocol
@@ -516,6 +517,22 @@ InstallVlanConfigForm (
     return Status;
   }
   PrivateData->DriverHandle = DriverHandle;
+
+  //
+  // Establish the parent-child relationship between the new created
+  // child handle and the ControllerHandle.
+  //
+  Status = gBS->OpenProtocol (
+                  PrivateData->ControllerHandle,
+                  &gEfiVlanConfigProtocolGuid,
+                  (VOID **)&VlanConfig,
+                  PrivateData->ImageHandle,
+                  PrivateData->DriverHandle,
+                  EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
   // Publish the HII package list
@@ -592,6 +609,16 @@ UninstallVlanConfigForm (
     HiiRemovePackages (PrivateData->HiiHandle);
     PrivateData->HiiHandle = NULL;
   }
+
+  //
+  // End the parent-child relationship.
+  //
+  gBS->CloseProtocol (
+         PrivateData->ControllerHandle,
+         &gEfiVlanConfigProtocolGuid,
+         PrivateData->ImageHandle,
+         PrivateData->DriverHandle
+         );
 
   //
   // Uninstall HII Config Access Protocol

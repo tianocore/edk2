@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name(2) protocol implementation for Mtftp4Dxe driver.
   
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include "Mtftp4Driver.h"
+#include "Mtftp4Impl.h"
 
 //
 // EFI Component Name Functions
@@ -174,6 +174,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mMtftp4DriverNameTable[] 
   }
 };
 
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE *gMtftp4ControllerNameTable = NULL;
+
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 
@@ -227,6 +229,72 @@ Mtftp4ComponentNameGetDriverName (
            mMtftp4DriverNameTable,
            DriverName,
            (BOOLEAN)(This == &gMtftp4ComponentName)
+           );
+}
+
+/**
+  Update the component name for the Mtftp4 child handle.
+
+  @param  Mtftp4[in]                A pointer to the EFI_MTFTP4_PROTOCOL.
+
+  
+  @retval EFI_SUCCESS               Update the ControllerNameTable of this instance successfully.
+  @retval EFI_INVALID_PARAMETER     The input parameter is invalid.
+  
+**/
+EFI_STATUS
+UpdateName (
+  IN   EFI_MTFTP4_PROTOCOL             *Mtftp4
+  )
+{
+  EFI_STATUS                       Status;
+  CHAR16                           HandleName[80];
+  EFI_MTFTP4_MODE_DATA             ModeData;
+
+  if (Mtftp4 == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Format the child name into the string buffer as:
+  // MTFTPv4 (ServerIp=192.168.1.10, ServerPort=69)
+  //
+  Status = Mtftp4->GetModeData (Mtftp4, &ModeData);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  UnicodeSPrint (HandleName, sizeof (HandleName),
+    L"MTFTPv4 (ServerIp=%d.%d.%d.%d, ServerPort=%d)",
+    ModeData.ConfigData.ServerIp.Addr[0],
+    ModeData.ConfigData.ServerIp.Addr[1],
+    ModeData.ConfigData.ServerIp.Addr[2],
+    ModeData.ConfigData.ServerIp.Addr[3],
+    ModeData.ConfigData.InitialServerPort
+    );
+
+  if (gMtftp4ControllerNameTable != NULL) {
+    FreeUnicodeStringTable (gMtftp4ControllerNameTable);
+    gMtftp4ControllerNameTable = NULL;
+  }
+  
+  Status = AddUnicodeString2 (
+             "eng",
+             gMtftp4ComponentName.SupportedLanguages,
+             &gMtftp4ControllerNameTable,
+             HandleName,
+             TRUE
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  return AddUnicodeString2 (
+           "en",
+           gMtftp4ComponentName2.SupportedLanguages,
+           &gMtftp4ControllerNameTable,
+           HandleName,
+           FALSE
            );
 }
 
@@ -308,5 +376,56 @@ Mtftp4ComponentNameGetControllerName (
      OUT CHAR16                                    **ControllerName
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_STATUS                    Status;
+  EFI_MTFTP4_PROTOCOL           *Mtftp4;
+
+  //
+  // Only provide names for child handles.
+  //
+  if (ChildHandle == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+  
+  // 
+  // Make sure this driver produced ChildHandle 
+  // 
+  Status = EfiTestChildHandle (
+             ControllerHandle,
+             ChildHandle,
+             &gEfiUdp4ProtocolGuid
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // 
+  // Retrieve an instance of a produced protocol from ChildHandle
+  // 
+  Status = gBS->OpenProtocol (
+                  ChildHandle,
+                  &gEfiMtftp4ProtocolGuid,
+                  (VOID **)&Mtftp4,
+                  NULL,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Update the component name for this child handle.
+  //
+  Status = UpdateName (Mtftp4);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return LookupUnicodeString2 (
+           Language,
+           This->SupportedLanguages,
+           gMtftp4ControllerNameTable,
+           ControllerName,
+           (BOOLEAN)(This == &gMtftp4ComponentName)
+           );
 }

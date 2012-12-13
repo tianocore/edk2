@@ -2,7 +2,7 @@
   Declaration of protocol interfaces in EFI_TCP4_PROTOCOL and EFI_TCP6_PROTOCOL.
   It is the common head file for all Tcp*.c in TCP driver.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -21,6 +21,7 @@
 #include <Protocol/DriverBinding.h>
 #include <Library/IpIoLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/PrintLib.h>
 
 #include "Socket.h"
 #include "TcpProto.h"
@@ -32,6 +33,7 @@ extern UINT16                        mTcp6RandomPort;
 extern CHAR16                        *mTcpStateName[];
 extern EFI_COMPONENT_NAME_PROTOCOL   gTcpComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gTcpComponentName2;
+extern EFI_UNICODE_STRING_TABLE      *gTcpControllerNameTable;
 
 extern LIST_ENTRY                    mTcpRunQue;
 extern LIST_ENTRY                    mTcpListenQue;
@@ -89,6 +91,12 @@ typedef struct _TCP4_ROUTE_INFO {
   EFI_IPv4_ADDRESS  *SubnetMask;
   EFI_IPv4_ADDRESS  *GatewayAddress;
 } TCP4_ROUTE_INFO;
+
+typedef struct {
+  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
+  UINTN                         NumberOfChildren;
+  EFI_HANDLE                    *ChildHandleBuffer;
+} TCP_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT;
 
 //
 // EFI_TCP4_PROTOCOL definitions.

@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name(2) protocol implementation for Dhcp6 driver.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -172,6 +172,19 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE       mDhcp6DriverNameTab
   }
 };
 
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE   *gDhcp6ControllerNameTable = NULL;
+
+CHAR16 *mDhcp6ControllerName[] = {
+  L"DHCPv6 (State=0, Init)",
+  L"DHCPv6 (State=1, Selecting)",
+  L"DHCPv6 (State=2, Requesting)",
+  L"DHCPv6 (State=3, Declining)",
+  L"DHCPv6 (State=4, Confirming)",
+  L"DHCPv6 (State=5, Releasing)",
+  L"DHCPv6 (State=6, Bound)",
+  L"DHCPv6 (State=7, Renewing)",
+  L"DHCPv6 (State=8, Rebinding)"
+};
 
 /**
   Retrieves a Unicode string that is the user-readable name of the driver.
@@ -229,6 +242,67 @@ Dhcp6ComponentNameGetDriverName (
            );
 }
 
+/**
+  Update the component name for the Dhcp6 child handle.
+
+  @param  Dhcp6[in]                   A pointer to the EFI_DHCP6_PROTOCOL.
+
+  
+  @retval EFI_SUCCESS                 Update the ControllerNameTable of this instance successfully.
+  @retval EFI_INVALID_PARAMETER       The input parameter is invalid.
+  
+**/
+EFI_STATUS
+UpdateName (
+  IN   EFI_DHCP6_PROTOCOL             *Dhcp6
+  )
+{
+  EFI_STATUS                       Status;
+  EFI_DHCP6_MODE_DATA              Dhcp6ModeData;
+  CHAR16                           HandleName[64];
+
+  if (Dhcp6 == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Format the child name into the string buffer.
+  //
+  Status = Dhcp6->GetModeData (Dhcp6, &Dhcp6ModeData, NULL);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  if (gDhcp6ControllerNameTable != NULL) {
+    FreeUnicodeStringTable (gDhcp6ControllerNameTable);
+    gDhcp6ControllerNameTable = NULL;
+  }
+  
+  if (Dhcp6ModeData.Ia == NULL) {
+    UnicodeSPrint (HandleName, sizeof (HandleName), L"DHCPv6 (No configured IA)");
+  } else {
+    StrCpy (HandleName, mDhcp6ControllerName[Dhcp6ModeData.Ia->State]);
+  }
+  
+  Status = AddUnicodeString2 (
+             "eng",
+             gDhcp6ComponentName.SupportedLanguages,
+             &gDhcp6ControllerNameTable,
+             HandleName,
+             TRUE
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  return AddUnicodeString2 (
+           "en",
+           gDhcp6ComponentName2.SupportedLanguages,
+           &gDhcp6ControllerNameTable,
+           HandleName,
+           FALSE
+           );
+}
 
 /**
   Retrieves a Unicode string that is the user-readable name of the controller
@@ -308,5 +382,57 @@ Dhcp6ComponentNameGetControllerName (
   OUT CHAR16                                          **ControllerName
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_STATUS                    Status;
+  EFI_DHCP6_PROTOCOL            *Dhcp6;
+
+  //
+  // Only provide names for child handles.
+  //
+  if (ChildHandle == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+  
+  // 
+  // Make sure this driver produced ChildHandle 
+  // 
+  Status = EfiTestChildHandle (
+             ControllerHandle,
+             ChildHandle, 
+             &gEfiUdp6ProtocolGuid
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Retrieve an instance of a produced protocol from ChildHandle
+  //
+  Status = gBS->OpenProtocol (
+                  ChildHandle,
+                  &gEfiDhcp6ProtocolGuid,
+                  (VOID **)&Dhcp6, 
+                  NULL,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Update the component name for this child handle.
+  //
+  Status = UpdateName (Dhcp6);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return LookupUnicodeString2 (
+           Language,
+           This->SupportedLanguages,
+           gDhcp6ControllerNameTable,
+           ControllerName,
+           (BOOLEAN)(This == &gDhcp6ComponentName)
+           );
 }
+

@@ -1,7 +1,7 @@
 /** @file
   The implementation of common functions shared by IP6 driver.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -329,6 +329,37 @@ Ip6AddAddr (
 }
 
 /**
+  Callback function which provided by user to remove one node in NetDestroyLinkList process.
+  
+  @param[in]    Entry           The entry to be removed.
+  @param[in]    Context         Pointer to the callback context corresponds to the Context in NetDestroyLinkList.
+
+  @retval EFI_SUCCESS           The entry has been removed successfully.
+  @retval Others                Fail to remove the entry.
+
+**/
+EFI_STATUS
+Ip6DestroyChildEntryByAddr (
+  IN LIST_ENTRY         *Entry,
+  IN VOID               *Context
+)
+{
+  IP6_PROTOCOL                  *Instance;
+  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
+  EFI_IPv6_ADDRESS              *Address;
+  
+  Instance = NET_LIST_USER_STRUCT_S (Entry, IP6_PROTOCOL, Link, IP6_PROTOCOL_SIGNATURE);
+  ServiceBinding = ((IP6_DESTROY_CHILD_BY_ADDR_CALLBACK_CONTEXT*) Context)->ServiceBinding;
+  Address = ((IP6_DESTROY_CHILD_BY_ADDR_CALLBACK_CONTEXT*) Context)->Address;
+
+  if ((Instance->State == IP6_STATE_CONFIGED) && EFI_IP6_EQUAL (&Instance->ConfigData.StationAddress, Address)) {
+    return ServiceBinding->DestroyChild (ServiceBinding, Instance->Handle);
+  }
+  
+  return EFI_SUCCESS;
+}
+
+/**
   Destroy the IP instance if its StationAddress is removed. It is the help function
   for Ip6RemoveAddr().
 
@@ -342,35 +373,20 @@ Ip6DestroyInstanceByAddress (
   IN EFI_IPv6_ADDRESS  *Address
   )
 {
-  BOOLEAN                       OneDestroyed;
-  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
-  LIST_ENTRY                    *Entry;
-  IP6_PROTOCOL                  *Instance;
+  LIST_ENTRY                    *List;
+  IP6_DESTROY_CHILD_BY_ADDR_CALLBACK_CONTEXT  Context;
 
   NET_CHECK_SIGNATURE (IpSb, IP6_SERVICE_SIGNATURE);
 
-  ServiceBinding = &IpSb->ServiceBinding;
-
-  //
-  // Upper layer IP protocol consumers may have tight relationship between several
-  // IP protocol instances, in other words, calling ServiceBinding->DestroyChild to
-  // destroy one IP child may cause other related IP children destroyed too. This
-  // will probably leave hole in the children list when we iterate it. So everytime
-  // we just destroy one child then back to the start point to iterate the list.
-  //
-  do {
-    OneDestroyed = FALSE;
-
-    NET_LIST_FOR_EACH (Entry, &IpSb->Children) {
-      Instance = NET_LIST_USER_STRUCT_S (Entry, IP6_PROTOCOL, Link, IP6_PROTOCOL_SIGNATURE);
-
-      if ((Instance->State == IP6_STATE_CONFIGED) && EFI_IP6_EQUAL (&Instance->ConfigData.StationAddress, Address)) {
-        ServiceBinding->DestroyChild (ServiceBinding, Instance->Handle);
-        OneDestroyed = TRUE;
-        break;
-      }
-    }
-  } while (OneDestroyed);
+  List = &IpSb->Children;
+  Context.ServiceBinding = &IpSb->ServiceBinding;
+  Context.Address = Address;
+  NetDestroyLinkList (
+    List,
+    Ip6DestroyChildEntryByAddr,
+    &Context,
+    NULL
+    );
 }
 
 /**

@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name(2) protocol implementation for Tcp4Dxe driver.
 
-Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -171,6 +171,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mTcpDriverNameTable[] = {
   }
 };
 
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE *gTcpControllerNameTable = NULL;
+
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 
@@ -224,6 +226,76 @@ TcpComponentNameGetDriverName (
            mTcpDriverNameTable,
            DriverName,
            (BOOLEAN) (This == &gTcp4ComponentName)
+           );
+}
+
+/**
+  Update the component name for the Tcp4 child handle.
+
+  @param  Tcp4[in]                   A pointer to the EFI_TCP4_PROTOCOL.
+
+  
+  @retval EFI_SUCCESS                Update the ControllerNameTable of this instance successfully.
+  @retval EFI_INVALID_PARAMETER      The input parameter is invalid.
+  
+**/
+EFI_STATUS
+UpdateName (
+  IN  EFI_TCP4_PROTOCOL             *Tcp4
+  )
+{
+  EFI_STATUS                       Status;
+  CHAR16                           HandleName[80];
+  EFI_TCP4_CONFIG_DATA             Tcp4ConfigData;
+
+  if (Tcp4 == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Format the child name into the string buffer as:
+  // TCPv4 (SrcPort=59, DestPort=60, ActiveFlag=TRUE)
+  //
+  Status = Tcp4->GetModeData (Tcp4, NULL, &Tcp4ConfigData, NULL, NULL, NULL);
+  if (!EFI_ERROR (Status)) {
+    UnicodeSPrint (HandleName, sizeof (HandleName),
+      L"TCPv4 (SrcPort=%d, DestPort=&d, ActiveFlag=%s)",
+      Tcp4ConfigData.AccessPoint.StationPort,
+      Tcp4ConfigData.AccessPoint.RemotePort,
+      (Tcp4ConfigData.AccessPoint.ActiveFlag ? L"TRUE" : L"FALSE")
+      );
+  } if (Status == EFI_NOT_STARTED) {
+    UnicodeSPrint (
+      HandleName,
+      sizeof (HandleName),
+      L"TCPv4 (Not started)"
+      );
+  } else {
+    return Status;
+  }
+
+  if (gTcpControllerNameTable != NULL) {
+    FreeUnicodeStringTable (gTcpControllerNameTable);
+    gTcpControllerNameTable = NULL;
+  }
+  
+  Status = AddUnicodeString2 (
+             "eng",
+             gTcp4ComponentName.SupportedLanguages,
+             &gTcpControllerNameTable,
+             HandleName,
+             TRUE
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  return AddUnicodeString2 (
+           "en",
+           gTcp4ComponentName2.SupportedLanguages,
+           &gTcpControllerNameTable,
+           HandleName,
+           FALSE
            );
 }
 
@@ -305,5 +377,56 @@ TcpComponentNameGetControllerName (
      OUT CHAR16                       **ControllerName
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_STATUS                    Status;
+  EFI_TCP4_PROTOCOL             *Tcp4;
+
+  //
+  // Only provide names for child handles.
+  //
+  if (ChildHandle == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+  
+  // 
+  // Make sure this driver produced ChildHandle 
+  // 
+  Status = EfiTestChildHandle (
+             ControllerHandle,
+             ChildHandle,
+             &gEfiIp4ProtocolGuid
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // 
+  // Retrieve an instance of a produced protocol from ChildHandle
+  // 
+  Status = gBS->OpenProtocol (
+                  ChildHandle,
+                  &gEfiTcp4ProtocolGuid,
+                  (VOID **)&Tcp4,
+                  NULL,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Update the component name for this child handle.
+  //
+  Status = UpdateName (Tcp4);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return LookupUnicodeString2 (
+           Language,
+           This->SupportedLanguages,
+           gTcpControllerNameTable,
+           ControllerName,
+           (BOOLEAN)(This == &gTcp4ComponentName)
+           );
 }

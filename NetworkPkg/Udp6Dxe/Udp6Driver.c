@@ -1,7 +1,7 @@
 /** @file
   Driver Binding functions and Service Binding functions for the Network driver module.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -179,6 +179,43 @@ EXIT:
 }
 
 /**
+  Callback function which provided by user to remove one node in NetDestroyLinkList process.
+  
+  @param[in]    Entry           The entry to be removed.
+  @param[in]    Context         Pointer to the callback context corresponds to the Context in NetDestroyLinkList.
+
+  @retval EFI_SUCCESS           The entry has been removed successfully.
+  @retval Others                Fail to remove the entry.
+
+**/
+EFI_STATUS
+Udp6DestroyChildEntryInHandleBuffer (
+  IN LIST_ENTRY         *Entry,
+  IN VOID               *Context
+)
+{
+  UDP6_INSTANCE_DATA            *Instance;
+  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
+  UINTN                         NumberOfChildren;
+  EFI_HANDLE                    *ChildHandleBuffer;
+
+  if (Entry == NULL || Context == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Instance = NET_LIST_USER_STRUCT_S (Entry, UDP6_INSTANCE_DATA, Link, UDP6_INSTANCE_DATA_SIGNATURE);
+  ServiceBinding    = ((UDP6_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *) Context)->ServiceBinding;
+  NumberOfChildren  = ((UDP6_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *) Context)->NumberOfChildren;
+  ChildHandleBuffer = ((UDP6_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *) Context)->ChildHandleBuffer;
+
+  if (!NetIsInHandleBuffer (Instance->ChildHandle, NumberOfChildren, ChildHandleBuffer)) {
+    return EFI_SUCCESS;
+  }
+
+  return ServiceBinding->DestroyChild (ServiceBinding, Instance->ChildHandle);
+}
+
+/**
   Stop this driver on ControllerHandle.
 
   This service is called by the  EFI boot service DisconnectController(). In order to
@@ -211,14 +248,15 @@ Udp6DriverBindingStop (
   EFI_HANDLE                    NicHandle;
   EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
   UDP6_SERVICE_DATA             *Udp6Service;
-  UDP6_INSTANCE_DATA            *Instance;
+  LIST_ENTRY                    *List;
+  UDP6_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT Context;
 
   //
   // Find the NicHandle where UDP6 ServiceBinding Protocol is installed.
   //
   NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiIp6ProtocolGuid);
   if (NicHandle == NULL) {
-    return EFI_DEVICE_ERROR;
+    return EFI_SUCCESS;
   }
 
   //
@@ -238,8 +276,21 @@ Udp6DriverBindingStop (
 
   Udp6Service = UDP6_SERVICE_DATA_FROM_THIS (ServiceBinding);
 
-  if (NumberOfChildren == 0) {
-
+  if (NumberOfChildren != 0) {
+    //
+    // NumberOfChildren is not zero, destroy the children instances in ChildHandleBuffer.
+    //
+    List = &Udp6Service->ChildrenList;
+    Context.ServiceBinding    = ServiceBinding;
+    Context.NumberOfChildren  = NumberOfChildren;
+    Context.ChildHandleBuffer = ChildHandleBuffer;
+    Status = NetDestroyLinkList (
+               List,
+               Udp6DestroyChildEntryInHandleBuffer,
+               &Context,
+               NULL
+               );
+  } else if (IsListEmpty (&Udp6Service->ChildrenList)) {
     gBS->UninstallMultipleProtocolInterfaces (
            NicHandle,
            &gEfiUdp6ServiceBindingProtocolGuid,
@@ -252,13 +303,8 @@ Udp6DriverBindingStop (
     Udp6CleanService (Udp6Service);
 
     FreePool (Udp6Service);
-  } else {
 
-    while (!IsListEmpty (&Udp6Service->ChildrenList)) {
-      Instance = NET_LIST_HEAD (&Udp6Service->ChildrenList, UDP6_INSTANCE_DATA, Link);
-
-      Status = ServiceBinding->DestroyChild (ServiceBinding, Instance->ChildHandle);
-    }
+    Status = EFI_SUCCESS;
   }
 
   return Status;
@@ -351,6 +397,21 @@ Udp6ServiceBindingCreateChild (
     goto ON_ERROR;
   }
 
+  //
+  // Open this instance's Ip6 protocol in the IpInfo BY_CHILD.
+  //
+  Status = gBS->OpenProtocol (
+                  Instance->IpInfo->ChildHandle,
+                  &gEfiIp6ProtocolGuid,
+                  (VOID **) &Ip6,
+                  gUdp6DriverBinding.DriverBindingHandle,
+                  Instance->ChildHandle,
+                  EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+                  );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
+  
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
@@ -440,20 +501,29 @@ Udp6ServiceBindingDestroyChild (
 
   Instance = UDP6_INSTANCE_DATA_FROM_THIS (Udp6Proto);
 
-  if (Instance->Destroyed) {
+  if (Instance->InDestroy) {
     return EFI_SUCCESS;
   }
 
   //
   // Use the Destroyed flag to avoid the re-entering of the following code.
   //
-  Instance->Destroyed = TRUE;
+  Instance->InDestroy = TRUE;
 
   //
-  // Close the Ip6 protocol.
+  // Close the Ip6 protocol on the default IpIo.
   //
   gBS->CloseProtocol (
          Udp6Service->IpIo->ChildHandle,
+         &gEfiIp6ProtocolGuid,
+         gUdp6DriverBinding.DriverBindingHandle,
+         Instance->ChildHandle
+         );
+  //
+  // Close the Ip6 protocol on this instance's IpInfo.
+  //
+  gBS->CloseProtocol (
+         Instance->IpInfo->ChildHandle,
          &gEfiIp6ProtocolGuid,
          gUdp6DriverBinding.DriverBindingHandle,
          Instance->ChildHandle
@@ -469,7 +539,7 @@ Udp6ServiceBindingDestroyChild (
                   NULL
                   );
   if (EFI_ERROR (Status)) {
-    Instance->Destroyed = FALSE;
+    Instance->InDestroy = FALSE;
     return Status;
   }
 

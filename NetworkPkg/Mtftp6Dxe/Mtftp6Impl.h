@@ -29,6 +29,7 @@
 #include <Library/UefiLib.h>
 #include <Library/BaseLib.h>
 #include <Library/NetLib.h>
+#include <Library/PrintLib.h>
 
 typedef struct _MTFTP6_SERVICE  MTFTP6_SERVICE;
 typedef struct _MTFTP6_INSTANCE MTFTP6_INSTANCE;
@@ -117,8 +118,13 @@ struct _MTFTP6_SERVICE {
   // mtftp driver and udp driver.
   //
   UDP_IO                        *DummyUdpIo;
-  BOOLEAN                       InDestroy;
 };
+
+typedef struct {
+  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
+  UINTN                         NumberOfChildren;
+  EFI_HANDLE                    *ChildHandleBuffer;
+} MTFTP6_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT;
 
 /**
   Returns the current operating mode data for the MTFTP6 instance.

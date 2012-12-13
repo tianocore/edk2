@@ -216,11 +216,10 @@ EfiDhcp6Stop (
 
   Instance->UdpSts = EFI_ALREADY_STARTED;
   Status = Dhcp6SendReleaseMsg (Instance, Instance->IaCb.Ia);
+  gBS->RestoreTPL (OldTpl);
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
-
-  gBS->RestoreTPL (OldTpl);
 
   //
   // Poll udp out of the net tpl if synchoronus call.

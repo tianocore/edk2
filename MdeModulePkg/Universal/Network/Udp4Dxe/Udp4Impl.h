@@ -1,7 +1,7 @@
 /** @file
   EFI UDPv4 protocol implementation.
    
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -31,12 +31,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/TimerLib.h>
 #include <Library/DpcLib.h>
+#include <Library/PrintLib.h>
 
 #include "Udp4Driver.h"
 
 
 extern EFI_COMPONENT_NAME_PROTOCOL     gUdp4ComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL    gUdp4ComponentName2;
+extern EFI_UNICODE_STRING_TABLE        *gUdpControllerNameTable;
 extern EFI_SERVICE_BINDING_PROTOCOL    mUdp4ServiceBinding;
 extern EFI_UDP4_PROTOCOL               mUdp4Protocol;
 extern UINT16                          mUdp4RandomPort;
@@ -109,7 +111,7 @@ typedef struct _UDP4_INSTANCE_DATA_ {
 
   IP_IO_IP_INFO         *IpInfo;
 
-  BOOLEAN               Destroyed;
+  BOOLEAN               InDestroy;
 } UDP4_INSTANCE_DATA;
 
 typedef struct _UDP4_RXDATA_WRAP_ {
@@ -118,6 +120,12 @@ typedef struct _UDP4_RXDATA_WRAP_ {
   UINT32                 TimeoutTick;
   EFI_UDP4_RECEIVE_DATA  RxData;
 } UDP4_RXDATA_WRAP;
+
+typedef struct {
+  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
+  UINTN                         NumberOfChildren;
+  EFI_HANDLE                    *ChildHandleBuffer;
+} UDP4_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT;
 
 /**
   Reads the current operational settings.

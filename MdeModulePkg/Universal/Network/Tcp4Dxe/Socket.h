@@ -30,6 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiLib.h>
 #include <Library/DpcLib.h>
+#include <Library/PrintLib.h>
 
 #define SOCK_SND_BUF        0
 #define SOCK_RCV_BUF        1
@@ -645,7 +646,7 @@ struct _SOCKET {
   SOCK_BUFFER           SndBuffer;  ///< Send buffer of application's data
   SOCK_BUFFER           RcvBuffer;  ///< Receive buffer of received data
   EFI_STATUS            SockError;  ///< The error returned by low layer protocol
-  BOOLEAN               IsDestroyed;
+  BOOLEAN               InDestroy;
 
   //
   // Fields used to manage the connection request

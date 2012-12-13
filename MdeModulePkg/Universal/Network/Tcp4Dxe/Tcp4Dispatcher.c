@@ -1,7 +1,7 @@
 /** @file
   Tcp request dispatcher implementation.
 
-Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -263,6 +263,8 @@ Tcp4AttachPcb (
   TCP_CB            *Tcb;
   TCP4_PROTO_DATA   *ProtoData;
   IP_IO             *IpIo;
+  EFI_STATUS        Status;
+  VOID              *Ip;
 
   Tcb = AllocateZeroPool (sizeof (TCP_CB));
 
@@ -284,6 +286,22 @@ Tcp4AttachPcb (
 
     FreePool (Tcb);
     return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Open the new created IP instance BY_CHILD.
+  //
+  Status = gBS->OpenProtocol (
+                  Tcb->IpInfo->ChildHandle,
+                  &gEfiIp4ProtocolGuid,
+                  &Ip,
+                  IpIo->Image,
+                  Sk->SockHandle,
+                  EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+                  );
+  if (EFI_ERROR (Status)) {
+    IpIoRemoveIp (IpIo, Tcb->IpInfo);
+    return Status;
   }
 
   InitializeListHead (&Tcb->List);
@@ -318,6 +336,16 @@ Tcp4DetachPcb (
 
   Tcp4FlushPcb (Tcb);
 
+  //
+  // Close the IP protocol.
+  //
+  gBS->CloseProtocol (
+         Tcb->IpInfo->ChildHandle,
+         &gEfiIp4ProtocolGuid,
+         ProtoData->TcpService->IpIo->Image,
+         Sk->SockHandle
+         );
+  
   IpIoRemoveIp (ProtoData->TcpService->IpIo, Tcb->IpInfo);
 
   FreePool (Tcb);

@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +19,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 extern EFI_DRIVER_BINDING_PROTOCOL   gIp4DriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL   gIp4ComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gIp4ComponentName2;
+extern EFI_UNICODE_STRING_TABLE      *gIp4ControllerNameTable;
+
+typedef struct {
+  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
+  UINTN                         NumberOfChildren;
+  EFI_HANDLE                    *ChildHandleBuffer;
+} IP4_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT;
 
 //
 // Function prototype for the driver's entry point

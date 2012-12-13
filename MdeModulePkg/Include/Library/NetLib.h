@@ -662,6 +662,72 @@ NetListInsertBefore (
   IN OUT LIST_ENTRY     *NewEntry
   );
 
+/**
+  Callback function which provided by user to remove one node in NetDestroyLinkList process.
+  
+  @param[in]    Entry           The entry to be removed.
+  @param[in]    Context         Pointer to the callback context corresponds to the Context in NetDestroyLinkList.
+
+  @retval EFI_SUCCESS           The entry has been removed successfully.
+  @retval Others                Fail to remove the entry.
+
+**/
+typedef
+EFI_STATUS
+(EFIAPI *NET_DESTROY_LINK_LIST_CALLBACK) (
+  IN LIST_ENTRY         *Entry,
+  IN VOID               *Context   OPTIONAL
+);
+
+/**
+  Safe destroy nodes in a linked list, and return the length of the list after all possible operations finished.
+
+  Destroy network children list by list traversals is not safe due to graph dependencies between nodes.
+  This function performs a safe traversal to destroy these nodes by checking to see if the node being destroyed
+  has been removed from the list or not.
+  If it has been removed, then restart the traversal from the head.
+  If it hasn't been removed, then continue with the next node directly.
+  This function will end the iterate and return the CallBack's last return value if error happens,
+  or retrun EFI_SUCCESS if 2 complete passes are made with no changes in the number of children in the list.  
+
+  @param[in]    List             The head of the list.
+  @param[in]    CallBack         Pointer to the callback function to destroy one node in the list.
+  @param[in]    Context          Pointer to the callback function's context: corresponds to the
+                                 parameter Context in NET_DESTROY_LINK_LIST_CALLBACK.
+  @param[out]   ListLength       The length of the link list if the function returns successfully.
+
+  @retval EFI_SUCCESS            Two complete passes are made with no changes in the number of children.
+  @retval EFI_INVALID_PARAMETER  The input parameter is invalid.
+  @retval Others                 Return the CallBack's last return value.
+
+**/
+EFI_STATUS
+EFIAPI
+NetDestroyLinkList (
+  IN   LIST_ENTRY                       *List,
+  IN   NET_DESTROY_LINK_LIST_CALLBACK   CallBack,
+  IN   VOID                             *Context,    OPTIONAL
+  OUT  UINTN                            *ListLength  OPTIONAL
+);
+
+/**
+  This function checks the input Handle to see if it's one of these handles in ChildHandleBuffer.
+
+  @param[in]  Handle             Handle to be checked.
+  @param[in]  NumberOfChildren   Number of Handles in ChildHandleBuffer.
+  @param[in]  ChildHandleBuffer  An array of child handles to be freed. May be NULL
+                                 if NumberOfChildren is 0.
+
+  @retval TURE                   Found the input Handle in ChildHandleBuffer.
+  @retval FALSE                  Can't find the input Handle in ChildHandleBuffer.
+
+**/
+BOOLEAN
+NetIsInHandleBuffer (
+  IN  EFI_HANDLE          Handle,
+  IN  UINTN               NumberOfChildren,
+  IN  EFI_HANDLE          *ChildHandleBuffer OPTIONAL
+);
 
 //
 // Object container: EFI network stack spec defines various kinds of
@@ -1335,6 +1401,28 @@ NetLibStrToIp6andPrefix (
   IN CONST CHAR16                *String,
   OUT      EFI_IPv6_ADDRESS      *Ip6Address,
   OUT      UINT8                 *PrefixLength
+  );
+
+/**
+
+  Convert one EFI_IPv6_ADDRESS to Null-terminated Unicode string.
+  The text representation of address is defined in RFC 4291.
+  
+  @param[in]       Ip6Address     The pointer to the IPv6 address.
+  @param[out]      String         The buffer to return the converted string.
+  @param[in]       StringSize     The length in bytes of the input String.
+                                  
+  @retval EFI_SUCCESS             Convert to string successfully.
+  @retval EFI_INVALID_PARAMETER   The input parameter is invalid.
+  @retval EFI_BUFFER_TOO_SMALL    The BufferSize is too small for the result. BufferSize has been 
+                                  updated with the size needed to complete the request.
+**/
+EFI_STATUS
+EFIAPI
+NetLibIp6ToStr (
+  IN         EFI_IPv6_ADDRESS      *Ip6Address,
+  OUT        CHAR16                *String,
+  IN         UINTN                 StringSize
   );
 
 //

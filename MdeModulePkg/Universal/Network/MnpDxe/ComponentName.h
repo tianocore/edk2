@@ -1,7 +1,7 @@
 /** @file
   The header file of UEFI Component Name(2) protocol.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -21,6 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 extern EFI_COMPONENT_NAME2_PROTOCOL gMnpComponentName2;
 extern EFI_COMPONENT_NAME_PROTOCOL  gMnpComponentName;
+extern EFI_UNICODE_STRING_TABLE     *gMnpControllerNameTable;
 
 /**
   Retrieves a Unicode string that is the user readable name of the driver.

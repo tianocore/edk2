@@ -34,6 +34,7 @@
 #include <Library/UefiLib.h>
 #include <Library/BaseLib.h>
 #include <Library/NetLib.h>
+#include <Library/PrintLib.h>
 
 
 typedef struct _DHCP6_IA_CB    DHCP6_IA_CB;
@@ -245,7 +246,7 @@ struct _DHCP6_INSTANCE {
   EFI_DHCP6_PACKET              *AdSelect;
   UINT8                         AdPref;
   EFI_IPv6_ADDRESS              *Unicast;
-  EFI_STATUS                    UdpSts;
+  volatile EFI_STATUS           UdpSts;
   BOOLEAN                       InDestroy;
   BOOLEAN                       MediaPresent;
   UINT64                        StartTime;
@@ -266,7 +267,6 @@ struct _DHCP6_SERVICE {
   UINT32                        Xid;
   LIST_ENTRY                    Child;
   UINTN                         NumOfChild;
-  BOOLEAN                       InDestroy;
 };
 
 /**

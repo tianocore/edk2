@@ -33,6 +33,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DpcLib.h>
+#include <Library/PrintLib.h>
 
 #include "Ip4Common.h"
 #include "Ip4Driver.h"
@@ -160,7 +161,6 @@ struct _IP4_SERVICE {
   UINT32                          Signature;
   EFI_SERVICE_BINDING_PROTOCOL    ServiceBinding;
   INTN                            State;
-  BOOLEAN                         InDestroy;
 
   //
   // List of all the IP instances and interfaces, and default

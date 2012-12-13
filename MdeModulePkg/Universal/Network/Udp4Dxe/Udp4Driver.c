@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -27,6 +27,43 @@ EFI_SERVICE_BINDING_PROTOCOL mUdp4ServiceBinding = {
   Udp4ServiceBindingCreateChild,
   Udp4ServiceBindingDestroyChild
 };
+
+/**
+  Callback function which provided by user to remove one node in NetDestroyLinkList process.
+  
+  @param[in]    Entry           The entry to be removed.
+  @param[in]    Context         Pointer to the callback context corresponds to the Context in NetDestroyLinkList.
+
+  @retval EFI_SUCCESS           The entry has been removed successfully.
+  @retval Others                Fail to remove the entry.
+
+**/
+EFI_STATUS
+Udp4DestroyChildEntryInHandleBuffer (
+  IN LIST_ENTRY         *Entry,
+  IN VOID               *Context
+)
+{
+  UDP4_INSTANCE_DATA            *Instance;
+  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
+  UINTN                         NumberOfChildren;
+  EFI_HANDLE                    *ChildHandleBuffer;
+
+  if (Entry == NULL || Context == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Instance = NET_LIST_USER_STRUCT_S (Entry, UDP4_INSTANCE_DATA, Link, UDP4_INSTANCE_DATA_SIGNATURE);
+  ServiceBinding    = ((UDP4_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *) Context)->ServiceBinding;
+  NumberOfChildren  = ((UDP4_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *) Context)->NumberOfChildren;
+  ChildHandleBuffer = ((UDP4_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *) Context)->ChildHandleBuffer;
+
+  if (!NetIsInHandleBuffer (Instance->ChildHandle, NumberOfChildren, ChildHandleBuffer)) {
+    return EFI_SUCCESS;
+  }
+
+  return ServiceBinding->DestroyChild (ServiceBinding, Instance->ChildHandle);
+}
 
 
 /**
@@ -178,18 +215,19 @@ Udp4DriverBindingStop (
   IN  EFI_HANDLE                   *ChildHandleBuffer
   )
 {
-  EFI_STATUS                    Status;
-  EFI_HANDLE                    NicHandle;
-  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
-  UDP4_SERVICE_DATA             *Udp4Service;
-  UDP4_INSTANCE_DATA            *Instance;
+  EFI_STATUS                                Status;
+  EFI_HANDLE                                NicHandle;
+  EFI_SERVICE_BINDING_PROTOCOL              *ServiceBinding;
+  UDP4_SERVICE_DATA                         *Udp4Service;
+  UDP4_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT  Context;
+  LIST_ENTRY                                *List;
 
   //
   // Find the NicHandle where UDP4 ServiceBinding Protocol is installed.
   //
   NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiIp4ProtocolGuid);
   if (NicHandle == NULL) {
-    return EFI_DEVICE_ERROR;
+    return EFI_SUCCESS;
   }
 
   //
@@ -208,9 +246,21 @@ Udp4DriverBindingStop (
   }
 
   Udp4Service = UDP4_SERVICE_DATA_FROM_THIS (ServiceBinding);
-
-  if (NumberOfChildren == 0) {
-
+  if (NumberOfChildren != 0) {
+    //
+    // NumberOfChildren is not zero, destroy the children instances in ChildHandleBuffer.
+    //
+    List = &Udp4Service->ChildrenList;
+    Context.ServiceBinding    = ServiceBinding;
+    Context.NumberOfChildren  = NumberOfChildren;
+    Context.ChildHandleBuffer = ChildHandleBuffer;
+    Status = NetDestroyLinkList (
+               List,
+               Udp4DestroyChildEntryInHandleBuffer,
+               &Context,
+               NULL
+               );
+  } else {
     gBS->UninstallMultipleProtocolInterfaces (
            NicHandle,
            &gEfiUdp4ServiceBindingProtocolGuid,
@@ -222,14 +272,11 @@ Udp4DriverBindingStop (
 
     Udp4CleanService (Udp4Service);
 
-    FreePool (Udp4Service);
-  } else {
-
-    while (!IsListEmpty (&Udp4Service->ChildrenList)) {
-      Instance = NET_LIST_HEAD (&Udp4Service->ChildrenList, UDP4_INSTANCE_DATA, Link);
-
-      ServiceBinding->DestroyChild (ServiceBinding, Instance->ChildHandle);
+    if (gUdpControllerNameTable != NULL) {
+      FreeUnicodeStringTable (gUdpControllerNameTable);
+      gUdpControllerNameTable = NULL;
     }
+    FreePool (Udp4Service);
   }
 
   return Status;
@@ -313,6 +360,21 @@ Udp4ServiceBindingCreateChild (
   //
   Status = gBS->OpenProtocol (
                   Udp4Service->IpIo->ChildHandle,
+                  &gEfiIp4ProtocolGuid,
+                  (VOID **) &Ip4,
+                  gUdp4DriverBinding.DriverBindingHandle,
+                  Instance->ChildHandle,
+                  EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+                  );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
+
+  //
+  // Open this instance's Ip4 protocol in the IpInfo BY_CHILD.
+  //
+  Status = gBS->OpenProtocol (
+                  Instance->IpInfo->ChildHandle,
                   &gEfiIp4ProtocolGuid,
                   (VOID **) &Ip4,
                   gUdp4DriverBinding.DriverBindingHandle,
@@ -412,14 +474,14 @@ Udp4ServiceBindingDestroyChild (
 
   Instance = UDP4_INSTANCE_DATA_FROM_THIS (Udp4Proto);
 
-  if (Instance->Destroyed) {
+  if (Instance->InDestroy) {
     return EFI_SUCCESS;
   }
 
   //
   // Use the Destroyed flag to avoid the re-entering of the following code.
   //
-  Instance->Destroyed = TRUE;
+  Instance->InDestroy = TRUE;
 
   //
   // Close the Ip4 protocol.
@@ -430,6 +492,15 @@ Udp4ServiceBindingDestroyChild (
          gUdp4DriverBinding.DriverBindingHandle,
          Instance->ChildHandle
          );
+  //
+  // Close the Ip4 protocol on this instance's IpInfo.
+  //
+  gBS->CloseProtocol (
+         Instance->IpInfo->ChildHandle,
+         &gEfiIp4ProtocolGuid,
+         gUdp4DriverBinding.DriverBindingHandle,
+         Instance->ChildHandle
+         );  
 
   //
   // Uninstall the Udp4Protocol previously installed on the ChildHandle.
@@ -441,7 +512,7 @@ Udp4ServiceBindingDestroyChild (
                   NULL
                   );
   if (EFI_ERROR (Status)) {
-    Instance->Destroyed = FALSE;
+    Instance->InDestroy = FALSE;
     return Status;
   }
 

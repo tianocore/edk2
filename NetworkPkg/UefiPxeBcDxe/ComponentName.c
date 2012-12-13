@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name(2) protocol implementation for UefiPxeBc driver.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -171,6 +171,16 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE       mPxeBcDriverNameTab
   }
 };
 
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE       mPxeBcControllerNameTable[] = {
+  {
+    "eng;en",
+    L"PXE Controller"
+  },
+  {
+    NULL,
+    NULL
+  }
+};
 
 /**
   Retrieves a Unicode string that is the user-readable name of the driver.
@@ -307,6 +317,42 @@ PxeBcComponentNameGetControllerName (
   OUT CHAR16                       **ControllerName
   )
 {
-  return EFI_UNSUPPORTED;
-}
+  EFI_STATUS                      Status;
+  EFI_HANDLE                      NicHandle;
+  PXEBC_PRIVATE_PROTOCOL          *Id;
 
+  if (ControllerHandle == NULL || ChildHandle != NULL) {
+    return EFI_UNSUPPORTED;
+  }
+  
+  NicHandle = PxeBcGetNicByIp4Children (ControllerHandle);
+  if (NicHandle == NULL) {
+    NicHandle = PxeBcGetNicByIp6Children (ControllerHandle);
+    if (NicHandle == NULL) {
+      return EFI_UNSUPPORTED;
+    }
+  }
+
+  //
+  // Try to retrieve the private data by PxeBcPrivate protocol.
+  //
+  Status = gBS->OpenProtocol (
+                  NicHandle,
+                  &gEfiCallerIdGuid,
+                  (VOID **) &Id,
+                  NULL,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return LookupUnicodeString2 (
+           Language,
+           This->SupportedLanguages,
+           mPxeBcControllerNameTable,
+           ControllerName,
+           (BOOLEAN)(This == &gPxeBcComponentName)
+           );
+}

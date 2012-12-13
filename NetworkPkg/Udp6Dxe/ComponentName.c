@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name(2) protocol implementation for UDP6 driver.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -174,6 +174,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mUdp6DriverNameTable[] = 
   }
 };
 
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  *gUdp6ControllerNameTable = NULL;
+
 /**
   Retrieves a Unicode string that is the user-readable name of the driver.
 
@@ -227,6 +229,70 @@ Udp6ComponentNameGetDriverName (
            mUdp6DriverNameTable,
            DriverName,
            (BOOLEAN) (This == &gUdp6ComponentName)
+           );
+}
+
+/**
+  Update the component name for the Udp6 child handle.
+
+  @param  Udp6[in]                  A pointer to the EFI_UDP6_PROTOCOL.
+
+  
+  @retval EFI_SUCCESS               Update the ControllerNameTable of this instance successfully.
+  @retval EFI_INVALID_PARAMETER     The input parameter is invalid.
+  
+**/
+EFI_STATUS
+UpdateName (
+  IN    EFI_UDP6_PROTOCOL             *Udp6
+  )
+{
+  EFI_STATUS                       Status;
+  CHAR16                           HandleName[64];
+  EFI_UDP6_CONFIG_DATA             Udp6ConfigData;
+
+  if (Udp6 == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Format the child name into the string buffer.
+  //
+  Status = Udp6->GetModeData (Udp6, &Udp6ConfigData, NULL, NULL, NULL);
+  if (!EFI_ERROR (Status)) {
+    UnicodeSPrint (HandleName, sizeof (HandleName),
+      L"UDPv6 (SrcPort=%d, DestPort=%d)",
+      Udp6ConfigData.StationPort,
+      Udp6ConfigData.RemotePort
+      );
+  } else if (Status == EFI_NOT_STARTED) {
+    UnicodeSPrint (HandleName, sizeof (HandleName), L"UDPv6 (Not started)");
+  } else {
+    UnicodeSPrint (HandleName, sizeof (HandleName), L"UDPv6 (%r)", Status);
+  }
+
+  if (gUdp6ControllerNameTable != NULL) {
+    FreeUnicodeStringTable (gUdp6ControllerNameTable);
+    gUdp6ControllerNameTable = NULL;
+  }
+
+  Status = AddUnicodeString2 (
+             "eng",
+             gUdp6ComponentName.SupportedLanguages,
+             &gUdp6ControllerNameTable,
+             HandleName,
+             TRUE
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return AddUnicodeString2 (
+           "en",
+           gUdp6ComponentName2.SupportedLanguages,
+           &gUdp6ControllerNameTable,
+           HandleName,
+           FALSE
            );
 }
 
@@ -308,6 +374,56 @@ Udp6ComponentNameGetControllerName (
   OUT CHAR16                       **ControllerName
   )
 {
-  return EFI_UNSUPPORTED;
-}
+  EFI_STATUS                    Status;
+  EFI_UDP6_PROTOCOL             *Udp6;
 
+  //
+  // Only provide names for child handles.
+  //
+  if (ChildHandle == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Make sure this driver produced ChildHandle
+  //
+  Status = EfiTestChildHandle (
+             ControllerHandle,
+             ChildHandle,
+             &gEfiIp6ProtocolGuid
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Retrieve an instance of a produced protocol from ChildHandle
+  //
+  Status = gBS->OpenProtocol (
+                  ChildHandle,
+                  &gEfiUdp6ProtocolGuid,
+                  (VOID **)&Udp6,
+                  NULL,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Update the component name for this child handle.
+  //
+  Status = UpdateName (Udp6);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return LookupUnicodeString2 (
+           Language,
+           This->SupportedLanguages,
+           gUdp6ControllerNameTable,
+           ControllerName,
+           (BOOLEAN)(This == &gUdp6ComponentName)
+           );
+}

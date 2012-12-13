@@ -19,6 +19,13 @@
 extern EFI_DRIVER_BINDING_PROTOCOL  gIp6DriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL  gIp6ComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL gIp6ComponentName2;
+extern EFI_UNICODE_STRING_TABLE     *gIp6ControllerNameTable;
+
+typedef struct {
+  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
+  UINTN                         NumberOfChildren;
+  EFI_HANDLE                    *ChildHandleBuffer;
+}IP6_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT;
 
 /**
   Clean up an IP6 service binding instance. It releases all

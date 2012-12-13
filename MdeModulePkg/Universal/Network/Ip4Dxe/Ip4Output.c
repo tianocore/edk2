@@ -1,7 +1,7 @@
 /** @file
   Transmit the IP4 packet.
   
-Copyright (c) 2005 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -204,6 +204,10 @@ Ip4SysPacketSent (
   @retval EFI_NO_MAPPING       There is no interface to the destination.
   @retval EFI_NOT_FOUND        There is no route to the destination
   @retval EFI_SUCCESS          The packet is successfully transmitted.
+  @retval EFI_BAD_BUFFER_SIZE  The length of the IPv4 header + option length +
+                               total data length is greater than MTU (or greater
+                               than the maximum packet size if Token.Packet.TxData.
+                               OverrideData.DoNotFragment is TRUE.)
   @retval Others               Failed to transmit the packet.
 
 **/
@@ -231,6 +235,7 @@ Ip4Output (
   UINT32                    Offset;
   UINT32                    Mtu;
   UINT32                    Num;
+  BOOLEAN                   RawData;
 
   //
   // Select an interface/source for system packet, application
@@ -252,11 +257,18 @@ Ip4Output (
 
   //
   // Before IPsec process, prepared the IP head.
+  // If Ip4Output is transmitting RawData, don't update IPv4 header.
   //
-  HeadLen        = sizeof (IP4_HEAD) + ((OptLen + 3) & (~0x03));
-  Head->HeadLen  = (UINT8) (HeadLen >> 2);
-  Head->Id       = mIp4Id++;
-  Head->Ver      = 4;
+  HeadLen = sizeof (IP4_HEAD) + ((OptLen + 3) & (~0x03));
+
+  if ((IpInstance != NULL) && IpInstance->ConfigData.RawData) {
+    RawData        = TRUE;
+  } else {
+    Head->HeadLen  = (UINT8) (HeadLen >> 2);
+    Head->Id       = mIp4Id++;
+    Head->Ver      = 4;
+    RawData        = FALSE;
+  }
   
   //
   // Call IPsec process.
@@ -323,6 +335,13 @@ Ip4Output (
   Mtu = IpSb->MaxPacketSize + sizeof (IP4_HEAD);  
 
   if (Packet->TotalSize + HeadLen > Mtu) {
+    //
+    // Fragmentation is diabled for RawData mode.
+    //
+    if (RawData) {
+      return EFI_BAD_BUFFER_SIZE;
+    }
+    
     //
     // Packet is fragmented from the tail to the head, that is, the
     // first frame sent is the last fragment of the packet. The first
