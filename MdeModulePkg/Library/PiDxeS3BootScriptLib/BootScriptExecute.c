@@ -1123,7 +1123,9 @@ BootScriptExecutePciCfgReadWrite (
   EFI_STATUS  Status;
   UINT64      Data;
   EFI_BOOT_SCRIPT_PCI_CONFIG_READ_WRITE  PciCfgReadWrite;
-  
+
+  Data = 0;
+
   CopyMem((VOID*)&PciCfgReadWrite, (VOID*)Script, sizeof(EFI_BOOT_SCRIPT_PCI_CONFIG_READ_WRITE));
 
   DEBUG ((EFI_D_INFO, "BootScriptExecutePciCfgReadWrite - 0x%08x, 0x%016lx, 0x%016lx\n", PCI_ADDRESS_ENCODE (PciCfgReadWrite.Address), AndMask, OrMask));
@@ -1561,6 +1563,9 @@ BootScriptExecutePciCfg2ReadWrite (
   UINT64      Data;
   EFI_STATUS  Status;
   EFI_BOOT_SCRIPT_PCI_CONFIG2_READ_WRITE PciCfg2ReadWrite;
+
+  Data = 0;
+
   CopyMem ((VOID*)&PciCfg2ReadWrite, (VOID*)Script, sizeof(EFI_BOOT_SCRIPT_PCI_CONFIG2_READ_WRITE));
 
   DEBUG ((EFI_D_INFO, "BootScriptExecutePciCfg2ReadWrite - 0x%04x, 0x%08x, 0x%016lx, 0x%016lx\n", PciCfg2ReadWrite.Segment, PCI_ADDRESS_ENCODE (PciCfg2ReadWrite.Address), AndMask, OrMask));
