@@ -2,6 +2,9 @@
   OVMF ACPI QEMU support
 
   Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
+
+  Copyright (C) 2012, Red Hat, Inc.
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -196,6 +199,19 @@ typedef struct {
   PCI_WINDOW PciWindow64;
 } FIRMWARE_DATA;
 
+typedef struct {
+  UINT8 NameOp;
+  UINT8 RootChar;
+  UINT8 NameChar[4];
+  UINT8 PackageOp;
+  UINT8 PkgLength;
+  UINT8 NumElements;
+  UINT8 DWordPrefix;
+  UINT8 Pm1aCntSlpTyp;
+  UINT8 Pm1bCntSlpTyp;
+  UINT8 Reserved[2];
+} SYSTEM_STATE_PACKAGE;
+
 #pragma pack()
 
 
@@ -296,6 +312,80 @@ PopulateFwData(
 
 
 STATIC
+VOID
+EFIAPI
+GetSuspendStates (
+  UINTN                *SuspendToRamSize,
+  SYSTEM_STATE_PACKAGE *SuspendToRam,
+  UINTN                *SuspendToDiskSize,
+  SYSTEM_STATE_PACKAGE *SuspendToDisk
+  )
+{
+  STATIC CONST SYSTEM_STATE_PACKAGE Template = {
+    0x08,                   // NameOp
+    '\\',                   // RootChar
+    { '_', 'S', 'x', '_' }, // NameChar[4]
+    0x12,                   // PackageOp
+    0x07,                   // PkgLength
+    0x01,                   // NumElements
+    0x0c,                   // DWordPrefix
+    0x00,                   // Pm1aCntSlpTyp
+    0x00,                   // Pm1bCntSlpTyp -- we don't support it
+    { 0x00, 0x00 }          // Reserved
+  };
+  RETURN_STATUS                     Status;
+  FIRMWARE_CONFIG_ITEM              FwCfgItem;
+  UINTN                             FwCfgSize;
+  UINT8                             SystemStates[6];
+
+  //
+  // configure defaults
+  //
+  *SuspendToRamSize = sizeof Template;
+  CopyMem (SuspendToRam, &Template, sizeof Template);
+  SuspendToRam->NameChar[2]   = '3'; // S3
+  SuspendToRam->Pm1aCntSlpTyp = 1;   // PIIX4: STR
+
+  *SuspendToDiskSize = sizeof Template;
+  CopyMem (SuspendToDisk, &Template, sizeof Template);
+  SuspendToDisk->NameChar[2]   = '4'; // S4
+  SuspendToDisk->Pm1aCntSlpTyp = 2;   // PIIX4: POSCL
+
+  //
+  // check for overrides
+  //
+  Status = QemuFwCfgFindFile ("etc/system-states", &FwCfgItem, &FwCfgSize);
+  if (Status != RETURN_SUCCESS || FwCfgSize != sizeof SystemStates) {
+    DEBUG ((DEBUG_INFO, "ACPI using S3/S4 defaults\n"));
+    return;
+  }
+  QemuFwCfgSelectItem (FwCfgItem);
+  QemuFwCfgReadBytes (sizeof SystemStates, SystemStates);
+
+  //
+  // Each byte corresponds to a system state. In each byte, the MSB tells us
+  // whether the given state is enabled. If so, the three LSBs specify the
+  // value to be written to the PM control register's SUS_TYP bits.
+  //
+  if (SystemStates[3] & BIT7) {
+    SuspendToRam->Pm1aCntSlpTyp = SystemStates[3] & (BIT2 | BIT1 | BIT0);
+    DEBUG ((DEBUG_INFO, "ACPI S3 value: %d\n", SuspendToRam->Pm1aCntSlpTyp));
+  } else {
+    *SuspendToRamSize = 0;
+    DEBUG ((DEBUG_INFO, "ACPI S3 disabled\n"));
+  }
+
+  if (SystemStates[4] & BIT7) {
+    SuspendToDisk->Pm1aCntSlpTyp = SystemStates[4] & (BIT2 | BIT1 | BIT0);
+    DEBUG ((DEBUG_INFO, "ACPI S4 value: %d\n", SuspendToDisk->Pm1aCntSlpTyp));
+  } else {
+    *SuspendToDiskSize = 0;
+    DEBUG ((DEBUG_INFO, "ACPI S4 disabled\n"));
+  }
+}
+
+
+STATIC
 EFI_STATUS
 EFIAPI
 QemuInstallAcpiSsdtTable (
@@ -312,10 +402,16 @@ QemuInstallAcpiSsdtTable (
 
   FwData = AllocateReservedPool (sizeof (*FwData));
   if (FwData != NULL) {
-    UINTN SsdtSize;
-    UINT8 *Ssdt;
+    UINTN                SuspendToRamSize;
+    SYSTEM_STATE_PACKAGE SuspendToRam;
+    UINTN                SuspendToDiskSize;
+    SYSTEM_STATE_PACKAGE SuspendToDisk;
+    UINTN                SsdtSize;
+    UINT8                *Ssdt;
 
-    SsdtSize = AcpiTableBufferSize + 17;
+    GetSuspendStates (&SuspendToRamSize,  &SuspendToRam,
+                      &SuspendToDiskSize, &SuspendToDisk);
+    SsdtSize = AcpiTableBufferSize + 17 + SuspendToRamSize + SuspendToDiskSize;
     Ssdt = AllocatePool (SsdtSize);
 
     if (Ssdt != NULL) {
@@ -351,6 +447,14 @@ QemuInstallAcpiSsdtTable (
 
         *(UINT32*) SsdtPtr = sizeof (*FwData);
         SsdtPtr += 4;
+
+        //
+        // add suspend system states
+        //
+        CopyMem (SsdtPtr, &SuspendToRam, SuspendToRamSize);
+        SsdtPtr += SuspendToRamSize;
+        CopyMem (SsdtPtr, &SuspendToDisk, SuspendToDiskSize);
+        SsdtPtr += SuspendToDiskSize;
 
         ASSERT((UINTN) (SsdtPtr - Ssdt) == SsdtSize);
         ((EFI_ACPI_DESCRIPTION_HEADER *) Ssdt)->Length = (UINT32) SsdtSize;
