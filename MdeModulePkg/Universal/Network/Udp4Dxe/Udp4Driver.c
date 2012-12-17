@@ -39,10 +39,11 @@ EFI_SERVICE_BINDING_PROTOCOL mUdp4ServiceBinding = {
 
 **/
 EFI_STATUS
+EFIAPI
 Udp4DestroyChildEntryInHandleBuffer (
   IN LIST_ENTRY         *Entry,
   IN VOID               *Context
-)
+  )
 {
   UDP4_INSTANCE_DATA            *Instance;
   EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;

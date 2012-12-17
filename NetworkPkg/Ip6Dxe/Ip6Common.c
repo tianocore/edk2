@@ -339,10 +339,11 @@ Ip6AddAddr (
 
 **/
 EFI_STATUS
+EFIAPI
 Ip6DestroyChildEntryByAddr (
   IN LIST_ENTRY         *Entry,
   IN VOID               *Context
-)
+  )
 {
   IP6_PROTOCOL                  *Instance;
   EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;

@@ -337,10 +337,11 @@ Dhcp6CreateInstance (
 
 **/
 EFI_STATUS
+EFIAPI
 Dhcp6DestroyChildEntry (
   IN LIST_ENTRY         *Entry,
   IN VOID               *Context
-)
+  )
 {
   DHCP6_INSTANCE                   *Instance;
   EFI_SERVICE_BINDING_PROTOCOL     *ServiceBinding;

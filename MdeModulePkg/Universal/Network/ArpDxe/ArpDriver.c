@@ -252,10 +252,11 @@ ArpCleanService (
 
 **/
 EFI_STATUS
+EFIAPI
 ArpDestroyChildEntryInHandleBuffer (
   IN LIST_ENTRY         *Entry,
   IN VOID               *Context
-)
+  )
 {
   ARP_INSTANCE_DATA             *Instance;
   EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;

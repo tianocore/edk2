@@ -677,7 +677,7 @@ EFI_STATUS
 (EFIAPI *NET_DESTROY_LINK_LIST_CALLBACK) (
   IN LIST_ENTRY         *Entry,
   IN VOID               *Context   OPTIONAL
-);
+  );
 
 /**
   Safe destroy nodes in a linked list, and return the length of the list after all possible operations finished.
@@ -708,7 +708,7 @@ NetDestroyLinkList (
   IN   NET_DESTROY_LINK_LIST_CALLBACK   CallBack,
   IN   VOID                             *Context,    OPTIONAL
   OUT  UINTN                            *ListLength  OPTIONAL
-);
+  );
 
 /**
   This function checks the input Handle to see if it's one of these handles in ChildHandleBuffer.
@@ -723,11 +723,12 @@ NetDestroyLinkList (
 
 **/
 BOOLEAN
+EFIAPI
 NetIsInHandleBuffer (
   IN  EFI_HANDLE          Handle,
   IN  UINTN               NumberOfChildren,
   IN  EFI_HANDLE          *ChildHandleBuffer OPTIONAL
-);
+  );
 
 //
 // Object container: EFI network stack spec defines various kinds of

@@ -189,10 +189,11 @@ EXIT:
 
 **/
 EFI_STATUS
+EFIAPI
 Udp6DestroyChildEntryInHandleBuffer (
   IN LIST_ENTRY         *Entry,
   IN VOID               *Context
-)
+  )
 {
   UDP6_INSTANCE_DATA            *Instance;
   EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;

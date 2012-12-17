@@ -247,10 +247,11 @@ Mtftp6CreateInstance (
 
 **/
 EFI_STATUS
+EFIAPI
 Mtftp6DestroyChildEntryInHandleBuffer (
   IN LIST_ENTRY         *Entry,
   IN VOID               *Context
-)
+  )
 {
   MTFTP6_INSTANCE               *Instance;
   EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;

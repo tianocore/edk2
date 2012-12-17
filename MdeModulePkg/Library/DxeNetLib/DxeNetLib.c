@@ -1095,7 +1095,7 @@ NetDestroyLinkList (
   IN   NET_DESTROY_LINK_LIST_CALLBACK   CallBack,
   IN   VOID                             *Context,    OPTIONAL
   OUT  UINTN                            *ListLength  OPTIONAL
-)
+  )
 {
   UINTN                         PreviousLength;
   LIST_ENTRY                    *Entry;
@@ -1158,7 +1158,7 @@ NetIsInHandleBuffer (
   IN  EFI_HANDLE          Handle,
   IN  UINTN               NumberOfChildren,
   IN  EFI_HANDLE          *ChildHandleBuffer OPTIONAL
-)
+  )
 {
   UINTN     Index;
   

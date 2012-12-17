@@ -147,10 +147,11 @@ Tcp4DestroyTimer (
 
 **/
 EFI_STATUS
+EFIAPI
 Tcp4DestroyChildEntryInHandleBuffer (
   IN LIST_ENTRY         *Entry,
   IN VOID               *Context
-)
+  )
 {
   SOCKET                        *Sock;
   EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;

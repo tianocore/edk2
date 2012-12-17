@@ -342,10 +342,11 @@ ON_ERROR:
 
 **/
 EFI_STATUS
+EFIAPI
 TcpDestroyChildEntryInHandleBuffer (
   IN LIST_ENTRY         *Entry,
   IN VOID               *Context
-)
+  )
 {
   SOCKET                        *Sock;
   EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;

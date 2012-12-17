@@ -34,7 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UdpIoLib.h>
-#include <LIbrary/PrintLib.h>
+#include <Library/PrintLib.h>
 
 extern EFI_MTFTP4_PROTOCOL  gMtftp4ProtocolTemplate;
 

@@ -37,10 +37,11 @@ EFI_DRIVER_BINDING_PROTOCOL gMnpDriverBinding = {
 
 **/
 EFI_STATUS
+EFIAPI
 MnpDestroyServiceDataEntry (
   IN LIST_ENTRY         *Entry,
   IN VOID               *Context
-)
+  )
 {
   MNP_SERVICE_DATA              *MnpServiceData;
   
@@ -59,10 +60,11 @@ MnpDestroyServiceDataEntry (
 
 **/
 EFI_STATUS
+EFIAPI
 MnpDestroyServiceChildEntry (
   IN LIST_ENTRY         *Entry,
   IN VOID               *Context
-)
+  )
 {
   MNP_SERVICE_DATA              *MnpServiceData;
 

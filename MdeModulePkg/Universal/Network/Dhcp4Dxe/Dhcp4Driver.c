@@ -364,10 +364,11 @@ ON_ERROR:
 
 **/
 EFI_STATUS
+EFIAPI
 Dhcp4DestroyChildEntry (
   IN LIST_ENTRY         *Entry,
   IN VOID               *Context
-)
+  )
 {
   DHCP_PROTOCOL                    *Instance;
   EFI_SERVICE_BINDING_PROTOCOL     *ServiceBinding;

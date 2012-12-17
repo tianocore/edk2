@@ -696,10 +696,11 @@ MnpDestroyServiceData (
 
 **/
 EFI_STATUS
+EFIAPI
 MnpDestoryChildEntry (
   IN LIST_ENTRY         *Entry,
   IN VOID               *Context
-)
+  )
 {
   MNP_INSTANCE_DATA             *Instance;
   EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;

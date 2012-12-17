@@ -406,10 +406,11 @@ Ip4CleanService (
 
 **/
 EFI_STATUS
+EFIAPI
 Ip4DestroyChildEntryInHandleBuffer (
   IN LIST_ENTRY         *Entry,
   IN VOID               *Context
-)
+  )
 {
   IP4_PROTOCOL                  *IpInstance;
   EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;

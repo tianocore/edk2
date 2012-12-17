@@ -328,10 +328,11 @@ ON_ERROR:
 
 **/
 EFI_STATUS
+EFIAPI
 Mtftp4DestroyChildEntryInHandleBuffer (
   IN LIST_ENTRY         *Entry,
   IN VOID               *Context
-)
+  )
 {
   MTFTP4_PROTOCOL               *Instance;
   EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;

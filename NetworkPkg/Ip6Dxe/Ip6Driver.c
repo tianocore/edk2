@@ -584,10 +584,11 @@ Ip6DriverBindingStart (
 
 **/
 EFI_STATUS
+EFIAPI
 Ip6DestroyChildEntryInHandleBuffer (
   IN LIST_ENTRY         *Entry,
   IN VOID               *Context
-)
+  )
 {
   IP6_PROTOCOL                  *IpInstance;
   EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
