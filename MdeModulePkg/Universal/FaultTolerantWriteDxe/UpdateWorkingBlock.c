@@ -166,6 +166,7 @@ WorkSpaceRefresh (
 {
   EFI_STATUS                      Status;
   UINTN                           Length;
+  UINTN                           RemainingSpaceSize;
 
   //
   // Initialize WorkSpace as FTW_ERASED_BYTE
@@ -198,7 +199,15 @@ WorkSpaceRefresh (
             FtwDevice->FtwWorkSpaceSize,
             &FtwDevice->FtwLastWriteHeader
             );
-  if (EFI_ERROR (Status)) {
+  RemainingSpaceSize = FtwDevice->FtwWorkSpaceSize - ((UINTN) FtwDevice->FtwLastWriteHeader - (UINTN) FtwDevice->FtwWorkSpace);
+  DEBUG ((EFI_D_INFO, "Ftw: Remaining work space size - %x\n", RemainingSpaceSize));
+  //
+  // If FtwGetLastWriteHeader() returns error, or the remaining space size is even not enough to contain
+  // one EFI_FAULT_TOLERANT_WRITE_HEADER + one EFI_FAULT_TOLERANT_WRITE_RECORD(It will cause that the header
+  // pointed by FtwDevice->FtwLastWriteHeader or record pointed by FtwDevice->FtwLastWriteRecord may contain invalid data),
+  // it needs to reclaim work space.
+  //
+  if (EFI_ERROR (Status) || RemainingSpaceSize < sizeof (EFI_FAULT_TOLERANT_WRITE_HEADER) + sizeof (EFI_FAULT_TOLERANT_WRITE_RECORD)) {
     //
     // reclaim work space in working block.
     //
