@@ -165,7 +165,7 @@ ShellCommandRunHelp (
               }
               ShellStatus = SHELL_NOT_FOUND;
             } else {
-              if (HelpPage == TRUE) {
+              if (HelpPage) {
                  ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HELP_PAGE_COMMAND), gShellLevel3HiiHandle, OutText);
               } else {
                 while (OutText[StrLen(OutText)-1] == L'\r' || OutText[StrLen(OutText)-1] == L'\n' || OutText[StrLen(OutText)-1] == L' ') {
