@@ -16,9 +16,9 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 4) {
   //
   // System Sleep States
   //
-  Name (\_S0, Package () {5, 0, 0, 0})
-  Name (\_S4, Package () {1, 0, 0, 0})
-  Name (\_S5, Package () {0, 0, 0, 0})
+  Name (\_S0, Package () {5, 0, 0, 0}) // Working
+  Name (\_S4, Package () {1, 0, 0, 0}) // Suspend to Disk
+  Name (\_S5, Package () {0, 0, 0, 0}) // Soft Off
 
   //
   //  System Bus
