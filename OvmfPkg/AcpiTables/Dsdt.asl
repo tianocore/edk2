@@ -17,6 +17,7 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 4) {
   // System Sleep States
   //
   Name (\_S0, Package () {5, 0, 0, 0}) // Working
+  Name (\_S3, Package () {1, 0, 0, 0}) // Suspend to Ram  (PIIX4: STR)
   Name (\_S4, Package () {2, 0, 0, 0}) // Suspend to Disk (PIIX4: POSCL)
   Name (\_S5, Package () {0, 0, 0, 0}) // Soft Off
 
