@@ -1922,7 +1922,7 @@ ParseIfrData (
       //
       DefaultData.Type        = DefaultValueFromOpcode;
       DefaultData.DefaultId   = VarDefaultId;
-      CopyMem (&DefaultData.Value, &IfrDefault->Value, sizeof (EFI_IFR_TYPE_VALUE));
+      CopyMem (&DefaultData.Value, &IfrDefault->Value, IfrDefault->Header.Length - OFFSET_OF (EFI_IFR_DEFAULT, Value));
       
       // If the value field is expression, set the cleaned flag.
       if (IfrDefault->Type ==  EFI_IFR_TYPE_OTHER) {
