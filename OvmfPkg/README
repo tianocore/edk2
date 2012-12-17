@@ -13,11 +13,12 @@ Current status: Alpha
 
 Current capabilities:
 * IA32 and X64 architectures
-* QEMU (0.9.1 or later)
+* QEMU (0.10.0 or later)
   - Video, keyboard, IDE, CD-ROM, serial
   - Runs UEFI shell
   - Optional NIC support.  Requires QEMU (0.12.2 or later)
-* UEFI Linux has booted (but is not stable)
+* UEFI Linux boots
+* UEFI Windows 8 boots
 
 === FUTURE PLANS ===
 
