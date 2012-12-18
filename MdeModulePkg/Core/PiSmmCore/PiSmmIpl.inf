@@ -64,6 +64,7 @@
   gEfiEventReadyToBootGuid                      # ALWAYS_CONSUMED
   gEfiEventLegacyBootGuid                       # ALWAYS_CONSUMED
   gEfiEventVirtualAddressChangeGuid             # ALWAYS_CONSUMED
+  gEfiEndOfDxeEventGroupGuid                    # ALWAYS_CONSUMED
   gLoadFixedAddressConfigurationTableGuid       # SIMETIMES_CONSUMED
 
 [Pcd]
