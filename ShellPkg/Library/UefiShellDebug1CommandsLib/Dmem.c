@@ -74,7 +74,7 @@ DisplayMmioMemory(
     ShellStatus = SHELL_NOT_FOUND;
   } else {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_DMEM_MMIO_HEADER_ROW), gShellDebug1HiiHandle, (UINT64)(UINTN)Address, Size);
-    DumpHex(2,0,Size,Buffer);
+    DumpHex(2, (UINTN)Address, Size, Buffer);
   }
 
   FreePool(Buffer);
@@ -168,7 +168,7 @@ ShellCommandRunDmem (
     if (ShellStatus == SHELL_SUCCESS) {
       if (!ShellCommandLineGetFlag(Package, L"-mmio")) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_DMEM_HEADER_ROW), gShellDebug1HiiHandle, (UINT64)(UINTN)Address, Size);
-        DumpHex(2,0,(UINTN)Size,Address);
+        DumpHex(2, (UINTN)Address, (UINTN)Size, Address);
         if (Address == (VOID*)gST) {
           Acpi20TableAddress  = 0;
           AcpiTableAddress    = 0;
