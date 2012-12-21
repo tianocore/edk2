@@ -16,6 +16,65 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "FaultTolerantWrite.h"
 
+EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER mWorkingBlockHeader = {ZERO_GUID, 0, 0, 0, 0, {0, 0, 0}, 0};
+
+/**
+  Initialize a local work space header.
+
+  Since Signature and WriteQueueSize have been known, Crc can be calculated out,
+  then the work space header will be fixed.
+**/
+VOID
+InitializeLocalWorkSpaceHeader (
+  VOID
+  )
+{
+  EFI_STATUS                              Status;
+
+  //
+  // Check signature with gEfiSystemNvDataFvGuid.
+  //
+  if (CompareGuid (&gEfiSystemNvDataFvGuid, &mWorkingBlockHeader.Signature)) {
+    //
+    // The local work space header has been initialized.
+    //
+    return;
+  }
+
+  SetMem (
+    &mWorkingBlockHeader,
+    sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER),
+    FTW_ERASED_BYTE
+    );
+
+  //
+  // Here using gEfiSystemNvDataFvGuid as the signature.
+  //
+  CopyMem (
+    &mWorkingBlockHeader.Signature,
+    &gEfiSystemNvDataFvGuid,
+    sizeof (EFI_GUID)
+    );
+  mWorkingBlockHeader.WriteQueueSize = (UINT64) (PcdGet32 (PcdFlashNvStorageFtwWorkingSize) - sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER));
+
+  //
+  // Crc is calculated with all the fields except Crc and STATE, so leave them as FTW_ERASED_BYTE.
+  //
+
+  //
+  // Calculate the Crc of woking block header
+  //
+  Status = gBS->CalculateCrc32 (
+                  &mWorkingBlockHeader,
+                  sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER),
+                  &mWorkingBlockHeader.Crc
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  mWorkingBlockHeader.WorkingBlockValid    = FTW_VALID_STATE;
+  mWorkingBlockHeader.WorkingBlockInvalid  = FTW_INVALID_STATE;
+}
+
 /**
   Check to see if it is a valid work space.
 
@@ -31,62 +90,16 @@ IsValidWorkSpace (
   IN EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *WorkingHeader
   )
 {
-  EFI_STATUS                              Status;
-  EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER WorkingBlockHeader;
-
   if (WorkingHeader == NULL) {
     return FALSE;
   }
 
-  if (WorkingHeader->WorkingBlockValid != FTW_VALID_STATE) {
-    DEBUG ((EFI_D_ERROR, "Ftw: Work block header valid bit check error\n"));
-    return FALSE;
-  }
-  //
-  // Check signature with gEfiSystemNvDataFvGuid
-  //
-  if (!CompareGuid (&gEfiSystemNvDataFvGuid, &WorkingHeader->Signature)) {
-    DEBUG ((EFI_D_ERROR, "Ftw: Work block header signature check error\n"));
-    return FALSE;
-  }
-  //
-  // Check the CRC of header
-  //
-  CopyMem (
-    &WorkingBlockHeader,
-    WorkingHeader,
-    sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER)
-    );
-
-  //
-  // Filter out the Crc and State fields
-  //
-  SetMem (
-    &WorkingBlockHeader.Crc,
-    sizeof (UINT32),
-    FTW_ERASED_BYTE
-    );
-  WorkingBlockHeader.WorkingBlockValid    = FTW_ERASE_POLARITY;
-  WorkingBlockHeader.WorkingBlockInvalid  = FTW_ERASE_POLARITY;
-
-  //
-  // Calculate the Crc of woking block header
-  //
-  Status = gBS->CalculateCrc32 (
-                  (UINT8 *) &WorkingBlockHeader,
-                  sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER),
-                  &WorkingBlockHeader.Crc
-                  );
-  if (EFI_ERROR (Status)) {
-    return FALSE;
+  if (CompareMem (WorkingHeader, &mWorkingBlockHeader, sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER)) == 0) {
+    return TRUE;
   }
 
-  if (WorkingBlockHeader.Crc != WorkingHeader->Crc) {
-    DEBUG ((EFI_D_ERROR, "Ftw: Work block header CRC check error\n"));
-    return FALSE;
-  }
-
-  return TRUE;
+  DEBUG ((EFI_D_ERROR, "Ftw: Work block header check error\n"));
+  return FALSE;
 }
 
 /**
@@ -103,49 +116,11 @@ InitWorkSpaceHeader (
   IN EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *WorkingHeader
   )
 {
-  EFI_STATUS  Status;
-
   if (WorkingHeader == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  //
-  // Here using gEfiSystemNvDataFvGuid as the signature.
-  //
-  CopyMem (
-    &WorkingHeader->Signature,
-    &gEfiSystemNvDataFvGuid,
-    sizeof (EFI_GUID)
-    );
-  WorkingHeader->WriteQueueSize = (UINT64) (PcdGet32 (PcdFlashNvStorageFtwWorkingSize) - sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER));
 
-  //
-  // Crc is calculated with all the fields except Crc and STATE
-  //
-  WorkingHeader->WorkingBlockValid    = FTW_ERASE_POLARITY;
-  WorkingHeader->WorkingBlockInvalid  = FTW_ERASE_POLARITY;
-
-  SetMem (
-    &WorkingHeader->Crc,
-    sizeof (UINT32),
-    FTW_ERASED_BYTE
-    );
-
-  //
-  // Calculate the CRC value
-  //
-  Status = gBS->CalculateCrc32 (
-                  (UINT8 *) WorkingHeader,
-                  sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER),
-                  &WorkingHeader->Crc
-                  );
-  if (EFI_ERROR (Status)) {
-    return EFI_ABORTED;
-  }
-  //
-  // Restore the WorkingBlockValid flag to VALID state
-  //
-  WorkingHeader->WorkingBlockValid    = FTW_VALID_STATE;
-  WorkingHeader->WorkingBlockInvalid  = FTW_INVALID_STATE;
+  CopyMem (WorkingHeader, &mWorkingBlockHeader, sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER));
 
   return EFI_SUCCESS;
 }

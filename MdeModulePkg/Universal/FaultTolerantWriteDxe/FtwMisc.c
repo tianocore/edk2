@@ -1174,6 +1174,8 @@ InitFtwProtocol (
   FtwDevice->FtwLastWriteHeader = NULL;
   FtwDevice->FtwLastWriteRecord = NULL;
 
+  InitializeLocalWorkSpaceHeader ();
+
   //
   // Refresh the working space data from working block
   //

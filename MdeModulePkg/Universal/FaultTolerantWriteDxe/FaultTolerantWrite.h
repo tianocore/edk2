@@ -3,7 +3,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by FtwLite module.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -20,6 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <PiDxe.h>
 
 #include <Guid/SystemNvDataGuid.h>
+#include <Guid/ZeroGuid.h>
 #include <Protocol/FaultTolerantWrite.h>
 #include <Protocol/FirmwareVolumeBlock.h>
 #include <Protocol/SwapAddressRange.h>
@@ -735,6 +736,17 @@ InitFtwDevice (
 EFI_STATUS
 InitFtwProtocol (
   IN OUT EFI_FTW_DEVICE               *FtwDevice
+  );
+
+/**
+  Initialize a local work space header.
+
+  Since Signature and WriteQueueSize have been known, Crc can be calculated out,
+  then the work space header will be fixed.
+**/
+VOID
+InitializeLocalWorkSpaceHeader (
+  VOID
   );
  
 #endif
