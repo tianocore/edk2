@@ -106,11 +106,12 @@ __sfvwrite(FILE *fp, struct __suio *uio)
       GETIOV(;);
       w = (*fp->_write)(fp->_cookie, p,
           (int)MIN(len, BUFSIZ));
-      if (w <= 0)
+      if (w < 0)
         goto err;
       p += w;
       len -= w;
-    } while ((uio->uio_resid -= w) != 0);
+    } while ((uio->uio_resid -= w) > 0);
+    uio->uio_resid = 0;   // Just in case it went negative such as when NL is expanded to CR NL
   } else if ((fp->_flags & __SLBF) == 0) {
     /*
      * Fully buffered: fill partially full buffer, if any,

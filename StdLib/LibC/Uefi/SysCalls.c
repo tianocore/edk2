@@ -708,7 +708,7 @@ open(
         if((oflags & O_TTY_INIT) && (filp->f_iflags & _S_ITTY) && (filp->devdata != NULL)) {
           // Initialize the device's termios flags to a "sane" value
           Termio = &((cIIO *)filp->devdata)->Termio;
-          Termio->c_iflag = ICRNL;
+          Termio->c_iflag = ICRNL | IGNSPEC;
           Termio->c_oflag = OPOST | ONLCR | OXTABS | ONOEOT | ONOCR | ONLRET | OCTRL;
           Termio->c_lflag = ECHO | ECHOE | ECHONL | ICANON;
           Termio->c_cc[VERASE]  = 0x08;   // ^H Backspace
