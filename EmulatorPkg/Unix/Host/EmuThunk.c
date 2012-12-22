@@ -259,18 +259,26 @@ QueryPerformanceCounter (
 {
 #if __APPLE__
   UINT64          Start;
-  Nanoseconds     elapsedNano;
+  static mach_timebase_info_data_t    sTimebaseInfo;
+
 
   Start = mach_absolute_time ();
 
   // Convert to nanoseconds.
 
-  // Have to do some pointer fun because AbsoluteToNanoseconds
-  // works in terms of UnsignedWide, which is a structure rather
-    // than a proper 64-bit integer.
-  elapsedNano = AbsoluteToNanoseconds (*(AbsoluteTime *) &Start);
+  // If this is the first time we've run, get the timebase.
+  // We can use denom == 0 to indicate that sTimebaseInfo is 
+  // uninitialised because it makes no sense to have a zero 
+  // denominator is a fraction.
 
-  return *(uint64_t *) &elapsedNano;
+  if ( sTimebaseInfo.denom == 0 ) {
+      (void) mach_timebase_info(&sTimebaseInfo);
+  }
+
+  // Do the maths. We hope that the multiplication doesn't 
+  // overflow; the price you pay for working in fixed point.
+
+  return (Start * sTimebaseInfo.numer) / sTimebaseInfo.denom;
 #else
   // Need to figure out what to do for Linux?
   return 0;
