@@ -33,6 +33,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   EmulatorPkg/EmulatorPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
 
 [LibraryClasses]
   PeiServicesLib
