@@ -42,8 +42,10 @@ extern EFI_DEVICE_PATH_PROTOCOL   *gPlatformDriverOption[];
   { \
     END_DEVICE_PATH_TYPE,\
     END_ENTIRE_DEVICE_PATH_SUBTYPE,\
-    END_DEVICE_PATH_LENGTH,\
-    0\
+    { \
+      END_DEVICE_PATH_LENGTH,\
+      0\
+    }\
   }
 
 
