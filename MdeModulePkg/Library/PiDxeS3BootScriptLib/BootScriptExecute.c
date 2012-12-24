@@ -16,107 +16,6 @@
 #include "InternalBootScriptLib.h"
 
 /**
-  Checks the parameter of SmbusExecute().
-
-  This function checks the input parameters of SmbusExecute().  If the input parameters are valid
-  for certain SMBus bus protocol, it will return EFI_SUCCESS; otherwise, it will return certain
-  error code based on the input SMBus bus protocol.
-
-  @param  SmBusAddress            Address that encodes the SMBUS Slave Address, SMBUS Command, SMBUS Data Length, 
-                                  and PEC.
-  @param  Operation               Signifies which particular SMBus hardware protocol instance that
-                                  it will use to execute the SMBus transactions. This SMBus
-                                  hardware protocol is defined by the SMBus Specification and is
-                                  not related to EFI.
-  @param  Length                  Signifies the number of bytes that this operation will do. The
-                                  maximum number of bytes can be revision specific and operation
-                                  specific. This field will contain the actual number of bytes that
-                                  are executed for this operation. Not all operations require this
-                                  argument.
-  @param  Buffer                  Contains the value of data to execute to the SMBus slave device.
-                                  Not all operations require this argument. The length of this
-                                  buffer is identified by Length.
-
-  @retval EFI_SUCCESS             All the parameters are valid for the corresponding SMBus bus
-                                  protocol. 
-  @retval EFI_INVALID_PARAMETER   Operation is not defined in EFI_SMBUS_OPERATION.
-  @retval EFI_INVALID_PARAMETER   Length/Buffer is NULL for operations except for EfiSmbusQuickRead
-                                  and EfiSmbusQuickWrite. Length is outside the range of valid
-                                  values.
-  @retval EFI_UNSUPPORTED         The SMBus operation or PEC is not supported.
-  @retval EFI_BUFFER_TOO_SMALL    Buffer is not sufficient for this operation.
-
-**/
-EFI_STATUS
-CheckParameters (
-  IN     UINTN                    SmBusAddress,
-  IN     EFI_SMBUS_OPERATION      Operation,
-  IN OUT UINTN                    *Length,
-  IN OUT VOID                     *Buffer
-  )
-{
-  EFI_STATUS  Status;
-  UINTN       RequiredLen;
-  EFI_SMBUS_DEVICE_COMMAND Command;
-  BOOLEAN                  PecCheck;
- 
-  Command      = SMBUS_LIB_COMMAND (SmBusAddress);
-  PecCheck     = SMBUS_LIB_PEC (SmBusAddress);
-  //
-  // Set default value to be 2:
-  // for SmbusReadWord, SmbusWriteWord and SmbusProcessCall. 
-  //
-  RequiredLen = 2;
-  Status      = EFI_SUCCESS;
-  switch (Operation) {
-    case EfiSmbusQuickRead:
-    case EfiSmbusQuickWrite:
-      if (PecCheck || Command != 0) {
-        return EFI_UNSUPPORTED;
-      }
-      break;
-    case EfiSmbusReceiveByte:
-    case EfiSmbusSendByte:
-      if (Command != 0) {
-        return EFI_UNSUPPORTED;
-      }
-      //
-      // Cascade to check length parameter.
-      //
-    case EfiSmbusReadByte:
-    case EfiSmbusWriteByte:
-      RequiredLen = 1;
-      //
-      // Cascade to check length parameter.
-      //
-    case EfiSmbusReadWord:
-    case EfiSmbusWriteWord:
-    case EfiSmbusProcessCall:
-      if (Buffer == NULL || Length == NULL) {
-        return EFI_INVALID_PARAMETER;
-      } else if (*Length < RequiredLen) {
-        Status = EFI_BUFFER_TOO_SMALL;
-      }
-      *Length = RequiredLen;
-      break;
-    case EfiSmbusReadBlock:
-    case EfiSmbusWriteBlock:
-      if ((Buffer == NULL) || 
-          (Length == NULL) || 
-          (*Length < MIN_SMBUS_BLOCK_LEN) ||
-          (*Length > MAX_SMBUS_BLOCK_LEN)) {
-        return EFI_INVALID_PARAMETER;
-      } 
-      break;
-    case EfiSmbusBWBRProcessCall:
-      return EFI_UNSUPPORTED;
-    default:
-      return EFI_INVALID_PARAMETER;
-  }
-  return Status;
-}
-
-/**
   Executes an SMBus operation to an SMBus controller. Returns when either the command has been
   executed or an error is encountered in doing the operation.
 
@@ -166,13 +65,7 @@ SmbusExecute (
   )
 {
   EFI_STATUS                      Status;
-  UINTN                           WorkBufferLen;
   UINT8                           WorkBuffer[MAX_SMBUS_BLOCK_LEN];
-
-  Status = CheckParameters (SmbusAddress, Operation, Length, Buffer);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
 
   switch (Operation) {
     case EfiSmbusQuickRead:
@@ -185,15 +78,15 @@ SmbusExecute (
       break;
     case EfiSmbusReceiveByte:
       DEBUG ((EFI_D_INFO, "EfiSmbusReceiveByte - 0x%08x\n", SmbusAddress));
-      *(UINT8 *) Buffer = SmBusReceiveByte (SmbusAddress, &Status);
+      SmBusReceiveByte (SmbusAddress, &Status);
       break;
     case EfiSmbusSendByte:
-      DEBUG ((EFI_D_INFO, "EfiSmbusReceiveByte - 0x%08x (0x%02x)\n", SmbusAddress, (UINTN)*(UINT8 *) Buffer));
+      DEBUG ((EFI_D_INFO, "EfiSmbusSendByte - 0x%08x (0x%02x)\n", SmbusAddress, (UINTN)*(UINT8 *) Buffer));
       SmBusSendByte (SmbusAddress, *(UINT8 *) Buffer, &Status);
       break;
     case EfiSmbusReadByte:
       DEBUG ((EFI_D_INFO, "EfiSmbusReadByte - 0x%08x\n", SmbusAddress));
-      *(UINT8 *) Buffer = SmBusReadDataByte (SmbusAddress, &Status);
+      SmBusReadDataByte (SmbusAddress, &Status);
       break;
     case EfiSmbusWriteByte:
       DEBUG ((EFI_D_INFO, "EfiSmbusWriteByte - 0x%08x (0x%02x)\n", SmbusAddress, (UINTN)*(UINT8 *) Buffer));
@@ -201,41 +94,30 @@ SmbusExecute (
       break;
     case EfiSmbusReadWord:
       DEBUG ((EFI_D_INFO, "EfiSmbusReadWord - 0x%08x\n", SmbusAddress));
-      *(UINT16 *) Buffer = SmBusReadDataWord (SmbusAddress, &Status);
+      SmBusReadDataWord (SmbusAddress, &Status);
       break;
     case EfiSmbusWriteWord:
-      DEBUG ((EFI_D_INFO, "EfiSmbusWriteByte - 0x%08x (0x%04x)\n", SmbusAddress, (UINTN)*(UINT16 *) Buffer));
+      DEBUG ((EFI_D_INFO, "EfiSmbusWriteWord - 0x%08x (0x%04x)\n", SmbusAddress, (UINTN)*(UINT16 *) Buffer));
       SmBusWriteDataWord (SmbusAddress, *(UINT16 *) Buffer, &Status);
       break;
     case EfiSmbusProcessCall:
       DEBUG ((EFI_D_INFO, "EfiSmbusProcessCall - 0x%08x (0x%04x)\n", SmbusAddress, (UINTN)*(UINT16 *) Buffer));
-      *(UINT16 *) Buffer = SmBusProcessCall (SmbusAddress, *(UINT16 *) Buffer, &Status);
+      SmBusProcessCall (SmbusAddress, *(UINT16 *) Buffer, &Status);
       break;
     case EfiSmbusReadBlock:
       DEBUG ((EFI_D_INFO, "EfiSmbusReadBlock - 0x%08x\n", SmbusAddress));
-      WorkBufferLen = SmBusReadBlock (SmbusAddress, WorkBuffer, &Status);
-      if (!EFI_ERROR (Status)) {
-        //
-        // Read block transaction is complete successfully, and then
-        // check whether the output buffer is large enough.  
-        //
-        if (*Length >= WorkBufferLen) {
-          CopyMem (Buffer, WorkBuffer, WorkBufferLen);
-        } else {
-          Status = EFI_BUFFER_TOO_SMALL;
-        }
-        *Length = WorkBufferLen;
-      }
+      SmBusReadBlock (SmbusAddress, WorkBuffer, &Status);
       break;
     case EfiSmbusWriteBlock:
-      DEBUG ((EFI_D_INFO, "EfiSmbusWriteBlock - 0x%08x (0x%04x)\n", SmbusAddress, (UINTN)*(UINT16 *) Buffer));
-      SmBusWriteBlock ((SmbusAddress + SMBUS_LIB_ADDRESS (0, 0, (*Length), FALSE))  , Buffer, &Status);
+      DEBUG ((EFI_D_INFO, "EfiSmbusWriteBlock - 0x%08x\n", SmbusAddress));
+      SmBusWriteBlock ((SmbusAddress + SMBUS_LIB_ADDRESS (0, 0, (*Length), FALSE)), Buffer, &Status);
       break;
     case EfiSmbusBWBRProcessCall:
-      //
-      // BUGBUG: Should this case be handled?
-      //
+      DEBUG ((EFI_D_INFO, "EfiSmbusBWBRProcessCall - 0x%08x\n", SmbusAddress));
+      SmBusBlockProcessCall ((SmbusAddress + SMBUS_LIB_ADDRESS (0, 0, (*Length), FALSE)), Buffer, WorkBuffer, &Status);
       break;
+    default:
+      return EFI_INVALID_PARAMETER;
   }
 
   return Status;  
@@ -766,7 +648,8 @@ BootScriptExecuteMemoryWrite (
   
   @retval EFI_SUCCESS The read succeed.
   @retval EFI_INVALID_PARAMETER if Width is not defined  
-                                
+  @note  A known Limitations in the implementation which is 64bits operations are not supported.
+
 **/
 EFI_STATUS
 ScriptPciCfgRead (
@@ -851,7 +734,8 @@ ScriptPciCfgRead (
   
   @retval EFI_SUCCESS The write succeed.
   @retval EFI_INVALID_PARAMETER if Width is not defined  
-                                
+  @note  A known Limitations in the implementation which is 64bits operations are not supported.
+
 **/
 EFI_STATUS
 ScriptPciCfgWrite (

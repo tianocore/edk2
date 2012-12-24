@@ -905,6 +905,8 @@ S3BootScriptSaveMemReadWrite (
 
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
   @retval RETURN_SUCCESS           Opcode is added.
+  @note  A known Limitations in the implementation which is 64bits operations are not supported.
+
 **/
 RETURN_STATUS
 EFIAPI
@@ -919,6 +921,12 @@ S3BootScriptSavePciCfgWrite (
   UINT8                *Script;
   UINT8                 WidthInByte;
   EFI_BOOT_SCRIPT_PCI_CONFIG_WRITE  ScriptPciWrite;
+
+  if (Width == S3BootScriptWidthUint64 ||
+      Width == S3BootScriptWidthFifoUint64 ||
+      Width == S3BootScriptWidthFillUint64) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   WidthInByte = (UINT8) (0x01 << (Width & 0x03));
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG_WRITE) + (WidthInByte * Count));
@@ -953,6 +961,8 @@ S3BootScriptSavePciCfgWrite (
 
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
   @retval RETURN__SUCCESS           Opcode is added.
+  @note  A known Limitations in the implementation which is 64bits operations are not supported.
+
 **/
 RETURN_STATUS
 EFIAPI
@@ -967,6 +977,12 @@ S3BootScriptSavePciCfgReadWrite (
   UINT8                *Script;
   UINT8                 WidthInByte;
   EFI_BOOT_SCRIPT_PCI_CONFIG_READ_WRITE  ScriptPciReadWrite;
+
+  if (Width == S3BootScriptWidthUint64 ||
+      Width == S3BootScriptWidthFifoUint64 ||
+      Width == S3BootScriptWidthFillUint64) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   WidthInByte = (UINT8) (0x01 << (Width & 0x03));
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG_READ_WRITE) + (WidthInByte * 2));
@@ -1006,6 +1022,8 @@ S3BootScriptSavePciCfgReadWrite (
 
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
   @retval RETURN_SUCCESS           Opcode is added.
+  @note  A known Limitations in the implementation which is non-zero Segment and 64bits operations are not supported.
+
 **/
 RETURN_STATUS
 EFIAPI
@@ -1021,7 +1039,14 @@ S3BootScriptSavePciCfg2Write (
   UINT8                *Script;
   UINT8                 WidthInByte;
   EFI_BOOT_SCRIPT_PCI_CONFIG2_WRITE  ScriptPciWrite2;
-  
+
+  if (Segment != 0 ||
+      Width == S3BootScriptWidthUint64 ||
+      Width == S3BootScriptWidthFifoUint64 ||
+      Width == S3BootScriptWidthFillUint64) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   WidthInByte = (UINT8) (0x01 << (Width & 0x03));
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG2_WRITE) + (WidthInByte * Count));
   
@@ -1057,6 +1082,8 @@ S3BootScriptSavePciCfg2Write (
 
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
   @retval RETURN_SUCCESS           Opcode is added.
+  @note  A known Limitations in the implementation which is non-zero Segment and 64bits operations are not supported.
+
 **/
 RETURN_STATUS
 EFIAPI
@@ -1072,6 +1099,13 @@ S3BootScriptSavePciCfg2ReadWrite (
   UINT8                *Script;
   UINT8                 WidthInByte;
   EFI_BOOT_SCRIPT_PCI_CONFIG2_READ_WRITE  ScriptPciReadWrite2;
+
+  if (Segment != 0 ||
+      Width == S3BootScriptWidthUint64 ||
+      Width == S3BootScriptWidthFifoUint64 ||
+      Width == S3BootScriptWidthFillUint64) {
+    return EFI_INVALID_PARAMETER;
+  }
   
   WidthInByte = (UINT8) (0x01 << (Width & 0x03));
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG2_READ_WRITE) + (WidthInByte * 2));
@@ -1101,6 +1135,107 @@ S3BootScriptSavePciCfg2ReadWrite (
 
   return RETURN_SUCCESS;
 }
+
+/**
+  Checks the parameter of S3BootScriptSaveSmbusExecute().
+
+  This function checks the input parameters of SmbusExecute().  If the input parameters are valid
+  for certain SMBus bus protocol, it will return EFI_SUCCESS; otherwise, it will return certain
+  error code based on the input SMBus bus protocol.
+
+  @param  SmBusAddress            Address that encodes the SMBUS Slave Address, SMBUS Command, SMBUS Data Length, 
+                                  and PEC.
+  @param  Operation               Signifies which particular SMBus hardware protocol instance that
+                                  it will use to execute the SMBus transactions. This SMBus
+                                  hardware protocol is defined by the SMBus Specification and is
+                                  not related to EFI.
+  @param  Length                  Signifies the number of bytes that this operation will do. The
+                                  maximum number of bytes can be revision specific and operation
+                                  specific. This field will contain the actual number of bytes that
+                                  are executed for this operation. Not all operations require this
+                                  argument.
+  @param  Buffer                  Contains the value of data to execute to the SMBus slave device.
+                                  Not all operations require this argument. The length of this
+                                  buffer is identified by Length.
+
+  @retval EFI_SUCCESS             All the parameters are valid for the corresponding SMBus bus
+                                  protocol. 
+  @retval EFI_INVALID_PARAMETER   Operation is not defined in EFI_SMBUS_OPERATION.
+  @retval EFI_INVALID_PARAMETER   Length/Buffer is NULL for operations except for EfiSmbusQuickRead
+                                  and EfiSmbusQuickWrite. Length is outside the range of valid
+                                  values.
+  @retval EFI_UNSUPPORTED         The SMBus operation or PEC is not supported.
+  @retval EFI_BUFFER_TOO_SMALL    Buffer is not sufficient for this operation.
+
+**/
+EFI_STATUS
+CheckParameters (
+  IN     UINTN                    SmBusAddress,
+  IN     EFI_SMBUS_OPERATION      Operation,
+  IN OUT UINTN                    *Length,
+  IN     VOID                     *Buffer
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       RequiredLen;
+  EFI_SMBUS_DEVICE_COMMAND Command;
+  BOOLEAN                  PecCheck;
+ 
+  Command      = SMBUS_LIB_COMMAND (SmBusAddress);
+  PecCheck     = SMBUS_LIB_PEC (SmBusAddress);
+  //
+  // Set default value to be 2:
+  // for SmbusReadWord, SmbusWriteWord and SmbusProcessCall. 
+  //
+  RequiredLen = 2;
+  Status      = EFI_SUCCESS;
+  switch (Operation) {
+    case EfiSmbusQuickRead:
+    case EfiSmbusQuickWrite:
+      if (PecCheck || Command != 0) {
+        return EFI_UNSUPPORTED;
+      }
+      break;
+    case EfiSmbusReceiveByte:
+    case EfiSmbusSendByte:
+      if (Command != 0) {
+        return EFI_UNSUPPORTED;
+      }
+      //
+      // Cascade to check length parameter.
+      //
+    case EfiSmbusReadByte:
+    case EfiSmbusWriteByte:
+      RequiredLen = 1;
+      //
+      // Cascade to check length parameter.
+      //
+    case EfiSmbusReadWord:
+    case EfiSmbusWriteWord:
+    case EfiSmbusProcessCall:
+      if (Buffer == NULL || Length == NULL) {
+        return EFI_INVALID_PARAMETER;
+      } else if (*Length < RequiredLen) {
+        Status = EFI_BUFFER_TOO_SMALL;
+      }
+      *Length = RequiredLen;
+      break;
+    case EfiSmbusReadBlock:
+    case EfiSmbusWriteBlock:
+    case EfiSmbusBWBRProcessCall:
+      if ((Buffer == NULL) || 
+          (Length == NULL) || 
+          (*Length < MIN_SMBUS_BLOCK_LEN) ||
+          (*Length > MAX_SMBUS_BLOCK_LEN)) {
+        return EFI_INVALID_PARAMETER;
+      }
+      break;
+    default:
+      return EFI_INVALID_PARAMETER;
+  }
+  return Status;
+}
+
 /**
   Adds a record for an SMBus command execution into a specified boot script table.
 
@@ -1122,11 +1257,24 @@ S3BootScriptSaveSmbusExecute (
   IN  VOID                              *Buffer
   )
 {
+  EFI_STATUS            Status;
+  UINTN                 BufferLength;
   UINT8                 DataSize;
   UINT8                *Script;
   EFI_BOOT_SCRIPT_SMBUS_EXECUTE  ScriptSmbusExecute;
 
-  DataSize = (UINT8)(sizeof (EFI_BOOT_SCRIPT_SMBUS_EXECUTE) + (*Length));
+  if (Length == NULL) {
+    BufferLength = 0;
+  } else {
+    BufferLength = *Length;
+  }
+
+  Status = CheckParameters (SmBusAddress, Operation, &BufferLength, Buffer);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  DataSize = (UINT8)(sizeof (EFI_BOOT_SCRIPT_SMBUS_EXECUTE) + BufferLength);
   
   Script = S3BootScriptGetEntryAddAddress (DataSize);
   if (Script == NULL) {
@@ -1139,13 +1287,13 @@ S3BootScriptSaveSmbusExecute (
   ScriptSmbusExecute.Length       = DataSize;
   ScriptSmbusExecute.SmBusAddress = (UINT64) SmBusAddress;
   ScriptSmbusExecute.Operation    = Operation;
-  ScriptSmbusExecute.DataSize     = (UINT32) *Length;
+  ScriptSmbusExecute.DataSize     = (UINT32) BufferLength;
 
   CopyMem ((VOID*)Script, (VOID*)&ScriptSmbusExecute, sizeof (EFI_BOOT_SCRIPT_SMBUS_EXECUTE));
   CopyMem (
     (VOID*)(Script + sizeof (EFI_BOOT_SCRIPT_SMBUS_EXECUTE)),
     Buffer,
-    (*Length)
+    BufferLength
     );
 
   SyncBootScript (Script);
@@ -1461,6 +1609,7 @@ S3BootScriptSaveIoPoll (
 
  @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
  @retval RETURN_SUCCESS           Opcode is added.
+  @note  A known Limitations in the implementation which is 64bits operations are not supported.
 
 **/
 RETURN_STATUS
@@ -1477,6 +1626,12 @@ S3BootScriptSavePciPoll (
   UINT8                    WidthInByte;  
   UINT8                    Length;
   EFI_BOOT_SCRIPT_PCI_CONFIG_POLL  ScriptPciPoll;
+
+  if (Width == S3BootScriptWidthUint64 ||
+      Width == S3BootScriptWidthFifoUint64 ||
+      Width == S3BootScriptWidthFillUint64) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   WidthInByte = (UINT8) (0x01 << (Width & 0x03));
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG_POLL) + (WidthInByte * 2));
@@ -1517,9 +1672,8 @@ S3BootScriptSavePciPoll (
 
  @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
  @retval RETURN_SUCCESS           Opcode is added.
- @note   A known Limitations in the implementation: When interpreting the opcode  EFI_BOOT_SCRIPT_PCI_CONFIG2_WRITE_OPCODE
-         EFI_BOOT_SCRIPT_PCI_CONFIG2_READ_WRITE_OPCODE and EFI_BOOT_SCRIPT_PCI_CONFIG2_POLL_OPCODE, the 'Segment' parameter is assumed as 
-         Zero, or else, assert.
+  @note  A known Limitations in the implementation which is non-zero Segment and 64bits operations are not supported.
+
 **/
 RETURN_STATUS
 EFIAPI
@@ -1536,7 +1690,14 @@ S3BootScriptSavePci2Poll (
   UINT8                   *Script;
   UINT8                    Length;
   EFI_BOOT_SCRIPT_PCI_CONFIG2_POLL  ScriptPci2Poll;
-  
+
+  if (Segment != 0 ||
+      Width == S3BootScriptWidthUint64 ||
+      Width == S3BootScriptWidthFifoUint64 ||
+      Width == S3BootScriptWidthFillUint64) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   WidthInByte = (UINT8) (0x01 << (Width & 0x03));
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG2_POLL) + (WidthInByte * 2));
   
