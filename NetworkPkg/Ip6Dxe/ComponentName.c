@@ -280,7 +280,7 @@ UpdateName (
     }
     UnicodeSPrint (
       HandleName + Offset,
-      sizeof(HandleName) - Offset,
+      sizeof(HandleName) - Offset * sizeof (CHAR16),
       L"DestinationAddress=%s)",
       Address
       );

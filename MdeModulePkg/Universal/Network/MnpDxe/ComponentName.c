@@ -148,7 +148,7 @@ UpdateName (
     for (Index = 0; Index < SnpModeData.HwAddressSize; Index++) {
       OffSet += UnicodeSPrint (
                   HandleName + OffSet,
-                  sizeof (HandleName) - OffSet,
+                  sizeof (HandleName) - OffSet * sizeof (CHAR16),
                   L"%02X-",
                   SnpModeData.CurrentAddress.Addr[Index]
                   );
@@ -162,7 +162,7 @@ UpdateName (
     //
     OffSet += UnicodeSPrint (
                 HandleName + OffSet,
-                sizeof (HandleName) - OffSet,
+                sizeof (HandleName) - OffSet * sizeof (CHAR16),
                 L", ProtocolType=0x%X, VlanId=%d)",
                 MnpConfigData.ProtocolTypeFilter,
                 Instance->MnpServiceData->VlanId

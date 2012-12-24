@@ -266,7 +266,7 @@ UpdateName (
   for (Index = 0; Index < Snp->Mode->HwAddressSize; Index++) {
     OffSet += UnicodeSPrint (
                 HandleName + OffSet,
-                sizeof (HandleName) - OffSet,
+                sizeof (HandleName) - OffSet * sizeof (CHAR16),
                 L"%02X-",
                 Snp->Mode->CurrentAddress.Addr[Index]
                 );
@@ -276,8 +276,8 @@ UpdateName (
   //
   OffSet--;
   OffSet += UnicodeSPrint (
-              HandleName,
-              sizeof (HandleName),
+              HandleName + OffSet,
+              sizeof (HandleName) - OffSet * sizeof (CHAR16),
               L")"
               );
   if (gSimpleNetworkControllerNameTable != NULL) {

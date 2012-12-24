@@ -1154,6 +1154,7 @@ NetDestroyLinkList (
 
 **/
 BOOLEAN
+EFIAPI
 NetIsInHandleBuffer (
   IN  EFI_HANDLE          Handle,
   IN  UINTN               NumberOfChildren,
