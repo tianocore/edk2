@@ -497,6 +497,19 @@ GraphicsConsoleControllerDriverStart (
         }
       }
     }
+    if (ModeNumber != Private->GraphicsOutput->Mode->Mode) {
+      //
+      // Current graphics mode is not set or is not set to the mode which we has found,
+      // set the new graphic mode.
+      //
+      Status = Private->GraphicsOutput->SetMode (Private->GraphicsOutput, ModeNumber);
+      if (EFI_ERROR (Status)) {
+        //
+        // The mode set operation failed
+        //
+        goto Error;
+      }
+    }
   } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
     //
     // At first try to set user-defined resolution
