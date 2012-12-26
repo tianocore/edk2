@@ -30,6 +30,23 @@
 #include "BasePeCoffLibInternals.h"
 
 /**
+  Adjust some fields in section header for TE image.
+
+  @param  SectionHeader             Pointer to the section header.
+  @param  TeStrippedOffset          Size adjust for the TE image.
+
+**/
+VOID
+PeCoffLoaderAdjustOffsetForTeImage (
+  EFI_IMAGE_SECTION_HEADER              *SectionHeader,
+  UINT32                                TeStrippedOffset
+  )
+{
+  SectionHeader->VirtualAddress   -= TeStrippedOffset;
+  SectionHeader->PointerToRawData -= TeStrippedOffset;
+}
+
+/**
   Retrieves the magic value from the PE/COFF header.
 
   @param  Hdr             The buffer in which to return the PE32, PE32+, or TE header.
@@ -157,6 +174,50 @@ PeCoffLoaderGetPeHeader (
     ImageContext->SectionAlignment  = 0;
     ImageContext->SizeOfHeaders     = sizeof (EFI_TE_IMAGE_HEADER) + (UINTN)Hdr.Te->BaseOfCode - (UINTN)Hdr.Te->StrippedSize;
 
+    //
+    // Check the StrippedSize.
+    //
+    if (sizeof (EFI_TE_IMAGE_HEADER) >= (UINT32)Hdr.Te->StrippedSize) {
+      ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+      return RETURN_UNSUPPORTED;
+    }
+
+    //
+    // Check the SizeOfHeaders field.
+    //
+    if (Hdr.Te->BaseOfCode <= Hdr.Te->StrippedSize) {
+      ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+      return RETURN_UNSUPPORTED;
+    }
+
+    //
+    // Read last byte of Hdr.Te->SizeOfHeaders from the file.
+    //
+    Size = 1;
+    ReadSize = Size;
+    Status = ImageContext->ImageRead (
+                             ImageContext->Handle,
+                             ImageContext->SizeOfHeaders - 1,
+                             &Size,
+                             &BufferData
+                             );
+    if (RETURN_ERROR (Status) || (Size != ReadSize)) {
+      ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
+      if (Size != ReadSize) {
+        Status = RETURN_UNSUPPORTED;
+      }
+      return Status;
+    }
+
+    //
+    // TE Image Data Directory Entry size is non-zero, but the Data Directory Virtual Address is zero.
+    // This case is not a valid TE image. 
+    //
+    if ((Hdr.Te->DataDirectory[0].Size != 0 && Hdr.Te->DataDirectory[0].VirtualAddress == 0) ||
+        (Hdr.Te->DataDirectory[1].Size != 0 && Hdr.Te->DataDirectory[1].VirtualAddress == 0)) {
+      ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+      return RETURN_UNSUPPORTED;
+    }
   } else if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE)  {
     ImageContext->IsTeImage = FALSE;
     ImageContext->Machine = Hdr.Pe32->FileHeader.Machine;
@@ -417,6 +478,13 @@ PeCoffLoaderGetPeHeader (
       return Status;
     }
 
+    //
+    // Adjust some field in Section Header for TE image.
+    //
+    if (ImageContext->IsTeImage) {
+      PeCoffLoaderAdjustOffsetForTeImage (&SectionHeader, (UINT32)Hdr.Te->StrippedSize - sizeof (EFI_TE_IMAGE_HEADER));
+    }
+
     if (SectionHeader.SizeOfRawData > 0) {
       //
       // Section data should bigger than the Pe header.
@@ -514,6 +582,7 @@ PeCoffLoaderGetImageInfo (
   EFI_IMAGE_DEBUG_DIRECTORY_ENTRY       DebugEntry;
   UINT32                                NumberOfRvaAndSizes;
   UINT16                                Magic;
+  UINT32                                TeStrippedOffset;
 
   if (ImageContext == NULL) {
     return RETURN_INVALID_PARAMETER;
@@ -535,6 +604,7 @@ PeCoffLoaderGetImageInfo (
   // Retrieve the base address of the image
   //
   if (!(ImageContext->IsTeImage)) {
+    TeStrippedOffset = 0;
     if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
       //
       // Use PE32 offset
@@ -547,7 +617,8 @@ PeCoffLoaderGetImageInfo (
       ImageContext->ImageAddress = Hdr.Pe32Plus->OptionalHeader.ImageBase;
     }
   } else {
-    ImageContext->ImageAddress = (PHYSICAL_ADDRESS)(Hdr.Te->ImageBase + Hdr.Te->StrippedSize - sizeof (EFI_TE_IMAGE_HEADER));
+    TeStrippedOffset = (UINT32)Hdr.Te->StrippedSize - sizeof (EFI_TE_IMAGE_HEADER);
+    ImageContext->ImageAddress = (PHYSICAL_ADDRESS)(Hdr.Te->ImageBase + TeStrippedOffset);
   }
 
   //
@@ -580,15 +651,6 @@ PeCoffLoaderGetImageInfo (
     ImageContext->RelocationsStripped = TRUE;
   } else {
     ImageContext->RelocationsStripped = FALSE;
-  }
-  
-  //
-  // TE Image Relocation Data Directory Entry size is non-zero, but the Relocation Data Directory Virtual Address is zero.
-  // This case is not a valid TE image. 
-  //
-  if ((ImageContext->IsTeImage) && (Hdr.Te->DataDirectory[0].Size != 0) && (Hdr.Te->DataDirectory[0].VirtualAddress == 0)) {
-    ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
-    return RETURN_UNSUPPORTED;
   }
 
   if (!(ImageContext->IsTeImage)) {
@@ -723,9 +785,8 @@ PeCoffLoaderGetImageInfo (
           DebugDirectoryEntryRva < SectionHeader.VirtualAddress + SectionHeader.Misc.VirtualSize) {
         DebugDirectoryEntryFileOffset = DebugDirectoryEntryRva -
                                         SectionHeader.VirtualAddress +
-                                        SectionHeader.PointerToRawData +
-                                        sizeof (EFI_TE_IMAGE_HEADER) -
-                                        Hdr.Te->StrippedSize;
+                                        SectionHeader.PointerToRawData -
+                                        TeStrippedOffset;
 
         //
         // File offset of the debug directory was found, if this is not the last
@@ -749,7 +810,7 @@ PeCoffLoaderGetImageInfo (
       // Section Table.  
       //
       if ((++Index) == (UINTN)Hdr.Te->NumberOfSections) {
-        ImageContext->ImageSize = (SectionHeader.VirtualAddress + SectionHeader.Misc.VirtualSize);
+        ImageContext->ImageSize = (SectionHeader.VirtualAddress + SectionHeader.Misc.VirtualSize) - TeStrippedOffset;
       }
 
       SectionHeaderOffset += sizeof (EFI_IMAGE_SECTION_HEADER);
@@ -791,8 +852,9 @@ PeCoffLoaderGetImageInfo (
 /**
   Converts an image address to the loaded address.
 
-  @param  ImageContext  The context of the image being loaded.
-  @param  Address       The relative virtual address to be converted to the loaded address.
+  @param  ImageContext      The context of the image being loaded.
+  @param  Address           The address to be converted to the loaded address.
+  @param  TeStrippedOffset  Stripped offset for TE image.
 
   @return The converted address or NULL if the address can not be converted.
 
@@ -800,18 +862,19 @@ PeCoffLoaderGetImageInfo (
 VOID *
 PeCoffLoaderImageAddress (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT          *ImageContext,
-  IN     UINTN                                 Address
+  IN     UINTN                                 Address, 
+  IN     UINTN                                 TeStrippedOffset
   )
 {
   //
   // Make sure that Address and ImageSize is correct for the loaded image.
   //
-  if (Address >= ImageContext->ImageSize) {
+  if (Address >= ImageContext->ImageSize + TeStrippedOffset) {
     ImageContext->ImageError = IMAGE_ERROR_INVALID_IMAGE_ADDRESS;
     return NULL;
   }
 
-  return (CHAR8 *)((UINTN) ImageContext->ImageAddress + Address);
+  return (CHAR8 *)((UINTN) ImageContext->ImageAddress + Address - TeStrippedOffset);
 }
 
 /**
@@ -867,6 +930,7 @@ PeCoffLoaderRelocateImage (
   PHYSICAL_ADDRESS                      BaseAddress;
   UINT32                                NumberOfRvaAndSizes;
   UINT16                                Magic;
+  UINT32                                TeStrippedOffset;
 
   ASSERT (ImageContext != NULL);
 
@@ -897,7 +961,7 @@ PeCoffLoaderRelocateImage (
 
   if (!(ImageContext->IsTeImage)) {
     Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)((UINTN)ImageContext->ImageAddress + ImageContext->PeCoffHeaderOffset);
-
+    TeStrippedOffset = 0;
     Magic = PeCoffLoaderGetPeHeaderMagicValue (Hdr);
 
     if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
@@ -930,47 +994,37 @@ PeCoffLoaderRelocateImage (
     // is present in the image. You have to check the NumberOfRvaAndSizes in
     // the optional header to verify a desired directory entry is there.
     //
-
-    if ((NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC) && (RelocDir->Size > 0)) {
-      RelocBase = PeCoffLoaderImageAddress (ImageContext, RelocDir->VirtualAddress);
-      RelocBaseEnd = PeCoffLoaderImageAddress (
-                      ImageContext,
-                      RelocDir->VirtualAddress + RelocDir->Size - 1
-                      );
-      if (RelocBase == NULL || RelocBaseEnd == NULL) {
-        return RETURN_LOAD_ERROR;
-      }
-    } else {
-      //
-      // Set base and end to bypass processing below.
-      //
-      RelocBase = RelocBaseEnd = NULL;
+    if ((NumberOfRvaAndSizes < EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC)) {
+      RelocDir = NULL;
     }
   } else {
     Hdr.Te             = (EFI_TE_IMAGE_HEADER *)(UINTN)(ImageContext->ImageAddress);
-    Adjust             = (UINT64) (BaseAddress - Hdr.Te->StrippedSize + sizeof (EFI_TE_IMAGE_HEADER) - Hdr.Te->ImageBase);
+    TeStrippedOffset   = (UINT32)Hdr.Te->StrippedSize - sizeof (EFI_TE_IMAGE_HEADER);
+    Adjust             = (UINT64) (BaseAddress - (Hdr.Te->ImageBase + TeStrippedOffset));
     if (Adjust != 0) {
-      Hdr.Te->ImageBase  = (UINT64) (BaseAddress - Hdr.Te->StrippedSize + sizeof (EFI_TE_IMAGE_HEADER));
+      Hdr.Te->ImageBase  = (UINT64) (BaseAddress - TeStrippedOffset);
     }
 
     //
     // Find the relocation block
     //
     RelocDir = &Hdr.Te->DataDirectory[0];
-    if (RelocDir->Size > 0) {
-      RelocBase = (EFI_IMAGE_BASE_RELOCATION *)(UINTN)(
-                                      ImageContext->ImageAddress +
-                                      RelocDir->VirtualAddress +
-                                      sizeof(EFI_TE_IMAGE_HEADER) -
-                                      Hdr.Te->StrippedSize
-                                      );
-      RelocBaseEnd = (EFI_IMAGE_BASE_RELOCATION *) ((UINTN) RelocBase + (UINTN) RelocDir->Size - 1);
-    } else {
-      //
-      // Set base and end to bypass processing below.
-      //
-      RelocBase = RelocBaseEnd = NULL;    
+  }
+
+  if ((RelocDir != NULL) && (RelocDir->Size > 0)) {
+    RelocBase = (EFI_IMAGE_BASE_RELOCATION *) PeCoffLoaderImageAddress (ImageContext, RelocDir->VirtualAddress, TeStrippedOffset);
+    RelocBaseEnd = (EFI_IMAGE_BASE_RELOCATION *) PeCoffLoaderImageAddress (ImageContext,
+                                                                            RelocDir->VirtualAddress + RelocDir->Size - 1,
+                                                                            TeStrippedOffset
+                                                                            );
+    if (RelocBase == NULL || RelocBaseEnd == NULL) {
+      return RETURN_LOAD_ERROR;
     }
+  } else {
+    //
+    // Set base and end to bypass processing below.
+    //
+    RelocBase = RelocBaseEnd = NULL;    
   }
 
   //
@@ -993,19 +1047,10 @@ PeCoffLoaderRelocateImage (
       }
 
       RelocEnd  = (UINT16 *) ((CHAR8 *) RelocBase + RelocBase->SizeOfBlock);
-
-      if (!(ImageContext->IsTeImage)) {
-        FixupBase = PeCoffLoaderImageAddress (ImageContext, RelocBase->VirtualAddress);
-        if (FixupBase == NULL) {
-          return RETURN_LOAD_ERROR;
-        }
-      } else {
-        FixupBase = (CHAR8 *)(UINTN)(ImageContext->ImageAddress +
-                      RelocBase->VirtualAddress +
-                      sizeof(EFI_TE_IMAGE_HEADER) -
-                      Hdr.Te->StrippedSize
-                      );
-      }    
+      FixupBase = PeCoffLoaderImageAddress (ImageContext, RelocBase->VirtualAddress, TeStrippedOffset);
+      if (FixupBase == NULL) {
+        return RETURN_LOAD_ERROR;
+      }  
 
       //
       // Run this relocation record
@@ -1154,7 +1199,7 @@ PeCoffLoaderLoadImage (
   EFI_IMAGE_RESOURCE_DATA_ENTRY         *ResourceDataEntry;
   CHAR16                                *String;
   UINT32                                Offset;
-
+  UINT32                                TeStrippedOffset;
 
   ASSERT (ImageContext != NULL);
 
@@ -1241,6 +1286,7 @@ PeCoffLoaderLoadImage (
                       Hdr.Pe32->FileHeader.SizeOfOptionalHeader
       );
     NumberOfSections = (UINTN) (Hdr.Pe32->FileHeader.NumberOfSections);
+    TeStrippedOffset = 0;
   } else {
     Status = ImageContext->ImageRead (
                             ImageContext->Handle,
@@ -1250,13 +1296,12 @@ PeCoffLoaderLoadImage (
                             );
 
     Hdr.Te = (EFI_TE_IMAGE_HEADER *)(UINTN)(ImageContext->ImageAddress);
-
     FirstSection = (EFI_IMAGE_SECTION_HEADER *) (
                       (UINTN)ImageContext->ImageAddress +
                       sizeof(EFI_TE_IMAGE_HEADER)
                       );
     NumberOfSections  = (UINTN) (Hdr.Te->NumberOfSections);
-
+    TeStrippedOffset  = (UINT32) Hdr.Te->StrippedSize - sizeof (EFI_TE_IMAGE_HEADER);
   }
 
   if (RETURN_ERROR (Status)) {
@@ -1280,11 +1325,8 @@ PeCoffLoaderLoadImage (
     //
     // Compute sections address
     //
-    Base = PeCoffLoaderImageAddress (ImageContext, Section->VirtualAddress);
-    End = PeCoffLoaderImageAddress (
-            ImageContext,
-            Section->VirtualAddress + Section->Misc.VirtualSize - 1
-            );
+    Base = PeCoffLoaderImageAddress (ImageContext, Section->VirtualAddress, TeStrippedOffset);
+    End  = PeCoffLoaderImageAddress (ImageContext, Section->VirtualAddress + Section->Misc.VirtualSize - 1, TeStrippedOffset);
 
     //
     // If the size of the section is non-zero and the base address or end address resolved to 0, then fail.
@@ -1294,28 +1336,13 @@ PeCoffLoaderLoadImage (
       return RETURN_LOAD_ERROR;
     }
 
-    if (ImageContext->IsTeImage) {
-      Base = (CHAR8 *)((UINTN) Base + sizeof (EFI_TE_IMAGE_HEADER) - (UINTN)Hdr.Te->StrippedSize);
-      End  = (CHAR8 *)((UINTN) End +  sizeof (EFI_TE_IMAGE_HEADER) - (UINTN)Hdr.Te->StrippedSize);
-    }
-
     if (Section->SizeOfRawData > 0) {
-      if (!(ImageContext->IsTeImage)) {
-        Status = ImageContext->ImageRead (
-                                ImageContext->Handle,
-                                Section->PointerToRawData,
-                                &Size,
-                                Base
-                                );
-      } else {
-        Status = ImageContext->ImageRead (
-                                ImageContext->Handle,
-                                Section->PointerToRawData + sizeof (EFI_TE_IMAGE_HEADER) - (UINTN)Hdr.Te->StrippedSize,
-                                &Size,
-                                Base
-                                );
-      }
-
+      Status = ImageContext->ImageRead (
+                              ImageContext->Handle,
+                              Section->PointerToRawData - TeStrippedOffset,
+                              &Size,
+                              Base
+                              );
       if (RETURN_ERROR (Status)) {
         ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
         return Status;
@@ -1350,7 +1377,8 @@ PeCoffLoaderLoadImage (
       //
       ImageContext->EntryPoint = (PHYSICAL_ADDRESS)(UINTN)PeCoffLoaderImageAddress (
                                                             ImageContext,
-                                                            (UINTN)Hdr.Pe32->OptionalHeader.AddressOfEntryPoint
+                                                            (UINTN)Hdr.Pe32->OptionalHeader.AddressOfEntryPoint,
+                                                            0
                                                             );
     } else {
       //
@@ -1358,16 +1386,16 @@ PeCoffLoaderLoadImage (
       //
       ImageContext->EntryPoint = (PHYSICAL_ADDRESS)(UINTN)PeCoffLoaderImageAddress (
                                                             ImageContext,
-                                                            (UINTN)Hdr.Pe32Plus->OptionalHeader.AddressOfEntryPoint
+                                                            (UINTN)Hdr.Pe32Plus->OptionalHeader.AddressOfEntryPoint,
+                                                            0
                                                             );
     }
   } else {
-    ImageContext->EntryPoint =  (PHYSICAL_ADDRESS) (
-                                (UINTN)ImageContext->ImageAddress  +
-                                (UINTN)Hdr.Te->AddressOfEntryPoint +
-                                (UINTN)sizeof(EFI_TE_IMAGE_HEADER) -
-                                (UINTN)Hdr.Te->StrippedSize
-                                );
+    ImageContext->EntryPoint = (PHYSICAL_ADDRESS)(UINTN)PeCoffLoaderImageAddress (
+                                                          ImageContext,
+                                                          (UINTN)Hdr.Te->AddressOfEntryPoint,
+                                                          TeStrippedOffset
+                                                          );
   }
 
   //
@@ -1411,107 +1439,82 @@ PeCoffLoaderLoadImage (
   // Load the Codeview information if present
   //
   if (ImageContext->DebugDirectoryEntryRva != 0) {
-    if (!(ImageContext->IsTeImage)) {
-      DebugEntry = PeCoffLoaderImageAddress (
-                    ImageContext,
-                    ImageContext->DebugDirectoryEntryRva
-                    );
-    } else {
-      DebugEntry = (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY *)(UINTN)(
-                      ImageContext->ImageAddress +
-                      ImageContext->DebugDirectoryEntryRva +
-                      sizeof(EFI_TE_IMAGE_HEADER) -
-                      Hdr.Te->StrippedSize
-                      );
+    DebugEntry = PeCoffLoaderImageAddress (
+                ImageContext,
+                ImageContext->DebugDirectoryEntryRva,
+                TeStrippedOffset
+                );
+    if (DebugEntry == NULL) {
+      ImageContext->ImageError = IMAGE_ERROR_FAILED_RELOCATION;
+      return RETURN_LOAD_ERROR;
     }
 
-    if (DebugEntry != NULL) {
-      TempDebugEntryRva = DebugEntry->RVA;
-      if (DebugEntry->RVA == 0 && DebugEntry->FileOffset != 0) {
-        Section--;
-        if ((UINTN)Section->SizeOfRawData < Section->Misc.VirtualSize) {
-          TempDebugEntryRva = Section->VirtualAddress + Section->Misc.VirtualSize;
-        } else {
-          TempDebugEntryRva = Section->VirtualAddress + Section->SizeOfRawData;
-        }
+    TempDebugEntryRva = DebugEntry->RVA;
+    if (DebugEntry->RVA == 0 && DebugEntry->FileOffset != 0) {
+      Section--;
+      if ((UINTN)Section->SizeOfRawData < Section->Misc.VirtualSize) {
+        TempDebugEntryRva = Section->VirtualAddress + Section->Misc.VirtualSize;
+      } else {
+        TempDebugEntryRva = Section->VirtualAddress + Section->SizeOfRawData;
+      }
+    }
+
+    if (TempDebugEntryRva != 0) {
+      ImageContext->CodeView = PeCoffLoaderImageAddress (ImageContext, TempDebugEntryRva, TeStrippedOffset); 
+      if (ImageContext->CodeView == NULL) {
+        ImageContext->ImageError = IMAGE_ERROR_FAILED_RELOCATION;
+        return RETURN_LOAD_ERROR;
       }
 
-      if (TempDebugEntryRva != 0) {
-        if (!(ImageContext->IsTeImage)) {
-          ImageContext->CodeView = PeCoffLoaderImageAddress (ImageContext, TempDebugEntryRva);
-        } else {
-          ImageContext->CodeView = (VOID *)(
-                                    (UINTN)ImageContext->ImageAddress +
-                                    (UINTN)TempDebugEntryRva +
-                                    (UINTN)sizeof (EFI_TE_IMAGE_HEADER) -
-                                    (UINTN) Hdr.Te->StrippedSize
-                                    );
-        }
+      if (DebugEntry->RVA == 0) {
+        Size = DebugEntry->SizeOfData;
+        Status = ImageContext->ImageRead (
+                                ImageContext->Handle,
+                                DebugEntry->FileOffset - TeStrippedOffset,
+                                &Size,
+                                ImageContext->CodeView
+                                );
+        //
+        // Should we apply fix up to this field according to the size difference between PE and TE?
+        // Because now we maintain TE header fields unfixed, this field will also remain as they are
+        // in original PE image.
+        //
 
-        if (ImageContext->CodeView == NULL) {
+        if (RETURN_ERROR (Status)) {
           ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
           return RETURN_LOAD_ERROR;
         }
 
-        if (DebugEntry->RVA == 0) {
-          Size = DebugEntry->SizeOfData;
-          if (!(ImageContext->IsTeImage)) {
-            Status = ImageContext->ImageRead (
-                                    ImageContext->Handle,
-                                    DebugEntry->FileOffset,
-                                    &Size,
-                                    ImageContext->CodeView
-                                    );
-          } else {
-            Status = ImageContext->ImageRead (
-                                    ImageContext->Handle,
-                                    DebugEntry->FileOffset + sizeof (EFI_TE_IMAGE_HEADER) - Hdr.Te->StrippedSize,
-                                    &Size,
-                                    ImageContext->CodeView
-                                    );
-            //
-            // Should we apply fix up to this field according to the size difference between PE and TE?
-            // Because now we maintain TE header fields unfixed, this field will also remain as they are
-            // in original PE image.
-            //
-          }
+        DebugEntry->RVA = TempDebugEntryRva;
+      }
 
-          if (RETURN_ERROR (Status)) {
-            ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
-            return RETURN_LOAD_ERROR;
-          }
-
-          DebugEntry->RVA = TempDebugEntryRva;
+      switch (*(UINT32 *) ImageContext->CodeView) {
+      case CODEVIEW_SIGNATURE_NB10:
+        if (DebugEntry->SizeOfData < sizeof (EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY)) {
+          ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+          return RETURN_UNSUPPORTED;
         }
+        ImageContext->PdbPointer = (CHAR8 *)ImageContext->CodeView + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY);
+        break;
 
-        switch (*(UINT32 *) ImageContext->CodeView) {
-        case CODEVIEW_SIGNATURE_NB10:
-          if (DebugEntry->SizeOfData < sizeof (EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY)) {
-            ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
-            return RETURN_UNSUPPORTED;
-          }
-          ImageContext->PdbPointer = (CHAR8 *)ImageContext->CodeView + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY);
-          break;
-
-        case CODEVIEW_SIGNATURE_RSDS:
-          if (DebugEntry->SizeOfData < sizeof (EFI_IMAGE_DEBUG_CODEVIEW_RSDS_ENTRY)) {
-            ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
-            return RETURN_UNSUPPORTED;
-          }
-          ImageContext->PdbPointer = (CHAR8 *)ImageContext->CodeView + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_RSDS_ENTRY);
-          break;
-
-        case CODEVIEW_SIGNATURE_MTOC:
-          if (DebugEntry->SizeOfData < sizeof (EFI_IMAGE_DEBUG_CODEVIEW_MTOC_ENTRY)) {
-            ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
-            return RETURN_UNSUPPORTED;
-          }
-          ImageContext->PdbPointer = (CHAR8 *)ImageContext->CodeView + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_MTOC_ENTRY);
-          break;
-
-        default:
-          break;
+      case CODEVIEW_SIGNATURE_RSDS:
+        if (DebugEntry->SizeOfData < sizeof (EFI_IMAGE_DEBUG_CODEVIEW_RSDS_ENTRY)) {
+          ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+          return RETURN_UNSUPPORTED;
         }
+        ImageContext->PdbPointer = (CHAR8 *)ImageContext->CodeView + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_RSDS_ENTRY);
+        break;
+
+      case CODEVIEW_SIGNATURE_MTOC:
+        if (DebugEntry->SizeOfData < sizeof (EFI_IMAGE_DEBUG_CODEVIEW_MTOC_ENTRY)) {
+          ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+          return RETURN_UNSUPPORTED;
+        }
+        ImageContext->PdbPointer = (CHAR8 *)ImageContext->CodeView + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_MTOC_ENTRY);
+        break;
+
+      default:
+        break;
       }
     }
   }
@@ -1536,7 +1539,7 @@ PeCoffLoaderLoadImage (
     }
 
     if (NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_RESOURCE && DirectoryEntry->Size != 0) {
-      Base = PeCoffLoaderImageAddress (ImageContext, DirectoryEntry->VirtualAddress);
+      Base = PeCoffLoaderImageAddress (ImageContext, DirectoryEntry->VirtualAddress, 0);
       if (Base != NULL) {
         ResourceDirectory = (EFI_IMAGE_RESOURCE_DIRECTORY *) Base;
         Offset = sizeof (EFI_IMAGE_RESOURCE_DIRECTORY) + sizeof (EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY) * 
@@ -1611,7 +1614,7 @@ PeCoffLoaderLoadImage (
                   return RETURN_UNSUPPORTED;
                 }
                 ResourceDataEntry = (EFI_IMAGE_RESOURCE_DATA_ENTRY *) (Base + ResourceDirectoryEntry->u2.OffsetToData);
-                ImageContext->HiiResourceData = (PHYSICAL_ADDRESS) (UINTN) PeCoffLoaderImageAddress (ImageContext, ResourceDataEntry->OffsetToData);
+                ImageContext->HiiResourceData = (PHYSICAL_ADDRESS) (UINTN) PeCoffLoaderImageAddress (ImageContext, ResourceDataEntry->OffsetToData, 0);
                 break;
               }
             }
