@@ -1209,11 +1209,6 @@ DriverEntry (
                   EFI_NATIVE_INTERFACE,
                   &mTcgDxeData.TcgProtocol
                   );
-  //
-  // Install ACPI Table
-  //
-  EfiCreateProtocolNotifyEvent (&gEfiAcpiTableProtocolGuid, TPL_CALLBACK, InstallAcpiTable, NULL, &Registration);
-    
   if (!EFI_ERROR (Status) && !mTcgDxeData.BsCap.TPMDeactivatedFlag) {
     //
     // Setup the log area and copy event log from hob list to it
@@ -1253,5 +1248,10 @@ DriverEntry (
                     );
   }
 
+  //
+  // Install ACPI Table
+  //
+  EfiCreateProtocolNotifyEvent (&gEfiAcpiTableProtocolGuid, TPL_CALLBACK, InstallAcpiTable, NULL, &Registration);
+  
   return Status;
 }
