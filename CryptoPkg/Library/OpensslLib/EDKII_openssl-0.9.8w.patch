@@ -260,20 +260,7 @@ Index: crypto/x509/x509_vfy.c
 ===================================================================
 --- crypto/x509/x509_vfy.c	(revision 1)
 +++ crypto/x509/x509_vfy.c	(working copy)
-@@ -386,7 +386,11 @@
- 
- static int check_chain_extensions(X509_STORE_CTX *ctx)
- {
--#ifdef OPENSSL_NO_CHAIN_VERIFY
-+#if defined(OPENSSL_NO_CHAIN_VERIFY) || defined(OPENSSL_SYS_UEFI)
-+  /* 
-+    NOTE: Bypass KU Flags Checking for UEFI version. There are incorrect KU flag setting
-+          in Authenticode Signing Certificates. 
-+  */
- 	return 1;
- #else
- 	int i, ok=0, must_be_ca, plen = 0;
-@@ -899,6 +903,10 @@
+@@ -899,6 +899,10 @@
  
  static int check_cert_time(X509_STORE_CTX *ctx, X509 *x)
  	{
@@ -284,7 +271,7 @@ Index: crypto/x509/x509_vfy.c
  	time_t *ptime;
  	int i;
  
-@@ -942,6 +950,7 @@
+@@ -942,6 +946,7 @@
  		}
  
  	return 1;
