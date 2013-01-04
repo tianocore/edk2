@@ -1,7 +1,7 @@
 /** @file
   Dhcp6 internal functions implementation.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -2410,7 +2410,7 @@ Dhcp6HandleStateful (
   ClientId = Service->ClientId;
   Status   = EFI_SUCCESS;
 
-  if (Instance->InDestory || Instance->Config == NULL) {
+  if (Instance->Config == NULL) {
     goto ON_CONTINUE;
   }
 
@@ -2523,10 +2523,6 @@ Dhcp6HandleStateless (
   Status    = EFI_SUCCESS;
   IsMatched = FALSE;
   InfCb     = NULL;
-
-  if (Instance->InDestory) {
-    goto ON_EXIT;
-  }
 
   if (Packet->Dhcp6.Header.MessageType != Dhcp6MsgReply) {
     goto ON_EXIT;

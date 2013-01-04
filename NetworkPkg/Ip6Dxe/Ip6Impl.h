@@ -1,7 +1,7 @@
 /** @file
   Implementation of EFI_IP6_PROTOCOL protocol interfaces and type definitions.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -68,7 +68,6 @@
 //
 #define IP6_STATE_UNCONFIGED   0
 #define IP6_STATE_CONFIGED     1
-#define IP6_STATE_DESTROY      2
 
 //
 // The state of IP6 service. It starts from UNSTARTED. It transits
@@ -157,13 +156,13 @@ struct _IP6_PROTOCOL {
   UINT32                    GroupCount;
 
   EFI_IP6_CONFIG_DATA       ConfigData;
+  BOOLEAN                   InDestroy;
 };
 
 struct _IP6_SERVICE {
   UINT32                          Signature;
   EFI_SERVICE_BINDING_PROTOCOL    ServiceBinding;
   INTN                            State;
-  BOOLEAN                         InDestroy;
 
   //
   // List of all the IP instances and interfaces, and default

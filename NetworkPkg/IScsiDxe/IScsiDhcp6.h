@@ -1,7 +1,7 @@
 /** @file
   The header file of iSCSI DHCP6 related configuration routines.
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -22,6 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /// Assigned by IANA, RFC 5970
 ///
 #define DHCP6_OPT_BOOT_FILE_URL  59
+#define DHCP6_OPT_BOOT_FILE_PARA 60
 
 #define ISCSI_ROOT_PATH_ID                   "iscsi:"
 #define ISCSI_ROOT_PATH_FIELD_DELIMITER      ':'

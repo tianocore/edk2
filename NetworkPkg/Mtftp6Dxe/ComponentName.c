@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name(2) protocol implementation for Mtftp6 driver.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -170,6 +170,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE        mMtftp6DriverNameT
   }
 };
 
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE   *gMtftp6ControllerNameTable = NULL;
+
 /**
   Retrieves a Unicode string that is the user-readable name of the driver.
 
@@ -225,6 +227,74 @@ Mtftp6ComponentNameGetDriverName (
           (BOOLEAN)(This == &gMtftp6ComponentName)
           );
 }
+
+/**
+  Update the component name for the Mtftp6 child handle.
+
+  @param  Mtftp6[in]                A pointer to the EFI_MTFTP6_PROTOCOL.
+
+  
+  @retval EFI_SUCCESS               Update the ControllerNameTable of this instance successfully.
+  @retval EFI_INVALID_PARAMETER     The input parameter is invalid.
+  
+**/
+EFI_STATUS
+UpdateName (
+  IN    EFI_MTFTP6_PROTOCOL             *Mtftp6
+  )
+{
+  EFI_STATUS                       Status;
+  CHAR16                           HandleName[128];
+  EFI_MTFTP6_MODE_DATA             Mtftp6ModeData;
+  CHAR16                           Address[sizeof"ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"];
+
+  if (Mtftp6 == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Format the child name into the string buffer.
+  //
+  Status = Mtftp6->GetModeData (Mtftp6, &Mtftp6ModeData);
+  if (!EFI_ERROR (Status)) {
+    Status = NetLibIp6ToStr (&Mtftp6ModeData.ConfigData.ServerIp, Address, sizeof(Address));
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    UnicodeSPrint (HandleName, sizeof (HandleName), 
+      L"MTFTPv6(ServerIp=%s, InitialServerPort=%d)",
+      Address,
+      Mtftp6ModeData.ConfigData.InitialServerPort
+      );
+  } else {
+    UnicodeSPrint (HandleName, 0x100, L"MTFTPv6(%r)", Status);
+  }
+
+  if (gMtftp6ControllerNameTable != NULL) {
+    FreeUnicodeStringTable (gMtftp6ControllerNameTable);
+    gMtftp6ControllerNameTable = NULL;
+  }
+  
+  Status = AddUnicodeString2 (
+             "eng",
+             gMtftp6ComponentName.SupportedLanguages,
+             &gMtftp6ControllerNameTable,
+             HandleName,
+             TRUE
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  return AddUnicodeString2 (
+           "en",
+           gMtftp6ComponentName2.SupportedLanguages,
+           &gMtftp6ControllerNameTable,
+           HandleName,
+           FALSE
+           );
+}
+
 
 /**
   Retrieves a Unicode string that is the user-readable name of the controller
@@ -304,5 +374,57 @@ Mtftp6ComponentNameGetControllerName (
   OUT CHAR16                                          **ControllerName
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_STATUS                    Status;
+  EFI_MTFTP6_PROTOCOL           *Mtftp6;
+
+  //
+  // Only provide names for child handles.
+  //
+  if (ChildHandle == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+  
+  // 
+  // Make sure this driver produced ChildHandle 
+  // 
+  Status = EfiTestChildHandle (
+             ControllerHandle,
+             ChildHandle, 
+             &gEfiUdp6ProtocolGuid
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Retrieve an instance of a produced protocol from ChildHandle
+  //
+  Status = gBS->OpenProtocol (
+                  ChildHandle,
+                  &gEfiMtftp6ProtocolGuid,
+                  (VOID **)&Mtftp6,
+                  NULL,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Update the component name for this child handle.
+  //
+  Status = UpdateName (Mtftp6);
+  if (EFI_ERROR (Status)) {
+    return Status; 
+  }
+
+  return LookupUnicodeString2 (
+           Language,
+           This->SupportedLanguages,
+           gMtftp6ControllerNameTable,
+           ControllerName,
+           (BOOLEAN)(This == &gMtftp6ComponentName)
+           );
 }
+

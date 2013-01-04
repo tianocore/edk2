@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2005 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -141,11 +141,13 @@ Ip4AccpetFrame (
   child wants to consume the packet because each IP child needs
   its own copy of the packet to make changes.
 
-  @param[in]  IpSb                   The IP4 service instance that received the packet
-  @param[in]  Head                   The header of the received packet
-  @param[in]  Packet                 The data of the received packet
+  @param[in]  IpSb               The IP4 service instance that received the packet.
+  @param[in]  Head               The header of the received packet.
+  @param[in]  Packet             The data of the received packet.
+  @param[in]  Option             Point to the IP4 packet header options.
+  @param[in]  OptionLen          Length of the IP4 packet header options.
 
-  @retval EFI_NOT_FOUND          No IP child accepts the packet
+  @retval EFI_NOT_FOUND          No IP child accepts the packet.
   @retval EFI_SUCCESS            The packet is enqueued or delivered to some IP
                                  children.
 
@@ -154,17 +156,21 @@ EFI_STATUS
 Ip4Demultiplex (
   IN IP4_SERVICE            *IpSb,
   IN IP4_HEAD               *Head,
-  IN NET_BUF                *Packet
+  IN NET_BUF                *Packet,
+  IN UINT8                  *Option,
+  IN UINT32                 OptionLen
   );
 
 /**
   Enqueue a received packet to all the IP children that share
   the same interface.
 
-  @param[in]  IpSb                   The IP4 service instance that receive the packet
-  @param[in]  Head                   The header of the received packet
-  @param[in]  Packet                 The data of the received packet
-  @param[in]  IpIf                   The interface to enqueue the packet to
+  @param[in]  IpSb               The IP4 service instance that receive the packet.
+  @param[in]  Head               The header of the received packet.
+  @param[in]  Packet             The data of the received packet.
+  @param[in]  Option             Point to the IP4 packet header options.
+  @param[in]  OptionLen          Length of the IP4 packet header options.  
+  @param[in]  IpIf               The interface to enqueue the packet to.
 
   @return The number of the IP4 children that accepts the packet
 
@@ -174,6 +180,8 @@ Ip4InterfaceEnquePacket (
   IN IP4_SERVICE            *IpSb,
   IN IP4_HEAD               *Head,
   IN NET_BUF                *Packet,
+  IN UINT8                  *Option,
+  IN UINT32                 OptionLen,
   IN IP4_INTERFACE          *IpIf
   );
 

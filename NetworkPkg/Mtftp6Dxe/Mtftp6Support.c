@@ -1,7 +1,7 @@
 /** @file
   Mtftp6 support functions implementation.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -903,6 +903,12 @@ Mtftp6OperationClean (
   }
 
   if (Instance->McastUdpIo != NULL) {
+    gBS->CloseProtocol (
+           Instance->McastUdpIo->UdpHandle,
+           &gEfiUdp6ProtocolGuid,
+           Instance->McastUdpIo->Image,
+           Instance->Handle
+           );
     UdpIoFreeIo (Instance->McastUdpIo);
     Instance->McastUdpIo = NULL;
   }

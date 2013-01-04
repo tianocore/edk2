@@ -58,6 +58,12 @@ Mtftp4CleanOperation (
   }
 
   if (Instance->McastUdpPort != NULL) {
+    gBS->CloseProtocol (
+           Instance->McastUdpPort->UdpHandle,
+           &gEfiUdp4ProtocolGuid,
+           gMtftp4DriverBinding.DriverBindingHandle,
+           Instance->Handle
+           );
     UdpIoFreeIo (Instance->McastUdpPort);
     Instance->McastUdpPort = NULL;
   }

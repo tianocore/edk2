@@ -1,7 +1,7 @@
 /** @file
   Implementation for iSCSI Boot Firmware Table publication.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -324,11 +324,8 @@ IScsiFillNICAndTargetSections (
 
       CopyMem (&Nic->PrimaryDns, &Attempt->PrimaryDns, sizeof (EFI_IPv6_ADDRESS));
       CopyMem (&Nic->SecondaryDns, &Attempt->SecondaryDns, sizeof (EFI_IPv6_ADDRESS));
-      //
-      // TODO: DHCP server address cannot be retrieved by DHCPv6 process since 
-      // DHCP server option is removed.
-      //CopyMem (&Nic->DhcpServer, &Attempt->DhcpServer, sizeof (EFI_IPv6_ADDRESS));
-      //
+      CopyMem (&Nic->DhcpServer, &Attempt->DhcpServer, sizeof (EFI_IPv6_ADDRESS));
+
     } else {
       ASSERT (FALSE);
     }

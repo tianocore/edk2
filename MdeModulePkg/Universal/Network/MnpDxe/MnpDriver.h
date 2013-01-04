@@ -1,7 +1,7 @@
 /** @file
   Declaration of strctures and functions for MnpDxe driver.
 
-Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -33,10 +33,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DpcLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/PrintLib.h>
 
 #include "ComponentName.h"
 
 #define MNP_DEVICE_DATA_SIGNATURE  SIGNATURE_32 ('M', 'n', 'p', 'D')
+
+//
+// Global Variables
+//
+extern  EFI_DRIVER_BINDING_PROTOCOL gMnpDriverBinding;
 
 typedef struct {
   UINT32                        Signature;

@@ -1,7 +1,7 @@
 /** @file
   Dhcp6 internal data structure and definition declaration.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -33,6 +33,7 @@
 #include <Library/UefiLib.h>
 #include <Library/BaseLib.h>
 #include <Library/NetLib.h>
+#include <Library/PrintLib.h>
 
 
 typedef struct _DHCP6_IA_CB    DHCP6_IA_CB;
@@ -244,7 +245,7 @@ struct _DHCP6_INSTANCE {
   EFI_DHCP6_PACKET              *AdSelect;
   UINT8                         AdPref;
   EFI_IPv6_ADDRESS              *Unicast;
-  EFI_STATUS                    UdpSts;
+  volatile EFI_STATUS           UdpSts;
   BOOLEAN                       InDestory;
   BOOLEAN                       MediaPresent;
   UINT64                        StartTime;
@@ -264,7 +265,6 @@ struct _DHCP6_SERVICE {
   UINT32                        Xid;
   LIST_ENTRY                    Child;
   UINTN                         NumOfChild;
-  BOOLEAN                       InDestory;
 };
 
 /**

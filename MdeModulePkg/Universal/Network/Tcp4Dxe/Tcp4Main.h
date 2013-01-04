@@ -1,7 +1,7 @@
 /** @file
   TCP4 protocol services header file.
 
-Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -74,6 +74,12 @@ typedef struct _TCP4_ROUTE_INFO {
   EFI_IPv4_ADDRESS  *SubnetMask;
   EFI_IPv4_ADDRESS  *GatewayAddress;
 } TCP4_ROUTE_INFO;
+
+typedef struct {
+  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
+  UINTN                         NumberOfChildren;
+  EFI_HANDLE                    *ChildHandleBuffer;
+} TCP4_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT;
 
 /**
   Get the current operational status of a TCP instance.

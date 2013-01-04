@@ -1,7 +1,7 @@
 /** @file
   Ip4 internal functions and type defintions.
   
-Copyright (c) 2005 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -33,6 +33,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DpcLib.h>
+#include <Library/PrintLib.h>
 
 #include "Ip4Common.h"
 #include "Ip4Driver.h"
@@ -160,7 +161,6 @@ struct _IP4_SERVICE {
   UINT32                          Signature;
   EFI_SERVICE_BINDING_PROTOCOL    ServiceBinding;
   INTN                            State;
-  BOOLEAN                         InDestory;
 
   //
   // List of all the IP instances and interfaces, and default

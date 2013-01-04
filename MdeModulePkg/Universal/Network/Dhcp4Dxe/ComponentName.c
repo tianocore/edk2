@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -174,6 +174,20 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mDhcpDriverNameTable[] = 
   }
 };
 
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE    *gDhcpControllerNameTable = NULL;
+
+CHAR16 *mDhcp4ControllerName[] = {
+  L"DHCPv4 (State=0, Stopped)",
+  L"DHCPv4 (State=1, Init)",
+  L"DHCPv4 (State=2, Selecting)",
+  L"DHCPv4 (State=3, Requesting)",
+  L"DHCPv4 (State=4, Bound)",
+  L"DHCPv4 (State=5, Renewing)",
+  L"DHCPv4 (State=6, Rebinding)",
+  L"DHCPv4 (State=7, InitReboot)",
+  L"DHCPv4 (State=8, Rebooting)"
+};
+
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 
@@ -227,6 +241,66 @@ DhcpComponentNameGetDriverName (
            mDhcpDriverNameTable,
            DriverName,
            (BOOLEAN)(This == &gDhcp4ComponentName)
+           );
+}
+
+/**
+  Update the component name for the Dhcp4 child handle.
+
+  @param  Dhcp4[in]               A pointer to the EFI_DHCP4_PROTOCOL.
+
+  
+  @retval EFI_SUCCESS             Update the ControllerNameTable of this instance successfully.
+  @retval EFI_INVALID_PARAMETER   The input parameter is invalid.
+  @retval EFI_DEVICE_ERROR        DHCP is in unknown state.
+  
+**/
+EFI_STATUS
+UpdateName (
+  IN     EFI_DHCP4_PROTOCOL             *Dhcp4
+  )
+{
+  EFI_STATUS                       Status;
+  EFI_DHCP4_MODE_DATA              Dhcp4ModeData;
+
+  if (Dhcp4 == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Format the child name into the string buffer.
+  //
+  Status = Dhcp4->GetModeData (Dhcp4, &Dhcp4ModeData);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  if (gDhcpControllerNameTable != NULL) {
+    FreeUnicodeStringTable (gDhcpControllerNameTable);
+    gDhcpControllerNameTable = NULL;
+  }
+  
+  if (Dhcp4ModeData.State > Dhcp4Rebooting) {
+    return EFI_DEVICE_ERROR;
+  }
+  
+  Status = AddUnicodeString2 (
+             "eng",
+             gDhcp4ComponentName.SupportedLanguages,
+             &gDhcpControllerNameTable,
+             mDhcp4ControllerName[Dhcp4ModeData.State],
+             TRUE
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  return AddUnicodeString2 (
+           "en",
+           gDhcp4ComponentName2.SupportedLanguages,
+           &gDhcpControllerNameTable,
+           mDhcp4ControllerName[Dhcp4ModeData.State],
+           FALSE
            );
 }
 
@@ -308,5 +382,56 @@ DhcpComponentNameGetControllerName (
   OUT CHAR16                                          **ControllerName
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_STATUS                    Status;
+  EFI_DHCP4_PROTOCOL            *Dhcp4;
+
+  //
+  // Only provide names for child handles.
+  //
+  if (ChildHandle == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+  
+  // 
+  // Make sure this driver produced ChildHandle 
+  // 
+  Status = EfiTestChildHandle (
+             ControllerHandle,
+             ChildHandle,
+             &gEfiUdp4ProtocolGuid
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // 
+  // Retrieve an instance of a produced protocol from ChildHandle  
+  // 
+  Status = gBS->OpenProtocol (
+                  ChildHandle,
+                  &gEfiDhcp4ProtocolGuid,
+                  (VOID **)&Dhcp4,
+                  NULL,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Update the component name for this child handle.
+  //
+  Status = UpdateName (Dhcp4);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return LookupUnicodeString2 (
+           Language,
+           This->SupportedLanguages,
+           gDhcpControllerNameTable,
+           ControllerName,
+           (BOOLEAN)(This == &gDhcp4ComponentName)
+           );
 }

@@ -2,7 +2,7 @@
   Implementation of EFI_COMPONENT_NAME_PROTOCOL and
   EFI_COMPONENT_NAME2_PROTOCOL protocol.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -174,6 +174,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE      mIp6DriverNameTable[
   }
 };
 
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE      *gIp6ControllerNameTable = NULL;
+
 /**
   Retrieves a Unicode string that is the user-readable name of the driver.
 
@@ -229,6 +231,88 @@ Ip6ComponentNameGetDriverName (
           (BOOLEAN) (This == &gIp6ComponentName)
           );
 
+}
+
+/**
+  Update the component name for the IP6 child handle.
+
+  @param  Ip6[in]                   A pointer to the EFI_IP6_PROTOCOL.
+
+  
+  @retval EFI_SUCCESS               Update the ControllerNameTable of this instance successfully.
+  @retval EFI_INVALID_PARAMETER     The input parameter is invalid.
+  
+**/
+EFI_STATUS
+UpdateName (
+  IN    EFI_IP6_PROTOCOL         *Ip6
+  )
+{
+  EFI_STATUS                       Status;
+  CHAR16                           HandleName[128];
+  EFI_IP6_MODE_DATA                Ip6ModeData;
+  UINTN                            Offset;
+  CHAR16                           Address[sizeof"ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"];
+
+  if (Ip6 == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Format the child name into the string buffer.
+  //
+  Offset = 0;
+  Status = Ip6->GetModeData (Ip6, &Ip6ModeData, NULL, NULL);
+  if (!EFI_ERROR (Status) && Ip6ModeData.IsStarted) {
+    Status = NetLibIp6ToStr (&Ip6ModeData.ConfigData.StationAddress, Address, sizeof(Address));
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    Offset += UnicodeSPrint (
+                HandleName,
+                sizeof(HandleName),
+                L"IPv6(StationAddress=%s, ",
+                Address
+                );
+    Status = NetLibIp6ToStr (&Ip6ModeData.ConfigData.DestinationAddress, Address, sizeof(Address));
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    UnicodeSPrint (
+      HandleName + Offset,
+      sizeof(HandleName) - Offset * sizeof (CHAR16),
+      L"DestinationAddress=%s)",
+      Address
+      );
+  } else if (!Ip6ModeData.IsStarted) {
+    UnicodeSPrint (HandleName, sizeof(HandleName), L"IPv6(Not started)");
+  } else {
+    UnicodeSPrint (HandleName, sizeof(HandleName), L"IPv6(%r)", Status);
+  }
+
+  if (gIp6ControllerNameTable != NULL) {
+      FreeUnicodeStringTable (gIp6ControllerNameTable);
+      gIp6ControllerNameTable = NULL;
+  }
+  
+  Status = AddUnicodeString2 (
+             "eng",
+             gIp6ComponentName.SupportedLanguages,
+             &gIp6ControllerNameTable,
+             HandleName,
+             TRUE
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  return AddUnicodeString2 (
+           "en",
+           gIp6ComponentName2.SupportedLanguages,
+           &gIp6ControllerNameTable,
+           HandleName,
+           FALSE
+           );
 }
 
 /**
@@ -309,5 +393,56 @@ Ip6ComponentNameGetControllerName (
   OUT CHAR16                                          **ControllerName
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_STATUS                    Status;
+  EFI_IP6_PROTOCOL              *Ip6;
+  
+  //
+  // Only provide names for child handles.
+  //
+  if (ChildHandle == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Make sure this driver produced ChildHandle 
+  //
+  Status = EfiTestChildHandle (
+             ControllerHandle,
+             ChildHandle,
+             &gEfiManagedNetworkProtocolGuid
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Retrieve an instance of a produced protocol from ChildHandle
+  //
+  Status = gBS->OpenProtocol (
+                  ChildHandle,
+                  &gEfiIp6ProtocolGuid,
+                  (VOID **)&Ip6,
+                  NULL,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Update the component name for this child handle.
+  //
+  Status = UpdateName (Ip6);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return LookupUnicodeString2 (
+           Language,
+           This->SupportedLanguages,
+           gIp6ControllerNameTable,
+           ControllerName,
+           (BOOLEAN)(This == &gIp6ComponentName)
+           );
 }

@@ -1,7 +1,7 @@
 /** @file
   The driver binding and service binding protocol for the TCP driver.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -323,6 +323,7 @@ ON_ERROR:
 
   if (TcpServiceData->IpIo != NULL) {
     IpIoDestroy (TcpServiceData->IpIo);
+    TcpServiceData->IpIo = NULL;
   }
 
   FreePool (TcpServiceData);
@@ -331,13 +332,53 @@ ON_ERROR:
 }
 
 /**
+  Callback function which provided by user to remove one node in NetDestroyLinkList process.
+  
+  @param[in]    Entry           The entry to be removed.
+  @param[in]    Context         Pointer to the callback context corresponds to the Context in NetDestroyLinkList.
+
+  @retval EFI_SUCCESS           The entry has been removed successfully.
+  @retval Others                Fail to remove the entry.
+
+**/
+EFI_STATUS
+EFIAPI
+TcpDestroyChildEntryInHandleBuffer (
+  IN LIST_ENTRY         *Entry,
+  IN VOID               *Context
+  )
+{
+  SOCKET                        *Sock;
+  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
+  UINTN                         NumberOfChildren;
+  EFI_HANDLE                    *ChildHandleBuffer;
+
+  if (Entry == NULL || Context == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Sock = NET_LIST_USER_STRUCT_S (Entry, SOCKET, Link, SOCK_SIGNATURE);
+  ServiceBinding    = ((TCP_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *) Context)->ServiceBinding;
+  NumberOfChildren  = ((TCP_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *) Context)->NumberOfChildren;
+  ChildHandleBuffer = ((TCP_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *) Context)->ChildHandleBuffer;
+
+  if (!NetIsInHandleBuffer (Sock->SockHandle, NumberOfChildren, ChildHandleBuffer)) {
+    return EFI_SUCCESS;
+  }
+
+  return ServiceBinding->DestroyChild (ServiceBinding, Sock->SockHandle);
+}
+
+/**
   Destroy a TCP6 or TCP4 service binding instance. It will release all
   the resources allocated by the instance.
 
   @param[in]  Controller         Controller handle of device to bind driver to.
   @param[in]  ImageHandle        The TCP driver's image handle.
-  @param[in]  NumberOfChildren    Number of Handles in ChildHandleBuffer. If number
+  @param[in]  NumberOfChildren   Number of Handles in ChildHandleBuffer. If number
                                  of children is zero stop the entire bus driver.
+  @param[in]  ChildHandleBuffer  An array of child handles to be freed. May be NULL
+                                 if NumberOfChildren is 0.  
   @param[in]  IpVersion          IP_VERSION_4 or IP_VERSION_6
 
   @retval EFI_SUCCESS            The resources used by the instance were cleaned up.
@@ -349,6 +390,7 @@ TcpDestroyService (
   IN EFI_HANDLE  Controller,
   IN EFI_HANDLE  ImageHandle,
   IN UINTN       NumberOfChildren,
+  IN EFI_HANDLE  *ChildHandleBuffer, OPTIONAL
   IN UINT8       IpVersion
   )
 {
@@ -358,7 +400,8 @@ TcpDestroyService (
   EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
   TCP_SERVICE_DATA              *TcpServiceData;
   EFI_STATUS                    Status;
-  SOCKET                        *Sock;
+  LIST_ENTRY                    *List;
+  TCP_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT  Context;
 
   ASSERT ((IpVersion == IP_VERSION_4) || (IpVersion == IP_VERSION_6));
 
@@ -372,7 +415,7 @@ TcpDestroyService (
 
   NicHandle = NetLibGetNicHandle (Controller, IpProtocolGuid);
   if (NicHandle == NULL) {
-    return EFI_NOT_FOUND;
+    return EFI_SUCCESS;
   }
 
   Status = gBS->OpenProtocol (
@@ -389,7 +432,18 @@ TcpDestroyService (
 
   TcpServiceData = TCP_SERVICE_FROM_THIS (ServiceBinding);
 
-  if (NumberOfChildren == 0) {
+  if (NumberOfChildren != 0) {
+    List = &TcpServiceData->SocketList;
+    Context.ServiceBinding = ServiceBinding;
+    Context.NumberOfChildren = NumberOfChildren;
+    Context.ChildHandleBuffer = ChildHandleBuffer;
+    Status = NetDestroyLinkList (
+               List,
+               TcpDestroyChildEntryInHandleBuffer,
+               &Context,
+               NULL
+               );
+  } else if (IsListEmpty (&TcpServiceData->SocketList)) {
     //
     // Uninstall TCP servicebinding protocol
     //
@@ -404,6 +458,7 @@ TcpDestroyService (
     // Destroy the IpIO consumed by TCP driver
     //
     IpIoDestroy (TcpServiceData->IpIo);
+    TcpServiceData->IpIo = NULL;
 
     //
     // Destroy the heartbeat timer.
@@ -419,16 +474,11 @@ TcpDestroyService (
     // Release the TCP service data
     //
     FreePool (TcpServiceData);
-  } else {
 
-    while (!IsListEmpty (&TcpServiceData->SocketList)) {
-      Sock = NET_LIST_HEAD (&TcpServiceData->SocketList, SOCKET, Link);
-
-      ServiceBinding->DestroyChild (ServiceBinding, Sock->SockHandle);
-    }
+    Status = EFI_SUCCESS;
   }
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
@@ -595,6 +645,7 @@ TcpDriverBindingStop (
                  ControllerHandle,
                  This->DriverBindingHandle,
                  NumberOfChildren,
+                 ChildHandleBuffer,
                  IP_VERSION_4
                  );
 
@@ -602,6 +653,7 @@ TcpDriverBindingStop (
                  ControllerHandle,
                  This->DriverBindingHandle,
                  NumberOfChildren,
+                 ChildHandleBuffer,
                  IP_VERSION_6
                  );
 
@@ -839,13 +891,10 @@ TcpServiceBindingDestroyChild (
   EFI_STATUS  Status;
   VOID        *Tcp;
   SOCKET      *Sock;
-  EFI_TPL     OldTpl;
 
   if (NULL == This || NULL == ChildHandle) {
     return EFI_INVALID_PARAMETER;
   }
-
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
   // retrieve the Tcp4 protocol from ChildHandle
@@ -884,8 +933,6 @@ TcpServiceBindingDestroyChild (
 
     SockDestroyChild (Sock);
   }
-
-  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }

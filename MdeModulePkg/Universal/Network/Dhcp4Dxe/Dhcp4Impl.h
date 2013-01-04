@@ -6,7 +6,7 @@
   RFC 1534: Interoperation Between DHCP and BOOTP
   RFC 3396: Encoding Long Options in DHCP.
   
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -84,7 +84,6 @@ struct _DHCP_SERVICE {
   EFI_SERVICE_BINDING_PROTOCOL  ServiceBinding;
 
   INTN                          ServiceState; // CONFIGED, UNCONFIGED, and DESTORY
-  BOOLEAN                       InDestory;
 
   EFI_HANDLE                    Controller;
   EFI_HANDLE                    Image;

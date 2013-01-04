@@ -1,7 +1,7 @@
 /** @file
   Routines to process Rrq (download).
   
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -486,6 +486,7 @@ Mtftp4RrqHandleOack (
   MTFTP4_OPTION             Reply;
   EFI_STATUS                Status;
   INTN                      Expected;
+  EFI_UDP4_PROTOCOL         *Udp4;
 
   *Completed = FALSE;
 
@@ -548,13 +549,31 @@ Mtftp4RrqHandleOack (
       //
       Instance->McastIp      = Reply.McastIp;
       Instance->McastPort    = Reply.McastPort;
-      Instance->McastUdpPort = UdpIoCreateIo (
-                                 Instance->Service->Controller,
-                                 Instance->Service->Image,
-                                 Mtftp4RrqConfigMcastPort,
-                                 UDP_IO_UDP4_VERSION,
-                                 Instance
-                                 );
+      if (Instance->McastUdpPort == NULL) {
+        Instance->McastUdpPort = UdpIoCreateIo (
+                                   Instance->Service->Controller,
+                                   Instance->Service->Image,
+                                   Mtftp4RrqConfigMcastPort,
+                                   UDP_IO_UDP4_VERSION,
+                                   Instance
+                                   );
+        if (Instance->McastUdpPort != NULL) {
+          Status = gBS->OpenProtocol (
+                          Instance->McastUdpPort->UdpHandle,
+                          &gEfiUdp4ProtocolGuid,
+                          (VOID **) &Udp4,
+                          Instance->Service->Image,
+                          Instance->Handle,
+                          EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+                          );
+          if (EFI_ERROR (Status)) {
+            UdpIoFreeIo (Instance->McastUdpPort);
+            Instance->McastUdpPort = NULL;
+            return EFI_DEVICE_ERROR;
+          }
+        }
+      }
+
 
       if (Instance->McastUdpPort == NULL) {
         return EFI_DEVICE_ERROR;

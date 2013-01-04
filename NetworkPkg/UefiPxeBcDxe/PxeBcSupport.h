@@ -1,7 +1,7 @@
 /** @file
   Support functions declaration for UefiPxeBc Driver.
 
-  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -485,4 +485,29 @@ CalcElapsedTime (
   IN     PXEBC_PRIVATE_DATA     *Private
   );
 
+/**
+  Get the Nic handle using any child handle in the IPv4 stack.
+
+  @param[in]  ControllerHandle    Pointer to child handle over IPv4.
+
+  @return NicHandle               The pointer to the Nic handle.
+
+**/
+EFI_HANDLE
+PxeBcGetNicByIp4Children (
+  IN EFI_HANDLE                 ControllerHandle
+  );
+
+/**
+  Get the Nic handle using any child handle in the IPv6 stack.
+
+  @param[in]  ControllerHandle    Pointer to child handle over IPv6.
+
+  @return NicHandle               The pointer to the Nic handle.
+
+**/
+EFI_HANDLE
+PxeBcGetNicByIp6Children (
+  IN EFI_HANDLE                  ControllerHandle
+  );
 #endif

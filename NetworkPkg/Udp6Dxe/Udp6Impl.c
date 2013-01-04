@@ -1,7 +1,7 @@
 /** @file
   Udp6 driver's whole implementation.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -363,7 +363,8 @@ ON_ERROR:
   }
 
   IpIoDestroy (Udp6Service->IpIo);
-
+  Udp6Service->IpIo = NULL;
+  
   return Status;
 }
 
@@ -388,6 +389,9 @@ Udp6CleanService (
   // Destroy the IpIo.
   //
   IpIoDestroy (Udp6Service->IpIo);
+  Udp6Service->IpIo = NULL;
+  
+  ZeroMem (Udp6Service, sizeof (UDP6_SERVICE_DATA));
 }
 
 
@@ -491,7 +495,7 @@ Udp6InitInstance (
   Instance->IcmpError   = EFI_SUCCESS;
   Instance->Configured  = FALSE;
   Instance->IsNoMapping = FALSE;
-  Instance->Destroyed   = FALSE;
+  Instance->InDestroy   = FALSE;
 }
 
 

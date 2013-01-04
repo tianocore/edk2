@@ -1,7 +1,7 @@
 /** @file
   Common definition and functions for IP6 driver.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -59,6 +59,11 @@ typedef enum {
   Ip6Multicast,
   Ip6AnyCast
 } IP6_ADDRESS_TYPE;
+
+typedef struct {
+  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
+  EFI_IPv6_ADDRESS              *Address;
+} IP6_DESTROY_CHILD_BY_ADDR_CALLBACK_CONTEXT;
 
 typedef struct _IP6_INTERFACE    IP6_INTERFACE;
 typedef struct _IP6_PROTOCOL     IP6_PROTOCOL;

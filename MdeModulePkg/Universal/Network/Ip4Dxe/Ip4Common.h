@@ -1,7 +1,7 @@
 /** @file
   Common definition for IP4.
   
-Copyright (c) 2005 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -62,6 +62,9 @@ typedef struct _IP4_SERVICE    IP4_SERVICE;
 
 #define IP4_FIRST_FRAGMENT(FragmentField) \
           ((BOOLEAN)(((FragmentField) & IP4_HEAD_OFFSET_MASK) == 0))
+
+#define IP4_DO_NOT_FRAGMENT(FragmentField) \
+          ((BOOLEAN)(((FragmentField) & IP4_HEAD_DF_MASK) == IP4_HEAD_DF_MASK))
 
 #define IP4_IS_BROADCAST(CastType) ((CastType) >= IP4_LOCAL_BROADCAST)
 

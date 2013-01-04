@@ -635,7 +635,7 @@ EfiIp6Configure (
   IpInstance = IP6_INSTANCE_FROM_PROTOCOL (This);
   IpSb       = IpInstance->Service;
 
-  if (IpSb->LinkLocalDadFail) {
+  if (IpSb->LinkLocalDadFail && Ip6ConfigData != NULL) {
     return EFI_DEVICE_ERROR;
   }
 
@@ -1776,10 +1776,6 @@ EfiIp6Cancel (
 
   IpInstance = IP6_INSTANCE_FROM_PROTOCOL (This);
   IpSb       = IpInstance->Service;
-
-  if (IpSb->LinkLocalDadFail) {
-    return EFI_DEVICE_ERROR;
-  }
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 

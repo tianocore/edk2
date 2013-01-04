@@ -1,6 +1,6 @@
 /** @file
   
-Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -173,6 +173,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mIp4DriverNameTable[] = {
   }
 };
 
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  *gIp4ControllerNameTable = NULL;
+
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 
@@ -228,6 +230,74 @@ Ip4ComponentNameGetDriverName (
            (BOOLEAN)(This == &gIp4ComponentName)
            );
 
+}
+
+/**
+  Update the component name for the IP4 child handle.
+
+  @param  Ip4[in]                 A pointer to the EFI_IP4_PROTOCOL.
+
+  
+  @retval EFI_SUCCESS             Update the ControllerNameTable of this instance successfully.
+  @retval EFI_INVALID_PARAMETER   The input parameter is invalid.
+  
+**/
+EFI_STATUS
+UpdateName (
+  IN     EFI_IP4_PROTOCOL         *Ip4
+  )
+{
+  EFI_STATUS                       Status;
+  CHAR16                           HandleName[80];
+  EFI_IP4_MODE_DATA                Ip4ModeData;
+
+  if (Ip4 == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Format the child name into the string buffer as:
+  // IPv4 (SrcIP=127.0.0.1, DestIP=127.0.0.1)
+  //
+  Status = Ip4->GetModeData (Ip4, &Ip4ModeData, NULL, NULL);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (!Ip4ModeData.IsStarted || !Ip4ModeData.IsConfigured) {
+    UnicodeSPrint (HandleName, sizeof (HandleName), L"IPv4 (Not started)");
+  } else {
+    UnicodeSPrint (HandleName, sizeof (HandleName),
+      L"IPv4 (SrcIP=%d.%d.%d.%d)",
+      Ip4ModeData.ConfigData.StationAddress.Addr[0],
+      Ip4ModeData.ConfigData.StationAddress.Addr[1],
+      Ip4ModeData.ConfigData.StationAddress.Addr[2],
+      Ip4ModeData.ConfigData.StationAddress.Addr[3]
+      );
+  }
+
+  if (gIp4ControllerNameTable != NULL) {
+    FreeUnicodeStringTable (gIp4ControllerNameTable);
+    gIp4ControllerNameTable = NULL;
+  }
+  Status = AddUnicodeString2 (
+             "eng",
+             gIp4ComponentName.SupportedLanguages,
+             &gIp4ControllerNameTable,
+             HandleName,
+             TRUE
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  return AddUnicodeString2 (
+           "en",
+           gIp4ComponentName2.SupportedLanguages,
+           &gIp4ControllerNameTable,
+           HandleName,
+           FALSE
+           );
 }
 
 /**
@@ -308,5 +378,57 @@ Ip4ComponentNameGetControllerName (
   OUT CHAR16                                          **ControllerName
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_STATUS                    Status;  
+  EFI_IP4_PROTOCOL              *Ip4;
+  
+  //
+  // Only provide names for child handles.
+  //
+  if (ChildHandle == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+
+  // 
+  // Make sure this driver produced ChildHandle 
+  // 
+  Status = EfiTestChildHandle (
+             ControllerHandle,
+             ChildHandle,
+             &gEfiManagedNetworkProtocolGuid
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // 
+  // Retrieve an instance of a produced protocol from ChildHandle  
+  // 
+  Status = gBS->OpenProtocol (
+                  ChildHandle,
+                  &gEfiIp4ProtocolGuid,
+                  (VOID **)&Ip4,
+                  NULL,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Update the component name for this child handle.
+  //
+  Status = UpdateName (Ip4);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return LookupUnicodeString2 (
+           Language,
+           This->SupportedLanguages,
+           gIp4ControllerNameTable,
+           ControllerName,
+           (BOOLEAN)(This == &gIp4ComponentName)
+           );
 }
+

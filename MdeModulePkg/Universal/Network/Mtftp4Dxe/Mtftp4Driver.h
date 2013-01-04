@@ -26,6 +26,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 extern EFI_COMPONENT_NAME_PROTOCOL   gMtftp4ComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gMtftp4ComponentName2;
 extern EFI_DRIVER_BINDING_PROTOCOL   gMtftp4DriverBinding;
+extern EFI_UNICODE_STRING_TABLE      *gMtftp4ControllerNameTable;
 
 /**
   Test whether MTFTP driver support this controller.

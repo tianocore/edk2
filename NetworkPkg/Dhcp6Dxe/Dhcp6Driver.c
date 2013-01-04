@@ -2,7 +2,7 @@
   Driver Binding functions and Service Binding functions
   implementationfor for Dhcp6 Driver.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -30,7 +30,6 @@ EFI_SERVICE_BINDING_PROTOCOL gDhcp6ServiceBindingTemplate = {
   Dhcp6ServiceBindingCreateChild,
   Dhcp6ServiceBindingDestroyChild
 };
-
 
 /**
   Configure the default Udp6Io to receive all the DHCP6 traffic
@@ -154,7 +153,6 @@ Dhcp6CreateService (
   // Initialize the fields of the new Dhcp6 service.
   //
   Dhcp6Srv->Signature       = DHCP6_SERVICE_SIGNATURE;
-  Dhcp6Srv->InDestory       = FALSE;
   Dhcp6Srv->Controller      = Controller;
   Dhcp6Srv->Image           = ImageHandle;
   Dhcp6Srv->Xid             = (0xffffff & NET_RANDOM (NetRandomInitSeed ()));
@@ -312,6 +310,36 @@ Dhcp6CreateInstance (
   *Instance = Dhcp6Ins;
 
   return EFI_SUCCESS;
+}
+
+/**
+  Callback function which provided by user to remove one node in NetDestroyLinkList process.
+  
+  @param[in]    Entry           The entry to be removed.
+  @param[in]    Context         Pointer to the callback context corresponds to the Context in NetDestroyLinkList.
+
+  @retval EFI_SUCCESS           The entry has been removed successfully.
+  @retval Others                Fail to remove the entry.
+
+**/
+EFI_STATUS
+EFIAPI
+Dhcp6DestroyChildEntry (
+  IN LIST_ENTRY         *Entry,
+  IN VOID               *Context
+  )
+{
+  DHCP6_INSTANCE                   *Instance;
+  EFI_SERVICE_BINDING_PROTOCOL     *ServiceBinding;
+
+  if (Entry == NULL || Context == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Instance = NET_LIST_USER_STRUCT_S (Entry, DHCP6_INSTANCE, Link, DHCP6_INSTANCE_SIGNATURE);
+  ServiceBinding = (EFI_SERVICE_BINDING_PROTOCOL *) Context;
+  
+  return ServiceBinding->DestroyChild (ServiceBinding, Instance->Handle);
 }
 
 
@@ -484,11 +512,11 @@ Dhcp6DriverBindingStop (
   )
 {
   EFI_STATUS                       Status;
-  EFI_TPL                          OldTpl;
   EFI_HANDLE                       NicHandle;
   EFI_SERVICE_BINDING_PROTOCOL     *ServiceBinding;
   DHCP6_SERVICE                    *Service;
-  DHCP6_INSTANCE                   *Instance;
+  LIST_ENTRY                       *List;
+  UINTN                            ListLength;
 
   //
   // Find and check the Nic handle by the controller handle.
@@ -496,7 +524,7 @@ Dhcp6DriverBindingStop (
   NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiUdp6ProtocolGuid);
 
   if (NicHandle == NULL) {
-    return EFI_DEVICE_ERROR;
+    return EFI_SUCCESS;
   }
 
   Status = gBS->OpenProtocol (
@@ -513,50 +541,44 @@ Dhcp6DriverBindingStop (
   }
 
   Service = DHCP6_SERVICE_FROM_THIS (ServiceBinding);
-
-  if (Service->InDestory) {
-    return EFI_SUCCESS;
+  if (!IsListEmpty (&Service->Child)) {
+    //
+    // Destroy all the children instances before destory the service.
+    //  
+    List = &Service->Child;
+    Status = NetDestroyLinkList (
+               List,
+               Dhcp6DestroyChildEntry,
+               ServiceBinding,
+               &ListLength
+               );
+    if (EFI_ERROR (Status) || ListLength != 0) {
+      Status = EFI_DEVICE_ERROR;
+    }
   }
 
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+  if (NumberOfChildren == 0 && !IsListEmpty (&Service->Child)) {
+    Status = EFI_DEVICE_ERROR;
+  }
 
-  if (NumberOfChildren == 0) {
+  if (NumberOfChildren == 0 && IsListEmpty (&Service->Child)) {
     //
     // Destory the service itself if no child instance left.
     //
-    Service->InDestory = TRUE;
-
     Status = gBS->UninstallProtocolInterface (
                     NicHandle,
                     &gEfiDhcp6ServiceBindingProtocolGuid,
                     ServiceBinding
                     );
-
     if (EFI_ERROR (Status)) {
-      Service->InDestory = FALSE;
       goto ON_EXIT;
     }
 
     Dhcp6DestroyService (Service);
-
-  } else {
-    //
-    // Destory all the children instances before destory the service.
-    //
-    while (!IsListEmpty (&Service->Child)) {
-      Instance = NET_LIST_HEAD (&Service->Child, DHCP6_INSTANCE, Link);
-      ServiceBinding->DestroyChild (ServiceBinding, Instance->Handle);
-    }
-    //
-    // Any of child failed to be destroyed.
-    //
-    if (Service->NumOfChild != 0) {
-      Status = EFI_DEVICE_ERROR;
-    }
+    Status = EFI_SUCCESS;
   }
-
+  
 ON_EXIT:
-  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
@@ -757,12 +779,13 @@ Dhcp6ServiceBindingDestroyChild (
   //
   // Uninstall the MTFTP6 protocol first to enable a top down destruction.
   //
+  gBS->RestoreTPL (OldTpl);
   Status = gBS->UninstallProtocolInterface (
                   ChildHandle,
                   &gEfiDhcp6ProtocolGuid,
                   Dhcp6
                   );
-
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   if (EFI_ERROR (Status)) {
     Instance->InDestory = FALSE;
     gBS->RestoreTPL (OldTpl);
@@ -775,9 +798,8 @@ Dhcp6ServiceBindingDestroyChild (
   RemoveEntryList (&Instance->Link);
   Service->NumOfChild--;
 
-  Dhcp6DestroyInstance (Instance);
-
   gBS->RestoreTPL (OldTpl);
 
+  Dhcp6DestroyInstance (Instance);
   return EFI_SUCCESS;
 }

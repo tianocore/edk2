@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name(2) protocol implementation for ArpDxe driver.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -36,6 +36,11 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gArpComponentName2 = 
 
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mArpDriverNameTable[] = {
   { "eng;en", L"ARP Network Service Driver" },
+  { NULL, NULL }
+};
+
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mArpControllerNameTable[] = {
+  { "eng;en", L"ARP Controller" },
   { NULL, NULL }
 };
 
@@ -173,6 +178,48 @@ ArpComponentNameGetControllerName (
   OUT CHAR16                                          **ControllerName
   )
 {
-  return EFI_UNSUPPORTED;
-}
+  EFI_STATUS                    Status;
+  EFI_ARP_PROTOCOL              *Arp;
 
+  //
+  // Only provide names for child handles.
+  //
+  if (ChildHandle == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+  
+  // 
+  // Make sure this driver produced ChildHandle 
+  // 
+  Status = EfiTestChildHandle (
+             ControllerHandle,
+             ChildHandle,
+             &gEfiManagedNetworkProtocolGuid
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // 
+  // Retrieve an instance of a produced protocol from ChildHandle  
+  // 
+  Status = gBS->OpenProtocol (
+                  ChildHandle,
+                  &gEfiArpProtocolGuid,
+                 (VOID **)&Arp,
+                  NULL,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return LookupUnicodeString2 (
+           Language,
+           This->SupportedLanguages,
+           mArpControllerNameTable,
+           ControllerName,
+           (BOOLEAN)(This == &gArpComponentName)
+           );
+}

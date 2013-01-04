@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name(2) protocol implementation for iSCSI.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -42,6 +42,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE     mIScsiDriverNameTable
     NULL
   }
 };
+
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  *gIScsiControllerNameTable = NULL;
 
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
@@ -98,6 +100,99 @@ IScsiComponentNameGetDriverName (
            (BOOLEAN) (This == &gIScsiComponentName)
            );
 }
+
+/**
+  Update the component name for the iSCSI NIC handle.
+
+  @param[in]  Controller            The handle of the NIC controller.
+  @param[in]  Ipv6Flag              TRUE if IP6 network stack is used.
+  
+  @retval EFI_SUCCESS               Update the ControllerNameTable of this instance successfully.
+  @retval EFI_INVALID_PARAMETER     The input parameter is invalid.
+  @retval EFI_UNSUPPORTED           Can't get the corresponding NIC info from the Controller handle.
+  
+**/
+EFI_STATUS
+UpdateName (
+  IN   EFI_HANDLE  Controller,
+  IN   BOOLEAN     Ipv6Flag
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_MAC_ADDRESS             MacAddr;
+  UINTN                       HwAddressSize;
+  UINT16                      VlanId;
+  ISCSI_NIC_INFO              *ThisNic;
+  ISCSI_NIC_INFO              *NicInfo;
+  LIST_ENTRY                  *Entry;
+  CHAR16                      HandleName[80];
+
+  //
+  // Get MAC address of this network device.
+  //
+  Status = NetLibGetMacAddress (Controller, &MacAddr, &HwAddressSize);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Get VLAN ID of this network device.
+  //
+  VlanId = NetLibGetVlanId (Controller);
+
+  //
+  // Check whether the NIC information exists.
+  //
+  ThisNic = NULL;
+
+  NET_LIST_FOR_EACH (Entry, &mPrivate->NicInfoList) {
+    NicInfo = NET_LIST_USER_STRUCT (Entry, ISCSI_NIC_INFO, Link);
+    if (NicInfo->HwAddressSize == HwAddressSize &&
+        CompareMem (&NicInfo->PermanentAddress, MacAddr.Addr, HwAddressSize) == 0 &&
+        NicInfo->VlanId == VlanId) {
+
+      ThisNic = NicInfo;
+      break;
+    }
+  }
+
+  if (ThisNic == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+
+  UnicodeSPrint (
+    HandleName,
+    sizeof (HandleName),
+    L"iSCSI (%s, NicIndex=%d)",
+    Ipv6Flag ? L"IPv6" : L"IPv4",
+    ThisNic->NicIndex
+  );
+
+  if (gIScsiControllerNameTable != NULL) {
+    FreeUnicodeStringTable (gIScsiControllerNameTable);
+    gIScsiControllerNameTable = NULL;
+  }
+
+  Status = AddUnicodeString2 (
+             "eng",
+             gIScsiComponentName.SupportedLanguages,
+             &gIScsiControllerNameTable,
+             HandleName,
+             TRUE
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return AddUnicodeString2 (
+           "en",
+           gIScsiComponentName2.SupportedLanguages,
+           &gIScsiControllerNameTable,
+           HandleName,
+           FALSE
+           );
+}
+
 
 /**
   Retrieves a Unicode string that is the user readable name of the controller
@@ -177,5 +272,54 @@ IScsiComponentNameGetControllerName (
   OUT CHAR16                        **ControllerName
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_HANDLE                      IScsiController;
+  BOOLEAN                         Ipv6Flag;
+  EFI_STATUS                      Status;
+  EFI_GUID                        *IScsiPrivateGuid;
+  ISCSI_PRIVATE_PROTOCOL          *IScsiIdentifier;
+
+  //
+  // Get the handle of the controller we are controling.
+  //
+  IScsiController = NetLibGetNicHandle (ControllerHandle, &gEfiTcp4ProtocolGuid);
+  if (IScsiController != NULL) {
+    IScsiPrivateGuid = &gIScsiV4PrivateGuid;
+    Ipv6Flag = FALSE;
+  } else {
+    IScsiController = NetLibGetNicHandle (ControllerHandle, &gEfiTcp6ProtocolGuid);
+    if (IScsiController != NULL) {
+      IScsiPrivateGuid = &gIScsiV6PrivateGuid;
+      Ipv6Flag = TRUE;
+    } else {
+      return EFI_UNSUPPORTED;
+    }
+  }
+
+  // 
+  // Retrieve an instance of a produced protocol from IScsiController  
+  // 
+  Status = gBS->OpenProtocol (
+                  IScsiController,
+                  IScsiPrivateGuid,
+                  (VOID **) &IScsiIdentifier,
+                  NULL,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = UpdateName(IScsiController, Ipv6Flag);
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
+
+  return LookupUnicodeString2 (
+           Language,
+           This->SupportedLanguages,
+           gIScsiControllerNameTable,
+           ControllerName,
+           (BOOLEAN)(This == &gIScsiComponentName)
+           );
 }

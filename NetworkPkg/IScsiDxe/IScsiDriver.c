@@ -1,7 +1,7 @@
 /** @file
   The entry point of IScsi driver.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -23,8 +23,8 @@ EFI_DRIVER_BINDING_PROTOCOL gIScsiDriverBinding = {
   NULL
 };
 
-EFI_GUID                    mIScsiV4PrivateGuid = ISCSI_V4_PRIVATE_GUID;
-EFI_GUID                    mIScsiV6PrivateGuid = ISCSI_V6_PRIVATE_GUID;
+EFI_GUID                    gIScsiV4PrivateGuid = ISCSI_V4_PRIVATE_GUID;
+EFI_GUID                    gIScsiV6PrivateGuid = ISCSI_V6_PRIVATE_GUID;
 ISCSI_PRIVATE_DATA          *mPrivate           = NULL;
 
 /**
@@ -121,7 +121,7 @@ IScsiDriverBindingSupported (
 
   Status = gBS->OpenProtocol (
                   ControllerHandle,
-                  &mIScsiV4PrivateGuid,
+                  &gIScsiV4PrivateGuid,
                   NULL,
                   This->DriverBindingHandle,
                   ControllerHandle,
@@ -150,7 +150,7 @@ IScsiDriverBindingSupported (
 
   Status = gBS->OpenProtocol (
                   ControllerHandle,
-                  &mIScsiV6PrivateGuid,
+                  &gIScsiV6PrivateGuid,
                   NULL,
                   This->DriverBindingHandle,
                   ControllerHandle,
@@ -231,11 +231,11 @@ IScsiStart (
   //
 
   if (IpVersion == IP_VERSION_4) {
-    IScsiPrivateGuid      = &mIScsiV4PrivateGuid;
+    IScsiPrivateGuid      = &gIScsiV4PrivateGuid;
     TcpServiceBindingGuid = &gEfiTcp4ServiceBindingProtocolGuid;
     ProtocolGuid          = &gEfiTcp4ProtocolGuid;
   } else if (IpVersion == IP_VERSION_6) {
-    IScsiPrivateGuid      = &mIScsiV6PrivateGuid;
+    IScsiPrivateGuid      = &gIScsiV6PrivateGuid;
     TcpServiceBindingGuid = &gEfiTcp6ServiceBindingProtocolGuid;
     ProtocolGuid          = &gEfiTcp6ProtocolGuid;
   } else {
@@ -931,13 +931,13 @@ IScsiDriverBindingStop (
   //
   IScsiController = NetLibGetNicHandle (ControllerHandle, &gEfiTcp4ProtocolGuid);
   if (IScsiController != NULL) {
-    ProtocolGuid            = &mIScsiV4PrivateGuid;
+    ProtocolGuid            = &gIScsiV4PrivateGuid;
     TcpProtocolGuid         = &gEfiTcp4ProtocolGuid;
     TcpServiceBindingGuid   = &gEfiTcp4ServiceBindingProtocolGuid;
   } else {
     IScsiController = NetLibGetNicHandle (ControllerHandle, &gEfiTcp6ProtocolGuid);
     ASSERT (IScsiController != NULL);
-    ProtocolGuid            = &mIScsiV6PrivateGuid;
+    ProtocolGuid            = &gIScsiV6PrivateGuid;
     TcpProtocolGuid         = &gEfiTcp6ProtocolGuid;
     TcpServiceBindingGuid   = &gEfiTcp6ServiceBindingProtocolGuid;
   }
@@ -1060,6 +1060,11 @@ IScsiUnload (
          &gIScsiAuthenticationInfo,
          NULL
          );
+
+  if (gIScsiControllerNameTable!= NULL) {
+    FreeUnicodeStringTable (gIScsiControllerNameTable);
+    gIScsiControllerNameTable = NULL;
+  }
   
   return gBS->UninstallMultipleProtocolInterfaces (
                 ImageHandle,

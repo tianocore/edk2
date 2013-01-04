@@ -821,7 +821,8 @@ Ip6OnDADFinished (
   UINT16                    OptBuf[4];
   EFI_DHCP6_PACKET_OPTION   *Oro;
   EFI_DHCP6_RETRANSMISSION  InfoReqReXmit;
-
+  EFI_IPv6_ADDRESS          AllNodes;
+  
   IpSb     = IpIf->Service;
   AddrInfo = DadEntry->AddressInfo;
 
@@ -921,6 +922,11 @@ Ip6OnDADFinished (
     FreePool (AddrInfo);
     RemoveEntryList (&DadEntry->Link);
     FreePool (DadEntry);
+    //
+    // Leave link-scope all-nodes multicast address (FF02::1)
+    //
+    Ip6SetToAllNodeMulticast (FALSE, IP6_LINK_LOCAL_SCOPE, &AllNodes);
+    Ip6LeaveGroup (IpSb, &AllNodes);
     //
     // Disable IP operation since link-local address is a duplicate address.
     //

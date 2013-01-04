@@ -9,7 +9,7 @@
   RFC2348 - TFTP Blocksize Option
   RFC2349 - TFTP Timeout Interval and Transfer Size Options
   
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -34,6 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UdpIoLib.h>
+#include <Library/PrintLib.h>
 
 extern EFI_MTFTP4_PROTOCOL  gMtftp4ProtocolTemplate;
 
@@ -67,8 +68,6 @@ typedef struct _MTFTP4_PROTOCOL MTFTP4_PROTOCOL;
 struct _MTFTP4_SERVICE {
   UINT32                        Signature;
   EFI_SERVICE_BINDING_PROTOCOL  ServiceBinding;
-
-  BOOLEAN                       InDestory;
 
   UINT16                        ChildrenNum;
   LIST_ENTRY                    Children;
@@ -148,6 +147,12 @@ struct _MTFTP4_PROTOCOL {
   BOOLEAN                       Master;
   UDP_IO                        *McastUdpPort;
 };
+
+typedef struct {
+  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
+  UINTN                         NumberOfChildren;
+  EFI_HANDLE                    *ChildHandleBuffer;
+} MTFTP4_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT;
 
 /**
   Clean up the MTFTP session to get ready for new operation.

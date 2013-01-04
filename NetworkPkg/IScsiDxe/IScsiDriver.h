@@ -1,7 +1,7 @@
 /** @file
   The header file of IScsiDriver.c.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -33,9 +33,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 extern EFI_COMPONENT_NAME2_PROTOCOL       gIScsiComponentName2;
 extern EFI_COMPONENT_NAME_PROTOCOL        gIScsiComponentName;
+extern EFI_UNICODE_STRING_TABLE           *gIScsiControllerNameTable;
 extern EFI_ISCSI_INITIATOR_NAME_PROTOCOL  gIScsiInitiatorName;
 extern EFI_AUTHENTICATION_INFO_PROTOCOL   gIScsiAuthenticationInfo;
 extern EFI_EXT_SCSI_PASS_THRU_PROTOCOL    gIScsiExtScsiPassThruProtocolTemplate;
+extern EFI_GUID                           gIScsiV4PrivateGuid;
+extern EFI_GUID                           gIScsiV6PrivateGuid;
 
 typedef struct {
   CHAR16          PortString[ISCSI_NAME_IFR_MAX_SIZE];

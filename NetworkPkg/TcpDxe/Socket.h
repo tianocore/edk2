@@ -477,7 +477,7 @@ struct _TCP_SOCKET {
   SOCK_BUFFER               SndBuffer;      ///< Send buffer of application's data
   SOCK_BUFFER               RcvBuffer;      ///< Receive buffer of received data
   EFI_STATUS                SockError;      ///< The error returned by low layer protocol
-  BOOLEAN                   IsDestroyed;
+  BOOLEAN                   InDestroy;
 
   //
   // Fields used to manage the connection request

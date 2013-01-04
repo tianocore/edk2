@@ -1,7 +1,7 @@
 /** @file
   Mtftp6 internal data structure and definition declaration.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved. <BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -29,6 +29,7 @@
 #include <Library/UefiLib.h>
 #include <Library/BaseLib.h>
 #include <Library/NetLib.h>
+#include <Library/PrintLib.h>
 
 typedef struct _MTFTP6_SERVICE  MTFTP6_SERVICE;
 typedef struct _MTFTP6_INSTANCE MTFTP6_INSTANCE;
@@ -117,8 +118,13 @@ struct _MTFTP6_SERVICE {
   // mtftp driver and udp driver.
   //
   UDP_IO                        *DummyUdpIo;
-  BOOLEAN                       InDestory;
 };
+
+typedef struct {
+  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
+  UINTN                         NumberOfChildren;
+  EFI_HANDLE                    *ChildHandleBuffer;
+} MTFTP6_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT;
 
 /**
   Returns the current operating mode data for the MTFTP6 instance.

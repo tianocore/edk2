@@ -565,11 +565,7 @@ Ip6ReceiveFrame (
 {
   EFI_STATUS                Status;
   IP6_LINK_RX_TOKEN         *Token;
-
-  if (IpSb->InDestroy) {
-    return EFI_INVALID_PARAMETER;
-  }
-
+  
   NET_CHECK_SIGNATURE (IpSb, IP6_SERVICE_SIGNATURE);
 
   Token           = &IpSb->RecvRequest;

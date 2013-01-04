@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -168,6 +168,17 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mPxeBcDriverNameTable[] =
   }
 };
 
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mPxeBcControllerNameTable[] = {
+  {
+    "eng;en",
+    L"PXE Controller"
+  },
+  {
+    NULL,
+    NULL
+  }
+};
+
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 
@@ -302,6 +313,53 @@ PxeBcComponentNameGetControllerName (
   OUT CHAR16                       **ControllerName
   )
 {
-  return EFI_UNSUPPORTED;
-}
+  EFI_PXE_BASE_CODE_PROTOCOL  *PxeBc;
+  EFI_HANDLE                  NicHandle;
+  EFI_STATUS                  Status;
+  
+  if (ControllerHandle == NULL || ChildHandle != NULL) {
+    return EFI_UNSUPPORTED;
+  }
 
+  NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiArpProtocolGuid);
+  if (NicHandle == NULL) {
+    NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiDhcp4ProtocolGuid);
+
+    if (NicHandle == NULL) {
+      NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiIp4ProtocolGuid);
+
+      if (NicHandle == NULL) {
+        NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiUdp4ProtocolGuid);
+
+        if (NicHandle == NULL) {
+          NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiMtftp4ProtocolGuid);
+
+          if (NicHandle == NULL) {
+            return EFI_UNSUPPORTED;
+          }
+        }
+      }
+    }
+  }
+
+  Status = gBS->OpenProtocol (
+                  NicHandle,
+                  &gEfiPxeBaseCodeProtocolGuid,
+                  (VOID **) &PxeBc,
+                  NULL,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return LookupUnicodeString2 (
+           Language,
+           This->SupportedLanguages,
+           mPxeBcControllerNameTable,
+           ControllerName,
+           (BOOLEAN)(This == &gPxeBcComponentName)
+           );
+}
