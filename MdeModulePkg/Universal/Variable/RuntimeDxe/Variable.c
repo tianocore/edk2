@@ -505,6 +505,7 @@ GetEndPointer (
   @param IsVolatile              The variable store is volatile or not;
                                  if it is non-volatile, need FTW.
   @param UpdatingVariable        Pointer to updating variable.
+  @param ReclaimAnyway           If TRUE, do reclaim anyway.
 
   @return EFI_OUT_OF_RESOURCES
   @return EFI_SUCCESS
@@ -516,7 +517,8 @@ Reclaim (
   IN  EFI_PHYSICAL_ADDRESS  VariableBase,
   OUT UINTN                 *LastVariableOffset,
   IN  BOOLEAN               IsVolatile,
-  IN  VARIABLE_HEADER       *UpdatingVariable
+  IN  VARIABLE_HEADER       *UpdatingVariable,
+  IN  BOOLEAN               ReclaimAnyway
   )
 {
   VARIABLE_HEADER       *Variable;
@@ -539,7 +541,9 @@ Reclaim (
   CHAR16                *UpdatingVariableNamePtr;
   UINTN                 CommonVariableTotalSize;
   UINTN                 HwErrVariableTotalSize;
+  BOOLEAN               NeedDoReclaim;
 
+  NeedDoReclaim = FALSE;
   VariableStoreHeader = (VARIABLE_STORE_HEADER *) ((UINTN) VariableBase);
 
   CommonVariableTotalSize = 0;
@@ -558,9 +562,16 @@ Reclaim (
        ) {
       VariableSize = (UINTN) NextVariable - (UINTN) Variable;
       MaximumBufferSize += VariableSize;
+    } else {
+      NeedDoReclaim = TRUE;
     }
 
     Variable = NextVariable;
+  }
+
+  if (!ReclaimAnyway && !NeedDoReclaim) {
+    DEBUG ((EFI_D_INFO, "Variable driver: no DELETED variable found, so no variable space could be reclaimed.\n"));
+    return EFI_SUCCESS;
   }
 
   //
@@ -1468,6 +1479,7 @@ UpdateVariable (
         UpdateVariableInfo (VariableName, VendorGuid, Variable->Volatile, FALSE, FALSE, TRUE, FALSE);
         if (!Variable->Volatile) {
           CacheVariable->CurrPtr->State = State;
+          FlushHobVariableToFlash (VariableName, VendorGuid);
         }
       }
       goto Done;     
@@ -1595,7 +1607,7 @@ UpdateVariable (
       // Perform garbage collection & reclaim operation.
       //
       Status = Reclaim (mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase, 
-                        &mVariableModuleGlobal->NonVolatileLastVariableOffset, FALSE, Variable->CurrPtr);
+                        &mVariableModuleGlobal->NonVolatileLastVariableOffset, FALSE, Variable->CurrPtr, FALSE);
       if (EFI_ERROR (Status)) {
         goto Done;
       }
@@ -1710,7 +1722,7 @@ UpdateVariable (
       // Perform garbage collection & reclaim operation.
       //
       Status = Reclaim (mVariableModuleGlobal->VariableGlobal.VolatileVariableBase, 
-                          &mVariableModuleGlobal->VolatileLastVariableOffset, TRUE, Variable->CurrPtr);
+                          &mVariableModuleGlobal->VolatileLastVariableOffset, TRUE, Variable->CurrPtr, FALSE);
       if (EFI_ERROR (Status)) {
         goto Done;
       }
@@ -1767,6 +1779,9 @@ UpdateVariable (
 
   if (!EFI_ERROR (Status)) {
     UpdateVariableInfo (VariableName, VendorGuid, Volatile, FALSE, TRUE, FALSE, FALSE);
+    if (!Volatile) {
+      FlushHobVariableToFlash (VariableName, VendorGuid);
+    }
   }
 
 Done:
@@ -2383,12 +2398,102 @@ ReclaimForOS(
             mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase,
             &mVariableModuleGlobal->NonVolatileLastVariableOffset,
             FALSE,
-            NULL
+            NULL,
+            FALSE
             );
     ASSERT_EFI_ERROR (Status);
   }
 }
 
+/**
+  Flush the HOB variable to flash.
+
+  @param[in] VariableName       Name of variable has been updated or deleted.
+  @param[in] VendorGuid         Guid of variable has been updated or deleted.
+
+**/
+VOID
+FlushHobVariableToFlash (
+  IN CHAR16                     *VariableName,
+  IN EFI_GUID                   *VendorGuid
+  )
+{
+  EFI_STATUS                    Status;
+  VARIABLE_STORE_HEADER         *VariableStoreHeader;
+  VARIABLE_HEADER               *Variable;
+  VOID                          *VariableData;
+  BOOLEAN                       ErrorFlag;
+
+  ErrorFlag = FALSE;
+
+  //
+  // Flush the HOB variable to flash.
+  //
+  if (mVariableModuleGlobal->VariableGlobal.HobVariableBase != 0) {
+    VariableStoreHeader = (VARIABLE_STORE_HEADER *) (UINTN) mVariableModuleGlobal->VariableGlobal.HobVariableBase;
+    //
+    // Set HobVariableBase to 0, it can avoid SetVariable to call back.
+    //
+    mVariableModuleGlobal->VariableGlobal.HobVariableBase = 0;
+    for ( Variable = GetStartPointer (VariableStoreHeader)
+        ; (Variable < GetEndPointer (VariableStoreHeader) && IsValidVariableHeader (Variable))
+        ; Variable = GetNextVariablePtr (Variable)
+        ) {
+      if (Variable->State != VAR_ADDED) {
+        //
+        // The HOB variable has been set to DELETED state in local.
+        //
+        continue;
+      }
+      ASSERT ((Variable->Attributes & EFI_VARIABLE_NON_VOLATILE) != 0);
+      if (VendorGuid == NULL || VariableName == NULL ||
+          !CompareGuid (VendorGuid, &Variable->VendorGuid) ||
+          StrCmp (VariableName, GetVariableNamePtr (Variable)) != 0) {
+        VariableData = GetVariableDataPtr (Variable);
+        Status = VariableServiceSetVariable (
+                   GetVariableNamePtr (Variable),
+                   &Variable->VendorGuid,
+                   Variable->Attributes,
+                   Variable->DataSize,
+                   VariableData
+                   );
+        DEBUG ((EFI_D_INFO, "Variable driver flush the HOB variable to flash: %g %s %r\n", &Variable->VendorGuid, GetVariableNamePtr (Variable), Status));
+      } else {
+        //
+        // The updated or deleted variable is matched with the HOB variable.
+        // Don't break here because we will try to set other HOB variables
+        // since this variable could be set successfully.
+        //
+        Status = EFI_SUCCESS;
+      }
+      if (!EFI_ERROR (Status)) {
+        //
+        // If set variable successful, or the updated or deleted variable is matched with the HOB variable,
+        // set the HOB variable to DELETED state in local.
+        //
+        DEBUG ((EFI_D_INFO, "Variable driver set the HOB variable to DELETED state in local: %g %s\n", &Variable->VendorGuid, GetVariableNamePtr (Variable)));
+        Variable->State &= VAR_DELETED;
+      } else {
+        ErrorFlag = TRUE;
+      }
+    }
+    if (ErrorFlag) {
+      //
+      // We still have HOB variable(s) not flushed in flash.
+      //
+      mVariableModuleGlobal->VariableGlobal.HobVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) VariableStoreHeader;
+    } else {
+      //
+      // All HOB variables have been flushed in flash.
+      //
+      DEBUG ((EFI_D_INFO, "Variable driver: all HOB variables have been flushed in flash.\n"));
+      if (!AtRuntime ()) {
+        FreePool ((VOID *) VariableStoreHeader);
+      }
+    }
+  }
+
+}
 
 /**
   Initializes variable write service after FVB was ready.
@@ -2407,8 +2512,6 @@ VariableWriteServiceInitialize (
   UINTN                           Index;
   UINT8                           Data;
   EFI_PHYSICAL_ADDRESS            VariableStoreBase;
-  VARIABLE_HEADER                 *Variable;
-  VOID                            *VariableData;
 
   VariableStoreBase   = mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase;
   VariableStoreHeader = (VARIABLE_STORE_HEADER *)(UINTN)VariableStoreBase;
@@ -2426,7 +2529,8 @@ VariableWriteServiceInitialize (
                  mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase,
                  &mVariableModuleGlobal->NonVolatileLastVariableOffset,
                  FALSE,
-                 NULL
+                 NULL,
+                 TRUE
                  );
       if (EFI_ERROR (Status)) {
         return Status;
@@ -2435,33 +2539,8 @@ VariableWriteServiceInitialize (
     }
   }
 
-  //
-  // Flush the HOB variable to flash and invalidate HOB variable.
-  //
-  if (mVariableModuleGlobal->VariableGlobal.HobVariableBase != 0) {
-    //
-    // Clear the HobVariableBase to avoid SetVariable() updating the variable in HOB
-    //
-    VariableStoreHeader = (VARIABLE_STORE_HEADER *) (UINTN) mVariableModuleGlobal->VariableGlobal.HobVariableBase;
-    mVariableModuleGlobal->VariableGlobal.HobVariableBase = 0;
+  FlushHobVariableToFlash (NULL, NULL);
 
-    for ( Variable = GetStartPointer (VariableStoreHeader)
-        ; (Variable < GetEndPointer (VariableStoreHeader) && IsValidVariableHeader (Variable))
-        ; Variable = GetNextVariablePtr (Variable)
-        ) {
-      ASSERT (Variable->State == VAR_ADDED);
-      ASSERT ((Variable->Attributes & EFI_VARIABLE_NON_VOLATILE) != 0);
-      VariableData = GetVariableDataPtr (Variable);
-      Status = VariableServiceSetVariable (
-                 GetVariableNamePtr (Variable),
-                 &Variable->VendorGuid,
-                 Variable->Attributes,
-                 Variable->DataSize,
-                 VariableData
-                 );
-      ASSERT_EFI_ERROR (Status);
-    }
-  }
   return EFI_SUCCESS;
 }
 
@@ -2513,8 +2592,12 @@ VariableCommonInitialize (
   GuidHob = GetFirstGuidHob (&gEfiVariableGuid);
   if (GuidHob != NULL) {
     VariableStoreHeader = GET_GUID_HOB_DATA (GuidHob);
+    VariableStoreLength = (UINT64) (GuidHob->Header.HobLength - sizeof (EFI_HOB_GUID_TYPE));
     if (GetVariableStoreStatus (VariableStoreHeader) == EfiValid) {
-      mVariableModuleGlobal->VariableGlobal.HobVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) VariableStoreHeader;
+      mVariableModuleGlobal->VariableGlobal.HobVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) AllocateRuntimeCopyPool ((UINTN) VariableStoreLength, (VOID *) VariableStoreHeader);
+      if (mVariableModuleGlobal->VariableGlobal.HobVariableBase == 0) {
+        return EFI_OUT_OF_RESOURCES;
+      }
     } else {
       DEBUG ((EFI_D_ERROR, "HOB Variable Store header is corrupted!\n"));
     }

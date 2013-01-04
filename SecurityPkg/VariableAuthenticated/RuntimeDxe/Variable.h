@@ -100,6 +100,19 @@ typedef struct {
 } VARIABLE_CACHE_ENTRY;
 
 /**
+  Flush the HOB variable to flash.
+
+  @param[in] VariableName       Name of variable has been updated or deleted.
+  @param[in] VendorGuid         Guid of variable has been updated or deleted.
+
+**/
+VOID
+FlushHobVariableToFlash (
+  IN CHAR16                     *VariableName,
+  IN EFI_GUID                   *VendorGuid
+  );
+
+/**
   Writes a buffer to variable storage space, in the working block.
 
   This function writes a buffer to variable storage space into a firmware
