@@ -524,7 +524,36 @@ TransferAtaDevice (
 
   Packet->Protocol = mAtaPassThruCmdProtocols[AtaDevice->UdmaValid][IsWrite];
   Packet->Length = EFI_ATA_PASS_THRU_LENGTH_SECTOR_COUNT;
-  Packet->Timeout  = ATA_TIMEOUT;
+  //
+  // |------------------------|-----------------|------------------------|-----------------|
+  // | ATA PIO Transfer Mode  |  Transfer Rate  | ATA DMA Transfer Mode  |  Transfer Rate  |
+  // |------------------------|-----------------|------------------------|-----------------|
+  // |       PIO Mode 0       |  3.3Mbytes/sec  | Single-word DMA Mode 0 |  2.1Mbytes/sec  |
+  // |------------------------|-----------------|------------------------|-----------------|
+  // |       PIO Mode 1       |  5.2Mbytes/sec  | Single-word DMA Mode 1 |  4.2Mbytes/sec  |
+  // |------------------------|-----------------|------------------------|-----------------|
+  // |       PIO Mode 2       |  8.3Mbytes/sec  | Single-word DMA Mode 2 |  8.4Mbytes/sec  |
+  // |------------------------|-----------------|------------------------|-----------------|
+  // |       PIO Mode 3       | 11.1Mbytes/sec  | Multi-word DMA Mode 0  |  4.2Mbytes/sec  |
+  // |------------------------|-----------------|------------------------|-----------------|
+  // |       PIO Mode 4       | 16.6Mbytes/sec  | Multi-word DMA Mode 1  | 13.3Mbytes/sec  |
+  // |------------------------|-----------------|------------------------|-----------------|
+  //
+  // As AtaBus is used to manage ATA devices, we have to use the lowest transfer rate to
+  // calculate the possible maximum timeout value for each read/write operation.
+  //
+  if (AtaDevice->UdmaValid) {
+    //
+    // Calculate the maximum timeout value for DMA read/write operation.
+    //
+    Packet->Timeout  = EFI_TIMER_PERIOD_SECONDS ((TransferLength * AtaDevice->BlockMedia.BlockSize) / 2100000 + 1);
+  } else {
+    //
+    // Calculate the maximum timeout value for PIO read/write operation
+    //
+    Packet->Timeout  = EFI_TIMER_PERIOD_SECONDS ((TransferLength * AtaDevice->BlockMedia.BlockSize) / 3300000 + 1);
+  }
+  
 
   return AtaDevicePassThru (AtaDevice, TaskPacket, Event);
 }
