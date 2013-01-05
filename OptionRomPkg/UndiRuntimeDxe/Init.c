@@ -1015,11 +1015,13 @@ InitializeUndi(
   EFI_EVENT     Event;
   EFI_STATUS    Status;
 
-  Status = EfiLibInstallDriverBinding (
+  Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
              &gUndiDriverBinding,
-             ImageHandle
+             ImageHandle,
+             &gUndiComponentName,
+             &gUndiComponentName2
              );
   ASSERT_EFI_ERROR (Status);
 
