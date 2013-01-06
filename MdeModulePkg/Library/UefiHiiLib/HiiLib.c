@@ -3123,6 +3123,7 @@ HiiCreateOneOfOpCode (
 {
   EFI_IFR_ONE_OF  OpCode;
   UINTN           Position;
+  UINTN           Length;
 
   ASSERT (OptionsOpCodeHandle != NULL);
   ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED | EFI_IFR_FLAG_OPTIONS_ONLY))) == 0);
@@ -3136,8 +3137,11 @@ HiiCreateOneOfOpCode (
   OpCode.Question.Flags                  = QuestionFlags;
   OpCode.Flags                           = OneOfFlags;
 
+  Length  = OFFSET_OF (EFI_IFR_ONE_OF, data);
+  Length += (1 << (OneOfFlags & EFI_IFR_NUMERIC_SIZE)) * 3;
+
   Position = InternalHiiOpCodeHandlePosition (OpCodeHandle);
-  InternalHiiCreateOpCodeExtended (OpCodeHandle, &OpCode, EFI_IFR_ONE_OF_OP, sizeof (OpCode), 0, 1);
+  InternalHiiCreateOpCodeExtended (OpCodeHandle, &OpCode, EFI_IFR_ONE_OF_OP, Length, 0, 1);
   InternalHiiAppendOpCodes (OpCodeHandle, OptionsOpCodeHandle);
   if (DefaultsOpCodeHandle != NULL) {
     InternalHiiAppendOpCodes (OpCodeHandle, DefaultsOpCodeHandle);
