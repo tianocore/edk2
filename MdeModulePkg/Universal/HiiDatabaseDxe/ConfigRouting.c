@@ -1,7 +1,7 @@
 /** @file
 Implementation of interfaces function for EFI_HII_CONFIG_ROUTING_PROTOCOL.
 
-Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1861,7 +1861,7 @@ ParseIfrData (
         // Prepare new DefaultValue
         //
         DefaultData.Type  = DefaultValueFromFlag;
-        CopyMem (&DefaultData.Value.u64, &IfrOneOfOption->Value.u64, sizeof (UINT64));
+        CopyMem (&DefaultData.Value, &IfrOneOfOption->Value, IfrOneOfOption->Header.Length - OFFSET_OF (EFI_IFR_ONE_OF_OPTION, Value));
         if ((IfrOneOfOption->Flags & EFI_IFR_OPTION_DEFAULT) == EFI_IFR_OPTION_DEFAULT) {
           DefaultData.DefaultId = EFI_HII_DEFAULT_CLASS_STANDARD;
           InsertDefaultValue (BlockData, &DefaultData);
@@ -1886,7 +1886,7 @@ ParseIfrData (
         // Prepare new DefaultValue
         //        
         DefaultData.Type        = DefaultValueFromDefault;
-        CopyMem (&DefaultData.Value.u64, &IfrOneOfOption->Value.u64, sizeof (UINT64));      
+        CopyMem (&DefaultData.Value, &IfrOneOfOption->Value, IfrOneOfOption->Header.Length - OFFSET_OF (EFI_IFR_ONE_OF_OPTION, Value));
         for (LinkData = DefaultIdArray->Entry.ForwardLink; LinkData != &DefaultIdArray->Entry; LinkData = LinkData->ForwardLink) {
           DefaultDataPtr = BASE_CR (LinkData, IFR_DEFAULT_DATA, Entry); 
           DefaultData.DefaultId   = DefaultDataPtr->DefaultId;
