@@ -1,7 +1,7 @@
 /** @file
   HII Library implementation that uses DXE protocols and services.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -2959,9 +2959,11 @@ HiiCreateNumericOpCode (
 {
   EFI_IFR_NUMERIC  OpCode;
   UINTN            Position;
+  UINTN            Length;
 
   ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED))) == 0);
 
+  Length  = 0;
   ZeroMem (&OpCode, sizeof (OpCode));
   OpCode.Question.QuestionId             = QuestionId;
   OpCode.Question.VarStoreId             = VarStoreId;
@@ -2976,33 +2978,39 @@ HiiCreateNumericOpCode (
     OpCode.data.u8.MinValue = (UINT8)Minimum;
     OpCode.data.u8.MaxValue = (UINT8)Maximum;
     OpCode.data.u8.Step     = (UINT8)Step;
+    Length                  = 3;
     break;
 
   case EFI_IFR_NUMERIC_SIZE_2:
     OpCode.data.u16.MinValue = (UINT16)Minimum;
     OpCode.data.u16.MaxValue = (UINT16)Maximum;
     OpCode.data.u16.Step     = (UINT16)Step;
+    Length                   = 6;
     break;
 
   case EFI_IFR_NUMERIC_SIZE_4:
     OpCode.data.u32.MinValue = (UINT32)Minimum;
     OpCode.data.u32.MaxValue = (UINT32)Maximum;
     OpCode.data.u32.Step     = (UINT32)Step;
+    Length                   = 12;
     break;
 
   case EFI_IFR_NUMERIC_SIZE_8:
     OpCode.data.u64.MinValue = Minimum;
     OpCode.data.u64.MaxValue = Maximum;
     OpCode.data.u64.Step     = Step;
+    Length                   = 24;
     break;
   }
 
+  Length += OFFSET_OF (EFI_IFR_NUMERIC, data);
+
   if (DefaultsOpCodeHandle == NULL) {
-    return InternalHiiCreateOpCode (OpCodeHandle, &OpCode, EFI_IFR_NUMERIC_OP, sizeof (OpCode));
+    return InternalHiiCreateOpCode (OpCodeHandle, &OpCode, EFI_IFR_NUMERIC_OP, Length);
   }
 
   Position = InternalHiiOpCodeHandlePosition (OpCodeHandle);
-  InternalHiiCreateOpCodeExtended (OpCodeHandle, &OpCode, EFI_IFR_NUMERIC_OP, sizeof (OpCode), 0, 1);
+  InternalHiiCreateOpCodeExtended (OpCodeHandle, &OpCode, EFI_IFR_NUMERIC_OP, Length, 0, 1);
   InternalHiiAppendOpCodes (OpCodeHandle, DefaultsOpCodeHandle);
   HiiCreateEndOpCode (OpCodeHandle);
   return InternalHiiOpCodeHandleBuffer (OpCodeHandle) + Position;
