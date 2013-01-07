@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -175,7 +175,7 @@ ASM_PFX(InternalAsmThunk16):
     andl    $0x7ffffffe, %eax           # clear PE, PG bits
     movl    %cr4, %ebp
     mov     %ebp, 0xfffffff1(%edx)
-    andl    $0x300, %ebp                # clear all but PCE and OSFXSR bits
+    andl    $0xffffffcf, %ebp           # clear PAE, PSE bits
     pushl   $0x10
     pop     %ecx                        # ecx <- selector for data segments
     lgdtl   0x20(%edx)
