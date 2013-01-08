@@ -1,7 +1,7 @@
 /** @file
   This module provide help function for displaying unicode string.
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -332,8 +332,9 @@ UefiLibGetStringWidth (
     //
     // Advance to the null-terminator or to the first width directive
     //
-    for (;(String[Index] != NARROW_CHAR) && (String[Index] != WIDE_CHAR) && (String[Index] != 0);
-         Index++, Count = Count + IncrementValue) {
+    for (;(String[Index] != NARROW_CHAR) && (String[Index] != WIDE_CHAR) && (String[Index] != 0); Index++) {
+      Count = Count + IncrementValue;
+
       if (LimitLen && Count > MaxWidth) {
         break;
       }
@@ -347,7 +348,7 @@ UefiLibGetStringWidth (
     }
 
     if (LimitLen && Count > MaxWidth) {
-      *Offset = Index - 1;
+      *Offset = Index;
       break;
     }
 
@@ -369,13 +370,6 @@ UefiLibGetStringWidth (
       IncrementValue = 2;
     }
   } while (String[Index] != 0);
-
-  //
-  // Increment by one to include the null-terminator in the size
-  //
-  if (!LimitLen) {
-    Count++;
-  }
 
   return Count * sizeof (CHAR16);
 }
@@ -420,6 +414,7 @@ CreatePopUp (
   UINTN                            Length;
   CHAR16                           *Line;
   UINTN                            EventIndex;
+  CHAR16                           *TmpString;
 
   //
   // Determine the length of the longest line in the popup and the the total 
@@ -520,10 +515,14 @@ CreatePopUp (
       // Length > MaxLength
       //
       UefiLibGetStringWidth (String, TRUE, MaxLength, &Length);
-      String[Length] = L'\0';
+      TmpString = AllocateZeroPool ((Length + 1) * sizeof (CHAR16));
+      ASSERT (TmpString != NULL);
+      StrnCpy(TmpString, String, Length - 3);
+      StrCat (TmpString, L"...");
 
       ConOut->SetCursorPosition (ConOut, Column + 1, Row++);
-      ConOut->OutputString (ConOut, String);
+      ConOut->OutputString (ConOut, TmpString);
+      FreePool (TmpString);
     }
     NumberOfLines--;
   }
