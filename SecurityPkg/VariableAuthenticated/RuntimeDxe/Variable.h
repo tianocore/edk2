@@ -2,7 +2,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by Variable modules.
 
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -364,6 +364,37 @@ GetFvbCountAndBuffer (
 EFI_STATUS
 VariableCommonInitialize (
   VOID
+  );
+
+/**
+
+  Variable store garbage collection and reclaim operation.
+
+  If ReclaimPubKeyStore is FALSE, reclaim variable space by deleting the obsoleted varaibles.
+  If ReclaimPubKeyStore is TRUE, reclaim invalid key in public key database and update the PubKeyIndex
+  for all the count-based authenticate variable in NV storage.
+
+  @param[in]   VariableBase            Base address of variable store.
+  @param[out]  LastVariableOffset      Offset of last variable.
+  @param[in]   IsVolatile              The variable store is volatile or not;
+                                       if it is non-volatile, need FTW.
+  @param[in]   UpdatingVariable        Pointer to updating variable.
+  @param[in]   ReclaimPubKeyStore      Reclaim for public key database or not.
+  @param[in]   ReclaimAnyway           If TRUE, do reclaim anyway.
+  
+  @return EFI_OUT_OF_RESOURCES         No enough memory resources.
+  @return EFI_SUCCESS                  Reclaim operation has finished successfully.
+  @return Others                       Unexpect error happened during reclaim operation.
+
+**/
+EFI_STATUS
+Reclaim (
+  IN  EFI_PHYSICAL_ADDRESS  VariableBase,
+  OUT UINTN                 *LastVariableOffset,
+  IN  BOOLEAN               IsVolatile,
+  IN  VARIABLE_HEADER       *UpdatingVariable,
+  IN  BOOLEAN               ReclaimPubKeyStore,
+  IN  BOOLEAN               ReclaimAnyway
   );
 
 /**

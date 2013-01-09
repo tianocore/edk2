@@ -16,7 +16,7 @@
   VariableServiceSetVariable() should also check authenticate data to avoid buffer overflow,
   integer overflow. It should also check attribute to avoid authentication bypass.
 
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -511,21 +511,157 @@ GetEndPointer (
   return (VARIABLE_HEADER *) HEADER_ALIGN ((UINTN) VarStoreHeader + VarStoreHeader->Size);
 }
 
+/**
+
+  Check the PubKeyIndex is a valid key or not.
+
+  This function will iterate the NV storage to see if this PubKeyIndex is still referenced 
+  by any valid count-based auth variabe.
+  
+  @param[in]  PubKeyIndex     Index of the public key in public key store.
+
+  @retval     TRUE            The PubKeyIndex is still in use.
+  @retval     FALSE           The PubKeyIndex is not referenced by any count-based auth variabe.
+  
+**/
+BOOLEAN
+IsValidPubKeyIndex (
+  IN   UINT32      PubKeyIndex
+  )
+{
+  VARIABLE_HEADER          *Variable;
+
+  if (PubKeyIndex > mPubKeyNumber) {
+    return FALSE;
+  }
+  
+  Variable = GetStartPointer (mNvVariableCache);
+  
+  while (IsValidVariableHeader (Variable)) {
+    if ((Variable->State == VAR_ADDED || Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) && 
+        Variable->PubKeyIndex == PubKeyIndex) {
+      return TRUE;
+    }
+    Variable = GetNextVariablePtr (Variable);
+  }
+  
+  return FALSE;
+}
+
+/**
+
+  Get the number of valid public key in PubKeyStore.
+  
+  @param[in]  PubKeyNumber     Number of the public key in public key store.
+
+  @return     Number of valid public key in PubKeyStore.
+
+**/
+UINT32
+GetValidPubKeyNumber (
+  IN   UINT32       PubKeyNumber
+  )
+{
+  UINT32       PubKeyIndex;
+  UINT32       Counter;
+
+  Counter = 0;
+  
+  for (PubKeyIndex = 1; PubKeyIndex <= PubKeyNumber; PubKeyIndex++) {
+    if (IsValidPubKeyIndex (PubKeyIndex)) {
+      Counter++;
+    }
+  }
+  
+  return Counter;
+}
+
+/**
+
+  Filter the useless key in public key store.
+
+  This function will find out all valid public keys in public key database, save them in new allocated 
+  buffer NewPubKeyStore, and give the new PubKeyIndex. The caller is responsible for freeing buffer
+  NewPubKeyIndex and NewPubKeyStore with FreePool().
+
+  @param[in]   PubKeyStore          Point to the public key database.
+  @param[in]   PubKeyNumber         Number of the public key in PubKeyStore.
+  @param[out]  NewPubKeyIndex       Point to an array of new PubKeyIndex corresponds to NewPubKeyStore.
+  @param[out]  NewPubKeyStore       Saved all valid public keys in PubKeyStore.
+  @param[out]  NewPubKeySize        Buffer size of the NewPubKeyStore.
+  
+  @retval  EFI_SUCCESS              Trim operation is complete successfully.
+  @retval  EFI_OUT_OF_RESOURCES     No enough memory resources, or no useless key in PubKeyStore.
+  
+**/
+EFI_STATUS
+PubKeyStoreFilter (
+  IN   UINT8         *PubKeyStore,
+  IN   UINT32        PubKeyNumber,
+  OUT  UINT32        **NewPubKeyIndex,
+  OUT  UINT8         **NewPubKeyStore,
+  OUT  UINT32        *NewPubKeySize
+  )
+{
+  UINT32        PubKeyIndex;
+  UINT32        CopiedKey;
+  UINT32        NewPubKeyNumber;
+  
+  NewPubKeyNumber = GetValidPubKeyNumber (PubKeyNumber);
+  if (NewPubKeyNumber == PubKeyNumber) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  if (NewPubKeyNumber != 0) {
+    *NewPubKeySize = NewPubKeyNumber * EFI_CERT_TYPE_RSA2048_SIZE;
+  } else {
+    *NewPubKeySize = sizeof (UINT8);
+  }
+
+  *NewPubKeyStore = AllocatePool (*NewPubKeySize);
+  if (*NewPubKeyStore == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  *NewPubKeyIndex = AllocateZeroPool ((PubKeyNumber + 1) * sizeof (UINT32));
+  if (*NewPubKeyIndex == NULL) {
+    FreePool (*NewPubKeyStore);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  CopiedKey = 0;
+  for (PubKeyIndex = 1; PubKeyIndex <= PubKeyNumber; PubKeyIndex++) {
+    if (IsValidPubKeyIndex (PubKeyIndex)) {
+      CopyMem (
+        *NewPubKeyStore + CopiedKey * EFI_CERT_TYPE_RSA2048_SIZE,
+        PubKeyStore + (PubKeyIndex - 1) * EFI_CERT_TYPE_RSA2048_SIZE,
+        EFI_CERT_TYPE_RSA2048_SIZE
+        );
+      (*NewPubKeyIndex)[PubKeyIndex] = ++CopiedKey;
+    }
+  }
+  return EFI_SUCCESS;
+}
 
 /**
 
   Variable store garbage collection and reclaim operation.
 
-  @param VariableBase            Base address of variable store.
-  @param LastVariableOffset      Offset of last variable.
-  @param IsVolatile              The variable store is volatile or not;
-                                 if it is non-volatile, need FTW.
-  @param UpdatingVariable        Pointer to updating variable.
-  @param ReclaimAnyway           If TRUE, do reclaim anyway.
+  If ReclaimPubKeyStore is FALSE, reclaim variable space by deleting the obsoleted varaibles.
+  If ReclaimPubKeyStore is TRUE, reclaim invalid key in public key database and update the PubKeyIndex
+  for all the count-based authenticate variable in NV storage.
 
-  @return EFI_OUT_OF_RESOURCES
-  @return EFI_SUCCESS
-  @return Others
+  @param[in]   VariableBase            Base address of variable store.
+  @param[out]  LastVariableOffset      Offset of last variable.
+  @param[in]   IsVolatile              The variable store is volatile or not;
+                                       if it is non-volatile, need FTW.
+  @param[in]   UpdatingVariable        Pointer to updating variable.
+  @param[in]   ReclaimPubKeyStore      Reclaim for public key database or not.
+  @param[in]   ReclaimAnyway           If TRUE, do reclaim anyway.
+  
+  @return EFI_OUT_OF_RESOURCES         No enough memory resources.
+  @return EFI_SUCCESS                  Reclaim operation has finished successfully.
+  @return Others                       Unexpect error happened during reclaim operation.
 
 **/
 EFI_STATUS
@@ -534,6 +670,7 @@ Reclaim (
   OUT UINTN                 *LastVariableOffset,
   IN  BOOLEAN               IsVolatile,
   IN  VARIABLE_HEADER       *UpdatingVariable,
+  IN  BOOLEAN               ReclaimPubKeyStore,
   IN  BOOLEAN               ReclaimAnyway
   )
 {
@@ -557,6 +694,10 @@ Reclaim (
   CHAR16                *UpdatingVariableNamePtr;
   UINTN                 CommonVariableTotalSize;
   UINTN                 HwErrVariableTotalSize;
+  UINT32                *NewPubKeyIndex;
+  UINT8                 *NewPubKeyStore;
+  UINT32                NewPubKeySize;
+  VARIABLE_HEADER       *PubKeyHeader;
   BOOLEAN               NeedDoReclaim;
 
   NeedDoReclaim = FALSE;
@@ -564,7 +705,11 @@ Reclaim (
 
   CommonVariableTotalSize = 0;
   HwErrVariableTotalSize  = 0;
-
+  NewPubKeyIndex = NULL;
+  NewPubKeyStore = NULL;
+  NewPubKeySize  = 0;
+  PubKeyHeader   = NULL;
+  
   //
   // Start Pointers for the variable.
   //
@@ -608,95 +753,42 @@ Reclaim (
   CopyMem (ValidBuffer, VariableStoreHeader, sizeof (VARIABLE_STORE_HEADER));
   CurrPtr = (UINT8 *) GetStartPointer ((VARIABLE_STORE_HEADER *) ValidBuffer);
 
-  //
-  // Reinstall all ADDED variables as long as they are not identical to Updating Variable.
-  //
-  Variable = GetStartPointer (VariableStoreHeader);
-  while (IsValidVariableHeader (Variable)) {
-    NextVariable = GetNextVariablePtr (Variable);
-    if (Variable->State == VAR_ADDED) {
-      if (UpdatingVariable != NULL) {
-        if (UpdatingVariable == Variable) {
+  if (ReclaimPubKeyStore) {
+    //
+    // Trim the PubKeyStore and get new PubKeyIndex.
+    //
+    Status = PubKeyStoreFilter (
+               mPubKeyStore,
+               mPubKeyNumber,
+               &NewPubKeyIndex,
+               &NewPubKeyStore,
+               &NewPubKeySize
+               );
+    if (EFI_ERROR (Status)) {
+      FreePool (ValidBuffer);
+      return Status;
+    }
+
+    //
+    // Refresh the PubKeyIndex for all valid variables (ADDED and IN_DELETED_TRANSITION).
+    //
+    Variable = GetStartPointer (mNvVariableCache);
+    while (IsValidVariableHeader (Variable)) {
+      NextVariable = GetNextVariablePtr (Variable);
+      if (Variable->State == VAR_ADDED || Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
+        if ((StrCmp (GetVariableNamePtr (Variable), AUTHVAR_KEYDB_NAME) == 0) && 
+            (CompareGuid (&Variable->VendorGuid, &gEfiAuthenticatedVariableGuid))) {
+          //
+          // Skip the public key database, it will be reinstalled later.
+          //
+          PubKeyHeader = Variable;
           Variable = NextVariable;
           continue;
         }
-
-        VariableNameSize         = NameSizeOfVariable(Variable);
-        UpdatingVariableNameSize = NameSizeOfVariable(UpdatingVariable);
-
-        VariableNamePtr         = GetVariableNamePtr (Variable);
-        UpdatingVariableNamePtr = GetVariableNamePtr (UpdatingVariable);
-        if (CompareGuid (&Variable->VendorGuid, &UpdatingVariable->VendorGuid)    &&
-            VariableNameSize == UpdatingVariableNameSize &&
-            CompareMem (VariableNamePtr, UpdatingVariableNamePtr, VariableNameSize) == 0 ) {
-          Variable = NextVariable;
-          continue;
-        }
-      }
-      VariableSize = (UINTN) NextVariable - (UINTN) Variable;
-      CopyMem (CurrPtr, (UINT8 *) Variable, VariableSize);
-      CurrPtr += VariableSize;
-      if ((!IsVolatile) && ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
-        HwErrVariableTotalSize += VariableSize;
-      } else if ((!IsVolatile) && ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
-        CommonVariableTotalSize += VariableSize;
-      }
-    }
-    Variable = NextVariable;
-  }
-
-  //
-  // Reinstall the variable being updated if it is not NULL.
-  //
-  if (UpdatingVariable != NULL) {
-    VariableSize = (UINTN)(GetNextVariablePtr (UpdatingVariable)) - (UINTN)UpdatingVariable;
-    CopyMem (CurrPtr, (UINT8 *) UpdatingVariable, VariableSize);
-    CurrPtr += VariableSize;
-    if ((!IsVolatile) && ((UpdatingVariable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
-        HwErrVariableTotalSize += VariableSize;
-    } else if ((!IsVolatile) && ((UpdatingVariable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
-        CommonVariableTotalSize += VariableSize;
-    }
-  }
-
-  //
-  // Reinstall all in delete transition variables.
-  //
-  Variable      = GetStartPointer (VariableStoreHeader);
-  while (IsValidVariableHeader (Variable)) {
-    NextVariable = GetNextVariablePtr (Variable);
-    if (Variable != UpdatingVariable && Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
-
-      //
-      // Buffer has cached all ADDED variable.
-      // Per IN_DELETED variable, we have to guarantee that
-      // no ADDED one in previous buffer.
-      //
-
-      FoundAdded = FALSE;
-      AddedVariable = GetStartPointer ((VARIABLE_STORE_HEADER *) ValidBuffer);
-      while (IsValidVariableHeader (AddedVariable)) {
-        NextAddedVariable = GetNextVariablePtr (AddedVariable);
-        NameSize = NameSizeOfVariable (AddedVariable);
-        if (CompareGuid (&AddedVariable->VendorGuid, &Variable->VendorGuid) &&
-            NameSize == NameSizeOfVariable (Variable)
-           ) {
-          Point0 = (VOID *) GetVariableNamePtr (AddedVariable);
-          Point1 = (VOID *) GetVariableNamePtr (Variable);
-          if (CompareMem (Point0, Point1, NameSizeOfVariable (AddedVariable)) == 0) {
-            FoundAdded = TRUE;
-            break;
-          }
-        }
-        AddedVariable = NextAddedVariable;
-      }
-      if (!FoundAdded) {
-        //
-        // Promote VAR_IN_DELETED_TRANSITION to VAR_ADDED.
-        //
+        
         VariableSize = (UINTN) NextVariable - (UINTN) Variable;
         CopyMem (CurrPtr, (UINT8 *) Variable, VariableSize);
-        ((VARIABLE_HEADER *) CurrPtr)->State = VAR_ADDED;
+        ((VARIABLE_HEADER*) CurrPtr)->PubKeyIndex = NewPubKeyIndex[Variable->PubKeyIndex];
         CurrPtr += VariableSize;
         if ((!IsVolatile) && ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
           HwErrVariableTotalSize += VariableSize;
@@ -704,9 +796,120 @@ Reclaim (
           CommonVariableTotalSize += VariableSize;
         }
       }
+      Variable = NextVariable;
     }
 
-    Variable = NextVariable;
+    //
+    // Reinstall the new public key database.
+    //
+    CopyMem (CurrPtr, (UINT8*) PubKeyHeader, sizeof (VARIABLE_HEADER));
+    Variable = (VARIABLE_HEADER*) CurrPtr;
+    Variable->DataSize = NewPubKeySize;
+    StrCpy (GetVariableNamePtr (Variable), GetVariableNamePtr (PubKeyHeader));
+    CopyMem (GetVariableDataPtr (Variable), NewPubKeyStore, NewPubKeySize);
+    CurrPtr = (UINT8*) GetNextVariablePtr (Variable); 
+    CommonVariableTotalSize += (UINTN) CurrPtr - (UINTN) Variable;
+  } else {
+    //
+    // Reinstall all ADDED variables as long as they are not identical to Updating Variable.
+    //
+    Variable = GetStartPointer (VariableStoreHeader);
+    while (IsValidVariableHeader (Variable)) {
+      NextVariable = GetNextVariablePtr (Variable);
+      if (Variable->State == VAR_ADDED) {
+        if (UpdatingVariable != NULL) {
+          if (UpdatingVariable == Variable) {
+            Variable = NextVariable;
+            continue;
+          }
+
+          VariableNameSize         = NameSizeOfVariable(Variable);
+          UpdatingVariableNameSize = NameSizeOfVariable(UpdatingVariable);
+
+          VariableNamePtr         = GetVariableNamePtr (Variable);
+          UpdatingVariableNamePtr = GetVariableNamePtr (UpdatingVariable);
+          if (CompareGuid (&Variable->VendorGuid, &UpdatingVariable->VendorGuid)    &&
+              VariableNameSize == UpdatingVariableNameSize &&
+              CompareMem (VariableNamePtr, UpdatingVariableNamePtr, VariableNameSize) == 0 ) {
+            Variable = NextVariable;
+            continue;
+          }
+        }
+        VariableSize = (UINTN) NextVariable - (UINTN) Variable;
+        CopyMem (CurrPtr, (UINT8 *) Variable, VariableSize);
+        CurrPtr += VariableSize;
+        if ((!IsVolatile) && ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
+          HwErrVariableTotalSize += VariableSize;
+        } else if ((!IsVolatile) && ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
+          CommonVariableTotalSize += VariableSize;
+        }
+      }
+      Variable = NextVariable;
+    }
+
+    //
+    // Reinstall the variable being updated if it is not NULL.
+    //
+    if (UpdatingVariable != NULL) {
+      VariableSize = (UINTN)(GetNextVariablePtr (UpdatingVariable)) - (UINTN)UpdatingVariable;
+      CopyMem (CurrPtr, (UINT8 *) UpdatingVariable, VariableSize);
+      CurrPtr += VariableSize;
+      if ((!IsVolatile) && ((UpdatingVariable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
+          HwErrVariableTotalSize += VariableSize;
+      } else if ((!IsVolatile) && ((UpdatingVariable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
+          CommonVariableTotalSize += VariableSize;
+      }
+    }
+
+    //
+    // Reinstall all in delete transition variables.
+    //
+    Variable      = GetStartPointer (VariableStoreHeader);
+    while (IsValidVariableHeader (Variable)) {
+      NextVariable = GetNextVariablePtr (Variable);
+      if (Variable != UpdatingVariable && Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
+
+        //
+        // Buffer has cached all ADDED variable.
+        // Per IN_DELETED variable, we have to guarantee that
+        // no ADDED one in previous buffer.
+        //
+
+        FoundAdded = FALSE;
+        AddedVariable = GetStartPointer ((VARIABLE_STORE_HEADER *) ValidBuffer);
+        while (IsValidVariableHeader (AddedVariable)) {
+          NextAddedVariable = GetNextVariablePtr (AddedVariable);
+          NameSize = NameSizeOfVariable (AddedVariable);
+          if (CompareGuid (&AddedVariable->VendorGuid, &Variable->VendorGuid) &&
+              NameSize == NameSizeOfVariable (Variable)
+             ) {
+            Point0 = (VOID *) GetVariableNamePtr (AddedVariable);
+            Point1 = (VOID *) GetVariableNamePtr (Variable);
+            if (CompareMem (Point0, Point1, NameSizeOfVariable (AddedVariable)) == 0) {
+              FoundAdded = TRUE;
+              break;
+            }
+          }
+          AddedVariable = NextAddedVariable;
+        }
+        if (!FoundAdded) {
+          //
+          // Promote VAR_IN_DELETED_TRANSITION to VAR_ADDED.
+          //
+          VariableSize = (UINTN) NextVariable - (UINTN) Variable;
+          CopyMem (CurrPtr, (UINT8 *) Variable, VariableSize);
+          ((VARIABLE_HEADER *) CurrPtr)->State = VAR_ADDED;
+          CurrPtr += VariableSize;
+          if ((!IsVolatile) && ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
+            HwErrVariableTotalSize += VariableSize;
+          } else if ((!IsVolatile) && ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
+            CommonVariableTotalSize += VariableSize;
+          }
+        }
+      }
+
+      Variable = NextVariable;
+    }
   }
 
   if (IsVolatile) {
@@ -748,6 +951,14 @@ Reclaim (
     *LastVariableOffset = (UINTN) NextVariable - (UINTN) VariableBase;
   }
 
+  if (NewPubKeyStore != NULL) {
+    FreePool (NewPubKeyStore);
+  }
+
+  if (NewPubKeyIndex != NULL) {
+    FreePool (NewPubKeyIndex);
+  }
+  
   FreePool (ValidBuffer);
 
   return Status;
@@ -1744,8 +1955,14 @@ UpdateVariable (
       //
       // Perform garbage collection & reclaim operation.
       //
-      Status = Reclaim (mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase,
-                        &mVariableModuleGlobal->NonVolatileLastVariableOffset, FALSE, Variable->CurrPtr, FALSE);
+      Status = Reclaim (
+                 mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase,
+                 &mVariableModuleGlobal->NonVolatileLastVariableOffset,
+                 FALSE,
+                 Variable->CurrPtr,
+                 FALSE,
+                 FALSE
+                 );
       if (EFI_ERROR (Status)) {
         goto Done;
       }
@@ -1859,8 +2076,14 @@ UpdateVariable (
       //
       // Perform garbage collection & reclaim operation.
       //
-      Status = Reclaim (mVariableModuleGlobal->VariableGlobal.VolatileVariableBase,
-                          &mVariableModuleGlobal->VolatileLastVariableOffset, TRUE, Variable->CurrPtr, FALSE);
+      Status = Reclaim (
+                 mVariableModuleGlobal->VariableGlobal.VolatileVariableBase,
+                 &mVariableModuleGlobal->VolatileLastVariableOffset,
+                 TRUE,
+                 Variable->CurrPtr,
+                 FALSE,
+                 FALSE
+                 );
       if (EFI_ERROR (Status)) {
         goto Done;
       }
@@ -2629,6 +2852,7 @@ ReclaimForOS(
             &mVariableModuleGlobal->NonVolatileLastVariableOffset,
             FALSE,
             NULL,
+            FALSE,
             FALSE
             );
     ASSERT_EFI_ERROR (Status);
@@ -2760,6 +2984,7 @@ VariableWriteServiceInitialize (
                  &mVariableModuleGlobal->NonVolatileLastVariableOffset,
                  FALSE,
                  NULL,
+                 FALSE,
                  TRUE
                  );
       if (EFI_ERROR (Status)) {
