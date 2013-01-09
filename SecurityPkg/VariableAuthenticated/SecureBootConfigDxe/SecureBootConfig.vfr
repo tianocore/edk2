@@ -1,7 +1,7 @@
 /** @file
   VFR file used by the SecureBoot configuration component.
 
-Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -32,7 +32,12 @@ formset
     title = STRING_TOKEN(STR_SECUREBOOT_TITLE);
 
     subtitle text = STRING_TOKEN(STR_NULL);
-    
+
+    text
+      help   = STRING_TOKEN(STR_SECURE_BOOT_STATE_HELP),
+      text   = STRING_TOKEN(STR_SECURE_BOOT_STATE_PROMPT),
+        text   = STRING_TOKEN(STR_SECURE_BOOT_STATE_CONTENT);
+        
     //
     // Define of Check Box: Attempt Secure Boot
     //
@@ -47,7 +52,7 @@ formset
     // Display of Check Box: Attempt Secure Boot
     //
     grayoutif ideqval SECUREBOOT_CONFIGURATION.HideSecureBoot == 1;
-    checkbox varid = SECUREBOOT_CONFIGURATION.SecureBootState,
+    checkbox varid = SECUREBOOT_CONFIGURATION.AttemptSecureBoot,
           questionid = KEY_SECURE_BOOT_ENABLE,
           prompt = STRING_TOKEN(STR_SECURE_BOOT_PROMPT),
           help   = STRING_TOKEN(STR_SECURE_BOOT_HELP),

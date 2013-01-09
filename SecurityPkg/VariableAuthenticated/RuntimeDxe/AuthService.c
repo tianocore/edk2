@@ -356,30 +356,23 @@ AutenticatedVariableServiceInitialize (
   DEBUG ((EFI_D_INFO, "Variable %s is %x\n", EFI_SECURE_BOOT_ENABLE_NAME, SecureBootEnable));
 
   //
-  // Check "CustomMode" variable's existence.
+  // Initialize "CustomMode" in STANDARD_SECURE_BOOT_MODE state.
   //
   FindVariable (EFI_CUSTOM_MODE_NAME, &gEfiCustomModeEnableGuid, &Variable, &mVariableModuleGlobal->VariableGlobal, FALSE);
-  if (Variable.CurrPtr != NULL) {
-    CustomMode = *(GetVariableDataPtr (Variable.CurrPtr));
-  } else {
-    //
-    // "CustomMode" not exist, initialize it in STANDARD_SECURE_BOOT_MODE.
-    //
-    CustomMode = STANDARD_SECURE_BOOT_MODE;
-    Status = UpdateVariable (
-               EFI_CUSTOM_MODE_NAME,
-               &gEfiCustomModeEnableGuid,
-               &CustomMode,
-               sizeof (UINT8),
-               EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-               0,
-               0,
-               &Variable,
-               NULL
-               );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+  CustomMode = STANDARD_SECURE_BOOT_MODE;
+  Status = UpdateVariable (
+             EFI_CUSTOM_MODE_NAME,
+             &gEfiCustomModeEnableGuid,
+             &CustomMode,
+             sizeof (UINT8),
+             EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+             0,
+             0,
+             &Variable,
+             NULL
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
   
   DEBUG ((EFI_D_INFO, "Variable %s is %x\n", EFI_CUSTOM_MODE_NAME, CustomMode));
