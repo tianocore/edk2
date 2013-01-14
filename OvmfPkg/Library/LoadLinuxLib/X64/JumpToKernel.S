@@ -23,8 +23,47 @@ ASM_GLOBAL ASM_PFX(JumpToKernel)
 #   );
 #------------------------------------------------------------------------------
 ASM_PFX(JumpToKernel):
+
+    // Set up for executing kernel. BP in %esi, entry point on the stack
+    // (64-bit when the 'ret' will use it as 32-bit, but we're little-endian)
     movq    %rdx, %rsi
-    addq    $0x200, %rcx
-    callq   %rcx
+    pushq   %rcx
+
+    // Jump into the compatibility mode CS
+    pushq   $0x10
+    leaq    1f, %rax
+    pushq   %rax
+    retfq
+
+1:  // Now in compatibility mode
+.code32
+    movl    $0x18, %eax
+    movl    %eax, %ds
+    movl    %eax, %es
+    movl    %eax, %fs
+    movl    %eax, %gs
+    movl    %eax, %ss
+
+    // Disable paging
+    movl    %cr0, %eax
+    btcl    $31, %eax
+    movl    %eax, %cr0
+
+    // Disable long mode in EFER
+    movl    $0x0c0000080, %ecx
+    rdmsr
+    btcl    $8, %eax
+    wrmsr
+
+    // Disable PAE
+    movl    %cr4, %eax
+    btcl    $5, %eax
+    movl    %eax, %cr4
+
+    // Zero registers and 'return' to kernel
+    xorl    %ebp, %ebp
+    xorl    %edi, %edi
+    xorl    %ebx, %ebx
     ret
+.code64
 
