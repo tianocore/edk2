@@ -1,7 +1,7 @@
 /** @file
   Interpret and execute the S3 data in S3 boot script. 
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -1176,7 +1176,7 @@ BootScriptExecuteMemPoll (
   }
 
   for (LoopTimes = 0; LoopTimes < MemPoll.LoopTimes; LoopTimes++) {
-    NanoSecondDelay ((UINTN)MemPoll.Duration);
+    MicroSecondDelay ((UINTN)MemPoll.Duration);
 
     Data = 0;
     Status = ScriptMemoryRead (

@@ -1,7 +1,7 @@
 /** @file
   Implementation for S3 SMM Boot Script Saver state driver.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -343,16 +343,33 @@ BootScriptWriteMemPoll (
   VOID                      *Data;                                       
   VOID                      *DataMask;                                   
   UINTN                      Delay;                                       
-                                                                         
+  UINTN                      LoopTimes;
+  UINT32                     Remainder;
+
   Width    = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);                  
   Address  = VA_ARG (Marker, UINT64);                                    
   Data     = VA_ARG (Marker, VOID *);                                    
   DataMask = VA_ARG (Marker, VOID *);                                    
   Delay    = (UINTN)VA_ARG (Marker, UINT64);                            
   //
-  // According to the spec, the interval between 2 pools is 100ns
-  //                                                                       
-  return S3BootScriptSaveMemPoll (Width, Address, DataMask, Data, 100, Delay); 
+  // According to the spec, the interval between 2 polls is 100ns,
+  // but the unit of Duration for S3BootScriptSaveMemPoll() is microsecond(1000ns).
+  // Duration * 1000ns * LoopTimes = Delay * 100ns
+  // Duration will be minimum 1(microsecond) to be minimum deviation,
+  // so LoopTimes = Delay / 10.
+  //
+  LoopTimes = DivU64x32Remainder (
+                Delay,
+                10,
+                &Remainder
+                );
+  if (Remainder != 0) {
+    //
+    // If Remainder is not zero, LoopTimes will be rounded up by 1.
+    //
+    LoopTimes +=1;
+  }
+  return S3BootScriptSaveMemPoll (Width, Address, DataMask, Data, 1, LoopTimes); 
 
 }
 
