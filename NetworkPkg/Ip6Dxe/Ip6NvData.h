@@ -1,7 +1,7 @@
 /** @file
   NVData structure used by the IP6 configuration component.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -43,7 +43,7 @@
 
 #define INTERFACE_ID_STR_MIN_SIZE 1
 #define INTERFACE_ID_STR_MAX_SIZE 23
-#define INTERFACE_ID_STR_STORAGE  24
+#define INTERFACE_ID_STR_STORAGE  25
 #define IP6_STR_MAX_SIZE          40
 #define ADDRESS_STR_MIN_SIZE      2
 #define ADDRESS_STR_MAX_SIZE      255
