@@ -263,8 +263,10 @@ IIO_GetOutputSize (
     @param[in]      EndXY     Pointer to the ending coordinate pair.
 
     @return   Returns the difference between the starting and ending coordinates.
+              The return value is positive if the coordinates contained in EndXY
+              are larger than StartXY, otherwise the return value is negative.
 **/
-UINT32
+int
 EFIAPI
 IIO_CursorDelta (
   cIIO         *This,
@@ -272,17 +274,15 @@ IIO_CursorDelta (
   CURSOR_XY    *EndXY
 )
 {
-  INT32    ColumnDelta;
-  INT32    RowDelta;
+  int    ColumnDelta;
+  int    RowDelta;
 
   RowDelta = (int)EndXY->Row - (int)StartXY->Row;
 
   assert(RowDelta >= 0);    // assert if EndXY is NOT after StartXY
 
-  ColumnDelta = (INT32)((This->MaxColumn * RowDelta) + EndXY->Column);
-  ColumnDelta -= (INT32)StartXY->Column;
+  ColumnDelta = (int)((This->MaxColumn * RowDelta) + EndXY->Column);
+  ColumnDelta -= (int)StartXY->Column;
 
-  assert(ColumnDelta >= 0); // assert if EndXY is NOT after StartXY
-
-  return (UINT32)ColumnDelta;
+  return ColumnDelta;
 }

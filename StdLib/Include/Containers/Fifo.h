@@ -151,8 +151,10 @@ typedef size_t     (EFIAPI *cFIFO_Flush)   (cFIFO *Self, size_t NumToFlush);
 /** Remove the most recent element from the FIFO.
 
     @param[in]    Self              Pointer to the FIFO instance.
+
+    @return     Returns the number of elements remaining in the FIFO.
 **/
-typedef void        (EFIAPI *cFIFO_Truncate)  (cFIFO *Self);
+typedef size_t        (EFIAPI *cFIFO_Truncate)  (cFIFO *Self);
 
 /** Cleanly delete a FIFO instance.
 
