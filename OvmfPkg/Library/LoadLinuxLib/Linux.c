@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -60,7 +60,8 @@ LoadLinuxCheckKernelSetup (
 
   if ((Bp->hdr.signature != 0xAA55) || // Check boot sector signature
       (Bp->hdr.header != SETUP_HDR) ||
-      (Bp->hdr.version < 0x205)        // We only support relocatable kernels
+      (Bp->hdr.version < 0x205) || // We only support relocatable kernels
+      (!Bp->hdr.relocatable_kernel)
      ) {
     return EFI_UNSUPPORTED;
   } else {
@@ -606,7 +607,7 @@ LoadLinux (
 
   Bp = (struct boot_params *) KernelSetup;
 
-  if (Bp->hdr.version < 0x205) {
+  if (Bp->hdr.version < 0x205 || !Bp->hdr.relocatable_kernel) {
     //
     // We only support relocatable kernels
     //
