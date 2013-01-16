@@ -1,5 +1,3 @@
-StdLib Issues
-=============
   Status Key:
     Open          Problem is unresolved and final disposition unknown.
     Verified      Problem has been reproduced.
@@ -7,12 +5,19 @@ StdLib Issues
     Document      Problem is to be fixed through improved documentation.
     Fixed         Problem has been resolved and changes committed.
 
+SocketLib
+=============
+      Category                             TOOLs       Reported       Status
+    ------------------------              --------  --------------  -----------
+
+StdLib Issues
+=============
       Category                             TOOLs       Reported       Status
     ------------------------              --------  --------------  -----------
 1:  Compilation Error                      vs2010             2012  Understood
     stdlib\libc\gdtoa\strtod.c(825) : warning C4789: destination of memory copy is too small
 
-2:  Compilation Error                       ALL               2012  Understood
+2:  Compilation Error                       ALL               2012  Fixed 1/2012
     StdLib/LibC/Uefi/SysCalls.c: In function 'utimes': error: 'va_start' used in function with fixed args
 
 3:  Usage Clarification                                       2012  Understood/Document
@@ -29,12 +34,21 @@ StdLib Issues
 6:  Application error return                                  2012  Verified
     On error, applications will sometimes return large positive numbers.
 
-7:  Compilation Error                       GCC46        Jan, 2013  Open
+7:  Compilation Error                       GCC46        Jan, 2013  Fixed 1/2013
     StdLib/LibC/Containers/Queues/Fifo.c:508:27: error: assignment from incompatible pointer type
 
-8:  chdir/cwd not in EFI Shell                                2012  Understood
+8:  Compilation Error
+    StdLib\LibC\Uefi\InteractiveIO\IIOutilities.c        Jan. 2013  Fixed 1/2013
+    IIO_CursorDelta: Declaration return type differs from definition return type.
+
+9:  chdir/cwd not in EFI Shell                                2012  Understood
     The chdir and getcwd functions only work if one is using the UEFI Shell.
 
-9:  No current volume/directory at app. startup.              2012  Understood
+10: No current volume/directory at app. startup.              2012  Understood
     If the Shell does not have a current volume or directory, file operations
     may hang or fail.
+
+PosixLib
+=============
+      Category                             TOOLs       Reported       Status
+    ------------------------              --------  --------------  -----------
