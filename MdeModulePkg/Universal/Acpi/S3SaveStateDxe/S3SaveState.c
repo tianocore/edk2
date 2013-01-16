@@ -359,7 +359,7 @@ BootScriptWriteMemPoll (
   // Duration will be minimum 1(microsecond) to be minimum deviation,
   // so LoopTimes = Delay / 10.
   //
-  LoopTimes = DivU64x32Remainder (
+  LoopTimes = (UINTN) DivU64x32Remainder (
                 Delay,
                 10,
                 &Remainder
