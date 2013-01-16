@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 ;
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
@@ -67,5 +67,29 @@ JumpToKernel PROC
     DB 0c3h                            ; ret
 
 JumpToKernel ENDP
+
+;------------------------------------------------------------------------------
+; VOID
+; EFIAPI
+; JumpToUefiKernel (
+;   EFI_HANDLE ImageHandle,        // rcx
+;   EFI_SYSTEM_TABLE *SystemTable, // rdx
+;   VOID *KernelBootParams         // r8
+;   VOID *KernelStart,             // r9
+;   );
+;------------------------------------------------------------------------------
+JumpToUefiKernel PROC
+
+    mov     rdi, rcx
+    mov     rsi, rdx
+    mov     rdx, r8
+    xor     rax, rax
+    mov     eax, [r8 + 264h]
+    add     r9, rax
+    add     r9, 200h
+    call    r9
+    ret
+
+JumpToUefiKernel ENDP
 
 END
