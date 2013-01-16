@@ -32,7 +32,6 @@
   @retval  Other     An error occurred.
 ***/
 int
-EFIAPI
 main (
   IN int Argc,
   IN char **Argv
