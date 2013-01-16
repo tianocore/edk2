@@ -1,0 +1,40 @@
+StdLib Issues
+=============
+  Status Key:
+    Open          Problem is unresolved and final disposition unknown.
+    Verified      Problem has been reproduced.
+    Understood    Root cause of problem is understood.
+    Document      Problem is to be fixed through improved documentation.
+    Fixed         Problem has been resolved and changes committed.
+
+      Category                             TOOLs       Reported       Status
+    ------------------------              --------  --------------  -----------
+1:  Compilation Error                      vs2010             2012  Understood
+    stdlib\libc\gdtoa\strtod.c(825) : warning C4789: destination of memory copy is too small
+
+2:  Compilation Error                       ALL               2012  Understood
+    StdLib/LibC/Uefi/SysCalls.c: In function 'utimes': error: 'va_start' used in function with fixed args
+
+3:  Usage Clarification                                       2012  Understood/Document
+    Clarify that the current StdLib may not be used for developing drivers.
+
+4:  Execution/Compile errors                                  2012  Understood
+    Mismatch in use of EFIAPI between declaration and definition of some functions.
+
+5:  Error message Quality during execution                    2012  Verified
+    Performing filesystem operations when a filesystem driver has not been
+    linked into the application results in hangs or error messages that are
+    misleading or unclear as to the cause.
+
+6:  Application error return                                  2012  Verified
+    On error, applications will sometimes return large positive numbers.
+
+7:  Compilation Error                       GCC46        Jan, 2013  Open
+    StdLib/LibC/Containers/Queues/Fifo.c:508:27: error: assignment from incompatible pointer type
+
+8:  chdir/cwd not in EFI Shell                                2012  Understood
+    The chdir and getcwd functions only work if one is using the UEFI Shell.
+
+9:  No current volume/directory at app. startup.              2012  Understood
+    If the Shell does not have a current volume or directory, file operations
+    may hang or fail.
