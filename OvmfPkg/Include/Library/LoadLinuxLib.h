@@ -1,7 +1,7 @@
 /** @file
   Load/boot UEFI Linux.
 
-  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -93,6 +93,26 @@ LoadLinuxAllocateKernelSetupPages (
   IN UINTN                  Pages
   );
 
+
+/**
+  Clears the uninitialised space before and after the struct setup_header
+  in the kernel setup image. The kernel requires that these be zeroed
+  unless explicitly initialised, so this function should be called after
+  the setup_header has been copied in from a bzImage, before setting up
+  anything else.
+
+  @param[in]     KernelSetup - The kernel setup image
+
+  @retval    EFI_SUCCESS - The Linux kernel setup was successfully initialized
+  @retval    EFI_INVALID_PARAMETER - KernelSetup was NULL
+  @retval    EFI_UNSUPPORTED - The Linux kernel is not supported
+
+**/
+EFI_STATUS
+EFIAPI
+LoadLinuxInitializeKernelSetup (
+  IN VOID        *KernelSetup
+  );
 
 /**
   Allocates pages for the kernel.

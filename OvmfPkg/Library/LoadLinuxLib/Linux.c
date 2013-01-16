@@ -119,6 +119,34 @@ LoadLinuxAllocateKernelSetupPages (
   }
 }
 
+EFI_STATUS
+EFIAPI
+LoadLinuxInitializeKernelSetup (
+  IN VOID        *KernelSetup
+  )
+{
+  EFI_STATUS                Status;
+  UINTN                     SetupEnd;
+  struct boot_params        *Bp;
+
+  Status = BasicKernelSetupCheck (KernelSetup);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Bp = (struct boot_params*) KernelSetup;
+
+  SetupEnd = 0x202 + (Bp->hdr.jump & 0xff);
+
+  //
+  // Clear all but the setup_header
+  //
+  ZeroMem (KernelSetup, 0x1f1);
+  ZeroMem (((UINT8 *)KernelSetup) + SetupEnd, 4096 - SetupEnd);
+  DEBUG ((EFI_D_INFO, "Cleared kernel setup 0-0x1f1, 0x%x-0x1000\n", SetupEnd));
+
+  return EFI_SUCCESS;
+}
 
 VOID*
 EFIAPI
