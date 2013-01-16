@@ -58,15 +58,20 @@ case `uname` in
     echo Cygwin not fully supported yet.
     ;;
   Darwin*)
-      Major=$(uname -r | cut -f 1 -d '.')
-      if [[ $Major == 9 ]]
-      then
+    Major=$(uname -r | cut -f 1 -d '.')
+    case $Major in
+      10)
+        TARGET_TOOLS=XCODE32
+        ;;
+      1[12])
+        TARGET_TOOLS=XCLANG
+        ;;
+       *)
         echo OvmfPkg requires Snow Leopard or later OS
         exit 1
-      else
-        TARGET_TOOLS=XCODE32
-      fi
-      ;;
+        ;;
+    esac
+    ;;
   Linux*)
     gcc_version=$(gcc -v 2>&1 | tail -1 | awk '{print $3}')
     case $gcc_version in
