@@ -3,7 +3,7 @@
 
   Set a IDT entry for interrupt vector 3 for debug purpose for x64 platform
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -48,6 +48,7 @@ HookPageFaultHandler (
 {
   UINT32         RegEax;
   UINT32         RegEdx;
+  UINTN          PageFaultHandlerHookAddress;
 
   AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
   mPhyMask = LShiftU64 (1, (UINT8)RegEax) - 1;
@@ -67,13 +68,14 @@ HookPageFaultHandler (
   //
   // Set Page Fault entry to catch >4G access
   //
+  PageFaultHandlerHookAddress = (UINTN)PageFaultHandlerHook;
   mOriginalHandler = (VOID *)(UINTN)(LShiftU64 (IdtEntry->Bits.OffsetUpper, 32) + IdtEntry->Bits.OffsetLow + (IdtEntry->Bits.OffsetHigh << 16));
-  IdtEntry->Bits.OffsetLow      = (UINT16)((UINTN)PageFaultHandlerHook);
+  IdtEntry->Bits.OffsetLow      = (UINT16)PageFaultHandlerHookAddress;
   IdtEntry->Bits.Selector       = (UINT16)AsmReadCs ();
   IdtEntry->Bits.Reserved_0     = 0;
   IdtEntry->Bits.GateType       = IA32_IDT_GATE_TYPE_INTERRUPT_32;
-  IdtEntry->Bits.OffsetHigh     = (UINT16)((UINTN)PageFaultHandlerHook >> 16);
-  IdtEntry->Bits.OffsetUpper    = (UINT32)((UINTN)PageFaultHandlerHook >> 32);
+  IdtEntry->Bits.OffsetHigh     = (UINT16)(PageFaultHandlerHookAddress >> 16);
+  IdtEntry->Bits.OffsetUpper    = (UINT32)(PageFaultHandlerHookAddress >> 32);
   IdtEntry->Bits.Reserved_1     = 0;
 
   if (mPage1GSupport) {

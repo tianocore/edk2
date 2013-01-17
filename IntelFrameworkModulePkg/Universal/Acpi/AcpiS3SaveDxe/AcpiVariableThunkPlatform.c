@@ -1,7 +1,7 @@
 /** @file
   This is an implementation of the AcpiVariable platform field for ECP platform.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -59,8 +59,8 @@ ACPI_VARIABLE_SET_COMPATIBILITY               *mAcpiVariableSetCompatibility = N
 **/
 VOID*
 AllocateMemoryBelow4G (
-  IN UINTN      MemoryType,
-  IN UINTN      Size
+  IN EFI_MEMORY_TYPE    MemoryType,
+  IN UINTN              Size
   );
 
 /**

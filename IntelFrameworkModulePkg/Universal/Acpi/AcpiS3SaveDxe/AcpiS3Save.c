@@ -2,7 +2,7 @@
   This is an implementation of the ACPI S3 Save protocol.  This is defined in
   S3 boot path specification 0.9.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -74,8 +74,8 @@ EFI_GUID              mAcpiS3IdtrProfileGuid = {
 **/
 VOID*
 AllocateMemoryBelow4G (
-  IN UINTN      MemoryType,
-  IN UINTN      Size
+  IN EFI_MEMORY_TYPE    MemoryType,
+  IN UINTN              Size
   )
 {
   UINTN                 Pages;
