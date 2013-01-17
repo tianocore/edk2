@@ -1502,7 +1502,7 @@ MainEditorInit (
   //
   // below will call the five components' init function
   //
-  Status = MainTitleBarInit (L"UEFI EDIT 2.0");
+  Status = MainTitleBarInit (L"UEFI EDIT");
   if (EFI_ERROR (Status)) {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN(STR_EDIT_LIBEDITOR_TITLEBAR), gShellDebug1HiiHandle);
     return EFI_LOAD_ERROR;

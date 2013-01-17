@@ -1687,7 +1687,7 @@ HMainEditorInit (
   //
   // below will call the five components' init function
   //
-  Status = MainTitleBarInit (NULL);
+  Status = MainTitleBarInit (L"UEFI HEXEDIT");
   if (EFI_ERROR (Status)) {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HEXEDIT_LIBEDITOR_MAINEDITOR_TITLE), gShellDebug1HiiHandle);
     return EFI_LOAD_ERROR;
