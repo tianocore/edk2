@@ -290,10 +290,10 @@ CreatePopulateInstallShellParametersProtocol (
   //
   // Build the full command line
   //
-  Status = SHELL_GET_ENVIRONMENT_VARIABLE(L"ShellOpt", &Size, &FullCommandLine);
+  Status = SHELL_GET_ENVIRONMENT_VARIABLE(L"ShellOpt", &Size, FullCommandLine);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     FullCommandLine = AllocateZeroPool(Size + LoadedImage->LoadOptionsSize);
-    Status = SHELL_GET_ENVIRONMENT_VARIABLE(L"ShellOpt", &Size, &FullCommandLine);
+    Status = SHELL_GET_ENVIRONMENT_VARIABLE(L"ShellOpt", &Size, FullCommandLine);
   }
   if (Status == EFI_NOT_FOUND) {
     //
