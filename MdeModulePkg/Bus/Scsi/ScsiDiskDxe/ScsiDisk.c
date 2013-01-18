@@ -1815,7 +1815,36 @@ ScsiDiskReadSectors (
     }
 
     ByteCount = SectorCount * BlockSize;
-    Timeout   = EFI_TIMER_PERIOD_SECONDS (2);
+    //
+    // |------------------------|-----------------|------------------|-----------------|
+    // |   ATA Transfer Mode    |  Transfer Rate  |  SCSI Interface  |  Transfer Rate  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // |       PIO Mode 0       |  3.3Mbytes/sec  |     SCSI-1       |    5Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // |       PIO Mode 1       |  5.2Mbytes/sec  |    Fast SCSI     |   10Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // |       PIO Mode 2       |  8.3Mbytes/sec  |  Fast-Wide SCSI  |   20Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // |       PIO Mode 3       | 11.1Mbytes/sec  |    Ultra SCSI    |   20Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // |       PIO Mode 4       | 16.6Mbytes/sec  |  Ultra Wide SCSI |   40Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // | Single-word DMA Mode 0 |  2.1Mbytes/sec  |    Ultra2 SCSI   |   40Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // | Single-word DMA Mode 1 |  4.2Mbytes/sec  | Ultra2 Wide SCSI |   80Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // | Single-word DMA Mode 2 |  8.4Mbytes/sec  |    Ultra3 SCSI   |  160Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // | Multi-word DMA Mode 0  |  4.2Mbytes/sec  |  Ultra-320 SCSI  |  320Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // | Multi-word DMA Mode 1  | 13.3Mbytes/sec  |  Ultra-640 SCSI  |  640Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    //
+    // As ScsiDisk and ScsiBus driver are used to manage SCSI or ATAPI devices, we have to use
+    // the lowest transfer rate to calculate the possible maximum timeout value for each operation.
+    // From the above table, we could know 2.1Mbytes per second is lowest one.
+    //
+    Timeout   = EFI_TIMER_PERIOD_SECONDS (ByteCount / 2100000 + 1);
 
     MaxRetry  = 2;
     for (Index = 0; Index < MaxRetry; Index++) {
@@ -1937,7 +1966,36 @@ ScsiDiskWriteSectors (
     }
 
     ByteCount = SectorCount * BlockSize;
-    Timeout   = EFI_TIMER_PERIOD_SECONDS (2);
+    //
+    // |------------------------|-----------------|------------------|-----------------|
+    // |   ATA Transfer Mode    |  Transfer Rate  |  SCSI Interface  |  Transfer Rate  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // |       PIO Mode 0       |  3.3Mbytes/sec  |     SCSI-1       |    5Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // |       PIO Mode 1       |  5.2Mbytes/sec  |    Fast SCSI     |   10Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // |       PIO Mode 2       |  8.3Mbytes/sec  |  Fast-Wide SCSI  |   20Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // |       PIO Mode 3       | 11.1Mbytes/sec  |    Ultra SCSI    |   20Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // |       PIO Mode 4       | 16.6Mbytes/sec  |  Ultra Wide SCSI |   40Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // | Single-word DMA Mode 0 |  2.1Mbytes/sec  |    Ultra2 SCSI   |   40Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // | Single-word DMA Mode 1 |  4.2Mbytes/sec  | Ultra2 Wide SCSI |   80Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // | Single-word DMA Mode 2 |  8.4Mbytes/sec  |    Ultra3 SCSI   |  160Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // | Multi-word DMA Mode 0  |  4.2Mbytes/sec  |  Ultra-320 SCSI  |  320Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    // | Multi-word DMA Mode 1  | 13.3Mbytes/sec  |  Ultra-640 SCSI  |  640Mbytes/sec  |
+    // |------------------------|-----------------|------------------|-----------------|
+    //
+    // As ScsiDisk and ScsiBus driver are used to manage SCSI or ATAPI devices, we have to use
+    // the lowest transfer rate to calculate the possible maximum timeout value for each operation.
+    // From the above table, we could know 2.1Mbytes per second is lowest one.
+    //
+    Timeout   = EFI_TIMER_PERIOD_SECONDS (ByteCount / 2100000 + 1);
     MaxRetry  = 2;
     for (Index = 0; Index < MaxRetry; Index++) {
       if (!ScsiDiskDevice->Cdb16Byte) {
