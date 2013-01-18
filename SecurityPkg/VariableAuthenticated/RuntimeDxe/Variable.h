@@ -65,6 +65,13 @@ typedef enum {
 
 typedef struct {
   VARIABLE_HEADER *CurrPtr;
+  //
+  // If both ADDED and IN_DELETED_TRANSITION variable are present,
+  // InDeletedTransitionPtr will point to the IN_DELETED_TRANSITION one.
+  // Otherwise, CurrPtr will point to the ADDED or IN_DELETED_TRANSITION one,
+  // and InDeletedTransitionPtr will be NULL at the same time.
+  //
+  VARIABLE_HEADER *InDeletedTransitionPtr;
   VARIABLE_HEADER *EndPtr;
   VARIABLE_HEADER *StartPtr;
   BOOLEAN         Volatile;
@@ -209,7 +216,7 @@ DataSizeOfVariable (
   @param[in] Attributes         Attributes of the variable.
   @param[in] KeyIndex           Index of associated public key.
   @param[in] MonotonicCount     Value of associated monotonic count.
-  @param[in] Variable           The variable information that is used to keep track of variable usage.
+  @param[in, out] Variable      The variable information that is used to keep track of variable usage.
 
   @param[in] TimeStamp          Value of associated TimeStamp.
 
@@ -226,7 +233,7 @@ UpdateVariable (
   IN      UINT32          Attributes OPTIONAL,
   IN      UINT32          KeyIndex  OPTIONAL,
   IN      UINT64          MonotonicCount  OPTIONAL,
-  IN      VARIABLE_POINTER_TRACK *Variable,
+  IN OUT  VARIABLE_POINTER_TRACK *Variable,
   IN      EFI_TIME        *TimeStamp  OPTIONAL  
   );
 
@@ -378,7 +385,7 @@ VariableCommonInitialize (
   @param[out]  LastVariableOffset      Offset of last variable.
   @param[in]   IsVolatile              The variable store is volatile or not;
                                        if it is non-volatile, need FTW.
-  @param[in]   UpdatingVariable        Pointer to updating variable.
+  @param[in, out] UpdatingPtrTrack     Pointer to updating variable pointer track structure.
   @param[in]   ReclaimPubKeyStore      Reclaim for public key database or not.
   @param[in]   ReclaimAnyway           If TRUE, do reclaim anyway.
   
@@ -392,7 +399,7 @@ Reclaim (
   IN  EFI_PHYSICAL_ADDRESS  VariableBase,
   OUT UINTN                 *LastVariableOffset,
   IN  BOOLEAN               IsVolatile,
-  IN  VARIABLE_HEADER       *UpdatingVariable,
+  IN OUT VARIABLE_POINTER_TRACK *UpdatingPtrTrack,
   IN  BOOLEAN               ReclaimPubKeyStore,
   IN  BOOLEAN               ReclaimAnyway
   );

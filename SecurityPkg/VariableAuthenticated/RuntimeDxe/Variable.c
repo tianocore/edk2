@@ -655,7 +655,7 @@ PubKeyStoreFilter (
   @param[out]  LastVariableOffset      Offset of last variable.
   @param[in]   IsVolatile              The variable store is volatile or not;
                                        if it is non-volatile, need FTW.
-  @param[in]   UpdatingVariable        Pointer to updating variable.
+  @param[in, out] UpdatingPtrTrack     Pointer to updating variable pointer track structure.
   @param[in]   ReclaimPubKeyStore      Reclaim for public key database or not.
   @param[in]   ReclaimAnyway           If TRUE, do reclaim anyway.
   
@@ -669,7 +669,7 @@ Reclaim (
   IN  EFI_PHYSICAL_ADDRESS  VariableBase,
   OUT UINTN                 *LastVariableOffset,
   IN  BOOLEAN               IsVolatile,
-  IN  VARIABLE_HEADER       *UpdatingVariable,
+  IN OUT VARIABLE_POINTER_TRACK *UpdatingPtrTrack,
   IN  BOOLEAN               ReclaimPubKeyStore,
   IN  BOOLEAN               ReclaimAnyway
   )
@@ -699,6 +699,12 @@ Reclaim (
   UINT32                NewPubKeySize;
   VARIABLE_HEADER       *PubKeyHeader;
   BOOLEAN               NeedDoReclaim;
+  VARIABLE_HEADER       *UpdatingVariable;
+
+  UpdatingVariable = NULL;
+  if (UpdatingPtrTrack != NULL) {
+    UpdatingVariable = UpdatingPtrTrack->CurrPtr;
+  }
 
   NeedDoReclaim = FALSE;
   VariableStoreHeader = (VARIABLE_STORE_HEADER *) ((UINTN) VariableBase);
@@ -853,6 +859,8 @@ Reclaim (
     if (UpdatingVariable != NULL) {
       VariableSize = (UINTN)(GetNextVariablePtr (UpdatingVariable)) - (UINTN)UpdatingVariable;
       CopyMem (CurrPtr, (UINT8 *) UpdatingVariable, VariableSize);
+      UpdatingPtrTrack->CurrPtr = (VARIABLE_HEADER *)((UINTN)UpdatingPtrTrack->StartPtr + ((UINTN)CurrPtr - (UINTN)GetStartPointer ((VARIABLE_STORE_HEADER *) ValidBuffer)));
+      UpdatingPtrTrack->InDeletedTransitionPtr = NULL;
       CurrPtr += VariableSize;
       if ((!IsVolatile) && ((UpdatingVariable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
           HwErrVariableTotalSize += VariableSize;
@@ -885,7 +893,7 @@ Reclaim (
              ) {
             Point0 = (VOID *) GetVariableNamePtr (AddedVariable);
             Point1 = (VOID *) GetVariableNamePtr (Variable);
-            if (CompareMem (Point0, Point1, NameSizeOfVariable (AddedVariable)) == 0) {
+            if (CompareMem (Point0, Point1, NameSize) == 0) {
               FoundAdded = TRUE;
               break;
             }
@@ -987,6 +995,8 @@ FindVariableEx (
   VARIABLE_HEADER                *InDeletedVariable;
   VOID                           *Point;
 
+  PtrTrack->InDeletedTransitionPtr = NULL;
+
   //
   // Find the variable by walk through HOB, volatile and non-volatile variable store.
   //
@@ -1004,6 +1014,7 @@ FindVariableEx (
           if (PtrTrack->CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
             InDeletedVariable   = PtrTrack->CurrPtr;
           } else {
+            PtrTrack->InDeletedTransitionPtr = InDeletedVariable;
             return EFI_SUCCESS;
           }
         } else {
@@ -1015,6 +1026,7 @@ FindVariableEx (
               if (PtrTrack->CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
                 InDeletedVariable     = PtrTrack->CurrPtr;
               } else {
+                PtrTrack->InDeletedTransitionPtr = InDeletedVariable;
                 return EFI_SUCCESS;
               }
             }
@@ -1606,7 +1618,7 @@ AutoUpdateLangVariable (
   @param[in] Attributes         Attributes of the variable.
   @param[in] KeyIndex           Index of associated public key.
   @param[in] MonotonicCount     Value of associated monotonic count.
-  @param[in] CacheVariable      The variable information which is used to keep track of variable usage.
+  @param[in, out] CacheVariable The variable information which is used to keep track of variable usage.
   @param[in] TimeStamp          Value of associated TimeStamp.
 
   @retval EFI_SUCCESS           The update operation is success.
@@ -1622,7 +1634,7 @@ UpdateVariable (
   IN      UINT32                      Attributes      OPTIONAL,
   IN      UINT32                      KeyIndex        OPTIONAL,
   IN      UINT64                      MonotonicCount  OPTIONAL,
-  IN      VARIABLE_POINTER_TRACK      *CacheVariable,
+  IN OUT  VARIABLE_POINTER_TRACK      *CacheVariable,
   IN      EFI_TIME                    *TimeStamp      OPTIONAL
   )
 {
@@ -1638,7 +1650,6 @@ UpdateVariable (
   BOOLEAN                             Volatile;
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *Fvb;
   UINT8                               State;
-  BOOLEAN                             Reclaimed;
   VARIABLE_POINTER_TRACK              *Variable;
   VARIABLE_POINTER_TRACK              NvVariable;
   VARIABLE_STORE_HEADER               *VariableStoreHeader;
@@ -1678,11 +1689,15 @@ UpdateVariable (
     Variable->StartPtr = GetStartPointer (VariableStoreHeader);
     Variable->EndPtr   = GetEndPointer (VariableStoreHeader);
     Variable->CurrPtr  = (VARIABLE_HEADER *)((UINTN)Variable->StartPtr + ((UINTN)CacheVariable->CurrPtr - (UINTN)CacheVariable->StartPtr));
+    if (CacheVariable->InDeletedTransitionPtr != NULL) {
+      Variable->InDeletedTransitionPtr = (VARIABLE_HEADER *)((UINTN)Variable->StartPtr + ((UINTN)CacheVariable->InDeletedTransitionPtr - (UINTN)CacheVariable->StartPtr));
+    } else {
+      Variable->InDeletedTransitionPtr = NULL;
+    }
     Variable->Volatile = FALSE;
   }
 
   Fvb       = mVariableModuleGlobal->FvbInstance;
-  Reclaimed = FALSE;
 
   //
   // Tricky part: Use scratch data area at the end of volatile variable store
@@ -1730,6 +1745,31 @@ UpdateVariable (
     // not delete the variable.
     //
     if ((((Attributes & EFI_VARIABLE_APPEND_WRITE) == 0) && (DataSize == 0))|| ((Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == 0)) {
+      if (Variable->InDeletedTransitionPtr != NULL) {
+        //
+        // Both ADDED and IN_DELETED_TRANSITION variable are present,
+        // set IN_DELETED_TRANSITION one to DELETED state first.
+        //
+        State = Variable->InDeletedTransitionPtr->State;
+        State &= VAR_DELETED;
+        Status = UpdateVariableStore (
+                   &mVariableModuleGlobal->VariableGlobal,
+                   Variable->Volatile,
+                   FALSE,
+                   Fvb,
+                   (UINTN) &Variable->InDeletedTransitionPtr->State,
+                   sizeof (UINT8),
+                   &State
+                   );
+        if (!EFI_ERROR (Status)) {
+          if (!Variable->Volatile) {
+            CacheVariable->InDeletedTransitionPtr->State = State;
+          }
+        } else {
+          goto Done;
+        }
+      }
+
       State = Variable->CurrPtr->State;
       State &= VAR_DELETED;
 
@@ -1959,7 +1999,7 @@ UpdateVariable (
                  mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase,
                  &mVariableModuleGlobal->NonVolatileLastVariableOffset,
                  FALSE,
-                 Variable->CurrPtr,
+                 Variable,
                  FALSE,
                  FALSE
                  );
@@ -1976,7 +2016,10 @@ UpdateVariable (
         Status = EFI_OUT_OF_RESOURCES;
         goto Done;
       }
-      Reclaimed = TRUE;
+      if (Variable->CurrPtr != NULL) {
+        CacheVariable->CurrPtr = (VARIABLE_HEADER *)((UINTN) CacheVariable->StartPtr + ((UINTN) Variable->CurrPtr - (UINTN) Variable->StartPtr));
+        CacheVariable->InDeletedTransitionPtr = NULL;
+      }
     }
     //
     // Four steps
@@ -2080,7 +2123,7 @@ UpdateVariable (
                  mVariableModuleGlobal->VariableGlobal.VolatileVariableBase,
                  &mVariableModuleGlobal->VolatileLastVariableOffset,
                  TRUE,
-                 Variable->CurrPtr,
+                 Variable,
                  FALSE,
                  FALSE
                  );
@@ -2096,7 +2139,10 @@ UpdateVariable (
         Status = EFI_OUT_OF_RESOURCES;
         goto Done;
       }
-      Reclaimed = TRUE;
+      if (Variable->CurrPtr != NULL) {
+        CacheVariable->CurrPtr = (VARIABLE_HEADER *)((UINTN) CacheVariable->StartPtr + ((UINTN) Variable->CurrPtr - (UINTN) Variable->StartPtr));
+        CacheVariable->InDeletedTransitionPtr = NULL;
+      }
     }
 
     NextVariable->State = VAR_ADDED;
@@ -2120,7 +2166,32 @@ UpdateVariable (
   //
   // Mark the old variable as deleted.
   //
-  if (!Reclaimed && !EFI_ERROR (Status) && Variable->CurrPtr != NULL) {
+  if (!EFI_ERROR (Status) && Variable->CurrPtr != NULL) {
+    if (Variable->InDeletedTransitionPtr != NULL) {
+      //
+      // Both ADDED and IN_DELETED_TRANSITION old variable are present,
+      // set IN_DELETED_TRANSITION one to DELETED state first.
+      //
+      State = Variable->InDeletedTransitionPtr->State;
+      State &= VAR_DELETED;
+      Status = UpdateVariableStore (
+                 &mVariableModuleGlobal->VariableGlobal,
+                 Variable->Volatile,
+                 FALSE,
+                 Fvb,
+                 (UINTN) &Variable->InDeletedTransitionPtr->State,
+                 sizeof (UINT8),
+                 &State
+                 );
+      if (!EFI_ERROR (Status)) {
+        if (!Variable->Volatile) {
+          CacheVariable->InDeletedTransitionPtr->State = State;
+        }
+      } else {
+        goto Done;
+      }
+    }
+
     State = Variable->CurrPtr->State;
     State &= VAR_DELETED;
 
@@ -2342,6 +2413,7 @@ VariableServiceGetNextVariableName (
   VARIABLE_STORE_TYPE     Type;
   VARIABLE_POINTER_TRACK  Variable;
   VARIABLE_POINTER_TRACK  VariableInHob;
+  VARIABLE_POINTER_TRACK  VariablePtrTrack;
   UINTN                   VarNameSize;
   EFI_STATUS              Status;
   VARIABLE_STORE_HEADER   *VariableStoreHeader[VariableStoreTypeMax];
@@ -2415,8 +2487,27 @@ VariableServiceGetNextVariableName (
     //
     // Variable is found
     //
-    if (Variable.CurrPtr->State == VAR_ADDED) {
-      if ((AtRuntime () && ((Variable.CurrPtr->Attributes & EFI_VARIABLE_RUNTIME_ACCESS) == 0)) == 0) {
+    if (Variable.CurrPtr->State == VAR_ADDED || Variable.CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
+      if (!AtRuntime () || ((Variable.CurrPtr->Attributes & EFI_VARIABLE_RUNTIME_ACCESS) != 0)) {
+        if (Variable.CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
+          //
+          // If it is a IN_DELETED_TRANSITION variable,
+          // and there is also a same ADDED one at the same time,
+          // don't return it.
+          //
+          VariablePtrTrack.StartPtr = Variable.StartPtr;
+          VariablePtrTrack.EndPtr = Variable.EndPtr;
+          Status = FindVariableEx (
+                     GetVariableNamePtr (Variable.CurrPtr),
+                     &Variable.CurrPtr->VendorGuid,
+                     FALSE,
+                     &VariablePtrTrack
+                     );
+          if (!EFI_ERROR (Status) && VariablePtrTrack.CurrPtr->State == VAR_ADDED) {
+            Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr);
+            continue;
+          }
+        }
 
         //
         // Don't return NV variable when HOB overrides it

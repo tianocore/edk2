@@ -3,7 +3,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by Variable modules.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -56,6 +56,13 @@ typedef enum {
 
 typedef struct {
   VARIABLE_HEADER *CurrPtr;
+  //
+  // If both ADDED and IN_DELETED_TRANSITION variable are present,
+  // InDeletedTransitionPtr will point to the IN_DELETED_TRANSITION one.
+  // Otherwise, CurrPtr will point to the ADDED or IN_DELETED_TRANSITION one,
+  // and InDeletedTransitionPtr will be NULL at the same time.
+  //
+  VARIABLE_HEADER *InDeletedTransitionPtr;
   VARIABLE_HEADER *EndPtr;
   VARIABLE_HEADER *StartPtr;
   BOOLEAN         Volatile;
@@ -141,7 +148,7 @@ FtwVariableSpace (
 
   @param[in] Attributes         Attribues of the variable.
 
-  @param[in] Variable           The variable information that is used to keep track of variable usage.
+  @param[in, out] Variable      The variable information that is used to keep track of variable usage.
 
   @retval EFI_SUCCESS           The update operation is success.
 
@@ -155,7 +162,7 @@ UpdateVariable (
   IN      VOID            *Data,
   IN      UINTN           DataSize,
   IN      UINT32          Attributes OPTIONAL,
-  IN      VARIABLE_POINTER_TRACK *Variable
+  IN OUT  VARIABLE_POINTER_TRACK *Variable
   );
 
 
