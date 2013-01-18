@@ -198,7 +198,7 @@ BiosVideoDriverBindingSupported (
         //
         if (Node->DevPath.Type != ACPI_DEVICE_PATH ||
             Node->DevPath.SubType != ACPI_ADR_DP ||
-            DevicePathNodeLength(&Node->DevPath) != sizeof(ACPI_ADR_DEVICE_PATH)) {
+            DevicePathNodeLength(&Node->DevPath) < sizeof(ACPI_ADR_DEVICE_PATH)) {
           Status = EFI_UNSUPPORTED;
         }
       }
@@ -1374,7 +1374,7 @@ BiosVideoCheckForVbe (
     //
     // Allocate double size of VESA_BIOS_EXTENSIONS_EDID_BLOCK_SIZE to avoid overflow
     //
-    EdidOverrideDataBlock = AllocatePool (sizeof (VESA_BIOS_EXTENSIONS_EDID_BLOCK_SIZE * 2));
+    EdidOverrideDataBlock = AllocatePool (VESA_BIOS_EXTENSIONS_EDID_BLOCK_SIZE * 2);
     if (NULL == EdidOverrideDataBlock) {
   		Status = EFI_OUT_OF_RESOURCES;
       goto Done;
