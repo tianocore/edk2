@@ -41,9 +41,12 @@
   LibWchar
   LibGen
   LibNetUtil
-  BsdSocketLib
-  EfiSocketLib
   DevShell
+  #
+  # Comment out the following two library classes if socket support is
+  # NOT being built in to Python.
+  #BsdSocketLib
+  #EfiSocketLib
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0F
@@ -72,8 +75,10 @@
 #Python
   PyMod-$(PYTHON_VERSION)/Python/getcopyright.c
   PyMod-$(PYTHON_VERSION)/Python/marshal.c
+  PyMod-$(PYTHON_VERSION)/Python/import.c
 
   Python-$(PYTHON_VERSION)/Python/_warnings.c
+  Python-$(PYTHON_VERSION)/Python/Python-ast.c
   Python-$(PYTHON_VERSION)/Python/asdl.c
   Python-$(PYTHON_VERSION)/Python/ast.c
   Python-$(PYTHON_VERSION)/Python/bltinmodule.c
@@ -93,7 +98,6 @@
   Python-$(PYTHON_VERSION)/Python/getplatform.c
   Python-$(PYTHON_VERSION)/Python/getversion.c
   Python-$(PYTHON_VERSION)/Python/graminit.c
-  Python-$(PYTHON_VERSION)/Python/import.c
   Python-$(PYTHON_VERSION)/Python/importdl.c
   Python-$(PYTHON_VERSION)/Python/modsupport.c
   Python-$(PYTHON_VERSION)/Python/mysnprintf.c
@@ -106,7 +110,6 @@
   Python-$(PYTHON_VERSION)/Python/pystate.c
   Python-$(PYTHON_VERSION)/Python/pystrcmp.c
   Python-$(PYTHON_VERSION)/Python/pystrtod.c
-  Python-$(PYTHON_VERSION)/Python/Python-ast.c
   Python-$(PYTHON_VERSION)/Python/pythonrun.c
   Python-$(PYTHON_VERSION)/Python/structmember.c
   Python-$(PYTHON_VERSION)/Python/symtable.c
@@ -114,6 +117,8 @@
   Python-$(PYTHON_VERSION)/Python/traceback.c
 
 #Objects
+  PyMod-$(PYTHON_VERSION)/Objects/longobject.c
+
   Python-$(PYTHON_VERSION)/Objects/abstract.c
   Python-$(PYTHON_VERSION)/Objects/boolobject.c
   Python-$(PYTHON_VERSION)/Objects/bufferobject.c
@@ -137,7 +142,6 @@
   Python-$(PYTHON_VERSION)/Objects/intobject.c
   Python-$(PYTHON_VERSION)/Objects/iterobject.c
   Python-$(PYTHON_VERSION)/Objects/listobject.c
-  Python-$(PYTHON_VERSION)/Objects/longobject.c
   Python-$(PYTHON_VERSION)/Objects/memoryobject.c
   Python-$(PYTHON_VERSION)/Objects/methodobject.c
   Python-$(PYTHON_VERSION)/Objects/moduleobject.c
@@ -170,6 +174,7 @@
   Python-$(PYTHON_VERSION)/Modules/_bisectmodule.c              #
   Python-$(PYTHON_VERSION)/Modules/_codecsmodule.c              #
   Python-$(PYTHON_VERSION)/Modules/_collectionsmodule.c         #
+  Python-$(PYTHON_VERSION)/Modules/_csv.c                       #
   Python-$(PYTHON_VERSION)/Modules/_heapqmodule.c               #
   Python-$(PYTHON_VERSION)/Modules/_json.c                      #
   Python-$(PYTHON_VERSION)/Modules/_localemodule.c              #
@@ -190,20 +195,27 @@
   Python-$(PYTHON_VERSION)/Modules/md5module.c                  #
   Python-$(PYTHON_VERSION)/Modules/operator.c                   #
   Python-$(PYTHON_VERSION)/Modules/parsermodule.c               #
-  Python-$(PYTHON_VERSION)/Modules/shamodule.c                  #
   Python-$(PYTHON_VERSION)/Modules/sha256module.c               #
   Python-$(PYTHON_VERSION)/Modules/sha512module.c               #
+  Python-$(PYTHON_VERSION)/Modules/shamodule.c                  #
   Python-$(PYTHON_VERSION)/Modules/signalmodule.c               #
   Python-$(PYTHON_VERSION)/Modules/socketmodule.c               #
   Python-$(PYTHON_VERSION)/Modules/stropmodule.c                #
+  Python-$(PYTHON_VERSION)/Modules/symtablemodule.c             #
   Python-$(PYTHON_VERSION)/Modules/timemodule.c                 #
   Python-$(PYTHON_VERSION)/Modules/unicodedata.c                #
   Python-$(PYTHON_VERSION)/Modules/xxsubtype.c                  #
   Python-$(PYTHON_VERSION)/Modules/zipimport.c                  #
   Python-$(PYTHON_VERSION)/Modules/zlibmodule.c                 #
 
-  Python-$(PYTHON_VERSION)/Modules/_csv.c                       #
-  Python-$(PYTHON_VERSION)/Modules/symtablemodule.c             #
+#Modules/_io
+  Python-$(PYTHON_VERSION)/Modules/_io/_iomodule.c              #
+  Python-$(PYTHON_VERSION)/Modules/_io/bufferedio.c             #
+  Python-$(PYTHON_VERSION)/Modules/_io/bytesio.c                #
+  Python-$(PYTHON_VERSION)/Modules/_io/fileio.c                 #
+  Python-$(PYTHON_VERSION)/Modules/_io/iobase.c                 #
+  Python-$(PYTHON_VERSION)/Modules/_io/stringio.c               #
+  Python-$(PYTHON_VERSION)/Modules/_io/textio.c                 #
 
 #Modules/cjkcodecs
   Python-$(PYTHON_VERSION)/Modules/cjkcodecs/multibytecodec.c   #
@@ -214,14 +226,11 @@
   Python-$(PYTHON_VERSION)/Modules/cjkcodecs/_codecs_kr.c       #
   Python-$(PYTHON_VERSION)/Modules/cjkcodecs/_codecs_tw.c       #
 
-#Modules/_io
-  Python-$(PYTHON_VERSION)/Modules/_io/_iomodule.c              #
-  Python-$(PYTHON_VERSION)/Modules/_io/bufferedio.c             #
-  Python-$(PYTHON_VERSION)/Modules/_io/bytesio.c                #
-  Python-$(PYTHON_VERSION)/Modules/_io/fileio.c                 #
-  Python-$(PYTHON_VERSION)/Modules/_io/iobase.c                 #
-  Python-$(PYTHON_VERSION)/Modules/_io/stringio.c               #
-  Python-$(PYTHON_VERSION)/Modules/_io/textio.c                 #
+#Modules/expat
+  Python-$(PYTHON_VERSION)/Modules/pyexpat.c                    #
+  PyMod-$(PYTHON_VERSION)/Modules/expat/xmlparse.c              #
+  Python-$(PYTHON_VERSION)/Modules/expat/xmlrole.c              #
+  Python-$(PYTHON_VERSION)/Modules/expat/xmltok.c               #
 
 #Modules/zlib
   Python-$(PYTHON_VERSION)/Modules/zlib/adler32.c               #
@@ -238,8 +247,8 @@
   Python-$(PYTHON_VERSION)/Modules/zlib/zutil.c                 #
 
 [BuildOptions]
-   MSFT:*_*_IA32_CC_FLAGS         = /Oi- /wd4018 /wd4054 /wd4055 /wd4101 /wd4131 /wd4152 /wd4204 /wd4210 /wd4244 /wd4267 /wd4305 /wd4310 /wd4389 /wd4701 /wd4702 /wd4706 /I$(WORKSPACE)\AppPkg\Applications\Python\Ia32 /I$(WORKSPACE)\AppPkg\Applications\Python\Efi /I$(WORKSPACE)\AppPkg\Applications\Python\Python-$(PYTHON_VERSION)\Include
-   MSFT:*_*_X64_CC_FLAGS          = /Oi- /wd4018 /wd4054 /wd4055 /wd4101 /wd4131 /wd4152 /wd4204 /wd4210 /wd4244 /wd4267 /wd4305 /wd4310 /wd4389 /wd4701 /wd4702 /wd4706 /I$(WORKSPACE)\AppPkg\Applications\Python\X64 /I$(WORKSPACE)\AppPkg\Applications\Python\Efi /I$(WORKSPACE)\AppPkg\Applications\Python\Python-$(PYTHON_VERSION)\Include
-    GCC:*_*_IA32_CC_FLAGS         = -fno-builtin -Wno-format -I$(WORKSPACE)/AppPkg/Applications/Python/Ia32 -I$(WORKSPACE)/AppPkg/Applications/Python/Python-$(PYTHON_VERSION)/Include
-    GCC:*_*_X64_CC_FLAGS          = -Wno-format -I$(WORKSPACE)/AppPkg/Applications/Python/X64 -I$(WORKSPACE)/AppPkg/Applications/Python/Python-$(PYTHON_VERSION)/Include
+   MSFT:*_*_IA32_CC_FLAGS         = /Oi- /wd4018 /wd4054 /wd4055 /wd4101 /wd4131 /wd4152 /wd4204 /wd4210 /wd4244 /wd4267 /wd4305 /wd4310 /wd4389 /wd4701 /wd4702 /wd4706 /I$(WORKSPACE)\AppPkg\Applications\Python\Ia32 /I$(WORKSPACE)\AppPkg\Applications\Python\Efi /I$(WORKSPACE)\AppPkg\Applications\Python\Python-$(PYTHON_VERSION)\Include /DHAVE_MEMMOVE /DUSE_PYEXPAT_CAPI /DXML_STATIC
+   MSFT:*_*_X64_CC_FLAGS          = /Oi- /wd4018 /wd4054 /wd4055 /wd4101 /wd4131 /wd4152 /wd4204 /wd4210 /wd4244 /wd4267 /wd4305 /wd4310 /wd4389 /wd4701 /wd4702 /wd4706 /I$(WORKSPACE)\AppPkg\Applications\Python\X64 /I$(WORKSPACE)\AppPkg\Applications\Python\Efi /I$(WORKSPACE)\AppPkg\Applications\Python\Python-$(PYTHON_VERSION)\Include /DHAVE_MEMMOVE /DUSE_PYEXPAT_CAPI /DXML_STATIC
+    GCC:*_*_IA32_CC_FLAGS         = -fno-builtin -Wno-format -I$(WORKSPACE)/AppPkg/Applications/Python/Ia32 -I$(WORKSPACE)/AppPkg/Applications/Python/Python-$(PYTHON_VERSION)/Include -DHAVE_MEMMOVE -DUSE_PYEXPAT_CAPI -DXML_STATIC
+    GCC:*_*_X64_CC_FLAGS          = -Wno-format -I$(WORKSPACE)/AppPkg/Applications/Python/X64 -I$(WORKSPACE)/AppPkg/Applications/Python/Python-$(PYTHON_VERSION)/Include -DHAVE_MEMMOVE -DUSE_PYEXPAT_CAPI -DXML_STATIC
     GCC:*_*_IPF_SYMRENAME_FLAGS   = --redefine-syms=$(WORKSPACE)/StdLib/GccSymRename.txt
