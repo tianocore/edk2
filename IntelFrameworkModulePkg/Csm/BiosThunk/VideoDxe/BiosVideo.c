@@ -1580,6 +1580,9 @@ BiosVideoCheckForVbe (
       continue;
     }
 
+    DEBUG ((EFI_D_INFO, "Video Controller Mode 0x%x: %d x %d\n",
+            VbeModeNumber, BiosVideoPrivate->VbeModeInformationBlock->XResolution, BiosVideoPrivate->VbeModeInformationBlock->YResolution));
+
     if (EdidFound && (ValidEdidTiming.ValidNumber > 0)) {
       //
       // EDID exist, check whether this mode match with any mode in EDID
@@ -1623,8 +1626,9 @@ BiosVideoCheckForVbe (
     //
     // Record the highest resolution mode to set later
     //
-    if ((BiosVideoPrivate->VbeModeInformationBlock->XResolution >= HighestHorizontalResolution) &&
-        (BiosVideoPrivate->VbeModeInformationBlock->YResolution >= HighestVerticalResolution)) {
+    if ((BiosVideoPrivate->VbeModeInformationBlock->XResolution > HighestHorizontalResolution) ||
+        ((BiosVideoPrivate->VbeModeInformationBlock->XResolution == HighestHorizontalResolution) && 
+         (BiosVideoPrivate->VbeModeInformationBlock->YResolution > HighestVerticalResolution))) {
       HighestHorizontalResolution = BiosVideoPrivate->VbeModeInformationBlock->XResolution;
       HighestVerticalResolution = BiosVideoPrivate->VbeModeInformationBlock->YResolution;
       HighestResolutionMode = ModeNumber;
