@@ -1,7 +1,7 @@
 /** @file
 Entry and initialization module for the browser.
 
-Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -32,6 +32,7 @@ SETUP_DRIVER_PRIVATE_DATA  mPrivateData = {
 EFI_HII_DATABASE_PROTOCOL         *mHiiDatabase;
 EFI_HII_STRING_PROTOCOL           *mHiiString;
 EFI_HII_CONFIG_ROUTING_PROTOCOL   *mHiiConfigRouting;
+EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL *mPathFromText;
 
 UINTN           gBrowserContextCount = 0;
 LIST_ENTRY      gBrowserContextList = INITIALIZE_LIST_HEAD_VARIABLE (gBrowserContextList);
@@ -84,6 +85,7 @@ CHAR16            *gAdjustNumber;
 CHAR16            *gSaveChanges;
 CHAR16            *gOptionMismatch;
 CHAR16            *gFormSuppress;
+CHAR16            *gProtocolNotFound;
 
 CHAR16            *mUnknownString = L"!";
 
@@ -661,6 +663,12 @@ InitializeSetup (
                   (VOID **) &mHiiConfigRouting
                   );
   ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->LocateProtocol (
+                  &gEfiDevicePathFromTextProtocolGuid,
+                  NULL,
+                  (VOID **) &mPathFromText
+                  );
 
   //
   // Publish our HII data
@@ -4184,6 +4192,7 @@ RestoreBrowserContext (
   gHelpBlockWidth       = Context->HelpBlockWidth;
   gOldFormSet           = Context->OldFormSet;
   gMenuRefreshHead      = Context->MenuRefreshHead;
+  gProtocolNotFound     = Context->ProtocolNotFound;
 
   CopyMem (&gScreenDimensions, &Context->ScreenDimensions, sizeof (gScreenDimensions));
   CopyMem (&gMenuOption, &Context->MenuOption, sizeof (gMenuOption));

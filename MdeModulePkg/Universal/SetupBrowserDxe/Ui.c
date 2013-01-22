@@ -1,7 +1,7 @@
 /** @file
 Utility functions for User Interface functions.
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1971,55 +1971,6 @@ FormSetGuidToHiiHandle (
 }
 
 /**
-  Transfer the device path string to binary format.
-
-  @param   StringPtr     The device path string info.
-
-  @retval  Device path binary info.
-
-**/
-EFI_DEVICE_PATH_PROTOCOL *
-ConvertDevicePathFromText (
-  IN CHAR16  *StringPtr
-  )
-{
-  UINTN                           BufferSize;
-  EFI_DEVICE_PATH_PROTOCOL        *DevicePath;
-  CHAR16                          TemStr[2];
-  UINT8                           *DevicePathBuffer;
-  UINTN                           Index;
-  UINT8                           DigitUint8;
-
-  ASSERT (StringPtr != NULL);
-
-  BufferSize = StrLen (StringPtr) / 2;
-  DevicePath = AllocatePool (BufferSize);
-  ASSERT (DevicePath != NULL);
-  
-  //
-  // Convert from Device Path String to DevicePath Buffer in the reverse order.
-  //
-  DevicePathBuffer = (UINT8 *) DevicePath;
-  for (Index = 0; StringPtr[Index] != L'\0'; Index ++) {
-    TemStr[0] = StringPtr[Index];
-    DigitUint8 = (UINT8) StrHexToUint64 (TemStr);
-    if (DigitUint8 == 0 && TemStr[0] != L'0') {
-      //
-      // Invalid Hex Char as the tail.
-      //
-      break;
-    }
-    if ((Index & 1) == 0) {
-      DevicePathBuffer [Index/2] = DigitUint8;
-    } else {
-      DevicePathBuffer [Index/2] = (UINT8) ((DevicePathBuffer [Index/2] << 4) + DigitUint8);
-    }
-  }
-
-  return DevicePath;
-}
-
-/**
   Process the goto op code, update the info in the selection structure.
 
   @param Statement    The statement belong to goto op code.
@@ -2064,16 +2015,32 @@ ProcessGotoOpCode (
     if (Selection->Form->ModalForm) {
       return Status;
     }
+
     //
     // Goto another Hii Package list
     //
+    if (mPathFromText != NULL) {
+      DevicePath = mPathFromText->ConvertTextToDevicePath(StringPtr);
+      if (DevicePath != NULL) {
+        Selection->Handle = DevicePathToHiiHandle (DevicePath);
+        FreePool (DevicePath);
+      }
+      FreePool (StringPtr);
+    } else {
+      //
+      // Not found the EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL protocol.
+      //
+      do {
+        CreateDialog (4, TRUE, 0, NULL, &Key, gEmptyString, gProtocolNotFound, gPressEnter, gEmptyString);
+      } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+      if (Repaint != NULL) {
+        *Repaint = TRUE;
+      }
+      FreePool (StringPtr);
+      return Status;
+    }
+
     Selection->Action = UI_ACTION_REFRESH_FORMSET;
-    DevicePath = ConvertDevicePathFromText (StringPtr);
-
-    Selection->Handle = DevicePathToHiiHandle (DevicePath);
-    FreePool (DevicePath);
-    FreePool (StringPtr);
-
     if (Selection->Handle == NULL) {
       //
       // If target Hii Handle not found, exit

@@ -1,7 +1,7 @@
 /** @file
 Utility functions for UI presentation.
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -602,6 +602,7 @@ InitializeBrowserStrings (
   gSaveChanges          = GetToken (STRING_TOKEN (SAVE_CHANGES), gHiiHandle);
   gOptionMismatch       = GetToken (STRING_TOKEN (OPTION_MISMATCH), gHiiHandle);
   gFormSuppress         = GetToken (STRING_TOKEN (FORM_SUPPRESSED), gHiiHandle);
+  gProtocolNotFound     = GetToken (STRING_TOKEN (PROTOCOL_NOT_FOUND), gHiiHandle);
   return ;
 }
 
@@ -642,6 +643,7 @@ FreeBrowserStrings (
   FreePool (gSaveChanges);
   FreePool (gOptionMismatch);
   FreePool (gFormSuppress);
+  FreePool (gProtocolNotFound);
   return ;
 }
 
