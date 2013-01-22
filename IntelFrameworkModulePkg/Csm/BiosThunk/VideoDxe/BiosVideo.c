@@ -1,7 +1,7 @@
 /** @file
   ConsoleOut Routines that speak VGA.
 
-Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -1129,49 +1129,79 @@ ParseEdidData (
                  ((EdidDataBlock->EstablishedTimings[2] & 0x80) << 9) ;
     for (Index = 0; Index < VESA_BIOS_EXTENSIONS_EDID_ESTABLISHED_TIMING_MAX_NUMBER; Index ++) {
       if ((TimingBits & 0x1) != 0) {
+        DEBUG ((EFI_D_INFO, "Established Timing: %d x %d\n",
+        mEstablishedEdidTiming[Index].HorizontalResolution, mEstablishedEdidTiming[Index].VerticalResolution));
         ValidEdidTiming->Key[ValidNumber] = CalculateEdidKey (&mEstablishedEdidTiming[Index]);
         ValidNumber ++;
       }
       TimingBits = TimingBits >> 1;
     }
-  } else {
+  }
+
+  //
+  // Parse the standard timing data
+  //
+  BufferIndex = &EdidDataBlock->StandardTimingIdentification[0];
+  for (Index = 0; Index < 8; Index ++) {
     //
-    // If no Established timing data, read the standard timing data
+    // Check if this is a valid Standard Timing entry
+    // VESA documents unused fields should be set to 01h
     //
-    BufferIndex = &EdidDataBlock->StandardTimingIdentification[0];
-    for (Index = 0; Index < 8; Index ++) {
-      if ((BufferIndex[0] != 0x1) && (BufferIndex[1] != 0x1)){
-        //
-        // A valid Standard Timing
-        //
-        HorizontalResolution = (UINT16) (BufferIndex[0] * 8 + 248);
-        AspectRatio = (UINT8) (BufferIndex[1] >> 6);
-        switch (AspectRatio) {
-          case 0:
-            VerticalResolution = (UINT16) (HorizontalResolution / 16 * 10);
-            break;
-          case 1:
-            VerticalResolution = (UINT16) (HorizontalResolution / 4 * 3);
-            break;
-          case 2:
-            VerticalResolution = (UINT16) (HorizontalResolution / 5 * 4);
-            break;
-          case 3:
-            VerticalResolution = (UINT16) (HorizontalResolution / 16 * 9);
-            break;
-          default:
-            VerticalResolution = (UINT16) (HorizontalResolution / 4 * 3);
-            break;
-        }
-        RefreshRate = (UINT8) ((BufferIndex[1] & 0x1f) + 60);
-        TempTiming.HorizontalResolution = HorizontalResolution;
-        TempTiming.VerticalResolution = VerticalResolution;
-        TempTiming.RefreshRate = RefreshRate;
-        ValidEdidTiming->Key[ValidNumber] = CalculateEdidKey (&TempTiming);
-        ValidNumber ++;
+    if ((BufferIndex[0] != 0x1) && (BufferIndex[1] != 0x1)){
+      //
+      // A valid Standard Timing
+      //
+      HorizontalResolution = (UINT16) (BufferIndex[0] * 8 + 248);
+      AspectRatio = (UINT8) (BufferIndex[1] >> 6);
+      switch (AspectRatio) {
+        case 0:
+          VerticalResolution = (UINT16) (HorizontalResolution / 16 * 10);
+          break;
+        case 1:
+          VerticalResolution = (UINT16) (HorizontalResolution / 4 * 3);
+          break;
+        case 2:
+          VerticalResolution = (UINT16) (HorizontalResolution / 5 * 4);
+          break;
+        case 3:
+          VerticalResolution = (UINT16) (HorizontalResolution / 16 * 9);
+          break;
+        default:
+          VerticalResolution = (UINT16) (HorizontalResolution / 4 * 3);
+          break;
       }
-      BufferIndex += 2;
+      RefreshRate = (UINT8) ((BufferIndex[1] & 0x1f) + 60);
+      DEBUG ((EFI_D_INFO, "Standard Timing: %d x %d\n", HorizontalResolution, VerticalResolution));
+      TempTiming.HorizontalResolution = HorizontalResolution;
+      TempTiming.VerticalResolution = VerticalResolution;
+      TempTiming.RefreshRate = RefreshRate;
+      ValidEdidTiming->Key[ValidNumber] = CalculateEdidKey (&TempTiming);
+      ValidNumber ++;
     }
+    BufferIndex += 2;
+  }
+
+  //
+  // Parse the Detailed Timing data
+  //
+  BufferIndex = &EdidDataBlock->DetailedTimingDescriptions[0];
+  for (Index = 0; Index < 4; Index ++, BufferIndex += VESA_BIOS_EXTENSIONS_DETAILED_TIMING_EACH_DESCRIPTOR_SIZE) {
+    if ((BufferIndex[0] == 0x0) && (BufferIndex[1] == 0x0)) {
+      //
+      // Check if this is a valid Detailed Timing Descriptor
+      // If first 2 bytes are zero, it is monitor descriptor other than detailed timing descriptor
+      //
+      continue;
+    }
+    //
+    // Calculate Horizontal and Vertical resolution
+    //
+    TempTiming.HorizontalResolution = ((UINT16)(BufferIndex[4] & 0xF0) << 4) | (BufferIndex[2]);
+    TempTiming.VerticalResolution = ((UINT16)(BufferIndex[7] & 0xF0) << 4) | (BufferIndex[5]);
+    DEBUG ((EFI_D_INFO, "Detailed Timing %d: %d x %d\n",
+            Index, TempTiming.HorizontalResolution, TempTiming.VerticalResolution));
+    ValidEdidTiming->Key[ValidNumber] = CalculateEdidKey (&TempTiming);
+    ValidNumber ++;
   }
 
   ValidEdidTiming->ValidNumber = ValidNumber;
