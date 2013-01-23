@@ -34,7 +34,7 @@ ASM_PFX(JumpToKernel):
     pushq   $0x10
     leaq    1f(%rip), %rax
     pushq   %rax
-    .byte   0x48, 0xcb                      ; retfq
+    .byte   0x48, 0xcb                      // retfq
 
 1:  // Now in compatibility mode
 .code32
