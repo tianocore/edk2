@@ -1797,14 +1797,14 @@ DriverSampleInit (
   MY_EFI_VARSTORE_DATA            *VarStoreConfig;
   EFI_INPUT_KEY                   HotKey;
   EFI_FORM_BROWSER_EXTENSION_PROTOCOL *FormBrowserEx;
-  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL *pToText;
+  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL *PathToText;
 
   //
   // Initialize the local variables.
   //
   ConfigRequestHdr = NULL;
   NewString        = NULL;
-  pToText          = NULL;
+  PathToText       = NULL;
 
   //
   // Initialize screen dimensions for SendForm().
@@ -1925,14 +1925,14 @@ DriverSampleInit (
   Status = gBS->LocateProtocol (
                   &gEfiDevicePathToTextProtocolGuid,
                   NULL,
-                  (VOID **) &pToText
+                  (VOID **) &PathToText
                   );
   ASSERT_EFI_ERROR (Status);
 
   //
   // Update the device path string.
   //
-  NewString = pToText->ConvertDevicePathToText((EFI_DEVICE_PATH_PROTOCOL*)&mHiiVendorDevicePath0, FALSE, FALSE);
+  NewString = PathToText->ConvertDevicePathToText((EFI_DEVICE_PATH_PROTOCOL*)&mHiiVendorDevicePath0, FALSE, FALSE);
   if (HiiSetString (HiiHandle[0], STRING_TOKEN (STR_DEVICE_PATH), NewString, NULL) == 0) {
     DriverSampleUnload (ImageHandle);
     return EFI_OUT_OF_RESOURCES;
