@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 #  
 #  This program and the accompanying materials                          
 #  are licensed and made available under the terms and conditions of the BSD License         
@@ -53,7 +53,10 @@ def dump_system_table(ec, mem_base, mem_size):
     debug_info_table = system_table.DebugInfoTable(ec, debug_info_table_base)
     debug_info_table.dump()
 
-def load_symbol_from_file(ec, filename, address):
+def load_symbol_from_file(ec, filename, address, verbose = False):
+    if verbose:
+        print "Add symbols of %s at 0x%x" % (filename, address)
+        
     try:
         ec.getImageService().addSymbols(filename, address)
     except:
@@ -62,7 +65,7 @@ def load_symbol_from_file(ec, filename, address):
             ec.getImageService().unloadSymbols(filename)
             ec.getImageService().addSymbols(filename, address)
         except:
-            print "Warning: not possible to load symbols from %s" % filename
+            print "Warning: not possible to load symbols from %s at 0x%x" % (filename, address)
             pass
 
 class ArmPlatform:
@@ -79,8 +82,9 @@ class ArmPlatformDebugger:
     REGION_TYPE_ROM    = 2
     REGION_TYPE_FV     = 3
     
-    def __init__(self, ec, report_log, regions):
+    def __init__(self, ec, report_log, regions, verbose = False):
         self.ec = ec
+        self.verbose = verbose
         fvs = []
         sysmem_base = None
         sysmem_size = None
@@ -89,7 +93,7 @@ class ArmPlatformDebugger:
             try:
                 self.build = build_report.BuildReport(report_log)
             except IOError:
-                raise IOError(2, 'Report \'%s\' isnot valid' % report_log)
+                raise IOError(2, 'Report \'%s\' is not valid' % report_log)
             
             # Generate list of supported Firmware Volumes
             if self.build.PCDs['gArmTokenSpaceGuid'].has_key('PcdFvSize') and int(self.build.PCDs['gArmTokenSpaceGuid']['PcdFvSize'][0],16) != 0:
@@ -141,7 +145,7 @@ class ArmPlatformDebugger:
                 self.firmware_volumes[fv_base] = firmware_volume.FirmwareVolume(self.ec, fv_base, fv_size)
                 
             stack_frame = self.ec.getTopLevelStackFrame()
-            info = self.firmware_volumes[fv_base].load_symbols_at(int(stack_frame.getRegisterService().getValue('PC')) & 0xFFFFFFFF)
+            info = self.firmware_volumes[fv_base].load_symbols_at(int(stack_frame.getRegisterService().getValue('PC')) & 0xFFFFFFFF, self.verbose)
             debug_infos.append(info)
             while stack_frame.next() is not None:
                 stack_frame = stack_frame.next()
@@ -171,7 +175,7 @@ class ArmPlatformDebugger:
                 self.debug_info_table = system_table.DebugInfoTable(self.ec, debug_info_table_base)
                 
             stack_frame = self.ec.getTopLevelStackFrame()
-            info = self.debug_info_table.load_symbols_at(int(stack_frame.getRegisterService().getValue('PC')) & 0xFFFFFFFF)
+            info = self.debug_info_table.load_symbols_at(int(stack_frame.getRegisterService().getValue('PC')) & 0xFFFFFFFF, self.verbose)
             debug_infos.append(info)
             while stack_frame.next() is not None:
                 stack_frame = stack_frame.next()
@@ -197,7 +201,7 @@ class ArmPlatformDebugger:
         for (fv_base, fv_size) in self.platform.fvs:
             if self.firmware_volumes.has_key(fv_base) == False:
                 self.firmware_volumes[fv_base] = firmware_volume.FirmwareVolume(self.ec, fv_base, fv_size)    
-            self.firmware_volumes[fv_base].load_all_symbols()
+            self.firmware_volumes[fv_base].load_all_symbols(self.verbose)
 
         try:
             # Load all symbols of module loaded into System Memory
@@ -210,7 +214,7 @@ class ArmPlatformDebugger:
                 debug_info_table_base = self.system_table.get_configuration_table(system_table.DebugInfoTable.CONST_DEBUG_INFO_TABLE_GUID)
                 self.debug_info_table = system_table.DebugInfoTable(self.ec, debug_info_table_base)
             
-            self.debug_info_table.load_all_symbols()
+            self.debug_info_table.load_all_symbols(self.verbose)
         except:
             # Debugger exception could be excepted if DRAM has not been initialized or if we have not started to run from DRAM yet
             print "Note: no symbols have been found in System Memory (possible cause: the UEFI permanent memory has been installed yet)"

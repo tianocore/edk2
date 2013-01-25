@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 #  
 #  This program and the accompanying materials                          
 #  are licensed and made available under the terms and conditions of the BSD License         
@@ -21,16 +21,18 @@ import edk2_debugger
 reload(edk2_debugger)
 
 def usage():
+    print "-v,--verbose"
     print "-a,--all: Load all symbols"
     print "-l,--report=: Filename for the EDK2 report log"
     print "-m,--sysmem=(base,size): System Memory region"
     print "-f,--fv=(base,size): Firmware region"
     print "-r,--rom=(base,size): ROM region"
 
+verbose = False
 load_all = False
 report_file = None
 regions = []
-opts,args = getopt.getopt(sys.argv[1:], "har:vm:vr:vf:v", ["help","all","report=","sysmem=","rom=","fv="])
+opts,args = getopt.getopt(sys.argv[1:], "hvar:vm:vr:vf:v", ["help","verbose","all","report=","sysmem=","rom=","fv="])
 if (opts is None) or (not opts):
     report_file = '../../../report.log'
 else:
@@ -44,6 +46,8 @@ else:
         if o in ("-h","--help"):
             usage()
             sys.exit()
+        elif o in ("-v","--verbose"):
+            verbose = True
         elif o in ("-a","--all"):
             load_all = True
         elif o in ("-l","--report"):
@@ -58,7 +62,7 @@ else:
             region_type = edk2_debugger.ArmPlatformDebugger.REGION_TYPE_ROM
             regex = region_reg
         else:
-            assert False, "Unhandled option"
+            assert False, "Unhandled option (%s)" % o
             
         if region_type:
             m = regex.match(a)
@@ -83,10 +87,8 @@ ec.getExecutionService().waitForStop()
 # in case the execution context reference is out of date
 ec = debugger.getExecutionContext(0)
 
-armplatform_debugger = edk2_debugger.ArmPlatformDebugger(ec, report_file, regions)
-
 try:
-    armplatform_debugger = edk2_debugger.ArmPlatformDebugger(ec, report_file, regions)
+    armplatform_debugger = edk2_debugger.ArmPlatformDebugger(ec, report_file, regions, verbose)
     
     if load_all:
         armplatform_debugger.load_all_symbols()

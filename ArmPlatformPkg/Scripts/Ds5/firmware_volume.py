@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 #  
 #  This program and the accompanying materials                          
 #  are licensed and made available under the terms and conditions of the BSD License         
@@ -269,7 +269,7 @@ class FirmwareVolume:
                 section = ffs.get_next_section(section)
             ffs = self.get_next_ffs(ffs)
 
-    def load_symbols_at(self, addr):
+    def load_symbols_at(self, addr, verbose = False):
         if self.DebugInfos == []:
             self.get_debug_info()
         
@@ -282,11 +282,16 @@ class FirmwareVolume:
                 else:
                     raise Exception('FirmwareVolume','Section Type not supported')
                 
-                edk2_debugger.load_symbol_from_file(self.ec, section.get_debug_filepath(), section.get_debug_elfbase())
+                try:
+                    edk2_debugger.load_symbol_from_file(self.ec, section.get_debug_filepath(), section.get_debug_elfbase(), verbose)
+                except Exception, (ErrorClass, ErrorMessage):
+                    if verbose:
+                        print "Error while loading a symbol file (%s: %s)" % (ErrorClass, ErrorMessage)
+                    pass
 
                 return debug_info
 
-    def load_all_symbols(self):
+    def load_all_symbols(self, verbose = False):
         if self.DebugInfos == []:
             self.get_debug_info()
         
@@ -298,4 +303,10 @@ class FirmwareVolume:
             else:
                 continue
             
-            edk2_debugger.load_symbol_from_file(self.ec, section.get_debug_filepath(), section.get_debug_elfbase())
+            try:
+                edk2_debugger.load_symbol_from_file(self.ec, section.get_debug_filepath(), section.get_debug_elfbase(), verbose)
+            except Exception, (ErrorClass, ErrorMessage):
+                if verbose:
+                    print "Error while loading a symbol file (%s: %s)" % (ErrorClass, ErrorMessage)
+                pass
+

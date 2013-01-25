@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 #  
 #  This program and the accompanying materials                          
 #  are licensed and made available under the terms and conditions of the BSD License         
@@ -48,7 +48,7 @@ class DebugInfoTable:
                     self.DebugInfos.append((image_base,image_size))
     
     # Return (base, size)
-    def load_symbols_at(self, addr):
+    def load_symbols_at(self, addr, verbose = False):
         if self.DebugInfos == []:
             self.get_debug_info()
         
@@ -57,7 +57,12 @@ class DebugInfoTable:
             if (addr >= debug_info[0]) and (addr < debug_info[0] + debug_info[1]):
                 section = firmware_volume.EfiSectionPE32(self.ec, debug_info[0])
                 
-                edk2_debugger.load_symbol_from_file(self.ec, section.get_debug_filepath(), section.get_debug_elfbase())
+                try:
+                    edk2_debugger.load_symbol_from_file(self.ec, section.get_debug_filepath(), section.get_debug_elfbase(), verbose)
+                except Exception, (ErrorClass, ErrorMessage):
+                    if verbose:
+                        print "Error while loading a symbol file (%s: %s)" % (ErrorClass, ErrorMessage)
+                    pass
 
                 found = True
                 return debug_info
@@ -65,14 +70,19 @@ class DebugInfoTable:
         if found == False:
             raise Exception('DebugInfoTable','No symbol found at 0x%x' % addr)
 
-    def load_all_symbols(self):
+    def load_all_symbols(self, verbose = False):
         if self.DebugInfos == []:
             self.get_debug_info()
         
         for debug_info in self.DebugInfos:
             section = firmware_volume.EfiSectionPE32(self.ec, debug_info[0])
            
-            edk2_debugger.load_symbol_from_file(self.ec, section.get_debug_filepath(), section.get_debug_elfbase())
+            try:
+                edk2_debugger.load_symbol_from_file(self.ec, section.get_debug_filepath(), section.get_debug_elfbase(), verbose)
+            except Exception, (ErrorClass, ErrorMessage):
+                if verbose:
+                    print "Error while loading a symbol file (%s: %s)" % (ErrorClass, ErrorMessage)
+                pass
 
     def dump(self):
         self.get_debug_info()
