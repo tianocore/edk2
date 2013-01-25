@@ -1820,11 +1820,11 @@ UpdateVariable (
         DataOffset = sizeof (VARIABLE_HEADER) + Variable->CurrPtr->NameSize + GET_PAD_SIZE (Variable->CurrPtr->NameSize);
         CopyMem (mStorageArea, (UINT8*)((UINTN) Variable->CurrPtr + DataOffset), Variable->CurrPtr->DataSize);
 
-        if (CompareGuid (VendorGuid, &gEfiImageSecurityDatabaseGuid) ||
-        	(CompareGuid (VendorGuid, &gEfiGlobalVariableGuid) && (StrCmp (VariableName, EFI_KEY_EXCHANGE_KEY_NAME) == 0))) {
+        if ((CompareGuid (VendorGuid, &gEfiImageSecurityDatabaseGuid) &&
+            ((StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE) == 0) || (StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE1) == 0))) ||
+            (CompareGuid (VendorGuid, &gEfiGlobalVariableGuid) && (StrCmp (VariableName, EFI_KEY_EXCHANGE_KEY_NAME) == 0))) {
           //
-          // For variables with the GUID EFI_IMAGE_SECURITY_DATABASE_GUID (i.e. where the data
-          // buffer is formatted as EFI_SIGNATURE_LIST), the driver shall not perform an append of
+          // For variables with formatted as EFI_SIGNATURE_LIST, the driver shall not perform an append of
           // EFI_SIGNATURE_DATA values that are already part of the existing variable value.
           //
           BufSize = AppendSignatureList (mStorageArea, Variable->CurrPtr->DataSize, Data, DataSize);
