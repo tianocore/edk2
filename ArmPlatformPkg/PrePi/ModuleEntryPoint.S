@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+//  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 //
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
@@ -15,6 +15,8 @@
 #include <Base.h>
 #include <Library/PcdLib.h>
 #include <AutoGen.h>
+
+#include <Chipset/ArmV7.h>
 
 .text
 .align 3
@@ -35,8 +37,7 @@ ASM_PFX(_ModuleEntryPoint):
 
 _SetSVCMode:
   // Enter SVC mode, Disable FIQ and IRQ
-  //TODO: remove hardcoded values
-  mov     r1, #0x13|0x80|0x40
+  mov     r1, #(CPSR_MODE_SVC | CPSR_IRQ | CPSR_FIQ)
   msr     CPSR_c, r1
 
 // Check if we can install the stack at the top of the System Memory or if we need

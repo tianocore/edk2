@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011-2013, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -25,6 +25,21 @@
 #define DOMAIN_ACCESS_CONTROL_CLIENT(a)   (1UL << (2 * (a)))
 #define DOMAIN_ACCESS_CONTROL_RESERVED(a) (2UL << (2 * (a)))
 #define DOMAIN_ACCESS_CONTROL_MANAGER(a)  (3UL << (2 * (a)))
+
+// CPSR - Coprocessor Status Register definitions
+#define CPSR_MODE_USER       0x10
+#define CPSR_MODE_FIQ        0x11
+#define CPSR_MODE_IRQ        0x12
+#define CPSR_MODE_SVC        0x13
+#define CPSR_MODE_ABORT      0x17
+#define CPSR_MODE_HYP        0x1A
+#define CPSR_MODE_UNDEFINED  0x1B
+#define CPSR_MODE_SYSTEM     0x1F
+#define CPSR_MODE_MASK       0x1F
+#define CPSR_ASYNC_ABORT     (1 << 8)
+#define CPSR_IRQ             (1 << 7)
+#define CPSR_FIQ             (1 << 6)
+
 
 // CPACR - Coprocessor Access Control Register definitions
 #define CPACR_CP_DENIED(cp)     0x00
