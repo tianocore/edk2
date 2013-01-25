@@ -54,4 +54,4 @@
   gOmap35xxTokenSpaceGuid.PcdOmap35xxArchTimer
 
 [Depex]
-  gHardwareInterruptProtocolGuid
+  gHardwareInterruptProtocolGuid

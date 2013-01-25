@@ -44,4 +44,4 @@
   
   
 [Depex]
-  gEfiCpuArchProtocolGuid AND gVirtualUncachedPagesProtocolGuid
+  gEfiCpuArchProtocolGuid AND gVirtualUncachedPagesProtocolGuid

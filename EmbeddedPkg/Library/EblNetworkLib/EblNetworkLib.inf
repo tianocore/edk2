@@ -31,4 +31,4 @@
   gEfiPxeBaseCodeProtocolGuid
 
 [Depex]
-  TRUE
+  TRUE

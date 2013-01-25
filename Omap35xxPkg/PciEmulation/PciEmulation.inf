@@ -54,4 +54,4 @@
 [Depex]
   gEfiMetronomeArchProtocolGuid AND 
   gEmbeddedExternalDeviceProtocolGuid
-  
+  

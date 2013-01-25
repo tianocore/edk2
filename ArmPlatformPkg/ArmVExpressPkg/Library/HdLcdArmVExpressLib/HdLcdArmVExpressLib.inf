@@ -41,4 +41,4 @@ HdLcdArmVExpress.c
 
 [Pcd]
   gArmVExpressTokenSpaceGuid.PcdPL111LcdMaxMode
-  gArmVExpressTokenSpaceGuid.PcdHdLcdVideoModeOscId
+  gArmVExpressTokenSpaceGuid.PcdHdLcdVideoModeOscId

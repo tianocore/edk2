@@ -39,4 +39,4 @@
   DxeServicesTableLib
 
 [Depex]
-  gEfiCpuArchProtocolGuid    
+  gEfiCpuArchProtocolGuid    

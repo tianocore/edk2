@@ -47,4 +47,4 @@
   gEfiDriverDiagnostics2ProtocolGuid
   
 [Depex]
-  TRUE
+  TRUE
