@@ -177,8 +177,11 @@ FileOpen (
     *AsciiPtr++ = *FileName++ & 0xFF;
   }
 
-  if ((AsciiStrCmp (AsciiFileName, "\\") == 0) || (AsciiStrCmp (AsciiFileName, "/") == 0) || (AsciiStrCmp (AsciiFileName, "") == 0)) {
-    // Opening '/', '\', or the NULL pathname is trying to open the root directory
+  if ((AsciiStrCmp (AsciiFileName, "\\") == 0) ||
+      (AsciiStrCmp (AsciiFileName, "/")  == 0) ||
+      (AsciiStrCmp (AsciiFileName, "")   == 0) ||
+      (AsciiStrCmp (AsciiFileName, ".")  == 0)) {
+    // Opening '/', '\', '.', or the NULL pathname is trying to open the root directory
     IsRoot = TRUE;
 
     // Root directory node doesn't have a name.
