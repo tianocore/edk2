@@ -808,6 +808,7 @@ Reclaim (
     //
     // Reinstall the new public key database.
     //
+    ASSERT (PubKeyHeader != NULL);
     CopyMem (CurrPtr, (UINT8*) PubKeyHeader, sizeof (VARIABLE_HEADER));
     Variable = (VARIABLE_HEADER*) CurrPtr;
     Variable->DataSize = NewPubKeySize;
