@@ -3,7 +3,7 @@
   Implement ReadOnly Variable Services required by PEIM and install
   PEI ReadOnly Varaiable2 PPI. These services operates the non volatile storage space.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -430,6 +430,7 @@ FindVariableEx (
   UINTN                   Index;
   UINTN                   Offset;
   BOOLEAN                 StopRecord;
+  VARIABLE_HEADER         *InDeletedVariable;
 
   if (VariableStoreHeader == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -446,6 +447,8 @@ FindVariableEx (
   PtrTrack->StartPtr = GetStartPointer (VariableStoreHeader);
   PtrTrack->EndPtr   = GetEndPointer   (VariableStoreHeader);
 
+  InDeletedVariable = NULL;
+
   //
   // No Variable Address equals zero, so 0 as initial value is safe.
   //
@@ -461,15 +464,20 @@ FindVariableEx (
       Offset   += IndexTable->Index[Index];
       MaxIndex  = (VARIABLE_HEADER *) ((UINT8 *) IndexTable->StartPtr + Offset);
       if (CompareWithValidVariable (MaxIndex, VariableName, VendorGuid, PtrTrack) == EFI_SUCCESS) {
-        return EFI_SUCCESS;
+        if (PtrTrack->CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
+          InDeletedVariable = PtrTrack->CurrPtr;
+        } else {
+          return EFI_SUCCESS;
+        }
       }
     }
 
     if (IndexTable->GoneThrough != 0) {
       //
-      // If the table has all the existing variables indexed and we still cannot find it.
+      // If the table has all the existing variables indexed, return.
       //
-      return EFI_NOT_FOUND;
+      PtrTrack->CurrPtr = InDeletedVariable;
+      return (PtrTrack->CurrPtr == NULL) ? EFI_NOT_FOUND : EFI_SUCCESS;
     }
   }
 
@@ -490,11 +498,11 @@ FindVariableEx (
   }
 
   //
-  // Find the variable by walk through non-volatile variable store
+  // Find the variable by walk through variable store
   //
   StopRecord = FALSE;
   while ((Variable < PtrTrack->EndPtr) && IsValidVariableHeader (Variable)) {
-    if (Variable->State == VAR_ADDED) {
+    if (Variable->State == VAR_ADDED || Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
       //
       // Record Variable in VariableIndex HOB
       //
@@ -513,7 +521,11 @@ FindVariableEx (
       }
 
       if (CompareWithValidVariable (Variable, VariableName, VendorGuid, PtrTrack) == EFI_SUCCESS) {
-        return EFI_SUCCESS;
+        if (PtrTrack->CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
+          InDeletedVariable = PtrTrack->CurrPtr;
+        } else {
+          return EFI_SUCCESS;
+        }
       }
     }
 
@@ -526,9 +538,9 @@ FindVariableEx (
     IndexTable->GoneThrough = 1;
   }
 
-  PtrTrack->CurrPtr = NULL;
+  PtrTrack->CurrPtr = InDeletedVariable;
 
-  return EFI_NOT_FOUND;
+  return (PtrTrack->CurrPtr == NULL) ? EFI_NOT_FOUND : EFI_SUCCESS;
 }
 
 /**
@@ -691,6 +703,8 @@ PeiGetNextVariableName (
   VARIABLE_STORE_TYPE     Type;
   VARIABLE_POINTER_TRACK  Variable;
   VARIABLE_POINTER_TRACK  VariableInHob;
+  VARIABLE_POINTER_TRACK  VariablePtrTrack;
+  VARIABLE_INDEX_TABLE    *IndexTable;
   UINTN                   VarNameSize;
   EFI_STATUS              Status;
   VARIABLE_STORE_HEADER   *VariableStoreHeader[VariableStoreTypeMax];
@@ -752,7 +766,32 @@ PeiGetNextVariableName (
       Variable.CurrPtr  = Variable.StartPtr;
     }
 
-    if (Variable.CurrPtr->State == VAR_ADDED) {
+    if (Variable.CurrPtr->State == VAR_ADDED || Variable.CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
+      if (Variable.CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
+        //
+        // If it is a IN_DELETED_TRANSITION variable,
+        // and there is also a same ADDED one at the same time,
+        // don't return it.
+        //
+        for (Type = (VARIABLE_STORE_TYPE) 0; Type < VariableStoreTypeMax; Type++) {
+          if ((VariableStoreHeader[Type] != NULL) && (Variable.StartPtr == GetStartPointer (VariableStoreHeader[Type]))) {
+            break;
+          }
+        }
+        ASSERT (Type < VariableStoreTypeMax);
+        GetVariableStore (Type, &IndexTable);
+        Status = FindVariableEx (
+                   VariableStoreHeader[Type],
+                   IndexTable,
+                   GetVariableNamePtr (Variable.CurrPtr),
+                   &Variable.CurrPtr->VendorGuid,
+                   &VariablePtrTrack
+                   );
+        if (!EFI_ERROR (Status) && VariablePtrTrack.CurrPtr->State == VAR_ADDED) {
+          Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr);
+          continue;
+        }
+      }
 
       //
       // Don't return NV variable when HOB overrides it
