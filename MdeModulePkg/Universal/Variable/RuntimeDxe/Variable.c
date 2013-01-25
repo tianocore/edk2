@@ -1496,6 +1496,7 @@ UpdateVariable (
                    );
         if (!EFI_ERROR (Status)) {
           if (!Variable->Volatile) {
+            ASSERT (CacheVariable->InDeletedTransitionPtr != NULL);
             CacheVariable->InDeletedTransitionPtr->State = State;
           }
         } else {
@@ -1824,6 +1825,7 @@ UpdateVariable (
                  );
       if (!EFI_ERROR (Status)) {
         if (!Variable->Volatile) {
+          ASSERT (CacheVariable->InDeletedTransitionPtr != NULL);
           CacheVariable->InDeletedTransitionPtr->State = State;
         }
       } else {
