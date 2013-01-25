@@ -2,7 +2,7 @@
 
 Copyright (c) 2009, Hewlett-Packard Company. All rights reserved.<BR>
 Portions copyright (c) 2010, Apple Inc. All rights reserved.<BR>
-Portions copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR> 
+Portions copyright (c) 2011-2013, ARM Ltd. All rights reserved.<BR> 
 
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -24,6 +24,7 @@ Abstract:
 
 #include <PiDxe.h>
 
+#include <Library/ArmLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -408,13 +409,13 @@ InterruptDxeInitialize (
   //
   // Unregister the default exception handler.
   //
-  Status = Cpu->RegisterInterruptHandler(Cpu, EXCEPT_ARM_IRQ, NULL);
+  Status = Cpu->RegisterInterruptHandler(Cpu, ARM_ARCH_EXCEPTION_IRQ, NULL);
   ASSERT_EFI_ERROR(Status);
 
   //
   // Register to receive interrupts
   //
-  Status = Cpu->RegisterInterruptHandler(Cpu, EXCEPT_ARM_IRQ, IrqInterruptHandler);
+  Status = Cpu->RegisterInterruptHandler(Cpu, ARM_ARCH_EXCEPTION_IRQ, IrqInterruptHandler);
   ASSERT_EFI_ERROR(Status);
 
   // Register for an ExitBootServicesEvent

@@ -19,6 +19,9 @@
 #include <Chipset/ArmV7Mmu.h>
 #include <Chipset/ArmV7ArchTimer.h>
 
+// ARM Interrupt ID in Exception Table
+#define ARM_ARCH_EXCEPTION_IRQ            EXCEPT_ARM_IRQ
+
 // Domain Access Control Register
 #define DOMAIN_ACCESS_CONTROL_MASK(a)     (3UL << (2 * (a)))
 #define DOMAIN_ACCESS_CONTROL_NONE(a)     (0UL << (2 * (a)))
