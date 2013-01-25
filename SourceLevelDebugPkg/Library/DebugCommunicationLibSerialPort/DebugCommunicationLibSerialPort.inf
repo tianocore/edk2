@@ -1,7 +1,7 @@
 ## @file
 #  Debug Communication Library instance based on serila port.
 #
-#  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -36,4 +36,10 @@
   SerialPortLib
   TimerLib
   DebugLib
-  
+  BaseMemoryLib
+  BaseLib
+
+[PCD]
+  ## The value of data buffer size used for Serial debug port handle.
+  ## It should be equal to sizeof (SERIAL_DEBUG_PORT_HANDLE).
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugPortHandleBufferSize|17

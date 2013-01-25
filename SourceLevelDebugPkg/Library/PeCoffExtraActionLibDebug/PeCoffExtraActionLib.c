@@ -1,7 +1,7 @@
 /** @file
   PE/Coff Extra Action library instances.
 
-  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -12,17 +12,7 @@
 
 **/
 
-#include <Base.h>
-#include <Library/PeCoffExtraActionLib.h>
-#include <Library/DebugLib.h>
-#include <Library/BaseLib.h>
-#include <Library/IoLib.h>
-#include <Library/PcdLib.h>
-
-#include <ImageDebugSupport.h>
-
-#define DEBUG_LOAD_IMAGE_METHOD_IO_HW_BREAKPOINT    1
-#define DEBUG_LOAD_IMAGE_METHOD_SOFT_INT3           2
+#include <PeCoffExtraActionLib.h>
 
 /**
   Check if the hardware breakpoint in Drx is enabled by checking the Lx and Gx bit in Dr7.
@@ -62,16 +52,19 @@ PeCoffLoaderExtraActionCommon (
   IN     UINTN                         Signature
   )
 {
-  BOOLEAN  InterruptState;
-  UINTN    Dr0;
-  UINTN    Dr1;
-  UINTN    Dr2;
-  UINTN    Dr3;
-  UINTN    Dr7;
-  UINTN    Cr4;
-  UINTN    NewDr7;
-  UINT8    LoadImageMethod;
-  UINT8    DebugAgentStatus;
+  BOOLEAN                    InterruptState;
+  UINTN                      Dr0;
+  UINTN                      Dr1;
+  UINTN                      Dr2;
+  UINTN                      Dr3;
+  UINTN                      Dr7;
+  UINTN                      Cr4;
+  UINTN                      NewDr7;
+  UINT8                      LoadImageMethod;
+  UINT8                      DebugAgentStatus;
+  IA32_DESCRIPTOR            IdtDescriptor;
+  IA32_IDT_GATE_DESCRIPTOR   OriginalIdtEntry;
+  BOOLEAN                    IdtEntryHooked;
 
   ASSERT (ImageContext != NULL);
 
@@ -84,6 +77,23 @@ PeCoffLoaderExtraActionCommon (
   //
   InterruptState = SaveAndDisableInterrupts ();
 
+  IdtEntryHooked  = FALSE;
+  LoadImageMethod = PcdGet8 (PcdDebugLoadImageMethod);
+  AsmReadIdtr (&IdtDescriptor);
+  if (!CheckDebugAgentHandler (&IdtDescriptor)) {
+    if (LoadImageMethod == DEBUG_LOAD_IMAGE_METHOD_SOFT_INT3) {
+      //
+      // Do not trigger INT3 if Debug Agent did not setup IDT entries.
+      //
+      return;
+    }
+    //
+    // Save and update IDT entry for INT1
+    //
+    SaveAndUpdateIdtEntry1 (&IdtDescriptor, &OriginalIdtEntry);
+    IdtEntryHooked = TRUE;
+  }
+  
   //
   // Save Debug Register State
   //
@@ -108,7 +118,6 @@ PeCoffLoaderExtraActionCommon (
   AsmWriteDr2 ((UINTN) ImageContext);
   AsmWriteDr3 (IO_PORT_BREAKPOINT_ADDRESS);
 
-  LoadImageMethod = PcdGet8 (PcdDebugLoadImageMethod);
   if (LoadImageMethod == DEBUG_LOAD_IMAGE_METHOD_IO_HW_BREAKPOINT) {
     AsmWriteDr7 (0x20000480);
     AsmWriteCr4 (Cr4 | BIT3);
@@ -154,6 +163,12 @@ PeCoffLoaderExtraActionCommon (
   }
   if (NewDr7 == 0x20000480) {
     AsmWriteDr7 (Dr7);
+  }
+  //
+  // Restore original IDT entry for INT1 if it was hooked.
+  //
+  if (IdtEntryHooked) {
+    RestoreIdtEntry1 (&IdtDescriptor, &OriginalIdtEntry);
   }
   //
   // Restore the interrupt state

@@ -1,7 +1,7 @@
 ## @file
 #  Debug Agent library instance for Dxe Core and Dxe modules.
 #
-#  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -75,6 +75,9 @@
   LocalApicLib
   TimerLib
   PrintLib
+  PeCoffGetEntryPointLib
+  PeCoffExtraActionLib
+  MemoryAllocationLib
 
 [Guids]
   gEfiDebugAgentGuid                            ## PRODUCES ## Configuration Table
@@ -83,13 +86,8 @@
 [Protocols]
   gEfiSerialIoProtocolGuid                      ## PRODUCES
   gEfiDevicePathProtocolGuid                    ## PRODUCES 
-  gEfiPcdProtocolGuid                           ## NOTIFY
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock                                  ## CONSUMES
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate                       ## CONSUMES
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits                       ## CONSUMES
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity                         ## CONSUMES
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits                       ## CONSUMES
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdExceptionsIgnoredByDebugger  ## CONSUMES
 

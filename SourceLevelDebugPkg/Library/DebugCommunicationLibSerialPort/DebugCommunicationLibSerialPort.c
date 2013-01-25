@@ -1,7 +1,7 @@
 /** @file
   Debug Port Library implementation based on serial port.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -18,6 +18,80 @@
 #include <Library/SerialPortLib.h>
 #include <Library/TimerLib.h>
 #include <Library/DebugLib.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+
+#pragma pack(1)
+//
+// The internal data structure of DEBUG_PORT_HANDLE, which stores some
+// important datum which are used across various phases.
+//
+typedef struct _SERIAL_DEBUG_PORT_HANDLE{
+  //
+  // Timter settings
+  //
+  UINT64       TimerFrequency;
+  UINT64       TimerCycle;
+  BOOLEAN      TimerCountDown;
+} SERIAL_DEBUG_PORT_HANDLE;
+#pragma pack()
+
+//
+// The global variable which can be used after memory is ready.
+//
+SERIAL_DEBUG_PORT_HANDLE     mSerialDebugPortHandle;
+
+/**
+  Check if the timer is timeout.
+  
+  @param[in] SerialDebugPortHandle  Pointer to Serial Debug port handle
+  @param[in] Timer                  The start timer from the begin.
+  @param[in] TimeoutTicker          Ticker number need time out.
+
+  @return TRUE  Timer time out occurs.
+  @retval FALSE Timer does not time out.
+
+**/
+BOOLEAN
+IsTimerTimeout (
+  IN SERIAL_DEBUG_PORT_HANDLE   *SerialDebugPortHandle,
+  IN UINT64                     Timer,
+  IN UINT64                     TimeoutTicker
+  )
+{
+  UINT64  CurrentTimer;
+  UINT64  Delta;
+
+  CurrentTimer = GetPerformanceCounter ();
+
+  if (SerialDebugPortHandle->TimerCountDown) {
+    //
+    // The timer counter counts down.  Check for roll over condition.
+    //
+    if (CurrentTimer < Timer) {
+      Delta = Timer - CurrentTimer;
+    } else {
+      //
+      // Handle one roll-over. 
+      //
+      Delta = SerialDebugPortHandle->TimerCycle - (CurrentTimer - Timer);
+    }
+  } else {
+    //
+    // The timer counter counts up.  Check for roll over condition.
+    //
+    if (CurrentTimer > Timer) {
+      Delta = CurrentTimer - Timer;
+    } else {
+      //
+      // Handle one roll-over. 
+      //
+      Delta = SerialDebugPortHandle->TimerCycle - (Timer - CurrentTimer);
+    }
+  }
+ 
+  return (BOOLEAN) (Delta >= TimeoutTicker);
+}
 
 /**
   Initialize the debug port.
@@ -62,7 +136,42 @@ DebugPortInitialize (
   IN DEBUG_PORT_CONTINUE  Function
   )
 {
-  RETURN_STATUS      Status;
+  RETURN_STATUS              Status;
+  SERIAL_DEBUG_PORT_HANDLE   Handle;
+  SERIAL_DEBUG_PORT_HANDLE   *SerialDebugPortHandle;
+  UINT64                     TimerStartValue;
+  UINT64                     TimerEndValue;
+
+  //
+  // Validate the PCD PcdDebugPortHandleBufferSize value 
+  //
+  ASSERT (PcdGet16 (PcdDebugPortHandleBufferSize) == sizeof (SERIAL_DEBUG_PORT_HANDLE));
+
+  if (Context != NULL && Function == NULL) {
+    SerialDebugPortHandle = (SERIAL_DEBUG_PORT_HANDLE *)Context;
+  } else {
+    ZeroMem (&Handle, sizeof (SERIAL_DEBUG_PORT_HANDLE));
+    SerialDebugPortHandle = &Handle;
+  }
+  SerialDebugPortHandle->TimerFrequency = GetPerformanceCounterProperties (
+                                            &TimerStartValue,
+                                            &TimerEndValue
+                                            );
+  DEBUG ((EFI_D_INFO, "Serial Debug Port: TimerFrequency  = 0x%lx\n", SerialDebugPortHandle->TimerFrequency)); 
+  DEBUG ((EFI_D_INFO, "Serial Debug Port: TimerStartValue = 0x%lx\n", TimerStartValue)); 
+  DEBUG ((EFI_D_INFO, "Serial Debug Port: TimerEndValue   = 0x%lx\n", TimerEndValue)); 
+
+  if (TimerEndValue < TimerStartValue) {
+    SerialDebugPortHandle->TimerCountDown = TRUE;
+    SerialDebugPortHandle->TimerCycle     = TimerStartValue - TimerEndValue;
+  } else {
+    SerialDebugPortHandle->TimerCountDown = FALSE;
+    SerialDebugPortHandle->TimerCycle     = TimerEndValue - TimerStartValue;
+  }  
+
+  if (Function == NULL && Context != NULL) {
+    return (DEBUG_PORT_HANDLE *) Context;
+  }
 
   Status = SerialPortInitialize ();
   if (RETURN_ERROR(Status)) {
@@ -70,10 +179,12 @@ DebugPortInitialize (
   }
 
   if (Function != NULL) {
-    Function (Context, NULL);
+    Function (Context, SerialDebugPortHandle);
+  } else {
+    CopyMem(&mSerialDebugPortHandle, SerialDebugPortHandle, sizeof (SERIAL_DEBUG_PORT_HANDLE));
   }
 
-  return NULL;
+  return (DEBUG_PORT_HANDLE)(UINTN)&mSerialDebugPortHandle;
 }
 
 /**
@@ -102,25 +213,62 @@ DebugPortReadBuffer (
   IN UINTN                 Timeout
   )
 {
-  UINTN                Index;
-  INTN                 Elapsed;
+  SERIAL_DEBUG_PORT_HANDLE *SerialDebugPortHandle;
+  UINTN                    Index;
+  UINT64                   Begin;
+  UINT64                   TimeoutTicker;
+  UINT64                   TimerRound;
+  
+  //
+  // If Handle is NULL, it means memory is ready for use.
+  // Use global variable to store handle value.
+  //
+  if (Handle == NULL) {
+    SerialDebugPortHandle = &mSerialDebugPortHandle;
+  } else {
+    SerialDebugPortHandle = (SERIAL_DEBUG_PORT_HANDLE *)Handle;
+  }
 
-  for (Index = 0; Index < NumberOfBytes; Index ++) {
-    Elapsed = (INTN) Timeout;
-    while (TRUE) {
-      if (SerialPortPoll () || Timeout == 0) {
-        SerialPortRead (Buffer + Index, 1);
-        break;
-      }
-      MicroSecondDelay (1000);
-      Elapsed -= 1000;
-      if (Elapsed < 0) {
+  Begin         = 0;
+  TimeoutTicker = 0;  
+  TimerRound    = 0;
+  if (Timeout != 0) {
+    Begin = GetPerformanceCounter ();
+    TimeoutTicker = DivU64x32 (
+                      MultU64x64 (
+                        SerialDebugPortHandle->TimerFrequency,
+                        Timeout
+                        ),
+                      1000000u
+                      );
+    TimerRound = DivU64x64Remainder (
+                   TimeoutTicker,
+                   DivU64x32 (SerialDebugPortHandle->TimerCycle, 2),
+                   &TimeoutTicker
+                   );
+  }
+  Index = 0;
+  while (Index < NumberOfBytes) {
+    if (SerialPortPoll () || Timeout == 0) {
+      SerialPortRead (Buffer + Index, 1);
+      Index ++; 
+      continue;
+    }
+    if (TimerRound == 0) {
+      if (IsTimerTimeout (SerialDebugPortHandle, Begin, TimeoutTicker)) {
+        //
+        // If time out occurs.
+        //
         return 0;
+      }
+    } else {
+      if (IsTimerTimeout (SerialDebugPortHandle, Begin, DivU64x32 (SerialDebugPortHandle->TimerCycle, 2))) {
+        TimerRound --;
       }
     }
   }
 
-  return NumberOfBytes;
+  return Index;
 }
 
 /**

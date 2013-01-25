@@ -1,7 +1,7 @@
 /** @file
   Code for debug timer to support debug agent library implementation.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -41,7 +41,7 @@ InitializeDebugTimer (
 
   InitializeApicTimer (ApicTimerDivisor, InitialCount, TRUE, DEBUG_TIMER_VECTOR);
 
-  if (MultiProcessorDebugSupport) {
+  if (MultiProcessorDebugSupport()) {
     mDebugMpContext.DebugTimerInitCount = InitialCount;
   }
 }
@@ -65,19 +65,26 @@ SaveAndSetDebugTimerInterrupt (
   IN BOOLEAN                EnableStatus
   )
 {
-  BOOLEAN     OldInterruptState;
   BOOLEAN     OldDebugTimerInterruptState;
 
-  OldInterruptState = SaveAndDisableInterrupts ();
   OldDebugTimerInterruptState = GetApicTimerInterruptState ();
   
-  if (EnableStatus) {
-    EnableApicTimerInterrupt ();
-  } else {
-    DisableApicTimerInterrupt ();
+  if (OldDebugTimerInterruptState != EnableStatus) {
+    if (EnableStatus) {
+      EnableApicTimerInterrupt ();
+    } else {
+      DisableApicTimerInterrupt ();
+    }
+    //
+    // Validate the Debug Timer interrupt state
+    // This will make additional delay after Local Apic Timer interrupt state is changed.
+    // Thus, CPU could handle the potential pending interrupt of Local Apic timer.
+    //
+    while (GetApicTimerInterruptState () != EnableStatus) {
+      CpuPause ();
+    }
   }
-
-  SetInterruptState (OldInterruptState);
+  
   return OldDebugTimerInterruptState;
 }
 

@@ -1,7 +1,7 @@
 ## @file
 #  Debug Agent library instance for SEC Core and PEI modules.
 #
-#  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -70,6 +70,13 @@
   DebugLib
   TimerLib
   PrintLib
+  PeiServicesLib
+  MemoryAllocationLib
+  PeCoffGetEntryPointLib
+  PeCoffExtraActionLib
+
+[Ppis]
+  gEfiPeiMemoryDiscoveredPpiGuid
 
 [Guids]
   gEfiDebugAgentGuid                            ## PRODUCES ## HOB
@@ -77,4 +84,5 @@
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock                                  ## CONSUMES
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdExceptionsIgnoredByDebugger  ## CONSUMES
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugPortHandleBufferSize    ## CONSUMES
 

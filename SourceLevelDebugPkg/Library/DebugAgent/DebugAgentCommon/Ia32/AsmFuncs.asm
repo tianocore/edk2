@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -39,6 +39,7 @@ CommonEntryAddr           DD    CommonEntry
 
 .code
 
+db   41h, 47h, 54h, 48h  ; AGENT_HANDLER_SIGNATURE     SIGNATURE_32('A','G','T','H')
 Exception0Handle:
     cli
     push    eax
@@ -259,7 +260,7 @@ NoExtrPush:
 
     ;; clear Dr7 while executing debugger itself
     xor     eax, eax
- ;; mov     dr7, eax
+    mov     dr7, eax
 
     ;; Dr6
     mov     eax, dr6

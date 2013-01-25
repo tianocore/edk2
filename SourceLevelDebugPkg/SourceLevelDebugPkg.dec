@@ -7,7 +7,7 @@
 # and host, PeCoffExtraActionLib instance to report symbol path information,
 # etc.
 #
-# Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under 
 # the terms and conditions of the BSD License that accompanies this distribution.  
 # The full text of the license may be found at
@@ -22,7 +22,7 @@
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = SourceLevelDebugPkg
   PACKAGE_GUID                   = DBF00C27-D8D7-443d-918B-4E85CDA1373B
-  PACKAGE_VERSION                = 0.80
+  PACKAGE_VERSION                = 0.85
 
 [Includes]
   Include
@@ -72,3 +72,7 @@
   ## 1: Use I/O Port 84 to issue hardware break point
   ## 2: Use INT3 to issue software break point
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugLoadImageMethod|0x1|UINT8|0x00000005
+
+  ## The data buffer size used by debug port in debug communication library.
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugPortHandleBufferSize|0x0|UINT16|0x00000006
+

@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -35,6 +35,7 @@ ASM_PFX(ExceptionStubHeaderSize):  .word     ASM_PFX(Exception1Handle) - ASM_PFX
 
 .text
 
+.byte 0x41, 0x47, 0x54, 0x48  # AGENT_HANDLER_SIGNATURE     SIGNATURE_32('A','G','T','H')
 ASM_PFX(Exception0Handle):
    cli
    pushq %rcx
@@ -280,7 +281,7 @@ NoExtrPush:
   pushq   %rax
 ## clear Dr7 while executing debugger itself
    xorq    %rax, %rax
-#debug   movq    %rax, %dr7
+   movq    %rax, %dr7
 
    movq    %dr6, %rax
   pushq    %rax

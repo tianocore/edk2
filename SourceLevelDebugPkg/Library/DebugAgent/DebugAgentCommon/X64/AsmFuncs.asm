@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -33,6 +33,7 @@ CommonEntryAddr                dq      CommonEntry ;
 
 .code
 
+db   41h, 47h, 54h, 48h  ; AGENT_HANDLER_SIGNATURE     SIGNATURE_32('A','G','T','H')
 Exception0Handle:
     cli
     push    rcx
@@ -198,7 +199,7 @@ NoExtrPush:
     push    rax
     mov     rax, cr2
     push    rax
-    push    0         ; cr0 will not saved???
+    push    0
     mov     rax, cr0
     push    rax
 

@@ -1,7 +1,7 @@
 /** @file
   Install Serial IO Protocol that layers on top of a Debug Communication Library instance.
 
-  Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -149,11 +149,11 @@ SerialRead (
 EFI_SERIAL_IO_MODE  mSerialIoMode = {
   SERIAL_PORT_DEFAULT_CONTROL_MASK,
   SERIAL_PORT_DEFAULT_TIMEOUT,
-  0,  // BaudRate
+  0,  // default BaudRate
   SERIAL_PORT_DEFAULT_RECEIVE_FIFO_DEPTH,
-  0,  // DataBits
-  0,  // Parity
-  0   // StopBits
+  0,  // default DataBits
+  0,  // default Parity
+  0   // default StopBits
 };
 
 //
@@ -204,10 +204,10 @@ SERIAL_IO_DEVICE_PATH mSerialIoDevicePath = {
       }
     },
     0,
-    0,  // BaudRate
-    0,  // DataBits
-    0,  // Parity
-    0,  // StopBits
+    0,  // default BaudRate
+    0,  // default DataBits
+    0,  // default Parity
+    0,  // default StopBits
   },
   {
     END_DEVICE_PATH_TYPE,
@@ -357,34 +357,15 @@ DebugTerminalFifoRemove (
 }
 
 /**
-  Notification function on EFI PCD protocol to install EFI Serial IO protocol based
-  on Debug Communication Library. 
-
-  @param[in]  Event    The event of notify protocol.
-  @param[in]  Context  Notify event context.
+  Install EFI Serial IO protocol based on Debug Communication Library. 
 
 **/
 VOID
-EFIAPI
-InstallSerialIoNotification (
-  IN EFI_EVENT     Event,
-  IN VOID          *Context
+InstallSerialIo (
+  VOID
   )
 {
-  EFI_STATUS  Status;
-
-  //
-  // Get Debug Port parameters from PCDs
-  //
-  mSerialIoDevicePath.UartDevicePath.BaudRate = PcdGet64 (PcdUartDefaultBaudRate);
-  mSerialIoDevicePath.UartDevicePath.DataBits = PcdGet8 (PcdUartDefaultDataBits);
-  mSerialIoDevicePath.UartDevicePath.Parity   = PcdGet8 (PcdUartDefaultParity);
-  mSerialIoDevicePath.UartDevicePath.StopBits = PcdGet8 (PcdUartDefaultStopBits);
-
-  mSerialIoMode.BaudRate = mSerialIoDevicePath.UartDevicePath.BaudRate;
-  mSerialIoMode.DataBits = mSerialIoDevicePath.UartDevicePath.DataBits;
-  mSerialIoMode.Parity   = mSerialIoDevicePath.UartDevicePath.Parity;
-  mSerialIoMode.StopBits = mSerialIoDevicePath.UartDevicePath.StopBits;
+  EFI_STATUS       Status;
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mSerialIoHandle,
@@ -448,22 +429,10 @@ SerialSetAttributes (
   )
 {
   //
-  // The Debug Communication Library does not support changing communications parameters, so unless
-  // the request is to use the default value or the value the Debug Communication Library is already
-  // using, then return EFI_INVALID_PARAMETER.
+  // The Debug Communication Library CAN NOT change communications parameters (if it has)
+  // actually. Because it also has no any idea on what parameters are based on, we cannot
+  // check the input parameters (like BaudRate, Parity, DataBits and StopBits). 
   //
-  if (BaudRate != 0 && BaudRate != PcdGet64 (PcdUartDefaultBaudRate)) {
-    return EFI_INVALID_PARAMETER;
-  }
-  if (Parity != DefaultParity && Parity != PcdGet8 (PcdUartDefaultParity)) {
-    return EFI_INVALID_PARAMETER;
-  }
-  if (DataBits != 0 && DataBits != PcdGet8 (PcdUartDefaultDataBits)) {
-    return EFI_INVALID_PARAMETER;
-  }
-  if (StopBits != DefaultStopBits && StopBits != PcdGet8 (PcdUartDefaultStopBits)) {
-    return EFI_INVALID_PARAMETER;
-  }
   
   //
   // Update the Timeout value in the mode structure based on the request.
@@ -536,7 +505,18 @@ SerialGetControl (
   )
 {
   DEBUG_PORT_HANDLE                Handle;
+  BOOLEAN                          DebugTimerInterruptState;
+  EFI_TPL                          Tpl;
 
+  //
+  // Raise TPL to prevent recursion from EFI timer interrupts
+  //
+  Tpl = gBS->RaiseTPL (TPL_NOTIFY);
+  
+  //
+  // Save and disable Debug Timer interrupt to avoid it to access Debug Port
+  //
+  DebugTimerInterruptState = SaveAndSetDebugTimerInterrupt (FALSE);
   Handle = GetDebugPortHandle ();
   
   //
@@ -552,6 +532,17 @@ SerialGetControl (
   if (!IsDebugTermianlFifoEmpty (&mSerialFifoForTerminal) || DebugPortPollBuffer (Handle)) {
     *Control &= ~EFI_SERIAL_INPUT_BUFFER_EMPTY;
   }
+
+  //
+  // Restore Debug Timer interrupt
+  //  
+  SaveAndSetDebugTimerInterrupt (DebugTimerInterruptState);
+  
+  //
+  // Restore to original TPL
+  //
+  gBS->RestoreTPL (Tpl);
+  
   return EFI_SUCCESS;
 }
 
@@ -577,7 +568,18 @@ SerialWrite (
   )
 {
   DEBUG_PORT_HANDLE                Handle;
+  BOOLEAN                          DebugTimerInterruptState;
+  EFI_TPL                          Tpl;
 
+  //
+  // Raise TPL to prevent recursion from EFI timer interrupts
+  //
+  Tpl = gBS->RaiseTPL (TPL_NOTIFY);
+  
+  //
+  // Save and disable Debug Timer interrupt to avoid it to access Debug Port
+  //
+  DebugTimerInterruptState = SaveAndSetDebugTimerInterrupt (FALSE);
   Handle = GetDebugPortHandle ();
   
   if ((mSerialIoMode.ControlMask & EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE) != 0)  {
@@ -593,6 +595,17 @@ SerialWrite (
   } else {
     *BufferSize = DebugPortWriteBuffer (Handle, Buffer, *BufferSize);
   }
+
+  //
+  // Restore Debug Timer interrupt
+  //  
+  SaveAndSetDebugTimerInterrupt (DebugTimerInterruptState);
+  
+  //
+  // Restore to original TPL
+  //
+  gBS->RestoreTPL (Tpl);
+  
   return EFI_SUCCESS;
 }
 
@@ -620,17 +633,24 @@ SerialRead (
   EFI_STATUS                  Status;
   UINTN                       Index;
   UINT8                       *Uint8Buffer;
-  BOOLEAN                     OldInterruptState;
+  BOOLEAN                     DebugTimerInterruptState;
+  EFI_TPL                     Tpl;
   DEBUG_PORT_HANDLE           Handle;
-  UINT8                       Data;
+  DEBUG_PACKET_HEADER         DebugHeader;
+  UINT8                       *Data8;
 
-  Handle = GetDebugPortHandle ();
-
+  //
+  // Raise TPL to prevent recursion from EFI timer interrupts
+  //
+  Tpl = gBS->RaiseTPL (TPL_NOTIFY);
+  
   //
   // Save and disable Debug Timer interrupt to avoid it to access Debug Port
   //
-  OldInterruptState = SaveAndSetDebugTimerInterrupt (FALSE);
-  
+  DebugTimerInterruptState = SaveAndSetDebugTimerInterrupt (FALSE);
+  Handle = GetDebugPortHandle ();
+ 
+  Data8 = (UINT8 *) &DebugHeader;
   Uint8Buffer = (UINT8 *)Buffer;
   if ((mSerialIoMode.ControlMask & EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE) != 0)  {
     if ((mLoopbackBuffer & SERIAL_PORT_LOOPBACK_BUFFER_FULL) == 0) {
@@ -644,9 +664,9 @@ SerialRead (
       //
       // Read input character from terminal FIFO firstly
       //
-      Status = DebugTerminalFifoRemove (&mSerialFifoForTerminal, &Data);
+      Status = DebugTerminalFifoRemove (&mSerialFifoForTerminal, Data8);
       if (Status == EFI_SUCCESS) {
-        *Uint8Buffer = Data;
+        *Uint8Buffer = *Data8;
         Uint8Buffer ++;
         continue;
       }
@@ -656,16 +676,25 @@ SerialRead (
       if (!DebugPortPollBuffer (Handle)) {
         break;
       }
-      DebugPortReadBuffer (Handle, &Data, 1, 0);
+      DebugPortReadBuffer (Handle, Data8, 1, 0);
 
-      if (Data== DEBUG_STARTING_SYMBOL_ATTACH ||
-          Data == DEBUG_STARTING_SYMBOL_BREAK) {
+      if (*Data8 == DEBUG_STARTING_SYMBOL_ATTACH) {
         //
         // Add the debug symbol into Debug FIFO
         //
-        DebugTerminalFifoAdd (&mSerialFifoForDebug, Data);
+        DebugAgentMsgPrint (DEBUG_AGENT_INFO, "Terminal Timer attach symbol received %x", *Data8);
+        DebugTerminalFifoAdd (&mSerialFifoForDebug, *Data8);
+      } else if (*Data8 == DEBUG_STARTING_SYMBOL_NORMAL) {
+        Status = ReadRemainingBreakPacket (Handle, &DebugHeader);
+        if (Status == EFI_SUCCESS) {
+          DebugAgentMsgPrint (DEBUG_AGENT_INFO, "Terminal Timer break symbol received %x", DebugHeader.Command);
+          DebugTerminalFifoAdd (&mSerialFifoForDebug, DebugHeader.Command);
+        }
+        if (Status == EFI_TIMEOUT) {
+          continue;
+        }
       } else {
-        *Uint8Buffer = Data;
+        *Uint8Buffer = *Data8;
         Uint8Buffer ++;
       }
     }
@@ -675,7 +704,12 @@ SerialRead (
   //
   // Restore Debug Timer interrupt
   //  
-  SaveAndSetDebugTimerInterrupt (OldInterruptState);
+  SaveAndSetDebugTimerInterrupt (DebugTimerInterruptState);
+  
+  //
+  // Restore to original TPL
+  //
+  gBS->RestoreTPL (Tpl);
   
   return EFI_SUCCESS;
 }
@@ -691,36 +725,90 @@ SerialRead (
 
 **/
 EFI_STATUS
+DebugReadBreakFromDebugPort (
+  IN  DEBUG_PORT_HANDLE      Handle,
+  OUT UINT8                  *BreakSymbol
+  )
+{
+  EFI_STATUS                 Status;
+  DEBUG_PACKET_HEADER        DebugHeader;
+  UINT8                      *Data8;
+
+  *BreakSymbol = 0;
+  //
+  // If Debug Port buffer has data, read it till it was break symbol or Debug Port buffer empty.
+  //
+  Data8 = (UINT8 *) &DebugHeader;
+  while (TRUE) {
+    //
+    // If start symbol is not received
+    //
+    if (!DebugPortPollBuffer (Handle)) {
+      //
+      // If no data in Debug Port, exit
+      //
+      break;
+    }
+    //
+    // Try to read the start symbol
+    //
+    DebugPortReadBuffer (Handle, Data8, 1, 0);
+    if (*Data8 == DEBUG_STARTING_SYMBOL_ATTACH) {
+      DebugAgentMsgPrint (DEBUG_AGENT_INFO, "Debug Timer attach symbol received %x", *Data8);
+      *BreakSymbol = *Data8;
+      return EFI_SUCCESS;
+    } 
+    if (*Data8 == DEBUG_STARTING_SYMBOL_NORMAL) {
+      Status = ReadRemainingBreakPacket (Handle, &DebugHeader);
+      if (Status == EFI_SUCCESS) {
+        DebugAgentMsgPrint (DEBUG_AGENT_INFO, "Debug Timer break symbol received %x", DebugHeader.Command);
+        *BreakSymbol = DebugHeader.Command;
+        return EFI_SUCCESS;
+      }
+      if (Status == EFI_TIMEOUT) {
+        break;
+      }
+    } else {
+      //
+      // Add to Terminal FIFO
+      //
+      DebugTerminalFifoAdd (&mSerialFifoForTerminal, *Data8);
+    }
+  }
+  
+  return EFI_NOT_FOUND;
+}
+
+/**
+  Read the Attach/Break-in symbols.
+
+  @param[in]  Handle         Pointer to Debug Port handle.
+  @param[out] BreakSymbol    Returned break symbol.
+
+  @retval EFI_SUCCESS        Read the symbol in BreakSymbol.
+  @retval EFI_NOT_FOUND      No read the break symbol.
+
+**/
+EFI_STATUS
 DebugReadBreakSymbol (
   IN  DEBUG_PORT_HANDLE      Handle,
   OUT UINT8                  *BreakSymbol
   )
 {
   EFI_STATUS               Status;
-  UINT8                    Data;
+  UINT8                    Data8;
 
-  Status = DebugTerminalFifoRemove (&mSerialFifoForDebug, &Data);
-  if (Status != EFI_SUCCESS) {
-    if (!DebugPortPollBuffer (Handle)) {
-      //
-      // No data in Debug Port buffer.
-      //
-      return EFI_NOT_FOUND;
-    } else {
-      //
-      // Read one character from Debug Port.
-      //
-      DebugPortReadBuffer (Handle, &Data, 1, 0);
-      if ((Data != DEBUG_STARTING_SYMBOL_ATTACH) && (Data != DEBUG_STARTING_SYMBOL_BREAK)) {
-        //
-        // If the data is not Break symbol, add it into Terminal FIFO
-        //
-        DebugTerminalFifoAdd (&mSerialFifoForTerminal, Data);
-        return EFI_NOT_FOUND;
-      }
-    }
+  //
+  // Read break symbol from debug FIFO firstly
+  //
+  Status = DebugTerminalFifoRemove (&mSerialFifoForDebug, &Data8);
+  if (Status == EFI_SUCCESS) {
+    *BreakSymbol = Data8;
+    return EFI_SUCCESS;
+  } else {
+    //
+    // Read Break symbol from debug port
+    //
+    return DebugReadBreakFromDebugPort (Handle, BreakSymbol);
   }
-  
-  *BreakSymbol = Data;
-  return EFI_SUCCESS;
 }

@@ -2,7 +2,7 @@
   Transfer protocol defintions used by debug agent and host. It is only
   intended to be used by Debug related module implementation.
 
-  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -21,24 +21,18 @@
 //
 // Current revision of transfer protocol
 //
-#define DEBUG_AGENT_REVISION            ((0 << 16) | 02)
+#define DEBUG_AGENT_REVISION            ((0 << 16) | 03)
 #define DEBUG_AGENT_CAPABILITIES        0
-
-//
-// Definitions for break command.
-//
-#define DEBUG_STARTING_SYMBOL_BREAK         (0xFC)
 
 //
 // Definitions for attach command
 //
-#define DEBUG_STARTING_SYMBOL_ATTACH        (0xFA)
+#define DEBUG_STARTING_SYMBOL_ATTACH    (0xFA)
 
 //
 // Definition for starting symbol of a normal debug packet. Choose a non-ASCII to avoid conflict with other serial output.
 //
 #define DEBUG_STARTING_SYMBOL_NORMAL    (0xFE)
-
 
 #pragma pack(1)
 
@@ -49,7 +43,8 @@ typedef struct {
   UINT8                      StartSymbol;
   UINT8                      Command;
   UINT8                      Length;    // Length of Debug Packet including header and payload in byte
-  UINT8                      CheckSum;
+  UINT8                      SequenceNo;
+  UINT16                     Crc;
 } DEBUG_PACKET_HEADER;
 
 //
@@ -86,6 +81,7 @@ typedef struct {
 #define DEBUG_COMMAND_DETACH                      (DEBUG_COMMAND_REQUEST | 0x16)
 #define DEBUG_COMMAND_CPUID                       (DEBUG_COMMAND_REQUEST | 0x17)
 #define DEBUG_COMMAND_SEARCH_SIGNATURE            (DEBUG_COMMAND_REQUEST | 0x18)
+#define DEBUG_COMMAND_HALT                        (DEBUG_COMMAND_REQUEST | 0x19)
 
 //
 // TARGET initiated commands
@@ -94,6 +90,7 @@ typedef struct {
 #define DEBUG_COMMAND_BREAK_POINT                 (DEBUG_COMMAND_REQUEST | 0x3E)
 #define DEBUG_COMMAND_MEMORY_READY                (DEBUG_COMMAND_REQUEST | 0x3D)
 #define DEBUG_COMMAND_PRINT_MESSAGE               (DEBUG_COMMAND_REQUEST | 0x3C)
+#define DEBUG_COMMAND_ATTACH_BREAK                (DEBUG_COMMAND_REQUEST | 0x3B)
 
 //
 // Response commands
@@ -308,8 +305,9 @@ typedef struct {
 //
 // Supported keys
 //
-#define DEBUG_AGENT_SETTING_SMM_ENTRY_BREAK     1
-#define DEBUG_AGENT_SETTING_PRINT_ERROR_LEVEL   2
+#define DEBUG_AGENT_SETTING_SMM_ENTRY_BREAK          1
+#define DEBUG_AGENT_SETTING_PRINT_ERROR_LEVEL        2
+#define DEBUG_AGENT_SETTING_BOOT_SCRIPT_ENTRY_BREAK  3
 //
 // Bitmask of print error level for debug message
 //

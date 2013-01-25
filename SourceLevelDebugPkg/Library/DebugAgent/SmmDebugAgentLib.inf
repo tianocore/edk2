@@ -1,7 +1,7 @@
 ## @file
 #  Debug Agent library instance for SMM modules.
 #
-#  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -15,7 +15,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = SecDebugAgentLib
+  BASE_NAME                      = SmmDebugAgentLib
   FILE_GUID                      = CB07D74C-598F-4268-A5D1-644FB4A481E8
   MODULE_TYPE                    = DXE_SMM_DRIVER
   VERSION_STRING                 = 0.7
@@ -69,11 +69,14 @@
   LocalApicLib
   TimerLib
   PrintLib
+  PeCoffExtraActionLib
+  PeCoffGetEntryPointLib
 
 [Guids]
   gEfiDebugAgentGuid                            ## CONSUMES ## Configuration Table
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdFSBClock                                  ## CONSUMES
-  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdExceptionsIgnoredByDebugger  ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdFSBClock                                             ## CONSUMES
+  ## Skip Page Fault exception (14) by default in SMM
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdExceptionsIgnoredByDebugger|0x00004000  ## CONSUMES
 

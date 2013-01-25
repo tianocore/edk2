@@ -1,7 +1,7 @@
 /** @file
   Header file for Multi-Processor support.
 
-  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -25,6 +25,7 @@ typedef struct {
 typedef struct {
   SPIN_LOCK                 MpContextSpinLock;   ///< Lock for writting MP context
   SPIN_LOCK                 DebugPortSpinLock;   ///< Lock for access debug port
+  SPIN_LOCK                 MailboxSpinLock;     ///< Lock for accessing mail box
   UINT8                     CpuBreakMask[DEBUG_CPU_MAX_COUNT/8];        ///< Bitmask of all breaking CPUs
   UINT8                     CpuStopStatusMask[DEBUG_CPU_MAX_COUNT/8];   ///< Bitmask of CPU stop status
   UINT32                    ViewPointIndex;      ///< Current view point to be debugged
@@ -35,7 +36,6 @@ typedef struct {
   BOOLEAN                   RunCommandSet;       ///< TRUE: RUN commmand is executing. FALSE : RUN command has been executed.
 } DEBUG_MP_CONTEXT;
 
-extern CONST BOOLEAN               MultiProcessorDebugSupport;
 extern DEBUG_MP_CONTEXT volatile   mDebugMpContext;
 extern DEBUG_CPU_DATA   volatile   mDebugCpuData;
 
@@ -62,43 +62,28 @@ GetProcessorIndex (
   );
 
 /**
-  Acquire access control on MP context.
+  Acquire a spin lock when Multi-processor supported.
 
   It will block in the function if cannot get the access control.
+  If Multi-processor is not supported, return directly.
+
+  @param[in, out] MpSpinLock      A pointer to the spin lock.
 
 **/
 VOID
-AcquireMpContextControl (
-  VOID
+AcquireMpSpinLock (
+  IN OUT SPIN_LOCK           *MpSpinLock
   );
 
 /**
-  Release access control on MP context.
+  Release a spin lock when Multi-processor supported.
+
+  @param[in, out] MpSpinLock      A pointer to the spin lock.
 
 **/
 VOID
-ReleaseMpContextControl (
-  VOID
-  );
-
-/**
-  Acquire access control on debug port.
-
-  It will block in the function if cannot get the access control.
-
-**/
-VOID
-AcquireDebugPortControl (
-  VOID
-  );
-
-/**
-  Release access control on debug port.
-
-**/
-VOID
-ReleaseDebugPortControl (
-  VOID
+ReleaseMpSpinLock (
+  IN OUT SPIN_LOCK           *MpSpinLock
   );
 
 /**
