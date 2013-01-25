@@ -249,7 +249,7 @@ SmbiosPrintStructure (
     PRINT_PENDING_STRING (Struct, Type0, BiosReleaseDate);
     ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_BIOS_SIZE), gShellDebug1HiiHandle, 64 * (Struct->Type0->BiosSize + 1));
 
-    DisplayBiosCharacteristics (*(UINT64 *) &(Struct->Type0->BiosCharacteristics), Option);
+    DisplayBiosCharacteristics (ReadUnaligned64 ((UINT64 *) (UINTN) &(Struct->Type0->BiosCharacteristics)), Option);
 
     if (Struct->Hdr->Length > 0x12) {
       DisplayBiosCharacteristicsExt1 (Struct->Type0->BIOSCharacteristicsExtensionBytes[0], Option);
@@ -416,7 +416,7 @@ SmbiosPrintStructure (
     PRINT_STRUCT_VALUE_H (Struct, Type7, InstalledSize);
     PRINT_STRUCT_VALUE_H (Struct, Type7, SupportedSRAMType);
     PRINT_STRUCT_VALUE_H (Struct, Type7, CurrentSRAMType);
-    DisplayCacheSRAMType (*(UINT16 *) &(Struct->Type7->CurrentSRAMType), Option);
+    DisplayCacheSRAMType (ReadUnaligned16 ((UINT16 *) (UINTN) &(Struct->Type7->CurrentSRAMType)), Option);
     PRINT_STRUCT_VALUE_H (Struct, Type7, CacheSpeed);
     DisplayCacheErrCorrectingType (Struct->Type7->ErrorCorrectionType, Option);
     DisplayCacheSystemCacheType (Struct->Type7->SystemCacheType, Option);
@@ -633,7 +633,7 @@ SmbiosPrintStructure (
     PRINT_PENDING_STRING (Struct, Type17, DeviceLocator);
     PRINT_PENDING_STRING (Struct, Type17, BankLocator);
     DisplayMemoryDeviceType (Struct->Type17->MemoryType, Option);
-    DisplayMemoryDeviceTypeDetail (*(UINT16 *) &(Struct->Type17->TypeDetail), Option);
+    DisplayMemoryDeviceTypeDetail (ReadUnaligned16 ((UINT16 *) (UINTN) &(Struct->Type17->TypeDetail)), Option);
     PRINT_STRUCT_VALUE_H (Struct, Type17, Speed);
     PRINT_PENDING_STRING (Struct, Type17, Manufacturer);
     PRINT_PENDING_STRING (Struct, Type17, SerialNumber);

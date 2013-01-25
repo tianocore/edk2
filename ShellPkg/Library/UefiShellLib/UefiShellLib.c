@@ -486,6 +486,8 @@ ShellOpenFileByDevicePath(
   EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *EfiSimpleFileSystemProtocol;
   EFI_FILE_PROTOCOL               *Handle1;
   EFI_FILE_PROTOCOL               *Handle2;
+  CHAR16                          *FnafPathName;
+  UINTN                           PathLen;
 
   if (FilePath == NULL || FileHandle == NULL || DeviceHandle == NULL) {
     return (EFI_INVALID_PARAMETER);
@@ -552,12 +554,35 @@ ShellOpenFileByDevicePath(
     Handle1 = NULL;
 
     //
+    // File Name Alignment Fix (FNAF)
+    // Handle2->Open may be incapable of handling a unaligned CHAR16 data.
+    // The structure pointed to by FilePath may be not CHAR16 aligned.
+    // This code copies the potentially unaligned PathName data from the
+    // FilePath structure to the aligned FnafPathName for use in the
+    // calls to Handl2->Open.
+    //
+
+    //
+    // Determine length of PathName, in bytes.
+    //
+    PathLen = DevicePathNodeLength (*FilePath) - SIZE_OF_FILEPATH_DEVICE_PATH;
+
+    //
+    // Allocate memory for the aligned copy of the string Extra allocation is to allow for forced alignment
+    // Copy bytes from possibly unaligned location to aligned location
+    //
+    FnafPathName = AllocateCopyPool(PathLen, (UINT8 *)((FILEPATH_DEVICE_PATH*)*FilePath)->PathName);
+    if (FnafPathName == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    //
     // Try to test opening an existing file
     //
     Status = Handle2->Open (
                           Handle2,
                           &Handle1,
-                          ((FILEPATH_DEVICE_PATH*)*FilePath)->PathName,
+                          FnafPathName,
                           OpenMode &~EFI_FILE_MODE_CREATE,
                           0
                          );
@@ -569,11 +594,17 @@ ShellOpenFileByDevicePath(
       Status = Handle2->Open (
                             Handle2,
                             &Handle1,
-                            ((FILEPATH_DEVICE_PATH*)*FilePath)->PathName,
+                            FnafPathName,
                             OpenMode,
                             Attributes
                            );
     }
+
+    //
+    // Free the alignment buffer
+    //
+    FreePool(FnafPathName);
+
     //
     // Close the last node
     //
