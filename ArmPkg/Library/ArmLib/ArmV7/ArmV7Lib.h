@@ -60,30 +60,6 @@ ArmDisableAsynchronousAbort (
   );
 
 VOID
-EFIAPI
-ArmEnableIrq (
-  VOID
-  );
-
-UINTN
-EFIAPI
-ArmDisableIrq (
-  VOID
-  );
-
-VOID
-EFIAPI
-ArmEnableFiq (
-  VOID
-  );
-
-UINTN
-EFIAPI
-ArmDisableFiq (
-  VOID
-  );
-
-VOID
 ArmV7PerformPoUDataCacheOperation (
   IN  ARM_V7_CACHE_OPERATION  DataCacheOperation
   );

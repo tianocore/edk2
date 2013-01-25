@@ -314,10 +314,22 @@ EFIAPI
 ArmDisableInterrupts (
   VOID
   );
-  
+
 BOOLEAN
 EFIAPI
 ArmGetInterruptState (
+  VOID
+  );
+
+UINTN
+EFIAPI
+ArmDisableIrq (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmEnableIrq (
   VOID
   );
 
