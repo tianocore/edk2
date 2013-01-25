@@ -26,9 +26,9 @@
 
 [FD.Sec_ArmPlatform_EFI]
 BaseAddress   = 0xEC000000|gArmTokenSpaceGuid.PcdSecureFdBaseAddress  #The base address of the Secure FLASH Device.
-Size          = 0x00010000|gArmTokenSpaceGuid.PcdSecureFdSize         #The size in bytes of the Secure FLASH Device
+Size          = 0x00012000|gArmTokenSpaceGuid.PcdSecureFdSize         #The size in bytes of the Secure FLASH Device
 ErasePolarity = 1
-BlockSize     = 0x00001000
+BlockSize     = 0x00001200
 NumBlocks     = 0x10
 
 ################################################################################
@@ -47,7 +47,7 @@ NumBlocks     = 0x10
 #
 ################################################################################
 
-0x00000000|0x00010000
+0x00000000|0x00012000
 gArmTokenSpaceGuid.PcdSecureFvBaseAddress|gArmTokenSpaceGuid.PcdSecureFvSize
 FV = FVMAIN_SEC
 
