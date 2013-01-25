@@ -1707,6 +1707,8 @@ UpdateDeletePage (
       //
       // The signature type is not supported in current implementation.
       //
+      ItemDataSize -= CertList->SignatureListSize;
+      CertList = (EFI_SIGNATURE_LIST *) ((UINT8 *) CertList + CertList->SignatureListSize);
       continue;
     }
 
