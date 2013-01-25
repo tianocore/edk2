@@ -105,6 +105,7 @@
   ArmPkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   ArmPkg/Library/BdsLib/BdsLib.inf
   ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
+  ArmPkg/Library/DebugAgentSymbolsBaseLib/DebugAgentSymbolsBaseLib.inf
   ArmPkg/Library/DebugPeCoffExtraActionLib/DebugPeCoffExtraActionLib.inf
   ArmPkg/Library/DebugUncachedMemoryAllocationLib/DebugUncachedMemoryAllocationLib.inf
   ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf

@@ -23,6 +23,9 @@
   PL390Gic.c
   PL390GicNonSec.c
 
+[LibraryClasses]
+  IoLib
+
 [Packages]
   ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec

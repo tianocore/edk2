@@ -180,6 +180,7 @@ LinuxLoaderConfig (
   LINUX_LOADER_OPTIONAL_DATA*  LinuxOptionalData;
   EFI_DEVICE_PATH*             DevicePathRoot;
 
+  Choice = (LINUX_LOADER_ACTION)0;
   SupportedBdsLoadOptions = NULL;
   SupportedBdsLoadOptionCount = 0;
 
