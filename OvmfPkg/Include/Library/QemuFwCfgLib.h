@@ -1,7 +1,7 @@
 /** @file
   QEMU/KVM Firmware Configuration access
 
-  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -99,6 +99,25 @@ EFIAPI
 QemuFwCfgReadBytes (
   IN UINTN                  Size,
   IN VOID                   *Buffer  OPTIONAL
+  );
+
+
+/**
+  Writes firmware configuration bytes from a buffer
+
+  If called multiple times, then the data written will
+  continue at the offset of the firmware configuration
+  item where the previous write ended.
+
+  @param[in] Size - Size in bytes to write
+  @param[in] Buffer - Buffer to read data from
+
+**/
+VOID
+EFIAPI
+QemuFwCfgWriteBytes (
+  IN UINTN                  Size,
+  IN VOID                   *Buffer
   );
 
 

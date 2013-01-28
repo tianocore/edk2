@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -45,6 +45,32 @@ STATIC BOOLEAN mQemuFwCfgSupported = FALSE;
 VOID
 EFIAPI
 IoReadFifo8 (
+  IN      UINTN                     Port,
+  IN      UINTN                     Count,
+  OUT     VOID                      *Buffer
+  );
+
+/**
+  Writes an 8-bit I/O port fifo from a block of memory.
+
+  Writes the 8-bit I/O fifo port specified by Port.
+
+  The port is written Count times, and the data are obtained
+  from the provided Buffer.
+
+  This function must guarantee that all I/O read and write operations are
+  serialized.
+
+  If 8-bit I/O port operations are not supported, then ASSERT().
+
+  @param  Port    The I/O port to read.
+  @param  Count   The number of times to read I/O port.
+  @param  Buffer  The buffer to store the read data into.
+
+**/
+VOID
+EFIAPI
+IoWriteFifo8 (
   IN      UINTN                     Port,
   IN      UINTN                     Count,
   OUT     VOID                      *Buffer
@@ -129,6 +155,29 @@ QemuFwCfgReadBytes (
     InternalQemuFwCfgReadBytes (Size, Buffer);
   } else {
     ZeroMem (Buffer, Size);
+  }
+}
+
+/**
+  Write firmware configuration bytes from a buffer
+
+  If called multiple times, then the data written will
+  continue at the offset of the firmware configuration
+  item where the previous write ended.
+
+  @param[in] Size - Size in bytes to write
+  @param[in] Buffer - Buffer to read data from
+
+**/
+VOID
+EFIAPI
+QemuFwCfgWriteBytes (
+  IN UINTN                  Size,
+  IN VOID                   *Buffer
+  )
+{
+  if (mQemuFwCfgSupported) {
+    IoWriteFifo8 (0x511, Size, Buffer);
   }
 }
 

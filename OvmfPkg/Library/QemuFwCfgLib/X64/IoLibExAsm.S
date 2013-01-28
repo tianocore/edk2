@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -26,5 +26,22 @@ ASM_PFX(IoReadFifo8):
     xchg    %r8, %rdi           # rdi: buffer address; r8: save rdi
 rep insb
     mov     %r8, %rdi           # restore rdi
+    ret
+
+#------------------------------------------------------------------------------
+#  VOID
+#  EFIAPI
+#  IoWriteFifo8 (
+#    IN UINTN                  Port,              // rcx
+#    IN UINTN                  Size,              // rdx
+#    IN VOID                   *Buffer            // r8
+#    );
+#------------------------------------------------------------------------------
+ASM_GLOBAL ASM_PFX(IoWriteFifo8)
+ASM_PFX(IoWriteFifo8):
+    xchg    %rcx, %rdx
+    xchg    %r8, %rsi           # rdi: buffer address; r8: save rsi
+rep outsb
+    mov     %r8, %rsi           # restore rsi
     ret
 
