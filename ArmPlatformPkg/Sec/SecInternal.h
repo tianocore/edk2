@@ -1,7 +1,7 @@
 /** @file
 *  Main file supporting the SEC Phase on ARM PLatforms
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -70,7 +70,7 @@ set_non_secure_mode (
 VOID
 SecCommonExceptionEntry (
   IN UINT32 Entry,
-  IN UINT32 LR
+  IN UINTN  LR
   );
 
 #endif

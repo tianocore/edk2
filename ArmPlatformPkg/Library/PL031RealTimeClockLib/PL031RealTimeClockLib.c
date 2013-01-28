@@ -4,6 +4,7 @@
   Currently this driver does not support runtime virtual calling.
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2011-2013, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -250,7 +251,7 @@ LibGetTime (
   )
 {
   EFI_STATUS  Status = EFI_SUCCESS;
-  UINTN       EpochSeconds;
+  UINT32      EpochSeconds;
   INT16       *TimeZone = 0;
   UINTN       *Daylight = 0;
 

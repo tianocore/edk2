@@ -1,6 +1,6 @@
 /*++ @file  NorFlashFvbDxe.c
 
- Copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR>
+ Copyright (c) 2011-201333, ARM Ltd. All rights reserved.<BR>
 
  This program and the accompanying materials
  are licensed and made available under the terms and conditions of the BSD License
@@ -107,7 +107,7 @@ InitializeFvAndVariableStoreHeaders (
   //
   // VARIABLE_STORE_HEADER
   //
-  VariableStoreHeader = (VARIABLE_STORE_HEADER*)((UINT32)Headers + FirmwareVolumeHeader->HeaderLength);
+  VariableStoreHeader = (VARIABLE_STORE_HEADER*)((UINTN)Headers + FirmwareVolumeHeader->HeaderLength);
   CopyGuid (&VariableStoreHeader->Signature, &gEfiVariableGuid);
   VariableStoreHeader->Size = PcdGet32(PcdFlashNvStorageVariableSize) - FirmwareVolumeHeader->HeaderLength;
   VariableStoreHeader->Format            = VARIABLE_STORE_FORMATTED;
@@ -172,7 +172,7 @@ ValidateFvHeader (
     return EFI_NOT_FOUND;
   }
 
-  VariableStoreHeader = (VARIABLE_STORE_HEADER*)((UINT32)FwVolHeader + FwVolHeader->HeaderLength);
+  VariableStoreHeader = (VARIABLE_STORE_HEADER*)((UINTN)FwVolHeader + FwVolHeader->HeaderLength);
 
   // Check the Variable Store Guid
   if( CompareGuid (&VariableStoreHeader->Signature, &gEfiVariableGuid) == FALSE ) {

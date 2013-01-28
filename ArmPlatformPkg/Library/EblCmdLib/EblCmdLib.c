@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -101,7 +101,7 @@ EblSymbolTable (
   for (Entry = 0; Entry < DebugImageTableHeader->TableSize; Entry++, DebugTable++) {
     if (DebugTable->NormalImage != NULL) {
       if ((DebugTable->NormalImage->ImageInfoType == EFI_DEBUG_IMAGE_INFO_TYPE_NORMAL) && (DebugTable->NormalImage->LoadedImageProtocolInstance != NULL)) {
-        ImageBase = (UINT32)DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase;
+        ImageBase = (UINTN)DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase;
         PeCoffSizeOfHeaders = PeCoffGetSizeOfHeaders ((VOID *)(UINTN)ImageBase);
         Pdb = PeCoffLoaderGetPdbPointer (DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase);
         if (Pdb != NULL) {
@@ -389,7 +389,7 @@ EblDevicePaths (
   for (Index = 0; Index < HandleCount; Index++) {
     Status = gBS->HandleProtocol (HandleBuffer[Index], &gEfiDevicePathProtocolGuid, (VOID **)&DevicePathProtocol);
     String = DevicePathToTextProtocol->ConvertDevicePathToText(DevicePathProtocol,TRUE,TRUE);
-    Print (L"[0x%X] %s\n",(UINT32)HandleBuffer[Index], String);
+    Print (L"[0x%X] %s\n",(UINTN)HandleBuffer[Index], String);
   }
 
   return EFI_SUCCESS;
