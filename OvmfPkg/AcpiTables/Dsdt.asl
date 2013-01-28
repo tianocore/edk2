@@ -203,10 +203,28 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 4) {
             Package () {0x0000FFFF, 0x02, \_SB.PCI0.LPC.LNKB, 0x00},
             Package () {0x0000FFFF, 0x03, \_SB.PCI0.LPC.LNKC, 0x00},
 
-            Package () {0x0001FFFF, 0x00, 0x00, 0x09},
             //
-            // list of IRQs occupied thus far: 9
+            // Bus 0, Device 1, Pin 0 (INTA) is special; it corresponds to the
+            // internally generated SCI (System Control Interrupt), which is
+            // always routed to GSI 9. By setting the third (= Source) field to
+            // zero, we could use the fourth (= Source Index) field to hardwire
+            // the pin to GSI 9 directly.
             //
+            // That way however, in accordance with the ACPI spec's description
+            // of SCI, the interrupt would be treated as "active low,
+            // shareable, level", and that doesn't match qemu.
+            //
+            // In QemuInstallAcpiMadtTable() [OvmfPkg/AcpiPlatformDxe/Qemu.c]
+            // we install an Interrupt Override Structure for the identity
+            // mapped IRQ#9 / GSI 9 (the corresponding bit being set in
+            // Pcd8259LegacyModeEdgeLevel), which describes the correct
+            // polarity (active high). As a consequence, some OS'en (eg. Linux)
+            // override the default (active low) polarity originating from the
+            // _PRT; others (eg. FreeBSD) don't. Therefore we need a separate
+            // link device just to specify a polarity that matches the MADT.
+            //
+            Package () {0x0001FFFF, 0x00, \_SB.PCI0.LPC.LNKS, 0x00},
+
             Package () {0x0001FFFF, 0x01, \_SB.PCI0.LPC.LNKB, 0x00},
             Package () {0x0001FFFF, 0x02, \_SB.PCI0.LPC.LNKC, 0x00},
             Package () {0x0001FFFF, 0x03, \_SB.PCI0.LPC.LNKD, 0x00},
@@ -290,6 +308,30 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 4) {
       //
       Device (LPC) {
         Name (_ADR, 0x00010000)
+
+        //
+        // The SCI cannot be rerouted or disabled with PIRQRC[A:D]; we only
+        // need this link device in order to specify the polarity.
+        //
+        Device (LNKS) {
+          Name (_HID, EISAID("PNP0C0F"))
+          Name (_UID, 0)
+
+          Name (_STA, 0xB) // 0x1: device present
+                           // 0x2: enabled and decoding resources
+                           // 0x8: functioning properly
+
+          Method (_SRS, 1, NotSerialized) { /* no-op */ }
+          Method (_DIS, 0, NotSerialized) { /* no-op */ }
+
+          Name (_PRS, ResourceTemplate () {
+            Interrupt (ResourceConsumer, Level, ActiveHigh, Shared) { 9 }
+            //
+            // list of IRQs occupied thus far: 9
+            //
+          })
+          Method (_CRS, 0, NotSerialized) { Return (_PRS) }
+        }
 
         //
         // PCI Interrupt Routing Configuration Registers, PIRQRC[A:D]
