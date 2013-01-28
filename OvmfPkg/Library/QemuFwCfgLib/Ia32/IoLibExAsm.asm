@@ -29,7 +29,7 @@ IoReadFifo8 PROC
     mov     dx, [esp + 4]
     mov     ecx, [esp + 8]
     push    edi
-    mov     edx, [esp + 16]
+    mov     edi, [esp + 16]
 rep insb
     pop     edi
     ret
