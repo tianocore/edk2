@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -13,7 +13,6 @@
 #------------------------------------------------------------------------------
 
 ASM_GLOBAL ASM_PFX(JumpToKernel)
-ASM_GLOBAL ASM_PFX(JumpToUefiKernel)
 
 #------------------------------------------------------------------------------
 # VOID
@@ -27,20 +26,4 @@ ASM_PFX(JumpToKernel):
     movl    0x8(%esp), %esi
     calll   0x4(%esp)
     ret
-
-#------------------------------------------------------------------------------
-# VOID
-# EFIAPI
-# JumpToUefiKernel (
-#   EFI_HANDLE ImageHandle,
-#   EFI_SYSTEM_TABLE *SystemTable,
-#   VOID *KernelBootParams,
-#   VOID *KernelStart
-#   );
-#------------------------------------------------------------------------------
-ASM_PFX(JumpToUefiKernel):
-    movl    0xc(%esp), %eax
-    movl    0x264(%eax), %eax
-    addl    0x10(%esp), %eax
-    jmp     %eax
 
