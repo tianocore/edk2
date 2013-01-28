@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -14,8 +14,11 @@
 
 #include "BdsInternal.h"
 
+#include <Guid/ArmGlobalVariableHob.h>
+
 extern EFI_HANDLE mImageHandle;
 extern BDS_LOAD_OPTION_SUPPORT *BdsLoadOptionSupportList;
+
 
 EFI_STATUS
 SelectBootDevice (
@@ -102,7 +105,7 @@ SelectBootDevice (
     }
     Index++;
   }
-  
+
 EXIT:
   BootDeviceListSupportedFree (&SupportedDeviceList, *SupportedBootDevice);
   return Status;
@@ -185,7 +188,7 @@ BootMenuAddBootOption (
     InitrdSize = GetDevicePathSize (InitrdPath);
 
     BootArguments = (ARM_BDS_LOADER_ARGUMENTS*)AllocatePool (sizeof(ARM_BDS_LOADER_ARGUMENTS) + CmdLineSize + InitrdSize);
-    
+
     BootArguments->LinuxArguments.CmdLineSize = CmdLineSize;
     BootArguments->LinuxArguments.InitrdSize = InitrdSize;
     CopyMem ((VOID*)(&BootArguments->LinuxArguments + 1), CmdLine, CmdLineSize);
@@ -211,7 +214,7 @@ BootMenuAddBootOption (
 FREE_DEVICE_PATH:
   FreePool (DevicePath);
 
-  
+
 EXIT:
   if (Status == EFI_ABORTED) {
     Print(L"\n");
@@ -439,7 +442,7 @@ BootMenuUpdateBootOption (
       InitrdSize = 0;
     }
 
-    Print(L"Arguments to pass to the binary: "); 
+    Print(L"Arguments to pass to the binary: ");
     if (CmdLineSize > 0) {
       AsciiStrnCpy(CmdLine, (CONST CHAR8*)(LinuxArguments + 1), CmdLineSize);
     } else {
@@ -511,10 +514,22 @@ UpdateFdtPath (
     // Append the Device Path node to the select device path
     FdtDevicePath = AppendDevicePathNode (SupportedBootDevice->DevicePathProtocol, FdtDevicePathNode);
     FdtDevicePathSize = GetDevicePathSize (FdtDevicePath);
-    Status = gRT->SetVariable ((CHAR16*)L"Fdt", &gEfiGlobalVariableGuid, (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS ), FdtDevicePathSize, FdtDevicePath);
+    Status = gRT->SetVariable (
+                    (CHAR16*)L"Fdt",
+                    &gArmGlobalVariableGuid,
+                    EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                    FdtDevicePathSize,
+                    FdtDevicePath
+                    );
     ASSERT_EFI_ERROR(Status);
   } else {
-    gRT->SetVariable ((CHAR16*)L"Fdt", &gEfiGlobalVariableGuid, (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS ), 0, NULL);
+    gRT->SetVariable (
+           (CHAR16*)L"Fdt",
+           &gArmGlobalVariableGuid,
+           EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+           0,
+           NULL
+           );
     ASSERT_EFI_ERROR(Status);
   }
 
