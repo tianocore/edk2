@@ -31,7 +31,6 @@
 
 [Sources.common]
   ArmPlatformLibNull.c
-  ArmPlatformLibNullMem.c
 
 [Sources.Arm]
   Arm/ArmPlatformHelper.S    | GCC
