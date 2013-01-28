@@ -1,8 +1,7 @@
 #/** @file
-# Memory Status Code Library for UEFI drivers
 #
-# Lib to provide memory journal status code reporting Routines
 # Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011-2013, ARM Ltd. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -25,7 +24,6 @@
 [Sources.common]
   PL031RealTimeClockLib.c
 
-
 [Packages]
   MdePkg/MdePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
@@ -37,7 +35,7 @@
   DebugLib
   PcdLib
   ArmPlatformSysConfigLib
-  
+
 [Pcd]
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase
   gArmPlatformTokenSpaceGuid.PcdPL031RtcPpmAccuracy
