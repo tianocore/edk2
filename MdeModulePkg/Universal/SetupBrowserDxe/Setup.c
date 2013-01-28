@@ -4115,6 +4115,7 @@ SaveBrowserContext (
   Context->HelpBlockWidth       = gHelpBlockWidth;
   Context->OldFormSet           = gOldFormSet;
   Context->MenuRefreshHead      = gMenuRefreshHead;
+  Context->ProtocolNotFound     = gProtocolNotFound;
 
   CopyMem (&Context->ScreenDimensions, &gScreenDimensions, sizeof (gScreenDimensions));
   CopyMem (&Context->MenuOption, &gMenuOption, sizeof (gMenuOption));
