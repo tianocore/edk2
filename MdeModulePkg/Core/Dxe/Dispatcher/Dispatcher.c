@@ -26,7 +26,7 @@
   Depex - Dependency Expresion.
   SOR   - Schedule On Request - Don't schedule if this bit is set.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -984,6 +984,7 @@ CoreProcessFvImageFile (
   UINTN                               BufferSize;
   EFI_FIRMWARE_VOLUME_HEADER          *FvHeader;
   UINT32                              FvAlignment;
+  EFI_DEVICE_PATH_PROTOCOL            *FvFileDevicePath;
 
   //
   // Read the first (and only the first) firmware volume section
@@ -1004,6 +1005,32 @@ CoreProcessFvImageFile (
                  &AuthenticationStatus
                  );
   if (!EFI_ERROR (Status)) {
+     //
+    // Evaluate the authentication status of the Firmware Volume through
+    // Security Architectural Protocol
+    //
+    if (gSecurity != NULL) {
+      FvFileDevicePath = CoreFvToDevicePath (Fv, FvHandle, DriverName);
+      Status = gSecurity->FileAuthenticationState (
+                            gSecurity,
+                            AuthenticationStatus,
+                            FvFileDevicePath
+                            );
+      if (FvFileDevicePath != NULL) {
+        FreePool (FvFileDevicePath);
+      }
+
+      if (Status != EFI_SUCCESS) {
+        //
+        // Security check failed. The firmware volume should not be used for any purpose.
+        //
+        if (Buffer != NULL) {
+          FreePool (Buffer);
+        }
+        return Status;
+      }
+    }
+
     //
     // FvImage should be at its required alignment.
     //
@@ -1087,7 +1114,6 @@ CoreFwVolEventProtocolNotify (
 {
   EFI_STATUS                    Status;
   EFI_STATUS                    GetNextFileStatus;
-  EFI_STATUS                    SecurityStatus;
   EFI_FIRMWARE_VOLUME2_PROTOCOL *Fv;
   EFI_DEVICE_PATH_PROTOCOL      *FvDevicePath;
   EFI_HANDLE                    FvHandle;
@@ -1157,24 +1183,6 @@ CoreFwVolEventProtocolNotify (
       // The Firmware volume doesn't have device path, can't be dispatched.
       //
       continue;
-    }
-
-    //
-    // Evaluate the authentication status of the Firmware Volume through
-    // Security Architectural Protocol
-    //
-    if (gSecurity != NULL) {
-      SecurityStatus = gSecurity->FileAuthenticationState (
-                                    gSecurity,
-                                    0,
-                                    FvDevicePath
-                                    );
-      if (SecurityStatus != EFI_SUCCESS) {
-        //
-        // Security check failed. The firmware volume should not be used for any purpose.
-        //
-        continue;
-      }
     }
 
     //
