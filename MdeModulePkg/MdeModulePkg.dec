@@ -4,7 +4,7 @@
 # It also provides the defintions(including PPIs/PROTOCOLs/GUIDs and library classes)
 # and libraries instances, which are used for those modules.
 #
-# Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under 
 # the terms and conditions of the BSD License that accompanies this distribution.  
 # The full text of the license may be found at
@@ -453,6 +453,11 @@
   #  If FALSE, TEXT statement will be set to GrayOut only when GrayOut condition is TRUE.
   gEfiMdeModulePkgTokenSpaceGuid.PcdBrowserGrayOutTextStatement|FALSE|BOOLEAN|0x0001004f
   
+  ## This PCD specifies whether unselectable menu should be gray out in HII Form Browser.
+  # If TRUE, the unselectable menu will be set to GrayOut.
+  # If FALSE, the menu will be show as normal menu entry even if it is not selectable.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBrowerGrayOutReadOnlyMenu|FALSE|BOOLEAN|0x00010070
+
   ## If TRUE, recovery from IDE disk will be supported.
   gEfiMdeModulePkgTokenSpaceGuid.PcdRecoveryOnIdeDisk|TRUE|BOOLEAN|0x00010060
 

@@ -778,6 +778,9 @@ UiAddMenuOption (
     if ((Statement->ValueExpression != NULL) ||
         ((Statement->QuestionFlags & EFI_IFR_FLAG_READ_ONLY) != 0)) {
       MenuOption->ReadOnly = TRUE;
+      if (FeaturePcdGet (PcdBrowerGrayOutReadOnlyMenu)) {
+        MenuOption->GrayOut = TRUE;
+      }
     }
 
     InsertTailList (&gMenuOption, &MenuOption->Link);

@@ -80,6 +80,7 @@
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport          ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdBrowserGrayOutTextStatement            ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBrowerGrayOutReadOnlyMenu              ## CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdBrowserSubtitleTextColor               ## CONSUMES
