@@ -1,7 +1,7 @@
 /** @file
   FrontPage routines to handle the callbacks and browser calls
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -21,6 +21,7 @@ BOOLEAN   mModeInitialized = FALSE;
 
 BOOLEAN   gConnectAllHappened = FALSE;
 UINTN     gCallbackKey;
+CHAR8     *mLanguageString;
 
 //
 // Boot video resolution and text mode.
@@ -178,13 +179,10 @@ FrontPageCallback (
   OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
   )
 {
-  CHAR8                         *LanguageString;
   CHAR8                         *LangCode;
   CHAR8                         *Lang;
   UINTN                         Index;
   EFI_STATUS                    Status;
-  CHAR8                         *PlatformSupportedLanguages;
-  CHAR8                         *BestLanguage;
 
   if (Action != EFI_BROWSER_ACTION_CHANGING && Action != EFI_BROWSER_ACTION_CHANGED) {
     //
@@ -210,18 +208,13 @@ FrontPageCallback (
 
     case FRONT_PAGE_KEY_LANGUAGE:
       //
-      // Collect the languages from what our current Language support is based on our VFR
-      //
-      LanguageString = HiiGetSupportedLanguages (gFrontPagePrivate.HiiHandle);
-      ASSERT (LanguageString != NULL);
-      //
       // Allocate working buffer for RFC 4646 language in supported LanguageString.
       //
-      Lang = AllocatePool (AsciiStrSize (LanguageString));
-      ASSERT (Lang != NULL);
+      Lang = AllocatePool (AsciiStrSize (mLanguageString));
+      ASSERT (Lang != NULL);  
 
       Index = 0;
-      LangCode = LanguageString;
+      LangCode = mLanguageString;
       while (*LangCode != 0) {
         GetNextLanguage (&LangCode, Lang);
 
@@ -232,43 +225,22 @@ FrontPageCallback (
         Index++;
       }
 
-      GetEfiGlobalVariable2 (L"PlatformLangCodes", (VOID**)&PlatformSupportedLanguages, NULL);
-      if (PlatformSupportedLanguages == NULL) {
-        PlatformSupportedLanguages = AllocateCopyPool (
-                                       AsciiStrSize ((CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLangCodes)),
-                                       (CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLangCodes)
-                                       );
-        ASSERT (PlatformSupportedLanguages != NULL);
-      }
-
-      //
-      // Select the best language in platform supported Language.
-      //
-      BestLanguage = GetBestLanguage (
-                       PlatformSupportedLanguages,
-                       FALSE,
-                       Lang,
-                       NULL
-                       );
-      if (BestLanguage != NULL) {
+      if (Index == Value->u8) {
         Status = gRT->SetVariable (
                         L"PlatformLang",
                         &gEfiGlobalVariableGuid,
                         EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                        AsciiStrSize (BestLanguage),
+                        AsciiStrSize (Lang),
                         Lang
                         );
         ASSERT_EFI_ERROR(Status);
-        FreePool (BestLanguage);
       } else {
         ASSERT (FALSE);
       }
 
       *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
 
-      FreePool (PlatformSupportedLanguages);
       FreePool (Lang);
-      FreePool (LanguageString);
       break;
 
     default:
@@ -328,11 +300,9 @@ InitializeFrontPage (
   )
 {
   EFI_STATUS                  Status;
-  CHAR8                       *LanguageString;
   CHAR8                       *LangCode;
   CHAR8                       *Lang;
   CHAR8                       *CurrentLang;
-  CHAR8                       *BestLanguage;
   UINTN                       OptionCount;
   CHAR16                      *StringBuffer;
   EFI_HII_HANDLE              HiiHandle;
@@ -341,7 +311,11 @@ InitializeFrontPage (
   VOID                        *EndOpCodeHandle;
   EFI_IFR_GUID_LABEL          *StartLabel;
   EFI_IFR_GUID_LABEL          *EndLabel;
-  BOOLEAN                     FirstFlag;
+  EFI_HII_STRING_PROTOCOL     *HiiString;
+  UINTN                       StringSize;
+
+  Lang         = NULL;
+  StringBuffer = NULL;
 
   if (InitializeHiiData) {
     //
@@ -422,62 +396,82 @@ InitializeFrontPage (
   // Collect the languages from what our current Language support is based on our VFR
   //
   HiiHandle = gFrontPagePrivate.HiiHandle;
-  LanguageString = HiiGetSupportedLanguages (HiiHandle);
-  ASSERT (LanguageString != NULL);
-  //
-  // Allocate working buffer for RFC 4646 language in supported LanguageString.
-  //
-  Lang = AllocatePool (AsciiStrSize (LanguageString));
-  ASSERT (Lang != NULL);
 
-  GetEfiGlobalVariable2 (L"PlatformLang", (VOID**)&CurrentLang, NULL);
-  //
-  // Select the best language in LanguageString as the default one.
-  //
-  BestLanguage = GetBestLanguage (
-                   LanguageString,
-                   FALSE,
-                   (CurrentLang != NULL) ? CurrentLang : "",
-                   (CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLang),
-                   LanguageString,
-                   NULL
-                   );
-  //
-  // BestLanguage must be selected as it is the first language in LanguageString by default
-  //
-  ASSERT (BestLanguage != NULL);
-
-  OptionCount = 0;
-  LangCode    = LanguageString;
-  FirstFlag   = FALSE;
+  CurrentLang = GetEfiGlobalVariable (L"PlatformLang");
 
   if (gFrontPagePrivate.LanguageToken == NULL) {
+    //
+    // Get Support language list from variable.
+    //
+    mLanguageString = GetEfiGlobalVariable (L"PlatformLangCodes");
+    if (mLanguageString == NULL) {
+      mLanguageString = AllocateCopyPool (
+                                 AsciiStrSize ((CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLangCodes)),
+                                 (CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLangCodes)
+                                 );
+      ASSERT (mLanguageString != NULL);
+    }
+
+    //
+    // Count the language list number.
+    //  
+    LangCode      = mLanguageString;
+    Lang          = AllocatePool (AsciiStrSize (mLanguageString));
+    ASSERT (Lang != NULL);
+    OptionCount = 0;
     while (*LangCode != 0) {
       GetNextLanguage (&LangCode, Lang);
       OptionCount ++;
     }
-    gFrontPagePrivate.LanguageToken = AllocatePool (OptionCount * sizeof (EFI_STRING_ID));
+
+    //
+    // Allocate extra 1 as the end tag.
+    //
+    gFrontPagePrivate.LanguageToken = AllocateZeroPool ((OptionCount + 1) * sizeof (EFI_STRING_ID));
     ASSERT (gFrontPagePrivate.LanguageToken != NULL);
-    FirstFlag = TRUE;
+
+    Status = gBS->LocateProtocol (&gEfiHiiStringProtocolGuid, NULL, (VOID **) &HiiString);
+    ASSERT_EFI_ERROR (Status);
+
+    LangCode     = mLanguageString;
+    OptionCount  = 0;
+    while (*LangCode != 0) {
+      GetNextLanguage (&LangCode, Lang);
+
+      StringSize = 0;
+      Status = HiiString->GetString (HiiString, Lang, HiiHandle, PRINTABLE_LANGUAGE_NAME_STRING_ID, StringBuffer, &StringSize, NULL);
+      if (Status == EFI_BUFFER_TOO_SMALL) {
+        StringBuffer = AllocateZeroPool (StringSize);
+        ASSERT (StringBuffer != NULL);
+        Status = HiiString->GetString (HiiString, Lang, HiiHandle, PRINTABLE_LANGUAGE_NAME_STRING_ID, StringBuffer, &StringSize, NULL);
+        ASSERT_EFI_ERROR (Status);
+      }
+
+      if (EFI_ERROR (Status)) {
+        StringBuffer = AllocatePool (AsciiStrSize (Lang) * sizeof (CHAR16));
+        ASSERT (StringBuffer != NULL);
+        AsciiStrToUnicodeStr (Lang, StringBuffer);
+      }
+
+      ASSERT (StringBuffer != NULL);
+      gFrontPagePrivate.LanguageToken[OptionCount] = HiiSetString (HiiHandle, 0, StringBuffer, NULL);
+      FreePool (StringBuffer);
+
+      OptionCount++;
+    }
   }
 
-  OptionCount = 0;
-  LangCode = LanguageString;
+  ASSERT (gFrontPagePrivate.LanguageToken != NULL);
+  LangCode     = mLanguageString;
+  OptionCount  = 0;
+  if (Lang == NULL) {
+    Lang = AllocatePool (AsciiStrSize (mLanguageString));
+    ASSERT (Lang != NULL);
+  }
   while (*LangCode != 0) {
     GetNextLanguage (&LangCode, Lang);
 
-    if (FirstFlag) {
-      StringBuffer = HiiGetString (HiiHandle, PRINTABLE_LANGUAGE_NAME_STRING_ID, Lang);
-      ASSERT (StringBuffer != NULL);
-
-      //
-      // Save the string Id for each language
-      //
-      gFrontPagePrivate.LanguageToken[OptionCount] = HiiSetString (HiiHandle, 0, StringBuffer, NULL);
-      FreePool (StringBuffer);
-    }
-
-    if (AsciiStrCmp (Lang, BestLanguage) == 0) {
+    if (CurrentLang != NULL && AsciiStrCmp (Lang, CurrentLang) == 0) {
       HiiCreateOneOfOptionOpCode (
         OptionsOpCodeHandle,
         gFrontPagePrivate.LanguageToken[OptionCount],
@@ -501,9 +495,7 @@ InitializeFrontPage (
   if (CurrentLang != NULL) {
     FreePool (CurrentLang);
   }
-  FreePool (BestLanguage);
   FreePool (Lang);
-  FreePool (LanguageString);
 
   HiiCreateOneOfOpCode (
     StartOpCodeHandle,
@@ -1229,6 +1221,9 @@ PlatformBdsEnterFrontPage (
 
   } while ((Status == EFI_SUCCESS) && (gCallbackKey != FRONT_PAGE_KEY_CONTINUE));
 
+  if (mLanguageString != NULL) {
+    FreePool (mLanguageString);
+  }
   //
   //Will leave browser, check any reset required change is applied? if yes, reset system
   //
