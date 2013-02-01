@@ -1,7 +1,7 @@
 /** @file
   Provides generic security measurement functions for DXE module.
 
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -102,7 +102,7 @@ CheckAuthenticationOperation (
   //
   // Make sure new auth operation can be recognized.
   //
-  ASSERT ((CheckAuthOperation & ~(EFI_AUTH_IMAGE_OPERATION_MASK | EFI_AUTH_OPERATION_IMAGE_REQUIRED)) == 0);
+  ASSERT ((CheckAuthOperation & ~(EFI_AUTH_IMAGE_OPERATION_MASK | EFI_AUTH_OPERATION_AUTHENTICATION_STATE | EFI_AUTH_OPERATION_IMAGE_REQUIRED)) == 0);
   
   //
   // When current operation includes measure image operation, 
