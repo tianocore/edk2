@@ -1,7 +1,7 @@
 /** @file
   Boot functions implementation for UefiPxeBc Driver.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -278,7 +278,7 @@ PxeBcSelectBootMenu (
   PXEBC_BOOT_MENU_ENTRY      *MenuArray[PXEBC_MENU_MAX_NUM];
 
   Finish    = FALSE;
-  Select    = 1;
+  Select    = 0;
   Index     = 0;
   *Type     = 0;
   Mode      = Private->PxeBc.Mode;
