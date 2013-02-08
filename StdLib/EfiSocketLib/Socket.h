@@ -33,9 +33,9 @@
 #define DEBUG_OPTION        0x00080000  ///<  Display option messages
 
 #define MAX_PENDING_CONNECTIONS     1   ///<  Maximum connection FIFO depth
-#define MAX_RX_DATA         65536       ///<  Maximum receive data size
+#define MAX_RX_DATA         0x01000000  ///<  Maximum receive data size
 #define MAX_TX_DATA         ( MAX_RX_DATA * 2 ) ///<  Maximum buffered transmit data in bytes
-#define RX_PACKET_DATA      16384       ///<  Maximum number of bytes in a RX packet
+#define RX_PACKET_DATA      0x00100000  ///<  Maximum number of bytes in a RX packet
 #define MAX_UDP_RETRANSMIT  16          ///<  UDP retransmit attempts to handle address not mapped
 
 #define ESL_STRUCTURE_ALIGNMENT_BYTES   15  ///<  Number of bytes for structure alignment
