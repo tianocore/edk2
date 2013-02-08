@@ -266,7 +266,7 @@ EslUdp4PortAllocate (
   pConfig->AcceptBroadcast = FALSE;
   pConfig->AcceptPromiscuous = FALSE;
   pConfig->AllowDuplicatePort = TRUE;
-  pConfig->DoNotFragment = TRUE;
+  pConfig->DoNotFragment = FALSE;
   Status = EFI_SUCCESS;
 
   //
