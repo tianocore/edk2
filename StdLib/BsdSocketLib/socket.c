@@ -146,7 +146,7 @@ BslSocketProtocolToFd (
     pDescriptor->f_flag = 0;
     pDescriptor->f_iflags = DTYPE_SOCKET;
     pDescriptor->MyFD = (UINT16)FileDescriptor;
-    pDescriptor->Oflags = 0;
+    pDescriptor->Oflags = O_RDWR;
     pDescriptor->Omode = S_ACC_READ | S_ACC_WRITE;
     pDescriptor->RefCount = 1;
     FILE_SET_MATURE ( pDescriptor );
