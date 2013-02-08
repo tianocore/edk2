@@ -386,7 +386,7 @@ SocketConnect (
             ( pRemoteAddress4->sin_addr.s_addr >> 8 ) & 0xff,
             ( pRemoteAddress4->sin_addr.s_addr >> 16 ) & 0xff,
             ( pRemoteAddress4->sin_addr.s_addr >> 24 ) & 0xff,
-            htons ( pRemoteAddress4->sin_port ));
+            ntohs ( pRemoteAddress4->sin_port ));
   }
   else {
     Print ( L"Connecting to remote system [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d\r\n",
@@ -406,7 +406,7 @@ SocketConnect (
             pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 13 ],
             pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 14 ],
             pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 15 ],
-            htons ( pRemoteAddress6->sin6_port ));
+            ntohs ( pRemoteAddress6->sin6_port ));
   }
 
   //
@@ -441,7 +441,7 @@ SocketConnect (
                 ( pRemoteAddress4->sin_addr.s_addr >> 8 ) & 0xff,
                 ( pRemoteAddress4->sin_addr.s_addr >> 16 ) & 0xff,
                 ( pRemoteAddress4->sin_addr.s_addr >> 24 ) & 0xff,
-                htons ( pRemoteAddress4->sin_port ));
+                ntohs ( pRemoteAddress4->sin_port ));
       }
       else {
         Print ( L"Connected to remote system [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d\r\n",
@@ -461,8 +461,9 @@ SocketConnect (
                 pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 13 ],
                 pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 14 ],
                 pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 15 ],
-                htons ( pRemoteAddress6->sin6_port ));
+                ntohs ( pRemoteAddress6->sin6_port ));
       }
+Print ( L"ConnectStatus: %d, Status: %r\r\n", ConnectStatus, Status );
     }
     else {
       //
@@ -478,6 +479,7 @@ SocketConnect (
   //
   //  Return the operation status
   //
+Print ( L"SocketConnect returning Status: %r\r\n", Status );
   return Status;
 }
 
@@ -571,6 +573,7 @@ SocketSend (
       DEBUG (( DEBUG_INFO,
                 "ERROR: send failed, errno: %d\r\n",
                 errno ));
+Print ( L"ERROR: send failed, errno: %d\r\n", errno );
 
       //
       //  Try again
@@ -636,6 +639,7 @@ SocketOpen (
     //  Wait for the remote network application to start
     //
     Status = SocketConnect ( );
+Print ( L"Status: %r\r\n", Status );
     if ( EFI_NOT_STARTED == Status ) {
       Status = SocketClose ( );
       continue;
@@ -659,6 +663,7 @@ SocketOpen (
   //
   //  Return the operation status
   //
+Print ( L"Returning Status: %r\r\n", Status );
   return Status;
 }
 
@@ -720,7 +725,7 @@ Tcp4Close (
                   pIpAddress[1],
                   pIpAddress[2],
                   pIpAddress[3],
-                  htons ( ((struct sockaddr_in *)&RemoteHostAddress)->sin_port ));
+                  ntohs ( ((struct sockaddr_in *)&RemoteHostAddress)->sin_port ));
         }
       }
     }
@@ -922,7 +927,7 @@ Tcp4Locate (
               pIpAddress[1],
               pIpAddress[2],
               pIpAddress[3],
-              htons ( ((struct sockaddr_in *)&RemoteHostAddress)->sin_port ));
+              ntohs ( ((struct sockaddr_in *)&RemoteHostAddress)->sin_port ));
       bTcp4Connecting = FALSE;
     }
 
@@ -1229,7 +1234,7 @@ Tcp4Open (
     Tcp4ConfigData.AccessPoint.RemoteAddress.Addr[1] = (UINT8)( ((struct sockaddr_in *)&RemoteHostAddress)->sin_addr.s_addr >> 8 );
     Tcp4ConfigData.AccessPoint.RemoteAddress.Addr[2] = (UINT8)( ((struct sockaddr_in *)&RemoteHostAddress)->sin_addr.s_addr >> 16 );
     Tcp4ConfigData.AccessPoint.RemoteAddress.Addr[3] = (UINT8)( ((struct sockaddr_in *)&RemoteHostAddress)->sin_addr.s_addr >> 24 );
-    Tcp4ConfigData.AccessPoint.RemotePort = ((struct sockaddr_in *)&RemoteHostAddress)->sin_port;
+    Tcp4ConfigData.AccessPoint.RemotePort = ntohs (((struct sockaddr_in *)&RemoteHostAddress)->sin_port);
     Tcp4ConfigData.AccessPoint.UseDefaultAddress = TRUE;
     Tcp4ConfigData.AccessPoint.SubnetMask.Addr[0] = 0;
     Tcp4ConfigData.AccessPoint.SubnetMask.Addr[1] = 0;
@@ -1288,7 +1293,7 @@ Tcp4Open (
             pIpAddress[1],
             pIpAddress[2],
             pIpAddress[3],
-            htons ( ((struct sockaddr_in *)&RemoteHostAddress)->sin_port ));
+            ntohs ( ((struct sockaddr_in *)&RemoteHostAddress)->sin_port ));
   } while ( 0 );
 
   if ( EFI_ERROR ( Status )) {
