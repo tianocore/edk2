@@ -340,7 +340,7 @@ SocketPoll (
                         ( pPortIpAddress4->sin_addr.s_addr >> 8 ) & 0xff,
                         ( pPortIpAddress4->sin_addr.s_addr >> 16 ) & 0xff,
                         ( pPortIpAddress4->sin_addr.s_addr >> 24 ) & 0xff,
-                        htons ( pPortIpAddress4->sin_port ),
+                        ntohs ( pPortIpAddress4->sin_port ),
                         errno ));
             }
             else {
@@ -362,7 +362,7 @@ SocketPoll (
                         pPortIpAddress6->sin6_addr.__u6_addr.__u6_addr8[ 13 ],
                         pPortIpAddress6->sin6_addr.__u6_addr.__u6_addr8[ 14 ],
                         pPortIpAddress6->sin6_addr.__u6_addr.__u6_addr8[ 15 ],
-                        htons ( pPortIpAddress6->sin6_port ),
+                        ntohs ( pPortIpAddress6->sin6_port ),
                         errno ));
             }
 
@@ -380,7 +380,7 @@ SocketPoll (
                           ( pPortIpAddress4->sin_addr.s_addr >> 8 ) & 0xff,
                           ( pPortIpAddress4->sin_addr.s_addr >> 16 ) & 0xff,
                           ( pPortIpAddress4->sin_addr.s_addr >> 24 ) & 0xff,
-                          htons ( pPortIpAddress4->sin_port )));
+                          ntohs ( pPortIpAddress4->sin_port )));
               }
               else {
                 DEBUG (( DEBUG_INFO,
@@ -402,7 +402,7 @@ SocketPoll (
                           pPortIpAddress6->sin6_addr.__u6_addr.__u6_addr8[ 13 ],
                           pPortIpAddress6->sin6_addr.__u6_addr.__u6_addr8[ 14 ],
                           pPortIpAddress6->sin6_addr.__u6_addr.__u6_addr8[ 15 ],
-                          htons ( pPortIpAddress6->sin6_port )));
+                          ntohs ( pPortIpAddress6->sin6_port )));
               }
             }
             else {
@@ -414,7 +414,7 @@ SocketPoll (
                           ( pPortIpAddress4->sin_addr.s_addr >> 8 ) & 0xff,
                           ( pPortIpAddress4->sin_addr.s_addr >> 16 ) & 0xff,
                           ( pPortIpAddress4->sin_addr.s_addr >> 24 ) & 0xff,
-                          htons ( pPortIpAddress4->sin_port ),
+                          ntohs ( pPortIpAddress4->sin_port ),
                           errno ));
               }
               else {
@@ -437,7 +437,7 @@ SocketPoll (
                           pPortIpAddress6->sin6_addr.__u6_addr.__u6_addr8[ 13 ],
                           pPortIpAddress6->sin6_addr.__u6_addr.__u6_addr8[ 14 ],
                           pPortIpAddress6->sin6_addr.__u6_addr.__u6_addr8[ 15 ],
-                          htons ( pPortIpAddress6->sin6_port ),
+                          ntohs ( pPortIpAddress6->sin6_port ),
                           errno ));
               }
             }
@@ -484,7 +484,7 @@ SocketPoll (
                           ( pRemoteAddress4->sin_addr.s_addr >> 8 ) & 0xff,
                           ( pRemoteAddress4->sin_addr.s_addr >> 16 ) & 0xff,
                           ( pRemoteAddress4->sin_addr.s_addr >> 24 ) & 0xff,
-                          htons ( pRemoteAddress4->sin_port ));
+                          ntohs ( pRemoteAddress4->sin_port ));
                 }
                 else {
                   Print ( L"Rejecting connection to remote system [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d\r\n",
@@ -504,7 +504,7 @@ SocketPoll (
                           pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 13 ],
                           pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 14 ],
                           pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 15 ],
-                          htons ( pRemoteAddress6->sin6_port ));
+                          ntohs ( pRemoteAddress6->sin6_port ));
                 }
 
                 //
@@ -522,7 +522,7 @@ SocketPoll (
                               ( pRemoteAddress4->sin_addr.s_addr >> 8 ) & 0xff,
                               ( pRemoteAddress4->sin_addr.s_addr >> 16 ) & 0xff,
                               ( pRemoteAddress4->sin_addr.s_addr >> 24 ) & 0xff,
-                              htons ( pRemoteAddress4->sin_port )));
+                              ntohs ( pRemoteAddress4->sin_port )));
                   }
                   else {
                     DEBUG (( DEBUG_INFO,
@@ -544,7 +544,7 @@ SocketPoll (
                               pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 13 ],
                               pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 14 ],
                               pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 15 ],
-                              htons ( pRemoteAddress6->sin6_port )));
+                              ntohs ( pRemoteAddress6->sin6_port )));
                   }
                 }
                 else {
@@ -570,7 +570,7 @@ SocketPoll (
                           ( pRemoteAddress4->sin_addr.s_addr >> 8 ) & 0xff,
                           ( pRemoteAddress4->sin_addr.s_addr >> 16 ) & 0xff,
                           ( pRemoteAddress4->sin_addr.s_addr >> 24 ) & 0xff,
-                          htons ( pRemoteAddress4->sin_port ));
+                          ntohs ( pRemoteAddress4->sin_port ));
                 }
                 else {
                   Print ( L"Connected to remote system [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d\r\n",
@@ -590,7 +590,7 @@ SocketPoll (
                           pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 13 ],
                           pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 14 ],
                           pRemoteAddress6->sin6_addr.__u6_addr.__u6_addr8[ 15 ],
-                          htons ( pRemoteAddress6->sin6_port ));
+                          ntohs ( pRemoteAddress6->sin6_port ));
                 }
 
                 //
@@ -625,7 +625,7 @@ SocketPoll (
                           ( pPortIpAddress4->sin_addr.s_addr >> 8 ) & 0xff,
                           ( pPortIpAddress4->sin_addr.s_addr >> 16 ) & 0xff,
                           ( pPortIpAddress4->sin_addr.s_addr >> 24 ) & 0xff,
-                          htons ( pPortIpAddress4->sin_port )));
+                          ntohs ( pPortIpAddress4->sin_port )));
               }
               else {
                 DEBUG (( DEBUG_INFO,
@@ -648,7 +648,7 @@ SocketPoll (
                           pPortIpAddress6->sin6_addr.__u6_addr.__u6_addr8[ 13 ],
                           pPortIpAddress6->sin6_addr.__u6_addr.__u6_addr8[ 14 ],
                           pPortIpAddress6->sin6_addr.__u6_addr.__u6_addr8[ 15 ],
-                          htons ( pPortIpAddress6->sin6_port )));
+                          ntohs ( pPortIpAddress6->sin6_port )));
               }
 
               //
@@ -677,7 +677,7 @@ SocketPoll (
                           ( pPortIpAddress4->sin_addr.s_addr >> 8 ) & 0xff,
                           ( pPortIpAddress4->sin_addr.s_addr >> 16 ) & 0xff,
                           ( pPortIpAddress4->sin_addr.s_addr >> 24 ) & 0xff,
-                          htons ( pPortIpAddress4->sin_port ),
+                          ntohs ( pPortIpAddress4->sin_port ),
                           errno ));
               }
               else {
@@ -699,7 +699,7 @@ SocketPoll (
                           pPortIpAddress6->sin6_addr.__u6_addr.__u6_addr8[ 13 ],
                           pPortIpAddress6->sin6_addr.__u6_addr.__u6_addr8[ 14 ],
                           pPortIpAddress6->sin6_addr.__u6_addr.__u6_addr8[ 15 ],
-                          htons ( pPortIpAddress6->sin6_port ),
+                          ntohs ( pPortIpAddress6->sin6_port ),
                           errno ));
               }
               CloseStatus = close ( PollFd[ Index ].fd );
@@ -713,7 +713,7 @@ SocketPoll (
                             ( pPortIpAddress4->sin_addr.s_addr >> 8 ) & 0xff,
                             ( pPortIpAddress4->sin_addr.s_addr >> 16 ) & 0xff,
                             ( pPortIpAddress4->sin_addr.s_addr >> 24 ) & 0xff,
-                            htons ( pPortIpAddress4->sin_port )));
+                            ntohs ( pPortIpAddress4->sin_port )));
                 }
                 else {
                   DEBUG (( DEBUG_INFO,
@@ -735,7 +735,7 @@ SocketPoll (
                             pPortIpAddress6->sin6_addr.__u6_addr.__u6_addr8[ 13 ],
                             pPortIpAddress6->sin6_addr.__u6_addr.__u6_addr8[ 14 ],
                             pPortIpAddress6->sin6_addr.__u6_addr.__u6_addr8[ 15 ],
-                            htons ( pPortIpAddress6->sin6_port )));
+                            ntohs ( pPortIpAddress6->sin6_port )));
                 }
               }
               else {
@@ -747,7 +747,7 @@ SocketPoll (
                             ( pPortIpAddress4->sin_addr.s_addr >> 8 ) & 0xff,
                             ( pPortIpAddress4->sin_addr.s_addr >> 16 ) & 0xff,
                             ( pPortIpAddress4->sin_addr.s_addr >> 24 ) & 0xff,
-                            htons ( pPortIpAddress4->sin_port ),
+                            ntohs ( pPortIpAddress4->sin_port ),
                             errno ));
                 }
                 else {
@@ -770,7 +770,7 @@ SocketPoll (
                             pPortIpAddress6->sin6_addr.__u6_addr.__u6_addr8[ 13 ],
                             pPortIpAddress6->sin6_addr.__u6_addr.__u6_addr8[ 14 ],
                             pPortIpAddress6->sin6_addr.__u6_addr.__u6_addr8[ 15 ],
-                            htons ( pPortIpAddress6->sin6_port ),
+                            ntohs ( pPortIpAddress6->sin6_port ),
                             errno ));
                 }
               }
