@@ -1,7 +1,7 @@
 /** @file
   Main file for attrib shell level 2 function.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -149,6 +149,9 @@ ShellCommandRunCd (
             }
           }
         } else if (StrStr(Param1Copy, L":") == NULL) {
+          //
+          // change directory without a drive identifier
+          //
           if (ShellGetCurrentDir(NULL) == NULL) {
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle);
             ShellStatus = SHELL_NOT_FOUND;
@@ -189,7 +192,7 @@ ShellCommandRunCd (
           }
         } else {
           //
-          // change directory on other drive letter
+          // change directory with a drive letter
           //
           Drive = AllocateZeroPool(StrSize(Param1Copy));
           if (Drive == NULL) {
@@ -199,7 +202,10 @@ ShellCommandRunCd (
             Drive = StrCpy(Drive, Param1Copy);
             Path = StrStr(Drive, L":");
             ASSERT(Path != NULL);
-            if (*(Path+1) == CHAR_NULL) {
+            if (EFI_ERROR(ShellIsDirectory(Param1Copy))) {
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NOT_DIR), gShellLevel2HiiHandle, Param1Copy);
+              ShellStatus = SHELL_NOT_FOUND;
+            } else if (*(Path+1) == CHAR_NULL) {
               ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle);
               ShellStatus = SHELL_NOT_FOUND;
             } else {
