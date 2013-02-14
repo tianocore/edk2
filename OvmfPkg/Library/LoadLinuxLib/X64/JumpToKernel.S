@@ -13,6 +13,7 @@
 #------------------------------------------------------------------------------
 
 ASM_GLOBAL ASM_PFX(JumpToKernel)
+ASM_GLOBAL ASM_PFX(JumpToUefiKernel)
 
 #------------------------------------------------------------------------------
 # VOID
@@ -66,4 +67,25 @@ ASM_PFX(JumpToKernel):
     xorl    %ebx, %ebx
     ret
 .code64
+
+#------------------------------------------------------------------------------
+# VOID
+# EFIAPI
+# JumpToUefiKernel (
+#   EFI_HANDLE ImageHandle,        // rcx
+#   EFI_SYSTEM_TABLE *SystemTable, // rdx
+#   VOID *KernelBootParams,        // r8
+#   VOID *KernelStart              // r9
+#   );
+#------------------------------------------------------------------------------
+ASM_PFX(JumpToUefiKernel):
+    movq    %rcx, %rdi
+    movq    %rdx, %rsi
+    movq    %r8, %rdx
+    xor     %rax, %rax
+    movl    0x264(%r8), %eax
+    addq    %rax, %r9
+    addq    $0x200, %r9
+    callq   %r9
+    ret
 

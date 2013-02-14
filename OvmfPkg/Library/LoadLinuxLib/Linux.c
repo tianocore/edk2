@@ -604,13 +604,10 @@ SetupGraphics (
 STATIC
 EFI_STATUS
 SetupLinuxBootParams (
-  IN VOID                   *Kernel,
   IN OUT struct boot_params *Bp
   )
 {
   SetupGraphics (Bp);
-
-  Bp->hdr.code32_start = (UINT32)(UINTN) Kernel;
 
   SetupLinuxMemmap (Bp);
 
@@ -644,7 +641,19 @@ LoadLinux (
 
   InitLinuxDescriptorTables ();
 
-  SetupLinuxBootParams (Kernel, (struct boot_params*) KernelSetup);
+  Bp->hdr.code32_start = (UINT32)(UINTN) Kernel;
+  if (Bp->hdr.version >= 0x20c && Bp->hdr.handover_offset &&
+      (Bp->hdr.load_flags & (sizeof (UINTN) == 4 ? BIT2 : BIT3))) {
+    DEBUG ((EFI_D_INFO, "Jumping to kernel EFI handover point at ofs %x\n", Bp->hdr.handover_offset));
+
+    DisableInterrupts ();
+    JumpToUefiKernel ((VOID*) gImageHandle, (VOID*) gST, KernelSetup, Kernel);
+  }
+
+  //
+  // Old kernels without EFI handover protocol
+  //
+  SetupLinuxBootParams (KernelSetup);
 
   DEBUG ((EFI_D_INFO, "Jumping to kernel\n"));
   DisableInterrupts ();
