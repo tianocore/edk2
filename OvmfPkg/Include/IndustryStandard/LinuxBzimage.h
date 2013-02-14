@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,7 +15,6 @@
 #define __LINUX_BZIMAGE_H__
 
 #define BOOTSIG			0x1FE
-#define SETUP_VERSION		0x206
 #define SETUP_HDR		0x53726448	/* 0x53726448 == "HdrS" */
 
 #define E820_RAM		1
@@ -55,7 +54,8 @@ struct setup_header {
 	UINT32 ramdisk_max;    /* Highest legal initrd address */
 	UINT32 kernel_alignment; /* Physical addr alignment required for kernel */
 	UINT8 relocatable_kernel; /* Whether kernel is relocatable or not */
-	UINT8 _pad2[3];
+	UINT8 min_alignment;
+	UINT16 xloadflags;
 	UINT32 cmdline_size;
 	UINT32 hardware_subarch;
 	UINT64 hardware_subarch_data;
