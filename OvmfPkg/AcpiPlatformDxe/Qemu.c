@@ -200,16 +200,20 @@ typedef struct {
 } FIRMWARE_DATA;
 
 typedef struct {
-  UINT8 NameOp;
-  UINT8 RootChar;
-  UINT8 NameChar[4];
-  UINT8 PackageOp;
-  UINT8 PkgLength;
-  UINT8 NumElements;
-  UINT8 DWordPrefix;
-  UINT8 Pm1aCntSlpTyp;
-  UINT8 Pm1bCntSlpTyp;
-  UINT8 Reserved[2];
+  UINT8 BytePrefix;
+  UINT8 ByteValue;
+} AML_BYTE;
+
+typedef struct {
+  UINT8    NameOp;
+  UINT8    RootChar;
+  UINT8    NameChar[4];
+  UINT8    PackageOp;
+  UINT8    PkgLength;
+  UINT8    NumElements;
+  AML_BYTE Pm1aCntSlpTyp;
+  AML_BYTE Pm1bCntSlpTyp;
+  AML_BYTE Reserved[2];
 } SYSTEM_STATE_PACKAGE;
 
 #pragma pack()
@@ -326,12 +330,14 @@ GetSuspendStates (
     '\\',                   // RootChar
     { '_', 'S', 'x', '_' }, // NameChar[4]
     0x12,                   // PackageOp
-    0x07,                   // PkgLength
-    0x01,                   // NumElements
-    0x0c,                   // DWordPrefix
-    0x00,                   // Pm1aCntSlpTyp
-    0x00,                   // Pm1bCntSlpTyp -- we don't support it
-    { 0x00, 0x00 }          // Reserved
+    0x0A,                   // PkgLength
+    0x04,                   // NumElements
+    { 0x0A, 0x00 },         // Pm1aCntSlpTyp
+    { 0x0A, 0x00 },         // Pm1bCntSlpTyp -- we don't support it
+    {                       // Reserved[2]
+      { 0x0A, 0x00 },
+      { 0x0A, 0x00 }
+    }
   };
   RETURN_STATUS                     Status;
   FIRMWARE_CONFIG_ITEM              FwCfgItem;
@@ -343,13 +349,13 @@ GetSuspendStates (
   //
   *SuspendToRamSize = sizeof Template;
   CopyMem (SuspendToRam, &Template, sizeof Template);
-  SuspendToRam->NameChar[2]   = '3'; // S3
-  SuspendToRam->Pm1aCntSlpTyp = 1;   // PIIX4: STR
+  SuspendToRam->NameChar[2]             = '3'; // S3
+  SuspendToRam->Pm1aCntSlpTyp.ByteValue = 1;   // PIIX4: STR
 
   *SuspendToDiskSize = sizeof Template;
   CopyMem (SuspendToDisk, &Template, sizeof Template);
-  SuspendToDisk->NameChar[2]   = '4'; // S4
-  SuspendToDisk->Pm1aCntSlpTyp = 2;   // PIIX4: POSCL
+  SuspendToDisk->NameChar[2]             = '4'; // S4
+  SuspendToDisk->Pm1aCntSlpTyp.ByteValue = 2;   // PIIX4: POSCL
 
   //
   // check for overrides
@@ -368,16 +374,20 @@ GetSuspendStates (
   // value to be written to the PM control register's SUS_TYP bits.
   //
   if (SystemStates[3] & BIT7) {
-    SuspendToRam->Pm1aCntSlpTyp = SystemStates[3] & (BIT2 | BIT1 | BIT0);
-    DEBUG ((DEBUG_INFO, "ACPI S3 value: %d\n", SuspendToRam->Pm1aCntSlpTyp));
+    SuspendToRam->Pm1aCntSlpTyp.ByteValue =
+        SystemStates[3] & (BIT2 | BIT1 | BIT0);
+    DEBUG ((DEBUG_INFO, "ACPI S3 value: %d\n",
+            SuspendToRam->Pm1aCntSlpTyp.ByteValue));
   } else {
     *SuspendToRamSize = 0;
     DEBUG ((DEBUG_INFO, "ACPI S3 disabled\n"));
   }
 
   if (SystemStates[4] & BIT7) {
-    SuspendToDisk->Pm1aCntSlpTyp = SystemStates[4] & (BIT2 | BIT1 | BIT0);
-    DEBUG ((DEBUG_INFO, "ACPI S4 value: %d\n", SuspendToDisk->Pm1aCntSlpTyp));
+    SuspendToDisk->Pm1aCntSlpTyp.ByteValue =
+        SystemStates[4] & (BIT2 | BIT1 | BIT0);
+    DEBUG ((DEBUG_INFO, "ACPI S4 value: %d\n",
+            SuspendToDisk->Pm1aCntSlpTyp.ByteValue));
   } else {
     *SuspendToDiskSize = 0;
     DEBUG ((DEBUG_INFO, "ACPI S4 disabled\n"));
