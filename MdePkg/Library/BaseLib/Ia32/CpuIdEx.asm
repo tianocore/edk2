@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -56,7 +56,7 @@ AsmCpuidEx  PROC    USES    ebx
     jecxz   @F
     mov     [ecx], edx
 @@:
-    mov     edx, [ebp + 28]
+    mov     ecx, [ebp + 28]
     jecxz   @F
     pop     [ecx]
 @@:
