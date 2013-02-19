@@ -430,8 +430,6 @@
   #
   Omap35xxPkg/PciEmulation/PciEmulation.inf
 
-  #NOTE: Open source EHCI stack doesn't work on Beagleboard.
-  #NOTE: UsbBus and UsbMassStorage don't work using iPhone SDK tool chain.
   MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf {
     <PcdsFixedAtBuild>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x800fffff
