@@ -1,7 +1,7 @@
 /** @file
   This implementation of EFI_PXE_BASE_CODE_PROTOCOL and EFI_LOAD_FILE_PROTOCOL.
 
-  Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -428,10 +428,6 @@ EfiPxeBcDhcp (
     // Start S.A.R.R. process to get a IPv6 address and other boot information.
     //
     Status = PxeBcDhcp6Sarr (Private, Private->Dhcp6);
-
-    if (EFI_ERROR (Status)) {
-      goto ON_EXIT;
-    }
   } else {
 
     //
@@ -443,13 +439,11 @@ EfiPxeBcDhcp (
     // Start D.O.R.A. process to get a IPv4 address and other boot information.
     //
     Status = PxeBcDhcp4Dora (Private, Private->Dhcp4);
-
-    if (EFI_ERROR (Status)) {
-      goto ON_EXIT;
-    }
   }
-  
-ON_EXIT:
+
+  //
+  // Reconfigure the UDP instance with the default configuration.
+  //
   if (Mode->UsingIpv6) {
     Private->Udp6Read->Configure (Private->Udp6Read, &Private->Udp6CfgData);
   } else {
@@ -690,9 +684,7 @@ EfiPxeBcDiscover (
       }
   }
 
-  if (EFI_ERROR (Status)) {
-    goto ON_EXIT;
-  } else {
+  if (!EFI_ERROR (Status)) {
     //
     // Parse the cached PXE reply packet, and store it into mode data if valid.
     //
@@ -964,11 +956,9 @@ EfiPxeBcMtftp (
     Mode->IcmpErrorReceived = TRUE;
   }
 
-  if (EFI_ERROR (Status)) {
-    goto ON_EXIT;
-  }
-  
-ON_EXIT:
+  //
+  // Reconfigure the UDP instance with the default configuration.
+  //
   if (Mode->UsingIpv6) {
     Private->Udp6Read->Configure (Private->Udp6Read, &Private->Udp6CfgData);
   } else {

@@ -1,7 +1,7 @@
 /** @file
   Support functions implementation for UefiPxeBc Driver.
 
-  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -59,10 +59,6 @@ PxeBcFlushStaionIp (
     }
 
     Status = Private->Ip6->Receive (Private->Ip6, &Private->Icmp6Token);
-    if (EFI_ERROR (Status)) {
-      goto ON_EXIT;
-    }
-
   } else {
     ASSERT (SubnetMask != NULL);
     CopyMem (&Private->Udp4CfgData.StationAddress, StationIp, sizeof (EFI_IPv4_ADDRESS));
@@ -82,10 +78,6 @@ PxeBcFlushStaionIp (
     }
 
     Status = Private->Ip4->Receive (Private->Ip4, &Private->IcmpToken);
-    if (EFI_ERROR (Status)) {
-      goto ON_EXIT;
-    }
-
   }
 
 ON_EXIT:
