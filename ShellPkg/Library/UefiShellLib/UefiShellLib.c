@@ -1,7 +1,7 @@
 /** @file
   Provides interface to shell functionality for shell commands and applications.
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -4058,4 +4058,49 @@ ShellFileHandleReadLine(
   }
 
   return (Status);
+}
+
+/**
+  Function to delete a file by name
+  
+  @param[in]       FileName       Pointer to file name to delete.
+  
+  @retval EFI_SUCCESS             the file was deleted sucessfully
+  @retval EFI_WARN_DELETE_FAILURE the handle was closed, but the file was not
+                                  deleted
+  @retval EFI_INVALID_PARAMETER   One of the parameters has an invalid value.
+  @retval EFI_NOT_FOUND           The specified file could not be found on the
+                                  device or the file system could not be found
+                                  on the device.
+  @retval EFI_NO_MEDIA            The device has no medium.
+  @retval EFI_MEDIA_CHANGED       The device has a different medium in it or the
+                                  medium is no longer supported.
+  @retval EFI_DEVICE_ERROR        The device reported an error.
+  @retval EFI_VOLUME_CORRUPTED    The file system structures are corrupted.
+  @retval EFI_WRITE_PROTECTED     The file or medium is write protected.
+  @retval EFI_ACCESS_DENIED       The file was opened read only.
+  @retval EFI_OUT_OF_RESOURCES    Not enough resources were available to open the
+                                  file.
+  @retval other                   The file failed to open
+**/
+EFI_STATUS
+EFIAPI
+ShellDeleteFileByName(
+  IN CONST CHAR16               *FileName
+  )
+{
+  EFI_STATUS                Status;
+  SHELL_FILE_HANDLE         FileHandle;
+  
+  Status = ShellFileExists(FileName);
+  
+  if (Status == EFI_SUCCESS){
+    Status = ShellOpenFileByName(FileName, &FileHandle, EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE | EFI_FILE_MODE_CREATE, 0x0);
+    if (Status == EFI_SUCCESS){
+      Status = ShellDeleteFile(&FileHandle);
+    }
+  } 
+
+  return(Status);
+  
 }
