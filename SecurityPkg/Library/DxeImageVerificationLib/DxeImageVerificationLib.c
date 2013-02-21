@@ -12,7 +12,7 @@
   DxeImageVerificationHandler(), HashPeImageByType(), HashPeImage() function will accept
   untrusted PE/COFF image and validate its data structure within this image buffer before use.
 
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -967,43 +967,6 @@ Done:
 }
 
 /**
-  Verify certificate in WIN_CERT_TYPE_PKCS_SIGNED_DATA format.
-
-  @param[in]  AuthData      Pointer to the Authenticode Signature retrieved from signed image.
-  @param[in]  AuthDataSize  Size of the Authenticode Signature in bytes.
-
-  @retval EFI_SUCCESS                 Image pass verification.
-  @retval EFI_SECURITY_VIOLATION      Image fail verification.
-
-**/
-EFI_STATUS
-VerifyCertPkcsSignedData (
-  IN UINT8              *AuthData,
-  IN UINTN              AuthDataSize
-  )
-{
-  //
-  // 1: Find certificate from DBX forbidden database for revoked certificate.
-  //
-  if (IsPkcsSignedDataVerifiedBySignatureList (AuthData, AuthDataSize, EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid)) {
-    //
-    // DBX is forbidden database, if Authenticode verification pass with
-    // one of the certificate in DBX, this image should be rejected.
-    //
-    return EFI_SECURITY_VIOLATION;
-  }
-
-  //
-  // 2: Find certificate from DB database and try to verify authenticode struct.
-  //
-  if (IsPkcsSignedDataVerifiedBySignatureList (AuthData, AuthDataSize, EFI_IMAGE_SECURITY_DATABASE, &gEfiImageSecurityDatabaseGuid)) {
-    return EFI_SUCCESS;
-  } else {
-    return EFI_SECURITY_VIOLATION;
-  }
-}
-
-/**
   Provide verification service for signed images, which include both signature validation
   and platform policy control. For signature types, both UEFI WIN_CERTIFICATE_UEFI_GUID and
   MSFT Authenticode type signatures are supported.
@@ -1011,25 +974,14 @@ VerifyCertPkcsSignedData (
   In this implementation, only verify external executables when in USER MODE.
   Executables from FV is bypass, so pass in AuthenticationStatus is ignored.
 
-  The image verification process is:
+  The image verification policy is:
     If the image is signed,
-      If the image's certificate verifies against a certificate (root or intermediate) in the allowed 
-      database (DB) and not in the forbidden database (DBX), the certificate verification is passed.
-        If the image's hash digest is in DBX,
-          deny execution.
-        If not,
-          run it.
-      If the Image's certificate verification failed.
-        If the Image's Hash is in DB and not in DBX,
-          run it.
-        Otherwise,
-          deny execution.
+      At least one valid signature or at least one hash value of the image must match a record
+      in the security database "db", and no valid signature nor any hash value of the image may
+      be reflected in the security database "dbx".
     Otherwise, the image is not signed,
-      Is the Image's Hash in DBX?
-        If yes, deny execution.
-        If not, is the Image's Hash in DB?
-          If yes, run it.
-          If not, deny execution.
+      The SHA256 hash value of the image must match a record in the security database "db", and
+      not be reflected in the security data base "dbx".
 
   Caution: This function may receive untrusted input.
   PE/COFF image is external input, so this function will validate its data structure
@@ -1084,12 +1036,12 @@ DxeImageVerificationHandler (
   UINT8                                *SecureBoot;
   PE_COFF_LOADER_IMAGE_CONTEXT         ImageContext;
   UINT32                               NumberOfRvaAndSizes;
-  UINT32                               CertSize;
   WIN_CERTIFICATE_EFI_PKCS             *PkcsCertData;
   WIN_CERTIFICATE_UEFI_GUID            *WinCertUefiGuid;
   UINT8                                *AuthData;
   UINTN                                AuthDataSize;
   EFI_IMAGE_DATA_DIRECTORY             *SecDataDir;
+  UINT32                               OffSet;
 
   SignatureList     = NULL;
   SignatureListSize = 0;
@@ -1098,6 +1050,8 @@ DxeImageVerificationHandler (
   PkcsCertData      = NULL;
   Action            = EFI_IMAGE_EXECUTION_AUTH_UNTESTED;
   Status            = EFI_ACCESS_DENIED;
+  VerifyStatus      = EFI_ACCESS_DENIED;
+
   //
   // Check the image type and get policy setting.
   //
@@ -1230,9 +1184,13 @@ DxeImageVerificationHandler (
     }
   }
 
-  if ((SecDataDir == NULL) || ((SecDataDir != NULL) && (SecDataDir->Size == 0))) {
+  //
+  // Start Image Validation.
+  //
+  if (SecDataDir == NULL || SecDataDir->Size == 0) {
     //
-    // This image is not signed.
+    // This image is not signed. The SHA256 hash value of the image must match a record in the security database "db", 
+    // and not be reflected in the security data base "dbx".
     //
     if (!HashPeImage (HASHALG_SHA256)) {
       goto Done;
@@ -1259,109 +1217,118 @@ DxeImageVerificationHandler (
   }
 
   //
-  // Verify signature of executables.
+  // Verify the signature of the image, multiple signatures are allowed as per PE/COFF Section 4.7 
+  // "Attribute Certificate Table".
+  // The first certificate starts at offset (SecDataDir->VirtualAddress) from the start of the file.
   //
-  WinCertificate = (WIN_CERTIFICATE *) (mImageBase + SecDataDir->VirtualAddress);
-
-  CertSize = sizeof (WIN_CERTIFICATE);
-
-  if ((SecDataDir->Size <= CertSize) || (SecDataDir->Size < WinCertificate->dwLength)) {
-    goto Done;
-  }
-
-  //
-  // Verify the image's Authenticode signature, only DER-encoded PKCS#7 signed data is supported.
-  //
-  if (WinCertificate->wCertificateType == WIN_CERT_TYPE_PKCS_SIGNED_DATA) {
-    //
-    // The certificate is formatted as WIN_CERTIFICATE_EFI_PKCS which is described in the 
-    // Authenticode specification.
-    //
-    PkcsCertData = (WIN_CERTIFICATE_EFI_PKCS *) WinCertificate;
-    if (PkcsCertData->Hdr.dwLength <= sizeof (PkcsCertData->Hdr)) {
-      goto Done;
+  for (OffSet = SecDataDir->VirtualAddress;
+       OffSet < (SecDataDir->VirtualAddress + SecDataDir->Size);
+       OffSet += WinCertificate->dwLength, OffSet += ALIGN_SIZE (OffSet)) {
+    WinCertificate = (WIN_CERTIFICATE *) (mImageBase + OffSet);
+    if ((SecDataDir->VirtualAddress + SecDataDir->Size - OffSet) <= sizeof (WIN_CERTIFICATE) ||
+        (SecDataDir->VirtualAddress + SecDataDir->Size - OffSet) < WinCertificate->dwLength) {
+      break;
     }
-    AuthData   = PkcsCertData->CertData;
-    AuthDataSize = PkcsCertData->Hdr.dwLength - sizeof(PkcsCertData->Hdr);
     
+    //
+    // Verify the image's Authenticode signature, only DER-encoded PKCS#7 signed data is supported.
+    //
+    if (WinCertificate->wCertificateType == WIN_CERT_TYPE_PKCS_SIGNED_DATA) {
+      //
+      // The certificate is formatted as WIN_CERTIFICATE_EFI_PKCS which is described in the 
+      // Authenticode specification.
+      //
+      PkcsCertData = (WIN_CERTIFICATE_EFI_PKCS *) WinCertificate;
+      if (PkcsCertData->Hdr.dwLength <= sizeof (PkcsCertData->Hdr)) {
+        break;
+      }
+      AuthData   = PkcsCertData->CertData;
+      AuthDataSize = PkcsCertData->Hdr.dwLength - sizeof(PkcsCertData->Hdr);
+    } else if (WinCertificate->wCertificateType == WIN_CERT_TYPE_EFI_GUID) {
+      //
+      // The certificate is formatted as WIN_CERTIFICATE_UEFI_GUID which is described in UEFI Spec.
+      //
+      WinCertUefiGuid = (WIN_CERTIFICATE_UEFI_GUID *) WinCertificate;
+      if (WinCertUefiGuid->Hdr.dwLength <= OFFSET_OF(WIN_CERTIFICATE_UEFI_GUID, CertData)) {
+        break;
+      }
+      if (!CompareGuid (&WinCertUefiGuid->CertType, &gEfiCertPkcs7Guid)) {
+        continue;
+      }
+      AuthData = WinCertUefiGuid->CertData;
+      AuthDataSize = WinCertUefiGuid->Hdr.dwLength - OFFSET_OF(WIN_CERTIFICATE_UEFI_GUID, CertData);
+    } else {
+      if (WinCertificate->dwLength < sizeof (WIN_CERTIFICATE)) {
+        break;
+      }
+      continue;
+    }
+
     Status = HashPeImageByType (AuthData, AuthDataSize);
     if (EFI_ERROR (Status)) {
-      goto Done;
+      continue;
     }
-
-    VerifyStatus = VerifyCertPkcsSignedData (AuthData, AuthDataSize);
-  } else if (WinCertificate->wCertificateType == WIN_CERT_TYPE_EFI_GUID) {
-    //
-    // The certificate is formatted as WIN_CERTIFICATE_UEFI_GUID which is described in UEFI Spec.
-    //
-    WinCertUefiGuid = (WIN_CERTIFICATE_UEFI_GUID *) WinCertificate;
-    if (!CompareGuid(&WinCertUefiGuid->CertType, &gEfiCertPkcs7Guid) ||
-        (WinCertUefiGuid->Hdr.dwLength <= OFFSET_OF(WIN_CERTIFICATE_UEFI_GUID, CertData))) {
-      goto Done;
-    }
-    AuthData = WinCertUefiGuid->CertData;
-    AuthDataSize = WinCertUefiGuid->Hdr.dwLength - OFFSET_OF(WIN_CERTIFICATE_UEFI_GUID, CertData);
     
-    Status = HashPeImageByType (AuthData, AuthDataSize);
-    if (EFI_ERROR (Status)) {
-      goto Done;
-    }
-    VerifyStatus = VerifyCertPkcsSignedData (AuthData, AuthDataSize);
-  } else {
-    goto Done;
-  }
-
-  if (!EFI_ERROR (VerifyStatus)) {
     //
-    // Verification is passed.
-    // Continue to check the image digest in signature database.
+    // Check the digital signature against the revoked certificate in forbidden database (dbx).
+    //
+    if (IsPkcsSignedDataVerifiedBySignatureList (AuthData, AuthDataSize, EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid)) {
+      Action = EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED;
+      VerifyStatus = EFI_ACCESS_DENIED;
+      break;
+    }
+
+    //
+    // Check the digital signature against the valid certificate in allowed database (db).
+    //
+    if (EFI_ERROR (VerifyStatus)) {
+      if (IsPkcsSignedDataVerifiedBySignatureList (AuthData, AuthDataSize, EFI_IMAGE_SECURITY_DATABASE, &gEfiImageSecurityDatabaseGuid)) {
+        VerifyStatus = EFI_SUCCESS;
+      }
+    }
+
+    //
+    // Check the image's hash value.
     //
     if (IsSignatureFoundInDatabase (EFI_IMAGE_SECURITY_DATABASE1, mImageDigest, &mCertType, mImageDigestSize)) {
-      //
-      // Executable signature verification passes, but is found in forbidden signature database.
-      //
       Action = EFI_IMAGE_EXECUTION_AUTH_SIG_FOUND;
-      Status = EFI_ACCESS_DENIED;
-    } else {
-      //
-      // For image verification against enrolled X.509 certificate(root or intermediate),
-      // no need to check image's hash in the allowed database.
-      //
-      return EFI_SUCCESS;
-    }
-  } else {
-    //
-    // Verification failure.
-    //
-    if (!IsSignatureFoundInDatabase (EFI_IMAGE_SECURITY_DATABASE1, mImageDigest, &mCertType, mImageDigestSize) &&
-        IsSignatureFoundInDatabase (EFI_IMAGE_SECURITY_DATABASE, mImageDigest, &mCertType, mImageDigestSize)) {
-      //
-      // Verification fail, Image Hash is not in forbidden database (DBX),
-      // and Image Hash is in allowed database (DB).
-      //
-      Status = EFI_SUCCESS;
-    } else {
-      Action = EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED;
-      Status = EFI_ACCESS_DENIED;
+      VerifyStatus = EFI_ACCESS_DENIED;
+      break;
+    } else if (EFI_ERROR (VerifyStatus)) {
+      if (IsSignatureFoundInDatabase (EFI_IMAGE_SECURITY_DATABASE, mImageDigest, &mCertType, mImageDigestSize)) {
+        VerifyStatus = EFI_SUCCESS;
+      }
     }
   }
 
-  if (EFI_ERROR (Status)) {
+  if (OffSet != (SecDataDir->VirtualAddress + SecDataDir->Size)) {
     //
-    // Get image hash value as executable's signature.
+    // The Size in Certificate Table or the attribute certicate table is corrupted.
     //
-    SignatureListSize = sizeof (EFI_SIGNATURE_LIST) + sizeof (EFI_SIGNATURE_DATA) - 1 + mImageDigestSize;
-    SignatureList     = (EFI_SIGNATURE_LIST *) AllocateZeroPool (SignatureListSize);
-    if (SignatureList == NULL) {
-      Status = EFI_OUT_OF_RESOURCES;
-      goto Done;
+    VerifyStatus = EFI_ACCESS_DENIED;
+  }
+  
+  if (!EFI_ERROR (VerifyStatus)) {
+    return EFI_SUCCESS;
+  } else {
+    Status = EFI_ACCESS_DENIED;
+    if (Action == EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED || Action == EFI_IMAGE_EXECUTION_AUTH_SIG_FOUND) {
+      //
+      // Get image hash value as executable's signature.
+      //
+      SignatureListSize = sizeof (EFI_SIGNATURE_LIST) + sizeof (EFI_SIGNATURE_DATA) - 1 + mImageDigestSize;
+      SignatureList     = (EFI_SIGNATURE_LIST *) AllocateZeroPool (SignatureListSize);
+      if (SignatureList == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Done;
+      }
+      SignatureList->SignatureHeaderSize  = 0;
+      SignatureList->SignatureListSize    = (UINT32) SignatureListSize;
+      SignatureList->SignatureSize        = (UINT32) mImageDigestSize;
+      CopyMem (&SignatureList->SignatureType, &mCertType, sizeof (EFI_GUID));
+      Signature = (EFI_SIGNATURE_DATA *) ((UINT8 *) SignatureList + sizeof (EFI_SIGNATURE_LIST));
+      CopyMem (Signature->SignatureData, mImageDigest, mImageDigestSize);
     }
-    SignatureList->SignatureHeaderSize  = 0;
-    SignatureList->SignatureListSize    = (UINT32) SignatureListSize;
-    SignatureList->SignatureSize        = (UINT32) mImageDigestSize;
-    CopyMem (&SignatureList->SignatureType, &mCertType, sizeof (EFI_GUID));
-    Signature = (EFI_SIGNATURE_DATA *) ((UINT8 *) SignatureList + sizeof (EFI_SIGNATURE_LIST));
-    CopyMem (Signature->SignatureData, mImageDigest, mImageDigestSize);
   }
 
 Done:

@@ -2,7 +2,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by ImageVerificationLib.
 
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -42,6 +42,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define EFI_CERT_TYPE_RSA2048_SIZE        256
 #define MAX_NOTIFY_STRING_LEN             64
 #define TWO_BYTE_ENCODE                   0x82
+
+#define ALIGNMENT_SIZE                    8
+#define ALIGN_SIZE(a) (((a) % ALIGNMENT_SIZE) ? ALIGNMENT_SIZE - ((a) % ALIGNMENT_SIZE) : 0)
 
 //
 // Image type definitions
