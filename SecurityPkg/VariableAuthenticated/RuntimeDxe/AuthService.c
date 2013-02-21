@@ -445,6 +445,10 @@ AddPubKeyInStore (
              FALSE
              );
   ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    return 0;
+  }
+
   //
   // Check whether the public key entry does exist.
   //
@@ -492,6 +496,9 @@ AddPubKeyInStore (
                  FALSE
                  );
       ASSERT_EFI_ERROR (Status);
+      if (EFI_ERROR (Status)) {
+        return 0;
+      }
 
       DataSize  = DataSizeOfVariable (Variable.CurrPtr);
       Data      = GetVariableDataPtr (Variable.CurrPtr);

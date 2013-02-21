@@ -651,27 +651,28 @@ PubKeyStoreFilter (
   If ReclaimPubKeyStore is TRUE, reclaim invalid key in public key database and update the PubKeyIndex
   for all the count-based authenticate variable in NV storage.
 
-  @param[in]   VariableBase            Base address of variable store.
-  @param[out]  LastVariableOffset      Offset of last variable.
-  @param[in]   IsVolatile              The variable store is volatile or not;
-                                       if it is non-volatile, need FTW.
-  @param[in, out] UpdatingPtrTrack     Pointer to updating variable pointer track structure.
-  @param[in]   ReclaimPubKeyStore      Reclaim for public key database or not.
-  @param[in]   ReclaimAnyway           If TRUE, do reclaim anyway.
+  @param[in]      VariableBase            Base address of variable store.
+  @param[out]     LastVariableOffset      Offset of last variable.
+  @param[in]      IsVolatile              The variable store is volatile or not;
+                                          if it is non-volatile, need FTW.
+  @param[in, out] UpdatingPtrTrack        Pointer to updating variable pointer track structure.
+  @param[in]      ReclaimPubKeyStore      Reclaim for public key database or not.
+  @param[in]      ReclaimAnyway           If TRUE, do reclaim anyway.
   
-  @return EFI_OUT_OF_RESOURCES         No enough memory resources.
   @return EFI_SUCCESS                  Reclaim operation has finished successfully.
+  @return EFI_OUT_OF_RESOURCES         No enough memory resources.
+  @return EFI_DEVICE_ERROR             The public key database doesn't exist.
   @return Others                       Unexpect error happened during reclaim operation.
 
 **/
 EFI_STATUS
 Reclaim (
-  IN  EFI_PHYSICAL_ADDRESS  VariableBase,
-  OUT UINTN                 *LastVariableOffset,
-  IN  BOOLEAN               IsVolatile,
-  IN OUT VARIABLE_POINTER_TRACK *UpdatingPtrTrack,
-  IN  BOOLEAN               ReclaimPubKeyStore,
-  IN  BOOLEAN               ReclaimAnyway
+  IN     EFI_PHYSICAL_ADDRESS         VariableBase,
+  OUT    UINTN                        *LastVariableOffset,
+  IN     BOOLEAN                      IsVolatile,
+  IN OUT VARIABLE_POINTER_TRACK       *UpdatingPtrTrack,
+  IN     BOOLEAN                      ReclaimPubKeyStore,
+  IN     BOOLEAN                      ReclaimAnyway
   )
 {
   VARIABLE_HEADER       *Variable;
@@ -809,6 +810,12 @@ Reclaim (
     // Reinstall the new public key database.
     //
     ASSERT (PubKeyHeader != NULL);
+    if (PubKeyHeader == NULL) {
+      FreePool (ValidBuffer);
+      FreePool (NewPubKeyIndex);
+      FreePool (NewPubKeyStore);
+      return EFI_DEVICE_ERROR;
+    }
     CopyMem (CurrPtr, (UINT8*) PubKeyHeader, sizeof (VARIABLE_HEADER));
     Variable = (VARIABLE_HEADER*) CurrPtr;
     Variable->DataSize = NewPubKeySize;
