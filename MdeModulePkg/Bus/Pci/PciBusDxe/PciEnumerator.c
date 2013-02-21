@@ -794,7 +794,6 @@ RejectPciDevice (
     if (Temp == PciDevice) {
       InitializePciDevice (Temp);
       RemoveEntryList (CurrentLink);
-      FreePciDevice (Temp);
       return EFI_SUCCESS;
     }
 
