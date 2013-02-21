@@ -3,7 +3,7 @@
   Child device(Disk, CDROM, etc) enumeration and child handler installation, and 
   driver stop.
     
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -719,6 +719,7 @@ IDEBusDriverBindingStart (
     //
     for (IdeDevice = BeginningIdeDevice; IdeDevice <= EndIdeDevice; IdeDevice++) {
 
+      ASSERT (IdeChannel * 2 + IdeDevice < MAX_IDE_DEVICE);
       if (IdeBusDriverPrivateData->DeviceProcessed[IdeChannel * 2 + IdeDevice]) {
         continue;
       }
@@ -738,6 +739,7 @@ IDEBusDriverBindingStart (
         continue;
       }
 
+      ASSERT (IdeChannel < IdeMaxChannel && IdeDevice < IdeMaxDevice);
       IdeBlkIoDevicePtr = IdeBlkIoDevice[IdeChannel][IdeDevice];
 
       //
