@@ -2859,6 +2859,82 @@ HiiCreateGotoOpCode (
 }
 
 /**
+  Create EFI_IFR_REF_OP, EFI_IFR_REF2_OP, EFI_IFR_REF3_OP and EFI_IFR_REF4_OP opcode.
+
+  When RefDevicePath is not zero, EFI_IFR_REF4 opcode will be created. 
+  When RefDevicePath is zero and RefFormSetId is not NULL, EFI_IFR_REF3 opcode will be created.
+  When RefDevicePath is zero, RefFormSetId is NULL and RefQuestionId is not zero, EFI_IFR_REF2 opcode will be created.
+  When RefDevicePath is zero, RefFormSetId is NULL and RefQuestionId is zero, EFI_IFR_REF opcode will be created.
+
+  If OpCodeHandle is NULL, then ASSERT().
+  If any reserved bits are set in QuestionFlags, then ASSERT().
+
+  @param[in]  OpCodeHandle   The handle to the buffer of opcodes.
+  @param[in]  RefFormId      The Destination Form ID.
+  @param[in]  Prompt         The string ID for Prompt.
+  @param[in]  Help           The string ID for Help.
+  @param[in]  QuestionFlags  The flags in Question Header
+  @param[in]  QuestionId     Question ID.
+  @param[in]  RefQuestionId  The question on the form to which this link is referring. 
+                             If its value is zero, then the link refers to the top of the form.
+  @param[in]  RefFormSetId   The form set to which this link is referring. If its value is NULL, and RefDevicePath is 
+                             zero, then the link is to the current form set.
+  @param[in]  RefDevicePath  The string identifier that specifies the string containing the text representation of 
+                             the device path to which the form set containing the form specified by FormId.
+                             If its value is zero, then the link refers to the current page.
+
+  @retval NULL   There is not enough space left in Buffer to add the opcode.
+  @retval Other  A pointer to the created opcode.
+
+**/
+UINT8 *
+EFIAPI
+HiiCreateGotoExOpCode (
+  IN VOID             *OpCodeHandle,
+  IN EFI_FORM_ID      RefFormId,
+  IN EFI_STRING_ID    Prompt,
+  IN EFI_STRING_ID    Help,
+  IN UINT8            QuestionFlags,
+  IN EFI_QUESTION_ID  QuestionId,
+  IN EFI_QUESTION_ID  RefQuestionId,
+  IN EFI_GUID         *RefFormSetId,    OPTIONAL
+  IN EFI_STRING_ID    RefDevicePath
+  )
+{
+  EFI_IFR_REF4  OpCode;
+  UINTN         OpCodeSize;
+
+  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED))) == 0);
+
+  ZeroMem (&OpCode, sizeof (OpCode));
+  OpCode.Question.Header.Prompt = Prompt;
+  OpCode.Question.Header.Help   = Help;
+  OpCode.Question.QuestionId    = QuestionId;
+  OpCode.Question.Flags         = QuestionFlags;
+  OpCode.FormId                 = RefFormId;
+  OpCode.QuestionId             = RefQuestionId;
+  OpCode.DevicePath             = RefDevicePath;
+  if (RefFormSetId != NULL) {
+    CopyMem (&OpCode.FormSetId, RefFormSetId, sizeof (OpCode.FormSetId));
+  }
+
+  //
+  // Cacluate OpCodeSize based on the input Ref value.
+  // Try to use the small OpCode to save size.
+  //
+  OpCodeSize = sizeof (EFI_IFR_REF);
+  if (RefDevicePath != 0) {
+    OpCodeSize = sizeof (EFI_IFR_REF4);
+  } else if (RefFormSetId != NULL) {
+    OpCodeSize = sizeof (EFI_IFR_REF3);
+  } else if (RefQuestionId != 0) {
+    OpCodeSize = sizeof (EFI_IFR_REF2);
+  }
+
+  return InternalHiiCreateOpCode (OpCodeHandle, &OpCode, EFI_IFR_REF_OP, OpCodeSize);
+}
+
+/**
   Create EFI_IFR_CHECKBOX_OP opcode.
 
   If OpCodeHandle is NULL, then ASSERT().
