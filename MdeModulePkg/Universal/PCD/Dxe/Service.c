@@ -1,7 +1,7 @@
 /** @file
     Help functions used by PCD DXE driver.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -150,6 +150,11 @@ GetWorker (
             //
             GetPtrTypeSize (TmpTokenNumber, &GetSize);
           }
+          //
+          // If the operation is successful, we copy the data
+          // to the default value buffer in the PCD Database.
+          // So that we can free the Data allocated in GetHiiVariable.
+          //
           CopyMem (VaraiableDefaultBuffer, Data + VariableHead->Offset, GetSize);
           FreePool (Data);
         }
@@ -166,19 +171,14 @@ GetWorker (
             //
             GetPtrTypeSize (TmpTokenNumber, &GetSize);
           }
+          //
+          // If the operation is successful, we copy the data
+          // to the default value buffer in the PCD Database.
+          // So that we can free the Data allocated in GetHiiVariable.
+          //
           CopyMem (VaraiableDefaultBuffer, Data + VariableHead->Offset, GetSize);
           FreePool (Data);
         }
-        //
-        // If the operation is successful, we copy the data
-        // to the default value buffer in the PCD Database.
-        // So that we can free the Data allocated in GetHiiVariable.
-        //
-        //
-        // If the operation is not successful, 
-        // Return 1) either the default value specified by Platform Integrator 
-        //        2) Or the value Set by a PCD set operation.
-        //
         RetPtr = (VOID *) VaraiableDefaultBuffer;
       }
       break;
@@ -535,6 +535,12 @@ GetHiiVariable (
     ASSERT (Status == EFI_SUCCESS);
     *VariableData = Buffer;
     *VariableSize = Size;
+  } else {
+    //
+    // Use Default Data only when variable is not found. 
+    // For other error status, correct data can't be got, and trig ASSERT().
+    //
+    ASSERT (Status == EFI_NOT_FOUND);
   }
 
   return Status;
