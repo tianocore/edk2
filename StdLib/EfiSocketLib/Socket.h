@@ -362,7 +362,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(* PFN_NET_CONFIGURE) (
+(EFIAPI * PFN_NET_CONFIGURE) (
   IN VOID * pProtocol,
   IN VOID * pConfigData
   );
@@ -378,7 +378,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(* PFN_NET_IO_START) (
+(EFIAPI * PFN_NET_IO_START) (
   IN VOID * pProtocol,
   IN VOID * pToken
   );
@@ -394,7 +394,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(* PFN_NET_POLL) (
+(EFIAPI * PFN_NET_POLL) (
   IN VOID * pProtocol
   );
 
