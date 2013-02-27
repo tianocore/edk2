@@ -1,7 +1,7 @@
 /** @file
   Pei Core Load Image Support
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -348,6 +348,7 @@ LoadAndRelocatePeCoffImage (
   EFI_STATUS                            Status;
   PE_COFF_LOADER_IMAGE_CONTEXT          ImageContext;
   PEI_CORE_INSTANCE                     *Private;
+  UINT64                                AlignImageSize;
 
   Private = PEI_CORE_INSTANCE_FROM_PS_THIS (GetPeiServicesTablePointer ());
 
@@ -377,6 +378,19 @@ LoadAndRelocatePeCoffImage (
   // Allocate Memory for the image when memory is ready, boot mode is not S3, and image is relocatable.
   //
   if ((!ImageContext.RelocationsStripped) && (Private->PeiMemoryInstalled) && (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME)) {
+    //
+    // Allocate more buffer to avoid buffer overflow.
+    //
+    if (ImageContext.IsTeImage) {
+      AlignImageSize = ImageContext.ImageSize + ((EFI_TE_IMAGE_HEADER *) Pe32Data)->StrippedSize - sizeof (EFI_TE_IMAGE_HEADER);
+    } else {
+      AlignImageSize = ImageContext.ImageSize;
+    }
+
+    if (ImageContext.SectionAlignment > EFI_PAGE_SIZE) {
+      AlignImageSize += ImageContext.SectionAlignment;
+    }
+
     if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
       Status = GetPeCoffImageFixLoadingAssignedAddress(&ImageContext, Private);
       if (EFI_ERROR (Status)){
@@ -384,10 +398,10 @@ LoadAndRelocatePeCoffImage (
         //
         // The PEIM is not assiged valid address, try to allocate page to load it.
         //
-        ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN) AllocatePages (EFI_SIZE_TO_PAGES ((UINT32) ImageContext.ImageSize));
+        ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN) AllocatePages (EFI_SIZE_TO_PAGES ((UINT32) AlignImageSize));
       }
     } else {
-      ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN) AllocatePages (EFI_SIZE_TO_PAGES ((UINT32) ImageContext.ImageSize));
+      ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN) AllocatePages (EFI_SIZE_TO_PAGES ((UINT32) AlignImageSize));
     }
     ASSERT (ImageContext.ImageAddress != 0);
     if (ImageContext.ImageAddress == 0) {
@@ -395,6 +409,15 @@ LoadAndRelocatePeCoffImage (
     }
 
     //
+    // Adjust the Image Address to make sure it is section alignment.
+    //
+    if (ImageContext.SectionAlignment > EFI_PAGE_SIZE) {
+      ImageContext.ImageAddress =
+          (ImageContext.ImageAddress + ImageContext.SectionAlignment - 1) &
+          ~((UINTN)ImageContext.SectionAlignment - 1);
+    }
+    //
+    // Fix alignment requirement when Load IPF TeImage into memory.
     // Skip the reserved space for the stripped PeHeader when load TeImage into memory.
     //
     if (ImageContext.IsTeImage) {
