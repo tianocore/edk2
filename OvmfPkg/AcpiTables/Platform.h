@@ -28,7 +28,6 @@
 #define EFI_ACPI_CREATOR_ID       SIGNATURE_32('O','V','M','F')
 #define EFI_ACPI_CREATOR_REVISION 0x00000099
 
-#define INT_MODEL       0x01
 #define SCI_INT_VECTOR  0x0009
 #define SMI_CMD_IO_PORT 0xB2
 #define ACPI_ENABLE     0xF1
@@ -52,7 +51,21 @@
 #define DAY_ALRM        0x00
 #define MON_ALRM        0x00
 #define CENTURY         0x00
-#define FLAG            EFI_ACPI_1_0_WBINVD | EFI_ACPI_1_0_PROC_C1 | EFI_ACPI_1_0_SLP_BUTTON | EFI_ACPI_1_0_RTC_S4
+#define FLAG            (EFI_ACPI_2_0_WBINVD | \
+                         EFI_ACPI_2_0_PROC_C1 | \
+                         EFI_ACPI_2_0_SLP_BUTTON | \
+                         EFI_ACPI_2_0_RTC_S4)
+
+//
+// Byte-aligned IO port register block initializer for
+// EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE
+//
+#define GAS2_IO(Base, Size) {                             \
+          EFI_ACPI_2_0_SYSTEM_IO, /* AddressSpaceId    */ \
+          (Size) * 8,             /* RegisterBitWidth  */ \
+          0,                      /* RegisterBitOffset */ \
+          0,                      /* Reserved          */ \
+          (Base)                  /* Address           */ \
+          }
 
 #endif
-

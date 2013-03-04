@@ -15,11 +15,11 @@
 
 #include "Platform.h"
 
-EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE FACP = {
+EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE FACP = {
   {
-    EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
-    sizeof (EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE),
-    EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION,
+    EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
+    sizeof (EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE),
+    EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION,
     0,                          // to make sum of entire table == 0
     {EFI_ACPI_OEM_ID},          // OEMID is a 6 bytes long field
     EFI_ACPI_OEM_TABLE_ID,      // OEM table identification(8 bytes long)
@@ -29,8 +29,8 @@ EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE FACP = {
   },
   0,                // Physical addesss of FACS
   0,                // Physical address of DSDT
-  INT_MODEL,        // System Interrupt Model
-  RESERVED,         // reserved
+  RESERVED,         // System Interrupt Model in ACPI 1.0, eliminated in 2.0
+  EFI_ACPI_2_0_PM_PROFILE_UNSPECIFIED, // Preferred PM profile
   SCI_INT_VECTOR,   // System vector of SCI interrupt
   SMI_CMD_IO_PORT,  // Port address of SMI command port
   ACPI_ENABLE,      // value to write to port smi_cmd to enable ACPI
@@ -62,10 +62,23 @@ EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE FACP = {
   DAY_ALRM,         // index to day-of-month alarm in RTC CMOS RAM
   MON_ALRM,         // index to month-of-year alarm in RTC CMOS RAM
   CENTURY,          // index to century in RTC CMOS RAM
-  0x00,             // Boot architecture flag
-  0x00,             // Boot architecture flag
+  0x0000,           // Boot architecture flag (16-bit)
   RESERVED,         // reserved
-  FLAG
+  FLAG,             // Fixed feature flags
+  { 0 },            // Address of the Reset Register
+  0,                // Value for the Reset Register to reset the system
+  { RESERVED },     // reserved[3]
+  0,                // 64-bit physical addesss of FACS, set at installation
+  0,                // 64-bit physical addesss of DSDT, set at installation
+
+  GAS2_IO(PM1a_EVT_BLK, PM1_EVT_LEN), // Ext. addr. of PM 1a Event Reg Blk
+  { 0 },                              // PM 1b Event Reg Blk unsupported
+  GAS2_IO(PM1a_CNT_BLK, PM1_CNT_LEN), // Ext. addr. of PM 1a Ctrl Reg Blk
+  { 0 },                              // PM 1b Ctrl Reg Blk unsupported
+  { 0 },                              // PM 2  Ctrl Reg Blk unsupported
+  GAS2_IO(PM_TMR_BLK, PM_TM_LEN),     // Ext. addr. of PM Timer Ctrl Reg Blk
+  GAS2_IO(GPE0_BLK, GPE0_BLK_LEN),    // Ext. addr. of GPE 0 Reg Blk
+  { 0 }                               // GPE 1 Reg Blk unsupported
 };
 
 
