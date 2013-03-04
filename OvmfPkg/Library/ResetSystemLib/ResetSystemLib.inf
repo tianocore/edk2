@@ -35,4 +35,4 @@
 [LibraryClasses]
   DebugLib
   IoLib
-
+  TimerLib

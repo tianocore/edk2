@@ -17,6 +17,7 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
+#include <Library/TimerLib.h>
 
 VOID
 AcpiPmControl (
@@ -46,7 +47,10 @@ ResetCold (
   )
 {
   IoWrite8 (0xCF9, BIT2 | BIT1); // 1st choice: PIIX3 RCR, RCPU|SRST
+  MicroSecondDelay (50);
+
   IoWrite8 (0x64, 0xfe);         // 2nd choice: keyboard controller
+  CpuDeadLoop ();
 }
 
 /**
@@ -63,6 +67,7 @@ ResetWarm (
   )
 {
   IoWrite8 (0x64, 0xfe);
+  CpuDeadLoop ();
 }
 
 /**
