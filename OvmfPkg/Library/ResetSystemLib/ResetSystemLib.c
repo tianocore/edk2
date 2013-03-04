@@ -45,7 +45,8 @@ ResetCold (
   VOID
   )
 {
-  IoWrite8 (0x64, 0xfe);
+  IoWrite8 (0xCF9, BIT2 | BIT1); // 1st choice: PIIX3 RCR, RCPU|SRST
+  IoWrite8 (0x64, 0xfe);         // 2nd choice: keyboard controller
 }
 
 /**
