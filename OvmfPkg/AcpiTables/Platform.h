@@ -1,6 +1,7 @@
 /** @file
   Platform specific defines for constructing ACPI tables
 
+  Copyright (c) 2012, 2013, Red Hat, Inc.
   Copyright (c) 2008, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are
   licensed and made available under the terms and conditions of the BSD License
@@ -23,9 +24,9 @@
 //
 #define EFI_ACPI_OEM_ID           'O','V','M','F',' ',' '   // OEMID 6 bytes long
 #define EFI_ACPI_OEM_TABLE_ID     SIGNATURE_64('O','V','M','F','E','D','K','2') // OEM table id 8 bytes long
-#define EFI_ACPI_OEM_REVISION     0x20120804
+#define EFI_ACPI_OEM_REVISION     0x20130221
 #define EFI_ACPI_CREATOR_ID       SIGNATURE_32('O','V','M','F')
-#define EFI_ACPI_CREATOR_REVISION 0x00000098
+#define EFI_ACPI_CREATOR_REVISION 0x00000099
 
 #define INT_MODEL       0x01
 #define SCI_INT_VECTOR  0x0009
