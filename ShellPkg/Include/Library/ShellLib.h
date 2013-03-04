@@ -1357,4 +1357,23 @@ ShellDeleteFileByName(
   IN CONST CHAR16               *FileName
   );
 
+/**
+  Function to print help file / man page content in the spec from the UEFI Shell protocol GetHelpText function.
+
+  @param[in] CommandToGetHelpOn  Pointer to a string containing the command name of help file to be printed.
+  @param[in] SectionToGetHelpOn  Pointer to the section specifier(s).
+  @param[in] PrintCommandText    If TRUE, prints the command followed by the help content, otherwise prints 
+                                 the help content only.
+  @retval EFI_DEVICE_ERROR       The help data format was incorrect.
+  @retval EFI_NOT_FOUND          The help data could not be found.
+  @retval EFI_SUCCESS            The operation was successful.
+**/
+EFI_STATUS
+EFIAPI
+ShellPrintHelp (
+  IN CONST CHAR16     *CommandToGetHelpOn,
+  IN CONST CHAR16     *SectionToGetHelpOn,
+  IN BOOLEAN          PrintCommandText
+  );
+
 #endif // __SHELL_LIB__

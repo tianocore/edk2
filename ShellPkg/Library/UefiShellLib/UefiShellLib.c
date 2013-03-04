@@ -4061,6 +4061,66 @@ ShellFileHandleReadLine(
 }
 
 /**
+  Function to print help file / man page content in the spec from the UEFI Shell protocol GetHelpText function.
+
+  @param[in] CommandToGetHelpOn  Pointer to a string containing the command name of help file to be printed.
+  @param[in] SectionToGetHelpOn  Pointer to the section specifier(s).
+  @param[in] PrintCommandText    If TRUE, prints the command followed by the help content, otherwise prints 
+                                 the help content only.
+  @retval EFI_DEVICE_ERROR       The help data format was incorrect.
+  @retval EFI_NOT_FOUND          The help data could not be found.
+  @retval EFI_SUCCESS            The operation was successful.
+**/
+EFI_STATUS
+EFIAPI
+ShellPrintHelp (
+  IN CONST CHAR16     *CommandToGetHelpOn,
+  IN CONST CHAR16     *SectionToGetHelpOn,
+  IN BOOLEAN          PrintCommandText
+  )
+{
+	EFI_STATUS          Status;
+	CHAR16              *OutText;
+	  
+	OutText = NULL;
+	
+  //
+  // Get the string to print based
+  //
+	Status = gEfiShellProtocol->GetHelpText (CommandToGetHelpOn, SectionToGetHelpOn, &OutText);
+  
+  //
+  // make sure we got a valid string
+  //
+  if (EFI_ERROR(Status)){
+    return Status;
+	} 
+  if (OutText == NULL || StrLen(OutText) == 0) {
+    return EFI_NOT_FOUND;  
+	}
+  
+  //
+  // Chop off trailing stuff we dont need
+  //
+  while (OutText[StrLen(OutText)-1] == L'\r' || OutText[StrLen(OutText)-1] == L'\n' || OutText[StrLen(OutText)-1] == L' ') {
+    OutText[StrLen(OutText)-1] = CHAR_NULL;
+  }
+  
+  //
+  // Print this out to the console
+  //
+  if (PrintCommandText) {
+    ShellPrintEx(-1, -1, L"%H%-14s%N- %s\r\n", CommandToGetHelpOn, OutText);
+  } else {
+    ShellPrintEx(-1, -1, L"%N%s\r\n", OutText);
+  }
+  
+  SHELL_FREE_NON_NULL(OutText);
+
+	return EFI_SUCCESS;
+}
+
+/**
   Function to delete a file by name
   
   @param[in]       FileName       Pointer to file name to delete.
