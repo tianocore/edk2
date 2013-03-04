@@ -35,9 +35,7 @@
 #define ACPI_DISABLE    0xF0
 #define S4BIOS_REQ      0x00
 #define PM1a_EVT_BLK    0x0000b000
-#define PM1b_EVT_BLK    0x00000000
 #define PM1a_CNT_BLK    0x0000b004
-#define PM1b_CNT_BLK    0x00000000
 #define PM2_CNT_BLK     0x00000000
 #define PM_TMR_BLK      0x0000b008
 #define GPE0_BLK        0x0000afe0

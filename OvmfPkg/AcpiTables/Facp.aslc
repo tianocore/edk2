@@ -1,6 +1,7 @@
 /** @file
   FACP Table
 
+  Copyright (c) 2013, Red Hat, Inc.
   Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are
   licensed and made available under the terms and conditions of the BSD License
@@ -37,9 +38,9 @@ EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE FACP = {
   S4BIOS_REQ,       // Value to write to SMI CMD port to enter the S4BIOS state
   0,                // PState control
   PM1a_EVT_BLK,     // Port address of Power Mgt 1a Event Reg Blk
-  PM1b_EVT_BLK,     // Port address of Power Mgt 1b Event Reg Blk
+  0,                // Power Mgt 1b Event Reg Blk unsupported
   PM1a_CNT_BLK,     // Port address of Power Mgt 1a Ctrl Reg Blk
-  PM1b_CNT_BLK,     // Port address of Power Mgt 1b Ctrl Reg Blk
+  0,                // Power Mgt 1b Ctrl Reg Blk unsupported
   PM2_CNT_BLK,      // Port address of Power Mgt 2  Ctrl Reg Blk
   PM_TMR_BLK,       // Port address of Power Mgt Timer Ctrl Reg Blk
   GPE0_BLK,         // Port addr of General Purpose Event 0 Reg Blk
