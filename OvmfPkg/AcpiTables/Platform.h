@@ -54,7 +54,10 @@
 #define FLAG            (EFI_ACPI_2_0_WBINVD | \
                          EFI_ACPI_2_0_PROC_C1 | \
                          EFI_ACPI_2_0_SLP_BUTTON | \
-                         EFI_ACPI_2_0_RTC_S4)
+                         EFI_ACPI_2_0_RTC_S4 | \
+                         EFI_ACPI_2_0_RESET_REG_SUP)
+#define RESET_REG       0xCF9
+#define RESET_VALUE     (BIT2 | BIT1) // PIIX3 Reset CPU + System Reset
 
 //
 // Byte-aligned IO port register block initializer for

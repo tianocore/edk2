@@ -65,8 +65,8 @@ EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE FACP = {
   0x0000,           // Boot architecture flag (16-bit)
   RESERVED,         // reserved
   FLAG,             // Fixed feature flags
-  { 0 },            // Address of the Reset Register
-  0,                // Value for the Reset Register to reset the system
+  GAS2_IO(RESET_REG, 1), // Extended address of the Reset Register
+  RESET_VALUE,           // Value for the Reset Register to reset the system
   { RESERVED },     // reserved[3]
   0,                // 64-bit physical addesss of FACS, set at installation
   0,                // 64-bit physical addesss of DSDT, set at installation
