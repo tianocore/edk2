@@ -1,7 +1,7 @@
 ##  @file
 # Shell Package
 #
-# Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -64,7 +64,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|16000
 !ifdef $(NO_SHELL_PROFILES)
   gEfiShellPkgTokenSpaceGuid.PcdShellProfileMask|0x00
-!endif
+!endif #$(NO_SHELL_PROFILES)
 
 [Components]
   ShellPkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
@@ -72,6 +72,13 @@
   ShellPkg/Library/UefiShellCommandLib/UefiShellCommandLib.inf
   ShellPkg/Library/UefiShellLevel2CommandsLib/UefiShellLevel2CommandsLib.inf
   ShellPkg/Library/UefiHandleParsingLib/UefiHandleParsingLib.inf
+
+  ShellPkg/Library/UefiDpLib/UefiDpLib.inf {
+    <LibraryClasses>
+      TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
+      PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
+      DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
+  }
 
   ShellPkg/Application/Shell/Shell.inf {
     <LibraryClasses>
@@ -83,6 +90,9 @@
       NULL|ShellPkg/Library/UefiShellInstall1CommandsLib/UefiShellInstall1CommandsLib.inf
       NULL|ShellPkg/Library/UefiShellDebug1CommandsLib/UefiShellDebug1CommandsLib.inf
       NULL|ShellPkg/Library/UefiShellNetwork1CommandsLib/UefiShellNetwork1CommandsLib.inf
-!endif
+!ifdef $(INCLUDE_DP)
+      NULL|ShellPkg/Library/UefiDpLib/UefiDpLib.inf
+!endif #$(INCLUDE_DP)
+!endif #$(NO_SHELL_PROFILES)
   }
 
