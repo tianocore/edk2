@@ -41,13 +41,13 @@ EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE FACP = {
   0,                // Power Mgt 1b Event Reg Blk unsupported
   PM1a_CNT_BLK,     // Port address of Power Mgt 1a Ctrl Reg Blk
   0,                // Power Mgt 1b Ctrl Reg Blk unsupported
-  PM2_CNT_BLK,      // Port address of Power Mgt 2  Ctrl Reg Blk
+  0,                // Power Mgt 2  Ctrl Reg Blk unsupported
   PM_TMR_BLK,       // Port address of Power Mgt Timer Ctrl Reg Blk
   GPE0_BLK,         // Port addr of General Purpose Event 0 Reg Blk
   GPE1_BLK,         // Port addr of General Purpose Event 1 Reg Blk
   PM1_EVT_LEN,      // Byte Length of ports at pm1X_evt_blk
   PM1_CNT_LEN,      // Byte Length of ports at pm1X_cnt_blk
-  PM2_CNT_LEN,      // Byte Length of ports at pm2_cnt_blk
+  0,                // Power Mgt 2 Ctrl Reg Blk unsupported
   PM_TM_LEN,        // Byte Length of ports at pm_tm_blk
   GPE0_BLK_LEN,     // Byte Length of ports at gpe0_blk
   GPE1_BLK_LEN,     // Byte Length of ports at gpe1_blk
