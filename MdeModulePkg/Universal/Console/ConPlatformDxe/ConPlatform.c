@@ -2,7 +2,7 @@
   Console Platform DXE Driver, install Console Device Guids and update Console
   Environment Variables.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -792,7 +792,9 @@ IsGopSibling (
   EFI_DEVICE_PATH_PROTOCOL  *NodeRight;
 
   for (NodeLeft = Left; !IsDevicePathEndType (NodeLeft); NodeLeft = NextDevicePathNode (NodeLeft)) {
-    if (DevicePathType (NodeLeft) == ACPI_DEVICE_PATH && DevicePathSubType (NodeLeft) == ACPI_ADR_DP) {
+    if ((DevicePathType (NodeLeft) == ACPI_DEVICE_PATH && DevicePathSubType (NodeLeft) == ACPI_ADR_DP) ||
+        (DevicePathType (NodeLeft) == HARDWARE_DEVICE_PATH && DevicePathSubType (NodeLeft) == HW_CONTROLLER_DP &&
+         DevicePathType (NextDevicePathNode (NodeLeft)) == ACPI_DEVICE_PATH && DevicePathSubType (NextDevicePathNode (NodeLeft)) == ACPI_ADR_DP)) {
       break;
     }
   }
@@ -802,7 +804,9 @@ IsGopSibling (
   }
 
   for (NodeRight = Right; !IsDevicePathEndType (NodeRight); NodeRight = NextDevicePathNode (NodeRight)) {
-    if (DevicePathType (NodeRight) == ACPI_DEVICE_PATH && DevicePathSubType (NodeRight) == ACPI_ADR_DP) {
+    if ((DevicePathType (NodeRight) == ACPI_DEVICE_PATH && DevicePathSubType (NodeRight) == ACPI_ADR_DP) ||
+        (DevicePathType (NodeRight) == HARDWARE_DEVICE_PATH && DevicePathSubType (NodeRight) == HW_CONTROLLER_DP &&
+         DevicePathType (NextDevicePathNode (NodeRight)) == ACPI_DEVICE_PATH && DevicePathSubType (NextDevicePathNode (NodeRight)) == ACPI_ADR_DP)) {
       break;
     }
   }
