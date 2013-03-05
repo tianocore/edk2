@@ -2,7 +2,7 @@
 # Intel Framework Module Package contains the definitions and module implementation
 # which follows Intel EFI Framework Specification.
 #
-# Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -147,14 +147,16 @@
   ## The PCD is used to mark whether the machine is in first boot cycle.
   #  TRUE means the machine is in first boot cycle. After completing the first boot,
   #  the PCD's value will be updated to FALSE.
+  #  This PCD should be set as HII type PCD by platform integrator.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBootState|TRUE|BOOLEAN|0x0001002f
 
   ## Timeout value for displaying progressing bar in before boot OS.
   #  According to UEFI 2.0 spec, the default TimeOut should be 0xffff.
+  #  This PCD should be set as HII type PCD by platform integrator mapped to variable L"TimeOut" and gEfiGlobalVariableGuid.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0xffff|UINT16|0x40000001
 
   ## Error level for hardware recorder. If value 0, platform does not support feature of hardware error record.
-  #  This PCD should be set as HII type PCD by platform integrator mapped to variable L"HwErrRecSupport"
+  #  This PCD should be set as HII type PCD by platform integrator mapped to variable L"HwErrRecSupport" and gEfiGlobalVariableGuid.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|0|UINT16|0x40000002
 
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]

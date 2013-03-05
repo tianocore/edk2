@@ -457,6 +457,8 @@ BdsEntry (
   LIST_ENTRY                      BootOptionList;
   UINTN                           BootNextSize;
   CHAR16                          *FirmwareVendor;
+  EFI_STATUS                      Status;
+  UINT16                          BootTimeOut;
 
   //
   // Insert the performance probe
@@ -509,6 +511,25 @@ BdsEntry (
   PlatformBdsInit ();
 
   InitializeHwErrRecSupport();
+
+  //
+  // Initialize L"Timeout" EFI global variable.
+  //
+  BootTimeOut = PcdGet16 (PcdPlatformBootTimeOut);
+  if (BootTimeOut != 0xFFFF) {
+    //
+    // If time out value equal 0xFFFF, no need set to 0xFFFF to variable area because UEFI specification
+    // define same behavior between no value or 0xFFFF value for L"Timeout".
+    //
+    Status = gRT->SetVariable (
+                    L"Timeout",
+                    &gEfiGlobalVariableGuid,
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                    sizeof (UINT16),
+                    &BootTimeOut
+                    );
+    ASSERT_EFI_ERROR(Status);
+  }
 
   //
   // bugbug: platform specific code
