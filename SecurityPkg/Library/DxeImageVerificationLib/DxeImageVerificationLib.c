@@ -837,7 +837,7 @@ IsSignatureFoundInDatabase (
   //
   CertList = (EFI_SIGNATURE_LIST *) Data;
   while ((DataSize > 0) && (DataSize >= CertList->SignatureListSize)) {
-    CertCount = (CertList->SignatureListSize - CertList->SignatureHeaderSize) / CertList->SignatureSize;
+    CertCount = (CertList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - CertList->SignatureHeaderSize) / CertList->SignatureSize;
     Cert      = (EFI_SIGNATURE_DATA *) ((UINT8 *) CertList + sizeof (EFI_SIGNATURE_LIST) + CertList->SignatureHeaderSize);
     if ((CertList->SignatureSize == sizeof(EFI_SIGNATURE_DATA) - 1 + SignatureSize) && (CompareGuid(&CertList->SignatureType, CertType))) {
       for (Index = 0; Index < CertCount; Index++) {
