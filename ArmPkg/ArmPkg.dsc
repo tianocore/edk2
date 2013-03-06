@@ -63,6 +63,7 @@
 
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
   CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
+  ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
   ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
   DmaLib|ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
 
@@ -124,6 +125,9 @@
   ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
   ArmPkg/Drivers/PL390Gic/PL390GicSecLib.inf
   ArmPkg/Drivers/TimerDxe/TimerDxe.inf
+
+  ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
+  ArmPkg/Library/ArmSmcLibNull/ArmSmcLibNull.inf
 
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
 

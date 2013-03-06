@@ -45,7 +45,7 @@
   LcdPlatformLib|ArmPlatformPkg/ArmVExpressPkg/Library/HdLcdArmVExpressLib/HdLcdArmVExpressLib.inf
   
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf 
-  ArmSmcLib|ArmPlatformPkg/Library/ArmSmcLib/ArmSmcLib.inf
+  ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
 
 [BuildOptions]
 !ifdef $(ARM_BIGLITTLE_TC2)

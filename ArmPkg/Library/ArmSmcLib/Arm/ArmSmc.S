@@ -11,24 +11,25 @@
 //
 //
 
-    EXPORT ArmCallSmc
-    EXPORT ArmCallSmcArg1
-    EXPORT ArmCallSmcArg2
-    EXPORT ArmCallSmcArg3
+.text
+.align 3
+.arch_extension sec
 
-    AREA   ArmSmc, CODE, READONLY
+GCC_ASM_EXPORT(ArmCallSmc)
+GCC_ASM_EXPORT(ArmCallSmcArg1)
+GCC_ASM_EXPORT(ArmCallSmcArg2)
+GCC_ASM_EXPORT(ArmCallSmcArg3)
 
-ArmCallSmc
+ASM_PFX(ArmCallSmc):
     push    {r1}
     mov     r1, r0
     ldr     r0,[r1]
     smc     #0
     str     r0,[r1]
     pop     {r1}
-    blx     lr
+    bx      lr
 
-// Arg1 in R1
-ArmCallSmcArg1
+ASM_PFX(ArmCallSmcArg1):
     push    {r2-r3}
     mov     r2, r0
     mov     r3, r1
@@ -38,9 +39,9 @@ ArmCallSmcArg1
     str     r0,[r2]
     str     r1,[r3]
     pop     {r2-r3}
-    blx     lr
+    bx      lr
 
-ArmCallSmcArg2
+ASM_PFX(ArmCallSmcArg2):
     push    {r3-r5}
     mov     r3, r0
     mov     r4, r1
@@ -53,9 +54,9 @@ ArmCallSmcArg2
     str     r1,[r4]
     str     r2,[r5]
     pop     {r3-r5}
-    blx     lr
+    bx      lr
 
-ArmCallSmcArg3
+ASM_PFX(ArmCallSmcArg3):
     push    {r4-r7}
     mov     r4, r0
     mov     r5, r1
@@ -71,6 +72,4 @@ ArmCallSmcArg3
     str     r2,[r6]
     str     r3,[r7]
     pop     {r4-r7}
-    blx     lr
-
-    END
+    bx      lr
