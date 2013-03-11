@@ -837,6 +837,7 @@ EfiPxeBcDiscover (
   // If info isn't offered,
   //   use the cached DhcpAck and ProxyOffer packets.
   //
+  ZeroMem (&DefaultInfo, sizeof (EFI_PXE_BASE_CODE_DISCOVER_INFO));
   if (*Layer != EFI_PXE_BASE_CODE_BOOT_LAYER_INITIAL) {
 
     if (!Mode->PxeDiscoverValid || !Mode->PxeReplyReceived || (!Mode->PxeBisReplyReceived && UseBis)) {
