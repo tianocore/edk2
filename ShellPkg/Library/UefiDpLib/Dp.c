@@ -136,14 +136,23 @@ ShellCommandRunDp (
   UINT64                    Ticker;
   UINTN                     Number2Display;
 
-  EFI_STRING                StringPtr   = NULL;
-  BOOLEAN                   SummaryMode = FALSE;
-  BOOLEAN                   VerboseMode = FALSE;
-  BOOLEAN                   AllMode     = FALSE;
-  BOOLEAN                   RawMode     = FALSE;
-  BOOLEAN                   TraceMode   = FALSE;
-  BOOLEAN                   ProfileMode = FALSE;
-  BOOLEAN                   ExcludeMode = FALSE;
+  EFI_STRING                StringPtr;
+  BOOLEAN                   SummaryMode;
+  BOOLEAN                   VerboseMode;
+  BOOLEAN                   AllMode;
+  BOOLEAN                   RawMode;
+  BOOLEAN                   TraceMode;
+  BOOLEAN                   ProfileMode;
+  BOOLEAN                   ExcludeMode;
+
+  StringPtr   = NULL;
+  SummaryMode = FALSE;
+  VerboseMode = FALSE;
+  AllMode     = FALSE;
+  RawMode     = FALSE;
+  TraceMode   = FALSE;
+  ProfileMode = FALSE;
+  ExcludeMode = FALSE;
 
   // Get DP's entry time as soon as possible.
   // This is used as the Shell-Phase end time.
