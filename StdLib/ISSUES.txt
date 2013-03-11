@@ -14,16 +14,17 @@ StdLib Issues
 =============
       Category                             TOOLs       Reported       Status
     ------------------------              --------  --------------  -----------
-1:  Compilation Error                      vs2010             2012  Understood
+1:  Compilation Error                      vs2010             2012  Fixed 3/2013
     stdlib\libc\gdtoa\strtod.c(825) : warning C4789: destination of memory copy is too small
+    runtime crashes when using floating-point formats with printf
 
 2:  Compilation Error                       ALL               2012  Fixed 1/2012
     StdLib/LibC/Uefi/SysCalls.c: In function 'utimes': error: 'va_start' used in function with fixed args
 
-3:  Usage Clarification                                       2012  Understood/Document
+3:  Usage Clarification                                       2012  Document
     Clarify that the current StdLib may not be used for developing drivers.
 
-4:  Execution/Compile errors                                  2012  Understood
+4:  Execution/Compile errors                                  2012  Fixed 1/2013
     Mismatch in use of EFIAPI between declaration and definition of some functions.
 
 5:  Error message Quality during execution                    2012  Verified
@@ -47,6 +48,9 @@ StdLib Issues
 10: No current volume/directory at app. startup.              2012  Understood
     If the Shell does not have a current volume or directory, file operations
     may hang or fail.
+
+11: printf("-%ls-", L"test") will only print "--"             2013  Fixed 3/2013
+
 
 PosixLib
 =============

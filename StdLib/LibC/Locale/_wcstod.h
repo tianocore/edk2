@@ -34,9 +34,9 @@
  * function template for wcstof, wcstod, wcstold.
  *
  * parameters:
- *	_FUNCNAME    : function name
- *	_RETURN_TYPE : return type
- *	_STRTOD_FUNC : real conversion function
+ *  _FUNCNAME    : function name
+ *  _RETURN_TYPE : return type
+ *  _STRTOD_FUNC : real conversion function
  */
 #ifndef __WCSTOD_H_
 #define __WCSTOD_H_
@@ -54,73 +54,73 @@
 _RETURN_TYPE
 _FUNCNAME(const wchar_t * __restrict nptr, wchar_t ** __restrict endptr)
 {
-	const wchar_t *src, *start;
-	_RETURN_TYPE val;
-	char *buf, *end;
-	size_t bufsiz, len;
+  const wchar_t *src, *start;
+  _RETURN_TYPE val;
+  char *buf, *end;
+  size_t bufsiz, len;
 
-	_DIAGASSERT(nptr != NULL);
-	/* endptr may be null */
+  _DIAGASSERT(nptr != NULL);
+  /* endptr may be null */
 
-	src = nptr;
-	while (iswspace((wint_t)*src) != 0)
-		++src;
-	if (*src == L'\0')
-		goto no_convert;
+  src = nptr;
+  while (iswspace((wint_t)*src) != 0)
+    ++src;
+  if (*src == L'\0')
+    goto no_convert;
 
-	/*
-	 * Convert the supplied numeric wide char. string to multibyte.
-	 *
-	 * We could attempt to find the end of the numeric portion of the
-	 * wide char. string to avoid converting unneeded characters but
-	 * choose not to bother; optimising the uncommon case where
-	 * the input string contains a lot of text after the number
-	 * duplicates a lot of strto{f,d,ld}()'s functionality and
-	 * slows down the most common cases.
-	 */
-	start = src;
-	len = wcstombs(NULL, src, 0);
-	if (len == (size_t)-1)
-		/* errno = EILSEQ */
-		goto no_convert;
+  /*
+   * Convert the supplied numeric wide char. string to multibyte.
+   *
+   * We could attempt to find the end of the numeric portion of the
+   * wide char. string to avoid converting unneeded characters but
+   * choose not to bother; optimising the uncommon case where
+   * the input string contains a lot of text after the number
+   * duplicates a lot of strto{f,d,ld}()'s functionality and
+   * slows down the most common cases.
+   */
+  start = src;
+  len = wcstombs(NULL, src, 0);
+  if (len == (size_t)-1)
+    /* errno = EILSEQ */
+    goto no_convert;
 
-	_DIAGASSERT(len > 0);
+  _DIAGASSERT(len > 0);
 
-	bufsiz = len;
-	buf = (void *)malloc(bufsiz + 1);
-	if (buf == NULL)
-		/* errno = ENOMEM */
-		goto no_convert;
+  bufsiz = len;
+  buf = (void *)malloc(bufsiz + 1);
+  if (buf == NULL)
+    /* errno = ENOMEM */
+    goto no_convert;
 
-	len = wcstombs(buf, src, bufsiz + 1);
+  len = wcstombs(buf, src, bufsiz + 1);
 
-	_DIAGASSERT(len == bufsiz);
-	_DIAGASSERT(buf[len] == '\0');
+  _DIAGASSERT(len == bufsiz);
+  _DIAGASSERT(buf[len] == '\0');
 
-	/* Let strto{f,d,ld}() do most of the work for us. */
-	val = _STRTOD_FUNC(buf, &end);
-	if (buf == end) {
-		free(buf);
-		goto no_convert;
-	}
+  /* Let strto{f,d,ld}() do most of the work for us. */
+  val = _STRTOD_FUNC(buf, &end);
+  if (buf == end) {
+    free(buf);
+    goto no_convert;
+  }
 
-	/*
-	 * We only know where the number ended in the _multibyte_
-	 * representation of the string. If the caller wants to know
-	 * where it ended, count multibyte characters to find the
-	 * corresponding position in the wide char string.
-	 */
-	if (endptr != NULL)
-		/* XXX Assume each wide char is one byte. */
-		*endptr = __UNCONST(start + (size_t)(end - buf));
+  /*
+   * We only know where the number ended in the _multibyte_
+   * representation of the string. If the caller wants to know
+   * where it ended, count multibyte characters to find the
+   * corresponding position in the wide char string.
+   */
+  if (endptr != NULL)
+    /* XXX Assume each wide char is one byte. */
+    *endptr = __UNCONST(start + (size_t)(end - buf));
 
-	free(buf);
+  free(buf);
 
-	return val;
+  return val;
 
 no_convert:
-	if (endptr != NULL)
-		*endptr = __UNCONST(nptr);
-	return 0;
+  if (endptr != NULL)
+    *endptr = __UNCONST(nptr);
+  return 0.0;
 }
 #endif /*__WCSTOD_H_*/

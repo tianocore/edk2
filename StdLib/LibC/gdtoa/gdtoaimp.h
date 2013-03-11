@@ -283,8 +283,7 @@ extern "C" {
 Exactly one of IEEE_LITTLE_ENDIAN, IEEE_BIG_ENDIAN, VAX, or IBM should be defined.
 #endif
 
-typedef union { double d; ULong L[2]; } U;
-//typedef union { double d; UINT32 L[2]; } U;
+typedef union { double d; UINT32 L[2]; } U;
 
 #ifdef YES_ALIAS
 #define dval(x) x

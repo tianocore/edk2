@@ -14,6 +14,7 @@
 #include  <stdlib.h>
 #include  <wchar.h>
 #include  <sys/types.h>
+#include  <limits.h>
 
 typedef      int      ch_UCS4;
 
@@ -913,6 +914,9 @@ wcsrtombs(
     return (0);
 
   if (Dest == NULL) {
+    if(MaxBytes <= 0) {
+      MaxBytes = ASCII_STRING_MAX;
+    }
     NumStored = EstimateWtoM(*Src, MaxBytes, NULL);
   }
   else {
