@@ -1,14 +1,14 @@
 /** @file
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
-*  
-*  This program and the accompanying materials                          
-*  are licensed and made available under the terms and conditions of the BSD License         
-*  which accompanies this distribution.  The full text of the license may be found at        
-*  http://opensource.org/licenses/bsd-license.php                                            
+*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 *
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+*  This program and the accompanying materials
+*  are licensed and made available under the terms and conditions of the BSD License
+*  which accompanies this distribution.  The full text of the license may be found at
+*  http://opensource.org/licenses/bsd-license.php
+*
+*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 *
 **/
 
@@ -243,6 +243,7 @@ PrepareFdt (
   UINTN                 Pages;
   BOOLEAN               PsciSmcSupported;
   UINTN                 Rx;
+  UINTN                 OriginalFdtSize;
 
   //
   // Ensure the Power State Coordination Interface (PSCI) SMCs are there if supported
@@ -271,16 +272,28 @@ PrepareFdt (
     }
   }
 
+  //
+  // Sanity checks on the original FDT blob.
+  //
   err = fdt_check_header ((VOID*)(UINTN)(*FdtBlobBase));
   if (err != 0) {
     Print (L"ERROR: Device Tree header not valid (err:%d)\n", err);
     return EFI_INVALID_PARAMETER;
   }
 
+  // The original FDT blob might have been loaded partially.
+  // Check that it is not the case.
+  OriginalFdtSize = (UINTN)fdt_totalsize ((VOID*)(UINTN)(*FdtBlobBase));
+  if (OriginalFdtSize > *FdtBlobSize) {
+    Print (L"ERROR: Incomplete FDT. Only %d/%d bytes have been loaded.\n",
+           *FdtBlobSize, OriginalFdtSize);
+    return EFI_INVALID_PARAMETER;
+  }
+
   //
   // Allocate memory for the new FDT
   //
-  NewFdtBlobSize = fdt_totalsize((VOID*)(UINTN)(*FdtBlobBase)) + FDT_ADDITIONAL_ENTRIES_SIZE;
+  NewFdtBlobSize = OriginalFdtSize + FDT_ADDITIONAL_ENTRIES_SIZE;
 
   // Try below a watermark address
   Status = EFI_NOT_FOUND;
@@ -370,10 +383,10 @@ PrepareFdt (
     if (node >= 0) {
       fdt_setprop_string(fdt, node, "name", "memory");
       fdt_setprop_string(fdt, node, "device_type", "memory");
-      
+
       GetSystemMemoryResources (&ResourceList);
       Resource = (BDS_SYSTEM_MEMORY_RESOURCE*)ResourceList.ForwardLink;
-      
+
       if (sizeof(UINTN) == sizeof(UINT32)) {
         Region.Base = cpu_to_fdt32((UINTN)Resource->PhysicalStart);
         Region.Size = cpu_to_fdt32((UINTN)Resource->ResourceLength);
@@ -507,7 +520,7 @@ PrepareFdt (
   return EFI_SUCCESS;
 
 FAIL_NEW_FDT:
-  *FdtBlobSize = (UINTN)fdt_totalsize ((VOID*)(UINTN)(*FdtBlobBase));
+  *FdtBlobSize = OriginalFdtSize;
   // Return success even if we failed to update the FDT blob. The original one is still valid.
   return EFI_SUCCESS;
 }
