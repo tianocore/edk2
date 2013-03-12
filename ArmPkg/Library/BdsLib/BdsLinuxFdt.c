@@ -452,12 +452,13 @@ PrepareFdt (
         }
 
         // If Power State Coordination Interface (PSCI) is not supported then it is expected the secondary
-        // cores are spinning waiting for the Operation System to release them
+        // cores are spinning waiting for the Operating System to release them
         if (PsciSmcSupported == FALSE) {
-          // Before to write our method check if a method is already exposed in the CPU node
+          // We as the bootloader are responsible for either creating or updating
+          // these entries. Do not trust the entries in the DT. We only know about
+          // 'spin-table' type. Do not try to update other types if defined.
           Method = fdt_getprop(fdt, cpu_node, "enable-method", &lenp);
-          if (Method == NULL) {
-            // No 'enable-method', we can create our entries
+          if ( (Method == NULL) || (!AsciiStrCmp((CHAR8 *)Method, "spin-table")) ) {
             fdt_setprop_string(fdt, cpu_node, "enable-method", "spin-table");
             CpuReleaseAddr = cpu_to_fdt64(ArmCoreInfoTable[Index].MailboxSetAddress);
             fdt_setprop(fdt, cpu_node, "cpu-release-addr", &CpuReleaseAddr, sizeof(CpuReleaseAddr));
@@ -466,6 +467,8 @@ PrepareFdt (
             if (((ArmCoreInfoTable[Index].ClusterId != ClusterId) || (ArmCoreInfoTable[Index].CoreId != CoreId))) {
               fdt_setprop_string(fdt, cpu_node, "status", "disabled");
             }
+          } else {
+            Print(L"Warning: Unsupported enable-method type for CPU[%d] : %a\n", Index, (CHAR8 *)Method);
           }
         }
       }
