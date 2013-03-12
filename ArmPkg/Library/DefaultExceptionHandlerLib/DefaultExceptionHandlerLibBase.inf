@@ -21,8 +21,10 @@
   LIBRARY_CLASS                  = DefaultExceptionHandlerLib
 
 [Sources.common]
-  DefaultExceptionHandler.c
   DefaultExceptionHandlerBase.c
+
+[Sources.ARM]
+  Arm/DefaultExceptionHandler.c
 
 [Packages]
   MdePkg/MdePkg.dec

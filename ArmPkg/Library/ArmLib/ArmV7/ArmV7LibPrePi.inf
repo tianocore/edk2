@@ -25,8 +25,8 @@
   ArmLibSupportV7.S    | GCC
   ArmLibSupportV7.asm  | RVCT
 
-  ../Common/ArmLibSupport.S    | GCC
-  ../Common/ArmLibSupport.asm  | RVCT
+  ../Common/Arm/ArmLibSupport.S    | GCC
+  ../Common/Arm/ArmLibSupport.asm  | RVCT
   ../Common/ArmLib.c
   
   ArmV7Support.S    | GCC

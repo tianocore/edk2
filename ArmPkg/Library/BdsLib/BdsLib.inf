@@ -25,10 +25,11 @@
   BdsAppLoader.c
   BdsHelper.c
   BdsLoadOption.c
-
-  BdsLinuxLoader.c
-  BdsLinuxAtag.c
   BdsLinuxFdt.c
+
+[Sources.ARM]
+  Arm/BdsLinuxLoader.c
+  Arm/BdsLinuxAtag.c
 
 [Packages]
   MdePkg/MdePkg.dec

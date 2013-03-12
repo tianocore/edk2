@@ -22,8 +22,8 @@
   LIBRARY_CLASS                  = ArmLib
 
 [Sources.common]
-  ../Common/ArmLibSupport.S    | GCC
-  ../Common/ArmLibSupport.asm  | RVCT
+  ../Common/Arm/ArmLibSupport.S    | GCC
+  ../Common/Arm/ArmLibSupport.asm  | RVCT
   ../Common/ArmLib.c
 
   Arm9Support.S    | GCC

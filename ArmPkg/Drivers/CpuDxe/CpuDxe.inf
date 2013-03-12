@@ -40,8 +40,8 @@
 #
 
 [Sources.ARM]
-  Mmu.c
-  Exception.c
+  ArmV6/Mmu.c
+  ArmV6/Exception.c
   ArmV6/ExceptionSupport.asm | RVCT
   ArmV6/ExceptionSupport.S   | GCC
 

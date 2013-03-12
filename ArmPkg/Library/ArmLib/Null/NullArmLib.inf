@@ -22,12 +22,14 @@
   LIBRARY_CLASS                  = ArmLib
 
 [Sources.common]
-  ../Common/ArmLibSupport.S    | GCC
-  ../Common/ArmLibSupport.asm  | RVCT
   ../Common/ArmLib.c
 
   NullArmLib.c
   NullArmCacheInformation.c
+
+[Sources.ARM]
+  ../Common/Arm/ArmLibSupport.S    | GCC
+  ../Common/Arm/ArmLibSupport.asm  | RVCT
 
 [Packages]
   ArmPkg/ArmPkg.dec

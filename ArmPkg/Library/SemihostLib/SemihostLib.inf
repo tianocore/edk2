@@ -27,10 +27,11 @@
 #
 #  VALID_ARCHITECTURES           = ARM
 #
+[Sources.common]
+  SemihostLib.c
+
 [Sources.ARM]
   Arm/GccSemihost.S | GCC
-  Arm/SemihostLib.c
-
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -38,10 +39,4 @@
 
 [LibraryClasses]
   BaseLib
-  
-[Protocols]
-  
-[Guids]
- 
-[Pcd]
  

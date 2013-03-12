@@ -21,10 +21,11 @@
   LIBRARY_CLASS                  = DefaultExceptionHandlerLib
   CONSTRUCTOR                    = DefaultExceptionHandlerConstructor
 
-
 [Sources.common]
-  DefaultExceptionHandler.c
   DefaultExceptionHandlerUefi.c
+
+[Sources.ARM]
+  Arm/DefaultExceptionHandler.c
 
 [Packages]
   MdePkg/MdePkg.dec

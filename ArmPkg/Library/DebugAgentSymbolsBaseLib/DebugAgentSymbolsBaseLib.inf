@@ -21,9 +21,11 @@
 
 [Sources.common]
   DebugAgentSymbolsBaseLib.c
-  DebugAgentException.asm        | RVCT
-  DebugAgentException.S          | GCC
-  
+
+[Sources.ARM]
+  Arm/DebugAgentException.asm        | RVCT
+  Arm/DebugAgentException.S          | GCC
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
