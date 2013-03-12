@@ -2,7 +2,7 @@
   Support a Semi Host file system over a debuggers JTAG
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Portions copyright (c) 2011, 2012, ARM Ltd. All rights reserved.<BR>
+  Portions copyright (c) 2011-2013, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -291,6 +291,7 @@ FileRead (
   Fcb = SEMIHOST_FCB_FROM_THIS(File);
 
   if (Fcb->IsRoot == TRUE) {
+    // By design, the Semihosting feature does not allow to list files on the host machine.
     Status = EFI_UNSUPPORTED;
   } else {
     Status = SemihostFileRead (Fcb->SemihostHandle, BufferSize, Buffer);
