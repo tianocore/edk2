@@ -11,6 +11,7 @@
 //
 //
 
+#include <AsmMacroIoLib.h>
 #include <Library/ArmLib.h>
 
   INCLUDE AsmMacroIoLib.inc
