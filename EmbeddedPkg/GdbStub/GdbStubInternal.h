@@ -63,7 +63,7 @@ extern CONST CHAR8 mHexToStr[];
 #define GDB_SIGTRAP     5  // Trace Trap (Breakpoint and SingleStep)
 #define GDB_SIGEMT      7  // Emulator Trap
 #define GDB_SIGFPE      8  // Floating point exception
-#define GDB_SIGSEGV     11 // Setgment violation, page fault 
+#define GDB_SIGSEGV     11 // Segment violation, page fault
 
 
 //

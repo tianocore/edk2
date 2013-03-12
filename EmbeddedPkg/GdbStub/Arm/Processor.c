@@ -94,7 +94,7 @@ MaxEfiException (
   VOID
   )
 {
-  return sizeof (gExceptionType)/sizeof (EFI_EXCEPTION_TYPE_ENTRY);
+  return sizeof (gExceptionType) / sizeof (EFI_EXCEPTION_TYPE_ENTRY);
 }
 
 
@@ -108,7 +108,7 @@ MaxRegisterCount (
   VOID
   )
 {
-  return sizeof (gRegisterOffsets)/sizeof (UINTN);
+  return sizeof (gRegisterOffsets) / sizeof (UINTN);
 }
 
 
@@ -140,7 +140,7 @@ CheckIsa (
  @retval  the pointer to the RegNumber-th pointer
  **/ 
 UINTN *
-FindPointerToRegister(
+FindPointerToRegister (
   IN  EFI_SYSTEM_CONTEXT      SystemContext,
   IN  UINTN           RegNumber  
   )
@@ -170,20 +170,20 @@ BasicReadRegister (
   CHAR8 Char;
   
   if (gRegisterOffsets[RegNumber] > 0xF00) {
-    AsciiSPrint(OutBufPtr, 9, "00000000");
+    AsciiSPrint (OutBufPtr, 9, "00000000");
     OutBufPtr += 8;
     return OutBufPtr;
   }
 
   RegSize = 0;
   while (RegSize < 32) {
-    Char = mHexToStr[(UINT8)((*FindPointerToRegister(SystemContext, RegNumber) >> (RegSize+4)) & 0xf)];
+    Char = mHexToStr[(UINT8)((*FindPointerToRegister (SystemContext, RegNumber) >> (RegSize+4)) & 0xf)];
     if ((Char >= 'A') && (Char <= 'F')) {
       Char = Char - 'A' + 'a';
     }
     *OutBufPtr++ = Char;
     
-    Char = mHexToStr[(UINT8)((*FindPointerToRegister(SystemContext, RegNumber) >> RegSize) & 0xf)];
+    Char = mHexToStr[(UINT8)((*FindPointerToRegister (SystemContext, RegNumber) >> RegSize) & 0xf)];
     if ((Char >= 'A') && (Char <= 'F')) {
       Char = Char - 'A' + 'a';
     }
@@ -212,7 +212,7 @@ ReadNthRegister (
   
   RegNumber = AsciiStrHexToUintn (&InBuffer[1]);
   
-  if (RegNumber >= MaxRegisterCount()) {
+  if (RegNumber >= MaxRegisterCount ()) {
     SendError (GDB_EINVALIDREGNUM); 
     return;
   }
@@ -221,7 +221,7 @@ ReadNthRegister (
   OutBufPtr = BasicReadRegister (SystemContext, RegNumber, OutBufPtr);
   
   *OutBufPtr = '\0';  // the end of the buffer
-  SendPacket(OutBuffer);
+  SendPacket (OutBuffer);
 }
 
 
@@ -238,18 +238,18 @@ ReadGeneralRegisters (
   UINTN   Index;
   CHAR8   *OutBuffer;
   CHAR8   *OutBufPtr;
-  UINTN   RegisterCount = MaxRegisterCount();
+  UINTN   RegisterCount = MaxRegisterCount ();
   
   // It is not safe to allocate pool here....
-  OutBuffer = AllocatePool((RegisterCount * 8) + 1); // 8 bytes per register in string format plus a null to terminate
+  OutBuffer = AllocatePool ((RegisterCount * 8) + 1); // 8 bytes per register in string format plus a null to terminate
   OutBufPtr = OutBuffer;
   for (Index = 0; Index < RegisterCount; Index++) {
     OutBufPtr = BasicReadRegister (SystemContext, Index, OutBufPtr);
   }
   
   *OutBufPtr = '\0';
-  SendPacket(OutBuffer);
-  FreePool(OutBuffer);
+  SendPacket (OutBuffer);
+  FreePool (OutBuffer);
 }
 
 
@@ -278,7 +278,7 @@ CHAR8
   NewValue = 0;
   RegSize = 0;
   while (RegSize < 32) {
-    TempValue = HexCharToInt(*InBufPtr++);
+    TempValue = HexCharToInt (*InBufPtr++);
     
     if ((INTN)TempValue < 0) {
       SendError (GDB_EBADMEMDATA); 
@@ -286,7 +286,7 @@ CHAR8
     }
     
     NewValue += (TempValue << (RegSize+4));
-    TempValue = HexCharToInt(*InBufPtr++);
+    TempValue = HexCharToInt (*InBufPtr++);
     
     if ((INTN)TempValue < 0) {
       SendError (GDB_EBADMEMDATA); 
@@ -296,7 +296,7 @@ CHAR8
     NewValue += (TempValue << RegSize); 
     RegSize = RegSize + 8;
   }
-  *(FindPointerToRegister(SystemContext, RegNumber)) = NewValue;
+  *(FindPointerToRegister (SystemContext, RegNumber)) = NewValue;
   return InBufPtr;
 }
 
@@ -327,7 +327,7 @@ WriteNthRegister (
   RegNumber = AsciiStrHexToUintn (RegNumBuffer); 
   
   // check if this is a valid Register Number
-  if (RegNumber >= MaxRegisterCount()) {
+  if (RegNumber >= MaxRegisterCount ()) {
     SendError (GDB_EINVALIDREGNUM); 
     return;
   }
@@ -353,11 +353,11 @@ WriteGeneralRegisters (
   UINTN  i;
   CHAR8  *InBufPtr; /// pointer to the input buffer
   UINTN  MinLength;
-  UINTN  RegisterCount = MaxRegisterCount();
+  UINTN  RegisterCount = MaxRegisterCount ();
 
   MinLength = (RegisterCount * 8) + 1;  // 'G' plus the registers in ASCII format
   
-  if (AsciiStrLen(InBuffer) < MinLength) {
+  if (AsciiStrLen (InBuffer) < MinLength) {
     //Bad message. Message is not the right length 
     SendError (GDB_EBADBUFSIZE); 
     return;
@@ -367,7 +367,7 @@ WriteGeneralRegisters (
   
   // Read the new values for the registers from the input buffer to an array, NewValueArray.
   // The values in the array are in the gdb ordering
-  for(i = 0; i < RegisterCount; i++) {
+  for (i = 0; i < RegisterCount; i++) {
     InBufPtr = BasicWriteRegister (SystemContext, i, InBufPtr);
   }
   
@@ -421,7 +421,7 @@ AddSingleStep (
     mSingleStepActive = FALSE;
   }
 
-  InvalidateInstructionCacheRange((VOID *)mSingleStepPC, mSingleStepDataSize);
+  InvalidateInstructionCacheRange ((VOID *)mSingleStepPC, mSingleStepDataSize);
   //DEBUG((EFI_D_ERROR, "AddSingleStep at 0x%08x (was: 0x%08x is:0x%08x)\n", SystemContext.SystemContextArm->PC, mSingleStepData, *(UINT32 *)mSingleStepPC));
 }
 
@@ -446,7 +446,7 @@ RemoveSingleStep (
     //DEBUG((EFI_D_ERROR, "RemoveSingleStep at 0x%08x (was: 0x%08x is:0x%08x)\n", SystemContext.SystemContextArm->PC, *(UINT32 *)mSingleStepPC, mSingleStepData));
     *(UINT32 *)mSingleStepPC = mSingleStepData;
   }
-  InvalidateInstructionCacheRange((VOID *)mSingleStepPC, mSingleStepDataSize);
+  InvalidateInstructionCacheRange ((VOID *)mSingleStepPC, mSingleStepDataSize);
   mSingleStepActive = FALSE;
 }
 
@@ -466,7 +466,7 @@ ContinueAtAddress (
   )
 {
   if (PacketData[1] != '\0') {
-    SystemContext.SystemContextArm->PC = AsciiStrHexToUintn(&PacketData[1]);
+    SystemContext.SystemContextArm->PC = AsciiStrHexToUintn (&PacketData[1]);
   } 
 }
 
@@ -484,7 +484,7 @@ SingleStep (
   IN    CHAR8                       *PacketData
   )
 {
-  SendNotSupported();
+  SendNotSupported ();
 }
 
 UINTN
@@ -521,15 +521,15 @@ SearchBreakpointList (
   LIST_ENTRY              *Current;
   ARM_SOFTWARE_BREAKPOINT *Breakpoint;
 
-  Current = GetFirstNode(&BreakpointList);
-  while (!IsNull(&BreakpointList, Current)) {
+  Current = GetFirstNode (&BreakpointList);
+  while (!IsNull (&BreakpointList, Current)) {
     Breakpoint = ARM_SOFTWARE_BREAKPOINT_FROM_LINK(Current);
 
     if (Address == Breakpoint->Address) {
       return Breakpoint;
     }
 
-    Current = GetNextNode(&BreakpointList, Current);
+    Current = GetNextNode (&BreakpointList, Current);
   }
 
   return NULL;
@@ -542,25 +542,25 @@ SetBreakpoint (
 {
   ARM_SOFTWARE_BREAKPOINT *Breakpoint;
 
-  Breakpoint = SearchBreakpointList(Address);
+  Breakpoint = SearchBreakpointList (Address);
 
   if (Breakpoint != NULL) {
     return;
   }
 
   // create and fill breakpoint structure
-  Breakpoint = AllocatePool(sizeof(ARM_SOFTWARE_BREAKPOINT));
+  Breakpoint = AllocatePool (sizeof(ARM_SOFTWARE_BREAKPOINT));
 
   Breakpoint->Signature   = ARM_SOFTWARE_BREAKPOINT_SIGNATURE;
   Breakpoint->Address     = Address;
   Breakpoint->Instruction = *(UINT32 *)Address;
   
   // Add it to the list
-  InsertTailList(&BreakpointList, &Breakpoint->Link);
+  InsertTailList (&BreakpointList, &Breakpoint->Link);
 
   // Insert the software breakpoint
   *(UINT32 *)Address = GDB_ARM_BKPT;
-  InvalidateInstructionCacheRange((VOID *)Address, 4);
+  InvalidateInstructionCacheRange ((VOID *)Address, 4);
 
   //DEBUG((EFI_D_ERROR, "SetBreakpoint at 0x%08x (was: 0x%08x is:0x%08x)\n", Address, Breakpoint->Instruction, *(UINT32 *)Address));
 }
@@ -572,22 +572,22 @@ ClearBreakpoint (
 {
   ARM_SOFTWARE_BREAKPOINT *Breakpoint;
 
-  Breakpoint = SearchBreakpointList(Address);
+  Breakpoint = SearchBreakpointList (Address);
 
   if (Breakpoint == NULL) {
     return;
   }
 
   // Add it to the list
-  RemoveEntryList(&Breakpoint->Link);
+  RemoveEntryList (&Breakpoint->Link);
 
   // Restore the original instruction
   *(UINT32 *)Address = Breakpoint->Instruction;
-  InvalidateInstructionCacheRange((VOID *)Address, 4);
+  InvalidateInstructionCacheRange ((VOID *)Address, 4);
 
   //DEBUG((EFI_D_ERROR, "ClearBreakpoint at 0x%08x (was: 0x%08x is:0x%08x)\n", Address, GDB_ARM_BKPT, *(UINT32 *)Address));
 
-  FreePool(Breakpoint);
+  FreePool (Breakpoint);
 }
 
 VOID
@@ -602,7 +602,7 @@ InsertBreakPoint (
   UINTN Length;
   UINTN ErrorCode;
 
-  ErrorCode = ParseBreakpointPacket(PacketData, &Type, &Address, &Length);
+  ErrorCode = ParseBreakpointPacket (PacketData, &Type, &Address, &Length);
   if (ErrorCode > 0) {
     SendError ((UINT8)ErrorCode);
     return;
@@ -618,7 +618,7 @@ InsertBreakPoint (
       return;
   }
 
-  SetBreakpoint(Address);
+  SetBreakpoint (Address);
 
   SendSuccess ();
 }
@@ -651,7 +651,7 @@ RemoveBreakPoint (
       return;
   }
 
-  ClearBreakpoint(Address);
+  ClearBreakpoint (Address);
 
   SendSuccess ();
 }
@@ -662,7 +662,7 @@ InitializeProcessor (
   )
 {
   // Initialize breakpoint list
-  InitializeListHead(&BreakpointList);
+  InitializeListHead (&BreakpointList);
 }
 
 BOOLEAN

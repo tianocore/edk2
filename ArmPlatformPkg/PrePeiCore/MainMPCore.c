@@ -121,7 +121,7 @@ PrimaryMain (
   CreatePpiList (&PpiListSize, &PpiList);
 
   // Enable the GIC Distributor
-  ArmGicEnableDistributor(PcdGet32(PcdGicDistributorBase));
+  ArmGicEnableDistributor (PcdGet32(PcdGicDistributorBase));
 
   // If ArmVe has not been built as Standalone then we need to wake up the secondary cores
   if (FeaturePcdGet (PcdSendSgiToBringUpSecondaryCores)) {
@@ -155,5 +155,5 @@ PrimaryMain (
   SecCoreData.StackSize              = (TemporaryRamBase + TemporaryRamSize) - (UINTN)SecCoreData.StackBase;
 
   // Jump to PEI core entry point
-  (PeiCoreEntryPoint)(&SecCoreData, PpiList);
+  PeiCoreEntryPoint (&SecCoreData, PpiList);
 }

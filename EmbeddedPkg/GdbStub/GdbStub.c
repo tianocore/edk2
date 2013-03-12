@@ -75,7 +75,6 @@ GdbStubEntry (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
-
 {
   EFI_STATUS                  Status;  
   EFI_DEBUG_SUPPORT_PROTOCOL  *DebugSupport;
@@ -84,8 +83,7 @@ GdbStubEntry (
   UINTN                       Index;
   UINTN                       Processor;
   BOOLEAN                     IsaSupported;
- 
-   
+
   Status = EfiGetSystemConfigurationTable (&gEfiDebugImageInfoTableGuid, (VOID **)&gDebugImageTableHeader);
   if (EFI_ERROR (Status)) {
     gDebugImageTableHeader = NULL;
@@ -136,10 +134,9 @@ GdbStubEntry (
   DEBUG ((EFI_D_INFO, "Debug Support Protocol Processor Index %d\n", gMaxProcessorIndex));
   
   // Call processor-specific init routine
-  InitializeProcessor();
+  InitializeProcessor ();
 
   for (Processor = 0; Processor <= gMaxProcessorIndex; Processor++) {
-    
     for (Index = 0; Index < MaxEfiException (); Index++) {
       Status = DebugSupport->RegisterExceptionCallback (DebugSupport, Processor,  GdbExceptionHandler, gExceptionType[Index].Exception);
       ASSERT_EFI_ERROR (Status);
@@ -165,7 +162,7 @@ GdbStubEntry (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Register for protocol notifactions on this event
+  // Register for protocol notifications on this event
   //
   Status = gBS->RegisterProtocolNotify (
                   &gEfiLoadedImageProtocolGuid,
@@ -181,8 +178,6 @@ GdbStubEntry (
    
   return EFI_SUCCESS;
 }
-
-
 
 /**
  Transfer length bytes of input buffer, starting at Address, to memory.
@@ -485,10 +480,9 @@ EFIAPI
 SendNotSupported (
   VOID          
   )             
-{       
+{
   SendPacket ("");
 }
-
 
 
 /**
@@ -596,11 +590,11 @@ ConvertEFItoGDBtype (
   IN  EFI_EXCEPTION_TYPE      EFIExceptionType
   )
 { 
-  UINTN i;
+  UINTN Index;
   
-  for (i=0; i < MaxEfiException() ; i++) {
-    if (gExceptionType[i].Exception == EFIExceptionType) {
-      return gExceptionType[i].SignalNo;
+  for (Index = 0; Index < MaxEfiException () ; Index++) {
+    if (gExceptionType[Index].Exception == EFIExceptionType) {
+      return gExceptionType[Index].SignalNo;
     }
   }
   return GDB_SIGTRAP; // this is a GDB trap
@@ -635,14 +629,14 @@ ReadFromMemory (
   InBufPtr++; // this skips ',' in the buffer
   
   /* Error checking */
-  if (AsciiStrLen(AddressBuffer) >= MAX_ADDR_SIZE) {
+  if (AsciiStrLen (AddressBuffer) >= MAX_ADDR_SIZE) {
     Print((CHAR16 *)L"Address is too long\n");
     SendError (GDB_EBADMEMADDRBUFSIZE); 
     return;
   }
   
   // 2 = 'm' + ','
-  if (AsciiStrLen(PacketData) - AsciiStrLen(AddressBuffer) - 2 >= MAX_LENGTH_SIZE) {
+  if (AsciiStrLen (PacketData) - AsciiStrLen (AddressBuffer) - 2 >= MAX_LENGTH_SIZE) {
     Print((CHAR16 *)L"Length is too long\n");
     SendError (GDB_EBADMEMLENGTH); 
     return;
@@ -699,14 +693,14 @@ WriteToMemory (
   /* Error checking */
   
   //Check if Address is not too long.
-  if (AsciiStrLen(AddressBuffer) >= MAX_ADDR_SIZE) {
+  if (AsciiStrLen (AddressBuffer) >= MAX_ADDR_SIZE) {
     Print ((CHAR16 *)L"Address too long..\n");
     SendError (GDB_EBADMEMADDRBUFSIZE); 
     return;
   }
   
   //Check if message length is not too long
-  if (AsciiStrLen(LengthBuffer) >= MAX_LENGTH_SIZE) {
+  if (AsciiStrLen (LengthBuffer) >= MAX_LENGTH_SIZE) {
     Print ((CHAR16 *)L"Length too long..\n");
     SendError (GDB_EBADMEMLENGBUFSIZE); 
     return;
@@ -714,7 +708,7 @@ WriteToMemory (
   
   // Check if Message is not too long/short.
   // 3 = 'M' + ',' + ':'
-  MessageLength = (AsciiStrLen(PacketData) - AsciiStrLen(AddressBuffer) - AsciiStrLen(LengthBuffer) - 3);
+  MessageLength = (AsciiStrLen (PacketData) - AsciiStrLen (AddressBuffer) - AsciiStrLen (LengthBuffer) - 3);
   if (MessageLength != (2*Length)) {
     //Message too long/short. New data is not the right size.
     SendError (GDB_EBADMEMDATASIZE);   
@@ -770,7 +764,7 @@ ParseBreakpointPacket (
   *AddressBufferPtr = '\0';
 
   //Check if Address is not too long.
-  if (AsciiStrLen(AddressBuffer) >= MAX_ADDR_SIZE) {
+  if (AsciiStrLen (AddressBuffer) >= MAX_ADDR_SIZE) {
     Print ((CHAR16 *)L"Address too long..\n");
     return 40; //EMSGSIZE: Message size too long.
   }
@@ -801,7 +795,7 @@ gXferObjectReadResponse (
   CHAR8   Char;
   UINTN   Count;
 
-  // responce starts with 'm' or 'l' if it is the end
+  // Response starts with 'm' or 'l' if it is the end
   OutBufPtr = gOutBuffer;
   *OutBufPtr++ = Type;
   Count = 1;
@@ -989,12 +983,11 @@ PeCoffLoaderGetDebuggerInfo (
 }
 
 
-
 /** 
   Process "qXfer:object:read:annex:offset,length" request.
   
   Returns an XML document that contains loaded libraries. In our case it is 
-  infomration in the EFI Debug Inmage Table converted into an XML document.
+  information in the EFI Debug Image Table converted into an XML document.
   
   GDB will call with an arbitrary length (it can't know the real length and 
   will reply with chunks of XML that are easy for us to deal with. Gdb will 
@@ -1006,12 +999,12 @@ PeCoffLoaderGetDebuggerInfo (
     <library name="/a/l/f/f.dll"><segment address="0x30000000"/></library>
   </library-list>
   
-  Since we can not allocate memory in interupt context this module has 
+  Since we can not allocate memory in interrupt context this module has
   assumptions about how it will get called:
   1) Length will generally be max remote packet size (big enough)
   2) First Offset of an XML document read needs to be 0
   3) This code will return back small chunks of the XML document on every read.
-     Each subseqent call will ask for the next availble part of the document.
+     Each subsequent call will ask for the next available part of the document.
      
   Note: The only variable size element in the XML is:
   "  <library name=\"%s\"><segment address=\"%p\"/></library>\n" and it is 
@@ -1039,6 +1032,7 @@ QxferLibrary (
     
     // Force a retry from the beginning 
     gPacketqXferLibraryOffset = 0;
+
     return;
   }
 
@@ -1117,7 +1111,7 @@ GdbExceptionHandler (
   CHAR8   *Ptr;
       
   
-  if (ValidateException(ExceptionType, SystemContext) == FALSE) {
+  if (ValidateException (ExceptionType, SystemContext) == FALSE) {
     return;
   }
 
@@ -1254,7 +1248,7 @@ GdbPeriodicCallBack (
   if (gCtrlCBreakFlag) {
     //
     // Update the context to force a single step trap when we exit the GDB
-    // stub. This will trasfer control to GdbExceptionHandler () and let
+    // stub. This will transfer control to GdbExceptionHandler () and let
     // us break into the program. We don't want to break into the GDB stub.
     //
     AddSingleStep (SystemContext);

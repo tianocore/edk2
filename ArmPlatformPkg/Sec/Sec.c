@@ -35,20 +35,20 @@ CEntryPoint (
   UINTN           JumpAddress;
 
   // Invalidate the data cache. Doesn't have to do the Data cache clean.
-  ArmInvalidateDataCache();
+  ArmInvalidateDataCache ();
 
   // Invalidate Instruction Cache
-  ArmInvalidateInstructionCache();
+  ArmInvalidateInstructionCache ();
 
   // Invalidate I & D TLBs
-  ArmInvalidateInstructionAndDataTlb();
+  ArmInvalidateInstructionAndDataTlb ();
 
   // CPU specific settings
   ArmCpuSetup (MpId);
 
   // Enable Floating Point Coprocessor if supported by the platform
   if (FixedPcdGet32 (PcdVFPEnabled)) {
-    ArmEnableVFP();
+    ArmEnableVFP ();
   }
 
   // Initialize peripherals that must be done at the early stage
@@ -95,7 +95,7 @@ CEntryPoint (
 
   // Test if Trustzone is supported on this platform
   if (FixedPcdGetBool (PcdTrustzoneSupport)) {
-    if (ArmIsMpCore()) {
+    if (ArmIsMpCore ()) {
       // Setup SMP in Non Secure world
       ArmCpuSetupSmpNonSecure (GET_CORE_ID(MpId));
     }

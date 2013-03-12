@@ -147,7 +147,7 @@ CheckIsa (
  @retval  the pointer to the RegNumber-th pointer
  **/
 UINTN *
-FindPointerToRegister(
+FindPointerToRegister (
   IN  EFI_SYSTEM_CONTEXT  SystemContext,
   IN  UINTN               RegNumber  
   )
@@ -177,8 +177,8 @@ BasicReadRegister (
   
   RegSize = 0;
   while (RegSize < REG_SIZE) {
-    *OutBufPtr++ = mHexToStr[((*FindPointerToRegister(SystemContext, RegNumber) >> (RegSize+4)) & 0xf)];
-    *OutBufPtr++ = mHexToStr[((*FindPointerToRegister(SystemContext, RegNumber) >> RegSize) & 0xf)];
+    *OutBufPtr++ = mHexToStr[((*FindPointerToRegister (SystemContext, RegNumber) >> (RegSize+4)) & 0xf)];
+    *OutBufPtr++ = mHexToStr[((*FindPointerToRegister (SystemContext, RegNumber) >> RegSize) & 0xf)];
     RegSize = RegSize + 8;
   }
   return OutBufPtr;
@@ -210,7 +210,7 @@ ReadNthRegister (
   }
 
   OutBufPtr = OutBuffer;
-  OutBufPtr = BasicReadRegister(SystemContext, RegNumber, OutBufPtr);
+  OutBufPtr = BasicReadRegister (SystemContext, RegNumber, OutBufPtr);
 
   *OutBufPtr = '\0';  // the end of the buffer
   SendPacket(OutBuffer);
@@ -233,8 +233,8 @@ ReadGeneralRegisters (
   CHAR8 *OutBufPtr;   // pointer to the output buffer
 
   OutBufPtr = OutBuffer;
-  for(i = 0 ; i < MaxRegisterCount() ; i++) {  // there are only 16 registers to read   
-    OutBufPtr = BasicReadRegister(SystemContext, i, OutBufPtr);
+  for (i = 0 ; i < MaxRegisterCount() ; i++) {  // there are only 16 registers to read   
+    OutBufPtr = BasicReadRegister (SystemContext, i, OutBufPtr);
   }
 
   *OutBufPtr = '\0';  // the end of the buffer
@@ -282,7 +282,7 @@ BasicWriteRegister (
     NewValue += (TempValue << RegSize); 
     RegSize = RegSize + 8;
   }
-  *(FindPointerToRegister(SystemContext, RegNumber)) = NewValue;
+  *(FindPointerToRegister (SystemContext, RegNumber)) = NewValue;
   return InBufPtr;
 }
 
@@ -353,8 +353,8 @@ WriteGeneralRegisters (
   
   // Read the new values for the registers from the input buffer to an array, NewValueArray.
   // The values in the array are in the gdb ordering
-  for(i=0; i < MaxRegisterCount(); i++) {  // there are only 16 registers to write
-    InBufPtr = BasicWriteRegister(SystemContext, i, InBufPtr);
+  for (i=0; i < MaxRegisterCount(); i++) {  // there are only 16 registers to write
+    InBufPtr = BasicWriteRegister (SystemContext, i, InBufPtr);
   }
 
   SendSuccess();
@@ -867,7 +867,7 @@ InsertBreakPoint (
 
     if (Status == EFI_UNSUPPORTED) {
       Print ((CHAR16 *)L"Not supported\n");
-      SendNotSupported();
+      SendNotSupported ();
       return;
     }
 
@@ -946,7 +946,7 @@ RemoveBreakPoint (
 
     if (Status == EFI_UNSUPPORTED) {
       Print ((CHAR16 *)L"Not supported.\n");
-      SendNotSupported();
+      SendNotSupported ();
       return;
     }
 
@@ -956,7 +956,7 @@ RemoveBreakPoint (
   }
 
   //Remove breakpoint
-  Status = DisableDebugRegister(SystemContext, Register);
+  Status = DisableDebugRegister (SystemContext, Register);
   if (EFI_ERROR(Status)) {
     Print ((CHAR16 *)L"Invalid argument.\n");
     SendError (GDB_EINVALIDARG);
