@@ -13,6 +13,8 @@
 **/
 
 #include "UefiShellLevel2CommandsLib.h"
+#include <Guid/FileSystemInfo.h>
+#include <Guid/FileSystemVolumeLabelInfo.h>
 
 /**
   Function to take a list of files to copy and a destination location and do
@@ -62,24 +64,29 @@ CopySingleFile(
   IN BOOLEAN      SilentMode
   )
 {
-  VOID                *Response;
-  UINTN               ReadSize;
-  SHELL_FILE_HANDLE   SourceHandle;
-  SHELL_FILE_HANDLE   DestHandle;
-  EFI_STATUS          Status;
-  VOID                *Buffer;
-  CHAR16              *TempName;
-  UINTN               Size;
-  EFI_SHELL_FILE_INFO *List;
-  SHELL_STATUS        ShellStatus;
-
+  VOID                  *Response;
+  UINTN                 ReadSize;
+  SHELL_FILE_HANDLE     SourceHandle;
+  SHELL_FILE_HANDLE     DestHandle;
+  EFI_STATUS            Status;
+  VOID                  *Buffer;
+  CHAR16                *TempName;
+  UINTN                 Size;
+  EFI_SHELL_FILE_INFO   *List;
+  SHELL_STATUS          ShellStatus;
+  UINT64                SourceFileSize;
+  UINT64                DestFileSize;
+  EFI_FILE_PROTOCOL     *DestVolumeFP;
+  EFI_FILE_SYSTEM_INFO  *DestVolumeInfo;
+  UINTN                 DestVolumeInfoSize;
 
   ASSERT(Resp != NULL);
 
-  SourceHandle  = NULL;
-  DestHandle    = NULL;
-  Response      = *Resp;
-  List          = NULL;
+  SourceHandle    = NULL;
+  DestHandle      = NULL;
+  Response        = *Resp;
+  List            = NULL;
+  DestVolumeInfo  = NULL;
 
   ReadSize = PcdGet16(PcdShellFileOperationSize);
   // Why bother copying a file to itself
@@ -143,7 +150,7 @@ CopySingleFile(
     // Now copy all the files under the directory...
     //
     TempName    = NULL;
-    Size          = 0;
+    Size        = 0;
     StrnCatGrow(&TempName, &Size, Source, 0);
     StrnCatGrow(&TempName, &Size, L"\\*", 0);
     if (TempName != NULL) {
@@ -157,31 +164,81 @@ CopySingleFile(
       Size = 0;
     }
   } else {
-    //
-    // open file with create enabled
-    //
-    Status = ShellOpenFileByName(Dest, &DestHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE|EFI_FILE_MODE_CREATE, 0);
-    if (EFI_ERROR(Status)) {
-      return (SHELL_ACCESS_DENIED);
-    }
+      //
+      // open file with create enabled
+      //
+      Status = ShellOpenFileByName(Dest, &DestHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE|EFI_FILE_MODE_CREATE, 0);
+      if (EFI_ERROR(Status)) {
+        return (SHELL_ACCESS_DENIED);
+      }
 
-    //
-    // open source file
-    //
-    Status = ShellOpenFileByName(Source, &SourceHandle, EFI_FILE_MODE_READ, 0);
-    ASSERT_EFI_ERROR(Status);
-
-    //
-    // copy data between files
-    //
-    Buffer = AllocateZeroPool(ReadSize);
-    ASSERT(Buffer != NULL);
-    while (ReadSize == PcdGet16(PcdShellFileOperationSize) && !EFI_ERROR(Status)) {
-      Status = ShellReadFile(SourceHandle, &ReadSize, Buffer);
+      //
+      // open source file
+      //
+      Status = ShellOpenFileByName(Source, &SourceHandle, EFI_FILE_MODE_READ, 0);
       ASSERT_EFI_ERROR(Status);
-      Status = ShellWriteFile(DestHandle, &ReadSize, Buffer);
+
+      //
+      //get file size of source file and freespace available on destination volume
+      //
+      ShellGetFileSize(SourceHandle, &SourceFileSize);
+      ShellGetFileSize(DestHandle, &DestFileSize);
+
+      //
+      //if the destination file already exists then it will be replaced, meaning the sourcefile effectively needs less storage space
+      //
+      if(DestFileSize < SourceFileSize){
+        SourceFileSize -= DestFileSize;
+      } else {
+        SourceFileSize = 0;
+      }
+
+      //
+      //get the system volume info to check the free space
+      //
+      DestVolumeFP = ConvertShellHandleToEfiFileProtocol(DestHandle);
+      DestVolumeInfo = NULL;
+      DestVolumeInfoSize = 0;
+      Status = DestVolumeFP->GetInfo(
+        DestVolumeFP,
+        &gEfiFileSystemInfoGuid,
+        &DestVolumeInfoSize,
+        DestVolumeInfo
+        );
+
+      if (Status == EFI_BUFFER_TOO_SMALL) {
+        DestVolumeInfo = AllocateZeroPool(DestVolumeInfoSize);
+        Status = DestVolumeFP->GetInfo(
+          DestVolumeFP,
+          &gEfiFileSystemInfoGuid,
+          &DestVolumeInfoSize,
+          DestVolumeInfo
+          );
+      }
+
+      //
+      //check if enough space available on destination drive to complete copy
+      //
+      if (DestVolumeInfo->FreeSpace < SourceFileSize) {
+        //
+        //not enough space on destination directory to copy file
+        //
+        SHELL_FREE_NON_NULL(DestVolumeInfo);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_CPY_FAIL), gShellLevel2HiiHandle);
+        return(SHELL_VOLUME_FULL);
+      } else {
+        //
+        // copy data between files
+        //
+        Buffer = AllocateZeroPool(ReadSize);
+        ASSERT(Buffer != NULL);
+        while (ReadSize == PcdGet16(PcdShellFileOperationSize) && !EFI_ERROR(Status)) {
+          Status = ShellReadFile(SourceHandle, &ReadSize, Buffer);
+          Status = ShellWriteFile(DestHandle, &ReadSize, Buffer);
+        }
+      }
+      SHELL_FREE_NON_NULL(DestVolumeInfo);
     }
-  }
 
   //
   // close files
@@ -274,7 +331,7 @@ ValidateAndCopyFiles(
   for (Node = (EFI_SHELL_FILE_INFO *)GetFirstNode(&FileList->Link)
     ;  !IsNull(&FileList->Link, &Node->Link)
     ;  Node = (EFI_SHELL_FILE_INFO *)GetNextNode(&FileList->Link, &Node->Link)
-   ){
+    ){
     //
     // skip the directory traversing stuff...
     //
@@ -326,7 +383,7 @@ ValidateAndCopyFiles(
   for (Node = (EFI_SHELL_FILE_INFO *)GetFirstNode(&FileList->Link)
     ;  !IsNull(&FileList->Link, &Node->Link)
     ;  Node = (EFI_SHELL_FILE_INFO *)GetNextNode(&FileList->Link, &Node->Link)
-   ){
+    ){
     if (ShellGetExecutionBreakFlag()) {
       break;
     }
@@ -342,7 +399,7 @@ ValidateAndCopyFiles(
 
     if (FileList->Link.ForwardLink == FileList->Link.BackLink // 1 item
       && EFI_ERROR(ShellIsDirectory(DestDir))                 // not an existing directory
-     ) {
+      ) {
       if (StrStr(DestDir, L":") == NULL) {
         //
         // simple copy of a single file
@@ -366,9 +423,9 @@ ValidateAndCopyFiles(
       // Check for leading slash
       //
       if (DestDir[0] == L'\\') {
-         //
-         // Copy to the root of CWD
-         //
+          //
+          // Copy to the root of CWD
+          //
         StrCpy(DestPath, Cwd);
         while (PathRemoveLastItem(DestPath));
         StrCat(DestPath, DestDir+1);
@@ -411,7 +468,7 @@ ValidateAndCopyFiles(
     if ( !EFI_ERROR(ShellIsDirectory(Node->FullName))
       && !EFI_ERROR(ShellIsDirectory(DestPath))
       && StrniCmp(Node->FullName, DestPath, StrLen(DestPath)) == NULL
-     ){
+      ){
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_SD_PARENT), gShellLevel2HiiHandle);
       ShellStatus = SHELL_INVALID_PARAMETER;
       break;
@@ -424,7 +481,7 @@ ValidateAndCopyFiles(
 
     if ((TempLocation = StrniCmp(Node->FullName, DestPath, StrLen(Node->FullName))) == 0
       && (DestPath[StrLen(Node->FullName)] == CHAR_NULL || DestPath[StrLen(Node->FullName)] == L'\\')
-     ) {
+      ) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_SD_SAME), gShellLevel2HiiHandle);
       ShellStatus = SHELL_INVALID_PARAMETER;
       break;
@@ -454,6 +511,7 @@ ValidateAndCopyFiles(
   }
 
   return (ShellStatus);
+
 }
 
 /**
