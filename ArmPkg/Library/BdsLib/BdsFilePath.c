@@ -17,6 +17,7 @@
 #include <Protocol/UsbIo.h>
 #include <Protocol/DiskIo.h>
 #include <Protocol/LoadedImage.h>
+#include <Protocol/SimpleNetwork.h>
 
 #define IS_DEVICE_PATH_NODE(node,type,subtype) (((node)->Type == (type)) && ((node)->SubType == (subtype)))
 
@@ -661,6 +662,7 @@ BdsPxeLoadImage (
   EFI_STATUS              Status;
   EFI_LOAD_FILE_PROTOCOL  *LoadFileProtocol;
   UINTN                   BufferSize;
+  EFI_PXE_BASE_CODE_PROTOCOL *Pxe;
 
   // Get Load File Protocol attached to the PXE protocol
   Status = gBS->HandleProtocol (Handle, &gEfiLoadFileProtocolGuid, (VOID **)&LoadFileProtocol);
@@ -681,6 +683,15 @@ BdsPxeLoadImage (
     }
   }
 
+  if (Status == EFI_ALREADY_STARTED) {
+    Status = gBS->LocateProtocol (&gEfiPxeBaseCodeProtocolGuid, NULL, (VOID **)&Pxe);
+    if (!EFI_ERROR(Status)) {
+      // If PXE is already started, we stop it
+      Pxe->Stop (Pxe);
+      // And we try again
+      return BdsPxeLoadImage (DevicePath, Handle, RemainingDevicePath, Type, Image, ImageSize);
+    }
+  }
   return Status;
 }
 
@@ -737,6 +748,8 @@ BdsTftpLoadImage (
   IPv4_DEVICE_PATH*           IPv4DevicePathNode;
   FILEPATH_DEVICE_PATH*       FilePathDevicePath;
   EFI_IP_ADDRESS              LocalIp;
+  CHAR8*                      AsciiPathName;
+  EFI_SIMPLE_NETWORK_PROTOCOL *Snp;
 
   ASSERT(IS_DEVICE_PATH_NODE (RemainingDevicePath, MESSAGING_DEVICE_PATH, MSG_IPv4_DP));
 
@@ -753,17 +766,44 @@ BdsTftpLoadImage (
     return Status;
   }
 
-  if (!IPv4DevicePathNode->StaticIpAddress) {
-    Status = Pxe->Dhcp(Pxe, TRUE);
-  } else {
-    CopyMem (&LocalIp.v4, &IPv4DevicePathNode->LocalIpAddress, sizeof (EFI_IPv4_ADDRESS));
-    Status = Pxe->SetStationIp (Pxe, &LocalIp, NULL);
-  }
-  if (EFI_ERROR (Status)) {
+  do {
+    if (!IPv4DevicePathNode->StaticIpAddress) {
+      Status = Pxe->Dhcp (Pxe, TRUE);
+    } else {
+      CopyMem (&LocalIp.v4, &IPv4DevicePathNode->LocalIpAddress, sizeof (EFI_IPv4_ADDRESS));
+      Status = Pxe->SetStationIp (Pxe, &LocalIp, NULL);
+    }
+
+    // If an IP Address has already been set and a different static IP address is requested then restart
+    // the Network service.
+    if (Status == EFI_ALREADY_STARTED) {
+      Status = gBS->LocateProtocol (&gEfiSimpleNetworkProtocolGuid, NULL, (VOID **)&Snp);
+      if (!EFI_ERROR (Status) && IPv4DevicePathNode->StaticIpAddress &&
+          (CompareMem (&Snp->Mode->CurrentAddress, &IPv4DevicePathNode->LocalIpAddress, sizeof(EFI_MAC_ADDRESS)) != 0))
+      {
+        Pxe->Stop (Pxe);
+        Status = Pxe->Start (Pxe, FALSE);
+        if (EFI_ERROR(Status)) {
+          break;
+        }
+        // After restarting the PXE protocol, we want to try again with our new IP Address
+        Status = EFI_ALREADY_STARTED;
+      }
+    }
+  } while (Status == EFI_ALREADY_STARTED);
+
+  if (EFI_ERROR(Status)) {
     return Status;
   }
 
   CopyMem (&ServerIp.v4, &IPv4DevicePathNode->RemoteIpAddress, sizeof (EFI_IPv4_ADDRESS));
+
+  // Convert the Unicode PathName to Ascii
+  AsciiPathName = AllocatePool ((StrLen (FilePathDevicePath->PathName) + 1) * sizeof (CHAR8));
+  if (AsciiPathName == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  UnicodeStrToAsciiStr (FilePathDevicePath->PathName, AsciiPathName);
 
   Status = Pxe->Mtftp (
                   Pxe,
@@ -773,18 +813,22 @@ BdsTftpLoadImage (
                   &TftpBufferSize,
                   NULL,
                   &ServerIp,
-                  (UINT8 *)FilePathDevicePath->PathName,
+                  (UINT8*)AsciiPathName,
                   NULL,
-                  TRUE
+                  FALSE
                   );
-  if (EFI_ERROR (Status)) {
-    return Status;
+  if (EFI_ERROR(Status)) {
+    if (Status == EFI_TFTP_ERROR) {
+      DEBUG((EFI_D_ERROR, "TFTP Error: Fail to get the size of the file\n"));
+    }
+    goto EXIT;
   }
 
   // Allocate a buffer to hold the whole file.
   TftpBuffer = AllocatePool (TftpBufferSize);
   if (TftpBuffer == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto EXIT;
   }
 
   Status = Pxe->Mtftp (
@@ -795,16 +839,19 @@ BdsTftpLoadImage (
                   &TftpBufferSize,
                   NULL,
                   &ServerIp,
-                  (UINT8 *)FilePathDevicePath->PathName,
+                  (UINT8*)AsciiPathName,
                   NULL,
                   FALSE
                   );
   if (EFI_ERROR (Status)) {
     FreePool (TftpBuffer);
   } else if (ImageSize != NULL) {
+    *Image = (UINTN)TftpBuffer;
     *ImageSize = (UINTN)TftpBufferSize;
   }
 
+EXIT:
+  FreePool (AsciiPathName);
   return Status;
 }
 

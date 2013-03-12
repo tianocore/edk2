@@ -65,6 +65,7 @@
   gEfiDiskIoProtocolGuid
   gEfiUsbIoProtocolGuid
   gEfiLoadedImageProtocolGuid
+  gEfiSimpleNetworkProtocolGuid
     
 [FeaturePcd]
   gArmTokenSpaceGuid.PcdArmPsciSupport
