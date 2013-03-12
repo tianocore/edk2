@@ -40,6 +40,11 @@ SemihostFileOpen (
     return RETURN_INVALID_PARAMETER;
   }
 
+  // Remove any leading separator (e.g.: '\'). EFI Shell adds one.
+  if (*FileName == '\\') {
+    FileName++;
+  }
+
   OpenBlock.FileName    = FileName;
   OpenBlock.Mode        = Mode;
   OpenBlock.NameLength  = AsciiStrLen(FileName);
