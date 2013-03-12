@@ -34,7 +34,7 @@ typedef struct {
 } LCD_GRAPHICS_DEVICE_PATH;
 
 typedef struct {
-  UINTN                                 Signature;
+  UINT32                                Signature;
   EFI_HANDLE                            Handle;
   EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  ModeInfo;
   EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE     Mode;
