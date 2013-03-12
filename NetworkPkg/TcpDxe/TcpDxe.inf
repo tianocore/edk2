@@ -1,0 +1,83 @@
+## @file TcpDxe.inf
+#  Component description file for Tcp module.
+#
+#  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php.
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TcpDxe
+  FILE_GUID                      = 1A7E4468-2F55-4a56-903C-01265EB7622B
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = TcpDriverEntryPoint
+  UNLOAD_IMAGE                   = NetLibDefaultUnload
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  TcpDriver.c
+  SockImpl.c
+  SockInterface.c
+  TcpDispatcher.c
+  TcpOutput.c
+  TcpMain.c
+  SockImpl.h
+  TcpMisc.c
+  TcpProto.h
+  TcpOption.c
+  TcpInput.c
+  TcpFunc.h
+  TcpOption.h
+  TcpTimer.c
+  TcpMain.h
+  Socket.h
+  ComponentName.c
+  TcpIo.c
+  TcpDriver.h
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DevicePathLib
+  DebugLib
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  DpcLib
+  NetLib
+  IpIoLib
+
+
+[Protocols]
+  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+  gEfiIp4ProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
+  gEfiIp4ServiceBindingProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
+  gEfiTcp4ProtocolGuid                          # PROTOCOL SOMETIMES_PRODUCED
+  gEfiTcp4ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_PRODUCED
+  gEfiIp6ProtocolGuid                           # PROTOCOL ALWAYS_CONSUMED
+  gEfiIp6ServiceBindingProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
+  gEfiTcp6ProtocolGuid                          # PROTOCOL SOMETIMES_PRODUCED
+  gEfiTcp6ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_PRODUCED
+

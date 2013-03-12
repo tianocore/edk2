@@ -1,0 +1,61 @@
+## @file
+#  Component description file for IpSecConfig6 application.
+#
+#  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php.
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = IpSecConfig
+  FILE_GUID                      = 0922E604-F5EC-42ef-980D-A35E9A2B1844
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeIpSecConfig
+
+[Sources]
+  IpSecConfigStrings.uni
+  IpSecConfig.c
+  IpSecConfig.h
+  Dump.c
+  Dump.h
+  Indexer.c
+  Indexer.h
+  Match.c
+  Match.h
+  Delete.h
+  Delete.c
+  Helper.c
+  Helper.h
+  ForEach.c
+  ForEach.h
+  PolicyEntryOperation.c
+  PolicyEntryOperation.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ShellPkg/ShellPkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  UefiApplicationEntryPoint
+  BaseMemoryLib
+  ShellLib
+  MemoryAllocationLib
+  DebugLib
+  HiiLib
+  NetLib
+  UefiLib
+
+[Protocols]
+  gEfiIpSec2ProtocolGuid                        ##CONSUMS
+  gEfiIpSecConfigProtocolGuid                   ##CONSUMS

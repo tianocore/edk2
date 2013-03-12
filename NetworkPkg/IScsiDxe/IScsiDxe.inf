@@ -1,0 +1,108 @@
+## @file
+#  Component description file for IScsi module.
+#
+# Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = IScsiDxe
+  FILE_GUID                      = 86CDDF93-4872-4597-8AF9-A35AE4D3725F
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = IScsiDriverEntryPoint
+  UNLOAD_IMAGE                   = IScsiUnload
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#
+#  DRIVER_BINDING                =  gIScsiDriverBinding
+#  COMPONENT_NAME                =  gIScsiComponentName
+#  COMPONENT_NAME2               =  gIScsiComponentName2
+#
+
+
+[Sources]
+  ComponentName.c
+  IScsiAuthenticationInfo.c
+  IScsiCHAP.h
+  IScsiCHAP.c
+  IScsiConfig.c
+  IScsiConfig.h
+  IScsiConfigNVDataStruc.h
+  IScsiConfigStrings.uni
+  IScsiConfigVfr.vfr
+  IScsiDhcp.c
+  IScsiDhcp.h
+  IScsiDhcp6.c
+  IScsiDhcp6.h
+  IScsiDriver.c
+  IScsiDriver.h
+  IScsiExtScsiPassThru.c
+  IScsiIbft.c
+  IScsiIbft.h
+  IScsiInitiatorName.c 
+  IScsiImpl.h
+  IScsiMisc.c
+  IScsiMisc.h
+  IScsiProto.c
+  IScsiProto.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  CryptoPkg/CryptoPkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  HiiLib
+  MemoryAllocationLib
+  NetLib
+  TcpIoLib
+  PrintLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib  
+  UefiRuntimeServicesTableLib
+  UefiHiiServicesLib
+  BaseCryptLib
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+  gEfiDriverBindingProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
+  gEfiPciIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
+  gEfiDhcp4ProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
+  gEfiDhcp6ProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED  
+  gEfiDhcp4ServiceBindingProtocolGuid           # PROTOCOL ALWAYS_CONSUMED
+  gEfiDhcp6ServiceBindingProtocolGuid           # PROTOCOL ALWAYS_CONSUMED  
+  gEfiTcp4ProtocolGuid                          # PROTOCOL ALWAYS_CONSUMED
+  gEfiTcp6ProtocolGuid                          # PROTOCOL ALWAYS_CONSUMED  
+  gEfiTcp4ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_CONSUMED
+  gEfiTcp6ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_CONSUMED  
+  gEfiExtScsiPassThruProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
+  gEfiHiiConfigAccessProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
+  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+  gEfiIScsiInitiatorNameProtocolGuid            # PROTOCOL ALWAYS_CONSUMED
+  gEfiAuthenticationInfoProtocolGuid            # PROTOCOL ALWAYS_CONSUMED  
+
+[Guids]
+  gEfiEventExitBootServicesGuid
+  gEfiIfrTianoGuid                              ## CONSUMES ## GUID
+  gEfiAcpiTableGuid                             ## CONSUMES ## GUID
+  gEfiAcpi10TableGuid                           ## CONSUMES ## GUID
+  gEfiAcpi20TableGuid                           ## CONSUMES ## GUID
+  gIScsiConfigGuid                              ## PRODUCES ## GUID

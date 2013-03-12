@@ -1,0 +1,101 @@
+## @file
+#  Component description file for IpSec module.
+#
+#  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php.
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = IpSecDxe
+  FILE_GUID                      = EE8367C0-A1D6-4565-8F89-EF628547B722
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = IpSecDriverEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  IpSecConfigImpl.c
+  IpSecConfigImpl.h
+  IpSecCryptIo.h
+  IpSecCryptIo.c
+  IpSecDebug.h
+  ComponentName.c
+  IkeCommon.h
+  IpSecImpl.c
+  IkeService.c
+  Ike.h
+  IkePacket.h
+  IkePacket.c
+  IpSecDebug.c
+  IpSecMain.c
+  IpSecDriver.c
+  IkeCommon.c
+  IetfConstants.c
+  IpSecImpl.h
+  IkeService.h
+  Ikev2/Ikev2.h
+  Ikev2/Payload.h
+  Ikev2/Utility.h
+  Ikev2/Utility.c
+  Ikev2/Sa.c
+  Ikev2/ChildSa.c
+  Ikev2/Info.c
+  Ikev2/Payload.c
+  Ikev2/Exchange.c
+  
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  CryptoPkg/CryptoPkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  DebugLib
+  PrintLib
+  BaseCryptLib
+  DpcLib
+  UdpIoLib
+  NetLib  
+  PcdLib
+  
+[Protocols]
+  gEfiIp4ConfigProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+  gEfiUdp4ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_CONSUMED  
+  gEfiUdp4ProtocolGuid                          # PROTOCOL ALWAYS_CONSUMED
+  gEfiUdp6ServiceBindingProtocolGuid            # PROTOCOL ALWAYS_CONSUMED  
+  gEfiUdp6ProtocolGuid                          # PROTOCOL ALWAYS_CONSUMED
+  gEfiIpSecConfigProtocolGuid                   # PROTOCOL ALWAYS_PRODUCED
+  gEfiIpSec2ProtocolGuid                        # PROTOCOL ALWAYS_PRODUCED
+  
+[Pcd]
+  gEfiNetworkPkgTokenSpaceGuid.PcdIpsecCertificateEnabled
+  gEfiNetworkPkgTokenSpaceGuid.PcdIpsecUefiCaFile
+  gEfiNetworkPkgTokenSpaceGuid.PcdIpsecUefiCaFileSize
+  gEfiNetworkPkgTokenSpaceGuid.PcdIpsecUefiCertificate
+  gEfiNetworkPkgTokenSpaceGuid.PcdIpsecUefiCertificateSize
+  gEfiNetworkPkgTokenSpaceGuid.PcdIpsecUefiCertificateKey
+  gEfiNetworkPkgTokenSpaceGuid.PcdIpsecUefiCertificateKeySize

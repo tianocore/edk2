@@ -1,0 +1,101 @@
+## @file
+#  Component description file for Ip6 module.
+#
+#  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php.
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Ip6Dxe
+  FILE_GUID                      = 5BEDB5CC-D830-4eb2-8742-2D4CC9B54F2C
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Ip6DriverEntryPoint
+  UNLOAD_IMAGE                   = NetLibDefaultUnload
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gIp6DriverBinding
+#  COMPONENT_NAME                =  gIp6ComponentName
+#  COMPONENT_NAME2               =  gIp6ComponentName2
+#
+
+[Sources]
+  Ip6Output.h
+  Ip6Option.h
+  Ip6Input.h
+  Ip6Nd.h
+  Ip6Mld.h
+  Ip6Impl.c
+  Ip6Driver.c
+  ComponentName.c
+  Ip6Nd.c
+  Ip6Input.c
+  Ip6ConfigImpl.c
+  Ip6ConfigImpl.h
+  Ip6Impl.h
+  Ip6Option.c
+  Ip6If.h
+  Ip6Icmp.h
+  Ip6Mld.c
+  Ip6Common.c
+  Ip6Route.c
+  Ip6If.c
+  Ip6Driver.h
+  Ip6Output.c
+  Ip6Icmp.c
+  Ip6Common.h
+  Ip6Route.h
+  Ip6DxeStrings.uni
+  Ip6NvData.h
+  Ip6ConfigNv.c
+  Ip6ConfigNv.h
+  Ip6Config.vfr
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DevicePathLib
+  HiiLib
+  UefiHiiServicesLib
+  PrintLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  UefiLib
+  DebugLib
+  NetLib
+  DpcLib
+
+[Protocols]
+  gEfiManagedNetworkServiceBindingProtocolGuid
+  gEfiManagedNetworkProtocolGuid
+  gEfiIp6ServiceBindingProtocolGuid
+  gEfiIp6ProtocolGuid
+  gEfiIp6ConfigProtocolGuid
+  gEfiDhcp6ServiceBindingProtocolGuid
+  gEfiDhcp6ProtocolGuid
+  gEfiIpSec2ProtocolGuid
+  gEfiHiiConfigAccessProtocolGuid
+
+[Guids]
+  gEfiIfrTianoGuid                              ## CONSUMES ## GUID
+  gIp6ConfigNvDataGuid                          ## PRODUCES ## GUID

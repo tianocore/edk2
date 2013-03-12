@@ -1,0 +1,69 @@
+## @file
+#  Component description file for Mtftp6 module.
+#
+#  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php.
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Mtftp6Dxe
+  FILE_GUID                      = 99F03B99-98D8-49dd-A8D3-3219D0FFE41E
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Mtftp6DriverEntryPoint
+  UNLOAD_IMAGE                   = NetLibDefaultUnload
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gMtftp6DriverBinding
+#  COMPONENT_NAME                =  gMtftp6ComponentName
+#  COMPONENT_NAME2               =  gMtftp6ComponentName2
+#
+
+[Sources]
+  Mtftp6Driver.c
+  Mtftp6Driver.h
+  Mtftp6Impl.c
+  Mtftp6Impl.h
+  Mtftp6Option.c
+  Mtftp6Option.h
+  Mtftp6Support.h
+  Mtftp6Support.c
+  Mtftp6Rrq.c
+  Mtftp6Wrq.c
+  ComponentName.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+[LibraryClasses]
+  UefiLib
+  BaseLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiDriverEntryPoint
+  DebugLib
+  NetLib
+  UdpIoLib
+
+
+[Protocols]
+  gEfiUdp6ServiceBindingProtocolGuid
+  gEfiUdp6ProtocolGuid
+  gEfiMtftp6ServiceBindingProtocolGuid
+  gEfiMtftp6ProtocolGuid
+
