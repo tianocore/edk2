@@ -49,6 +49,7 @@
 [Guids]
   gEfiFileInfoGuid
   gArmMpCoreInfoGuid
+  gArmGlobalVariableGuid
 
 [Protocols]
   gEfiBdsArchProtocolGuid                       

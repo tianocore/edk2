@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -14,6 +14,9 @@
 
 #ifndef __ARM_GLOBAL_VARIABLE_GUID_H__
 #define __ARM_GLOBAL_VARIABLE_GUID_H__
+
+#include <Pi/PiBootMode.h>
+#include <Pi/PiHob.h>
 
 #define ARM_HOB_GLOBAL_VARIABLE_GUID  \
   { 0xc3253c90, 0xa24f, 0x4599, { 0xa6, 0x64, 0x1f, 0x88, 0x13, 0x77, 0x8f, 0xc9} };

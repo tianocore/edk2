@@ -1,14 +1,14 @@
 /** @file
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
-*  
-*  This program and the accompanying materials                          
-*  are licensed and made available under the terms and conditions of the BSD License         
-*  which accompanies this distribution.  The full text of the license may be found at        
-*  http://opensource.org/licenses/bsd-license.php                                            
+*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 *
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+*  This program and the accompanying materials
+*  are licensed and made available under the terms and conditions of the BSD License
+*  which accompanies this distribution.  The full text of the license may be found at
+*  http://opensource.org/licenses/bsd-license.php
+*
+*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 *
 **/
 
@@ -294,8 +294,21 @@ PrintPerformance (
 }
 
 EFI_STATUS
+GetGlobalEnvironmentVariable (
+  IN     CONST CHAR16*   VariableName,
+  IN     VOID*           DefaultValue,
+  IN OUT UINTN*          Size,
+  OUT    VOID**          Value
+  )
+{
+  return GetEnvironmentVariable (VariableName, &gEfiGlobalVariableGuid,
+           DefaultValue, Size, Value);
+}
+
+EFI_STATUS
 GetEnvironmentVariable (
   IN     CONST CHAR16*   VariableName,
+  IN     EFI_GUID*       VendorGuid,
   IN     VOID*           DefaultValue,
   IN OUT UINTN*          Size,
   OUT    VOID**          Value
@@ -307,13 +320,13 @@ GetEnvironmentVariable (
   // Try to get the variable size.
   *Value = NULL;
   VariableSize = 0;
-  Status = gRT->GetVariable ((CHAR16 *) VariableName, &gEfiGlobalVariableGuid, NULL, &VariableSize, *Value);
+  Status = gRT->GetVariable ((CHAR16 *) VariableName, VendorGuid, NULL, &VariableSize, *Value);
   if (Status == EFI_NOT_FOUND) {
     if ((DefaultValue != NULL) && (Size != NULL) && (*Size != 0)) {
       // If the environment variable does not exist yet then set it with the default value
       Status = gRT->SetVariable (
                     (CHAR16*)VariableName,
-                    &gEfiGlobalVariableGuid,
+                    VendorGuid,
                     EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
                     *Size,
                     DefaultValue
@@ -329,7 +342,7 @@ GetEnvironmentVariable (
       return EFI_OUT_OF_RESOURCES;
     }
 
-    Status = gRT->GetVariable ((CHAR16 *)VariableName, &gEfiGlobalVariableGuid, NULL, &VariableSize, *Value);
+    Status = gRT->GetVariable ((CHAR16 *)VariableName, VendorGuid, NULL, &VariableSize, *Value);
     if (EFI_ERROR (Status)) {
       FreePool(*Value);
       return EFI_INVALID_PARAMETER;

@@ -1,14 +1,14 @@
 /** @file
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
-*  
-*  This program and the accompanying materials                          
-*  are licensed and made available under the terms and conditions of the BSD License         
-*  which accompanies this distribution.  The full text of the license may be found at        
-*  http://opensource.org/licenses/bsd-license.php                                            
+*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 *
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+*  This program and the accompanying materials
+*  are licensed and made available under the terms and conditions of the BSD License
+*  which accompanies this distribution.  The full text of the license may be found at
+*  http://opensource.org/licenses/bsd-license.php
+*
+*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 *
 **/
 
@@ -39,7 +39,7 @@ GetConsoleDevicePathFromVariable (
   CHAR16*                   NextDevicePathStr;
   EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL  *EfiDevicePathFromTextProtocol;
 
-  Status = GetEnvironmentVariable (ConsoleVarName, NULL, NULL, (VOID**)&DevicePathInstances);
+  Status = GetGlobalEnvironmentVariable (ConsoleVarName, NULL, NULL, (VOID**)&DevicePathInstances);
   if (EFI_ERROR(Status)) {
     // In case no default console device path has been defined we assume a driver handles the console (eg: SimpleTextInOutSerial)
     if ((DefaultConsolePaths == NULL) || (DefaultConsolePaths[0] == L'\0')) {
@@ -124,7 +124,7 @@ InitializeConsolePipe (
         EFI_DEVICE_PATH_TO_TEXT_PROTOCOL* DevicePathToTextProtocol;
         CHAR16* DevicePathTxt;
         EFI_STATUS Status;
-	
+
         Status = gBS->LocateProtocol(&gEfiDevicePathToTextProtocolGuid, NULL, (VOID **)&DevicePathToTextProtocol);
         if (!EFI_ERROR(Status)) {
           DevicePathTxt = DevicePathToTextProtocol->ConvertDevicePathToText (DevicePath, TRUE, TRUE);
@@ -313,7 +313,7 @@ StartDefaultBootOnTimeout (
   Size = sizeof(UINT16);
   Timeout = (UINT16)PcdGet16 (PcdPlatformBootTimeOut);
   TimeoutPtr = &Timeout;
-  GetEnvironmentVariable (L"Timeout", &Timeout, &Size, (VOID**)&TimeoutPtr);
+  GetGlobalEnvironmentVariable (L"Timeout", &Timeout, &Size, (VOID**)&TimeoutPtr);
 
   if (Timeout != 0xFFFF) {
     if (Timeout > 0) {
@@ -344,7 +344,7 @@ StartDefaultBootOnTimeout (
     // In case of Timeout we start the default boot selection
     if (Timeout == 0) {
       // Get the Boot Option Order from the environment variable (a default value should have been created)
-      GetEnvironmentVariable (L"BootOrder", NULL, &BootOrderSize, (VOID**)&BootOrder);
+      GetGlobalEnvironmentVariable (L"BootOrder", NULL, &BootOrderSize, (VOID**)&BootOrder);
 
       for (Index = 0; Index < BootOrderSize / sizeof (UINT16); Index++) {
         UnicodeSPrint (BootVariableName, 9 * sizeof(CHAR16), L"Boot%04X", BootOrder[Index]);
@@ -362,19 +362,19 @@ StartDefaultBootOnTimeout (
 }
 
 /**
-  This function uses policy data from the platform to determine what operating 
-  system or system utility should be loaded and invoked.  This function call 
-  also optionally make the use of user input to determine the operating system 
-  or system utility to be loaded and invoked.  When the DXE Core has dispatched 
-  all the drivers on the dispatch queue, this function is called.  This 
-  function will attempt to connect the boot devices required to load and invoke 
-  the selected operating system or system utility.  During this process, 
-  additional firmware volumes may be discovered that may contain addition DXE 
-  drivers that can be dispatched by the DXE Core.   If a boot device cannot be 
-  fully connected, this function calls the DXE Service Dispatch() to allow the 
-  DXE drivers from any newly discovered firmware volumes to be dispatched.  
-  Then the boot device connection can be attempted again.  If the same boot 
-  device connection operation fails twice in a row, then that boot device has 
+  This function uses policy data from the platform to determine what operating
+  system or system utility should be loaded and invoked.  This function call
+  also optionally make the use of user input to determine the operating system
+  or system utility to be loaded and invoked.  When the DXE Core has dispatched
+  all the drivers on the dispatch queue, this function is called.  This
+  function will attempt to connect the boot devices required to load and invoke
+  the selected operating system or system utility.  During this process,
+  additional firmware volumes may be discovered that may contain addition DXE
+  drivers that can be dispatched by the DXE Core.   If a boot device cannot be
+  fully connected, this function calls the DXE Service Dispatch() to allow the
+  DXE drivers from any newly discovered firmware volumes to be dispatched.
+  Then the boot device connection can be attempted again.  If the same boot
+  device connection operation fails twice in a row, then that boot device has
   failed, and should be skipped.  This function should never return.
 
   @param  This             The EFI_BDS_ARCH_PROTOCOL instance.
@@ -408,7 +408,7 @@ BdsEntry (
 
   // If BootNext environment variable is defined then we just load it !
   BootNextSize = sizeof(UINT16);
-  Status = GetEnvironmentVariable (L"BootNext", NULL, &BootNextSize, (VOID**)&BootNext);
+  Status = GetGlobalEnvironmentVariable (L"BootNext", NULL, &BootNextSize, (VOID**)&BootNext);
   if (!EFI_ERROR(Status)) {
     ASSERT(BootNextSize == sizeof(UINT16));
 

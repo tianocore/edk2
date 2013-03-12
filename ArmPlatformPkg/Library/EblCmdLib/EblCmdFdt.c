@@ -1,14 +1,14 @@
 /** @file
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
-*  
-*  This program and the accompanying materials                          
-*  are licensed and made available under the terms and conditions of the BSD License         
-*  which accompanies this distribution.  The full text of the license may be found at        
-*  http://opensource.org/licenses/bsd-license.php                                            
+*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 *
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+*  This program and the accompanying materials
+*  are licensed and made available under the terms and conditions of the BSD License
+*  which accompanies this distribution.  The full text of the license may be found at
+*  http://opensource.org/licenses/bsd-license.php
+*
+*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 *
 **/
 
@@ -26,7 +26,7 @@
 
 #include <Protocol/DevicePathFromText.h>
 
-#include <Guid/GlobalVariable.h>
+#include <Guid/ArmGlobalVariableHob.h>
 
 #include <libfdt.h>
 
@@ -187,7 +187,7 @@ EblDumpFdt (
 
   // If no FDT file is passed to the argument then get the one from the platform
   if (Argc < 2) {
-    Status = GetEnvironmentVariable (L"Fdt",NULL,NULL,(VOID**)&FdtDevicePath);
+    Status = GetEnvironmentVariable (L"Fdt", &gArmGlobalVariableGuid, NULL, NULL, (VOID**)&FdtDevicePath);
     if (Status == EFI_NOT_FOUND) {
       // No set yet, get the Default Device Path
       Status = gBS->LocateProtocol (&gEfiDevicePathFromTextProtocolGuid, NULL, (VOID **)&EfiDevicePathFromTextProtocol);

@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -76,7 +76,7 @@ BootOptionFromLoadOptionVariable (
   EFI_LOAD_OPTION       EfiLoadOption;
   UINTN                 EfiLoadOptionSize;
 
-  Status = GetEnvironmentVariable (BootVariableName, NULL, &EfiLoadOptionSize, (VOID**)&EfiLoadOption);
+  Status = GetGlobalEnvironmentVariable (BootVariableName, NULL, &EfiLoadOptionSize, (VOID**)&EfiLoadOption);
   if (!EFI_ERROR(Status)) {
     *BdsLoadOption = NULL;
     Status = BootOptionParseLoadOption (EfiLoadOption, EfiLoadOptionSize, BdsLoadOption);
@@ -203,7 +203,7 @@ BootOptionToLoadOptionVariable (
   // When it is a new entry we must add the entry to the BootOrder
   if (OldLoadOption == NULL) {
     // Add the new Boot Index to the list
-    Status = GetEnvironmentVariable (L"BootOrder", NULL, &BootOrderSize, (VOID**)&BootOrder);
+    Status = GetGlobalEnvironmentVariable (L"BootOrder", NULL, &BootOrderSize, (VOID**)&BootOrder);
     if (!EFI_ERROR(Status)) {
       BootOrder = ReallocatePool (BootOrderSize, BootOrderSize + sizeof(UINT16), BootOrder);
       // Add the new index at the end
@@ -225,7 +225,7 @@ BootOptionToLoadOptionVariable (
         );
     DEBUG((EFI_D_ERROR,"Create %s\n",BootVariableName));
 
-    // Free memory allocated by GetEnvironmentVariable
+    // Free memory allocated by GetGlobalEnvironmentVariable
     if (!EFI_ERROR(Status)) {
       FreePool (BootOrder);
     }
@@ -249,7 +249,7 @@ BootOptionAllocateBootIndex (
   BOOLEAN           Found;
 
   // Get the Boot Option Order from the environment variable
-  Status = GetEnvironmentVariable (L"BootOrder", NULL, &BootOrderSize, (VOID**)&BootOrder);
+  Status = GetGlobalEnvironmentVariable (L"BootOrder", NULL, &BootOrderSize, (VOID**)&BootOrder);
   if (!EFI_ERROR(Status)) {
     for (BootIndex = 0; BootIndex <= 0xFFFF; BootIndex++) {
       Found = FALSE;

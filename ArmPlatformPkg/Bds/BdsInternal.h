@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -54,7 +54,7 @@ typedef enum {
 typedef struct {
   UINT16                     CmdLineSize;
   UINT16                     InitrdSize;
-  
+
   // These following fields have variable length and are packed:
   //CHAR8                      *CmdLine;
   //EFI_DEVICE_PATH_PROTOCOL   *InitrdPathList;
@@ -106,14 +106,6 @@ typedef struct _BDS_LOAD_OPTION_SUPPORT {
 
 #define LOAD_OPTION_ENTRY_FROM_LINK(a)  BASE_CR(a, BDS_LOAD_OPTION_ENTRY, Link)
 #define LOAD_OPTION_FROM_LINK(a)        ((BDS_LOAD_OPTION_ENTRY*)BASE_CR(a, BDS_LOAD_OPTION_ENTRY, Link))->BdsLoadOption
-
-EFI_STATUS
-GetEnvironmentVariable (
-  IN     CONST CHAR16*   VariableName,
-  IN     VOID*           DefaultValue,
-  IN OUT UINTN*          Size,
-  OUT    VOID**          Value
-  );
 
 EFI_STATUS
 BootDeviceListSupportedInit (

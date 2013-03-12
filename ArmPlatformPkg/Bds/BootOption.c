@@ -12,6 +12,7 @@
 *
 **/
 
+#include <Guid/ArmGlobalVariableHob.h>
 #include "BdsInternal.h"
 
 extern EFI_HANDLE mImageHandle;
@@ -76,7 +77,8 @@ BootOptionStart (
 
       // Get the FDT device path
       FdtDevicePathSize = GetDevicePathSize (DefaultFdtDevicePath);
-      Status = GetEnvironmentVariable ((CHAR16 *)L"Fdt", DefaultFdtDevicePath, &FdtDevicePathSize, (VOID **)&FdtDevicePath);
+      Status = GetEnvironmentVariable ((CHAR16 *)L"Fdt", &gArmGlobalVariableGuid,
+                 DefaultFdtDevicePath, &FdtDevicePathSize, (VOID **)&FdtDevicePath);
       ASSERT_EFI_ERROR(Status);
 
       Status = BdsBootLinuxFdt (BootOption->FilePathList,
@@ -120,7 +122,7 @@ BootOptionList (
   InitializeListHead (BootOptionList);
 
   // Get the Boot Option Order from the environment variable
-  Status = GetEnvironmentVariable (L"BootOrder", NULL, &BootOrderSize, (VOID**)&BootOrder);
+  Status = GetGlobalEnvironmentVariable (L"BootOrder", NULL, &BootOrderSize, (VOID**)&BootOrder);
   if (EFI_ERROR(Status)) {
     return Status;
   }
@@ -286,7 +288,7 @@ BootOptionCreate (
       );
 
   // Add the new Boot Index to the list
-  Status = GetEnvironmentVariable (L"BootOrder", NULL, &BootOrderSize, (VOID**)&BootOrder);
+  Status = GetGlobalEnvironmentVariable (L"BootOrder", NULL, &BootOrderSize, (VOID**)&BootOrder);
   if (!EFI_ERROR(Status)) {
     BootOrder = ReallocatePool (BootOrderSize, BootOrderSize + sizeof(UINT16), BootOrder);
     // Add the new index at the end
@@ -358,7 +360,7 @@ BootOptionDelete (
   EFI_STATUS    Status;
 
   // Remove the entry from the BootOrder environment variable
-  Status = GetEnvironmentVariable (L"BootOrder", NULL, &BootOrderSize, (VOID**)&BootOrder);
+  Status = GetGlobalEnvironmentVariable (L"BootOrder", NULL, &BootOrderSize, (VOID**)&BootOrder);
   if (!EFI_ERROR(Status)) {
     BootOrderCount = BootOrderSize / sizeof(UINT16);
 
