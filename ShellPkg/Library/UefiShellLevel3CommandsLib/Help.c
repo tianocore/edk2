@@ -1,7 +1,7 @@
 /** @file
   Main file for Help shell level 3 function.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -48,9 +48,9 @@ ShellCommandRunHelp (
   CHAR16              *SectionToGetHelpOn;
   CHAR16              *HiiString;
   BOOLEAN             Found;
-  BOOLEAN             HelpPage;
+  BOOLEAN             PrintCommandText;
 
-  HelpPage            = FALSE;
+  PrintCommandText    = TRUE;
   ProblemParam        = NULL;
   ShellStatus         = SHELL_SUCCESS;
   OutText             = NULL;
@@ -111,7 +111,7 @@ ShellCommandRunHelp (
         ASSERT(SectionToGetHelpOn == NULL);
         StrnCatGrow(&SectionToGetHelpOn, NULL, L"NAME", 0);
       } else {
-        HelpPage = TRUE;
+        PrintCommandText = FALSE;
         ASSERT(SectionToGetHelpOn == NULL);
         //
         // Get the section name for the given command name
@@ -156,26 +156,13 @@ ShellCommandRunHelp (
             //
             // We have a command to look for help on.
             //
-            Status = gEfiShellProtocol->GetHelpText(Node->CommandString, SectionToGetHelpOn, &OutText);
-            if (EFI_ERROR(Status) || OutText == NULL) {
-              if (Status == EFI_DEVICE_ERROR) {
+            Status = ShellPrintHelp(Node->CommandString, SectionToGetHelpOn, PrintCommandText);
+            if (Status == EFI_DEVICE_ERROR) {
                 ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HELP_INV), gShellLevel3HiiHandle, Node->CommandString);
-              } else {
+            } else if (EFI_ERROR(Status)) {
                 ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HELP_NF), gShellLevel3HiiHandle, Node->CommandString);
-              }
-              ShellStatus = SHELL_NOT_FOUND;
             } else {
-              if (HelpPage) {
-                 ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HELP_PAGE_COMMAND), gShellLevel3HiiHandle, OutText);
-              } else {
-                while (OutText[StrLen(OutText)-1] == L'\r' || OutText[StrLen(OutText)-1] == L'\n' || OutText[StrLen(OutText)-1] == L' ') {
-                  OutText[StrLen(OutText)-1] = CHAR_NULL;
-                }
-                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HELP_COMMAND), gShellLevel3HiiHandle, Node->CommandString, OutText);
-              }
-              FreePool(OutText);
-              OutText = NULL;
-              Found = TRUE;
+                Found = TRUE;
             }
           }
         }
@@ -183,30 +170,18 @@ ShellCommandRunHelp (
         // Search the .man file for Shell applications (Shell external commands).
         //
         if (!Found) {
-          Status = gEfiShellProtocol->GetHelpText (CommandToGetHelpOn, SectionToGetHelpOn, &OutText);
-          if (EFI_ERROR(Status) || OutText == NULL) {
+            Status = ShellPrintHelp(CommandToGetHelpOn, SectionToGetHelpOn, FALSE);
             if (Status == EFI_DEVICE_ERROR) {
-              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_HELP_INV), gShellLevel3HiiHandle, CommandToGetHelpOn);
+               ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HELP_INV), gShellLevel3HiiHandle, CommandToGetHelpOn);
+            } else if (EFI_ERROR(Status)) {
+               ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HELP_NF), gShellLevel3HiiHandle, CommandToGetHelpOn);
             } else {
-              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_HELP_NF), gShellLevel3HiiHandle, CommandToGetHelpOn);
+              Found = TRUE;
             }
-            ShellStatus = SHELL_NOT_FOUND;
-          } else {
-            while (OutText[StrLen (OutText) - 1] == L'\r' || OutText[StrLen (OutText) - 1] == L'\n' || OutText[StrLen (OutText) - 1] == L' ') {
-              OutText[StrLen (OutText)-1] = CHAR_NULL;
-            }
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_HELP_COMMAND), gShellLevel3HiiHandle, CommandToGetHelpOn, OutText);
-            if (OutText != NULL) {
-              FreePool (OutText);
-              OutText = NULL;
-            }
-            Found = TRUE;
-          }
         }
       }
 
-      if (!Found && ShellStatus == SHELL_SUCCESS) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HELP_NF), gShellLevel3HiiHandle, CommandToGetHelpOn);
+      if (!Found) {
         ShellStatus = SHELL_NOT_FOUND;
       }
 
@@ -215,6 +190,14 @@ ShellCommandRunHelp (
       //
       ShellCommandLineFreeVarList (Package);
     }
+  }
+
+  if (CommandToGetHelpOn != NULL && StrCmp(CommandToGetHelpOn, L"*") == 0){
+    //
+    // If '*' then the command entered was 'Help' without qualifiers, This footer
+    // provides additional info on help switches
+    //
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HELP_FOOTER), gShellLevel3HiiHandle);
   }
   if (CommandToGetHelpOn != NULL) {
     FreePool(CommandToGetHelpOn);
