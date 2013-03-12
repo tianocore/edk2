@@ -570,4 +570,16 @@ ArmReadSctlr (
   VOID
   );
 
+UINTN
+EFIAPI
+ArmReadHVBar (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmWriteHVBar (
+  IN  UINTN   HypModeVectorBase
+  );
+
 #endif // __ARM_LIB__

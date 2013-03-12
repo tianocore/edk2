@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------ 
 //
 // Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-// Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+// Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 //
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -44,6 +44,8 @@
     EXPORT ArmWriteScr
     EXPORT ArmReadMVBar
     EXPORT ArmWriteMVBar
+    EXPORT ArmReadHVBar
+    EXPORT ArmWriteHVBar
     EXPORT ArmCallWFE
     EXPORT ArmCallSEV
     EXPORT ArmReadSctlr
@@ -159,6 +161,14 @@ ArmReadScr
 
 ArmWriteScr
   mcr     p15, 0, r0, c1, c1, 0
+  bx      lr
+
+ArmReadHVBar
+  mrc     p15, 4, r0, c12, c0, 0
+  bx      lr
+
+ArmWriteHVBar
+  mcr     p15, 4, r0, c12, c0, 0
   bx      lr
 
 ArmReadMVBar
