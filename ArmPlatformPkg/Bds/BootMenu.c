@@ -676,7 +676,23 @@ BootMenuMain (
             }
             Print(L"\t- Arguments: %a\n", (&OptionalData->Arguments.LinuxArguments + 1));
           }
-          Print(L"\t- LoaderType: %d\n", LoaderType);
+
+          switch (LoaderType) {
+            case BDS_LOADER_EFI_APPLICATION:
+              Print(L"\t- LoaderType: EFI Application\n");
+              break;
+
+            case BDS_LOADER_KERNEL_LINUX_ATAG:
+              Print(L"\t- LoaderType: Linux kernel with ATAG support\n");
+              break;
+
+            case BDS_LOADER_KERNEL_LINUX_FDT:
+              Print(L"\t- LoaderType: Linux kernel with FDT support\n");
+              break;
+
+            default:
+              Print(L"\t- LoaderType: Not recognized (%d)\n", LoaderType);
+          }
         }
         FreePool(DevicePathTxt);
       DEBUG_CODE_END();
