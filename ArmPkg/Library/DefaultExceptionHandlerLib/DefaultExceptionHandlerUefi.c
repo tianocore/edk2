@@ -62,9 +62,9 @@ DefaultExceptionHandlerConstructor (
 **/
 CHAR8 *
 GetImageName (
-  IN  UINT32  FaultAddress,
-  OUT UINT32  *ImageBase,
-  OUT UINT32  *PeCoffSizeOfHeaders
+  IN  UINTN  FaultAddress,
+  OUT UINTN  *ImageBase,
+  OUT UINTN  *PeCoffSizeOfHeaders
   )
 {
   EFI_DEBUG_IMAGE_INFO  *DebugTable;
@@ -83,7 +83,7 @@ GetImageName (
           (DebugTable->NormalImage->LoadedImageProtocolInstance != NULL)) {
         if ((Address >= (CHAR8 *)DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase) &&
             (Address <= ((CHAR8 *)DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase + DebugTable->NormalImage->LoadedImageProtocolInstance->ImageSize))) {
-          *ImageBase = (UINT32)DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase;
+          *ImageBase = (UINTN)DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase;
           *PeCoffSizeOfHeaders = PeCoffGetSizeOfHeaders ((VOID *)(UINTN)*ImageBase);
           return PeCoffLoaderGetPdbPointer (DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase);
         }
@@ -93,3 +93,4 @@ GetImageName (
 
   return NULL;
 }
+

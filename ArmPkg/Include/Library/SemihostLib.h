@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  Portions copyright (c) 2011, 2012, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -38,38 +39,38 @@ RETURN_STATUS
 SemihostFileOpen (
   IN  CHAR8  *FileName,
   IN  UINT32 Mode,
-  OUT UINT32 *FileHandle
+  OUT UINTN  *FileHandle
   );
 
 RETURN_STATUS
 SemihostFileSeek (
-  IN UINT32 FileHandle,
-  IN UINT32 Offset
+  IN UINTN  FileHandle,
+  IN UINTN  Offset
   );
 
 RETURN_STATUS
 SemihostFileRead (
-  IN     UINT32 FileHandle,
-  IN OUT UINT32 *Length,
+  IN     UINTN  FileHandle,
+  IN OUT UINTN  *Length,
   OUT    VOID   *Buffer
   );
 
 RETURN_STATUS
 SemihostFileWrite (
-  IN     UINT32 FileHandle,
-  IN OUT UINT32 *Length,
+  IN     UINTN  FileHandle,
+  IN OUT UINTN  *Length,
   IN     VOID   *Buffer
   );
 
 RETURN_STATUS
 SemihostFileClose (
-  IN UINT32 FileHandle
+  IN UINTN  FileHandle
   );
 
 RETURN_STATUS
 SemihostFileLength (
-  IN  UINT32 FileHandle,
-  OUT UINT32 *Length
+  IN  UINTN  FileHandle,
+  OUT UINTN  *Length
   );
 
 RETURN_STATUS

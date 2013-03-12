@@ -2,7 +2,8 @@
   Support a Semi Host file system over a debuggers JTAG
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+  Portions copyright (c) 2011, 2012, ARM Ltd. All rights reserved.<BR>
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -73,7 +74,7 @@ typedef struct {
   EFI_FILE    File;
   CHAR8       *FileName;
   UINT32      Position;
-  UINT32      SemihostHandle;
+  UINTN       SemihostHandle;
   BOOLEAN     IsRoot;
 } SEMIHOST_FCB;
 
@@ -152,7 +153,7 @@ FileOpen (
 {
   SEMIHOST_FCB  *FileFcb = NULL;
   EFI_STATUS    Status   = EFI_SUCCESS;
-  UINT32        SemihostHandle;
+  UINTN         SemihostHandle;
   CHAR8         *AsciiFileName;
   CHAR8         *AsciiPtr;
   UINTN         Length;
@@ -360,7 +361,7 @@ FileSetPosition (
   )
 {
   SEMIHOST_FCB *Fcb    = NULL;
-  UINT32       Length;
+  UINTN        Length;
   EFI_STATUS   Status;
 
   Fcb = SEMIHOST_FCB_FROM_THIS(File);
@@ -395,7 +396,7 @@ GetFileInfo (
   UINTN           NameSize = 0;
   UINTN           ResultSize;
   UINTN           Index;
-  UINT32          Length;
+  UINTN           Length;
   EFI_STATUS      Status;
 
   if (Fcb->IsRoot == TRUE) {

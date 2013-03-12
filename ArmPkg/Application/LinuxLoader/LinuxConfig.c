@@ -189,7 +189,7 @@ LinuxLoaderConfig (
     Print (L"[%d] Update Linux Boot Entry\n",LINUX_LOADER_UPDATE);
 
     Print (L"Option: ");
-    Status = GetHIInputInteger (&Choice);
+    Status = GetHIInputInteger ((UINTN*)&Choice);
     if (Status == EFI_INVALID_PARAMETER) {
       Print (L"\n");
       return Status;
@@ -268,7 +268,7 @@ LinuxLoaderConfig (
 
       do {
         Print (L"Update Boot Entry: ");
-        Status = GetHIInputInteger (&Choice);
+        Status = GetHIInputInteger ((UINTN*)&Choice);
         if (Status == EFI_INVALID_PARAMETER) {
           Print (L"\n");
           return Status;

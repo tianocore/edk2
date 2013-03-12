@@ -26,9 +26,9 @@
 **/
 CHAR8 *
 GetImageName (
-  IN  UINT32  FaultAddress,
-  OUT UINT32  *ImageBase,
-  OUT UINT32  *PeCoffSizeOfHeaders
+  IN  UINTN  FaultAddress,
+  OUT UINTN  *ImageBase,
+  OUT UINTN  *PeCoffSizeOfHeaders
   )
 {
   return NULL;

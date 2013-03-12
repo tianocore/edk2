@@ -150,7 +150,7 @@ PrepareFdt (
   IN     EFI_PHYSICAL_ADDRESS InitrdImage,
   IN     UINTN                InitrdImageSize,
   IN OUT EFI_PHYSICAL_ADDRESS *FdtBlobBase,
-  IN OUT UINT32               *FdtBlobSize
+  IN OUT UINTN                *FdtBlobSize
   );
 
 #endif

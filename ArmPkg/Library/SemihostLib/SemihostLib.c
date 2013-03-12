@@ -30,7 +30,7 @@ RETURN_STATUS
 SemihostFileOpen (
   IN  CHAR8  *FileName,
   IN  UINT32 Mode,
-  OUT UINT32 *FileHandle
+  OUT UINTN  *FileHandle
   )
 {
   SEMIHOST_FILE_OPEN_BLOCK  OpenBlock;
@@ -56,8 +56,8 @@ SemihostFileOpen (
 
 RETURN_STATUS
 SemihostFileSeek (
-  IN UINT32 FileHandle,
-  IN UINT32 Offset
+  IN UINTN  FileHandle,
+  IN UINTN  Offset
   )
 {
   SEMIHOST_FILE_SEEK_BLOCK  SeekBlock;
@@ -77,8 +77,8 @@ SemihostFileSeek (
 
 RETURN_STATUS
 SemihostFileRead (
-  IN     UINT32 FileHandle,
-  IN OUT UINT32 *Length,
+  IN     UINTN  FileHandle,
+  IN OUT UINTN  *Length,
   OUT    VOID   *Buffer
   )
 {
@@ -105,8 +105,8 @@ SemihostFileRead (
 
 RETURN_STATUS
 SemihostFileWrite (
-  IN     UINT32 FileHandle,
-  IN OUT UINT32 *Length,
+  IN     UINTN  FileHandle,
+  IN OUT UINTN  *Length,
   IN     VOID   *Buffer
   )
 {
@@ -127,7 +127,7 @@ SemihostFileWrite (
 
 RETURN_STATUS
 SemihostFileClose (
-  IN UINT32 FileHandle
+  IN UINTN  FileHandle
   )
 {
   INT32 Result = Semihost_SYS_CLOSE(&FileHandle);
@@ -141,8 +141,8 @@ SemihostFileClose (
 
 RETURN_STATUS
 SemihostFileLength (
-  IN  UINT32 FileHandle,
-  OUT UINT32 *Length
+  IN  UINTN  FileHandle,
+  OUT UINTN  *Length
   )
 {
   INT32       Result;
