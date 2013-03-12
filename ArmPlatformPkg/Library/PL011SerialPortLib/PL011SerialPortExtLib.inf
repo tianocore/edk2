@@ -1,8 +1,9 @@
 #/** @file
 #  
-#  Convert SerialLib into SerialIo protocol
+#  Component description file for PL011SerialPortLib module
 #  
-#  Copyright (c) 2008, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR>
+#  
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -15,41 +16,28 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = SerialDxe
-  FILE_GUID                      = D3987D4B-971A-435F-8CAF-4967EB627241
-  MODULE_TYPE                    = DXE_DRIVER
+  BASE_NAME                      = PL011SerialPortExtLib
+  FILE_GUID                      = 2be281f1-c506-4558-bd98-d6930e6de9d6
+  MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-
-  ENTRY_POINT                    = SerialDxeInitialize
+  LIBRARY_CLASS                  = SerialPortExtLib
 
 [Sources.common]
-  SerialIo.c
-
-[Packages]
-  MdePkg/MdePkg.dec
-  EmbeddedPkg/EmbeddedPkg.dec
+  PL011SerialPortExtLib.c
 
 [LibraryClasses]
-  BaseLib
-  ReportStatusCodeLib
-  MemoryAllocationLib
-  UefiLib
-  UefiBootServicesTableLib
-  BaseMemoryLib
-  DebugLib
-  UefiDriverEntryPoint
-  SerialPortLib
-  SerialPortExtLib
+  PL011UartLib
+  PcdLib
 
-[Protocols]
-  gEfiSerialIoProtocolGuid    
-  gEfiDevicePathProtocolGuid
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
 
-[FixedPcd]
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits
-
-[Depex] 
-  TRUE

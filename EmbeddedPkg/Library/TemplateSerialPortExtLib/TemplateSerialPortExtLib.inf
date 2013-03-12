@@ -1,7 +1,8 @@
 #/** @file
-# EDK Serial port lib
+# Template for Extended Serial Port Library for UEFI drivers
 #
-# Copyright (c) 2009, Apple Inc. All rights reserved.<BR>
+# Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2012, ARM Ltd. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -15,11 +16,11 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = BeagleBoardSerialPortLib
-  FILE_GUID                      = 97546cbd-c0ff-4c48-ab0b-e4f58862acd3
+  BASE_NAME                      = TemplateSerialPortExtLib
+  FILE_GUID                      = 231fe752-40ac-40b0-8d23-4e341309b964
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = SerialPortLib
+  LIBRARY_CLASS                  = SerialPortExtLib
 
 
 #
@@ -27,18 +28,9 @@
 #
 
 [Sources.common]
-  SerialPortLib.c
-
-[LibraryClasses]
-  DebugLib
-  IoLib
-  OmapLib
+  TemplateSerialPortExtLib.c
 
 [Packages]
-  EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
-  Omap35xxPkg/Omap35xxPkg.dec
-  
-[FixedPcd]
-  gOmap35xxTokenSpaceGuid.PcdOmap35xxConsoleUart
+  EmbeddedPkg/EmbeddedPkg.dec
 

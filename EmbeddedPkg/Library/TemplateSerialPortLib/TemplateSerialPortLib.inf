@@ -1,8 +1,8 @@
 #/** @file
-# Memory Status Code Library for UEFI drivers
+# Template for Serial Port Library for UEFI drivers
 #
-# Lib to provide memory journal status code reporting Routines
 # Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2012, ARM Ltd. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -18,13 +18,13 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = TemplateSerialPortLib
   FILE_GUID                      = A9133571-AD4B-4457-94A8-A9CC2CE7574F
-  MODULE_TYPE                    = PEIM
+  MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = SerialPortLib
 
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = ARM IA32 X64 IPF EBC
 #
 
 [Sources.common]
