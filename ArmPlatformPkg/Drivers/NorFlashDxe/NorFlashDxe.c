@@ -596,7 +596,7 @@ NorFlashWriteSingleBlock (
   if ((WordAddress & BOUNDARY_OF_32_WORDS) == 0x00) {
 
     // First, break the entire block into buffer-sized chunks.
-    BuffersInBlock = (UINTN)BlockSizeInWords / P30_MAX_BUFFER_SIZE_IN_BYTES;
+    BuffersInBlock = (UINTN)(BlockSizeInWords * 4) / P30_MAX_BUFFER_SIZE_IN_BYTES;
 
     // Then feed each buffer chunk to the NOR Flash
     for(BufferIndex=0;
