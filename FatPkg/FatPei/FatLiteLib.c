@@ -1,7 +1,7 @@
 /** @file
   General purpose supporting routines for FAT recovery PEIM
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
@@ -317,15 +317,16 @@ EngFatToStr (
   // No DBCS issues, just expand and add null terminate to end of string
   //
   while (*Fat != 0 && FatSize != 0) {
+    if (*Fat == ' ') {
+      break;
+    }
     *String = *Fat;
     String += 1;
     Fat += 1;
     FatSize -= 1;
-    if (*Fat == ' ') {
-      *String = 0;
-      return ;
-    }
   }
+
+  *String = 0;
 }
 
 
