@@ -12,8 +12,11 @@
 *
 **/
 
+#include <Library/ArmSmcLib.h>
 #include <Library/PcdLib.h>
 #include <libfdt.h>
+
+#include <IndustryStandard/ArmSmc.h>
 
 #include "BdsInternal.h"
 #include "BdsLinuxLoader.h"
@@ -218,6 +221,7 @@ PrepareFdt (
   INTN                  cpu_node;
   INTN                  lenp;
   CONST VOID*           BootArg;
+  CONST VOID*           Method;
   EFI_PHYSICAL_ADDRESS  InitrdImageStart;
   EFI_PHYSICAL_ADDRESS  InitrdImageEnd;
   FdtRegion             Region;
@@ -237,6 +241,35 @@ PrepareFdt (
   UINTN                 DescriptorSize;
   UINT32                DescriptorVersion;
   UINTN                 Pages;
+  BOOLEAN               PsciSmcSupported;
+  UINTN                 Rx;
+
+  //
+  // Ensure the Power State Coordination Interface (PSCI) SMCs are there if supported
+  //
+  PsciSmcSupported = FALSE;
+  if (FeaturePcdGet (PcdArmPsciSupport) == TRUE) {
+    // Check the SMC response to the Presence SMC
+    Rx   = ARM_SMC_ID_PRESENCE;
+    ArmCallSmc (&Rx);
+    if (Rx == 1) {
+      // Check the SMC UID
+      Rx   = ARM_SMC_ID_UID;
+      ArmCallSmc (&Rx);
+      if (Rx == ARM_TRUSTZONE_UID_4LETTERID) {
+        Rx   = ARM_SMC_ID_UID + 1;
+        ArmCallSmc (&Rx);
+        //TODO: Replace ARM magic number
+        if (Rx == 0x40524d48) {
+          PsciSmcSupported = TRUE;
+        }
+      }
+      if (PsciSmcSupported == FALSE) {
+        DEBUG((EFI_D_ERROR,"Warning: The Power State Coordination Interface (PSCI) is not supported"
+                           "by your platform Trusted Firmware.\n"));
+      }
+    }
+  }
 
   err = fdt_check_header ((VOID*)(UINTN)(*FdtBlobBase));
   if (err != 0) {
@@ -418,16 +451,47 @@ PrepareFdt (
           fdt_setprop(fdt, cpu_node, "reg", &Index, sizeof(Index));
         }
 
-        fdt_setprop_string(fdt, cpu_node, "enable-method", "spin-table");
-        CpuReleaseAddr = cpu_to_fdt64(ArmCoreInfoTable[Index].MailboxSetAddress);
-        fdt_setprop(fdt, cpu_node, "cpu-release-addr", &CpuReleaseAddr, sizeof(CpuReleaseAddr));
+        // If Power State Coordination Interface (PSCI) is not supported then it is expected the secondary
+        // cores are spinning waiting for the Operation System to release them
+        if (PsciSmcSupported == FALSE) {
+          // Before to write our method check if a method is already exposed in the CPU node
+          Method = fdt_getprop(fdt, cpu_node, "enable-method", &lenp);
+          if (Method == NULL) {
+            // No 'enable-method', we can create our entries
+            fdt_setprop_string(fdt, cpu_node, "enable-method", "spin-table");
+            CpuReleaseAddr = cpu_to_fdt64(ArmCoreInfoTable[Index].MailboxSetAddress);
+            fdt_setprop(fdt, cpu_node, "cpu-release-addr", &CpuReleaseAddr, sizeof(CpuReleaseAddr));
 
-        // If it is not the primary core than the cpu should be disabled
-        if (((ArmCoreInfoTable[Index].ClusterId != ClusterId) || (ArmCoreInfoTable[Index].CoreId != CoreId))) {
-          fdt_setprop_string(fdt, cpu_node, "status", "disabled");
+            // If it is not the primary core than the cpu should be disabled
+            if (((ArmCoreInfoTable[Index].ClusterId != ClusterId) || (ArmCoreInfoTable[Index].CoreId != CoreId))) {
+              fdt_setprop_string(fdt, cpu_node, "status", "disabled");
+            }
+          }
         }
       }
       break;
+    }
+  }
+
+  // If the Power State Coordination Interface is supported then we signal it in the Device Tree
+  if (PsciSmcSupported == TRUE) {
+    // Before to create it we check if the node is not already defined in the Device Tree
+    node = fdt_subnode_offset(fdt, 0, "psci");
+    if (node < 0) {
+      // The 'psci' node does not exist, create it
+      node = fdt_add_subnode(fdt, 0, "psci");
+      if (node < 0) {
+        DEBUG((EFI_D_ERROR,"Error on creating 'psci' node\n"));
+        Status = EFI_INVALID_PARAMETER;
+        goto FAIL_NEW_FDT;
+      } else {
+        fdt_setprop_string(fdt, node, "compatible", "arm,psci");
+        fdt_setprop_string(fdt, node, "method", "smc");
+        fdt_setprop_cell(fdt, node, "cpu_suspend", ARM_SMC_ARM_CPU_SUSPEND);
+        fdt_setprop_cell(fdt, node, "cpu_off", ARM_SMC_ARM_CPU_OFF);
+        fdt_setprop_cell(fdt, node, "cpu_on", ARM_SMC_ARM_CPU_ON);
+        fdt_setprop_cell(fdt, node, "cpu_migrate", ARM_SMC_ARM_MIGRATE);
+      }
     }
   }
 

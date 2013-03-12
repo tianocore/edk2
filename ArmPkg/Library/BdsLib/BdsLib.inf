@@ -35,9 +35,11 @@
   MdePkg/MdePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
 
 [LibraryClasses]
   ArmLib
+  ArmSmcLib
   BaseLib
   DebugLib
   DevicePathLib
@@ -64,7 +66,8 @@
   gEfiUsbIoProtocolGuid
   gEfiLoadedImageProtocolGuid
     
-[FeaturePcd]  
+[FeaturePcd]
+  gArmTokenSpaceGuid.PcdArmPsciSupport
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdSystemMemoryBase

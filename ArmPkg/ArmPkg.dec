@@ -65,6 +65,9 @@
   # it has been configured by the CPU DXE
   gArmTokenSpaceGuid.PcdDebuggerExceptionSupport|FALSE|BOOLEAN|0x00000032
   
+  # Define if the Power State Coordination Interface (PSCI) is supported by the Platform Trusted Firmware
+  gArmTokenSpaceGuid.PcdArmPsciSupport|FALSE|BOOLEAN|0x00000033
+  
 [PcdsFixedAtBuild.common]
   gArmTokenSpaceGuid.PcdTrustzoneSupport|FALSE|BOOLEAN|0x00000006
 
