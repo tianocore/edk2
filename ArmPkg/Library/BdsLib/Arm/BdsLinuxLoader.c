@@ -146,11 +146,13 @@ BdsBootLinuxAtag (
 {
   EFI_STATUS            Status;
   UINT32                LinuxImageSize;
+  UINT32                InitrdImageBaseSize = 0;
   UINT32                InitrdImageSize = 0;
   UINT32                AtagSize;
   EFI_PHYSICAL_ADDRESS  AtagBase;
   EFI_PHYSICAL_ADDRESS  LinuxImage;
-  EFI_PHYSICAL_ADDRESS  InitrdImage;
+  EFI_PHYSICAL_ADDRESS  InitrdImageBase = 0;
+  EFI_PHYSICAL_ADDRESS  InitrdImage = 0;
 
   PERF_START (NULL, "BDS", NULL, 0);
 
@@ -164,21 +166,24 @@ BdsBootLinuxAtag (
 
   if (InitrdDevicePath) {
     // Load the initrd near to the Linux kernel
-    InitrdImage = LINUX_KERNEL_MAX_OFFSET;
-    Status = BdsLoadImage (InitrdDevicePath, AllocateMaxAddress, &InitrdImage, &InitrdImageSize);
+    InitrdImageBase = LINUX_KERNEL_MAX_OFFSET;
+    Status = BdsLoadImage (InitrdDevicePath, AllocateMaxAddress, &InitrdImageBase, &InitrdImageBaseSize);
     if (Status == EFI_OUT_OF_RESOURCES) {
-      Status = BdsLoadImage (InitrdDevicePath, AllocateAnyPages, &InitrdImage, &InitrdImageSize);
+      Status = BdsLoadImage (InitrdDevicePath, AllocateAnyPages, &InitrdImageBase, &InitrdImageBaseSize);
     }
     if (EFI_ERROR(Status)) {
       Print (L"ERROR: Did not find initrd image.\n");
-      return Status;
+      goto EXIT_FREE_LINUX;
     }
     
     // Check if the initrd is a uInitrd
-    if (*(UINT32*)((UINTN)InitrdImage) == LINUX_UIMAGE_SIGNATURE) {
+    if (*(UINT32*)((UINTN)InitrdImageBase) == LINUX_UIMAGE_SIGNATURE) {
       // Skip the 64-byte image header
-      InitrdImage = (EFI_PHYSICAL_ADDRESS)((UINTN)InitrdImage + 64);
-      InitrdImageSize -= 64;
+      InitrdImage = (EFI_PHYSICAL_ADDRESS)((UINTN)InitrdImageBase + 64);
+      InitrdImageSize = InitrdImageBaseSize - 64;
+    } else {
+      InitrdImage = InitrdImageBase;
+      InitrdImageSize = InitrdImageBaseSize;
     }
   }
 
@@ -190,10 +195,20 @@ BdsBootLinuxAtag (
   Status = PrepareAtagList (CommandLineArguments, InitrdImage, InitrdImageSize, &AtagBase, &AtagSize);
   if (EFI_ERROR(Status)) {
     Print(L"ERROR: Can not prepare ATAG list. Status=0x%X\n", Status);
-    return Status;
+    goto EXIT_FREE_INITRD;
   }
 
   return StartLinux (LinuxImage, LinuxImageSize, AtagBase, AtagSize, PcdGet32(PcdArmMachineType));
+
+EXIT_FREE_INITRD:
+  if (InitrdDevicePath) {
+    gBS->FreePages (InitrdImageBase, EFI_SIZE_TO_PAGES (InitrdImageBaseSize));
+  }
+
+EXIT_FREE_LINUX:
+  gBS->FreePages (LinuxImage, EFI_SIZE_TO_PAGES (LinuxImageSize));
+
+  return Status;
 }
 
 /**
@@ -218,11 +233,13 @@ BdsBootLinuxFdt (
 {
   EFI_STATUS            Status;
   UINT32                LinuxImageSize;
+  UINT32                InitrdImageBaseSize = 0;
   UINT32                InitrdImageSize = 0;
   UINT32                FdtBlobSize;
   EFI_PHYSICAL_ADDRESS  FdtBlobBase;
   EFI_PHYSICAL_ADDRESS  LinuxImage;
-  EFI_PHYSICAL_ADDRESS  InitrdImage;
+  EFI_PHYSICAL_ADDRESS  InitrdImageBase = 0;
+  EFI_PHYSICAL_ADDRESS  InitrdImage = 0;
 
   PERF_START (NULL, "BDS", NULL, 0);
 
@@ -235,21 +252,24 @@ BdsBootLinuxFdt (
   }
 
   if (InitrdDevicePath) {
-    InitrdImage = LINUX_KERNEL_MAX_OFFSET;
-    Status = BdsLoadImage (InitrdDevicePath, AllocateMaxAddress, &InitrdImage, &InitrdImageSize);
+    InitrdImageBase = LINUX_KERNEL_MAX_OFFSET;
+    Status = BdsLoadImage (InitrdDevicePath, AllocateMaxAddress, &InitrdImageBase, &InitrdImageBaseSize);
     if (Status == EFI_OUT_OF_RESOURCES) {
-      Status = BdsLoadImage (InitrdDevicePath, AllocateAnyPages, &InitrdImage, &InitrdImageSize);
+      Status = BdsLoadImage (InitrdDevicePath, AllocateAnyPages, &InitrdImageBase, &InitrdImageBaseSize);
     }
     if (EFI_ERROR(Status)) {
       Print (L"ERROR: Did not find initrd image.\n");
-      return Status;
+      goto EXIT_FREE_LINUX;
     }
 
     // Check if the initrd is a uInitrd
     if (*(UINT32*)((UINTN)InitrdImage) == LINUX_UIMAGE_SIGNATURE) {
       // Skip the 64-byte image header
-      InitrdImage = (EFI_PHYSICAL_ADDRESS)((UINTN)InitrdImage + 64);
-      InitrdImageSize -= 64;
+      InitrdImage = (EFI_PHYSICAL_ADDRESS)((UINTN)InitrdImageBase + 64);
+      InitrdImageSize = InitrdImageBaseSize - 64;
+    } else {
+      InitrdImage = InitrdImageBase;
+      InitrdImageSize = InitrdImageBaseSize;
     }
   }
 
@@ -258,7 +278,7 @@ BdsBootLinuxFdt (
   Status = BdsLoadImage (FdtDevicePath, AllocateAnyPages, &FdtBlobBase, &FdtBlobSize);
   if (EFI_ERROR(Status)) {
     Print (L"ERROR: Did not find Device Tree blob.\n");
-    return Status;
+    goto EXIT_FREE_INITRD;
   }
 
   // Update the Fdt with the Initrd information. The FDT will increase in size.
@@ -266,9 +286,22 @@ BdsBootLinuxFdt (
   Status = PrepareFdt (CommandLineArguments, InitrdImage, InitrdImageSize, &FdtBlobBase, &FdtBlobSize);
   if (EFI_ERROR(Status)) {
     Print(L"ERROR: Can not load kernel with FDT. Status=%r\n", Status);
-    return Status;
+    goto EXIT_FREE_FDT;
   }
 
   return StartLinux (LinuxImage, LinuxImageSize, FdtBlobBase, FdtBlobSize, ARM_FDT_MACHINE_TYPE);
+
+EXIT_FREE_FDT:
+  gBS->FreePages (FdtBlobBase, EFI_SIZE_TO_PAGES (FdtBlobSize));
+
+EXIT_FREE_INITRD:
+  if (InitrdDevicePath) {
+    gBS->FreePages (InitrdImageBase, EFI_SIZE_TO_PAGES (InitrdImageBaseSize));
+  }
+
+EXIT_FREE_LINUX:
+  gBS->FreePages (LinuxImage, EFI_SIZE_TO_PAGES (LinuxImageSize));
+
+  return Status;
 }
 

@@ -310,7 +310,7 @@ PrepareFdt (
     Status = gBS->AllocatePages (AllocateAnyPages, EfiBootServicesData, EFI_SIZE_TO_PAGES(NewFdtBlobSize), &NewFdtBlobBase);
     if (EFI_ERROR(Status)) {
       ASSERT_EFI_ERROR(Status);
-      goto FAIL_NEW_FDT;
+      goto FAIL_ALLOCATE_NEW_FDT;
     } else {
       DEBUG ((EFI_D_WARN, "WARNING: Loaded FDT at random address 0x%lX.\nWARNING: There is a risk of accidental overwriting by other code/data.\n", NewFdtBlobBase));
     }
@@ -515,12 +515,18 @@ PrepareFdt (
     //DebugDumpFdt (fdt);
   DEBUG_CODE_END();
 
+  // If we succeeded to generate the new Device Tree then free the old Device Tree
+  gBS->FreePages (*FdtBlobBase, EFI_SIZE_TO_PAGES (*FdtBlobSize));
+
   *FdtBlobBase = NewFdtBlobBase;
   *FdtBlobSize = (UINTN)fdt_totalsize ((VOID*)(UINTN)(NewFdtBlobBase));
   return EFI_SUCCESS;
 
 FAIL_NEW_FDT:
-  *FdtBlobSize = OriginalFdtSize;
+  gBS->FreePages (NewFdtBlobBase, EFI_SIZE_TO_PAGES (NewFdtBlobSize));
+
+FAIL_ALLOCATE_NEW_FDT:
+  *FdtBlobSize = (UINTN)fdt_totalsize ((VOID*)(UINTN)(*FdtBlobBase));
   // Return success even if we failed to update the FDT blob. The original one is still valid.
   return EFI_SUCCESS;
 }
