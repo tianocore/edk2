@@ -1,0 +1,102 @@
+## @file
+#  Component name for SecureBoot configuration module.
+#
+# Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution. The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SecureBootConfigDxe
+  FILE_GUID                      = F0E6A44F-7195-41c3-AC64-54F202CD0A21
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SecureBootConfigDriverEntryPoint
+  UNLOAD_IMAGE                   = SecureBootConfigDriverUnload
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  SecureBootConfigDriver.c
+  SecureBootConfigImpl.c
+  SecureBootConfigFileExplorer.c
+  SecureBootConfigDevicePath.c
+  SecureBootConfigMisc.c
+  SecureBootConfigImpl.h
+  SecureBootConfig.vfr
+  SecureBootConfigStrings.uni
+  SecureBootConfigNvData.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  BaseCryptLib
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiDriverEntryPoint
+  UefiHiiServicesLib
+  DebugLib
+  HiiLib
+  PlatformSecureLib  
+
+[Guids]
+  gEfiIfrTianoGuid
+  gEfiCustomModeEnableGuid
+  gEfiSecureBootEnableDisableGuid
+  gSecureBootConfigFormSetGuid
+  gEfiCertPkcs7Guid
+  gEfiCertRsa2048Guid                           ## CONSUMES
+  gEfiCertX509Guid                              ## CONSUMES
+  gEfiCertSha1Guid                              ## CONSUMES
+  gEfiCertSha256Guid                            ## CONSUMES
+  gEfiCertTypeRsa2048Sha256Guid                 ## CONSUMES
+  gEfiImageSecurityDatabaseGuid                 ## CONSUMES
+  gEfiFileSystemVolumeLabelInfoIdGuid           ## CONSUMES
+  gEfiGlobalVariableGuid                        ## PRODUCES ## Variable Guid
+  gEfiVT100PlusGuid                             ## CONSUMES ## GUID (The type of terminal)
+  gEfiVT100Guid                                 ## CONSUMES ## GUID (The type of terminal)
+                                                ## CONSUMES ## GUID HOB (The hob holding memory type information)
+  gEfiVTUTF8Guid                                ## CONSUMES ## GUID (The type of terminal)
+                                                ## SOMETIMES_CONSUMES ## Variable:L"BootXX" (Boot option variable)
+                                                ## CONSUMES           ## Variable:L"Timeout" (The time out value in second of showing progress bar)
+                                                ## SOMETIMES_CONSUMES ## Variable:L"BootOrder" (The boot option array)
+                                                ## SOMETIMES_CONSUMES ## Variable:L"DriverOrder" (The driver order list)
+                                                ## SOMETIMES_CONSUMES ## Variable:L"ConIn" (The device path of console in device)
+                                                ## SOMETIMES_CONSUMES ## Variable:L"ConOut" (The device path of console out device)
+                                                ## SOMETIMES_CONSUMES ## Variable:L"ErrOut" (The device path of error out device)
+  gEfiFileInfoGuid                              ## CONSUMES ## GUID
+  gEfiPcAnsiGuid                                ## CONSUMES ## GUID (The type of terminal)
+  gEfiUartDevicePathGuid                        ## CONSUMES ## GUID (Identify the device path for UARD device)
+  gEfiSasDevicePathGuid                         ## CONSUMES ## GUID (Identify the device path for SAS device)
+
+[Protocols]
+  gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
+  gEfiHiiConfigRoutingProtocolGuid              ## CONSUMES
+  gEfiSimpleFileSystemProtocolGuid              ## PROTOCOL CONSUMES
+  gEfiLoadFileProtocolGuid                      ## PROTOCOL CONSUMES
+  gEfiBlockIoProtocolGuid                       ## PROTOCOL CONSUMES
+  gEfiDevicePathProtocolGuid                    ## PROTOCOL CONSUMES
+  gEfiDevicePathToTextProtocolGuid
+  gEfiDebugPortProtocolGuid
+
+[Depex]
+  gEfiHiiConfigRoutingProtocolGuid  AND
+  gEfiHiiDatabaseProtocolGuid       AND
+  gEfiVariableArchProtocolGuid      AND
+  gEfiVariableWriteArchProtocolGuid

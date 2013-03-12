@@ -1,0 +1,65 @@
+## @file
+#  The component description for PEI variable driver. 
+#
+# Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution. The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiVariable
+  FILE_GUID                      = B1F7AF2F-2807-478c-A893-2BF4DDD1F62B
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PeimInitializeVariableServices
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  Variable.c
+  Variable.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  PcdLib
+  HobLib
+  PeimEntryPoint
+  DebugLib
+  PeiServicesTablePointerLib
+  PeiServicesLib
+
+[Guids]
+  gEfiAuthenticatedVariableGuid
+  gEfiVariableIndexTableGuid
+  gEfiSystemNvDataFvGuid
+
+[Ppis]
+  gEfiPeiReadOnlyVariable2PpiGuid                ## SOMETIMES_PRODUCES (Not for boot mode RECOVERY)
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64  ## CONSUMES
+
+[Depex]
+  TRUE
+
+#
+#  [BootMode]
+#    RECOVERY          ## CONSUMES
+#
+
