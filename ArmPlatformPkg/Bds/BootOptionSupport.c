@@ -34,7 +34,7 @@ BdsLoadOptionFileSystemList (
 EFI_STATUS
 BdsLoadOptionFileSystemCreateDevicePath (
   IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNode,
+  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes,
   OUT ARM_BDS_LOADER_TYPE       *BootType,
   OUT UINT32                    *Attributes
   );
@@ -61,7 +61,7 @@ BdsLoadOptionMemMapList (
 EFI_STATUS
 BdsLoadOptionMemMapCreateDevicePath (
   IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNode,
+  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes,
   OUT ARM_BDS_LOADER_TYPE       *BootType,
   OUT UINT32                    *Attributes
   );
@@ -88,7 +88,7 @@ BdsLoadOptionPxeList (
 EFI_STATUS
 BdsLoadOptionPxeCreateDevicePath (
   IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNode,
+  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes,
   OUT ARM_BDS_LOADER_TYPE       *BootType,
   OUT UINT32                    *Attributes
   );
@@ -115,7 +115,7 @@ BdsLoadOptionTftpList (
 EFI_STATUS
 BdsLoadOptionTftpCreateDevicePath (
   IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNode,
+  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes,
   OUT ARM_BDS_LOADER_TYPE       *BootType,
   OUT UINT32                    *Attributes
   );
@@ -332,7 +332,7 @@ BdsLoadOptionFileSystemList (
 EFI_STATUS
 BdsLoadOptionFileSystemCreateDevicePath (
   IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNode,
+  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes,
   OUT ARM_BDS_LOADER_TYPE       *BootType,
   OUT UINT32                    *Attributes
   )
@@ -350,16 +350,17 @@ BdsLoadOptionFileSystemCreateDevicePath (
 
   BootFilePathSize = StrSize (BootFilePath);
   if (BootFilePathSize == 2) {
-    *DevicePathNode = NULL;
+    *DevicePathNodes = NULL;
     return EFI_NOT_FOUND;
   }
 
   // Create the FilePath Device Path node
-  FilePathDevicePath = (FILEPATH_DEVICE_PATH*)AllocatePool(SIZE_OF_FILEPATH_DEVICE_PATH + BootFilePathSize);
+  FilePathDevicePath = (FILEPATH_DEVICE_PATH*)AllocatePool(SIZE_OF_FILEPATH_DEVICE_PATH + BootFilePathSize + END_DEVICE_PATH_LENGTH);
   FilePathDevicePath->Header.Type = MEDIA_DEVICE_PATH;
   FilePathDevicePath->Header.SubType = MEDIA_FILEPATH_DP;
   SetDevicePathNodeLength (FilePathDevicePath, SIZE_OF_FILEPATH_DEVICE_PATH + BootFilePathSize);
   CopyMem (FilePathDevicePath->PathName, BootFilePath, BootFilePathSize);
+  SetDevicePathEndNode ((VOID*)((UINTN)FilePathDevicePath + SIZE_OF_FILEPATH_DEVICE_PATH + BootFilePathSize));
 
   if (BootType != NULL || Attributes != NULL) {
     Status = BootDeviceGetType (FilePathDevicePath->PathName, BootType, Attributes);
@@ -368,7 +369,7 @@ BdsLoadOptionFileSystemCreateDevicePath (
   if (EFI_ERROR(Status)) {
     FreePool (FilePathDevicePath);
   } else {
-    *DevicePathNode = (EFI_DEVICE_PATH_PROTOCOL*)FilePathDevicePath;
+    *DevicePathNodes = (EFI_DEVICE_PATH_PROTOCOL*)FilePathDevicePath;
   }
 
   return Status;
@@ -533,7 +534,7 @@ BdsLoadOptionMemMapList (
 EFI_STATUS
 BdsLoadOptionMemMapCreateDevicePath (
   IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNode,
+  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes,
   OUT ARM_BDS_LOADER_TYPE       *BootType,
   OUT UINT32                    *Attributes
   )
@@ -574,7 +575,7 @@ BdsLoadOptionMemMapCreateDevicePath (
   if (EFI_ERROR(Status)) {
     FreePool (MemMapDevicePath);
   } else {
-    *DevicePathNode = (EFI_DEVICE_PATH_PROTOCOL*)MemMapDevicePath;
+    *DevicePathNodes = (EFI_DEVICE_PATH_PROTOCOL*)MemMapDevicePath;
   }
 
   return Status;
@@ -691,13 +692,13 @@ BdsLoadOptionPxeList (
 EFI_STATUS
 BdsLoadOptionPxeCreateDevicePath (
   IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNode,
+  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes,
   OUT ARM_BDS_LOADER_TYPE       *BootType,
   OUT UINT32                    *Attributes
   )
 {
-  *DevicePathNode = (EFI_DEVICE_PATH_PROTOCOL *) AllocatePool (END_DEVICE_PATH_LENGTH);
-  SetDevicePathEndNode (*DevicePathNode);
+  *DevicePathNodes = (EFI_DEVICE_PATH_PROTOCOL *) AllocatePool (END_DEVICE_PATH_LENGTH);
+  SetDevicePathEndNode (*DevicePathNodes);
   *BootType = BDS_LOADER_EFI_APPLICATION;
   return EFI_SUCCESS;
 }
@@ -793,7 +794,7 @@ BdsLoadOptionTftpList (
 EFI_STATUS
 BdsLoadOptionTftpCreateDevicePath (
   IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNode,
+  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes,
   OUT ARM_BDS_LOADER_TYPE       *BootType,
   OUT UINT32                    *Attributes
   )
@@ -839,7 +840,7 @@ BdsLoadOptionTftpCreateDevicePath (
   }
 
   // Allocate the memory for the IPv4 + File Path Device Path Nodes
-  IPv4DevicePathNode = (IPv4_DEVICE_PATH*)AllocatePool(sizeof(IPv4_DEVICE_PATH) + SIZE_OF_FILEPATH_DEVICE_PATH + BootFilePathSize);
+  IPv4DevicePathNode = (IPv4_DEVICE_PATH*)AllocatePool(sizeof(IPv4_DEVICE_PATH) + SIZE_OF_FILEPATH_DEVICE_PATH + BootFilePathSize + END_DEVICE_PATH_LENGTH);
 
   // Create the IPv4 Device Path
   IPv4DevicePathNode->Header.Type    = MESSAGING_DEVICE_PATH;
@@ -859,6 +860,9 @@ BdsLoadOptionTftpCreateDevicePath (
   SetDevicePathNodeLength (FilePathDevicePath, SIZE_OF_FILEPATH_DEVICE_PATH + BootFilePathSize);
   CopyMem (FilePathDevicePath->PathName, BootFilePath, BootFilePathSize);
 
+  // Set the End Device Path Node
+  SetDevicePathEndNode ((VOID*)((UINTN)FilePathDevicePath + SIZE_OF_FILEPATH_DEVICE_PATH + BootFilePathSize));
+
   if (BootType != NULL || Attributes != NULL) {
     Status = BootDeviceGetType (NULL, BootType, Attributes);
   }
@@ -866,7 +870,7 @@ BdsLoadOptionTftpCreateDevicePath (
   if (EFI_ERROR(Status)) {
     FreePool (IPv4DevicePathNode);
   } else {
-    *DevicePathNode = (EFI_DEVICE_PATH_PROTOCOL*)IPv4DevicePathNode;
+    *DevicePathNodes = (EFI_DEVICE_PATH_PROTOCOL*)IPv4DevicePathNode;
   }
 
   return Status;
