@@ -155,8 +155,6 @@ FileOpen (
   EFI_STATUS    Status   = EFI_SUCCESS;
   UINTN         SemihostHandle;
   CHAR8         *AsciiFileName;
-  CHAR8         *AsciiPtr;
-  UINTN         Length;
   UINT32        SemihostMode;
   BOOLEAN       IsRoot;
 
@@ -164,19 +162,12 @@ FileOpen (
     return EFI_INVALID_PARAMETER;
   }
 
-  // Semihost interface requires ASCII filesnames
-  Length = StrSize (FileName);
-
-  AsciiFileName = AllocatePool (Length);
+  // Semihost interface requires ASCII filenames
+  AsciiFileName = AllocatePool ((StrLen (FileName) + 1) * sizeof (CHAR8));
   if (AsciiFileName == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-
-  AsciiPtr = AsciiFileName;
-
-  while (Length--) {
-    *AsciiPtr++ = *FileName++ & 0xFF;
-  }
+  UnicodeStrToAsciiStr (FileName, AsciiFileName);
 
   if ((AsciiStrCmp (AsciiFileName, "\\") == 0) ||
       (AsciiStrCmp (AsciiFileName, "/")  == 0) ||
