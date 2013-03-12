@@ -1,0 +1,113 @@
+## @file
+#  Cryptographic Library Instance for DXE_RUNTIME_DRIVER
+#
+#  Caution: This module requires additional review when modified.
+#  This library will have external input - signature.
+#  This external input must be validated carefully to avoid security issue like
+#  buffer overflow, integer overflow.
+#
+#  Note: MD4 Digest functions, HMAC-MD5 functions, HMAC-SHA1 functions, AES/
+#  TDES/ARC4 functions, RSA external functions, PKCS#7 SignedData sign functions,
+#  Diffie-Hellman functions, authenticode signature verification functions are
+#  not supported in this instance.
+#
+#  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = RuntimeCryptLib
+  FILE_GUID                      = 78189cc0-727d-46a4-84ea-f7dd860de64a
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BaseCryptLib|DXE_RUNTIME_DRIVER
+  CONSTRUCTOR                    = RuntimeCryptLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF ARM
+#
+
+[Sources]
+  Hash/CryptMd4Null.c
+  Hash/CryptMd5.c
+  Hash/CryptSha1.c
+  Hash/CryptSha256.c
+  Hmac/CryptHmacMd5Null.c
+  Hmac/CryptHmacSha1Null.c
+  Cipher/CryptAesNull.c
+  Cipher/CryptTdesNull.c
+  Cipher/CryptArc4Null.c
+  Pk/CryptRsaBasic.c
+  Pk/CryptRsaExtNull.c
+  Pk/CryptPkcs7SignNull.c
+  Pk/CryptPkcs7Verify.c 
+  Pk/CryptDhNull.c
+  Pk/CryptX509.c
+  Pk/CryptAuthenticodeNull.c
+  Pem/CryptPem.c
+
+  SysCall/CrtWrapper.c
+  SysCall/TimerWrapper.c
+  SysCall/RuntimeMemAllocation.c
+
+[Sources.Ia32]
+  SysCall/Ia32/MathMultS64x64.c     | MSFT
+  SysCall/Ia32/MathDivU64x64.c      | MSFT
+  SysCall/Ia32/MathReminderU64x64.c | MSFT
+  SysCall/Ia32/MathLShiftS64.c      | MSFT
+  SysCall/Ia32/MathRShiftU64.c      | MSFT
+
+  SysCall/Ia32/MathMultS64x64.c     | INTEL
+  SysCall/Ia32/MathDivU64x64.c      | INTEL
+  SysCall/Ia32/MathReminderU64x64.c | INTEL
+  SysCall/Ia32/MathLShiftS64.c      | INTEL
+  SysCall/Ia32/MathRShiftU64.c      | INTEL
+
+  SysCall/Ia32/MathMultS64x64.S     | GCC
+  SysCall/Ia32/MathDivU64x64.S      | GCC
+  SysCall/Ia32/MathReminderU64x64.S | GCC
+  SysCall/Ia32/MathLShiftS64.S      | GCC
+  SysCall/Ia32/MathRShiftU64.S      | GCC
+
+  Rand/CryptRandTsc.c
+
+[Sources.X64]
+  Rand/CryptRandTsc.c
+
+[Sources.IPF]
+  Rand/CryptRandItc.c
+
+[Sources.ARM]
+  Rand/CryptRand.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  DebugLib
+  OpensslLib
+  IntrinsicLib
+  PrintLib
+
+#
+# Remove these [BuildOptions] after this library is cleaned up
+#
+[BuildOptions]
+  GCC:*_GCC44_IA32_CC_FLAGS = "-D__cdecl=__attribute__((cdecl))" "-D__declspec(t)=__attribute__((t))"
+  

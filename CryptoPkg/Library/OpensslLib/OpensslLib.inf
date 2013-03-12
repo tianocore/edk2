@@ -1,0 +1,611 @@
+## @file
+# OpenSSL Library implementation.
+# 
+#  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = OpensslLib
+  FILE_GUID                      = C873A7D0-9824-409f-9B42-2C158B992E69
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = OpensslLib
+  DEFINE OPENSSL_PATH            = openssl-0.9.8w
+  DEFINE OPENSSL_FLAGS           = -DOPENSSL_SYSNAME_UWIN -DOPENSSL_SYS_UEFI -DL_ENDIAN -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -DOPENSSL_NO_CAMELLIA -DOPENSSL_NO_SEED -DOPENSSL_NO_RC5 -DOPENSSL_NO_MDC2 -DOPENSSL_NO_SOCK -DOPENSSL_NO_CMS -DOPENSSL_NO_JPAKE -DOPENSSL_NO_CAPIENG -DOPENSSL_NO_ERR -DOPENSSL_NO_KRB5 -DOPENSSL_NO_DYNAMIC_ENGINE -DGETPID_IS_MEANINGLESS -DOPENSSL_NO_STDIO -DOPENSSL_NO_FP_API -DOPENSSL_NO_DGRAM -DOPENSSL_NO_ASM
+  DEFINE OPENSSL_EXFLAGS         = -DOPENSSL_SMALL_FOOTPRINT -DOPENSSL_NO_SHA0 -DOPENSSL_NO_SHA512 -DOPENSSL_NO_LHASH -DOPENSSL_NO_HW -DOPENSSL_NO_OCSP -DOPENSSL_NO_LOCKING -DOPENSSL_NO_DEPRECATED
+  
+#
+# OPENSSL_FLAGS is set to define the following flags to be compatible with 
+# EDK II build system and UEFI executiuon environment 
+#
+#   OPENSSL_SYSNAME_UWIN
+#   OPENSSL_SYS_UEFI 
+#   L_ENDIAN 
+#   _CRT_SECURE_NO_DEPRECATE 
+#   _CRT_NONSTDC_NO_DEPRECATE 
+#   OPENSSL_NO_CAMELLIA 
+#   OPENSSL_NO_SEED 
+#   OPENSSL_NO_RC5 
+#   OPENSSL_NO_MDC2 
+#   OPENSSL_NO_SOCK 
+#   OPENSSL_NO_CMS 
+#   OPENSSL_NO_JPAKE 
+#   OPENSSL_NO_CAPIENG 
+#   OPENSSL_NO_ERR 
+#   OPENSSL_NO_KRB5 
+#   OPENSSL_NO_DYNAMIC_ENGINE 
+#   GETPID_IS_MEANINGLESS 
+#   OPENSSL_NO_STDIO 
+#   OPENSSL_NO_FP_API 
+#   OPENSSL_NO_DGRAM  
+#   OPENSSL_NO_ASM
+#
+  
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF ARM
+#
+
+[Sources]
+  $(OPENSSL_PATH)/e_os.h
+  $(OPENSSL_PATH)/crypto/cryptlib.c
+  $(OPENSSL_PATH)/crypto/dyn_lck.c
+  $(OPENSSL_PATH)/crypto/mem.c
+  $(OPENSSL_PATH)/crypto/mem_clr.c
+  $(OPENSSL_PATH)/crypto/mem_dbg.c
+  $(OPENSSL_PATH)/crypto/cversion.c
+  $(OPENSSL_PATH)/crypto/ex_data.c
+
+  #
+  # Not required for UEFI.
+  #
+  # $(OPENSSL_PATH)/crypto/tmdiff.c
+
+  $(OPENSSL_PATH)/crypto/cpt_err.c
+  $(OPENSSL_PATH)/crypto/ebcdic.c
+  $(OPENSSL_PATH)/crypto/uid.c
+  $(OPENSSL_PATH)/crypto/o_time.c
+  $(OPENSSL_PATH)/crypto/o_str.c
+  $(OPENSSL_PATH)/crypto/o_dir.c
+  $(OPENSSL_PATH)/crypto/o_init.c
+  $(OPENSSL_PATH)/crypto/fips_err.c
+  $(OPENSSL_PATH)/crypto/md2/md2_dgst.c
+  $(OPENSSL_PATH)/crypto/md2/md2_one.c
+  $(OPENSSL_PATH)/crypto/md4/md4_dgst.c
+  $(OPENSSL_PATH)/crypto/md4/md4_one.c
+  $(OPENSSL_PATH)/crypto/md5/md5_dgst.c
+  $(OPENSSL_PATH)/crypto/md5/md5_one.c
+  $(OPENSSL_PATH)/crypto/sha/sha_dgst.c
+  $(OPENSSL_PATH)/crypto/sha/sha1dgst.c
+  $(OPENSSL_PATH)/crypto/sha/sha_one.c
+  $(OPENSSL_PATH)/crypto/sha/sha1_one.c
+  $(OPENSSL_PATH)/crypto/sha/sha256.c
+  $(OPENSSL_PATH)/crypto/sha/sha512.c
+  $(OPENSSL_PATH)/crypto/hmac/hmac.c
+  $(OPENSSL_PATH)/crypto/ripemd/rmd_dgst.c
+  $(OPENSSL_PATH)/crypto/ripemd/rmd_one.c
+  $(OPENSSL_PATH)/crypto/des/des_lib.c
+  $(OPENSSL_PATH)/crypto/des/set_key.c
+  $(OPENSSL_PATH)/crypto/des/ecb_enc.c
+  $(OPENSSL_PATH)/crypto/des/cbc_enc.c
+  $(OPENSSL_PATH)/crypto/des/ecb3_enc.c
+  $(OPENSSL_PATH)/crypto/des/cfb64enc.c
+  $(OPENSSL_PATH)/crypto/des/cfb64ede.c
+  $(OPENSSL_PATH)/crypto/des/cfb_enc.c
+  $(OPENSSL_PATH)/crypto/des/ofb64ede.c
+  $(OPENSSL_PATH)/crypto/des/enc_read.c
+  $(OPENSSL_PATH)/crypto/des/enc_writ.c
+  $(OPENSSL_PATH)/crypto/des/ofb64enc.c
+  $(OPENSSL_PATH)/crypto/des/ofb_enc.c
+  $(OPENSSL_PATH)/crypto/des/str2key.c
+  $(OPENSSL_PATH)/crypto/des/pcbc_enc.c
+  $(OPENSSL_PATH)/crypto/des/qud_cksm.c
+  $(OPENSSL_PATH)/crypto/des/rand_key.c
+  $(OPENSSL_PATH)/crypto/des/des_enc.c
+  $(OPENSSL_PATH)/crypto/des/fcrypt_b.c
+  $(OPENSSL_PATH)/crypto/des/fcrypt.c
+  $(OPENSSL_PATH)/crypto/des/xcbc_enc.c
+  $(OPENSSL_PATH)/crypto/des/rpc_enc.c
+  $(OPENSSL_PATH)/crypto/des/cbc_cksm.c
+  $(OPENSSL_PATH)/crypto/des/ede_cbcm_enc.c
+  $(OPENSSL_PATH)/crypto/des/des_old.c
+  $(OPENSSL_PATH)/crypto/des/des_old2.c
+  $(OPENSSL_PATH)/crypto/des/read2pwd.c
+  $(OPENSSL_PATH)/crypto/rc2/rc2_ecb.c
+  $(OPENSSL_PATH)/crypto/rc2/rc2_skey.c
+  $(OPENSSL_PATH)/crypto/rc2/rc2_cbc.c
+  $(OPENSSL_PATH)/crypto/rc2/rc2cfb64.c
+  $(OPENSSL_PATH)/crypto/rc2/rc2ofb64.c
+  $(OPENSSL_PATH)/crypto/rc4/rc4_enc.c
+  $(OPENSSL_PATH)/crypto/rc4/rc4_skey.c
+  $(OPENSSL_PATH)/crypto/rc4/rc4_fblk.c
+  $(OPENSSL_PATH)/crypto/idea/i_cbc.c
+  $(OPENSSL_PATH)/crypto/idea/i_cfb64.c
+  $(OPENSSL_PATH)/crypto/idea/i_ofb64.c
+  $(OPENSSL_PATH)/crypto/idea/i_ecb.c
+  $(OPENSSL_PATH)/crypto/idea/i_skey.c
+  $(OPENSSL_PATH)/crypto/bf/bf_skey.c
+  $(OPENSSL_PATH)/crypto/bf/bf_ecb.c
+  $(OPENSSL_PATH)/crypto/bf/bf_enc.c
+  $(OPENSSL_PATH)/crypto/bf/bf_cfb64.c
+  $(OPENSSL_PATH)/crypto/bf/bf_ofb64.c
+  $(OPENSSL_PATH)/crypto/cast/c_skey.c
+  $(OPENSSL_PATH)/crypto/cast/c_ecb.c
+  $(OPENSSL_PATH)/crypto/cast/c_enc.c
+  $(OPENSSL_PATH)/crypto/cast/c_cfb64.c
+  $(OPENSSL_PATH)/crypto/cast/c_ofb64.c
+  $(OPENSSL_PATH)/crypto/aes/aes_misc.c
+  $(OPENSSL_PATH)/crypto/aes/aes_ecb.c
+  $(OPENSSL_PATH)/crypto/aes/aes_cfb.c
+  $(OPENSSL_PATH)/crypto/aes/aes_ofb.c
+  $(OPENSSL_PATH)/crypto/aes/aes_ctr.c
+  $(OPENSSL_PATH)/crypto/aes/aes_ige.c
+  $(OPENSSL_PATH)/crypto/aes/aes_wrap.c
+  $(OPENSSL_PATH)/crypto/aes/aes_core.c
+  $(OPENSSL_PATH)/crypto/aes/aes_cbc.c
+  $(OPENSSL_PATH)/crypto/bn/bn_add.c
+  $(OPENSSL_PATH)/crypto/bn/bn_div.c
+  $(OPENSSL_PATH)/crypto/bn/bn_exp.c
+  $(OPENSSL_PATH)/crypto/bn/bn_lib.c
+  $(OPENSSL_PATH)/crypto/bn/bn_ctx.c
+  $(OPENSSL_PATH)/crypto/bn/bn_mul.c
+  $(OPENSSL_PATH)/crypto/bn/bn_mod.c
+  $(OPENSSL_PATH)/crypto/bn/bn_print.c
+  $(OPENSSL_PATH)/crypto/bn/bn_rand.c
+  $(OPENSSL_PATH)/crypto/bn/bn_shift.c
+  $(OPENSSL_PATH)/crypto/bn/bn_word.c
+  $(OPENSSL_PATH)/crypto/bn/bn_blind.c
+  $(OPENSSL_PATH)/crypto/bn/bn_kron.c
+  $(OPENSSL_PATH)/crypto/bn/bn_sqrt.c
+  $(OPENSSL_PATH)/crypto/bn/bn_gcd.c
+  $(OPENSSL_PATH)/crypto/bn/bn_prime.c
+  $(OPENSSL_PATH)/crypto/bn/bn_err.c
+  $(OPENSSL_PATH)/crypto/bn/bn_sqr.c
+  $(OPENSSL_PATH)/crypto/bn/bn_asm.c
+  $(OPENSSL_PATH)/crypto/bn/bn_recp.c
+  $(OPENSSL_PATH)/crypto/bn/bn_mont.c
+  $(OPENSSL_PATH)/crypto/bn/bn_mpi.c
+  $(OPENSSL_PATH)/crypto/bn/bn_exp2.c
+  $(OPENSSL_PATH)/crypto/bn/bn_gf2m.c
+  $(OPENSSL_PATH)/crypto/bn/bn_nist.c
+  $(OPENSSL_PATH)/crypto/bn/bn_depr.c
+  $(OPENSSL_PATH)/crypto/bn/bn_x931p.c
+  $(OPENSSL_PATH)/crypto/bn/bn_const.c
+  $(OPENSSL_PATH)/crypto/bn/bn_opt.c
+  $(OPENSSL_PATH)/crypto/rsa/rsa_eay.c
+  $(OPENSSL_PATH)/crypto/rsa/rsa_gen.c
+  $(OPENSSL_PATH)/crypto/rsa/rsa_lib.c
+  $(OPENSSL_PATH)/crypto/rsa/rsa_sign.c
+  $(OPENSSL_PATH)/crypto/rsa/rsa_saos.c
+  $(OPENSSL_PATH)/crypto/rsa/rsa_err.c
+  $(OPENSSL_PATH)/crypto/rsa/rsa_pk1.c
+  $(OPENSSL_PATH)/crypto/rsa/rsa_ssl.c
+  $(OPENSSL_PATH)/crypto/rsa/rsa_none.c
+  $(OPENSSL_PATH)/crypto/rsa/rsa_oaep.c
+  $(OPENSSL_PATH)/crypto/rsa/rsa_chk.c
+  $(OPENSSL_PATH)/crypto/rsa/rsa_null.c
+  $(OPENSSL_PATH)/crypto/rsa/rsa_pss.c
+  $(OPENSSL_PATH)/crypto/rsa/rsa_x931.c
+  $(OPENSSL_PATH)/crypto/rsa/rsa_x931g.c
+  $(OPENSSL_PATH)/crypto/rsa/rsa_asn1.c
+  $(OPENSSL_PATH)/crypto/rsa/rsa_depr.c
+  $(OPENSSL_PATH)/crypto/rsa/rsa_eng.c
+  $(OPENSSL_PATH)/crypto/dsa/dsa_gen.c
+  $(OPENSSL_PATH)/crypto/dsa/dsa_key.c
+  $(OPENSSL_PATH)/crypto/dsa/dsa_lib.c
+  $(OPENSSL_PATH)/crypto/dsa/dsa_asn1.c
+  $(OPENSSL_PATH)/crypto/dsa/dsa_vrf.c
+  $(OPENSSL_PATH)/crypto/dsa/dsa_sign.c
+  $(OPENSSL_PATH)/crypto/dsa/dsa_err.c
+  $(OPENSSL_PATH)/crypto/dsa/dsa_ossl.c
+  $(OPENSSL_PATH)/crypto/dsa/dsa_depr.c
+  $(OPENSSL_PATH)/crypto/dsa/dsa_utl.c
+  $(OPENSSL_PATH)/crypto/dso/dso_dl.c
+  $(OPENSSL_PATH)/crypto/dso/dso_dlfcn.c
+  $(OPENSSL_PATH)/crypto/dso/dso_err.c
+  $(OPENSSL_PATH)/crypto/dso/dso_lib.c
+  $(OPENSSL_PATH)/crypto/dso/dso_null.c
+  $(OPENSSL_PATH)/crypto/dso/dso_openssl.c
+  $(OPENSSL_PATH)/crypto/dso/dso_win32.c
+  $(OPENSSL_PATH)/crypto/dso/dso_vms.c
+  $(OPENSSL_PATH)/crypto/dh/dh_asn1.c
+  $(OPENSSL_PATH)/crypto/dh/dh_gen.c
+  $(OPENSSL_PATH)/crypto/dh/dh_key.c
+  $(OPENSSL_PATH)/crypto/dh/dh_lib.c
+  $(OPENSSL_PATH)/crypto/dh/dh_check.c
+  $(OPENSSL_PATH)/crypto/dh/dh_err.c
+  $(OPENSSL_PATH)/crypto/dh/dh_depr.c
+  $(OPENSSL_PATH)/crypto/ec/ec_lib.c
+  $(OPENSSL_PATH)/crypto/ec/ecp_smpl.c
+  $(OPENSSL_PATH)/crypto/ec/ecp_mont.c
+  $(OPENSSL_PATH)/crypto/ec/ecp_nist.c
+  $(OPENSSL_PATH)/crypto/ec/ec_cvt.c
+  $(OPENSSL_PATH)/crypto/ec/ec_mult.c
+  $(OPENSSL_PATH)/crypto/ec/ec_err.c
+  $(OPENSSL_PATH)/crypto/ec/ec_curve.c
+  $(OPENSSL_PATH)/crypto/ec/ec_check.c
+  $(OPENSSL_PATH)/crypto/ec/ec_print.c
+  $(OPENSSL_PATH)/crypto/ec/ec_asn1.c
+  $(OPENSSL_PATH)/crypto/ec/ec_key.c
+  $(OPENSSL_PATH)/crypto/ec/ec2_smpl.c
+  $(OPENSSL_PATH)/crypto/ec/ec2_mult.c
+  $(OPENSSL_PATH)/crypto/ecdh/ech_lib.c
+  $(OPENSSL_PATH)/crypto/ecdh/ech_ossl.c
+  $(OPENSSL_PATH)/crypto/ecdh/ech_key.c
+  $(OPENSSL_PATH)/crypto/ecdh/ech_err.c
+  $(OPENSSL_PATH)/crypto/ecdsa/ecs_lib.c
+  $(OPENSSL_PATH)/crypto/ecdsa/ecs_asn1.c
+  $(OPENSSL_PATH)/crypto/ecdsa/ecs_ossl.c
+  $(OPENSSL_PATH)/crypto/ecdsa/ecs_sign.c
+  $(OPENSSL_PATH)/crypto/ecdsa/ecs_vrf.c
+  $(OPENSSL_PATH)/crypto/ecdsa/ecs_err.c
+  $(OPENSSL_PATH)/crypto/buffer/buffer.c
+  $(OPENSSL_PATH)/crypto/buffer/buf_str.c
+  $(OPENSSL_PATH)/crypto/buffer/buf_err.c
+  $(OPENSSL_PATH)/crypto/bio/bio_lib.c
+  $(OPENSSL_PATH)/crypto/bio/bio_cb.c
+  $(OPENSSL_PATH)/crypto/bio/bio_err.c
+  $(OPENSSL_PATH)/crypto/bio/bss_mem.c
+  $(OPENSSL_PATH)/crypto/bio/bss_null.c
+  $(OPENSSL_PATH)/crypto/bio/bss_fd.c
+  $(OPENSSL_PATH)/crypto/bio/bss_file.c
+  $(OPENSSL_PATH)/crypto/bio/bf_null.c
+  $(OPENSSL_PATH)/crypto/bio/bf_buff.c
+
+  #
+  # Not required for UEFI.
+  #
+  # $(OPENSSL_PATH)/crypto/bio/b_print.c
+  
+  $(OPENSSL_PATH)/crypto/bio/b_dump.c
+  $(OPENSSL_PATH)/crypto/bio/bf_nbio.c
+  $(OPENSSL_PATH)/crypto/bio/bss_log.c
+  $(OPENSSL_PATH)/crypto/bio/bss_bio.c
+  $(OPENSSL_PATH)/crypto/bio/bss_dgram.c
+  $(OPENSSL_PATH)/crypto/stack/stack.c
+  $(OPENSSL_PATH)/crypto/lhash/lhash.c
+  $(OPENSSL_PATH)/crypto/lhash/lh_stats.c
+  $(OPENSSL_PATH)/crypto/rand/md_rand.c
+  $(OPENSSL_PATH)/crypto/rand/randfile.c
+  $(OPENSSL_PATH)/crypto/rand/rand_lib.c
+  $(OPENSSL_PATH)/crypto/rand/rand_eng.c
+  $(OPENSSL_PATH)/crypto/rand/rand_err.c
+  $(OPENSSL_PATH)/crypto/rand/rand_egd.c
+  $(OPENSSL_PATH)/crypto/rand/rand_win.c
+  $(OPENSSL_PATH)/crypto/rand/rand_unix.c
+  $(OPENSSL_PATH)/crypto/rand/rand_os2.c
+  $(OPENSSL_PATH)/crypto/rand/rand_nw.c
+  $(OPENSSL_PATH)/crypto/err/err.c
+  $(OPENSSL_PATH)/crypto/err/err_def.c
+  $(OPENSSL_PATH)/crypto/err/err_all.c
+  $(OPENSSL_PATH)/crypto/err/err_prn.c
+  $(OPENSSL_PATH)/crypto/err/err_str.c
+  $(OPENSSL_PATH)/crypto/err/err_bio.c
+  $(OPENSSL_PATH)/crypto/objects/o_names.c
+  $(OPENSSL_PATH)/crypto/objects/obj_dat.c
+  $(OPENSSL_PATH)/crypto/objects/obj_lib.c
+  $(OPENSSL_PATH)/crypto/objects/obj_err.c
+  $(OPENSSL_PATH)/crypto/evp/encode.c
+  $(OPENSSL_PATH)/crypto/evp/digest.c
+  $(OPENSSL_PATH)/crypto/evp/dig_eng.c
+  $(OPENSSL_PATH)/crypto/evp/evp_enc.c
+  $(OPENSSL_PATH)/crypto/evp/evp_key.c
+  $(OPENSSL_PATH)/crypto/evp/evp_acnf.c
+  $(OPENSSL_PATH)/crypto/evp/evp_cnf.c
+  $(OPENSSL_PATH)/crypto/evp/e_des.c
+  $(OPENSSL_PATH)/crypto/evp/e_bf.c
+  $(OPENSSL_PATH)/crypto/evp/e_idea.c
+  $(OPENSSL_PATH)/crypto/evp/e_des3.c
+  $(OPENSSL_PATH)/crypto/evp/e_rc4.c
+  $(OPENSSL_PATH)/crypto/evp/e_aes.c
+  $(OPENSSL_PATH)/crypto/evp/names.c
+  $(OPENSSL_PATH)/crypto/evp/e_xcbc_d.c
+  $(OPENSSL_PATH)/crypto/evp/e_rc2.c
+  $(OPENSSL_PATH)/crypto/evp/e_cast.c
+  $(OPENSSL_PATH)/crypto/evp/e_rc5.c
+  $(OPENSSL_PATH)/crypto/evp/enc_min.c
+  $(OPENSSL_PATH)/crypto/evp/m_null.c
+  $(OPENSSL_PATH)/crypto/evp/m_md2.c
+  $(OPENSSL_PATH)/crypto/evp/m_md4.c
+  $(OPENSSL_PATH)/crypto/evp/m_md5.c
+  $(OPENSSL_PATH)/crypto/evp/m_sha.c
+  $(OPENSSL_PATH)/crypto/evp/m_sha1.c
+  $(OPENSSL_PATH)/crypto/evp/m_dss.c
+  $(OPENSSL_PATH)/crypto/evp/m_dss1.c
+  $(OPENSSL_PATH)/crypto/evp/m_ripemd.c
+  $(OPENSSL_PATH)/crypto/evp/m_ecdsa.c
+  $(OPENSSL_PATH)/crypto/evp/p_open.c
+  $(OPENSSL_PATH)/crypto/evp/p_seal.c
+  $(OPENSSL_PATH)/crypto/evp/p_sign.c
+  $(OPENSSL_PATH)/crypto/evp/p_verify.c
+  $(OPENSSL_PATH)/crypto/evp/p_lib.c
+  $(OPENSSL_PATH)/crypto/evp/p_enc.c
+  $(OPENSSL_PATH)/crypto/evp/p_dec.c
+  $(OPENSSL_PATH)/crypto/evp/bio_md.c
+  $(OPENSSL_PATH)/crypto/evp/bio_b64.c
+  $(OPENSSL_PATH)/crypto/evp/bio_enc.c
+  $(OPENSSL_PATH)/crypto/evp/evp_err.c
+  $(OPENSSL_PATH)/crypto/evp/e_null.c
+  $(OPENSSL_PATH)/crypto/evp/c_all.c
+  $(OPENSSL_PATH)/crypto/evp/c_allc.c
+  $(OPENSSL_PATH)/crypto/evp/c_alld.c
+  $(OPENSSL_PATH)/crypto/evp/evp_lib.c
+  $(OPENSSL_PATH)/crypto/evp/bio_ok.c
+  $(OPENSSL_PATH)/crypto/evp/evp_pkey.c
+  $(OPENSSL_PATH)/crypto/evp/evp_pbe.c
+  $(OPENSSL_PATH)/crypto/evp/p5_crpt.c
+  $(OPENSSL_PATH)/crypto/evp/p5_crpt2.c
+  $(OPENSSL_PATH)/crypto/evp/e_old.c
+  $(OPENSSL_PATH)/crypto/asn1/a_object.c
+  $(OPENSSL_PATH)/crypto/asn1/a_bitstr.c
+  $(OPENSSL_PATH)/crypto/asn1/a_utctm.c
+  $(OPENSSL_PATH)/crypto/asn1/a_gentm.c
+  $(OPENSSL_PATH)/crypto/asn1/a_time.c
+  $(OPENSSL_PATH)/crypto/asn1/a_int.c
+  $(OPENSSL_PATH)/crypto/asn1/a_octet.c
+  $(OPENSSL_PATH)/crypto/asn1/a_print.c
+  $(OPENSSL_PATH)/crypto/asn1/a_type.c
+  $(OPENSSL_PATH)/crypto/asn1/a_set.c
+  $(OPENSSL_PATH)/crypto/asn1/a_dup.c
+  $(OPENSSL_PATH)/crypto/asn1/a_d2i_fp.c
+  $(OPENSSL_PATH)/crypto/asn1/a_i2d_fp.c
+  $(OPENSSL_PATH)/crypto/asn1/a_enum.c
+  $(OPENSSL_PATH)/crypto/asn1/a_utf8.c
+  $(OPENSSL_PATH)/crypto/asn1/a_sign.c
+  $(OPENSSL_PATH)/crypto/asn1/a_digest.c
+  $(OPENSSL_PATH)/crypto/asn1/a_verify.c
+  $(OPENSSL_PATH)/crypto/asn1/a_mbstr.c
+  $(OPENSSL_PATH)/crypto/asn1/a_strex.c
+  $(OPENSSL_PATH)/crypto/asn1/x_algor.c
+  $(OPENSSL_PATH)/crypto/asn1/x_val.c
+  $(OPENSSL_PATH)/crypto/asn1/x_pubkey.c
+  $(OPENSSL_PATH)/crypto/asn1/x_sig.c
+  $(OPENSSL_PATH)/crypto/asn1/x_req.c
+  $(OPENSSL_PATH)/crypto/asn1/x_attrib.c
+  $(OPENSSL_PATH)/crypto/asn1/x_bignum.c
+  $(OPENSSL_PATH)/crypto/asn1/x_long.c
+  $(OPENSSL_PATH)/crypto/asn1/x_name.c
+  $(OPENSSL_PATH)/crypto/asn1/x_x509.c
+  $(OPENSSL_PATH)/crypto/asn1/x_x509a.c
+  $(OPENSSL_PATH)/crypto/asn1/x_crl.c
+  $(OPENSSL_PATH)/crypto/asn1/x_info.c
+  $(OPENSSL_PATH)/crypto/asn1/x_spki.c
+  $(OPENSSL_PATH)/crypto/asn1/nsseq.c
+  $(OPENSSL_PATH)/crypto/asn1/d2i_pu.c
+  $(OPENSSL_PATH)/crypto/asn1/d2i_pr.c
+  $(OPENSSL_PATH)/crypto/asn1/i2d_pu.c
+  $(OPENSSL_PATH)/crypto/asn1/i2d_pr.c
+  $(OPENSSL_PATH)/crypto/asn1/t_req.c
+  $(OPENSSL_PATH)/crypto/asn1/t_x509.c
+  $(OPENSSL_PATH)/crypto/asn1/t_x509a.c
+  $(OPENSSL_PATH)/crypto/asn1/t_crl.c
+  $(OPENSSL_PATH)/crypto/asn1/t_pkey.c
+  $(OPENSSL_PATH)/crypto/asn1/t_spki.c
+  $(OPENSSL_PATH)/crypto/asn1/t_bitst.c
+  $(OPENSSL_PATH)/crypto/asn1/tasn_new.c
+  $(OPENSSL_PATH)/crypto/asn1/tasn_fre.c
+  $(OPENSSL_PATH)/crypto/asn1/tasn_enc.c
+  $(OPENSSL_PATH)/crypto/asn1/tasn_dec.c
+  $(OPENSSL_PATH)/crypto/asn1/tasn_utl.c
+  $(OPENSSL_PATH)/crypto/asn1/tasn_typ.c
+  $(OPENSSL_PATH)/crypto/asn1/f_int.c
+  $(OPENSSL_PATH)/crypto/asn1/f_string.c
+  $(OPENSSL_PATH)/crypto/asn1/n_pkey.c
+  $(OPENSSL_PATH)/crypto/asn1/f_enum.c
+  $(OPENSSL_PATH)/crypto/asn1/a_hdr.c
+  $(OPENSSL_PATH)/crypto/asn1/x_pkey.c
+  $(OPENSSL_PATH)/crypto/asn1/a_bool.c
+  $(OPENSSL_PATH)/crypto/asn1/x_exten.c
+  $(OPENSSL_PATH)/crypto/asn1/asn_mime.c
+  $(OPENSSL_PATH)/crypto/asn1/asn1_gen.c
+  $(OPENSSL_PATH)/crypto/asn1/asn1_par.c
+  $(OPENSSL_PATH)/crypto/asn1/asn1_lib.c
+  $(OPENSSL_PATH)/crypto/asn1/asn1_err.c
+  $(OPENSSL_PATH)/crypto/asn1/a_meth.c
+  $(OPENSSL_PATH)/crypto/asn1/a_bytes.c
+  $(OPENSSL_PATH)/crypto/asn1/a_strnid.c
+  $(OPENSSL_PATH)/crypto/asn1/evp_asn1.c
+  $(OPENSSL_PATH)/crypto/asn1/asn_pack.c
+  $(OPENSSL_PATH)/crypto/asn1/p5_pbe.c
+  $(OPENSSL_PATH)/crypto/asn1/p5_pbev2.c
+  $(OPENSSL_PATH)/crypto/asn1/p8_pkey.c
+  $(OPENSSL_PATH)/crypto/asn1/asn_moid.c
+  $(OPENSSL_PATH)/crypto/pem/pem_sign.c
+  $(OPENSSL_PATH)/crypto/pem/pem_seal.c
+  $(OPENSSL_PATH)/crypto/pem/pem_info.c
+  $(OPENSSL_PATH)/crypto/pem/pem_lib.c
+  $(OPENSSL_PATH)/crypto/pem/pem_all.c
+  $(OPENSSL_PATH)/crypto/pem/pem_err.c
+  $(OPENSSL_PATH)/crypto/pem/pem_x509.c
+  $(OPENSSL_PATH)/crypto/pem/pem_xaux.c
+  $(OPENSSL_PATH)/crypto/pem/pem_oth.c
+  $(OPENSSL_PATH)/crypto/pem/pem_pk8.c
+  $(OPENSSL_PATH)/crypto/pem/pem_pkey.c
+  $(OPENSSL_PATH)/crypto/x509/x509_def.c
+  $(OPENSSL_PATH)/crypto/x509/x509_d2.c
+  $(OPENSSL_PATH)/crypto/x509/x509_r2x.c
+  $(OPENSSL_PATH)/crypto/x509/x509_cmp.c
+  $(OPENSSL_PATH)/crypto/x509/x509_obj.c
+  $(OPENSSL_PATH)/crypto/x509/x509_req.c
+  $(OPENSSL_PATH)/crypto/x509/x509spki.c
+  $(OPENSSL_PATH)/crypto/x509/x509_vfy.c
+  $(OPENSSL_PATH)/crypto/x509/x509_set.c
+  $(OPENSSL_PATH)/crypto/x509/x509cset.c
+  $(OPENSSL_PATH)/crypto/x509/x509rset.c
+  $(OPENSSL_PATH)/crypto/x509/x509_err.c
+  $(OPENSSL_PATH)/crypto/x509/x509name.c
+  $(OPENSSL_PATH)/crypto/x509/x509_v3.c
+  $(OPENSSL_PATH)/crypto/x509/x509_ext.c
+  $(OPENSSL_PATH)/crypto/x509/x509_att.c
+  $(OPENSSL_PATH)/crypto/x509/x509type.c
+  $(OPENSSL_PATH)/crypto/x509/x509_lu.c
+  $(OPENSSL_PATH)/crypto/x509/x_all.c
+  $(OPENSSL_PATH)/crypto/x509/x509_txt.c
+  $(OPENSSL_PATH)/crypto/x509/x509_trs.c
+  $(OPENSSL_PATH)/crypto/x509/by_file.c
+  $(OPENSSL_PATH)/crypto/x509/by_dir.c
+  $(OPENSSL_PATH)/crypto/x509/x509_vpm.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_bcons.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_bitst.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_conf.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_extku.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_ia5.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_lib.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_prn.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_utl.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3err.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_genn.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_alt.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_skey.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_akey.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_pku.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_int.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_enum.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_sxnet.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_cpols.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_crld.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_purp.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_info.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_ocsp.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_akeya.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_pmaps.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_pcons.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_ncons.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_pcia.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_pci.c
+  $(OPENSSL_PATH)/crypto/x509v3/pcy_cache.c
+  $(OPENSSL_PATH)/crypto/x509v3/pcy_node.c
+  $(OPENSSL_PATH)/crypto/x509v3/pcy_data.c
+  $(OPENSSL_PATH)/crypto/x509v3/pcy_map.c
+  $(OPENSSL_PATH)/crypto/x509v3/pcy_tree.c
+  $(OPENSSL_PATH)/crypto/x509v3/pcy_lib.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_asid.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_addr.c
+  $(OPENSSL_PATH)/crypto/conf/conf_err.c
+  $(OPENSSL_PATH)/crypto/conf/conf_lib.c
+  $(OPENSSL_PATH)/crypto/conf/conf_api.c
+  $(OPENSSL_PATH)/crypto/conf/conf_def.c
+  $(OPENSSL_PATH)/crypto/conf/conf_mod.c
+  $(OPENSSL_PATH)/crypto/conf/conf_mall.c
+  $(OPENSSL_PATH)/crypto/conf/conf_sap.c
+  $(OPENSSL_PATH)/crypto/txt_db/txt_db.c
+  $(OPENSSL_PATH)/crypto/pkcs7/pk7_asn1.c
+  $(OPENSSL_PATH)/crypto/pkcs7/pk7_lib.c
+  $(OPENSSL_PATH)/crypto/pkcs7/pkcs7err.c
+  $(OPENSSL_PATH)/crypto/pkcs7/pk7_doit.c
+  $(OPENSSL_PATH)/crypto/pkcs7/pk7_smime.c
+  $(OPENSSL_PATH)/crypto/pkcs7/pk7_attr.c
+  $(OPENSSL_PATH)/crypto/pkcs7/pk7_mime.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_add.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_asn.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_attr.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_crpt.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_crt.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_decr.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_init.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_key.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_kiss.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_mutl.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_utl.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_npas.c
+  $(OPENSSL_PATH)/crypto/pkcs12/pk12err.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_p8d.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_p8e.c
+  $(OPENSSL_PATH)/crypto/comp/comp_lib.c
+  $(OPENSSL_PATH)/crypto/comp/comp_err.c
+  $(OPENSSL_PATH)/crypto/comp/c_rle.c
+  $(OPENSSL_PATH)/crypto/comp/c_zlib.c
+  $(OPENSSL_PATH)/crypto/engine/eng_err.c
+  $(OPENSSL_PATH)/crypto/engine/eng_lib.c
+  $(OPENSSL_PATH)/crypto/engine/eng_list.c
+  $(OPENSSL_PATH)/crypto/engine/eng_init.c
+  $(OPENSSL_PATH)/crypto/engine/eng_ctrl.c
+  $(OPENSSL_PATH)/crypto/engine/eng_table.c
+  $(OPENSSL_PATH)/crypto/engine/eng_pkey.c
+  $(OPENSSL_PATH)/crypto/engine/eng_fat.c
+  $(OPENSSL_PATH)/crypto/engine/eng_all.c
+  $(OPENSSL_PATH)/crypto/engine/tb_rsa.c
+  $(OPENSSL_PATH)/crypto/engine/tb_dsa.c
+  $(OPENSSL_PATH)/crypto/engine/tb_ecdsa.c
+  $(OPENSSL_PATH)/crypto/engine/tb_dh.c
+  $(OPENSSL_PATH)/crypto/engine/tb_ecdh.c
+  $(OPENSSL_PATH)/crypto/engine/tb_rand.c
+  $(OPENSSL_PATH)/crypto/engine/tb_store.c
+  $(OPENSSL_PATH)/crypto/engine/tb_cipher.c
+  $(OPENSSL_PATH)/crypto/engine/tb_digest.c
+  $(OPENSSL_PATH)/crypto/engine/eng_openssl.c
+  $(OPENSSL_PATH)/crypto/engine/eng_cnf.c
+  $(OPENSSL_PATH)/crypto/engine/eng_dyn.c
+  $(OPENSSL_PATH)/crypto/engine/eng_cryptodev.c
+  $(OPENSSL_PATH)/crypto/engine/eng_padlock.c
+  $(OPENSSL_PATH)/crypto/ocsp/ocsp_asn.c
+  $(OPENSSL_PATH)/crypto/ocsp/ocsp_ext.c
+  $(OPENSSL_PATH)/crypto/ocsp/ocsp_ht.c
+  $(OPENSSL_PATH)/crypto/ocsp/ocsp_lib.c
+  $(OPENSSL_PATH)/crypto/ocsp/ocsp_cl.c
+  $(OPENSSL_PATH)/crypto/ocsp/ocsp_srv.c
+  $(OPENSSL_PATH)/crypto/ocsp/ocsp_prn.c
+  $(OPENSSL_PATH)/crypto/ocsp/ocsp_vfy.c
+  $(OPENSSL_PATH)/crypto/ocsp/ocsp_err.c
+  $(OPENSSL_PATH)/crypto/ui/ui_err.c
+  $(OPENSSL_PATH)/crypto/ui/ui_lib.c
+
+  #
+  # Not required when OPENSSL_NO_STDIO is set, which is is for UEFI.
+  #
+  # $(OPENSSL_PATH)/crypto/ui/ui_openssl.c
+
+  $(OPENSSL_PATH)/crypto/ui/ui_util.c
+  $(OPENSSL_PATH)/crypto/ui/ui_compat.c
+  $(OPENSSL_PATH)/crypto/krb5/krb5_asn.c
+  $(OPENSSL_PATH)/crypto/store/str_err.c
+  $(OPENSSL_PATH)/crypto/store/str_lib.c
+  $(OPENSSL_PATH)/crypto/store/str_meth.c
+  $(OPENSSL_PATH)/crypto/store/str_mem.c
+  $(OPENSSL_PATH)/crypto/pqueue/pqueue.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  DebugLib
+
+[BuildOptions]
+   #
+   # Override MSFT build option to remove /W4 (to silence warning messages when building OpenSSL).
+   #
+   MSFT:DEBUG_VS2003_IA32_CC_FLAGS        == /nologo /c /WX /Gs32768 /Gy /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /GX- /Zi /Gm -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w -DTHIRTY_TWO_BIT
+   MSFT:RELEASE_VS2003_IA32_CC_FLAGS      == /nologo /c /WX /Gs32768 /Gy /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /GX- -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w  -DTHIRTY_TWO_BIT
+   MSFT:DEBUG_VS2003xASL_IA32_CC_FLAGS    == /nologo /c /WX /Gs32768 /Gy /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /GX- /Zi /Gm -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w -DTHIRTY_TWO_BIT
+   MSFT:RELEASE_VS2003xASL_IA32_CC_FLAGS  == /nologo /c /WX /Gs32768 /Gy /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /GX- -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w -DTHIRTY_TWO_BIT
+   MSFT:DEBUG_DDK3790_IA32_CC_FLAGS       == /nologo /c /WX /Gy /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w -DTHIRTY_TWO_BIT
+   MSFT:RELEASE_DDK3790_IA32_CC_FLAGS     == /nologo /c /WX /Gy /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w -DTHIRTY_TWO_BIT
+   MSFT:DEBUG_DDK3790xASL_IA32_CC_FLAGS   == /nologo /c /WX /Gy /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w -DTHIRTY_TWO_BIT
+   MSFT:RELEASE_DDK3790xASL_IA32_CC_FLAGS == /nologo /c /WX /Gy /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w -DTHIRTY_TWO_BIT
+   MSFT:DEBUG_*_IA32_CC_FLAGS             == /nologo /c /WX /GS- /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w -DTHIRTY_TWO_BIT
+   MSFT:RELEASE_*_IA32_CC_FLAGS           == /nologo /c /WX /GS- /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w -DTHIRTY_TWO_BIT
+   MSFT:NOOPT_*_IA32_CC_FLAGS             == /nologo /c /WX /GS- /Gs32768 /D UNICODE /Od /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w -DTHIRTY_TWO_BIT
+   MSFT:DEBUG_*_X64_CC_FLAGS              == /nologo /c /WX /GS- /X /Gs32768 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w -DSIXTY_FOUR_BIT
+   MSFT:RELEASE_*_X64_CC_FLAGS            == /nologo /c /WX /GS- /X /Gs32768 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w -DSIXTY_FOUR_BIT
+   MSFT:NOOPT_*_X64_CC_FLAGS              == /nologo /c /WX /GS- /X /Gs32768 /D UNICODE /Od /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w -DSIXTY_FOUR_BIT
+   MSFT:DEBUG_*_IPF_CC_FLAGS              == /nologo /c /WX /GS- /X /EHs-c- /GR- /Gy /Os /GL /FIAutoGen.h /QIPF_fr32 /Zi -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w -DSIXTY_FOUR_BIT
+   MSFT:RELEASE_*_IPF_CC_FLAGS            == /nologo /c /WX /GS- /X /EHs-c- /GR- /Gy /Os /GL /FIAutoGen.h /QIPF_fr32 -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w -DSIXTY_FOUR_BIT
+   MSFT:NOOPT_*_IPF_CC_FLAGS              == /nologo /c /WX /GS- /X /EHs-c- /GR- /Gy /Od /FIAutoGen.h /QIPF_fr32 /Zi -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w -DSIXTY_FOUR_BIT
+   INTEL:*_*_IA32_CC_FLAGS                = -U_WIN32 -U_WIN64 -U_MSC_VER -U__ICC $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w -DTHIRTY_TWO_BIT
+   INTEL:*_*_X64_CC_FLAGS                 = -U_WIN32 -U_WIN64 -U_MSC_VER -U__ICC $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w -DSIXTY_FOUR_BIT
+   INTEL:*_*_IPF_CC_FLAGS                 = -U_WIN32 -U_WIN64 -U_MSC_VER -U__ICC $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) /w -DSIXTY_FOUR_BIT
+   GCC:*_*_IA32_CC_FLAGS                  = -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) -w -DTHIRTY_TWO_BIT
+   GCC:*_*_X64_CC_FLAGS                   = -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) -w -DSIXTY_FOUR_BIT
+   GCC:*_*_IPF_CC_FLAGS                   = -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) -w -DSIXTY_FOUR_BIT
+   RVCT:*_*_IA32_CC_FLAGS                 = $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) --library_interface=aeabi_clib99 --fpu=vfpv3 -DTHIRTY_TWO_BIT
+   RVCT:*_*_X64_CC_FLAGS                  = $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) --library_interface=aeabi_clib99 --fpu=vfpv3 -DSIXTY_FOUR_BIT
+   RVCT:*_*_IPF_CC_FLAGS                  = $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) --library_interface=aeabi_clib99 --fpu=vfpv3 -DSIXTY_FOUR_BIT

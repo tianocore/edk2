@@ -1,0 +1,61 @@
+
+================================================================================
+                                 Introduction
+================================================================================
+  OpenSSL is a well-known open source implementation of SSL and TLS protocols.
+The core library implements the basic cryptographic functions and provides various
+utility functions. The OpenSSL library is widely used in variety of security 
+products development as base crypto provider. (See http://www.openssl.org for more 
+information for OpenSSL).
+  UEFI (Unified Extensible Firmware Interface) is a specification detailing the 
+interfaces between OS and platform firmware. Several security features were 
+introduced (e.g. Authenticated Variable Service, Driver Signing, etc) from UEFI 
+2.2 (http://www.uefi.org). These security features highly depends on the 
+cryptography. This patch will enable openssl building under UEFI environment.
+
+
+================================================================================
+                                OpenSSL-Version
+================================================================================
+  Current supported OpenSSL version for UEFI Crypto Library is 0.9.8w.
+    http://www.openssl.org/source/openssl-0.9.8w.tar.gz
+
+
+================================================================================
+                      HOW to Install Openssl for UEFI Building
+================================================================================
+1.  Download OpenSSL 0.9.8w from official website:
+   	http://www.openssl.org/source/openssl-0.9.8w.tar.gz
+
+    NOTE: Some web browsers may rename the downloaded TAR file to openssl-0.9.8w.tar.tar.
+          When you do the download, rename the "openssl-0.9.8w.tar.tar" to
+          "openssl-0.9.8w.tar.gz" or rename the local downloaded file with ".tar.tar"
+          extension to ".tar.gz".
+
+2.  Extract TAR into CryptoPkg/Library/OpenSslLib/openssl-0.9.8w
+
+    NOTE: If you use WinZip to unpack the openssl source in Windows, please 
+          uncheck the WinZip smart CR/LF conversion option (WINZIP: Options --> 
+          Configuration --> Miscellaneous --> "TAR file smart CR/LF conversion").
+  
+3.  Apply this patch: EDKII_openssl-0.9.8w.patch, and make installation
+
+    For Windows Environment:
+    ------------------------
+    1) Make sure the patch utility has been installed in your machine.
+       Install Cygwin or get the patch utility binary from 
+          http://gnuwin32.sourceforge.net/packages/patch.htm
+    2) cd $(WORKSPACE)\CryptoPkg\Library\OpensslLib\openssl-0.9.8w
+    3) patch -p0 -i ..\EDKII_openssl-0.9.8w.patch
+    4) cd ..
+    5) Install.cmd
+
+    For Linux* Environment:
+    -----------------------
+    1) Make sure the patch utility has been installed in your machine.
+       Patch utility is available from http://directory.fsf.org/project/patch/
+    2) cd $(WORKSPACE)/CryptoPkg/Library/OpensslLib/openssl-0.9.8w
+    3) patch -p0 -i ../EDKII_openssl-0.9.8w.patch
+    4) cd ..
+    5) ./Install.sh
+

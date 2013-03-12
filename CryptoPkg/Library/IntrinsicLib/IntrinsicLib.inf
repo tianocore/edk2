@@ -1,0 +1,72 @@
+## @file
+#  Intrinsic Routines Wrapper Library Instance.
+#
+#  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseIntrinsicLib
+  FILE_GUID                      = 63850097-3E97-4c4f-A52D-C811A0106105
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = IntrinsicLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#
+
+[Sources]
+  MemoryIntrinsics.c
+
+[Sources.IA32]
+  CopyMem.c
+
+[Sources.X64]
+  CopyMem.c
+
+[Sources.IPF]
+  CopyMem.c | MSFT
+  CopyMem.c | INTEL
+#
+# In tools_def.txt, GCC rename symbol name memcpy to be CopyMem for IPF,
+# i.e. "DEFINE GCC_IPF_SYMRENAME_FLAGS     = --redefine-sym memcpy=CopyMem",
+# so there will be no source file CopyMem.c for GCC compiler family.
+#
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+
+[BuildOptions]
+   #
+   # Override MSFT build option to remove /Oi and /GL
+   #
+   MSFT:DEBUG_VS2003_IA32_CC_FLAGS        == /nologo /c /WX /W4 /Gs32768 /Gy /D UNICODE /O1b2 /FIAutoGen.h /EHs-c- /GR- /GF /GX- /Zi /Gm
+   MSFT:RELEASE_VS2003_IA32_CC_FLAGS      == /nologo /c /WX /W4 /Gs32768 /Gy /D UNICODE /O1b2 /FIAutoGen.h /EHs-c- /GR- /GF /GX-
+   MSFT:DEBUG_VS2003xASL_IA32_CC_FLAGS    == /nologo /c /WX /W4 /Gs32768 /Gy /D UNICODE /O1b2 /FIAutoGen.h /EHs-c- /GR- /GF /GX- /Zi /Gm
+   MSFT:RELEASE_VS2003xASL_IA32_CC_FLAGS  == /nologo /c /WX /W4 /Gs32768 /Gy /D UNICODE /O1b2 /FIAutoGen.h /EHs-c- /GR- /GF /GX-
+   MSFT:DEBUG_DDK3790_IA32_CC_FLAGS       == /nologo /c /WX /Gy /Gs32768 /D UNICODE /O1b2 /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
+   MSFT:RELEASE_DDK3790_IA32_CC_FLAGS     == /nologo /c /WX /Gy /Gs32768 /D UNICODE /O1b2 /FIAutoGen.h /EHs-c- /GR- /GF
+   MSFT:DEBUG_DDK3790xASL_IA32_CC_FLAGS   == /nologo /c /WX /Gy /Gs32768 /D UNICODE /O1b2 /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
+   MSFT:RELEASE_DDK3790xASL_IA32_CC_FLAGS == /nologo /c /WX /Gy /Gs32768 /D UNICODE /O1b2 /FIAutoGen.h /EHs-c- /GR- /GF
+   MSFT:DEBUG_*_IA32_CC_FLAGS             == /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
+   MSFT:RELEASE_*_IA32_CC_FLAGS           == /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /FIAutoGen.h /EHs-c- /GR- /GF
+   MSFT:DEBUG_*_X64_CC_FLAGS              == /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /O1b2s /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
+   MSFT:RELEASE_*_X64_CC_FLAGS            == /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /O1b2s /Gy /FIAutoGen.h /EHs-c- /GR- /GF
+   MSFT:DEBUG_*_IPF_CC_FLAGS              == /nologo /c /WX /GS- /X /W4 /EHs-c- /GR- /Gy /Os /FIAutoGen.h /QIPF_fr32 /Zi
+   MSFT:RELEASE_*_IPF_CC_FLAGS            == /nologo /c /WX /GS- /X /W4 /EHs-c- /GR- /Gy /Os /FIAutoGen.h /QIPF_fr32
+  INTEL:*_*_*_CC_FLAGS                    =  /Oi-
+    GCC:*_*_*_CC_FLAGS                    =  -fno-builtin
