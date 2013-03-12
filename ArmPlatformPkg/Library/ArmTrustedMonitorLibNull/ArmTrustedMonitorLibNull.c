@@ -30,8 +30,9 @@ ArmSecureMonitorWorldInitialize (
   )
 {
   // Ensure the Monitor Table is 32bit aligned
-  ASSERT (IS_ALIGNED(MonitorVectorTable, BIT5));
+  ASSERT (((UINTN)&MonitorVectorTable & ARM_VECTOR_TABLE_ALIGNMENT) == 0);
 
   // Write the Monitor Mode Vector Table Address
   ArmWriteMVBar ((UINTN) &MonitorVectorTable);
 }
+

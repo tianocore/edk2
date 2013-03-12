@@ -20,12 +20,14 @@
   MODULE_TYPE                    = SEC
   VERSION_STRING                 = 1.0
 
-[Sources.ARM]
-  Helper.asm           | RVCT
-  Helper.S             | GCC
+[Sources]
   Sec.c
-  SecEntryPoint.S      | GCC
-  SecEntryPoint.asm    | RVCT
+
+[Sources.ARM]
+  Arm/Helper.asm           | RVCT
+  Arm/Helper.S             | GCC
+  Arm/SecEntryPoint.S      | GCC
+  Arm/SecEntryPoint.asm    | RVCT
   
 [Packages]
   MdePkg/MdePkg.dec

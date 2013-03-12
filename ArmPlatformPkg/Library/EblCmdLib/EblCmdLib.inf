@@ -29,8 +29,10 @@
 
 [Sources.common]
   EblCmdLib.c
-  EblCmdMmu.c
   EblCmdFdt.c
+
+[Sources.ARM]
+  Arm/EblCmdMmu.c
 
 [Packages]
   MdePkg/MdePkg.dec

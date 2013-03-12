@@ -74,4 +74,10 @@ SecondaryMain (
   IN UINTN MpId
   );
 
+VOID
+PeiCommonExceptionEntry (
+  IN UINT32 Entry,
+  IN UINTN LR
+  );
+
 #endif

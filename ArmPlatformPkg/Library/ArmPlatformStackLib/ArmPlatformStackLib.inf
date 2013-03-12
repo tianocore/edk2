@@ -26,9 +26,9 @@
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
 
-[Sources.common]
-  ArmPlatformStackLib.asm     | RVCT
-  ArmPlatformStackLib.S       | GCC
+[Sources.ARM]
+  Arm/ArmPlatformStackLib.asm     | RVCT
+  Arm/ArmPlatformStackLib.S       | GCC
 
 [FixedPcd]
   gArmPlatformTokenSpaceGuid.PcdCoreCount

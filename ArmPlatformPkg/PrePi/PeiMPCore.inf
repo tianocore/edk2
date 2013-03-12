@@ -19,11 +19,13 @@
   MODULE_TYPE                    = SEC
   VERSION_STRING                 = 1.0
 
-[Sources.ARM]
+[Sources]
   PrePi.c
-  ModuleEntryPoint.S   | GCC
-  ModuleEntryPoint.asm | RVCT
   MainMPCore.c
+
+[Sources.ARM]
+  Arm/ModuleEntryPoint.S   | GCC
+  Arm/ModuleEntryPoint.asm | RVCT
   
 [Packages]
   MdePkg/MdePkg.dec

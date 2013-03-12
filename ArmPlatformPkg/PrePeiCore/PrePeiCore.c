@@ -1,7 +1,7 @@
 /** @file
 *  Main file supporting the transition to PEI Core in Normal World for Versatile Express
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -15,9 +15,7 @@
 
 #include <Library/BaseLib.h>
 #include <Library/DebugAgentLib.h>
-#include <Library/PrintLib.h>
 #include <Library/ArmLib.h>
-#include <Library/SerialPortLib.h>
 
 #include <Ppi/ArmGlobalVariable.h>
 
@@ -74,10 +72,10 @@ CEntryPoint (
   )
 {
   //Clean Data cache
-  ArmCleanInvalidateDataCache();
+  ArmCleanInvalidateDataCache ();
 
   //Invalidate instruction cache
-  ArmInvalidateInstructionCache();
+  ArmInvalidateInstructionCache ();
 
   // Enable Instruction & Data caches
   ArmEnableDataCache ();
@@ -88,9 +86,9 @@ CEntryPoint (
   // as Non-secure interface is already enabled in Secure world.
   //
 
-  // Write VBAR - The Vector table must be 32-byte aligned
-  ASSERT(((UINT32)PeiVectorTable & ((1 << 5)-1)) == 0);
-  ArmWriteVBar((UINT32)PeiVectorTable);
+  // Write VBAR - The Exception Vector table must be aligned to its requirement
+  ASSERT (((UINTN)PeiVectorTable & ARM_VECTOR_TABLE_ALIGNMENT) == 0);
+  ArmWriteVBar ((UINTN)PeiVectorTable);
 
   //Note: The MMU will be enabled by MemoryPeim. Only the primary core will have the MMU on.
 
@@ -162,44 +160,3 @@ PrePeiCoreGetGlobalVariableMemory (
   return EFI_SUCCESS;
 }
 
-VOID
-PeiCommonExceptionEntry (
-  IN UINT32 Entry,
-  IN UINT32 LR
-  )
-{
-  CHAR8           Buffer[100];
-  UINTN           CharCount;
-
-  switch (Entry) {
-  case 0:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"Reset Exception at 0x%X\n\r",LR);
-    break;
-  case 1:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"Undefined Exception at 0x%X\n\r",LR);
-    break;
-  case 2:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"SWI Exception at 0x%X\n\r",LR);
-    break;
-  case 3:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"PrefetchAbort Exception at 0x%X\n\r",LR);
-    break;
-  case 4:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"DataAbort Exception at 0x%X\n\r",LR);
-    break;
-  case 5:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"Reserved Exception at 0x%X\n\r",LR);
-    break;
-  case 6:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"IRQ Exception at 0x%X\n\r",LR);
-    break;
-  case 7:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"FIQ Exception at 0x%X\n\r",LR);
-    break;
-  default:
-    CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"Unknown Exception at 0x%X\n\r",LR);
-    break;
-  }
-  SerialPortWrite ((UINT8 *) Buffer, CharCount);
-  while(1);
-}

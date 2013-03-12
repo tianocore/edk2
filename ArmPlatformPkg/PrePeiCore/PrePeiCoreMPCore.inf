@@ -20,16 +20,19 @@
   MODULE_TYPE                    = SEC
   VERSION_STRING                 = 1.0
 
-[Sources.ARM]
-  PrePeiCoreEntryPoint.asm | RVCT
-  PrePeiCoreEntryPoint.S   | GCC
-  PrePeiCore.c
+[Sources.common]
   MainMPCore.c
-  SwitchStack.asm      | RVCT
-  SwitchStack.S        | GCC
-  Exception.asm        | RVCT
-  Exception.S          | GCC
-  
+  PrePeiCore.c
+
+[Sources.ARM]
+  Arm/ArchPrePeiCore.c
+  Arm/PrePeiCoreEntryPoint.asm | RVCT
+  Arm/PrePeiCoreEntryPoint.S   | GCC
+  Arm/SwitchStack.asm      | RVCT
+  Arm/SwitchStack.S        | GCC
+  Arm/Exception.asm        | RVCT
+  Arm/Exception.S          | GCC
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
