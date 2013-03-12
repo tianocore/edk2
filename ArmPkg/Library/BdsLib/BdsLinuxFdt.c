@@ -104,6 +104,23 @@ DebugDumpFdt (
   UINTN shift;
   UINT32 version;
 
+  {
+    // Can 'memreserve' be printed by below code?
+    INTN num = fdt_num_mem_rsv(FdtBlob);
+    INTN i, err;
+    UINT64 addr = 0,size = 0;
+
+    for (i = 0; i < num; i++) {
+      err = fdt_get_mem_rsv(FdtBlob, i, &addr, &size);
+      if (err) {
+        DEBUG((EFI_D_ERROR, "Error (%d) : Cannot get memreserve section (%d)\n", err, i));
+      }
+      else {
+        Print(L"/memreserve/ \t0x%lx \t0x%lx;\n",addr,size);
+      }
+    }
+  }
+
   depth = 0;
   shift = 4;
 
@@ -159,6 +176,25 @@ DebugDumpFdt (
   }
 }
 
+STATIC
+BOOLEAN
+IsLinuxReservedRegion (
+  IN EFI_MEMORY_TYPE MemoryType
+  )
+{
+  switch(MemoryType) {
+  case EfiRuntimeServicesCode:
+  case EfiRuntimeServicesData:
+  case EfiUnusableMemory:
+  case EfiACPIReclaimMemory:
+  case EfiACPIMemoryNVS:
+    return TRUE;
+  default:
+    return FALSE;
+  }
+}
+
+
 typedef struct {
   UINTN   Base;
   UINTN   Size;
@@ -195,6 +231,12 @@ PrepareFdt (
   UINT32                ClusterId;
   UINT32                CoreId;
   UINT64                CpuReleaseAddr;
+  UINTN                 MemoryMapSize;
+  EFI_MEMORY_DESCRIPTOR *MemoryMap;
+  UINTN                 MapKey;
+  UINTN                 DescriptorSize;
+  UINT32                DescriptorVersion;
+  UINTN                 Pages;
 
   err = fdt_check_header ((VOID*)(UINTN)(*FdtBlobBase));
   if (err != 0) {
@@ -259,7 +301,9 @@ PrepareFdt (
     }
   DEBUG_CODE_END();
 
+  //
   // Set Linux CmdLine
+  //
   if ((CommandLineArguments != NULL) && (AsciiStrLen (CommandLineArguments) > 0)) {
     err = fdt_setprop(fdt, node, "bootargs", CommandLineArguments, AsciiStrSize(CommandLineArguments));
     if (err) {
@@ -267,7 +311,9 @@ PrepareFdt (
     }
   }
 
+  //
   // Set Linux Initrd
+  //
   if (InitrdImageSize != 0) {
     InitrdImageStart = cpu_to_fdt64 (InitrdImage);
     err = fdt_setprop(fdt, node, "linux,initrd-start", &InitrdImageStart, sizeof(EFI_PHYSICAL_ADDRESS));
@@ -281,7 +327,9 @@ PrepareFdt (
     }
   }
 
+  //
   // Set Physical memory setup if does not exist
+  //
   node = fdt_subnode_offset(fdt, 0, "memory");
   if (node < 0) {
     // The 'memory' node does not exist, create it
@@ -308,7 +356,39 @@ PrepareFdt (
     }
   }
 
+  //
+  // Add the memory regions reserved by the UEFI Firmware
+  //
+
+  // Retrieve the UEFI Memory Map
+  MemoryMap = NULL;
+  MemoryMapSize = 0;
+  Status = gBS->GetMemoryMap (&MemoryMapSize, MemoryMap, &MapKey, &DescriptorSize, &DescriptorVersion);
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    Pages = EFI_SIZE_TO_PAGES (MemoryMapSize) + 1;
+    MemoryMap = AllocatePages (Pages);
+    Status = gBS->GetMemoryMap (&MemoryMapSize, MemoryMap, &MapKey, &DescriptorSize, &DescriptorVersion);
+  }
+
+  // Go through the list and add the reserved region to the Device Tree
+  if (!EFI_ERROR(Status)) {
+    for (Index = 0; Index < (MemoryMapSize / sizeof(EFI_MEMORY_DESCRIPTOR)); Index++) {
+      if (IsLinuxReservedRegion ((EFI_MEMORY_TYPE)MemoryMap[Index].Type)) {
+        DEBUG((DEBUG_VERBOSE, "Reserved region of type %d [0x%X, 0x%X]\n",
+            MemoryMap[Index].Type,
+            (UINTN)MemoryMap[Index].PhysicalStart,
+            (UINTN)(MemoryMap[Index].PhysicalStart + MemoryMap[Index].NumberOfPages * EFI_PAGE_SIZE)));
+        err = fdt_add_mem_rsv(fdt, MemoryMap[Index].PhysicalStart, MemoryMap[Index].NumberOfPages * EFI_PAGE_SIZE);
+        if (err != 0) {
+          Print(L"Warning: Fail to add 'memreserve' (err:%d)\n", err);
+        }
+      }
+    }
+  }
+
+  //
   // Setup Arm Mpcore Info if it is a multi-core or multi-cluster platforms
+  //
   for (Index=0; Index < gST->NumberOfTableEntries; Index++) {
     // Check for correct GUID type
     if (CompareGuid (&gArmMpCoreInfoGuid, &(gST->ConfigurationTable[Index].VendorGuid))) {
