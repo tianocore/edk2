@@ -26,8 +26,8 @@
   If Node is NULL, then ASSERT().
   If PcdVerifyNodeInList is TRUE and DoMembershipCheck is TRUE and Node 
   is in not a member of List, then return FALSE
-  If PcdMaximumLinkedListLenth is not zero, and List contains more than
-  PcdMaximumLinkedListLenth nodes, then ASSERT().
+  If PcdMaximumLinkedListLength is not zero, and List contains more than
+  PcdMaximumLinkedListLength nodes, then ASSERT().
 
   @param  List              A pointer to a node in a linked list.
   @param  Node              A pointer to a node in a linked list.
@@ -153,7 +153,7 @@ InitializeListHead (
   If Entry is NULL, then ASSERT().
   If ListHead was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or
   InitializeListHead(), then ASSERT().
-  If PcdMaximumLinkedListLenth is not zero, and prior to insertion the number
+  If PcdMaximumLinkedListLength is not zero, and prior to insertion the number
   of nodes in ListHead, including the ListHead node, is greater than or
   equal to PcdMaximumLinkedListLength, then ASSERT().
 
@@ -194,7 +194,7 @@ InsertHeadList (
   If Entry is NULL, then ASSERT().
   If ListHead was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or 
   InitializeListHead(), then ASSERT().
-  If PcdMaximumLinkedListLenth is not zero, and prior to insertion the number
+  If PcdMaximumLinkedListLength is not zero, and prior to insertion the number
   of nodes in ListHead, including the ListHead node, is greater than or
   equal to PcdMaximumLinkedListLength, then ASSERT().
 
@@ -234,7 +234,7 @@ InsertTailList (
   If List is NULL, then ASSERT().
   If List was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or 
   InitializeListHead(), then ASSERT().
-  If PcdMaximumLinkedListLenth is not zero, and the number of nodes
+  If PcdMaximumLinkedListLength is not zero, and the number of nodes
   in List, including the List node, is greater than or equal to
   PcdMaximumLinkedListLength, then ASSERT().
 
@@ -269,8 +269,8 @@ GetFirstNode (
   If Node is NULL, then ASSERT().
   If List was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or 
   InitializeListHead(), then ASSERT().
-  If PcdMaximumLinkedListLenth is not zero, and List contains more than
-  PcdMaximumLinkedListLenth nodes, then ASSERT().
+  If PcdMaximumLinkedListLength is not zero, and List contains more than
+  PcdMaximumLinkedListLength nodes, then ASSERT().
   If PcdVerifyNodeInList is TRUE and Node is not a node in List, then ASSERT().
 
   @param  List  A pointer to the head node of a doubly-linked list.
@@ -305,8 +305,8 @@ GetNextNode (
   If Node is NULL, then ASSERT().
   If List was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or 
   InitializeListHead(), then ASSERT().
-  If PcdMaximumLinkedListLenth is not zero, and List contains more than
-  PcdMaximumLinkedListLenth nodes, then ASSERT().
+  If PcdMaximumLinkedListLength is not zero, and List contains more than
+  PcdMaximumLinkedListLength nodes, then ASSERT().
   If PcdVerifyNodeInList is TRUE and Node is not a node in List, then ASSERT().
  
   @param  List  A pointer to the head node of a doubly-linked list.
@@ -339,7 +339,7 @@ GetPreviousNode (
   If ListHead is NULL, then ASSERT().
   If ListHead was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or 
   InitializeListHead(), then ASSERT().
-  If PcdMaximumLinkedListLenth is not zero, and the number of nodes
+  If PcdMaximumLinkedListLength is not zero, and the number of nodes
   in List, including the List node, is greater than or equal to
   PcdMaximumLinkedListLength, then ASSERT().
 
@@ -376,7 +376,7 @@ IsListEmpty (
   If Node is NULL, then ASSERT().
   If List was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or InitializeListHead(), 
   then ASSERT().
-  If PcdMaximumLinkedListLenth is not zero, and the number of nodes
+  If PcdMaximumLinkedListLength is not zero, and the number of nodes
   in List, including the List node, is greater than or equal to
   PcdMaximumLinkedListLength, then ASSERT().
   If PcdVerifyNodeInList is TRUE and Node is not a node in List and Node is not 
@@ -415,7 +415,7 @@ IsNull (
   If Node is NULL, then ASSERT().
   If List was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or
   InitializeListHead(), then ASSERT().
-  If PcdMaximumLinkedListLenth is not zero, and the number of nodes
+  If PcdMaximumLinkedListLength is not zero, and the number of nodes
   in List, including the List node, is greater than or equal to
   PcdMaximumLinkedListLength, then ASSERT().
   If PcdVerifyNodeInList is TRUE and Node is not a node in List, then ASSERT().

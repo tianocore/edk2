@@ -349,7 +349,7 @@ InternalSwitchStack (
   If List->ForwardLink is NULL, then ASSERT().
   If List->backLink is NULL, then ASSERT().
   If Node is NULL, then ASSERT();
-  If PcdMaximumLinkedListLenth is not zero, and prior to insertion the number
+  If PcdMaximumLinkedListLength is not zero, and prior to insertion the number
   of nodes in ListHead, including the ListHead node, is greater than or
   equal to PcdMaximumLinkedListLength, then ASSERT().
 
