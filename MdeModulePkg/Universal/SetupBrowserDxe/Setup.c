@@ -47,7 +47,7 @@ BOOLEAN               gResetRequired;
 EFI_HII_HANDLE        gHiiHandle;
 UINT16                gDirection;
 EFI_SCREEN_DESCRIPTOR gScreenDimensions;
-BROWSER_SETTING_SCOPE gBrowserSettingScope = FormSetLevel;
+BROWSER_SETTING_SCOPE gBrowserSettingScope = SystemLevel;
 BOOLEAN               mBrowserScopeFirstSet = TRUE;
 EXIT_HANDLER          ExitHandlerFunction = NULL;
 UINTN                 gFooterHeight;
@@ -559,66 +559,6 @@ BrowserCallback (
 }
 
 /**
-  Notify function will remove the formset in the maintain list 
-  once this formset is removed.
-  
-  Functions which are registered to receive notification of
-  database events have this prototype. The actual event is encoded
-  in NotifyType. The following table describes how PackageType,
-  PackageGuid, Handle, and Package are used for each of the
-  notification types.
-
-  @param PackageType  Package type of the notification.
-
-  @param PackageGuid  If PackageType is
-                      EFI_HII_PACKAGE_TYPE_GUID, then this is
-                      the pointer to the GUID from the Guid
-                      field of EFI_HII_PACKAGE_GUID_HEADER.
-                      Otherwise, it must be NULL.
-
-  @param Package  Points to the package referred to by the
-                  notification Handle The handle of the package
-                  list which contains the specified package.
-
-  @param Handle       The HII handle.
-
-  @param NotifyType   The type of change concerning the
-                      database. See
-                      EFI_HII_DATABASE_NOTIFY_TYPE.
-
-**/
-EFI_STATUS
-EFIAPI
-FormsetRemoveNotify (
-  IN UINT8                              PackageType,
-  IN CONST EFI_GUID                     *PackageGuid,
-  IN CONST EFI_HII_PACKAGE_HEADER       *Package,
-  IN EFI_HII_HANDLE                     Handle,
-  IN EFI_HII_DATABASE_NOTIFY_TYPE       NotifyType
-  )
-{
-  FORM_BROWSER_FORMSET *FormSet;
-
-  //
-  // Ignore the update for current using formset, which is handled by another notify function.
-  //
-  if (IsHiiHandleInBrowserContext (Handle)) {
-    return EFI_SUCCESS;
-  }
-  
-  //
-  // Remove the backup FormSet data when the Form Package is removed.
-  //
-  FormSet = GetFormSetFromHiiHandle (Handle);
-  if (FormSet != NULL) {
-    RemoveEntryList (&FormSet->Link);
-    DestroyFormSet (FormSet);
-  }
-  
-  return EFI_SUCCESS;
-}
-
-/**
   Initialize Setup Browser driver.
 
   @param ImageHandle     The image handle.
@@ -636,7 +576,6 @@ InitializeSetup (
   )
 {
   EFI_STATUS                  Status;
-  EFI_HANDLE                  NotifyHandle;
   EFI_INPUT_KEY               DefaultHotKey;
   EFI_STRING                  HelpString;
 
@@ -732,19 +671,6 @@ InitializeSetup (
                   EFI_NATIVE_INTERFACE,
                   &mPrivateData.FormBrowserEx
                   );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Register notify for Form package remove
-  //
-  Status = mHiiDatabase->RegisterPackageNotify (
-                           mHiiDatabase,
-                           EFI_HII_PACKAGE_FORMS,
-                           NULL,
-                           FormsetRemoveNotify,
-                           EFI_HII_DATABASE_NOTIFY_REMOVE_PACK,
-                           &NotifyHandle
-                           );
   ASSERT_EFI_ERROR (Status);
 
   return Status;
@@ -2259,6 +2185,52 @@ SendDiscardInfoToDriver (
 }
 
 /**
+  Validate the FormSet. If the formset is not validate, remove it from the list.
+
+  @param  FormSet                The input FormSet which need to validate.
+
+  @retval TRUE                   The handle is validate.
+  @retval FALSE                  The handle is invalidate.
+
+**/
+BOOLEAN
+ValidateFormSet (
+  FORM_BROWSER_FORMSET    *FormSet
+  )
+{
+  EFI_HII_HANDLE          *HiiHandles;
+  UINTN                   Index;
+  BOOLEAN                 Find;
+
+  ASSERT (FormSet != NULL);
+  Find = FALSE;
+  //
+  // Get all the Hii handles
+  //
+  HiiHandles = HiiGetHiiHandles (NULL);
+  ASSERT (HiiHandles != NULL);
+
+  //
+  // Search for formset of each class type
+  //
+  for (Index = 0; HiiHandles[Index] != NULL; Index++) {
+    if (HiiHandles[Index] == FormSet->HiiHandle) {
+      Find = TRUE;
+      break;
+    }
+  }
+
+  if (!Find) {
+    RemoveEntryList (&FormSet->Link);
+    DestroyFormSet (FormSet);
+  }
+
+  FreePool (HiiHandles);
+
+  return Find;
+}
+
+/**
   Discard data based on the input setting scope (Form, FormSet or System).
 
   @param  FormSet                FormSet data structure.
@@ -2365,8 +2337,11 @@ DiscardForm (
     Link = GetFirstNode (&gBrowserFormSetList);
     while (!IsNull (&gBrowserFormSetList, Link)) {
       LocalFormSet = FORM_BROWSER_FORMSET_FROM_LINK (Link);
-      DiscardForm (LocalFormSet, NULL, FormSetLevel);
       Link = GetNextNode (&gBrowserFormSetList, Link);
+      if (!ValidateFormSet(LocalFormSet)) {
+        continue;
+      }
+      DiscardForm (LocalFormSet, NULL, FormSetLevel);
       if (!IsHiiHandleInBrowserContext (LocalFormSet->HiiHandle)) {
         //
         // Remove maintain backup list after discard except for the current using FormSet.
@@ -2646,8 +2621,11 @@ SubmitForm (
     Link = GetFirstNode (&gBrowserFormSetList);
     while (!IsNull (&gBrowserFormSetList, Link)) {
       LocalFormSet = FORM_BROWSER_FORMSET_FROM_LINK (Link);
-      SubmitForm (LocalFormSet, NULL, FormSetLevel);
       Link = GetNextNode (&gBrowserFormSetList, Link);
+      if (!ValidateFormSet(LocalFormSet)) {
+        continue;
+      }
+      SubmitForm (LocalFormSet, NULL, FormSetLevel);
       if (!IsHiiHandleInBrowserContext (LocalFormSet->HiiHandle)) {
         //
         // Remove maintain backup list after save except for the current using FormSet.
@@ -3332,8 +3310,11 @@ ExtractDefault (
     Link = GetFirstNode (&gBrowserFormSetList);
     while (!IsNull (&gBrowserFormSetList, Link)) {
       LocalFormSet = FORM_BROWSER_FORMSET_FROM_LINK (Link);
-      ExtractDefault (LocalFormSet, NULL, DefaultId, FormSetLevel, GetDefaultValueScope, Storage, RetrieveValueFirst);
       Link = GetNextNode (&gBrowserFormSetList, Link);
+      if (!ValidateFormSet(LocalFormSet)) {
+        continue;
+      }
+      ExtractDefault (LocalFormSet, NULL, DefaultId, FormSetLevel, GetDefaultValueScope, Storage, RetrieveValueFirst);
     }
   }
 
@@ -4224,10 +4205,13 @@ GetFormSetFromHiiHandle (
   Link = GetFirstNode (&gBrowserFormSetList);
   while (!IsNull (&gBrowserFormSetList, Link)) {
     FormSet = FORM_BROWSER_FORMSET_FROM_LINK (Link);
+    Link = GetNextNode (&gBrowserFormSetList, Link);
+    if (!ValidateFormSet(FormSet)) {
+      continue;
+    }
     if (FormSet->HiiHandle == Handle) {
       return FormSet;
     }
-    Link = GetNextNode (&gBrowserFormSetList, Link);
   }
   
   return NULL;
@@ -4480,11 +4464,14 @@ SaveReminder (
   Link = GetFirstNode (&gBrowserFormSetList);
   while (!IsNull (&gBrowserFormSetList, Link)) {
     FormSet = FORM_BROWSER_FORMSET_FROM_LINK (Link);
+    Link = GetNextNode (&gBrowserFormSetList, Link);
+    if (!ValidateFormSet(FormSet)) {
+      continue;
+    }
     if (IsNvUpdateRequired (FormSet)) {
       IsDataChanged = TRUE;
       break;
     }
-    Link = GetNextNode (&gBrowserFormSetList, Link);
   }
   
   //
