@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -1518,6 +1518,22 @@ InternalLegacyBiosFarCall (
   IN  EFI_IA32_REGISTER_SET           *Regs,
   IN  VOID                            *Stack,
   IN  UINTN                           StackSize
+  );
+
+/**
+  Load a legacy PC-AT OpROM for VGA controller.
+
+  @param  Private                Driver private data.
+
+  @retval EFI_SUCCESS            Legacy ROM successfully installed for this device.
+  @retval EFI_DEVICE_ERROR       No VGA device handle found, or native EFI video
+                                 driver cannot be successfully disconnected, or VGA
+                                 thunk driver cannot be successfully connected.
+
+**/
+EFI_STATUS
+LegacyBiosInstallVgaRom (
+  IN  LEGACY_BIOS_INSTANCE            *Private
   );
 
 #endif
