@@ -305,8 +305,6 @@ SendForm (
   //
   InitializeBrowserStrings ();
 
-  gFunctionKeySetting = ENABLE_FUNCTION_KEY_SETTING;
-
   //
   // Ensure we are in Text mode
   //
@@ -4008,6 +4006,8 @@ InitializeFormSet (
       break;
     }
   }
+
+  gFunctionKeySetting = ENABLE_FUNCTION_KEY_SETTING;
 
   if ((gClassOfVfr & FORMSET_CLASS_FRONT_PAGE) == FORMSET_CLASS_FRONT_PAGE) {
     gFrontPageHandle = FormSet->HiiHandle;

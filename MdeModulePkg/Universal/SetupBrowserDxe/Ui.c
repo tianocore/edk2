@@ -3285,7 +3285,8 @@ UiDisplayMenu (
           // Check whether Key matches the registered hot key.
           //
           HotKey = NULL;
-          if ((gBrowserSettingScope == SystemLevel) || (gFunctionKeySetting != NONE_FUNCTION_KEY_SETTING)) {
+          if ((gBrowserSettingScope == SystemLevel) || 
+              (Selection->FormEditable && gFunctionKeySetting != NONE_FUNCTION_KEY_SETTING)) {
             HotKey = GetHotKeyFromRegisterList (&Key);
           }
           if (HotKey != NULL) {
