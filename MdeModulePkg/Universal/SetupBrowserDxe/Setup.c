@@ -47,7 +47,7 @@ BOOLEAN               gResetRequired;
 EFI_HII_HANDLE        gHiiHandle;
 UINT16                gDirection;
 EFI_SCREEN_DESCRIPTOR gScreenDimensions;
-BROWSER_SETTING_SCOPE gBrowserSettingScope = SystemLevel;
+BROWSER_SETTING_SCOPE gBrowserSettingScope = FormSetLevel;
 BOOLEAN               mBrowserScopeFirstSet = TRUE;
 EXIT_HANDLER          ExitHandlerFunction = NULL;
 UINTN                 gFooterHeight;
