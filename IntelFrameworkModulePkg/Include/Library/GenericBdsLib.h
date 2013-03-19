@@ -4,7 +4,7 @@
     2) BDS boot device connect interface.
     3) BDS Misc interfaces for mainting boot variable, ouput string.
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -528,30 +528,6 @@ BdsLibUpdateConsoleVariable (
 EFI_STATUS
 EFIAPI
 BdsLibConnectConsoleVariable (
-  IN  CHAR16                 *ConVarName
-  );
-
-/**
-  Connect the console device base on the variable ConVarName, if
-  device path of the ConVarName is multi-instance device path and
-  anyone of the instances is connected success, then this function
-  will return success. 
-  Dispatch service is not called when the handle associate with one 
-  device path node can not be created successfully. Here no driver 
-  dependency is assumed exist, so need not to call this service.
-
-  @param  ConVarName               Console related variable name, ConIn, ConOut,
-                                   ErrOut.
-
-  @retval EFI_NOT_FOUND            There is not any console devices connected
-                                   success
-  @retval EFI_SUCCESS              Success connect any one instance of the console
-                                   device path base on the variable ConVarName.
-
-**/
-EFI_STATUS
-EFIAPI
-BdsLibConnectConsoleVariableWithOutDispatch (
   IN  CHAR16                 *ConVarName
   );
 
