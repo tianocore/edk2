@@ -38,7 +38,7 @@
 
 #include <Guid/Performance.h>
 
-#include <PerformanceTokens.h>
+#include "PerformanceTokens.h"
 #include "Dp.h"
 #include "Literals.h"
 #include "DpInternal.h"
