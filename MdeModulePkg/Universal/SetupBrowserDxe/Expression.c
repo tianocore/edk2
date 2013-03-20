@@ -1446,7 +1446,6 @@ IfrMid (
   UINTN          Base;
   UINTN          Length;
   CHAR16         *SubString;
-  UINT8          *Buffer;
   UINT16         BufferLen;
 
   ZeroMem (Value, sizeof (Value));
@@ -1502,7 +1501,6 @@ IfrMid (
 
     FreePool (String);
   } else {
-    Buffer    = Value[2].Buffer;
     BufferLen = Value[2].BufferLen;
     
     Result->Type = EFI_IFR_TYPE_BUFFER;
