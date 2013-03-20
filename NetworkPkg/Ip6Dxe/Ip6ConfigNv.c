@@ -695,7 +695,6 @@ Ip6ConvertInterfaceInfoToString (
   CHAR16                         PortString[ADDRESS_STR_MAX_SIZE];
   CHAR16                         FormatString[8];
   EFI_STRING_ID                  StringId;
-  EFI_STATUS                     Status;
 
   if ((IfInfo == NULL) || (HiiHandle == NULL) || (IfrNvData == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -780,17 +779,7 @@ Ip6ConvertInterfaceInfoToString (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  //
-  // Print the route table information.
-  //
-  Status = Ip6ConvertAddressListToString (
-             PortString,
-             HiiHandle,
-             Ip6ConfigNvRouteTable,
-             IfInfo->RouteTable,
-             IfInfo->RouteCount
-             );
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /**
