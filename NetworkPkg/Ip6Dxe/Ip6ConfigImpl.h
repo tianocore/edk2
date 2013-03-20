@@ -1,7 +1,7 @@
 /** @file
   Definitions for EFI IPv6 Configuartion Protocol implementation.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -129,7 +129,7 @@ typedef struct {
 
 typedef struct {
   UINT16                    Offset;
-  UINTN                     DataSize;
+  UINT32                    DataSize;
   EFI_IP6_CONFIG_DATA_TYPE  DataType;
 } IP6_CONFIG_DATA_RECORD;
 

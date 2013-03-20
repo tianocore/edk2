@@ -1,7 +1,7 @@
 /** @file
   The implementation of EFI IPv6 Configuration Protocol.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -473,7 +473,7 @@ Ip6ConfigWriteConfigData (
 
       DataRecord           = &Variable->DataRecord[Variable->DataRecordCount];
       DataRecord->DataType = (EFI_IP6_CONFIG_DATA_TYPE) Index;
-      DataRecord->DataSize = DataItem->DataSize;
+      DataRecord->DataSize = (UINT32) DataItem->DataSize;
       DataRecord->Offset   = (UINT16) (Heap - (CHAR8 *) Variable);
 
       Variable->DataRecordCount++;
