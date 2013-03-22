@@ -1,7 +1,7 @@
 /** @file
   UEFI Memory page management functions.
 
-Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -834,7 +834,18 @@ CoreConvertPages (
     //
     CoreAddRange (NewType, Start, RangeEnd, Attribute);
     if (NewType == EfiConventionalMemory) {
-      DEBUG_CLEAR_MEMORY ((VOID *)(UINTN) Start, (UINTN) (RangeEnd - Start + 1));
+      //
+      // Avoid calling DEBUG_CLEAR_MEMORY() for an address of 0 because this
+      // macro will ASSERT() if address is 0.  Instead, CoreAddRange() guarantees
+      // that the page starting at address 0 is always filled with zeros.
+      //
+      if (Start == 0) {
+        if (RangeEnd > EFI_PAGE_SIZE) {
+          DEBUG_CLEAR_MEMORY ((VOID *)(UINTN) EFI_PAGE_SIZE, (UINTN) (RangeEnd - EFI_PAGE_SIZE + 1));
+        }
+      } else {
+        DEBUG_CLEAR_MEMORY ((VOID *)(UINTN) Start, (UINTN) (RangeEnd - Start + 1));
+      }
     }
 
     //
