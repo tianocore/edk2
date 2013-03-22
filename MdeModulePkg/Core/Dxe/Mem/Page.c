@@ -177,7 +177,20 @@ CoreAddRange (
   ASSERT_LOCKED (&gMemoryLock);
 
   DEBUG ((DEBUG_PAGE, "AddRange: %lx-%lx to %d\n", Start, End, Type));
-
+  
+  //
+  // If memory of type EfiConventionalMemory is being added that includes the page 
+  // starting at address 0, then zero the page starting at address 0.  This has 
+  // two benifits.  It helps find NULL pointer bugs and it also maximizes 
+  // compatibility with operating systems that may evaluate memory in this page 
+  // for legacy data structures.  If memory of any other type is added starting 
+  // at address 0, then do not zero the page at address 0 because the page is being 
+  // used for other purposes.
+  //  
+  if (Type == EfiConventionalMemory && Start == 0 && (End >= EFI_PAGE_SIZE - 1)) {
+    SetMem ((VOID *)(UINTN)Start, EFI_PAGE_SIZE, 0);
+  }
+  
   //
   // Memory map being altered so updated key
   //
