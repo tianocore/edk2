@@ -195,6 +195,7 @@ typedef struct {
 
 
 extern LIST_ENTRY          gMenuOption;
+extern LIST_ENTRY          gMenuList;
 extern MENU_REFRESH_ENTRY  *gMenuRefreshHead;
 extern UI_MENU_SELECTION   *gCurrentSelection;
 extern BOOLEAN             mHiiPackageListUpdated;
@@ -250,9 +251,10 @@ UiAddMenuList (
   );
 
 /**
-  Search Menu with given FormId in the parent menu and all its child menus.
+  Search Menu with given FormId, FormSetGuid and Handle in all cached menu list.
 
   @param  Parent                 The parent of menu to search.
+  @param  Handle                 Hii handle related to this formset.
   @param  FormSetGuid            The Formset GUID of the menu to search.  
   @param  FormId                 The Form ID of menu to search.
 
@@ -262,14 +264,16 @@ UiAddMenuList (
 UI_MENU_LIST *
 UiFindChildMenuList (
   IN UI_MENU_LIST         *Parent,
+  IN EFI_HII_HANDLE       Handle,
   IN EFI_GUID             *FormSetGuid, 
   IN UINT16               FormId
   );
 
 /**
-  Search Menu with given FormSetGuid and FormId in all cached menu list.
+  Search Menu with given Handle, FormSetGuid and FormId in all cached menu list.
 
   @param  FormSetGuid            The Formset GUID of the menu to search.
+  @param  Handle                 Hii handle related to this formset.
   @param  FormId                 The Form ID of menu to search.
 
   @return A pointer to menu found or NULL if not found.
@@ -277,8 +281,20 @@ UiFindChildMenuList (
 **/
 UI_MENU_LIST *
 UiFindMenuList (
+  IN EFI_HII_HANDLE       Handle,
   IN EFI_GUID             *FormSetGuid,
   IN UINT16               FormId
+  );
+
+/**
+  Free Menu list linked list.
+
+  @param  MenuListHead    One Menu list point in the menu list.
+
+**/
+VOID
+UiFreeMenuList (
+  LIST_ENTRY   *MenuListHead
   );
 
 /**

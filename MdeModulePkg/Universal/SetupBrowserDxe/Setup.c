@@ -245,6 +245,11 @@ SendForm (
   gFooterHeight = FOOTER_HEIGHT + (Index / 3);
 
   //
+  // Clean the history menu list.
+  //
+  InitializeListHead (&gMenuList);
+
+  //
   // Save globals used by SendForm()
   //
   SaveBrowserContext ();
@@ -378,6 +383,7 @@ SendForm (
   }
 
   FreeBrowserStrings ();
+  UiFreeMenuList(&gMenuList);
 
   gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
   gST->ConOut->ClearScreen (gST->ConOut);

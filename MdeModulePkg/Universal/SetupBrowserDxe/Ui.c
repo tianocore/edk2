@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Setup.h"
 
 LIST_ENTRY          gMenuOption;
-LIST_ENTRY          gMenuList = INITIALIZE_LIST_HEAD_VARIABLE (gMenuList);
+LIST_ENTRY          gMenuList;
 MENU_REFRESH_ENTRY  *gMenuRefreshHead;                // Menu list used for refresh timer opcode.
 MENU_REFRESH_ENTRY  *gMenuEventGuidRefreshHead;       // Menu list used for refresh event guid opcode.
 
@@ -219,9 +219,10 @@ UiAddMenuList (
 
 
 /**
-  Search Menu with given FormId and FormSetGuid in all cached menu list.
+  Search Menu with given FormId, FormSetGuid and Handle in all cached menu list.
 
   @param  Parent                 The parent of menu to search.
+  @param  Handle                 Hii handle related to this formset.
   @param  FormSetGuid            The Formset GUID of the menu to search.  
   @param  FormId                 The Form ID of menu to search.
 
@@ -231,6 +232,7 @@ UiAddMenuList (
 UI_MENU_LIST *
 UiFindChildMenuList (
   IN UI_MENU_LIST         *Parent,
+  IN EFI_HII_HANDLE       Handle,
   IN EFI_GUID             *FormSetGuid, 
   IN UINT16               FormId
   )
@@ -241,7 +243,7 @@ UiFindChildMenuList (
 
   ASSERT (Parent != NULL);
 
-  if (Parent->FormId == FormId && CompareGuid (FormSetGuid, &Parent->FormSetGuid)) {
+  if (Parent->FormId == FormId && CompareGuid (FormSetGuid, &Parent->FormSetGuid) && Parent->HiiHandle == Handle) {
     return Parent;
   }
 
@@ -249,7 +251,7 @@ UiFindChildMenuList (
   while (!IsNull (&Parent->ChildListHead, Link)) {
     Child = UI_MENU_LIST_FROM_LINK (Link);
 
-    MenuList = UiFindChildMenuList (Child, FormSetGuid, FormId);
+    MenuList = UiFindChildMenuList (Child, Handle, FormSetGuid, FormId);
     if (MenuList != NULL) {
       return MenuList;
     }
@@ -262,9 +264,10 @@ UiFindChildMenuList (
 
 
 /**
-  Search Menu with given FormSetGuid and FormId in all cached menu list.
+  Search Menu with given Handle, FormSetGuid and FormId in all cached menu list.
 
   @param  FormSetGuid            The Formset GUID of the menu to search.
+  @param  Handle                 Hii handle related to this formset.
   @param  FormId                 The Form ID of menu to search.
 
   @return A pointer to menu found or NULL if not found.
@@ -272,6 +275,7 @@ UiFindChildMenuList (
 **/
 UI_MENU_LIST *
 UiFindMenuList (
+  IN EFI_HII_HANDLE       Handle,
   IN EFI_GUID             *FormSetGuid,
   IN UINT16               FormId
   )
@@ -284,8 +288,14 @@ UiFindMenuList (
   while (!IsNull (&gMenuList, Link)) {
     MenuList = UI_MENU_LIST_FROM_LINK (Link);
 
-    Child = UiFindChildMenuList(MenuList, FormSetGuid, FormId);
+    Child = UiFindChildMenuList(MenuList, Handle, FormSetGuid, FormId);
     if (Child != NULL) {
+
+      //
+      // If this form already in the menu history list,
+      // just free the list between old this form.
+      //
+      UiFreeMenuList(&Child->ChildListHead);
       return Child;
     }
 
@@ -295,6 +305,28 @@ UiFindMenuList (
   return NULL;
 }
 
+/**
+  Free Menu list linked list.
+
+  @param  MenuListHead    One Menu list point in the menu list.
+
+**/
+VOID
+UiFreeMenuList (
+  LIST_ENTRY   *MenuListHead
+  )
+{
+  UI_MENU_LIST    *MenuList;
+
+  while (!IsListEmpty (MenuListHead)) {
+    MenuList = UI_MENU_LIST_FROM_LINK (MenuListHead->ForwardLink);
+    RemoveEntryList (&MenuList->Link);
+    
+    UiFreeMenuList(&MenuList->ChildListHead);
+    FreePool (MenuList);
+  }
+
+}
 
 /**
   Free Menu option linked list.
@@ -1997,11 +2029,8 @@ ProcessGotoOpCode (
   FORM_BROWSER_FORM               *RefForm;
   EFI_INPUT_KEY                   Key;
   EFI_STATUS                      Status;
-  UI_MENU_LIST                    *MenuList;
-  BOOLEAN                         UpdateFormInfo;
-  
-  Status = EFI_SUCCESS;
-  UpdateFormInfo = TRUE;
+
+  Status    = EFI_SUCCESS;
   StringPtr = NULL;
 
   //
@@ -2122,21 +2151,9 @@ ProcessGotoOpCode (
         *NewLine = TRUE;
       }
     }
-    UpdateFormInfo = FALSE;
   } else {
     if ((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != 0) {
       Selection->Action = UI_ACTION_REFRESH_FORM;
-    }
-    UpdateFormInfo = FALSE;
-  }
-
-  if (UpdateFormInfo) {
-    //
-    // Link current form so that we can always go back when someone hits the ESC
-    //
-    MenuList = UiFindMenuList (&Selection->FormSetGuid, Selection->FormId);
-    if (MenuList == NULL && Selection->CurrentMenu != NULL) {
-      MenuList = UiAddMenuList (Selection->CurrentMenu, Selection->Handle, &Selection->FormSetGuid, Selection->FormId);
     }
   }
 
@@ -2279,12 +2296,12 @@ UiDisplayMenu (
   //
   // Find current Menu
   //
-  CurrentMenu = UiFindMenuList (&Selection->FormSetGuid, Selection->FormId);
+  CurrentMenu = UiFindMenuList (Selection->Handle, &Selection->FormSetGuid, Selection->FormId);
   if (CurrentMenu == NULL) {
     //
     // Current menu not found, add it to the menu tree
     //
-    CurrentMenu = UiAddMenuList (NULL, Selection->Handle, &Selection->FormSetGuid, Selection->FormId);
+    CurrentMenu = UiAddMenuList (Selection->CurrentMenu, Selection->Handle, &Selection->FormSetGuid, Selection->FormId);
   }
   ASSERT (CurrentMenu != NULL);
   Selection->CurrentMenu = CurrentMenu;
