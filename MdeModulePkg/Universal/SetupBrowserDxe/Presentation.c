@@ -1254,6 +1254,7 @@ ProcessCallBackFunction (
           break;
 
         case EFI_BROWSER_ACTION_REQUEST_EXIT:
+          DiscardFormIsRequired = TRUE;
           Selection->Action = UI_ACTION_EXIT;
           break;
 
