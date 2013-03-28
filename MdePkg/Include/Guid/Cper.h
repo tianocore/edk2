@@ -11,7 +11,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
-  GUIDs introduced from UEFI 2.1 Specification.
+  GUIDs introduced from UEFI 2.3.1 Specification.
 
 **/
 
@@ -209,7 +209,6 @@ typedef struct {
   UINT8                  SecValidMask;
   UINT8                  Resv1;
   UINT32                 SectionFlags;
-  UINT8                  Resv2[3];
   EFI_GUID               SectionType;
   EFI_GUID               FruId;
   UINT32                 Severity;

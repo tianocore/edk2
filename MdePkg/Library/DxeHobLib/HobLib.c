@@ -1,7 +1,7 @@
 /** @file
   HOB Library implemenation for Dxe Phase.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -314,7 +314,8 @@ BuildResourceDescriptorHob (
   
   If Guid is NULL, then ASSERT().
   If there is no additional space for HOB creation, then ASSERT().
-  If DataLength >= (0x10000 - sizeof (EFI_HOB_GUID_TYPE)), then ASSERT().
+  If DataLength > (0xFFF8 - sizeof (EFI_HOB_GUID_TYPE)), then ASSERT().
+  HobLength is UINT16 and multiples of 8 bytes, so the max HobLength is 0xFFF8.
 
   @param  Guid          The GUID to tag the customized HOB.
   @param  DataLength    The size of the data payload for the GUID HOB.
@@ -351,7 +352,8 @@ BuildGuidHob (
   If Guid is NULL, then ASSERT().
   If Data is NULL and DataLength > 0, then ASSERT().
   If there is no additional space for HOB creation, then ASSERT().
-  If DataLength >= (0x10000 - sizeof (EFI_HOB_GUID_TYPE)), then ASSERT().
+  If DataLength > (0xFFF8 - sizeof (EFI_HOB_GUID_TYPE)), then ASSERT().
+  HobLength is UINT16 and multiples of 8 bytes, so the max HobLength is 0xFFF8.
 
   @param  Guid          The GUID to tag the customized HOB.
   @param  Data          The data to be copied into the data field of the GUID HOB.

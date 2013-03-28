@@ -3,7 +3,7 @@
 
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -237,7 +237,7 @@ InternalAsmThunk16  PROC    USES    ebp ebx esi edi ds  es  fs  gs
     and     eax, 7ffffffeh              ; clear PE, PG bits
     mov     ebp, cr4
     mov     [edx + (SavedCr4 - SavedCr0)], ebp
-    and     ebp, 300h                   ; clear all but PCE and OSFXSR bits
+    and     ebp, NOT 30h                ; clear PAE, PSE bits
     push    10h
     pop     ecx                         ; ecx <- selector for data segments
     lgdt    fword ptr [edx + (_16Gdtr - SavedCr0)]
