@@ -63,6 +63,7 @@
   gEfiSmmReadyToLockProtocolGuid                # PROTOCOL ALWAYS_PRODUCED
   gEfiSmmCpuIo2ProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
   gEfiFirmwareVolume2ProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
+  gEfiSmmEndOfDxeProtocolGuid                   # PROTOCOL ALWAYS_PRODUCED
   gEfiSecurityArchProtocolGuid                  # PROTOCOL SOMETIMES_CONSUMED
   gEfiSecurity2ArchProtocolGuid                 # PROTOCOL SOMETIMES_CONSUMED
   gEfiLoadedImageProtocolGuid                   # PROTOCOL SOMETIMES_PRODUCED
@@ -76,3 +77,4 @@
   gAprioriGuid                                  # ALWAYS_CONSUMED
   gEfiEventDxeDispatchGuid                      # ALWAYS_CONSUMED
   gEfiEventLegacyBootGuid                       # ALWAYS_CONSUMED
+  gEfiEndOfDxeEventGroupGuid                    # ALWAYS_CONSUMED

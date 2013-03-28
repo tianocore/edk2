@@ -3,7 +3,7 @@
   to be replayed during an S3 resume. This library class maps directly on top
   of the IoLib class. 
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -186,6 +186,7 @@ S3IoBitFieldRead8 (
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If Value is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Port       The I/O port to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -221,6 +222,7 @@ S3IoBitFieldWrite8 (
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If OrData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Port       The I/O port to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -256,6 +258,7 @@ S3IoBitFieldOr8 (
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If AndData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Port       The I/O port to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -292,6 +295,8 @@ S3IoBitFieldAnd8 (
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If AndData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
+  If OrData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Port       The I/O port to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -481,6 +486,7 @@ S3IoBitFieldRead16 (
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If Value is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Port       The I/O port to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -516,6 +522,7 @@ S3IoBitFieldWrite16 (
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If OrData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Port       The I/O port to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -551,6 +558,7 @@ S3IoBitFieldOr16 (
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If AndData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Port       The I/O port to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -588,6 +596,8 @@ S3IoBitFieldAnd16 (
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If AndData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
+  If OrData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Port       The I/O port to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -777,6 +787,7 @@ S3IoBitFieldRead32 (
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If Value is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Port       The I/O port to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -812,6 +823,7 @@ S3IoBitFieldWrite32 (
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If OrData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Port       The I/O port to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -847,6 +859,7 @@ S3IoBitFieldOr32 (
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If AndData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Port       The I/O port to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -884,6 +897,8 @@ S3IoBitFieldAnd32 (
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If AndData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
+  If OrData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Port       The I/O port to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -1073,6 +1088,7 @@ S3IoBitFieldRead64 (
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If Value is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Port       The I/O port to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -1108,6 +1124,7 @@ S3IoBitFieldWrite64 (
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If OrData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Port       The I/O port to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -1143,6 +1160,7 @@ S3IoBitFieldOr64 (
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If AndData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Port       The I/O port to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -1180,6 +1198,8 @@ S3IoBitFieldAnd64 (
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If AndData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
+  If OrData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Port       The I/O port to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -1368,6 +1388,7 @@ S3MmioBitFieldRead8 (
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If Value is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Address    The MMIO register to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -1404,6 +1425,7 @@ S3MmioBitFieldWrite8 (
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If OrData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Address    The MMIO register to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -1440,6 +1462,7 @@ S3MmioBitFieldOr8 (
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If AndData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Address    The MMIO register to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -1477,6 +1500,8 @@ S3MmioBitFieldAnd8 (
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If AndData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
+  If OrData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Address    The MMIO register to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -1666,6 +1691,7 @@ S3MmioBitFieldRead16 (
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If Value is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Address    The MMIO register to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -1702,6 +1728,7 @@ S3MmioBitFieldWrite16 (
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If OrData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Address    The MMIO register to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -1738,6 +1765,7 @@ S3MmioBitFieldOr16 (
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If AndData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Address    The MMIO register to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -1775,6 +1803,8 @@ S3MmioBitFieldAnd16 (
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If AndData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
+  If OrData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Address    The MMIO register to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -1963,6 +1993,7 @@ S3MmioBitFieldRead32 (
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If Value is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Address    The MMIO register to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -1999,6 +2030,7 @@ S3MmioBitFieldWrite32 (
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If OrData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Address    The MMIO register to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -2035,6 +2067,7 @@ S3MmioBitFieldOr32 (
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If AndData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Address    The MMIO register to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -2072,6 +2105,8 @@ S3MmioBitFieldAnd32 (
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If AndData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
+  If OrData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Address    The MMIO register to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -2260,6 +2295,7 @@ S3MmioBitFieldRead64 (
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If Value is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Address    The MMIO register to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -2296,6 +2332,7 @@ S3MmioBitFieldWrite64 (
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If OrData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Address    The MMIO register to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -2332,6 +2369,7 @@ S3MmioBitFieldOr64 (
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If AndData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Address    The MMIO register to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.
@@ -2369,6 +2407,8 @@ S3MmioBitFieldAnd64 (
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
   If EndBit is less than StartBit, then ASSERT().
+  If AndData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
+  If OrData is larger than the bitmask value range specified by StartBit and EndBit, then ASSERT().
 
   @param[in]  Address    The MMIO register to write.
   @param[in]  StartBit   The ordinal of the least significant bit in the bit field.

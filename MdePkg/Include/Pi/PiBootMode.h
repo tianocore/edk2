@@ -1,7 +1,7 @@
 /** @file
   Present the boot mode values in PI.
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -11,7 +11,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:
-  PI Version 1.0
+  PI Version 1.2.1A
 
 **/
 
@@ -33,6 +33,7 @@ typedef UINT32  EFI_BOOT_MODE;
 #define BOOT_WITH_DEFAULT_SETTINGS                    0x04
 #define BOOT_ON_S4_RESUME                             0x05
 #define BOOT_ON_S5_RESUME                             0x06
+#define BOOT_WITH_MFG_MODE_SETTINGS                   0x07
 #define BOOT_ON_S2_RESUME                             0x10
 #define BOOT_ON_S3_RESUME                             0x11
 #define BOOT_ON_FLASH_UPDATE                          0x12
