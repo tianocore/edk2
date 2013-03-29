@@ -1590,7 +1590,16 @@ BiosVideoCheckForVbe (
       Timing.HorizontalResolution = BiosVideoPrivate->VbeModeInformationBlock->XResolution;
       Timing.VerticalResolution = BiosVideoPrivate->VbeModeInformationBlock->YResolution;
       if (!SearchEdidTiming (&ValidEdidTiming, &Timing)) {
+        //
+        // When EDID comes from INT10 call, EDID does not include 800x600, 640x480 and 1024x768,
+        // but INT10 can support these modes, we add them into GOP mode.
+        //
+        if ((BiosVideoPrivate->EdidDiscovered.SizeOfEdid != 0) &&
+            !((Timing.HorizontalResolution) == 1024 && (Timing.VerticalResolution == 768)) &&
+            !((Timing.HorizontalResolution) == 800 && (Timing.VerticalResolution == 600)) &&
+            !((Timing.HorizontalResolution) == 640 && (Timing.VerticalResolution == 480))) {
         continue;
+        }
       }
     }
 
