@@ -2,7 +2,7 @@
 
     Usb bus enumeration support.
 
-Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -814,9 +814,6 @@ UsbEnumerateNewDev (
   return EFI_SUCCESS;
 
 ON_ERROR:
-  if (Address != Bus->MaxDevices) {
-    Bus->Devices[Address] = NULL;
-  }
 
   if (Child != NULL) {
     UsbFreeDevice (Child);

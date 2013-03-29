@@ -1,7 +1,7 @@
 /** @file
   The XHCI controller driver.
 
-Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -916,7 +916,7 @@ XhcControlTransfer (
       ((Request->RequestType == USB_REQUEST_TYPE (EfiUsbDataIn, USB_REQ_TYPE_STANDARD, USB_TARGET_DEVICE)) || 
       ((Request->RequestType == USB_REQUEST_TYPE (EfiUsbDataIn, USB_REQ_TYPE_CLASS, USB_TARGET_DEVICE))))) {
     DescriptorType = (UINT8)(Request->Value >> 8);
-    if ((DescriptorType == USB_DESC_TYPE_DEVICE) && (*DataLength == sizeof (EFI_USB_DEVICE_DESCRIPTOR))) {
+    if ((DescriptorType == USB_DESC_TYPE_DEVICE) && ((*DataLength == sizeof (EFI_USB_DEVICE_DESCRIPTOR)) || ((DeviceSpeed == EFI_USB_SPEED_FULL) && (*DataLength == 8)))) {
         ASSERT (Data != NULL);
         //
         // Store a copy of device scriptor as hub device need this info to configure endpoint.
