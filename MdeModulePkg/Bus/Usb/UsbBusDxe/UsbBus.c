@@ -813,6 +813,7 @@ UsbIoPortReset (
   USB_DEVICE              *Dev;
   EFI_TPL                 OldTpl;
   EFI_STATUS              Status;
+  UINT8                   DevAddress;
 
   OldTpl = gBS->RaiseTPL (USB_BUS_TPL);
 
@@ -834,12 +835,17 @@ UsbIoPortReset (
     goto ON_EXIT;
   }
 
+  HubIf->HubApi->ClearPortChange (HubIf, Dev->ParentPort);
+
   //
   // Reset the device to its current address. The device now has an address
   // of ZERO after port reset, so need to set Dev->Address to the device again for
   // host to communicate with it.
   //
-  Status  = UsbSetAddress (Dev, Dev->Address);
+  DevAddress   = Dev->Address;
+  Dev->Address = 0;
+  Status  = UsbSetAddress (Dev, DevAddress);
+  Dev->Address = DevAddress;
 
   gBS->Stall (USB_SET_DEVICE_ADDRESS_STALL);
   

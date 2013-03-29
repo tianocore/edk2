@@ -975,13 +975,13 @@ UsbHubResetPort (
   }
 
   //
-  // Drive the reset signal for at least 10ms. Check USB 2.0 Spec
+  // Drive the reset signal for worst 20ms. Check USB 2.0 Spec
   // section 7.1.7.5 for timing requirements.
   //
   gBS->Stall (USB_SET_PORT_RESET_STALL);
 
   //
-  // USB hub will clear RESET bit if reset is actually finished.
+  // Check USB_PORT_STAT_C_RESET bit to see if the resetting state is done.
   //
   ZeroMem (&PortState, sizeof (EFI_USB_PORT_STATUS));
 
@@ -989,8 +989,8 @@ UsbHubResetPort (
     Status = UsbHubGetPortStatus (HubIf, Port, &PortState);
 
     if (!EFI_ERROR (Status) &&
-        !USB_BIT_IS_SET (PortState.PortStatus, USB_PORT_STAT_RESET)) {
-
+        USB_BIT_IS_SET (PortState.PortChangeStatus, USB_PORT_STAT_C_RESET)) {
+      gBS->Stall (USB_SET_PORT_RECOVERY_STALL);
       return EFI_SUCCESS;
     }
 
