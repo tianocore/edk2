@@ -230,7 +230,7 @@ BootScriptExecutorEntryPoint (
   if (EFI_ERROR (Status)) {
 
       //
-      // This is the first-time loaded by DXE core. reload itself to NVS mem
+      // This is the first-time loaded by DXE core. reload itself to RESERVED mem
       //
       //
       // A workarouond: Here we install a dummy handle
@@ -263,7 +263,7 @@ BootScriptExecutorEntryPoint (
       FfsBuffer = 0xFFFFFFFF;
       Status = gBS->AllocatePages (
                     AllocateMaxAddress,
-                    EfiACPIMemoryNVS,
+                    EfiReservedMemoryType,
                     Pages,
                     &FfsBuffer
                     );
@@ -320,7 +320,7 @@ BootScriptExecutorEntryPoint (
 
     } else {
       //
-      // the entry point is invoked after reloading. following code only run in  ACPI NVS
+      // the entry point is invoked after reloading. following code only run in RESERVED mem
       //
       BufferSize = sizeof (BOOT_SCRIPT_EXECUTOR_VARIABLE);
 
@@ -328,7 +328,7 @@ BootScriptExecutorEntryPoint (
       Pages = EFI_SIZE_TO_PAGES(BufferSize);
       Status = gBS->AllocatePages (
                       AllocateMaxAddress,
-                      EfiACPIMemoryNVS,
+                      EfiReservedMemoryType,
                       Pages,
                       &BootScriptExecutorBuffer
                       );
