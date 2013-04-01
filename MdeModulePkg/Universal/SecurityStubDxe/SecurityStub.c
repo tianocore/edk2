@@ -1,7 +1,7 @@
 /** @file
   This driver produces Security2 and Security architectural protocol based on SecurityManagementLib.
  
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -69,13 +69,20 @@ SecurityStubAuthenticateState (
   IN CONST EFI_DEVICE_PATH_PROTOCOL    *File
   )
 {
-  return ExecuteSecurity2Handlers (EFI_AUTH_OPERATION_AUTHENTICATION_STATE, 
+  EFI_STATUS Status;
+  
+  Status = ExecuteSecurity2Handlers (EFI_AUTH_OPERATION_AUTHENTICATION_STATE, 
                                    AuthenticationStatus, 
                                    File,
                                    NULL, 
                                    0, 
                                    FALSE
                                    );
+  if (Status == EFI_SUCCESS) {
+    Status = ExecuteSecurityHandlers (AuthenticationStatus, File);
+  }
+  
+  return Status;
 }
 
 /**

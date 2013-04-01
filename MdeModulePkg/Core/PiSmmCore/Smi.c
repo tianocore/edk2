@@ -1,7 +1,7 @@
 /** @file
   SMI management.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -128,11 +128,11 @@ SmiManage (
   LIST_ENTRY   *Head;
   SMI_ENTRY    *SmiEntry;
   SMI_HANDLER  *SmiHandler;
-  BOOLEAN      InterruptQuiesced;
+  BOOLEAN      SuccessReturn;
   EFI_STATUS   Status;
   
   Status = EFI_NOT_FOUND;
-  InterruptQuiesced = FALSE;
+  SuccessReturn = FALSE;
   if (HandlerType == NULL) {
     //
     // Root SMI handler
@@ -167,8 +167,8 @@ SmiManage (
     switch (Status) {
     case EFI_INTERRUPT_PENDING:
       //
-      // If a handler returns EFI_INTERRUPT_PENDING then no additional handlers 
-      // will be processed and EFI_INTERRUPT_PENDING will be returned.
+      // If a handler returns EFI_INTERRUPT_PENDING and HandlerType is not NULL then
+      // no additional handlers will be processed and EFI_INTERRUPT_PENDING will be returned.
       //
       if (HandlerType != NULL) {
         return EFI_INTERRUPT_PENDING;
@@ -177,12 +177,14 @@ SmiManage (
 
     case EFI_SUCCESS:
       //
-      // If a handler returns EFI_SUCCESS then no additional handlers will be processed.
-      // then the function will return EFI_SUCCESS.
+      // If at least one of the handlers returns EFI_SUCCESS then the function will return
+      // EFI_SUCCESS. If a handler returns EFI_SUCCESS and HandlerType is not NULL then no
+      // additional handlers will be processed.
       //
       if (HandlerType != NULL) {
         return EFI_SUCCESS;
       }
+      SuccessReturn = TRUE;
       break;
 
     case EFI_WARN_INTERRUPT_SOURCE_QUIESCED:
@@ -190,7 +192,7 @@ SmiManage (
       // If at least one of the handlers returns EFI_WARN_INTERRUPT_SOURCE_QUIESCED
       // then the function will return EFI_SUCCESS. 
       //
-      InterruptQuiesced = TRUE;
+      SuccessReturn = TRUE;
       break;
 
     case EFI_WARN_INTERRUPT_SOURCE_PENDING:
@@ -209,7 +211,7 @@ SmiManage (
     }
   }
 
-  if (InterruptQuiesced) {
+  if (SuccessReturn) {
     Status = EFI_SUCCESS;
   }
 

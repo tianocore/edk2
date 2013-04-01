@@ -27,7 +27,7 @@
 
   Depex - Dependency Expresion.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -671,6 +671,9 @@ SmmLoadImage (
   // used the UEFI Boot Services AllocatePool() function
   //
   Status = gBS->FreePool(Buffer);
+  if (!EFI_ERROR (Status) && EFI_ERROR (SecurityStatus)) {
+    Status = SecurityStatus;
+  }
   return Status;  
 }
 
@@ -1197,7 +1200,6 @@ SmmDriverDispatchHandler (
   UINTN                         HandleCount;
   EFI_HANDLE                    *HandleBuffer;
   EFI_STATUS                    GetNextFileStatus;
-  EFI_STATUS                    SecurityStatus;
   EFI_FIRMWARE_VOLUME2_PROTOCOL *Fv;
   EFI_DEVICE_PATH_PROTOCOL      *FvDevicePath;
   EFI_HANDLE                    FvHandle;
@@ -1256,31 +1258,6 @@ SmmDriverDispatchHandler (
       // The Firmware volume doesn't have device path, can't be dispatched.
       //
       continue;
-    }
-
-    //
-    // If the Security Architectural Protocol has not been located yet, then attempt to locate it
-    //
-    if (mSecurity == NULL) {
-      gBS->LocateProtocol (&gEfiSecurityArchProtocolGuid, NULL, (VOID**)&mSecurity);
-    }
-
-    //
-    // Evaluate the authentication status of the Firmware Volume through
-    // Security Architectural Protocol
-    //
-    if (mSecurity != NULL) {
-      SecurityStatus = mSecurity->FileAuthenticationState (
-                                    mSecurity,
-                                    0,
-                                    FvDevicePath
-                                    );
-      if (SecurityStatus != EFI_SUCCESS) {
-        //
-        // Security check failed. The firmware volume should not be used for any purpose.
-        //
-        continue;
-      }
     }
 
     //

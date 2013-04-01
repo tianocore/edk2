@@ -1,7 +1,7 @@
 /** @file
   UEFI Memory page management functions.
 
-Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -177,7 +177,20 @@ CoreAddRange (
   ASSERT_LOCKED (&gMemoryLock);
 
   DEBUG ((DEBUG_PAGE, "AddRange: %lx-%lx to %d\n", Start, End, Type));
-
+  
+  //
+  // If memory of type EfiConventionalMemory is being added that includes the page 
+  // starting at address 0, then zero the page starting at address 0.  This has 
+  // two benifits.  It helps find NULL pointer bugs and it also maximizes 
+  // compatibility with operating systems that may evaluate memory in this page 
+  // for legacy data structures.  If memory of any other type is added starting 
+  // at address 0, then do not zero the page at address 0 because the page is being 
+  // used for other purposes.
+  //  
+  if (Type == EfiConventionalMemory && Start == 0 && (End >= EFI_PAGE_SIZE - 1)) {
+    SetMem ((VOID *)(UINTN)Start, EFI_PAGE_SIZE, 0);
+  }
+  
   //
   // Memory map being altered so updated key
   //
@@ -834,7 +847,18 @@ CoreConvertPages (
     //
     CoreAddRange (NewType, Start, RangeEnd, Attribute);
     if (NewType == EfiConventionalMemory) {
-      DEBUG_CLEAR_MEMORY ((VOID *)(UINTN) Start, (UINTN) (RangeEnd - Start + 1));
+      //
+      // Avoid calling DEBUG_CLEAR_MEMORY() for an address of 0 because this
+      // macro will ASSERT() if address is 0.  Instead, CoreAddRange() guarantees
+      // that the page starting at address 0 is always filled with zeros.
+      //
+      if (Start == 0) {
+        if (RangeEnd > EFI_PAGE_SIZE) {
+          DEBUG_CLEAR_MEMORY ((VOID *)(UINTN) EFI_PAGE_SIZE, (UINTN) (RangeEnd - EFI_PAGE_SIZE + 1));
+        }
+      } else {
+        DEBUG_CLEAR_MEMORY ((VOID *)(UINTN) Start, (UINTN) (RangeEnd - Start + 1));
+      }
     }
 
     //
