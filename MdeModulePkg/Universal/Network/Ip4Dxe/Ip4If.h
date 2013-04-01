@@ -1,7 +1,7 @@
 /** @file
   Definition for IP4 pesudo interface structure.
   
-Copyright (c) 2005 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -154,7 +154,7 @@ struct _IP4_INTERFACE {
   BOOLEAN                       Configured;
 
   //
-  // Handle used to create/destory ARP child. All the IP children
+  // Handle used to create/destroy ARP child. All the IP children
   // share one MNP which is owned by IP service binding.
   //
   EFI_HANDLE                    Controller;

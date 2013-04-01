@@ -1,7 +1,7 @@
 /** @file
   The implementation for Ping shell command.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1190,14 +1190,14 @@ ON_ERROR:
 }
 
 /**
-  Destory the IP instance.
+  Destroy the IP instance.
 
   @param[in]    Private    The pointer of PING_PRIVATE_DATA.
 
 **/
 VOID
 EFIAPI
-Ping6DestoryIp6Instance (
+Ping6DestroyIp6Instance (
   IN PING_PRIVATE_DATA    *Private
   )
 {
@@ -1414,7 +1414,7 @@ ON_EXIT:
     }
 
     if (Private->IpChildHandle != NULL) {
-      Ping6DestoryIp6Instance (Private);
+      Ping6DestroyIp6Instance (Private);
     }
 
     FreePool (Private);

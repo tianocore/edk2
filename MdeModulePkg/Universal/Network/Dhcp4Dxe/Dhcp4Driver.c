@@ -146,11 +146,11 @@ DhcpConfigUdpIo (
 
 
 /**
-  Destory the DHCP service. The Dhcp4 service may be partly initialized,
+  Destroy the DHCP service. The Dhcp4 service may be partly initialized,
   or partly destroyed. If a resource is destroyed, it is marked as so in
   case the destroy failed and being called again later.
 
-  @param[in]  DhcpSb                 The DHCP service instance to destory.
+  @param[in]  DhcpSb                 The DHCP service instance to destroy.
 
   @retval EFI_SUCCESS            Always return success.
 
@@ -466,7 +466,7 @@ Dhcp4DriverBindingStop (
     //
     // Destroy the service itself if no child instance left.
     //
-    DhcpSb->ServiceState = DHCP_DESTORY;
+    DhcpSb->ServiceState = DHCP_DESTROY;
 
     gBS->UninstallProtocolInterface (
            NicHandle,
@@ -507,7 +507,7 @@ DhcpInitProtocol (
   InitializeListHead (&Instance->Link);
   Instance->Handle            = NULL;
   Instance->Service           = DhcpSb;
-  Instance->InDestory         = FALSE;
+  Instance->InDestroy         = FALSE;
   Instance->CompletionEvent   = NULL;
   Instance->RenewRebindEvent  = NULL;
   Instance->Token             = NULL;
@@ -674,15 +674,15 @@ Dhcp4ServiceBindingDestroyChild (
   //
   // A child can be destroyed more than once. For example,
   // Dhcp4DriverBindingStop will destroy all of its children.
-  // when caller driver is being stopped, it will destory the
+  // when caller driver is being stopped, it will destroy the
   // dhcp child it opens.
   //
-  if (Instance->InDestory) {
+  if (Instance->InDestroy) {
     return EFI_SUCCESS;
   }
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
-  Instance->InDestory = TRUE;
+  Instance->InDestroy = TRUE;
 
   //
   // Close the Udp4 protocol.
@@ -705,7 +705,7 @@ Dhcp4ServiceBindingDestroyChild (
                   );
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   if (EFI_ERROR (Status)) {
-    Instance->InDestory = FALSE;
+    Instance->InDestroy = FALSE;
 
     gBS->RestoreTPL (OldTpl);
     return Status;

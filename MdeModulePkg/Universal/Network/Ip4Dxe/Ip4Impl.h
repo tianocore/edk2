@@ -51,23 +51,23 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // The state of IP4 protocol. It starts from UNCONFIGED. if it is
 // successfully configured, it goes to CONFIGED. if configure NULL
-// is called, it becomes UNCONFIGED again. If (partly) destoried, it
-// becomes DESTORY.
+// is called, it becomes UNCONFIGED again. If (partly) destroyed, it
+// becomes DESTROY.
 //
 #define IP4_STATE_UNCONFIGED    0
 #define IP4_STATE_CONFIGED      1
-#define IP4_STATE_DESTORY       2
+#define IP4_STATE_DESTROY       2
 
 //
 // The state of IP4 service. It starts from UNSTARTED. It transits
 // to STARTED if autoconfigure is started. If default address is
-// configured, it becomes CONFIGED. and if partly destoried, it goes
-// to DESTORY.
+// configured, it becomes CONFIGED. and if partly destroyed, it goes
+// to DESTROY.
 //
 #define IP4_SERVICE_UNSTARTED   0
 #define IP4_SERVICE_STARTED     1
 #define IP4_SERVICE_CONFIGED    2
-#define IP4_SERVICE_DESTORY     3
+#define IP4_SERVICE_DESTROY     3
 
 
 ///

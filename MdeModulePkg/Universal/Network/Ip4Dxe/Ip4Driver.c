@@ -118,7 +118,7 @@ Ip4DriverBindingSupported (
   Clean up a IP4 service binding instance. It will release all
   the resource allocated by the instance. The instance may be
   partly initialized, or partly destroyed. If a resource is
-  destroyed, it is marked as that in case the destory failed and
+  destroyed, it is marked as that in case the destroy failed and
   being called again later.
 
   @param[in]  IpSb               The IP4 serviceing binding instance to clean up
@@ -314,7 +314,7 @@ ON_ERROR:
   Clean up a IP4 service binding instance. It will release all
   the resource allocated by the instance. The instance may be
   partly initialized, or partly destroyed. If a resource is
-  destroyed, it is marked as that in case the destory failed and
+  destroyed, it is marked as that in case the destroy failed and
   being called again later.
 
   @param[in]  IpSb               The IP4 serviceing binding instance to clean up
@@ -611,7 +611,7 @@ Ip4DriverBindingStop (
     }
 
     IpSb = IP4_SERVICE_FROM_PROTOCOL (ServiceBinding);
-    if (IpSb->Ip4Config != NULL && (IpSb->State != IP4_SERVICE_DESTORY)) {
+    if (IpSb->Ip4Config != NULL && (IpSb->State != IP4_SERVICE_DESTROY)) {
 
       IpSb->Ip4Config->Stop (IpSb->Ip4Config);
 
@@ -683,7 +683,7 @@ Ip4DriverBindingStop (
                );
   } else if (IsListEmpty (&IpSb->Children)) {
     State           = IpSb->State;
-    IpSb->State     = IP4_SERVICE_DESTORY;
+    IpSb->State     = IP4_SERVICE_DESTROY;
 
     //
     // Clear the variable data.
@@ -886,18 +886,18 @@ Ip4ServiceBindingDestroyChild (
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
-  // A child can be destoried more than once. For example,
-  // Ip4DriverBindingStop will destory all of its children.
-  // when UDP driver is being stopped, it will destory all
+  // A child can be destroyed more than once. For example,
+  // Ip4DriverBindingStop will destroy all of its children.
+  // when UDP driver is being stopped, it will destroy all
   // the IP child it opens.
   //
-  if (IpInstance->State == IP4_STATE_DESTORY) {
+  if (IpInstance->State == IP4_STATE_DESTROY) {
     gBS->RestoreTPL (OldTpl);
     return EFI_SUCCESS;
   }
 
   State             = IpInstance->State;
-  IpInstance->State = IP4_STATE_DESTORY;
+  IpInstance->State = IP4_STATE_DESTROY;
 
   //
   // Close the Managed Network protocol.

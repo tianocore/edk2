@@ -1042,7 +1042,7 @@ TimeoutToGetMap (
 }
 
 /**
-  Create an IP child, use it to start the auto configuration, then destory it.
+  Create an IP child, use it to start the auto configuration, then destroy it.
 
   @param[in] NicInfo    The pointer to the NIC_INFO of the Nic to be configured.
 

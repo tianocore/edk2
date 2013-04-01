@@ -1,7 +1,7 @@
 /** @file
   Implement IP4 pesudo interface.
   
-Copyright (c) 2005 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -745,10 +745,10 @@ Ip4FreeInterface (
   }
 
   //
-  // Destory the interface if this is the last IP instance that
+  // Destroy the interface if this is the last IP instance that
   // has the address. Remove all the system transmitted packets
   // from this interface, cancel the receive request if there is
-  // one, and destory the ARP requests.
+  // one, and destroy the ARP requests.
   //
   Ip4CancelFrames (Interface, EFI_ABORTED, Ip4CancelInstanceFrame, NULL);
   Ip4CancelReceive (Interface);

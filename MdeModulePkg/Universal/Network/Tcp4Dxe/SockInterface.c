@@ -131,7 +131,7 @@ SockBufferToken (
 
 
 /**
-  Destory the socket Sock and its associated protocol control block.
+  Destroy the socket Sock and its associated protocol control block.
 
   @param  Sock                 The socket to be destroyed.
 

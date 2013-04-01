@@ -48,12 +48,12 @@ typedef struct _DHCP_PROTOCOL DHCP_PROTOCOL;
 // The state of the DHCP service. It starts as UNCONFIGED. If
 // and active child configures the service successfully, it
 // goes to CONFIGED. If the active child configures NULL, it
-// goes back to UNCONFIGED. It becomes DESTORY if it is (partly)
-// destoried.
+// goes back to UNCONFIGED. It becomes DESTROY if it is (partly)
+// destroyed.
 //
 #define DHCP_UNCONFIGED          0
 #define DHCP_CONFIGED            1
-#define DHCP_DESTORY             2
+#define DHCP_DESTROY             2
 
 
 struct _DHCP_PROTOCOL {
@@ -63,7 +63,7 @@ struct _DHCP_PROTOCOL {
   EFI_HANDLE                        Handle;
   DHCP_SERVICE                      *Service;
 
-  BOOLEAN                           InDestory;
+  BOOLEAN                           InDestroy;
 
   EFI_EVENT                         CompletionEvent;
   EFI_EVENT                         RenewRebindEvent;
@@ -83,7 +83,7 @@ struct _DHCP_SERVICE {
   UINT32                        Signature;
   EFI_SERVICE_BINDING_PROTOCOL  ServiceBinding;
 
-  INTN                          ServiceState; // CONFIGED, UNCONFIGED, and DESTORY
+  INTN                          ServiceState; // CONFIGED, UNCONFIGED, and DESTROY
 
   EFI_HANDLE                    Controller;
   EFI_HANDLE                    Image;

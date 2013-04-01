@@ -845,7 +845,7 @@ Ip4AccpetFrame (
   IpSb   = (IP4_SERVICE *) Context;
   Option = NULL;
 
-  if (EFI_ERROR (IoStatus) || (IpSb->State == IP4_SERVICE_DESTORY)) {
+  if (EFI_ERROR (IoStatus) || (IpSb->State == IP4_SERVICE_DESTROY)) {
     goto DROP;
   }
 

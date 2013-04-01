@@ -60,7 +60,7 @@ typedef struct _MTFTP4_PROTOCOL MTFTP4_PROTOCOL;
 
 #define MTFTP4_STATE_UNCONFIGED     0
 #define MTFTP4_STATE_CONFIGED       1
-#define MTFTP4_STATE_DESTORY        2
+#define MTFTP4_STATE_DESTROY        2
 
 ///
 /// Mtftp service block
@@ -98,7 +98,7 @@ struct _MTFTP4_PROTOCOL {
   EFI_MTFTP4_PROTOCOL           Mtftp4;
 
   INTN                          State;
-  BOOLEAN                       InDestory;
+  BOOLEAN                       InDestroy;
 
   MTFTP4_SERVICE                *Service;
   EFI_HANDLE                    Handle;

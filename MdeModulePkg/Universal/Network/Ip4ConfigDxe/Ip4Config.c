@@ -1,7 +1,7 @@
 /** @file
   This code implements the IP4Config and NicIp4Config protocols.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -125,6 +125,15 @@ EfiNicIp4ConfigSetInfo (
   // Signal the IP4 to run the auto configuration again
   //
   if (Reconfig && (Instance->ReconfigEvent != NULL)) {
+    //
+    // When NicConfig is NULL, NIC IP4 configuration parameter is removed,
+    // the auto configuration process should stop running the configuration
+    // policy for the EFI IPv4 Protocol driver.
+    //
+    if (NicConfig == NULL) {
+      Instance->DoNotStart = TRUE;
+    }
+
     Status = gBS->SignalEvent (Instance->ReconfigEvent);
     DispatchDpc ();
   }
@@ -344,6 +353,12 @@ EfiIp4ConfigStart (
   Instance->NicConfig     = EfiNicIp4ConfigGetInfo (Instance);
 
   if (Instance->NicConfig == NULL) {
+    if (Instance->DoNotStart) {
+      Instance->DoNotStart = FALSE;
+      Status = EFI_SUCCESS;
+      goto ON_EXIT;
+    }
+
     Source = IP4_CONFIG_SOURCE_DHCP;
   } else {
     Source = Instance->NicConfig->Source;
