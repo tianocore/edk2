@@ -8,14 +8,19 @@
 #  This module should be used with SMM Runtime DXE module together. The 
 #  SMM Runtime DXE module would install variable arch protocol and variable 
 #  write arch protocol based on SMM variable module.
-# Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution. The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  Caution: This module requires additional review when modified.
+#  This driver will have external input - variable data and communicate buffer in SMM mode.
+#  This external input must be validated carefully to avoid security issue like
+#  buffer overflow, integer overflow.
+#
+# Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution. The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
 ##
@@ -62,6 +67,7 @@
   gEfiSmmFirmwareVolumeBlockProtocolGuid        ## SOMETIMES_CONSUMES
   gEfiSmmVariableProtocolGuid                   ## ALWAYS_PRODUCES
   gEfiSmmFaultTolerantWriteProtocolGuid         ## SOMETIMES_CONSUMES
+  gEfiSmmAccess2ProtocolGuid                    ## ALWAYS_CONSUMES
 
 [Guids]
   gEfiVariableGuid                              ## PRODUCES ## Configuration Table Guid 
