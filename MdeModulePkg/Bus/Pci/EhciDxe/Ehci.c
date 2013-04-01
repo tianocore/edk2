@@ -6,9 +6,10 @@
   Control, Bulk, Interrupt and Isochronous requests to Usb2.0 device.
 
   Note that EhciDxe driver is enhanced to guarantee that the EHCI controller get attached
-  to the EHCI controller before the UHCI driver attaches to the companion UHCI controller. 
-  This way avoids the control transfer on a shared port between EHCI and companion host
-  controller when UHCI gets attached earlier than EHCI and a USB 2.0 device inserts.
+  to the EHCI controller before a UHCI or OHCI driver attaches to the companion UHCI or 
+  OHCI controller.  This way avoids the control transfer on a shared port between EHCI 
+  and companion host controller when UHCI or OHCI gets attached earlier than EHCI and a 
+  USB 2.0 device inserts.
 
 Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
@@ -1403,7 +1404,7 @@ EhcDriverBindingSupported (
   // Test whether the controller belongs to Ehci type
   //
   if ((UsbClassCReg.BaseCode != PCI_CLASS_SERIAL) || (UsbClassCReg.SubClassCode != PCI_CLASS_SERIAL_USB)
-      || ((UsbClassCReg.ProgInterface != PCI_IF_EHCI) && (UsbClassCReg.ProgInterface !=PCI_IF_UHCI))) {
+      || ((UsbClassCReg.ProgInterface != PCI_IF_EHCI) && (UsbClassCReg.ProgInterface != PCI_IF_UHCI) && (UsbClassCReg.ProgInterface != PCI_IF_OHCI))) {
 
     Status = EFI_UNSUPPORTED;
   }
@@ -1690,10 +1691,10 @@ EhcDriverBindingStart (
   EFI_HANDLE              *HandleBuffer;
   UINTN                   NumberOfHandles;
   UINTN                   Index;
-  UINTN                   UhciSegmentNumber;
-  UINTN                   UhciBusNumber;
-  UINTN                   UhciDeviceNumber;
-  UINTN                   UhciFunctionNumber;
+  UINTN                   CompanionSegmentNumber;
+  UINTN                   CompanionBusNumber;
+  UINTN                   CompanionDeviceNumber;
+  UINTN                   CompanionFunctionNumber;
   UINTN                   EhciSegmentNumber;
   UINTN                   EhciBusNumber;
   UINTN                   EhciDeviceNumber;
@@ -1783,19 +1784,19 @@ EhcDriverBindingStart (
     goto CLOSE_PCIIO;
   }
   //
-  // determine if the device is UHCI host controller or not. If yes, then find out the 
+  // Determine if the device is UHCI or OHCI host controller or not. If yes, then find out the 
   // companion usb ehci host controller and force EHCI driver get attached to it before
-  // UHCI driver attaches to UHCI host controller.
+  // UHCI or OHCI driver attaches to UHCI or OHCI host controller.
   //
-  if ((UsbClassCReg.ProgInterface == PCI_IF_UHCI) &&
+  if ((UsbClassCReg.ProgInterface == PCI_IF_UHCI || UsbClassCReg.ProgInterface == PCI_IF_OHCI) &&
        (UsbClassCReg.BaseCode == PCI_CLASS_SERIAL) && 
        (UsbClassCReg.SubClassCode == PCI_CLASS_SERIAL_USB)) {
     Status = PciIo->GetLocation (
                     PciIo,
-                    &UhciSegmentNumber,
-                    &UhciBusNumber,
-                    &UhciDeviceNumber,
-                    &UhciFunctionNumber
+                    &CompanionSegmentNumber,
+                    &CompanionBusNumber,
+                    &CompanionDeviceNumber,
+                    &CompanionFunctionNumber
                     );
     if (EFI_ERROR (Status)) {
       goto CLOSE_PCIIO;
@@ -1853,7 +1854,7 @@ EhcDriverBindingStart (
         // Currently, the judgment on the companion usb host controller is through the
         // same bus number, which may vary on different platform.
         //
-        if (EhciBusNumber == UhciBusNumber) {
+        if (EhciBusNumber == CompanionBusNumber) {
           gBS->CloseProtocol (
                     Controller,
                     &gEfiPciIoProtocolGuid,
@@ -2081,7 +2082,7 @@ EhcDriverBindingStop (
 
   //
   // Disable routing of all ports to EHCI controller, so all ports are 
-  // routed back to the UHCI controller.
+  // routed back to the UHCI or OHCI controller.
   //
   EhcClearOpRegBit (Ehc, EHC_CONFIG_FLAG_OFFSET, CONFIGFLAG_ROUTE_EHC);
 

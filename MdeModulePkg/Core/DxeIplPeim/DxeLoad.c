@@ -241,20 +241,25 @@ DxeLoadCore (
                NULL,
                (VOID **) &PeiRecovery
                );
-    //
-    // Report Status code the failure of locating Recovery PPI 
-    //
-    REPORT_STATUS_CODE (
-      EFI_ERROR_CODE | EFI_ERROR_MAJOR,
-      (EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_EC_RECOVERY_PPI_NOT_FOUND)
-      );    
-    ASSERT_EFI_ERROR (Status);
+
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Locate Recovery PPI Failed.(Status = %r)\n", Status));
+      //
+      // Report Status code the failure of locating Recovery PPI 
+      //
+      REPORT_STATUS_CODE (
+        EFI_ERROR_CODE | EFI_ERROR_MAJOR,
+        (EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_EC_RECOVERY_PPI_NOT_FOUND)
+        );
+      CpuDeadLoop ();
+    }
+
     REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_PC_CAPSULE_LOAD));
     Status = PeiRecovery->LoadRecoveryCapsule (PeiServices, PeiRecovery);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "Load Recovery Capsule Failed.(Status = %r)\n", Status));
       //
-      // Report Status code that S3Resume PPI can not be found
+      // Report Status code that recovery image can not be found
       //
       REPORT_STATUS_CODE (
         EFI_ERROR_CODE | EFI_ERROR_MAJOR,

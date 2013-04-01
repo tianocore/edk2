@@ -1,7 +1,7 @@
 /** @file
   Internal library implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -568,6 +568,12 @@ PciHostBridgeResourceAllocator (
                                 RootBridgeDev->Handle,
                                 AcpiConfig
                                 );
+        //
+        // If SubmitResources returns error, PciBus isn't able to start.
+        // It's a fatal error so assertion is added.
+        //
+        DEBUG ((EFI_D_INFO, "PciBus: HostBridge->SubmitResources() - %r\n", Status));
+        ASSERT_EFI_ERROR (Status);
       }
 
       //
@@ -598,6 +604,7 @@ PciHostBridgeResourceAllocator (
     // Notify platform to start to program the resource
     //
     Status = NotifyPhase (PciResAlloc, EfiPciHostBridgeAllocateResources);
+    DEBUG ((EFI_D_INFO, "PciBus: HostBridge->NotifyPhase(AllocateResources) - %r\n", Status));
     if (!FeaturePcdGet (PcdPciBusHotplugDeviceSupport)) {
       //
       // If Hot Plug is not supported

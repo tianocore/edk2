@@ -1007,17 +1007,15 @@ XhcControlTransfer (
       if ((State & XHC_PORTSC_PS) >> 10 == 0) {
         PortStatus.PortStatus |= USB_PORT_STAT_SUPER_SPEED;
       }
-    } else if (DeviceSpeed == EFI_USB_SPEED_HIGH) {
+    } else {
       //
-      // For high speed hub, its bit9~10 presents the attached device speed.
+      // For high or full/low speed hub, its bit9~10 presents the attached device speed.
       //
       if (XHC_BIT_IS_SET (State, BIT9)) {
         PortStatus.PortStatus |= USB_PORT_STAT_LOW_SPEED;
       } else if (XHC_BIT_IS_SET (State, BIT10)) {
         PortStatus.PortStatus |= USB_PORT_STAT_HIGH_SPEED;
       }
-    } else {
-      ASSERT (0);
     }
 
     //
