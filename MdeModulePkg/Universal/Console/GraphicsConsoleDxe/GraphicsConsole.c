@@ -57,7 +57,7 @@ GRAPHICS_CONSOLE_MODE_DATA mGraphicsConsoleModeData[] = {
 EFI_HII_DATABASE_PROTOCOL   *mHiiDatabase;
 EFI_HII_FONT_PROTOCOL       *mHiiFont;
 EFI_HII_HANDLE              mHiiHandle;
-EFI_EVENT                   mHiiRegistration;
+VOID                        *mHiiRegistration;
 
 EFI_GUID             mFontPackageListGuid = {0xf5f219d3, 0x7006, 0x4648, {0xac, 0x8d, 0xd6, 0x1d, 0xfb, 0x7b, 0xc6, 0xad}};
 
@@ -806,42 +806,14 @@ EfiLocateHiiProtocol (
   VOID
   )
 {
-  EFI_HANDLE  Handle;
-  UINTN       Size;
   EFI_STATUS  Status;
 
-  //
-  // There should only be one - so buffer size is this
-  //
-  Size = sizeof (EFI_HANDLE);
-
-  Status = gBS->LocateHandle (
-                  ByProtocol,
-                  &gEfiHiiDatabaseProtocolGuid,
-                  NULL,
-                  &Size,
-                  (VOID **) &Handle
-                  );
-
+  Status = gBS->LocateProtocol (&gEfiHiiDatabaseProtocolGuid, NULL, (VOID **) &mHiiDatabase);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status = gBS->HandleProtocol (
-                  Handle,
-                  &gEfiHiiDatabaseProtocolGuid,
-                  (VOID **) &mHiiDatabase
-                  );
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = gBS->HandleProtocol (
-                  Handle,
-                  &gEfiHiiFontProtocolGuid,
-                  (VOID **) &mHiiFont
-                  );
+  Status = gBS->LocateProtocol (&gEfiHiiFontProtocolGuid, NULL, (VOID **) &mHiiFont);
   return Status;
 }
 
@@ -2057,7 +2029,9 @@ RegisterFontPackage (
                   NULL,
                   (VOID **) &HiiDatabase
                   );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    return;
+  }
 
   //
   // Add 4 bytes to the header for entire length for HiiAddPackages use only.
