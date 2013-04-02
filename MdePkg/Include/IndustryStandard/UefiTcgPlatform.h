@@ -26,6 +26,7 @@
 #define EV_S_CRTM_CONTENTS          ((TCG_EVENTTYPE) 0x00000007)
 #define EV_S_CRTM_VERSION           ((TCG_EVENTTYPE) 0x00000008)
 #define EV_CPU_MICROCODE            ((TCG_EVENTTYPE) 0x00000009)
+#define EV_TABLE_OF_DEVICES         ((TCG_EVENTTYPE) 0x0000000B)
 
 //
 // EFI specific event types
@@ -51,6 +52,25 @@
   "Exit Boot Services Returned with Failure"
 #define EFI_EXIT_BOOT_SERVICES_SUCCEEDED    \
   "Exit Boot Services Returned with Success"
+
+
+#define EV_POSTCODE_INFO_POST_CODE    "POST CODE"
+#define POST_CODE_STR_LEN             (sizeof(EV_POSTCODE_INFO_POST_CODE) - 1)
+
+#define EV_POSTCODE_INFO_SMM_CODE     "SMM CODE"
+#define SMM_CODE_STR_LEN              (sizeof(EV_POSTCODE_INFO_SMM_CODE) - 1)
+
+#define EV_POSTCODE_INFO_ACPI_DATA    "ACPI DATA"
+#define ACPI_DATA_LEN                 (sizeof(EV_POSTCODE_INFO_ACPI_DATA) - 1)
+
+#define EV_POSTCODE_INFO_BIS_CODE     "BIS CODE"
+#define BIS_CODE_LEN                  (sizeof(EV_POSTCODE_INFO_BIS_CODE) - 1)
+
+#define EV_POSTCODE_INFO_UEFI_PI      "UEFI PI"
+#define UEFI_PI_LEN                   (sizeof(EV_POSTCODE_INFO_UEFI_PI) - 1)
+
+#define EV_POSTCODE_INFO_OPROM        "Embedded Option ROM"
+#define OPROM_LEN                     (sizeof(EV_POSTCODE_INFO_OPROM) - 1)
 
 //
 // Set structure alignment to 1-byte

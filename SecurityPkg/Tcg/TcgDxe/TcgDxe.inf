@@ -62,6 +62,7 @@
   gEfiTcgProtocolGuid                           ## PRODUCES
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+  gEfiMpServiceProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
 
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmPlatformClass
