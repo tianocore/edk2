@@ -2,7 +2,7 @@
   This code produces the Smbios protocol. It also responsible for constructing 
   SMBIOS table into system table.
   
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -87,11 +87,11 @@ SMBIOS_TABLE_ENTRY_POINT EntryPointStructureData = {
   //
   0,
   //
-  // StructureTableLength, TO BE FILLED
+  // TableLength, TO BE FILLED
   //
   0,
   //
-  // StructureTableAddress, TO BE FILLED
+  // TableAddress, TO BE FILLED
   //
   0,
   //
@@ -101,7 +101,8 @@ SMBIOS_TABLE_ENTRY_POINT EntryPointStructureData = {
   //
   // SmbiosBcdRevision
   //
-  0  
+  (UINT8) ((FixedPcdGet16 (PcdSmbiosVersion) >> 4) & 0xf0)
+  | (UINT8) (FixedPcdGet16 (PcdSmbiosVersion) & 0x0f)
 };
 
 
