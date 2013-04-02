@@ -29,6 +29,7 @@
 #
 
 [Sources.common]
+  PerformanceTokens.h
   UefiDpLib.c
   UefiDpLib.h
   UefiDpLib.uni
