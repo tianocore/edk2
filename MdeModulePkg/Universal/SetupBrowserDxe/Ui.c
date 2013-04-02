@@ -266,8 +266,8 @@ UiFindChildMenuList (
 /**
   Search Menu with given Handle, FormSetGuid and FormId in all cached menu list.
 
-  @param  FormSetGuid            The Formset GUID of the menu to search.
   @param  Handle                 Hii handle related to this formset.
+  @param  FormSetGuid            The Formset GUID of the menu to search.
   @param  FormId                 The Form ID of menu to search.
 
   @return A pointer to menu found or NULL if not found.
