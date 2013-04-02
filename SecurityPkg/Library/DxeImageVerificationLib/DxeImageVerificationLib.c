@@ -715,14 +715,15 @@ AddImageExeInfo (
 
   if (Name != NULL) {
     NameStringLen = StrSize (Name);
+  } else {
+    NameStringLen = sizeof (CHAR16);
   }
 
-  ImageExeInfoTable = NULL;
   EfiGetSystemConfigurationTable (&gEfiImageSecurityDatabaseGuid, (VOID **) &ImageExeInfoTable);
   if (ImageExeInfoTable != NULL) {
     //
     // The table has been found!
-    // We must enlarge the table to accmodate the new exe info entry.
+    // We must enlarge the table to accomodate the new exe info entry.
     //
     ImageExeInfoTableSize = GetImageExeInfoTableSize (ImageExeInfoTable);
   } else {
@@ -755,6 +756,8 @@ AddImageExeInfo (
 
   if (Name != NULL) {
     CopyMem ((UINT8 *) &ImageExeInfoEntry->InfoSize + sizeof (UINT32), Name, NameStringLen);
+  } else {
+    ZeroMem ((UINT8 *) &ImageExeInfoEntry->InfoSize + sizeof (UINT32), sizeof (CHAR16));
   }
   CopyMem (
     (UINT8 *) &ImageExeInfoEntry->InfoSize + sizeof (UINT32) + NameStringLen,

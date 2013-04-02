@@ -1,7 +1,7 @@
 /** @file
   HII Config Access protocol implementation of SecureBoot configuration module.
 
-Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -253,6 +253,7 @@ DeleteVariable (
   if (Variable == NULL) {
     return EFI_SUCCESS;
   }
+  FreePool (Variable);
 
   Data     = NULL;
   DataSize = 0;
@@ -276,6 +277,31 @@ DeleteVariable (
     FreePool (Data);
   }
   return Status;
+}
+
+/**
+
+  Set the platform secure boot mode into "Custom" or "Standard" mode.
+
+  @param[in]   SecureBootMode        New secure boot mode: STANDARD_SECURE_BOOT_MODE or
+                                     CUSTOM_SECURE_BOOT_MODE.
+  
+  @return EFI_SUCCESS                The platform has switched to the special mode successfully.
+  @return other                      Fail to operate the secure boot mode.
+  
+**/
+EFI_STATUS
+SetSecureBootMode (
+  IN     UINT8         SecureBootMode
+  )
+{
+  return gRT->SetVariable (                          
+                EFI_CUSTOM_MODE_NAME,
+                &gEfiCustomModeEnableGuid,
+                EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                sizeof (UINT8),
+                &SecureBootMode
+                );
 }
 
 /**
@@ -380,6 +406,11 @@ EnrollPlatformKey (
 
   PkCert = NULL;
 
+  Status = SetSecureBootMode(CUSTOM_SECURE_BOOT_MODE);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   //
   // Parse the file's postfix. Only support DER encoded X.509 certificate files.
   //
@@ -456,6 +487,11 @@ DeletePlatformKey (
 )
 {
   EFI_STATUS Status;
+
+  Status = SetSecureBootMode(CUSTOM_SECURE_BOOT_MODE);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   Status = DeleteVariable (
              EFI_PLATFORM_KEY_NAME,
@@ -766,9 +802,15 @@ EnrollKeyExchangeKey (
   ) 
 {
   UINT16*     FilePostFix;
+  EFI_STATUS  Status;
   
   if ((Private->FileContext->FileName == NULL) || (Private->SignatureGUID == NULL)) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  Status = SetSecureBootMode(CUSTOM_SECURE_BOOT_MODE);
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   //
@@ -1508,11 +1550,17 @@ EnrollSignatureDatabase (
   ) 
 {
   UINT16*      FilePostFix;
+  EFI_STATUS   Status;
 
   if ((Private->FileContext->FileName == NULL) || (Private->FileContext->FHandle == NULL) || (Private->SignatureGUID == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
+  Status = SetSecureBootMode(CUSTOM_SECURE_BOOT_MODE);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
   //
   // Parse the file's postfix. 
   //
@@ -1756,6 +1804,11 @@ DeleteKeyExchangeKey (
   Cert            = NULL;
   Attr            = 0;   
   DeleteKekIndex  = QuestionId - OPTION_DEL_KEK_QUESTION_ID;
+
+  Status = SetSecureBootMode(CUSTOM_SECURE_BOOT_MODE);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
   
   //
   // Get original KEK variable.
@@ -1944,6 +1997,11 @@ DeleteSignature (
   Cert            = NULL;
   Attr            = 0; 
 
+  Status = SetSecureBootMode(CUSTOM_SECURE_BOOT_MODE);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   //
   // Get original signature list data.
   //                           
@@ -2103,23 +2161,25 @@ SecureBootExtractConfigFromVariable (
 {
   UINT8   *SecureBootEnable;
   UINT8   *SetupMode;
-  UINT8   *SecureBoot;
   UINT8   *SecureBootMode;
 
   SecureBootEnable = NULL;
   SetupMode        = NULL;
-  SecureBoot       = NULL;
   SecureBootMode   = NULL;
   
   //
   // If the SecureBootEnable Variable doesn't exist, hide the SecureBoot Enable/Disable
   // Checkbox.
   //
+  ConfigData->AttemptSecureBoot = FALSE;
   GetVariable2 (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, (VOID**)&SecureBootEnable, NULL);
   if (SecureBootEnable == NULL) {
     ConfigData->HideSecureBoot = TRUE;
   } else {
     ConfigData->HideSecureBoot = FALSE;
+    if ((*SecureBootEnable) == SECURE_BOOT_ENABLE) {
+      ConfigData->AttemptSecureBoot = TRUE;
+    }
   }
   
   //
@@ -2140,16 +2200,6 @@ SecureBootExtractConfigFromVariable (
   } else  {
     ConfigData->HasPk = TRUE;
   }
-  
-  //
-  // If the value of SecureBoot variable is 1, the platform is operating in secure boot mode.
-  //
-  GetVariable2 (EFI_SECURE_BOOT_MODE_NAME, &gEfiGlobalVariableGuid, (VOID**)&SecureBoot, NULL);
-  if (SecureBoot != NULL && *SecureBoot == SECURE_BOOT_MODE_ENABLE) {
-    ConfigData->SecureBootState = TRUE;
-  } else {
-    ConfigData->SecureBootState = FALSE;
-  }
 
   //
   // Get the SecureBootMode from CustomMode variable.
@@ -2160,7 +2210,16 @@ SecureBootExtractConfigFromVariable (
   } else {
     ConfigData->SecureBootMode = *(SecureBootMode);
   }
-  
+
+  if (SecureBootEnable != NULL) {
+    FreePool (SecureBootEnable);
+  }
+  if (SetupMode != NULL) {
+    FreePool (SetupMode);
+  }
+  if (SecureBootMode != NULL) {
+    FreePool (SecureBootMode);
+  }
 }
 
 /**
@@ -2206,6 +2265,7 @@ SecureBootExtractConfig (
   EFI_STRING                        ConfigRequestHdr;
   SECUREBOOT_CONFIG_PRIVATE_DATA    *PrivateData;
   BOOLEAN                           AllocatedRequest;
+  UINT8                             *SecureBoot;
 
   if (Progress == NULL || Results == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2215,6 +2275,7 @@ SecureBootExtractConfig (
   ConfigRequestHdr = NULL;
   ConfigRequest    = NULL;
   Size             = 0;
+  SecureBoot       = NULL;
   
   ZeroMem (&Configuration, sizeof (Configuration));
   PrivateData      = SECUREBOOT_CONFIG_PRIVATE_FROM_THIS (This);
@@ -2228,6 +2289,19 @@ SecureBootExtractConfig (
   // Get Configuration from Variable.
   //
   SecureBootExtractConfigFromVariable (&Configuration);
+
+  //
+  // Update current secure boot state.
+  //
+  GetVariable2 (EFI_SECURE_BOOT_MODE_NAME, &gEfiGlobalVariableGuid, (VOID**)&SecureBoot, NULL);
+  if (SecureBoot != NULL && *SecureBoot == SECURE_BOOT_MODE_ENABLE) {
+    HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_SECURE_BOOT_STATE_CONTENT), L"Enabled", NULL);
+  } else {
+    HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_SECURE_BOOT_STATE_CONTENT), L"Disabled", NULL);
+  }
+  if (SecureBoot != NULL) {
+    FreePool (SecureBoot);
+  }
   
   BufferSize = sizeof (SECUREBOOT_CONFIGURATION);
   ConfigRequest = Request;
@@ -2355,15 +2429,21 @@ SecureBootCallback (
   SECUREBOOT_CONFIGURATION        *IfrNvData;
   UINT16                          LabelId;
   UINT8                           *SecureBootEnable;
+  UINT8                           *SecureBootMode;
+  UINT8                           *SetupMode;
   CHAR16                          PromptString[100];
 
   SecureBootEnable = NULL;
+  SecureBootMode   = NULL;
+  SetupMode        = NULL;
 
   if ((This == NULL) || (Value == NULL) || (ActionRequest == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((Action != EFI_BROWSER_ACTION_CHANGED) && (Action != EFI_BROWSER_ACTION_CHANGING)) {
+  if ((Action != EFI_BROWSER_ACTION_CHANGED) &&
+      (Action != EFI_BROWSER_ACTION_CHANGING) &&
+      (Action != EFI_BROWSER_ACTION_FORM_CLOSE)) {
     return EFI_UNSUPPORTED;
   }
   
@@ -2388,6 +2468,7 @@ SecureBootCallback (
     case KEY_SECURE_BOOT_ENABLE:
       GetVariable2 (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, (VOID**)&SecureBootEnable, NULL);
       if (NULL != SecureBootEnable) {
+        FreePool (SecureBootEnable);
         if (EFI_ERROR (SaveSecureBootVariable (Value->u8))) {
           CreatePopUp (
             EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
@@ -2400,11 +2481,10 @@ SecureBootCallback (
           CreatePopUp (
             EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
             &Key,
-            L"Secure boot configuration is changed, please reset the platform to take effect!",
+            L"Configuration changed, please reset the platform to take effect!",
             NULL
             );
         }
-        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY; 
       }
       break;
 
@@ -2461,10 +2541,26 @@ SecureBootCallback (
       break;
 
     case KEY_SECURE_BOOT_DELETE_PK: 
-        if (Value->u8) {
+      if (Value->u8) {
+        CreatePopUp (
+          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+          &Key,
+          L"Are you sure you want to delete PK? Secure boot will be disabled!",
+          L"Press 'Y' to delete PK and exit, 'N' to discard change and return",
+          NULL
+          );
+        if (Key.UnicodeChar == 'y' || Key.UnicodeChar == 'Y') {
           Status = DeletePlatformKey ();
-          *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
+          if (EFI_ERROR (Status)) {
+            CreatePopUp (
+              EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+              &Key,
+              L"Only Physical Presence User could delete PK in custom mode!",
+              NULL
+              );
+          }
         }
+      }
       break;
 
     case KEY_DELETE_KEK:
@@ -2547,7 +2643,7 @@ SecureBootCallback (
   } else if (Action == EFI_BROWSER_ACTION_CHANGED) {
     switch (QuestionId) {
     case KEY_SECURE_BOOT_ENABLE:
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;      
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
       break;  
     case KEY_VALUE_SAVE_AND_EXIT_PK:
       Status = EnrollPlatformKey (Private);
@@ -2588,8 +2684,8 @@ SecureBootCallback (
       break;
       
     case KEY_SECURE_BOOT_MODE:
-      GetVariable2 (EFI_CUSTOM_MODE_NAME, &gEfiCustomModeEnableGuid, (VOID**)&SecureBootEnable, NULL);
-      if (NULL != SecureBootEnable) {
+      GetVariable2 (EFI_CUSTOM_MODE_NAME, &gEfiCustomModeEnableGuid, (VOID**)&SecureBootMode, NULL);
+      if (NULL != SecureBootMode) {
         Status = gRT->SetVariable (                          
                         EFI_CUSTOM_MODE_NAME,
                         &gEfiCustomModeEnableGuid,
@@ -2599,6 +2695,7 @@ SecureBootCallback (
                         );
         *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
         IfrNvData->SecureBootMode = Value->u8;
+        FreePool (SecureBootMode);
       }        
       break;
 
@@ -2619,10 +2716,32 @@ SecureBootCallback (
       break;
 
     case KEY_SECURE_BOOT_DELETE_PK:
-      if (Value->u8) {
+      GetVariable2 (EFI_SETUP_MODE_NAME, &gEfiGlobalVariableGuid, (VOID**)&SetupMode, NULL);
+      if (SetupMode == NULL || (*SetupMode) == SETUP_MODE) {
+        IfrNvData->DeletePk = TRUE;
+        IfrNvData->HasPk    = FALSE;
         *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+      } else  {
+        IfrNvData->DeletePk = FALSE;
+        IfrNvData->HasPk    = TRUE;
+        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
+      }
+      if (SetupMode != NULL) {
+        FreePool (SetupMode);
       }
       break;  
+    }
+  } else if (Action == EFI_BROWSER_ACTION_FORM_CLOSE) {
+    //
+    // Force the platform back to Standard Mode once user leave the setup screen.
+    //
+    GetVariable2 (EFI_CUSTOM_MODE_NAME, &gEfiCustomModeEnableGuid, (VOID**)&SecureBootMode, NULL);
+    if (NULL != SecureBootMode && *SecureBootMode == CUSTOM_SECURE_BOOT_MODE) {
+      IfrNvData->SecureBootMode = STANDARD_SECURE_BOOT_MODE;
+      SetSecureBootMode(STANDARD_SECURE_BOOT_MODE);
+    }
+    if (SecureBootMode != NULL) {
+      FreePool (SecureBootMode);
     }
   }
   
