@@ -399,10 +399,10 @@ InitializeFrontPage (
 
   CurrentLang = GetEfiGlobalVariable (L"PlatformLang");
 
-  if (gFrontPagePrivate.LanguageToken == NULL) {
-    //
-    // Get Support language list from variable.
-    //
+  //
+  // Get Support language list from variable.
+  //
+  if (mLanguageString == NULL){
     mLanguageString = GetEfiGlobalVariable (L"PlatformLangCodes");
     if (mLanguageString == NULL) {
       mLanguageString = AllocateCopyPool (
@@ -411,7 +411,9 @@ InitializeFrontPage (
                                  );
       ASSERT (mLanguageString != NULL);
     }
+  }
 
+  if (gFrontPagePrivate.LanguageToken == NULL) {
     //
     // Count the language list number.
     //  
@@ -1223,6 +1225,7 @@ PlatformBdsEnterFrontPage (
 
   if (mLanguageString != NULL) {
     FreePool (mLanguageString);
+    mLanguageString = NULL;
   }
   //
   //Will leave browser, check any reset required change is applied? if yes, reset system
