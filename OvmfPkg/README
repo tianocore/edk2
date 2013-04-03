@@ -52,6 +52,7 @@ these binary outputs:
 * OVMF.FD
   - Please note!  This filename has changed.  Older releases used OVMF.Fv.
 * OvmfVideo.rom
+  - This file is not built separately any longer, starting with svn r13520.
 
 More information on building OVMF can be found at:
 

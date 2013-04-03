@@ -227,7 +227,6 @@ def create_zip(arch):
         'FV'
         )
     zipf.write(os.path.join(FV_DIR, 'OVMF.fd'), 'OVMF.fd')
-    zipf.write(os.path.join(FV_DIR, 'OvmfVideo.rom'), 'OvmfVideo.rom')
     zipf.close()
     print '[done]'
 
