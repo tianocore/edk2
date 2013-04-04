@@ -682,6 +682,7 @@ LegacyBiosInstall (
   LEGACY_BIOS_INSTANCE               *Private;
   EFI_TO_COMPATIBILITY16_INIT_TABLE  *EfiToLegacy16InitTable;
   EFI_PHYSICAL_ADDRESS               MemoryAddress;
+  EFI_PHYSICAL_ADDRESS               EbdaReservedBaseAddress;
   VOID                               *MemoryPtr;
   EFI_PHYSICAL_ADDRESS               MemoryAddressUnder1MB;
   UINTN                              Index;
@@ -880,9 +881,21 @@ LegacyBiosInstall (
   //
   // Allocate all 32k chunks from 0x60000 ~ 0x88000 for Legacy OPROMs that
   // don't use PMM but look for zeroed memory. Note that various non-BBS
-  // SCSIs expect different areas to be free
+  // OpROMs expect different areas to be free
   //
-  for (MemStart = 0x60000; MemStart < 0x88000; MemStart += 0x1000) {
+  EbdaReservedBaseAddress = MemoryAddress;
+  MemoryAddress = PcdGet32 (PcdOpromReservedMemoryBase);
+  MemorySize    = PcdGet32 (PcdOpromReservedMemorySize);
+  //
+  // Check if base address and size for reserved memory are 4KB aligned.
+  //
+  ASSERT ((MemoryAddress & 0xFFF) == 0);
+  ASSERT ((MemorySize & 0xFFF) == 0);
+  //
+  // Check if the reserved memory is below EBDA reserved range.
+  //
+  ASSERT ((MemoryAddress < EbdaReservedBaseAddress) && ((MemoryAddress + MemorySize - 1) < EbdaReservedBaseAddress));
+  for (MemStart = MemoryAddress; MemStart < MemoryAddress + MemorySize; MemStart += 0x1000) {
     Status = AllocateLegacyMemory (
                AllocateAddress,
                MemStart,

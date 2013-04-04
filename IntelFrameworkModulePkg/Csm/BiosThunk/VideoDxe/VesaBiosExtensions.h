@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -168,6 +168,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define VESA_BIOS_EXTENSIONS_EDID_BLOCK_SIZE                    128
 #define VESA_BIOS_EXTENSIONS_EDID_ESTABLISHED_TIMING_MAX_NUMBER 17
 
+//
+// Established Timings: 24 possible resolutions
+// Standard Timings: 8 possible resolutions
+// Detailed Timings: 4 possible resolutions
+//
+#define VESA_BIOS_EXTENSIONS_EDID_TIMING_MAX_NUMBER             36
+
+//
+// Timing data size for Established Timings, Standard Timings and Detailed Timings
+//
+#define VESA_BIOS_EXTENSIONS_ESTABLISHED_TIMING_SIZE                  3
+#define VESA_BIOS_EXTENSIONS_STANDARD_TIMING_SIZE                     16
+#define VESA_BIOS_EXTENSIONS_DETAILED_TIMING_EACH_DESCRIPTOR_SIZE     18
+#define VESA_BIOS_EXTENSIONS_DETAILED_TIMING_DESCRIPTOR_MAX_SIZE      72
+
 typedef struct {
   UINT16  HorizontalResolution;
   UINT16  VerticalResolution;
@@ -176,7 +191,7 @@ typedef struct {
 
 typedef struct {
   UINT32  ValidNumber;
-  UINT32  Key[VESA_BIOS_EXTENSIONS_EDID_ESTABLISHED_TIMING_MAX_NUMBER];
+  UINT32  Key[VESA_BIOS_EXTENSIONS_EDID_TIMING_MAX_NUMBER];
 } VESA_BIOS_EXTENSIONS_VALID_EDID_TIMING;
 
 typedef struct {
@@ -203,9 +218,9 @@ typedef struct {
   UINT8   BlueY;                            //Blue-y Bits 9 - 2
   UINT8   WhiteX;                           //White-x Bits 9 - 2
   UINT8   WhiteY;                           //White-x Bits 9 - 2
-  UINT8   EstablishedTimings[3];
-  UINT8   StandardTimingIdentification[16];
-  UINT8   DetailedTimingDescriptions[72];
+  UINT8   EstablishedTimings[VESA_BIOS_EXTENSIONS_ESTABLISHED_TIMING_SIZE];
+  UINT8   StandardTimingIdentification[VESA_BIOS_EXTENSIONS_STANDARD_TIMING_SIZE];
+  UINT8   DetailedTimingDescriptions[VESA_BIOS_EXTENSIONS_DETAILED_TIMING_DESCRIPTOR_MAX_SIZE];
   UINT8   ExtensionFlag;                    //Number of (optional) 128-byte EDID extension blocks to follow
   UINT8   Checksum;
 } VESA_BIOS_EXTENSIONS_EDID_DATA_BLOCK;
