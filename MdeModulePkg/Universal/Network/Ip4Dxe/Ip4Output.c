@@ -1,7 +1,7 @@
 /** @file
   Transmit the IP4 packet.
   
-Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -286,46 +286,40 @@ Ip4Output (
   if (EFI_ERROR(Status)) {
     return Status;
   }
+  
+  Dest = Head->Dst;
+  if (IP4_IS_BROADCAST (Ip4GetNetCast (Dest, IpIf)) || (Dest == IP4_ALLONE_ADDRESS)) {
+    //
+    // Set the gateway to local broadcast if the Dest is
+    // the broadcast address for the connected network or
+    // it is local broadcast.
+    //
+    GateWay = IP4_ALLONE_ADDRESS;
 
-  //
-  // Route the packet unless overrided, that is, GateWay isn't zero.
-  //
-  if (GateWay == IP4_ALLZERO_ADDRESS) {
-    Dest = Head->Dst;
+  } else if (IP4_IS_MULTICAST (Dest)) {
+    //
+    // Set the gateway to the destination if it is an multicast
+    // address. The IP4_INTERFACE won't consult ARP to send local
+    // broadcast and multicast.
+    //
+    GateWay = Head->Dst;
 
-    if (IP4_IS_BROADCAST (Ip4GetNetCast (Dest, IpIf)) || (Dest == IP4_ALLONE_ADDRESS)) {
-      //
-      // Set the gateway to local broadcast if the Dest is
-      // the broadcast address for the connected network or
-      // it is local broadcast.
-      //
-      GateWay = IP4_ALLONE_ADDRESS;
-
-    } else if (IP4_IS_MULTICAST (Dest)) {
-      //
-      // Set the gateway to the destination if it is an multicast
-      // address. The IP4_INTERFACE won't consult ARP to send local
-      // broadcast and multicast.
-      //
-      GateWay = Head->Dst;
-
+  } else if (GateWay == IP4_ALLZERO_ADDRESS) {
+    //
+    // Route the packet unless overrided, that is, GateWay isn't zero.
+    //
+    if (IpInstance == NULL) {
+      CacheEntry = Ip4Route (IpSb->DefaultRouteTable, Head->Dst, Head->Src);
     } else {
-      //
-      // Consult the route table to route the packet
-      //
-      if (IpInstance == NULL) {
-        CacheEntry = Ip4Route (IpSb->DefaultRouteTable, Head->Dst, Head->Src);
-      } else {
-        CacheEntry = Ip4Route (IpInstance->RouteTable, Head->Dst, Head->Src);
-      }
-
-      if (CacheEntry == NULL) {
-        return EFI_NOT_FOUND;
-      }
-
-      GateWay = CacheEntry->NextHop;
-      Ip4FreeRouteCacheEntry (CacheEntry);
+      CacheEntry = Ip4Route (IpInstance->RouteTable, Head->Dst, Head->Src);
     }
+
+    if (CacheEntry == NULL) {
+      return EFI_NOT_FOUND;
+    }
+
+    GateWay = CacheEntry->NextHop;
+    Ip4FreeRouteCacheEntry (CacheEntry);
   }
 
   //

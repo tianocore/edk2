@@ -572,6 +572,7 @@ EfiPxeBcDiscover (
   //
   // There are 3 methods to get the information for discover.
   //
+  ZeroMem (&DefaultInfo, sizeof (EFI_PXE_BASE_CODE_DISCOVER_INFO));
   if (*Layer != EFI_PXE_BASE_CODE_BOOT_LAYER_INITIAL) {
     //
     // 1. Take the previous setting as the discover info.

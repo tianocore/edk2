@@ -1,7 +1,7 @@
 /** @file
   Implement IP4 pesudo interface.
   
-Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -740,24 +740,11 @@ Ip4FreeInterface (
   //
   Ip4CancelFrames (Interface, EFI_ABORTED, Ip4CancelInstanceFrame, IpInstance);
 
-  if (--Interface->RefCnt > 0) {
-    return EFI_SUCCESS;
-  }
-
   //
-  // Destroy the interface if this is the last IP instance that
-  // has the address. Remove all the system transmitted packets
-  // from this interface, cancel the receive request if there is
-  // one, and destroy the ARP requests.
+  // Destroy the ARP instance if this is the last IP instance that
+  // has the address.
   //
-  Ip4CancelFrames (Interface, EFI_ABORTED, Ip4CancelInstanceFrame, NULL);
-  Ip4CancelReceive (Interface);
-
-  ASSERT (IsListEmpty (&Interface->IpInstances));
-  ASSERT (IsListEmpty (&Interface->ArpQues));
-  ASSERT (IsListEmpty (&Interface->SentFrames));
-
-  if (Interface->Arp != NULL) {
+  if (Interface->Arp != NULL && IsListEmpty (&Interface->IpInstances)) {
     gBS->CloseProtocol (
           Interface->ArpHandle,
           &gEfiArpProtocolGuid,
@@ -771,7 +758,24 @@ Ip4FreeInterface (
       &gEfiArpServiceBindingProtocolGuid,
       Interface->ArpHandle
       );
+    Interface->Arp = NULL;
   }
+  
+  if (--Interface->RefCnt > 0) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Destroy the interface if it is not referenced by any IP instance (for common Interface)
+  // or the IP service (for the DefaultInterface). Remove all the system transmitted packets
+  // from this interface, cancel the receive request if there is one.
+  //
+  Ip4CancelFrames (Interface, EFI_ABORTED, Ip4CancelInstanceFrame, NULL);
+  Ip4CancelReceive (Interface);
+
+  ASSERT (IsListEmpty (&Interface->IpInstances));
+  ASSERT (IsListEmpty (&Interface->ArpQues));
+  ASSERT (IsListEmpty (&Interface->SentFrames));
 
   RemoveEntryList (&Interface->Link);
   FreePool (Interface);

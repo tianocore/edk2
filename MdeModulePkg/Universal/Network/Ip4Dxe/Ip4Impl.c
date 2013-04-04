@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -562,6 +562,9 @@ Ip4AutoConfigCallBackDpc (
   IP4_ADDR                  SubnetMask;
   IP4_ADDR                  SubnetAddress;
   IP4_ADDR                  GatewayAddress;
+  IP4_PROTOCOL              *Ip4Instance;
+  EFI_ARP_PROTOCOL          *Arp;
+  LIST_ENTRY                *Entry;
 
   IpSb      = (IP4_SERVICE *) Context;
   NET_CHECK_SIGNATURE (IpSb, IP4_SERVICE_SIGNATURE);
@@ -650,9 +653,31 @@ Ip4AutoConfigCallBackDpc (
   StationAddress = EFI_NTOHL (Data->StationAddress);
   SubnetMask = EFI_NTOHL (Data->SubnetMask);
   Status = Ip4SetAddress (IpIf, StationAddress, SubnetMask);
-
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
+  }
+
+  if (IpIf->Arp != NULL) {
+    //   
+    // A non-NULL IpIf->Arp here means a new ARP child is created when setting default address, 
+    // but some IP children may have referenced the default interface before it is configured,
+    // these IP instances also consume this ARP protocol so they need to open it BY_CHILD_CONTROLLER.
+    //
+    Arp = NULL;
+    NET_LIST_FOR_EACH (Entry, &IpIf->IpInstances) {
+      Ip4Instance = NET_LIST_USER_STRUCT_S (Entry, IP4_PROTOCOL, AddrLink, IP4_PROTOCOL_SIGNATURE);
+      Status = gBS->OpenProtocol (
+                      IpIf->ArpHandle,
+                      &gEfiArpProtocolGuid,
+                      (VOID **) &Arp,
+                      gIp4DriverBinding.DriverBindingHandle,
+                      Ip4Instance->Handle,
+                      EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+                      );
+      if (EFI_ERROR (Status)) {
+        goto ON_EXIT;
+      }
+    }
   }
 
   Ip4AddRoute (

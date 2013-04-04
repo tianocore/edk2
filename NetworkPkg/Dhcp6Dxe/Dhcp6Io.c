@@ -1,7 +1,7 @@
 /** @file
   Dhcp6 internal functions implementation.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -2925,7 +2925,9 @@ Dhcp6OnTimerTick (
           // Select the advertisement received before.
           //
           Status = Dhcp6SelectAdvertiseMsg (Instance, Instance->AdSelect);
-          if (EFI_ERROR (Status)) {
+          if (Status == EFI_ABORTED) {
+            goto ON_CLOSE;
+          } else if (EFI_ERROR (Status)) {
             TxCb->RetryCnt++;
           }
           return;
@@ -2941,6 +2943,7 @@ Dhcp6OnTimerTick (
       // Check whether overflow the max retry count limit for this packet
       //
       if (TxCb->RetryCtl.Mrc != 0 && TxCb->RetryCtl.Mrc < TxCb->RetryCnt) {
+        Status = EFI_NO_RESPONSE;
         goto ON_CLOSE;
       }
 
@@ -2948,6 +2951,7 @@ Dhcp6OnTimerTick (
       // Check whether overflow the max retry duration for this packet
       //
       if (TxCb->RetryCtl.Mrd != 0 && TxCb->RetryCtl.Mrd <= TxCb->RetryLos) {
+        Status = EFI_NO_RESPONSE;
         goto ON_CLOSE;
       }
 
@@ -3037,9 +3041,10 @@ Dhcp6OnTimerTick (
 
  ON_CLOSE:
 
-  if (TxCb->TxPacket->Dhcp6.Header.MessageType == Dhcp6MsgInfoRequest ||
+  if (TxCb->TxPacket != NULL &&
+      (TxCb->TxPacket->Dhcp6.Header.MessageType == Dhcp6MsgInfoRequest ||
       TxCb->TxPacket->Dhcp6.Header.MessageType == Dhcp6MsgRenew       ||
-      TxCb->TxPacket->Dhcp6.Header.MessageType == Dhcp6MsgConfirm
+      TxCb->TxPacket->Dhcp6.Header.MessageType == Dhcp6MsgConfirm)
       ) {
     //
     // The failure of renew/Confirm will still switch to the bound state.
@@ -3064,6 +3069,6 @@ Dhcp6OnTimerTick (
     //
     // The failure of the others will terminate current state machine if timeout.
     //
-    Dhcp6CleanupSession (Instance, EFI_NO_RESPONSE);
+    Dhcp6CleanupSession (Instance, Status);
   }
 }
