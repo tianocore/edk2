@@ -99,8 +99,17 @@ typedef struct _USB_HUB_API    USB_HUB_API;
 // [USB20-7.1.7.5, it says 10ms for hub and 50ms for
 // root hub]
 //
-#define USB_SET_PORT_RESET_STALL       (10 * USB_BUS_1_MILLISECOND)
+// According to USB2.0, Chapter 11.5.1.5 Resetting,
+// the worst case for TDRST is 20ms
+//
+#define USB_SET_PORT_RESET_STALL       (20 * USB_BUS_1_MILLISECOND)
 #define USB_SET_ROOT_PORT_RESET_STALL  (50 * USB_BUS_1_MILLISECOND)
+
+//
+// Wait for port recovery to accept SetAddress, refers to specification
+// [USB20-7.1.7.5, it says 10 ms for TRSTRCY]
+//
+#define USB_SET_PORT_RECOVERY_STALL    (10 * USB_BUS_1_MILLISECOND)
 
 //
 // Wait for clear roothub port reset, set by experience

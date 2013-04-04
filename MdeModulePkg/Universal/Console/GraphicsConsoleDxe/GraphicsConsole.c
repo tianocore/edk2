@@ -549,6 +549,8 @@ GraphicsConsoleControllerDriverStart (
     }
   }
 
+  DEBUG ((EFI_D_INFO, "GraphicsConsole video resolution %d x %d\n", HorizontalResolution, VerticalResolution));
+
   //
   // Initialize the mode which GraphicsConsole supports.
   //
