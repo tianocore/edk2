@@ -1,7 +1,7 @@
 /** @file
 Utility functions for expression evaluation.
 
-Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2210,6 +2210,7 @@ EvaluateExpression (
   UINT8                   *TempBuffer;
   EFI_TIME                EfiTime;
   EFI_HII_VALUE           QuestionVal;
+  EFI_DEVICE_PATH_PROTOCOL *DevicePath;
 
   //
   // Save current stack offset.
@@ -2469,17 +2470,22 @@ EvaluateExpression (
       }
 
       if (OpCode->DevicePath != 0) {
+        Value->Type = EFI_IFR_TYPE_UNDEFINED;
+
         StrPtr = GetToken (OpCode->DevicePath, FormSet->HiiHandle);
-        if (StrPtr == NULL) {
-          Value->Type = EFI_IFR_TYPE_UNDEFINED;
-          break;
+        if (StrPtr != NULL && mPathFromText != NULL) {
+          DevicePath = mPathFromText->ConvertTextToDevicePath(StrPtr);
+          if (DevicePath != NULL && GetQuestionValueFromForm(DevicePath, NULL, &OpCode->Guid, Value->Value.u16, &QuestionVal)) {
+            Value = &QuestionVal;
+          }
+          if (DevicePath != NULL) {
+            FreePool (DevicePath);
+          }
         }
 
-        if (!GetQuestionValueFromForm((EFI_DEVICE_PATH_PROTOCOL*)StrPtr, NULL, &OpCode->Guid, Value->Value.u16, &QuestionVal)){
-          Value->Type = EFI_IFR_TYPE_UNDEFINED;
-          break;
+        if (StrPtr != NULL) {
+          FreePool (StrPtr);
         }
-        Value = &QuestionVal;
       } else if (CompareGuid (&OpCode->Guid, &gZeroGuid) != 0) {
         if (!GetQuestionValueFromForm(NULL, FormSet->HiiHandle, &OpCode->Guid, Value->Value.u16, &QuestionVal)){
           Value->Type = EFI_IFR_TYPE_UNDEFINED;

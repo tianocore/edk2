@@ -3783,18 +3783,14 @@ HiiConfigToBlock (
     Status = EFI_INVALID_PARAMETER;
     goto Exit;
   }
-  //
-  // Skip '&'
-  //
-  StringPtr++;
 
   //
   // Parse each <ConfigElement> if exists
-  // Only <BlockConfig> format is supported by this help function.
+  // Only '&'<BlockConfig> format is supported by this help function.
   // <BlockConfig> ::= 'OFFSET='<Number>&'WIDTH='<Number>&'VALUE='<Number>
   //
-  while (*StringPtr != 0 && StrnCmp (StringPtr, L"OFFSET=", StrLen (L"OFFSET=")) == 0) {
-    StringPtr += StrLen (L"OFFSET=");
+  while (*StringPtr != 0 && StrnCmp (StringPtr, L"&OFFSET=", StrLen (L"&OFFSET=")) == 0) {
+    StringPtr += StrLen (L"&OFFSET=");
     //
     // Get Offset
     //
@@ -3813,7 +3809,7 @@ HiiConfigToBlock (
 
     StringPtr += Length;
     if (StrnCmp (StringPtr, L"&WIDTH=", StrLen (L"&WIDTH=")) != 0) {
-      *Progress = StringPtr - Length - StrLen (L"OFFSET=") - 1;
+      *Progress = StringPtr - Length - StrLen (L"&OFFSET=");
       Status = EFI_INVALID_PARAMETER;
       goto Exit;
     }
@@ -3854,7 +3850,7 @@ HiiConfigToBlock (
 
     StringPtr += Length;
     if (*StringPtr != 0 && *StringPtr != L'&') {
-      *Progress = StringPtr - Length - 7;
+      *Progress = StringPtr - Length - StrLen (L"&VALUE=");
       Status = EFI_INVALID_PARAMETER;
       goto Exit;
     }
@@ -3873,20 +3869,18 @@ HiiConfigToBlock (
     Value = NULL;
 
     //
-    // If '\0', parsing is finished. Otherwise skip '&' to continue
+    // If '\0', parsing is finished.
     //
     if (*StringPtr == 0) {
       break;
     }
-
-    StringPtr++;
   }
   
   //
-  // The input string is ConfigAltResp format.
+  // The input string is not ConfigResp format, return error.
   //
-  if ((*StringPtr != 0) && (StrnCmp (StringPtr, L"&GUID=", StrLen (L"&GUID=")) != 0)) {
-    *Progress = StringPtr - 1;
+  if (*StringPtr != 0) {
+    *Progress = StringPtr;
     Status = EFI_INVALID_PARAMETER;
     goto Exit;
   }

@@ -1,7 +1,7 @@
 /** @file
 Private MACRO, structure and function definitions for Setup Browser module.
 
-Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -30,6 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/HiiDatabase.h>
 #include <Protocol/HiiString.h>
 #include <Protocol/UserManager.h>
+#include <Protocol/DevicePathFromText.h>
 
 #include <Guid/MdeModuleHii.h>
 #include <Guid/HiiPlatformSetupFormset.h>
@@ -546,6 +547,7 @@ typedef struct {
   CHAR16                *SaveChanges;
   CHAR16                *OptionMismatch;
   CHAR16                *FormSuppress;
+  CHAR16                *ProtocolNotFound;
   CHAR16                PromptBlockWidth;
   CHAR16                OptionBlockWidth;
   CHAR16                HelpBlockWidth;
@@ -597,6 +599,7 @@ typedef enum {
 extern EFI_HII_DATABASE_PROTOCOL         *mHiiDatabase;
 extern EFI_HII_STRING_PROTOCOL           *mHiiString;
 extern EFI_HII_CONFIG_ROUTING_PROTOCOL   *mHiiConfigRouting;
+extern EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL *mPathFromText;
 
 extern BANNER_DATA           *gBannerData;
 extern EFI_HII_HANDLE        gFrontPageHandle;
@@ -647,6 +650,7 @@ extern CHAR16            *gAdjustNumber;
 extern CHAR16            *gSaveChanges;
 extern CHAR16            *gOptionMismatch;
 extern CHAR16            *gFormSuppress;
+extern CHAR16            *gProtocolNotFound;
 
 extern CHAR16            gPromptBlockWidth;
 extern CHAR16            gOptionBlockWidth;

@@ -2,7 +2,7 @@
 This is an example of how a driver might export data to the HII protocol to be
 later utilized by the Setup Protocol
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1795,11 +1795,14 @@ DriverSampleInit (
   BOOLEAN                         ActionFlag;
   EFI_STRING                      ConfigRequestHdr;
   MY_EFI_VARSTORE_DATA            *VarStoreConfig;
+  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL *PathToText;
 
   //
   // Initialize the local variables.
   //
   ConfigRequestHdr = NULL;
+  NewString        = NULL;
+  PathToText       = NULL;
   //
   // Initialize screen dimensions for SendForm().
   // Remove 3 characters from top and bottom
@@ -1915,15 +1918,26 @@ DriverSampleInit (
   }
 
   PrivateData->HiiHandle[1] = HiiHandle[1];
+ 
+  Status = gBS->LocateProtocol (
+                  &gEfiDevicePathToTextProtocolGuid,
+                  NULL,
+                  (VOID **) &PathToText
+                  );
+  ASSERT_EFI_ERROR (Status);
 
   //
   // Update the device path string.
   //
-  if (HiiSetString (HiiHandle[0], STRING_TOKEN (STR_DEVICE_PATH), (EFI_STRING) &mHiiVendorDevicePath0, NULL) == 0) {
+  NewString = PathToText->ConvertDevicePathToText((EFI_DEVICE_PATH_PROTOCOL*)&mHiiVendorDevicePath0, FALSE, FALSE);
+  if (HiiSetString (HiiHandle[0], STRING_TOKEN (STR_DEVICE_PATH), NewString, NULL) == 0) {
     DriverSampleUnload (ImageHandle);
     return EFI_OUT_OF_RESOURCES;
   }
-  
+  if (NewString != NULL) {
+    FreePool (NewString);
+  }
+
   //
   // Very simple example of how one would update a string that is already
   // in the HII database
