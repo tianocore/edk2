@@ -198,6 +198,16 @@ RuntimeServiceGetVariable (
     return EFI_INVALID_PARAMETER;
   }
 
+  if (*DataSize >= mVariableBufferSize) {
+    //
+    // DataSize may be near MAX_ADDRESS incorrectly, this can cause the computed PayLoadSize to
+    // overflow to a small value and pass the check in InitCommunicateBuffer().
+    // To protect against this vulnerability, return EFI_INVALID_PARAMETER if DataSize is >= mVariableBufferSize.
+    // And there will be further check to ensure the total size is also not > mVariableBufferSize.
+    //
+    return EFI_INVALID_PARAMETER;
+  }
+
   AcquireLockOnlyAtBootTime(&mVariableServicesLock);
 
   //
@@ -272,6 +282,16 @@ RuntimeServiceGetNextVariableName (
   SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME *SmmGetNextVariableName;
 
   if (VariableNameSize == NULL || VariableName == NULL || VendorGuid == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (*VariableNameSize >= mVariableBufferSize) {
+    //
+    // VariableNameSize may be near MAX_ADDRESS incorrectly, this can cause the computed PayLoadSize to
+    // overflow to a small value and pass the check in InitCommunicateBuffer().
+    // To protect against this vulnerability, return EFI_INVALID_PARAMETER if VariableNameSize is >= mVariableBufferSize.
+    // And there will be further check to ensure the total size is also not > mVariableBufferSize.
+    //
     return EFI_INVALID_PARAMETER;
   }
 
@@ -352,6 +372,16 @@ RuntimeServiceSetVariable (
   } 
 
   if (DataSize != 0 && Data == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (DataSize >= mVariableBufferSize) {
+    //
+    // DataSize may be near MAX_ADDRESS incorrectly, this can cause the computed PayLoadSize to
+    // overflow to a small value and pass the check in InitCommunicateBuffer().
+    // To protect against this vulnerability, return EFI_INVALID_PARAMETER if DataSize is >= mVariableBufferSize.
+    // And there will be further check to ensure the total size is also not > mVariableBufferSize.
+    //
     return EFI_INVALID_PARAMETER;
   }
 

@@ -2756,6 +2756,11 @@ VariableCommonInitialize (
   ASSERT(VariableStoreHeader->Size == VariableStoreLength);
     
   //
+  // The max variable or hardware error variable size should be < variable store size.
+  //
+  ASSERT(MAX (PcdGet32 (PcdMaxVariableSize), PcdGet32 (PcdMaxHardwareErrorVariableSize)) < VariableStoreLength);
+
+  //
   // Parse non-volatile variable data and get last variable offset.
   //
   NextVariable  = GetStartPointer ((VARIABLE_STORE_HEADER *)(UINTN)VariableStoreBase);
