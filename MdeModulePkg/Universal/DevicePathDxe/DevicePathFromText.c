@@ -1,7 +1,7 @@
 /** @file
   DevicePathFromText protocol as defined in the UEFI 2.0 specification.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1636,6 +1636,7 @@ DevPathFromTextSAS (
   CHAR16          *DriveBayStr;
   CHAR16          *ReservedStr;
   UINT16          Info;
+  UINT16          Uint16;
   SAS_DEVICE_PATH *Sas;
 
   AddressStr  = GetNextParamStr (&TextDeviceNode);
@@ -1646,7 +1647,6 @@ DevPathFromTextSAS (
   ConnectStr  = GetNextParamStr (&TextDeviceNode);
   DriveBayStr = GetNextParamStr (&TextDeviceNode);
   ReservedStr = GetNextParamStr (&TextDeviceNode);
-  Info        = 0x0000;
   Sas         = (SAS_DEVICE_PATH *) CreateDeviceNode (
                                        MESSAGING_DEVICE_PATH,
                                        MSG_VENDOR_DP,
@@ -1657,25 +1657,51 @@ DevPathFromTextSAS (
   Strtoi64 (AddressStr, &Sas->SasAddress);
   Strtoi64 (LunStr, &Sas->Lun);
   Sas->RelativeTargetPort = (UINT16) Strtoi (RTPStr);
-  if (StrCmp (SASSATAStr, L"NoTopology") != 0) {
-    if (StrCmp (DriveBayStr, L"0") == 0) {
-      Info |= 0x0001;
+
+  if (StrCmp (SASSATAStr, L"NoTopology") == 0) {
+    Info = 0x0;
+
+  } else if ((StrCmp (SASSATAStr, L"SATA") == 0) || (StrCmp (SASSATAStr, L"SAS") == 0)) {
+
+    Uint16 = (UINT16) Strtoi (DriveBayStr);
+    if (Uint16 == 0) {
+      Info = 0x1;
     } else {
-      Info |= 0x0002;
-      Info = (UINT16) (Info | (Strtoi (DriveBayStr) << 8));
+      Info = (UINT16) (0x2 | ((Uint16 - 1) << 8));
     }
 
     if (StrCmp (SASSATAStr, L"SATA") == 0) {
-      Info |= 0x0010;
+      Info |= BIT4;
     }
 
+    //
+    // Location is an integer between 0 and 1 or else
+    // the keyword Internal (0) or External (1).
+    //
     if (StrCmp (LocationStr, L"External") == 0) {
-      Info |= 0x0020;
+      Uint16 = 1;
+    } else if (StrCmp (LocationStr, L"Internal") == 0) {
+      Uint16 = 0;
+    } else {
+      Uint16 = (Strtoi (LocationStr) & BIT0);
     }
+    Info |= (Uint16 << 5);
 
+    //
+    // Connect is an integer between 0 and 3 or else
+    // the keyword Direct (0) or Expanded (1).
+    //
     if (StrCmp (ConnectStr, L"Expanded") == 0) {
-      Info |= 0x0040;
+      Uint16 = 1;
+    } else if (StrCmp (ConnectStr, L"Direct") == 0) {
+      Uint16 = 0;
+    } else {
+      Uint16 = (Strtoi (ConnectStr) & (BIT0 | BIT1));
     }
+    Info |= (Uint16 << 6);
+
+  } else {
+    Info = (UINT16) Strtoi (SASSATAStr);
   }
 
   Sas->DeviceTopology = Info;
@@ -1705,6 +1731,9 @@ DevPathFromTextSasEx (
   CHAR16            *ConnectStr;
   CHAR16            *DriveBayStr;
   UINT16            Info;
+  UINT16            Uint16;
+  UINT64            SasAddress;
+  UINT64            Lun;
   SASEX_DEVICE_PATH *SasEx;
 
   AddressStr  = GetNextParamStr (&TextDeviceNode);
@@ -1714,37 +1743,62 @@ DevPathFromTextSasEx (
   LocationStr = GetNextParamStr (&TextDeviceNode);
   ConnectStr  = GetNextParamStr (&TextDeviceNode);
   DriveBayStr = GetNextParamStr (&TextDeviceNode);
-  Info        = 0x0000;
   SasEx       = (SASEX_DEVICE_PATH *) CreateDeviceNode (
                                         MESSAGING_DEVICE_PATH,
                                         MSG_SASEX_DP,
                                         (UINT16) sizeof (SASEX_DEVICE_PATH)
                                         );
 
-  Strtoi64 (AddressStr, (UINT64 *) &SasEx->SasAddress);
-  Strtoi64 (LunStr,     (UINT64 *) &SasEx->Lun);
-  *(UINT64 *) &SasEx->SasAddress = SwapBytes64 (*(UINT64 *) &SasEx->SasAddress);
-  *(UINT64 *) &SasEx->Lun        = SwapBytes64 (*(UINT64 *) &SasEx->Lun);
+  Strtoi64 (AddressStr, &SasAddress);
+  Strtoi64 (LunStr,     &Lun);
+  WriteUnaligned64 ((UINT64 *) &SasEx->SasAddress, SwapBytes64 (SasAddress));
+  WriteUnaligned64 ((UINT64 *) &SasEx->Lun,        SwapBytes64 (Lun));
   SasEx->RelativeTargetPort      = (UINT16) Strtoi (RTPStr);
-  if (StrCmp (SASSATAStr, L"NoTopology") != 0) {
-    if (StrCmp (DriveBayStr, L"0") == 0) {
-      Info |= 0x0001;
+
+  if (StrCmp (SASSATAStr, L"NoTopology") == 0) {
+    Info = 0x0;
+
+  } else if ((StrCmp (SASSATAStr, L"SATA") == 0) || (StrCmp (SASSATAStr, L"SAS") == 0)) {
+
+    Uint16 = (UINT16) Strtoi (DriveBayStr);
+    if (Uint16 == 0) {
+      Info = 0x1;
     } else {
-      Info |= 0x0002;
-      Info = (UINT16) (Info | (Strtoi (DriveBayStr) << 8));
+      Info = (UINT16) (0x2 | ((Uint16 - 1) << 8));
     }
 
     if (StrCmp (SASSATAStr, L"SATA") == 0) {
-      Info |= 0x0010;
+      Info |= BIT4;
     }
 
+    //
+    // Location is an integer between 0 and 1 or else
+    // the keyword Internal (0) or External (1).
+    //
     if (StrCmp (LocationStr, L"External") == 0) {
-      Info |= 0x0020;
+      Uint16 = 1;
+    } else if (StrCmp (LocationStr, L"Internal") == 0) {
+      Uint16 = 0;
+    } else {
+      Uint16 = (Strtoi (LocationStr) & BIT0);
     }
+    Info |= (Uint16 << 5);
 
+    //
+    // Connect is an integer between 0 and 3 or else
+    // the keyword Direct (0) or Expanded (1).
+    //
     if (StrCmp (ConnectStr, L"Expanded") == 0) {
-      Info |= 0x0040;
+      Uint16 = 1;
+    } else if (StrCmp (ConnectStr, L"Direct") == 0) {
+      Uint16 = 0;
+    } else {
+      Uint16 = (Strtoi (ConnectStr) & (BIT0 | BIT1));
     }
+    Info |= (Uint16 << 6);
+
+  } else {
+    Info = (UINT16) Strtoi (SASSATAStr);
   }
 
   SasEx->DeviceTopology = Info;
