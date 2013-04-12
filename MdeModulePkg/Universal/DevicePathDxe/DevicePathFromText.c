@@ -1683,7 +1683,7 @@ DevPathFromTextSAS (
     } else if (StrCmp (LocationStr, L"Internal") == 0) {
       Uint16 = 0;
     } else {
-      Uint16 = (Strtoi (LocationStr) & BIT0);
+      Uint16 = ((UINT16) Strtoi (LocationStr) & BIT0);
     }
     Info |= (Uint16 << 5);
 
@@ -1696,7 +1696,7 @@ DevPathFromTextSAS (
     } else if (StrCmp (ConnectStr, L"Direct") == 0) {
       Uint16 = 0;
     } else {
-      Uint16 = (Strtoi (ConnectStr) & (BIT0 | BIT1));
+      Uint16 = ((UINT16) Strtoi (ConnectStr) & (BIT0 | BIT1));
     }
     Info |= (Uint16 << 6);
 
@@ -1780,7 +1780,7 @@ DevPathFromTextSasEx (
     } else if (StrCmp (LocationStr, L"Internal") == 0) {
       Uint16 = 0;
     } else {
-      Uint16 = (Strtoi (LocationStr) & BIT0);
+      Uint16 = ((UINT16) Strtoi (LocationStr) & BIT0);
     }
     Info |= (Uint16 << 5);
 
@@ -1793,7 +1793,7 @@ DevPathFromTextSasEx (
     } else if (StrCmp (ConnectStr, L"Direct") == 0) {
       Uint16 = 0;
     } else {
-      Uint16 = (Strtoi (ConnectStr) & (BIT0 | BIT1));
+      Uint16 = ((UINT16) Strtoi (ConnectStr) & (BIT0 | BIT1));
     }
     Info |= (Uint16 << 6);
 
