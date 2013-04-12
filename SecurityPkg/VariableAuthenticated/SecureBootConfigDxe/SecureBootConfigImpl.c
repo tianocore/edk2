@@ -2378,6 +2378,11 @@ SecureBootRouteConfig (
        OUT EFI_STRING                          *Progress
   )
 {
+  UINT8                      *SecureBootEnable;
+  SECUREBOOT_CONFIGURATION   IfrNvData;
+  UINTN                      BufferSize;
+  EFI_STATUS                 Status;
+  
   if (Configuration == NULL || Progress == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -2385,6 +2390,31 @@ SecureBootRouteConfig (
   *Progress = Configuration;
   if (!HiiIsConfigHdrMatch (Configuration, &gSecureBootConfigFormSetGuid, mSecureBootStorageName)) {
     return EFI_NOT_FOUND;
+  }
+
+  BufferSize = sizeof (SECUREBOOT_CONFIGURATION);
+  Status = gHiiConfigRouting->ConfigToBlock (
+                                gHiiConfigRouting,
+                                Configuration,
+                                (UINT8 *)&IfrNvData,
+                                &BufferSize,
+                                Progress
+                                );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Store Buffer Storage back to EFI variable if needed
+  //
+  SecureBootEnable = NULL;
+  GetVariable2 (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, (VOID**)&SecureBootEnable, NULL);
+  if (NULL != SecureBootEnable) {
+    FreePool (SecureBootEnable);
+    Status = SaveSecureBootVariable (IfrNvData.AttemptSecureBoot);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
   }
 
   *Progress = Configuration + StrLen (Configuration);
@@ -2445,7 +2475,8 @@ SecureBootCallback (
 
   if ((Action != EFI_BROWSER_ACTION_CHANGED) &&
       (Action != EFI_BROWSER_ACTION_CHANGING) &&
-      (Action != EFI_BROWSER_ACTION_FORM_CLOSE)) {
+      (Action != EFI_BROWSER_ACTION_FORM_CLOSE) &&
+      (Action != EFI_BROWSER_ACTION_DEFAULT_STANDARD)) {
     return EFI_UNSUPPORTED;
   }
   
@@ -2732,6 +2763,17 @@ SecureBootCallback (
         FreePool (SetupMode);
       }
       break;  
+    }
+  } else if (Action == EFI_BROWSER_ACTION_DEFAULT_STANDARD) {
+    if (QuestionId == KEY_HIDE_SECURE_BOOT) {
+      GetVariable2 (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, (VOID**)&SecureBootEnable, NULL);
+      if (SecureBootEnable == NULL) {
+        IfrNvData->HideSecureBoot = TRUE;
+      } else {
+        FreePool (SecureBootEnable);
+        IfrNvData->HideSecureBoot = FALSE;
+      }
+      Value->b = IfrNvData->HideSecureBoot;
     }
   } else if (Action == EFI_BROWSER_ACTION_FORM_CLOSE) {
     //

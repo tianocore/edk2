@@ -43,8 +43,10 @@ formset
     //
     suppressif TRUE;
       checkbox varid   = SECUREBOOT_CONFIGURATION.HideSecureBoot,
+              questionid = KEY_HIDE_SECURE_BOOT,
               prompt   = STRING_TOKEN(STR_NULL),
               help     = STRING_TOKEN(STR_NULL),
+              flags    = INTERACTIVE,
       endcheckbox;
     endif;  
     
