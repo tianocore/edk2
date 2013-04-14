@@ -260,8 +260,7 @@ PrepareFdt (
       if (Rx == ARM_TRUSTZONE_UID_4LETTERID) {
         Rx   = ARM_SMC_ID_UID + 1;
         ArmCallSmc (&Rx);
-        //TODO: Replace ARM magic number
-        if (Rx == 0x40524d48) {
+        if (Rx == ARM_TRUSTZONE_ARM_UID) {
           PsciSmcSupported = TRUE;
         }
       }
