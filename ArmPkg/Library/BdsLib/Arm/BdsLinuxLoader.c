@@ -263,7 +263,7 @@ BdsBootLinuxFdt (
     }
 
     // Check if the initrd is a uInitrd
-    if (*(UINT32*)((UINTN)InitrdImage) == LINUX_UIMAGE_SIGNATURE) {
+    if (*(UINT32*)((UINTN)InitrdImageBase) == LINUX_UIMAGE_SIGNATURE) {
       // Skip the 64-byte image header
       InitrdImage = (EFI_PHYSICAL_ADDRESS)((UINTN)InitrdImageBase + 64);
       InitrdImageSize = InitrdImageBaseSize - 64;
