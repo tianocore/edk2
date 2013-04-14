@@ -2,7 +2,7 @@
 # ARM processor package.
 #
 # Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2011 - 2012, ARM Limited. All rights reserved.
+# Copyright (c) 2011 - 2013, ARM Limited. All rights reserved.
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -137,8 +137,6 @@
   # 0xC00 = cp10 | cp11
   gArmTokenSpaceGuid.PcdArmNsacr|0xC00|UINT32|0x00000039
   
-  gArmTokenSpaceGuid.PcdArmNonSecModeTransition|0x0|UINT32|0x0000003E
-
   # System Memory (DRAM): These PCDs define the region of in-built system memory
   # Some platforms can get DRAM extensions, these additional regions will be declared
   # to UEFI by ArmPLatformPlib   
@@ -167,9 +165,6 @@
   gArmTokenSpaceGuid.PcdArmLinuxKernelMaxOffset|0x08000000|UINT32|0x0000001F
   # The Linux ATAGs are expected to be under 0x4000 (16KB) from the beginning of the System Memory
   gArmTokenSpaceGuid.PcdArmLinuxAtagMaxOffset|0x4000|UINT32|0x00000020
-  # If the fixed FDT address is not available, then it should be loaded the below the kernel
-  # The recommandation from the Linux kernel is to have the FDT below 16KB
-  gArmTokenSpaceGuid.PcdArmLinuxFdtMaxOffset|0x4000|UINT32|0x00000023
 
   #
   # ARM Architectural Timer
@@ -178,3 +173,13 @@
   # ARM Architectural Timer Interrupt(GIC PPI) number
   gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|29|UINT32|0x00000035  
   gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|30|UINT32|0x00000036
+
+[PcdsFixedAtBuild.ARM]
+  # By default we do not do a transition to non-secure mode
+  gArmTokenSpaceGuid.PcdArmNonSecModeTransition|0x0|UINT32|0x0000003E
+  # If the fixed FDT address is not available, then it should be loaded below the kernel.
+  # The recommendation from the Linux kernel is to have the FDT below 16KB.
+  # (see the kernel doc: Documentation/arm/Booting)
+  gArmTokenSpaceGuid.PcdArmLinuxFdtMaxOffset|0x4000|UINT32|0x00000023
+  # The FDT blob must be loaded at a 64bit aligned address.
+  gArmTokenSpaceGuid.PcdArmLinuxFdtAlignment|0x8|UINT32|0x00000026

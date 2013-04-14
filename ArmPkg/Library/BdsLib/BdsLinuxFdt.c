@@ -214,7 +214,9 @@ PrepareFdt (
 {
   EFI_STATUS            Status;
   EFI_PHYSICAL_ADDRESS  NewFdtBlobBase;
+  EFI_PHYSICAL_ADDRESS  NewFdtBlobAllocation;
   UINTN                 NewFdtBlobSize;
+  UINT32                FdtAlignment;
   VOID*                 fdt;
   INTN                  err;
   INTN                  node;
@@ -295,9 +297,15 @@ PrepareFdt (
   //
   NewFdtBlobSize = OriginalFdtSize + FDT_ADDITIONAL_ENTRIES_SIZE;
 
+  // If FDT load address needs to be aligned, allocate more space.
+  FdtAlignment = PcdGet32 (PcdArmLinuxFdtAlignment);
+  if (FdtAlignment != 0) {
+    NewFdtBlobSize += FdtAlignment;
+  }
+
   // Try below a watermark address
   Status = EFI_NOT_FOUND;
-  if (PcdGet32(PcdArmLinuxFdtMaxOffset) != 0) {
+  if (PcdGet32 (PcdArmLinuxFdtMaxOffset) != 0) {
     NewFdtBlobBase = LINUX_FDT_MAX_OFFSET;
     Status = gBS->AllocatePages (AllocateMaxAddress, EfiBootServicesData, EFI_SIZE_TO_PAGES(NewFdtBlobSize), &NewFdtBlobBase);
     if (EFI_ERROR(Status)) {
@@ -314,6 +322,11 @@ PrepareFdt (
     } else {
       DEBUG ((EFI_D_WARN, "WARNING: Loaded FDT at random address 0x%lX.\nWARNING: There is a risk of accidental overwriting by other code/data.\n", NewFdtBlobBase));
     }
+  }
+
+  NewFdtBlobAllocation = NewFdtBlobBase;
+  if (FdtAlignment != 0) {
+    NewFdtBlobBase = ALIGN (NewFdtBlobBase, FdtAlignment);
   }
 
   // Load the Original FDT tree into the new region
@@ -530,7 +543,7 @@ PrepareFdt (
   return EFI_SUCCESS;
 
 FAIL_NEW_FDT:
-  gBS->FreePages (NewFdtBlobBase, EFI_SIZE_TO_PAGES (NewFdtBlobSize));
+  gBS->FreePages (NewFdtBlobAllocation, EFI_SIZE_TO_PAGES (NewFdtBlobSize));
 
 FAIL_ALLOCATE_NEW_FDT:
   *FdtBlobSize = (UINTN)fdt_totalsize ((VOID*)(UINTN)(*FdtBlobBase));
