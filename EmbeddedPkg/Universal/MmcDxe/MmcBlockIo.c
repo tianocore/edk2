@@ -515,6 +515,10 @@ MmcIoBlocks (
   MmcHost = MmcHostInstance->MmcHost;
   ASSERT (MmcHost);
 
+  if (This->Media->MediaId != MediaId) {
+    return EFI_MEDIA_CHANGED;
+  }
+
   if ((MmcHost == 0)|| (Buffer == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -529,17 +533,23 @@ MmcIoBlocks (
     return EFI_INVALID_PARAMETER;
   }
 
-  // The buffer size must not be zero and it must be an exact multiple of the block size
-  if ((BufferSize == 0) || ((BufferSize % This->Media->BlockSize) != 0)) {
+  if((Transfer == MMC_IOBLOCKS_WRITE) && (This->Media->ReadOnly == TRUE)) {
+    return EFI_WRITE_PROTECTED;
+  }
+
+  // Reading 0 Byte is valid
+  if (BufferSize == 0) {
+    return EFI_SUCCESS;
+  }
+
+  // The buffer size must be an exact multiple of the block size
+  if ((BufferSize % This->Media->BlockSize) != 0) {
     return EFI_BAD_BUFFER_SIZE;
   }
 
-  if (This->Media->MediaId != MediaId) {
-    return EFI_MEDIA_CHANGED;
-  }
-
-  if((Transfer == MMC_IOBLOCKS_WRITE) && (This->Media->ReadOnly == TRUE)) {
-    return EFI_WRITE_PROTECTED;
+  // Check the alignment
+  if ((This->Media->IoAlign > 2) && (((UINTN)Buffer & (This->Media->IoAlign - 1)) != 0)) {
+    return EFI_INVALID_PARAMETER;
   }
 
   BytesRemainingToBeTransfered = BufferSize;
