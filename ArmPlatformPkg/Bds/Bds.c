@@ -406,6 +406,13 @@ BdsEntry (
     UnicodeSPrint (gST->FirmwareVendor, Size, L"%a EFI %a %a", PcdGetPtr(PcdFirmwareVendor), __DATE__, __TIME__);
   }
 
+  //
+  // Fixup Table CRC after we updated Firmware Vendor
+  //
+  gST->Hdr.CRC32 = 0;
+  Status = gBS->CalculateCrc32 ((VOID*)gST, gST->Hdr.HeaderSize, &gST->Hdr.CRC32);
+  ASSERT_EFI_ERROR (Status);
+
   // If BootNext environment variable is defined then we just load it !
   BootNextSize = sizeof(UINT16);
   Status = GetGlobalEnvironmentVariable (L"BootNext", NULL, &BootNextSize, (VOID**)&BootNext);
@@ -447,6 +454,13 @@ BdsEntry (
 
   // Now we need to setup the EFI System Table with information about the console devices.
   InitializeConsole ();
+
+  //
+  // Update the CRC32 in the EFI System Table header
+  //
+  gST->Hdr.CRC32 = 0;
+  Status = gBS->CalculateCrc32 ((VOID*)gST, gST->Hdr.HeaderSize, &gST->Hdr.CRC32);
+  ASSERT_EFI_ERROR (Status);
 
   // Timer before initiating the default boot selection
   StartDefaultBootOnTimeout ();
