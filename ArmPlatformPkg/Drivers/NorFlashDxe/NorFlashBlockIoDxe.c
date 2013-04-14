@@ -1,6 +1,6 @@
 /** @file  NorFlashBlockIoDxe.c
 
-  Copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011-2013, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -51,17 +51,27 @@ NorFlashBlockIoReadBlocks (
 {
   NOR_FLASH_INSTANCE  *Instance;
   EFI_STATUS          Status;
+  EFI_BLOCK_IO_MEDIA  *Media;
+
+  if (This == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Instance = INSTANCE_FROM_BLKIO_THIS(This);
+  Media = This->Media;
 
   DEBUG ((DEBUG_BLKIO, "NorFlashBlockIoReadBlocks(MediaId=0x%x, Lba=%ld, BufferSize=0x%x bytes (%d kB), BufferPtr @ 0x%08x)\n", MediaId, Lba, BufferSizeInBytes, Buffer));
 
-  if( !This->Media->MediaPresent ) {
+  if (!Media) {
+    Status = EFI_INVALID_PARAMETER;
+  } else if (!Media->MediaPresent) {
     Status = EFI_NO_MEDIA;
-  } else if( This->Media->MediaId != MediaId ) {
+  } else if (Media->MediaId != MediaId) {
     Status = EFI_MEDIA_CHANGED;
+  } else if ((Media->IoAlign > 2) && (((UINTN)Buffer & (Media->IoAlign - 1)) != 0)) {
+    Status = EFI_INVALID_PARAMETER;
   } else {
-    Status = NorFlashReadBlocks (Instance,Lba,BufferSizeInBytes,Buffer);
+    Status = NorFlashReadBlocks (Instance, Lba, BufferSizeInBytes, Buffer);
   }
 
   return Status;

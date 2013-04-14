@@ -1,6 +1,6 @@
 /** @file  NorFlashDxe.c
 
-  Copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011-2013, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -721,27 +721,26 @@ NorFlashReadBlocks (
   UINT32              NumBlocks;
   UINTN               StartAddress;
 
+  DEBUG((DEBUG_BLKIO, "NorFlashReadBlocks: BufferSize=0x%xB BlockSize=0x%xB LastBlock=%ld, Lba=%ld.\n",
+      BufferSizeInBytes, Instance->Media.BlockSize, Instance->Media.LastBlock, Lba));
+
   // The buffer must be valid
   if (Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  // We must have some bytes to read
-  DEBUG((DEBUG_BLKIO, "NorFlashReadBlocks: BufferSize=0x%x bytes.\n", BufferSizeInBytes));
-  if(BufferSizeInBytes == 0) {
-    return EFI_BAD_BUFFER_SIZE;
+  // Return if we have not any byte to read 
+  if (BufferSizeInBytes == 0) {
+    return EFI_SUCCESS;
   }
 
   // The size of the buffer must be a multiple of the block size
-  DEBUG((DEBUG_BLKIO, "NorFlashReadBlocks: BlockSize=0x%x bytes.\n", Instance->Media.BlockSize));
   if ((BufferSizeInBytes % Instance->Media.BlockSize) != 0) {
     return EFI_BAD_BUFFER_SIZE;
   }
 
   // All blocks must be within the device
   NumBlocks = ((UINT32)BufferSizeInBytes) / Instance->Media.BlockSize ;
-
-  DEBUG((DEBUG_BLKIO, "NorFlashReadBlocks: NumBlocks=%d, LastBlock=%ld, Lba=%ld\n", NumBlocks, Instance->Media.LastBlock, Lba));
 
   if ((Lba + NumBlocks) > (Instance->Media.LastBlock + 1)) {
     DEBUG((EFI_D_ERROR, "NorFlashReadBlocks: ERROR - Read will exceed last block\n"));
