@@ -154,11 +154,6 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenPcAnsi()"
 
   #
-  # ARM L2x0 PCDs
-  #
-  gArmTokenSpaceGuid.PcdL2x0ControllerBase|0x1E00A000
-  
-  #
   # ARM Architectual Timer Frequency
   #
   gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|60000000

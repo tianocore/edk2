@@ -128,11 +128,6 @@
   gArmTokenSpaceGuid.PcdGicDistributorBase|0x10041000
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x10040000
 
-  #
-  # ARM L2x0 PCDs
-  #
-  gArmTokenSpaceGuid.PcdL2x0ControllerBase|0x1F002000
- 
 
 ################################################################################
 #
