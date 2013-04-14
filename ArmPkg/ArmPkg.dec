@@ -163,8 +163,6 @@
   # BdsLib
   #
   gArmTokenSpaceGuid.PcdArmMachineType|0|UINT32|0x0000001E
-  # The compressed Linux kernel is expected to load at MemStart + 0x8000 (e.g. 0x8000_8000)
-  gArmTokenSpaceGuid.PcdArmLinuxKernelFixedOffset|0x00008000|UINT32|0x00000027
   # The compressed Linux kernel is expected to be under 128MB from the beginning of the System Memory
   gArmTokenSpaceGuid.PcdArmLinuxKernelMaxOffset|0x08000000|UINT32|0x0000001F
   # The Linux ATAGs are expected to be under 0x4000 (16KB) from the beginning of the System Memory

@@ -76,7 +76,6 @@
 
   gArmTokenSpaceGuid.PcdArmMachineType
   gArmTokenSpaceGuid.PcdArmLinuxFdtMaxOffset
-  gArmTokenSpaceGuid.PcdArmLinuxKernelFixedOffset
   gArmTokenSpaceGuid.PcdArmLinuxKernelMaxOffset
   gArmTokenSpaceGuid.PcdArmLinuxAtagMaxOffset
   
