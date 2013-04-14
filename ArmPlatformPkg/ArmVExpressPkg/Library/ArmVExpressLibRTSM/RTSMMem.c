@@ -126,22 +126,3 @@ ArmPlatformGetVirtualMemoryMap (
 
   *VirtualMemoryMap = VirtualMemoryTable;
 }
-
-/**
-  Return the EFI Memory Map provided by extension memory on your platform
-
-  This EFI Memory Map of the System Memory is used by MemoryInitPei module to create the Resource
-  Descriptor HOBs used by DXE core.
-  TODO: CompleteMe .... say this is the memory not covered by the System Memory PCDs
-
-  @param[out]   EfiMemoryMap        Array of ARM_SYSTEM_MEMORY_REGION_DESCRIPTOR describing an
-                                    EFI Memory region. This array must be ended by a zero-filled entry
-
-**/
-EFI_STATUS
-ArmPlatformGetAdditionalSystemMemory (
-  OUT ARM_SYSTEM_MEMORY_REGION_DESCRIPTOR** EfiMemoryMap
-  )
-{
-  return EFI_UNSUPPORTED;
-}
