@@ -244,6 +244,7 @@ PrepareFdt (
   BOOLEAN               PsciSmcSupported;
   UINTN                 Rx;
   UINTN                 OriginalFdtSize;
+  BOOLEAN               CpusNodeExist;
 
   //
   // Ensure the Power State Coordination Interface (PSCI) SMCs are there if supported
@@ -448,6 +449,9 @@ PrepareFdt (
         fdt_setprop_string(fdt, node, "name", "cpus");
         fdt_setprop_cell(fdt, node, "#address-cells", 1);
         fdt_setprop_cell(fdt, node, "#size-cells", 0);
+        CpusNodeExist = FALSE;
+      } else {
+        CpusNodeExist = TRUE;
       }
 
       // Get pointer to ARM processor table
@@ -456,16 +460,20 @@ PrepareFdt (
 
       for (Index = 0; Index < ArmProcessorTable->NumberOfEntries; Index++) {
         AsciiSPrint (Name, 10, "cpu@%d", Index);
-        cpu_node = fdt_subnode_offset(fdt, node, Name);
-        if (cpu_node < 0) {
+
+        // If the 'cpus' node did not exist then creates the 'cpu' nodes. In case 'cpus' node
+        // is provided in the original FDT then we do not add any 'cpu' node.
+        if (!CpusNodeExist) {
           cpu_node = fdt_add_subnode(fdt, node, Name);
           fdt_setprop_string(fdt, cpu_node, "device-type", "cpu");
           fdt_setprop(fdt, cpu_node, "reg", &Index, sizeof(Index));
+        } else {
+          cpu_node = fdt_subnode_offset(fdt, node, Name);
         }
 
         // If Power State Coordination Interface (PSCI) is not supported then it is expected the secondary
         // cores are spinning waiting for the Operating System to release them
-        if (PsciSmcSupported == FALSE) {
+        if ((PsciSmcSupported == FALSE) && (cpu_node >= 0)) {
           // We as the bootloader are responsible for either creating or updating
           // these entries. Do not trust the entries in the DT. We only know about
           // 'spin-table' type. Do not try to update other types if defined.
