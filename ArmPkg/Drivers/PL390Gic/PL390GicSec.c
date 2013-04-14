@@ -39,14 +39,15 @@ ArmGicSetupNonSecure (
   // Set priority Mask so that no interrupts get through to CPU
   MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCPMR, 0);
 
-  // Check if there are any pending interrupts
-  //TODO: could be extended to take Peripheral interrupts into consideration, but at the moment only SGI's are taken into consideration.
-  while(0 != (MmioRead32 (GicDistributorBase + ARM_GIC_ICDICPR) & 0xF)) {
-    // Some of the SGI's are still pending, read Ack register and send End of Interrupt Signal
-    InterruptId = MmioRead32 (GicInterruptInterfaceBase + ARM_GIC_ICCIAR);
+  InterruptId = MmioRead32 (GicInterruptInterfaceBase + ARM_GIC_ICCIAR);
 
-    // Write to End of interrupt signal
+  // Only try to clear valid interrupts. Ignore spurious interrupts.
+  while ((InterruptId & 0x3FF) < ArmGicGetMaxNumInterrupts (GicDistributorBase))   {
+    // Some of the SGI's are still pending, read Ack register and send End of Interrupt Signal
     MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCEIOR, InterruptId);
+
+    // Next
+    InterruptId = MmioRead32 (GicInterruptInterfaceBase + ARM_GIC_ICCIAR);
   }
 
   // Only the primary core should set the Non Secure bit to the SPIs (Shared Peripheral Interrupt).
