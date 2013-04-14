@@ -2,7 +2,7 @@
   Serial I/O Port library functions with no library constructor/destructor
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011 - 2012, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -41,11 +41,6 @@ PL011UartInitializePort (
 {
   UINT32      LineControl;
   UINT32      Divisor;
-
-  // The BaudRate must be passed
-  if (BaudRate == 0) {
-    return RETURN_INVALID_PARAMETER;
-  }
 
   LineControl = 0;
 
@@ -130,10 +125,20 @@ PL011UartInitializePort (
   //
   // Baud Rate
   //
-  if (PcdGet32(PL011UartInteger) != 0) {
-    MmioWrite32 (UartBase + UARTIBRD, PcdGet32(PL011UartInteger));
-    MmioWrite32 (UartBase + UARTFBRD, PcdGet32(PL011UartFractional));
-  } else {
+
+  // If BaudRate is zero then use default baud rate
+  if (BaudRate == 0) {
+    if (PcdGet32 (PL011UartInteger) != 0) {
+      MmioWrite32 (UartBase + UARTIBRD, PcdGet32 (PL011UartInteger));
+      MmioWrite32 (UartBase + UARTFBRD, PcdGet32 (PL011UartFractional));
+    } else {
+      BaudRate = PcdGet32 (PcdSerialBaudRate);
+      ASSERT (BaudRate != 0);
+    }
+  }
+
+  // If BaudRate != 0 then we must calculate the divisor from the value
+  if (BaudRate != 0) {
     Divisor = (PcdGet32 (PL011UartClkInHz) * 4) / BaudRate;
     MmioWrite32 (UartBase + UARTIBRD, Divisor >> 6);
     MmioWrite32 (UartBase + UARTFBRD, Divisor & 0x3F);
