@@ -205,6 +205,8 @@ RuntimeServiceGetVariable (
   EFI_STATUS                                Status;
   UINTN                                     PayloadSize;
   SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE  *SmmVariableHeader;
+  UINTN                                     SmmCommBufPayloadSize;
+  UINTN                                     TempDataSize;
 
   if (VariableName == NULL || VendorGuid == NULL || DataSize == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -214,13 +216,16 @@ RuntimeServiceGetVariable (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (*DataSize >= mVariableBufferSize) {
-    //
-    // DataSize may be near MAX_ADDRESS incorrectly, this can cause the computed PayLoadSize to
-    // overflow to a small value and pass the check in InitCommunicateBuffer().
-    // To protect against this vulnerability, return EFI_INVALID_PARAMETER if DataSize is >= mVariableBufferSize.
-    // And there will be further check to ensure the total size is also not > mVariableBufferSize.
-    //
+  //
+  // SMM Communication Buffer max payload size
+  //
+  SmmCommBufPayloadSize = mVariableBufferSize - (SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE);
+  TempDataSize          = *DataSize;
+
+  //
+  // If VariableName exceeds SMM payload limit. Return failure
+  //
+  if (StrSize (VariableName) > SmmCommBufPayloadSize - OFFSET_OF (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE, Name)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -230,7 +235,14 @@ RuntimeServiceGetVariable (
   // Init the communicate buffer. The buffer data size is:
   // SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + PayloadSize.
   //
-  PayloadSize = OFFSET_OF (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE, Name) + StrSize (VariableName) + *DataSize;
+  if (TempDataSize > SmmCommBufPayloadSize - OFFSET_OF (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE, Name) - StrSize (VariableName)) {
+    //
+    // If output data buffer exceed SMM payload limit. Trim output buffer to SMM payload size
+    //
+    TempDataSize = SmmCommBufPayloadSize - OFFSET_OF (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE, Name) - StrSize (VariableName);
+  }
+  PayloadSize = OFFSET_OF (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE, Name) + StrSize (VariableName) + TempDataSize;
+
   Status = InitCommunicateBuffer ((VOID **)&SmmVariableHeader, PayloadSize, SMM_VARIABLE_FUNCTION_GET_VARIABLE);
   if (EFI_ERROR (Status)) {
     goto Done;
@@ -238,7 +250,7 @@ RuntimeServiceGetVariable (
   ASSERT (SmmVariableHeader != NULL);
 
   CopyGuid (&SmmVariableHeader->Guid, VendorGuid);
-  SmmVariableHeader->DataSize   = *DataSize;
+  SmmVariableHeader->DataSize   = TempDataSize;
   SmmVariableHeader->NameSize   = StrSize (VariableName);
   if (Attributes == NULL) {
     SmmVariableHeader->Attributes = 0;
@@ -255,7 +267,13 @@ RuntimeServiceGetVariable (
   //
   // Get data from SMM.
   //
-  *DataSize = SmmVariableHeader->DataSize;
+  if (Status == EFI_SUCCESS || Status == EFI_BUFFER_TOO_SMALL) {
+    //
+    // SMM CommBuffer DataSize can be a trimed value
+    // Only update DataSize when needed
+    //
+    *DataSize = SmmVariableHeader->DataSize;
+  }
   if (Attributes != NULL) {
     *Attributes = SmmVariableHeader->Attributes;
   }
