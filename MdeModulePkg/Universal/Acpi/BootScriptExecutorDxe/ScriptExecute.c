@@ -45,21 +45,23 @@ S3BootScriptExecutorEntryFunction (
   UINTN                                         TempStackTop;
   UINTN                                         TempStack[0x10];
   UINTN                                         AsmTransferControl16Address;
+  IA32_DESCRIPTOR                               IdtDescriptor;
 
   //
   // Disable interrupt of Debug timer, since new IDT table cannot handle it.
   //
   SaveAndSetDebugTimerInterrupt (FALSE);
 
+  AsmReadIdtr (&IdtDescriptor);
   //
   // Restore IDT for debug
   //
   SetIdtEntry (AcpiS3Context);
 
   //
-  // Initialize Debug Agent to support source level debug in S3 path.
+  // Initialize Debug Agent to support source level debug in S3 path, it will disable interrupt and Debug Timer.
   //
-  InitializeDebugAgent (DEBUG_AGENT_INIT_S3, NULL, NULL);
+  InitializeDebugAgent (DEBUG_AGENT_INIT_S3, (VOID *)&IdtDescriptor, NULL);
 
   //
   // Because not install BootScriptExecute PPI(used just in this module), So just pass NULL

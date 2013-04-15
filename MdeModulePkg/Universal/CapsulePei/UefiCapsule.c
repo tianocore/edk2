@@ -1,7 +1,7 @@
 /** @file
   Capsule update PEIM for UEFI2.0
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -349,6 +349,10 @@ Thunk32To64 (
     //
     AsmWriteCr3 ((UINTN) PageTableAddress);
 
+    //
+    // Disable interrupt of Debug timer, since the IDT table cannot work in long mode
+    //
+    SaveAndSetDebugTimerInterrupt (FALSE);
     //
     // Transfer to long mode
     //

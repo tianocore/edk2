@@ -46,6 +46,7 @@
 [LibraryClasses]
   BaseLib
   DebugLib
+  DebugAgentLib
 
 [Depex]
   FALSE
