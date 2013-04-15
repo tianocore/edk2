@@ -759,17 +759,21 @@ AhciPioTransfer (
     Status = EFI_TIMEOUT;
     Delay  = (UINT32) (DivU64x32 (Timeout, 1000) + 1);
     do {
-      Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_TFD;
-      PortTfd = AhciReadReg (PciIo, (UINT32) Offset);
-
-      if ((PortTfd & EFI_AHCI_PORT_TFD_ERR) != 0) {
-        Status = EFI_DEVICE_ERROR;
-        break;
-      }
       Offset = FisBaseAddr + EFI_AHCI_PIO_FIS_OFFSET;
 
       Status = AhciCheckMemSet (Offset, EFI_AHCI_FIS_TYPE_MASK, EFI_AHCI_FIS_PIO_SETUP, 0);
       if (!EFI_ERROR (Status)) {
+        Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_TFD;
+        PortTfd = AhciReadReg (PciIo, (UINT32) Offset);
+        //
+        // PxTFD will be updated if there is a D2H or SetupFIS received. 
+        // For PIO IN transfer, D2H means a device error. Therefore we only need to check the TFD after receiving a SetupFIS.
+        //
+        if ((PortTfd & EFI_AHCI_PORT_TFD_ERR) != 0) {
+          Status = EFI_DEVICE_ERROR;
+          break;
+        }
+
         PrdCount = *(volatile UINT32 *) (&(AhciRegisters->AhciCmdList[0].AhciCmdPrdbc));
         if (PrdCount == DataCount) {
           break;

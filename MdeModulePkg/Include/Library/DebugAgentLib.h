@@ -1,7 +1,7 @@
 /** @file
   Debug Agent Library provide source-level debug capability.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -15,15 +15,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __DEBUG_AGENT_LIB_H__
 #define __DEBUG_AGENT_LIB_H__
 
-#define DEBUG_AGENT_INIT_PREMEM_SEC      1
-#define DEBUG_AGENT_INIT_POSTMEM_SEC     2
-#define DEBUG_AGENT_INIT_DXE_CORE        3
-#define DEBUG_AGENT_INIT_SMM             4
-#define DEBUG_AGENT_INIT_ENTER_SMI       5
-#define DEBUG_AGENT_INIT_EXIT_SMI        6
-#define DEBUG_AGENT_INIT_S3              7
-#define DEBUG_AGENT_INIT_DXE_AP          8
-
+#define DEBUG_AGENT_INIT_PREMEM_SEC              1
+#define DEBUG_AGENT_INIT_POSTMEM_SEC             2
+#define DEBUG_AGENT_INIT_DXE_CORE                3
+#define DEBUG_AGENT_INIT_SMM                     4
+#define DEBUG_AGENT_INIT_ENTER_SMI               5
+#define DEBUG_AGENT_INIT_EXIT_SMI                6
+#define DEBUG_AGENT_INIT_S3                      7
+#define DEBUG_AGENT_INIT_DXE_AP                  8
+#define DEBUG_AGENT_INIT_PEI                     9
+#define DEBUG_AGENT_INIT_DXE_LOAD               10
+#define DEBUG_AGENT_INIT_DXE_UNLOAD             11
+#define DEBUG_AGENT_INIT_THUNK_PEI_IA32TOX64    12
 
 //
 // Context for DEBUG_AGENT_INIT_POSTMEM_SEC
