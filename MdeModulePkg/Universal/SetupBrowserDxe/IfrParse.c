@@ -18,6 +18,7 @@ UINT16           mStatementIndex;
 UINT16           mExpressionOpCodeIndex;
 
 BOOLEAN          mInScopeSubtitle;
+extern LIST_ENTRY      gBrowserStorageList;
 /**
   Initialize Statement header members.
 
@@ -179,6 +180,7 @@ CreateQuestion (
   FORMSET_STORAGE          *Storage;
   NAME_VALUE_NODE          *NameValueNode;
   EFI_STATUS               Status;
+  BOOLEAN                  Find;
 
   Statement = CreateStatement (OpCodeData, FormSet, Form);
   if (Statement == NULL) {
@@ -220,7 +222,7 @@ CreateQuestion (
     Storage = FORMSET_STORAGE_FROM_LINK (Link);
 
     if (Storage->VarStoreId == Statement->VarStoreId) {
-      Statement->Storage = Storage;
+      Statement->Storage = Storage->BrowserStorage;
       break;
     }
 
@@ -238,19 +240,39 @@ CreateQuestion (
 
     if (Statement->Storage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
       //
-      // Insert to Name/Value varstore list
+      // Check whether old string node already exist.
       //
-      NameValueNode = AllocateZeroPool (sizeof (NAME_VALUE_NODE));
-      ASSERT (NameValueNode != NULL);
-      NameValueNode->Signature = NAME_VALUE_NODE_SIGNATURE;
-      NameValueNode->Name = AllocateCopyPool (StrSize (Statement->VariableName), Statement->VariableName);
-      ASSERT (NameValueNode->Name != NULL);
-      NameValueNode->Value = AllocateZeroPool (0x10);
-      ASSERT (NameValueNode->Value != NULL);
-      NameValueNode->EditValue = AllocateZeroPool (0x10);
-      ASSERT (NameValueNode->EditValue != NULL);
+      Find = FALSE;
+      if (!IsListEmpty(&Statement->Storage->NameValueListHead)) {  
+        Link = GetFirstNode (&Statement->Storage->NameValueListHead);
+        while (!IsNull (&Statement->Storage->NameValueListHead, Link)) {
+          NameValueNode = NAME_VALUE_NODE_FROM_LINK (Link);
 
-      InsertTailList (&Statement->Storage->NameValueListHead, &NameValueNode->Link);
+          if (StrCmp (Statement->VariableName, NameValueNode->Name) == 0) {
+            Find = TRUE;
+            break;
+          }
+
+          Link = GetNextNode (&Statement->Storage->NameValueListHead, Link);
+        }
+      }
+
+      if (!Find) {
+        //
+        // Insert to Name/Value varstore list
+        //
+        NameValueNode = AllocateZeroPool (sizeof (NAME_VALUE_NODE));
+        ASSERT (NameValueNode != NULL);
+        NameValueNode->Signature = NAME_VALUE_NODE_SIGNATURE;
+        NameValueNode->Name = AllocateCopyPool (StrSize (Statement->VariableName), Statement->VariableName);
+        ASSERT (NameValueNode->Name != NULL);
+        NameValueNode->Value = AllocateZeroPool (0x10);
+        ASSERT (NameValueNode->Value != NULL);
+        NameValueNode->EditValue = AllocateZeroPool (0x10);
+        ASSERT (NameValueNode->EditValue != NULL);
+
+        InsertTailList (&Statement->Storage->NameValueListHead, &NameValueNode->Link);
+      }
     }
   }
 
@@ -281,32 +303,6 @@ CreateExpression (
   return Expression;
 }
 
-
-/**
-  Allocate a FORMSET_STORAGE data structure and insert to FormSet Storage List.
-
-  @param  FormSet                Pointer of the current FormSet
-
-  @return Pointer to a FORMSET_STORAGE data structure.
-
-**/
-FORMSET_STORAGE *
-CreateStorage (
-  IN FORM_BROWSER_FORMSET  *FormSet
-  )
-{
-  FORMSET_STORAGE  *Storage;
-
-  Storage = AllocateZeroPool (sizeof (FORMSET_STORAGE));
-  ASSERT (Storage != NULL);
-  Storage->Signature = FORMSET_STORAGE_SIGNATURE;
-  InitializeListHead (&Storage->NameValueListHead);
-  InsertTailList (&FormSet->StorageListHead, &Storage->Link);
-
-  return Storage;
-}
-
-
 /**
   Create ConfigHdr string for a storage.
 
@@ -319,7 +315,7 @@ CreateStorage (
 EFI_STATUS
 InitializeConfigHdr (
   IN FORM_BROWSER_FORMSET  *FormSet,
-  IN OUT FORMSET_STORAGE   *Storage
+  IN OUT BROWSER_STORAGE   *Storage
   )
 {
   CHAR16      *Name;
@@ -341,12 +337,185 @@ InitializeConfigHdr (
     return EFI_NOT_FOUND;
   }
 
-  Storage->ConfigRequest = AllocateCopyPool (StrSize (Storage->ConfigHdr), Storage->ConfigHdr);
-  Storage->SpareStrLen = 0;
-
   return EFI_SUCCESS;
 }
 
+/**
+  Find the global storage link base on the input storate type, name and guid.
+
+  @param  StorageType                Storage type.
+  @param  StorageGuid                Storage guid.
+  @param  StorageName                Storage Name.
+
+  @return Pointer to a GLOBAL_STORAGE data structure.
+
+**/
+BROWSER_STORAGE *
+FindStorageInList (
+  IN UINT8                 StorageType,
+  IN EFI_GUID              *StorageGuid,
+  IN CHAR16                *StorageName
+  )
+{
+  LIST_ENTRY       *Link;
+  BROWSER_STORAGE  *BrowserStorage;
+
+  Link  = GetFirstNode (&gBrowserStorageList);
+  while (!IsNull (&gBrowserStorageList, Link)) {
+    BrowserStorage = BROWSER_STORAGE_FROM_LINK (Link);
+
+    if ((BrowserStorage->Type == StorageType) && CompareGuid (&BrowserStorage->Guid, StorageGuid)) {
+      if (StorageType == EFI_HII_VARSTORE_NAME_VALUE) {
+        return BrowserStorage;
+      }
+
+      if (StrCmp (BrowserStorage->Name, StorageName) == 0) {
+        return BrowserStorage;
+      }
+    }
+
+    //
+    // Get Next Storage.
+    //
+    Link = GetNextNode (&gBrowserStorageList, Link);
+  }
+
+  return NULL;
+}
+
+/**
+  Intialize the Global Storage.
+
+  @param  BrowserStorage              Pointer to the global storage.
+  @param  StorageType                Storage type.
+  @param  OpCodeData                 Binary data for this opcode.
+
+**/
+VOID
+IntializeBrowserStorage (
+  IN BROWSER_STORAGE       *BrowserStorage,
+  IN UINT8                 StorageType,
+  IN UINT8                 *OpCodeData
+  )
+{
+  switch (StorageType) {
+    case EFI_HII_VARSTORE_BUFFER:
+      CopyMem (&BrowserStorage->Guid, &((EFI_IFR_VARSTORE *) OpCodeData)->Guid, sizeof (EFI_GUID));
+      CopyMem (&BrowserStorage->Size, &((EFI_IFR_VARSTORE *) OpCodeData)->Size, sizeof (UINT16));
+
+      BrowserStorage->Buffer     = AllocateZeroPool (BrowserStorage->Size);
+      BrowserStorage->EditBuffer = AllocateZeroPool (BrowserStorage->Size);
+      break;
+
+    case EFI_HII_VARSTORE_EFI_VARIABLE:
+    case EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER:
+      CopyMem (&BrowserStorage->Guid,       &((EFI_IFR_VARSTORE_EFI *) OpCodeData)->Guid,       sizeof (EFI_GUID));
+      CopyMem (&BrowserStorage->Attributes, &((EFI_IFR_VARSTORE_EFI *) OpCodeData)->Attributes, sizeof (UINT32));
+      CopyMem (&BrowserStorage->Size,       &((EFI_IFR_VARSTORE_EFI *) OpCodeData)->Size,       sizeof (UINT16));
+
+      if (StorageType ==  EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) {
+        BrowserStorage->Buffer     = AllocateZeroPool (BrowserStorage->Size);
+        BrowserStorage->EditBuffer = AllocateZeroPool (BrowserStorage->Size);
+      }
+      break;
+
+    case EFI_HII_VARSTORE_NAME_VALUE:
+      CopyMem (&BrowserStorage->Guid, &((EFI_IFR_VARSTORE_NAME_VALUE *) OpCodeData)->Guid, sizeof (EFI_GUID));
+
+      InitializeListHead (&BrowserStorage->NameValueListHead);
+      break;
+
+    default:
+      break;
+  }
+}
+
+/**
+  Allocate a FORMSET_STORAGE data structure and insert to FormSet Storage List.
+
+  @param  FormSet                    Pointer of the current FormSet
+  @param  StorageType                Storage type.
+  @param  OpCodeData                 Binary data for this opcode.
+
+  @return Pointer to a FORMSET_STORAGE data structure.
+
+**/
+FORMSET_STORAGE *
+CreateStorage (
+  IN FORM_BROWSER_FORMSET  *FormSet,
+  IN UINT8                 StorageType,
+  IN UINT8                 *OpCodeData
+  )
+{
+  FORMSET_STORAGE         *Storage;
+  CHAR16                  *UnicodeString;
+  UINT16                  Index;
+  BROWSER_STORAGE         *BrowserStorage;
+  EFI_GUID                *StorageGuid;
+  CHAR8                   *StorageName;
+
+  UnicodeString = NULL;
+  StorageName   = NULL;
+  switch (StorageType) {
+    case EFI_HII_VARSTORE_BUFFER:
+      StorageGuid = (EFI_GUID *) (CHAR8*) &((EFI_IFR_VARSTORE *) OpCodeData)->Guid;
+      StorageName = (CHAR8 *) ((EFI_IFR_VARSTORE *) OpCodeData)->Name;
+      break;
+
+    case EFI_HII_VARSTORE_EFI_VARIABLE:
+    case EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER:
+      StorageGuid = (EFI_GUID *) (CHAR8*) &((EFI_IFR_VARSTORE_EFI *) OpCodeData)->Guid;
+      StorageName = (CHAR8 *) ((EFI_IFR_VARSTORE_EFI *) OpCodeData)->Name;
+      break;
+
+    default:
+      ASSERT (StorageType == EFI_HII_VARSTORE_NAME_VALUE);
+      StorageGuid = &((EFI_IFR_VARSTORE_NAME_VALUE *) OpCodeData)->Guid;
+      break;
+  }
+
+  if (StorageType != EFI_HII_VARSTORE_NAME_VALUE) {
+    ASSERT (StorageName != NULL);
+
+    UnicodeString = AllocateZeroPool (AsciiStrSize (StorageName) * 2);
+    ASSERT (UnicodeString != NULL);
+    for (Index = 0; StorageName[Index] != 0; Index++) {
+      UnicodeString[Index] = (CHAR16) StorageName[Index];
+    }
+  }
+
+  Storage = AllocateZeroPool (sizeof (FORMSET_STORAGE));
+  ASSERT (Storage != NULL);
+  Storage->Signature = FORMSET_STORAGE_SIGNATURE;
+  InsertTailList (&FormSet->StorageListHead, &Storage->Link);
+
+  BrowserStorage = FindStorageInList(StorageType, StorageGuid, UnicodeString);
+  if (BrowserStorage == NULL) {
+    BrowserStorage = AllocateZeroPool (sizeof (BROWSER_STORAGE));
+    ASSERT (BrowserStorage != NULL);
+
+    BrowserStorage->Signature = BROWSER_STORAGE_SIGNATURE;
+    InsertTailList (&gBrowserStorageList, &BrowserStorage->Link);
+
+    IntializeBrowserStorage (BrowserStorage, StorageType, OpCodeData);
+    BrowserStorage->Type = StorageType;
+    if (StorageType != EFI_HII_VARSTORE_NAME_VALUE) {
+      BrowserStorage->Name = UnicodeString;
+    }
+
+    InitializeConfigHdr (FormSet, BrowserStorage);
+  }
+  //
+  // Add count because one formset storage use this global storage.
+  //
+  BrowserStorage->ReferenceCount++;
+
+  Storage->BrowserStorage = BrowserStorage;
+  Storage->ConfigRequest = AllocateCopyPool (StrSize (BrowserStorage->ConfigHdr), BrowserStorage->ConfigHdr);
+  Storage->SpareStrLen = 0;
+
+  return Storage;
+}
 
 /**
   Initialize Request Element of a Question. <RequestElement> ::= '&'<BlockName> | '&'<Label>
@@ -366,7 +535,8 @@ InitializeRequestElement (
   IN OUT FORM_BROWSER_FORM        *Form
   )
 {
-  FORMSET_STORAGE  *Storage;
+  BROWSER_STORAGE  *Storage;
+  FORMSET_STORAGE  *FormsetStorage;
   UINTN            StrLen;
   UINTN            StringSize;
   CHAR16           *NewStr;
@@ -414,26 +584,42 @@ InitializeRequestElement (
   }
 
   //
+  // Find Formset Storage for this Question
+  //
+  FormsetStorage = NULL;
+  Link = GetFirstNode (&FormSet->StorageListHead);
+  while (!IsNull (&FormSet->StorageListHead, Link)) {
+    FormsetStorage = FORMSET_STORAGE_FROM_LINK (Link);
+
+    if (FormsetStorage->VarStoreId == Question->VarStoreId) {
+      break;
+    }
+
+    Link = GetNextNode (&FormSet->StorageListHead, Link);
+  }
+  ASSERT (FormsetStorage != NULL);
+
+  //
   // Append <RequestElement> to <ConfigRequest>
   //
-  if (StrLen > Storage->SpareStrLen) {
+  if (StrLen > FormsetStorage->SpareStrLen) {
     //
     // Old String buffer is not sufficient for RequestElement, allocate a new one
     //
-    StringSize = (Storage->ConfigRequest != NULL) ? StrSize (Storage->ConfigRequest) : sizeof (CHAR16);
+    StringSize = (FormsetStorage->ConfigRequest != NULL) ? StrSize (FormsetStorage->ConfigRequest) : sizeof (CHAR16);
     NewStr = AllocateZeroPool (StringSize + CONFIG_REQUEST_STRING_INCREMENTAL * sizeof (CHAR16));
     ASSERT (NewStr != NULL);
-    if (Storage->ConfigRequest != NULL) {
-      CopyMem (NewStr, Storage->ConfigRequest, StringSize);
-      FreePool (Storage->ConfigRequest);
+    if (FormsetStorage->ConfigRequest != NULL) {
+      CopyMem (NewStr, FormsetStorage->ConfigRequest, StringSize);
+      FreePool (FormsetStorage->ConfigRequest);
     }
-    Storage->ConfigRequest = NewStr;
-    Storage->SpareStrLen   = CONFIG_REQUEST_STRING_INCREMENTAL;
+    FormsetStorage->ConfigRequest = NewStr;
+    FormsetStorage->SpareStrLen   = CONFIG_REQUEST_STRING_INCREMENTAL;
   }
 
-  StrCat (Storage->ConfigRequest, RequestElement);
-  Storage->ElementCount++;
-  Storage->SpareStrLen -= StrLen;
+  StrCat (FormsetStorage->ConfigRequest, RequestElement);
+  FormsetStorage->ElementCount++;
+  FormsetStorage->SpareStrLen -= StrLen;
 
   //
   // Update the Config Request info saved in the form.
@@ -444,7 +630,7 @@ InitializeRequestElement (
   while (!IsNull (&Form->ConfigRequestHead, Link)) {
     ConfigInfo = FORM_BROWSER_CONFIG_REQUEST_FROM_LINK (Link);
 
-    if (ConfigInfo != NULL && ConfigInfo->Storage->VarStoreId == Storage->VarStoreId) {
+    if (ConfigInfo != NULL && ConfigInfo->Storage == Storage) {
       Find = TRUE;
       break;
     }
@@ -532,7 +718,6 @@ DestroyExpression (
   FreePool (Expression);
 }
 
-
 /**
   Free resources of a storage.
 
@@ -544,46 +729,19 @@ DestroyStorage (
   IN FORMSET_STORAGE   *Storage
   )
 {
-  LIST_ENTRY         *Link;
-  NAME_VALUE_NODE    *NameValueNode;
-
   if (Storage == NULL) {
     return;
   }
 
-  if (Storage->Name != NULL) {
-    FreePool (Storage->Name);
-  }
-  if (Storage->Buffer != NULL) {
-    FreePool (Storage->Buffer);
-  }
-  if (Storage->EditBuffer != NULL) {
-    FreePool (Storage->EditBuffer);
-  }
-
-  while (!IsListEmpty (&Storage->NameValueListHead)) {
-    Link = GetFirstNode (&Storage->NameValueListHead);
-    NameValueNode = NAME_VALUE_NODE_FROM_LINK (Link);
-    RemoveEntryList (&NameValueNode->Link);
-
-    if (NameValueNode->Name != NULL) {
-      FreePool (NameValueNode->Name);
-    }
-    if (NameValueNode->Value != NULL) {
-      FreePool (NameValueNode->Value);
-    }
-    if (NameValueNode->EditValue != NULL) {
-      FreePool (NameValueNode->EditValue);
-    }
-    FreePool (NameValueNode);
-  }
-
-  if (Storage->ConfigHdr != NULL) {
-    FreePool (Storage->ConfigHdr);
-  }
   if (Storage->ConfigRequest != NULL) {
     FreePool (Storage->ConfigRequest);
   }
+
+  //
+  // Minus the reference to the global storage.
+  //
+  ASSERT (Storage->BrowserStorage->ReferenceCount > 0);
+  Storage->BrowserStorage->ReferenceCount--; 
 
   FreePool (Storage);
 }
@@ -915,7 +1073,6 @@ ParseOpCodes (
   )
 {
   EFI_STATUS              Status;
-  UINT16                  Index;
   FORM_BROWSER_FORM       *CurrentForm;
   FORM_BROWSER_STATEMENT  *CurrentStatement;
   EXPRESSION_OPCODE       *ExpressionOpCode;
@@ -931,7 +1088,6 @@ ParseOpCodes (
   QUESTION_DEFAULT        *CurrentDefault;
   QUESTION_OPTION         *CurrentOption;
   UINT8                   Width;
-  CHAR8                   *AsciiString;
   UINT16                  NumberOfStatement;
   UINT16                  NumberOfExpression;
   EFI_IMAGE_ID            *ImageId;
@@ -1104,7 +1260,7 @@ ParseOpCodes (
             while (!IsNull (&FormSet->StorageListHead, Link)) {
               VarStorage = FORMSET_STORAGE_FROM_LINK (Link);
               if (VarStorage->VarStoreId == ((EFI_IFR_GET *) OpCodeData)->VarStoreId) {
-                ExpressionOpCode->VarStorage = VarStorage;
+                ExpressionOpCode->VarStorage = VarStorage->BrowserStorage;
                 break;
               }
               Link = GetNextNode (&FormSet->StorageListHead, Link);
@@ -1448,76 +1604,28 @@ ParseOpCodes (
       //
       // Create a buffer Storage for this FormSet
       //
-      Storage = CreateStorage (FormSet);
-      Storage->Type = EFI_HII_VARSTORE_BUFFER;
-
+      Storage = CreateStorage (FormSet, EFI_HII_VARSTORE_BUFFER, OpCodeData);
       CopyMem (&Storage->VarStoreId, &((EFI_IFR_VARSTORE *) OpCodeData)->VarStoreId, sizeof (EFI_VARSTORE_ID));
-      CopyMem (&Storage->Guid,       &((EFI_IFR_VARSTORE *) OpCodeData)->Guid,       sizeof (EFI_GUID));
-      CopyMem (&Storage->Size,       &((EFI_IFR_VARSTORE *) OpCodeData)->Size,       sizeof (UINT16));
-
-      Storage->Buffer = AllocateZeroPool (Storage->Size);
-      Storage->EditBuffer = AllocateZeroPool (Storage->Size);
-
-      AsciiString = (CHAR8 *) ((EFI_IFR_VARSTORE *) OpCodeData)->Name;
-      Storage->Name = AllocateZeroPool (AsciiStrSize (AsciiString) * 2);
-      ASSERT (Storage->Name != NULL);
-      for (Index = 0; AsciiString[Index] != 0; Index++) {
-        Storage->Name[Index] = (CHAR16) AsciiString[Index];
-      }
-
-      //
-      // Initialize <ConfigHdr>
-      //
-      InitializeConfigHdr (FormSet, Storage);
       break;
 
     case EFI_IFR_VARSTORE_NAME_VALUE_OP:
       //
       // Create a name/value Storage for this FormSet
       //
-      Storage = CreateStorage (FormSet);
-      Storage->Type = EFI_HII_VARSTORE_NAME_VALUE;
-
+      Storage = CreateStorage (FormSet, EFI_HII_VARSTORE_NAME_VALUE, OpCodeData);
       CopyMem (&Storage->VarStoreId, &((EFI_IFR_VARSTORE_NAME_VALUE *) OpCodeData)->VarStoreId, sizeof (EFI_VARSTORE_ID));
-      CopyMem (&Storage->Guid,       &((EFI_IFR_VARSTORE_NAME_VALUE *) OpCodeData)->Guid,       sizeof (EFI_GUID));
-
-      //
-      // Initialize <ConfigHdr>
-      //
-      InitializeConfigHdr (FormSet, Storage);
       break;
 
     case EFI_IFR_VARSTORE_EFI_OP:
       //
       // Create a EFI variable Storage for this FormSet
       //
-      Storage = CreateStorage (FormSet);
-
-      CopyMem (&Storage->VarStoreId, &((EFI_IFR_VARSTORE_EFI *) OpCodeData)->VarStoreId, sizeof (EFI_VARSTORE_ID));
-      CopyMem (&Storage->Guid,       &((EFI_IFR_VARSTORE_EFI *) OpCodeData)->Guid,       sizeof (EFI_GUID));
-      CopyMem (&Storage->Attributes, &((EFI_IFR_VARSTORE_EFI *) OpCodeData)->Attributes, sizeof (UINT32));
-      CopyMem (&Storage->Size,       &((EFI_IFR_VARSTORE_EFI *) OpCodeData)->Size,       sizeof (UINT16));
-
       if (OpCodeLength < sizeof (EFI_IFR_VARSTORE_EFI)) {
-        Storage->Type = EFI_HII_VARSTORE_EFI_VARIABLE;
-        break;
-      } 
-
-      Storage->Type = EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER;
-      Storage->Buffer = AllocateZeroPool (Storage->Size);
-      Storage->EditBuffer = AllocateZeroPool (Storage->Size);
-
-      AsciiString = (CHAR8 *) ((EFI_IFR_VARSTORE_EFI *) OpCodeData)->Name;
-      Storage->Name = AllocateZeroPool (AsciiStrSize (AsciiString) * 2);
-      ASSERT (Storage->Name != NULL);
-      for (Index = 0; AsciiString[Index] != 0; Index++) {
-        Storage->Name[Index] = (CHAR16) AsciiString[Index];
+        Storage = CreateStorage (FormSet, EFI_HII_VARSTORE_EFI_VARIABLE, OpCodeData);
+      } else {
+        Storage = CreateStorage (FormSet, EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER, OpCodeData);
       }
-
-      //
-      // Initialize <ConfigHdr>
-      //
-      InitializeConfigHdr (FormSet, Storage);
+      CopyMem (&Storage->VarStoreId, &((EFI_IFR_VARSTORE_EFI *) OpCodeData)->VarStoreId, sizeof (EFI_VARSTORE_ID));
       break;
 
     //
