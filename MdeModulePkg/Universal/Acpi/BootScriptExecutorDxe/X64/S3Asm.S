@@ -2,7 +2,7 @@
 #   This is the assembly code for transferring to control to OS S3 waking vector
 #   for X64 platform
 #
-# Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are
 # licensed and made available under the terms and conditions of the BSD License
@@ -18,14 +18,14 @@ ASM_GLOBAL ASM_PFX(AsmTransferControl)
 ASM_PFX(AsmTransferControl):
     # rcx S3WakingVector    :DWORD
     # rdx AcpiLowMemoryBase :DWORD
-    lea   _AsmTransferControl_al_0000, %eax 
+    lea   _AsmTransferControl_al_0000(%rip), %eax 
     movq  $0x2800000000, %r8 
     orq   %r8, %rax
     pushq %rax
     shrd  $20, %ecx, %ebx
     andl  $0x0f, %ecx 
     movw  %cx, %bx
-    movl  %ebx, jmp_addr 
+    movl  %ebx, jmp_addr(%rip) 
     lret
 _AsmTransferControl_al_0000:
     .byte    0x0b8, 0x30, 0      # mov ax, 30h as selector
@@ -124,7 +124,7 @@ ASM_PFX(PageFaultHandlerHook):
     popq     %rcx
     popq     %rax                         # restore all volatile registers
     jnz      L1
-    jmpq     *ASM_PFX(mOriginalHandler)
+    jmpq     *ASM_PFX(mOriginalHandler)(%rip)
 L1:
     addq     $0x08, %rsp                  # skip error code for PF
     iretq
