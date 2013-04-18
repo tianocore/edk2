@@ -216,7 +216,7 @@ typedef struct {
 
 #define NAME_VALUE_NODE_FROM_LINK(a)  CR (a, NAME_VALUE_NODE, Link, NAME_VALUE_NODE_SIGNATURE)
 
-#define FORMSET_STORAGE_SIGNATURE  SIGNATURE_32 ('F', 'S', 'T', 'G')
+#define BROWSER_STORAGE_SIGNATURE  SIGNATURE_32 ('B', 'S', 'T', 'G')
 
 typedef struct {
   UINTN            Signature;
@@ -224,7 +224,6 @@ typedef struct {
 
   UINT8            Type;           // Storage type
 
-  UINT16           VarStoreId;
   EFI_GUID         Guid;
 
   CHAR16           *Name;          // For EFI_IFR_VARSTORE
@@ -237,6 +236,21 @@ typedef struct {
   UINT32           Attributes;     // For EFI_IFR_VARSTORE_EFI: EFI Variable attribute
 
   CHAR16           *ConfigHdr;     // <ConfigHdr>
+  UINT8            ReferenceCount; // How many form set storage refrence this storage.
+} BROWSER_STORAGE;
+
+#define BROWSER_STORAGE_FROM_LINK(a)  CR (a, BROWSER_STORAGE, Link, BROWSER_STORAGE_SIGNATURE)
+
+#define FORMSET_STORAGE_SIGNATURE  SIGNATURE_32 ('F', 'S', 'T', 'G')
+
+typedef struct {
+  UINTN            Signature;
+  LIST_ENTRY       Link;
+
+  UINT16           VarStoreId;
+
+  BROWSER_STORAGE  *BrowserStorage;
+
   CHAR16           *ConfigRequest; // <ConfigRequest> = <ConfigHdr> + <RequestElement>
   UINTN            ElementCount;   // Number of <RequestElement> in the <ConfigRequest>
   UINTN            SpareStrLen;    // Spare length of ConfigRequest string buffer
@@ -272,7 +286,7 @@ typedef struct {
   EFI_STRING_ID     DevicePath;  // For EFI_IFR_QUESTION_REF3_2, EFI_IFR_QUESTION_REF3_3
   EFI_GUID          Guid;
 
-  FORMSET_STORAGE   *VarStorage; // For EFI_IFR_SET, EFI_IFR_GET
+  BROWSER_STORAGE   *VarStorage; // For EFI_IFR_SET, EFI_IFR_GET
   VAR_STORE_INFO    VarStoreInfo;// For EFI_IFR_SET, EFI_IFR_GET
   UINT8             ValueType;   // For EFI_IFR_SET, EFI_IFR_GET
   UINT8             ValueWidth;  // For EFI_IFR_SET, EFI_IFR_GET
@@ -372,7 +386,7 @@ typedef struct {
   //
   EFI_QUESTION_ID       QuestionId;       // The value of zero is reserved
   EFI_VARSTORE_ID       VarStoreId;       // A value of zero indicates no variable storage
-  FORMSET_STORAGE       *Storage;
+  BROWSER_STORAGE       *Storage;
   VAR_STORE_INFO        VarStoreInfo;
   UINT16                StorageWidth;
   UINT8                 QuestionFlags;
@@ -430,7 +444,7 @@ typedef struct {
   UINTN                 ElementCount;   // Number of <RequestElement> in the <ConfigRequest>  
   UINTN                 SpareStrLen;
 
-  FORMSET_STORAGE       *Storage;
+  BROWSER_STORAGE       *Storage;
 } FORM_BROWSER_CONFIG_REQUEST;
 #define FORM_BROWSER_CONFIG_REQUEST_FROM_LINK(a)  CR (a, FORM_BROWSER_CONFIG_REQUEST, Link, FORM_BROWSER_CONFIG_REQUEST_SIGNATURE)
 
@@ -909,7 +923,7 @@ CreateDialog (
 **/
 EFI_STATUS
 GetValueByName (
-  IN FORMSET_STORAGE             *Storage,
+  IN BROWSER_STORAGE             *Storage,
   IN CHAR16                      *Name,
   IN OUT CHAR16                  **Value,
   IN GET_SET_QUESTION_VALUE_WITH GetValueFrom
@@ -929,7 +943,7 @@ GetValueByName (
 **/
 EFI_STATUS
 SetValueByName (
-  IN FORMSET_STORAGE             *Storage,
+  IN BROWSER_STORAGE             *Storage,
   IN CHAR16                      *Name,
   IN CHAR16                      *Value,
   IN GET_SET_QUESTION_VALUE_WITH SetValueTo
@@ -1111,7 +1125,7 @@ ExtractDefault (
   IN UINT16                           DefaultId,
   IN BROWSER_SETTING_SCOPE            SettingScope,
   IN BROWSER_GET_DEFAULT_VALUE        GetDefaultValueScope,
-  IN FORMSET_STORAGE                  *Storage,
+  IN BROWSER_STORAGE                  *Storage,
   IN BOOLEAN                          RetrieveValueFirst
   );
 
@@ -1156,9 +1170,9 @@ LoadFormSetConfig (
 /**
   Convert setting of Buffer Storage or NameValue Storage to <ConfigResp>.
 
-  @param  Buffer                 The Storage to be conveted.
+  @param  Storage                The Storage to be conveted.
   @param  ConfigResp             The returned <ConfigResp>.
-  @param  SingleForm             Whether update data for single form or formset level.
+  @param  ConfigRequest          The ConfigRequest string.
 
   @retval EFI_SUCCESS            Convert success.
   @retval EFI_INVALID_PARAMETER  Incorrect storage type.
@@ -1166,9 +1180,9 @@ LoadFormSetConfig (
 **/
 EFI_STATUS
 StorageToConfigResp (
-  IN VOID                    *Buffer,
+  IN BROWSER_STORAGE         *Storage,
   IN CHAR16                  **ConfigResp,
-  IN BOOLEAN                 SingleForm
+  IN CHAR16                  *ConfigRequest
   );
 
 /**
@@ -1183,7 +1197,7 @@ StorageToConfigResp (
 **/
 EFI_STATUS
 ConfigRespToStorage (
-  IN FORMSET_STORAGE         *Storage,
+  IN BROWSER_STORAGE         *Storage,
   IN CHAR16                  *ConfigResp
   );
 
