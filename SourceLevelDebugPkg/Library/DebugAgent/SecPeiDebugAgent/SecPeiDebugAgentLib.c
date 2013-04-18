@@ -244,23 +244,51 @@ DebugAgentCallbackMemoryDiscoveredPpi (
   IN VOID                                 *Ppi
   )
 {
+  EFI_STATUS                     Status;
   DEBUG_AGENT_MAILBOX            *Mailbox;
   BOOLEAN                        InterruptStatus;
-  
+  EFI_PHYSICAL_ADDRESS           Memory; 
+  DEBUG_AGENT_MAILBOX            *NewMailbox;
+  UINT64                         *MailboxLocationInHob;
+
   //
   // Save and disable original interrupt status
   //
   InterruptStatus = SaveAndDisableInterrupts ();
-  
+
+  //
+  // Allocate ACPI NVS memory for new Mailbox and Debug Port Handle buffer
+  //
+  Status = PeiServicesAllocatePages (
+             EfiACPIMemoryNVS,
+             EFI_SIZE_TO_PAGES (sizeof(DEBUG_AGENT_MAILBOX) + PcdGet16(PcdDebugPortHandleBufferSize)),
+             &Memory
+             );
+  ASSERT_EFI_ERROR (Status);
+  NewMailbox = (DEBUG_AGENT_MAILBOX *) (UINTN) Memory;
+  //
+  // Copy Mailbox and Debug Port Handle buffer to new location in ACPI NVS memory, because original Mailbox
+  // and Debug Port Handle buffer in the allocated pool that may be marked as free by DXE Core after DXE Core
+  // reallocates the HOB.
+  //
+  Mailbox = GetMailboxPointer ();
+  CopyMem (NewMailbox, Mailbox, sizeof (DEBUG_AGENT_MAILBOX));
+  CopyMem (NewMailbox + 1, (VOID *)(UINTN)Mailbox->DebugPortHandle, PcdGet16(PcdDebugPortHandleBufferSize));
+  //
+  // Update Mailbox Location pointer in GUIDed HOB and IDT entry with new one
+  //
+  MailboxLocationInHob = GetMailboxLocationFromHob ();
+  *MailboxLocationInHob = (UINT64)(UINTN)NewMailbox;
+  SetLocationSavedMailboxPointerInIdtEntry (MailboxLocationInHob);
+  //
+  // Update Debug Port Handle in new Mailbox
+  //
+  UpdateMailboxContent (NewMailbox, DEBUG_MAILBOX_DEBUG_PORT_HANDLE_INDEX, (UINT64)(UINTN)(NewMailbox + 1));
   //
   // Set physical memory ready flag
   //
-  Mailbox = GetMailboxPointer ();
   SetDebugFlag (DEBUG_AGENT_FLAG_MEMORY_READY, 1);
 
-  //
-  // Memory has been ready
-  //
   if (IsHostAttached ()) {
     //
     // Trigger one software interrupt to inform HOST
