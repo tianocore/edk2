@@ -219,7 +219,7 @@ CopySingleFile(
       //
       //check if enough space available on destination drive to complete copy
       //
-      if (DestVolumeInfo->FreeSpace < SourceFileSize) {
+      if (DestVolumeInfo!= NULL && (DestVolumeInfo->FreeSpace < SourceFileSize)) {
         //
         //not enough space on destination directory to copy file
         //
