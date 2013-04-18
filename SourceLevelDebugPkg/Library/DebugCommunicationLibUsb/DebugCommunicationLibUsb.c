@@ -674,10 +674,16 @@ InitializeUsbDebugHardware (
   //
   if (((MmioRead32((UINTN)&UsbDebugPortRegister->ControlStatus) & (USB_DEBUG_PORT_OWNER | USB_DEBUG_PORT_IN_USE))
        != (USB_DEBUG_PORT_OWNER | USB_DEBUG_PORT_IN_USE)) || (Handle->Initialized == USBDBG_RESET)) {
+    DEBUG ((
+      EFI_D_INFO,
+      "UsbDbg: Need to reset the host controller. ControlStatus = %08x\n",
+      MmioRead32((UINTN)&UsbDebugPortRegister->ControlStatus)
+      ));
     //
     // If the host controller is halted, then reset and restart it.
     //
     if ((MmioRead32((UINTN)UsbStatus) & BIT12) != 0) {
+      DEBUG ((EFI_D_INFO, "UsbDbg: Reset the host controller.\n"));
       //
       // reset the host controller.
       //
@@ -712,7 +718,9 @@ InitializeUsbDebugHardware (
     return RETURN_NOT_FOUND;
   }
 
-  if (Handle->Initialized != USBDBG_INIT_DONE) {
+  if (Handle->Initialized != USBDBG_INIT_DONE ||
+      (MmioRead32 ((UINTN) &UsbDebugPortRegister->ControlStatus) & USB_DEBUG_PORT_ENABLE) == 0) {
+    DEBUG ((EFI_D_INFO, "UsbDbg: Reset the debug port.\n"));
     //
     // Reset the debug port
     //
