@@ -1,7 +1,7 @@
 /** @file
   Provide generic extract guided section functions for PEI phase.
 
-  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -242,6 +242,16 @@ ExtractGuidedSectionRegisterHandlers (
   CopyGuid (HandlerInfo->ExtractHandlerGuidTable + HandlerInfo->NumberOfExtractHandler, SectionGuid);
   HandlerInfo->ExtractDecodeHandlerTable [HandlerInfo->NumberOfExtractHandler] = DecodeHandler;
   HandlerInfo->ExtractGetInfoHandlerTable [HandlerInfo->NumberOfExtractHandler++] = GetInfoHandler;
+
+  //
+  // Build the Guided Section GUID HOB to record the GUID itself.
+  // Then the content of the GUIDed HOB will be the same as the GUID value itself.
+  //
+  BuildGuidDataHob (
+    (EFI_GUID *) SectionGuid,
+    (VOID *) SectionGuid,
+    sizeof (GUID)
+    );
 
   return RETURN_SUCCESS;
 }

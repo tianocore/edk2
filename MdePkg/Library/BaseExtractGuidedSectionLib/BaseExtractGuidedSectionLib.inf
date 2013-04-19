@@ -7,8 +7,11 @@
 #  in their initialization without any issues. They only have to be careful in 
 #  the implementation of runtime services, because this BASE library instance doesn't 
 #  convert the address pointed by PcdGuidedExtractHandlerTableAddress to the virtual address.
-#  
-#  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+#  And a driver should use this ExtractGuidedSectionLib to do implementation internally, also
+#  this ExtractGuidedSectionLib couldn't be used for guided section extraction that is required
+#  by PEI and DXE core for recovery or capsule image processing, etc.
+#
+#  Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License

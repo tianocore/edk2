@@ -607,6 +607,55 @@ FirmwareVolmeInfoPpiNotifyCallback (
 }
 
 /**
+  Verify the Guided Section GUID by checking if there is the Guided Section GUID HOB recorded the GUID itself.
+
+  @param GuidedSectionGuid          The Guided Section GUID.
+  @param GuidedSectionExtraction    A pointer to the pointer to the supported Guided Section Extraction Ppi
+                                    for the Guided Section.
+
+  @return TRUE      The GuidedSectionGuid could be identified, and the pointer to
+                    the Guided Section Extraction Ppi will be returned to *GuidedSectionExtraction.
+  @return FALSE     The GuidedSectionGuid could not be identified, or 
+                    the Guided Section Extraction Ppi has not been installed yet.
+
+**/
+BOOLEAN
+VerifyGuidedSectionGuid (
+  IN  EFI_GUID                                  *GuidedSectionGuid,
+  OUT EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI     **GuidedSectionExtraction
+  )
+{
+  EFI_PEI_HOB_POINTERS  Hob;
+  EFI_GUID              *GuidRecorded;
+  VOID                  *Interface;
+  EFI_STATUS            Status;
+
+  //
+  // Check if there is the Guided Section GUID HOB recorded the GUID itself.
+  //
+  Hob.Raw = GetFirstGuidHob (GuidedSectionGuid);
+  if (Hob.Raw != NULL) {
+    GuidRecorded = (EFI_GUID *) GET_GUID_HOB_DATA (Hob);
+    if (CompareGuid (GuidRecorded, GuidedSectionGuid)) {
+      //
+      // Found the recorded GuidedSectionGuid.
+      //
+      Status = PeiServicesLocatePpi (GuidedSectionGuid, 0, NULL, (VOID **) &Interface);
+      if (!EFI_ERROR (Status) && Interface != NULL) {
+        //
+        // Found the supported Guided Section Extraction Ppi for the Guided Section.
+        //
+        *GuidedSectionExtraction = (EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI *) Interface;
+        return TRUE;
+      }
+      return FALSE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
   Go through the file to search SectionType section. 
   Search within encapsulation sections (compression and GUIDed) recursively, 
   until the match section is found.
@@ -643,6 +692,7 @@ ProcessSection (
   UINTN                                   Index;
   UINT32                                  Authentication;
   PEI_CORE_INSTANCE                       *PrivateData;
+  EFI_GUID                                *SectionDefinitionGuid;
 
   PrivateData   = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
   *OutputBuffer = NULL;
@@ -702,21 +752,11 @@ ProcessSection (
       Status = EFI_NOT_FOUND;
       if (Section->Type == EFI_SECTION_GUID_DEFINED) {
         if (IS_SECTION2 (Section)) {
-          Status = PeiServicesLocatePpi (
-                     &((EFI_GUID_DEFINED_SECTION2 *)Section)->SectionDefinitionGuid, 
-                     0, 
-                     NULL, 
-                     (VOID **) &GuidSectionPpi
-                     );
+          SectionDefinitionGuid = &((EFI_GUID_DEFINED_SECTION2 *)Section)->SectionDefinitionGuid;
         } else {
-          Status = PeiServicesLocatePpi (
-                     &((EFI_GUID_DEFINED_SECTION *)Section)->SectionDefinitionGuid, 
-                     0, 
-                     NULL, 
-                     (VOID **) &GuidSectionPpi
-                     );
+          SectionDefinitionGuid = &((EFI_GUID_DEFINED_SECTION *)Section)->SectionDefinitionGuid;
         }
-        if (!EFI_ERROR (Status)) {
+        if (VerifyGuidedSectionGuid (SectionDefinitionGuid, &GuidSectionPpi)) {
           Status = GuidSectionPpi->ExtractSection (
                                      GuidSectionPpi,
                                      Section,

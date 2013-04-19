@@ -1,7 +1,7 @@
 /** @file
   Provide generic extract guided section functions for Dxe phase.
 
-  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -18,6 +18,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/ExtractGuidedSectionLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
 #define EXTRACT_HANDLER_TABLE_SIZE   0x10
 
@@ -175,6 +176,8 @@ ExtractGuidedSectionRegisterHandlers (
   )
 {
   UINT32 Index;
+  VOID   *GuidData;
+
   //
   // Check input paramter.
   //
@@ -211,7 +214,16 @@ ExtractGuidedSectionRegisterHandlers (
   CopyGuid (&mExtractHandlerGuidTable [mNumberOfExtractHandler], SectionGuid);
   mExtractDecodeHandlerTable [mNumberOfExtractHandler] = DecodeHandler;
   mExtractGetInfoHandlerTable [mNumberOfExtractHandler++] = GetInfoHandler;
-  
+
+  //
+  // Install the Guided Section GUID configuration table to record the GUID itself.
+  // Then the content of the configuration table buffer will be the same as the GUID value itself.
+  //
+  GuidData = AllocateCopyPool (sizeof (GUID), (VOID *) SectionGuid);
+  if (GuidData != NULL) {
+    gBS->InstallConfigurationTable ((EFI_GUID *) SectionGuid, GuidData);
+  }
+
   return RETURN_SUCCESS;
 }
 
