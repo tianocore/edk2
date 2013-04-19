@@ -5,7 +5,7 @@
   IA-32, x86, IPF, and EBC processor types. The library functions are memory-based 
   and can be ported easily to any environment.
   
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -34,6 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define IMAGE_ERROR_SECTION_NOT_LOADED           8
 #define IMAGE_ERROR_FAILED_RELOCATION            9
 #define IMAGE_ERROR_FAILED_ICACHE_FLUSH          10
+#define IMAGE_ERROR_UNSUPPORTED                  11
 
 /**
   Reads contents of a PE/COFF image.
@@ -60,7 +61,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param  Buffer          Output buffer that contains the data read from the PE/COFF image.
   
   @retval RETURN_SUCCESS            The specified portion of the PE/COFF image was 
-                                    read and the size 
+                                    read and the size return in ReadSize.
   @retval RETURN_DEVICE_ERROR       The specified portion of the PE/COFF image 
                                     could not be read due to a device error.
 

@@ -116,8 +116,9 @@ PeCoffLoaderGetPeHeader (
 /**
   Converts an image address to the loaded address.
 
-  @param  ImageContext  The context of the image being loaded.
-  @param  Address       The address to be converted to the loaded address.
+  @param  ImageContext      The context of the image being loaded.
+  @param  Address           The address to be converted to the loaded address.
+  @param  TeStrippedOffset  Stripped offset for TE image.
 
   @return The converted address or NULL if the address can not be converted.
 
@@ -125,7 +126,8 @@ PeCoffLoaderGetPeHeader (
 VOID *
 PeCoffLoaderImageAddress (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT          *ImageContext,
-  IN     UINTN                                 Address
+  IN     UINTN                                 Address,
+  IN     UINTN                                 TeStrippedOffset
   );
 
 #endif
