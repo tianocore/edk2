@@ -9,6 +9,13 @@
   This library is mainly used by SMM Core to start performance logging to ensure that
   SMM Performance and PerformanceEx Protocol are installed at the very beginning of SMM phase.
 
+ Caution: This module requires additional review when modified.
+ This driver will have external input - performance data and communicate buffer in SMM mode.
+ This external input must be validated carefully to avoid security issue like
+ buffer overflow, integer overflow.
+
+ SmmPerformanceHandlerEx(), SmmPerformanceHandler() will receive untrusted input and do basic validation.
+
 Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -474,6 +481,9 @@ IsAddressInSmram (
   Communication service SMI Handler entry.
 
   This SMI handler provides services for the performance wrapper driver.
+  
+   Caution: This function may receive untrusted input.
+   Communicate buffer and buffer size are external input, so this function will do basic validation.
 
   @param[in]     DispatchHandle  The unique handle assigned to this handler by SmiHandlerRegister().
   @param[in]     RegisterContext Points to an optional handler context which was specified when the
@@ -506,8 +516,22 @@ SmmPerformanceHandlerEx (
 
   GaugeEntryExArray = NULL;
 
-  ASSERT (CommBuffer != NULL);
+  //
+  // If input is invalid, stop processing this SMI
+  //
+  if (CommBuffer == NULL || CommBufferSize == NULL) {
+    return EFI_SUCCESS;
+  }
 
+  if(*CommBufferSize < sizeof (SMM_PERF_COMMUNICATE_EX)) {
+    return EFI_SUCCESS;
+  }
+
+  if (IsAddressInSmram ((EFI_PHYSICAL_ADDRESS)(UINTN)CommBuffer, *CommBufferSize)) {
+    DEBUG ((EFI_D_ERROR, "SMM communcation data buffer is in SMRAM!\n"));
+    return EFI_SUCCESS;
+  }
+  
   SmmPerfCommData = (SMM_PERF_COMMUNICATE_EX *)CommBuffer;
 
   switch (SmmPerfCommData->Function) {
@@ -528,9 +552,9 @@ SmmPerformanceHandlerEx (
        //
        DataSize = SmmPerfCommData->NumberOfEntries * sizeof(GAUGE_DATA_ENTRY_EX);
        if (IsAddressInSmram ((EFI_PHYSICAL_ADDRESS)(UINTN)SmmPerfCommData->GaugeDataEx, DataSize)) {
-         DEBUG ((EFI_D_ERROR, "Smm Performance Data buffer is in SMRAM!\n"));
+         DEBUG ((EFI_D_ERROR, "SMM Performance Data buffer is in SMRAM!\n"));
          Status = EFI_ACCESS_DENIED;
-         break ;
+         break;
        }
 
        GaugeEntryExArray = (GAUGE_DATA_ENTRY_EX *) (mGaugeData + 1);
@@ -543,11 +567,12 @@ SmmPerformanceHandlerEx (
        break;
 
     default:
-       ASSERT (FALSE);
        Status = EFI_UNSUPPORTED;
   }
 
+
   SmmPerfCommData->ReturnStatus = Status;
+  
   return EFI_SUCCESS;
 }
 
@@ -555,6 +580,9 @@ SmmPerformanceHandlerEx (
   Communication service SMI Handler entry.
 
   This SMI handler provides services for the performance wrapper driver.
+
+  Caution: This function may receive untrusted input.
+  Communicate buffer and buffer size are external input, so this function will do basic validation.
 
   @param[in]     DispatchHandle  The unique handle assigned to this handler by SmiHandlerRegister().
   @param[in]     RegisterContext Points to an optional handler context which was specified when the
@@ -586,10 +614,24 @@ SmmPerformanceHandler (
   UINTN                 DataSize;
   UINTN                 Index;
   UINTN                 LogEntryKey;
-
+  
   GaugeEntryExArray = NULL;
 
-  ASSERT (CommBuffer != NULL);
+  //
+  // If input is invalid, stop processing this SMI
+  //
+  if (CommBuffer == NULL || CommBufferSize == NULL) {
+    return EFI_SUCCESS;
+  }
+
+  if(*CommBufferSize < sizeof (SMM_PERF_COMMUNICATE)) {
+    return EFI_SUCCESS;
+  }
+
+  if (IsAddressInSmram ((EFI_PHYSICAL_ADDRESS)(UINTN)CommBuffer, *CommBufferSize)) {
+    DEBUG ((EFI_D_ERROR, "SMM communcation data buffer is in SMRAM!\n"));
+    return EFI_SUCCESS;
+  }
 
   SmmPerfCommData = (SMM_PERF_COMMUNICATE *)CommBuffer;
 
@@ -611,9 +653,9 @@ SmmPerformanceHandler (
        //
        DataSize = SmmPerfCommData->NumberOfEntries * sizeof(GAUGE_DATA_ENTRY);
        if (IsAddressInSmram ((EFI_PHYSICAL_ADDRESS)(UINTN)SmmPerfCommData->GaugeData, DataSize)) {
-         DEBUG ((EFI_D_ERROR, "Smm Performance Data buffer is in SMRAM!\n"));
+         DEBUG ((EFI_D_ERROR, "SMM Performance Data buffer is in SMRAM!\n"));
          Status = EFI_ACCESS_DENIED;
-         break ;
+         break;
        }
 
        GaugeEntryExArray = (GAUGE_DATA_ENTRY_EX *) (mGaugeData + 1);
@@ -630,11 +672,12 @@ SmmPerformanceHandler (
        break;
 
     default:
-       ASSERT (FALSE);
        Status = EFI_UNSUPPORTED;
   }
 
+
   SmmPerfCommData->ReturnStatus = Status;
+  
   return EFI_SUCCESS;
 }
 
