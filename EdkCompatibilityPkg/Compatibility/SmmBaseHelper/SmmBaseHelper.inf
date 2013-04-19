@@ -1,7 +1,7 @@
 ## @file
 #  Component description file for SMM Base Helper SMM driver.
 #
-#  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -72,6 +72,7 @@
   gEfiSmmCpuIo2ProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
   gEfiLoadPeImageProtocolGuid            # PROTOCOL ALWAYS_CONSUMED
   gEfiSmmReadyToLockProtocolGuid         # PROTOCOL ALWAYS_CONSUMED
+  gEfiSmmAccess2ProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
 
 [Depex]
   gEfiSmmCpuProtocolGuid AND
