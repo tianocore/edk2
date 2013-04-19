@@ -488,6 +488,19 @@ SmmVariableHandler (
       
     case SMM_VARIABLE_FUNCTION_SET_VARIABLE:
       SmmVariableHeader = (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *) SmmVariableFunctionHeader->Data;
+      InfoSize = OFFSET_OF(SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE, Name)
+                 + SmmVariableHeader->DataSize + SmmVariableHeader->NameSize;
+
+      //
+      // SMRAM range check already covered before
+      // Data buffer should not contain SMM range
+      //
+      if (InfoSize > *CommBufferSize - SMM_VARIABLE_COMMUNICATE_HEADER_SIZE) {
+        DEBUG ((EFI_D_ERROR, "Data size exceed communication buffer size limit!\n"));
+        Status = EFI_ACCESS_DENIED;
+        goto EXIT;
+      }
+
       Status = VariableServiceSetVariable (
                  SmmVariableHeader->Name,
                  &SmmVariableHeader->Guid,
