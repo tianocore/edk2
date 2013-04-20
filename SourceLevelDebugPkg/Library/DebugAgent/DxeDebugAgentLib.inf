@@ -90,4 +90,5 @@
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock                                  ## CONSUMES
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdExceptionsIgnoredByDebugger  ## CONSUMES
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugPortHandleBufferSize    ## CONSUMES
 
