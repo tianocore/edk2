@@ -379,7 +379,7 @@ InitializeDebugAgent (
     //
     // Save init arch type when debug agent initialized
     //
-    SetDebugFlag (DEBUG_AGENT_FLAG_INIT_ARCH, sizeof (UINTN) / 4);
+    SetDebugFlag (DEBUG_AGENT_FLAG_INIT_ARCH, DEBUG_ARCH_SYMBOL);
 
     InitializeDebugTimer ();
 
