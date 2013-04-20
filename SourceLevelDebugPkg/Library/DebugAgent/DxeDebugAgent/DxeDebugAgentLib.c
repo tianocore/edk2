@@ -55,6 +55,8 @@ InternalConstructorWorker (
   EFI_STATUS                  Status;
   EFI_PHYSICAL_ADDRESS        Address;
   BOOLEAN                     DebugTimerInterruptState;
+  DEBUG_AGENT_MAILBOX         *Mailbox;
+  DEBUG_AGENT_MAILBOX         *NewMailbox;
 
   //
   // Install EFI Serial IO protocol on debug port
@@ -65,20 +67,28 @@ InternalConstructorWorker (
   Status = gBS->AllocatePages (
                   AllocateAnyPages,
                   EfiACPIMemoryNVS,
-                  EFI_SIZE_TO_PAGES (sizeof (DEBUG_AGENT_MAILBOX)),
+                  EFI_SIZE_TO_PAGES (sizeof(DEBUG_AGENT_MAILBOX) + PcdGet16(PcdDebugPortHandleBufferSize)),
                   &Address
                   );
   ASSERT_EFI_ERROR (Status);
 
   DebugTimerInterruptState = SaveAndSetDebugTimerInterrupt (FALSE);
-  CopyMem (
-    (UINT8 *) (UINTN) Address,
-    (UINT8 *) (UINTN) GetMailboxPointer (),
-    sizeof (DEBUG_AGENT_MAILBOX)
-    );
-  DebugTimerInterruptState = SaveAndSetDebugTimerInterrupt (DebugTimerInterruptState);
 
-  mMailboxPointer = (DEBUG_AGENT_MAILBOX *) (UINTN) Address;
+  NewMailbox = (DEBUG_AGENT_MAILBOX *) (UINTN) Address;
+  //
+  // Copy Mailbox and Debug Port Handle buffer to new location in ACPI NVS memory, because original Mailbox
+  // and Debug Port Handle buffer may be free at runtime, SMM debug agent needs to access them
+  //
+  Mailbox = GetMailboxPointer ();
+  CopyMem (NewMailbox, Mailbox, sizeof (DEBUG_AGENT_MAILBOX));
+  CopyMem (NewMailbox + 1, (VOID *)(UINTN)Mailbox->DebugPortHandle, PcdGet16(PcdDebugPortHandleBufferSize));
+  //
+  // Update Debug Port Handle in new Mailbox
+  //
+  UpdateMailboxContent (NewMailbox, DEBUG_MAILBOX_DEBUG_PORT_HANDLE_INDEX, (UINT64)(UINTN)(NewMailbox + 1));
+  mMailboxPointer = NewMailbox;
+
+  DebugTimerInterruptState = SaveAndSetDebugTimerInterrupt (DebugTimerInterruptState);
 
   Status = gBS->InstallConfigurationTable (&gEfiDebugAgentGuid, (VOID *) mMailboxPointer);
   ASSERT_EFI_ERROR (Status);
