@@ -281,6 +281,7 @@ DebugAgentCallbackMemoryDiscoveredPpi (
   // Update Mailbox Location pointer in GUIDed HOB and IDT entry with new one
   //
   MailboxLocationInHob = GetMailboxLocationFromHob ();
+  ASSERT (MailboxLocationInHob != NULL);
   *MailboxLocationInHob = (UINT64)(UINTN)NewMailbox;
   SetLocationSavedMailboxPointerInIdtEntry (MailboxLocationInHob);
   //
