@@ -1,7 +1,7 @@
 /** @file
   The implementation of Extended SAL variable services.
 
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -2591,6 +2591,14 @@ EsalSetVariable (
     PayloadSize = DataSize; 
   }
 
+  
+  if ((UINTN)(~0) - PayloadSize < StrSize(VariableName)){
+    //
+    // Prevent whole variable size overflow 
+    // 
+    return EFI_INVALID_PARAMETER;
+  }
+
   VariableGlobal = &Global->VariableGlobal[VirtualMode];
   Instance = Global->FvbInstance;
 
@@ -2599,8 +2607,7 @@ EsalSetVariable (
     // For variable for hardware error record, the size of the VariableName, including the Unicode Null
     // in bytes plus the DataSize is limited to maximum size of PcdGet32(PcdMaxHardwareErrorVariableSize) bytes.
     //
-    if ((PayloadSize > PcdGet32(PcdMaxHardwareErrorVariableSize)) ||                                                       
-        (sizeof (VARIABLE_HEADER) + StrSize (VariableName) + PayloadSize > PcdGet32(PcdMaxHardwareErrorVariableSize))) {
+    if (StrSize (VariableName) + PayloadSize > PcdGet32(PcdMaxHardwareErrorVariableSize) - sizeof (VARIABLE_HEADER)) {
       return EFI_INVALID_PARAMETER;
     }
     //
@@ -2616,8 +2623,7 @@ EsalSetVariable (
     // For variable not for hardware error record, the size of the VariableName, including the
     // Unicode Null in bytes plus the DataSize is limited to maximum size of PcdGet32(PcdMaxVariableSize) bytes.
     //
-    if ((PayloadSize > PcdGet32(PcdMaxVariableSize)) ||
-        (sizeof (VARIABLE_HEADER) + StrSize (VariableName) + PayloadSize > PcdGet32(PcdMaxVariableSize))) {
+    if (StrSize (VariableName) + PayloadSize > PcdGet32(PcdMaxVariableSize) - sizeof (VARIABLE_HEADER)) {
       return EFI_INVALID_PARAMETER;
     }  
   }  

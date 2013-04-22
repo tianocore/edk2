@@ -442,8 +442,15 @@ RuntimeServiceSetVariable (
     return EFI_INVALID_PARAMETER;
   }
 
+  if ((UINTN)(~0) - StrSize (VariableName) < OFFSET_OF (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE, Name) + DataSize) {
+    //
+    // Prevent PayloadSize overflow
+    //
+    return EFI_INVALID_PARAMETER;
+  }
+
   AcquireLockOnlyAtBootTime(&mVariableServicesLock);
- 
+
   //
   // Init the communicate buffer. The buffer data size is:
   // SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + PayloadSize.

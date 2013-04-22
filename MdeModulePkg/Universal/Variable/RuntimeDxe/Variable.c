@@ -2218,14 +2218,20 @@ VariableServiceSetVariable (
     return EFI_INVALID_PARAMETER;
   }
 
+  if ((UINTN)(~0) - DataSize < StrSize(VariableName)){
+    //
+    // Prevent whole variable size overflow 
+    // 
+    return EFI_INVALID_PARAMETER;
+  }
+
   //
   //  The size of the VariableName, including the Unicode Null in bytes plus
   //  the DataSize is limited to maximum size of PcdGet32 (PcdMaxHardwareErrorVariableSize)
   //  bytes for HwErrRec, and PcdGet32 (PcdMaxVariableSize) bytes for the others.
   //
   if ((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
-    if ((DataSize > PcdGet32 (PcdMaxHardwareErrorVariableSize)) ||
-        (sizeof (VARIABLE_HEADER) + StrSize (VariableName) + DataSize > PcdGet32 (PcdMaxHardwareErrorVariableSize))) {
+    if ( StrSize (VariableName) + DataSize > PcdGet32 (PcdMaxHardwareErrorVariableSize) - sizeof (VARIABLE_HEADER)) {
       return EFI_INVALID_PARAMETER;
     }
     if (!IsHwErrRecVariable(VariableName, VendorGuid)) {
@@ -2236,8 +2242,7 @@ VariableServiceSetVariable (
     //  The size of the VariableName, including the Unicode Null in bytes plus
     //  the DataSize is limited to maximum size of PcdGet32 (PcdMaxVariableSize) bytes.
     //
-    if ((DataSize > PcdGet32 (PcdMaxVariableSize)) ||
-        (sizeof (VARIABLE_HEADER) + StrSize (VariableName) + DataSize > PcdGet32 (PcdMaxVariableSize))) {
+    if (StrSize (VariableName) + DataSize > PcdGet32 (PcdMaxVariableSize) - sizeof (VARIABLE_HEADER)) {
       return EFI_INVALID_PARAMETER;
     }  
   }

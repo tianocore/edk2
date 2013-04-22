@@ -424,6 +424,13 @@ RuntimeServiceSetVariable (
     return EFI_INVALID_PARAMETER;
   }
 
+  if ((UINTN)(~0) - StrSize (VariableName) < OFFSET_OF (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE, Name) + DataSize) {
+    //
+    // Prevent PayloadSize overflow
+    //
+    return EFI_INVALID_PARAMETER;
+  }
+
   AcquireLockOnlyAtBootTime(&mVariableServicesLock);
  
   //
