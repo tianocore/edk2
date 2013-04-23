@@ -7,7 +7,7 @@
   3) RsaCheckKey
   4) RsaPkcs1Sign
 
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -22,26 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <openssl/rsa.h>
 #include <openssl/err.h>
-
-//
-// ASN.1 value for Hash Algorithm ID with the Distringuished Encoding Rules (DER)
-// Refer to Section 9.2 of PKCS#1 v2.1
-//                           
-CONST UINT8  Asn1IdMd5[] = {
-  0x30, 0x20, 0x30, 0x0c, 0x06, 0x08, 0x2a, 0x86,
-  0xf7, 0x0d, 0x02, 0x05, 0x05, 0x00, 0x04, 0x10
-  };
-
-CONST UINT8  Asn1IdSha1[] = {
-  0x30, 0x21, 0x30, 0x09, 0x06, 0x05, 0x2b, 0x0e,
-  0x03, 0x02, 0x1a, 0x05, 0x00, 0x04, 0x14
-  };
-
-CONST UINT8  Asn1IdSha256[] = {
-  0x30, 0x31, 0x30, 0x0d, 0x06, 0x09, 0x60, 0x86,
-  0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01, 0x05,
-  0x00, 0x04, 0x20
-  };
+#include <openssl/objects.h>
 
 /**
   Gets the tag-designated RSA key component from the established RSA context.
@@ -307,75 +288,6 @@ RsaCheckKey (
 }
 
 /**
-  Performs the PKCS1-v1_5 encoding methods defined in RSA PKCS #1.
-
-  @param[in]     Message        Message buffer to be encoded.
-  @param[in]     MessageSize    Size of message buffer in bytes.
-  @param[out]    DigestInfo     Pointer to buffer of digest info for output.
-  @param[in,out] DigestInfoSize On input, the size of DigestInfo buffer in bytes.
-                                On output, the size of data returned in DigestInfo
-                                buffer in bytes.
-
-  @retval TRUE   PKCS1-v1_5 encoding finished successfully.
-  @retval FALSE  Any input parameter is invalid.
-  @retval FALSE  DigestInfo buffer is not large enough.
-
-**/  
-BOOLEAN
-DigestInfoEncoding (
-  IN CONST UINT8  *Message,
-  IN       UINTN  MessageSize,
-  OUT      UINT8  *DigestInfo,
-  IN OUT   UINTN  *DigestInfoSize
-  )
-{
-  CONST UINT8  *HashDer;
-  UINTN        DerSize;
-
-  //
-  // Check input parameters.
-  //
-  if (Message == NULL || DigestInfo == NULL || DigestInfoSize == NULL) {
-    return FALSE;
-  }
-
-  //
-  // The original message length is used to determine the hash algorithm since
-  // message is digest value hashed by the specified algorithm.
-  //
-  switch (MessageSize) {
-  case MD5_DIGEST_SIZE:
-    HashDer = Asn1IdMd5;
-    DerSize = sizeof (Asn1IdMd5);
-    break;
-  
-  case SHA1_DIGEST_SIZE:
-    HashDer = Asn1IdSha1;
-    DerSize = sizeof (Asn1IdSha1);
-    break;
-   
-  case SHA256_DIGEST_SIZE:
-    HashDer = Asn1IdSha256;
-    DerSize = sizeof (Asn1IdSha256);
-    break;
-  
-  default:
-    return FALSE;
-  }
-
-  if (*DigestInfoSize < DerSize + MessageSize) {
-    *DigestInfoSize = DerSize + MessageSize;
-    return FALSE;
-  }
-
-  CopyMem (DigestInfo, HashDer, DerSize);
-  CopyMem (DigestInfo + DerSize, Message, MessageSize);
-
-  *DigestInfoSize = DerSize + MessageSize;
-  return TRUE;
-}
-
-/**
   Carries out the RSA-SSA signature generation with EMSA-PKCS1-v1_5 encoding scheme.
 
   This function carries out the RSA-SSA signature generation with EMSA-PKCS1-v1_5 encoding scheme defined in
@@ -412,13 +324,12 @@ RsaPkcs1Sign (
 {
   RSA      *Rsa;
   UINTN    Size;
-  INTN     ReturnVal;
+  INT32    DigestType;
 
   //
   // Check input parameters.
   //
-  if (RsaContext == NULL || MessageHash == NULL ||
-    (HashSize != MD5_DIGEST_SIZE && HashSize != SHA1_DIGEST_SIZE && HashSize != SHA256_DIGEST_SIZE)) {
+  if (RsaContext == NULL || MessageHash == NULL) {
     return FALSE;
   }
 
@@ -429,28 +340,38 @@ RsaPkcs1Sign (
     *SigSize = Size;
     return FALSE;
   }
-
+  
   if (Signature == NULL) {
     return FALSE;
   }
+  
+  //
+  // Determine the message digest algorithm according to digest size.
+  //   Only MD5, SHA-1 or SHA-256 algorithm is supported. 
+  //
+  switch (HashSize) {
+  case MD5_DIGEST_SIZE:
+    DigestType = NID_md5;
+    break;
+    
+  case SHA1_DIGEST_SIZE:
+    DigestType = NID_sha1;
+    break;
+    
+  case SHA256_DIGEST_SIZE:
+    DigestType = NID_sha256;
+    break;
 
-  if (!DigestInfoEncoding (MessageHash, HashSize, Signature, SigSize)) {
+  default:
     return FALSE;
-  }
+  }  
 
-  ReturnVal = RSA_private_encrypt (
-                (UINT32) *SigSize,
-                Signature,
-                Signature,
-                Rsa,
-                RSA_PKCS1_PADDING
-                );
-
-  if (ReturnVal < (INTN) *SigSize) {
-    return FALSE;
-  }
-
-  *SigSize = (UINTN) ReturnVal;
-  return TRUE;
+  return (BOOLEAN) RSA_sign (
+                     DigestType,
+                     MessageHash,
+                     (UINT32) HashSize,
+                     Signature,
+                     (UINT32 *) SigSize,
+                     (RSA *) RsaContext
+                     );
 }
-
