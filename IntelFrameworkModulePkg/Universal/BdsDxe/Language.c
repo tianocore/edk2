@@ -400,7 +400,6 @@ IsLangInSupportedLangCodes(
                                       TRUE for L"Lang" LangName or FALSE for L"PlatformLang" LangName.
 
 **/
-
 VOID
 InitializeLangVariable (
   IN CHAR16     *LangName,
