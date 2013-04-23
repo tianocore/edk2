@@ -415,7 +415,7 @@ InitializeLangVariable (
   //
   // Find current Lang or PlatformLang from EFI Variable.
   //
-  Status = GetEfiGlobalVariable2 (LangName, &Lang, NULL);
+  Status = GetEfiGlobalVariable2 (LangName, (VOID **) &Lang, NULL);
   //
   // If Lang or PlatformLang variable is not found,
   // or it has been set to an unsupported value(not one of the supported language codes),
