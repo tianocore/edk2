@@ -1,8 +1,11 @@
 ## @file
-# This module is the Runtime DXE part corresponding to SMM Fault Tolerant Write (FTW) module. 
+# This module is the DXE part corresponding to SMM Fault Tolerant Write (FTW) module.
 # It installs FTW protocol and works with SMM FTW module together.
+# The FTW protocol will not work after End Of Dxe because it will be not safe to expose
+# the related operations in SMM handler in SMM FTW module. You can use the FTW protocol
+# before End Of Dxe or use FaultTolerantWriteDxe module instead if you really want to.
 #
-# Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
