@@ -1,7 +1,7 @@
 /** @file
   Tcp driver function.
 
-Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -607,7 +607,7 @@ Tcp4CreateSocketCallback (
                   (VOID **) &This->ParentDevicePath,
                   TcpServiceData->DriverBindingHandle,
                   This->SockHandle,
-                  EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
     gBS->CloseProtocol (
@@ -647,16 +647,6 @@ Tcp4DestroySocketCallback (
   // Remove this node from the list.
   //
   RemoveEntryList (&This->Link);
-
-  //
-  // Close the device path protocol
-  //
-  gBS->CloseProtocol (
-         TcpServiceData->ControllerHandle,
-         &gEfiDevicePathProtocolGuid,
-         TcpServiceData->DriverBindingHandle,
-         This->SockHandle
-         );
 
   //
   // Close the Ip4 protocol.

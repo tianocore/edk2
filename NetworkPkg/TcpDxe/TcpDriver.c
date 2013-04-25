@@ -1,7 +1,7 @@
 /** @file
   The driver binding and service binding protocol for the TCP driver.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -717,7 +717,7 @@ TcpCreateSocketCallback (
                   (VOID **) &This->ParentDevicePath,
                   TcpServiceData->DriverBindingHandle,
                   This->SockHandle,
-                  EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
     gBS->CloseProtocol (
@@ -764,16 +764,6 @@ TcpDestroySocketCallback (
   // Remove this node from the list.
   //
   RemoveEntryList (&This->Link);
-
-  //
-  // Close the device path protocol
-  //
-  gBS->CloseProtocol (
-         TcpServiceData->ControllerHandle,
-         &gEfiDevicePathProtocolGuid,
-         TcpServiceData->DriverBindingHandle,
-         This->SockHandle
-         );
 
   //
   // Close the IP protocol.
