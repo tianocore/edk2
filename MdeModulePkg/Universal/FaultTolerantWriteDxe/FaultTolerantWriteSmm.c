@@ -99,6 +99,32 @@ InternalIsAddressInSmram (
   return FALSE;
 }
 
+/**
+  This function check if the address refered by Buffer and Length is valid.
+
+  @param Buffer  the buffer address to be checked.
+  @param Length  the buffer length to be checked.
+
+  @retval TRUE  this address is valid.
+  @retval FALSE this address is NOT valid.
+**/
+BOOLEAN
+InternalIsAddressValid (
+  IN UINTN                 Buffer,
+  IN UINTN                 Length
+  )
+{
+  if (Buffer > (MAX_ADDRESS - Length)) {
+    //
+    // Overflow happen
+    //
+    return FALSE;
+  }
+  if (InternalIsAddressInSmram ((EFI_PHYSICAL_ADDRESS)Buffer, (UINT64)Length)) {
+    return FALSE;
+  }
+  return TRUE;
+}
 
 /**
   Retrive the SMM FVB protocol interface by HANDLE.
@@ -356,8 +382,8 @@ SmmFaultTolerantWriteHandler (
     return EFI_SUCCESS;
   }
 
-  if (InternalIsAddressInSmram ((EFI_PHYSICAL_ADDRESS)(UINTN)CommBuffer, *CommBufferSize)) {
-    DEBUG ((EFI_D_ERROR, "SMM communication buffer size is in SMRAM!\n"));
+  if (!InternalIsAddressValid ((UINTN)CommBuffer, *CommBufferSize)) {
+    DEBUG ((EFI_D_ERROR, "SMM communication buffer in SMRAM or overflow!\n"));
     return EFI_SUCCESS;
   }
 

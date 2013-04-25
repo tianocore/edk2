@@ -11,7 +11,7 @@
 
   FpdtSmiHandler() will receive untrusted input and do basic validation.
 
-  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -205,6 +205,33 @@ InternalIsAddressInSmram (
 }
 
 /**
+  This function check if the address refered by Buffer and Length is valid.
+
+  @param Buffer  the buffer address to be checked.
+  @param Length  the buffer length to be checked.
+
+  @retval TRUE  this address is valid.
+  @retval FALSE this address is NOT valid.
+**/
+BOOLEAN
+InternalIsAddressValid (
+  IN UINTN                 Buffer,
+  IN UINTN                 Length
+  )
+{
+  if (Buffer > (MAX_ADDRESS - Length)) {
+    //
+    // Overflow happen
+    //
+    return FALSE;
+  }
+  if (InternalIsAddressInSmram ((EFI_PHYSICAL_ADDRESS)Buffer, (UINT64)Length)) {
+    return FALSE;
+  }
+  return TRUE;
+}
+
+/**
   Communication service SMI Handler entry.
 
   This SMI handler provides services for report SMM boot records. 
@@ -251,8 +278,8 @@ FpdtSmiHandler (
     return EFI_SUCCESS;
   }
   
-  if (InternalIsAddressInSmram ((EFI_PHYSICAL_ADDRESS)(UINTN)CommBuffer, *CommBufferSize)) {
-    DEBUG ((EFI_D_ERROR, "SMM communication data buffer is in SMRAM!\n"));
+  if (!InternalIsAddressValid ((UINTN)CommBuffer, *CommBufferSize)) {
+    DEBUG ((EFI_D_ERROR, "SMM communication data buffer in SMRAM or overflow!\n"));
     return EFI_SUCCESS;
   }
 
@@ -275,8 +302,8 @@ FpdtSmiHandler (
        // Sanity check
        //
        SmmCommData->BootRecordSize = mBootRecordSize;
-       if (InternalIsAddressInSmram ((EFI_PHYSICAL_ADDRESS)(UINTN)SmmCommData->BootRecordData, mBootRecordSize)) {
-         DEBUG ((EFI_D_ERROR, "SMM Data buffer is in SMRAM!\n"));
+       if (!InternalIsAddressValid ((UINTN)SmmCommData->BootRecordData, mBootRecordSize)) {
+         DEBUG ((EFI_D_ERROR, "SMM Data buffer in SMRAM or overflow!\n"));
          Status = EFI_ACCESS_DENIED;
          break;
        }

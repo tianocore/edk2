@@ -16,7 +16,7 @@
 
  SmmPerformanceHandlerEx(), SmmPerformanceHandler() will receive untrusted input and do basic validation.
 
-Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -478,6 +478,33 @@ IsAddressInSmram (
 }
 
 /**
+  This function check if the address refered by Buffer and Length is valid.
+
+  @param Buffer  the buffer address to be checked.
+  @param Length  the buffer length to be checked.
+
+  @retval TRUE  this address is valid.
+  @retval FALSE this address is NOT valid.
+**/
+BOOLEAN
+IsAddressValid (
+  IN UINTN                 Buffer,
+  IN UINTN                 Length
+  )
+{
+  if (Buffer > (MAX_ADDRESS - Length)) {
+    //
+    // Overflow happen
+    //
+    return FALSE;
+  }
+  if (IsAddressInSmram ((EFI_PHYSICAL_ADDRESS)Buffer, (UINT64)Length)) {
+    return FALSE;
+  }
+  return TRUE;
+}
+
+/**
   Communication service SMI Handler entry.
 
   This SMI handler provides services for the performance wrapper driver.
@@ -527,8 +554,8 @@ SmmPerformanceHandlerEx (
     return EFI_SUCCESS;
   }
 
-  if (IsAddressInSmram ((EFI_PHYSICAL_ADDRESS)(UINTN)CommBuffer, *CommBufferSize)) {
-    DEBUG ((EFI_D_ERROR, "SMM communcation data buffer is in SMRAM!\n"));
+  if (!IsAddressValid ((UINTN)CommBuffer, *CommBufferSize)) {
+    DEBUG ((EFI_D_ERROR, "SMM communcation data buffer in SMRAM or overflow!\n"));
     return EFI_SUCCESS;
   }
   
@@ -551,8 +578,8 @@ SmmPerformanceHandlerEx (
        // Sanity check
        //
        DataSize = SmmPerfCommData->NumberOfEntries * sizeof(GAUGE_DATA_ENTRY_EX);
-       if (IsAddressInSmram ((EFI_PHYSICAL_ADDRESS)(UINTN)SmmPerfCommData->GaugeDataEx, DataSize)) {
-         DEBUG ((EFI_D_ERROR, "SMM Performance Data buffer is in SMRAM!\n"));
+       if (!IsAddressValid ((UINTN)SmmPerfCommData->GaugeDataEx, DataSize)) {
+         DEBUG ((EFI_D_ERROR, "SMM Performance Data buffer in SMRAM or overflow!\n"));
          Status = EFI_ACCESS_DENIED;
          break;
        }
@@ -628,8 +655,8 @@ SmmPerformanceHandler (
     return EFI_SUCCESS;
   }
 
-  if (IsAddressInSmram ((EFI_PHYSICAL_ADDRESS)(UINTN)CommBuffer, *CommBufferSize)) {
-    DEBUG ((EFI_D_ERROR, "SMM communcation data buffer is in SMRAM!\n"));
+  if (!IsAddressValid ((UINTN)CommBuffer, *CommBufferSize)) {
+    DEBUG ((EFI_D_ERROR, "SMM communcation data buffer in SMRAM or overflow!\n"));
     return EFI_SUCCESS;
   }
 
@@ -652,8 +679,8 @@ SmmPerformanceHandler (
        // Sanity check
        //
        DataSize = SmmPerfCommData->NumberOfEntries * sizeof(GAUGE_DATA_ENTRY);
-       if (IsAddressInSmram ((EFI_PHYSICAL_ADDRESS)(UINTN)SmmPerfCommData->GaugeData, DataSize)) {
-         DEBUG ((EFI_D_ERROR, "SMM Performance Data buffer is in SMRAM!\n"));
+       if (!IsAddressValid ((UINTN)SmmPerfCommData->GaugeData, DataSize)) {
+         DEBUG ((EFI_D_ERROR, "SMM Performance Data buffer in SMRAM or overflow!\n"));
          Status = EFI_ACCESS_DENIED;
          break;
        }
