@@ -1,7 +1,7 @@
 /** @file
   Internal file explorer functions for SecureBoot configuration module.
 
-Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -323,7 +323,7 @@ DestroyMenuEntry (
 
   FileContext = (SECUREBOOT_FILE_CONTEXT *) MenuEntry->FileContext;
 
-  if (!FileContext->IsRoot) {
+  if (!FileContext->IsRoot && FileContext->DevicePath != NULL) {
     FreePool (FileContext->DevicePath);
   } else {
     if (FileContext->FHandle != NULL) {
@@ -340,7 +340,9 @@ DestroyMenuEntry (
 
   FreePool (FileContext);
 
-  FreePool (MenuEntry->DisplayString);
+  if (MenuEntry->DisplayString != NULL) {
+    FreePool (MenuEntry->DisplayString);
+  }
   if (MenuEntry->HelpString != NULL) {
     FreePool (MenuEntry->HelpString);
   }
