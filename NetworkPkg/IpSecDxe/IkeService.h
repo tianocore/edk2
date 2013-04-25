@@ -1,7 +1,7 @@
 /** @file
   Prototypes definitions of IKE service.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -143,6 +143,7 @@ typedef struct _IKE_EXCHANGE_INTERFACE {
 
   @param[in] Private        Point to IPSEC_PRIVATE_DATA
   @param[in] Controller     Handler for NIC card.
+  @param[in] ImageHandle    The handle that contains the EFI_DRIVER_BINDING_PROTOCOL instance.
 
   @retval EFI_SUCCESS             The Operation is successful.
   @retval EFI_OUT_OF_RESOURCE     The required system resource can't be allocated.
@@ -151,7 +152,8 @@ typedef struct _IKE_EXCHANGE_INTERFACE {
 EFI_STATUS
 IkeOpenInputUdp4 (
   IN IPSEC_PRIVATE_DATA             *Private,
-  IN EFI_HANDLE                     Controller
+  IN EFI_HANDLE                     Controller,
+  IN EFI_HANDLE                     ImageHandle
   );
 
 /**
@@ -162,6 +164,7 @@ IkeOpenInputUdp4 (
 
   @param[in] Private        Point to IPSEC_PRIVATE_DATA
   @param[in] Controller     Handler for NIC card.
+  @param[in] ImageHandle    The handle that contains the EFI_DRIVER_BINDING_PROTOCOL instance.
 
   @retval EFI_SUCCESS             The Operation is successful.
   @retval EFI_OUT_OF_RESOURCE     The required system resource can't be allocated.
@@ -170,7 +173,8 @@ IkeOpenInputUdp4 (
 EFI_STATUS
 IkeOpenInputUdp6 (
   IN IPSEC_PRIVATE_DATA             *Private,
-  IN EFI_HANDLE                     Controller
+  IN EFI_HANDLE                     Controller,
+  IN EFI_HANDLE                     ImageHandle
   );
 
 /**

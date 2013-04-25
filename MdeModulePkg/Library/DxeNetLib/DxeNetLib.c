@@ -1,7 +1,7 @@
 /** @file
   Network library.
 
-Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1788,6 +1788,7 @@ NetLibDefaultUnload (
   EFI_HANDLE                        *DeviceHandleBuffer;
   UINTN                             DeviceHandleCount;
   UINTN                             Index;
+  UINTN                             Index2;
   EFI_DRIVER_BINDING_PROTOCOL       *DriverBinding;
   EFI_COMPONENT_NAME_PROTOCOL       *ComponentName;
   EFI_COMPONENT_NAME2_PROTOCOL      *ComponentName2;
@@ -1809,28 +1810,12 @@ NetLibDefaultUnload (
     return Status;
   }
 
-  //
-  // Disconnect the driver specified by ImageHandle from all
-  // the devices in the handle database.
-  //
-  for (Index = 0; Index < DeviceHandleCount; Index++) {
-    Status = gBS->DisconnectController (
-                    DeviceHandleBuffer[Index],
-                    ImageHandle,
-                    NULL
-                    );
-  }
-
-  //
-  // Uninstall all the protocols installed in the driver entry point
-  //
   for (Index = 0; Index < DeviceHandleCount; Index++) {
     Status = gBS->HandleProtocol (
                     DeviceHandleBuffer[Index],
                     &gEfiDriverBindingProtocolGuid,
                     (VOID **) &DriverBinding
                     );
-
     if (EFI_ERROR (Status)) {
       continue;
     }
@@ -1838,12 +1823,28 @@ NetLibDefaultUnload (
     if (DriverBinding->ImageHandle != ImageHandle) {
       continue;
     }
-
+    
+    //
+    // Disconnect the driver specified by ImageHandle from all
+    // the devices in the handle database.
+    //
+    for (Index2 = 0; Index2 < DeviceHandleCount; Index2++) {
+      Status = gBS->DisconnectController (
+                      DeviceHandleBuffer[Index2],
+                      DriverBinding->DriverBindingHandle,
+                      NULL
+                      );
+    }
+    
+    //
+    // Uninstall all the protocols installed in the driver entry point
+    //    
     gBS->UninstallProtocolInterface (
-          ImageHandle,
+          DriverBinding->DriverBindingHandle,
           &gEfiDriverBindingProtocolGuid,
           DriverBinding
           );
+    
     Status = gBS->HandleProtocol (
                     DeviceHandleBuffer[Index],
                     &gEfiComponentNameProtocolGuid,
@@ -1851,7 +1852,7 @@ NetLibDefaultUnload (
                     );
     if (!EFI_ERROR (Status)) {
       gBS->UninstallProtocolInterface (
-             ImageHandle,
+             DriverBinding->DriverBindingHandle,
              &gEfiComponentNameProtocolGuid,
              ComponentName
              );
@@ -1864,7 +1865,7 @@ NetLibDefaultUnload (
                     );
     if (!EFI_ERROR (Status)) {
       gBS->UninstallProtocolInterface (
-             ImageHandle,
+             DriverBinding->DriverBindingHandle,
              &gEfiComponentName2ProtocolGuid,
              ComponentName2
              );

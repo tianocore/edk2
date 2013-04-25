@@ -1,7 +1,7 @@
 /** @file
   Provide IPsec Key Exchange (IKE) service general interfaces.
 
-  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -346,6 +346,7 @@ ON_EXIT:
 
   @param[in] Private        Point to IPSEC_PRIVATE_DATA
   @param[in] Controller     Handler for NIC card.
+  @param[in] ImageHandle    The handle that contains the EFI_DRIVER_BINDING_PROTOCOL instance.
 
   @retval EFI_SUCCESS             The Operation is successful.
   @retval EFI_OUT_OF_RESOURCE     The required system resource can't be allocated.
@@ -354,7 +355,8 @@ ON_EXIT:
 EFI_STATUS
 IkeOpenInputUdp4 (
   IN IPSEC_PRIVATE_DATA           *Private,
-  IN EFI_HANDLE                   Controller
+  IN EFI_HANDLE                   Controller,
+  IN EFI_HANDLE                   ImageHandle
   )
 {
   IKE_UDP_SERVICE *Udp4Srv;
@@ -378,7 +380,7 @@ IkeOpenInputUdp4 (
   //
   Udp4Srv->Input = UdpIoCreateIo (
                      Controller,
-                     Private->ImageHandle,
+                     ImageHandle,
                      IkeConfigUdp4,
                      UDP_IO_UDP4_VERSION,
                      NULL
@@ -390,7 +392,7 @@ IkeOpenInputUdp4 (
   }
 
   Udp4Srv->NicHandle    = Controller;
-  Udp4Srv->ImageHandle  = Private->ImageHandle;
+  Udp4Srv->ImageHandle  = ImageHandle;
   Udp4Srv->ListHead     = &(Private->Udp4List);
   Udp4Srv->IpVersion    = UDP_IO_UDP4_VERSION;
   Udp4Srv->IsConfigured = FALSE;
@@ -417,6 +419,7 @@ IkeOpenInputUdp4 (
 
   @param[in] Private        Point to IPSEC_PRIVATE_DATA
   @param[in] Controller     Handler for NIC card.
+  @param[in] ImageHandle    The handle that contains the EFI_DRIVER_BINDING_PROTOCOL instance.
 
   @retval EFI_SUCCESS             The Operation is successful.
   @retval EFI_OUT_OF_RESOURCE     The required system resource can't be allocated.
@@ -425,7 +428,8 @@ IkeOpenInputUdp4 (
 EFI_STATUS
 IkeOpenInputUdp6 (
   IN IPSEC_PRIVATE_DATA           *Private,
-  IN EFI_HANDLE                   Controller
+  IN EFI_HANDLE                   Controller,
+  IN EFI_HANDLE                   ImageHandle
   )
 {
   IKE_UDP_SERVICE *Udp6Srv;
@@ -446,7 +450,7 @@ IkeOpenInputUdp6 (
   //
   Udp6Srv->Input = UdpIoCreateIo (
                      Controller,
-                     Private->ImageHandle,
+                     ImageHandle,
                      IkeConfigUdp6,
                      UDP_IO_UDP6_VERSION,
                      NULL
@@ -458,7 +462,7 @@ IkeOpenInputUdp6 (
   }
 
   Udp6Srv->NicHandle    = Controller;
-  Udp6Srv->ImageHandle  = Private->ImageHandle;
+  Udp6Srv->ImageHandle  = ImageHandle;
   Udp6Srv->ListHead     = &(Private->Udp6List);
   Udp6Srv->IpVersion    = UDP_IO_UDP6_VERSION;
   Udp6Srv->IsConfigured = FALSE;
