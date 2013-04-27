@@ -38,9 +38,7 @@ X509ConstructCertificate (
   OUT  UINT8        **SingleX509Cert
   )
 {
-  BIO      *CertBio;
   X509     *X509Cert;
-  BOOLEAN  Status;
 
   //
   // Check input parameters.
@@ -49,31 +47,17 @@ X509ConstructCertificate (
     return FALSE;
   }
 
-  Status = FALSE;
-
   //
   // Read DER-encoded X509 Certificate and Construct X509 object.
   //
-  CertBio = BIO_new (BIO_s_mem ());
-  BIO_write (CertBio, Cert, (int) CertSize);
-  if (CertBio == NULL) {
-    goto _Exit;
-  }
-  X509Cert = d2i_X509_bio (CertBio, NULL);
+  X509Cert = d2i_X509 (NULL, &Cert, (long) CertSize);
   if (X509Cert == NULL) {
-    goto _Exit;
+    return FALSE;
   }
 
   *SingleX509Cert = (UINT8 *) X509Cert;
-  Status = TRUE;
 
-_Exit:
-  //
-  // Release Resources.
-  //
-  BIO_free (CertBio);
-
-  return Status;
+  return TRUE;
 }
 
 /**

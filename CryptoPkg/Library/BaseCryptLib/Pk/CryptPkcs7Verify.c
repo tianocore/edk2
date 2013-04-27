@@ -25,6 +25,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <openssl/objects.h>
 #include <openssl/x509.h>
+#include <openssl/x509v3.h>
 #include <openssl/pkcs7.h>
 
 UINT8 mOidValue[9] = { 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x07, 0x02 };
@@ -543,7 +544,6 @@ Pkcs7Verify (
   )
 {
   PKCS7       *Pkcs7;
-  BIO         *CertBio;
   BIO         *DataBio;
   BOOLEAN     Status;
   X509        *Cert;
@@ -562,7 +562,6 @@ Pkcs7Verify (
   }
   
   Pkcs7     = NULL;
-  CertBio   = NULL;
   DataBio   = NULL;
   Cert      = NULL;
   CertStore = NULL;
@@ -614,12 +613,7 @@ Pkcs7Verify (
   //
   // Read DER-encoded root certificate and Construct X509 Certificate
   //
-  CertBio = BIO_new (BIO_s_mem ());
-  BIO_write (CertBio, TrustedCert, (int)CertLength);
-  if (CertBio == NULL) {
-    goto _Exit;
-  }
-  Cert = d2i_X509_bio (CertBio, NULL);
+  Cert = d2i_X509 (NULL, &TrustedCert, (long) CertLength);
   if (Cert == NULL) {
     goto _Exit;
   }
@@ -649,6 +643,13 @@ Pkcs7Verify (
   BIO_write (DataBio, InData, (int)DataLength);
 
   //
+  // OpenSSL PKCS7 Verification by default checks for SMIME (email signing) and
+  // doesn't support the extended key usage for Authenticode Code Signing.
+  // Bypass the certificate purpose checking by enabling any purposes setting.
+  //
+  X509_STORE_set_purpose (CertStore, X509_PURPOSE_ANY);
+
+  //
   // Verifies the PKCS#7 signedData structure
   //
   Status = (BOOLEAN) PKCS7_verify (Pkcs7, NULL, CertStore, DataBio, NULL, PKCS7_BINARY);
@@ -658,7 +659,6 @@ _Exit:
   // Release Resources
   //
   BIO_free (DataBio);
-  BIO_free (CertBio);
   X509_free (Cert);
   X509_STORE_free (CertStore);
   PKCS7_free (Pkcs7);

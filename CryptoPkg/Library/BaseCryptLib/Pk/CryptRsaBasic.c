@@ -7,7 +7,7 @@
   3) RsaSetKey
   4) RsaPkcs1Verify
 
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -21,8 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "InternalCryptLib.h"
 
 #include <openssl/rsa.h>
-#include <openssl/err.h>
-
+#include <openssl/objects.h>
 
 /**
   Allocates and initializes one RSA context for subsequent use.
@@ -285,67 +284,52 @@ RsaPkcs1Verify (
   IN  VOID         *RsaContext,
   IN  CONST UINT8  *MessageHash,
   IN  UINTN        HashSize,
-  IN  UINT8        *Signature,
+  IN  CONST UINT8  *Signature,
   IN  UINTN        SigSize
   )
 {
-  INTN     Length;
+  INT32    DigestType;
+  UINT8    *SigBuf;
 
   //
   // Check input parameters.
   //
-  if (RsaContext == NULL || MessageHash == NULL || Signature == NULL || SigSize > INT_MAX) {
+  if (RsaContext == NULL || MessageHash == NULL || Signature == NULL) {
     return FALSE;
   }
 
-  
-  //
-  // Check for unsupported hash size:
-  //    Only MD5, SHA-1 or SHA-256 digest size is supported
-  //
-  if (HashSize != MD5_DIGEST_SIZE && HashSize != SHA1_DIGEST_SIZE && HashSize != SHA256_DIGEST_SIZE) {
-    return FALSE;
-  }
-  
-  //
-  // RSA PKCS#1 Signature Decoding using OpenSSL RSA Decryption with Public Key
-  //
-  Length = RSA_public_decrypt (
-             (UINT32) SigSize,
-             Signature,
-             Signature,
-             RsaContext,
-             RSA_PKCS1_PADDING
-             );
-
-  //
-  // Invalid RSA Key or PKCS#1 Padding Checking Failed (if Length < 0)
-  // NOTE: Length should be the addition of HashSize and some DER value.
-  //       Ignore more strict length checking here.
-  //
-  if (Length < (INTN) HashSize) {
+  if (SigSize > INT_MAX || SigSize == 0) {
     return FALSE;
   }
 
   //
-  // Validate the MessageHash and Decoded Signature
-  // NOTE: The decoded Signature should be the DER encoding of the DigestInfo value
-  //       DigestInfo ::= SEQUENCE {
-  //           digestAlgorithm AlgorithmIdentifier
-  //           digest OCTET STRING
-  //       }
-  //       Then Memory Comparing should skip the DER value of the underlying SEQUENCE
-  //       type and AlgorithmIdentifier.
+  // Determine the message digest algorithm according to digest size.
+  //   Only MD5, SHA-1 or SHA-256 algorithm is supported. 
   //
-  if (CompareMem (MessageHash, Signature + Length - HashSize, HashSize) == 0) {
-    //
-    // Valid RSA PKCS#1 Signature
-    //
-    return TRUE;
-  } else {
-    //
-    // Failed to verification
-    //
+  switch (HashSize) {
+  case MD5_DIGEST_SIZE:
+    DigestType = NID_md5;
+    break;
+    
+  case SHA1_DIGEST_SIZE:
+    DigestType = NID_sha1;
+    break;
+    
+  case SHA256_DIGEST_SIZE:
+    DigestType = NID_sha256;
+    break;
+
+  default:
     return FALSE;
   }
+
+  SigBuf = (UINT8 *) Signature;
+  return (BOOLEAN) RSA_verify (
+                     DigestType,
+                     MessageHash,
+                     (UINT32) HashSize,
+                     SigBuf,
+                     (UINT32) SigSize,
+                     (RSA *) RsaContext
+                     );
 }
