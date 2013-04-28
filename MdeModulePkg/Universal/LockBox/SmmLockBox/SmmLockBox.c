@@ -9,7 +9,7 @@
   SmmLockBoxHandler(), SmmLockBoxRestore(), SmmLockBoxUpdate(), SmmLockBoxSave()
   will receive untrusted input and do basic validation.
 
-Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -125,7 +125,7 @@ SmmLockBoxSave (
   // Sanity check
   //
   if (!IsAddressValid ((UINTN)LockBoxParameterSave->Buffer, (UINTN)LockBoxParameterSave->Length)) {
-    DEBUG ((EFI_D_ERROR, "SmmLockBox Save address in SMRAM!\n"));
+    DEBUG ((EFI_D_ERROR, "SmmLockBox Save address in SMRAM or buffer overflow!\n"));
     LockBoxParameterSave->Header.ReturnStatus = (UINT64)EFI_ACCESS_DENIED;
     return ;
   }
@@ -203,7 +203,7 @@ SmmLockBoxUpdate (
   // Sanity check
   //
   if (!IsAddressValid ((UINTN)LockBoxParameterUpdate->Buffer, (UINTN)LockBoxParameterUpdate->Length)) {
-    DEBUG ((EFI_D_ERROR, "SmmLockBox Update address in SMRAM!\n"));
+    DEBUG ((EFI_D_ERROR, "SmmLockBox Update address in SMRAM or buffer overflow!\n"));
     LockBoxParameterUpdate->Header.ReturnStatus = (UINT64)EFI_ACCESS_DENIED;
     return ;
   }
@@ -241,7 +241,7 @@ SmmLockBoxRestore (
   // Sanity check
   //
   if (!IsAddressValid ((UINTN)LockBoxParameterRestore->Buffer, (UINTN)LockBoxParameterRestore->Length)) {
-    DEBUG ((EFI_D_ERROR, "SmmLockBox Restore address in SMRAM!\n"));
+    DEBUG ((EFI_D_ERROR, "SmmLockBox Restore address in SMRAM or buffer overflow!\n"));
     LockBoxParameterRestore->Header.ReturnStatus = (UINT64)EFI_ACCESS_DENIED;
     return ;
   }
@@ -320,7 +320,7 @@ SmmLockBoxHandler (
     return EFI_SUCCESS;
   }
   if (!IsAddressValid ((UINTN)CommBuffer, *CommBufferSize)) {
-    DEBUG ((EFI_D_ERROR, "SmmLockBox Command Buffer in SMRAM!\n"));
+    DEBUG ((EFI_D_ERROR, "SmmLockBox Command Buffer in SMRAM or overflow!\n"));
     return EFI_SUCCESS;
   }
 
