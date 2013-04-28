@@ -43,7 +43,7 @@
   Caution: This module requires additional review when modified.
   This driver need to make sure the CommBuffer is not in the SMRAM range. 
 
-Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -60,12 +60,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "FaultTolerantWrite.h"
 #include "FaultTolerantWriteSmmCommon.h"
 #include <Protocol/SmmAccess2.h>
+#include <Protocol/SmmEndOfDxe.h>
 
 EFI_EVENT                                 mFvbRegistration = NULL;
 EFI_FTW_DEVICE                            *mFtwDevice      = NULL;
 EFI_SMRAM_DESCRIPTOR                      *mSmramRanges;
 UINTN                                     mSmramRangeCount;
 
+///
+/// The flag to indicate whether the platform has left the DXE phase of execution.
+///
+BOOLEAN                                   mEndOfDxe = FALSE;
 
 /**
   This function check if the address is in SMRAM.
@@ -357,6 +362,16 @@ SmmFaultTolerantWriteHandler (
   }
 
   SmmFtwFunctionHeader = (SMM_FTW_COMMUNICATE_FUNCTION_HEADER *)CommBuffer;
+
+  if (mEndOfDxe) {
+    //
+    // It will be not safe to expose the operations after End Of Dxe.
+    //
+    DEBUG ((EFI_D_ERROR, "SmmFtwHandler: Not safe to do the operation: %x after End Of Dxe, so access denied!\n", SmmFtwFunctionHeader->Function));
+    SmmFtwFunctionHeader->ReturnStatus = EFI_ACCESS_DENIED;
+    return EFI_SUCCESS;
+  }
+
   switch (SmmFtwFunctionHeader->Function) {
     case FTW_FUNCTION_GET_MAX_BLOCK_SIZE:
       SmmGetMaxBlockSizeHeader = (SMM_FTW_GET_MAX_BLOCK_SIZE_HEADER *) SmmFtwFunctionHeader->Data;
@@ -430,6 +445,13 @@ SmmFaultTolerantWriteHandler (
       
     case FTW_FUNCTION_GET_LAST_WRITE:
       SmmFtwGetLastWriteHeader = (SMM_FTW_GET_LAST_WRITE_HEADER *) SmmFtwFunctionHeader->Data;
+      if ((UINTN)(~0) - SmmFtwGetLastWriteHeader->PrivateDataSize < OFFSET_OF (SMM_FTW_GET_LAST_WRITE_HEADER, Data)){
+        //
+        // Prevent InfoSize overflow
+        //
+        Status = EFI_ACCESS_DENIED;
+        break;
+      }
       InfoSize = OFFSET_OF (SMM_FTW_GET_LAST_WRITE_HEADER, Data) + SmmFtwGetLastWriteHeader->PrivateDataSize;
 
       //
@@ -532,6 +554,27 @@ FvbNotificationEvent (
   return EFI_SUCCESS;
 }
 
+/**
+  SMM END_OF_DXE protocol notification event handler.
+ 
+  @param  Protocol   Points to the protocol's unique identifier
+  @param  Interface  Points to the interface instance
+  @param  Handle     The handle on which the interface was installed
+
+  @retval EFI_SUCCESS   SmmEndOfDxeCallback runs successfully
+
+**/
+EFI_STATUS
+EFIAPI
+SmmEndOfDxeCallback (
+  IN CONST EFI_GUID                       *Protocol,
+  IN VOID                                 *Interface,
+  IN EFI_HANDLE                           Handle
+  )
+{
+  mEndOfDxe = TRUE;
+  return EFI_SUCCESS;
+}
 
 /**
   This function is the entry point of the Fault Tolerant Write driver.
@@ -555,7 +598,8 @@ SmmFaultTolerantWriteInitialize (
   EFI_HANDLE                              FtwHandle;
   EFI_SMM_ACCESS2_PROTOCOL                *SmmAccess;
   UINTN                                   Size;
-  
+  VOID                                    *SmmEndOfDxeRegistration;
+
   //
   // Allocate private data structure for SMM FTW protocol and do some initialization
   //
@@ -585,6 +629,16 @@ SmmFaultTolerantWriteInitialize (
   ASSERT_EFI_ERROR (Status);
 
   mSmramRangeCount = Size / sizeof (EFI_SMRAM_DESCRIPTOR);
+
+  //
+  // Register EFI_SMM_END_OF_DXE_PROTOCOL_GUID notify function.
+  //
+  Status = gSmst->SmmRegisterProtocolNotify (
+                    &gEfiSmmEndOfDxeProtocolGuid,
+                    SmmEndOfDxeCallback,
+                    &SmmEndOfDxeRegistration
+                    );
+  ASSERT_EFI_ERROR (Status);
 
   //
   // Register FvbNotificationEvent () notify function.

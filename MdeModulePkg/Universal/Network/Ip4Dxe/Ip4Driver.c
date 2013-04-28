@@ -1,7 +1,7 @@
 /** @file
   The driver binding and service binding protocol for IP4 driver.
 
-Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -572,6 +572,8 @@ Ip4DriverBindingStop (
   INTN                                     State;
   LIST_ENTRY                               *List;
   IP4_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT  Context;
+  IP4_INTERFACE                            *IpIf;
+  IP4_ROUTE_TABLE                          *RouteTable;
 
   //
   // IP4 driver opens the MNP child, ARP children or the IP4_CONFIG protocol
@@ -681,6 +683,35 @@ Ip4DriverBindingStop (
                &Context,
                NULL
                );
+  } else if (IpSb->DefaultInterface->ArpHandle == ControllerHandle) {
+    //
+    // The ARP protocol for the default interface is being uninstalled and all
+    // its IP child handles should have been destroyed before. So, release the
+    // default interface and route table, create a new one and mark it as not started.
+    //
+    Ip4CancelReceive (IpSb->DefaultInterface);
+    Ip4FreeInterface (IpSb->DefaultInterface, NULL);
+    Ip4FreeRouteTable (IpSb->DefaultRouteTable);
+    
+    IpIf = Ip4CreateInterface (IpSb->Mnp, IpSb->Controller, IpSb->Image);
+    if (IpIf == NULL) {
+      goto ON_ERROR;
+    }
+    RouteTable = Ip4CreateRouteTable ();
+    if (RouteTable == NULL) {
+      Ip4FreeInterface (IpIf, NULL);
+      goto ON_ERROR;;
+    }
+    
+    IpSb->DefaultInterface  = IpIf;
+    InsertHeadList (&IpSb->Interfaces, &IpIf->Link);
+    IpSb->DefaultRouteTable = RouteTable;
+    Ip4ReceiveFrame (IpIf, NULL, Ip4AccpetFrame, IpSb);
+
+    if (IpSb->Ip4Config != NULL && IpSb->State != IP4_SERVICE_DESTROY) {
+      IpSb->Ip4Config->Stop (IpSb->Ip4Config);
+    }
+    IpSb->State = IP4_SERVICE_UNSTARTED;
   } else if (IsListEmpty (&IpSb->Children)) {
     State           = IpSb->State;
     IpSb->State     = IP4_SERVICE_DESTROY;

@@ -548,7 +548,6 @@ AhciBuildCommand (
 
     CommandList->AhciCmdA = 1;
     CommandList->AhciCmdP = 1;
-    CommandList->AhciCmdC = (DataLength == 0) ? 1 : 0;
 
     AhciOrReg (PciIo, Offset, (EFI_AHCI_PORT_CMD_DLAE | EFI_AHCI_PORT_CMD_ATAPI));
   } else {

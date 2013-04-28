@@ -1,7 +1,7 @@
 /** @file
   PCI resouces support functions implemntation for PCI Bus module.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1472,7 +1472,14 @@ ProgramPpbApperture (
 
   case PPB_BAR_0:
   case PPB_BAR_1:
-    PciIo->Pci.Write (
+    switch ((Node->PciDev->PciBar[Node->Bar]).BarType) {
+
+      case PciBarTypeIo16:
+      case PciBarTypeIo32:
+      case PciBarTypeMem32:
+      case PciBarTypePMem32:
+
+        PciIo->Pci.Write (
                  PciIo,
                  EfiPciIoWidthUint32,
                  (Node->PciDev->PciBar[Node->Bar]).Offset,
@@ -1480,9 +1487,40 @@ ProgramPpbApperture (
                  &Address
                  );
 
-    Node->PciDev->PciBar[Node->Bar].BaseAddress = Address;
-    Node->PciDev->PciBar[Node->Bar].Length      = Node->Length;
+        Node->PciDev->PciBar[Node->Bar].BaseAddress = Address;
+        Node->PciDev->PciBar[Node->Bar].Length      = Node->Length;
+        break;
 
+      case PciBarTypeMem64:
+      case PciBarTypePMem64:
+
+        Address32 = (UINT32) (Address & 0x00000000FFFFFFFF);
+
+        PciIo->Pci.Write (
+                 PciIo,
+                 EfiPciIoWidthUint32,
+                 (Node->PciDev->PciBar[Node->Bar]).Offset,
+                 1,
+                 &Address32
+                 );
+
+        Address32 = (UINT32) RShiftU64 (Address, 32);
+
+        PciIo->Pci.Write (
+                 PciIo,
+                 EfiPciIoWidthUint32,
+                 (UINT8) ((Node->PciDev->PciBar[Node->Bar]).Offset + 4),
+                 1,
+                 &Address32
+                 );
+
+        Node->PciDev->PciBar[Node->Bar].BaseAddress = Address;
+        Node->PciDev->PciBar[Node->Bar].Length      = Node->Length;
+        break;
+
+      default:
+        break;
+    }
     break;
 
   case PPB_IO_RANGE:
