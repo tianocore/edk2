@@ -2,7 +2,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by AuthService module.
 
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -249,20 +249,24 @@ ProcessVarWithKek (
   will be appended to the original EFI_SIGNATURE_LIST, duplicate EFI_SIGNATURE_DATA
   will be ignored.
 
-  @param[in, out]  Data            Pointer to original EFI_SIGNATURE_LIST.
-  @param[in]       DataSize        Size of Data buffer.
-  @param[in]       NewData         Pointer to new EFI_SIGNATURE_LIST to be appended.
-  @param[in]       NewDataSize     Size of NewData buffer.
+  @param[in, out]  Data             Pointer to original EFI_SIGNATURE_LIST.
+  @param[in]       DataSize         Size of Data buffer.
+  @param[in]       FreeBufSize      Size of free data buffer 
+  @param[in]       NewData          Pointer to new EFI_SIGNATURE_LIST to be appended.
+  @param[in]       NewDataSize      Size of NewData buffer.
+  @param[out]      MergedBufSize    Size of the merged buffer
 
-  @return Size of the merged buffer.
+  @return EFI_BUFFER_TOO_SMALL if input Data buffer overflowed
 
 **/
-UINTN
+EFI_STATUS
 AppendSignatureList (
   IN  OUT VOID            *Data,
   IN  UINTN               DataSize,
+  IN  UINTN               FreeBufSize,
   IN  VOID                *NewData,
-  IN  UINTN               NewDataSize
+  IN  UINTN               NewDataSize,
+  OUT UINTN               *MergedBufSize
   );
 
 /**

@@ -192,7 +192,7 @@ AutenticatedVariableServiceInitialize (
   //
   // Reserved runtime buffer for "Append" operation in virtual mode.
   //
-  mStorageArea  = AllocateRuntimePool (PcdGet32 (PcdMaxVariableSize));
+  mStorageArea  = AllocateRuntimePool (MAX (PcdGet32 (PcdMaxVariableSize), PcdGet32 (PcdMaxHardwareErrorVariableSize)));
   if (mStorageArea == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -1316,20 +1316,24 @@ ProcessVariable (
   will be appended to the original EFI_SIGNATURE_LIST, duplicate EFI_SIGNATURE_DATA
   will be ignored.
 
-  @param[in, out]  Data            Pointer to original EFI_SIGNATURE_LIST.
-  @param[in]       DataSize        Size of Data buffer.
-  @param[in]       NewData         Pointer to new EFI_SIGNATURE_LIST to be appended.
-  @param[in]       NewDataSize     Size of NewData buffer.
+  @param[in, out]  Data              Pointer to original EFI_SIGNATURE_LIST.
+  @param[in]       DataSize          Size of Data buffer.
+  @param[in]       FreeBufSize       Size of free data buffer 
+  @param[in]       NewData           Pointer to new EFI_SIGNATURE_LIST to be appended.
+  @param[in]       NewDataSize       Size of NewData buffer.
+  @param[out]      MergedBufSize     Size of the merged buffer
 
-  @return Size of the merged buffer.
+  @return EFI_BUFFER_TOO_SMALL if input Data buffer overflowed
 
 **/
-UINTN
+EFI_STATUS
 AppendSignatureList (
   IN  OUT VOID            *Data,
   IN  UINTN               DataSize,
+  IN  UINTN               FreeBufSize,
   IN  VOID                *NewData,
-  IN  UINTN               NewDataSize
+  IN  UINTN               NewDataSize,
+  OUT UINTN               *MergedBufSize
   )
 {
   EFI_SIGNATURE_LIST  *CertList;
@@ -1388,15 +1392,25 @@ AppendSignatureList (
         // New EFI_SIGNATURE_DATA, append it.
         //
         if (CopiedCount == 0) {
+          if (FreeBufSize < sizeof (EFI_SIGNATURE_LIST) + NewCertList->SignatureHeaderSize) {
+            return EFI_BUFFER_TOO_SMALL;
+          }
+
           //
           // Copy EFI_SIGNATURE_LIST header for only once.
           //
+
           CopyMem (Tail, NewCertList, sizeof (EFI_SIGNATURE_LIST) + NewCertList->SignatureHeaderSize);
           Tail = Tail + sizeof (EFI_SIGNATURE_LIST) + NewCertList->SignatureHeaderSize;
+          FreeBufSize -= sizeof (EFI_SIGNATURE_LIST) + NewCertList->SignatureHeaderSize;
         }
 
+        if (FreeBufSize < NewCertList->SignatureSize) {
+          return EFI_BUFFER_TOO_SMALL;
+        }
         CopyMem (Tail, NewCert, NewCertList->SignatureSize);
         Tail += NewCertList->SignatureSize;
+        FreeBufSize -= NewCertList->SignatureSize;
         CopiedCount++;
       }
 
@@ -1416,7 +1430,8 @@ AppendSignatureList (
     NewCertList = (EFI_SIGNATURE_LIST *) ((UINT8 *) NewCertList + NewCertList->SignatureListSize);
   }
 
-  return (Tail - (UINT8 *) Data);
+  *MergedBufSize = (Tail - (UINT8 *) Data);
+  return EFI_SUCCESS;
 }
 
 /**

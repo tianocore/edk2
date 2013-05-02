@@ -1649,7 +1649,7 @@ UpdateVariable (
   EFI_STATUS                          Status;
   VARIABLE_HEADER                     *NextVariable;
   UINTN                               ScratchSize;
-  UINTN                               ScratchDataSize;
+  UINTN                               MaxDataSize;
   UINTN                               NonVolatileVarableStoreSize;
   UINTN                               VarNameOffset;
   UINTN                               VarDataOffset;
@@ -1664,7 +1664,6 @@ UpdateVariable (
   UINTN                               CacheOffset;
   UINTN                               BufSize;
   UINTN                               DataOffset;
-  UINTN                               RevBufSize;
 
   if (mVariableModuleGlobal->FvbInstance == NULL) {
     //
@@ -1713,7 +1712,7 @@ UpdateVariable (
   //
   NextVariable = GetEndPointer ((VARIABLE_STORE_HEADER *) ((UINTN) mVariableModuleGlobal->VariableGlobal.VolatileVariableBase));
   ScratchSize = MAX (PcdGet32 (PcdMaxVariableSize), PcdGet32 (PcdMaxHardwareErrorVariableSize));
-  ScratchDataSize = ScratchSize - sizeof (VARIABLE_HEADER) - StrSize (VariableName) - GET_PAD_SIZE (StrSize (VariableName));
+
 
   if (Variable->CurrPtr != NULL) {
     //
@@ -1827,14 +1826,36 @@ UpdateVariable (
         DataOffset = sizeof (VARIABLE_HEADER) + Variable->CurrPtr->NameSize + GET_PAD_SIZE (Variable->CurrPtr->NameSize);
         CopyMem (mStorageArea, (UINT8*)((UINTN) Variable->CurrPtr + DataOffset), Variable->CurrPtr->DataSize);
 
+        //
+        // Set Max Common Variable Data Size as default MaxDataSize 
+        //
+        MaxDataSize = PcdGet32 (PcdMaxVariableSize) - sizeof (VARIABLE_HEADER) - StrSize (VariableName) - GET_PAD_SIZE (StrSize (VariableName));
+
+
         if ((CompareGuid (VendorGuid, &gEfiImageSecurityDatabaseGuid) &&
             ((StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE) == 0) || (StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE1) == 0))) ||
             (CompareGuid (VendorGuid, &gEfiGlobalVariableGuid) && (StrCmp (VariableName, EFI_KEY_EXCHANGE_KEY_NAME) == 0))) {
+
           //
           // For variables with formatted as EFI_SIGNATURE_LIST, the driver shall not perform an append of
           // EFI_SIGNATURE_DATA values that are already part of the existing variable value.
           //
-          BufSize = AppendSignatureList (mStorageArea, Variable->CurrPtr->DataSize, Data, DataSize);
+          Status = AppendSignatureList (
+                     mStorageArea, 
+                     Variable->CurrPtr->DataSize, 
+                     MaxDataSize - Variable->CurrPtr->DataSize,
+                     Data, 
+                     DataSize, 
+                     &BufSize
+                     );
+          if (Status == EFI_BUFFER_TOO_SMALL) {
+            //
+            // Signture List is too long, Failed to Append
+            //
+            Status = EFI_INVALID_PARAMETER;
+            goto Done;
+          }
+
           if (BufSize == Variable->CurrPtr->DataSize) {
             if ((TimeStamp == NULL) || CompareTimeStamp (TimeStamp, &Variable->CurrPtr->TimeStamp)) {
               //
@@ -1849,18 +1870,21 @@ UpdateVariable (
         } else {
           //
           // For other Variables, append the new data to the end of previous data.
+          // Max Harware error record variable data size is different from common variable
           //
+          if ((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
+            MaxDataSize = PcdGet32 (PcdMaxHardwareErrorVariableSize) - sizeof (VARIABLE_HEADER) - StrSize (VariableName) - GET_PAD_SIZE (StrSize (VariableName));
+          }
+
+          if (Variable->CurrPtr->DataSize + DataSize > MaxDataSize) {
+            //
+            // Exsiting data + Appended data exceed maximum variable size limitation 
+            //
+            Status = EFI_INVALID_PARAMETER;
+            goto Done;
+          }
           CopyMem ((UINT8*)((UINTN) mStorageArea + Variable->CurrPtr->DataSize), Data, DataSize);
           BufSize = Variable->CurrPtr->DataSize + DataSize;
-        }
-
-        RevBufSize = MIN (PcdGet32 (PcdMaxVariableSize), ScratchDataSize);
-        if (BufSize > RevBufSize) {
-          //
-          // If variable size (previous + current) is bigger than reserved buffer in runtime,
-          // return EFI_OUT_OF_RESOURCES.
-          //
-          return EFI_OUT_OF_RESOURCES;
         }
 
         //
