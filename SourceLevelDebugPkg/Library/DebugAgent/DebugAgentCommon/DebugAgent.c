@@ -1110,55 +1110,127 @@ GetBreakCause (
 }
 
 /**
-  Send packet with response data to HOST.
+  Copy memory from source to destination with specified width.
+
+  @param[out] Dest        A pointer to the destination buffer of the memory copy.
+  @param[in]  Src         A pointer to the source buffer of the memory copy.
+  @param[in]  Count       The number of data with specified width to copy from source to destination.
+  @param[in]  Width       Data width in byte.
+
+**/
+VOID
+CopyMemByWidth (
+  OUT UINT8               *Dest,
+  IN  UINT8               *Src,
+  IN  UINT16              Count,
+  IN  UINT8               Width
+  )
+{
+  UINT8                   *Destination;
+  UINT8                   *Source;
+  INT8                    Step;
+
+  if (Src > Dest) {
+    Destination = Dest;
+    Source      = Src;
+    Step        = Width;
+  } else {
+    //
+    // Copy memory from tail to avoid memory overlap
+    //
+    Destination = Dest + (Count - 1) * Width;
+    Source      = Src  + (Count - 1) * Width;
+    Step        = -Width;
+  }
+
+  while (Count-- != 0) {
+    switch (Width) {
+    case 1:
+      *(UINT8 *) Destination = MmioRead8 ((UINTN) Source);
+      break;
+    case 2:
+      *(UINT16 *) Destination = MmioRead16 ((UINTN) Source);
+      break;
+    case 4:
+      *(UINT32 *) Destination = MmioRead32 ((UINTN) Source);
+      break;
+    case 8:
+      *(UINT64 *) Destination = MmioRead64 ((UINTN) Source);
+      break;
+    default:
+      ASSERT (FALSE);
+    }
+    Source      += Step;
+    Destination += Step;
+  }
+}
+
+/**
+  Read memory with speicifed width and send packet with response data to HOST.
 
   @param[in] Data        Pointer to response data buffer.
-  @param[in] DataSize    Size of response data in byte.
+  @param[in] Count       The number of data with specified Width.
+  @param[in] Width       Data width in byte.
 
   @retval RETURN_SUCCESS      Response data was sent successfully.
 
 **/
 RETURN_STATUS
-SendDataResponsePacket (
+ReadMemoryAndSendResponsePacket (
   IN UINT8                *Data,
-  IN UINT16               DataSize
+  IN UINT16               Count,
+  IN UINT8                Width
   )
 {
   RETURN_STATUS        Status;
   DEBUG_PACKET_HEADER  *DebugHeader;
   BOOLEAN              LastPacket;
   DEBUG_PACKET_HEADER  *AckDebugHeader;
-  UINT8                DebugPacket[DEBUG_DATA_UPPER_LIMIT];
+  UINT8                DebugPacket[DEBUG_DATA_UPPER_LIMIT + sizeof (UINT64) - 1];
   UINT8                InputPacketBuffer[DEBUG_DATA_UPPER_LIMIT];
   DEBUG_PORT_HANDLE    Handle;
   UINT8                SequenceNo;
+  UINTN                RemainingDataSize;
+  UINTN                CurrentDataSize;
 
   Handle = GetDebugPortHandle();
 
-  DebugHeader = (DEBUG_PACKET_HEADER *) &DebugPacket;
+  //
+  // Data is appended end of Debug Packet header,  make sure data address
+  // in Debug Packet 8-byte alignment always
+  //
+  DebugHeader = (DEBUG_PACKET_HEADER *) (ALIGN_VALUE ((UINTN)&DebugPacket + sizeof (DEBUG_PACKET_HEADER), sizeof (UINT64))
+                                         - sizeof (DEBUG_PACKET_HEADER));
   DebugHeader->StartSymbol = DEBUG_STARTING_SYMBOL_NORMAL;
 
+  RemainingDataSize = Count * Width;
   while (TRUE) {
     SequenceNo = GetMailboxPointer()->HostSequenceNo;
-    if (DataSize <= DEBUG_DATA_MAXIMUM_REAL_DATA) {
+    if (RemainingDataSize <= DEBUG_DATA_MAXIMUM_REAL_DATA) {
+      //
+      // If the remaining data is less one real packet size, this is the last data packet
+      //
+      CurrentDataSize = RemainingDataSize;
       LastPacket = TRUE;
-      DebugHeader->Command    = DEBUG_COMMAND_OK;
-      DebugHeader->Length     = (UINT8) (DataSize + sizeof (DEBUG_PACKET_HEADER));
-      DebugHeader->SequenceNo = SequenceNo;
-      DebugHeader->Crc        = 0;
-      CopyMem (DebugHeader + 1, Data, DataSize);
-
+      DebugHeader->Command = DEBUG_COMMAND_OK;
     } else {
+      //
+      // Data is too larger to be sent in one packet, calculate the actual data size could
+      // be sent in one Maximum data packet
+      //
+      CurrentDataSize = (DEBUG_DATA_MAXIMUM_REAL_DATA / Width) * Width;
       LastPacket = FALSE;
-      DebugHeader->Command    = DEBUG_COMMAND_IN_PROGRESS;
-      DebugHeader->Length     = DEBUG_DATA_MAXIMUM_REAL_DATA + sizeof (DEBUG_PACKET_HEADER);
-      DebugHeader->SequenceNo = SequenceNo;
-      DebugHeader->Crc        = 0;
-      CopyMem (DebugHeader + 1, Data, DEBUG_DATA_MAXIMUM_REAL_DATA);
+      DebugHeader->Command = DEBUG_COMMAND_IN_PROGRESS;
     }
-
     //
-    // Calculate and fill the checksum
+    // Construct the rest Debug header
+    //
+    DebugHeader->Length     = (UINT8)(CurrentDataSize + sizeof (DEBUG_PACKET_HEADER));
+    DebugHeader->SequenceNo = SequenceNo;
+    DebugHeader->Crc        = 0;
+    CopyMemByWidth ((UINT8 *)(DebugHeader + 1), Data, (UINT16) CurrentDataSize / Width, Width);
+    //
+    // Calculate and fill the checksum, DebugHeader->Crc should be 0 before invoking CalculateCrc16 ()
     //
     DebugHeader->Crc = CalculateCrc16 ((UINT8 *) DebugHeader, DebugHeader->Length, 0);
 
@@ -1184,10 +1256,10 @@ SendDataResponsePacket (
       }
       if ((SequenceNo == (UINT8) (DebugHeader->SequenceNo + 1)) && (AckDebugHeader->Command == DEBUG_COMMAND_CONTINUE)) {
         //
-        // Send the rest packet
+        // Calculate the rest data size
         //
-        Data     += DEBUG_DATA_MAXIMUM_REAL_DATA;
-        DataSize -= DEBUG_DATA_MAXIMUM_REAL_DATA;
+        Data              += CurrentDataSize;
+        RemainingDataSize -= CurrentDataSize;
         UpdateMailboxContent (GetMailboxPointer(), DEBUG_MAILBOX_HOST_SEQUENCE_NO_INDEX, (UINT8) SequenceNo);
         break;
       }
@@ -1197,6 +1269,24 @@ SendDataResponsePacket (
       }
     }
   }
+}
+
+/**
+  Send packet with response data to HOST.
+
+  @param[in] Data        Pointer to response data buffer.
+  @param[in] DataSize    Size of response data in byte.
+
+  @retval RETURN_SUCCESS      Response data was sent successfully.
+
+**/
+RETURN_STATUS
+SendDataResponsePacket (
+  IN UINT8                *Data,
+  IN UINT16               DataSize
+  )
+{
+  return ReadMemoryAndSendResponsePacket (Data, DataSize, 1);
 }
 
 /**
@@ -1349,7 +1439,7 @@ CommandCommunication (
   )
 {
   RETURN_STATUS                     Status;
-  UINT8                             InputPacketBuffer[DEBUG_DATA_UPPER_LIMIT];
+  UINT8                             InputPacketBuffer[DEBUG_DATA_UPPER_LIMIT + sizeof (UINT64) - 1];
   DEBUG_PACKET_HEADER               *DebugHeader;
   UINT8                             Width;
   UINT8                             Data8;
@@ -1376,6 +1466,7 @@ CommandCommunication (
   DEBUG_AGENT_EXCEPTION_BUFFER      AgentExceptionBuffer;
   UINT32                            IssuedViewPoint;
   DEBUG_AGENT_MAILBOX               *Mailbox;
+  UINT8                             *AlignedDataPtr;
 
   ProcessorIndex  = 0;
   IssuedViewPoint = 0;
@@ -1644,12 +1735,19 @@ CommandCommunication (
 
     case DEBUG_COMMAND_READ_MEMORY:
       MemoryRead = (DEBUG_DATA_READ_MEMORY *) (DebugHeader + 1);
-      Status = SendDataResponsePacket ((UINT8 *) (UINTN) MemoryRead->Address, (UINT16) (MemoryRead->Count * MemoryRead->Width));
+      Status = ReadMemoryAndSendResponsePacket ((UINT8 *) (UINTN) MemoryRead->Address, MemoryRead->Count, MemoryRead->Width);
       break;
 
     case DEBUG_COMMAND_WRITE_MEMORY:
       MemoryWrite = (DEBUG_DATA_WRITE_MEMORY *) (DebugHeader + 1);
-      CopyMem ((VOID *) (UINTN) MemoryWrite->Address, &MemoryWrite->Data, MemoryWrite->Count * MemoryWrite->Width);
+      //
+      // Copy data into one memory with 8-byte alignment address
+      //
+      AlignedDataPtr = ALIGN_POINTER ((UINT8 *) &MemoryWrite->Data, sizeof (UINT64));
+      if (AlignedDataPtr != (UINT8 *) &MemoryWrite->Data) {
+        CopyMem (AlignedDataPtr, (UINT8 *) &MemoryWrite->Data, MemoryWrite->Count * MemoryWrite->Width);
+      }
+      CopyMemByWidth ((UINT8 *) (UINTN) MemoryWrite->Address, AlignedDataPtr, MemoryWrite->Count, MemoryWrite->Width);
       SendAckPacket (DEBUG_COMMAND_OK);
       break;
 
@@ -1915,7 +2013,7 @@ InterruptProcess (
     // the saved CPU content in CommandCommunication()
     //
     if (GetDebugFlag (DEBUG_AGENT_FLAG_AGENT_IN_PROGRESS) == 1) {
-      DebugAgentMsgPrint (DEBUG_AGENT_ERROR, "Debug agent meet one Exception, ExceptionNum is %d.\n", Vector);
+      DebugAgentMsgPrint (DEBUG_AGENT_ERROR, "Debug agent meet one Exception, ExceptionNum is %d, EIP = 0x%x.\n", Vector, (UINTN)CpuContext->Eip);
       ExceptionBuffer = (DEBUG_AGENT_EXCEPTION_BUFFER *) (UINTN) GetMailboxPointer()->ExceptionBufferPointer;
       ExceptionBuffer->ExceptionContent.ExceptionNum  = (UINT8) Vector;
       ExceptionBuffer->ExceptionContent.ExceptionData = (UINT32) CpuContext->ExceptionData;
