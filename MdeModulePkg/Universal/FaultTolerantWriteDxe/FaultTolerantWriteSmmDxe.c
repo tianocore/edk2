@@ -3,7 +3,7 @@
   Implement the Fault Tolerant Write (FTW) protocol based on SMM FTW 
   module.
 
-Copyright (c) 2011, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -463,13 +463,17 @@ FtwGetLastWrite (
   // Get data from SMM
   //
   *PrivateDataSize = SmmFtwGetLastWriteHeader->PrivateDataSize;
-  if (!EFI_ERROR (Status)) {
+  if (Status == EFI_SUCCESS || Status == EFI_BUFFER_TOO_SMALL) {
     *Lba      = SmmFtwGetLastWriteHeader->Lba;
     *Offset   = SmmFtwGetLastWriteHeader->Offset; 
     *Length   = SmmFtwGetLastWriteHeader->Length;
     *Complete = SmmFtwGetLastWriteHeader->Complete;
     CopyGuid (CallerId, &SmmFtwGetLastWriteHeader->CallerId);
-    CopyMem (PrivateData, SmmFtwGetLastWriteHeader->Data, *PrivateDataSize);
+    if (Status == EFI_SUCCESS) {
+      CopyMem (PrivateData, SmmFtwGetLastWriteHeader->Data, *PrivateDataSize);
+    }
+  } else if (Status == EFI_NOT_FOUND) {
+    *Complete = SmmFtwGetLastWriteHeader->Complete;
   }
 
   FreePool (SmmCommunicateHeader);  
