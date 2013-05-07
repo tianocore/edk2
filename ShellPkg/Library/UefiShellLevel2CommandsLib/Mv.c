@@ -135,7 +135,6 @@ GetDestinationLocation(
 {
   EFI_SHELL_FILE_INFO       *DestList;
   EFI_SHELL_FILE_INFO       *Node;
-  EFI_STATUS                Status;
   CHAR16                    *DestPath;
   CHAR16                    *TempLocation;
   UINTN                     NewSize;
@@ -159,7 +158,7 @@ GetDestinationLocation(
   //
   // get the destination path
   //
-  Status = ShellOpenFileMetaArg((CHAR16*)DestDir, EFI_FILE_MODE_WRITE|EFI_FILE_MODE_READ|EFI_FILE_MODE_CREATE, &DestList);
+  ShellOpenFileMetaArg((CHAR16*)DestDir, EFI_FILE_MODE_WRITE|EFI_FILE_MODE_READ|EFI_FILE_MODE_CREATE, &DestList);
   if (DestList == NULL || IsListEmpty(&DestList->Link)) {
     //
     // Not existing... must be renaming

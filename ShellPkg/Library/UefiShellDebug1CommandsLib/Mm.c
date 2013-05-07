@@ -217,7 +217,6 @@ ShellCommandRunMm (
   UINT64                          Buffer;
   UINTN                           Index;
   UINTN                           Size;
-  CHAR16                          *AddressStr;
 //  CHAR16                          *ValueStr;
   BOOLEAN                         Complete;
   CHAR16                          *InputStr;
@@ -245,7 +244,6 @@ ShellCommandRunMm (
   Width       = EfiPciWidthUint8;
   Size        = 1;
   AccessType  = EfiMemory;
-  AddressStr  = NULL;
 //  ValueStr    = NULL;
   Interactive = TRUE;
   Package     = NULL;

@@ -81,13 +81,11 @@ LoadDriver(
 {
   EFI_HANDLE                    LoadedDriverHandle;
   EFI_STATUS                    Status;
-  EFI_DEVICE_PATH_PROTOCOL      *Node;
   EFI_DEVICE_PATH_PROTOCOL      *FilePath;
   EFI_LOADED_IMAGE_PROTOCOL     *LoadedDriverImage;
 
   LoadedDriverImage   = NULL;
   FilePath            = NULL;
-  Node                = NULL;
   LoadedDriverHandle  = NULL;
   Status              = EFI_SUCCESS;
 

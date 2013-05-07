@@ -190,9 +190,6 @@ HMemImageRead (
   CHAR16                          *Str;
   HEFI_EDITOR_LINE                *Line;
 
-  EDIT_FILE_TYPE                  BufferTypeBackup;
-
-  BufferTypeBackup        = HBufferImage.BufferType;
   HBufferImage.BufferType = FileTypeMemBuffer;
 
   Buffer                  = AllocateZeroPool (Size);
@@ -301,8 +298,6 @@ HMemImageSave (
   EFI_STATUS                      Status;
   VOID                            *Buffer;
 
-  EDIT_FILE_TYPE                  BufferTypeBackup;
-
   //
   // not modified, so directly return
   //
@@ -310,7 +305,6 @@ HMemImageSave (
     return EFI_SUCCESS;
   }
 
-  BufferTypeBackup        = HBufferImage.BufferType;
   HBufferImage.BufferType = FileTypeMemBuffer;
 
   Buffer                  = AllocateZeroPool (Size);

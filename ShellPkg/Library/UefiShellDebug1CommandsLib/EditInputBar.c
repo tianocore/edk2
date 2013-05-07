@@ -133,8 +133,6 @@ InputBarRefresh (
   UINTN                   Size;
   EFI_STATUS              Status;
   BOOLEAN                 NoDisplay;
-  UINTN                   Limit;
-  UINTN                   mPromptLen;
   UINTN                   EventIndex;
   UINTN                   CursorRow;
   UINTN                   CursorCol;
@@ -163,12 +161,6 @@ InputBarRefresh (
 
   gST->ConOut->SetCursorPosition (gST->ConOut, 0, LastRow - 1);
   ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN(STR_EDIT_LIBINPUTBAR_MAININPUTBAR), gShellDebug1HiiHandle, mPrompt);
-
-  //
-  // that's the maximum input length that can be displayed on screen
-  //
-  mPromptLen = StrLen (mPrompt);
-  Limit     = LastColumn - mPromptLen;
 
   //
   // this is a selection mPrompt, cursor will stay in edit area

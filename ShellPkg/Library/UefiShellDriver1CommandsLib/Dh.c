@@ -674,9 +674,7 @@ DoDhByHandle(
 {
   CHAR16              *ProtocolInfoString;
   SHELL_STATUS        ShellStatus;
-  EFI_STATUS          Status;
 
-  Status              = EFI_SUCCESS;
   ShellStatus         = SHELL_SUCCESS;
   ProtocolInfoString  = NULL;
 

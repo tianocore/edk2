@@ -378,7 +378,6 @@ ShellCommandRunTime (
 {
   EFI_STATUS    Status;
   LIST_ENTRY    *Package;
-  CHAR16        *Message;
   EFI_TIME      TheTime;
   CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
@@ -387,13 +386,11 @@ ShellCommandRunTime (
   CONST CHAR16  *TempLocation;
   UINTN         TzMinutes;
 
-  ShellStatus  = SHELL_SUCCESS;
-  ProblemParam = NULL;
-
   //
   // Initialize variables
   //
-  Message = NULL;
+  ShellStatus  = SHELL_SUCCESS;
+  ProblemParam = NULL;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)

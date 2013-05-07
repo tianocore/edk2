@@ -293,7 +293,7 @@ BcfgAddDebug1(
   EFI_STATUS                Status;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *FilePath;
-  EFI_DEVICE_PATH_PROTOCOL  *FileNode;
+  /* EFI_DEVICE_PATH_PROTOCOL  *FileNode; */
   CHAR16                    *Str;
   UINT8                     *TempByteBuffer;
   UINT8                     *TempByteStart;
@@ -328,7 +328,7 @@ BcfgAddDebug1(
 
   Str             = NULL;
   FilePath        = NULL;
-  FileNode        = NULL;
+  /* FileNode        = NULL; */
   FileList        = NULL;
   Handles         = NULL;
   ShellStatus     = SHELL_SUCCESS;

@@ -87,6 +87,7 @@ CopySingleFile(
   Response        = *Resp;
   List            = NULL;
   DestVolumeInfo  = NULL;
+  ShellStatus     = SHELL_SUCCESS;
 
   ReadSize = PcdGet16(PcdShellFileOperationSize);
   // Why bother copying a file to itself
@@ -255,7 +256,7 @@ CopySingleFile(
   //
   // return
   //
-  return (SHELL_SUCCESS);
+  return ShellStatus;
 }
 
 /**
@@ -537,12 +538,11 @@ ProcessValidateAndCopyFiles(
 {
   SHELL_STATUS        ShellStatus;
   EFI_SHELL_FILE_INFO *List;
-  EFI_STATUS          Status;
   EFI_FILE_INFO       *FileInfo;
 
   List = NULL;
 
-  Status = ShellOpenFileMetaArg((CHAR16*)DestDir, EFI_FILE_MODE_READ, &List);
+  ShellOpenFileMetaArg((CHAR16*)DestDir, EFI_FILE_MODE_READ, &List);
   if (List != NULL && List->Link.ForwardLink != List->Link.BackLink) {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_MARG_ERROR), gShellLevel2HiiHandle, DestDir);
     ShellStatus = SHELL_INVALID_PARAMETER;

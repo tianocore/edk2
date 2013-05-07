@@ -29,21 +29,18 @@ ShellCommandRunCls (
 {
   EFI_STATUS    Status;
   LIST_ENTRY    *Package;
-  CHAR16        *Message;
   UINTN         Background;
   UINTN         ForeColor;
   CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
   CONST CHAR16  *Param1;
 
-  ShellStatus   = SHELL_SUCCESS;
-  ProblemParam  = NULL;
-  Background    = 0;
-
   //
   // Initialize variables
   //
-  Message = NULL;
+  ShellStatus   = SHELL_SUCCESS;
+  ProblemParam  = NULL;
+  Background    = 0;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)

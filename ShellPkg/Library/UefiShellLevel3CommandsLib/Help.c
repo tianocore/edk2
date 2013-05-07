@@ -41,7 +41,6 @@ ShellCommandRunHelp (
   LIST_ENTRY          *Package;
   CHAR16              *ProblemParam;
   SHELL_STATUS        ShellStatus;
-  CHAR16              *OutText;
   CONST COMMAND_LIST  *CommandList;
   CONST COMMAND_LIST  *Node;
   CHAR16              *CommandToGetHelpOn;
@@ -53,7 +52,6 @@ ShellCommandRunHelp (
   PrintCommandText    = TRUE;
   ProblemParam        = NULL;
   ShellStatus         = SHELL_SUCCESS;
-  OutText             = NULL;
   CommandToGetHelpOn  = NULL;
   SectionToGetHelpOn  = NULL;
   Found               = FALSE;

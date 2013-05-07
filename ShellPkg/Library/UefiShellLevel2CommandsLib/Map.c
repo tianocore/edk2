@@ -1025,7 +1025,6 @@ ShellCommandRunMap (
   CONST CHAR16  *SName;
   CONST CHAR16  *Mapping;
   EFI_HANDLE    MapAsHandle;
-  CONST EFI_DEVICE_PATH_PROTOCOL *DevPath;
   SHELL_STATUS  ShellStatus;
   BOOLEAN       SfoMode;
   BOOLEAN       ConstMode;
@@ -1037,7 +1036,6 @@ ShellCommandRunMap (
   ProblemParam  = NULL;
   Mapping       = NULL;
   SName         = NULL;
-  DevPath       = NULL;
   ShellStatus   = SHELL_SUCCESS;
   MapAsHandle = NULL;
 

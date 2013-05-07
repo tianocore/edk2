@@ -994,7 +994,6 @@ InternalOpenFileDevicePath(
   SHELL_FILE_HANDLE               ShellHandle;
   EFI_FILE_PROTOCOL               *Handle1;
   EFI_FILE_PROTOCOL               *Handle2;
-  EFI_DEVICE_PATH_PROTOCOL        *DpCopy;
   FILEPATH_DEVICE_PATH            *AlignedNode;
 
   if (FileHandle == NULL) {
@@ -1004,7 +1003,6 @@ InternalOpenFileDevicePath(
   Handle1       = NULL;
   Handle2       = NULL;
   Handle        = NULL;
-  DpCopy        = DevicePath;
   ShellHandle   = NULL;
   FilePathNode  = NULL;
   AlignedNode   = NULL;

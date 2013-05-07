@@ -181,11 +181,7 @@ HDiskImageRead (
   UINTN                           Bytes;
 
   HEFI_EDITOR_LINE                *Line;
-  UINT64                          ByteOffset;
 
-  EDIT_FILE_TYPE                  BufferTypeBackup;
-
-  BufferTypeBackup        = HBufferImage.BufferType;
   HBufferImage.BufferType = FileTypeDiskBuffer;
 
   DevicePath              = gEfiShellProtocol->GetDevicePathFromMap(DeviceName);
@@ -225,8 +221,6 @@ HDiskImageRead (
     StatusBarSetStatusString (L"Read Disk Failed");
     return EFI_OUT_OF_RESOURCES;
   }
-
-  ByteOffset = MultU64x32 (Offset, BlkIo->Media->BlockSize);
 
   //
   // read from disk
@@ -355,10 +349,6 @@ HDiskImageSave (
   VOID                            *Buffer;
   UINTN                           Bytes;
 
-  UINT64                          ByteOffset;
-
-  EDIT_FILE_TYPE                  BufferTypeBackup;
-
   //
   // if not modified, directly return
   //
@@ -366,7 +356,6 @@ HDiskImageSave (
     return EFI_SUCCESS;
   }
 
-  BufferTypeBackup        = HBufferImage.BufferType;
   HBufferImage.BufferType = FileTypeDiskBuffer;
 
   DevicePath              = gEfiShellProtocol->GetDevicePathFromMap(DeviceName);
@@ -405,8 +394,6 @@ HDiskImageSave (
     FreePool (Buffer);
     return Status;
   }
-
-  ByteOffset = MultU64x32 (Offset, BlkIo->Media->BlockSize);
 
   //
   // write the buffer to disk

@@ -490,11 +490,9 @@ EditGetDefaultFileName (
 {
   EFI_STATUS         Status;
   UINTN              Suffix;
-  BOOLEAN            FoundNewFile;
   CHAR16             *FileNameTmp;
 
   Suffix       = 0;
-  FoundNewFile = FALSE;
 
   do {
     FileNameTmp = CatSPrint (NULL, L"NewFile%d.%s", Suffix, Extension);

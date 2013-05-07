@@ -2054,13 +2054,11 @@ ShellCommandRunPci (
   LIST_ENTRY                        *Package;
   CHAR16                            *ProblemParam;
   SHELL_STATUS                      ShellStatus;
-  UINTN                             Size;
   CONST CHAR16                      *Temp;
 
   ShellStatus         = SHELL_SUCCESS;
   Status              = EFI_SUCCESS;
   Address             = 0;
-  Size                = 0;
   IoDev               = NULL;
   HandleBuf           = NULL;
   Package             = NULL;

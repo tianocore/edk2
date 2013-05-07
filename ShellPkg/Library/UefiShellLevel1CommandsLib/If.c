@@ -662,12 +662,9 @@ BuildNextStatement (
   OUT END_TAG_TYPE  *EndTag
   )
 {
-  CHAR16    *Buffer;
-  UINTN     BufferSize;
-
   *EndTag = EndTagMax;
 
-  for(Buffer = NULL, BufferSize = 0
+  for(
     ; ParameterNumber < gEfiShellParametersProtocol->Argc
     ; ParameterNumber++
    ) {

@@ -33,7 +33,6 @@ IsDirectoryEmpty (
   IN EFI_HANDLE   FileHandle
   )
 {
-  EFI_STATUS      Status;
   EFI_FILE_INFO   *FileInfo;
   BOOLEAN         NoFile;
   BOOLEAN         RetVal;
@@ -41,9 +40,9 @@ IsDirectoryEmpty (
   RetVal = TRUE;
   NoFile = FALSE;
 
-  for (Status = FileHandleFindFirstFile(FileHandle, &FileInfo)
+  for (FileHandleFindFirstFile(FileHandle, &FileInfo)
     ;  !NoFile
-    ;  Status = FileHandleFindNextFile(FileHandle, FileInfo, &NoFile)
+    ;  FileHandleFindNextFile(FileHandle, FileInfo, &NoFile)
    ){
     if (StrStr(FileInfo->FileName, L".") != FileInfo->FileName
       &&StrStr(FileInfo->FileName, L"..") != FileInfo->FileName) {

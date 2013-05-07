@@ -598,7 +598,6 @@ HMainCommandCut (
   )
 {
   UINTN             Index;
-  HEFI_EDITOR_LINE  *Line;
   LIST_ENTRY    *Link;
   UINT8             *Buffer;
   UINTN             Count;
@@ -622,8 +621,6 @@ HMainCommandCut (
   for (Index = 0; Index < (HMainEditor.SelectEnd - 1) / 0x10; Index++) {
     Link = Link->ForwardLink;
   }
-
-  Line    = CR (Link, HEFI_EDITOR_LINE, Link, EFI_EDITOR_LINE_LIST);
 
   Count   = HMainEditor.SelectEnd - HMainEditor.SelectStart + 1;
   Buffer  = AllocateZeroPool (Count);
