@@ -1,7 +1,7 @@
 /** @file
   The entry point of IScsi driver.
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -14,10 +14,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "IScsiImpl.h"
 
-EFI_DRIVER_BINDING_PROTOCOL gIScsiDriverBinding = {
-  IScsiDriverBindingSupported,
-  IScsiDriverBindingStart,
-  IScsiDriverBindingStop,
+EFI_DRIVER_BINDING_PROTOCOL gIScsiIp4DriverBinding = {
+  IScsiIp4DriverBindingSupported,
+  IScsiIp4DriverBindingStart,
+  IScsiIp4DriverBindingStop,
+  0xa,
+  NULL,
+  NULL
+};
+
+EFI_DRIVER_BINDING_PROTOCOL gIScsiIp6DriverBinding = {
+  IScsiIp6DriverBindingSupported,
+  IScsiIp6DriverBindingStart,
+  IScsiIp6DriverBindingStop,
   0xa,
   NULL,
   NULL
@@ -28,7 +37,7 @@ EFI_GUID                    gIScsiV6PrivateGuid = ISCSI_V6_PRIVATE_GUID;
 ISCSI_PRIVATE_DATA          *mPrivate           = NULL;
 
 /**
-  Tests to see if this driver supports the RemainingDevicePath.
+  Tests to see if this driver supports the RemainingDevicePath. 
 
   @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This 
                                    parameter is ignored by device drivers, and is optional for bus 
@@ -67,22 +76,8 @@ IScsiIsDevicePathSupported (
 
 
 /**
-  Tests to see if this driver supports a given controller. If a child device is provided, 
-  it further tests to see if this driver supports creating a handle for the specified child device.
-
-  This function checks to see if the driver specified by This supports the device specified by 
-  ControllerHandle. Drivers typically use the device path attached to 
-  ControllerHandle and/or the services from the bus I/O abstraction attached to 
-  ControllerHandle to determine if the driver supports ControllerHandle. This function 
-  may be called many times during platform initialization. In order to reduce boot times, the tests 
-  performed by this function must be very small and take as little time as possible to execute. This 
-  function must not change the state of any hardware devices, and this function must be aware that the 
-  device specified by ControllerHandle may already be managed by the same driver or a 
-  different driver. This function must match its calls to AllocatePages() with FreePages(), 
-  AllocatePool() with FreePool(), and OpenProtocol() with CloseProtocol().  
-  Since ControllerHandle may have been previously started by the same driver, if a protocol is 
-  already in the opened state, then it must not be closed with CloseProtocol(). This is required 
-  to guarantee the state of ControllerHandle is not modified by this function.
+  Tests to see if this driver supports a given controller. This is the worker function for
+  IScsiIp4(6)DriverBindingSupported.
 
   @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
   @param[in]  ControllerHandle     The handle of the controller to test. This handle 
@@ -95,75 +90,51 @@ IScsiIsDevicePathSupported (
                                    by ControllerHandle and the child controller specified 
                                    by RemainingDevicePath are both supported by this 
                                    bus driver.
+  @param[in]  IpVersion            IP_VERSION_4 or IP_VERSION_6.
 
   @retval EFI_SUCCESS              The device specified by ControllerHandle and
                                    RemainingDevicePath is supported by the driver specified by This.
   @retval EFI_ALREADY_STARTED      The device specified by ControllerHandle and
                                    RemainingDevicePath is already being managed by the driver
                                    specified by This.
-  @retval EFI_ACCESS_DENIED        The device specified by ControllerHandle and
-                                   RemainingDevicePath is already being managed by a different
-                                   driver or an application that requires exclusive access.
-                                   Currently not implemented.
   @retval EFI_UNSUPPORTED          The device specified by ControllerHandle and
                                    RemainingDevicePath is not supported by the driver specified by This.
 **/
 EFI_STATUS
 EFIAPI
-IScsiDriverBindingSupported (
+IScsiSupported (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL,
+  IN UINT8                        IpVersion
   )
 {
   EFI_STATUS                Status;
-  BOOLEAN                   IsIscsi4Started;
+  EFI_GUID                  *IScsiServiceBindingGuid;
+  EFI_GUID                  *TcpServiceBindingGuid;
 
-  Status = gBS->OpenProtocol (
-                  ControllerHandle,
-                  &gIScsiV4PrivateGuid,
-                  NULL,
-                  This->DriverBindingHandle,
-                  ControllerHandle,
-                  EFI_OPEN_PROTOCOL_TEST_PROTOCOL
-                  );
-  if (!EFI_ERROR (Status)) {
-    IsIscsi4Started = TRUE;
+  if (IpVersion == IP_VERSION_4) {
+    IScsiServiceBindingGuid  = &gIScsiV4PrivateGuid;
+    TcpServiceBindingGuid    = &gEfiTcp4ServiceBindingProtocolGuid;
   } else {
-    Status = gBS->OpenProtocol (
-                    ControllerHandle,
-                    &gEfiTcp4ServiceBindingProtocolGuid,
-                    NULL,
-                    This->DriverBindingHandle,
-                    ControllerHandle,
-                    EFI_OPEN_PROTOCOL_TEST_PROTOCOL
-                    );
-    if (!EFI_ERROR (Status)) {
-      Status = IScsiIsDevicePathSupported (RemainingDevicePath);
-      if (!EFI_ERROR (Status)) {
-        return EFI_SUCCESS;
-      }
-    }
-
-    IsIscsi4Started = FALSE;
+    IScsiServiceBindingGuid  = &gIScsiV6PrivateGuid;
+    TcpServiceBindingGuid    = &gEfiTcp6ServiceBindingProtocolGuid;
   }
 
   Status = gBS->OpenProtocol (
                   ControllerHandle,
-                  &gIScsiV6PrivateGuid,
+                  IScsiServiceBindingGuid,
                   NULL,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_TEST_PROTOCOL
                   );
   if (!EFI_ERROR (Status)) {
-    if (IsIscsi4Started) {
-      return EFI_ALREADY_STARTED;
-    }
+    return EFI_ALREADY_STARTED;
   } else {
     Status = gBS->OpenProtocol (
                     ControllerHandle,
-                    &gEfiTcp6ServiceBindingProtocolGuid,
+                    TcpServiceBindingGuid,
                     NULL,
                     This->DriverBindingHandle,
                     ControllerHandle,
@@ -183,13 +154,13 @@ IScsiDriverBindingSupported (
 
 /**
   Start to manage the controller. This is the worker function for
-  IScsiDriverBindingStart.
+  IScsiIp4(6)DriverBindingStart.
 
   @param[in]  Image                Handle of the image.
   @param[in]  ControllerHandle     Handle of the controller.
-  @param[in]  IpVersion            Ip4 or Ip6
+  @param[in]  IpVersion            IP_VERSION_4 or IP_VERSION_6.
 
-  @retval EFI_SUCCES            This driver supports this device.
+  @retval EFI_SUCCES            This driver was started.
   @retval EFI_ALREADY_STARTED   This driver is already running on this device.
   @retval EFI_INVALID_PARAMETER Any input parameter is invalid.
   @retval EFI_NOT_FOUND         There is no sufficient information to establish
@@ -777,83 +748,8 @@ ON_ERROR:
 }
 
 /**
-  Starts a device controller or a bus controller.
-
-  The Start() function is designed to be invoked from the EFI boot service ConnectController().
-  As a result, much of the error checking on the parameters to Start() has been moved into this 
-  common boot service. It is legal to call Start() from other locations, 
-  but the following calling restrictions must be followed or the system behavior will not be deterministic.
-  1. ControllerHandle must be a valid EFI_HANDLE.
-  2. If RemainingDevicePath is not NULL, then it must be a pointer to a naturally aligned
-     EFI_DEVICE_PATH_PROTOCOL.
-  3. Prior to calling Start(), the Supported() function for the driver specified by This must
-     have been called with the same calling parameters, and Supported() must have returned EFI_SUCCESS.  
-
-  @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in]  ControllerHandle     The handle of the controller to start. This handle 
-                                   must support a protocol interface that supplies 
-                                   an I/O abstraction to the driver.
-  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This 
-                                   parameter is ignored by device drivers, and is optional for bus 
-                                   drivers. For a bus driver, if this parameter is NULL, then handles 
-                                   for all the children of Controller are created by this driver.  
-                                   If this parameter is not NULL and the first Device Path Node is 
-                                   not the End of Device Path Node, then only the handle for the 
-                                   child device specified by the first Device Path Node of 
-                                   RemainingDevicePath is created by this driver.
-                                   If the first Device Path Node of RemainingDevicePath is 
-                                   the End of Device Path Node, no child handle is created by this
-                                   driver.
-
-  @retval EFI_SUCCESS              The device was started.
-  @retval EFI_DEVICE_ERROR         The device could not be started due to a device error.Currently not implemented.
-  @retval EFI_OUT_OF_RESOURCES     The request could not be completed due to a lack of resources.
-  @retval Others                   The driver failed to start the device.
-
-**/
-EFI_STATUS
-EFIAPI
-IScsiDriverBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                   ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
-  )
-{
-  EFI_STATUS        V4Status;
-  EFI_STATUS        V6Status;
-
-  V4Status = IScsiStart (This->DriverBindingHandle, ControllerHandle, IP_VERSION_4);
-  if (V4Status == EFI_ALREADY_STARTED) {
-    V4Status = EFI_SUCCESS;
-  }
-
-  V6Status = IScsiStart (This->DriverBindingHandle, ControllerHandle, IP_VERSION_6);
-  if (V6Status == EFI_ALREADY_STARTED) {
-    V6Status = EFI_SUCCESS;
-  }
-
-  if (!EFI_ERROR (V4Status) || !EFI_ERROR (V6Status)) {
-    return EFI_SUCCESS;
-  } else if (EFI_ERROR (V4Status)) {
-    return V4Status;
-  } else {
-    return V6Status;
-  }
-}
-
-/**
-  Stops a device controller or a bus controller.
-  
-  The Stop() function is designed to be invoked from the EFI boot service DisconnectController(). 
-  As a result, much of the error checking on the parameters to Stop() has been moved 
-  into this common boot service. It is legal to call Stop() from other locations, 
-  but the following calling restrictions must be followed or the system behavior will not be deterministic.
-  1. ControllerHandle must be a valid EFI_HANDLE that was used on a previous call to this
-     same driver's Start() function.
-  2. The first NumberOfChildren handles of ChildHandleBuffer must all be a valid
-     EFI_HANDLE. In addition, all of these handles must have been created in this driver's
-     Start() function, and the Start() function must have called OpenProtocol() on
-     ControllerHandle with an Attribute of EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER.
+  Stops a device controller or a bus controller. This is the worker function for
+  IScsiIp4(6)DriverBindingStop.
   
   @param[in]  This              A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
   @param[in]  ControllerHandle  A handle to the device being stopped. The handle must 
@@ -862,18 +758,20 @@ IScsiDriverBindingStart (
   @param[in]  NumberOfChildren  The number of child device handles in ChildHandleBuffer.
   @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL 
                                 if NumberOfChildren is 0.
-
+  @param[in]  IpVersion         IP_VERSION_4 or IP_VERSION_6.
+  
   @retval EFI_SUCCESS           The device was stopped.
   @retval EFI_DEVICE_ERROR      The device could not be stopped due to a device error.
 
 **/
 EFI_STATUS
 EFIAPI
-IScsiDriverBindingStop (
+IScsiStop (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   ControllerHandle,
   IN UINTN                        NumberOfChildren,
-  IN EFI_HANDLE                   *ChildHandleBuffer OPTIONAL
+  IN EFI_HANDLE                   *ChildHandleBuffer OPTIONAL,
+  IN UINT8                        IpVersion
   )
 {
   EFI_HANDLE                      IScsiController;
@@ -911,7 +809,7 @@ IScsiDriverBindingStop (
     // the protocol here, but do not uninstall the device path protocol and
     // EXT SCSI PASS THRU protocol installed on ExtScsiPassThruHandle.
     //
-    if (!Conn->Ipv6Flag) {
+    if (IpVersion == IP_VERSION_4) {
       ProtocolGuid = &gEfiTcp4ProtocolGuid;
     } else {
       ProtocolGuid = &gEfiTcp6ProtocolGuid;
@@ -929,17 +827,18 @@ IScsiDriverBindingStop (
   //
   // Get the handle of the controller we are controling.
   //
-  IScsiController = NetLibGetNicHandle (ControllerHandle, &gEfiTcp4ProtocolGuid);
-  if (IScsiController != NULL) {
+  if (IpVersion == IP_VERSION_4) {
     ProtocolGuid            = &gIScsiV4PrivateGuid;
     TcpProtocolGuid         = &gEfiTcp4ProtocolGuid;
     TcpServiceBindingGuid   = &gEfiTcp4ServiceBindingProtocolGuid;
   } else {
-    IScsiController = NetLibGetNicHandle (ControllerHandle, &gEfiTcp6ProtocolGuid);
-    ASSERT (IScsiController != NULL);
     ProtocolGuid            = &gIScsiV6PrivateGuid;
     TcpProtocolGuid         = &gEfiTcp6ProtocolGuid;
     TcpServiceBindingGuid   = &gEfiTcp6ServiceBindingProtocolGuid;
+  }
+  IScsiController = NetLibGetNicHandle (ControllerHandle, TcpProtocolGuid);
+  if (IScsiController == NULL) {
+    return EFI_SUCCESS;
   }
 
   Status = gBS->OpenProtocol (
@@ -1002,6 +901,315 @@ IScsiDriverBindingStop (
   return EFI_SUCCESS;
 }
 
+/**
+  Tests to see if this driver supports a given controller. If a child device is provided, 
+  it tests to see if this driver supports creating a handle for the specified child device.
+
+  This function checks to see if the driver specified by This supports the device specified by 
+  ControllerHandle. Drivers typically use the device path attached to 
+  ControllerHandle and/or the services from the bus I/O abstraction attached to 
+  ControllerHandle to determine if the driver supports ControllerHandle. This function 
+  may be called many times during platform initialization. In order to reduce boot times, the tests 
+  performed by this function must be very small and take as little time as possible to execute. This 
+  function must not change the state of any hardware devices, and this function must be aware that the 
+  device specified by ControllerHandle may already be managed by the same driver or a 
+  different driver. This function must match its calls to AllocatePages() with FreePages(), 
+  AllocatePool() with FreePool(), and OpenProtocol() with CloseProtocol().  
+  Since ControllerHandle may have been previously started by the same driver, if a protocol is 
+  already in the opened state, then it must not be closed with CloseProtocol(). This is required 
+  to guarantee the state of ControllerHandle is not modified by this function.
+
+  @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param[in]  ControllerHandle     The handle of the controller to test. This handle 
+                                   must support a protocol interface that supplies 
+                                   an I/O abstraction to the driver.
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This 
+                                   parameter is ignored by device drivers, and is optional for bus 
+                                   drivers. For bus drivers, if this parameter is not NULL, then 
+                                   the bus driver must determine if the bus controller specified 
+                                   by ControllerHandle and the child controller specified 
+                                   by RemainingDevicePath are both supported by this 
+                                   bus driver.
+
+  @retval EFI_SUCCESS              The device specified by ControllerHandle and
+                                   RemainingDevicePath is supported by the driver specified by This.
+  @retval EFI_ALREADY_STARTED      The device specified by ControllerHandle and
+                                   RemainingDevicePath is already managed by the driver
+                                   specified by This.
+  @retval EFI_ACCESS_DENIED        The device specified by ControllerHandle and
+                                   RemainingDevicePath is already managed by a different
+                                   driver or an application that requires exclusive access.
+                                   Currently not implemented.
+  @retval EFI_UNSUPPORTED          The device specified by ControllerHandle and
+                                   RemainingDevicePath is not supported by the driver specified by This.
+**/
+EFI_STATUS
+EFIAPI
+IScsiIp4DriverBindingSupported (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
+  )
+{
+  return IScsiSupported (
+           This,
+           ControllerHandle,
+           RemainingDevicePath,
+           IP_VERSION_4
+           );
+}
+
+/**
+  Starts a device controller or a bus controller.
+
+  The Start() function is designed to be invoked from the EFI boot service ConnectController().
+  As a result, much of the error checking on the parameters to Start() has been moved into this 
+  common boot service. It is legal to call Start() from other locations, 
+  but the following calling restrictions must be followed or the system behavior will not be deterministic.
+  1. ControllerHandle must be a valid EFI_HANDLE.
+  2. If RemainingDevicePath is not NULL, then it must be a pointer to a naturally aligned
+     EFI_DEVICE_PATH_PROTOCOL.
+  3. Prior to calling Start(), the Supported() function for the driver specified by This must
+     have been called with the same calling parameters, and Supported() must have returned EFI_SUCCESS.  
+
+  @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param[in]  ControllerHandle     The handle of the controller to start. This handle 
+                                   must support a protocol interface that supplies 
+                                   an I/O abstraction to the driver.
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This 
+                                   parameter is ignored by device drivers, and is optional for bus 
+                                   drivers. For a bus driver, if this parameter is NULL, then handles 
+                                   for all the children of Controller are created by this driver.  
+                                   If this parameter is not NULL and the first Device Path Node is 
+                                   not the End of Device Path Node, then only the handle for the 
+                                   child device specified by the first Device Path Node of 
+                                   RemainingDevicePath is created by this driver.
+                                   If the first Device Path Node of RemainingDevicePath is 
+                                   the End of Device Path Node, no child handle is created by this
+                                   driver.
+
+  @retval EFI_SUCCESS              The device was started.
+  @retval EFI_DEVICE_ERROR         The device could not be started due to a device error. Currently not implemented.
+  @retval EFI_OUT_OF_RESOURCES     The request could not be completed due to a lack of resources.
+  @retval Others                   The driver failed to start the device.
+
+**/
+EFI_STATUS
+EFIAPI
+IScsiIp4DriverBindingStart (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
+  )
+{
+  EFI_STATUS        Status;
+
+  Status = IScsiStart (This->DriverBindingHandle, ControllerHandle, IP_VERSION_4);
+  if (Status == EFI_ALREADY_STARTED) {
+    Status = EFI_SUCCESS;
+  }
+
+  return Status;
+}
+
+/**
+  Stops a device controller or a bus controller.
+  
+  The Stop() function is designed to be invoked from the EFI boot service DisconnectController(). 
+  As a result, much of the error checking on the parameters to Stop() has been moved 
+  into this common boot service. It is legal to call Stop() from other locations, 
+  but the following calling restrictions must be followed or the system behavior will not be deterministic.
+  1. ControllerHandle must be a valid EFI_HANDLE that was used on a previous call to this
+     same driver's Start() function.
+  2. The first NumberOfChildren handles of ChildHandleBuffer must all be a valid
+     EFI_HANDLE. In addition, all of these handles must have been created in this driver's
+     Start() function, and the Start() function must have called OpenProtocol() on
+     ControllerHandle with an Attribute of EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER.
+  
+  @param[in]  This              A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param[in]  ControllerHandle  A handle to the device being stopped. The handle must 
+                                support a bus specific I/O protocol for the driver 
+                                to use to stop the device.
+  @param[in]  NumberOfChildren  The number of child device handles in ChildHandleBuffer.
+  @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL 
+                                if NumberOfChildren is 0.
+
+  @retval EFI_SUCCESS           The device was stopped.
+  @retval EFI_DEVICE_ERROR      The device could not be stopped due to a device error.
+
+**/
+EFI_STATUS
+EFIAPI
+IScsiIp4DriverBindingStop (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   ControllerHandle,
+  IN UINTN                        NumberOfChildren,
+  IN EFI_HANDLE                   *ChildHandleBuffer OPTIONAL
+  )
+{
+  return IScsiStop (
+           This,
+           ControllerHandle,
+           NumberOfChildren,
+           ChildHandleBuffer,
+           IP_VERSION_4
+           );
+}
+
+/**
+  Tests to see if this driver supports a given controller. If a child device is provided, 
+  it tests to see if this driver supports creating a handle for the specified child device.
+
+  This function checks to see if the driver specified by This supports the device specified by 
+  ControllerHandle. Drivers typically use the device path attached to 
+  ControllerHandle and/or the services from the bus I/O abstraction attached to 
+  ControllerHandle to determine if the driver supports ControllerHandle. This function 
+  may be called many times during platform initialization. In order to reduce boot times, the tests 
+  performed by this function must be very small and take as little time as possible to execute. This 
+  function must not change the state of any hardware devices, and this function must be aware that the 
+  device specified by ControllerHandle may already be managed by the same driver or a 
+  different driver. This function must match its calls to AllocatePages() with FreePages(), 
+  AllocatePool() with FreePool(), and OpenProtocol() with CloseProtocol().  
+  Since ControllerHandle may have been previously started by the same driver, if a protocol is 
+  already in the opened state, then it must not be closed with CloseProtocol(). This is required 
+  to guarantee the state of ControllerHandle is not modified by this function.
+
+  @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param[in]  ControllerHandle     The handle of the controller to test. This handle 
+                                   must support a protocol interface that supplies 
+                                   an I/O abstraction to the driver.
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This 
+                                   parameter is ignored by device drivers, and is optional for bus 
+                                   drivers. For bus drivers, if this parameter is not NULL, then 
+                                   the bus driver must determine if the bus controller specified 
+                                   by ControllerHandle and the child controller specified 
+                                   by RemainingDevicePath are both supported by this 
+                                   bus driver.
+
+  @retval EFI_SUCCESS              The device specified by ControllerHandle and
+                                   RemainingDevicePath is supported by the driver specified by This.
+  @retval EFI_ALREADY_STARTED      The device specified by ControllerHandle and
+                                   RemainingDevicePath is already managed by the driver
+                                   specified by This.
+  @retval EFI_ACCESS_DENIED        The device specified by ControllerHandle and
+                                   RemainingDevicePath is already managed by a different
+                                   driver or an application that requires exclusive access.
+                                   Currently not implemented.
+  @retval EFI_UNSUPPORTED          The device specified by ControllerHandle and
+                                   RemainingDevicePath is not supported by the driver specified by This.
+**/
+EFI_STATUS
+EFIAPI
+IScsiIp6DriverBindingSupported (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
+  )
+{
+  return IScsiSupported (
+           This,
+           ControllerHandle,
+           RemainingDevicePath,
+           IP_VERSION_6
+           );
+}
+
+/**
+  Starts a device controller or a bus controller.
+
+  The Start() function is designed to be invoked from the EFI boot service ConnectController().
+  As a result, much of the error checking on the parameters to Start() has been moved into this 
+  common boot service. It is legal to call Start() from other locations, 
+  but the following calling restrictions must be followed or the system behavior will not be deterministic.
+  1. ControllerHandle must be a valid EFI_HANDLE.
+  2. If RemainingDevicePath is not NULL, then it must be a pointer to a naturally aligned
+     EFI_DEVICE_PATH_PROTOCOL.
+  3. Prior to calling Start(), the Supported() function for the driver specified by This must
+     have been called with the same calling parameters, and Supported() must have returned EFI_SUCCESS.  
+
+  @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param[in]  ControllerHandle     The handle of the controller to start. This handle 
+                                   must support a protocol interface that supplies 
+                                   an I/O abstraction to the driver.
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This 
+                                   parameter is ignored by device drivers, and is optional for bus 
+                                   drivers. For a bus driver, if this parameter is NULL, then handles 
+                                   for all the children of Controller are created by this driver.  
+                                   If this parameter is not NULL and the first Device Path Node is 
+                                   not the End of Device Path Node, then only the handle for the 
+                                   child device specified by the first Device Path Node of 
+                                   RemainingDevicePath is created by this driver.
+                                   If the first Device Path Node of RemainingDevicePath is 
+                                   the End of Device Path Node, no child handle is created by this
+                                   driver.
+
+  @retval EFI_SUCCESS              The device was started.
+  @retval EFI_DEVICE_ERROR         The device could not be started due to a device error. Currently not implemented.
+  @retval EFI_OUT_OF_RESOURCES     The request could not be completed due to a lack of resources.
+  @retval Others                   The driver failed to start the device.
+
+**/
+EFI_STATUS
+EFIAPI
+IScsiIp6DriverBindingStart (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
+  )
+{
+  EFI_STATUS        Status;
+
+  Status = IScsiStart (This->DriverBindingHandle, ControllerHandle, IP_VERSION_6);
+  if (Status == EFI_ALREADY_STARTED) {
+    Status = EFI_SUCCESS;
+  }
+
+  return Status;
+}
+
+/**
+  Stops a device controller or a bus controller.
+  
+  The Stop() function is designed to be invoked from the EFI boot service DisconnectController(). 
+  As a result, much of the error checking on the parameters to Stop() has been moved 
+  into this common boot service. It is legal to call Stop() from other locations, 
+  but the following calling restrictions must be followed or the system behavior will not be deterministic.
+  1. ControllerHandle must be a valid EFI_HANDLE that was used on a previous call to this
+     same driver's Start() function.
+  2. The first NumberOfChildren handles of ChildHandleBuffer must all be a valid
+     EFI_HANDLE. In addition, all of these handles must have been created in this driver's
+     Start() function, and the Start() function must have called OpenProtocol() on
+     ControllerHandle with an Attribute of EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER.
+  
+  @param[in]  This              A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param[in]  ControllerHandle  A handle to the device being stopped. The handle must 
+                                support a bus specific I/O protocol for the driver 
+                                to use to stop the device.
+  @param[in]  NumberOfChildren  The number of child device handles in ChildHandleBuffer.
+  @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL 
+                                if NumberOfChildren is 0.
+
+  @retval EFI_SUCCESS           The device was stopped.
+  @retval EFI_DEVICE_ERROR      The device could not be stopped due to a device error.
+
+**/
+EFI_STATUS
+EFIAPI
+IScsiIp6DriverBindingStop (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   ControllerHandle,
+  IN UINTN                        NumberOfChildren,
+  IN EFI_HANDLE                   *ChildHandleBuffer OPTIONAL
+  )
+{
+  return IScsiStop (
+           This,
+           ControllerHandle,
+           NumberOfChildren,
+           ChildHandleBuffer,
+           IP_VERSION_6
+           );
+}
 
 /**
   Unload the iSCSI driver.
@@ -1033,23 +1241,27 @@ IScsiUnload (
                   &DeviceHandleCount,
                   &DeviceHandleBuffer
                   );
-  if (!EFI_ERROR (Status)) {
-    for (Index = 0; Index < DeviceHandleCount; Index++) {
-      Status = gBS->DisconnectController (
-                      DeviceHandleBuffer[Index],
-                      ImageHandle,
-                      NULL
-                      );
-    }
-
-    if (DeviceHandleBuffer != NULL) {
-      FreePool (DeviceHandleBuffer);
-    }
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
+
+  for (Index = 0; Index < DeviceHandleCount; Index++) {
+    gBS->DisconnectController (
+           DeviceHandleBuffer[Index],
+           gIScsiIp4DriverBinding.DriverBindingHandle,
+           NULL
+           );
+    gBS->DisconnectController (
+           DeviceHandleBuffer[Index],
+           gIScsiIp6DriverBinding.DriverBindingHandle,
+           NULL
+           );
+  }
+
   //
   // Unload the iSCSI configuration form.
   //
-  IScsiConfigFormUnload (gIScsiDriverBinding.DriverBindingHandle);
+  IScsiConfigFormUnload (gIScsiIp4DriverBinding.DriverBindingHandle);
 
   //
   // Uninstall the protocols installed by iSCSI driver.
@@ -1066,18 +1278,31 @@ IScsiUnload (
     gIScsiControllerNameTable = NULL;
   }
   
-  return gBS->UninstallMultipleProtocolInterfaces (
-                ImageHandle,
-                &gEfiDriverBindingProtocolGuid,
-                &gIScsiDriverBinding,
-                &gEfiComponentName2ProtocolGuid,
-                &gIScsiComponentName2,
-                &gEfiComponentNameProtocolGuid,
-                &gIScsiComponentName,
-                &gEfiIScsiInitiatorNameProtocolGuid,
-                &gIScsiInitiatorName,
-                NULL
-                );
+  gBS->UninstallMultipleProtocolInterfaces (
+         gIScsiIp4DriverBinding.DriverBindingHandle,
+         &gEfiDriverBindingProtocolGuid,
+         &gIScsiIp4DriverBinding,
+         &gEfiComponentName2ProtocolGuid,
+         &gIScsiComponentName2,
+         &gEfiComponentNameProtocolGuid,
+         &gIScsiComponentName,
+         &gEfiIScsiInitiatorNameProtocolGuid,
+         &gIScsiInitiatorName,
+         NULL
+         );
+
+  gBS->UninstallMultipleProtocolInterfaces (
+         gIScsiIp6DriverBinding.DriverBindingHandle,
+         &gEfiDriverBindingProtocolGuid,
+         &gIScsiIp6DriverBinding,
+         &gEfiComponentName2ProtocolGuid,
+         &gIScsiComponentName2,
+         &gEfiComponentNameProtocolGuid,
+         &gIScsiComponentName,
+         NULL
+         );
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -1125,7 +1350,7 @@ IScsiDriverEntryPoint (
   Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
-             &gIScsiDriverBinding,
+             &gIScsiIp4DriverBinding,
              ImageHandle,
              &gIScsiComponentName,
              &gIScsiComponentName2
@@ -1134,6 +1359,18 @@ IScsiDriverEntryPoint (
     return Status;
   }
 
+  Status = EfiLibInstallDriverBindingComponentName2 (
+             ImageHandle,
+             SystemTable,
+             &gIScsiIp6DriverBinding,
+             NULL,
+             &gIScsiComponentName,
+             &gIScsiComponentName2
+             );
+  if (EFI_ERROR (Status)) {
+    goto Error1;
+  }
+  
   //
   // Install the iSCSI Initiator Name Protocol.
   //
@@ -1144,7 +1381,7 @@ IScsiDriverEntryPoint (
                   &gIScsiInitiatorName
                   );
   if (EFI_ERROR (Status)) {
-    goto Error1;
+    goto Error2;
   } 
 
   //
@@ -1153,7 +1390,7 @@ IScsiDriverEntryPoint (
   mPrivate = AllocateZeroPool (sizeof (ISCSI_PRIVATE_DATA));
   if (mPrivate == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
-    goto Error2;
+    goto Error3;
   }
 
   InitializeListHead (&mPrivate->NicInfoList);
@@ -1162,9 +1399,9 @@ IScsiDriverEntryPoint (
   //
   // Initialize the configuration form of iSCSI.
   //
-  Status = IScsiConfigFormInit (gIScsiDriverBinding.DriverBindingHandle);
+  Status = IScsiConfigFormInit (gIScsiIp4DriverBinding.DriverBindingHandle);
   if (EFI_ERROR (Status)) {
-    goto Error3;
+    goto Error4;
   }
 
   //
@@ -1184,19 +1421,19 @@ IScsiDriverEntryPoint (
                     &gIScsiAuthenticationInfo
                     );
     if (EFI_ERROR (Status)) {
-      goto Error4;
+      goto Error5;
     }    
   }
 
   return EFI_SUCCESS;
 
-Error4:
-  IScsiConfigFormUnload (gIScsiDriverBinding.DriverBindingHandle);
+Error5:
+  IScsiConfigFormUnload (gIScsiIp4DriverBinding.DriverBindingHandle);
 
-Error3:
+Error4:
   FreePool (mPrivate);
 
-Error2:
+Error3:
   gBS->UninstallMultipleProtocolInterfaces (
          ImageHandle,
          &gEfiIScsiInitiatorNameProtocolGuid,
@@ -1204,11 +1441,23 @@ Error2:
          NULL
          );
 
+Error2:
+  gBS->UninstallMultipleProtocolInterfaces (
+         gIScsiIp6DriverBinding.DriverBindingHandle,
+         &gEfiDriverBindingProtocolGuid,
+         &gIScsiIp6DriverBinding,
+         &gEfiComponentName2ProtocolGuid,
+         &gIScsiComponentName2,
+         &gEfiComponentNameProtocolGuid,
+         &gIScsiComponentName,
+         NULL
+         );
+
 Error1:
   gBS->UninstallMultipleProtocolInterfaces (
          ImageHandle,
          &gEfiDriverBindingProtocolGuid,
-         &gIScsiDriverBinding,
+         &gIScsiIp4DriverBinding,
          &gEfiComponentName2ProtocolGuid,
          &gIScsiComponentName2,
          &gEfiComponentNameProtocolGuid,

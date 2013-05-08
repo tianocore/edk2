@@ -66,10 +66,19 @@ SOCK_INIT_DATA                mTcpDefaultSockData = {
   NULL,
 };
 
-EFI_DRIVER_BINDING_PROTOCOL   gTcpDriverBinding = {
-  TcpDriverBindingSupported,
-  TcpDriverBindingStart,
-  TcpDriverBindingStop,
+EFI_DRIVER_BINDING_PROTOCOL   gTcp4DriverBinding = {
+  Tcp4DriverBindingSupported,
+  Tcp4DriverBindingStart,
+  Tcp4DriverBindingStop,
+  0xa,
+  NULL,
+  NULL
+};
+
+EFI_DRIVER_BINDING_PROTOCOL   gTcp6DriverBinding = {
+  Tcp6DriverBindingSupported,
+  Tcp6DriverBindingStart,
+  Tcp6DriverBindingStop,
   0xa,
   NULL,
   NULL
@@ -172,12 +181,37 @@ TcpDriverEntryPoint (
   Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
-             &gTcpDriverBinding,
+             &gTcp4DriverBinding,
              ImageHandle,
              &gTcpComponentName,
              &gTcpComponentName2
              );
   if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Install the TCP Driver Binding Protocol
+  //
+  Status = EfiLibInstallDriverBindingComponentName2 (
+             ImageHandle,
+             SystemTable,
+             &gTcp6DriverBinding,
+             NULL,
+             &gTcpComponentName,
+             &gTcpComponentName2
+             );
+  if (EFI_ERROR (Status)) {
+    gBS->UninstallMultipleProtocolInterfaces (
+           ImageHandle,
+           &gEfiDriverBindingProtocolGuid,
+           &gTcp4DriverBinding,
+           &gEfiComponentName2ProtocolGuid,
+           &gTcpComponentName2,
+           &gEfiComponentNameProtocolGuid,
+           &gTcpComponentName,
+           NULL
+           );
     return Status;
   }
 
@@ -496,14 +530,13 @@ TcpDestroyService (
 **/
 EFI_STATUS
 EFIAPI
-TcpDriverBindingSupported (
+Tcp4DriverBindingSupported (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   ControllerHandle,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   )
 {
   EFI_STATUS  Status;
-  BOOLEAN     IsTcp4Started;
 
   //
   // Test for the Tcp4ServiceBinding Protocol
@@ -516,58 +549,22 @@ TcpDriverBindingSupported (
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_TEST_PROTOCOL
                   );
-  if (EFI_ERROR (Status)) {
-    //
-    // Test for the Ip4ServiceBinding Protocol
-    //
-    Status = gBS->OpenProtocol (
-                    ControllerHandle,
-                    &gEfiIp4ServiceBindingProtocolGuid,
-                    NULL,
-                    This->DriverBindingHandle,
-                    ControllerHandle,
-                    EFI_OPEN_PROTOCOL_TEST_PROTOCOL
-                    );
-    if (!EFI_ERROR (Status)) {
-      return EFI_SUCCESS;
-    }
-
-    IsTcp4Started = FALSE;
-  } else {
-    IsTcp4Started = TRUE;
+  if (!EFI_ERROR (Status)) {
+    return EFI_ALREADY_STARTED;
   }
-
+  
   //
-  // Check the Tcp6ServiceBinding Protocol
+  // Test for the Ip4ServiceBinding Protocol
   //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
-                  &gEfiTcp6ServiceBindingProtocolGuid,
+                  &gEfiIp4ServiceBindingProtocolGuid,
                   NULL,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_TEST_PROTOCOL
                   );
-  if (EFI_ERROR (Status)) {
-    //
-    // Test for the Ip6ServiceBinding Protocol
-    //
-    Status = gBS->OpenProtocol (
-                    ControllerHandle,
-                    &gEfiIp6ServiceBindingProtocolGuid,
-                    NULL,
-                    This->DriverBindingHandle,
-                    ControllerHandle,
-                    EFI_OPEN_PROTOCOL_TEST_PROTOCOL
-                    );
-    if (!EFI_ERROR (Status)) {
-      return EFI_SUCCESS;
-    }
-  } else if (IsTcp4Started) {
-    return EFI_ALREADY_STARTED;
-  }
-
-  return EFI_UNSUPPORTED;
+  return Status;
 }
 
 /**
@@ -586,32 +583,20 @@ TcpDriverBindingSupported (
 **/
 EFI_STATUS
 EFIAPI
-TcpDriverBindingStart (
+Tcp4DriverBindingStart (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   ControllerHandle,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   )
 {
-  EFI_STATUS  Tcp4Status;
-  EFI_STATUS  Tcp6Status;
+  EFI_STATUS  Status;
 
-  Tcp4Status = TcpCreateService (ControllerHandle, This->DriverBindingHandle, IP_VERSION_4);
-  if ((Tcp4Status == EFI_ALREADY_STARTED) || (Tcp4Status == EFI_UNSUPPORTED)) {
-    Tcp4Status = EFI_SUCCESS;
+  Status = TcpCreateService (ControllerHandle, This->DriverBindingHandle, IP_VERSION_4);
+  if ((Status == EFI_ALREADY_STARTED) || (Status == EFI_UNSUPPORTED)) {
+    Status = EFI_SUCCESS;
   }
 
-  Tcp6Status = TcpCreateService (ControllerHandle, This->DriverBindingHandle, IP_VERSION_6);
-  if ((Tcp6Status == EFI_ALREADY_STARTED) || (Tcp6Status == EFI_UNSUPPORTED)) {
-    Tcp6Status = EFI_SUCCESS;
-  }
-
-  if (!EFI_ERROR (Tcp4Status) || !EFI_ERROR (Tcp6Status)) {
-    return EFI_SUCCESS;
-  } else if (EFI_ERROR (Tcp4Status)) {
-    return Tcp4Status;
-  } else {
-    return Tcp6Status;
-  }
+  return Status;
 }
 
 /**
@@ -631,37 +616,137 @@ TcpDriverBindingStart (
 **/
 EFI_STATUS
 EFIAPI
-TcpDriverBindingStop (
+Tcp4DriverBindingStop (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                   ControllerHandle,
   IN  UINTN                        NumberOfChildren,
   IN  EFI_HANDLE                   *ChildHandleBuffer OPTIONAL
   )
 {
-  EFI_STATUS  Tcp4Status;
-  EFI_STATUS  Tcp6Status;
+  return TcpDestroyService (
+           ControllerHandle,
+           This->DriverBindingHandle,
+           NumberOfChildren,
+           ChildHandleBuffer,
+           IP_VERSION_4
+           );
+}
 
-  Tcp4Status = TcpDestroyService (
-                 ControllerHandle,
-                 This->DriverBindingHandle,
-                 NumberOfChildren,
-                 ChildHandleBuffer,
-                 IP_VERSION_4
-                 );
+/**
+  Test to see if this driver supports ControllerHandle.
 
-  Tcp6Status = TcpDestroyService (
-                 ControllerHandle,
-                 This->DriverBindingHandle,
-                 NumberOfChildren,
-                 ChildHandleBuffer,
-                 IP_VERSION_6
-                 );
+  @param[in]  This                Protocol instance pointer.
+  @param[in]  ControllerHandle    Handle of device to test.
+  @param[in]  RemainingDevicePath Optional parameter use to pick a specific
+                                  child device to start.
 
-  if (EFI_ERROR (Tcp4Status) && EFI_ERROR (Tcp6Status)) {
-    return EFI_DEVICE_ERROR;
-  } else {
-    return EFI_SUCCESS;
+  @retval EFI_SUCCESS             This driver supports this device.
+  @retval EFI_ALREADY_STARTED     This driver is already running on this device.
+  @retval other                   This driver does not support this device.
+
+**/
+EFI_STATUS
+EFIAPI
+Tcp6DriverBindingSupported (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
+  )
+{
+  EFI_STATUS  Status;
+
+  //
+  // Test for the Tcp6ServiceBinding Protocol
+  //
+  Status = gBS->OpenProtocol (
+                  ControllerHandle,
+                  &gEfiTcp6ServiceBindingProtocolGuid,
+                  NULL,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+                  );
+  if (!EFI_ERROR (Status)) {
+    return EFI_ALREADY_STARTED;
   }
+  
+  //
+  // Test for the Ip6ServiceBinding Protocol
+  //
+  Status = gBS->OpenProtocol (
+                  ControllerHandle,
+                  &gEfiIp6ServiceBindingProtocolGuid,
+                  NULL,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+                  );
+  return Status;
+}
+
+/**
+  Start this driver on ControllerHandle.
+
+  @param[in]  This                   Protocol instance pointer.
+  @param[in]  ControllerHandle       Handle of device to bind driver to.
+  @param[in]  RemainingDevicePath    Optional parameter use to pick a specific child
+                                     device to start.
+
+  @retval EFI_SUCCESS            The driver is added to ControllerHandle.
+  @retval EFI_OUT_OF_RESOURCES   There are not enough resources to start the
+                                 driver.
+  @retval other                  The driver cannot be added to ControllerHandle.
+
+**/
+EFI_STATUS
+EFIAPI
+Tcp6DriverBindingStart (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = TcpCreateService (ControllerHandle, This->DriverBindingHandle, IP_VERSION_6);
+  if ((Status == EFI_ALREADY_STARTED) || (Status == EFI_UNSUPPORTED)) {
+    Status = EFI_SUCCESS;
+  }
+
+  return Status;
+}
+
+/**
+  Stop this driver on ControllerHandle.
+
+  @param[in]  This              A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param[in]  ControllerHandle  A handle to the device being stopped. The handle must
+                                support a bus specific I/O protocol for the driver
+                                to use to stop the device.
+  @param[in]  NumberOfChildren  The number of child device handles in ChildHandleBuffer.
+  @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL
+                                if NumberOfChildren is 0.
+
+  @retval EFI_SUCCESS           The device was stopped.
+  @retval EFI_DEVICE_ERROR      The device could not be stopped due to a device error.
+
+**/
+EFI_STATUS
+EFIAPI
+Tcp6DriverBindingStop (
+  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  UINTN                        NumberOfChildren,
+  IN  EFI_HANDLE                   *ChildHandleBuffer OPTIONAL
+  )
+{
+  return TcpDestroyService (
+           ControllerHandle,
+           This->DriverBindingHandle,
+           NumberOfChildren,
+           ChildHandleBuffer,
+           IP_VERSION_6
+           );
 }
 
 /**
@@ -903,7 +988,7 @@ TcpServiceBindingDestroyChild (
                   ChildHandle,
                   &gEfiTcp4ProtocolGuid,
                   &Tcp,
-                  gTcpDriverBinding.DriverBindingHandle,
+                  gTcp4DriverBinding.DriverBindingHandle,
                   ChildHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
@@ -915,7 +1000,7 @@ TcpServiceBindingDestroyChild (
                     ChildHandle,
                     &gEfiTcp6ProtocolGuid,
                     &Tcp,
-                    gTcpDriverBinding.DriverBindingHandle,
+                    gTcp6DriverBinding.DriverBindingHandle,
                     ChildHandle,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
                     );

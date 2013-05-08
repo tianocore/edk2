@@ -1,7 +1,7 @@
 /** @file
   The prototype of driver binding and service binding protocol for TCP driver.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -90,7 +90,7 @@ TcpDriverEntryPoint (
 **/
 EFI_STATUS
 EFIAPI
-TcpDriverBindingSupported (
+Tcp4DriverBindingSupported (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   ControllerHandle,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
@@ -112,7 +112,7 @@ TcpDriverBindingSupported (
 **/
 EFI_STATUS
 EFIAPI
-TcpDriverBindingStart (
+Tcp4DriverBindingStart (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   ControllerHandle,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
@@ -135,7 +135,74 @@ TcpDriverBindingStart (
 **/
 EFI_STATUS
 EFIAPI
-TcpDriverBindingStop (
+Tcp4DriverBindingStop (
+  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  UINTN                        NumberOfChildren,
+  IN  EFI_HANDLE                   *ChildHandleBuffer OPTIONAL
+  );
+
+/**
+  Test to see if this driver supports ControllerHandle.
+
+  @param[in]  This                Protocol instance pointer.
+  @param[in]  ControllerHandle    Handle of the device to test.
+  @param[in]  RemainingDevicePath Optional parameter use to pick a specific
+                                  child device to start.
+
+  @retval EFI_SUCCESS             This driver supports this device.
+  @retval EFI_ALREADY_STARTED     This driver is already running on this device.
+  @retval other                   This driver does not support this device.
+
+**/
+EFI_STATUS
+EFIAPI
+Tcp6DriverBindingSupported (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
+  );
+
+/**
+  Start this driver on ControllerHandle.
+
+  @param[in]  This                   Protocol instance pointer.
+  @param[in]  ControllerHandle       Handle of device to bind driver to.
+  @param[in]  RemainingDevicePath    Optional parameter use to pick a specific child
+                                     device to start.
+
+  @retval EFI_SUCCESS            The driver was added to ControllerHandle.
+  @retval EFI_OUT_OF_RESOURCES   There are not enough resources to start the
+                                 driver.
+  @retval other                  The driver cannot be added to ControllerHandle.
+
+**/
+EFI_STATUS
+EFIAPI
+Tcp6DriverBindingStart (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
+  );
+
+/**
+  Stop this driver on ControllerHandle.
+
+  @param[in]  This              A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param[in]  ControllerHandle  A handle to the device being stopped. The handle must
+                                support a bus specific I/O protocol for the driver
+                                to use to stop the device.
+  @param[in]  NumberOfChildren  The number of child device handles in ChildHandleBuffer.
+  @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL
+                                if NumberOfChildren is 0.
+
+  @retval EFI_SUCCESS           The device was stopped.
+  @retval EFI_DEVICE_ERROR      The device could not be stopped due to a device error.
+
+**/
+EFI_STATUS
+EFIAPI
+Tcp6DriverBindingStop (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                   ControllerHandle,
   IN  UINTN                        NumberOfChildren,
