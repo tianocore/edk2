@@ -19,7 +19,7 @@
 #include "Ia32/DebugException.h"
 
 CHAR8 mErrorMsgVersionAlert[]       = "\rThe SourceLevelDebugPkg you are using requires a newer version of the Intel(R) UDK Debugger Tool.\r\n";
-CHAR8 mErrorMsgSendInitPacket[]     = "\rSend INIT break packet and try to connect the HOST (Intel(R) UDK Debugger Tool v1.3) ...\r\n";
+CHAR8 mErrorMsgSendInitPacket[]     = "\rSend INIT break packet and try to connect the HOST (Intel(R) UDK Debugger Tool v1.3.1) ...\r\n";
 CHAR8 mErrorMsgConnectOK[]          = "HOST connection is successful!\r\n";
 CHAR8 mErrorMsgConnectFail[]        = "HOST connection is failed!\r\n";
 CHAR8 mWarningMsgIngoreBreakpoint[] = "Ignore break point in SMM for SMI issued during DXE debugging!\r\n";
