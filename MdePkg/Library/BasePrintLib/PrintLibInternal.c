@@ -517,6 +517,9 @@ BasePrintLibSPrintMarker (
         if (sizeof (VOID *) > 4) {
           Flags |= LONG_TYPE;
         }
+        //
+        // break skipped on purpose
+        //
       case 'X':
         Flags |= PREFIX_ZERO;
         //

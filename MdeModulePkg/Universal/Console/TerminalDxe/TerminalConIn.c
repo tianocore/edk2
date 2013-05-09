@@ -369,7 +369,7 @@ TerminalConInRegisterKeyNotify (
   NewNotify->Signature         = TERMINAL_CONSOLE_IN_EX_NOTIFY_SIGNATURE;
   NewNotify->KeyNotificationFn = KeyNotificationFunction;
   NewNotify->NotifyHandle      = (EFI_HANDLE) NewNotify;
-  CopyMem (&NewNotify->KeyData, KeyData, sizeof (KeyData));
+  CopyMem (&NewNotify->KeyData, KeyData, sizeof (EFI_KEY_DATA));
   InsertTailList (&TerminalDevice->NotifyList, &NewNotify->NotifyEntry);
 
   *NotifyHandle                = NewNotify->NotifyHandle;
@@ -1458,6 +1458,7 @@ UnicodeToEfiKey (
           if (TerminalDevice->TerminalType == PCANSITYPE) {
             Key.ScanCode = SCAN_F10;
           }
+          break;
         case '?':
           if (TerminalDevice->TerminalType == VT100TYPE) {
             Key.ScanCode = SCAN_PAGE_UP;
@@ -1472,6 +1473,7 @@ UnicodeToEfiKey (
           if (TerminalDevice->TerminalType == PCANSITYPE) {
             Key.ScanCode = SCAN_F9;
           }
+          break;
         case '/':
           if (TerminalDevice->TerminalType == VT100TYPE) {
             Key.ScanCode = SCAN_PAGE_DOWN;

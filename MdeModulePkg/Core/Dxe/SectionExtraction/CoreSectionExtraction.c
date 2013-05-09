@@ -66,6 +66,11 @@ typedef struct {
   //
   UINTN                       EncapsulatedStreamHandle;
   EFI_GUID                    *EncapsulationGuid;
+  //
+  // If the section REQUIRES an extraction protocol, register for RPN 
+  // when the required GUIDed extraction protocol becomes available.
+  //
+  EFI_EVENT                   Event;
 } CORE_SECTION_CHILD_NODE;
 
 #define CORE_SECTION_STREAM_SIGNATURE SIGNATURE_32('S','X','S','S')
@@ -91,7 +96,6 @@ typedef struct {
   CORE_SECTION_CHILD_NODE     *ChildNode;
   CORE_SECTION_STREAM_NODE    *ParentStream;
   VOID                        *Registration;
-  EFI_EVENT                   Event;
 } RPN_EVENT_CONTEXT;
 
 
@@ -604,6 +608,7 @@ NotifyGuidedExtraction (
   //  Close the event when done.
   //
   gBS->CloseEvent (Event);
+  Context->ChildNode->Event = NULL;
   FreePool (Context);
 }  
 
@@ -631,13 +636,13 @@ CreateGuidedExtractionRpnEvent (
   Context->ChildNode = ChildNode;
   Context->ParentStream = ParentStream;
  
-  Context->Event = EfiCreateProtocolNotifyEvent (
-                    Context->ChildNode->EncapsulationGuid,
-                    TPL_NOTIFY,
-                    NotifyGuidedExtraction,
-                    Context,
-                    &Context->Registration
-                    );
+  Context->ChildNode->Event = EfiCreateProtocolNotifyEvent (
+                                Context->ChildNode->EncapsulationGuid,
+                                TPL_NOTIFY,
+                                NotifyGuidedExtraction,
+                                Context,
+                                &Context->Registration
+                                );
 }
 
 /**
@@ -692,7 +697,7 @@ CreateChildNode (
   //
   // Allocate a new node
   //
-  *ChildNode = AllocatePool (sizeof (CORE_SECTION_CHILD_NODE));
+  *ChildNode = AllocateZeroPool (sizeof (CORE_SECTION_CHILD_NODE));
   Node = *ChildNode;
   if (Node == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -1334,6 +1339,11 @@ FreeChildNode (
     //
     CloseSectionStream (ChildNode->EncapsulatedStreamHandle);
   }
+
+  if (ChildNode->Event != NULL) {
+    gBS->CloseEvent (ChildNode->Event);
+  }
+
   //
   // Last, free the child node itself
   //

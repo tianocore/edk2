@@ -405,7 +405,7 @@ SmmLoadImage (
   
   if (EFI_ERROR (Status)) {
     if (Buffer != NULL) {
-      Status = gBS->FreePool (Buffer);
+      gBS->FreePool (Buffer);
     }
     return Status;
   }
@@ -453,7 +453,7 @@ SmmLoadImage (
   Status = PeCoffLoaderGetImageInfo (&ImageContext);
   if (EFI_ERROR (Status)) {
     if (Buffer != NULL) {
-      Status = gBS->FreePool (Buffer);
+      gBS->FreePool (Buffer);
     }
     return Status;
   }
@@ -489,7 +489,7 @@ SmmLoadImage (
                    );
        if (EFI_ERROR (Status)) {
          if (Buffer != NULL) {
-           Status = gBS->FreePool (Buffer);
+           gBS->FreePool (Buffer);
          } 
          return Status;
        }     
@@ -507,7 +507,7 @@ SmmLoadImage (
                   );
      if (EFI_ERROR (Status)) {
        if (Buffer != NULL) {
-         Status = gBS->FreePool (Buffer);
+         gBS->FreePool (Buffer);
        }
        return Status;
      }
@@ -526,7 +526,7 @@ SmmLoadImage (
   Status = PeCoffLoaderLoadImage (&ImageContext);
   if (EFI_ERROR (Status)) {
     if (Buffer != NULL) {
-      Status = gBS->FreePool (Buffer);
+      gBS->FreePool (Buffer);
     }
     SmmFreePages (DstBuffer, PageCount);
     return Status;
@@ -538,7 +538,7 @@ SmmLoadImage (
   Status = PeCoffLoaderRelocateImage (&ImageContext);
   if (EFI_ERROR (Status)) {
     if (Buffer != NULL) {
-      Status = gBS->FreePool (Buffer);
+      gBS->FreePool (Buffer);
     }
     SmmFreePages (DstBuffer, PageCount);
     return Status;
@@ -562,7 +562,7 @@ SmmLoadImage (
   Status = gBS->AllocatePool (EfiBootServicesData, sizeof (EFI_LOADED_IMAGE_PROTOCOL), (VOID **)&DriverEntry->LoadedImage);
   if (EFI_ERROR (Status)) {
     if (Buffer != NULL) {
-      Status = gBS->FreePool (Buffer);
+      gBS->FreePool (Buffer);
     }
     SmmFreePages (DstBuffer, PageCount);
     return Status;
@@ -583,7 +583,7 @@ SmmLoadImage (
   Status = gBS->AllocatePool (EfiBootServicesData, GetDevicePathSize (FilePath), (VOID **)&DriverEntry->LoadedImage->FilePath);
   if (EFI_ERROR (Status)) {
     if (Buffer != NULL) {
-      Status = gBS->FreePool (Buffer);
+      gBS->FreePool (Buffer);
     }
     SmmFreePages (DstBuffer, PageCount);
     return Status;
