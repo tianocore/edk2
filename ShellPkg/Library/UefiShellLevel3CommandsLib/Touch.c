@@ -38,7 +38,11 @@ TouchFileByHandle (
     return (EFI_ACCESS_DENIED);
   }
   Status = gRT->GetTime(&FileInfo->ModificationTime, NULL);
-  ASSERT_EFI_ERROR(Status);
+  if (EFI_ERROR(Status)) {
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"gRT->GetTime", Status);
+    return (SHELL_DEVICE_ERROR);
+  }
+
   CopyMem(&FileInfo->LastAccessTime, &FileInfo->ModificationTime, sizeof(EFI_TIME));
 
   Status = gEfiShellProtocol->SetFileInfo(Handle, FileInfo);
