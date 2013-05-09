@@ -1,7 +1,7 @@
 /** @file
   DevicePathToText protocol as defined in the UEFI 2.0 specification.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -234,23 +234,26 @@ DevPathToTextVendor (
           ((SAS_DEVICE_PATH *) Vendor)->RelativeTargetPort
           );
         Info = (((SAS_DEVICE_PATH *) Vendor)->DeviceTopology);
-        if ((Info & 0x0f) == 0) {
+        if (((Info & 0x0f) == 0) && ((Info & BIT7) == 0)) {
           CatPrint (Str, L"NoTopology,0,0,0,");
-        } else if (((Info & 0x0f) == 1) || ((Info & 0x0f) == 2)) {
+        } else if (((Info & 0x0f) <= 2) && ((Info & BIT7) == 0)) {
           CatPrint (
             Str,
             L"%s,%s,%s,",
-            ((Info & (0x1 << 4)) != 0) ? L"SATA" : L"SAS",
-            ((Info & (0x1 << 5)) != 0) ? L"External" : L"Internal",
-            ((Info & (0x1 << 6)) != 0) ? L"Expanded" : L"Direct"
+            ((Info & BIT4) != 0) ? L"SATA" : L"SAS",
+            ((Info & BIT5) != 0) ? L"External" : L"Internal",
+            ((Info & BIT6) != 0) ? L"Expanded" : L"Direct"
             );
           if ((Info & 0x0f) == 1) {
             CatPrint (Str, L"0,");
           } else {
-            CatPrint (Str, L"0x%x,", (Info >> 8) & 0xff);
+            //
+            // Value 0x0 thru 0xFF -> Drive 1 thru Drive 256
+            //
+            CatPrint (Str, L"0x%x,", ((Info >> 8) & 0xff) + 1);
           }
         } else {
-          CatPrint (Str, L"0,0,0,0,");
+          CatPrint (Str, L"0x%x,0,0,0,", Info);
         }
 
         CatPrint (Str, L"0x%x)", ((SAS_DEVICE_PATH *) Vendor)->Reserved);
@@ -689,23 +692,26 @@ DevPathToTextSasEx (
   }
   CatPrint (Str, L",0x%x,", SasEx->RelativeTargetPort);
 
-  if ((SasEx->DeviceTopology & 0x0f) == 0) {
+  if (((SasEx->DeviceTopology & 0x0f) == 0) && ((SasEx->DeviceTopology & BIT7) == 0)) {
     CatPrint (Str, L"NoTopology,0,0,0");
-  } else if (((SasEx->DeviceTopology & 0x0f) == 1) || ((SasEx->DeviceTopology & 0x0f) == 2)) {
+  } else if (((SasEx->DeviceTopology & 0x0f) <= 2) && ((SasEx->DeviceTopology & BIT7) == 0)) {
     CatPrint (
       Str,
       L"%s,%s,%s,",
-      ((SasEx->DeviceTopology & (0x1 << 4)) != 0) ? L"SATA" : L"SAS",
-      ((SasEx->DeviceTopology & (0x1 << 5)) != 0) ? L"External" : L"Internal",
-      ((SasEx->DeviceTopology & (0x1 << 6)) != 0) ? L"Expanded" : L"Direct"
+      ((SasEx->DeviceTopology & BIT4) != 0) ? L"SATA" : L"SAS",
+      ((SasEx->DeviceTopology & BIT5) != 0) ? L"External" : L"Internal",
+      ((SasEx->DeviceTopology & BIT6) != 0) ? L"Expanded" : L"Direct"
       );
     if ((SasEx->DeviceTopology & 0x0f) == 1) {
       CatPrint (Str, L"0");
     } else {
-      CatPrint (Str, L"0x%x", (SasEx->DeviceTopology >> 8) & 0xff);
+      //
+      // Value 0x0 thru 0xFF -> Drive 1 thru Drive 256
+      //
+      CatPrint (Str, L"0x%x", ((SasEx->DeviceTopology >> 8) & 0xff) + 1);
     }
   } else {
-    CatPrint (Str, L"0,0,0,0");
+    CatPrint (Str, L"0x%x,0,0,0", SasEx->DeviceTopology);
   }
 
   CatPrint (Str, L")");

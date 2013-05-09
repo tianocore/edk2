@@ -58,6 +58,7 @@
   PrintLib
   HiiLib
   DevicePathLib
+  PcdLib
 
 [Guids]
   gEfiIfrTianoGuid                              ## CONSUMES  ## GUID

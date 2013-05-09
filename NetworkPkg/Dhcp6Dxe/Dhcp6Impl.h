@@ -249,6 +249,10 @@ struct _DHCP6_INSTANCE {
   volatile EFI_STATUS           UdpSts;
   BOOLEAN                       InDestroy;
   BOOLEAN                       MediaPresent;
+  //
+  // StartTime is used to calculate the 'elapsed-time' option. Refer to RFC3315,
+  // the elapsed-time is amount of time since the client began its current DHCP transaction. 
+  //
   UINT64                        StartTime;
 };
 

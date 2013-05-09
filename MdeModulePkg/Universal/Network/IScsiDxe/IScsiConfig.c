@@ -1,7 +1,7 @@
 /** @file
   Helper functions for configuring or getting the parameters relating to iSCSI.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -94,7 +94,7 @@ IScsiParseIsIdFromString (
   if (StrLen (IsIdStr) != 6) {
     UnicodeSPrint (
       PortString,
-      (UINTN) ISCSI_NAME_IFR_MAX_SIZE,
+      (UINTN) sizeof (PortString),
       L"Error! Input is incorrect, please input 6 hex numbers!\n"
       );
 
@@ -700,7 +700,7 @@ IScsiFormCallback (
       ConfigFormEntry = IScsiGetConfigFormEntryByIndex ((UINT32) (QuestionId - KEY_DEVICE_ENTRY_BASE));
       ASSERT (ConfigFormEntry != NULL);
 
-      UnicodeSPrint (PortString, (UINTN) 128, L"Port %s", ConfigFormEntry->MacString);
+      UnicodeSPrint (PortString, (UINTN) sizeof (PortString), L"Port %s", ConfigFormEntry->MacString);
       DeviceFormTitleToken = (EFI_STRING_ID) STR_ISCSI_DEVICE_FORM_TITLE;
       HiiSetString (Private->RegisteredHandle, DeviceFormTitleToken, PortString, NULL);
 
@@ -1034,13 +1034,13 @@ IScsiConfigUpdateForm (
       //
       // Compose the Port string and create a new EFI_STRING_ID.
       //
-      UnicodeSPrint (PortString, 128, L"Port %s", ConfigFormEntry->MacString);
+      UnicodeSPrint (PortString, sizeof (PortString), L"Port %s", ConfigFormEntry->MacString);
       ConfigFormEntry->PortTitleToken = HiiSetString (mCallbackInfo->RegisteredHandle, 0, PortString, NULL);
 
       //
       // Compose the help string of this port and create a new EFI_STRING_ID.
       //
-      UnicodeSPrint (PortString, 128, L"Set the iSCSI parameters on port %s", ConfigFormEntry->MacString);
+      UnicodeSPrint (PortString, sizeof (PortString), L"Set the iSCSI parameters on port %s", ConfigFormEntry->MacString);
       ConfigFormEntry->PortTitleHelpToken = HiiSetString (mCallbackInfo->RegisteredHandle, 0, PortString, NULL);
 
       InsertTailList (&mIScsiConfigFormList, &ConfigFormEntry->Link);

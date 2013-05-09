@@ -24,7 +24,6 @@
 #include <Library/BaseLib.h>
 #include <Library/SynchronizationLib.h>
 #include <Library/DebugLib.h>
-#include <Library/PcdLib.h>
 #include <Library/HobLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>

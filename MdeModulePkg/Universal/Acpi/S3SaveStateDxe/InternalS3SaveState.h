@@ -25,7 +25,6 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/S3BootScriptLib.h>
-#include <Library/PcdLib.h>
 #include <Library/SmbusLib.h>
 #include <IndustryStandard/SmBus.h>
 /**

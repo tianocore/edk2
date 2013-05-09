@@ -389,7 +389,10 @@ GetPeCoffImageFixLoadingAssignedAddress(
      if (EFI_ERROR (Status)) {
        return Status;
      }
-     
+     if (Size != sizeof (EFI_IMAGE_SECTION_HEADER)) {
+       return EFI_NOT_FOUND;
+     }
+
      Status = EFI_NOT_FOUND;
      
      if ((SectionHeader.Characteristics & EFI_IMAGE_SCN_CNT_CODE) == 0) {
@@ -1079,7 +1082,10 @@ CoreLoadImageCommon (
   if (SourceBuffer != NULL) {
     FHand.Source     = SourceBuffer;
     FHand.SourceSize = SourceSize;
-    CoreLocateDevicePath (&gEfiDevicePathProtocolGuid, &HandleFilePath, &DeviceHandle);
+    Status = CoreLocateDevicePath (&gEfiDevicePathProtocolGuid, &HandleFilePath, &DeviceHandle);
+    if (EFI_ERROR (Status)) {
+      DeviceHandle = NULL;
+    }
     if (SourceSize > 0) {
       Status = EFI_SUCCESS;
     } else {
@@ -1125,11 +1131,9 @@ CoreLoadImageCommon (
     }
   }
 
-  if (Status == EFI_ALREADY_STARTED) {
+  if (EFI_ERROR (Status)) {
     Image = NULL;
     goto Done;
-  } else if (EFI_ERROR (Status)) {
-    return Status;
   }
 
   if (gSecurity2 != NULL) {
@@ -1191,7 +1195,8 @@ CoreLoadImageCommon (
   //
   Image = AllocateZeroPool (sizeof(LOADED_IMAGE_PRIVATE_DATA));
   if (Image == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Done;
   }
 
   //

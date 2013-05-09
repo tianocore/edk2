@@ -4,7 +4,7 @@
 # for Atapi CD ROM device.
 #
 # This module discovers CDROM devices in Legacy and native mode and installs block IO ppis for them.
-# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions
@@ -51,6 +51,7 @@
   TimerLib
   PeiServicesTablePointerLib
   MemoryAllocationLib
+  PcdLib
 
 [Ppis]
   gPeiAtaControllerPpiGuid                      # PPI ALWAYS_CONSUMED

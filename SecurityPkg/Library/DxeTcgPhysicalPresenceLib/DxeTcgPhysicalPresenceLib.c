@@ -8,7 +8,7 @@
 
   ExecutePendingTpmRequest() will receive untrusted input and do validation.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -1010,13 +1010,6 @@ ExecutePendingTpmRequest (
   UINTN                             DataSize;
   BOOLEAN                           RequestConfirmed;
 
-  if (TcgPpData->PPRequest == PHYSICAL_PRESENCE_NO_ACTION) {
-    //
-    // No operation request
-    //
-    return;
-  }
-
   if (!HaveValidTpmRequest(TcgPpData, &RequestConfirmed)) {
     //
     // Invalid operation request.
@@ -1164,6 +1157,13 @@ TcgPhysicalPresenceLibProcessRequest (
   }
 
   DEBUG ((EFI_D_INFO, "[TPM] Flags=%x, PPRequest=%x\n", TcgPpData.Flags, TcgPpData.PPRequest));
+
+  if (TcgPpData.PPRequest == PHYSICAL_PRESENCE_NO_ACTION) {
+    //
+    // No operation request
+    //
+    return;
+  }
 
   Status = GetTpmCapability (TcgProtocol, &LifetimeLock, &CmdEnable);
   if (EFI_ERROR (Status)) {

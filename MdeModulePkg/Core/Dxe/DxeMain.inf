@@ -92,6 +92,7 @@
   TimerLib
   DxeServicesLib
   DebugAgentLib
+  PcdLib
 
 [Guids]
   gEfiEventMemoryMapChangeGuid                  ## CONSUMES ## Event

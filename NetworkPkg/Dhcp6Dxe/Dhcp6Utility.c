@@ -647,6 +647,75 @@ Dhcp6AppendOption (
   return Buf;
 }
 
+/**
+  Append the appointed IA Address option to Buf, and move Buf to the end.
+
+  @param[in, out] Buf           The pointer to the position to append.
+  @param[in]      IaAddr        The pointer to the IA Address.
+  @param[in]      MessageType   Message type of DHCP6 package.
+
+  @return         Buf           The position to append the next option.
+
+**/
+UINT8 *
+Dhcp6AppendIaAddrOption (
+  IN OUT UINT8                  *Buf,
+  IN     EFI_DHCP6_IA_ADDRESS   *IaAddr,
+  IN     UINT32                 MessageType
+)
+{
+
+  //  The format of the IA Address option is:
+  //
+  //       0                   1                   2                   3
+  //       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+  //      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  //      |          OPTION_IAADDR        |          option-len           |
+  //      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  //      |                                                               |
+  //      |                         IPv6 address                          |
+  //      |                                                               |
+  //      |                                                               |
+  //      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  //      |                      preferred-lifetime                       |
+  //      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  //      |                        valid-lifetime                         |
+  //      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  //      .                                                               .
+  //      .                        IAaddr-options                         .
+  //      .                                                               .
+  //      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  
+  //
+  // Fill the value of Ia Address option type
+  //
+  WriteUnaligned16 ((UINT16 *) Buf, HTONS (Dhcp6OptIaAddr));
+  Buf                     += 2;
+
+  WriteUnaligned16 ((UINT16 *) Buf, HTONS (sizeof (EFI_DHCP6_IA_ADDRESS)));
+  Buf                     += 2;
+
+  CopyMem (Buf, &IaAddr->IpAddress, sizeof(EFI_IPv6_ADDRESS));
+  Buf                     += sizeof(EFI_IPv6_ADDRESS);
+
+  //
+  // Fill the value of preferred-lifetime and valid-lifetime.
+  // According to RFC3315 Chapter 18.1.2, the preferred-lifetime and valid-lifetime fields
+  // should set to 0 when initiate a Confirm message.
+  //
+  if (MessageType != Dhcp6MsgConfirm) {
+    WriteUnaligned32 ((UINT32 *) Buf, HTONL (IaAddr->PreferredLifetime));
+  }
+  Buf                     += 4;
+
+  if (MessageType != Dhcp6MsgConfirm) {
+    WriteUnaligned32 ((UINT32 *) Buf, HTONL (IaAddr->ValidLifetime));
+  }
+  Buf                     += 4;
+
+  return Buf;
+}
+
 
 /**
   Append the appointed Ia option to Buf, and move Buf to the end.
@@ -655,6 +724,7 @@ Dhcp6AppendOption (
   @param[in]      Ia            The pointer to the Ia.
   @param[in]      T1            The time of T1.
   @param[in]      T2            The time of T2.
+  @param[in]      MessageType   Message type of DHCP6 package.
 
   @return         Buf           The position to append the next Ia option.
 
@@ -664,13 +734,13 @@ Dhcp6AppendIaOption (
   IN OUT UINT8                  *Buf,
   IN     EFI_DHCP6_IA           *Ia,
   IN     UINT32                 T1,
-  IN     UINT32                 T2
+  IN     UINT32                 T2,
+  IN     UINT32                 MessageType
   )
 {
   UINT8                     *AddrOpt;
   UINT16                    *Len;
   UINTN                     Index;
-  UINT16                    Length;
 
   //
   //  The format of IA_NA and IA_TA option:
@@ -713,9 +783,9 @@ Dhcp6AppendIaOption (
   // Fill the value of t1 and t2 if iana, keep it 0xffffffff if no specified.
   //
   if (Ia->Descriptor.Type == Dhcp6OptIana) {
-    WriteUnaligned32 ((UINT32 *) Buf, ((T1 != 0) ? T1 : 0xffffffff));
+    WriteUnaligned32 ((UINT32 *) Buf, HTONL ((T1 != 0) ? T1 : 0xffffffff));
     Buf                   += 4;
-    WriteUnaligned32 ((UINT32 *) Buf, ((T2 != 0) ? T2 : 0xffffffff));
+    WriteUnaligned32 ((UINT32 *) Buf, HTONL ((T2 != 0) ? T2 : 0xffffffff));
     Buf                   += 4;
   }
 
@@ -723,15 +793,8 @@ Dhcp6AppendIaOption (
   // Fill all the addresses belong to the Ia
   //
   for (Index = 0; Index < Ia->IaAddressCount; Index++) {
-
-     AddrOpt = (UINT8 *) Ia->IaAddress + Index * sizeof (EFI_DHCP6_IA_ADDRESS);
-     Length  = HTONS ((UINT16) sizeof (EFI_DHCP6_IA_ADDRESS));
-     Buf     = Dhcp6AppendOption (
-                 Buf,
-                 HTONS (Dhcp6OptIaAddr),
-                 Length,
-                 AddrOpt
-                 );
+    AddrOpt = (UINT8 *) Ia->IaAddress + Index * sizeof (EFI_DHCP6_IA_ADDRESS);
+    Buf = Dhcp6AppendIaAddrOption (Buf, (EFI_DHCP6_IA_ADDRESS *) AddrOpt, MessageType);
   }
 
   //
@@ -827,7 +890,7 @@ SetElapsedTime (
 
   //
   // Sentinel value of 0 means that this is the first DHCP packet that we are
-  // sending and that we need to initialize the value.  First DHCP Solicit
+  // sending and that we need to initialize the value.  First DHCP message
   // gets 0 elapsed-time.  Otherwise, calculate based on StartTime.
   //
   if (Instance->StartTime == 0) {
@@ -934,10 +997,39 @@ Dhcp6SeekIaOption (
   return Option;
 }
 
+/**
+  Check whether the incoming IPv6 address in IaAddr is one of the maintained 
+  addresses in the IA control blcok.
+
+  @param[in]  IaAddr            The pointer to the IA Address to be checked.
+  @param[in]  CurrentIa         The pointer to the IA in IA control block.
+
+  @retval     TRUE              Yes, this Address is already in IA control block.
+  @retval     FALSE             No, this Address is NOT in IA control block.
+
+**/
+BOOLEAN
+Dhcp6AddrIsInCurrentIa (
+  IN    EFI_DHCP6_IA_ADDRESS      *IaAddr,
+  IN    EFI_DHCP6_IA              *CurrentIa
+  )
+{
+  UINT32    Index;
+
+  ASSERT (IaAddr != NULL && CurrentIa != NULL);
+  
+  for (Index = 0; Index < CurrentIa->IaAddressCount; Index++) {
+    if (EFI_IP6_EQUAL(&IaAddr->IpAddress, &CurrentIa->IaAddress[Index].IpAddress)) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
 
 /**
   Parse the address option and update the address infomation.
 
+  @param[in]      CurrentIa     The pointer to the Ia Address in control blcok.
   @param[in]      IaInnerOpt    The pointer to the buffer.
   @param[in]      IaInnerLen    The length to parse.
   @param[out]     AddrNum       The number of addresses.
@@ -946,6 +1038,7 @@ Dhcp6SeekIaOption (
 **/
 VOID
 Dhcp6ParseAddrOption (
+  IN     EFI_DHCP6_IA            *CurrentIa,
   IN     UINT8                   *IaInnerOpt,
   IN     UINT16                  IaInnerLen,
      OUT UINT32                  *AddrNum,
@@ -956,6 +1049,8 @@ Dhcp6ParseAddrOption (
   UINT16                      DataLen;
   UINT16                      OpCode;
   UINT32                      ValidLt;
+  UINT32                      PreferredLt;
+  EFI_DHCP6_IA_ADDRESS        *IaAddr;
 
   //
   //  The format of the IA Address option:
@@ -992,19 +1087,21 @@ Dhcp6ParseAddrOption (
 
   while (Cursor < IaInnerOpt + IaInnerLen) {
     //
-    // Count the Ia address option with non-0 valid time.
+    // Refer to RFC3315 Chapter 18.1.8, we need to update lifetimes for any addresses in the IA option
+    // that the client already has recorded in the IA, and discard the Ia address option with 0 valid time.
     //
     OpCode  = ReadUnaligned16 ((UINT16 *) Cursor);
-    ValidLt = ReadUnaligned32 ((UINT32 *) (Cursor + 24));
-    if (OpCode == HTONS (Dhcp6OptIaAddr) && ValidLt != 0) {
-
+    PreferredLt = NTOHL (ReadUnaligned32 ((UINT32 *) (Cursor + 20)));
+    ValidLt = NTOHL (ReadUnaligned32 ((UINT32 *) (Cursor + 24)));
+    IaAddr = (EFI_DHCP6_IA_ADDRESS *) (Cursor + 4);
+    if (OpCode == HTONS (Dhcp6OptIaAddr) && ValidLt >= PreferredLt &&
+        (Dhcp6AddrIsInCurrentIa(IaAddr, CurrentIa) || ValidLt !=0)) {
       if (AddrBuf != NULL) {
-        CopyMem (AddrBuf, Cursor + 4, sizeof (EFI_DHCP6_IA_ADDRESS));
-        AddrBuf->PreferredLifetime = NTOHL (AddrBuf->PreferredLifetime);
-        AddrBuf->ValidLifetime     = NTOHL (AddrBuf->ValidLifetime);
+        CopyMem (AddrBuf, IaAddr, sizeof (EFI_DHCP6_IA_ADDRESS));
+        AddrBuf->PreferredLifetime = PreferredLt;
+        AddrBuf->ValidLifetime     = ValidLt;
         AddrBuf = (EFI_DHCP6_IA_ADDRESS *) ((UINT8 *) AddrBuf + sizeof (EFI_DHCP6_IA_ADDRESS));
       }
-
       (*AddrNum)++;
     }
     DataLen = NTOHS (ReadUnaligned16 ((UINT16 *) (Cursor + 2)));
@@ -1025,6 +1122,7 @@ Dhcp6ParseAddrOption (
   @retval     EFI_NOT_FOUND         No valid IA option is found.
   @retval     EFI_SUCCESS           Create an IA control block successfully.
   @retval     EFI_OUT_OF_RESOURCES  Required system resources could not be allocated.
+  @retval     EFI_DEVICE_ERROR      An unexpected error.
 
 **/
 EFI_STATUS
@@ -1041,14 +1139,14 @@ Dhcp6GenerateIaCb (
   EFI_DHCP6_IA                 *Ia;
 
   if (Instance->IaCb.Ia == NULL) {
-    return EFI_NOT_FOUND;
+    return EFI_DEVICE_ERROR;
   }
 
   //
   // Calculate the number of addresses for this Ia, excluding the addresses with
   // the value 0 of valid lifetime.
   //
-  Dhcp6ParseAddrOption (IaInnerOpt, IaInnerLen, &AddrNum, NULL);
+  Dhcp6ParseAddrOption (Instance->IaCb.Ia, IaInnerOpt, IaInnerLen, &AddrNum, NULL);
 
   if (AddrNum == 0) {
     return EFI_NOT_FOUND;
@@ -1070,7 +1168,7 @@ Dhcp6GenerateIaCb (
   Ia->State          = Instance->IaCb.Ia->State;
   Ia->IaAddressCount = AddrNum;
   CopyMem (&Ia->Descriptor, &Instance->Config->IaDescriptor, sizeof (EFI_DHCP6_IA_DESCRIPTOR));
-  Dhcp6ParseAddrOption (IaInnerOpt, IaInnerLen, &AddrNum, Ia->IaAddress);
+  Dhcp6ParseAddrOption (Instance->IaCb.Ia, IaInnerOpt, IaInnerLen, &AddrNum, Ia->IaAddress);
 
   //
   // Free original IA resource.

@@ -1,7 +1,7 @@
 /** @file
 Dynamically update the pages.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1191,7 +1191,7 @@ GetLegacyBootOptionVar (
   }
   
   for (Index = 0; Index < OrderSize / sizeof (UINT16); Index++) {
-    UnicodeSPrint (StrTemp, 100, L"Boot%04x", OrderBuffer[Index]);
+    UnicodeSPrint (StrTemp, sizeof (StrTemp), L"Boot%04x", OrderBuffer[Index]);
     OptionBuffer = BdsLibGetVariableAndSize (
                     StrTemp,
                     &gEfiGlobalVariableGuid,

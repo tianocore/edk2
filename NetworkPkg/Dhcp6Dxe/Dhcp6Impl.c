@@ -104,12 +104,6 @@ EfiDhcp6Start (
   Instance->UdpSts = EFI_ALREADY_STARTED;
 
   //
-  // Need to clear initial time to make sure that elapsed-time
-  // is set to 0 for first Solicit.
-  //
-  Instance->StartTime = 0;
-
-  //
   // Send the solicit message to start S.A.R.R process.
   //
   Status = Dhcp6SendSolicitMsg (Instance);

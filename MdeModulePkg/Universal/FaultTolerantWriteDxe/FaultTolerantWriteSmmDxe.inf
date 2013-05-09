@@ -45,7 +45,6 @@
   DebugLib
   DxeServicesTableLib
   UefiDriverEntryPoint
-  PcdLib  
 
 [Protocols]
   gEfiFaultTolerantWriteProtocolGuid           ## ALWAYS_PRODUCES

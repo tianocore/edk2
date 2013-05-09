@@ -1,7 +1,7 @@
 /** @file
   Implementation of driver entry point and driver binding protocol.
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed
 and made available under the terms and conditions of the BSD License which
 accompanies this distribution. The full text of the license may be found at
@@ -258,7 +258,7 @@ Done:
                                device to start.
 
   @retval EFI_SUCCESS          This driver is added to ControllerHandle
-  @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
+  @retval EFI_DEVICE_ERROR     This driver could not be started due to a device error
   @retval other                This driver does not support this device
 
 **/
@@ -698,11 +698,11 @@ SimpleNetworkDriverStart (
     return Status;
   }
 
-  Status = mPciIo->FreeBuffer (
-                        mPciIo,
-                        SNP_MEM_PAGES (4096),
-                        Snp->Cpb
-                        );
+  mPciIo->FreeBuffer (
+            mPciIo,
+            SNP_MEM_PAGES (4096),
+            Snp->Cpb
+            );
 
 Error_DeleteSNP:
 
@@ -725,6 +725,13 @@ NiiError:
         This->DriverBindingHandle,
         Controller
         );
+
+  //
+  // If we got here that means we are in error state.
+  //
+  if (!EFI_ERROR (Status)) {
+    Status = EFI_DEVICE_ERROR;
+  }
 
   return Status;
 }

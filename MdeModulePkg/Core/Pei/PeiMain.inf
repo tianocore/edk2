@@ -4,7 +4,7 @@
 # 2) Dispatch PEIM from discovered FV.
 # 3) Handoff control to DxeIpl to load DXE core and enter DXE phase.
 #
-# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -67,6 +67,7 @@
   CacheMaintenanceLib
   PeCoffLib
   PeiServicesTablePointerLib
+  PcdLib
 
 [Guids]
   gPeiAprioriFileNameGuid       ## CONSUMES ## GUID

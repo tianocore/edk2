@@ -1071,7 +1071,7 @@ IfrToString (
       CopyMem (TmpBuf, Value.Buffer, Value.BufferLen * sizeof (CHAR16));
       PrintFormat = L"%s";  
     }
-    UnicodeSPrint (Buffer, MAXIMUM_VALUE_CHARACTERS, PrintFormat, Value.Buffer);  
+    UnicodeSPrint (Buffer, sizeof (Buffer), PrintFormat, Value.Buffer);  
     String = Buffer; 
     FreePool (TmpBuf);
     FreePool (Value.Buffer);
