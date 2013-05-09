@@ -111,6 +111,7 @@ SmmLockBoxSave (
   )
 {
   EFI_STATUS                  Status;
+  EFI_SMM_LOCK_BOX_PARAMETER_SAVE TempLockBoxParameterSave;
 
   //
   // Sanity check
@@ -121,10 +122,12 @@ SmmLockBoxSave (
     return ;
   }
 
+  CopyMem (&TempLockBoxParameterSave, LockBoxParameterSave, sizeof (EFI_SMM_LOCK_BOX_PARAMETER_SAVE));
+
   //
   // Sanity check
   //
-  if (!IsAddressValid ((UINTN)LockBoxParameterSave->Buffer, (UINTN)LockBoxParameterSave->Length)) {
+  if (!IsAddressValid ((UINTN)TempLockBoxParameterSave.Buffer, (UINTN)TempLockBoxParameterSave.Length)) {
     DEBUG ((EFI_D_ERROR, "SmmLockBox Save address in SMRAM or buffer overflow!\n"));
     LockBoxParameterSave->Header.ReturnStatus = (UINT64)EFI_ACCESS_DENIED;
     return ;
@@ -134,9 +137,9 @@ SmmLockBoxSave (
   // Save data
   //
   Status = SaveLockBox (
-             &LockBoxParameterSave->Guid,
-             (VOID *)(UINTN)LockBoxParameterSave->Buffer,
-             (UINTN)LockBoxParameterSave->Length
+             &TempLockBoxParameterSave.Guid,
+             (VOID *)(UINTN)TempLockBoxParameterSave.Buffer,
+             (UINTN)TempLockBoxParameterSave.Length
              );
   LockBoxParameterSave->Header.ReturnStatus = (UINT64)Status;
   return ;
@@ -153,6 +156,7 @@ SmmLockBoxSetAttributes (
   )
 {
   EFI_STATUS                    Status;
+  EFI_SMM_LOCK_BOX_PARAMETER_SET_ATTRIBUTES TempLockBoxParameterSetAttributes;
 
   //
   // Sanity check
@@ -163,12 +167,14 @@ SmmLockBoxSetAttributes (
     return ;
   }
 
+  CopyMem (&TempLockBoxParameterSetAttributes, LockBoxParameterSetAttributes, sizeof (EFI_SMM_LOCK_BOX_PARAMETER_SET_ATTRIBUTES));
+
   //
   // Update data
   //
   Status = SetLockBoxAttributes (
-             &LockBoxParameterSetAttributes->Guid,
-             LockBoxParameterSetAttributes->Attributes
+             &TempLockBoxParameterSetAttributes.Guid,
+             TempLockBoxParameterSetAttributes.Attributes
              );
   LockBoxParameterSetAttributes->Header.ReturnStatus = (UINT64)Status;
   return ;
@@ -189,6 +195,7 @@ SmmLockBoxUpdate (
   )
 {
   EFI_STATUS                    Status;
+  EFI_SMM_LOCK_BOX_PARAMETER_UPDATE TempLockBoxParameterUpdate;
 
   //
   // Sanity check
@@ -199,10 +206,12 @@ SmmLockBoxUpdate (
     return ;
   }
 
+  CopyMem (&TempLockBoxParameterUpdate, LockBoxParameterUpdate, sizeof (EFI_SMM_LOCK_BOX_PARAMETER_UPDATE));
+
   //
   // Sanity check
   //
-  if (!IsAddressValid ((UINTN)LockBoxParameterUpdate->Buffer, (UINTN)LockBoxParameterUpdate->Length)) {
+  if (!IsAddressValid ((UINTN)TempLockBoxParameterUpdate.Buffer, (UINTN)TempLockBoxParameterUpdate.Length)) {
     DEBUG ((EFI_D_ERROR, "SmmLockBox Update address in SMRAM or buffer overflow!\n"));
     LockBoxParameterUpdate->Header.ReturnStatus = (UINT64)EFI_ACCESS_DENIED;
     return ;
@@ -212,10 +221,10 @@ SmmLockBoxUpdate (
   // Update data
   //
   Status = UpdateLockBox (
-             &LockBoxParameterUpdate->Guid,
-             (UINTN)LockBoxParameterUpdate->Offset,
-             (VOID *)(UINTN)LockBoxParameterUpdate->Buffer,
-             (UINTN)LockBoxParameterUpdate->Length
+             &TempLockBoxParameterUpdate.Guid,
+             (UINTN)TempLockBoxParameterUpdate.Offset,
+             (VOID *)(UINTN)TempLockBoxParameterUpdate.Buffer,
+             (UINTN)TempLockBoxParameterUpdate.Length
              );
   LockBoxParameterUpdate->Header.ReturnStatus = (UINT64)Status;
   return ;
@@ -236,11 +245,14 @@ SmmLockBoxRestore (
   )
 {
   EFI_STATUS                     Status;
+  EFI_SMM_LOCK_BOX_PARAMETER_RESTORE TempLockBoxParameterRestore;
+
+  CopyMem (&TempLockBoxParameterRestore, LockBoxParameterRestore, sizeof (EFI_SMM_LOCK_BOX_PARAMETER_RESTORE));
 
   //
   // Sanity check
   //
-  if (!IsAddressValid ((UINTN)LockBoxParameterRestore->Buffer, (UINTN)LockBoxParameterRestore->Length)) {
+  if (!IsAddressValid ((UINTN)TempLockBoxParameterRestore.Buffer, (UINTN)TempLockBoxParameterRestore.Length)) {
     DEBUG ((EFI_D_ERROR, "SmmLockBox Restore address in SMRAM or buffer overflow!\n"));
     LockBoxParameterRestore->Header.ReturnStatus = (UINT64)EFI_ACCESS_DENIED;
     return ;
@@ -249,17 +261,17 @@ SmmLockBoxRestore (
   //
   // Restore data
   //
-  if ((LockBoxParameterRestore->Length == 0) && (LockBoxParameterRestore->Buffer == 0)) {
+  if ((TempLockBoxParameterRestore.Length == 0) && (TempLockBoxParameterRestore.Buffer == 0)) {
     Status = RestoreLockBox (
-               &LockBoxParameterRestore->Guid,
+               &TempLockBoxParameterRestore.Guid,
                NULL,
                NULL
                );
   } else {
     Status = RestoreLockBox (
-               &LockBoxParameterRestore->Guid,
-               (VOID *)(UINTN)LockBoxParameterRestore->Buffer,
-               (UINTN *)&LockBoxParameterRestore->Length
+               &TempLockBoxParameterRestore.Guid,
+               (VOID *)(UINTN)TempLockBoxParameterRestore.Buffer,
+               (UINTN *)&TempLockBoxParameterRestore.Length
                );
   }
   LockBoxParameterRestore->Header.ReturnStatus = (UINT64)Status;

@@ -267,6 +267,8 @@ FpdtSmiHandler (
 {
   EFI_STATUS                   Status;
   SMM_BOOT_RECORD_COMMUNICATE  *SmmCommData;
+  UINTN                        BootRecordSize;
+  VOID                         *BootRecordData;
 
   //
   // If input is invalid, stop processing this SMI
@@ -280,7 +282,7 @@ FpdtSmiHandler (
   }
   
   if (!InternalIsAddressValid ((UINTN)CommBuffer, *CommBufferSize)) {
-    DEBUG ((EFI_D_ERROR, "SMM communication data buffer in SMRAM or overflow!\n"));
+    DEBUG ((EFI_D_ERROR, "FpdtSmiHandler: SMM communication data buffer in SMRAM or overflow!\n"));
     return EFI_SUCCESS;
   }
 
@@ -294,7 +296,9 @@ FpdtSmiHandler (
        break;
 
     case SMM_FPDT_FUNCTION_GET_BOOT_RECORD_DATA :
-       if (SmmCommData->BootRecordData == NULL || SmmCommData->BootRecordSize < mBootRecordSize) {
+       BootRecordData = SmmCommData->BootRecordData;
+       BootRecordSize = SmmCommData->BootRecordSize;
+       if (BootRecordData == NULL || BootRecordSize < mBootRecordSize) {
          Status = EFI_INVALID_PARAMETER;
          break;
        } 
@@ -303,14 +307,14 @@ FpdtSmiHandler (
        // Sanity check
        //
        SmmCommData->BootRecordSize = mBootRecordSize;
-       if (!InternalIsAddressValid ((UINTN)SmmCommData->BootRecordData, mBootRecordSize)) {
-         DEBUG ((EFI_D_ERROR, "SMM Data buffer in SMRAM or overflow!\n"));
+       if (!InternalIsAddressValid ((UINTN)BootRecordData, mBootRecordSize)) {
+         DEBUG ((EFI_D_ERROR, "FpdtSmiHandler: SMM Data buffer in SMRAM or overflow!\n"));
          Status = EFI_ACCESS_DENIED;
          break;
        }
 
        CopyMem (
-         (UINT8*)SmmCommData->BootRecordData, 
+         (UINT8*)BootRecordData, 
          mBootRecordBuffer, 
          mBootRecordSize
          );
