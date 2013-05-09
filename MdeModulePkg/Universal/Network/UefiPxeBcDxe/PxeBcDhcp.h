@@ -1,7 +1,7 @@
 /** @file
   Dhcp and Discover routines for PxeBc.
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -160,7 +160,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define IS_DISABLE_BCAST_DISCOVER(x)    (((x) & BIT (0)) == BIT (0))
 #define IS_DISABLE_MCAST_DISCOVER(x)    (((x) & BIT (1)) == BIT (1))
 #define IS_ENABLE_USE_SERVER_LIST(x)    (((x) & BIT (2)) == BIT (2))
-#define IS_ENABLE_BOOT_FILE_NAME(x)     (((x) & BIT (3)) == BIT (3))
+#define IS_DISABLE_PROMPT_MENU(x)       (((x) & BIT (3)) == BIT (3))
 
 #define SET_VENDOR_OPTION_BIT_MAP(x, y) (((x)[(y) / 32]) = (UINT32) ((x)[(y) / 32]) | BIT ((y) % 32))
 

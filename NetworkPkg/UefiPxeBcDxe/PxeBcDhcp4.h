@@ -1,7 +1,7 @@
 /** @file
   Functions declaration related with DHCPv4 for UefiPxeBc Driver.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -200,7 +200,7 @@ typedef enum {
 #define IS_ENABLE_USE_SERVER_LIST(x) \
   (((x) & BIT (2)) == BIT (2))
 
-#define IS_ENABLE_BOOT_FILE_NAME(x) \
+#define IS_DISABLE_PROMPT_MENU(x) \
   (((x) & BIT (3)) == BIT (3))
 
 
