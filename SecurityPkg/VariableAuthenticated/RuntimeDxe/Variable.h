@@ -2,7 +2,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by Variable modules.
 
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -65,6 +65,13 @@ typedef enum {
 
 typedef struct {
   VARIABLE_HEADER *CurrPtr;
+  //
+  // If both ADDED and IN_DELETED_TRANSITION variable are present,
+  // InDeletedTransitionPtr will point to the IN_DELETED_TRANSITION one.
+  // Otherwise, CurrPtr will point to the ADDED or IN_DELETED_TRANSITION one,
+  // and InDeletedTransitionPtr will be NULL at the same time.
+  //
+  VARIABLE_HEADER *InDeletedTransitionPtr;
   VARIABLE_HEADER *EndPtr;
   VARIABLE_HEADER *StartPtr;
   BOOLEAN         Volatile;
@@ -98,6 +105,19 @@ typedef struct {
   UINTN       DataSize;
   VOID        *Data;
 } VARIABLE_CACHE_ENTRY;
+
+/**
+  Flush the HOB variable to flash.
+
+  @param[in] VariableName       Name of variable has been updated or deleted.
+  @param[in] VendorGuid         Guid of variable has been updated or deleted.
+
+**/
+VOID
+FlushHobVariableToFlash (
+  IN CHAR16                     *VariableName,
+  IN EFI_GUID                   *VendorGuid
+  );
 
 /**
   Writes a buffer to variable storage space, in the working block.
@@ -196,7 +216,7 @@ DataSizeOfVariable (
   @param[in] Attributes         Attributes of the variable.
   @param[in] KeyIndex           Index of associated public key.
   @param[in] MonotonicCount     Value of associated monotonic count.
-  @param[in] Variable           The variable information that is used to keep track of variable usage.
+  @param[in, out] Variable      The variable information that is used to keep track of variable usage.
 
   @param[in] TimeStamp          Value of associated TimeStamp.
 
@@ -213,7 +233,7 @@ UpdateVariable (
   IN      UINT32          Attributes OPTIONAL,
   IN      UINT32          KeyIndex  OPTIONAL,
   IN      UINT64          MonotonicCount  OPTIONAL,
-  IN      VARIABLE_POINTER_TRACK *Variable,
+  IN OUT  VARIABLE_POINTER_TRACK *Variable,
   IN      EFI_TIME        *TimeStamp  OPTIONAL  
   );
 
@@ -351,6 +371,38 @@ GetFvbCountAndBuffer (
 EFI_STATUS
 VariableCommonInitialize (
   VOID
+  );
+
+/**
+
+  Variable store garbage collection and reclaim operation.
+
+  If ReclaimPubKeyStore is FALSE, reclaim variable space by deleting the obsoleted varaibles.
+  If ReclaimPubKeyStore is TRUE, reclaim invalid key in public key database and update the PubKeyIndex
+  for all the count-based authenticate variable in NV storage.
+
+  @param[in]      VariableBase            Base address of variable store.
+  @param[out]     LastVariableOffset      Offset of last variable.
+  @param[in]      IsVolatile              The variable store is volatile or not;
+                                          if it is non-volatile, need FTW.
+  @param[in, out] UpdatingPtrTrack        Pointer to updating variable pointer track structure.
+  @param[in]      ReclaimPubKeyStore      Reclaim for public key database or not.
+  @param[in]      ReclaimAnyway           If TRUE, do reclaim anyway.
+  
+  @return EFI_SUCCESS                  Reclaim operation has finished successfully.
+  @return EFI_OUT_OF_RESOURCES         No enough memory resources.
+  @return EFI_DEVICE_ERROR             The public key database doesn't exist.
+  @return Others                       Unexpect error happened during reclaim operation.
+
+**/
+EFI_STATUS
+Reclaim (
+  IN     EFI_PHYSICAL_ADDRESS         VariableBase,
+  OUT    UINTN                        *LastVariableOffset,
+  IN     BOOLEAN                      IsVolatile,
+  IN OUT VARIABLE_POINTER_TRACK       *UpdatingPtrTrack,
+  IN     BOOLEAN                      ReclaimPubKeyStore,
+  IN     BOOLEAN                      ReclaimAnyway
   );
 
 /**

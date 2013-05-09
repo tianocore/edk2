@@ -27,6 +27,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 extern EFI_GUID gEfiAuthenticatedVariableGuid;
 extern EFI_GUID gEfiSecureBootEnableDisableGuid;
+extern EFI_GUID gEfiCertDbGuid;
 
 ///
 /// "SecureBootEnable" variable for the Secure Boot feature enable/disable.

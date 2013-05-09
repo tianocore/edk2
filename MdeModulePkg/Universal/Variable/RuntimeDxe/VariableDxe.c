@@ -3,7 +3,7 @@
   Implement all four UEFI Runtime Variable services for the nonvolatile
   and volatile storage space and install variable architecture protocol.
   
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -231,6 +231,7 @@ VariableClassAddressChangeEvent (
   EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->PlatformLang);
   EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase);
   EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->VariableGlobal.VolatileVariableBase);
+  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->VariableGlobal.HobVariableBase);
   EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal);
   EfiConvertPointer (0x0, (VOID **) &mNvVariableCache);  
 }
