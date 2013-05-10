@@ -17,10 +17,14 @@
 #include <ArmPlatform.h>
 
 .text 
-.align 3
+.align 2
 
+GCC_ASM_EXPORT(ArmPlatformPeiBootAction)
 GCC_ASM_EXPORT(ArmPlatformGetCorePosition)
 GCC_ASM_EXPORT(ArmPlatformIsPrimaryCore)
+
+ASM_PFX(ArmPlatformPeiBootAction):
+  bx    lr
 
 //UINTN
 //ArmPlatformGetCorePosition (

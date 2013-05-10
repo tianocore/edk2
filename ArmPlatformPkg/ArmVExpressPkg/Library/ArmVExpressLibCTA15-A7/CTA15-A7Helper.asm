@@ -18,11 +18,16 @@
 
   INCLUDE AsmMacroIoLib.inc
 
+  EXPORT  ArmPlatformPeiBootAction
   EXPORT  ArmPlatformGetCorePosition
   EXPORT  ArmPlatformIsPrimaryCore
 
   PRESERVE8
   AREA    CTA15A7Helper, CODE, READONLY
+
+ArmPlatformPeiBootAction FUNCTION
+  bx    lr
+  ENDFUNC
 
 //UINTN
 //ArmPlatformGetCorePosition (

@@ -23,11 +23,15 @@ GCC_ASM_IMPORT(CEntryPoint)
 GCC_ASM_IMPORT(ArmPlatformGetCorePosition)
 GCC_ASM_IMPORT(ArmPlatformIsPrimaryCore)
 GCC_ASM_IMPORT(ArmReadMpidr)
+GCC_ASM_IMPORT(ArmPlatformPeiBootAction)
 GCC_ASM_EXPORT(_ModuleEntryPoint)
 
 StartupAddr: .word    CEntryPoint
 
 ASM_PFX(_ModuleEntryPoint):
+  // Do early platform specific actions
+  bl    ASM_PFX(ArmPlatformPeiBootAction)
+
   // Identify CPU ID
   bl    ASM_PFX(ArmReadMpidr)
   // Keep a copy of the MpId register value

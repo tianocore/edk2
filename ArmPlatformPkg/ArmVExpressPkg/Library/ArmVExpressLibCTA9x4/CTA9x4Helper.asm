@@ -18,6 +18,7 @@
 
   INCLUDE AsmMacroIoLib.inc
 
+  EXPORT  ArmPlatformPeiBootAction
   EXPORT  ArmPlatformIsPrimaryCore
   EXPORT  ArmPlatformGetPrimaryCoreMpId
   EXPORT  ArmPlatformGetCorePosition
@@ -59,6 +60,10 @@ ArmPlatformIsPrimaryCore FUNCTION
 //  );
 ArmPlatformGetCorePosition FUNCTION
   and   r0, r0, #ARM_CORE_MASK
+  bx    lr
+  ENDFUNC
+
+ArmPlatformPeiBootAction FUNCTION
   bx    lr
   ENDFUNC
 

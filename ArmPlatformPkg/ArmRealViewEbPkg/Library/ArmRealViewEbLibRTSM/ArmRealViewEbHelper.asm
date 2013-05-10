@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2012, ARM Limited. All rights reserved.
+//  Copyright (c) 2012-2013, ARM Limited. All rights reserved.
 //
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
@@ -16,14 +16,14 @@
 
   INCLUDE AsmMacroIoLib.inc
 
+  EXPORT  ArmPlatformPeiBootAction
   EXPORT  ArmPlatformGetCorePosition
   EXPORT  ArmPlatformIsPrimaryCore
 
   IMPORT  _gPcd_FixedAtBuild_PcdArmPrimaryCore
   IMPORT  _gPcd_FixedAtBuild_PcdArmPrimaryCoreMask
   
-  PRESERVE8
-  AREA    ArmPlatformNullHelper, CODE, READONLY
+  AREA    ArmRealViewEbHelper, CODE, READONLY
 
 //UINTN
 //ArmPlatformGetCorePosition (
@@ -52,5 +52,8 @@ ArmPlatformIsPrimaryCore FUNCTION
   bx    lr
   ENDFUNC
 
-  END
+ArmPlatformPeiBootAction FUNCTION
+  bx    lr
+  ENDFUNC
 
+  END

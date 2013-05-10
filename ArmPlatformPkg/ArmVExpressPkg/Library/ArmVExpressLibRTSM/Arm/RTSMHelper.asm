@@ -22,6 +22,7 @@
 
   INCLUDE AsmMacroIoLib.inc
 
+  EXPORT    ArmPlatformPeiBootAction
   EXPORT    ArmGetCpuCountPerCluster
   EXPORT    ArmPlatformIsPrimaryCore
   EXPORT    ArmPlatformGetPrimaryCoreMpId
@@ -31,6 +32,10 @@
   IMPORT    _gPcd_FixedAtBuild_PcdArmPrimaryCoreMask
 
   AREA RTSMHelper, CODE, READONLY
+
+ArmPlatformPeiBootAction FUNCTION
+  bx    lr
+  ENDFUNC
 
 // IN None
 // OUT r0 = SCU Base Address

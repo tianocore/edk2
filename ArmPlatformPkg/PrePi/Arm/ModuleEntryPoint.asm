@@ -23,6 +23,7 @@
   IMPORT  CEntryPoint
   IMPORT  ArmPlatformIsPrimaryCore
   IMPORT  ArmReadMpidr
+  IMPORT  ArmPlatformPeiBootAction
   IMPORT  ArmPlatformStackSet
   
   EXPORT  _ModuleEntryPoint
@@ -33,6 +34,9 @@
 StartupAddr        DCD      CEntryPoint
 
 _ModuleEntryPoint
+  // Do early platform specific actions
+  bl    ArmPlatformPeiBootAction
+
   // Get ID of this CPU in Multicore system
   bl    ArmReadMpidr
   // Keep a copy of the MpId register value

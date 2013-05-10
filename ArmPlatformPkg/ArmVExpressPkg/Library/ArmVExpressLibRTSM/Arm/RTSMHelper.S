@@ -16,12 +16,14 @@
 #include <Library/ArmLib.h>
 #include <Library/PcdLib.h>
 #include <AutoGen.h>
+#include "AsmMacroIoLib.inc"
 
 #include <Chipset/ArmCortexA9.h>
 
 .text
 .align 2
 
+GCC_ASM_EXPORT(ArmPlatformPeiBootAction)
 GCC_ASM_EXPORT(ArmGetCpuCountPerCluster)
 GCC_ASM_EXPORT(ArmPlatformIsPrimaryCore)
 GCC_ASM_EXPORT(ArmPlatformGetPrimaryCoreMpId)
@@ -30,6 +32,9 @@ GCC_ASM_EXPORT(ArmPlatformGetCorePosition)
 GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCore)
 GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask)
 
+ASM_PFX(ArmPlatformPeiBootAction):
+  bx    lr
+
 # IN None
 # OUT r0 = SCU Base Address
 ASM_PFX(ArmGetScuBaseAddress):
@@ -37,7 +42,7 @@ ASM_PFX(ArmGetScuBaseAddress):
   # the Configuration BAR as a stack is not necessary setup. The SCU is at the
   # offset 0x0000 from the Private Memory Region.
   mrc   p15, 4, r0, c15, c0, 0
-  bx  lr
+  bx    lr
 
 //UINTN
 //ArmPlatformGetPrimaryCoreMpId (

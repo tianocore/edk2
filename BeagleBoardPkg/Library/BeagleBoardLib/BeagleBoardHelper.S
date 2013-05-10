@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2012, ARM Limited. All rights reserved.
+#  Copyright (c) 2012-2013, ARM Limited. All rights reserved.
 #  
 #  This program and the accompanying materials                          
 #  are licensed and made available under the terms and conditions of the BSD License         
@@ -18,6 +18,7 @@
 .align 2
 
 GCC_ASM_EXPORT(ArmPlatformIsPrimaryCore)
+GCC_ASM_EXPORT(ArmPlatformPeiBootAction)
 
 //UINTN
 //ArmPlatformIsPrimaryCore (
@@ -27,5 +28,8 @@ ASM_PFX(ArmPlatformIsPrimaryCore):
   // BeagleBoard has a single core. We must always return 1.
   mov	r0, #1
   bx 	lr
+
+ASM_PFX(ArmPlatformPeiBootAction):
+  bx    lr
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED 

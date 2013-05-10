@@ -22,6 +22,7 @@
   IMPORT  ArmPlatformGetCorePosition
   IMPORT  ArmPlatformIsPrimaryCore
   IMPORT  ArmReadMpidr
+  IMPORT  ArmPlatformPeiBootAction
   EXPORT  _ModuleEntryPoint
   
   PRESERVE8
@@ -30,6 +31,9 @@
 StartupAddr        DCD      CEntryPoint
 
 _ModuleEntryPoint
+  // Do early platform specific actions
+  bl    ArmPlatformPeiBootAction
+
   // Identify CPU ID
   bl    ArmReadMpidr
   // Keep a copy of the MpId register value

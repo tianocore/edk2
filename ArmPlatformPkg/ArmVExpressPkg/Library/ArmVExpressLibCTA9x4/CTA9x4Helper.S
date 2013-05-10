@@ -17,8 +17,8 @@
 .text
 .align 2
 
+GCC_ASM_EXPORT(ArmPlatformPeiBootAction)
 GCC_ASM_EXPORT(ArmPlatformIsPrimaryCore)
-GCC_ASM_EXPORT(ArmPlatformGetPrimaryCoreMpId)
 GCC_ASM_EXPORT(ArmPlatformGetCorePosition)
 
 GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCore)
@@ -54,6 +54,9 @@ ASM_PFX(ArmPlatformIsPrimaryCore):
 //  );
 ASM_PFX(ArmPlatformGetCorePosition):
   and   r0, r0, #ARM_CORE_MASK
+  bx    lr
+
+ASM_PFX(ArmPlatformPeiBootAction):
   bx    lr
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED

@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2012, ARM Limited. All rights reserved.
+//  Copyright (c) 2012-2013, ARM Limited. All rights reserved.
 //
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
@@ -15,8 +15,9 @@
 #include <Library/ArmLib.h>
 
 .text 
-.align 3
+.align 2
 
+GCC_ASM_EXPORT(ArmPlatformPeiBootAction)
 GCC_ASM_EXPORT(ArmPlatformGetCorePosition)
 GCC_ASM_EXPORT(ArmPlatformIsPrimaryCore)
 
@@ -46,4 +47,7 @@ ASM_PFX(ArmPlatformIsPrimaryCore):
   cmp   r0, r1
   moveq r0, #1
   movne r0, #0
+  bx    lr
+
+ASM_PFX(ArmPlatformPeiBootAction):
   bx    lr
