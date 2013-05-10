@@ -33,10 +33,10 @@ StartupAddr        DCD      CEntryPoint
 
 _ModuleEntryPoint FUNCTION
   // First ensure all interrupts are disabled
-  blx   ArmDisableInterrupts
+  bl    ArmDisableInterrupts
 
   // Ensure that the MMU and caches are off
-  blx   ArmDisableCachesAndMmu
+  bl    ArmDisableCachesAndMmu
 
   // By default, we are doing a cold boot
   mov   r10, #ARM_SEC_COLD_BOOT
