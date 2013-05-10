@@ -1802,6 +1802,8 @@ XhcExitBootService (
     gBS->CloseEvent (Xhc->PollTimer);
   }
 
+  XhcClearBiosOwnership (Xhc);
+
   //
   // Restore original PCI attributes
   //
@@ -1811,8 +1813,6 @@ XhcExitBootService (
                   Xhc->OriginalPciAttributes,
                   NULL
                   );
-
-  XhcClearBiosOwnership (Xhc);
 }
 
 /**

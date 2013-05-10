@@ -786,10 +786,13 @@ UsbBuildDescTable (
     return Status;
   }
 
-  DevDesc          = UsbDev->DevDesc;
-  NumConfig        = DevDesc->Desc.NumConfigurations;
-  DevDesc->Configs = AllocateZeroPool (NumConfig * sizeof (USB_CONFIG_DESC *));
+  DevDesc   = UsbDev->DevDesc;
+  NumConfig = DevDesc->Desc.NumConfigurations;
+  if (NumConfig == 0) {
+    return EFI_DEVICE_ERROR;
+  }
 
+  DevDesc->Configs = AllocateZeroPool (NumConfig * sizeof (USB_CONFIG_DESC *));
   if (DevDesc->Configs == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
