@@ -2914,7 +2914,15 @@ LegacyBiosInstallPciRom (
       return EFI_UNSUPPORTED;
     }
 
-    if (!Private->VgaInstalled) {
+    Status = Private->LegacyBiosPlatform->GetPlatformHandle (
+                                            Private->LegacyBiosPlatform,
+                                            EfiGetPlatformVgaHandle,
+                                            0,
+                                            &HandleBuffer,
+                                            &HandleCount,
+                                            NULL
+                                            );
+    if ((!EFI_ERROR (Status)) && (!Private->VgaInstalled)) {
       //
       // A return status of EFI_NOT_FOUND is considered valid (No EFI
       // driver is controlling video.
