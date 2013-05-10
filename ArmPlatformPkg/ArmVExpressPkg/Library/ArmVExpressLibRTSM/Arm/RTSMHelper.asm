@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+//  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 //  
 //  This program and the accompanying materials                          
 //  are licensed and made available under the terms and conditions of the BSD License         
@@ -13,6 +13,7 @@
 
 #include <AsmMacroIoLib.h>
 #include <Base.h>
+#include <Library/ArmLib.h>
 #include <Library/PcdLib.h>
 
 #include <Chipset/ArmCortexA9.h>
@@ -24,9 +25,10 @@
   EXPORT    ArmGetCpuCountPerCluster
   EXPORT    ArmPlatformIsPrimaryCore
   EXPORT    ArmPlatformGetPrimaryCoreMpId
+  EXPORT    ArmPlatformGetCorePosition
 
-  IMPORT  _gPcd_FixedAtBuild_PcdArmPrimaryCore
-  IMPORT  _gPcd_FixedAtBuild_PcdArmPrimaryCoreMask
+  IMPORT    _gPcd_FixedAtBuild_PcdArmPrimaryCore
+  IMPORT    _gPcd_FixedAtBuild_PcdArmPrimaryCoreMask
 
   AREA RTSMHelper, CODE, READONLY
 
@@ -101,6 +103,17 @@ ArmPlatformIsPrimaryCore FUNCTION
   moveq r0, #1
   movne r0, #0
   bx 	lr
+  ENDFUNC
+
+//UINTN
+//ArmPlatformGetCorePosition (
+//  IN UINTN MpId
+//  );
+ArmPlatformGetCorePosition FUNCTION
+  and   r1, r0, #ARM_CORE_MASK
+  and   r0, r0, #ARM_CLUSTER_MASK
+  add   r0, r1, r0, LSR #7
+  bx    lr
   ENDFUNC
 
   END

@@ -120,16 +120,6 @@
   .long (_Data)           ;                 \
 1:
 
-// Convert the (ClusterId,CoreId) into a Core Position
-// We assume there are 4 cores per cluster
-// Note: 0xFFFF is the magic value for ARM_CORE_MASK | ARM_CLUSTER_MASK
-#define GetCorePositionFromMpId(Pos, MpId, Tmp)  \
-  ldr   Tmp, =0xFFFF                             \
-  and   MpId, Tmp                                \
-  lsr   Pos, MpId, #6 ;                          \
-  and   Tmp, MpId, #3 ;                          \
-  add   Pos, Pos, Tmp
-
 // Reserve a region at the top of the Primary Core stack
 // for Global variables for the XIP phase
 #define SetPrimaryStack(StackTop, GlobalSize, Tmp)  \
@@ -210,16 +200,6 @@ _InitializePrimaryStackEnd:
 
 #define LoadConstantToReg(Data, Reg) \
   ldr  Reg, =Data
-
-// Convert the (ClusterId,CoreId) into a Core Position
-// We assume there are 4 cores per cluster
-// Note: 0xFFFF is the magic value for ARM_CORE_MASK | ARM_CLUSTER_MASK
-#define GetCorePositionFromMpId(Pos, MpId, Tmp)    \
-  ldr   Tmp, =0xFFFF ;                             \
-  and   MpId, Tmp ;                                \
-  lsr   Pos, MpId, #6 ;                            \
-  and   Tmp, MpId, #3 ;                            \
-  add   Pos, Pos, Tmp
 
 #define SetPrimaryStack(StackTop, GlobalSize, Tmp)  \
   and     Tmp, GlobalSize, #7         ;             \
@@ -312,8 +292,6 @@ _InitializePrimaryStackEnd:
 
 // conditional load testing eq flag
 #define LoadConstantToRegIfEq(Data, Reg)  LoadConstantToRegIfEqMacro Data, Reg
-
-#define GetCorePositionFromMpId(Pos, MpId, Tmp)  GetCorePositionFromMpId Pos, MpId, Tmp
 
 #define SetPrimaryStack(StackTop,GlobalSize,Tmp) SetPrimaryStack StackTop, GlobalSize, Tmp
 

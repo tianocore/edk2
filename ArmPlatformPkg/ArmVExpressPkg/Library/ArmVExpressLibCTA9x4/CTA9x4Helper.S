@@ -12,12 +12,14 @@
 #
 
 #include <AsmMacroIoLib.h>
+#include <Library/ArmLib.h>
 
 .text
 .align 2
 
 GCC_ASM_EXPORT(ArmPlatformIsPrimaryCore)
 GCC_ASM_EXPORT(ArmPlatformGetPrimaryCoreMpId)
+GCC_ASM_EXPORT(ArmPlatformGetCorePosition)
 
 GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCore)
 GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask)
@@ -44,6 +46,14 @@ ASM_PFX(ArmPlatformIsPrimaryCore):
   cmp   r0, r1
   moveq r0, #1
   movne r0, #0
+  bx    lr
+
+//UINTN
+//ArmPlatformGetCorePosition (
+//  IN UINTN MpId
+//  );
+ASM_PFX(ArmPlatformGetCorePosition):
+  and   r0, r0, #ARM_CORE_MASK
   bx    lr
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED

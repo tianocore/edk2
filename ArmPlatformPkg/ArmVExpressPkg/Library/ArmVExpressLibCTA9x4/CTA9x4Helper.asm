@@ -12,6 +12,7 @@
 //
 
 #include <AsmMacroIoLib.h>
+#include <Library/ArmLib.h>
 
 #include <AutoGen.h>
 
@@ -19,6 +20,7 @@
 
   EXPORT  ArmPlatformIsPrimaryCore
   EXPORT  ArmPlatformGetPrimaryCoreMpId
+  EXPORT  ArmPlatformGetCorePosition
 
   IMPORT  _gPcd_FixedAtBuild_PcdArmPrimaryCore
   IMPORT  _gPcd_FixedAtBuild_PcdArmPrimaryCoreMask
@@ -48,6 +50,15 @@ ArmPlatformIsPrimaryCore FUNCTION
   cmp   r0, r1
   moveq r0, #1
   movne r0, #0
+  bx    lr
+  ENDFUNC
+
+//UINTN
+//ArmPlatformGetCorePosition (
+//  IN UINTN MpId
+//  );
+ArmPlatformGetCorePosition FUNCTION
+  and   r0, r0, #ARM_CORE_MASK
   bx    lr
   ENDFUNC
 

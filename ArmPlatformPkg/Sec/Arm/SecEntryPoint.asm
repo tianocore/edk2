@@ -19,6 +19,7 @@
   
   IMPORT  CEntryPoint
   IMPORT  ArmPlatformIsPrimaryCore
+  IMPORT  ArmPlatformGetCorePosition
   IMPORT  ArmPlatformSecBootAction
   IMPORT  ArmPlatformSecBootMemoryInit
   IMPORT  ArmDisableInterrupts
@@ -93,10 +94,11 @@ _SetupSecondaryCoreStack
   // Get the top of the primary stacks (and the base of the secondary stacks)
   LoadConstantToReg (FixedPcdGet32(PcdCPUCoresSecStackBase), r1)
   LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecPrimaryStackSize), r2)
-  add   r1, r1, r2
+  add   r6, r1, r2
 
-  // Get the Core Position (ClusterId * 4) + CoreId
-  GetCorePositionFromMpId(r0, r9, r2)
+  // Get the Core Position
+  mov   r0, r9
+  bl    ArmPlatformGetCorePosition
   // The stack starts at the top of the stack region. Add '1' to the Core Position to get the top of the stack
   add   r0, r0, #1
 
@@ -104,7 +106,7 @@ _SetupSecondaryCoreStack
   LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecSecondaryStackSize), r2)
   mul   r0, r0, r2
   // SP = StackBase + StackOffset
-  add   sp, r1, r0
+  add   sp, r6, r0
 
 _PrepareArguments
   // Move sec startup address into a data register
