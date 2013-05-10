@@ -51,6 +51,3 @@
   gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmTokenSpaceGuid.PcdSystemMemorySize
   gArmTokenSpaceGuid.PcdFvBaseAddress
-
-  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
-  gArmTokenSpaceGuid.PcdArmPrimaryCore

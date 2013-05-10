@@ -32,6 +32,8 @@
 
 [Sources.common]
   ArmRealViewEb.c
+  ArmRealViewEbHelper.asm | RVCT
+  ArmRealViewEbHelper.S   | GCC
 
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdCacheEnable

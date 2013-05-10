@@ -37,8 +37,6 @@
 [Sources.ARM]
   Arm/RTSMBoot.asm     | RVCT
   Arm/RTSMBoot.S       | GCC
-  Arm/RTSMHelper.asm   | RVCT
-  Arm/RTSMHelper.S     | GCC
 
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdCacheEnable

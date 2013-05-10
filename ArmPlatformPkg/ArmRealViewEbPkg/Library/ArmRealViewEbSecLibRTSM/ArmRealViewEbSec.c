@@ -14,6 +14,7 @@
 
 #include <Library/IoLib.h>
 #include <Library/ArmLib.h>
+#include <Library/ArmPlatformLib.h>
 #include <Library/ArmPlatformSecLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
@@ -51,7 +52,7 @@ ArmPlatformSecInitialize (
   )
 {
   // If it is not the primary core then there is nothing to do
-  if (!IS_PRIMARY_CORE(MpId)) {
+  if (!ArmPlatformIsPrimaryCore (MpId)) {
     return RETURN_SUCCESS;
   }
 

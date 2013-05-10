@@ -93,7 +93,7 @@ CEntryPoint (
   //Note: The MMU will be enabled by MemoryPeim. Only the primary core will have the MMU on.
 
   // If not primary Jump to Secondary Main
-  if (IS_PRIMARY_CORE(MpId)) {
+  if (ArmPlatformIsPrimaryCore (MpId)) {
     // Initialize the Debug Agent for Source Level Debugging
     InitializeDebugAgent (DEBUG_AGENT_INIT_POSTMEM_SEC, NULL, NULL);
     SaveAndSetDebugTimerInterrupt (TRUE);

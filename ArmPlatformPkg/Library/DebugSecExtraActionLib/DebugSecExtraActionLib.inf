@@ -30,10 +30,12 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
 
 [LibraryClasses]
+  ArmPlatformLib
   DebugLib
   PcdLib
   ArmGicLib
@@ -46,9 +48,6 @@
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFvBaseAddress
-  
-  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
-  gArmTokenSpaceGuid.PcdArmPrimaryCore
 
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase

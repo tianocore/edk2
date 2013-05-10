@@ -112,7 +112,6 @@ typedef enum {
 //
 // ARM MP Core IDs
 //
-#define IS_PRIMARY_CORE(MpId) (((MpId) & PcdGet32(PcdArmPrimaryCoreMask)) == PcdGet32(PcdArmPrimaryCore))
 #define ARM_CORE_MASK         0xFF
 #define ARM_CLUSTER_MASK      (0xFF << 8)
 #define GET_CORE_ID(MpId)     ((MpId) & ARM_CORE_MASK)

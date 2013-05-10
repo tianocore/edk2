@@ -122,9 +122,12 @@
 
 // Convert the (ClusterId,CoreId) into a Core Position
 // We assume there are 4 cores per cluster
-#define GetCorePositionFromMpId(Pos, MpId, Tmp) \
-  lsr   Pos, MpId, #6 ;                        \
-  and   Tmp, MpId, #3 ;                        \
+// Note: 0xFFFF is the magic value for ARM_CORE_MASK | ARM_CLUSTER_MASK
+#define GetCorePositionFromMpId(Pos, MpId, Tmp)  \
+  ldr   Tmp, =0xFFFF                             \
+  and   MpId, Tmp                                \
+  lsr   Pos, MpId, #6 ;                          \
+  and   Tmp, MpId, #3 ;                          \
   add   Pos, Pos, Tmp
 
 // Reserve a region at the top of the Primary Core stack
@@ -207,10 +210,15 @@ _InitializePrimaryStackEnd:
 
 #define LoadConstantToReg(Data, Reg) \
   ldr  Reg, =Data
-  
-#define GetCorePositionFromMpId(Pos, MpId, Tmp) \
-  lsr   Pos, MpId, #6 ;                        \
-  and   Tmp, MpId, #3 ;                        \
+
+// Convert the (ClusterId,CoreId) into a Core Position
+// We assume there are 4 cores per cluster
+// Note: 0xFFFF is the magic value for ARM_CORE_MASK | ARM_CLUSTER_MASK
+#define GetCorePositionFromMpId(Pos, MpId, Tmp)    \
+  ldr   Tmp, =0xFFFF ;                             \
+  and   MpId, Tmp ;                                \
+  lsr   Pos, MpId, #6 ;                            \
+  and   Tmp, MpId, #3 ;                            \
   add   Pos, Pos, Tmp
 
 #define SetPrimaryStack(StackTop, GlobalSize, Tmp)  \

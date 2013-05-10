@@ -217,7 +217,7 @@ CEntryPoint (
   // Initialize the platform specific controllers
   ArmPlatformInitialize (MpId);
 
-  if (IS_PRIMARY_CORE(MpId) && PerformanceMeasurementEnabled ()) {
+  if (ArmPlatformIsPrimaryCore (MpId) && PerformanceMeasurementEnabled ()) {
     // Initialize the Timer Library to setup the Timer HW controller
     TimerConstructor ();
     // We cannot call yet the PerformanceLib because the HOB List has not been initialized
@@ -240,7 +240,7 @@ CEntryPoint (
 
   // Define the Global Variable region when we are not running in XIP
   if (!IS_XIP()) {
-    if (IS_PRIMARY_CORE(MpId)) {
+    if (ArmPlatformIsPrimaryCore (MpId)) {
       mGlobalVariableBase = GlobalVariableBase;
       if (ArmIsMpCore()) {
         // Signal the Global Variable Region is defined (event: ARM_CPU_EVENT_DEFAULT)
@@ -253,7 +253,7 @@ CEntryPoint (
   }
   
   // If not primary Jump to Secondary Main
-  if (IS_PRIMARY_CORE(MpId)) {
+  if (ArmPlatformIsPrimaryCore (MpId)) {
     // Goto primary Main.
     PrimaryMain (UefiMemoryBase, StacksBase, GlobalVariableBase, StartTimeStamp);
   } else {

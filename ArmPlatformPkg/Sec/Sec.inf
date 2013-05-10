@@ -38,6 +38,7 @@
 [LibraryClasses]
   ArmCpuLib
   ArmLib
+  ArmPlatformLib
   ArmPlatformSecLib
   ArmTrustedMonitorLib
   BaseLib
@@ -61,14 +62,11 @@
   gArmTokenSpaceGuid.PcdArmNsacr
   gArmTokenSpaceGuid.PcdArmNonSecModeTransition
   
-  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
-  gArmTokenSpaceGuid.PcdArmPrimaryCore
-  
   gArmTokenSpaceGuid.PcdSecureFvBaseAddress
   gArmTokenSpaceGuid.PcdSecureFvSize
   
   gArmTokenSpaceGuid.PcdFvBaseAddress
-  
+
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecPrimaryStackSize
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecSecondaryStackSize

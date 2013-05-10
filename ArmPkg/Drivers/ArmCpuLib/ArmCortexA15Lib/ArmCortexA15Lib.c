@@ -55,7 +55,7 @@ ArmCpuSetupSmpNonSecure (
   )
 {
   /*// Make the SCU accessible in Non Secure world
-  if (IS_PRIMARY_CORE(MpId)) {
+  if (ArmPlatformIsPrimaryCore (MpId)) {
     ScuBase = ArmGetScuBaseAddress();
 
     // Allow NS access to SCU register

@@ -39,6 +39,8 @@
   BeagleBoardMem.c
   PadConfiguration.c
   Clock.c
+  BeagleBoardHelper.S    | GCC
+  BeagleBoardHelper.asm  | RVCT
 
 [Protocols]
 

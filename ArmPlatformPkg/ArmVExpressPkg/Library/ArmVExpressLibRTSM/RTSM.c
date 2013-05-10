@@ -97,7 +97,7 @@ ArmPlatformInitialize (
   IN  UINTN                     MpId
   )
 {
-  if (!IS_PRIMARY_CORE(MpId)) {
+  if (!ArmPlatformIsPrimaryCore (MpId)) {
     return RETURN_SUCCESS;
   }
 

@@ -19,6 +19,7 @@
 #include <Base.h>
 #include <Library/ArmLib.h>
 #include <Library/ArmCpuLib.h>
+#include <Library/ArmPlatformLib.h>
 #include <Library/ArmPlatformSecLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>

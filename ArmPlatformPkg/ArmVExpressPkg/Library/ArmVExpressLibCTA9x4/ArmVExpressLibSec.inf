@@ -36,6 +36,8 @@
 
 [Sources.common]
   CTA9x4.c
+  CTA9x4Helper.S   | GCC
+  CTA9x4Helper.asm | RVCT
 
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdCacheEnable

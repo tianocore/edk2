@@ -56,7 +56,7 @@ CEntryPoint (
   ArmPlatformSecInitialize (MpId);
 
   // Primary CPU clears out the SCU tag RAMs, secondaries wait
-  if (IS_PRIMARY_CORE(MpId) && (SecBootMode == ARM_SEC_COLD_BOOT)) {
+  if (ArmPlatformIsPrimaryCore (MpId) && (SecBootMode == ARM_SEC_COLD_BOOT)) {
     if (ArmIsMpCore()) {
       // Signal for the initial memory is configured (event: BOOT_MEM_INIT)
       ArmCallSEV ();
@@ -108,7 +108,7 @@ CEntryPoint (
     // Enter Monitor Mode
     enter_monitor_mode ((UINTN)TrustedWorldInitialization, MpId, SecBootMode, (VOID*)(PcdGet32(PcdCPUCoresSecMonStackBase) + (PcdGet32(PcdCPUCoreSecMonStackSize) * (GET_CORE_POS(MpId) + 1))));
   } else {
-    if (IS_PRIMARY_CORE(MpId)) {
+    if (ArmPlatformIsPrimaryCore (MpId)) {
       SerialPrint ("Trust Zone Configuration is disabled\n\r");
     }
 
@@ -147,7 +147,7 @@ TrustedWorldInitialization (
 
   // Setup the Trustzone Chipsets
   if (SecBootMode == ARM_SEC_COLD_BOOT) {
-    if (IS_PRIMARY_CORE(MpId)) {
+    if (ArmPlatformIsPrimaryCore (MpId)) {
       if (ArmIsMpCore()) {
         // Signal the secondary core the Security settings is done (event: EVENT_SECURE_INIT)
         ArmCallSEV ();

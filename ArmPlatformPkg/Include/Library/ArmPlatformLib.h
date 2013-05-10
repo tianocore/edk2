@@ -40,8 +40,32 @@ typedef struct {
   UINT64                       NumberOfBytes;
 } ARM_SYSTEM_MEMORY_REGION_DESCRIPTOR;
 
+/**
+  Return the core position from the value of its MpId register
+
+  This function returns the core position from the position 0 in the processor.
+  This function might be called from assembler before any stack is set.
+
+  @return   Return the core position
+
+**/
 UINTN
 ArmPlatformGetCorePosition (
+  IN UINTN MpId
+  );
+
+/**
+  Return a non-zero value if the callee is the primary core
+
+  This function returns a non-zero value if the callee is the primary core.
+  The primary core is the core responsible to initialize the hardware and run UEFI.
+  This function might be called from assembler before any stack is set.
+
+  @return   Return a non-zero value if the callee is the primary core.
+
+**/
+UINTN
+ArmPlatformIsPrimaryCore (
   IN UINTN MpId
   );
 

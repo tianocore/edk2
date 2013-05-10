@@ -31,10 +31,5 @@
 [Sources.common]
   ArmCortexA15Lib.c
 
-[FeaturePcd]
-
 [FixedPcd]
-  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
-  gArmTokenSpaceGuid.PcdArmPrimaryCore
-
   gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz

@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2011, ARM Limited. All rights reserved.
+//  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 //  
 //  This program and the accompanying materials                          
 //  are licensed and made available under the terms and conditions of the BSD License         
@@ -22,21 +22,26 @@
   INCLUDE AsmMacroIoLib.inc
 
   EXPORT    ArmGetCpuCountPerCluster
-    
+  EXPORT    ArmPlatformIsPrimaryCore
+
+  IMPORT  _gPcd_FixedAtBuild_PcdArmPrimaryCore
+  IMPORT  _gPcd_FixedAtBuild_PcdArmPrimaryCoreMask
+
   AREA RTSMHelper, CODE, READONLY
 
 // IN None
 // OUT r0 = SCU Base Address
-ArmGetScuBaseAddress
+ArmGetScuBaseAddress FUNCTION
   // Read Configuration Base Address Register. ArmCBar cannot be called to get
   // the Configuration BAR as a stack is not necessary setup. The SCU is at the
   // offset 0x0000 from the Private Memory Region.
   mrc   p15, 4, r0, c15, c0, 0
   bx  lr
+  ENDFUNC
 
 // IN None
 // OUT r0 = number of cores present in the system
-ArmGetCpuCountPerCluster
+ArmGetCpuCountPerCluster FUNCTION
   stmfd SP!, {r1-r2}
 
   // Read CP15 MIDR
@@ -69,5 +74,22 @@ _Return
   add   r0, r0, #1
   ldmfd SP!, {r1-r2}
   bx lr
+  ENDFUNC
+
+//UINTN
+//ArmPlatformIsPrimaryCore (
+//  IN UINTN MpId
+//  );
+ArmPlatformIsPrimaryCore FUNCTION
+  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask, r1)
+  ldr   r1, [r1]
+  and   r0, r0, r1
+  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCore, r1)
+  ldr   r1, [r1]
+  cmp   r0, r1
+  moveq r0, #1
+  movne r0, #0
+  bx 	lr
+  ENDFUNC
 
   END

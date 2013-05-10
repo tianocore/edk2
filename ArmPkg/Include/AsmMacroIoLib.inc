@@ -82,6 +82,10 @@
   
   MACRO
   GetCorePositionFromMpId $Pos, $MpId, $Tmp
+  ;Note: The ARM macro does not support the pre-processing. 0xFF and (0xFF << 8) are the values of
+  ;      ARM_CORE_MASK and ARM_CLUSTER_MASK 
+  mov   $Tmp, #(0xFF :OR: (0xFF << 8))
+  and   $MpId, $Tmp
   lsr   $Pos, $MpId, #6
   and   $Tmp, $MpId, #3
   add   $Pos, $Pos, $Tmp

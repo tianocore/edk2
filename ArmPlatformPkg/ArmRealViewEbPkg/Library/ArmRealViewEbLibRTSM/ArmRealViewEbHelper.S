@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2012-2013, ARM Limited. All rights reserved.
+//  Copyright (c) 2012, ARM Limited. All rights reserved.
 //
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
@@ -14,13 +14,14 @@
 #include <AsmMacroIoLib.h>
 #include <Library/ArmLib.h>
 
-#include <ArmPlatform.h>
-
 .text 
 .align 3
 
 GCC_ASM_EXPORT(ArmPlatformGetCorePosition)
 GCC_ASM_EXPORT(ArmPlatformIsPrimaryCore)
+
+GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCore)
+GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask)
 
 //UINTN
 //ArmPlatformGetCorePosition (
@@ -37,28 +38,12 @@ ASM_PFX(ArmPlatformGetCorePosition):
 //  IN UINTN MpId
 //  );
 ASM_PFX(ArmPlatformIsPrimaryCore):
-  // Extract cpu_id and cluster_id from ARM_SCC_CFGREG48
-  // with cpu_id[0:3] and cluster_id[4:7]
-  LoadConstantToReg (ARM_CTA15A7_SCC_CFGREG48, r1)
+  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask, r1)
   ldr   r1, [r1]
-  lsr   r1, #24
-
-  // Shift the SCC value to get the cluster ID at the offset #8
-  lsl   r2, r1, #4
-  and   r2, r2, #0xF00
-
-  // Keep only the cpu ID from the original SCC
-  and   r1, r1, #0x0F
-  // Add the Cluster ID to the Cpu ID
-  orr   r1, r1, r2
-
-  // Keep the Cluster ID and Core ID from the MPID
-  LoadConstantToReg (ARM_CLUSTER_MASK | ARM_CORE_MASK, r2)
-  and   r0, r0, r2
-
-  // Compare mpid and boot cpu from ARM_SCC_CFGREG48
+  and   r0, r0, r1
+  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCore, r1)
+  ldr   r1, [r1]
   cmp   r0, r1
   moveq r0, #1
   movne r0, #0
   bx    lr
-

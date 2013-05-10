@@ -90,8 +90,6 @@
   
   gArmPlatformTokenSpaceGuid.PcdCoreCount
   gArmPlatformTokenSpaceGuid.PcdClusterCount
-  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
-  gArmTokenSpaceGuid.PcdArmPrimaryCore
 
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize

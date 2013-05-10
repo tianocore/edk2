@@ -29,6 +29,7 @@
 [LibraryClasses]
   IoLib
   ArmLib
+  ArmPlatformLib
 
 [Sources.common]
   ArmRealViewEbSec.c
@@ -41,5 +42,3 @@
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFvBaseAddress
 
-  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
-  gArmTokenSpaceGuid.PcdArmPrimaryCore

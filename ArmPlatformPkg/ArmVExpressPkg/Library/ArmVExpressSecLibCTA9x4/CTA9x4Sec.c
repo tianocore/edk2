@@ -36,7 +36,7 @@ ArmPlatformSecTrustzoneInit (
   )
 {
   // Nothing to do
-  if (!IS_PRIMARY_CORE(MpId)) {
+  if (!ArmPlatformIsPrimaryCore (MpId)) {
     return;
   }
 
@@ -120,7 +120,7 @@ ArmPlatformSecInitialize (
   )
 {
   // If it is not the primary core then there is nothing to do
-  if (!IS_PRIMARY_CORE(MpId)) {
+  if (!ArmPlatformIsPrimaryCore (MpId)) {
     return RETURN_SUCCESS;
   }
 

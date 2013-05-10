@@ -11,12 +11,17 @@
 //
 //
 
+#include <AsmMacroIoLib.h>
 #include <Library/ArmLib.h>
 
 .text 
 .align 3
 
 GCC_ASM_EXPORT(ArmPlatformGetCorePosition)
+GCC_ASM_EXPORT(ArmPlatformIsPrimaryCore)
+
+GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCore)
+GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask)
 
 //UINTN
 //ArmPlatformGetCorePosition (
@@ -28,3 +33,18 @@ ASM_PFX(ArmPlatformGetCorePosition):
   add	r0, r1, r0, LSR #7
   bx 	lr
 
+
+//UINTN
+//ArmPlatformIsPrimaryCore (
+//  IN UINTN MpId
+//  );
+ASM_PFX(ArmPlatformIsPrimaryCore):
+  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask, r1)
+  ldr   r1, [r1]
+  and   r0, r0, r1
+  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCore, r1)
+  ldr   r1, [r1]
+  cmp   r0, r1
+  moveq r0, #1
+  movne r0, #0
+  bx    lr

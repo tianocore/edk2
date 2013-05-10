@@ -16,6 +16,7 @@
 
 #include <Library/ArmLib.h>
 #include <Library/ArmGicLib.h>
+#include <Library/ArmPlatformLib.h>
 #include <Library/ArmPlatformSecLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
@@ -70,7 +71,7 @@ ArmPlatformSecExtraAction (
     // Warning: This code assumes the DRAM has already been initialized by ArmPlatformSecLib
     //
 
-    if (IS_PRIMARY_CORE(MpId)) {
+    if (ArmPlatformIsPrimaryCore (MpId)) {
       UINTN*   StartAddress = (UINTN*)PcdGet32(PcdFvBaseAddress);
 
       // Patch the DRAM to make an infinite loop at the start address
@@ -96,7 +97,7 @@ ArmPlatformSecExtraAction (
     // Warning: This code assumes the DRAM has already been initialized by ArmPlatformSecLib
     //
 
-    if (IS_PRIMARY_CORE(MpId)) {
+    if (ArmPlatformIsPrimaryCore (MpId)) {
       // Signal the secondary cores they can jump to PEI phase
       ArmGicSendSgiTo (PcdGet32(PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E, PcdGet32 (PcdGicSgiIntId));
 
