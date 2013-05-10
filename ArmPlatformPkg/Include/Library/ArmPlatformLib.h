@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -24,7 +24,6 @@
 //
 #include <Ppi/MasterBootMode.h>
 #include <Ppi/BootInRecoveryMode.h>
-#include <Guid/MemoryTypeInformation.h>
 
 #include <Library/ArmLib.h>
 
