@@ -18,11 +18,22 @@
   INCLUDE AsmMacroIoLib.inc
 
   EXPORT  ArmPlatformIsPrimaryCore
+  EXPORT  ArmPlatformGetPrimaryCoreMpId
 
   IMPORT  _gPcd_FixedAtBuild_PcdArmPrimaryCore
   IMPORT  _gPcd_FixedAtBuild_PcdArmPrimaryCoreMask
 
   AREA CTA9x4Helper, CODE, READONLY
+
+//UINTN
+//ArmPlatformGetPrimaryCoreMpId (
+//  VOID
+//  );
+ArmPlatformGetPrimaryCoreMpId FUNCTION
+  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask, r0)
+  ldr     r0, [r0]
+  bx 	  lr
+  ENDFUNC
 
 //UINTN
 //ArmPlatformIsPrimaryCore (

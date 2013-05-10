@@ -17,6 +17,7 @@
   INCLUDE AsmMacroIoLib.inc
 
   EXPORT  ArmPlatformGetCorePosition
+  EXPORT  ArmPlatformGetPrimaryCoreMpId
   EXPORT  ArmPlatformIsPrimaryCore
 
   IMPORT  _gPcd_FixedAtBuild_PcdArmPrimaryCore
@@ -34,6 +35,16 @@ ArmPlatformGetCorePosition FUNCTION
   and	r0, r0, #ARM_CLUSTER_MASK
   add	r0, r1, r0, LSR #7
   bx 	lr
+  ENDFUNC
+
+//UINTN
+//ArmPlatformGetPrimaryCoreMpId (
+//  VOID
+//  );
+ArmPlatformGetPrimaryCoreMpId FUNCTION
+  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask, r0)
+  ldr   r0, [r0]
+  bx    lr
   ENDFUNC
 
 //UINTN

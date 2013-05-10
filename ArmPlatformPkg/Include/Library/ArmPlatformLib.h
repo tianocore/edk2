@@ -70,6 +70,20 @@ ArmPlatformIsPrimaryCore (
   );
 
 /**
+  Return the MpId of the primary core
+
+  This function returns the MpId of the primary core.
+  This function might be called from assembler before any stack is set.
+
+  @return   Return the MpId of the primary core
+
+**/
+UINTN
+ArmPlatformGetPrimaryCoreMpId (
+  VOID
+  );
+
+/**
   Return the current Boot Mode
 
   This function returns the boot reason on the platform

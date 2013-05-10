@@ -18,6 +18,7 @@
 .align 3
 
 GCC_ASM_EXPORT(ArmPlatformGetCorePosition)
+GCC_ASM_EXPORT(ArmPlatformGetPrimaryCoreMpId)
 GCC_ASM_EXPORT(ArmPlatformIsPrimaryCore)
 
 GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCore)
@@ -33,6 +34,14 @@ ASM_PFX(ArmPlatformGetCorePosition):
   add	r0, r1, r0, LSR #7
   bx 	lr
 
+//UINTN
+//ArmPlatformGetPrimaryCoreMpId (
+//  VOID
+//  );
+ASM_PFX(ArmPlatformGetPrimaryCoreMpId):
+  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask, r0)
+  ldr   r0, [r0]
+  bx    lr
 
 //UINTN
 //ArmPlatformIsPrimaryCore (

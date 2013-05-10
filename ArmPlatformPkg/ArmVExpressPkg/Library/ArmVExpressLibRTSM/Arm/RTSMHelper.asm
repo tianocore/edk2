@@ -23,6 +23,7 @@
 
   EXPORT    ArmGetCpuCountPerCluster
   EXPORT    ArmPlatformIsPrimaryCore
+  EXPORT    ArmPlatformGetPrimaryCoreMpId
 
   IMPORT  _gPcd_FixedAtBuild_PcdArmPrimaryCore
   IMPORT  _gPcd_FixedAtBuild_PcdArmPrimaryCoreMask
@@ -37,6 +38,16 @@ ArmGetScuBaseAddress FUNCTION
   // offset 0x0000 from the Private Memory Region.
   mrc   p15, 4, r0, c15, c0, 0
   bx  lr
+  ENDFUNC
+
+//UINTN
+//ArmPlatformGetPrimaryCoreMpId (
+//  VOID
+//  );
+ArmPlatformGetPrimaryCoreMpId FUNCTION
+  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask, r0)
+  ldr   r0, [r0]
+  bx    lr
   ENDFUNC
 
 // IN None

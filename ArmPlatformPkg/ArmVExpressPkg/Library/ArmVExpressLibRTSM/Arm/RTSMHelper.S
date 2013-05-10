@@ -23,6 +23,7 @@
 
 GCC_ASM_EXPORT(ArmGetCpuCountPerCluster)
 GCC_ASM_EXPORT(ArmPlatformIsPrimaryCore)
+GCC_ASM_EXPORT(ArmPlatformGetPrimaryCoreMpId)
 
 GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCore)
 GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask)
@@ -35,6 +36,15 @@ ASM_PFX(ArmGetScuBaseAddress):
   # offset 0x0000 from the Private Memory Region.
   mrc   p15, 4, r0, c15, c0, 0
   bx  lr
+
+//UINTN
+//ArmPlatformGetPrimaryCoreMpId (
+//  VOID
+//  );
+ASM_PFX(ArmPlatformGetPrimaryCoreMpId):
+  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask, r0)
+  ldr   r0, [r0]
+  bx    lr
 
 # IN None
 # OUT r0 = number of cores present in the system
