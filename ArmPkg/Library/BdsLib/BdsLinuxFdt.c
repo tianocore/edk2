@@ -25,6 +25,12 @@
 #define PALIGN(p, a)    ((void *)(ALIGN((unsigned long)(p), (a))))
 #define GET_CELL(p)     (p += 4, *((const UINT32 *)(p-4)))
 
+typedef struct {
+  UINTN   Base;
+  UINTN   Size;
+} FdtRegion;
+
+
 STATIC
 UINTN
 IsPrintableString (
@@ -198,10 +204,110 @@ IsLinuxReservedRegion (
 }
 
 
-typedef struct {
-  UINTN   Base;
-  UINTN   Size;
-} FdtRegion;
+STATIC
+BOOLEAN
+IsPsciSmcSupported (
+  VOID
+  )
+{
+  BOOLEAN               PsciSmcSupported;
+  UINTN                 Rx;
+
+  PsciSmcSupported = FALSE;
+
+  // Check the SMC response to the Presence SMC
+  Rx = ARM_SMC_ID_PRESENCE;
+  ArmCallSmc (&Rx);
+  if (Rx == 1) {
+    // Check the SMC UID
+    Rx = ARM_SMC_ID_UID;
+    ArmCallSmc (&Rx);
+    if (Rx == ARM_TRUSTZONE_UID_4LETTERID) {
+      Rx = ARM_SMC_ID_UID + 1;
+      ArmCallSmc (&Rx);
+      if (Rx == ARM_TRUSTZONE_ARM_UID) {
+        PsciSmcSupported = TRUE;
+      }
+    }
+  }
+
+  return PsciSmcSupported;
+}
+
+
+/**
+** Relocate the FDT blob to a more appropriate location for the Linux kernel.
+** This function will allocate memory for the relocated FDT blob.
+**
+** @retval EFI_SUCCESS on success.
+** @retval EFI_OUT_OF_RESOURCES or EFI_INVALID_PARAMETER on failure.
+*/
+STATIC
+EFI_STATUS
+RelocateFdt (
+  EFI_PHYSICAL_ADDRESS   OriginalFdt,
+  UINTN                  OriginalFdtSize,
+  EFI_PHYSICAL_ADDRESS   *RelocatedFdt,
+  UINTN                  *RelocatedFdtSize,
+  EFI_PHYSICAL_ADDRESS   *RelocatedFdtAlloc
+  )
+{
+  EFI_STATUS            Status;
+  INTN                  Error;
+  UINT32                FdtAlignment;
+
+  *RelocatedFdtSize = OriginalFdtSize + FDT_ADDITIONAL_ENTRIES_SIZE;
+
+  // If FDT load address needs to be aligned, allocate more space.
+  FdtAlignment = PcdGet32 (PcdArmLinuxFdtAlignment);
+  if (FdtAlignment != 0) {
+    *RelocatedFdtSize += FdtAlignment;
+  }
+
+  // Try below a watermark address.
+  Status = EFI_NOT_FOUND;
+  if (PcdGet32 (PcdArmLinuxFdtMaxOffset) != 0) {
+    *RelocatedFdt = LINUX_FDT_MAX_OFFSET;
+    Status = gBS->AllocatePages (AllocateMaxAddress, EfiBootServicesData,
+                    EFI_SIZE_TO_PAGES (*RelocatedFdtSize), RelocatedFdt);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_WARN, "Warning: Failed to load FDT below address 0x%lX (%r). Will try again at a random address anywhere.\n", *RelocatedFdt, Status));
+    }
+  }
+
+  // Try anywhere there is available space.
+  if (EFI_ERROR (Status)) {
+    Status = gBS->AllocatePages (AllocateAnyPages, EfiBootServicesData,
+                    EFI_SIZE_TO_PAGES (*RelocatedFdtSize), RelocatedFdt);
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return EFI_OUT_OF_RESOURCES;
+    } else {
+      DEBUG ((EFI_D_WARN, "WARNING: Loaded FDT at random address 0x%lX.\nWARNING: There is a risk of accidental overwriting by other code/data.\n", *RelocatedFdt));
+    }
+  }
+
+  *RelocatedFdtAlloc = *RelocatedFdt;
+  if (FdtAlignment != 0) {
+    *RelocatedFdt = ALIGN (*RelocatedFdt, FdtAlignment);
+  }
+
+  // Load the Original FDT tree into the new region
+  Error = fdt_open_into ((VOID*)(UINTN) OriginalFdt,
+            (VOID*)(UINTN)(*RelocatedFdt), *RelocatedFdtSize);
+  if (Error) {
+    DEBUG ((EFI_D_ERROR, "fdt_open_into(): %a\n", fdt_strerror (Error)));
+    gBS->FreePages (*RelocatedFdtAlloc, EFI_SIZE_TO_PAGES (*RelocatedFdtSize));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  DEBUG_CODE_BEGIN();
+    //DebugDumpFdt (fdt);
+  DEBUG_CODE_END();
+
+  return EFI_SUCCESS;
+}
+
 
 EFI_STATUS
 PrepareFdt (
@@ -216,7 +322,6 @@ PrepareFdt (
   EFI_PHYSICAL_ADDRESS  NewFdtBlobBase;
   EFI_PHYSICAL_ADDRESS  NewFdtBlobAllocation;
   UINTN                 NewFdtBlobSize;
-  UINT32                FdtAlignment;
   VOID*                 fdt;
   INTN                  err;
   INTN                  node;
@@ -244,35 +349,10 @@ PrepareFdt (
   UINT32                DescriptorVersion;
   UINTN                 Pages;
   BOOLEAN               PsciSmcSupported;
-  UINTN                 Rx;
   UINTN                 OriginalFdtSize;
   BOOLEAN               CpusNodeExist;
 
-  //
-  // Ensure the Power State Coordination Interface (PSCI) SMCs are there if supported
-  //
-  PsciSmcSupported = FALSE;
-  if (FeaturePcdGet (PcdArmPsciSupport) == TRUE) {
-    // Check the SMC response to the Presence SMC
-    Rx   = ARM_SMC_ID_PRESENCE;
-    ArmCallSmc (&Rx);
-    if (Rx == 1) {
-      // Check the SMC UID
-      Rx   = ARM_SMC_ID_UID;
-      ArmCallSmc (&Rx);
-      if (Rx == ARM_TRUSTZONE_UID_4LETTERID) {
-        Rx   = ARM_SMC_ID_UID + 1;
-        ArmCallSmc (&Rx);
-        if (Rx == ARM_TRUSTZONE_ARM_UID) {
-          PsciSmcSupported = TRUE;
-        }
-      }
-      if (PsciSmcSupported == FALSE) {
-        DEBUG((EFI_D_ERROR,"Warning: The Power State Coordination Interface (PSCI) is not supported"
-                           "by your platform Trusted Firmware.\n"));
-      }
-    }
-  }
+  NewFdtBlobAllocation = 0;
 
   //
   // Sanity checks on the original FDT blob.
@@ -293,63 +373,35 @@ PrepareFdt (
   }
 
   //
-  // Allocate memory for the new FDT
+  // Relocate the FDT to its final location.
   //
-  NewFdtBlobSize = OriginalFdtSize + FDT_ADDITIONAL_ENTRIES_SIZE;
-
-  // If FDT load address needs to be aligned, allocate more space.
-  FdtAlignment = PcdGet32 (PcdArmLinuxFdtAlignment);
-  if (FdtAlignment != 0) {
-    NewFdtBlobSize += FdtAlignment;
+  Status = RelocateFdt (*FdtBlobBase, OriginalFdtSize,
+             &NewFdtBlobBase, &NewFdtBlobSize, &NewFdtBlobAllocation);
+  if (EFI_ERROR (Status)) {
+    goto FAIL_RELOCATE_FDT;
   }
 
-  // Try below a watermark address
-  Status = EFI_NOT_FOUND;
-  if (PcdGet32 (PcdArmLinuxFdtMaxOffset) != 0) {
-    NewFdtBlobBase = LINUX_FDT_MAX_OFFSET;
-    Status = gBS->AllocatePages (AllocateMaxAddress, EfiBootServicesData, EFI_SIZE_TO_PAGES(NewFdtBlobSize), &NewFdtBlobBase);
-    if (EFI_ERROR(Status)) {
-      DEBUG ((EFI_D_WARN, "Warning: Failed to load FDT below address 0x%lX (%r). Will try again at a random address anywhere.\n", NewFdtBlobBase, Status));
+  //
+  // Ensure the Power State Coordination Interface (PSCI) SMCs are there if supported
+  //
+  PsciSmcSupported = FALSE;
+  if (FeaturePcdGet (PcdArmPsciSupport) == TRUE) {
+    PsciSmcSupported = IsPsciSmcSupported();
+    if (PsciSmcSupported == FALSE) {
+      DEBUG ((EFI_D_ERROR, "Warning: The Power State Coordination Interface (PSCI) is not supported by your platform Trusted Firmware.\n"));
     }
   }
 
-  // Try anywhere there is available space
-  if (EFI_ERROR(Status)) {
-    Status = gBS->AllocatePages (AllocateAnyPages, EfiBootServicesData, EFI_SIZE_TO_PAGES(NewFdtBlobSize), &NewFdtBlobBase);
-    if (EFI_ERROR(Status)) {
-      ASSERT_EFI_ERROR(Status);
-      goto FAIL_ALLOCATE_NEW_FDT;
-    } else {
-      DEBUG ((EFI_D_WARN, "WARNING: Loaded FDT at random address 0x%lX.\nWARNING: There is a risk of accidental overwriting by other code/data.\n", NewFdtBlobBase));
-    }
-  }
-
-  NewFdtBlobAllocation = NewFdtBlobBase;
-  if (FdtAlignment != 0) {
-    NewFdtBlobBase = ALIGN (NewFdtBlobBase, FdtAlignment);
-  }
-
-  // Load the Original FDT tree into the new region
   fdt = (VOID*)(UINTN)NewFdtBlobBase;
-  err = fdt_open_into((VOID*)(UINTN)(*FdtBlobBase), fdt, NewFdtBlobSize);
-  if (err) {
-    DEBUG((EFI_D_ERROR, "fdt_open_into(): %a\n", fdt_strerror(err)));
-    Status = EFI_INVALID_PARAMETER;
-    goto FAIL_NEW_FDT;
-  }
 
-  DEBUG_CODE_BEGIN();
-    //DebugDumpFdt (fdt);
-  DEBUG_CODE_END();
-
-  node = fdt_subnode_offset(fdt, 0, "chosen");
+  node = fdt_subnode_offset (fdt, 0, "chosen");
   if (node < 0) {
     // The 'chosen' node does not exist, create it
     node = fdt_add_subnode(fdt, 0, "chosen");
     if (node < 0) {
       DEBUG((EFI_D_ERROR,"Error on finding 'chosen' node\n"));
       Status = EFI_INVALID_PARAMETER;
-      goto FAIL_NEW_FDT;
+      goto FAIL_COMPLETE_FDT;
     }
   }
 
@@ -519,7 +571,7 @@ PrepareFdt (
       if (node < 0) {
         DEBUG((EFI_D_ERROR,"Error on creating 'psci' node\n"));
         Status = EFI_INVALID_PARAMETER;
-        goto FAIL_NEW_FDT;
+        goto FAIL_COMPLETE_FDT;
       } else {
         fdt_setprop_string(fdt, node, "compatible", "arm,psci");
         fdt_setprop_string(fdt, node, "method", "smc");
@@ -542,13 +594,12 @@ PrepareFdt (
   *FdtBlobSize = (UINTN)fdt_totalsize ((VOID*)(UINTN)(NewFdtBlobBase));
   return EFI_SUCCESS;
 
-FAIL_NEW_FDT:
+FAIL_COMPLETE_FDT:
   gBS->FreePages (NewFdtBlobAllocation, EFI_SIZE_TO_PAGES (NewFdtBlobSize));
 
-FAIL_ALLOCATE_NEW_FDT:
+FAIL_RELOCATE_FDT:
   *FdtBlobSize = (UINTN)fdt_totalsize ((VOID*)(UINTN)(*FdtBlobBase));
-  // Return success even if we failed to update the FDT blob. The original one is still valid.
+  // Return success even if we failed to update the FDT blob.
+  // The original one is still valid.
   return EFI_SUCCESS;
 }
-
-
