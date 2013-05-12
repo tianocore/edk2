@@ -361,6 +361,8 @@ PrepareFdt (
   BOOLEAN               PsciSmcSupported;
   UINTN                 OriginalFdtSize;
   BOOLEAN               CpusNodeExist;
+  UINTN                 CoreMpId;
+  UINTN                 Smc;
 
   NewFdtBlobAllocation = 0;
 
@@ -503,7 +505,11 @@ PrepareFdt (
   }
 
   //
-  // Setup Arm Mpcore Info if it is a multi-core or multi-cluster platforms
+  // Setup Arm Mpcore Info if it is a multi-core or multi-cluster platforms.
+  //
+  // For 'cpus' and 'cpu' device tree nodes bindings, refer to this file
+  // in the kernel documentation:
+  // Documentation/devicetree/bindings/arm/cpus.txt
   //
   for (Index=0; Index < gST->NumberOfTableEntries; Index++) {
     // Check for correct GUID type
@@ -517,7 +523,7 @@ PrepareFdt (
         // Create the /cpus node
         node = fdt_add_subnode(fdt, 0, "cpus");
         fdt_setprop_string(fdt, node, "name", "cpus");
-        fdt_setprop_cell(fdt, node, "#address-cells", 1);
+        fdt_setprop_cell (fdt, node, "#address-cells", sizeof (UINTN) / 4);
         fdt_setprop_cell(fdt, node, "#size-cells", 0);
         CpusNodeExist = FALSE;
       } else {
@@ -531,12 +537,25 @@ PrepareFdt (
       for (Index = 0; Index < ArmProcessorTable->NumberOfEntries; Index++) {
         AsciiSPrint (Name, 10, "cpu@%d", Index);
 
-        // If the 'cpus' node did not exist then creates the 'cpu' nodes. In case 'cpus' node
-        // is provided in the original FDT then we do not add any 'cpu' node.
+        // If the 'cpus' node did not exist then create all the 'cpu' nodes.
+        // In case 'cpus' node is provided in the original FDT then we do not add
+        // any 'cpu' node.
         if (!CpusNodeExist) {
-          cpu_node = fdt_add_subnode(fdt, node, Name);
-          fdt_setprop_string(fdt, cpu_node, "device-type", "cpu");
-          fdt_setprop(fdt, cpu_node, "reg", &Index, sizeof(Index));
+          cpu_node = fdt_add_subnode (fdt, node, Name);
+          if (cpu_node < 0) {
+            DEBUG ((EFI_D_ERROR, "Error on creating '%s' node\n", Name));
+            Status = EFI_INVALID_PARAMETER;
+            goto FAIL_COMPLETE_FDT;
+          }
+
+          fdt_setprop_string (fdt, cpu_node, "device_type", "cpu");
+          CoreMpId = (UINTN) GET_MPID (ArmCoreInfoTable[Index].ClusterId,
+                               ArmCoreInfoTable[Index].CoreId);
+          CoreMpId = cpu_to_fdtn (CoreMpId);
+          fdt_setprop (fdt, cpu_node, "reg", &CoreMpId, sizeof (CoreMpId));
+          if (PsciSmcSupported) {
+            fdt_setprop_string (fdt, cpu_node, "enable-method", "psci");
+          }
         } else {
           cpu_node = fdt_subnode_offset(fdt, node, Name);
         }
@@ -578,12 +597,20 @@ PrepareFdt (
         Status = EFI_INVALID_PARAMETER;
         goto FAIL_COMPLETE_FDT;
       } else {
-        fdt_setprop_string(fdt, node, "compatible", "arm,psci");
-        fdt_setprop_string(fdt, node, "method", "smc");
-        fdt_setprop_cell(fdt, node, "cpu_suspend", ARM_SMC_ARM_CPU_SUSPEND);
-        fdt_setprop_cell(fdt, node, "cpu_off", ARM_SMC_ARM_CPU_OFF);
-        fdt_setprop_cell(fdt, node, "cpu_on", ARM_SMC_ARM_CPU_ON);
-        fdt_setprop_cell(fdt, node, "cpu_migrate", ARM_SMC_ARM_MIGRATE);
+        fdt_setprop_string (fdt, node, "compatible", "arm,psci");
+        fdt_setprop_string (fdt, node, "method", "smc");
+
+        Smc = cpu_to_fdtn (ARM_SMC_ARM_CPU_SUSPEND);
+        fdt_setprop (fdt, node, "cpu_suspend", &Smc, sizeof (Smc));
+
+        Smc = cpu_to_fdtn (ARM_SMC_ARM_CPU_OFF);
+        fdt_setprop (fdt, node, "cpu_off", &Smc, sizeof (Smc));
+
+        Smc = cpu_to_fdtn (ARM_SMC_ARM_CPU_ON);
+        fdt_setprop (fdt, node, "cpu_on", &Smc, sizeof (Smc));
+
+        Smc = cpu_to_fdtn (ARM_SMC_ARM_MIGRATE);
+        fdt_setprop (fdt, node, "migrate", &Smc, sizeof (Smc));
       }
     }
   }
