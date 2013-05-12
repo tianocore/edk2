@@ -25,6 +25,16 @@
 #define PALIGN(p, a)    ((void *)(ALIGN((unsigned long)(p), (a))))
 #define GET_CELL(p)     (p += 4, *((const UINT32 *)(p-4)))
 
+STATIC inline
+UINTN
+cpu_to_fdtn (UINTN x) {
+  if (sizeof (UINTN) == sizeof (UINT32)) {
+    return cpu_to_fdt32 (x);
+  } else {
+    return cpu_to_fdt64 (x);
+  }
+}
+
 typedef struct {
   UINTN   Base;
   UINTN   Size;
@@ -452,13 +462,8 @@ PrepareFdt (
       GetSystemMemoryResources (&ResourceList);
       Resource = (BDS_SYSTEM_MEMORY_RESOURCE*)ResourceList.ForwardLink;
 
-      if (sizeof(UINTN) == sizeof(UINT32)) {
-        Region.Base = cpu_to_fdt32((UINTN)Resource->PhysicalStart);
-        Region.Size = cpu_to_fdt32((UINTN)Resource->ResourceLength);
-      } else {
-        Region.Base = cpu_to_fdt64((UINTN)Resource->PhysicalStart);
-        Region.Size = cpu_to_fdt64((UINTN)Resource->ResourceLength);
-      }
+      Region.Base = cpu_to_fdtn ((UINTN)Resource->PhysicalStart);
+      Region.Size = cpu_to_fdtn ((UINTN)Resource->ResourceLength);
 
       err = fdt_setprop(fdt, node, "reg", &Region, sizeof(Region));
       if (err) {
