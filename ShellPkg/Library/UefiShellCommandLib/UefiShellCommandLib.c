@@ -1,7 +1,7 @@
 /** @file
   Provides interface to shell internal functions for shell commands.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -13,12 +13,6 @@
 **/
 
 #include "UefiShellCommandLib.h"
-
-/// The tag for use in identifying UNICODE files.
-/// If the file is UNICODE, the first 16 bits of the file will equal this value.
-enum {
-  gUnicodeFileTag = 0xFEFF
-};
 
 // STATIC local variables
 STATIC SHELL_COMMAND_INTERNAL_LIST_ENTRY  mCommandList;
