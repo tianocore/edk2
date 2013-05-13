@@ -6,7 +6,7 @@
 # Option ROM image for all CPU architectures, including EBC target.
 # A single driver can support mixes of EFI 1.1, UEFI 2.0 and UEFI 2.1.
 #
-# Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -101,9 +101,9 @@
   OptionRomPkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
   OptionRomPkg/Library/GopBltLib/GopBltLib.inf
 
-  OptionRomPkg/Application/BltLibSample/BltLibSample.inf
-
   OptionRomPkg/AtapiPassThruDxe/AtapiPassThruDxe.inf
   OptionRomPkg/CirrusLogic5430Dxe/CirrusLogic5430Dxe.inf
   OptionRomPkg/UndiRuntimeDxe/UndiRuntimeDxe.inf
 
+[Components.IA32, Components.X64, Components.IPF]
+  OptionRomPkg/Application/BltLibSample/BltLibSample.inf

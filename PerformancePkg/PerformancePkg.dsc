@@ -1,7 +1,7 @@
 ## @file
 # Build description file to generate Shell DP application.
 #
-# Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -68,6 +68,9 @@
 
 [LibraryClasses.IPF]
   PalLib|MdePkg/Library/UefiPalLib/UefiPalLib.inf
+  TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
+
+[LibraryClasses.EBC]
   TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
 
 [Components.IA32, Components.X64]

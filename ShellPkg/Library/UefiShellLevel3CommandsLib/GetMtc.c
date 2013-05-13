@@ -1,7 +1,7 @@
 /** @file
   Main file for GetMtc shell level 3 function.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -70,17 +70,12 @@ ShellCommandRunGetMtc (
       // Get the monotonic counter count
       //
       Status = gBS->GetNextMonotonicCount(&Mtc);
-      switch(Status) {
-        case EFI_DEVICE_ERROR:
-          ShellStatus = SHELL_DEVICE_ERROR;
-          break;
-        case EFI_SECURITY_VIOLATION:
-          ShellStatus = SHELL_SECURITY_VIOLATION;
-          break;
-        default:
-          if (EFI_ERROR(Status)) {
-            ShellStatus = SHELL_DEVICE_ERROR;
-          }
+      if (Status == EFI_DEVICE_ERROR) {
+        ShellStatus = SHELL_DEVICE_ERROR;
+      } else if (Status == EFI_SECURITY_VIOLATION) {
+        ShellStatus = SHELL_SECURITY_VIOLATION;
+      } else if (EFI_ERROR(Status)) {
+        ShellStatus = SHELL_DEVICE_ERROR;
       }
 
       //

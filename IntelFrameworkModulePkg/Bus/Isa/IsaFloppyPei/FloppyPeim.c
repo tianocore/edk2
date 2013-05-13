@@ -1,7 +1,7 @@
 /** @file
 Floppy Peim to support Recovery function from Floppy device.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -1018,22 +1018,12 @@ DiscoverFdcDevice (
   // Check Media
   //
   Status = DisketChanged (FdcBlkIoDev, Info);
-  switch (Status) {
-  case EFI_NO_MEDIA:
+  if (Status == EFI_NO_MEDIA) {
     //
     // No diskette in floppy.
     //
-    MediaInfo->MediaPresent = FALSE;
-    break;
-
-  case EFI_MEDIA_CHANGED:
-  case EFI_SUCCESS:
-    //
-    // Diskette exists in floppy.
-    //
-    break;
-
-  default:
+    MediaInfo->MediaPresent = FALSE;    
+  } else if (Status != EFI_MEDIA_CHANGED && Status != EFI_SUCCESS) {
     //
     // EFI_DEVICE_ERROR
     //

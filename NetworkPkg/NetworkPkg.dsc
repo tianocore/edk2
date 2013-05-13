@@ -1,7 +1,7 @@
 ## @file
 # UEFI 2.2 Network Module Package for All Architectures
 #
-# Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -85,17 +85,18 @@
 ###################################################################################################
 
 [Components]
-  NetworkPkg/IpSecDxe/IpSecDxe.inf
   NetworkPkg/Ip6Dxe/Ip6Dxe.inf
   NetworkPkg/TcpDxe/TcpDxe.inf
   NetworkPkg/Udp6Dxe/Udp6Dxe.inf
   NetworkPkg/Dhcp6Dxe/Dhcp6Dxe.inf
   NetworkPkg/Mtftp6Dxe/Mtftp6Dxe.inf
 
-[Components.IA32, Components.X64, Components.IPF]
-  NetworkPkg/IScsiDxe/IScsiDxe.inf
-  NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
-  NetworkPkg/Application/Ping6/Ping6.inf
   NetworkPkg/Application/IfConfig6/IfConfig6.inf
   NetworkPkg/Application/IpsecConfig/IpSecConfig.inf
   NetworkPkg/Application/VConfig/VConfig.inf
+
+[Components.IA32, Components.X64, Components.IPF]
+  NetworkPkg/IpSecDxe/IpSecDxe.inf
+  NetworkPkg/IScsiDxe/IScsiDxe.inf
+  NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
+  NetworkPkg/Application/Ping6/Ping6.inf

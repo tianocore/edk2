@@ -1,7 +1,7 @@
 /** @file
   The driver binding for IP4 CONFIG protocol.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -71,7 +71,7 @@ IP4_CONFIG_INSTANCE        mIp4ConfigTemplate = {
   NULL,
   NULL,
   NULL,
-  EFI_NOT_READY,
+  0,
   {
     0,
     0,
@@ -109,6 +109,8 @@ Ip4ConfigDriverEntryPoint (
   IN EFI_SYSTEM_TABLE       *SystemTable
   )
 {
+  mIp4ConfigTemplate.Result = EFI_NOT_READY;
+
   return EfiLibInstallDriverBindingComponentName2 (
            ImageHandle,
            SystemTable,

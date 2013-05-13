@@ -1,7 +1,7 @@
 ## @file
 #  Security Module Package for All Architectures.
 #
-# Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -92,8 +92,6 @@
   SecurityPkg/Library/DxeImageAuthenticationStatusLib/DxeImageAuthenticationStatusLib.inf
   SecurityPkg/UserIdentification/UserIdentifyManagerDxe/UserIdentifyManagerDxe.inf
   SecurityPkg/UserIdentification/UserProfileManagerDxe/UserProfileManagerDxe.inf
-  SecurityPkg/UserIdentification/PwdCredentialProviderDxe/PwdCredentialProviderDxe.inf
-  SecurityPkg/UserIdentification/UsbCredentialProviderDxe/UsbCredentialProviderDxe.inf
 
   #
   # Application
@@ -104,28 +102,34 @@
   # TPM
   #
   SecurityPkg/Library/DxeTpmMeasureBootLib/DxeTpmMeasureBootLib.inf
-  SecurityPkg/Tcg/TcgPei/TcgPei.inf
-  SecurityPkg/Tcg/TcgDxe/TcgDxe.inf
+  SecurityPkg/Library/TpmCommLib/TpmCommLib.inf
+
   SecurityPkg/Tcg/PhysicalPresencePei/PhysicalPresencePei.inf
   SecurityPkg/Tcg/MemoryOverwriteControl/TcgMor.inf
+  
+[Components.IA32, Components.X64, Components.IPF]
+  SecurityPkg/UserIdentification/PwdCredentialProviderDxe/PwdCredentialProviderDxe.inf
+  SecurityPkg/UserIdentification/UsbCredentialProviderDxe/UsbCredentialProviderDxe.inf
+  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
+  SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableRuntimeDxe.inf
+
+  #
+  # TPM
+  #
+  SecurityPkg/Tcg/TcgPei/TcgPei.inf
+  SecurityPkg/Tcg/TcgDxe/TcgDxe.inf
   SecurityPkg/Tcg/TcgConfigDxe/TcgConfigDxe.inf {
     <LibraryClasses>
       PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   }
-  SecurityPkg/Tcg/TcgSmm/TcgSmm.inf
-  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
-  
+
 [Components.IA32, Components.X64]
-  SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableRuntimeDxe.inf
   SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableSmm.inf
   SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableSmmRuntimeDxe.inf
+  SecurityPkg/Tcg/TcgSmm/TcgSmm.inf
 
 [Components.IPF]
   SecurityPkg/VariableAuthenticated/EsalVariableDxeSal/EsalVariableDxeSal.inf 
-
-[Components.EBC]
-# Build only
-  SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableRuntimeDxe.inf 
 
 [BuildOptions]
    MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:256

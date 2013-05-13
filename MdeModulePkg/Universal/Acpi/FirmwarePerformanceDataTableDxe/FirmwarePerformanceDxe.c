@@ -5,7 +5,7 @@
   for Firmware Basic Boot Performance Record and other boot performance records, 
   and install FPDT to ACPI table.
 
-  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -238,7 +238,7 @@ InstallFirmwarePerformanceDataTable (
   EFI_ACPI_TABLE_PROTOCOL       *AcpiTableProtocol;
   EFI_PHYSICAL_ADDRESS          Address;
   UINTN                         Size;
-  UINT8                         SmmBootRecordCommBuffer[SMM_BOOT_RECORD_COMM_SIZE];
+  UINT8                         *SmmBootRecordCommBuffer;
   EFI_SMM_COMMUNICATE_HEADER    *SmmCommBufferHeader;
   SMM_BOOT_RECORD_COMMUNICATE   *SmmCommData;
   UINTN                         CommSize;
@@ -259,6 +259,8 @@ InstallFirmwarePerformanceDataTable (
   //
   // Collect boot records from SMM drivers.
   //
+  SmmBootRecordCommBuffer = AllocateZeroPool (SMM_BOOT_RECORD_COMM_SIZE);
+  ASSERT (SmmBootRecordCommBuffer != NULL);
   SmmCommData = NULL;
   Status = gBS->LocateProtocol (&gEfiSmmCommunicationProtocolGuid, NULL, (VOID **) &Communication);
   if (!EFI_ERROR (Status)) {
@@ -294,6 +296,7 @@ InstallFirmwarePerformanceDataTable (
       ASSERT_EFI_ERROR(SmmCommData->ReturnStatus);
     }
   }
+  FreePool (SmmBootRecordCommBuffer);
 
   //
   // Prepare memory for runtime Performance Record. 

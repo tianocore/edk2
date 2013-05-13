@@ -1,7 +1,7 @@
 /** @file
   Main file for map shell level 2 command.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1091,18 +1091,15 @@ ShellCommandRunMap (
           if (SName != NULL) {
             Status = PerformMappingDelete(SName);
             if (EFI_ERROR(Status)) {
-              switch (Status) {
-                case EFI_ACCESS_DENIED:
-                  ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellLevel2HiiHandle);
-                  ShellStatus = SHELL_ACCESS_DENIED;
-                  break;
-                case EFI_NOT_FOUND:
-                  ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MAP_NF), gShellLevel2HiiHandle, SName);
-                  ShellStatus = SHELL_INVALID_PARAMETER;
-                  break;
-                default:
-                  ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel2HiiHandle, Status);
-                  ShellStatus = SHELL_UNSUPPORTED;
+              if (Status == EFI_ACCESS_DENIED) {
+                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellLevel2HiiHandle);
+                ShellStatus = SHELL_ACCESS_DENIED;
+              } else if (Status == EFI_NOT_FOUND) {
+                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MAP_NF), gShellLevel2HiiHandle, SName);
+                ShellStatus = SHELL_INVALID_PARAMETER;
+              } else {
+                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel2HiiHandle, Status);
+                ShellStatus = SHELL_UNSUPPORTED;
               }
             }
           } else {
