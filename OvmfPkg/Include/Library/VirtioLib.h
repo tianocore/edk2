@@ -140,8 +140,8 @@ VirtioRingUninit (
 // request.
 //
 typedef struct {
-  UINT16 HeadIdx;
-  UINT16 NextAvailIdx;
+  UINT16 HeadDescIdx;
+  UINT16 NextDescIdx;
 } DESC_INDICES;
 
 
@@ -169,9 +169,8 @@ VirtioPrepare (
 
   Append a contiguous buffer for transmission / reception via the virtio ring.
 
-  This function implements the following sections from virtio-0.9.5:
+  This function implements the following section from virtio-0.9.5:
   - 2.4.1.1 Placing Buffers into the Descriptor Table
-  - 2.4.1.2 Updating the Available Ring
 
   Free space is taken as granted, since the individual drivers support only
   synchronous requests and host side status is processed in lock-step with
@@ -199,13 +198,9 @@ VirtioPrepare (
 
   In *Indices:
 
-  @param [in] HeadIdx           The index identifying the head buffer (first
-                                buffer appended) belonging to this same
-                                request.
-
-  @param [in out] NextAvailIdx  On input, the index identifying the next
-                                descriptor available to carry the buffer. On
-                                output, incremented by one, modulo 2^16.
+  @param [in out] NextDescIdx  On input, the index identifying the next
+                               descriptor to carry the buffer. On output,
+                               incremented by one, modulo 2^16.
 
 **/
 VOID
@@ -221,8 +216,8 @@ VirtioAppendDesc (
 
 /**
 
-  Notify the host about appended descriptors and wait until it processes the
-  last one (ie. all of them).
+  Notify the host about the descriptor chain just built, and wait until the
+  host processes it.
 
   @param[in] PciIo        The target virtio PCI device to notify.
 
@@ -230,8 +225,10 @@ VirtioAppendDesc (
 
   @param[in out] Ring     The virtio ring with descriptors to submit.
 
-  @param[in] Indices      The function waits until the host processes
-                          descriptors up to Indices->NextAvailIdx.
+  In *Indices:
+
+  @param[in] HeadDescIdx  Identifies the head descriptor of the descriptor
+                          chain.
 
 
   @return              Error code from VirtioWrite() if it fails.
