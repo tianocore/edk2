@@ -1353,15 +1353,16 @@ ON_ERROR:
            &gEfiCallerIdGuid,
            &Private->Id
            );
-    if (Private != NULL) {
-      FreePool (Private);
-    }
   }
 
   if (IpVersion == IP_VERSION_4) {
     PxeBcDestroyIp4Children (This, Private);
   } else {
     PxeBcDestroyIp6Children (This, Private);
+  }
+
+  if (FirstStart && Private != NULL) {
+    FreePool (Private);
   }
 
   return Status;
