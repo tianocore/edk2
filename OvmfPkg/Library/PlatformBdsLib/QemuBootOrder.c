@@ -677,6 +677,35 @@ TranslateOfwNodes (
       TargetLun[0],
       TargetLun[1]
       );
+  } else if (NumNodes >= 3 &&
+             SubstringEq (OfwNode[1].DriverName, "ethernet") &&
+             SubstringEq (OfwNode[2].DriverName, "ethernet-phy")
+             ) {
+    //
+    // OpenFirmware device path (Ethernet NIC):
+    //
+    //   /pci@i0cf8/ethernet@3[,2]/ethernet-phy@0
+    //        ^              ^                  ^
+    //        |              |                  fixed
+    //        |              PCI slot[, function] holding Ethernet card
+    //        PCI root at system bus port, PIO
+    //
+    // UEFI device path prefix (dependent on presence of nonzero PCI function):
+    //
+    //   PciRoot(0x0)/Pci(0x3,0x0)/MAC(525400E15EEF,0x1)
+    //   PciRoot(0x0)/Pci(0x3,0x2)/MAC(525400E15EEF,0x1)
+    //                                 ^            ^
+    //                                 MAC address  IfType (1 == Ethernet)
+    //
+    // (Some UEFI NIC drivers don't set 0x1 for IfType.)
+    //
+    Written = UnicodeSPrintAsciiFormat (
+      Translated,
+      *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
+      "PciRoot(0x0)/Pci(0x%x,0x%x)/MAC",
+      PciDevFun[0],
+      PciDevFun[1]
+      );
   } else {
     return RETURN_UNSUPPORTED;
   }
