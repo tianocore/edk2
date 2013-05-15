@@ -380,12 +380,11 @@ VirtioAppendDesc (
 
   @param[in] VirtQueueId  Identifies the queue for the target device.
 
-  @param[in out] Ring     The virtio ring with descriptors to submit.
+  @param[in,out] Ring     The virtio ring with descriptors to submit.
 
-  In *Indices:
-
-  @param[in] HeadDescIdx  Identifies the head descriptor of the descriptor
-                          chain.
+  @param[in] Indices      Indices->NextDescIdx is not accessed.
+                          Indices->HeadDescIdx identifies the head descriptor
+                          of the descriptor chain.
 
 
   @return              Error code from VirtioWrite() if it fails.
