@@ -1,7 +1,7 @@
 /** @file
   Provides application point extension for "C" style main funciton
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -29,6 +29,10 @@
 
   An application that uses UefiShellCEntryLib must have a ShellAppMain
   function as prototyped in Include/Library/ShellCEntryLib.h.
+
+  Note that the Shell uses POSITIVE integers for error values, while UEFI
+  uses NEGATIVE values.  If the application is to be used within a script,
+  it needs to return one of the SHELL_STATUS values defined in ShellBase.h.
 
   @param  ImageHandle  The image handle of the UEFI Application.
   @param  SystemTable  A pointer to the EFI System Table.
@@ -91,9 +95,5 @@ ShellCEntryLib (
       ASSERT(FALSE);
     }
   }
-  if (ReturnFromMain == 0) {
-    return (EFI_SUCCESS);
-  } else {
-    return (EFI_UNSUPPORTED);
-  }
+  return ReturnFromMain;
 }
