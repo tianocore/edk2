@@ -66,13 +66,30 @@ http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=How_to_build_OVM
   (qemu-system-x86_64 works for the IA32 firmware as well, of course.)
 * Use the QEMU -L parameter to specify the directory where the bios.bin
   file is located.
-* Optionally you can use the QEMU -serial command to capture the
-  OVMF debug messages.  For example: -serial file:serial.log
 * The EFI shell is built into OVMF builds at this time, so it should
   run automatically if a UEFI boot application is not found on the
   removable media.
 * On Linux, newer version of QEMU may enable KVM feature, and this might
   cause OVMF to fail to boot.  The QEMU '-no-kvm' may allow OVMF to boot.
+* Capturing OVMF debug messages on qemu:
+  - The default OVMF build writes debug messages to IO port 0x402.  The
+    following qemu command line options save them in the file called
+    debug.log: '-debugcon file:debug.log -global isa-debugcon.iobase=0x402'.
+  - It is possible to revert to the original behavior, when debug messages were
+    written to the emulated serial port (potentially intermixing OVMF debug
+    output with UEFI serial console output).  For this the
+    '-D DEBUG_ON_SERIAL_PORT' option has to be passed to the build command (see
+    the next section), and in order to capture the serial output qemu needs to
+    be started with eg. '-serial file:serial.log'.
+  - Debug messages fall into several categories.  Logged vs. suppressed
+    categories are controlled at OVMF build time by the
+    'gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel' bitmask (an UINT32
+    value) in the selected .dsc file.  Individual bits of this bitmask are
+    defined in <MdePkg/Include/Library/DebugLib.h>.  One non-default bit (with
+    some performance impact) that is frequently set for debugging is 0x00400000
+    (DEBUG_VERBOSE).
+  - The RELEASE build target ('-b RELEASE' build option, see below) disables
+    all debug messages.  The default build target is DEBUG.
 
 === Build Scripts ===
 
@@ -86,7 +103,7 @@ $ OvmfPkg/build.sh -a X64 qemu
 And to run a 64-bit UEFI bootable ISO image:
 $ OvmfPkg/build.sh -a X64 qemu -cdrom /path/to/disk-image.iso
 
-To build a 32-bit OVMF without debug serial messages using GCC 4.5:
+To build a 32-bit OVMF without debug messages using GCC 4.5:
 $ OvmfPkg/build.sh -a IA32 -b RELEASE -t GCC45
 
 === Network Support ===
