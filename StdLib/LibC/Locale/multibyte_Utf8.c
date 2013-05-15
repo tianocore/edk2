@@ -197,19 +197,24 @@ DecodeOneStateful(
   int           NumConv;
   unsigned char ch;
 
-  if((Src == NULL) || (*Src == '\0')) {
-    return 0;
-  }
   if(pS == NULL) {
     pS = &LocalConvState;
   }
-  SrcEnd  = Src + Len;
   NumConv = 0;
-  while(Src < SrcEnd) {
-    ch = (unsigned char)*Src++;
-    NumConv = ProcessOneByte(ch, pS);
-    if(NumConv != -2)
-      break;
+  if(Src != NULL) {
+    if(*Src != 0) {
+      SrcEnd  = Src + Len;
+      while(Src < SrcEnd) {
+        ch = (unsigned char)*Src++;
+        NumConv = ProcessOneByte(ch, pS);
+        if(NumConv != -2) {
+          break;
+        }
+      }
+    }
+    else if(Dest != NULL) {
+      *Dest = 0;
+    }
   }
   if((NumConv > 0) && (Dest != NULL)) {
     Dest[0] = pS->D[0];
@@ -416,14 +421,6 @@ EncodeUtf8(char *Dest, wchar_t ch)
   */
   if(Dest != NULL) {        // Save character if Dest is not NULL
     memcpy(Dest, Buff, NumInBuff);
-
-    if(ch != 0) {
-      // Terminate the destination string.
-      Dest[NumInBuff] = '\0';
-    }
-    else {
-      NumInBuff = 0;
-    }
   }
   return NumInBuff;             // Tell the caller
 }
@@ -646,7 +643,7 @@ mbsrtowcs(
   size_t        RetVal = 0;
   const char   *MySrc;
 
-  if((src == NULL) || (*src == NULL) || (**src == '\0')) {
+  if((src == NULL) || (*src == NULL)) {
     return 0;
   }
 
@@ -855,7 +852,7 @@ wctomb(
 }
 
 /** The wcsrtombs function converts a sequence of wide characters from the array
-    indirectly pointed to by Dest into a sequence of corresponding multibyte
+    indirectly pointed to by Src into a sequence of corresponding multibyte
     characters that begins in the conversion state described by the object
     pointed to by ps.
 
@@ -914,15 +911,16 @@ wcsrtombs(
     return (0);
 
   if (Dest == NULL) {
-    if(MaxBytes <= 0) {
-      MaxBytes = ASCII_STRING_MAX;
-    }
-    NumStored = EstimateWtoM(*Src, MaxBytes, NULL);
+    NumStored = EstimateWtoM(*Src, ASCII_STRING_MAX, NULL);
   }
   else {
-    while (OneWcToMcLen(InCh = *(*Src)++) <= MaxBytes) {
+    if((MaxBytes < 0) || (MaxBytes > ASCII_STRING_MAX)) {
+      MaxBytes = ASCII_STRING_MAX;
+    }
+    while ((MaxBytes > 0) && (OneWcToMcLen(InCh = *(*Src)++) <= MaxBytes)) {
       if(InCh == 0) {
         *Src = NULL;
+        *Dest = 0;      // NUL terminate Dest string, but don't count the NUL
         break;
       }
       count = (int)wcrtomb(Dest, InCh, NULL);
