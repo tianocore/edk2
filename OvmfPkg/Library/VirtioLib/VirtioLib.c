@@ -285,7 +285,7 @@ VirtioRingUninit (
 
   The calling driver must be in VSTAT_DRIVER_OK state.
 
-  @param[in out] Ring  The virtio ring we intend to append descriptors to.
+  @param[in,out] Ring  The virtio ring we intend to append descriptors to.
 
   @param[out] Indices  The DESC_INDICES structure to initialize.
 
