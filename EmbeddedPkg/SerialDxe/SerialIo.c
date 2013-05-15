@@ -7,6 +7,7 @@
   
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2013, ARM Ltd. All rights reserved.<BR>
   
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -165,7 +166,7 @@ SerialSetAttributes (
   EFI_STATUS  Status;
   EFI_TPL     Tpl;
 
-  Status = SerialPortSetAttributes (BaudRate, ReceiveFifoDepth, Timeout, Parity, DataBits, StopBits);
+  Status = SerialPortSetAttributes (&BaudRate, &ReceiveFifoDepth, &Timeout, &Parity, &DataBits, &StopBits);
   if (EFI_ERROR(Status)) {
     return Status;
   }

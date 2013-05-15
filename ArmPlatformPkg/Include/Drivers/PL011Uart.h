@@ -91,12 +91,12 @@
 RETURN_STATUS
 EFIAPI
 PL011UartInitializePort (
-  IN UINTN               UartBase,
-  IN UINT64              BaudRate,
-  IN UINT32              ReceiveFifoDepth,
-  IN EFI_PARITY_TYPE     Parity,
-  IN UINT8               DataBits,
-  IN EFI_STOP_BITS_TYPE  StopBits
+  IN OUT UINTN               UartBase,
+  IN OUT UINT64              *BaudRate,
+  IN OUT UINT32              *ReceiveFifoDepth,
+  IN OUT EFI_PARITY_TYPE     *Parity,
+  IN OUT UINT8               *DataBits,
+  IN OUT EFI_STOP_BITS_TYPE  *StopBits
   );
 
 /**

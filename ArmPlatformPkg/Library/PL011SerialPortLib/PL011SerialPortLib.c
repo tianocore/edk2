@@ -2,7 +2,7 @@
   Serial I/O Port library functions with no library constructor/destructor
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2012, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2012 - 2013, ARM Ltd. All rights reserved.<BR>
   
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -37,13 +37,21 @@ SerialPortInitialize (
   VOID
   )
 {
+  UINT64              BaudRate;
+  UINT32              ReceiveFifoDepth;
+  EFI_PARITY_TYPE     Parity;
+  UINT8               DataBits;
+  EFI_STOP_BITS_TYPE  StopBits;
+
+  BaudRate = (UINTN)PcdGet64 (PcdUartDefaultBaudRate);
+  ReceiveFifoDepth = 0; // Use the default value for Fifo depth
+  Parity = (EFI_PARITY_TYPE)PcdGet8 (PcdUartDefaultParity);
+  DataBits = PcdGet8 (PcdUartDefaultDataBits);
+  StopBits = (EFI_STOP_BITS_TYPE) PcdGet8 (PcdUartDefaultStopBits);
+
   return PL011UartInitializePort (
       (UINTN)PcdGet64 (PcdSerialRegisterBase),
-      (UINTN)PcdGet64 (PcdUartDefaultBaudRate),
-      0, // Use the default value for Fifo depth
-      (EFI_PARITY_TYPE)PcdGet8 (PcdUartDefaultParity),
-      PcdGet8 (PcdUartDefaultDataBits),
-      (EFI_STOP_BITS_TYPE) PcdGet8 (PcdUartDefaultStopBits));
+      &BaudRate, &ReceiveFifoDepth, &Parity, &DataBits, &StopBits);
 }
 
 /**
