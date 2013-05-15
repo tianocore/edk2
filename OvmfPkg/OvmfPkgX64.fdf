@@ -249,10 +249,11 @@ FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
 #
 # Network modules
 #
-!if $(NETWORK_ENABLE)
+!if $(E1000_ENABLE)
   FILE DRIVER = 5D695E11-9B3F-4b83-B25F-4A8D5D69BE07 {
     SECTION PE32 = Intel3.5/EFIX64/E3507X2.EFI
   }
+!endif
   INF  MdeModulePkg/Universal/Network/SnpDxe/SnpDxe.inf
   INF  MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
   INF  MdeModulePkg/Universal/Network/MnpDxe/MnpDxe.inf
@@ -266,7 +267,6 @@ FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
   INF  MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
   INF  MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
   INF  MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
-!endif
 
 #
 # Usb Support

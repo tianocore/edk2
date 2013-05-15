@@ -108,31 +108,65 @@ $ OvmfPkg/build.sh -a IA32 -b RELEASE -t GCC45
 
 === Network Support ===
 
-To add network drivers to OVMF:
+OVMF provides a generic UEFI network stack by default, with the lowest level
+driver (the NIC driver) missing in the default build. In order to complete the
+stack and make eg. DHCP, PXE Boot, and socket test utilities from the StdLib
+edk2 package work, (1) qemu has to be configured to emulate a NIC, (2) a
+matching UEFI NIC driver must be available when OVMF boots.
 
-* Download UEFI drivers for the e1000 NIC
-  - http://downloadcenter.intel.com/Detail_Desc.aspx?agr=Y&DwnldID=17515&lang=eng
-  - Install the drivers into a directory called Intel3.5 in your WORKSPACE
+(If a NIC is configured for the virtual machine, and -- dependent on boot order
+-- PXE booting is attempted, but no DHCP server responds to OVMF's DHCP
+DISCOVER message at startup, the boot process may take approx. 3 seconds
+longer.)
 
-* Include the drivers in OVMF during the build:
-  - Add '-D NETWORK_ENABLE' to your build command
-  - For example: build -D NETWORK_ENABLE
+* For each NIC emulated by qemu, a GPLv2 licensed UEFI driver is available from
+  the iPXE project. The qemu source distribution, starting with version 1.5,
+  contains prebuilt binaries of these drivers (and of course allows one to
+  rebuild them from source as well).
 
-* Use the QEMU -net parameter to enable NIC support.
-  - QEMU does not support UEFI DHCP or UEFI PXE Boot, so long timeouts will
-    occur when NICs are enabled.  The long timeouts can be avoided by
-    interrupts the boot sequence by pressing a key when the logo appears.
-  - Example: Enable e1000 NIC with a DHCP server and restrict packet
-    forwarding:
-    -net nic,model=e1000 -net user,restrict=yes -net user,dhcpstart=10.0.2.10
-  - Example: Enable e1000 NIC with a DHCP server, restrict packet forwarding,
-    and generate PCAP file:
-    -net nic,model=e1000 -net user,restrict=yes -net user,dhcpstart=10.0.2.10
-    -net dump,file=a.pcap
-  - Example: Enable 2 e1000 NICs with a DHCP server and restrict
-    packet forwarding:
-    -net nic,model=e1000,addr=3 -net nic,model=e1000,addr=4
-    -net user,restrict=yes -net user,dhcpstart=10.0.2.10
+* Use the qemu -netdev and -device options, or the legacy -net option, to
+  enable NIC support: <http://wiki.qemu.org/Documentation/Networking>.
+
+* For a qemu >= 1.5 binary running *without* any "-M machine" option where
+  "machine" would identify a < qemu-1.5 configuration (for example: "-M
+  pc-i440fx-1.4" or "-M pc-0.13"), the drivers are available from the default
+  qemu installation to OVMF without further settings.
+
+* For a qemu binary in [0.13, 1.5), or a qemu >= 1.5 binary with an "-M
+  machine" option where "machine" selects a < qemu-1.5 configuration:
+
+  - download a >= 1.5.0-rc1 source tarball from <http://wiki.qemu.org/Download>,
+
+  - extract the following files from the tarball and install them in a
+    location that is accessible to qemu processes (this may depend on your
+    SELinux configuration, for example):
+
+    qemu-VERSION/pc-bios/efi-e1000.rom
+    qemu-VERSION/pc-bios/efi-ne2k_pci.rom
+    qemu-VERSION/pc-bios/efi-pcnet.rom
+    qemu-VERSION/pc-bios/efi-rtl8139.rom
+    qemu-VERSION/pc-bios/efi-virtio.rom
+
+  - extend the NIC's -device option on the qemu command line with a matching
+    "romfile=" optarg:
+
+    -device e1000,...,romfile=/full/path/to/efi-e1000.rom
+    -device ne2k_pci,...,romfile=/full/path/to/efi-ne2k_pci.rom
+    -device pcnet,...,romfile=/full/path/to/efi-pcnet.rom
+    -device rtl8139,...,romfile=/full/path/to/efi-rtl8139.rom
+    -device virtio-net-pci,...,romfile=/full/path/to/efi-virtio.rom
+
+* Independently of the iPXE NIC drivers, Intel's proprietary E1000 NIC driver
+  can be embedded in the OVMF image at build time, as an alternative guest
+  driver for "-device e1000":
+
+  - Download UEFI drivers for the e1000 NIC
+    - http://downloadcenter.intel.com/Detail_Desc.aspx?agr=Y&DwnldID=17515&lang=eng
+    - Install the drivers into a directory called Intel3.5 in your WORKSPACE.
+
+  - Include the driver in OVMF during the build:
+    - Add "-D E1000_ENABLE -D FD_SIZE_2MB" to your build command,
+    - For example: "build -D E1000_ENABLE -D FD_SIZE_2MB".
 
 === UNIXGCC Debug ===
 

@@ -467,7 +467,6 @@
   #
   # Network Support
   #
-!if $(NETWORK_ENABLE)
   MdeModulePkg/Universal/Network/SnpDxe/SnpDxe.inf
   MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
   MdeModulePkg/Universal/Network/MnpDxe/MnpDxe.inf
@@ -481,7 +480,6 @@
   MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
   MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
   MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
-!endif
 
   #
   # Usb Support
