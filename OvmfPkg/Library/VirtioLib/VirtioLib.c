@@ -329,27 +329,26 @@ VirtioPrepare (
   The caller is responsible for initializing *Indices with VirtioPrepare()
   first.
 
-  @param[in out] Ring           The virtio ring to append the buffer to, as a
-                                descriptor.
+  @param[in,out] Ring        The virtio ring to append the buffer to, as a
+                             descriptor.
 
-  @param [in] BufferPhysAddr    (Guest pseudo-physical) start address of the
-                                transmit / receive buffer.
+  @param[in] BufferPhysAddr  (Guest pseudo-physical) start address of the
+                             transmit / receive buffer.
 
-  @param [in] BufferSize        Number of bytes to transmit or receive.
+  @param[in] BufferSize      Number of bytes to transmit or receive.
 
-  @param [in] Flags             A bitmask of VRING_DESC_F_* flags. The caller
-                                computes this mask dependent on further buffers
-                                to append and transfer direction.
-                                VRING_DESC_F_INDIRECT is unsupported. The
-                                VRING_DESC.Next field is always set, but the
-                                host only interprets it dependent on
-                                VRING_DESC_F_NEXT.
+  @param[in] Flags           A bitmask of VRING_DESC_F_* flags. The caller
+                             computes this mask dependent on further buffers to
+                             append and transfer direction.
+                             VRING_DESC_F_INDIRECT is unsupported. The
+                             VRING_DESC.Next field is always set, but the host
+                             only interprets it dependent on VRING_DESC_F_NEXT.
 
-  In *Indices:
-
-  @param [in out] NextDescIdx  On input, the index identifying the next
-                               descriptor to carry the buffer. On output,
-                               incremented by one, modulo 2^16.
+  @param[in,out] Indices     Indices->HeadDescIdx is not accessed.
+                             On input, Indices->NextDescIdx identifies the next
+                             descriptor to carry the buffer. On output,
+                             Indices->NextDescIdx is incremented by one, modulo
+                             2^16.
 
 **/
 VOID
