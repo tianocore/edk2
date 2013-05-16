@@ -7,7 +7,7 @@
   This module register report status code listener to collect performance data
   for S3 Resume Performance Record on S3 resume boot path.
 
-  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -20,7 +20,6 @@
 
 #include <PiPei.h>
 
-#include <Ppi/ReadOnlyVariable2.h>
 #include <Ppi/ReportStatusCodeHandler.h>
 #include <Ppi/SecPerformance.h>
 
@@ -68,9 +67,8 @@ FpdtStatusCodeListenerPei (
 {
   EFI_STATUS                           Status;
   UINT64                               CurrentTime;
-  EFI_PEI_READ_ONLY_VARIABLE2_PPI      *VariableServices;
   UINTN                                VarSize;
-  FIRMWARE_PERFORMANCE_VARIABLE        PerformanceVariable;
+  EFI_PHYSICAL_ADDRESS                 S3PerformanceTablePointer;
   S3_PERFORMANCE_TABLE                 *AcpiS3PerformanceTable;
   EFI_ACPI_5_0_FPDT_S3_RESUME_RECORD   *AcpiS3ResumeRecord;
   UINT64                               S3ResumeTotal;
@@ -90,33 +88,20 @@ FpdtStatusCodeListenerPei (
   //
   CurrentTime = GetTimeInNanoSecond (GetPerformanceCounter ());
 
-  Status = PeiServicesLocatePpi (
-             &gEfiPeiReadOnlyVariable2PpiGuid,
-             0,
-             NULL,
-             (VOID **) &VariableServices
-             );
-  ASSERT_EFI_ERROR (Status);
-
   //
   // Update S3 Resume Performance Record.
   //
-  VarSize = sizeof (FIRMWARE_PERFORMANCE_VARIABLE);
-  Status = VariableServices->GetVariable (
-                               VariableServices,
-                               EFI_FIRMWARE_PERFORMANCE_VARIABLE_NAME,
-                               &gEfiFirmwarePerformanceGuid,
-                               NULL,
-                               &VarSize,
-                               &PerformanceVariable
-                               );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+  S3PerformanceTablePointer = 0;
+  VarSize = sizeof (EFI_PHYSICAL_ADDRESS);
+  Status = RestoreLockBox (&gFirmwarePerformanceS3PointerGuid, &S3PerformanceTablePointer, &VarSize);
+  ASSERT_EFI_ERROR (Status);
 
-  AcpiS3PerformanceTable = (S3_PERFORMANCE_TABLE *) (UINTN) PerformanceVariable.S3PerformanceTablePointer;
+  AcpiS3PerformanceTable = (S3_PERFORMANCE_TABLE *) (UINTN) S3PerformanceTablePointer;
   ASSERT (AcpiS3PerformanceTable != NULL);
-  ASSERT (AcpiS3PerformanceTable->Header.Signature == EFI_ACPI_5_0_FPDT_S3_PERFORMANCE_TABLE_SIGNATURE);
+  if (AcpiS3PerformanceTable->Header.Signature != EFI_ACPI_5_0_FPDT_S3_PERFORMANCE_TABLE_SIGNATURE) {
+    DEBUG ((EFI_D_ERROR, "FPDT S3 performance data in ACPI memory get corrupted\n"));
+    return EFI_ABORTED;
+  }
   AcpiS3ResumeRecord = &AcpiS3PerformanceTable->S3Resume;
   AcpiS3ResumeRecord->FullResume = CurrentTime;
   //

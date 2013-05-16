@@ -21,6 +21,8 @@
 #include <Protocol/ReportStatusCodeHandler.h>
 #include <Protocol/AcpiTable.h>
 #include <Protocol/SmmCommunication.h>
+#include <Protocol/LockBox.h>
+#include <Protocol/Variable.h>
 
 #include <Guid/Acpi.h>
 #include <Guid/FirmwarePerformance.h>
@@ -36,7 +38,8 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/HobLib.h>
-#include <Library/PcdLib.h>
+#include <Library/LockBoxLib.h>
+#include <Library/UefiLib.h>
 
 //
 // ACPI table information used to initialize tables.
@@ -51,6 +54,7 @@
 
 EFI_RSC_HANDLER_PROTOCOL    *mRscHandlerProtocol = NULL;
 
+BOOLEAN                     mLockBoxReady = FALSE;
 EFI_EVENT                   mReadyToBootEvent;
 EFI_EVENT                   mLegacyBootEvent;
 EFI_EVENT                   mExitBootServicesEvent;
@@ -206,6 +210,7 @@ FpdtAllocateReservedMemoryBelow4G (
   EFI_STATUS            Status;
   VOID                  *Buffer;
 
+  Buffer  = NULL;
   Pages   = EFI_SIZE_TO_PAGES (Size);
   Address = 0xffffffff;
 
@@ -217,10 +222,104 @@ FpdtAllocateReservedMemoryBelow4G (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  Buffer = (VOID *) (UINTN) Address;
-  ZeroMem (Buffer, Size);
+  if (!EFI_ERROR (Status)) {
+    Buffer = (VOID *) (UINTN) Address;
+    ZeroMem (Buffer, Size);
+  }
 
   return Buffer;
+}
+
+/**
+  Callback function upon VariableArchProtocol and LockBoxProtocol
+  to allocate S3 performance table memory and save the pointer to LockBox.
+
+  @param[in] Event    Event whose notification function is being invoked.
+  @param[in] Context  Pointer to the notification function's context.
+**/
+VOID
+EFIAPI
+FpdtAllocateS3PerformanceTableMemory (
+  IN  EFI_EVENT                             Event,
+  IN  VOID                                  *Context
+  )
+{
+  EFI_STATUS                    Status;
+  VOID                          *Interface;
+  FIRMWARE_PERFORMANCE_VARIABLE PerformanceVariable;
+  UINTN                         Size;
+  EFI_PHYSICAL_ADDRESS          S3PerformanceTablePointer;
+
+  if (mLockBoxReady && (mAcpiS3PerformanceTable != NULL)) {
+    //
+    // The memory for S3 performance table should have been ready,
+    // and the pointer should have been saved to LockBox, just return.
+    //
+    return;
+  }
+
+  if (!mLockBoxReady) {
+    Status = gBS->LocateProtocol (&gEfiLockBoxProtocolGuid, NULL, &Interface);
+    if (!EFI_ERROR (Status)) {
+      //
+      // LockBox services has been ready.
+      //
+      mLockBoxReady = TRUE;
+    }
+  }
+
+  if (mAcpiS3PerformanceTable == NULL) {
+    Status = gBS->LocateProtocol (&gEfiVariableArchProtocolGuid, NULL, &Interface);
+    if (!EFI_ERROR (Status)) {
+      //
+      // Try to allocate the same runtime buffer as last time boot.
+      //
+      ZeroMem (&PerformanceVariable, sizeof (PerformanceVariable));
+      Size = sizeof (PerformanceVariable);
+      Status = gRT->GetVariable (
+                      EFI_FIRMWARE_PERFORMANCE_VARIABLE_NAME,
+                      &gEfiFirmwarePerformanceGuid,
+                      NULL,
+                      &Size,
+                      &PerformanceVariable
+                      );
+      if (!EFI_ERROR (Status)) {
+        Status = gBS->AllocatePages (
+                        AllocateAddress,
+                        EfiReservedMemoryType,
+                        EFI_SIZE_TO_PAGES (sizeof (S3_PERFORMANCE_TABLE)),
+                        &PerformanceVariable.S3PerformanceTablePointer
+                        );
+        if (!EFI_ERROR (Status)) {
+          mAcpiS3PerformanceTable = (S3_PERFORMANCE_TABLE *) (UINTN) PerformanceVariable.S3PerformanceTablePointer;
+        }
+      }
+      if (mAcpiS3PerformanceTable == NULL) {
+        //
+        // Fail to allocate at specified address, continue to allocate at any address.
+        //
+        mAcpiS3PerformanceTable = (S3_PERFORMANCE_TABLE *) FpdtAllocateReservedMemoryBelow4G (sizeof (S3_PERFORMANCE_TABLE));
+      }
+      DEBUG ((EFI_D_INFO, "FPDT: ACPI S3 Performance Table address = 0x%x\n", mAcpiS3PerformanceTable));
+      if (mAcpiS3PerformanceTable != NULL) {
+        CopyMem (mAcpiS3PerformanceTable, &mS3PerformanceTableTemplate, sizeof (mS3PerformanceTableTemplate));
+      }
+    }
+  }
+
+  if (mLockBoxReady && (mAcpiS3PerformanceTable != NULL)) {
+    //
+    // If LockBox services has been ready and memory for FPDT S3 performance table has been allocated,
+    // save the pointer to LockBox for use in S3 resume.
+    //
+    S3PerformanceTablePointer = (EFI_PHYSICAL_ADDRESS) (UINTN) mAcpiS3PerformanceTable;
+    Status = SaveLockBox (
+               &gFirmwarePerformanceS3PointerGuid,
+               &S3PerformanceTablePointer,
+               sizeof (EFI_PHYSICAL_ADDRESS)
+               );
+    ASSERT_EFI_ERROR (Status);
+  }
 }
 
 /**
@@ -236,15 +335,13 @@ InstallFirmwarePerformanceDataTable (
 {
   EFI_STATUS                    Status;
   EFI_ACPI_TABLE_PROTOCOL       *AcpiTableProtocol;
-  EFI_PHYSICAL_ADDRESS          Address;
   UINTN                         Size;
   UINT8                         *SmmBootRecordCommBuffer;
   EFI_SMM_COMMUNICATE_HEADER    *SmmCommBufferHeader;
   SMM_BOOT_RECORD_COMMUNICATE   *SmmCommData;
   UINTN                         CommSize;
-  UINTN                         PerformanceRuntimeDataSize;
-  UINT8                         *PerformanceRuntimeData; 
-  UINT8                         *PerformanceRuntimeDataHead; 
+  UINTN                         BootPerformanceDataSize;
+  UINT8                         *BootPerformanceData; 
   EFI_SMM_COMMUNICATION_PROTOCOL  *Communication;
   FIRMWARE_PERFORMANCE_VARIABLE PerformanceVariable;
 
@@ -299,15 +396,12 @@ InstallFirmwarePerformanceDataTable (
   FreePool (SmmBootRecordCommBuffer);
 
   //
-  // Prepare memory for runtime Performance Record. 
-  // Runtime performance records includes two tables S3 performance table and Boot performance table. 
-  // S3 Performance table includes S3Resume and S3Suspend records. 
+  // Prepare memory for Boot Performance table.
   // Boot Performance table includes BasicBoot record, and one or more appended Boot Records. 
   //
-  PerformanceRuntimeData = NULL;
-  PerformanceRuntimeDataSize = sizeof (S3_PERFORMANCE_TABLE) + sizeof (BOOT_PERFORMANCE_TABLE) + mBootRecordSize + PcdGet32 (PcdExtFpdtBootRecordPadSize);
+  BootPerformanceDataSize = sizeof (BOOT_PERFORMANCE_TABLE) + mBootRecordSize + PcdGet32 (PcdExtFpdtBootRecordPadSize);
   if (SmmCommData != NULL) {
-    PerformanceRuntimeDataSize += SmmCommData->BootRecordSize;
+    BootPerformanceDataSize += SmmCommData->BootRecordSize;
   }
 
   //
@@ -323,87 +417,59 @@ InstallFirmwarePerformanceDataTable (
                   &PerformanceVariable
                   );
   if (!EFI_ERROR (Status)) {
-    Address = PerformanceVariable.S3PerformanceTablePointer;
     Status = gBS->AllocatePages (
                     AllocateAddress,
                     EfiReservedMemoryType,
-                    EFI_SIZE_TO_PAGES (PerformanceRuntimeDataSize),
-                    &Address
+                    EFI_SIZE_TO_PAGES (BootPerformanceDataSize),
+                    &PerformanceVariable.BootPerformanceTablePointer
                     );
     if (!EFI_ERROR (Status)) {
-      PerformanceRuntimeData = (UINT8 *) (UINTN) Address;
+      mAcpiBootPerformanceTable = (BOOT_PERFORMANCE_TABLE *) (UINTN) PerformanceVariable.BootPerformanceTablePointer;
     }
   }
 
-  if (PerformanceRuntimeData == NULL) {
+  if (mAcpiBootPerformanceTable == NULL) {
     //
     // Fail to allocate at specified address, continue to allocate at any address.
     //
-    PerformanceRuntimeData = FpdtAllocateReservedMemoryBelow4G (PerformanceRuntimeDataSize);
+    mAcpiBootPerformanceTable = (BOOT_PERFORMANCE_TABLE *) FpdtAllocateReservedMemoryBelow4G (BootPerformanceDataSize);
   }
-  DEBUG ((EFI_D_INFO, "FPDT: Performance Runtime Data address = 0x%x\n", PerformanceRuntimeData));
+  DEBUG ((EFI_D_INFO, "FPDT: ACPI Boot Performance Table address = 0x%x\n", mAcpiBootPerformanceTable));
 
-  if (PerformanceRuntimeData == NULL) {
+  if (mAcpiBootPerformanceTable == NULL) {
     if (SmmCommData != NULL && SmmCommData->BootRecordData != NULL) {
       FreePool (SmmCommData->BootRecordData);
     }
+    if (mAcpiS3PerformanceTable != NULL) {
+      FreePages (mAcpiS3PerformanceTable, EFI_SIZE_TO_PAGES (sizeof (S3_PERFORMANCE_TABLE)));
+    }
     return EFI_OUT_OF_RESOURCES;
-  }
-  
-  PerformanceRuntimeDataHead = PerformanceRuntimeData;
-
-  if (FeaturePcdGet (PcdFirmwarePerformanceDataTableS3Support)) {
-    //
-    // Prepare S3 Performance Table.
-    //
-    mAcpiS3PerformanceTable = (S3_PERFORMANCE_TABLE *) PerformanceRuntimeData;
-    CopyMem (mAcpiS3PerformanceTable, &mS3PerformanceTableTemplate, sizeof (mS3PerformanceTableTemplate));
-    PerformanceRuntimeData  = PerformanceRuntimeData + mAcpiS3PerformanceTable->Header.Length;
-    DEBUG ((EFI_D_INFO, "FPDT: ACPI S3 Performance Table address = 0x%x\n", mAcpiS3PerformanceTable));
-    //
-    // Save S3 Performance Table address to Variable for use in Firmware Performance PEIM.
-    //
-    PerformanceVariable.S3PerformanceTablePointer = (EFI_PHYSICAL_ADDRESS) (UINTN) mAcpiS3PerformanceTable;
-    //
-    // Update S3 Performance Table Pointer in template.
-    //
-    mFirmwarePerformanceTableTemplate.S3PointerRecord.S3PerformanceTablePointer = (UINT64) PerformanceVariable.S3PerformanceTablePointer;
-  } else {
-    //
-    // Exclude S3 Performance Table Pointer from FPDT table template.
-    //
-    mFirmwarePerformanceTableTemplate.Header.Length -= sizeof (EFI_ACPI_5_0_FPDT_S3_PERFORMANCE_TABLE_POINTER_RECORD);
   }
 
   //
   // Prepare Boot Performance Table.
   //
-  mAcpiBootPerformanceTable = (BOOT_PERFORMANCE_TABLE *) PerformanceRuntimeData;
+  BootPerformanceData = (UINT8 *) mAcpiBootPerformanceTable;
   //
   // Fill Basic Boot record to Boot Performance Table.
   //
-  CopyMem (PerformanceRuntimeData, &mBootPerformanceTableTemplate, sizeof (mBootPerformanceTableTemplate));
-  PerformanceRuntimeData = PerformanceRuntimeData + mAcpiBootPerformanceTable->Header.Length;
+  CopyMem (mAcpiBootPerformanceTable, &mBootPerformanceTableTemplate, sizeof (mBootPerformanceTableTemplate));
+  BootPerformanceData = BootPerformanceData + mAcpiBootPerformanceTable->Header.Length;
   //
   // Fill Boot records from boot drivers.
   //
-  CopyMem (PerformanceRuntimeData, mBootRecordBuffer, mBootRecordSize);
+  CopyMem (BootPerformanceData, mBootRecordBuffer, mBootRecordSize);
   mAcpiBootPerformanceTable->Header.Length += mBootRecordSize;
-  PerformanceRuntimeData = PerformanceRuntimeData + mBootRecordSize;
+  BootPerformanceData = BootPerformanceData + mBootRecordSize;
   if (SmmCommData != NULL && SmmCommData->BootRecordData != NULL) {
     //
     // Fill Boot records from SMM drivers.
     //
-    CopyMem (PerformanceRuntimeData, SmmCommData->BootRecordData, SmmCommData->BootRecordSize);
+    CopyMem (BootPerformanceData, SmmCommData->BootRecordData, SmmCommData->BootRecordSize);
     FreePool (SmmCommData->BootRecordData);
     mAcpiBootPerformanceTable->Header.Length = (UINT32) (mAcpiBootPerformanceTable->Header.Length + SmmCommData->BootRecordSize);
-    PerformanceRuntimeData = PerformanceRuntimeData + SmmCommData->BootRecordSize;
+    BootPerformanceData = BootPerformanceData + SmmCommData->BootRecordSize;
   }
-  //
-  // Reserve space for boot records after ReadyToBoot.
-  //
-  PerformanceRuntimeData = PerformanceRuntimeData + PcdGet32 (PcdExtFpdtBootRecordPadSize);
-  DEBUG ((EFI_D_INFO, "FPDT: ACPI Boot Performance Table address = 0x%x\n", mAcpiBootPerformanceTable));
   //
   // Save Boot Performance Table address to Variable for use in S4 resume.
   //
@@ -414,12 +480,20 @@ InstallFirmwarePerformanceDataTable (
   mFirmwarePerformanceTableTemplate.BootPointerRecord.BootPerformanceTablePointer = (UINT64) (UINTN) mAcpiBootPerformanceTable;
 
   //
+  // Save S3 Performance Table address to Variable for use in S4 resume.
+  //
+  PerformanceVariable.S3PerformanceTablePointer = (EFI_PHYSICAL_ADDRESS) (UINTN) mAcpiS3PerformanceTable;
+  //
+  // Update S3 Performance Table Pointer in template.
+  //
+  mFirmwarePerformanceTableTemplate.S3PointerRecord.S3PerformanceTablePointer = (UINT64) (UINTN) mAcpiS3PerformanceTable;
+  //
   // Save Runtime Performance Table pointers to Variable.
   //
   Status = gRT->SetVariable (
                   EFI_FIRMWARE_PERFORMANCE_VARIABLE_NAME,
                   &gEfiFirmwarePerformanceGuid,
-                  EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                  EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
                   sizeof (PerformanceVariable),
                   &PerformanceVariable
                   );
@@ -436,7 +510,10 @@ InstallFirmwarePerformanceDataTable (
                                 &mFirmwarePerformanceTableTemplateKey
                                 );
   if (EFI_ERROR (Status)) {
-    FreePool (PerformanceRuntimeDataHead);
+    FreePages (mAcpiBootPerformanceTable, EFI_SIZE_TO_PAGES (BootPerformanceDataSize));
+    if (mAcpiS3PerformanceTable != NULL) {
+      FreePages (mAcpiS3PerformanceTable, EFI_SIZE_TO_PAGES (sizeof (S3_PERFORMANCE_TABLE)));
+    }
     mAcpiBootPerformanceTable = NULL;
     mAcpiS3PerformanceTable = NULL;
     return Status;
@@ -703,6 +780,7 @@ FirmwarePerformanceDxeEntryPoint (
   EFI_STATUS               Status;
   EFI_HOB_GUID_TYPE        *GuidHob;
   FIRMWARE_SEC_PERFORMANCE *Performance;
+  VOID                     *Registration;
 
   //
   // Get Report Status Code Handler Protocol.
@@ -767,6 +845,32 @@ FirmwarePerformanceDxeEntryPoint (
     // SEC Performance Data Hob not found, ResetEnd in ACPI FPDT table will be 0.
     //
     DEBUG ((EFI_D_ERROR, "FPDT: WARNING: SEC Performance Data Hob not found, ResetEnd will be set to 0!\n"));
+  }
+
+  if (FeaturePcdGet (PcdFirmwarePerformanceDataTableS3Support)) {
+    //
+    // Register callback function upon VariableArchProtocol and LockBoxProtocol
+    // to allocate S3 performance table memory and save the pointer to LockBox.
+    //
+    EfiCreateProtocolNotifyEvent (
+      &gEfiVariableArchProtocolGuid,
+      TPL_CALLBACK,
+      FpdtAllocateS3PerformanceTableMemory,
+      NULL,
+      &Registration
+      );
+    EfiCreateProtocolNotifyEvent (
+      &gEfiLockBoxProtocolGuid,
+      TPL_CALLBACK,
+      FpdtAllocateS3PerformanceTableMemory,
+      NULL,
+      &Registration
+      );
+  } else {
+    //
+    // Exclude S3 Performance Table Pointer from FPDT table template.
+    //
+    mFirmwarePerformanceTableTemplate.Header.Length -= sizeof (EFI_ACPI_5_0_FPDT_S3_PERFORMANCE_TABLE_POINTER_RECORD);
   }
 
   return EFI_SUCCESS;
