@@ -3437,6 +3437,175 @@ LoadFormSetConfig (
 }
 
 /**
+  Check whether current element in the ConfigReqeust string.
+
+  @param  BrowserStorage                Storage which includes ConfigReqeust.
+  @param  RequestElement                New element need to check.
+
+  @retval TRUE        The Element is in the ConfigReqeust string.
+  @retval FALSE       The Element not in the configReqeust String.
+
+**/
+BOOLEAN 
+ElementValidation (
+  BROWSER_STORAGE   *BrowserStorage,
+  CHAR16            *RequestElement
+  )
+{
+  return StrStr (BrowserStorage->ConfigRequest, RequestElement) != NULL ? TRUE : FALSE;
+}
+
+/**
+  Append the Request element to the Config Request.
+
+  @param  ConfigRequest          Current ConfigRequest info.
+  @param  SpareStrLen            Current remain free buffer for config reqeust.
+  @param  RequestElement         New Request element.
+
+**/
+VOID
+AppendConfigRequest (
+  IN OUT CHAR16               **ConfigRequest,
+  IN OUT UINTN                *SpareStrLen,
+  IN     CHAR16               *RequestElement
+  )
+{
+  CHAR16   *NewStr;
+  UINTN    StringSize;
+  UINTN    StrLength;
+
+  StrLength = StrLen (RequestElement) * sizeof (CHAR16);
+
+  //
+  // Append <RequestElement> to <ConfigRequest>
+  //
+  if (StrLength > *SpareStrLen) {
+    //
+    // Old String buffer is not sufficient for RequestElement, allocate a new one
+    //
+    StringSize = (*ConfigRequest != NULL) ? StrSize (*ConfigRequest) : sizeof (CHAR16);
+    NewStr = AllocateZeroPool (StringSize + CONFIG_REQUEST_STRING_INCREMENTAL * sizeof (CHAR16));
+    ASSERT (NewStr != NULL);
+
+    if (*ConfigRequest != NULL) {
+      CopyMem (NewStr, *ConfigRequest, StringSize);
+      FreePool (*ConfigRequest);
+    }
+    *ConfigRequest = NewStr;
+    *SpareStrLen   = CONFIG_REQUEST_STRING_INCREMENTAL;
+  }
+
+  StrCat (*ConfigRequest, RequestElement);
+  *SpareStrLen -= StrLength;
+}
+
+/**
+  Adjust the config request info, remove the request elements which already in AllConfigRequest string.
+
+  @param  Storage                Form set Storage.
+  @param  ConfigRequest          Return the ConfigRequest info.
+
+  @retval TRUE                   Has element not covered by current used elements, need to continue to call ExtractConfig
+  @retval FALSE                  All elements covered by current used elements.
+
+**/
+BOOLEAN 
+ConfigRequestAdjust (
+  IN  FORMSET_STORAGE         *Storage,
+  OUT CHAR16                  **ConfigRequest
+  )
+{
+  CHAR16       *RequestElement;
+  CHAR16       *NextRequestElement;
+  CHAR16       *RetBuf;
+  UINTN        SpareBufLen;
+  CHAR16       *SearchKey;
+  BOOLEAN      RetVal;
+
+  SpareBufLen    = 0;
+  RetBuf         = NULL;
+  RetVal         = FALSE;
+
+  if (Storage->BrowserStorage->ConfigRequest == NULL) {
+    Storage->BrowserStorage->ConfigRequest = AllocateCopyPool (StrSize (Storage->ConfigRequest), Storage->ConfigRequest);
+    *ConfigRequest = AllocateCopyPool (StrSize (Storage->ConfigRequest), Storage->ConfigRequest);
+    return TRUE;
+  }
+
+  if (Storage->BrowserStorage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
+    //
+    // "&Name1&Name2" section for EFI_HII_VARSTORE_NAME_VALUE storage
+    //
+    SearchKey = L"&";
+  } else {
+    //
+    // "&OFFSET=####&WIDTH=####" section for EFI_HII_VARSTORE_BUFFER storage
+    //
+    SearchKey = L"&OFFSET";
+  }
+
+  //
+  // Prepare the config header.
+  // 
+  RetBuf = AllocateCopyPool(StrSize (Storage->BrowserStorage->ConfigHdr), Storage->BrowserStorage->ConfigHdr);
+  ASSERT (RetBuf != NULL);
+
+  //
+  // Find SearchKey storage
+  //
+  if (Storage->BrowserStorage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
+    RequestElement = StrStr (Storage->ConfigRequest, L"PATH");
+    ASSERT (RequestElement != NULL);
+    RequestElement = StrStr (RequestElement, SearchKey);    
+  } else {
+    RequestElement = StrStr (Storage->ConfigRequest, SearchKey);
+  }
+
+  while (RequestElement != NULL) {
+    //
+    // +1 to avoid find header itself.
+    //
+    NextRequestElement = StrStr (RequestElement + 1, SearchKey);
+
+    //
+    // The last Request element in configRequest string.
+    //
+    if (NextRequestElement != NULL) {
+      //
+      // Replace "&" with '\0'.
+      //
+      *NextRequestElement = L'\0';
+    }
+ 
+    if (!ElementValidation (Storage->BrowserStorage, RequestElement)) {
+      //
+      // Add this element to the Storage->BrowserStorage->AllRequestElement.
+      //
+      AppendConfigRequest(&Storage->BrowserStorage->ConfigRequest, &Storage->BrowserStorage->SpareStrLen, RequestElement);
+      AppendConfigRequest (&RetBuf, &SpareBufLen, RequestElement);
+      RetVal = TRUE;
+    }
+
+    if (NextRequestElement != NULL) {
+      //
+      // Restore '&' with '\0' for later used.
+      //
+      *NextRequestElement = L'&';
+    }
+
+    RequestElement = NextRequestElement;
+  }
+
+  if (RetVal) {
+    *ConfigRequest = RetBuf;
+  } else {
+    FreePool (RetBuf);
+  }
+
+  return RetVal;
+}
+
+/**
   Fill storage's edit copy with settings requested from Configuration Driver.
 
   @param  FormSet                FormSet data structure.
@@ -3455,19 +3624,26 @@ LoadStorage (
   EFI_STRING  Progress;
   EFI_STRING  Result;
   CHAR16      *StrPtr;
+  CHAR16      *ConfigRequest;
 
   if (Storage->BrowserStorage->Type == EFI_HII_VARSTORE_EFI_VARIABLE) {
     return EFI_SUCCESS;
   }
 
   if (Storage->BrowserStorage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) {
-    Status = gRT->GetVariable (
-                     Storage->BrowserStorage->Name,
-                     &Storage->BrowserStorage->Guid,
-                     NULL,
-                     (UINTN*)&Storage->BrowserStorage->Size,
-                     Storage->BrowserStorage->EditBuffer
-                     );
+    Status = EFI_SUCCESS;
+    //
+    // EFI varstore data all get from variable, so no need to get again.
+    //
+    if (Storage->BrowserStorage->ReferenceCount == 1) {
+      Status = gRT->GetVariable (
+                       Storage->BrowserStorage->Name,
+                       &Storage->BrowserStorage->Guid,
+                       NULL,
+                       (UINTN*)&Storage->BrowserStorage->Size,
+                       Storage->BrowserStorage->EditBuffer
+                       );
+    }
     return Status;
   }
 
@@ -3483,14 +3659,24 @@ LoadStorage (
   }
 
   //
+  // Adjust the ConfigRequest string, only the field not saved in BrowserStorage->AllConfig
+  // will used to call ExtractConfig.
+  //
+  if (!ConfigRequestAdjust(Storage, &ConfigRequest)) {
+    return EFI_SUCCESS;
+  }
+
+  //
   // Request current settings from Configuration Driver
   //
   Status = FormSet->ConfigAccess->ExtractConfig (
                                     FormSet->ConfigAccess,
-                                    Storage->ConfigRequest,
+                                    ConfigRequest,
                                     &Progress,
                                     &Result
                                     );
+  FreePool (ConfigRequest);
+
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -3564,7 +3750,7 @@ InitializeCurrentSetting (
     // Storage is not found in backup formset and current global storage not has other driver used,
     // request it from ConfigDriver
     //
-    if (OldStorage == NULL && Storage->BrowserStorage->ReferenceCount == 1) {
+    if (OldStorage == NULL) {
       Status = LoadStorage (FormSet, Storage);
 
       if (EFI_ERROR (Status)) {

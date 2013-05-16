@@ -236,6 +236,9 @@ typedef struct {
   UINT32           Attributes;     // For EFI_IFR_VARSTORE_EFI: EFI Variable attribute
 
   CHAR16           *ConfigHdr;     // <ConfigHdr>
+  CHAR16           *ConfigRequest; // <ConfigRequest> = <ConfigHdr> + <RequestElement>
+                                   // <RequestElement> includes all fields which is used by current form sets.
+  UINTN            SpareStrLen;    // Spare length of ConfigRequest string buffer
   UINT8            ReferenceCount; // How many form set storage refrence this storage.
 } BROWSER_STORAGE;
 
