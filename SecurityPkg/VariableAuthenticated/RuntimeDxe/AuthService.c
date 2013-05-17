@@ -675,7 +675,6 @@ UpdatePlatformMode (
 {
   EFI_STATUS              Status;
   VARIABLE_POINTER_TRACK  Variable;
-  UINT32                  VarAttr;
   UINT8                   SecureBootMode;
   UINT8                   SecureBootEnable;
   UINTN                   VariableDataSize;
@@ -736,13 +735,12 @@ UpdatePlatformMode (
     }
   }
 
-  VarAttr = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS;
   Status  = UpdateVariable (
               EFI_SECURE_BOOT_MODE_NAME,
               &gEfiGlobalVariableGuid,
               &SecureBootMode,
               sizeof(UINT8),
-              VarAttr,
+              EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS,
               0,
               0,
               &Variable,
