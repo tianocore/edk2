@@ -2,7 +2,7 @@
 # Component description file for Variable module.
 #
 # This module installs three EFI_RUNTIME_SERVICES: SetVariable, GetVariable, GetNextVariableName.
-# Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -59,13 +59,15 @@
   gEfiVariableWriteArchProtocolGuid             ## ALWAYS_PRODUCES
   gEfiVariableArchProtocolGuid                  ## ALWAYS_PRODUCES
   gEfiFaultTolerantWriteProtocolGuid            ## SOMETIMES_CONSUMES
+  gEdkiiVariableLockProtocolGuid                ## ALWAYS_PRODUCES
 
 [Guids]
   gEfiVariableGuid                              ## PRODUCES ## Configuration Table Guid 
   gEfiGlobalVariableGuid                        ## PRODUCES ## Variable Guid
-  gEfiEventVirtualAddressChangeGuid             ## PRODUCES ## Event
+  gEfiEventVirtualAddressChangeGuid             ## CONSUMES ## Event
   gEfiSystemNvDataFvGuid                        ## CONSUMES
   gEfiHardwareErrorVariableGuid                 ## SOMETIMES_CONSUMES
+  gEfiEndOfDxeEventGroupGuid                    ## CONSUMES ## Event
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize

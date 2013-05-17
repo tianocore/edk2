@@ -3,7 +3,7 @@
   Implement all four UEFI Runtime Variable services for the nonvolatile
   and volatile storage space and install variable architecture protocol.
   
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -21,6 +21,9 @@ extern VARIABLE_INFO_ENTRY     *gVariableInfo;
 EFI_HANDLE                     mHandle                    = NULL;
 EFI_EVENT                      mVirtualAddressChangeEvent = NULL;
 EFI_EVENT                      mFtwRegistration           = NULL;
+extern BOOLEAN                 mEndOfDxe;
+extern BOOLEAN                 mEnableLocking;
+EDKII_VARIABLE_LOCK_PROTOCOL   mVariableLock              = { VariableLockRequestToLock };
 
 /**
   Return TRUE if ExitBootServices () has been called.
@@ -255,12 +258,34 @@ OnReadyToBoot (
   VOID                                    *Context
   )
 {
+  //
+  // Set the End Of DXE bit in case the EFI_END_OF_DXE_EVENT_GROUP_GUID event is not signaled.
+  //
+  mEndOfDxe = TRUE;
   ReclaimForOS ();
   if (FeaturePcdGet (PcdVariableCollectStatistics)) {
     gBS->InstallConfigurationTable (&gEfiVariableGuid, gVariableInfo);
   }
 }
 
+/**
+  Notification function of EFI_END_OF_DXE_EVENT_GROUP_GUID event group.
+
+  This is a notification function registered on EFI_END_OF_DXE_EVENT_GROUP_GUID event group.
+
+  @param  Event        Event whose notification function is being invoked.
+  @param  Context      Pointer to the notification function's context.
+
+**/
+VOID
+EFIAPI
+OnEndOfDxe (
+  EFI_EVENT                               Event,
+  VOID                                    *Context
+  )
+{
+  mEndOfDxe = TRUE;
+}
 
 /**
   Fault Tolerant Write protocol notification event handler.
@@ -375,9 +400,18 @@ VariableServiceInitialize (
   )
 {
   EFI_STATUS                            Status;
-  EFI_EVENT                             ReadyToBootEvent;    
+  EFI_EVENT                             ReadyToBootEvent;
+  EFI_EVENT                             EndOfDxeEvent;
 
   Status = VariableCommonInitialize ();
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &mHandle,
+                  &gEdkiiVariableLockProtocolGuid,
+                  &mVariableLock,
+                  NULL
+                  );
   ASSERT_EFI_ERROR (Status);
 
   SystemTable->RuntimeServices->GetVariable         = VariableServiceGetVariable;
@@ -426,6 +460,20 @@ VariableServiceInitialize (
              NULL, 
              &ReadyToBootEvent
              );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Register the event handling function to set the End Of DXE flag.
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  OnEndOfDxe,
+                  NULL,
+                  &gEfiEndOfDxeEventGroupGuid,
+                  &EndOfDxeEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;
 }

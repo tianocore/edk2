@@ -38,6 +38,17 @@ EFI_BDS_ARCH_PROTOCOL  gBds = {
 
 UINT16                          *mBootNext = NULL;
 
+///
+/// The read-only variables defined in UEFI Spec.
+///
+CHAR16  *mReadOnlyVariables[] = {
+  L"PlatformLangCodes",
+  L"LangCodes",
+  L"BootOptionSupport",
+  L"HwErrRecSupport",
+  L"OsIndicationsSupported"
+  };
+
 /**
 
   Install Boot Device Selection Protocol
@@ -459,6 +470,8 @@ BdsEntry (
   CHAR16                          *FirmwareVendor;
   EFI_STATUS                      Status;
   UINT16                          BootTimeOut;
+  UINTN                           Index;
+  EDKII_VARIABLE_LOCK_PROTOCOL    *VariableLock;
 
   //
   // Insert the performance probe
@@ -497,18 +510,24 @@ BdsEntry (
   BdsFormalizeEfiGlobalVariable();
 
   //
+  // Mark the read-only variables if the Variable Lock protocol exists
+  //
+  Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **) &VariableLock);
+  DEBUG ((EFI_D_INFO, "[BdsDxe] Locate Variable Lock protocol - %r\n", Status));
+  if (!EFI_ERROR (Status)) {
+    for (Index = 0; Index < sizeof (mReadOnlyVariables) / sizeof (mReadOnlyVariables[0]); Index++) {
+      Status = VariableLock->RequestToLock (VariableLock, mReadOnlyVariables[Index], &gEfiGlobalVariableGuid);
+      ASSERT_EFI_ERROR (Status);
+    }
+  }
+
+  //
   // Report Status Code to indicate connecting drivers will happen
   //
   REPORT_STATUS_CODE (
     EFI_PROGRESS_CODE,
     (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_PC_BEGIN_CONNECTING_DRIVERS)
     );
-
-  //
-  // Do the platform init, can be customized by OEM/IBV
-  //
-  PERF_START (NULL, "PlatformBds", "BDS", 0);
-  PlatformBdsInit ();
 
   InitializeHwErrRecSupport();
 
@@ -538,6 +557,12 @@ BdsEntry (
   InitializeStringSupport ();
   InitializeLanguage (TRUE);
   InitializeFrontPage (TRUE);
+
+  //
+  // Do the platform init, can be customized by OEM/IBV
+  //
+  PERF_START (NULL, "PlatformBds", "BDS", 0);
+  PlatformBdsInit ();
 
   //
   // Set up the device list based on EFI 1.1 variables

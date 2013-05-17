@@ -29,6 +29,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SmmFirmwareVolumeBlock.h>
 #include <Protocol/SmmFaultTolerantWrite.h>
 #include <Protocol/SmmAccess2.h>
+#include <Protocol/SmmEndOfDxe.h>
 
 #include <Library/SmmServicesTableLib.h>
 
@@ -46,14 +47,60 @@ BOOLEAN                                              mAtRuntime              = F
 EFI_GUID                                             mZeroGuid               = {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
 UINT8                                                *mVariableBufferPayload = NULL;
 UINTN                                                mVariableBufferPayloadSize;
+extern BOOLEAN                                       mEndOfDxe;
+extern BOOLEAN                                       mEnableLocking;
+
+/**
+
+  This code sets variable in storage blocks (Volatile or Non-Volatile).
+
+  @param VariableName                     Name of Variable to be found.
+  @param VendorGuid                       Variable vendor GUID.
+  @param Attributes                       Attribute value of the variable found
+  @param DataSize                         Size of Data found. If size is less than the
+                                          data, this value contains the required size.
+  @param Data                             Data pointer.
+
+  @return EFI_INVALID_PARAMETER           Invalid parameter.
+  @return EFI_SUCCESS                     Set successfully.
+  @return EFI_OUT_OF_RESOURCES            Resource not enough to set variable.
+  @return EFI_NOT_FOUND                   Not found.
+  @return EFI_WRITE_PROTECTED             Variable is read-only.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmVariableSetVariable (
+  IN CHAR16                  *VariableName,
+  IN EFI_GUID                *VendorGuid,
+  IN UINT32                  Attributes,
+  IN UINTN                   DataSize,
+  IN VOID                    *Data
+  )
+{
+  EFI_STATUS                 Status;
+
+  //
+  // Disable write protection when the calling SetVariable() through EFI_SMM_VARIABLE_PROTOCOL.
+  //
+  mEnableLocking = FALSE;
+  Status         = VariableServiceSetVariable (
+                     VariableName,
+                     VendorGuid,
+                     Attributes,
+                     DataSize,
+                     Data
+                     );
+  mEnableLocking = TRUE;
+  return Status;
+}
 
 EFI_SMM_VARIABLE_PROTOCOL      gSmmVariable = {
   VariableServiceGetVariable,
   VariableServiceGetNextVariableName,
-  VariableServiceSetVariable,
+  SmmVariableSetVariable,
   VariableServiceQueryVariableInfo
 };
-
 
 /**
   Return TRUE if ExitBootServices () has been called.
@@ -450,6 +497,7 @@ SmmVariableHandler (
   SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME  *GetNextVariableName;
   SMM_VARIABLE_COMMUNICATE_QUERY_VARIABLE_INFO     *QueryVariableInfo;
   VARIABLE_INFO_ENTRY                              *VariableInfo;
+  SMM_VARIABLE_COMMUNICATE_LOCK_VARIABLE           *VariableToLock;
   UINTN                                            InfoSize;
   UINTN                                            NameBufferSize;
   UINTN                                            CommBufferPayloadSize;
@@ -635,6 +683,7 @@ SmmVariableHandler (
       break;
 
     case SMM_VARIABLE_FUNCTION_READY_TO_BOOT:
+      mEndOfDxe = TRUE;
       if (AtRuntime()) {
         Status = EFI_UNSUPPORTED;
         break;
@@ -667,6 +716,51 @@ SmmVariableHandler (
       *CommBufferSize = InfoSize + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE;
       break;
 
+    case SMM_VARIABLE_FUNCTION_LOCK_VARIABLE:
+      if (CommBufferPayloadSize < OFFSET_OF(SMM_VARIABLE_COMMUNICATE_LOCK_VARIABLE, Name)) {
+        DEBUG ((EFI_D_ERROR, "RequestToLock: SMM communication buffer size invalid!\n"));
+        return EFI_SUCCESS;
+      }
+      //
+      // Copy the input communicate buffer payload to pre-allocated SMM variable buffer payload.
+      //
+      CopyMem (mVariableBufferPayload, SmmVariableFunctionHeader->Data, CommBufferPayloadSize);
+      VariableToLock = (SMM_VARIABLE_COMMUNICATE_LOCK_VARIABLE *) mVariableBufferPayload;
+
+      if (VariableToLock->NameSize > MAX_ADDRESS - OFFSET_OF (SMM_VARIABLE_COMMUNICATE_LOCK_VARIABLE, Name)) {
+        //
+        // Prevent InfoSize overflow happen
+        //
+        Status = EFI_ACCESS_DENIED;
+        goto EXIT;
+      }
+
+      if (VariableToLock->NameSize < sizeof (CHAR16) || VariableToLock->Name[VariableToLock->NameSize/sizeof (CHAR16) - 1] != L'\0') {
+        //
+        // Make sure VariableName is A Null-terminated string.
+        //
+        Status = EFI_ACCESS_DENIED;
+        goto EXIT;
+      }
+      
+      InfoSize = OFFSET_OF (SMM_VARIABLE_COMMUNICATE_LOCK_VARIABLE, Name) + VariableToLock->NameSize;
+      
+      //
+      // SMRAM range check already covered before
+      //
+      if (InfoSize > CommBufferPayloadSize) {
+        DEBUG ((EFI_D_ERROR, "Data size exceed communication buffer size limit!\n"));
+        Status = EFI_ACCESS_DENIED;
+        goto EXIT;
+      }
+
+      Status = VariableLockRequestToLock (
+                 NULL,
+                 VariableToLock->Name,
+                 &VariableToLock->Guid
+                 );
+      break;
+
     default:
       Status = EFI_UNSUPPORTED;
   }
@@ -678,6 +772,28 @@ EXIT:
   return EFI_SUCCESS;
 }
 
+/**
+  SMM END_OF_DXE protocol notification event handler.
+
+  @param  Protocol   Points to the protocol's unique identifier
+  @param  Interface  Points to the interface instance
+  @param  Handle     The handle on which the interface was installed
+
+  @retval EFI_SUCCESS   SmmEndOfDxeCallback runs successfully
+
+**/
+EFI_STATUS
+EFIAPI
+SmmEndOfDxeCallback (
+  IN CONST EFI_GUID                       *Protocol,
+  IN VOID                                 *Interface,
+  IN EFI_HANDLE                           Handle
+  )
+{
+  DEBUG ((EFI_D_INFO, "[Variable]END_OF_DXE is signaled\n"));
+  mEndOfDxe = TRUE;
+  return EFI_SUCCESS;
+}
 
 /**
   SMM Fault Tolerant Write protocol notification event handler.
@@ -774,6 +890,7 @@ VariableServiceInitialize (
   VOID                                    *SmmFtwRegistration;
   EFI_SMM_ACCESS2_PROTOCOL                *SmmAccess;
   UINTN                                   Size;
+  VOID                                    *SmmEndOfDxeRegistration;
 
   //
   // Variable initialize.
@@ -843,6 +960,16 @@ VariableServiceInitialize (
                                         );
   ASSERT_EFI_ERROR (Status);
  
+  //
+  // Register EFI_SMM_END_OF_DXE_PROTOCOL_GUID notify function.
+  //
+  Status = gSmst->SmmRegisterProtocolNotify (
+                    &gEfiSmmEndOfDxeProtocolGuid,
+                    SmmEndOfDxeCallback,
+                    &SmmEndOfDxeRegistration
+                    );
+  ASSERT_EFI_ERROR (Status);
+
   //
   // Register FtwNotificationEvent () notify function.
   // 
