@@ -2632,14 +2632,41 @@ SecureBootCallback (
 
     case KEY_VALUE_SAVE_AND_EXIT_KEK:
       Status = EnrollKeyExchangeKey (Private);
+      if (EFI_ERROR (Status)) {
+        CreatePopUp (
+          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+          &Key,
+          L"ERROR: Unsupported file type!",
+          L"Only supports DER-encoded X509 certificate",
+          NULL
+          );
+      }
       break;
 
     case KEY_VALUE_SAVE_AND_EXIT_DB:
       Status = EnrollSignatureDatabase (Private, EFI_IMAGE_SECURITY_DATABASE);
+      if (EFI_ERROR (Status)) {
+        CreatePopUp (
+          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+          &Key,
+          L"ERROR: Unsupported file type!",
+          L"Only supports DER-encoded X509 certificate and executable EFI image",
+          NULL
+          );
+      }
       break;
 
     case KEY_VALUE_SAVE_AND_EXIT_DBX:
       Status = EnrollSignatureDatabase (Private, EFI_IMAGE_SECURITY_DATABASE1);
+      if (EFI_ERROR (Status)) {
+        CreatePopUp (
+          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+          &Key,
+          L"ERROR: Unsupported file type!",
+          L"Only supports DER-encoded X509 certificate and executable EFI image",
+          NULL
+          );
+      }
       break;
 
     default:
@@ -2680,13 +2707,13 @@ SecureBootCallback (
       break;  
     case KEY_VALUE_SAVE_AND_EXIT_PK:
       Status = EnrollPlatformKey (Private);
-      UnicodeSPrint (
-        PromptString,
-        sizeof (PromptString),
-        L"Only DER encoded certificate file (%s) is supported.",
-        mSupportX509Suffix
-        );
       if (EFI_ERROR (Status)) {
+        UnicodeSPrint (
+          PromptString,
+          sizeof (PromptString),
+          L"Only DER encoded certificate file (%s) is supported.",
+          mSupportX509Suffix
+          );
         CreatePopUp (
           EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
           &Key,
