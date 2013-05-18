@@ -1348,53 +1348,6 @@ Done:
 }
 
 /**
-  When VariableWriteArchProtocol install, create "SecureBoot" variable.
-
-  @param[in] Event    Event whose notification function is being invoked.
-  @param[in] Context  Pointer to the notification function's context.
-
-**/
-VOID
-EFIAPI
-VariableWriteCallBack (
-  IN  EFI_EVENT                           Event,
-  IN  VOID                                *Context
-  )
-{
-  UINT8                       SecureBootMode;
-  UINT8                       *SecureBootModePtr;
-  EFI_STATUS                  Status;
-  VOID                        *ProtocolPointer;
-
-  Status = gBS->LocateProtocol (&gEfiVariableWriteArchProtocolGuid, NULL, &ProtocolPointer);
-  if (EFI_ERROR (Status)) {
-    return;
-  }
-
-  //
-  // Check whether "SecureBoot" variable exists.
-  // If this library is built-in, it means firmware has capability to perform
-  // driver signing verification.
-  //
-  GetEfiGlobalVariable2 (EFI_SECURE_BOOT_MODE_NAME, (VOID**)&SecureBootModePtr, NULL);
-  if (SecureBootModePtr == NULL) {
-    SecureBootMode   = SECURE_BOOT_MODE_DISABLE;
-    //
-    // Authenticated variable driver will update "SecureBoot" depending on SetupMode variable.
-    //
-    gRT->SetVariable (
-           EFI_SECURE_BOOT_MODE_NAME,
-           &gEfiGlobalVariableGuid,
-           EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-           sizeof (UINT8),
-           &SecureBootMode
-           );
-  } else {
-    FreePool (SecureBootModePtr);
-  }
-}
-
-/**
   Register security measurement handler.
 
   @param  ImageHandle   ImageHandle of the loaded driver.
@@ -1409,19 +1362,6 @@ DxeImageVerificationLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  VOID                *Registration;
-
-  //
-  // Register callback function upon VariableWriteArchProtocol.
-  //
-  EfiCreateProtocolNotifyEvent (
-    &gEfiVariableWriteArchProtocolGuid,
-    TPL_CALLBACK,
-    VariableWriteCallBack,
-    NULL,
-    &Registration
-    );
-
   return RegisterSecurity2Handler (
           DxeImageVerificationHandler,
           EFI_AUTH_OPERATION_VERIFY_IMAGE | EFI_AUTH_OPERATION_IMAGE_REQUIRED
