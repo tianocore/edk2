@@ -717,48 +717,16 @@ SmmVariableHandler (
       break;
 
     case SMM_VARIABLE_FUNCTION_LOCK_VARIABLE:
-      if (CommBufferPayloadSize < OFFSET_OF(SMM_VARIABLE_COMMUNICATE_LOCK_VARIABLE, Name)) {
-        DEBUG ((EFI_D_ERROR, "RequestToLock: SMM communication buffer size invalid!\n"));
-        return EFI_SUCCESS;
-      }
-      //
-      // Copy the input communicate buffer payload to pre-allocated SMM variable buffer payload.
-      //
-      CopyMem (mVariableBufferPayload, SmmVariableFunctionHeader->Data, CommBufferPayloadSize);
-      VariableToLock = (SMM_VARIABLE_COMMUNICATE_LOCK_VARIABLE *) mVariableBufferPayload;
-
-      if (VariableToLock->NameSize > MAX_ADDRESS - OFFSET_OF (SMM_VARIABLE_COMMUNICATE_LOCK_VARIABLE, Name)) {
-        //
-        // Prevent InfoSize overflow happen
-        //
+      if (mEndOfDxe) {
         Status = EFI_ACCESS_DENIED;
-        goto EXIT;
+      } else {
+        VariableToLock = (SMM_VARIABLE_COMMUNICATE_LOCK_VARIABLE *) SmmVariableFunctionHeader->Data;
+        Status = VariableLockRequestToLock (
+                   NULL,
+                   VariableToLock->Name,
+                   &VariableToLock->Guid
+                   );
       }
-
-      if (VariableToLock->NameSize < sizeof (CHAR16) || VariableToLock->Name[VariableToLock->NameSize/sizeof (CHAR16) - 1] != L'\0') {
-        //
-        // Make sure VariableName is A Null-terminated string.
-        //
-        Status = EFI_ACCESS_DENIED;
-        goto EXIT;
-      }
-      
-      InfoSize = OFFSET_OF (SMM_VARIABLE_COMMUNICATE_LOCK_VARIABLE, Name) + VariableToLock->NameSize;
-      
-      //
-      // SMRAM range check already covered before
-      //
-      if (InfoSize > CommBufferPayloadSize) {
-        DEBUG ((EFI_D_ERROR, "Data size exceed communication buffer size limit!\n"));
-        Status = EFI_ACCESS_DENIED;
-        goto EXIT;
-      }
-
-      Status = VariableLockRequestToLock (
-                 NULL,
-                 VariableToLock->Name,
-                 &VariableToLock->Guid
-                 );
       break;
 
     default:

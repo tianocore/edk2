@@ -22,7 +22,6 @@ EFI_HANDLE                     mHandle                    = NULL;
 EFI_EVENT                      mVirtualAddressChangeEvent = NULL;
 EFI_EVENT                      mFtwRegistration           = NULL;
 extern BOOLEAN                 mEndOfDxe;
-extern BOOLEAN                 mEnableLocking;
 EDKII_VARIABLE_LOCK_PROTOCOL   mVariableLock              = { VariableLockRequestToLock };
 
 /**

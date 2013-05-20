@@ -186,10 +186,20 @@ VariableLockRequestToLock (
   )
 {
   EFI_STATUS                                Status;
+  UINTN                                     VariableNameSize;
   UINTN                                     PayloadSize;
   SMM_VARIABLE_COMMUNICATE_LOCK_VARIABLE    *VariableToLock;
 
   if (VariableName == NULL || VariableName[0] == 0 || VendorGuid == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  VariableNameSize = StrSize (VariableName);
+
+  //
+  // If VariableName exceeds SMM payload limit. Return failure
+  //
+  if (VariableNameSize > mVariableBufferPayloadSize - OFFSET_OF (SMM_VARIABLE_COMMUNICATE_LOCK_VARIABLE, Name)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -199,7 +209,7 @@ VariableLockRequestToLock (
   // Init the communicate buffer. The buffer data size is:
   // SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + PayloadSize.
   //
-  PayloadSize = OFFSET_OF (SMM_VARIABLE_COMMUNICATE_LOCK_VARIABLE, Name) + StrSize (VariableName);
+  PayloadSize = OFFSET_OF (SMM_VARIABLE_COMMUNICATE_LOCK_VARIABLE, Name) + VariableNameSize;
   Status = InitCommunicateBuffer ((VOID **) &VariableToLock, PayloadSize, SMM_VARIABLE_FUNCTION_LOCK_VARIABLE);
   if (EFI_ERROR (Status)) {
     goto Done;
@@ -207,7 +217,7 @@ VariableLockRequestToLock (
   ASSERT (VariableToLock != NULL);
 
   CopyGuid (&VariableToLock->Guid, VendorGuid);
-  VariableToLock->NameSize = StrSize (VariableName);
+  VariableToLock->NameSize = VariableNameSize;
   CopyMem (VariableToLock->Name, VariableName, VariableToLock->NameSize);
 
   //
