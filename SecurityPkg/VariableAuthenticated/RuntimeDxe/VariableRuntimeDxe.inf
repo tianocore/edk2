@@ -67,11 +67,12 @@
   gEfiVariableWriteArchProtocolGuid             ## ALWAYS_PRODUCES
   gEfiVariableArchProtocolGuid                  ## ALWAYS_PRODUCES
   gEfiFaultTolerantWriteProtocolGuid            ## SOMETIMES_CONSUMES
+  gEdkiiVariableLockProtocolGuid                ## ALWAYS_PRODUCES
 
 [Guids]
   gEfiAuthenticatedVariableGuid                 ## PRODUCES ## Configuration Table Guid
   gEfiGlobalVariableGuid                        ## PRODUCES ## Variable Guid
-  gEfiEventVirtualAddressChangeGuid             ## PRODUCES ## Event
+  gEfiEventVirtualAddressChangeGuid             ## CONSUMES ## Event
   gEfiCertTypeRsa2048Sha256Guid
   gEfiImageSecurityDatabaseGuid
   gEfiCertX509Guid
@@ -82,6 +83,7 @@
   gEfiSystemNvDataFvGuid                        ## CONSUMES
   gEfiCertDbGuid
   gEfiHardwareErrorVariableGuid                 ## SOMETIMES_CONSUMES
+  gEfiEndOfDxeEventGroupGuid                    ## CONSUMES ## Event
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize

@@ -21,6 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/FaultTolerantWrite.h>
 #include <Protocol/FirmwareVolumeBlock.h>
 #include <Protocol/Variable.h>
+#include <Protocol/VariableLock.h>
 #include <Library/PcdLib.h>
 #include <Library/HobLib.h>
 #include <Library/UefiDriverEntryPoint.h>
@@ -105,6 +106,12 @@ typedef struct {
   UINTN       DataSize;
   VOID        *Data;
 } VARIABLE_CACHE_ENTRY;
+
+typedef struct {
+  EFI_GUID    Guid;
+  CHAR16      *Name;
+  LIST_ENTRY  Link;
+} VARIABLE_ENTRY;
 
 /**
   Flush the HOB variable to flash.
@@ -577,7 +584,30 @@ VariableServiceQueryVariableInfo (
   OUT UINT64                 *RemainingVariableStorageSize,
   OUT UINT64                 *MaximumVariableSize
   );  
-  
+
+/**
+  Mark a variable that will become read-only after leaving the DXE phase of execution.
+
+  @param[in] This          The VARIABLE_LOCK_PROTOCOL instance.
+  @param[in] VariableName  A pointer to the variable name that will be made read-only subsequently.
+  @param[in] VendorGuid    A pointer to the vendor GUID that will be made read-only subsequently.
+
+  @retval EFI_SUCCESS           The variable specified by the VariableName and the VendorGuid was marked
+                                as pending to be read-only.
+  @retval EFI_INVALID_PARAMETER VariableName or VendorGuid is NULL.
+                                Or VariableName is an empty string.
+  @retval EFI_ACCESS_DENIED     EFI_END_OF_DXE_EVENT_GROUP_GUID or EFI_EVENT_GROUP_READY_TO_BOOT has
+                                already been signaled.
+  @retval EFI_OUT_OF_RESOURCES  There is not enough resource to hold the lock request.
+**/
+EFI_STATUS
+EFIAPI
+VariableLockRequestToLock (
+  IN CONST EDKII_VARIABLE_LOCK_PROTOCOL *This,
+  IN       CHAR16                       *VariableName,
+  IN       EFI_GUID                     *VendorGuid
+  );
+
 extern VARIABLE_MODULE_GLOBAL  *mVariableModuleGlobal;
 
 #endif
