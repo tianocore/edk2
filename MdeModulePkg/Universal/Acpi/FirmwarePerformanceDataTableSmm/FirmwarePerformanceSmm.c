@@ -268,6 +268,7 @@ FpdtSmiHandler (
   SMM_BOOT_RECORD_COMMUNICATE  *SmmCommData;
   UINTN                        BootRecordSize;
   VOID                         *BootRecordData;
+  UINTN                        TempCommBufferSize;
 
   //
   // If input is invalid, stop processing this SMI
@@ -276,11 +277,13 @@ FpdtSmiHandler (
     return EFI_SUCCESS;
   }
 
-  if(*CommBufferSize < sizeof (SMM_BOOT_RECORD_COMMUNICATE)) {
+  TempCommBufferSize = *CommBufferSize;
+
+  if(TempCommBufferSize < sizeof (SMM_BOOT_RECORD_COMMUNICATE)) {
     return EFI_SUCCESS;
   }
   
-  if (!InternalIsAddressValid ((UINTN)CommBuffer, *CommBufferSize)) {
+  if (!InternalIsAddressValid ((UINTN)CommBuffer, TempCommBufferSize)) {
     DEBUG ((EFI_D_ERROR, "FpdtSmiHandler: SMM communication data buffer in SMRAM or overflow!\n"));
     return EFI_SUCCESS;
   }

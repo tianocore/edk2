@@ -506,6 +506,7 @@ SmmVariableHandler (
   UINTN                                            InfoSize;
   UINTN                                            NameBufferSize;
   UINTN                                            CommBufferPayloadSize;
+  UINTN                                            TempCommBufferSize;
 
   //
   // If input is invalid, stop processing this SMI
@@ -514,17 +515,19 @@ SmmVariableHandler (
     return EFI_SUCCESS;
   }
 
-  if (*CommBufferSize < SMM_VARIABLE_COMMUNICATE_HEADER_SIZE) {
+  TempCommBufferSize = *CommBufferSize;
+
+  if (TempCommBufferSize < SMM_VARIABLE_COMMUNICATE_HEADER_SIZE) {
     DEBUG ((EFI_D_ERROR, "SmmVariableHandler: SMM communication buffer size invalid!\n"));
     return EFI_SUCCESS;
   }
-  CommBufferPayloadSize = *CommBufferSize - SMM_VARIABLE_COMMUNICATE_HEADER_SIZE;
+  CommBufferPayloadSize = TempCommBufferSize - SMM_VARIABLE_COMMUNICATE_HEADER_SIZE;
   if (CommBufferPayloadSize > mVariableBufferPayloadSize) {
     DEBUG ((EFI_D_ERROR, "SmmVariableHandler: SMM communication buffer payload size invalid!\n"));
     return EFI_SUCCESS;
   }
 
-  if (!InternalIsAddressValid ((UINTN)CommBuffer, *CommBufferSize)) {
+  if (!InternalIsAddressValid ((UINTN)CommBuffer, TempCommBufferSize)) {
     DEBUG ((EFI_D_ERROR, "SmmVariableHandler: SMM communication buffer in SMRAM or overflow!\n"));
     return EFI_SUCCESS;
   }
@@ -705,7 +708,7 @@ SmmVariableHandler (
 
     case SMM_VARIABLE_FUNCTION_GET_STATISTICS:
       VariableInfo = (VARIABLE_INFO_ENTRY *) SmmVariableFunctionHeader->Data;
-      InfoSize = *CommBufferSize - SMM_VARIABLE_COMMUNICATE_HEADER_SIZE;
+      InfoSize = TempCommBufferSize - SMM_VARIABLE_COMMUNICATE_HEADER_SIZE;
 
       //
       // Do not need to check SmmVariableFunctionHeader->Data in SMRAM here. 

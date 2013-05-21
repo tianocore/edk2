@@ -321,17 +321,27 @@ SmmLockBoxHandler (
   )
 {
   EFI_SMM_LOCK_BOX_PARAMETER_HEADER *LockBoxParameterHeader;
+  UINTN                             TempCommBufferSize;
 
   DEBUG ((EFI_D_ERROR, "SmmLockBox SmmLockBoxHandler Enter\n"));
 
   //
+  // If input is invalid, stop processing this SMI
+  //
+  if (CommBuffer == NULL || CommBufferSize == NULL) {
+    return EFI_SUCCESS;
+  }
+
+  TempCommBufferSize = *CommBufferSize;
+
+  //
   // Sanity check
   //
-  if (*CommBufferSize < sizeof(EFI_SMM_LOCK_BOX_PARAMETER_HEADER)) {
+  if (TempCommBufferSize < sizeof(EFI_SMM_LOCK_BOX_PARAMETER_HEADER)) {
     DEBUG ((EFI_D_ERROR, "SmmLockBox Command Buffer Size invalid!\n"));
     return EFI_SUCCESS;
   }
-  if (!IsAddressValid ((UINTN)CommBuffer, *CommBufferSize)) {
+  if (!IsAddressValid ((UINTN)CommBuffer, TempCommBufferSize)) {
     DEBUG ((EFI_D_ERROR, "SmmLockBox Command Buffer in SMRAM or overflow!\n"));
     return EFI_SUCCESS;
   }
@@ -346,35 +356,35 @@ SmmLockBoxHandler (
 
   switch (LockBoxParameterHeader->Command) {
   case EFI_SMM_LOCK_BOX_COMMAND_SAVE:
-    if (*CommBufferSize < sizeof(EFI_SMM_LOCK_BOX_PARAMETER_SAVE)) {
+    if (TempCommBufferSize < sizeof(EFI_SMM_LOCK_BOX_PARAMETER_SAVE)) {
       DEBUG ((EFI_D_ERROR, "SmmLockBox Command Buffer Size for SAVE invalid!\n"));
       break;
     }
     SmmLockBoxSave ((EFI_SMM_LOCK_BOX_PARAMETER_SAVE *)(UINTN)LockBoxParameterHeader);
     break;
   case EFI_SMM_LOCK_BOX_COMMAND_UPDATE:
-    if (*CommBufferSize < sizeof(EFI_SMM_LOCK_BOX_PARAMETER_UPDATE)) {
+    if (TempCommBufferSize < sizeof(EFI_SMM_LOCK_BOX_PARAMETER_UPDATE)) {
       DEBUG ((EFI_D_ERROR, "SmmLockBox Command Buffer Size for UPDATE invalid!\n"));
       break;
     }
     SmmLockBoxUpdate ((EFI_SMM_LOCK_BOX_PARAMETER_UPDATE *)(UINTN)LockBoxParameterHeader);
     break;
   case EFI_SMM_LOCK_BOX_COMMAND_RESTORE:
-    if (*CommBufferSize < sizeof(EFI_SMM_LOCK_BOX_PARAMETER_RESTORE)) {
+    if (TempCommBufferSize < sizeof(EFI_SMM_LOCK_BOX_PARAMETER_RESTORE)) {
       DEBUG ((EFI_D_ERROR, "SmmLockBox Command Buffer Size for RESTORE invalid!\n"));
       break;
     }
     SmmLockBoxRestore ((EFI_SMM_LOCK_BOX_PARAMETER_RESTORE *)(UINTN)LockBoxParameterHeader);
     break;
   case EFI_SMM_LOCK_BOX_COMMAND_SET_ATTRIBUTES:
-    if (*CommBufferSize < sizeof(EFI_SMM_LOCK_BOX_PARAMETER_SET_ATTRIBUTES)) {
+    if (TempCommBufferSize < sizeof(EFI_SMM_LOCK_BOX_PARAMETER_SET_ATTRIBUTES)) {
       DEBUG ((EFI_D_ERROR, "SmmLockBox Command Buffer Size for SET_ATTRIBUTES invalid!\n"));
       break;
     }
     SmmLockBoxSetAttributes ((EFI_SMM_LOCK_BOX_PARAMETER_SET_ATTRIBUTES *)(UINTN)LockBoxParameterHeader);
     break;
   case EFI_SMM_LOCK_BOX_COMMAND_RESTORE_ALL_IN_PLACE:
-    if (*CommBufferSize < sizeof(EFI_SMM_LOCK_BOX_PARAMETER_RESTORE_ALL_IN_PLACE)) {
+    if (TempCommBufferSize < sizeof(EFI_SMM_LOCK_BOX_PARAMETER_RESTORE_ALL_IN_PLACE)) {
       DEBUG ((EFI_D_ERROR, "SmmLockBox Command Buffer Size for RESTORE_ALL_IN_PLACE invalid!\n"));
       break;
     }

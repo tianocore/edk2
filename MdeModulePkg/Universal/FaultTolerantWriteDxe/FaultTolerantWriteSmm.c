@@ -372,7 +372,7 @@ SmmFaultTolerantWriteHandler (
   UINTN                                            CommBufferPayloadSize;
   UINTN                                            PrivateDataSize;
   UINTN                                            Length;
-
+  UINTN                                            TempCommBufferSize;
 
   //
   // If input is invalid, stop processing this SMI
@@ -381,13 +381,15 @@ SmmFaultTolerantWriteHandler (
     return EFI_SUCCESS;
   }
 
-  if (*CommBufferSize < SMM_FTW_COMMUNICATE_HEADER_SIZE) {
+  TempCommBufferSize = *CommBufferSize;
+
+  if (TempCommBufferSize < SMM_FTW_COMMUNICATE_HEADER_SIZE) {
     DEBUG ((EFI_D_ERROR, "SmmFtwHandler: SMM communication buffer size invalid!\n"));
     return EFI_SUCCESS;
   }
-  CommBufferPayloadSize = *CommBufferSize - SMM_FTW_COMMUNICATE_HEADER_SIZE;
+  CommBufferPayloadSize = TempCommBufferSize - SMM_FTW_COMMUNICATE_HEADER_SIZE;
 
-  if (!InternalIsAddressValid ((UINTN)CommBuffer, *CommBufferSize)) {
+  if (!InternalIsAddressValid ((UINTN)CommBuffer, TempCommBufferSize)) {
     DEBUG ((EFI_D_ERROR, "SmmFtwHandler: SMM communication buffer in SMRAM or overflow!\n"));
     return EFI_SUCCESS;
   }
