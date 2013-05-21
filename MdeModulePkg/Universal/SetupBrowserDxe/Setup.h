@@ -1544,4 +1544,15 @@ GetHotKeyFromRegisterList (
   IN EFI_INPUT_KEY *KeyData
   );
 
+/**
+  Base on the current formset info, clean the ConfigRequest string in browser storage.
+
+  @param  FormSet                Pointer of the FormSet
+
+**/
+VOID
+CleanBrowserStorage (
+  IN OUT FORM_BROWSER_FORMSET  *FormSet
+  );
+
 #endif

@@ -367,6 +367,7 @@ SendForm (
       // If no data is changed, don't need to save current FormSet into the maintain list.
       //
       if (!IsNvUpdateRequired (gOldFormSet)) {
+        CleanBrowserStorage(gOldFormSet);
         RemoveEntryList (&gOldFormSet->Link);
         DestroyFormSet (gOldFormSet);
       }
@@ -2215,6 +2216,7 @@ ValidateFormSet (
   }
 
   if (!Find) {
+    CleanBrowserStorage(FormSet);
     RemoveEntryList (&FormSet->Link);
     DestroyFormSet (FormSet);
   }
@@ -2340,6 +2342,7 @@ DiscardForm (
         //
         // Remove maintain backup list after discard except for the current using FormSet.
         //
+        CleanBrowserStorage(LocalFormSet);
         RemoveEntryList (&LocalFormSet->Link);
         DestroyFormSet (LocalFormSet);
       }
@@ -2626,6 +2629,7 @@ SubmitForm (
         //
         // Remove maintain backup list after save except for the current using FormSet.
         //
+        CleanBrowserStorage(LocalFormSet);
         RemoveEntryList (&LocalFormSet->Link);
         DestroyFormSet (LocalFormSet);
       }
@@ -3437,6 +3441,150 @@ LoadFormSetConfig (
 }
 
 /**
+  Remove the Request element from the Config Request.
+
+  @param  Storage                Pointer to the browser storage.
+  @param  RequestElement         The pointer to the Request element.
+
+**/
+VOID
+RemoveElement (
+  IN OUT BROWSER_STORAGE      *Storage,
+  IN     CHAR16               *RequestElement
+  )
+{
+  CHAR16   *NewStr;
+  CHAR16   *DestStr;
+
+  ASSERT (Storage->ConfigRequest != NULL && RequestElement != NULL);
+
+  NewStr = StrStr (Storage->ConfigRequest, RequestElement);
+
+  if (NewStr == NULL) {
+    return;
+  }
+
+  //
+  // Remove this element from this ConfigRequest.
+  //
+  DestStr = NewStr;
+  NewStr += StrLen (RequestElement);
+  CopyMem (DestStr, NewStr, StrSize (NewStr));
+  
+  Storage->SpareStrLen += StrLen (RequestElement);  
+}
+
+/**
+  Adjust config request in storage, remove the request elements existed in the input ConfigRequest.
+
+  @param  Storage                Pointer to the browser storage.
+  @param  ConfigRequest          The pointer to the Request element.
+
+**/
+VOID
+RemoveConfigRequest (
+  BROWSER_STORAGE   *Storage,
+  CHAR16            *ConfigRequest
+  )
+{
+  CHAR16       *RequestElement;
+  CHAR16       *NextRequestElement;
+  CHAR16       *SearchKey;
+
+  if (Storage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
+    //
+    // "&Name1&Name2" section for EFI_HII_VARSTORE_NAME_VALUE storage
+    //
+    SearchKey = L"&";
+  } else {
+    //
+    // "&OFFSET=####&WIDTH=####" section for EFI_HII_VARSTORE_BUFFER storage
+    //
+    SearchKey = L"&OFFSET";
+  }
+
+  //
+  // Find SearchKey storage
+  //
+  if (Storage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
+    RequestElement = StrStr (ConfigRequest, L"PATH");
+    ASSERT (RequestElement != NULL);
+    RequestElement = StrStr (RequestElement, SearchKey);    
+  } else {
+    RequestElement = StrStr (ConfigRequest, SearchKey);
+  }
+
+  while (RequestElement != NULL) {
+    //
+    // +1 to avoid find header itself.
+    //
+    NextRequestElement = StrStr (RequestElement + 1, SearchKey);
+
+    //
+    // The last Request element in configRequest string.
+    //
+    if (NextRequestElement != NULL) {
+      //
+      // Replace "&" with '\0'.
+      //
+      *NextRequestElement = L'\0';
+    }
+
+    RemoveElement (Storage, RequestElement);
+
+    if (NextRequestElement != NULL) {
+      //
+      // Restore '&' with '\0' for later used.
+      //
+      *NextRequestElement = L'&';
+    }
+
+    RequestElement = NextRequestElement;
+  }
+
+  //
+  // If no request element remain, just remove the ConfigRequest string.
+  //
+  if (StrCmp (Storage->ConfigRequest, Storage->ConfigHdr) == 0) {
+    FreePool (Storage->ConfigRequest);
+    Storage->ConfigRequest = NULL;
+    Storage->SpareStrLen   = 0;
+  }
+}
+
+/**
+  Base on the current formset info, clean the ConfigRequest string in browser storage.
+
+  @param  FormSet                Pointer of the FormSet
+
+**/
+VOID
+CleanBrowserStorage (
+  IN OUT FORM_BROWSER_FORMSET  *FormSet
+  )
+{
+  LIST_ENTRY            *Link;
+  FORMSET_STORAGE       *Storage;
+
+  Link = GetFirstNode (&FormSet->StorageListHead);
+  while (!IsNull (&FormSet->StorageListHead, Link)) {
+    Storage = FORMSET_STORAGE_FROM_LINK (Link);
+    Link = GetNextNode (&FormSet->StorageListHead, Link);
+
+    if ((Storage->BrowserStorage->Type != EFI_HII_VARSTORE_BUFFER) && 
+        (Storage->BrowserStorage->Type != EFI_HII_VARSTORE_NAME_VALUE)) {
+      continue;
+    }
+
+    if (Storage->ConfigRequest == NULL || Storage->BrowserStorage->ConfigRequest == NULL) {
+      continue;
+    }
+
+    RemoveConfigRequest (Storage->BrowserStorage, Storage->ConfigRequest);
+  }
+}
+
+/**
   Check whether current element in the ConfigReqeust string.
 
   @param  BrowserStorage                Storage which includes ConfigReqeust.
@@ -3474,7 +3622,7 @@ AppendConfigRequest (
   UINTN    StringSize;
   UINTN    StrLength;
 
-  StrLength = StrLen (RequestElement) * sizeof (CHAR16);
+  StrLength = StrLen (RequestElement);
 
   //
   // Append <RequestElement> to <ConfigRequest>
