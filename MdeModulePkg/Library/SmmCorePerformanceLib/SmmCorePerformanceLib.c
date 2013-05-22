@@ -543,6 +543,7 @@ SmmPerformanceHandlerEx (
   GAUGE_DATA_ENTRY_EX       *GaugeDataEx;
   UINTN                     NumberOfEntries;
   UINTN                     LogEntryKey;
+  UINTN                     TempCommBufferSize;
 
   GaugeEntryExArray = NULL;
 
@@ -553,11 +554,13 @@ SmmPerformanceHandlerEx (
     return EFI_SUCCESS;
   }
 
-  if(*CommBufferSize < sizeof (SMM_PERF_COMMUNICATE_EX)) {
+  TempCommBufferSize = *CommBufferSize;
+
+  if(TempCommBufferSize < sizeof (SMM_PERF_COMMUNICATE_EX)) {
     return EFI_SUCCESS;
   }
 
-  if (!IsAddressValid ((UINTN)CommBuffer, *CommBufferSize)) {
+  if (!IsAddressValid ((UINTN)CommBuffer, TempCommBufferSize)) {
     DEBUG ((EFI_D_ERROR, "SmmPerformanceHandlerEx: SMM communcation data buffer in SMRAM or overflow!\n"));
     return EFI_SUCCESS;
   }
@@ -649,7 +652,8 @@ SmmPerformanceHandler (
   GAUGE_DATA_ENTRY      *GaugeData;
   UINTN                 NumberOfEntries;
   UINTN                 LogEntryKey;
-  
+  UINTN                 TempCommBufferSize;
+
   GaugeEntryExArray = NULL;
 
   //
@@ -659,11 +663,13 @@ SmmPerformanceHandler (
     return EFI_SUCCESS;
   }
 
-  if(*CommBufferSize < sizeof (SMM_PERF_COMMUNICATE)) {
+  TempCommBufferSize = *CommBufferSize;
+
+  if(TempCommBufferSize < sizeof (SMM_PERF_COMMUNICATE)) {
     return EFI_SUCCESS;
   }
 
-  if (!IsAddressValid ((UINTN)CommBuffer, *CommBufferSize)) {
+  if (!IsAddressValid ((UINTN)CommBuffer, TempCommBufferSize)) {
     DEBUG ((EFI_D_ERROR, "SmmPerformanceHandler: SMM communcation data buffer in SMRAM or overflow!\n"));
     return EFI_SUCCESS;
   }
