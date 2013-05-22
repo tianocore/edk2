@@ -112,13 +112,16 @@ IScsiSupported (
   EFI_STATUS                Status;
   EFI_GUID                  *IScsiServiceBindingGuid;
   EFI_GUID                  *TcpServiceBindingGuid;
+  EFI_GUID                  *DhcpServiceBindingGuid;
 
   if (IpVersion == IP_VERSION_4) {
     IScsiServiceBindingGuid  = &gIScsiV4PrivateGuid;
     TcpServiceBindingGuid    = &gEfiTcp4ServiceBindingProtocolGuid;
+    DhcpServiceBindingGuid   = &gEfiDhcp4ServiceBindingProtocolGuid;
   } else {
     IScsiServiceBindingGuid  = &gIScsiV6PrivateGuid;
     TcpServiceBindingGuid    = &gEfiTcp6ServiceBindingProtocolGuid;
+    DhcpServiceBindingGuid   = &gEfiDhcp6ServiceBindingProtocolGuid;
   }
 
   Status = gBS->OpenProtocol (
@@ -141,9 +144,19 @@ IScsiSupported (
                     EFI_OPEN_PROTOCOL_TEST_PROTOCOL
                     );
     if (!EFI_ERROR (Status)) {
-      Status = IScsiIsDevicePathSupported (RemainingDevicePath);
+      Status = gBS->OpenProtocol (
+                      ControllerHandle,
+                      DhcpServiceBindingGuid,
+                      NULL,
+                      This->DriverBindingHandle,
+                      ControllerHandle,
+                      EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+                      );
       if (!EFI_ERROR (Status)) {
-        return EFI_SUCCESS;
+        Status = IScsiIsDevicePathSupported (RemainingDevicePath);
+        if (!EFI_ERROR (Status)) {
+          return EFI_SUCCESS;
+        }
       }
     }
   }
