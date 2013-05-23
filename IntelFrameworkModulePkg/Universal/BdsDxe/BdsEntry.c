@@ -452,6 +452,54 @@ BdsFormalizeEfiGlobalVariable (
 
 /**
 
+  Allocate a block of memory that will contain performance data to OS.
+
+**/
+VOID
+BdsAllocateMemoryForPerformanceData (
+  VOID
+  )
+{
+  EFI_STATUS                    Status;
+  EFI_PHYSICAL_ADDRESS          AcpiLowMemoryBase;
+  EDKII_VARIABLE_LOCK_PROTOCOL  *VariableLock;
+
+  AcpiLowMemoryBase = 0x0FFFFFFFFULL;
+
+  //
+  // Allocate a block of memory that will contain performance data to OS.
+  //
+  Status = gBS->AllocatePages (
+                  AllocateMaxAddress,
+                  EfiReservedMemoryType,
+                  EFI_SIZE_TO_PAGES (PERF_DATA_MAX_LENGTH),
+                  &AcpiLowMemoryBase
+                  );
+  if (!EFI_ERROR (Status)) {
+    //
+    // Save the pointer to variable for use in S3 resume.
+    //
+    Status = gRT->SetVariable (
+               L"PerfDataMemAddr",
+               &gPerformanceProtocolGuid,
+               EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+               sizeof (EFI_PHYSICAL_ADDRESS),
+               &AcpiLowMemoryBase
+               );
+    ASSERT_EFI_ERROR (Status);
+    //
+    // Mark L"PerfDataMemAddr" variable to read-only if the Variable Lock protocol exists
+    //
+    Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **) &VariableLock);
+    if (!EFI_ERROR (Status)) {
+      Status = VariableLock->RequestToLock (VariableLock, L"PerfDataMemAddr", &gPerformanceProtocolGuid);
+      ASSERT_EFI_ERROR (Status);
+    }
+  }
+}
+
+/**
+
   Service routine for BdsInstance->Entry(). Devices are connected, the
   consoles are initialized, and the boot options are tried.
 
@@ -478,6 +526,10 @@ BdsEntry (
   //
   PERF_END (NULL, "DXE", NULL, 0);
   PERF_START (NULL, "BDS", NULL, 0);
+
+  PERF_CODE (
+    BdsAllocateMemoryForPerformanceData ();
+  );
 
   //
   // Initialize the global system boot option and driver option

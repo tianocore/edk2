@@ -87,16 +87,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
 
-  Allocates a block of memory to store performance data.
-
-**/
-VOID
-AllocateMemoryForPerformanceData (
-  VOID
-  );
-
-/**
-
   Writes performance data of booting into the allocated memory.
   OS can process these records.
 

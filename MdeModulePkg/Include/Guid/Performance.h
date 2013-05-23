@@ -4,7 +4,7 @@
   * performance protocol interfaces.
   * performance variables.  
 
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -48,6 +48,7 @@ typedef struct {
 #define PERF_TOKEN_SIZE         28
 #define PERF_TOKEN_LENGTH       (PERF_TOKEN_SIZE - 1)
 #define PERF_PEI_ENTRY_MAX_NUM  50
+#define PERF_DATA_MAX_LENGTH    0x4000
 
 typedef struct {
   CHAR8   Token[PERF_TOKEN_SIZE];

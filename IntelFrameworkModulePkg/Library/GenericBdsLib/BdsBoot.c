@@ -1,7 +1,7 @@
 /** @file
   BDS Lib functions which relate with create or process the boot option.
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2228,10 +2228,6 @@ BdsLibBootViaBootOption (
   EFI_ACPI_S3_SAVE_PROTOCOL *AcpiS3Save;
   LIST_ENTRY                TempBootLists;
   EFI_BOOT_LOGO_PROTOCOL    *BootLogo;
-
-  PERF_CODE (
-    AllocateMemoryForPerformanceData ();
-  );
 
   *ExitDataSize = 0;
   *ExitData     = NULL;
