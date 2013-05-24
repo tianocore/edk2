@@ -14,8 +14,8 @@
 
 #include "PrintLibInternal.h"
 
-#define WARNING_STATUS_NUMBER         4
-#define ERROR_STATUS_NUMBER           24
+#define WARNING_STATUS_NUMBER         5
+#define ERROR_STATUS_NUMBER           33
 
 GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 mHexStr[] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 
@@ -25,6 +25,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 *mStatusString[] = {
   "Warning Delete Failure",       //  RETURN_WARN_DELETE_FAILURE    = 2
   "Warning Write Failure",        //  RETURN_WARN_WRITE_FAILURE     = 3
   "Warning Buffer Too Small",     //  RETURN_WARN_BUFFER_TOO_SMALL  = 4
+  "Warning Stale Data",           //  RETURN_WARN_STALE_DATA        = 5
   "Load Error",                   //  RETURN_LOAD_ERROR             = 1  | MAX_BIT
   "Invalid Parameter",            //  RETURN_INVALID_PARAMETER      = 2  | MAX_BIT
   "Unsupported",                  //  RETURN_UNSUPPORTED            = 3  | MAX_BIT
@@ -49,6 +50,15 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 *mStatusString[] = {
   "ICMP Error",                   //  RETURN_ICMP_ERROR             = 22 | MAX_BIT
   "TFTP Error",                   //  RETURN_TFTP_ERROR             = 23 | MAX_BIT
   "Protocol Error"                //  RETURN_PROTOCOL_ERROR         = 24 | MAX_BIT
+  "Incompatible Version",         //  RETURN_INCOMPATIBLE_VERSION   = 25 | MAX_BIT
+  "Security Violation",           //  RETURN_SECURITY_VIOLATION     = 26 | MAX_BIT
+  "CRC Error",                    //  RETURN_CRC_ERROR              = 27 | MAX_BIT
+  "End of Media",                 //  RETURN_END_OF_MEDIA           = 28 | MAX_BIT
+  "Reserved (29)",                //  RESERVED                      = 29 | MAX_BIT
+  "Reserved (30)",                //  RESERVED                      = 30 | MAX_BIT
+  "End of File",                  //  RETURN_END_OF_FILE            = 31 | MAX_BIT
+  "Invalid Language",             //  RETURN_INVALID_LANGUAGE       = 32 | MAX_BIT
+  "Compromised Data"              //  RETURN_COMPROMISED_DATA       = 33 | MAX_BIT
 };
 
 

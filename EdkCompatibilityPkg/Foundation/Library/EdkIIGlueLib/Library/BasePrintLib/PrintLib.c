@@ -23,7 +23,7 @@ Abstract:
 #include "PrintLibInternal.h"
 
 #define WARNING_STATUS_NUMBER         4
-#define ERROR_STATUS_NUMBER           24
+#define ERROR_STATUS_NUMBER           31
 #define ASSERT_UNICODE_BUFFER(Buffer) ASSERT ((((UINTN) (Buffer)) & 0x01) == 0)
 
 GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 *StatusString [] = {
@@ -56,6 +56,13 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 *StatusString [] = {
   "ICMP Error",                   //  RETURN_ICMP_ERROR             = 22 | MAX_BIT
   "TFTP Error",                   //  RETURN_TFTP_ERROR             = 23 | MAX_BIT
   "Protocol Error"                //  RETURN_PROTOCOL_ERROR         = 24 | MAX_BIT
+  "Incompatible Version",         //  RETURN_INCOMPATIBLE_VERSION   = 25 | MAX_BIT
+  "Security Violation",           //  RETURN_SECURITY_VIOLATION     = 26 | MAX_BIT
+  "CRC Error",                    //  RETURN_CRC_ERROR              = 27 | MAX_BIT
+  "End of Media",                 //  RETURN_END_OF_MEDIA           = 28 | MAX_BIT
+  "Reserved (29)",                //  RESERVED                      = 29 | MAX_BIT
+  "Reserved (30)",                //  RESERVED                      = 30 | MAX_BIT
+  "End of File"                   //  RETURN_END_OF_FILE            = 31 | MAX_BIT
 };
 
 /**
