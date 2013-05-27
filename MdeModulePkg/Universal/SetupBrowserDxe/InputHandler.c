@@ -1023,10 +1023,10 @@ GetSelectionInputPopUp (
     for (Index = 0; Index < OptionCount; Index++) {
       OneOfOption = QUESTION_OPTION_FROM_LINK (Link);
       Link = GetNextNode (&Question->OptionListHead, Link);
-      if ((OneOfOption->SuppressExpression == NULL) ||
-            EvaluateExpressionList(OneOfOption->SuppressExpression, FALSE, NULL, NULL) == ExpressFalse) {
-        RemoveEntryList (&OneOfOption->Link);
-        InsertHeadList (&Question->OptionListHead, &OneOfOption->Link);
+      if ((OneOfOption->SuppressExpression != NULL) &&
+          EvaluateExpressionList(OneOfOption->SuppressExpression, FALSE, NULL, NULL) > ExpressFalse) {
+        continue;
+      } else {
         PopUpMenuLines++;
       }
     }
@@ -1040,6 +1040,13 @@ GetSelectionInputPopUp (
   Link = GetFirstNode (&Question->OptionListHead);
   for (Index = 0; Index < PopUpMenuLines; Index++) {
     OneOfOption = QUESTION_OPTION_FROM_LINK (Link);
+    Link = GetNextNode (&Question->OptionListHead, Link);
+
+    if (!OrderedList && (OneOfOption->SuppressExpression != NULL) &&
+        EvaluateExpressionList(OneOfOption->SuppressExpression, FALSE, NULL, NULL) > ExpressFalse) {
+      Index--;
+      continue;
+    }
 
     StringPtr = GetToken (OneOfOption->Text, MenuOption->Handle);
     if (StrLen (StringPtr) > PopUpWidth) {
@@ -1053,8 +1060,6 @@ GetSelectionInputPopUp (
       //
       HighlightOptionIndex = Index;
     }
-
-    Link = GetNextNode (&Question->OptionListHead, Link);
   }
 
   //
@@ -1123,6 +1128,13 @@ GetSelectionInputPopUp (
     Link = GetFirstNode (&Question->OptionListHead);
     for (Index = 0; Index < TopOptionIndex; Index++) {
       Link = GetNextNode (&Question->OptionListHead, Link);
+
+      OneOfOption = QUESTION_OPTION_FROM_LINK (Link);
+      if (!OrderedList && (OneOfOption->SuppressExpression != NULL) &&
+          EvaluateExpressionList(OneOfOption->SuppressExpression, FALSE, NULL, NULL) > ExpressFalse) {
+        Index--;
+        continue;
+      }
     }
 
     //
@@ -1132,6 +1144,12 @@ GetSelectionInputPopUp (
     for (Index = TopOptionIndex; (Index < PopUpMenuLines) && (Index2 < Bottom); Index++) {
       OneOfOption = QUESTION_OPTION_FROM_LINK (Link);
       Link = GetNextNode (&Question->OptionListHead, Link);
+
+      if (!OrderedList && (OneOfOption->SuppressExpression != NULL) &&
+          EvaluateExpressionList(OneOfOption->SuppressExpression, FALSE, NULL, NULL) > ExpressFalse) {
+        Index--;
+        continue;
+      }
 
       StringPtr = GetToken (OneOfOption->Text, MenuOption->Handle);
       ASSERT (StringPtr != NULL);
