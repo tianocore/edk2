@@ -356,14 +356,15 @@ InstallFirmwarePerformanceDataTable (
   //
   // Collect boot records from SMM drivers.
   //
-  SmmBootRecordCommBuffer = AllocateZeroPool (SMM_BOOT_RECORD_COMM_SIZE);
-  ASSERT (SmmBootRecordCommBuffer != NULL);
-  SmmCommData = NULL;
+  SmmBootRecordCommBuffer = NULL;
+  SmmCommData             = NULL;
   Status = gBS->LocateProtocol (&gEfiSmmCommunicationProtocolGuid, NULL, (VOID **) &Communication);
   if (!EFI_ERROR (Status)) {
     //
     // Initialize communicate buffer 
     //
+    SmmBootRecordCommBuffer = AllocateZeroPool (SMM_BOOT_RECORD_COMM_SIZE);
+    ASSERT (SmmBootRecordCommBuffer != NULL);
     SmmCommBufferHeader = (EFI_SMM_COMMUNICATE_HEADER*)SmmBootRecordCommBuffer;
     SmmCommData = (SMM_BOOT_RECORD_COMMUNICATE*)SmmCommBufferHeader->Data;
     ZeroMem((UINT8*)SmmCommData, sizeof(SMM_BOOT_RECORD_COMMUNICATE));
@@ -393,7 +394,6 @@ InstallFirmwarePerformanceDataTable (
       ASSERT_EFI_ERROR(SmmCommData->ReturnStatus);
     }
   }
-  FreePool (SmmBootRecordCommBuffer);
 
   //
   // Prepare memory for Boot Performance table.
@@ -440,6 +440,9 @@ InstallFirmwarePerformanceDataTable (
     if (SmmCommData != NULL && SmmCommData->BootRecordData != NULL) {
       FreePool (SmmCommData->BootRecordData);
     }
+    if (SmmBootRecordCommBuffer != NULL) {
+      FreePool (SmmBootRecordCommBuffer);
+    }
     if (mAcpiS3PerformanceTable != NULL) {
       FreePages (mAcpiS3PerformanceTable, EFI_SIZE_TO_PAGES (sizeof (S3_PERFORMANCE_TABLE)));
     }
@@ -470,6 +473,10 @@ InstallFirmwarePerformanceDataTable (
     mAcpiBootPerformanceTable->Header.Length = (UINT32) (mAcpiBootPerformanceTable->Header.Length + SmmCommData->BootRecordSize);
     BootPerformanceData = BootPerformanceData + SmmCommData->BootRecordSize;
   }
+  if (SmmBootRecordCommBuffer != NULL) {
+    FreePool (SmmBootRecordCommBuffer);
+  }
+
   //
   // Save Boot Performance Table address to Variable for use in S4 resume.
   //
