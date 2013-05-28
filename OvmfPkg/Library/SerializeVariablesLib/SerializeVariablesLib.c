@@ -284,13 +284,26 @@ IterateVariablesCallbackSetSystemVariable (
   IN  VOID                         *Data
   )
 {
-  return gRT->SetVariable (
-           VariableName,
-           VendorGuid,
-           Attributes,
-           DataSize,
-           Data
-           );
+  EFI_STATUS          Status;
+  STATIC CONST UINT32 AuthMask =
+                        EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS |
+                        EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
+
+  Status = gRT->SetVariable (
+             VariableName,
+             VendorGuid,
+             Attributes,
+             DataSize,
+             Data
+             );
+
+  if (Status == EFI_SECURITY_VIOLATION && (Attributes & AuthMask) != 0) {
+    DEBUG ((DEBUG_WARN, "%a: setting authenticated variable \"%s\" "
+            "failed with EFI_SECURITY_VIOLATION, ignoring\n", __FUNCTION__,
+            VariableName));
+    Status = EFI_SUCCESS;
+  }
+  return Status;
 }
 
 
