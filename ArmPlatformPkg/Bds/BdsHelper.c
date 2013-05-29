@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -26,9 +26,16 @@ EditHIInputStr (
   EFI_INPUT_KEY   Key;
   EFI_STATUS      Status;
 
+  // The command line must be at least one character long
+  ASSERT (MaxCmdLine > 0);
+
   Print (CmdLine);
 
-  for (CmdLineIndex = StrLen (CmdLine); CmdLineIndex < MaxCmdLine; ) {
+  // Ensure the last character of the buffer is the NULL character
+  CmdLine[MaxCmdLine - 1] = '\0';
+
+  // To prevent a buffer overflow, we only allow to enter (MaxCmdLine-1) characters
+  for (CmdLineIndex = StrLen (CmdLine); CmdLineIndex < MaxCmdLine-1; ) {
     Status = gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &WaitIndex);
     ASSERT_EFI_ERROR (Status);
 
