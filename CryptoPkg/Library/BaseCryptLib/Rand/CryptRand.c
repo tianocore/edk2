@@ -57,7 +57,11 @@ RandomSeed (
     RAND_seed (DefaultSeed, sizeof (DefaultSeed));
   }
 
-  return TRUE;
+  if (RAND_status () == 1) {
+    return TRUE;
+  }
+
+  return FALSE;
 }
 
 /**
