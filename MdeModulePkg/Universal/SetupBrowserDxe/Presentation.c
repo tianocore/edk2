@@ -1244,6 +1244,7 @@ ProcessCallBackFunction (
       if (Action == EFI_BROWSER_ACTION_CHANGED) {
         switch (ActionRequest) {
         case EFI_BROWSER_ACTION_REQUEST_RESET:
+          DiscardFormIsRequired = TRUE;
           gResetRequired = TRUE;
           Selection->Action = UI_ACTION_EXIT;
           break;
