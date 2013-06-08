@@ -4,7 +4,7 @@ This is EDK style package and the following steps can help to build the package:
    https://efi-shell.tianocore.org/servlets/ProjectDocumentList?folderID=46&expandFolder=46&folderID=53
    
    Alternatively, the EDK Shell source directory can be retrieved from the following SVN address:
-   https://efi-shell.svn.sourceforge.net/svnroot/efi-shell/trunk/Shell
+   https://svn.code.sf.net/p/efi-shell/code/trunk/Shell
    SVN Revision r33 corresponds to Efi-Shell-Dev-Snapshot-20090527.zip development snapshot.
    
 2. Update EDK_SHELL_DIR macro in the [Defines] section in EdkShellPkg.dsc to point to

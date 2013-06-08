@@ -58,7 +58,7 @@ B. Build DUET image on Linux Platform
 
 	To build DUET image, Mingw GCC is required:
 	
-		1).  Check out build tools project from svn repository: https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools
+		1).  Check out build tools project from svn repository: https://svn.code.sf.net/p/edk2-buildtools/code/trunk/BaseTools
 		2).  Assume check out directory is /EDKII/BaseTools, enter /EDKII/BaseTools/gcc directory. Please refer to README.txt install all the necessary
 			 build packages following:
 			 * Python 2.5

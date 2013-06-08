@@ -1,5 +1,5 @@
 The binaries of FatBinPkg are generated with RELEASE_MYTOOLS from FatPkgDev Combo at the following SVN address: 
-http://edk2-fatdriver2.svn.sourceforge.net/svnroot/edk2-fatdriver2/trunk/Combo/FatPkgDev
+https://svn.code.sf.net/p/edk2-fatdriver2/code/trunk/Combo/FatPkgDev
 
 # Ebc, Ia32, Ipf, X64
   The binaries in this package currently are built from UDK2010.SR1 release: MdePkg and BaseTools (r12898), FatPkg (r67)
