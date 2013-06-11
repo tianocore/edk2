@@ -107,6 +107,7 @@ MainTitleBarRefresh (
   // backup the old screen attributes
   //
   Orig.Data             = gST->ConOut->Mode->Attribute;
+  New.Data              = 0;
   New.Colors.Foreground = Orig.Colors.Background;
   New.Colors.Background = Orig.Colors.Foreground;
 

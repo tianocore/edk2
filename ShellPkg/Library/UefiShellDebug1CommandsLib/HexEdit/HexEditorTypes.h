@@ -60,7 +60,7 @@ typedef struct {
 
 typedef union {
   HEFI_EDITOR_COLOR_ATTRIBUTES  Colors;
-  UINT8                         Data;
+  UINTN                         Data;
 } HEFI_EDITOR_COLOR_UNION;
 
 typedef struct {

@@ -13,8 +13,6 @@
 
 #include "Shell.h"
 
-STATIC CONST CHAR16                     mCrLfString[3] = { CHAR_CARRIAGE_RETURN, CHAR_LINEFEED, CHAR_NULL };
-
 /**
   Install our intermediate ConOut into the system table to
   keep a log of all the info that is displayed to the user.

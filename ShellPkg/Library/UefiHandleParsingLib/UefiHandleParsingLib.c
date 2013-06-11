@@ -349,8 +349,8 @@ TxtOutProtocolDumpInformation(
       Temp == NULL?L"":Temp,
       Index == Dev->Mode->Mode ? L'*' : L' ',
       Index,
-      !EFI_ERROR(Status)?Col:-1,
-      !EFI_ERROR(Status)?Row:-1
+      !EFI_ERROR(Status)?(INTN)Col:-1,
+      !EFI_ERROR(Status)?(INTN)Row:-1
      );
   }
   FreePool(Temp);

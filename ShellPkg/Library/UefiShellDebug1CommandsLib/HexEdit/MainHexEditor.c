@@ -290,7 +290,6 @@ HMainCommandSaveBuffer (
         // the file won't be saved
         //
         return EFI_SUCCESS;
-        break;
 
       case L'c':
       case L'C':

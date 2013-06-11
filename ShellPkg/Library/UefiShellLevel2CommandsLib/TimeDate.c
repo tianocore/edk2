@@ -667,7 +667,7 @@ CheckAndSetTimeZone (
   if (*Walker == L'-') {
     TheTime.TimeZone = (INT16)((ShellStrToUintn (++Walker)) * 60);
   } else {
-    TheTime.TimeZone = (INT16)((ShellStrToUintn (Walker)) * -60);
+    TheTime.TimeZone = (INT16)((INT16)(ShellStrToUintn (Walker)) * -60);
   }
   if (Walker2 != NULL) {
     Walker = Walker2 + 1;

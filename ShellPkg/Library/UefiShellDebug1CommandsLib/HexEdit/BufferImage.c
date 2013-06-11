@@ -580,6 +580,7 @@ HBufferImageRestoreMousePosition (
       // backup the old screen attributes
       //
       Orig                  = HMainEditor.ColorAttributes;
+      New.Data              = 0;
       New.Colors.Foreground = Orig.Colors.Background;
       New.Colors.Background = Orig.Colors.Foreground;
 
@@ -755,6 +756,7 @@ HBufferImageRefresh (
   UINTN                   Tmp;
 
   Orig                  = HMainEditor.ColorAttributes;
+  New.Data              = 0;
   New.Colors.Foreground = Orig.Colors.Background;
   New.Colors.Background = Orig.Colors.Foreground;
 
