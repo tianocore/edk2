@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1335,7 +1335,7 @@ Returns:
                       &gEfiFirmwareVolumeBlockProtocolGuid,
                       &FvbDevice->FwVolBlockInstance,
                       &gEfiDevicePathProtocolGuid,
-                      &FvbDevice->DevicePath,
+                      FvbDevice->DevicePath,
                       NULL
                       );
       ASSERT_EFI_ERROR (Status);
