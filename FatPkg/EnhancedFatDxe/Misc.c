@@ -342,9 +342,19 @@ Returns:
 
 --*/
 {
-  EFI_TIME  Now;
-  gRT->GetTime (&Now, NULL);
-  FatEfiTimeToFatTime (&Now, FatNow);
+  EFI_STATUS Status;
+  EFI_TIME   Now;
+
+  Status = gRT->GetTime (&Now, NULL);
+  if (!EFI_ERROR (Status)) {
+    FatEfiTimeToFatTime (&Now, FatNow);
+  } else {
+    ZeroMem (&Now, sizeof (EFI_TIME));
+    Now.Year = 1980;
+    Now.Month = 1;
+    Now.Day = 1;
+    FatEfiTimeToFatTime (&Now, FatNow);
+  }
 }
 
 BOOLEAN
