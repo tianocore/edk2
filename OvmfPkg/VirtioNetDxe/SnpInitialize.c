@@ -120,7 +120,8 @@ VirtioNetInitTx (
 {
   UINTN PktIdx;
 
-  Dev->TxMaxPending = MIN (Dev->TxRing.QueueSize / 2, VNET_MAX_PENDING);
+  Dev->TxMaxPending = (UINT16) MIN (Dev->TxRing.QueueSize / 2,
+                                 VNET_MAX_PENDING);
   Dev->TxCurPending = 0;
   Dev->TxFreeStack  = AllocatePool (Dev->TxMaxPending *
                         sizeof *Dev->TxFreeStack);
@@ -141,7 +142,7 @@ VirtioNetInitTx (
     Dev->TxRing.Desc[DescIdx].Addr  = (UINTN) &Dev->TxSharedReq;
     Dev->TxRing.Desc[DescIdx].Len   = sizeof Dev->TxSharedReq;
     Dev->TxRing.Desc[DescIdx].Flags = VRING_DESC_F_NEXT;
-    Dev->TxRing.Desc[DescIdx].Next  = DescIdx + 1;
+    Dev->TxRing.Desc[DescIdx].Next  = (UINT16) (DescIdx + 1);
 
     //
     // The second descriptor of each pending TX packet is updated on the fly,
@@ -221,7 +222,7 @@ VirtioNetInitRx (
   // Limit the number of pending RX packets if the queue is big. The division
   // by two is due to the above "two descriptors per packet" trait.
   //
-  RxAlwaysPending = MIN (Dev->RxRing.QueueSize / 2, VNET_MAX_PENDING);
+  RxAlwaysPending = (UINT16) MIN (Dev->RxRing.QueueSize / 2, VNET_MAX_PENDING);
 
   Dev->RxBuf = AllocatePool (RxAlwaysPending * RxBufSize);
   if (Dev->RxBuf == NULL) {
@@ -261,11 +262,12 @@ VirtioNetInitRx (
     Dev->RxRing.Desc[DescIdx].Addr  = (UINTN) RxPtr;
     Dev->RxRing.Desc[DescIdx].Len   = sizeof (VIRTIO_NET_REQ);
     Dev->RxRing.Desc[DescIdx].Flags = VRING_DESC_F_WRITE | VRING_DESC_F_NEXT;
-    Dev->RxRing.Desc[DescIdx].Next  = DescIdx + 1;
+    Dev->RxRing.Desc[DescIdx].Next  = (UINT16) (DescIdx + 1);
     RxPtr += Dev->RxRing.Desc[DescIdx++].Len;
 
     Dev->RxRing.Desc[DescIdx].Addr  = (UINTN) RxPtr;
-    Dev->RxRing.Desc[DescIdx].Len   = RxBufSize - sizeof (VIRTIO_NET_REQ);
+    Dev->RxRing.Desc[DescIdx].Len   = (UINT32) (RxBufSize -
+                                                sizeof (VIRTIO_NET_REQ));
     Dev->RxRing.Desc[DescIdx].Flags = VRING_DESC_F_WRITE;
     RxPtr += Dev->RxRing.Desc[DescIdx++].Len;
   }

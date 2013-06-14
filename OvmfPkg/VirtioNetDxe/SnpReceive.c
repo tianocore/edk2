@@ -156,7 +156,7 @@ VirtioNetReceive (
   RxPtr += SIZE_OF_VNET (VhdrMac);
 
   if (Protocol != NULL) {
-    *Protocol = ((UINT16) RxPtr[0] << 8) | RxPtr[1];
+    *Protocol = (UINT16) ((RxPtr[0] << 8) | RxPtr[1]);
   }
   RxPtr += sizeof (UINT16);
 
@@ -169,7 +169,8 @@ RecycleDesc:
   // virtio-0.9.5, 2.4.1 Supplying Buffers to The Device
   //
   AvailIdx = *Dev->RxRing.Avail.Idx;
-  Dev->RxRing.Avail.Ring[AvailIdx++ % Dev->RxRing.QueueSize] = DescIdx;
+  Dev->RxRing.Avail.Ring[AvailIdx++ % Dev->RxRing.QueueSize] =
+    (UINT16) DescIdx;
 
   MemoryFence ();
   *Dev->RxRing.Avail.Idx = AvailIdx;
