@@ -3,7 +3,7 @@
   Implementation of the SNP.Transmit() function and its private helpers if any.
 
   Copyright (C) 2013, Red Hat, Inc.
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -140,7 +140,7 @@ VirtioNetTransmit (
     *Ptr++ = (UINT8) (*Protocol >> 8);
     *Ptr++ = (UINT8) *Protocol;
 
-    ASSERT (Ptr - (UINT8 *) Buffer == Dev->Snm.MediaHeaderSize);
+    ASSERT ((UINTN) (Ptr - (UINT8 *) Buffer) == Dev->Snm.MediaHeaderSize);
   }
 
   //

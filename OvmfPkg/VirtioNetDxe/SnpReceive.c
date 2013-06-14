@@ -3,7 +3,7 @@
   Implementation of the SNP.Receive() function and its private helpers if any.
 
   Copyright (C) 2013, Red Hat, Inc.
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -142,7 +142,7 @@ VirtioNetReceive (
     *HeaderSize = Dev->Snm.MediaHeaderSize;
   }
 
-  RxPtr = (UINT8 *)Dev->RxRing.Desc[DescIdx + 1].Addr;
+  RxPtr = (UINT8 *)(UINTN) Dev->RxRing.Desc[DescIdx + 1].Addr;
   CopyMem (Buffer, RxPtr, RxLen);
 
   if (DestAddr != NULL) {

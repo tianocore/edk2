@@ -4,7 +4,7 @@
   any.
 
   Copyright (C) 2013, Red Hat, Inc.
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -136,12 +136,12 @@ VirtioNetGetStatus (
 
       UsedElemIdx = Dev->TxLastUsed++ % Dev->TxRing.QueueSize;
       DescIdx = Dev->TxRing.Used.UsedElem[UsedElemIdx].Id;
-      ASSERT (DescIdx < 2 * Dev->TxMaxPending - 1);
+      ASSERT (DescIdx < (UINT32) (2 * Dev->TxMaxPending - 1));
 
       //
       // report buffer address to caller that has been enqueued by caller
       //
-      *TxBuf = (VOID *) Dev->TxRing.Desc[DescIdx + 1].Addr;
+      *TxBuf = (VOID *)(UINTN) Dev->TxRing.Desc[DescIdx + 1].Addr;
 
       //
       // now this descriptor can be used again to enqueue a transmit buffer
