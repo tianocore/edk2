@@ -108,11 +108,11 @@ $ OvmfPkg/build.sh -a IA32 -b RELEASE -t GCC45
 
 === Network Support ===
 
-OVMF provides a generic UEFI network stack by default, with the lowest level
-driver (the NIC driver) missing in the default build. In order to complete the
-stack and make eg. DHCP, PXE Boot, and socket test utilities from the StdLib
-edk2 package work, (1) qemu has to be configured to emulate a NIC, (2) a
-matching UEFI NIC driver must be available when OVMF boots.
+OVMF provides a UEFI network stack by default. Its lowest level driver is the
+NIC driver, higher levels are generic. In order to make DHCP, PXE Boot, and eg.
+socket test utilities from the StdLib edk2 package work, (1) qemu has to be
+configured to emulate a NIC, (2) a matching UEFI NIC driver must be available
+when OVMF boots.
 
 (If a NIC is configured for the virtual machine, and -- dependent on boot order
 -- PXE booting is attempted, but no DHCP server responds to OVMF's DHCP
@@ -122,23 +122,23 @@ longer.)
 * For each NIC emulated by qemu, a GPLv2 licensed UEFI driver is available from
   the iPXE project. The qemu source distribution, starting with version 1.5,
   contains prebuilt binaries of these drivers (and of course allows one to
-  rebuild them from source as well).
+  rebuild them from source as well). This is the recommended set of drivers.
 
 * Use the qemu -netdev and -device options, or the legacy -net option, to
   enable NIC support: <http://wiki.qemu.org/Documentation/Networking>.
 
 * For a qemu >= 1.5 binary running *without* any "-M machine" option where
   "machine" would identify a < qemu-1.5 configuration (for example: "-M
-  pc-i440fx-1.4" or "-M pc-0.13"), the drivers are available from the default
-  qemu installation to OVMF without further settings.
+  pc-i440fx-1.4" or "-M pc-0.13"), the iPXE drivers are automatically available
+  to and configured for OVMF in the default qemu installation.
 
 * For a qemu binary in [0.13, 1.5), or a qemu >= 1.5 binary with an "-M
   machine" option where "machine" selects a < qemu-1.5 configuration:
 
   - download a >= 1.5.0-rc1 source tarball from <http://wiki.qemu.org/Download>,
 
-  - extract the following files from the tarball and install them in a
-    location that is accessible to qemu processes (this may depend on your
+  - extract the following iPXE driver files from the tarball and install them
+    in a location that is accessible to qemu processes (this may depend on your
     SELinux configuration, for example):
 
     qemu-VERSION/pc-bios/efi-e1000.rom
@@ -156,9 +156,11 @@ longer.)
     -device rtl8139,...,romfile=/full/path/to/efi-rtl8139.rom
     -device virtio-net-pci,...,romfile=/full/path/to/efi-virtio.rom
 
-* Independently of the iPXE NIC drivers, Intel's proprietary E1000 NIC driver
-  can be embedded in the OVMF image at build time, as an alternative guest
-  driver for "-device e1000":
+* Independently of the iPXE NIC drivers, the default OVMF build provides a
+  basic virtio-net driver, located in OvmfPkg/VirtioNetDxe.
+
+* Also independently of the iPXE NIC drivers, Intel's proprietary E1000 NIC
+  driver (PROEFI) can be embedded in the OVMF image at build time:
 
   - Download UEFI drivers for the e1000 NIC
     - http://downloadcenter.intel.com/Detail_Desc.aspx?agr=Y&DwnldID=17515&lang=eng
@@ -167,6 +169,15 @@ longer.)
   - Include the driver in OVMF during the build:
     - Add "-D E1000_ENABLE -D FD_SIZE_2MB" to your build command,
     - For example: "build -D E1000_ENABLE -D FD_SIZE_2MB".
+
+* When a matching iPXE driver is configured for a NIC as described above, it
+  takes priority over other drivers that could possibly drive the card too:
+
+                 | e1000  ne2k_pci  pcnet  rtl8139  virtio-net-pci
+    -------------+------------------------------------------------
+    iPXE         |   x       x        x       x           x
+    VirtioNetDxe |                                        x
+    Intel PROEFI |   x
 
 === UNIXGCC Debug ===
 
