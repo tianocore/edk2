@@ -1,7 +1,7 @@
 /** @file
   The driver binding and service binding protocol for IP6 driver.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -412,39 +412,6 @@ Ip6CreateService (
     goto ON_ERROR;
   }
 
-  //
-  // The timer expires every 100 (IP6_TIMER_INTERVAL_IN_MS) milliseconds.
-  //
-  Status = gBS->SetTimer (IpSb->FasterTimer, TimerPeriodic, TICKS_PER_MS * IP6_TIMER_INTERVAL_IN_MS);
-  if (EFI_ERROR (Status)) {
-    goto ON_ERROR;
-  }
-
-  //
-  // The timer expires every 1000 (IP6_ONE_SECOND_IN_MS) milliseconds.
-  //
-  Status = gBS->SetTimer (IpSb->Timer, TimerPeriodic, TICKS_PER_MS * IP6_ONE_SECOND_IN_MS);
-  if (EFI_ERROR (Status)) {
-    goto ON_ERROR;
-  }
-
-
-  Status = gBS->CreateEvent (
-                  EVT_NOTIFY_SIGNAL,
-                  TPL_NOTIFY,
-                  Ip6OnFrameReceived,
-                  &IpSb->RecvRequest,
-                  &MnpToken->Event
-                  );
-  if (EFI_ERROR (Status)) {
-    goto ON_ERROR;
-  }
-
-  Status = Ip6ReceiveFrame (Ip6AcceptFrame, IpSb);
-  if (EFI_ERROR (Status)) {
-    goto ON_ERROR;
-  }
-
   Status = NetLibGetMacString (IpSb->Controller, IpSb->Image, &IpSb->MacString);
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
@@ -458,6 +425,17 @@ Ip6CreateService (
   IpSb->DefaultInterface = Ip6CreateInterface (IpSb, TRUE);
   if (IpSb->DefaultInterface == NULL) {
     Status = EFI_DEVICE_ERROR;
+    goto ON_ERROR;
+  }
+
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  Ip6OnFrameReceived,
+                  &IpSb->RecvRequest,
+                  &MnpToken->Event
+                  );
+  if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
 
@@ -557,19 +535,52 @@ Ip6DriverBindingStart (
                   NULL
                   );
 
-  if (EFI_ERROR (Status)) {
+  if (!EFI_ERROR (Status)) {
+    //
+    // ready to go: start the receiving and timer
+    //
+    Status = Ip6ReceiveFrame (Ip6AcceptFrame, IpSb);
+    if (EFI_ERROR (Status)) {
+      goto ON_ERROR;
+    }
 
-    Ip6CleanService (IpSb);
-    FreePool (IpSb);
-  } else {
+    //
+    // The timer expires every 100 (IP6_TIMER_INTERVAL_IN_MS) milliseconds.
+    //
+    Status = gBS->SetTimer (
+                    IpSb->FasterTimer,
+                    TimerPeriodic,
+                    TICKS_PER_MS * IP6_TIMER_INTERVAL_IN_MS
+                    );
+    if (EFI_ERROR (Status)) {
+      goto ON_ERROR;
+    }
+
+    //
+    // The timer expires every 1000 (IP6_ONE_SECOND_IN_MS) milliseconds.
+    //
+    Status = gBS->SetTimer (
+                    IpSb->Timer,
+                    TimerPeriodic,
+                    TICKS_PER_MS * IP6_ONE_SECOND_IN_MS
+                    );
+    if (EFI_ERROR (Status)) {
+      goto ON_ERROR;
+    }    
+
     //
     // Initialize the IP6 ID
     //
     mIp6Id = NET_RANDOM (NetRandomInitSeed ());
 
     Ip6SetVariableData (IpSb);
+
+    return EFI_SUCCESS;
   }
 
+ON_ERROR:
+  Ip6CleanService (IpSb);
+  FreePool (IpSb);
   return Status;
 }
 
