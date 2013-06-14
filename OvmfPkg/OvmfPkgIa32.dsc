@@ -272,7 +272,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported|6
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv|32
 !if $(SECURE_BOOT_ENABLE) == TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x10000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
 !else
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x400
 !endif
