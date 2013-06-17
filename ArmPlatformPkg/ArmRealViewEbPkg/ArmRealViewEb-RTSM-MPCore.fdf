@@ -1,6 +1,6 @@
-# FLASH layout file for ARM VE.
+# FLASH layout file for ARM RealView EB.
 #
-#  Copyright (c) 2011, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 #  
 #  This program and the accompanying materials                          
 #  are licensed and made available under the terms and conditions of the BSD License         
@@ -28,10 +28,10 @@
 
 [FD.ArmRealViewEb_EFI]
 BaseAddress   = 0x40000000|gArmTokenSpaceGuid.PcdFdBaseAddress
-Size          = 0x00200000|gArmTokenSpaceGuid.PcdFdSize
+Size          = 0x00150000|gArmTokenSpaceGuid.PcdFdSize
 ErasePolarity = 1
 BlockSize     = 0x00010000
-NumBlocks     = 0x20
+NumBlocks     = 0x15
 
 ################################################################################
 #
