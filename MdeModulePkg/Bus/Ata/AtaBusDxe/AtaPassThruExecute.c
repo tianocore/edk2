@@ -10,7 +10,7 @@
   for Security Protocol Specific layout. This implementation uses big endian for
   Cylinder register.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -541,19 +541,21 @@ TransferAtaDevice (
   //
   // As AtaBus is used to manage ATA devices, we have to use the lowest transfer rate to
   // calculate the possible maximum timeout value for each read/write operation.
+  // The timout value is rounded up to nearest integar and here an additional 30s is added
+  // to follow ATA spec in which it mentioned that the device may take up to 30s to respond
+  // commands in the Standby/Idle mode.
   //
   if (AtaDevice->UdmaValid) {
     //
     // Calculate the maximum timeout value for DMA read/write operation.
     //
-    Packet->Timeout  = EFI_TIMER_PERIOD_SECONDS ((TransferLength * AtaDevice->BlockMedia.BlockSize) / 2100000 + 1);
+    Packet->Timeout  = EFI_TIMER_PERIOD_SECONDS (DivU64x32 (MultU64x32 (TransferLength, AtaDevice->BlockMedia.BlockSize), 2100000) + 31);
   } else {
     //
     // Calculate the maximum timeout value for PIO read/write operation
     //
-    Packet->Timeout  = EFI_TIMER_PERIOD_SECONDS ((TransferLength * AtaDevice->BlockMedia.BlockSize) / 3300000 + 1);
+    Packet->Timeout  = EFI_TIMER_PERIOD_SECONDS (DivU64x32 (MultU64x32 (TransferLength, AtaDevice->BlockMedia.BlockSize), 3300000) + 31);
   }
-  
 
   return AtaDevicePassThru (AtaDevice, TaskPacket, Event);
 }
