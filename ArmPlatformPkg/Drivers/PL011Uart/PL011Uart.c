@@ -131,7 +131,7 @@ PL011UartInitializePort (
   //
 
   // If BaudRate is zero then use default baud rate
-  if (BaudRate == 0) {
+  if (*BaudRate == 0) {
     if (PcdGet32 (PL011UartInteger) != 0) {
       MmioWrite32 (UartBase + UARTIBRD, PcdGet32 (PL011UartInteger));
       MmioWrite32 (UartBase + UARTFBRD, PcdGet32 (PL011UartFractional));
