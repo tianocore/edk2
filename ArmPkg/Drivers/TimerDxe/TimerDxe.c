@@ -1,15 +1,15 @@
 /** @file
   Timer Architecture Protocol driver of the ARM flavor
 
-  Copyright (c) 2011 ARM Ltd. All rights reserved.<BR>
-  
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2011-2013 ARM Ltd. All rights reserved.<BR>
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -336,6 +336,10 @@ TimerInitialize (
   ASSERT_EFI_ERROR (Status);
 
   // Disable the timer
+  TimerCtrlReg = ArmArchTimerGetTimerCtrlReg ();
+  TimerCtrlReg |= ARM_ARCH_TIMER_IMASK;
+  TimerCtrlReg &= ~ARM_ARCH_TIMER_ENABLE;
+  ArmArchTimerSetTimerCtrlReg (TimerCtrlReg);
   Status = TimerDriverSetTimerPeriod (&gTimer, 0);
   ASSERT_EFI_ERROR (Status);
 
@@ -349,11 +353,6 @@ TimerInitialize (
   Status = gInterrupt->RegisterInterruptSource (gInterrupt, PcdGet32 (PcdArmArchTimerIntrNum), TimerInterruptHandler);
   ASSERT_EFI_ERROR (Status);
 
-  // Unmask timer interrupts
-  TimerCtrlReg = ArmArchTimerGetTimerCtrlReg ();
-  TimerCtrlReg &= ~ARM_ARCH_TIMER_IMASK;
-  ArmArchTimerSetTimerCtrlReg (TimerCtrlReg);
-
   // Set up default timer
   Status = TimerDriverSetTimerPeriod (&gTimer, FixedPcdGet32(PcdTimerPeriod)); // TIMER_DEFAULT_PERIOD
   ASSERT_EFI_ERROR (Status);
@@ -366,11 +365,9 @@ TimerInitialize (
                   );
   ASSERT_EFI_ERROR(Status);
 
-  // enable Secure timer interrupts
-  Status = gInterrupt->EnableInterruptSource (gInterrupt, PcdGet32 (PcdArmArchTimerSecIntrNum));
-
-  // enable NonSecure timer interrupts
-  Status = gInterrupt->EnableInterruptSource (gInterrupt, PcdGet32 (PcdArmArchTimerIntrNum));
+  // Everything is ready, unmask and enable timer interrupts
+  TimerCtrlReg = ARM_ARCH_TIMER_ENABLE;
+  ArmArchTimerSetTimerCtrlReg (TimerCtrlReg);
 
   // Register for an ExitBootServicesEvent
   Status = gBS->CreateEvent (EVT_SIGNAL_EXIT_BOOT_SERVICES, TPL_NOTIFY, ExitBootServicesEvent, NULL, &EfiExitBootServicesEvent);
