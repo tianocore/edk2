@@ -130,19 +130,17 @@ PL011UartInitializePort (
   // Baud Rate
   //
 
-  // If BaudRate is zero then use default baud rate
-  if (*BaudRate == 0) {
-    if (PcdGet32 (PL011UartInteger) != 0) {
+  // If PL011 Integral value has been defined then always ignore the BAUD rate
+  if (PcdGet32 (PL011UartInteger) != 0) {
       MmioWrite32 (UartBase + UARTIBRD, PcdGet32 (PL011UartInteger));
       MmioWrite32 (UartBase + UARTFBRD, PcdGet32 (PL011UartFractional));
-    } else {
+  } else {
+    // If BAUD rate is zero then replace it with the system default value
+    if (*BaudRate == 0) {
       *BaudRate = PcdGet32 (PcdSerialBaudRate);
       ASSERT (*BaudRate != 0);
     }
-  }
 
-  // If BaudRate != 0 then we must calculate the divisor from the value
-  if (*BaudRate != 0) {
     Divisor = (PcdGet32 (PL011UartClkInHz) * 4) / *BaudRate;
     MmioWrite32 (UartBase + UARTIBRD, Divisor >> 6);
     MmioWrite32 (UartBase + UARTFBRD, Divisor & 0x3F);
