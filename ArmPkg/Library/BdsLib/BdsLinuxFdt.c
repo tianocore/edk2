@@ -535,7 +535,9 @@ PrepareFdt (
       ArmCoreInfoTable = ArmProcessorTable->ArmCpus;
 
       for (Index = 0; Index < ArmProcessorTable->NumberOfEntries; Index++) {
-        AsciiSPrint (Name, 10, "cpu@%d", Index);
+        CoreMpId = (UINTN) GET_MPID (ArmCoreInfoTable[Index].ClusterId,
+                             ArmCoreInfoTable[Index].CoreId);
+        AsciiSPrint (Name, 10, "cpu@%x", CoreMpId);
 
         // If the 'cpus' node did not exist then create all the 'cpu' nodes.
         // In case 'cpus' node is provided in the original FDT then we do not add
@@ -549,8 +551,7 @@ PrepareFdt (
           }
 
           fdt_setprop_string (fdt, cpu_node, "device_type", "cpu");
-          CoreMpId = (UINTN) GET_MPID (ArmCoreInfoTable[Index].ClusterId,
-                               ArmCoreInfoTable[Index].CoreId);
+
           CoreMpId = cpu_to_fdtn (CoreMpId);
           fdt_setprop (fdt, cpu_node, "reg", &CoreMpId, sizeof (CoreMpId));
           if (PsciSmcSupported) {
