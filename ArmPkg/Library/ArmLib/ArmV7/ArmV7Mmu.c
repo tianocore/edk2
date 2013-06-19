@@ -222,10 +222,10 @@ ArmConfigureMmu (
 
   ArmCleanInvalidateDataCache ();
   ArmInvalidateInstructionCache ();
-  ArmInvalidateTlb ();
 
   ArmDisableDataCache ();
   ArmDisableInstructionCache();
+  // TLBs are also invalidated when calling ArmDisableMmu()
   ArmDisableMmu ();
 
   // Make sure nothing sneaked into the cache
