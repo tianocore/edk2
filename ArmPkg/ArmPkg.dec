@@ -163,8 +163,6 @@
   gArmTokenSpaceGuid.PcdArmMachineType|0|UINT32|0x0000001E
   # The compressed Linux kernel is expected to be under 128MB from the beginning of the System Memory
   gArmTokenSpaceGuid.PcdArmLinuxKernelMaxOffset|0x08000000|UINT32|0x0000001F
-  # The Linux ATAGs are expected to be under 0x4000 (16KB) from the beginning of the System Memory
-  gArmTokenSpaceGuid.PcdArmLinuxAtagMaxOffset|0x4000|UINT32|0x00000020
 
   #
   # ARM Architectural Timer
@@ -177,6 +175,10 @@
 [PcdsFixedAtBuild.ARM]
   # By default we do not do a transition to non-secure mode
   gArmTokenSpaceGuid.PcdArmNonSecModeTransition|0x0|UINT32|0x0000003E
+
+  # The Linux ATAGs are expected to be under 0x4000 (16KB) from the beginning of the System Memory
+  gArmTokenSpaceGuid.PcdArmLinuxAtagMaxOffset|0x4000|UINT32|0x00000020
+
   # If the fixed FDT address is not available, then it should be loaded below the kernel.
   # The recommendation from the Linux kernel is to have the FDT below 16KB.
   # (see the kernel doc: Documentation/arm/Booting)

@@ -78,7 +78,9 @@
   gArmTokenSpaceGuid.PcdArmLinuxFdtMaxOffset
   gArmTokenSpaceGuid.PcdArmLinuxFdtAlignment
   gArmTokenSpaceGuid.PcdArmLinuxKernelMaxOffset
+
+[FixedPcd.ARM]
   gArmTokenSpaceGuid.PcdArmLinuxAtagMaxOffset
-  
+
 [Depex]
   TRUE
