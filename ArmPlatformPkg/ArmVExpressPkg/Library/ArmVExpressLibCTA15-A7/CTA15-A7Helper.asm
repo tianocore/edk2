@@ -61,7 +61,7 @@ ArmPlatformIsPrimaryCore FUNCTION
   orr   r1, r1, r2
 
   // Keep the Cluster ID and Core ID from the MPID
-  LoadConstantToReg (ARM_CLUSTER_MASK | ARM_CORE_MASK, r2)
+  LoadConstantToReg (ARM_CLUSTER_MASK :OR: ARM_CORE_MASK, r2)
   and   r0, r0, r2
 
   // Compare mpid and boot cpu from ARM_SCC_CFGREG48
