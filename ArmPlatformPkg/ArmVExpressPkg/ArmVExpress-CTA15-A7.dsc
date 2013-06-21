@@ -48,7 +48,7 @@
   ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
 
 [BuildOptions]
-!ifdef $(ARM_BIGLITTLE_TC2)
+!ifdef ARM_BIGLITTLE_TC2
   RVCT:*_*_ARM_ARCHCC_FLAGS  = -DARM_BIGLITTLE_TC2=1
   RVCT:*_*_ARM_PP_FLAGS  = -DARM_BIGLITTLE_TC2=1
 
@@ -97,7 +97,7 @@
   # Stacks for MPCores in Secure World
   # SRAM (CS1) is only available between 0x14000000 and 0x14001000 on the model
   # ZBT SRAM is available between 0x2E000000 and 0x2E010000 on the model
-!ifdef $(ARM_BIGLITTLE_TC2)
+!ifdef ARM_BIGLITTLE_TC2
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0x17000000
 !else
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0x2E000000
@@ -111,7 +111,7 @@
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x80000000
   gArmTokenSpaceGuid.PcdSystemMemorySize|0x40000000
 
-!ifdef $(ARM_BIGLITTLE_TC2)
+!ifdef ARM_BIGLITTLE_TC2
   # TC2 Dual-Cluster profile
   gArmPlatformTokenSpaceGuid.PcdClusterCount|2
 
@@ -149,7 +149,7 @@
   ## PL031 RealTimeClock
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x1C170000
 
-!ifdef $(ARM_BIGLITTLE_TC2)
+!ifdef ARM_BIGLITTLE_TC2
   ## PL111 Lcd & HdLcd
   gArmPlatformTokenSpaceGuid.PcdPL111LcdBase|0x1C1F0000
   gArmPlatformTokenSpaceGuid.PcdArmHdLcdBase|0x2B000000
@@ -190,7 +190,7 @@
   #
   # ARM Architectural Timer Frequency
   #
-!ifdef $(ARM_BIGLITTLE_TC2)
+!ifdef ARM_BIGLITTLE_TC2
   gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|24000000
 !else
   gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|10000000
@@ -253,7 +253,7 @@
   #
   # Filesystems
   #
-!ifndef $(ARM_BIGLITTLE_TC2)
+!ifndef ARM_BIGLITTLE_TC2
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
 !endif
   

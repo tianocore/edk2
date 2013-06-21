@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 #  
 #  This program and the accompanying materials                          
 #  are licensed and made available under the terms and conditions of the BSD License         
@@ -54,7 +54,7 @@
 ################################################################################
 
 [PcdsFeatureFlag.common]
-!ifdef $(EDK2_SKIP_PEICORE)
+!ifdef EDK2_SKIP_PEICORE
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec|TRUE
   gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores|TRUE
 !endif
@@ -151,7 +151,7 @@
   #
   # PEI Phase modules
   #
-!ifdef $(EDK2_SKIP_PEICORE)
+!ifdef EDK2_SKIP_PEICORE
   ArmPlatformPkg/PrePi/PeiMPCore.inf {
     <LibraryClasses>
       ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf

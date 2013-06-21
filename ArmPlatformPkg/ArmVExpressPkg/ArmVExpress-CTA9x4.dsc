@@ -81,7 +81,7 @@
 ################################################################################
 
 [PcdsFeatureFlag.common]
-!ifdef $(EDK2_ARMVE_STANDALONE)
+!ifdef EDK2_ARMVE_STANDALONE
   gArmPlatformTokenSpaceGuid.PcdStandalone|TRUE
 !else
   gArmPlatformTokenSpaceGuid.PcdStandalone|FALSE
@@ -89,7 +89,7 @@
   gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores|TRUE
 !endif
 
-!ifdef $(EDK2_SKIP_PEICORE)
+!ifdef EDK2_SKIP_PEICORE
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec|TRUE
   gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores|TRUE
 !endif
@@ -210,7 +210,7 @@
   #
   # PEI Phase modules
   #
-!ifdef $(EDK2_SKIP_PEICORE)
+!ifdef EDK2_SKIP_PEICORE
   ArmPlatformPkg/PrePi/PeiMPCore.inf {
     <LibraryClasses>
       ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
