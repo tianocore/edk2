@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 #  
 #  This program and the accompanying materials                          
 #  are licensed and made available under the terms and conditions of the BSD License         
@@ -21,15 +21,22 @@
   PLATFORM_GUID                  = eb2bd5ff-2379-4a06-9c12-db905cdee9ea 
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
-!ifdef $(EDK2_ARMVE_STANDALONE)
-  OUTPUT_DIRECTORY               = Build/ArmVExpress-CTA9x4-Standalone
-!else
-  OUTPUT_DIRECTORY               = Build/ArmVExpress-CTA9x4
-!endif
   SUPPORTED_ARCHITECTURES        = ARM
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = ArmPlatformPkg/ArmVExpressPkg/ArmVExpress-CTA9x4.fdf
+
+  # Reflashing the NOR Flash is a slow process. To ease the development on ARM Versatile Express Cortex-A9x4,
+  # the UEFI firmware can be built to be started from DRAM (instead of NOR Flash).
+  # The engineer only needs to copy the new binary in DRAM with the hardware debugger and execute from there.
+!ifndef EDK2_ARMVE_STANDALONE
+  DEFINE EDK2_ARMVE_STANDALONE=1
+!endif
+!if $(EDK2_ARMVE_STANDALONE) == 1
+  OUTPUT_DIRECTORY               = Build/ArmVExpress-CTA9x4-Standalone
+!else
+  OUTPUT_DIRECTORY               = Build/ArmVExpress-CTA9x4
+!endif
 
 !include ArmPlatformPkg/ArmVExpressPkg/ArmVExpress.dsc.inc
 
