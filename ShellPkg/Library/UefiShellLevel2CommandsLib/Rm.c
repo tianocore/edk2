@@ -1,7 +1,7 @@
 /** @file
   Main file for attrib shell level 2 function.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -75,6 +75,7 @@ CascadeDelete(
   EFI_SHELL_FILE_INFO   *Node2;
   EFI_STATUS            Status;
   SHELL_PROMPT_RESPONSE *Resp;
+  CHAR16                *TempName;
 
   Resp                  = NULL;
   ShellStatus           = SHELL_SUCCESS;
@@ -120,6 +121,22 @@ CascadeDelete(
           continue;
         }
         Node2->Status = gEfiShellProtocol->OpenFileByName (Node2->FullName, &Node2->Handle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE);
+        if (EFI_ERROR(Node2->Status) && StrStr(Node2->FileName, L":") == NULL) {
+          //
+          // Update the node filename to have full path with file system identifier
+          //
+          TempName = AllocateZeroPool(StrSize(Node->FullName) + StrSize(Node2->FullName));
+          StrCpy(TempName, Node->FullName);
+          TempName[StrStr(TempName, L":")+1-TempName] = CHAR_NULL;
+          StrCat(TempName, Node2->FullName);
+          FreePool((VOID*)Node2->FullName);
+          Node2->FullName = TempName;
+
+          //
+          // Now try again to open the file
+          //
+          Node2->Status = gEfiShellProtocol->OpenFileByName (Node2->FullName, &Node2->Handle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE);
+        }
         ShellStatus = CascadeDelete(Node2, Quiet);
         if (ShellStatus != SHELL_SUCCESS) {
           if (List!=NULL) {
