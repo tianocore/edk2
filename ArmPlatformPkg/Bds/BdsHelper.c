@@ -205,7 +205,8 @@ HasFilePathEfiExtension (
   IN CHAR16* FilePath
   )
 {
-  return (StrCmp (FilePath + (StrSize(FilePath)/sizeof(CHAR16)) - 5, L".efi") == 0);
+  return (StrCmp (FilePath + (StrSize (FilePath) / sizeof (CHAR16)) - 5, L".EFI") == 0) ||
+         (StrCmp (FilePath + (StrSize (FilePath) / sizeof (CHAR16)) - 5, L".efi") == 0);
 }
 
 // Return the last non end-type Device Path Node from a Device Path
