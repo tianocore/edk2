@@ -2,7 +2,7 @@
 
   XHCI transfer scheduling routines.
 
-Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1101,7 +1101,7 @@ XhcExecTransfer (
   }
 
   Status = EFI_SUCCESS;
-  Loop   = (Timeout * XHC_1_MILLISECOND / XHC_POLL_DELAY) + 1;
+  Loop   = Timeout * XHC_1_MILLISECOND;
   if (Timeout == 0) {
     Loop = 0xFFFFFFFF;
   }
@@ -1113,7 +1113,7 @@ XhcExecTransfer (
     if (Urb->Finished) {
       break;
     }
-    gBS->Stall (XHC_POLL_DELAY);
+    gBS->Stall (XHC_1_MICROSECOND);
   }
 
   if (Index == Loop) {

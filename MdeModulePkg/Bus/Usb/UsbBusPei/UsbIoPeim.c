@@ -1,7 +1,7 @@
 /** @file
 The module is used to implement Usb Io PPI interfaces.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved. <BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -24,7 +24,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param  This                   The pointer of PEI_USB_IO_PPI.
   @param  Request                USB device request to send.
   @param  Direction              Specifies the data direction for the data stage.
-  @param  Timeout                Indicates the maximum timeout, in millisecond.
+  @param  Timeout                Indicates the maximum timeout, in millisecond. If Timeout
+                                 is 0, then the caller must wait for the function to be
+                                 completed until EFI_SUCCESS or EFI_DEVICE_ERROR is returned.
   @param  Data                   Data buffer to be transmitted or received from USB device.
   @param  DataLength             The size (in bytes) of the data buffer.
 
@@ -96,7 +98,9 @@ PeiUsbControlTransfer (
                                 from or receive into.
   @param  DataLength            The lenght of the data buffer.
   @param  Timeout               Indicates the maximum time, in millisecond, which the
-                                transfer is allowed to complete.
+                                transfer is allowed to complete. If Timeout is 0, then
+                                the caller must wait for the function to be completed
+                                until EFI_SUCCESS or EFI_DEVICE_ERROR is returned.
 
   @retval EFI_SUCCESS           The transfer was completed successfully.
   @retval EFI_OUT_OF_RESOURCES  The transfer failed due to lack of resource.

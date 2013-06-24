@@ -6,7 +6,7 @@
   Refer to section 16.2.4 of the UEFI 2.3 Specification for more information on 
   these interfaces.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -47,8 +47,11 @@ typedef struct _PEI_USB_IO_PPI  PEI_USB_IO_PPI;
   @param[in]     Direction     Specifies the data direction for the transfer. There 
                                are three values available: 
                                EfiUsbDataIn, EfiUsbDataOut and EfiUsbNoData.
-  @param[in]     TimeOut       Indicates the maximum time, in milliseconds, that 
+  @param[in]     Timeout       Indicates the maximum time, in milliseconds, that 
                                the transfer is allowed to complete.
+                               If Timeout is 0, then the caller must wait for the
+                               function to be completed until EFI_SUCCESS or
+                               EFI_DEVICE_ERROR is returned.
   @param[in,out] Data          A pointer to the buffer of data that will be 
                                transmitted to or received from the USB device.
   @param[in]     DataLength    On input, indicates the size, in bytes, of the data 
@@ -82,10 +85,13 @@ EFI_STATUS
 
   @param[in] PeiServices       The pointer to the PEI Services Table.
   @param[in] This              The pointer to this instance of the PEI_USB_IO_PPI.
-  @param[in] EndPointAddress   The endpoint address.
+  @param[in] DeviceEndpoint    The endpoint address.
   @param[in] Data              The data buffer to be transfered.
   @param[in] DataLength        The length of data buffer.
-  @param[in] TimeOut           The timeout for the transfer, in milliseconds.
+  @param[in] Timeout           The timeout for the transfer, in milliseconds.
+                               If Timeout is 0, then the caller must wait for the
+                               function to be completed until EFI_SUCCESS or
+                               EFI_DEVICE_ERROR is returned.
 
   @retval EFI_SUCCESS             The bulk transfer completed successfully.
   @retval EFI_INVALID_PARAMETER   Some parameters are invalid.

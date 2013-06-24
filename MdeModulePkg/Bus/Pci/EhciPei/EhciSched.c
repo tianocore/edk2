@@ -2,7 +2,7 @@
 PEIM to produce gPeiUsb2HostControllerPpiGuid based on gPeiUsbControllerPpiGuid
 which is used to enable recovery function from USB Drivers.
 
-Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -425,19 +425,29 @@ EhcExecTransfer (
   UINTN                   Index;
   UINTN                   Loop;
   BOOLEAN                 Finished;
+  BOOLEAN                 InfiniteLoop;
 
   Status    = EFI_SUCCESS;
-  Loop      = (TimeOut * EHC_1_MILLISECOND / EHC_SYNC_POLL_INTERVAL) + 1;
-  Finished  = FALSE;
+  Loop      = TimeOut * EHC_1_MILLISECOND;
+  Finished     = FALSE;
+  InfiniteLoop = FALSE;
 
-  for (Index = 0; Index < Loop; Index++) {
+  //
+  // If Timeout is 0, then the caller must wait for the function to be completed
+  // until EFI_SUCCESS or EFI_DEVICE_ERROR is returned.
+  //
+  if (TimeOut == 0) {
+    InfiniteLoop = TRUE;
+  }
+
+  for (Index = 0; InfiniteLoop || (Index < Loop); Index++) {
     Finished = EhcCheckUrbResult (Ehc, Urb);
 
     if (Finished) {
       break;
     }
 
-    MicroSecondDelay (EHC_SYNC_POLL_INTERVAL);
+    MicroSecondDelay (EHC_1_MICROSECOND);
   }
 
   if (!Finished) {

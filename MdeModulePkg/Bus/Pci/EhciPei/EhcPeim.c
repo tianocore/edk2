@@ -2,7 +2,7 @@
 PEIM to produce gPeiUsb2HostControllerPpiGuid based on gPeiUsbControllerPpiGuid
 which is used to enable recovery function from USB Drivers.
 
-Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -532,6 +532,8 @@ EhcInitHC (
                                 the subsequent bulk transfer.
   @param  TimeOut               Indicates the maximum time, in millisecond, which the
                                 transfer is allowed to complete.
+                                If Timeout is 0, then the caller must wait for the function
+                                to be completed until EFI_SUCCESS or EFI_DEVICE_ERROR is returned.
   @param  Translator            A pointr to the transaction translator data.                                
   @param  TransferResult        A pointer to the detailed result information of the
                                 bulk transfer.
@@ -995,6 +997,8 @@ ON_EXIT:
   @param  Data                   Data buffer to be transmitted or received from USB device.
   @param  DataLength             The size (in bytes) of the data buffer.
   @param  TimeOut                Indicates the maximum timeout, in millisecond.
+                                 If Timeout is 0, then the caller must wait for the function
+                                 to be completed until EFI_SUCCESS or EFI_DEVICE_ERROR is returned.
   @param  Translator             Transaction translator to be used by this device.
   @param  TransferResult         Return the result of this control transfer.
 

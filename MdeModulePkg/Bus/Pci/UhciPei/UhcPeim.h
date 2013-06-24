@@ -1,7 +1,7 @@
 /** @file
 Private Header file for Usb Host Controller PEIM
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -94,6 +94,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define OUTPUT_PACKET_ID      0xE1
 #define ERROR_PACKET_ID       0x55
 
+#define STALL_1_MICRO_SECOND  1
 #define STALL_1_MILLI_SECOND  1000
 
 

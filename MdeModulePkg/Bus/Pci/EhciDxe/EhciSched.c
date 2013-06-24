@@ -2,7 +2,7 @@
 
   EHCI transfer scheduling routines.
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -694,7 +694,7 @@ EhcExecTransfer (
   BOOLEAN                 InfiniteLoop;
 
   Status       = EFI_SUCCESS;
-  Loop         = (TimeOut * EHC_1_MILLISECOND / EHC_SYNC_POLL_INTERVAL) + 1;
+  Loop         = TimeOut * EHC_1_MILLISECOND;
   Finished     = FALSE;
   InfiniteLoop = FALSE;
 
@@ -714,7 +714,7 @@ EhcExecTransfer (
       break;
     }
 
-    gBS->Stall (EHC_SYNC_POLL_INTERVAL);
+    gBS->Stall (EHC_1_MICROSECOND);
   }
 
   if (!Finished) {

@@ -2,7 +2,7 @@
 
   The EHCI register operation routines.
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -580,7 +580,7 @@ UhciExecuteTransfer (
 
   Finished     = FALSE;
   Status       = EFI_SUCCESS;
-  Delay        = (TimeOut * UHC_1_MILLISECOND / UHC_SYNC_POLL_INTERVAL) + 1;
+  Delay        = TimeOut * UHC_1_MILLISECOND;
   InfiniteLoop = FALSE;
 
   //
@@ -602,7 +602,7 @@ UhciExecuteTransfer (
       break;
     }
 
-    gBS->Stall (UHC_SYNC_POLL_INTERVAL);
+    gBS->Stall (UHC_1_MICROSECOND);
   }
 
   if (!Finished) {

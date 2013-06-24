@@ -2,7 +2,7 @@
 PEIM to produce gPeiUsbHostControllerPpiGuid based on gPeiUsbControllerPpiGuid
 which is used to enable recovery function from USB Drivers.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved. <BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -153,6 +153,8 @@ UhcPeimEntry (
   @param  Data                   Data buffer to be transmitted or received from USB device.
   @param  DataLength             The size (in bytes) of the data buffer.
   @param  TimeOut                Indicates the maximum timeout, in millisecond.
+                                 If Timeout is 0, then the caller must wait for the function
+                                 to be completed until EFI_SUCCESS or EFI_DEVICE_ERROR is returned.
   @param  TransferResult         Return the result of this control transfer.
 
   @retval EFI_SUCCESS            Transfer was completed successfully.
@@ -391,6 +393,8 @@ UhcControlTransfer (
                                 the subsequent bulk transfer.
   @param  TimeOut               Indicates the maximum time, in millisecond, which the
                                 transfer is allowed to complete.
+                                If Timeout is 0, then the caller must wait for the function
+                                to be completed until EFI_SUCCESS or EFI_DEVICE_ERROR is returned.
   @param  TransferResult        A pointer to the detailed result information of the
                                 bulk transfer.
 
@@ -2508,12 +2512,21 @@ ExecuteControlTransfer (
 {
   UINTN   ErrTDPos;
   UINTN   Delay;
+  BOOLEAN InfiniteLoop;
 
   ErrTDPos          = 0;
   *TransferResult   = EFI_USB_NOERROR;
   *ActualLen        = 0;
+  InfiniteLoop      = FALSE;
 
-  Delay = (TimeOut * STALL_1_MILLI_SECOND / 200) + 1;
+  Delay = TimeOut * STALL_1_MILLI_SECOND;
+  //
+  // If Timeout is 0, then the caller must wait for the function to be completed
+  // until EFI_SUCCESS or EFI_DEVICE_ERROR is returned.
+  //
+  if (TimeOut == 0) {
+    InfiniteLoop = TRUE;
+  }
 
   do {
 
@@ -2525,11 +2538,10 @@ ExecuteControlTransfer (
     if ((*TransferResult & EFI_USB_ERR_NOTEXECUTE) != EFI_USB_ERR_NOTEXECUTE) {
       break;
     }
-    MicroSecondDelay (200);
+    MicroSecondDelay (STALL_1_MICRO_SECOND);
     Delay--;
 
-  } while (Delay != 0);
-
+  } while (InfiniteLoop || (Delay != 0));
 
   if (*TransferResult != EFI_USB_NOERROR) {
     return EFI_DEVICE_ERROR;
@@ -2566,12 +2578,21 @@ ExecBulkTransfer (
   UINTN   ErrTDPos;
   UINTN   ScrollNum;
   UINTN   Delay;
+  BOOLEAN InfiniteLoop;
 
   ErrTDPos          = 0;
   *TransferResult   = EFI_USB_NOERROR;
   *ActualLen        = 0;
+  InfiniteLoop      = FALSE;
 
-  Delay = (TimeOut * STALL_1_MILLI_SECOND / 200) + 1;
+  Delay = TimeOut * STALL_1_MILLI_SECOND;
+  //
+  // If Timeout is 0, then the caller must wait for the function to be completed
+  // until EFI_SUCCESS or EFI_DEVICE_ERROR is returned.
+  //
+  if (TimeOut == 0) {
+    InfiniteLoop = TRUE;
+  }
 
   do {
 
@@ -2582,10 +2603,10 @@ ExecBulkTransfer (
     if ((*TransferResult & EFI_USB_ERR_NOTEXECUTE) != EFI_USB_ERR_NOTEXECUTE) {
       break;
     }
-    MicroSecondDelay (200);
+    MicroSecondDelay (STALL_1_MICRO_SECOND);
     Delay--;
 
-  } while (Delay != 0);
+  } while (InfiniteLoop || (Delay != 0));
 
   //
   // has error
