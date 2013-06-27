@@ -354,6 +354,7 @@ PrepareFdt (
   UINT64                CpuReleaseAddr;
   UINTN                 MemoryMapSize;
   EFI_MEMORY_DESCRIPTOR *MemoryMap;
+  EFI_MEMORY_DESCRIPTOR *MemoryMapPtr;
   UINTN                 MapKey;
   UINTN                 DescriptorSize;
   UINT32                DescriptorVersion;
@@ -483,24 +484,32 @@ PrepareFdt (
   MemoryMapSize = 0;
   Status = gBS->GetMemoryMap (&MemoryMapSize, MemoryMap, &MapKey, &DescriptorSize, &DescriptorVersion);
   if (Status == EFI_BUFFER_TOO_SMALL) {
+    // The UEFI specification advises to allocate more memory for the MemoryMap buffer between successive
+    // calls to GetMemoryMap(), since allocation of the new buffer may potentially increase memory map size.
     Pages = EFI_SIZE_TO_PAGES (MemoryMapSize) + 1;
     MemoryMap = AllocatePages (Pages);
+    if (MemoryMap == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto FAIL_COMPLETE_FDT;
+    }
     Status = gBS->GetMemoryMap (&MemoryMapSize, MemoryMap, &MapKey, &DescriptorSize, &DescriptorVersion);
   }
 
   // Go through the list and add the reserved region to the Device Tree
   if (!EFI_ERROR(Status)) {
-    for (Index = 0; Index < (MemoryMapSize / sizeof(EFI_MEMORY_DESCRIPTOR)); Index++) {
-      if (IsLinuxReservedRegion ((EFI_MEMORY_TYPE)MemoryMap[Index].Type)) {
+    MemoryMapPtr = MemoryMap;
+    for (Index = 0; Index < (MemoryMapSize / DescriptorSize); Index++) {
+      if (IsLinuxReservedRegion ((EFI_MEMORY_TYPE)MemoryMapPtr->Type)) {
         DEBUG((DEBUG_VERBOSE, "Reserved region of type %d [0x%X, 0x%X]\n",
-            MemoryMap[Index].Type,
-            (UINTN)MemoryMap[Index].PhysicalStart,
-            (UINTN)(MemoryMap[Index].PhysicalStart + MemoryMap[Index].NumberOfPages * EFI_PAGE_SIZE)));
-        err = fdt_add_mem_rsv(fdt, MemoryMap[Index].PhysicalStart, MemoryMap[Index].NumberOfPages * EFI_PAGE_SIZE);
+            MemoryMapPtr->Type,
+            (UINTN)MemoryMapPtr->PhysicalStart,
+            (UINTN)(MemoryMapPtr->PhysicalStart + MemoryMapPtr->NumberOfPages * EFI_PAGE_SIZE)));
+        err = fdt_add_mem_rsv(fdt, MemoryMapPtr->PhysicalStart, MemoryMapPtr->NumberOfPages * EFI_PAGE_SIZE);
         if (err != 0) {
           Print(L"Warning: Fail to add 'memreserve' (err:%d)\n", err);
         }
       }
+      MemoryMapPtr = (EFI_MEMORY_DESCRIPTOR*)((UINTN)MemoryMapPtr + DescriptorSize);
     }
   }
 
