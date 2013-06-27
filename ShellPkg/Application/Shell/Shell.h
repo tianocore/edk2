@@ -1,7 +1,7 @@
 /** @file
   function definitions for internal to shell functions.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -71,7 +71,8 @@ typedef struct {
   UINT32  NoMap:1;        ///< Was "-nomap"         found on command line.
   UINT32  NoVersion:1;    ///< Was "-noversion"     found on command line.
   UINT32  Delay:1;        ///< Was "-delay[:n]      found on command line
-  UINT32  Reserved:8;     ///< Extra bits
+  UINT32  Exit:1;         ///< Was "-_exit"          found on command line
+  UINT32  Reserved:7;     ///< Extra bits
 } SHELL_BITS;
 
 typedef union {

@@ -2,7 +2,7 @@
   Member functions of EFI_SHELL_PROTOCOL and functions for creation,
   manipulation, and initialization of EFI_SHELL_PROTOCOL.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1594,7 +1594,7 @@ EfiShellExecute(
   Temp = NULL;
   Size = 0;
   ASSERT((Temp == NULL && Size == 0) || (Temp != NULL));
-  StrnCatGrow(&Temp, &Size, L"Shell.efi ", 0);
+  StrnCatGrow(&Temp, &Size, L"Shell.efi -_exit ", 0);
   StrnCatGrow(&Temp, &Size, CommandLine, 0);
 
   Status = InternalShellExecuteDevicePath(
