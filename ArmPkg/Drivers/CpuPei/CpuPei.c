@@ -2,7 +2,7 @@
 
 Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2011 Hewlett Packard Corporation. All rights reserved.<BR>
-Copyright (c) 2011, ARM Limited. All rights reserved.<BR>
+Copyright (c) 2011-2013, ARM Limited. All rights reserved.<BR>
 
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -137,7 +137,10 @@ ConfigureMmu (
     SystemMemoryBase, SystemMemoryLength/1024/1024,
     (CacheAttributes == DDR_ATTRIBUTES_CACHED) ? "cacheable" : "uncacheable"));
 
-  ArmConfigureMmu (MemoryTable, &TranslationTableBase, &TranslationTableSize);
+  Status = ArmConfigureMmu (MemoryTable, &TranslationTableBase, &TranslationTableSize);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "Error: Failed to enable MMU (error code: %r)\n", Status));
+  }
   
   BuildMemoryAllocationHob((EFI_PHYSICAL_ADDRESS)(UINTN)TranslationTableBase, TranslationTableSize, EfiBootServicesData);
 }

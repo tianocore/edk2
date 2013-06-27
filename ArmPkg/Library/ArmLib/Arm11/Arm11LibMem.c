@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2011 - 2013, ARM Limited. All rights reserved.
   
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -63,18 +64,21 @@ FillTranslationTable (
   }
 }
 
-VOID
+RETURN_STATUS
 EFIAPI
 ArmConfigureMmu (
   IN  ARM_MEMORY_REGION_DESCRIPTOR  *MemoryTable,
-  OUT VOID                          **TranslationTableBase OPTIONAL,
-  OUT UINTN                         *TranslationTableSize  OPTIONAL
+  OUT VOID                         **TranslationTableBase OPTIONAL,
+  OUT UINTN                         *TranslationTableSize OPTIONAL
   )
 {
   VOID  *TranslationTable;
 
   // Allocate pages for translation table.
-  TranslationTable = AllocatePages(EFI_SIZE_TO_PAGES(TRANSLATION_TABLE_SIZE + TRANSLATION_TABLE_ALIGNMENT));
+  TranslationTable = AllocatePages (EFI_SIZE_TO_PAGES (TRANSLATION_TABLE_SIZE + TRANSLATION_TABLE_ALIGNMENT));
+  if (TranslationTable == NULL) {
+    return RETURN_OUT_OF_RESOURCES;
+  }
   TranslationTable = (VOID *)(((UINTN)TranslationTable + TRANSLATION_TABLE_ALIGNMENT_MASK) & ~TRANSLATION_TABLE_ALIGNMENT_MASK);
 
   if (TranslationTableBase != NULL) {
@@ -125,9 +129,7 @@ ArmConfigureMmu (
     
   ArmEnableInstructionCache();
   ArmEnableDataCache();
-  ArmEnableMmu();  
+  ArmEnableMmu();
+
+  return RETURN_SUCCESS;
 }
-
-
-
-

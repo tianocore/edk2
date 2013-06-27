@@ -382,11 +382,11 @@ ArmGetTTBR0BaseAddress (
   VOID
   );
 
-VOID
+RETURN_STATUS
 EFIAPI
 ArmConfigureMmu (
   IN  ARM_MEMORY_REGION_DESCRIPTOR  *MemoryTable,
-  OUT VOID                          **TranslationTableBase OPTIONAL,
+  OUT VOID                         **TranslationTableBase OPTIONAL,
   OUT UINTN                         *TranslationTableSize  OPTIONAL
   );
   
