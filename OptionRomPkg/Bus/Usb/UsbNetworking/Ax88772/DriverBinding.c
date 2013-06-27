@@ -1,7 +1,7 @@
 /** @file
   Implement the driver binding protocol for Asix AX88772 Ethernet driver.
 
-  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011-2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -481,22 +481,9 @@ EntryPoint (
   IN EFI_SYSTEM_TABLE * pSystemTable
   )
 {
-  EFI_LOADED_IMAGE_PROTOCOL * pLoadedImage;
   EFI_STATUS    Status;
 
   DBG_ENTER ( );
-
-  //
-  //  Enable unload support
-  //
-  Status = gBS->HandleProtocol (
-                  gImageHandle,
-                  &gEfiLoadedImageProtocolGuid,
-                  (VOID **)&pLoadedImage
-                  );
-  if (!EFI_ERROR (Status)) {
-    pLoadedImage->Unload = DriverUnload;
-  }
 
   //
   //  Add the driver to the list of drivers

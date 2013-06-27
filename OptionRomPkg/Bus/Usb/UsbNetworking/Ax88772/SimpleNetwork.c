@@ -858,7 +858,7 @@ SN_Setup (
   pMode->State = EfiSimpleNetworkStopped;
   pMode->HwAddressSize = PXE_HWADDR_LEN_ETHER;
   pMode->MediaHeaderSize = sizeof ( ETHERNET_HEADER );
-  pMode->MaxPacketSize = AX88772_MAX_PKT_SIZE;
+  pMode->MaxPacketSize = MAX_ETHERNET_PKT_SIZE;
   pMode->NvRamSize = 0;
   pMode->NvRamAccessSize = 0;
   pMode->ReceiveFilterMask = EFI_SIMPLE_NETWORK_RECEIVE_UNICAST
@@ -885,6 +885,15 @@ SN_Setup (
   pNicDevice->PhyId = PHY_ID_INTERNAL;
   pNicDevice->b100Mbps = TRUE;
   pNicDevice->bFullDuplex = TRUE;
+
+  Status = gBS->AllocatePool ( EfiRuntimeServicesData, 
+                               MAX_BULKIN_SIZE,
+                               (VOID **) &pNicDevice->pBulkInBuff);
+  if ( EFI_ERROR(Status)) {
+    DEBUG (( EFI_D_ERROR, "Memory are not enough\n"));
+    return Status;
+  }
+        
   Status = Ax88772MacAddressGet (
                 pNicDevice,
                 &pMode->PermanentAddress.Addr[0]);
@@ -958,7 +967,7 @@ SN_Start (
       pMode->State = EfiSimpleNetworkStarted;
       pMode->HwAddressSize = PXE_HWADDR_LEN_ETHER;
       pMode->MediaHeaderSize = sizeof ( ETHERNET_HEADER );
-      pMode->MaxPacketSize = AX88772_MAX_PKT_SIZE;
+      pMode->MaxPacketSize = MAX_ETHERNET_PKT_SIZE;
       pMode->ReceiveFilterMask = EFI_SIMPLE_NETWORK_RECEIVE_UNICAST
                                | EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST
                                | EFI_SIMPLE_NETWORK_RECEIVE_BROADCAST
@@ -1360,7 +1369,11 @@ SN_Transmit (
       // Update the link status
       //
       pNicDevice = DEV_FROM_SIMPLE_NETWORK ( pSimpleNetwork );
-      Ax88772Rx ( pNicDevice, FALSE );
+
+      //
+      //No need to call receive to receive packet
+      //
+      //Ax88772Rx ( pNicDevice, FALSE );
       pMode->MediaPresent = pNicDevice->bLinkUp;
 
       //

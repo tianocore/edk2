@@ -39,22 +39,24 @@
 //------------------------------------------------------------------------------
 //  Macros
 //------------------------------------------------------------------------------
-
-#if defined(_MSC_VER)           /* Handle Microsoft VC++ compiler specifics. */
-#define DBG_ENTER()             DEBUG (( DEBUG_INFO, "Entering " __FUNCTION__ "\n" )) ///<  Display routine entry
-#define DBG_EXIT()              DEBUG (( DEBUG_INFO, "Exiting " __FUNCTION__ "\n" ))  ///<  Display routine exit
-#define DBG_EXIT_DEC(Status)    DEBUG (( DEBUG_INFO, "Exiting " __FUNCTION__ ", Status: %d\n", Status ))      ///<  Display routine exit with decimal value
-#define DBG_EXIT_HEX(Status)    DEBUG (( DEBUG_INFO, "Exiting " __FUNCTION__ ", Status: 0x%08x\n", Status ))  ///<  Display routine exit with hex value
-#define DBG_EXIT_STATUS(Status) DEBUG (( DEBUG_INFO, "Exiting " __FUNCTION__ ", Status: %r\n", Status ))      ///<  Display routine exit with status value
-#define DBG_EXIT_TF(Status)     DEBUG (( DEBUG_INFO, "Exiting " __FUNCTION__ ", returning %s\n", (FALSE == Status) ? L"FALSE" : L"TRUE" ))  ///<  Display routine with TRUE/FALSE value
-#else   //  _MSC_VER
+//
+//Too many output debug info hangs system in Debug tip
+//
+//#if defined(_MSC_VER)           /* Handle Microsoft VC++ compiler specifics. */
+//#define DBG_ENTER()             DEBUG (( DEBUG_INFO, "Entering " __FUNCTION__ "\n" )) ///<  Display routine entry
+//#define DBG_EXIT()              DEBUG (( DEBUG_INFO, "Exiting " __FUNCTION__ "\n" ))  ///<  Display routine exit
+//#define DBG_EXIT_DEC(Status)    DEBUG (( DEBUG_INFO, "Exiting " __FUNCTION__ ", Status: %d\n", Status ))      ///<  Display routine exit with decimal value
+//#define DBG_EXIT_HEX(Status)    DEBUG (( DEBUG_INFO, "Exiting " __FUNCTION__ ", Status: 0x%08x\n", Status ))  ///<  Display routine exit with hex value
+//#define DBG_EXIT_STATUS(Status) DEBUG (( DEBUG_INFO, "Exiting " __FUNCTION__ ", Status: %r\n", Status ))      ///<  Display routine exit with status value
+//#define DBG_EXIT_TF(Status)     DEBUG (( DEBUG_INFO, "Exiting " __FUNCTION__ ", returning %s\n", (FALSE == Status) ? L"FALSE" : L"TRUE" ))  ///<  Display routine with TRUE/FALSE value
+//#else   //  _MSC_VER
 #define DBG_ENTER()               ///<  Display routine entry
 #define DBG_EXIT()                ///<  Display routine exit
 #define DBG_EXIT_DEC(Status)      ///<  Display routine exit with decimal value
 #define DBG_EXIT_HEX(Status)      ///<  Display routine exit with hex value
 #define DBG_EXIT_STATUS(Status)   ///<  Display routine exit with status value
 #define DBG_EXIT_TF(Status)       ///<  Display routine with TRUE/FALSE value
-#endif  //  _MSC_VER
+//#endif  //  _MSC_VER
 
 #define USB_IS_IN_ENDPOINT(EndPointAddr)      (((EndPointAddr) & BIT7) != 0)  ///<  Return TRUE/FALSE for IN direction
 #define USB_IS_OUT_ENDPOINT(EndPointAddr)     (((EndPointAddr) & BIT7) == 0)  ///<  Return TRUE/FALSE for OUT direction
@@ -80,6 +82,8 @@
 #define ETHERNET_HEADER_SIZE  sizeof ( ETHERNET_HEADER )  ///<  Size in bytes of the Ethernet header
 #define MIN_ETHERNET_PKT_SIZE 60    ///<  Minimum packet size including Ethernet header
 #define MAX_ETHERNET_PKT_SIZE 1500  ///<  Ethernet spec 3.1.1: Minimum packet size
+#define MAX_BULKIN_SIZE       2048  ///<  Maximum size of one UsbBulk 
+
 
 #define USB_NETWORK_CLASS   0x09    ///<  USB Network class code
 #define USB_BUS_TIMEOUT     1000    ///<  USB timeout in milliseconds
@@ -340,6 +344,7 @@ typedef struct {
   RX_TX_PACKET * pRxTail;   ///<  Tail of receive packet list
   RX_TX_PACKET * pRxFree;   ///<  Free packet list
   INT32 MulticastHash[2];   ///<  Hash table for multicast destination addresses
+  UINT8 * pBulkInBuff;      ///<  Buffer for Usb Bulk
 } NIC_DEVICE;
 
 #define DEV_FROM_SIMPLE_NETWORK(a)  CR (a, NIC_DEVICE, SimpleNetwork, DEV_SIGNATURE)  ///< Locate NIC_DEVICE from Simple Network Protocol

@@ -1,10 +1,10 @@
-#/** @file
+## @file
 # Component description file for ASIX AX88772 USB/Ethernet driver.
 #
 # This module provides support for the ASIX AX88772 USB/Ethernet adapter.
-# Copyright (c) 2011, Intel Corporation
+# Copyright (c) 2011-2013, Intel Corporation. All rights reserved.<BR>
 #
-#  All rights reserved. This program and the accompanying materials
+#  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
@@ -12,10 +12,10 @@
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 [Defines]
-  INF_VERSION                    = 0x00010005
+  INF_VERSION                    = 0x00010018
   BASE_NAME                      = Ax88772b
   FILE_GUID                      = 95C8D770-E1A4-4422-B263-E32F14FD8186
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
@@ -47,15 +47,10 @@
   UefiRuntimeLib
   UefiDriverEntryPoint
 
-[Protocols]
-  gEfiDevicePathProtocolGuid
-  gEfiSimpleNetworkProtocolGuid
+[Protocols]  
+  gEfiDevicePathProtocolGuid           ## BY_START
+  gEfiSimpleNetworkProtocolGuid        ## BY_START
   gEfiUsbIoProtocolGuid                ## TO_START
-
-[Guids]
-  gEfiEventExitBootServicesGuid        ## PRODUCES ## Event
-  gEfiEventVirtualAddressChangeGuid    ## PRODUCES ## Event
-  gEfiNicIp4ConfigVariableGuid
 
 [Depex]
   gEfiBdsArchProtocolGuid AND

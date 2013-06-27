@@ -1,7 +1,7 @@
 /** @file
   Implement the driver binding protocol for Asix AX88772 Ethernet driver.
                      
-  Copyright (c) 2011, Intel Corporation
+  Copyright (c) 2011-2013, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -632,20 +632,7 @@ EntryPoint (
   IN EFI_SYSTEM_TABLE * pSystemTable
   )
 {
-  EFI_LOADED_IMAGE_PROTOCOL * pLoadedImage;
   EFI_STATUS    Status;
-
-  //
-  //  Enable unload support
-  //
-  Status = gBS->HandleProtocol (
-                  gImageHandle,
-                  &gEfiLoadedImageProtocolGuid,
-                  (VOID **)&pLoadedImage
-                  );
-  if (!EFI_ERROR (Status)) {
-    pLoadedImage->Unload = DriverUnload;
-  }
 
   //
   //  Add the driver to the list of drivers
@@ -659,13 +646,12 @@ EntryPoint (
              &gComponentName2
              );
   if ( !EFI_ERROR ( Status )) {
-
-    AsciiPrint ("Installed: gEfiDriverBindingProtocolGuid on   0x%08x\r\n",
-              ImageHandle );
-    AsciiPrint("Installed: gEfiComponentNameProtocolGuid on   0x%08x\r\n",
-              ImageHandle );
-    AsciiPrint("Installed: gEfiComponentName2ProtocolGuid on   0x%08x\r\n",
-              ImageHandle );
+    DEBUG ((EFI_D_INFO, "Installed: gEfiDriverBindingProtocolGuid on   0x%08x\r\n",
+              ImageHandle));
+    DEBUG ((EFI_D_INFO, "Installed: gEfiComponentNameProtocolGuid on   0x%08x\r\n",
+              ImageHandle));
+    DEBUG ((EFI_D_INFO,"Installed: gEfiComponentName2ProtocolGuid on   0x%08x\r\n",
+              ImageHandle ));
 
   }
   return Status;

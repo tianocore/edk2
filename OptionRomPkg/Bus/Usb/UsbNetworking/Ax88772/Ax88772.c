@@ -656,6 +656,78 @@ Ax88772Reset (
 }
 
 
+VOID 
+FillPkt2Queue (
+  IN NIC_DEVICE * pNicDevice,
+  IN UINTN BufLength)
+{
+
+  UINT16 * pLength;
+  UINT16 * pLengthBar;
+  UINT8* pData;
+  UINT32 offset;
+  RX_TX_PACKET * pRxPacket;
+  UINTN LengthInBytes;
+  EFI_STATUS Status;
+  
+  for ( offset = 0; offset < BufLength; ){
+    pLength = (UINT16*) (pNicDevice->pBulkInBuff + offset);
+    pLengthBar = (UINT16*) (pNicDevice->pBulkInBuff + offset +2);
+    
+    *pLength &= 0x7ff;
+    *pLengthBar &= 0x7ff;
+    *pLengthBar |= 0xf800;
+      
+    if ((*pLength ^ *pLengthBar ) != 0xFFFF) {
+      DEBUG (( EFI_D_ERROR , "Pkt length error. BufLength = %d\n", BufLength));
+      return;
+    }
+      
+    pRxPacket = pNicDevice->pRxFree;
+    LengthInBytes = sizeof ( *pRxPacket ) - sizeof ( pRxPacket->pNext );
+    if ( NULL == pRxPacket ) {
+      Status = gBS->AllocatePool ( EfiRuntimeServicesData,
+                                   sizeof( RX_TX_PACKET ),
+                                   (VOID **) &pRxPacket );
+      if ( !EFI_ERROR ( Status )) {
+        //
+        //  Add this packet to the free packet list
+        //
+        pNicDevice->pRxFree = pRxPacket;
+        pRxPacket->pNext = NULL;
+      }
+      else {
+        //
+        //  Use the discard packet buffer
+        //
+        //pRxPacket = &Packet;
+      }
+    }
+      
+
+    pData = pNicDevice->pBulkInBuff + offset + 4;
+    pRxPacket->Length = *pLength;
+    pRxPacket->LengthBar = *(UINT16*) (pNicDevice->pBulkInBuff + offset +2);
+    CopyMem (&pRxPacket->Data[0], pData, *pLength);
+    //DEBUG((DEBUG_INFO, "Packet [%d]\n", *pLength));
+    
+    pNicDevice->pRxFree = pRxPacket->pNext;
+    pRxPacket->pNext = NULL;
+    
+    if ( NULL == pNicDevice->pRxTail ) {
+      pNicDevice->pRxHead = pRxPacket;
+    }
+    else {
+      pNicDevice->pRxTail->pNext = pRxPacket;
+    }
+    pNicDevice->pRxTail = pRxPacket;
+    offset += (*pLength + 4);
+              
+  }
+}
+
+
+
 /**
   Receive a frame from the network.
 
@@ -760,10 +832,10 @@ Ax88772Rx (
     //  Locate a packet for use
     //
     pRxPacket = pNicDevice->pRxFree;
-    LengthInBytes = sizeof ( *pRxPacket ) - sizeof ( pRxPacket->pNext );
+    LengthInBytes = MAX_BULKIN_SIZE;
     if ( NULL == pRxPacket ) {
       Status = gBS->AllocatePool ( EfiRuntimeServicesData,
-                                   LengthInBytes,
+                                   sizeof ( *pRxPacket ),
                                    (VOID **) &pRxPacket );
       if ( !EFI_ERROR ( Status )) {
         //
@@ -783,16 +855,22 @@ Ax88772Rx (
     //
     //  Attempt to receive a packet
     //
+    SetMem (&pNicDevice->pBulkInBuff[0], MAX_BULKIN_SIZE, 0);
     pUsbIo = pNicDevice->pUsbIo;
     Status = pUsbIo->UsbBulkTransfer ( pUsbIo,
                                        USB_ENDPOINT_DIR_IN | BULK_IN_ENDPOINT,
-                                       &pRxPacket->Length,
+                                       &pNicDevice->pBulkInBuff[0],
                                        &LengthInBytes,
                                        2,
                                        &TransferStatus );
+    if ( LengthInBytes > 0 ) {
+      FillPkt2Queue(pNicDevice, LengthInBytes);
+    }
+    pRxPacket = pNicDevice->pRxHead;
     if (( !EFI_ERROR ( Status ))
       && ( 0 < pRxPacket->Length )
-      && ( pRxPacket->Length <= sizeof ( pRxPacket->Data ))) {
+      && ( pRxPacket->Length <= sizeof ( pRxPacket->Data ))
+      && ( LengthInBytes > 0)) {
 
       //
       //  Determine if the packet should be received
@@ -869,22 +947,6 @@ Ax88772Rx (
                     LengthInBytes ));
         }
         
-        //
-        //  Remove this packet from the free packet list
-        //
-        pNicDevice->pRxFree = pRxPacket->pNext;
-        pRxPacket->pNext = NULL;
-
-        //
-        //  Append this packet to the receive list
-        //
-        if ( NULL == pNicDevice->pRxTail ) {
-          pNicDevice->pRxHead = pRxPacket;
-        }
-        else {
-          pNicDevice->pRxTail->pNext = pRxPacket;
-        }
-        pNicDevice->pRxTail = pRxPacket;
       }
       else {
         //

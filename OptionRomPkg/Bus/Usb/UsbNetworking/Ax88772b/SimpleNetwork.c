@@ -1,7 +1,7 @@
 /** @file
   Provides the Simple Network functions.
 
-  Copyright (c) 2011, Intel Corporation
+  Copyright (c) 2011 - 2013, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -203,7 +203,12 @@ SN_GetStatus (
       Status = EFI_SUCCESS;
     }
     else {
-      Status = EFI_NOT_STARTED;
+      if ( EfiSimpleNetworkStarted == pMode->State ) {
+        Status = EFI_DEVICE_ERROR;
+      }
+      else {
+        Status = EFI_NOT_STARTED;
+      }
     }
       
   }
@@ -317,7 +322,7 @@ SN_MCastIPtoMAC (
   IN EFI_SIMPLE_NETWORK_PROTOCOL * pSimpleNetwork,
   IN BOOLEAN bIPv6,
   IN EFI_IP_ADDRESS * pIP,
-  IN EFI_MAC_ADDRESS * pMAC
+  OUT EFI_MAC_ADDRESS * pMAC
   )
 {
   EFI_STATUS Status;
@@ -349,13 +354,22 @@ SN_MCastIPtoMAC (
         return EFI_INVALID_PARAMETER;
       }
       else {
-        pMAC->Addr[0] = 0x01;
-        pMAC->Addr[1] = 0x00;
-        pMAC->Addr[2] = 0x5e;
-        pMAC->Addr[3] = (UINT8) (pIP->v4.Addr[1] & 0x7f);
-        pMAC->Addr[4] = (UINT8) pIP->v4.Addr[2];
-        pMAC->Addr[5] = (UINT8) pIP->v4.Addr[3];
-        Status = EFI_SUCCESS;
+        if (pSimpleNetwork->Mode->State == EfiSimpleNetworkInitialized)
+        {
+          pMAC->Addr[0] = 0x01;
+          pMAC->Addr[1] = 0x00;
+          pMAC->Addr[2] = 0x5e;
+          pMAC->Addr[3] = (UINT8) (pIP->v4.Addr[1] & 0x7f);
+          pMAC->Addr[4] = (UINT8) pIP->v4.Addr[2];
+          pMAC->Addr[5] = (UINT8) pIP->v4.Addr[3];
+          Status = EFI_SUCCESS;
+        }
+        else if (pSimpleNetwork->Mode->State == EfiSimpleNetworkStarted) {
+          Status = EFI_DEVICE_ERROR;
+        }
+        else {
+          Status = EFI_NOT_STARTED;
+        }
         gBS->RestoreTPL(TplPrevious);
       }
   }
@@ -471,7 +485,10 @@ SN_Receive (
   //
   // Verify the parameters
   //
-  if (( NULL != pSimpleNetwork ) && ( NULL != pSimpleNetwork->Mode )) {
+  if (( NULL != pSimpleNetwork ) && 
+    ( NULL != pSimpleNetwork->Mode ) && 
+    (NULL != pBufferSize) && 
+    (NULL != pBuffer)) {
     //
     // The interface must be running
     //
@@ -576,7 +593,12 @@ SN_Receive (
       
     }
     else {
-      Status = EFI_NOT_STARTED;
+      if (EfiSimpleNetworkStarted == pMode->State) {
+        Status = EFI_DEVICE_ERROR;
+      }
+      else {
+        Status = EFI_NOT_STARTED;
+      }
     }
   }
   else {
@@ -852,7 +874,12 @@ SN_Reset (
    	 	}
    	}
    	else {
-   		Status = EFI_NOT_STARTED;
+      if (EfiSimpleNetworkStarted == pMode->State) {
+        Status = EFI_DEVICE_ERROR;
+      }
+      else {
+        Status = EFI_NOT_STARTED;
+      }
    	}  
   }
   else {
@@ -1148,13 +1175,13 @@ SN_StationAddress (
   //
   if (( NULL != pSimpleNetwork )
     && ( NULL != pSimpleNetwork->Mode )
-    && (( !bReset ) || ( bReset && ( NULL != pNew )))) {
+    && (( bReset ) || ( ( !bReset) && ( NULL != pNew )))) {
     //
     // Verify that the adapter is already started
     //
     pNicDevice = DEV_FROM_SIMPLE_NETWORK ( pSimpleNetwork );
     pMode = pSimpleNetwork->Mode;
-    if ( EfiSimpleNetworkStarted == pMode->State ) {
+    if ( EfiSimpleNetworkInitialized == pMode->State ) {
       //
       // Determine the adapter MAC address
       //
@@ -1181,7 +1208,12 @@ SN_StationAddress (
       Status = Ax88772MacAddressSet ( pNicDevice, &pMode->CurrentAddress.Addr[0]);
     }
     else {
-      Status = EFI_NOT_STARTED;
+      if (EfiSimpleNetworkStarted == pMode->State) {
+        Status = EFI_DEVICE_ERROR;
+      }
+      else {
+        Status = EFI_NOT_STARTED;
+      }
     }
   }
   else {
@@ -1249,8 +1281,43 @@ SN_Statistics (
   )
 {
   EFI_STATUS Status;
-
-  Status = EFI_UNSUPPORTED;
+  EFI_SIMPLE_NETWORK_MODE * pMode;
+  //
+  // Verify the prarameters
+  //
+  if (( NULL != pSimpleNetwork ) && ( NULL != pSimpleNetwork->Mode )) {
+    pMode = pSimpleNetwork->Mode;
+    //
+    // Determine if the interface is started 
+    //
+    if (EfiSimpleNetworkInitialized == pMode->State){
+      //
+      // Determine if the StatisticsSize is big enough
+      //
+      if (sizeof (EFI_NETWORK_STATISTICS) <= *pStatisticsSize){
+        if (bReset) {
+          Status = EFI_SUCCESS;
+        } 
+        else {
+          Status = EFI_UNSUPPORTED;
+        }
+      }
+      else {
+        Status = EFI_BUFFER_TOO_SMALL;
+      }
+    }
+    else{
+      if (EfiSimpleNetworkStarted == pMode->State) {
+        Status = EFI_DEVICE_ERROR;
+      }
+      else {
+        Status = EFI_NOT_STARTED;
+      }
+    }
+  }
+  else {
+  	Status = EFI_INVALID_PARAMETER;
+  }
 
   return Status;
 }
@@ -1441,127 +1508,151 @@ SN_Transmit (
 
   // Verify the parameters
   //
-  if (( NULL != pSimpleNetwork ) && ( NULL != pSimpleNetwork->Mode )) {
+  if (( NULL != pSimpleNetwork ) && 
+      ( NULL != pSimpleNetwork->Mode ) && 
+      ( NULL != pBuffer) && 
+      ( (HeaderSize == 0) || ( (NULL != pDestAddr) && (NULL != pProtocol) ))) {
     //
     // The interface must be running
     //
     pMode = pSimpleNetwork->Mode;
-    if ( EfiSimpleNetworkInitialized == pMode->State ) {
+    //
+    // Verify parameter of HeaderSize
+    //
+    if ((HeaderSize == 0) || (HeaderSize == pMode->MediaHeaderSize)){
       //
-      // Update the link status
+      // Determine if BufferSize is big enough
       //
-      pNicDevice = DEV_FROM_SIMPLE_NETWORK ( pSimpleNetwork );
-      pMode->MediaPresent = pNicDevice->bLinkUp;
+      if (BufferSize >= pMode->MediaHeaderSize){
+        if ( EfiSimpleNetworkInitialized == pMode->State ) {
+          //
+          // Update the link status
+          //
+          pNicDevice = DEV_FROM_SIMPLE_NETWORK ( pSimpleNetwork );
+          pMode->MediaPresent = pNicDevice->bLinkUp;
 
-      //
-      //  Release the synchronization with Ax88772Timer
-      //      
-      if ( pMode->MediaPresent && pNicDevice->bComplete) {
-        //
-        //  Copy the packet into the USB buffer
-        //
+          //
+          //  Release the synchronization with Ax88772Timer
+          //      
+          if ( pMode->MediaPresent && pNicDevice->bComplete) {
+            //
+            //  Copy the packet into the USB buffer
+            //
 
-        CopyMem ( &pNicDevice->pTxTest->Data[0], pBuffer, BufferSize ); 
-        pNicDevice->pTxTest->Length = (UINT16) BufferSize;
+            CopyMem ( &pNicDevice->pTxTest->Data[0], pBuffer, BufferSize ); 
+            pNicDevice->pTxTest->Length = (UINT16) BufferSize;
 
-        //
-        //  Transmit the packet
-        //
-        pHeader = (ETHERNET_HEADER *) &pNicDevice->pTxTest->Data[0];
-        if ( 0 != HeaderSize ) {
-          if ( NULL != pDestAddr ) {
-            CopyMem ( &pHeader->dest_addr, pDestAddr, PXE_HWADDR_LEN_ETHER );
-          }
-          if ( NULL != pSrcAddr ) {
-            CopyMem ( &pHeader->src_addr, pSrcAddr, PXE_HWADDR_LEN_ETHER );
+            //
+            //  Transmit the packet
+            //
+            pHeader = (ETHERNET_HEADER *) &pNicDevice->pTxTest->Data[0];
+            if ( 0 != HeaderSize ) {
+              if ( NULL != pDestAddr ) {
+                CopyMem ( &pHeader->dest_addr, pDestAddr, PXE_HWADDR_LEN_ETHER );
+              }
+              if ( NULL != pSrcAddr ) {
+                CopyMem ( &pHeader->src_addr, pSrcAddr, PXE_HWADDR_LEN_ETHER );
+              }
+              else {
+                CopyMem ( &pHeader->src_addr, &pMode->CurrentAddress.Addr[0], PXE_HWADDR_LEN_ETHER );
+              }
+              if ( NULL != pProtocol ) {
+                Type = *pProtocol;
+              }
+              else {
+                Type = pNicDevice->pTxTest->Length;
+              }
+              Type = (UINT16)(( Type >> 8 ) | ( Type << 8 ));
+              pHeader->type = Type;
+            }
+            if ( pNicDevice->pTxTest->Length < MIN_ETHERNET_PKT_SIZE ) {
+              pNicDevice->pTxTest->Length = MIN_ETHERNET_PKT_SIZE;
+              ZeroMem ( &pNicDevice->pTxTest->Data[ BufferSize ],
+                        pNicDevice->pTxTest->Length - BufferSize );
+            }
+        
+            DEBUG ((EFI_D_INFO, "TX: %02x-%02x-%02x-%02x-%02x-%02x  %02x-%02x-%02x-%02x-%02x-%02x"
+                      "  %02x-%02x  %d bytes\r\n",
+                      pNicDevice->pTxTest->Data[0],
+                      pNicDevice->pTxTest->Data[1],
+                      pNicDevice->pTxTest->Data[2],
+                      pNicDevice->pTxTest->Data[3],
+                      pNicDevice->pTxTest->Data[4],
+                      pNicDevice->pTxTest->Data[5],
+                      pNicDevice->pTxTest->Data[6],
+                      pNicDevice->pTxTest->Data[7],
+                      pNicDevice->pTxTest->Data[8],
+                      pNicDevice->pTxTest->Data[9],
+                      pNicDevice->pTxTest->Data[10],
+                      pNicDevice->pTxTest->Data[11],
+                      pNicDevice->pTxTest->Data[12],
+                      pNicDevice->pTxTest->Data[13],
+                      pNicDevice->pTxTest->Length ));
+
+            pNicDevice->pTxTest->LengthBar = ~(pNicDevice->pTxTest->Length);
+            TransferLength = sizeof ( pNicDevice->pTxTest->Length )
+                           + sizeof ( pNicDevice->pTxTest->LengthBar )
+                           + pNicDevice->pTxTest->Length;
+                           
+            if (TransferLength % 512 == 0 || TransferLength % 1024 == 0)
+                TransferLength +=4;
+
+            //
+            //  Work around USB bus driver bug where a timeout set by receive
+            //  succeeds but the timeout expires immediately after, causing the
+            //  transmit operation to timeout.
+            //
+            pUsbIo = pNicDevice->pUsbIo;
+            Status = pUsbIo->UsbBulkTransfer ( pUsbIo,
+                                               BULK_OUT_ENDPOINT,
+                                               &pNicDevice->pTxTest->Length,
+                                               &TransferLength,
+                                               0xfffffffe, 
+                                               &TransferStatus );
+            if ( !EFI_ERROR ( Status )) {
+              Status = TransferStatus;
+            }
+
+            if ( !EFI_ERROR ( Status )) {
+              pNicDevice->pTxBuffer = pBuffer;
+            }
+            else {
+              if ((TransferLength != (UINTN)( pNicDevice->pTxTest->Length + 4 )) &&
+                   (TransferLength != (UINTN)(( pNicDevice->pTxTest->Length + 4 ) + 4))) {
+                DEBUG ((EFI_D_INFO, "TransferLength didn't match Packet Length\n"));
+              }
+              //
+              //  Reset the controller to fix the error
+              //
+              if ( EFI_DEVICE_ERROR == Status ) {
+                SN_Reset ( pSimpleNetwork, FALSE );
+              }
+              Status = EFI_NOT_READY;
+            }
           }
           else {
-            CopyMem ( &pHeader->src_addr, &pMode->CurrentAddress.Addr[0], PXE_HWADDR_LEN_ETHER );
+            //
+            // No packets available.
+            //
+            Status = EFI_NOT_READY;
           }
-          if ( NULL != pProtocol ) {
-            Type = *pProtocol;
-          }
-          else {
-            Type = pNicDevice->pTxTest->Length;
-          }
-          Type = (UINT16)(( Type >> 8 ) | ( Type << 8 ));
-          pHeader->type = Type;
-        }
-        if ( pNicDevice->pTxTest->Length < MIN_ETHERNET_PKT_SIZE ) {
-          pNicDevice->pTxTest->Length = MIN_ETHERNET_PKT_SIZE;
-          ZeroMem ( &pNicDevice->pTxTest->Data[ BufferSize ],
-                    pNicDevice->pTxTest->Length - BufferSize );
-        }
-    
-        DEBUG ((EFI_D_INFO, "TX: %02x-%02x-%02x-%02x-%02x-%02x  %02x-%02x-%02x-%02x-%02x-%02x"
-                  "  %02x-%02x  %d bytes\r\n",
-                  pNicDevice->pTxTest->Data[0],
-                  pNicDevice->pTxTest->Data[1],
-                  pNicDevice->pTxTest->Data[2],
-                  pNicDevice->pTxTest->Data[3],
-                  pNicDevice->pTxTest->Data[4],
-                  pNicDevice->pTxTest->Data[5],
-                  pNicDevice->pTxTest->Data[6],
-                  pNicDevice->pTxTest->Data[7],
-                  pNicDevice->pTxTest->Data[8],
-                  pNicDevice->pTxTest->Data[9],
-                  pNicDevice->pTxTest->Data[10],
-                  pNicDevice->pTxTest->Data[11],
-                  pNicDevice->pTxTest->Data[12],
-                  pNicDevice->pTxTest->Data[13],
-                  pNicDevice->pTxTest->Length ));
-
-        pNicDevice->pTxTest->LengthBar = ~(pNicDevice->pTxTest->Length);
-        TransferLength = sizeof ( pNicDevice->pTxTest->Length )
-                       + sizeof ( pNicDevice->pTxTest->LengthBar )
-                       + pNicDevice->pTxTest->Length;
-                       
-        if (TransferLength % 512 == 0 || TransferLength % 1024 == 0)
-            TransferLength +=4;
-
-        //
-        //  Work around USB bus driver bug where a timeout set by receive
-        //  succeeds but the timeout expires immediately after, causing the
-        //  transmit operation to timeout.
-        //
-        pUsbIo = pNicDevice->pUsbIo;
-        Status = pUsbIo->UsbBulkTransfer ( pUsbIo,
-                                           BULK_OUT_ENDPOINT,
-                                           &pNicDevice->pTxTest->Length,
-                                           &TransferLength,
-                                           0xfffffffe, 
-                                           &TransferStatus );
-        if ( !EFI_ERROR ( Status )) {
-          Status = TransferStatus;
-        }
-
-        if ( !EFI_ERROR ( Status )) {
-          pNicDevice->pTxBuffer = pBuffer;
+          
         }
         else {
-          if ((TransferLength != (UINTN)( pNicDevice->pTxTest->Length + 4 )) &&
-               (TransferLength != (UINTN)(( pNicDevice->pTxTest->Length + 4 ) + 4))) {
-            DEBUG ((EFI_D_INFO, "TransferLength didn't match Packet Length\n"));
+          if (EfiSimpleNetworkStarted == pMode->State) {
+            Status = EFI_DEVICE_ERROR;
           }
-          //
-          //  Reset the controller to fix the error
-          //
-          if ( EFI_DEVICE_ERROR == Status ) {
-                SN_Reset ( pSimpleNetwork, FALSE );
+          else {
+            Status = EFI_NOT_STARTED ;
           }
-          Status = EFI_NOT_READY;
         }
       }
       else {
-        //
-        // No packets available.
-        //
-        Status = EFI_NOT_READY;
+        Status = EFI_BUFFER_TOO_SMALL;
       }
-      
     }
     else {
-      Status = EFI_NOT_STARTED ;
+      Status = EFI_INVALID_PARAMETER;
     }
   }
   else {
