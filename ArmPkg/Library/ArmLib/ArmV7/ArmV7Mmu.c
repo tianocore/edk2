@@ -23,6 +23,7 @@
 #include "ArmV7Lib.h"
 #include "ArmLibPrivate.h"
 
+STATIC
 VOID
 PopulateLevel2PageTable (
   IN UINT32                         *SectionEntry,
@@ -120,6 +121,7 @@ PopulateLevel2PageTable (
 
 }
 
+STATIC
 VOID
 FillTranslationTable (
   IN  UINT32                        *TranslationTable,
