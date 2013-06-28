@@ -126,18 +126,26 @@ CascadeDelete(
           // Update the node filename to have full path with file system identifier
           //
           TempName = AllocateZeroPool(StrSize(Node->FullName) + StrSize(Node2->FullName));
-          StrCpy(TempName, Node->FullName);
-          TempName[StrStr(TempName, L":")+1-TempName] = CHAR_NULL;
-          StrCat(TempName, Node2->FullName);
-          FreePool((VOID*)Node2->FullName);
-          Node2->FullName = TempName;
+          if (TempName == NULL) {
+            ShellStatus = EFI_OUT_OF_RESOURCES;
+          } else {
+            StrCpy(TempName, Node->FullName);
+            TempName[StrStr(TempName, L":")+1-TempName] = CHAR_NULL;
+            StrCat(TempName, Node2->FullName);
+            FreePool((VOID*)Node2->FullName);
+            Node2->FullName = TempName;
 
-          //
-          // Now try again to open the file
-          //
-          Node2->Status = gEfiShellProtocol->OpenFileByName (Node2->FullName, &Node2->Handle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE);
+            //
+            // Now try again to open the file
+            //
+            Node2->Status = gEfiShellProtocol->OpenFileByName (Node2->FullName, &Node2->Handle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE);
+          }
         }
-        ShellStatus = CascadeDelete(Node2, Quiet);
+        if (!EFI_ERROR(Node2->Status)) {
+          ShellStatus = CascadeDelete(Node2, Quiet);
+        } else if (ShellStatus == SHELL_SUCCESS) {
+          ShellStatus = Node2->Status;
+        }
         if (ShellStatus != SHELL_SUCCESS) {
           if (List!=NULL) {
             gEfiShellProtocol->FreeFileList(&List);
