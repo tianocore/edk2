@@ -31,6 +31,11 @@ typedef struct {
   UINT8               Scope;
 } IFR_BLOCK_DATA;
 
+typedef struct {
+  EFI_VARSTORE_ID     VarStoreId;
+  UINT16              Size;
+} IFR_VARSTORAGE_DATA;
+
 //
 // <ConfigHdr> Template
 //
@@ -914,42 +919,93 @@ InternalHiiGetValueOfNumber (
 }
 
 /**
+  Get value from config request resp string.
+
+  @param ConfigElement           ConfigResp string contains the current setting.
+  @param VarName                 The variable name which need to get value.
+  @param VarValue                The return value.
+  
+  @retval EFI_SUCCESS            Get the value for the VarName
+  @retval EFI_OUT_OF_RESOURCES   The memory is not enough.
+**/
+EFI_STATUS
+GetValueFromRequest (
+  IN CHAR16                       *ConfigElement,
+  IN CHAR16                       *VarName,
+  OUT UINT64                      *VarValue
+  )
+{
+  UINT8                        *TmpBuffer;
+  CHAR16                       *StringPtr;
+  UINTN                        Length;
+  EFI_STATUS                   Status;
+
+  //
+  // Find VarName related string.
+  //
+  StringPtr = StrStr (ConfigElement, VarName);
+  ASSERT (StringPtr != NULL);
+
+  //
+  // Skip the "VarName=" string
+  //
+  StringPtr += StrLen (VarName) + 1;
+
+  //
+  // Get Offset
+  //
+  Status = InternalHiiGetValueOfNumber (StringPtr, &TmpBuffer, &Length);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  *VarValue = 0;
+  CopyMem (VarValue, TmpBuffer, (((Length + 1) / 2) < sizeof (UINT64)) ? ((Length + 1) / 2) : sizeof (UINT64));
+
+  FreePool (TmpBuffer);
+
+  return EFI_SUCCESS;
+}
+
+/**
   This internal function parses IFR data to validate current setting.
 
-  @param ConfigResp         ConfigResp string contains the current setting.
+  Base on the NameValueType, if it is TRUE, RequestElement and HiiHandle is valid;
+  else the VarBuffer and CurrentBlockArray is valid.
+
   @param HiiPackageList     Point to Hii package list.
   @param PackageListLength  The length of the pacakge.
   @param VarGuid            Guid of the buffer storage.
   @param VarName            Name of the buffer storage.
+  @param VarBuffer          The data buffer for the storage.
+  @param CurrentBlockArray  The block array from the config Requst string.
+  @param RequestElement     The config string for this storage.
+  @param HiiHandle          The HiiHandle for this formset.
+  @param NameValueType      Whether current storage is name/value varstore or not.
   
   @retval EFI_SUCCESS            The current setting is valid.
   @retval EFI_OUT_OF_RESOURCES   The memory is not enough.
   @retval EFI_INVALID_PARAMETER  The config string or the Hii package is invalid.
 **/
 EFI_STATUS
-EFIAPI
-InternalHiiValidateCurrentSetting (
-  IN EFI_STRING                    ConfigResp,
+ValidateQuestionFromVfr (
   IN EFI_HII_PACKAGE_LIST_HEADER   *HiiPackageList,
   IN UINTN                         PackageListLength,
   IN EFI_GUID                      *VarGuid,
-  IN CHAR16                        *VarName
+  IN CHAR16                        *VarName,
+  IN UINT8                         *VarBuffer,
+  IN IFR_BLOCK_DATA                *CurrentBlockArray,
+  IN CHAR16                        *RequestElement,
+  IN EFI_HII_HANDLE                HiiHandle,
+  IN BOOLEAN                       NameValueType
   )
-{ 
-  IFR_BLOCK_DATA               *CurrentBlockArray;
-  IFR_BLOCK_DATA               *BlockData;
-  IFR_BLOCK_DATA               *NewBlockData;
+{
   IFR_BLOCK_DATA               VarBlockData;
-  EFI_STRING                   StringPtr;
-  UINTN                        Length;
   UINT8                        *TmpBuffer;
   UINT16                       Offset;
   UINT16                       Width;
   UINT64                       VarValue;
   EFI_IFR_TYPE_VALUE           TmpValue;
-  LIST_ENTRY                   *Link;
-  UINT8                        *VarBuffer;
-  UINTN                        MaxBufferSize;
   EFI_STATUS                   Status;
   EFI_HII_PACKAGE_HEADER       PacakgeHeader;
   UINT32                       PackageOffset;
@@ -957,6 +1013,9 @@ InternalHiiValidateCurrentSetting (
   UINTN                        IfrOffset;
   EFI_IFR_OP_HEADER            *IfrOpHdr;
   EFI_IFR_VARSTORE             *IfrVarStore;
+  EFI_IFR_VARSTORE_NAME_VALUE  *IfrNameValueStore;
+  EFI_IFR_VARSTORE_EFI         *IfrEfiVarStore;
+  IFR_VARSTORAGE_DATA          VarStoreData;
   EFI_IFR_ONE_OF               *IfrOneOf;
   EFI_IFR_NUMERIC              *IfrNumeric;
   EFI_IFR_ONE_OF_OPTION        *IfrOneOfOption;
@@ -964,24 +1023,574 @@ InternalHiiValidateCurrentSetting (
   EFI_IFR_STRING               *IfrString;
   CHAR8                        *VarStoreName;
   UINTN                        Index;
-  
-  //
-  // 1. Get the current setting to current block data array and Convert them into VarBuffer
-  //
+  CHAR16                       *QuestionName;
+  CHAR16                       *StringPtr;
 
   //
-  // Skip ConfigHdr string
+  // Initialize the local variables.
   //
-  StringPtr = ConfigResp;
-  StringPtr = StrStr (ConfigResp, L"&OFFSET");
-  if (StringPtr == NULL) {
+  Index             = 0;
+  VarStoreName      = NULL;
+  Status            = EFI_SUCCESS;
+  TmpBuffer         = NULL;
+  VarValue          = 0;
+  IfrVarStore       = NULL;
+  IfrNameValueStore = NULL;
+  IfrEfiVarStore    = NULL;
+  ZeroMem (&VarStoreData, sizeof (IFR_VARSTORAGE_DATA));
+  ZeroMem (&VarBlockData, sizeof (VarBlockData));
+
+  //
+  // Check IFR value is in block data, then Validate Value
+  //
+  PackageOffset = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
+  while (PackageOffset < PackageListLength) {
+    CopyMem (&PacakgeHeader, (UINT8 *) HiiPackageList + PackageOffset, sizeof (PacakgeHeader));
+
     //
-    // No ConfigBlock value is required to be validated.
-    // EFI_SUCCESS directly return.
+    // Parse IFR opcode from the form package.
     //
-    return EFI_SUCCESS;
+    if (PacakgeHeader.Type == EFI_HII_PACKAGE_FORMS) {
+      IfrOffset   = sizeof (PacakgeHeader);
+      PackageData = (UINT8 *) HiiPackageList + PackageOffset;
+      while (IfrOffset < PacakgeHeader.Length) {
+        IfrOpHdr = (EFI_IFR_OP_HEADER *) (PackageData + IfrOffset);
+        //
+        // Validate current setting to the value built in IFR opcode
+        //
+        switch (IfrOpHdr->OpCode) {
+        case EFI_IFR_VARSTORE_OP:
+          //
+          // VarStoreId has been found. No further found.
+          //
+          if (VarStoreData.VarStoreId != 0) {
+            break;
+          }
+          //
+          // Find the matched VarStoreId to the input VarGuid and VarName
+          //
+          IfrVarStore = (EFI_IFR_VARSTORE *) IfrOpHdr;
+          if (CompareGuid ((EFI_GUID *) (VOID *) &IfrVarStore->Guid, VarGuid)) {
+            VarStoreName = (CHAR8 *) IfrVarStore->Name;
+            for (Index = 0; VarStoreName[Index] != 0; Index ++) {
+              if ((CHAR16) VarStoreName[Index] != VarName[Index]) {
+                break;
+              }
+            }
+            //
+            // The matched VarStore is found.
+            //
+            if ((VarStoreName[Index] != 0) || (VarName[Index] != 0)) {
+              IfrVarStore = NULL;
+            }
+          } else {
+            IfrVarStore = NULL;
+          }
+
+          if (IfrVarStore != NULL) {
+            VarStoreData.VarStoreId = IfrVarStore->VarStoreId;
+            VarStoreData.Size       = IfrVarStore->Size;
+          }
+          break;
+        case EFI_IFR_VARSTORE_NAME_VALUE_OP:
+          //
+          // VarStoreId has been found. No further found.
+          //
+          if (VarStoreData.VarStoreId != 0) {
+            break;
+          }
+          //
+          // Find the matched VarStoreId to the input VarGuid
+          //
+          IfrNameValueStore = (EFI_IFR_VARSTORE_NAME_VALUE *) IfrOpHdr;
+          if (!CompareGuid ((EFI_GUID *) (VOID *) &IfrNameValueStore->Guid, VarGuid)) {
+            IfrNameValueStore = NULL;
+          }
+
+          if (IfrNameValueStore != NULL) {
+            VarStoreData.VarStoreId = IfrNameValueStore->VarStoreId;
+          }
+          break;
+        case EFI_IFR_VARSTORE_EFI_OP:
+          //
+          // VarStore is found. Don't need to search any more.
+          //
+          if (VarStoreData.VarStoreId != 0) {
+            break;
+          }
+
+          IfrEfiVarStore = (EFI_IFR_VARSTORE_EFI *) IfrOpHdr;
+
+          //
+          // If the length is small than the structure, this is from old efi 
+          // varstore definition. Old efi varstore get config directly from 
+          // GetVariable function.
+          //
+          if (IfrOpHdr->Length < sizeof (EFI_IFR_VARSTORE_EFI)) {
+            break;
+          }
+
+          if (CompareGuid ((EFI_GUID *) (VOID *) &IfrEfiVarStore->Guid, VarGuid)) {
+            VarStoreName = (CHAR8 *) IfrEfiVarStore->Name;
+            for (Index = 0; VarStoreName[Index] != 0; Index ++) {
+              if ((CHAR16) VarStoreName[Index] != VarName[Index]) {
+                break;
+              }
+            }
+            //
+            // The matched VarStore is found.
+            //
+            if ((VarStoreName[Index] != 0) || (VarName[Index] != 0)) {
+              IfrEfiVarStore = NULL;
+            }
+          } else {
+            IfrEfiVarStore = NULL;
+          }
+
+          if (IfrEfiVarStore != NULL) {
+            //
+            // Find the matched VarStore
+            //
+            VarStoreData.VarStoreId = IfrEfiVarStore->VarStoreId;
+            VarStoreData.Size       = IfrEfiVarStore->Size;
+          }
+          break;
+        case EFI_IFR_FORM_OP:
+        case EFI_IFR_FORM_MAP_OP:
+          //
+          // Check the matched VarStoreId is found.
+          //
+          if (VarStoreData.VarStoreId == 0) {
+            return EFI_SUCCESS;
+          }
+          break;
+        case EFI_IFR_ONE_OF_OP:
+          //
+          // Check whether current value is the one of option.
+          //
+
+          //
+          // OneOf question is not in IFR Form. This IFR form is not valid. 
+          //
+          if (VarStoreData.VarStoreId == 0) {
+            return EFI_INVALID_PARAMETER;
+          }
+          // 
+          // Check whether this question is for the requested varstore.
+          //
+          IfrOneOf = (EFI_IFR_ONE_OF *) IfrOpHdr;
+          if (IfrOneOf->Question.VarStoreId != VarStoreData.VarStoreId) {
+            break;
+          }
+
+          if (NameValueType) {
+            QuestionName = HiiGetString (HiiHandle, IfrOneOf->Question.VarStoreInfo.VarName, NULL);
+            ASSERT (QuestionName != NULL);
+
+            if (StrStr (RequestElement, QuestionName) == NULL) {
+              //
+              // This question is not in the current configuration string. Skip it.
+              //
+              break;
+            }
+
+            Status = GetValueFromRequest (RequestElement, QuestionName, &VarValue);
+            if (EFI_ERROR (Status)) {
+              return Status;
+            }
+          } else {
+            //
+            // Get Offset by Question header and Width by DataType Flags
+            //
+            Offset = IfrOneOf->Question.VarStoreInfo.VarOffset;
+            Width  = (UINT16) (1 << (IfrOneOf->Flags & EFI_IFR_NUMERIC_SIZE));
+            //
+            // Check whether this question is in current block array.
+            //
+            if (!BlockArrayCheck (CurrentBlockArray, Offset, Width)) {
+              //
+              // This question is not in the current configuration string. Skip it.
+              //
+              break;
+            }
+            //
+            // Check this var question is in the var storage 
+            //
+            if ((Offset + Width) > VarStoreData.Size) {
+              //
+              // This question exceeds the var store size. 
+              //
+              return EFI_INVALID_PARAMETER;
+            }
+
+            //
+            // Get the current value for oneof opcode
+            //
+            VarValue = 0;
+            CopyMem (&VarValue, VarBuffer +  Offset, Width);
+          }
+          //
+          // Set Block Data, to be checked in the following Oneof option opcode.
+          //
+          VarBlockData.OpCode     = IfrOpHdr->OpCode;
+          VarBlockData.Scope      = IfrOpHdr->Scope;
+          break;
+        case EFI_IFR_NUMERIC_OP:
+          //
+          // Check the current value is in the numeric range.
+          //
+
+          //
+          // Numeric question is not in IFR Form. This IFR form is not valid. 
+          //
+          if (VarStoreData.VarStoreId == 0) {
+            return EFI_INVALID_PARAMETER;
+          }
+          //
+          // Check whether this question is for the requested varstore.
+          //
+          IfrNumeric = (EFI_IFR_NUMERIC *) IfrOpHdr;
+          if (IfrNumeric->Question.VarStoreId != VarStoreData.VarStoreId) {
+            break;
+          }
+
+          if (NameValueType) {
+            QuestionName = HiiGetString (HiiHandle, IfrNumeric->Question.VarStoreInfo.VarName, NULL);
+            ASSERT (QuestionName != NULL);
+
+            if (StrStr (RequestElement, QuestionName) == NULL) {
+              //
+              // This question is not in the current configuration string. Skip it.
+              //
+              break;
+            }
+            
+            Status = GetValueFromRequest (RequestElement, QuestionName, &VarValue);
+            if (EFI_ERROR (Status)) {
+              return Status;
+            }
+          } else {
+            //
+            // Get Offset by Question header and Width by DataType Flags
+            //
+            Offset = IfrNumeric->Question.VarStoreInfo.VarOffset;
+            Width  = (UINT16) (1 << (IfrNumeric->Flags & EFI_IFR_NUMERIC_SIZE));
+            //
+            // Check whether this question is in current block array.
+            //
+            if (!BlockArrayCheck (CurrentBlockArray, Offset, Width)) {
+              //
+              // This question is not in the current configuration string. Skip it.
+              //
+              break;
+            }
+            //
+            // Check this var question is in the var storage 
+            //
+            if ((Offset + Width) > VarStoreData.Size) {
+              //
+              // This question exceeds the var store size. 
+              //
+              return EFI_INVALID_PARAMETER;
+            }
+
+            //
+            // Check the current value is in the numeric range.
+            //
+            VarValue = 0;
+            CopyMem (&VarValue, VarBuffer +  Offset, Width);
+          }
+          switch (IfrNumeric->Flags & EFI_IFR_NUMERIC_SIZE) {
+          case EFI_IFR_NUMERIC_SIZE_1:
+            if ((UINT8) VarValue < IfrNumeric->data.u8.MinValue || (UINT8) VarValue > IfrNumeric->data.u8.MaxValue) {
+              //
+              // Not in the valid range.
+              //
+              return EFI_INVALID_PARAMETER;
+            }
+            break;
+          case EFI_IFR_NUMERIC_SIZE_2:
+            if ((UINT16) VarValue < IfrNumeric->data.u16.MinValue || (UINT16) VarValue > IfrNumeric->data.u16.MaxValue) {
+              //
+              // Not in the valid range.
+              //
+              return EFI_INVALID_PARAMETER;
+            }
+            break;
+          case EFI_IFR_NUMERIC_SIZE_4:
+            if ((UINT32) VarValue < IfrNumeric->data.u32.MinValue || (UINT32) VarValue > IfrNumeric->data.u32.MaxValue) {
+              //
+              // Not in the valid range.
+              //
+              return EFI_INVALID_PARAMETER;
+            }
+            break;
+          case EFI_IFR_NUMERIC_SIZE_8:
+            if ((UINT64) VarValue < IfrNumeric->data.u64.MinValue || (UINT64) VarValue > IfrNumeric->data.u64.MaxValue) {
+              //
+              // Not in the valid range.
+              //
+              return EFI_INVALID_PARAMETER;
+            }
+            break;
+          }
+
+          break;
+        case EFI_IFR_CHECKBOX_OP:
+          //
+          // Check value is BOOLEAN type, only 0 and 1 is valid.
+          //
+
+          //
+          // CheckBox question is not in IFR Form. This IFR form is not valid. 
+          //
+          if (VarStoreData.VarStoreId == 0) {
+            return EFI_INVALID_PARAMETER;
+          }
+
+          //
+          // Check whether this question is for the requested varstore.
+          //
+          IfrCheckBox = (EFI_IFR_CHECKBOX *) IfrOpHdr;
+          if (IfrCheckBox->Question.VarStoreId != VarStoreData.VarStoreId) {
+            break;
+          }
+
+          if (NameValueType) {
+            QuestionName = HiiGetString (HiiHandle, IfrCheckBox->Question.VarStoreInfo.VarName, NULL);
+            ASSERT (QuestionName != NULL);
+
+            if (StrStr (RequestElement, QuestionName) == NULL) {
+              //
+              // This question is not in the current configuration string. Skip it.
+              //
+              break;
+            }
+            
+            Status = GetValueFromRequest (RequestElement, QuestionName, &VarValue);
+            if (EFI_ERROR (Status)) {
+              return Status;
+            }
+          } else {
+            //
+            // Get Offset by Question header
+            //
+            Offset = IfrCheckBox->Question.VarStoreInfo.VarOffset;
+            Width  = (UINT16) sizeof (BOOLEAN);
+            //
+            // Check whether this question is in current block array.
+            //
+            if (!BlockArrayCheck (CurrentBlockArray, Offset, Width)) {
+              //
+              // This question is not in the current configuration string. Skip it.
+              //
+              break;
+            }
+            //
+            // Check this var question is in the var storage 
+            //
+            if ((Offset + Width) > VarStoreData.Size) {
+              //
+              // This question exceeds the var store size. 
+              //
+              return EFI_INVALID_PARAMETER;
+            }
+            //
+            // Check the current value is in the numeric range.
+            //
+            VarValue = 0;
+            CopyMem (&VarValue, VarBuffer +  Offset, Width);
+          }
+          //
+          // Boolean type, only 1 and 0 is valid.
+          //
+          if (VarValue > 1) {
+            return EFI_INVALID_PARAMETER;
+          }
+          break;
+        case EFI_IFR_STRING_OP:
+          //
+          // Check current string length is less than maxsize
+          //
+
+          //
+          // CheckBox question is not in IFR Form. This IFR form is not valid. 
+          //
+          if (VarStoreData.VarStoreId == 0) {
+            return EFI_INVALID_PARAMETER;
+          }
+
+          //
+          // Check whether this question is for the requested varstore.
+          //
+          IfrString = (EFI_IFR_STRING *) IfrOpHdr;
+          if (IfrString->Question.VarStoreId != VarStoreData.VarStoreId) {
+            break;
+          }
+          //
+          // Get Width by OneOf Flags
+          //
+          Width  = (UINT16) (IfrString->MaxSize * sizeof (UINT16));
+          if (NameValueType) {
+            QuestionName = HiiGetString (HiiHandle, IfrString->Question.VarStoreInfo.VarName, NULL);
+            ASSERT (QuestionName != NULL);
+
+            StringPtr = StrStr (RequestElement, QuestionName);
+            if (StringPtr == NULL) {
+              //
+              // This question is not in the current configuration string. Skip it.
+              //
+              break;
+            }
+
+            //
+            // Skip the "=".
+            // 
+            StringPtr += 1;
+            
+            //
+            // Check current string length is less than maxsize
+            //
+            if (StrSize (StringPtr) > Width) {
+              return EFI_INVALID_PARAMETER;
+            }
+          } else {
+            //
+            // Get Offset/Width by Question header and OneOf Flags
+            //
+            Offset = IfrString->Question.VarStoreInfo.VarOffset;
+            //
+            // Check whether this question is in current block array.
+            //
+            if (!BlockArrayCheck (CurrentBlockArray, Offset, Width)) {
+              //
+              // This question is not in the current configuration string. Skip it.
+              //
+              break;
+            }
+            //
+            // Check this var question is in the var storage 
+            //
+            if ((Offset + Width) > VarStoreData.Size) {
+              //
+              // This question exceeds the var store size. 
+              //
+              return EFI_INVALID_PARAMETER;
+            }
+
+            //
+            // Check current string length is less than maxsize
+            //
+            if (StrSize ((CHAR16 *) (VarBuffer + Offset)) > Width) {
+              return EFI_INVALID_PARAMETER;
+            }
+          }
+          break;
+        case EFI_IFR_ONE_OF_OPTION_OP:
+          //
+          // Opcode Scope is zero. This one of option is not to be checked. 
+          //
+          if (VarBlockData.Scope == 0) {
+            break;
+          }
+
+          //
+          // Only check for OneOf and OrderList opcode
+          //
+          IfrOneOfOption = (EFI_IFR_ONE_OF_OPTION *) IfrOpHdr;
+          if (VarBlockData.OpCode == EFI_IFR_ONE_OF_OP) {
+            //
+            // Check current value is the value of one of option.
+            //
+            ASSERT (IfrOneOfOption->Type <= EFI_IFR_TYPE_NUM_SIZE_64);
+            ZeroMem (&TmpValue, sizeof (EFI_IFR_TYPE_VALUE));
+            CopyMem (&TmpValue, &IfrOneOfOption->Value, IfrOneOfOption->Header.Length - OFFSET_OF (EFI_IFR_ONE_OF_OPTION, Value));
+            if (VarValue == TmpValue.u64) {
+              //
+              // The value is one of option value.
+              // Set OpCode to Zero, don't need check again.
+              //
+              VarBlockData.OpCode = 0;
+            }
+          }
+          break;
+        case EFI_IFR_END_OP:
+          //
+          // Decrease opcode scope for the validated opcode
+          //
+          if (VarBlockData.Scope > 0) {
+            VarBlockData.Scope --;
+          }
+
+          //
+          // OneOf value doesn't belong to one of option value. 
+          //
+          if ((VarBlockData.Scope == 0) && (VarBlockData.OpCode == EFI_IFR_ONE_OF_OP)) {
+            return EFI_INVALID_PARAMETER;
+          }
+          break;
+        default:
+          //
+          // Increase Scope for the validated opcode
+          //
+          if (VarBlockData.Scope > 0) {
+            VarBlockData.Scope = (UINT8) (VarBlockData.Scope + IfrOpHdr->Scope);
+          }
+          break;
+        }
+        //
+        // Go to the next opcode
+        //
+        IfrOffset += IfrOpHdr->Length;
+      }
+      //
+      // Only one form is in a package list.
+      //
+      break;
+    }
+
+    //
+    // Go to next package.
+    //
+    PackageOffset += PacakgeHeader.Length;
   }
-   
+
+  return EFI_SUCCESS;
+}
+
+/**
+  This internal function parses IFR data to validate current setting.
+
+  @param ConfigElement         ConfigResp element string contains the current setting.
+  @param CurrentBlockArray     Current block array.
+  @param VarBuffer             Data buffer for this varstore.
+  
+  @retval EFI_SUCCESS            The current setting is valid.
+  @retval EFI_OUT_OF_RESOURCES   The memory is not enough.
+  @retval EFI_INVALID_PARAMETER  The config string or the Hii package is invalid.
+**/
+EFI_STATUS
+GetBlockDataInfo (
+  IN  CHAR16                        *ConfigElement,
+  OUT IFR_BLOCK_DATA                **CurrentBlockArray,
+  OUT UINT8                         **VarBuffer
+  )
+{
+  IFR_BLOCK_DATA               *BlockData;
+  IFR_BLOCK_DATA               *NewBlockData;
+  EFI_STRING                   StringPtr;
+  UINTN                        Length;
+  UINT8                        *TmpBuffer;
+  UINT16                       Offset;
+  UINT16                       Width;
+  LIST_ENTRY                   *Link;
+  UINTN                        MaxBufferSize;
+  EFI_STATUS                   Status;
+  CHAR8                        *VarStoreName;
+  UINTN                        Index;
+  IFR_BLOCK_DATA               *BlockArray;
+  UINT8                        *DataBuffer;
+  
   //
   // Initialize the local variables.
   //
@@ -991,22 +1600,26 @@ InternalHiiValidateCurrentSetting (
   BlockData     = NULL;
   NewBlockData  = NULL;
   TmpBuffer     = NULL;
+  BlockArray    = NULL;
   MaxBufferSize = HII_LIB_DEFAULT_VARSTORE_SIZE;
-  VarBuffer     = AllocateZeroPool (MaxBufferSize);
-  if (VarBuffer == NULL) {
+  DataBuffer     = AllocateZeroPool (MaxBufferSize);
+  if (DataBuffer == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
   //
-  // Init CurrentBlockArray
+  // Init BlockArray
   //
-  CurrentBlockArray = (IFR_BLOCK_DATA *) AllocateZeroPool (sizeof (IFR_BLOCK_DATA));
-  if (CurrentBlockArray == NULL) {
+  BlockArray = (IFR_BLOCK_DATA *) AllocateZeroPool (sizeof (IFR_BLOCK_DATA));
+  if (BlockArray == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
-  InitializeListHead (&CurrentBlockArray->Entry);
-  
+  InitializeListHead (&BlockArray->Entry);
+
+  StringPtr = StrStr (ConfigElement, L"&OFFSET=");
+  ASSERT (StringPtr != NULL);
+
   //
   // Parse each <RequestElement> if exists
   // Only <BlockName> format is supported by this help function.
@@ -1087,12 +1700,12 @@ InternalHiiValidateCurrentSetting (
     // Check whether VarBuffer is enough
     //
     if ((UINTN) (Offset + Width) > MaxBufferSize) {
-      VarBuffer = ReallocatePool (
+      DataBuffer = ReallocatePool (
                     MaxBufferSize,
                     Offset + Width + HII_LIB_DEFAULT_VARSTORE_SIZE,
-                    VarBuffer
+                    DataBuffer
                     );
-      if (VarBuffer == NULL) {
+      if (DataBuffer == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
         goto Done;
       }
@@ -1102,7 +1715,7 @@ InternalHiiValidateCurrentSetting (
     //
     // Update the Block with configuration info
     //
-    CopyMem (VarBuffer + Offset, TmpBuffer, Width);
+    CopyMem (DataBuffer + Offset, TmpBuffer, Width);
     FreePool (TmpBuffer);
     TmpBuffer = NULL;
 
@@ -1120,7 +1733,7 @@ InternalHiiValidateCurrentSetting (
     //
     // Insert the new block data into the block data array.
     //
-    for (Link = CurrentBlockArray->Entry.ForwardLink; Link != &CurrentBlockArray->Entry; Link = Link->ForwardLink) {
+    for (Link = BlockArray->Entry.ForwardLink; Link != &BlockArray->Entry; Link = Link->ForwardLink) {
       BlockData = BASE_CR (Link, IFR_BLOCK_DATA, Entry);
       if (NewBlockData->Offset == BlockData->Offset) {
         if (NewBlockData->Width > BlockData->Width) {
@@ -1140,7 +1753,7 @@ InternalHiiValidateCurrentSetting (
     //
     // Insert new block data into the array tail.
     //
-    if (Link == &CurrentBlockArray->Entry) {
+    if (Link == &BlockArray->Entry) {
       InsertTailList (Link, &NewBlockData->Entry);
     }
 
@@ -1158,8 +1771,8 @@ InternalHiiValidateCurrentSetting (
   //
   // Merge the aligned block data into the single block data.
   //
-  Link = CurrentBlockArray->Entry.ForwardLink;
-  while ((Link != &CurrentBlockArray->Entry) && (Link->ForwardLink != &CurrentBlockArray->Entry)) {
+  Link = BlockArray->Entry.ForwardLink;
+  while ((Link != &BlockArray->Entry) && (Link->ForwardLink != &BlockArray->Entry)) {
     BlockData = BASE_CR (Link, IFR_BLOCK_DATA, Entry);
     NewBlockData = BASE_CR (Link->ForwardLink, IFR_BLOCK_DATA, Entry);
     if ((NewBlockData->Offset >= BlockData->Offset) && (NewBlockData->Offset <= (BlockData->Offset + BlockData->Width))) {
@@ -1170,403 +1783,108 @@ InternalHiiValidateCurrentSetting (
       FreePool (NewBlockData);
       continue;
     }
-    Link = Link->ForwardLink;      
-  }
-  
-  if (IsListEmpty (&CurrentBlockArray->Entry)) {
-    Status = EFI_SUCCESS;
-    goto Done;
+    Link = Link->ForwardLink;
   }
 
-  //
-  // 2. Check IFR value is in block data, then Validate Value
-  //
-  ZeroMem (&VarBlockData, sizeof (VarBlockData));
-  VarValue      = 0;
-  IfrVarStore   = NULL;
-  PackageOffset = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
-  while (PackageOffset < PackageListLength) {
-    CopyMem (&PacakgeHeader, (UINT8 *) HiiPackageList + PackageOffset, sizeof (PacakgeHeader));
-    
-    //
-    // Parse IFR opcode from the form package.
-    //
-    if (PacakgeHeader.Type == EFI_HII_PACKAGE_FORMS) {
-      IfrOffset   = sizeof (PacakgeHeader);
-      PackageData = (UINT8 *) HiiPackageList + PackageOffset;
-      while (IfrOffset < PacakgeHeader.Length) {
-        IfrOpHdr = (EFI_IFR_OP_HEADER *) (PackageData + IfrOffset);
-        //
-        // Validate current setting to the value built in IFR opcode
-        //
-        switch (IfrOpHdr->OpCode) {
-        case EFI_IFR_VARSTORE_OP:          
-          //
-          // VarStoreId has been found. No further found.
-          //
-          if (IfrVarStore != NULL) {
-            break;
-          }
-          //
-          // Find the matched VarStoreId to the input VarGuid and VarName
-          //
-          IfrVarStore = (EFI_IFR_VARSTORE *) IfrOpHdr;
-          if (CompareGuid ((EFI_GUID *) (VOID *) &IfrVarStore->Guid, VarGuid)) {
-            VarStoreName = (CHAR8 *) IfrVarStore->Name;
-            for (Index = 0; VarStoreName[Index] != 0; Index ++) {
-              if ((CHAR16) VarStoreName[Index] != VarName[Index]) {
-                break;
-              }
-            }
-            //
-            // The matched VarStore is found.
-            //
-            if ((VarStoreName[Index] != 0) || (VarName[Index] != 0)) {
-              IfrVarStore = NULL;
-            }
-          } else {
-            IfrVarStore = NULL;
-          }
-          break;
-        case EFI_IFR_FORM_OP:
-        case EFI_IFR_FORM_MAP_OP:
-          //
-          // Check the matched VarStoreId is found.
-          //
-          if (IfrVarStore == NULL) {
-            Status = EFI_SUCCESS;
-            goto Done;
-          }
-          break;
-        case EFI_IFR_ONE_OF_OP:
-          //
-          // Check whether current value is the one of option.
-          //
-
-          //
-          // OneOf question is not in IFR Form. This IFR form is not valid. 
-          //
-          if (IfrVarStore == NULL) {
-            Status = EFI_INVALID_PARAMETER;
-            goto Done;
-          }
-          // 
-          // Check whether this question is for the requested varstore.
-          //
-          IfrOneOf = (EFI_IFR_ONE_OF *) IfrOpHdr;
-          if (IfrOneOf->Question.VarStoreId != IfrVarStore->VarStoreId) {
-            break;
-          }
-          
-          //
-          // Get Offset by Question header and Width by DataType Flags
-          //
-          Offset = IfrOneOf->Question.VarStoreInfo.VarOffset;
-          Width  = (UINT16) (1 << (IfrOneOf->Flags & EFI_IFR_NUMERIC_SIZE));
-          //
-          // Check whether this question is in current block array.
-          //
-          if (!BlockArrayCheck (CurrentBlockArray, Offset, Width)) {
-            //
-            // This question is not in the current configuration string. Skip it.
-            //
-            break;
-          }
-          //
-          // Check this var question is in the var storage 
-          //
-          if ((Offset + Width) > IfrVarStore->Size) {
-            //
-            // This question exceeds the var store size. 
-            //
-            Status = EFI_INVALID_PARAMETER;
-            goto Done;
-          }
-
-          //
-          // Get the current value for oneof opcode
-          //
-          VarValue = 0;
-          CopyMem (&VarValue, VarBuffer +  Offset, Width);
-          //
-          // Set Block Data, to be checked in the following Oneof option opcode.
-          //
-          VarBlockData.Offset     = Offset;
-          VarBlockData.Width      = Width;
-          VarBlockData.OpCode     = IfrOpHdr->OpCode;
-          VarBlockData.Scope      = IfrOpHdr->Scope;
-          break;
-        case EFI_IFR_NUMERIC_OP:
-          //
-          // Check the current value is in the numeric range.
-          //
-
-          //
-          // Numeric question is not in IFR Form. This IFR form is not valid. 
-          //
-          if (IfrVarStore == NULL) {
-            Status = EFI_INVALID_PARAMETER;
-            goto Done;
-          }
-          //
-          // Check whether this question is for the requested varstore.
-          //
-          IfrNumeric = (EFI_IFR_NUMERIC *) IfrOpHdr;
-          if (IfrNumeric->Question.VarStoreId != IfrVarStore->VarStoreId) {
-            break;
-          }
-          
-          //
-          // Get Offset by Question header and Width by DataType Flags
-          //
-          Offset = IfrNumeric->Question.VarStoreInfo.VarOffset;
-          Width  = (UINT16) (1 << (IfrNumeric->Flags & EFI_IFR_NUMERIC_SIZE));
-          //
-          // Check whether this question is in current block array.
-          //
-          if (!BlockArrayCheck (CurrentBlockArray, Offset, Width)) {
-            //
-            // This question is not in the current configuration string. Skip it.
-            //
-            break;
-          }
-          //
-          // Check this var question is in the var storage 
-          //
-          if ((Offset + Width) > IfrVarStore->Size) {
-            //
-            // This question exceeds the var store size. 
-            //
-            Status = EFI_INVALID_PARAMETER;
-            goto Done;
-          }
-
-          //
-          // Check the current value is in the numeric range.
-          //
-          VarValue = 0;
-          CopyMem (&VarValue, VarBuffer +  Offset, Width);
-          switch (IfrNumeric->Flags & EFI_IFR_NUMERIC_SIZE) {
-          case EFI_IFR_NUMERIC_SIZE_1:
-            if ((UINT8) VarValue < IfrNumeric->data.u8.MinValue || (UINT8) VarValue > IfrNumeric->data.u8.MaxValue) {
-              //
-              // Not in the valid range.
-              //
-              Status = EFI_INVALID_PARAMETER;
-              goto Done;
-            }
-            break;
-          case EFI_IFR_NUMERIC_SIZE_2:
-            if ((UINT16) VarValue < IfrNumeric->data.u16.MinValue || (UINT16) VarValue > IfrNumeric->data.u16.MaxValue) {
-              //
-              // Not in the valid range.
-              //
-              Status = EFI_INVALID_PARAMETER;
-              goto Done;
-            }
-            break;
-          case EFI_IFR_NUMERIC_SIZE_4:
-            if ((UINT32) VarValue < IfrNumeric->data.u32.MinValue || (UINT32) VarValue > IfrNumeric->data.u32.MaxValue) {
-              //
-              // Not in the valid range.
-              //
-              Status = EFI_INVALID_PARAMETER;
-              goto Done;
-            }
-            break;
-          case EFI_IFR_NUMERIC_SIZE_8:
-            if ((UINT64) VarValue < IfrNumeric->data.u64.MinValue || (UINT64) VarValue > IfrNumeric->data.u64.MaxValue) {
-              //
-              // Not in the valid range.
-              //
-              Status = EFI_INVALID_PARAMETER;
-              goto Done;
-            }
-            break;
-          }
-
-          break;
-        case EFI_IFR_CHECKBOX_OP:
-          //
-          // Check value is BOOLEAN type, only 0 and 1 is valid.
-          //
-
-          //
-          // CheckBox question is not in IFR Form. This IFR form is not valid. 
-          //
-          if (IfrVarStore == NULL) {
-            Status = EFI_INVALID_PARAMETER;
-            goto Done;
-          }
-
-          //
-          // Check whether this question is for the requested varstore.
-          //
-          IfrCheckBox = (EFI_IFR_CHECKBOX *) IfrOpHdr;
-          if (IfrCheckBox->Question.VarStoreId != IfrVarStore->VarStoreId) {
-            break;
-          }
-          
-          //
-          // Get Offset by Question header
-          //
-          Offset = IfrCheckBox->Question.VarStoreInfo.VarOffset;
-          Width  = (UINT16) sizeof (BOOLEAN);
-          //
-          // Check whether this question is in current block array.
-          //
-          if (!BlockArrayCheck (CurrentBlockArray, Offset, Width)) {
-            //
-            // This question is not in the current configuration string. Skip it.
-            //
-            break;
-          }
-          //
-          // Check this var question is in the var storage 
-          //
-          if ((Offset + Width) > IfrVarStore->Size) {
-            //
-            // This question exceeds the var store size. 
-            //
-            Status = EFI_INVALID_PARAMETER;
-            goto Done;
-          }
-
-          //
-          // Boolean type, only 1 and 0 is valid.
-          //
-          if (*(VarBuffer + Offset) > 1) {
-            Status = EFI_INVALID_PARAMETER;
-            goto Done;            
-          }
-          
-          break;
-        case EFI_IFR_STRING_OP:
-          //
-          // Check current string length is less than maxsize
-          //
-
-          //
-          // CheckBox question is not in IFR Form. This IFR form is not valid. 
-          //
-          if (IfrVarStore == NULL) {
-            Status = EFI_INVALID_PARAMETER;
-            goto Done;
-          }
-
-          //
-          // Check whether this question is for the requested varstore.
-          //
-          IfrString = (EFI_IFR_STRING *) IfrOpHdr;
-          if (IfrString->Question.VarStoreId != IfrVarStore->VarStoreId) {
-            break;
-          }
-          
-          //
-          // Get Offset/Width by Question header and OneOf Flags
-          //
-          Offset = IfrString->Question.VarStoreInfo.VarOffset;
-          Width  = (UINT16) (IfrString->MaxSize * sizeof (UINT16));
-          //
-          // Check whether this question is in current block array.
-          //
-          if (!BlockArrayCheck (CurrentBlockArray, Offset, Width)) {
-            //
-            // This question is not in the current configuration string. Skip it.
-            //
-            break;
-          }
-          //
-          // Check this var question is in the var storage 
-          //
-          if ((Offset + Width) > IfrVarStore->Size) {
-            //
-            // This question exceeds the var store size. 
-            //
-            Status = EFI_INVALID_PARAMETER;
-            goto Done;
-          }
-          
-          //
-          // Check current string length is less than maxsize
-          //
-          if (StrSize ((CHAR16 *) (VarBuffer + Offset)) > Width) {
-            Status = EFI_INVALID_PARAMETER;
-            goto Done;            
-          }
-          break;
-        case EFI_IFR_ONE_OF_OPTION_OP:
-          //
-          // Opcode Scope is zero. This one of option is not to be checked. 
-          //
-          if (VarBlockData.Scope == 0) {
-            break;
-          }
-
-          //
-          // Only check for OneOf and OrderList opcode
-          //
-          IfrOneOfOption = (EFI_IFR_ONE_OF_OPTION *) IfrOpHdr;
-          if (VarBlockData.OpCode == EFI_IFR_ONE_OF_OP) {
-            //
-            // Check current value is the value of one of option.
-            //
-            ASSERT (IfrOneOfOption->Type <= EFI_IFR_TYPE_NUM_SIZE_64);
-            ZeroMem (&TmpValue, sizeof (EFI_IFR_TYPE_VALUE));
-            CopyMem (&TmpValue, &IfrOneOfOption->Value, IfrOneOfOption->Header.Length - OFFSET_OF (EFI_IFR_ONE_OF_OPTION, Value));
-            if (VarValue == TmpValue.u64) {
-              //
-              // The value is one of option value.
-              // Set OpCode to Zero, don't need check again.
-              //
-              VarBlockData.OpCode = 0;
-            }
-          }
-
-          break;
-        case EFI_IFR_END_OP:
-          //
-          // Decrease opcode scope for the validated opcode
-          //
-          if (VarBlockData.Scope > 0) {
-            VarBlockData.Scope --;
-          }
-
-          //
-          // OneOf value doesn't belong to one of option value. 
-          //
-          if ((VarBlockData.Scope == 0) && (VarBlockData.OpCode == EFI_IFR_ONE_OF_OP)) {
-            Status = EFI_INVALID_PARAMETER;
-            goto Done;
-          }
-          break;
-        default:
-          //
-          // Increase Scope for the validated opcode
-          //
-          if (VarBlockData.Scope > 0) {
-            VarBlockData.Scope = (UINT8) (VarBlockData.Scope + IfrOpHdr->Scope);
-          }
-          break;
-        }
-        //
-        // Go to the next opcode
-        //
-        IfrOffset += IfrOpHdr->Length;
-      }
-      //
-      // Only one form is in a package list.
-      //
-      break;
-    }
-    
-    //
-    // Go to next package.
-    //
-    PackageOffset += PacakgeHeader.Length;      
-  }
+  *VarBuffer         = DataBuffer;
+  *CurrentBlockArray = BlockArray;
+  return EFI_SUCCESS;
 
 Done:
+  if (DataBuffer != NULL) {
+    FreePool (DataBuffer);
+  }
+  
+  if (BlockArray != NULL) {
+    //
+    // Free Link Array CurrentBlockArray
+    //
+    while (!IsListEmpty (&BlockArray->Entry)) {
+      BlockData = BASE_CR (BlockArray->Entry.ForwardLink, IFR_BLOCK_DATA, Entry);
+      RemoveEntryList (&BlockData->Entry);
+      FreePool (BlockData);
+    }
+    FreePool (BlockArray);
+  }
+
+  return Status;
+}
+
+/**
+  This internal function parses IFR data to validate current setting.
+
+  @param ConfigResp         ConfigResp string contains the current setting.
+  @param HiiPackageList     Point to Hii package list.
+  @param PackageListLength  The length of the pacakge.
+  @param VarGuid            Guid of the buffer storage.
+  @param VarName            Name of the buffer storage.
+  @param HiiHandle          The HiiHandle for this package.
+  
+  @retval EFI_SUCCESS            The current setting is valid.
+  @retval EFI_OUT_OF_RESOURCES   The memory is not enough.
+  @retval EFI_INVALID_PARAMETER  The config string or the Hii package is invalid.
+**/
+EFI_STATUS
+EFIAPI
+InternalHiiValidateCurrentSetting (
+  IN EFI_STRING                    ConfigResp,
+  IN EFI_HII_PACKAGE_LIST_HEADER   *HiiPackageList,
+  IN UINTN                         PackageListLength,
+  IN EFI_GUID                      *VarGuid,
+  IN CHAR16                        *VarName,
+  IN EFI_HII_HANDLE                HiiHandle
+  )
+{
+  CHAR16              *StringPtr;
+  EFI_STATUS          Status;
+  IFR_BLOCK_DATA      *CurrentBlockArray;
+  IFR_BLOCK_DATA      *BlockData;
+  UINT8               *VarBuffer;
+  BOOLEAN             NameValueType;
+
+  CurrentBlockArray = NULL;
+  VarBuffer         = NULL;
+  StringPtr         = NULL;
+  Status            = EFI_SUCCESS;
+
+  //
+  // If StringPtr != NULL, get the request elements.
+  //
+  if (StrStr (ConfigResp, L"&OFFSET=") != NULL) {
+    Status = GetBlockDataInfo(ConfigResp, &CurrentBlockArray, &VarBuffer);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    NameValueType = FALSE;
+  } else {
+    //
+    // Skip header part.
+    //
+    StringPtr = StrStr (ConfigResp, L"PATH=");
+    ASSERT (StringPtr != NULL);
+
+    if (StrStr (StringPtr, L"&") != NULL) {
+      NameValueType = TRUE;
+    } else {
+      //
+      // Not found Request element, return success.
+      //
+      return EFI_SUCCESS;
+    }
+  }
+
+  Status = ValidateQuestionFromVfr(
+                          HiiPackageList,
+                          PackageListLength,
+                          VarGuid,
+                          VarName,
+                          VarBuffer,
+                          CurrentBlockArray,
+                          ConfigResp,
+                          HiiHandle,
+                          NameValueType
+                          );
+
   if (VarBuffer != NULL) {
     FreePool (VarBuffer);
   }
@@ -1580,10 +1898,38 @@ Done:
       RemoveEntryList (&BlockData->Entry);
       FreePool (BlockData);
     }
-    FreePool (CurrentBlockArray);    
+    FreePool (CurrentBlockArray);
   }
 
   return Status;
+}
+
+/**
+  Check whether the ConfigRequest string has the request elements.
+  For EFI_HII_VARSTORE_BUFFER type, the request has "&OFFSET=****&WIDTH=****..." format.
+  For EFI_HII_VARSTORE_NAME_VALUE type, the request has "&NAME1**&NAME2..." format.
+
+  @param  ConfigRequest      The input config request string.
+
+  @retval  TRUE              The input include config request elements.
+  @retval  FALSE             The input string not includes.
+                                 
+**/
+BOOLEAN
+GetElementsFromRequest (
+  IN EFI_STRING    ConfigRequest
+  )
+{
+  EFI_STRING   TmpRequest;
+
+  TmpRequest = StrStr (ConfigRequest, L"PATH=");
+  ASSERT (TmpRequest != NULL);
+
+  if ((StrStr (TmpRequest, L"&OFFSET=") != NULL) || (StrStr (TmpRequest, L"&") != NULL)) {
+    return TRUE;
+  }
+
+  return FALSE;
 }
 
 /**
@@ -1765,7 +2111,7 @@ InternalHiiIfrValueAction (
       // Its default value and validating can't execute by parsing IFR data.
       // Directly jump into the next ConfigAltResp string for another pair Guid, Name, and Path.   
       //
-	    Status = EFI_SUCCESS;
+      Status = EFI_SUCCESS;
       goto NextConfigAltResp;
     }
 
@@ -1822,7 +2168,7 @@ InternalHiiIfrValueAction (
     //
     // Only the ConfigHdr is found. Not any block data is found. No data is required to be validated and set.
     //
-    if (StrStr (ConfigResp, L"&OFFSET=") == NULL) {
+    if (!GetElementsFromRequest (ConfigResp)) {
       goto NextConfigAltResp;
     }
     
@@ -1839,7 +2185,7 @@ InternalHiiIfrValueAction (
       //
       // Current Setting is in ConfigResp, will be set into buffer, then check it again.
       //
-      Status = InternalHiiValidateCurrentSetting (ConfigResp, HiiPackageList, PackageListLength, VarGuid, VarName);
+      Status = InternalHiiValidateCurrentSetting (ConfigResp, HiiPackageList, PackageListLength, VarGuid, VarName, HiiHandle);
     }
 
     if (EFI_ERROR (Status)) {
@@ -1855,10 +2201,10 @@ NextConfigAltResp:
       HiiPackageList = NULL;
     }
     
-  	if (ConfigResp != NULL) {
-  	  FreePool (ConfigResp);
-  	  ConfigResp = NULL;
-  	}
+    if (ConfigResp != NULL) {
+      FreePool (ConfigResp);
+      ConfigResp = NULL;
+    }
 
     //
     // Free the allocated buffer.

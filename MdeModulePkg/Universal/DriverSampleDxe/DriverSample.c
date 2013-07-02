@@ -1794,6 +1794,7 @@ DriverSampleInit (
   DRIVER_SAMPLE_CONFIGURATION     *Configuration;
   BOOLEAN                         ActionFlag;
   EFI_STRING                      ConfigRequestHdr;
+  EFI_STRING                      NameRequestHdr;
   MY_EFI_VARSTORE_DATA            *VarStoreConfig;
   EFI_INPUT_KEY                   HotKey;
   EFI_FORM_BROWSER_EXTENSION_PROTOCOL *FormBrowserEx;
@@ -1973,6 +1974,9 @@ DriverSampleInit (
   ConfigRequestHdr = HiiConstructConfigHdr (&gDriverSampleFormSetGuid, VariableName, DriverHandle[0]);
   ASSERT (ConfigRequestHdr != NULL);
 
+  NameRequestHdr = HiiConstructConfigHdr (&gDriverSampleFormSetGuid, NULL, DriverHandle[0]);
+  ASSERT (NameRequestHdr != NULL);
+
   BufferSize = sizeof (DRIVER_SAMPLE_CONFIGURATION);
   Status = gRT->GetVariable (VariableName, &gDriverSampleFormSetGuid, NULL, &BufferSize, Configuration);
   if (EFI_ERROR (Status)) {
@@ -1991,12 +1995,18 @@ DriverSampleInit (
     // EFI variable for NV config doesn't exit, we should build this variable
     // based on default values stored in IFR
     //
+    ActionFlag = HiiSetToDefaults (NameRequestHdr, EFI_HII_DEFAULT_CLASS_STANDARD);
+    ASSERT (ActionFlag);
+
     ActionFlag = HiiSetToDefaults (ConfigRequestHdr, EFI_HII_DEFAULT_CLASS_STANDARD);
     ASSERT (ActionFlag);
   } else {
     //
     // EFI variable does exist and Validate Current Setting
     //
+    ActionFlag = HiiValidateSettings (NameRequestHdr);
+    ASSERT (ActionFlag);
+
     ActionFlag = HiiValidateSettings (ConfigRequestHdr);
     ASSERT (ActionFlag);
   }

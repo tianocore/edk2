@@ -359,6 +359,8 @@ formset
             maximum = 0xff,
             step    = 0,
             locked,
+            default = 16, defaultstore = MyStandardDefault,     // This is standard default value
+            default = 17, defaultstore = MyManufactureDefault,  // This is manufacture default value
     endnumeric;
 
     numeric varid   = MyNameValueVar[1],     // This numeric take NameValueVar1 as storage
@@ -368,6 +370,8 @@ formset
             minimum = 0,
             maximum = 0xffff,
             step    = 0,
+            default = 18, defaultstore = MyStandardDefault,     // This is standard default value
+            default = 19, defaultstore = MyManufactureDefault,  // This is manufacture default value
     endnumeric;
 
     //

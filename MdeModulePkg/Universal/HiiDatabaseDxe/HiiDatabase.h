@@ -67,6 +67,7 @@ typedef struct {
   CHAR16              *Name;
   EFI_VARSTORE_ID     VarStoreId;
   UINT16              Size;
+  UINT8               Type;
   LIST_ENTRY          BlockEntry;        // Link to its Block array
 } IFR_VARSTORAGE_DATA;
 
@@ -78,6 +79,7 @@ typedef struct {
   UINT8               OpCode;
   UINT8               Scope;
   LIST_ENTRY          DefaultValueEntry; // Link to its default value array
+  CHAR16              *Name;
 } IFR_BLOCK_DATA;
 
 //
@@ -102,9 +104,10 @@ typedef struct {
 //
 // Storage types
 //
-#define EFI_HII_VARSTORE_BUFFER            0
-#define EFI_HII_VARSTORE_NAME_VALUE        1
-#define EFI_HII_VARSTORE_EFI_VARIABLE      2
+#define EFI_HII_VARSTORE_BUFFER              0
+#define EFI_HII_VARSTORE_NAME_VALUE          1
+#define EFI_HII_VARSTORE_EFI_VARIABLE        2
+#define EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER 3
 
 #define HII_FORMSET_STORAGE_SIGNATURE           SIGNATURE_32 ('H', 'S', 'T', 'G')
 typedef struct {
