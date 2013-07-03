@@ -4,7 +4,7 @@
 # The Emulation Platform can be used to debug individual modules, prior to creating
 #    a real platform. This also provides an example for how an DSC is created.
 #
-# Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -294,6 +294,7 @@
   Nt32Pkg/StallPei/StallPei.inf
   Nt32Pkg/WinNtFlashMapPei/WinNtFlashMapPei.inf
   
+  MdeModulePkg/Universal/FaultTolerantWritePei/FaultTolerantWritePei.inf
 !if $(SECURE_BOOT_ENABLE) == TRUE
   SecurityPkg/VariableAuthenticated/Pei/VariablePei.inf
 !else
