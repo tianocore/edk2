@@ -1469,12 +1469,12 @@ ParseIfrData (
 
       IfrVarStore = (EFI_IFR_VARSTORE *) IfrOpHdr;
 
-      VarStoreName = AllocateZeroPool (AsciiStrSize (IfrVarStore->Name) * sizeof (CHAR16));
+      VarStoreName = AllocateZeroPool (AsciiStrSize ((CHAR8 *)IfrVarStore->Name) * sizeof (CHAR16));
       if (VarStoreName == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
         goto Done;
       }
-      AsciiStrToUnicodeStr (IfrVarStore->Name, VarStoreName);
+      AsciiStrToUnicodeStr ((CHAR8 *)IfrVarStore->Name, VarStoreName);
 
       if (IsThisVarstore((VOID *)&IfrVarStore->Guid, VarStoreName, ConfigHdr)) {
         //
@@ -1507,12 +1507,12 @@ ParseIfrData (
         break;
       }
 
-      VarStoreName = AllocateZeroPool (AsciiStrSize (IfrEfiVarStore->Name) * sizeof (CHAR16));
+      VarStoreName = AllocateZeroPool (AsciiStrSize ((CHAR8 *)IfrEfiVarStore->Name) * sizeof (CHAR16));
       if (VarStoreName == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
         goto Done;
       }
-      AsciiStrToUnicodeStr (IfrEfiVarStore->Name, VarStoreName);
+      AsciiStrToUnicodeStr ((CHAR8 *)IfrEfiVarStore->Name, VarStoreName);
 
       if (IsThisVarstore (&IfrEfiVarStore->Guid, VarStoreName, ConfigHdr)) {
         //
