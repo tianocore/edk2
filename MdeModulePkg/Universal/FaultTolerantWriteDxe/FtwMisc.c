@@ -689,6 +689,7 @@ FlushSpareBlockToWorkingBlock (
     return EFI_ABORTED;
   }
 
+  FtwDevice->FtwWorkSpaceHeader->WorkingBlockInvalid = FTW_INVALID_STATE;
   FtwDevice->FtwWorkSpaceHeader->WorkingBlockValid = FTW_VALID_STATE;
 
   return EFI_SUCCESS;
@@ -775,7 +776,7 @@ FtwGetLastWriteHeader (
   Offset          = sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER);
 
   while (FtwHeader->Complete == FTW_VALID_STATE) {
-    Offset += WRITE_TOTAL_SIZE (FtwHeader->NumberOfWrites, FtwHeader->PrivateDataSize);
+    Offset += FTW_WRITE_TOTAL_SIZE (FtwHeader->NumberOfWrites, FtwHeader->PrivateDataSize);
     //
     // If Offset exceed the FTW work space boudary, return error.
     //
@@ -834,7 +835,7 @@ FtwGetLastWriteRecord (
     FtwRecord++;
 
     if (FtwWriteHeader->PrivateDataSize != 0) {
-      FtwRecord = (EFI_FAULT_TOLERANT_WRITE_RECORD *) ((UINTN) FtwRecord + FtwWriteHeader->PrivateDataSize);
+      FtwRecord = (EFI_FAULT_TOLERANT_WRITE_RECORD *) ((UINTN) FtwRecord + (UINTN) FtwWriteHeader->PrivateDataSize);
     }
   }
   //
@@ -844,7 +845,7 @@ FtwGetLastWriteRecord (
   //  also return the last record.
   //
   if (Index == FtwWriteHeader->NumberOfWrites) {
-    *FtwWriteRecord = (EFI_FAULT_TOLERANT_WRITE_RECORD *) ((UINTN) FtwRecord - RECORD_SIZE (FtwWriteHeader->PrivateDataSize));
+    *FtwWriteRecord = (EFI_FAULT_TOLERANT_WRITE_RECORD *) ((UINTN) FtwRecord - FTW_RECORD_SIZE (FtwWriteHeader->PrivateDataSize));
     return EFI_SUCCESS;
   }
 
@@ -901,7 +902,7 @@ IsLastRecordOfWrites (
   Head  = (UINT8 *) FtwHeader;
   Ptr   = (UINT8 *) FtwRecord;
 
-  Head += WRITE_TOTAL_SIZE (FtwHeader->NumberOfWrites - 1, FtwHeader->PrivateDataSize);
+  Head += FTW_WRITE_TOTAL_SIZE (FtwHeader->NumberOfWrites - 1, FtwHeader->PrivateDataSize);
   return (BOOLEAN) (Head == Ptr);
 }
 
@@ -929,7 +930,7 @@ GetPreviousRecordOfWrites (
   }
 
   Ptr = (UINT8 *) (*FtwRecord);
-  Ptr -= RECORD_SIZE (FtwHeader->PrivateDataSize);
+  Ptr -= FTW_RECORD_SIZE (FtwHeader->PrivateDataSize);
   *FtwRecord = (EFI_FAULT_TOLERANT_WRITE_RECORD *) Ptr;
   return EFI_SUCCESS;
 }
@@ -1259,7 +1260,7 @@ InitFtwProtocol (
   FtwHeader = FtwDevice->FtwLastWriteHeader;
   Offset    = (UINT8 *) FtwHeader - FtwDevice->FtwWorkSpace;
   if (FtwDevice->FtwWorkSpace[Offset] != FTW_ERASED_BYTE) {
-    Offset += WRITE_TOTAL_SIZE (FtwHeader->NumberOfWrites, FtwHeader->PrivateDataSize);
+    Offset += FTW_WRITE_TOTAL_SIZE (FtwHeader->NumberOfWrites, FtwHeader->PrivateDataSize);
   }
   
   if (!IsErasedFlashBuffer (FtwDevice->FtwWorkSpace + Offset, FtwDevice->FtwWorkSpaceSize - Offset)) {
@@ -1283,7 +1284,7 @@ InitFtwProtocol (
       // if (SpareCompleted) THEN  Restart to fault tolerant write.
       //
       FvbHandle = NULL;
-      FvbHandle = GetFvbByAddress (FtwDevice->FtwLastWriteRecord->FvBaseAddress, &Fvb);
+      FvbHandle = GetFvbByAddress ((EFI_PHYSICAL_ADDRESS) (UINTN) ((INT64) FtwDevice->SpareAreaAddress + FtwDevice->FtwLastWriteRecord->RelativeOffset), &Fvb);
       if (FvbHandle != NULL) {
         Status = FtwRestart (&FtwDevice->FtwInstance, FvbHandle);
         DEBUG ((EFI_D_ERROR, "FtwLite: Restart last write - %r\n", Status));

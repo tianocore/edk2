@@ -39,6 +39,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/EventGroup.h>
 #include <Guid/VariableFormat.h>
 #include <Guid/SystemNvDataGuid.h>
+#include <Guid/FaultTolerantWrite.h>
 #include <Guid/HardwareErrorVariable.h>
 
 #define VARIABLE_RECLAIM_THRESHOLD (1024)

@@ -3,7 +3,7 @@
   These are the common Fault Tolerant Write (FTW) functions that are shared 
   by DXE FTW driver and SMM FTW driver.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -95,7 +95,7 @@ FtwAllocate (
   //
   // Check if there is enough space for the coming allocation
   //
-  if (WRITE_TOTAL_SIZE (NumberOfWrites, PrivateDataSize) > FtwDevice->FtwWorkSpaceHeader->WriteQueueSize) {
+  if (FTW_WRITE_TOTAL_SIZE (NumberOfWrites, PrivateDataSize) > FtwDevice->FtwWorkSpaceHeader->WriteQueueSize) {
     DEBUG ((EFI_D_ERROR, "Ftw: Allocate() request exceed Workspace, Caller: %g\n", CallerId));
     return EFI_BUFFER_TOO_SMALL;
   }
@@ -115,7 +115,7 @@ FtwAllocate (
   // If workspace is not enough, then reclaim workspace
   //
   Offset = (UINT8 *) FtwHeader - (UINT8 *) FtwDevice->FtwWorkSpace;
-  if (Offset + WRITE_TOTAL_SIZE (NumberOfWrites, PrivateDataSize) > FtwDevice->FtwWorkSpaceSize) {
+  if (Offset + FTW_WRITE_TOTAL_SIZE (NumberOfWrites, PrivateDataSize) > FtwDevice->FtwWorkSpaceSize) {
     Status = FtwReclaimWorkSpace (FtwDevice, TRUE);
     if (EFI_ERROR (Status)) {
       return EFI_ABORTED;
@@ -365,7 +365,7 @@ FtwWrite (
   //
   // If Record is out of the range of Header, return access denied.
   //
-  if (((UINTN)((UINT8 *) Record - (UINT8 *) Header)) > WRITE_TOTAL_SIZE (Header->NumberOfWrites - 1, Header->PrivateDataSize)) {
+  if (((UINTN)((UINT8 *) Record - (UINT8 *) Header)) > FTW_WRITE_TOTAL_SIZE (Header->NumberOfWrites - 1, Header->PrivateDataSize)) {
     return EFI_ACCESS_DENIED;
   }
 
@@ -415,13 +415,13 @@ FtwWrite (
   Record->Lba     = Lba;
   Record->Offset  = Offset;
   Record->Length  = Length;
-  Record->FvBaseAddress = FvbPhysicalAddress;
+  Record->RelativeOffset = (INT64) (FvbPhysicalAddress + (UINTN) Lba * FtwDevice->BlockSize) - (INT64) FtwDevice->SpareAreaAddress;
   if (PrivateData != NULL) {
-    CopyMem ((Record + 1), PrivateData, Header->PrivateDataSize);
+    CopyMem ((Record + 1), PrivateData, (UINTN) Header->PrivateDataSize);
   }
 
   MyOffset  = (UINT8 *) Record - FtwDevice->FtwWorkSpace;
-  MyLength  = RECORD_SIZE (Header->PrivateDataSize);
+  MyLength  = FTW_RECORD_SIZE (Header->PrivateDataSize);
 
   Status = FtwDevice->FtwFvBlock->Write (
                                     FtwDevice->FtwFvBlock,
@@ -693,6 +693,10 @@ FtwAbort (
     return EFI_ABORTED;
   }
 
+  if (FtwDevice->FtwLastWriteHeader->HeaderAllocated != FTW_VALID_STATE) {
+    return EFI_NOT_FOUND;
+  }
+
   if (FtwDevice->FtwLastWriteHeader->Complete == FTW_VALID_STATE) {
     return EFI_NOT_FOUND;
   }
@@ -809,16 +813,16 @@ FtwGetLastWrite (
   //
   CopyMem (CallerId, &Header->CallerId, sizeof (EFI_GUID));
   *Lba      = Record->Lba;
-  *Offset   = Record->Offset;
-  *Length   = Record->Length;
+  *Offset   = (UINTN) Record->Offset;
+  *Length   = (UINTN) Record->Length;
   *Complete = (BOOLEAN) (Record->DestinationComplete == FTW_VALID_STATE);
 
   if (*PrivateDataSize < Header->PrivateDataSize) {
-    *PrivateDataSize  = Header->PrivateDataSize;
+    *PrivateDataSize  = (UINTN) Header->PrivateDataSize;
     PrivateData       = NULL;
     Status            = EFI_BUFFER_TOO_SMALL;
   } else {
-    *PrivateDataSize = Header->PrivateDataSize;
+    *PrivateDataSize = (UINTN) Header->PrivateDataSize;
     CopyMem (PrivateData, Record + 1, *PrivateDataSize);
     Status = EFI_SUCCESS;
   }

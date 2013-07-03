@@ -68,6 +68,7 @@
   gEfiSystemNvDataFvGuid                        ## CONSUMES
   gEfiHardwareErrorVariableGuid                 ## SOMETIMES_CONSUMES
   gEfiEndOfDxeEventGroupGuid                    ## CONSUMES ## Event
+  gEdkiiFaultTolerantWriteGuid                  ## CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize

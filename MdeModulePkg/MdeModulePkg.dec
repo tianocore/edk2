@@ -119,6 +119,14 @@
   #  Include/Guid/SystemNvDataGuid.h
   gEfiSystemNvDataFvGuid         = { 0xFFF12B8D, 0x7696, 0x4C8B, { 0xA9, 0x85, 0x27, 0x47, 0x07, 0x5B, 0x4F, 0x50 }}
 
+  ## GUID used as the signature of FTW working block header.
+  #  Include/Guid/SystemNvDataGuid.h
+  gEdkiiWorkingBlockSignatureGuid   = { 0x9e58292b, 0x7c68, 0x497d, { 0xa0, 0xce, 0x65,  0x0, 0xfd, 0x9f, 0x1b, 0x95 }}
+
+  ## GUID used to build FTW last write data hob and install PPI to inform the check for FTW last write data has been done.
+  #  Include/Guid/FaultTolerantWrite.h
+  gEdkiiFaultTolerantWriteGuid      = { 0x1d3e9cb8, 0x43af, 0x490b, { 0x83,  0xa, 0x35, 0x16, 0xaa, 0x53, 0x20, 0x47 }}
+
   ## Guid specify the device is the console out device.
   #  Include/Guid/ConsoleOutDevice.h
   gEfiConsoleOutDeviceGuid       = { 0xD3B36F2C, 0xD551, 0x11D4, { 0x9A, 0x46, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }}

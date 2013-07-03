@@ -3,7 +3,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by FtwLite module.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -38,59 +38,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 #define FTW_ERASE_POLARITY  1
 
-#define FTW_VALID_STATE     0
-#define FTW_INVALID_STATE   1
-
 #define FTW_ERASED_BYTE     ((UINT8) (255))
 #define FTW_POLARITY_REVERT ((UINT8) (255))
 
-//
-// EFI Fault tolerant block update write queue entry
-//
-typedef struct {
-  UINT8     HeaderAllocated : 1;
-  UINT8     WritesAllocated : 1;
-  UINT8     Complete : 1;
 #define HEADER_ALLOCATED  0x1
 #define WRITES_ALLOCATED  0x2
 #define WRITES_COMPLETED  0x4
-  UINT8     Reserved : 5;
-  EFI_GUID  CallerId;
-  UINTN     NumberOfWrites;
-  UINTN     PrivateDataSize;
-} EFI_FAULT_TOLERANT_WRITE_HEADER;
 
-//
-// EFI Fault tolerant block update write queue record
-//
-typedef struct {
-  UINT8   BootBlockUpdate : 1;
-  UINT8   SpareComplete : 1;
-  UINT8   DestinationComplete : 1;
 #define BOOT_BLOCK_UPDATE 0x1
 #define SPARE_COMPLETED   0x2
 #define DEST_COMPLETED    0x4
-  UINT8   Reserved : 5;
-  EFI_LBA Lba;
-  UINTN   Offset;
-  UINTN   Length;
-  EFI_PHYSICAL_ADDRESS  FvBaseAddress;
-  //
-  // UINT8                PrivateData[PrivateDataSize]
-  //
-} EFI_FAULT_TOLERANT_WRITE_RECORD;
 
-
-#define RECORD_SIZE(PrivateDataSize)  (sizeof (EFI_FAULT_TOLERANT_WRITE_RECORD) + PrivateDataSize)
-
-#define RECORD_TOTAL_SIZE(NumberOfWrites, PrivateDataSize) \
-    ((NumberOfWrites) * (sizeof (EFI_FAULT_TOLERANT_WRITE_RECORD) + PrivateDataSize))
-
-#define WRITE_TOTAL_SIZE(NumberOfWrites, PrivateDataSize) \
-    ( \
-      sizeof (EFI_FAULT_TOLERANT_WRITE_HEADER) + (NumberOfWrites) * \
-        (sizeof (EFI_FAULT_TOLERANT_WRITE_RECORD) + PrivateDataSize) \
-    )
 
 #define FTW_DEVICE_SIGNATURE  SIGNATURE_32 ('F', 'T', 'W', 'D')
 

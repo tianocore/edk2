@@ -52,7 +52,7 @@
   PcdLib
 
 [Guids]
-  gEfiSystemNvDataFvGuid                        ## CONSUMES ## FV Signature of Working Space Header
+  gEdkiiWorkingBlockSignatureGuid                  ## CONSUMES ## FV Signature of Working Space Header
 
 [Protocols]
   gEfiSmmSwapAddressRangeProtocolGuid     | gEfiMdeModulePkgTokenSpaceGuid.PcdFullFtwServiceEnable          ## CONSUMES
