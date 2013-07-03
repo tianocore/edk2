@@ -2,7 +2,7 @@
   Firmware Block Services to support emulating non-volatile variables
   by pretending that a memory buffer is storage for the NV variables.
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -781,52 +781,6 @@ InitializeFvAndVariableStoreHeaders (
   Fv->Checksum = CalculateCheckSum16 (Ptr, Fv->HeaderLength);
 }
 
-
-/**
-  Initializes the Fault Tolerant Write data structure
-
-  This data structure is used by the Fault Tolerant Write driver.
-
-  @param[in]  Buffer - Location for the FTW data structure
-
-**/
-VOID
-InitializeFtwState (
-  IN  VOID   *Buffer
-  )
-{
-  EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *Hdr;
-  UINT32                                  TempCrc;
-  STATIC EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER DefaultFtw = {
-    EFI_SYSTEM_NV_DATA_FV_GUID, // EFI_GUID  Signature;
-    ERASED_UINT32,              // UINT32    Crc;
-    ERASED_BIT,                 // UINT8     WorkingBlockValid : 1;
-    ERASED_BIT,                 // UINT8     WorkingBlockInvalid : 1;
-    0,                          // UINT8     Reserved : 6;
-    { 0, 0, 0 },                // UINT8     Reserved3[3];
-    FTW_WRITE_QUEUE_SIZE        // UINT64    WriteQueueSize;
-  };
-
-  CopyMem (Buffer, (VOID*) &DefaultFtw, sizeof (DefaultFtw));
-
-  Hdr = (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER*) Buffer;
-
-  //
-  // Calculate checksum.
-  //
-  // The Crc, WorkingBlockValid and WorkingBlockInvalid bits should
-  // be set to the erased state before computing the checksum.
-  //
-  gBS->CalculateCrc32 (Buffer, sizeof (DefaultFtw), &TempCrc);
-  Hdr->Crc = TempCrc;
-
-  //
-  // Mark as valid.
-  //
-  Hdr->WorkingBlockValid = NOT_ERASED_BIT;
-}
-
-
 /**
   Main entry point.
 
@@ -908,9 +862,6 @@ FvbInitialize (
   // Initialize the Fault Tolerant Write data area
   //
   SubPtr = (VOID*) ((UINT8*) Ptr + PcdGet32 (PcdVariableStoreSize));
-  if (Initialize) {
-    InitializeFtwState (SubPtr);
-  }
   PcdSet32 (PcdFlashNvStorageFtwWorkingBase, (UINT32)(UINTN) SubPtr);
 
   //
