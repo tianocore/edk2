@@ -1955,7 +1955,7 @@ ParseIfrData (
         //
         // Check whether this question is in requested block array.
         //
-        if (!BlockArrayCheck (RequestBlockArray, BlockData->Offset, BlockData->Width, BlockData->Name != NULL, HiiHandle)) {
+        if (!BlockArrayCheck (RequestBlockArray, BlockData->Offset, BlockData->Width, (BOOLEAN)(BlockData->Name != NULL), HiiHandle)) {
           //
           // This question is not in the requested string. Skip it.
           //
