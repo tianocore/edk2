@@ -6,7 +6,7 @@
 #  This external input must be validated carefully to avoid security issue like
 #  buffer overflow, integer overflow.
 #
-# Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -84,6 +84,7 @@
   gEfiCertDbGuid
   gEfiHardwareErrorVariableGuid                 ## SOMETIMES_CONSUMES
   gEfiEndOfDxeEventGroupGuid                    ## CONSUMES ## Event
+  gEdkiiFaultTolerantWriteGuid                  ## CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
