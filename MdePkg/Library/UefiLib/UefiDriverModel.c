@@ -2,7 +2,7 @@
   Library functions that abstract driver model protocols
   installation.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are
   licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -51,8 +51,14 @@ EfiLibInstallDriverBinding (
 
   ASSERT (DriverBinding != NULL);
 
+  //
+  // Update the ImageHandle and DriverBindingHandle fields of the Driver Binding Protocol
+  //
+  DriverBinding->ImageHandle         = ImageHandle;
+  DriverBinding->DriverBindingHandle = DriverBindingHandle;
+
   Status = gBS->InstallMultipleProtocolInterfaces (
-                  &DriverBindingHandle,
+                  &DriverBinding->DriverBindingHandle,
                   &gEfiDriverBindingProtocolGuid, DriverBinding,
                   NULL
                   );
@@ -60,12 +66,6 @@ EfiLibInstallDriverBinding (
   // ASSERT if the call to InstallMultipleProtocolInterfaces() failed
   //
   ASSERT_EFI_ERROR (Status);
-
-  //
-  // Update the ImageHandle and DriverBindingHandle fields of the Driver Binding Protocol
-  //
-  DriverBinding->ImageHandle         = ImageHandle;
-  DriverBinding->DriverBindingHandle = DriverBindingHandle;
 
   return Status;
 }
@@ -113,17 +113,23 @@ EfiLibInstallAllDriverProtocols (
 
   ASSERT (DriverBinding != NULL);
 
+  //
+  // Update the ImageHandle and DriverBindingHandle fields of the Driver Binding Protocol
+  //
+  DriverBinding->ImageHandle         = ImageHandle;
+  DriverBinding->DriverBindingHandle = DriverBindingHandle;
+  
   if (DriverDiagnostics == NULL || FeaturePcdGet(PcdDriverDiagnosticsDisable)) {
     if (DriverConfiguration == NULL) {
       if (ComponentName == NULL || FeaturePcdGet(PcdComponentNameDisable)) {
         Status = gBS->InstallMultipleProtocolInterfaces (
-                        &DriverBindingHandle,
+                        &DriverBinding->DriverBindingHandle,
                         &gEfiDriverBindingProtocolGuid, DriverBinding,
                         NULL
                         );
       } else {
         Status = gBS->InstallMultipleProtocolInterfaces (
-                        &DriverBindingHandle,
+                        &DriverBinding->DriverBindingHandle,
                         &gEfiDriverBindingProtocolGuid, DriverBinding,
                         &gEfiComponentNameProtocolGuid, ComponentName,
                         NULL
@@ -132,14 +138,14 @@ EfiLibInstallAllDriverProtocols (
     } else {
       if (ComponentName == NULL || FeaturePcdGet(PcdComponentNameDisable)) {
         Status = gBS->InstallMultipleProtocolInterfaces (
-                        &DriverBindingHandle,
+                        &DriverBinding->DriverBindingHandle,
                         &gEfiDriverBindingProtocolGuid,       DriverBinding,
                         &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
                         NULL
                         );
       } else {
         Status = gBS->InstallMultipleProtocolInterfaces (
-                        &DriverBindingHandle,
+                        &DriverBinding->DriverBindingHandle,
                         &gEfiDriverBindingProtocolGuid,       DriverBinding,
                         &gEfiComponentNameProtocolGuid,       ComponentName,
                         &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
@@ -151,14 +157,14 @@ EfiLibInstallAllDriverProtocols (
     if (DriverConfiguration == NULL) {
       if (ComponentName == NULL || FeaturePcdGet(PcdComponentNameDisable)) {
         Status = gBS->InstallMultipleProtocolInterfaces (
-                        &DriverBindingHandle,
+                        &DriverBinding->DriverBindingHandle,
                         &gEfiDriverBindingProtocolGuid,     DriverBinding,
                         &gEfiDriverDiagnosticsProtocolGuid, DriverDiagnostics,
                         NULL
                         );
       } else {
         Status = gBS->InstallMultipleProtocolInterfaces (
-                        &DriverBindingHandle,
+                        &DriverBinding->DriverBindingHandle,
                         &gEfiDriverBindingProtocolGuid,     DriverBinding,
                         &gEfiComponentNameProtocolGuid,     ComponentName,
                         &gEfiDriverDiagnosticsProtocolGuid, DriverDiagnostics,
@@ -168,7 +174,7 @@ EfiLibInstallAllDriverProtocols (
     } else {
       if (ComponentName == NULL || FeaturePcdGet(PcdComponentNameDisable)) {
        Status = gBS->InstallMultipleProtocolInterfaces (
-                        &DriverBindingHandle,
+                        &DriverBinding->DriverBindingHandle,
                         &gEfiDriverBindingProtocolGuid,       DriverBinding,
                         &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
                         &gEfiDriverDiagnosticsProtocolGuid,   DriverDiagnostics,
@@ -176,7 +182,7 @@ EfiLibInstallAllDriverProtocols (
                         );
       } else {
         Status = gBS->InstallMultipleProtocolInterfaces (
-                        &DriverBindingHandle,
+                        &DriverBinding->DriverBindingHandle,
                         &gEfiDriverBindingProtocolGuid,       DriverBinding,
                         &gEfiComponentNameProtocolGuid,       ComponentName,
                         &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
@@ -191,12 +197,6 @@ EfiLibInstallAllDriverProtocols (
   // ASSERT if the call to InstallMultipleProtocolInterfaces() failed
   //
   ASSERT_EFI_ERROR (Status);
-
-  //
-  // Update the ImageHandle and DriverBindingHandle fields of the Driver Binding Protocol
-  //
-  DriverBinding->ImageHandle         = ImageHandle;
-  DriverBinding->DriverBindingHandle = DriverBindingHandle;
 
   return Status;
 }
@@ -241,16 +241,22 @@ EfiLibInstallDriverBindingComponentName2 (
 
   ASSERT (DriverBinding != NULL);
 
+  //
+  // Update the ImageHandle and DriverBindingHandle fields of the Driver Binding Protocol
+  //
+  DriverBinding->ImageHandle         = ImageHandle;
+  DriverBinding->DriverBindingHandle = DriverBindingHandle;
+
   if (ComponentName == NULL || FeaturePcdGet(PcdComponentNameDisable)) {
     if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
       Status = gBS->InstallMultipleProtocolInterfaces (
-                      &DriverBindingHandle,
+                      &DriverBinding->DriverBindingHandle,
                       &gEfiDriverBindingProtocolGuid, DriverBinding,
                       NULL
                       );
       } else {
       Status = gBS->InstallMultipleProtocolInterfaces (
-                      &DriverBindingHandle,
+                      &DriverBinding->DriverBindingHandle,
                       &gEfiDriverBindingProtocolGuid, DriverBinding,
                       &gEfiComponentName2ProtocolGuid, ComponentName2,
                       NULL
@@ -259,14 +265,14 @@ EfiLibInstallDriverBindingComponentName2 (
   } else {
      if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
        Status = gBS->InstallMultipleProtocolInterfaces (
-                       &DriverBindingHandle,
+                       &DriverBinding->DriverBindingHandle,
                        &gEfiDriverBindingProtocolGuid, DriverBinding,
                        &gEfiComponentNameProtocolGuid, ComponentName,
                        NULL
                        );
      } else {
        Status = gBS->InstallMultipleProtocolInterfaces (
-                       &DriverBindingHandle,
+                       &DriverBinding->DriverBindingHandle,
                        &gEfiDriverBindingProtocolGuid, DriverBinding,
                        &gEfiComponentNameProtocolGuid, ComponentName,
                        &gEfiComponentName2ProtocolGuid, ComponentName2,
@@ -274,16 +280,11 @@ EfiLibInstallDriverBindingComponentName2 (
                        );
     }
   }
+
   //
   // ASSERT if the call to InstallMultipleProtocolInterfaces() failed
   //
   ASSERT_EFI_ERROR (Status);
-
-  //
-  // Update the ImageHandle and DriverBindingHandle fields of the Driver Binding Protocol
-  //
-  DriverBinding->ImageHandle         = ImageHandle;
-  DriverBinding->DriverBindingHandle = DriverBindingHandle;
 
   return Status;
 }
@@ -338,6 +339,12 @@ EfiLibInstallAllDriverProtocols2 (
 
   ASSERT (DriverBinding != NULL); 
 
+  //
+  // Update the ImageHandle and DriverBindingHandle fields of the Driver Binding Protocol
+  //
+  DriverBinding->ImageHandle         = ImageHandle;
+  DriverBinding->DriverBindingHandle = DriverBindingHandle;
+  
   if (DriverConfiguration2 == NULL) {
     if (DriverConfiguration == NULL) {
       if (DriverDiagnostics == NULL || FeaturePcdGet(PcdDriverDiagnosticsDisable)) {
@@ -345,13 +352,13 @@ EfiLibInstallAllDriverProtocols2 (
           if (ComponentName == NULL || FeaturePcdGet(PcdComponentNameDisable)) {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               NULL
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
                               NULL
@@ -360,14 +367,14 @@ EfiLibInstallAllDriverProtocols2 (
           } else {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               NULL
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
@@ -379,14 +386,14 @@ EfiLibInstallAllDriverProtocols2 (
           if (ComponentName == NULL || FeaturePcdGet(PcdComponentNameDisable)) {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiDriverDiagnostics2ProtocolGuid, DriverDiagnostics2,
                               NULL
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
                               &gEfiDriverDiagnostics2ProtocolGuid, DriverDiagnostics2,
@@ -396,7 +403,7 @@ EfiLibInstallAllDriverProtocols2 (
           } else {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiDriverDiagnostics2ProtocolGuid, DriverDiagnostics2,
@@ -404,7 +411,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
@@ -419,14 +426,14 @@ EfiLibInstallAllDriverProtocols2 (
           if (ComponentName == NULL || FeaturePcdGet(PcdComponentNameDisable)) {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiDriverDiagnosticsProtocolGuid, DriverDiagnostics,
                               NULL
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
                               &gEfiDriverDiagnosticsProtocolGuid, DriverDiagnostics,
@@ -436,7 +443,7 @@ EfiLibInstallAllDriverProtocols2 (
           } else {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiDriverDiagnosticsProtocolGuid, DriverDiagnostics,
@@ -444,7 +451,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
@@ -457,7 +464,7 @@ EfiLibInstallAllDriverProtocols2 (
           if (ComponentName == NULL || FeaturePcdGet(PcdComponentNameDisable)) {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiDriverDiagnosticsProtocolGuid, DriverDiagnostics,
                               &gEfiDriverDiagnostics2ProtocolGuid, DriverDiagnostics2,
@@ -465,7 +472,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
                               &gEfiDriverDiagnosticsProtocolGuid, DriverDiagnostics,
@@ -476,7 +483,7 @@ EfiLibInstallAllDriverProtocols2 (
           } else {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiDriverDiagnosticsProtocolGuid, DriverDiagnostics,
@@ -485,7 +492,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
@@ -503,14 +510,14 @@ EfiLibInstallAllDriverProtocols2 (
           if (ComponentName == NULL || FeaturePcdGet(PcdComponentNameDisable)) {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
                               NULL
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
                               &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
@@ -520,7 +527,7 @@ EfiLibInstallAllDriverProtocols2 (
           } else {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
@@ -528,7 +535,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
@@ -541,7 +548,7 @@ EfiLibInstallAllDriverProtocols2 (
           if (ComponentName == NULL || FeaturePcdGet(PcdComponentNameDisable)) {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
                               &gEfiDriverDiagnostics2ProtocolGuid, DriverDiagnostics2,
@@ -549,7 +556,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
                               &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
@@ -560,7 +567,7 @@ EfiLibInstallAllDriverProtocols2 (
           } else {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
@@ -569,7 +576,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
@@ -585,7 +592,7 @@ EfiLibInstallAllDriverProtocols2 (
           if (ComponentName == NULL || FeaturePcdGet(PcdComponentNameDisable)) {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
                               &gEfiDriverDiagnosticsProtocolGuid, DriverDiagnostics,
@@ -593,7 +600,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
                               &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
@@ -604,7 +611,7 @@ EfiLibInstallAllDriverProtocols2 (
           } else {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
@@ -613,7 +620,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
@@ -627,7 +634,7 @@ EfiLibInstallAllDriverProtocols2 (
           if (ComponentName == NULL || FeaturePcdGet(PcdComponentNameDisable)) {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
                               &gEfiDriverDiagnosticsProtocolGuid, DriverDiagnostics,
@@ -636,7 +643,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
                               &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
@@ -648,7 +655,7 @@ EfiLibInstallAllDriverProtocols2 (
           } else {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
@@ -658,7 +665,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
@@ -679,14 +686,14 @@ EfiLibInstallAllDriverProtocols2 (
           if (ComponentName == NULL || FeaturePcdGet(PcdComponentNameDisable)) {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiDriverConfiguration2ProtocolGuid, DriverConfiguration2,
                               NULL
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
                               &gEfiDriverConfiguration2ProtocolGuid, DriverConfiguration2,
@@ -696,7 +703,7 @@ EfiLibInstallAllDriverProtocols2 (
           } else {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiDriverConfiguration2ProtocolGuid, DriverConfiguration2,
@@ -704,7 +711,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
@@ -717,7 +724,7 @@ EfiLibInstallAllDriverProtocols2 (
           if (ComponentName == NULL || FeaturePcdGet(PcdComponentNameDisable)) {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiDriverDiagnostics2ProtocolGuid, DriverDiagnostics2,
                               &gEfiDriverConfiguration2ProtocolGuid, DriverConfiguration2,
@@ -725,7 +732,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
                               &gEfiDriverConfiguration2ProtocolGuid, DriverConfiguration2,
@@ -736,7 +743,7 @@ EfiLibInstallAllDriverProtocols2 (
           } else {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiDriverConfiguration2ProtocolGuid, DriverConfiguration2,
@@ -745,7 +752,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
@@ -761,7 +768,7 @@ EfiLibInstallAllDriverProtocols2 (
           if (ComponentName == NULL || FeaturePcdGet(PcdComponentNameDisable)) {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiDriverDiagnosticsProtocolGuid, DriverDiagnostics,
                               &gEfiDriverConfiguration2ProtocolGuid, DriverConfiguration2,
@@ -769,7 +776,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
                               &gEfiDriverConfiguration2ProtocolGuid, DriverConfiguration2,
@@ -780,7 +787,7 @@ EfiLibInstallAllDriverProtocols2 (
           } else {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiDriverDiagnosticsProtocolGuid, DriverDiagnostics,
@@ -789,7 +796,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
@@ -803,7 +810,7 @@ EfiLibInstallAllDriverProtocols2 (
           if (ComponentName == NULL || FeaturePcdGet(PcdComponentNameDisable)) {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiDriverConfiguration2ProtocolGuid, DriverConfiguration2,
                               &gEfiDriverDiagnosticsProtocolGuid, DriverDiagnostics,
@@ -812,7 +819,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
                               &gEfiDriverConfiguration2ProtocolGuid, DriverConfiguration2,
@@ -824,7 +831,7 @@ EfiLibInstallAllDriverProtocols2 (
           } else {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiDriverConfiguration2ProtocolGuid, DriverConfiguration2,
@@ -834,7 +841,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
@@ -853,7 +860,7 @@ EfiLibInstallAllDriverProtocols2 (
           if (ComponentName == NULL || FeaturePcdGet(PcdComponentNameDisable)) {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
                               &gEfiDriverConfiguration2ProtocolGuid, DriverConfiguration2,
@@ -861,7 +868,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
                               &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
@@ -872,7 +879,7 @@ EfiLibInstallAllDriverProtocols2 (
           } else {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
@@ -881,7 +888,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
@@ -895,7 +902,7 @@ EfiLibInstallAllDriverProtocols2 (
           if (ComponentName == NULL || FeaturePcdGet(PcdComponentNameDisable)) {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
                               &gEfiDriverConfiguration2ProtocolGuid, DriverConfiguration2,
@@ -904,7 +911,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
                               &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
@@ -916,7 +923,7 @@ EfiLibInstallAllDriverProtocols2 (
           } else {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
@@ -926,7 +933,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
@@ -943,7 +950,7 @@ EfiLibInstallAllDriverProtocols2 (
           if (ComponentName == NULL || FeaturePcdGet(PcdComponentNameDisable)) {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
                               &gEfiDriverConfiguration2ProtocolGuid, DriverConfiguration2,
@@ -952,7 +959,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
                               &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
@@ -964,7 +971,7 @@ EfiLibInstallAllDriverProtocols2 (
           } else {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
@@ -974,7 +981,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
@@ -989,7 +996,7 @@ EfiLibInstallAllDriverProtocols2 (
           if (ComponentName == NULL || FeaturePcdGet(PcdComponentNameDisable)) {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
                               &gEfiDriverConfiguration2ProtocolGuid, DriverConfiguration2,
@@ -999,7 +1006,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
                               &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
@@ -1012,7 +1019,7 @@ EfiLibInstallAllDriverProtocols2 (
           } else {
             if (ComponentName2 == NULL || FeaturePcdGet(PcdComponentName2Disable)) {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiDriverConfigurationProtocolGuid, DriverConfiguration,
@@ -1023,7 +1030,7 @@ EfiLibInstallAllDriverProtocols2 (
                               );
             } else {
               Status = gBS->InstallMultipleProtocolInterfaces (
-                              &DriverBindingHandle,
+                              &DriverBinding->DriverBindingHandle,
                               &gEfiDriverBindingProtocolGuid, DriverBinding,
                               &gEfiComponentNameProtocolGuid, ComponentName,
                               &gEfiComponentName2ProtocolGuid, ComponentName2,
@@ -1040,19 +1047,10 @@ EfiLibInstallAllDriverProtocols2 (
     }
   }
 
-
   //
   // ASSERT if the call to InstallMultipleProtocolInterfaces() failed
   //
   ASSERT_EFI_ERROR (Status);
 
-  //
-  // Update the ImageHandle and DriverBindingHandle fields of the Driver Binding Protocol
-  //
-  DriverBinding->ImageHandle         = ImageHandle;
-  DriverBinding->DriverBindingHandle = DriverBindingHandle;
-
   return Status;
 }
-
-

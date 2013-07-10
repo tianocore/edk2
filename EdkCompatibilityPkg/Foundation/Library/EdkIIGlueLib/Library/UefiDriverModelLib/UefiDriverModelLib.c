@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -40,23 +40,26 @@ UefiDriverModelLibConstructor (
   )
 {
   EFI_STATUS                   Status = EFI_UNSUPPORTED;
-  EFI_HANDLE                   DriverBindingHandle;
   EFI_DRIVER_BINDING_PROTOCOL  *DriverBinding;
 
   //
+  // The Driver Binding Protocol must never be NULL
+  //
+  DriverBinding = (EFI_DRIVER_BINDING_PROTOCOL *) _gDriverModelProtocolList[0].DriverBinding;
+  ASSERT(DriverBinding != NULL);
+
+  //
+  // Update the ImageHandle and DriverBindingHandle fields of the Driver Binding Protocol
   // Install the first Driver Bindng Protocol onto ImageHandle
   //
-  DriverBindingHandle = ImageHandle;
+  DriverBinding->ImageHandle         = ImageHandle;
+  DriverBinding->DriverBindingHandle = ImageHandle;
 
   //
   // See if onle one Driver Binding Protocol is advertised by the driver
   // EdkIIGlueLib: _gDriverModelProtocolListEntries is always 1
   //
 
-  //
-  // The Driver Binding Protocol must never be NULL
-  //
-  ASSERT(_gDriverModelProtocolList[0].DriverBinding != NULL);
 
   //
   // Check for all 8 possible combinations of the ComponentName, DriverConfiguration, and DriverDiagnostics Protocol
@@ -68,14 +71,14 @@ UefiDriverModelLibConstructor (
       if (_gDriverModelProtocolList[0].DriverConfiguration == NULL) {
         if (_gDriverModelProtocolList[0].ComponentName == NULL) {
           Status = gBS->InstallMultipleProtocolInterfaces (
-                          &DriverBindingHandle,
-                          &gEfiDriverBindingProtocolGuid, (EFI_DRIVER_BINDING_PROTOCOL *)_gDriverModelProtocolList[0].DriverBinding,
+                          &DriverBinding->DriverBindingHandle,
+                          &gEfiDriverBindingProtocolGuid, DriverBinding,
                           NULL
                           );
         } else {
           Status = gBS->InstallMultipleProtocolInterfaces (
-                          &DriverBindingHandle,
-                          &gEfiDriverBindingProtocolGuid, (EFI_DRIVER_BINDING_PROTOCOL *)_gDriverModelProtocolList[0].DriverBinding,
+                          &DriverBinding->DriverBindingHandle,
+                          &gEfiDriverBindingProtocolGuid, DriverBinding,
                           &gEfiComponentNameProtocolGuid, (EFI_COMPONENT_NAME_PROTOCOL *)_gDriverModelProtocolList[0].ComponentName,
                           NULL
                           );
@@ -83,15 +86,15 @@ UefiDriverModelLibConstructor (
       } else {
         if (_gDriverModelProtocolList[0].ComponentName == NULL) {
           Status = gBS->InstallMultipleProtocolInterfaces (
-                          &DriverBindingHandle,
-                          &gEfiDriverBindingProtocolGuid,       (EFI_DRIVER_BINDING_PROTOCOL *)_gDriverModelProtocolList[0].DriverBinding,
+                          &DriverBinding->DriverBindingHandle,
+                          &gEfiDriverBindingProtocolGuid,       DriverBinding,
                           &gEfiDriverConfigurationProtocolGuid, (EFI_DRIVER_CONFIGURATION_PROTOCOL *)_gDriverModelProtocolList[0].DriverConfiguration,
                           NULL
                           );
         } else {
           Status = gBS->InstallMultipleProtocolInterfaces (
-                          &DriverBindingHandle,
-                          &gEfiDriverBindingProtocolGuid,       (EFI_DRIVER_BINDING_PROTOCOL *)_gDriverModelProtocolList[0].DriverBinding,
+                          &DriverBinding->DriverBindingHandle,
+                          &gEfiDriverBindingProtocolGuid,       DriverBinding,
                           &gEfiComponentNameProtocolGuid,       (EFI_COMPONENT_NAME_PROTOCOL *)_gDriverModelProtocolList[0].ComponentName,
                           &gEfiDriverConfigurationProtocolGuid, (EFI_DRIVER_CONFIGURATION_PROTOCOL *)_gDriverModelProtocolList[0].DriverConfiguration,
                           NULL
@@ -102,15 +105,15 @@ UefiDriverModelLibConstructor (
       if (_gDriverModelProtocolList[0].DriverConfiguration == NULL) {
         if (_gDriverModelProtocolList[0].ComponentName == NULL) {
           Status = gBS->InstallMultipleProtocolInterfaces (
-                          &DriverBindingHandle,
-                          &gEfiDriverBindingProtocolGuid,     (EFI_DRIVER_BINDING_PROTOCOL *)_gDriverModelProtocolList[0].DriverBinding,
+                          &DriverBinding->DriverBindingHandle,
+                          &gEfiDriverBindingProtocolGuid,     DriverBinding,
                           &gEfiDriverDiagnosticsProtocolGuid, (EFI_DRIVER_DIAGNOSTICS_PROTOCOL *)_gDriverModelProtocolList[0].DriverDiagnostics,
                           NULL
                           );
         } else {
           Status = gBS->InstallMultipleProtocolInterfaces (
-                          &DriverBindingHandle,
-                          &gEfiDriverBindingProtocolGuid,     (EFI_DRIVER_BINDING_PROTOCOL *)_gDriverModelProtocolList[0].DriverBinding,
+                          &DriverBinding->DriverBindingHandle,
+                          &gEfiDriverBindingProtocolGuid,     DriverBinding,
                           &gEfiComponentNameProtocolGuid,     (EFI_COMPONENT_NAME_PROTOCOL *)_gDriverModelProtocolList[0].ComponentName,
                           &gEfiDriverDiagnosticsProtocolGuid, (EFI_DRIVER_DIAGNOSTICS_PROTOCOL *)_gDriverModelProtocolList[0].DriverDiagnostics,
                           NULL
@@ -119,16 +122,16 @@ UefiDriverModelLibConstructor (
       } else {
         if (_gDriverModelProtocolList[0].ComponentName == NULL) {
           Status = gBS->InstallMultipleProtocolInterfaces (
-                          &DriverBindingHandle,
-                          &gEfiDriverBindingProtocolGuid,       (EFI_DRIVER_BINDING_PROTOCOL *)_gDriverModelProtocolList[0].DriverBinding,
+                          &DriverBinding->DriverBindingHandle,
+                          &gEfiDriverBindingProtocolGuid,       DriverBinding,
                           &gEfiDriverConfigurationProtocolGuid, (EFI_DRIVER_CONFIGURATION_PROTOCOL *)_gDriverModelProtocolList[0].DriverConfiguration,
                           &gEfiDriverDiagnosticsProtocolGuid,   (EFI_DRIVER_DIAGNOSTICS_PROTOCOL *)_gDriverModelProtocolList[0].DriverDiagnostics,
                           NULL
                           );
         } else {
           Status = gBS->InstallMultipleProtocolInterfaces (
-                          &DriverBindingHandle,
-                          &gEfiDriverBindingProtocolGuid,       (EFI_DRIVER_BINDING_PROTOCOL *)_gDriverModelProtocolList[0].DriverBinding,
+                          &DriverBinding->DriverBindingHandle,
+                          &gEfiDriverBindingProtocolGuid,       DriverBinding,
                           &gEfiComponentNameProtocolGuid,       (EFI_COMPONENT_NAME_PROTOCOL *)_gDriverModelProtocolList[0].ComponentName,
                           &gEfiDriverConfigurationProtocolGuid, (EFI_DRIVER_CONFIGURATION_PROTOCOL *)_gDriverModelProtocolList[0].DriverConfiguration,
                           &gEfiDriverDiagnosticsProtocolGuid,   (EFI_DRIVER_DIAGNOSTICS_PROTOCOL *)_gDriverModelProtocolList[0].DriverDiagnostics,
@@ -144,14 +147,14 @@ UefiDriverModelLibConstructor (
       if (_gDriverModelProtocolList[0].DriverConfiguration2== NULL) {
         if (_gDriverModelProtocolList[0].ComponentName2== NULL) {
           Status = gBS->InstallMultipleProtocolInterfaces (
-                          &DriverBindingHandle,
-                          &gEfiDriverBindingProtocolGuid, (EFI_DRIVER_BINDING_PROTOCOL *)_gDriverModelProtocolList[0].DriverBinding,
+                          &DriverBinding->DriverBindingHandle,
+                          &gEfiDriverBindingProtocolGuid, DriverBinding,
                           NULL
                           );
         } else {
           Status = gBS->InstallMultipleProtocolInterfaces (
-                          &DriverBindingHandle,
-                          &gEfiDriverBindingProtocolGuid,  (EFI_DRIVER_BINDING_PROTOCOL *)_gDriverModelProtocolList[0].DriverBinding,
+                          &DriverBinding->DriverBindingHandle,
+                          &gEfiDriverBindingProtocolGuid,  DriverBinding,
                           &gEfiComponentName2ProtocolGuid, (EFI_COMPONENT_NAME2_PROTOCOL *)_gDriverModelProtocolList[0].ComponentName2,
                           NULL
                           );
@@ -159,15 +162,15 @@ UefiDriverModelLibConstructor (
       } else {
         if (_gDriverModelProtocolList[0].ComponentName2 == NULL) {
           Status = gBS->InstallMultipleProtocolInterfaces (
-                          &DriverBindingHandle,
-                          &gEfiDriverBindingProtocolGuid,        (EFI_DRIVER_BINDING_PROTOCOL *)_gDriverModelProtocolList[0].DriverBinding,
+                          &DriverBinding->DriverBindingHandle,
+                          &gEfiDriverBindingProtocolGuid,        DriverBinding,
                           &gEfiDriverConfiguration2ProtocolGuid, (EFI_DRIVER_CONFIGURATION2_PROTOCOL *)_gDriverModelProtocolList[0].DriverConfiguration2,
                           NULL
                           );
         } else {
           Status = gBS->InstallMultipleProtocolInterfaces (
-                          &DriverBindingHandle,
-                          &gEfiDriverBindingProtocolGuid,        (EFI_DRIVER_BINDING_PROTOCOL *)_gDriverModelProtocolList[0].DriverBinding,
+                          &DriverBinding->DriverBindingHandle,
+                          &gEfiDriverBindingProtocolGuid,        DriverBinding,
                           &gEfiComponentName2ProtocolGuid,       (EFI_COMPONENT_NAME2_PROTOCOL *)_gDriverModelProtocolList[0].ComponentName2,
                           &gEfiDriverConfiguration2ProtocolGuid, (EFI_DRIVER_CONFIGURATION2_PROTOCOL *)_gDriverModelProtocolList[0].DriverConfiguration2,
                           NULL
@@ -178,15 +181,15 @@ UefiDriverModelLibConstructor (
       if (_gDriverModelProtocolList[0].DriverConfiguration2 == NULL) {
         if (_gDriverModelProtocolList[0].ComponentName2 == NULL) {
           Status = gBS->InstallMultipleProtocolInterfaces (
-                          &DriverBindingHandle,
-                          &gEfiDriverBindingProtocolGuid,      (EFI_DRIVER_BINDING_PROTOCOL *)_gDriverModelProtocolList[0].DriverBinding,
+                          &DriverBinding->DriverBindingHandle,
+                          &gEfiDriverBindingProtocolGuid,      DriverBinding,
                           &gEfiDriverDiagnostics2ProtocolGuid, (EFI_DRIVER_DIAGNOSTICS2_PROTOCOL *)_gDriverModelProtocolList[0].DriverDiagnostics2,
                           NULL
                           );
         } else {
           Status = gBS->InstallMultipleProtocolInterfaces (
-                          &DriverBindingHandle,
-                          &gEfiDriverBindingProtocolGuid,      (EFI_DRIVER_BINDING_PROTOCOL *)_gDriverModelProtocolList[0].DriverBinding,
+                          &DriverBinding->DriverBindingHandle,
+                          &gEfiDriverBindingProtocolGuid,      DriverBinding,
                           &gEfiComponentName2ProtocolGuid,     (EFI_COMPONENT_NAME2_PROTOCOL *)_gDriverModelProtocolList[0].ComponentName2,
                           &gEfiDriverDiagnostics2ProtocolGuid, (EFI_DRIVER_DIAGNOSTICS2_PROTOCOL *)_gDriverModelProtocolList[0].DriverDiagnostics2,
                           NULL
@@ -195,16 +198,16 @@ UefiDriverModelLibConstructor (
       } else {
         if (_gDriverModelProtocolList[0].ComponentName2 == NULL) {
           Status = gBS->InstallMultipleProtocolInterfaces (
-                          &DriverBindingHandle,
-                          &gEfiDriverBindingProtocolGuid,        (EFI_DRIVER_BINDING_PROTOCOL *)_gDriverModelProtocolList[0].DriverBinding,
+                          &DriverBinding->DriverBindingHandle,
+                          &gEfiDriverBindingProtocolGuid,        DriverBinding,
                           &gEfiDriverConfiguration2ProtocolGuid, (EFI_DRIVER_CONFIGURATION2_PROTOCOL *)_gDriverModelProtocolList[0].DriverConfiguration2,
                           &gEfiDriverDiagnostics2ProtocolGuid,   (EFI_DRIVER_DIAGNOSTICS2_PROTOCOL *)_gDriverModelProtocolList[0].DriverDiagnostics2,
                           NULL
                           );
         } else {
           Status = gBS->InstallMultipleProtocolInterfaces (
-                          &DriverBindingHandle,
-                          &gEfiDriverBindingProtocolGuid,        (EFI_DRIVER_BINDING_PROTOCOL *)_gDriverModelProtocolList[0].DriverBinding,
+                          &DriverBinding->DriverBindingHandle,
+                          &gEfiDriverBindingProtocolGuid,        DriverBinding,
                           &gEfiComponentName2ProtocolGuid,       (EFI_COMPONENT_NAME2_PROTOCOL *)_gDriverModelProtocolList[0].ComponentName2,
                           &gEfiDriverConfiguration2ProtocolGuid, (EFI_DRIVER_CONFIGURATION2_PROTOCOL *)_gDriverModelProtocolList[0].DriverConfiguration2,
                           &gEfiDriverDiagnostics2ProtocolGuid,   (EFI_DRIVER_DIAGNOSTICS2_PROTOCOL *)_gDriverModelProtocolList[0].DriverDiagnostics2,
@@ -219,16 +222,7 @@ UefiDriverModelLibConstructor (
   // ASSERT if the call to InstallMultipleProtocolInterfaces() failed
   //
   ASSERT_EFI_ERROR (Status);
-
-  //
-  // Update the ImageHandle and DriverBindingHandle fields of the Driver Binding Protocol
-  //
-  DriverBinding = (EFI_DRIVER_BINDING_PROTOCOL *)_gDriverModelProtocolList[0].DriverBinding;
-  DriverBinding->ImageHandle         = ImageHandle;
-  DriverBinding->DriverBindingHandle = DriverBindingHandle;
-
-  
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
