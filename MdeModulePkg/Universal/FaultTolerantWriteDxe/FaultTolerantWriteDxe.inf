@@ -47,6 +47,7 @@
   DebugLib
   UefiLib
   PcdLib
+  ReportStatusCodeLib
 
 [Guids]
   gEdkiiWorkingBlockSignatureGuid               ## CONSUMES ## FV Signature of Working Space Header

@@ -335,6 +335,7 @@ FtwNotificationEvent (
   UINT64                                  Length;
   EFI_PHYSICAL_ADDRESS                    VariableStoreBase;
   UINT64                                  VariableStoreLength;
+  UINTN                                   FtwMaxBlockSize;
 
   //
   // Ensure FTW protocol is installed.
@@ -343,7 +344,12 @@ FtwNotificationEvent (
   if (EFI_ERROR (Status)) {
     return ;
   }
-  
+
+  Status = FtwProtocol->GetMaxBlockSize (FtwProtocol, &FtwMaxBlockSize);
+  if (!EFI_ERROR (Status)) {
+    ASSERT (PcdGet32 (PcdFlashNvStorageVariableSize) <= FtwMaxBlockSize);
+  }
+
   //
   // Find the proper FVB protocol for variable.
   //

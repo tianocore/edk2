@@ -548,7 +548,7 @@
   ## The size of volatile buffer. This buffer is used to store VOLATILE attribute variable.
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x10000|UINT32|0x30000005
 
-  ## Size of the FTW spare block range. Note that this value should larger than PcdFlashNvStorageVariableSize
+  ## Size of the FTW spare block range. Note that this value should larger than PcdFlashNvStorageVariableSize and block size aligned.
   # The root cause is that variable driver will use FTW protocol to reclaim variable region.
   # If the length of variable region is larger than FTW spare size, it means the whole variable region can not
   # be reflushed through the manner of fault tolerant write.
@@ -679,7 +679,7 @@
   ## Base address of the NV variable range in flash device
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0x0|UINT32|0x30000001
 
-  ## Base address of the FTW spare block range in flash device.
+  ## Base address of the FTW spare block range in flash device. Note that this value should be block size aligned.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0x0|UINT32|0x30000013
 
   ## Base address of the FTW working block range in flash device.
@@ -688,7 +688,7 @@
   ## 64-bit Base address of the NV variable range in flash device
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0x0|UINT64|0x80000001
 
-  ## 64-bit Base address of the FTW spare block range in flash device.
+  ## 64-bit Base address of the FTW spare block range in flash device. Note that this value should be block size aligned.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0x0|UINT64|0x80000013
 
   ## 64-bit Base address of the FTW working block range in flash device.

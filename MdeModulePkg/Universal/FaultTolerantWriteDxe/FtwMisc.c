@@ -1111,6 +1111,20 @@ FindFvbForFtw (
               ASSERT (FALSE);
               return EFI_ABORTED;
             }
+            //
+            // Check the alignment of spare area address and length, they should be block size aligned
+            //
+            if (((FtwDevice->SpareAreaAddress & (FtwDevice->BlockSize - 1)) != 0) ||
+                ((FtwDevice->SpareAreaLength & (FtwDevice->BlockSize - 1)) != 0)) {
+              DEBUG ((EFI_D_ERROR, "Ftw: Spare area address or length is not block size aligned\n"));
+              FreePool (HandleBuffer);
+              //
+              // Report Status Code EFI_SW_EC_ABORTED.
+              //
+              REPORT_STATUS_CODE (  (EFI_ERROR_CODE | EFI_ERROR_UNRECOVERED), (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_EC_ABORTED));
+              ASSERT (FALSE);
+              CpuDeadLoop ();
+            }
             break;
           }
         }
@@ -1118,12 +1132,12 @@ FindFvbForFtw (
     }
   }
   FreePool (HandleBuffer);
- 
+
   if ((FtwDevice->FtwBackupFvb == NULL) || (FtwDevice->FtwFvBlock == NULL) ||
     (FtwDevice->FtwWorkSpaceLba == (EFI_LBA) (-1)) || (FtwDevice->FtwSpareLba == (EFI_LBA) (-1))) {
     return EFI_ABORTED;
   }
-    
+
   return EFI_SUCCESS;
 }
 
