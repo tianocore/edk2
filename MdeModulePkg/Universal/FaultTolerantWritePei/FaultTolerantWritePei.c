@@ -254,23 +254,26 @@ PeimFaultTolerantWriteInitialize (
                  );
     }
 
-    if (!EFI_ERROR (Status) && ((FtwLastWriteRecord->SpareComplete == FTW_VALID_STATE) && (FtwLastWriteRecord->DestinationComplete != FTW_VALID_STATE))) {
-      //
-      // If FTW last write was still in progress with SpareComplete set and DestinationComplete not set.
-      // It means the target buffer has been backed up in spare block, then target block has been erased,
-      // but the target buffer has not been writen in target block from spare block, we need to build
-      // FAULT_TOLERANT_WRITE_LAST_WRITE_DATA GUID hob to hold the FTW last write data.
-      //
-      FtwLastWrite.TargetAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) ((INT64) SpareAreaAddress + FtwLastWriteRecord->RelativeOffset);
-      FtwLastWrite.SpareAddress = SpareAreaAddress;
-      FtwLastWrite.Length = SpareAreaLength;
-      DEBUG ((
-        EFI_D_INFO,
-        "FtwPei last write data: TargetAddress - 0x%x SpareAddress - 0x%x Length - 0x%x\n",
-        (UINTN) FtwLastWrite.TargetAddress,
-        (UINTN) FtwLastWrite.SpareAddress,
-        (UINTN) FtwLastWrite.Length));
-      BuildGuidDataHob (&gEdkiiFaultTolerantWriteGuid, (VOID *) &FtwLastWrite, sizeof (FAULT_TOLERANT_WRITE_LAST_WRITE_DATA));
+    if (!EFI_ERROR (Status)) {
+      ASSERT (FtwLastWriteRecord != NULL);
+      if ((FtwLastWriteRecord->SpareComplete == FTW_VALID_STATE) && (FtwLastWriteRecord->DestinationComplete != FTW_VALID_STATE)) {
+        //
+        // If FTW last write was still in progress with SpareComplete set and DestinationComplete not set.
+        // It means the target buffer has been backed up in spare block, then target block has been erased,
+        // but the target buffer has not been writen in target block from spare block, we need to build
+        // FAULT_TOLERANT_WRITE_LAST_WRITE_DATA GUID hob to hold the FTW last write data.
+        //
+        FtwLastWrite.TargetAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) ((INT64) SpareAreaAddress + FtwLastWriteRecord->RelativeOffset);
+        FtwLastWrite.SpareAddress = SpareAreaAddress;
+        FtwLastWrite.Length = SpareAreaLength;
+        DEBUG ((
+          EFI_D_INFO,
+          "FtwPei last write data: TargetAddress - 0x%x SpareAddress - 0x%x Length - 0x%x\n",
+          (UINTN) FtwLastWrite.TargetAddress,
+          (UINTN) FtwLastWrite.SpareAddress,
+          (UINTN) FtwLastWrite.Length));
+        BuildGuidDataHob (&gEdkiiFaultTolerantWriteGuid, (VOID *) &FtwLastWrite, sizeof (FAULT_TOLERANT_WRITE_LAST_WRITE_DATA));
+      }
     }
   } else {
     FtwWorkingBlockHeader = NULL;
