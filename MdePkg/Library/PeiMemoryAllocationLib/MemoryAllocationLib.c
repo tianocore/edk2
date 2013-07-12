@@ -2,7 +2,7 @@
   Support routines for memory allocation routines 
   based on PeiService for PEI phase drivers.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -21,6 +21,7 @@
 #include <Library/PeiServicesLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/HobLib.h>
 
 
 /**
@@ -44,15 +45,43 @@ InternalAllocatePages (
 {
   EFI_STATUS            Status;
   EFI_PHYSICAL_ADDRESS  Memory; 
+  EFI_MEMORY_TYPE       RequestType;
+  EFI_PEI_HOB_POINTERS  Hob;
 
   if (Pages == 0) {
     return NULL;
   }
 
-  Status = PeiServicesAllocatePages (MemoryType, Pages, &Memory);
+  RequestType = MemoryType;
+  if (MemoryType == EfiReservedMemoryType) {
+    //
+    // PEI AllocatePages() doesn't support EfiReservedMemoryType. 
+    // Change RequestType to EfiBootServicesData for memory allocation.
+    //
+    RequestType = EfiBootServicesData;
+  }
+
+  Status = PeiServicesAllocatePages (RequestType, Pages, &Memory);
   if (EFI_ERROR (Status)) {
     return NULL;
   }
+  
+  if (MemoryType == EfiReservedMemoryType) {
+    //
+    // Memory type needs to be updated to EfiReservedMemoryType. Per PI spec Volume 1, 
+    // PEI AllocatePages() will automate the creation of the Memory Allocation HOB types. 
+    // Search Memory Allocation HOB and find the matched memory region,
+    // then change its memory type to EfiReservedMemoryType.
+    //
+    Hob.Raw = GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION);
+    while (Hob.Raw != NULL && Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress != Memory) {
+      Hob.Raw = GET_NEXT_HOB (Hob);
+      Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw);
+    }
+    ASSERT (Hob.Raw != NULL);
+    Hob.MemoryAllocation->AllocDescriptor.MemoryType = EfiReservedMemoryType;
+  }
+
   return (VOID *) (UINTN) Memory;
 }
 
