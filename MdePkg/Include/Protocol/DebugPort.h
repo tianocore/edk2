@@ -4,7 +4,7 @@
   This protocol is used by debug agent to communicate with the
   remote debug host.
   
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -128,13 +128,15 @@ struct _EFI_DEBUGPORT_PROTOCOL {
 //
 #define EFI_DEBUGPORT_VARIABLE_NAME L"DEBUGPORT"
 #define EFI_DEBUGPORT_VARIABLE_GUID EFI_DEBUGPORT_PROTOCOL_GUID
-#define gEfiDebugPortVariableGuid   gEfiDebugPortProtocolGuid
+
+extern EFI_GUID  gEfiDebugPortVariableGuid;
 
 //
 // DebugPort device path definitions...
 //
 #define DEVICE_PATH_MESSAGING_DEBUGPORT EFI_DEBUGPORT_PROTOCOL_GUID
-#define gEfiDebugPortDevicePathGuid     gEfiDebugPortProtocolGuid
+
+extern EFI_GUID  gEfiDebugPortDevicePathGuid;
 
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL  Header;

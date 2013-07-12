@@ -1,7 +1,7 @@
 /** @file
   Processor or Compiler specific defines and types for IA-32 architecture.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -225,6 +225,12 @@ typedef INT32   INTN;
 /// Maximum legal IA-32 address.
 ///
 #define MAX_ADDRESS   0xFFFFFFFF
+
+///
+/// Maximum legal IA-32 INTN and UINTN values.
+///
+#define MAX_INTN   ((INTN)0x7FFFFFFF)
+#define MAX_UINTN  ((UINTN)0xFFFFFFFF)
 
 ///
 /// The stack alignment required for IA-32.

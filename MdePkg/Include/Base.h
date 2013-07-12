@@ -6,7 +6,7 @@
   environment. There are a set of base libraries in the Mde Package that can
   be used to implement base modules.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -206,6 +206,17 @@ struct _LIST_ENTRY {
 ///
 #define NULL  ((VOID *) 0)
 
+///
+/// Maximum values for common UEFI Data Types
+///
+#define MAX_INT8    ((INT8)0x7F)
+#define MAX_UINT8   ((UINT8)0xFF)
+#define MAX_INT16   ((INT16)0x7FFF)
+#define MAX_UINT16  ((UINT16)0xFFFF)
+#define MAX_INT32   ((INT32)0x7FFFFFFF)
+#define MAX_UINT32  ((UINT32)0xFFFFFFFF)
+#define MAX_INT64   ((INT64)0x7FFFFFFFFFFFFFFFULL)
+#define MAX_UINT64  ((UINT64)0xFFFFFFFFFFFFFFFFULL)
 
 #define  BIT0     0x00000001
 #define  BIT1     0x00000002
