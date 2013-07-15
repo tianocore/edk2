@@ -1,5 +1,5 @@
 /** @file
-  UncachedMemoryAllocation lib that uses DXE CPU driver to chnage cachability for
+  UncachedMemoryAllocation lib that uses DXE Service to change cachability for
   a buffer.
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
@@ -41,8 +41,6 @@ UncachedInternalAllocateAlignedPages (
   );
   
   
-
-EFI_CPU_ARCH_PROTOCOL           *gDebugUncachedCpu;
 
 //
 // Assume all of memory has the same cache attributes, unless we do our magic
@@ -265,7 +263,7 @@ UncachedFreeAlignedPages (
   ASSERT (Pages != 0);
   
   Memory = (EFI_PHYSICAL_ADDRESS) (UINTN) Buffer;
-  Status = gDebugUncachedCpu->SetMemoryAttributes (gDebugUncachedCpu, Memory, EFI_PAGES_TO_SIZE (Pages), gAttributes);
+  Status = gDS->SetMemorySpaceAttributes (Memory, EFI_PAGES_TO_SIZE (Pages), gAttributes);
   
   Status = gBS->FreePages (Memory, Pages);
   ASSERT_EFI_ERROR (Status);
@@ -591,36 +589,4 @@ UncachedSafeFreePool (
     Buffer = NULL;
   }
 }
-
-/**
-  The constructor function caches the pointer of DXE Services Table.
-
-  The constructor function caches the pointer of DXE Services Table.
-  It will ASSERT() if that operation fails.
-  It will ASSERT() if the pointer of DXE Services Table is NULL.
-  It will always return EFI_SUCCESS.
-
-  @param  ImageHandle   The firmware allocated handle for the EFI image.
-  @param  SystemTable   A pointer to the EFI System Table.
-
-  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
-
-**/
-EFI_STATUS
-EFIAPI
-UncachedMemoryAllocationLibConstructor (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
-  )
-{
-  EFI_STATUS    Status;
-  
-  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&gDebugUncachedCpu);
-  ASSERT_EFI_ERROR(Status);
-
-
-  return Status;
-}
-
-
 

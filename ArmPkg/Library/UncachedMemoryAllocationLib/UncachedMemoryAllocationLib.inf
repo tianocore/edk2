@@ -1,5 +1,7 @@
 #/** @file
-# Semihosting  serail port lib
+#
+#  UncachedMemoryAllocation lib that uses DXE Service to change cachability for
+#  a buffer.
 #
 # Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
 #
@@ -20,7 +22,6 @@
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = UncachedMemoryAllocationLib
-  CONSTRUCTOR                    = UncachedMemoryAllocationLibConstructor
 
 [Sources.common]
   UncachedMemoryAllocationLib.c
@@ -29,14 +30,9 @@
   ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
 
-[Protocols]
-  gEfiCpuArchProtocolGuid
-
 [LibraryClasses]
   BaseLib
   ArmLib
   MemoryAllocationLib
   DxeServicesTableLib
 
-[Depex]
-  gEfiCpuArchProtocolGuid    
