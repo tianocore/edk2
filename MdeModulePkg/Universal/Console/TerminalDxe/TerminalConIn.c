@@ -1,7 +1,7 @@
 /** @file
   Implementation for EFI_SIMPLE_TEXT_INPUT_PROTOCOL protocol.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -293,6 +293,10 @@ TerminalConInSetState (
 {
   if (KeyToggleState == NULL) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  if ((*KeyToggleState & EFI_TOGGLE_STATE_VALID) != EFI_TOGGLE_STATE_VALID) {
+    return EFI_UNSUPPORTED;
   }
 
   return EFI_SUCCESS;
