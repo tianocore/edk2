@@ -349,15 +349,15 @@ SetupLinuxMemmap (
     if ((LastE820 != NULL) &&
         (LastE820->type == (UINT32) E820Type) &&
         (MemoryMap->PhysicalStart == LastEndAddr)) {
-      LastE820->size += EFI_PAGES_TO_SIZE (MemoryMap->NumberOfPages);
-      LastEndAddr += EFI_PAGES_TO_SIZE (MemoryMap->NumberOfPages);
+      LastE820->size += EFI_PAGES_TO_SIZE ((UINTN) MemoryMap->NumberOfPages);
+      LastEndAddr += EFI_PAGES_TO_SIZE ((UINTN) MemoryMap->NumberOfPages);
     } else {
       if (E820EntryCount >= (sizeof (Bp->e820_map) / sizeof (Bp->e820_map[0]))) {
         break;
       }
       E820->type = (UINT32) E820Type;
       E820->addr = MemoryMap->PhysicalStart;
-      E820->size = EFI_PAGES_TO_SIZE (MemoryMap->NumberOfPages);
+      E820->size = EFI_PAGES_TO_SIZE ((UINTN) MemoryMap->NumberOfPages);
       LastE820 = E820;
       LastEndAddr = E820->addr + E820->size;
       E820++;
