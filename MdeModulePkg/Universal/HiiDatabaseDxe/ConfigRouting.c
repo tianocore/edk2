@@ -1433,20 +1433,12 @@ ParseIfrData (
   CHAR16                   *VarStoreName;
   UINT16                   VarWidth;
   UINT16                   VarDefaultId;
-  EFI_STRING               GuidStr;
-  EFI_STRING               NameStr;
-  EFI_STRING               TempStr;
-  UINTN                    LengthString;
   BOOLEAN                  FirstOneOfOption;
   LIST_ENTRY               *LinkData;
   LIST_ENTRY               *LinkDefault;
   EFI_IFR_VARSTORE_NAME_VALUE *IfrNameValueVarStore;
 
-  LengthString     = 0;
   Status           = EFI_SUCCESS;
-  GuidStr          = NULL;
-  NameStr          = NULL;
-  TempStr          = NULL;
   BlockData        = NULL;
   DefaultDataPtr   = NULL;
   FirstOneOfOption = FALSE;
@@ -2875,7 +2867,6 @@ GetFullStringFromHiiFormPackages (
   EFI_STRING                   ConfigHdr;
   EFI_STRING                   StringPtr;
   EFI_STRING                   Progress;
-  BOOLEAN                      DataExist;
 
   if (DataBaseRecord == NULL || DevicePath == NULL || Request == NULL || AltCfgResp == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2891,7 +2882,6 @@ GetFullStringFromHiiFormPackages (
   ConfigHdr         = NULL;
   HiiFormPackage    = NULL;
   PackageSize       = 0;
-  DataExist         = FALSE;
   Progress          = *Request;
 
   Status = GetFormPackageData (DataBaseRecord, &HiiFormPackage, &PackageSize);

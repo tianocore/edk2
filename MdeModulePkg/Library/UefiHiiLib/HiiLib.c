@@ -1001,7 +1001,6 @@ ValidateQuestionFromVfr (
   )
 {
   IFR_BLOCK_DATA               VarBlockData;
-  UINT8                        *TmpBuffer;
   UINT16                       Offset;
   UINT16                       Width;
   UINT64                       VarValue;
@@ -1032,7 +1031,6 @@ ValidateQuestionFromVfr (
   Index             = 0;
   VarStoreName      = NULL;
   Status            = EFI_SUCCESS;
-  TmpBuffer         = NULL;
   VarValue          = 0;
   IfrVarStore       = NULL;
   IfrNameValueStore = NULL;
@@ -1586,16 +1584,12 @@ GetBlockDataInfo (
   LIST_ENTRY                   *Link;
   UINTN                        MaxBufferSize;
   EFI_STATUS                   Status;
-  CHAR8                        *VarStoreName;
-  UINTN                        Index;
   IFR_BLOCK_DATA               *BlockArray;
   UINT8                        *DataBuffer;
   
   //
   // Initialize the local variables.
   //
-  Index         = 0;
-  VarStoreName  = NULL;
   Status        = EFI_SUCCESS;
   BlockData     = NULL;
   NewBlockData  = NULL;
