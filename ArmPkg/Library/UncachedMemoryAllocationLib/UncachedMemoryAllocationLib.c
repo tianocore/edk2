@@ -25,8 +25,6 @@
 #include <Library/ArmLib.h>
 #include <Library/DxeServicesTableLib.h>
 
-#include <Protocol/Cpu.h>
-
 VOID *
 UncachedInternalAllocatePages (
   IN EFI_MEMORY_TYPE  MemoryType,  
