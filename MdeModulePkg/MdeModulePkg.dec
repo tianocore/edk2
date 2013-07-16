@@ -563,18 +563,12 @@
   ## FFS filename to find the capsule coalesce image.
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleCoalesceFile|{ 0xA6, 0xE4, 0xFD, 0xF7, 0x4C, 0x29, 0x3c, 0x49, 0xB5, 0x0F, 0x97, 0x34, 0x55, 0x3B, 0xB7, 0x57 }|VOID*|0x30000017
 
-  ## Single root I/O virtualization virtual function memory BAR alignment
-  #  BITN set indicates 2 of n+12 power
-  #  BIT0 set indicates 4KB alignment
-  #  BIT1 set indicates 8KB alignment
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize|0x1|UINT32|0x10000047
-  
   ## Flag of enabling/disabling the feature of Loading Module at Fixed Address 
   #  -1: Enable the feature as fixed offset to TOLM
   #   0: Disable the feature.
   #  Positive Value:  Enable the feature as fixed absolute address, and the value is the top memory address 
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable|0|UINT64|0x30001015
-  
+
   ## Smbios version
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0207|UINT16|0x00010055
 
@@ -704,6 +698,12 @@
 
   ## This PCD specifies whether the Single Root I/O virtualization support.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSupport|TRUE|BOOLEAN|0x10000044
+
+  ## Single root I/O virtualization virtual function memory BAR alignment
+  #  BITN set indicates 2 of n+12 power
+  #  BIT0 set indicates 4KB alignment
+  #  BIT1 set indicates 8KB alignment
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize|0x1|UINT32|0x10000047
 
   ## This PCD specifies whether the Alternative Routing-ID support.
   gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport|TRUE|BOOLEAN|0x10000045
