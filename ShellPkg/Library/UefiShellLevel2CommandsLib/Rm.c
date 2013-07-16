@@ -127,7 +127,7 @@ CascadeDelete(
           //
           TempName = AllocateZeroPool(StrSize(Node->FullName) + StrSize(Node2->FullName));
           if (TempName == NULL) {
-            ShellStatus = EFI_OUT_OF_RESOURCES;
+            ShellStatus = SHELL_OUT_OF_RESOURCES;
           } else {
             StrCpy(TempName, Node->FullName);
             TempName[StrStr(TempName, L":")+1-TempName] = CHAR_NULL;
