@@ -346,13 +346,6 @@ InterruptDxeInitialize (
   EFI_CPU_ARCH_PROTOCOL   *Cpu;
   UINT32                  CpuTarget;
   
-  // Check PcdGicPrimaryCoreId has been set in case the Primary Core is not the core 0 of Cluster 0
-  DEBUG_CODE_BEGIN();
-  if ((PcdGet32(PcdArmPrimaryCore) != 0) && (PcdGet32 (PcdGicPrimaryCoreId) == 0)) {
-    DEBUG((EFI_D_WARN,"Warning: the PCD PcdGicPrimaryCoreId does not seem to be set up for the configuration.\n"));
-  }
-  DEBUG_CODE_END();
-
   // Make sure the Interrupt Controller Protocol is not already installed in the system.
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gHardwareInterruptProtocolGuid);
 

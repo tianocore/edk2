@@ -122,7 +122,6 @@
   #  A7_1 = 0x101, GicCoreId = 3
   #  A7_2 = 0x102, GicCoreId = 4
   gArmTokenSpaceGuid.PcdArmPrimaryCore|0x100
-  gArmTokenSpaceGuid.PcdGicPrimaryCoreId|2
 !endif
   
   #

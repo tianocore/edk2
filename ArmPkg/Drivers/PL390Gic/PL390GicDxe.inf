@@ -51,7 +51,6 @@
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
   
   gArmTokenSpaceGuid.PcdArmPrimaryCore
-  gArmTokenSpaceGuid.PcdGicPrimaryCoreId
 
 [Depex]
   gEfiCpuArchProtocolGuid

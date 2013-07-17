@@ -110,13 +110,6 @@ PrimaryMain (
   UINTN                       TemporaryRamBase;
   UINTN                       TemporaryRamSize;
 
-  // Check PcdGicPrimaryCoreId has been set in case the Primary Core is not the core 0 of Cluster 0
-  DEBUG_CODE_BEGIN();
-  if ((PcdGet32(PcdArmPrimaryCore) != 0) && (PcdGet32 (PcdGicPrimaryCoreId) == 0)) {
-    DEBUG((EFI_D_WARN,"Warning: the PCD PcdGicPrimaryCoreId does not seem to be set up for the configuration.\n"));
-  }
-  DEBUG_CODE_END();
-
   CreatePpiList (&PpiListSize, &PpiList);
 
   // Enable the GIC Distributor
