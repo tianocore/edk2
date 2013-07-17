@@ -371,11 +371,26 @@ InterruptDxeInitialize (
       );
   }
 
-  // Configure interrupts for Primary Cpu
-  CpuTarget = (1 << PcdGet32 (PcdGicPrimaryCoreId));
-  CpuTarget |= (CpuTarget << 24) | (CpuTarget << 16) | (CpuTarget << 8);
-  for (Index = 0; Index < (mGicNumInterrupts / 4); Index++) {
-    MmioWrite32 (PcdGet32(PcdGicDistributorBase) + ARM_GIC_ICDIPTR + (Index*4), CpuTarget);
+  //
+  // Targets the interrupts to the Primary Cpu
+  //
+
+  // Only Primary CPU will run this code. We can identify our GIC CPU ID by reading
+  // the GIC Distributor Target register. The 8 first GICD_ITARGETSRn are banked to each
+  // connected CPU. These 8 registers hold the CPU targets fields for interrupts 0-31.
+  // More Info in the GIC Specification about "Interrupt Processor Targets Registers"
+  //
+  // Read the first Interrupt Processor Targets Register (that corresponds to the 4
+  // first SGIs)
+  CpuTarget = MmioRead32 (PcdGet32 (PcdGicDistributorBase) + ARM_GIC_ICDIPTR);
+
+  // The CPU target is a bit field mapping each CPU to a GIC CPU Interface. This value
+  // cannot be 0.
+  ASSERT (CpuTarget != 0);
+
+  // The 8 first Interrupt Processor Targets Registers are read-only
+  for (Index = 8; Index < (mGicNumInterrupts / 4); Index++) {
+    MmioWrite32 (PcdGet32 (PcdGicDistributorBase) + ARM_GIC_ICDIPTR + (Index * 4), CpuTarget);
   }
 
   // Set binary point reg to 0x7 (no preemption)
