@@ -62,7 +62,6 @@ SecondaryMain (
   UINT32                  CoreId;
   VOID                    (*SecondaryStart)(VOID);
   UINTN                   SecondaryEntryAddr;
-  UINTN                   AcknowledgedCoreId;
 
   ClusterId = GET_CLUSTER_ID(MpId);
   CoreId    = GET_CORE_ID(MpId);
@@ -95,8 +94,8 @@ SecondaryMain (
     SecondaryEntryAddr = MmioRead32 (ArmCoreInfoTable[Index].MailboxGetAddress);
 
     // Acknowledge the interrupt and send End of Interrupt signal.
-    ArmGicAcknowledgeInterrupt (PcdGet32(PcdGicDistributorBase), PcdGet32(PcdGicInterruptInterfaceBase), &AcknowledgedCoreId, NULL);
-  } while ((SecondaryEntryAddr == 0) && (AcknowledgedCoreId != PcdGet32 (PcdGicPrimaryCoreId)));
+    ArmGicAcknowledgeInterrupt (PcdGet32(PcdGicDistributorBase), PcdGet32(PcdGicInterruptInterfaceBase), NULL, NULL);
+  } while (SecondaryEntryAddr == 0);
 
   // Jump to secondary core entry point.
   SecondaryStart = (VOID (*)())SecondaryEntryAddr;
