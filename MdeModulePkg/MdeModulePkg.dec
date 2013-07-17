@@ -699,12 +699,6 @@
   ## This PCD specifies whether the Single Root I/O virtualization support.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSupport|TRUE|BOOLEAN|0x10000044
 
-  ## Single root I/O virtualization virtual function memory BAR alignment
-  #  BITN set indicates 2 of n+12 power
-  #  BIT0 set indicates 4KB alignment
-  #  BIT1 set indicates 8KB alignment
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize|0x1|UINT32|0x10000047
-
   ## This PCD specifies whether the Alternative Routing-ID support.
   gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport|TRUE|BOOLEAN|0x10000045
 
@@ -712,6 +706,12 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport|FALSE|BOOLEAN|0x10000046
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+  ## Single root I/O virtualization virtual function memory BAR alignment
+  #  BITN set indicates 2 of n+12 power
+  #  BIT0 set indicates 4KB alignment
+  #  BIT1 set indicates 8KB alignment
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize|0x1|UINT32|0x10000047
+
   ## This PCD defines the times to print hello world string.
   #  This PCD is a sample to explain FixedAtBuild UINT32 PCD usage.
   gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintTimes|1|UINT32|0x40000005
