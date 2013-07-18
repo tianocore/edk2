@@ -38,13 +38,8 @@
   Arm/RTSMBoot.asm     | RVCT
   Arm/RTSMBoot.S       | GCC
 
-[FeaturePcd]
-  gEmbeddedTokenSpaceGuid.PcdCacheEnable
-  gArmPlatformTokenSpaceGuid.PcdNorFlashRemapping
-  gArmPlatformTokenSpaceGuid.PcdStandalone
+[Sources.AARCH64]
+  AArch64/RTSMBoot.S   | GCC
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFvBaseAddress
-
-  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
-  gArmTokenSpaceGuid.PcdArmPrimaryCore

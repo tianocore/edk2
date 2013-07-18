@@ -38,6 +38,9 @@
   Arm/RTSMHelper.asm    | RVCT
   Arm/RTSMHelper.S      | GCC
 
+[Sources.AARCH64]
+  AArch64/RTSMHelper.S  | GCC
+
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdCacheEnable
   gArmPlatformTokenSpaceGuid.PcdNorFlashRemapping
@@ -50,3 +53,5 @@
 
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
   gArmTokenSpaceGuid.PcdArmPrimaryCore
+
+  gArmPlatformTokenSpaceGuid.PcdCoreCount
