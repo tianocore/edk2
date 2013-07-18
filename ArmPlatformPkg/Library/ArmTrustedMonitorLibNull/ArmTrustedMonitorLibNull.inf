@@ -19,12 +19,13 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ArmTrustedMonitorLib
 
-[Sources.common]
-  ArmTrustedMonitorLibNull.c
-
 [Sources.ARM]
+  Arm/ArmTrustedMonitorLibNull.c
   Arm/MonitorTable.asm     | RVCT
   Arm/MonitorTable.S       | GCC
+
+[Sources.AARCH64]
+  AArch64/ArmTrustedMonitorLibNull.c
 
 [Packages]
   ArmPkg/ArmPkg.dec

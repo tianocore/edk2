@@ -24,8 +24,13 @@
   MainMPCore.c
 
 [Sources.ARM]
+  Arm/ArchPrePi.c
   Arm/ModuleEntryPoint.S   | GCC
   Arm/ModuleEntryPoint.asm | RVCT
+
+[Sources.AArch64]
+  AArch64/ArchPrePi.c
+  AArch64/ModuleEntryPoint.S   | GCC
   
 [Packages]
   MdePkg/MdePkg.dec

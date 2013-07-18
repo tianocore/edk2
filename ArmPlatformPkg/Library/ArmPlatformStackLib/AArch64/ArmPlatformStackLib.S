@@ -22,10 +22,11 @@ GCC_ASM_EXPORT(ArmPlatformStackSet)
 GCC_ASM_EXPORT(ArmPlatformStackSetPrimary)
 GCC_ASM_EXPORT(ArmPlatformStackSetSecondary)
 
+GCC_ASM_IMPORT(ArmPlatformIsPrimaryCore)
 GCC_ASM_IMPORT(ArmPlatformGetCorePosition)
+GCC_ASM_IMPORT(ArmPlatformGetPrimaryCoreMpId)
 
 GCC_ASM_IMPORT(gPcd_FixedAtBuild_PcdCoreCount)
-GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCore)
 
 //VOID
 //ArmPlatformStackSet (
@@ -35,16 +36,33 @@ GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCore)
 //  IN UINTN SecondaryStackSize
 //  );
 ASM_PFX(ArmPlatformStackSet):
+  // Save parameters
+  mov   x6, x3
+  mov   x5, x2
+  mov   x4, x1
+  mov   x3, x0
+
+  // Save the Link register
+  mov   x7, x30
+
   // Identify Stack
-  // Mask for ClusterId|CoreId
-  LoadConstantToReg (0xFFFF, r4)
-  and   r1, r1, r4
-  // Is it the Primary Core ?
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCore, r4)
-  ldr   r4, [r4]
-  cmp   r1, r4
-  beq   ASM_PFX(ArmPlatformStackSetPrimary)
-  bne   ASM_PFX(ArmPlatformStackSetSecondary)
+  mov   x0, x1
+  bl    ASM_PFX(ArmPlatformIsPrimaryCore)
+  cmp   x0, #1
+
+  // Restore parameters
+  mov   x0, x3
+  mov   x1, x4
+  mov   x2, x5
+  mov   x3, x6
+
+  // Restore the Link register
+  mov   x30, x7
+
+  // Should be ASM_PFX(ArmPlatformStackSetPrimary) but generate linker error 'unsupported ELF EM_AARCH64'
+  b.eq  ArmPlatformStackSetPrimaryL
+  // Should be ASM_PFX(ArmPlatformStackSetSecondary) but generate linker error 'unsupported ELF EM_AARCH64'
+  b.ne  ArmPlatformStackSetSecondaryL
 
 //VOID
 //ArmPlatformStackSetPrimary (
@@ -53,22 +71,24 @@ ASM_PFX(ArmPlatformStackSet):
 //  IN UINTN PrimaryStackSize,
 //  IN UINTN SecondaryStackSize
 //  );
+ArmPlatformStackSetPrimaryL:
 ASM_PFX(ArmPlatformStackSetPrimary):
-  mov   r4, lr
+  // Save the Link register
+  mov   x4, x30
 
   // Add stack of primary stack to StackBase
-  add   r0, r0, r2
+  add   x0, x0, x2
 
   // Compute SecondaryCoresCount * SecondaryCoreStackSize
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdCoreCount, r1)
-  ldr   r1, [r1]
-  sub   r1, #1
-  mul   r3, r3, r1
+  LoadConstantToReg (_gPcd_FixedAtBuild_PcdCoreCount, x1)
+  ldr   w1, [x1]
+  sub   x1, x1, #1
+  mul   x3, x3, x1
 
   // Set Primary Stack ((StackBase + PrimaryStackSize) + (SecondaryCoresCount * SecondaryCoreStackSize))
-  add   sp, r0, r3
+  add   sp, x0, x3
 
-  bx    r4
+  br    x4
 
 //VOID
 //ArmPlatformStackSetSecondary (
@@ -77,30 +97,33 @@ ASM_PFX(ArmPlatformStackSetPrimary):
 //  IN UINTN PrimaryStackSize,
 //  IN UINTN SecondaryStackSize
 //  );
+ArmPlatformStackSetSecondaryL:
 ASM_PFX(ArmPlatformStackSetSecondary):
-  mov   r4, lr
-  mov   sp, r0
+  // Save the Link register
+  mov   x4, x30
+  mov   sp, x0
 
   // Get Core Position
-  mov   r0, r1
+  mov   x0, x1
   bl    ASM_PFX(ArmPlatformGetCorePosition)
-  mov   r5, r0
+  mov   x5, x0
 
   // Get Primary Core Position
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCore, r0)
-  ldr   r0, [r0]
+  bl    ASM_PFX(ArmPlatformGetPrimaryCoreMpId)
   bl    ASM_PFX(ArmPlatformGetCorePosition)
 
   // Get Secondary Core Position. We should get consecutive secondary stack number from 1...(CoreCount-1)
-  cmp   r5, r0
-  subhi r5, r5, #1
-  add   r5, r5, #1
+  cmp   x5, x0
+  b.ls  1f
+  // Decrement the position if after the primary core
+  sub   x5, x5, #1
+1:
+  add   x5, x5, #1
 
   // Compute top of the secondary stack
-  mul   r3, r3, r5
+  mul   x3, x3, x5
 
   // Set stack
-  add   sp, sp, r3
+  add   sp, sp, x3
 
-  bx r4
-
+  br    x4

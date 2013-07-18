@@ -111,12 +111,8 @@ PrePiMain (
           ((FixedPcdGet32 (PcdFdBaseAddress) >= FixedPcdGet32 (PcdSystemMemoryBase)) &&
            ((UINT32)(FixedPcdGet32 (PcdFdBaseAddress) + FixedPcdGet32 (PcdFdSize)) <= (UINT32)(FixedPcdGet32 (PcdSystemMemoryBase) + FixedPcdGet32 (PcdSystemMemorySize)))));
 
-  // Enable program flow prediction, if supported.
-  ArmEnableBranchPrediction ();
-
-  if (FixedPcdGet32(PcdVFPEnabled)) {
-    ArmEnableVFP();
-  }
+  // Initialize the architecture specific bits
+  ArchInitialize ();
 
   // Initialize the Serial Port
   SerialPortInitialize ();

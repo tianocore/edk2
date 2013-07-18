@@ -1,6 +1,6 @@
 #/** @file
 #
-#  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 #  
 #  This program and the accompanying materials                          
 #  are licensed and made available under the terms and conditions of the BSD License         
@@ -62,10 +62,6 @@
   gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0|UINT32|0x00000005
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecPrimaryStackSize|0x10000|UINT32|0x00000036
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecSecondaryStackSize|0x1000|UINT32|0x00000006
-
-  # Stack for CPU Cores in Secure Monitor Mode
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase|0|UINT32|0x00000007
-  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize|0x1000|UINT32|0x00000008
 
   # Stack for CPU Cores in Non Secure Mode
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0|UINT32|0x00000009
@@ -142,4 +138,16 @@
   
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L""|VOID*|0x0000001B
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L""|VOID*|0x0000001C
-  
+
+[PcdsFixedAtBuild.ARM]
+  # Stack for CPU Cores in Secure Monitor Mode
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase|0|UINT32|0x00000007
+  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize|0x1000|UINT32|0x00000008
+
+[PcdsFixedAtBuild.AARCH64]
+  # The Secure World is only running in EL3. Only one set of stacks is needed for AArch64.
+  # The Secure stacks are described by PcdCPUCoresSecStackBase, PcdCPUCoreSecPrimaryStackSize
+  # and PcdCPUCoreSecSecondaryStackSize
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase|0|UINT32|0x00000007
+  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize|0x0|UINT32|0x00000008
+

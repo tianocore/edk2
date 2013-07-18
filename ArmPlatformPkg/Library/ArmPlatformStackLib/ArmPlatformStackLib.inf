@@ -30,6 +30,9 @@
   Arm/ArmPlatformStackLib.asm     | RVCT
   Arm/ArmPlatformStackLib.S       | GCC
 
+[Sources.AARCH64]
+  AArch64/ArmPlatformStackLib.S     | GCC
+
 [FixedPcd]
   gArmPlatformTokenSpaceGuid.PcdCoreCount
 

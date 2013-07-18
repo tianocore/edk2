@@ -81,4 +81,10 @@ GetPlatformPpi (
   OUT VOID      **Ppi
   );
 
+// Initialize the Architecture specific controllers
+VOID
+ArchInitialize (
+  VOID
+  );
+
 #endif /* _PREPI_H_ */
