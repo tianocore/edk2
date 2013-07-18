@@ -82,7 +82,11 @@ PciEnumerator (
   //
   // Notify the pci bus enumeration is about to begin
   //
-  NotifyPhase (PciResAlloc, EfiPciHostBridgeBeginEnumeration);
+  Status = NotifyPhase (PciResAlloc, EfiPciHostBridgeBeginEnumeration);
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
   // Start the bus allocation phase
@@ -105,7 +109,11 @@ PciEnumerator (
   //
   // Notify the pci bus enumeration is about to complete
   //
-  NotifyPhase (PciResAlloc, EfiPciHostBridgeEndEnumeration);
+  Status = NotifyPhase (PciResAlloc, EfiPciHostBridgeEndEnumeration);
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
   // Process P2C
