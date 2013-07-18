@@ -140,8 +140,53 @@ class EfiSectionPE32:
         if (base_of_code < base_of_data) and (base_of_code != 0):
             return base_of_code
         else:
-            return base_of_data       
+            return base_of_data
+
+class EfiSectionPE64:
+    def __init__(self, ec, base_pe64):
+        self.ec = ec
+        self.base_pe64 = base_pe64
+
+    def get_debug_filepath(self):
+        # Offset from dos hdr to PE file hdr (EFI_IMAGE_NT_HEADERS64)
+        #file_header_offset = self.ec.getMemoryService().readMemory32(self.base_pe64 + 0x3C)
+        file_header_offset = 0x0
+
+        # Offset to debug dir in PE hdrs
+        debug_dir_entry_rva = self.ec.getMemoryService().readMemory32(self.base_pe64 + file_header_offset + 0x138)
+        if debug_dir_entry_rva == 0:
+            raise Exception("EfiFileSectionPE64","No Debug Directory")
+
+        debug_type = self.ec.getMemoryService().readMemory32(self.base_pe64 + debug_dir_entry_rva + 0xC)
+        if (debug_type != 0xdf) and (debug_type != EfiFileSection.EFI_IMAGE_DEBUG_TYPE_CODEVIEW):
+            raise Exception("EfiFileSectionPE64","Debug type is not dwarf")
+        
+        
+        debug_rva = self.ec.getMemoryService().readMemory32(self.base_pe64 + debug_dir_entry_rva + 0x14)
+        
+        dwarf_sig = struct.unpack("cccc", self.ec.getMemoryService().read(str(self.base_pe64 + debug_rva), 4, 32))
+        if (dwarf_sig != 0x66727764) and (dwarf_sig != FirmwareFile.CONST_NB10_SIGNATURE):
+            raise Exception("EfiFileSectionPE64","Dwarf debug signature not found")
     
+        if dwarf_sig == 0x66727764:
+            filename = self.base_pe64 + debug_rva + 0xc
+        else:
+            filename = self.base_pe64 + debug_rva + 0x10
+        filename = struct.unpack("200s", self.ec.getMemoryService().read(str(filename), 200, 32))[0]
+        return filename[0:string.find(filename,'\0')]
+    
+    def get_debug_elfbase(self):
+        # Offset from dos hdr to PE file hdr
+        pe_file_header = self.base_pe64 + self.ec.getMemoryService().readMemory32(self.base_pe64 + 0x3C)
+        
+        base_of_code = self.base_pe64 + self.ec.getMemoryService().readMemory32(pe_file_header + 0x28)
+        base_of_data = self.base_pe64 + self.ec.getMemoryService().readMemory32(pe_file_header + 0x2C)
+        
+        if (base_of_code < base_of_data) and (base_of_code != 0):
+            return base_of_code
+        else:
+            return base_of_data
+        
 class FirmwareFile:
     EFI_FV_FILETYPE_RAW                   = 0x01
     EFI_FV_FILETYPE_FREEFORM              = 0x02
@@ -287,7 +332,6 @@ class FirmwareVolume:
                 except Exception, (ErrorClass, ErrorMessage):
                     if verbose:
                         print "Error while loading a symbol file (%s: %s)" % (ErrorClass, ErrorMessage)
-                    pass
 
                 return debug_info
 
@@ -308,5 +352,4 @@ class FirmwareVolume:
             except Exception, (ErrorClass, ErrorMessage):
                 if verbose:
                     print "Error while loading a symbol file (%s: %s)" % (ErrorClass, ErrorMessage)
-                pass
 

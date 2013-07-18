@@ -66,7 +66,15 @@ def load_symbol_from_file(ec, filename, address, verbose = False):
             ec.getImageService().addSymbols(filename, address)
         except:
             print "Warning: not possible to load symbols from %s at 0x%x" % (filename, address)
-            pass
+
+def is_aarch64(ec):
+    success = True
+    try:
+        # Try to access a Aarch64 specific register
+        ec.getRegisterService().getValue('X0')
+    except:
+        success = False
+    return success
 
 class ArmPlatform:
     def __init__(self, sysmembase=None, sysmemsize=None, fvs={}):
@@ -189,8 +197,11 @@ class ArmPlatformDebugger:
                     if (pc >= debug_info[0]) and (pc < debug_info[0] + debug_info[1]):
                         found = True
                 if found == False:
-                    info = self.debug_info_table.load_symbols_at(pc)
-                    debug_infos.append(info)
+                    try:
+                        info = self.debug_info_table.load_symbols_at(pc)
+                        debug_infos.append(info)
+                    except:
+                        pass
                 
             #self.debug_info_table.load_symbols_at(pc)
         else:
@@ -218,4 +229,3 @@ class ArmPlatformDebugger:
         except:
             # Debugger exception could be excepted if DRAM has not been initialized or if we have not started to run from DRAM yet
             print "Note: no symbols have been found in System Memory (possible cause: the UEFI permanent memory has been installed yet)"
-            pass
