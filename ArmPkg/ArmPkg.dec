@@ -190,3 +190,9 @@
   # Other modes include using SP0 or switching to Aarch32, but these are
   # not currently supported.
   gArmTokenSpaceGuid.PcdArmNonSecModeTransition|0x3c9|UINT32|0x0000003E
+  # If the fixed FDT address is not available, then it should be loaded above the kernel.
+  # The recommendation from the AArch64 Linux kernel is to have the FDT below 512MB.
+  # (see the kernel doc: Documentation/arm64/booting.txt)
+  gArmTokenSpaceGuid.PcdArmLinuxFdtMaxOffset|0x20000000|UINT32|0x00000023
+  # The FDT blob must be loaded at a 2MB aligned address.
+  gArmTokenSpaceGuid.PcdArmLinuxFdtAlignment|0x00200000|UINT32|0x00000026

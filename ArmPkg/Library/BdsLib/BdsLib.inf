@@ -31,6 +31,10 @@
   Arm/BdsLinuxLoader.c
   Arm/BdsLinuxAtag.c
 
+[Sources.AARCH64]
+  AArch64/BdsLinuxLoader.c
+  AArch64/BdsLinuxLoaderHelper.S  | GCC
+
 [Packages]
   MdePkg/MdePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
@@ -48,6 +52,9 @@
   SerialPortLib
   FdtLib
   TimerLib
+
+[LibraryClasses.AARCH64]
+  ArmGicLib
 
 [Guids]
   gEfiFileInfoGuid
@@ -81,6 +88,10 @@
 
 [FixedPcd.ARM]
   gArmTokenSpaceGuid.PcdArmLinuxAtagMaxOffset
+
+[FixedPcd.AARCH64]
+  gArmTokenSpaceGuid.PcdGicDistributorBase
+  gArmTokenSpaceGuid.PcdGicSgiIntId
 
 [Depex]
   TRUE

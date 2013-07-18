@@ -129,7 +129,6 @@
 
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
 
-  ArmPkg/Application/LinuxLoader/LinuxAtagLoader.inf
   ArmPkg/Application/LinuxLoader/LinuxFdtLoader.inf
 
 [Components.ARM]
@@ -145,6 +144,8 @@
 #  ArmPkg/Library/ArmLib/Arm9/Arm9ArmLibPrePi.inf
   ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
   ArmPkg/Library/ArmLib/ArmV7/ArmV7LibPrePi.inf
+
+  ArmPkg/Application/LinuxLoader/LinuxAtagLoader.inf
 
 [Components.AARCH64]
   ArmPkg/Drivers/ArmCpuLib/ArmCortexAEMv8Lib/ArmCortexAEMv8Lib.inf
