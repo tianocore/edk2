@@ -46,6 +46,10 @@
   ArmV6/ExceptionSupport.asm | RVCT
   ArmV6/ExceptionSupport.S   | GCC
 
+[Sources.AARCH64]
+  AArch64/Mmu.c
+  AArch64/Exception.c
+  AArch64/ExceptionSupport.S   | GCC
 
 [Packages]
   ArmPkg/ArmPkg.dec

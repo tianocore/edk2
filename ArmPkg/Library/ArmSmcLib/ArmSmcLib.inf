@@ -23,6 +23,9 @@
   Arm/ArmSmc.asm    | RVCT
   Arm/ArmSmc.S      | GCC
 
+[Sources.AARCH64]
+  AArch64/ArmSmc.S    | GCC
+
 [Packages]
   MdePkg/MdePkg.dec
   ArmPkg/ArmPkg.dec

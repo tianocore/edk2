@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -12,8 +12,8 @@
 *
 **/
 
-#ifndef __ARMV7_ARCH_TIMER_H_
-#define __ARMV7_ARCH_TIMER_H_
+#ifndef __ARM_ARCH_TIMER_H_
+#define __ARM_ARCH_TIMER_H_
 
 UINTN
 EFIAPI
@@ -135,4 +135,5 @@ ArmWriteCntvOff (
   UINT64   Val
   );
 
-#endif
+#endif // __ARM_ARCH_TIMER_H_
+

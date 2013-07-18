@@ -1,0 +1,48 @@
+#/** @file
+#
+#  Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+#  Portions copyright (c) 2011-2013, ARM Ltd. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AArch64LibPrePi
+  FILE_GUID                      = fd72688d-dbd8-4cf2-91a3-15171dea7816
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmLib
+
+[Sources.common]
+  ArmLibSupportV8.S                   | GCC
+  AArch64Support.S                    | GCC
+
+  ../Common/AArch64/ArmLibSupport.S   | GCC
+  ../Common/ArmLib.c
+
+  AArch64Lib.c
+  AArch64Mmu.c
+
+  AArch64ArchTimer.c
+  AArch64ArchTimerSupport.S           | GCC
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  PrePiLib
+
+[Protocols]
+  gEfiCpuArchProtocolGuid
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdArmCacheOperationThreshold

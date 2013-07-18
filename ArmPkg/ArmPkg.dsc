@@ -25,7 +25,7 @@
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/Arm
-  SUPPORTED_ARCHITECTURES        = ARM
+  SUPPORTED_ARCHITECTURES        = ARM|AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -61,8 +61,8 @@
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   DefaultExceptionHandlerLib|ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
 
-  ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
   CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
+  ArmGicLib|ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
   ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
   ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
   DmaLib|ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
@@ -75,6 +75,12 @@
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
   
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+
+[LibraryClasses.ARM]
+  ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
+
+[LibraryClasses.AARCH64]
+  ArmLib|ArmPkg/Library/ArmLib/AArch64/AArch64Lib.inf
 
 [LibraryClasses.common.PEIM]
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
@@ -89,20 +95,15 @@
 [LibraryClasses.ARM]
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
+[LibraryClasses.AARCH64]
+  NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
+
 [Components.common]
   ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
   ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
   ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
-#  ArmPkg/Library/ArmLib/Arm11/Arm11ArmLib.inf
-#  ArmPkg/Library/ArmLib/Arm11/Arm11ArmLibPrePi.inf
-#  ArmPkg/Library/ArmLib/Arm9/Arm9ArmLib.inf
-#  ArmPkg/Library/ArmLib/Arm9/Arm9ArmLibPrePi.inf
-  ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
-  ArmPkg/Library/ArmLib/ArmV7/ArmV7LibPrePi.inf
-  ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
   ArmPkg/Library/ArmLib/Null/NullArmLib.inf
   ArmPkg/Library/BaseMemoryLibStm/BaseMemoryLibStm.inf
-  ArmPkg/Library/BaseMemoryLibVstm/BaseMemoryLibVstm.inf
   ArmPkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   ArmPkg/Library/BdsLib/BdsLib.inf
   ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
@@ -116,9 +117,6 @@
   ArmPkg/Library/SemihostLib/SemihostLib.inf
   ArmPkg/Library/UncachedMemoryAllocationLib/UncachedMemoryAllocationLib.inf
 
-  ArmPkg/Drivers/ArmCpuLib/ArmCortexA8Lib/ArmCortexA8Lib.inf
-  ArmPkg/Drivers/ArmCpuLib/ArmCortexA9Lib/ArmCortexA9Lib.inf
-  ArmPkg/Drivers/ArmCpuLib/ArmCortexA15Lib/ArmCortexA15Lib.inf
   ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   ArmPkg/Drivers/CpuPei/CpuPei.inf
   ArmPkg/Drivers/PL390Gic/PL390GicDxe.inf
@@ -133,3 +131,24 @@
 
   ArmPkg/Application/LinuxLoader/LinuxAtagLoader.inf
   ArmPkg/Application/LinuxLoader/LinuxFdtLoader.inf
+
+[Components.ARM]
+  ArmPkg/Library/BaseMemoryLibVstm/BaseMemoryLibVstm.inf
+
+  ArmPkg/Drivers/ArmCpuLib/ArmCortexA8Lib/ArmCortexA8Lib.inf
+  ArmPkg/Drivers/ArmCpuLib/ArmCortexA9Lib/ArmCortexA9Lib.inf
+  ArmPkg/Drivers/ArmCpuLib/ArmCortexA15Lib/ArmCortexA15Lib.inf
+
+#  ArmPkg/Library/ArmLib/Arm11/Arm11ArmLib.inf
+#  ArmPkg/Library/ArmLib/Arm11/Arm11ArmLibPrePi.inf
+#  ArmPkg/Library/ArmLib/Arm9/Arm9ArmLib.inf
+#  ArmPkg/Library/ArmLib/Arm9/Arm9ArmLibPrePi.inf
+  ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
+  ArmPkg/Library/ArmLib/ArmV7/ArmV7LibPrePi.inf
+
+[Components.AARCH64]
+  ArmPkg/Drivers/ArmCpuLib/ArmCortexAEMv8Lib/ArmCortexAEMv8Lib.inf
+  ArmPkg/Drivers/ArmCpuLib/ArmCortexA5xLib/ArmCortexA5xLib.inf
+
+  ArmPkg/Library/ArmLib/AArch64/AArch64LibSec.inf
+  ArmPkg/Library/ArmLib/AArch64/AArch64LibPrePi.inf

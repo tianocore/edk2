@@ -2,6 +2,7 @@
 # Semihosting JTAG lib
 #
 # Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+# Copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -25,7 +26,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = ARM
+#  VALID_ARCHITECTURES           = ARM AARCH64
 #
 [Sources.common]
   SemihostLib.c
@@ -33,10 +34,13 @@
 [Sources.ARM]
   Arm/GccSemihost.S | GCC
 
+[Sources.AARCH64]
+  AArch64/GccSemihost.S | GCC
+
 [Packages]
   MdePkg/MdePkg.dec
   ArmPkg/ArmPkg.dec
 
 [LibraryClasses]
   BaseLib
- 
+

@@ -26,6 +26,9 @@
   Arm/DebugAgentException.asm        | RVCT
   Arm/DebugAgentException.S          | GCC
 
+[Sources.AARCH64]
+  AArch64/DebugAgentException.S      | GCC
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec

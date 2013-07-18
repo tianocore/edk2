@@ -148,9 +148,16 @@ SetMemoryAttributes (
   IN EFI_PHYSICAL_ADDRESS      VirtualMask
   );
 
+VOID
+GetRootTranslationTableInfo (
+  IN  UINTN    T0SZ,
+  OUT UINTN   *TableLevel,
+  OUT UINTN   *TableEntryCount
+  );
+
 EFI_STATUS
 SetGcdMemorySpaceAttributes (
-  IN EFI_GCD_MEMORY_SPACE_DESCRIPTOR     *MemorySpaceMap,
+  IN EFI_GCD_MEMORY_SPACE_DESCRIPTOR    *MemorySpaceMap,
   IN UINTN                               NumberOfDescriptors,
   IN EFI_PHYSICAL_ADDRESS                BaseAddress,
   IN UINT64                              Length,

@@ -336,7 +336,7 @@ PrepareFdt (
   INTN                  err;
   INTN                  node;
   INTN                  cpu_node;
-  INTN                  lenp;
+  INT32                 lenp;
   CONST VOID*           BootArg;
   CONST VOID*           Method;
   EFI_PHYSICAL_ADDRESS  InitrdImageStart;

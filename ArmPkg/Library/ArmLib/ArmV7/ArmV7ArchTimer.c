@@ -21,7 +21,7 @@
 #include <Library/DebugLib.h>
 #include "ArmV7Lib.h"
 #include "ArmLibPrivate.h"
-#include <Library/ArmV7ArchTimerLib.h>
+#include <Library/ArmArchTimerLib.h>
 
 VOID
 EFIAPI

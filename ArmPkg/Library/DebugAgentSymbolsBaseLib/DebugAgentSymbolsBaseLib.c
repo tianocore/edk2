@@ -285,7 +285,7 @@ InitializeDebugAgent (
 
   // Now we've got UART, make the check:
   // - The Vector table must be 32-byte aligned
-  ASSERT(((UINTN)DebugAgentVectorTable & ARM_VECTOR_TABLE_ALIGNMENT) == 0);
+  //Need to fix basetools ASSERT(((UINTN)DebugAgentVectorTable & ARM_VECTOR_TABLE_ALIGNMENT) == 0);
   ArmWriteVBar ((UINTN)DebugAgentVectorTable);
 
   // We use InitFlag to know if DebugAgent has been intialized from

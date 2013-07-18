@@ -181,3 +181,12 @@
   gArmTokenSpaceGuid.PcdArmLinuxFdtMaxOffset|0x4000|UINT32|0x00000023
   # The FDT blob must be loaded at a 64bit aligned address.
   gArmTokenSpaceGuid.PcdArmLinuxFdtAlignment|0x8|UINT32|0x00000026
+
+[PcdsFixedAtBuild.AARCH64]
+  # By default we do transition to EL2 non-secure mode with Stack for EL2.
+  #        Mode Description              Bits
+  # NS EL2 SP2 all interupts disabled =  0x3c9
+  # NS EL1 SP1 all interupts disabled =  0x3c5
+  # Other modes include using SP0 or switching to Aarch32, but these are
+  # not currently supported.
+  gArmTokenSpaceGuid.PcdArmNonSecModeTransition|0x3c9|UINT32|0x0000003E

@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2011, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -12,8 +12,8 @@
 
 **/
 
-#ifndef __ARM_V7_ARCH_TIMER_LIB_H__
-#define __ARM_V7_ARCH_TIMER_LIB_H__
+#ifndef __ARM_ARCH_TIMER_LIB_H__
+#define __ARM_ARCH_TIMER_LIB_H__
 
 #define ARM_ARCH_TIMER_ENABLE           (1 << 0)
 #define ARM_ARCH_TIMER_IMASK            (1 << 1)
@@ -36,7 +36,7 @@ typedef enum {
   CnthpCtl,
   CnthpCval,
   RegMaximum
-}ARM_ARCH_TIMER_REGS;
+} ARM_ARCH_TIMER_REGS;
 
 VOID
 EFIAPI
@@ -112,4 +112,4 @@ ArmArchTimerSetCompareVal (
   IN   UINT64   Val
   );
 
-#endif // __ARM_V7_ARCH_TIMER_LIB_H__
+#endif // __ARM_ARCH_TIMER_LIB_H__

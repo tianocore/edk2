@@ -19,7 +19,7 @@
 #include <Library/TimerLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
-#include <Library/ArmV7ArchTimerLib.h>
+#include <Library/ArmArchTimerLib.h>
 #include <Chipset/ArmV7.h>
 
 #define TICKS_PER_MICRO_SEC     (PcdGet32 (PcdArmArchTimerFreqInHz)/1000000U)
@@ -43,15 +43,18 @@ TimerConstructor (
     // manual lower bound of the frequency is in the range of 1-10MHz
     ASSERT (TICKS_PER_MICRO_SEC);
 
+#ifdef MDE_CPU_ARM
+    // Only set the frequency for ARMv7. We expect the secure firmware to have already do it
     // If the security extensions are not implemented set Timer Frequency
     if ((ArmReadIdPfr1 () & 0xF0) == 0x0) {
       ArmArchTimerSetTimerFreq (PcdGet32 (PcdArmArchTimerFreqInHz));
     }
+#endif
 
     // Architectural Timer Frequency must be set in the Secure privileged(if secure extensions are supported) mode.
     // If the reset value (0) is returned just ASSERT.
     TimerFreq = ArmArchTimerGetTimerFreq ();
-    ASSERT (TimerFreq);
+    ASSERT (TimerFreq != 0);
 
   } else {
     DEBUG ((EFI_D_ERROR, "ARM Architectural Timer is not available in the CPU, hence this library can not be used.\n"));

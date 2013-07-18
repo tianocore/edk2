@@ -26,6 +26,9 @@
   Arm/ArmSmcNull.asm    | RVCT
   Arm/ArmSmcNull.S      | GCC
 
+[Sources.AARCH64]
+  AArch64/ArmSmcNull.S    | GCC
+
 [Packages]
   MdePkg/MdePkg.dec
   ArmPkg/ArmPkg.dec

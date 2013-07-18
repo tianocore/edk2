@@ -7,6 +7,7 @@
 #
 #  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 #  Portions copyright (c) 2010, Apple Inc. All rights reserved.<BR>
+#  Portions copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -28,7 +29,7 @@
 
 
 #
-#  VALID_ARCHITECTURES           = ARM
+#  VALID_ARCHITECTURES           = ARM AARCH64
 #
 
 
@@ -54,6 +55,9 @@
   Arm/SetMem.asm
   Arm/SetMem.S
 
+[Sources.AARCH64]
+  AArch64/CopyMem.c
+  AArch64/SetMem.c
 
 [Packages]
   MdePkg/MdePkg.dec

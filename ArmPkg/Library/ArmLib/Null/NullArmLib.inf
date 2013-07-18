@@ -31,6 +31,9 @@
   ../Common/Arm/ArmLibSupport.S    | GCC
   ../Common/Arm/ArmLibSupport.asm  | RVCT
 
+[Sources.AARCH64]
+  ../Common/AArch64/ArmLibSupport.S    | GCC
+
 [Packages]
   ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
