@@ -144,7 +144,7 @@ CascadeDelete(
         if (!EFI_ERROR(Node2->Status)) {
           ShellStatus = CascadeDelete(Node2, Quiet);
         } else if (ShellStatus == SHELL_SUCCESS) {
-          ShellStatus = Node2->Status;
+          ShellStatus = (SHELL_STATUS)(Node2->Status&(~0x80000000));
         }
         if (ShellStatus != SHELL_SUCCESS) {
           if (List!=NULL) {
