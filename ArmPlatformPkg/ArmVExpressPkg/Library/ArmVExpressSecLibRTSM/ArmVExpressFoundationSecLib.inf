@@ -1,0 +1,42 @@
+#/* @file
+#
+#  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#*/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = RTSMArmVExpressFoundationSecLib
+  FILE_GUID                      = 9de85c42-0894-11e2-8ed6-1c6f650265cc
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmPlatformSecLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+
+[LibraryClasses]
+  IoLib
+  ArmLib
+  SerialPortLib
+
+[Sources.common]
+  RTSMFoundationSec.c
+
+[Sources.AARCH64]
+  AArch64/RTSMFoundationBoot.S  | GCC
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdFvBaseAddress
