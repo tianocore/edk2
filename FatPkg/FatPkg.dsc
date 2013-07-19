@@ -21,7 +21,7 @@
   PLATFORM_GUID                  = 25b55dbc-9d0b-4a32-80da-46e1273d622c
   PLATFORM_VERSION               = 0.2
   DSC_SPECIFICATION              = 0x00010005
-  SUPPORTED_ARCHITECTURES        = IA32|X64|IPF|EBC|ARM
+  SUPPORTED_ARCHITECTURES        = IA32|X64|IPF|EBC|ARM|AARCH64
   OUTPUT_DIRECTORY               = Build/Fat
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
@@ -59,7 +59,7 @@
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
   MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
 
-[LibraryClasses.ARM]
+[LibraryClasses.ARM, LibraryClasses.AARCH64]
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
 ###################################################################################################
