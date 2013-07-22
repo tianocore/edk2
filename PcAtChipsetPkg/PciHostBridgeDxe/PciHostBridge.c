@@ -1,7 +1,7 @@
 /** @file
   Provides the basic interfaces to abstract a PCI Host Bridge Resource Allocation
 
-Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2008 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are
 licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -281,12 +281,14 @@ NotifyPhase(
     }  
     break;
 
+  case EfiPciHostBridgeEndEnumeration:
+    break;
+
   case EfiPciHostBridgeBeginBusAllocation:
     //
     // No specific action is required here, can perform any chipset specific programing
     //
     HostBridgeInstance->CanRestarted = FALSE;
-    return EFI_SUCCESS;
     break;
 
   case EfiPciHostBridgeEndBusAllocation:
@@ -294,7 +296,6 @@ NotifyPhase(
     // No specific action is required here, can perform any chipset specific programing
     //
     //HostBridgeInstance->CanRestarted = FALSE;
-    return EFI_SUCCESS;
     break;
 
   case EfiPciHostBridgeBeginResourceAllocation:
@@ -302,7 +303,6 @@ NotifyPhase(
     // No specific action is required here, can perform any chipset specific programing
     //
     //HostBridgeInstance->CanRestarted = FALSE;
-    return EFI_SUCCESS;
     break;
 
   case EfiPciHostBridgeAllocateResources:
@@ -472,7 +472,6 @@ NotifyPhase(
     HostBridgeInstance->ResourceSubmited = FALSE;
     HostBridgeInstance->CanRestarted     = TRUE;      
     return ReturnStatus;
-    break;
 
   case EfiPciHostBridgeEndResourceAllocation:
     HostBridgeInstance->CanRestarted = FALSE;
@@ -480,7 +479,7 @@ NotifyPhase(
 
   default:
     return EFI_INVALID_PARAMETER;
-  }; // end switch
+  }
   
   return EFI_SUCCESS;  
 }
