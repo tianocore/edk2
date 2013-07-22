@@ -71,8 +71,8 @@ InternalBaseLibBitFieldOrUint (
   //
   // Higher bits in OrData those are not used must be zero. 
   //
-  // EndBit – StartBit + 1 might be 32 while the result right shifting 32 on a 32bit integer is undefined,
-  // So the logic is updated to right shift (EndBit – StartBit) bits and compare the last bit directly.
+  // EndBit - StartBit + 1 might be 32 while the result right shifting 32 on a 32bit integer is undefined,
+  // So the logic is updated to right shift (EndBit - StartBit) bits and compare the last bit directly.
   //
   ASSERT ((OrData >> (EndBit - StartBit)) == ((OrData >> (EndBit - StartBit)) & 1));
   
@@ -113,8 +113,8 @@ InternalBaseLibBitFieldAndUint (
   //
   // Higher bits in AndData those are not used must be zero. 
   //
-  // EndBit – StartBit + 1 might be 32 while the result right shifting 32 on a 32bit integer is undefined,
-  // So the logic is updated to right shift (EndBit – StartBit) bits and compare the last bit directly.
+  // EndBit - StartBit + 1 might be 32 while the result right shifting 32 on a 32bit integer is undefined,
+  // So the logic is updated to right shift (EndBit - StartBit) bits and compare the last bit directly.
   //
   ASSERT ((AndData >> (EndBit - StartBit)) == ((AndData >> (EndBit - StartBit)) & 1));
 
@@ -811,8 +811,8 @@ BitFieldOr64 (
   //
   // Higher bits in OrData those are not used must be zero. 
   //
-  // EndBit – StartBit + 1 might be 64 while the result right shifting 64 on RShiftU64() API is invalid,
-  // So the logic is updated to right shift (EndBit – StartBit) bits and compare the last bit directly.
+  // EndBit - StartBit + 1 might be 64 while the result right shifting 64 on RShiftU64() API is invalid,
+  // So the logic is updated to right shift (EndBit - StartBit) bits and compare the last bit directly.
   //
   ASSERT (RShiftU64 (OrData, EndBit - StartBit) == (RShiftU64 (OrData, EndBit - StartBit) & 1));
 
@@ -863,8 +863,8 @@ BitFieldAnd64 (
   //
   // Higher bits in AndData those are not used must be zero. 
   //
-  // EndBit – StartBit + 1 might be 64 while the right shifting 64 on RShiftU64() API is invalid,
-  // So the logic is updated to right shift (EndBit – StartBit) bits and compare the last bit directly.
+  // EndBit - StartBit + 1 might be 64 while the right shifting 64 on RShiftU64() API is invalid,
+  // So the logic is updated to right shift (EndBit - StartBit) bits and compare the last bit directly.
   //
   ASSERT (RShiftU64 (AndData, EndBit - StartBit) == (RShiftU64 (AndData, EndBit - StartBit) & 1));
 
