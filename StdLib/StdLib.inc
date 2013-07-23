@@ -69,6 +69,9 @@
 [LibraryClasses.ARM]
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
+[LibraryClasses.AArch64]
+  NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
+
 [Components]
 # BaseLib and BaseMemoryLib need to be built with the /GL- switch when using the Microsoft
 # tool chain.  This is required so that the library functions can be resolved during
