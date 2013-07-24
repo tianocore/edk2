@@ -298,9 +298,6 @@ BdsBootLinuxFdt (
     // Update the MailboxBase variable used in the pen code
     *(UINTN*)(PenBase + ((UINTN)&AsmMailboxbase - (UINTN)&SecondariesPenStart)) = MailBoxBase;
 
-    // Flush caches to make sure our pen gets to mem before we free the cores.
-    ArmCleanDataCache();
-
     for (Index=0; Index < gST->NumberOfTableEntries; Index++) {
       // Check for correct GUID type
       if (CompareGuid (&gArmMpCoreInfoGuid, &(gST->ConfigurationTable[Index].VendorGuid))) {
@@ -323,6 +320,8 @@ BdsBootLinuxFdt (
         }
       }
     }
+    // Flush caches to make sure our pen gets to mem before we free the cores.
+    ArmCleanDataCache();
   }
 
   // By setting address=0 we leave the memory allocation to the function
