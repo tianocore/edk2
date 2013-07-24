@@ -79,7 +79,7 @@ PeCoffLoaderImageFormatSupported (
   IN  UINT16  Machine
   )
 {
-  if ((Machine == IMAGE_FILE_MACHINE_AARCH64) || (Machine ==  IMAGE_FILE_MACHINE_EBC)) {
+  if ((Machine == IMAGE_FILE_MACHINE_ARM64) || (Machine ==  IMAGE_FILE_MACHINE_EBC)) {
     return TRUE;
   }
 
