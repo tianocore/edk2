@@ -273,13 +273,13 @@ GetBlockEntryListFromAddress (
   ASSERT ((*BlockEntrySize & (SIZE_4KB - 1)) == 0);
 
   //
-  // Calculate LastBlockEntry from T0SZ
+  // Calculate LastBlockEntry from T0SZ - this is the last block entry of the root Translation table
   //
   T0SZ = ArmGetTCR () & TCR_T0SZ_MASK;
   // Get the Table info from T0SZ
   GetRootTranslationTableInfo (T0SZ, &RootTableLevel, &RootTableEntryCount);
   // The last block of the root table depends on the number of entry in this table
-  *LastBlockEntry = (UINT64*)((UINTN)RootTable + (RootTableEntryCount * sizeof(UINT64)));
+  *LastBlockEntry = (UINT64*)((UINTN)RootTable + ((RootTableEntryCount - 1) * sizeof(UINT64)));
 
   // If the start address is 0x0 then we use the size of the region to identify the alignment
   if (RegionStart == 0) {
@@ -331,7 +331,7 @@ GetBlockEntryListFromAddress (
         BlockEntry = (UINT64*)TT_GET_ENTRY_FOR_ADDRESS (TranslationTable, IndexLevel + 1, RegionStart);
 
         // Set the last block for this new table
-        *LastBlockEntry = (UINT64*)((UINTN)TranslationTable + (TT_ENTRY_COUNT * sizeof(UINT64)));
+        *LastBlockEntry = (UINT64*)((UINTN)TranslationTable + ((TT_ENTRY_COUNT - 1) * sizeof(UINT64)));
       }
     } else if ((*BlockEntry & TT_TYPE_MASK) == TT_TYPE_BLOCK_ENTRY) {
       // If we are not at the last level then we need to split this BlockEntry
@@ -373,6 +373,8 @@ GetBlockEntryListFromAddress (
 
         // Fill the new BlockEntry with the TranslationTable
         *BlockEntry = ((UINTN)TranslationTable & TT_ADDRESS_MASK_DESCRIPTION_TABLE) | TableAttributes | TT_TYPE_TABLE_ENTRY;
+        // Update the last block entry with the newly created translation table
+        *LastBlockEntry = (UINT64*)((UINTN)TranslationTable + ((TT_ENTRY_COUNT - 1) * sizeof(UINT64)));
 
         // Populate the newly created lower level table
         BlockEntry = TranslationTable;
