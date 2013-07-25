@@ -742,7 +742,7 @@ IScsiProcessLoginRsp (
   NetbufQueAppend (&Conn->RspQue, Pdu);
 
   Conn->PartialRspRcvd = Continue;
-  if ((!Transit) || Continue) {
+  if (Continue) {
     //
     // It's a partial response, have to wait for another or more Request/Response
     // conversations to get the full response.
