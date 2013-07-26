@@ -301,8 +301,10 @@ GetBlockEntryListFromAddress (
   // Identify the Page Level the RegionStart must belongs to
   PageLevel = 3 - ((BaseAddressAlignment - 12) / 9);
 
-  // If the required size is smaller than the current block size then we need to go to the page bellow.
-  if (*BlockEntrySize < TT_ADDRESS_AT_LEVEL(PageLevel)) {
+  // If the required size is smaller than the current block size then we need to go to the page below.
+  // The PageLevel was calculated on the Base Address alignment but did not take in account the alignment
+  // of the allocation size
+  if (*BlockEntrySize < TT_BLOCK_ENTRY_SIZE_AT_LEVEL (PageLevel)) {
     // It does not fit so we need to go a page level above
     PageLevel++;
   }
@@ -311,7 +313,7 @@ GetBlockEntryListFromAddress (
   *TableLevel = PageLevel;
 
   // Now, we have the Table Level we can get the Block Size associated to this table
-  *BlockEntrySize = TT_ADDRESS_AT_LEVEL(PageLevel);
+  *BlockEntrySize = TT_BLOCK_ENTRY_SIZE_AT_LEVEL (PageLevel);
 
   //
   // Get the Table Descriptor for the corresponding PageLevel. We need to decompose RegionStart to get appropriate entries
@@ -357,8 +359,8 @@ GetBlockEntryListFromAddress (
         // Shift back to right to set zero before the effective address
         BlockEntryAddress = BlockEntryAddress << TT_ADDRESS_OFFSET_AT_LEVEL(IndexLevel);
 
-        // Set the correct entry type
-        if (IndexLevel + 1 == 3) {
+        // Set the correct entry type for the next page level
+        if ((IndexLevel + 1) == 3) {
           Attributes |= TT_TYPE_BLOCK_ENTRY_LEVEL3;
         } else {
           Attributes |= TT_TYPE_BLOCK_ENTRY;
@@ -371,7 +373,7 @@ GetBlockEntryListFromAddress (
         }
         TranslationTable = (UINT64*)((UINTN)TranslationTable & TT_ADDRESS_MASK_DESCRIPTION_TABLE);
 
-        // Fill the new BlockEntry with the TranslationTable
+        // Fill the BlockEntry with the new TranslationTable
         *BlockEntry = ((UINTN)TranslationTable & TT_ADDRESS_MASK_DESCRIPTION_TABLE) | TableAttributes | TT_TYPE_TABLE_ENTRY;
         // Update the last block entry with the newly created translation table
         *LastBlockEntry = (UINT64*)((UINTN)TranslationTable + ((TT_ENTRY_COUNT - 1) * sizeof(UINT64)));
