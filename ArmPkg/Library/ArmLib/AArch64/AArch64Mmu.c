@@ -536,8 +536,10 @@ ArmConfigureMmu (
   //
   // Set TCR that allows us to retrieve T0SZ in the subsequent functions
   //
-  if ((ArmReadCurrentEL () == AARCH64_EL2) || (ArmReadCurrentEL () == AARCH64_EL3)) {
-    //Note: Bits 23 and 31 are reserved bits in TCR_EL2 and TCR_EL3
+  // Ideally we will be running at EL2, but should support EL1 as well.
+  // UEFI should not run at EL3.
+  if (ArmReadCurrentEL () == AARCH64_EL2) {
+    //Note: Bits 23 and 31 are reserved(RES1) bits in TCR_EL2
     TCR = T0SZ | (1UL << 31) | (1UL << 23) | TCR_TG0_4KB;
 
     // Set the Physical Address Size using MaxAddress
@@ -554,12 +556,33 @@ ArmConfigureMmu (
     } else if (MaxAddress < SIZE_256TB) {
       TCR |= TCR_PS_256TB;
     } else {
-      DEBUG ((EFI_D_ERROR, "ArmConfigureMmu: The MaxAddress 0x%lX is not supported by this MMU support.\n", MaxAddress));
+      DEBUG ((EFI_D_ERROR, "ArmConfigureMmu: The MaxAddress 0x%lX is not supported by this MMU configuration.\n", MaxAddress));
+      ASSERT (0); // Bigger than 48-bit memory space are not supported
+      return RETURN_UNSUPPORTED;
+    }
+  } else if (ArmReadCurrentEL () == AARCH64_EL1) {
+    TCR = T0SZ | TCR_TG0_4KB;
+
+    // Set the Physical Address Size using MaxAddress
+    if (MaxAddress < SIZE_4GB) {
+      TCR |= TCR_IPS_4GB;
+    } else if (MaxAddress < SIZE_64GB) {
+      TCR |= TCR_IPS_64GB;
+    } else if (MaxAddress < SIZE_1TB) {
+      TCR |= TCR_IPS_1TB;
+    } else if (MaxAddress < SIZE_4TB) {
+      TCR |= TCR_IPS_4TB;
+    } else if (MaxAddress < SIZE_16TB) {
+      TCR |= TCR_IPS_16TB;
+    } else if (MaxAddress < SIZE_256TB) {
+      TCR |= TCR_IPS_256TB;
+    } else {
+      DEBUG ((EFI_D_ERROR, "ArmConfigureMmu: The MaxAddress 0x%lX is not supported by this MMU configuration.\n", MaxAddress));
       ASSERT (0); // Bigger than 48-bit memory space are not supported
       return RETURN_UNSUPPORTED;
     }
   } else {
-    ASSERT (0); // Bigger than 48-bit memory space are not supported
+    ASSERT (0); // UEFI is only expected to run at EL2 and EL1, not EL3.
     return RETURN_UNSUPPORTED;
   }
 
