@@ -167,7 +167,7 @@ ASM_PFX(ArmUpdateTranslationTableEntry):
 
 ASM_PFX(ArmInvalidateTlb):
    EL1_OR_EL2_OR_EL3(x0)
-1: tlbi  alle1
+1: tlbi  vmalle1
    b     4f
 2: tlbi  alle2
    b     4f

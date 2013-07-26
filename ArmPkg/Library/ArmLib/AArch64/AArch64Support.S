@@ -123,7 +123,7 @@ ASM_PFX(ArmEnableMmu):
 3: mrs     x0, sctlr_el3       // Read System control register EL3
 4: orr     x0, x0, #CTRL_M_BIT // Set MMU enable bit
    EL1_OR_EL2_OR_EL3(x1)
-1: tlbi    alle1
+1: tlbi    vmalle1
    isb
    msr     sctlr_el1, x0       // Write back
    b       4f
@@ -149,7 +149,7 @@ ASM_PFX(ArmDisableMmu):
 4: bic     x0, x0, #CTRL_M_BIT  // Clear MMU enable bit
    EL1_OR_EL2_OR_EL3(x1)
 1: msr     sctlr_el1, x0        // Write back
-   tlbi    alle1
+   tlbi    vmalle1
    b       4f
 2: msr     sctlr_el2, x0        // Write back
    tlbi    alle2
@@ -441,7 +441,7 @@ ASM_PFX(ArmCallWFI):
 
 ASM_PFX(ArmInvalidateInstructionAndDataTlb):
    EL1_OR_EL2_OR_EL3(x0)
-1: tlbi  alle1
+1: tlbi  vmalle1
    b     4f
 2: tlbi  alle2
    b     4f
