@@ -15,6 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 --*/
 
+#include <Library/MemoryAllocationLib.h>
 #include "CpuDxe.h"
 
 #define TT_ATTR_INDX_INVALID    ((UINT32)~0)
@@ -122,6 +123,8 @@ GetNextEntryAttribute (
     }
   }
 
+  FreePool (MemorySpaceMap);
+
   return BaseAddress + (EntryCount * TT_ADDRESS_AT_LEVEL(TableLevel));
 }
 
@@ -184,6 +187,8 @@ SyncCacheConfig (
       BaseAddressGcdRegion,
       EndAddressGcdRegion - BaseAddressGcdRegion,
       PageAttributeToGcdAttribute (PageAttribute));
+
+  FreePool (MemorySpaceMap);
 
   return EFI_SUCCESS;
 }

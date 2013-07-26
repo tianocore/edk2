@@ -337,6 +337,8 @@ EblDumpGcd (
     AsciiPrint ("\n");
   }
 
+  FreePool (MemorySpaceMap);
+
   Status = gDS->GetIoSpaceMap(&NumberOfDescriptors,&IoSpaceMap);
   if (EFI_ERROR (Status)) {
       return Status;
@@ -354,6 +356,8 @@ EblDumpGcd (
 
     AsciiPrint ("\n");
   }
+
+  FreePool (IoSpaceMap);
 
   return EFI_SUCCESS;
 }
