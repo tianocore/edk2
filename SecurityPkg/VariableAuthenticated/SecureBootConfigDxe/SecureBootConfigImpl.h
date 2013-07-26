@@ -23,7 +23,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SimpleFileSystem.h>
 #include <Protocol/BlockIo.h>
 #include <Protocol/DevicePath.h>
-#include <Protocol/DevicePathToText.h>
 #include <Protocol/DebugPort.h>
 #include <Protocol/LoadFile.h>
 

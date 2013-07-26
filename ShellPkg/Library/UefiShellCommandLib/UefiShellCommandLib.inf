@@ -1,7 +1,7 @@
 ##  @file
 #  Provides interface to shell internal functions for shell commands.
 #
-#  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved. <BR>
+#  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved. <BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -52,7 +52,6 @@
   gEfiUnicodeCollation2ProtocolGuid                       # ALWAYS_CONSUMED
   gEfiShellProtocolGuid                                   # ALWAYS_CONSUMED
   gEfiShellParametersProtocolGuid                         # ALWAYS_CONSUMED
-  gEfiDevicePathToTextProtocolGuid                        # ALWAYS_CONSUMED
 
 [Guids]
   gEfiSasDevicePathGuid                                   # ALWAYS_CONSUMED

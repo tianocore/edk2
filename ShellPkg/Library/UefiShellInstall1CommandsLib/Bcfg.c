@@ -1050,7 +1050,7 @@ BcfgDisplayDumpInstall1(
     if ((*(UINT16*)(Buffer+4)) != 0) {
       DevPath = AllocateZeroPool(*(UINT16*)(Buffer+4));
       CopyMem(DevPath, Buffer+6+StrSize((CHAR16*)(Buffer+6)), *(UINT16*)(Buffer+4));
-      DevPathString = gDevPathToText->ConvertDevicePathToText(DevPath, TRUE, FALSE);
+      DevPathString = ConvertDevicePathToText(DevPath, TRUE, FALSE);
     } else {
       DevPath       = NULL;
       DevPathString = NULL;

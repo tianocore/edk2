@@ -32,7 +32,6 @@ Revision History
 #include <Protocol/HiiDatabase.h>
 #include <Protocol/HiiString.h>
 #include <Protocol/FormBrowserEx.h>
-#include <Protocol/DevicePathToText.h>
 
 #include <Guid/MdeModuleHii.h>
 #include <Library/DebugLib.h>

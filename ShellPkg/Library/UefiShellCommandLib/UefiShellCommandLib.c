@@ -30,7 +30,6 @@ STATIC BUFFER_LIST                        mFileHandleList;
 
 // global variables required by library class.
 EFI_UNICODE_COLLATION_PROTOCOL    *gUnicodeCollation            = NULL;
-EFI_DEVICE_PATH_TO_TEXT_PROTOCOL  *gDevPathToText               = NULL;
 SHELL_MAP_LIST                    gShellMapList;
 SHELL_MAP_LIST                    *gShellCurDir                 = NULL;
 
@@ -54,12 +53,6 @@ CommandInit(
   EFI_STATUS Status;
   if (gUnicodeCollation == NULL) {
     Status = gBS->LocateProtocol(&gEfiUnicodeCollation2ProtocolGuid, NULL, (VOID**)&gUnicodeCollation);
-    if (EFI_ERROR(Status)) {
-      return (EFI_DEVICE_ERROR);
-    }
-  }
-  if (gDevPathToText == NULL) {
-    Status = gBS->LocateProtocol(&gEfiDevicePathToTextProtocolGuid, NULL, (VOID**)&gDevPathToText);
     if (EFI_ERROR(Status)) {
       return (EFI_DEVICE_ERROR);
     }
@@ -184,7 +177,6 @@ ShellCommandLibDestructor (
   }
 
   gUnicodeCollation            = NULL;
-  gDevPathToText               = NULL;
   gShellCurDir                 = NULL;
 
   return (RETURN_SUCCESS);

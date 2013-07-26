@@ -421,7 +421,7 @@ PerformSingleMappingDisplay(
   if (TempSpot != NULL) {
     *TempSpot = CHAR_NULL;
   }
-  DevPathString = gDevPathToText->ConvertDevicePathToText(DevPath, TRUE, FALSE);
+  DevPathString = ConvertDevicePathToText(DevPath, TRUE, FALSE);
   if (!SFO) {
     TempLen = StrLen(CurrentName);
     ShellPrintHiiEx (

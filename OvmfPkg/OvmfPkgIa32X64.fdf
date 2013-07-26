@@ -1,7 +1,7 @@
 ## @file
 #  Open Virtual Machine Firmware: FDF
 #
-#  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -155,6 +155,7 @@ READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
 APRIORI DXE {
+  INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 }
 

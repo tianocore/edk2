@@ -290,7 +290,6 @@ DumpResourceMap (
   PCI_RESOURCE_NODE                *ChildPMem32Node;
   PCI_RESOURCE_NODE                *ChildMem64Node;
   PCI_RESOURCE_NODE                *ChildPMem64Node;
-  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL *ToText;
   CHAR16                           *Str;
 
   DEBUG ((EFI_D_INFO, "PciBus: Resource Map for "));
@@ -309,19 +308,11 @@ DumpResourceMap (
       Bridge->BusNumber, Bridge->DeviceNumber, Bridge->FunctionNumber
       ));
   } else {
-    Status = gBS->LocateProtocol (
-                    &gEfiDevicePathToTextProtocolGuid,
-                    NULL,
-                    (VOID **) &ToText
-                    );
-    Str = NULL;
-    if (!EFI_ERROR (Status)) {
-      Str = ToText->ConvertDevicePathToText (
-                      DevicePathFromHandle (Bridge->Handle),
-                      FALSE,
-                      FALSE
-                      );
-    }
+    Str = ConvertDevicePathToText (
+            DevicePathFromHandle (Bridge->Handle),
+            FALSE,
+            FALSE
+            );
     DEBUG ((EFI_D_INFO, "Root Bridge %s\n", Str != NULL ? Str : L""));
     if (Str != NULL) {
       FreePool (Str);

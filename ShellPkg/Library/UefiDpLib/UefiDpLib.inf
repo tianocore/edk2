@@ -62,13 +62,13 @@
   UefiBootServicesTableLib
   SortLib
   PrintLib
+  DevicePathLib
 
 [Protocols]
   gEfiLoadedImageProtocolGuid                             # ALWAYS_CONSUMED
   gEfiDriverBindingProtocolGuid                           # SOMETIMES_CONSUMED
   gEfiComponentName2ProtocolGuid                          # SOMETIMES_CONSUMED
   gEfiLoadedImageDevicePathProtocolGuid                   # SOMETIMES_CONSUMED
-  gEfiDevicePathToTextProtocolGuid                        # SOMETIMES_CONSUMED
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize

@@ -1,7 +1,7 @@
 /** @file
   Main file for bcfg shell Debug1 function.
 
-  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1052,7 +1052,7 @@ BcfgDisplayDumpDebug1(
     if ((*(UINT16*)(Buffer+4)) != 0) {
       DevPath = AllocateZeroPool(*(UINT16*)(Buffer+4));
       CopyMem(DevPath, Buffer+6+StrSize((CHAR16*)(Buffer+6)), *(UINT16*)(Buffer+4));
-      DevPathString = gDevPathToText->ConvertDevicePathToText(DevPath, TRUE, FALSE);
+      DevPathString = ConvertDevicePathToText(DevPath, TRUE, FALSE);
     } else {
       DevPath       = NULL;
       DevPathString = NULL;

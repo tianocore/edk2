@@ -2,7 +2,7 @@
   Ihe internal heder file includes the required Protocol/Guid/Library
   and the shared function APIs.
 
-Copyright (c) 2007 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -29,7 +29,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/ComponentName2.h>
 #include <Protocol/ComponentName.h>
 #include <Protocol/DriverBinding.h>
-#include <Protocol/DevicePathToText.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/PlatformDriverOverride.h>
 #include <Guid/MdeModuleHii.h>

@@ -115,27 +115,18 @@ InternalShellProtocolDebugPrintMessage (
   IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath
   )
 {
-  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL  *DevicePathToText;
   EFI_STATUS                        Status;
   CHAR16                            *Temp;
 
-  Status = EFI_SUCCESS;
   DEBUG_CODE_BEGIN();
-  DevicePathToText = NULL;
 
-  Status = gBS->LocateProtocol(&gEfiDevicePathToTextProtocolGuid,
-                               NULL,
-                               (VOID**)&DevicePathToText);
   if (Mapping != NULL) {
     DEBUG((EFI_D_INFO, "Added new map item:\"%S\"\r\n", Mapping));
   }
-  if (!EFI_ERROR(Status)) {
-    if (DevicePath != NULL) {
-      Temp = DevicePathToText->ConvertDevicePathToText(DevicePath, TRUE, TRUE);
-      DEBUG((EFI_D_INFO, "DevicePath: %S\r\n", Temp));
-      FreePool(Temp);
-    }
-  }
+  Temp = ConvertDevicePathToText(DevicePath, TRUE, TRUE);
+  DEBUG((EFI_D_INFO, "DevicePath: %S\r\n", Temp));
+  FreePool(Temp);
+
   DEBUG_CODE_END();
   return (Status);
 }
@@ -647,7 +638,6 @@ EfiShellGetDeviceName(
 {
   EFI_STATUS                        Status;
   EFI_COMPONENT_NAME2_PROTOCOL      *CompName2;
-  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL  *DevicePathToText;
   EFI_DEVICE_PATH_PROTOCOL          *DevicePath;
   EFI_HANDLE                        *HandleList;
   UINTN                             HandleCount;
@@ -815,28 +805,19 @@ EfiShellGetDeviceName(
     }
   }
   if ((Flags & EFI_DEVICE_NAME_USE_DEVICE_PATH) != 0) {
-    Status = gBS->LocateProtocol(
-      &gEfiDevicePathToTextProtocolGuid,
+    Status = gBS->OpenProtocol(
+      DeviceHandle,
+      &gEfiDevicePathProtocolGuid,
+      (VOID**)&DevicePath,
+      gImageHandle,
       NULL,
-      (VOID**)&DevicePathToText);
-    //
-    // we now have the device path to text protocol
-    //
+      EFI_OPEN_PROTOCOL_GET_PROTOCOL);
     if (!EFI_ERROR(Status)) {
-      Status = gBS->OpenProtocol(
-        DeviceHandle,
-        &gEfiDevicePathProtocolGuid,
-        (VOID**)&DevicePath,
-        gImageHandle,
-        NULL,
-        EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-      if (!EFI_ERROR(Status)) {
-        //
-        // use device path to text on the device path
-        //
-        *BestDeviceName = DevicePathToText->ConvertDevicePathToText(DevicePath, TRUE, TRUE);
-        return (EFI_SUCCESS);
-      }
+      //
+      // use device path to text on the device path
+      //
+      *BestDeviceName = ConvertDevicePathToText(DevicePath, TRUE, TRUE);
+      return (EFI_SUCCESS);
     }
   }
   //
@@ -1583,11 +1564,11 @@ EfiShellExecute(
   DevPath = AppendDevicePath (ShellInfoObject.ImageDevPath, ShellInfoObject.FileDevPath);
 
   DEBUG_CODE_BEGIN();
-  Temp = gDevPathToText->ConvertDevicePathToText(ShellInfoObject.FileDevPath, TRUE, TRUE);
+  Temp = ConvertDevicePathToText(ShellInfoObject.FileDevPath, TRUE, TRUE);
   FreePool(Temp);
-  Temp = gDevPathToText->ConvertDevicePathToText(ShellInfoObject.ImageDevPath, TRUE, TRUE);
+  Temp = ConvertDevicePathToText(ShellInfoObject.ImageDevPath, TRUE, TRUE);
   FreePool(Temp);
-  Temp = gDevPathToText->ConvertDevicePathToText(DevPath, TRUE, TRUE);
+  Temp = ConvertDevicePathToText(DevPath, TRUE, TRUE);
   FreePool(Temp);
   DEBUG_CODE_END();
 

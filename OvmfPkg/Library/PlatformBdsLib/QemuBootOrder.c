@@ -1,7 +1,7 @@
 /** @file
   Rewrite the BootOrder NvVar based on QEMU's "bootorder" fw_cfg file.
 
-  Copyright (C) 2012, Red Hat, Inc.
+  Copyright (C) 2012 - 2013, Red Hat, Inc.
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -20,7 +20,7 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/BaseLib.h>
 #include <Library/PrintLib.h>
-#include <Protocol/DevicePathToText.h>
+#include <Library/DevicePathLib.h>
 #include <Guid/GlobalVariable.h>
 
 
@@ -866,18 +866,17 @@ BOOLEAN
 Match (
   IN  CONST CHAR16                           *Translated,
   IN  UINTN                                  TranslatedLength,
-  IN  CONST EFI_DEVICE_PATH_PROTOCOL         *DevicePath,
-  IN  CONST EFI_DEVICE_PATH_TO_TEXT_PROTOCOL *DevPathToText
+  IN  CONST EFI_DEVICE_PATH_PROTOCOL         *DevicePath
   )
 {
   CHAR16  *Converted;
   BOOLEAN Result;
 
-  Converted = DevPathToText->ConvertDevicePathToText (
-                               DevicePath,
-                               FALSE, // DisplayOnly
-                               FALSE  // AllowShortcuts
-                               );
+  Converted = ConvertDevicePathToText (
+                DevicePath,
+                FALSE, // DisplayOnly
+                FALSE  // AllowShortcuts
+                );
   if (Converted == NULL) {
     return FALSE;
   }
@@ -933,9 +932,6 @@ SetBootOrderFromQemu (
   )
 {
   RETURN_STATUS                    Status;
-
-  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL *DevPathToText;
-
   FIRMWARE_CONFIG_ITEM             FwCfgItem;
   UINTN                            FwCfgSize;
   CHAR8                            *FwCfg;
@@ -945,15 +941,6 @@ SetBootOrderFromQemu (
 
   UINTN                            TranslatedSize;
   CHAR16                           Translated[TRANSLATION_OUTPUT_SIZE];
-
-  Status = gBS->LocateProtocol (
-                  &gEfiDevicePathToTextProtocolGuid,
-                  NULL, // optional registration key
-                  (VOID **) &DevPathToText
-                  );
-  if (Status != EFI_SUCCESS) {
-    return Status;
-  }
 
   Status = QemuFwCfgFindFile ("bootorder", &FwCfgItem, &FwCfgSize);
   if (Status != RETURN_SUCCESS) {
@@ -1019,8 +1006,7 @@ SetBootOrderFromQemu (
             Match (
               Translated,
               TranslatedSize, // contains length, not size, in CHAR16's here
-              BootOption->DevicePath,
-              DevPathToText
+              BootOption->DevicePath
               )
             ) {
           //

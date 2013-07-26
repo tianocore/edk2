@@ -55,6 +55,7 @@
   HiiLib
   PrintLib
   UefiLib
+  DevicePathLib
 
 [Guids]
   gEfiIfrTianoGuid                              ## CONSUMES ## Guid
@@ -70,7 +71,6 @@
   gEfiHiiDatabaseProtocolGuid                   ## CONSUMES
   gEfiSimpleTextInputExProtocolGuid             ## CONSUMES
   gEfiFormBrowserExProtocolGuid                 ## CONSUMES
-  gEfiDevicePathToTextProtocolGuid              ## CONSUMES
 
 [Depex]
   gEfiSimpleTextOutProtocolGuid AND gEfiHiiDatabaseProtocolGuid AND gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid

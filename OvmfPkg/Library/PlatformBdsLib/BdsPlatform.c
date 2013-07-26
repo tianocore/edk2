@@ -1,7 +1,7 @@
 /** @file
   Platform BDS customizations.
 
-  Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -209,14 +209,16 @@ Returns:
   // Print Device Path
   //
   DevPathStr = DevicePathToStr(DevicePath);
-  DEBUG((
-    EFI_D_INFO,
-    "BdsPlatform.c+%d: COM%d DevPath: %s\n",
-    __LINE__,
-    gPnp16550ComPortDeviceNode.UID + 1,
-    DevPathStr
-    ));
-  FreePool(DevPathStr);
+  if (DevPathStr != NULL) {
+    DEBUG((
+      EFI_D_INFO,
+      "BdsPlatform.c+%d: COM%d DevPath: %s\n",
+      __LINE__,
+      gPnp16550ComPortDeviceNode.UID + 1,
+      DevPathStr
+      ));
+    FreePool(DevPathStr);
+  }
 
   BdsLibUpdateConsoleVariable (VarConsoleOut, DevicePath, NULL);
   BdsLibUpdateConsoleVariable (VarConsoleInp, DevicePath, NULL);
@@ -236,14 +238,16 @@ Returns:
   // Print Device Path
   //
   DevPathStr = DevicePathToStr(DevicePath);
-  DEBUG((
-    EFI_D_INFO,
-    "BdsPlatform.c+%d: COM%d DevPath: %s\n",
-    __LINE__,
-    gPnp16550ComPortDeviceNode.UID + 1,
-    DevPathStr
-    ));
-  FreePool(DevPathStr);
+  if (DevPathStr != NULL) {
+    DEBUG((
+      EFI_D_INFO,
+      "BdsPlatform.c+%d: COM%d DevPath: %s\n",
+      __LINE__,
+      gPnp16550ComPortDeviceNode.UID + 1,
+      DevPathStr
+      ));
+    FreePool(DevPathStr);
+  }
 
   BdsLibUpdateConsoleVariable (VarConsoleOut, DevicePath, NULL);
   BdsLibUpdateConsoleVariable (VarConsoleInp, DevicePath, NULL);
@@ -799,12 +803,14 @@ ConnectRecursivelyIfPciMassStorage (
     // Print Device Path
     //
     DevPathStr = DevicePathToStr (DevicePath);
-    DEBUG((
-      EFI_D_INFO,
-      "Found Mass Storage device: %s\n",
-      DevPathStr
-      ));
-    FreePool(DevPathStr);
+    if (DevPathStr != NULL) {
+      DEBUG((
+        EFI_D_INFO,
+        "Found Mass Storage device: %s\n",
+        DevPathStr
+        ));
+      FreePool(DevPathStr);
+    }
 
     Status = gBS->ConnectController (Handle, NULL, NULL, TRUE);
     if (EFI_ERROR (Status)) {

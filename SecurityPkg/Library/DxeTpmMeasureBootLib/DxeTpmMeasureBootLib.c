@@ -31,7 +31,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/TcgService.h>
 #include <Protocol/BlockIo.h>
 #include <Protocol/DiskIo.h>
-#include <Protocol/DevicePathToText.h>
 #include <Protocol/FirmwareVolumeBlock.h>
 
 #include <Guid/MeasuredFvHob.h>
@@ -940,21 +939,14 @@ DxeTpmMeasureBootHandler (
     //    
     DEBUG_CODE_BEGIN ();
       CHAR16                            *ToText;
-      EFI_DEVICE_PATH_TO_TEXT_PROTOCOL  *DevPathToText;
-      Status = gBS->LocateProtocol (
-                      &gEfiDevicePathToTextProtocolGuid,
-                      NULL,
-                      (VOID **) &DevPathToText
-                      );
-      if (!EFI_ERROR (Status)) {
-        ToText = DevPathToText->ConvertDevicePathToText (
-                                  DevicePathNode,
-                                  FALSE,
-                                  TRUE
-                                  );
-        if (ToText != NULL) {
-          DEBUG ((DEBUG_INFO, "The measured image path is %s.\n", ToText));
-        }
+      ToText = ConvertDevicePathToText (
+                 DevicePathNode,
+                 FALSE,
+                 TRUE
+                 );
+      if (ToText != NULL) {
+        DEBUG ((DEBUG_INFO, "The measured image path is %s.\n", ToText));
+        FreePool (ToText);
       }
     DEBUG_CODE_END ();
 
