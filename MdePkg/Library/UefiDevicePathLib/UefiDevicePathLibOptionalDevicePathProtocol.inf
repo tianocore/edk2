@@ -2,9 +2,10 @@
 # Instance of Device Path Library based on Device Path Protocol.
 #
 #  Device Path Library that layers on top of the UEFI 2.0 Device Path Protocol.
-#  This library is not available for EFI 1.10 modules.
+#  If the DevicePathFromText/DevicePathToText protocol doesn't exist, the library
+#  uses its internal conversion logic.
 #
-#  Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -18,39 +19,52 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = UefiDevicePathLibDevicePathProtocol
-  FILE_GUID                      = 050EB8C6-C12E-4b86-892B-40985E8B3137
+  BASE_NAME                      = UefiDevicePathLibOptionalDevicePathProtocol
+  FILE_GUID                      = 3E1C696D-FCF0-45a7-85A7-E86C2A1C1080
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = DevicePathLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER SMM_CORE
 
-  CONSTRUCTOR                    = DevicePathLibConstructor
+  CONSTRUCTOR                    = UefiDevicePathLibOptionalDevicePathProtocolConstructor
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
 [Sources]
-  UefiDevicePathLib.c
-
+  DevicePathUtilities.c
+  DevicePathToText.c
+  DevicePathFromText.c
+  UefiDevicePathLibOptionalDevicePathProtocol.c
+  UefiDevicePathLib.h
 
 [Packages]
   MdePkg/MdePkg.dec
 
 
 [LibraryClasses]
-  UefiBootServicesTableLib
-  BaseMemoryLib
-  MemoryAllocationLib
   BaseLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
   DebugLib
+  BaseMemoryLib
   PcdLib
+  PrintLib
+
+[Guids]
+  gEfiVTUTF8Guid
+  gEfiVT100Guid
+  gEfiVT100PlusGuid
+  gEfiPcAnsiGuid
+  gEfiUartDevicePathGuid
+  gEfiSasDevicePathGuid
 
 [Protocols]
   gEfiDevicePathProtocolGuid                    ## CONSUMES
   gEfiDevicePathUtilitiesProtocolGuid           ## CONSUMES
   gEfiDevicePathToTextProtocolGuid              ## CONSUMES
   gEfiDevicePathFromTextProtocolGuid            ## CONSUMES
+  gEfiDebugPortProtocolGuid                     ## SOMETIMES_CONSUMES ## GUID
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdMaximumDevicePathNodeCount

@@ -1,26 +1,150 @@
 /** @file
-  Device Path services. The thing to remember is device paths are built out of
-  nodes. The device path is terminated by an end node that is length
-  sizeof(EFI_DEVICE_PATH_PROTOCOL). That would be why there is sizeof(EFI_DEVICE_PATH_PROTOCOL)
-  all over this file.
+  Definition for Device Path library.
 
-  The only place where multi-instance device paths are supported is in
-  environment varibles. Multi-instance device paths should never be placed
-  on a Handle.
+Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
-  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php.                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
+#ifndef _UEFI_DEVICE_PATH_LIB_H_
+#define _UEFI_DEVICE_PATH_LIB_H_
+#include <Uefi.h>
+#include <Protocol/DevicePathUtilities.h>
+#include <Protocol/DebugPort.h>
+#include <Protocol/DevicePathToText.h>
+#include <Protocol/DevicePathFromText.h>
+#include <Guid/PcAnsi.h>
+#include <Library/DebugLib.h>
+#include <Library/PrintLib.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/DevicePathLib.h>
+#include <Library/PcdLib.h>
 
-#include "UefiDevicePathLib.h"
+#define IS_COMMA(a)                ((a) == L',')
+#define IS_HYPHEN(a)               ((a) == L'-')
+#define IS_DOT(a)                  ((a) == L'.')
+#define IS_LEFT_PARENTH(a)         ((a) == L'(')
+#define IS_RIGHT_PARENTH(a)        ((a) == L')')
+#define IS_SLASH(a)                ((a) == L'/')
+#define IS_NULL(a)                 ((a) == L'\0')
+
+
+//
+// Private Data structure
+//
+typedef struct {
+  CHAR16  *Str;
+  UINTN   Count;
+  UINTN   Capacity;
+} POOL_PRINT;
+
+typedef
+EFI_DEVICE_PATH_PROTOCOL  *
+(*DEVICE_PATH_FROM_TEXT) (
+  IN  CHAR16 *Str
+  );
+
+typedef
+VOID
+(*DEVICE_PATH_TO_TEXT) (
+  IN OUT POOL_PRINT  *Str,
+  IN VOID            *DevicePath,
+  IN BOOLEAN         DisplayOnly,
+  IN BOOLEAN         AllowShortcuts
+  );
+
+typedef struct {
+  UINT8                Type;
+  UINT8                SubType;
+  DEVICE_PATH_TO_TEXT  Function;
+} DEVICE_PATH_TO_TEXT_TABLE;
+
+typedef struct {
+  CHAR16                    *DevicePathNodeText;
+  DEVICE_PATH_FROM_TEXT     Function;
+} DEVICE_PATH_FROM_TEXT_TABLE;
+
+typedef struct {
+  BOOLEAN ClassExist;
+  UINT8   Class;
+  BOOLEAN SubClassExist;
+  UINT8   SubClass;
+} USB_CLASS_TEXT;
+
+#define USB_CLASS_AUDIO            1
+#define USB_CLASS_CDCCONTROL       2
+#define USB_CLASS_HID              3
+#define USB_CLASS_IMAGE            6
+#define USB_CLASS_PRINTER          7
+#define USB_CLASS_MASS_STORAGE     8
+#define USB_CLASS_HUB              9
+#define USB_CLASS_CDCDATA          10
+#define USB_CLASS_SMART_CARD       11
+#define USB_CLASS_VIDEO            14
+#define USB_CLASS_DIAGNOSTIC       220
+#define USB_CLASS_WIRELESS         224
+
+#define USB_CLASS_RESERVE          254
+#define USB_SUBCLASS_FW_UPDATE     1
+#define USB_SUBCLASS_IRDA_BRIDGE   2
+#define USB_SUBCLASS_TEST          3
+
+#define RFC_1700_UDP_PROTOCOL      17
+#define RFC_1700_TCP_PROTOCOL      6
+
+#pragma pack(1)
+
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL  Header;
+  EFI_GUID                  Guid;
+  UINT8                     VendorDefinedData[1];
+} VENDOR_DEFINED_HARDWARE_DEVICE_PATH;
+
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL  Header;
+  EFI_GUID                  Guid;
+  UINT8                     VendorDefinedData[1];
+} VENDOR_DEFINED_MESSAGING_DEVICE_PATH;
+
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL  Header;
+  EFI_GUID                  Guid;
+  UINT8                     VendorDefinedData[1];
+} VENDOR_DEFINED_MEDIA_DEVICE_PATH;
+
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL  Header;
+  UINT32                    Hid;
+  UINT32                    Uid;
+  UINT32                    Cid;
+  CHAR8                     HidUidCidStr[3];
+} ACPI_EXTENDED_HID_DEVICE_PATH_WITH_STR;
+
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL  Header;
+  UINT16                    NetworkProtocol;
+  UINT16                    LoginOption;
+  UINT64                    Lun;
+  UINT16                    TargetPortalGroupTag;
+  CHAR8                     TargetName[1];
+} ISCSI_DEVICE_PATH_WITH_NAME;
+
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL  Header;
+  EFI_GUID                  Guid;
+  UINT8                     VendorDefinedData[1];
+} VENDOR_DEVICE_PATH_WITH_DATA;
+
+#pragma pack()
 
 /**
   Returns the size of a device path in bytes.
@@ -37,12 +161,9 @@
 **/
 UINTN
 EFIAPI
-GetDevicePathSize (
+UefiDevicePathLibGetDevicePathSize (
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath
-  )
-{
-  return UefiDevicePathLibGetDevicePathSize (DevicePath);
-}
+  );
 
 /**
   Creates a new copy of an existing device path.
@@ -62,12 +183,9 @@ GetDevicePathSize (
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
-DuplicateDevicePath (
+UefiDevicePathLibDuplicateDevicePath (
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath
-  )
-{
-  return UefiDevicePathLibDuplicateDevicePath (DevicePath);
-}
+  );
 
 /**
   Creates a new device path by appending a second device path to a first device path.
@@ -95,13 +213,10 @@ DuplicateDevicePath (
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
-AppendDevicePath (
+UefiDevicePathLibAppendDevicePath (
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *FirstDevicePath,  OPTIONAL
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *SecondDevicePath  OPTIONAL
-  )
-{
-  return UefiDevicePathLibAppendDevicePath (FirstDevicePath, SecondDevicePath);
-}
+  );
 
 /**
   Creates a new path by appending the device node to the device path.
@@ -133,13 +248,10 @@ AppendDevicePath (
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
-AppendDevicePathNode (
+UefiDevicePathLibAppendDevicePathNode (
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath,     OPTIONAL
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePathNode  OPTIONAL
-  )
-{
-  return UefiDevicePathLibAppendDevicePathNode (DevicePath, DevicePathNode);
-}
+  );
 
 /**
   Creates a new device path by appending the specified device path instance to the specified device
@@ -166,13 +278,10 @@ AppendDevicePathNode (
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
-AppendDevicePathInstance (
+UefiDevicePathLibAppendDevicePathInstance (
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath,        OPTIONAL
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePathInstance OPTIONAL
-  )
-{
-  return UefiDevicePathLibAppendDevicePathInstance (DevicePath, DevicePathInstance);
-}
+  );
 
 /**
   Creates a copy of the current device path instance and returns a pointer to the next device path
@@ -204,13 +313,10 @@ AppendDevicePathInstance (
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
-GetNextDevicePathInstance (
+UefiDevicePathLibGetNextDevicePathInstance (
   IN OUT EFI_DEVICE_PATH_PROTOCOL    **DevicePath,
   OUT UINTN                          *Size
-  )
-{
-  return UefiDevicePathLibGetNextDevicePathInstance (DevicePath, Size);
-}
+  );
 
 /**
   Creates a device node.
@@ -233,14 +339,11 @@ GetNextDevicePathInstance (
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
-CreateDeviceNode (
+UefiDevicePathLibCreateDeviceNode (
   IN UINT8                           NodeType,
   IN UINT8                           NodeSubType,
   IN UINT16                          NodeLength
-  )
-{
-  return UefiDevicePathLibCreateDeviceNode (NodeType, NodeSubType, NodeLength);
-}
+  );
 
 /**
   Determines if a device path is single or multi-instance.
@@ -259,38 +362,10 @@ CreateDeviceNode (
 **/
 BOOLEAN
 EFIAPI
-IsDevicePathMultiInstance (
+UefiDevicePathLibIsDevicePathMultiInstance (
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath
-  )
-{
-  return UefiDevicePathLibIsDevicePathMultiInstance (DevicePath);
-}
+  );
 
-/**
-  Converts a device node to its string representation.
-
-  @param DeviceNode        A Pointer to the device node to be converted.
-  @param DisplayOnly       If DisplayOnly is TRUE, then the shorter text representation
-                           of the display node is used, where applicable. If DisplayOnly
-                           is FALSE, then the longer text representation of the display node
-                           is used.
-  @param AllowShortcuts    If AllowShortcuts is TRUE, then the shortcut forms of text
-                           representation for a device node can be used, where applicable.
-
-  @return A pointer to the allocated text representation of the device node or NULL if DeviceNode
-          is NULL or there was insufficient memory.
-
-**/
-CHAR16 *
-EFIAPI
-ConvertDeviceNodeToText (
-  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DeviceNode,
-  IN BOOLEAN                         DisplayOnly,
-  IN BOOLEAN                         AllowShortcuts
-  )
-{
-  return UefiDevicePathLibConvertDeviceNodeToText (DeviceNode, DisplayOnly, AllowShortcuts);
-}
 
 /**
   Converts a device path to its text representation.
@@ -309,14 +384,34 @@ ConvertDeviceNodeToText (
 **/
 CHAR16 *
 EFIAPI
-ConvertDevicePathToText (
+UefiDevicePathLibConvertDevicePathToText (
   IN CONST EFI_DEVICE_PATH_PROTOCOL   *DevicePath,
   IN BOOLEAN                          DisplayOnly,
   IN BOOLEAN                          AllowShortcuts
-  )
-{
-  return UefiDevicePathLibConvertDevicePathToText (DevicePath, DisplayOnly, AllowShortcuts);
-}
+  );
+
+/**
+  Converts a device node to its string representation.
+
+  @param DeviceNode        A Pointer to the device node to be converted.
+  @param DisplayOnly       If DisplayOnly is TRUE, then the shorter text representation
+                           of the display node is used, where applicable. If DisplayOnly
+                           is FALSE, then the longer text representation of the display node
+                           is used.
+  @param AllowShortcuts    If AllowShortcuts is TRUE, then the shortcut forms of text
+                           representation for a device node can be used, where applicable.
+
+  @return A pointer to the allocated text representation of the device node or NULL if DeviceNode
+          is NULL or there was insufficient memory.
+
+**/
+CHAR16 *
+EFIAPI
+UefiDevicePathLibConvertDeviceNodeToText (
+  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DeviceNode,
+  IN BOOLEAN                         DisplayOnly,
+  IN BOOLEAN                         AllowShortcuts
+  );
 
 /**
   Convert text to the binary representation of a device node.
@@ -331,12 +426,9 @@ ConvertDevicePathToText (
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
-ConvertTextToDeviceNode (
+UefiDevicePathLibConvertTextToDeviceNode (
   IN CONST CHAR16 *TextDeviceNode
-  )
-{
-  return UefiDevicePathLibConvertTextToDeviceNode (TextDeviceNode);
-}
+  );
 
 /**
   Convert text to the binary representation of a device path.
@@ -352,9 +444,8 @@ ConvertTextToDeviceNode (
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
-ConvertTextToDevicePath (
+UefiDevicePathLibConvertTextToDevicePath (
   IN CONST CHAR16 *TextDevicePath
-  )
-{
-  return UefiDevicePathLibConvertTextToDevicePath (TextDevicePath);
-}
+  );
+
+#endif

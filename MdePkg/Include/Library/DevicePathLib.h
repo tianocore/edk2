@@ -4,7 +4,7 @@
   This library provides defines, macros, and functions to help create and parse 
   EFI_DEVICE_PATH_PROTOCOL structures.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -481,6 +481,86 @@ EFIAPI
 FileDevicePath (
   IN EFI_HANDLE                      Device,     OPTIONAL
   IN CONST CHAR16                    *FileName
+  );
+
+/**
+  Converts a device path to its text representation.
+
+  @param DevicePath      A Pointer to the device to be converted.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+  @return A pointer to the allocated text representation of the device path or
+          NULL if DeviceNode is NULL or there was insufficient memory.
+
+**/
+CHAR16 *
+EFIAPI
+ConvertDevicePathToText (
+  IN CONST EFI_DEVICE_PATH_PROTOCOL   *DevicePath,
+  IN BOOLEAN                          DisplayOnly,
+  IN BOOLEAN                          AllowShortcuts
+  );
+
+/**
+  Converts a device node to its string representation.
+
+  @param DeviceNode        A Pointer to the device node to be converted.
+  @param DisplayOnly       If DisplayOnly is TRUE, then the shorter text representation
+                           of the display node is used, where applicable. If DisplayOnly
+                           is FALSE, then the longer text representation of the display node
+                           is used.
+  @param AllowShortcuts    If AllowShortcuts is TRUE, then the shortcut forms of text
+                           representation for a device node can be used, where applicable.
+
+  @return A pointer to the allocated text representation of the device node or NULL if DeviceNode
+          is NULL or there was insufficient memory.
+
+**/
+CHAR16 *
+EFIAPI
+ConvertDeviceNodeToText (
+  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DeviceNode,
+  IN BOOLEAN                         DisplayOnly,
+  IN BOOLEAN                         AllowShortcuts
+  );
+
+/**
+  Convert text to the binary representation of a device node.
+
+  @param TextDeviceNode  TextDeviceNode points to the text representation of a device
+                         node. Conversion starts with the first character and continues
+                         until the first non-device node character.
+
+  @return A pointer to the EFI device node or NULL if TextDeviceNode is NULL or there was
+          insufficient memory or text unsupported.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+EFIAPI
+ConvertTextToDeviceNode (
+  IN CONST CHAR16 *TextDeviceNode
+  );
+
+/**
+  Convert text to the binary representation of a device path.
+
+  @param TextDevicePath  TextDevicePath points to the text representation of a device
+                         path. Conversion starts with the first character and continues
+                         until the first non-device node character.
+
+  @return A pointer to the allocated device path or NULL if TextDeviceNode is NULL or
+          there was insufficient memory.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+EFIAPI
+ConvertTextToDevicePath (
+  IN CONST CHAR16 *TextDevicePath
   );
 
 #endif

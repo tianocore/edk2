@@ -2,7 +2,7 @@
   Device Path Driver to produce DevPathUtilities Protocol, DevPathFromText Protocol
   and DevPathToText Protocol.
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -13,19 +13,24 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include "DevicePath.h"
-
-EFI_HANDLE  mDevicePathHandle = NULL;
+#include <Uefi.h>
+#include <Protocol/DevicePathUtilities.h>
+#include <Protocol/DevicePathToText.h>
+#include <Protocol/DevicePathFromText.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/DevicePathLib.h>
+#include <Library/PcdLib.h>
 
 GLOBAL_REMOVE_IF_UNREFERENCED CONST EFI_DEVICE_PATH_UTILITIES_PROTOCOL mDevicePathUtilities = {
-  GetDevicePathSizeProtocolInterface,
-  DuplicateDevicePathProtocolInterface,
-  AppendDevicePathProtocolInterface,
-  AppendDeviceNodeProtocolInterface,
-  AppendDevicePathInstanceProtocolInterface,
-  GetNextDevicePathInstanceProtocolInterface,
-  IsDevicePathMultiInstanceProtocolInterface,
-  CreateDeviceNodeProtocolInterface
+  GetDevicePathSize,
+  DuplicateDevicePath,
+  AppendDevicePath,
+  AppendDevicePathNode,
+  AppendDevicePathInstance,
+  GetNextDevicePathInstance,
+  IsDevicePathMultiInstance,
+  CreateDeviceNode
 };
 
 GLOBAL_REMOVE_IF_UNREFERENCED CONST EFI_DEVICE_PATH_TO_TEXT_PROTOCOL   mDevicePathToText = {
@@ -37,11 +42,6 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL mDevicePa
   ConvertTextToDeviceNode,
   ConvertTextToDevicePath
 };
-
-GLOBAL_REMOVE_IF_UNREFERENCED CONST EFI_GUID mEfiDevicePathMessagingUartFlowControlGuid = DEVICE_PATH_MESSAGING_UART_FLOW_CONTROL;
-GLOBAL_REMOVE_IF_UNREFERENCED CONST EFI_GUID mEfiDevicePathMessagingSASGuid             = DEVICE_PATH_MESSAGING_SAS;
-
-
 
 /**
   The user Entry Point for DevicePath module.
@@ -64,12 +64,14 @@ DevicePathEntryPoint (
   )
 {
   EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
 
+  Handle = NULL;
   Status = EFI_UNSUPPORTED;
   if (FeaturePcdGet (PcdDevicePathSupportDevicePathToText)) {
     if (FeaturePcdGet (PcdDevicePathSupportDevicePathFromText)) {
       Status = gBS->InstallMultipleProtocolInterfaces (
-                      &mDevicePathHandle,
+                      &Handle,
                       &gEfiDevicePathUtilitiesProtocolGuid, &mDevicePathUtilities,
                       &gEfiDevicePathToTextProtocolGuid,    &mDevicePathToText,
                       &gEfiDevicePathFromTextProtocolGuid,  &mDevicePathFromText,
@@ -77,7 +79,7 @@ DevicePathEntryPoint (
                       );
     } else {
       Status = gBS->InstallMultipleProtocolInterfaces (
-                      &mDevicePathHandle,
+                      &Handle,
                       &gEfiDevicePathUtilitiesProtocolGuid, &mDevicePathUtilities,
                       &gEfiDevicePathToTextProtocolGuid,    &mDevicePathToText,
                       NULL
@@ -86,14 +88,14 @@ DevicePathEntryPoint (
   } else {
     if (FeaturePcdGet (PcdDevicePathSupportDevicePathFromText)) {
       Status = gBS->InstallMultipleProtocolInterfaces (
-                      &mDevicePathHandle,
+                      &Handle,
                       &gEfiDevicePathUtilitiesProtocolGuid, &mDevicePathUtilities,
                       &gEfiDevicePathFromTextProtocolGuid,  &mDevicePathFromText,
                       NULL
                       );
     } else {
       Status = gBS->InstallMultipleProtocolInterfaces (
-                      &mDevicePathHandle,
+                      &Handle,
                       &gEfiDevicePathUtilitiesProtocolGuid, &mDevicePathUtilities,
                       NULL
                       );
