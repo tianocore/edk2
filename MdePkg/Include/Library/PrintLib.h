@@ -2,7 +2,7 @@
   Provides services to print a formatted string to a buffer. All combinations of
   Unicode and ASCII strings are supported.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -46,8 +46,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       - Place a comma every 3rd digit of the number.  Only valid for type d.
         If 0 is also specified, then 0 is ignored.
     - L, l
-      - The number being printed is a UINT64.  Only valid for types X, x, and d.
-        If this flag is not specified, then the number being printed is a int.
+      - The number being printed is size UINT64.  Only valid for types X, x, and d.
+        If this flag is not specified, then the number being printed is size int.
     - NOTE: All invalid flags are ignored.
 
   [width]:
@@ -78,20 +78,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       - The argument is a Unicode character.  ASCII characters can be printed 
         using this type too by making sure bits 8..15 of the argument are set to 0.
     - x
-      - The argument is a hexadecimal number.  The characters used are 0..9 and 
+      - The argument is an unsigned hexadecimal number.  The characters used are 0..9 and 
         A..F.  If the flag 'L' is not specified, then the argument is assumed 
-        to be an int.  This does not follow ANSI C.
+        to be size int.  This does not follow ANSI C.
     - X
-      - The argument is a hexadecimal number and the number is padded with 
+      - The argument is an unsigned hexadecimal number and the number is padded with 
         zeros.  This is equivalent to a format string of "0x". If the flag 
-        'L' is not specified, then the argument is assumed to be an int.  
+        'L' is not specified, then the argument is assumed to be size int.  
         This does not follow ANSI C.
     - d
-      - The argument is a decimal number.  If the flag 'L' is not specified, 
-        then the argument is assumed to be an int.  
+      - The argument is a signed decimal number.  If the flag 'L' is not specified, 
+        then the argument is assumed to be size int.  
     - p
-      - The argument is a pointer that is a (VOID *), and it is printed as a 
-        hexadecimal number  The characters used are 0..9 and A..F.
+      - The argument is a pointer that is a (VOID *), and it is printed as an 
+        unsigned hexadecimal number  The characters used are 0..9 and A..F.
     - a
       - The argument is a pointer to an ASCII string.  
         This does not follow ANSI C.
