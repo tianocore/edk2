@@ -1,8 +1,8 @@
 /** @file
   Include file that supports UEFI.
 
-  This include file must contain things defined in the UEFI 2.3 specification.
-  If a code construct is defined in the UEFI 2.3 specification it must be included
+  This include file must contain things defined in the UEFI 2.4 specification.
+  If a code construct is defined in the UEFI 2.4 specification it must be included
   by this include file.
 
 Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
@@ -1732,6 +1732,7 @@ EFI_STATUS
 // EFI Runtime Services Table
 //
 #define EFI_SYSTEM_TABLE_SIGNATURE      SIGNATURE_64 ('I','B','I',' ','S','Y','S','T')
+#define EFI_2_40_SYSTEM_TABLE_REVISION  ((2 << 16) | (40))
 #define EFI_2_31_SYSTEM_TABLE_REVISION  ((2 << 16) | (31))
 #define EFI_2_30_SYSTEM_TABLE_REVISION  ((2 << 16) | (30))
 #define EFI_2_20_SYSTEM_TABLE_REVISION  ((2 << 16) | (20))
@@ -2083,6 +2084,7 @@ typedef struct {
 #define EFI_REMOVABLE_MEDIA_FILE_NAME_IA64    L"\\EFI\\BOOT\\BOOTIA64.EFI"
 #define EFI_REMOVABLE_MEDIA_FILE_NAME_X64     L"\\EFI\\BOOT\\BOOTX64.EFI"
 #define EFI_REMOVABLE_MEDIA_FILE_NAME_ARM     L"\\EFI\\BOOT\\BOOTARM.EFI"
+#define EFI_REMOVABLE_MEDIA_FILE_NAME_AARCH64 L"\\EFI\\BOOT\\BOOTAA64.EFI"
 
 #if   defined (MDE_CPU_IA32)
   #define EFI_REMOVABLE_MEDIA_FILE_NAME   EFI_REMOVABLE_MEDIA_FILE_NAME_IA32
@@ -2093,6 +2095,8 @@ typedef struct {
 #elif defined (MDE_CPU_EBC)
 #elif defined (MDE_CPU_ARM)
   #define EFI_REMOVABLE_MEDIA_FILE_NAME   EFI_REMOVABLE_MEDIA_FILE_NAME_ARM
+#elif defined (MDE_CPU_AARCH64)
+  #define EFI_REMOVABLE_MEDIA_FILE_NAME   EFI_REMOVABLE_MEDIA_FILE_NAME_AARCH64
 #else
   #error Unknown Processor Type
 #endif

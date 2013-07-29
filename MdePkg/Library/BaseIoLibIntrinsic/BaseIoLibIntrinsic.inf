@@ -28,7 +28,7 @@
 
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF ARM
+#  VALID_ARCHITECTURES           = IA32 X64 IPF ARM AARCH64
 #
 
 [Sources]
@@ -52,6 +52,9 @@
   IoLibIpf.c
 
 [Sources.ARM]
+  IoLibArm.c
+
+[Sources.AARCH64]
   IoLibArm.c
 
 [Packages]

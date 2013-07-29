@@ -2,6 +2,8 @@
   Defines data types and constants introduced in UEFI.
 
 Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Portions copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
+
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -241,6 +243,11 @@ typedef union {
 ///
 #define EFI_IMAGE_MACHINE_ARMTHUMB_MIXED  0x01C2
 
+///
+/// PE32+ Machine type for AARCH64 A64 images.
+///
+#define EFI_IMAGE_MACHINE_AARCH64  0xAA64
+
 
 #if   defined (MDE_CPU_IA32)
 
@@ -269,6 +276,13 @@ typedef union {
   (((Machine) == EFI_IMAGE_MACHINE_ARMTHUMB_MIXED) || ((Machine) == EFI_IMAGE_MACHINE_EBC))
 
 #define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine) ((Machine) == EFI_IMAGE_MACHINE_ARMTHUMB_MIXED) 
+
+#elif defined (MDE_CPU_AARCH64)
+
+#define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) \
+  (((Machine) == EFI_IMAGE_MACHINE_AARCH64) || ((Machine) == EFI_IMAGE_MACHINE_EBC))
+
+#define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine) (FALSE)
 
 #elif defined (MDE_CPU_EBC)
 

@@ -27,7 +27,7 @@
 
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM AARCH64
 #
 
 [Sources.IA32]
@@ -43,6 +43,9 @@
   EbcCache.c
 
 [Sources.ARM]
+  ArmCache.c
+
+[Sources.AARCH64]
   ArmCache.c
 
 [Packages]
