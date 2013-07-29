@@ -148,6 +148,8 @@ typedef UINT16  EFI_PXE_BASE_CODE_UDP_PORT;
 //
 // PXE Tag definition that identifies the processor 
 // and programming environment of the client system.
+// These identifiers are defined by IETF:
+// http://www.ietf.org/assignments/dhcpv6-parameters/dhcpv6-parameters.xml
 //
 #if defined (MDE_CPU_IA32)
 #define EFI_PXE_CLIENT_SYSTEM_ARCHITECTURE    0x0006
@@ -157,6 +159,8 @@ typedef UINT16  EFI_PXE_BASE_CODE_UDP_PORT;
 #define EFI_PXE_CLIENT_SYSTEM_ARCHITECTURE    0x0007
 #elif defined (MDE_CPU_ARM)
 #define EFI_PXE_CLIENT_SYSTEM_ARCHITECTURE    0x000A
+#elif defined (MDE_CPU_AARCH64)
+#define EFI_PXE_CLIENT_SYSTEM_ARCHITECTURE    0x000B
 #endif
 
 
