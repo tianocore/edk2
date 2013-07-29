@@ -23,7 +23,7 @@
   LIBRARY_CLASS                  = SynchronizationLib
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM AARCH64
 #
 [Sources]
   BaseSynchronizationLibInternals.h
@@ -78,6 +78,10 @@
 [Sources.ARM]
   Synchronization.c
   Arm/Synchronization.c
+
+[Sources.AARCH64]
+  Synchronization.c
+  AArch64/Synchronization.c
 
 [Packages]
   MdePkg/MdePkg.dec
