@@ -32,7 +32,7 @@
 
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM AARCH64
 #
 
 [Sources]
@@ -47,6 +47,9 @@
 
 [Sources.ARM]
   Arm/PeCoffLoaderEx.c
+
+[Sources.AARCH64]
+  AArch64/PeCoffLoaderEx.c
 
 [Packages]
   MdePkg/MdePkg.dec

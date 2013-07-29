@@ -4,7 +4,7 @@
   EFI_IMAGE_NT_HEADERS64 is for PE32+. 
 
   This file is coded to the Visual Studio, Microsoft Portable Executable and 
-  Common Object File Format Specification, Revision 8.0 - May 16, 2006. 
+  Common Object File Format Specification, Revision 8.3 - February 6, 2013.
   This file also includes some definitions in PI Specification, Revision 1.0.
 
 Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
@@ -39,6 +39,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define IMAGE_FILE_MACHINE_EBC             0x0EBC
 #define IMAGE_FILE_MACHINE_X64             0x8664
 #define IMAGE_FILE_MACHINE_ARMTHUMB_MIXED  0x01c2
+#define IMAGE_FILE_MACHINE_ARM64           0xAA64
 
 //
 // EXE file formats
