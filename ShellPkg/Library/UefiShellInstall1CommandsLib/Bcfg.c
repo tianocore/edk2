@@ -523,6 +523,7 @@ BcfgAddInstall1(
 
       CopyMem (TempByteBuffer, Desc, DescSize);
       TempByteBuffer += DescSize;
+      ASSERT (FilePath != NULL);
       CopyMem (TempByteBuffer, FilePath, FilePathSize);
 
       UnicodeSPrint (OptionStr, sizeof(OptionStr), L"%s%04x", Target == BcfgTargetBootOrder?L"Boot":L"Driver", TargetLocation);

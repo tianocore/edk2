@@ -118,6 +118,7 @@ InternalShellProtocolDebugPrintMessage (
   EFI_STATUS                        Status;
   CHAR16                            *Temp;
 
+  Status = EFI_SUCCESS;
   DEBUG_CODE_BEGIN();
 
   if (Mapping != NULL) {
