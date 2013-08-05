@@ -2,7 +2,7 @@
   SCSI Bus driver that layers on every SCSI Pass Thru and
   Extended SCSI Pass Thru protocol in the system.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1293,7 +1293,7 @@ DiscoverScsiDevice (
   for (Index = 0; Index < MaxRetry; Index++) {
     Status = ScsiInquiryCommand (
               &ScsiIoDevice->ScsiIo,
-              EFI_TIMER_PERIOD_SECONDS (1),
+              SCSI_BUS_TIMEOUT,
               NULL,
               &SenseDataLength,
               &HostAdapterStatus,
