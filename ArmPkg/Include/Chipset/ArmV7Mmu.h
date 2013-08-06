@@ -139,8 +139,8 @@
 #define TT_DESCRIPTOR_CONVERT_TO_PAGE_NG(Desc)                  ((((Desc) & TT_DESCRIPTOR_SECTION_NG_MASK) >> 6) & TT_DESCRIPTOR_PAGE_NG_MASK)
 #define TT_DESCRIPTOR_CONVERT_TO_PAGE_S(Desc)                  ((((Desc) & TT_DESCRIPTOR_SECTION_S_MASK) >> 6) & TT_DESCRIPTOR_PAGE_S_MASK)
 #define TT_DESCRIPTOR_CONVERT_TO_PAGE_XN(Desc,IsLargePage)      ((IsLargePage)? \
-                                                                    ((((Desc) & TT_DESCRIPTOR_SECTION_XN_MASK) >> 4) & TT_DESCRIPTOR_LARGEPAGE_XN_MASK):    \
-                                                                    ((((Desc) & TT_DESCRIPTOR_SECTION_XN_MASK) << 11) & TT_DESCRIPTOR_PAGE_XN_MASK))
+                                                                    ((((Desc) & TT_DESCRIPTOR_SECTION_XN_MASK) << 11) & TT_DESCRIPTOR_LARGEPAGE_XN_MASK):    \
+                                                                    ((((Desc) & TT_DESCRIPTOR_SECTION_XN_MASK) >> 4) & TT_DESCRIPTOR_PAGE_XN_MASK))
 #define TT_DESCRIPTOR_CONVERT_TO_PAGE_CACHE_POLICY(Desc,IsLargePage)      (IsLargePage? \
                                                                     (((Desc) & TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK) & TT_DESCRIPTOR_LARGEPAGE_CACHE_POLICY_MASK): \
                                                                     (((((Desc) & (0x3 << 12)) >> 6) | (Desc & (0x3 << 2)))))
