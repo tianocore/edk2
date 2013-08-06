@@ -34,15 +34,6 @@
 // ID_AA64PFR0 - AArch64 Processor Feature Register 0 definitions
 #define AARCH64_PFR0_FP         (0xF << 16)
 
-// NSACR - Non-Secure Access Control Register definitions
-#define NSACR_CP(cp)            ((1 << (cp)) & 0x3FFF)
-#define NSACR_NSD32DIS          (1 << 14)
-#define NSACR_NSASEDIS          (1 << 15)
-#define NSACR_PLE               (1 << 16)
-#define NSACR_TL                (1 << 17)
-#define NSACR_NS_SMP            (1 << 18)
-#define NSACR_RFR               (1 << 19)
-
 // SCR - Secure Configuration Register definitions
 #define SCR_NS                  (1 << 0)
 #define SCR_IRQ                 (1 << 1)
@@ -174,6 +165,11 @@ PageAttributeToGcdAttribute (
 UINT64
 GcdAttributeToPageAttribute (
   IN UINT64 GcdAttributes
+  );
+
+UINTN
+ArmWriteCptr (
+  IN  UINT64 Cptr
   );
 
 #endif // __AARCH64_H__

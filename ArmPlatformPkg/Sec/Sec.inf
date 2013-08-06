@@ -24,12 +24,14 @@
   Sec.c
 
 [Sources.ARM]
+  Arm/Arch.c
   Arm/Helper.asm           | RVCT
   Arm/Helper.S             | GCC
   Arm/SecEntryPoint.S      | GCC
   Arm/SecEntryPoint.asm    | RVCT
   
 [Sources.AARCH64]
+  AArch64/Arch.c
   AArch64/Helper.S        | GCC
   AArch64/SecEntryPoint.S | GCC
 
@@ -56,14 +58,13 @@
 [FeaturePcd]
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec
   
-[FixedPcd]
+[FixedPcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
 
   gArmTokenSpaceGuid.PcdTrustzoneSupport
   gArmTokenSpaceGuid.PcdVFPEnabled
   
   gArmTokenSpaceGuid.PcdArmScr
-  gArmTokenSpaceGuid.PcdArmNsacr
   gArmTokenSpaceGuid.PcdArmNonSecModeTransition
   
   gArmTokenSpaceGuid.PcdSecureFvBaseAddress
@@ -81,3 +82,6 @@
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
   
   gArmPlatformTokenSpaceGuid.PcdSecGlobalVariableSize  
+
+[FixedPcd.ARM]
+  gArmTokenSpaceGuid.PcdArmNsacr

@@ -128,15 +128,7 @@
   # - BIT9 : SIF - Secure Instruction Fetch
   # 0x31 = NS | EA | FW
   gArmTokenSpaceGuid.PcdArmScr|0x31|UINT32|0x00000038
-  
-  # Non Secure Access Control Register
-  # - BIT15 : NSASEDIS - Disable Non-secure Advanced SIMD functionality
-  # - BIT14 : NSD32DIS - Disable Non-secure use of D16-D31 
-  # - BIT11 : cp11 - Non-secure access to coprocessor 11 enable
-  # - BIT10 : cp10 - Non-secure access to coprocessor 10 enable
-  # 0xC00 = cp10 | cp11
-  gArmTokenSpaceGuid.PcdArmNsacr|0xC00|UINT32|0x00000039
-  
+
   # System Memory (DRAM): These PCDs define the region of in-built system memory
   # Some platforms can get DRAM extensions, these additional regions will be declared
   # to UEFI by ArmPLatformPlib   
@@ -181,6 +173,14 @@
   gArmTokenSpaceGuid.PcdArmLinuxFdtMaxOffset|0x4000|UINT32|0x00000023
   # The FDT blob must be loaded at a 64bit aligned address.
   gArmTokenSpaceGuid.PcdArmLinuxFdtAlignment|0x8|UINT32|0x00000026
+
+  # Non Secure Access Control Register
+  # - BIT15 : NSASEDIS - Disable Non-secure Advanced SIMD functionality
+  # - BIT14 : NSD32DIS - Disable Non-secure use of D16-D31
+  # - BIT11 : cp11 - Non-secure access to coprocessor 11 enable
+  # - BIT10 : cp10 - Non-secure access to coprocessor 10 enable
+  # 0xC00 = cp10 | cp11
+  gArmTokenSpaceGuid.PcdArmNsacr|0xC00|UINT32|0x00000039
 
 [PcdsFixedAtBuild.AARCH64]
   # By default we do transition to EL2 non-secure mode with Stack for EL2.

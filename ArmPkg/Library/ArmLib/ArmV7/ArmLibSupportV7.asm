@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------ 
 //
 // Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-// Copyright (c) 2011, ARM Limited. All rights reserved.
+// Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 //
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -25,7 +25,9 @@
     EXPORT  ArmDisableInterrupts
     EXPORT  ReadCCSIDR
     EXPORT  ReadCLIDR
-    
+    EXPORT  ArmReadNsacr
+    EXPORT  ArmWriteNsacr
+
     AREA ArmLibSupportV7, CODE, READONLY
 
 
@@ -96,5 +98,13 @@ ReadCCSIDR
 ReadCLIDR
   mrc p15,1,r0,c0,c0,1 ; Read CP15 Cache Level ID Register
   bx  lr
-  
+
+ArmReadNsacr
+  mrc     p15, 0, r0, c1, c1, 2
+  bx      lr
+
+ArmWriteNsacr
+  mcr     p15, 0, r0, c1, c1, 2
+  bx      lr
+
   END

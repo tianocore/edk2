@@ -112,5 +112,17 @@ EFIAPI
 ArmReadIdPfr1 (
   VOID
   );
-  
+
+UINT32
+EFIAPI
+ArmReadNsacr (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmWriteNsacr (
+  IN  UINT32   Nsacr
+  );
+
 #endif // __ARM_V7_H__

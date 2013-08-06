@@ -32,7 +32,7 @@ GCC_ASM_EXPORT (ArmWriteAuxCr)
 GCC_ASM_EXPORT (ArmReadAuxCr)
 GCC_ASM_EXPORT (ArmInvalidateTlb)
 GCC_ASM_EXPORT (ArmUpdateTranslationTableEntry)
-GCC_ASM_EXPORT (ArmWriteNsacr)
+GCC_ASM_EXPORT (ArmWriteCptr)
 GCC_ASM_EXPORT (ArmWriteScr)
 GCC_ASM_EXPORT (ArmWriteMVBar)
 GCC_ASM_EXPORT (ArmCallWFE)
@@ -176,9 +176,9 @@ ASM_PFX(ArmInvalidateTlb):
    isb
    ret
 
-ASM_PFX(ArmWriteNsacr):
+ASM_PFX(ArmWriteCptr):
   msr     cptr_el3, x0           // EL3 Coprocessor Trap Reg (CPTR)
-  ret                            // Non-Secure Access Control Reg (NSACR) in ARMv7
+  ret
 
 ASM_PFX(ArmWriteScr):
   msr     scr_el3, x0            // Secure configuration register EL3

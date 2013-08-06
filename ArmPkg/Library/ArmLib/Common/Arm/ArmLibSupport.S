@@ -38,8 +38,6 @@ GCC_ASM_EXPORT(ArmWriteAuxCr)
 GCC_ASM_EXPORT(ArmReadAuxCr)
 GCC_ASM_EXPORT(ArmInvalidateTlb)
 GCC_ASM_EXPORT(ArmUpdateTranslationTableEntry)
-GCC_ASM_EXPORT(ArmReadNsacr)
-GCC_ASM_EXPORT(ArmWriteNsacr)
 GCC_ASM_EXPORT(ArmReadScr)
 GCC_ASM_EXPORT(ArmWriteScr)
 GCC_ASM_EXPORT(ArmReadMVBar)
@@ -145,14 +143,6 @@ ASM_PFX(ArmInvalidateTlb):
   mcr     p15,0,R9,c7,c5,6      @ BPIALL Invalidate Branch predictor array. R9 == NoOp
   dsb
   isb
-  bx      lr
-
-ASM_PFX(ArmReadNsacr):
-  mrc     p15, 0, r0, c1, c1, 2
-  bx      lr
-
-ASM_PFX(ArmWriteNsacr):
-  mcr     p15, 0, r0, c1, c1, 2
   bx      lr
 
 ASM_PFX(ArmReadScr):

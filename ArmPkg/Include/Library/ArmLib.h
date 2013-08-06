@@ -537,18 +537,6 @@ ArmEnableVFP (
 
 UINT32
 EFIAPI
-ArmReadNsacr (
-  VOID
-  );
-
-VOID
-EFIAPI
-ArmWriteNsacr (
-  IN  UINT32   SetWayFormat
-  );
-
-UINT32
-EFIAPI
 ArmReadScr (
   VOID
   );

@@ -165,8 +165,8 @@ TrustedWorldInitialization (
   JumpAddress = PcdGet32 (PcdFvBaseAddress);
   ArmPlatformSecExtraAction (MpId, &JumpAddress);
 
-  // Write to CP15 Non-secure Access Control Register
-  ArmWriteNsacr (PcdGet32 (PcdArmNsacr));
+  // Initialize architecture specific security policy
+  ArmSecArchTrustzoneInit ();
 
   // CP15 Secure Configuration Register
   ArmWriteScr (PcdGet32 (PcdArmScr));

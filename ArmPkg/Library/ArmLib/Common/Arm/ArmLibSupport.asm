@@ -38,8 +38,6 @@
     EXPORT ArmReadAuxCr
     EXPORT ArmInvalidateTlb
     EXPORT ArmUpdateTranslationTableEntry
-    EXPORT ArmReadNsacr
-    EXPORT ArmWriteNsacr
     EXPORT ArmReadScr
     EXPORT ArmWriteScr
     EXPORT ArmReadMVBar
@@ -145,14 +143,6 @@ ArmInvalidateTlb
   mcr     p15,0,R9,c7,c5,6      // BPIALL Invalidate Branch predictor array. R9 == NoOp
   dsb
   isb
-  bx      lr
-
-ArmReadNsacr
-  mrc     p15, 0, r0, c1, c1, 2
-  bx      lr
-
-ArmWriteNsacr
-  mcr     p15, 0, r0, c1, c1, 2
   bx      lr
 
 ArmReadScr

@@ -74,4 +74,10 @@ SecCommonExceptionEntry (
   IN UINTN  LR
   );
 
+VOID
+EFIAPI
+ArmSecArchTrustzoneInit (
+  VOID
+  );
+
 #endif

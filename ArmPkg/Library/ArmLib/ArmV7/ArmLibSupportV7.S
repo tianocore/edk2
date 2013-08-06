@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------ 
 #
 # Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2011, ARM Limited. All rights reserved.
+# Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -29,6 +29,8 @@ GCC_ASM_EXPORT(ArmEnableInterrupts)
 GCC_ASM_EXPORT(ArmDisableInterrupts)
 GCC_ASM_EXPORT(ReadCCSIDR)
 GCC_ASM_EXPORT(ReadCLIDR)
+GCC_ASM_EXPORT(ArmReadNsacr)
+GCC_ASM_EXPORT(ArmWriteNsacr)
 
 #------------------------------------------------------------------------------
 
@@ -97,5 +99,13 @@ ASM_PFX(ReadCCSIDR):
 ASM_PFX(ReadCLIDR):
   mrc p15,1,r0,c0,c0,1 @ Read CP15 Cache Level ID Register
   bx  lr
+
+ASM_PFX(ArmReadNsacr):
+  mrc     p15, 0, r0, c1, c1, 2
+  bx      lr
+
+ASM_PFX(ArmWriteNsacr):
+  mcr     p15, 0, r0, c1, c1, 2
+  bx      lr
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED
