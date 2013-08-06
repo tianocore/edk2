@@ -1,15 +1,15 @@
 /** @file
 *  Main file supporting the transition to PEI Core in Normal World for Versatile Express
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
-*  
-*  This program and the accompanying materials                          
-*  are licensed and made available under the terms and conditions of the BSD License         
-*  which accompanies this distribution.  The full text of the license may be found at        
-*  http://opensource.org/licenses/bsd-license.php                                            
+*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 *
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+*  This program and the accompanying materials
+*  are licensed and made available under the terms and conditions of the BSD License
+*  which accompanies this distribution.  The full text of the license may be found at
+*  http://opensource.org/licenses/bsd-license.php
+*
+*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 *
 **/
 
@@ -71,14 +71,13 @@ CEntryPoint (
   IN  EFI_PEI_CORE_ENTRY_POINT  PeiCoreEntryPoint
   )
 {
-  //Clean Data cache
-  ArmCleanInvalidateDataCache ();
-
-  //Invalidate instruction cache
+  // Data Cache enabled on Primary core when MMU is enabled.
+  ArmDisableDataCache ();
+  // Invalidate Data cache
+  ArmInvalidateDataCache ();
+  // Invalidate instruction cache
   ArmInvalidateInstructionCache ();
-
-  // Enable Instruction & Data caches
-  ArmEnableDataCache ();
+  // Enable Instruction Caches on all cores.
   ArmEnableInstructionCache ();
 
   //
