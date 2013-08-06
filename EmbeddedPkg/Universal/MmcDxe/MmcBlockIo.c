@@ -486,6 +486,22 @@ MmcDetectCard (
   }
 }
 
+EFI_STATUS
+MmcStopTransmission (
+  EFI_MMC_HOST_PROTOCOL     *MmcHost
+  )
+{
+  EFI_STATUS              Status;
+  UINT32                  Response[4];
+  // Command 12 - Stop transmission (ends read or write)
+  // Normally only needed for streaming transfers or after error.
+  Status = MmcHost->SendCommand (MmcHost, MMC_CMD12, 0);
+  if (!EFI_ERROR (Status)) {
+    MmcHost->ReceiveResponse (MmcHost, MMC_RESPONSE_TYPE_R1b, Response);
+  }
+  return Status;
+}
+
 #define MMCI0_BLOCKLEN 512
 #define MMCI0_TIMEOUT  10000
 
@@ -598,6 +614,7 @@ MmcIoBlocks (
       Status = MmcHost->ReadBlockData (MmcHost, Lba, This->Media->BlockSize, Buffer);
       if (EFI_ERROR (Status)) {
         DEBUG ((EFI_D_BLKIO, "MmcIoBlocks(): Error Read Block Data and Status = %r\n", Status));
+        MmcStopTransmission (MmcHost);
         return Status;
       }
       Status = MmcNotifyState (MmcHostInstance, MmcProgrammingState);
@@ -610,14 +627,9 @@ MmcIoBlocks (
       Status = MmcHost->WriteBlockData (MmcHost, Lba, This->Media->BlockSize, Buffer);
       if (EFI_ERROR (Status)) {
         DEBUG ((EFI_D_BLKIO, "MmcIoBlocks(): Error Write Block Data and Status = %r\n", Status));
+        MmcStopTransmission (MmcHost);
         return Status;
       }
-    }
-
-    // Command 12 - Stop transmission (ends read)
-    Status = MmcHost->SendCommand (MmcHost, MMC_CMD12, 0);
-    if (!EFI_ERROR (Status)) {
-      MmcHost->ReceiveResponse (MmcHost, MMC_RESPONSE_TYPE_R1b, Response);
     }
 
     // Command 13 - Read status and wait for programming to complete (return to tran)
