@@ -1,14 +1,14 @@
 /** @file
 *
 *  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
-*  
-*  This program and the accompanying materials                          
-*  are licensed and made available under the terms and conditions of the BSD License         
-*  which accompanies this distribution.  The full text of the license may be found at        
-*  http://opensource.org/licenses/bsd-license.php                                            
 *
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+*  This program and the accompanying materials
+*  are licensed and made available under the terms and conditions of the BSD License
+*  which accompanies this distribution.  The full text of the license may be found at
+*  http://opensource.org/licenses/bsd-license.php
+*
+*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 *
 **/
 
@@ -18,9 +18,6 @@
 #include <Library/TimerLib.h>
 
 #include "Mmc.h"
-
-// Untested ...
-//#define USE_STREAM
 
 #define MAX_RETRY_COUNT  1000
 #define CMD_RETRY_COUNT  20
@@ -112,7 +109,7 @@ PrintCSD (
   DEBUG ((EFI_D_ERROR, "\t- Maximum Read Data Block: %d\n",2 << (MMC_CSD_GET_READBLLEN(Csd)-1)));
   DEBUG ((EFI_D_ERROR, "\t- Maximum Write Data Block: %d\n",2 << (MMC_CSD_GET_WRITEBLLEN(Csd)-1)));
 
-  if (!MMC_CSD_GET_FILEFORMATGRP(Csd)) {
+  if (!MMC_CSD_GET_FILEFORMATGRP (Csd)) {
     Value = MMC_CSD_GET_FILEFORMAT (Csd);
     if (Value == 0)         DEBUG ((EFI_D_ERROR, "\t- Format (0): Hard disk-like file system with partition table\n"));
     else if (Value == 1)    DEBUG ((EFI_D_ERROR, "\t- Format (1): DOS FAT (floppy-like) with boot sector only (no partition table)\n"));
@@ -157,7 +154,7 @@ PrintResponseR1 (
 
 EFI_STATUS
 EFIAPI
-MmcGetCardStatus(
+MmcGetCardStatus (
 	IN MMC_HOST_INSTANCE     *MmcHostInstance
   )
 {
@@ -173,7 +170,7 @@ MmcGetCardStatus(
   if (MmcHost == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  if(MmcHostInstance->State != MmcHwInitializationState){
+  if (MmcHostInstance->State != MmcHwInitializationState) {
     //Get the Status of the card.
     CmdArg = MmcHostInstance->CardInfo.RCA << 16;
     Status = MmcHost->SendCommand (MmcHost, MMC_CMD13, CmdArg);
@@ -249,7 +246,7 @@ MmcIdentificationMode (
     MmcHost->ReceiveResponse (MmcHost, MMC_RESPONSE_TYPE_R7, Response);
     PrintResponseR1 (Response[0]);
     //check if it is valid response
-    if(Response[0] != CmdArg){
+    if (Response[0] != CmdArg) {
       DEBUG ((EFI_D_ERROR, "The Card is not usable\n"));
       return EFI_UNSUPPORTED;
     }
@@ -263,44 +260,44 @@ MmcIdentificationMode (
     // SD Card or MMC Card ? CMD55 indicates to the card that the next command is an application specific command
     Status = MmcHost->SendCommand (MmcHost, MMC_CMD55, 0);
     if (Status == EFI_SUCCESS) {
-        DEBUG ((EFI_D_INFO, "Card should be SD\n"));
-        if (IsHCS) {
-            MmcHostInstance->CardInfo.CardType = SD_CARD_2;
-        } else {
-            MmcHostInstance->CardInfo.CardType = SD_CARD;
-        }
+      DEBUG ((EFI_D_INFO, "Card should be SD\n"));
+      if (IsHCS) {
+        MmcHostInstance->CardInfo.CardType = SD_CARD_2;
+      } else {
+        MmcHostInstance->CardInfo.CardType = SD_CARD;
+      }
 
-        // Note: The first time CmdArg will be zero
-        CmdArg = ((UINTN *) &(MmcHostInstance->CardInfo.OCRData))[0];
-        if (IsHCS) {
-            CmdArg |= BIT30;
-        }
-        Status = MmcHost->SendCommand (MmcHost, MMC_ACMD41, CmdArg);
-        if (!EFI_ERROR (Status)) {
-          MmcHost->ReceiveResponse (MmcHost, MMC_RESPONSE_TYPE_OCR, Response);
-          ((UINT32 *) &(MmcHostInstance->CardInfo.OCRData))[0] = Response[0];
-        }
+      // Note: The first time CmdArg will be zero
+      CmdArg = ((UINTN *) &(MmcHostInstance->CardInfo.OCRData))[0];
+      if (IsHCS) {
+        CmdArg |= BIT30;
+      }
+      Status = MmcHost->SendCommand (MmcHost, MMC_ACMD41, CmdArg);
+      if (!EFI_ERROR (Status)) {
+        MmcHost->ReceiveResponse (MmcHost, MMC_RESPONSE_TYPE_OCR, Response);
+        ((UINT32 *) &(MmcHostInstance->CardInfo.OCRData))[0] = Response[0];
+      }
     } else {
-        DEBUG ((EFI_D_INFO, "Card should be MMC\n"));
-        MmcHostInstance->CardInfo.CardType = MMC_CARD;
+      DEBUG ((EFI_D_INFO, "Card should be MMC\n"));
+      MmcHostInstance->CardInfo.CardType = MMC_CARD;
 
-        Status = MmcHost->SendCommand (MmcHost, MMC_CMD1, 0x800000);
-        if (!EFI_ERROR (Status)) {
-          MmcHost->ReceiveResponse (MmcHost, MMC_RESPONSE_TYPE_OCR, Response);
-          ((UINT32 *) &(MmcHostInstance->CardInfo.OCRData))[0] = Response[0];
-        }
+      Status = MmcHost->SendCommand (MmcHost, MMC_CMD1, 0x800000);
+      if (!EFI_ERROR (Status)) {
+        MmcHost->ReceiveResponse (MmcHost, MMC_RESPONSE_TYPE_OCR, Response);
+        ((UINT32 *) &(MmcHostInstance->CardInfo.OCRData))[0] = Response[0];
+      }
     }
 
     if (!EFI_ERROR (Status)) {
       if (!MmcHostInstance->CardInfo.OCRData.PowerUp) {
-          MicroSecondDelay (1);
-          Timeout--;
+        MicroSecondDelay (1);
+        Timeout--;
       } else {
-          if ((MmcHostInstance->CardInfo.CardType == SD_CARD_2) && (MmcHostInstance->CardInfo.OCRData.AccessMode & BIT1)) {
-              MmcHostInstance->CardInfo.CardType = SD_CARD_2_HIGH;
-              DEBUG ((EFI_D_ERROR, "High capacity card.\n"));
-          }
-          break;  // The MMC/SD card is ready. Continue the Identification Mode
+        if ((MmcHostInstance->CardInfo.CardType == SD_CARD_2) && (MmcHostInstance->CardInfo.OCRData.AccessMode & BIT1)) {
+          MmcHostInstance->CardInfo.CardType = SD_CARD_2_HIGH;
+          DEBUG ((EFI_D_ERROR, "High capacity card.\n"));
+        }
+        break;  // The MMC/SD card is ready. Continue the Identification Mode
       }
     } else {
       MicroSecondDelay (1);
@@ -327,7 +324,7 @@ MmcIdentificationMode (
     return Status;
   }
   MmcHost->ReceiveResponse (MmcHost, MMC_RESPONSE_TYPE_CID, Response);
-  PrintCID(Response);
+  PrintCID (Response);
 
   Status = MmcNotifyState (MmcHostInstance, MmcIdentificationState);
   if (EFI_ERROR (Status)) {
@@ -374,8 +371,9 @@ EFI_STATUS InitializeMmcDevice (
   EFI_STATUS              Status;
   UINTN                   CardSize, NumBlocks, BlockSize, CmdArg;
   EFI_MMC_HOST_PROTOCOL   *MmcHost;
-  UINTN                   BlockCount = 1;
-  
+  UINTN                   BlockCount;
+
+  BlockCount = 1;
   MmcHost = MmcHostInstance->MmcHost;
 
   MmcIdentificationMode (MmcHostInstance);
@@ -384,21 +382,21 @@ EFI_STATUS InitializeMmcDevice (
   CmdArg = MmcHostInstance->CardInfo.RCA << 16;
   Status = MmcHost->SendCommand (MmcHost, MMC_CMD9, CmdArg);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "MmcIdentificationMode(MMC_CMD9): Error, Status=%r\n", Status));
+    DEBUG((EFI_D_ERROR, "InitializeMmcDevice(MMC_CMD9): Error, Status=%r\n", Status));
     return Status;
   }
   //Read Response
   MmcHost->ReceiveResponse (MmcHost, MMC_RESPONSE_TYPE_CSD, Response);
-  PrintCSD(Response);
+  PrintCSD (Response);
 
   if (MmcHostInstance->CardInfo.CardType == SD_CARD_2_HIGH) {
     CardSize = HC_MMC_CSD_GET_DEVICESIZE (Response);
     NumBlocks = ((CardSize + 1) * 1024);
-    BlockSize = 1 << MMC_CSD_GET_READBLLEN(Response);
+    BlockSize = 1 << MMC_CSD_GET_READBLLEN (Response);
   } else {
     CardSize = MMC_CSD_GET_DEVICESIZE (Response);
     NumBlocks = (CardSize + 1) * (1 << (MMC_CSD_GET_DEVICESIZEMULT (Response) + 2));
-    BlockSize = 1 << MMC_CSD_GET_READBLLEN(Response);
+    BlockSize = 1 << MMC_CSD_GET_READBLLEN (Response);
   }
 
   //For >=2G card, BlockSize may be 1K, but the transfer size is 512 bytes.
@@ -416,20 +414,21 @@ EFI_STATUS InitializeMmcDevice (
   CmdArg = MmcHostInstance->CardInfo.RCA << 16;
   Status = MmcHost->SendCommand (MmcHost, MMC_CMD7, CmdArg);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "MmcIdentificationMode(MMC_CMD7): Error and Status = %r\n", Status));
+    DEBUG((EFI_D_ERROR, "InitializeMmcDevice(MMC_CMD7): Error and Status = %r\n", Status));
     return Status;
   }
 
   Status = MmcNotifyState (MmcHostInstance, MmcTransferState);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "MmcIdentificationMode() : Error MmcTransferState\n"));
+    DEBUG((EFI_D_ERROR, "InitializeMmcDevice(): Error MmcTransferState\n"));
     return Status;
   }
 
   // Set Block Length
   Status = MmcHost->SendCommand (MmcHost, MMC_CMD16, MmcHostInstance->BlockIo.Media->BlockSize);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "MmcIdentificationMode(MMC_CMD16): Error MmcHostInstance->BlockIo.Media->BlockSize: %d and Error = %r\n", MmcHostInstance->BlockIo.Media->BlockSize, Status));
+    DEBUG((EFI_D_ERROR, "InitializeMmcDevice(MMC_CMD16): Error MmcHostInstance->BlockIo.Media->BlockSize: %d and Error = %r\n",
+                        MmcHostInstance->BlockIo.Media->BlockSize, Status));
     return Status;
   }
 
@@ -508,10 +507,11 @@ MmcIoBlocks (
   MMC_HOST_INSTANCE       *MmcHostInstance;
   EFI_MMC_HOST_PROTOCOL   *MmcHost;
   UINTN                   BytesRemainingToBeTransfered;
-  UINTN                   BlockCount = 1;
+  UINTN                   BlockCount;
 
+  BlockCount = 1;
   MmcHostInstance = MMC_HOST_INSTANCE_FROM_BLOCK_IO_THIS (This);
-  ASSERT (MmcHostInstance != 0);
+  ASSERT (MmcHostInstance != NULL);
   MmcHost = MmcHostInstance->MmcHost;
   ASSERT (MmcHost);
 
@@ -519,7 +519,7 @@ MmcIoBlocks (
     return EFI_MEDIA_CHANGED;
   }
 
-  if ((MmcHost == 0)|| (Buffer == NULL)) {
+  if ((MmcHost == NULL) || (Buffer == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -529,11 +529,11 @@ MmcIoBlocks (
   }
 
   // All blocks must be within the device
-  if ((Lba + (BufferSize / This->Media->BlockSize)) > (This->Media->LastBlock + 1)){
+  if ((Lba + (BufferSize / This->Media->BlockSize)) > (This->Media->LastBlock + 1)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if((Transfer == MMC_IOBLOCKS_WRITE) && (This->Media->ReadOnly == TRUE)) {
+  if ((Transfer == MMC_IOBLOCKS_WRITE) && (This->Media->ReadOnly == TRUE)) {
     return EFI_WRITE_PROTECTED;
   }
 
@@ -581,19 +581,11 @@ MmcIoBlocks (
     }
 
     if (Transfer == MMC_IOBLOCKS_READ) {
-#ifndef USE_STREAM
       // Read a single block
       Cmd = MMC_CMD17;
-#else
-      //TODO: Should we support read stream (MMC_CMD11)
-#endif
     } else {
-#ifndef USE_STREAM
       // Write a single block
       Cmd = MMC_CMD24;
-#else
-      //TODO: Should we support write stream (MMC_CMD20)
-#endif
     }
     Status = MmcHost->SendCommand (MmcHost, Cmd, CmdArg);
     if (EFI_ERROR (Status)) {
@@ -602,34 +594,24 @@ MmcIoBlocks (
     }
 
     if (Transfer == MMC_IOBLOCKS_READ) {
-#ifndef USE_STREAM
       // Read one block of Data
       Status = MmcHost->ReadBlockData (MmcHost, Lba, This->Media->BlockSize, Buffer);
       if (EFI_ERROR (Status)) {
         DEBUG ((EFI_D_BLKIO, "MmcIoBlocks(): Error Read Block Data and Status = %r\n", Status));
         return Status;
       }
-#else
-      //TODO: Read a stream
-      ASSERT (0);
-#endif
       Status = MmcNotifyState (MmcHostInstance, MmcProgrammingState);
       if (EFI_ERROR (Status)) {
         DEBUG ((EFI_D_ERROR, "MmcIoBlocks() : Error MmcProgrammingState\n"));
         return Status;
       }
     } else {
-#ifndef USE_STREAM
       // Write one block of Data
       Status = MmcHost->WriteBlockData (MmcHost, Lba, This->Media->BlockSize, Buffer);
       if (EFI_ERROR (Status)) {
         DEBUG ((EFI_D_BLKIO, "MmcIoBlocks(): Error Write Block Data and Status = %r\n", Status));
         return Status;
       }
-#else
-      //TODO: Write a stream
-      ASSERT (0);
-#endif
     }
 
     // Command 12 - Stop transmission (ends read)
