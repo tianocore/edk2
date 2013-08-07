@@ -40,16 +40,16 @@ PeCoffLoaderRelocateImageEx (
   IN UINT64      Adjust
   )
 {
-  UINT64      *F64;
+  UINT64      *Fixup64;
 
   switch ((*Reloc) >> 12) {
 
     case EFI_IMAGE_REL_BASED_DIR64:
-      F64 = (UINT64 *) Fixup;
-      *F64 = *F64 + (UINT64) Adjust;
+      Fixup64 = (UINT64 *) Fixup;
+      *Fixup64 = *Fixup64 + (UINT64) Adjust;
       if (*FixupData != NULL) {
         *FixupData = ALIGN_POINTER(*FixupData, sizeof(UINT64));
-        *(UINT64 *)(*FixupData) = *F64;
+        *(UINT64 *)(*FixupData) = *Fixup64;
         *FixupData = *FixupData + sizeof(UINT64);
       }
       break;
