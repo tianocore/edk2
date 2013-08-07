@@ -28,7 +28,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC (EBC is for build only)
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC (EBC is for build only) AARCH64
 #
 
 [Sources]
@@ -53,7 +53,7 @@
 [Sources.EBC]
   Ebc/DxeLoadFunc.c
 
-[Sources.ARM]
+[Sources.ARM, Sources.AARCH64]
   Arm/DxeLoadFunc.c
 
 [Packages]

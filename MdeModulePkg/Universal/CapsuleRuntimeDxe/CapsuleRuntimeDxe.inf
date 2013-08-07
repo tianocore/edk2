@@ -33,7 +33,7 @@
 [Sources]
   CapsuleService.c
 
-[Sources.Ia32, Sources.IPF, Sources.EBC, Sources.ARM]
+[Sources.Ia32, Sources.IPF, Sources.EBC, Sources.ARM, Sources.AARCH64]
   SaveLongModeContext.c
 
 [Sources.X64]
