@@ -10,7 +10,7 @@
   WrapPkcs7Data(), Pkcs7GetSigners(), Pkcs7Verify() will get UEFI Authenticated
   Variable and will do basic check for data structure.
 
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -640,7 +640,13 @@ Pkcs7Verify (
   // in PKCS#7 structure. So ignore NULL checking here.
   //
   DataBio = BIO_new (BIO_s_mem ());
-  BIO_write (DataBio, InData, (int)DataLength);
+  if (DataBio == NULL) {
+    goto _Exit;
+  }
+
+  if (BIO_write (DataBio, InData, (int) DataLength) <= 0) {
+    goto _Exit;
+  }
 
   //
   // OpenSSL PKCS7 Verification by default checks for SMIME (email signing) and
