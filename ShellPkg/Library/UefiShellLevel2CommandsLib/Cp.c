@@ -89,7 +89,7 @@ CopySingleFile(
   DestVolumeInfo  = NULL;
   ShellStatus     = SHELL_SUCCESS;
 
-  ReadSize = PcdGet16(PcdShellFileOperationSize);
+  ReadSize = PcdGet32(PcdShellFileOperationSize);
   // Why bother copying a file to itself
   if (StrCmp(Source, Dest) == 0) {
     return (SHELL_SUCCESS);
@@ -233,7 +233,7 @@ CopySingleFile(
         //
         Buffer = AllocateZeroPool(ReadSize);
         ASSERT(Buffer != NULL);
-        while (ReadSize == PcdGet16(PcdShellFileOperationSize) && !EFI_ERROR(Status)) {
+        while (ReadSize == PcdGet32(PcdShellFileOperationSize) && !EFI_ERROR(Status)) {
           Status = ShellReadFile(SourceHandle, &ReadSize, Buffer);
           Status = ShellWriteFile(DestHandle, &ReadSize, Buffer);
         }

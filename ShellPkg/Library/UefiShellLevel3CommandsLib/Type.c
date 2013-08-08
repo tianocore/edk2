@@ -42,7 +42,7 @@ TypeFileByHandle (
   UINTN       LoopVar;
   CHAR16      AsciiChar;
 
-  ReadSize = PcdGet16(PcdShellFileOperationSize);
+  ReadSize = PcdGet32(PcdShellFileOperationSize);
   Buffer = AllocateZeroPool(ReadSize);
   if (Buffer == NULL) {
     return (EFI_OUT_OF_RESOURCES);
@@ -51,7 +51,7 @@ TypeFileByHandle (
   Status = ShellSetFilePosition(Handle, 0);
   ASSERT_EFI_ERROR(Status);
 
-  while (ReadSize == ((UINTN)PcdGet16(PcdShellFileOperationSize))){
+  while (ReadSize == ((UINTN)PcdGet32(PcdShellFileOperationSize))){
     ZeroMem(Buffer, ReadSize);
     Status = ShellReadFile(Handle, &ReadSize, Buffer);
     if (EFI_ERROR(Status)){

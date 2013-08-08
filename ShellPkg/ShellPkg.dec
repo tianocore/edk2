@@ -103,7 +103,7 @@
   gEfiShellPkgTokenSpaceGuid.PcdShellMapNameLength|50|UINT8|0x00000009
 
   ## This determins how many bytes are read out of files at a time for file operations (type, copy, etc...)
-  gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize|1000|UINT16|0x0000000A
+  gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize|1000|UINT32|0x0000000A
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This flag is used to control the protocols produced by the shell
