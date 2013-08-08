@@ -71,10 +71,13 @@ COMPONENT_TYPE    = LIBRARY
   Ipf/Ia_64Gen.h
   Ipf/HwAccess.s
   Ipf/PeiServicePointer.c
-  
+
 [sources.ARM]
   Arm/PerformancePrimitives.c
-    
+
+[sources.AArch64]
+  AArch64/PerformancePrimitives.c
+
 [libraries.common]
   EdkGuidLib
   EfiCommonLib

@@ -42,7 +42,7 @@ Returns:
 
 --*/
 {
-  // CPU does not have a timer for ARM....
+  // CPU does not have a timer for AArch64 ...
   ASSERT (FALSE);
   return EFI_SUCCESS;
 }

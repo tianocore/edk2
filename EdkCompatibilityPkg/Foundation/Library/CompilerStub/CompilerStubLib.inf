@@ -47,6 +47,9 @@ COMPONENT_TYPE  = LIBRARY
   
 [sources.ARM]
   Dummy.c
+
+[sources.AARCH64]
+  Dummy.c
   
 [includes.common]
   $(EDK_SOURCE)/Foundation
@@ -67,6 +70,9 @@ COMPONENT_TYPE  = LIBRARY
 [libraries.common]
 
 [libraries.ARM]
+  CompilerIntrinsicsLib
+
+[libraries.AArch64]
   CompilerIntrinsicsLib
 
 [nmake.common]

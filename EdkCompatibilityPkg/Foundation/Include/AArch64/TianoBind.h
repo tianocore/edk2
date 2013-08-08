@@ -12,37 +12,21 @@
 
 Module Name:
 
-  PerformancePrimitives.c
+  TianoBind.h
 
 Abstract:
 
-  Support for Performance library
+  Tiano's Processor or Compiler specific defines and types for AArch64
+  besides EfiBind.h.
 
 --*/
 
-#include "TianoCommon.h"
+#ifndef _TIANO_BIND_H_
+#define _TIANO_BIND_H_
 
-EFI_STATUS
-GetTimerValue (
-  OUT UINT64    *TimerValue
-  )
-/*++
+#include <EfiBind.h>
 
-Routine Description:
+#define EFI_DXE_ENTRY_POINT(InitFunction)
+#define EFI_SMI_HANDLER_ENTRY_POINT(InitFunction)
 
-  Get timer value.
-
-Arguments:
-
-  TimerValue  - Pointer to the returned timer value
-
-Returns:
-
-  EFI_SUCCESS - Successfully got timer value
-
---*/
-{
-  // CPU does not have a timer for ARM....
-  ASSERT (FALSE);
-  return EFI_SUCCESS;
-}
+#endif

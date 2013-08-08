@@ -1,13 +1,13 @@
 /*++
 
 Copyright (c) 2004 - 2006, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -17,10 +17,10 @@ Abstract:
 
   DebugSupport protocol and supporting definitions as defined in the EFI 1.1
   specification.
-  
+
   The DebugSupport protocol is used by source level debuggers to abstract the
   processor and handle context save and restore operations.
- 
+
 --*/
 
 #ifndef _DEBUG_SUPPORT_H_
@@ -205,7 +205,7 @@ typedef struct {
   UINT8   Xmm7[16];
 #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   //
-  // NOTE: UEFI 2.0 spec definition as follows. It should be updated 
+  // NOTE: UEFI 2.0 spec definition as follows. It should be updated
   // after spec update.
   //
   UINT8   Reserved11[14 * 16];
@@ -534,11 +534,12 @@ VOID
 // Machine type definition
 //
 typedef enum {
-  IsaIa32 = EFI_IMAGE_MACHINE_IA32,
-  IsaX64  = EFI_IMAGE_MACHINE_X64,
-  IsaIpf  = EFI_IMAGE_MACHINE_IA64,
-  IsaEbc  = EFI_IMAGE_MACHINE_EBC,
-  IsaArm  = EFI_IMAGE_MACHINE_ARMTHUMB_MIXED
+  IsaIa32       = EFI_IMAGE_MACHINE_IA32,
+  IsaX64        = EFI_IMAGE_MACHINE_X64,
+  IsaIpf        = EFI_IMAGE_MACHINE_IA64,
+  IsaEbc        = EFI_IMAGE_MACHINE_EBC,
+  IsaArm        = EFI_IMAGE_MACHINE_ARMTHUMB_MIXED,
+  IsaAArch64    = EFI_IMAGE_MACHINE_AARCH64
 } EFI_INSTRUCTION_SET_ARCHITECTURE;
 
 EFI_FORWARD_DECLARATION (EFI_DEBUG_SUPPORT_PROTOCOL);

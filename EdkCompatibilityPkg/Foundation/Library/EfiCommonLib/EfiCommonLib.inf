@@ -74,6 +74,11 @@ COMPONENT_TYPE  = LIBRARY
   EfiZeroMem.c
   Math.c
 
+[sources.AArch64]
+  EfiCopyMem.c
+  EfiSetMem.c
+  EfiZeroMem.c
+  Math.c
 
 [includes.common]
   $(EDK_SOURCE)/Foundation
@@ -95,6 +100,9 @@ COMPONENT_TYPE  = LIBRARY
   EdkFrameworkGuidLib
 
 [libraries.ARM]
+  CompilerIntrinsicsLib
+
+[libraries.AArch64]
   CompilerIntrinsicsLib
 
 [nmake.common]

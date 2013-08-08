@@ -12,37 +12,15 @@
 
 Module Name:
 
-  PerformancePrimitives.c
+  ProcDep.h
 
 Abstract:
 
-  Support for Performance library
+  AArch64 specific Runtime Lib code. At this time there is none.
 
 --*/
 
-#include "TianoCommon.h"
+#ifndef _PROC_DEP_H_
+#define _PROC_DEP_H_
 
-EFI_STATUS
-GetTimerValue (
-  OUT UINT64    *TimerValue
-  )
-/*++
-
-Routine Description:
-
-  Get timer value.
-
-Arguments:
-
-  TimerValue  - Pointer to the returned timer value
-
-Returns:
-
-  EFI_SUCCESS - Successfully got timer value
-
---*/
-{
-  // CPU does not have a timer for ARM....
-  ASSERT (FALSE);
-  return EFI_SUCCESS;
-}
+#endif
