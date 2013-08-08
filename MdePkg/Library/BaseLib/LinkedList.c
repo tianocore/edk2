@@ -1,7 +1,7 @@
 /** @file
   Linked List Library Functions.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -241,7 +241,7 @@ InsertTailList (
   @param  List  A pointer to the head node of a doubly-linked list.
 
   @return The first node of a doubly-linked list.
-  @retval NULL  The list is empty.
+  @retval List  The list is empty.
 
 **/
 LIST_ENTRY *
