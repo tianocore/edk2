@@ -12,8 +12,38 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include "Setup.h"
+#include "FormDisplay.h"
 
+/**
+  Get maximum and minimum info from this opcode.
+
+  @param  OpCode            Pointer to the current input opcode.
+  @param  Minimum           The minimum size info for this opcode.
+  @param  Maximum           The maximum size info for this opcode.
+
+**/
+VOID
+GetFieldFromOp (
+  IN   EFI_IFR_OP_HEADER       *OpCode,
+  OUT  UINTN                   *Minimum,
+  OUT  UINTN                   *Maximum
+  )
+{
+  EFI_IFR_STRING    *StringOp;
+  EFI_IFR_PASSWORD  *PasswordOp;
+  if (OpCode->OpCode == EFI_IFR_STRING_OP) {
+    StringOp = (EFI_IFR_STRING *) OpCode;
+    *Minimum = StringOp->MinSize;
+    *Maximum = StringOp->MaxSize;    
+  } else if (OpCode->OpCode == EFI_IFR_PASSWORD_OP) {
+    PasswordOp = (EFI_IFR_PASSWORD *) OpCode;
+    *Minimum = PasswordOp->MinSize;
+    *Maximum = PasswordOp->MaxSize;       
+  } else {
+    *Minimum = 0;
+    *Maximum = 0;       
+  }
+}
 
 /**
   Get string or password input from user.
@@ -52,11 +82,11 @@ ReadString (
   BOOLEAN                 CursorVisible;
   UINTN                   Minimum;
   UINTN                   Maximum;
-  FORM_BROWSER_STATEMENT  *Question;
+  FORM_DISPLAY_ENGINE_STATEMENT  *Question;
   BOOLEAN                 IsPassword;
 
-  DimensionsWidth  = gScreenDimensions.RightColumn - gScreenDimensions.LeftColumn;
-  DimensionsHeight = gScreenDimensions.BottomRow - gScreenDimensions.TopRow;
+  DimensionsWidth  = gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn;
+  DimensionsHeight = gStatementDimensions.BottomRow - gStatementDimensions.TopRow;
 
   NullCharacter    = CHAR_NULL;
   ScreenSize       = GetStringWidth (Prompt) / sizeof (CHAR16);
@@ -64,10 +94,9 @@ ReadString (
   Space[1]         = CHAR_NULL;
 
   Question         = MenuOption->ThisTag;
-  Minimum          = (UINTN) Question->Minimum;
-  Maximum          = (UINTN) Question->Maximum;
+  GetFieldFromOp(Question->OpCode, &Minimum, &Maximum);
 
-  if (Question->Operand == EFI_IFR_PASSWORD_OP) {
+  if (Question->OpCode->OpCode == EFI_IFR_PASSWORD_OP) {
     IsPassword = TRUE;
   } else {
     IsPassword = FALSE;
@@ -87,14 +116,14 @@ ReadString (
   BufferedString = AllocateZeroPool (ScreenSize * 2);
   ASSERT (BufferedString);
 
-  Start = (DimensionsWidth - ScreenSize - 2) / 2 + gScreenDimensions.LeftColumn + 1;
-  Top   = ((DimensionsHeight - 6) / 2) + gScreenDimensions.TopRow - 1;
+  Start = (DimensionsWidth - ScreenSize - 2) / 2 + gStatementDimensions.LeftColumn + 1;
+  Top   = ((DimensionsHeight - 6) / 2) + gStatementDimensions.TopRow - 1;
 
   //
   // Display prompt for string
   //
+  // CreateDialog (NULL, "", Prompt, Space, "", NULL);
   CreateMultiStringPopUp (ScreenSize, 4, &NullCharacter, Prompt, Space, &NullCharacter);
-
   gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_BLACK, EFI_LIGHTGRAY));
 
   CursorVisible = gST->ConOut->Mode->CursorVisible;
@@ -122,7 +151,7 @@ ReadString (
       BufferedString[Count] = StringPtr[Index];
 
       if (IsPassword) {
-        PrintChar (L'*');
+        PrintCharAt ((UINTN)-1, (UINTN)-1, L'*');
       }
     }
 
@@ -181,7 +210,7 @@ ReadString (
         // To save code space, we can then treat this as an error and return back to the menu.
         //
         do {
-          CreateDialog (4, TRUE, 0, NULL, &Key, &NullCharacter, gMiniString, gPressEnter, &NullCharacter);
+          CreateDialog (&Key, &NullCharacter, gMiniString, gPressEnter, &NullCharacter, NULL);
         } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
 
         FreePool (TempString);
@@ -258,7 +287,7 @@ ReadString (
         BufferedString[Count] = StringPtr[Index];
 
         if (IsPassword) {
-          PrintChar (L'*');
+          PrintCharAt ((UINTN)-1, (UINTN)-1, L'*');
         }
       }
 
@@ -279,12 +308,12 @@ ReadString (
   like:  Year change:  2012.02.29 -> 2013.02.29 -> 2013.02.01
          Month change: 2013.03.29 -> 2013.02.29 -> 2013.02.28
 
-  @param  Question          Pointer to current question.
+  @param  QuestionValue     Pointer to current question.
   @param  Sequence          The sequence of the field in the question.
 **/
 VOID
 AdjustQuestionValue (
-  IN  FORM_BROWSER_STATEMENT  *Question,
+  IN  EFI_HII_VALUE           *QuestionValue,
   IN  UINT8                   Sequence
   )
 {
@@ -293,12 +322,8 @@ AdjustQuestionValue (
   UINT8     Maximum;
   UINT8     Minimum;
 
-  if (Question->Operand != EFI_IFR_DATE_OP) {
-    return;
-  }
-
-  Month   = Question->HiiValue.Value.date.Month;
-  Year    = Question->HiiValue.Value.date.Year;
+  Month   = QuestionValue->Value.date.Month;
+  Year    = QuestionValue->Value.date.Year;
   Minimum = 1;
 
   switch (Month) {
@@ -324,8 +349,8 @@ AdjustQuestionValue (
   // Change the month area.
   //
   if (Sequence == 0) {
-    if (Question->HiiValue.Value.date.Day > Maximum) {
-      Question->HiiValue.Value.date.Day = Maximum;
+    if (QuestionValue->Value.date.Day > Maximum) {
+      QuestionValue->Value.date.Day = Maximum;
     }
   }
   
@@ -333,16 +358,76 @@ AdjustQuestionValue (
   // Change the Year area.
   //
   if (Sequence == 2) {
-    if (Question->HiiValue.Value.date.Day > Maximum) {
-      Question->HiiValue.Value.date.Day = Minimum;
+    if (QuestionValue->Value.date.Day > Maximum) {
+      QuestionValue->Value.date.Day = Minimum;
     }
+  }
+}
+
+/**
+  Get field info from numeric opcode.
+
+  @param  OpCode            Pointer to the current input opcode.
+  @param  Minimum           The minimum size info for this opcode.
+  @param  Maximum           The maximum size info for this opcode.
+  @param  Step              The step size info for this opcode.
+  @param  StorageWidth      The storage width info for this opcode.
+
+**/
+VOID
+GetValueFromNum (
+  IN  EFI_IFR_OP_HEADER     *OpCode,
+  OUT UINT64                *Minimum,
+  OUT UINT64                *Maximum,
+  OUT UINT64                *Step,
+  OUT UINT16                *StorageWidth
+)
+{
+  EFI_IFR_NUMERIC       *NumericOp;
+
+  NumericOp = (EFI_IFR_NUMERIC *) OpCode;
+  
+  switch (NumericOp->Flags & EFI_IFR_NUMERIC_SIZE) {
+  case EFI_IFR_NUMERIC_SIZE_1:
+    *Minimum = NumericOp->data.u8.MinValue;
+    *Maximum = NumericOp->data.u8.MaxValue;
+    *Step    = NumericOp->data.u8.Step;
+    *StorageWidth = (UINT16) sizeof (UINT8);
+    break;
+  
+  case EFI_IFR_NUMERIC_SIZE_2:
+    *Minimum = NumericOp->data.u16.MinValue;
+    *Maximum = NumericOp->data.u16.MaxValue;
+    *Step    = NumericOp->data.u16.Step;
+    *StorageWidth = (UINT16) sizeof (UINT16);
+    break;
+  
+  case EFI_IFR_NUMERIC_SIZE_4:
+    *Minimum = NumericOp->data.u32.MinValue;
+    *Maximum = NumericOp->data.u32.MaxValue;
+    *Step    = NumericOp->data.u32.Step;
+    *StorageWidth = (UINT16) sizeof (UINT32);
+    break;
+  
+  case EFI_IFR_NUMERIC_SIZE_8:
+    *Minimum = NumericOp->data.u64.MinValue;
+    *Maximum = NumericOp->data.u64.MaxValue;
+    *Step    = NumericOp->data.u64.Step;
+    *StorageWidth = (UINT16) sizeof (UINT64);
+    break;
+  
+  default:
+    break;
+  }
+
+  if (*Maximum == 0) {
+    *Maximum = (UINT64) -1;
   }
 }
 
 /**
   This routine reads a numeric value from the user input.
 
-  @param  Selection         Pointer to current selection.
   @param  MenuOption        Pointer to the current input menu.
 
   @retval EFI_SUCCESS       If numerical input is read successfully
@@ -351,7 +436,6 @@ AdjustQuestionValue (
 **/
 EFI_STATUS
 GetNumericInput (
-  IN  UI_MENU_SELECTION           *Selection,
   IN  UI_MENU_OPTION              *MenuOption
   )
 {
@@ -375,9 +459,9 @@ GetNumericInput (
   UINT8                   Digital;
   EFI_INPUT_KEY           Key;
   EFI_HII_VALUE           *QuestionValue;
-  FORM_BROWSER_FORM       *Form;
-  FORM_BROWSER_FORMSET    *FormSet;
-  FORM_BROWSER_STATEMENT  *Question;
+  FORM_DISPLAY_ENGINE_STATEMENT  *Question;
+  EFI_IFR_NUMERIC                *NumericOp;
+  UINT16                         StorageWidth;
 
   Column            = MenuOption->OptCol;
   Row               = MenuOption->Row;
@@ -385,14 +469,13 @@ GetNumericInput (
   Count             = 0;
   InputWidth        = 0;
   Digital           = 0;
+  StorageWidth      = 0;
+  Minimum           = 0;
+  Maximum           = 0;
+  NumericOp         = NULL;
 
-  FormSet       = Selection->FormSet;
-  Form          = Selection->Form;
   Question      = MenuOption->ThisTag;
-  QuestionValue = &Question->HiiValue;
-  Step          = Question->Step;
-  Minimum       = Question->Minimum;
-  Maximum       = Question->Maximum;
+  QuestionValue = &Question->CurrentValue;
 
   //
   // Only two case, user can enter to this function: Enter and +/- case.
@@ -400,7 +483,7 @@ GetNumericInput (
   //
   ManualInput        = (BOOLEAN)(gDirection == 0 ? TRUE : FALSE);
 
-  if ((Question->Operand == EFI_IFR_DATE_OP) || (Question->Operand == EFI_IFR_TIME_OP)) {
+  if ((Question->OpCode->OpCode == EFI_IFR_DATE_OP) || (Question->OpCode->OpCode == EFI_IFR_TIME_OP)) {
     DateOrTime = TRUE;
   } else {
     DateOrTime = FALSE;
@@ -411,7 +494,7 @@ GetNumericInput (
   //
   EraseLen = 0;
   EditValue = 0;
-  if (Question->Operand == EFI_IFR_DATE_OP) {
+  if (Question->OpCode->OpCode == EFI_IFR_DATE_OP) {
     Step = 1;
     Minimum = 1;
 
@@ -457,7 +540,7 @@ GetNumericInput (
     default:
       break;
     }
-  } else if (Question->Operand == EFI_IFR_TIME_OP) {
+  } else if (Question->OpCode->OpCode == EFI_IFR_TIME_OP) {
     Step = 1;
     Minimum = 0;
 
@@ -484,18 +567,15 @@ GetNumericInput (
       break;
     }
   } else {
-    //
-    // Numeric
-    //
-    EraseLen = gOptionBlockWidth;
+    ASSERT (Question->OpCode->OpCode == EFI_IFR_NUMERIC_OP);
+    NumericOp = (EFI_IFR_NUMERIC *) Question->OpCode;
+    GetValueFromNum(Question->OpCode, &Minimum, &Maximum, &Step, &StorageWidth);
     EditValue = QuestionValue->Value.u64;
-    if (Maximum == 0) {
-      Maximum = (UINT64) -1;
-    }
+    EraseLen  = gOptionBlockWidth;
   }
 
-  if ((Question->Operand == EFI_IFR_NUMERIC_OP) &&
-      ((Question->Flags & EFI_IFR_DISPLAY) == EFI_IFR_DISPLAY_UINT_HEX)) {
+  if ((Question->OpCode->OpCode == EFI_IFR_NUMERIC_OP) && (NumericOp != NULL) &&
+      ((NumericOp->Flags & EFI_IFR_DISPLAY) == EFI_IFR_DISPLAY_UINT_HEX)) {
     HexInput = TRUE;
   } else {
     HexInput = FALSE;
@@ -505,11 +585,11 @@ GetNumericInput (
   // Enter from "Enter" input, clear the old word showing.
   //
   if (ManualInput) {
-    if (Question->Operand == EFI_IFR_NUMERIC_OP) {
+    if (Question->OpCode->OpCode == EFI_IFR_NUMERIC_OP) {
       if (HexInput) {
-        InputWidth = Question->StorageWidth * 2;
+        InputWidth = StorageWidth * 2;
       } else {
-        switch (Question->StorageWidth) {
+        switch (StorageWidth) {
         case 1:
           InputWidth = 3;
           break;
@@ -538,11 +618,11 @@ GetNumericInput (
       InputText[InputWidth + 1] = RIGHT_NUMERIC_DELIMITER;
       InputText[InputWidth + 2] = L'\0';
 
-      PrintAt (Column, Row, InputText);
+      PrintStringAt (Column, Row, InputText);
       Column++;
     }
 
-    if (Question->Operand == EFI_IFR_DATE_OP) {
+    if (Question->OpCode->OpCode == EFI_IFR_DATE_OP) {
       if (MenuOption->Sequence == 2) {
         InputWidth = 4;
       } else {
@@ -563,13 +643,13 @@ GetNumericInput (
       }
       InputText[InputWidth + 2] = L'\0';
 
-      PrintAt (Column, Row, InputText);
+      PrintStringAt (Column, Row, InputText);
       if (MenuOption->Sequence == 0) {
         Column++;
       }
     }
 
-    if (Question->Operand == EFI_IFR_TIME_OP) {
+    if (Question->OpCode->OpCode == EFI_IFR_TIME_OP) {
       InputWidth = 2;
 
       if (MenuOption->Sequence == 0) {
@@ -586,7 +666,7 @@ GetNumericInput (
       }
       InputText[InputWidth + 2] = L'\0';
 
-      PrintAt (Column, Row, InputText);
+      PrintStringAt (Column, Row, InputText);
       if (MenuOption->Sequence == 0) {
         Column++;
       }
@@ -654,7 +734,7 @@ TheKey2:
           }
 
           ZeroMem (FormattedNumber, 21 * sizeof (CHAR16));
-          if (Question->Operand == EFI_IFR_DATE_OP) {
+          if (Question->OpCode->OpCode == EFI_IFR_DATE_OP) {
             if (MenuOption->Sequence == 2) {
               //
               // Year
@@ -674,7 +754,7 @@ TheKey2:
               ASSERT (EraseLen >= 1);
               FormattedNumber[EraseLen - 1] = DATE_SEPARATOR;
             }
-          } else if (Question->Operand == EFI_IFR_TIME_OP) {
+          } else if (Question->OpCode->OpCode == EFI_IFR_TIME_OP) {
             UnicodeSPrint (FormattedNumber, 21 * sizeof (CHAR16), L"%02d", (UINT8) EditValue);
 
             if (MenuOption->Sequence == 0) {
@@ -689,11 +769,11 @@ TheKey2:
             PrintFormattedNumber (Question, FormattedNumber, 21 * sizeof (CHAR16));
           }
 
-          gST->ConOut->SetAttribute (gST->ConOut, PcdGet8 (PcdBrowserFieldTextColor) | FIELD_BACKGROUND);
+          gST->ConOut->SetAttribute (gST->ConOut, GetFieldTextColor ());
           for (Loop = 0; Loop < EraseLen; Loop++) {
-            PrintAt (MenuOption->OptCol + Loop, MenuOption->Row, L" ");
+            PrintStringAt (MenuOption->OptCol + Loop, MenuOption->Row, L" ");
           }
-          gST->ConOut->SetAttribute (gST->ConOut, PcdGet8 (PcdBrowserFieldTextHighlightColor) | PcdGet8 (PcdBrowserFieldBackgroundHighlightColor));
+          gST->ConOut->SetAttribute (gST->ConOut, GetHighlightTextColor ());
 
           if (MenuOption->Sequence == 0) {
             PrintCharAt (MenuOption->OptCol, Row, LEFT_NUMERIC_DELIMITER);
@@ -703,7 +783,7 @@ TheKey2:
           PrintStringAt (Column, Row, FormattedNumber);
 
           if (!DateOrTime || MenuOption->Sequence == 2) {
-            PrintChar (RIGHT_NUMERIC_DELIMITER);
+            PrintCharAt ((UINTN)-1, (UINTN)-1, RIGHT_NUMERIC_DELIMITER);
           }
         }
 
@@ -730,16 +810,18 @@ EnterCarriageReturn:
       // Validate input value with Minimum value.
       //
       if (EditValue < Minimum) {
-        UpdateStatusBar (Selection, INPUT_ERROR, Question->QuestionFlags, TRUE);
+        UpdateStatusBar (INPUT_ERROR, TRUE);
         break;
       } else {
-        UpdateStatusBar (Selection, INPUT_ERROR, Question->QuestionFlags, FALSE);
+        UpdateStatusBar (INPUT_ERROR, FALSE);
       }
-
+      
+      CopyMem (&gUserInput->InputValue, &Question->CurrentValue, sizeof (EFI_HII_VALUE));
+      QuestionValue = &gUserInput->InputValue;
       //
       // Store Edit value back to Question
       //
-      if (Question->Operand == EFI_IFR_DATE_OP) {
+      if (Question->OpCode->OpCode == EFI_IFR_DATE_OP) {
         switch (MenuOption->Sequence) {
         case 0:
           QuestionValue->Value.date.Month = (UINT8) EditValue;
@@ -756,7 +838,7 @@ EnterCarriageReturn:
         default:
           break;
         }
-      } else if (Question->Operand == EFI_IFR_TIME_OP) {
+      } else if (Question->OpCode->OpCode  == EFI_IFR_TIME_OP) {
         switch (MenuOption->Sequence) {
         case 0:
           QuestionValue->Value.time.Hour = (UINT8) EditValue;
@@ -785,32 +867,12 @@ EnterCarriageReturn:
       // Sample like: 2012.02.29 -> 2013.02.29 -> 2013.02.01
       //              2013.03.29 -> 2013.02.29 -> 2013.02.28
       //
-      if (Question->Operand == EFI_IFR_DATE_OP && 
+      if (Question->OpCode->OpCode  == EFI_IFR_DATE_OP && 
         (MenuOption->Sequence == 0 || MenuOption->Sequence == 2)) {
-        AdjustQuestionValue (Question, (UINT8)MenuOption->Sequence);
+        AdjustQuestionValue (QuestionValue, (UINT8)MenuOption->Sequence);
       }
 
-      //
-      // Check to see if the Value is something reasonable against consistency limitations.
-      // If not, let's kick the error specified.
-      //
-      Status = ValidateQuestion (FormSet, Form, Question, EFI_HII_EXPRESSION_INCONSISTENT_IF);
-      if (EFI_ERROR (Status)) {
-        //
-        // Input value is not valid, restore Question Value
-        //
-        GetQuestionValue (FormSet, Form, Question, GetSetValueWithEditBuffer);
-      } else {
-        SetQuestionValue (FormSet, Form, Question, GetSetValueWithEditBuffer);
-        if (!DateOrTime || (Question->Storage != NULL)) {
-          //
-          // NV flag is unnecessary for RTC type of Date/Time
-          //
-          UpdateStatusBar (Selection, NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
-        }
-      }
-
-      return Status;
+      return ValidateQuestion (Question);
       break;
 
     case CHAR_BACKSPACE:
@@ -822,10 +884,10 @@ EnterCarriageReturn:
         // Remove a character
         //
         EditValue = PreviousNumber[Count - 1];
-        UpdateStatusBar (Selection, INPUT_ERROR, Question->QuestionFlags, FALSE);
+        UpdateStatusBar (INPUT_ERROR,  FALSE);
         Count--;
         Column--;
-        PrintAt (Column, Row, L" ");
+        PrintStringAt (Column, Row, L" ");
       }
       break;
 
@@ -839,12 +901,12 @@ EnterCarriageReturn:
           } else if ((Key.UnicodeChar >= L'a') && (Key.UnicodeChar <= L'f')) {
             Digital = (UINT8) (Key.UnicodeChar - L'a' + 0x0A);
           } else {
-            UpdateStatusBar (Selection, INPUT_ERROR, Question->QuestionFlags, TRUE);
+            UpdateStatusBar (INPUT_ERROR, TRUE);
             break;
           }
         } else {
           if (Key.UnicodeChar > L'9' || Key.UnicodeChar < L'0') {
-            UpdateStatusBar (Selection, INPUT_ERROR, Question->QuestionFlags, TRUE);
+            UpdateStatusBar (INPUT_ERROR, TRUE);
             break;
           }
         }
@@ -873,32 +935,178 @@ EnterCarriageReturn:
         }
 
         if (EditValue > Maximum) {
-          UpdateStatusBar (Selection, INPUT_ERROR, Question->QuestionFlags, TRUE);
+          UpdateStatusBar (INPUT_ERROR, TRUE);
           ASSERT (Count < sizeof (PreviousNumber) / sizeof (PreviousNumber[0]));
           EditValue = PreviousNumber[Count];
           break;
         } else {
-          UpdateStatusBar (Selection, INPUT_ERROR, Question->QuestionFlags, FALSE);
+          UpdateStatusBar (INPUT_ERROR, FALSE);
         }
 
         Count++;
         ASSERT (Count < (sizeof (PreviousNumber) / sizeof (PreviousNumber[0])));
         PreviousNumber[Count] = EditValue;
 
+        gST->ConOut->SetAttribute (gST->ConOut, GetHighlightTextColor ());
         PrintCharAt (Column, Row, Key.UnicodeChar);
         Column++;
       }
       break;
     }
   } while (TRUE);
-
 }
 
+/**
+  Adjust option order base on the question value.
+
+  @param  Question           Pointer to current question.
+  @param  PopUpMenuLines     The line number of the pop up menu.
+
+  @retval EFI_SUCCESS       If Option input is processed successfully
+  @retval EFI_DEVICE_ERROR  If operation fails
+
+**/
+EFI_STATUS
+AdjustOptionOrder (
+  IN  FORM_DISPLAY_ENGINE_STATEMENT  *Question,
+  OUT UINTN                          *PopUpMenuLines
+  )
+{
+  UINTN                   Index;
+  EFI_IFR_ORDERED_LIST    *OrderList;
+  UINT8                   *ValueArray;
+  UINT8                   ValueType;
+  LIST_ENTRY              *Link;
+  DISPLAY_QUESTION_OPTION *OneOfOption;
+  EFI_HII_VALUE           *HiiValueArray;
+
+  Link        = GetFirstNode (&Question->OptionListHead);
+  OneOfOption = DISPLAY_QUESTION_OPTION_FROM_LINK (Link);
+  ValueArray  = Question->CurrentValue.Buffer;
+  ValueType   =  OneOfOption->OptionOpCode->Type;
+  OrderList   = (EFI_IFR_ORDERED_LIST *) Question->OpCode;
+
+  for (Index = 0; Index < OrderList->MaxContainers; Index++) {
+    if (GetArrayData (ValueArray, ValueType, Index) == 0) {
+      break;
+    }
+  }
+  
+  *PopUpMenuLines = Index;
+  
+  //
+  // Prepare HiiValue array
+  //  
+  HiiValueArray = AllocateZeroPool (*PopUpMenuLines * sizeof (EFI_HII_VALUE));
+  ASSERT (HiiValueArray != NULL);
+
+  for (Index = 0; Index < *PopUpMenuLines; Index++) {
+    HiiValueArray[Index].Type = ValueType;
+    HiiValueArray[Index].Value.u64 = GetArrayData (ValueArray, ValueType, Index);
+  }
+  
+  for (Index = 0; Index < *PopUpMenuLines; Index++) {
+    OneOfOption = ValueToOption (Question, &HiiValueArray[*PopUpMenuLines - Index - 1]);
+    if (OneOfOption == NULL) {
+      return EFI_NOT_FOUND;
+    }
+  
+    RemoveEntryList (&OneOfOption->Link);
+  
+    //
+    // Insert to head.
+    //
+    InsertHeadList (&Question->OptionListHead, &OneOfOption->Link);
+  }
+  
+  FreePool (HiiValueArray);
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Base on the type to compare the value.
+
+  @param  Value1                The first value need to compare.
+  @param  Value2                The second value need to compare.
+  @param  Type                  The value type for above two values.
+
+  @retval TRUE                  The two value are same.
+  @retval FALSE                 The two value are different.
+
+**/
+BOOLEAN
+IsValuesEqual (
+  IN EFI_IFR_TYPE_VALUE *Value1,
+  IN EFI_IFR_TYPE_VALUE *Value2,
+  IN UINT8              Type
+  )
+{
+  switch (Type) {
+  case EFI_IFR_TYPE_BOOLEAN:
+  case EFI_IFR_TYPE_NUM_SIZE_8:
+    return (BOOLEAN) (Value1->u8 == Value2->u8);
+  
+  case EFI_IFR_TYPE_NUM_SIZE_16:
+    return (BOOLEAN) (Value1->u16 == Value2->u16);
+  
+  case EFI_IFR_TYPE_NUM_SIZE_32:
+    return (BOOLEAN) (Value1->u32 == Value2->u32);
+  
+  case EFI_IFR_TYPE_NUM_SIZE_64:
+    return (BOOLEAN) (Value1->u64 == Value2->u64);
+
+  default:
+    ASSERT (FALSE);
+    return FALSE;
+  }
+}
+
+/**
+  Base on the type to set the value.
+
+  @param  Dest                  The dest value.
+  @param  Source                The source value.
+  @param  Type                  The value type for above two values.
+
+**/
+VOID
+SetValuesByType (
+  OUT EFI_IFR_TYPE_VALUE *Dest,
+  IN  EFI_IFR_TYPE_VALUE *Source,
+  IN  UINT8              Type
+  )
+{
+  switch (Type) {
+  case EFI_IFR_TYPE_BOOLEAN:
+    Dest->b = Source->b;
+    break;
+
+  case EFI_IFR_TYPE_NUM_SIZE_8:
+    Dest->u8 = Source->u8;
+    break;
+
+  case EFI_IFR_TYPE_NUM_SIZE_16:
+    Dest->u16 = Source->u16;
+    break;
+
+  case EFI_IFR_TYPE_NUM_SIZE_32:
+    Dest->u32 = Source->u32;
+    break;
+
+  case EFI_IFR_TYPE_NUM_SIZE_64:
+    Dest->u64 = Source->u64;
+    break;
+
+  default:
+    ASSERT (FALSE);
+    break;
+  }
+}
 
 /**
   Get selection for OneOf and OrderedList (Left/Right will be ignored).
 
-  @param  Selection         Pointer to current selection.
   @param  MenuOption        Pointer to the current input menu.
 
   @retval EFI_SUCCESS       If Option input is processed successfully
@@ -907,7 +1115,6 @@ EnterCarriageReturn:
 **/
 EFI_STATUS
 GetSelectionInputPopUp (
-  IN  UI_MENU_SELECTION           *Selection,
   IN  UI_MENU_OPTION              *MenuOption
   )
 {
@@ -934,16 +1141,16 @@ GetSelectionInputPopUp (
   LIST_ENTRY              *Link;
   BOOLEAN                 OrderedList;
   UINT8                   *ValueArray;
+  UINT8                   *ReturnValue;
   UINT8                   ValueType;
   EFI_HII_VALUE           HiiValue;
-  EFI_HII_VALUE           *HiiValueArray;
-  UINTN                   OptionCount;
-  QUESTION_OPTION         *OneOfOption;
-  QUESTION_OPTION         *CurrentOption;
-  FORM_BROWSER_STATEMENT  *Question;
+  DISPLAY_QUESTION_OPTION         *OneOfOption;
+  DISPLAY_QUESTION_OPTION         *CurrentOption;
+  FORM_DISPLAY_ENGINE_STATEMENT  *Question;
   INTN                    Result;
+  EFI_IFR_ORDERED_LIST    *OrderList;
 
-  DimensionsWidth   = gScreenDimensions.RightColumn - gScreenDimensions.LeftColumn;
+  DimensionsWidth   = gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn;
 
   ValueArray        = NULL;
   ValueType         = 0;
@@ -954,81 +1161,33 @@ GetSelectionInputPopUp (
   StringPtr = AllocateZeroPool ((gOptionBlockWidth + 1) * 2);
   ASSERT (StringPtr);
 
+  ZeroMem (&HiiValue, sizeof (EFI_HII_VALUE));
+
   Question = MenuOption->ThisTag;
-  if (Question->Operand == EFI_IFR_ORDERED_LIST_OP) {
-    ValueArray = Question->BufferValue;
-    ValueType = Question->ValueType;
+  if (Question->OpCode->OpCode == EFI_IFR_ORDERED_LIST_OP) {
+    Link = GetFirstNode (&Question->OptionListHead);
+    OneOfOption = DISPLAY_QUESTION_OPTION_FROM_LINK (Link);
+    ValueArray = Question->CurrentValue.Buffer;
+    ValueType =  OneOfOption->OptionOpCode->Type;
     OrderedList = TRUE;
+    OrderList = (EFI_IFR_ORDERED_LIST *) Question->OpCode;
   } else {
     OrderedList = FALSE;
+    OrderList = NULL;
   }
 
   //
   // Calculate Option count
   //
-  if (OrderedList) {
-    for (Index = 0; Index < Question->MaxContainers; Index++) {
-      if (GetArrayData (ValueArray, ValueType, Index) == 0) {
-        break;
-      }
-    }
-
-    OptionCount = Index;
-  } else {
-    OptionCount = 0;
-    Link = GetFirstNode (&Question->OptionListHead);
-    while (!IsNull (&Question->OptionListHead, Link)) {
-      OneOfOption = QUESTION_OPTION_FROM_LINK (Link);
-
-      OptionCount++;
-
-      Link = GetNextNode (&Question->OptionListHead, Link);
-    }
-  }
-
-  //
-  // Move valid Option to list head.
-  //
   PopUpMenuLines = 0;
   if (OrderedList) {
-    //
-    // Prepare HiiValue array
-    //  
-    HiiValueArray = AllocateZeroPool (OptionCount * sizeof (EFI_HII_VALUE));
-    ASSERT (HiiValueArray != NULL);
-    for (Index = 0; Index < OptionCount; Index++) {
-      HiiValueArray[Index].Type = ValueType;
-      HiiValueArray[Index].Value.u64 = GetArrayData (ValueArray, ValueType, Index);
-    }
-
-    for (Index = 0; Index < OptionCount; Index++) {
-      OneOfOption = ValueToOption (Question, &HiiValueArray[OptionCount - Index - 1]);
-      if (OneOfOption == NULL) {
-        return EFI_NOT_FOUND;
-      }
-
-      RemoveEntryList (&OneOfOption->Link);
-
-      //
-      // Insert to head.
-      //
-      InsertHeadList (&Question->OptionListHead, &OneOfOption->Link);
-
-      PopUpMenuLines++;
-    }
-
-    FreePool (HiiValueArray);
+    AdjustOptionOrder(Question, &PopUpMenuLines);
   } else {
     Link = GetFirstNode (&Question->OptionListHead);
-    for (Index = 0; Index < OptionCount; Index++) {
-      OneOfOption = QUESTION_OPTION_FROM_LINK (Link);
+    while (!IsNull (&Question->OptionListHead, Link)) {
+      OneOfOption = DISPLAY_QUESTION_OPTION_FROM_LINK (Link);
+      PopUpMenuLines++;
       Link = GetNextNode (&Question->OptionListHead, Link);
-      if ((OneOfOption->SuppressExpression != NULL) &&
-          EvaluateExpressionList(OneOfOption->SuppressExpression, FALSE, NULL, NULL) > ExpressFalse) {
-        continue;
-      } else {
-        PopUpMenuLines++;
-      }
     }
   }
 
@@ -1039,27 +1198,23 @@ GetSelectionInputPopUp (
   HighlightOptionIndex = 0;
   Link = GetFirstNode (&Question->OptionListHead);
   for (Index = 0; Index < PopUpMenuLines; Index++) {
-    OneOfOption = QUESTION_OPTION_FROM_LINK (Link);
-    Link = GetNextNode (&Question->OptionListHead, Link);
+    OneOfOption = DISPLAY_QUESTION_OPTION_FROM_LINK (Link);
 
-    if (!OrderedList && (OneOfOption->SuppressExpression != NULL) &&
-        EvaluateExpressionList(OneOfOption->SuppressExpression, FALSE, NULL, NULL) > ExpressFalse) {
-      Index--;
-      continue;
-    }
-
-    StringPtr = GetToken (OneOfOption->Text, MenuOption->Handle);
+    StringPtr = GetToken (OneOfOption->OptionOpCode->Option, gFormData->HiiHandle);
     if (StrLen (StringPtr) > PopUpWidth) {
       PopUpWidth = StrLen (StringPtr);
     }
     FreePool (StringPtr);
-
-    if (!OrderedList && (CompareHiiValue (&Question->HiiValue, &OneOfOption->Value, &Result, NULL) == EFI_SUCCESS) && (Result == 0)) {
+    HiiValue.Type = OneOfOption->OptionOpCode->Type;
+    SetValuesByType (&HiiValue.Value, &OneOfOption->OptionOpCode->Value, HiiValue.Type);
+    if (!OrderedList && (CompareHiiValue (&Question->CurrentValue, &HiiValue, &Result, NULL) == EFI_SUCCESS) && (Result == 0)) {
       //
       // Find current selected Option for OneOf
       //
       HighlightOptionIndex = Index;
     }
+
+    Link = GetNextNode (&Question->OptionListHead, Link);
   }
 
   //
@@ -1068,16 +1223,16 @@ GetSelectionInputPopUp (
   PopUpWidth = PopUpWidth + POPUP_PAD_SPACE_COUNT;
 
   SavedAttribute = gST->ConOut->Mode->Attribute;
-  gST->ConOut->SetAttribute (gST->ConOut, POPUP_TEXT | POPUP_BACKGROUND);
+  gST->ConOut->SetAttribute (gST->ConOut, GetPopupColor ());
 
   if ((PopUpWidth + POPUP_FRAME_WIDTH) > DimensionsWidth) {
     PopUpWidth = DimensionsWidth - POPUP_FRAME_WIDTH;
   }
 
-  Start  = (DimensionsWidth - PopUpWidth - POPUP_FRAME_WIDTH) / 2 + gScreenDimensions.LeftColumn;
+  Start  = (DimensionsWidth - PopUpWidth - POPUP_FRAME_WIDTH) / 2 + gStatementDimensions.LeftColumn;
   End    = Start + PopUpWidth + POPUP_FRAME_WIDTH;
-  Top    = gScreenDimensions.TopRow + NONE_FRONT_PAGE_HEADER_HEIGHT;
-  Bottom = gScreenDimensions.BottomRow - STATUS_BAR_HEIGHT - gFooterHeight - 1;
+  Top    = gStatementDimensions.TopRow;
+  Bottom = gStatementDimensions.BottomRow - 1;
 
   MenuLinesInView = Bottom - Top - 1;
   if (MenuLinesInView >= PopUpMenuLines) {
@@ -1097,7 +1252,7 @@ GetSelectionInputPopUp (
     //
     // Clear that portion of the screen
     //
-    ClearLines (Start, End, Top, Bottom, POPUP_TEXT | POPUP_BACKGROUND);
+    ClearLines (Start, End, Top, Bottom, GetPopupColor ());
 
     //
     // Draw "One of" pop-up menu
@@ -1111,11 +1266,11 @@ GetSelectionInputPopUp (
         Character = BOXDRAW_HORIZONTAL;
       }
 
-      PrintChar (Character);
+      PrintCharAt ((UINTN)-1, (UINTN)-1, Character);
     }
 
     Character = BOXDRAW_DOWN_LEFT;
-    PrintChar (Character);
+    PrintCharAt ((UINTN)-1, (UINTN)-1, Character);
     Character = BOXDRAW_VERTICAL;
     for (Index = Top + 1; Index < Bottom; Index++) {
       PrintCharAt (Start, Index, Character);
@@ -1128,13 +1283,6 @@ GetSelectionInputPopUp (
     Link = GetFirstNode (&Question->OptionListHead);
     for (Index = 0; Index < TopOptionIndex; Index++) {
       Link = GetNextNode (&Question->OptionListHead, Link);
-
-      OneOfOption = QUESTION_OPTION_FROM_LINK (Link);
-      if (!OrderedList && (OneOfOption->SuppressExpression != NULL) &&
-          EvaluateExpressionList(OneOfOption->SuppressExpression, FALSE, NULL, NULL) > ExpressFalse) {
-        Index--;
-        continue;
-      }
     }
 
     //
@@ -1142,16 +1290,10 @@ GetSelectionInputPopUp (
     //
     Index2 = Top + 1;
     for (Index = TopOptionIndex; (Index < PopUpMenuLines) && (Index2 < Bottom); Index++) {
-      OneOfOption = QUESTION_OPTION_FROM_LINK (Link);
+      OneOfOption = DISPLAY_QUESTION_OPTION_FROM_LINK (Link);
       Link = GetNextNode (&Question->OptionListHead, Link);
 
-      if (!OrderedList && (OneOfOption->SuppressExpression != NULL) &&
-          EvaluateExpressionList(OneOfOption->SuppressExpression, FALSE, NULL, NULL) > ExpressFalse) {
-        Index--;
-        continue;
-      }
-
-      StringPtr = GetToken (OneOfOption->Text, MenuOption->Handle);
+      StringPtr = GetToken (OneOfOption->OptionOpCode->Option, gFormData->HiiHandle);
       ASSERT (StringPtr != NULL);
       //
       // If the string occupies multiple lines, truncate it to fit in one line,
@@ -1172,11 +1314,11 @@ GetSelectionInputPopUp (
           //
           CurrentOption = OneOfOption;
 
-          gST->ConOut->SetAttribute (gST->ConOut, PICKLIST_HIGHLIGHT_TEXT | PICKLIST_HIGHLIGHT_BACKGROUND);
+          gST->ConOut->SetAttribute (gST->ConOut, GetPickListColor ());
           PrintStringAt (Start + 2, Index2, StringPtr);
-          gST->ConOut->SetAttribute (gST->ConOut, POPUP_TEXT | POPUP_BACKGROUND);
+          gST->ConOut->SetAttribute (gST->ConOut, GetPopupColor ());
         } else {
-          gST->ConOut->SetAttribute (gST->ConOut, POPUP_TEXT | POPUP_BACKGROUND);
+          gST->ConOut->SetAttribute (gST->ConOut, GetPopupColor ());
           PrintStringAt (Start + 2, Index2, StringPtr);
         }
 
@@ -1193,11 +1335,11 @@ GetSelectionInputPopUp (
         Character = BOXDRAW_HORIZONTAL;
       }
 
-      PrintChar (Character);
+      PrintCharAt ((UINTN)-1, (UINTN)-1, Character);
     }
 
     Character = BOXDRAW_UP_LEFT;
-    PrintChar (Character);
+    PrintCharAt ((UINTN)-1, (UINTN)-1, Character);
 
     //
     // Get User selection
@@ -1313,7 +1455,7 @@ TheKey:
         if (OrderedList) {
           HiiValue.Type = ValueType;
           HiiValue.Value.u64 = 0;
-          for (Index = 0; Index < Question->MaxContainers; Index++) {
+          for (Index = 0; Index < OrderList->MaxContainers; Index++) {
             HiiValue.Value.u64 = GetArrayData (ValueArray, ValueType, Index);
             if (HiiValue.Value.u64 == 0) {
               break;
@@ -1342,44 +1484,44 @@ TheKey:
       // return the current selection
       //
       if (OrderedList) {
+        ReturnValue = AllocateZeroPool (Question->CurrentValue.BufferLen);
+        ASSERT (ReturnValue != NULL);
         Index = 0;
         Link = GetFirstNode (&Question->OptionListHead);
         while (!IsNull (&Question->OptionListHead, Link)) {
-          OneOfOption = QUESTION_OPTION_FROM_LINK (Link);
+          OneOfOption = DISPLAY_QUESTION_OPTION_FROM_LINK (Link);
           Link = GetNextNode (&Question->OptionListHead, Link);
 
-          if ((OneOfOption->SuppressExpression != NULL) &&
-              EvaluateExpressionList(OneOfOption->SuppressExpression, FALSE, NULL, NULL) != ExpressFalse) {
-            continue;
-          }
-
-          SetArrayData (ValueArray, ValueType, Index, OneOfOption->Value.Value.u64);
+          SetArrayData (ReturnValue, ValueType, Index, OneOfOption->OptionOpCode->Value.u64);
 
           Index++;
-          if (Index > Question->MaxContainers) {
+          if (Index > OrderList->MaxContainers) {
             break;
           }
         }
+        if (CompareMem (ReturnValue, ValueArray, Question->CurrentValue.BufferLen) == 0) {
+          FreePool (ReturnValue);
+          return EFI_DEVICE_ERROR;
+        } else {
+          gUserInput->InputValue.Buffer = ReturnValue;
+          gUserInput->InputValue.BufferLen = Question->CurrentValue.BufferLen;
+          Status = EFI_SUCCESS;
+        }
       } else {
         ASSERT (CurrentOption != NULL);
-        CopyMem (&Question->HiiValue, &CurrentOption->Value, sizeof (EFI_HII_VALUE));
+        gUserInput->InputValue.Type = CurrentOption->OptionOpCode->Type;
+        if (IsValuesEqual (&Question->CurrentValue.Value, &CurrentOption->OptionOpCode->Value, gUserInput->InputValue.Type)) {
+          return EFI_DEVICE_ERROR;
+        } else {
+          SetValuesByType (&gUserInput->InputValue.Value, &CurrentOption->OptionOpCode->Value, gUserInput->InputValue.Type);
+          Status = EFI_SUCCESS;
+        }
       }
 
       gST->ConOut->SetAttribute (gST->ConOut, SavedAttribute);
 
-      Status = ValidateQuestion (Selection->FormSet, Selection->Form, Question, EFI_HII_EXPRESSION_INCONSISTENT_IF);
-      if (EFI_ERROR (Status)) {
-        //
-        // Input value is not valid, restore Question Value
-        //
-        GetQuestionValue (Selection->FormSet, Selection->Form, Question, GetSetValueWithEditBuffer);
-      } else {
-        SetQuestionValue (Selection->FormSet, Selection->Form, Question, GetSetValueWithEditBuffer);
-        UpdateStatusBar (Selection, NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);
-      }
-
-      return Status;
-
+      return ValidateQuestion (Question);
+      
     default:
       break;
     }
@@ -1387,32 +1529,3 @@ TheKey:
 
 }
 
-/**
-  Wait for a key to be pressed by user.
-
-  @param Key         The key which is pressed by user.
-
-  @retval EFI_SUCCESS The function always completed successfully.
-
-**/
-EFI_STATUS
-WaitForKeyStroke (
-  OUT  EFI_INPUT_KEY           *Key
-  )
-{
-  EFI_STATUS  Status;
-
-  while (TRUE) {
-    Status = gST->ConIn->ReadKeyStroke (gST->ConIn, Key);
-    if (!EFI_ERROR (Status)) {
-      break;
-    }
-
-    if (Status != EFI_NOT_READY) {
-      continue;
-    }
-
-    UiWaitForSingleEvent (gST->ConIn->WaitForKey, 0, 0);
-  }
-  return Status;
-}
