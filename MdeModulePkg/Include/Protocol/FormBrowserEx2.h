@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __FORM_BROWSER_EXTENSION2_H__
 #define __FORM_BROWSER_EXTENSION2_H__
 
-#include <Protocol\FormBrowserEx.h>
+#include <Protocol/FormBrowserEx.h>
 
 #define EDKII_FORM_BROWSER_EXTENSION2_PROTOCOL_GUID  \
   { 0xa770c357, 0xb693, 0x4e6d, { 0xa6, 0xcf, 0xd2, 0x1c, 0x72, 0x8e, 0x55, 0xb }}
