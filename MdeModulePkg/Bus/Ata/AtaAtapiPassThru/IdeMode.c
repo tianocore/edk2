@@ -1,7 +1,7 @@
 /** @file
   Header file for AHCI mode of ATA host controller.
 
-  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -2296,8 +2296,17 @@ IdeAtaSmartReturnStatusCheck (
              );
 
   if (EFI_ERROR (Status)) {
+    REPORT_STATUS_CODE (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      (EFI_IO_BUS_ATA_ATAPI | EFI_IOB_ATA_BUS_SMART_DISABLED)
+      );
     return EFI_DEVICE_ERROR;
   }
+
+  REPORT_STATUS_CODE (
+    EFI_PROGRESS_CODE,
+    (EFI_IO_BUS_ATA_ATAPI | EFI_IOB_ATA_BUS_SMART_ENABLE)
+    );
 
   LBAMid  = IdeReadPortB (Instance->PciIo, Instance->IdeRegisters[Channel].CylinderLsb);
   LBAHigh = IdeReadPortB (Instance->PciIo, Instance->IdeRegisters[Channel].CylinderMsb);
@@ -2307,12 +2316,19 @@ IdeAtaSmartReturnStatusCheck (
     // The threshold exceeded condition is not detected by the device
     //
     DEBUG ((EFI_D_INFO, "The S.M.A.R.T threshold exceeded condition is not detected\n"));
-
+    REPORT_STATUS_CODE (
+          EFI_PROGRESS_CODE,
+          (EFI_IO_BUS_ATA_ATAPI | EFI_IOB_ATA_BUS_SMART_UNDERTHRESHOLD)
+          );
   } else if ((LBAMid == 0xf4) && (LBAHigh == 0x2c)) {
     //
     // The threshold exceeded condition is detected by the device
     //
     DEBUG ((EFI_D_INFO, "The S.M.A.R.T threshold exceeded condition is detected\n"));
+    REPORT_STATUS_CODE (
+         EFI_PROGRESS_CODE,
+         (EFI_IO_BUS_ATA_ATAPI | EFI_IOB_ATA_BUS_SMART_OVERTHRESHOLD)
+         );
   }
 
   return EFI_SUCCESS;
@@ -2350,11 +2366,20 @@ IdeAtaSmartSupport (
     //
     DEBUG ((EFI_D_INFO, "S.M.A.R.T feature is not supported at [%a] channel [%a] device!\n",
             (Channel == 1) ? "secondary" : "primary", (Device == 1) ? "slave" : "master"));
+    REPORT_STATUS_CODE (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      (EFI_IO_BUS_ATA_ATAPI | EFI_IOB_ATA_BUS_SMART_NOTSUPPORTED)
+      );
   } else {
     //
     // Check if the feature is enabled. If not, then enable S.M.A.R.T.
     //
     if ((IdentifyData->AtaData.command_set_feature_enb_85 & 0x0001) != 0x0001) {
+
+      REPORT_STATUS_CODE (
+        EFI_PROGRESS_CODE,
+        (EFI_IO_BUS_ATA_ATAPI | EFI_IOB_ATA_BUS_SMART_DISABLE)
+        );
 
       ZeroMem (&AtaCommandBlock, sizeof (EFI_ATA_COMMAND_BLOCK));
 

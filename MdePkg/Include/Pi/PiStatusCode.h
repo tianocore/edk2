@@ -1,7 +1,7 @@
 /** @file
   StatusCode related definitions in PI.
 
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -596,7 +596,10 @@ typedef struct {
 //
 // IO Bus Class ATA/ATAPI Subclass Progress Code definitions.
 //
-
+#define EFI_IOB_ATA_BUS_SMART_ENABLE          (EFI_SUBCLASS_SPECIFIC | 0x00000000)
+#define EFI_IOB_ATA_BUS_SMART_DISABLE         (EFI_SUBCLASS_SPECIFIC | 0x00000001)
+#define EFI_IOB_ATA_BUS_SMART_OVERTHRESHOLD   (EFI_SUBCLASS_SPECIFIC | 0x00000002)
+#define EFI_IOB_ATA_BUS_SMART_UNDERTHRESHOLD  (EFI_SUBCLASS_SPECIFIC | 0x00000003)
 //
 // IO Bus Class FC Subclass Progress Code definitions.
 //
@@ -669,6 +672,8 @@ typedef struct {
 //
 // IO Bus Class ATA/ATAPI Subclass Error Code definitions.
 //
+#define EFI_IOB_ATA_BUS_SMART_NOTSUPPORTED  (EFI_SUBCLASS_SPECIFIC | 0x00000000)
+#define EFI_IOB_ATA_BUS_SMART_DISABLED      (EFI_SUBCLASS_SPECIFIC | 0x00000001)
 
 //
 // IO Bus Class FC Subclass Error Code definitions.
