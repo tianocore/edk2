@@ -2,7 +2,7 @@
 
   This file contains the definition for XHCI host controller schedule routines.
 
-Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -172,6 +172,8 @@ typedef struct _URB {
   EFI_USB_DEVICE_REQUEST          *Request;
   VOID                            *Data;
   UINTN                           DataLen;
+  VOID                            *DataPhy;
+  VOID                            *DataMap;
   EFI_ASYNC_USB_TRANSFER_CALLBACK Callback;
   VOID                            *Context;
   //
@@ -1303,6 +1305,19 @@ XhcCreateUrb (
   IN UINTN                              DataLen,
   IN EFI_ASYNC_USB_TRANSFER_CALLBACK    Callback,
   IN VOID                               *Context
+  );
+
+/**
+  Free an allocated URB.
+
+  @param  Xhc                   The XHCI device.
+  @param  Urb                   The URB to free.
+
+**/
+VOID
+XhcFreeUrb (
+  IN USB_XHCI_INSTANCE    *Xhc,
+  IN URB                  *Urb
   );
 
 /**

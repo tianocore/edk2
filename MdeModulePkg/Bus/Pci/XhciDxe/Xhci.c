@@ -907,6 +907,17 @@ XhcControlTransfer (
     goto FREE_URB;
   }
 
+  Xhc->PciIo->Flush (Xhc->PciIo);
+  
+  if (Urb->DataMap != NULL) {
+    Status = Xhc->PciIo->Unmap (Xhc->PciIo, Urb->DataMap);
+    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      Status = EFI_DEVICE_ERROR;
+      goto FREE_URB;
+    }  
+  }
+
   //
   // Hook Get_Descriptor request from UsbBus as we need evaluate context and configure endpoint.
   // Hook Get_Status request form UsbBus as we need trace device attach/detach event happened at hub.
@@ -1185,7 +1196,8 @@ XhcBulkTransfer (
     Status = EFI_DEVICE_ERROR;
   }
 
-  FreePool (Urb);
+  Xhc->PciIo->Flush (Xhc->PciIo);
+  XhcFreeUrb (Xhc, Urb);
 
 ON_EXIT:
 
@@ -1351,6 +1363,7 @@ XhcAsyncInterruptTransfer (
   Status = RingIntTransferDoorBell (Xhc, Urb);
 
 ON_EXIT:
+  Xhc->PciIo->Flush (Xhc->PciIo);
   gBS->RestoreTPL (OldTpl);
 
   return Status;
@@ -1482,7 +1495,8 @@ XhcSyncInterruptTransfer (
     Status = EFI_DEVICE_ERROR;
   }
 
-  FreePool (Urb);
+  Xhc->PciIo->Flush (Xhc->PciIo);
+  XhcFreeUrb (Xhc, Urb);
 
 ON_EXIT:
   if (EFI_ERROR (Status)) {

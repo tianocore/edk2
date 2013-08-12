@@ -40,6 +40,7 @@ typedef struct _USB_DEV_CONTEXT      USB_DEV_CONTEXT;
 #include "XhciReg.h"
 #include "XhciSched.h"
 #include "ComponentName.h"
+#include "UsbHcMem.h"
 
 //
 // The unit is microsecond, setting it as 1us.
@@ -201,6 +202,7 @@ struct _USB_XHCI_INSTANCE {
   UINT32                    Signature;
   EFI_PCI_IO_PROTOCOL       *PciIo;
   UINT64                    OriginalPciAttributes;
+  USBHC_MEM_POOL            *MemPool;
 
   EFI_USB2_HC_PROTOCOL      Usb2Hc;
 
@@ -223,10 +225,14 @@ struct _USB_XHCI_INSTANCE {
   UINT16                    MaxInterrupt;
   UINT32                    PageSize;
   UINT64                    *ScratchBuf;
+  VOID                      *ScratchMap;
   UINT32                    MaxScratchpadBufs;
+  UINT64                    *ScratchEntry;
+  UINTN                     *ScratchEntryMap;
   UINT32                    ExtCapRegBase;
   UINT32                    UsbLegSupOffset;
   UINT64                    *DCBAA;
+  VOID                      *DCBAAMap;
   UINT32                    MaxSlotsEn;
   //
   // Cmd Transfer Ring

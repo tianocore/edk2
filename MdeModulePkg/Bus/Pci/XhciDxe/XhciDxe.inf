@@ -6,7 +6,7 @@
 #  It implements the interfaces of monitoring the status of all ports and transferring
 #  Control, Bulk, Interrupt and Isochronous requests to those attached usb LS/FS/HS/SS devices.
 #
-#  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -42,6 +42,8 @@
   Xhci.c
   XhciReg.c
   XhciSched.c
+  UsbHcMem.c
+  UsbHcMem.h  
   ComponentName.c
   ComponentName.h
   Xhci.h
