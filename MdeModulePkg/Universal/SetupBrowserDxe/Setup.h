@@ -22,7 +22,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SimpleTextOut.h>
 #include <Protocol/SimpleTextIn.h>
 #include <Protocol/FormBrowser2.h>
-#include <Protocol/FormBrowserEx.h>
+#include <Protocol/FormBrowserEx2.h>
+#include <Protocol/DisplayProtocol.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/UnicodeCollation.h>
 #include <Protocol/HiiConfigAccess.h>
@@ -47,104 +48,27 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/HiiLib.h>
 #include <Library/PcdLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/UefiLib.h>
 
-#include "Colors.h"
 
 //
 // This is the generated header file which includes whatever needs to be exported (strings + IFR)
 //
 
-extern UINT8  SetupBrowserStrings[];
+#define UI_ACTION_NONE               0
+#define UI_ACTION_REFRESH_FORM       1
+#define UI_ACTION_REFRESH_FORMSET    2
+#define UI_ACTION_EXIT               3
 
 //
-// Screen definitions
-//
-#define BANNER_HEIGHT                 6
-#define BANNER_COLUMNS                3
-#define BANNER_LEFT_COLUMN_INDENT     1
-
-#define FRONT_PAGE_HEADER_HEIGHT      6
-#define NONE_FRONT_PAGE_HEADER_HEIGHT 3
-#define LEFT_SKIPPED_COLUMNS          3
-#define FOOTER_HEIGHT                 4
-#define STATUS_BAR_HEIGHT             1
-#define SCROLL_ARROW_HEIGHT           1
-#define POPUP_PAD_SPACE_COUNT         5
-#define POPUP_FRAME_WIDTH             2
-
-//
-// Definition for function key setting
-//
-#define NONE_FUNCTION_KEY_SETTING     0
-#define ENABLE_FUNCTION_KEY_SETTING   1
-
-typedef struct {
-  EFI_GUID  FormSetGuid;
-  UINTN     KeySetting;
-} FUNCTIION_KEY_SETTING;
-
-//
-// Character definitions
-//
-#define CHAR_SPACE              0x0020
-#define UPPER_LOWER_CASE_OFFSET 0x20
-
 //
 // Time definitions
 //
 #define ONE_SECOND  10000000
 
-//
-// Display definitions
-//
-#define LEFT_HYPER_DELIMITER      L'<'
-#define RIGHT_HYPER_DELIMITER     L'>'
-
-#define LEFT_ONEOF_DELIMITER      L'<'
-#define RIGHT_ONEOF_DELIMITER     L'>'
-
-#define LEFT_NUMERIC_DELIMITER    L'['
-#define RIGHT_NUMERIC_DELIMITER   L']'
-
-#define LEFT_CHECKBOX_DELIMITER   L'['
-#define RIGHT_CHECKBOX_DELIMITER  L']'
-
-#define CHECK_ON                  L'X'
-#define CHECK_OFF                 L' '
-
-#define TIME_SEPARATOR            L':'
-#define DATE_SEPARATOR            L'/'
-
-#define YES_ANSWER                L'Y'
-#define NO_ANSWER                 L'N'
-
-//
-// This is the Input Error Message
-//
-#define INPUT_ERROR 1
-
-//
-// This is the NV RAM update required Message
-//
-#define NV_UPDATE_REQUIRED  2
-
-//
-// Refresh the Status Bar with flags
-//
-#define REFRESH_STATUS_BAR  0xff
-
-//
 // Incremental string lenght of ConfigRequest
 //
 #define CONFIG_REQUEST_STRING_INCREMENTAL  1024
-
-//
-// HII value compare result
-//
-#define HII_VALUE_UNDEFINED     0
-#define HII_VALUE_EQUAL         1
-#define HII_VALUE_LESS_THAN     2
-#define HII_VALUE_GREATER_THAN  3
 
 //
 // Incremental size of stack for expression
@@ -163,15 +87,12 @@ typedef struct {
   //
   // Produced protocol
   //
-  EFI_FORM_BROWSER2_PROTOCOL          FormBrowser2;
-  
-  EFI_FORM_BROWSER_EXTENSION_PROTOCOL FormBrowserEx;
+  EFI_FORM_BROWSER2_PROTOCOL            FormBrowser2;
+  EFI_FORM_BROWSER_EXTENSION_PROTOCOL   FormBrowserEx;
+
+  EDKII_FORM_BROWSER_EXTENSION2_PROTOCOL FormBrowserEx2;
 
 } SETUP_DRIVER_PRIVATE_DATA;
-
-typedef struct {
-  EFI_STRING_ID  Banner[BANNER_HEIGHT][BANNER_COLUMNS];
-} BANNER_DATA;
 
 //
 // IFR relative definition
@@ -193,16 +114,6 @@ typedef struct {
 
 #define FORM_INCONSISTENT_VALIDATION         0
 #define FORM_NO_SUBMIT_VALIDATION            1
-
-#define FORMSET_CLASS_PLATFORM_SETUP         0x0001
-#define FORMSET_CLASS_FRONT_PAGE             0x0002
-
-typedef struct {
-  UINT8               Type;
-  UINT8               *Buffer;
-  UINT16              BufferLen;
-  EFI_IFR_TYPE_VALUE  Value;
-} EFI_HII_VALUE;
 
 #define NAME_VALUE_NODE_SIGNATURE  SIGNATURE_32 ('N', 'V', 'S', 'T')
 
@@ -255,6 +166,7 @@ typedef struct {
   BROWSER_STORAGE  *BrowserStorage;
 
   CHAR16           *ConfigRequest; // <ConfigRequest> = <ConfigHdr> + <RequestElement>
+  CHAR16           *ConfigElements;// Elements need to load initial data.
   UINTN            ElementCount;   // Number of <RequestElement> in the <ConfigRequest>
   UINTN            SpareStrLen;    // Spare length of ConfigRequest string buffer
 } FORMSET_STORAGE;
@@ -344,6 +256,8 @@ typedef struct {
 typedef struct {
   UINTN                Signature;
   LIST_ENTRY           Link;
+  
+  EFI_IFR_ONE_OF_OPTION  *OpCode;   // OneOfOption Data
 
   EFI_STRING_ID        Text;
   UINT8                Flags;
@@ -376,6 +290,7 @@ typedef struct {
   LIST_ENTRY            Link;
 
   UINT8                 Operand;          // The operand (first byte) of this Statement or Question
+  EFI_IFR_OP_HEADER     *OpCode;
 
   //
   // Statement Header
@@ -383,6 +298,11 @@ typedef struct {
   EFI_STRING_ID         Prompt;
   EFI_STRING_ID         Help;
   EFI_STRING_ID         TextTwo;          // For EFI_IFR_TEXT
+
+  //
+  // Fake Question Id, used for statement not has true QuestionId.
+  //
+  EFI_QUESTION_ID       FakeQuestionId;
 
   //
   // Question Header
@@ -417,6 +337,7 @@ typedef struct {
   EFI_DEFAULT_ID        DefaultId;        // for EFI_IFR_RESET_BUTTON
   EFI_GUID              RefreshGuid;      // for EFI_IFR_REFRESH_ID
   BOOLEAN               Locked;           // Whether this statement is locked.
+  BOOLEAN               ValueChanged;     // Whether this statement's value is changed.
   //
   // Get from IFR parsing
   //
@@ -467,8 +388,6 @@ typedef struct {
   BOOLEAN              ModalForm;            // Whether this is a modal form.
   BOOLEAN              Locked;               // Whether this form is locked.
 
-  BOOLEAN              NvUpdateRequired;     // Whether this form has NV update request.
-
   LIST_ENTRY           ExpressionListHead;   // List of Expressions (FORM_EXPRESSION)
   LIST_ENTRY           StatementListHead;    // List of Statements and Questions (FORM_BROWSER_STATEMENT)
   LIST_ENTRY           ConfigRequestHead;    // List of configreques for all storage.
@@ -502,6 +421,7 @@ typedef struct {
   UINTN                           IfrBinaryLength;
   UINT8                           *IfrBinaryData;
 
+  BOOLEAN                         QuestionInited;   // Have finished question initilization?
   EFI_GUID                        Guid;
   EFI_STRING_ID                   FormSetTitle;
   EFI_STRING_ID                   Help;
@@ -514,13 +434,20 @@ typedef struct {
   FORM_BROWSER_STATEMENT          *StatementBuffer;     // Buffer for all Statements and Questions
   EXPRESSION_OPCODE               *ExpressionBuffer;    // Buffer for all Expression OpCode
 
+  LIST_ENTRY                      StatementListOSF;     // Statement list out side of the form.
   LIST_ENTRY                      StorageListHead;      // Storage list (FORMSET_STORAGE)
   LIST_ENTRY                      DefaultStoreListHead; // DefaultStore list (FORMSET_DEFAULTSTORE)
   LIST_ENTRY                      FormListHead;         // Form list (FORM_BROWSER_FORM)
   LIST_ENTRY                      ExpressionListHead;   // List of Expressions (FORM_EXPRESSION)
 } FORM_BROWSER_FORMSET;
-
 #define FORM_BROWSER_FORMSET_FROM_LINK(a)  CR (a, FORM_BROWSER_FORMSET, Link, FORM_BROWSER_FORMSET_SIGNATURE)
+
+typedef struct {
+  LIST_ENTRY   Link;
+  EFI_EVENT    RefreshEvent;
+} FORM_BROWSER_REFRESH_EVENT_NODE;
+
+#define FORM_BROWSER_REFRESH_EVENT_FROM_LINK(a) BASE_CR (a, FORM_BROWSER_REFRESH_EVENT_NODE, Link)
 
 #define BROWSER_CONTEXT_SIGNATURE  SIGNATURE_32 ('B', 'C', 'T', 'X')
 
@@ -531,67 +458,54 @@ typedef struct {
   //
   // Globals defined in Setup.c
   //
-  BANNER_DATA           *BannerData;
-  UINTN                 ClassOfVfr;
-  UINTN                 FunctionKeySetting;
-  BOOLEAN               ResetRequired;
-  UINT16                Direction;
-  EFI_SCREEN_DESCRIPTOR ScreenDimensions;
-  CHAR16                *EnterString;
-  CHAR16                *EnterCommitString;
-  CHAR16                *EnterEscapeString;
-  CHAR16                *EscapeString;
-  CHAR16                *MoveHighlight;
-  CHAR16                *MakeSelection;
-  CHAR16                *DecNumericInput;
-  CHAR16                *HexNumericInput;
-  CHAR16                *ToggleCheckBox;
-  CHAR16                *PromptForData;
-  CHAR16                *PromptForPassword;
-  CHAR16                *PromptForNewPassword;
-  CHAR16                *ConfirmPassword;
-  CHAR16                *ConfirmError;
-  CHAR16                *PassowordInvalid;
-  CHAR16                *PressEnter;
-  CHAR16                *EmptyString;
-  CHAR16                *AreYouSure;
-  CHAR16                *YesResponse;
-  CHAR16                *NoResponse;
-  CHAR16                *MiniString;
-  CHAR16                *PlusString;
-  CHAR16                *MinusString;
-  CHAR16                *AdjustNumber;
-  CHAR16                *SaveChanges;
-  CHAR16                *OptionMismatch;
-  CHAR16                *FormSuppress;
-  CHAR16                *ProtocolNotFound;
-  CHAR16                PromptBlockWidth;
-  CHAR16                OptionBlockWidth;
-  CHAR16                HelpBlockWidth;
-  FORM_BROWSER_FORMSET  *OldFormSet;
+  BOOLEAN                  ResetRequired;
+  BOOLEAN                  ExitRequired;
+  EFI_HII_HANDLE           HiiHandle;
 
-  //
-  // Globals defined in Ui.c
-  //
-  LIST_ENTRY           MenuOption;
-  VOID                 *MenuRefreshHead;
+  LIST_ENTRY           FormHistoryList;
 } BROWSER_CONTEXT;
 
 #define BROWSER_CONTEXT_FROM_LINK(a)  CR (a, BROWSER_CONTEXT, Link, BROWSER_CONTEXT_SIGNATURE)
 
-#define BROWSER_HOT_KEY_SIGNATURE  SIGNATURE_32 ('B', 'H', 'K', 'S')
-
 typedef struct {
-  UINTN                 Signature;
-  LIST_ENTRY            Link;
-  
-  EFI_INPUT_KEY         *KeyData;
-  IN UINT32             Action;
-  IN UINT16             DefaultId;
-  IN EFI_STRING         HelpString;
-} BROWSER_HOT_KEY;
+  EFI_HII_HANDLE  Handle;
 
-#define BROWSER_HOT_KEY_FROM_LINK(a)  CR (a, BROWSER_HOT_KEY, Link, BROWSER_HOT_KEY_SIGNATURE)
+  //
+  // Target formset/form/Question information
+  //
+  EFI_GUID        FormSetGuid;
+  UINT16          FormId;
+  UINT16          QuestionId;
+  UINTN           Sequence;  // used for time/date only.
+
+  UINTN           TopRow;
+  UINTN           BottomRow;
+  UINTN           PromptCol;
+  UINTN           OptionCol;
+  UINTN           CurrentRow;
+
+  //
+  // Ation for Browser to taken:
+  //   UI_ACTION_NONE            - navigation inside a form
+  //   UI_ACTION_REFRESH_FORM    - re-evaluate expressions and repaint form
+  //   UI_ACTION_REFRESH_FORMSET - re-parse formset IFR binary
+  //
+  UINTN           Action;
+
+  //
+  // Current selected fomset/form/Question
+  //
+  FORM_BROWSER_FORMSET    *FormSet;
+  FORM_BROWSER_FORM       *Form;
+  FORM_BROWSER_STATEMENT  *Statement;
+
+  //
+  // Whether the Form is editable
+  //
+  BOOLEAN                 FormEditable;
+
+  FORM_ENTRY_INFO            *CurrentMenu;
+} UI_MENU_SELECTION;
 
 //
 // Scope for get defaut value. It may be GetDefaultForNoStorage, GetDefaultForStorage or GetDefaultForAll.
@@ -614,72 +528,32 @@ typedef enum {
 } GET_SET_QUESTION_VALUE_WITH;
 
 extern EFI_HII_DATABASE_PROTOCOL         *mHiiDatabase;
-extern EFI_HII_STRING_PROTOCOL           *mHiiString;
 extern EFI_HII_CONFIG_ROUTING_PROTOCOL   *mHiiConfigRouting;
 extern EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL *mPathFromText;
+extern EDKII_FORM_DISPLAY_ENGINE_PROTOCOL *mFormDisplay;
 
-extern BANNER_DATA           *gBannerData;
-extern EFI_HII_HANDLE        gFrontPageHandle;
-extern UINTN                 gClassOfVfr;
-extern UINTN                 gFunctionKeySetting;
 extern BOOLEAN               gResetRequired;
-extern EFI_HII_HANDLE        gHiiHandle;
-extern UINT16                gDirection;
-extern EFI_SCREEN_DESCRIPTOR gScreenDimensions;
+extern BOOLEAN               gExitRequired;
 
 extern FORM_BROWSER_FORMSET  *gOldFormSet;
 extern LIST_ENTRY            gBrowserFormSetList;
 extern LIST_ENTRY            gBrowserHotKeyList;
 extern BROWSER_SETTING_SCOPE gBrowserSettingScope;
 extern EXIT_HANDLER          ExitHandlerFunction;
-extern UINTN                 gFooterHeight;
-
+extern EFI_HII_HANDLE        mCurrentHiiHandle;
 //
 // Browser Global Strings
 //
-extern CHAR16            *gDiscardFailed;
-extern CHAR16            *gDefaultFailed;
-extern CHAR16            *gEnterString;
-extern CHAR16            *gEnterCommitString;
-extern CHAR16            *gEnterEscapeString;
-extern CHAR16            *gEscapeString;
-extern CHAR16            *gSaveFailed;
-extern CHAR16            *gMoveHighlight;
-extern CHAR16            *gMakeSelection;
-extern CHAR16            *gDecNumericInput;
-extern CHAR16            *gHexNumericInput;
-extern CHAR16            *gToggleCheckBox;
-extern CHAR16            *gPromptForData;
-extern CHAR16            *gPromptForPassword;
-extern CHAR16            *gPromptForNewPassword;
-extern CHAR16            *gConfirmPassword;
-extern CHAR16            *gConfirmError;
-extern CHAR16            *gPassowordInvalid;
-extern CHAR16            *gPressEnter;
 extern CHAR16            *gEmptyString;
-extern CHAR16            *gAreYouSure;
-extern CHAR16            *gYesResponse;
-extern CHAR16            *gNoResponse;
-extern CHAR16            *gMiniString;
-extern CHAR16            *gPlusString;
-extern CHAR16            *gMinusString;
-extern CHAR16            *gAdjustNumber;
-extern CHAR16            *gSaveChanges;
-extern CHAR16            *gOptionMismatch;
-extern CHAR16            *gFormSuppress;
-extern CHAR16            *gProtocolNotFound;
-
-extern CHAR16            gPromptBlockWidth;
-extern CHAR16            gOptionBlockWidth;
-extern CHAR16            gHelpBlockWidth;
 
 extern EFI_GUID          gZeroGuid;
-extern EFI_GUID          gTianoHiiIfrGuid;
 
-#include "Ui.h"
+extern UI_MENU_SELECTION  *gCurrentSelection;
+
 //
 // Global Procedure Defines
 //
+#include "Expression.h"
 
 /**
   Initialize the HII String Token to the correct values.
@@ -688,91 +562,6 @@ extern EFI_GUID          gTianoHiiIfrGuid;
 VOID
 InitializeBrowserStrings (
   VOID
-  );
-
-/**
-  Prints a unicode string to the default console,
-  using L"%s" format.
-
-  @param  String     String pointer.
-
-  @return Length of string printed to the console
-
-**/
-UINTN
-PrintString (
-  IN CHAR16       *String
-  );
-
-/**
-  Prints a chracter to the default console,
-  using L"%c" format.
-
-  @param  Character  Character to print.
-
-  @return Length of string printed to the console.
-
-**/
-UINTN
-PrintChar (
-  CHAR16       Character
-  );
-
-/**
-  Prints a formatted unicode string to the default console, at
-  the supplied cursor position.
-
-  @param  Column     The cursor position to print the string at.
-  @param  Row        The cursor position to print the string at
-  @param  Fmt        Format string
-  @param  ...        Variable argument list for formating string.
-
-  @return Length of string printed to the console
-
-**/
-UINTN
-EFIAPI
-PrintAt (
-  IN UINTN     Column,
-  IN UINTN     Row,
-  IN CHAR16    *Fmt,
-  ...
-  );
-
-/**
-  Prints a unicode string to the default console, at
-  the supplied cursor position, using L"%s" format.
-
-  @param  Column     The cursor position to print the string at.
-  @param  Row        The cursor position to print the string at
-  @param  String     String pointer.
-
-  @return Length of string printed to the console
-
-**/
-UINTN
-PrintStringAt (
-  IN UINTN     Column,
-  IN UINTN     Row,
-  IN CHAR16    *String
-  );
-
-/**
-  Prints a chracter to the default console, at
-  the supplied cursor position, using L"%c" format.
-
-  @param  Column     The cursor position to print the string at.
-  @param  Row        The cursor position to print the string at.
-  @param  Character  Character to print.
-
-  @return Length of string printed to the console.
-
-**/
-UINTN
-PrintCharAt (
-  IN UINTN     Column,
-  IN UINTN     Row,
-  CHAR16       Character
   );
 
 /**
@@ -800,17 +589,6 @@ DestroyFormSet (
   IN OUT FORM_BROWSER_FORMSET  *FormSet
   );
 
-/**
-  This function displays the page frame.
-
-  @param  Selection              Selection contains the information about 
-                                 the Selection, form and formset to be displayed.
-                                 Selection action may be updated in retrieve callback.
-**/
-VOID
-DisplayPageFrame (
-  IN UI_MENU_SELECTION    *Selection
-  );
 
 /**
   Create a new string in HII Package List.
@@ -860,59 +638,6 @@ GetToken (
   );
 
 /**
-  Draw a pop up windows based on the dimension, number of lines and
-  strings specified.
-
-  @param RequestedWidth  The width of the pop-up.
-  @param NumberOfLines   The number of lines.
-  @param Marker          The variable argument list for the list of string to be printed.
-
-**/
-VOID
-CreateSharedPopUp (
-  IN  UINTN                       RequestedWidth,
-  IN  UINTN                       NumberOfLines,
-  IN  VA_LIST                     Marker
-  );
-
-/**
-  Routine used to abstract a generic dialog interface and return the selected key or string
-
-  @param  NumberOfLines          The number of lines for the dialog box
-  @param  HotKey                 Defines whether a single character is parsed
-                                 (TRUE) and returned in KeyValue or a string is
-                                 returned in StringBuffer.  Two special characters
-                                 are considered when entering a string, a SCAN_ESC
-                                 and an CHAR_CARRIAGE_RETURN.  SCAN_ESC terminates
-                                 string input and returns
-  @param  MaximumStringSize      The maximum size in bytes of a typed in string
-                                 (each character is a CHAR16) and the minimum
-                                 string returned is two bytes
-  @param  StringBuffer           The passed in pointer to the buffer which will
-                                 hold the typed in string if HotKey is FALSE
-  @param  KeyValue               The EFI_KEY value returned if HotKey is TRUE..
-  @param  ...                    A series of (quantity == NumberOfLines) text
-                                 strings which will be used to construct the dialog
-                                 box
-
-  @retval EFI_SUCCESS            Displayed dialog and received user interaction
-  @retval EFI_INVALID_PARAMETER  One of the parameters was invalid (e.g.
-                                 (StringBuffer == NULL) && (HotKey == FALSE))
-  @retval EFI_DEVICE_ERROR       User typed in an ESC character to exit the routine
-
-**/
-EFI_STATUS
-EFIAPI
-CreateDialog (
-  IN  UINTN                       NumberOfLines,
-  IN  BOOLEAN                     HotKey,
-  IN  UINTN                       MaximumStringSize,
-  OUT CHAR16                      *StringBuffer,
-  OUT EFI_INPUT_KEY               *KeyValue,
-  ...
-  );
-
-/**
   Get Value for given Name from a NameValue Storage.
 
   @param  Storage                The NameValue Storage.
@@ -939,6 +664,7 @@ GetValueByName (
   @param  Name                   The Name.
   @param  Value                  The Value to set.
   @param  SetValueTo             Whether update editValue or Value.
+  @param  ReturnNode             The node use the input name.
 
   @retval EFI_SUCCESS            Value found for given Name.
   @retval EFI_NOT_FOUND          No such Name found in NameValue storage.
@@ -946,10 +672,31 @@ GetValueByName (
 **/
 EFI_STATUS
 SetValueByName (
-  IN BROWSER_STORAGE             *Storage,
-  IN CHAR16                      *Name,
-  IN CHAR16                      *Value,
-  IN GET_SET_QUESTION_VALUE_WITH SetValueTo
+  IN  BROWSER_STORAGE             *Storage,
+  IN  CHAR16                      *Name,
+  IN  CHAR16                      *Value,
+  IN  GET_SET_QUESTION_VALUE_WITH SetValueTo,
+  OUT NAME_VALUE_NODE             **ReturnNode
+  );
+
+/**
+  Validate whether this question's value has changed.
+
+  @param  FormSet                FormSet data structure.
+  @param  Form                   Form data structure.
+  @param  Question               Question to be initialized.
+  @param  GetValueFrom           Where to get value, may from editbuffer, buffer or hii driver.
+
+  @retval TRUE                   Question's value has changed.
+  @retval FALSE                  Question's value has not changed
+
+**/
+BOOLEAN
+IsQuestionValueChanged (
+  IN FORM_BROWSER_FORMSET             *FormSet,
+  IN FORM_BROWSER_FORM                *Form,
+  IN OUT FORM_BROWSER_STATEMENT       *Question,
+  IN GET_SET_QUESTION_VALUE_WITH      GetValueFrom
   );
 
 /**
@@ -1071,10 +818,8 @@ GetQuestionDefault (
 
   @param  FormSet                FormSet data structure.
 
-  @retval EFI_SUCCESS            The function completed successfully.
-
 **/
-EFI_STATUS
+VOID
 InitializeCurrentSetting (
   IN OUT FORM_BROWSER_FORMSET             *FormSet
   );
@@ -1087,7 +832,6 @@ InitializeCurrentSetting (
                                  GUID), take the first FormSet found in package
                                  list.
   @param  FormSet                FormSet data structure.
-  @param  UpdateGlobalVar        Whether need to update the global variable.
 
   @retval EFI_SUCCESS            The function completed successfully.
   @retval EFI_NOT_FOUND          The specified FormSet could not be found.
@@ -1097,8 +841,7 @@ EFI_STATUS
 InitializeFormSet (
   IN  EFI_HII_HANDLE                   Handle,
   IN OUT EFI_GUID                      *FormSetGuid,
-  OUT FORM_BROWSER_FORMSET             *FormSet,
-  IN  BOOLEAN                          UpdateGlobalVar                   
+  OUT FORM_BROWSER_FORMSET             *FormSet                   
   );
 
 /**
@@ -1176,6 +919,7 @@ LoadFormSetConfig (
   @param  Storage                The Storage to be conveted.
   @param  ConfigResp             The returned <ConfigResp>.
   @param  ConfigRequest          The ConfigRequest string.
+  @param  GetEditBuf             Get the data from editbuffer or buffer.
 
   @retval EFI_SUCCESS            Convert success.
   @retval EFI_INVALID_PARAMETER  Incorrect storage type.
@@ -1185,7 +929,8 @@ EFI_STATUS
 StorageToConfigResp (
   IN BROWSER_STORAGE         *Storage,
   IN CHAR16                  **ConfigResp,
-  IN CHAR16                  *ConfigRequest
+  IN CHAR16                  *ConfigRequest,
+  IN BOOLEAN                 GetEditBuf
   );
 
 /**
@@ -1210,10 +955,8 @@ ConfigRespToStorage (
   @param  FormSet                FormSet data structure.
   @param  Storage                Buffer Storage.
 
-  @retval EFI_SUCCESS            The function completed successfully.
-
 **/
-EFI_STATUS
+VOID
 LoadStorage (
   IN FORM_BROWSER_FORMSET    *FormSet,
   IN FORMSET_STORAGE         *Storage
@@ -1349,30 +1092,29 @@ BrowserCallback (
                          about the Selection, form and formset to be displayed.
                          On output, Selection return the screen item that is selected
                          by user.
-  @param Repaint         Whether need to repaint the menu.
-  @param NewLine         Whether need to show at new line.
+  @param SettingLevel    Input Settting level, if it is FormLevel, just exit current form. 
+                         else, we need to exit current formset.
   
-  @retval TRUE           Need return.
-  @retval FALSE          No need to return.
+  @retval TRUE           Exit current form.
+  @retval FALSE          User press ESC and keep in current form.
 **/
 BOOLEAN
 FindNextMenu (
-  IN OUT UI_MENU_SELECTION    *Selection,
-  IN     BOOLEAN              *Repaint, 
-  IN     BOOLEAN              *NewLine  
+  IN OUT UI_MENU_SELECTION        *Selection,
+  IN       BROWSER_SETTING_SCOPE  SettingLevel
   );
 
 /**
-  check whether the formset need to update the NV.
+  check whether the form need to update the NV.
 
-  @param  FormSet                FormSet data structure.
-  @param  SetValue               Whether set new value or clear old value.
+  @param  Form                Form data structure.
 
+  @retval TRUE                   Need to update the NV.
+  @retval FALSE                  No need to update the NV.
 **/
-VOID
-UpdateNvInfoInForm (
-  IN FORM_BROWSER_FORMSET  *FormSet,
-  IN BOOLEAN               SetValue
+BOOLEAN
+IsNvUpdateRequiredForForm (
+  IN FORM_BROWSER_FORM    *Form
   );
 
 /**
@@ -1383,9 +1125,22 @@ UpdateNvInfoInForm (
   @retval TRUE                   Need to update the NV.
   @retval FALSE                  No need to update the NV.
 **/
-BOOLEAN 
-IsNvUpdateRequired (
+BOOLEAN
+IsNvUpdateRequiredForFormSet (
   IN FORM_BROWSER_FORMSET  *FormSet
+  );
+
+/**
+  Check whether the storage data for current form set is changed.
+
+  @param  FormSet           FormSet data structure.
+
+  @retval TRUE              Data is changed.
+  @retval FALSE             Data is not changed.
+**/
+BOOLEAN 
+IsStorageDataChangedForFormSet (
+  IN FORM_BROWSER_FORMSET             *FormSet
   );
 
 /**
@@ -1517,6 +1272,38 @@ RegiserExitHandler (
   );
 
 /**
+  
+  Check whether the browser data has been modified. 
+
+  @retval TRUE        Browser data is changed.
+  @retval FALSE       No browser data is changed.
+
+**/
+BOOLEAN 
+EFIAPI
+IsBrowserDataModified (
+  VOID
+  );
+
+/**
+  
+  Execute the action requested by the Action parameter. 
+
+  @param[in] Action     Execute the request action.
+  @param[in] DefaultId  The default Id info when need to load default value.
+
+  @retval EFI_SUCCESS              Execute the request action succss.
+  @retval EFI_INVALID_PARAMETER    The input action value is invalid.
+
+**/
+EFI_STATUS 
+EFIAPI
+ExecuteAction (
+  IN UINT32        Action,
+  IN UINT16        DefaultId
+  );
+
+/**
   Create reminder to let user to choose save or discard the changed browser data.
   Caller can use it to actively check the changed browser data.
 
@@ -1545,6 +1332,267 @@ GetHotKeyFromRegisterList (
   );
 
 /**
+
+  Get FORM_BROWSER_STATEMENT from FORM_DISPLAY_ENGINE_STATEMENT based on the OpCode info.
+
+  @param DisplayStatement        The input FORM_DISPLAY_ENGINE_STATEMENT.
+
+  @retval FORM_BROWSER_STATEMENT  The return FORM_BROWSER_STATEMENT info.
+
+**/
+FORM_BROWSER_STATEMENT *
+GetBrowserStatement (
+  IN FORM_DISPLAY_ENGINE_STATEMENT *DisplayStatement
+  );
+  
+/**
+  Password may be stored as encrypted by Configuration Driver. When change a
+  password, user will be challenged with old password. To validate user input old
+  password, we will send the clear text to Configuration Driver via Callback().
+  Configuration driver is responsible to check the passed in password and return
+  the validation result. If validation pass, state machine in password Callback()
+  will transit from BROWSER_STATE_VALIDATE_PASSWORD to BROWSER_STATE_SET_PASSWORD.
+  After user type in new password twice, Callback() will be invoked to send the
+  new password to Configuration Driver.
+
+  @param  Selection              Pointer to UI_MENU_SELECTION.
+  @param  MenuOption             The MenuOption for this password Question.
+  @param  String                 The clear text of password.
+
+  @retval EFI_NOT_AVAILABLE_YET  Callback() request to terminate password input.
+  @return In state of BROWSER_STATE_VALIDATE_PASSWORD:
+  @retval EFI_SUCCESS            Password correct, Browser will prompt for new
+                                 password.
+  @retval EFI_NOT_READY          Password incorrect, Browser will show error
+                                 message.
+  @retval Other                  Browser will do nothing.
+  @return In state of BROWSER_STATE_SET_PASSWORD:
+  @retval EFI_SUCCESS            Set password success.
+  @retval Other                  Set password failed.
+
+**/
+EFI_STATUS
+PasswordCallback (
+  IN  UI_MENU_SELECTION           *Selection,
+  IN  FORM_BROWSER_STATEMENT      *Question,
+  IN  CHAR16                      *String
+  );
+
+/**
+  Display error message for invalid password.
+
+**/
+VOID
+PasswordInvalid (
+  VOID
+  );
+
+/**
+  The worker function that send the displays to the screen. On output,
+  the selection made by user is returned.
+
+  @param Selection       On input, Selection tell setup browser the information
+                         about the Selection, form and formset to be displayed.
+                         On output, Selection return the screen item that is selected
+                         by user.
+
+  @retval EFI_SUCCESS    The page is displayed successfully.
+  @return Other value if the page failed to be diplayed.
+
+**/
+EFI_STATUS
+SetupBrowser (
+  IN OUT UI_MENU_SELECTION    *Selection
+  );
+  
+/**
+  Free up the resource allocated for all strings required
+  by Setup Browser.
+
+**/
+VOID
+FreeBrowserStrings (
+  VOID
+  );
+
+/**
+  Create a menu with specified formset GUID and form ID, and add it as a child
+  of the given parent menu.
+
+  @param  HiiHandle              Hii handle related to this formset.
+  @param  FormSetGuid            The Formset Guid of menu to be added.
+  @param  FormId                 The Form ID of menu to be added.
+  @param  QuestionId             The question id of this menu to be added.
+
+  @return A pointer to the newly added menu or NULL if memory is insufficient.
+
+**/
+FORM_ENTRY_INFO *
+UiAddMenuList (
+  IN EFI_HII_HANDLE       HiiHandle,
+  IN EFI_GUID             *FormSetGuid,
+  IN UINT16               FormId,
+  IN UINT16               QuestionId
+  );
+
+/**
+  Search Menu with given FormSetGuid and FormId in all cached menu list.
+
+  @param  HiiHandle              HiiHandle for FormSet.
+  @param  FormSetGuid            The Formset GUID of the menu to search.
+  @param  FormId                 The Form ID of menu to search.
+
+  @return A pointer to menu found or NULL if not found.
+
+**/
+FORM_ENTRY_INFO *
+UiFindMenuList (
+  IN EFI_HII_HANDLE       HiiHandle, 
+  IN EFI_GUID             *FormSetGuid,
+  IN UINT16               FormId
+  );
+
+/**
+  Free Menu list linked list.
+
+  @param  MenuListHead    One Menu list point in the menu list.
+
+**/
+VOID
+UiFreeMenuList (
+  LIST_ENTRY   *MenuListHead
+  );
+
+/**
+  Find parent menu for current menu.
+
+  @param  CurrentMenu    Current Menu
+
+  @retval   The parent menu for current menu.
+**/
+FORM_ENTRY_INFO *
+UiFindParentMenu (
+  IN FORM_ENTRY_INFO  *CurrentMenu
+  );
+
+/**
+  Search an Option of a Question by its value.
+
+  @param  Question               The Question
+  @param  OptionValue            Value for Option to be searched.
+
+  @retval Pointer                Pointer to the found Option.
+  @retval NULL                   Option not found.
+
+**/
+QUESTION_OPTION *
+ValueToOption (
+  IN FORM_BROWSER_STATEMENT   *Question,
+  IN EFI_HII_VALUE            *OptionValue
+  );
+/**
+  Return data element in an Array by its Index.
+
+  @param  Array                  The data array.
+  @param  Type                   Type of the data in this array.
+  @param  Index                  Zero based index for data in this array.
+
+  @retval Value                  The data to be returned
+
+**/
+UINT64
+GetArrayData (
+  IN VOID                     *Array,
+  IN UINT8                    Type,
+  IN UINTN                    Index
+  );
+
+/**
+  Set value of a data element in an Array by its Index.
+
+  @param  Array                  The data array.
+  @param  Type                   Type of the data in this array.
+  @param  Index                  Zero based index for data in this array.
+  @param  Value                  The value to be set.
+
+**/
+VOID
+SetArrayData (
+  IN VOID                     *Array,
+  IN UINT8                    Type,
+  IN UINTN                    Index,
+  IN UINT64                   Value
+  );
+
+/**
+   Compare two Hii value.
+ 
+   @param  Value1                 Expression value to compare on left-hand.
+   @param  Value2                 Expression value to compare on right-hand.
+   @param  Result                 Return value after compare.
+                                  retval 0                      Two operators equal.
+                                  return Positive value if Value1 is greater than Value2.
+                                  retval Negative value if Value1 is less than Value2.
+   @param  HiiHandle              Only required for string compare.
+ 
+   @retval other                  Could not perform compare on two values.
+   @retval EFI_SUCCESS            Compare the value success.
+ 
+**/
+EFI_STATUS
+CompareHiiValue (
+  IN  EFI_HII_VALUE   *Value1,
+  IN  EFI_HII_VALUE   *Value2,
+  OUT INTN            *Result,
+  IN  EFI_HII_HANDLE  HiiHandle OPTIONAL
+  );
+
+/**
+  Perform Password check. 
+  Passwork may be encrypted by driver that requires the specific check.
+  
+  @param  Form             Form where Password Statement is in.
+  @param  Statement        Password statement
+  @param  PasswordString   Password string to be checked. It may be NULL.
+                           NULL means to restore password.
+                           "" string can be used to checked whether old password does exist.
+  
+  @return Status     Status of Password check.
+**/
+EFI_STATUS
+EFIAPI
+PasswordCheck (
+  IN FORM_DISPLAY_ENGINE_FORM      *Form,
+  IN FORM_DISPLAY_ENGINE_STATEMENT *Statement,
+  IN EFI_STRING                    PasswordString  OPTIONAL
+  );
+
+/**
+
+  Get FORM_BROWSER_STATEMENT from FORM_DISPLAY_ENGINE_STATEMENT based on the OpCode info.
+
+  @param DisplayStatement        The input FORM_DISPLAY_ENGINE_STATEMENT.
+
+  @retval FORM_BROWSER_STATEMENT  The return FORM_BROWSER_STATEMENT info.
+
+**/
+FORM_BROWSER_STATEMENT *
+GetBrowserStatement (
+  IN FORM_DISPLAY_ENGINE_STATEMENT *DisplayStatement
+  );
+  
+/**
+
+  Initialize the Display form structure data.
+
+**/
+VOID
+InitializeDisplayFormData (
+  VOID
+  );
+
+
+/**
   Base on the current formset info, clean the ConfigRequest string in browser storage.
 
   @param  FormSet                Pointer of the FormSet
@@ -1554,5 +1602,5 @@ VOID
 CleanBrowserStorage (
   IN OUT FORM_BROWSER_FORMSET  *FormSet
   );
-
+  
 #endif
