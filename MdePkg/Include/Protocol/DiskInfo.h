@@ -2,7 +2,7 @@
   Provides the basic interfaces to abstract platform information regarding an 
   IDE controller.  
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -62,7 +62,15 @@ typedef struct _EFI_DISK_INFO_PROTOCOL  EFI_DISK_INFO_PROTOCOL;
 ///
 #define EFI_DISK_INFO_AHCI_INTERFACE_GUID \
   { \
-    0x9e498932, 0x4abc, 0x45af, {0xa3, 0x4d, 0x2, 0x47, 0x78, 0x7b, 0xe7, 0xc6} \
+    0x9e498932, 0x4abc, 0x45af, {0xa3, 0x4d, 0x2, 0x47, 0x78, 0x7b, 0xe7, 0xc6 } \
+  }
+
+///
+/// Global ID for a NVME interface.  Used to fill in EFI_DISK_INFO_PROTOCOL.Interface
+///
+#define EFI_DISK_INFO_NVME_INTERFACE_GUID \
+  { \
+    0x3ab14680, 0x5d3f, 0x4a4d, {0xbc, 0xdc, 0xcc, 0x38, 0x0, 0x18, 0xc7, 0xf7 } \
   }
 
 /**
