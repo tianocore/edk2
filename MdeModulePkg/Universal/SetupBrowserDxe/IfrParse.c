@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 UINT16           mStatementIndex;
 UINT16           mExpressionOpCodeIndex;
-EFI_QUESTION_ID  mUsedQuestionId;
+
 BOOLEAN          mInScopeSubtitle;
 extern LIST_ENTRY      gBrowserStorageList;
 /**
@@ -42,9 +42,9 @@ CreateStatement (
 
   if (Form == NULL) {
     //
-    // Only guid op may out side the form level.
+    // We are currently not in a Form Scope, so just skip this Statement
     //
-    ASSERT (((EFI_IFR_OP_HEADER *) OpCodeData)->OpCode == EFI_IFR_GUID_OP);
+    return NULL;
   }
 
   Statement = &FormSet->StatementBuffer[mStatementIndex];
@@ -58,7 +58,6 @@ CreateStatement (
   Statement->Signature = FORM_BROWSER_STATEMENT_SIGNATURE;
 
   Statement->Operand = ((EFI_IFR_OP_HEADER *) OpCodeData)->OpCode;
-  Statement->OpCode  = (EFI_IFR_OP_HEADER *) OpCodeData;
 
   StatementHdr = (EFI_IFR_STATEMENT_HEADER *) (OpCodeData + sizeof (EFI_IFR_OP_HEADER));
   CopyMem (&Statement->Prompt, &StatementHdr->Prompt, sizeof (EFI_STRING_ID));
@@ -83,11 +82,8 @@ CreateStatement (
   //
   // Insert this Statement into current Form
   //
-  if (Form == NULL) {
-    InsertTailList (&FormSet->StatementListOSF, &Statement->Link);
-  } else {
-    InsertTailList (&Form->StatementListHead, &Statement->Link);
-  }
+  InsertTailList (&Form->StatementListHead, &Statement->Link);
+
   return Statement;
 }
 
@@ -1137,7 +1133,6 @@ ParseOpCodes (
   CountOpCodes (FormSet, &NumberOfStatement, &NumberOfExpression);
 
   mStatementIndex = 0;
-  mUsedQuestionId = 1;
   FormSet->StatementBuffer = AllocateZeroPool (NumberOfStatement * sizeof (FORM_BROWSER_STATEMENT));
   if (FormSet->StatementBuffer == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -1149,7 +1144,6 @@ ParseOpCodes (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  InitializeListHead (&FormSet->StatementListOSF);
   InitializeListHead (&FormSet->StorageListHead);
   InitializeListHead (&FormSet->DefaultStoreListHead);
   InitializeListHead (&FormSet->FormListHead);
@@ -1508,6 +1502,7 @@ ParseOpCodes (
       InitializeListHead (&CurrentForm->ConfigRequestHead);
 
       CurrentForm->FormType = STANDARD_MAP_FORM_TYPE;
+      CurrentForm->NvUpdateRequired = FALSE;
       CopyMem (&CurrentForm->FormId,    &((EFI_IFR_FORM *) OpCodeData)->FormId,    sizeof (UINT16));
       CopyMem (&CurrentForm->FormTitle, &((EFI_IFR_FORM *) OpCodeData)->FormTitle, sizeof (EFI_STRING_ID));
 
@@ -1544,6 +1539,7 @@ ParseOpCodes (
       CurrentForm = AllocateZeroPool (sizeof (FORM_BROWSER_FORM));
       ASSERT (CurrentForm != NULL);
       CurrentForm->Signature = FORM_BROWSER_FORM_SIGNATURE;
+      CurrentForm->NvUpdateRequired = FALSE;
       InitializeListHead (&CurrentForm->ExpressionListHead);
       InitializeListHead (&CurrentForm->StatementListHead);
       InitializeListHead (&CurrentForm->ConfigRequestHead);
@@ -1657,7 +1653,7 @@ ParseOpCodes (
       ASSERT (CurrentStatement != NULL);
 
       CurrentStatement->Flags = ((EFI_IFR_SUBTITLE *) OpCodeData)->Flags;
-      CurrentStatement->FakeQuestionId = mUsedQuestionId++;
+
       if (Scope != 0) {
         mInScopeSubtitle = TRUE;
       }
@@ -1666,14 +1662,13 @@ ParseOpCodes (
     case EFI_IFR_TEXT_OP:
       CurrentStatement = CreateStatement (OpCodeData, FormSet, CurrentForm);
       ASSERT (CurrentStatement != NULL);
-      CurrentStatement->FakeQuestionId = mUsedQuestionId++;
+
       CopyMem (&CurrentStatement->TextTwo, &((EFI_IFR_TEXT *) OpCodeData)->TextTwo, sizeof (EFI_STRING_ID));
       break;
 
     case EFI_IFR_RESET_BUTTON_OP:
       CurrentStatement = CreateStatement (OpCodeData, FormSet, CurrentForm);
       ASSERT (CurrentStatement != NULL);
-      CurrentStatement->FakeQuestionId = mUsedQuestionId++;
       CopyMem (&CurrentStatement->DefaultId, &((EFI_IFR_RESET_BUTTON *) OpCodeData)->DefaultId, sizeof (EFI_DEFAULT_ID));
       break;
 
@@ -1918,7 +1913,6 @@ ParseOpCodes (
       CurrentOption = AllocateZeroPool (sizeof (QUESTION_OPTION));
       ASSERT (CurrentOption != NULL);
       CurrentOption->Signature = QUESTION_OPTION_SIGNATURE;
-      CurrentOption->OpCode    = (EFI_IFR_ONE_OF_OPTION *) OpCodeData;
 
       CurrentOption->Flags = ((EFI_IFR_ONE_OF_OPTION *) OpCodeData)->Flags;
       CurrentOption->Value.Type = ((EFI_IFR_ONE_OF_OPTION *) OpCodeData)->Type;
@@ -2276,8 +2270,45 @@ ParseOpCodes (
     //
     // Vendor specific
     //
-    case EFI_IFR_GUID_OP:     
-      CurrentStatement = CreateStatement (OpCodeData, FormSet, CurrentForm);
+    case EFI_IFR_GUID_OP:
+      if (CompareGuid (&gEfiIfrTianoGuid, (EFI_GUID *)(OpCodeData + sizeof (EFI_IFR_OP_HEADER)))) {
+        //
+        // Tiano specific GUIDed opcodes
+        //
+        switch (((EFI_IFR_GUID_LABEL *) OpCodeData)->ExtendOpCode) {
+        case EFI_IFR_EXTEND_OP_LABEL:
+          //
+          // just ignore label
+          //
+          break;
+
+        case EFI_IFR_EXTEND_OP_BANNER:
+          //
+          // By SubClass to get Banner Data from Front Page
+          //
+          if (FormSet->SubClass == EFI_FRONT_PAGE_SUBCLASS) {
+            CopyMem (
+              &gBannerData->Banner[((EFI_IFR_GUID_BANNER *) OpCodeData)->LineNumber][
+              ((EFI_IFR_GUID_BANNER *) OpCodeData)->Alignment],
+              &((EFI_IFR_GUID_BANNER *) OpCodeData)->Title,
+              sizeof (EFI_STRING_ID)
+              );
+          }
+          break;
+
+        case EFI_IFR_EXTEND_OP_CLASS:
+          CopyMem (&FormSet->Class, &((EFI_IFR_GUID_CLASS *) OpCodeData)->Class, sizeof (UINT16));
+          break;
+
+        case EFI_IFR_EXTEND_OP_SUBCLASS:
+          CopyMem (&FormSet->SubClass, &((EFI_IFR_GUID_SUBCLASS *) OpCodeData)->SubClass, sizeof (UINT16));
+          break;
+
+        default:
+          break;
+        }
+      }
+
       break;
 
     //

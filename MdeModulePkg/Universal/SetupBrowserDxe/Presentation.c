@@ -19,12 +19,364 @@ UI_MENU_SELECTION  *gCurrentSelection;
 EFI_HII_HANDLE     mCurrentHiiHandle = NULL;
 EFI_GUID           mCurrentFormSetGuid = {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
 UINT16             mCurrentFormId = 0;
-EFI_EVENT          mValueChangedEvent = NULL;
-LIST_ENTRY         mRefreshEventList = INITIALIZE_LIST_HEAD_VARIABLE (mRefreshEventList);
-UINT32             gBrowserStatus = BROWSER_SUCCESS;
-CHAR16             *gErrorInfo;
-UINT16             mCurFakeQestId;
-FORM_DISPLAY_ENGINE_FORM gDisplayFormData;
+
+/**
+  Clear retangle with specified text attribute.
+
+  @param  LeftColumn     Left column of retangle.
+  @param  RightColumn    Right column of retangle.
+  @param  TopRow         Start row of retangle.
+  @param  BottomRow      End row of retangle.
+  @param  TextAttribute  The character foreground and background.
+
+**/
+VOID
+ClearLines (
+  IN UINTN               LeftColumn,
+  IN UINTN               RightColumn,
+  IN UINTN               TopRow,
+  IN UINTN               BottomRow,
+  IN UINTN               TextAttribute
+  )
+{
+  CHAR16  *Buffer;
+  UINTN   Row;
+
+  //
+  // For now, allocate an arbitrarily long buffer
+  //
+  Buffer = AllocateZeroPool (0x10000);
+  ASSERT (Buffer != NULL);
+
+  //
+  // Set foreground and background as defined
+  //
+  gST->ConOut->SetAttribute (gST->ConOut, TextAttribute);
+
+  //
+  // Much faster to buffer the long string instead of print it a character at a time
+  //
+  SetUnicodeMem (Buffer, RightColumn - LeftColumn, L' ');
+
+  //
+  // Clear the desired area with the appropriate foreground/background
+  //
+  for (Row = TopRow; Row <= BottomRow; Row++) {
+    PrintStringAt (LeftColumn, Row, Buffer);
+  }
+
+  gST->ConOut->SetCursorPosition (gST->ConOut, LeftColumn, TopRow);
+
+  FreePool (Buffer);
+  return ;
+}
+
+/**
+  Concatenate a narrow string to another string.
+
+  @param Destination The destination string.
+  @param Source      The source string. The string to be concatenated.
+                     to the end of Destination.
+
+**/
+VOID
+NewStrCat (
+  IN OUT CHAR16               *Destination,
+  IN     CHAR16               *Source
+  )
+{
+  UINTN Length;
+
+  for (Length = 0; Destination[Length] != 0; Length++)
+    ;
+
+  //
+  // We now have the length of the original string
+  // We can safely assume for now that we are concatenating a narrow value to this string.
+  // For instance, the string is "XYZ" and cat'ing ">"
+  // If this assumption changes, we need to make this routine a bit more complex
+  //
+  Destination[Length] = NARROW_CHAR;
+  Length++;
+
+  StrCpy (Destination + Length, Source);
+}
+
+/**
+  Count the storage space of a Unicode string.
+
+  This function handles the Unicode string with NARROW_CHAR
+  and WIDE_CHAR control characters. NARROW_HCAR and WIDE_CHAR
+  does not count in the resultant output. If a WIDE_CHAR is
+  hit, then 2 Unicode character will consume an output storage
+  space with size of CHAR16 till a NARROW_CHAR is hit.
+
+  If String is NULL, then ASSERT ().
+
+  @param String          The input string to be counted.
+
+  @return Storage space for the input string.
+
+**/
+UINTN
+GetStringWidth (
+  IN CHAR16               *String
+  )
+{
+  UINTN Index;
+  UINTN Count;
+  UINTN IncrementValue;
+
+  ASSERT (String != NULL);
+  if (String == NULL) {
+    return 0;
+  }
+
+  Index           = 0;
+  Count           = 0;
+  IncrementValue  = 1;
+
+  do {
+    //
+    // Advance to the null-terminator or to the first width directive
+    //
+    for (;
+         (String[Index] != NARROW_CHAR) && (String[Index] != WIDE_CHAR) && (String[Index] != 0);
+         Index++, Count = Count + IncrementValue
+        )
+      ;
+
+    //
+    // We hit the null-terminator, we now have a count
+    //
+    if (String[Index] == 0) {
+      break;
+    }
+    //
+    // We encountered a narrow directive - strip it from the size calculation since it doesn't get printed
+    // and also set the flag that determines what we increment by.(if narrow, increment by 1, if wide increment by 2)
+    //
+    if (String[Index] == NARROW_CHAR) {
+      //
+      // Skip to the next character
+      //
+      Index++;
+      IncrementValue = 1;
+    } else {
+      //
+      // Skip to the next character
+      //
+      Index++;
+      IncrementValue = 2;
+    }
+  } while (String[Index] != 0);
+
+  //
+  // Increment by one to include the null-terminator in the size
+  //
+  Count++;
+
+  return Count * sizeof (CHAR16);
+}
+
+/**
+  This function displays the page frame.
+
+  @param  Selection              Selection contains the information about 
+                                 the Selection, form and formset to be displayed.
+                                 Selection action may be updated in retrieve callback.
+**/
+VOID
+DisplayPageFrame (
+  IN UI_MENU_SELECTION    *Selection
+  )
+{
+  UINTN                  Index;
+  UINT8                  Line;
+  UINT8                  Alignment;
+  CHAR16                 Character;
+  CHAR16                 *Buffer;
+  CHAR16                 *StrFrontPageBanner;
+  UINTN                  Row;
+  EFI_SCREEN_DESCRIPTOR  LocalScreen;
+  UINT8                  RowIdx;
+  UINT8                  ColumnIdx;
+
+  ZeroMem (&LocalScreen, sizeof (EFI_SCREEN_DESCRIPTOR));
+  gST->ConOut->QueryMode (gST->ConOut, gST->ConOut->Mode->Mode, &LocalScreen.RightColumn, &LocalScreen.BottomRow);
+  ClearLines (0, LocalScreen.RightColumn, 0, LocalScreen.BottomRow, KEYHELP_BACKGROUND);
+
+  if (Selection->Form->ModalForm) {
+    return;
+  }
+
+  CopyMem (&LocalScreen, &gScreenDimensions, sizeof (EFI_SCREEN_DESCRIPTOR));
+
+  //
+  // For now, allocate an arbitrarily long buffer
+  //
+  Buffer = AllocateZeroPool (0x10000);
+  ASSERT (Buffer != NULL);
+
+  Character = BOXDRAW_HORIZONTAL;
+
+  for (Index = 0; Index + 2 < (LocalScreen.RightColumn - LocalScreen.LeftColumn); Index++) {
+    Buffer[Index] = Character;
+  }
+
+  if ((gClassOfVfr & FORMSET_CLASS_FRONT_PAGE) == FORMSET_CLASS_FRONT_PAGE) {
+    //
+    //    ClearLines(0, LocalScreen.RightColumn, 0, BANNER_HEIGHT-1, BANNER_TEXT | BANNER_BACKGROUND);
+    //
+    ClearLines (
+      LocalScreen.LeftColumn,
+      LocalScreen.RightColumn,
+      LocalScreen.TopRow,
+      FRONT_PAGE_HEADER_HEIGHT - 1 + LocalScreen.TopRow,
+      BANNER_TEXT | BANNER_BACKGROUND
+      );
+    //
+    //    for (Line = 0; Line < BANNER_HEIGHT; Line++) {
+    //
+    for (Line = (UINT8) LocalScreen.TopRow; Line < BANNER_HEIGHT + (UINT8) LocalScreen.TopRow; Line++) {
+      //
+      //      for (Alignment = 0; Alignment < BANNER_COLUMNS; Alignment++) {
+      //
+      for (Alignment = (UINT8) LocalScreen.LeftColumn;
+           Alignment < BANNER_COLUMNS + (UINT8) LocalScreen.LeftColumn;
+           Alignment++
+          ) {
+        RowIdx = (UINT8) (Line - (UINT8) LocalScreen.TopRow);
+        ColumnIdx = (UINT8) (Alignment - (UINT8) LocalScreen.LeftColumn);
+
+        ASSERT (RowIdx < BANNER_HEIGHT);
+        ASSERT (ColumnIdx < BANNER_COLUMNS);
+
+        if (gBannerData->Banner[RowIdx][ColumnIdx] != 0x0000) {
+          StrFrontPageBanner = GetToken (
+                                gBannerData->Banner[RowIdx][ColumnIdx],
+                                gFrontPageHandle
+                                );
+        } else {
+          continue;
+        }
+
+        switch (Alignment - LocalScreen.LeftColumn) {
+        case 0:
+          //
+          // Handle left column
+          //
+          PrintStringAt (LocalScreen.LeftColumn + BANNER_LEFT_COLUMN_INDENT, Line, StrFrontPageBanner);
+          break;
+
+        case 1:
+          //
+          // Handle center column
+          //
+          PrintStringAt (
+            LocalScreen.LeftColumn + (LocalScreen.RightColumn - LocalScreen.LeftColumn) / 3,
+            Line,
+            StrFrontPageBanner
+            );
+          break;
+
+        case 2:
+          //
+          // Handle right column
+          //
+          PrintStringAt (
+            LocalScreen.LeftColumn + (LocalScreen.RightColumn - LocalScreen.LeftColumn) * 2 / 3,
+            Line,
+            StrFrontPageBanner
+            );
+          break;
+        }
+
+        FreePool (StrFrontPageBanner);
+      }
+    }
+  }
+
+  ClearLines (
+    LocalScreen.LeftColumn,
+    LocalScreen.RightColumn,
+    LocalScreen.BottomRow - STATUS_BAR_HEIGHT - gFooterHeight,
+    LocalScreen.BottomRow - STATUS_BAR_HEIGHT - 1,
+    KEYHELP_TEXT | KEYHELP_BACKGROUND
+    );
+
+  if ((gClassOfVfr & FORMSET_CLASS_FRONT_PAGE) != FORMSET_CLASS_FRONT_PAGE) {
+    ClearLines (
+      LocalScreen.LeftColumn,
+      LocalScreen.RightColumn,
+      LocalScreen.TopRow,
+      LocalScreen.TopRow + NONE_FRONT_PAGE_HEADER_HEIGHT - 1,
+      TITLE_TEXT | TITLE_BACKGROUND
+      );
+    //
+    // Print Top border line
+    // +------------------------------------------------------------------------------+
+    // ?                                                                             ?
+    // +------------------------------------------------------------------------------+
+    //
+    Character = BOXDRAW_DOWN_RIGHT;
+
+    PrintChar (Character);
+    PrintString (Buffer);
+
+    Character = BOXDRAW_DOWN_LEFT;
+    PrintChar (Character);
+
+    Character = BOXDRAW_VERTICAL;
+    for (Row = LocalScreen.TopRow + 1; Row <= LocalScreen.TopRow + NONE_FRONT_PAGE_HEADER_HEIGHT - 2; Row++) {
+      PrintCharAt (LocalScreen.LeftColumn, Row, Character);
+      PrintCharAt (LocalScreen.RightColumn - 1, Row, Character);
+    }
+
+    Character = BOXDRAW_UP_RIGHT;
+    PrintCharAt (LocalScreen.LeftColumn, LocalScreen.TopRow + NONE_FRONT_PAGE_HEADER_HEIGHT - 1, Character);
+    PrintString (Buffer);
+
+    Character = BOXDRAW_UP_LEFT;
+    PrintChar (Character);
+
+    if ((gClassOfVfr & FORMSET_CLASS_PLATFORM_SETUP) == FORMSET_CLASS_PLATFORM_SETUP) {
+      //
+      // Print Bottom border line
+      // +------------------------------------------------------------------------------+
+      // ?                                                                             ?
+      // +------------------------------------------------------------------------------+
+      //
+      Character = BOXDRAW_DOWN_RIGHT;
+      PrintCharAt (LocalScreen.LeftColumn, LocalScreen.BottomRow - STATUS_BAR_HEIGHT - gFooterHeight, Character);
+
+      PrintString (Buffer);
+
+      Character = BOXDRAW_DOWN_LEFT;
+      PrintChar (Character);
+      Character = BOXDRAW_VERTICAL;
+      for (Row = LocalScreen.BottomRow - STATUS_BAR_HEIGHT - gFooterHeight + 1;
+           Row <= LocalScreen.BottomRow - STATUS_BAR_HEIGHT - 2;
+           Row++
+          ) {
+        PrintCharAt (LocalScreen.LeftColumn, Row, Character);
+        PrintCharAt (LocalScreen.RightColumn - 1, Row, Character);
+      }
+
+      Character = BOXDRAW_UP_RIGHT;
+      PrintCharAt (LocalScreen.LeftColumn, LocalScreen.BottomRow - STATUS_BAR_HEIGHT - 1, Character);
+
+      PrintString (Buffer);
+
+      Character = BOXDRAW_UP_LEFT;
+      PrintChar (Character);
+    }
+  }
+
+  FreePool (Buffer);
+
+}
+
 
 /**
   Evaluate all expressions in a Form.
@@ -69,1608 +421,461 @@ EvaluateFormExpressions (
   return EFI_SUCCESS;
 }
 
-/**
-  Add empty function for event process function.
-
-  @param Event    The Event need to be process
-  @param Context  The context of the event.
-
-**/
-VOID
-EFIAPI
-SetupBrowserEmptyFunction (
-  IN  EFI_EVENT    Event,
-  IN  VOID         *Context
-  )
-{
-}
-
-/**
-  Base on the opcode buffer info to get the display statement.
-
-  @param OpCode    The input opcode buffer for this statement.
-  
-  @retval Statement  The statement use this opcode buffer.
-
-**/
-FORM_DISPLAY_ENGINE_STATEMENT *
-GetDisplayStatement (
-  IN EFI_IFR_OP_HEADER     *OpCode
-  )
-{
-  FORM_DISPLAY_ENGINE_STATEMENT *DisplayStatement;
-  LIST_ENTRY                    *Link;
-
-  Link = GetFirstNode (&gDisplayFormData.StatementListHead);
-  while (!IsNull (&gDisplayFormData.StatementListHead, Link)) {
-    DisplayStatement = FORM_DISPLAY_ENGINE_STATEMENT_FROM_LINK (Link);
-
-    if (DisplayStatement->OpCode == OpCode) {
-      return DisplayStatement;
-    }
-    Link = GetNextNode (&gDisplayFormData.StatementListHead, Link);
-  }
-
-  return NULL;
-}
-
-/**
-  Free the refresh event list.
-
-**/
-VOID 
-FreeRefreshEvent (
-  VOID
-  )
-{
-  LIST_ENTRY   *Link;
-  FORM_BROWSER_REFRESH_EVENT_NODE *EventNode;
-
-  while (!IsListEmpty (&mRefreshEventList)) {
-    Link = GetFirstNode (&mRefreshEventList);
-    EventNode = FORM_BROWSER_REFRESH_EVENT_FROM_LINK (Link);
-    RemoveEntryList (&EventNode->Link);
-
-    gBS->CloseEvent (EventNode->RefreshEvent);
-
-    FreePool (EventNode);
-  }
-}
-
-/**
-  Check whether this statement value is changed. If yes, update the statement value and return TRUE; 
-  else return FALSE.
-
-  @param Statement           The statement need to check.
-
-**/
-VOID
-UpdateStatement (
-  IN OUT FORM_BROWSER_STATEMENT        *Statement
-  )
-{
-  GetQuestionValue (gCurrentSelection->FormSet, gCurrentSelection->Form, Statement, GetSetValueWithHiiDriver);
-
-  //
-  // Reset FormPackage update flag
-  //
-  mHiiPackageListUpdated = FALSE;
-
-  //
-  // Question value may be changed, need invoke its Callback()
-  //
-  ProcessCallBackFunction (gCurrentSelection, Statement, EFI_BROWSER_ACTION_CHANGING, FALSE);
-  
-  if (mHiiPackageListUpdated) {
-    //
-    // Package list is updated, force to reparse IFR binary of target Formset
-    //
-    mHiiPackageListUpdated = FALSE;
-    gCurrentSelection->Action = UI_ACTION_REFRESH_FORMSET;
-  }
-}
-
-/**
-  Refresh the question which has refresh guid event attribute.
-  
-  @param Event    The event which has this function related.     
-  @param Context  The input context info related to this event or the status code return to the caller.
-**/
-VOID
-EFIAPI
-RefreshEventNotify(
-  IN      EFI_EVENT Event,
-  IN      VOID      *Context
-  )
-{
-  FORM_BROWSER_STATEMENT        *Statement;
-
-  Statement = (FORM_BROWSER_STATEMENT *)Context;
-  UpdateStatement(Statement);
-  gBS->SignalEvent (mValueChangedEvent);
-}
+/*
++------------------------------------------------------------------------------+
+?                                 Setup Page                                  ?
++------------------------------------------------------------------------------+
 
 
-/**
-  Create refresh hook event for statement which has refresh event or interval.
 
-  @param Statement           The statement need to check.
 
-**/
-VOID
-CreateRefreshEvent (
-  IN     FORM_BROWSER_STATEMENT        *Statement
-  )
-{
-  EFI_STATUS                      Status;
-  EFI_EVENT                       RefreshEvent;
-  FORM_BROWSER_REFRESH_EVENT_NODE *EventNode;
 
-  //
-  // If question has refresh guid, create the notify function.
-  //
-  Status = gBS->CreateEventEx (
-                    EVT_NOTIFY_SIGNAL,
-                    TPL_CALLBACK,
-                    RefreshEventNotify,
-                    Statement,
-                    &Statement->RefreshGuid,
-                    &RefreshEvent);
-  ASSERT_EFI_ERROR (Status);
 
-  EventNode = AllocateZeroPool (sizeof (FORM_BROWSER_REFRESH_EVENT_NODE));
-  ASSERT (EventNode != NULL);
-  EventNode->RefreshEvent = RefreshEvent;
-  InsertTailList(&mRefreshEventList, &EventNode->Link);
-}
 
-/**
-  Perform value check for a question.
-  
-  @param  Question       The question need to do check.
-  @param  ErrorInfo      Return info about the error.
-  
-  @retval  The check result.
-**/
-UINT32
-InConsistentIfCheck (
-  IN  FORM_BROWSER_STATEMENT        *Question,
-  OUT STATEMENT_ERROR_INFO          *ErrorInfo
-  )
-{
-  EFI_STATUS              Status;
-  LIST_ENTRY              *Link;
-  FORM_EXPRESSION         *Expression;
-  LIST_ENTRY              *ListHead;
-  UINT32                  RetVal;
 
-  RetVal     = STATEMENT_VALID;
-  ListHead   = &Question->InconsistentListHead;
 
-  Link = GetFirstNode (ListHead);
-  while (!IsNull (ListHead, Link)) {
-    Expression = FORM_EXPRESSION_FROM_LINK (Link);
-    Link = GetNextNode (ListHead, Link);
 
-    //
-    // Evaluate the expression
-    //
-    Status = EvaluateExpression (gCurrentSelection->FormSet, gCurrentSelection->Form, Expression);
-    if (EFI_ERROR (Status)) {
-      continue;
-    }
 
-    if ((Expression->Result.Type == EFI_IFR_TYPE_BOOLEAN) && Expression->Result.Value.b) {
-      ErrorInfo->StringId = Expression->Error;
-      ErrorInfo->TimeOut  = 0;
-      RetVal              = INCOSISTENT_IF_TRUE;
-      break;
-    }
-  }
 
-  return RetVal;
-}
 
-/**
-  Perform value check for a question.
-  
-  @param  Form       Form where Statement is in.
-  @param  Statement  Value will check for it.
-  @param  InputValue New value will be checked.
-  @param  ErrorInfo  Return the error info for this check.
-  
-  @retval TRUE   Input Value is valid.
-  @retval FALSE  Input Value is invalid.
-**/
-UINT32
-EFIAPI
-QuestionCheck (
-  IN  FORM_DISPLAY_ENGINE_FORM      *Form,
-  IN  FORM_DISPLAY_ENGINE_STATEMENT *Statement,
-  IN  EFI_HII_VALUE                 *InputValue,
-  OUT STATEMENT_ERROR_INFO          *ErrorInfo
-  )
-{
-  FORM_BROWSER_STATEMENT  *Question;
-  EFI_HII_VALUE           BackUpValue;
-  UINT8                   *BackUpBuffer;
-  UINT32                  RetVal;
 
-  BackUpBuffer = NULL;
-  RetVal       = STATEMENT_VALID;
 
-  ASSERT (Form != NULL && Statement != NULL && InputValue != NULL && ErrorInfo != NULL);
 
-  Question = GetBrowserStatement(Statement);
-  ASSERT (Question != NULL);
 
-  //
-  // Back up the quesion value.
-  //
-  switch (Question->Operand) {
-  case EFI_IFR_ORDERED_LIST_OP:
-    BackUpBuffer = AllocateCopyPool (Question->StorageWidth, Question->BufferValue);
-    ASSERT (BackUpBuffer != NULL);
-    CopyMem (Question->BufferValue, InputValue->Buffer, Question->StorageWidth);
-    break;
-
-  default:
-    CopyMem (&BackUpValue, &Question->HiiValue, sizeof (EFI_HII_VALUE));
-    CopyMem (&Question->HiiValue, InputValue, sizeof (EFI_HII_VALUE));
-    break;
-  }
-
-  //
-  // Do the inconsistentif check.
-  //
-  if (!IsListEmpty (&Question->InconsistentListHead)) {
-    RetVal = InConsistentIfCheck(Question, ErrorInfo);
-  }
-
-  //
-  // Restore the quesion value.
-  //
-  switch (Question->Operand) {
-  case EFI_IFR_ORDERED_LIST_OP:
-    CopyMem (Question->BufferValue, BackUpBuffer, Question->StorageWidth);
-    break;
-
-  default:
-    CopyMem (&Question->HiiValue, &BackUpValue, sizeof (EFI_HII_VALUE));
-    break;
-  }
-
-  return RetVal;
-}
++------------------------------------------------------------------------------+
+?F1=Scroll Help                 F9=Reset to Defaults        F10=Save and Exit ?
+| ^"=Move Highlight          <Spacebar> Toggles Checkbox   Esc=Discard Changes |
++------------------------------------------------------------------------------+
+*/
 
 /**
 
-  Initialize the Display statement structure data.
 
-  @param DisplayStatement      Pointer to the display Statement data strucure.
-  @param Statement             The statement need to check.
-  @param HostDisplayStatement  Pointer to the display Statement data strucure which is an host statement.
-**/
-VOID
-InitializeDisplayStatement (
-  IN OUT FORM_DISPLAY_ENGINE_STATEMENT *DisplayStatement,
-  IN     FORM_BROWSER_STATEMENT        *Statement,
-  IN     FORM_DISPLAY_ENGINE_STATEMENT *HostDisplayStatement
-  )
-{
-  LIST_ENTRY                 *Link;
-  QUESTION_OPTION            *Option;
-  DISPLAY_QUESTION_OPTION    *DisplayOption;
-
-  DisplayStatement->Signature = FORM_DISPLAY_ENGINE_STATEMENT_SIGNATURE;
-  DisplayStatement->Version   = FORM_DISPLAY_ENGINE_STATEMENT_VERSION_1;
-  DisplayStatement->OpCode    = Statement->OpCode;
-  InitializeListHead (&DisplayStatement->NestStatementList);
-  InitializeListHead (&DisplayStatement->OptionListHead);
-
-  if ((EvaluateExpressionList(Statement->Expression, FALSE, NULL, NULL) == ExpressGrayOut) || Statement->Locked) {
-    DisplayStatement->Attribute |= HII_DISPLAY_GRAYOUT;
-  }
-  if ((Statement->ValueExpression != NULL) || ((Statement->QuestionFlags & EFI_IFR_FLAG_READ_ONLY) != 0)) {
-    DisplayStatement->Attribute |= HII_DISPLAY_READONLY;
-  }
-
-  //
-  // Initilize the option list in statement.
-  //
-  Link = GetFirstNode (&Statement->OptionListHead);
-  while (!IsNull (&Statement->OptionListHead, Link)) {
-    Option = QUESTION_OPTION_FROM_LINK (Link);
-    Link = GetNextNode (&Statement->OptionListHead, Link);
-    if ((Option->SuppressExpression != NULL) &&
-        ((EvaluateExpressionList(Option->SuppressExpression, FALSE, NULL, NULL) == ExpressSuppress))) {
-      continue;
-    }
-
-    DisplayOption = AllocateZeroPool (sizeof (DISPLAY_QUESTION_OPTION));
-    ASSERT (DisplayOption != NULL);
-
-    DisplayOption->ImageId      = Option->ImageId;
-    DisplayOption->Signature    = DISPLAY_QUESTION_OPTION_SIGNATURE;
-    DisplayOption->OptionOpCode = Option->OpCode;
-    InsertTailList(&DisplayStatement->OptionListHead, &DisplayOption->Link);
-  }
-
-  CopyMem (&DisplayStatement->CurrentValue, &Statement->HiiValue, sizeof (EFI_HII_VALUE));
-
-  //
-  // Some special op code need an extra buffer to save the data.
-  // Such as string, password, orderedlist...
-  //
-  if (Statement->BufferValue != NULL) {
-    //
-    // Ordered list opcode may not initilized, get default value here.
-    //
-    if (Statement->OpCode->OpCode == EFI_IFR_ORDERED_LIST_OP && GetArrayData (Statement->BufferValue, Statement->ValueType, 0) == 0) {
-      GetQuestionDefault (gCurrentSelection->FormSet, gCurrentSelection->Form, Statement, 0);
-    }
-
-    DisplayStatement->CurrentValue.Buffer    = AllocateCopyPool(Statement->StorageWidth,Statement->BufferValue);
-    DisplayStatement->CurrentValue.BufferLen = Statement->StorageWidth;
-  }
-
-  DisplayStatement->SettingChangedFlag = Statement->ValueChanged;
-
-  //
-  // Get the highlight statement for current form.
-  //
-  if (((gCurrentSelection->QuestionId != 0) && (Statement->QuestionId == gCurrentSelection->QuestionId)) ||
-      ((mCurFakeQestId != 0) && (Statement->FakeQuestionId == mCurFakeQestId))) {
-    gDisplayFormData.HighLightedStatement = DisplayStatement;
-  }
-
-  //
-  // Create the refresh event process function.
-  //
-  if (!CompareGuid (&Statement->RefreshGuid, &gZeroGuid)) {
-    CreateRefreshEvent (Statement);
-  }
-
-  //
-  // For RTC type of date/time, set default refresh interval to be 1 second.
-  //
-  if ((Statement->Operand == EFI_IFR_DATE_OP || Statement->Operand == EFI_IFR_TIME_OP) && Statement->Storage == NULL) {
-    Statement->RefreshInterval = 1;
-  }
-
-  //
-  // Create the refresh guid hook event.
-  // If the statement in this form has refresh event or refresh interval, browser will create this event for display engine.
-  //
-  if ((!CompareGuid (&Statement->RefreshGuid, &gZeroGuid)) || (Statement->RefreshInterval != 0)) {
-    gDisplayFormData.FormRefreshEvent = mValueChangedEvent;
-  }
-
-  //
-  // Save the password check function for later use.
-  //
-  if (Statement->Operand == EFI_IFR_PASSWORD_OP) {
-    DisplayStatement->PasswordCheck = PasswordCheck;
-  }
-
-  //
-  // Save the validate check question for later use.
-  //
-  if (!IsListEmpty (&Statement->InconsistentListHead)) {
-    DisplayStatement->ValidateQuestion = QuestionCheck;
-  }
-
-  //
-  // If this statement is nest in the subtitle, insert to the host statement.
-  // else insert to the form it belongs to.
-  //
-  if (Statement->InSubtitle) {
-    InsertTailList(&HostDisplayStatement->NestStatementList, &DisplayStatement->DisplayLink);
-  } else {
-    InsertTailList(&gDisplayFormData.StatementListHead, &DisplayStatement->DisplayLink);
-  }
-}
-
-/**
-  Process for the refresh interval statement.
-
-  @param Event    The Event need to be process
-  @param Context  The context of the event.
-
-**/
-VOID
-EFIAPI
-RefreshIntervalProcess (
-  IN  EFI_EVENT    Event,
-  IN  VOID         *Context
-  )
-{
-  FORM_BROWSER_STATEMENT        *Statement;
-  LIST_ENTRY                    *Link;
-
-  Link = GetFirstNode (&gCurrentSelection->Form->StatementListHead);
-  while (!IsNull (&gCurrentSelection->Form->StatementListHead, Link)) {
-    Statement = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
-    Link = GetNextNode (&gCurrentSelection->Form->StatementListHead, Link);
-
-    if (Statement->RefreshInterval == 0) {
-      continue;
-    }
-
-    UpdateStatement(Statement);
-  }
-
-  gBS->SignalEvent (mValueChangedEvent);
-}
-
-/**
-
-  Make a copy of the global hotkey info.
-
-**/
-VOID
-UpdateHotkeyList (
-  VOID
-  )
-{
-  BROWSER_HOT_KEY  *HotKey;
-  BROWSER_HOT_KEY  *CopyKey;
-  LIST_ENTRY       *Link;
-
-  Link = GetFirstNode (&gBrowserHotKeyList);
-  while (!IsNull (&gBrowserHotKeyList, Link)) {
-    HotKey = BROWSER_HOT_KEY_FROM_LINK (Link);
-
-    CopyKey             = AllocateCopyPool(sizeof (BROWSER_HOT_KEY), HotKey);
-    CopyKey->KeyData    = AllocateCopyPool(sizeof (EFI_INPUT_KEY), HotKey->KeyData);
-    CopyKey->HelpString = AllocateCopyPool(StrSize (HotKey->HelpString), HotKey->HelpString);
-
-    InsertTailList(&gDisplayFormData.HotKeyListHead, &CopyKey->Link);
-
-    Link = GetNextNode (&gBrowserHotKeyList, Link);
-  }
-}
-
-/**
-
-  Enum all statement in current form, find all the statement can be display and
-  add to the display form.
-
-**/
-VOID
-AddStatementToDisplayForm (
-  VOID
-  )
-{
-  EFI_STATUS                    Status;
-  LIST_ENTRY                    *Link;
-  FORM_BROWSER_STATEMENT        *Statement;
-  FORM_DISPLAY_ENGINE_STATEMENT *DisplayStatement;
-  FORM_DISPLAY_ENGINE_STATEMENT *HostDisplayStatement;
-  UINT8                         MinRefreshInterval;
-  EFI_EVENT                     RefreshIntervalEvent;
-  FORM_BROWSER_REFRESH_EVENT_NODE *EventNode;
-  BOOLEAN                       FormEditable;
-
-  HostDisplayStatement = NULL;
-  MinRefreshInterval   = 0;
-  FormEditable         = FALSE;
-
-  //
-  // Process the statement outside the form, these statements are not recognized
-  // by browser core.
-  //
-  Link = GetFirstNode (&gCurrentSelection->FormSet->StatementListOSF);
-  while (!IsNull (&gCurrentSelection->FormSet->StatementListOSF, Link)) {
-    Statement = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
-    Link = GetNextNode (&gCurrentSelection->FormSet->StatementListOSF, Link);
-
-    DisplayStatement = AllocateZeroPool (sizeof (FORM_DISPLAY_ENGINE_STATEMENT));
-    ASSERT (DisplayStatement != NULL);
-    DisplayStatement->Signature = FORM_DISPLAY_ENGINE_STATEMENT_SIGNATURE;
-    DisplayStatement->Version   = FORM_DISPLAY_ENGINE_STATEMENT_VERSION_1;
-    DisplayStatement->OpCode = Statement->OpCode;
-
-    InitializeListHead (&DisplayStatement->NestStatementList);
-    InitializeListHead (&DisplayStatement->OptionListHead);
-
-    InsertTailList(&gDisplayFormData.StatementListOSF, &DisplayStatement->DisplayLink);
-  }
-
-  //
-  // Process the statement in this form.
-  //
-  Link = GetFirstNode (&gCurrentSelection->Form->StatementListHead);
-  while (!IsNull (&gCurrentSelection->Form->StatementListHead, Link)) {
-    Statement = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
-    Link = GetNextNode (&gCurrentSelection->Form->StatementListHead, Link);
-
-    //
-    // This statement can't be show, skip it.
-    //
-    if (EvaluateExpressionList(Statement->Expression, FALSE, NULL, NULL) > ExpressGrayOut) {
-      continue;
-    }
-
-    DisplayStatement = AllocateZeroPool (sizeof (FORM_DISPLAY_ENGINE_STATEMENT));
-    ASSERT (DisplayStatement != NULL);
-
-    //
-    // Initialize this statement and add it to the display form.
-    //
-    InitializeDisplayStatement(DisplayStatement, Statement, HostDisplayStatement);
-
-    //
-    // Save the Host statement info.
-    // Host statement may has nest statement follow it.
-    //
-    if (!Statement->InSubtitle) {
-      HostDisplayStatement = DisplayStatement;
-    }
-
-    if (Statement->Storage != NULL) {
-      FormEditable = TRUE;
-    }
-
-    //
-    // Get the minimal refresh interval value for later use.
-    //
-    if ((Statement->RefreshInterval != 0) && 
-      (MinRefreshInterval == 0 || Statement->RefreshInterval < MinRefreshInterval)) {
-      MinRefreshInterval = Statement->RefreshInterval;
-    }
-  }
-
-  //
-  // Create the periodic timer for refresh interval statement.
-  //
-  if (MinRefreshInterval != 0) {
-    Status = gBS->CreateEvent (EVT_TIMER | EVT_NOTIFY_SIGNAL, TPL_CALLBACK, RefreshIntervalProcess, NULL, &RefreshIntervalEvent);
-    ASSERT_EFI_ERROR (Status);
-    Status = gBS->SetTimer (RefreshIntervalEvent, TimerPeriodic, MinRefreshInterval * ONE_SECOND);
-    ASSERT_EFI_ERROR (Status);
-
-    EventNode = AllocateZeroPool (sizeof (FORM_BROWSER_REFRESH_EVENT_NODE));
-    ASSERT (EventNode != NULL);
-    EventNode->RefreshEvent = RefreshIntervalEvent;
-    InsertTailList(&mRefreshEventList, &EventNode->Link);
-  }
-
-  //
-  // Update hotkey list field.
-  //
-  if (gBrowserSettingScope == SystemLevel || FormEditable) {
-    UpdateHotkeyList();
-  }
-}
-
-/**
-
-  Initialize the SettingChangedFlag variable in the display form.
-
-**/
-VOID
-UpdateDataChangedFlag (
-  VOID
-  )
-{
-  LIST_ENTRY           *Link;
-  FORM_BROWSER_FORMSET *LocalFormSet;
-
-  gDisplayFormData.SettingChangedFlag   = FALSE;
-
-  if (IsNvUpdateRequiredForForm (gCurrentSelection->Form)) {
-    gDisplayFormData.SettingChangedFlag = TRUE;
-    return;
-  }
-
-  //
-  // Base on the system level to check whether need to show the NV flag.
-  // 
-  switch (gBrowserSettingScope) {
-  case SystemLevel:
-    //
-    // Check the maintain list to see whether there is any change.
-    //
-    Link = GetFirstNode (&gBrowserFormSetList);
-    while (!IsNull (&gBrowserFormSetList, Link)) {
-      LocalFormSet = FORM_BROWSER_FORMSET_FROM_LINK (Link);
-      if (IsNvUpdateRequiredForFormSet(LocalFormSet)) {
-        gDisplayFormData.SettingChangedFlag = TRUE;
-        return;
-      }
-      Link = GetNextNode (&gBrowserFormSetList, Link);
-    }
-    break;
-
-  case FormSetLevel:
-    if (IsNvUpdateRequiredForFormSet(gCurrentSelection->FormSet)) {
-      gDisplayFormData.SettingChangedFlag = TRUE;
-      return;
-    }
-    break;
-
-  default:
-    break;
-  }
-}
-
-/**
-
-  Initialize the Display form structure data.
-
-**/
-VOID
-InitializeDisplayFormData (
-  VOID
-  )
-{
-  EFI_STATUS  Status;
-
-  gDisplayFormData.Signature   = FORM_DISPLAY_ENGINE_FORM_SIGNATURE;
-  gDisplayFormData.Version     = FORM_DISPLAY_ENGINE_VERSION_1;
-  gDisplayFormData.ImageId     = 0;
-  gDisplayFormData.AnimationId = 0;
-
-  InitializeListHead (&gDisplayFormData.StatementListHead);
-  InitializeListHead (&gDisplayFormData.StatementListOSF);
-  InitializeListHead (&gDisplayFormData.HotKeyListHead);
-
-  Status = gBS->CreateEvent (
-        EVT_NOTIFY_WAIT, 
-        TPL_CALLBACK,
-        SetupBrowserEmptyFunction,
-        NULL,
-        &mValueChangedEvent
-        );
-  ASSERT_EFI_ERROR (Status); 
-}
-
-/**
-
-  Free the kotkey info saved in form data.
-
-**/
-VOID
-FreeHotkeyList (
-  VOID
-  )
-{
-  BROWSER_HOT_KEY  *HotKey;
-  LIST_ENTRY       *Link;
-
-  while (!IsListEmpty (&gDisplayFormData.HotKeyListHead)) {
-    Link = GetFirstNode (&gDisplayFormData.HotKeyListHead);
-    HotKey = BROWSER_HOT_KEY_FROM_LINK (Link);
-
-    RemoveEntryList (&HotKey->Link);
-
-    FreePool (HotKey->KeyData);
-    FreePool (HotKey->HelpString);
-    FreePool (HotKey);
-  }
-}
-
-/**
-
-  Update the Display form structure data.
-
-**/
-VOID
-UpdateDisplayFormData (
-  VOID
-  )
-{
-  gDisplayFormData.FormTitle        = gCurrentSelection->Form->FormTitle;
-  gDisplayFormData.FormId           = gCurrentSelection->FormId;
-  gDisplayFormData.HiiHandle        = gCurrentSelection->Handle;
-  CopyGuid (&gDisplayFormData.FormSetGuid, &gCurrentSelection->FormSetGuid);
-
-  gDisplayFormData.Attribute        = 0;
-  gDisplayFormData.Attribute       |= gCurrentSelection->Form->ModalForm ? HII_DISPLAY_MODAL : 0;
-  gDisplayFormData.Attribute       |= gCurrentSelection->Form->Locked    ? HII_DISPLAY_LOCK  : 0;
-
-  gDisplayFormData.FormRefreshEvent     = NULL;
-  gDisplayFormData.HighLightedStatement = NULL;
-
-  gDisplayFormData.BrowserStatus = gBrowserStatus;
-  gDisplayFormData.ErrorString   = gErrorInfo;
-
-  gBrowserStatus = BROWSER_SUCCESS;
-  gErrorInfo     = NULL;
-
-  UpdateDataChangedFlag ();
-
-  AddStatementToDisplayForm ();
-}
-
-/**
-
-  Free the Display Statement structure data.
-
-  @param   StatementList         Point to the statement list which need to be free.
-
-**/
-VOID
-FreeStatementData (
-  LIST_ENTRY           *StatementList
-  )
-{
-  LIST_ENTRY                    *Link;
-  LIST_ENTRY                    *OptionLink;
-  FORM_DISPLAY_ENGINE_STATEMENT *Statement;
-  DISPLAY_QUESTION_OPTION       *Option;
-
-  //
-  // Free Statements/Questions
-  //
-  while (!IsListEmpty (StatementList)) {
-    Link = GetFirstNode (StatementList);
-    Statement = FORM_DISPLAY_ENGINE_STATEMENT_FROM_LINK (Link);
-
-    //
-    // Free Options List
-    //
-    while (!IsListEmpty (&Statement->OptionListHead)) {
-      OptionLink = GetFirstNode (&Statement->OptionListHead);
-      Option = DISPLAY_QUESTION_OPTION_FROM_LINK (OptionLink);
-      RemoveEntryList (&Option->Link);
-      FreePool (Option);
-    }
-
-    //
-    // Free nest statement List
-    //
-    if (!IsListEmpty (&Statement->NestStatementList)) {
-      FreeStatementData(&Statement->NestStatementList);
-    }
-
-    RemoveEntryList (&Statement->DisplayLink);
-    FreePool (Statement);
-  }
-}
-
-/**
-
-  Free the Display form structure data.
-
-**/
-VOID
-FreeDisplayFormData (
-  VOID
-  )
-{
-  FreeStatementData (&gDisplayFormData.StatementListHead);
-  FreeStatementData (&gDisplayFormData.StatementListOSF);
-
-  FreeRefreshEvent();
-
-  FreeHotkeyList();
-}
-
-/**
-
-  Get FORM_BROWSER_STATEMENT from FORM_DISPLAY_ENGINE_STATEMENT based on the OpCode info.
-
-  @param DisplayStatement        The input FORM_DISPLAY_ENGINE_STATEMENT.
-
-  @retval FORM_BROWSER_STATEMENT  The return FORM_BROWSER_STATEMENT info.
-
-**/
-FORM_BROWSER_STATEMENT *
-GetBrowserStatement (
-  IN FORM_DISPLAY_ENGINE_STATEMENT *DisplayStatement
-  )
-{
-  FORM_BROWSER_STATEMENT *Statement;
-  LIST_ENTRY             *Link;
-
-  Link = GetFirstNode (&gCurrentSelection->Form->StatementListHead);
-  while (!IsNull (&gCurrentSelection->Form->StatementListHead, Link)) {
-    Statement = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
-
-    if (Statement->OpCode == DisplayStatement->OpCode) {
-      return Statement;
-    }
-
-    Link = GetNextNode (&gCurrentSelection->Form->StatementListHead, Link);
-  }
-
-  return NULL;
-}
-
-/**
-
-  Process the action request in user input.
-
-  @param Action                  The user input action request info.
-  @param DefaultId               The user input default Id info.
-
-  @retval EFI_SUCESSS            This function always return successfully for now.
-
-**/
-EFI_STATUS 
-ProcessAction (
-  IN UINT32        Action,
-  IN UINT16        DefaultId
-  )
-{
-  EFI_STATUS    Status;
-
-  //
-  // This is caused by use press ESC, and it should not combine with other action type.
-  //
-  if ((Action & BROWSER_ACTION_FORM_EXIT) == BROWSER_ACTION_FORM_EXIT) {
-    FindNextMenu (gCurrentSelection, FormLevel);
-    return EFI_SUCCESS;
-  }
-
-  //
-  // Below is normal hotkey trigged action, these action maybe combine with each other.
-  //
-  if ((Action & BROWSER_ACTION_DISCARD) == BROWSER_ACTION_DISCARD) {
-    DiscardForm (gCurrentSelection->FormSet, gCurrentSelection->Form, gBrowserSettingScope);
-  }
-
-  if ((Action & BROWSER_ACTION_DEFAULT) == BROWSER_ACTION_DEFAULT) {
-    ExtractDefault (gCurrentSelection->FormSet, gCurrentSelection->Form, DefaultId, gBrowserSettingScope, GetDefaultForAll, NULL, FALSE);
-  }
-
-  if ((Action & BROWSER_ACTION_SUBMIT) == BROWSER_ACTION_SUBMIT) {
-    Status = SubmitForm (gCurrentSelection->FormSet, gCurrentSelection->Form, gBrowserSettingScope);
-    if (EFI_ERROR (Status)) {
-      gBrowserStatus = BROWSER_SUBMIT_FAIL;
-    }
-  }
-
-  if ((Action & BROWSER_ACTION_RESET) == BROWSER_ACTION_RESET) {
-    gResetRequired = TRUE;
-  }
-
-  if ((Action & BROWSER_ACTION_EXIT) == BROWSER_ACTION_EXIT) {
-    //
-    // Form Exit without saving, Similar to ESC Key.
-    // FormSet Exit without saving, Exit SendForm.
-    // System Exit without saving, CallExitHandler and Exit SendForm.
-    //
-    DiscardForm (gCurrentSelection->FormSet, gCurrentSelection->Form, gBrowserSettingScope);
-    if (gBrowserSettingScope == FormLevel || gBrowserSettingScope == FormSetLevel) {
-      FindNextMenu (gCurrentSelection, gBrowserSettingScope);
-    } else if (gBrowserSettingScope == SystemLevel) {
-      if (ExitHandlerFunction != NULL) {
-        ExitHandlerFunction ();
-      }
-      gCurrentSelection->Action = UI_ACTION_EXIT;
-    }
-  }
-
-  return EFI_SUCCESS;
-}
-
-
-/**
-  Find HII Handle in the HII database associated with given Device Path.
-
-  If DevicePath is NULL, then ASSERT.
-
-  @param  DevicePath             Device Path associated with the HII package list
-                                 handle.
-
-  @retval Handle                 HII package list Handle associated with the Device
-                                        Path.
-  @retval NULL                   Hii Package list handle is not found.
-
-**/
-EFI_HII_HANDLE
-EFIAPI
-DevicePathToHiiHandle (
-  IN EFI_DEVICE_PATH_PROTOCOL   *DevicePath
-  )
-{
-  EFI_STATUS                  Status;
-  EFI_DEVICE_PATH_PROTOCOL    *TmpDevicePath;
-  UINTN                       BufferSize;
-  UINTN                       HandleCount;
-  UINTN                       Index;
-  EFI_HANDLE                  Handle;
-  EFI_HANDLE                  DriverHandle;
-  EFI_HII_HANDLE              *HiiHandles;
-  EFI_HII_HANDLE              HiiHandle;
-
-  ASSERT (DevicePath != NULL);
-
-  TmpDevicePath = DevicePath;
-  //
-  // Locate Device Path Protocol handle buffer
-  //
-  Status = gBS->LocateDevicePath (
-                  &gEfiDevicePathProtocolGuid,
-                  &TmpDevicePath,
-                  &DriverHandle
-                  );
-  if (EFI_ERROR (Status) || !IsDevicePathEnd (TmpDevicePath)) {
-    return NULL;
-  }
-
-  //
-  // Retrieve all HII Handles from HII database
-  //
-  BufferSize = 0x1000;
-  HiiHandles = AllocatePool (BufferSize);
-  ASSERT (HiiHandles != NULL);
-  Status = mHiiDatabase->ListPackageLists (
-                           mHiiDatabase,
-                           EFI_HII_PACKAGE_TYPE_ALL,
-                           NULL,
-                           &BufferSize,
-                           HiiHandles
-                           );
-  if (Status == EFI_BUFFER_TOO_SMALL) {
-    FreePool (HiiHandles);
-    HiiHandles = AllocatePool (BufferSize);
-    ASSERT (HiiHandles != NULL);
-
-    Status = mHiiDatabase->ListPackageLists (
-                             mHiiDatabase,
-                             EFI_HII_PACKAGE_TYPE_ALL,
-                             NULL,
-                             &BufferSize,
-                             HiiHandles
-                             );
-  }
-
-  if (EFI_ERROR (Status)) {
-    FreePool (HiiHandles);
-    return NULL;
-  }
-
-  //
-  // Search Hii Handle by Driver Handle
-  //
-  HiiHandle = NULL;
-  HandleCount = BufferSize / sizeof (EFI_HII_HANDLE);
-  for (Index = 0; Index < HandleCount; Index++) {
-    Status = mHiiDatabase->GetPackageListHandle (
-                             mHiiDatabase,
-                             HiiHandles[Index],
-                             &Handle
-                             );
-    if (!EFI_ERROR (Status) && (Handle == DriverHandle)) {
-      HiiHandle = HiiHandles[Index];
-      break;
-    }
-  }
-
-  FreePool (HiiHandles);
-  return HiiHandle;
-}
-
-/**
-  Find HII Handle in the HII database associated with given form set guid.
-
-  If FormSetGuid is NULL, then ASSERT.
-
-  @param  ComparingGuid          FormSet Guid associated with the HII package list
-                                 handle.
-
-  @retval Handle                 HII package list Handle associated with the Device
-                                        Path.
-  @retval NULL                   Hii Package list handle is not found.
-
-**/
-EFI_HII_HANDLE
-FormSetGuidToHiiHandle (
-  EFI_GUID     *ComparingGuid
-  )
-{
-  EFI_HII_HANDLE               *HiiHandles;
-  UINTN                        Index;
-  EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
-  UINTN                        BufferSize;
-  UINT32                       Offset;
-  UINT32                       Offset2;
-  UINT32                       PackageListLength;
-  EFI_HII_PACKAGE_HEADER       PackageHeader;
-  UINT8                        *Package;
-  UINT8                        *OpCodeData;
-  EFI_STATUS                   Status;
-  EFI_HII_HANDLE               HiiHandle;
-
-  ASSERT (ComparingGuid != NULL);
-
-  HiiHandle  = NULL;
-  //
-  // Get all the Hii handles
-  //
-  HiiHandles = HiiGetHiiHandles (NULL);
-  ASSERT (HiiHandles != NULL);
-
-  //
-  // Search for formset of each class type
-  //
-  for (Index = 0; HiiHandles[Index] != NULL; Index++) {
-    BufferSize = 0;
-    HiiPackageList = NULL;
-    Status = mHiiDatabase->ExportPackageLists (mHiiDatabase, HiiHandles[Index], &BufferSize, HiiPackageList);
-    if (Status == EFI_BUFFER_TOO_SMALL) {
-      HiiPackageList = AllocatePool (BufferSize);
-      ASSERT (HiiPackageList != NULL);
-
-      Status = mHiiDatabase->ExportPackageLists (mHiiDatabase, HiiHandles[Index], &BufferSize, HiiPackageList);
-    }
-    if (EFI_ERROR (Status) || HiiPackageList == NULL) {
-      return NULL;
-    }
-
-    //
-    // Get Form package from this HII package List
-    //
-    Offset = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
-    Offset2 = 0;
-    CopyMem (&PackageListLength, &HiiPackageList->PackageLength, sizeof (UINT32)); 
-
-    while (Offset < PackageListLength) {
-      Package = ((UINT8 *) HiiPackageList) + Offset;
-      CopyMem (&PackageHeader, Package, sizeof (EFI_HII_PACKAGE_HEADER));
-
-      if (PackageHeader.Type == EFI_HII_PACKAGE_FORMS) {
-        //
-        // Search FormSet in this Form Package
-        //
-        Offset2 = sizeof (EFI_HII_PACKAGE_HEADER);
-        while (Offset2 < PackageHeader.Length) {
-          OpCodeData = Package + Offset2;
-
-          if (((EFI_IFR_OP_HEADER *) OpCodeData)->OpCode == EFI_IFR_FORM_SET_OP) {
-            //
-            // Try to compare against formset GUID
-            //
-            if (CompareGuid (ComparingGuid, (EFI_GUID *)(OpCodeData + sizeof (EFI_IFR_OP_HEADER)))) {
-              HiiHandle = HiiHandles[Index];
-              break;
-            }
-          }
-
-          Offset2 += ((EFI_IFR_OP_HEADER *) OpCodeData)->Length;
-        }
-      }
-      if (HiiHandle != NULL) {
-        break;
-      }
-      Offset += PackageHeader.Length;
-    }
-    
-    FreePool (HiiPackageList);
-  	if (HiiHandle != NULL) {
-  		break;
-  	}
-  }
-
-  FreePool (HiiHandles);
-
-  return HiiHandle;
-}
-
-/**
-  check how to process the changed data in current form or form set.
+  Display form and wait for user to select one menu option, then return it.
 
   @param Selection       On input, Selection tell setup browser the information
                          about the Selection, form and formset to be displayed.
                          On output, Selection return the screen item that is selected
                          by user.
-
-  @param Scope           Data save or discard scope, form or formset.
-
-  @retval                TRUE   Success process the changed data, will return to the parent form.
-  @retval                FALSE  Reject to process the changed data, will stay at  current form.
-**/
-BOOLEAN
-ProcessChangedData (
-  IN OUT UI_MENU_SELECTION       *Selection,
-  IN     BROWSER_SETTING_SCOPE   Scope
-  )
-{
-  BOOLEAN  RetValue;
-
-  RetValue = TRUE;
-  switch (mFormDisplay->ConfirmDataChange()) {
-    case BROWSER_ACTION_DISCARD:
-      DiscardForm (Selection->FormSet, Selection->Form, Scope);
-      break;
-  
-    case BROWSER_ACTION_SUBMIT:
-      SubmitForm (Selection->FormSet, Selection->Form, Scope);
-      break;
-
-    case BROWSER_ACTION_NONE:
-      RetValue = FALSE;
-      break;
-
-    default:
-      //
-      // if Invalid value return, process same as BROWSER_ACTION_NONE.
-      //
-      RetValue = FALSE;
-      break;
-  }
-
-  return RetValue;
-}
-
-/**
-  Find parent formset menu(the first menu which has different formset) for current menu.
-  If not find, just return to the first menu.
-
-  @param Selection    The selection info.
-
-**/
-VOID
-FindParentFormSet (
-  IN OUT   UI_MENU_SELECTION           *Selection
-  )
-{
-  FORM_ENTRY_INFO            *CurrentMenu;
-  FORM_ENTRY_INFO            *ParentMenu;
-
-  CurrentMenu = Selection->CurrentMenu;
-  ParentMenu  = UiFindParentMenu(CurrentMenu);
-
-  //
-  // Find a menu which has different formset guid with current.
-  //
-  while (ParentMenu != NULL && CompareGuid (&CurrentMenu->FormSetGuid, &ParentMenu->FormSetGuid)) {
-    CurrentMenu = ParentMenu;
-    ParentMenu  = UiFindParentMenu(CurrentMenu);
-  }
-
-  if (ParentMenu != NULL) {
-    CopyMem (&Selection->FormSetGuid, &ParentMenu->FormSetGuid, sizeof (EFI_GUID));
-    Selection->Handle = ParentMenu->HiiHandle;
-    Selection->FormId     = ParentMenu->FormId;
-    Selection->QuestionId = ParentMenu->QuestionId;
-  } else {
-    Selection->FormId     = CurrentMenu->FormId;
-    Selection->QuestionId = CurrentMenu->QuestionId;
-  }
-
-  Selection->Statement  = NULL;
-}
-
-/**
-  Process the goto op code, update the info in the selection structure.
-
-  @param Statement    The statement belong to goto op code.
-  @param Selection    The selection info.
-
-  @retval EFI_SUCCESS    The menu process successfully.
-  @return Other value if the process failed.
-**/
-EFI_STATUS
-ProcessGotoOpCode (
-  IN OUT   FORM_BROWSER_STATEMENT      *Statement,
-  IN OUT   UI_MENU_SELECTION           *Selection
-  )
-{
-  CHAR16                          *StringPtr;
-  EFI_DEVICE_PATH_PROTOCOL        *DevicePath;
-  FORM_BROWSER_FORM               *RefForm;
-  EFI_STATUS                      Status;
-  EFI_HII_HANDLE                  HiiHandle;
-  
-  Status    = EFI_SUCCESS;
-  StringPtr = NULL;
-  HiiHandle = NULL;
-
-  //
-  // Prepare the device path check, get the device path info first.
-  //
-  if (Statement->HiiValue.Value.ref.DevicePath != 0) {
-    StringPtr = GetToken (Statement->HiiValue.Value.ref.DevicePath, Selection->FormSet->HiiHandle);
-  }
-
-  //
-  // Check whether the device path string is a valid string.
-  //
-  if (Statement->HiiValue.Value.ref.DevicePath != 0 && StringPtr != NULL) {
-    if (Selection->Form->ModalForm) {
-      return Status;
-    }
-
-    //
-    // Goto another Hii Package list
-    //
-    if (mPathFromText != NULL) {
-      DevicePath = mPathFromText->ConvertTextToDevicePath(StringPtr);
-      if (DevicePath != NULL) {
-        HiiHandle = DevicePathToHiiHandle (DevicePath);
-        FreePool (DevicePath);
-      }
-      FreePool (StringPtr);
-    } else {
-      //
-      // Not found the EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL protocol.
-      //
-      gBrowserStatus = BROWSER_PROTOCOL_NOT_FOUND;
-      FreePool (StringPtr);
-      return Status;
-    }
-
-    if (HiiHandle != Selection->Handle) {
-      //
-      // Goto another Formset, check for uncommitted data
-      //
-      if ((gBrowserSettingScope == FormLevel || gBrowserSettingScope == FormSetLevel) &&
-          IsNvUpdateRequiredForFormSet(Selection->FormSet)) {
-        if (!ProcessChangedData(Selection, FormSetLevel)) {
-          return EFI_SUCCESS;
-        }
-      }
-    }
-
-    Selection->Action = UI_ACTION_REFRESH_FORMSET;
-    Selection->Handle = HiiHandle;
-    if (Selection->Handle == NULL) {
-      //
-      // If target Hii Handle not found, exit current formset.
-      //
-      FindParentFormSet(Selection);
-      return EFI_SUCCESS;
-    }
-
-    CopyMem (&Selection->FormSetGuid,&Statement->HiiValue.Value.ref.FormSetGuid, sizeof (EFI_GUID));
-    Selection->FormId = Statement->HiiValue.Value.ref.FormId;
-    Selection->QuestionId = Statement->HiiValue.Value.ref.QuestionId;
-  } else if (!CompareGuid (&Statement->HiiValue.Value.ref.FormSetGuid, &gZeroGuid)) {
-    if (Selection->Form->ModalForm) {
-      return Status;
-    }
-    if (!CompareGuid (&Statement->HiiValue.Value.ref.FormSetGuid, &Selection->FormSetGuid)) {
-      //
-      // Goto another Formset, check for uncommitted data
-      //
-      if ((gBrowserSettingScope == FormLevel || gBrowserSettingScope == FormSetLevel) &&
-         IsNvUpdateRequiredForFormSet(Selection->FormSet)) {
-        if (!ProcessChangedData(Selection, FormSetLevel)) {
-          return EFI_SUCCESS;
-        }
-      }
-    }
-
-    Selection->Action = UI_ACTION_REFRESH_FORMSET;
-    Selection->Handle = FormSetGuidToHiiHandle(&Statement->HiiValue.Value.ref.FormSetGuid);
-    if (Selection->Handle == NULL) {
-      //
-      // If target Hii Handle not found, exit current formset.
-      //
-      FindParentFormSet(Selection);
-      return EFI_SUCCESS;
-    }
-
-    CopyMem (&Selection->FormSetGuid, &Statement->HiiValue.Value.ref.FormSetGuid, sizeof (EFI_GUID));
-    Selection->FormId = Statement->HiiValue.Value.ref.FormId;
-    Selection->QuestionId = Statement->HiiValue.Value.ref.QuestionId;
-  } else if (Statement->HiiValue.Value.ref.FormId != 0) {
-    //
-    // Goto another Form, check for uncommitted data
-    //
-    if (Statement->HiiValue.Value.ref.FormId != Selection->FormId) {
-      if ((gBrowserSettingScope == FormLevel && IsNvUpdateRequiredForForm(Selection->Form))) {
-        if (!ProcessChangedData (Selection, FormLevel)) {
-          return EFI_SUCCESS;
-        }
-      }
-    }
-
-    RefForm = IdToForm (Selection->FormSet, Statement->HiiValue.Value.ref.FormId);
-    if ((RefForm != NULL) && (RefForm->SuppressExpression != NULL)) {
-      if (EvaluateExpressionList(RefForm->SuppressExpression, TRUE, Selection->FormSet, RefForm) != ExpressFalse) {
-        //
-        // Form is suppressed. 
-        //
-        gBrowserStatus = BROWSER_FORM_SUPPRESS;
-        return EFI_SUCCESS;
-      }
-    }
-
-    Selection->FormId = Statement->HiiValue.Value.ref.FormId;
-    Selection->QuestionId = Statement->HiiValue.Value.ref.QuestionId;
-  } else if (Statement->HiiValue.Value.ref.QuestionId != 0) {
-    Selection->QuestionId = Statement->HiiValue.Value.ref.QuestionId;
-  }
-
-  return Status;
-}
-
-
-/**
-  Process Question Config.
-
-  @param  Selection              The UI menu selection.
-  @param  Question               The Question to be peocessed.
-
-  @retval EFI_SUCCESS            Question Config process success.
-  @retval Other                  Question Config process fail.
-
-**/
-EFI_STATUS
-ProcessQuestionConfig (
-  IN  UI_MENU_SELECTION       *Selection,
-  IN  FORM_BROWSER_STATEMENT  *Question
-  )
-{
-  EFI_STATUS                      Status;
-  CHAR16                          *ConfigResp;
-  CHAR16                          *Progress;
-  EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
-
-  if (Question->QuestionConfig == 0) {
-    return EFI_SUCCESS;
-  }
-
-  //
-  // Get <ConfigResp>
-  //
-  ConfigResp = GetToken (Question->QuestionConfig, Selection->FormSet->HiiHandle);
-  if (ConfigResp == NULL) {
-    return EFI_NOT_FOUND;
-  }
-
-  //
-  // Send config to Configuration Driver
-  //
-  ConfigAccess = Selection->FormSet->ConfigAccess;
-  if (ConfigAccess == NULL) {
-    return EFI_UNSUPPORTED;
-  }
-  Status = ConfigAccess->RouteConfig (
-                           ConfigAccess,
-                           ConfigResp,
-                           &Progress
-                           );
-
-  return Status;
-}
-
-/**
-
-  Process the user input data.
-
-  @param UserInput               The user input data.
-  @param ChangeHighlight         Whether need to change the highlight statement.  
-
-  @retval EFI_SUCESSS            This function always return successfully for now.
-
-**/
-EFI_STATUS
-ProcessUserInput (
-  IN USER_INPUT               *UserInput,
-  IN BOOLEAN                  ChangeHighlight
-  )
-{
-  EFI_STATUS                    Status;
-  FORM_BROWSER_STATEMENT        *Statement;
-
-  Status = EFI_SUCCESS;
-
-  //
-  // When Exit from FormDisplay function, one of the below two cases must be true.
-  //
-  ASSERT (UserInput->Action != 0 || UserInput->SelectedStatement != NULL);
-
-  //
-  // Remove the last highligh question id, this id will update when show next form.
-  //
-  gCurrentSelection->QuestionId = 0;
-
-  //
-  // First process the Action field in USER_INPUT.
-  //
-  if (UserInput->Action != 0) {
-    Status = ProcessAction (UserInput->Action, UserInput->DefaultId);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
-    //
-    // Clear the highlight info.
-    //
-    gCurrentSelection->Statement = NULL;
-
-    if (UserInput->SelectedStatement != NULL) {
-      Statement = GetBrowserStatement(UserInput->SelectedStatement);
-      ASSERT (Statement != NULL);
-      //
-      // Save the current highlight menu in the menu history data.
-      // which will be used when later browse back to this form.
-      //
-      gCurrentSelection->CurrentMenu->QuestionId = Statement->QuestionId;
-      //
-      // For statement like text, actio, it not has question id.
-      // So use FakeQuestionId to save the question.
-      //
-      if (gCurrentSelection->CurrentMenu->QuestionId == 0) {
-        mCurFakeQestId = Statement->FakeQuestionId;
-      } else {
-        mCurFakeQestId = 0;
-      }
-    }
-  } else {
-    Statement = GetBrowserStatement(UserInput->SelectedStatement);
-    ASSERT (Statement != NULL);
-
-    gCurrentSelection->Statement = Statement;
-
-    if (ChangeHighlight) {
-      //
-      // This question is the current user select one,record it and later
-      // show it as the highlight question.
-      //
-      gCurrentSelection->CurrentMenu->QuestionId = Statement->QuestionId;
-      //
-      // For statement like text, actio, it not has question id.
-      // So use FakeQuestionId to save the question.
-      //
-      if (gCurrentSelection->CurrentMenu->QuestionId == 0) {
-        mCurFakeQestId = Statement->FakeQuestionId;
-      } else {
-        mCurFakeQestId = 0;
-      }
-    }
-
-    switch (Statement->Operand) {
-    case EFI_IFR_REF_OP:
-      Status = ProcessGotoOpCode(Statement, gCurrentSelection);
-      break;
-    
-    case EFI_IFR_ACTION_OP:
-      //
-      // Process the Config string <ConfigResp>
-      //
-      Status = ProcessQuestionConfig (gCurrentSelection, Statement);
-      break;
-    
-    case EFI_IFR_RESET_BUTTON_OP:
-      //
-      // Reset Question to default value specified by DefaultId
-      //
-      Status = ExtractDefault (gCurrentSelection->FormSet, NULL, Statement->DefaultId, FormSetLevel, GetDefaultForAll, NULL, FALSE);
-      break;
-
-    default:
-      switch (Statement->Operand) {
-      case EFI_IFR_STRING_OP:
-        DeleteString(Statement->HiiValue.Value.string, gCurrentSelection->FormSet->HiiHandle);
-        Statement->HiiValue.Value.string = UserInput->InputValue.Value.string;
-        CopyMem (Statement->BufferValue, UserInput->InputValue.Buffer, (UINTN) UserInput->InputValue.BufferLen);
-        FreePool (UserInput->InputValue.Buffer);
-        break;
-
-      case EFI_IFR_PASSWORD_OP:
-        if (UserInput->InputValue.Buffer == NULL) {
-          //
-          // User not input new password, just return.
-          //
-          break;
-        }
-
-        DeleteString(Statement->HiiValue.Value.string, gCurrentSelection->FormSet->HiiHandle);
-        Statement->HiiValue.Value.string = UserInput->InputValue.Value.string;
-        CopyMem (Statement->BufferValue, UserInput->InputValue.Buffer, (UINTN) UserInput->InputValue.BufferLen);
-        FreePool (UserInput->InputValue.Buffer);
-        //
-        // Two password match, send it to Configuration Driver
-        //
-        if ((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != 0) {
-          PasswordCheck (NULL, UserInput->SelectedStatement, (CHAR16 *) Statement->BufferValue);
-          //
-          // Clean the value after saved it.
-          //
-          ZeroMem (Statement->BufferValue, (UINTN) UserInput->InputValue.BufferLen);
-          HiiSetString (gCurrentSelection->FormSet->HiiHandle, Statement->HiiValue.Value.string, (CHAR16*)Statement->BufferValue, NULL);
-        } else {
-          SetQuestionValue (gCurrentSelection->FormSet, gCurrentSelection->Form, Statement, GetSetValueWithHiiDriver);
-        }
-        break;
-
-      case EFI_IFR_ORDERED_LIST_OP:
-        CopyMem (Statement->BufferValue, UserInput->InputValue.Buffer, UserInput->InputValue.BufferLen);
-        break;
-
-      default:
-        CopyMem (&Statement->HiiValue, &UserInput->InputValue, sizeof (EFI_HII_VALUE));
-        break;
-      }
-      if (Statement->Operand != EFI_IFR_PASSWORD_OP) {
-        SetQuestionValue (gCurrentSelection->FormSet, gCurrentSelection->Form, Statement, GetSetValueWithEditBuffer);
-      }
-      break;
-    }
-  }
-
-  return Status;
-}
-
-/**
-
-  Display form and wait for user to select one menu option, then return it.
-
   @retval EFI_SUCESSS            This function always return successfully for now.
 
 **/
 EFI_STATUS
 DisplayForm (
-  VOID
+  IN OUT UI_MENU_SELECTION           *Selection
   )
 {
-  EFI_STATUS               Status;
-  USER_INPUT               UserInput;
-  FORM_ENTRY_INFO          *CurrentMenu;
-  BOOLEAN                  ChangeHighlight;
+  CHAR16                 *StringPtr;
+  UINT16                 MenuItemCount;
+  EFI_HII_HANDLE         Handle;
+  EFI_SCREEN_DESCRIPTOR  LocalScreen;
+  UINT16                 Width;
+  UINTN                  ArrayEntry;
+  CHAR16                 *OutputString;
+  LIST_ENTRY             *Link;
+  FORM_BROWSER_STATEMENT *Statement;
+  UINT16                 NumberOfLines;
+  EFI_STATUS             Status;
+  UI_MENU_OPTION         *MenuOption;
+  UINT16                 GlyphWidth;
 
-  ZeroMem (&UserInput, sizeof (USER_INPUT));
+  Handle        = Selection->Handle;
+  MenuItemCount = 0;
+  ArrayEntry    = 0;
+  OutputString  = NULL;
 
-  //
-  // Update the menu history data.
-  //
-  CurrentMenu = UiFindMenuList (gCurrentSelection->Handle, &gCurrentSelection->FormSetGuid, gCurrentSelection->FormId);
-  if (CurrentMenu == NULL) {
-    //
-    // Current menu not found, add it to the menu tree
-    //
-    CurrentMenu = UiAddMenuList (gCurrentSelection->Handle, &gCurrentSelection->FormSetGuid,
-                                 gCurrentSelection->FormId, gCurrentSelection->QuestionId);
-    ASSERT (CurrentMenu != NULL);
+  UiInitMenu ();
+
+  CopyMem (&LocalScreen, &gScreenDimensions, sizeof (EFI_SCREEN_DESCRIPTOR));
+
+  StringPtr = GetToken (Selection->Form->FormTitle, Handle);
+
+  if ((gClassOfVfr & FORMSET_CLASS_FRONT_PAGE) != FORMSET_CLASS_FRONT_PAGE) {
+    if (Selection->Form->ModalForm) {
+      gST->ConOut->SetAttribute (gST->ConOut, TITLE_TEXT | EFI_BACKGROUND_BLACK);
+    } else {
+      gST->ConOut->SetAttribute (gST->ConOut, TITLE_TEXT | TITLE_BACKGROUND);
+    }
+    PrintStringAt (
+      (LocalScreen.RightColumn + LocalScreen.LeftColumn - GetStringWidth (StringPtr) / 2) / 2,
+      LocalScreen.TopRow + 1,
+      StringPtr
+      );
   }
-  gCurrentSelection->CurrentMenu = CurrentMenu;
 
   //
-  // Find currrent highlight statement.
+  // Remove Buffer allocated for StringPtr after it has been used.
   //
-  if (gCurrentSelection->QuestionId == 0) {
-    //
-    // Highlight not specified, fetch it from cached menu
-    //
-    gCurrentSelection->QuestionId = CurrentMenu->QuestionId;
-  }
+  FreePool (StringPtr);
 
   //
   // Evaluate all the Expressions in this Form
   //
-  Status = EvaluateFormExpressions (gCurrentSelection->FormSet, gCurrentSelection->Form);
+  Status = EvaluateFormExpressions (Selection->FormSet, Selection->Form);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  UpdateDisplayFormData ();
+  Selection->FormEditable = FALSE;
+  Link = GetFirstNode (&Selection->Form->StatementListHead);
+  while (!IsNull (&Selection->Form->StatementListHead, Link)) {
+    Statement = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
 
-  //
-  // Three possible status maybe return.
-  //
-  // EFI_INVALID_PARAMETER: The input dimension info is not valid.
-  // EFI_NOT_FOUND:         The input value for oneof/orderedlist opcode is not valid
-  //                        and an valid value has return.
-  // EFI_SUCCESS:           Success shows form and get user input in UserInput paramenter.
-  //
-  Status = mFormDisplay->FormDisplay (&gDisplayFormData, &UserInput);
-  if (EFI_ERROR (Status) && Status != EFI_NOT_FOUND) {
-    FreeDisplayFormData();
-    return Status;
+    if (EvaluateExpressionList(Statement->Expression, FALSE, NULL, NULL) <= ExpressGrayOut) {
+      StringPtr = GetToken (Statement->Prompt, Handle);
+      ASSERT (StringPtr != NULL);
+
+      Width     = GetWidth (Statement, Handle);
+
+      NumberOfLines = 1;
+      ArrayEntry = 0;
+      GlyphWidth = 1;
+      for (; GetLineByWidth (StringPtr, Width, &GlyphWidth,&ArrayEntry, &OutputString) != 0x0000;) {
+        //
+        // If there is more string to process print on the next row and increment the Skip value
+        //
+        if (StrLen (&StringPtr[ArrayEntry]) != 0) {
+          NumberOfLines++;
+        }
+
+        FreePool (OutputString);
+      }
+
+      //
+      // We are NOT!! removing this StringPtr buffer via FreePool since it is being used in the menuoptions, we will do
+      // it in UiFreeMenu.
+      //
+      MenuOption = UiAddMenuOption (StringPtr, Selection->Handle, Selection->Form, Statement, NumberOfLines, MenuItemCount);
+      MenuItemCount++;
+
+      if (MenuOption->IsQuestion && !MenuOption->ReadOnly) {
+        //
+        // At least one item is not readonly, this Form is considered as editable
+        //
+        Selection->FormEditable = TRUE;
+      }
+    }
+
+    Link = GetNextNode (&Selection->Form->StatementListHead, Link);
   }
 
-  //
-  // If status is EFI_SUCCESS, means user has change the highlight menu and new user input return.
-  //                           in this case, browser need to change the highlight menu.
-  // If status is EFI_NOT_FOUND, means the input DisplayFormData has error for oneof/orderedlist 
-  //                          opcode and new valid value has return, browser core need to adjust
-  //                          value for this opcode and shows this form again.
-  //
-  ChangeHighlight = (Status == EFI_SUCCESS ? TRUE :FALSE);
+  Status = UiDisplayMenu (Selection);
 
-  Status = ProcessUserInput (&UserInput, ChangeHighlight);
-
-  FreeDisplayFormData();
+  UiFreeMenu ();
 
   return Status;
+}
+
+/**
+  Initialize the HII String Token to the correct values.
+
+**/
+VOID
+InitializeBrowserStrings (
+  VOID
+  )
+{
+  gEnterString          = GetToken (STRING_TOKEN (ENTER_STRING), gHiiHandle);
+  gEnterCommitString    = GetToken (STRING_TOKEN (ENTER_COMMIT_STRING), gHiiHandle);
+  gEnterEscapeString    = GetToken (STRING_TOKEN (ENTER_ESCAPE_STRING), gHiiHandle);
+  gEscapeString         = GetToken (STRING_TOKEN (ESCAPE_STRING), gHiiHandle);
+  gMoveHighlight        = GetToken (STRING_TOKEN (MOVE_HIGHLIGHT), gHiiHandle);
+  gMakeSelection        = GetToken (STRING_TOKEN (MAKE_SELECTION), gHiiHandle);
+  gDecNumericInput      = GetToken (STRING_TOKEN (DEC_NUMERIC_INPUT), gHiiHandle);
+  gHexNumericInput      = GetToken (STRING_TOKEN (HEX_NUMERIC_INPUT), gHiiHandle);
+  gToggleCheckBox       = GetToken (STRING_TOKEN (TOGGLE_CHECK_BOX), gHiiHandle);
+  gPromptForData        = GetToken (STRING_TOKEN (PROMPT_FOR_DATA), gHiiHandle);
+  gPromptForPassword    = GetToken (STRING_TOKEN (PROMPT_FOR_PASSWORD), gHiiHandle);
+  gPromptForNewPassword = GetToken (STRING_TOKEN (PROMPT_FOR_NEW_PASSWORD), gHiiHandle);
+  gConfirmPassword      = GetToken (STRING_TOKEN (CONFIRM_PASSWORD), gHiiHandle);
+  gConfirmError         = GetToken (STRING_TOKEN (CONFIRM_ERROR), gHiiHandle);
+  gPassowordInvalid     = GetToken (STRING_TOKEN (PASSWORD_INVALID), gHiiHandle);
+  gPressEnter           = GetToken (STRING_TOKEN (PRESS_ENTER), gHiiHandle);
+  gEmptyString          = GetToken (STRING_TOKEN (EMPTY_STRING), gHiiHandle);
+  gAreYouSure           = GetToken (STRING_TOKEN (ARE_YOU_SURE), gHiiHandle);
+  gYesResponse          = GetToken (STRING_TOKEN (ARE_YOU_SURE_YES), gHiiHandle);
+  gNoResponse           = GetToken (STRING_TOKEN (ARE_YOU_SURE_NO), gHiiHandle);
+  gMiniString           = GetToken (STRING_TOKEN (MINI_STRING), gHiiHandle);
+  gPlusString           = GetToken (STRING_TOKEN (PLUS_STRING), gHiiHandle);
+  gMinusString          = GetToken (STRING_TOKEN (MINUS_STRING), gHiiHandle);
+  gAdjustNumber         = GetToken (STRING_TOKEN (ADJUST_NUMBER), gHiiHandle);
+  gSaveChanges          = GetToken (STRING_TOKEN (SAVE_CHANGES), gHiiHandle);
+  gOptionMismatch       = GetToken (STRING_TOKEN (OPTION_MISMATCH), gHiiHandle);
+  gFormSuppress         = GetToken (STRING_TOKEN (FORM_SUPPRESSED), gHiiHandle);
+  gProtocolNotFound     = GetToken (STRING_TOKEN (PROTOCOL_NOT_FOUND), gHiiHandle);
+  return ;
+}
+
+/**
+  Free up the resource allocated for all strings required
+  by Setup Browser.
+
+**/
+VOID
+FreeBrowserStrings (
+  VOID
+  )
+{
+  FreePool (gEnterString);
+  FreePool (gEnterCommitString);
+  FreePool (gEnterEscapeString);
+  FreePool (gEscapeString);
+  FreePool (gMoveHighlight);
+  FreePool (gMakeSelection);
+  FreePool (gDecNumericInput);
+  FreePool (gHexNumericInput);
+  FreePool (gToggleCheckBox);
+  FreePool (gPromptForData);
+  FreePool (gPromptForPassword);
+  FreePool (gPromptForNewPassword);
+  FreePool (gConfirmPassword);
+  FreePool (gPassowordInvalid);
+  FreePool (gConfirmError);
+  FreePool (gPressEnter);
+  FreePool (gEmptyString);
+  FreePool (gAreYouSure);
+  FreePool (gYesResponse);
+  FreePool (gNoResponse);
+  FreePool (gMiniString);
+  FreePool (gPlusString);
+  FreePool (gMinusString);
+  FreePool (gAdjustNumber);
+  FreePool (gSaveChanges);
+  FreePool (gOptionMismatch);
+  FreePool (gFormSuppress);
+  FreePool (gProtocolNotFound);
+  return ;
+}
+
+/**
+  Show all registered HotKey help strings on bottom Rows.
+
+**/
+VOID
+PrintHotKeyHelpString (
+  VOID
+  )
+{
+  UINTN                  CurrentCol;
+  UINTN                  CurrentRow;
+  UINTN                  BottomRowOfHotKeyHelp;
+  UINTN                  ColumnWidth;
+  UINTN                  Index;
+  EFI_SCREEN_DESCRIPTOR  LocalScreen;
+  LIST_ENTRY             *Link;
+  BROWSER_HOT_KEY        *HotKey;
+
+  CopyMem (&LocalScreen, &gScreenDimensions, sizeof (EFI_SCREEN_DESCRIPTOR));
+  ColumnWidth            = (LocalScreen.RightColumn - LocalScreen.LeftColumn) / 3;
+  BottomRowOfHotKeyHelp  = LocalScreen.BottomRow - STATUS_BAR_HEIGHT - 3;
+
+  //
+  // Calculate total number of Register HotKeys. 
+  //
+  Index = 0;
+  Link  = GetFirstNode (&gBrowserHotKeyList);
+  while (!IsNull (&gBrowserHotKeyList, Link)) {
+    HotKey = BROWSER_HOT_KEY_FROM_LINK (Link);
+    //
+    // Help string can't exceed ColumnWidth. One Row will show three Help information. 
+    //
+    if (StrLen (HotKey->HelpString) > ColumnWidth) {
+      HotKey->HelpString[ColumnWidth] = L'\0';
+    }
+    //
+    // Calculate help information Column and Row.
+    //
+    if ((Index % 3) != 2) {
+      CurrentCol = LocalScreen.LeftColumn + (2 - Index % 3) * ColumnWidth;
+    } else {
+      CurrentCol = LocalScreen.LeftColumn + 2;
+    }
+    CurrentRow = BottomRowOfHotKeyHelp - Index / 3;
+    //
+    // Print HotKey help string on bottom Row.
+    //
+    PrintStringAt (CurrentCol, CurrentRow, HotKey->HelpString);
+
+    //
+    // Get Next Hot Key.
+    //
+    Link = GetNextNode (&gBrowserHotKeyList, Link);
+    Index ++;
+  }
+  
+  return;
+}
+
+/**
+  Update key's help imformation.
+
+  @param Selection       Tell setup browser the information about the Selection
+  @param  MenuOption     The Menu option
+  @param  Selected       Whether or not a tag be selected
+
+**/
+VOID
+UpdateKeyHelp (
+  IN  UI_MENU_SELECTION           *Selection,
+  IN  UI_MENU_OPTION              *MenuOption,
+  IN  BOOLEAN                     Selected
+  )
+{
+  UINTN                  SecCol;
+  UINTN                  ThdCol;
+  UINTN                  LeftColumnOfHelp;
+  UINTN                  RightColumnOfHelp;
+  UINTN                  TopRowOfHelp;
+  UINTN                  BottomRowOfHelp;
+  UINTN                  StartColumnOfHelp;
+  EFI_SCREEN_DESCRIPTOR  LocalScreen;
+  FORM_BROWSER_STATEMENT *Statement;
+
+  gST->ConOut->SetAttribute (gST->ConOut, KEYHELP_TEXT | KEYHELP_BACKGROUND);
+
+  if (Selection->Form->ModalForm) {
+    return;
+  }
+
+  CopyMem (&LocalScreen, &gScreenDimensions, sizeof (EFI_SCREEN_DESCRIPTOR));
+
+  SecCol            = LocalScreen.LeftColumn + (LocalScreen.RightColumn - LocalScreen.LeftColumn) / 3;
+  ThdCol            = LocalScreen.LeftColumn + (LocalScreen.RightColumn - LocalScreen.LeftColumn) / 3 * 2;
+
+  StartColumnOfHelp = LocalScreen.LeftColumn + 2;
+  LeftColumnOfHelp  = LocalScreen.LeftColumn + 1;
+  RightColumnOfHelp = LocalScreen.RightColumn - 2;
+  TopRowOfHelp      = LocalScreen.BottomRow - STATUS_BAR_HEIGHT - gFooterHeight + 1;
+  BottomRowOfHelp   = LocalScreen.BottomRow - STATUS_BAR_HEIGHT - 2;
+
+  Statement = MenuOption->ThisTag;
+  switch (Statement->Operand) {
+  case EFI_IFR_ORDERED_LIST_OP:
+  case EFI_IFR_ONE_OF_OP:
+  case EFI_IFR_NUMERIC_OP:
+  case EFI_IFR_TIME_OP:
+  case EFI_IFR_DATE_OP:
+    ClearLines (LeftColumnOfHelp, RightColumnOfHelp, TopRowOfHelp, BottomRowOfHelp, KEYHELP_TEXT | KEYHELP_BACKGROUND);
+
+    if (!Selected) {
+      //
+      // On system setting, HotKey will show on every form.
+      //
+      if (gBrowserSettingScope == SystemLevel ||
+          (Selection->FormEditable && gFunctionKeySetting != NONE_FUNCTION_KEY_SETTING)) {
+        PrintHotKeyHelpString ();
+      }
+
+      if ((gClassOfVfr & FORMSET_CLASS_PLATFORM_SETUP) == FORMSET_CLASS_PLATFORM_SETUP) {
+        PrintStringAt (ThdCol, BottomRowOfHelp, gEscapeString);
+      }
+
+      if ((Statement->Operand == EFI_IFR_DATE_OP) ||
+          (Statement->Operand == EFI_IFR_TIME_OP)) {
+        PrintAt (
+          StartColumnOfHelp,
+          BottomRowOfHelp,
+          L"%c%c%c%c%s",
+          ARROW_UP,
+          ARROW_DOWN,
+          ARROW_RIGHT,
+          ARROW_LEFT,
+          gMoveHighlight
+          );
+        PrintStringAt (SecCol, BottomRowOfHelp, gEnterString);
+        PrintStringAt (StartColumnOfHelp, TopRowOfHelp, gAdjustNumber);
+      } else {
+        PrintAt (StartColumnOfHelp, BottomRowOfHelp, L"%c%c%s", ARROW_UP, ARROW_DOWN, gMoveHighlight);
+        if (Statement->Operand == EFI_IFR_NUMERIC_OP && Statement->Step != 0) {
+          PrintStringAt (StartColumnOfHelp, TopRowOfHelp, gAdjustNumber);
+        } 
+        PrintStringAt (SecCol, BottomRowOfHelp, gEnterString);
+      }
+    } else {
+      PrintStringAt (SecCol, BottomRowOfHelp, gEnterCommitString);
+
+      //
+      // If it is a selected numeric with manual input, display different message
+      //
+      if ((Statement->Operand == EFI_IFR_NUMERIC_OP) || 
+          (Statement->Operand == EFI_IFR_DATE_OP) ||
+          (Statement->Operand == EFI_IFR_TIME_OP)) {
+        PrintStringAt (
+          SecCol,
+          TopRowOfHelp,
+          ((Statement->Flags & EFI_IFR_DISPLAY_UINT_HEX) == EFI_IFR_DISPLAY_UINT_HEX) ? gHexNumericInput : gDecNumericInput
+          );
+      } else if (Statement->Operand != EFI_IFR_ORDERED_LIST_OP) {
+        PrintAt (StartColumnOfHelp, BottomRowOfHelp, L"%c%c%s", ARROW_UP, ARROW_DOWN, gMoveHighlight);
+      }
+
+      if (Statement->Operand == EFI_IFR_ORDERED_LIST_OP) {
+        PrintStringAt (StartColumnOfHelp, TopRowOfHelp, gPlusString);
+        PrintStringAt (ThdCol, TopRowOfHelp, gMinusString);
+      }
+
+      PrintStringAt (ThdCol, BottomRowOfHelp, gEnterEscapeString);
+    }
+    break;
+
+  case EFI_IFR_CHECKBOX_OP:
+    ClearLines (LeftColumnOfHelp, RightColumnOfHelp, TopRowOfHelp, BottomRowOfHelp, KEYHELP_TEXT | KEYHELP_BACKGROUND);
+
+    //
+    // On system setting, HotKey will show on every form.
+    //
+    if (gBrowserSettingScope == SystemLevel ||
+        (Selection->FormEditable && gFunctionKeySetting != NONE_FUNCTION_KEY_SETTING)) {
+      PrintHotKeyHelpString ();
+    }
+    if ((gClassOfVfr & FORMSET_CLASS_PLATFORM_SETUP) == FORMSET_CLASS_PLATFORM_SETUP) {
+      PrintStringAt (ThdCol, BottomRowOfHelp, gEscapeString);
+    }
+
+    PrintAt (StartColumnOfHelp, BottomRowOfHelp, L"%c%c%s", ARROW_UP, ARROW_DOWN, gMoveHighlight);
+    PrintStringAt (SecCol, BottomRowOfHelp, gToggleCheckBox);
+    break;
+
+  case EFI_IFR_REF_OP:
+  case EFI_IFR_PASSWORD_OP:
+  case EFI_IFR_STRING_OP:
+  case EFI_IFR_TEXT_OP:
+  case EFI_IFR_ACTION_OP:
+  case EFI_IFR_RESET_BUTTON_OP:
+  case EFI_IFR_SUBTITLE_OP:
+    ClearLines (LeftColumnOfHelp, RightColumnOfHelp, TopRowOfHelp, BottomRowOfHelp, KEYHELP_TEXT | KEYHELP_BACKGROUND);
+
+    if (!Selected) {
+      //
+      // On system setting, HotKey will show on every form.
+      //
+      if (gBrowserSettingScope == SystemLevel ||
+          (Selection->FormEditable && gFunctionKeySetting != NONE_FUNCTION_KEY_SETTING)) {
+        PrintHotKeyHelpString ();
+      }
+      if ((gClassOfVfr & FORMSET_CLASS_PLATFORM_SETUP) == FORMSET_CLASS_PLATFORM_SETUP) {
+        PrintStringAt (ThdCol, BottomRowOfHelp, gEscapeString);
+      }
+
+      PrintAt (StartColumnOfHelp, BottomRowOfHelp, L"%c%c%s", ARROW_UP, ARROW_DOWN, gMoveHighlight);
+      if (Statement->Operand != EFI_IFR_TEXT_OP && Statement->Operand != EFI_IFR_SUBTITLE_OP) {
+        PrintStringAt (SecCol, BottomRowOfHelp, gEnterString);
+      }
+    } else {
+      if (Statement->Operand != EFI_IFR_REF_OP) {
+        PrintStringAt (
+          (LocalScreen.RightColumn - GetStringWidth (gEnterCommitString) / 2) / 2,
+          BottomRowOfHelp,
+          gEnterCommitString
+          );
+        PrintStringAt (ThdCol, BottomRowOfHelp, gEnterEscapeString);
+      }
+    }
+    break;
+
+  default:
+    break;
+  }
 }
 
 /**
@@ -1715,136 +920,60 @@ FormUpdateNotify (
 }
 
 /**
-  Update the NV flag info for this form set.
+  check whether the formset need to update the NV.
 
   @param  FormSet                FormSet data structure.
 
+  @retval TRUE                   Need to update the NV.
+  @retval FALSE                  No need to update the NV.
 **/
-BOOLEAN
-IsNvUpdateRequiredForFormSet (
+BOOLEAN 
+IsNvUpdateRequired (
   IN FORM_BROWSER_FORMSET  *FormSet
   )
 {
   LIST_ENTRY              *Link;
   FORM_BROWSER_FORM       *Form;
-  BOOLEAN                 RetVal;
-
-  //
-  // Not finished question initialization, return FALSE.
-  //
-  if (!FormSet->QuestionInited) {
-    return FALSE;
-  }
-
-  RetVal = FALSE;
 
   Link = GetFirstNode (&FormSet->FormListHead);
   while (!IsNull (&FormSet->FormListHead, Link)) {
     Form = FORM_BROWSER_FORM_FROM_LINK (Link);
 
-    RetVal = IsNvUpdateRequiredForForm(Form);
-    if (RetVal) {
-      break;
-    }
-
-    Link = GetNextNode (&FormSet->FormListHead, Link);
-  }
-
-  return RetVal;
-}
-
-/**
-  Update the NvUpdateRequired flag for a form.
-
-  @param  Form                Form data structure.
-
-**/
-BOOLEAN
-IsNvUpdateRequiredForForm (
-  IN FORM_BROWSER_FORM    *Form
-  )
-{
-  LIST_ENTRY              *Link;
-  FORM_BROWSER_STATEMENT  *Statement;
-
-  Link = GetFirstNode (&Form->StatementListHead);
-  while (!IsNull (&Form->StatementListHead, Link)) {
-    Statement = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
-
-    if (Statement->ValueChanged) {
+    if (Form->NvUpdateRequired ) {
       return TRUE;
     }
 
-    Link = GetNextNode (&Form->StatementListHead, Link);
+    Link = GetNextNode (&FormSet->FormListHead, Link);
   }
 
   return FALSE;
 }
 
 /**
-  Check whether the storage data for current form set is changed.
+  check whether the formset need to update the NV.
 
-  @param  FormSet           FormSet data structure.
+  @param  FormSet                FormSet data structure.
+  @param  SetValue               Whether set new value or clear old value.
 
-  @retval TRUE              Data is changed.
-  @retval FALSE             Data is not changed.
 **/
-BOOLEAN 
-IsStorageDataChangedForFormSet (
-  IN FORM_BROWSER_FORMSET             *FormSet
+VOID
+UpdateNvInfoInForm (
+  IN FORM_BROWSER_FORMSET  *FormSet,
+  IN BOOLEAN               SetValue
   )
 {
   LIST_ENTRY              *Link;
-  FORMSET_STORAGE         *Storage;
-  BROWSER_STORAGE         *BrowserStorage;
-  CHAR16                  *ConfigRespNew;
-  CHAR16                  *ConfigRespOld;
-  BOOLEAN                 RetVal;
+  FORM_BROWSER_FORM       *Form;
+  
+  Link = GetFirstNode (&FormSet->FormListHead);
+  while (!IsNull (&FormSet->FormListHead, Link)) {
+    Form = FORM_BROWSER_FORM_FROM_LINK (Link);
 
-  RetVal        = FALSE;
-  ConfigRespNew = NULL;
-  ConfigRespOld = NULL;
+    Form->NvUpdateRequired = SetValue;
 
-  //
-  // Request current settings from Configuration Driver
-  //
-  Link = GetFirstNode (&FormSet->StorageListHead);
-  while (!IsNull (&FormSet->StorageListHead, Link)) {
-    Storage = FORMSET_STORAGE_FROM_LINK (Link);
-    Link = GetNextNode (&FormSet->StorageListHead, Link);
-
-    BrowserStorage = Storage->BrowserStorage;
-
-    if (BrowserStorage->Type == EFI_HII_VARSTORE_EFI_VARIABLE) {
-      continue;
-    }
-
-    if (Storage->ElementCount == 0) {
-      continue;
-    }
-
-    StorageToConfigResp (BrowserStorage, &ConfigRespNew, Storage->ConfigRequest, TRUE);
-    StorageToConfigResp (BrowserStorage, &ConfigRespOld, Storage->ConfigRequest, FALSE);
-    ASSERT (ConfigRespNew != NULL && ConfigRespOld != NULL);
-
-    if (StrCmp (ConfigRespNew, ConfigRespOld) != 0) {
-      RetVal = TRUE;
-    }
-
-    FreePool (ConfigRespNew);
-    ConfigRespNew = NULL;
-
-    FreePool (ConfigRespOld);
-    ConfigRespOld = NULL;
-
-    if (RetVal) {
-      break;
-    }
+    Link = GetNextNode (&FormSet->FormListHead, Link);
   }
-
-  return RetVal;
 }
-
 /**
   Find menu which will show next time.
 
@@ -1852,79 +981,98 @@ IsStorageDataChangedForFormSet (
                          about the Selection, form and formset to be displayed.
                          On output, Selection return the screen item that is selected
                          by user.
-  @param SettingLevel    Input Settting level, if it is FormLevel, just exit current form. 
-                         else, we need to exit current formset.
+  @param Repaint         Whether need to repaint the menu.
+  @param NewLine         Whether need to show at new line.
   
-  @retval TRUE           Exit current form.
-  @retval FALSE          User press ESC and keep in current form.
+  @retval TRUE           Need return.
+  @retval FALSE          No need to return.
 **/
 BOOLEAN
 FindNextMenu (
-  IN OUT UI_MENU_SELECTION        *Selection,
-  IN       BROWSER_SETTING_SCOPE  SettingLevel
+  IN OUT UI_MENU_SELECTION    *Selection,
+  IN     BOOLEAN              *Repaint, 
+  IN     BOOLEAN              *NewLine  
   )
 {
-  FORM_ENTRY_INFO            *CurrentMenu;
-  FORM_ENTRY_INFO            *ParentMenu;
-  BROWSER_SETTING_SCOPE      Scope;
+  UI_MENU_LIST            *CurrentMenu;
+  CHAR16                  YesResponse;
+  CHAR16                  NoResponse;
+  EFI_INPUT_KEY           Key;
+  BROWSER_SETTING_SCOPE   Scope;
   
   CurrentMenu = Selection->CurrentMenu;
-  ParentMenu  = NULL;
-  Scope       = FormSetLevel;
 
-  if (CurrentMenu != NULL && (ParentMenu = UiFindParentMenu(CurrentMenu)) != NULL) {
+  if (CurrentMenu != NULL && CurrentMenu->Parent != NULL) {
     //
     // we have a parent, so go to the parent menu
     //
-    if (CompareGuid (&CurrentMenu->FormSetGuid, &ParentMenu->FormSetGuid)) {
-      if (SettingLevel == FormSetLevel) {
-        //
-        // Find a menu which has different formset guid with current.
-        //
-        while (CompareGuid (&CurrentMenu->FormSetGuid, &ParentMenu->FormSetGuid)) {
-          CurrentMenu = ParentMenu;
-          if ((ParentMenu = UiFindParentMenu(CurrentMenu)) == NULL) {
-            break;
-          }
-        }
-
-        if (ParentMenu != NULL) {
-          Scope = FormSetLevel;
-        }
-      } else {
-        Scope = FormLevel;
-      }
-    } else {
-      Scope = FormSetLevel;
-    }
-  }
-
-  //
-  // Form Level Check whether the data is changed.
-  //
-  if ((gBrowserSettingScope == FormLevel && IsNvUpdateRequiredForForm (Selection->Form)) ||
-      (gBrowserSettingScope == FormSetLevel && IsNvUpdateRequiredForFormSet(Selection->FormSet) && Scope == FormSetLevel)) {
-    if (!ProcessChangedData(Selection, Scope)) {
-      return FALSE;
-    }
-  }
-
-  if (ParentMenu != NULL) {
-    //
-    // ParentMenu is found. Then, go to it.
-    //
-    if (Scope == FormLevel) {
+    if (CompareGuid (&CurrentMenu->FormSetGuid, &CurrentMenu->Parent->FormSetGuid)) {
+      //
+      // The parent menu and current menu are in the same formset
+      //
       Selection->Action = UI_ACTION_REFRESH_FORM;
+      Scope             = FormLevel;
     } else {
       Selection->Action = UI_ACTION_REFRESH_FORMSET;
-      CopyMem (&Selection->FormSetGuid, &ParentMenu->FormSetGuid, sizeof (EFI_GUID));
-      Selection->Handle = ParentMenu->HiiHandle;
+      CopyMem (&Selection->FormSetGuid, &CurrentMenu->Parent->FormSetGuid, sizeof (EFI_GUID));
+      Selection->Handle = CurrentMenu->Parent->HiiHandle;
+      Scope             = FormSetLevel;
+    }
+
+    //
+    // Form Level Check whether the data is changed.
+    //
+    if ((gBrowserSettingScope == FormLevel && Selection->Form->NvUpdateRequired) ||
+        (gBrowserSettingScope == FormSetLevel && IsNvUpdateRequired(Selection->FormSet) && Scope == FormSetLevel)) {
+      gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+  
+      YesResponse = gYesResponse[0];
+      NoResponse  = gNoResponse[0];
+  
+      //
+      // If NV flag is up, prompt user
+      //
+      do {
+        CreateDialog (4, TRUE, 0, NULL, &Key, gEmptyString, gSaveChanges, gAreYouSure, gEmptyString);
+      } while
+      (
+        (Key.ScanCode != SCAN_ESC) &&
+        ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) != (NoResponse | UPPER_LOWER_CASE_OFFSET)) &&
+        ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) != (YesResponse | UPPER_LOWER_CASE_OFFSET))
+      );
+  
+      if (Key.ScanCode == SCAN_ESC) {
+        //
+        // User hits the ESC key, Ingore. 
+        //
+        if (Repaint != NULL) {
+          *Repaint = TRUE;
+        }
+        if (NewLine != NULL) {
+          *NewLine = TRUE;
+        }
+
+        Selection->Action = UI_ACTION_NONE;
+        return FALSE;
+      }
+  
+      if ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) == (YesResponse | UPPER_LOWER_CASE_OFFSET)) {
+        //
+        // If the user hits the YesResponse key
+        //
+        SubmitForm (Selection->FormSet, Selection->Form, Scope);
+      } else {
+        //
+        // If the user hits the NoResponse key
+        //
+        DiscardForm (Selection->FormSet, Selection->Form, Scope);
+      }
     }
 
     Selection->Statement = NULL;
 
-    Selection->FormId = ParentMenu->FormId;
-    Selection->QuestionId = ParentMenu->QuestionId;
+    Selection->FormId = CurrentMenu->Parent->FormId;
+    Selection->QuestionId = CurrentMenu->Parent->QuestionId;
 
     //
     // Clear highlight record for this menu
@@ -1933,11 +1081,70 @@ FindNextMenu (
     return FALSE;
   }
 
-  //
-  // Current in root page, exit the SendForm
-  //
-  Selection->Action = UI_ACTION_EXIT;
+  if ((gClassOfVfr & FORMSET_CLASS_FRONT_PAGE) == FORMSET_CLASS_FRONT_PAGE) {
+    //
+    // We never exit FrontPage, so skip the ESC
+    //
+    Selection->Action = UI_ACTION_NONE;
+    return FALSE;
+  }
 
+  //
+  // We are going to leave current FormSet, so check uncommited data in this FormSet
+  //
+  if (gBrowserSettingScope != SystemLevel && IsNvUpdateRequired(Selection->FormSet)) {
+    gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+
+    YesResponse = gYesResponse[0];
+    NoResponse  = gNoResponse[0];
+
+    //
+    // If NV flag is up, prompt user
+    //
+    do {
+      CreateDialog (4, TRUE, 0, NULL, &Key, gEmptyString, gSaveChanges, gAreYouSure, gEmptyString);
+    } while
+    (
+      (Key.ScanCode != SCAN_ESC) &&
+      ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) != (NoResponse | UPPER_LOWER_CASE_OFFSET)) &&
+      ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) != (YesResponse | UPPER_LOWER_CASE_OFFSET))
+    );
+
+    if (Key.ScanCode == SCAN_ESC) {
+      //
+      // User hits the ESC key
+      //
+      if (Repaint != NULL) {
+        *Repaint = TRUE;
+      }
+
+      if (NewLine != NULL) {
+        *NewLine = TRUE;
+      }
+
+      Selection->Action = UI_ACTION_NONE;
+      return FALSE;
+    }
+
+    if ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) == (YesResponse | UPPER_LOWER_CASE_OFFSET)) {
+      //
+      // If the user hits the YesResponse key
+      //
+      SubmitForm (Selection->FormSet, Selection->Form, FormSetLevel);
+    } else {
+      //
+      // If the user hits the NoResponse key
+      //
+      DiscardForm (Selection->FormSet, Selection->Form, FormSetLevel);
+    }
+  }
+
+  Selection->Statement = NULL;
+  if (CurrentMenu != NULL) {
+    CurrentMenu->QuestionId = 0;
+  }
+
+  Selection->Action = UI_ACTION_EXIT;
   return TRUE;
 }
 
@@ -2039,17 +1246,17 @@ ProcessCallBackFunction (
         case EFI_BROWSER_ACTION_REQUEST_RESET:
           DiscardFormIsRequired = TRUE;
           gResetRequired = TRUE;
-          NeedExit              = TRUE;
+          Selection->Action = UI_ACTION_EXIT;
           break;
 
         case EFI_BROWSER_ACTION_REQUEST_SUBMIT:
           SubmitFormIsRequired = TRUE;
-          NeedExit              = TRUE;
+          Selection->Action = UI_ACTION_EXIT;
           break;
 
         case EFI_BROWSER_ACTION_REQUEST_EXIT:
           DiscardFormIsRequired = TRUE;
-          NeedExit              = TRUE;
+          Selection->Action = UI_ACTION_EXIT;
           break;
 
         case EFI_BROWSER_ACTION_REQUEST_FORM_SUBMIT_EXIT:
@@ -2060,7 +1267,7 @@ ProcessCallBackFunction (
 
         case EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD_EXIT:
           DiscardFormIsRequired = TRUE;
-          SettingLevel          = FormLevel;
+          SettingLevel          = FormLevel;      
           NeedExit              = TRUE;
           break;
 
@@ -2113,7 +1320,7 @@ ProcessCallBackFunction (
   }
 
   if (NeedExit) {
-    FindNextMenu (Selection, SettingLevel);
+    FindNextMenu (Selection, NULL, NULL);
   }
 
   return Status;
@@ -2193,7 +1400,9 @@ SetupBrowser (
   EFI_HANDLE                      NotifyHandle;
   FORM_BROWSER_STATEMENT          *Statement;
   EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
+  EFI_INPUT_KEY                   Key;
 
+  gMenuRefreshHead = NULL;
   ConfigAccess = Selection->FormSet->ConfigAccess;
 
   //
@@ -2214,17 +1423,21 @@ SetupBrowser (
   //
   // Initialize current settings of Questions in this FormSet
   //
-  InitializeCurrentSetting (Selection->FormSet);
+  Status = InitializeCurrentSetting (Selection->FormSet);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
 
   //
-  // Initilize Action field.
+  // Update gOldFormSet on maintain back up FormSet list.
+  // And, make gOldFormSet point to current FormSet. 
   //
-  Selection->Action = UI_ACTION_REFRESH_FORM;
-
-  //
-  // Clean the mCurFakeQestId value is formset refreshed.
-  //
-  mCurFakeQestId = 0;
+  if (gOldFormSet != NULL) {
+    RemoveEntryList (&gOldFormSet->Link);
+    DestroyFormSet (gOldFormSet);
+  }
+  gOldFormSet = Selection->FormSet;
+  InsertTailList (&gBrowserFormSetList, &gOldFormSet->Link);
 
   do {
     //
@@ -2267,7 +1480,10 @@ SetupBrowser (
         //
         // Form is suppressed. 
         //
-        gBrowserStatus = BROWSER_FORM_SUPPRESS;
+        do {
+          CreateDialog (4, TRUE, 0, NULL, &Key, gEmptyString, gFormSuppress, gPressEnter, gEmptyString);
+        } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+
         Status = EFI_NOT_FOUND;
         goto Done;
       }
@@ -2282,6 +1498,7 @@ SetupBrowser (
         ((Selection->Handle != mCurrentHiiHandle) ||
         (!CompareGuid (&Selection->FormSetGuid, &mCurrentFormSetGuid)) ||
         (Selection->FormId != mCurrentFormId))) {
+
       //
       // Keep current form information
       //
@@ -2294,6 +1511,12 @@ SetupBrowser (
         goto Done;
       }
 
+      //
+      // EXIT requests to close form.
+      //
+      if (Selection->Action == UI_ACTION_EXIT) {
+        goto Done;
+      }
       //
       // IFR is updated during callback of open form, force to reparse the IFR binary
       //
@@ -2313,6 +1536,12 @@ SetupBrowser (
     }
 
     //
+    // EXIT requests to close form.
+    //
+    if (Selection->Action == UI_ACTION_EXIT) {
+      goto Done;
+    }
+    //
     // IFR is updated during callback of read value, force to reparse the IFR binary
     //
     if (mHiiPackageListUpdated) {
@@ -2322,9 +1551,14 @@ SetupBrowser (
     }
 
     //
+    // Displays the Header and Footer borders
+    //
+    DisplayPageFrame (Selection);
+
+    //
     // Display form
     //
-    Status = DisplayForm ();
+    Status = DisplayForm (Selection);
     if (EFI_ERROR (Status)) {
       goto Done;
     }
@@ -2334,16 +1568,20 @@ SetupBrowser (
     //
     Statement = Selection->Statement;
     if (Statement != NULL) {
+      if ((Statement->QuestionFlags & EFI_IFR_FLAG_RESET_REQUIRED) == EFI_IFR_FLAG_RESET_REQUIRED) {
+        gResetRequired = TRUE;
+      }
+
       if ((ConfigAccess != NULL) && 
           ((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) == EFI_IFR_FLAG_CALLBACK) && 
           (Statement->Operand != EFI_IFR_PASSWORD_OP)) {
-        Status = ProcessCallBackFunction(Selection, Statement, EFI_BROWSER_ACTION_CHANGING, FALSE);
-        if (Statement->Operand == EFI_IFR_REF_OP) {
+        Status = ProcessCallBackFunction(Selection, Statement, EFI_BROWSER_ACTION_CHANGING, FALSE);         
+        if (Statement->Operand == EFI_IFR_REF_OP && Selection->Action != UI_ACTION_EXIT) {
           //
           // Process dynamic update ref opcode.
           //
           if (!EFI_ERROR (Status)) {
-            Status = ProcessGotoOpCode(Statement, Selection);
+            Status = ProcessGotoOpCode(Statement, Selection, NULL, NULL);
           }
           
           //
@@ -2362,27 +1600,6 @@ SetupBrowser (
           ProcessCallBackFunction(Selection, Statement, EFI_BROWSER_ACTION_CHANGED, FALSE);
         }
       }
-    }
-
-    //
-    // Check whether Exit flag is TRUE.
-    //
-    if (gExitRequired) {
-      switch (gBrowserSettingScope) {
-      case SystemLevel:
-        Selection->Action = UI_ACTION_EXIT;
-        break;
-
-      case FormSetLevel:
-      case FormLevel:
-        FindNextMenu (Selection, gBrowserSettingScope);
-        break;
-
-      default:
-        break;
-      }
-
-      gExitRequired = FALSE;
     }
 
     //

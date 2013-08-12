@@ -19,7 +19,7 @@
   BASE_NAME                      = SetupBrowser
   FILE_GUID                      = EBf342FE-B1D3-4EF8-957C-8048606FF671
   MODULE_TYPE                    = DXE_DRIVER
-  VERSION_STRING                 = 2.0
+  VERSION_STRING                 = 1.0
   ENTRY_POINT                    = InitializeSetup
 
 #
@@ -29,12 +29,19 @@
 #
 
 [Sources]
+  SetupBrowserStr.uni
   Setup.c
   Setup.h
   IfrParse.c
   Expression.c
+  InputHandler.c
+  Print.c
   Presentation.c
-  Expression.h
+  ProcessOptions.c
+  Ui.c
+  Ui.h
+  Colors.h
+
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -52,27 +59,34 @@
   HiiLib
   DevicePathLib
   PcdLib
-  UefiLib
 
 [Guids]
+  gEfiIfrTianoGuid                              ## CONSUMES  ## GUID
   gEfiIfrFrameworkGuid                          ## CONSUMES  ## GUID
   gEfiHiiPlatformSetupFormsetGuid
   gEfiHiiStandardFormGuid                       ## SOMETIMES_CONSUMES ## GUID
 
 [Protocols]
   gEfiHiiConfigAccessProtocolGuid               ## CONSUMES
+  gEfiHiiStringProtocolGuid                     ## CONSUMES
   gEfiFormBrowser2ProtocolGuid                  ## PRODUCES
-  gEdkiiFormBrowserEx2ProtocolGuid              ## PRODUCES
+  gEfiFormBrowserExProtocolGuid                 ## PRODUCES
   gEfiHiiConfigRoutingProtocolGuid              ## CONSUMES
   gEfiHiiDatabaseProtocolGuid                   ## CONSUMES
   gEfiUnicodeCollation2ProtocolGuid             ## CONSUMES
   gEfiUserManagerProtocolGuid                   ## SOMETIMES_CONSUMES
   gEfiDevicePathFromTextProtocolGuid            ## SOMETIMES_CONSUMES
-  gEdkiiFormDisplayEngineProtocolGuid           ## PRODUCE
-  gEfiFormBrowserExProtocolGuid                 ## PRODUCE
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport          ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBrowserGrayOutTextStatement            ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBrowerGrayOutReadOnlyMenu              ## CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBrowserSubtitleTextColor               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBrowserFieldTextColor                  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBrowserFieldTextHighlightColor         ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBrowserFieldBackgroundHighlightColor   ## CONSUMES
 
 [Depex]
   gEfiHiiDatabaseProtocolGuid AND gEfiHiiConfigRoutingProtocolGuid

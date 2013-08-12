@@ -787,7 +787,7 @@ FORM_BROWSER_FORM *
 IdToForm (
   IN FORM_BROWSER_FORMSET  *FormSet,
   IN UINT16                FormId
-  )
+)
 {
   LIST_ENTRY         *Link;
   FORM_BROWSER_FORM  *Form;
@@ -2105,7 +2105,7 @@ GetQuestionValueFromForm (
   //
   FormSet = AllocateZeroPool (sizeof (FORM_BROWSER_FORMSET));
   ASSERT (FormSet != NULL);
-  Status = InitializeFormSet(HiiHandle, FormSetGuid, FormSet);
+  Status = InitializeFormSet(HiiHandle, FormSetGuid, FormSet, FALSE);
   if (EFI_ERROR (Status)) {
     GetTheVal = FALSE;
     goto Done;
@@ -2800,7 +2800,7 @@ EvaluateExpression (
             for (Index = 0; Index < OpCode->ValueWidth; Index ++, TempBuffer --) {
               StrPtr += UnicodeValueToString (StrPtr, PREFIX_ZERO | RADIX_HEX, *TempBuffer, 2);
             }
-            Status = SetValueByName (OpCode->VarStorage, OpCode->ValueName, NameValue, GetSetValueWithEditBuffer, NULL);
+            Status = SetValueByName (OpCode->VarStorage, OpCode->ValueName, NameValue, GetSetValueWithEditBuffer);
             FreePool (NameValue);
             if (!EFI_ERROR (Status)) {
               Data1.Value.b = TRUE;
