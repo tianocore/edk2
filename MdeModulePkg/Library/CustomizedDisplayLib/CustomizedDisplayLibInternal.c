@@ -130,20 +130,35 @@ PrintBannerInfo (
 }
 
 /**
+  Print framework and form title for a page.
 
-  Print framework for a page.
-  
+  @param[in]  FormData             Form Data to be shown in Page
 **/
 VOID
 PrintFramework (
-  VOID
+  IN FORM_DISPLAY_ENGINE_FORM       *FormData
   )
 {
   UINTN                  Index;
   CHAR16                 Character;
   CHAR16                 *Buffer;
   UINTN                  Row;
+  CHAR16                 *TitleStr;
 
+  if (gClassOfVfr != FORMSET_CLASS_PLATFORM_SETUP) {
+    //
+    // Only Setup page needs Framework
+    //
+    ClearLines (
+      gScreenDimensions.LeftColumn,
+      gScreenDimensions.RightColumn,
+      gScreenDimensions.BottomRow - STATUS_BAR_HEIGHT - gFooterHeight,
+      gScreenDimensions.BottomRow - STATUS_BAR_HEIGHT - 1,
+      KEYHELP_TEXT | KEYHELP_BACKGROUND
+      );
+    return;
+  }
+    
   Buffer = AllocateZeroPool (0x10000);
   ASSERT (Buffer != NULL);
   Character = BOXDRAW_HORIZONTAL;
@@ -151,108 +166,30 @@ PrintFramework (
     Buffer[Index] = Character;
   }
 
-  ClearLines (
-    gScreenDimensions.LeftColumn,
-    gScreenDimensions.RightColumn,
-    gScreenDimensions.BottomRow - STATUS_BAR_HEIGHT - gFooterHeight,
-    gScreenDimensions.BottomRow - STATUS_BAR_HEIGHT - 1,
-    KEYHELP_TEXT | KEYHELP_BACKGROUND
-    );
-
-  if ((gClassOfVfr & FORMSET_CLASS_PLATFORM_SETUP) == FORMSET_CLASS_PLATFORM_SETUP) {
-    ClearLines (
-      gScreenDimensions.LeftColumn,
-      gScreenDimensions.RightColumn,
-      gScreenDimensions.TopRow,
-      gScreenDimensions.TopRow + NONE_FRONT_PAGE_HEADER_HEIGHT - 1,
-      TITLE_TEXT | TITLE_BACKGROUND
-      );
-    //
-    // Print Top border line
-    // +------------------------------------------------------------------------------+
-    // ?                                                                             ?
-    // +------------------------------------------------------------------------------+
-    //
-    Character = BOXDRAW_DOWN_RIGHT;
-
-    PrintCharAt ((UINTN) -1, (UINTN) -1, Character);
-    PrintStringAt ((UINTN) -1, (UINTN) -1, Buffer);
-
-    Character = BOXDRAW_DOWN_LEFT;
-    PrintCharAt ((UINTN) -1, (UINTN) -1, Character);
-
-    Character = BOXDRAW_VERTICAL;
-    for (Row = gScreenDimensions.TopRow + 1; Row <= gScreenDimensions.TopRow + NONE_FRONT_PAGE_HEADER_HEIGHT - 2; Row++) {
-      PrintCharAt (gScreenDimensions.LeftColumn, Row, Character);
-      PrintCharAt (gScreenDimensions.RightColumn - 1, Row, Character);
-    }
-
-    Character = BOXDRAW_UP_RIGHT;
-    PrintCharAt (gScreenDimensions.LeftColumn, gScreenDimensions.TopRow + NONE_FRONT_PAGE_HEADER_HEIGHT - 1, Character);
-    PrintStringAt ((UINTN) -1, (UINTN) -1, Buffer);
-
-    Character = BOXDRAW_UP_LEFT;
-    PrintCharAt ((UINTN) -1, (UINTN) -1, Character);
-
-    //
-    // Print Bottom border line
-    // +------------------------------------------------------------------------------+
-    // ?                                                                             ?
-    // +------------------------------------------------------------------------------+
-    //
-    Character = BOXDRAW_DOWN_RIGHT;
-    PrintCharAt (gScreenDimensions.LeftColumn, gScreenDimensions.BottomRow - STATUS_BAR_HEIGHT - gFooterHeight, Character);
-
-    PrintStringAt ((UINTN) -1, (UINTN) -1, Buffer);
-
-    Character = BOXDRAW_DOWN_LEFT;
-    PrintCharAt ((UINTN) -1, (UINTN) -1, Character);
-    Character = BOXDRAW_VERTICAL;
-    for (Row = gScreenDimensions.BottomRow - STATUS_BAR_HEIGHT - gFooterHeight + 1;
-         Row <= gScreenDimensions.BottomRow - STATUS_BAR_HEIGHT - 2;
-         Row++
-        ) {
-      PrintCharAt (gScreenDimensions.LeftColumn, Row, Character);
-      PrintCharAt (gScreenDimensions.RightColumn - 1, Row, Character);
-    }
-
-    Character = BOXDRAW_UP_RIGHT;
-    PrintCharAt (gScreenDimensions.LeftColumn, gScreenDimensions.BottomRow - STATUS_BAR_HEIGHT - 1, Character);
-
-    PrintStringAt ((UINTN) -1, (UINTN) -1, Buffer);
-
-    Character = BOXDRAW_UP_LEFT;
-    PrintCharAt ((UINTN) -1, (UINTN) -1, Character);
-  }
-  
-  FreePool (Buffer);
-}
-
-/**
-  Print the form title.
-
-  @param[in]  FormData             Form Data to be shown in Page
-
-**/
-VOID
-PrintFormTitle (
-  IN FORM_DISPLAY_ENGINE_FORM       *FormData
-  )
-{
-  CHAR16                 *TitleStr;
-
-  if ((gClassOfVfr & FORMSET_CLASS_PLATFORM_SETUP) != FORMSET_CLASS_PLATFORM_SETUP) {  
-    //
-    // Only Setup Page need Title.
-    //
-    return;
-  }
-  
-  TitleStr = LibGetToken (FormData->FormTitle, FormData->HiiHandle);
-  ASSERT (TitleStr != NULL);
-  
+  //
+  // Print Top border line
+  // +------------------------------------------------------------------------------+
+  // ?                                                                             ?
+  // +------------------------------------------------------------------------------+
+  //
   gST->ConOut->SetAttribute (gST->ConOut, TITLE_TEXT | TITLE_BACKGROUND);
+  Character = BOXDRAW_DOWN_RIGHT;
 
+  PrintCharAt (gScreenDimensions.LeftColumn, gScreenDimensions.TopRow, Character);
+  PrintStringAt ((UINTN) -1, (UINTN) -1, Buffer);
+
+  Character = BOXDRAW_DOWN_LEFT;
+  PrintCharAt ((UINTN) -1, (UINTN) -1, Character);
+
+  Character = BOXDRAW_VERTICAL;
+  for (Row = gScreenDimensions.TopRow + 1; Row <= gScreenDimensions.TopRow + NONE_FRONT_PAGE_HEADER_HEIGHT - 2; Row++) {
+    PrintCharAt (gScreenDimensions.LeftColumn, Row, Character);
+    PrintCharAt (gScreenDimensions.RightColumn - 1, Row, Character);
+  }
+  
+  //
+  // Print Form Title
+  //
   ClearLines (
     gScreenDimensions.LeftColumn + 1,
     gScreenDimensions.RightColumn - 1,
@@ -261,13 +198,53 @@ PrintFormTitle (
     TITLE_TEXT | TITLE_BACKGROUND
     );
 
+  TitleStr = LibGetToken (FormData->FormTitle, FormData->HiiHandle);
+  ASSERT (TitleStr != NULL);
   PrintStringAt (
     (gScreenDimensions.RightColumn + gScreenDimensions.LeftColumn - LibGetStringWidth (TitleStr) / 2) / 2,
     gScreenDimensions.TopRow + 1,
     TitleStr
     );
-
   FreePool (TitleStr);
+
+  Character = BOXDRAW_UP_RIGHT;
+  PrintCharAt (gScreenDimensions.LeftColumn, gScreenDimensions.TopRow + NONE_FRONT_PAGE_HEADER_HEIGHT - 1, Character);
+  PrintStringAt ((UINTN) -1, (UINTN) -1, Buffer);
+
+  Character = BOXDRAW_UP_LEFT;
+  PrintCharAt ((UINTN) -1, (UINTN) -1, Character);
+
+  //
+  // Print Bottom border line
+  // +------------------------------------------------------------------------------+
+  // ?                                                                             ?
+  // +------------------------------------------------------------------------------+
+  //
+  Character = BOXDRAW_DOWN_RIGHT;
+  PrintCharAt (gScreenDimensions.LeftColumn, gScreenDimensions.BottomRow - STATUS_BAR_HEIGHT - gFooterHeight, Character);
+
+  PrintStringAt ((UINTN) -1, (UINTN) -1, Buffer);
+
+  Character = BOXDRAW_DOWN_LEFT;
+  PrintCharAt ((UINTN) -1, (UINTN) -1, Character);
+  Character = BOXDRAW_VERTICAL;
+  for (Row = gScreenDimensions.BottomRow - STATUS_BAR_HEIGHT - gFooterHeight + 1;
+       Row <= gScreenDimensions.BottomRow - STATUS_BAR_HEIGHT - 2;
+       Row++
+      ) {
+    PrintCharAt (gScreenDimensions.LeftColumn, Row, Character);
+    PrintCharAt (gScreenDimensions.RightColumn - 1, Row, Character);
+  }
+
+  Character = BOXDRAW_UP_RIGHT;
+  PrintCharAt (gScreenDimensions.LeftColumn, gScreenDimensions.BottomRow - STATUS_BAR_HEIGHT - 1, Character);
+
+  PrintStringAt ((UINTN) -1, (UINTN) -1, Buffer);
+
+  Character = BOXDRAW_UP_LEFT;
+  PrintCharAt ((UINTN) -1, (UINTN) -1, Character);
+  
+  FreePool (Buffer);
 }
 
 /**
@@ -300,7 +277,7 @@ ProcessUserOpcode(
           //
           // Only in front page form set, we care about the banner data.
           //
-          if ((gClassOfVfr & FORMSET_CLASS_FRONT_PAGE) == FORMSET_CLASS_FRONT_PAGE) {
+          if (gClassOfVfr == FORMSET_CLASS_FRONT_PAGE) {
             //
             // Initialize Driver private data
             //

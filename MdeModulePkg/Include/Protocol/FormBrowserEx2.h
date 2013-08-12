@@ -2,7 +2,7 @@
   Extension Form Browser Protocol provides the services that can be used to 
   register the different hot keys for the standard Browser actions described in UEFI specification.
 
-Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -62,8 +62,8 @@ typedef struct {
 
   EFI_HII_HANDLE  HiiHandle;
   EFI_GUID        FormSetGuid;
-  UINT16          FormId;
-  UINT16          QuestionId;
+  EFI_FORM_ID     FormId;
+  EFI_QUESTION_ID QuestionId;
 } FORM_ENTRY_INFO;
 
 #define FORM_ENTRY_INFO_FROM_LINK(a)  CR (a, FORM_ENTRY_INFO, Link, FORM_ENTRY_INFO_SIGNATURE)

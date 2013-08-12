@@ -554,6 +554,15 @@ FormDisplay (
   );
 
 /**
+  Clear Screen to the initial state.
+**/
+VOID
+EFIAPI 
+DriverClearDisplayPage (
+  VOID
+  );
+
+/**
   Exit Display and Clear Screen to the original state.
 
 **/

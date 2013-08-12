@@ -32,7 +32,6 @@
   FormDisplayStr.uni
   FormDisplay.c
   FormDisplay.h
-  Print.c
   ProcessOptions.c
   InputHandler.c
   
@@ -64,7 +63,4 @@
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdBrowserGrayOutTextStatement            ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdBrowerGrayOutReadOnlyMenu              ## CONSUMES
-
-[BuildOptions] 
-  MSFT:*_*_*_CC_FLAGS     = /Od 
 

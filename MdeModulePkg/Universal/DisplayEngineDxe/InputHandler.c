@@ -1045,16 +1045,16 @@ IsValuesEqual (
   switch (Type) {
   case EFI_IFR_TYPE_BOOLEAN:
   case EFI_IFR_TYPE_NUM_SIZE_8:
-    return Value1->u8 == Value2->u8;
+    return (BOOLEAN) (Value1->u8 == Value2->u8);
   
   case EFI_IFR_TYPE_NUM_SIZE_16:
-    return Value1->u16 == Value2->u16;
-
+    return (BOOLEAN) (Value1->u16 == Value2->u16);
+  
   case EFI_IFR_TYPE_NUM_SIZE_32:
-    return Value1->u32 == Value2->u32;
-
+    return (BOOLEAN) (Value1->u32 == Value2->u32);
+  
   case EFI_IFR_TYPE_NUM_SIZE_64:
-    return Value1->u64 == Value2->u64;
+    return (BOOLEAN) (Value1->u64 == Value2->u64);
 
   default:
     ASSERT (FALSE);

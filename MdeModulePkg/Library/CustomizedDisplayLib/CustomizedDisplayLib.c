@@ -18,7 +18,7 @@ EFI_GUID          gCustomizedDisplayLibGuid = { 0x99fdc8fd, 0x849b, 0x4eba, { 0x
 
 EFI_HII_HANDLE    mCDLStringPackHandle;
 UINT16            gClassOfVfr;                 // Formset class information
-UINT16            gLastClassOfVfr = 0;
+BOOLEAN           gLibIsFirstForm = TRUE;
 BANNER_DATA       *gBannerData;
 
 UINTN             gFooterHeight;
@@ -37,8 +37,8 @@ Statement
 
 
 +------------------------------------------------------------------------------+
-| F1=Scroll Help                 F9=Reset to Defaults        F10=Save and Exit |
-| ^"=Move Highlight          <Spacebar> Toggles Checkbox   Esc=Discard Changes |
+|                                F9=Reset to Defaults        F10=Save          |
+| ^"=Move Highlight          <Spacebar> Toggles Checkbox     Esc=Exit          |
 +------------------------------------------------------------------------------+
   StatusBar
 **/
@@ -74,9 +74,6 @@ DisplayPageFrame (
   }
 
   gClassOfVfr = FORMSET_CLASS_PLATFORM_SETUP;
-  if ((FormData->Attribute & HII_DISPLAY_MODAL) != 0) {
-    gClassOfVfr = FORMSET_CLASS_MODEL_PAGE;
-  }
 
   ProcessExternedOpcode(FormData);
 
@@ -84,7 +81,7 @@ DisplayPageFrame (
   // Calculate the ScreenForStatement.
   //
   ScreenForStatement->BottomRow   = gScreenDimensions.BottomRow - STATUS_BAR_HEIGHT - gFooterHeight;
-  if ((gClassOfVfr & FORMSET_CLASS_FRONT_PAGE) == FORMSET_CLASS_FRONT_PAGE) {
+  if (gClassOfVfr == FORMSET_CLASS_FRONT_PAGE) {
     ScreenForStatement->TopRow    = gScreenDimensions.TopRow + FRONT_PAGE_HEADER_HEIGHT;
   } else {
     ScreenForStatement->TopRow    = gScreenDimensions.TopRow + NONE_FRONT_PAGE_HEADER_HEIGHT;
@@ -92,41 +89,29 @@ DisplayPageFrame (
   ScreenForStatement->LeftColumn  = gScreenDimensions.LeftColumn;
   ScreenForStatement->RightColumn = gScreenDimensions.RightColumn;
 
-  //
-  // If Last Vfr Class is same to current Vfr Class, 
-  // they will have the same page frame. So, Page Frame is not required to be repainted.
-  //
-  if (gLastClassOfVfr == gClassOfVfr) {
-    UpdateStatusBar(NV_UPDATE_REQUIRED, FormData->SettingChangedFlag);
-    PrintFormTitle(FormData);
-    return EFI_SUCCESS;
+  if ((gLibIsFirstForm) || ((FormData->Attribute & HII_DISPLAY_MODAL) != 0)) {
+    //
+    // Ensure we are in Text mode
+    //
+    gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
+    ClearLines (0, gScreenDimensions.RightColumn, 0, gScreenDimensions.BottomRow, KEYHELP_BACKGROUND);
+    gLibIsFirstForm = FALSE;
   }
 
   //
-  // Record last ClassOfVfr and Streen Information.
+  // Don't print frame for modal form.
   //
-  gLastClassOfVfr = gClassOfVfr;
-
-  //
-  // Ensure we are in Text mode
-  //
-  gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
-
-  ClearLines (0, gScreenDimensions.RightColumn, 0, gScreenDimensions.BottomRow, KEYHELP_BACKGROUND);
-
   if ((FormData->Attribute & HII_DISPLAY_MODAL) != 0) {
     return EFI_SUCCESS;
   }
 
-  if ((gClassOfVfr & FORMSET_CLASS_FRONT_PAGE) == FORMSET_CLASS_FRONT_PAGE) {
+  if (gClassOfVfr == FORMSET_CLASS_FRONT_PAGE) {
     PrintBannerInfo (FormData);
   }
 
-  PrintFramework ();
+  PrintFramework (FormData);
 
   UpdateStatusBar(NV_UPDATE_REQUIRED, FormData->SettingChangedFlag);
-
-  PrintFormTitle(FormData);
 
   return EFI_SUCCESS;
 }
@@ -213,7 +198,7 @@ RefreshKeyHelp (
     if (!Selected) {
         PrintHotKeyHelpString (FormData);
 
-      if ((gClassOfVfr & FORMSET_CLASS_PLATFORM_SETUP) == FORMSET_CLASS_PLATFORM_SETUP) {
+      if (gClassOfVfr == FORMSET_CLASS_PLATFORM_SETUP) {
         PrintStringAt (ThdCol, BottomRowOfHelp, gEscapeString);
       }
 
@@ -269,7 +254,7 @@ RefreshKeyHelp (
   case EFI_IFR_CHECKBOX_OP:
     PrintHotKeyHelpString (FormData);
 
-    if ((gClassOfVfr & FORMSET_CLASS_PLATFORM_SETUP) == FORMSET_CLASS_PLATFORM_SETUP) {
+    if (gClassOfVfr == FORMSET_CLASS_PLATFORM_SETUP) {
       PrintStringAt (ThdCol, BottomRowOfHelp, gEscapeString);
     }
 
@@ -287,7 +272,7 @@ RefreshKeyHelp (
      if (!Selected) {
       PrintHotKeyHelpString (FormData);
 
-      if ((gClassOfVfr & FORMSET_CLASS_PLATFORM_SETUP) == FORMSET_CLASS_PLATFORM_SETUP) {
+      if (gClassOfVfr == FORMSET_CLASS_PLATFORM_SETUP) {
         PrintStringAt (ThdCol, BottomRowOfHelp, gEscapeString);
       }
 
@@ -584,7 +569,7 @@ FormExitPolicy (
   VOID
   )
 {
-  return (gClassOfVfr & FORMSET_CLASS_FRONT_PAGE) == FORMSET_CLASS_FRONT_PAGE ? FALSE : TRUE;
+  return gClassOfVfr == FORMSET_CLASS_FRONT_PAGE ? FALSE : TRUE;
 }
 
 /**
@@ -883,7 +868,7 @@ ClearDisplayPage (
 {
   gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
   gST->ConOut->ClearScreen (gST->ConOut);
-  gLastClassOfVfr = 0;
+  gLibIsFirstForm = TRUE;
 }
 
 /**

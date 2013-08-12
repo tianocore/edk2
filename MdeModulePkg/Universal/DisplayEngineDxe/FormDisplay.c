@@ -97,9 +97,9 @@ EFI_GUID  gDisplayEngineGuid = {
   0xE38C1029, 0xE38F, 0x45b9, {0x8F, 0x0D, 0xE2, 0xE6, 0x0B, 0xC9, 0xB2, 0x62}
 };
 
+FORM_ENTRY_INFO               gFormEntryInfo;
 UINTN                         gSequence;
 EFI_SCREEN_DESCRIPTOR         gStatementDimensions;
-EFI_SCREEN_DESCRIPTOR         gOldStatementDimensions = {0};
 BOOLEAN                       mStatementLayoutIsChanged = TRUE;
 USER_INPUT                    *gUserInput;
 FORM_DISPLAY_ENGINE_FORM      *gFormData;
@@ -107,6 +107,8 @@ EFI_HII_HANDLE                gHiiHandle;
 UINT16                        gDirection;
 LIST_ENTRY                    gMenuOption;
 DISPLAY_HIGHLIGHT_MENU_INFO   gHighligthMenuInfo = {0};
+BOOLEAN                       mIsFirstForm = TRUE;
+FORM_ENTRY_INFO               gOldFormEntry = {0};
 
 //
 // Browser Global Strings
@@ -138,7 +140,7 @@ FORM_DISPLAY_DRIVER_PRIVATE_DATA  mPrivateData = {
   NULL,
   {
     FormDisplay,
-    ClearDisplayPage,
+    DriverClearDisplayPage,
     ConfirmDataChange
   }
 };
@@ -2978,6 +2980,7 @@ UiDisplayMenu (
       break;
 
     case CfExit:
+      gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
       if (HelpString != NULL) {
         FreePool (HelpString);
       }
@@ -3096,16 +3099,65 @@ FormDisplay (
     return Status;
   }
 
-  if (CompareMem (&gOldStatementDimensions, &gStatementDimensions, sizeof (gStatementDimensions)) == 0) {
-    mStatementLayoutIsChanged = FALSE;
-  } else {
+  //
+  // Check whether layout is changed.
+  //
+  if (mIsFirstForm 
+      || (gOldFormEntry.HiiHandle != FormData->HiiHandle)
+      || (!CompareGuid (&gOldFormEntry.FormSetGuid, &FormData->FormSetGuid))
+      || (gOldFormEntry.FormId != FormData->FormId)) {
     mStatementLayoutIsChanged = TRUE;
-    CopyMem (&gOldStatementDimensions, &gStatementDimensions, sizeof (gStatementDimensions));
+  } else {
+    mStatementLayoutIsChanged = FALSE;
   }
 
   Status = UiDisplayMenu(FormData);
+  
+  //
+  // Backup last form info.
+  //
+  mIsFirstForm            = FALSE;
+  gOldFormEntry.HiiHandle = FormData->HiiHandle;
+  CopyGuid (&gOldFormEntry.FormSetGuid, &FormData->FormSetGuid);
+  gOldFormEntry.FormId    = FormData->FormId;
 
   return Status;
+}
+
+/**
+  Clear Screen to the initial state.
+**/
+VOID
+EFIAPI 
+DriverClearDisplayPage (
+  VOID
+  )
+{
+  ClearDisplayPage ();
+  mIsFirstForm = TRUE;
+}
+
+/**
+  Set Buffer to Value for Size bytes.
+
+  @param  Buffer                 Memory to set.
+  @param  Size                   Number of bytes to set
+  @param  Value                  Value of the set operation.
+
+**/
+VOID
+SetUnicodeMem (
+  IN VOID   *Buffer,
+  IN UINTN  Size,
+  IN CHAR16 Value
+  )
+{
+  CHAR16  *Ptr;
+
+  Ptr = Buffer;
+  while ((Size--)  != 0) {
+    *(Ptr++) = Value;
+  }
 }
 
 /**
@@ -3153,6 +3205,9 @@ InitializeDisplayEngine (
   ASSERT_EFI_ERROR (Status);
 
   InitializeDisplayStrings();
+  
+  ZeroMem (&gHighligthMenuInfo, sizeof (gHighligthMenuInfo));
+  ZeroMem (&gOldFormEntry, sizeof (gOldFormEntry));
 
   //
   // Use BrowserEx2 protocol to register HotKey.

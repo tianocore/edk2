@@ -77,6 +77,4 @@
 [Depex]
   gEfiHiiDatabaseProtocolGuid AND gEfiHiiConfigRoutingProtocolGuid
 
-[BuildOptions] 
-  MSFT:*_*_*_CC_FLAGS     = /Od 
 

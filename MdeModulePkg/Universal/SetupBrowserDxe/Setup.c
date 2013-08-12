@@ -46,7 +46,7 @@ UINTN           gBrowserContextCount = 0;
 LIST_ENTRY      gBrowserContextList = INITIALIZE_LIST_HEAD_VARIABLE (gBrowserContextList);
 LIST_ENTRY      gBrowserFormSetList = INITIALIZE_LIST_HEAD_VARIABLE (gBrowserFormSetList);
 LIST_ENTRY      gBrowserHotKeyList  = INITIALIZE_LIST_HEAD_VARIABLE (gBrowserHotKeyList);
-LIST_ENTRY      gBrowserStorageList  = INITIALIZE_LIST_HEAD_VARIABLE (gBrowserStorageList);
+LIST_ENTRY      gBrowserStorageList = INITIALIZE_LIST_HEAD_VARIABLE (gBrowserStorageList);
 
 BOOLEAN               gResetRequired;
 BOOLEAN               gExitRequired;
@@ -58,17 +58,15 @@ EXIT_HANDLER          ExitHandlerFunction = NULL;
 // Browser Global Strings
 //
 CHAR16            *gEmptyString;
-
 CHAR16            *mUnknownString = L"!";
 
 EFI_GUID  gZeroGuid = {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
-EFI_GUID  gSetupBrowserGuid = {
-  0xab368524, 0xb60c, 0x495b, {0xa0, 0x9, 0x12, 0xe8, 0x5b, 0x1a, 0xea, 0x32}
-};
 
-FORM_BROWSER_FORMSET  *gOldFormSet = NULL;
-extern UINT32   gBrowserStatus;
-extern CHAR16   *gErrorInfo;
+extern UINT32          gBrowserStatus;
+extern CHAR16          *gErrorInfo;
+extern EFI_GUID        mCurrentFormSetGuid;
+extern EFI_HII_HANDLE  mCurrentHiiHandle;
+extern UINT16          mCurrentFormId;
 extern FORM_DISPLAY_ENGINE_FORM gDisplayFormData;
 
 /**
@@ -4612,11 +4610,6 @@ SaveBrowserContext (
     return;
   }
 
-  //
-  // Not support SendForm nest in another SendForm, assert here.
-  //
-  ASSERT (FALSE);
-
   Context = AllocatePool (sizeof (BROWSER_CONTEXT));
   ASSERT (Context != NULL);
 
@@ -4625,9 +4618,12 @@ SaveBrowserContext (
   //
   // Save FormBrowser context
   //
+  Context->Selection            = gCurrentSelection;
   Context->ResetRequired        = gResetRequired;
   Context->ExitRequired         = gExitRequired;
   Context->HiiHandle            = mCurrentHiiHandle;
+  Context->FormId               = mCurrentFormId;
+  CopyGuid (&Context->FormSetGuid, &mCurrentFormSetGuid);
 
   //
   // Save the menu history data.
@@ -4677,9 +4673,12 @@ RestoreBrowserContext (
   //
   // Restore FormBrowser context
   //
+  gCurrentSelection     = Context->Selection;
   gResetRequired        = Context->ResetRequired;
   gExitRequired         = Context->ExitRequired;
   mCurrentHiiHandle     = Context->HiiHandle;
+  mCurrentFormId        = Context->FormId;
+  CopyGuid (&mCurrentFormSetGuid, &Context->FormSetGuid);
 
   //
   // Restore the menu history data.

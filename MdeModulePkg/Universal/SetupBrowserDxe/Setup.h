@@ -449,23 +449,6 @@ typedef struct {
 
 #define FORM_BROWSER_REFRESH_EVENT_FROM_LINK(a) BASE_CR (a, FORM_BROWSER_REFRESH_EVENT_NODE, Link)
 
-#define BROWSER_CONTEXT_SIGNATURE  SIGNATURE_32 ('B', 'C', 'T', 'X')
-
-typedef struct {
-  UINTN                 Signature;
-  LIST_ENTRY            Link;
-
-  //
-  // Globals defined in Setup.c
-  //
-  BOOLEAN                  ResetRequired;
-  BOOLEAN                  ExitRequired;
-  EFI_HII_HANDLE           HiiHandle;
-
-  LIST_ENTRY           FormHistoryList;
-} BROWSER_CONTEXT;
-
-#define BROWSER_CONTEXT_FROM_LINK(a)  CR (a, BROWSER_CONTEXT, Link, BROWSER_CONTEXT_SIGNATURE)
 
 typedef struct {
   EFI_HII_HANDLE  Handle;
@@ -507,6 +490,27 @@ typedef struct {
   FORM_ENTRY_INFO            *CurrentMenu;
 } UI_MENU_SELECTION;
 
+#define BROWSER_CONTEXT_SIGNATURE  SIGNATURE_32 ('B', 'C', 'T', 'X')
+
+typedef struct {
+  UINTN                 Signature;
+  LIST_ENTRY            Link;
+
+  //
+  // Globals defined in Setup.c
+  //
+  BOOLEAN                  ResetRequired;
+  BOOLEAN                  ExitRequired;
+  EFI_HII_HANDLE           HiiHandle;
+  EFI_GUID                 FormSetGuid;
+  EFI_FORM_ID              FormId;
+  UI_MENU_SELECTION        *Selection;
+
+  LIST_ENTRY           FormHistoryList;
+} BROWSER_CONTEXT;
+
+#define BROWSER_CONTEXT_FROM_LINK(a)  CR (a, BROWSER_CONTEXT, Link, BROWSER_CONTEXT_SIGNATURE)
+
 //
 // Scope for get defaut value. It may be GetDefaultForNoStorage, GetDefaultForStorage or GetDefaultForAll.
 //
@@ -535,7 +539,6 @@ extern EDKII_FORM_DISPLAY_ENGINE_PROTOCOL *mFormDisplay;
 extern BOOLEAN               gResetRequired;
 extern BOOLEAN               gExitRequired;
 
-extern FORM_BROWSER_FORMSET  *gOldFormSet;
 extern LIST_ENTRY            gBrowserFormSetList;
 extern LIST_ENTRY            gBrowserHotKeyList;
 extern BROWSER_SETTING_SCOPE gBrowserSettingScope;

@@ -57,7 +57,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define FORMSET_CLASS_PLATFORM_SETUP         0x0001
 #define FORMSET_CLASS_FRONT_PAGE             0x0002
-#define FORMSET_CLASS_MODEL_PAGE             0x0004
 
 
 #define FRONT_PAGE_HEADER_HEIGHT      6
@@ -130,23 +129,12 @@ PrintBannerInfo (
   );
 
 /**
+  Print framework and form title for a page.
 
-  Print framework for a page.
-  
+  @param[in]  FormData             Form Data to be shown in Page
 **/
 VOID
 PrintFramework (
-  VOID
-  );
-  
-/**
-  Print the form title.
-
-  @param[in]  FormData             Form Data to be shown in Page
-
-**/
-VOID
-PrintFormTitle (
   IN FORM_DISPLAY_ENGINE_FORM       *FormData
   );
 

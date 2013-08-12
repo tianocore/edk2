@@ -19,7 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
 +------------------------------------------------------------------------------+
-?                                 Setup Page                                  ?
+|                                 Setup Page                                   |
 +------------------------------------------------------------------------------+
 
 Statement
@@ -31,8 +31,8 @@ Statement
 
 
 +------------------------------------------------------------------------------+
-?F1=Scroll Help                 F9=Reset to Defaults        F10=Save and Exit ?
-| ^"=Move Highlight          <Spacebar> Toggles Checkbox   Esc=Discard Changes |
+|                                F9=Reset to Defaults        F10=Save          |
+| ^"=Move Highlight          <Spacebar> Toggles Checkbox     Esc=Exit          |
 +------------------------------------------------------------------------------+
   StatusBar
 **/
