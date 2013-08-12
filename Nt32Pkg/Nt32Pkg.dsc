@@ -102,6 +102,7 @@
   DpcLib|MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
   OemHookStatusCodeLib|MdeModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
   GenericBdsLib|IntelFrameworkModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
+  CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
   SecurityManagementLib|MdeModulePkg/Library/DxeSecurityManagementLib/DxeSecurityManagementLib.inf
   TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
@@ -406,6 +407,7 @@
 
   IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
+  MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
   MdeModulePkg/Universal/PrintDxe/PrintDxe.inf
   MdeModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf {
