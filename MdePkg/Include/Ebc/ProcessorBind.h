@@ -4,7 +4,7 @@
   We currently only have one EBC compiler so there may be some Intel compiler
   specific functions in this file.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -102,6 +102,12 @@ typedef unsigned long         UINTN;
 /// Maximum legal EBC address
 ///
 #define MAX_ADDRESS   ((UINTN) ~0)
+
+///
+/// Maximum legal EBC INTN and UINTN values.
+///
+#define MAX_UINTN  ((UINTN) ~0)
+#define MAX_INTN   ((INTN)~MAX_BIT)
 
 ///
 /// The stack alignment required for EBC
