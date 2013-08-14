@@ -214,6 +214,9 @@
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
   MdeModulePkg/Bus/Usb/UsbMouseAbsolutePointerDxe/UsbMouseAbsolutePointerDxe.inf
   MdeModulePkg/Bus/Usb/UsbMouseDxe/UsbMouseDxe.inf
+  MdeModulePkg/Bus/I2c/I2cDxe/I2cBusDxe.inf
+  MdeModulePkg/Bus/I2c/I2cDxe/I2cHostDxe.inf
+  MdeModulePkg/Bus/I2c/I2cDxe/I2cDxe.inf
 
   MdeModulePkg/Core/Dxe/DxeMain.inf {
     <LibraryClasses>
