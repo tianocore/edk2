@@ -29,7 +29,6 @@ PciEnumerator (
   IN EFI_HANDLE                    Controller
   )
 {
-  EFI_HANDLE                                        Handle;
   EFI_HANDLE                                        HostBridgeHandle;
   EFI_STATUS                                        Status;
   EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL  *PciResAlloc;
@@ -134,9 +133,8 @@ PciEnumerator (
 
   gFullEnumeration = FALSE;
 
-  Handle = NULL;
   Status = gBS->InstallProtocolInterface (
-                  &Handle,
+                  &HostBridgeHandle,
                   &gEfiPciEnumerationCompleteProtocolGuid,
                   EFI_NATIVE_INTERFACE,
                   NULL
