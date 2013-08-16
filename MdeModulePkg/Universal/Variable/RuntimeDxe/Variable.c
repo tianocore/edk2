@@ -2275,9 +2275,9 @@ VariableServiceSetVariable (
   }
 
   //
-  // Not support authenticated variable write yet.
+  // Not support authenticated or append variable write yet.
   //
-  if ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) {
+  if ((Attributes & (EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS | EFI_VARIABLE_APPEND_WRITE)) != 0) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -2359,6 +2359,16 @@ VariableServiceSetVariable (
   if (!EFI_ERROR (Status)) {
     if (((Variable.CurrPtr->Attributes & EFI_VARIABLE_RUNTIME_ACCESS) == 0) && AtRuntime ()) {
       Status = EFI_WRITE_PROTECTED;
+      goto Done;
+    }
+    if (Attributes != 0 && Attributes != Variable.CurrPtr->Attributes) {
+      //
+      // If a preexisting variable is rewritten with different attributes, SetVariable() shall not
+      // modify the variable and shall return EFI_INVALID_PARAMETER. Two exceptions to this rule:
+      // 1. No access attributes specified
+      // 2. The only attribute differing is EFI_VARIABLE_APPEND_WRITE
+      //
+      Status = EFI_INVALID_PARAMETER;
       goto Done;
     }
   }

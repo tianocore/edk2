@@ -2831,6 +2831,16 @@ VariableServiceSetVariable (
       Status = EFI_WRITE_PROTECTED;
       goto Done;
     }
+    if (Attributes != 0 && (Attributes & (~EFI_VARIABLE_APPEND_WRITE)) != Variable.CurrPtr->Attributes) {
+      //
+      // If a preexisting variable is rewritten with different attributes, SetVariable() shall not
+      // modify the variable and shall return EFI_INVALID_PARAMETER. Two exceptions to this rule:
+      // 1. No access attributes specified
+      // 2. The only attribute differing is EFI_VARIABLE_APPEND_WRITE
+      //
+      Status = EFI_INVALID_PARAMETER;
+      goto Done;
+    }
   }
   
   //
