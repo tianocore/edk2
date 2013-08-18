@@ -373,6 +373,7 @@ EnrollPlatformKey (
   UINTN                           DataSize;
   EFI_SIGNATURE_LIST              *PkCert;
   UINT16*                         FilePostFix;
+  UINTN                           NameLength;
   
   if (Private->FileContext->FileName == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -383,7 +384,11 @@ EnrollPlatformKey (
   //
   // Parse the file's postfix. Only support DER encoded X.509 certificate files.
   //
-  FilePostFix = Private->FileContext->FileName + StrLen (Private->FileContext->FileName) - 4;
+  NameLength = StrLen (Private->FileContext->FileName);
+  if (NameLength <= 4) {
+    return EFI_INVALID_PARAMETER;
+  }
+  FilePostFix = Private->FileContext->FileName + NameLength - 4;
   if (!IsDerEncodeCertificate(FilePostFix)) {
     DEBUG ((EFI_D_ERROR, "Unsupported file type, only DER encoded certificate (%s) is supported.", mSupportX509Suffix));
     return EFI_INVALID_PARAMETER;
@@ -766,6 +771,7 @@ EnrollKeyExchangeKey (
   ) 
 {
   UINT16*     FilePostFix;
+  UINTN       NameLength;
   
   if ((Private->FileContext->FileName == NULL) || (Private->SignatureGUID == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -775,7 +781,11 @@ EnrollKeyExchangeKey (
   // Parse the file's postfix. Supports DER-encoded X509 certificate, 
   // and .pbk as RSA public key file.
   //
-  FilePostFix = Private->FileContext->FileName + StrLen (Private->FileContext->FileName) - 4;
+  NameLength = StrLen (Private->FileContext->FileName);
+  if (NameLength <= 4) {
+    return EFI_INVALID_PARAMETER;
+  }
+  FilePostFix = Private->FileContext->FileName + NameLength - 4;
   if (IsDerEncodeCertificate(FilePostFix)) {
     return EnrollX509ToKek (Private);
   } else if (CompareMem (FilePostFix, L".pbk",4) == 0) {
@@ -1508,6 +1518,7 @@ EnrollSignatureDatabase (
   ) 
 {
   UINT16*      FilePostFix;
+  UINTN        NameLength;
 
   if ((Private->FileContext->FileName == NULL) || (Private->FileContext->FHandle == NULL) || (Private->SignatureGUID == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -1516,7 +1527,11 @@ EnrollSignatureDatabase (
   //
   // Parse the file's postfix. 
   //
-  FilePostFix = Private->FileContext->FileName + StrLen (Private->FileContext->FileName) - 4;
+  NameLength = StrLen (Private->FileContext->FileName);
+  if (NameLength <= 4) {
+    return EFI_INVALID_PARAMETER;
+  }
+  FilePostFix = Private->FileContext->FileName + NameLength - 4;
   if (IsDerEncodeCertificate(FilePostFix)) {
     //
     // Supports DER-encoded X509 certificate.
