@@ -280,8 +280,12 @@ SetupLinuxMemmap (
   // Enlarge space here, because we will allocate pool now.
   //
   MemoryMapSize += EFI_PAGE_SIZE;
-  MemoryMap = AllocatePool (MemoryMapSize);
-  ASSERT (MemoryMap != NULL);
+  Status = gBS->AllocatePool (
+                  EfiLoaderData,
+                  MemoryMapSize,
+                  (VOID **) &MemoryMap
+                  );
+  ASSERT_EFI_ERROR (Status);
 
   //
   // Get System MemoryMap
