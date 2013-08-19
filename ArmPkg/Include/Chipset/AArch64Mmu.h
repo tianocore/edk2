@@ -43,6 +43,9 @@
 // The first offset starts at 12bit. There are 4 levels of 9-bit address range from level 3 to level 0
 #define TT_ADDRESS_AT_LEVEL(TableLevel)       (1 << TT_ADDRESS_OFFSET_AT_LEVEL(TableLevel))
 
+#define TT_LAST_BLOCK_ADDRESS(TranslationTable, EntryCount) \
+    ((UINT64*)((EFI_PHYSICAL_ADDRESS)(TranslationTable) + (((EntryCount) - 1) * sizeof(UINT64))))
+
 // There are 512 entries per table when 4K Granularity
 #define TT_ENTRY_COUNT                          512
 #define TT_ALIGNMENT_BLOCK_ENTRY                BIT12
