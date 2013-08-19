@@ -696,3 +696,185 @@ SetMemoryAttributes (
 
   return Status;
 }
+
+UINT64
+EfiAttributeToArmAttribute (
+  IN UINT64                    EfiAttributes
+  )
+{
+  UINT64 ArmAttributes;
+
+  switch (EfiAttributes & EFI_MEMORY_CACHETYPE_MASK) {
+    case EFI_MEMORY_UC:
+      // Map to strongly ordered
+      ArmAttributes = TT_DESCRIPTOR_SECTION_CACHE_POLICY_STRONGLY_ORDERED; // TEX[2:0] = 0, C=0, B=0
+      break;
+
+    case EFI_MEMORY_WC:
+      // Map to normal non-cachable
+      ArmAttributes = TT_DESCRIPTOR_SECTION_CACHE_POLICY_NON_CACHEABLE; // TEX [2:0]= 001 = 0x2, B=0, C=0
+      break;
+
+    case EFI_MEMORY_WT:
+      // Write through with no-allocate
+      ArmAttributes = TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_THROUGH_NO_ALLOC; // TEX [2:0] = 0, C=1, B=0
+      break;
+
+    case EFI_MEMORY_WB:
+      // Write back (with allocate)
+      ArmAttributes = TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_BACK_ALLOC; // TEX [2:0] = 001, C=1, B=1
+      break;
+
+    case EFI_MEMORY_WP:
+    case EFI_MEMORY_XP:
+    case EFI_MEMORY_RP:
+    case EFI_MEMORY_UCE:
+    default:
+      // Cannot be implemented UEFI definition unclear for ARM
+      // Cause a page fault if these ranges are accessed.
+      ArmAttributes = TT_DESCRIPTOR_SECTION_TYPE_FAULT;
+      DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(): Unsupported attribute %x will page fault on access\n", EfiAttributes));
+      break;
+  }
+
+  // Determine protection attributes
+  if (EfiAttributes & EFI_MEMORY_WP) {
+    ArmAttributes |= TT_DESCRIPTOR_SECTION_AP_RO_RO;
+  } else {
+    ArmAttributes |= TT_DESCRIPTOR_SECTION_AP_RW_RW;
+  }
+
+  // Determine eXecute Never attribute
+  if (EfiAttributes & EFI_MEMORY_XP) {
+    ArmAttributes |= TT_DESCRIPTOR_SECTION_XN_MASK;
+  }
+
+  return ArmAttributes;
+}
+
+EFI_STATUS
+GetMemoryRegionPage (
+  IN     UINT32                  *PageTable,
+  IN OUT UINTN                   *BaseAddress,
+  OUT    UINTN                   *RegionLength,
+  OUT    UINTN                   *RegionAttributes
+  )
+{
+  UINT32      PageAttributes;
+  UINT32      TableIndex;
+  UINT32      PageDescriptor;
+
+  // Convert the section attributes into page attributes
+  PageAttributes = ConvertSectionAttributesToPageAttributes (*RegionAttributes, 0);
+
+  // Calculate index into first level translation table for start of modification
+  TableIndex = TT_DESCRIPTOR_PAGE_BASE_ADDRESS(*BaseAddress) >> TT_DESCRIPTOR_PAGE_BASE_SHIFT;
+  ASSERT (TableIndex < TRANSLATION_TABLE_PAGE_COUNT);
+
+  // Go through the page table to find the end of the section
+  for (; TableIndex < TRANSLATION_TABLE_PAGE_COUNT; TableIndex++) {
+    // Get the section at the given index
+    PageDescriptor = PageTable[TableIndex];
+
+    if ((PageDescriptor & TT_DESCRIPTOR_PAGE_TYPE_MASK) == TT_DESCRIPTOR_PAGE_TYPE_FAULT) {
+      // Case: End of the boundary of the region
+      return EFI_SUCCESS;
+    } else if ((PageDescriptor & TT_DESCRIPTOR_PAGE_TYPE_PAGE) == TT_DESCRIPTOR_PAGE_TYPE_PAGE) {
+      if ((PageDescriptor & TT_DESCRIPTOR_PAGE_ATTRIBUTE_MASK) == PageAttributes) {
+        *RegionLength = *RegionLength + TT_DESCRIPTOR_PAGE_SIZE;
+      } else {
+        // Case: End of the boundary of the region
+        return EFI_SUCCESS;
+      }
+    } else {
+      // We do not support Large Page yet. We return EFI_SUCCESS that means end of the region.
+      ASSERT(0);
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+EFI_STATUS
+GetMemoryRegion (
+  IN OUT UINTN                   *BaseAddress,
+  OUT    UINTN                   *RegionLength,
+  OUT    UINTN                   *RegionAttributes
+  )
+{
+  EFI_STATUS                  Status;
+  UINT32                      TableIndex;
+  UINT32                      PageAttributes;
+  UINT32                      PageTableIndex;
+  UINT32                      SectionDescriptor;
+  ARM_FIRST_LEVEL_DESCRIPTOR *FirstLevelTable;
+  UINT32                     *PageTable;
+
+  // Initialize the arguments
+  *RegionLength = 0;
+
+  // Obtain page table base
+  FirstLevelTable = (ARM_FIRST_LEVEL_DESCRIPTOR *)ArmGetTTBR0BaseAddress ();
+
+  // Calculate index into first level translation table for start of modification
+  TableIndex = TT_DESCRIPTOR_SECTION_BASE_ADDRESS (*BaseAddress) >> TT_DESCRIPTOR_SECTION_BASE_SHIFT;
+  ASSERT (TableIndex < TRANSLATION_TABLE_SECTION_COUNT);
+
+  // Get the section at the given index
+  SectionDescriptor = FirstLevelTable[TableIndex];
+
+  // If 'BaseAddress' belongs to the section then round it to the section boundary
+  if (((SectionDescriptor & TT_DESCRIPTOR_SECTION_TYPE_MASK) == TT_DESCRIPTOR_SECTION_TYPE_SECTION) ||
+      ((SectionDescriptor & TT_DESCRIPTOR_SECTION_TYPE_MASK) == TT_DESCRIPTOR_SECTION_TYPE_SUPERSECTION))
+  {
+    *BaseAddress = (*BaseAddress) & TT_DESCRIPTOR_SECTION_BASE_ADDRESS_MASK;
+    *RegionAttributes = SectionDescriptor & TT_DESCRIPTOR_SECTION_ATTRIBUTE_MASK;
+  } else {
+    // Otherwise, we round it to the page boundary
+    *BaseAddress = (*BaseAddress) & TT_DESCRIPTOR_PAGE_BASE_ADDRESS_MASK;
+
+    // Get the attribute at the page table level (Level 2)
+    PageTable = (UINT32*)(SectionDescriptor & TT_DESCRIPTOR_SECTION_PAGETABLE_ADDRESS_MASK);
+
+    // Calculate index into first level translation table for start of modification
+    PageTableIndex = TT_DESCRIPTOR_PAGE_BASE_ADDRESS (*BaseAddress) >> TT_DESCRIPTOR_PAGE_BASE_SHIFT;
+    ASSERT (PageTableIndex < TRANSLATION_TABLE_PAGE_COUNT);
+
+    PageAttributes = PageTable[PageTableIndex] & TT_DESCRIPTOR_PAGE_ATTRIBUTE_MASK;
+    *RegionAttributes = TT_DESCRIPTOR_CONVERT_TO_SECTION_CACHE_POLICY (PageAttributes, 0) |
+                        TT_DESCRIPTOR_CONVERT_TO_SECTION_AP (PageAttributes);
+  }
+
+  for (;TableIndex < TRANSLATION_TABLE_SECTION_COUNT; TableIndex++) {
+    // Get the section at the given index
+    SectionDescriptor = FirstLevelTable[TableIndex];
+
+    // If the entry is a level-2 page table then we scan it to find the end of the region
+    if ((SectionDescriptor & TT_DESCRIPTOR_SECTION_TYPE_MASK) == TT_DESCRIPTOR_SECTION_TYPE_PAGE_TABLE) {
+      // Extract the page table location from the descriptor
+      PageTable = (UINT32*)(SectionDescriptor & TT_DESCRIPTOR_SECTION_PAGETABLE_ADDRESS_MASK);
+
+      // Scan the page table to find the end of the region.
+      Status = GetMemoryRegionPage (PageTable, BaseAddress, RegionLength, RegionAttributes);
+
+      // If we have found the end of the region (Status == EFI_SUCCESS) then we exit the for-loop
+      if (Status == EFI_SUCCESS) {
+        break;
+      }
+    } else if (((SectionDescriptor & TT_DESCRIPTOR_SECTION_TYPE_MASK) == TT_DESCRIPTOR_SECTION_TYPE_SECTION) ||
+               ((SectionDescriptor & TT_DESCRIPTOR_SECTION_TYPE_MASK) == TT_DESCRIPTOR_SECTION_TYPE_SUPERSECTION)) {
+      if ((SectionDescriptor & TT_DESCRIPTOR_SECTION_ATTRIBUTE_MASK) != *RegionAttributes) {
+        // If the attributes of the section differ from the one targeted then we exit the loop
+        break;
+      } else {
+        *RegionLength = *RegionLength + TT_DESCRIPTOR_SECTION_SIZE;
+      }
+    } else {
+      // If we are on an invalid section then it means it is the end of our section.
+      break;
+    }
+  }
+
+  return EFI_SUCCESS;
+}

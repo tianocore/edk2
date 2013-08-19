@@ -194,3 +194,149 @@ SyncCacheConfig (
 
   return EFI_SUCCESS;
 }
+
+UINT64
+EfiAttributeToArmAttribute (
+  IN UINT64                    EfiAttributes
+  )
+{
+  UINT64 ArmAttributes;
+
+  switch (EfiAttributes & EFI_MEMORY_CACHETYPE_MASK) {
+  case EFI_MEMORY_UC:
+    ArmAttributes = TT_ATTR_INDX_DEVICE_MEMORY;
+    break;
+  case EFI_MEMORY_WC:
+    ArmAttributes = TT_ATTR_INDX_MEMORY_NON_CACHEABLE;
+    break;
+  case EFI_MEMORY_WT:
+    ArmAttributes = TT_ATTR_INDX_MEMORY_WRITE_THROUGH;
+    break;
+  case EFI_MEMORY_WB:
+    ArmAttributes = TT_ATTR_INDX_MEMORY_WRITE_BACK;
+    break;
+  default:
+    DEBUG ((EFI_D_ERROR, "EfiAttributeToArmAttribute: 0x%lX attributes is not supported.\n", EfiAttributes));
+    ASSERT (0);
+    ArmAttributes = TT_ATTR_INDX_DEVICE_MEMORY;
+  }
+
+  // Set the access flag to match the block attributes
+  ArmAttributes |= TT_AF;
+
+  // Determine protection attributes
+  if (EfiAttributes & EFI_MEMORY_WP) {
+    ArmAttributes |= TT_AP_RO_RO;
+  }
+
+  // Process eXecute Never attribute
+  if (EfiAttributes & EFI_MEMORY_XP) {
+    ArmAttributes |= TT_PXN_MASK;
+  }
+
+  return ArmAttributes;
+}
+
+// This function will recursively go down the page table to find the first block address linked to 'BaseAddress'.
+// And then the function will identify the size of the region that has the same page table attribute.
+EFI_STATUS
+GetMemoryRegionRec (
+  IN     UINT64                  *TranslationTable,
+  IN     UINTN                    TableLevel,
+  IN     UINT64                  *LastBlockEntry,
+  IN OUT UINTN                   *BaseAddress,
+  OUT    UINTN                   *RegionLength,
+  OUT    UINTN                   *RegionAttributes
+  )
+{
+  EFI_STATUS Status;
+  UINT64    *NextTranslationTable;
+  UINT64    *BlockEntry;
+  UINT64     BlockEntryType;
+  UINT64     EntryType;
+
+  if (TableLevel != 3) {
+    BlockEntryType = TT_TYPE_BLOCK_ENTRY;
+  } else {
+    BlockEntryType = TT_TYPE_BLOCK_ENTRY_LEVEL3;
+  }
+
+  // Find the block entry linked to the Base Address
+  BlockEntry = (UINT64*)TT_GET_ENTRY_FOR_ADDRESS (TranslationTable, TableLevel, *BaseAddress);
+  EntryType = *BlockEntry & TT_TYPE_MASK;
+
+  if (EntryType == TT_TYPE_TABLE_ENTRY) {
+    NextTranslationTable = (UINT64*)(*BlockEntry & TT_ADDRESS_MASK_DESCRIPTION_TABLE);
+
+    // The entry is a page table, so we go to the next level
+    Status = GetMemoryRegionRec (
+        NextTranslationTable, // Address of the next level page table
+        TableLevel + 1, // Next Page Table level
+        (UINTN*)TT_LAST_BLOCK_ADDRESS(NextTranslationTable, TT_ENTRY_COUNT),
+        BaseAddress, RegionLength, RegionAttributes);
+
+    // In case of 'Success', it means the end of the block region has been found into the upper
+    // level translation table
+    if (!EFI_ERROR(Status)) {
+      return EFI_SUCCESS;
+    }
+  } else if (EntryType == BlockEntryType) {
+    // We have found the BlockEntry attached to the address. We save its start address (the start
+    // address might be before the 'BaseAdress') and attributes
+    *BaseAddress      = *BaseAddress & ~(TT_ADDRESS_AT_LEVEL(TableLevel) - 1);
+    *RegionLength     = 0;
+    *RegionAttributes = *BlockEntry & TT_ATTRIBUTES_MASK;
+  } else {
+    // We have an 'Invalid' entry
+    return EFI_UNSUPPORTED;
+  }
+
+  while (BlockEntry <= LastBlockEntry) {
+    if ((*BlockEntry & TT_ATTRIBUTES_MASK) == *RegionAttributes) {
+      *RegionLength = *RegionLength + TT_BLOCK_ENTRY_SIZE_AT_LEVEL(TableLevel);
+    } else {
+      // In case we have found the end of the region we return success
+      return EFI_SUCCESS;
+    }
+    BlockEntry++;
+  }
+
+  // If we have reached the end of the TranslationTable and we have not found the end of the region then
+  // we return EFI_NOT_FOUND.
+  // The caller will continue to look for the memory region at its level
+  return EFI_NOT_FOUND;
+}
+
+EFI_STATUS
+GetMemoryRegion (
+  IN OUT UINTN                   *BaseAddress,
+  OUT    UINTN                   *RegionLength,
+  OUT    UINTN                   *RegionAttributes
+  )
+{
+  EFI_STATUS  Status;
+  UINT64     *TranslationTable;
+  UINTN       TableLevel;
+  UINTN       EntryCount;
+  UINTN       T0SZ;
+
+  ASSERT ((BaseAddress != NULL) && (RegionLength != NULL) && (RegionAttributes != NULL));
+
+  TranslationTable = ArmGetTTBR0BaseAddress ();
+
+  T0SZ = ArmGetTCR () & TCR_T0SZ_MASK;
+  // Get the Table info from T0SZ
+  GetRootTranslationTableInfo (T0SZ, &TableLevel, &EntryCount);
+
+  Status = GetMemoryRegionRec (TranslationTable, TableLevel,
+      (UINTN*)TT_LAST_BLOCK_ADDRESS(TranslationTable, EntryCount),
+      BaseAddress, RegionLength, RegionAttributes);
+
+  // If the region continues up to the end of the root table then GetMemoryRegionRec()
+  // will return EFI_NOT_FOUND
+  if (Status == EFI_NOT_FOUND) {
+    return EFI_SUCCESS;
+  } else {
+    return Status;
+  }
+}

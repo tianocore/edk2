@@ -178,18 +178,37 @@ CpuSetMemoryAttributes (
   IN EFI_CPU_ARCH_PROTOCOL    *This,
   IN EFI_PHYSICAL_ADDRESS      BaseAddress,
   IN UINT64                    Length,
-  IN UINT64                    Attributes
+  IN UINT64                    EfiAttributes
   )
 {
-  DEBUG ((EFI_D_PAGE, "CpuSetMemoryAttributes(%lx, %lx, %lx)\n", BaseAddress, Length, Attributes));
+  EFI_STATUS  Status;
+  UINTN       ArmAttributes;
+  UINTN       RegionBaseAddress;
+  UINTN       RegionLength;
+  UINTN       RegionArmAttributes;
 
   if ((BaseAddress & (SIZE_4KB - 1)) != 0) {
     // Minimum granularity is SIZE_4KB (4KB on ARM)
-    DEBUG ((EFI_D_PAGE, "CpuSetMemoryAttributes(%lx, %lx, %lx): Minimum ganularity is SIZE_4KB\n", BaseAddress, Length, Attributes));
+    DEBUG ((EFI_D_PAGE, "CpuSetMemoryAttributes(%lx, %lx, %lx): Minimum ganularity is SIZE_4KB\n", BaseAddress, Length, EfiAttributes));
     return EFI_UNSUPPORTED;
   }
 
-  return SetMemoryAttributes (BaseAddress, Length, Attributes, 0);
+  // Convert the 'Attribute' into ARM Attribute
+  ArmAttributes = EfiAttributeToArmAttribute (EfiAttributes);
+
+  // Get the region starting from 'BaseAddress' and its 'Attribute'
+  RegionBaseAddress = BaseAddress;
+  Status = GetMemoryRegion (&RegionBaseAddress, &RegionLength, &RegionArmAttributes);
+
+  // Data & Instruction Caches are flushed when we set new memory attributes.
+  // So, we only set the attributes if the new region is different.
+  if (EFI_ERROR (Status) || (RegionArmAttributes != ArmAttributes) ||
+      ((BaseAddress + Length) > (RegionBaseAddress + RegionLength)))
+  {
+    return SetMemoryAttributes (BaseAddress, Length, EfiAttributes, 0);
+  } else {
+    return EFI_SUCCESS;
+  }
 }
 
 EFI_STATUS

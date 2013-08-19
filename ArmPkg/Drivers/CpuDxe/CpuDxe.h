@@ -148,6 +148,19 @@ SetMemoryAttributes (
   IN EFI_PHYSICAL_ADDRESS      VirtualMask
   );
 
+// The ARM Attributes might be defined on 64-bit (case of the long format description table)
+UINT64
+EfiAttributeToArmAttribute (
+  IN UINT64                    EfiAttributes
+  );
+
+EFI_STATUS
+GetMemoryRegion (
+  IN OUT UINTN                   *BaseAddress,
+  OUT    UINTN                   *RegionLength,
+  OUT    UINTN                   *RegionAttributes
+  );
+
 VOID
 GetRootTranslationTableInfo (
   IN  UINTN    T0SZ,
