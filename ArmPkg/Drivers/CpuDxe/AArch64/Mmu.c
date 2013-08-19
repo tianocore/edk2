@@ -89,7 +89,7 @@ GetNextEntryAttribute (
           // Update GCD with the last region
           SetGcdMemorySpaceAttributes (MemorySpaceMap, NumberOfDescriptors,
               *StartGcdRegion,
-              (BaseAddress + (Index * TT_ADDRESS_AT_LEVEL(TableLevel)) - 1) - *StartGcdRegion,
+              (BaseAddress + (Index * TT_ADDRESS_AT_LEVEL(TableLevel))) - *StartGcdRegion,
               PageAttributeToGcdAttribute (EntryAttribute));
         }
 
@@ -113,8 +113,8 @@ GetNextEntryAttribute (
         // Update GCD with the last region
         SetGcdMemorySpaceAttributes (MemorySpaceMap, NumberOfDescriptors,
             *StartGcdRegion,
-            (BaseAddress + (Index * TT_ADDRESS_AT_LEVEL(TableLevel)) - 1) - *StartGcdRegion,
-            PageAttributeToGcdAttribute (EntryAttribute));
+            (BaseAddress + (Index * TT_ADDRESS_AT_LEVEL(TableLevel))) - *StartGcdRegion,
+            PageAttributeToGcdAttribute (*PrevEntryAttribute));
 
         // Start of the new region
         *StartGcdRegion = BaseAddress + (Index * TT_ADDRESS_AT_LEVEL(TableLevel));
@@ -182,11 +182,13 @@ SyncCacheConfig (
                                                BaseAddressGcdRegion,
                                                &PageAttribute, &BaseAddressGcdRegion);
 
-  // Update GCD with the last region
-  SetGcdMemorySpaceAttributes (MemorySpaceMap, NumberOfDescriptors,
-      BaseAddressGcdRegion,
-      EndAddressGcdRegion - BaseAddressGcdRegion,
-      PageAttributeToGcdAttribute (PageAttribute));
+  // Update GCD with the last region if valid
+  if (PageAttribute != TT_ATTR_INDX_INVALID) {
+    SetGcdMemorySpaceAttributes (MemorySpaceMap, NumberOfDescriptors,
+        BaseAddressGcdRegion,
+        EndAddressGcdRegion - BaseAddressGcdRegion,
+        PageAttributeToGcdAttribute (PageAttribute));
+  }
 
   FreePool (MemorySpaceMap);
 

@@ -96,6 +96,13 @@ SetGcdMemorySpaceAttributes (
   DEBUG ((DEBUG_GCD, "SetGcdMemorySpaceAttributes[0x%lX; 0x%lX] = 0x%lX\n",
       BaseAddress, BaseAddress + Length, Attributes));
 
+  // We do not support a smaller granularity than 4KB on ARM Architecture
+  if ((Length & EFI_PAGE_MASK) != 0) {
+    DEBUG ((DEBUG_WARN,
+            "Warning: We do not support smaller granularity than 4KB on ARM Architecture (passed length: 0x%lX).\n",
+            Length));
+  }
+
   //
   // Get all memory descriptors covered by the memory range
   //
