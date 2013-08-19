@@ -635,12 +635,7 @@ ConvertSectionToPages (
 
   // Get section attributes and convert to page attributes
   SectionDescriptor = FirstLevelTable[FirstLevelIdx];
-  PageDescriptor = TT_DESCRIPTOR_PAGE_TYPE_PAGE;
-  PageDescriptor |= TT_DESCRIPTOR_CONVERT_TO_PAGE_CACHE_POLICY(SectionDescriptor,0);
-  PageDescriptor |= TT_DESCRIPTOR_CONVERT_TO_PAGE_AP(SectionDescriptor);
-  PageDescriptor |= TT_DESCRIPTOR_CONVERT_TO_PAGE_XN(SectionDescriptor,0);
-  PageDescriptor |= TT_DESCRIPTOR_CONVERT_TO_PAGE_NG(SectionDescriptor);
-  PageDescriptor |= TT_DESCRIPTOR_CONVERT_TO_PAGE_S(SectionDescriptor);
+  PageDescriptor = TT_DESCRIPTOR_PAGE_TYPE_PAGE | ConvertSectionAttributesToPageAttributes (SectionDescriptor, FALSE);
 
   // Allocate a page table for the 4KB entries (we use up a full page even though we only need 1KB)
   Status = gBS->AllocatePages (AllocateAnyPages, EfiBootServicesData, 1, &PageTableAddr);

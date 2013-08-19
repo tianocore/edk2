@@ -222,4 +222,10 @@
                                                         TT_DESCRIPTOR_PAGE_AP_RW_RW                                                       | \
                                                         TT_DESCRIPTOR_PAGE_CACHE_POLICY_NON_CACHEABLE)
 
+UINT32
+ConvertSectionAttributesToPageAttributes (
+  IN UINT32   SectionAttributes,
+  IN BOOLEAN  IsLargePage
+  );
+
 #endif

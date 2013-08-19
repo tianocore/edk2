@@ -23,6 +23,24 @@
 #include "ArmV7Lib.h"
 #include "ArmLibPrivate.h"
 
+UINT32
+ConvertSectionAttributesToPageAttributes (
+  IN UINT32   SectionAttributes,
+  IN BOOLEAN  IsLargePage
+  )
+{
+  UINT32 PageAttributes;
+
+  PageAttributes = 0;
+  PageAttributes |= TT_DESCRIPTOR_CONVERT_TO_PAGE_CACHE_POLICY (SectionAttributes, IsLargePage);
+  PageAttributes |= TT_DESCRIPTOR_CONVERT_TO_PAGE_AP (SectionAttributes);
+  PageAttributes |= TT_DESCRIPTOR_CONVERT_TO_PAGE_XN (SectionAttributes, IsLargePage);
+  PageAttributes |= TT_DESCRIPTOR_CONVERT_TO_PAGE_NG (SectionAttributes);
+  PageAttributes |= TT_DESCRIPTOR_CONVERT_TO_PAGE_S (SectionAttributes);
+
+  return PageAttributes;
+}
+
 STATIC
 VOID
 PopulateLevel2PageTable (
@@ -76,12 +94,7 @@ PopulateLevel2PageTable (
       TranslationTable = ((UINTN)TranslationTable + TRANSLATION_TABLE_PAGE_ALIGNMENT_MASK) & ~TRANSLATION_TABLE_PAGE_ALIGNMENT_MASK;
 
       // Translate the Section Descriptor into Page Descriptor
-      SectionDescriptor = TT_DESCRIPTOR_PAGE_TYPE_PAGE;
-      SectionDescriptor |= TT_DESCRIPTOR_CONVERT_TO_PAGE_CACHE_POLICY(*SectionEntry,0);
-      SectionDescriptor |= TT_DESCRIPTOR_CONVERT_TO_PAGE_AP(*SectionEntry);
-      SectionDescriptor |= TT_DESCRIPTOR_CONVERT_TO_PAGE_XN(*SectionEntry,0);
-      SectionDescriptor |= TT_DESCRIPTOR_CONVERT_TO_PAGE_NG(*SectionEntry);
-      SectionDescriptor |= TT_DESCRIPTOR_CONVERT_TO_PAGE_S(*SectionEntry);
+      SectionDescriptor = TT_DESCRIPTOR_PAGE_TYPE_PAGE | ConvertSectionAttributesToPageAttributes (*SectionEntry, FALSE);
 
       BaseSectionAddress = TT_DESCRIPTOR_SECTION_BASE_ADDRESS(*SectionEntry);
 
