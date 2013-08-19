@@ -38,8 +38,8 @@ AsmCommonExceptionEntry (
   );
 
 
-EFI_EXCEPTION_CALLBACK  gExceptionHandlers[MAX_ARM_EXCEPTION + 1];
-EFI_EXCEPTION_CALLBACK  gDebuggerExceptionHandlers[MAX_ARM_EXCEPTION + 1];
+EFI_EXCEPTION_CALLBACK  gExceptionHandlers[MAX_AARCH64_EXCEPTION + 1];
+EFI_EXCEPTION_CALLBACK  gDebuggerExceptionHandlers[MAX_AARCH64_EXCEPTION + 1];
 
 
 
@@ -69,7 +69,7 @@ RegisterInterruptHandler (
   IN EFI_CPU_INTERRUPT_HANDLER      InterruptHandler
   )
 {
-  if (InterruptType > MAX_ARM_EXCEPTION) {
+  if (InterruptType > MAX_AARCH64_EXCEPTION) {
     return EFI_UNSUPPORTED;
   }
 
