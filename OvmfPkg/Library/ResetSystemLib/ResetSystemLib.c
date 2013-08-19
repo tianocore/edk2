@@ -27,7 +27,7 @@ AcpiPmControl (
 {
   ASSERT (SuspendType < 6);
 
-  IoBitFieldWrite16  (PcdGet16 (PcdAcpiPmBaseAddress) + 4, 10, 13, SuspendType);
+  IoBitFieldWrite16  (PcdGet16 (PcdAcpiPmBaseAddress) + 4, 10, 13, (UINT16) SuspendType);
   IoOr16 (PcdGet16 (PcdAcpiPmBaseAddress) + 4, BIT13);
   CpuDeadLoop ();
 }
