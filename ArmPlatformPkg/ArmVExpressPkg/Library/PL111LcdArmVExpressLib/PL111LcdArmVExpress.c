@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2011, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011-2013, ARM Ltd. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -234,6 +234,7 @@ LcdPlatformSetMode (
   UINT32                LcdSite;
   UINT32                OscillatorId;
   SYS_CONFIG_FUNCTION   Function;
+  UINT32                SysId;
 
   if (ModeNumber >= LcdPlatformGetMaxMode ()) {
     return EFI_INVALID_PARAMETER;
@@ -261,14 +262,20 @@ LcdPlatformSetMode (
     return Status;
   }
 
-  // On the ARM Versatile Express Model (RTSM) the value of the SysId is equal to 0x225F500.
-  // Note: The DVI Mode is not modelled on RTSM
-  if (MmioRead32 (ARM_VE_SYS_ID_REG) != 0x225F500) {
-    // Set the DVI into the new mode
-    Status = ArmPlatformSysConfigSet (SYS_CFG_DVIMODE, mResolutions[ModeNumber].Mode);
-    if (EFI_ERROR(Status)) {
-      ASSERT_EFI_ERROR (Status);
-      return Status;
+  // The FVP foundation model does not have an LCD.
+  // On the FVP models the GIC variant in encoded in bits [15:12].
+  // Note: The DVI Mode is not modelled by RTSM or FVP models.
+  SysId = MmioRead32 (ARM_VE_SYS_ID_REG);
+  if (SysId != ARM_RTSM_SYS_ID) {
+    // Take out the FVP GIC variant to reduce the permutations.
+    SysId &= ~ARM_FVP_SYS_ID_VARIANT_MASK;
+    if (SysId != (ARM_FVP_BASE_SYS_ID & ~ARM_FVP_SYS_ID_VARIANT_MASK)) {
+      // Set the DVI into the new mode
+      Status = ArmPlatformSysConfigSet (SYS_CFG_DVIMODE, mResolutions[ModeNumber].Mode);
+      if (EFI_ERROR(Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
     }
   }
 

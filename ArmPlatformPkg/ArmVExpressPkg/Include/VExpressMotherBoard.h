@@ -1,7 +1,7 @@
 /** @file
 *  Header defining Versatile Express constants (Base addresses, sizes, flags)
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -94,5 +94,36 @@
 #define SYS_CFG_OSC_SITE2                         VIRTUAL_SYS_CFG(ARM_VE_DAUGHTERBOARD_2_SITE,SYS_CFG_OSC)
 // Can not access the battery backed-up hardware clock on the Versatile Express motherboard
 #define SYS_CFG_RTC                               VIRTUAL_SYS_CFG(ARM_VE_UNSUPPORTED,1)
+
+//
+// System ID
+//
+// All RTSM VE models have the same System ID : 0x225F500
+//
+// FVP models have a different System ID.
+// Default Base model System ID : 0x00201100
+// [31:28] Rev     - Board revision:          0x0     = Rev A
+// [27:16] HBI     - HBI board number in BCD: 0x020   = v8 Base Platform
+// [15:12] Variant - Build variant of board:  0x1     = Variant B. (GIC 64k map)
+// [11:8]  Plat    - Platform type:           0x1     = Model
+// [7:0]   FPGA    - FPGA build, BCD coded:   0x00
+//
+//HBI = 010 = Foundation Model
+//HBI = 020 = Base Platform
+//
+// And specifically, the GIC register banks start at the following
+// addresses:
+//              Variant = 0             Variant = 1
+//GICD          0x2c001000              0x2f000000
+//GICC          0x2c002000              0x2c000000
+//GICH          0x2c004000              0x2c010000
+//GICV          0x2c006000              0x2c020000
+
+// The default SYS_IDs. These can be changed when starting the model.
+#define ARM_RTSM_SYS_ID                (0x225F500)
+#define ARM_FVP_BASE_SYS_ID            (0x00201100)
+#define ARM_FVP_FOUNDATION_SYS_ID      (0x00101100)
+
+#define ARM_FVP_SYS_ID_VARIANT_MASK    (UINT32)(0xFUL << 12)
 
 #endif /* VEXPRESSMOTHERBOARD_H_ */
