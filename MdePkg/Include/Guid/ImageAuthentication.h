@@ -1,8 +1,7 @@
 /** @file
-  Platform Key, Key Exchange Key, and Image signature database are defined 
-  for the signed image validation.
+  Image signature database are defined for the signed image validation.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -35,35 +34,12 @@
 /// for the forbidden signature database.
 ///
 #define EFI_IMAGE_SECURITY_DATABASE1      L"dbx"
+
 #define SECURE_BOOT_MODE_ENABLE           1
 #define SECURE_BOOT_MODE_DISABLE          0
 #define SETUP_MODE                        1
 #define USER_MODE                         0
-///
-/// Globally "SetupMode" variable to specify whether the system is currently operating 
-/// in setup mode (1) or not (0). All other values are reserved.
-///
-#define EFI_SETUP_MODE_NAME               L"SetupMode"
-///
-/// Globally "PK" variable for the Platform Key Signature Database.
-///
-#define EFI_PLATFORM_KEY_NAME             L"PK"
-///
-/// Globally "KEK" variable for the Key Exchange Key Signature Database.
-///
-#define EFI_KEY_EXCHANGE_KEY_NAME         L"KEK"
-///
-/// Globally "SignatureSupport" variable returns an array of GUIDs, 
-/// with each GUID representing a type of signature which the platform 
-/// firmware supports for images and other data.
-///
-#define EFI_SIGNATURE_SUPPORT_NAME        L"SignatureSupport"
 
-///
-/// Globally "SecureBoot" variable to specify whether the platform firmware 
-/// is operating in Secure boot mode (1) or not (0). All other values are reserved.
-///
-#define EFI_SECURE_BOOT_MODE_NAME         L"SecureBoot"
 
 //***********************************************************************
 // Signature Database
