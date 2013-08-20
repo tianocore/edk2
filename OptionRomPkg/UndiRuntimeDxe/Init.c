@@ -1,7 +1,7 @@
 /** @file
   Initialization functions for EFI UNDI32 driver.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -64,7 +64,7 @@ UndiNotifyVirtual (
     //
     // UNDI32DeviceList is an array of pointers
     //
-    for (Index = 0; Index < pxe_31->IFcnt; Index++) {
+    for (Index = 0; Index < (pxe_31->IFcnt | pxe_31->IFcntExt << 8); Index++) {
       UNDI32DeviceList[Index]->NIIProtocol_31.Id = (UINT64) (UINTN) Pxe31Pointer;
       EfiConvertPointer (
         EFI_OPTIONAL_PTR,
@@ -409,7 +409,7 @@ UndiDriverStart (
   // the IfNum index for the current interface will be the total number
   // of interfaces initialized so far
   //
-  UNDI32Device->NIIProtocol_31.IfNum  = pxe_31->IFcnt;
+  UNDI32Device->NIIProtocol_31.IfNum  = pxe_31->IFcnt | pxe_31->IFcntExt << 8;
 
   PxeUpdate (&UNDI32Device->NicInfo, pxe_31);
 
@@ -470,7 +470,7 @@ UndiDriverStart (
     goto UndiErrorDeleteDevicePath;
   }
 
-  Len = (pxe_31->IFcnt * sizeof (UndiDataPointer->NII_entry)) + sizeof (UndiDataPointer);
+  Len = ((pxe_31->IFcnt|pxe_31->IFcntExt << 8)* sizeof (UndiDataPointer->NII_entry)) + sizeof (UndiDataPointer);
   Status = gBS->AllocatePool (EfiRuntimeServicesData, Len, (VOID **) &UndiDataPointer);
 
   if (EFI_ERROR (Status)) {
@@ -949,10 +949,10 @@ InstallConfigTable (
 
   UndiData = (UNDI_CONFIG_TABLE *)UndiDataPointer;
 
-  UndiData->NumberOfInterfaces  = pxe_31->IFcnt;
+  UndiData->NumberOfInterfaces  = (pxe_31->IFcnt | pxe_31->IFcntExt << 8);
   UndiData->nextlink            = NULL;
 
-  for (Index = 0; Index < pxe_31->IFcnt; Index++) {
+  for (Index = 0; Index < (pxe_31->IFcnt | pxe_31->IFcntExt << 8); Index++) {
     UndiData->NII_entry[Index].NII_InterfacePointer = &UNDI32DeviceList[Index]->NIIProtocol_31;
     UndiData->NII_entry[Index].DevicePathPointer    = UNDI32DeviceList[Index]->Undi32DevPath;
   }

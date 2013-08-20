@@ -3,7 +3,7 @@
   structure prototypes, global variables and constants that
   are needed for porting PXE to EFI.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -719,10 +719,11 @@ typedef struct s_pxe_hw_undi {
   PXE_UINT8   Len;            ///< sizeof(PXE_HW_UNDI).
   PXE_UINT8   Fudge;          ///< makes 8-bit cksum equal zero.
   PXE_UINT8   Rev;            ///< PXE_ROMID_REV.
-  PXE_UINT8   IFcnt;          ///< physical connector count.
+  PXE_UINT8   IFcnt;          ///< physical connector count lower byte.
   PXE_UINT8   MajorVer;       ///< PXE_ROMID_MAJORVER.
   PXE_UINT8   MinorVer;       ///< PXE_ROMID_MINORVER.
-  PXE_UINT16  reserved;       ///< zero, not used.
+  PXE_UINT8   IFcntExt;       ///< physical connector count upper byte.
+  PXE_UINT8   reserved;       ///< zero, not used.
   PXE_UINT32  Implementation; ///< implementation flags.
   ///< reserved             ///< vendor use.
   ///< UINT32 Status;       ///< status port.
@@ -815,10 +816,11 @@ typedef struct s_pxe_sw_undi {
   PXE_UINT8   Len;            ///< sizeof(PXE_SW_UNDI).
   PXE_UINT8   Fudge;          ///< makes 8-bit cksum zero.
   PXE_UINT8   Rev;            ///< PXE_ROMID_REV.
-  PXE_UINT8   IFcnt;          ///< physical connector count.
+  PXE_UINT8   IFcnt;          ///< physical connector count lower byte.
   PXE_UINT8   MajorVer;       ///< PXE_ROMID_MAJORVER.
   PXE_UINT8   MinorVer;       ///< PXE_ROMID_MINORVER.
-  PXE_UINT16  reserved1;      ///< zero, not used.
+  PXE_UINT8   IFcntExt;       ///< physical connector count upper byte.
+  PXE_UINT8   reserved1;      ///< zero, not used.
   PXE_UINT32  Implementation; ///< Implementation flags.
   PXE_UINT64  EntryPoint;     ///< API entry point.
   PXE_UINT8   reserved2[3];   ///< zero, not used.

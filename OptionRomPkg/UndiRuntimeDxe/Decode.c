@@ -1,7 +1,7 @@
 /** @file
   Provides the basic UNID functions.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1290,7 +1290,7 @@ UNDI_APIEntry_new (
 
   CdbPtr = (PXE_CDB *) (UINTN) cdb;
 
-  if (CdbPtr->IFnum >= pxe_31->IFcnt) {
+  if (CdbPtr->IFnum >= (pxe_31->IFcnt | pxe_31->IFcntExt << 8) ) {
     CdbPtr->StatFlags = PXE_STATFLAGS_COMMAND_FAILED;
     CdbPtr->StatCode  = PXE_STATCODE_INVALID_CDB;
     return ;
@@ -1336,7 +1336,7 @@ UNDI_APIEntry_Common (
   if ((CdbPtr->OpCode > PXE_OPCODE_LAST_VALID) ||
       (CdbPtr->StatCode != PXE_STATCODE_INITIALIZE) ||
       (CdbPtr->StatFlags != PXE_STATFLAGS_INITIALIZE) ||
-      (CdbPtr->IFnum >= pxe_31->IFcnt) ) {
+      (CdbPtr->IFnum >= (pxe_31->IFcnt | pxe_31->IFcntExt << 8) ) {
     goto badcdb;
 
   }
@@ -1436,24 +1436,28 @@ PxeUpdate (
   IN PXE_SW_UNDI        *PxePtr
   )
 {
+  UINT16 NicNum;
+  NicNum = (PxePtr->IFcnt | PxePtr->IFcntEx << 8);
+  
   if (NicPtr == NULL) {
-    if (PxePtr->IFcnt > 0) {
+    if (NicNum > 0) {
       //
       // number of NICs this undi supports
       //
-      PxePtr->IFcnt--;
+      NicNum --;
     }
-
-    PxePtr->Fudge = (UINT8) (PxePtr->Fudge - CalculateSum8 ((VOID *) PxePtr, PxePtr->Len));
-    return ;
+    goto done;
   }
 
   //
   // number of NICs this undi supports
   //
-  PxePtr->IFcnt++;
+  NicNum++;
+  
+done: 
+  PxePtr->IFcnt = (UINT8)(NicNum & 0xFF);
+  PxePtr->IFcntEx = (UINT8) ((NicNum & 0xFF00) >> 8);
   PxePtr->Fudge = (UINT8) (PxePtr->Fudge - CalculateSum8 ((VOID *) PxePtr, PxePtr->Len));
-
   return ;
 }
 
@@ -1485,6 +1489,7 @@ PxeStructInit (
   // number of NICs this undi supports
   //
   PxePtr->IFcnt = 0;
+  PxePtr->IFcntEx = 0;
   PxePtr->Rev       = PXE_ROMID_REV;
   PxePtr->MajorVer  = PXE_ROMID_MAJORVER;
   PxePtr->MinorVer  = PXE_ROMID_MINORVER;

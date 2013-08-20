@@ -1,7 +1,7 @@
 /** @file
   EFI Network Interface Identifier Protocol.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -34,7 +34,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     0x1ACED566, 0x76ED, 0x4218, {0xBC, 0x81, 0x76, 0x7F, 0x1F, 0x97, 0x7A, 0x89 } \
   }
 
-#define EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL_REVISION    0x00010000
+//
+// Revision defined in UEFI Specification 2.4
+//
+#define EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL_REVISION    0x00020000
+
 
 ///
 /// Revision defined in EFI1.1.
@@ -70,9 +74,9 @@ struct _EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL {
   UINT8     MajorVer;   ///< Major version number.
   UINT8     MinorVer;   ///< Minor version number.
   BOOLEAN   Ipv6Supported; ///< TRUE if the network interface supports IPv6; otherwise FALSE.
-  UINT8     IfNum;      ///< The network interface number that is being identified by this Network
-                        ///< Interface Identifier Protocol. This field must be less than or equal
-                        ///< to the IFcnt field in the !PXE structure.
+  UINT16    IfNum;      ///< The network interface number that is being identified by this Network 
+                        ///< Interface Identifier Protocol. This field must be less than or 
+                        ///< equal to the (IFcnt | IFcntExt <<8 ) fields in the !PXE structure.
 
 };
 

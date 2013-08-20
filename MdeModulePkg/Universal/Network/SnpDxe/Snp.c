@@ -410,8 +410,13 @@ SimpleNetworkDriverStart (
 
   Snp->TxRxBufferSize     = 0;
   Snp->TxRxBuffer         = NULL;
+ 
+  if (Nii->Revision >= EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL_REVISION) {
+  	Snp->IfNum = Nii->IfNum;
 
-  Snp->IfNum              = Nii->IfNum;
+  } else {
+    Snp->IfNum = (UINT8) (Nii->IfNum & 0xFF);
+  }
 
   if ((Pxe->hw.Implementation & PXE_ROMID_IMP_HW_UNDI) != 0) {
     Snp->IsSwUndi             = FALSE;
