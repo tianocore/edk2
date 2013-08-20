@@ -3767,9 +3767,9 @@ Done:
                                  instance.
   @param  Results                Null-terminated Unicode string in
                                  <MultiConfigAltResp> format which has all values
-                                 filled in for the names in the Request string.
-                                 String to be allocated by the  called function.
-                                 De-allocation is up to the caller.
+                                 filled in for the entirety of the current HII 
+                                 database. String to be allocated by the  called 
+                                 function. De-allocation is up to the caller.
 
   @retval EFI_SUCCESS            The Results string is filled with the values
                                  corresponding to all requested names.
@@ -4482,8 +4482,9 @@ Exit:
                                  (see below)  is returned.
   @param  BlockSize              The length of the Block in units of UINT8.  On
                                  input, this is the size of the Block. On output,
-                                 if successful, contains the index of the  last
-                                 modified byte in the Block.
+                                 if successful, contains the largest index of the
+                                 modified byte in the Block, or the required buffer
+                                 size if the Block is not large enough.
   @param  Progress               On return, points to an element of the ConfigResp
                                  string filled in with the offset of the most
                                  recent '&' before the first failing name / value
@@ -4503,7 +4504,8 @@ Exit:
                                  value pair. Block is left updated and
                                  Progress points at the '&' preceding the first
                                  non-<BlockName>.
-  @retval EFI_DEVICE_ERROR       Block not large enough. Progress undefined.
+  @retval EFI_BUFFER_TOO_SMALL   Block not large enough. Progress undefined. 
+                                 BlockSize is updated with the required buffer size.
   @retval EFI_NOT_FOUND          Target for the specified routing data was not found.
                                  Progress points to the "G" in "GUID" of the errant
                                  routing data.
@@ -4680,7 +4682,7 @@ HiiConfigToBlock (
   if (MaxBlockSize > BufferSize) {
     *BlockSize = MaxBlockSize;
     if (Block != NULL) {
-      return EFI_DEVICE_ERROR;
+      return EFI_BUFFER_TOO_SMALL;
     }
   }
 

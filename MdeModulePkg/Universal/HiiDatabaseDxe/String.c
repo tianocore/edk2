@@ -1590,7 +1590,8 @@ Done:
   @retval EFI_INVALID_LANGUAGE   - The string specified by StringId is available but
   @retval EFI_BUFFER_TOO_SMALL   The buffer specified by StringSize is too small to
                                   hold the string.
-  @retval EFI_INVALID_PARAMETER  The String or Language or StringSize was NULL.
+  @retval EFI_INVALID_PARAMETER  The Language or StringSize was NULL.
+  @retval EFI_INVALID_PARAMETER  The value referenced by StringSize was not zero and String was NULL.
   @retval EFI_OUT_OF_RESOURCES   There were insufficient resources to complete the
                                  request.
 
@@ -1775,7 +1776,8 @@ HiiSetString (
                                  the length of Languages, in bytes.
 
   @retval EFI_SUCCESS            The languages were returned successfully.
-  @retval EFI_INVALID_PARAMETER  The Languages or LanguagesSize was NULL.
+  @retval EFI_INVALID_PARAMETER  The LanguagesSize was NULL.
+  @retval EFI_INVALID_PARAMETER  The value referenced by LanguagesSize is not zero and Languages is NULL.
   @retval EFI_BUFFER_TOO_SMALL   The LanguagesSize is too small to hold the list of
                                   supported languages. LanguageSize is updated to
                                  contain the required size.
@@ -1799,7 +1801,10 @@ HiiGetLanguages (
   HII_STRING_PACKAGE_INSTANCE         *StringPackage;
   UINTN                               ResultSize;
 
-  if (This == NULL || Languages == NULL || LanguagesSize == NULL || PackageList == NULL) {
+  if (This == NULL || LanguagesSize == NULL || PackageList == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  if (*LanguagesSize != 0 && Languages == NULL) {
     return EFI_INVALID_PARAMETER;
   }
   if (!IsHiiHandleValid (PackageList)) {
@@ -1871,15 +1876,16 @@ HiiGetLanguages (
                                  points to the length of SecondaryLanguages in bytes.
 
   @retval EFI_SUCCESS            Secondary languages were correctly returned.
-  @retval EFI_INVALID_PARAMETER  PrimaryLanguage or SecondaryLanguages or
-                                 SecondaryLanguagesSize was NULL.
+  @retval EFI_INVALID_PARAMETER  PrimaryLanguage or SecondaryLanguagesSize was NULL.
+  @retval EFI_INVALID_PARAMETER  The value referenced by SecondaryLanguagesSize is not
+                                 zero and SecondaryLanguages is NULL.
   @retval EFI_BUFFER_TOO_SMALL   The buffer specified by SecondaryLanguagesSize is
                                  too small to hold the returned information.
                                  SecondaryLanguageSize is updated to hold the size of
                                  the buffer required.
   @retval EFI_INVALID_LANGUAGE   The language specified by PrimaryLanguage is not
                                  present in the specified package list.
-  @retval EFI_NOT_FOUND          The specified PackageList is not in the Database.                                
+  @retval EFI_NOT_FOUND          The specified PackageList is not in the Database.
 
 **/
 EFI_STATUS
@@ -1901,10 +1907,10 @@ HiiGetSecondaryLanguages (
   CHAR8                               *Languages;
   UINTN                               ResultSize;
 
-  if (This == NULL || PackageList == NULL || PrimaryLanguage == NULL) {
+  if (This == NULL || PackageList == NULL || PrimaryLanguage == NULL || SecondaryLanguagesSize == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  if (SecondaryLanguages == NULL || SecondaryLanguagesSize == NULL) {
+  if (SecondaryLanguages == NULL && *SecondaryLanguagesSize != 0) {
     return EFI_INVALID_PARAMETER;
   }
   if (!IsHiiHandleValid (PackageList)) {

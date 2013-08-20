@@ -2679,14 +2679,15 @@ Exit:
                                   with the  first font. On return, points to the
                                   returned font handle or points to NULL if there
                                   are no more matching fonts.
-  @param  StringInfoIn            Upon entry, points to the font to return
-                                  information about. 
-                                  If NULL, then the information about the system default 
-                                  font will be returned.
-  @param  StringInfoOut           Upon return, contains the matching font's
-                                  information.  If NULL, then no information is
-                                  returned. It's caller's responsibility to free
-                                  this buffer.
+  @param  StringInfoIn            Upon entry, points to the font to return information
+                                  about. If NULL, then the information about the system
+                                  default font will be returned.
+  @param  StringInfoOut           Upon return, contains the matching font's information.
+                                  If NULL, then no information is returned. This buffer
+                                  is allocated with a call to the Boot Service AllocatePool().
+                                  It is the caller's responsibility to call the Boot 
+                                  Service FreePool() when the caller no longer requires
+                                  the contents of StringInfoOut.
   @param  String                  Points to the string which will be tested to
                                   determine  if all characters are available. If
                                   NULL, then any font  is acceptable.

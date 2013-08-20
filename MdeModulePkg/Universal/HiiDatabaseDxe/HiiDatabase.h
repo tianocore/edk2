@@ -725,13 +725,15 @@ HiiGetGlyph (
                                   with the  first font. On return, points to the
                                   returned font handle or points to NULL if there
                                   are no more matching fonts.
-  @param  StringInfoIn            Upon entry, points to the font to return
-                                  information about. If NULL, then the information about the system default 
-                                  font will be returned.
-  @param  StringInfoOut           Upon return, contains the matching font's
-                                  information.  If NULL, then no information is
-                                  returned. It's caller's responsibility to free
-                                  this buffer.
+  @param  StringInfoIn            Upon entry, points to the font to return information
+                                  about. If NULL, then the information about the system
+                                  default font will be returned.
+  @param  StringInfoOut           Upon return, contains the matching font's information.
+                                  If NULL, then no information is returned. This buffer
+                                  is allocated with a call to the Boot Service AllocatePool().
+                                  It is the caller's responsibility to call the Boot 
+                                  Service FreePool() when the caller no longer requires
+                                  the contents of StringInfoOut.
   @param  String                  Points to the string which will be tested to
                                   determine  if all characters are available. If
                                   NULL, then any font  is acceptable.
@@ -739,7 +741,7 @@ HiiGetGlyph (
   @retval EFI_SUCCESS             Matching font returned successfully.
   @retval EFI_NOT_FOUND           No matching font was found.
   @retval EFI_INVALID_PARAMETER   StringInfoIn is NULL.
-  @retval EFI_INVALID_PARAMETER  StringInfoIn->FontInfoMask is an invalid combination.
+  @retval EFI_INVALID_PARAMETER   StringInfoIn->FontInfoMask is an invalid combination.
   @retval EFI_OUT_OF_RESOURCES    There were insufficient resources to complete the
                                   request.
 **/
@@ -1004,13 +1006,14 @@ HiiNewString (
   @retval EFI_SUCCESS             The string was returned successfully.
   @retval EFI_NOT_FOUND           The string specified by StringId is not
                                   available.
-  @retval EFI_NOT_FOUND           The string specified by StringId is available but
-                                                not in the specified language.
-                                                The specified PackageList is not in the database.
-  @retval EFI_INVALID_LANGUAGE   - The string specified by StringId is available but
+                                  The specified PackageList is not in the database.
+  @retval EFI_INVALID_LANGUAGE    The string specified by StringId is available but
+                                  not in the specified language.
   @retval EFI_BUFFER_TOO_SMALL    The buffer specified by StringSize is too small
                                   to  hold the string.
-  @retval EFI_INVALID_PARAMETER   The String or Language or StringSize was NULL.
+  @retval EFI_INVALID_PARAMETER   The Language or StringSize was NULL.
+  @retval EFI_INVALID_PARAMETER   The value referenced by StringSize was not zero
+                                  and String was NULL.
   @retval EFI_OUT_OF_RESOURCES    There were insufficient resources to complete the
                                    request.
 
@@ -1076,7 +1079,8 @@ HiiSetString (
                                   points to the length of Languages, in bytes.
 
   @retval EFI_SUCCESS             The languages were returned successfully.
-  @retval EFI_INVALID_PARAMETER   The Languages or LanguagesSize was NULL.
+  @retval EFI_INVALID_PARAMETER   The LanguagesSize was NULL.
+  @retval EFI_INVALID_PARAMETER   The value referenced by LanguagesSize is not zero and Languages is NULL.
   @retval EFI_BUFFER_TOO_SMALL    The LanguagesSize is too small to hold the list
                                   of  supported languages. LanguageSize is updated
                                   to contain the required size.
@@ -1117,15 +1121,16 @@ HiiGetLanguages (
                                   in bytes.
 
   @retval EFI_SUCCESS             Secondary languages were correctly returned.
-  @retval EFI_INVALID_PARAMETER   PrimaryLanguage or SecondaryLanguages or
-                                  SecondaryLanguagesSize was NULL.
+  @retval EFI_INVALID_PARAMETER   PrimaryLanguage or SecondaryLanguagesSize was NULL.
+  @retval EFI_INVALID_PARAMETER   The value referenced by SecondaryLanguagesSize is not
+                                  zero and SecondaryLanguages is NULL.
   @retval EFI_BUFFER_TOO_SMALL    The buffer specified by SecondaryLanguagesSize is
                                   too small to hold the returned information.
                                   SecondaryLanguageSize is updated to hold the size of
                                   the buffer required.
   @retval EFI_INVALID_LANGUAGE    The language specified by PrimaryLanguage is not
                                   present in the specified package list.
-  @retval EFI_NOT_FOUND          The specified PackageList is not in the Database.                                
+  @retval EFI_NOT_FOUND           The specified PackageList is not in the Database.
 
 **/
 EFI_STATUS
@@ -1244,18 +1249,19 @@ HiiUpdatePackageList (
   @param  Handle                  An array of EFI_HII_HANDLE instances returned.
 
   @retval EFI_SUCCESS             The matching handles are outputed successfully.
-                                                HandleBufferLength is updated with the actual length.
+                                  HandleBufferLength is updated with the actual length.
   @retval EFI_BUFFER_TO_SMALL     The HandleBufferLength parameter indicates that
                                   Handle is too small to support the number of
                                   handles. HandleBufferLength is updated with a
                                   value that will  enable the data to fit.
   @retval EFI_NOT_FOUND           No matching handle could not be found in
                                   database.
-  @retval EFI_INVALID_PARAMETER   Handle or HandleBufferLength was NULL.
-  @retval EFI_INVALID_PARAMETER  PackageType is not a EFI_HII_PACKAGE_TYPE_GUID but
-                         PackageGuid is not NULL, PackageType is a EFI_HII_
-                         PACKAGE_TYPE_GUID but PackageGuid is NULL.
-  
+  @retval EFI_INVALID_PARAMETER   HandleBufferLength was NULL.
+  @retval EFI_INVALID_PARAMETER   The value referenced by HandleBufferLength was not
+                                  zero and Handle was NULL.
+  @retval EFI_INVALID_PARAMETER   PackageType is not a EFI_HII_PACKAGE_TYPE_GUID but
+                                  PackageGuid is not NULL, PackageType is a EFI_HII_
+                                  PACKAGE_TYPE_GUID but PackageGuid is NULL.
 
 **/
 EFI_STATUS
@@ -1293,7 +1299,9 @@ HiiListPackageLists (
                                   a value that will enable the data to fit.
   @retval EFI_NOT_FOUND           The specifiecd Handle could not be found in the
                                   current database.
-  @retval EFI_INVALID_PARAMETER   Handle or Buffer or BufferSize was NULL.
+  @retval EFI_INVALID_PARAMETER   BufferSize was NULL.
+  @retval EFI_INVALID_PARAMETER   The value referenced by BufferSize was not zero 
+                                  and Buffer was NULL.
 
 **/
 EFI_STATUS
@@ -1393,8 +1401,9 @@ HiiUnregisterPackageNotify (
                                   number of GUIDs. KeyGuidBufferLength is
                                   updated with a value that will enable the data to
                                   fit.
-  @retval EFI_INVALID_PARAMETER   The KeyGuidBuffer or KeyGuidBufferLength was
-                                  NULL.
+  @retval EFI_INVALID_PARAMETER   The KeyGuidBufferLength is NULL.
+  @retval EFI_INVALID_PARAMETER   The value referenced by KeyGuidBufferLength is not
+                                  zero and KeyGuidBuffer is NULL.
   @retval EFI_NOT_FOUND           There was no keyboard layout.
 
 **/
@@ -1549,9 +1558,9 @@ HiiConfigRoutingExtractConfig (
                                   instance.
   @param  Results                 Null-terminated Unicode string in
                                   <MultiConfigAltResp> format which has all values
-                                  filled in for the names in the Request string.
-                                  String to be allocated by the  called function.
-                                  De-allocation is up to the caller.
+                                  filled in for the entirety of the current HII 
+                                  database. String to be allocated by the  called 
+                                  function. De-allocation is up to the caller.
 
   @retval EFI_SUCCESS             The Results string is filled with the values
                                   corresponding to all requested names.
@@ -1674,8 +1683,9 @@ HiiBlockToConfig (
                                   (see below)  is returned.
   @param  BlockSize               The length of the Block in units of UINT8.  On
                                   input, this is the size of the Block. On output,
-                                  if successful, contains the index of the  last
-                                  modified byte in the Block.
+                                  if successful, contains the largest index of the
+                                  modified byte in the Block, or the required buffer
+                                  size if the Block is not large enough.
   @param  Progress                On return, points to an element of the ConfigResp
                                    string filled in with the offset of the most
                                   recent '&' before the first failing name / value
@@ -1700,6 +1710,8 @@ HiiBlockToConfig (
                                   value pair. Block is left updated and
                                   Progress points at the '&' preceding the first
                                   non-<BlockName>.
+  @retval EFI_BUFFER_TOO_SMALL    Block not large enough. Progress undefined. 
+                                  BlockSize is updated with the required buffer size.
 
 **/
 EFI_STATUS
