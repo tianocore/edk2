@@ -26,6 +26,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/DevicePath.h>
 #include <Protocol/DriverBinding.h>
 #include <Protocol/DiskIo.h>
+#include <Protocol/DiskIo2.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/BaseLib.h>
@@ -54,6 +55,7 @@ typedef struct {
   EFI_BLOCK_IO_MEDIA        Media2;//For BlockIO2
 
   EFI_DISK_IO_PROTOCOL      *DiskIo;
+  EFI_DISK_IO2_PROTOCOL     *DiskIo2;
   EFI_BLOCK_IO_PROTOCOL     *ParentBlockIo;
   EFI_BLOCK_IO2_PROTOCOL    *ParentBlockIo2;
   UINT64                    Start;
@@ -63,6 +65,11 @@ typedef struct {
   EFI_GUID                  *EspGuid;
 
 } PARTITION_PRIVATE_DATA;
+
+typedef struct {
+  EFI_DISK_IO2_TOKEN           DiskIo2Token;
+  EFI_BLOCK_IO2_TOKEN          *BlockIo2Token;
+} PARTITION_ACCESS_TASK;
 
 #define PARTITION_DEVICE_FROM_BLOCK_IO_THIS(a)  CR (a, PARTITION_PRIVATE_DATA, BlockIo, PARTITION_PRIVATE_DATA_SIGNATURE)
 #define PARTITION_DEVICE_FROM_BLOCK_IO2_THIS(a) CR (a, PARTITION_PRIVATE_DATA, BlockIo2, PARTITION_PRIVATE_DATA_SIGNATURE)
@@ -308,6 +315,7 @@ PartitionComponentNameGetControllerName (
   @param[in]  This              Protocol instance pointer.
   @param[in]  ParentHandle      Parent Handle for new child.
   @param[in]  ParentDiskIo      Parent DiskIo interface.
+  @param[in]  ParentDiskIo2     Parent DiskIo2 interface.
   @param[in]  ParentBlockIo     Parent BlockIo interface.
   @param[in]  ParentBlockIo2    Parent BlockIo2 interface.
   @param[in]  ParentDevicePath  Parent Device Path.
@@ -326,6 +334,7 @@ PartitionInstallChildHandle (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                   ParentHandle,
   IN  EFI_DISK_IO_PROTOCOL         *ParentDiskIo,
+  IN  EFI_DISK_IO2_PROTOCOL        *ParentDiskIo2,
   IN  EFI_BLOCK_IO_PROTOCOL        *ParentBlockIo,
   IN  EFI_BLOCK_IO2_PROTOCOL       *ParentBlockIo2,
   IN  EFI_DEVICE_PATH_PROTOCOL     *ParentDevicePath,
@@ -342,6 +351,7 @@ PartitionInstallChildHandle (
   @param[in]  This       Calling context.
   @param[in]  Handle     Parent Handle.
   @param[in]  DiskIo     Parent DiskIo interface.
+  @param[in]  DiskIo2    Parent DiskIo2 interface.
   @param[in]  BlockIo    Parent BlockIo interface.
   @param[in]  BlockIo2   Parent BlockIo2 interface.
   @param[in]  DevicePath Parent Device Path.
@@ -357,6 +367,7 @@ PartitionInstallGptChildHandles (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                   Handle,
   IN  EFI_DISK_IO_PROTOCOL         *DiskIo,
+  IN  EFI_DISK_IO2_PROTOCOL        *DiskIo2,
   IN  EFI_BLOCK_IO_PROTOCOL        *BlockIo,
   IN  EFI_BLOCK_IO2_PROTOCOL       *BlockIo2,
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
@@ -368,6 +379,7 @@ PartitionInstallGptChildHandles (
   @param[in]  This        Calling context.
   @param[in]  Handle      Parent Handle.
   @param[in]  DiskIo      Parent DiskIo interface.
+  @param[in]  DiskIo2     Parent DiskIo2 interface.
   @param[in]  BlockIo     Parent BlockIo interface.
   @param[in]  BlockIo2    Parent BlockIo2 interface.
   @param[in]  DevicePath  Parent Device Path
@@ -383,6 +395,7 @@ PartitionInstallElToritoChildHandles (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                   Handle,
   IN  EFI_DISK_IO_PROTOCOL         *DiskIo,
+  IN  EFI_DISK_IO2_PROTOCOL        *DiskIo2,
   IN  EFI_BLOCK_IO_PROTOCOL        *BlockIo,
   IN  EFI_BLOCK_IO2_PROTOCOL       *BlockIo2,
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
@@ -394,6 +407,7 @@ PartitionInstallElToritoChildHandles (
   @param[in]  This              Calling context.
   @param[in]  Handle            Parent Handle.
   @param[in]  DiskIo            Parent DiskIo interface.
+  @param[in]  DiskIo2           Parent DiskIo2 interface.
   @param[in]  BlockIo           Parent BlockIo interface.
   @param[in]  BlockIo2          Parent BlockIo2 interface.
   @param[in]  DevicePath        Parent Device Path.
@@ -408,6 +422,7 @@ PartitionInstallMbrChildHandles (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                   Handle,
   IN  EFI_DISK_IO_PROTOCOL         *DiskIo,
+  IN  EFI_DISK_IO2_PROTOCOL        *DiskIo2,
   IN  EFI_BLOCK_IO_PROTOCOL        *BlockIo,
   IN  EFI_BLOCK_IO2_PROTOCOL       *BlockIo2,
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
@@ -419,6 +434,7 @@ EFI_STATUS
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                   Handle,
   IN  EFI_DISK_IO_PROTOCOL         *DiskIo,
+  IN  EFI_DISK_IO2_PROTOCOL        *DiskIo2,
   IN  EFI_BLOCK_IO_PROTOCOL        *BlockIo,
   IN  EFI_BLOCK_IO2_PROTOCOL       *BlockIo2,
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath

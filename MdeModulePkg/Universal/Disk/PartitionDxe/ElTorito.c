@@ -1,7 +1,7 @@
 /** @file
   Decode an El Torito formatted CD-ROM
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -22,6 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param[in]  This        Calling context.
   @param[in]  Handle      Parent Handle.
   @param[in]  DiskIo      Parent DiskIo interface.
+  @param[in]  DiskIo2     Parent DiskIo2 interface.
   @param[in]  BlockIo     Parent BlockIo interface.
   @param[in]  BlockIo2    Parent BlockIo2 interface.
   @param[in]  DevicePath  Parent Device Path
@@ -37,6 +38,7 @@ PartitionInstallElToritoChildHandles (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                   Handle,
   IN  EFI_DISK_IO_PROTOCOL         *DiskIo,
+  IN  EFI_DISK_IO2_PROTOCOL        *DiskIo2,
   IN  EFI_BLOCK_IO_PROTOCOL        *BlockIo,
   IN  EFI_BLOCK_IO2_PROTOCOL       *BlockIo2,
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
@@ -258,6 +260,7 @@ PartitionInstallElToritoChildHandles (
                 This,
                 Handle,
                 DiskIo,
+                DiskIo2,
                 BlockIo,
                 BlockIo2,
                 DevicePath,

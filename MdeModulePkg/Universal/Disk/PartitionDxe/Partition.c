@@ -4,7 +4,7 @@
   of the raw block devices media. Currently "El Torito CD-ROM", Legacy
   MBR, and GPT partition schemes are supported.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -200,6 +200,7 @@ PartitionDriverBindingStart (
   EFI_BLOCK_IO_PROTOCOL     *BlockIo;
   EFI_BLOCK_IO2_PROTOCOL    *BlockIo2;
   EFI_DISK_IO_PROTOCOL      *DiskIo;
+  EFI_DISK_IO2_PROTOCOL     *DiskIo2;
   EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath;
   PARTITION_DETECT_ROUTINE  *Routine;
   BOOLEAN                   MediaPresent;
@@ -243,8 +244,11 @@ PartitionDriverBindingStart (
                   (VOID **) &BlockIo2,
                   This->DriverBindingHandle,
                   ControllerHandle,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
+  if (EFI_ERROR (Status)) {
+    BlockIo2 = NULL;
+  }
 
   //
   // Get the Device Path Protocol on ControllerHandle's handle.
@@ -261,6 +265,9 @@ PartitionDriverBindingStart (
     goto Exit;
   }
 
+  //
+  // Get the DiskIo and DiskIo2.
+  //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiDiskIoProtocolGuid,
@@ -281,6 +288,18 @@ PartitionDriverBindingStart (
 
   OpenStatus = Status;
 
+  Status = gBS->OpenProtocol (
+                  ControllerHandle,
+                  &gEfiDiskIo2ProtocolGuid,
+                  (VOID **) &DiskIo2,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
+  if (EFI_ERROR (Status) && Status != EFI_ALREADY_STARTED) {
+    DiskIo2 = NULL;
+  }
+
   //
   // Try to read blocks when there's media or it is removable physical partition.
   //
@@ -299,6 +318,7 @@ PartitionDriverBindingStart (
                    This,
                    ControllerHandle,
                    DiskIo,
+                   DiskIo2,
                    BlockIo,
                    BlockIo2,
                    ParentDevicePath
@@ -404,7 +424,7 @@ PartitionDriverBindingStop (
     //    
     gBS->CloseProtocol (
            ControllerHandle,
-           &gEfiBlockIo2ProtocolGuid,
+           &gEfiDiskIo2ProtocolGuid,
            This->DriverBindingHandle,
            ControllerHandle
            );
@@ -699,7 +719,7 @@ PartitionFlushBlocks (
   Probe the media status and return EFI_NO_MEDIA or EFI_MEDIA_CHANGED
   for no media or media change case. Otherwise DefaultStatus is returned.
 
-  @param BlockIo2           Pointer to the BlockIo2 instance.
+  @param DiskIo2            Pointer to the DiskIo2 instance.
   @param MediaId            Id of the media, changes every time the media is replaced.
   @param DefaultStatus      The default status to return when it's not the no media
                             or media change case.
@@ -710,7 +730,7 @@ PartitionFlushBlocks (
 **/
 EFI_STATUS
 ProbeMediaStatusEx (
-  IN EFI_BLOCK_IO2_PROTOCOL  *BlockIo2,
+  IN EFI_DISK_IO2_PROTOCOL   *DiskIo2,
   IN UINT32                  MediaId,
   IN EFI_STATUS              DefaultStatus
   )
@@ -718,16 +738,9 @@ ProbeMediaStatusEx (
   EFI_STATUS                 Status;
 
   //
-  // Read from LBA 0 but passing NULL as buffer pointer to detect the media status.
+  // Read 1 byte from offset 0 but passing NULL as buffer pointer
   //
-  Status = BlockIo2->ReadBlocksEx (
-                       BlockIo2,
-                       MediaId,
-                       0,
-                       NULL,
-                       0,
-                       NULL
-                       );
+  Status = DiskIo2->ReadDiskEx (DiskIo2, MediaId, 0, NULL, 1, NULL);
   if ((Status == EFI_NO_MEDIA) || (Status == EFI_MEDIA_CHANGED)) {
     return Status;
   }
@@ -760,6 +773,68 @@ PartitionResetEx (
                                     Private->ParentBlockIo2,
                                     ExtendedVerification
                                     );
+}
+
+/**
+  The general callback for the DiskIo2 interfaces.
+  @param  Event                 Event whose notification function is being invoked.
+  @param  Context               The pointer to the notification function's context,
+                                which points to the PARTITION_ACCESS_TASK instance.
+**/
+VOID
+EFIAPI
+PartitionOnAccessComplete (
+  IN EFI_EVENT                 Event,
+  IN VOID                      *Context
+  )
+{
+  PARTITION_ACCESS_TASK   *Task;
+
+  Task = (PARTITION_ACCESS_TASK *) Context;
+
+  gBS->CloseEvent (Event);
+
+  Task->BlockIo2Token->TransactionStatus = Task->DiskIo2Token.TransactionStatus;
+  gBS->SignalEvent (Task->BlockIo2Token->Event);
+
+  FreePool (Task);
+}
+
+/**
+  Create a new PARTITION_ACCESS_TASK instance.
+
+  @param  Token  Pointer to the EFI_BLOCK_IO2_TOKEN.
+
+  @return Pointer to the created PARTITION_ACCESS_TASK instance or NULL upon failure.
+**/
+PARTITION_ACCESS_TASK *
+PartitionCreateAccessTask (
+  IN EFI_BLOCK_IO2_TOKEN    *Token
+  )
+{
+  EFI_STATUS                Status;
+  PARTITION_ACCESS_TASK     *Task;
+
+  Task = AllocatePool (sizeof (*Task));
+  if (Task == NULL) {
+    return NULL;
+  }
+
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  PartitionOnAccessComplete,
+                  Task,
+                  &Task->DiskIo2Token.Event
+                  );
+  if (EFI_ERROR (Status)) {
+    FreePool (Task);
+    return NULL;
+  }
+
+  Task->BlockIo2Token = Token;
+
+  return Task;
 }
 
 /**
@@ -806,44 +881,38 @@ PartitionReadBlocksEx (
   OUT    VOID                   *Buffer
   )
 {
+  EFI_STATUS              Status;
   PARTITION_PRIVATE_DATA  *Private;
   UINT64                  Offset;
-  UINT32                  UnderRun;
+  PARTITION_ACCESS_TASK   *Task;
 
   Private = PARTITION_DEVICE_FROM_BLOCK_IO2_THIS (This);
 
-  if (Token == NULL) {
-    return ProbeMediaStatusEx (Private->ParentBlockIo2, MediaId, EFI_INVALID_PARAMETER);
-  }
-
   if (BufferSize % Private->BlockSize != 0) {
-    return ProbeMediaStatusEx (Private->ParentBlockIo2, MediaId, EFI_BAD_BUFFER_SIZE);
+    return ProbeMediaStatusEx (Private->DiskIo2, MediaId, EFI_BAD_BUFFER_SIZE);
   }
 
   Offset = MultU64x32 (Lba, Private->BlockSize) + Private->Start;
   if (Offset + BufferSize > Private->End) {
-    return ProbeMediaStatusEx (Private->ParentBlockIo2, MediaId, EFI_INVALID_PARAMETER);
+    return ProbeMediaStatusEx (Private->DiskIo2, MediaId, EFI_INVALID_PARAMETER);
   }
 
-  //
-  // Since the BlockIO2 call Parent BlockIO2 directly, so here the offset must
-  // be multiple of BlockSize. If the Spec will be updated the DiskIO to support
-  // BlockIO2, this limitation will be removed and call DiskIO here.
-  //
-  Lba = DivU64x32Remainder (Offset, Private->BlockSize, &UnderRun);
-  if (UnderRun != 0) {
-    return ProbeMediaStatusEx (Private->ParentBlockIo2, MediaId, EFI_UNSUPPORTED);
+  if ((Token != NULL) && (Token->Event != NULL)) {
+    Task = PartitionCreateAccessTask (Token);
+    if (Task == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    Status = Private->DiskIo2->ReadDiskEx (Private->DiskIo2, MediaId, Offset, &Task->DiskIo2Token, BufferSize, Buffer);
+    if (EFI_ERROR (Status)) {
+      gBS->CloseEvent (Task->DiskIo2Token.Event);
+      FreePool (Task);
+    }
+  } else {
+    Status = Private->DiskIo2->ReadDiskEx (Private->DiskIo2, MediaId, Offset, NULL, BufferSize, Buffer);
   }
 
-  //
-  // Because some partitions have different block size from their parent
-  // device, in that case the Block I/O2 couldn't be called.
-  //
-  if (Private->BlockSize != Private->ParentBlockIo->Media->BlockSize) {
-    return ProbeMediaStatusEx (Private->ParentBlockIo2, MediaId, EFI_UNSUPPORTED);
-  }
-
-  return Private->ParentBlockIo2->ReadBlocksEx (Private->ParentBlockIo2, MediaId, Lba, Token, BufferSize, Buffer);
+  return Status;
 }
 
 /**
@@ -888,44 +957,37 @@ PartitionWriteBlocksEx (
   IN     VOID                   *Buffer
   )
 {
+  EFI_STATUS              Status;
   PARTITION_PRIVATE_DATA  *Private;
   UINT64                  Offset;
-  UINT32                  UnderRun;
+  PARTITION_ACCESS_TASK   *Task;
 
   Private = PARTITION_DEVICE_FROM_BLOCK_IO2_THIS (This);
 
-  if (Token == NULL) {
-    return ProbeMediaStatusEx (Private->ParentBlockIo2, MediaId, EFI_INVALID_PARAMETER);
-  }
-
   if (BufferSize % Private->BlockSize != 0) {
-    return ProbeMediaStatusEx (Private->ParentBlockIo2, MediaId, EFI_BAD_BUFFER_SIZE);
+    return ProbeMediaStatusEx (Private->DiskIo2, MediaId, EFI_BAD_BUFFER_SIZE);
   }
 
   Offset = MultU64x32 (Lba, Private->BlockSize) + Private->Start;
   if (Offset + BufferSize > Private->End) {
-    return ProbeMediaStatusEx (Private->ParentBlockIo2, MediaId, EFI_INVALID_PARAMETER);
+    return ProbeMediaStatusEx (Private->DiskIo2, MediaId, EFI_INVALID_PARAMETER);
   }
+  
+  if ((Token != NULL) && (Token->Event != NULL)) {
+    Task = PartitionCreateAccessTask (Token);
+    if (Task == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
 
-  //
-  // Since the BlockIO2 call Parent BlockIO2 directly, so here the offset must
-  // be multiple of BlockSize. If the Spec will be updated the DiskIO to support
-  // BlockIO2, this limitation will be removed and call DiskIO here.
-  //
-  Lba = DivU64x32Remainder (Offset, Private->BlockSize, &UnderRun);
-  if (UnderRun != 0) {
-    return ProbeMediaStatusEx (Private->ParentBlockIo2, MediaId, EFI_UNSUPPORTED);
+    Status =  Private->DiskIo2->WriteDiskEx (Private->DiskIo2, MediaId, Offset, &Task->DiskIo2Token, BufferSize, Buffer);
+    if (EFI_ERROR (Status)) {
+      gBS->CloseEvent (Task->DiskIo2Token.Event);
+      FreePool (Task);
+    }
+  } else {
+    Status = Private->DiskIo2->WriteDiskEx (Private->DiskIo2, MediaId, Offset, NULL, BufferSize, Buffer);
   }
-
-  //
-  // Because some kinds of partition have different block size from their parent,
-  // in that case it couldn't call parent Block I/O2. 
-  //
-  if (Private->BlockSize != Private->ParentBlockIo->Media->BlockSize) {
-    return ProbeMediaStatusEx (Private->ParentBlockIo2, MediaId, EFI_UNSUPPORTED);
-  }
-
-  return Private->ParentBlockIo2->WriteBlocksEx (Private->ParentBlockIo2, MediaId, Lba, Token, BufferSize, Buffer);
+  return Status;
 }
 
 /**
@@ -957,19 +1019,27 @@ PartitionFlushBlocksEx (
   IN OUT EFI_BLOCK_IO2_TOKEN    *Token
   )
 {
+  EFI_STATUS              Status;
   PARTITION_PRIVATE_DATA  *Private;
+  PARTITION_ACCESS_TASK   *Task;
 
   Private = PARTITION_DEVICE_FROM_BLOCK_IO2_THIS (This);
 
-  //
-  // Because some kinds of partition have different block size from their parent,
-  // in that case it couldn't call parent Block I/O2. 
-  //
-  if (Private->BlockSize != Private->ParentBlockIo->Media->BlockSize) {
-    return EFI_UNSUPPORTED;
-  }
+  if ((Token != NULL) && (Token->Event != NULL)) {
+    Task = PartitionCreateAccessTask (Token);
+    if (Task == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
 
-  return Private->ParentBlockIo2->FlushBlocksEx (Private->ParentBlockIo2, Token);
+    Status = Private->DiskIo2->FlushDiskEx (Private->DiskIo2, &Task->DiskIo2Token);
+    if (EFI_ERROR (Status)) {
+      gBS->CloseEvent (Task->DiskIo2Token.Event);
+      FreePool (Task);
+    }
+  } else {
+    Status = Private->DiskIo2->FlushDiskEx (Private->DiskIo2, NULL);
+  }
+  return Status;
 }
 
 
@@ -980,6 +1050,7 @@ PartitionFlushBlocksEx (
   @param[in]  This              Protocol instance pointer.
   @param[in]  ParentHandle      Parent Handle for new child.
   @param[in]  ParentDiskIo      Parent DiskIo interface.
+  @param[in]  ParentDiskIo2     Parent DiskIo2 interface.
   @param[in]  ParentBlockIo     Parent BlockIo interface.
   @param[in]  ParentBlockIo2    Parent BlockIo2 interface.
   @param[in]  ParentDevicePath  Parent Device Path.
@@ -998,6 +1069,7 @@ PartitionInstallChildHandle (
   IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                   ParentHandle,
   IN  EFI_DISK_IO_PROTOCOL         *ParentDiskIo,
+  IN  EFI_DISK_IO2_PROTOCOL        *ParentDiskIo2,
   IN  EFI_BLOCK_IO_PROTOCOL        *ParentBlockIo,
   IN  EFI_BLOCK_IO2_PROTOCOL       *ParentBlockIo2,
   IN  EFI_DEVICE_PATH_PROTOCOL     *ParentDevicePath,
@@ -1026,6 +1098,7 @@ PartitionInstallChildHandle (
   Private->ParentBlockIo    = ParentBlockIo;
   Private->ParentBlockIo2   = ParentBlockIo2;
   Private->DiskIo           = ParentDiskIo;
+  Private->DiskIo2          = ParentDiskIo2;
 
   //
   // Set the BlockIO into Private Data.
@@ -1043,7 +1116,8 @@ PartitionInstallChildHandle (
   //
   // Set the BlockIO2 into Private Data.
   //
-  if (Private->ParentBlockIo2 != NULL) {
+  if (Private->DiskIo2 != NULL) {
+    ASSERT (Private->ParentBlockIo2 != NULL);
     Private->BlockIo2.Media    = &Private->Media2;
     CopyMem (Private->BlockIo2.Media, ParentBlockIo2->Media, sizeof (EFI_BLOCK_IO_MEDIA));
 
@@ -1065,9 +1139,7 @@ PartitionInstallChildHandle (
 
   Private->Media.BlockSize = (UINT32) BlockSize;
 
-  //
-  // For BlockIO2, it should keep the same alignment with the parent BlockIO2's.
-  //
+  Private->Media2.IoAlign   = 0;
   Private->Media2.LogicalPartition = TRUE;
   Private->Media2.LastBlock = Private->Media.LastBlock;
   Private->Media2.BlockSize = (UINT32) BlockSize;
@@ -1105,17 +1177,9 @@ PartitionInstallChildHandle (
 
   //
   // Create the new handle. 
-  // BlockIO2 will be installed on the condition that the blocksize of parent BlockIO 
-  // is same with the child BlockIO's. Instead of calling the DiskIO, the child BlockIO2 
-  // directly call the parent BlockIO and doesn't handle the different block size issue.
-  // If SPEC will update the DiskIO to support the Non-Blocking model, the BlockIO2 will call
-  // DiskIO to handle the blocksize unequal issue and the limitation will be remove from
-  // here.
   //
   Private->Handle = NULL;
-  if ((Private->ParentBlockIo2 != NULL) &&
-      (Private->ParentBlockIo2->Media->BlockSize == BlockSize)
-     ) {
+  if (Private->DiskIo2 != NULL) {
     Status = gBS->InstallMultipleProtocolInterfaces (
                     &Private->Handle,
                     &gEfiDevicePathProtocolGuid,

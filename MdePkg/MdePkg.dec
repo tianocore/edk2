@@ -5,7 +5,7 @@
 # It also provides the definitions(including PPIs/PROTOCOLs/GUIDs) of
 # EFI1.10/UEFI2.3.1/PI1.2 and some Industry Standards.
 #
-# Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available under
@@ -1290,10 +1290,16 @@
   gEfiBlockIo2ProtocolGuid             = { 0xa77b2472, 0xe282, 0x4e9f, {0xa2, 0x45, 0xc2, 0xc0, 0xe2, 0x7b, 0xbc, 0xc1 }}
 
   ## Include/Protocol/StorageSecurityCommand.h
-  gEfiStorageSecurityCommandProtocolGuid    = { 0xc88b0b6d, 0x0dfc, 0x49a7, {0x9c, 0xb4, 0x49, 0x7, 0x4b, 0x4c, 0x3a, 0x78 }}
+  gEfiStorageSecurityCommandProtocolGuid = { 0xc88b0b6d, 0x0dfc, 0x49a7, {0x9c, 0xb4, 0x49, 0x7, 0x4b, 0x4c, 0x3a, 0x78 }}
 
   ## Include/Protocol/UserCredential2.h
-  gEfiUserCredential2ProtocolGuid       = { 0xe98adb03, 0xb8b9, 0x4af8, {0xba, 0x20, 0x26, 0xe9, 0x11, 0x4c, 0xbc, 0xe5 }}
+  gEfiUserCredential2ProtocolGuid      = { 0xe98adb03, 0xb8b9, 0x4af8, {0xba, 0x20, 0x26, 0xe9, 0x11, 0x4c, 0xbc, 0xe5 }}
+
+  #
+  # Protocols defined in UEFI2.4
+  #
+  ## Include/Protocol/DiskIo2.h
+  gEfiDiskIo2ProtocolGuid              = { 0x151c8eae, 0x7f2c, 0x472c, { 0x9e, 0x54, 0x98, 0x28, 0x19, 0x4f, 0x6a, 0x88 }}
 
 [PcdsFeatureFlag]
   ## If TRUE, the component name protocol will not be installed.
