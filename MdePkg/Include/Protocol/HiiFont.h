@@ -56,7 +56,7 @@ typedef struct _EFI_HII_ROW_INFO {
   UINTN   LineWidth;  ///< The width of the text on the line, in pixels.
   
   ///
-  /// The number of pixels above the bottom of the row of the font baseline or 0 if none.  
+  /// The font baseline offset in pixels from the bottom of the row, or 0 if none.
   ///
   UINTN   BaselineOffset;
 } EFI_HII_ROW_INFO;
@@ -427,9 +427,12 @@ EFI_STATUS
                         information about. If NULL, then the information 
                         about the system default font will be returned.
 
-  @param StringInfoOut  Upon return, contains the matching
-                        font's information. If NULL, then no
-                        information is returned.
+  @param  StringInfoOut Upon return, contains the matching font's information.
+                        If NULL, then no information is returned. This buffer
+                        is allocated with a call to the Boot Service AllocatePool().
+                        It is the caller's responsibility to call the Boot 
+                        Service FreePool() when the caller no longer requires
+                        the contents of StringInfoOut.
 
   @param String         Points to the string which will be tested to
                         determine if all characters are available. If

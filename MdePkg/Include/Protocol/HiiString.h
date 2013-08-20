@@ -88,14 +88,16 @@ EFI_STATUS
 
   @retval EFI_SUCCESS            The string was returned successfully.
   @retval EFI_NOT_FOUND          The string specified by StringId is not available.
-  @retval EFI_NOT_FOUND          The string specified by StringId is available but
-                                 not in the specified language.
                                  The specified PackageList is not in the database.
+  @retval EFI_INVALID_LANGUAGE    The string specified by StringId is available but 
+                                  not in the specified language.
   @retval EFI_BUFFER_TOO_SMALL   The buffer specified by StringSize is too small to
                                  hold the string.
-  @retval EFI_INVALID_PARAMETER  The String or Language or StringSize was NULL.
-  @retval EFI_OUT_OF_RESOURCES   There were insufficient resources to complete the
-                                 request.
+  @retval EFI_INVALID_PARAMETER   The Language or StringSize was NULL.
+  @retval EFI_INVALID_PARAMETER   The value referenced by StringSize was not zero and
+                                  String was NULL.
+  @retval EFI_OUT_OF_RESOURCES    There were insufficient resources to complete the
+                                  request.
 
 **/
 typedef
@@ -157,7 +159,9 @@ EFI_STATUS
                                  the length of Languages, in bytes.
 
   @retval EFI_SUCCESS            The languages were returned successfully.
-  @retval EFI_INVALID_PARAMETER  The Languages or LanguagesSize was NULL.
+  @retval EFI_INVALID_PARAMETER  The LanguagesSize was NULL.
+  @retval EFI_INVALID_PARAMETER  The value referenced by LanguagesSize is not zero
+                                 and Languages is NULL.
   @retval EFI_BUFFER_TOO_SMALL   The LanguagesSize is too small to hold the list of
                                  supported languages. LanguageSize is updated to
                                  contain the required size.
@@ -196,15 +200,16 @@ EFI_STATUS
                                  points to the length of SecondaryLanguages in bytes.
 
   @retval EFI_SUCCESS            Secondary languages were correctly returned.
-  @retval EFI_INVALID_PARAMETER  PrimaryLanguage or SecondaryLanguages or
-                                 SecondaryLanguagesSize was NULL.
+  @retval EFI_INVALID_PARAMETER  PrimaryLanguage or SecondaryLanguagesSize was NULL.
+  @retval EFI_INVALID_PARAMETER  The value referenced by SecondaryLanguagesSize is not
+                                 zero and SecondaryLanguages is NULL.
   @retval EFI_BUFFER_TOO_SMALL   The buffer specified by SecondaryLanguagesSize is
                                  too small to hold the returned information.
                                  SecondaryLanguageSize is updated to hold the size of
                                  the buffer required.
   @retval EFI_INVALID_LANGUAGE   The language specified by PrimaryLanguage is not
                                  present in the specified package list.
-  @retval EFI_NOT_FOUND          The specified PackageList is not in the Database.                                
+  @retval EFI_NOT_FOUND          The specified PackageList is not in the Database.
 
 **/
 typedef

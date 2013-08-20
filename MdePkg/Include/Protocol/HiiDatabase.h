@@ -223,7 +223,9 @@ EFI_STATUS
                                 updated with a value that will
                                 enable the data to fit.
   @retval EFI_NOT_FOUND         No matching handle could be found in database.
-  @retval EFI_INVALID_PARAMETER Handle or HandleBufferLength was NULL.
+  @retval EFI_INVALID_PARAMETER HandleBufferLength was NULL.
+  @retval EFI_INVALID_PARAMETER The value referenced by HandleBufferLength was not
+                                zero and Handle was NULL.
   @retval EFI_INVALID_PARAMETER PackageType is not a EFI_HII_PACKAGE_TYPE_GUID but
                                 PackageGuid is not NULL, PackageType is a EFI_HII_
                                 PACKAGE_TYPE_GUID but PackageGuid is NULL.
@@ -271,6 +273,13 @@ EFI_STATUS
   
   @retval EFI_OUT_OF_RESOURCES  BufferSize is too small to hold the package.
 
+  @retval EFI_NOT_FOUND         The specifiecd Handle could not be found in the
+                                current database.
+  
+  @retval EFI_INVALID_PARAMETER BufferSize was NULL.
+  
+  @retval EFI_INVALID_PARAMETER The value referenced by BufferSize was not zero 
+                                and Buffer was NULL.
 **/
 typedef
 EFI_STATUS
@@ -393,6 +402,11 @@ EFI_STATUS
                                 KeyGuidBufferLength is updated
                                 with a value that will enable
                                 the data to fit.
+  @retval EFI_INVALID_PARAMETER The KeyGuidBufferLength is NULL.
+  @retval EFI_INVALID_PARAMETER The value referenced by 
+                                KeyGuidBufferLength is not
+                                zero and KeyGuidBuffer is NULL.
+  @retval EFI_NOT_FOUND         There was no keyboard layout.
 
 **/
 typedef
