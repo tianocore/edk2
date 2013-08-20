@@ -2,7 +2,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by DxeCore module.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -673,8 +673,12 @@ CoreInstallProtocolInterfaceNotify (
                                  arguments to InstallProtocolInterface(). All the
                                  protocols are added to Handle.
 
+  @retval EFI_SUCCESS            All the protocol interface was installed.
+  @retval EFI_OUT_OF_RESOURCES   There was not enough memory in pool to install all the protocols.
+  @retval EFI_ALREADY_STARTED    A Device Path Protocol instance was passed in that is already present in
+                                 the handle database.
   @retval EFI_INVALID_PARAMETER  Handle is NULL.
-  @retval EFI_SUCCESS            Protocol interfaces successfully installed.
+  @retval EFI_INVALID_PARAMETER  Protocol is already installed on the handle specified by Handle.
 
 **/
 EFI_STATUS

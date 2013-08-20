@@ -1148,6 +1148,8 @@ EFI_STATUS
   @retval EFI_OUT_OF_RESOURCES  There was not enough memory in pool to install all the protocols.
   @retval EFI_ALREADY_STARTED   A Device Path Protocol instance was passed in that is already present in
                                 the handle database.
+  @retval EFI_INVALID_PARAMETER Handle is NULL.
+  @retval EFI_INVALID_PARAMETER Protocol is already installed on the handle specified by Handle.
 
 **/
 typedef
