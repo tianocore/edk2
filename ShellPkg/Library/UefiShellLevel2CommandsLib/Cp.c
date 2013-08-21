@@ -96,22 +96,9 @@ CopySingleFile(
   }
 
   //
-  // Open destination file without create
-  //
-  Status = ShellOpenFileByName(Dest, &DestHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE, 0);
-
-  //
-  // close file
-  //
-  if (DestHandle != NULL) {
-    ShellCloseFile(&DestHandle);
-    DestHandle   = NULL;
-  }
-
-  //
   // if the destination file existed check response and possibly prompt user
   //
-  if (!EFI_ERROR(Status)) {
+  if (ShellFileExists(Dest) == EFI_SUCCESS) {
     if (Response == NULL && !SilentMode) {
       Status = ShellPromptForResponseHii(ShellPromptResponseTypeYesNoAllCancel, STRING_TOKEN (STR_GEN_DEST_EXIST_OVR), gShellLevel2HiiHandle, &Response);
     }
@@ -165,81 +152,83 @@ CopySingleFile(
       Size = 0;
     }
   } else {
-      //
-      // open file with create enabled
-      //
-      Status = ShellOpenFileByName(Dest, &DestHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE|EFI_FILE_MODE_CREATE, 0);
-      if (EFI_ERROR(Status)) {
-        return (SHELL_ACCESS_DENIED);
-      }
+    Status = ShellDeleteFileByName(Dest);
 
-      //
-      // open source file
-      //
-      Status = ShellOpenFileByName(Source, &SourceHandle, EFI_FILE_MODE_READ, 0);
-      ASSERT_EFI_ERROR(Status);
+    //
+    // open file with create enabled
+    //
+    Status = ShellOpenFileByName(Dest, &DestHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE|EFI_FILE_MODE_CREATE, 0);
+    if (EFI_ERROR(Status)) {
+      return (SHELL_ACCESS_DENIED);
+    }
 
-      //
-      //get file size of source file and freespace available on destination volume
-      //
-      ShellGetFileSize(SourceHandle, &SourceFileSize);
-      ShellGetFileSize(DestHandle, &DestFileSize);
+    //
+    // open source file
+    //
+    Status = ShellOpenFileByName(Source, &SourceHandle, EFI_FILE_MODE_READ, 0);
+    ASSERT_EFI_ERROR(Status);
 
-      //
-      //if the destination file already exists then it will be replaced, meaning the sourcefile effectively needs less storage space
-      //
-      if(DestFileSize < SourceFileSize){
-        SourceFileSize -= DestFileSize;
-      } else {
-        SourceFileSize = 0;
-      }
+    //
+    //get file size of source file and freespace available on destination volume
+    //
+    ShellGetFileSize(SourceHandle, &SourceFileSize);
+    ShellGetFileSize(DestHandle, &DestFileSize);
 
-      //
-      //get the system volume info to check the free space
-      //
-      DestVolumeFP = ConvertShellHandleToEfiFileProtocol(DestHandle);
-      DestVolumeInfo = NULL;
-      DestVolumeInfoSize = 0;
+    //
+    //if the destination file already exists then it will be replaced, meaning the sourcefile effectively needs less storage space
+    //
+    if(DestFileSize < SourceFileSize){
+      SourceFileSize -= DestFileSize;
+    } else {
+      SourceFileSize = 0;
+    }
+
+    //
+    //get the system volume info to check the free space
+    //
+    DestVolumeFP = ConvertShellHandleToEfiFileProtocol(DestHandle);
+    DestVolumeInfo = NULL;
+    DestVolumeInfoSize = 0;
+    Status = DestVolumeFP->GetInfo(
+      DestVolumeFP,
+      &gEfiFileSystemInfoGuid,
+      &DestVolumeInfoSize,
+      DestVolumeInfo
+      );
+
+    if (Status == EFI_BUFFER_TOO_SMALL) {
+      DestVolumeInfo = AllocateZeroPool(DestVolumeInfoSize);
       Status = DestVolumeFP->GetInfo(
         DestVolumeFP,
         &gEfiFileSystemInfoGuid,
         &DestVolumeInfoSize,
         DestVolumeInfo
         );
-
-      if (Status == EFI_BUFFER_TOO_SMALL) {
-        DestVolumeInfo = AllocateZeroPool(DestVolumeInfoSize);
-        Status = DestVolumeFP->GetInfo(
-          DestVolumeFP,
-          &gEfiFileSystemInfoGuid,
-          &DestVolumeInfoSize,
-          DestVolumeInfo
-          );
-      }
-
-      //
-      //check if enough space available on destination drive to complete copy
-      //
-      if (DestVolumeInfo!= NULL && (DestVolumeInfo->FreeSpace < SourceFileSize)) {
-        //
-        //not enough space on destination directory to copy file
-        //
-        SHELL_FREE_NON_NULL(DestVolumeInfo);
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_CPY_FAIL), gShellLevel2HiiHandle);
-        return(SHELL_VOLUME_FULL);
-      } else {
-        //
-        // copy data between files
-        //
-        Buffer = AllocateZeroPool(ReadSize);
-        ASSERT(Buffer != NULL);
-        while (ReadSize == PcdGet32(PcdShellFileOperationSize) && !EFI_ERROR(Status)) {
-          Status = ShellReadFile(SourceHandle, &ReadSize, Buffer);
-          Status = ShellWriteFile(DestHandle, &ReadSize, Buffer);
-        }
-      }
-      SHELL_FREE_NON_NULL(DestVolumeInfo);
     }
+
+    //
+    //check if enough space available on destination drive to complete copy
+    //
+    if (DestVolumeInfo!= NULL && (DestVolumeInfo->FreeSpace < SourceFileSize)) {
+      //
+      //not enough space on destination directory to copy file
+      //
+      SHELL_FREE_NON_NULL(DestVolumeInfo);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_CPY_FAIL), gShellLevel2HiiHandle);
+      return(SHELL_VOLUME_FULL);
+    } else {
+      //
+      // copy data between files
+      //
+      Buffer = AllocateZeroPool(ReadSize);
+      ASSERT(Buffer != NULL);
+      while (ReadSize == PcdGet32(PcdShellFileOperationSize) && !EFI_ERROR(Status)) {
+        Status = ShellReadFile(SourceHandle, &ReadSize, Buffer);
+        Status = ShellWriteFile(DestHandle, &ReadSize, Buffer);
+      }
+    }
+    SHELL_FREE_NON_NULL(DestVolumeInfo);
+  }
 
   //
   // close files
@@ -549,8 +538,10 @@ ProcessValidateAndCopyFiles(
   SHELL_STATUS        ShellStatus;
   EFI_SHELL_FILE_INFO *List;
   EFI_FILE_INFO       *FileInfo;
+  CHAR16              *FullName;
 
-  List = NULL;
+  List      = NULL;
+  FullName  = NULL;
 
   ShellOpenFileMetaArg((CHAR16*)DestDir, EFI_FILE_MODE_READ, &List);
   if (List != NULL && List->Link.ForwardLink != List->Link.BackLink) {
@@ -563,18 +554,21 @@ ProcessValidateAndCopyFiles(
     FileInfo    = NULL;
     FileInfo = gEfiShellProtocol->GetFileInfo(((EFI_SHELL_FILE_INFO *)List->Link.ForwardLink)->Handle);
     ASSERT(FileInfo != NULL);
+    StrnCatGrow(&FullName, NULL, ((EFI_SHELL_FILE_INFO *)List->Link.ForwardLink)->FullName, 0);
+    ShellCloseFileMetaArg(&List);
     if ((FileInfo->Attribute & EFI_FILE_READ_ONLY) == 0) {
-      ShellStatus = ValidateAndCopyFiles(FileList, ((EFI_SHELL_FILE_INFO *)List->Link.ForwardLink)->FullName, SilentMode, RecursiveMode, NULL);
+      ShellStatus = ValidateAndCopyFiles(FileList, FullName, SilentMode, RecursiveMode, NULL);
     } else {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_DEST_ERROR), gShellLevel2HiiHandle);
       ShellStatus = SHELL_ACCESS_DENIED;
     }
-    SHELL_FREE_NON_NULL(FileInfo);
-    ShellCloseFileMetaArg(&List);
   } else {
+    ShellCloseFileMetaArg(&List);
     ShellStatus = ValidateAndCopyFiles(FileList, DestDir, SilentMode, RecursiveMode, NULL);
   }
 
+  SHELL_FREE_NON_NULL(FileInfo);
+  SHELL_FREE_NON_NULL(FullName);
   return (ShellStatus);
 }
 
