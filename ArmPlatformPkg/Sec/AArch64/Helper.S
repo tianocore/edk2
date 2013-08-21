@@ -18,40 +18,11 @@
 .text
 .align 3
 
-ASM_GLOBAL ASM_PFX(SetupExceptionLevel3)
 ASM_GLOBAL ASM_PFX(SwitchToNSExceptionLevel1)
 ASM_GLOBAL ASM_PFX(enter_monitor_mode)
 ASM_GLOBAL ASM_PFX(return_from_exception)
 ASM_GLOBAL ASM_PFX(copy_cpsr_into_spsr)
 ASM_GLOBAL ASM_PFX(set_non_secure_mode)
-
-ASM_PFX(SetupExceptionLevel3):
-   // Check for the primary CPU to avoid a race on the distributor registers.
-   mrs     x0, mpidr_el1
-   tst     x0, #15
-   b.ne    1f                              // secondary CPU
-
-   LoadConstantToReg (FixedPcdGet32(PcdGicInterruptInterfaceBase), x1)
-   mov     w0, #3                          // EnableGrp0 | EnableGrp1
-   str     w0, [x1]
-
-1: LoadConstantToReg (FixedPcdGet32(PcdGicDistributorBase), x1)
-   add     x1, x1, #0x80
-   mov     w0, #~0                         // Grp1 interrupts
-   str     w0, [x1], #4
-   b.ne    2f                              // Only local interrupts for secondary CPUs
-   str     w0, [x1], #4
-   str     w0, [x1], #4
-
-2: LoadConstantToReg (FixedPcdGet32(PcdGicInterruptInterfaceBase), x1)
-   ldr     w0, [x1]
-   mov     w0, #3                          // EnableGrp0 | EnableGrp1
-   str     w0, [x1]
-
-   mov     w0, #1 << 7                     // allow NS access to GICC_PMR
-   str     w0, [x1, #4]                    // GICC_PMR
-
-   ret
 
 // Switch from EL3 to NS-EL1
 ASM_PFX(SwitchToNSExceptionLevel1):
@@ -104,21 +75,6 @@ ASM_PFX(enter_monitor_mode):
 // We may need to do some config before we change to another Mode.
 ASM_PFX(return_from_exception):
    msr     elr_el3, x0
-
-   mrs     x7, spsr_el3
-   ands    w7, w7, #0xC
-   cmp     w7, #0xC       // EL3?
-   b.eq    3f
-   bl      ASM_PFX(SetupExceptionLevel3)
-   cmp     w7, #0x8       // EL2?
-   b.eq    2f
-   cmp     w7, #0x4       // EL1?
-   b.eq    1f
-   b       dead           // We should never get here.
-
-1: bl      ASM_PFX(SwitchToNSExceptionLevel1)
-2: // EL2: No more setup required.
-3: // EL3: Not sure why we would do this.
    eret
 
 // For AArch64 we need to construct the spsr we want from individual bits and pieces.
