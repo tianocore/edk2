@@ -110,24 +110,6 @@
   gArmTokenSpaceGuid.PcdHypFdSize|0|UINT32|0x0000003B
   gArmTokenSpaceGuid.PcdHypFvBaseAddress|0|UINT32|0x0000003C
   gArmTokenSpaceGuid.PcdHypFvSize|0|UINT32|0x0000003D
- 
-  #
-  # ARM Security Extension
-  #
-  
-  # Secure Configuration Register
-  # - BIT0 : NS - Non Secure bit 
-  # - BIT1 : IRQ Handler
-  # - BIT2 : FIQ Handler
-  # - BIT3 : EA - External Abort
-  # - BIT4 : FW - F bit writable
-  # - BIT5 : AW - A bit writable
-  # - BIT6 : nET - Not Early Termination
-  # - BIT7 : SCD - Secure Monitor Call Disable
-  # - BIT8 : HCE - Hyp Call enable
-  # - BIT9 : SIF - Secure Instruction Fetch
-  # 0x31 = NS | EA | FW
-  gArmTokenSpaceGuid.PcdArmScr|0x31|UINT32|0x00000038
 
   # System Memory (DRAM): These PCDs define the region of in-built system memory
   # Some platforms can get DRAM extensions, these additional regions will be declared
@@ -161,6 +143,24 @@
   gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|30|UINT32|0x00000036
 
 [PcdsFixedAtBuild.ARM]
+  #
+  # ARM Security Extension
+  #
+
+  # Secure Configuration Register
+  # - BIT0 : NS - Non Secure bit
+  # - BIT1 : IRQ Handler
+  # - BIT2 : FIQ Handler
+  # - BIT3 : EA - External Abort
+  # - BIT4 : FW - F bit writable
+  # - BIT5 : AW - A bit writable
+  # - BIT6 : nET - Not Early Termination
+  # - BIT7 : SCD - Secure Monitor Call Disable
+  # - BIT8 : HCE - Hyp Call enable
+  # - BIT9 : SIF - Secure Instruction Fetch
+  # 0x31 = NS | EA | FW
+  gArmTokenSpaceGuid.PcdArmScr|0x31|UINT32|0x00000038
+
   # By default we do not do a transition to non-secure mode
   gArmTokenSpaceGuid.PcdArmNonSecModeTransition|0x0|UINT32|0x0000003E
 
@@ -183,6 +183,28 @@
   gArmTokenSpaceGuid.PcdArmNsacr|0xC00|UINT32|0x00000039
 
 [PcdsFixedAtBuild.AARCH64]
+  #
+  # AArch64 Security Extension
+  #
+
+  # Secure Configuration Register
+  # - BIT0 : NS - Non Secure bit
+  # - BIT1 : IRQ Handler
+  # - BIT2 : FIQ Handler
+  # - BIT3 : EA - External Abort
+  # - BIT4 : FW - F bit writable
+  # - BIT5 : AW - A bit writable
+  # - BIT6 : nET - Not Early Termination
+  # - BIT7 : SCD - Secure Monitor Call Disable
+  # - BIT8 : HCE - Hyp Call enable
+  # - BIT9 : SIF - Secure Instruction Fetch
+  # - BIT10: RW -  Register width control for lower exception levels
+  # - BIT11: SIF - Enables Secure EL1 access to EL1 Architectural Timer
+  # - BIT12: TWI - Trap WFI
+  # - BIT13: TWE - Trap WFE
+  # 0x501 = NS | HCE | RW
+  gArmTokenSpaceGuid.PcdArmScr|0x501|UINT32|0x00000038
+
   # By default we do transition to EL2 non-secure mode with Stack for EL2.
   #        Mode Description              Bits
   # NS EL2 SP2 all interupts disabled =  0x3c9

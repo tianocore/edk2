@@ -26,20 +26,6 @@ ASM_GLOBAL ASM_PFX(copy_cpsr_into_spsr)
 ASM_GLOBAL ASM_PFX(set_non_secure_mode)
 
 ASM_PFX(SetupExceptionLevel3):
-   mrs    x0, scr_el3            // Read EL3 Secure Configuration Register
-   orr    x0, x0, #1             // EL0 an EL1 cannot access secure memory
-
-   // Send all interrupts to their respective Exception levels for EL3
-   bic    x0, x0, #(1 << 1)      // IRQ
-   bic    x0, x0, #(1 << 2)      // FIQ
-   bic    x0, x0, #(1 << 3)      // Serror and Abort
-   orr    x0, x0, #(1 << 8)      // Enable HVC
-   orr    x0, x0, #(1 << 10)     // Make next level down 64Bit. This is EL2 in the case of the Model.
-                                 // We need a nice way to detect this.
-   msr    scr_el3, x0            // Write back our settings
-
-   msr    cptr_el3, xzr          // Disable copro traps to EL3
-
    // Check for the primary CPU to avoid a race on the distributor registers.
    mrs     x0, mpidr_el1
    tst     x0, #15
