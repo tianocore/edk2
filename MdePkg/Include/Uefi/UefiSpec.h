@@ -987,7 +987,15 @@ typedef enum {
   /// state.  If the system does not support this reset type, then when the system
   /// is rebooted, it should exhibit the EfiResetCold attributes.
   ///
-  EfiResetShutdown
+  EfiResetShutdown,
+  ///
+  /// Used to induce a system-wide reset. The exact type of the reset is defined by
+  /// the EFI_GUID that follows the Null-terminated Unicode string passed into
+  /// ResetData. If the platform does not recognize the EFI_GUID in ResetData the 
+  /// platform must pick a supported reset type to perform. The platform may
+  /// optionally log the parameters from any non-normal reset that occurs.
+  ///
+  EfiResetPlatformSpecific
 } EFI_RESET_TYPE;
 
 /**
