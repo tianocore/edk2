@@ -1085,6 +1085,7 @@ ShellConvertVariables (
   CHAR16              *NewCommandLine1;
   CHAR16              *NewCommandLine2;
   CHAR16              *Temp;
+  CHAR16              *Temp2;
   UINTN               ItemSize;
   CHAR16              *ItemTemp;
   SCRIPT_FILE         *CurrentScriptFile;
@@ -1143,15 +1144,6 @@ ShellConvertVariables (
   }
 
   //
-  // Quick out if none were found...
-  //
-  if (NewSize == StrSize(OriginalCommandLine)) {
-    ASSERT(Temp == NULL);
-    Temp = StrnCatGrow(&Temp, NULL, OriginalCommandLine, 0);
-    return (Temp);
-  }
-
-  //
   // now do the replacements...
   //
   NewCommandLine1 = AllocateZeroPool(NewSize);
@@ -1182,8 +1174,51 @@ ShellConvertVariables (
     ShellCopySearchAndReplace(NewCommandLine1, NewCommandLine2, NewSize, AliasListNode->Alias, AliasListNode->CommandString, TRUE, FALSE);
     StrCpy(NewCommandLine1, NewCommandLine2);
     }
+
+    //
+    // Remove non-existant environment variables in scripts only
+    //
+    for (Temp = NewCommandLine1 ; Temp != NULL ; ) {
+      Temp = StrStr(Temp, L"%");
+      if (Temp == NULL) {
+        break;
+      }
+      while (*(Temp - 1) == L'^') {
+        Temp = StrStr(Temp + 1, L"%");
+        if (Temp == NULL) {
+          break;
+       }
+      }
+      if (Temp == NULL) {
+        break;
+      }
+      
+      Temp2 = StrStr(Temp + 1, L"%");
+      if (Temp2 == NULL) {
+        break;
+      }
+      while (*(Temp2 - 1) == L'^') {
+        Temp2 = StrStr(Temp2 + 1, L"%");
+        if (Temp2 == NULL) {
+          break;
+        }
+      }
+      if (Temp2 == NULL) {
+        break;
+      }
+      
+      Temp2++;
+      CopyMem(Temp, Temp2, StrSize(Temp2));
+    }
+
   }
 
+  //
+  // Now cleanup any straggler intentionally ignored "%" characters
+  //
+  ShellCopySearchAndReplace(NewCommandLine1, NewCommandLine2, NewSize, L"^%", L"%", TRUE, FALSE);
+  StrCpy(NewCommandLine1, NewCommandLine2);
+  
   FreePool(NewCommandLine2);
   FreePool(ItemTemp);
 
