@@ -1,14 +1,14 @@
 /** @file
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
-*  
-*  This program and the accompanying materials                          
-*  are licensed and made available under the terms and conditions of the BSD License         
-*  which accompanies this distribution.  The full text of the license may be found at        
-*  http://opensource.org/licenses/bsd-license.php                                            
+*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 *
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+*  This program and the accompanying materials
+*  are licensed and made available under the terms and conditions of the BSD License
+*  which accompanies this distribution.  The full text of the license may be found at
+*  http://opensource.org/licenses/bsd-license.php
+*
+*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 *
 **/
 
@@ -70,6 +70,11 @@
 #define ARM_GIC_ICCICR_SIGNAL_SECURE_TO_FIQ     0x08
 #define ARM_GIC_ICCICR_USE_SBPR                 0x10
 
+// Bit Mask for GICC_IIDR
+#define ARM_GIC_ICCIDR_GET_PRODUCT_ID(IccIdr)   (((IccIdr) >> 20) & 0xFFF)
+#define ARM_GIC_ICCIDR_GET_ARCH_VERSION(IccIdr) (((IccIdr) >> 16) & 0xF)
+#define ARM_GIC_ICCIDR_GET_REVISION(IccIdr)     (((IccIdr) >> 12) & 0xF)
+#define ARM_GIC_ICCIDR_GET_IMPLEMENTER(IccIdr)  ((IccIdr) & 0xFFF)
 
 //
 // GIC Secure interfaces
