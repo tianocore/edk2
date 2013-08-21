@@ -107,8 +107,8 @@
   #
   gArmTokenSpaceGuid.PcdArmUncachedMemoryMask|0x0000000040000000
 
-  ## Trustzone enable
-  # gArmTokenSpaceGuid.PcdTrustzoneSupport|TRUE
+  ## Trustzone enable (to make the transition from EL3 to EL2 in ArmPlatformPkg/Sec)
+  gArmTokenSpaceGuid.PcdTrustzoneSupport|TRUE
  
   #
   # ARM PrimeCell
