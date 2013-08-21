@@ -1336,7 +1336,7 @@ UNDI_APIEntry_Common (
   if ((CdbPtr->OpCode > PXE_OPCODE_LAST_VALID) ||
       (CdbPtr->StatCode != PXE_STATCODE_INITIALIZE) ||
       (CdbPtr->StatFlags != PXE_STATFLAGS_INITIALIZE) ||
-      (CdbPtr->IFnum >= (pxe_31->IFcnt | pxe_31->IFcntExt << 8) ) {
+      (CdbPtr->IFnum >= (pxe_31->IFcnt |  pxe_31->IFcntExt << 8))) {
     goto badcdb;
 
   }
@@ -1437,7 +1437,7 @@ PxeUpdate (
   )
 {
   UINT16 NicNum;
-  NicNum = (PxePtr->IFcnt | PxePtr->IFcntEx << 8);
+  NicNum = (PxePtr->IFcnt | PxePtr->IFcntExt << 8);
   
   if (NicPtr == NULL) {
     if (NicNum > 0) {
@@ -1456,7 +1456,7 @@ PxeUpdate (
   
 done: 
   PxePtr->IFcnt = (UINT8)(NicNum & 0xFF);
-  PxePtr->IFcntEx = (UINT8) ((NicNum & 0xFF00) >> 8);
+  PxePtr->IFcntExt = (UINT8) ((NicNum & 0xFF00) >> 8);
   PxePtr->Fudge = (UINT8) (PxePtr->Fudge - CalculateSum8 ((VOID *) PxePtr, PxePtr->Len));
   return ;
 }
@@ -1489,7 +1489,7 @@ PxeStructInit (
   // number of NICs this undi supports
   //
   PxePtr->IFcnt = 0;
-  PxePtr->IFcntEx = 0;
+  PxePtr->IFcntExt = 0;
   PxePtr->Rev       = PXE_ROMID_REV;
   PxePtr->MajorVer  = PXE_ROMID_MAJORVER;
   PxePtr->MinorVer  = PXE_ROMID_MINORVER;
