@@ -354,6 +354,7 @@ DiskIoDriverBindingStop (
 /**
   Destroy the sub task.
 
+  @param Instance     Pointer to the DISK_IO_PRIVATE_DATA.
   @param Subtask      Subtask.
 
   @return LIST_ENTRY *  Pointer to the next link of subtask.
