@@ -131,7 +131,6 @@ DiskIoDriverBindingStart (
   EFI_STATUS            Status;
   DISK_IO_PRIVATE_DATA  *Instance;
   EFI_TPL               OldTpl;
-  EFI_BLOCK_IO_MEDIA    *Media;
 
   Instance = NULL;
 
@@ -173,8 +172,6 @@ DiskIoDriverBindingStart (
     goto ErrorExit;
   }
   
-  Media = Instance->BlockIo->Media;
-
   //
   // The BlockSize and IoAlign of BlockIo and BlockIo2 should equal.
   //
