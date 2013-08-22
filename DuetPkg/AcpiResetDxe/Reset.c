@@ -138,6 +138,9 @@ EfiAcpiResetSystem (
     //
     IoWrite8 (0x64, 0xfe);
     CpuDeadLoop ();
+
+  default:
+    break;
   }
 
   //
