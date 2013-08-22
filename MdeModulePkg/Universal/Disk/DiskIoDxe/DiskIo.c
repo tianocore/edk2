@@ -809,7 +809,7 @@ DiskIo2ReadWriteDisk (
   BlockIo2  = Instance->BlockIo2;
   Media     = BlockIo->Media;
   Status    = EFI_SUCCESS;
-  Blocking  = ((Token == NULL) || (Token->Event == NULL));
+  Blocking  = (BOOLEAN) ((Token == NULL) || (Token->Event == NULL));
 
   if (Media->MediaId != MediaId) {
     return EFI_MEDIA_CHANGED;
