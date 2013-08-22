@@ -8,7 +8,7 @@
   CheckImage(), GetPackageInfo(), and SetPackageInfo() shall return 
   EFI_UNSUPPORTED if not supported by the driver.
   
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -85,6 +85,11 @@ typedef struct {
   /// values of this parameter.
   /// 
   UINT64                           Compatibilities;
+  ///
+  /// Describes the lowest ImageDescriptor version that the device will accept. Only
+  /// present in version 2 or higher.
+  ///
+  UINT32                           LowestSupportedImageVersion;
 } EFI_FIRMWARE_IMAGE_DESCRIPTOR;
 
 
@@ -127,7 +132,7 @@ typedef struct {
 ///
 /// Descriptor Version
 ///
-#define   EFI_FIRMWARE_IMAGE_DESCRIPTOR_VERSION   1
+#define   EFI_FIRMWARE_IMAGE_DESCRIPTOR_VERSION   2
 
 
 ///
