@@ -65,20 +65,29 @@ formset
     //
     // Display of Oneof: 'Secure Boot Mode'
     //
-    oneof varid  = SECUREBOOT_CONFIGURATION.SecureBootMode,
-          questionid = KEY_SECURE_BOOT_MODE,      
-          prompt = STRING_TOKEN(STR_SECURE_BOOT_MODE_PROMPT),
-          help   = STRING_TOKEN(STR_SECURE_BOOT_MODE_HELP),
-          flags  = INTERACTIVE,
-          option text = STRING_TOKEN(STR_STANDARD_MODE),    value = SECURE_BOOT_MODE_STANDARD, flags = DEFAULT;
-          option text = STRING_TOKEN(STR_CUSTOM_MODE),      value = SECURE_BOOT_MODE_CUSTOM,   flags = 0;
-    endoneof;
+    disableif TRUE;
+      oneof varid  = SECUREBOOT_CONFIGURATION.SecureBootMode,
+            prompt = STRING_TOKEN(STR_SECURE_BOOT_MODE_PROMPT),
+            help   = STRING_TOKEN(STR_SECURE_BOOT_MODE_HELP),
+            flags  = INTERACTIVE,
+            option text = STRING_TOKEN(STR_STANDARD_MODE),    value = SECURE_BOOT_MODE_STANDARD, flags = 0;
+            option text = STRING_TOKEN(STR_CUSTOM_MODE),      value = SECURE_BOOT_MODE_CUSTOM,   flags = 0;
+      endoneof;
+    endif;
+      oneof name = SecureBootMode,
+            questionid = KEY_SECURE_BOOT_MODE,      
+            prompt = STRING_TOKEN(STR_SECURE_BOOT_MODE_PROMPT),
+            help   = STRING_TOKEN(STR_SECURE_BOOT_MODE_HELP),
+            flags  = INTERACTIVE | NUMERIC_SIZE_1,
+            option text = STRING_TOKEN(STR_STANDARD_MODE),    value = SECURE_BOOT_MODE_STANDARD, flags = DEFAULT;
+            option text = STRING_TOKEN(STR_CUSTOM_MODE),      value = SECURE_BOOT_MODE_CUSTOM,   flags = 0;
+      endoneof;
     
     //
     //
     // Display of 'Current Secure Boot Mode'
     //
-    suppressif ideqval SECUREBOOT_CONFIGURATION.SecureBootMode == SECURE_BOOT_MODE_STANDARD;
+    suppressif questionref(SecureBootMode) == SECURE_BOOT_MODE_STANDARD;
       grayoutif NOT ideqval SECUREBOOT_CONFIGURATION.PhysicalPresent == 1;
       goto FORMID_SECURE_BOOT_OPTION_FORM,
            prompt = STRING_TOKEN(STR_SECURE_BOOT_OPTION),

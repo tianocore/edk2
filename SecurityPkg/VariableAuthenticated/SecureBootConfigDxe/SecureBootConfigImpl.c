@@ -48,6 +48,8 @@ HII_VENDOR_DEVICE_PATH          mSecureBootHiiVendorDevicePath = {
 };
 
 
+BOOLEAN mIsEnterSecureBootForm = FALSE;
+
 //
 // OID ASN.1 Value for Hash Algorithms
 //
@@ -2407,6 +2409,14 @@ SecureBootRouteConfig (
     return EFI_NOT_FOUND;
   }
 
+  //
+  // Get Configuration from Variable.
+  //
+  SecureBootExtractConfigFromVariable (&IfrNvData);
+
+  //
+  // Map the Configuration to the configuration block.
+  //
   BufferSize = sizeof (SECUREBOOT_CONFIGURATION);
   Status = gHiiConfigRouting->ConfigToBlock (
                                 gHiiConfigRouting,
@@ -2488,6 +2498,25 @@ SecureBootCallback (
     return EFI_INVALID_PARAMETER;
   }
 
+  if (Action == EFI_BROWSER_ACTION_FORM_OPEN) {
+    if (QuestionId == KEY_SECURE_BOOT_MODE) {
+      mIsEnterSecureBootForm = TRUE;
+    }
+
+    return EFI_SUCCESS;
+  }
+  
+  if (Action == EFI_BROWSER_ACTION_RETRIEVE) {
+    Status = EFI_UNSUPPORTED;
+    if (QuestionId == KEY_SECURE_BOOT_MODE) {
+      if (mIsEnterSecureBootForm) {
+        Value->u8 = SECURE_BOOT_MODE_STANDARD;
+        Status = EFI_SUCCESS;
+      }
+    }
+    return Status;
+  }
+  
   if ((Action != EFI_BROWSER_ACTION_CHANGED) &&
       (Action != EFI_BROWSER_ACTION_CHANGING) &&
       (Action != EFI_BROWSER_ACTION_FORM_CLOSE) &&
@@ -2759,19 +2788,7 @@ SecureBootCallback (
       break;
       
     case KEY_SECURE_BOOT_MODE:
-      GetVariable2 (EFI_CUSTOM_MODE_NAME, &gEfiCustomModeEnableGuid, (VOID**)&SecureBootMode, NULL);
-      if (NULL != SecureBootMode) {
-        Status = gRT->SetVariable (                          
-                        EFI_CUSTOM_MODE_NAME,
-                        &gEfiCustomModeEnableGuid,
-                        EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                        sizeof (UINT8),
-                        &Value->u8
-                        );
-        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
-        IfrNvData->SecureBootMode = Value->u8;
-        FreePool (SecureBootMode);
-      }        
+      mIsEnterSecureBootForm = FALSE;
       break;
 
     case KEY_SECURE_BOOT_KEK_GUID:
