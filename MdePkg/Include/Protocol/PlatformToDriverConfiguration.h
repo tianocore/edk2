@@ -5,7 +5,7 @@
   by a UEFI Driver in its Start() function. This protocol allows the driver to receive 
   configuration information as part of being started.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -84,7 +84,7 @@ typedef struct _EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL EFI_PLATFORM_TO_DR
                               may be different for different
                               protocols. UEFI driver decodes this
                               structure and its contents based on
-                              ProtocolGuid. ParameterBlock is
+                              ParameterTypeGuid. ParameterBlock is
                               allocated by the platform and the
                               platform is responsible for freeing
                               the ParameterBlock after Result is

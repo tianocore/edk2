@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2008-2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -97,7 +97,7 @@ EFI_STATUS
                          parameters specific to the ParameterTypeGuid. This structure
                          is defined based on the protocol and may be different for
                          different protocols. UEFI driver decodes this structure
-                         and its contents based on ProtocolGuid. ParameterBlock
+                         and its contents based on ParameterTypeGuid. ParameterBlock
                          is allocated by the platform and the platform is responsible
                          for freeing the ParameterBlock after Response is called.
     ParameterBlockSize - The platform returns the size of the ParameterBlock in bytes.
