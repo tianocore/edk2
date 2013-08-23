@@ -61,6 +61,7 @@ VirtioNetIsPacketAvailable (
   //
   MemoryFence ();
   RxCurUsed = *Dev->RxRing.Used.Idx;
+  MemoryFence ();
 
   if (Dev->RxLastUsed != RxCurUsed) {
     gBS->SignalEvent (&Dev->Snp.WaitForPacket);

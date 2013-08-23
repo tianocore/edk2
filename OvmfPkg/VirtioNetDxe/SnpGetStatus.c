@@ -103,6 +103,7 @@ VirtioNetGetStatus (
   MemoryFence ();
   RxCurUsed = *Dev->RxRing.Used.Idx;
   TxCurUsed = *Dev->TxRing.Used.Idx;
+  MemoryFence ();
 
   if (InterruptStatus != NULL) {
     //

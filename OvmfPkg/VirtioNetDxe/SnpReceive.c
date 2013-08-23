@@ -105,6 +105,7 @@ VirtioNetReceive (
   //
   MemoryFence ();
   RxCurUsed = *Dev->RxRing.Used.Idx;
+  MemoryFence ();
 
   if (Dev->RxLastUsed == RxCurUsed) {
     Status = EFI_NOT_READY;

@@ -456,5 +456,6 @@ VirtioFlush (
     MemoryFence();
   }
 
+  MemoryFence();
   return EFI_SUCCESS;
 }
