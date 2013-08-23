@@ -1,7 +1,7 @@
 /** @file
   EFI Driver Diagnostics Protocol
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -40,6 +40,12 @@ typedef enum {
   /// suitable for a manufacturing and test environment.
   ///
   EfiDriverDiagnosticTypeManufacturing= 2,
+  ///
+  /// This is an optional diagnostic type that would only be used in the situation where an 
+  /// EFI_NOT_READY had been returned by a previous call to RunDiagnostics()
+  /// and there is a desire to cancel the current running diagnostics operation.
+  ///
+  EfiDriverDiagnosticTypeCancel       = 3,
   EfiDriverDiagnosticTypeMaximum
 } EFI_DRIVER_DIAGNOSTIC_TYPE;
 
