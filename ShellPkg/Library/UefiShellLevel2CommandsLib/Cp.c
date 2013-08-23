@@ -542,6 +542,7 @@ ProcessValidateAndCopyFiles(
 
   List      = NULL;
   FullName  = NULL;
+  FileInfo  = NULL;
 
   ShellOpenFileMetaArg((CHAR16*)DestDir, EFI_FILE_MODE_READ, &List);
   if (List != NULL && List->Link.ForwardLink != List->Link.BackLink) {
