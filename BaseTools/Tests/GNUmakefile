@@ -1,5 +1,5 @@
 ## @file
-# Windows makefile for 'Tests' module build.
+# GNU/Linux makefile for 'Tests' module build.
 #
 # Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials

@@ -92,3 +92,8 @@ gUNPACK_DIR = None
 # Flag used to mark whether the INF file is Binary INF or not.
 #
 gIS_BINARY_INF = False
+#
+# Used by Library instance parser
+# {FilePath: FileObj}
+#
+gLIBINSTANCEDICT = {}

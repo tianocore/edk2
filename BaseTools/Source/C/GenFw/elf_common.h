@@ -2,6 +2,7 @@
 Ported ELF include files from FreeBSD
 
 Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
+Portions Copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -183,6 +184,7 @@ typedef struct {
 #define EM_TINYJ	61	/* Advanced Logic Corp. TinyJ processor. */
 #define EM_X86_64	62	/* Advanced Micro Devices x86-64 */
 #define	EM_AMD64	EM_X86_64	/* Advanced Micro Devices x86-64 (compat) */
+#define EM_AARCH64	183	/* ARM 64bit Architecture */
 
 /* Non-standard or deprecated. */
 #define EM_486		6	/* Intel i486. */
@@ -542,6 +544,135 @@ typedef struct {
 #define	R_386_TLS_DTPMOD32	35	/* GOT entry containing TLS index */
 #define	R_386_TLS_DTPOFF32	36	/* GOT entry containing TLS offset */
 #define	R_386_TLS_TPOFF32	37	/* GOT entry of -ve static TLS offset */
+
+/* Null relocation */
+#define	R_AARCH64_NONE				256	/* No relocation */
+/* Static AArch64 relocations */
+ /* Static data relocations */
+#define	R_AARCH64_ABS64				257	/* S + A */
+#define	R_AARCH64_ABS32				258	/* S + A */
+#define	R_AARCH64_ABS16				259	/* S + A */
+#define	R_AARCH64_PREL64			260	/* S + A - P */
+#define	R_AARCH64_PREL32			261	/* S + A - P */
+#define	R_AARCH64_PREL16			262	/* S + A - P */
+ /* Group relocations to create a 16, 32, 48, or 64 bit unsigned data value or address inline */
+#define	R_AARCH64_MOVW_UABS_G0			263	/* S + A */
+#define	R_AARCH64_MOVW_UABS_G0_NC		264	/* S + A */
+#define	R_AARCH64_MOVW_UABS_G1			265	/* S + A */
+#define	R_AARCH64_MOVW_UABS_G1_NC		266	/* S + A */
+#define	R_AARCH64_MOVW_UABS_G2			267	/* S + A */
+#define	R_AARCH64_MOVW_UABS_G2_NC		268	/* S + A */
+#define	R_AARCH64_MOVW_UABS_G3			269	/* S + A */
+ /* Group relocations to create a 16, 32, 48, or 64 bit signed data or offset value inline */
+#define	R_AARCH64_MOVW_SABS_G0			270	/* S + A */
+#define	R_AARCH64_MOVW_SABS_G1			271	/* S + A */
+#define	R_AARCH64_MOVW_SABS_G2			272	/* S + A */
+ /* Relocations to generate 19, 21 and 33 bit PC-relative addresses */
+#define	R_AARCH64_LD_PREL_LO19			273	/* S + A - P */
+#define	R_AARCH64_ADR_PREL_LO21			274	/* S + A - P */
+#define	R_AARCH64_ADR_PREL_PG_HI21		275	/* Page(S+A) - Page(P) */
+#define	R_AARCH64_ADR_PREL_PG_HI21_NC		276	/* Page(S+A) - Page(P) */
+#define	R_AARCH64_ADD_ABS_LO12_NC		277	/* S + A */
+#define	R_AARCH64_LDST8_ABS_LO12_NC		278	/* S + A */
+#define	R_AARCH64_LDST16_ABS_LO12_NC		284	/* S + A */
+#define	R_AARCH64_LDST32_ABS_LO12_NC		285	/* S + A */
+#define	R_AARCH64_LDST64_ABS_LO12_NC		286	/* S + A */
+#define	R_AARCH64_LDST128_ABS_LO12_NC		299	/* S + A */
+ /* Relocations for control-flow instructions - all offsets are a multiple of 4 */
+#define	R_AARCH64_TSTBR14			279	/* S+A-P */
+#define	R_AARCH64_CONDBR19			280	/* S+A-P */
+#define	R_AARCH64_JUMP26			282	/* S+A-P */
+#define	R_AARCH64_CALL26			283	/* S+A-P */
+ /* Group relocations to create a 16, 32, 48, or 64 bit PC-relative offset inline */
+#define	R_AARCH64_MOVW_PREL_G0			287	/* S+A-P */
+#define	R_AARCH64_MOVW_PREL_G0_NC		288	/* S+A-P */
+#define	R_AARCH64_MOVW_PREL_G1			289	/* S+A-P */
+#define	R_AARCH64_MOVW_PREL_G1_NC		290	/* S+A-P */
+#define	R_AARCH64_MOVW_PREL_G2			291	/* S+A-P */
+#define	R_AARCH64_MOVW_PREL_G2_NC		292	/* S+A-P */
+#define	R_AARCH64_MOVW_PREL_G3			293	/* S+A-P */
+ /* Group relocations to create a 16, 32, 48, or 64 bit GOT-relative offsets inline */
+#define	R_AARCH64_MOVW_GOTOFF_G0		300	/* G(S)-GOT */
+#define	R_AARCH64_MOVW_GOTOFF_G0_NC		301	/* G(S)-GOT */
+#define	R_AARCH64_MOVW_GOTOFF_G1		302	/* G(S)-GOT */
+#define	R_AARCH64_MOVW_GOTOFF_G1_NC		303	/* G(S)-GOT */
+#define	R_AARCH64_MOVW_GOTOFF_G2		304	/* G(S)-GOT */
+#define	R_AARCH64_MOVW_GOTOFF_G2_NC		305	/* G(S)-GOT */
+#define	R_AARCH64_MOVW_GOTOFF_G3		306	/* G(S)-GOT */
+ /*  GOT-relative data relocations */
+#define	R_AARCH64_GOTREL64			307	/* S+A-GOT */
+#define	R_AARCH64_GOTREL32			308	/* S+A-GOT */
+ /* GOT-relative instruction relocations */
+#define	R_AARCH64_GOT_LD_PREL19			309	/* G(S)-P */
+#define	R_AARCH64_LD64_GOTOFF_LO15		310	/* G(S)-GOT */
+#define	R_AARCH64_ADR_GOT_PAGE			311	/* Page(G(S))-Page(P) */
+#define	R_AARCH64_LD64_GOT_LO12_NC		312	/* G(S) */
+#define	R_AARCH64_LD64_GOTPAGE_LO15		313	/* G(S)-Page(GOT) */
+/* Relocations for thread-local storage */
+ /* General Dynamic TLS relocations */
+#define	R_AARCH64_TLSGD_ADR_PREL21		512	/* G(TLSIDX(S+A)) - P */
+#define	R_AARCH64_TLSGD_ADR_PAGE21		513	/* Page(G(TLSIDX(S+A))) - Page(P) */
+#define	R_AARCH64_TLSGD_ADD_LO12_NC		514	/* G(TLSIDX(S+A)) */
+#define	R_AARCH64_TLSGD_MOVW_G1			515	/* G(TLSIDX(S+A)) - GOT */
+#define	R_AARCH64_TLSGD_MOVW_G0_NC		516	/* G(TLSIDX(S+A)) - GOT */
+ /* Local Dynamic TLS relocations */
+#define	R_AARCH64_TLSLD_ADR_PREL21		517	/* G(LDM(S))) - P */
+#define	R_AARCH64_TLSLD_ADR_PAGE21		518	/* Page(G(LDM(S)))-Page(P) */
+#define	R_AARCH64_TLSLD_ADD_LO12_NC		519	/* G(LDM(S)) */
+#define	R_AARCH64_TLSLD_MOVW_G1			520	/* G(LDM(S)) - GOT */
+#define	R_AARCH64_TLSLD_MOVW_G0_NC		521	/* G(LDM(S)) - GOT */
+#define	R_AARCH64_TLSLD_LD_PREL19		522	/* G(LDM(S)) - P */
+#define	R_AARCH64_TLSLD_MOVW_DTPREL_G2		523	/* DTPREL(S+A) */
+#define	R_AARCH64_TLSLD_MOVW_DTPREL_G1		524	/* DTPREL(S+A) */
+#define	R_AARCH64_TLSLD_MOVW_DTPREL_G1_NC	525	/* DTPREL(S+A) */
+#define	R_AARCH64_TLSLD_MOVW_DTPREL_G0		526	/* DTPREL(S+A) */
+#define	R_AARCH64_TLSLD_MOVW_DTPREL_G0_NC	527	/* DTPREL(S+A) */
+#define	R_AARCH64_TLSLD_ADD_DTPREL_HI12		528	/* DTPREL(S+A) */
+#define	R_AARCH64_TLSLD_ADD_DTPREL_LO12		529	/* DTPREL(S+A) */
+#define	R_AARCH64_TLSLD_ADD_DTPREL_LO12_NC	530	/* DTPREL(S+A) */
+#define	R_AARCH64_TLSLD_LDST8_DTPREL_LO12	531	/* DTPREL(S+A) */
+#define	R_AARCH64_TLSLD_LDST8_DTPREL_LO12_NC	532	/* DTPREL(S+A) */
+#define	R_AARCH64_TLSLD_LDST16_DTPREL_LO12	533	/* DTPREL(S+A) */
+#define	R_AARCH64_TLSLD_LDST16_DTPREL_LO12_NC	534	/* DTPREL(S+A) */
+#define	R_AARCH64_TLSLD_LDST32_DTPREL_LO12	535	/* DTPREL(S+A) */
+#define	R_AARCH64_TLSLD_LDST32_DTPREL_LO12_NC	536	/* DTPREL(S+A) */
+#define	R_AARCH64_TLSLD_LDST64_DTPREL_LO12	537	/* DTPREL(S+A) */
+#define	R_AARCH64_TLSLD_LDST64_DTPREL_LO12_NC	538	/* DTPREL(S+A) */
+ /* Initial Exec TLS relocations */
+#define	R_AARCH64_TLSIE_MOVW_GOTTPREL_G1	539	/* G(TPREL(S+A)) - GOT */
+#define	R_AARCH64_TLSIE_MOVW_GOTTPREL_G0_NC	540	/* G(TPREL(S+A)) - GOT */
+#define	R_AARCH64_TLSIE_ADR_GOTTPREL_PAGE21	541	/* Page(G(TPREL(S+A))) - Page(P) */
+#define	R_AARCH64_TLSIE_LD64_GOTTPREL_LO12_NC	542	/* G(TPREL(S+A)) */
+#define	R_AARCH64_TLSIE_LD_GOTTPREL_PREL19	543	/* G(TPREL(S+A)) - P */
+ /* Local Exec TLS relocations */
+#define	R_AARCH64_TLSLE_MOVW_TPREL_G2		544	/* TPREL(S+A) */
+#define	R_AARCH64_TLSLE_MOVW_TPREL_G1		545	/* TPREL(S+A) */
+#define	R_AARCH64_TLSLE_MOVW_TPREL_G1_NC	546	/* TPREL(S+A) */
+#define	R_AARCH64_TLSLE_MOVW_TPREL_G0		547	/* TPREL(S+A) */
+#define	R_AARCH64_TLSLE_MOVW_TPREL_G0_NC	548	/* TPREL(S+A) */
+#define	R_AARCH64_TLSLE_ADD_TPREL_HI12		549	/* TPREL(S+A) */
+#define	R_AARCH64_TLSLE_ADD_TPREL_LO12		550	/* TPREL(S+A) */
+#define	R_AARCH64_TLSLE_ADD_TPREL_LO12_NC	551	/* TPREL(S+A) */
+#define	R_AARCH64_TLSLE_LDST8_TPREL_LO12	552	/* TPREL(S+A) */
+#define	R_AARCH64_TLSLE_LDST8_TPREL_LO12_NC	553	/* TPREL(S+A) */
+#define	R_AARCH64_TLSLE_LDST16_TPREL_LO12	554	/* TPREL(S+A) */
+#define	R_AARCH64_TLSLE_LDST16_TPREL_LO12_NC	555	/* TPREL(S+A) */
+#define	R_AARCH64_TLSLE_LDST32_TPREL_LO12	556	/* TPREL(S+A) */
+#define	R_AARCH64_TLSLE_LDST32_TPREL_LO12_NC	557	/* TPREL(S+A) */
+#define	R_AARCH64_TLSLE_LDST64_TPREL_LO12	558	/* TPREL(S+A) */
+#define	R_AARCH64_TLSLE_LDST64_TPREL_LO12_NC	559	/* TPREL(S+A) */
+/* Dynamic relocations */
+ /* Dynamic relocations */
+#define	R_AARCH64_COPY				1024
+#define	R_AARCH64_GLOB_DAT			1025	/* S + A */
+#define	R_AARCH64_JUMP_SLOT			1026	/* S + A */
+#define	R_AARCH64_RELATIVE			1027	/* Delta(S) + A , Delta(P) + A */
+#define	R_AARCH64_TLS_DTPREL64			1028	/* DTPREL(S+A) */
+#define	R_AARCH64_TLS_DTPMOD64			1029	/* LDM(S) */
+#define	R_AARCH64_TLS_TPREL64			1030	/* TPREL(S+A) */
+#define	R_AARCH64_TLS_DTPREL32			1031	/* DTPREL(S+A) */
+#define	R_AARCH64_TLS_DTPMOD32			1032	/* LDM(S) */
+#define	R_AARCH64_TLS_TPREL32			1033	/* DTPREL(S+A) */
 
 #define	R_ALPHA_NONE		0	/* No reloc */
 #define	R_ALPHA_REFLONG		1	/* Direct 32 bit */

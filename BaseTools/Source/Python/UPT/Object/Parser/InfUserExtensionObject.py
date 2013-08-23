@@ -89,19 +89,19 @@ class InfUserExtensionObject():
             InfUserExtensionItemObj.SetContent(UserExtensionCont)
             InfUserExtensionItemObj.SetSupArchList(IdContentItem[2]) 
             
-            for CheckItem in self.UserExtension:
-                if IdContentItem[0] == CheckItem[0] and IdContentItem[1] == CheckItem[1]:
-                    if IdContentItem[2].upper() == 'COMMON' or CheckItem[2].upper() == 'COMMON':
-                        #
-                        # For COMMON ARCH type, do special check.
-                        #
-                        Logger.Error('InfParser', 
-                            ToolError.FORMAT_INVALID,
-                            ST.ERR_INF_PARSER_UE_SECTION_DUPLICATE_ERROR%\
-                            (IdContentItem[0] + '.' + IdContentItem[1] + '.' + IdContentItem[2]),
-                            File=GlobalData.gINF_MODULE_NAME, 
-                            Line=LineNo,
-                            ExtraData=None)
+#            for CheckItem in self.UserExtension:
+#                if IdContentItem[0] == CheckItem[0] and IdContentItem[1] == CheckItem[1]:
+#                    if IdContentItem[2].upper() == 'COMMON' or CheckItem[2].upper() == 'COMMON':
+#                        #
+#                        # For COMMON ARCH type, do special check.
+#                        #
+#                        Logger.Error('InfParser', 
+#                            ToolError.FORMAT_INVALID,
+#                            ST.ERR_INF_PARSER_UE_SECTION_DUPLICATE_ERROR%\
+#                            (IdContentItem[0] + '.' + IdContentItem[1] + '.' + IdContentItem[2]),
+#                            File=GlobalData.gINF_MODULE_NAME, 
+#                            Line=LineNo,
+#                            ExtraData=None)
             
             if self.UserExtension.has_key(IdContentItem):           
                 #

@@ -34,6 +34,8 @@ from MetaDataTable import *
 from MetaFileTable import *
 from MetaFileParser import *
 from BuildClassObject import *
+from WorkspaceCommon import GetDeclaredPcd
+from Common.Misc import AnalyzeDscPcd
 
 ## Platform build information from DSC file
 #
@@ -134,6 +136,7 @@ class DscBuildData(PlatformBuildClassObject):
         self._LibraryInstances  = None
         self._LibraryClasses    = None
         self._Pcds              = None
+        self._DecPcds           = None
         self._BuildOptions      = None
         self._LoadFixAddress    = None
         self._RFCLanguages      = None
@@ -613,6 +616,46 @@ class DscBuildData(PlatformBuildClassObject):
                 self._LibraryClasses[Library.BaseName, ':dummy:'] = Library
         return self._LibraryClasses
 
+    def _ValidatePcd(self, PcdCName, TokenSpaceGuid, Setting, PcdType, LineNo):
+        if self._DecPcds == None:
+            self._DecPcds = GetDeclaredPcd(self, self._Bdb, self._Arch, self._Target, self._Toolchain)
+        if (PcdCName, TokenSpaceGuid) not in self._DecPcds:
+            EdkLogger.error('build', PARSER_ERROR,
+                            "Pcd (%s.%s) defined in DSC is not declared in DEC files." % (TokenSpaceGuid, PcdCName),
+                            File=self.MetaFile, Line=LineNo)
+        ValueList, IsValid, Index = AnalyzeDscPcd(Setting, PcdType, self._DecPcds[PcdCName, TokenSpaceGuid].DatumType)
+        if not IsValid and PcdType not in [MODEL_PCD_FEATURE_FLAG, MODEL_PCD_FIXED_AT_BUILD]:
+            EdkLogger.error('build', FORMAT_INVALID, "Pcd format incorrect.", File=self.MetaFile, Line=LineNo,
+                            ExtraData="%s.%s|%s" % (TokenSpaceGuid, PcdCName, Setting))
+        if ValueList[Index] and PcdType not in [MODEL_PCD_FEATURE_FLAG, MODEL_PCD_FIXED_AT_BUILD]:
+            try:
+                ValueList[Index] = ValueExpression(ValueList[Index], GlobalData.gPlatformPcds)(True)
+            except WrnExpression, Value:
+                ValueList[Index] = Value.result
+            except EvaluationException, Excpt:
+                if hasattr(Excpt, 'Pcd'):
+                    if Excpt.Pcd in GlobalData.gPlatformOtherPcds:
+                        EdkLogger.error('Parser', FORMAT_INVALID, "Cannot use this PCD (%s) in an expression as"
+                                        " it must be defined in a [PcdsFixedAtBuild] or [PcdsFeatureFlag] section"
+                                        " of the DSC file" % Excpt.Pcd,
+                                        File=self.MetaFile, Line=LineNo)
+                    else:
+                        EdkLogger.error('Parser', FORMAT_INVALID, "PCD (%s) is not defined in DSC file" % Excpt.Pcd,
+                                        File=self.MetaFile, Line=LineNo)
+                else:
+                    EdkLogger.error('Parser', FORMAT_INVALID, "Invalid expression: %s" % str(Excpt),
+                                    File=self.MetaFile, Line=LineNo)
+            if ValueList[Index] == 'True':
+                ValueList[Index] = '1'
+            elif ValueList[Index] == 'False':
+                ValueList[Index] = '0'
+        if ValueList[Index]:
+            Valid, ErrStr = CheckPcdDatum(self._DecPcds[PcdCName, TokenSpaceGuid].DatumType, ValueList[Index])
+            if not Valid:
+                EdkLogger.error('build', FORMAT_INVALID, ErrStr, File=self.MetaFile, Line=LineNo,
+                                ExtraData="%s.%s" % (TokenSpaceGuid, PcdCName))
+        return ValueList
+
     ## Retrieve all PCD settings in platform
     def _GetPcds(self):
         if self._Pcds == None:
@@ -663,14 +706,14 @@ class DscBuildData(PlatformBuildClassObject):
         # Find out all possible PCD candidates for self._Arch
         RecordList = self._RawData[Type, self._Arch]
         for TokenSpaceGuid, PcdCName, Setting, Arch, SkuName, Dummy3, Dummy4 in RecordList:
-            PcdSet.add((PcdCName, TokenSpaceGuid))
+            PcdSet.add((PcdCName, TokenSpaceGuid, Dummy4))
             PcdDict[Arch, PcdCName, TokenSpaceGuid] = Setting
         # Remove redundant PCD candidates
-        for PcdCName, TokenSpaceGuid in PcdSet:
+        for PcdCName, TokenSpaceGuid, Dummy4 in PcdSet:
             Setting = PcdDict[self._Arch, PcdCName, TokenSpaceGuid]
             if Setting == None:
                 continue
-            PcdValue, DatumType, MaxDatumSize = AnalyzePcdData(Setting)
+            PcdValue, DatumType, MaxDatumSize = self._ValidatePcd(PcdCName, TokenSpaceGuid, Setting, Type, Dummy4)
             Pcds[PcdCName, TokenSpaceGuid] = PcdClassObject(
                                                 PcdCName,
                                                 TokenSpaceGuid,
@@ -702,15 +745,15 @@ class DscBuildData(PlatformBuildClassObject):
         # Find out all possible PCD candidates for self._Arch
         RecordList = self._RawData[Type, self._Arch]
         for TokenSpaceGuid, PcdCName, Setting, Arch, SkuName, Dummy3, Dummy4 in RecordList:
-            PcdList.append((PcdCName, TokenSpaceGuid))
+            PcdList.append((PcdCName, TokenSpaceGuid, Dummy4))
             PcdDict[Arch, SkuName, PcdCName, TokenSpaceGuid] = Setting
         # Remove redundant PCD candidates, per the ARCH and SKU
-        for PcdCName, TokenSpaceGuid in PcdList:
+        for PcdCName, TokenSpaceGuid, Dummy4 in PcdList:
             Setting = PcdDict[self._Arch, self.SkuName, PcdCName, TokenSpaceGuid]
             if Setting == None:
                 continue
                       
-            PcdValue, DatumType, MaxDatumSize = AnalyzePcdData(Setting)
+            PcdValue, DatumType, MaxDatumSize = self._ValidatePcd(PcdCName, TokenSpaceGuid, Setting, Type, Dummy4)
                 
             SkuInfo = SkuInfoClass(self.SkuName, self.SkuIds[self.SkuName], '', '', '', '', '', PcdValue)
             Pcds[PcdCName, TokenSpaceGuid] = PcdClassObject(
@@ -744,14 +787,14 @@ class DscBuildData(PlatformBuildClassObject):
         RecordList = self._RawData[Type, self._Arch]
         # Find out all possible PCD candidates for self._Arch
         for TokenSpaceGuid, PcdCName, Setting, Arch, SkuName, Dummy3, Dummy4 in RecordList:
-            PcdSet.add((PcdCName, TokenSpaceGuid))
+            PcdSet.add((PcdCName, TokenSpaceGuid, Dummy4))
             PcdDict[Arch, SkuName, PcdCName, TokenSpaceGuid] = Setting
         # Remove redundant PCD candidates, per the ARCH and SKU
-        for PcdCName, TokenSpaceGuid in PcdSet:
+        for PcdCName, TokenSpaceGuid, Dummy4 in PcdSet:
             Setting = PcdDict[self._Arch, self.SkuName, PcdCName, TokenSpaceGuid]
             if Setting == None:
                 continue
-            VariableName, VariableGuid, VariableOffset, DefaultValue = AnalyzeHiiPcdData(Setting)
+            VariableName, VariableGuid, VariableOffset, DefaultValue = self._ValidatePcd(PcdCName, TokenSpaceGuid, Setting, Type, Dummy4)
             SkuInfo = SkuInfoClass(self.SkuName, self.SkuIds[self.SkuName], VariableName, VariableGuid, VariableOffset, DefaultValue)
             Pcds[PcdCName, TokenSpaceGuid] = PcdClassObject(
                                                 PcdCName,
@@ -784,10 +827,10 @@ class DscBuildData(PlatformBuildClassObject):
         # Find out all possible PCD candidates for self._Arch
         RecordList = self._RawData[Type, self._Arch]
         for TokenSpaceGuid, PcdCName, Setting, Arch, SkuName, Dummy3, Dummy4 in RecordList:
-            PcdList.append((PcdCName, TokenSpaceGuid))
+            PcdList.append((PcdCName, TokenSpaceGuid, Dummy4))
             PcdDict[Arch, SkuName, PcdCName, TokenSpaceGuid] = Setting
         # Remove redundant PCD candidates, per the ARCH and SKU
-        for PcdCName, TokenSpaceGuid in PcdList:
+        for PcdCName, TokenSpaceGuid, Dummy4 in PcdList:
             Setting = PcdDict[self._Arch, self.SkuName, PcdCName, TokenSpaceGuid]
             if Setting == None:
                 continue
@@ -797,7 +840,7 @@ class DscBuildData(PlatformBuildClassObject):
             # At this point, we put all the data into the PcdClssObject for we don't know the PCD's datumtype
             # until the DEC parser has been called.
             # 
-            VpdOffset, MaxDatumSize, InitialValue = AnalyzeVpdPcdData(Setting)
+            VpdOffset, MaxDatumSize, InitialValue = self._ValidatePcd(PcdCName, TokenSpaceGuid, Setting, Type, Dummy4)
 
             SkuInfo = SkuInfoClass(self.SkuName, self.SkuIds[self.SkuName], '', '', '', '', VpdOffset, InitialValue)
             Pcds[PcdCName, TokenSpaceGuid] = PcdClassObject(
@@ -841,32 +884,6 @@ class DscBuildData(PlatformBuildClassObject):
         if (Name, Guid) not in self.Pcds:
             self.Pcds[Name, Guid] = PcdClassObject(Name, Guid, '', '', '', '', '', {}, False, None)
         self.Pcds[Name, Guid].DefaultValue = Value
-
-    def IsPlatformPcdDeclared(self, DecPcds):
-        for PcdType in (MODEL_PCD_FIXED_AT_BUILD, MODEL_PCD_PATCHABLE_IN_MODULE, MODEL_PCD_FEATURE_FLAG,
-                        MODEL_PCD_DYNAMIC_DEFAULT, MODEL_PCD_DYNAMIC_HII, MODEL_PCD_DYNAMIC_VPD,
-                        MODEL_PCD_DYNAMIC_EX_DEFAULT, MODEL_PCD_DYNAMIC_EX_HII, MODEL_PCD_DYNAMIC_EX_VPD):
-            RecordList = self._RawData[PcdType, self._Arch]
-            for TokenSpaceGuid, PcdCName, Setting, Arch, SkuName, Dummy3, Dummy4 in RecordList:
-                if (PcdCName, TokenSpaceGuid) not in DecPcds:
-                    EdkLogger.error('build', PARSER_ERROR,
-                                    "Pcd (%s.%s) defined in DSC is not declared in DEC files." % (TokenSpaceGuid, PcdCName),
-                                    File=self.MetaFile, Line=Dummy4)
-                PcdValue = ''
-                if PcdType in (MODEL_PCD_DYNAMIC_VPD, MODEL_PCD_DYNAMIC_EX_VPD):
-                    if DecPcds[PcdCName, TokenSpaceGuid].DatumType == "VOID*":
-                        PcdValue = AnalyzeVpdPcdData(Setting)[2]
-                    else:
-                        PcdValue = AnalyzeVpdPcdData(Setting)[1]
-                elif PcdType in (MODEL_PCD_DYNAMIC_HII, MODEL_PCD_DYNAMIC_EX_HII):
-                    PcdValue = AnalyzeHiiPcdData(Setting)[3]
-                else:
-                    PcdValue = AnalyzePcdData(Setting)[0]
-                if PcdValue:
-                    Valid, ErrStr = CheckPcdDatum(DecPcds[PcdCName, TokenSpaceGuid].DatumType, PcdValue)
-                    if not Valid:
-                        EdkLogger.error('build', FORMAT_INVALID, ErrStr, File=self.MetaFile, Line=Dummy4,
-                                    ExtraData="%s.%s" % (TokenSpaceGuid, PcdCName))
 
     _Macros             = property(_GetMacros)
     Arch                = property(_GetArch, _SetArch)

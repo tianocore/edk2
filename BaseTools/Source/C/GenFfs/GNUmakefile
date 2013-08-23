@@ -1,5 +1,5 @@
 ## @file
-# Windows makefile for 'GenFfs' module build.
+# GNU/Linux makefile for 'GenFfs' module build.
 #
 # Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials

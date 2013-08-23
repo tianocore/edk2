@@ -293,12 +293,13 @@ class WorkspaceAutoGen(AutoGen):
             Platform = self.BuildDatabase[self.MetaFile, Arch, Target, Toolchain]
 
             DecPcds = {}
+            DecPcdsKey = set()
             PGen = PlatformAutoGen(self, self.MetaFile, Target, Toolchain, Arch)
             Pkgs = PGen.PackageList
             for Pkg in Pkgs:
                 for Pcd in Pkg.Pcds:
                     DecPcds[Pcd[0], Pcd[1]] = Pkg.Pcds[Pcd]
-            Platform.IsPlatformPcdDeclared(DecPcds)
+                    DecPcdsKey.add((Pcd[0], Pcd[1], Pcd[2]))
 
             Platform.SkuName = self.SkuId
             for Name, Guid in PcdSet:
@@ -310,7 +311,21 @@ class WorkspaceAutoGen(AutoGen):
                         File = self.FdfProfile.PcdFileLineDict[Name, Guid][0],
                         Line = self.FdfProfile.PcdFileLineDict[Name, Guid][1]
                     )
-                Platform.AddPcd(Name, Guid, PcdSet[Name, Guid])
+                else:
+                    # Check whether Dynamic or DynamicEx PCD used in FDF file. If used, build break and give a error message.
+                    if (Name, Guid, TAB_PCDS_FIXED_AT_BUILD) in DecPcdsKey \
+                        or (Name, Guid, TAB_PCDS_PATCHABLE_IN_MODULE) in DecPcdsKey \
+                        or (Name, Guid, TAB_PCDS_FEATURE_FLAG) in DecPcdsKey:
+                        Platform.AddPcd(Name, Guid, PcdSet[Name, Guid])
+                        continue
+                    elif (Name, Guid, TAB_PCDS_DYNAMIC) in DecPcdsKey or (Name, Guid, TAB_PCDS_DYNAMIC_EX) in DecPcdsKey:
+                        EdkLogger.error(
+                                'build',
+                                PARSER_ERROR,
+                                "Using Dynamic or DynamicEx type of PCD [%s.%s] in FDF file is not allowed." % (Guid, Name),
+                                File = self.FdfProfile.PcdFileLineDict[Name, Guid][0],
+                                Line = self.FdfProfile.PcdFileLineDict[Name, Guid][1]
+                        )
 
             Pa = PlatformAutoGen(self, self.MetaFile, Target, Toolchain, Arch)
             #

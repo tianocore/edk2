@@ -25,7 +25,7 @@ from CommonClass import *
 #
 # @var ModuleType:               To store value for ModuleType
 # @var SupArchList:              To store value for SupArchList, selection scope is in below list
-#                                EBC | IA32 | X64 | IPF | ARM | PPC
+#                                EBC | IA32 | X64 | IPF | ARM | PPC | AARCH64
 # @var BinaryModule:             To store value for BinaryModule
 # @var OutputFileBasename:       To store value for OutputFileBasename
 # @var ClonedFrom:               To store value for ClonedFrom, it is a set structure as

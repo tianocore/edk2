@@ -170,28 +170,29 @@ class InfLibrarySectionParser(InfParserSectionRoot):
                             File=FileName, 
                             Line=LineNo, 
                             ExtraData=LineContent)
-            
+
             if IsLibInstanceInfo(LineContent):
                 LibInsFlag = True
                 continue
-            
+
             if LibInsFlag:
-                LibGuid, LibVer = GetLibInstanceInfo(LineContent, GlobalData.gWORKSPACE, LineNo)
+                LibGuid, LibVer = GetLibInstanceInfo(LineContent, GlobalData.gWORKSPACE, LineNo, FileName)
                 #
                 # If the VERSION_STRING is missing from the INF file, tool should default to "0".
                 #
                 if LibVer == '':
                     LibVer = '0'
                 if LibGuid != '':
-                    LibraryList.append((LibGuid, LibVer))
+                    if (LibGuid, LibVer) not in LibraryList:
+                        LibraryList.append((LibGuid, LibVer))
                 else:
-                    Logger.Error('InfParser', 
+                    Logger.Error('InfParser',
                             FORMAT_INVALID,
-                            ST.ERR_LIB_INSTANCE_MISS_GUID, 
-                            File=FileName, 
-                            Line=LineNo, 
-                            ExtraData=LineContent)                    
-                
+                            ST.ERR_LIB_INSTANCE_MISS_GUID,
+                            File=FileName,
+                            Line=LineNo,
+                            ExtraData=LineContent)
+
         #
         # Current section archs
         #    

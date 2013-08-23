@@ -2,7 +2,7 @@
   
   The definition of CFormPkg's member function
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -115,6 +115,10 @@ private:
 
   VOID                _WRITE_PKG_LINE (IN FILE *, IN UINT32 , IN CONST CHAR8 *, IN CHAR8 *, IN UINT32);
   VOID                _WRITE_PKG_END (IN FILE *, IN UINT32 , IN CONST CHAR8 *, IN CHAR8 *, IN UINT32);
+  SBufferNode *       GetBinBufferNodeForAddr (IN CHAR8 *);
+  SBufferNode *       CreateNewNode ();
+  SBufferNode *       GetNodeBefore (IN SBufferNode *);
+  EFI_VFR_RETURN_CODE InsertNodeBefore (IN SBufferNode *, IN SBufferNode *);
 
 private:
   SPendingAssign      *PendingAssignList;
@@ -145,12 +149,22 @@ public:
     IN CVfrDataStorage     &lCVfrDataStorage,
     IN CVfrQuestionDB      &lCVfrQuestionDB,
     IN EFI_GUID            *LocalFormSetGuid,
-    IN UINT32 LineNo
+    IN UINT32              LineNo,
+    OUT CHAR8              **InsertOpcodeAddr
+    );
+  EFI_VFR_RETURN_CODE AdjustDynamicInsertOpcode (
+    IN CHAR8              *LastFormEndAddr,
+    IN CHAR8              *InsertOpcodeAddr
+    );
+  CHAR8 *             GetBufAddrBaseOnOffset (
+    IN UINT32             Offset
     );
 };
 
 extern CFormPkg       gCFormPkg;
 extern CVfrStringDB   gCVfrStringDB;
+extern UINT32         gAdjustOpcodeOffset;
+extern BOOLEAN        gNeedAdjustOpcode;
 
 struct SIfrRecord {
   UINT32     mLineNo;
@@ -189,6 +203,10 @@ public:
     mSwitch = FALSE;
   }
 
+  SIfrRecord * GetRecordInfoFromOffset (IN UINT32);
+  VOID        IfrAdjustOffsetForRecord (VOID);
+  BOOLEAN     IfrAdjustDynamicOpcodeInRecords (VOID);
+
   UINT32      IfrRecordRegister (IN UINT32, IN CHAR8 *, IN UINT8, IN UINT32);
   VOID        IfrRecordInfoUpdate (IN UINT32, IN UINT32, IN CHAR8*, IN UINT8, IN UINT32);
   VOID        IfrRecordOutput (IN FILE *, IN UINT32 LineNo);
@@ -225,6 +243,10 @@ public:
 
   inline CHAR8 * GetObjBinAddr (VOID) {
     return mObjBinBuf;
+  }
+
+  inline UINT32 GetObjBinOffset (VOID) {
+    return mPkgOffset;
   }
 
   inline UINT8   GetObjBinLen (VOID) {
@@ -411,6 +433,10 @@ public:
 
     return _FLAGS_ZERO (Flags) ? VFR_RETURN_SUCCESS : VFR_RETURN_FLAGS_UNSUPPORTED;
   }
+
+  VOID UpdateCIfrQuestionHeader (IN EFI_IFR_QUESTION_HEADER *Header) {
+    mHeader = Header;
+  }
 };
 
 /*
@@ -560,6 +586,10 @@ public:
 
   BOOLEAN IsNumericOpcode () {
     return IsNumeric;
+  }
+
+  VOID UpdateCIfrMinMaxStepData (IN MINMAXSTEP_DATA *MinMaxStepData) {
+    mMinMaxStepData = MinMaxStepData;
   }
 };
 
@@ -858,7 +888,7 @@ public:
 
 class CIfrModal : public CIfrObj, public CIfrOpHeader {
 private:
-  EFI_IFR_MODAL *mModal;
+  EFI_IFR_MODAL_TAG *mModal;
 
 public:
   CIfrModal () : CIfrObj (EFI_IFR_MODAL_TAG_OP, (CHAR8 **)&mModal),
@@ -900,14 +930,15 @@ private:
 
 public:
   CIfrDefault (
+    IN UINT8              Size,
     IN UINT16             DefaultId = EFI_HII_DEFAULT_CLASS_STANDARD,
     IN UINT8              Type      = EFI_IFR_TYPE_OTHER,
     IN EFI_IFR_TYPE_VALUE Value     = gZeroEfiIfrTypeValue
-    ) : CIfrObj (EFI_IFR_DEFAULT_OP, (CHAR8 **)&mDefault),
-        CIfrOpHeader (EFI_IFR_DEFAULT_OP, &mDefault->Header) {
+    ) : CIfrObj (EFI_IFR_DEFAULT_OP, (CHAR8 **)&mDefault, Size),
+        CIfrOpHeader (EFI_IFR_DEFAULT_OP, &mDefault->Header, Size) {
     mDefault->Type      = Type;
-    mDefault->Value     = Value;
     mDefault->DefaultId = DefaultId;
+    memcpy (&(mDefault->Value), &Value, Size - OFFSET_OF (EFI_IFR_DEFAULT, Value));
   }
 
   VOID SetDefaultId (IN UINT16 DefaultId) {
@@ -919,7 +950,30 @@ public:
   }
 
   VOID SetValue (IN EFI_IFR_TYPE_VALUE Value) {
-    mDefault->Value = Value;
+    memcpy (&mDefault->Value, &Value, mDefault->Header.Length - OFFSET_OF (EFI_IFR_DEFAULT, Value));
+  }
+};
+
+class CIfrDefault2 : public CIfrObj, public CIfrOpHeader {
+private:
+  EFI_IFR_DEFAULT_2 *mDefault;
+
+public:
+  CIfrDefault2 (
+    IN UINT16             DefaultId = EFI_HII_DEFAULT_CLASS_STANDARD,
+    IN UINT8              Type      = EFI_IFR_TYPE_OTHER
+    ) : CIfrObj (EFI_IFR_DEFAULT_OP, (CHAR8 **)&mDefault, sizeof (EFI_IFR_DEFAULT_2)),
+        CIfrOpHeader (EFI_IFR_DEFAULT_OP, &mDefault->Header, sizeof (EFI_IFR_DEFAULT_2)) {
+    mDefault->Type      = Type;
+    mDefault->DefaultId = DefaultId;
+  }
+
+  VOID SetDefaultId (IN UINT16 DefaultId) {
+    mDefault->DefaultId = DefaultId;
+  }
+
+  VOID SetType (IN UINT8 Type) {
+    mDefault->Type = Type;
   }
 };
 
@@ -1254,7 +1308,7 @@ private:
   EFI_IFR_NUMERIC *mNumeric;
 
 public:
-  CIfrNumeric () : CIfrObj (EFI_IFR_NUMERIC_OP, (CHAR8 **)&mNumeric),
+  CIfrNumeric () : CIfrObj (EFI_IFR_NUMERIC_OP, (CHAR8 **)&mNumeric, sizeof (EFI_IFR_NUMERIC), TRUE),
                    CIfrOpHeader (EFI_IFR_NUMERIC_OP, &mNumeric->Header),
                    CIfrQuestionHeader (&mNumeric->Question),
                    CIfrMinMaxStepData (&mNumeric->data, TRUE) {
@@ -1266,6 +1320,27 @@ public:
   ~CIfrNumeric () {
     gCurrentQuestion   = NULL;
     gCurrentMinMaxData = NULL;
+  }
+
+  VOID ShrinkBinSize (IN UINT16 Size) {
+    //
+    // Update the buffer size which is truly be used later.
+    //
+    ShrinkObjBin(Size);
+    DecLength(Size);
+
+    //
+    // Allocate buffer in gCFormPkg.
+    //
+    _EMIT_PENDING_OBJ();
+
+    //
+    // Update the buffer pointer used by other class.
+    //
+    mNumeric = (EFI_IFR_NUMERIC *) GetObjBinAddr();
+    UpdateHeader (&mNumeric->Header);
+    UpdateCIfrQuestionHeader(&mNumeric->Question);
+    UpdateCIfrMinMaxStepData(&mNumeric->data);
   }
 
   EFI_VFR_RETURN_CODE SetFlags (IN UINT8 HFlags, IN UINT8 LFlags) {
@@ -1290,7 +1365,7 @@ private:
   EFI_IFR_ONE_OF *mOneOf;
 
 public:
-  CIfrOneOf () : CIfrObj (EFI_IFR_ONE_OF_OP, (CHAR8 **)&mOneOf),
+  CIfrOneOf () : CIfrObj (EFI_IFR_ONE_OF_OP, (CHAR8 **)&mOneOf, sizeof (EFI_IFR_ONE_OF), TRUE),
                  CIfrOpHeader (EFI_IFR_ONE_OF_OP, &mOneOf->Header),
                  CIfrQuestionHeader (&mOneOf->Question),
                  CIfrMinMaxStepData (&mOneOf->data) {
@@ -1318,6 +1393,27 @@ public:
       mOneOf->Flags = LFlags | EFI_IFR_DISPLAY_UINT_DEC;
     }
     return VFR_RETURN_SUCCESS;
+  }
+
+  VOID ShrinkBinSize (IN UINT16 Size) {
+    //
+    // Update the buffer size which is truly be used later.
+    //
+    ShrinkObjBin(Size);
+    DecLength(Size);
+
+    //
+    // Allocate buffer in gCFormPkg.
+    //
+    _EMIT_PENDING_OBJ();
+
+    //
+    // Update the buffer pointer used by other class.
+    //
+    mOneOf = (EFI_IFR_ONE_OF *) GetObjBinAddr();
+    UpdateHeader (&mOneOf->Header);
+    UpdateCIfrQuestionHeader(&mOneOf->Question);
+    UpdateCIfrMinMaxStepData(&mOneOf->data);
   }
 };
 
@@ -1581,12 +1677,12 @@ private:
   EFI_IFR_ONE_OF_OPTION *mOneOfOption;
 
 public:
-  CIfrOneOfOption () : CIfrObj (EFI_IFR_ONE_OF_OPTION_OP, (CHAR8 **)&mOneOfOption),
-                       CIfrOpHeader (EFI_IFR_ONE_OF_OPTION_OP, &mOneOfOption->Header) {
+  CIfrOneOfOption (UINT8 Size) : CIfrObj (EFI_IFR_ONE_OF_OPTION_OP, (CHAR8 **)&mOneOfOption, Size),
+                       CIfrOpHeader (EFI_IFR_ONE_OF_OPTION_OP, &mOneOfOption->Header, Size) {
     mOneOfOption->Flags  = 0;
     mOneOfOption->Option = EFI_STRING_ID_INVALID;
     mOneOfOption->Type   = EFI_IFR_TYPE_OTHER;
-    memset (&mOneOfOption->Value, 0, sizeof (mOneOfOption->Value));
+    memset (&mOneOfOption->Value, 0, Size - OFFSET_OF (EFI_IFR_ONE_OF_OPTION, Value));
   }
 
   VOID SetOption (IN EFI_STRING_ID Option) {
@@ -1639,7 +1735,7 @@ public:
   }
 
   VOID SetValue (IN EFI_IFR_TYPE_VALUE Value) {
-    mOneOfOption->Value = Value;
+    memcpy (&mOneOfOption->Value, &Value, mOneOfOption->Header.Length - OFFSET_OF (EFI_IFR_ONE_OF_OPTION, Value));
   }
 
   UINT8 GetFlags (VOID) {

@@ -368,7 +368,7 @@ def CleanString(Line, CommentCharacter=DataType.TAB_COMMENT_SPLIT, AllowCppStyle
 
 ## CleanString2
 #
-# Split comments in a string
+# Split statement with comments in a string
 # Remove spaces
 #
 # @param Line:              The string to be cleaned
@@ -387,15 +387,21 @@ def CleanString2(Line, CommentCharacter=DataType.TAB_COMMENT_SPLIT, AllowCppStyl
     if AllowCppStyleComment:
         Line = Line.replace(DataType.TAB_COMMENT_EDK_SPLIT, CommentCharacter)
     #
-    # separate comments and statements
+    # separate comments and statements, but we should escape comment character in string
     #
-    LineParts = Line.split(CommentCharacter, 1);
-    #
-    # remove whitespace again
-    #
-    Line = LineParts[0].strip();
-    if len(LineParts) > 1:
-        Comment = LineParts[1].strip()
+    InString = False
+    CommentInString = False
+    Comment = ''
+    for Index in range(0, len(Line)):
+        if Line[Index] == '"':
+            InString = not InString
+        elif Line[Index] == CommentCharacter and InString:
+            CommentInString = True
+        elif Line[Index] == CommentCharacter and not InString:
+            Comment = Line[Index:].strip()
+            Line = Line[0:Index].strip()
+            break
+    if Comment:
         # Remove prefixed and trailing comment characters
         Start = 0
         End = len(Comment)
@@ -405,8 +411,6 @@ def CleanString2(Line, CommentCharacter=DataType.TAB_COMMENT_SPLIT, AllowCppStyl
             End -= 1
         Comment = Comment[Start:End]
         Comment = Comment.strip()
-    else:
-        Comment = ''
 
     return Line, Comment
 

@@ -1,5 +1,5 @@
 ## @file
-#  GNU Make makefile for C tools build.
+#  GNU/Linux makefile for C tools build.
 #
 #  Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
 #

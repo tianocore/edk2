@@ -9,7 +9,7 @@ If you do not have a tianocore.org account, you can make use of the 'guest'
 account with an empty password.
 
 In a web browser, you can 'browse' the relavent source at this location:
- https://buildtools.tianocore.org/source/browse/buildtools/trunk/BaseTools/gcc
+ http://sourceforge.net/p/edk2-buildtools/code/HEAD/tree/trunk/BaseTools/gcc
 
 Or, with subversion, you can download the relavent source with this command:
- svn co https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/gcc
+ svn co https://svn.code.sf.net/p/edk2-buildtools/code/trunk/BaseTools/gcc

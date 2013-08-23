@@ -76,7 +76,7 @@ class VerSection (VerSectionClassObject):
             StringData = ''
 
         GenFdsGlobalVariable.GenerateSection(OutputFile, None, 'EFI_SECTION_VERSION',
-                                             Ui=StringData, Ver=self.BuildNum)
+                                             Ver=StringData, BuildNumber=self.BuildNum)
         OutputFileList = []
         OutputFileList.append(OutputFile)
         return OutputFileList, self.Alignment

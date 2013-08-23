@@ -113,10 +113,15 @@ class FD(FDClassObject):
             PreviousRegionStart = RegionObj.Offset
             PreviousRegionSize = RegionObj.Size
             #
+            # Verify current region fits within allocated FD section Size
+            #
+            if PreviousRegionStart + PreviousRegionSize > self.Size:
+                EdkLogger.error("GenFds", GENFDS_ERROR,
+                                'FD %s size too small to fit region with offset 0x%X and size 0x%X'
+                                % (self.FdUiName, PreviousRegionStart, PreviousRegionSize))
+            #
             # Call each region's AddToBuffer function
             #
-            if PreviousRegionSize > self.Size:
-                EdkLogger.error("GenFds", GENFDS_ERROR, 'FD %s size too small' % self.FdUiName)
             GenFdsGlobalVariable.VerboseLogger('Call each region\'s AddToBuffer function')
             RegionObj.AddToBuffer (FdBuffer, self.BaseAddress, self.BlockSizeList, self.ErasePolarity, GenFds.ImageBinDict, self.vtfRawDict, self.DefineVarDict)
         #

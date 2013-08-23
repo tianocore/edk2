@@ -1,5 +1,5 @@
 ## @file
-# Windows makefile for 'VfrCompile' module build.
+# GNU/Linux makefile for 'VfrCompile' module build.
 #
 # Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials

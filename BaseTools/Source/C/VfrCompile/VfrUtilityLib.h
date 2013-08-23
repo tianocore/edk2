@@ -2,7 +2,7 @@
   
   Vfr common library functions.
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -57,13 +57,14 @@ struct SConfigInfo {
 
 struct SConfigItem {
   CHAR8         *mName;         // varstore name
-  CHAR8         *mId;           // varstore ID
+  EFI_GUID      *mGuid;         // varstore guid, varstore name + guid deside one varstore
+  CHAR8         *mId;           // default ID
   SConfigInfo   *mInfoStrList;  // list of Offset/Value in the varstore
   SConfigItem   *mNext;
 
 public:
-  SConfigItem (IN CHAR8 *, IN CHAR8 *);
-  SConfigItem (IN CHAR8 *, IN CHAR8 *, IN UINT8, IN UINT16, IN UINT16, IN EFI_IFR_TYPE_VALUE);
+  SConfigItem (IN CHAR8 *, IN EFI_GUID *, IN CHAR8 *);
+  SConfigItem (IN CHAR8 *, IN EFI_GUID *, IN CHAR8 *, IN UINT8, IN UINT16, IN UINT16, IN EFI_IFR_TYPE_VALUE);
   virtual ~SConfigItem ();
 };
 
@@ -77,11 +78,11 @@ public:
   CVfrBufferConfig (VOID);
   virtual ~CVfrBufferConfig (VOID);
 
-  virtual UINT8   Register (IN CHAR8 *, IN CHAR8 *Info = NULL);
+  virtual UINT8   Register (IN CHAR8 *, IN EFI_GUID *,IN CHAR8 *Info = NULL);
   virtual VOID    Open (VOID);
   virtual BOOLEAN Eof(VOID);
-  virtual UINT8   Select (IN CHAR8 *, IN CHAR8 *Info = NULL);
-  virtual UINT8   Write (IN CONST CHAR8, IN CHAR8 *, IN CHAR8 *, IN UINT8, IN UINT16, IN UINT32, IN EFI_IFR_TYPE_VALUE);
+  virtual UINT8   Select (IN CHAR8 *, IN EFI_GUID *, IN CHAR8 *Info = NULL);
+  virtual UINT8   Write (IN CONST CHAR8, IN CHAR8 *, IN EFI_GUID *, IN CHAR8 *, IN UINT8, IN UINT16, IN UINT32, IN EFI_IFR_TYPE_VALUE);
 #if 0
   virtual UINT8   Read (OUT CHAR8 **, OUT CHAR8 **, OUT CHAR8 **, OUT CHAR8 **, OUT CHAR8 **);
 #endif
@@ -284,6 +285,10 @@ private:
   BOOLEAN         ChekVarStoreIdFree (IN EFI_VARSTORE_ID);
   VOID            MarkVarStoreIdUsed (IN EFI_VARSTORE_ID);
   VOID            MarkVarStoreIdUnused (IN EFI_VARSTORE_ID);
+  EFI_VARSTORE_ID CheckGuidField (IN SVfrVarStorageNode *, 
+                                  IN EFI_GUID *, 
+                                  IN BOOLEAN *, 
+                                  OUT EFI_VFR_RETURN_CODE *);
 
 public:
   CVfrDataStorage ();
@@ -303,17 +308,15 @@ public:
 
   EFI_VFR_RETURN_CODE DeclareBufferVarStore (IN CHAR8 *, IN EFI_GUID *, IN CVfrVarDataTypeDB *, IN CHAR8 *, IN EFI_VARSTORE_ID, IN BOOLEAN Flag = TRUE);
 
-  EFI_VFR_RETURN_CODE GetVarStoreId (IN CHAR8 *, OUT EFI_VARSTORE_ID *);
-  EFI_VFR_RETURN_CODE GetVarStoreType (IN CHAR8 *, OUT EFI_VFR_VARSTORE_TYPE &);
+  EFI_VFR_RETURN_CODE GetVarStoreId (IN CHAR8 *, OUT EFI_VARSTORE_ID *, IN EFI_GUID *VarGuid = NULL);
   EFI_VFR_VARSTORE_TYPE GetVarStoreType (IN EFI_VARSTORE_ID);
+  EFI_GUID *          GetVarStoreGuid (IN  EFI_VARSTORE_ID);
   EFI_VFR_RETURN_CODE GetVarStoreName (IN EFI_VARSTORE_ID, OUT CHAR8 **);
-  EFI_VFR_RETURN_CODE GetVarStoreByDataType (IN CHAR8 *, OUT SVfrVarStorageNode **);
+  EFI_VFR_RETURN_CODE GetVarStoreByDataType (IN CHAR8 *, OUT SVfrVarStorageNode **, IN EFI_GUID *VarGuid = NULL);
 
-  EFI_VFR_RETURN_CODE GetBufferVarStoreDataTypeName (IN CHAR8 *, OUT CHAR8 **);
+  EFI_VFR_RETURN_CODE GetBufferVarStoreDataTypeName (IN EFI_VARSTORE_ID, OUT CHAR8 **);
   EFI_VFR_RETURN_CODE GetEfiVarStoreInfo (IN EFI_VARSTORE_INFO *);
   EFI_VFR_RETURN_CODE GetNameVarStoreInfo (IN EFI_VARSTORE_INFO *, IN UINT32);
-
-  EFI_VFR_RETURN_CODE BufferVarStoreRequestElementAdd (IN CHAR8 *, IN EFI_VARSTORE_INFO &);
 };
 
 #define EFI_QUESTION_ID_MAX              0xFFFF
@@ -396,7 +399,7 @@ public:
   EFI_VFR_RETURN_CODE ReRegisterDefaultStoreById (IN UINT16, IN CHAR8 *, IN EFI_STRING_ID);
   BOOLEAN             DefaultIdRegistered (IN UINT16);
   EFI_VFR_RETURN_CODE GetDefaultId (IN CHAR8 *, OUT UINT16 *);
-  EFI_VFR_RETURN_CODE BufferVarStoreAltConfigAdd (IN EFI_VARSTORE_ID, IN EFI_VARSTORE_INFO &, IN CHAR8 *, IN UINT8, IN EFI_IFR_TYPE_VALUE);
+  EFI_VFR_RETURN_CODE BufferVarStoreAltConfigAdd (IN EFI_VARSTORE_ID, IN EFI_VARSTORE_INFO &, IN CHAR8 *, IN EFI_GUID *, IN UINT8, IN EFI_IFR_TYPE_VALUE);
 };
 
 #define EFI_RULE_ID_START    0x01

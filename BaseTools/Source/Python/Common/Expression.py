@@ -246,12 +246,14 @@ class ValueExpression(object):
     #   @return: True or False if RealValue is False
     #            Evaluated value of string format if RealValue is True
     #
-    def __call__(self, RealValue=False):
+    def __call__(self, RealValue=False, Depth=0):
         if self._NoProcess:
             return self._Expr
 
+        self._Depth = Depth
+
         self._Expr = self._Expr.strip()
-        if RealValue:
+        if RealValue and Depth == 0:
             self._Token = self._Expr
             if self.__IsNumberToken():
                 return self._Expr
@@ -471,7 +473,7 @@ class ValueExpression(object):
                 Ex = BadExpression(ERR_PCD_RESOLVE % self._Token)
                 Ex.Pcd = self._Token
                 raise Ex
-            self._Token = ValueExpression(self._Symb[self._Token], self._Symb)(True)
+            self._Token = ValueExpression(self._Symb[self._Token], self._Symb)(True, self._Depth+1)
             if type(self._Token) != type(''):
                 self._LiteralToken = hex(self._Token)
                 return
@@ -551,7 +553,7 @@ class ValueExpression(object):
             if Match and not Expr[Match.end():Match.end()+1].isalnum() \
                 and Expr[Match.end():Match.end()+1] != '_':
                 self._Idx += Match.end()
-                self._Token = ValueExpression(GuidStringToGuidStructureString(Expr[0:Match.end()]))(True)
+                self._Token = ValueExpression(GuidStringToGuidStructureString(Expr[0:Match.end()]))(True, self._Depth+1)
                 return self._Token
             elif self.__IsIdChar(Ch):
                 return self.__GetIdToken()

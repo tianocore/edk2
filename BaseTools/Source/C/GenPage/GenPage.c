@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -91,8 +91,7 @@ Returns:
 
 --*/
 {
-  printf ("%s v%d.%d %s -Utility to generate the EfiLoader image containing page table.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
-  printf ("Copyright (c) 2008 - 2011 Intel Corporation. All rights reserved.\n");
+  printf ("%s Version %d.%d Build %s\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
 }
 
 VOID
@@ -100,25 +99,29 @@ Usage (
   void
   )
 {
-  Version();
-  printf ("\nUsage: \n\
-   GenPage\n\
-     -o, --output Filename\n\
-                        The file that contains both non-page table part and\n\
-                        page table\n\
-     [-b, --baseaddr baseaddress]\n\
+  printf ("Usage: GenPage.exe [options] EfiLoaderImageName \n\n\
+Copyright (c) 2008 - 2013, Intel Corporation.  All rights reserved.\n\n\
+  Utility to generate the EfiLoader image containing a page table.\n\n\
+optional arguments:\n\
+  -h, --help            Show this help message and exit\n\
+  --version             Show program's version number and exit\n\
+  -d [DEBUG], --debug [DEBUG]\n\
+                        Output DEBUG statements, where DEBUG_LEVEL is 0 (min)\n\
+                        - 9 (max)\n\
+  -v, --verbose         Print informational statements\n\
+  -q, --quiet           Returns the exit code, error messages will be\n\
+                        displayed\n\
+  -s, --silent          Returns only the exit code; informational and error\n\
+                        messages are not displayed\n\
+  -o OUTPUT_FILENAME, --output OUTPUT_FILENAME\n\
+                        Output file contain both the non-page table part and\n\
+                        the page table\n\
+  -b BASE_ADDRESS, --baseaddr BASE_ADDRESS\n\
                         The page table location\n\
-     [-f, --offset offset]\n\
+  -f OFFSET, --offset OFFSET\n\
                         The position that the page table will appear in the\n\
                         output file\n\
-     [-v, --verbose]    Turn on verbose output with informational messages\n\
-                        printed\n\
-     [--version]        Print version and copyright of this program and exit\n\
-     [-q, --quiet]      Disable all messages except unrecoverable errors\n\
-     [-d, --debug[#]]   Enable debug messages, at level #\n\
-     [-h, --help]       Print copyright, version and usage of this program\n\
-                        and exit\n\
-     EfiLoaderImageName\n");
+  --sfo                 Reserved for future use\n");
 
 }
 

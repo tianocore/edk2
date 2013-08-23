@@ -2,7 +2,7 @@
   
   VfrCompiler Error definition
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -43,13 +43,24 @@ typedef enum {
   VFR_RETURN_DATA_STRING_ERROR,
   VFR_RETURN_DEFAULT_VALUE_REDEFINED,
   VFR_RETURN_CONSTANT_ONLY,
+  VFR_RETURN_VARSTORE_NAME_REDEFINED_ERROR,
   VFR_RETURN_CODEUNDEFINED
 } EFI_VFR_RETURN_CODE;
+
+typedef enum {
+  VFR_WARNING_DEFAULT_VALUE_REDEFINED = 0,
+  VFR_WARNING_CODEUNDEFINED
+} EFI_VFR_WARNING_CODE;
 
 typedef struct _SVFR_ERROR_HANDLE {
   EFI_VFR_RETURN_CODE    mErrorCode;
   CONST CHAR8            *mErrorMsg;
 } SVFR_ERROR_HANDLE;
+
+typedef struct _SVFR_WARNING_HANDLE {
+  EFI_VFR_WARNING_CODE    mWarningCode;
+  CONST CHAR8            *mWarningMsg;
+} SVFR_WARNING_HANDLE;
 
 struct SVfrFileScopeRecord {
   CHAR8                 *mFileName;
@@ -65,17 +76,21 @@ class CVfrErrorHandle {
 private:
   CHAR8               *mInputFileName;
   SVFR_ERROR_HANDLE   *mVfrErrorHandleTable;
+  SVFR_WARNING_HANDLE *mVfrWarningHandleTable;
   SVfrFileScopeRecord *mScopeRecordListHead;
   SVfrFileScopeRecord *mScopeRecordListTail;
+  BOOLEAN             mWarningAsError;
 
 public:
   CVfrErrorHandle (VOID);
   ~CVfrErrorHandle (VOID);
 
+  VOID  SetWarningAsError (IN BOOLEAN);
   VOID  SetInputFile (IN CHAR8 *);
   VOID  ParseFileScopeRecord (IN CHAR8 *, IN UINT32);
   VOID  GetFileNameLineNum (IN UINT32, OUT CHAR8 **, OUT UINT32 *);
   UINT8 HandleError (IN EFI_VFR_RETURN_CODE, IN UINT32 LineNum = 0, IN CHAR8 *TokName = NULL);
+  UINT8 HandleWarning (IN EFI_VFR_WARNING_CODE, IN UINT32 LineNum = 0, IN CHAR8 *TokName = NULL);
   VOID  PrintMsg (IN UINT32 LineNum = 0, IN CHAR8 *TokName = NULL, IN CONST CHAR8 *MsgType = "Error", IN CONST CHAR8 *ErrorMsg = "");
 };
 

@@ -110,6 +110,8 @@ class FileStatement (FileStatementClassObject) :
                 if FvParentAddr != None and isinstance(section, GuidSection):
                     section.FvParentAddr = FvParentAddr
 
+                if self.KeepReloc == False:
+                    section.KeepReloc = False
                 sectList, align = section.GenSection(OutputDir, self.NameGuid, SecIndex, self.KeyStringList, None, Dict)
                 if sectList != []:
                     for sect in sectList:

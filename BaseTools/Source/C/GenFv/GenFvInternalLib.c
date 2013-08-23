@@ -1,6 +1,7 @@
 /** @file
 
 Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Portions Copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -1580,6 +1581,11 @@ Returns:
     // Since the ARM reset vector is in the FV Header you really don't need a
     // Volume Top File, but if you have one for some reason don't crash...
     //
+  } else if (MachineType == EFI_IMAGE_MACHINE_AARCH64) {
+    //
+    // Since the AArch64 reset vector is in the FV Header you really don't need a
+    // Volume Top File, but if you have one for some reason don't crash...
+    //
   } else {
     Error (NULL, 0, 3000, "Invalid", "machine type=0x%X in PEI core.", MachineType);
     return EFI_ABORTED;
@@ -1617,9 +1623,11 @@ Routine Description:
   This parses the FV looking for SEC and patches that address into the 
   beginning of the FV header.
 
-  For ARM the reset vector is at 0x00000000 or 0xFFFF0000.
+  For ARM32 the reset vector is at 0x00000000 or 0xFFFF0000.
+  For AArch64 the reset vector is at 0x00000000.
+
   This would commonly map to the first entry in the ROM. 
-  ARM Exceptions:
+  ARM32 Exceptions:
   Reset            +0    
   Undefined        +4
   SWI              +8
@@ -1633,11 +1641,10 @@ Routine Description:
   2) Reset vector is data bytes FDF file and that code branches to reset vector 
     in the beginning of the FV (fixed size offset).
 
-
   Need to have the jump for the reset vector at location zero.
   We also need to store the address or PEI (if it exists).
   We stub out a return from interrupt in case the debugger 
-   is using SWI.
+   is using SWI (not done for AArch64, not enough space in struct).
   The optional entry to the common exception handler is 
    to support full featured exception handling from ROM and is currently 
     not support by this tool.
@@ -1664,10 +1671,14 @@ Returns:
   UINT16                    MachineType;
   EFI_PHYSICAL_ADDRESS      PeiCorePhysicalAddress;
   EFI_PHYSICAL_ADDRESS      SecCorePhysicalAddress;
-  INT32                     ResetVector[4]; // 0 - is branch relative to SEC entry point
+  INT32                     ResetVector[4]; // ARM32:
+                                            // 0 - is branch relative to SEC entry point
                                             // 1 - PEI Entry Point
                                             // 2 - movs pc,lr for a SWI handler
                                             // 3 - Place holder for Common Exception Handler
+                                            // AArch64: Used as UINT64 ResetVector[2]
+                                            // 0 - is branch relative to SEC entry point
+                                            // 1 - PEI Entry Point
 
   //
   // Verify input parameters
@@ -1727,7 +1738,7 @@ Returns:
       PeiCorePhysicalAddress += EntryPoint;
       DebugMsg (NULL, 0, 9, "PeiCore physical entry point address", "Address = 0x%llX", (unsigned long long) PeiCorePhysicalAddress);
 
-      if (MachineType == EFI_IMAGE_MACHINE_ARMT) {
+      if (MachineType == EFI_IMAGE_MACHINE_ARMT || MachineType == EFI_IMAGE_MACHINE_AARCH64) {
         memset (ResetVector, 0, sizeof (ResetVector));
         // Address of PEI Core, if we have one
         ResetVector[1] = (UINT32)PeiCorePhysicalAddress;
@@ -1767,7 +1778,7 @@ Returns:
     return EFI_ABORTED;
   }
   
-  if (MachineType != EFI_IMAGE_MACHINE_ARMT) {
+  if ((MachineType != EFI_IMAGE_MACHINE_ARMT) && (MachineType != EFI_IMAGE_MACHINE_AARCH64)) {
     //
     // If SEC is not ARM we have nothing to do
     //
@@ -1821,31 +1832,60 @@ Returns:
     DebugMsg (NULL, 0, 9, "PeiCore physical entry point address", "Address = 0x%llX", (unsigned long long) PeiCorePhysicalAddress);
   }
   
+  if (MachineType == EFI_IMAGE_MACHINE_ARMT) {
+    // B SecEntryPoint - signed_immed_24 part +/-32MB offset
+    // on ARM, the PC is always 8 ahead, so we're not really jumping from the base address, but from base address + 8
+    ResetVector[0] = (INT32)(SecCorePhysicalAddress - FvInfo->BaseAddress - 8) >> 2;
+
+    if (ResetVector[0] > 0x00FFFFFF) {
+      Error (NULL, 0, 3000, "Invalid", "SEC Entry point must be within 32MB of the start of the FV");
+      return EFI_ABORTED;
+    }
   
-  // B SecEntryPoint - signed_immed_24 part +/-32MB offset
-  // on ARM, the PC is always 8 ahead, so we're not really jumping from the base address, but from base address + 8
-  ResetVector[0] = (INT32)(SecCorePhysicalAddress - FvInfo->BaseAddress - 8) >> 2;
+    // Add opcode for an uncondional branch with no link. AKA B SecEntryPoint
+    ResetVector[0] |= 0xEB000000;
   
-  if (ResetVector[0] > 0x00FFFFFF) {
-    Error (NULL, 0, 3000, "Invalid", "SEC Entry point must be within 32MB of the start of the FV");
-    return EFI_ABORTED;    
+  
+    // Address of PEI Core, if we have one
+    ResetVector[1] = (UINT32)PeiCorePhysicalAddress;
+  
+    // SWI handler movs   pc,lr. Just in case a debugger uses SWI
+    ResetVector[2] = 0xE1B0F07E;
+  
+    // Place holder to support a common interrupt handler from ROM.
+    // Currently not suppprted. For this to be used the reset vector would not be in this FV
+    // and the exception vectors would be hard coded in the ROM and just through this address
+    // to find a common handler in the a module in the FV.
+    ResetVector[3] = 0;
+  } else if (MachineType == EFI_IMAGE_MACHINE_AARCH64) {
+
+  /* NOTE:
+    ARMT above has an entry in ResetVector[2] for SWI. The way we are using the ResetVector
+    array at the moment, for AArch64, does not allow us space for this as the header only
+    allows for a fixed amount of bytes at the start. If we are sure that UEFI will live
+    within the first 4GB of addressable RAM we could potensioally adopt the same ResetVector
+    layout as above. But for the moment we replace the four 32bit vectors with two 64bit
+    vectors in the same area of the Image heasder. This allows UEFI to start from a 64bit
+    base.
+  */
+
+    ((UINT64*)ResetVector)[0] = (UINT64)(SecCorePhysicalAddress - FvInfo->BaseAddress) >> 2;
+
+    // B SecEntryPoint - signed_immed_26 part +/-128MB offset
+    if ( ((UINT64*)ResetVector)[0] > 0x03FFFFFF) {
+      Error (NULL, 0, 3000, "Invalid", "SEC Entry point must be within 128MB of the start of the FV");
+      return EFI_ABORTED;
+    }
+    // Add opcode for an uncondional branch with no link. AKA B SecEntryPoint
+    ((UINT64*)ResetVector)[0] |= 0x14000000;
+
+    // Address of PEI Core, if we have one
+    ((UINT64*)ResetVector)[1] = (UINT64)PeiCorePhysicalAddress;
+
+  } else {
+    Error (NULL, 0, 3000, "Invalid", "Unknown ARM machine type");
+    return EFI_ABORTED;
   }
-  
-  // Add opcode for an uncondional branch with no link. AKA B SecEntryPoint
-  ResetVector[0] |= 0xEB000000;
-  
-  
-  // Address of PEI Core, if we have one
-  ResetVector[1] = (UINT32)PeiCorePhysicalAddress;
-  
-  // SWI handler movs   pc,lr. Just in case a debugger uses SWI
-  ResetVector[2] = 0xE1B0F07E;
-  
-  // Place holder to support a common interrupt handler from ROM. 
-  // Currently not suppprted. For this to be used the reset vector would not be in this FV
-  // and the exception vectors would be hard coded in the ROM and just through this address 
-  // to find a common handler in the a module in the FV.
-  ResetVector[3] = 0;
 
   //
   // Copy to the beginning of the FV 
@@ -1948,8 +1988,8 @@ Returns:
   //
   // Verify machine type is supported
   //
-  if (*MachineType != EFI_IMAGE_MACHINE_IA32 && *MachineType != EFI_IMAGE_MACHINE_IA64 && *MachineType != EFI_IMAGE_MACHINE_X64 && *MachineType != EFI_IMAGE_MACHINE_EBC && 
-      *MachineType != EFI_IMAGE_MACHINE_ARMT) {
+  if ((*MachineType != EFI_IMAGE_MACHINE_IA32) && (*MachineType != EFI_IMAGE_MACHINE_IA64) && (*MachineType != EFI_IMAGE_MACHINE_X64) && (*MachineType != EFI_IMAGE_MACHINE_EBC) && 
+      (*MachineType != EFI_IMAGE_MACHINE_ARMT) && (*MachineType != EFI_IMAGE_MACHINE_AARCH64)) {
     Error (NULL, 0, 3000, "Invalid", "Unrecognized machine type in the PE32 file.");
     return EFI_UNSUPPORTED;
   }
@@ -2895,7 +2935,8 @@ Returns:
       return Status;
     }
 
-    if (ImageContext.Machine == EFI_IMAGE_MACHINE_ARMT) {
+    if ( (ImageContext.Machine == EFI_IMAGE_MACHINE_ARMT) ||
+         (ImageContext.Machine == EFI_IMAGE_MACHINE_AARCH64) ) {
       mArm = TRUE;
     }
 
@@ -3163,7 +3204,8 @@ Returns:
       return Status;
     }
 
-    if (ImageContext.Machine == EFI_IMAGE_MACHINE_ARMT) {
+    if ( (ImageContext.Machine == EFI_IMAGE_MACHINE_ARMT) ||
+         (ImageContext.Machine == EFI_IMAGE_MACHINE_AARCH64) ) {
       mArm = TRUE;
     }
 

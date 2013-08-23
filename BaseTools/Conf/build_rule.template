@@ -301,8 +301,8 @@
         -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
 
     <Command.GCC>
-        $(OBJCOPY) --only-keep-debug ${src} $(DEBUG_DIR)(+)$(MODULE_NAME).debug
-        $(OBJCOPY) --strip-unneeded ${src}
+        $(CP) ${src} $(DEBUG_DIR)(+)$(MODULE_NAME).debug
+        $(OBJCOPY) --strip-unneeded -R .eh_frame ${src}
 
         #
         #The below 2 lines are only needed for UNIXGCC tool chain, which genereates PE image directly

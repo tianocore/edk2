@@ -14,4 +14,4 @@
 
 **/
 
-#define __BUILD_VERSION "Build 2524"
+#define __BUILD_VERSION ""

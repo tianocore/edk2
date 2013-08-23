@@ -39,7 +39,7 @@ class SkuInfoListClass(IncludeStatementClass):
 #
 # @var DscSpecification:         To store value for DscSpecification
 # @var SupArchList:              To store value for SupArchList, selection scope is in below list
-#                                EBC | IA32 | X64 | IPF | ARM | PPC
+#                                EBC | IA32 | X64 | IPF | ARM | PPC | AARCH64
 # @var BuildTargets:             To store value for BuildTargets, selection scope is in below list
 #                                RELEASE | DEBUG
 # @var IntermediateDirectories:  To store value for IntermediateDirectories, selection scope is in below list

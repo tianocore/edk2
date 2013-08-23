@@ -2,7 +2,7 @@
   
   VfrCompiler error handler.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -45,17 +45,24 @@ static SVFR_ERROR_HANDLE VFR_ERROR_HANDLE_TABLE [] = {
   { VFR_RETURN_DATA_STRING_ERROR, ": data field string error or not support"},
   { VFR_RETURN_DEFAULT_VALUE_REDEFINED, ": default value re-defined with different value"},
   { VFR_RETURN_CONSTANT_ONLY, ": only constant is allowed in the expression"},
+  { VFR_RETURN_VARSTORE_NAME_REDEFINED_ERROR, ": Varstore name is defined by more than one varstores, it can't be referred as varstore, only varstore strucure name could be used."},
   { VFR_RETURN_CODEUNDEFINED, ": undefined Error Code" }
+};
+
+static SVFR_WARNING_HANDLE VFR_WARNING_HANDLE_TABLE [] = {
+  { VFR_WARNING_DEFAULT_VALUE_REDEFINED, ": default value re-defined with different value"},
+  { VFR_WARNING_CODEUNDEFINED, ": undefined Warning Code" }
 };
 
 CVfrErrorHandle::CVfrErrorHandle (
   VOID
   )
 {
-  mInputFileName       = NULL;
-  mScopeRecordListHead = NULL;
-  mScopeRecordListTail = NULL;
-  mVfrErrorHandleTable = VFR_ERROR_HANDLE_TABLE;
+  mInputFileName         = NULL;
+  mScopeRecordListHead   = NULL;
+  mScopeRecordListTail   = NULL;
+  mVfrErrorHandleTable   = VFR_ERROR_HANDLE_TABLE;
+  mVfrWarningHandleTable = VFR_WARNING_HANDLE_TABLE;
 }
 
 CVfrErrorHandle::~CVfrErrorHandle (
@@ -74,9 +81,18 @@ CVfrErrorHandle::~CVfrErrorHandle (
     delete pNode;
   }
 
-  mScopeRecordListHead = NULL;
-  mScopeRecordListTail = NULL;
-  mVfrErrorHandleTable = NULL;
+  mScopeRecordListHead   = NULL;
+  mScopeRecordListTail   = NULL;
+  mVfrErrorHandleTable   = NULL;
+  mVfrWarningHandleTable = NULL;
+}
+
+VOID
+CVfrErrorHandle::SetWarningAsError (
+  IN BOOLEAN  WarningAsError
+  )
+{
+  mWarningAsError = WarningAsError;
 }
 
 VOID
@@ -236,6 +252,43 @@ CVfrErrorHandle::HandleError (
   if (ErrorMsg != NULL) {
     GetFileNameLineNum (LineNum, &FileName, &FileLine);
     Error (FileName, FileLine, 0x3000, TokName, (CHAR8 *) "\t%s\n", (CHAR8 *) ErrorMsg);
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+UINT8
+CVfrErrorHandle::HandleWarning (
+  IN EFI_VFR_WARNING_CODE WarningCode,
+  IN UINT32               LineNum,
+  IN CHAR8                *TokName
+  )
+{
+  UINT32                 Index;
+  CHAR8                  *FileName = NULL;
+  UINT32                 FileLine;
+  CONST CHAR8            *WarningMsg = NULL;
+
+  if (mVfrWarningHandleTable == NULL) {
+    return 1;
+  }
+
+  GetFileNameLineNum (LineNum, &FileName, &FileLine);
+
+  if (mWarningAsError) {
+    Error (FileName, FileLine, 0x2220, "warning treated as error", NULL);
+  }
+
+  for (Index = 0; mVfrWarningHandleTable[Index].mWarningCode != VFR_WARNING_CODEUNDEFINED; Index++) {
+    if (WarningCode == mVfrWarningHandleTable[Index].mWarningCode) {
+      WarningMsg = mVfrWarningHandleTable[Index].mWarningMsg;
+      break;
+    }
+  }
+
+  if (WarningMsg != NULL) {
+    Warning (FileName, FileLine, 0, TokName, (CHAR8 *) "\t%s\n", (CHAR8 *) WarningMsg);
     return 1;
   } else {
     return 0;

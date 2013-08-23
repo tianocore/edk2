@@ -3,10 +3,10 @@
 @REM   however it may be executed directly from the BaseTools project folder
 @REM   if the file is not executed within a WORKSPACE\BaseTools folder.
 @REM
-@REM Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+@REM Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 @REM
 @REM This program and the accompanying materials are licensed and made available
-@REM under the terms and conditions of the BSD Licensewhich accompanies this 
+@REM under the terms and conditions of the BSD License which accompanies this 
 @REM distribution.  The full text of the license may be found at:
 @REM   http://opensource.org/licenses/bsd-license.php
 @REM

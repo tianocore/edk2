@@ -301,7 +301,7 @@ def myOptionParser():
     usage = "%prog [options] -f input_file -a arch_list -b build_target -p active_platform -t tool_chain_tag -D \"MacroName [= MacroValue]\""
     Parser = OptionParser(usage=usage,description=__copyright__,version="%prog " + str(versionNumber))
     Parser.add_option("-f", "--file", dest="filename", type="string", help="Name of FDF file to convert", action="callback", callback=SingleCheckCallback)
-    Parser.add_option("-a", "--arch", dest="archList", help="comma separated list containing one or more of: IA32, X64, IPF, ARM or EBC which should be built, overrides target.txt?s TARGET_ARCH")
+    Parser.add_option("-a", "--arch", dest="archList", help="comma separated list containing one or more of: IA32, X64, IPF, ARM, AARCH64 or EBC which should be built, overrides target.txt?s TARGET_ARCH")
     Parser.add_option("-q", "--quiet", action="store_true", type=None, help="Disable all messages except FATAL ERRORS.")
     Parser.add_option("-v", "--verbose", action="store_true", type=None, help="Turn on verbose output with informational messages printed.")
     Parser.add_option("-d", "--debug", action="store", type="int", help="Enable debug messages at specified level.")

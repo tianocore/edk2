@@ -5,6 +5,7 @@
   @bug Fix text - doc as defined in MSFT EFI specification.
 
   Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Portions copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -48,6 +49,7 @@
 #define IMAGE_FILE_MACHINE_X64      0x8664
 #define IMAGE_FILE_MACHINE_ARM      0x01c0  // Thumb only
 #define IMAGE_FILE_MACHINE_ARMT     0x01c2  // 32bit Mixed ARM and Thumb/Thumb 2  Little Endian
+#define IMAGE_FILE_MACHINE_ARM64    0xAA64  // 64bit ARM Architecture, Little Endian
 
 //
 // Support old names for backward compatible
@@ -58,6 +60,7 @@
 #define EFI_IMAGE_MACHINE_EBC       IMAGE_FILE_MACHINE_EBC  
 #define EFI_IMAGE_MACHINE_X64       IMAGE_FILE_MACHINE_X64
 #define EFI_IMAGE_MACHINE_ARMT      IMAGE_FILE_MACHINE_ARMT
+#define EFI_IMAGE_MACHINE_AARCH64   IMAGE_FILE_MACHINE_ARM64
 
 #define EFI_IMAGE_DOS_SIGNATURE     0x5A4D      // MZ
 #define EFI_IMAGE_OS2_SIGNATURE     0x454E      // NE

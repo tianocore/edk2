@@ -1,5 +1,5 @@
 /*++
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -494,6 +494,7 @@ vfrFormSetDefinition :
      UINT8       ClassGuidNum = 0;
      CIfrFormSet *FSObj = NULL;
      UINT16      C, SC;
+     CHAR8*      InsertOpcodeAddr = NULL;
   >>
   L:FormSet
   Uuid "=" guidDefinition[Guid] ","
@@ -585,7 +586,38 @@ vfrFormSetDefinition :
                                                         //
                                                         _DeclareDefaultFrameworkVarStore (GET_LINENO(E));
                                                       }
-                                                      CRT_END_OP (E); if (FSObj != NULL) delete FSObj;
+                                                      
+                                                      //
+                                                      // Declare undefined Question so that they can be used in expression.
+                                                      //
+                                                      if (gCFormPkg.HavePendingUnassigned()) {
+                                                        mParserStatus += gCFormPkg.DeclarePendingQuestion (
+                                                                    gCVfrVarDataTypeDB,
+                                                                    mCVfrDataStorage,
+                                                                    mCVfrQuestionDB,
+                                                                    &mFormsetGuid,
+                                                                    E->getLine(),
+                                                                    &InsertOpcodeAddr
+                                                                  );
+                                                        gNeedAdjustOpcode = TRUE;
+                                                      }
+
+                                                      CRT_END_OP (E);
+
+                                                      //
+                                                      // Adjust the pending question position.
+                                                      // Move the position from current to before the end of the last form in the form set.
+                                                      //
+                                                      if (gNeedAdjustOpcode) {
+                                                        gCFormPkg.AdjustDynamicInsertOpcode (
+                                                          mLastFormEndAddr,
+                                                          InsertOpcodeAddr
+                                                        );
+                                                      }
+
+                                                      if (FSObj != NULL) {
+                                                        delete FSObj;
+                                                      }
                                                     >>
   ";"
   ;
@@ -866,7 +898,7 @@ vfrStatementVarStoreLinear :
                                                                                   VarStoreId
                                                                                   ), LineNum);
                                                        VSObj.SetGuid (&Guid);
-                                                       _PCATCH(mCVfrDataStorage.GetVarStoreId(StoreName, &VarStoreId), SN);
+                                                       _PCATCH(mCVfrDataStorage.GetVarStoreId(StoreName, &VarStoreId, &Guid), SN);
                                                        VSObj.SetVarStoreId (VarStoreId);
                                                        _PCATCH(gCVfrVarDataTypeDB.GetDataTypeSize(TypeName, &Size), LineNum);
                                                        VSObj.SetSize ((UINT16) Size);
@@ -952,7 +984,7 @@ vfrStatementVarStoreEfi :
                                                                                   TypeName,
                                                                                   VarStoreId
                                                                                   ), LineNum);                                                        
-                                                         _PCATCH(mCVfrDataStorage.GetVarStoreId(StoreName, &VarStoreId), SN);
+                                                         _PCATCH(mCVfrDataStorage.GetVarStoreId(StoreName, &VarStoreId, &Guid), SN);
                                                          _PCATCH(gCVfrVarDataTypeDB.GetDataTypeSize(TypeName, &Size), LineNum);
                                                        } else {
                                                         _PCATCH(mCVfrDataStorage.DeclareBufferVarStore (
@@ -962,7 +994,7 @@ vfrStatementVarStoreEfi :
                                                                                   TypeName,
                                                                                   VarStoreId
                                                                                   ), LineNum);                                                      
-                                                         _PCATCH(mCVfrDataStorage.GetVarStoreId(TN->getText(), &VarStoreId), VN);
+                                                         _PCATCH(mCVfrDataStorage.GetVarStoreId(TN->getText(), &VarStoreId, &Guid), VN);
                                                          _PCATCH(gCVfrVarDataTypeDB.GetDataTypeSize(TypeName, &Size), N->getLine());
                                                        }
                                                        VSEObj.SetGuid (&Guid);                                                       
@@ -995,7 +1027,7 @@ vfrStatementVarStoreNameValue :
   Uuid "=" guidDefinition[Guid]                     << _PCATCH(mCVfrDataStorage.DeclareNameVarStoreEnd (&Guid), SN); >>
                                                     <<
                                                        VSNVObj.SetGuid (&Guid);
-                                                       _PCATCH(mCVfrDataStorage.GetVarStoreId(SN->getText(), &VarStoreId), SN);
+                                                       _PCATCH(mCVfrDataStorage.GetVarStoreId(SN->getText(), &VarStoreId, &Guid), SN);
                                                        VSNVObj.SetVarStoreId (VarStoreId);
                                                     >>
   ";"
@@ -1069,9 +1101,14 @@ vfrStatementHeader[CIfrStatementHeader *SHObj] :
 vfrQuestionHeader[CIfrQuestionHeader & QHObj, EFI_QUESION_TYPE QType = QUESTION_NORMAL]:
   <<
      EFI_VARSTORE_INFO Info;
+     Info.mVarType               = EFI_IFR_TYPE_OTHER;
+     Info.mVarTotalSize          = 0;
+     Info.mInfo.mVarOffset       = EFI_VAROFFSET_INVALID;
+     Info.mVarStoreId            = EFI_VARSTORE_ID_INVALID;
      EFI_QUESTION_ID   QId       = EFI_QUESTION_ID_INVALID;
      CHAR8             *QName    = NULL;
      CHAR8             *VarIdStr = NULL;
+     mUsedDefaultCount           = 0;
   >>
   {
     Name "=" QN:StringIdentifier ","                <<
@@ -1119,8 +1156,8 @@ vfrQuestionHeader[CIfrQuestionHeader & QHObj, EFI_QUESION_TYPE QType = QUESTION_
                                                     << 
                                                        if (VarIdStr != NULL) {
                                                          delete VarIdStr; 
-                                                         _SAVE_CURRQEST_VARINFO (Info);
                                                        }
+                                                       _SAVE_CURRQEST_VARINFO (Info);
                                                     >>
   ;
 
@@ -1144,6 +1181,7 @@ vfrStorageVarId[EFI_VARSTORE_INFO & Info, CHAR8 *&QuestVarIdStr, BOOLEAN CheckFl
      CHAR8                 *TName       = NULL;
      EFI_VFR_RETURN_CODE   VfrReturnCode = VFR_RETURN_SUCCESS;
      EFI_IFR_TYPE_VALUE    Dummy        = gZeroEfiIfrTypeValue;
+     EFI_GUID              *VarGuid     = NULL;
   >>
   (
     SN1:StringIdentifier                            << SName = SN1->getText(); _STRCAT(&VarIdStr, SN1->getText()); >>
@@ -1154,7 +1192,7 @@ vfrStorageVarId[EFI_VARSTORE_INFO & Info, CHAR8 *&QuestVarIdStr, BOOLEAN CheckFl
                                                        _STRCAT(&VarIdStr, "]");
                                                     >>
                                                     <<
-                                                       VfrReturnCode = mCVfrDataStorage.GetVarStoreType (SName, VarStoreType);
+                                                       VfrReturnCode = mCVfrDataStorage.GetVarStoreId(SName, &$Info.mVarStoreId);
                                                        if (mCompatibleMode && VfrReturnCode == VFR_RETURN_UNDEFINED) {
                                                           mCVfrDataStorage.DeclareBufferVarStore (
                                                                              SName,
@@ -1164,11 +1202,10 @@ vfrStorageVarId[EFI_VARSTORE_INFO & Info, CHAR8 *&QuestVarIdStr, BOOLEAN CheckFl
                                                                              EFI_VARSTORE_ID_INVALID,
                                                                              FALSE
                                                                              );
-                                                          VfrReturnCode = mCVfrDataStorage.GetVarStoreType (SName, VarStoreType);
+                                                          VfrReturnCode = mCVfrDataStorage.GetVarStoreId(SName, &$Info.mVarStoreId, &mFormsetGuid);
                                                        }
                                                        if (CheckFlag || VfrReturnCode == VFR_RETURN_SUCCESS) {
                                                          _PCATCH(VfrReturnCode, SN1);
-                                                         _PCATCH(mCVfrDataStorage.GetVarStoreId (SName, &$Info.mVarStoreId), SN1);
                                                          _PCATCH(mCVfrDataStorage.GetNameVarStoreInfo (&$Info, Idx), SN1);
                                                        }
 
@@ -1179,7 +1216,7 @@ vfrStorageVarId[EFI_VARSTORE_INFO & Info, CHAR8 *&QuestVarIdStr, BOOLEAN CheckFl
   (
     SN2:StringIdentifier                            << SName = SN2->getText(); _STRCAT(&VarIdStr, SName); >>
                                                     <<
-                                                       VfrReturnCode = mCVfrDataStorage.GetVarStoreType (SName, VarStoreType);
+                                                       VfrReturnCode = mCVfrDataStorage.GetVarStoreId(SName, &$Info.mVarStoreId);
                                                        if (mCompatibleMode && VfrReturnCode == VFR_RETURN_UNDEFINED) {
                                                           mCVfrDataStorage.DeclareBufferVarStore (
                                                                              SName,
@@ -1189,13 +1226,13 @@ vfrStorageVarId[EFI_VARSTORE_INFO & Info, CHAR8 *&QuestVarIdStr, BOOLEAN CheckFl
                                                                              EFI_VARSTORE_ID_INVALID,
                                                                              FALSE
                                                                              );
-                                                          VfrReturnCode = mCVfrDataStorage.GetVarStoreType (SName, VarStoreType);
+                                                          VfrReturnCode = mCVfrDataStorage.GetVarStoreId(SName, &$Info.mVarStoreId, &mFormsetGuid);
                                                        }
                                                        if (CheckFlag || VfrReturnCode == VFR_RETURN_SUCCESS) {
                                                          _PCATCH(VfrReturnCode, SN2);
-                                                         _PCATCH(mCVfrDataStorage.GetVarStoreId (SName, &$Info.mVarStoreId), SN2);
+                                                         VarStoreType = mCVfrDataStorage.GetVarStoreType ($Info.mVarStoreId);
                                                          if (VarStoreType == EFI_VFR_VARSTORE_BUFFER) {
-                                                           _PCATCH(mCVfrDataStorage.GetBufferVarStoreDataTypeName(SName, &TName), SN2);
+                                                           _PCATCH(mCVfrDataStorage.GetBufferVarStoreDataTypeName(Info.mVarStoreId, &TName), SN2);
                                                            _STRCAT(&VarStr, TName);
                                                          }
                                                        }
@@ -1234,13 +1271,16 @@ vfrStorageVarId[EFI_VARSTORE_INFO & Info, CHAR8 *&QuestVarIdStr, BOOLEAN CheckFl
                                                          break;
                                                        case EFI_VFR_VARSTORE_BUFFER:
                                                          _PCATCH(gCVfrVarDataTypeDB.GetDataFieldInfo (VarStr, $Info.mInfo.mVarOffset, $Info.mVarType, $Info.mVarTotalSize), SN2->getLine(), VarStr);
+                                                         VarGuid = mCVfrDataStorage.GetVarStoreGuid($Info.mVarStoreId);
                                                          _PCATCH((EFI_VFR_RETURN_CODE)gCVfrBufferConfig.Register (
                                                                     SName,
+                                                                    VarGuid,
                                                                     NULL),
                                                                  SN2->getLine());
                                                          _PCATCH((EFI_VFR_RETURN_CODE)gCVfrBufferConfig.Write (
                                                                     'a',
                                                                     SName,
+                                                                    VarGuid,
                                                                     NULL,
                                                                     $Info.mVarType,
                                                                     $Info.mInfo.mVarOffset,
@@ -1389,23 +1429,7 @@ vfrFormDefinition :
                                                         LObj3.SetNumber (0xffff);  //add end label for UEFI, label number hardcode 0xffff
                                                       }
 
-                                                      //
-                                                      // Declare undefined Question so that they can be used in expression.
-                                                      //
-                                                      if (gCFormPkg.HavePendingUnassigned()) {
-                                                        gCFormPkg.DeclarePendingQuestion (
-                                                                    gCVfrVarDataTypeDB,
-                                                                    mCVfrDataStorage,
-                                                                    mCVfrQuestionDB,
-                                                                    &mFormsetGuid,
-                                                                    E->getLine()
-                                                                  );
-                                                      }
-
-                                                      //
-                                                      // mCVfrQuestionDB.PrintAllQuestion();
-                                                      //
-                                                      CRT_END_OP (E);
+                                                      {CIfrEnd EObj; EObj.SetLineNo (E->getLine()); mLastFormEndAddr = EObj.GetObjBinAddr (); gAdjustOpcodeOffset = EObj.GetObjBinOffset ();}
                                                     >>
   ";"
   ;
@@ -1455,42 +1479,72 @@ vfrStatementDefault :
   <<
      BOOLEAN               IsExp         = FALSE;
      EFI_IFR_TYPE_VALUE    Val           = gZeroEfiIfrTypeValue;
-     CIfrDefault           DObj;
+     CIfrDefault           *DObj         = NULL;
+     CIfrDefault2          *DObj2        = NULL;
      EFI_DEFAULT_ID        DefaultId     = EFI_HII_DEFAULT_CLASS_STANDARD;
      CHAR8                 *VarStoreName = NULL;
      EFI_VFR_VARSTORE_TYPE VarStoreType  = EFI_VFR_VARSTORE_INVALID;
+     UINT32                Size          = 0;
+     EFI_GUID              *VarGuid      = NULL;
   >>
-  D:Default                                         << DObj.SetLineNo(D->getLine()); >>
+  D:Default                                         
   (
     (
-        vfrStatementValue ","                       << IsExp = TRUE; DObj.SetScope (1); CIfrEnd EndObj1; EndObj1.SetLineNo(D->getLine()); >>
-      | "=" vfrConstantValueField[_GET_CURRQEST_DATATYPE()] > [Val] ","  << 
+      "=" vfrConstantValueField[_GET_CURRQEST_DATATYPE()] > [Val] ","  
+                                                    << 
                                                         if (gCurrentMinMaxData != NULL && gCurrentMinMaxData->IsNumericOpcode()) {
                                                           //check default value is valid for Numeric Opcode
                                                           if (Val.u64 < gCurrentMinMaxData->GetMinData(_GET_CURRQEST_DATATYPE()) || Val.u64 > gCurrentMinMaxData->GetMaxData(_GET_CURRQEST_DATATYPE())) {
                                                             _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "Numeric default value must be between MinValue and MaxValue.");
                                                           }
                                                         }
-                                                        DObj.SetType (_GET_CURRQEST_DATATYPE()); 
-                                                        DObj.SetValue(Val);
+                                                        if (_GET_CURRQEST_DATATYPE() == EFI_IFR_TYPE_OTHER) {
+                                                          _PCATCH (VFR_RETURN_FATAL_ERROR, D->getLine(), "Default data type error.");
+                                                          Size = sizeof (EFI_IFR_TYPE_VALUE);
+                                                        } else {
+                                                          _PCATCH (gCVfrVarDataTypeDB.GetDataTypeSize (_GET_CURRQEST_DATATYPE(), &Size), D->getLine());
+                                                        }
+                                                        Size += OFFSET_OF (EFI_IFR_DEFAULT, Value);
+                                                        DObj = new CIfrDefault ((UINT8)Size);
+                                                        DObj->SetLineNo(D->getLine());
+                                                        DObj->SetType (_GET_CURRQEST_DATATYPE()); 
+                                                        DObj->SetValue(Val);
                                                     >>
+      |                                             << IsExp = TRUE; DObj2 = new CIfrDefault2; DObj2->SetLineNo(D->getLine()); DObj2->SetScope (1); >>
+        vfrStatementValue ","                       << CIfrEnd EndObj1; EndObj1.SetLineNo(D->getLine()); >>
     )
     {
-      DefaultStore "=" SN:StringIdentifier ","      << _PCATCH(mCVfrDefaultStore.GetDefaultId (SN->getText(), &DefaultId), SN); DObj.SetDefaultId (DefaultId); >>
+      DefaultStore "=" SN:StringIdentifier ","      << 
+                                                        _PCATCH(mCVfrDefaultStore.GetDefaultId (SN->getText(), &DefaultId), SN); 
+                                                        if (DObj != NULL) {
+                                                          DObj->SetDefaultId (DefaultId); 
+                                                        } 
+
+                                                        if (DObj2 != NULL) {
+                                                          DObj2->SetDefaultId (DefaultId); 
+                                                        }
+                                                    >>
     }
                                                     <<
+                                                      CheckDuplicateDefaultValue (DefaultId, D);
+                                                      if (_GET_CURRQEST_VARTINFO().mVarStoreId != EFI_VARSTORE_ID_INVALID) {
                                                        _PCATCH(mCVfrDataStorage.GetVarStoreName (_GET_CURRQEST_VARTINFO().mVarStoreId, &VarStoreName), D->getLine());
-                                                       _PCATCH(mCVfrDataStorage.GetVarStoreType (VarStoreName, VarStoreType), D->getLine());
+                                                       VarGuid = mCVfrDataStorage.GetVarStoreGuid(_GET_CURRQEST_VARTINFO().mVarStoreId);
+                                                       VarStoreType = mCVfrDataStorage.GetVarStoreType (_GET_CURRQEST_VARTINFO().mVarStoreId);
                                                        if ((IsExp == FALSE) && (VarStoreType == EFI_VFR_VARSTORE_BUFFER)) {
                                                          _PCATCH(mCVfrDefaultStore.BufferVarStoreAltConfigAdd (
                                                                    DefaultId,
                                                                    _GET_CURRQEST_VARTINFO(),
                                                                    VarStoreName,
+                                                                   VarGuid,
                                                                    _GET_CURRQEST_DATATYPE (),
-                                                                   Val),
-                                                                   D->getLine()
-                                                                   );
+                                                                     Val),
+                                                                     D->getLine()
+                                                                     );
+                                                         }
                                                        }
+                                                       if (DObj  != NULL) {delete DObj;} 
+                                                       if (DObj2 != NULL) {delete DObj2;} 
                                                     >>
   )
   ;
@@ -1755,7 +1809,11 @@ vfrStatementGoto :
                                                           default: break;
                                                           }
                                                        >>
-  vfrQuestionHeader[*QHObj, QUESTION_REF]
+  vfrQuestionHeader[*QHObj, QUESTION_REF]              <<
+                                                          if (_GET_CURRQEST_DATATYPE() == EFI_IFR_TYPE_OTHER) {
+                                                            _GET_CURRQEST_VARTINFO().mVarType = EFI_IFR_TYPE_REF;
+                                                          }
+                                                       >>
   { "," F:FLAGS  "=" vfrGotoFlags[QHObj, F->getLine()] }
   {
     "," Key "=" KN:Number                              << AssignQuestionKey (*QHObj, KN); >>
@@ -1824,49 +1882,62 @@ vfrStatementCheckBox :
      EFI_IFR_TYPE_VALUE Val = gZeroEfiIfrTypeValue;
      CHAR8              *VarStoreName = NULL;
      UINT32             DataTypeSize;
+     EFI_GUID           *VarStoreGuid = NULL;
   >>
   L:CheckBox                                           << CBObj.SetLineNo(L->getLine()); >>
   vfrQuestionHeader[CBObj] ","                         << //check data type
-                                                          _PCATCH (gCVfrVarDataTypeDB.GetDataTypeSize (_GET_CURRQEST_DATATYPE(), &DataTypeSize), L->getLine(), "CheckBox varid is not the valid data type");
-                                                          if (DataTypeSize != 0 && DataTypeSize != _GET_CURRQEST_VARSIZE()) {
-                                                            _PCATCH (VFR_RETURN_INVALID_PARAMETER, L->getLine(), "CheckBox varid doesn't support array");
-                                                          } else if ((mCVfrDataStorage.GetVarStoreType (_GET_CURRQEST_VARTINFO().mVarStoreId) == EFI_VFR_VARSTORE_BUFFER) &&
-                                                                    (_GET_CURRQEST_VARSIZE() != sizeof (BOOLEAN))) {
-                                                            _PCATCH (VFR_RETURN_INVALID_PARAMETER, L->getLine(), "CheckBox varid only support BOOLEAN data type");
+                                                          if (_GET_CURRQEST_DATATYPE() == EFI_IFR_TYPE_OTHER) {
+                                                            _GET_CURRQEST_VARTINFO().mVarType = EFI_IFR_TYPE_BOOLEAN;
+                                                          }
+                                                          if (_GET_CURRQEST_VARTINFO().mVarStoreId != EFI_VARSTORE_ID_INVALID) {
+                                                            _PCATCH (gCVfrVarDataTypeDB.GetDataTypeSize (_GET_CURRQEST_DATATYPE(), &DataTypeSize), L->getLine(), "CheckBox varid is not the valid data type");
+                                                            if (DataTypeSize != 0 && DataTypeSize != _GET_CURRQEST_VARSIZE()) {
+                                                              _PCATCH (VFR_RETURN_INVALID_PARAMETER, L->getLine(), "CheckBox varid doesn't support array");
+                                                            } else if ((mCVfrDataStorage.GetVarStoreType (_GET_CURRQEST_VARTINFO().mVarStoreId) == EFI_VFR_VARSTORE_BUFFER) &&
+                                                                      (_GET_CURRQEST_VARSIZE() != sizeof (BOOLEAN))) {
+                                                              _PCATCH (VFR_RETURN_INVALID_PARAMETER, L->getLine(), "CheckBox varid only support BOOLEAN data type");
+                                                            }
                                                           }
                                                        >>
   {
     F:FLAGS "=" vfrCheckBoxFlags[CBObj, F->getLine()] ","
                                                        <<
-                                                          _PCATCH(mCVfrDataStorage.GetVarStoreName (_GET_CURRQEST_VARTINFO().mVarStoreId, &VarStoreName), VFR_RETURN_SUCCESS, L, "Failed to retrieve varstore name");
-                                                          Val.b = TRUE;
-                                                          if (CBObj.GetFlags () & 0x01) {
-                                                            _PCATCH(
-                                                              mCVfrDefaultStore.BufferVarStoreAltConfigAdd (
-                                                                                  EFI_HII_DEFAULT_CLASS_STANDARD,
-                                                                                  _GET_CURRQEST_VARTINFO(),
-                                                                                  VarStoreName,
-                                                                                  _GET_CURRQEST_DATATYPE (),
-                                                                                  Val
-                                                                                  ),
-                                                              VFR_RETURN_SUCCESS,
-                                                              L,
-                                                              "No standard default storage found"
-                                                              );
-                                                          }
-                                                          if (CBObj.GetFlags () & 0x02) {
-                                                            _PCATCH(
-                                                              mCVfrDefaultStore.BufferVarStoreAltConfigAdd (
-                                                                                  EFI_HII_DEFAULT_CLASS_MANUFACTURING,
-                                                                                  _GET_CURRQEST_VARTINFO(),
-                                                                                  VarStoreName,
-                                                                                  _GET_CURRQEST_DATATYPE (),
-                                                                                  Val
-                                                                                  ),
-                                                              VFR_RETURN_SUCCESS,
-                                                              L,
-                                                              "No manufacturing default storage found"
-                                                              );
+                                                         if (_GET_CURRQEST_VARTINFO().mVarStoreId != EFI_VARSTORE_ID_INVALID) {
+                                                            _PCATCH(mCVfrDataStorage.GetVarStoreName (_GET_CURRQEST_VARTINFO().mVarStoreId, &VarStoreName), VFR_RETURN_SUCCESS, L, "Failed to retrieve varstore name");
+                                                            VarStoreGuid = mCVfrDataStorage.GetVarStoreGuid(_GET_CURRQEST_VARTINFO().mVarStoreId);
+                                                            Val.b = TRUE;
+                                                            if (CBObj.GetFlags () & 0x01) {
+                                                              CheckDuplicateDefaultValue (EFI_HII_DEFAULT_CLASS_STANDARD, F);
+                                                              _PCATCH(
+                                                                mCVfrDefaultStore.BufferVarStoreAltConfigAdd (
+                                                                                    EFI_HII_DEFAULT_CLASS_STANDARD,
+                                                                                    _GET_CURRQEST_VARTINFO(),
+                                                                                    VarStoreName,
+                                                                                    VarStoreGuid,
+                                                                                    _GET_CURRQEST_DATATYPE (),
+                                                                                    Val
+                                                                                    ),
+                                                                VFR_RETURN_SUCCESS,
+                                                                L,
+                                                                "No standard default storage found"
+                                                                );
+                                                            }
+                                                            if (CBObj.GetFlags () & 0x02) {
+                                                              CheckDuplicateDefaultValue (EFI_HII_DEFAULT_CLASS_MANUFACTURING, F);
+                                                              _PCATCH(
+                                                                mCVfrDefaultStore.BufferVarStoreAltConfigAdd (
+                                                                                    EFI_HII_DEFAULT_CLASS_MANUFACTURING,
+                                                                                    _GET_CURRQEST_VARTINFO(),
+                                                                                    VarStoreName,
+                                                                                    VarStoreGuid,
+                                                                                    _GET_CURRQEST_DATATYPE (),
+                                                                                    Val
+                                                                                    ),
+                                                                VFR_RETURN_SUCCESS,
+                                                                L,
+                                                                "No manufacturing default storage found"
+                                                                );
+                                                            }
                                                           }
                                                         >>
   }
@@ -1962,11 +2033,16 @@ vfrStatementDate :
      CHAR8              *VarIdStr[3] = {NULL, };
      CIfrDate           DObj;
      EFI_IFR_TYPE_VALUE Val = gZeroEfiIfrTypeValue;
+     UINT8              Size = OFFSET_OF (EFI_IFR_DEFAULT, Value) + sizeof (EFI_HII_DATE);
   >>
   L:Date                                               << DObj.SetLineNo(L->getLine()); >>
   (
     (
-      vfrQuestionHeader[DObj, QUESTION_DATE] ","
+      vfrQuestionHeader[DObj, QUESTION_DATE] ","       <<
+                                                          if (_GET_CURRQEST_DATATYPE() == EFI_IFR_TYPE_OTHER) {
+                                                            _GET_CURRQEST_VARTINFO().mVarType = EFI_IFR_TYPE_DATE;
+                                                          }
+                                                       >>
     { F:FLAGS "=" vfrDateFlags[DObj, F->getLine()] "," }
       vfrStatementQuestionOptionList
     )
@@ -1998,7 +2074,7 @@ vfrStatementDate :
                                                           DObj.SetHelp (_STOSID(YH->getText()));
                                                           if (VarIdStr[0] != NULL) { delete VarIdStr[0]; } if (VarIdStr[1] != NULL) { delete VarIdStr[1]; } if (VarIdStr[2] != NULL) { delete VarIdStr[2]; }
                                                        >>
-                                                       << {CIfrDefault DefaultObj(EFI_HII_DEFAULT_CLASS_STANDARD, EFI_IFR_TYPE_DATE, Val); DefaultObj.SetLineNo(L->getLine());} >>
+                                                       << {CIfrDefault DefaultObj(Size, EFI_HII_DEFAULT_CLASS_STANDARD, EFI_IFR_TYPE_DATE, Val); DefaultObj.SetLineNo(L->getLine());} >>
     )
     ( vfrStatementInconsistentIf )*
   )
@@ -2126,38 +2202,45 @@ vfrSetMinMaxStep[CIfrMinMaxStepData & MMSDObj] :
 vfrStatementNumeric :
   <<
      CIfrNumeric NObj;
-     UINT32 DataTypeSize;
-     BOOLEAN IsSupported;
+     UINT32      DataTypeSize;
+     BOOLEAN     IsSupported = TRUE;
+     UINT8       ShrinkSize  = 0;
   >>
   L:Numeric                                            << NObj.SetLineNo(L->getLine()); >>
   vfrQuestionHeader[NObj] ","                          << // check data type
-                                                          _PCATCH (gCVfrVarDataTypeDB.GetDataTypeSize (_GET_CURRQEST_DATATYPE(), &DataTypeSize), L->getLine(), "Numeric varid is not the valid data type");
-                                                          if (DataTypeSize != 0 && DataTypeSize != _GET_CURRQEST_VARSIZE()) {
-                                                            _PCATCH (VFR_RETURN_INVALID_PARAMETER, L->getLine(), "Numeric varid doesn't support array");
+                                                          if (_GET_CURRQEST_VARTINFO().mVarStoreId != EFI_VARSTORE_ID_INVALID) {
+                                                            _PCATCH (gCVfrVarDataTypeDB.GetDataTypeSize (_GET_CURRQEST_DATATYPE(), &DataTypeSize), L->getLine(), "Numeric varid is not the valid data type");
+                                                            if (DataTypeSize != 0 && DataTypeSize != _GET_CURRQEST_VARSIZE()) {
+                                                              _PCATCH (VFR_RETURN_INVALID_PARAMETER, L->getLine(), "Numeric varid doesn't support array");
+                                                            }
+                                                            _PCATCH(NObj.SetFlags (NObj.FLAGS(), _GET_CURRQEST_DATATYPE()), L->getLine());
                                                           }
-                                                          _PCATCH(NObj.SetFlags (NObj.FLAGS(), _GET_CURRQEST_DATATYPE()), L->getLine());
                                                        >>
   { F:FLAGS "=" vfrNumericFlags[NObj, F->getLine()] "," }
   {
     Key   "=" KN:Number ","                            << AssignQuestionKey (NObj, KN); >>
   }
-  vfrSetMinMaxStep[NObj]
-  vfrStatementQuestionOptionList
-  E:EndNumeric                                         << 
-                                                          IsSupported = FALSE;
+  vfrSetMinMaxStep[NObj]                               <<
                                                           switch (_GET_CURRQEST_DATATYPE()) {
-                                                            case EFI_IFR_TYPE_NUM_SIZE_8:
-                                                            case EFI_IFR_TYPE_NUM_SIZE_16:
-                                                            case EFI_IFR_TYPE_NUM_SIZE_32:
-                                                            case EFI_IFR_TYPE_NUM_SIZE_64:
-                                                              IsSupported = TRUE;
-                                                              break;
-                                                            default:
+                                                            //
+                                                            // Base on the type to know the actual used size,shrink the buffer 
+                                                            // size allocate before.
+                                                            //
+                                                            case EFI_IFR_TYPE_NUM_SIZE_8: ShrinkSize = 21;break;
+                                                            case EFI_IFR_TYPE_NUM_SIZE_16:ShrinkSize = 18;break;
+                                                            case EFI_IFR_TYPE_NUM_SIZE_32:ShrinkSize = 12;break;
+                                                            case EFI_IFR_TYPE_NUM_SIZE_64:break;
+                                                            default: 
+                                                              IsSupported = FALSE;
                                                               break;
                                                           }
+                                                          NObj.ShrinkBinSize (ShrinkSize);
                                                           if (!IsSupported) {
                                                             _PCATCH (VFR_RETURN_INVALID_PARAMETER, L->getLine(), "Numeric question only support UINT8, UINT16, UINT32 and UINT64 data type.");
                                                           }
+                                                       >>
+  vfrStatementQuestionOptionList
+  E:EndNumeric                                         << 
                                                           CRT_END_OP (E); 
                                                        >>
   ";"
@@ -2168,32 +2251,37 @@ vfrNumericFlags [CIfrNumeric & NObj, UINT32 LineNum] :
      UINT8 LFlags = _GET_CURRQEST_DATATYPE() & EFI_IFR_NUMERIC_SIZE;
      UINT8 HFlags = 0;
      EFI_VFR_VARSTORE_TYPE VarStoreType = EFI_VFR_VARSTORE_INVALID;
+     BOOLEAN IsSetType = FALSE;
   >>
-  numericFlagsField[HFlags, LFlags] ( "\|" numericFlagsField[HFlags, LFlags] )*
+  numericFlagsField[HFlags, LFlags, IsSetType] ( "\|" numericFlagsField[HFlags, LFlags, IsSetType] )*
                                                        <<
                                                           //check data type flag
-                                                          VarStoreType = mCVfrDataStorage.GetVarStoreType (_GET_CURRQEST_VARTINFO().mVarStoreId);
-                                                          if (VarStoreType == EFI_VFR_VARSTORE_BUFFER || VarStoreType == EFI_VFR_VARSTORE_EFI) {
-                                                            if (_GET_CURRQEST_DATATYPE() != (LFlags & EFI_IFR_NUMERIC_SIZE)) {
-                                                              _PCATCH(VFR_RETURN_INVALID_PARAMETER, LineNum, "Numeric Flag is not same to Numeric VarData type");
+                                                          if (_GET_CURRQEST_VARTINFO().mVarStoreId != EFI_VARSTORE_ID_INVALID) {
+                                                            VarStoreType = mCVfrDataStorage.GetVarStoreType (_GET_CURRQEST_VARTINFO().mVarStoreId);
+                                                            if (VarStoreType == EFI_VFR_VARSTORE_BUFFER || VarStoreType == EFI_VFR_VARSTORE_EFI) {
+                                                              if (_GET_CURRQEST_DATATYPE() != (LFlags & EFI_IFR_NUMERIC_SIZE)) {
+                                                                _PCATCH(VFR_RETURN_INVALID_PARAMETER, LineNum, "Numeric Flag is not same to Numeric VarData type");
+                                                              }
+                                                            } else {
+                                                              // update data type for name/value store
+                                                              UINT32 DataTypeSize;
+                                                              _GET_CURRQEST_VARTINFO().mVarType = LFlags & EFI_IFR_NUMERIC_SIZE;
+                                                              gCVfrVarDataTypeDB.GetDataTypeSize (_GET_CURRQEST_DATATYPE(), &DataTypeSize);
+                                                              _GET_CURRQEST_VARTINFO().mVarTotalSize = DataTypeSize;
                                                             }
-                                                          } else {
-                                                            // update data type for name/value store
-                                                            UINT32 DataTypeSize;
+                                                          } else if (IsSetType){
                                                             _GET_CURRQEST_VARTINFO().mVarType = LFlags & EFI_IFR_NUMERIC_SIZE;
-                                                            gCVfrVarDataTypeDB.GetDataTypeSize (_GET_CURRQEST_DATATYPE(), &DataTypeSize);
-                                                            _GET_CURRQEST_VARTINFO().mVarTotalSize = DataTypeSize;
                                                           }
                                                           _PCATCH(NObj.SetFlags (HFlags, LFlags), LineNum);
                                                        >>
   ;
 
-numericFlagsField [UINT8 & HFlags, UINT8 & LFlags] :
+numericFlagsField [UINT8 & HFlags, UINT8 & LFlags, BOOLEAN & IsSetType] :
     N:Number                                           << _PCATCH(_STOU8(N->getText()) == 0 ? VFR_RETURN_SUCCESS : VFR_RETURN_UNSUPPORTED, N->getLine()); >>
-  | "NUMERIC_SIZE_1"                                   << $LFlags = ($LFlags & ~EFI_IFR_NUMERIC_SIZE) | EFI_IFR_NUMERIC_SIZE_1; >>
-  | "NUMERIC_SIZE_2"                                   << $LFlags = ($LFlags & ~EFI_IFR_NUMERIC_SIZE) | EFI_IFR_NUMERIC_SIZE_2; >>
-  | "NUMERIC_SIZE_4"                                   << $LFlags = ($LFlags & ~EFI_IFR_NUMERIC_SIZE) | EFI_IFR_NUMERIC_SIZE_4; >>
-  | "NUMERIC_SIZE_8"                                   << $LFlags = ($LFlags & ~EFI_IFR_NUMERIC_SIZE) | EFI_IFR_NUMERIC_SIZE_8; >>
+  | "NUMERIC_SIZE_1"                                   << $LFlags = ($LFlags & ~EFI_IFR_NUMERIC_SIZE) | EFI_IFR_NUMERIC_SIZE_1; IsSetType = TRUE;>>
+  | "NUMERIC_SIZE_2"                                   << $LFlags = ($LFlags & ~EFI_IFR_NUMERIC_SIZE) | EFI_IFR_NUMERIC_SIZE_2; IsSetType = TRUE;>>
+  | "NUMERIC_SIZE_4"                                   << $LFlags = ($LFlags & ~EFI_IFR_NUMERIC_SIZE) | EFI_IFR_NUMERIC_SIZE_4; IsSetType = TRUE;>>
+  | "NUMERIC_SIZE_8"                                   << $LFlags = ($LFlags & ~EFI_IFR_NUMERIC_SIZE) | EFI_IFR_NUMERIC_SIZE_8; IsSetType = TRUE;>>
   | "DISPLAY_INT_DEC"                                  << $LFlags = ($LFlags & ~EFI_IFR_DISPLAY) | EFI_IFR_DISPLAY_INT_DEC; >>
   | "DISPLAY_UINT_DEC"                                 << $LFlags = ($LFlags & ~EFI_IFR_DISPLAY) | EFI_IFR_DISPLAY_UINT_DEC; >>
   | "DISPLAY_UINT_HEX"                                 << $LFlags = ($LFlags & ~EFI_IFR_DISPLAY) | EFI_IFR_DISPLAY_UINT_HEX; >>
@@ -2204,36 +2292,44 @@ vfrStatementOneOf :
   <<
      CIfrOneOf OObj;
      UINT32    DataTypeSize;
-     BOOLEAN   IsSupported;
+     BOOLEAN   IsSupported = TRUE;
+     UINT8     ShrinkSize  = 0;
   >>
   L:OneOf                                              << OObj.SetLineNo(L->getLine()); >>
   vfrQuestionHeader[OObj] ","                          << //check data type
-                                                          _PCATCH (gCVfrVarDataTypeDB.GetDataTypeSize (_GET_CURRQEST_DATATYPE(), &DataTypeSize), L->getLine(), "OneOf varid is not the valid data type");
-                                                          if (DataTypeSize != 0 && DataTypeSize != _GET_CURRQEST_VARSIZE()) {
-                                                            _PCATCH (VFR_RETURN_INVALID_PARAMETER, L->getLine(), "OneOf varid doesn't support array");
+                                                          if (_GET_CURRQEST_VARTINFO().mVarStoreId != EFI_VARSTORE_ID_INVALID) {
+                                                            _PCATCH (gCVfrVarDataTypeDB.GetDataTypeSize (_GET_CURRQEST_DATATYPE(), &DataTypeSize), L->getLine(), "OneOf varid is not the valid data type");
+                                                            if (DataTypeSize != 0 && DataTypeSize != _GET_CURRQEST_VARSIZE()) {
+                                                              _PCATCH (VFR_RETURN_INVALID_PARAMETER, L->getLine(), "OneOf varid doesn't support array");
+                                                            }
+                                                            _PCATCH(OObj.SetFlags (OObj.FLAGS(), _GET_CURRQEST_DATATYPE()), L->getLine());
                                                           }
-                                                          _PCATCH(OObj.SetFlags (OObj.FLAGS(), _GET_CURRQEST_DATATYPE()), L->getLine());
                                                        >>
   { F:FLAGS "=" vfrOneofFlagsField[OObj, F->getLine()] "," }
   {
     vfrSetMinMaxStep[OObj]
   }
-  vfrStatementQuestionOptionList
-  E:EndOneOf                                           << 
-                                                          IsSupported = FALSE;
+                                                       <<
                                                           switch (_GET_CURRQEST_DATATYPE()) {
-                                                            case EFI_IFR_TYPE_NUM_SIZE_8:
-                                                            case EFI_IFR_TYPE_NUM_SIZE_16:
-                                                            case EFI_IFR_TYPE_NUM_SIZE_32:
-                                                            case EFI_IFR_TYPE_NUM_SIZE_64:
-                                                              IsSupported = TRUE;
-                                                              break;
+                                                            //
+                                                            // Base on the type to know the actual used size,shrink the buffer 
+                                                            // size allocate before.
+                                                            //
+                                                            case EFI_IFR_TYPE_NUM_SIZE_8: ShrinkSize = 21;break;
+                                                            case EFI_IFR_TYPE_NUM_SIZE_16:ShrinkSize = 18;break;
+                                                            case EFI_IFR_TYPE_NUM_SIZE_32:ShrinkSize = 12;break;
+                                                            case EFI_IFR_TYPE_NUM_SIZE_64:break;
                                                             default:
+                                                              IsSupported = FALSE;
                                                               break;
                                                           }
+                                                          OObj.ShrinkBinSize (ShrinkSize);
                                                           if (!IsSupported) {
                                                             _PCATCH (VFR_RETURN_INVALID_PARAMETER, L->getLine(), "OneOf question only support UINT8, UINT16, UINT32 and UINT64 data type.");
                                                           }
+                                                       >>
+  vfrStatementQuestionOptionList
+  E:EndOneOf                                           <<
                                                           CRT_END_OP (E); 
                                                        >>
   ";"
@@ -2244,21 +2340,26 @@ vfrOneofFlagsField [CIfrOneOf & OObj, UINT32 LineNum] :
      UINT8 LFlags = _GET_CURRQEST_DATATYPE() & EFI_IFR_NUMERIC_SIZE;
      UINT8 HFlags = 0;
      EFI_VFR_VARSTORE_TYPE VarStoreType = EFI_VFR_VARSTORE_INVALID;
+     BOOLEAN IsSetType = FALSE;
   >>
-  numericFlagsField[HFlags, LFlags] ( "\|" numericFlagsField[HFlags, LFlags] )*
+  numericFlagsField[HFlags, LFlags, IsSetType] ( "\|" numericFlagsField[HFlags, LFlags, IsSetType] )*
                                                        <<
                                                           //check data type flag
-                                                          VarStoreType = mCVfrDataStorage.GetVarStoreType (_GET_CURRQEST_VARTINFO().mVarStoreId);
-                                                          if (VarStoreType == EFI_VFR_VARSTORE_BUFFER || VarStoreType == EFI_VFR_VARSTORE_EFI) {
-                                                            if (_GET_CURRQEST_DATATYPE() != (LFlags & EFI_IFR_NUMERIC_SIZE)) {
-                                                              _PCATCH(VFR_RETURN_INVALID_PARAMETER, LineNum, "Numeric Flag is not same to Numeric VarData type");
+                                                          if (_GET_CURRQEST_VARTINFO().mVarStoreId != EFI_VARSTORE_ID_INVALID) {
+                                                            VarStoreType = mCVfrDataStorage.GetVarStoreType (_GET_CURRQEST_VARTINFO().mVarStoreId);
+                                                            if (VarStoreType == EFI_VFR_VARSTORE_BUFFER || VarStoreType == EFI_VFR_VARSTORE_EFI) {
+                                                              if (_GET_CURRQEST_DATATYPE() != (LFlags & EFI_IFR_NUMERIC_SIZE)) {
+                                                                _PCATCH(VFR_RETURN_INVALID_PARAMETER, LineNum, "Numeric Flag is not same to Numeric VarData type");
+                                                              }
+                                                            } else {
+                                                              // update data type for Name/Value store
+                                                              UINT32 DataTypeSize;
+                                                              _GET_CURRQEST_VARTINFO().mVarType = LFlags & EFI_IFR_NUMERIC_SIZE;
+                                                              gCVfrVarDataTypeDB.GetDataTypeSize (_GET_CURRQEST_DATATYPE(), &DataTypeSize);
+                                                              _GET_CURRQEST_VARTINFO().mVarTotalSize = DataTypeSize;
                                                             }
-                                                          } else {
-                                                            // update data type for Name/Value store
-                                                            UINT32 DataTypeSize;
+                                                          } else if (IsSetType){
                                                             _GET_CURRQEST_VARTINFO().mVarType = LFlags & EFI_IFR_NUMERIC_SIZE;
-                                                            gCVfrVarDataTypeDB.GetDataTypeSize (_GET_CURRQEST_DATATYPE(), &DataTypeSize);
-                                                            _GET_CURRQEST_VARTINFO().mVarTotalSize = DataTypeSize;
                                                           }
                                                           _PCATCH(OObj.SetFlags (HFlags, LFlags), LineNum);
                                                        >>
@@ -2423,11 +2524,16 @@ vfrStatementTime :
      CHAR8              *VarIdStr[3] = {NULL, };
      CIfrTime           TObj;
      EFI_IFR_TYPE_VALUE Val = gZeroEfiIfrTypeValue;
+     UINT8              Size = OFFSET_OF (EFI_IFR_DEFAULT, Value) + sizeof (EFI_HII_TIME);
   >>
   L:Time                                               << TObj.SetLineNo(L->getLine()); >>
   (
     (
-      vfrQuestionHeader[TObj, QUESTION_TIME] ","
+      vfrQuestionHeader[TObj, QUESTION_TIME] ","       <<
+                                                          if (_GET_CURRQEST_DATATYPE() == EFI_IFR_TYPE_OTHER) {
+                                                            _GET_CURRQEST_VARTINFO().mVarType = EFI_IFR_TYPE_TIME;
+                                                          }
+                                                       >>
     { F:FLAGS "=" vfrTimeFlags[TObj, F->getLine()] "," }
       vfrStatementQuestionOptionList
     )
@@ -2459,7 +2565,7 @@ vfrStatementTime :
                                                           TObj.SetHelp (_STOSID(HH->getText()));
                                                           if (VarIdStr[0] != NULL) { delete VarIdStr[0]; } if (VarIdStr[1] != NULL) { delete VarIdStr[1]; } if (VarIdStr[2] != NULL) { delete VarIdStr[2]; }
                                                        >>
-                                                       << {CIfrDefault DefaultObj(EFI_HII_DEFAULT_CLASS_STANDARD, EFI_IFR_TYPE_TIME, Val); DefaultObj.SetLineNo(L->getLine());} >>
+                                                       << {CIfrDefault DefaultObj(Size, EFI_HII_DEFAULT_CLASS_STANDARD, EFI_IFR_TYPE_TIME, Val); DefaultObj.SetLineNo(L->getLine());} >>
     )
     ( vfrStatementInconsistentIf )*
   )
@@ -2774,11 +2880,32 @@ vfrStatementOptions :
 
 vfrStatementOneOfOption :
   <<
-     EFI_IFR_TYPE_VALUE Val = gZeroEfiIfrTypeValue;
-     CIfrOneOfOption    OOOObj;
+     EFI_IFR_TYPE_VALUE Val           = gZeroEfiIfrTypeValue;
      CHAR8              *VarStoreName = NULL;
+     UINT32             Size          = 0;
+     BOOLEAN            TypeError     = FALSE;
+     EFI_VFR_RETURN_CODE ReturnCode   = VFR_RETURN_SUCCESS;
+     EFI_GUID           *VarStoreGuid = NULL;
+     
+     if (_GET_CURRQEST_DATATYPE() == EFI_IFR_TYPE_OTHER) {
+       TypeError = TRUE;
+       Size = sizeof (EFI_IFR_TYPE_VALUE);
+     } else {
+       ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSize (_GET_CURRQEST_DATATYPE(), &Size);
+     }
+
+     Size += OFFSET_OF (EFI_IFR_ONE_OF_OPTION, Value);
+     CIfrOneOfOption    OOOObj ((UINT8)Size);
   >>
-  L:Option                                             << OOOObj.SetLineNo(L->getLine()); >>
+  L:Option                                             <<      
+                                                          OOOObj.SetLineNo(L->getLine());
+                                                          if (TypeError) {
+                                                            _PCATCH (VFR_RETURN_FATAL_ERROR, L->getLine(), "Get data type error.");
+                                                          }
+                                                          if (ReturnCode != VFR_RETURN_SUCCESS) {
+                                                            _PCATCH (ReturnCode, L->getLine());
+                                                          }
+                                                       >>
   Text  "=" "STRING_TOKEN" "\(" S:Number "\)" ","      << OOOObj.SetOption (_STOSID(S->getText())); >>
   Value "=" vfrConstantValueField[_GET_CURRQEST_DATATYPE()] >[Val] ","    
                                                        << 
@@ -2807,24 +2934,31 @@ vfrStatementOneOfOption :
                                                        >>
   F:FLAGS "=" vfrOneOfOptionFlags[OOOObj, F->getLine()]
                                                        <<
-                                                          _PCATCH(mCVfrDataStorage.GetVarStoreName (_GET_CURRQEST_VARTINFO().mVarStoreId, &VarStoreName), L->getLine());
-                                                          if (OOOObj.GetFlags () & 0x10) {
-                                                            _PCATCH(mCVfrDefaultStore.BufferVarStoreAltConfigAdd (
-                                                                      EFI_HII_DEFAULT_CLASS_STANDARD,
-                                                                       _GET_CURRQEST_VARTINFO(),
-                                                                      VarStoreName,
-                                                                      _GET_CURRQEST_DATATYPE (),
-                                                                      Val
-                                                                      ), L->getLine());
-                                                          }
-                                                          if (OOOObj.GetFlags () & 0x20) {
-                                                            _PCATCH(mCVfrDefaultStore.BufferVarStoreAltConfigAdd (
-                                                                      EFI_HII_DEFAULT_CLASS_MANUFACTURING,
-                                                                       _GET_CURRQEST_VARTINFO(),
-                                                                      VarStoreName,
-                                                                      _GET_CURRQEST_DATATYPE (),
-                                                                      Val
-                                                                      ), L->getLine());
+                                                          if (_GET_CURRQEST_VARTINFO().mVarStoreId != EFI_VARSTORE_ID_INVALID) {
+                                                            _PCATCH(mCVfrDataStorage.GetVarStoreName (_GET_CURRQEST_VARTINFO().mVarStoreId, &VarStoreName), L->getLine());
+                                                            VarStoreGuid = mCVfrDataStorage.GetVarStoreGuid(_GET_CURRQEST_VARTINFO().mVarStoreId);
+                                                            if (OOOObj.GetFlags () & 0x10) {
+                                                              CheckDuplicateDefaultValue (EFI_HII_DEFAULT_CLASS_STANDARD, F);
+                                                              _PCATCH(mCVfrDefaultStore.BufferVarStoreAltConfigAdd (
+                                                                        EFI_HII_DEFAULT_CLASS_STANDARD,
+                                                                         _GET_CURRQEST_VARTINFO(),
+                                                                        VarStoreName,
+                                                                        VarStoreGuid,
+                                                                        _GET_CURRQEST_DATATYPE (),
+                                                                        Val
+                                                                        ), L->getLine());
+                                                            }
+                                                            if (OOOObj.GetFlags () & 0x20) {
+                                                              CheckDuplicateDefaultValue (EFI_HII_DEFAULT_CLASS_MANUFACTURING, F);
+                                                              _PCATCH(mCVfrDefaultStore.BufferVarStoreAltConfigAdd (
+                                                                        EFI_HII_DEFAULT_CLASS_MANUFACTURING,
+                                                                         _GET_CURRQEST_VARTINFO(),
+                                                                        VarStoreName,
+                                                                        VarStoreGuid,
+                                                                        _GET_CURRQEST_DATATYPE (),
+                                                                        Val
+                                                                        ), L->getLine());
+                                                            }
                                                           }
                                                        >>
   {
@@ -3237,8 +3371,8 @@ vareqvalExp [UINT32 & RootLevel, UINT32 & ExpOpCount] :
      UINT16          ConstVal;
      CHAR8           *VarIdStr;
      UINT32          LineNo;
-     EFI_VFR_VARSTORE_TYPE VarStoreType = EFI_VFR_VARSTORE_INVALID;
      EFI_VFR_RETURN_CODE   VfrReturnCode = VFR_RETURN_SUCCESS;
+     EFI_VARSTORE_ID       VarStoreId   = EFI_VARSTORE_ID_INVALID;
   >>
   L:VarEqVal                                          <<
                                                         if (!mCompatibleMode) {
@@ -3249,7 +3383,7 @@ vareqvalExp [UINT32 & RootLevel, UINT32 & ExpOpCount] :
   OpenParen
   VN:Number                                           <<
                                                           VarIdStr = NULL; _STRCAT(&VarIdStr, VK->getText()); _STRCAT(&VarIdStr, VN->getText());
-                                                          VfrReturnCode = mCVfrDataStorage.GetVarStoreType (VarIdStr, VarStoreType);
+                                                          VfrReturnCode = mCVfrDataStorage.GetVarStoreId (VarIdStr, &VarStoreId);
                                                           if (VfrReturnCode == VFR_RETURN_UNDEFINED) {
                                                             _PCATCH (mCVfrDataStorage.DeclareEfiVarStore (
                                                                                         VarIdStr,
@@ -3887,6 +4021,13 @@ private:
 
   EFI_VARSTORE_INFO   mCurrQestVarInfo;
   EFI_GUID            *mOverrideClassGuid;
+  CHAR8*              mLastFormEndAddr;
+
+//
+// Whether the question already has default value.
+//
+  UINT16              mUsedDefaultArray[EFI_IFR_MAX_DEFAULT_TYPE];
+  UINT16              mUsedDefaultCount;
 
 //
 // For framework vfr compatibility
@@ -3902,6 +4043,7 @@ private:
   UINT8               _GET_CURRQEST_DATATYPE ();
   UINT32              _GET_CURRQEST_VARSIZE ();
   UINT32              _GET_CURRQEST_ARRAY_SIZE();
+  VOID                CheckDuplicateDefaultValue (IN EFI_DEFAULT_ID, IN ANTLRTokenPtr);
 
 public:
   VOID                _PCATCH (IN INTN, IN INTN, IN ANTLRTokenPtr, IN CONST CHAR8 *);
@@ -4485,7 +4627,7 @@ EfiVfrParser::_DeclareDefaultLinearVarStore (
                        TypeNameList[Index],
                        EFI_VARSTORE_ID_INVALID
                        );
-    mCVfrDataStorage.GetVarStoreId(TypeNameList[Index], &VarStoreId);
+    mCVfrDataStorage.GetVarStoreId(TypeNameList[Index], &VarStoreId, &mFormsetGuid);
     VSObj.SetVarStoreId (VarStoreId);
     gCVfrVarDataTypeDB.GetDataTypeSize(TypeNameList[Index], &Size);
     VSObj.SetSize ((UINT16) Size);
@@ -4510,7 +4652,7 @@ EfiVfrParser::_DeclareDefaultLinearVarStore (
                        (CHAR8 *) DateType,
                        EFI_VARSTORE_ID_INVALID
                        );
-    mCVfrDataStorage.GetVarStoreId((CHAR8 *) DateName, &VarStoreId);
+    mCVfrDataStorage.GetVarStoreId((CHAR8 *) DateName, &VarStoreId, &mFormsetGuid);
     VSObj.SetVarStoreId (VarStoreId);
     gCVfrVarDataTypeDB.GetDataTypeSize((CHAR8 *) DateType, &Size);
     VSObj.SetSize ((UINT16) Size);
@@ -4531,7 +4673,7 @@ EfiVfrParser::_DeclareDefaultLinearVarStore (
                        (CHAR8 *) TimeType,
                        EFI_VARSTORE_ID_INVALID
                        );
-    mCVfrDataStorage.GetVarStoreId((CHAR8 *) TimeName, &VarStoreId);
+    mCVfrDataStorage.GetVarStoreId((CHAR8 *) TimeName, &VarStoreId, &mFormsetGuid);
     VSObj.SetVarStoreId (VarStoreId);
     gCVfrVarDataTypeDB.GetDataTypeSize((CHAR8 *) TimeType, &Size);
     VSObj.SetSize ((UINT16) Size);
@@ -4761,5 +4903,26 @@ EfiVfrParser::SetCompatibleMode (IN BOOLEAN Mode)
 {
   mCompatibleMode = Mode;
   mCVfrQuestionDB.SetCompatibleMode (Mode);
+}
+
+VOID
+EfiVfrParser::CheckDuplicateDefaultValue (
+  IN EFI_DEFAULT_ID      DefaultId,
+  IN ANTLRTokenPtr       Tok
+  )
+{
+  UINT16    Index;
+
+  for(Index = 0; Index < mUsedDefaultCount; Index++) {
+    if (mUsedDefaultArray[Index] == DefaultId) {
+      gCVfrErrorHandle.HandleWarning (VFR_WARNING_DEFAULT_VALUE_REDEFINED, Tok->getLine(), Tok->getText());
+    }
+  }
+
+  if (mUsedDefaultCount >= EFI_IFR_MAX_DEFAULT_TYPE - 1) {
+    gCVfrErrorHandle.HandleError (VFR_RETURN_FATAL_ERROR, Tok->getLine(), Tok->getText());
+  }
+
+  mUsedDefaultArray[mUsedDefaultCount++] = DefaultId;
 }
 >>

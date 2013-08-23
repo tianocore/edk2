@@ -2,7 +2,7 @@
 # This file is used to define common string related functions used in parsing 
 # process
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -737,7 +737,7 @@ def IsHexDigit(Str):
                 return False
     return False
 
-## Check if the string is HexDgit and its interger value within limit of UINT32 
+## Check if the string is HexDgit and its integer value within limit of UINT32 
 #
 # Return true if all characters in the string are digits and there is at 
 # least one character 

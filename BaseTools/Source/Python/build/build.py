@@ -1,7 +1,7 @@
 ## @file
 # build a platform or a module
 #
-#  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -23,7 +23,7 @@ import glob
 import time
 import platform
 import traceback
-import encodings.ascii 
+import encodings.ascii
 
 from struct import *
 from threading import *
@@ -47,9 +47,9 @@ import Common.EdkLogger
 import Common.GlobalData as GlobalData
 
 # Version and Copyright
-VersionNumber = "0.5" + ' ' + gBUILD_VERSION
+VersionNumber = "0.51" + ' ' + gBUILD_VERSION
 __version__ = "%prog Version " + VersionNumber
-__copyright__ = "Copyright (c) 2007 - 2010, Intel Corporation  All rights reserved."
+__copyright__ = "Copyright (c) 2007 - 2013, Intel Corporation  All rights reserved."
 
 ## standard targets of build command
 gSupportedTarget = ['all', 'genc', 'genmake', 'modules', 'libraries', 'fds', 'clean', 'cleanall', 'cleanlib', 'run']
@@ -119,12 +119,12 @@ def CheckEnvVariable():
     EfiSourceDir = os.path.normcase(os.path.normpath(os.environ["EFI_SOURCE"]))
     EdkSourceDir = os.path.normcase(os.path.normpath(os.environ["EDK_SOURCE"]))
     EcpSourceDir = os.path.normcase(os.path.normpath(os.environ["ECP_SOURCE"]))
- 
+
     os.environ["EFI_SOURCE"] = EfiSourceDir
     os.environ["EDK_SOURCE"] = EdkSourceDir
     os.environ["ECP_SOURCE"] = EcpSourceDir
     os.environ["EDK_TOOLS_PATH"] = os.path.normcase(os.environ["EDK_TOOLS_PATH"])
-    
+
     if not os.path.exists(EcpSourceDir):
         EdkLogger.verbose("ECP_SOURCE = %s doesn't exist. Edk modules could not be built." % EcpSourceDir)
     elif ' ' in EcpSourceDir:
@@ -313,7 +313,7 @@ class BuildUnit:
         if not BuildCommand:
             EdkLogger.error("build", OPTION_MISSING,
                             "No build command found for this module. "
-                            "Please check your setting of %s_%s_%s_MAKE_PATH in Conf/tools_def.txt file." % 
+                            "Please check your setting of %s_%s_%s_MAKE_PATH in Conf/tools_def.txt file." %
                                 (Obj.BuildTarget, Obj.ToolChain, Obj.Arch),
                             ExtraData=str(Obj))
 
@@ -669,7 +669,7 @@ class PeImageInfo():
     #
     # Constructor will load all required image information.
     #
-    #   @param  BaseName          The full file path of image. 
+    #   @param  BaseName          The full file path of image.
     #   @param  Guid              The GUID for image.
     #   @param  Arch              Arch of this image.
     #   @param  OutputDir         The output directory for image.
@@ -838,7 +838,7 @@ class Build():
     #
     def InitBuild(self):
         # parse target.txt, tools_def.txt, and platform file
-        self.LoadConfiguration()        
+        self.LoadConfiguration()
 
         # Allow case-insensitive for those from command line or configuration file
         ErrorCode, ErrorInfo = self.PlatformFile.Validate(".dsc", False)
@@ -897,7 +897,7 @@ class Build():
         if BuildCommand == None or len(BuildCommand) == 0:
             EdkLogger.error("build", OPTION_MISSING,
                             "No build command found for this module. "
-                            "Please check your setting of %s_%s_%s_MAKE_PATH in Conf/tools_def.txt file." % 
+                            "Please check your setting of %s_%s_%s_MAKE_PATH in Conf/tools_def.txt file." %
                                 (AutoGenObject.BuildTarget, AutoGenObject.ToolChain, AutoGenObject.Arch),
                             ExtraData=str(AutoGenObject))
 
@@ -994,9 +994,9 @@ class Build():
                 elif SectionHeader[0] in ['.data', '.sdata']:
                     DataSectionAddress = SectionHeader[1]
             if AddrIsOffset:
-                MapBuffer.write('(GUID=%s, .textbaseaddress=-0x%010X, .databaseaddress=-0x%010X)\n' % (ModuleInfo.Guid, 0 - (BaseAddress + TextSectionAddress), 0 - (BaseAddress + DataSectionAddress))) 
+                MapBuffer.write('(GUID=%s, .textbaseaddress=-0x%010X, .databaseaddress=-0x%010X)\n' % (ModuleInfo.Guid, 0 - (BaseAddress + TextSectionAddress), 0 - (BaseAddress + DataSectionAddress)))
             else:
-                MapBuffer.write('(GUID=%s, .textbaseaddress=0x%010X, .databaseaddress=0x%010X)\n' % (ModuleInfo.Guid, BaseAddress + TextSectionAddress, BaseAddress + DataSectionAddress)) 
+                MapBuffer.write('(GUID=%s, .textbaseaddress=0x%010X, .databaseaddress=0x%010X)\n' % (ModuleInfo.Guid, BaseAddress + TextSectionAddress, BaseAddress + DataSectionAddress))
             #
             # Add debug image full path.
             #
@@ -1076,7 +1076,7 @@ class Build():
         for ModuleGuid in ModuleList:
             Module = ModuleList[ModuleGuid]
             GlobalData.gProcessingFile = "%s [%s, %s, %s]" % (Module.MetaFile, Module.Arch, Module.ToolChain, Module.BuildTarget)
-            
+
             OutputImageFile = ''
             for ResultFile in Module.CodaTargetList:
                 if str(ResultFile.Target).endswith('.efi'):
@@ -1127,15 +1127,15 @@ class Build():
                         if Pcd.Type == TAB_PCDS_PATCHABLE_IN_MODULE and Pcd.TokenCName in TAB_PCDS_PATCHABLE_LOAD_FIX_ADDRESS_LIST:
                             ModuleIsPatch = True
                             break
-                
+
                 if not ModuleIsPatch:
                     continue
                 #
                 # Module includes the patchable load fix address PCDs.
-                # It will be fixed up later. 
+                # It will be fixed up later.
                 #
                 PatchEfiImageList.append (OutputImageFile)
-        
+
         #
         # Get Top Memory address
         #
@@ -1155,14 +1155,14 @@ class Build():
         #
         # Patch FixAddress related PCDs into EFI image
         #
-        for EfiImage in PatchEfiImageList: 
+        for EfiImage in PatchEfiImageList:
             EfiImageMap = EfiImage.replace('.efi', '.map')
             if not os.path.exists(EfiImageMap):
                 continue
             #
             # Get PCD offset in EFI image by GenPatchPcdTable function
             #
-            PcdTable = parsePcdInfoFromMapFile(EfiImageMap, EfiImage) 
+            PcdTable = parsePcdInfoFromMapFile(EfiImageMap, EfiImage)
             #
             # Patch real PCD value by PatchPcdValue tool
             #
@@ -1178,16 +1178,16 @@ class Build():
                     ReturnValue, ErrorInfo = PatchBinaryFile (EfiImage, PcdInfo[1], TAB_PCDS_PATCHABLE_LOAD_FIX_ADDRESS_SMM_PAGE_SIZE_DATA_TYPE, str (SmmSize/0x1000))
                 if ReturnValue != 0:
                     EdkLogger.error("build", PARAMETER_INVALID, "Patch PCD value failed", ExtraData=ErrorInfo)
-        
+
         MapBuffer.write('PEI_CODE_PAGE_NUMBER      = 0x%x\n' % (PeiSize/0x1000))
         MapBuffer.write('BOOT_CODE_PAGE_NUMBER     = 0x%x\n' % (BtSize/0x1000))
         MapBuffer.write('RUNTIME_CODE_PAGE_NUMBER  = 0x%x\n' % (RtSize/0x1000))
         if len (SmmModuleList) > 0:
             MapBuffer.write('SMM_CODE_PAGE_NUMBER      = 0x%x\n' % (SmmSize/0x1000))
-        
-        PeiBaseAddr = TopMemoryAddress - RtSize - BtSize 
+
+        PeiBaseAddr = TopMemoryAddress - RtSize - BtSize
         BtBaseAddr  = TopMemoryAddress - RtSize
-        RtBaseAddr  = TopMemoryAddress - ReservedRuntimeMemorySize 
+        RtBaseAddr  = TopMemoryAddress - ReservedRuntimeMemorySize
 
         self._RebaseModule (MapBuffer, PeiBaseAddr, PeiModuleList, TopMemoryAddress == 0)
         self._RebaseModule (MapBuffer, BtBaseAddr, BtModuleList, TopMemoryAddress == 0)
@@ -1196,7 +1196,7 @@ class Build():
         MapBuffer.write('\n\n')
         sys.stdout.write ("\n")
         sys.stdout.flush()
-    
+
     ## Save platform Map file
     #
     def _SaveMapFile (self, MapBuffer, Wa):
@@ -1243,7 +1243,7 @@ class Build():
                 self.BuildReport.AddPlatformReport(Wa)
                 self.Progress.Stop("done!")
                 self._Build(self.Target, Wa)
-                
+
                 # Create MAP file when Load Fix Address is enabled.
                 if self.Target in ["", "all", "fds"]:
                     for Arch in Wa.ArchList:
@@ -1292,7 +1292,7 @@ class Build():
             GlobalData.gGlobalDefines['TARGET'] = BuildTarget
             for ToolChain in self.ToolChainList:
                 GlobalData.gGlobalDefines['TOOLCHAIN'] = ToolChain
-                GlobalData.gGlobalDefines['TOOL_CHAIN_TAG'] = ToolChain             
+                GlobalData.gGlobalDefines['TOOL_CHAIN_TAG'] = ToolChain
                 #
                 # module build needs platform build information, so get platform
                 # AutoGen first
@@ -1383,7 +1383,7 @@ class Build():
             GlobalData.gGlobalDefines['TARGET'] = BuildTarget
             for ToolChain in self.ToolChainList:
                 GlobalData.gGlobalDefines['TOOLCHAIN'] = ToolChain
-                GlobalData.gGlobalDefines['TOOL_CHAIN_TAG'] = ToolChain  
+                GlobalData.gGlobalDefines['TOOL_CHAIN_TAG'] = ToolChain
                 Wa = WorkspaceAutoGen(
                         self.WorkspaceDir,
                         self.PlatformFile,
@@ -1414,6 +1414,7 @@ class Build():
                     Pa = PlatformAutoGen(Wa, self.PlatformFile, BuildTarget, ToolChain, Arch)
                     if Pa == None:
                         continue
+                    pModules = []
                     for Module in Pa.Platform.Modules:
                         # Get ModuleAutoGen object to generate C code file and makefile
                         Ma = ModuleAutoGen(Wa, Module, BuildTarget, ToolChain, Arch, self.PlatformFile)
@@ -1433,6 +1434,9 @@ class Build():
                             if self.Target == "genmake":
                                 continue
                         self.Progress.Stop("done!")
+                        pModules.append(Ma)
+
+                    for Ma in pModules:
                         # Generate build task for the module
                         Bt = BuildTask.New(ModuleMakeUnit(Ma, self.Target))
                         # Break build if any build thread has error
@@ -1537,10 +1541,10 @@ class Build():
                 if not os.path.exists(FvDir):
                     continue
 
-                for Arch in self.ArchList:    
+                for Arch in self.ArchList:
                     # Build up the list of supported architectures for this build
                     prefix = '%s_%s_%s_' % (BuildTarget, ToolChain, Arch)
-    
+
                     # Look through the tool definitions for GUIDed tools
                     guidAttribs = []
                     for (attrib, value) in self.ToolDef.ToolsDefTxtDictionary.iteritems():
@@ -1555,7 +1559,7 @@ class Build():
                                 path = self.ToolDef.ToolsDefTxtDictionary[path]
                                 path = self.GetFullPathOfTool(path)
                                 guidAttribs.append((guid, toolName, path))
-    
+
                     # Write out GuidedSecTools.txt
                     toolsFile = os.path.join(FvDir, 'GuidedSectionTools.txt')
                     toolsFile = open(toolsFile, 'wt')
@@ -1632,7 +1636,7 @@ def ParseDefines(DefineList=[]):
                 EdkLogger.error('build', FORMAT_INVALID,
                                 "The macro name must be in the pattern [A-Z][A-Z0-9_]*",
                                 ExtraData=DefineTokenList[0])
-                
+
             if len(DefineTokenList) == 1:
                 DefineDict[DefineTokenList[0]] = "TRUE"
             else:
@@ -1656,8 +1660,8 @@ def SingleCheckCallback(option, opt_str, value, parser):
 #
 def MyOptionParser():
     Parser = OptionParser(description=__copyright__,version=__version__,prog="build.exe",usage="%prog [options] [all|fds|genc|genmake|clean|cleanall|cleanlib|modules|libraries|run]")
-    Parser.add_option("-a", "--arch", action="append", type="choice", choices=['IA32','X64','IPF','EBC','ARM'], dest="TargetArch",
-        help="ARCHS is one of list: IA32, X64, IPF, ARM or EBC, which overrides target.txt's TARGET_ARCH definition. To specify more archs, please repeat this option.")
+    Parser.add_option("-a", "--arch", action="append", type="choice", choices=['IA32','X64','IPF','EBC','ARM', 'AARCH64'], dest="TargetArch",
+        help="ARCHS is one of list: IA32, X64, IPF, ARM, AARCH64 or EBC, which overrides target.txt's TARGET_ARCH definition. To specify more archs, please repeat this option.")
     Parser.add_option("-p", "--platform", action="callback", type="string", dest="PlatformFile", callback=SingleCheckCallback,
         help="Build the platform specified by the DSC file name argument, overriding target.txt's ACTIVE_PLATFORM definition.")
     Parser.add_option("-m", "--module", action="callback", type="string", dest="ModuleFile", callback=SingleCheckCallback,

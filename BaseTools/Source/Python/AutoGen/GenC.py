@@ -2043,7 +2043,8 @@ def CreateHeaderCode(Info, AutoGenC, AutoGenH):
         if 'PcdLib' in Info.Module.LibraryClasses or Info.Module.Pcds:
             AutoGenH.Append("#include <Library/PcdLib.h>\n")
 
-        AutoGenH.Append('\nextern GUID  gEfiCallerIdGuid;\n\n')
+        AutoGenH.Append('\nextern GUID  gEfiCallerIdGuid;')
+        AutoGenH.Append('\nextern CHAR8 *gEfiCallerBaseName;\n\n')
 
         if Info.IsLibrary:
             return
@@ -2066,6 +2067,7 @@ def CreateHeaderCode(Info, AutoGenC, AutoGenH):
         # Publish the CallerId Guid
         #
         AutoGenC.Append('\nGLOBAL_REMOVE_IF_UNREFERENCED GUID gEfiCallerIdGuid = %s;\n' % GuidStringToGuidStructureString(Info.Guid))
+        AutoGenC.Append('\nGLOBAL_REMOVE_IF_UNREFERENCED CHAR8 *gEfiCallerBaseName = "%s";\n' % Info.Name)
 
 ## Create common code for header file
 #

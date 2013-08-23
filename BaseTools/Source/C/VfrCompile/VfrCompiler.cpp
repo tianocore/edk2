@@ -2,7 +2,7 @@
   
   VfrCompiler main class and main function.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -82,6 +82,7 @@ CVfrCompiler::OptionInitialization (
   mOptions.CPreprocessorOptions          = NULL;
   mOptions.CompatibleMode                = FALSE;
   mOptions.HasOverrideClassGuid          = FALSE;
+  mOptions.WarningAsError                = FALSE;
   memset (&mOptions.OverrideClassGuid, 0, sizeof (EFI_GUID));
   
   if (Argc == 1) {
@@ -153,6 +154,8 @@ CVfrCompiler::OptionInitialization (
         goto Fail;
       }
       mOptions.HasOverrideClassGuid = TRUE;
+    } else if (stricmp(Argv[Index], "-w") == 0 || stricmp(Argv[Index], "--warning-as-error") == 0) {
+      mOptions.WarningAsError = TRUE;
     } else {
       DebugError (NULL, 0, 1000, "Unknown option", "unrecognized option %s", Argv[Index]);
       goto Fail;
@@ -425,6 +428,8 @@ CVfrCompiler::Usage (
     "  -g, --guid",
     "                 override class guid input",
     "                 format is xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "  -w  --warning-as-error",
+    "                 treat warning as an error",
     NULL
     };
   for (Index = 0; Help[Index] != NULL; Index++) {
@@ -516,6 +521,7 @@ CVfrCompiler::Compile (
   InFileName = (mOptions.SkipCPreprocessor == TRUE) ? mOptions.VfrFileName : mOptions.PreprocessorOutputFileName;
 
   gCVfrErrorHandle.SetInputFile (InFileName);
+  gCVfrErrorHandle.SetWarningAsError(mOptions.WarningAsError);
 
   if ((pInFile = fopen (InFileName, "r")) == NULL) {
     DebugError (NULL, 0, 0001, "Error opening the input file", InFileName);
@@ -554,11 +560,54 @@ Fail:
 }
 
 VOID
+CVfrCompiler::UpdateInfoForDynamicOpcode (
+  VOID
+  )
+{
+  SIfrRecord          *pRecord;
+
+  if (!gNeedAdjustOpcode) {
+    return;
+  }
+  
+  //
+  // Base on the original offset info to update the record list.
+  //
+  if (!gCIfrRecordInfoDB.IfrAdjustDynamicOpcodeInRecords()) {
+    DebugError (NULL, 0, 1001, "Error parsing vfr file", "Can find the offset in the record.");
+  }
+
+  //
+  // Base on the opcode binary length to recalculate the offset for each opcode.
+  //
+  gCIfrRecordInfoDB.IfrAdjustOffsetForRecord();
+
+  //
+  // Base on the offset to find the binary address.
+  //
+  pRecord = gCIfrRecordInfoDB.GetRecordInfoFromOffset(gAdjustOpcodeOffset);
+  while (pRecord != NULL) {
+    pRecord->mIfrBinBuf = gCFormPkg.GetBufAddrBaseOnOffset(pRecord->mOffset);
+    if (pRecord->mIfrBinBuf == NULL) {
+      DebugError (NULL, 0, 0001, "Error parsing vfr file", " 0x%X. offset not allocated.", pRecord->mOffset);
+    }
+    pRecord = pRecord->mNext;
+  }
+}
+
+VOID
 CVfrCompiler::AdjustBin (
   VOID
   )
 {
   EFI_VFR_RETURN_CODE Status;
+
+  if (!IS_RUN_STATUS(STATUS_COMPILEED)) {
+    return;
+  }
+
+  UpdateInfoForDynamicOpcode ();
+
   //
   // Check Binary Code consistent between Form and IfrRecord
   //
@@ -759,6 +808,8 @@ main (
   )
 {
   COMPILER_RUN_STATUS  Status;
+
+  SetPrintLevel(WARNING_LOG_LEVEL);
   CVfrCompiler         Compiler(Argc, Argv);
   
   Compiler.PreProcess();

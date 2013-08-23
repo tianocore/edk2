@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -542,8 +542,7 @@ Returns:
 
 --*/
 {
-  printf ("%s v%d.%d %s -Utility to retrieve and update the boot sector or MBR.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
-  printf ("Copyright (c) 2009 - 2010 Intel Corporation. All rights reserved.\n");
+  printf ("%s Version %d.%d Build%s\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
 }
 
 VOID
@@ -551,18 +550,27 @@ PrintUsage (
   void
   )
 {
-  Version();
-  printf ("\nUsage: \n\
-   GenBootSector\n\
-     [-l, --list list disks]\n\
-     [-i, --input Filename]\n\
-     [-o, --output Filename]\n\
-     [-m, --mbr process the MBR also]\n\
-     [-v, --verbose]\n\
-     [--version]\n\
-     [-q, --quiet disable all messages except fatal errors]\n\
-     [-d, --debug[#]\n\
-     [-h, --help]\n");
+  printf ("Usage: GenBootSector [options] --cfg-file CFG_FILE\n\n\
+Copyright (c) 2009 - 2013, Intel Corporation.  All rights reserved.\n\n\
+  Utility to retrieve and update the boot sector or MBR.\n\n\
+optional arguments:\n\
+  -h, --help            Show this help message and exit\n\
+  --version             Show program's version number and exit\n\
+  -d [DEBUG], --debug [DEBUG]\n\
+                        Output DEBUG statements, where DEBUG_LEVEL is 0 (min)\n\
+                        - 9 (max)\n\
+  -v, --verbose         Print informational statements\n\
+  -q, --quiet           Returns the exit code, error messages will be\n\
+                        displayed\n\
+  -s, --silent          Returns only the exit code; informational and error\n\
+                        messages are not displayed\n\
+  -l, --list            List disk drives\n\
+  -i INPUT_FILENAME, --input INPUT_FILENAME\n\
+                        Input file name\n\
+  -o OUTPUT_FILENAME, --output OUTPUT_FILENAME\n\
+                        Output file name\n\
+  -m, --mbr             Also process the MBR\n\
+  --sfo                 Reserved for future use\n");
 
 }
 

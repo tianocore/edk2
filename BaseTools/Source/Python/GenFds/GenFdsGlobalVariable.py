@@ -345,7 +345,7 @@ class GenFdsGlobalVariable:
 
     @staticmethod
     def GenerateSection(Output, Input, Type=None, CompressionType=None, Guid=None,
-                        GuidHdrLen=None, GuidAttr=[], Ui=None, Ver=None, InputAlign=None):
+                        GuidHdrLen=None, GuidAttr=[], Ui=None, Ver=None, InputAlign=None, BuildNumber=None):
         Cmd = ["GenSec"]
         if Type not in [None, '']:
             Cmd += ["-s", Type]
@@ -364,6 +364,7 @@ class GenFdsGlobalVariable:
             for SecAlign in InputAlign:
                 Cmd += ["--sectionalign", SecAlign]
 
+        CommandFile = Output + '.txt'
         if Ui not in [None, '']:
             #Cmd += ["-n", '"' + Ui + '"']
             SectionData = array.array('B', [0,0,0,0])
@@ -374,19 +375,20 @@ class GenFdsGlobalVariable:
             GenFdsGlobalVariable.SectionHeader.pack_into(SectionData, 0, Len & 0xff, (Len >> 8) & 0xff, (Len >> 16) & 0xff, 0x15)
             SaveFileOnChange(Output,  SectionData.tostring())
         elif Ver not in [None, '']:
-            #Cmd += ["-j", Ver]
-            SectionData = array.array('B', [0,0,0,0])
-            SectionData.fromstring(Ver.encode("utf_16_le"))
-            SectionData.append(0)
-            SectionData.append(0)
-            Len = len(SectionData)
-            GenFdsGlobalVariable.SectionHeader.pack_into(SectionData, 0, Len & 0xff, (Len >> 8) & 0xff, (Len >> 16) & 0xff, 0x14)
-            SaveFileOnChange(Output,  SectionData.tostring())
+            Cmd += ["-n", Ver]
+            if BuildNumber:
+                Cmd += ["-j", BuildNumber]
+            Cmd += ["-o", Output]
+
+            SaveFileOnChange(CommandFile, ' '.join(Cmd), False)
+            if not GenFdsGlobalVariable.NeedsUpdate(Output, list(Input) + [CommandFile]):
+                return
+
+            GenFdsGlobalVariable.CallExternalTool(Cmd, "Failed to generate section")
         else:
             Cmd += ["-o", Output]
             Cmd += Input
 
-            CommandFile = Output + '.txt'
             SaveFileOnChange(CommandFile, ' '.join(Cmd), False)
             if not GenFdsGlobalVariable.NeedsUpdate(Output, list(Input) + [CommandFile]):
                 return

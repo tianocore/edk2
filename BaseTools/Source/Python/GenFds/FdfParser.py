@@ -1707,6 +1707,38 @@ class FdfParser:
 
         return False
 
+    ## __CalcRegionExpr(self)
+    #
+    #   Calculate expression for offset or size of a region
+    #
+    #   @return: None if invalid expression
+    #            Calculated number if successfully
+    #
+    def __CalcRegionExpr(self):
+        StartPos = self.GetFileBufferPos()
+        Expr = ''
+        PairCount = 0
+        while not self.__EndOfFile():
+            CurCh = self.__CurrentChar()
+            if CurCh == '(':
+                PairCount += 1
+            elif CurCh == ')':
+                PairCount -= 1
+
+            if CurCh in '|\r\n' and PairCount == 0:
+                break
+            Expr += CurCh
+            self.__GetOneChar()
+        try:
+            return long(
+                ValueExpression(Expr,
+                                dict(['%s.%s' % (Pcd[1], Pcd[0]), Val] 
+                                     for Pcd, Val in self.Profile.PcdDict.iteritems())
+                                )(True),0)
+        except Exception:
+            self.SetFileBufferPos(StartPos)
+            return None
+
     ## __GetRegionLayout() method
     #
     #   Get region layout for FD
@@ -1717,19 +1749,21 @@ class FdfParser:
     #   @retval False       Not able to find
     #
     def __GetRegionLayout(self, Fd):
-        if not self.__GetNextHexNumber():
+        Offset = self.__CalcRegionExpr() 
+        if Offset == None:
             return False
 
         RegionObj = Region.Region()
-        RegionObj.Offset = long(self.__Token, 0)
+        RegionObj.Offset = Offset
         Fd.RegionList.append(RegionObj)
 
         if not self.__IsToken( "|"):
             raise Warning("expected '|'", self.FileName, self.CurrentLineNumber)
 
-        if not self.__GetNextHexNumber():
+        Size = self.__CalcRegionExpr()
+        if Size == None:
             raise Warning("expected Region Size", self.FileName, self.CurrentLineNumber)
-        RegionObj.Size = long(self.__Token, 0)
+        RegionObj.Size = Size
 
         if not self.__GetNextWord():
             return True
@@ -2503,16 +2537,16 @@ class FdfParser:
         self.__GetFileOpts( FfsFileObj)
 
         if not self.__IsToken("{"):
-#            if self.__IsKeyword('RELOCS_STRIPPED') or self.__IsKeyword('RELOCS_RETAINED'):
-#                if self.__FileCouldHaveRelocFlag(FfsFileObj.FvFileType):
-#                    if self.__Token == 'RELOCS_STRIPPED':
-#                        FfsFileObj.KeepReloc = False
-#                    else:
-#                        FfsFileObj.KeepReloc = True
-#                else:
-#                    raise Warning("File type %s could not have reloc strip flag%d" % (FfsFileObj.FvFileType, self.CurrentLineNumber), self.FileName, self.CurrentLineNumber)
-#
-#            if not self.__IsToken("{"):
+            if self.__IsKeyword('RELOCS_STRIPPED') or self.__IsKeyword('RELOCS_RETAINED'):
+                if self.__FileCouldHaveRelocFlag(FfsFileObj.FvFileType):
+                    if self.__Token == 'RELOCS_STRIPPED':
+                        FfsFileObj.KeepReloc = False
+                    else:
+                        FfsFileObj.KeepReloc = True
+                else:
+                    raise Warning("File type %s could not have reloc strip flag%d" % (FfsFileObj.FvFileType, self.CurrentLineNumber), self.FileName, self.CurrentLineNumber)
+
+            if not self.__IsToken("{"):
                 raise Warning("expected '{'", self.FileName, self.CurrentLineNumber)
 
         if not self.__GetNextToken():
@@ -3186,7 +3220,7 @@ class FdfParser:
             raise Warning("expected '.'", self.FileName, self.CurrentLineNumber)
 
         Arch = self.__SkippedChars.rstrip(".")
-        if Arch.upper() not in ("IA32", "X64", "IPF", "EBC", "ARM", "COMMON"):
+        if Arch.upper() not in ("IA32", "X64", "IPF", "EBC", "ARM", "AARCH64", "COMMON"):
             raise Warning("Unknown Arch '%s'" % Arch, self.FileName, self.CurrentLineNumber)
 
         ModuleType = self.__GetModuleType()
@@ -3764,7 +3798,7 @@ class FdfParser:
             raise Warning("expected '.'", self.FileName, self.CurrentLineNumber)
 
         Arch = self.__SkippedChars.rstrip(".").upper()
-        if Arch not in ("IA32", "X64", "IPF", "ARM"):
+        if Arch not in ("IA32", "X64", "IPF", "ARM", "AARCH64"):
             raise Warning("Unknown Arch '%s'" % Arch, self.FileName, self.CurrentLineNumber)
 
         if not self.__GetNextWord():
@@ -3778,7 +3812,7 @@ class FdfParser:
         if self.__IsToken(","):
             if not self.__GetNextWord():
                 raise Warning("expected Arch list", self.FileName, self.CurrentLineNumber)
-            if self.__Token.upper() not in ("IA32", "X64", "IPF", "ARM"):
+            if self.__Token.upper() not in ("IA32", "X64", "IPF", "ARM", "AARCH64"):
                 raise Warning("Unknown Arch '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
             VtfObj.ArchList = self.__Token.upper()
 

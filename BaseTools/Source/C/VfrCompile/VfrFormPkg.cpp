@@ -2,7 +2,7 @@
   
   The definition of CFormPkg's member function
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -152,12 +152,39 @@ CFormPkg::~CFormPkg ()
   PendingAssignList = NULL;
 }
 
+SBufferNode *
+CFormPkg::CreateNewNode (
+  VOID
+  )
+{
+  SBufferNode *Node;
+
+  Node = new SBufferNode;
+  if (Node == NULL) {
+    return NULL;
+  }
+
+  Node->mBufferStart = new CHAR8[mBufferSize];
+  if (Node->mBufferStart == NULL) {
+    delete Node;
+    return NULL;
+  } else {
+    memset (Node->mBufferStart, 0, mBufferSize);
+    Node->mBufferEnd  = Node->mBufferStart + mBufferSize;
+    Node->mBufferFree = Node->mBufferStart;
+    Node->mNext       = NULL;
+  }
+
+  return Node;
+}
+
 CHAR8 *
 CFormPkg::IfrBinBufferGet (
   IN UINT32 Len
   )
 {
-  CHAR8 *BinBuffer = NULL;
+  CHAR8       *BinBuffer = NULL;
+  SBufferNode *Node      = NULL;
 
   if ((Len == 0) || (Len > mBufferSize)) {
     return NULL;
@@ -167,22 +194,9 @@ CFormPkg::IfrBinBufferGet (
     BinBuffer = mCurrBufferNode->mBufferFree;
     mCurrBufferNode->mBufferFree += Len;
   } else {
-    SBufferNode *Node;
-
-    Node = new SBufferNode;
+    Node = CreateNewNode ();
     if (Node == NULL) {
       return NULL;
-    }
-
-    Node->mBufferStart = new CHAR8[mBufferSize];
-    if (Node->mBufferStart == NULL) {
-      delete Node;
-      return NULL;
-    } else {
-      memset (Node->mBufferStart, 0, mBufferSize);
-      Node->mBufferEnd  = Node->mBufferStart + mBufferSize;
-      Node->mBufferFree = Node->mBufferStart;
-      Node->mNext       = NULL;
     }
 
     if (mBufferNodeQueueTail == NULL) {
@@ -245,7 +259,7 @@ CFormPkg::Read (
   }
 
   if (mReadBufferNode == NULL) {
-  	return 0;
+    return 0;
   }
 
   for (Index = 0; Index < Size; Index++) {
@@ -256,7 +270,7 @@ CFormPkg::Read (
         return Index;
       } else {
         mReadBufferOffset = 0;
-        Buffer[Index] = mReadBufferNode->mBufferStart[mReadBufferOffset++];
+        Index --;
       }
     }
   }
@@ -402,6 +416,9 @@ CFormPkg::_WRITE_PKG_END (
 }
 
 #define BYTES_PRE_LINE 0x10
+UINT32   gAdjustOpcodeOffset = 0;
+BOOLEAN  gNeedAdjustOpcode   = FALSE;
+UINT32   gAdjustOpcodeLen    = 0;
 
 EFI_VFR_RETURN_CODE 
 CFormPkg::GenCFile (
@@ -548,13 +565,236 @@ CFormPkg::PendingAssignPrintAll (
   }
 }
 
+SBufferNode *
+CFormPkg::GetBinBufferNodeForAddr (
+  IN CHAR8              *BinBuffAddr
+  )
+{
+  SBufferNode *TmpNode;
+
+  TmpNode = mBufferNodeQueueHead;
+
+  while (TmpNode != NULL) {
+    if (TmpNode->mBufferStart <= BinBuffAddr && TmpNode->mBufferFree >= BinBuffAddr) {
+      return TmpNode;
+    }
+
+    TmpNode = TmpNode->mNext;
+  }
+
+  return NULL;
+}
+
+SBufferNode *
+CFormPkg::GetNodeBefore(
+  IN SBufferNode *CurrentNode
+  )
+{
+  SBufferNode *FirstNode   = mBufferNodeQueueHead;
+  SBufferNode *LastNode    = mBufferNodeQueueHead;
+
+  while (FirstNode != NULL) {
+    if (FirstNode == CurrentNode) {
+      break;
+    }
+
+    LastNode    = FirstNode;
+    FirstNode   = FirstNode->mNext;
+  }
+
+  if (FirstNode == NULL) {
+    LastNode = NULL;
+  }
+
+  return LastNode;
+}
+
+EFI_VFR_RETURN_CODE
+CFormPkg::InsertNodeBefore(
+  IN SBufferNode *CurrentNode,
+  IN SBufferNode *NewNode
+  )
+{
+  SBufferNode *LastNode = GetNodeBefore (CurrentNode);
+
+  if (LastNode == NULL) {
+    return VFR_RETURN_MISMATCHED;
+  }
+
+  NewNode->mNext = LastNode->mNext;
+  LastNode->mNext = NewNode;
+
+  return VFR_RETURN_SUCCESS;
+}
+
+CHAR8 *
+CFormPkg::GetBufAddrBaseOnOffset (
+  IN UINT32      Offset
+  )
+{
+  SBufferNode *TmpNode;
+  UINT32      TotalBufLen;
+  UINT32      CurrentBufLen;
+
+  TotalBufLen = 0;
+
+  for (TmpNode = mBufferNodeQueueHead; TmpNode != NULL; TmpNode = TmpNode->mNext) {
+    CurrentBufLen = TmpNode->mBufferFree - TmpNode->mBufferStart;
+    if (Offset >= TotalBufLen && Offset < TotalBufLen + CurrentBufLen) {
+      return TmpNode->mBufferStart + (Offset - TotalBufLen);
+    }
+
+    TotalBufLen += CurrentBufLen;
+  }
+
+  return NULL;
+}
+
+EFI_VFR_RETURN_CODE
+CFormPkg::AdjustDynamicInsertOpcode (
+  IN CHAR8              *LastFormEndAddr,
+  IN CHAR8              *InsertOpcodeAddr
+  )
+{
+  SBufferNode *LastFormEndNode;
+  SBufferNode *InsertOpcodeNode;
+  SBufferNode *NewRestoreNodeBegin;
+  SBufferNode *NewRestoreNodeEnd;
+  SBufferNode *NewLastEndNode;
+  SBufferNode *TmpNode;
+  UINT32      NeedRestoreCodeLen;
+
+  NewRestoreNodeEnd = NULL;
+
+  LastFormEndNode  = GetBinBufferNodeForAddr(LastFormEndAddr);
+  InsertOpcodeNode = GetBinBufferNodeForAddr(InsertOpcodeAddr);
+
+  if (LastFormEndNode == InsertOpcodeNode) {
+    //
+    // Create New Node to save the restore opcode.
+    //
+    NeedRestoreCodeLen = InsertOpcodeAddr - LastFormEndAddr;
+    gAdjustOpcodeLen   = NeedRestoreCodeLen;
+    NewRestoreNodeBegin = CreateNewNode ();
+    if (NewRestoreNodeBegin == NULL) {
+      return VFR_RETURN_OUT_FOR_RESOURCES;
+    }
+    memcpy (NewRestoreNodeBegin->mBufferFree, LastFormEndAddr, NeedRestoreCodeLen);
+    NewRestoreNodeBegin->mBufferFree += NeedRestoreCodeLen;
+
+    //
+    // Override the restore buffer data.
+    //
+    memcpy (LastFormEndAddr, InsertOpcodeAddr, InsertOpcodeNode->mBufferFree - InsertOpcodeAddr);
+    InsertOpcodeNode->mBufferFree -= NeedRestoreCodeLen;
+    memset (InsertOpcodeNode->mBufferFree, 0, NeedRestoreCodeLen);
+  } else {
+    //
+    // Create New Node to save the restore opcode.
+    //
+    NeedRestoreCodeLen = LastFormEndNode->mBufferFree - LastFormEndAddr;
+    gAdjustOpcodeLen   = NeedRestoreCodeLen;
+    NewRestoreNodeBegin = CreateNewNode ();
+    if (NewRestoreNodeBegin == NULL) {
+      return VFR_RETURN_OUT_FOR_RESOURCES;
+    }
+    memcpy (NewRestoreNodeBegin->mBufferFree, LastFormEndAddr, NeedRestoreCodeLen);
+    NewRestoreNodeBegin->mBufferFree += NeedRestoreCodeLen;
+    //
+    // Override the restore buffer data.
+    //
+    LastFormEndNode->mBufferFree -= NeedRestoreCodeLen;
+    //
+    // Link the restore data to new node.
+    //
+    NewRestoreNodeBegin->mNext = LastFormEndNode->mNext;
+
+    //
+    // Count the Adjust opcode len.
+    //
+    TmpNode = LastFormEndNode->mNext;
+    while (TmpNode != InsertOpcodeNode) {
+      gAdjustOpcodeLen += TmpNode->mBufferFree - TmpNode->mBufferStart;
+      TmpNode = TmpNode->mNext;
+    }
+
+    //
+    // Create New Node to save the last node of restore opcode.
+    //
+    NeedRestoreCodeLen = InsertOpcodeAddr - InsertOpcodeNode->mBufferStart;
+    gAdjustOpcodeLen  += NeedRestoreCodeLen;
+    if (NeedRestoreCodeLen > 0) {
+      NewRestoreNodeEnd = CreateNewNode ();
+      if (NewRestoreNodeEnd == NULL) {
+        return VFR_RETURN_OUT_FOR_RESOURCES;
+      }
+      memcpy (NewRestoreNodeEnd->mBufferFree, InsertOpcodeNode->mBufferStart, NeedRestoreCodeLen);
+      NewRestoreNodeEnd->mBufferFree += NeedRestoreCodeLen;
+      //
+      // Override the restore buffer data.
+      //
+      memcpy (InsertOpcodeNode->mBufferStart, InsertOpcodeAddr, InsertOpcodeNode->mBufferFree - InsertOpcodeAddr);
+      InsertOpcodeNode->mBufferFree -= InsertOpcodeAddr - InsertOpcodeNode->mBufferStart;
+
+      //
+      // Insert the last restore data node.
+      //
+      TmpNode = GetNodeBefore (InsertOpcodeNode);
+      if (TmpNode == LastFormEndNode) {
+        NewRestoreNodeBegin->mNext = NewRestoreNodeEnd;
+      } else {
+        TmpNode->mNext = NewRestoreNodeEnd;
+      }
+      //
+      // Connect the dynamic opcode node to the node before last form end node.
+      //
+      LastFormEndNode->mNext = InsertOpcodeNode;
+    }
+  }
+
+  if (mBufferNodeQueueTail->mBufferFree - mBufferNodeQueueTail->mBufferStart > 2) {
+    //
+    // End form set opcode all in the mBufferNodeQueueTail node.
+    //
+    NewLastEndNode = CreateNewNode ();
+    if (NewLastEndNode == NULL) {
+      return VFR_RETURN_OUT_FOR_RESOURCES;
+    }
+    NewLastEndNode->mBufferStart[0] = 0x29;
+    NewLastEndNode->mBufferStart[1] = 0x02;
+    NewLastEndNode->mBufferFree += 2;
+
+    mBufferNodeQueueTail->mBufferFree -= 2;
+
+    mBufferNodeQueueTail->mNext = NewRestoreNodeBegin;
+    if (NewRestoreNodeEnd != NULL) {
+      NewRestoreNodeEnd->mNext = NewLastEndNode;
+    } else {
+      NewRestoreNodeBegin->mNext = NewLastEndNode;
+    }
+
+    mBufferNodeQueueTail = NewLastEndNode;
+  } else if (mBufferNodeQueueTail->mBufferFree - mBufferNodeQueueTail->mBufferStart == 2) {
+    TmpNode = GetNodeBefore(mBufferNodeQueueTail);
+    TmpNode->mNext = NewRestoreNodeBegin;
+    if (NewRestoreNodeEnd != NULL) {
+      NewRestoreNodeEnd->mNext = mBufferNodeQueueTail;
+    } else {
+      NewRestoreNodeBegin->mNext = mBufferNodeQueueTail;
+    }
+  }
+
+  return VFR_RETURN_SUCCESS;
+}
+
 EFI_VFR_RETURN_CODE
 CFormPkg::DeclarePendingQuestion (
   IN CVfrVarDataTypeDB   &lCVfrVarDataTypeDB,
   IN CVfrDataStorage     &lCVfrDataStorage,
   IN CVfrQuestionDB      &lCVfrQuestionDB,
   IN EFI_GUID            *LocalFormSetGuid,
-  IN UINT32 LineNo
+  IN UINT32              LineNo,
+  OUT CHAR8              **InsertOpcodeAddr
   )
 {
   SPendingAssign *pNode;
@@ -563,8 +803,10 @@ CFormPkg::DeclarePendingQuestion (
   CHAR8          FName[MAX_NAME_LEN];
   CHAR8          *SName;
   CHAR8          *NewStr;
+  UINT32         ShrinkSize;
   EFI_VFR_RETURN_CODE  ReturnCode;
   EFI_VFR_VARSTORE_TYPE VarStoreType  = EFI_VFR_VARSTORE_INVALID;
+  EFI_VARSTORE_ID       VarStoreId    = EFI_VARSTORE_ID_INVALID;
 
   //
   // Declare all questions as Numeric in DisableIf True
@@ -572,6 +814,7 @@ CFormPkg::DeclarePendingQuestion (
   // DisableIf
   CIfrDisableIf DIObj;
   DIObj.SetLineNo (LineNo);
+  *InsertOpcodeAddr = DIObj.GetObjBinAddr ();
   
   //TrueOpcode
   CIfrTrue TObj (LineNo);
@@ -581,7 +824,7 @@ CFormPkg::DeclarePendingQuestion (
     if (pNode->mFlag == PENDING) {
       CIfrNumeric CNObj;
       EFI_VARSTORE_INFO Info; 
-  	  EFI_QUESTION_ID   QId   = EFI_QUESTION_ID_INVALID;
+      EFI_QUESTION_ID   QId   = EFI_QUESTION_ID_INVALID;
 
       CNObj.SetLineNo (LineNo);
       CNObj.SetPrompt (0x0);
@@ -611,7 +854,7 @@ CFormPkg::DeclarePendingQuestion (
       //
       // Get VarStoreType
       //
-      ReturnCode = lCVfrDataStorage.GetVarStoreType (FName, VarStoreType);
+      ReturnCode = lCVfrDataStorage.GetVarStoreId (FName, &Info.mVarStoreId);
       if (ReturnCode == VFR_RETURN_UNDEFINED) {
         lCVfrDataStorage.DeclareBufferVarStore (
                            FName, 
@@ -621,18 +864,13 @@ CFormPkg::DeclarePendingQuestion (
                            EFI_VARSTORE_ID_INVALID,
                            FALSE
                            );
-        ReturnCode = lCVfrDataStorage.GetVarStoreType (FName, VarStoreType);  
+        ReturnCode = lCVfrDataStorage.GetVarStoreId (FName, &Info.mVarStoreId, LocalFormSetGuid); 
       }
       if (ReturnCode != VFR_RETURN_SUCCESS) {
         gCVfrErrorHandle.PrintMsg (pNode->mLineNo, FName, "Error", "Var Store Type is not defined");
         return ReturnCode;
       }
-      
-      ReturnCode = lCVfrDataStorage.GetVarStoreId (FName, &Info.mVarStoreId);
-      if (ReturnCode != VFR_RETURN_SUCCESS) {
-        gCVfrErrorHandle.PrintMsg (pNode->mLineNo, FName, "Error", "Var Store Type is not defined");
-        return ReturnCode;
-      }
+      VarStoreType = lCVfrDataStorage.GetVarStoreType (Info.mVarStoreId); 
 
       if (*VarStr == '\0' && ArrayIdx != INVALID_ARRAY_INDEX) {
         ReturnCode = lCVfrDataStorage.GetNameVarStoreInfo (&Info, ArrayIdx);
@@ -642,7 +880,7 @@ CFormPkg::DeclarePendingQuestion (
         } else if (VarStoreType == EFI_VFR_VARSTORE_BUFFER) {
           VarStr = pNode->mKey;
           //convert VarStr with store name to VarStr with structure name
-          ReturnCode = lCVfrDataStorage.GetBufferVarStoreDataTypeName (FName, &SName);
+          ReturnCode = lCVfrDataStorage.GetBufferVarStoreDataTypeName (Info.mVarStoreId, &SName);
           if (ReturnCode == VFR_RETURN_SUCCESS) {
             NewStr = new CHAR8[strlen (VarStr) + strlen (SName) + 1];
             NewStr[0] = '\0';
@@ -676,19 +914,24 @@ CFormPkg::DeclarePendingQuestion (
       switch (Info.mVarType) {
       case EFI_IFR_TYPE_NUM_SIZE_64:
         CNObj.SetMinMaxStepData ((UINT64) 0, (UINT64) -1 , (UINT64) 0);
+        ShrinkSize = 0;
         break;
       case EFI_IFR_TYPE_NUM_SIZE_32:
         CNObj.SetMinMaxStepData ((UINT32) 0, (UINT32) -1 , (UINT32) 0);
+        ShrinkSize = 12;
         break;
       case EFI_IFR_TYPE_NUM_SIZE_16:
         CNObj.SetMinMaxStepData ((UINT16) 0, (UINT16) -1 , (UINT16) 0);
+        ShrinkSize = 18;
         break;
       case EFI_IFR_TYPE_NUM_SIZE_8:
         CNObj.SetMinMaxStepData ((UINT8) 0, (UINT8) -1 , (UINT8) 0);
+        ShrinkSize = 21;
         break;
       default:
         break;
       }
+      CNObj.ShrinkBinSize (ShrinkSize);
 
       //
       // For undefined Efi VarStore type question
@@ -698,7 +941,7 @@ CFormPkg::DeclarePendingQuestion (
         CIfrVarEqName CVNObj (QId, Info.mInfo.mVarName);
         CVNObj.SetLineNo (LineNo);
       }
-      
+
       //
       // End for Numeric
       //
@@ -983,6 +1226,94 @@ CIfrRecordInfoDB::GetOpcodeQuestionId (
   return QuestionHead->QuestionId;
 }
 
+SIfrRecord *
+CIfrRecordInfoDB::GetRecordInfoFromOffset (
+  IN UINT32 Offset
+  )
+{
+  SIfrRecord *pNode = NULL;
+
+  for (pNode = mIfrRecordListHead; pNode != NULL; pNode = pNode->mNext) {
+    if (pNode->mOffset == Offset) {
+      return pNode;
+    }
+  }
+
+  return pNode;
+}
+
+/*
+  Add just the op code position.
+
+  From
+  
+  | form end opcode + end of if opcode for form ... + Dynamic opcode + form set end opcode |
+  
+  To
+  
+  | Dynamic opcode + form end opcode + end of if opcode for form ... + form set end opcode |
+
+*/
+BOOLEAN
+CIfrRecordInfoDB::IfrAdjustDynamicOpcodeInRecords (
+  VOID
+  )
+{
+  UINT32             OpcodeOffset;
+  SIfrRecord         *pNode, *pPreNode;
+  SIfrRecord         *pStartNode, *pNodeBeforeStart;
+  SIfrRecord         *pEndNode;
+  
+  pStartNode = NULL;
+  pEndNode   = NULL;
+  OpcodeOffset = 0;
+
+  //
+  // Base on the offset info to get the node.
+  //
+  for (pNode = mIfrRecordListHead; pNode->mNext != NULL; pPreNode = pNode,pNode = pNode->mNext) {
+    if (OpcodeOffset == gAdjustOpcodeOffset) {
+      pStartNode       = pNode;
+      pNodeBeforeStart = pPreNode;
+    } else if (OpcodeOffset == gAdjustOpcodeOffset + gAdjustOpcodeLen) {
+      pEndNode = pPreNode;
+    }
+
+    OpcodeOffset += pNode->mBinBufLen;
+  }
+
+  //
+  // Check the value.
+  //
+  if (pEndNode == NULL || pStartNode == NULL) {
+    return FALSE;
+  }
+
+  //
+  // Adjust the node. pPreNode save the Node before mIfrRecordListTail
+  //
+  pNodeBeforeStart->mNext = pEndNode->mNext;
+  pPreNode->mNext = pStartNode;
+  pEndNode->mNext = mIfrRecordListTail;
+
+  return TRUE;
+}
+
+VOID
+CIfrRecordInfoDB::IfrAdjustOffsetForRecord (
+  VOID
+  )
+{
+  UINT32             OpcodeOffset;
+  SIfrRecord         *pNode;
+
+  OpcodeOffset = 0;
+  for (pNode = mIfrRecordListHead; pNode != NULL; pNode = pNode->mNext) {
+    pNode->mOffset = OpcodeOffset;
+    OpcodeOffset += pNode->mBinBufLen;
+  }
+}
+
 EFI_VFR_RETURN_CODE
 CIfrRecordInfoDB::IfrRecordAdjust (
   VOID
@@ -1195,11 +1526,7 @@ CIfrRecordInfoDB::IfrRecordAdjust (
   // Update Ifr Opcode Offset
   //
   if (Status == VFR_RETURN_SUCCESS) {
-    OpcodeOffset = 0;
-    for (pNode = mIfrRecordListHead; pNode != NULL; pNode = pNode->mNext) {
-      pNode->mOffset = OpcodeOffset;
-      OpcodeOffset += pNode->mBinBufLen;
-    }
+    IfrAdjustOffsetForRecord ();
   }
   return Status;
 }
@@ -1344,7 +1671,7 @@ static struct {
   { sizeof (EFI_IFR_CATENATE), 0 },            // EFI_IFR_CATENATE_OP
   { sizeof (EFI_IFR_GUID), 0 },                // EFI_IFR_GUID_OP
   { sizeof (EFI_IFR_SECURITY), 0 },            // EFI_IFR_SECURITY_OP - 0x60
-  { sizeof (EFI_IFR_MODAL), 0},                // EFI_IFR_MODAL_OP - 0x61
+  { sizeof (EFI_IFR_MODAL_TAG), 0},            // EFI_IFR_MODAL_TAG_OP - 0x61
   { sizeof (EFI_IFR_REFRESH_ID), 0},           // EFI_IFR_REFRESH_ID_OP - 0x62
 };
 
@@ -1368,7 +1695,7 @@ static struct {
   "EFI_IFR_STRING_REF1","EFI_IFR_STRING_REF2",          "EFI_IFR_CONDITIONAL",   "EFI_IFR_QUESTION_REF3",   "EFI_IFR_ZERO",          "EFI_IFR_ONE",
   "EFI_IFR_ONES",       "EFI_IFR_UNDEFINED",            "EFI_IFR_LENGTH",        "EFI_IFR_DUP",             "EFI_IFR_THIS",          "EFI_IFR_SPAN",
   "EFI_IFR_VALUE",      "EFI_IFR_DEFAULT",              "EFI_IFR_DEFAULTSTORE",  "EFI_IFR_FORM_MAP",        "EFI_IFR_CATENATE",      "EFI_IFR_GUID",
-  "EFI_IFR_SECURITY",   "EFI_IFR_MODAL",                "EFI_IFR_REFRESH_ID",
+  "EFI_IFR_SECURITY",   "EFI_IFR_MODAL_TAG",            "EFI_IFR_REFRESH_ID",
 };
 
 VOID

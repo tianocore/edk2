@@ -42,12 +42,12 @@ from Library import DataType as DT
 # @param WorkSpace. The WorkSpace directory used to combined with INF file path.
 #
 # @return GUID, Version
-def GetLibInstanceInfo(String, WorkSpace, LineNo):
-    
+def GetLibInstanceInfo(String, WorkSpace, LineNo, CurrentInfFileName):
+
     FileGuidString = ""
     VerString = ""
-    
-    OrignalString = String 
+
+    OrignalString = String
     String = String.strip()
     if not String:
         return None, None
@@ -56,28 +56,48 @@ def GetLibInstanceInfo(String, WorkSpace, LineNo):
     #
     String = GetHelpStringByRemoveHashKey(String)
     String = String.strip()
-    
+
+    #
+    # To deal with library instance specified by GUID and version
+    #
+    RegFormatGuidPattern = re.compile("\s*([0-9a-fA-F]){8}-"
+                                       "([0-9a-fA-F]){4}-"
+                                       "([0-9a-fA-F]){4}-"
+                                       "([0-9a-fA-F]){4}-"
+                                       "([0-9a-fA-F]){12}\s*")
+    VersionPattern = re.compile('[\t\s]*\d+(\.\d+)?[\t\s]*')
+    GuidMatchedObj = RegFormatGuidPattern.search(String)
+
+    if String.upper().startswith('GUID') and GuidMatchedObj and 'Version' in String:
+        VersionStr = String[String.upper().find('VERSION') + 8:]
+        VersionMatchedObj = VersionPattern.search(VersionStr)
+        if VersionMatchedObj:
+            Guid = GuidMatchedObj.group().strip()
+            Version = VersionMatchedObj.group().strip()
+            return GetGuidVerFormLibInstance(Guid, Version, WorkSpace, CurrentInfFileName)
+
+    #
+    # To deal with library instance specified by file name
+    #
     FileLinesList = GetFileLineContent(String, WorkSpace, LineNo, OrignalString)
 
-        
+
     ReFindFileGuidPattern = re.compile("^\s*FILE_GUID\s*=.*$")
     ReFindVerStringPattern = re.compile("^\s*VERSION_STRING\s*=.*$")
-    
-    FileLinesList = ProcessLineExtender(FileLinesList)
 
     for Line in FileLinesList:
         if ReFindFileGuidPattern.match(Line):
             FileGuidString = Line
         if ReFindVerStringPattern.match(Line):
             VerString = Line
-    
+
     if FileGuidString:
         FileGuidString = GetSplitValueList(FileGuidString, '=', 1)[1]
     if VerString:
         VerString = GetSplitValueList(VerString, '=', 1)[1]
-        
+
     return FileGuidString, VerString
-    
+
 ## GetPackageListInfo
 #
 # Get the package information from INF file.
@@ -184,36 +204,97 @@ def GetFileLineContent(FileName, WorkSpace, LineNo, OriginalString):
     #
     # Validate file exist/format.
     #
-    if IsValidPath(FileName, WorkSpace):
-        IsValidFileFlag = True
-    else:
+    if not IsValidPath(FileName, WorkSpace):
         Logger.Error("InfParser", 
                      ToolError.FORMAT_INVALID,
                      ST.ERR_INF_PARSER_FILE_NOT_EXIST_OR_NAME_INVALID%(FileName),
                      File=GlobalData.gINF_MODULE_NAME, 
                      Line=LineNo, 
                      ExtraData=OriginalString)
-        return False
     
     FileLinesList = []
     
-    if IsValidFileFlag:  
+    try:
+        FullFileName = FullFileName.replace('\\', '/')
+        Inputfile = open(FullFileName, "rb", 0)
         try:
-            FullFileName = FullFileName.replace('\\', '/')
-            Inputfile = open(FullFileName, "rb", 0)
-            try:
-                FileLinesList = Inputfile.readlines()
-            except BaseException:
-                Logger.Error("InfParser", ToolError.FILE_READ_FAILURE, ST.ERR_FILE_OPEN_FAILURE, File=FullFileName)
-            finally:
-                Inputfile.close()
+            FileLinesList = Inputfile.readlines()
         except BaseException:
-            Logger.Error("InfParser", 
-                         ToolError.FILE_READ_FAILURE, 
-                         ST.ERR_FILE_OPEN_FAILURE,
-                         File=FullFileName)
-        
-        FileLinesList = ProcessLineExtender(FileLinesList)
+            Logger.Error("InfParser", ToolError.FILE_READ_FAILURE, ST.ERR_FILE_OPEN_FAILURE, File=FullFileName)
+        finally:
+            Inputfile.close()
+    except BaseException:
+        Logger.Error("InfParser",
+                     ToolError.FILE_READ_FAILURE,
+                     ST.ERR_FILE_OPEN_FAILURE,
+                     File=FullFileName)
+    
+    FileLinesList = ProcessLineExtender(FileLinesList)
     
     return FileLinesList
-    
+
+##
+# Get all INF files from current workspace
+#
+#
+def GetInfsFromWorkSpace(WorkSpace):
+    InfFiles = []
+    for top, dirs, files in os.walk(WorkSpace):
+        dirs = dirs # just for pylint
+        for File in files:
+            if File.upper().endswith(".INF"):
+                InfFiles.append(os.path.join(top, File))
+
+    return InfFiles
+
+##
+# Get GUID and version from library instance file
+#
+#
+def GetGuidVerFormLibInstance(Guid, Version, WorkSpace, CurrentInfFileName):
+    for InfFile in GetInfsFromWorkSpace(WorkSpace):
+        try:
+            if InfFile.strip().upper() == CurrentInfFileName.strip().upper():
+                continue
+            InfFile = InfFile.replace('\\', '/')
+            if InfFile not in GlobalData.gLIBINSTANCEDICT:
+                InfFileObj = open(InfFile, "rb", 0)
+                GlobalData.gLIBINSTANCEDICT[InfFile] = InfFileObj
+            else:
+                InfFileObj = GlobalData.gLIBINSTANCEDICT[InfFile]
+
+        except BaseException:
+            Logger.Error("InfParser",
+                         ToolError.FILE_READ_FAILURE,
+                         ST.ERR_FILE_OPEN_FAILURE,
+                         File=InfFile)
+        try:
+            FileLinesList = InfFileObj.readlines()
+            FileLinesList = ProcessLineExtender(FileLinesList)
+
+            ReFindFileGuidPattern = re.compile("^\s*FILE_GUID\s*=.*$")
+            ReFindVerStringPattern = re.compile("^\s*VERSION_STRING\s*=.*$")
+
+            for Line in FileLinesList:
+                if ReFindFileGuidPattern.match(Line):
+                    FileGuidString = Line
+                if ReFindVerStringPattern.match(Line):
+                    VerString = Line
+
+            if FileGuidString:
+                FileGuidString = GetSplitValueList(FileGuidString, '=', 1)[1]
+            if VerString:
+                VerString = GetSplitValueList(VerString, '=', 1)[1]
+
+            if FileGuidString.strip().upper() == Guid.upper() and \
+                VerString.strip().upper() == Version.upper():
+                return Guid, Version
+
+        except BaseException:
+            Logger.Error("InfParser", ToolError.FILE_READ_FAILURE, ST.ERR_FILE_OPEN_FAILURE, File=InfFile)
+        finally:
+            InfFileObj.close()
+
+    return '', ''
+
+

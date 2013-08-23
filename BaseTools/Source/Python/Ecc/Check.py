@@ -821,7 +821,7 @@ class Check(object):
             RecordSet = EccGlobalData.gDb.TblInf.Exec(SqlCommand)
             for Record in RecordSet:
                 Path = Record[1]
-                Path = Path.upper().replace('\X64', '').replace('\IA32', '').replace('\EBC', '').replace('\IPF', '').replace('\ARM', '')
+                Path = Path.upper().replace('\X64', '').replace('\IA32', '').replace('\EBC', '').replace('\IPF', '').replace('\ARM', '').replace('\AARCH64', '')
                 if Path in InfPathList:
                     if not EccGlobalData.gException.IsException(ERROR_META_DATA_FILE_CHECK_MODULE_FILE_NO_USE, Record[2]):
                         EccGlobalData.gDb.TblReport.Insert(ERROR_META_DATA_FILE_CHECK_MODULE_FILE_NO_USE, OtherMsg="The source file [%s] is existing in module directory but it is not described in INF file." % (Record[2]), BelongsToTable='File', BelongsToItem=Record[0])

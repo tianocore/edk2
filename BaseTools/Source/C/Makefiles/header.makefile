@@ -4,6 +4,7 @@
 # ARCH = x86_64 or x64 for EM64T build
 # ARCH = ia32 or IA32 for IA32 build
 # ARCH = ia64 or IA64 for IA64 build
+# ARCH = Arm or ARM for ARM build
 #
 # Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
@@ -32,6 +33,10 @@ endif
 
 ifeq ($(ARCH), X64)
 ARCH_INCLUDE = -I $(MAKEROOT)/Include/X64/
+endif
+
+ifeq ($(ARCH), ARM)
+ARCH_INCLUDE = -I $(MAKEROOT)/Include/Arm/
 endif
 
 INCLUDE = $(TOOL_INCLUDE) -I $(MAKEROOT) -I $(MAKEROOT)/Include/Common -I $(MAKEROOT)/Include/ -I $(MAKEROOT)/Include/IndustryStandard -I $(MAKEROOT)/Common/ -I .. -I . $(ARCH_INCLUDE) 

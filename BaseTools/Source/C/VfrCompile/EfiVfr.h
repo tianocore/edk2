@@ -38,6 +38,8 @@ Abstract:
 #define EFI_STRING_ID_INVALID    0x0
 #define EFI_IMAGE_ID_INVALID     0xFFFF
 
+#define EFI_IFR_MAX_DEFAULT_TYPE 0x10
+
 typedef enum {
   QUESTION_NORMAL,
   QUESTION_DATE,
