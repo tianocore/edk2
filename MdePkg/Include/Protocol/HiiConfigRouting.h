@@ -5,7 +5,7 @@
   information from configuration applications, routing the
   results to the appropriate drivers.
   
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -99,8 +99,13 @@ typedef struct _EFI_HII_CONFIG_ROUTING_PROTOCOL EFI_HII_CONFIG_ROUTING_PROTOCOL;
                                   to the most recent & before the
                                   error, or the beginning of the
                                   string.
-  @retval EFI_INVALID_PARAMETER   Unknown name.
-
+  @retval EFI_INVALID_PARAMETER   The ExtractConfig function of the
+                                  underlying HII Configuration 
+                                  Access Protocol returned 
+                                  EFI_INVALID_PARAMETER. Progress
+                                  set to most recent & before the
+                                  error or the beginning of the
+                                  string.
 
 **/
 typedef

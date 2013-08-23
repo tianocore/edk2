@@ -3448,8 +3448,10 @@ ConfigRequestValidate (
                                  Progress parameter is set to NULL.
   @retval EFI_INVALID_PARAMETER  Illegal syntax. Progress set to most recent &
                                  before the error or the beginning of the string.
-  @retval EFI_INVALID_PARAMETER  Unknown name. Progress points to the & before the
-                                 name in question.
+  @retval EFI_INVALID_PARAMETER  The ExtractConfig function of the underlying HII
+                                 Configuration Access Protocol returned 
+                                 EFI_INVALID_PARAMETER. Progress set to most recent
+                                 & before the error or the beginning of the string.
 
 **/
 EFI_STATUS
@@ -4322,7 +4324,7 @@ HiiBlockToConfig (
     //
     Status = GetValueOfNumber (StringPtr, &TmpBuffer, &Length);
     if (EFI_ERROR (Status)) {
-      *Progress = ConfigRequest;
+      *Progress = TmpPtr - 1;
       goto Exit;
     }
     Offset = 0;
@@ -4335,7 +4337,7 @@ HiiBlockToConfig (
 
     StringPtr += Length;
     if (StrnCmp (StringPtr, L"&WIDTH=", StrLen (L"&WIDTH=")) != 0) {
-      *Progress = StringPtr - Length - StrLen (L"OFFSET=") - 1;
+      *Progress = TmpPtr - 1;
       Status = EFI_INVALID_PARAMETER;
       goto Exit;
     }
@@ -4346,7 +4348,7 @@ HiiBlockToConfig (
     //
     Status = GetValueOfNumber (StringPtr, &TmpBuffer, &Length);
     if (EFI_ERROR (Status)) {
-      *Progress = ConfigRequest;
+      *Progress =  TmpPtr - 1;
       goto Exit;
     }
     Width = 0;
@@ -4359,7 +4361,7 @@ HiiBlockToConfig (
 
     StringPtr += Length;
     if (*StringPtr != 0 && *StringPtr != L'&') {
-      *Progress = StringPtr - Length - StrLen (L"&WIDTH=");
+      *Progress =  TmpPtr - 1;
       Status = EFI_INVALID_PARAMETER;
       goto Exit;
     }
@@ -4523,6 +4525,7 @@ HiiConfigToBlock (
 {
   HII_DATABASE_PRIVATE_DATA           *Private;
   EFI_STRING                          StringPtr;
+  EFI_STRING                          TmpPtr;
   UINTN                               Length;
   EFI_STATUS                          Status;
   UINT8                               *TmpBuffer;
@@ -4581,13 +4584,14 @@ HiiConfigToBlock (
   // <BlockConfig> ::= 'OFFSET='<Number>&'WIDTH='<Number>&'VALUE='<Number>
   //
   while (*StringPtr != 0 && StrnCmp (StringPtr, L"&OFFSET=", StrLen (L"&OFFSET=")) == 0) {
+    TmpPtr     = StringPtr;
     StringPtr += StrLen (L"&OFFSET=");
     //
     // Get Offset
     //
     Status = GetValueOfNumber (StringPtr, &TmpBuffer, &Length);
     if (EFI_ERROR (Status)) {
-      *Progress = ConfigResp;
+      *Progress = TmpPtr;
       goto Exit;
     }
     Offset = 0;
@@ -4600,7 +4604,7 @@ HiiConfigToBlock (
 
     StringPtr += Length;
     if (StrnCmp (StringPtr, L"&WIDTH=", StrLen (L"&WIDTH=")) != 0) {
-      *Progress = StringPtr - Length - StrLen (L"&OFFSET=");
+      *Progress = TmpPtr;
       Status = EFI_INVALID_PARAMETER;
       goto Exit;
     }
@@ -4611,7 +4615,7 @@ HiiConfigToBlock (
     //
     Status = GetValueOfNumber (StringPtr, &TmpBuffer, &Length);
     if (EFI_ERROR (Status)) {
-      *Progress = ConfigResp;
+      *Progress = TmpPtr;
       goto Exit;
     }
     Width = 0;
@@ -4624,7 +4628,7 @@ HiiConfigToBlock (
 
     StringPtr += Length;
     if (StrnCmp (StringPtr, L"&VALUE=", StrLen (L"&VALUE=")) != 0) {
-      *Progress = StringPtr - Length - StrLen (L"&WIDTH=");
+      *Progress = TmpPtr;
       Status = EFI_INVALID_PARAMETER;
       goto Exit;
     }
@@ -4635,13 +4639,13 @@ HiiConfigToBlock (
     //
     Status = GetValueOfNumber (StringPtr, &Value, &Length);
     if (EFI_ERROR (Status)) {
-      *Progress = ConfigResp;
+      *Progress = TmpPtr;
       goto Exit;
     }
 
     StringPtr += Length;
     if (*StringPtr != 0 && *StringPtr != L'&') {
-      *Progress = StringPtr - Length - StrLen (L"&VALUE=");
+      *Progress = TmpPtr;
       Status = EFI_INVALID_PARAMETER;
       goto Exit;
     }
