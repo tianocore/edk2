@@ -109,8 +109,8 @@ typedef struct {
 
 #define EFI_HII_VARSTORE_BUFFER              0
 #define EFI_HII_VARSTORE_NAME_VALUE          1
-#define EFI_HII_VARSTORE_EFI_VARIABLE        2
-#define EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER 3
+#define EFI_HII_VARSTORE_EFI_VARIABLE        2    // EFI Varstore type follow UEFI spec before 2.3.1.
+#define EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER 3    // EFI varstore type follow UEFI spec 2.3.1 and later.
 
 #define FORM_INCONSISTENT_VALIDATION         0
 #define FORM_NO_SUBMIT_VALIDATION            1

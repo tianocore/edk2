@@ -1625,8 +1625,14 @@ ParseOpCodes (
       // Create a EFI variable Storage for this FormSet
       //
       if (OpCodeLength < sizeof (EFI_IFR_VARSTORE_EFI)) {
+        //
+        // Create efi varstore with format follow UEFI spec before 2.3.1.
+        //
         Storage = CreateStorage (FormSet, EFI_HII_VARSTORE_EFI_VARIABLE, OpCodeData);
       } else {
+        //
+        // Create efi varstore with format follow UEFI spec 2.3.1 and later.
+        //
         Storage = CreateStorage (FormSet, EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER, OpCodeData);
       }
       CopyMem (&Storage->VarStoreId, &((EFI_IFR_VARSTORE_EFI *) OpCodeData)->VarStoreId, sizeof (EFI_VARSTORE_ID));
