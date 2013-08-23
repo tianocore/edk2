@@ -234,14 +234,10 @@ INF  RuleOverride=ACPITABLE OvmfPkg/AcpiTables/AcpiTables.inf
 
 INF  RuleOverride = BINARY USE = X64 FatBinPkg/EnhancedFatDxe/Fat.inf
 
-!if $(BUILD_NEW_SHELL)
+!ifndef $(USE_OLD_SHELL)
 INF  ShellPkg/Application/Shell/Shell.inf
 !else
-!if $(USE_NEW_SHELL)
-INF  RuleOverride = BINARY USE = X64 ShellBinPkg/UefiShell/UefiShell.inf
-!else
 INF  RuleOverride = BINARY USE = X64 EdkShellBinPkg/FullShell/FullShell.inf
-!endif
 !endif
 
 FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
