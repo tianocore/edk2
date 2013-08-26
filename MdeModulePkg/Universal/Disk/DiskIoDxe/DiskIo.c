@@ -642,7 +642,7 @@ DiskIoCreateSubtaskList (
       InsertTailList (Subtasks, &Subtask->Link);
     }
 
-    Subtask = DiskIoCreateSubtask (Write, OverRunLba, 0, OverRun, WorkingBuffer, BufferPtr, Blocking);
+    Subtask = DiskIoCreateSubtask (Write, OverRunLba, 0, OverRun, WorkingBuffer, BufferPtr + BufferSize, Blocking);
     if (Subtask == NULL) {
       goto Done;
     }
