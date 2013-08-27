@@ -286,7 +286,6 @@ ValidateAndCopyFiles(
   VOID                      *Response;
   UINTN                     PathLen;
   CONST CHAR16              *Cwd;
-  CONST CHAR16              *TempLocation;
   UINTN                     NewSize;
 
   if (Resp == NULL) {
@@ -479,7 +478,7 @@ ValidateAndCopyFiles(
       break;
     }
 
-    if ((TempLocation = StrniCmp(Node->FullName, DestPath, StrLen(Node->FullName))) == 0
+    if ((StrniCmp(Node->FullName, DestPath, StrLen(Node->FullName)) == 0)
       && (DestPath[StrLen(Node->FullName)] == CHAR_NULL || DestPath[StrLen(Node->FullName)] == L'\\')
       ) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_SD_SAME), gShellLevel2HiiHandle);
@@ -552,7 +551,6 @@ ProcessValidateAndCopyFiles(
   } else if (List != NULL) {
     ASSERT(((EFI_SHELL_FILE_INFO *)List->Link.ForwardLink) != NULL);
     ASSERT(((EFI_SHELL_FILE_INFO *)List->Link.ForwardLink)->FullName != NULL);
-    FileInfo    = NULL;
     FileInfo = gEfiShellProtocol->GetFileInfo(((EFI_SHELL_FILE_INFO *)List->Link.ForwardLink)->Handle);
     ASSERT(FileInfo != NULL);
     StrnCatGrow(&FullName, NULL, ((EFI_SHELL_FILE_INFO *)List->Link.ForwardLink)->FullName, 0);

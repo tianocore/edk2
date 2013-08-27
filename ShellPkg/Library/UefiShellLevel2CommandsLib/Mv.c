@@ -136,7 +136,6 @@ GetDestinationLocation(
   EFI_SHELL_FILE_INFO       *DestList;
   EFI_SHELL_FILE_INFO       *Node;
   CHAR16                    *DestPath;
-  CHAR16                    *TempLocation;
   UINTN                     NewSize;
 
   DestList = NULL;
@@ -163,7 +162,7 @@ GetDestinationLocation(
     //
     // Not existing... must be renaming
     //
-    if ((TempLocation = StrStr(DestDir, L":")) == NULL) {
+    if (StrStr(DestDir, L":") == NULL) {
       if (Cwd == NULL) {
         ShellCloseFileMetaArg(&DestList);
         return (SHELL_INVALID_PARAMETER);
