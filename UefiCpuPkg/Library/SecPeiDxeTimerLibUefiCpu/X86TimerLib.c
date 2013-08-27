@@ -3,7 +3,7 @@
 
   This library uses the local APIC library so that it supports x2APIC mode.
   
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -55,22 +55,49 @@ InternalX86Delay (
   )
 {
   INT32                             Ticks;
-  UINT32                            PowerOfTwoCounter;
+  UINT32                            Times;
+  UINT32                            InitCount;
+  UINT32                            StartTick;
 
   //
-  // The target timer count is calculated here
+  // In case Delay is too larger, separate it into several small delay slot.
+  // Devided Delay by half value of Init Count is to avoid Delay close to
+  // the Init Count, timeout maybe missing if the time consuming between 2
+  // GetApicTimerCurrentCount() invoking is larger than the time gap between
+  // Delay and the Init Count.
   //
-  Ticks = GetApicTimerCurrentCount () - Delay;
+  InitCount = GetApicTimerInitCount ();
+  Times     = Delay / (InitCount / 2);
+  Delay     = Delay % (InitCount / 2);
 
   //
-  // Wait until time out
-  // Delay > 2^31 could not be handled by this function
-  // Timer wrap-arounds are handled correctly by this function
+  // Get Start Tick and do delay
   //
-  PowerOfTwoCounter = GetPowerOfTwo32 (GetApicTimerInitCount ());
-  while (((UINT32)(GetApicTimerCurrentCount () - Ticks) & PowerOfTwoCounter) == 0) {
-    CpuPause ();
-  }
+  StartTick  = GetApicTimerCurrentCount ();
+  do {
+    //
+    // Wait until time out by Delay value
+    //
+    do {
+      CpuPause ();
+      //
+      // Get Ticks from Start to Current.
+      //
+      Ticks = StartTick - GetApicTimerCurrentCount ();
+      //
+      // Ticks < 0 means Timer wrap-arounds happens.
+      //
+      if (Ticks < 0) {
+        Ticks += InitCount;
+      }
+    } while ((UINT32)Ticks < Delay);
+
+    //
+    // Update StartTick and Delay for next delay slot
+    //
+    StartTick -= (StartTick > Delay) ?  Delay : (Delay - InitCount);
+    Delay      = InitCount / 2;
+  } while (Times-- > 0);
 }
 
 /**
@@ -181,10 +208,6 @@ GetPerformanceCounterProperties (
 {
   if (StartValue != NULL) {
     *StartValue = (UINT64)GetApicTimerInitCount ();
-    //
-    // make sure StartValue is all 1s from High Bit
-    //
-    ASSERT ((*StartValue & (*StartValue + 1)) == 0);
   }
 
   if (EndValue != NULL) {
