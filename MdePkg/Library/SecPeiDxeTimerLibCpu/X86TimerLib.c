@@ -1,7 +1,7 @@
 /** @file
   Timer Library functions built upon local APIC on IA32/x64.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -88,6 +88,22 @@ InternalX86GetTimerTick (
 }
 
 /**
+  Internal function to read the initial timer count of local APIC.
+
+  @param  ApicBase  The base address of memory mapped registers of local APIC.
+
+  @return The initial timer count read.
+
+**/
+UINT32
+InternalX86GetInitTimerCount (
+  IN      UINTN                     ApicBase
+  )
+{
+  return MmioRead32 (ApicBase + APIC_TMICT);
+}
+
+/**
   Stalls the CPU for at least the given number of ticks.
 
   Stalls the CPU for at least the given number of ticks. It's invoked by
@@ -105,22 +121,49 @@ InternalX86Delay (
   )
 {
   INT32                             Ticks;
-  UINT32                            PowerOfTwoCounter;
+  UINT32                            Times;
+  UINT32                            InitCount;
+  UINT32                            StartTick;
 
   //
-  // The target timer count is calculated here
+  // In case Delay is too larger, separate it into several small delay slot.
+  // Devided Delay by half value of Init Count is to avoid Delay close to
+  // the Init Count, timeout maybe missing if the time consuming between 2
+  // GetApicTimerCurrentCount() invoking is larger than the time gap between
+  // Delay and the Init Count.
   //
-  Ticks = InternalX86GetTimerTick (ApicBase) - Delay;
+  InitCount = InternalX86GetInitTimerCount (ApicBase);
+  Times     = Delay / (InitCount / 2);
+  Delay     = Delay % (InitCount / 2);
 
   //
-  // Wait until time out
-  // Delay > 2^31 could not be handled by this function
-  // Timer wrap-arounds are handled correctly by this function
+  // Get Start Tick and do delay
   //
-  PowerOfTwoCounter = GetPowerOfTwo32 (MmioRead32 (ApicBase + APIC_TMICT));
-  while (((UINT32)(InternalX86GetTimerTick (ApicBase) - Ticks) & PowerOfTwoCounter) == 0) {
-    CpuPause ();
-  }
+  StartTick  = InternalX86GetTimerTick (ApicBase);
+  do {
+    //
+    // Wait until time out by Delay value
+    //
+    do {
+      CpuPause ();
+      //
+      // Get Ticks from Start to Current.
+      //
+      Ticks = StartTick - InternalX86GetTimerTick (ApicBase);
+      //
+      // Ticks < 0 means Timer wrap-arounds happens.
+      //
+      if (Ticks < 0) {
+        Ticks += InitCount;
+      }
+    } while ((UINT32)Ticks < Delay);
+
+    //
+    // Update StartTick and Delay for next delay slot
+    //
+    StartTick -= (StartTick > Delay) ?  Delay : (Delay - InitCount);
+    Delay      = InitCount / 2;
+  } while (Times-- > 0);
 }
 
 /**
@@ -242,11 +285,7 @@ GetPerformanceCounterProperties (
   ApicBase = InternalX86GetApicBase ();
 
   if (StartValue != NULL) {
-    *StartValue = MmioRead32 (ApicBase + APIC_TMICT);
-    //
-    // make sure StartValue is all 1s from High Bit
-    //
-    ASSERT ((*StartValue & (*StartValue + 1)) == 0);
+    *StartValue = (UINT64)InternalX86GetInitTimerCount (ApicBase);
   }
 
   if (EndValue != NULL) {
