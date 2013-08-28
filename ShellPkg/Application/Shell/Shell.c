@@ -2,6 +2,7 @@
   This is THE shell (application)
 
   Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2013, Hewlett-Packard Development Company, L.P.
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1359,7 +1360,7 @@ RunCommand(
   UINTN                     Argc;
   CHAR16                    **Argv;
   BOOLEAN                   LastError;
-  CHAR16                    LeString[11];
+  CHAR16                    LeString[19];
   CHAR16                    *PostAliasCmdLine;
   UINTN                     PostAliasSize;
   CHAR16                    *PostVariableCmdLine;
@@ -1556,7 +1557,7 @@ RunCommand(
         if (!EFI_ERROR(Status))  {
           Status = ShellCommandRunCommandHandler(ShellInfoObject.NewShellParametersProtocol->Argv[0], &ShellStatus, &LastError);
           ASSERT_EFI_ERROR(Status);
-          UnicodeSPrint(LeString, sizeof(LeString)*sizeof(LeString[0]), L"0x%08x", ShellStatus);
+          UnicodeSPrint(LeString, sizeof(LeString), L"0x%08Lx", ShellStatus);
           DEBUG_CODE(InternalEfiShellSetEnv(L"DebugLasterror", LeString, TRUE););
           if (LastError) {
             InternalEfiShellSetEnv(L"Lasterror", LeString, TRUE);
@@ -1607,7 +1608,7 @@ RunCommand(
             //
             // Updatet last error status.
             //
-            UnicodeSPrint(LeString, sizeof(LeString)*sizeof(LeString[0]), L"0x%08x", StatusCode);
+            UnicodeSPrint(LeString, sizeof(LeString), L"0x%08Lx", StatusCode);
             DEBUG_CODE(InternalEfiShellSetEnv(L"DebugLasterror", LeString, TRUE););
             InternalEfiShellSetEnv(L"Lasterror", LeString, TRUE);
           }
@@ -1909,7 +1910,7 @@ RunScriptFileHandle (
         }
 
         if (ShellCommandGetScriptExit()) {
-          UnicodeSPrint(LeString, sizeof(LeString)*sizeof(LeString[0]), L"0x%Lx", ShellCommandGetExitCode());
+          UnicodeSPrint(LeString, sizeof(LeString), L"0x%Lx", ShellCommandGetExitCode());
           DEBUG_CODE(InternalEfiShellSetEnv(L"DebugLasterror", LeString, TRUE););
           InternalEfiShellSetEnv(L"Lasterror", LeString, TRUE);
 
