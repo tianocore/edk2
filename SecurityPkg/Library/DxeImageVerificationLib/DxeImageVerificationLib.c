@@ -1086,6 +1086,14 @@ DxeImageVerificationHandler (
     return EFI_ACCESS_DENIED;
   }
 
+  //
+  // The policy QUERY_USER_ON_SECURITY_VIOLATION violates the UEFI spec and has been removed.
+  //
+  ASSERT (Policy != QUERY_USER_ON_SECURITY_VIOLATION);
+  if (Policy == QUERY_USER_ON_SECURITY_VIOLATION) {
+    CpuDeadLoop ();
+  }
+
   GetEfiGlobalVariable2 (EFI_SECURE_BOOT_MODE_NAME, (VOID**)&SecureBoot, NULL);
   //
   // Skip verification if SecureBoot variable doesn't exist.

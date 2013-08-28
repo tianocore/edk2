@@ -87,7 +87,8 @@
   #  DEFER_EXECUTE_ON_SECURITY_VIOLATION    0x00000003
   #  DENY_EXECUTE_ON_SECURITY_VIOLATION     0x00000004
   #  QUERY_USER_ON_SECURITY_VIOLATION       0x00000005 
-  gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x00|UINT32|0x00000001
+  #  NOTE: Do NOT use QUERY_USER_ON_SECURITY_VIOLATION since it violates the UEFI specification and has been removed.
+  gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x04|UINT32|0x00000001
   
   ## Pcd for removable media.
   #  Removable media include CD-ROM, Floppy, USB and network.
@@ -98,7 +99,8 @@
   #  DEFER_EXECUTE_ON_SECURITY_VIOLATION    0x00000003
   #  DENY_EXECUTE_ON_SECURITY_VIOLATION     0x00000004
   #  QUERY_USER_ON_SECURITY_VIOLATION       0x00000005
-  gEfiSecurityPkgTokenSpaceGuid.PcdRemovableMediaImageVerificationPolicy|0x05|UINT32|0x00000002
+  #  NOTE: Do NOT use QUERY_USER_ON_SECURITY_VIOLATION since it violates the UEFI specification and has been removed.
+  gEfiSecurityPkgTokenSpaceGuid.PcdRemovableMediaImageVerificationPolicy|0x04|UINT32|0x00000002
   
   ## Pcd for fixed media.
   #  Fixed media include hard disk.
@@ -109,7 +111,8 @@
   #  DEFER_EXECUTE_ON_SECURITY_VIOLATION    0x00000003
   #  DENY_EXECUTE_ON_SECURITY_VIOLATION     0x00000004
   #  QUERY_USER_ON_SECURITY_VIOLATION       0x00000005  
-  gEfiSecurityPkgTokenSpaceGuid.PcdFixedMediaImageVerificationPolicy|0x05|UINT32|0x00000003
+  #  NOTE: Do NOT use QUERY_USER_ON_SECURITY_VIOLATION since it violates the UEFI specification and has been removed.
+  gEfiSecurityPkgTokenSpaceGuid.PcdFixedMediaImageVerificationPolicy|0x04|UINT32|0x00000003
   
   ## Defer Image Load policy settings.
   #  The policy is bitwise. 
