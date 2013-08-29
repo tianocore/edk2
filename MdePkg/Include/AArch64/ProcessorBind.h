@@ -32,7 +32,7 @@
 
 #if _MSC_EXTENSIONS
   //
-  // use Microsoft* C complier dependent interger width types
+  // use Microsoft* C complier dependent integer width types 
   //
   typedef unsigned __int64    UINT64;
   typedef __int64             INT64;
@@ -44,10 +44,11 @@
   typedef unsigned char       BOOLEAN;
   typedef unsigned char       UINT8;
   typedef char                CHAR8;
-  typedef char                INT8;
+  typedef signed char         INT8;
 #else
   //
   // Assume standard AARCH64 alignment.
+  //
   typedef unsigned long long  UINT64;
   typedef long long           INT64;
   typedef unsigned int        UINT32;
@@ -58,7 +59,7 @@
   typedef unsigned char       BOOLEAN;
   typedef unsigned char       UINT8;
   typedef char                CHAR8;
-  typedef char                INT8;
+  typedef signed char         INT8;
 #endif
 
 ///
@@ -80,17 +81,23 @@ typedef INT64   INTN;
 ///
 /// A value of native width with the highest bit set.
 ///
-#define MAX_BIT      0x8000000000000000
+#define MAX_BIT     0x8000000000000000ULL
 
 ///
 /// A value of native width with the two highest bits set.
 ///
-#define MAX_2_BITS   0xC000000000000000
+#define MAX_2_BITS  0xC000000000000000ULL
 
 ///
 /// Maximum legal AARCH64  address
 ///
-#define MAX_ADDRESS  0xFFFFFFFFFFFFFFFF
+#define MAX_ADDRESS   0xFFFFFFFFFFFFFFFFULL
+
+///
+/// Maximum legal AArch64 INTN and UINTN values.
+///
+#define MAX_INTN   ((INTN)0x7FFFFFFFFFFFFFFFULL)
+#define MAX_UINTN  ((UINTN)0xFFFFFFFFFFFFFFFFULL)
 
 ///
 /// The stack alignment required for AARCH64
