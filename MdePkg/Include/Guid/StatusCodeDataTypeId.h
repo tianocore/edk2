@@ -1,7 +1,7 @@
 /** @file
   GUID used to identify id for the caller who is initiating the Status Code.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -148,12 +148,12 @@ typedef struct {
   ///
   EFI_STATUS_CODE_DATA                 DataHeader;
   ///
-  /// The device path to the controller or the hardware device. Note that this parameter is a
-  /// variable-length device path structure and not a pointer to such a structure. This
-  /// structure is populated only if it is a physical device. For virtual devices, the Size
-  /// field in DataHeader is set to zero and this field is not populated.
+  /// The device path to the controller or the hardware device. Note that this parameter is a 
+  /// variable-length device path structure and not a pointer to such a structure. This structure is
+  /// populated only if it is a physical device. For virtual devices, the Size field in DataHeader
+  /// is set to zero and this field is not populated.
   ///
-  UINT8                                *DevicePath;
+  //  EFI_DEVICE_PATH_PROTOCOL         DevicePath;
 } EFI_DEVICE_PATH_EXTENDED_DATA;
 
 ///
@@ -223,21 +223,21 @@ typedef struct {
   ///
   UINT16                             AllocResSize;
   ///
-  /// The device path to the controller or the hardware device that did not get the requested
-  /// resources. Note that this parameter is the variable-length device path structure and not
-  /// a pointer to this structure.
+  /// The device path to the controller or the hardware device that did not get the requested 
+  /// resources. Note that this parameter is the variable-length device path structure and not 
+  /// a pointer to this structure. 
   ///
-  UINT8                              *DevicePath;
+  //  EFI_DEVICE_PATH_PROTOCOL       DevicePath;
   ///
   /// The requested resources in the format of an ACPI 2.0 resource descriptor. This
   /// parameter is not a pointer; it is the complete resource descriptor.
   ///
-  UINT8                              *ReqRes;
+  //  UINT8                          ReqRes[…];
   ///
-  /// The allocated resources in the format of an ACPI 2.0 resource descriptor. This
+  /// The allocated resources in the format of an ACPI 2.0 resource descriptor. This 
   /// parameter is not a pointer; it is the complete resource descriptor.
   ///
-  UINT8                              *AllocRes;
+  //  UINT8                          AllocRes[…];
 } EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA;
 
 ///
@@ -752,11 +752,11 @@ typedef struct {
   ///
   UINT16                         DevicePathSize;
   ///
-  /// Matches the RemainingDevicePath parameter being passed to the Start() 
-  /// function. Note that this parameter is the variable-length device path and not a pointer 
+  /// Matches the RemainingDevicePath parameter being passed to the Start() function. 
+  /// Note that this parameter is the variable-length device path and not a pointer 
   /// to the device path.
   ///  
-  UINT8                          *RemainingDevicePath;
+  //  EFI_DEVICE_PATH_PROTOCOL   RemainingDevicePath;
 } EFI_STATUS_CODE_START_EXTENDED_DATA;
 
 ///
