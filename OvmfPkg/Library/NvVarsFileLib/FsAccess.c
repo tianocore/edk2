@@ -1,7 +1,7 @@
 /** @file
   File System Access for NvVarsFileLib
 
-  Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -276,6 +276,39 @@ ReadNvVarsFile (
 
 
 /**
+  Writes a variable to indicate that the NV variables
+  have been loaded from the file system.
+
+**/
+STATIC
+VOID
+SetNvVarsVariable (
+  VOID
+  )
+{
+  BOOLEAN                        VarData;
+  UINTN                          Size;
+
+  //
+  // Write a variable to indicate we've already loaded the
+  // variable data.  If it is found, we skip the loading on
+  // subsequent attempts.
+  //
+  Size = sizeof (VarData);
+  VarData = TRUE;
+  gRT->SetVariable (
+         L"NvVars",
+         &gEfiSimpleFileSystemProtocolGuid,
+         EFI_VARIABLE_NON_VOLATILE |
+           EFI_VARIABLE_BOOTSERVICE_ACCESS |
+           EFI_VARIABLE_RUNTIME_ACCESS,
+         Size,
+         (VOID*) &VarData
+         );
+}
+
+
+/**
   Loads the non-volatile variables from the NvVars file on the
   given file system.
 
@@ -332,17 +365,7 @@ LoadNvVarsFromFs (
   // variable data.  If it is found, we skip the loading on
   // subsequent attempts.
   //
-  Size = sizeof (VarData);
-  VarData = TRUE;
-  gRT->SetVariable (
-         L"NvVars",
-         &gEfiSimpleFileSystemProtocolGuid,
-         EFI_VARIABLE_NON_VOLATILE |
-           EFI_VARIABLE_BOOTSERVICE_ACCESS |
-           EFI_VARIABLE_RUNTIME_ACCESS,
-         Size,
-         (VOID*) &VarData
-         );
+  SetNvVarsVariable();
 
   DEBUG ((
     EFI_D_INFO,
@@ -475,6 +498,13 @@ SaveNvVarsToFs (
   FileHandleClose (File);
 
   if (!EFI_ERROR (Status)) {
+    //
+    // Write a variable to indicate we've already loaded the
+    // variable data.  If it is found, we skip the loading on
+    // subsequent attempts.
+    //
+    SetNvVarsVariable();
+
     DEBUG ((EFI_D_INFO, "Saved NV Variables to NvVars file\n"));
   }
 
