@@ -1,7 +1,7 @@
 /** @file
   Main Header file for the MMC DXE driver
 
-  Copyright (c) 2011, ARM Limited. All rights reserved.
+  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
   
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
@@ -24,6 +24,7 @@
 #include <Protocol/MmcHost.h>
 
 #include <Library/UefiLib.h>
+#include <Library/DebugLib.h>
 
 #define MMC_TRACE(txt)  DEBUG((EFI_D_BLKIO, "MMC: " txt "\n"))
 
@@ -297,6 +298,31 @@ EFIAPI
 CheckCardsCallback (
   IN  EFI_EVENT   Event,
   IN  VOID        *Context
+  );
+
+VOID
+PrintCSD (
+  IN UINT32* Csd
+  );
+
+VOID
+PrintRCA (
+  IN UINT32 Rca
+  );
+
+VOID
+PrintOCR (
+  IN UINT32 Ocr
+  );
+
+VOID
+PrintResponseR1 (
+  IN  UINT32 Response
+  );
+
+VOID
+PrintCID (
+  IN UINT32* Cid
   );
 
 #endif

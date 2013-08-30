@@ -1,7 +1,7 @@
 /** @file
   Main file of the MMC Dxe driver. The driver entrypoint is defined into this file.
 
-  Copyright (c) 2011, ARM Limited. All rights reserved.
+  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
   
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
@@ -14,14 +14,12 @@
 **/
 
 #include <Protocol/DevicePath.h>
-#include <Protocol/MmcHost.h>
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DevicePathLib.h>
-#include <Library/DebugLib.h>
 
 #include "Mmc.h"
 
