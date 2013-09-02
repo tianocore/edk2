@@ -468,6 +468,7 @@
   Arm/GetInterruptsState.asm | RVCT
   Arm/CpuPause.asm           | RVCT
   Arm/CpuBreakpoint.asm      | RVCT
+  Arm/MemoryFence.asm        | RVCT
  
   Arm/Math64.S                  | GCC
   Arm/SwitchStack.S             | GCC
@@ -476,12 +477,14 @@
   Arm/GetInterruptsState.S      | GCC
   Arm/SetJumpLongJump.S         | GCC
   Arm/CpuBreakpoint.S           | GCC
+  Arm/MemoryFence.S             | GCC
 
 [Sources.AARCH64]
   Arm/InternalSwitchStack.c
   Arm/Unaligned.c
   Math64.c
 
+  AArch64/MemoryFence.S             | GCC
   AArch64/SwitchStack.S             | GCC
   AArch64/EnableInterrupts.S        | GCC
   AArch64/DisableInterrupts.S       | GCC
