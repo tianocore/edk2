@@ -768,7 +768,7 @@ GetMemoryRegionPage (
   PageAttributes = ConvertSectionAttributesToPageAttributes (*RegionAttributes, 0);
 
   // Calculate index into first level translation table for start of modification
-  TableIndex = TT_DESCRIPTOR_PAGE_BASE_ADDRESS(*BaseAddress) >> TT_DESCRIPTOR_PAGE_BASE_SHIFT;
+  TableIndex = ((*BaseAddress) & TT_DESCRIPTOR_PAGE_INDEX_MASK)  >> TT_DESCRIPTOR_PAGE_BASE_SHIFT;
   ASSERT (TableIndex < TRANSLATION_TABLE_PAGE_COUNT);
 
   // Go through the page table to find the end of the section
@@ -838,7 +838,7 @@ GetMemoryRegion (
     PageTable = (UINT32*)(SectionDescriptor & TT_DESCRIPTOR_SECTION_PAGETABLE_ADDRESS_MASK);
 
     // Calculate index into first level translation table for start of modification
-    PageTableIndex = TT_DESCRIPTOR_PAGE_BASE_ADDRESS (*BaseAddress) >> TT_DESCRIPTOR_PAGE_BASE_SHIFT;
+    PageTableIndex = ((*BaseAddress) & TT_DESCRIPTOR_PAGE_INDEX_MASK)  >> TT_DESCRIPTOR_PAGE_BASE_SHIFT;
     ASSERT (PageTableIndex < TRANSLATION_TABLE_PAGE_COUNT);
 
     PageAttributes = PageTable[PageTableIndex] & TT_DESCRIPTOR_PAGE_ATTRIBUTE_MASK;
