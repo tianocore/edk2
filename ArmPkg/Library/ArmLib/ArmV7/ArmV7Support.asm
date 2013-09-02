@@ -209,7 +209,7 @@ ArmSetLowVectors
 
 ArmSetHighVectors
   mrc     p15, 0, r0, c1, c0, 0 ; Read SCTLR into R0 (Read control register configuration data)
-  orr     r0, r0, #0x00002000   ; clear V bit
+  orr     r0, r0, #0x00002000   ; Set V bit
   mcr     p15, 0, r0, c1, c0, 0 ; Write R0 into SCTLR (Write control register configuration data)
   isb
   bx      LR
