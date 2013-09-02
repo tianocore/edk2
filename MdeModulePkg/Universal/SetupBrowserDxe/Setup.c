@@ -1255,13 +1255,6 @@ GetQuestionValue (
   }
 
   //
-  // Statement don't have storage, skip them
-  //
-  if (Question->QuestionId == 0) {
-    return Status;
-  }
-
-  //
   // Question value is provided by an Expression, evaluate it
   //
   if (Question->ValueExpression != NULL) {
@@ -1674,13 +1667,6 @@ SetQuestionValue (
 
   if (SetValueTo >= GetSetValueWithMax) {
     return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Statement don't have storage, skip them
-  //
-  if (Question->QuestionId == 0) {
-    return Status;
   }
 
   //
