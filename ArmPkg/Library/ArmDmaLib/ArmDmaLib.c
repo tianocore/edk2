@@ -131,7 +131,7 @@ DmaMap (
 
     if ((Operation == MapOperationBusMasterRead) || (Operation == MapOperationBusMasterCommonBuffer)) {
       // In case the buffer is used for instance to send command to a PCI controller, we must ensure the memory is uncached
-      Status = gDS->SetMemorySpaceAttributes (ALIGN_VALUE(*DeviceAddress - BASE_4KB - 1,BASE_4KB), ALIGN_VALUE(*NumberOfBytes,BASE_4KB), EFI_MEMORY_WC);
+      Status = gDS->SetMemorySpaceAttributes (*DeviceAddress & ~(BASE_4KB - 1), ALIGN_VALUE (*NumberOfBytes, BASE_4KB), EFI_MEMORY_WC);
       ASSERT_EFI_ERROR (Status);
     }
   }
