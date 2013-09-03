@@ -30,3 +30,5 @@
 [Binaries.ARM]
   PE32|Arm/Shell.efi|*
 
+[Binaries.AArch64]
+  PE32|AArch64/Shell.efi|*
