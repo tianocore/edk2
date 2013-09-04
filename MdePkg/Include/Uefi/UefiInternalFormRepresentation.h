@@ -3,7 +3,7 @@
   IFR is primarily consumed by the EFI presentation engine, and produced by EFI
   internal application and drivers as well as all add-in card option-ROM drivers
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -779,6 +779,7 @@ typedef union {
 #define EFI_IFR_SECURITY_OP            0x60
 #define EFI_IFR_MODAL_TAG_OP           0x61
 #define EFI_IFR_REFRESH_ID_OP          0x62
+#define EFI_IFR_WARNING_IF_OP          0x63
 
 //
 // Definitions of IFR Standard Headers
@@ -1125,6 +1126,12 @@ typedef struct _EFI_IFR_NO_SUBMIT_IF {
   EFI_IFR_OP_HEADER        Header;
   EFI_STRING_ID            Error;
 } EFI_IFR_NO_SUBMIT_IF;
+
+typedef struct _EFI_IFR_WARNING_IF {
+  EFI_IFR_OP_HEADER        Header;
+  EFI_STRING_ID            Warning;
+  UINT8                    TimeOut;
+} EFI_IFR_WARNING_IF;
 
 typedef struct _EFI_IFR_REFRESH {
   EFI_IFR_OP_HEADER        Header;
