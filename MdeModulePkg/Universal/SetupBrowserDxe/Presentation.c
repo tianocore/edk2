@@ -52,6 +52,7 @@ EvaluateFormExpressions (
 
     if (Expression->Type == EFI_HII_EXPRESSION_INCONSISTENT_IF ||
         Expression->Type == EFI_HII_EXPRESSION_NO_SUBMIT_IF ||
+        Expression->Type == EFI_HII_EXPRESSION_WARNING_IF ||
         Expression->Type == EFI_HII_EXPRESSION_WRITE ||
         (Expression->Type == EFI_HII_EXPRESSION_READ && Form->FormType != STANDARD_MAP_FORM_TYPE)) {
       //
@@ -228,13 +229,15 @@ CreateRefreshEvent (
   Perform value check for a question.
   
   @param  Question       The question need to do check.
+  @param  Type           Condition type need to check.
   @param  ErrorInfo      Return info about the error.
   
   @retval  The check result.
 **/
 UINT32
-InConsistentIfCheck (
+ConditionCheck (
   IN  FORM_BROWSER_STATEMENT        *Question,
+  IN  UINT8                         Type,
   OUT STATEMENT_ERROR_INFO          *ErrorInfo
   )
 {
@@ -245,8 +248,23 @@ InConsistentIfCheck (
   UINT32                  RetVal;
 
   RetVal     = STATEMENT_VALID;
-  ListHead   = &Question->InconsistentListHead;
+  ListHead   = NULL;
 
+  switch (Type) {
+  case EFI_HII_EXPRESSION_INCONSISTENT_IF:
+    ListHead = &Question->InconsistentListHead;
+    break;
+
+  case EFI_HII_EXPRESSION_WARNING_IF:
+    ListHead = &Question->WarningListHead;
+    break;
+
+  default:
+    ASSERT (FALSE);
+    return RetVal;
+  }
+
+  ASSERT (ListHead != NULL);
   Link = GetFirstNode (ListHead);
   while (!IsNull (ListHead, Link)) {
     Expression = FORM_EXPRESSION_FROM_LINK (Link);
@@ -262,8 +280,21 @@ InConsistentIfCheck (
 
     if ((Expression->Result.Type == EFI_IFR_TYPE_BOOLEAN) && Expression->Result.Value.b) {
       ErrorInfo->StringId = Expression->Error;
-      ErrorInfo->TimeOut  = 0;
-      RetVal              = INCOSISTENT_IF_TRUE;
+      switch (Type) {
+      case EFI_HII_EXPRESSION_INCONSISTENT_IF:
+        ErrorInfo->TimeOut  = 0;
+        RetVal              = INCOSISTENT_IF_TRUE;
+        break;
+
+      case EFI_HII_EXPRESSION_WARNING_IF:
+        ErrorInfo->TimeOut  = Expression->TimeOut;
+        RetVal              = WARNING_IF_TRUE;
+        break;
+
+      default:
+        ASSERT (FALSE);
+        break;
+      }
       break;
     }
   }
@@ -324,7 +355,14 @@ QuestionCheck (
   // Do the inconsistentif check.
   //
   if (!IsListEmpty (&Question->InconsistentListHead)) {
-    RetVal = InConsistentIfCheck(Question, ErrorInfo);
+    RetVal = ConditionCheck(Question, EFI_HII_EXPRESSION_INCONSISTENT_IF, ErrorInfo);
+  }
+
+  //
+  // Do the warningif check.
+  //
+  if (RetVal == STATEMENT_VALID && !IsListEmpty (&Question->WarningListHead)) {
+    RetVal = ConditionCheck(Question, EFI_HII_EXPRESSION_WARNING_IF, ErrorInfo);
   }
 
   //
@@ -456,7 +494,7 @@ InitializeDisplayStatement (
   //
   // Save the validate check question for later use.
   //
-  if (!IsListEmpty (&Statement->InconsistentListHead)) {
+  if (!IsListEmpty (&Statement->InconsistentListHead) || !IsListEmpty (&Statement->WarningListHead)) {
     DisplayStatement->ValidateQuestion = QuestionCheck;
   }
 

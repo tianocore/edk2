@@ -106,6 +106,7 @@ typedef struct {
 #define EFI_HII_EXPRESSION_RULE              6
 #define EFI_HII_EXPRESSION_READ              7
 #define EFI_HII_EXPRESSION_WRITE             8
+#define EFI_HII_EXPRESSION_WARNING_IF        9
 
 #define EFI_HII_VARSTORE_BUFFER              0
 #define EFI_HII_VARSTORE_NAME_VALUE          1
@@ -223,6 +224,8 @@ typedef struct {
   EFI_STRING_ID     Error;           // For EFI_IFR_NO_SUBMIT_IF, EFI_IFR_INCONSISTENT_IF only
 
   EFI_HII_VALUE     Result;          // Expression evaluation result
+
+  UINT8             TimeOut;         // For EFI_IFR_WARNING_IF
 
   LIST_ENTRY        OpCodeListHead;  // OpCodes consist of this expression (EXPRESSION_OPCODE)
 } FORM_EXPRESSION;
@@ -351,6 +354,7 @@ typedef struct {
 
   LIST_ENTRY            InconsistentListHead;// nested inconsistent expression list (FORM_EXPRESSION)
   LIST_ENTRY            NoSubmitListHead;    // nested nosubmit expression list (FORM_EXPRESSION)
+  LIST_ENTRY            WarningListHead;     // nested warning expression list (FORM_EXPRESSION)
   FORM_EXPRESSION_LIST  *Expression;         // nesting inside of GrayOutIf/DisableIf/SuppressIf
 
   FORM_EXPRESSION       *ReadExpression;     // nested EFI_IFR_READ, provide this question value by read expression.

@@ -54,6 +54,7 @@ CreateStatement (
   InitializeListHead (&Statement->OptionListHead);
   InitializeListHead (&Statement->InconsistentListHead);
   InitializeListHead (&Statement->NoSubmitListHead);
+  InitializeListHead (&Statement->WarningListHead);
 
   Statement->Signature = FORM_BROWSER_STATEMENT_SIGNATURE;
 
@@ -810,6 +811,17 @@ DestroyStatement (
   //
   while (!IsListEmpty (&Statement->NoSubmitListHead)) {
     Link = GetFirstNode (&Statement->NoSubmitListHead);
+    Expression = FORM_EXPRESSION_FROM_LINK (Link);
+    RemoveEntryList (&Expression->Link);
+
+    DestroyExpression (Expression);
+  }
+
+  //
+  // Free WarningIf List
+  //
+  while (!IsListEmpty (&Statement->WarningListHead)) {
+    Link = GetFirstNode (&Statement->WarningListHead);
     Expression = FORM_EXPRESSION_FROM_LINK (Link);
     RemoveEntryList (&Expression->Link);
 
@@ -2020,6 +2032,25 @@ ParseOpCodes (
       }
       break;
 
+    case EFI_IFR_WARNING_IF_OP:
+      //
+      // Create an Expression node
+      //
+      CurrentExpression = CreateExpression (CurrentForm);
+      CopyMem (&CurrentExpression->Error, &((EFI_IFR_WARNING_IF *) OpCodeData)->Warning, sizeof (EFI_STRING_ID));
+      CurrentExpression->TimeOut = ((EFI_IFR_WARNING_IF *) OpCodeData)->TimeOut;
+      CurrentExpression->Type    = EFI_HII_EXPRESSION_WARNING_IF;
+      InsertTailList (&CurrentStatement->WarningListHead, &CurrentExpression->Link);
+
+      //
+      // Take a look at next OpCode to see whether current expression consists
+      // of single OpCode
+      //
+      if (((EFI_IFR_OP_HEADER *) (OpCodeData + OpCodeLength))->Scope == 0) {
+        SingleOpCodeExpression = TRUE;
+      }
+      break;
+
     case EFI_IFR_SUPPRESS_IF_OP:
       //
       // Question and Option will appear in scope of this OpCode
@@ -2327,6 +2358,7 @@ ParseOpCodes (
 
       case EFI_IFR_NO_SUBMIT_IF_OP:
       case EFI_IFR_INCONSISTENT_IF_OP:
+      case EFI_IFR_WARNING_IF_OP:
         //
         // Ignore end of EFI_IFR_NO_SUBMIT_IF and EFI_IFR_INCONSISTENT_IF
         //
