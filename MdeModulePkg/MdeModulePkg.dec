@@ -574,9 +574,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleCoalesceFile|{ 0xA6, 0xE4, 0xFD, 0xF7, 0x4C, 0x29, 0x3c, 0x49, 0xB5, 0x0F, 0x97, 0x34, 0x55, 0x3B, 0xB7, 0x57 }|VOID*|0x30000017
 
   ## Flag of enabling/disabling the feature of Loading Module at Fixed Address 
-  #  -1: Enable the feature as fixed offset to TOLM
-  #   0: Disable the feature.
-  #  Positive Value:  Enable the feature as fixed absolute address, and the value is the top memory address 
+  #  0xFFFFFFFFFFFFFFFF: Enable the feature as fixed offset to TOLM
+  #  0:                  Disable the feature
+  #  Other Value:        Enable the feature as fixed absolute address, and the value is the top memory address 
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable|0|UINT64|0x30001015
 
   ## Smbios version
