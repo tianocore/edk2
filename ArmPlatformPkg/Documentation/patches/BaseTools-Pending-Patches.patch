@@ -1,93 +1,152 @@
-Index: BaseTools/Conf/tools_def.template
-===================================================================
---- BaseTools/Conf/tools_def.template	(revision 13864)
-+++ BaseTools/Conf/tools_def.template	(working copy)
-@@ -2541,7 +2541,7 @@
- DEFINE GCC_IA32_CC_FLAGS           = DEF(GCC_ALL_CC_FLAGS) -m32 -malign-double -freorder-blocks -freorder-blocks-and-partition -O2 -mno-stack-arg-probe
- DEFINE GCC_X64_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -mno-red-zone -Wno-address -mno-stack-arg-probe
- DEFINE GCC_IPF_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -minline-int-divide-min-latency
--DEFINE GCC_ARMGCC_CC_FLAGS         = DEF(GCC_ALL_CC_FLAGS) -mword-relocations -mlittle-endian -mabi=aapcs -mapcs -fno-short-enums -save-temps -fsigned-char  -ffunction-sections -fdata-sections -fomit-frame-pointer
-+DEFINE GCC_ARMGCC_CC_FLAGS         = DEF(GCC_ALL_CC_FLAGS) -mword-relocations -mlittle-endian -mabi=aapcs -mapcs -fno-short-enums -save-temps -fsigned-char  -ffunction-sections -fdata-sections -fomit-frame-pointer -Wno-address
- DEFINE GCC_DLINK_FLAGS_COMMON      = -nostdlib --pie
- DEFINE GCC_IA32_X64_DLINK_COMMON   = DEF(GCC_DLINK_FLAGS_COMMON) --gc-sections
- DEFINE GCC_IA32_X64_ASLDLINK_FLAGS = DEF(GCC_IA32_X64_DLINK_COMMON) --entry _ReferenceAcpiTable -u $(IMAGE_ENTRY_POINT)
-@@ -4628,7 +4628,8 @@
- #
- ####################################################################################
+From 7686eed1a9ed96791cfa65ec5b2f5fdaca538e53 Mon Sep 17 00:00:00 2001
+From: Olivier Martin <olivier.martin@arm.com>
+Date: Tue, 11 Jun 2013 10:56:12 +0100
+Subject: [PATCH 3/8] BaseTools/GenFw: Set the PE/COFF attribute BaseOfCode with the address of the first '.text' section
+
+Before this change the alignment of the first code section was not taken into account.
+
+Change-Id: I6e6b07edb2f7e7179c9467b43857c44a8309cb68
+Contributed-under: TianoCore Contribution Agreement 1.0
+Signed-off-by: Olivier Martin <olivier.martin@arm.com>
+---
+ BaseTools/Source/C/GenFw/Elf32Convert.c |   20 +++++++++++++++++++-
+ BaseTools/Source/C/GenFw/Elf64Convert.c |   19 ++++++++++++++++++-
+ 2 files changed, 37 insertions(+), 2 deletions(-)
+ mode change 100644 => 100755 BaseTools/Source/C/GenFw/Elf32Convert.c
+ mode change 100644 => 100755 BaseTools/Source/C/GenFw/Elf64Convert.c
+
+diff --git a/BaseTools/Source/C/GenFw/Elf32Convert.c b/BaseTools/Source/C/GenFw/Elf32Convert.c
+old mode 100644
+new mode 100755
+index ddb45ac..58ac333
+--- a/BaseTools/Source/C/GenFw/Elf32Convert.c
++++ b/BaseTools/Source/C/GenFw/Elf32Convert.c
+@@ -1,6 +1,7 @@
+ /** @file
  
--DEFINE RVCT_ALL_CC_FLAGS   = --c90 -c --no_autoinline --asm --gnu --apcs /interwork --signed_chars --no_unaligned_access --split_sections --enum_is_int --preinclude AutoGen.h --diag_warning 167 --diag_style=ide
-+DEFINE RVCT_ALL_ASM_FLAGS   = --diag_suppress=1786 --diag_error=warning --apcs /interwork
-+DEFINE RVCT_ALL_CC_FLAGS   = --c90 -c --no_autoinline --asm --gnu --apcs /interwork --signed_chars --no_unaligned_access --split_sections --enum_is_int --preinclude AutoGen.h --diag_suppress=186 --diag_warning 167 --diag_error=warning --diag_style=ide
- DEFINE RVCT_ALL_DLINK_FLAGS   = --ro-base 0 --no_scanlib --reloc --no_exceptions --datacompressor off --strict --symbols --diag_style=ide
+ Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
++Portions copyright (c) 2013, ARM Ltd. All rights reserved.<BR>
  
- ####################################################################################
-@@ -4652,13 +4653,13 @@
- RELEASE_RVCT_ARM_DLINK_FLAGS     = $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list $(DEST_DIR_DEBUG)/$(BASE_NAME).map 
+ This program and the accompanying materials are licensed and made available
+ under the terms and conditions of the BSD License which accompanies this
+@@ -18,6 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+ #include <windows.h>
+ #include <io.h>
+ #endif
++#include <assert.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -264,9 +266,12 @@ ScanSections32 (
+   EFI_IMAGE_OPTIONAL_HEADER_UNION *NtHdr;
+   UINT32                          CoffEntry;
+   UINT32                          SectionCount;
++  BOOLEAN                         FoundText;
  
+   CoffEntry = 0;
+   mCoffOffset = 0;
++  mTextOffset = 0;
++  FoundText = FALSE;
  
--*_RVCT_ARM_ASM_FLAGS       = $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) --apcs /interwork
-+*_RVCT_ARM_ASM_FLAGS       = $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_ASM_FLAGS)
- *_RVCT_ARM_PP_FLAGS        = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E
- *_RVCT_ARM_VFRPP_FLAGS     = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E  -DVFRCOMPILE --preinclude $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
- *_RVCT_ARM_MAKE_PATH       = nmake /NOLOGO
- *_RVCT_ARM_SLINK_FLAGS     = --partial -o
-   DEBUG_RVCT_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_CC_FLAGS) -O1 -g
--RELEASE_RVCT_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_CC_FLAGS) -O2
-+RELEASE_RVCT_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --diag_suppress=550 DEF(RVCT_ALL_CC_FLAGS) -O2
+   //
+   // Coff file start with a DOS header.
+@@ -291,7 +296,6 @@ ScanSections32 (
+   // First text sections.
+   //
+   mCoffOffset = CoffAlign(mCoffOffset);
+-  mTextOffset = mCoffOffset;
+   SectionCount = 0;
+   for (i = 0; i < mEhdr->e_shnum; i++) {
+     Elf_Shdr *shdr = GetShdrByIndex(i);
+@@ -315,12 +319,26 @@ ScanSections32 (
+           (mEhdr->e_entry < shdr->sh_addr + shdr->sh_size)) {
+         CoffEntry = mCoffOffset + mEhdr->e_entry - shdr->sh_addr;
+       }
++
++      //
++      // Set mTextOffset with the offset of the first '.text' section
++      //
++      if (!FoundText) {
++        mTextOffset = mCoffOffset;
++        FoundText = TRUE;
++      }
++
+       mCoffSectionsOffset[i] = mCoffOffset;
+       mCoffOffset += shdr->sh_size;
+       SectionCount ++;
+     }
+   }
  
- ##################
- # ARM definitions
-@@ -4691,13 +4692,13 @@
- DEBUG_RVCTLINUX_ARM_DLINK_FLAGS     = $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list $(DEST_DIR_DEBUG)/$(BASE_NAME).map 
- RELEASE_RVCTLINUX_ARM_DLINK_FLAGS   = $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list $(DEST_DIR_DEBUG)/$(BASE_NAME).map
++  if (!FoundText) {
++    Error (NULL, 0, 3000, "Invalid", "Did not find any '.text' section.");
++    assert (FALSE);
++  }
++
+   if (mEhdr->e_machine != EM_ARM) {
+     mCoffOffset = CoffAlign(mCoffOffset);
+   }
+diff --git a/BaseTools/Source/C/GenFw/Elf64Convert.c b/BaseTools/Source/C/GenFw/Elf64Convert.c
+old mode 100644
+new mode 100755
+index 72d6cd1..713f8f7
+--- a/BaseTools/Source/C/GenFw/Elf64Convert.c
++++ b/BaseTools/Source/C/GenFw/Elf64Convert.c
+@@ -19,6 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+ #include <windows.h>
+ #include <io.h>
+ #endif
++#include <assert.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -258,9 +259,12 @@ ScanSections64 (
+   EFI_IMAGE_OPTIONAL_HEADER_UNION *NtHdr;
+   UINT32                          CoffEntry;
+   UINT32                          SectionCount;
++  BOOLEAN                         FoundText;
  
--*_RVCTLINUX_ARM_ASM_FLAGS       = $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) --apcs /interwork
-+*_RVCTLINUX_ARM_ASM_FLAGS       = $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_ASM_FLAGS)
- *_RVCTLINUX_ARM_PP_FLAGS        = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E
- *_RVCTLINUX_ARM_VFRPP_FLAGS     = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E  -DVFRCOMPILE --preinclude $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
- *_RVCTLINUX_ARM_MAKE_PATH       = make
- *_RVCTLINUX_ARM_SLINK_FLAGS     = --partial -o
-   DEBUG_RVCTLINUX_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_CC_FLAGS) -O1 -g
--RELEASE_RVCTLINUX_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_CC_FLAGS) -O2
-+RELEASE_RVCTLINUX_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --diag_suppress=550 DEF(RVCT_ALL_CC_FLAGS) -O2
+   CoffEntry = 0;
+   mCoffOffset = 0;
++  mTextOffset = 0;
++  FoundText = FALSE;
  
- ##################
- # ARM definitions
-@@ -4739,13 +4740,13 @@
-   DEBUG_RVCTCYGWIN_ARM_DLINK_FLAGS     = "$(DLINKPATH_FLAG)" $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list `cygpath -m $(DEST_DIR_DEBUG)/$(BASE_NAME).map` 
- RELEASE_RVCTCYGWIN_ARM_DLINK_FLAGS     = "$(DLINKPATH_FLAG)" $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list `cygpath -m $(DEST_DIR_DEBUG)/$(BASE_NAME).map` 
-  
--*_RVCTCYGWIN_ARM_ASM_FLAGS       = "$(ASMPATH_FLAG)" $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) --apcs /interwork
-+*_RVCTCYGWIN_ARM_ASM_FLAGS       = "$(ASMPATH_FLAG)" $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_ASM_FLAGS)
- *_RVCTCYGWIN_ARM_PP_FLAGS        = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E
- *_RVCTCYGWIN_ARM_VFRPP_FLAGS     = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E  -DVFRCOMPILE --preinclude `cygpath -m $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h`
- *_RVCTCYGWIN_ARM_MAKE_PATH       = make
- *_RVCTCYGWIN_ARM_SLINK_FLAGS     = "$(SLINKPATH_FLAG)" --partial -o
-   DEBUG_RVCTCYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_CC_FLAGS) -O1 -g
--RELEASE_RVCTCYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_CC_FLAGS) -O2
-+RELEASE_RVCTCYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --diag_suppress=550 DEF(RVCT_ALL_CC_FLAGS) -O2
+   //
+   // Coff file start with a DOS header.
+@@ -286,7 +290,6 @@ ScanSections64 (
+   // First text sections.
+   //
+   mCoffOffset = CoffAlign(mCoffOffset);
+-  mTextOffset = mCoffOffset;
+   SectionCount = 0;
+   for (i = 0; i < mEhdr->e_shnum; i++) {
+     Elf_Shdr *shdr = GetShdrByIndex(i);
+@@ -310,12 +313,26 @@ ScanSections64 (
+           (mEhdr->e_entry < shdr->sh_addr + shdr->sh_size)) {
+         CoffEntry = (UINT32) (mCoffOffset + mEhdr->e_entry - shdr->sh_addr);
+       }
++
++      //
++      // Set mTextOffset with the offset of the first '.text' section
++      //
++      if (!FoundText) {
++        mTextOffset = mCoffOffset;
++        FoundText = TRUE;
++      }
++
+       mCoffSectionsOffset[i] = mCoffOffset;
+       mCoffOffset += (UINT32) shdr->sh_size;
+       SectionCount ++;
+     }
+   }
  
- ##################
- # ARM definitions
-@@ -4813,8 +4814,8 @@
- *_ARMGCC_ARM_SLINK_FLAGS =  -rc
- *_ARMGCC_ARM_DLINK_FLAGS =  $(ARCHDLINK_FLAGS) -Ttext=0x0 --oformat=elf32-littlearm --emit-relocs -nostdlib -u $(IMAGE_ENTRY_POINT) -e $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
- 
--  DEBUG_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARMGCC_CC_FLAGS) -combine -O0
--RELEASE_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARMGCC_CC_FLAGS) -combine -Wno-unused
-+  DEBUG_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARMGCC_CC_FLAGS) -O0
-+RELEASE_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARMGCC_CC_FLAGS) -Wno-unused
- 
- ####################################################################################
- #
-@@ -4871,8 +4872,8 @@
- *_ARMLINUXGCC_ARM_SLINK_FLAGS =  -rc
- *_ARMLINUXGCC_ARM_DLINK_FLAGS =  $(ARCHDLINK_FLAGS) -Ttext=0x0 --oformat=elf32-littlearm --emit-relocs -nostdlib -u $(IMAGE_ENTRY_POINT) -e $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
- 
--  DEBUG_ARMLINUXGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARMGCC_CC_FLAGS) -Wno-address -O0
--RELEASE_ARMLINUXGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARMGCC_CC_FLAGS) -Wno-address -Wno-unused-but-set-variable
-+  DEBUG_ARMLINUXGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARMGCC_CC_FLAGS) -fno-stack-protector -mno-unaligned-access -O0
-+RELEASE_ARMLINUXGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ARMGCC_CC_FLAGS) -fno-stack-protector  -mno-unaligned-access -Wno-unused-but-set-variable
- 
- #################
- # ASM 16 linker defintions
++  if (!FoundText) {
++    Error (NULL, 0, 3000, "Invalid", "Did not find any '.text' section.");
++    assert (FALSE);
++  }
++
+   if (mEhdr->e_machine != EM_ARM) {
+     mCoffOffset = CoffAlign(mCoffOffset);
+   }
+-- 
+1.7.0.4
+
