@@ -218,7 +218,11 @@ GetNameFromHandle (
   CHAR16                      *NameString;
   UINTN                       StringSize;
   CHAR8                       *PlatformLanguage;
+  CHAR8                       *BestLanguage;
   EFI_COMPONENT_NAME2_PROTOCOL      *ComponentName2;
+
+  BestLanguage     = NULL;
+  PlatformLanguage = NULL;
 
   //
   // Method 1: Get the name string from image PDB
@@ -269,13 +273,23 @@ GetNameFromHandle (
     // Get the current platform language setting
     //
     GetEfiGlobalVariable2 (L"PlatformLang", (VOID**)&PlatformLanguage, NULL);
+
+    BestLanguage = GetBestLanguage(
+                     ComponentName2->SupportedLanguages,
+                     FALSE,
+                     PlatformLanguage,
+                     ComponentName2->SupportedLanguages,
+                     NULL
+                     );
+
+    SafeFreePool (PlatformLanguage);
     Status = ComponentName2->GetDriverName (
                                ComponentName2,
-                               PlatformLanguage != NULL ? PlatformLanguage : "en-US",
+                               BestLanguage,
                                &StringPtr
                                );
+    SafeFreePool (BestLanguage);
     if (!EFI_ERROR (Status)) {
-      SafeFreePool (PlatformLanguage);
       StrnCpy (mGaugeString, StringPtr, DP_GAUGE_STRING_LENGTH);
       mGaugeString[DP_GAUGE_STRING_LENGTH] = 0;
       return;
