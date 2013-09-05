@@ -34,7 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 VOID
 EFIAPI
-InternalEmptyFuntion (
+InternalEmptyFunction (
   IN EFI_EVENT                Event,
   IN VOID                     *Context
   )
@@ -67,7 +67,7 @@ EfiCreateEventLegacyBoot (
 {
   return EfiCreateEventLegacyBootEx (
            TPL_CALLBACK,
-           InternalEmptyFuntion,
+           InternalEmptyFunction,
            NULL,
            LegacyBootEvent
            );
@@ -101,7 +101,8 @@ EfiCreateEventLegacyBootEx (
   OUT EFI_EVENT         *LegacyBootEvent
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS        Status;
+  EFI_EVENT_NOTIFY  WorkerNotifyFunction;
 
   ASSERT (LegacyBootEvent != NULL);
 
@@ -114,10 +115,19 @@ EfiCreateEventLegacyBootEx (
     //
     // For UEFI 2.0 and the future use an Event Group
     //
+    if (NotifyFunction == NULL) {
+      //
+      // CreateEventEx will check NotifyFunction is NULL or not and return error.
+      // Use dummy routine for the case NotifyFunction is NULL.
+      //
+      WorkerNotifyFunction = InternalEmptyFunction;
+    } else {
+      WorkerNotifyFunction = NotifyFunction;
+    }
     Status = gBS->CreateEventEx (
                     EVT_NOTIFY_SIGNAL,
                     NotifyTpl,
-                    NotifyFunction,
+                    WorkerNotifyFunction,
                     NotifyContext,
                     &gEfiEventLegacyBootGuid,
                     LegacyBootEvent
@@ -152,7 +162,7 @@ EfiCreateEventReadyToBoot (
 {
   return EfiCreateEventReadyToBootEx (
            TPL_CALLBACK,
-           InternalEmptyFuntion,
+           InternalEmptyFunction,
            NULL,
            ReadyToBootEvent
            );
@@ -186,7 +196,8 @@ EfiCreateEventReadyToBootEx (
   OUT EFI_EVENT         *ReadyToBootEvent
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS        Status;
+  EFI_EVENT_NOTIFY  WorkerNotifyFunction;
 
   ASSERT (ReadyToBootEvent != NULL);
 
@@ -199,10 +210,19 @@ EfiCreateEventReadyToBootEx (
     //
     // For UEFI 2.0 and the future use an Event Group
     //
+    if (NotifyFunction == NULL) {
+      //
+      // CreateEventEx will check NotifyFunction is NULL or not and return error.
+      // Use dummy routine for the case NotifyFunction is NULL.
+      //
+      WorkerNotifyFunction = InternalEmptyFunction;
+    } else {
+      WorkerNotifyFunction = NotifyFunction;
+    }
     Status = gBS->CreateEventEx (
                     EVT_NOTIFY_SIGNAL,
                     NotifyTpl,
-                    NotifyFunction,
+                    WorkerNotifyFunction,
                     NotifyContext,
                     &gEfiEventReadyToBootGuid,
                     ReadyToBootEvent
