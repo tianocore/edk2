@@ -645,8 +645,6 @@ EfiShellGetDeviceName(
   UINTN                             LoopVar;
   CHAR16                            *DeviceNameToReturn;
   CHAR8                             *Lang;
-  CHAR8                             *TempChar;
-
   UINTN                             ParentControllerCount;
   EFI_HANDLE                        *ParentControllerBuffer;
   UINTN                             ParentDriverCount;
@@ -703,23 +701,7 @@ EfiShellGetDeviceName(
       if (EFI_ERROR(Status)) {
         continue;
       }
-      if (Language == NULL) {
-        Lang = AllocateZeroPool(AsciiStrSize(CompName2->SupportedLanguages));
-        if (Lang == NULL) {
-          return (EFI_OUT_OF_RESOURCES);
-        }
-        AsciiStrCpy(Lang, CompName2->SupportedLanguages);
-        TempChar = AsciiStrStr(Lang, ";");
-        if (TempChar != NULL){
-          *TempChar = CHAR_NULL;
-        }
-      } else {
-        Lang = AllocateZeroPool(AsciiStrSize(Language));
-        if (Lang == NULL) {
-          return (EFI_OUT_OF_RESOURCES);
-        }
-        AsciiStrCpy(Lang, Language);
-      }
+      Lang = GetBestLanguageForDriver(CompName2->SupportedLanguages, Language, FALSE);
       Status = CompName2->GetControllerName(CompName2, DeviceHandle, NULL, Lang, &DeviceNameToReturn);
       FreePool(Lang);
       Lang = NULL;
@@ -762,23 +744,7 @@ EfiShellGetDeviceName(
           if (EFI_ERROR(Status)) {
             continue;
           }
-          if (Language == NULL) {
-            Lang = AllocateZeroPool(AsciiStrSize(CompName2->SupportedLanguages));
-            if (Lang == NULL) {
-              return (EFI_OUT_OF_RESOURCES);
-            }
-            AsciiStrCpy(Lang, CompName2->SupportedLanguages);
-            TempChar = AsciiStrStr(Lang, ";");
-            if (TempChar != NULL){
-              *TempChar = CHAR_NULL;
-            }
-          } else {
-            Lang = AllocateZeroPool(AsciiStrSize(Language));
-            if (Lang == NULL) {
-              return (EFI_OUT_OF_RESOURCES);
-            }
-            AsciiStrCpy(Lang, Language);
-          }
+          Lang = GetBestLanguageForDriver(CompName2->SupportedLanguages, Language, FALSE);
           Status = CompName2->GetControllerName(CompName2, ParentControllerBuffer[LoopVar], DeviceHandle, Lang, &DeviceNameToReturn);
           FreePool(Lang);
           Lang = NULL;

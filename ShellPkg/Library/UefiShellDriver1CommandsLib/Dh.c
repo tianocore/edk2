@@ -60,7 +60,6 @@ GetDriverName (
   )
 {
   CHAR8                             *Lang;
-  CHAR8                             *TempChar;
   EFI_STATUS                        Status;
   EFI_COMPONENT_NAME2_PROTOCOL      *CompName2;
   CHAR16                            *NameToReturn;
@@ -87,23 +86,7 @@ GetDriverName (
   if (EFI_ERROR(Status)) {
     return (EFI_NOT_FOUND);
   }
-  if (Language == NULL) {
-    Lang = AllocateZeroPool(AsciiStrSize(CompName2->SupportedLanguages));
-    if (Lang == NULL) {
-      return (EFI_OUT_OF_RESOURCES);
-    }
-    AsciiStrCpy(Lang, CompName2->SupportedLanguages);
-    TempChar = AsciiStrStr(Lang, ";");
-    if (TempChar != NULL){
-      *TempChar = CHAR_NULL;
-    }
-  } else {
-    Lang = AllocateZeroPool(AsciiStrSize(Language));
-    if (Lang == NULL) {
-      return (EFI_OUT_OF_RESOURCES);
-    }
-    AsciiStrCpy(Lang, Language);
-  }
+  Lang = GetBestLanguageForDriver (CompName2->SupportedLanguages, Language, FALSE);
   Status = CompName2->GetDriverName(CompName2, Lang, &NameToReturn);
   FreePool(Lang);
 

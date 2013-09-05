@@ -23,6 +23,7 @@
 #include <Library/PcdLib.h>
 #include <Library/UefiLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/HandleParsingLib.h>
 
 #include <Pi/PiFirmwareFile.h>
 #include <Library/DxeServicesLib.h>
@@ -252,7 +253,7 @@ GetNameFromHandle (
     //
     // Get the current platform language setting
     //
-    GetEfiGlobalVariable2 (L"PlatformLang", (VOID**)&PlatformLanguage, NULL);
+    PlatformLanguage = GetBestLanguageForDriver(ComponentName2->SupportedLanguages, NULL, FALSE);
     Status = ComponentName2->GetDriverName (
                                ComponentName2,
                                PlatformLanguage != NULL ? PlatformLanguage : "en-US",

@@ -1,7 +1,7 @@
 /** @file
   Main file for DrvDiag shell Driver1 function.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -71,7 +71,6 @@ DoDiagnostics (
   UINTN                               HandleIndex1;
   UINTN                               HandleIndex2;
   CHAR8                               *Language;
-  CHAR8                               *TempChar;
   BOOLEAN                             Found;
 
   if ((ChildHandle != NULL && AllChilds) || (Mode >= TestModeMax)){
@@ -180,24 +179,8 @@ DoDiagnostics (
                 gImageHandle,
                 NULL,
                 EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-              if (!EFI_ERROR(Status)) {
-                if (Lang == NULL) {
-                  Language = AllocateZeroPool(AsciiStrSize(DriverDiagnostics2->SupportedLanguages));
-                  if (Language == NULL) {
-                    return (EFI_OUT_OF_RESOURCES);
-                  }
-                  AsciiStrCpy(Language, DriverDiagnostics2->SupportedLanguages);
-                  TempChar = AsciiStrStr(Language, ";");
-                  if (TempChar != NULL){
-                    *TempChar = CHAR_NULL;
-                  }
-                } else {
-                  Language = AllocateZeroPool(AsciiStrSize(Lang));
-                  if (Language == NULL) {
-                    return (EFI_OUT_OF_RESOURCES);
-                  }
-                  AsciiStrCpy(Language, Lang);
-                }
+              if (!EFI_ERROR(Status) && (DriverDiagnostics2 != NULL)) {
+                Language = GetBestLanguageForDriver(DriverDiagnostics2->SupportedLanguages, Lang, FALSE);
                 Found = TRUE;
                 Status = DriverDiagnostics2->RunDiagnostics(
                   DriverDiagnostics2,
@@ -220,23 +203,7 @@ DoDiagnostics (
                 NULL,
                 EFI_OPEN_PROTOCOL_GET_PROTOCOL);
               if (!EFI_ERROR(Status)) {
-                if (Lang == NULL) {
-                  Language = AllocateZeroPool(AsciiStrSize(DriverDiagnostics2->SupportedLanguages));
-                  if (Language == NULL) {
-                    return (EFI_OUT_OF_RESOURCES);
-                  }
-                  AsciiStrCpy(Language, DriverDiagnostics2->SupportedLanguages);
-                  TempChar = AsciiStrStr(Language, ";");
-                  if (TempChar != NULL){
-                    *TempChar = CHAR_NULL;
-                  }
-                } else {
-                  Language = AllocateZeroPool(AsciiStrSize(Lang));
-                  if (Language == NULL) {
-                    return (EFI_OUT_OF_RESOURCES);
-                  }
-                  AsciiStrCpy(Language, Lang);
-                }
+                Language = GetBestLanguageForDriver(DriverDiagnostics->SupportedLanguages, Lang, FALSE);
                 Status = DriverDiagnostics->RunDiagnostics(
                   DriverDiagnostics,
                   ControllerHandleList[ControllerHandleListLoop],

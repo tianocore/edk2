@@ -1,7 +1,7 @@
 /** @file
   Provides interface to advanced shell functionality for parsing both handle and protocol database.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -93,6 +93,27 @@ EFIAPI
 GetStringNameFromHandle(
   IN CONST EFI_HANDLE TheHandle,
   IN CONST CHAR8      *Language
+  );
+
+/**
+  Get best support language for this driver.
+  
+  First base on the user input language  to search, second base on the current 
+  platform used language to search, third get the first language from the 
+  support language list. The caller need to free the buffer of the best language.
+
+  @param[in] SupportedLanguages      The support languages for this driver.
+  @param[in] InputLanguage           The user input language.
+  @param[in] Iso639Language          Whether get language for ISO639.
+
+  @return                            The best support language for this driver.
+**/
+CHAR8 *
+EFIAPI
+GetBestLanguageForDriver (
+  IN CONST CHAR8  *SupportedLanguages,
+  IN CONST CHAR8  *InputLanguage,
+  IN BOOLEAN      Iso639Language
   );
 
 #define HR_UNKNOWN                     0
