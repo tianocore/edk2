@@ -59,6 +59,7 @@ Mtftp6RrqSendAck (
   // Reset current retry count of the instance.
   //
   Instance->CurRetry = 0;
+  Instance->LastPacket = Packet;
 
   return Mtftp6TransmitPacket (Instance, Packet);
 }
