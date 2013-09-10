@@ -1,7 +1,7 @@
 /** @file
   PEM (Privacy Enhanced Mail) Format Handler Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -109,8 +109,11 @@ RsaGetPrivateKeyFromPem (
   // Read encrypted PEM Data.
   //
   PemBio = BIO_new (BIO_s_mem ());
-  BIO_write (PemBio, PemData, (int) PemSize);
   if (PemBio == NULL) {
+    goto _Exit;
+  }
+
+  if (BIO_write (PemBio, PemData, (int) PemSize) <= 0) {
     goto _Exit;
   }
 

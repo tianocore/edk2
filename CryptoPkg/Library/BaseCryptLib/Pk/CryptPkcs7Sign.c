@@ -1,7 +1,7 @@
 /** @file
   PKCS#7 SignedData Sign Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -124,7 +124,13 @@ Pkcs7Sign (
   // Convert the data to be signed to BIO format. 
   //
   DataBio = BIO_new (BIO_s_mem ());
-  BIO_write (DataBio, InData, (int) InDataSize);
+  if (DataBio == NULL) {
+    goto _Exit;
+  }
+
+  if (BIO_write (DataBio, InData, (int) InDataSize) <= 0) {
+    goto _Exit;
+  }
 
   //
   // Create the PKCS#7 signedData structure.
@@ -155,6 +161,7 @@ Pkcs7Sign (
 
   Tmp        = P7Data;
   P7DataSize = i2d_PKCS7 (Pkcs7, (unsigned char **) &Tmp);
+  ASSERT (P7DataSize > 19);
 
   //
   // Strip ContentInfo to content only for signeddata. The data be trimmed off
