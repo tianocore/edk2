@@ -122,7 +122,6 @@
 #else
   #define NMBCLUSTERS 1024    /* map size, max cluster allocation */
 #endif
-#endif
 
 /*
  * Minimum and maximum sizes of the kernel malloc arena in PAGE_SIZE-sized
