@@ -414,19 +414,15 @@ DevicePathProtocolDumpInformation(
   CHAR16                            *Temp;
   CHAR16                            *Temp2;
   EFI_STATUS                        Status;
-  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL  *DevPathToText;
   Temp = NULL;
 
-  Status = gBS->LocateProtocol(&gEfiDevicePathToTextProtocolGuid, NULL, (VOID**)&DevPathToText);
+  Status = gBS->OpenProtocol(TheHandle, &gEfiDevicePathProtocolGuid, (VOID**)&DevPath, gImageHandle, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
   if (!EFI_ERROR(Status)) {
-    Status = gBS->OpenProtocol(TheHandle, &gEfiDevicePathProtocolGuid, (VOID**)&DevPath, gImageHandle, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-    if (!EFI_ERROR(Status)) {
-      //
-      // I cannot decide whether to allow shortcuts here (the second BOOLEAN on the next line)
-      //
-      Temp = DevPathToText->ConvertDevicePathToText(DevPath, TRUE, TRUE);
-      gBS->CloseProtocol(TheHandle, &gEfiDevicePathProtocolGuid, gImageHandle, NULL);
-    }
+    //
+    // I cannot decide whether to allow shortcuts here (the second BOOLEAN on the next line)
+    //
+    Temp = ConvertDevicePathToText(DevPath, TRUE, TRUE);
+    gBS->CloseProtocol(TheHandle, &gEfiDevicePathProtocolGuid, gImageHandle, NULL);
   }
   if (!Verbose && Temp != NULL && StrLen(Temp) > 30) {
     Temp2 = NULL;

@@ -13,7 +13,7 @@
   4. It save all the mapping info in NV variables which will be consumed
      by platform override protocol driver to publish the platform override protocol.
 
-Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -104,45 +104,29 @@ HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath = {
 };
 
 /**
-  Converting a given device to an unicode string. 
-  
-  This function will dependent on gEfiDevicePathToTextProtocolGuid, if protocol
-  does not installed, then return unknown device path L"?" directly.
-  
+  Converting a given device to an unicode string.
+
   @param    DevPath     Given device path instance
   
   @return   Converted string from given device path.
-  @retval   L"?"  Can not locate gEfiDevicePathToTextProtocolGuid protocol for converting.
+  @retval   L"?" Converting failed.
 **/
 CHAR16 *
 DevicePathToStr (
   IN EFI_DEVICE_PATH_PROTOCOL     *DevPath
   )
 {
-  EFI_STATUS                       Status;
-  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL *DevPathToText;
-  CHAR16                           *ToText;
-  
-  if (DevPath == NULL) {
-    return L"";
+  CHAR16                          *Text;
+  Text = ConvertDevicePathToText (
+           DevPath,
+           FALSE,
+           TRUE
+           );
+  if (Text == NULL) {
+    return AllocateCopyPool (sizeof (L"?"), L"?");
+  } else {
+    return Text;
   }
-    
-  Status = gBS->LocateProtocol (
-                  &gEfiDevicePathToTextProtocolGuid,
-                  NULL,
-                  (VOID **) &DevPathToText
-                  );
-  if (!EFI_ERROR (Status)) {
-    ToText = DevPathToText->ConvertDevicePathToText (
-                              DevPath,
-                              FALSE,
-                              TRUE
-                              );
-    ASSERT (ToText != NULL);
-    return ToText;
-  }
-
-  return L"?";
 }
 
 /**

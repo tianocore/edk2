@@ -1795,14 +1795,13 @@ DriverSampleInit (
   BOOLEAN                         ActionFlag;
   EFI_STRING                      ConfigRequestHdr;
   MY_EFI_VARSTORE_DATA            *VarStoreConfig;
-  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL *PathToText;
 
   //
   // Initialize the local variables.
   //
   ConfigRequestHdr = NULL;
   NewString        = NULL;
-  PathToText       = NULL;
+
   //
   // Initialize screen dimensions for SendForm().
   // Remove 3 characters from top and bottom
@@ -1918,18 +1917,11 @@ DriverSampleInit (
   }
 
   PrivateData->HiiHandle[1] = HiiHandle[1];
- 
-  Status = gBS->LocateProtocol (
-                  &gEfiDevicePathToTextProtocolGuid,
-                  NULL,
-                  (VOID **) &PathToText
-                  );
-  ASSERT_EFI_ERROR (Status);
 
   //
   // Update the device path string.
   //
-  NewString = PathToText->ConvertDevicePathToText((EFI_DEVICE_PATH_PROTOCOL*)&mHiiVendorDevicePath0, FALSE, FALSE);
+  NewString = ConvertDevicePathToText((EFI_DEVICE_PATH_PROTOCOL*)&mHiiVendorDevicePath0, FALSE, FALSE);
   if (HiiSetString (HiiHandle[0], STRING_TOKEN (STR_DEVICE_PATH), NewString, NULL) == 0) {
     DriverSampleUnload (ImageHandle);
     return EFI_OUT_OF_RESOURCES;

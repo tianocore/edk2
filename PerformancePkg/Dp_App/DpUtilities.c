@@ -1,7 +1,7 @@
 /** @file
   Utility functions used by the Dp application.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -31,7 +31,6 @@
 #include <Protocol/DriverBinding.h>
 #include <Protocol/ComponentName2.h>
 #include <Protocol/DevicePath.h>
-#include <Protocol/DevicePathToText.h>
 
 #include <Guid/Performance.h>
 
@@ -220,7 +219,6 @@ GetNameFromHandle (
   UINTN                       StringSize;
   CHAR8                       *PlatformLanguage;
   EFI_COMPONENT_NAME2_PROTOCOL      *ComponentName2;
-  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL  *DevicePathToText;
 
   //
   // Method 1: Get the name string from image PDB
@@ -336,19 +334,12 @@ GetNameFromHandle (
       //
       // Method 5: Get the name string from image DevicePath
       //
-      Status = gBS->LocateProtocol (
-                      &gEfiDevicePathToTextProtocolGuid,
-                      NULL,
-                      (VOID **) &DevicePathToText
-                      );
-      if (!EFI_ERROR (Status)) {
-        NameString = DevicePathToText->ConvertDevicePathToText (LoadedImageDevicePath, TRUE, FALSE);
-        if (NameString != NULL) {
-          StrnCpy (mGaugeString, NameString, DP_GAUGE_STRING_LENGTH);
-          mGaugeString[DP_GAUGE_STRING_LENGTH] = 0;
-          FreePool (NameString);
-          return;
-        }
+      NameString = ConvertDevicePathToText (LoadedImageDevicePath, TRUE, FALSE);
+      if (NameString != NULL) {
+        StrnCpy (mGaugeString, NameString, DP_GAUGE_STRING_LENGTH);
+        mGaugeString[DP_GAUGE_STRING_LENGTH] = 0;
+        FreePool (NameString);
+        return;
       }
     }
   }

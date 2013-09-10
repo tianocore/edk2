@@ -1,7 +1,7 @@
 /** @file
   Main file for Unload shell Driver1 function.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -67,7 +67,6 @@ DumpLoadedImageProtocolInfo (
 {
   EFI_LOADED_IMAGE_PROTOCOL         *Image;
   EFI_STATUS                        Status;
-  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL  *DevicePathToText;
   CHAR16                            *DevicePathText;
   CHAR16                            *CodeTypeText;
   CHAR16                            *DataTypeText;
@@ -79,23 +78,10 @@ DumpLoadedImageProtocolInfo (
   if (EFI_ERROR(Status)) {
     return (EFI_INVALID_PARAMETER);
   }
-
-  Status = gBS->LocateProtocol(
-    &gEfiDevicePathToTextProtocolGuid,
-    NULL,
-    (VOID**)&DevicePathToText);
-  //
-  // we now have the device path to text protocol
-  //
-  if (!EFI_ERROR(Status)) {
-    DevicePathText = DevicePathToText->ConvertDevicePathToText(Image->FilePath, TRUE, TRUE);
-  } else {
-    DevicePathText = NULL;
-  }
-
-  CodeTypeText = ConvertMemoryType(Image->ImageCodeType);
-  DataTypeText = ConvertMemoryType(Image->ImageDataType);
-  PdbPointer = (CHAR8*)PeCoffLoaderGetPdbPointer(Image->ImageBase);
+  DevicePathText = ConvertDevicePathToText(Image->FilePath, TRUE, TRUE);
+  CodeTypeText   = ConvertMemoryType(Image->ImageCodeType);
+  DataTypeText   = ConvertMemoryType(Image->ImageDataType);
+  PdbPointer     = (CHAR8*)PeCoffLoaderGetPdbPointer(Image->ImageBase);
   ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_UNLOAD_VERBOSE), gShellDriver1HiiHandle,
     ConvertHandleToHandleIndex(TheHandle),
     TheHandle,

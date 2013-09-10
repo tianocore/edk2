@@ -160,6 +160,7 @@ APRIORI PEI {
   INF  Nt32Pkg/WinNtOemHookStatusCodeHandlerPei/WinNtOemHookStatusCodeHandlerPei.inf
   }
 APRIORI DXE {
+  INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
   INF  Nt32Pkg/MetronomeDxe/MetronomeDxe.inf
   }

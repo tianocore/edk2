@@ -1,7 +1,7 @@
 /** @file
   Main file for NULL named library for Profile1 shell command functions.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -28,7 +28,6 @@
 #include <Protocol/DevicePath.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/UnicodeCollation.h>
-#include <Protocol/DevicePathToText.h>
 #include <Protocol/DriverDiagnostics2.h>
 #include <Protocol/DriverDiagnostics.h>
 #include <Protocol/PlatformDriverOverride.h>

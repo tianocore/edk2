@@ -1,7 +1,7 @@
 /** @file
   Main file for Dh shell Driver1 function.
 
-  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -260,7 +260,7 @@ GetDriverImageName (
     return (Status);
   }
   DevicePath = LoadedImage->FilePath;
-  *Name = gDevPathToText->ConvertDevicePathToText(DevicePath, TRUE, TRUE);
+  *Name = ConvertDevicePathToText(DevicePath, TRUE, TRUE);
   return (EFI_SUCCESS);
 }
 
@@ -354,7 +354,7 @@ DisplayDriverModelHandle (
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_DH_OUTPUT_DRIVER1), gShellDriver1HiiHandle, TempStringPointer!=NULL?TempStringPointer:L"<Unknown>");
     SHELL_FREE_NON_NULL(TempStringPointer);
   
-    TempStringPointer = gDevPathToText->ConvertDevicePathToText(DevicePath, TRUE, FALSE);
+    TempStringPointer = ConvertDevicePathToText(DevicePath, TRUE, FALSE);
     ShellPrintHiiEx(
       -1, 
       -1, 

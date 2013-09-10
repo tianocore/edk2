@@ -16,7 +16,7 @@
 #  4. It save all the mapping info in NV variables for the following boot, 
 #     which will be consumed by GetDriver API of the produced the platform override protocol.
 #
-# Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -95,7 +95,6 @@
   gEfiFormBrowser2ProtocolGuid                  ## CONSUMED
   gEfiHiiConfigRoutingProtocolGuid              ## CONSUMED
   gEfiHiiConfigAccessProtocolGuid               ## PRODUCED
-  gEfiDevicePathToTextProtocolGuid              ## CONSUMED
   gEfiPlatformDriverOverrideProtocolGuid        ## PRODUCED
 
 [Depex]
