@@ -947,6 +947,7 @@ InternalHiiValidateCurrentSetting (
   UINT16                       Offset;
   UINT16                       Width;
   UINT64                       VarValue;
+  UINT64                       TmpValue;
   LIST_ENTRY                   *Link;
   UINT8                        *VarBuffer;
   UINTN                        MaxBufferSize;
@@ -1511,7 +1512,9 @@ InternalHiiValidateCurrentSetting (
             //
             // Check current value is the value of one of option.
             //
-            if (VarValue == IfrOneOfOption->Value.u64) {
+            TmpValue = 0;
+            CopyMem (&TmpValue, &IfrOneOfOption->Value, IfrOneOfOption->Header.Length - OFFSET_OF (EFI_IFR_ONE_OF_OPTION, Value));
+            if (VarValue == TmpValue) {
               //
               // The value is one of option value.
               // Set OpCode to Zero, don't need check again.
@@ -2629,7 +2632,7 @@ HiiCreateOneOfOptionOpCode (
   OpCode.Type   = Type;
   CopyMem (&OpCode.Value, &Value, mHiiDefaultTypeToWidth[Type]);
 
-  return InternalHiiCreateOpCode (OpCodeHandle, &OpCode, EFI_IFR_ONE_OF_OPTION_OP, sizeof (OpCode));
+  return InternalHiiCreateOpCode (OpCodeHandle, &OpCode, EFI_IFR_ONE_OF_OPTION_OP, OFFSET_OF(EFI_IFR_ONE_OF_OPTION, Value) + mHiiDefaultTypeToWidth[Type]);
 }
 
 /**
