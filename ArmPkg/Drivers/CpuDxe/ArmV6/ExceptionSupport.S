@@ -242,7 +242,7 @@ NoAdjustNeeded:
 
   str       R5, [SP, #0x3c]         @ Store it in EFI_SYSTEM_CONTEXT_ARM.PC
   
-  sub       R1, SP, #0x60           @ We pused 0x60 bytes on the stack 
+  add       R1, SP, #0x60           @ We pushed 0x60 bytes on the stack
   str       R1, [SP, #0x34]         @ Store it in EFI_SYSTEM_CONTEXT_ARM.SP
   
                                     @ R0 is ExceptionType 
