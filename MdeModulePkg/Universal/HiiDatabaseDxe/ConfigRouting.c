@@ -882,6 +882,7 @@ GetVarStoreType (
   GuidStr          = NULL;
   NameStr          = NULL;
   TempStr          = NULL;
+  *IsEfiVarstore   = FALSE;
 
   Status = GetFormPackageData(DataBaseRecord, &HiiFormPackage, &PackageSize);
   if (EFI_ERROR (Status)) {
