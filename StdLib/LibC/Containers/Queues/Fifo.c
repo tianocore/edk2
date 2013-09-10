@@ -220,7 +220,6 @@ FIFO_Enqueue (
 
   assert(Self != NULL);
   assert(pElement != NULL);
-  assert(Count >= 0);
 
   if(FIFO_IsFull(Self)) {
     Count = 0;
