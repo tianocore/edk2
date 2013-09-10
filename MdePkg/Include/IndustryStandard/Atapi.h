@@ -2,7 +2,7 @@
   This file contains just some basic definitions that are needed by drivers
   that dealing with ATA/ATAPI interface.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -102,7 +102,7 @@ typedef struct {
   UINT16  obsolete_51_52[2];           
   UINT16  field_validity;     
   UINT16  obsolete_54_58[5];     
-  UINT16  multi_sector_setting;     
+  UINT16  multi_sector_setting;
   UINT16  user_addressable_sectors_lo; 
   UINT16  user_addressable_sectors_hi; 
   UINT16  obsolete_62;     
@@ -112,9 +112,14 @@ typedef struct {
   UINT16  rec_multi_word_dma_cycle_time; 
   UINT16  min_pio_cycle_time_without_flow_control; 
   UINT16  min_pio_cycle_time_with_flow_control; 
-  UINT16  reserved_69_74[6]; 
+  UINT16  additional_supported;                    ///< word 69
+  UINT16  reserved_70;
+  UINT16  reserved_71_74[4];                       ///< Reserved for IDENTIFY PACKET DEVICE cmd.
   UINT16  queue_depth;     
-  UINT16  reserved_76_79[4];                       ///< Reserved for Serial ATA.
+  UINT16  serial_ata_capabilities;
+  UINT16  reserved_77;                             ///< Reserved for Serial ATA
+  UINT16  serial_ata_features_supported;
+  UINT16  serial_ata_features_enabled;
   UINT16  major_version_no; 
   UINT16  minor_version_no; 
   UINT16  command_set_supported_82;                ///< word 82
@@ -129,14 +134,14 @@ typedef struct {
   UINT16  advanced_power_management_level;
   UINT16  master_password_identifier;
   UINT16  hardware_configuration_test_result;
-  UINT16  acoustic_management_value;
+  UINT16  obsolete_94;
   UINT16  stream_minimum_request_size;
   UINT16  streaming_transfer_time_for_dma;
   UINT16  streaming_access_latency_for_dma_and_pio;
   UINT16  streaming_performance_granularity[2];    ///< word 98~99
   UINT16  maximum_lba_for_48bit_addressing[4];     ///< word 100~103
   UINT16  streaming_transfer_time_for_pio;
-  UINT16  reserved_105;
+  UINT16  max_no_of_512byte_blocks_per_data_set_cmd;
   UINT16  phy_logic_sector_support;                ///< word 106
   UINT16  interseek_delay_for_iso7779;
   UINT16  world_wide_name[4];                      ///< word 108~111
@@ -151,7 +156,11 @@ typedef struct {
   UINT16  security_status;                         ///< word 128
   UINT16  vendor_specific_129_159[31]; 
   UINT16  cfa_power_mode;                          ///< word 160
-  UINT16  reserved_for_compactflash_161_175[15];
+  UINT16  reserved_for_compactflash_161_167[7];
+  UINT16  device_nominal_form_factor;
+  UINT16  is_data_set_cmd_supported;
+  CHAR8   additional_product_identifier[8];
+  UINT16  reserved_174_175[2];
   CHAR8   media_serial_number[60];                 ///< word 176~205
   UINT16  sct_command_transport;                   ///< word 206
   UINT16  reserved_207_208[2];
@@ -161,14 +170,15 @@ typedef struct {
   UINT16  nv_cache_capabilities;
   UINT16  nv_cache_size_in_logical_block_lsw;      ///< word 215
   UINT16  nv_cache_size_in_logical_block_msw;      ///< word 216
-  UINT16  nv_cache_read_speed;
-  UINT16  nv_cache_write_speed;
+  UINT16  nominal_media_rotation_rate;
+  UINT16  reserved_218;
   UINT16  nv_cache_options;                        ///< word 219
   UINT16  write_read_verify_mode;                  ///< word 220
   UINT16  reserved_221;
   UINT16  transport_major_revision_number;
   UINT16  transport_minor_revision_number;
-  UINT16  reserved_224_233[10];
+  UINT16  reserved_224_229[6];
+  UINT64  extended_no_of_addressable_sectors;
   UINT16  min_number_per_download_microcode_mode3; ///< word 234
   UINT16  max_number_per_download_microcode_mode3; ///< word 235
   UINT16  reserved_236_254[19];
@@ -206,8 +216,11 @@ typedef struct {
   UINT16  reserved_69_70[2];
   UINT16  obsolete_71_72[2];
   UINT16  reserved_73_74[2];
-  UINT16  queue_depth;
-  UINT16  reserved_76_79[4];
+  UINT16  obsolete_75;
+  UINT16  serial_ata_capabilities;
+  UINT16  reserved_77;                             ///< Reserved for Serial ATA
+  UINT16  serial_ata_features_supported;
+  UINT16  serial_ata_features_enabled;
   UINT16  major_version_no;                        ///< word 80
   UINT16  minor_version_no;                        ///< word 81
   UINT16  cmd_set_support_82;
@@ -219,21 +232,26 @@ typedef struct {
   UINT16  ultra_dma_select;
   UINT16  time_required_for_sec_erase;             ///< word 89
   UINT16  time_required_for_enhanced_sec_erase;    ///< word 90
-  UINT16  reserved_91;
+  UINT16  advanced_power_management_level;
   UINT16  master_pwd_revison_code;
   UINT16  hardware_reset_result;                   ///< word 93
-  UINT16  current_auto_acoustic_mgmt_value;
+  UINT16  obsolete_94;
   UINT16  reserved_95_107[13];
   UINT16  world_wide_name[4];                      ///< word 108~111
   UINT16  reserved_for_128bit_wwn_112_115[4];
-  UINT16  reserved_116_124[9];
+  UINT16  reserved_116_118[3];  
+  UINT16  command_and_feature_sets_supported;      ///< word 119
+  UINT16  command_and_feature_sets_supported_enabled;
+  UINT16  reserved_121_124[4];
   UINT16  atapi_byte_count_0_behavior;             ///< word 125
-  UINT16  obsolete_126;
-  UINT16  removable_media_status_notification_support;
+  UINT16  obsolete_126_127[2];
   UINT16  security_status;
-  UINT16  reserved_129_160[32];
-  UINT16  cfa_reserved_161_175[15];
-  UINT16  reserved_176_254[79];
+  UINT16  reserved_129_159[31];
+  UINT16  cfa_reserved_160_175[16];
+  UINT16  reserved_176_221[46];
+  UINT16  transport_major_version;
+  UINT16  transport_minor_version;
+  UINT16  reserved_224_254[31];
   UINT16  integrity_word;
 } ATAPI_IDENTIFY_DATA;
 

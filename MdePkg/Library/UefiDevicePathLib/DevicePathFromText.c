@@ -1,7 +1,7 @@
 /** @file
   DevicePathFromText protocol as defined in the UEFI 2.0 specification.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -12,8 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include "DevicePath.h"
-
+#include "UefiDevicePathLib.h"
 
 /**
 
@@ -25,7 +24,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 CHAR16 *
-StrDuplicate (
+UefiDevicePathLibStrDuplicate (
   IN CONST CHAR16  *Src
   )
 {
@@ -58,7 +57,7 @@ GetParamByNodeName (
   // Check whether the node name matchs
   //
   NodeNameLength = StrLen (NodeName);
-  if (CompareMem (Str, NodeName, NodeNameLength * sizeof (CHAR16)) != 0) {
+  if (StrnCmp (Str, NodeName, NodeNameLength) != 0) {
     return NULL;
   }
 
@@ -255,176 +254,33 @@ GetNextDeviceNodeStr (
 
 
 /**
-  Skip the leading white space and '0x' or '0X' of a integer string
+  Return whether the integer string is a hex string.
 
   @param Str             The integer string
-  @param IsHex           TRUE: Hex string, FALSE: Decimal string
 
-  @return The trimmed Hex string.
+  @retval TRUE   Hex string
+  @retval FALSE  Decimal string
 
 **/
-CHAR16 *
-TrimHexStr (
-  IN CHAR16   *Str,
-  OUT BOOLEAN *IsHex
+BOOLEAN
+IsHexStr (
+  IN CHAR16   *Str
   )
 {
-  *IsHex = FALSE;
-
   //
   // skip preceeding white space
   //
-  while ((*Str != 0) && *Str == ' ') {
-    Str += 1;
+  while ((*Str != 0) && *Str == L' ') {
+    Str ++;
   }
   //
   // skip preceeding zeros
   //
-  while ((*Str != 0) && *Str == '0') {
-    Str += 1;
+  while ((*Str != 0) && *Str == L'0') {
+    Str ++;
   }
-  //
-  // skip preceeding character 'x' or 'X'
-  //
-  if ((*Str != 0) && (*Str == 'x' || *Str == 'X')) {
-    Str += 1;
-    *IsHex = TRUE;
-  }
-
-  return Str;
-}
-
-/**
-
-  Convert hex string to uint.
-
-  @param Str             The hex string
-
-  @return A UINTN value represented by Str
-
-**/
-UINTN
-Xtoi (
-  IN CHAR16  *Str
-  )
-{
-  return StrHexToUintn (Str);
-}
-
-/**
-
-  Convert hex string to 64 bit data.
-
-  @param Str             The hex string
-  @param Data            A pointer to the UINT64 value represented by Str
-
-**/
-VOID
-Xtoi64 (
-  IN  CHAR16  *Str,
-  OUT UINT64  *Data
-  )
-{
-  *Data = StrHexToUint64 (Str);
-}
-
-/**
-
-  Convert decimal string to uint.
-
-  @param Str             The decimal string
-
-  @return A UINTN value represented by Str
-
-**/
-UINTN
-Dtoi (
-  IN CHAR16  *Str
-  )
-{
-  UINTN   Rvalue;
-  CHAR16  Char;
-  UINTN   High;
-  UINTN   Low;
-
-  ASSERT (Str != NULL);
-
-  High = (UINTN) -1 / 10;
-  Low  = (UINTN) -1 % 10;
-  //
-  // skip preceeding white space
-  //
-  while ((*Str != 0) && *Str == ' ') {
-    Str += 1;
-  }
-  //
-  // convert digits
-  //
-  Rvalue = 0;
-  Char = *(Str++);
-  while (Char != 0) {
-    if (Char >= '0' && Char <= '9') {
-      if ((Rvalue > High || Rvalue == High) && (Char - '0' > (INTN) Low)) {
-        return (UINTN) -1;
-      }
-
-      Rvalue = (Rvalue * 10) + Char - '0';
-    } else {
-      break;
-    }
-
-    Char = *(Str++);
-  }
-
-  return Rvalue;
-}
-
-/**
-
-  Convert decimal string to uint.
-
-  @param Str             The decimal string
-  @param Data            A pointer to the UINT64 value represented by Str
-
-**/
-VOID
-Dtoi64 (
-  IN CHAR16  *Str,
-  OUT UINT64 *Data
-  )
-{
-  UINT64   Rvalue;
-  CHAR16   Char;
-  UINT64   High;
-  UINT64   Low;
-
-  ASSERT (Str != NULL);
-  ASSERT (Data != NULL);
-
-  //
-  // skip preceeding white space
-  //
-  while ((*Str != 0) && *Str == ' ') {
-    Str += 1;
-  }
-  //
-  // convert digits
-  //
-  Rvalue = 0;
-  Char = *(Str++);
-  while (Char != 0) {
-    if (Char >= '0' && Char <= '9') {
-      High = LShiftU64 (Rvalue, 3);
-      Low = LShiftU64 (Rvalue, 1);
-      Rvalue = High + Low + Char - '0';
-    } else {
-      break;
-    }
-
-    Char = *(Str++);
-  }
-
-  *Data = Rvalue;
+  
+  return (BOOLEAN) (*Str == L'x' || *Str == L'X');
 }
 
 /**
@@ -441,14 +297,10 @@ Strtoi (
   IN CHAR16  *Str
   )
 {
-  BOOLEAN IsHex;
-
-  Str = TrimHexStr (Str, &IsHex);
-
-  if (IsHex) {
-    return Xtoi (Str);
+  if (IsHexStr (Str)) {
+    return StrHexToUintn (Str);
   } else {
-    return Dtoi (Str);
+    return StrDecimalToUintn (Str);
   }
 }
 
@@ -466,14 +318,10 @@ Strtoi64 (
   OUT UINT64  *Data
   )
 {
-  BOOLEAN IsHex;
-
-  Str = TrimHexStr (Str, &IsHex);
-
-  if (IsHex) {
-    Xtoi64 (Str, Data);
+  if (IsHexStr (Str)) {
+    *Data = StrHexToUint64 (Str);
   } else {
-    Dtoi64 (Str, Data);
+    *Data = StrDecimalToUint64 (Str);
   }
 }
 
@@ -631,7 +479,7 @@ StrToIPv4Addr (
   UINTN  Index;
 
   for (Index = 0; Index < 4; Index++) {
-    IPv4Addr->Addr[Index] = (UINT8) Dtoi (SplitStr (Str, L'.'));
+    IPv4Addr->Addr[Index] = (UINT8) StrDecimalToUintn (SplitStr (Str, L'.'));
   }
 }
 
@@ -652,7 +500,7 @@ StrToIPv6Addr (
   UINT16 Data;
 
   for (Index = 0; Index < 8; Index++) {
-    Data = (UINT16) Xtoi (SplitStr (Str, L':'));
+    Data = (UINT16) StrHexToUintn (SplitStr (Str, L':'));
     IPv6Addr->Addr[Index * 2] = (UINT8) (Data >> 8);
     IPv6Addr->Addr[Index * 2 + 1] = (UINT8) (Data & 0xff);
   }
@@ -874,22 +722,19 @@ DevPathFromTextCtrl (
   Converts a string to EisaId.
 
   @param Text   The input string.
-  @param EisaId A pointer to the output EisaId.
 
+  @return UINT32 EISA ID.
 **/
-VOID
+UINT32
 EisaIdFromText (
-  IN CHAR16 *Text,
-  OUT UINT32 *EisaId
+  IN CHAR16 *Text
   )
 {
-  UINTN PnpId;
-
-  PnpId = Xtoi (Text + 3);
-  *EisaId = (((Text[0] - '@') & 0x1f) << 10) +
-            (((Text[1] - '@') & 0x1f) << 5) +
-            ((Text[2] - '@') & 0x1f) +
-            (UINT32) (PnpId << 16);
+  return (((Text[0] - 'A' + 1) & 0x1f) << 10)
+       + (((Text[1] - 'A' + 1) & 0x1f) <<  5)
+       + (((Text[2] - 'A' + 1) & 0x1f) <<  0)
+       + (UINT32) (StrHexToUintn (&Text[3]) << 16)
+       ;
 }
 
 /**
@@ -917,7 +762,7 @@ DevPathFromTextAcpi (
                                       (UINT16) sizeof (ACPI_HID_DEVICE_PATH)
                                       );
 
-  EisaIdFromText (HIDStr, &Acpi->HID);
+  Acpi->HID = EisaIdFromText (HIDStr);
   Acpi->UID = (UINT32) Strtoi (UIDStr);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) Acpi;
@@ -1089,8 +934,8 @@ DevPathFromTextAcpiEx (
                                                Length
                                                );
 
-  EisaIdFromText (HIDStr, &AcpiEx->HID);
-  EisaIdFromText (CIDStr, &AcpiEx->CID);
+  AcpiEx->HID = EisaIdFromText (HIDStr);
+  AcpiEx->CID = EisaIdFromText (CIDStr);
   AcpiEx->UID = (UINT32) Strtoi (UIDStr);
 
   AsciiStr = (CHAR8 *) ((UINT8 *)AcpiEx + sizeof (ACPI_EXTENDED_HID_DEVICE_PATH));
@@ -1131,8 +976,8 @@ DevPathFromTextAcpiExp (
                                                   Length
                                                   );
 
-  EisaIdFromText (HIDStr, &AcpiEx->HID);
-  EisaIdFromText (CIDStr, &AcpiEx->CID);
+  AcpiEx->HID = EisaIdFromText (HIDStr);
+  AcpiEx->CID = EisaIdFromText (CIDStr);
   AcpiEx->UID = 0;
 
   AsciiStr = (CHAR8 *) ((UINT8 *)AcpiEx + sizeof (ACPI_EXTENDED_HID_DEVICE_PATH));
@@ -1357,7 +1202,7 @@ DevPathFromText1394 (
                                           );
 
   F1394DevPath->Reserved = 0;
-  Xtoi64 (GuidStr, &F1394DevPath->Guid);
+  F1394DevPath->Guid     = StrHexToUint64 (GuidStr);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) F1394DevPath;
 }
@@ -2035,8 +1880,8 @@ DevPathFromTextUart (
                                            (UINT16) sizeof (UART_DEVICE_PATH)
                                            );
 
-  Uart->BaudRate  = (StrCmp (BaudStr, L"DEFAULT") == 0) ? 115200 : Dtoi (BaudStr);
-  Uart->DataBits  = (UINT8) ((StrCmp (DataBitsStr, L"DEFAULT") == 0) ? 8 : Dtoi (DataBitsStr));
+  Uart->BaudRate  = (StrCmp (BaudStr, L"DEFAULT") == 0) ? 115200 : StrDecimalToUintn (BaudStr);
+  Uart->DataBits  = (UINT8) ((StrCmp (DataBitsStr, L"DEFAULT") == 0) ? 8 : StrDecimalToUintn (DataBitsStr));
   switch (*ParityStr) {
   case L'D':
     Uart->Parity = 0;
@@ -2681,7 +2526,7 @@ DevPathFromTextHD (
                                                     (UINT16) sizeof (HARDDRIVE_DEVICE_PATH)
                                                     );
 
-  Hd->PartitionNumber = (UINT32) Dtoi (PartitionStr);
+  Hd->PartitionNumber = (UINT32) StrDecimalToUintn (PartitionStr);
 
   ZeroMem (Hd->Signature, 16);
   Hd->MBRType = (UINT8) 0;
@@ -2988,84 +2833,84 @@ DevPathFromTextSata (
                                 MSG_SATA_DP,
                                 (UINT16) sizeof (SATA_DEVICE_PATH)
                                 );
-  Sata->HBAPortNumber = (UINT16) Xtoi (Param1);
+  Sata->HBAPortNumber = (UINT16) StrHexToUintn (Param1);
   if (Param3 != NULL) {
-    Sata->PortMultiplierPortNumber = (UINT16) Xtoi (Param2);
+    Sata->PortMultiplierPortNumber = (UINT16) StrHexToUintn (Param2);
     Param2                   = Param3;
   } else {
     Sata->PortMultiplierPortNumber = SATA_HBA_DIRECT_CONNECT_FLAG;
   }
-  Sata->Lun = (UINT16) Xtoi (Param2);
+  Sata->Lun = (UINT16) StrHexToUintn (Param2);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) Sata;
 }
 
-GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE DevPathFromTextTable[] = {
-  {L"Pci", DevPathFromTextPci},
-  {L"PcCard", DevPathFromTextPcCard},
-  {L"MemoryMapped", DevPathFromTextMemoryMapped},
-  {L"VenHw", DevPathFromTextVenHw},
-  {L"Ctrl", DevPathFromTextCtrl},
-  {L"Acpi", DevPathFromTextAcpi},
-  {L"PciRoot", DevPathFromTextPciRoot},
-  {L"PcieRoot", DevPathFromTextPcieRoot},
-  {L"Floppy", DevPathFromTextFloppy},
-  {L"Keyboard", DevPathFromTextKeyboard},
-  {L"Serial", DevPathFromTextSerial},
-  {L"ParallelPort", DevPathFromTextParallelPort},
-  {L"AcpiEx", DevPathFromTextAcpiEx},
-  {L"AcpiExp", DevPathFromTextAcpiExp},
-  {L"AcpiAdr", DevPathFromTextAcpiAdr},
-  {L"Ata", DevPathFromTextAta},
-  {L"Scsi", DevPathFromTextScsi},
-  {L"Fibre", DevPathFromTextFibre},
-  {L"FibreEx", DevPathFromTextFibreEx},
-  {L"I1394", DevPathFromText1394},
-  {L"USB", DevPathFromTextUsb},
-  {L"I2O", DevPathFromTextI2O},
-  {L"Infiniband", DevPathFromTextInfiniband},
-  {L"VenMsg", DevPathFromTextVenMsg},
-  {L"VenPcAnsi", DevPathFromTextVenPcAnsi},
-  {L"VenVt100", DevPathFromTextVenVt100},
-  {L"VenVt100Plus", DevPathFromTextVenVt100Plus},
-  {L"VenUtf8", DevPathFromTextVenUtf8},
-  {L"UartFlowCtrl", DevPathFromTextUartFlowCtrl},
-  {L"SAS", DevPathFromTextSAS},
-  {L"SasEx", DevPathFromTextSasEx},
-  {L"DebugPort", DevPathFromTextDebugPort},
-  {L"MAC", DevPathFromTextMAC},
-  {L"IPv4", DevPathFromTextIPv4},
-  {L"IPv6", DevPathFromTextIPv6},
-  {L"Uart", DevPathFromTextUart},
-  {L"UsbClass", DevPathFromTextUsbClass},
-  {L"UsbAudio", DevPathFromTextUsbAudio},
-  {L"UsbCDCControl", DevPathFromTextUsbCDCControl},
-  {L"UsbHID", DevPathFromTextUsbHID},
-  {L"UsbImage", DevPathFromTextUsbImage},
-  {L"UsbPrinter", DevPathFromTextUsbPrinter},
-  {L"UsbMassStorage", DevPathFromTextUsbMassStorage},
-  {L"UsbHub", DevPathFromTextUsbHub},
-  {L"UsbCDCData", DevPathFromTextUsbCDCData},
-  {L"UsbSmartCard", DevPathFromTextUsbSmartCard},
-  {L"UsbVideo", DevPathFromTextUsbVideo},
-  {L"UsbDiagnostic", DevPathFromTextUsbDiagnostic},
-  {L"UsbWireless", DevPathFromTextUsbWireless},
-  {L"UsbDeviceFirmwareUpdate", DevPathFromTextUsbDeviceFirmwareUpdate},
-  {L"UsbIrdaBridge", DevPathFromTextUsbIrdaBridge},
-  {L"UsbTestAndMeasurement", DevPathFromTextUsbTestAndMeasurement},
-  {L"UsbWwid", DevPathFromTextUsbWwid},
-  {L"Unit", DevPathFromTextUnit},
-  {L"iSCSI", DevPathFromTextiSCSI},
-  {L"Vlan", DevPathFromTextVlan},
-  {L"HD", DevPathFromTextHD},
-  {L"CDROM", DevPathFromTextCDROM},
-  {L"VenMEDIA", DevPathFromTextVenMEDIA},
-  {L"Media", DevPathFromTextMedia},
-  {L"Fv", DevPathFromTextFv},
-  {L"FvFile", DevPathFromTextFvFile},
-  {L"Offset", DevPathFromTextRelativeOffsetRange},
-  {L"BBS", DevPathFromTextBBS},
-  {L"Sata", DevPathFromTextSata},
+GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE mUefiDevicePathLibDevPathFromTextTable[] = {
+  {L"Pci",                     DevPathFromTextPci                     },
+  {L"PcCard",                  DevPathFromTextPcCard                  },
+  {L"MemoryMapped",            DevPathFromTextMemoryMapped            },
+  {L"VenHw",                   DevPathFromTextVenHw                   },
+  {L"Ctrl",                    DevPathFromTextCtrl                    },
+  {L"Acpi",                    DevPathFromTextAcpi                    },
+  {L"PciRoot",                 DevPathFromTextPciRoot                 },
+  {L"PcieRoot",                DevPathFromTextPcieRoot                },
+  {L"Floppy",                  DevPathFromTextFloppy                  },
+  {L"Keyboard",                DevPathFromTextKeyboard                },
+  {L"Serial",                  DevPathFromTextSerial                  },
+  {L"ParallelPort",            DevPathFromTextParallelPort            },
+  {L"AcpiEx",                  DevPathFromTextAcpiEx                  },
+  {L"AcpiExp",                 DevPathFromTextAcpiExp                 },
+  {L"AcpiAdr",                 DevPathFromTextAcpiAdr                 },
+  {L"Ata",                     DevPathFromTextAta                     },
+  {L"Scsi",                    DevPathFromTextScsi                    },
+  {L"Fibre",                   DevPathFromTextFibre                   },
+  {L"FibreEx",                 DevPathFromTextFibreEx                 },
+  {L"I1394",                   DevPathFromText1394                    },
+  {L"USB",                     DevPathFromTextUsb                     },
+  {L"I2O",                     DevPathFromTextI2O                     },
+  {L"Infiniband",              DevPathFromTextInfiniband              },
+  {L"VenMsg",                  DevPathFromTextVenMsg                  },
+  {L"VenPcAnsi",               DevPathFromTextVenPcAnsi               },
+  {L"VenVt100",                DevPathFromTextVenVt100                },
+  {L"VenVt100Plus",            DevPathFromTextVenVt100Plus            },
+  {L"VenUtf8",                 DevPathFromTextVenUtf8                 },
+  {L"UartFlowCtrl",            DevPathFromTextUartFlowCtrl            },
+  {L"SAS",                     DevPathFromTextSAS                     },
+  {L"SasEx",                   DevPathFromTextSasEx                   },
+  {L"DebugPort",               DevPathFromTextDebugPort               },
+  {L"MAC",                     DevPathFromTextMAC                     },
+  {L"IPv4",                    DevPathFromTextIPv4                    },
+  {L"IPv6",                    DevPathFromTextIPv6                    },
+  {L"Uart",                    DevPathFromTextUart                    },
+  {L"UsbClass",                DevPathFromTextUsbClass                },
+  {L"UsbAudio",                DevPathFromTextUsbAudio                },
+  {L"UsbCDCControl",           DevPathFromTextUsbCDCControl           },
+  {L"UsbHID",                  DevPathFromTextUsbHID                  },
+  {L"UsbImage",                DevPathFromTextUsbImage                },
+  {L"UsbPrinter",              DevPathFromTextUsbPrinter              },
+  {L"UsbMassStorage",          DevPathFromTextUsbMassStorage          },
+  {L"UsbHub",                  DevPathFromTextUsbHub                  },
+  {L"UsbCDCData",              DevPathFromTextUsbCDCData              },
+  {L"UsbSmartCard",            DevPathFromTextUsbSmartCard            },
+  {L"UsbVideo",                DevPathFromTextUsbVideo                },
+  {L"UsbDiagnostic",           DevPathFromTextUsbDiagnostic           },
+  {L"UsbWireless",             DevPathFromTextUsbWireless             },
+  {L"UsbDeviceFirmwareUpdate", DevPathFromTextUsbDeviceFirmwareUpdate },
+  {L"UsbIrdaBridge",           DevPathFromTextUsbIrdaBridge           },
+  {L"UsbTestAndMeasurement",   DevPathFromTextUsbTestAndMeasurement   },
+  {L"UsbWwid",                 DevPathFromTextUsbWwid                 },
+  {L"Unit",                    DevPathFromTextUnit                    },
+  {L"iSCSI",                   DevPathFromTextiSCSI                   },
+  {L"Vlan",                    DevPathFromTextVlan                    },
+  {L"HD",                      DevPathFromTextHD                      },
+  {L"CDROM",                   DevPathFromTextCDROM                   },
+  {L"VenMEDIA",                DevPathFromTextVenMEDIA                },
+  {L"Media",                   DevPathFromTextMedia                   },
+  {L"Fv",                      DevPathFromTextFv                      },
+  {L"FvFile",                  DevPathFromTextFvFile                  },
+  {L"Offset",                  DevPathFromTextRelativeOffsetRange     },
+  {L"BBS",                     DevPathFromTextBBS                     },
+  {L"Sata",                    DevPathFromTextSata                    },
   {NULL, NULL}
 };
 
@@ -3082,11 +2927,11 @@ GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE DevPathFromTextTable[]
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
-ConvertTextToDeviceNode (
+UefiDevicePathLibConvertTextToDeviceNode (
   IN CONST CHAR16 *TextDeviceNode
   )
 {
-  DUMP_NODE                DumpNode;
+  DEVICE_PATH_FROM_TEXT    FromText;
   CHAR16                   *ParamStr;
   EFI_DEVICE_PATH_PROTOCOL *DeviceNode;
   CHAR16                   *DeviceNodeStr;
@@ -3097,26 +2942,26 @@ ConvertTextToDeviceNode (
   }
 
   ParamStr      = NULL;
-  DumpNode      = NULL;
-  DeviceNodeStr = StrDuplicate (TextDeviceNode);
+  FromText      = NULL;
+  DeviceNodeStr = UefiDevicePathLibStrDuplicate (TextDeviceNode);
   ASSERT (DeviceNodeStr != NULL);
 
-  for (Index = 0; DevPathFromTextTable[Index].Function != NULL; Index++) {
-    ParamStr = GetParamByNodeName (DeviceNodeStr, DevPathFromTextTable[Index].DevicePathNodeText);
+  for (Index = 0; mUefiDevicePathLibDevPathFromTextTable[Index].Function != NULL; Index++) {
+    ParamStr = GetParamByNodeName (DeviceNodeStr, mUefiDevicePathLibDevPathFromTextTable[Index].DevicePathNodeText);
     if (ParamStr != NULL) {
-      DumpNode = DevPathFromTextTable[Index].Function;
+      FromText = mUefiDevicePathLibDevPathFromTextTable[Index].Function;
       break;
     }
   }
 
-  if (DumpNode == NULL) {
+  if (FromText == NULL) {
     //
     // A file path
     //
-    DumpNode = DevPathFromTextFilePath;
-    DeviceNode = DumpNode (DeviceNodeStr);
+    FromText = DevPathFromTextFilePath;
+    DeviceNode = FromText (DeviceNodeStr);
   } else {
-    DeviceNode = DumpNode (ParamStr);
+    DeviceNode = FromText (ParamStr);
     FreePool (ParamStr);
   }
 
@@ -3139,19 +2984,16 @@ ConvertTextToDeviceNode (
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
-ConvertTextToDevicePath (
+UefiDevicePathLibConvertTextToDevicePath (
   IN CONST CHAR16 *TextDevicePath
   )
 {
-  DUMP_NODE                DumpNode;
-  CHAR16                   *ParamStr;
   EFI_DEVICE_PATH_PROTOCOL *DeviceNode;
-  UINTN                    Index;
   EFI_DEVICE_PATH_PROTOCOL *NewDevicePath;
   CHAR16                   *DevicePathStr;
   CHAR16                   *Str;
   CHAR16                   *DeviceNodeStr;
-  UINT8                    IsInstanceEnd;
+  BOOLEAN                  IsInstanceEnd;
   EFI_DEVICE_PATH_PROTOCOL *DevicePath;
 
   if ((TextDevicePath == NULL) || (IS_NULL (*TextDevicePath))) {
@@ -3162,43 +3004,23 @@ ConvertTextToDevicePath (
   ASSERT (DevicePath != NULL);
   SetDevicePathEndNode (DevicePath);
 
-  ParamStr            = NULL;
-  DeviceNodeStr       = NULL;
-  DevicePathStr       = StrDuplicate (TextDevicePath);
+  DevicePathStr = UefiDevicePathLibStrDuplicate (TextDevicePath);
 
-  Str                 = DevicePathStr;
+  Str           = DevicePathStr;
   while ((DeviceNodeStr = GetNextDeviceNodeStr (&Str, &IsInstanceEnd)) != NULL) {
-    DumpNode = NULL;
-    for (Index = 0; DevPathFromTextTable[Index].Function != NULL; Index++) {
-      ParamStr = GetParamByNodeName (DeviceNodeStr, DevPathFromTextTable[Index].DevicePathNodeText);
-      if (ParamStr != NULL) {
-        DumpNode = DevPathFromTextTable[Index].Function;
-        break;
-      }
-    }
+    DeviceNode = UefiDevicePathLibConvertTextToDeviceNode (DeviceNodeStr);
 
-    if (DumpNode == NULL) {
-      //
-      // A file path
-      //
-      DumpNode  = DevPathFromTextFilePath;
-      DeviceNode = DumpNode (DeviceNodeStr);
-    } else {
-      DeviceNode = DumpNode (ParamStr);
-      FreePool (ParamStr);
-    }
-
-    NewDevicePath = AppendDeviceNodeProtocolInterface (DevicePath, DeviceNode);
+    NewDevicePath = AppendDevicePathNode (DevicePath, DeviceNode);
     FreePool (DevicePath);
     FreePool (DeviceNode);
     DevicePath = NewDevicePath;
 
-    if (IsInstanceEnd != 0) {
+    if (IsInstanceEnd) {
       DeviceNode = (EFI_DEVICE_PATH_PROTOCOL *) AllocatePool (END_DEVICE_PATH_LENGTH);
       ASSERT (DeviceNode != NULL);
-      SET_DEVICE_PATH_INSTANCE_END_NODE (DeviceNode);
+      SetDevicePathEndNode (DeviceNode);
 
-      NewDevicePath = AppendDeviceNodeProtocolInterface (DevicePath, DeviceNode);
+      NewDevicePath = AppendDevicePathNode (DevicePath, DeviceNode);
       FreePool (DevicePath);
       FreePool (DeviceNode);
       DevicePath = NewDevicePath;
