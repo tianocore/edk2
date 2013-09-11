@@ -1,7 +1,7 @@
 /** @file
   EFI PEI Core dispatch services
   
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -305,7 +305,7 @@ PeiLoadFixAddressHook(
       //
       // If range described in this hob is not system memory or heigher than MAX_ADDRESS, ignored.
       //
-      if (ResourceHob->ResourceType != EFI_RESOURCE_SYSTEM_MEMORY &&
+      if (ResourceHob->ResourceType != EFI_RESOURCE_SYSTEM_MEMORY ||
           ResourceHob->PhysicalStart + ResourceHob->ResourceLength > MAX_ADDRESS)   {
         continue;
       }   
@@ -375,7 +375,7 @@ PeiLoadFixAddressHook(
           //
           // If range described in this hob is not system memory or heigher than MAX_ADDRESS, ignored.
           //
-          if (NextResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY && NextResourceHob->PhysicalStart + NextResourceHob->ResourceLength > MAX_ADDRESS) {
+          if (NextResourceHob->ResourceType != EFI_RESOURCE_SYSTEM_MEMORY || NextResourceHob->PhysicalStart + NextResourceHob->ResourceLength > MAX_ADDRESS) {
             continue;
           }
           //

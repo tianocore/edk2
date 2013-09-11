@@ -176,6 +176,11 @@ XhcCreateUrb (
 
   Status = XhcCreateTransferTrb (Xhc, Urb);
   ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "XhcCreateUrb: XhcCreateTransferTrb Failed, Status = %r\n", Status));
+    FreePool (Urb);
+    Urb = NULL;
+  }
 
   return Urb;
 }
@@ -572,7 +577,10 @@ XhcRecoverHaltedEndpoint (
              XHC_GENERIC_TIMEOUT,
              (TRB_TEMPLATE **) (UINTN) &EvtTrb
              );
-  ASSERT (!EFI_ERROR(Status));
+  if (EFI_ERROR(Status)) {
+    DEBUG ((EFI_D_ERROR, "XhcRecoverHaltedEndpoint: Reset Endpoint Failed, Status = %r\n", Status));
+    goto Done;
+  }
 
   //
   // 2)Set dequeue pointer
@@ -590,13 +598,17 @@ XhcRecoverHaltedEndpoint (
              XHC_GENERIC_TIMEOUT,
              (TRB_TEMPLATE **) (UINTN) &EvtTrb
              );
-  ASSERT (!EFI_ERROR(Status));
+  if (EFI_ERROR(Status)) {
+    DEBUG ((EFI_D_ERROR, "XhcRecoverHaltedEndpoint: Set Dequeue Pointer Failed, Status = %r\n", Status));
+    goto Done;
+  }
 
   //
   // 3)Ring the doorbell to transit from stop to active
   //
   XhcRingDoorBell (Xhc, SlotId, Dci);
 
+Done:
   return Status;
 }
 
@@ -1379,7 +1391,6 @@ XhcPollPortStatusChange (
       } else {
         Status = XhcInitializeDeviceSlot64 (Xhc, ParentRouteChart, Port, RouteChart, Speed);
       }
-      ASSERT_EFI_ERROR (Status);
     }
   } else if ((PortState->PortStatus & USB_PORT_STAT_CONNECTION) == 0) {
     //
@@ -1392,7 +1403,6 @@ XhcPollPortStatusChange (
       } else {
         Status = XhcDisableSlotCmd64 (Xhc, SlotId);
       }
-      ASSERT_EFI_ERROR (Status);
     }
   }
   return Status;
@@ -1745,7 +1755,10 @@ XhcInitializeDeviceSlot (
               XHC_GENERIC_TIMEOUT,
               (TRB_TEMPLATE **) (UINTN) &EvtTrb
               );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "XhcInitializeDeviceSlot: Enable Slot Failed, Status = %r\n", Status));
+    return Status;
+  }
   ASSERT (EvtTrb->SlotId <= Xhc->MaxSlotsEn);
   DEBUG ((EFI_D_INFO, "Enable Slot Successfully, The Slot ID = 0x%x\n", EvtTrb->SlotId));
   SlotId = (UINT8)EvtTrb->SlotId;
@@ -1884,12 +1897,11 @@ XhcInitializeDeviceSlot (
              XHC_GENERIC_TIMEOUT,
              (TRB_TEMPLATE **) (UINTN) &EvtTrb
              );
-  ASSERT (!EFI_ERROR(Status));
-
-  DeviceAddress = (UINT8) ((DEVICE_CONTEXT *) OutputContext)->Slot.DeviceAddress;
-  DEBUG ((EFI_D_INFO, "    Address %d assigned successfully\n", DeviceAddress));
-
-  Xhc->UsbDevContext[SlotId].XhciDevAddr = DeviceAddress;
+  if (!EFI_ERROR (Status)) {
+    DeviceAddress = (UINT8) ((DEVICE_CONTEXT *) OutputContext)->Slot.DeviceAddress;
+    DEBUG ((EFI_D_INFO, "    Address %d assigned successfully\n", DeviceAddress));
+    Xhc->UsbDevContext[SlotId].XhciDevAddr = DeviceAddress;
+  }
 
   return Status;
 }
@@ -1938,7 +1950,10 @@ XhcInitializeDeviceSlot64 (
               XHC_GENERIC_TIMEOUT,
               (TRB_TEMPLATE **) (UINTN) &EvtTrb
               );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "XhcInitializeDeviceSlot64: Enable Slot Failed, Status = %r\n", Status));
+    return Status;
+  }
   ASSERT (EvtTrb->SlotId <= Xhc->MaxSlotsEn);
   DEBUG ((EFI_D_INFO, "Enable Slot Successfully, The Slot ID = 0x%x\n", EvtTrb->SlotId));
   SlotId = (UINT8)EvtTrb->SlotId;
@@ -2077,13 +2092,11 @@ XhcInitializeDeviceSlot64 (
              XHC_GENERIC_TIMEOUT,
              (TRB_TEMPLATE **) (UINTN) &EvtTrb
              );
-  ASSERT (!EFI_ERROR(Status));
-
-  DeviceAddress = (UINT8) ((DEVICE_CONTEXT_64 *) OutputContext)->Slot.DeviceAddress;
-  DEBUG ((EFI_D_INFO, "    Address %d assigned successfully\n", DeviceAddress));
-
-  Xhc->UsbDevContext[SlotId].XhciDevAddr = DeviceAddress;
-
+  if (!EFI_ERROR (Status)) {
+    DeviceAddress = (UINT8) ((DEVICE_CONTEXT_64 *) OutputContext)->Slot.DeviceAddress;
+    DEBUG ((EFI_D_INFO, "    Address %d assigned successfully\n", DeviceAddress));
+    Xhc->UsbDevContext[SlotId].XhciDevAddr = DeviceAddress;
+  }
   return Status;
 }
 
@@ -2144,7 +2157,10 @@ XhcDisableSlotCmd (
              XHC_GENERIC_TIMEOUT,
              (TRB_TEMPLATE **) (UINTN) &EvtTrb
              );
-  ASSERT_EFI_ERROR(Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "XhcDisableSlotCmd: Disable Slot Command Failed, Status = %r\n", Status));
+    return Status;
+  }
   //
   // Free the slot's device context entry
   //
@@ -2243,7 +2259,10 @@ XhcDisableSlotCmd64 (
              XHC_GENERIC_TIMEOUT,
              (TRB_TEMPLATE **) (UINTN) &EvtTrb
              );
-  ASSERT_EFI_ERROR(Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "XhcDisableSlotCmd: Disable Slot Command Failed, Status = %r\n", Status));
+    return Status;
+  }
   //
   // Free the slot's device context entry
   //
@@ -2474,8 +2493,9 @@ XhcSetConfigCmd (
              XHC_GENERIC_TIMEOUT,
              (TRB_TEMPLATE **) (UINTN) &EvtTrb
              );
-  ASSERT_EFI_ERROR(Status);
-
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "XhcSetConfigCmd: Config Endpoint Failed, Status = %r\n", Status));
+  }
   return Status;
 }
 
@@ -2500,7 +2520,6 @@ XhcSetConfigCmd64 (
   )
 {
   EFI_STATUS                  Status;
-
   USB_INTERFACE_DESCRIPTOR    *IfDesc;
   USB_ENDPOINT_DESCRIPTOR     *EpDesc;
   UINT8                       Index;
@@ -2666,7 +2685,9 @@ XhcSetConfigCmd64 (
              XHC_GENERIC_TIMEOUT,
              (TRB_TEMPLATE **) (UINTN) &EvtTrb
              );
-  ASSERT_EFI_ERROR(Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "XhcSetConfigCmd64: Config Endpoint Failed, Status = %r\n", Status));
+  }
 
   return Status;
 }
@@ -2719,8 +2740,9 @@ XhcEvaluateContext (
              XHC_GENERIC_TIMEOUT,
              (TRB_TEMPLATE **) (UINTN) &EvtTrb
              );
-  ASSERT (!EFI_ERROR(Status));
-
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "XhcEvaluateContext: Evaluate Context Failed, Status = %r\n", Status));
+  }
   return Status;
 }
 
@@ -2771,8 +2793,9 @@ XhcEvaluateContext64 (
              XHC_GENERIC_TIMEOUT,
              (TRB_TEMPLATE **) (UINTN) &EvtTrb
              );
-  ASSERT (!EFI_ERROR(Status));
-
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "XhcEvaluateContext64: Evaluate Context Failed, Status = %r\n", Status));
+  }
   return Status;
 }
 
@@ -2838,8 +2861,9 @@ XhcConfigHubContext (
               XHC_GENERIC_TIMEOUT,
               (TRB_TEMPLATE **) (UINTN) &EvtTrb
               );
-  ASSERT (!EFI_ERROR(Status));
-
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "XhcConfigHubContext: Config Endpoint Failed, Status = %r\n", Status));
+  }
   return Status;
 }
 
@@ -2901,11 +2925,12 @@ XhcConfigHubContext64 (
   Status = XhcCmdTransfer (
               Xhc,
               (TRB_TEMPLATE *) (UINTN) &CmdTrbCfgEP,
-              XHC_GENERIC_TIMEOUT,
-              (TRB_TEMPLATE **) (UINTN) &EvtTrb
-              );
-  ASSERT (!EFI_ERROR(Status));
-
+             XHC_GENERIC_TIMEOUT,
+             (TRB_TEMPLATE **) (UINTN) &EvtTrb
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "XhcConfigHubContext64: Config Endpoint Failed, Status = %r\n", Status));
+  }
   return Status;
 }
 

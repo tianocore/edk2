@@ -1,7 +1,7 @@
 /** @file
   Header file for SCSI Bus Driver.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -59,6 +59,11 @@ typedef struct {
 // SCSI Bus Controller device strcuture
 //
 #define SCSI_BUS_DEVICE_SIGNATURE  SIGNATURE_32 ('s', 'c', 's', 'i')
+
+//
+// SCSI Bus Timeout Experience Value
+//
+#define SCSI_BUS_TIMEOUT           EFI_TIMER_PERIOD_SECONDS (3)
 
 //
 // The ScsiBusProtocol is just used to locate ScsiBusDev

@@ -2,7 +2,7 @@
 
   Internal generic functions to operate flash block.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -411,7 +411,7 @@ FlushSpareBlockToBootBlock (
     return EFI_ABORTED;
   }
   //
-  // Write memory buffer currenet spare block. Still top block.
+  // Write memory buffer to current spare block. Still top block.
   //
   Ptr = Buffer;
   for (Index = 0; Index < FtwDevice->NumberOfSpareBlock; Index += 1) {
@@ -1147,6 +1147,7 @@ InitFtwProtocol (
   EFI_FAULT_TOLERANT_WRITE_HEADER     *FtwHeader;
   UINTN                               Offset;
   EFI_HANDLE                          FvbHandle;
+  EFI_LBA                             WorkSpaceLbaOffset;
 
   //
   // Find the right SMM Fvb protocol instance for FTW.
@@ -1188,10 +1189,11 @@ InitFtwProtocol (
     //
     // Read from spare block
     //
+    WorkSpaceLbaOffset = FtwDevice->FtwWorkSpaceLba - FtwDevice->FtwWorkBlockLba;
     Length = FtwDevice->FtwWorkSpaceSize;
     Status = FtwDevice->FtwBackupFvb->Read (
                     FtwDevice->FtwBackupFvb,
-                    FtwDevice->FtwSpareLba,
+                    FtwDevice->FtwSpareLba + WorkSpaceLbaOffset,
                     FtwDevice->FtwWorkSpaceBase,
                     &Length,
                     FtwDevice->FtwWorkSpace

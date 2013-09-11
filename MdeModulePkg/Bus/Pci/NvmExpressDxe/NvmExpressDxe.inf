@@ -1,0 +1,68 @@
+## @file
+#  Component Description File For NVM Express Host Controller Module.
+#
+#  NvmExpressDxe driver is used to manage non-volatile memory subsystem which follows
+#  NVM Express specification.
+#
+#  Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php.
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = NvmExpressDxe
+  FILE_GUID                      = 5BE3BDF4-53CF-46a3-A6A9-73C34A6E5EE3
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = NvmExpressDriverEntry
+  UNLOAD_IMAGE                   = NvmExpressUnload
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gNvmExpressDriverBinding
+#  COMPONENT_NAME                =  gNvmExpressComponentName
+#  COMPONENT_NAME2               =  gNvmExpressComponentName2
+
+[Sources]
+  NvmExpressBlockIo.c
+  NvmExpressBlockIo.h
+  ComponentName.c
+  NvmExpress.c
+  NvmExpress.h
+  NvmExpressDiskInfo.c
+  NvmExpressDiskInfo.h
+  NvmExpressHci.c
+  NvmExpressHci.h
+  NvmExpressPassthru.c
+  NvmExpressPassthru.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  BaseLib
+  DebugLib
+  DevicePathLib
+  MemoryAllocationLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiLib
+  PrintLib
+
+[Protocols]
+  gEfiPciIoProtocolGuid                       ## TO_START
+  gEfiDevicePathProtocolGuid                  ## TO_START
+  gEfiBlockIoProtocolGuid                     ## BY_START
+  gEfiDiskInfoProtocolGuid                    ## BY_START
+  gEfiDriverSupportedEfiVersionProtocolGuid   ## BY_START
