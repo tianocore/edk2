@@ -1671,7 +1671,11 @@ typedef struct {
   @retval EFI_INVALID_PARAMETER CapsuleCount is 0.
   @retval EFI_DEVICE_ERROR      The capsule update was started, but failed due to a device error.
   @retval EFI_UNSUPPORTED       The capsule type is not supported on this platform.
-  @retval EFI_OUT_OF_RESOURCES  There were insufficient resources to process the capsule.
+  @retval EFI_OUT_OF_RESOURCES  When ExitBootServices() has been previously called this error indicates the capsule 
+                                is compatible with this platform but is not capable of being submitted or processed 
+                                in runtime. The caller may resubmit the capsule prior to ExitBootServices().
+  @retval EFI_OUT_OF_RESOURCES  When ExitBootServices() has not been previously called then this error indicates 
+                                the capsule is compatible with this platform but there are insufficient resources to process.
 
 **/
 typedef
@@ -1698,7 +1702,11 @@ EFI_STATUS
   @retval EFI_UNSUPPORTED       The capsule type is not supported on this platform, and
                                 MaximumCapsuleSize and ResetType are undefined.
   @retval EFI_INVALID_PARAMETER MaximumCapsuleSize is NULL.
-  @retval EFI_OUT_OF_RESOURCES  There were insufficient resources to process the query request.
+  @retval EFI_OUT_OF_RESOURCES  When ExitBootServices() has been previously called this error indicates the capsule 
+                                is compatible with this platform but is not capable of being submitted or processed 
+                                in runtime. The caller may resubmit the capsule prior to ExitBootServices().
+  @retval EFI_OUT_OF_RESOURCES  When ExitBootServices() has not been previously called then this error indicates 
+                                the capsule is compatible with this platform but there are insufficient resources to process.
 
 **/
 typedef
