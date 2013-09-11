@@ -4,7 +4,7 @@
   It installs the Capsule Architectural Protocol defined in PI1.0a to signify 
   the capsule runtime services are ready.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -73,6 +73,11 @@ SaveLongModeContext (
   @retval EFI_INVALID_PARAMETER CapsuleCount is Zero.
   @retval EFI_INVALID_PARAMETER For across reset capsule image, ScatterGatherList is NULL.
   @retval EFI_UNSUPPORTED       CapsuleImage is not recognized by the firmware.
+  @retval EFI_OUT_OF_RESOURCES  When ExitBootServices() has been previously called this error indicates the capsule 
+                                is compatible with this platform but is not capable of being submitted or processed 
+                                in runtime. The caller may resubmit the capsule prior to ExitBootServices().
+  @retval EFI_OUT_OF_RESOURCES  When ExitBootServices() has not been previously called then this error indicates 
+                                the capsule is compatible with this platform but there are insufficient resources to process.
 
 **/
 EFI_STATUS
@@ -140,7 +145,7 @@ UpdateCapsule (
     //
     if ((CapsuleHeader->Flags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET) == 0) {
       if (EfiAtRuntime ()) { 
-        Status = EFI_UNSUPPORTED;
+        Status = EFI_OUT_OF_RESOURCES;
       } else {
         Status = ProcessCapsuleImage(CapsuleHeader);
       }
