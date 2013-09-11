@@ -172,10 +172,12 @@ NvmeRead (
   UINT32                           BlockSize;
   NVME_CONTROLLER_PRIVATE_DATA     *Controller;
   UINT32                           MaxTransferBlocks;
+  UINTN                            OrginalBlocks;
 
-  Status     = EFI_SUCCESS;
-  Controller = Device->Controller;
-  BlockSize  = Device->Media.BlockSize;
+  Status        = EFI_SUCCESS;
+  Controller    = Device->Controller;
+  BlockSize     = Device->Media.BlockSize;
+  OrginalBlocks = Blocks;
 
   if (Controller->ControllerData->Mdts != 0) {
     MaxTransferBlocks = (1 << (Controller->ControllerData->Mdts)) * (1 << (Controller->Cap.Mpsmin + 12)) / BlockSize;
@@ -200,7 +202,7 @@ NvmeRead (
     }
   }
 
-  DEBUG ((EFI_D_INFO, "NvmeRead()  Lba = %8d, Blocks = %8d, BlockSize = %d Status = %r\n", Lba, Blocks, BlockSize, Status));
+  DEBUG ((EFI_D_INFO, "NvmeRead()  Lba = 0x%08x, Original = 0x%08x, Remaining = 0x%08x, BlockSize = 0x%x Status = %r\n", Lba, OrginalBlocks, Blocks, BlockSize, Status));
 
   return Status;
 }
@@ -229,10 +231,12 @@ NvmeWrite (
   UINT32                           BlockSize;
   NVME_CONTROLLER_PRIVATE_DATA     *Controller;
   UINT32                           MaxTransferBlocks;
+  UINTN                            OrginalBlocks;
 
-  Status     = EFI_SUCCESS;
-  Controller = Device->Controller;
-  BlockSize  = Device->Media.BlockSize;
+  Status        = EFI_SUCCESS;
+  Controller    = Device->Controller;
+  BlockSize     = Device->Media.BlockSize;
+  OrginalBlocks = Blocks;
 
   if (Controller->ControllerData->Mdts != 0) {
     MaxTransferBlocks = (1 << (Controller->ControllerData->Mdts)) * (1 << (Controller->Cap.Mpsmin + 12)) / BlockSize;
@@ -257,7 +261,7 @@ NvmeWrite (
     }
   }
 
-  DEBUG ((EFI_D_INFO, "NvmeWrite() Lba = %8d, Blocks = %8d, BlockSize = %d Status = %r\n", Lba, Blocks, BlockSize, Status));
+  DEBUG ((EFI_D_INFO, "NvmeWrite() Lba = 0x%08x, Original = 0x%08x, Remaining = 0x%08x, BlockSize = 0x%x Status = %r\n", Lba, OrginalBlocks, Blocks, BlockSize, Status));
 
   return Status;
 }
