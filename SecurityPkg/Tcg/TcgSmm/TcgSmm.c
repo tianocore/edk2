@@ -8,7 +8,7 @@
 
   PhysicalPresenceCallback() and MemoryClearCallback() will receive untrusted input and do some check.
 
-Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -103,7 +103,22 @@ PhysicalPresenceCallback (
     }
     mTcgNvs->PhysicalPresence.ReturnCode = PP_SUBMIT_REQUEST_SUCCESS;
   } else if (mTcgNvs->PhysicalPresence.Parameter == ACPI_FUNCTION_GET_USER_CONFIRMATION_STATUS_FOR_REQUEST) {
-    Flags = PpData.Flags;  
+    //
+    // Get the Physical Presence flags
+    //
+    DataSize = sizeof (UINT8);
+    Status = mSmmVariable->SmmGetVariable (
+                             PHYSICAL_PRESENCE_FLAGS_VARIABLE,
+                             &gEfiPhysicalPresenceGuid,
+                             NULL,
+                             &DataSize,
+                             &Flags
+                             );
+    if (EFI_ERROR (Status)) {
+      mTcgNvs->PhysicalPresence.ReturnCode = PP_SUBMIT_REQUEST_GENERAL_FAILURE;
+      return EFI_SUCCESS;
+    }
+
     RequestConfirmed = FALSE;
 
     switch (mTcgNvs->PhysicalPresence.Request) {

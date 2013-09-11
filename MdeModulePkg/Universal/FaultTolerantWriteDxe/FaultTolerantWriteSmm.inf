@@ -50,6 +50,7 @@
   DebugLib
   UefiLib
   PcdLib
+  ReportStatusCodeLib
 
 [Guids]
   gEfiSystemNvDataFvGuid                        ## CONSUMES ## FV Signature of Working Space Header

@@ -73,6 +73,7 @@
   gEfiSmmVariableProtocolGuid                   ## ALWAYS_PRODUCES
   gEfiSmmFaultTolerantWriteProtocolGuid         ## SOMETIMES_CONSUMES
   gEfiSmmAccess2ProtocolGuid                    ## ALWAYS_CONSUMES
+  gEfiSmmEndOfDxeProtocolGuid                   ## ALWAYS_CONSUMES
 
 [Guids]
   gEfiAuthenticatedVariableGuid                 ## PRODUCES ## Configuration Table Guid

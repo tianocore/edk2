@@ -59,6 +59,7 @@
   gEfiVariableArchProtocolGuid                  ## ALWAYS_PRODUCES  
   gEfiSmmCommunicationProtocolGuid
   gEfiSmmVariableProtocolGuid
+  gEdkiiVariableLockProtocolGuid                ## ALWAYS_PRODUCES
 
 [Guids]
   gEfiEventVirtualAddressChangeGuid             ## PRODUCES ## Event

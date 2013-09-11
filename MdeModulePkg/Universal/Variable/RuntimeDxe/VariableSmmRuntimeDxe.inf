@@ -4,7 +4,7 @@
 #  This module is the Runtime DXE part correspond to SMM variable module. It 
 #  installs variable arch protocol and variable write arch protocol and works 
 #  with SMM variable module together. 
-# Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -54,6 +54,7 @@
   gEfiVariableArchProtocolGuid                  ## ALWAYS_PRODUCES  
   gEfiSmmCommunicationProtocolGuid
   gEfiSmmVariableProtocolGuid
+  gEdkiiVariableLockProtocolGuid                ## ALWAYS_PRODUCES
 
 [Guids]
   gEfiEventVirtualAddressChangeGuid             ## PRODUCES ## Event

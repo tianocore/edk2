@@ -60,6 +60,10 @@ typedef struct {
 // is gEfiSmmVariableProtocolGuid.
 //
 #define SMM_VARIABLE_FUNCTION_GET_STATISTICS          7
+//
+// The payload for this function is SMM_VARIABLE_COMMUNICATE_LOCK_VARIABLE
+//
+#define SMM_VARIABLE_FUNCTION_LOCK_VARIABLE           8
 
 ///
 /// Size of SMM communicate header, without including the payload.
@@ -100,5 +104,7 @@ typedef struct {
   UINT64          MaximumVariableSize;
   UINT32          Attributes; 
 } SMM_VARIABLE_COMMUNICATE_QUERY_VARIABLE_INFO;
+
+typedef SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME SMM_VARIABLE_COMMUNICATE_LOCK_VARIABLE;
 
 #endif // _SMM_VARIABLE_COMMON_H_

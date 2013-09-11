@@ -326,6 +326,10 @@
   #  Include/Protocol/SmmVariableProtocol.h
   gEfiSmmVariableProtocolGuid = { 0xed32d533, 0x99e6, 0x4209, { 0x9c, 0xc0, 0x2d, 0x72, 0xcd, 0xd9, 0x98, 0xa7 }}
 
+  ## This protocol is intended for use as a means to mark a variable read-only after the event EFI_END_OF_DXE_EVENT_GUID is signaled.
+  #  Include/Protocol/VariableLock.h
+  gEdkiiVariableLockProtocolGuid = { 0xcd3d0a05, 0x9e24, 0x437c, { 0xa8, 0x91, 0x1e, 0xe0, 0x53, 0xdb, 0x76, 0x38 }}
+
   ## This protocol is similar with DXE FVB protocol and used in the UEFI SMM evvironment.
   #  Include/Protocol/SmmFirmwareVolumeBlock.h
   gEfiSmmFirmwareVolumeBlockProtocolGuid = { 0xd326d041, 0xbd31, 0x4c01, { 0xb5, 0xa8, 0x62, 0x8b, 0xe8, 0x7f, 0x6, 0x53 }}
@@ -542,7 +546,7 @@
   ## The size of volatile buffer. This buffer is used to store VOLATILE attribute variable.
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x10000|UINT32|0x30000005
 
-  ## Size of the FTW spare block range. Note that this value should larger than PcdFlashNvStorageVariableSize
+  ## Size of the FTW spare block range. Note that this value should larger than PcdFlashNvStorageVariableSize and block size aligned.
   # The root cause is that variable driver will use FTW protocol to reclaim variable region.
   # If the length of variable region is larger than FTW spare size, it means the whole variable region can not
   # be reflushed through the manner of fault tolerant write.
@@ -667,7 +671,7 @@
   ## Base address of the NV variable range in flash device
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0x0|UINT32|0x30000001
 
-  ## Base address of the FTW spare block range in flash device.
+  ## Base address of the FTW spare block range in flash device. Note that this value should be block size aligned.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0x0|UINT32|0x30000013
 
   ## Base address of the FTW working block range in flash device.
@@ -676,7 +680,7 @@
   ## 64-bit Base address of the NV variable range in flash device
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0x0|UINT64|0x80000001
 
-  ## 64-bit Base address of the FTW spare block range in flash device.
+  ## 64-bit Base address of the FTW spare block range in flash device. Note that this value should be block size aligned.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0x0|UINT64|0x80000013
 
   ## 64-bit Base address of the FTW working block range in flash device.

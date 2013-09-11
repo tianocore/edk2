@@ -29,6 +29,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/Variable.h>
 #include <Protocol/SmmCommunication.h>
 #include <Protocol/SmmVariable.h>
+#include <Protocol/VariableLock.h>
 
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -54,6 +55,7 @@ UINT8                           *mVariableBufferPhysical    = NULL;
 UINTN                            mVariableBufferSize;
 UINTN                            mVariableBufferPayloadSize;
 EFI_LOCK                         mVariableServicesLock;
+EDKII_VARIABLE_LOCK_PROTOCOL     mVariableLock;
 
 /**
   Acquires lock only at boot time. Simply returns at runtime.
@@ -173,6 +175,73 @@ SendCommunicateBuffer (
   return  SmmVariableFunctionHeader->ReturnStatus;
 }
 
+/**
+  Mark a variable that will become read-only after leaving the DXE phase of execution.
+
+  @param[in] This          The VARIABLE_LOCK_PROTOCOL instance.
+  @param[in] VariableName  A pointer to the variable name that will be made read-only subsequently.
+  @param[in] VendorGuid    A pointer to the vendor GUID that will be made read-only subsequently.
+
+  @retval EFI_SUCCESS           The variable specified by the VariableName and the VendorGuid was marked
+                                as pending to be read-only.
+  @retval EFI_INVALID_PARAMETER VariableName or VendorGuid is NULL.
+                                Or VariableName is an empty string.
+  @retval EFI_ACCESS_DENIED     EFI_END_OF_DXE_EVENT_GROUP_GUID or EFI_EVENT_GROUP_READY_TO_BOOT has
+                                already been signaled.
+  @retval EFI_OUT_OF_RESOURCES  There is not enough resource to hold the lock request.
+**/
+EFI_STATUS
+EFIAPI
+VariableLockRequestToLock (
+  IN CONST EDKII_VARIABLE_LOCK_PROTOCOL *This,
+  IN       CHAR16                       *VariableName,
+  IN       EFI_GUID                     *VendorGuid
+  )
+{
+  EFI_STATUS                                Status;
+  UINTN                                     VariableNameSize;
+  UINTN                                     PayloadSize;
+  SMM_VARIABLE_COMMUNICATE_LOCK_VARIABLE    *VariableToLock;
+
+  if (VariableName == NULL || VariableName[0] == 0 || VendorGuid == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  VariableNameSize = StrSize (VariableName);
+
+  //
+  // If VariableName exceeds SMM payload limit. Return failure
+  //
+  if (VariableNameSize > mVariableBufferPayloadSize - OFFSET_OF (SMM_VARIABLE_COMMUNICATE_LOCK_VARIABLE, Name)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  AcquireLockOnlyAtBootTime(&mVariableServicesLock);
+
+  //
+  // Init the communicate buffer. The buffer data size is:
+  // SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + PayloadSize.
+  //
+  PayloadSize = OFFSET_OF (SMM_VARIABLE_COMMUNICATE_LOCK_VARIABLE, Name) + VariableNameSize;
+  Status = InitCommunicateBuffer ((VOID **) &VariableToLock, PayloadSize, SMM_VARIABLE_FUNCTION_LOCK_VARIABLE);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+  ASSERT (VariableToLock != NULL);
+
+  CopyGuid (&VariableToLock->Guid, VendorGuid);
+  VariableToLock->NameSize = VariableNameSize;
+  CopyMem (VariableToLock->Name, VariableName, VariableToLock->NameSize);
+
+  //
+  // Send data to SMM.
+  //
+  Status = SendCommunicateBuffer (PayloadSize);
+
+Done:
+  ReleaseLockOnlyAtBootTime (&mVariableServicesLock);
+  return Status;
+}
 
 /**
   This code finds variable in storage blocks (Volatile or Non-Volatile).
@@ -740,12 +809,22 @@ VariableSmmRuntimeInitialize (
   IN EFI_SYSTEM_TABLE                       *SystemTable
   )
 {
+  EFI_STATUS                                Status;
   VOID                                      *SmmVariableRegistration;
   VOID                                      *SmmVariableWriteRegistration;
   EFI_EVENT                                 OnReadyToBootEvent;
   EFI_EVENT                                 ExitBootServiceEvent;
 
   EfiInitializeLock (&mVariableServicesLock, TPL_NOTIFY);
+
+  mVariableLock.RequestToLock = VariableLockRequestToLock;
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &mHandle,
+                  &gEdkiiVariableLockProtocolGuid,
+                  &mVariableLock,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
 
   //
   // Smm variable service is ready

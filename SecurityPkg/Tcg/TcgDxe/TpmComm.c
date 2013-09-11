@@ -1,7 +1,7 @@
 /** @file  
   Utility functions used by TPM Dxe driver.
 
-Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -144,10 +144,17 @@ TpmCommLogEvent (
   IN      UINT8                     *NewEventData
   )
 {
-  UINT32                            NewLogSize;
+  UINTN                            NewLogSize;
+
+  //
+  // Prevent Event Overflow
+  //
+  if (NewEventHdr->EventSize > (UINTN)(~0) - sizeof (*NewEventHdr)) {
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   NewLogSize = sizeof (*NewEventHdr) + NewEventHdr->EventSize;
-  if (NewLogSize + *LogSize > MaxSize) {
+  if (NewLogSize > MaxSize - *LogSize) {
     return EFI_OUT_OF_RESOURCES;
   }
 

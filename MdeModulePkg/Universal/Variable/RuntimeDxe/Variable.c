@@ -21,12 +21,28 @@ VARIABLE_MODULE_GLOBAL  *mVariableModuleGlobal;
 ///
 /// Define a memory cache that improves the search performance for a variable.
 ///
-VARIABLE_STORE_HEADER  *mNvVariableCache = NULL;
+VARIABLE_STORE_HEADER  *mNvVariableCache      = NULL;
 
 ///
 /// The memory entry used for variable statistics data.
 ///
-VARIABLE_INFO_ENTRY    *gVariableInfo    = NULL;
+VARIABLE_INFO_ENTRY    *gVariableInfo         = NULL;
+
+///
+/// The list to store the variables which cannot be set after the EFI_END_OF_DXE_EVENT_GROUP_GUID
+/// or EVT_GROUP_READY_TO_BOOT event.
+///
+LIST_ENTRY             mLockedVariableList    = INITIALIZE_LIST_HEAD_VARIABLE (mLockedVariableList);
+
+///
+/// The flag to indicate whether the platform has left the DXE phase of execution.
+///
+BOOLEAN                mEndOfDxe              = FALSE;
+
+///
+/// The flag to indicate whether the variable storage locking is enabled.
+///
+BOOLEAN                mEnableLocking         = TRUE;
 
 
 /**
@@ -1919,6 +1935,58 @@ IsHwErrRecVariable (
 }
 
 /**
+  Mark a variable that will become read-only after leaving the DXE phase of execution.
+
+  @param[in] This          The VARIABLE_LOCK_PROTOCOL instance.
+  @param[in] VariableName  A pointer to the variable name that will be made read-only subsequently.
+  @param[in] VendorGuid    A pointer to the vendor GUID that will be made read-only subsequently.
+
+  @retval EFI_SUCCESS           The variable specified by the VariableName and the VendorGuid was marked
+                                as pending to be read-only.
+  @retval EFI_INVALID_PARAMETER VariableName or VendorGuid is NULL.
+                                Or VariableName is an empty string.
+  @retval EFI_ACCESS_DENIED     EFI_END_OF_DXE_EVENT_GROUP_GUID or EFI_EVENT_GROUP_READY_TO_BOOT has
+                                already been signaled.
+  @retval EFI_OUT_OF_RESOURCES  There is not enough resource to hold the lock request.
+**/
+EFI_STATUS
+EFIAPI
+VariableLockRequestToLock (
+  IN CONST EDKII_VARIABLE_LOCK_PROTOCOL *This,
+  IN       CHAR16                       *VariableName,
+  IN       EFI_GUID                     *VendorGuid
+  )
+{
+  VARIABLE_ENTRY                  *Entry;
+
+  if (VariableName == NULL || VariableName[0] == 0 || VendorGuid == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (mEndOfDxe) {
+    return EFI_ACCESS_DENIED;
+  }
+
+  Entry = AllocateRuntimePool (sizeof (*Entry) + StrSize (VariableName));
+  if (Entry == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  DEBUG ((EFI_D_INFO, "[Variable] Lock: %g:%s\n", VendorGuid, VariableName));
+
+  AcquireLockOnlyAtBootTime(&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
+
+  Entry->Name = (CHAR16 *) (Entry + 1);
+  StrCpy   (Entry->Name, VariableName);
+  CopyGuid (&Entry->Guid, VendorGuid);
+  InsertTailList (&mLockedVariableList, &Entry->Link);
+
+  ReleaseLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
+
+  return EFI_SUCCESS;
+}
+
+/**
 
   This code finds variable in storage blocks (Volatile or Non-Volatile).
 
@@ -2192,6 +2260,8 @@ VariableServiceSetVariable (
   EFI_STATUS                          Status;
   VARIABLE_HEADER                     *NextVariable;
   EFI_PHYSICAL_ADDRESS                Point;
+  LIST_ENTRY                          *Link;
+  VARIABLE_ENTRY                      *Entry;
 
   //
   // Check input parameters.
@@ -2247,16 +2317,6 @@ VariableServiceSetVariable (
     }  
   }
 
-  if (AtRuntime ()) {
-    //
-    // HwErrRecSupport Global Variable identifies the level of hardware error record persistence
-    // support implemented by the platform. This variable is only modified by firmware and is read-only to the OS.
-    //
-    if (CompareGuid (VendorGuid, &gEfiGlobalVariableGuid) && (StrCmp (VariableName, L"HwErrRecSupport") == 0)) {
-      return EFI_WRITE_PROTECTED;
-    }
-  }
-
   AcquireLockOnlyAtBootTime(&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
 
   //
@@ -2275,13 +2335,31 @@ VariableServiceSetVariable (
     mVariableModuleGlobal->NonVolatileLastVariableOffset = (UINTN) NextVariable - (UINTN) Point;
   }
 
+  if (mEndOfDxe && mEnableLocking) {
+    //
+    // Treat the variables listed in the forbidden variable list as read-only after leaving DXE phase.
+    //
+    for ( Link = GetFirstNode (&mLockedVariableList)
+        ; !IsNull (&mLockedVariableList, Link)
+        ; Link = GetNextNode (&mLockedVariableList, Link)
+        ) {
+      Entry = BASE_CR (Link, VARIABLE_ENTRY, Link);
+      if (CompareGuid (&Entry->Guid, VendorGuid) && (StrCmp (Entry->Name, VariableName) == 0)) {
+        Status = EFI_WRITE_PROTECTED;
+        DEBUG ((EFI_D_INFO, "[Variable]: Changing readonly variable after leaving DXE phase - %g:%s\n", VendorGuid, VariableName));
+        goto Done;
+      }
+    }
+  }
+
   //
   // Check whether the input variable is already existed.
   //
   Status = FindVariable (VariableName, VendorGuid, &Variable, &mVariableModuleGlobal->VariableGlobal, TRUE);
   if (!EFI_ERROR (Status)) {
     if (((Variable.CurrPtr->Attributes & EFI_VARIABLE_RUNTIME_ACCESS) == 0) && AtRuntime ()) {
-      return EFI_WRITE_PROTECTED;
+      Status = EFI_WRITE_PROTECTED;
+      goto Done;
     }
   }
 
@@ -2292,6 +2370,7 @@ VariableServiceSetVariable (
 
   Status = UpdateVariable (VariableName, VendorGuid, Data, DataSize, Attributes, &Variable);
 
+Done:
   InterlockedDecrement (&mVariableModuleGlobal->VariableGlobal.ReentrantState);
   ReleaseLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
 

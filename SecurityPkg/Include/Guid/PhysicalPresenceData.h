@@ -4,7 +4,7 @@
   cleared after it is processed in the next boot cycle. The TPM response 
   is saved to variable.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -29,16 +29,7 @@ typedef struct {
   UINT8   PPRequest;      ///< Physical Presence request command.
   UINT8   LastPPRequest;
   UINT32  PPResponse;
-  UINT8   Flags;
 } EFI_PHYSICAL_PRESENCE;
-
-//
-// The definition bit of the flags
-//
-#define FLAG_NO_PPI_PROVISION                    BIT0
-#define FLAG_NO_PPI_CLEAR                        BIT1
-#define FLAG_NO_PPI_MAINTENANCE                  BIT2
-#define FLAG_RESET_TRACK                         BIT3
 
 //
 // The definition of physical presence operation actions
@@ -66,6 +57,20 @@ typedef struct {
 #define PHYSICAL_PRESENCE_SET_NO_PPI_MAINTENANCE_TRUE             20
 #define PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR                   21
 #define PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR_ENABLE_ACTIVATE   22
+
+//
+// This variable is used to save TPM Management Flags and corresponding operations.
+// It should be protected from malicious software (e.g. Set it as read-only variable). 
+//
+#define PHYSICAL_PRESENCE_FLAGS_VARIABLE  L"PhysicalPresenceFlags"
+
+//
+// The definition bit of the TPM Management Flags
+//
+#define FLAG_NO_PPI_PROVISION                    BIT0
+#define FLAG_NO_PPI_CLEAR                        BIT1
+#define FLAG_NO_PPI_MAINTENANCE                  BIT2
+#define FLAG_RESET_TRACK                         BIT3
 
 extern EFI_GUID  gEfiPhysicalPresenceGuid;
 
