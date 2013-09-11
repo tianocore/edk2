@@ -35,6 +35,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/LegacyDevOrder.h>
 #include <Guid/BdsHii.h>
 #include <Guid/ConnectConInEvent.h>
+#include <Guid/Performance.h>
 #include <Protocol/GenericMemoryTest.h>
 #include <Protocol/FormBrowser2.h>
 #include <Protocol/HiiConfigAccess.h>
@@ -66,7 +67,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/CapsuleLib.h>
 #include <Library/HiiLib.h>
 #include <Library/DevicePathLib.h>
-#include <Library/PcdLib.h>
 #include <Library/UefiHiiServicesLib.h>
 
 #include <Library/GenericBdsLib.h>
