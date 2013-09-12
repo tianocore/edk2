@@ -4,7 +4,7 @@
   AuthenticatedVariableFormat.h defines variable data headers 
   and variable storage region headers.
 
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -29,6 +29,7 @@ extern EFI_GUID gEfiAuthenticatedVariableGuid;
 extern EFI_GUID gEfiSecureBootEnableDisableGuid;
 extern EFI_GUID gEfiCertDbGuid;
 extern EFI_GUID gEfiCustomModeEnableGuid;
+extern EFI_GUID gEfiVendorKeysNvGuid;
 
 ///
 /// "SecureBootEnable" variable for the Secure Boot feature enable/disable.
@@ -50,6 +51,16 @@ extern EFI_GUID gEfiCustomModeEnableGuid;
 #define EFI_CUSTOM_MODE_NAME          L"CustomMode"
 #define CUSTOM_SECURE_BOOT_MODE       1
 #define STANDARD_SECURE_BOOT_MODE     0
+
+///
+///  "VendorKeysNv" variable to record the out of band secure boot keys modification.
+///  This variable is a read-only NV varaible that indicates whether someone other than
+///  the platform vendor has used a mechanism not defined by the UEFI Specification to
+///  transition the system to setup mode or to update secure boot keys.
+///
+#define EFI_VENDOR_KEYS_NV_VARIABLE_NAME       L"VendorKeysNv"
+#define VENDOR_KEYS_VALID             1
+#define VENDOR_KEYS_MODIFIED          0
 
 ///
 /// Alignment of variable name and data, according to the architecture:

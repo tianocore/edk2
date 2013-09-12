@@ -86,6 +86,7 @@
   gEfiCertRsa2048Guid
   gEfiSecureBootEnableDisableGuid
   gEfiCustomModeEnableGuid
+  gEfiVendorKeysNvGuid
   gEfiSystemNvDataFvGuid                        ## CONSUMES
   gEfiCertDbGuid
   gEfiHardwareErrorVariableGuid                 ## SOMETIMES_CONSUMES
