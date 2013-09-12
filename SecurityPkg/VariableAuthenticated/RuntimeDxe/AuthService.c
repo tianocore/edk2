@@ -2195,7 +2195,24 @@ VerifyTimeBasedPayload (
 
   if (AuthVarType == AuthVarTypePk) {
     //
-    // Get platform key from variable.
+    // Verify that the signature has been made with the current Platform Key (no chaining for PK).
+    // First, get signer's certificates from SignedData.
+    //
+    VerifyStatus = Pkcs7GetSigners (
+                     SigData,
+                     SigDataSize,
+                     &SignerCerts,
+                     &CertStackSize,
+                     &RootCert,
+                     &RootCertSize
+                     );
+    if (!VerifyStatus) {
+      goto Exit;
+    }
+
+    //
+    // Second, get the current platform key from variable. Check whether it's identical with signer's certificates
+    // in SignedData. If not, return error immediately.
     //
     Status = FindVariable (
                EFI_PLATFORM_KEY_NAME,
@@ -2205,14 +2222,16 @@ VerifyTimeBasedPayload (
                FALSE
                );
     if (EFI_ERROR (Status)) {
-      return Status;
+      VerifyStatus = FALSE;
+      goto Exit;
     }
-
     CertList = (EFI_SIGNATURE_LIST *) GetVariableDataPtr (PkVariable.CurrPtr);
     Cert     = (EFI_SIGNATURE_DATA *) ((UINT8 *) CertList + sizeof (EFI_SIGNATURE_LIST) + CertList->SignatureHeaderSize);
-    RootCert      = Cert->SignatureData;
-    RootCertSize  = CertList->SignatureSize - (sizeof (EFI_SIGNATURE_DATA) - 1);
-
+    if ((RootCertSize != (CertList->SignatureSize - (sizeof (EFI_SIGNATURE_DATA) - 1))) ||
+        (CompareMem (Cert->SignatureData, RootCert, RootCertSize) != 0)) {
+      VerifyStatus = FALSE;
+      goto Exit;
+    }
 
     //
     // Verify Pkcs7 SignedData via Pkcs7Verify library.
@@ -2368,7 +2387,7 @@ VerifyTimeBasedPayload (
 
 Exit:
 
-  if (AuthVarType == AuthVarTypePriv) {
+  if (AuthVarType == AuthVarTypePk || AuthVarType == AuthVarTypePriv) {
     Pkcs7FreeSigners (RootCert);
     Pkcs7FreeSigners (SignerCerts);
   }
