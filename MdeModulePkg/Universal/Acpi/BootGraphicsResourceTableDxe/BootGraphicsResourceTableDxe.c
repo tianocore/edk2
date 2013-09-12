@@ -1,7 +1,7 @@
 /** @file
   This module install ACPI Boot Graphics Resource Table (BGRT).
 
-  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -235,9 +235,9 @@ BgrtAcpiTableChecksum (
 }
 
 /**
-  Allocate EfiReservedMemoryType below 4G memory address.
+  Allocate EfiBootServicesData below 4G memory address.
 
-  This function allocates EfiReservedMemoryType below 4G memory address.
+  This function allocates EfiBootServicesData below 4G memory address.
 
   @param[in]  Size   Size of memory to allocate.
 
@@ -245,7 +245,7 @@ BgrtAcpiTableChecksum (
 
 **/
 VOID *
-BgrtAllocateReservedMemoryBelow4G (
+BgrtAllocateBsDataMemoryBelow4G (
   IN UINTN       Size
   )
 {
@@ -259,7 +259,7 @@ BgrtAllocateReservedMemoryBelow4G (
 
   Status = gBS->AllocatePages (
                   AllocateMaxAddress,
-                  EfiReservedMemoryType,
+                  EfiBootServicesData,
                   Pages,
                   &Address
                   );
@@ -361,9 +361,12 @@ InstallBootGraphicsResourceTable (
     if (mLogoHeight > (((UINT32) ~0) - sizeof (BMP_IMAGE_HEADER)) / (mLogoWidth * 3 + PaddingSize)) {
       return EFI_UNSUPPORTED;
     }
-    
+
+    //
+    // The image should be stored in EfiBootServicesData, allowing the system to reclaim the memory
+    //
     BmpSize = (mLogoWidth * 3 + PaddingSize) * mLogoHeight + sizeof (BMP_IMAGE_HEADER);
-    ImageBuffer = BgrtAllocateReservedMemoryBelow4G (BmpSize);
+    ImageBuffer = BgrtAllocateBsDataMemoryBelow4G (BmpSize);
     if (ImageBuffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
