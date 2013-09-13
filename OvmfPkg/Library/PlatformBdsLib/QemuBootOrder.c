@@ -2,6 +2,7 @@
   Rewrite the BootOrder NvVar based on QEMU's "bootorder" fw_cfg file.
 
   Copyright (C) 2012 - 2013, Red Hat, Inc.
+  Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -238,6 +239,15 @@ typedef struct {
 
 
 /**
+  Array element tracking an enumerated boot option that has the
+  LOAD_OPTION_ACTIVE attribute.
+**/
+typedef struct {
+  CONST BDS_COMMON_OPTION *BootOption; // reference only, no ownership
+} ACTIVE_OPTION;
+
+
+/**
 
   Append BootOptionId to BootOrder, reallocating the latter if needed.
 
@@ -278,6 +288,77 @@ BootOrderAppend (
   }
 
   BootOrder->Data[BootOrder->Produced++] = BootOptionId;
+  return RETURN_SUCCESS;
+}
+
+
+/**
+
+  Create an array of ACTIVE_OPTION elements for a boot option list.
+
+  @param[in]  BootOptionList  A boot option list, created with
+                              BdsLibEnumerateAllBootOption().
+
+  @param[out] ActiveOption    Pointer to the first element in the new array.
+                              The caller is responsible for freeing the array
+                              with FreePool() after use.
+
+  @param[out] Count           Number of elements in the new array.
+
+
+  @retval RETURN_SUCCESS           The ActiveOption array has been created.
+
+  @retval RETURN_NOT_FOUND         No active entry has been found in
+                                   BootOptionList.
+
+  @retval RETURN_OUT_OF_RESOURCES  Memory allocation failed.
+
+**/
+STATIC
+RETURN_STATUS
+CollectActiveOptions (
+  IN   CONST LIST_ENTRY *BootOptionList,
+  OUT  ACTIVE_OPTION    **ActiveOption,
+  OUT  UINTN            *Count
+  )
+{
+  UINTN ScanMode;
+
+  *ActiveOption = NULL;
+
+  //
+  // Scan the list twice:
+  // - count active entries,
+  // - store links to active entries.
+  //
+  for (ScanMode = 0; ScanMode < 2; ++ScanMode) {
+    CONST LIST_ENTRY *Link;
+
+    Link = BootOptionList->ForwardLink;
+    *Count = 0;
+    while (Link != BootOptionList) {
+      CONST BDS_COMMON_OPTION *Current;
+
+      Current = CR (Link, BDS_COMMON_OPTION, Link, BDS_LOAD_OPTION_SIGNATURE);
+      if (IS_LOAD_OPTION_TYPE (Current->Attribute, LOAD_OPTION_ACTIVE)) {
+        if (ScanMode == 1) {
+          (*ActiveOption)[*Count].BootOption = Current;
+        }
+        ++*Count;
+      }
+      Link = Link->ForwardLink;
+    }
+
+    if (ScanMode == 0) {
+      if (*Count == 0) {
+        return RETURN_NOT_FOUND;
+      }
+      *ActiveOption = AllocatePool (*Count * sizeof **ActiveOption);
+      if (*ActiveOption == NULL) {
+        return RETURN_OUT_OF_RESOURCES;
+      }
+    }
+  }
   return RETURN_SUCCESS;
 }
 
@@ -967,6 +1048,8 @@ SetBootOrderFromQemu (
   CONST CHAR8                      *FwCfgPtr;
 
   BOOT_ORDER                       BootOrder;
+  ACTIVE_OPTION                    *ActiveOption;
+  UINTN                            ActiveCount;
 
   UINTN                            TranslatedSize;
   CHAR16                           Translated[TRANSLATION_OUTPUT_SIZE];
@@ -1007,6 +1090,11 @@ SetBootOrderFromQemu (
     goto ErrorFreeFwCfg;
   }
 
+  Status = CollectActiveOptions (BootOptionList, &ActiveOption, &ActiveCount);
+  if (RETURN_ERROR (Status)) {
+    goto ErrorFreeBootOrder;
+  }
+
   //
   // translate each OpenFirmware path
   //
@@ -1016,38 +1104,29 @@ SetBootOrderFromQemu (
          Status == RETURN_UNSUPPORTED ||
          Status == RETURN_BUFFER_TOO_SMALL) {
     if (Status == RETURN_SUCCESS) {
-      CONST LIST_ENTRY *Link;
+      UINTN Idx;
 
       //
-      // match translated OpenFirmware path against all enumerated boot options
+      // match translated OpenFirmware path against all active boot options
       //
-      for (Link = BootOptionList->ForwardLink; Link != BootOptionList;
-           Link = Link->ForwardLink) {
-        CONST BDS_COMMON_OPTION *BootOption;
-
-        BootOption = CR (
-                       Link,
-                       BDS_COMMON_OPTION,
-                       Link,
-                       BDS_LOAD_OPTION_SIGNATURE
-                       );
-        if (IS_LOAD_OPTION_TYPE (BootOption->Attribute, LOAD_OPTION_ACTIVE) &&
-            Match (
+      for (Idx = 0; Idx < ActiveCount; ++Idx) {
+        if (Match (
               Translated,
               TranslatedSize, // contains length, not size, in CHAR16's here
-              BootOption->DevicePath
+              ActiveOption[Idx].BootOption->DevicePath
               )
             ) {
           //
           // match found, store ID and continue with next OpenFirmware path
           //
-          Status = BootOrderAppend (&BootOrder, BootOption->BootCurrent);
+          Status = BootOrderAppend (&BootOrder,
+                     ActiveOption[Idx].BootOption->BootCurrent);
           if (Status != RETURN_SUCCESS) {
-            goto ErrorFreeBootOrder;
+            goto ErrorFreeActiveOption;
           }
           break;
         }
-      } // scanned all enumerated boot options
+      } // scanned all active boot options
     }   // translation successful
 
     TranslatedSize = sizeof (Translated) / sizeof (Translated[0]);
@@ -1076,6 +1155,9 @@ SetBootOrderFromQemu (
       Status == EFI_SUCCESS ? "success" : "error"
       ));
   }
+
+ErrorFreeActiveOption:
+  FreePool (ActiveOption);
 
 ErrorFreeBootOrder:
   FreePool (BootOrder.Data);
