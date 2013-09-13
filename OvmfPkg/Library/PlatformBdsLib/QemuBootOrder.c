@@ -1013,6 +1013,105 @@ Exit:
 
 
 /**
+  Append some of the unselected active boot options to the boot order.
+
+  This function should accommodate any further policy changes in "boot option
+  survival". Currently we're adding back everything that starts with neither
+  PciRoot() nor HD().
+
+  @param[in,out] BootOrder     The structure holding the boot order to
+                               complete. The caller is responsible for
+                               initializing (and potentially populating) it
+                               before calling this function.
+
+  @param[in,out] ActiveOption  The array of active boot options to scan.
+                               Entries marked as Appended will be skipped.
+                               Those of the rest that satisfy the survival
+                               policy will be added to BootOrder with
+                               BootOrderAppend().
+
+  @param[in]     ActiveCount   Number of elements in ActiveOption.
+
+
+  @retval RETURN_SUCCESS  BootOrder has been extended with any eligible boot
+                          options.
+
+  @return                 Error codes returned by BootOrderAppend().
+**/
+STATIC
+RETURN_STATUS
+BootOrderComplete (
+  IN OUT  BOOT_ORDER    *BootOrder,
+  IN OUT  ACTIVE_OPTION *ActiveOption,
+  IN      UINTN         ActiveCount
+  )
+{
+  RETURN_STATUS Status;
+  UINTN         Idx;
+
+  Status = RETURN_SUCCESS;
+  Idx = 0;
+  while (!RETURN_ERROR (Status) && Idx < ActiveCount) {
+    if (!ActiveOption[Idx].Appended) {
+      CONST BDS_COMMON_OPTION        *Current;
+      CONST EFI_DEVICE_PATH_PROTOCOL *FirstNode;
+
+      Current = ActiveOption[Idx].BootOption;
+      FirstNode = Current->DevicePath;
+      if (FirstNode != NULL) {
+        CHAR16        *Converted;
+        STATIC CHAR16 ConvFallBack[] = L"<unable to convert>";
+        BOOLEAN       Keep;
+
+        Converted = ConvertDevicePathToText (FirstNode, FALSE, FALSE);
+        if (Converted == NULL) {
+          Converted = ConvFallBack;
+        }
+
+        Keep = TRUE;
+        if (DevicePathType(FirstNode) == MEDIA_DEVICE_PATH &&
+            DevicePathSubType(FirstNode) == MEDIA_HARDDRIVE_DP) {
+          //
+          // drop HD()
+          //
+          Keep = FALSE;
+        } else if (DevicePathType(FirstNode) == ACPI_DEVICE_PATH &&
+                   DevicePathSubType(FirstNode) == ACPI_DP) {
+          ACPI_HID_DEVICE_PATH *Acpi;
+
+          Acpi = (ACPI_HID_DEVICE_PATH *) FirstNode;
+          if ((Acpi->HID & PNP_EISA_ID_MASK) == PNP_EISA_ID_CONST &&
+              EISA_ID_TO_NUM (Acpi->HID) == 0x0a03) {
+            //
+            // drop PciRoot()
+            //
+            Keep = FALSE;
+          }
+        }
+
+        if (Keep) {
+          Status = BootOrderAppend (BootOrder, &ActiveOption[Idx]);
+          if (!RETURN_ERROR (Status)) {
+            DEBUG ((DEBUG_VERBOSE, "%a: keeping \"%s\"\n", __FUNCTION__,
+              Converted));
+          }
+        } else {
+          DEBUG ((DEBUG_VERBOSE, "%a: dropping \"%s\"\n", __FUNCTION__,
+            Converted));
+        }
+
+        if (Converted != ConvFallBack) {
+          FreePool (Converted);
+        }
+      }
+    }
+    ++Idx;
+  }
+  return Status;
+}
+
+
+/**
 
   Set the boot order based on configuration retrieved from QEMU.
 
@@ -1140,6 +1239,15 @@ SetBootOrderFromQemu (
   if (Status == RETURN_NOT_FOUND && BootOrder.Produced > 0) {
     //
     // No more OpenFirmware paths, some matches found: rewrite BootOrder NvVar.
+    // Some of the active boot options that have not been selected over fw_cfg
+    // should be preserved at the end of the boot order.
+    //
+    Status = BootOrderComplete (&BootOrder, ActiveOption, ActiveCount);
+    if (RETURN_ERROR (Status)) {
+      goto ErrorFreeActiveOption;
+    }
+
+    //
     // See Table 10 in the UEFI Spec 2.3.1 with Errata C for the required
     // attributes.
     //
