@@ -1,4 +1,4 @@
-/** @file 
+/** @file
   strncasecmp implementation
 
   Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
@@ -11,7 +11,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
  * Copyright (c) 1987, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -37,8 +37,8 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
 
-	$NetBSD: strncasecmp.c,v 1.2 2007/06/04 18:19:27 christos Exp $
-  strcasecmp.c	8.1 (Berkeley) 6/4/93
+  $NetBSD: strncasecmp.c,v 1.2 2007/06/04 18:19:27 christos Exp $
+  strcasecmp.c  8.1 (Berkeley) 6/4/93
 **/
 #include <LibConfig.h>
 #include <sys/cdefs.h>
@@ -55,25 +55,28 @@ __weak_alias(strncasecmp,_strncasecmp)
 #else
 #include <lib/libkern/libkern.h>
 #include <machine/limits.h>
-#endif 
+#endif
 
 int
 strncasecmp(const char *s1, const char *s2, size_t n)
 {
+  int   CompareVal;
 
-	_DIAGASSERT(s1 != NULL);
-	_DIAGASSERT(s2 != NULL);
+  _DIAGASSERT(s1 != NULL);
+  _DIAGASSERT(s2 != NULL);
 
-	if (n != 0) {
-		const unsigned char *us1 = (const unsigned char *)s1,
-				*us2 = (const unsigned char *)s2;
-
-		do {
-			if (tolower(*us1) != tolower(*us2++))
-				return (tolower(*us1) - tolower(*--us2));
-			if (*us1++ == '\0')
-				break;
-		} while (--n != 0);
-	}
-	return (0);
+  if (n != 0) {
+    do {
+      CompareVal = tolower(*s1) - tolower(*s2);
+      if (CompareVal != 0) {
+        return (CompareVal);
+      }
+      ++s1;
+      ++s2;
+      if (*s1 == '\0') {
+        break;
+      }
+    } while (--n != 0);
+  }
+  return (0);
 }
