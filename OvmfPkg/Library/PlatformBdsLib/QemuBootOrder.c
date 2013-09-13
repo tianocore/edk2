@@ -244,20 +244,22 @@ typedef struct {
 **/
 typedef struct {
   CONST BDS_COMMON_OPTION *BootOption; // reference only, no ownership
+  BOOLEAN                 Appended;    // has been added to a BOOT_ORDER?
 } ACTIVE_OPTION;
 
 
 /**
 
-  Append BootOptionId to BootOrder, reallocating the latter if needed.
+  Append an active boot option to BootOrder, reallocating the latter if needed.
 
   @param[in out] BootOrder     The structure pointing to the array and holding
                                allocation and usage counters.
 
-  @param[in]     BootOptionId  The value to append to the array.
+  @param[in]     ActiveOption  The active boot option whose ID should be
+                               appended to the array.
 
 
-  @retval RETURN_SUCCESS           BootOptionId appended.
+  @retval RETURN_SUCCESS           ID of ActiveOption appended.
 
   @retval RETURN_OUT_OF_RESOURCES  Memory reallocation failed.
 
@@ -265,8 +267,8 @@ typedef struct {
 STATIC
 RETURN_STATUS
 BootOrderAppend (
-  IN OUT  BOOT_ORDER *BootOrder,
-  IN      UINT16     BootOptionId
+  IN OUT  BOOT_ORDER    *BootOrder,
+  IN OUT  ACTIVE_OPTION *ActiveOption
   )
 {
   if (BootOrder->Produced == BootOrder->Allocated) {
@@ -287,7 +289,9 @@ BootOrderAppend (
     BootOrder->Data      = DataNew;
   }
 
-  BootOrder->Data[BootOrder->Produced++] = BootOptionId;
+  BootOrder->Data[BootOrder->Produced++] =
+                                         ActiveOption->BootOption->BootCurrent;
+  ActiveOption->Appended = TRUE;
   return RETURN_SUCCESS;
 }
 
@@ -343,6 +347,7 @@ CollectActiveOptions (
       if (IS_LOAD_OPTION_TYPE (Current->Attribute, LOAD_OPTION_ACTIVE)) {
         if (ScanMode == 1) {
           (*ActiveOption)[*Count].BootOption = Current;
+          (*ActiveOption)[*Count].Appended   = FALSE;
         }
         ++*Count;
       }
@@ -1119,8 +1124,7 @@ SetBootOrderFromQemu (
           //
           // match found, store ID and continue with next OpenFirmware path
           //
-          Status = BootOrderAppend (&BootOrder,
-                     ActiveOption[Idx].BootOption->BootCurrent);
+          Status = BootOrderAppend (&BootOrder, &ActiveOption[Idx]);
           if (Status != RETURN_SUCCESS) {
             goto ErrorFreeActiveOption;
           }
