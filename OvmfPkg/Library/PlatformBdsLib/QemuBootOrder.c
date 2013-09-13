@@ -882,6 +882,34 @@ Match (
   }
 
   //
+  // Attempt to expand any relative UEFI device path starting with HD() to an
+  // absolute device path first. The logic imitates BdsLibBootViaBootOption().
+  // We don't have to free the absolute device path,
+  // BdsExpandPartitionPartialDevicePathToFull() has internal caching.
+  //
+  Result = FALSE;
+  if (DevicePathType (DevicePath) == MEDIA_DEVICE_PATH &&
+      DevicePathSubType (DevicePath) == MEDIA_HARDDRIVE_DP) {
+    EFI_DEVICE_PATH_PROTOCOL *AbsDevicePath;
+    CHAR16                   *AbsConverted;
+
+    AbsDevicePath = BdsExpandPartitionPartialDevicePathToFull (
+                      (HARDDRIVE_DEVICE_PATH *) DevicePath);
+    if (AbsDevicePath == NULL) {
+      goto Exit;
+    }
+    AbsConverted = ConvertDevicePathToText (AbsDevicePath, FALSE, FALSE);
+    if (AbsConverted == NULL) {
+      goto Exit;
+    }
+    DEBUG ((DEBUG_VERBOSE,
+      "%a: expanded relative device path \"%s\" for prefix matching\n",
+      __FUNCTION__, Converted));
+    FreePool (Converted);
+    Converted = AbsConverted;
+  }
+
+  //
   // Is Translated a prefix of Converted?
   //
   Result = (BOOLEAN)(StrnCmp (Converted, Translated, TranslatedLength) == 0);
@@ -892,6 +920,7 @@ Match (
     Converted,
     Result ? "match" : "no match"
     ));
+Exit:
   FreePool (Converted);
   return Result;
 }
