@@ -387,6 +387,7 @@ NvmExpressPassThru (
   UINT64                        *Prp;
   VOID                          *PrpListHost;
   UINTN                         PrpListNo;
+  UINT32                        Data;
 
   //
   // check the data fields in Packet parameter.
@@ -431,8 +432,8 @@ NvmExpressPassThru (
   //
   // Currently we only support PRP for data transfer, SGL is NOT supported.
   //
-  ASSERT ((Sq->Opc & BIT15) == 0);
-  if ((Sq->Opc & BIT15) != 0) {
+  ASSERT (Sq->Psdt == 0);
+  if (Sq->Psdt != 0) {
     DEBUG ((EFI_D_ERROR, "NvmExpressPassThru: doesn't support SGL mechanism\n"));
     return EFI_UNSUPPORTED;
   }
@@ -534,14 +535,14 @@ NvmExpressPassThru (
   // Ring the submission queue doorbell.
   //
   Private->SqTdbl[Qid].Sqt ^= 1;
-
+  Data = ReadUnaligned32 ((UINT32*)&Private->SqTdbl[Qid]);
   PciIo->Mem.Write (
                PciIo,
                EfiPciIoWidthUint32,
                NVME_BAR,
                NVME_SQTDBL_OFFSET(Qid, Private->Cap.Dstrd),
                1,
-               &Private->SqTdbl[Qid]
+               &Data
                );
 
   Status = gBS->CreateEvent (
@@ -591,13 +592,14 @@ NvmExpressPassThru (
     NvmeDumpStatus(Cq);
   DEBUG_CODE_END();
 
+  Data = ReadUnaligned32 ((UINT32*)&Private->CqHdbl[Qid]);
   PciIo->Mem.Write (
                PciIo,
                EfiPciIoWidthUint32,
                NVME_BAR,
                NVME_CQHDBL_OFFSET(Qid, Private->Cap.Dstrd),
                1,
-               &Private->CqHdbl[Qid]
+               &Data
                );
 
 EXIT:

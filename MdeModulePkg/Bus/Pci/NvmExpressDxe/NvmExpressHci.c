@@ -33,21 +33,23 @@ ReadNvmeControllerCapabilities (
 {
   EFI_PCI_IO_PROTOCOL   *PciIo;
   EFI_STATUS            Status;
+  UINT64                Data;
 
   PciIo  = Private->PciIo;
   Status = PciIo->Mem.Read (
                         PciIo,
-                        EfiPciIoWidthUint64,
+                        EfiPciIoWidthUint32,
                         NVME_BAR,
                         NVME_CAP_OFFSET,
-                        1,
-                        Cap
+                        2,
+                        &Data
                         );
 
   if (EFI_ERROR(Status)) {
     return Status;
   }
 
+  WriteUnaligned64 ((UINT64*)Cap, Data);
   return EFI_SUCCESS;
 }
 
@@ -69,6 +71,7 @@ ReadNvmeControllerConfiguration (
 {
   EFI_PCI_IO_PROTOCOL   *PciIo;
   EFI_STATUS            Status;
+  UINT32                Data;
 
   PciIo  = Private->PciIo;
   Status = PciIo->Mem.Read (
@@ -77,13 +80,14 @@ ReadNvmeControllerConfiguration (
                         NVME_BAR,
                         NVME_CC_OFFSET,
                         1,
-                        Cc
+                        &Data
                         );
 
   if (EFI_ERROR(Status)) {
     return Status;
   }
 
+  WriteUnaligned32 ((UINT32*)Cc, Data);
   return EFI_SUCCESS;
 }
 
@@ -105,15 +109,17 @@ WriteNvmeControllerConfiguration (
 {
   EFI_PCI_IO_PROTOCOL   *PciIo;
   EFI_STATUS            Status;
+  UINT32                Data;
 
   PciIo  = Private->PciIo;
+  Data   = ReadUnaligned32 ((UINT32*)Cc);
   Status = PciIo->Mem.Write (
                         PciIo,
                         EfiPciIoWidthUint32,
                         NVME_BAR,
                         NVME_CC_OFFSET,
                         1,
-                        Cc
+                        &Data
                         );
 
   if (EFI_ERROR(Status)) {
@@ -149,6 +155,7 @@ ReadNvmeControllerStatus (
 {
   EFI_PCI_IO_PROTOCOL   *PciIo;
   EFI_STATUS            Status;
+  UINT32                Data;
 
   PciIo  = Private->PciIo;
   Status = PciIo->Mem.Read (
@@ -157,13 +164,14 @@ ReadNvmeControllerStatus (
                         NVME_BAR,
                         NVME_CSTS_OFFSET,
                         1,
-                        Csts
+                        &Data
                         );
 
   if (EFI_ERROR(Status)) {
     return Status;
   }
 
+  WriteUnaligned32 ((UINT32*)Csts, Data);
   return EFI_SUCCESS;
 }
 
@@ -185,6 +193,7 @@ ReadNvmeAdminQueueAttributes (
 {
   EFI_PCI_IO_PROTOCOL   *PciIo;
   EFI_STATUS            Status;
+  UINT32                Data;
 
   PciIo  = Private->PciIo;
   Status = PciIo->Mem.Read (
@@ -193,13 +202,14 @@ ReadNvmeAdminQueueAttributes (
                         NVME_BAR,
                         NVME_AQA_OFFSET,
                         1,
-                        Aqa
+                        &Data
                         );
 
   if (EFI_ERROR(Status)) {
     return Status;
   }
 
+  WriteUnaligned32 ((UINT32*)Aqa, Data);
   return EFI_SUCCESS;
 }
 
@@ -221,15 +231,17 @@ WriteNvmeAdminQueueAttributes (
 {
   EFI_PCI_IO_PROTOCOL   *PciIo;
   EFI_STATUS            Status;
+  UINT32                Data;
 
   PciIo  = Private->PciIo;
+  Data   = ReadUnaligned32 ((UINT32*)Aqa);
   Status = PciIo->Mem.Write (
                         PciIo,
                         EfiPciIoWidthUint32,
                         NVME_BAR,
                         NVME_AQA_OFFSET,
                         1,
-                        Aqa
+                        &Data
                         );
 
   if (EFI_ERROR(Status)) {
@@ -260,21 +272,23 @@ ReadNvmeAdminSubmissionQueueBaseAddress (
 {
   EFI_PCI_IO_PROTOCOL   *PciIo;
   EFI_STATUS            Status;
+  UINT64                Data;
 
   PciIo  = Private->PciIo;
   Status = PciIo->Mem.Read (
                         PciIo,
-                        EfiPciIoWidthUint64,
+                        EfiPciIoWidthUint32,
                         NVME_BAR,
                         NVME_ASQ_OFFSET,
-                        1,
-                        Asq
+                        2,
+                        &Data
                         );
 
   if (EFI_ERROR(Status)) {
     return Status;
   }
 
+  WriteUnaligned64 ((UINT64*)Asq, Data);
   return EFI_SUCCESS;
 }
 
@@ -296,15 +310,18 @@ WriteNvmeAdminSubmissionQueueBaseAddress (
 {
   EFI_PCI_IO_PROTOCOL   *PciIo;
   EFI_STATUS            Status;
+  UINT64                Data;
 
   PciIo  = Private->PciIo;
+  Data   = ReadUnaligned64 ((UINT64*)Asq);
+
   Status = PciIo->Mem.Write (
                         PciIo,
-                        EfiPciIoWidthUint64,
+                        EfiPciIoWidthUint32,
                         NVME_BAR,
                         NVME_ASQ_OFFSET,
-                        1,
-                        Asq
+                        2,
+                        &Data
                         );
 
   if (EFI_ERROR(Status)) {
@@ -334,21 +351,24 @@ ReadNvmeAdminCompletionQueueBaseAddress (
 {
   EFI_PCI_IO_PROTOCOL   *PciIo;
   EFI_STATUS            Status;
+  UINT64                Data;
 
   PciIo  = Private->PciIo;
+
   Status = PciIo->Mem.Read (
                         PciIo,
-                        EfiPciIoWidthUint64,
+                        EfiPciIoWidthUint32,
                         NVME_BAR,
                         NVME_ACQ_OFFSET,
-                        1,
-                        Acq
+                        2,
+                        &Data
                         );
 
   if (EFI_ERROR(Status)) {
     return Status;
   }
 
+  WriteUnaligned64 ((UINT64*)Acq, Data);
   return EFI_SUCCESS;
 }
 
@@ -370,15 +390,18 @@ WriteNvmeAdminCompletionQueueBaseAddress (
 {
   EFI_PCI_IO_PROTOCOL   *PciIo;
   EFI_STATUS            Status;
+  UINT64                Data;
 
   PciIo  = Private->PciIo;
+  Data   = ReadUnaligned64 ((UINT64*)Acq);
+
   Status = PciIo->Mem.Write (
                         PciIo,
-                        EfiPciIoWidthUint64,
+                        EfiPciIoWidthUint32,
                         NVME_BAR,
                         NVME_ACQ_OFFSET,
-                        1,
-                        Acq
+                        2,
+                        &Data
                         );
 
   if (EFI_ERROR(Status)) {
@@ -921,6 +944,25 @@ NvmeControllerInit (
     Private->ControllerData = NULL;
     return EFI_NOT_FOUND;
   }
+
+  //
+  // Dump NvmExpress Identify Controller Data
+  //
+  Private->ControllerData->Sn[19] = 0;
+  Private->ControllerData->Mn[39] = 0;
+  DEBUG ((EFI_D_INFO, " == NVME IDENTIFY CONTROLLER DATA ==\n"));
+  DEBUG ((EFI_D_INFO, "    PCI VID   : 0x%x\n", Private->ControllerData->Vid));
+  DEBUG ((EFI_D_INFO, "    PCI SSVID : 0x%x\n", Private->ControllerData->Ssvid));
+  DEBUG ((EFI_D_INFO, "    SN        : %a\n",   (CHAR8 *)(Private->ControllerData->Sn)));
+  DEBUG ((EFI_D_INFO, "    MN        : %a\n",   (CHAR8 *)(Private->ControllerData->Mn)));
+  DEBUG ((EFI_D_INFO, "    FR        : 0x%x\n", *((UINT64*)Private->ControllerData->Fr)));
+  DEBUG ((EFI_D_INFO, "    RAB       : 0x%x\n", Private->ControllerData->Rab));
+  DEBUG ((EFI_D_INFO, "    IEEE      : 0x%x\n", *(UINT32*)Private->ControllerData->Ieee_oiu));
+  DEBUG ((EFI_D_INFO, "    AERL      : 0x%x\n", Private->ControllerData->Aerl));
+  DEBUG ((EFI_D_INFO, "    SQES      : 0x%x\n", Private->ControllerData->Sqes));
+  DEBUG ((EFI_D_INFO, "    CQES      : 0x%x\n", Private->ControllerData->Cqes));
+  DEBUG ((EFI_D_INFO, "    NN        : 0x%x\n", Private->ControllerData->Nn));
+
   return Status;
 }
 

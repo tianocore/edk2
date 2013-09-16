@@ -56,11 +56,11 @@ extern EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL  gNvmExpressDriverSupportedEfiV
 #define PCI_CLASS_MASS_STORAGE_NVM                0x08  // mass storage sub-class non-volatile memory.
 #define PCI_IF_NVMHCI                             0x02  // mass storage programming interface NVMHCI.
 
-#define NVME_ASQ_SIZE                             2     // Number of admin submission queue entries
-#define NVME_ACQ_SIZE                             2     // Number of admin completion queue entries
+#define NVME_ASQ_SIZE                             1     // Number of admin submission queue entries, which is 0-based
+#define NVME_ACQ_SIZE                             1     // Number of admin completion queue entries, which is 0-based
 
-#define NVME_CSQ_SIZE                             2     // Number of I/O submission queue entries
-#define NVME_CCQ_SIZE                             2     // Number of I/O completion queue entries
+#define NVME_CSQ_SIZE                             1     // Number of I/O submission queue entries, which is 0-based
+#define NVME_CCQ_SIZE                             1     // Number of I/O completion queue entries, which is 0-based
 
 #define NVME_MAX_IO_QUEUES                        2     // Number of I/O queues supported by the driver
 

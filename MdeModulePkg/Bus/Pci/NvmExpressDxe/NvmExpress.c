@@ -215,6 +215,15 @@ EnumerateNvmeDevNamespace (
            );
 
     //
+    // Dump NvmExpress Identify Namespace Data
+    //
+    DEBUG ((EFI_D_INFO, " == NVME IDENTIFY NAMESPACE [%d] DATA ==\n", NamespaceId));
+    DEBUG ((EFI_D_INFO, "    NSZE        : 0x%x\n", NamespaceData->Nsze));
+    DEBUG ((EFI_D_INFO, "    NCAP        : 0x%x\n", NamespaceData->Ncap));
+    DEBUG ((EFI_D_INFO, "    NUSE        : 0x%x\n", NamespaceData->Nuse));
+    DEBUG ((EFI_D_INFO, "    LBAF0.LBADS : 0x%x\n", (NamespaceData->LbaFormat[0].Lbads)));
+
+    //
     // Build controller name for Component Name (2) protocol.
     //
     UnicodeSPrintAsciiFormat (Device->ModelName, sizeof (Device->ModelName), "%a-%a-%x", Private->ControllerData->Sn, Private->ControllerData->Mn, NamespaceData->Eui64);
@@ -657,7 +666,7 @@ NvmExpressDriverBindingStart (
                       PciIo,
                       AllocateAnyPages,
                       EfiBootServicesData,
-                      6,
+                      4,
                       (VOID**)&Private->Buffer,
                       0
                       );
