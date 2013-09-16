@@ -101,8 +101,8 @@ MemoryPeim (
       PcdGet32 (PcdSystemMemorySize)
   );
 
-  SystemMemoryTop = PcdGet32 (PcdSystemMemoryBase) + PcdGet32 (PcdSystemMemorySize);
-  FdTop = PcdGet32(PcdFdBaseAddress) + PcdGet32(PcdFdSize);
+  SystemMemoryTop = (EFI_PHYSICAL_ADDRESS)PcdGet32 (PcdSystemMemoryBase) + (EFI_PHYSICAL_ADDRESS)PcdGet32 (PcdSystemMemorySize);
+  FdTop = (EFI_PHYSICAL_ADDRESS)PcdGet32(PcdFdBaseAddress) + (EFI_PHYSICAL_ADDRESS)PcdGet32(PcdFdSize);
 
   // EDK2 does not have the concept of boot firmware copied into DRAM. To avoid the DXE
   // core to overwrite this area we must mark the region with the attribute non-present
