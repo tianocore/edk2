@@ -41,14 +41,6 @@
 #include <Library/LockBoxLib.h>
 #include <Library/UefiLib.h>
 
-//
-// ACPI table information used to initialize tables.
-//
-#define EFI_ACPI_OEM_ID           "INTEL"
-#define EFI_ACPI_OEM_TABLE_ID     0x2020204F4E414954ULL // "TIANO   "
-#define EFI_ACPI_OEM_REVISION     0x00000001
-#define EFI_ACPI_CREATOR_ID       0x5446534D            // TBD "MSFT"
-#define EFI_ACPI_CREATOR_REVISION 0x01000013            // TBD
 #define EXTENSION_RECORD_SIZE     0x10000
 #define SMM_BOOT_RECORD_COMM_SIZE OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data) + sizeof(SMM_BOOT_RECORD_COMMUNICATE)
 
@@ -73,13 +65,13 @@ FIRMWARE_PERFORMANCE_TABLE  mFirmwarePerformanceTableTemplate = {
     EFI_ACPI_5_0_FIRMWARE_PERFORMANCE_DATA_TABLE_REVISION,    // Revision
     0x00, // Checksum will be updated at runtime
     //
-    // It is expected that these values will be updated at runtime.
+    // It is expected that these values will be updated at EntryPoint.
     //
-    EFI_ACPI_OEM_ID,            // OEMID is a 6 bytes long field
-    EFI_ACPI_OEM_TABLE_ID,      // OEM table identification(8 bytes long)
-    EFI_ACPI_OEM_REVISION,      // OEM revision number
-    EFI_ACPI_CREATOR_ID,        // ASL compiler vendor ID
-    EFI_ACPI_CREATOR_REVISION,  // ASL compiler revision number
+    {0x00},     // OEM ID is a 6 bytes long field
+    0x00,       // OEM Table ID(8 bytes long)
+    0x00,       // OEM Revision
+    0x00,       // Creator ID
+    0x00,       // Creator Revision
   },
   //
   // Firmware Basic Boot Performance Table Pointer Record.
@@ -788,6 +780,18 @@ FirmwarePerformanceDxeEntryPoint (
   EFI_HOB_GUID_TYPE        *GuidHob;
   FIRMWARE_SEC_PERFORMANCE *Performance;
   VOID                     *Registration;
+  UINT64                   OemTableId;
+
+  CopyMem (
+    mFirmwarePerformanceTableTemplate.Header.OemId,
+    PcdGetPtr (PcdAcpiDefaultOemId),
+    sizeof (mFirmwarePerformanceTableTemplate.Header.OemId)
+    );
+  OemTableId = PcdGet64 (PcdAcpiDefaultOemTableId);
+  CopyMem (&mFirmwarePerformanceTableTemplate.Header.OemTableId, &OemTableId, sizeof (UINT64));
+  mFirmwarePerformanceTableTemplate.Header.OemRevision      = PcdGet32 (PcdAcpiDefaultOemRevision);
+  mFirmwarePerformanceTableTemplate.Header.CreatorId        = PcdGet32 (PcdAcpiDefaultCreatorId);
+  mFirmwarePerformanceTableTemplate.Header.CreatorRevision  = PcdGet32 (PcdAcpiDefaultCreatorRevision);
 
   //
   // Get Report Status Code Handler Protocol.

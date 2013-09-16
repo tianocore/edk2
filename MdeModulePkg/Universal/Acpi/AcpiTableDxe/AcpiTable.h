@@ -1,7 +1,7 @@
 /** @file
   ACPI Table Protocol Driver
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -105,15 +105,6 @@ typedef struct {
 // The maximum number of tables this driver supports
 //
 #define EFI_ACPI_MAX_NUM_TABLES 20
-
-//
-// ACPI table information used to initialize tables.
-//
-#define EFI_ACPI_OEM_ID           "INTEL "
-#define EFI_ACPI_OEM_TABLE_ID     SIGNATURE_64('E', 'D', 'K', '2', ' ', ' ', ' ', ' ')
-#define EFI_ACPI_OEM_REVISION     0x00000002
-#define EFI_ACPI_CREATOR_ID       0x20202020
-#define EFI_ACPI_CREATOR_REVISION 0x01000013
 
 //
 // Protocol private structure definition
