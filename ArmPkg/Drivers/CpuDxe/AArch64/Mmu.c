@@ -90,7 +90,7 @@ GetNextEntryAttribute (
           SetGcdMemorySpaceAttributes (MemorySpaceMap, NumberOfDescriptors,
               *StartGcdRegion,
               (BaseAddress + (Index * TT_ADDRESS_AT_LEVEL(TableLevel))) - *StartGcdRegion,
-              PageAttributeToGcdAttribute (EntryAttribute));
+              PageAttributeToGcdAttribute (*PrevEntryAttribute));
         }
 
         // Start of the new region
