@@ -1618,9 +1618,6 @@ ProcessUserInput (
         CopyMem (&Statement->HiiValue, &UserInput->InputValue, sizeof (EFI_HII_VALUE));
         break;
       }
-      if (Statement->Operand != EFI_IFR_PASSWORD_OP) {
-        SetQuestionValue (gCurrentSelection->FormSet, gCurrentSelection->Form, Statement, GetSetValueWithEditBuffer);
-      }
       break;
     }
   }
@@ -2012,6 +2009,8 @@ ProcessCallBackFunction (
   BOOLEAN                         NeedExit;
   LIST_ENTRY                      *Link;
   BROWSER_SETTING_SCOPE           SettingLevel;
+  EFI_IFR_TYPE_VALUE              BackUpValue;
+  UINT8                           *BackUpBuffer;
 
   ConfigAccess = Selection->FormSet->ConfigAccess;
   SubmitFormIsRequired  = FALSE;
@@ -2020,6 +2019,7 @@ ProcessCallBackFunction (
   NeedExit              = FALSE;
   Status                = EFI_SUCCESS;
   ActionRequest         = EFI_BROWSER_ACTION_REQUEST_NONE;
+  BackUpBuffer          = NULL;
 
   if (ConfigAccess == NULL) {
     return EFI_SUCCESS;
@@ -2058,7 +2058,18 @@ ProcessCallBackFunction (
       //
       TypeValue = (EFI_IFR_TYPE_VALUE *) Statement->BufferValue;
     }
-      
+
+    //
+    // If EFI_BROWSER_ACTION_CHANGING type, back up the new question value.
+    //
+    if (Action == EFI_BROWSER_ACTION_CHANGING) {
+      if (HiiValue->Type == EFI_IFR_TYPE_BUFFER) {
+        BackUpBuffer = AllocateCopyPool(Statement->StorageWidth + sizeof(CHAR16), Statement->BufferValue);
+      } else {
+        CopyMem (&BackUpValue, &HiiValue->Value, sizeof (EFI_IFR_TYPE_VALUE));
+      }
+    }
+
     ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
     Status = ConfigAccess->Callback (
                              ConfigAccess,
@@ -2126,10 +2137,26 @@ ProcessCallBackFunction (
       }
     } else {
       //
+      // If the callback returns EFI_UNSUPPORTED for EFI_BROWSER_ACTION_CHANGING, 
+      // then the browser will use the value passed to Callback() and ignore the 
+      // value returned by Callback(). 
+      //
+      if (Action  == EFI_BROWSER_ACTION_CHANGING && Status == EFI_UNSUPPORTED) {
+        if (HiiValue->Type == EFI_IFR_TYPE_BUFFER) {
+          CopyMem (Statement->BufferValue, BackUpBuffer, Statement->StorageWidth + sizeof(CHAR16));
+        } else {
+          CopyMem (&HiiValue->Value, &BackUpValue, sizeof (EFI_IFR_TYPE_VALUE));
+        }
+
+        SetQuestionValue(Selection->FormSet, Selection->Form, Statement, GetSetValueWithEditBuffer);
+      }
+
+      //
       // According the spec, return fail from call back of "changing" and 
       // "retrieve", should restore the question's value.
       //
-      if (Action  == EFI_BROWSER_ACTION_CHANGING || Action == EFI_BROWSER_ACTION_RETRIEVE) {
+      if ((Action == EFI_BROWSER_ACTION_CHANGING && Status != EFI_UNSUPPORTED) || 
+           Action == EFI_BROWSER_ACTION_RETRIEVE) {
         GetQuestionValue(Selection->FormSet, Selection->Form, Statement, GetSetValueWithEditBuffer);
       }
 
@@ -2139,6 +2166,10 @@ ProcessCallBackFunction (
         //
         Status = EFI_SUCCESS;
       }
+    }
+
+    if (BackUpBuffer != NULL) {
+      FreePool (BackUpBuffer);
     }
   }
 
@@ -2399,6 +2430,8 @@ SetupBrowser (
         if (!EFI_ERROR (Status) && Statement->Operand != EFI_IFR_REF_OP) {
           ProcessCallBackFunction(Selection, Statement, EFI_BROWSER_ACTION_CHANGED, FALSE);
         }
+      } else if (Statement->Operand != EFI_IFR_PASSWORD_OP) {
+        SetQuestionValue (gCurrentSelection->FormSet, gCurrentSelection->Form, Statement, GetSetValueWithEditBuffer);
       }
     }
 
