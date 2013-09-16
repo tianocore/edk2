@@ -320,7 +320,7 @@ ASM_PFX(AArch64AllDataCachesOperation):
   mov   x1, x0                  // Save Function call in x1
   mrs   x6, clidr_el1           // Read EL1 CLIDR
   and   x3, x6, #0x7000000      // Mask out all but Level of Coherency (LoC)
-  lsr   x3, x3, #23             // Left align cache level value
+  lsr   x3, x3, #24             // Left align cache level value
   cbz   x3, L_Finished          // No need to clean if LoC is 0
   mov   x10, #0                 // Start clean at cache level 0
   b     Loop1
@@ -332,7 +332,7 @@ ASM_PFX(AArch64PerformPoUDataCacheOperation):
   mov   x1, x0                  // Save Function call in x1
   mrs   x6, clidr_el1           // Read EL1 CLIDR
   and   x3, x6, #0x38000000     // Mask out all but Point of Unification (PoU)
-  lsr   x3, x3, #26             // Left align cache level value
+  lsr   x3, x3, #27             // Left align cache level value
   cbz   x3, L_Finished          // No need to clean if LoC is 0
   mov   x10, #0                 // Start clean at cache level 0
 
