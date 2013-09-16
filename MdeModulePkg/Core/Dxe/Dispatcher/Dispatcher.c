@@ -1036,39 +1036,48 @@ CoreProcessFvImageFile (
     //
     FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) Buffer;
     //
-    // Get FvHeader alignment
+    // If EFI_FVB2_WEAK_ALIGNMENT is set in the volume header then the first byte of the volume
+    // can be aligned on any power-of-two boundary. A weakly aligned volume can not be moved from
+    // its initial linked location and maintain its alignment.
     //
-    FvAlignment = 1 << ((FvHeader->Attributes & EFI_FVB2_ALIGNMENT) >> 16);
-    //
-    // FvAlignment must be greater than or equal to 8 bytes of the minimum FFS alignment value. 
-    //
-    if (FvAlignment < 8) {
-      FvAlignment = 8;
+    if ((FvHeader->Attributes & EFI_FVB2_WEAK_ALIGNMENT) != EFI_FVB2_WEAK_ALIGNMENT) {
+      //
+      // Get FvHeader alignment
+      //
+      FvAlignment = 1 << ((FvHeader->Attributes & EFI_FVB2_ALIGNMENT) >> 16);
+      //
+      // FvAlignment must be greater than or equal to 8 bytes of the minimum FFS alignment value.
+      //
+      if (FvAlignment < 8) {
+        FvAlignment = 8;
+      }
+      //
+      // Allocate the aligned buffer for the FvImage.
+      //
+      AlignedBuffer = AllocateAlignedPages (EFI_SIZE_TO_PAGES (BufferSize), (UINTN) FvAlignment);
+      if (AlignedBuffer == NULL) {
+        FreePool (Buffer);
+        return EFI_OUT_OF_RESOURCES;
+      } else {
+        //
+        // Move FvImage into the aligned buffer and release the original buffer.
+        //
+        CopyMem (AlignedBuffer, Buffer, BufferSize);
+        FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) AlignedBuffer;
+        CoreFreePool (Buffer);
+        Buffer = NULL;
+      }
     }
     //
-    // Allocate the aligned buffer for the FvImage.
+    // Produce a FVB protocol for the file
     //
-    AlignedBuffer = AllocateAlignedPages (EFI_SIZE_TO_PAGES (BufferSize), (UINTN) FvAlignment);
-    if (AlignedBuffer == NULL) {
-      Status = EFI_OUT_OF_RESOURCES;
-    } else {
-      //
-      // Move FvImage into the aligned buffer and release the original buffer.
-      //
-      CopyMem (AlignedBuffer, Buffer, BufferSize);
-      CoreFreePool (Buffer);
-      Buffer = NULL;
-      //
-      // Produce a FVB protocol for the file
-      //
-      Status = ProduceFVBProtocolOnBuffer (
-                (EFI_PHYSICAL_ADDRESS) (UINTN) AlignedBuffer,
-                (UINT64)BufferSize,
-                FvHandle,
-                AuthenticationStatus,
-                NULL
-                );
-    }
+    Status = ProduceFVBProtocolOnBuffer (
+              (EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader,
+              (UINT64)BufferSize,
+              FvHandle,
+              AuthenticationStatus,
+              NULL
+              );
   }
 
   if (EFI_ERROR (Status)) {

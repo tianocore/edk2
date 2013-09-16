@@ -1,7 +1,7 @@
 /** @file
   Pei Core Firmware File System service routines.
   
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -226,7 +226,7 @@ FindFileEx (
   IN  CONST EFI_GUID                 *FileName,   OPTIONAL
   IN        EFI_FV_FILETYPE          SearchType,
   IN OUT    EFI_PEI_FILE_HANDLE      *FileHandle,
-  IN OUT    EFI_PEI_FV_HANDLE        *AprioriFile  OPTIONAL
+  IN OUT    EFI_PEI_FILE_HANDLE      *AprioriFile  OPTIONAL
   )
 {
   EFI_FIRMWARE_VOLUME_HEADER            *FwVolHeader;
@@ -1112,26 +1112,33 @@ ProcessFvFile (
   }
 
   //
-  // FvAlignment must be more than 8 bytes required by FvHeader structure.
+  // If EFI_FVB2_WEAK_ALIGNMENT is set in the volume header then the first byte of the volume
+  // can be aligned on any power-of-two boundary. A weakly aligned volume can not be moved from
+  // its initial linked location and maintain its alignment.
   //
-  FvAlignment = 1 << ((ReadUnaligned32 (&FvHeader->Attributes) & EFI_FVB2_ALIGNMENT) >> 16);
-  if (FvAlignment < 8) {
-    FvAlignment = 8;
-  }
-  
-  //
-  // Check FvImage
-  //
-  if ((UINTN) FvHeader % FvAlignment != 0) {
-    FvLength    = ReadUnaligned64 (&FvHeader->FvLength);
-    NewFvBuffer = AllocateAlignedPages (EFI_SIZE_TO_PAGES ((UINT32) FvLength), FvAlignment);
-    if (NewFvBuffer == NULL) {
-      return EFI_OUT_OF_RESOURCES;
+  if ((ReadUnaligned32 (&FvHeader->Attributes) & EFI_FVB2_WEAK_ALIGNMENT) != EFI_FVB2_WEAK_ALIGNMENT) {
+    //
+    // FvAlignment must be greater than or equal to 8 bytes of the minimum FFS alignment value.
+    //
+    FvAlignment = 1 << ((ReadUnaligned32 (&FvHeader->Attributes) & EFI_FVB2_ALIGNMENT) >> 16);
+    if (FvAlignment < 8) {
+      FvAlignment = 8;
     }
-    CopyMem (NewFvBuffer, FvHeader, (UINTN) FvLength);
-    FvHeader = (EFI_FIRMWARE_VOLUME_HEADER*) NewFvBuffer;
+
+    //
+    // Check FvImage
+    //
+    if ((UINTN) FvHeader % FvAlignment != 0) {
+      FvLength    = ReadUnaligned64 (&FvHeader->FvLength);
+      NewFvBuffer = AllocateAlignedPages (EFI_SIZE_TO_PAGES ((UINT32) FvLength), FvAlignment);
+      if (NewFvBuffer == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+      CopyMem (NewFvBuffer, FvHeader, (UINTN) FvLength);
+      FvHeader = (EFI_FIRMWARE_VOLUME_HEADER*) NewFvBuffer;
+    }
   }
-  
+
   Status = ParentFvPpi->GetVolumeInfo (ParentFvPpi, ParentFvHandle, &ParentFvImageInfo);
   ASSERT_EFI_ERROR (Status);
   
