@@ -68,6 +68,21 @@ typedef struct {
 
 #define FORM_ENTRY_INFO_FROM_LINK(a)  CR (a, FORM_ENTRY_INFO, Link, FORM_ENTRY_INFO_SIGNATURE)
 
+#define FORM_QUESTION_ATTRIBUTE_OVERRIDE_SIGNATURE    SIGNATURE_32 ('f', 'q', 'o', 's')
+
+typedef struct {
+  UINTN            Signature;
+  LIST_ENTRY       Link;
+
+  EFI_QUESTION_ID  QuestionId;           // Find the question
+  EFI_FORM_ID      FormId;               // Find the form
+  EFI_GUID         FormSetGuid;          // Find the formset.
+  EFI_HII_HANDLE   HiiHandle;            // Find the HII handle
+  UINT32           Attribute;            // Hide or grayout ... 
+} QUESTION_ATTRIBUTE_OVERRIDE;
+
+#define FORM_QUESTION_ATTRIBUTE_OVERRIDE_FROM_LINK(a)  CR (a, QUESTION_ATTRIBUTE_OVERRIDE, Link, FORM_QUESTION_ATTRIBUTE_OVERRIDE_SIGNATURE)
+
 struct _EDKII_FORM_BROWSER_EXTENSION2_PROTOCOL {
   ///
   /// Version for protocol future extension.
@@ -82,6 +97,10 @@ struct _EDKII_FORM_BROWSER_EXTENSION2_PROTOCOL {
   /// A list of type FORMID_INFO is Browser View Form History List.
   ///
   LIST_ENTRY                FormViewHistoryHead;
+  ///
+  /// A list of type QUESTION_ATTRIBUTE_OVERRIDE.
+  ///
+  LIST_ENTRY                OverrideQestListHead;
 };
 
 extern EFI_GUID gEdkiiFormBrowserEx2ProtocolGuid;

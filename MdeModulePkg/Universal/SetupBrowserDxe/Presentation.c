@@ -571,6 +571,47 @@ UpdateHotkeyList (
 
 /**
 
+  Get the extra question attribute from override question list.
+
+  @param    QuestionId    The question id for this request question.
+
+  @retval   The attribute for this question or NULL if not found this 
+            question in the list.
+
+**/
+UINT32 
+ProcessQuestionExtraAttr (
+  IN   EFI_QUESTION_ID  QuestionId
+  )
+{
+  LIST_ENTRY                   *Link;
+  QUESTION_ATTRIBUTE_OVERRIDE  *QuestionDesc;
+
+  //
+  // Return HII_DISPLAY_NONE if input a invalid question id.
+  //
+  if (QuestionId == 0) {
+    return HII_DISPLAY_NONE;
+  }
+
+  Link = GetFirstNode (&mPrivateData.FormBrowserEx2.OverrideQestListHead);
+  while (!IsNull (&mPrivateData.FormBrowserEx2.OverrideQestListHead, Link)) {
+    QuestionDesc = FORM_QUESTION_ATTRIBUTE_OVERRIDE_FROM_LINK (Link);
+    Link = GetNextNode (&mPrivateData.FormBrowserEx2.OverrideQestListHead, Link);
+
+    if ((QuestionDesc->QuestionId == QuestionId) &&
+        (QuestionDesc->FormId     == gCurrentSelection->FormId) &&
+        (QuestionDesc->HiiHandle  == gCurrentSelection->Handle) &&
+        CompareGuid (&QuestionDesc->FormSetGuid, &gCurrentSelection->FormSetGuid)) {
+      return QuestionDesc->Attribute;
+    }
+  }
+
+  return HII_DISPLAY_NONE;
+}
+
+/**
+
   Enum all statement in current form, find all the statement can be display and
   add to the display form.
 
@@ -589,6 +630,7 @@ AddStatementToDisplayForm (
   EFI_EVENT                     RefreshIntervalEvent;
   FORM_BROWSER_REFRESH_EVENT_NODE *EventNode;
   BOOLEAN                       FormEditable;
+  UINT32                        ExtraAttribute;
 
   HostDisplayStatement = NULL;
   MinRefreshInterval   = 0;
@@ -630,6 +672,14 @@ AddStatementToDisplayForm (
       continue;
     }
 
+    //
+    // Check the extra attribute.
+    //
+    ExtraAttribute = ProcessQuestionExtraAttr (Statement->QuestionId);
+    if ((ExtraAttribute & HII_DISPLAY_SUPPRESS) != 0) {
+      continue;
+    }
+
     DisplayStatement = AllocateZeroPool (sizeof (FORM_DISPLAY_ENGINE_STATEMENT));
     ASSERT (DisplayStatement != NULL);
 
@@ -637,6 +687,11 @@ AddStatementToDisplayForm (
     // Initialize this statement and add it to the display form.
     //
     InitializeDisplayStatement(DisplayStatement, Statement, HostDisplayStatement);
+
+    //
+    // Set the extra attribute.
+    //
+    DisplayStatement->Attribute |= ExtraAttribute;
 
     //
     // Save the Host statement info.

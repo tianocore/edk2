@@ -548,6 +548,7 @@ extern LIST_ENTRY            gBrowserHotKeyList;
 extern BROWSER_SETTING_SCOPE gBrowserSettingScope;
 extern EXIT_HANDLER          ExitHandlerFunction;
 extern EFI_HII_HANDLE        mCurrentHiiHandle;
+extern SETUP_DRIVER_PRIVATE_DATA mPrivateData;
 //
 // Browser Global Strings
 //
