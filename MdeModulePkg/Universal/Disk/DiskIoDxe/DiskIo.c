@@ -403,8 +403,6 @@ DiskIo2OnReadWriteComplete (
   EFI_STATUS            TransactionStatus;
   DISK_IO_PRIVATE_DATA  *Instance;
 
-  gBS->CloseEvent (Event);
-
   Subtask           = (DISK_IO_SUBTASK *) Context;
   TransactionStatus = Subtask->BlockIo2Token.TransactionStatus;
   Task              = Subtask->Task;
@@ -414,26 +412,13 @@ DiskIo2OnReadWriteComplete (
   ASSERT (Instance->Signature == DISK_IO_PRIVATE_DATA_SIGNATURE);
   ASSERT (Task->Signature     == DISK_IO2_TASK_SIGNATURE);
 
-  if (Subtask->WorkingBuffer != NULL) {
-    if (!EFI_ERROR (TransactionStatus) && (Task->Token != NULL) && !Subtask->Write) {
-      CopyMem (Subtask->Buffer, Subtask->WorkingBuffer + Subtask->Offset, Subtask->Length);
-    }
-
-    //
-    // The WorkingBuffer of blocking subtask either points to SharedWorkingBuffer
-    // or will be used by non-blocking subtask which will be freed below.
-    //
-    if (!Subtask->Blocking) {
-      FreeAlignedPages (
-        Subtask->WorkingBuffer, 
-        Subtask->Length < Instance->BlockIo->Media->BlockSize
-        ? EFI_SIZE_TO_PAGES (Instance->BlockIo->Media->BlockSize)
-        : EFI_SIZE_TO_PAGES (Subtask->Length)
-        );
-    }
+  if ((Subtask->WorkingBuffer != NULL) && !EFI_ERROR (TransactionStatus) && 
+      (Task->Token != NULL) && !Subtask->Write
+     ) {
+    CopyMem (Subtask->Buffer, Subtask->WorkingBuffer + Subtask->Offset, Subtask->Length);
   }
-  RemoveEntryList (&Subtask->Link);
-  FreePool (Subtask);
+
+  DiskIoDestroySubtask (Instance, Subtask);
 
   if (EFI_ERROR (TransactionStatus) || IsListEmpty (&Task->Subtasks)) {
     if (Task->Token != NULL) {
@@ -961,7 +946,7 @@ DiskIo2ReadWriteDisk (
     RemoveEntryList (&Task->Link);
     EfiReleaseLock (&Instance->TaskQueueLock);
 
-    if (Task->Token != NULL) {
+    if (!EFI_ERROR (Status) && (Task->Token != NULL)) {
       //
       // Task->Token should be set to NULL by the DiskIo2OnReadWriteComplete
       // It it's not, that means the non-blocking request was downgraded to blocking request.

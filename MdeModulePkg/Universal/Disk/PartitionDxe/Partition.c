@@ -352,11 +352,11 @@ PartitionDriverBindingStart (
           ControllerHandle
           );
     //
-    // Close Parent BlockIO2 if has.
+    // Close Parent DiskIo2 if has.
     //    
     gBS->CloseProtocol (
            ControllerHandle,
-           &gEfiBlockIo2ProtocolGuid,
+           &gEfiDiskIo2ProtocolGuid,
            This->DriverBindingHandle,
            ControllerHandle
            );
@@ -822,7 +822,7 @@ PartitionCreateAccessTask (
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
+                  TPL_NOTIFY,
                   PartitionOnAccessComplete,
                   Task,
                   &Task->DiskIo2Token.Event
