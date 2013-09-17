@@ -232,12 +232,12 @@ typedef struct {
   /// The requested resources in the format of an ACPI 2.0 resource descriptor. This
   /// parameter is not a pointer; it is the complete resource descriptor.
   ///
-  //  UINT8                          ReqRes[…];
+  //  UINT8                          ReqRes[];
   ///
   /// The allocated resources in the format of an ACPI 2.0 resource descriptor. This 
   /// parameter is not a pointer; it is the complete resource descriptor.
   ///
-  //  UINT8                          AllocRes[…];
+  //  UINT8                          AllocRes[];
 } EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA;
 
 ///
