@@ -137,10 +137,12 @@ EFI_STATUS
 //
 // Attribute for Statement and Form
 //
+#define HII_DISPLAY_NONE             0
 #define HII_DISPLAY_GRAYOUT          BIT0
 #define HII_DISPLAY_LOCK             BIT1
 #define HII_DISPLAY_READONLY         BIT2
 #define HII_DISPLAY_MODAL            BIT3
+#define HII_DISPLAY_SUPPRESS         BIT4
 
 struct _FORM_DISPLAY_ENGINE_STATEMENT{
   UINTN                 Signature;

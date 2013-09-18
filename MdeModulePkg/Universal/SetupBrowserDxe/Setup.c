@@ -766,7 +766,8 @@ InitializeSetup (
   //
   // Install FormBrowserEx2 protocol
   //
-  InitializeListHead (&mPrivateData.FormBrowserEx2.FormViewHistoryHead);  
+  InitializeListHead (&mPrivateData.FormBrowserEx2.FormViewHistoryHead);
+  InitializeListHead (&mPrivateData.FormBrowserEx2.OverrideQestListHead);
   mPrivateData.Handle = NULL;
   Status = gBS->InstallProtocolInterface (
                   &mPrivateData.Handle,
