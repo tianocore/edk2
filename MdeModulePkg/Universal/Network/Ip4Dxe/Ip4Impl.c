@@ -2002,7 +2002,8 @@ EfiIp4Transmit (
 
     RawHdrLen = (UINT8) (RawHdrLen & 0x0f);
     if (RawHdrLen < 5) {
-      return EFI_INVALID_PARAMETER;
+      Status = EFI_INVALID_PARAMETER;
+      goto ON_EXIT;
     }
 
     RawHdrLen = (UINT8) (RawHdrLen << 2);
@@ -2014,7 +2015,8 @@ EfiIp4Transmit (
     DontFragment = IP4_DO_NOT_FRAGMENT (Head.Fragment);
 
     if (!DontFragment) {
-      return EFI_INVALID_PARAMETER;
+      Status = EFI_INVALID_PARAMETER;
+      goto ON_EXIT;
     }
 
     GateWay = IP4_ALLZERO_ADDRESS;
