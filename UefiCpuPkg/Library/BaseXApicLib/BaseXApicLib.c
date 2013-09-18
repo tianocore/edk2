@@ -3,7 +3,7 @@
 
   This local APIC library instance supports xAPIC mode only.
 
-  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -207,7 +207,7 @@ SetApicMode (
 /**
   Get the initial local APIC ID of the executing processor assigned by hardware upon power on or reset.
 
-  In xAPIC mode, the initial local APIC ID is 8-bit, and may be different from current APIC ID.
+  In xAPIC mode, the initial local APIC ID may be different from current APIC ID.
   In x2APIC mode, the local APIC ID can't be changed and there is no concept of initial APIC ID. In this case, 
   the 32-bit local APIC ID is returned as initial APIC ID.
 
@@ -219,9 +219,26 @@ GetInitialApicId (
   VOID
   )
 {
+  UINT32 ApicId;
+  UINT32 MaxCpuIdIndex;
   UINT32 RegEbx;
 
   ASSERT (GetApicMode () == LOCAL_APIC_MODE_XAPIC);
+
+  //
+  // Get the max index of basic CPUID
+  //
+  AsmCpuid (CPUID_SIGNATURE, &MaxCpuIdIndex, NULL, NULL, NULL);
+
+  //
+  // If CPUID Leaf B is supported, 
+  // Then the initial 32-bit APIC ID = CPUID.0BH:EDX
+  // Else the initial 8-bit APIC ID = CPUID.1:EBX[31:24]
+  //
+  if (MaxCpuIdIndex >= CPUID_EXTENDED_TOPOLOGY) {
+    AsmCpuidEx (CPUID_EXTENDED_TOPOLOGY, 0, NULL, NULL, NULL, &ApicId);
+    return ApicId;
+  }
 
   AsmCpuid (CPUID_VERSION_INFO, NULL, &RegEbx, NULL, NULL);
   return RegEbx >> 24;
@@ -241,9 +258,15 @@ GetApicId (
   UINT32 ApicId;
 
   ASSERT (GetApicMode () == LOCAL_APIC_MODE_XAPIC);
-
-  ApicId = ReadLocalApicReg (XAPIC_ID_OFFSET);
-  ApicId >>= 24;
+  
+  if ((ApicId = GetInitialApicId ()) < 0x100) {
+    //
+    // If the initial local APIC ID is less 0x100, read APIC ID from
+    // XAPIC_ID_OFFSET, otherwise return the initial local APIC ID.
+    //
+    ApicId = ReadLocalApicReg (XAPIC_ID_OFFSET);
+    ApicId >>= 24;
+  }
   return ApicId;
 }
 

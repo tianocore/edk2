@@ -4,7 +4,7 @@
   Local APIC library assumes local APIC is enabled. It does not
   handles cases where local APIC is disabled.
 
-  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -78,7 +78,7 @@ SetApicMode (
 /**
   Get the initial local APIC ID of the executing processor assigned by hardware upon power on or reset.
 
-  In xAPIC mode, the initial local APIC ID is 8-bit, and may be different from current APIC ID.
+  In xAPIC mode, the initial local APIC ID may be different from current APIC ID.
   In x2APIC mode, the local APIC ID can't be changed and there is no concept of initial APIC ID. In this case, 
   the 32-bit local APIC ID is returned as initial APIC ID.
 
