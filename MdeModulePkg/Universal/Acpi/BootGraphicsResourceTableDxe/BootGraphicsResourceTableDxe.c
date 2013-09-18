@@ -27,15 +27,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
-
-//
-// ACPI table information used to initialize tables.
-//
-#define EFI_ACPI_OEM_ID           "INTEL"
-#define EFI_ACPI_OEM_TABLE_ID     0x2020204F4E414954ULL // "TIANO   "
-#define EFI_ACPI_OEM_REVISION     0x00000001
-#define EFI_ACPI_CREATOR_ID       0x5446534D            // TBD "MSFT"
-#define EFI_ACPI_CREATOR_REVISION 0x01000013            // TBD
+#include <Library/PcdLib.h>
 
 //
 // Module globals.
@@ -81,13 +73,13 @@ EFI_ACPI_5_0_BOOT_GRAPHICS_RESOURCE_TABLE mBootGraphicsResourceTableTemplate = {
     EFI_ACPI_5_0_BOOT_GRAPHICS_RESOURCE_TABLE_REVISION,     // Revision
     0x00,  // Checksum will be updated at runtime
     //
-    // It is expected that these values will be updated at runtime.
+    // It is expected that these values will be updated at EntryPoint.
     //
-    EFI_ACPI_OEM_ID,            // OEMID is a 6 bytes long field
-    EFI_ACPI_OEM_TABLE_ID,      // OEM table identification(8 bytes long)
-    EFI_ACPI_OEM_REVISION,      // OEM revision number
-    EFI_ACPI_CREATOR_ID,        // ASL compiler vendor ID
-    EFI_ACPI_CREATOR_REVISION,  // ASL compiler revision number
+    {0x00},     // OEM ID is a 6 bytes long field
+    0x00,       // OEM Table ID(8 bytes long)
+    0x00,       // OEM Revision
+    0x00,       // Creator ID
+    0x00,       // Creator Revision
   },
   EFI_ACPI_5_0_BGRT_VERSION,         // Version
   EFI_ACPI_5_0_BGRT_STATUS_VALID,    // Status
@@ -467,6 +459,18 @@ BootGraphicsDxeEntryPoint (
   )
 {
   EFI_STATUS  Status;
+  UINT64      OemTableId;
+
+  CopyMem (
+    mBootGraphicsResourceTableTemplate.Header.OemId,
+    PcdGetPtr (PcdAcpiDefaultOemId),
+    sizeof (mBootGraphicsResourceTableTemplate.Header.OemId)
+    );
+  OemTableId = PcdGet64 (PcdAcpiDefaultOemTableId);
+  CopyMem (&mBootGraphicsResourceTableTemplate.Header.OemTableId, &OemTableId, sizeof (UINT64));
+  mBootGraphicsResourceTableTemplate.Header.OemRevision      = PcdGet32 (PcdAcpiDefaultOemRevision);
+  mBootGraphicsResourceTableTemplate.Header.CreatorId        = PcdGet32 (PcdAcpiDefaultCreatorId);
+  mBootGraphicsResourceTableTemplate.Header.CreatorRevision  = PcdGet32 (PcdAcpiDefaultCreatorRevision);
 
   //
   // Install Boot Logo protocol.

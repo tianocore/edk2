@@ -1,7 +1,7 @@
 /** @file
   ACPI Support Protocol implementation
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -1839,13 +1839,13 @@ AcpiSupportAcpiSupportConstructor (
   //
   CurrentData = EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER_SIGNATURE;
   CopyMem (&AcpiSupportInstance->Rsdp1->Signature, &CurrentData, sizeof (UINT64));
-  CopyMem (AcpiSupportInstance->Rsdp1->OemId, EFI_ACPI_OEM_ID, 6);
+  CopyMem (AcpiSupportInstance->Rsdp1->OemId, PcdGetPtr (PcdAcpiDefaultOemId), sizeof (AcpiSupportInstance->Rsdp1->OemId));
   AcpiSupportInstance->Rsdp1->Reserved    = EFI_ACPI_RESERVED_BYTE;
   AcpiSupportInstance->Rsdp1->RsdtAddress = (UINT32) (UINTN) AcpiSupportInstance->Rsdt1;
 
   CurrentData = EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER_SIGNATURE;
   CopyMem (&AcpiSupportInstance->Rsdp3->Signature, &CurrentData, sizeof (UINT64));
-  CopyMem (AcpiSupportInstance->Rsdp3->OemId, EFI_ACPI_OEM_ID, 6);
+  CopyMem (AcpiSupportInstance->Rsdp3->OemId, PcdGetPtr (PcdAcpiDefaultOemId), sizeof (AcpiSupportInstance->Rsdp3->OemId));
   AcpiSupportInstance->Rsdp3->Revision    = EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER_REVISION;
   AcpiSupportInstance->Rsdp3->RsdtAddress = (UINT32) (UINTN) AcpiSupportInstance->Rsdt3;
   AcpiSupportInstance->Rsdp3->Length      = sizeof (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER);
@@ -1863,12 +1863,12 @@ AcpiSupportAcpiSupportConstructor (
   AcpiSupportInstance->Rsdt1->Signature = EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_TABLE_SIGNATURE;
   AcpiSupportInstance->Rsdt1->Length    = sizeof (EFI_ACPI_DESCRIPTION_HEADER);
   AcpiSupportInstance->Rsdt1->Revision  = EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_TABLE_REVISION;
-  CopyMem (AcpiSupportInstance->Rsdt1->OemId, EFI_ACPI_OEM_ID, 6);
-  CurrentData = EFI_ACPI_OEM_TABLE_ID;
+  CopyMem (AcpiSupportInstance->Rsdt1->OemId, PcdGetPtr (PcdAcpiDefaultOemId), sizeof (AcpiSupportInstance->Rsdt1->OemId));
+  CurrentData = PcdGet64 (PcdAcpiDefaultOemTableId);
   CopyMem (&AcpiSupportInstance->Rsdt1->OemTableId, &CurrentData, sizeof (UINT64));
-  AcpiSupportInstance->Rsdt1->OemRevision     = EFI_ACPI_OEM_REVISION;
-  AcpiSupportInstance->Rsdt1->CreatorId       = EFI_ACPI_CREATOR_ID;
-  AcpiSupportInstance->Rsdt1->CreatorRevision = EFI_ACPI_CREATOR_REVISION;
+  AcpiSupportInstance->Rsdt1->OemRevision     = PcdGet32 (PcdAcpiDefaultOemRevision);
+  AcpiSupportInstance->Rsdt1->CreatorId       = PcdGet32 (PcdAcpiDefaultCreatorId);
+  AcpiSupportInstance->Rsdt1->CreatorRevision = PcdGet32 (PcdAcpiDefaultCreatorRevision);
   //
   // We always reserve first one for FADT
   //
@@ -1878,12 +1878,12 @@ AcpiSupportAcpiSupportConstructor (
   AcpiSupportInstance->Rsdt3->Signature       = EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_TABLE_SIGNATURE;
   AcpiSupportInstance->Rsdt3->Length          = sizeof (EFI_ACPI_DESCRIPTION_HEADER);
   AcpiSupportInstance->Rsdt3->Revision        = EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_TABLE_REVISION;
-  CopyMem (AcpiSupportInstance->Rsdt3->OemId, EFI_ACPI_OEM_ID, 6);
-  CurrentData = EFI_ACPI_OEM_TABLE_ID;
+  CopyMem (AcpiSupportInstance->Rsdt3->OemId, PcdGetPtr (PcdAcpiDefaultOemId), sizeof (AcpiSupportInstance->Rsdt3->OemId));
+  CurrentData = PcdGet64 (PcdAcpiDefaultOemTableId);
   CopyMem (&AcpiSupportInstance->Rsdt3->OemTableId, &CurrentData, sizeof (UINT64));
-  AcpiSupportInstance->Rsdt3->OemRevision     = EFI_ACPI_OEM_REVISION;
-  AcpiSupportInstance->Rsdt3->CreatorId       = EFI_ACPI_CREATOR_ID;
-  AcpiSupportInstance->Rsdt3->CreatorRevision = EFI_ACPI_CREATOR_REVISION;
+  AcpiSupportInstance->Rsdt3->OemRevision     = PcdGet32 (PcdAcpiDefaultOemRevision);
+  AcpiSupportInstance->Rsdt3->CreatorId       = PcdGet32 (PcdAcpiDefaultCreatorId);
+  AcpiSupportInstance->Rsdt3->CreatorRevision = PcdGet32 (PcdAcpiDefaultCreatorRevision);
   //
   // We always reserve first one for FADT
   //
@@ -1896,12 +1896,12 @@ AcpiSupportAcpiSupportConstructor (
   AcpiSupportInstance->Xsdt->Signature  = EFI_ACPI_3_0_EXTENDED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE;
   AcpiSupportInstance->Xsdt->Length     = sizeof (EFI_ACPI_DESCRIPTION_HEADER);
   AcpiSupportInstance->Xsdt->Revision   = EFI_ACPI_3_0_EXTENDED_SYSTEM_DESCRIPTION_TABLE_REVISION;
-  CopyMem (AcpiSupportInstance->Xsdt->OemId, EFI_ACPI_OEM_ID, 6);
-  CurrentData = EFI_ACPI_OEM_TABLE_ID;
+  CopyMem (AcpiSupportInstance->Xsdt->OemId, PcdGetPtr (PcdAcpiDefaultOemId), sizeof (AcpiSupportInstance->Xsdt->OemId));
+  CurrentData = PcdGet64 (PcdAcpiDefaultOemTableId);
   CopyMem (&AcpiSupportInstance->Xsdt->OemTableId, &CurrentData, sizeof (UINT64));
-  AcpiSupportInstance->Xsdt->OemRevision      = EFI_ACPI_OEM_REVISION;
-  AcpiSupportInstance->Xsdt->CreatorId        = EFI_ACPI_CREATOR_ID;
-  AcpiSupportInstance->Xsdt->CreatorRevision  = EFI_ACPI_CREATOR_REVISION;
+  AcpiSupportInstance->Xsdt->OemRevision      = PcdGet32 (PcdAcpiDefaultOemRevision);
+  AcpiSupportInstance->Xsdt->CreatorId        = PcdGet32 (PcdAcpiDefaultCreatorId);
+  AcpiSupportInstance->Xsdt->CreatorRevision  = PcdGet32 (PcdAcpiDefaultCreatorRevision);
   //
   // We always reserve first one for FADT
   //

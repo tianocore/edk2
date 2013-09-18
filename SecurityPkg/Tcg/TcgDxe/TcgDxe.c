@@ -8,7 +8,7 @@ buffer overflow, integer overflow.
 
 TcgDxePassThroughToTpm() will receive untrusted input and do basic validation.
 
-Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -1177,6 +1177,7 @@ InstallAcpiTable (
   EFI_STATUS                        Status;
   EFI_ACPI_TABLE_PROTOCOL           *AcpiTable;
   UINT8                             Checksum;
+  UINT64                            OemTableId;
 
   Status = gBS->LocateProtocol (&gEfiAcpiTableProtocolGuid, NULL, (VOID **)&AcpiTable);
   if (EFI_ERROR (Status)) {
@@ -1184,7 +1185,12 @@ InstallAcpiTable (
   }
 
   if (PcdGet8 (PcdTpmPlatformClass) == TCG_PLATFORM_TYPE_CLIENT) {
- 
+    CopyMem (mTcgClientAcpiTemplate.Header.OemId, PcdGetPtr (PcdAcpiDefaultOemId), sizeof (mTcgClientAcpiTemplate.Header.OemId));
+    OemTableId = PcdGet64 (PcdAcpiDefaultOemTableId);
+    CopyMem (&mTcgClientAcpiTemplate.Header.OemTableId, &OemTableId, sizeof (UINT64));
+    mTcgClientAcpiTemplate.Header.OemRevision      = PcdGet32 (PcdAcpiDefaultOemRevision);
+    mTcgClientAcpiTemplate.Header.CreatorId        = PcdGet32 (PcdAcpiDefaultCreatorId);
+    mTcgClientAcpiTemplate.Header.CreatorRevision  = PcdGet32 (PcdAcpiDefaultCreatorRevision);
     //
     // The ACPI table must be checksumed before calling the InstallAcpiTable() 
     // service of the ACPI table protocol to install it.
@@ -1199,7 +1205,12 @@ InstallAcpiTable (
                             &TableKey
                             );
   } else {
-
+    CopyMem (mTcgServerAcpiTemplate.Header.OemId, PcdGetPtr (PcdAcpiDefaultOemId), sizeof (mTcgServerAcpiTemplate.Header.OemId));
+    OemTableId = PcdGet64 (PcdAcpiDefaultOemTableId);
+    CopyMem (&mTcgServerAcpiTemplate.Header.OemTableId, &OemTableId, sizeof (UINT64));
+    mTcgServerAcpiTemplate.Header.OemRevision      = PcdGet32 (PcdAcpiDefaultOemRevision);
+    mTcgServerAcpiTemplate.Header.CreatorId        = PcdGet32 (PcdAcpiDefaultCreatorId);
+    mTcgServerAcpiTemplate.Header.CreatorRevision  = PcdGet32 (PcdAcpiDefaultCreatorRevision);
     //
     // The ACPI table must be checksumed before calling the InstallAcpiTable() 
     // service of the ACPI table protocol to install it.

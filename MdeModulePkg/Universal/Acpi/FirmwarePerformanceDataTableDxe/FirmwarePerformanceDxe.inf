@@ -75,6 +75,11 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderLoad
   gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderStart
   gEfiMdeModulePkgTokenSpaceGuid.PcdExtFpdtBootRecordPadSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwarePerformanceDataTableS3Support
