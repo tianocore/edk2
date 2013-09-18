@@ -35,6 +35,7 @@
 [Sources]
   DxeImageVerificationLib.c
   DxeImageVerificationLib.h
+  Measurement.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -54,6 +55,7 @@
   BaseCryptLib
   SecurityManagementLib
   PeCoffLib
+  TpmMeasurementLib
 
 [Protocols]
   gEfiFirmwareVolume2ProtocolGuid

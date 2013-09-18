@@ -26,6 +26,10 @@
   ##  @libraryclass  Definitions for common TPM commands as library API for TPM
   #                  module use.
   TpmCommLib|Include/Library/TpmCommLib.h
+  Tpm2CommandLib|Include/Library/Tpm2CommandLib.h
+  Tpm2DeviceLib|Include/Library/Tpm2DeviceLib.h
+  TrEEPhysicalPresenceLib|Include/Library/TrEEPhysicalPresenceLib.h
+  TpmMeasurementLib|Include/Library/TpmMeasurementLib.h
 
 [Guids]
   ## Security package token space guid
@@ -74,12 +78,27 @@
   ## Include/Guid/SecureBootConfigHii.h
   gSecureBootConfigFormSetGuid       = { 0x5daf50a5, 0xea81, 0x4de2, {0x8f, 0x9b, 0xca, 0xbd, 0xa9, 0xcf, 0x5c, 0x14}}
                                       
+  ## Include/Guid/TrEEPhysicalPresenceData.h
+  gEfiTrEEPhysicalPresenceGuid = { 0xf24643c2, 0xc622, 0x494e, { 0x8a, 0xd, 0x46, 0x32, 0x57, 0x9c, 0x2d, 0x5b }}
+
+  ## Include/Guid/TpmInstance.h
+  gEfiTpmDeviceInstanceNoneGuid      = { 0x00000000, 0x0000, 0x0000, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } }
+  gEfiTpmDeviceInstanceTpm12Guid     = { 0x8b01e5b6, 0x4f19, 0x46e8, { 0xab, 0x93, 0x1c, 0x53, 0x67, 0x1b, 0x90, 0xcc } }
+  gEfiTpmDeviceInstanceTpm20DtpmGuid = { 0x286bf25a, 0xc2c3, 0x408c, { 0xb3, 0xb4, 0x25, 0xe6, 0x75, 0x8b, 0x73, 0x17 } }
+  gEfiTpmDeviceSelectedGuid          = { 0x7f4158d3, 0x74d, 0x456d, { 0x8c, 0xb2, 0x1, 0xf9, 0xc8, 0xf7, 0x9d, 0xaa } }
+
+  ## Include/Guid/TrEEConfigHii.h
+  gTrEEConfigFormSetGuid              = {0xc54b425f, 0xaa79, 0x48b4, { 0x98, 0x1f, 0x99, 0x8b, 0x3c, 0x4b, 0x64, 0x1c }}
+
 [Ppis]
   ## Include/Ppi/LockPhysicalPresence.h
   gPeiLockPhysicalPresencePpiGuid    = { 0xef9aefe5, 0x2bd3, 0x4031, { 0xaf, 0x7d, 0x5e, 0xfe, 0x5a, 0xbb, 0x9a, 0xd } }
 
   ## Include/Ppi/TpmInitialized.h
   gPeiTpmInitializedPpiGuid      = { 0xe9db0d58, 0xd48d, 0x47f6, { 0x9c, 0x6e, 0x6f, 0x40, 0xe8, 0x6c, 0x7b, 0x41 }}
+
+  ## Include/Ppi/FirmwareVolumeInfoMeasurementExcluded.h
+  gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid = { 0x6e056ff9, 0xc695, 0x4364, { 0x9e, 0x2c, 0x61, 0x26, 0xf5, 0xce, 0xea, 0xae } }
 
 [PcdsFixedAtBuild]
   ## Pcd for OptionRom.
@@ -167,3 +186,56 @@
   ## This PCD is used to specify the default value for physicalPresenceHWEnable bit when setting physicalPresenceLifetimeLock bit.
   ## If PcdPhysicalPresenceHwEnable is set to TRUE, physicalPresenceHWEnable bit will be set, else this bit will be cleared.
   gEfiSecurityPkgTokenSpaceGuid.PcdPhysicalPresenceHwEnable|TRUE|BOOLEAN|0x00010005
+
+[PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+  ## This PCD indicates if debugger exists.
+  gEfiSecurityPkgTokenSpaceGuid.PcdFirmwareDebuggerInitialized|FALSE|BOOLEAN|0x00010009
+
+  ## This PCD indicates the TPM2 initializatin policy.
+  ## 0: No initialization needed - most likely used for chipset SRTM sloution, in which TPM is already initialized.
+  ## 1: Initialization needed.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2InitializationPolicy|1|UINT8|0x0001000A
+
+  ## This PCD indicates the TPM initializatin policy.
+  ## 0: No initialization needed - most likely used for chipset SRTM sloution, in which TPM is already initialized.
+  ## 1: Initialization needed.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInitializationPolicy|1|UINT8|0x0001000B
+
+  ## This PCD indicates the TPM2 SelfTest policy.
+  ## 0: No SelfTest needed - most likely used for fTPM, because it might already be tested.
+  ## 1: SelfTest needed.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2SelfTestPolicy|1|UINT8|0x0001000C
+
+  ## This PCD indicates the TPM2 SCRTM policy.
+  ##   0: No SCRTM needed - In this case, it is already done.
+  ##   1: SCRTM done by BIOS.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2ScrtmPolicy|1|UINT8|0x0001000D
+
+  ## This PCD indicates the TPM SCRTM policy.
+  ##   0: No SCRTM needed - In this case, it is already done.
+  ##   1: SCRTM done by BIOS.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmScrtmPolicy|1|UINT8|0x0001000E
+
+  ## Guid name to identify TPM instance
+  ## TPM_DEVICE_INTERFACE_NONE means disable
+  ## TPM_DEVICE_INTERFACE_TPM12 means TPM1.2 DTPM
+  ## TPM_DEVICE_INTERFACE_DTPM2 means TPM2 DTPM
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid |{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }|VOID*|0x0001000F
+
+  ## This PCD indicates the TPM2 Hash mask.
+  ##   BIT0: SHA1
+  ##   BIT1: SHA256
+  ##   BIT2: SHA384
+  ##   BIT3: SHA512
+  ## If this bit is set, that means this algorithm is needed to extend to PCR.
+  ## If this bit is clear, that means this algorithm is NOT needed to extend to PCR.
+  ## 0xFFFFFFFF means extend all.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0xFFFFFFFF|UINT32|0x00010010
+
+  ## This PCD indicates if BIOS auto detect TPM1.2 or dTPM2.0.
+  ## 0: No auto detection.
+  ## 1: Auto detection.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmAutoDetection|TRUE|BOOLEAN|0x00010011
+
+  ## This PCD indicates TPM base address.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0xFED40000|UINT64|0x00010012

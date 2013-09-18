@@ -50,6 +50,7 @@
 [Guids]
   gEfiPhysicalPresenceGuid
   gEfiMemoryOverwriteControlDataGuid
+  gEfiTpmDeviceInstanceTpm12Guid
 
 [Protocols]
   gEfiSmmSwDispatch2ProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
@@ -57,6 +58,7 @@
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
 
 [Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId
 
 [Depex]

@@ -24,6 +24,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <IndustryStandard/Acpi.h>
 #include <IndustryStandard/PeImage.h>
 #include <IndustryStandard/SmBios.h>
+#include <IndustryStandard/TcpaAcpi.h>
 
 #include <Guid/GlobalVariable.h>
 #include <Guid/SmBios.h>
@@ -31,6 +32,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/TcgEventHob.h>
 #include <Guid/EventGroup.h>
 #include <Guid/EventExitBootServiceFailed.h>
+#include <Guid/TpmInstance.h>
+
 #include <Protocol/DevicePath.h>
 #include <Protocol/TcgService.h>
 #include <Protocol/AcpiTable.h>
@@ -52,38 +55,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "TpmComm.h"
 
 #define  EFI_TCG_LOG_AREA_SIZE        0x10000
-
-#pragma pack (1)
-
-typedef struct _EFI_TCG_CLIENT_ACPI_TABLE {
-  EFI_ACPI_DESCRIPTION_HEADER       Header;
-  UINT16                            PlatformClass;
-  UINT32                            Laml;
-  EFI_PHYSICAL_ADDRESS              Lasa;
-} EFI_TCG_CLIENT_ACPI_TABLE;
-
-typedef struct _EFI_TCG_SERVER_ACPI_TABLE {
-  EFI_ACPI_DESCRIPTION_HEADER             Header;
-  UINT16                                  PlatformClass;
-  UINT16                                  Reserved0;
-  UINT64                                  Laml;
-  EFI_PHYSICAL_ADDRESS                    Lasa;
-  UINT16                                  SpecRev;
-  UINT8                                   DeviceFlags;
-  UINT8                                   InterruptFlags;
-  UINT8                                   Gpe;
-  UINT8                                   Reserved1[3];
-  UINT32                                  GlobalSysInt;
-  EFI_ACPI_3_0_GENERIC_ADDRESS_STRUCTURE  BaseAddress;
-  UINT32                                  Reserved2;
-  EFI_ACPI_3_0_GENERIC_ADDRESS_STRUCTURE  ConfigAddress;
-  UINT8                                   PciSegNum;
-  UINT8                                   PciBusNum;
-  UINT8                                   PciDevNum;
-  UINT8                                   PciFuncNum;
-} EFI_TCG_SERVER_ACPI_TABLE;
-
-#pragma pack ()
 
 #define TCG_DXE_DATA_FROM_THIS(this)  \
   BASE_CR (this, TCG_DXE_DATA, TcgProtocol)
@@ -1343,6 +1314,11 @@ DriverEntry (
   EFI_STATUS                        Status;
   EFI_EVENT                         Event;
   VOID                              *Registration;
+
+  if (!CompareGuid (PcdGetPtr(PcdTpmInstanceGuid), &gEfiTpmDeviceInstanceTpm12Guid)){
+    DEBUG ((EFI_D_ERROR, "No TPM12 instance required!\n"));
+    return EFI_UNSUPPORTED;
+  }
 
   mTcgDxeData.TpmHandle = (TIS_TPM_HANDLE)(UINTN)TPM_BASE_ADDRESS;
   Status = TisPcRequestUseTpm (mTcgDxeData.TpmHandle);

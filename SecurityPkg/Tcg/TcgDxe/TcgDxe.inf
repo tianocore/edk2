@@ -58,6 +58,7 @@
   gEfiEventReadyToBootGuid
   gEfiEventExitBootServicesGuid
   gEventExitBootServicesFailedGuid              # ALWAYS_CONSUMED
+  gEfiTpmDeviceInstanceTpm12Guid
 
 [Protocols]
   gEfiTcgProtocolGuid                           ## PRODUCES
@@ -67,6 +68,7 @@
 
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmPlatformClass
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision

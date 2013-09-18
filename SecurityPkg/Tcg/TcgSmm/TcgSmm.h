@@ -21,6 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Guid/PhysicalPresenceData.h>
 #include <Guid/MemoryOverwriteControl.h>
+#include <Guid/TpmInstance.h>
 
 #include <Protocol/SmmSwDispatch2.h>
 #include <Protocol/AcpiTable.h>

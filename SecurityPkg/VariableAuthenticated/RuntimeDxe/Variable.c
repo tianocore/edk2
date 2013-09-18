@@ -105,6 +105,20 @@ GLOBAL_VARIABLE_ENTRY mGlobalVariableList2[] = {
 };
 
 /**
+
+  SecureBoot Hook for auth variable update.
+
+  @param[in] VariableName                 Name of Variable to be found.
+  @param[in] VendorGuid                   Variable vendor GUID.
+**/
+VOID
+EFIAPI
+SecureBootHook (
+  IN CHAR16                                 *VariableName,
+  IN EFI_GUID                               *VendorGuid
+  );
+
+/**
   Routine used to track statistical information about variable usage.
   The data is stored in the EFI system table so it can be accessed later.
   VariableInfo.efi can dump out the table. Only Boot Services variable
@@ -2980,6 +2994,15 @@ VariableServiceSetVariable (
 Done:
   InterlockedDecrement (&mVariableModuleGlobal->VariableGlobal.ReentrantState);
   ReleaseLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
+
+  if (!AtRuntime ()) {
+    if (!EFI_ERROR (Status)) {
+      SecureBootHook (
+        VariableName,
+        VendorGuid
+        );
+    }
+  }
 
   return Status;
 }

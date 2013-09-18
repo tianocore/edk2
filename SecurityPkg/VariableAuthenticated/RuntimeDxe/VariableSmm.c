@@ -51,6 +51,23 @@ extern BOOLEAN                                       mEndOfDxe;
 extern BOOLEAN                                       mEnableLocking;
 
 /**
+  SecureBoot Hook for SetVariable.
+
+  @param[in] VariableName                 Name of Variable to be found.
+  @param[in] VendorGuid                   Variable vendor GUID.
+
+**/
+VOID
+EFIAPI
+SecureBootHook (
+  IN CHAR16                                 *VariableName,
+  IN EFI_GUID                               *VendorGuid
+  )
+{
+  return ;
+}
+
+/**
 
   This code sets variable in storage blocks (Volatile or Non-Volatile).
 
