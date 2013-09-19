@@ -176,7 +176,9 @@ ShellCommandRunSetVar (
           if (Status == EFI_BUFFER_TOO_SMALL) {
             Buffer = AllocateZeroPool(Size);
             Status = gRT->GetVariable((CHAR16*)VariableName, &Guid, &Attributes2, &Size, Buffer);
-            FreePool(Buffer);
+            if (Buffer != NULL) {
+              FreePool(Buffer);
+            }
             Attributes = Attributes2;
           }          
           //
