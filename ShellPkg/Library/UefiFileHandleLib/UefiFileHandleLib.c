@@ -84,9 +84,9 @@ FileHandleGetInfo (
     //
     // if we got an error free the memory and return NULL
     //
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR(Status) && (FileInfo != NULL)) {
       FreePool(FileInfo);
-      return NULL;
+      FileInfo = NULL;
     }
   }
   return (FileInfo);
