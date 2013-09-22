@@ -22,7 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <IndustryStandard/Tpm12.h>
 
-#pragma pack (push, 1)
+#pragma pack (1)
 
 // Annex A Algorithm Constants
 
@@ -1804,6 +1804,6 @@ typedef struct {
   TPM_RC responseCode;
 } TPM2_RESPONSE_HEADER;
 
-#pragma pack (pop)
+#pragma pack ()
 
 #endif
