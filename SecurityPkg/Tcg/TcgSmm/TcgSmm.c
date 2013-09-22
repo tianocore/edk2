@@ -386,6 +386,11 @@ InitializeTcgSmm (
   EFI_SMM_SW_REGISTER_CONTEXT    SwContext;
   EFI_HANDLE                     SwHandle;
 
+  if (!CompareGuid (PcdGetPtr(PcdTpmInstanceGuid), &gEfiTpmDeviceInstanceTpm12Guid)){
+    DEBUG ((EFI_D_ERROR, "No TPM12 instance required!\n"));
+    return EFI_UNSUPPORTED;
+  }
+
   Status = PublishAcpiTable ();
   ASSERT_EFI_ERROR (Status);
 

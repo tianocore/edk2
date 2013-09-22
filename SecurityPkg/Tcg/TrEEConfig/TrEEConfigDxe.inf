@@ -1,0 +1,74 @@
+## @file
+#  Component name for TrEE configuration module.
+#  NOTE: This module is only for reference only, each platform should have its own setup page.
+#
+# Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution. The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TrEEConfigDxe
+  FILE_GUID                      = 3141FD4D-EA02-4a70-9BCE-97EE837319AC
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = TrEEConfigDriverEntryPoint
+  UNLOAD_IMAGE                   = TrEEConfigDriverUnload
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  TrEEConfigDriver.c
+  TrEEConfigImpl.c
+  TrEEConfigImpl.h
+  TrEEConfig.vfr
+  TrEEConfigStrings.uni
+  TrEEConfigNvData.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiDriverEntryPoint
+  UefiHiiServicesLib
+  DebugLib
+  HiiLib
+  PcdLib
+  PrintLib
+  Tpm2DeviceLib
+  Tpm12DeviceLib
+  Tpm2CommandLib
+
+[Guids]
+  gEfiTrEEPhysicalPresenceGuid
+  gTrEEConfigFormSetGuid
+
+[Protocols]
+  gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
+  gEfiHiiConfigRoutingProtocolGuid              ## CONSUMES
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid
+
+[Depex]
+  gEfiTrEEProtocolGuid              AND
+  gEfiHiiConfigRoutingProtocolGuid  AND
+  gEfiHiiDatabaseProtocolGuid       AND
+  gEfiVariableArchProtocolGuid      AND
+  gEfiVariableWriteArchProtocolGuid

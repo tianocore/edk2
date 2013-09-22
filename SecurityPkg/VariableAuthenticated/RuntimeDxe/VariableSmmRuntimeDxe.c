@@ -58,6 +58,20 @@ EFI_LOCK                         mVariableServicesLock;
 EDKII_VARIABLE_LOCK_PROTOCOL     mVariableLock;
 
 /**
+  SecureBoot Hook for SetVariable.
+
+  @param[in] VariableName                 Name of Variable to be found.
+  @param[in] VendorGuid                   Variable vendor GUID.
+
+**/
+VOID
+EFIAPI
+SecureBootHook (
+  IN CHAR16                                 *VariableName,
+  IN EFI_GUID                               *VendorGuid
+  );
+
+/**
   Acquires lock only at boot time. Simply returns at runtime.
 
   This is a temperary function that will be removed when
@@ -545,6 +559,15 @@ RuntimeServiceSetVariable (
 
 Done:
   ReleaseLockOnlyAtBootTime (&mVariableServicesLock);
+
+  if (!EfiAtRuntime ()) {
+    if (!EFI_ERROR (Status)) {
+      SecureBootHook (
+        VariableName,
+        VendorGuid
+        );
+    }
+  }
   return Status;
 }
 

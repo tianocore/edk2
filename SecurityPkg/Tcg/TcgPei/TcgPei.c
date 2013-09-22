@@ -1,7 +1,7 @@
 /** @file
   Initialize TPM device and measure FVs before handing off control to DXE.
 
-Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -21,9 +21,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Ppi/TpmInitialized.h>
 #include <Ppi/FirmwareVolume.h>
 #include <Ppi/EndOfPeiPhase.h>
+#include <Ppi/FirmwareVolumeInfoMeasurementExcluded.h>
 
 #include <Guid/TcgEventHob.h>
 #include <Guid/MeasuredFvHob.h>
+#include <Guid/TpmInstance.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -50,6 +52,8 @@ UINT32 mMeasuredBaseFvIndex = 0;
 
 EFI_PLATFORM_FIRMWARE_BLOB mMeasuredChildFvInfo[FixedPcdGet32 (PcdPeiCoreMaxFvSupported)];
 UINT32 mMeasuredChildFvIndex = 0;
+
+EFI_PEI_FIRMWARE_VOLUME_INFO_MEASUREMENT_EXCLUDED_PPI *mMeasurementExcludedFvPpi;
 
 /**
   Lock physical presence if needed.
@@ -310,6 +314,19 @@ MeasureFvImage (
   TIS_TPM_HANDLE                    TpmHandle;
 
   TpmHandle = (TIS_TPM_HANDLE) (UINTN) TPM_BASE_ADDRESS;
+
+  //
+  // Check if it is in Excluded FV list
+  //
+  if (mMeasurementExcludedFvPpi != NULL) {
+    for (Index = 0; Index < mMeasurementExcludedFvPpi->Count; Index ++) {
+      if (mMeasurementExcludedFvPpi->Fv[Index].FvBase == FvBase) {
+        DEBUG ((DEBUG_INFO, "The FV which is excluded by TcgPei starts at: 0x%x\n", FvBase));
+        DEBUG ((DEBUG_INFO, "The FV which is excluded by TcgPei has the size: 0x%x\n", FvLength));
+        return EFI_SUCCESS;
+      }
+    }
+  }
 
   //
   // Check whether FV is in the measured FV list.
@@ -627,6 +644,14 @@ PeimEntryMP (
   EFI_STATUS                        Status;
   TIS_TPM_HANDLE                    TpmHandle;
 
+  Status = PeiServicesLocatePpi (
+               &gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid, 
+               0, 
+               NULL,
+               (VOID**)&mMeasurementExcludedFvPpi
+               );
+  // Do not check status, because it is optional
+
   TpmHandle = (TIS_TPM_HANDLE)(UINTN)TPM_BASE_ADDRESS;
   Status = TisPcRequestUseTpm ((TIS_PC_REGISTERS_PTR)TpmHandle);
   if (EFI_ERROR (Status)) {
@@ -634,8 +659,10 @@ PeimEntryMP (
   }
 
   if (IsTpmUsable (PeiServices, TpmHandle)) {
-    Status = MeasureCRTMVersion (PeiServices, TpmHandle);
-    ASSERT_EFI_ERROR (Status);
+    if (PcdGet8 (PcdTpmScrtmPolicy) == 1) {
+      Status = MeasureCRTMVersion (PeiServices, TpmHandle);
+      ASSERT_EFI_ERROR (Status);
+    }
 
     Status = MeasureMainBios (PeiServices, TpmHandle);
   }  
@@ -673,6 +700,11 @@ PeimEntryMA (
   EFI_BOOT_MODE                     BootMode;
   TIS_TPM_HANDLE                    TpmHandle;
 
+  if (!CompareGuid (PcdGetPtr(PcdTpmInstanceGuid), &gEfiTpmDeviceInstanceTpm12Guid)){
+    DEBUG ((EFI_D_ERROR, "No TPM12 instance required!\n"));
+    return EFI_UNSUPPORTED;
+  }
+
   if (PcdGetBool (PcdHideTpmSupport) && PcdGetBool (PcdHideTpm)) {
     return EFI_UNSUPPORTED;
   }
@@ -703,9 +735,11 @@ PeimEntryMA (
       return Status;
     }
 
-    Status = TpmCommStartup ((EFI_PEI_SERVICES**)PeiServices, TpmHandle, BootMode);
-    if (EFI_ERROR (Status) ) {
-      return Status;
+    if (PcdGet8 (PcdTpmInitializationPolicy) == 1) {
+      Status = TpmCommStartup ((EFI_PEI_SERVICES**)PeiServices, TpmHandle, BootMode);
+      if (EFI_ERROR (Status) ) {
+        return Status;
+      }
     }
 
     //

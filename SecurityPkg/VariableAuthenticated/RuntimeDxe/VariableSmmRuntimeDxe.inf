@@ -38,6 +38,7 @@
 
 [Sources]
   VariableSmmRuntimeDxe.c
+  Measurement.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -53,6 +54,7 @@
   DxeServicesTableLib
   UefiDriverEntryPoint
   PcdLib  
+  TpmMeasurementLib
 
 [Protocols]
   gEfiVariableWriteArchProtocolGuid             ## ALWAYS_PRODUCES
@@ -64,6 +66,7 @@
 [Guids]
   gEfiEventVirtualAddressChangeGuid             ## PRODUCES ## Event
   gSmmVariableWriteGuid
+  gEfiImageSecurityDatabaseGuid
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize

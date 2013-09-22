@@ -39,6 +39,7 @@
   Variable.h
   AuthService.c
   AuthService.h
+  Measurement.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -61,6 +62,7 @@
   BaseCryptLib
   PlatformSecureLib
   HobLib
+  TpmMeasurementLib
 
 [Protocols]
   gEfiFirmwareVolumeBlockProtocolGuid           ## SOMETIMES_CONSUMES

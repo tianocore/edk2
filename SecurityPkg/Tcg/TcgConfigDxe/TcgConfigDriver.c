@@ -1,7 +1,7 @@
 /** @file
   The module entry point for Tcg configuration module.
 
-Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "TcgConfigImpl.h"
+#include <Guid/TpmInstance.h>
 
 /**
   The entry point for Tcg configuration driver.
@@ -36,6 +37,11 @@ TcgConfigDriverEntryPoint (
   EFI_STATUS                Status;
   TCG_CONFIG_PRIVATE_DATA   *PrivateData;
   EFI_TCG_PROTOCOL          *TcgProtocol;
+
+  if (!CompareGuid (PcdGetPtr(PcdTpmInstanceGuid), &gEfiTpmDeviceInstanceTpm12Guid)){
+    DEBUG ((EFI_D_ERROR, "No TPM12 instance required!\n"));
+    return EFI_UNSUPPORTED;
+  }
 
   Status = TisPcRequestUseTpm ((TIS_TPM_HANDLE) (UINTN) TPM_BASE_ADDRESS);
   if (EFI_ERROR (Status)) {
