@@ -897,11 +897,12 @@ UserConfirm (
   Check if there is a valid physical presence command request. Also updates parameter value 
   to whether the requested physical presence command already confirmed by user
  
-   @param[in]  TcgPpData                 EFI TCG Physical Presence request data. 
-   @param[out] RequestConfirmed            If the physical presence operation command required user confirm from UI.
-                                             True, it indicates the command doesn't require user confirm, or already confirmed 
-                                                   in last boot cycle by user.
-                                             False, it indicates the command need user confirm from UI.
+   @param[in]  TcgPpData           EFI TCG Physical Presence request data.
+   @param[in]  Flags               The physical presence interface flags. 
+   @param[out] RequestConfirmed    If the physical presence operation command required user confirm from UI.
+                                   True, it indicates the command doesn't require user confirm, or already confirmed 
+                                   in last boot cycle by user.
+                                   False, it indicates the command need user confirm from UI.
 
    @retval  TRUE        Physical Presence operation command is valid.
    @retval  FALSE       Physical Presence operation command is invalid.
@@ -998,6 +999,7 @@ HaveValidTpmRequest  (
 
   @param[in] TcgProtocol          EFI TCG Protocol instance. 
   @param[in] TcgPpData            Point to the physical presence NV variable.
+  @param[in] Flags                The physical presence interface flags.
 
 **/
 VOID
