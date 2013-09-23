@@ -2,7 +2,7 @@
                                  OVERVIEW
 ============================================================================
 The binaries of ShellBinPkg are generated with ShellPkg project and built with 
-BaseTools Package (r14400). The binaries are built with no debug information 
+BaseTools Package (r14706). The binaries are built with no debug information 
 by building with "RELEASE" target.
 
 The following steps can help to re-generate these binaries for customization:
