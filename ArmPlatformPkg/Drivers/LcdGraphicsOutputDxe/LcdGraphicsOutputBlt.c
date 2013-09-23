@@ -301,7 +301,7 @@ BltVideoFill (
       DestinationAddr = (VOID *)((UINT32 *)FrameBufferBase + DestinationLine * HorizontalResolution  + DestinationX);
 
       // Fill the entire line
-      SetMemN( DestinationAddr, WidthInBytes, *((UINT32 *)EfiSourcePixel));
+      SetMem32 (DestinationAddr, WidthInBytes, *((UINT32 *)EfiSourcePixel));
     }
     break;
 
