@@ -345,7 +345,8 @@ FileWrite (
   Fcb = SEMIHOST_FCB_FROM_THIS(File);
 
   // We cannot write a read-only file
-  if (Fcb->OpenMode & EFI_FILE_READ_ONLY) {
+  if ((Fcb->Info.Attribute & EFI_FILE_READ_ONLY)
+      || !(Fcb->OpenMode & EFI_FILE_MODE_WRITE)) {
     return EFI_ACCESS_DENIED;
   }
 
@@ -567,7 +568,8 @@ FileFlush (
   if (Fcb->IsRoot) {
     return EFI_SUCCESS;
   } else {
-    if (Fcb->Info.Attribute & EFI_FILE_READ_ONLY) {
+    if ((Fcb->Info.Attribute & EFI_FILE_READ_ONLY)
+        || !(Fcb->OpenMode & EFI_FILE_MODE_WRITE)) {
       return EFI_ACCESS_DENIED;
     } else {
       return EFI_SUCCESS;
