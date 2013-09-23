@@ -15,8 +15,8 @@ This is EDK style package and the following steps can help to build the package:
    To use this file, execute the following command under workspace to build EDK Shell source:
    build -a IA32 -a X64 -a IPF -p EdkShellPkg\EdkShellPkg.dsc
    
-4. If you need to compile for GCC or ARM you will need to apply ShellR61.patch.
-   cd $(WORKSPACE)/Shell and execute patch -p1 < $(WORKSPACE)/EdkShellPkg/ShellR61.patch.
+4. If you need to compile for GCC or ARM you will need to apply ShellR64.patch.
+   cd $(WORKSPACE)/Shell and execute patch -p0 < $(WORKSPACE)/EdkShellPkg/ShellR64.patch.
    If you are using a case sensative file system there are a few case bugs that patch 
    would not fix. Just fix the case of the file to match its usage and you should be 
    able to compile.

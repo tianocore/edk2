@@ -21,7 +21,7 @@
   PLATFORM_VERSION               = 1.04
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/EdkShellPkg
-  SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|ARM
+  SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|ARM|AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 # 
@@ -86,7 +86,7 @@ DEFINE GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x0002000A -DPI_S
 [Libraries.IPF]
   EdkCompatibilityPkg/Foundation/Cpu/Itanium/CpuIa64Lib/CpuIA64Lib.inf
 
-[Libraries.ARM]
+[Libraries.ARM, Libraries.AARCH64]
   EdkCompatibilityPkg/Foundation/Library/CompilerStub/CompilerStubLib.inf
   ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
@@ -254,5 +254,7 @@ DEFINE GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x0002000A -DPI_S
   RVCT:*_*_ARM_APP_FLAGS    = -DEFIARM $(GCC_MACRO)
   RVCT:*_*_ARM_PP_FLAGS     = -DEFIARM $(GCC_MACRO)
 
-
-
+  GCC:*_*_AARCH64_CC_FLAGS     = -DEFIAARCH64 $(GCC_MACRO)
+  GCC:*_*_AARCH64_VFRPP_FLAGS  = -DEFIAARCH64 $(GCC_MACRO)
+  GCC:*_*_AARCH64_APP_FLAGS    = -DEFIAARCH64 $(GCC_MACRO)
+  GCC:*_*_AARCH64_PP_FLAGS     = -DEFIAARCH64 $(GCC_MACRO)
