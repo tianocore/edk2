@@ -842,8 +842,10 @@ NvmeControllerInit (
   //
   // set number of entries admin submission & completion queues.
   //
-  Aqa.Asqs = NVME_ASQ_SIZE;
-  Aqa.Acqs = NVME_ACQ_SIZE;
+  Aqa.Asqs  = NVME_ASQ_SIZE;
+  Aqa.Rsvd1 = 0;
+  Aqa.Acqs  = NVME_ACQ_SIZE;
+  Aqa.Rsvd2 = 0;
 
   //
   // Address of admin submission queue.
