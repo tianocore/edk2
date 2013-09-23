@@ -99,8 +99,6 @@ LcdShutdown (
   VOID
   )
 {
-  // Nothing to do in terms of hardware.
-  // We could switch off the monitor display if required
-
-  //TODO: ImplementMe
+  // Disable the controller
+  MmioAnd32 (PL111_REG_LCD_CONTROL, ~PL111_CTRL_LCD_EN);
 }

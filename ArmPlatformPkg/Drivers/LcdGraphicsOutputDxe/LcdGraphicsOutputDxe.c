@@ -225,7 +225,13 @@ LcdGraphicsExitBootServicesEvent (
   IN VOID       *Context
   )
 {
-	//TODO: Implement me
+  // By default, this PCD is FALSE. But if a platform starts a predefined OS that
+  // does not use a framebuffer then we might want to disable the display controller
+  // to avoid to display corrupted information on the screen.
+  if (FeaturePcdGet (PcdGopDisableOnExitBootServices)) {
+    // Turn-off the Display controller
+    LcdShutdown ();
+  }
 }
 
 /***************************************

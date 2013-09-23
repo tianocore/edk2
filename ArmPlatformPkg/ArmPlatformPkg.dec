@@ -53,7 +53,11 @@
   gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores|FALSE|BOOLEAN|0x00000004
 
   gArmPlatformTokenSpaceGuid.PcdNorFlashCheckBlockLocked|FALSE|BOOLEAN|0x0000003C
-  
+
+  # Disable the GOP controller on ExitBootServices(). By default the value is FALSE,
+  # we assume the OS will handle the FrameBuffer from the UEFI GOP information.
+  gArmPlatformTokenSpaceGuid.PcdGopDisableOnExitBootServices|FALSE|BOOLEAN|0x0000003D
+
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdCoreCount|1|UINT32|0x00000039
   gArmPlatformTokenSpaceGuid.PcdClusterCount|1|UINT32|0x00000038

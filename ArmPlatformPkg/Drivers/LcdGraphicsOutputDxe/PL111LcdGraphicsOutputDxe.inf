@@ -52,5 +52,8 @@
 [FixedPcd]
   gArmPlatformTokenSpaceGuid.PcdPL111LcdBase
 
+[FeaturePcd]
+  gArmPlatformTokenSpaceGuid.PcdGopDisableOnExitBootServices
+
 [Depex]
   gEfiCpuArchProtocolGuid

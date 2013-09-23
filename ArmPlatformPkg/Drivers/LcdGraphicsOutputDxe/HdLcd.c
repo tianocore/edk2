@@ -120,6 +120,6 @@ LcdShutdown (
   VOID
   )
 {
-  // Nothing to do in terms of hardware.
-  // We could switch off the monitor display if required
+  // Disable the controller
+  MmioWrite32 (HDLCD_REG_COMMAND, HDLCD_DISABLE);
 }
