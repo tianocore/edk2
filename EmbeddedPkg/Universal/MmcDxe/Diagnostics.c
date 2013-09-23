@@ -17,6 +17,7 @@
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/BaseLib.h>
 
 #include "Mmc.h"
 
@@ -31,7 +32,7 @@ DiagnosticInitLog (
   )
 {
   mLogRemainChar = MaxBufferChar;
-  mLogBuffer = AllocatePool ((UINTN)MaxBufferChar * sizeof(CHAR16));
+  mLogBuffer = AllocatePool ((UINTN)MaxBufferChar * sizeof (CHAR16));
   return mLogBuffer;
 }
 
@@ -79,8 +80,8 @@ CompareBuffer (
 
   for (i = 0; i < (BufferSize >> 3); i++) {
     if (*BufferA64 != *BufferB64) {
-      DEBUG((EFI_D_ERROR, "CompareBuffer: Error at %i", i));
-      DEBUG((EFI_D_ERROR, "(0x%lX) != (0x%lX)\n", *BufferA64, *BufferB64));
+      DEBUG ((EFI_D_ERROR, "CompareBuffer: Error at %i", i));
+      DEBUG ((EFI_D_ERROR, "(0x%lX) != (0x%lX)\n", *BufferA64, *BufferB64));
       return FALSE;
     }
     BufferA64++;
@@ -192,6 +193,11 @@ MmcDriverDiagnosticsRunDiagnostics (
     return EFI_INVALID_PARAMETER;
   }
 
+  // Check Language is supported (i.e. is "en-*" - only English is supported)
+  if (AsciiStrnCmp (Language, "en", 2) != 0) {
+    return EFI_UNSUPPORTED;
+  }
+
   Status = EFI_SUCCESS;
   *ErrorType  = NULL;
   *BufferSize = DIAGNOSTIC_LOGBUFFER_MAXCHAR;
@@ -202,8 +208,8 @@ MmcDriverDiagnosticsRunDiagnostics (
   // For each MMC instance
   CurrentLink = mMmcHostPool.ForwardLink;
   while (CurrentLink != NULL && CurrentLink != &mMmcHostPool && (Status == EFI_SUCCESS)) {
-    MmcHostInstance = MMC_HOST_INSTANCE_FROM_LINK(CurrentLink);
-    ASSERT(MmcHostInstance != NULL);
+    MmcHostInstance = MMC_HOST_INSTANCE_FROM_LINK (CurrentLink);
+    ASSERT (MmcHostInstance != NULL);
 
     // LBA=1 Size=BlockSize
     DiagnosticLog (L"MMC Driver Diagnostics - Test: First Block\n");
