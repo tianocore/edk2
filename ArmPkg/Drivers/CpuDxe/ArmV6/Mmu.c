@@ -851,7 +851,7 @@ GetMemoryRegion (
     SectionDescriptor = FirstLevelTable[TableIndex];
 
     // If the entry is a level-2 page table then we scan it to find the end of the region
-    if ((SectionDescriptor & TT_DESCRIPTOR_SECTION_TYPE_MASK) == TT_DESCRIPTOR_SECTION_TYPE_PAGE_TABLE) {
+    if (TT_DESCRIPTOR_SECTION_TYPE_IS_PAGE_TABLE (SectionDescriptor)) {
       // Extract the page table location from the descriptor
       PageTable = (UINT32*)(SectionDescriptor & TT_DESCRIPTOR_SECTION_PAGETABLE_ADDRESS_MASK);
 
