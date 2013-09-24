@@ -1673,6 +1673,7 @@ static struct {
   { sizeof (EFI_IFR_SECURITY), 0 },            // EFI_IFR_SECURITY_OP - 0x60
   { sizeof (EFI_IFR_MODAL_TAG), 0},            // EFI_IFR_MODAL_TAG_OP - 0x61
   { sizeof (EFI_IFR_REFRESH_ID), 0},           // EFI_IFR_REFRESH_ID_OP - 0x62
+  { sizeof (EFI_IFR_WARNING_IF), 1},           // EFI_IFR_WARNING_IF_OP - 0x63
 };
 
 #ifdef CIFROBJ_DEUBG
@@ -1695,7 +1696,7 @@ static struct {
   "EFI_IFR_STRING_REF1","EFI_IFR_STRING_REF2",          "EFI_IFR_CONDITIONAL",   "EFI_IFR_QUESTION_REF3",   "EFI_IFR_ZERO",          "EFI_IFR_ONE",
   "EFI_IFR_ONES",       "EFI_IFR_UNDEFINED",            "EFI_IFR_LENGTH",        "EFI_IFR_DUP",             "EFI_IFR_THIS",          "EFI_IFR_SPAN",
   "EFI_IFR_VALUE",      "EFI_IFR_DEFAULT",              "EFI_IFR_DEFAULTSTORE",  "EFI_IFR_FORM_MAP",        "EFI_IFR_CATENATE",      "EFI_IFR_GUID",
-  "EFI_IFR_SECURITY",   "EFI_IFR_MODAL_TAG",            "EFI_IFR_REFRESH_ID",
+  "EFI_IFR_SECURITY",   "EFI_IFR_MODAL_TAG",            "EFI_IFR_REFRESH_ID",    "EFI_IFR_WARNING_IF",
 };
 
 VOID

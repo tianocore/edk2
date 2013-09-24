@@ -827,6 +827,7 @@ class DscParser(MetaFileParser):
         except:
             EdkLogger.error("Parser", FILE_READ_FAILURE, ExtraData=self.MetaFile)
 
+        OwnerId = {}
         for Index in range(0, len(Content)):
             Line = CleanString(Content[Index])
             # skip empty line
@@ -847,6 +848,7 @@ class DscParser(MetaFileParser):
                 self._SubsectionType = MODEL_UNKNOWN
                 self._SubsectionName = ''
                 self._Owner[-1] = -1
+                OwnerId = {}
                 continue
             # subsection header
             elif Line[0] == TAB_OPTION_START and Line[-1] == TAB_OPTION_END:
@@ -871,6 +873,9 @@ class DscParser(MetaFileParser):
             # LineBegin=-1, ColumnBegin=-1, LineEnd=-1, ColumnEnd=-1, Enabled=-1
             #
             for Arch, ModuleType in self._Scope:
+                Owner = self._Owner[-1]
+                if self._SubsectionType != MODEL_UNKNOWN:
+                    Owner = OwnerId[Arch]
                 self._LastItem = self._Store(
                                         self._ItemType,
                                         self._ValueList[0],
@@ -878,7 +883,7 @@ class DscParser(MetaFileParser):
                                         self._ValueList[2],
                                         Arch,
                                         ModuleType,
-                                        self._Owner[-1],
+                                        Owner,
                                         self._From,
                                         self._LineIndex + 1,
                                         - 1,
@@ -886,6 +891,8 @@ class DscParser(MetaFileParser):
                                         - 1,
                                         self._Enabled
                                         )
+                if self._SubsectionType == MODEL_UNKNOWN and self._InSubsection:
+                    OwnerId[Arch] = self._LastItem
 
         if self._DirectiveStack:
             Type, Line, Text = self._DirectiveStack[-1]
@@ -1040,6 +1047,11 @@ class DscParser(MetaFileParser):
                             ExtraData=self._CurrentLine + " (<TokenSpaceGuidCName>.<TokenCName>|<PcdValue>)",
                             File=self.MetaFile, Line=self._LineIndex + 1)
         if self._ValueList[2] == '':
+            #
+            # The PCD values are optional for FIXEDATBUILD and PATCHABLEINMODULE
+            #
+            if self._SectionType in (MODEL_PCD_FIXED_AT_BUILD, MODEL_PCD_PATCHABLE_IN_MODULE):
+                return
             EdkLogger.error('Parser', FORMAT_INVALID, "No PCD value given",
                             ExtraData=self._CurrentLine + " (<TokenSpaceGuidCName>.<TokenCName>|<PcdValue>)",
                             File=self.MetaFile, Line=self._LineIndex + 1)

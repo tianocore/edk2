@@ -184,6 +184,7 @@ VfrParserStart (
 #token Goto("goto")                             "goto"
 #token FormSetGuid("formsetguid")               "formsetguid"
 #token InconsistentIf("inconsistentif")         "inconsistentif"
+#token WarningIf("warningif")                   "warningif"
 #token NoSubmitIf("nosubmitif")                 "nosubmitif"
 #token EndIf("endif")                           "endif"
 #token Key("key")                               "key"
@@ -2627,7 +2628,8 @@ vfrStatementQuestionTag :
   vfrStatementRefresh           |
   vfrStatementVarstoreDevice    |
   vfrStatementExtension         |
-  vfrStatementRefreshEvent
+  vfrStatementRefreshEvent      |
+  vfrStatementWarningIf
   ;
 
 vfrStatementQuestionTagList :
@@ -2821,6 +2823,15 @@ vfrStatementNoSubmitIf :
   L:NoSubmitIf                                         << NSIObj.SetLineNo(L->getLine()); >>
   Prompt "=" "STRING_TOKEN" "\(" S:Number "\)" ","     << NSIObj.SetError (_STOSID(S->getText())); >>
   { FLAGS "=" flagsField ( "\|" flagsField )* "," }
+  vfrStatementExpression[0]
+  E:EndIf                                              << CRT_END_OP (E); >>
+  ;
+
+vfrStatementWarningIf :
+  << CIfrWarningIf WIObj; >>
+  L:WarningIf                                          << WIObj.SetLineNo(L->getLine()); >>
+  Prompt "=" "STRING_TOKEN" "\(" S:Number "\)" ","     << WIObj.SetWarning (_STOSID(S->getText())); >>
+  {Timeout "=" T:Number ","                            << WIObj.SetTimeOut (_STOU8(T->getText())); >>}
   vfrStatementExpression[0]
   E:EndIf                                              << CRT_END_OP (E); >>
   ;

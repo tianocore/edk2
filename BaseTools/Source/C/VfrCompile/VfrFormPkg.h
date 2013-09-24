@@ -1612,6 +1612,26 @@ public:
   }
 };
 
+class CIfrWarningIf : public CIfrObj, public CIfrOpHeader {
+private:
+  EFI_IFR_WARNING_IF *mWarningIf;
+
+public:
+  CIfrWarningIf () : CIfrObj (EFI_IFR_WARNING_IF_OP, (CHAR8 **)&mWarningIf),
+                        CIfrOpHeader (EFI_IFR_WARNING_IF_OP, &mWarningIf->Header) {
+    mWarningIf->Warning = EFI_STRING_ID_INVALID;
+    mWarningIf->TimeOut = 0;
+  }
+
+  VOID SetWarning (IN EFI_STRING_ID Warning) {
+    mWarningIf->Warning = Warning;
+  }
+
+  VOID SetTimeOut (IN UINT8 TimeOut) {
+    mWarningIf->TimeOut = TimeOut;
+  }
+};
+
 class CIfrNoSubmitIf : public CIfrObj, public CIfrOpHeader {
 private:
   EFI_IFR_NO_SUBMIT_IF *mNoSubmitIf;
