@@ -12,5 +12,5 @@ The following steps can help to re-generate these binaries for customization:
    To generate them, execute: "build -a IA32 -a X64 -a IPF -p EdkShellPkg\EdkShellPkg.dsc -m Shell\XXX\*.inf -b RELEASE". XXX means the corresponding module name.
 
 
-The Arm binaries of EdkShellBinPkg are generated with EFI shell project (svn r61) and build with Edk Compatibility & BaseTools Package (r13646).
+The Arm binaries of EdkShellBinPkg are generated with EFI shell project (svn r64) and build with Edk Compatibility & BaseTools Package (r14706).
 Build Instructions are available on this page http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=ArmPkg/Binaries.

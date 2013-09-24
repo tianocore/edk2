@@ -26,7 +26,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#  VALID_ARCHITECTURES           = IA32 X64 IPF ARM AARCH64
 #
 
 [Binaries.Ia32]
@@ -41,3 +41,5 @@
 [Binaries.ARM]
   PE32|Arm/Shell_Full.efi|*
 
+[Binaries.AARCH64]
+  PE32|AArch64/Shell_Full.efi|*
