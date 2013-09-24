@@ -53,6 +53,7 @@ BOOLEAN               gExitRequired;
 BROWSER_SETTING_SCOPE gBrowserSettingScope = FormSetLevel;
 BOOLEAN               mBrowserScopeFirstSet = TRUE;
 EXIT_HANDLER          ExitHandlerFunction = NULL;
+FORM_BROWSER_FORMSET  *mSystemLevelFormSet;
 
 //
 // Browser Global Strings
@@ -255,6 +256,9 @@ LoadAllHiiFormset (
   UINTN                   Index;
   EFI_GUID                ZeroGuid;
   EFI_STATUS              Status;
+  FORM_BROWSER_FORMSET    *OldFormset;
+
+  OldFormset = mSystemLevelFormSet;
 
   //
   // Get all the Hii handles
@@ -278,6 +282,8 @@ LoadAllHiiFormset (
     //
     LocalFormSet = AllocateZeroPool (sizeof (FORM_BROWSER_FORMSET));
     ASSERT (LocalFormSet != NULL);
+    mSystemLevelFormSet = LocalFormSet;
+
     ZeroMem (&ZeroGuid, sizeof (ZeroGuid));
     Status = InitializeFormSet (HiiHandles[Index], &ZeroGuid, LocalFormSet);
     if (EFI_ERROR (Status) || IsListEmpty (&LocalFormSet->FormListHead)) {
@@ -300,6 +306,8 @@ LoadAllHiiFormset (
   // Free resources, and restore gOldFormSet and gClassOfVfr
   //
   FreePool (HiiHandles);
+
+  mSystemLevelFormSet = OldFormset;
 }
 
 /**
@@ -388,6 +396,7 @@ SendForm (
         break;
       }
       Selection->FormSet = FormSet;
+      mSystemLevelFormSet = FormSet;
 
       //
       // Display this formset
@@ -397,6 +406,7 @@ SendForm (
       Status = SetupBrowser (Selection);
 
       gCurrentSelection = NULL;
+      mSystemLevelFormSet = NULL;
 
       //
       // If no data is changed, don't need to save current FormSet into the maintain list.
@@ -580,7 +590,6 @@ BrowserCallback (
   LIST_ENTRY            *Link;
   BROWSER_STORAGE       *Storage;
   FORMSET_STORAGE       *FormsetStorage;
-  FORM_BROWSER_FORMSET  *FormSet;
   UINTN                 TotalSize;
   BOOLEAN               Found;
 
@@ -650,16 +659,15 @@ BrowserCallback (
     //
     // GUID/Name is not specified, take the first storage in FormSet
     //
-    if (gCurrentSelection == NULL) {
+    if (mSystemLevelFormSet == NULL) {
       return EFI_NOT_READY;
     }
 
     //
     // Generate <ConfigResp>
     //
-    FormSet = gCurrentSelection->FormSet;
-    Link = GetFirstNode (&FormSet->StorageListHead);
-    if (IsNull (&FormSet->StorageListHead, Link)) {
+    Link = GetFirstNode (&mSystemLevelFormSet->StorageListHead);
+    if (IsNull (&mSystemLevelFormSet->StorageListHead, Link)) {
       return EFI_UNSUPPORTED;
     }
 
@@ -2361,7 +2369,8 @@ DiscardForm (
   LIST_ENTRY                   *Link;
   FORMSET_STORAGE              *Storage;
   FORM_BROWSER_CONFIG_REQUEST  *ConfigInfo;
-  FORM_BROWSER_FORMSET    *LocalFormSet;
+  FORM_BROWSER_FORMSET         *LocalFormSet;
+  FORM_BROWSER_FORMSET         *OldFormSet;
 
   //
   // Check the supported setting level.
@@ -2440,7 +2449,8 @@ DiscardForm (
     //
     // System Level Discard.
     //
-    
+    OldFormSet = mSystemLevelFormSet;
+
     //
     // Discard changed value for each FormSet in the maintain list.
     //
@@ -2451,6 +2461,9 @@ DiscardForm (
       if (!ValidateFormSet(LocalFormSet)) {
         continue;
       }
+
+      mSystemLevelFormSet = LocalFormSet;
+
       DiscardForm (LocalFormSet, NULL, FormSetLevel);
       if (!IsHiiHandleInBrowserContext (LocalFormSet->HiiHandle)) {
         //
@@ -2461,6 +2474,8 @@ DiscardForm (
         DestroyFormSet (LocalFormSet);
       }
     }
+
+    mSystemLevelFormSet = OldFormSet;
   }
 
   return EFI_SUCCESS;  
@@ -3402,6 +3417,7 @@ ExtractDefault (
   LIST_ENTRY              *Link;
   FORM_BROWSER_STATEMENT  *Question;
   FORM_BROWSER_FORMSET    *LocalFormSet;
+  FORM_BROWSER_FORMSET    *OldFormSet;
 
   Status = EFI_SUCCESS;
 
@@ -3485,7 +3501,9 @@ ExtractDefault (
     // Preload all Hii formset.
     //
     LoadAllHiiFormset();
-       
+
+    OldFormSet = mSystemLevelFormSet;
+
     //
     // Set Default Value for each FormSet in the maintain list.
     //
@@ -3496,8 +3514,13 @@ ExtractDefault (
       if (!ValidateFormSet(LocalFormSet)) {
         continue;
       }
+
+      mSystemLevelFormSet = LocalFormSet;
+
       ExtractDefault (LocalFormSet, NULL, DefaultId, FormSetLevel, GetDefaultValueScope, Storage, RetrieveValueFirst);
     }
+
+    mSystemLevelFormSet = OldFormSet;
   }
 
   return EFI_SUCCESS;
@@ -4210,7 +4233,7 @@ LoadStorage (
       return;
 
     case EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER:
-      if (Storage->BrowserStorage->ReferenceCount > 1) {
+      if (Storage->BrowserStorage->ConfigRequest != NULL) {
         ConfigRequestAdjust(Storage);
         return;
       }
@@ -4312,6 +4335,17 @@ InitializeCurrentSetting (
   FORM_BROWSER_FORMSET    *OldFormSet;
 
   //
+  // Try to find pre FormSet in the maintain backup list.
+  // If old formset != NULL, destroy this formset. Add new formset to gBrowserFormSetList.
+  //
+  OldFormSet = GetFormSetFromHiiHandle (FormSet->HiiHandle);
+  if (OldFormSet != NULL) {
+    RemoveEntryList (&OldFormSet->Link);
+    DestroyFormSet (OldFormSet);
+  }
+  InsertTailList (&gBrowserFormSetList, &FormSet->Link);
+
+  //
   // Extract default from IFR binary for no storage questions.
   //  
   ExtractDefault (FormSet, NULL, EFI_HII_DEFAULT_CLASS_STANDARD, FormSetLevel, GetDefaultForNoStorage, NULL, TRUE);
@@ -4327,17 +4361,6 @@ InitializeCurrentSetting (
 
     Link = GetNextNode (&FormSet->StorageListHead, Link);
   }
-
-  //
-  // Try to find pre FormSet in the maintain backup list.
-  // If old formset != NULL, destroy this formset. Add new formset to gBrowserFormSetList.
-  //
-  OldFormSet = GetFormSetFromHiiHandle (FormSet->HiiHandle);
-  if (OldFormSet != NULL) {
-    RemoveEntryList (&OldFormSet->Link);
-    DestroyFormSet (OldFormSet);
-  }
-  InsertTailList (&gBrowserFormSetList, &FormSet->Link);
 }
 
 

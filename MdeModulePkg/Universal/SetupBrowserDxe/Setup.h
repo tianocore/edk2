@@ -151,7 +151,6 @@ typedef struct {
   CHAR16           *ConfigRequest; // <ConfigRequest> = <ConfigHdr> + <RequestElement>
                                    // <RequestElement> includes all fields which is used by current form sets.
   UINTN            SpareStrLen;    // Spare length of ConfigRequest string buffer
-  UINT8            ReferenceCount; // How many form set storage refrence this storage.
 } BROWSER_STORAGE;
 
 #define BROWSER_STORAGE_FROM_LINK(a)  CR (a, BROWSER_STORAGE, Link, BROWSER_STORAGE_SIGNATURE)
