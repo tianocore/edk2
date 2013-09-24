@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ; @file
-; Transition from 32 bit flat protected mode into 64 bit flat protected mode
+; Sets the CR3 register for 64-bit paging
 ;
 ; Copyright (c) 2008 - 2013, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
@@ -18,28 +18,13 @@ BITS    32
 ;
 ; Modified:  EAX
 ;
-Transition32FlatTo64Flat:
+SetCr3ForPageTables64:
 
-    OneTimeCall SetCr3ForPageTables64
+    ;
+    ; These pages are built into the ROM image by Tools/FixupForRawSection.py
+    ;
+    mov     eax, ((ADDR_OF_START_OF_RESET_CODE & ~0xfff) - 0x1000)
+    mov     cr3, eax
 
-    mov     eax, cr4
-    bts     eax, 5                      ; enable PAE
-    mov     cr4, eax                    
-
-    mov     ecx, 0xc0000080
-    rdmsr
-    bts     eax, 8                      ; set LME
-    wrmsr
-
-    mov     eax, cr0
-    bts     eax, 31                     ; set PG
-    mov     cr0, eax                    ; enable paging
-
-    jmp     LINEAR_CODE64_SEL:ADDR_OF(jumpTo64BitAndLandHere)
-BITS    64
-jumpTo64BitAndLandHere:
-
-    debugShowPostCode POSTCODE_64BIT_MODE
-
-    OneTimeCallRet Transition32FlatTo64Flat
+    OneTimeCallRet SetCr3ForPageTables64
 
