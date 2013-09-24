@@ -28,14 +28,12 @@ BITS    32
 %define PAGE_2M_PAT          0x01000
 
 %define PAGE_2M_PDE_ATTR (PAGE_2M_MBO + \
-                          PAGE_CACHE_DISABLE + \
                           PAGE_ACCESSED + \
                           PAGE_DIRTY + \
                           PAGE_READ_WRITE + \
                           PAGE_PRESENT)
 
-%define PAGE_PDP_ATTR (PAGE_CACHE_DISABLE + \
-                       PAGE_ACCESSED + \
+%define PAGE_PDP_ATTR (PAGE_ACCESSED + \
                        PAGE_READ_WRITE + \
                        PAGE_PRESENT)
 
