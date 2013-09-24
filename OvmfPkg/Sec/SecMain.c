@@ -1,7 +1,7 @@
 /** @file
   Main SEC phase code.  Transitions to PEI.
 
-  Copyright (c) 2008 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -30,8 +30,6 @@
 #include <Library/ExtractGuidedSectionLib.h>
 
 #include <Ppi/TemporaryRamSupport.h>
-
-#include <IndustryStandard/X64Paging.h>
 
 #define SEC_IDT_ENTRY_COUNT  34
 
@@ -525,137 +523,6 @@ FindImageBase (
   }
 }
 
-#if defined (MDE_CPU_X64)
-/**
-  Allocates and fills in the Page Directory and Page Table Entries to
-  establish a 1:1 Virtual to Physical mapping.
-
-  @param  Location   Memory to build the page tables in
-
-**/
-VOID
-Create4GbIdentityMappingPageTables (
-  VOID *Location
-  )
-{
-  UINT32                                        RegEax;
-  UINT32                                        RegEdx;
-  EFI_PHYSICAL_ADDRESS                          PageAddress;
-  UINTN                                         IndexOfPml4Entries;
-  UINTN                                         IndexOfPdpEntries;
-  UINTN                                         IndexOfPageDirectoryEntries;
-  UINT32                                        NumberOfPml4EntriesNeeded;
-  UINT32                                        NumberOfPdpEntriesNeeded;
-  X64_PAGE_MAP_AND_DIRECTORY_POINTER            *PageMapLevel4Entry;
-  X64_PAGE_MAP_AND_DIRECTORY_POINTER            *PageMap;
-  X64_PAGE_MAP_AND_DIRECTORY_POINTER            *PageDirectoryPointerEntry;
-  X64_PAGE_TABLE_ENTRY                          *PageDirectoryEntry;
-  UINTN                                         NextAllocAddress;
-  BOOLEAN                                       Page1GSupport;
-  X64_PAGE_TABLE_1G_ENTRY                       *PageDirectory1GEntry;
-
-  Page1GSupport = FALSE;
-  AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
-  if (RegEax >= 0x80000001) {
-    AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
-    if ((RegEdx & BIT26) != 0) {
-      Page1GSupport = TRUE;
-    }
-  }
-
-  //
-  // Only build entries for the first 4GB at this stage.
-  //
-  NumberOfPml4EntriesNeeded = 1;
-  NumberOfPdpEntriesNeeded = 4;
-
-  NextAllocAddress = (UINTN) Location;
-
-  //
-  // By architecture only one PageMapLevel4 exists - so lets allocate storage for it.
-  //
-  PageMap         = (VOID *) NextAllocAddress;
-  NextAllocAddress += SIZE_4KB;
-
-  PageMapLevel4Entry = PageMap;
-  PageAddress        = 0;
-  for (IndexOfPml4Entries = 0; IndexOfPml4Entries < NumberOfPml4EntriesNeeded; IndexOfPml4Entries++, PageMapLevel4Entry++) {
-    //
-    // Each PML4 entry points to a page of Page Directory Pointer entires.
-    // So lets allocate space for them and fill them in in the IndexOfPdpEntries loop.
-    //
-    PageDirectoryPointerEntry = (VOID *) NextAllocAddress;
-    NextAllocAddress += SIZE_4KB;
-
-    //
-    // Make a PML4 Entry
-    //
-    PageMapLevel4Entry->Uint64 = (UINT64)(UINTN)PageDirectoryPointerEntry;
-    PageMapLevel4Entry->Bits.ReadWrite = 1;
-    PageMapLevel4Entry->Bits.Present = 1;
-
-    if (Page1GSupport) {
-      PageDirectory1GEntry = (VOID *) PageDirectoryPointerEntry;
-
-      for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectory1GEntry++, PageAddress += SIZE_1GB) {
-        //
-        // Fill in the Page Directory entries
-        //
-        PageDirectory1GEntry->Uint64 = (UINT64)PageAddress;
-        PageDirectory1GEntry->Bits.ReadWrite = 1;
-        PageDirectory1GEntry->Bits.Present = 1;
-        PageDirectory1GEntry->Bits.MustBe1 = 1;
-      }
-    } else {
-      for (IndexOfPdpEntries = 0; IndexOfPdpEntries < NumberOfPdpEntriesNeeded; IndexOfPdpEntries++, PageDirectoryPointerEntry++) {
-        //
-        // Each Directory Pointer entries points to a page of Page Directory entires.
-        // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
-        //
-        PageDirectoryEntry = (VOID *) NextAllocAddress;
-        NextAllocAddress += SIZE_4KB;
-
-        //
-        // Fill in a Page Directory Pointer Entries
-        //
-        PageDirectoryPointerEntry->Uint64 = (UINT64)(UINTN)PageDirectoryEntry;
-        PageDirectoryPointerEntry->Bits.ReadWrite = 1;
-        PageDirectoryPointerEntry->Bits.Present = 1;
-
-        for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PageAddress += SIZE_2MB) {
-          //
-          // Fill in the Page Directory entries
-          //
-          PageDirectoryEntry->Uint64 = (UINT64)PageAddress;
-          PageDirectoryEntry->Bits.ReadWrite = 1;
-          PageDirectoryEntry->Bits.Present = 1;
-          PageDirectoryEntry->Bits.MustBe1 = 1;
-        }
-      }
-
-      for (; IndexOfPdpEntries < 512; IndexOfPdpEntries++, PageDirectoryPointerEntry++) {
-        ZeroMem (
-          PageDirectoryPointerEntry,
-          sizeof(X64_PAGE_MAP_AND_DIRECTORY_POINTER)
-          );
-      }
-    }
-  }
-
-  //
-  // For the PML4 entries we are not using fill in a null entry.
-  //
-  for (; IndexOfPml4Entries < 512; IndexOfPml4Entries++, PageMapLevel4Entry++) {
-    ZeroMem (
-      PageMapLevel4Entry,
-      sizeof (X64_PAGE_MAP_AND_DIRECTORY_POINTER)
-      );
-  }
-
-  AsmWriteCr3 ((UINTN) PageMap);
-}
-#endif
-
 /*
   Find and return Pei Core entry point.
 
@@ -778,14 +645,7 @@ SecCoreStartupWithStack (
   //
   IoWrite8 (0x21, 0xff);
   IoWrite8 (0xA1, 0xff);
-
-#if defined (MDE_CPU_X64)
-  //
-  // Create Identity Mapped Pages in RAM
-  //
-  Create4GbIdentityMappingPageTables (TopOfCurrentStack);
-#endif
-
+  
   //
   // Initialize Debug Agent to support source level debug in SEC/PEI phases before memory ready.
   //
