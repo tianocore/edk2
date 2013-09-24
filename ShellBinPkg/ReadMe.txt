@@ -41,7 +41,5 @@ developer may integrate this code into an existing platform:
 1. RM can delete current working directory via other map name.
 2. DrvCfg does not overlap boot manager functionality.
 3. Shell documentation is in development and forthcoming.
-4. ARM binaries are based on revision 13646. It is expected the binaries to
-sync with the other architectures next time they are rebuilt.
 
 ============================================================================
