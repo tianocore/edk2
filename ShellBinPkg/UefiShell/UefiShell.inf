@@ -1,0 +1,34 @@
+##  @file
+#  This is the UEFI Shell application binary file.
+#
+#  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = Shell
+  FILE_GUID                      = 7C04A583-9E3E-4f1c-AD65-E05268D0B4D1
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+
+[Binaries.Ia32]
+  PE32|Ia32/Shell.efi|*
+
+[Binaries.X64]
+  PE32|X64/Shell.efi|*
+
+[Binaries.ARM]
+  PE32|Arm/Shell.efi|*
+
+[Binaries.AArch64]
+  PE32|AArch64/Shell.efi|*
