@@ -1,0 +1,53 @@
+##  @file
+#  Provides shell install1 functions
+#
+#  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved. <BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = UefiShellInstall1CommandsLib
+  FILE_GUID                      = D250E364-51C6-49ed-AEBF-6D83F5130F74
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = ShellInstall1CommandsLibConstructor
+  DESTRUCTOR                     = ShellInstall1CommandsLibDestructor
+
+[Sources.common]
+  UefiShellInstall1CommandsLib.c
+  UefiShellInstall1CommandsLib.h
+  UefiShellInstall1CommandsLib.uni
+  Bcfg.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  ShellCommandLib
+  ShellLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  SortLib
+  PrintLib
+
+[Pcd]
+  gEfiShellPkgTokenSpaceGuid.PcdShellProfileMask # ALWAYS_CONSUMED
+
+[Guids]
+  gShellInstall1HiiGuid
