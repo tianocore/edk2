@@ -541,7 +541,7 @@ extern EDKII_FORM_DISPLAY_ENGINE_PROTOCOL *mFormDisplay;
 
 extern BOOLEAN               gResetRequired;
 extern BOOLEAN               gExitRequired;
-
+extern BOOLEAN               gFinishRetrieveCall;
 extern LIST_ENTRY            gBrowserFormSetList;
 extern LIST_ENTRY            gBrowserHotKeyList;
 extern BROWSER_SETTING_SCOPE gBrowserSettingScope;
@@ -1157,7 +1157,9 @@ IsStorageDataChangedForFormSet (
                                about the Selection, form and formset to be displayed.
                                On output, Selection return the screen item that is selected
                                by user.
-  @param Statement             The Question which need to call.
+  @param FormSet               The formset this question belong to.
+  @param Form                  The form this question belong to.
+  @param Question              The Question which need to call.
   @param Action                The action request.
   @param SkipSaveOrDiscard     Whether skip save or discard action.
 
@@ -1167,6 +1169,8 @@ IsStorageDataChangedForFormSet (
 EFI_STATUS 
 ProcessCallBackFunction (
   IN OUT UI_MENU_SELECTION               *Selection,
+  IN     FORM_BROWSER_FORMSET            *FormSet,
+  IN     FORM_BROWSER_FORM               *Form,
   IN     FORM_BROWSER_STATEMENT          *Question,
   IN     EFI_BROWSER_ACTION              Action,
   IN     BOOLEAN                         SkipSaveOrDiscard

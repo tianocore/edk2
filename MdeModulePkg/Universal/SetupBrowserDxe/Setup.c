@@ -48,6 +48,7 @@ LIST_ENTRY      gBrowserFormSetList = INITIALIZE_LIST_HEAD_VARIABLE (gBrowserFor
 LIST_ENTRY      gBrowserHotKeyList  = INITIALIZE_LIST_HEAD_VARIABLE (gBrowserHotKeyList);
 LIST_ENTRY      gBrowserStorageList = INITIALIZE_LIST_HEAD_VARIABLE (gBrowserStorageList);
 
+BOOLEAN               gFinishRetrieveCall;
 BOOLEAN               gResetRequired;
 BOOLEAN               gExitRequired;
 BROWSER_SETTING_SCOPE gBrowserSettingScope = FormSetLevel;
@@ -257,8 +258,11 @@ LoadAllHiiFormset (
   EFI_GUID                ZeroGuid;
   EFI_STATUS              Status;
   FORM_BROWSER_FORMSET    *OldFormset;
+  BOOLEAN                 OldRetrieveValue;
 
   OldFormset = mSystemLevelFormSet;
+  OldRetrieveValue = gFinishRetrieveCall;
+  gFinishRetrieveCall = FALSE;
 
   //
   // Get all the Hii handles
@@ -307,6 +311,7 @@ LoadAllHiiFormset (
   //
   FreePool (HiiHandles);
 
+  gFinishRetrieveCall = OldRetrieveValue;
   mSystemLevelFormSet = OldFormset;
 }
 
@@ -365,6 +370,7 @@ SendForm (
   //
   SaveBrowserContext ();
 
+  gFinishRetrieveCall = FALSE;
   gResetRequired = FALSE;
   gExitRequired  = FALSE;
   Status         = EFI_SUCCESS;
@@ -3651,7 +3657,8 @@ LoadFormConfig (
     // Call the Retrieve call back function for all questions.
     //
     if ((FormSet->ConfigAccess != NULL) && (Selection != NULL) &&
-        ((Question->QuestionFlags & EFI_IFR_FLAG_CALLBACK) == EFI_IFR_FLAG_CALLBACK)) {
+        ((Question->QuestionFlags & EFI_IFR_FLAG_CALLBACK) == EFI_IFR_FLAG_CALLBACK) &&
+        !gFinishRetrieveCall) {
       //
       // Check QuestionValue does exist.
       //
@@ -3675,7 +3682,7 @@ LoadFormConfig (
                          );
       }
 
-      Status = ProcessCallBackFunction(Selection, Question, EFI_BROWSER_ACTION_RETRIEVE, TRUE);
+      Status = ProcessCallBackFunction(Selection, FormSet, Form, Question, EFI_BROWSER_ACTION_RETRIEVE, TRUE);
     }
 
     //
