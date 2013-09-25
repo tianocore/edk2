@@ -509,10 +509,6 @@ CreateStorage (
 
     InitializeConfigHdr (FormSet, BrowserStorage);
   }
-  //
-  // Add count because one formset storage use this global storage.
-  //
-  BrowserStorage->ReferenceCount++;
 
   Storage->BrowserStorage = BrowserStorage;
   Storage->ConfigRequest = AllocateCopyPool (StrSize (BrowserStorage->ConfigHdr), BrowserStorage->ConfigHdr);
@@ -740,12 +736,6 @@ DestroyStorage (
   if (Storage->ConfigRequest != NULL) {
     FreePool (Storage->ConfigRequest);
   }
-
-  //
-  // Minus the reference to the global storage.
-  //
-  ASSERT (Storage->BrowserStorage->ReferenceCount > 0);
-  Storage->BrowserStorage->ReferenceCount--; 
 
   FreePool (Storage);
 }
