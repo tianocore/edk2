@@ -886,9 +886,9 @@ typedef struct _EFI_IFR_IMAGE {
   EFI_IMAGE_ID             Id;
 } EFI_IFR_IMAGE;
 
-typedef struct _EFI_IFR_MODAL {
+typedef struct _EFI_IFR_MODAL_TAG {
   EFI_IFR_OP_HEADER        Header;
-} EFI_IFR_MODAL;
+} EFI_IFR_MODAL_TAG;
 
 typedef struct _EFI_IFR_LOCKED {
   EFI_IFR_OP_HEADER        Header;
@@ -905,6 +905,12 @@ typedef struct _EFI_IFR_DEFAULT {
   UINT8                    Type;
   EFI_IFR_TYPE_VALUE       Value;
 } EFI_IFR_DEFAULT;
+
+typedef struct _EFI_IFR_DEFAULT_2 {
+  EFI_IFR_OP_HEADER        Header;
+  UINT16                   DefaultId;
+  UINT8                    Type;
+} EFI_IFR_DEFAULT_2;
 
 typedef struct _EFI_IFR_VALUE {
   EFI_IFR_OP_HEADER        Header;
