@@ -2637,17 +2637,16 @@ BdsExpandPartitionPartialDevicePathToFull (
           TempNewDevicePath = CachedDevicePath;
           CachedDevicePath = BdsLibDelPartMatchInstance (CachedDevicePath, BlockIoDevicePath);
           FreePool(TempNewDevicePath);
+        }
 
-          TempNewDevicePath = CachedDevicePath;
-          CachedDevicePath = AppendDevicePathInstance (BlockIoDevicePath, CachedDevicePath);
-          if (TempNewDevicePath != NULL) {
-            FreePool(TempNewDevicePath);
-          }
-        } else {
+        if (CachedDevicePath != NULL) {
           TempNewDevicePath = CachedDevicePath;
           CachedDevicePath = AppendDevicePathInstance (BlockIoDevicePath, CachedDevicePath);
           FreePool(TempNewDevicePath);
+        } else {
+          CachedDevicePath = DuplicateDevicePath (BlockIoDevicePath);
         }
+
         //
         // Here limit the device path instance number to 12, which is max number for a system support 3 IDE controller
         // If the user try to boot many OS in different HDs or partitions, in theory, 
