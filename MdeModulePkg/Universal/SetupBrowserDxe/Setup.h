@@ -106,11 +106,12 @@ typedef struct {
 #define EFI_HII_EXPRESSION_RULE              6
 #define EFI_HII_EXPRESSION_READ              7
 #define EFI_HII_EXPRESSION_WRITE             8
+#define EFI_HII_EXPRESSION_WARNING_IF        9
 
 #define EFI_HII_VARSTORE_BUFFER              0
 #define EFI_HII_VARSTORE_NAME_VALUE          1
-#define EFI_HII_VARSTORE_EFI_VARIABLE        2
-#define EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER 3
+#define EFI_HII_VARSTORE_EFI_VARIABLE        2    // EFI Varstore type follow UEFI spec before 2.3.1.
+#define EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER 3    // EFI varstore type follow UEFI spec 2.3.1 and later.
 
 #define FORM_INCONSISTENT_VALIDATION         0
 #define FORM_NO_SUBMIT_VALIDATION            1
@@ -222,6 +223,8 @@ typedef struct {
   EFI_STRING_ID     Error;           // For EFI_IFR_NO_SUBMIT_IF, EFI_IFR_INCONSISTENT_IF only
 
   EFI_HII_VALUE     Result;          // Expression evaluation result
+
+  UINT8             TimeOut;         // For EFI_IFR_WARNING_IF
 
   LIST_ENTRY        OpCodeListHead;  // OpCodes consist of this expression (EXPRESSION_OPCODE)
 } FORM_EXPRESSION;
@@ -350,6 +353,7 @@ typedef struct {
 
   LIST_ENTRY            InconsistentListHead;// nested inconsistent expression list (FORM_EXPRESSION)
   LIST_ENTRY            NoSubmitListHead;    // nested nosubmit expression list (FORM_EXPRESSION)
+  LIST_ENTRY            WarningListHead;     // nested warning expression list (FORM_EXPRESSION)
   FORM_EXPRESSION_LIST  *Expression;         // nesting inside of GrayOutIf/DisableIf/SuppressIf
 
   FORM_EXPRESSION       *ReadExpression;     // nested EFI_IFR_READ, provide this question value by read expression.
@@ -537,7 +541,7 @@ extern EDKII_FORM_DISPLAY_ENGINE_PROTOCOL *mFormDisplay;
 
 extern BOOLEAN               gResetRequired;
 extern BOOLEAN               gExitRequired;
-
+extern BOOLEAN               gFinishRetrieveCall;
 extern LIST_ENTRY            gBrowserFormSetList;
 extern LIST_ENTRY            gBrowserHotKeyList;
 extern BROWSER_SETTING_SCOPE gBrowserSettingScope;
@@ -1153,7 +1157,9 @@ IsStorageDataChangedForFormSet (
                                about the Selection, form and formset to be displayed.
                                On output, Selection return the screen item that is selected
                                by user.
-  @param Statement             The Question which need to call.
+  @param FormSet               The formset this question belong to.
+  @param Form                  The form this question belong to.
+  @param Question              The Question which need to call.
   @param Action                The action request.
   @param SkipSaveOrDiscard     Whether skip save or discard action.
 
@@ -1163,6 +1169,8 @@ IsStorageDataChangedForFormSet (
 EFI_STATUS 
 ProcessCallBackFunction (
   IN OUT UI_MENU_SELECTION               *Selection,
+  IN     FORM_BROWSER_FORMSET            *FormSet,
+  IN     FORM_BROWSER_FORM               *Form,
   IN     FORM_BROWSER_STATEMENT          *Question,
   IN     EFI_BROWSER_ACTION              Action,
   IN     BOOLEAN                         SkipSaveOrDiscard
