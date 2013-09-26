@@ -2281,7 +2281,7 @@ EvaluateExpression (
       Value->Value.b = (BOOLEAN) ((Result == 0) ? TRUE : FALSE);
       break;
 
-    case EFI_IFR_EQ_ID_LIST_OP:
+    case EFI_IFR_EQ_ID_VAL_LIST_OP:
       Question = IdToQuestion (FormSet, Form, OpCode->QuestionId);
       if (Question == NULL) {
         Value->Type = EFI_IFR_TYPE_UNDEFINED;

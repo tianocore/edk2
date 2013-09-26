@@ -700,7 +700,7 @@ typedef union {
 #define EFI_IFR_INCONSISTENT_IF_OP     0x11
 #define EFI_IFR_EQ_ID_VAL_OP           0x12
 #define EFI_IFR_EQ_ID_ID_OP            0x13
-#define EFI_IFR_EQ_ID_LIST_OP          0x14
+#define EFI_IFR_EQ_ID_VAL_LIST_OP      0x14
 #define EFI_IFR_AND_OP                 0x15
 #define EFI_IFR_OR_OP                  0x16
 #define EFI_IFR_NOT_OP                 0x17
