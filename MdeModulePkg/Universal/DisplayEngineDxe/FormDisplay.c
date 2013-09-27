@@ -130,6 +130,7 @@ CHAR16            *gOptionMismatch;
 CHAR16            *gFormSuppress;
 CHAR16            *gProtocolNotFound;
 
+CHAR16            gModalSkipColumn;
 CHAR16            gPromptBlockWidth;
 CHAR16            gOptionBlockWidth;
 CHAR16            gHelpBlockWidth;
@@ -259,19 +260,27 @@ GetPrompt (
   Get the supported width for a particular op-code
 
   @param  Statement              The curent statement.
+  @param  AdjustWidth            The width which is saved for the space.
 
   @return Returns the number of CHAR16 characters that is support.
 
 **/
 UINT16
 GetWidth (
-  IN FORM_DISPLAY_ENGINE_STATEMENT        *Statement
+  IN FORM_DISPLAY_ENGINE_STATEMENT        *Statement,
+  OUT UINT16                              *AdjustWidth
   )
 {
   CHAR16       *String;
   UINTN        Size;
-  UINT16       Width;
   EFI_IFR_TEXT *TestOp;
+
+  //
+  // For modal form, clean the entire row.
+  //
+  if ((gFormData->Attribute & HII_DISPLAY_MODAL) != 0) {
+    return (UINT16)(gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn - gModalSkipColumn - SCROLL_ARROW_HEIGHT);
+  }
 
   Size = 0;
 
@@ -297,12 +306,23 @@ GetWidth (
       //
       ((Statement->OpCode->OpCode == EFI_IFR_TEXT_OP) && (Size == 0))
       ) {
-    Width = (UINT16) (gPromptBlockWidth + gOptionBlockWidth);
-  } else {
-    Width = (UINT16) gPromptBlockWidth;
+    
+    //
+    // Return the space width.
+    // 
+    if (AdjustWidth != NULL) {
+      *AdjustWidth = 2;
+    }
+    //
+    // Keep consistent with current behavior.
+    //
+    return (UINT16) (gPromptBlockWidth + gOptionBlockWidth - 2);
   }
 
-  return (UINT16) (Width - LEFT_SKIPPED_COLUMNS);
+  if (AdjustWidth != NULL) {
+    *AdjustWidth = 1;
+  }
+  return (UINT16) (gPromptBlockWidth - 1);
 }
 
 /**
@@ -516,7 +536,7 @@ UiAddMenuOption (
   String = GetToken (PromptId, gFormData->HiiHandle);
   ASSERT (String != NULL);
 
-  Width  = GetWidth (Statement);
+  Width  = GetWidth (Statement, NULL);
   for (; GetLineByWidth (String, Width, &GlyphWidth,&ArrayEntry, &OutputString) != 0x0000;) {
     //
     // If there is more string to process print on the next row and increment the Skip value
@@ -1438,6 +1458,379 @@ FindTopMenu (
 }
 
 /**
+  Update highlight menu info.
+
+  @param  MenuOption               The menu opton which is highlight.
+
+**/
+VOID
+UpdateHighlightMenuInfo (
+  IN UI_MENU_OPTION            *MenuOption
+  )
+{
+  FORM_DISPLAY_ENGINE_STATEMENT   *Statement;
+
+  //
+  // This is the current selected statement
+  //
+  Statement = MenuOption->ThisTag;
+
+  //
+  // Get the highlight statement.
+  //
+  gUserInput->SelectedStatement = Statement;
+  gSequence = (UINT16) MenuOption->Sequence;
+
+  //
+  // Record highlight row info for date/time opcode.
+  //
+  if (Statement->OpCode->OpCode == EFI_IFR_DATE_OP || Statement->OpCode->OpCode == EFI_IFR_TIME_OP) {
+    gHighligthMenuInfo.QuestionId = GetQuestionIdInfo(Statement->OpCode);
+    gHighligthMenuInfo.DisplayRow = (UINT16) MenuOption->Row;
+  } else {
+    gHighligthMenuInfo.QuestionId = 0;
+    gHighligthMenuInfo.DisplayRow = 0;
+  }
+
+  RefreshKeyHelp(gFormData, Statement, FALSE);
+}
+
+/**
+  Update attribut for this menu.
+
+  @param  MenuOption               The menu opton which this attribut used to.
+  @param  Highlight                Whether this menu will be highlight.
+
+**/
+VOID
+SetDisplayAttribute (
+  IN UI_MENU_OPTION                  *MenuOption,
+  IN BOOLEAN                         Highlight
+  )
+{
+  FORM_DISPLAY_ENGINE_STATEMENT   *Statement;
+  
+  Statement = MenuOption->ThisTag;
+
+  if (Highlight) {
+    gST->ConOut->SetAttribute (gST->ConOut, GetHighlightTextColor ());
+    return;
+  }
+
+  if (MenuOption->GrayOut) {
+    gST->ConOut->SetAttribute (gST->ConOut, GetGrayedTextColor ());
+  } else {
+    if (Statement->OpCode->OpCode == EFI_IFR_SUBTITLE_OP) {
+      gST->ConOut->SetAttribute (gST->ConOut, GetSubTitleTextColor ());
+    } else {
+      gST->ConOut->SetAttribute (gST->ConOut, GetFieldTextColor ());
+    }
+  }
+}
+
+/**
+  Print string for this menu option.
+
+  @param  MenuOption               The menu opton which this attribut used to.
+  @param  Col                      The column that this string will be print at.
+  @param  Row                      The row that this string will be print at.
+  @param  String                   The string which need to print.
+  @param  Width                    The width need to print, if string is less than the
+                                   width, the block space will be used.
+  @param  Highlight                Whether this menu will be highlight.
+
+**/
+VOID
+DisplayMenuString (
+  IN UI_MENU_OPTION         *MenuOption,
+  IN UINTN                  Col,
+  IN UINTN                  Row,
+  IN CHAR16                 *String,
+  IN UINTN                  Width,
+  IN BOOLEAN                Highlight
+  )
+{
+  UINTN            Length;
+
+  //
+  // Print string with normal color.
+  //
+  if (!Highlight) {
+    PrintStringAtWithWidth (Col, Row, String, Width);
+    return;
+  }
+  
+  //
+  // Print the highlight menu string.
+  // First print the highlight string.
+  // 
+  SetDisplayAttribute(MenuOption, TRUE);
+  Length = PrintStringAt (Col, Row, String);
+
+  //
+  // Second, clean the empty after the string.
+  //
+  SetDisplayAttribute(MenuOption, FALSE);
+  PrintStringAtWithWidth (Col + Length, Row, L"", Width - Length);
+}
+
+/**
+  Print string for this menu option.
+
+  @param  MenuOption               The menu opton which this attribut used to.
+  @param  SkipWidth                The skip width between the left to the start of the prompt.
+  @param  BeginCol                 The begin column for one menu.
+  @param  SkipLine                 The skip line for this menu. 
+  @param  BottomRow                The bottom row for this form.
+  @param  Highlight                Whether this menu will be highlight.
+
+  @retval EFI_SUCESSS              Process the user selection success.
+
+**/
+EFI_STATUS
+DisplayOneMenu (
+  IN UI_MENU_OPTION                  *MenuOption,
+  IN UINTN                           SkipWidth,
+  IN UINTN                           BeginCol,
+  IN UINTN                           SkipLine,
+  IN UINTN                           BottomRow,
+  IN BOOLEAN                         Highlight
+  )
+{
+  FORM_DISPLAY_ENGINE_STATEMENT   *Statement;
+  UINTN                           Index;
+  UINT16                          Width;
+  UINT16                          PromptWidth;
+  CHAR16                          *StringPtr;
+  CHAR16                          *OptionString;
+  CHAR16                          *OutputString;
+  UINTN                           OriginalRow;
+  UINT16                          GlyphWidth;
+  UINTN                           Temp;
+  UINTN                           Temp2;
+  UINTN                           Temp3;
+  EFI_STATUS                      Status;
+  UINTN                           Row;
+  UINTN                           Col;
+  UINTN                           PromptLineNum;
+  CHAR16                          AdjustValue;
+
+  Statement = MenuOption->ThisTag;
+  Col       = MenuOption->Col;
+  Row       = MenuOption->Row;
+  Temp      = SkipLine;
+  Temp2     = SkipLine;
+  Temp3     = SkipLine;
+  AdjustValue = 0;
+
+  //
+  // Set default color.
+  //
+  SetDisplayAttribute (MenuOption, FALSE);
+
+  //
+  // 1. Paint the option string.
+  //
+  Status = ProcessOptions (MenuOption, FALSE, &OptionString, FALSE);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (OptionString != NULL) {
+    if (Statement->OpCode->OpCode == EFI_IFR_DATE_OP || Statement->OpCode->OpCode == EFI_IFR_TIME_OP) {
+      //
+      // Adjust option string for date/time opcode.
+      //
+      ProcessStringForDateTime(MenuOption, OptionString, TRUE);
+    }
+  
+    Width       = (UINT16) gOptionBlockWidth - 1;
+    OriginalRow = Row;
+    GlyphWidth  = 1;
+  
+    for (Index = 0; GetLineByWidth (OptionString, Width, &GlyphWidth, &Index, &OutputString) != 0x0000;) {
+      if (((Temp2 == 0)) && (Row <= BottomRow)) {
+        if (Statement->OpCode->OpCode == EFI_IFR_DATE_OP || Statement->OpCode->OpCode == EFI_IFR_TIME_OP) {
+          //
+          // For date/time question, it has three menu options for this qustion.
+          // The first/second menu options with the skip value is 0. the last one
+          // with skip value is 1.
+          //
+          if (MenuOption->Skip != 0) {
+            //
+            // For date/ time, print the last past (year for date and second for time)
+            // - 7 means skip [##/##/ for date and [##:##: for time.
+            //
+            DisplayMenuString (MenuOption,MenuOption->OptCol, Row, OutputString, Width + 1 - 7, Highlight);
+          } else {
+            //
+            // For date/ time, print the first and second past (year for date and second for time)
+            //                
+            DisplayMenuString (MenuOption, MenuOption->OptCol, Row, OutputString, StrLen (OutputString), Highlight);
+          }
+        } else {
+          DisplayMenuString (MenuOption, MenuOption->OptCol, Row, OutputString, Width + 1, Highlight);
+        }
+      }
+      
+      //
+      // If there is more string to process print on the next row and increment the Skip value
+      //
+      if (StrLen (&OptionString[Index]) != 0) {
+        if (Temp2 == 0) {
+          Row++;
+          //
+          // Since the Number of lines for this menu entry may or may not be reflected accurately
+          // since the prompt might be 1 lines and option might be many, and vice versa, we need to do
+          // some testing to ensure we are keeping this in-sync.
+          //
+          // If the difference in rows is greater than or equal to the skip value, increase the skip value
+          //
+          if ((Row - OriginalRow) >= MenuOption->Skip) {
+            MenuOption->Skip++;
+          }
+        }
+      }
+  
+      FreePool (OutputString);
+      if (Temp2 != 0) {
+        Temp2--;
+      }
+    }
+  
+    Row   = OriginalRow;
+    Highlight = FALSE;
+
+    FreePool (OptionString);
+  }
+  Temp2 = 0;
+
+
+  //
+  // 2. Pre calculate the skip value.
+  //
+  if ((Statement->OpCode->OpCode  == EFI_IFR_TEXT_OP) && (((EFI_IFR_TEXT*)Statement->OpCode)->TextTwo != 0)) {
+    StringPtr   = GetToken (((EFI_IFR_TEXT*)Statement->OpCode)->TextTwo, gFormData->HiiHandle);
+  
+    Width       = (UINT16) gOptionBlockWidth - 1;
+    OriginalRow = Row;
+    GlyphWidth    = 1;
+    for (Index = 0; GetLineByWidth (StringPtr, Width, &GlyphWidth, &Index, &OutputString) != 0x0000;) { 
+      if (StrLen (&StringPtr[Index]) != 0) {
+        Row++;
+        if ((Row - OriginalRow) >= MenuOption->Skip) {
+          MenuOption->Skip++;
+        }
+      }
+      FreePool (OutputString);
+    }
+  
+    Row = OriginalRow;
+    FreePool (StringPtr);
+  }
+
+
+  //
+  // 3. Paint the description.
+  //
+  PromptWidth   = GetWidth (Statement, &AdjustValue);
+  OriginalRow   = Row;
+  GlyphWidth    = 1;
+  PromptLineNum = 0;
+
+  if (MenuOption->Description == NULL || MenuOption->Description[0] == '\0') {
+    while (Temp++ < MenuOption->Skip) {
+      PrintStringAtWithWidth (BeginCol, Row++, L"", PromptWidth + AdjustValue + SkipWidth);
+    } 
+  } else {
+    for (Index = 0; GetLineByWidth (MenuOption->Description, PromptWidth, &GlyphWidth, &Index, &OutputString) != 0x0000;) {      
+      if ((Temp == 0) && (Row <= BottomRow)) { 
+        //
+        // 1.Clean the start LEFT_SKIPPED_COLUMNS 
+        //
+        PrintStringAtWithWidth (BeginCol, Row, L"", SkipWidth);
+        
+        if (Statement->OpCode->OpCode == EFI_IFR_REF_OP && MenuOption->Col >= 2) {
+          //
+          // Print Arrow for Goto button.
+          //
+          PrintCharAt (
+            MenuOption->Col - 2,
+            Row,
+            GEOMETRICSHAPE_RIGHT_TRIANGLE
+            );
+        }
+        DisplayMenuString (MenuOption, MenuOption->Col, Row, OutputString, PromptWidth + AdjustValue, Highlight);
+        PromptLineNum ++;
+      }
+      //
+      // If there is more string to process print on the next row and increment the Skip value
+      //
+      if (StrLen (&MenuOption->Description[Index]) != 0) {
+        if (Temp == 0) {
+          Row++;
+        }
+      }
+
+      FreePool (OutputString);
+      if (Temp != 0) {
+        Temp--;
+      }
+    }
+
+    Highlight = FALSE;
+
+    //
+    // Clean the empty prompt line.
+    // These line is used by option string but not prompt, so clean them here.
+    //
+    Row = OriginalRow + PromptLineNum;
+    while (PromptLineNum + SkipLine < MenuOption->Skip && Row <= BottomRow) {
+      PrintStringAtWithWidth (BeginCol, Row, L"", PromptWidth + AdjustValue + SkipWidth);
+      PromptLineNum ++;
+      Row ++;
+    }
+  }
+  Row = OriginalRow;
+
+
+  //
+  // 4. If this is a text op with secondary text information
+  //
+  if ((Statement->OpCode->OpCode  == EFI_IFR_TEXT_OP) && (((EFI_IFR_TEXT*)Statement->OpCode)->TextTwo != 0)) {
+    StringPtr   = GetToken (((EFI_IFR_TEXT*)Statement->OpCode)->TextTwo, gFormData->HiiHandle);
+  
+    Width       = (UINT16) gOptionBlockWidth - 1;
+    OriginalRow = Row;
+    GlyphWidth  = 1;
+
+    for (Index = 0; GetLineByWidth (StringPtr, Width, &GlyphWidth, &Index, &OutputString) != 0x0000;) { 
+      if ((Temp3 == 0) && (Row <= BottomRow)) {
+        DisplayMenuString (MenuOption, MenuOption->OptCol, Row, OutputString, Width + 1, Highlight);
+      }
+      //
+      // If there is more string to process print on the next row and increment the Skip value
+      //
+      if (StrLen (&StringPtr[Index]) != 0) {
+        if (Temp3 == 0) {
+          Row++;
+        }
+      }
+  
+      FreePool (OutputString);
+      if (Temp3 != 0) {
+        Temp3--;
+      }
+    }
+  
+    Row = OriginalRow;
+    FreePool (StringPtr);
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   Display menu and wait for user to select one menu option, then return it.
   If AutoBoot is enabled, then if user doesn't select any option,
   after period of time, it will automatically return the first menu option.
@@ -1458,10 +1851,8 @@ UiDisplayMenu (
   UINTN                           DistanceValue;
   UINTN                           Row;
   UINTN                           Col;
-  UINTN                           TempRightCol;
   UINTN                           Temp;
   UINTN                           Temp2;
-  UINTN                           Temp3;
   UINTN                           TopRow;
   UINTN                           BottomRow;
   UINTN                           OriginalRow;
@@ -1491,7 +1882,6 @@ UiDisplayMenu (
   UI_SCREEN_OPERATION             ScreenOperation;
   UINT16                          DefaultId;
   FORM_DISPLAY_ENGINE_STATEMENT   *Statement;
-  UINTN                           ModalSkipColumn;
   BROWSER_HOT_KEY                 *HotKey;
   UINTN                           HelpPageIndex;
   UINTN                           HelpPageCount;
@@ -1507,6 +1897,7 @@ UiDisplayMenu (
   EFI_STRING_ID                   HelpInfo;
   UI_EVENT_TYPE                   EventType;
   FORM_DISPLAY_ENGINE_STATEMENT   *InitialHighlight;
+  BOOLEAN                         SkipHighLight;
 
   EventType           = UIEventNone;
   Status              = EFI_SUCCESS;
@@ -1531,6 +1922,7 @@ UiDisplayMenu (
   UpArrow             = FALSE;
   DownArrow           = FALSE;
   SkipValue           = 0;
+  SkipHighLight       = FALSE;
 
   NextMenuOption      = NULL;
   PreviousMenuOption  = NULL;
@@ -1538,21 +1930,27 @@ UiDisplayMenu (
   HotKey              = NULL;
   Repaint             = TRUE;
   MenuOption          = NULL;
-  ModalSkipColumn     = (gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn) / 6;
+  gModalSkipColumn    = (CHAR16) (gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn) / 6;
   InitialHighlight    = gFormData->HighLightedStatement;
 
   ZeroMem (&Key, sizeof (EFI_INPUT_KEY));
 
-  gOptionBlockWidth = (CHAR16) ((gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn) / 3);
-  gPromptBlockWidth = (CHAR16) (gOptionBlockWidth + LEFT_SKIPPED_COLUMNS);
-  gHelpBlockWidth   = (CHAR16) (gOptionBlockWidth - LEFT_SKIPPED_COLUMNS);
+  //
+  //  Left                                              right
+  //   |<-.->|<-.........->|<- .........->|<-...........->|
+  //     Skip    Prompt         Option         Help 
+  //
+  Width             = (CHAR16) ((gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn) / 3);
+  gOptionBlockWidth = Width + 1; 
+  gHelpBlockWidth   = (CHAR16) (Width - LEFT_SKIPPED_COLUMNS);
+  gPromptBlockWidth = (CHAR16) (gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn - 2 * Width - 1);
 
   TopRow    = gStatementDimensions.TopRow    + SCROLL_ARROW_HEIGHT;
   BottomRow = gStatementDimensions.BottomRow - SCROLL_ARROW_HEIGHT - 1;
 
   Row = TopRow;
   if ((FormData->Attribute & HII_DISPLAY_MODAL) != 0) {
-    Col = gStatementDimensions.LeftColumn + LEFT_SKIPPED_COLUMNS + ModalSkipColumn;
+    Col = gStatementDimensions.LeftColumn + LEFT_SKIPPED_COLUMNS + gModalSkipColumn;
   } else {
     Col = gStatementDimensions.LeftColumn + LEFT_SKIPPED_COLUMNS;
   }
@@ -1565,30 +1963,21 @@ UiDisplayMenu (
   while (TRUE) {
     switch (ControlFlag) {
     case CfInitialization:
-      if (IsListEmpty (&gMenuOption)) {
-        
-        if ((FormData->Attribute & HII_DISPLAY_MODAL) == 0) {
-          //
-          // Clear Statement range.
-          //
-          ClearLines (
-            gStatementDimensions.LeftColumn,
-            gStatementDimensions.RightColumn,
-            TopRow - SCROLL_ARROW_HEIGHT,
-            BottomRow + SCROLL_ARROW_HEIGHT,
-            GetFieldTextColor ()
-            );
-            
-          //
-          // Clear Key Range
-          //
-          RefreshKeyHelp (gFormData, NULL, FALSE);
-        }
+      if ((gOldFormEntry.HiiHandle != FormData->HiiHandle) || 
+          (!CompareGuid (&gOldFormEntry.FormSetGuid, &FormData->FormSetGuid))) {
+        //
+        // Clear Statement range if different formset is painted.
+        //
+        ClearLines (
+          gStatementDimensions.LeftColumn,
+          gStatementDimensions.RightColumn,
+          TopRow - SCROLL_ARROW_HEIGHT,
+          BottomRow + SCROLL_ARROW_HEIGHT,
+          GetFieldTextColor ()
+          );
 
-        ControlFlag = CfReadKey;
-      } else {
-        ControlFlag = CfRepaint;
       }
+      ControlFlag = CfRepaint;
       break;
 
     case CfRepaint:
@@ -1602,47 +1991,25 @@ UiDisplayMenu (
         UpArrow         = FALSE;
         Row             = TopRow;
 
-        Temp            = (UINTN) SkipValue;
-        Temp2           = (UINTN) SkipValue;
-        Temp3           = (UINTN) SkipValue;
+        gST->ConOut->SetAttribute (gST->ConOut, GetFieldTextColor ());
+        
+        //
+        // 1. Check whether need to print the arrow up.
+        //
+        if (!ValueIsScroll (TRUE, TopOfScreen)) {
+          UpArrow = TRUE;
+        }
+        
+        PrintStringAtWithWidth(gStatementDimensions.LeftColumn, TopRow - 1, L"", gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn);
 
-        //
-        // 1. Clear the screen.
-        //
-        if ((FormData->Attribute & HII_DISPLAY_MODAL) != 0) {
-          ClearLines (
-            gStatementDimensions.LeftColumn + ModalSkipColumn,
-            gStatementDimensions.LeftColumn + ModalSkipColumn + gPromptBlockWidth + gOptionBlockWidth,
+        if (UpArrow) {
+          gST->ConOut->SetAttribute (gST->ConOut, GetArrowColor ());
+          PrintCharAt (
+            gStatementDimensions.LeftColumn + gPromptBlockWidth + gOptionBlockWidth + 1,
             TopRow - SCROLL_ARROW_HEIGHT,
-            BottomRow + SCROLL_ARROW_HEIGHT,
-            GetFieldTextColor ()
+            ARROW_UP
             );
-        } else {
-          TempRightCol = gStatementDimensions.RightColumn;
-          if (!mStatementLayoutIsChanged) {
-            TempRightCol = gStatementDimensions.RightColumn - gHelpBlockWidth;
-          }
-          ClearLines (
-            gStatementDimensions.LeftColumn,
-            gStatementDimensions.RightColumn,
-            TopRow - SCROLL_ARROW_HEIGHT,
-            TopRow - 1,
-            GetFieldTextColor ()
-            );
-          ClearLines (
-            gStatementDimensions.LeftColumn,
-            TempRightCol,
-            TopRow,
-            BottomRow,
-            GetFieldTextColor ()
-            );
-          ClearLines (
-            gStatementDimensions.LeftColumn,
-            gStatementDimensions.RightColumn,
-            BottomRow + 1,
-            BottomRow + SCROLL_ARROW_HEIGHT,
-            GetFieldTextColor ()
-            );
+          gST->ConOut->SetAttribute (gST->ConOut, GetFieldTextColor ());
         }
 
         //
@@ -1653,168 +2020,30 @@ UiDisplayMenu (
           MenuOption->Row     = Row;
           MenuOption->Col     = Col;
           if ((FormData->Attribute & HII_DISPLAY_MODAL) != 0) {
-            MenuOption->OptCol  = gPromptBlockWidth + 1 + gStatementDimensions.LeftColumn + ModalSkipColumn;
+            MenuOption->OptCol  = gStatementDimensions.LeftColumn + LEFT_SKIPPED_COLUMNS + gPromptBlockWidth + gModalSkipColumn;
           } else {
-            MenuOption->OptCol  = gPromptBlockWidth + 1 + gStatementDimensions.LeftColumn;
+            MenuOption->OptCol  = gStatementDimensions.LeftColumn + LEFT_SKIPPED_COLUMNS + gPromptBlockWidth;
           }
 
-          Statement = MenuOption->ThisTag;
           if (MenuOption->NestInStatement) {
             MenuOption->Col += SUBTITLE_INDENT;
           }
 
-          if (MenuOption->GrayOut) {
-            gST->ConOut->SetAttribute (gST->ConOut, GetGrayedTextColor ());
-          } else {
-            if (Statement->OpCode->OpCode == EFI_IFR_SUBTITLE_OP) {
-              gST->ConOut->SetAttribute (gST->ConOut, GetSubTitleTextColor ());
-            }
+          //
+          // Save the highlight menu, will be used in CfRefreshHighLight case.
+          //
+          if (Link == NewPos) {
+            SavedMenuOption = MenuOption;
+            SkipHighLight   = TRUE;
           }
-
-          Width       = GetWidth (Statement);
-          OriginalRow = Row;
-          GlyphWidth  = 1;
-
-          if (Statement->OpCode->OpCode == EFI_IFR_REF_OP && MenuOption->Col >= 2) {
-            //
-            // Print Arrow for Goto button.
-            //
-            PrintCharAt (
-              MenuOption->Col - 2,
-              Row,
-              GEOMETRICSHAPE_RIGHT_TRIANGLE
-              );
-          }
-
-          //
-          // 2.1. Paint the description.
-          //
-          for (Index = 0; GetLineByWidth (MenuOption->Description, Width, &GlyphWidth, &Index, &OutputString) != 0x0000;) {
-            //
-            // Temp means need to skip how many lines from the start.
-            //
-            if ((Temp == 0) && (Row <= BottomRow)) {
-              PrintStringAt (MenuOption->Col, Row, OutputString);
-            }
-            //
-            // If there is more string to process print on the next row and increment the Skip value
-            //
-            if (StrLen (&MenuOption->Description[Index]) != 0) {
-              if (Temp == 0) {
-                Row++;
-              }
-            }
-
-            FreePool (OutputString);
-            if (Temp != 0) {
-              Temp--;
-            }
-          }
-
-          Temp  = 0;
-          Row   = OriginalRow;
-
-          //
-          // 2.2. Paint the option string.
-          //
-          Status = ProcessOptions (MenuOption, FALSE, &OptionString, FALSE);
-          //
-          // If Error occur, question value update in ProcessOptions.
-          // Exit current FormDisplay with new question value.
-          //
-          if (EFI_ERROR (Status)) {
-            return Status;
-          }
-
-          if (OptionString != NULL) {
-            if (Statement->OpCode->OpCode == EFI_IFR_DATE_OP || Statement->OpCode->OpCode == EFI_IFR_TIME_OP) {
-              ProcessStringForDateTime(MenuOption, OptionString, TRUE);
-            }
-
-            Width       = (UINT16) gOptionBlockWidth;
-            OriginalRow = Row;
-            GlyphWidth  = 1;
-
-            for (Index = 0; GetLineByWidth (OptionString, Width, &GlyphWidth, &Index, &OutputString) != 0x0000;) {
-              if ((Temp2 == 0) && (Row <= BottomRow)) {
-                PrintStringAt (MenuOption->OptCol, Row, OutputString);
-              }
-              //
-              // If there is more string to process print on the next row and increment the Skip value
-              //
-              if (StrLen (&OptionString[Index]) != 0) {
-                if (Temp2 == 0) {
-                  Row++;
-                  //
-                  // Since the Number of lines for this menu entry may or may not be reflected accurately
-                  // since the prompt might be 1 lines and option might be many, and vice versa, we need to do
-                  // some testing to ensure we are keeping this in-sync.
-                  //
-                  // If the difference in rows is greater than or equal to the skip value, increase the skip value
-                  //
-                  if ((Row - OriginalRow) >= MenuOption->Skip) {
-                    MenuOption->Skip++;
-                  }
-                }
-              }
-
-              FreePool (OutputString);
-              if (Temp2 != 0) {
-                Temp2--;
-              }
-            }
-
-            Row   = OriginalRow;
-
-            FreePool (OptionString);
-          }
-          Temp2 = 0;
-
-          //
-          // If this is a text op with secondary text information
-          //
-          if ((Statement->OpCode->OpCode  == EFI_IFR_TEXT_OP) && (((EFI_IFR_TEXT*)Statement->OpCode)->TextTwo != 0)) {
-            StringPtr   = GetToken (((EFI_IFR_TEXT*)Statement->OpCode)->TextTwo, gFormData->HiiHandle);
-
-            Width       = (UINT16) gOptionBlockWidth;
-            OriginalRow = Row;
-            GlyphWidth = 1;
-
-            for (Index = 0; GetLineByWidth (StringPtr, Width, &GlyphWidth, &Index, &OutputString) != 0x0000;) {
-              if ((Temp3 == 0) && (Row <= BottomRow)) {
-                PrintStringAt (MenuOption->OptCol, Row, OutputString);
-              }
-              //
-              // If there is more string to process print on the next row and increment the Skip value
-              //
-              if (StrLen (&StringPtr[Index]) != 0) {
-                if (Temp3 == 0) {
-                  Row++;
-                  //
-                  // Since the Number of lines for this menu entry may or may not be reflected accurately
-                  // since the prompt might be 1 lines and option might be many, and vice versa, we need to do
-                  // some testing to ensure we are keeping this in-sync.
-                  //
-                  // If the difference in rows is greater than or equal to the skip value, increase the skip value
-                  //
-                  if ((Row - OriginalRow) >= MenuOption->Skip) {
-                    MenuOption->Skip++;
-                  }
-                }
-              }
-
-              FreePool (OutputString);
-              if (Temp3 != 0) {
-                Temp3--;
-              }
-            }
-
-            Row = OriginalRow;
-            FreePool (StringPtr);
-          }
-          Temp3 = 0;
-
-          gST->ConOut->SetAttribute (gST->ConOut, GetFieldTextColor ());
+          
+          DisplayOneMenu (MenuOption, 
+                          ((FormData->Attribute & HII_DISPLAY_MODAL) != 0) ? LEFT_SKIPPED_COLUMNS + gModalSkipColumn : LEFT_SKIPPED_COLUMNS,
+                          gStatementDimensions.LeftColumn, 
+                          Link == TopOfScreen ? SkipValue : 0, 
+                          BottomRow,
+                          Link == NewPos && IsSelectable(MenuOption)
+                          );
 
           //
           // 3. Update the row info which will be used by next menu.
@@ -1835,20 +2064,22 @@ UiDisplayMenu (
           }
         }
 
-        if (!ValueIsScroll (TRUE, TopOfScreen)) {
-          UpArrow = TRUE;
+        //
+        // 3. Menus in this form may not cover all form, clean the remain field.
+        //
+        while (Row <= BottomRow) {
+          if ((FormData->Attribute & HII_DISPLAY_MODAL) != 0) {
+            PrintStringAtWithWidth(gStatementDimensions.LeftColumn, Row++, L"", gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn);
+          } else {
+            PrintStringAtWithWidth(gStatementDimensions.LeftColumn, Row++, L"", gStatementDimensions.RightColumn - gHelpBlockWidth - gStatementDimensions.LeftColumn);
+          }
         }
 
-        if (UpArrow) {
-          gST->ConOut->SetAttribute (gST->ConOut, GetArrowColor ());
-          PrintCharAt (
-            gStatementDimensions.LeftColumn + gPromptBlockWidth + gOptionBlockWidth + 1,
-            TopRow - SCROLL_ARROW_HEIGHT,
-            ARROW_UP
-            );
-          gST->ConOut->SetAttribute (gST->ConOut, GetFieldTextColor ());
-        }
-
+        //
+        // 4. Print the down arrow row.
+        //
+        PrintStringAtWithWidth(gStatementDimensions.LeftColumn, BottomRow + 1, L"", gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn);
+       
         if (DownArrow) {
           gST->ConOut->SetAttribute (gST->ConOut, GetArrowColor ());
           PrintCharAt (
@@ -1860,6 +2091,10 @@ UiDisplayMenu (
         }
 
         MenuOption = NULL;
+
+        if (IsListEmpty (&gMenuOption)) { 
+          ControlFlag = CfReadKey;
+        }
       }
       break;
 
@@ -1871,6 +2106,13 @@ UiDisplayMenu (
       // NewPos:     Current menu option that need to hilight
       //
       ControlFlag = CfUpdateHelpString;
+
+      if (SkipHighLight) {
+        MenuOption    = SavedMenuOption;
+        SkipHighLight = FALSE;
+        UpdateHighlightMenuInfo (MenuOption);
+        break;
+      }
 
       if (MenuOption != NULL && TopOfScreen == &MenuOption->Link) {
         Temp = SkipValue;
@@ -1933,7 +2175,7 @@ UiDisplayMenu (
               }
 
               OriginalRow = MenuOption->Row;
-              Width       = GetWidth (MenuOption->ThisTag);
+              Width       = GetWidth (MenuOption->ThisTag, NULL);
               GlyphWidth  = 1;
 
               for (Index = 0; GetLineByWidth (MenuOption->Description, Width, &GlyphWidth, &Index, &OutputString) != 0x0000;) {
@@ -1967,25 +2209,9 @@ UiDisplayMenu (
         MenuOption = MENU_OPTION_FROM_LINK (NewPos);
         Statement = MenuOption->ThisTag;
 
-        //
-        // Get the highlight statement.
-        //
-        gUserInput->SelectedStatement = Statement;
-        gSequence = (UINT16) MenuOption->Sequence;
-
-        //
-        // Record highlight row info for date/time opcode.
-        //
-        if (Statement->OpCode->OpCode == EFI_IFR_DATE_OP || Statement->OpCode->OpCode == EFI_IFR_TIME_OP) {
-          gHighligthMenuInfo.QuestionId = GetQuestionIdInfo(Statement->OpCode);
-          gHighligthMenuInfo.DisplayRow = (UINT16) MenuOption->Row;
-        } else {
-          gHighligthMenuInfo.QuestionId = 0;
-          gHighligthMenuInfo.DisplayRow = 0;
-        }
+        UpdateHighlightMenuInfo (MenuOption);
 
         if (!IsSelectable (MenuOption)) {
-          RefreshKeyHelp(gFormData, Statement, FALSE);
           break;
         }
 
@@ -2031,7 +2257,7 @@ UiDisplayMenu (
           if (NewLine) {
             OriginalRow = MenuOption->Row;
 
-            Width       = GetWidth (Statement);
+            Width       = GetWidth (Statement, NULL);
             GlyphWidth          = 1;
 
             for (Index = 0; GetLineByWidth (MenuOption->Description, Width, &GlyphWidth, &Index, &OutputString) != 0x0000;) {
@@ -2057,8 +2283,6 @@ UiDisplayMenu (
 
           }
         }
-
-        RefreshKeyHelp(gFormData, MenuOption->ThisTag, FALSE);
 
         //
         // Clear reverse attribute

@@ -144,6 +144,12 @@ RefreshKeyHelp (
   EFI_IFR_DATE           *DateOp;
   EFI_IFR_TIME           *TimeOp;
   BOOLEAN                HexDisplay;
+  UINTN                  ColumnWidth1;
+  UINTN                  ColumnWidth2;
+  UINTN                  ColumnWidth3;
+  CHAR16                 *ColumnStr1;
+  CHAR16                 *ColumnStr2;
+  CHAR16                 *ColumnStr3;
 
   ASSERT (FormData != NULL);
   if (FormData == NULL) {
@@ -161,17 +167,27 @@ RefreshKeyHelp (
 
   StartColumnOfHelp = gScreenDimensions.LeftColumn + 2;
   LeftColumnOfHelp  = gScreenDimensions.LeftColumn + 1;
-  RightColumnOfHelp = gScreenDimensions.RightColumn - 2;
+  RightColumnOfHelp = gScreenDimensions.RightColumn - 1;
   TopRowOfHelp      = gScreenDimensions.BottomRow - STATUS_BAR_HEIGHT - gFooterHeight + 1;
   BottomRowOfHelp   = gScreenDimensions.BottomRow - STATUS_BAR_HEIGHT - 2;
 
-  ClearLines (LeftColumnOfHelp, RightColumnOfHelp, TopRowOfHelp, BottomRowOfHelp, KEYHELP_TEXT | KEYHELP_BACKGROUND);
+  ColumnWidth1      = SecCol - StartColumnOfHelp;
+  ColumnWidth2      = ThdCol - SecCol;
+  ColumnWidth3      = RightColumnOfHelp - ThdCol;
+  ColumnStr1        = gLibEmptyString;
+  ColumnStr2        = gLibEmptyString;
+  ColumnStr3        = gLibEmptyString;
+
   if (Statement == NULL) {
     //
     // Print Key for Form without showable statement.
     //
-    PrintHotKeyHelpString (FormData);
-    PrintStringAt (ThdCol, BottomRowOfHelp, gEscapeString);
+    PrintHotKeyHelpString (FormData, TRUE);
+    PrintStringAtWithWidth (StartColumnOfHelp, BottomRowOfHelp, gLibEmptyString, ColumnWidth1);
+    PrintStringAtWithWidth (SecCol, BottomRowOfHelp, gLibEmptyString, ColumnWidth2);
+    PrintStringAtWithWidth (StartColumnOfHelp, TopRowOfHelp, gLibEmptyString, ColumnWidth1);
+    PrintStringAtWithWidth (ThdCol, BottomRowOfHelp, gEscapeString, ColumnWidth3);
+
     return;
   }
 
@@ -196,16 +212,17 @@ RefreshKeyHelp (
   case EFI_IFR_TIME_OP:
   case EFI_IFR_DATE_OP:
     if (!Selected) {
-        PrintHotKeyHelpString (FormData);
+      PrintHotKeyHelpString (FormData, TRUE);
 
       if (gClassOfVfr == FORMSET_CLASS_PLATFORM_SETUP) {
-        PrintStringAt (ThdCol, BottomRowOfHelp, gEscapeString);
+        ColumnStr3 = gEscapeString;
       }
+      PrintStringAtWithWidth (ThdCol, BottomRowOfHelp, ColumnStr3, ColumnWidth3);
 
       if ((Statement->OpCode->OpCode == EFI_IFR_DATE_OP) ||
           (Statement->OpCode->OpCode == EFI_IFR_TIME_OP)) {
         PrintAt (
-          0, 
+          ColumnWidth1, 
           StartColumnOfHelp,
           BottomRowOfHelp,
           L"%c%c%c%c%s",
@@ -215,17 +232,19 @@ RefreshKeyHelp (
           ARROW_LEFT,
           gMoveHighlight
           );
-        PrintStringAt (SecCol, BottomRowOfHelp, gEnterString);
-        PrintStringAt (StartColumnOfHelp, TopRowOfHelp, gAdjustNumber);
+        PrintStringAtWithWidth (SecCol, BottomRowOfHelp, gEnterString, ColumnWidth2);
+        PrintStringAtWithWidth (StartColumnOfHelp, TopRowOfHelp, gAdjustNumber, ColumnWidth1);
       } else {
-        PrintAt (0, StartColumnOfHelp, BottomRowOfHelp, L"%c%c%s", ARROW_UP, ARROW_DOWN, gMoveHighlight);
+        PrintAt (ColumnWidth1, StartColumnOfHelp, BottomRowOfHelp, L"%c%c%s", ARROW_UP, ARROW_DOWN, gMoveHighlight);
         if (Statement->OpCode->OpCode == EFI_IFR_NUMERIC_OP && NumericOp != NULL && LibGetFieldFromNum(Statement->OpCode) != 0) {
-          PrintStringAt (StartColumnOfHelp, TopRowOfHelp, gAdjustNumber);
-        } 
-        PrintStringAt (SecCol, BottomRowOfHelp, gEnterString);
+          ColumnStr1 = gAdjustNumber;
+        }
+        PrintStringAtWithWidth (StartColumnOfHelp, TopRowOfHelp, ColumnStr1, ColumnWidth1);
+        PrintStringAtWithWidth (SecCol, BottomRowOfHelp, gEnterString, ColumnWidth2);
       }
     } else {
-      PrintStringAt (SecCol, BottomRowOfHelp, gEnterCommitString);
+      PrintHotKeyHelpString (FormData, FALSE);
+      PrintStringAtWithWidth (SecCol, BottomRowOfHelp, gEnterCommitString, ColumnWidth2);
 
       //
       // If it is a selected numeric with manual input, display different message
@@ -233,33 +252,35 @@ RefreshKeyHelp (
       if ((Statement->OpCode->OpCode == EFI_IFR_NUMERIC_OP) || 
           (Statement->OpCode->OpCode == EFI_IFR_DATE_OP) ||
           (Statement->OpCode->OpCode == EFI_IFR_TIME_OP)) {
-        PrintStringAt (
-          SecCol,
-          TopRowOfHelp,
-          HexDisplay ? gHexNumericInput : gDecNumericInput
-          );
-      } else if (Statement->OpCode->OpCode != EFI_IFR_ORDERED_LIST_OP) {
-        PrintAt (0, StartColumnOfHelp, BottomRowOfHelp, L"%c%c%s", ARROW_UP, ARROW_DOWN, gMoveHighlight);
+        ColumnStr2 = HexDisplay ? gHexNumericInput : gDecNumericInput;
+        PrintStringAtWithWidth (StartColumnOfHelp, BottomRowOfHelp, gLibEmptyString, ColumnWidth1);
+      } else {
+        PrintAt (ColumnWidth1, StartColumnOfHelp, BottomRowOfHelp, L"%c%c%s", ARROW_UP, ARROW_DOWN, gMoveHighlight);
       }
 
       if (Statement->OpCode->OpCode == EFI_IFR_ORDERED_LIST_OP) {
-        PrintStringAt (StartColumnOfHelp, TopRowOfHelp, gPlusString);
-        PrintStringAt (ThdCol, TopRowOfHelp, gMinusString);
+        ColumnStr1 = gPlusString;
+        ColumnStr3 = gMinusString;
       }
+      PrintStringAtWithWidth (StartColumnOfHelp, TopRowOfHelp, ColumnStr1, ColumnWidth1);
+      PrintStringAtWithWidth (ThdCol, TopRowOfHelp, ColumnStr3, ColumnWidth3);
+      PrintStringAtWithWidth (SecCol, TopRowOfHelp, ColumnStr2, ColumnWidth2);
 
-      PrintStringAt (ThdCol, BottomRowOfHelp, gEnterEscapeString);
+      PrintStringAtWithWidth (ThdCol, BottomRowOfHelp, gEnterEscapeString, ColumnWidth3);
     }
     break;
 
   case EFI_IFR_CHECKBOX_OP:
-    PrintHotKeyHelpString (FormData);
+    PrintHotKeyHelpString (FormData, TRUE);
 
     if (gClassOfVfr == FORMSET_CLASS_PLATFORM_SETUP) {
-      PrintStringAt (ThdCol, BottomRowOfHelp, gEscapeString);
+      ColumnStr3 = gEscapeString;
     }
+    PrintStringAtWithWidth (ThdCol, BottomRowOfHelp, ColumnStr3, ColumnWidth3);
 
-    PrintAt (0, StartColumnOfHelp, BottomRowOfHelp, L"%c%c%s", ARROW_UP, ARROW_DOWN, gMoveHighlight);
-    PrintStringAt (SecCol, BottomRowOfHelp, gToggleCheckBox);
+    PrintAt (ColumnWidth1, StartColumnOfHelp, BottomRowOfHelp, L"%c%c%s", ARROW_UP, ARROW_DOWN, gMoveHighlight);
+    PrintStringAtWithWidth (SecCol, BottomRowOfHelp, gToggleCheckBox, ColumnWidth2);
+    PrintStringAtWithWidth (StartColumnOfHelp, TopRowOfHelp, gLibEmptyString, ColumnWidth1);
     break;
 
   case EFI_IFR_REF_OP:
@@ -270,25 +291,29 @@ RefreshKeyHelp (
   case EFI_IFR_RESET_BUTTON_OP:
   case EFI_IFR_SUBTITLE_OP:
      if (!Selected) {
-      PrintHotKeyHelpString (FormData);
+      PrintHotKeyHelpString (FormData, TRUE);
 
       if (gClassOfVfr == FORMSET_CLASS_PLATFORM_SETUP) {
-        PrintStringAt (ThdCol, BottomRowOfHelp, gEscapeString);
+        ColumnStr3 = gEscapeString;
       }
+      PrintStringAtWithWidth (ThdCol, BottomRowOfHelp, ColumnStr3, ColumnWidth3);
 
-      PrintAt (0, StartColumnOfHelp, BottomRowOfHelp, L"%c%c%s", ARROW_UP, ARROW_DOWN, gMoveHighlight);
+      PrintAt (ColumnWidth1, StartColumnOfHelp, BottomRowOfHelp, L"%c%c%s", ARROW_UP, ARROW_DOWN, gMoveHighlight);
       if (Statement->OpCode->OpCode != EFI_IFR_TEXT_OP && Statement->OpCode->OpCode != EFI_IFR_SUBTITLE_OP) {
-        PrintStringAt (SecCol, BottomRowOfHelp, gEnterString);
+        ColumnStr2 = gEnterString;
       }
+      PrintStringAtWithWidth (SecCol, BottomRowOfHelp, ColumnStr2, ColumnWidth2);
+      PrintStringAtWithWidth (StartColumnOfHelp, TopRowOfHelp, ColumnStr1, ColumnWidth1);
     } else {
-      if (Statement->OpCode->OpCode  != EFI_IFR_REF_OP) {
-        PrintStringAt (
-          (gScreenDimensions.RightColumn - LibGetStringWidth (gEnterCommitString) / 2) / 2,
-          BottomRowOfHelp,
-          gEnterCommitString
-          );
-        PrintStringAt (ThdCol, BottomRowOfHelp, gEnterEscapeString);
+      PrintHotKeyHelpString (FormData, FALSE);
+      if (Statement->OpCode->OpCode != EFI_IFR_REF_OP) {
+        ColumnStr2 = gEnterCommitString;
+        ColumnStr3 = gEnterEscapeString;
       }
+      PrintStringAtWithWidth (StartColumnOfHelp, TopRowOfHelp, ColumnStr1, ColumnWidth1);
+      PrintStringAtWithWidth (StartColumnOfHelp, BottomRowOfHelp, ColumnStr1, ColumnWidth1);
+      PrintStringAtWithWidth (SecCol, BottomRowOfHelp, ColumnStr2, ColumnWidth2);
+      PrintStringAtWithWidth (ThdCol, BottomRowOfHelp, ColumnStr3, ColumnWidth3);
     }
     break;
 
