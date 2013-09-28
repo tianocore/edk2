@@ -279,7 +279,10 @@ GetWidth (
   // For modal form, clean the entire row.
   //
   if ((gFormData->Attribute & HII_DISPLAY_MODAL) != 0) {
-    return (UINT16)(gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn - gModalSkipColumn - SCROLL_ARROW_HEIGHT);
+    if (AdjustWidth  != NULL) {
+      *AdjustWidth = LEFT_SKIPPED_COLUMNS;
+    }
+    return (UINT16)(gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn - 2 * (gModalSkipColumn + LEFT_SKIPPED_COLUMNS));
   }
 
   Size = 0;
@@ -1999,9 +2002,12 @@ UiDisplayMenu (
         if (!ValueIsScroll (TRUE, TopOfScreen)) {
           UpArrow = TRUE;
         }
-        
-        PrintStringAtWithWidth(gStatementDimensions.LeftColumn, TopRow - 1, L"", gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn);
 
+        if ((FormData->Attribute & HII_DISPLAY_MODAL) != 0) {
+          PrintStringAtWithWidth(gStatementDimensions.LeftColumn + gModalSkipColumn, TopRow - 1, L"", gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn - 2 * gModalSkipColumn);
+        } else {
+          PrintStringAtWithWidth(gStatementDimensions.LeftColumn, TopRow - 1, L"", gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn);
+        }
         if (UpArrow) {
           gST->ConOut->SetAttribute (gST->ConOut, GetArrowColor ());
           PrintCharAt (
@@ -2036,14 +2042,24 @@ UiDisplayMenu (
             SavedMenuOption = MenuOption;
             SkipHighLight   = TRUE;
           }
-          
-          DisplayOneMenu (MenuOption, 
-                          ((FormData->Attribute & HII_DISPLAY_MODAL) != 0) ? LEFT_SKIPPED_COLUMNS + gModalSkipColumn : LEFT_SKIPPED_COLUMNS,
-                          gStatementDimensions.LeftColumn, 
-                          Link == TopOfScreen ? SkipValue : 0, 
-                          BottomRow,
-                          Link == NewPos && IsSelectable(MenuOption)
-                          );
+
+          if ((FormData->Attribute & HII_DISPLAY_MODAL) != 0) {
+            DisplayOneMenu (MenuOption, 
+                            LEFT_SKIPPED_COLUMNS,
+                            gStatementDimensions.LeftColumn + gModalSkipColumn, 
+                            Link == TopOfScreen ? SkipValue : 0, 
+                            BottomRow,
+                            Link == NewPos && IsSelectable(MenuOption)
+                            );
+          } else {
+            DisplayOneMenu (MenuOption, 
+                            LEFT_SKIPPED_COLUMNS,
+                            gStatementDimensions.LeftColumn, 
+                            Link == TopOfScreen ? SkipValue : 0, 
+                            BottomRow,
+                            Link == NewPos && IsSelectable(MenuOption)
+                            );         
+          }
 
           //
           // 3. Update the row info which will be used by next menu.
@@ -2069,7 +2085,7 @@ UiDisplayMenu (
         //
         while (Row <= BottomRow) {
           if ((FormData->Attribute & HII_DISPLAY_MODAL) != 0) {
-            PrintStringAtWithWidth(gStatementDimensions.LeftColumn, Row++, L"", gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn);
+            PrintStringAtWithWidth(gStatementDimensions.LeftColumn + gModalSkipColumn, Row++, L"", gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn - 2 * gModalSkipColumn);
           } else {
             PrintStringAtWithWidth(gStatementDimensions.LeftColumn, Row++, L"", gStatementDimensions.RightColumn - gHelpBlockWidth - gStatementDimensions.LeftColumn);
           }
@@ -2078,8 +2094,11 @@ UiDisplayMenu (
         //
         // 4. Print the down arrow row.
         //
-        PrintStringAtWithWidth(gStatementDimensions.LeftColumn, BottomRow + 1, L"", gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn);
-       
+        if ((FormData->Attribute & HII_DISPLAY_MODAL) != 0) {
+          PrintStringAtWithWidth(gStatementDimensions.LeftColumn + gModalSkipColumn, BottomRow + 1, L"", gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn - 2 *  + gModalSkipColumn);
+        } else {
+          PrintStringAtWithWidth(gStatementDimensions.LeftColumn, BottomRow + 1, L"", gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn);
+        }
         if (DownArrow) {
           gST->ConOut->SetAttribute (gST->ConOut, GetArrowColor ());
           PrintCharAt (
