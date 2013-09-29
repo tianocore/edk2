@@ -1307,6 +1307,9 @@
   ## Include/Protocol/DiskIo2.h
   gEfiDiskIo2ProtocolGuid              = { 0x151c8eae, 0x7f2c, 0x472c, { 0x9e, 0x54, 0x98, 0x28, 0x19, 0x4f, 0x6a, 0x88 }}
 
+  ## Include/Protocol/Timestamp.h
+  gEfiTimestampProtocolGuid            = { 0xafbfde41, 0x2e6e, 0x4262, {0xba, 0x65, 0x62, 0xb9, 0x23, 0x6e, 0x54, 0x95 }}
+
 [PcdsFeatureFlag]
   ## If TRUE, the component name protocol will not be installed.
   gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE|BOOLEAN|0x0000000d
