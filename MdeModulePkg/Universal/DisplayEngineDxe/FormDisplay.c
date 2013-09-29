@@ -2049,7 +2049,7 @@ UiDisplayMenu (
                             gStatementDimensions.LeftColumn + gModalSkipColumn, 
                             Link == TopOfScreen ? SkipValue : 0, 
                             BottomRow,
-                            Link == NewPos && IsSelectable(MenuOption)
+                            (BOOLEAN) ((Link == NewPos) && IsSelectable(MenuOption))
                             );
           } else {
             DisplayOneMenu (MenuOption, 
@@ -2057,7 +2057,7 @@ UiDisplayMenu (
                             gStatementDimensions.LeftColumn, 
                             Link == TopOfScreen ? SkipValue : 0, 
                             BottomRow,
-                            Link == NewPos && IsSelectable(MenuOption)
+                            (BOOLEAN) ((Link == NewPos) && IsSelectable(MenuOption))
                             );         
           }
 
