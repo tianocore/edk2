@@ -193,11 +193,13 @@ LibGetStringWidth (
   Show all registered HotKey help strings on bottom Rows.
 
   @param FormData          The curent input form data info.
+  @param SetState          Set HotKey or Clear HotKey
 
 **/
 VOID
 PrintHotKeyHelpString (
-  IN FORM_DISPLAY_ENGINE_FORM      *FormData
+  IN FORM_DISPLAY_ENGINE_FORM      *FormData,
+  IN BOOLEAN                       SetState
   );
   
 /**
