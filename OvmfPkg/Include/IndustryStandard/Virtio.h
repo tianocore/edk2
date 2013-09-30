@@ -20,6 +20,19 @@
 
 #include <Base.h>
 
+//
+// VirtIo Subsystem Device IDs
+//
+#define VIRTIO_SUBSYSTEM_NETWORK_CARD       1
+#define VIRTIO_SUBSYSTEM_BLOCK_DEVICE       2
+#define VIRTIO_SUBSYSTEM_CONSOLE            3
+#define VIRTIO_SUBSYSTEM_ENTROPY_SOURCE     4
+#define VIRTIO_SUBSYSTEM_MEMORY_BALLOONING  5
+#define VIRTIO_SUBSYSTEM_IO_MEMORY          6
+#define VIRTIO_SUBSYSTEM_RPMSG              7
+#define VIRTIO_SUBSYSTEM_SCSI_HOST          8
+#define VIRTIO_SUBSYSTEM_9P_TRANSPORT       9
+#define VIRTIO_SUBSYSTEM_MAC80211_WLAN      10
 
 //
 // Data in the communication area is defined as packed and accessed as
