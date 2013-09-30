@@ -575,7 +575,7 @@ VirtioBlkDriverBindingSupported (
     Status = (Pci.Hdr.VendorId == 0x1AF4 &&
               Pci.Hdr.DeviceId >= 0x1000 && Pci.Hdr.DeviceId <= 0x103F &&
               Pci.Hdr.RevisionID == 0x00 &&
-              Pci.Device.SubsystemID == 0x02) ? EFI_SUCCESS : EFI_UNSUPPORTED;
+              Pci.Device.SubsystemID == VIRTIO_SUBSYSTEM_BLOCK_DEVICE) ? EFI_SUCCESS : EFI_UNSUPPORTED;
   }
 
   //

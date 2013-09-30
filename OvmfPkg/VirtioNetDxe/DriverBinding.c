@@ -369,7 +369,7 @@ VirtioNetDriverBindingSupported (
     Status = (Pci.Hdr.VendorId == 0x1AF4 &&
               Pci.Hdr.DeviceId >= 0x1000 && Pci.Hdr.DeviceId <= 0x103F &&
               Pci.Hdr.RevisionID == 0x00 &&
-              Pci.Device.SubsystemID == 0x01) ? EFI_SUCCESS : EFI_UNSUPPORTED;
+              Pci.Device.SubsystemID == VIRTIO_SUBSYSTEM_NETWORK_CARD) ? EFI_SUCCESS : EFI_UNSUPPORTED;
   }
 
   gBS->CloseProtocol (DeviceHandle, &gEfiPciIoProtocolGuid,
