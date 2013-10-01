@@ -61,7 +61,7 @@ typedef struct {
 typedef struct {
   NIC_ADDR                  NicAddr;      ///< Link layer address to identify the NIC.
   UINT32                    Source;       ///< Static or DHCP.
-  BOOLEAN                   Perment;      ///< Survive the reboot or not.
+  BOOLEAN                   Permanent;    ///< Survive the reboot or not.
   EFI_IP4_IPCONFIG_DATA     Ip4Info;      ///< IP addresses.
 } NIC_IP4_CONFIG_INFO;
 

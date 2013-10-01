@@ -319,7 +319,7 @@ Ip4ConfigDriverBindingStart (
   //
   NicConfig = Ip4ConfigReadVariable (Instance);
   if (NicConfig != NULL) {
-    if (!NicConfig->Perment) {
+    if (!NicConfig->Permanent) {
       //
       // Delete the non-permanent configuration.
       //

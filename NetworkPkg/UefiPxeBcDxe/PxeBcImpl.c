@@ -612,7 +612,7 @@ EfiPxeBcDiscover (
       if (Index != Info->IpCnt) {
         //
         // It's invalid if the first server doesn't accecpt any response
-        // and meanwhile any of the rest servers accept any reponse.
+        // but any of the other servers does accept any response.
         //
         Status = EFI_INVALID_PARAMETER;
         goto ON_EXIT;

@@ -1249,7 +1249,7 @@ IfconfigSetNicAddr (
   
   if (StringNoCaseCompare(&Temp, &DhcpTemp) == 0) {
     //
-    // Validate the parameter for DHCP, two valid forms: eth0 DHCP and eth0 DHCP perment
+    // Validate the parameter for DHCP, two valid forms: eth0 DHCP and eth0 DHCP permanent
     //
     if ((Argc != 2) && (Argc!= 3)) {
       ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellNetwork1HiiHandle, Temp);
@@ -1274,7 +1274,7 @@ IfconfigSetNicAddr (
     }
 
     if ((OldConfig != NULL) && (OldConfig->Source == IP4_CONFIG_SOURCE_DHCP) &&
-        (OldConfig->Perment == Permanent)) {
+        (OldConfig->Permanent == Permanent)) {
 
       ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_IFCONFIG_INTERFACE_CONFIGURED), gShellNetwork1HiiHandle, Info->Name);
       ShellStatus = SHELL_ALREADY_STARTED;
@@ -1285,7 +1285,7 @@ IfconfigSetNicAddr (
   } else if (StringNoCaseCompare(&Temp, &StaticTemp) == 0) {
     //
     // validate the parameter, two forms: eth0 static IP NETMASK GATEWAY and
-    // eth0 static IP NETMASK GATEWAY perment
+    // eth0 static IP NETMASK GATEWAY permanent 
     //
     if ((Argc != 5) && (Argc != 6)) {
       ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellNetwork1HiiHandle, Temp);
@@ -1716,8 +1716,8 @@ ShellCommandRunIfconfig (
 
     //
     // The correct command line arguments for setting address are:
-    // IfConfig -s eth0 DHCP [perment]
-    // IfConfig -s eth0 static ip netmask gateway [perment]
+    // IfConfig -s eth0 DHCP [permanent]
+    // IfConfig -s eth0 static ip netmask gateway [permanent]
     //
     if (Item == NULL || (CountSubItems(Item) < 2) || (CountSubItems(Item) > 6) || (CountSubItems(Item) == 4)) {
       ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellNetwork1HiiHandle, L"-s");

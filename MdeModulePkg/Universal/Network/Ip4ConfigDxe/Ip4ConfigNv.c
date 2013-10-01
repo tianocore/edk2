@@ -271,7 +271,7 @@ Ip4ConfigConvertIfrNvDataToDeviceConfigData (
     ZeroMem (&Ip4ConfigInstance->Ip4ConfigCallbackInfo.Gateway, sizeof (EFI_IPv4_ADDRESS));
   }
 
-  NicInfo->Perment = TRUE;
+  NicInfo->Permanent = TRUE;
   CopyMem (&NicInfo->NicAddr, &Ip4ConfigInstance->NicAddr, sizeof (NIC_ADDR));
 
   return EfiNicIp4ConfigSetInfo (Ip4ConfigInstance, NicInfo, TRUE);
