@@ -1,6 +1,7 @@
 /** @file
   The implementation for ifcommand shell command.
 
+  Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
   Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -1388,7 +1389,7 @@ IfconfigSetNicAddr (
   }
 
   CopyMem (&Config->NicAddr, &Info->NicAddress, sizeof (NIC_ADDR));
-  Config->Perment = Permanent;
+  Config->Permanent = Permanent;
 
   //
   // Use HII service to set NIC address
@@ -1474,9 +1475,9 @@ IfconfigShowNicInfo (
     }
 
     ShellPrintHiiEx(-1, -1, NULL,
-      STRING_TOKEN (STR_IFCONFIG_PERMENT_STATUS),
+      STRING_TOKEN (STR_IFCONFIG_PERMANENT_STATUS),
       gShellNetwork1HiiHandle,
-      (NicInfo->ConfigInfo->Perment? L"TRUE":L"FALSE")
+      (NicInfo->ConfigInfo->Permanent? L"TRUE":L"FALSE")
       );
 
     Ip4Config = &NicInfo->ConfigInfo->Ip4Info;
