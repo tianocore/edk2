@@ -1578,6 +1578,58 @@ DisplayMenuString (
 }
 
 /**
+  Check whether this menu can has option string.
+
+  @param  MenuOption               The menu opton which this attribut used to.
+
+  @retval TRUE                     This menu option can have option string.
+  @retval FALSE                    This menu option can't have option string.
+
+**/
+BOOLEAN 
+HasOptionString (
+  IN UI_MENU_OPTION                  *MenuOption
+  )
+{
+  FORM_DISPLAY_ENGINE_STATEMENT   *Statement;
+  CHAR16                          *String;
+  UINTN                           Size;
+  EFI_IFR_TEXT                    *TestOp;
+
+  Size = 0;
+  Statement = MenuOption->ThisTag;
+
+  //
+  // See if the second text parameter is really NULL
+  //
+  if (Statement->OpCode->OpCode == EFI_IFR_TEXT_OP) {
+    TestOp = (EFI_IFR_TEXT *) Statement->OpCode;
+    if (TestOp->TextTwo != 0) {
+      String = GetToken (TestOp->TextTwo, gFormData->HiiHandle);
+      Size   = StrLen (String);
+      FreePool (String);
+    }
+  }
+
+  if ((Statement->OpCode->OpCode == EFI_IFR_SUBTITLE_OP) ||
+    (Statement->OpCode->OpCode == EFI_IFR_REF_OP) ||
+    (Statement->OpCode->OpCode == EFI_IFR_PASSWORD_OP) ||
+    (Statement->OpCode->OpCode == EFI_IFR_ACTION_OP) ||
+    (Statement->OpCode->OpCode == EFI_IFR_RESET_BUTTON_OP) ||
+    //
+    // Allow a wide display if text op-code and no secondary text op-code
+    //
+    ((Statement->OpCode->OpCode == EFI_IFR_TEXT_OP) && (Size == 0))
+    ) {
+
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+
+/**
   Print string for this menu option.
 
   @param  MenuOption               The menu opton which this attribut used to.
@@ -1607,7 +1659,6 @@ DisplayOneMenu (
   CHAR16                          *StringPtr;
   CHAR16                          *OptionString;
   CHAR16                          *OutputString;
-  UINTN                           OriginalRow;
   UINT16                          GlyphWidth;
   UINTN                           Temp;
   UINTN                           Temp2;
@@ -1616,15 +1667,18 @@ DisplayOneMenu (
   UINTN                           Row;
   UINTN                           Col;
   UINTN                           PromptLineNum;
+  UINTN                           OptionLineNum;
   CHAR16                          AdjustValue;
+  UINTN                           MaxRow;
 
   Statement = MenuOption->ThisTag;
-  Col       = MenuOption->Col;
-  Row       = MenuOption->Row;
   Temp      = SkipLine;
   Temp2     = SkipLine;
   Temp3     = SkipLine;
-  AdjustValue = 0;
+  AdjustValue   = 0;
+  PromptLineNum = 0;
+  OptionLineNum = 0;
+  MaxRow        = 0;
 
   //
   // Set default color.
@@ -1648,8 +1702,9 @@ DisplayOneMenu (
     }
   
     Width       = (UINT16) gOptionBlockWidth - 1;
-    OriginalRow = Row;
+    Row         = MenuOption->Row;
     GlyphWidth  = 1;
+    OptionLineNum = 0;
   
     for (Index = 0; GetLineByWidth (OptionString, Width, &GlyphWidth, &Index, &OutputString) != 0x0000;) {
       if (((Temp2 == 0)) && (Row <= BottomRow)) {
@@ -1674,6 +1729,7 @@ DisplayOneMenu (
         } else {
           DisplayMenuString (MenuOption, MenuOption->OptCol, Row, OutputString, Width + 1, Highlight);
         }
+        OptionLineNum++;
       }
       
       //
@@ -1689,7 +1745,7 @@ DisplayOneMenu (
           //
           // If the difference in rows is greater than or equal to the skip value, increase the skip value
           //
-          if ((Row - OriginalRow) >= MenuOption->Skip) {
+          if ((Row - MenuOption->Row) >= MenuOption->Skip) {
             MenuOption->Skip++;
           }
         }
@@ -1701,50 +1757,22 @@ DisplayOneMenu (
       }
     }
   
-    Row   = OriginalRow;
     Highlight = FALSE;
 
     FreePool (OptionString);
   }
-  Temp2 = 0;
-
 
   //
-  // 2. Pre calculate the skip value.
-  //
-  if ((Statement->OpCode->OpCode  == EFI_IFR_TEXT_OP) && (((EFI_IFR_TEXT*)Statement->OpCode)->TextTwo != 0)) {
-    StringPtr   = GetToken (((EFI_IFR_TEXT*)Statement->OpCode)->TextTwo, gFormData->HiiHandle);
-  
-    Width       = (UINT16) gOptionBlockWidth - 1;
-    OriginalRow = Row;
-    GlyphWidth    = 1;
-    for (Index = 0; GetLineByWidth (StringPtr, Width, &GlyphWidth, &Index, &OutputString) != 0x0000;) { 
-      if (StrLen (&StringPtr[Index]) != 0) {
-        Row++;
-        if ((Row - OriginalRow) >= MenuOption->Skip) {
-          MenuOption->Skip++;
-        }
-      }
-      FreePool (OutputString);
-    }
-  
-    Row = OriginalRow;
-    FreePool (StringPtr);
-  }
-
-
-  //
-  // 3. Paint the description.
+  // 2. Paint the description.
   //
   PromptWidth   = GetWidth (Statement, &AdjustValue);
-  OriginalRow   = Row;
+  Row           = MenuOption->Row;
   GlyphWidth    = 1;
   PromptLineNum = 0;
 
   if (MenuOption->Description == NULL || MenuOption->Description[0] == '\0') {
-    while (Temp++ < MenuOption->Skip) {
-      PrintStringAtWithWidth (BeginCol, Row++, L"", PromptWidth + AdjustValue + SkipWidth);
-    } 
+    PrintStringAtWithWidth (BeginCol, Row, L"", PromptWidth + AdjustValue + SkipWidth);
+    PromptLineNum++;
   } else {
     for (Index = 0; GetLineByWidth (MenuOption->Description, PromptWidth, &GlyphWidth, &Index, &OutputString) != 0x0000;) {      
       if ((Temp == 0) && (Row <= BottomRow)) { 
@@ -1782,34 +1810,24 @@ DisplayOneMenu (
     }
 
     Highlight = FALSE;
-
-    //
-    // Clean the empty prompt line.
-    // These line is used by option string but not prompt, so clean them here.
-    //
-    Row = OriginalRow + PromptLineNum;
-    while (PromptLineNum + SkipLine < MenuOption->Skip && Row <= BottomRow) {
-      PrintStringAtWithWidth (BeginCol, Row, L"", PromptWidth + AdjustValue + SkipWidth);
-      PromptLineNum ++;
-      Row ++;
-    }
   }
-  Row = OriginalRow;
 
 
   //
-  // 4. If this is a text op with secondary text information
+  // 3. If this is a text op with secondary text information
   //
   if ((Statement->OpCode->OpCode  == EFI_IFR_TEXT_OP) && (((EFI_IFR_TEXT*)Statement->OpCode)->TextTwo != 0)) {
     StringPtr   = GetToken (((EFI_IFR_TEXT*)Statement->OpCode)->TextTwo, gFormData->HiiHandle);
   
     Width       = (UINT16) gOptionBlockWidth - 1;
-    OriginalRow = Row;
+    Row         = MenuOption->Row;
     GlyphWidth  = 1;
+    OptionLineNum = 0;
 
     for (Index = 0; GetLineByWidth (StringPtr, Width, &GlyphWidth, &Index, &OutputString) != 0x0000;) { 
       if ((Temp3 == 0) && (Row <= BottomRow)) {
         DisplayMenuString (MenuOption, MenuOption->OptCol, Row, OutputString, Width + 1, Highlight);
+        OptionLineNum++;
       }
       //
       // If there is more string to process print on the next row and increment the Skip value
@@ -1825,9 +1843,23 @@ DisplayOneMenu (
         Temp3--;
       }
     }
-  
-    Row = OriginalRow;
+
     FreePool (StringPtr);
+  }
+
+  //
+  // 4.Line number for Option string and prompt string are not equal.
+  //  Clean the column whose line number is less.
+  //
+  if (HasOptionString(MenuOption) && (OptionLineNum != PromptLineNum)) {
+    Col    =  OptionLineNum < PromptLineNum ? MenuOption->OptCol : BeginCol;
+    Row    = (OptionLineNum < PromptLineNum ? OptionLineNum : PromptLineNum) + MenuOption->Row;
+    Width  = (UINT16) (OptionLineNum < PromptLineNum ? gOptionBlockWidth : PromptWidth + AdjustValue + SkipWidth);
+    MaxRow = (OptionLineNum < PromptLineNum ? PromptLineNum : OptionLineNum) + MenuOption->Row - 1;
+    
+    while (Row <= MaxRow) {
+      DisplayMenuString (MenuOption, Col, Row++, L"", Width, FALSE);
+    }
   }
 
   return EFI_SUCCESS;
