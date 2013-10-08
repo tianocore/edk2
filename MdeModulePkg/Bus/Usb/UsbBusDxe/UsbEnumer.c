@@ -921,7 +921,7 @@ UsbEnumeratePort (
     // Case4:
     //   Device connected or disconnected normally. 
     //
-    DEBUG ((EFI_D_ERROR, "UsbEnumeratePort: Device Connect/Disconnect Normally\n", Port));
+    DEBUG ((EFI_D_INFO, "UsbEnumeratePort: Device Connect/Disconnect Normally\n", Port));
   }
 
   // 

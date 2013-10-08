@@ -847,7 +847,7 @@ UsbBuildDescTable (
   Status = UsbBuildLangTable (UsbDev);
 
   if (EFI_ERROR (Status)) {
-    DEBUG (( EFI_D_ERROR, "UsbBuildDescTable: get language ID table %r\n", Status));
+    DEBUG (( EFI_D_INFO, "UsbBuildDescTable: get language ID table %r\n", Status));
   }
 
   return EFI_SUCCESS;
