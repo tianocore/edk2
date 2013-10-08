@@ -2076,7 +2076,7 @@ UiDisplayMenu (
           }
 
           if ((FormData->Attribute & HII_DISPLAY_MODAL) != 0) {
-            DisplayOneMenu (MenuOption, 
+            Status = DisplayOneMenu (MenuOption, 
                             LEFT_SKIPPED_COLUMNS,
                             gStatementDimensions.LeftColumn + gModalSkipColumn, 
                             Link == TopOfScreen ? SkipValue : 0, 
@@ -2084,7 +2084,7 @@ UiDisplayMenu (
                             (BOOLEAN) ((Link == NewPos) && IsSelectable(MenuOption))
                             );
           } else {
-            DisplayOneMenu (MenuOption, 
+            Status = DisplayOneMenu (MenuOption, 
                             LEFT_SKIPPED_COLUMNS,
                             gStatementDimensions.LeftColumn, 
                             Link == TopOfScreen ? SkipValue : 0, 
@@ -2093,6 +2093,9 @@ UiDisplayMenu (
                             );         
           }
 
+          if (EFI_ERROR (Status)) {
+            return Status;
+          }
           //
           // 3. Update the row info which will be used by next menu.
           //
