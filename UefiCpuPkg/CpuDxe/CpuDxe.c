@@ -637,9 +637,9 @@ CpuSetMemoryAttributes (
   // to avoid unnecessary computing.
   //
   if (mIsFlushingGCD) {
-    DEBUG((EFI_D_ERROR, "  Flushing GCD\n"));
-      return EFI_SUCCESS;
-    }
+    DEBUG((EFI_D_INFO, "  Flushing GCD\n"));
+    return EFI_SUCCESS;
+  }
 
   switch (Attributes) {
   case EFI_MEMORY_UC:
