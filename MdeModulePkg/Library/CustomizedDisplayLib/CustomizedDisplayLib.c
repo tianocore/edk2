@@ -420,6 +420,7 @@ CreateDialog (
   UINTN   DimensionsWidth;
   UINTN   DimensionsHeight;
   UINTN   CurrentAttribute;
+  BOOLEAN CursorVisible;
 
   //
   // If screen dimension info is not ready, get it from console.
@@ -453,7 +454,8 @@ CreateDialog (
     LargestString = DimensionsWidth - 2;
   }
   
-  CurrentAttribute  = gST->ConOut->Mode->Attribute;  
+  CurrentAttribute  = gST->ConOut->Mode->Attribute;
+  CursorVisible     = gST->ConOut->Mode->CursorVisible;
   gST->ConOut->EnableCursor (gST->ConOut, FALSE);
   gST->ConOut->SetAttribute (gST->ConOut, GetPopupColor ());
 
@@ -535,7 +537,7 @@ CreateDialog (
   }
 
   gST->ConOut->SetAttribute (gST->ConOut, CurrentAttribute);
-  gST->ConOut->EnableCursor (gST->ConOut, TRUE);
+  gST->ConOut->EnableCursor (gST->ConOut, CursorVisible);
 }
 
 /**
