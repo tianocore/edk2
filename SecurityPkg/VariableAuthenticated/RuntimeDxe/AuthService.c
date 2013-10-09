@@ -1089,7 +1089,7 @@ ProcessVarWithPk (
       return Status;
     }
 
-    if (mPlatformMode != SETUP_MODE || IsPk) {
+    if ((mPlatformMode != SETUP_MODE) || IsPk) {
       Status = VendorKeyIsModified ();
     }
   } else if (mPlatformMode == USER_MODE) {
