@@ -258,7 +258,7 @@ FtwReclaimWorkSpace (
   UINT8                                   *Ptr;
   EFI_LBA                                 WorkSpaceLbaOffset;
 
-  DEBUG ((EFI_D_ERROR, "Ftw: start to reclaim work space\n"));
+  DEBUG ((EFI_D_INFO, "Ftw: start to reclaim work space\n"));
 
   WorkSpaceLbaOffset = FtwDevice->FtwWorkSpaceLba - FtwDevice->FtwWorkBlockLba;
 
@@ -473,7 +473,7 @@ FtwReclaimWorkSpace (
 
   FreePool (SpareBuffer);
 
-  DEBUG ((EFI_D_ERROR, "Ftw: reclaim work space successfully\n"));
+  DEBUG ((EFI_D_INFO, "Ftw: reclaim work space successfully\n"));
 
   return EFI_SUCCESS;
 }

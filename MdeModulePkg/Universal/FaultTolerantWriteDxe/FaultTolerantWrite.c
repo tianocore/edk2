@@ -159,7 +159,7 @@ FtwAllocate (
   }
 
   DEBUG (
-    (EFI_D_ERROR,
+    (EFI_D_INFO,
     "Ftw: Allocate() success, Caller:%g, # %d\n",
     CallerId,
     NumberOfWrites)
@@ -573,7 +573,7 @@ FtwWrite (
   FreePool (SpareBuffer);
 
   DEBUG (
-    (EFI_D_ERROR,
+    (EFI_D_INFO,
     "Ftw: Write() success, (Lba:Offset)=(%lx:0x%x), Length: 0x%x\n",
     Lba,
     Offset,
