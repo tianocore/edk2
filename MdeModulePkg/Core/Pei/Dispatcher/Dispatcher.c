@@ -653,7 +653,7 @@ PeiDispatcher (
   PeimFileHandle = NULL;
   EntryPoint     = 0;
 
-  if ((Private->PeiMemoryInstalled) && (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME)) {
+  if ((Private->PeiMemoryInstalled) && (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME || PcdGetBool (PcdShadowPeimOnS3Boot))) {
     //
     // Once real memory is available, shadow the RegisterForShadow modules. And meanwhile
     // update the modules' status from PEIM_STATE_REGISITER_FOR_SHADOW to PEIM_STATE_DONE.
@@ -972,7 +972,7 @@ PeiDispatcher (
             ProcessNotifyList (Private);
 
             if ((Private->PeiMemoryInstalled) && (Private->Fv[FvCount].PeimState[PeimCount] == PEIM_STATE_REGISITER_FOR_SHADOW) &&   \
-                (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME)) {
+                (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME || PcdGetBool (PcdShadowPeimOnS3Boot))) {
               //
               // If memory is availble we shadow images by default for performance reasons.
               // We call the entry point a 2nd time so the module knows it's shadowed.

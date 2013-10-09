@@ -1,7 +1,7 @@
 /** @file
   Load image file from fv to memory. 
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -47,7 +47,10 @@ typedef struct _EFI_PEI_LOAD_FILE_PPI EFI_PEI_LOAD_FILE_PPI;
   @retval EFI_INVALID_PARAMETER EntryPoint was NULL.
   @retval EFI_UNSUPPORTED       An image requires relocations or is not
                                 memory mapped.
-   
+  @retval EFI_WARN_BUFFER_TOO_SMALL 
+                                There is not enough heap to allocate the requested size.
+                                This will not prevent the XIP image from being invoked.
+
 **/
 typedef
 EFI_STATUS

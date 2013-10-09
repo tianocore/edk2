@@ -662,6 +662,9 @@
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxEfiSystemTablePointerAddress|0x0|UINT64|0x30001027
 
+  ## This PCD specifies whether to shadow PEIM on S3 boot path after memory is ready. 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnS3Boot|FALSE|BOOLEAN|0x30001028
+
   ## Default OEM ID for ACPI table creation, its length must be 0x6 bytes to follow ACPI specification.
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId|"INTEL "|VOID*|0x30001034
 
