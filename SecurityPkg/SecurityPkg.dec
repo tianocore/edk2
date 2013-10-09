@@ -25,11 +25,16 @@
 [LibraryClasses]
   ##  @libraryclass  Definitions for common TPM commands as library API for TPM
   #                  module use.
-  TpmCommLib|Include/Library/TpmCommLib.h
+  HashLib|Include/Library/HashLib.h
+  PlatformSecureLib|Include/Library/PlatformSecureLib.h
+  TcgPhysicalPresenceLib|Include/Library/TcgPhysicalPresenceLib.h
   Tpm2CommandLib|Include/Library/Tpm2CommandLib.h
   Tpm2DeviceLib|Include/Library/Tpm2DeviceLib.h
-  TrEEPhysicalPresenceLib|Include/Library/TrEEPhysicalPresenceLib.h
+  Tpm12CommandLib|Include/Library/Tpm12CommandLib.h
+  Tpm12DeviceLib|Include/Library/Tpm12DeviceLib.h
+  TpmCommLib|Include/Library/TpmCommLib.h
   TpmMeasurementLib|Include/Library/TpmMeasurementLib.h
+  TrEEPhysicalPresenceLib|Include/Library/TrEEPhysicalPresenceLib.h
 
 [Guids]
   ## Security package token space guid

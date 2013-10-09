@@ -19,7 +19,7 @@
   FILE_GUID                      = DDCBCFBA-8EEB-488a-96D6-097831A6E50B
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = HashLibBaseCrypto|PEIM
+  LIBRARY_CLASS                  = HashLib|PEIM
 
 #
 # The following information is for reference only and not required by the build tools.
