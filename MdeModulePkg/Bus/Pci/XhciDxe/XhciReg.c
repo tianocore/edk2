@@ -571,16 +571,18 @@ XhcClearBiosOwnership (
 }
 
 /**
-  Calculate the XHCI legacy support capability register offset.
+  Calculate the offset of the XHCI capability.
 
   @param  Xhc     The XHCI Instance.
+  @param  CapId   The XHCI Capability ID.
 
   @return The offset of XHCI legacy support capability register.
 
 **/
 UINT32
-XhcGetLegSupCapAddr (
-  IN USB_XHCI_INSTANCE    *Xhc
+XhcGetCapabilityAddr (
+  IN USB_XHCI_INSTANCE    *Xhc,
+  IN UINT8                CapId
   )
 {
   UINT32 ExtCapOffset;
@@ -594,7 +596,7 @@ XhcGetLegSupCapAddr (
     // Check if the extended capability register's capability id is USB Legacy Support.
     //
     Data = XhcReadExtCapReg (Xhc, ExtCapOffset);
-    if ((Data & 0xFF) == 0x1) {
+    if ((Data & 0xFF) == CapId) {
       return ExtCapOffset;
     }
     //
@@ -660,6 +662,8 @@ XhcResetHC (
 {
   EFI_STATUS              Status;
 
+  Status = EFI_SUCCESS;
+
   DEBUG ((EFI_D_INFO, "XhcResetHC!\n"));
   //
   // Host can only be reset when it is halt. If not so, halt it
@@ -672,8 +676,12 @@ XhcResetHC (
     }
   }
 
-  XhcSetOpRegBit (Xhc, XHC_USBCMD_OFFSET, XHC_USBCMD_RESET);
-  Status = XhcWaitOpRegBit (Xhc, XHC_USBCMD_OFFSET, XHC_USBCMD_RESET, FALSE, Timeout);
+  if (((XhcReadExtCapReg (Xhc, Xhc->DebugCapSupOffset) & 0xFF) != XHC_CAP_USB_DEBUG) ||
+      ((XhcReadExtCapReg (Xhc, Xhc->DebugCapSupOffset + XHC_DC_DCCTRL) & BIT0) == 0)) {
+    XhcSetOpRegBit (Xhc, XHC_USBCMD_OFFSET, XHC_USBCMD_RESET);
+    Status = XhcWaitOpRegBit (Xhc, XHC_USBCMD_OFFSET, XHC_USBCMD_RESET, FALSE, Timeout);
+  }
+
   return Status;
 }
 

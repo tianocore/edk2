@@ -29,6 +29,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define USB_HUB_CLASS_CODE          0x09
 #define USB_HUB_SUBCLASS_CODE       0x00
 
+#define XHC_CAP_USB_LEGACY          0x01
+#define XHC_CAP_USB_DEBUG           0x0A
+
 //============================================//
 //           XHCI register offset             //
 //============================================//
@@ -66,6 +69,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define XHC_ERSTSZ_OFFSET                  0x28 // Event Ring Segment Table Size Register Offset
 #define XHC_ERSTBA_OFFSET                  0x30 // Event Ring Segment Table Base Address Register Offset
 #define XHC_ERDP_OFFSET                    0x38 // Event Ring Dequeue Pointer Register Offset
+
+//
+// Debug registers offset
+//
+#define XHC_DC_DCCTRL                      0x20
 
 #define USBLEGSP_BIOS_SEMAPHORE            BIT16 // HC BIOS Owned Semaphore
 #define USBLEGSP_OS_SEMAPHORE              BIT24 // HC OS Owned Semaphore
@@ -448,6 +456,21 @@ XhcClearRuntimeRegBit (
   );
 
 /**
+  Read XHCI extended capability register.
+
+  @param  Xhc          The XHCI Instance.
+  @param  Offset       The offset of the extended capability register.
+
+  @return The register content read
+
+**/
+UINT32
+XhcReadExtCapReg (
+  IN  USB_XHCI_INSTANCE   *Xhc,
+  IN  UINT32              Offset
+  );
+
+/**
   Whether the XHCI host controller is halted.
 
   @param  Xhc     The XHCI Instance.
@@ -524,16 +547,18 @@ XhcRunHC (
   );
 
 /**
-  Calculate the XHCI legacy support capability register offset.
+  Calculate the offset of the XHCI capability.
 
   @param  Xhc     The XHCI Instance.
+  @param  CapId   The XHCI Capability ID.
 
   @return The offset of XHCI legacy support capability register.
 
 **/
 UINT32
-XhcGetLegSupCapAddr (
-  IN USB_XHCI_INSTANCE    *Xhc
+XhcGetCapabilityAddr (
+  IN USB_XHCI_INSTANCE    *Xhc,
+  IN UINT8                CapId
   );
 
 #endif
