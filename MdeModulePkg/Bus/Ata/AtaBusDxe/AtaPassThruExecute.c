@@ -583,6 +583,62 @@ FreeAtaSubTask (
 }
 
 /**
+  Terminate any in-flight non-blocking I/O requests by signaling an EFI_ABORTED
+  in the TransactionStatus member of the EFI_BLOCK_IO2_TOKEN for the non-blocking
+  I/O. After that it is safe to free any Token or Buffer data structures that
+  were allocated to initiate the non-blockingI/O requests that were in-flight for
+  this device.
+
+  @param[in]  AtaDevice     The ATA child device involved for the operation.
+
+**/
+VOID
+EFIAPI
+AtaTerminateNonBlockingTask (
+  IN ATA_DEVICE               *AtaDevice
+  )
+{
+  BOOLEAN               SubTaskEmpty;
+  EFI_TPL               OldTpl;
+  ATA_BUS_ASYN_TASK     *AtaTask;
+  LIST_ENTRY            *Entry;
+  LIST_ENTRY            *List;
+
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+  //
+  // Abort all executing tasks from now.
+  //
+  AtaDevice->Abort = TRUE;
+
+  List = &AtaDevice->AtaTaskList;
+  for (Entry = GetFirstNode (List); !IsNull (List, Entry);) {
+    AtaTask  = ATA_ASYN_TASK_FROM_ENTRY (Entry);
+    AtaTask->Token->TransactionStatus = EFI_ABORTED;
+    gBS->SignalEvent (AtaTask->Token->Event);
+
+    Entry = RemoveEntryList (Entry);
+    FreePool (AtaTask);
+  }
+  gBS->RestoreTPL (OldTpl);
+
+  do {
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+    //
+    // Wait for executing subtasks done.
+    //
+    SubTaskEmpty = IsListEmpty (&AtaDevice->AtaSubTaskList);
+    gBS->RestoreTPL (OldTpl);
+  } while (!SubTaskEmpty);
+
+  //
+  // Aborting operation has been done. From now on, don't need to abort normal operation.
+  //  
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+  AtaDevice->Abort = FALSE;
+  gBS->RestoreTPL (OldTpl);
+}
+
+/**
   Call back funtion when the event is signaled.
 
   @param[in]  Event     The Event this notify function registered to.
@@ -617,6 +673,11 @@ AtaNonBlockingCallBack (
   if ((!(*Task->IsError)) && ((Task->Packet.Asb->AtaStatus & 0x01) == 0x01)) {
     Task->Token->TransactionStatus = EFI_DEVICE_ERROR;
   }
+
+  if (AtaDevice->Abort) {
+    Task->Token->TransactionStatus = EFI_ABORTED;
+  }
+
   DEBUG ((
     EFI_D_BLKIO,
     "NON-BLOCKING EVENT FINISHED!- STATUS = %r\n",
@@ -652,7 +713,7 @@ AtaNonBlockingCallBack (
     //
     if (!IsListEmpty (&AtaDevice->AtaTaskList)) {
       Entry   = GetFirstNode (&AtaDevice->AtaTaskList);
-      AtaTask = ATA_AYNS_TASK_FROM_ENTRY (Entry);
+      AtaTask = ATA_ASYN_TASK_FROM_ENTRY (Entry);
       DEBUG ((EFI_D_BLKIO, "Start to embark a new Ata Task\n"));
       DEBUG ((EFI_D_BLKIO, "AtaTask->NumberOfBlocks = %x; AtaTask->Token=%x\n", AtaTask->NumberOfBlocks, AtaTask->Token));
       Status = AccessAtaDevice (
@@ -737,7 +798,7 @@ AccessAtaDevice(
   SubTask    = NULL;
   SubEvent   = NULL;
   AtaTask    = NULL;
-  
+
   //
   // Ensure AtaDevice->Lba48Bit is a valid boolean value
   //
@@ -750,6 +811,7 @@ AccessAtaDevice(
   //
   if ((Token != NULL) && (Token->Event != NULL)) {
     OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+
     if (!IsListEmpty (&AtaDevice->AtaSubTaskList)) {
       AtaTask = AllocateZeroPool (sizeof (ATA_BUS_ASYN_TASK));
       if (AtaTask == NULL) {
@@ -788,7 +850,7 @@ AccessAtaDevice(
     DEBUG ((EFI_D_BLKIO, "AccessAtaDevice, NumberOfBlocks=%x\n", NumberOfBlocks));
     DEBUG ((EFI_D_BLKIO, "AccessAtaDevice, MaxTransferBlockNumber=%x\n", MaxTransferBlockNumber));
     DEBUG ((EFI_D_BLKIO, "AccessAtaDevice, EventCount=%x\n", TempCount));
-  }else {
+  } else {
     while (!IsListEmpty (&AtaDevice->AtaTaskList) || !IsListEmpty (&AtaDevice->AtaSubTaskList)) {
       //
       // Stall for 100us.

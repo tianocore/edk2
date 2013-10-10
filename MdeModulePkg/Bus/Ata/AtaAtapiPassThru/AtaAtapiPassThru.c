@@ -1764,7 +1764,10 @@ AtaPassThruResetPort (
   IN UINT16                     Port
   )
 {
-  return EFI_UNSUPPORTED;
+  //
+  // Return success directly then upper layer driver could think reset port operation is done.
+  //
+  return EFI_SUCCESS;
 }
 
 /**
@@ -1806,7 +1809,10 @@ AtaPassThruResetDevice (
   IN UINT16                     PortMultiplierPort
   )
 {
-  return EFI_UNSUPPORTED;
+  //
+  // Return success directly then upper layer driver could think reset device operation is done.
+  //
+  return EFI_SUCCESS;
 }
 
 /**
@@ -2274,7 +2280,10 @@ ExtScsiPassThruResetChannel (
   IN  EFI_EXT_SCSI_PASS_THRU_PROTOCOL   *This
   )
 {
-  return EFI_UNSUPPORTED;
+  //
+  // Return success directly then upper layer driver could think reset channel operation is done.
+  //
+  return EFI_SUCCESS;
 }
 
 /**
@@ -2304,7 +2313,10 @@ ExtScsiPassThruResetTargetLun (
   IN UINT64                             Lun
   )
 {
-  return EFI_UNSUPPORTED;
+  //
+  // Return success directly then upper layer driver could think reset target LUN operation is done.
+  //
+  return EFI_SUCCESS;
 }
 
 /**

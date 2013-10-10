@@ -90,7 +90,8 @@ ATA_DEVICE gAtaDeviceTemplate = {
   NULL,                        // ControllerNameTable
   {L'\0', },                   // ModelName
   {NULL, NULL},                // AtaTaskList
-  {NULL, NULL}                 // AtaSubTaskList
+  {NULL, NULL},                // AtaSubTaskList
+  FALSE                        // Abort
 };
 
 /**
@@ -172,7 +173,7 @@ ReleaseAtaResources (
        ) {
       DelEntry = Entry;
       Entry    = Entry->ForwardLink;
-      SubTask  = ATA_AYNS_SUB_TASK_FROM_ENTRY (DelEntry);
+      SubTask  = ATA_ASYN_SUB_TASK_FROM_ENTRY (DelEntry);
 
       RemoveEntryList (DelEntry);
       FreeAtaSubTask (SubTask);
@@ -187,7 +188,7 @@ ReleaseAtaResources (
        ) {
       DelEntry = Entry;
       Entry    = Entry->ForwardLink;
-      AtaTask     = ATA_AYNS_TASK_FROM_ENTRY (DelEntry);
+      AtaTask  = ATA_ASYN_TASK_FROM_ENTRY (DelEntry);
 
       RemoveEntryList (DelEntry);
       FreePool (AtaTask);
@@ -1216,6 +1217,8 @@ AtaBlockIoResetEx (
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   AtaDevice = ATA_DEVICE_FROM_BLOCK_IO2 (This);
+
+  AtaTerminateNonBlockingTask (AtaDevice);
 
   Status = ResetAtaDevice (AtaDevice);
 

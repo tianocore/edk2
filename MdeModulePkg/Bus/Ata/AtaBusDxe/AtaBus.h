@@ -4,7 +4,7 @@
   This file defines common data structures, macro definitions and some module
   internal function header files.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -148,6 +148,7 @@ typedef struct {
 
   LIST_ENTRY                            AtaTaskList;
   LIST_ENTRY                            AtaSubTaskList;
+  BOOLEAN                               Abort;
 } ATA_DEVICE;
 
 //
@@ -181,8 +182,8 @@ typedef struct {
 #define ATA_DEVICE_FROM_BLOCK_IO2(a)        CR (a, ATA_DEVICE, BlockIo2, ATA_DEVICE_SIGNATURE)
 #define ATA_DEVICE_FROM_DISK_INFO(a)        CR (a, ATA_DEVICE, DiskInfo, ATA_DEVICE_SIGNATURE)
 #define ATA_DEVICE_FROM_STORAGE_SECURITY(a) CR (a, ATA_DEVICE, StorageSecurity, ATA_DEVICE_SIGNATURE)
-#define ATA_AYNS_SUB_TASK_FROM_ENTRY(a)     CR (a, ATA_BUS_ASYN_SUB_TASK, TaskEntry, ATA_SUB_TASK_SIGNATURE)
-#define ATA_AYNS_TASK_FROM_ENTRY(a)         CR (a, ATA_BUS_ASYN_TASK, TaskEntry, ATA_TASK_SIGNATURE)
+#define ATA_ASYN_SUB_TASK_FROM_ENTRY(a)     CR (a, ATA_BUS_ASYN_SUB_TASK, TaskEntry, ATA_SUB_TASK_SIGNATURE)
+#define ATA_ASYN_TASK_FROM_ENTRY(a)         CR (a, ATA_BUS_ASYN_TASK, TaskEntry, ATA_TASK_SIGNATURE)
 
 //
 // Global Variables
@@ -301,6 +302,7 @@ AccessAtaDevice(
   IN BOOLEAN                        IsWrite,
   IN OUT EFI_BLOCK_IO2_TOKEN        *Token
   );
+
 /**
   Trust transfer data from/to ATA device.
 
@@ -805,6 +807,22 @@ AtaBlockIoFlushBlocksEx (
   );
 
 /**
+  Terminate any in-flight non-blocking I/O requests by signaling an EFI_ABORTED
+  in the TransactionStatus member of the EFI_BLOCK_IO2_TOKEN for the non-blocking
+  I/O. After that it is safe to free any Token or Buffer data structures that
+  were allocated to initiate the non-blockingI/O requests that were in-flight for
+  this device.
+
+  @param[in]  AtaDevice     The ATA child device involved for the operation.
+
+**/
+VOID
+EFIAPI
+AtaTerminateNonBlockingTask (
+  IN ATA_DEVICE               *AtaDevice
+  );
+
+/**
   Provides inquiry information for the controller type.
 
   This function is used by the IDE bus driver to get inquiry data.  Data format
@@ -940,20 +958,20 @@ AtaDiskInfoWhichIde (
   return EFI_SUCCESS. If the security protocol command completes with an error, the
   function shall return EFI_DEVICE_ERROR.
 
-  @param  This		                     Indicates a pointer to the calling context.
-  @param  MediaId	                     ID of the medium to receive data from.
-  @param  Timeout		                   The timeout, in 100ns units, to use for the execution
+  @param  This                         Indicates a pointer to the calling context.
+  @param  MediaId                      ID of the medium to receive data from.
+  @param  Timeout                      The timeout, in 100ns units, to use for the execution
                                        of the security protocol command. A Timeout value of 0
                                        means that this function will wait indefinitely for the
                                        security protocol command to execute. If Timeout is greater
                                        than zero, then this function will return EFI_TIMEOUT
-				                               if the time required to execute the receive data command
-				                               is greater than Timeout.
+                                       if the time required to execute the receive data command
+                                       is greater than Timeout.
   @param  SecurityProtocolId           The value of the "Security Protocol" parameter of
                                        the security protocol command to be sent.
   @param  SecurityProtocolSpecificData The value of the "Security Protocol Specific" parameter
                                        of the security protocol command to be sent.
-  @param  PayloadBufferSize		         Size in bytes of the payload data buffer.
+  @param  PayloadBufferSize            Size in bytes of the payload data buffer.
   @param  PayloadBuffer                A pointer to a destination buffer to store the security
                                        protocol command specific payload data for the security
                                        protocol command. The caller is responsible for having
@@ -1020,20 +1038,20 @@ AtaStorageSecurityReceiveData (
   EFI_SUCCESS. If the security protocol command completes with an error, the function
   shall return EFI_DEVICE_ERROR.
 
-  @param  This		                     Indicates a pointer to the calling context.
-  @param  MediaId	                     ID of the medium to receive data from.
-  @param  Timeout		                   The timeout, in 100ns units, to use for the execution
+  @param  This                         Indicates a pointer to the calling context.
+  @param  MediaId                      ID of the medium to receive data from.
+  @param  Timeout                      The timeout, in 100ns units, to use for the execution
                                        of the security protocol command. A Timeout value of 0
                                        means that this function will wait indefinitely for the
                                        security protocol command to execute. If Timeout is greater
                                        than zero, then this function will return EFI_TIMEOUT
-				                               if the time required to execute the receive data command
-				                               is greater than Timeout.
+                                       if the time required to execute the receive data command
+                                       is greater than Timeout.
   @param  SecurityProtocolId           The value of the "Security Protocol" parameter of
                                        the security protocol command to be sent.
   @param  SecurityProtocolSpecificData The value of the "Security Protocol Specific" parameter
                                        of the security protocol command to be sent.
-  @param  PayloadBufferSize		         Size in bytes of the payload data buffer.
+  @param  PayloadBufferSize            Size in bytes of the payload data buffer.
   @param  PayloadBuffer                A pointer to a destination buffer to store the security
                                        protocol command specific payload data for the security
                                        protocol command.
