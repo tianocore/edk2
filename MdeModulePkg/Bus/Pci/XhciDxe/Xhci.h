@@ -222,6 +222,7 @@ struct _USB_XHCI_INSTANCE {
   UINT32                    MaxScratchpadBufs;
   UINT32                    ExtCapRegBase;
   UINT32                    UsbLegSupOffset;
+  UINT32                    DebugCapSupOffset;
   UINT64                    *DCBAA;
   UINT32                    MaxSlotsEn;
   //
