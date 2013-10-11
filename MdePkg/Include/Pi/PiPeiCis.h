@@ -1,7 +1,7 @@
 /** @file
   PI PEI master include file. This file should match the PI spec.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -396,6 +396,38 @@ EFI_STATUS
   );
 
 /**
+  Searches for the next matching section within the specified file.
+
+  This service enables PEI modules to discover the section of a given type within a valid file.
+  This service will search within encapsulation sections (compression and GUIDed) as well. It will
+  search inside of a GUIDed section or a compressed section, but may not, for example, search a
+  GUIDed section inside a GUIDes section.
+  This service will not search within compression sections or GUIDed sections that require
+  extraction if memory is not present.
+
+  @param  PeiServices           An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param  SectionType           The value of the section type to find.
+  @param  SectionInstance       Section instance to find.
+  @param  FileHandle            Handle of the firmware file to search.
+  @param  SectionData           A pointer to the discovered section, if successful.
+  @param  AuthenticationStatus  A pointer to the authentication status for this section.
+
+  @retval EFI_SUCCESS      The section was found.
+  @retval EFI_NOT_FOUND    The section was not found.
+
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EFI_PEI_FFS_FIND_SECTION_DATA3)(
+  IN CONST EFI_PEI_SERVICES            **PeiServices,
+  IN EFI_SECTION_TYPE                  SectionType,
+  IN UINTN                             SectionInstance,
+  IN EFI_PEI_FILE_HANDLE               FileHandle,
+  OUT VOID                             **SectionData,
+  OUT UINT32                           *AuthenticationStatus
+  );
+
+/**
   This function registers the found memory configuration with the PEI Foundation.
 
   @param  PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
@@ -608,6 +640,38 @@ typedef struct {
   UINT32                  BufferSize;
 } EFI_FV_FILE_INFO;
 
+///
+/// The information with authentication status of the FV file.
+///
+typedef struct {
+  ///
+  /// Name of the file.
+  ///
+  EFI_GUID                FileName;
+  ///
+  /// File type.
+  ///
+  EFI_FV_FILETYPE         FileType;
+  ///
+  /// Attributes of the file.
+  ///
+  EFI_FV_FILE_ATTRIBUTES  FileAttributes;
+  ///
+  /// Points to the file's data (not the header).
+  /// Not valid if EFI_FV_FILE_ATTRIB_MEMORY_MAPPED
+  /// is zero.
+  ///
+  VOID                    *Buffer;
+  ///
+  /// Size of the file's data.
+  ///
+  UINT32                  BufferSize;
+  ///
+  /// Authentication status for this file.
+  ///
+  UINT32                  AuthenticationStatus;
+} EFI_FV_FILE_INFO2;
+
 /**
   Returns information about a specific file.
 
@@ -631,6 +695,30 @@ EFI_STATUS
 (EFIAPI *EFI_PEI_FFS_GET_FILE_INFO)(
   IN  EFI_PEI_FILE_HANDLE         FileHandle,
   OUT EFI_FV_FILE_INFO            *FileInfo
+  );
+
+/**
+  Returns information about a specific file.
+
+  This function returns information about a specific file,
+  including its file name, type, attributes, starting address, size and authentication status.
+  If the firmware volume is not memory mapped, then the Buffer member will be NULL.
+
+  @param FileHandle   The handle of the file.
+  @param FileInfo     Upon exit, points to the file's
+                      information.
+
+  @retval EFI_SUCCESS             File information was returned.
+  @retval EFI_INVALID_PARAMETER   FileHandle does not
+                                  represent a valid file.
+  @retval EFI_INVALID_PARAMETER   FileInfo is NULL.
+
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EFI_PEI_FFS_GET_FILE_INFO2)(
+  IN  EFI_PEI_FILE_HANDLE         FileHandle,
+  OUT EFI_FV_FILE_INFO2           *FileInfo
   );
 
 ///
@@ -813,6 +901,8 @@ struct _EFI_PEI_SERVICES {
   EFI_PEI_FFS_GET_FILE_INFO       FfsGetFileInfo;
   EFI_PEI_FFS_GET_VOLUME_INFO     FfsGetVolumeInfo;
   EFI_PEI_REGISTER_FOR_SHADOW     RegisterForShadow;
+  EFI_PEI_FFS_FIND_SECTION_DATA3  FindSectionData3;
+  EFI_PEI_FFS_GET_FILE_INFO2      FfsGetFileInfo2;
 };
 
 

@@ -540,23 +540,27 @@ PeiLoadImageLoadImage (
   // Try to find a first exe section (if PcdPeiCoreImageLoaderSearchTeSectionFirst
   // is true, TE will be searched first).
   //
-  Status = PeiServicesFfsFindSectionData (
+  Status = PeiServicesFfsFindSectionData3 (
              SearchType1,
+             0,
              FileHandle,
-             &Pe32Data
+             &Pe32Data,
+             AuthenticationState
              );
   //
   // If we didn't find a first exe section, try to find the second exe section.
   //
   if (EFI_ERROR (Status)) {
-    Status = PeiServicesFfsFindSectionData (
+    Status = PeiServicesFfsFindSectionData3 (
                SearchType2,
+               0,
                FileHandle,
-               &Pe32Data
+               &Pe32Data,
+               AuthenticationState
                );
     if (EFI_ERROR (Status)) {
       //
-      // PEI core only carry the loader function fro TE and PE32 executables
+      // PEI core only carry the loader function for TE and PE32 executables
       // If this two section does not exist, just return.
       //
       return Status;

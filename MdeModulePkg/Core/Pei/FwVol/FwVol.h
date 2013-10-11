@@ -160,6 +160,40 @@ PeiFfsFvPpiFindSectionByType (
   );
 
 /**
+  Find the next matching section in the firmware file.
+
+  This service enables PEI modules to discover sections
+  of a given instance and type within a valid file.
+
+  @param This                   Points to this instance of the
+                                EFI_PEI_FIRMWARE_VOLUME_PPI.
+  @param SearchType             A filter to find only sections of this
+                                type.
+  @param SearchInstance         A filter to find the specific instance
+                                of sections.
+  @param FileHandle             Handle of firmware file in which to
+                                search.
+  @param SectionData            Updated upon return to point to the
+                                section found.
+  @param AuthenticationStatus   Updated upon return to point to the
+                                authentication status for this section.
+
+  @retval EFI_SUCCESS     Section was found.
+  @retval EFI_NOT_FOUND   Section of the specified type was not
+                          found. SectionData contains NULL.
+**/
+EFI_STATUS
+EFIAPI
+PeiFfsFvPpiFindSectionByType2 (
+  IN  CONST EFI_PEI_FIRMWARE_VOLUME_PPI    *This,
+  IN        EFI_SECTION_TYPE               SearchType,
+  IN        UINTN                          SearchInstance,
+  IN        EFI_PEI_FILE_HANDLE            FileHandle,
+  OUT VOID                                 **SectionData,
+  OUT UINT32                               *AuthenticationStatus
+  );
+
+/**
   Returns information about a specific file.
 
   This function returns information about a specific
@@ -184,6 +218,33 @@ PeiFfsFvPpiGetFileInfo (
   IN  CONST EFI_PEI_FIRMWARE_VOLUME_PPI   *This, 
   IN        EFI_PEI_FILE_HANDLE           FileHandle, 
   OUT       EFI_FV_FILE_INFO              *FileInfo
+  );
+
+/**
+  Returns information about a specific file.
+
+  This function returns information about a specific
+  file, including its file name, type, attributes, starting
+  address, size and authentication status.
+
+  @param This                     Points to this instance of the
+                                  EFI_PEI_FIRMWARE_VOLUME_PPI.
+  @param FileHandle               Handle of the file.
+  @param FileInfo                 Upon exit, points to the file's
+                                  information.
+
+  @retval EFI_SUCCESS             File information returned.
+  @retval EFI_INVALID_PARAMETER   If FileHandle does not
+                                  represent a valid file.
+  @retval EFI_INVALID_PARAMETER   If FileInfo is NULL.
+
+**/
+EFI_STATUS
+EFIAPI
+PeiFfsFvPpiGetFileInfo2 (
+  IN  CONST EFI_PEI_FIRMWARE_VOLUME_PPI   *This,
+  IN        EFI_PEI_FILE_HANDLE           FileHandle,
+  OUT       EFI_FV_FILE_INFO2             *FileInfo
   );
 
 /**
@@ -250,7 +311,7 @@ FindFileEx (
 /**
   Report the information for a new discoveried FV in unknown format.
   
-  If the EFI_PEI_FIRMWARE_VOLUME_PPI has not been install for specifical FV format, but
+  If the EFI_PEI_FIRMWARE_VOLUME_PPI has not been installed for specifical FV format, but
   the FV in this FV format has been discoveried, then the information of this FV
   will be cached into PEI_CORE_INSTANCE's UnknownFvInfo array.
   Also a notification would be installed for unknown FV format guid, if EFI_PEI_FIRMWARE_VOLUME_PPI
@@ -258,19 +319,15 @@ FindFileEx (
   using new installed EFI_PEI_FIRMWARE_VOLUME_PPI.
   
   @param PrivateData  Point to instance of PEI_CORE_INSTANCE
-  @param Format       Point to the unknown FV format guid.
-  @param FvInfo       Point to FvInfo buffer.
-  @param FvInfoSize   The size of FvInfo buffer.
+  @param FvInfo2Ppi   Point to FvInfo2 PPI.
   
   @retval EFI_OUT_OF_RESOURCES  The FV info array in PEI_CORE_INSTANCE has no more spaces.
   @retval EFI_SUCCESS           Success to add the information for unknown FV.
 **/
 EFI_STATUS
 AddUnknownFormatFvInfo (
-  IN PEI_CORE_INSTANCE *PrivateData,
-  IN EFI_GUID          *Format,
-  IN VOID              *FvInfo,
-  IN UINT32            FvInfoSize
+  IN PEI_CORE_INSTANCE                  *PrivateData,
+  IN EFI_PEI_FIRMWARE_VOLUME_INFO2_PPI  *FvInfo2Ppi
   );
   
 /**
@@ -283,6 +340,7 @@ AddUnknownFormatFvInfo (
   @param Format           Point to given FV format guid
   @param FvInfo           On return, the pointer of FV information buffer in given FV format guid
   @param FvInfoSize       On return, the size of FV information buffer.
+  @param AuthenticationStatus On return, the authentication status of FV information buffer.
   
   @retval EFI_NOT_FOUND  The FV is not found for new installed EFI_PEI_FIRMWARE_VOLUME_PPI
   @retval EFI_SUCCESS    Success to find a FV which could be processed by new installed EFI_PEI_FIRMWARE_VOLUME_PPI.
@@ -292,7 +350,8 @@ FindUnknownFormatFvInfo (
   IN  PEI_CORE_INSTANCE *PrivateData,
   IN  EFI_GUID          *Format,
   OUT VOID              **FvInfo,
-  OUT UINT32            *FvInfoSize
+  OUT UINT32            *FvInfoSize,
+  OUT UINT32            *AuthenticationStatus
   );
   
 /**

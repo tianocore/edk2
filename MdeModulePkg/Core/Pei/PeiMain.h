@@ -1,7 +1,7 @@
 /** @file
   Definition of Pei Core Structures and Services
   
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -22,6 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Ppi/Reset.h>
 #include <Ppi/FirmwareVolume.h>
 #include <Ppi/FirmwareVolumeInfo.h>
+#include <Ppi/FirmwareVolumeInfo2.h>
 #include <Ppi/Decompress.h>
 #include <Ppi/GuidedSectionExtraction.h>
 #include <Ppi/LoadFile.h>
@@ -110,12 +111,14 @@ typedef struct {
   UINT8                               PeimState[FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)];
   EFI_PEI_FILE_HANDLE                 FvFileHandles[FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)];
   BOOLEAN                             ScanFv;
+  UINT32                              AuthenticationStatus;
 } PEI_CORE_FV_HANDLE;
 
 typedef struct {
   EFI_GUID                            FvFormat;
   VOID                                *FvInfo;
   UINT32                              FvInfoSize;
+  UINT32                              AuthenticationStatus;
   EFI_PEI_NOTIFY_DESCRIPTOR           NotifyDescriptor;
 } PEI_CORE_UNKNOW_FORMAT_FV_INFO;
 
@@ -124,6 +127,7 @@ typedef struct {
   EFI_COMMON_SECTION_HEADER*          Section[CACHE_SETION_MAX_NUMBER];
   VOID*                               SectionData[CACHE_SETION_MAX_NUMBER];
   UINTN                               SectionSize[CACHE_SETION_MAX_NUMBER];
+  UINT32                              AuthenticationStatus[CACHE_SETION_MAX_NUMBER];
   UINTN                               AllSectionCount;
   UINTN                               SectionIndex;
 } CACHE_SECTION_DATA;
@@ -583,23 +587,23 @@ VerifyFv (
   );
 
 /**
-
   Provide a callout to the security verification service.
-
 
   @param PrivateData     PeiCore's private data structure
   @param VolumeHandle    Handle of FV
   @param FileHandle      Handle of PEIM's ffs
+  @param AuthenticationStatus Authentication status
 
   @retval EFI_SUCCESS              Image is OK
   @retval EFI_SECURITY_VIOLATION   Image is illegal
-
+  @retval EFI_NOT_FOUND            If security PPI is not installed.
 **/
 EFI_STATUS
 VerifyPeim (
   IN PEI_CORE_INSTANCE      *PrivateData,
   IN EFI_PEI_FV_HANDLE      VolumeHandle,
-  IN EFI_PEI_FILE_HANDLE    FileHandle
+  IN EFI_PEI_FILE_HANDLE    FileHandle,
+  IN UINT32                 AuthenticationStatus
   );
 
 /**
@@ -712,6 +716,31 @@ PeiFfsFindSectionData (
   IN     EFI_SECTION_TYPE      SectionType,
   IN     EFI_PEI_FILE_HANDLE   FileHandle,
   OUT VOID                     **SectionData
+  );
+
+/**
+  Searches for the next matching section within the specified file.
+
+  @param  PeiServices           An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param  SectionType           The value of the section type to find.
+  @param  SectionInstance       Section instance to find.
+  @param  FileHandle            Handle of the firmware file to search.
+  @param  SectionData           A pointer to the discovered section, if successful.
+  @param  AuthenticationStatus  A pointer to the authentication status for this section.
+
+  @retval EFI_SUCCESS      The section was found.
+  @retval EFI_NOT_FOUND    The section was not found.
+
+**/
+EFI_STATUS
+EFIAPI
+PeiFfsFindSectionData3 (
+  IN CONST EFI_PEI_SERVICES    **PeiServices,
+  IN     EFI_SECTION_TYPE      SectionType,
+  IN     UINTN                 SectionInstance,
+  IN     EFI_PEI_FILE_HANDLE   FileHandle,
+  OUT VOID                     **SectionData,
+  OUT UINT32                   *AuthenticationStatus
   );
 
 /**
@@ -968,6 +997,24 @@ PeiFfsGetFileInfo (
   );
 
 /**
+  Returns information about a specific file.
+
+  @param FileHandle       Handle of the file.
+  @param FileInfo         Upon exit, points to the file's information.
+
+  @retval EFI_INVALID_PARAMETER If FileInfo is NULL.
+  @retval EFI_INVALID_PARAMETER If FileHandle does not represent a valid file.
+  @retval EFI_SUCCESS           File information returned.
+
+**/
+EFI_STATUS
+EFIAPI 
+PeiFfsGetFileInfo2 (
+  IN EFI_PEI_FILE_HANDLE  FileHandle,
+  OUT EFI_FV_FILE_INFO2   *FileInfo
+  );
+
+/**
   Returns information about the specified volume.
 
   @param VolumeHandle    Handle of the volume.
@@ -1061,19 +1108,22 @@ SecurityPpiNotifyCallback (
   );
 
 /**
-  Get Fv image from the FV type file, then install FV INFO ppi, Build FV hob.
+  Get Fv image from the FV type file, then install FV INFO(2) ppi, Build FV hob.
 
+  @param PrivateData          PeiCore's private data structure
   @param ParentFvCoreHandle   Pointer of EFI_CORE_FV_HANDLE to parent Fv image that contain this Fv image.
   @param ParentFvFileHandle   File handle of a Fv type file that contain this Fv image.
 
   @retval EFI_NOT_FOUND         FV image can't be found.
   @retval EFI_SUCCESS           Successfully to process it.
   @retval EFI_OUT_OF_RESOURCES  Can not allocate page when aligning FV image
+  @retval EFI_SECURITY_VIOLATION Image is illegal
   @retval Others                Can not find EFI_SECTION_FIRMWARE_VOLUME_IMAGE section
   
 **/
 EFI_STATUS
 ProcessFvFile (
+  IN  PEI_CORE_INSTANCE           *PrivateData,
   IN  PEI_CORE_FV_HANDLE          *ParentFvCoreHandle,
   IN  EFI_PEI_FILE_HANDLE         ParentFvFileHandle
   );

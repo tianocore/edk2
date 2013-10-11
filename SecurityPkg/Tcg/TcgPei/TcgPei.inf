@@ -57,6 +57,7 @@
 [Ppis]
   gPeiLockPhysicalPresencePpiGuid
   gEfiPeiFirmwareVolumeInfoPpiGuid
+  gEfiPeiFirmwareVolumeInfo2PpiGuid
   gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid
   gPeiTpmInitializedPpiGuid
   gEfiEndOfPeiSignalPpiGuid

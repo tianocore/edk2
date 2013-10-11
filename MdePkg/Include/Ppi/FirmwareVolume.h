@@ -1,7 +1,7 @@
 /** @file
   This file provides functions for accessing a memory-mapped firmware volume of a specific format.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -154,6 +154,33 @@ EFI_STATUS
 );
 
 /**
+  Returns information about a specific file.
+
+  This function returns information about a specific
+  file, including its file name, type, attributes, starting
+  address, size and authentication status. 
+
+  @param This                     Points to this instance of the
+                                  EFI_PEI_FIRMWARE_VOLUME_PPI.
+  @param FileHandle               Handle of the file.
+  @param FileInfo                 Upon exit, points to the file's
+                                  information.
+
+  @retval EFI_SUCCESS             File information returned.
+  @retval EFI_INVALID_PARAMETER   If FileHandle does not
+                                  represent a valid file.
+  @retval EFI_INVALID_PARAMETER   If FileInfo is NULL.
+
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EFI_PEI_FV_GET_FILE_INFO2)(
+  IN  CONST EFI_PEI_FIRMWARE_VOLUME_PPI   *This, 
+  IN  EFI_PEI_FILE_HANDLE                 FileHandle,
+  OUT EFI_FV_FILE_INFO2                   *FileInfo
+);
+
+/**
   This function returns information about the firmware volume.
   
   @param This                     Points to this instance of the
@@ -203,6 +230,43 @@ EFI_STATUS
   OUT VOID                                 **SectionData
 );
 
+/**
+  Find the next matching section in the firmware file.
+
+  This service enables PEI modules to discover sections
+  of a given instance and type within a valid file.
+
+  @param This                   Points to this instance of the
+                                EFI_PEI_FIRMWARE_VOLUME_PPI.
+  @param SearchType             A filter to find only sections of this
+                                type.
+  @param SearchInstance         A filter to find the specific instance
+                                of sections.
+  @param FileHandle             Handle of firmware file in which to
+                                search.
+  @param SectionData            Updated upon return to point to the
+                                section found.
+  @param AuthenticationStatus   Updated upon return to point to the
+                                authentication status for this section.
+
+  @retval EFI_SUCCESS     Section was found.
+  @retval EFI_NOT_FOUND   Section of the specified type was not
+                          found. SectionData contains NULL.
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EFI_PEI_FV_FIND_SECTION2)(
+  IN  CONST EFI_PEI_FIRMWARE_VOLUME_PPI    *This,
+  IN  EFI_SECTION_TYPE                     SearchType,
+  IN  UINTN                                SearchInstance,
+  IN  EFI_PEI_FILE_HANDLE                  FileHandle,
+  OUT VOID                                 **SectionData,
+  OUT UINT32                               *AuthenticationStatus
+);
+
+#define EFI_PEI_FIRMWARE_VOLUME_PPI_SIGNATURE SIGNATURE_32 ('P', 'F', 'V', 'P')
+#define EFI_PEI_FIRMWARE_VOLUME_PPI_REVISION 0x00010030
+
 ///
 /// This PPI provides functions for accessing a memory-mapped firmware volume of a specific format.
 ///
@@ -213,6 +277,16 @@ struct _EFI_PEI_FIRMWARE_VOLUME_PPI {
   EFI_PEI_FV_GET_FILE_INFO    GetFileInfo;
   EFI_PEI_FV_GET_INFO         GetVolumeInfo;
   EFI_PEI_FV_FIND_SECTION     FindSectionByType;
+  EFI_PEI_FV_GET_FILE_INFO2   GetFileInfo2;
+  EFI_PEI_FV_FIND_SECTION2    FindSectionByType2;
+  ///
+  /// Signature is used to keep backward-compatibility, set to {'P','F','V','P'}.
+  ///
+  UINT32                      Signature;
+  ///
+  /// Revision for further extension.
+  ///
+  UINT32                      Revision;
 };
 
 extern EFI_GUID gEfiPeiFirmwareVolumePpiGuid;

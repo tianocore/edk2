@@ -5,7 +5,7 @@
   policy to the PEI Foundation, namely the case of a PEIM's authentication 
   state being returned during the PEI section extraction process.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -75,7 +75,7 @@ EFI_STATUS
   IN CONST  EFI_PEI_SECURITY2_PPI *This,
   IN UINT32                       AuthenticationStatus,
   IN EFI_PEI_FV_HANDLE            FvHandle,
-  IN EFI_PEI_FV_HANDLE            FileHandle,
+  IN EFI_PEI_FILE_HANDLE          FileHandle,
   IN OUT    BOOLEAN               *DeferExecution
 );
 

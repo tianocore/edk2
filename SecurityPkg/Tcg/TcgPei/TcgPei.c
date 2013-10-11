@@ -17,6 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <IndustryStandard/Tpm12.h>
 #include <IndustryStandard/UefiTcgPlatform.h>
 #include <Ppi/FirmwareVolumeInfo.h>
+#include <Ppi/FirmwareVolumeInfo2.h>
 #include <Ppi/LockPhysicalPresence.h>
 #include <Ppi/TpmInitialized.h>
 #include <Ppi/FirmwareVolume.h>
@@ -120,6 +121,11 @@ EFI_PEI_NOTIFY_DESCRIPTOR           mNotifyList[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK,
     &gEfiPeiFirmwareVolumeInfoPpiGuid,
+    FirmwareVolmeInfoPpiNotifyCallback 
+  },
+  {
+    EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK,
+    &gEfiPeiFirmwareVolumeInfo2PpiGuid,
     FirmwareVolmeInfoPpiNotifyCallback 
   },
   {

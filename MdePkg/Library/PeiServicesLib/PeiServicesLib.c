@@ -1,7 +1,7 @@
 /** @file
   Implementation for PEI Services Library.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,6 +16,7 @@
 #include <PiPei.h>
 
 #include <Ppi/FirmwareVolumeInfo.h>
+#include <Ppi/FirmwareVolumeInfo2.h>
 #include <Guid/FirmwareFileSystem2.h>
 
 #include <Library/PeiServicesLib.h>
@@ -23,15 +24,6 @@
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/BaseMemoryLib.h>
-
-
-GLOBAL_REMOVE_IF_UNREFERENCED CONST EFI_PEI_PPI_DESCRIPTOR     mPpiListTemplate[] = {
-  {
-    (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
-    &gEfiPeiFirmwareVolumeInfoPpiGuid,
-    NULL
-  }
-};
 
 /**
   This service enables a given PEIM to register an interface into the PEI Foundation.
@@ -310,6 +302,36 @@ PeiServicesFfsFindSectionData (
 }
 
 /**
+  This service enables PEIMs to discover sections of a given instance and type within a valid FFS file.
+
+  @param  SectionType           The value of the section type to find.
+  @param  SectionInstance       Section instance to find.
+  @param  FileHandle            A pointer to the file header that contains the set 
+                                of sections to be searched.
+  @param  SectionData           A pointer to the discovered section, if successful.
+  @param  AuthenticationStatus  A pointer to the authentication status for this section.
+
+  @retval EFI_SUCCESS           The section was found.
+  @retval EFI_NOT_FOUND         The section was not found.
+
+**/
+EFI_STATUS
+EFIAPI
+PeiServicesFfsFindSectionData3 (
+  IN EFI_SECTION_TYPE           SectionType,
+  IN UINTN                      SectionInstance,
+  IN EFI_PEI_FILE_HANDLE        FileHandle,
+  OUT VOID                      **SectionData,
+  OUT UINT32                    *AuthenticationStatus
+  )
+{
+  CONST EFI_PEI_SERVICES **PeiServices;
+
+  PeiServices = GetPeiServicesTablePointer ();
+  return (*PeiServices)->FindSectionData3 (PeiServices, SectionType, SectionInstance, FileHandle, SectionData, AuthenticationStatus);
+}
+
+/**
   This service enables PEIMs to register the permanent memory configuration
   that has been initialized with the PEI Foundation.
 
@@ -459,6 +481,30 @@ PeiServicesFfsGetFileInfo (
   return (*GetPeiServicesTablePointer())->FfsGetFileInfo (FileHandle, FileInfo);
 }
 
+/**
+  This service is a wrapper for the PEI Service FfsGetFileInfo2(), except the pointer to the PEI Services
+  Table has been removed. See the Platform Initialization Pre-EFI Initialization Core Interface
+  Specification for details.
+
+  @param FileHandle               The handle of the file.
+  @param FileInfo                 Upon exit, points to the file's
+                                  information.
+
+  @retval EFI_SUCCESS             File information returned.
+  @retval EFI_INVALID_PARAMETER   If FileHandle does not
+                                  represent a valid file.
+  @retval EFI_INVALID_PARAMETER   FileInfo is NULL.
+
+**/
+EFI_STATUS
+EFIAPI
+PeiServicesFfsGetFileInfo2 (
+  IN CONST  EFI_PEI_FILE_HANDLE   FileHandle,
+  OUT EFI_FV_FILE_INFO2           *FileInfo
+  )
+{
+  return (*GetPeiServicesTablePointer())->FfsGetFileInfo2 (FileHandle, FileInfo);
+}
 
 /**
   This service is a wrapper for the PEI Service FfsFindByName(), except the pointer to the PEI Services 
@@ -522,43 +568,46 @@ PeiServicesFfsGetVolumeInfo (
 }
 
 /**
-  Install a EFI_PEI_FIRMWARE_VOLUME_INFO_PPI instance so the PEI Core will be notified about a new firmware volume.
-  
-  This function allocates, initializes, and installs a new EFI_PEI_FIRMWARE_VOLUME_INFO_PPI using 
-  the parameters passed in to initialize the fields of the EFI_PEI_FIRMWARE_VOLUME_INFO_PPI instance.
-  If the resources can not be allocated for EFI_PEI_FIRMWARE_VOLUME_INFO_PPI, then ASSERT().
-  If the EFI_PEI_FIRMWARE_VOLUME_INFO_PPI can not be installed, then ASSERT().
+  Install a EFI_PEI_FIRMWARE_VOLUME_INFO(2)_PPI instance so the PEI Core will be notified about a new firmware volume.
 
-  
-  @param  FvFormat             Unique identifier of the format of the memory-mapped 
-                               firmware volume.  This parameter is optional and 
-                               may be NULL.  If NULL is specified, the 
+  This function allocates, initializes, and installs a new EFI_PEI_FIRMWARE_VOLUME_INFO(2)_PPI using
+  the parameters passed in to initialize the fields of the EFI_PEI_FIRMWARE_VOLUME_INFO(2)_PPI instance.
+  If the resources can not be allocated for EFI_PEI_FIRMWARE_VOLUME_INFO(2)_PPI, then ASSERT().
+  If the EFI_PEI_FIRMWARE_VOLUME_INFO(2)_PPI can not be installed, then ASSERT().
+
+  @param  InstallFvInfoPpi     Install FvInfo Ppi if it is TRUE. Otherwise, install FvInfo2 Ppi.
+  @param  FvFormat             Unique identifier of the format of the memory-mapped
+                               firmware volume.  This parameter is optional and
+                               may be NULL.  If NULL is specified, the
                                EFI_FIRMWARE_FILE_SYSTEM2_GUID format is assumed.
-  @param  FvInfo               Points to a buffer which allows the 
-                               EFI_PEI_FIRMWARE_VOLUME_PPI to process the volume. 
-                               The format of this buffer is specific to the FvFormat. 
-                               For memory-mapped firmware volumes, this typically 
+  @param  FvInfo               Points to a buffer which allows the
+                               EFI_PEI_FIRMWARE_VOLUME_PPI to process the volume.
+                               The format of this buffer is specific to the FvFormat.
+                               For memory-mapped firmware volumes, this typically
                                points to the first byte of the firmware volume.
-  @param  FvInfoSize           The size, in bytes, of FvInfo. For memory-mapped 
-                               firmware volumes, this is typically the size of 
+  @param  FvInfoSize           The size, in bytes, of FvInfo. For memory-mapped
+                               firmware volumes, this is typically the size of
                                the firmware volume.
-  @param  ParentFvName         If the new firmware volume originated from a file 
-                               in a different firmware volume, then this parameter 
+  @param  ParentFvName         If the new firmware volume originated from a file
+                               in a different firmware volume, then this parameter
                                specifies the GUID name of the originating firmware
                                volume. Otherwise, this parameter must be NULL.
-  @param  ParentFileName       If the new firmware volume originated from a file 
-                               in a different firmware volume, then this parameter 
-                               specifies the GUID file name of the originating 
+  @param  ParentFileName       If the new firmware volume originated from a file
+                               in a different firmware volume, then this parameter
+                               specifies the GUID file name of the originating
                                firmware file. Otherwise, this parameter must be NULL.
+  @param  AuthenticationStatus Authentication Status, it will be ignored if InstallFvInfoPpi is TRUE.
 **/
 VOID
 EFIAPI
-PeiServicesInstallFvInfoPpi (
+InternalPeiServicesInstallFvInfoPpi (
+  IN       BOOLEAN                 InstallFvInfoPpi,
   IN CONST EFI_GUID                *FvFormat, OPTIONAL
   IN CONST VOID                    *FvInfo,
   IN       UINT32                  FvInfoSize,
   IN CONST EFI_GUID                *ParentFvName, OPTIONAL
-  IN CONST EFI_GUID                *ParentFileName OPTIONAL
+  IN CONST EFI_GUID                *ParentFileName, OPTIONAL
+  IN       UINT32                  AuthenticationStatus
   )
 {
   EFI_STATUS                       Status;   
@@ -566,11 +615,24 @@ PeiServicesInstallFvInfoPpi (
   EFI_PEI_PPI_DESCRIPTOR           *FvInfoPpiDescriptor;
   EFI_GUID                         *ParentFvNameValue;
   EFI_GUID                         *ParentFileNameValue;
+  EFI_GUID                         *PpiGuid;
 
   ParentFvNameValue   = NULL;
   ParentFileNameValue = NULL;
-  FvInfoPpi = AllocateZeroPool (sizeof (EFI_PEI_FIRMWARE_VOLUME_INFO_PPI));
-  ASSERT(FvInfoPpi != NULL);
+  if (InstallFvInfoPpi) {
+    //
+    // To install FvInfo Ppi.
+    //
+    FvInfoPpi = AllocateZeroPool (sizeof (EFI_PEI_FIRMWARE_VOLUME_INFO_PPI));
+    PpiGuid = &gEfiPeiFirmwareVolumeInfoPpiGuid;
+  } else {
+    //
+    // To install FvInfo2 Ppi.
+    //
+    FvInfoPpi = AllocateZeroPool (sizeof (EFI_PEI_FIRMWARE_VOLUME_INFO2_PPI));
+    ((EFI_PEI_FIRMWARE_VOLUME_INFO2_PPI *) FvInfoPpi)->AuthenticationStatus = AuthenticationStatus;
+    PpiGuid = &gEfiPeiFirmwareVolumeInfo2PpiGuid;
+  }
 
   if (FvFormat != NULL) {
     CopyGuid (&FvInfoPpi->FvFormat, FvFormat);
@@ -590,12 +652,100 @@ PeiServicesInstallFvInfoPpi (
     FvInfoPpi->ParentFileName = ParentFileNameValue;
   }
 
-  FvInfoPpiDescriptor = AllocateCopyPool (sizeof(EFI_PEI_PPI_DESCRIPTOR), mPpiListTemplate);
+  FvInfoPpiDescriptor = AllocatePool (sizeof (EFI_PEI_PPI_DESCRIPTOR));
   ASSERT (FvInfoPpiDescriptor != NULL);
 
+  FvInfoPpiDescriptor->Guid  = PpiGuid;
+  FvInfoPpiDescriptor->Flags = EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
   FvInfoPpiDescriptor->Ppi   = (VOID *) FvInfoPpi;
   Status = PeiServicesInstallPpi (FvInfoPpiDescriptor);
   ASSERT_EFI_ERROR (Status);
 
+}
+
+/**
+  Install a EFI_PEI_FIRMWARE_VOLUME_INFO_PPI instance so the PEI Core will be notified about a new firmware volume.
+
+  This function allocates, initializes, and installs a new EFI_PEI_FIRMWARE_VOLUME_INFO_PPI using
+  the parameters passed in to initialize the fields of the EFI_PEI_FIRMWARE_VOLUME_INFO_PPI instance.
+  If the resources can not be allocated for EFI_PEI_FIRMWARE_VOLUME_INFO_PPI, then ASSERT().
+  If the EFI_PEI_FIRMWARE_VOLUME_INFO_PPI can not be installed, then ASSERT().
+
+  @param  FvFormat             Unique identifier of the format of the memory-mapped
+                               firmware volume.  This parameter is optional and
+                               may be NULL.  If NULL is specified, the
+                               EFI_FIRMWARE_FILE_SYSTEM2_GUID format is assumed.
+  @param  FvInfo               Points to a buffer which allows the
+                               EFI_PEI_FIRMWARE_VOLUME_PPI to process the volume.
+                               The format of this buffer is specific to the FvFormat.
+                               For memory-mapped firmware volumes, this typically
+                               points to the first byte of the firmware volume.
+  @param  FvInfoSize           The size, in bytes, of FvInfo. For memory-mapped
+                               firmware volumes, this is typically the size of
+                               the firmware volume.
+  @param  ParentFvName         If the new firmware volume originated from a file
+                               in a different firmware volume, then this parameter
+                               specifies the GUID name of the originating firmware
+                               volume. Otherwise, this parameter must be NULL.
+  @param  ParentFileName       If the new firmware volume originated from a file
+                               in a different firmware volume, then this parameter
+                               specifies the GUID file name of the originating
+                               firmware file. Otherwise, this parameter must be NULL.
+**/
+VOID
+EFIAPI
+PeiServicesInstallFvInfoPpi (
+  IN CONST EFI_GUID                *FvFormat, OPTIONAL
+  IN CONST VOID                    *FvInfo,
+  IN       UINT32                  FvInfoSize,
+  IN CONST EFI_GUID                *ParentFvName, OPTIONAL
+  IN CONST EFI_GUID                *ParentFileName OPTIONAL
+  )
+{
+  InternalPeiServicesInstallFvInfoPpi (TRUE, FvFormat, FvInfo, FvInfoSize, ParentFvName, ParentFileName, 0);
+}
+
+/**
+  Install a EFI_PEI_FIRMWARE_VOLUME_INFO2_PPI instance so the PEI Core will be notified about a new firmware volume.
+
+  This function allocates, initializes, and installs a new EFI_PEI_FIRMWARE_VOLUME_INFO2_PPI using
+  the parameters passed in to initialize the fields of the EFI_PEI_FIRMWARE_VOLUME_INFO2_PPI instance.
+  If the resources can not be allocated for EFI_PEI_FIRMWARE_VOLUME_INFO2_PPI, then ASSERT().
+  If the EFI_PEI_FIRMWARE_VOLUME_INFO2_PPI can not be installed, then ASSERT().
+
+  @param  FvFormat             Unique identifier of the format of the memory-mapped
+                               firmware volume.  This parameter is optional and
+                               may be NULL.  If NULL is specified, the
+                               EFI_FIRMWARE_FILE_SYSTEM2_GUID format is assumed.
+  @param  FvInfo               Points to a buffer which allows the
+                               EFI_PEI_FIRMWARE_VOLUME_PPI to process the volume.
+                               The format of this buffer is specific to the FvFormat.
+                               For memory-mapped firmware volumes, this typically
+                               points to the first byte of the firmware volume.
+  @param  FvInfoSize           The size, in bytes, of FvInfo. For memory-mapped
+                               firmware volumes, this is typically the size of
+                               the firmware volume.
+  @param  ParentFvName         If the new firmware volume originated from a file
+                               in a different firmware volume, then this parameter
+                               specifies the GUID name of the originating firmware
+                               volume. Otherwise, this parameter must be NULL.
+  @param  ParentFileName       If the new firmware volume originated from a file
+                               in a different firmware volume, then this parameter
+                               specifies the GUID file name of the originating
+                               firmware file. Otherwise, this parameter must be NULL.
+  @param  AuthenticationStatus Authentication Status
+**/
+VOID
+EFIAPI
+PeiServicesInstallFvInfo2Ppi (
+  IN CONST EFI_GUID                *FvFormat, OPTIONAL
+  IN CONST VOID                    *FvInfo,
+  IN       UINT32                  FvInfoSize,
+  IN CONST EFI_GUID                *ParentFvName, OPTIONAL
+  IN CONST EFI_GUID                *ParentFileName, OPTIONAL
+  IN       UINT32                  AuthenticationStatus
+  )
+{
+  InternalPeiServicesInstallFvInfoPpi (FALSE, FvFormat, FvInfo, FvInfoSize, ParentFvName, ParentFileName, AuthenticationStatus);
 }
 
