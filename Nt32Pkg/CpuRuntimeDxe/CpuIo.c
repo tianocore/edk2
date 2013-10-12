@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -326,11 +326,11 @@ Returns:
   }
 
   Width = (EFI_CPU_IO_PROTOCOL_WIDTH)(Width & 0x03);
-  if (Address - 1 + (1 << Width) * Count > Limit) {
+  if (Address - 1 + ((UINTN)1 << Width) * Count > Limit) {
     return EFI_UNSUPPORTED;
   }
 
-  AlignMask = (1 << Width) - 1;
+  AlignMask = ((UINTN)1 << Width) - 1;
   if ((UINTN) Buffer & AlignMask) {
     return EFI_UNSUPPORTED;
   }

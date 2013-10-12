@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -379,7 +379,7 @@ WinNtGopSetMode (
     //
     // Adjust the window size
     //
-    Private->WinNtThunk->MoveWindow (Private->WindowHandle, Rect.left, Rect.top, Width, Height, TRUE);
+    Private->WinNtThunk->MoveWindow (Private->WindowHandle, Rect.left, Rect.top, (INT32)Width, (INT32)Height, TRUE);
 
   }
 
@@ -582,10 +582,10 @@ WinNtGopBlt (
     //
     // Mark the area we just blted as Invalid so WM_PAINT will update.
     //
-    Rect.left   = DestinationX;
-    Rect.top    = DestinationY;
-    Rect.right  = DestinationX + Width;
-    Rect.bottom = DestinationY + Height;
+    Rect.left   = (LONG)DestinationX;
+    Rect.top    = (LONG)DestinationY;
+    Rect.right  = (LONG)(DestinationX + Width);
+    Rect.bottom = (LONG)(DestinationY + Height);
     Private->WinNtThunk->InvalidateRect (Private->WindowHandle, &Rect, FALSE);
 
     //
@@ -900,7 +900,7 @@ WinNtGopThreadWinMain (
   Private->WindowsClass.hInstance     = NULL;
   Private->WindowsClass.hIcon         = Private->WinNtThunk->LoadIcon (NULL, IDI_APPLICATION);
   Private->WindowsClass.hCursor       = Private->WinNtThunk->LoadCursor (NULL, IDC_ARROW);
-  Private->WindowsClass.hbrBackground = (HBRUSH) COLOR_WINDOW;
+  Private->WindowsClass.hbrBackground = (HBRUSH)(UINTN)COLOR_WINDOW;
   Private->WindowsClass.lpszMenuName  = NULL;
   Private->WindowsClass.lpszClassName = WIN_NT_GOP_CLASS_NAME;
   Private->WindowsClass.hIconSm       = Private->WinNtThunk->LoadIcon (NULL, IDI_APPLICATION);
@@ -963,7 +963,7 @@ WinNtGopThreadWinMain (
     Private->WinNtThunk->DispatchMessage (&Message);
   }
 
-  return Message.wParam;
+  return (DWORD)Message.wParam;
 }
 
 

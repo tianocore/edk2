@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -34,9 +34,11 @@ Abstract:
 #define GUID  _WINNT_DUP_GUID_____
 #define _LIST_ENTRY  _WINNT_DUP_LIST_ENTRY_FORWARD
 #define LIST_ENTRY   _WINNT_DUP_LIST_ENTRY
+#if defined (MDE_CPU_IA32)
 #define InterlockedIncrement _WINNT_DUP_InterlockedIncrement
 #define InterlockedDecrement _WINNT_DUP_InterlockedDecrement
 #define InterlockedCompareExchange64 _WINNT_DUP_InterlockedCompareExchange64
+#endif
 #undef UNALIGNED
 #undef CONST
 #undef VOID
@@ -45,7 +47,9 @@ Abstract:
 // WQBugBug: This typedef is to make "windows.h" buildable.
 //                   It should be removed after the root cause why
 //                   size_t is undefined when go into the line below is found.
+#if defined (MDE_CPU_IA32)
 typedef UINT32 size_t ;
+#endif
 
 #include "windows.h"
 

@@ -529,7 +529,7 @@ Returns:
   BlockIo = &Private->BlockIo;
   BlockIo->Revision = EFI_BLOCK_IO_PROTOCOL_REVISION;
   BlockIo->Media = &Private->Media;
-  BlockIo->Media->BlockSize = Private->BlockSize;
+  BlockIo->Media->BlockSize = (UINT32)Private->BlockSize;
   BlockIo->Media->LastBlock = Private->NumberOfBlocks - 1;
   BlockIo->Media->MediaId = 0;;
 
@@ -626,10 +626,10 @@ Returns:
   //
   Private->NtHandle = Private->WinNtThunk->CreateFile (
                                             Private->Filename,
-                                            Private->ReadMode,
-                                            Private->ShareMode,
+                                            (DWORD)Private->ReadMode,
+                                            (DWORD)Private->ShareMode,
                                             NULL,
-                                            Private->OpenMode,
+                                            (DWORD)Private->OpenMode,
                                             0,
                                             NULL
                                             );
@@ -658,7 +658,7 @@ Returns:
   Status = SetFilePointer64 (Private, 0, &FileSize, FILE_END);
 
   if (EFI_ERROR (Status)) {
-    FileSize = MultU64x32 (Private->NumberOfBlocks, Private->BlockSize);
+    FileSize = MultU64x32 (Private->NumberOfBlocks, (UINT32)Private->BlockSize);
     if (Private->DeviceType == EfiWinNtVirtualDisks) {
       DEBUG ((EFI_D_ERROR, "PlOpenBlock: Could not get filesize of %s\n", Private->Filename));
       Status = EFI_UNSUPPORTED;
@@ -667,10 +667,10 @@ Returns:
   }
 
   if (Private->NumberOfBlocks == 0) {
-    Private->NumberOfBlocks = DivU64x32 (FileSize, Private->BlockSize);
+    Private->NumberOfBlocks = DivU64x32 (FileSize, (UINT32)Private->BlockSize);
   }
 
-  EndOfFile = MultU64x32 (Private->NumberOfBlocks, Private->BlockSize);
+  EndOfFile = MultU64x32 (Private->NumberOfBlocks, (UINT32)Private->BlockSize);
 
   if (FileSize != EndOfFile) {
     //
@@ -832,7 +832,7 @@ Returns:
     return EFI_MEDIA_CHANGED;
   }
 
-  if ((UINT32) Buffer % Private->Media.IoAlign != 0) {
+  if ((UINTN) Buffer % Private->Media.IoAlign != 0) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -858,7 +858,7 @@ Returns:
   //
   // Seek to End of File
   //
-  DistanceToMove = MultU64x32 (Lba, BlockSize);
+  DistanceToMove = MultU64x32 (Lba, (UINT32)BlockSize);
   Status = SetFilePointer64 (Private, DistanceToMove, &DistanceMoved, FILE_BEGIN);
 
   if (EFI_ERROR (Status)) {

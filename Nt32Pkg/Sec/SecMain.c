@@ -110,6 +110,16 @@ SecNt32PeCoffRelocateImage (
   );
 
 VOID
+EFIAPI
+PeiSwitchStacks (
+  IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
+  IN      VOID                      *Context1,  OPTIONAL
+  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *Context3,  OPTIONAL
+  IN      VOID                      *NewStack
+  );
+
+VOID
 SecPrint (
   CHAR8  *Format,
   ...
@@ -129,7 +139,7 @@ SecPrint (
   WriteFile (
     GetStdHandle (STD_OUTPUT_HANDLE), 
     Buffer,
-    CharCount,
+    (DWORD)CharCount,
     (LPDWORD)&CharCount,
     NULL
     );
@@ -505,6 +515,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
+#if defined (MDE_CPU_IA32)
 /**
   Transfers control to a function starting with a new stack.
 
@@ -562,6 +573,7 @@ PeiSwitchStacks (
   //
   ASSERT (FALSE);  
 }
+#endif
 
 VOID
 SecLoadFromCore (

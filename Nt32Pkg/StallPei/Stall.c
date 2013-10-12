@@ -1,7 +1,7 @@
 /**@file
   EFI_PEI_STALL implementation for NT32 simulation environment.
   
-Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -100,7 +100,7 @@ Stall (
   // so micro second units need be divided by 1000 to convert to ms
   //
   NtThunk = (EFI_WIN_NT_THUNK_PROTOCOL*) PeiNtService->NtThunk();
-  NtThunk->Sleep ((Microseconds + 999) / 1000); 
+  NtThunk->Sleep ((DWORD)((Microseconds + 999) / 1000)); 
   
   return EFI_SUCCESS;
 }

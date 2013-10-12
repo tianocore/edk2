@@ -31,7 +31,12 @@
   WinNtThunk.c
   FwVol.c
   SecMain.c
+
+[Sources.ia32]
   Stack.asm
+
+[Sources.x64]
+  StackX64.asm
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -67,6 +72,12 @@
   MSFT:*_*_IA32_PP_FLAGS == /nologo /E /TC /FIAutoGen.h
   MSFT:*_*_IA32_ASM_FLAGS == /nologo /W3 /WX /c /coff /Cx /Zd /W0 /Zi
   MSFT:*_*_IA32_ASMLINK_FLAGS       == /link /nologo /tiny
+
+  MSFT:*_*_X64_DLINK_FLAGS == /out:"$(BIN_DIR)\SecMain.exe" /base:0x10000000 /pdb:"$(BIN_DIR)\SecMain.pdb" /LIBPATH:"$(VCINSTALLDIR)\Lib\AMD64" /LIBPATH:"$(VCINSTALLDIR)\PlatformSdk\Lib\AMD64" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:AMD64 /LTCG Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib
+  MSFT:*_*_X64_CC_FLAGS == /nologo /W4 /WX /Gy /c /D UNICODE /Od /FIAutoGen.h /EHs-c- /GF /Gs8192 /Zi /Gm /D _CRT_SECURE_NO_WARNINGS /D _CRT_SECURE_NO_DEPRECATE
+  MSFT:*_*_X64_PP_FLAGS == /nologo /E /TC /FIAutoGen.h
+  MSFT:*_*_X64_ASM_FLAGS == /nologo /W3 /WX /c /Cx /Zd /W0 /Zi
+  MSFT:*_*_X64_ASMLINK_FLAGS       == /link /nologo
 
   INTEL:*_*_IA32_DLINK_FLAGS == /out:"$(BIN_DIR)\SecMain.exe" /base:0x10000000 /pdb:"$(BIN_DIR)\SecMain.pdb" /LIBPATH:"C:\Program Files\Intel\Compiler\C++\9.1\IA32\Lib" /LIBPATH:"$(VCINSTALLDIR)\Lib" /LIBPATH:"$(VCINSTALLDIR)\PlatformSdk\Lib" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:I386 /LTCG Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib
   INTEL:*_*_IA32_CC_FLAGS == /nologo /W4 /WX /Gy /c /D UNICODE /Od /FIAutoGen.h /EHs-c- /GF /Gs8192 /Zi /Gm /D _CRT_SECURE_NO_WARNINGS /D _CRT_SECURE_NO_DEPRECATE

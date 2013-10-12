@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -704,7 +704,7 @@ SnpNt32ReceiveFilters (
   ReturnValue = GlobalData->NtNetUtilityTable.SetReceiveFilter (
                                                 Instance->InterfaceInfo.InterfaceIndex,
                                                 EnableBits,
-                                                McastFilterCount,
+                                                (UINT32)McastFilterCount,
                                                 McastFilter
                                                 );
 
@@ -863,7 +863,7 @@ SnpNt32GetStatus (
 {
 
   if (TxBuffer != NULL) {
-    *((UINT8 **) TxBuffer) = (UINT8 *) 1;
+    *((UINT8 **) TxBuffer) = (UINT8 *)(UINTN) 1;
   }
 
   if (InterruptStatus != NULL) {
@@ -933,8 +933,8 @@ SnpNt32Transmit (
 
   ReturnValue = GlobalData->NtNetUtilityTable.Transmit (
                                                 Instance->InterfaceInfo.InterfaceIndex,
-                                                HeaderSize,
-                                                BufferSize,
+                                                (UINT32)HeaderSize,
+                                                (UINT32)BufferSize,
                                                 Buffer,
                                                 SrcAddr,
                                                 DestAddr,
@@ -1189,7 +1189,7 @@ SnpNt32InitializeGlobalData (
     //
     //  Set the interface information.
     //
-    Instance->InterfaceInfo = NetInterfaceInfoBuffer[Index];
+    CopyMem (&Instance->InterfaceInfo, &NetInterfaceInfoBuffer[Index], sizeof(Instance->InterfaceInfo));
     //
     //  Initialize this instance
     //
@@ -1265,8 +1265,8 @@ SnpNt32InitializeInstanceData (
   //
   //  Copy Current/PermanentAddress MAC address
   //
-  Instance->Mode.CurrentAddress   = Instance->InterfaceInfo.MacAddr;
-  Instance->Mode.PermanentAddress = Instance->InterfaceInfo.MacAddr;
+  CopyMem (&Instance->Mode.CurrentAddress, &Instance->InterfaceInfo.MacAddr, sizeof(Instance->Mode.CurrentAddress));
+  CopyMem (&Instance->Mode.PermanentAddress, &Instance->InterfaceInfo.MacAddr, sizeof(Instance->Mode.PermanentAddress));
 
   //
   //  Since the fake SNP is based on a real NIC, to avoid conflict with the host

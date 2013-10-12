@@ -950,7 +950,7 @@ Returns:
     //
     // Check input parameters
     //
-    if (NumOfLba == 0 || (StartingLba + NumOfLba) > NumOfBlocks) {
+    if ((NumOfLba == 0) || ((StartingLba + NumOfLba) > NumOfBlocks)) {
       VA_END (args);
       return EFI_INVALID_PARAMETER;
     }
