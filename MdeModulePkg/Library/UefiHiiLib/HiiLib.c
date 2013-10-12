@@ -3284,7 +3284,8 @@ HiiCreateGotoExOpCode (
   @param[in]  OpCodeHandle          Handle to the buffer of opcodes.
   @param[in]  QuestionId            Question ID
   @param[in]  VarStoreId            Storage ID
-  @param[in]  VarOffset             Offset in Storage
+  @param[in]  VarOffset             Offset in Storage or String ID of the name (VarName)
+                                    for this name/value pair.
   @param[in]  Prompt                String ID for Prompt
   @param[in]  Help                  String ID for Help
   @param[in]  QuestionFlags         Flags in Question Header
@@ -3345,7 +3346,8 @@ HiiCreateCheckBoxOpCode (
   @param[in]  OpCodeHandle          Handle to the buffer of opcodes.
   @param[in]  QuestionId            Question ID
   @param[in]  VarStoreId            Storage ID
-  @param[in]  VarOffset             Offset in Storage
+  @param[in]  VarOffset             Offset in Storage or String ID of the name (VarName)
+                                    for this name/value pair.
   @param[in]  Prompt                String ID for Prompt
   @param[in]  Help                  String ID for Help
   @param[in]  QuestionFlags         Flags in Question Header
@@ -3446,7 +3448,8 @@ HiiCreateNumericOpCode (
   @param[in]  OpCodeHandle          Handle to the buffer of opcodes.
   @param[in]  QuestionId            Question ID
   @param[in]  VarStoreId            Storage ID
-  @param[in]  VarOffset             Offset in Storage
+  @param[in]  VarOffset             Offset in Storage or String ID of the name (VarName)
+                                    for this name/value pair.
   @param[in]  Prompt                String ID for Prompt
   @param[in]  Help                  String ID for Help
   @param[in]  QuestionFlags         Flags in Question Header
@@ -3513,7 +3516,8 @@ HiiCreateStringOpCode (
   @param[in]  OpCodeHandle          Handle to the buffer of opcodes.
   @param[in]  QuestionId            Question ID
   @param[in]  VarStoreId            Storage ID
-  @param[in]  VarOffset             Offset in Storage
+  @param[in]  VarOffset             Offset in Storage or String ID of the name (VarName)
+                                    for this name/value pair.
   @param[in]  Prompt                String ID for Prompt
   @param[in]  Help                  String ID for Help
   @param[in]  QuestionFlags         Flags in Question Header
@@ -3580,7 +3584,8 @@ HiiCreateOneOfOpCode (
   @param[in]  OpCodeHandle          Handle to the buffer of opcodes.
   @param[in]  QuestionId            Question ID
   @param[in]  VarStoreId            Storage ID
-  @param[in]  VarOffset             Offset in Storage
+  @param[in]  VarOffset             Offset in Storage or String ID of the name (VarName)
+                                    for this name/value pair.
   @param[in]  Prompt                String ID for Prompt
   @param[in]  Help                  String ID for Help
   @param[in]  QuestionFlags         Flags in Question Header
@@ -3682,7 +3687,8 @@ HiiCreateTextOpCode (
   @param[in]  QuestionId            Question ID
   @param[in]  VarStoreId            Storage ID, optional. If DateFlags is not
                                     QF_DATE_STORAGE_NORMAL, this parameter is ignored.
-  @param[in]  VarOffset             Offset in Storage, optional. If DateFlags is not
+  @param[in]  VarOffset             Offset in Storage or String ID of the name (VarName)
+                                    for this name/value pair, optional. If DateFlags is not
                                     QF_DATE_STORAGE_NORMAL, this parameter is ignored.
   @param[in]  Prompt                String ID for Prompt
   @param[in]  Help                  String ID for Help
@@ -3746,7 +3752,8 @@ HiiCreateDateOpCode (
   @param[in]  QuestionId            Question ID
   @param[in]  VarStoreId            Storage ID, optional. If TimeFlags is not
                                     QF_TIME_STORAGE_NORMAL, this parameter is ignored.
-  @param[in]  VarOffset             Offset in Storage, optional. If TimeFlags is not
+  @param[in]  VarOffset             Offset in Storage or String ID of the name (VarName)
+                                    for this name/value pair, optional. If TimeFlags is not
                                     QF_TIME_STORAGE_NORMAL, this parameter is ignored.
   @param[in]  Prompt                String ID for Prompt
   @param[in]  Help                  String ID for Help
