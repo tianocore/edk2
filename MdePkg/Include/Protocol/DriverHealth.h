@@ -20,7 +20,7 @@
   may then need to be reconnected or the system may need to be rebooted for the 
   configuration changes to take affect. 
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -74,20 +74,10 @@ typedef struct {
   @param[in]  Limit             The maximum value of Value for the current repair operation.
                                 For example, a driver that wants to specify progress in 
                                 percent would use a Limit value of 100.
-  
-  @retval EFI_SUCCESS           An attempt to repair the controller specified by
-                                ControllerHandle and ChildHandle was performed. The
-                                result of the repair operation can bet determined by
-                                calling GetHealthStatus().
-  @retval EFI_UNSUPPORTED       The driver specified by This is not currently managing the
-                                controller specified by ControllerHandle and
-                                ChildHandle.
-  @retval EFI_OUT_OF_RESOURCES  There are not enough resources to perform the repair operation.
-
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_DRIVER_HEALTH_REPAIR_PROGRESS_NOTIFY)(
+(EFIAPI *EFI_DRIVER_HEALTH_REPAIR_NOTIFY)(
   IN UINTN  Value,
   IN UINTN  Limit
   );
@@ -193,17 +183,17 @@ EFI_STATUS
   Performs a repair operation on a controller in the platform.  This function can 
   optionally report repair progress information back to the platform. 
   
-  @param[in] This                  A pointer to the EFI_DRIVER_HEALTH_PROTOCOL instance.
-  @param[in] ControllerHandle      The handle of the controller to repair.
-  @param[in] ChildHandle           The handle of the child controller to repair.  This is 
-                                   an optional parameter that may be NULL.  It will be NULL 
-                                   for device drivers.  It will also be NULL for bus 
-                                   drivers when an attempt is made to repair a bus controller.
-                                   If will not be NULL when an attempt is made to repair a 
-                                   child controller produced by the driver.
-  @param[in] ProgressNotification  A notification function that may be used by a driver to 
-                                   report the progress of the repair operation.  This is 
-                                   an optional parameter that may be NULL.  
+  @param[in] This              A pointer to the EFI_DRIVER_HEALTH_PROTOCOL instance.
+  @param[in] ControllerHandle  The handle of the controller to repair.
+  @param[in] ChildHandle       The handle of the child controller to repair.  This is 
+                               an optional parameter that may be NULL.  It will be NULL 
+                               for device drivers.  It will also be NULL for bus 
+                               drivers when an attempt is made to repair a bus controller.
+                               If will not be NULL when an attempt is made to repair a 
+                               child controller produced by the driver.
+  @param[in] RepairNotify      A notification function that may be used by a driver to 
+                               report the progress of the repair operation.  This is 
+                               an optional parameter that may be NULL.  
 
 
   @retval EFI_SUCCESS           An attempt to repair the controller specified by 
@@ -222,8 +212,8 @@ EFI_STATUS
 (EFIAPI *EFI_DRIVER_HEALTH_REPAIR)(
   IN  EFI_DRIVER_HEALTH_PROTOCOL                *This,
   IN  EFI_HANDLE                                ControllerHandle,
-  IN  EFI_HANDLE                                ChildHandle          OPTIONAL,
-  IN  EFI_DRIVER_HEALTH_REPAIR_PROGRESS_NOTIFY  ProgressNotification OPTIONAL
+  IN  EFI_HANDLE                                ChildHandle       OPTIONAL,
+  IN  EFI_DRIVER_HEALTH_REPAIR_NOTIFY           RepairNotify      OPTIONAL
   );
 
 ///

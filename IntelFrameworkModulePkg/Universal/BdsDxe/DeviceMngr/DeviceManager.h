@@ -1,7 +1,7 @@
 /** @file
   The platform device manager reference implement
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -313,13 +313,20 @@ ProcessSingleControllerHealth (
   );
 
 /**
-  Repair notification function, simply print the repair progress.
+  Reports the progress of a repair operation.
 
-  @param  Value   The value of part has been repaired.
-  @param  Limit   Total value need to be repaired.
+  @param[in]  Value             A value between 0 and Limit that identifies the current 
+                                progress of the repair operation.
+
+  @param[in]  Limit             The maximum value of Value for the current repair operation.
+                                For example, a driver that wants to specify progress in 
+                                percent would use a Limit value of 100.
+
+  @retval EFI_SUCCESS           The progress of a repair operation is reported successfully.
 
 **/
-VOID
+EFI_STATUS
+EFIAPI
 RepairNotify (
   IN  UINTN Value,
   IN  UINTN Limit
