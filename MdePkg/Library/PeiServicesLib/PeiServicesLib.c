@@ -624,12 +624,14 @@ InternalPeiServicesInstallFvInfoPpi (
     // To install FvInfo Ppi.
     //
     FvInfoPpi = AllocateZeroPool (sizeof (EFI_PEI_FIRMWARE_VOLUME_INFO_PPI));
+    ASSERT (FvInfoPpi != NULL);
     PpiGuid = &gEfiPeiFirmwareVolumeInfoPpiGuid;
   } else {
     //
     // To install FvInfo2 Ppi.
     //
     FvInfoPpi = AllocateZeroPool (sizeof (EFI_PEI_FIRMWARE_VOLUME_INFO2_PPI));
+    ASSERT (FvInfoPpi != NULL);
     ((EFI_PEI_FIRMWARE_VOLUME_INFO2_PPI *) FvInfoPpi)->AuthenticationStatus = AuthenticationStatus;
     PpiGuid = &gEfiPeiFirmwareVolumeInfo2PpiGuid;
   }
