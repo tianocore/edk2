@@ -265,7 +265,7 @@ GetMemoryRegionRec (
   BlockEntry = (UINT64*)TT_GET_ENTRY_FOR_ADDRESS (TranslationTable, TableLevel, *BaseAddress);
   EntryType = *BlockEntry & TT_TYPE_MASK;
 
-  if (EntryType == TT_TYPE_TABLE_ENTRY) {
+  if ((TableLevel < 3) && (EntryType == TT_TYPE_TABLE_ENTRY)) {
     NextTranslationTable = (UINT64*)(*BlockEntry & TT_ADDRESS_MASK_DESCRIPTION_TABLE);
 
     // The entry is a page table, so we go to the next level
