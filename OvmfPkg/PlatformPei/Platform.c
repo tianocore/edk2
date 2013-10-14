@@ -287,8 +287,9 @@ ReserveEmuVariableNvStore (
   //
   VariableStore =
     (EFI_PHYSICAL_ADDRESS)(UINTN)
-      AllocateRuntimePool (
-        2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize)
+      AllocateAlignedPages (
+        EFI_SIZE_TO_PAGES (2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize)),
+        PcdGet32 (PcdFlashNvStorageFtwSpareSize)
         );
   DEBUG ((EFI_D_INFO,
           "Reserved variable store memory: 0x%lX; size: %dkb\n",
