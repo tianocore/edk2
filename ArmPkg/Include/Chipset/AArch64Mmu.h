@@ -33,15 +33,15 @@
 // The first offset starts at 12bit. There are 4 levels of 9-bit address range from level 3 to level 0
 #define TT_ADDRESS_OFFSET_AT_LEVEL(TableLevel)  (12 + ((3 - (TableLevel)) * 9))
 
-#define TT_BLOCK_ENTRY_SIZE_AT_LEVEL(Level)     (1 << TT_ADDRESS_OFFSET_AT_LEVEL(Level))
+#define TT_BLOCK_ENTRY_SIZE_AT_LEVEL(Level)     (1ULL << TT_ADDRESS_OFFSET_AT_LEVEL(Level))
 
 // Get the associated entry in the given Translation Table
 #define TT_GET_ENTRY_FOR_ADDRESS(TranslationTable, Level, Address)  \
-    ((UINTN)(TranslationTable) + ((((Address) >> TT_ADDRESS_OFFSET_AT_LEVEL(Level)) & (BIT9-1)) * sizeof(UINT64)))
+    ((UINTN)(TranslationTable) + ((((UINTN)(Address) >> TT_ADDRESS_OFFSET_AT_LEVEL(Level)) & (BIT9-1)) * sizeof(UINT64)))
 
 // Return the smallest address granularity from the table level.
 // The first offset starts at 12bit. There are 4 levels of 9-bit address range from level 3 to level 0
-#define TT_ADDRESS_AT_LEVEL(TableLevel)       (1 << TT_ADDRESS_OFFSET_AT_LEVEL(TableLevel))
+#define TT_ADDRESS_AT_LEVEL(TableLevel)       (1ULL << TT_ADDRESS_OFFSET_AT_LEVEL(TableLevel))
 
 #define TT_LAST_BLOCK_ADDRESS(TranslationTable, EntryCount) \
     ((UINT64*)((EFI_PHYSICAL_ADDRESS)(TranslationTable) + (((EntryCount) - 1) * sizeof(UINT64))))
