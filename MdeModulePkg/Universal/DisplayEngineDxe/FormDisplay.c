@@ -259,7 +259,7 @@ GetPrompt (
 /**
   Get the supported width for a particular op-code
 
-  @param  Statement              The curent statement.
+  @param  MenuOption             The menu option.
   @param  AdjustWidth            The width which is saved for the space.
 
   @return Returns the number of CHAR16 characters that is support.
@@ -267,13 +267,17 @@ GetPrompt (
 **/
 UINT16
 GetWidth (
-  IN FORM_DISPLAY_ENGINE_STATEMENT        *Statement,
-  OUT UINT16                              *AdjustWidth
+  IN  UI_MENU_OPTION     *MenuOption,
+  OUT UINT16             *AdjustWidth
   )
 {
-  CHAR16       *String;
-  UINTN        Size;
-  EFI_IFR_TEXT *TestOp;
+  CHAR16                        *String;
+  UINTN                         Size;
+  EFI_IFR_TEXT                  *TestOp;
+  UINT16                        ReturnWidth;
+  FORM_DISPLAY_ENGINE_STATEMENT *Statement;
+
+  Statement = MenuOption->ThisTag;
 
   //
   // For modal form, clean the entire row.
@@ -319,13 +323,23 @@ GetWidth (
     //
     // Keep consistent with current behavior.
     //
-    return (UINT16) (gPromptBlockWidth + gOptionBlockWidth - 2);
+    ReturnWidth = (UINT16) (gPromptBlockWidth + gOptionBlockWidth - 2);
+  } else {
+    if (AdjustWidth != NULL) {
+      *AdjustWidth = 1;
+    }
+
+    ReturnWidth =  (UINT16) (gPromptBlockWidth - 1);
   }
 
-  if (AdjustWidth != NULL) {
-    *AdjustWidth = 1;
+  //
+  // For nest in statement, should the subtitle indent.
+  //
+  if (MenuOption->NestInStatement) {
+    ReturnWidth -= SUBTITLE_INDENT;
   }
-  return (UINT16) (gPromptBlockWidth - 1);
+
+  return ReturnWidth;
 }
 
 /**
@@ -539,24 +553,7 @@ UiAddMenuOption (
   String = GetToken (PromptId, gFormData->HiiHandle);
   ASSERT (String != NULL);
 
-  Width  = GetWidth (Statement, NULL);
-  for (; GetLineByWidth (String, Width, &GlyphWidth,&ArrayEntry, &OutputString) != 0x0000;) {
-    //
-    // If there is more string to process print on the next row and increment the Skip value
-    //
-    if (StrLen (&String[ArrayEntry]) != 0) {
-      NumberOfLines++;
-    }
-    FreePool (OutputString);
-  }
-
   if (Statement->OpCode->OpCode == EFI_IFR_DATE_OP || Statement->OpCode->OpCode == EFI_IFR_TIME_OP) {
-    //
-    // Add three MenuOptions for Date/Time
-    // Data format :      [01/02/2004]      [11:22:33]
-    // Line number :        0  0    1         0  0  1
-    //
-    NumberOfLines = 0;
     Count = 3;
   }
 
@@ -571,14 +568,6 @@ UiAddMenuOption (
     MenuOption->NestInStatement = NestIn;
     MenuOption->EntryNumber = *MenuItemCount;
 
-    if (Index == 2) {
-      //
-      // Override LineNumber for the MenuOption in Date/Time sequence
-      //
-      MenuOption->Skip = 1;
-    } else {
-      MenuOption->Skip = NumberOfLines;
-    }
     MenuOption->Sequence = Index;
 
     if ((Statement->Attribute & HII_DISPLAY_GRAYOUT) != 0) {
@@ -631,6 +620,37 @@ UiAddMenuOption (
       if (FeaturePcdGet (PcdBrowerGrayOutReadOnlyMenu)) {
         MenuOption->GrayOut = TRUE;
       }
+    }
+
+    if (Index == 0 && 
+      (Statement->OpCode->OpCode != EFI_IFR_DATE_OP) && 
+      (Statement->OpCode->OpCode != EFI_IFR_TIME_OP)) {
+      Width  = GetWidth (MenuOption, NULL);
+      for (; GetLineByWidth (String, Width, &GlyphWidth,&ArrayEntry, &OutputString) != 0x0000;) {
+        //
+        // If there is more string to process print on the next row and increment the Skip value
+        //
+        if (StrLen (&String[ArrayEntry]) != 0) {
+          NumberOfLines++;
+        }
+        FreePool (OutputString);
+      }
+    } else {
+      //
+      // Add three MenuOptions for Date/Time
+      // Data format :      [01/02/2004]      [11:22:33]
+      // Line number :        0  0    1         0  0  1
+      //    
+      NumberOfLines = 0;
+    }
+
+    if (Index == 2) {
+      //
+      // Override LineNumber for the MenuOption in Date/Time sequence
+      //
+      MenuOption->Skip = 1;
+    } else {
+      MenuOption->Skip = NumberOfLines;
     }
 
     InsertTailList (&gMenuOption, &MenuOption->Link);
@@ -1765,7 +1785,7 @@ DisplayOneMenu (
   //
   // 2. Paint the description.
   //
-  PromptWidth   = GetWidth (Statement, &AdjustValue);
+  PromptWidth   = GetWidth (MenuOption, &AdjustValue);
   Row           = MenuOption->Row;
   GlyphWidth    = 1;
   PromptLineNum = 0;
@@ -2077,7 +2097,7 @@ UiDisplayMenu (
 
           if ((FormData->Attribute & HII_DISPLAY_MODAL) != 0) {
             Status = DisplayOneMenu (MenuOption, 
-                            LEFT_SKIPPED_COLUMNS,
+                            MenuOption->Col - gStatementDimensions.LeftColumn,
                             gStatementDimensions.LeftColumn + gModalSkipColumn, 
                             Link == TopOfScreen ? SkipValue : 0, 
                             BottomRow,
@@ -2085,7 +2105,7 @@ UiDisplayMenu (
                             );
           } else {
             Status = DisplayOneMenu (MenuOption, 
-                            LEFT_SKIPPED_COLUMNS,
+                            MenuOption->Col - gStatementDimensions.LeftColumn,
                             gStatementDimensions.LeftColumn, 
                             Link == TopOfScreen ? SkipValue : 0, 
                             BottomRow,
@@ -2194,7 +2214,7 @@ UiDisplayMenu (
               ProcessStringForDateTime(MenuOption, OptionString, FALSE);
             }
 
-            Width               = (UINT16) gOptionBlockWidth;
+            Width               = (UINT16) gOptionBlockWidth - 1;
             OriginalRow         = MenuOption->Row;
             GlyphWidth          = 1;
 
@@ -2229,7 +2249,7 @@ UiDisplayMenu (
               }
 
               OriginalRow = MenuOption->Row;
-              Width       = GetWidth (MenuOption->ThisTag, NULL);
+              Width       = GetWidth (MenuOption, NULL);
               GlyphWidth  = 1;
 
               for (Index = 0; GetLineByWidth (MenuOption->Description, Width, &GlyphWidth, &Index, &OutputString) != 0x0000;) {
@@ -2280,7 +2300,7 @@ UiDisplayMenu (
           if (Statement->OpCode->OpCode == EFI_IFR_DATE_OP || Statement->OpCode->OpCode == EFI_IFR_TIME_OP) {
             ProcessStringForDateTime(MenuOption, OptionString, FALSE);
           }
-          Width               = (UINT16) gOptionBlockWidth;
+          Width               = (UINT16) gOptionBlockWidth - 1;
 
           OriginalRow         = MenuOption->Row;
           GlyphWidth          = 1;
@@ -2311,7 +2331,7 @@ UiDisplayMenu (
           if (NewLine) {
             OriginalRow = MenuOption->Row;
 
-            Width       = GetWidth (Statement, NULL);
+            Width       = GetWidth (MenuOption, NULL);
             GlyphWidth          = 1;
 
             for (Index = 0; GetLineByWidth (MenuOption->Description, Width, &GlyphWidth, &Index, &OutputString) != 0x0000;) {
@@ -2874,6 +2894,11 @@ UiDisplayMenu (
         MenuOption = MENU_OPTION_FROM_LINK (SavedListEntry);
         UpdateStatusBar (INPUT_ERROR, FALSE);
       } else {
+        if (NewPos->ForwardLink == &gMenuOption) {
+          NewLine   = FALSE;
+          Repaint   = FALSE;
+          break;
+        }
         //
         // Scroll up to the last page.
         //
@@ -2882,6 +2907,7 @@ UiDisplayMenu (
         MenuOption      = MENU_OPTION_FROM_LINK (SavedListEntry);
         ScreenOperation = UiPageUp;
         ControlFlag     = CfScreenOperation;
+        SkipValue       = 0;
       }
       break;
 
@@ -2938,23 +2964,32 @@ UiDisplayMenu (
       }
       
       if ((Link->BackLink == &gMenuOption) && (Index >= TopRow)) {
-        SkipValue = 0;
         if (TopOfScreen == &gMenuOption) {
           TopOfScreen = gMenuOption.ForwardLink;
           NewPos      = gMenuOption.BackLink;
           MoveToNextStatement (TRUE, &NewPos, BottomRow - TopRow);
-          Repaint = FALSE;
+          if (Index < PreviousMenuOption->Skip) {
+            Repaint = TRUE;
+            SkipValue = PreviousMenuOption->Skip - (Index - TopRow);
+          } else {
+            Repaint = FALSE;
+            SkipValue = 0;
+          }
         } else if (TopOfScreen != Link) {
           TopOfScreen = Link;
           NewPos      = Link;
           MoveToNextStatement (FALSE, &NewPos, BottomRow - TopRow);
+          SkipValue = 0;
         } else {
           //
           // Finally we know that NewPos is the last MenuOption can be focused.
           //
-          Repaint = FALSE;
+          if (SkipValue == 0) {
+            Repaint = FALSE;
+          }
           NewPos  = Link;
           MoveToNextStatement (FALSE, &NewPos, BottomRow - TopRow);
+          SkipValue = 0;
         }
       } else {
         if (Index > TopRow) {
@@ -3002,6 +3037,13 @@ UiDisplayMenu (
 
       ASSERT (NewPos != NULL);
       if (NewPos->ForwardLink == &gMenuOption) {
+        MenuOption = MENU_OPTION_FROM_LINK (NewPos);
+        if (SkipValue + BottomRow - TopRow + 1 < MenuOption->Skip) {
+          SkipValue += BottomRow - TopRow + 1;
+          NewLine = TRUE;
+          Repaint = TRUE;
+          break;
+        }
         NewLine = FALSE;
         Repaint = FALSE;
         break;
@@ -3080,6 +3122,12 @@ UiDisplayMenu (
       AdjustDateAndTimePosition (FALSE, &NewPos);
 
       if (NewPos->ForwardLink != &gMenuOption) {
+        if (NewPos == TopOfScreen) {
+          Temp2 = SkipValue;
+        } else {
+          Temp2 = 0;
+        }
+
         MenuOption      = MENU_OPTION_FROM_LINK (NewPos);
         NewLine         = TRUE;
         NewPos          = NewPos->ForwardLink;
@@ -3088,11 +3136,11 @@ UiDisplayMenu (
         //
         // Current menu not at the bottom of the form.
         //
-        if (BottomRow >= MenuOption->Row + MenuOption->Skip) {
+        if (BottomRow >= MenuOption->Row + MenuOption->Skip - Temp2) {
           //
           // Find the next selectable menu.
           //
-          Difference = MoveToNextStatement (FALSE, &NewPos, BottomRow - MenuOption->Row - MenuOption->Skip);
+          Difference = MoveToNextStatement (FALSE, &NewPos, BottomRow - MenuOption->Row - MenuOption->Skip + Temp2);
           //
           // We hit the end of MenuOption that can be focused
           // so we simply scroll to the first page.
@@ -3124,10 +3172,10 @@ UiDisplayMenu (
         if (NextMenuOption->Row == 0) {
           UpdateOptionSkipLines (NextMenuOption);
         }
-        DistanceValue  = Difference + NextMenuOption->Skip;
+        DistanceValue  = Difference + NextMenuOption->Skip - Temp2;
 
         Temp = MenuOption->Row + MenuOption->Skip + DistanceValue - 1;
-        if ((MenuOption->Row + MenuOption->Skip == BottomRow + 1) &&
+        if ((MenuOption->Row + MenuOption->Skip - Temp2 == BottomRow + 1) &&
             (NextMenuOption->ThisTag->OpCode->OpCode == EFI_IFR_DATE_OP ||
              NextMenuOption->ThisTag->OpCode->OpCode == EFI_IFR_TIME_OP)
             ) {
@@ -3225,7 +3273,7 @@ UiDisplayMenu (
         //
         // Scroll to the first page.
         //
-        if (TopOfScreen != gMenuOption.ForwardLink) {
+        if (TopOfScreen != gMenuOption.ForwardLink || SkipValue != 0) {
           TopOfScreen = gMenuOption.ForwardLink;
           Repaint     = TRUE;
           MenuOption  = NULL;
