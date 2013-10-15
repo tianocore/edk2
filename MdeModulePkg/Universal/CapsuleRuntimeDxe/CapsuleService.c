@@ -19,6 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Protocol/Capsule.h>
 #include <Guid/CapsuleVendor.h>
+#include <Guid/FmpCapsule.h>
 
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
@@ -29,7 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiRuntimeLib.h>
 #include <Library/BaseLib.h>
 #include <Library/PrintLib.h>
-
+#include <Library/BaseMemoryLib.h>
 //
 // Handle for the installation of Capsule Architecture Protocol.
 //
@@ -124,12 +125,23 @@ UpdateCapsule (
     if ((CapsuleHeader->Flags & (CAPSULE_FLAGS_PERSIST_ACROSS_RESET | CAPSULE_FLAGS_INITIATE_RESET)) == CAPSULE_FLAGS_INITIATE_RESET) {
       return EFI_INVALID_PARAMETER;
     }
+
+    //
+    // Check FMP capsule flag 
+    //
+    if (CompareGuid(&CapsuleHeader->CapsuleGuid, &gEfiFmpCapsuleGuid)
+     && (CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) != 0 ) {
+       return EFI_INVALID_PARAMETER;
+    }
+
     //
     // Check Capsule image without populate flag by firmware support capsule function  
     //
-    if (((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) && 
-        (SupportCapsuleImage (CapsuleHeader) != EFI_SUCCESS)) {
-      return EFI_UNSUPPORTED;
+    if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) {
+      Status = SupportCapsuleImage (CapsuleHeader);
+      if (EFI_ERROR(Status)) {
+        return Status;
+      }
     }
   }
 
@@ -250,6 +262,7 @@ QueryCapsuleCapabilities (
   OUT EFI_RESET_TYPE       *ResetType
   )
 {
+  EFI_STATUS                Status;
   UINTN                     ArrayNumber;
   EFI_CAPSULE_HEADER        *CapsuleHeader;
   BOOLEAN                   NeedReset;
@@ -287,12 +300,23 @@ QueryCapsuleCapabilities (
     if ((CapsuleHeader->Flags & (CAPSULE_FLAGS_PERSIST_ACROSS_RESET | CAPSULE_FLAGS_INITIATE_RESET)) == CAPSULE_FLAGS_INITIATE_RESET) {
       return EFI_INVALID_PARAMETER;
     }
+
+    //
+    // Check FMP capsule flag 
+    //
+    if (CompareGuid(&CapsuleHeader->CapsuleGuid, &gEfiFmpCapsuleGuid)
+     && (CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) != 0 ) {
+       return EFI_INVALID_PARAMETER;
+    }
+
     //
     // Check Capsule image without populate flag is supported by firmware
     //
-    if (((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) && 
-        (SupportCapsuleImage (CapsuleHeader) != EFI_SUCCESS)) {
-      return EFI_UNSUPPORTED;
+    if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) {
+      Status = SupportCapsuleImage (CapsuleHeader);
+      if (EFI_ERROR(Status)) {
+        return Status;
+      }
     }
   }
 
@@ -306,7 +330,7 @@ QueryCapsuleCapabilities (
       break;
     }
   }
-  
+
   if (NeedReset) {
     //
     //Check if the platform supports update capsule across a system reset

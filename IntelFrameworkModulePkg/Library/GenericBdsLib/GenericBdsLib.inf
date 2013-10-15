@@ -22,7 +22,7 @@
   FILE_GUID                      = e405ec31-ccaa-4dd4-83e8-0aec01703f7e
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = GenericBdsLib|DXE_DRIVER UEFI_APPLICATION 
+  LIBRARY_CLASS                  = GenericBdsLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION 
   CONSTRUCTOR                    = GenericBdsLibConstructor
 
 #
@@ -78,6 +78,7 @@
   gLastEnumLangGuid                             ## SOMETIMES_PRODUCES ## Variable:L"LastEnumLang" (Platform language at last time enumeration.)
   gHdBootDevicePathVariablGuid                  ## SOMETIMES_PRODUCES ## Variable:L"HDDP" (The device path of Boot file on Hard device.)
   gBdsLibStringPackageGuid                      ## PRODUCES ## GUID (HII String PackageList Guid)
+  gEfiLegacyDevOrderVariableGuid                ## CONSUMES ## GUID
 
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid              # PROTOCOL CONSUMES

@@ -36,6 +36,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/BdsHii.h>
 #include <Guid/ConnectConInEvent.h>
 #include <Guid/Performance.h>
+#include <Guid/FmpCapsule.h>
 #include <Protocol/GenericMemoryTest.h>
 #include <Protocol/FormBrowser2.h>
 #include <Protocol/HiiConfigAccess.h>

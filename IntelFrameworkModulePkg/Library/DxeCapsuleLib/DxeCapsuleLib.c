@@ -1,7 +1,7 @@
 /** @file
-  Capsule Library instance to update capsule image to flash.
+  Capsule Library instance to process capsule images.
 
-  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -13,12 +13,368 @@
 
 **/
 #include <PiDxe.h>
+
 #include <Guid/Capsule.h>
+#include <Guid/FmpCapsule.h>
+
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/CapsuleLib.h>
+#include <Library/GenericBdsLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/BaseLib.h>
+#include <Library/DevicePathLib.h>
+
+#include <Protocol/FirmwareManagement.h>
+#include <Protocol/DevicePath.h>
+
+
+/**
+  Function indicate the current completion progress of the firmware
+  update. Platform may override with own specific progress function.
+
+  @param  Completion    A value between 1 and 100 indicating the current completion progress of the firmware update
+
+  @retval EFI_SUCESS    Input capsule is a correct FMP capsule.
+**/
+EFI_STATUS
+EFIAPI
+Update_Image_Progress (
+   IN UINTN Completion
+)
+{
+  return EFI_SUCCESS;
+}
+
+
+/**
+  Validate Fmp capsules layout.
+
+  @param  CapsuleHeader    Points to a capsule header.
+
+  @retval EFI_SUCESS                     Input capsule is a correct FMP capsule.
+  @retval EFI_INVALID_PARAMETER  Input capsule is not a correct FMP capsule.
+**/
+EFI_STATUS
+ValidateFmpCapsule (
+  IN EFI_CAPSULE_HEADER *CapsuleHeader
+  )
+{
+  EFI_FIRMWARE_MANAGEMENT_CAPSULE_HEADER       *FmpCapsuleHeader;
+  UINT8                                        *EndOfCapsule;
+  EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER *ImageHeader;
+  UINT8                                        *EndOfPayload;
+  UINT64                                       *ItemOffsetList;
+  UINT32                                       ItemNum;
+  UINTN                                        Index;
+
+  FmpCapsuleHeader = (EFI_FIRMWARE_MANAGEMENT_CAPSULE_HEADER *) ((UINT8 *) CapsuleHeader + CapsuleHeader->HeaderSize);
+  EndOfCapsule     = (UINT8 *) CapsuleHeader + CapsuleHeader->CapsuleImageSize;
+
+  if (FmpCapsuleHeader->Version > EFI_FIRMWARE_MANAGEMENT_CAPSULE_HEADER_INIT_VERSION) {
+    return EFI_INVALID_PARAMETER;
+  }
+  ItemOffsetList = (UINT64 *)(FmpCapsuleHeader + 1);
+
+  ItemNum = FmpCapsuleHeader->EmbeddedDriverCount + FmpCapsuleHeader->PayloadItemCount;
+
+  if (ItemNum == FmpCapsuleHeader->EmbeddedDriverCount) {
+    //
+    // No payload element 
+    //
+    if (((UINT8 *)FmpCapsuleHeader + ItemOffsetList[ItemNum - 1]) < EndOfCapsule) {
+      return EFI_SUCCESS;
+    } else {
+      return EFI_INVALID_PARAMETER;
+    }
+  }
+
+  if (FmpCapsuleHeader->PayloadItemCount != 0) {
+    //
+    // Check if the last payload is within capsule image range
+    //
+    ImageHeader  = (EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER *)((UINT8 *)FmpCapsuleHeader + ItemOffsetList[ItemNum - 1]);
+    EndOfPayload = (UINT8 *)(ImageHeader + 1) + ImageHeader->UpdateImageSize + ImageHeader->UpdateVendorCodeSize;
+  } else {
+    //
+    // No driver & payload element in FMP
+    //
+    EndOfPayload = (UINT8 *)(FmpCapsuleHeader + 1);
+  }
+
+  if (EndOfPayload != EndOfCapsule) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // All the address in ItemOffsetList must be stored in ascending order
+  //
+  if (ItemNum >= 2) {
+    for (Index = 0; Index < ItemNum - 1; Index++) {
+      if (ItemOffsetList[Index] >= ItemOffsetList[Index + 1]) {
+        return EFI_INVALID_PARAMETER;
+      }
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Process Firmware management protocol data capsule.  
+
+  @param  CapsuleHeader         Points to a capsule header.
+
+  @retval EFI_SUCESS            Process Capsule Image successfully.
+  @retval EFI_UNSUPPORTED       Capsule image is not supported by the firmware.
+  @retval EFI_VOLUME_CORRUPTED  FV volume in the capsule is corrupted.
+  @retval EFI_OUT_OF_RESOURCES  Not enough memory.
+**/
+EFI_STATUS
+ProcessFmpCapsuleImage (
+  IN EFI_CAPSULE_HEADER *CapsuleHeader
+  )
+{
+  EFI_STATUS                                    Status;
+  EFI_FIRMWARE_MANAGEMENT_CAPSULE_HEADER        *FmpCapsuleHeader;
+  UINT8                                         *EndOfCapsule;
+  EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER  *ImageHeader;
+  EFI_HANDLE                                    ImageHandle;
+  UINT64                                        *ItemOffsetList;
+  UINT32                                        ItemNum;
+  UINTN                                         Index;
+  UINTN                                         ExitDataSize;
+  EFI_HANDLE                                    *HandleBuffer;
+  EFI_FIRMWARE_MANAGEMENT_PROTOCOL              *Fmp;
+  UINTN                                         NumberOfHandles;
+  UINTN                                         DescriptorSize;
+  UINT8                                         FmpImageInfoCount;
+  UINT32                                        FmpImageInfoDescriptorVer;
+  UINTN                                         ImageInfoSize;
+  UINT32                                        PackageVersion;
+  CHAR16                                        *PackageVersionName;
+  CHAR16                                        *AbortReason;
+  EFI_FIRMWARE_IMAGE_DESCRIPTOR                 *FmpImageInfoBuf;
+  EFI_FIRMWARE_IMAGE_DESCRIPTOR                 *TempFmpImageInfo;
+  UINTN                                         DriverLen;
+  UINTN                                         Index1;
+  UINTN                                         Index2;
+  MEMMAP_DEVICE_PATH                            MemMapNode;
+  EFI_DEVICE_PATH_PROTOCOL                      *DriverDevicePath;
+
+  Status           = EFI_SUCCESS;
+  HandleBuffer     = NULL;
+  ExitDataSize     = 0;
+  DriverDevicePath = NULL;
+
+  FmpCapsuleHeader = (EFI_FIRMWARE_MANAGEMENT_CAPSULE_HEADER *) ((UINT8 *) CapsuleHeader + CapsuleHeader->HeaderSize);
+  EndOfCapsule     = (UINT8 *) CapsuleHeader + CapsuleHeader->CapsuleImageSize;
+
+  if (FmpCapsuleHeader->Version > EFI_FIRMWARE_MANAGEMENT_CAPSULE_HEADER_INIT_VERSION) {
+    return EFI_INVALID_PARAMETER;
+  }
+  ItemOffsetList = (UINT64 *)(FmpCapsuleHeader + 1);
+
+  ItemNum = FmpCapsuleHeader->EmbeddedDriverCount + FmpCapsuleHeader->PayloadItemCount;
+
+  //
+  // capsule in which driver count and payload count are both zero is not processed.
+  //
+  if (ItemNum == 0) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // 1. ConnectAll to ensure 
+  //    All the communication protocol required by driver in capsule installed 
+  //    All FMP protocols are installed
+  //
+  BdsLibConnectAll();
+
+
+  //
+  // 2. Try to load & start all the drivers within capsule 
+  //
+  SetDevicePathNodeLength (&MemMapNode.Header, sizeof (MemMapNode));
+  MemMapNode.Header.Type     = HARDWARE_DEVICE_PATH;
+  MemMapNode.Header.SubType  = HW_MEMMAP_DP;
+  MemMapNode.MemoryType      = EfiBootServicesCode;
+  MemMapNode.StartingAddress = (EFI_PHYSICAL_ADDRESS)CapsuleHeader;
+  MemMapNode.EndingAddress   = (EFI_PHYSICAL_ADDRESS)((UINT8 *)CapsuleHeader + CapsuleHeader->CapsuleImageSize - 1);
+
+  DriverDevicePath = AppendDevicePathNode (NULL, &MemMapNode.Header);
+  if (DriverDevicePath == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  for (Index = 0; Index < FmpCapsuleHeader->EmbeddedDriverCount; Index++) {
+    if (FmpCapsuleHeader->PayloadItemCount == 0 && Index == FmpCapsuleHeader->EmbeddedDriverCount - 1) {
+      //
+      // When driver is last element in the ItemOffsetList array, the driver size is calculated by reference CapsuleImageSize in EFI_CAPSULE_HEADER
+      //
+      DriverLen = CapsuleHeader->CapsuleImageSize - CapsuleHeader->HeaderSize - ItemOffsetList[Index];
+    } else {
+      DriverLen = ItemOffsetList[Index + 1] - ItemOffsetList[Index];
+    }
+
+    Status = gBS->LoadImage(
+                    FALSE,
+                    gImageHandle,
+                    DriverDevicePath,
+                    (UINT8 *)FmpCapsuleHeader + ItemOffsetList[Index],
+                    DriverLen,
+                    &ImageHandle
+                    );
+    if (EFI_ERROR(Status)) {
+      goto EXIT;
+    }
+
+    Status = gBS->StartImage(
+                    ImageHandle, 
+                    &ExitDataSize, 
+                    NULL
+                    );
+    if (EFI_ERROR(Status)) {
+      DEBUG ((DEBUG_ERROR, "Driver Return Status = %r\n", Status));
+      goto EXIT;
+    }
+  }
+
+  //
+  // Connnect all again to connect drivers within capsule 
+  //
+  if (FmpCapsuleHeader->EmbeddedDriverCount > 0) {
+    BdsLibConnectAll();
+  }
+
+  //
+  // 3. Route payload to right FMP instance
+  //
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiFirmwareManagementProtocolGuid,
+                  NULL,
+                  &NumberOfHandles,
+                  &HandleBuffer
+                  );
+
+  if (!EFI_ERROR(Status)) {
+    for(Index1 = 0; Index1 < NumberOfHandles; Index1++) {
+      Status = gBS->HandleProtocol(
+                      HandleBuffer[Index1],
+                      &gEfiFirmwareManagementProtocolGuid,
+                      &Fmp
+                      );
+      if (EFI_ERROR(Status)) {
+        continue;
+      }
+
+      ImageInfoSize = 0;
+      Status = Fmp->GetImageInfo (
+                      Fmp,
+                      &ImageInfoSize,
+                      NULL,
+                      NULL,
+                      NULL,
+                      NULL,
+                      NULL,
+                      NULL
+                      );
+      if (Status != EFI_BUFFER_TOO_SMALL) {
+        continue;
+      }
+
+      FmpImageInfoBuf = NULL;
+      FmpImageInfoBuf = AllocateZeroPool (ImageInfoSize);
+      if (FmpImageInfoBuf == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto EXIT;
+      }
+
+      PackageVersionName = NULL;
+      Status = Fmp->GetImageInfo (
+                      Fmp,
+                      &ImageInfoSize,               // ImageInfoSize
+                      FmpImageInfoBuf,              // ImageInfo
+                      &FmpImageInfoDescriptorVer,   // DescriptorVersion
+                      &FmpImageInfoCount,           // DescriptorCount
+                      &DescriptorSize,              // DescriptorSize
+                      &PackageVersion,              // PackageVersion
+                      &PackageVersionName           // PackageVersionName
+                      );
+
+      //
+      // If FMP GetInformation interface failed, skip this resource
+      //
+      if (EFI_ERROR(Status)) {
+        FreePool(FmpImageInfoBuf);
+        continue;
+      }
+
+      if (PackageVersionName != NULL) {
+        FreePool(PackageVersionName);
+      }
+
+      TempFmpImageInfo = FmpImageInfoBuf;
+      for (Index2 = 0; Index2 < FmpImageInfoCount; Index2++) {
+        //
+        // Check all the payload entry in capsule payload list 
+        //
+        for (Index = FmpCapsuleHeader->EmbeddedDriverCount; Index < ItemNum; Index++) {
+          ImageHeader  = (EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER *)((UINT8 *)FmpCapsuleHeader + ItemOffsetList[Index]);
+          if (CompareGuid(&ImageHeader->UpdateImageTypeId, &TempFmpImageInfo->ImageTypeId) &&
+              ImageHeader->UpdateImageIndex == TempFmpImageInfo->ImageIndex) {
+            AbortReason = NULL;
+            if (ImageHeader->UpdateVendorCodeSize == 0) {
+              Status = Fmp->SetImage(
+                              Fmp,
+                              TempFmpImageInfo->ImageIndex,           // ImageIndex
+                              (UINT8 *)(ImageHeader + 1),             // Image
+                              ImageHeader->UpdateImageSize,           // ImageSize
+                              NULL,                                   // VendorCode
+                              Update_Image_Progress,                  // Progress
+                              &AbortReason                            // AbortReason
+                              );
+            } else {
+              Status = Fmp->SetImage(
+                              Fmp,
+                              TempFmpImageInfo->ImageIndex,                                          // ImageIndex
+                              (UINT8 *)(ImageHeader + 1),                                            // Image
+                              ImageHeader->UpdateImageSize,                                          // ImageSize
+                              (UINT8 *)((UINT8 *) (ImageHeader + 1) + ImageHeader->UpdateImageSize), // VendorCode
+                              Update_Image_Progress,                                                 // Progress
+                              &AbortReason                                                           // AbortReason
+                              );
+            }
+            if (AbortReason != NULL) {
+              DEBUG ((EFI_D_ERROR, "%s\n", AbortReason));
+              FreePool(AbortReason);
+            }
+          }
+        }
+        //
+        // Use DescriptorSize to move ImageInfo Pointer to stay compatible with different ImageInfo version
+        //
+        TempFmpImageInfo = (EFI_FIRMWARE_IMAGE_DESCRIPTOR *)((UINT8 *)TempFmpImageInfo + DescriptorSize);
+      }
+      FreePool(FmpImageInfoBuf);
+    }
+  }
+
+EXIT:
+
+  if (HandleBuffer != NULL) {
+    FreePool(HandleBuffer);
+  }
+
+  if (DriverDevicePath != NULL) {
+    FreePool(DriverDevicePath);
+  }
+
+  return Status;
+}
 
 /**
   Those capsules supported by the firmwares.
@@ -27,6 +383,7 @@
 
   @retval EFI_SUCESS       Input capsule is supported by firmware.
   @retval EFI_UNSUPPORTED  Input capsule is not supported by the firmware.
+  @retval EFI_INVALID_PARAMETER Input capsule layout is not correct
 **/
 EFI_STATUS
 EFIAPI
@@ -36,6 +393,13 @@ SupportCapsuleImage (
 {
   if (CompareGuid (&gEfiCapsuleGuid, &CapsuleHeader->CapsuleGuid)) {
     return EFI_SUCCESS;
+  }
+
+  if (CompareGuid (&gEfiFmpCapsuleGuid, &CapsuleHeader->CapsuleGuid)) {
+    //
+    // Check layout of FMP capsule
+    //
+    return ValidateFmpCapsule(CapsuleHeader);
   }
 
   return EFI_UNSUPPORTED;
@@ -70,6 +434,21 @@ ProcessCapsuleImage (
 
   if (SupportCapsuleImage (CapsuleHeader) != EFI_SUCCESS) {
     return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Check FMP capsule layout
+  //
+  if (CompareGuid (&gEfiFmpCapsuleGuid, &CapsuleHeader->CapsuleGuid)){
+    Status = ValidateFmpCapsule(CapsuleHeader);
+    if (EFI_ERROR(Status)) {
+      return Status;
+    }
+
+    //
+    // Press EFI FMP Capsule
+    //
+    return ProcessFmpCapsuleImage(CapsuleHeader);
   }
 
   //

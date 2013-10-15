@@ -403,7 +403,9 @@ BdsFormalizeEfiGlobalVariable (
   //
   // OS indicater support variable
   //
-  OsIndicationSupport = EFI_OS_INDICATIONS_BOOT_TO_FW_UI;
+  OsIndicationSupport = EFI_OS_INDICATIONS_BOOT_TO_FW_UI \
+                      | EFI_OS_INDICATIONS_FMP_CAPSULE_SUPPORTED;
+
   Status = gRT->SetVariable (
                   L"OsIndicationsSupported",
                   &gEfiGlobalVariableGuid,

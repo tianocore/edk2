@@ -141,6 +141,7 @@
   gDeviceManagerFormSetGuid                     ## SOMETIMES_PRODUCES ## DeviceManager HII Package
   gDriverHealthFormSetGuid                      ## SOMETIMES_PRODUCES ## DriverHealth HII Package
   gConnectConInEventGuid                        ## CONSUMES ## GUID (Connect ConIn Event)
+  gEfiFmpCapsuleGuid                            ## CONSUMES ## GUID (FMP Capsule)
 
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid              ## PROTOCOL CONSUMES
