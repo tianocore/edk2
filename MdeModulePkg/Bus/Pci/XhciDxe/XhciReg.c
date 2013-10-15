@@ -543,6 +543,10 @@ XhcSetBiosOwnership (
 {
   UINT32                    Buffer;
 
+  if (Xhc->UsbLegSupOffset == 0xFFFFFFFF) {
+    return;
+  }
+
   DEBUG ((EFI_D_INFO, "XhcSetBiosOwnership: called to set BIOS ownership\n"));
 
   Buffer = XhcReadExtCapReg (Xhc, Xhc->UsbLegSupOffset);
@@ -562,6 +566,10 @@ XhcClearBiosOwnership (
   )
 {
   UINT32                    Buffer;
+
+  if (Xhc->UsbLegSupOffset == 0xFFFFFFFF) {
+    return;
+  }
 
   DEBUG ((EFI_D_INFO, "XhcClearBiosOwnership: called to clear BIOS ownership\n"));
 
@@ -606,7 +614,7 @@ XhcGetCapabilityAddr (
     ExtCapOffset += (NextExtCapReg << 2);
   } while (NextExtCapReg != 0);
 
-  return 0;
+  return 0xFFFFFFFF;
 }
 
 /**
@@ -676,7 +684,7 @@ XhcResetHC (
     }
   }
 
-  if (((XhcReadExtCapReg (Xhc, Xhc->DebugCapSupOffset) & 0xFF) != XHC_CAP_USB_DEBUG) ||
+  if ((Xhc->DebugCapSupOffset == 0xFFFFFFFF) || ((XhcReadExtCapReg (Xhc, Xhc->DebugCapSupOffset) & 0xFF) != XHC_CAP_USB_DEBUG) ||
       ((XhcReadExtCapReg (Xhc, Xhc->DebugCapSupOffset + XHC_DC_DCCTRL) & BIT0) == 0)) {
     XhcSetOpRegBit (Xhc, XHC_USBCMD_OFFSET, XHC_USBCMD_RESET);
     Status = XhcWaitOpRegBit (Xhc, XHC_USBCMD_OFFSET, XHC_USBCMD_RESET, FALSE, Timeout);
