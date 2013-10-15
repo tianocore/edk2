@@ -316,6 +316,106 @@ BootMaintCallback (
     
     UpdatePageId (Private, QuestionId);
 
+    if (QuestionId < FILE_OPTION_OFFSET) {
+      if (QuestionId < CONFIG_OPTION_OFFSET) {
+        switch (QuestionId) {
+        case KEY_VALUE_BOOT_FROM_FILE:
+          Private->FeCurrentState = FileExplorerStateBootFromFile;
+          break;
+
+        case FORM_BOOT_ADD_ID:
+          Private->FeCurrentState = FileExplorerStateAddBootOption;
+          break;
+
+        case FORM_DRV_ADD_FILE_ID:
+          Private->FeCurrentState = FileExplorerStateAddDriverOptionState;
+          break;
+
+        case FORM_DRV_ADD_HANDLE_ID:
+          CleanUpPage (FORM_DRV_ADD_HANDLE_ID, Private);
+          UpdateDrvAddHandlePage (Private);
+          break;
+
+        case FORM_BOOT_DEL_ID:
+          CleanUpPage (FORM_BOOT_DEL_ID, Private);
+          UpdateBootDelPage (Private);
+          break;
+
+        case FORM_BOOT_CHG_ID:
+        case FORM_DRV_CHG_ID:
+          UpdatePageBody (QuestionId, Private);
+          break;
+
+        case FORM_DRV_DEL_ID:
+          CleanUpPage (FORM_DRV_DEL_ID, Private);
+          UpdateDrvDelPage (Private);
+          break;
+
+        case FORM_BOOT_NEXT_ID:
+          CleanUpPage (FORM_BOOT_NEXT_ID, Private);
+          UpdateBootNextPage (Private);
+          break;
+
+        case FORM_TIME_OUT_ID:
+          CleanUpPage (FORM_TIME_OUT_ID, Private);
+          UpdateTimeOutPage (Private);
+          break;
+
+        case FORM_CON_IN_ID:
+        case FORM_CON_OUT_ID:
+        case FORM_CON_ERR_ID:
+          UpdatePageBody (QuestionId, Private);
+          break;
+
+        case FORM_CON_MODE_ID:
+          CleanUpPage (FORM_CON_MODE_ID, Private);
+          UpdateConModePage (Private);
+          break;
+
+        case FORM_CON_COM_ID:
+          CleanUpPage (FORM_CON_COM_ID, Private);
+          UpdateConCOMPage (Private);
+          break;
+
+        case FORM_SET_FD_ORDER_ID:
+        case FORM_SET_HD_ORDER_ID:
+        case FORM_SET_CD_ORDER_ID:
+        case FORM_SET_NET_ORDER_ID:
+        case FORM_SET_BEV_ORDER_ID:
+          CleanUpPage (QuestionId, Private);
+          UpdateSetLegacyDeviceOrderPage (QuestionId, Private);
+          break;
+
+        default:
+          break;
+        }
+      } else if ((QuestionId >= TERMINAL_OPTION_OFFSET) && (QuestionId < CONSOLE_OPTION_OFFSET)) {
+        Index2                    = (UINT16) (QuestionId - TERMINAL_OPTION_OFFSET);
+        Private->CurrentTerminal  = Index2;
+
+        CleanUpPage (FORM_CON_COM_SETUP_ID, Private);
+        UpdateTerminalPage (Private);
+
+      } else if (QuestionId >= HANDLE_OPTION_OFFSET) {
+        Index2                  = (UINT16) (QuestionId - HANDLE_OPTION_OFFSET);
+
+        NewMenuEntry            = BOpt_GetMenuEntry (&DriverMenu, Index2);
+        ASSERT (NewMenuEntry != NULL);
+        Private->HandleContext  = (BM_HANDLE_CONTEXT *) NewMenuEntry->VariableContext;
+
+        CleanUpPage (FORM_DRV_ADD_HANDLE_DESC_ID, Private);
+
+        Private->MenuEntry                  = NewMenuEntry;
+        Private->LoadContext->FilePathList  = Private->HandleContext->DevicePath;
+
+        UpdateDriverAddHandleDescPage (Private);
+      }
+    }
+  } else if (Action == EFI_BROWSER_ACTION_CHANGED) {
+    if ((Value == NULL) || (ActionRequest == NULL)) {
+      return EFI_INVALID_PARAMETER;
+    }
+    
     //
     // need to be subtituded.
     //
@@ -466,133 +566,33 @@ BootMaintCallback (
         //
         Value->u8 = NewLegacyDev[Index3];
       }
-    }
-
-    if (QuestionId < FILE_OPTION_OFFSET) {
-      if (QuestionId < CONFIG_OPTION_OFFSET) {
-        switch (QuestionId) {
-        case KEY_VALUE_BOOT_FROM_FILE:
-          Private->FeCurrentState = FileExplorerStateBootFromFile;
-          break;
-
-        case FORM_BOOT_ADD_ID:
-          Private->FeCurrentState = FileExplorerStateAddBootOption;
-          break;
-
-        case FORM_DRV_ADD_FILE_ID:
-          Private->FeCurrentState = FileExplorerStateAddDriverOptionState;
-          break;
-
-        case FORM_DRV_ADD_HANDLE_ID:
-          CleanUpPage (FORM_DRV_ADD_HANDLE_ID, Private);
-          UpdateDrvAddHandlePage (Private);
-          break;
-
-        case FORM_BOOT_DEL_ID:
-          CleanUpPage (FORM_BOOT_DEL_ID, Private);
-          UpdateBootDelPage (Private);
-          break;
-
-        case FORM_BOOT_CHG_ID:
-        case FORM_DRV_CHG_ID:
-          UpdatePageBody (QuestionId, Private);
-          break;
-
-        case FORM_DRV_DEL_ID:
-          CleanUpPage (FORM_DRV_DEL_ID, Private);
-          UpdateDrvDelPage (Private);
-          break;
-
-        case FORM_BOOT_NEXT_ID:
-          CleanUpPage (FORM_BOOT_NEXT_ID, Private);
-          UpdateBootNextPage (Private);
-          break;
-
-        case FORM_TIME_OUT_ID:
-          CleanUpPage (FORM_TIME_OUT_ID, Private);
-          UpdateTimeOutPage (Private);
-          break;
-
-        case FORM_CON_IN_ID:
-        case FORM_CON_OUT_ID:
-        case FORM_CON_ERR_ID:
-          UpdatePageBody (QuestionId, Private);
-          break;
-
-        case FORM_CON_MODE_ID:
-          CleanUpPage (FORM_CON_MODE_ID, Private);
-          UpdateConModePage (Private);
-          break;
-
-        case FORM_CON_COM_ID:
-          CleanUpPage (FORM_CON_COM_ID, Private);
-          UpdateConCOMPage (Private);
-          break;
-
-        case FORM_SET_FD_ORDER_ID:
-        case FORM_SET_HD_ORDER_ID:
-        case FORM_SET_CD_ORDER_ID:
-        case FORM_SET_NET_ORDER_ID:
-        case FORM_SET_BEV_ORDER_ID:
-          CleanUpPage (QuestionId, Private);
-          UpdateSetLegacyDeviceOrderPage (QuestionId, Private);
-          break;
-
-        default:
-          break;
+    } else {
+      switch (QuestionId) {
+      case KEY_VALUE_SAVE_AND_EXIT:
+      case KEY_VALUE_NO_SAVE_AND_EXIT:
+        if (QuestionId == KEY_VALUE_SAVE_AND_EXIT) {
+          Status = ApplyChangeHandler (Private, CurrentFakeNVMap, Private->BmmPreviousPageId);
+          if (EFI_ERROR (Status)) {
+            return Status;
+          }
+        } else if (QuestionId == KEY_VALUE_NO_SAVE_AND_EXIT) {
+          DiscardChangeHandler (Private, CurrentFakeNVMap);
         }
-      } else if ((QuestionId >= TERMINAL_OPTION_OFFSET) && (QuestionId < CONSOLE_OPTION_OFFSET)) {
-        Index2                    = (UINT16) (QuestionId - TERMINAL_OPTION_OFFSET);
-        Private->CurrentTerminal  = Index2;
 
-        CleanUpPage (FORM_CON_COM_SETUP_ID, Private);
-        UpdateTerminalPage (Private);
+        //
+        // Tell browser not to ask for confirmation of changes,
+        // since we have already applied or discarded.
+        //
+        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_SUBMIT_EXIT;
+        break;  
 
-      } else if (QuestionId >= HANDLE_OPTION_OFFSET) {
-        Index2                  = (UINT16) (QuestionId - HANDLE_OPTION_OFFSET);
+      case FORM_RESET:
+        gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
+        return EFI_UNSUPPORTED;
 
-        NewMenuEntry            = BOpt_GetMenuEntry (&DriverMenu, Index2);
-        ASSERT (NewMenuEntry != NULL);
-        Private->HandleContext  = (BM_HANDLE_CONTEXT *) NewMenuEntry->VariableContext;
-
-        CleanUpPage (FORM_DRV_ADD_HANDLE_DESC_ID, Private);
-
-        Private->MenuEntry                  = NewMenuEntry;
-        Private->LoadContext->FilePathList  = Private->HandleContext->DevicePath;
-
-        UpdateDriverAddHandleDescPage (Private);
+      default:
+        break;
       }
-    }
-  } else if (Action == EFI_BROWSER_ACTION_CHANGED) {
-    if ((Value == NULL) || (ActionRequest == NULL)) {
-      return EFI_INVALID_PARAMETER;
-    }
-    
-    switch (QuestionId) {
-    case KEY_VALUE_SAVE_AND_EXIT:
-    case KEY_VALUE_NO_SAVE_AND_EXIT:
-      if (QuestionId == KEY_VALUE_SAVE_AND_EXIT) {
-        Status = ApplyChangeHandler (Private, CurrentFakeNVMap, Private->BmmPreviousPageId);
-        if (EFI_ERROR (Status)) {
-          return Status;
-        }
-      } else if (QuestionId == KEY_VALUE_NO_SAVE_AND_EXIT) {
-        DiscardChangeHandler (Private, CurrentFakeNVMap);
-      }
-
-      //
-      // Tell browser not to ask for confirmation of changes,
-      // since we have already applied or discarded.
-      //
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_SUBMIT_EXIT;
-      break;  
-
-    case FORM_RESET:
-      gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
-      return EFI_UNSUPPORTED;
-
-    default:
-      break;
     }
   }
 
