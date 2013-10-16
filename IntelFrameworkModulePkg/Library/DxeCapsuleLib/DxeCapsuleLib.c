@@ -201,8 +201,8 @@ ProcessFmpCapsuleImage (
   MemMapNode.Header.Type     = HARDWARE_DEVICE_PATH;
   MemMapNode.Header.SubType  = HW_MEMMAP_DP;
   MemMapNode.MemoryType      = EfiBootServicesCode;
-  MemMapNode.StartingAddress = (EFI_PHYSICAL_ADDRESS)CapsuleHeader;
-  MemMapNode.EndingAddress   = (EFI_PHYSICAL_ADDRESS)((UINT8 *)CapsuleHeader + CapsuleHeader->CapsuleImageSize - 1);
+  MemMapNode.StartingAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)CapsuleHeader;
+  MemMapNode.EndingAddress   = (EFI_PHYSICAL_ADDRESS)(UINTN)((UINT8 *)CapsuleHeader + CapsuleHeader->CapsuleImageSize - 1);
 
   DriverDevicePath = AppendDevicePathNode (NULL, &MemMapNode.Header);
   if (DriverDevicePath == NULL) {
@@ -210,13 +210,13 @@ ProcessFmpCapsuleImage (
   }
 
   for (Index = 0; Index < FmpCapsuleHeader->EmbeddedDriverCount; Index++) {
-    if (FmpCapsuleHeader->PayloadItemCount == 0 && Index == FmpCapsuleHeader->EmbeddedDriverCount - 1) {
+    if (FmpCapsuleHeader->PayloadItemCount == 0 && Index == (UINTN)FmpCapsuleHeader->EmbeddedDriverCount - 1) {
       //
       // When driver is last element in the ItemOffsetList array, the driver size is calculated by reference CapsuleImageSize in EFI_CAPSULE_HEADER
       //
-      DriverLen = CapsuleHeader->CapsuleImageSize - CapsuleHeader->HeaderSize - ItemOffsetList[Index];
+      DriverLen = CapsuleHeader->CapsuleImageSize - CapsuleHeader->HeaderSize - (UINTN)ItemOffsetList[Index];
     } else {
-      DriverLen = ItemOffsetList[Index + 1] - ItemOffsetList[Index];
+      DriverLen = (UINTN)ItemOffsetList[Index + 1] - (UINTN)ItemOffsetList[Index];
     }
 
     Status = gBS->LoadImage(
@@ -265,7 +265,7 @@ ProcessFmpCapsuleImage (
       Status = gBS->HandleProtocol(
                       HandleBuffer[Index1],
                       &gEfiFirmwareManagementProtocolGuid,
-                      &Fmp
+                      (VOID **)&Fmp
                       );
       if (EFI_ERROR(Status)) {
         continue;
