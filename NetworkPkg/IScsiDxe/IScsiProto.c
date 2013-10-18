@@ -259,15 +259,16 @@ IScsiCreateConnection (
     CopyMem (&Tcp4IoConfig->Gateway, &NvData->Gateway, sizeof (EFI_IPv4_ADDRESS));
     CopyMem (&Tcp4IoConfig->RemoteIp, &NvData->TargetIp, sizeof (EFI_IPv4_ADDRESS));
 
-    Tcp4IoConfig->RemotePort = NvData->TargetPort;
-    Tcp4IoConfig->ActiveFlag = TRUE;
-
+    Tcp4IoConfig->RemotePort  = NvData->TargetPort;
+    Tcp4IoConfig->ActiveFlag  = TRUE;
+    Tcp4IoConfig->StationPort = 0;
   } else {
     Tcp6IoConfig = &TcpIoConfig.Tcp6IoConfigData;
   
     CopyMem (&Tcp6IoConfig->RemoteIp, &NvData->TargetIp, sizeof (EFI_IPv6_ADDRESS));
-    Tcp6IoConfig->RemotePort = NvData->TargetPort;
-    Tcp6IoConfig->ActiveFlag = TRUE;
+    Tcp6IoConfig->RemotePort  = NvData->TargetPort;
+    Tcp6IoConfig->ActiveFlag  = TRUE;
+    Tcp6IoConfig->StationPort = 0;
   }
 
   //
