@@ -1,6 +1,7 @@
 /** @file
   Main file for ls shell level 2 function.
 
+  Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
   Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -71,6 +72,26 @@ PrintLsOutput(
   }
 
   PathCleanUpDirectories(CorrectedPath);
+
+  if (!Sfo) {
+    //
+    // get directory name from path...
+    //
+    DirectoryName = GetFullyQualifiedPath(CorrectedPath);
+
+    //
+    // print header
+    //
+    ShellPrintHiiEx (
+      0,
+      gST->ConOut->Mode->CursorRow,
+      NULL,
+      STRING_TOKEN (STR_LS_HEADER_LINE1),
+      gShellLevel2HiiHandle,
+      DirectoryName
+     );
+    FreePool(DirectoryName);
+  }
 
   Status = ShellOpenFileMetaArg((CHAR16*)CorrectedPath, EFI_FILE_MODE_READ, &ListHead);
   if (EFI_ERROR(Status)) {
@@ -192,25 +213,6 @@ PrintLsOutput(
     }
   }
 
-  if (!Sfo) {
-    //
-    // get directory name from path...
-    //
-    DirectoryName = GetFullyQualifiedPath(CorrectedPath);
-
-    //
-    // print header
-    //
-    ShellPrintHiiEx (
-      0,
-      gST->ConOut->Mode->CursorRow,
-      NULL,
-      STRING_TOKEN (STR_LS_HEADER_LINE1),
-      gShellLevel2HiiHandle,
-      DirectoryName
-     );
-    FreePool(DirectoryName);
-  }
   for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode(&ListHead->Link)
       ; !IsNull(&ListHead->Link, &Node->Link)
       ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode(&ListHead->Link, &Node->Link)
@@ -230,21 +232,17 @@ PrintLsOutput(
        ){
         continue;
       }
-    } else if (Attribs != EFI_FILE_VALID_ATTR) {
-      if (Count == 1) {
-        //
-        // the bit must match
-        //
-        if ( (Node->Info->Attribute & Attribs) != Attribs) {
-          continue;
-        }
-      } else {
-        //
-        // exact match on all bits
-        //
-        if ( (Node->Info->Attribute|EFI_FILE_ARCHIVE) != (Attribs|EFI_FILE_ARCHIVE)) {
-          continue;
-        }
+    } else if ((Attribs != EFI_FILE_VALID_ATTR) ||
+               (Count == 5)) {
+      //
+      // Only matches the bits which "Attribs" contains, not
+      // all files/directories with any of the bits.
+      // Count == 5 is used to tell the difference between a user
+      // specifying all bits (EX: -arhsda) and just specifying
+      // -a (means display all files with any attribute).
+      //
+      if ( (Node->Info->Attribute & Attribs) != Attribs) {
+        continue;
       }
     }
 
@@ -543,7 +541,21 @@ ShellCommandRunLs (
             ASSERT((FullPath == NULL && Size == 0) || (FullPath != NULL));
             StrnCatGrow(&FullPath, &Size, PathName, 0);
             if  (ShellIsDirectory(PathName) == EFI_SUCCESS) {
-              StrnCatGrow(&FullPath, &Size, L"\\*", 0);
+              if (PathName[StrLen (PathName) - 1] == '\\') {
+                //
+                // For path ending with '\', just append '*'.
+                //
+                StrnCatGrow (&FullPath, &Size, L"*", 0);
+              } else if (PathName[StrLen (PathName) - 1] == '*') {
+                //
+                // For path ending with '*', do nothing.
+                //
+              } else {
+                //
+                // Otherwise, append '\*' to directory name.
+                //
+                StrnCatGrow (&FullPath, &Size, L"\\*", 0);
+              }
             }
           }
         } else {
@@ -568,7 +580,7 @@ ShellCommandRunLs (
             (INT16)(TheTime.TimeZone==EFI_UNSPECIFIED_TIMEZONE?0:TheTime.TimeZone)
            );
           if (ShellStatus == SHELL_NOT_FOUND) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_FILES), gShellLevel2HiiHandle);
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_LS_FILE_NOT_FOUND), gShellLevel2HiiHandle);
           } else if (ShellStatus == SHELL_INVALID_PARAMETER) {
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle);
           } else if (ShellStatus == SHELL_ABORTED) {
