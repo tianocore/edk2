@@ -1,6 +1,7 @@
 /** @file
   Main file for Type shell level 3 function.
 
+  Copyright (c) 2013, Hewlett-Packard Development Company, L.P.
   Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -31,59 +32,129 @@
 EFI_STATUS
 EFIAPI
 TypeFileByHandle (
-  IN EFI_HANDLE Handle,
-  BOOLEAN Ascii,
-  BOOLEAN UCS2
+  IN SHELL_FILE_HANDLE Handle,
+  IN BOOLEAN Ascii,
+  IN BOOLEAN UCS2
   )
 {
   UINTN       ReadSize;
   VOID        *Buffer;
+  VOID        *AllocatedBuffer;
   EFI_STATUS  Status;
   UINTN       LoopVar;
+  UINTN       LoopSize;
   CHAR16      AsciiChar;
+  CHAR16      Ucs2Char;
 
   ReadSize = PcdGet32(PcdShellFileOperationSize);
-  Buffer = AllocateZeroPool(ReadSize);
-  if (Buffer == NULL) {
+  AllocatedBuffer = AllocateZeroPool(ReadSize);
+  if (AllocatedBuffer == NULL) {
     return (EFI_OUT_OF_RESOURCES);
   }
 
   Status = ShellSetFilePosition(Handle, 0);
   ASSERT_EFI_ERROR(Status);
 
-  while (ReadSize == ((UINTN)PcdGet32(PcdShellFileOperationSize))){
+  while (ReadSize == ((UINTN)PcdGet32(PcdShellFileOperationSize))) {
+    Buffer = AllocatedBuffer;
     ZeroMem(Buffer, ReadSize);
     Status = ShellReadFile(Handle, &ReadSize, Buffer);
     if (EFI_ERROR(Status)){
       break;
     }
 
-    if (!(Ascii|UCS2)){
+    if (!(Ascii|UCS2)) {
       if (*(UINT16*)Buffer == gUnicodeFileTag) {
         UCS2 = TRUE;
-        Buffer = ((UINT16*)Buffer) + 1;
       } else {
         Ascii = TRUE;
       }
     }
 
-    //
-    // We want to use plain Print function here! (no color support for files)
-    //
-    if (Ascii){
-      for (LoopVar = 0 ; LoopVar < ReadSize ; LoopVar++) {
-      AsciiChar = CHAR_NULL;
-      AsciiChar = ((CHAR8*)Buffer)[LoopVar];
-      if (AsciiChar == CHAR_NULL) {
-        AsciiChar = '.';
-      }
-      Print(L"%c", AsciiChar);
+    if (Ascii) {
+      LoopSize = ReadSize;
+      for (LoopVar = 0 ; LoopVar < LoopSize ; LoopVar++) {
+        //
+        // The valid range of ASCII characters is 0x20-0x7E.
+        // Display "." when there is an invalid character.
+        //
+        AsciiChar = CHAR_NULL;
+        AsciiChar = ((CHAR8*)Buffer)[LoopVar];
+        if (AsciiChar == '\r' || AsciiChar == '\n') {
+          //
+          // Allow Line Feed (LF) (0xA) & Carriage Return (CR) (0xD)
+          // characters to be displayed as is.
+          // 
+          if (AsciiChar == '\n' && ((CHAR8*)Buffer)[LoopVar-1] != '\r') {
+            //
+            // In case Line Feed (0xA) is encountered & Carriage Return (0xD)
+            // was not the previous character, print CR and LF. This is because
+            // Shell 2.0 requires carriage return with line feed for displaying
+            // each new line from left.
+            //
+            ShellPrintEx (-1, -1, L"\r\n");
+            continue;
+          }
+        } else {
+          //
+          // For all other characters which are not printable, display '.'
+          //
+          if (AsciiChar < 0x20 || AsciiChar >= 0x7F) {
+            AsciiChar = '.';
+          }
+        }
+        ShellPrintEx (-1, -1, L"%c", AsciiChar);
       }
     } else {
-      Print(L"%s", Buffer);
+      if (*(UINT16*)Buffer == gUnicodeFileTag) {
+        //
+        // For unicode files, skip displaying the byte order marker.
+        //
+        Buffer = ((UINT16*)Buffer) + 1;
+        LoopSize = (ReadSize / (sizeof (CHAR16))) - 1;
+      } else {
+        LoopSize = ReadSize / (sizeof (CHAR16));
+      }
+      
+      for (LoopVar = 0 ; LoopVar < LoopSize ; LoopVar++) {
+        //
+        // An invalid range of characters is 0x0-0x1F.
+        // Display "." when there is an invalid character.
+        //
+        Ucs2Char = CHAR_NULL;
+        Ucs2Char = ((CHAR16*)Buffer)[LoopVar];
+        if (Ucs2Char == '\r' || Ucs2Char == '\n') {
+          //
+          // Allow Line Feed (LF) (0xA) & Carriage Return (CR) (0xD)
+          // characters to be displayed as is.
+          // 
+          if (Ucs2Char == '\n' && ((CHAR16*)Buffer)[LoopVar-1] != '\r') {
+            //
+            // In case Line Feed (0xA) is encountered & Carriage Return (0xD)
+            // was not the previous character, print CR and LF. This is because
+            // Shell 2.0 requires carriage return with line feed for displaying
+            // each new line from left.
+            //
+            ShellPrintEx (-1, -1, L"\r\n");
+            continue;
+          }
+        } 
+        else if (Ucs2Char < 0x20) {
+          //
+          // For all other characters which are not printable, display '.'
+          //
+          Ucs2Char = L'.';
+        }
+        ShellPrintEx (-1, -1, L"%c", Ucs2Char);
+      }
+    }
+
+    if (ShellGetExecutionBreakFlag()) {
+      break;
     }
   }
-  Print(L"\r\n", Buffer);
+  FreePool (AllocatedBuffer);
+  ShellPrintEx (-1, -1, L"\r\n");
   return (Status);
 }
 
@@ -196,6 +267,11 @@ ShellCommandRunType (
                 ; !IsNull(&FileList->Link, &Node->Link) && !ShellGetExecutionBreakFlag()
                 ; Node = (EFI_SHELL_FILE_INFO*)GetNextNode(&FileList->Link, &Node->Link)
                ){
+
+              if (ShellGetExecutionBreakFlag()) {
+                break;
+              }
+
               //
               // make sure the file opened ok
               //
@@ -217,7 +293,7 @@ ShellCommandRunType (
               //
               // do it
               //
-              Status = TypeFileByHandle(Node->Handle, AsciiMode, UnicodeMode);
+              Status = TypeFileByHandle (Node->Handle, AsciiMode, UnicodeMode);
               if (EFI_ERROR(Status)) {
                 ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_TYP_ERROR), gShellLevel3HiiHandle, Node->FileName, Status);
                 ShellStatus = SHELL_INVALID_PARAMETER;
