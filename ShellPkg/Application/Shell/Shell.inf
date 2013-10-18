@@ -1,6 +1,7 @@
 ##  @file
 #  This is the shell application
 #
+#  Copyright (c) 2013, Hewlett-Packard Development Company, L.P.
 #  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
@@ -106,4 +107,5 @@
   gEfiShellPkgTokenSpaceGuid.PcdShellMapNameLength        # ALWAYS_CONSUMED
   gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize      # ALWAYS_CONSUMED
   gEfiShellPkgTokenSpaceGuid.PcdShellForceConsole         # ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupplier             # ALWAYS_CONSUMED
 

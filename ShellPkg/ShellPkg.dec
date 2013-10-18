@@ -2,6 +2,7 @@
 #
 # This Package provides all definitions for EFI and UEFI Shell
 #
+# Copyright (c) 2013, Hewlett-Packard Development Company, L.P.
 # Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available under
@@ -47,7 +48,7 @@
 
 [Guids]
   gEfiShellEnvironment2ExtGuid    = {0xd2c18636, 0x40e5, 0x4eb5, {0xa3, 0x1b, 0x36, 0x69, 0x5f, 0xd4, 0x2c, 0x87}}
-  gEfiShellPkgTokenSpaceGuid	    = {0x171e9188, 0x31d3, 0x40f5, {0xb1, 0x0c, 0x53, 0x9b, 0x2d, 0xb9, 0x40, 0xcd}}
+  gEfiShellPkgTokenSpaceGuid      = {0x171e9188, 0x31d3, 0x40f5, {0xb1, 0x0c, 0x53, 0x9b, 0x2d, 0xb9, 0x40, 0xcd}}
   gShellVariableGuid              = {0x158def5a, 0xf656, 0x419c, {0xb0, 0x27, 0x7a, 0x31, 0x92, 0xc0, 0x79, 0xd2}}
   gShellMapGuid                   = {0x51271e13, 0x7de3, 0x43af, {0x8b, 0xc2, 0x71, 0xad, 0x3b, 0x82, 0x43, 0x25}}
   gShellAliasGuid                 = {0x0053d9d6, 0x2659, 0x4599, {0xa2, 0x6b, 0xef, 0x45, 0x36, 0xe6, 0x31, 0xa9}}
@@ -119,3 +120,6 @@
   ## this flag determins the default number of screens kept for history log.
   #  the spec defines 3 as the minimum
   gEfiShellPkgTokenSpaceGuid.PcdShellScreenLogCount|3|UINT8|0x00000008
+
+  ## Unicode string of the shell supplier
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupplier|L"EDK II"|VOID*|0x00000010

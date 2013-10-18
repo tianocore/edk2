@@ -297,11 +297,28 @@ UefiMain (
         0,
         gST->ConOut->Mode->CursorRow,
         NULL,
-        STRING_TOKEN (STR_VER_OUTPUT_MAIN),
+        STRING_TOKEN (STR_VER_OUTPUT_MAIN_SHELL),
         ShellInfoObject.HiiHandle,
         SupportLevel[PcdGet8(PcdShellSupportLevel)],
         gEfiShellProtocol->MajorVersion,
-        gEfiShellProtocol->MinorVersion,
+        gEfiShellProtocol->MinorVersion
+       );
+
+      ShellPrintHiiEx (
+        -1,
+        -1,
+        NULL,
+        STRING_TOKEN (STR_VER_OUTPUT_MAIN_SUPPLIER),
+        ShellInfoObject.HiiHandle,
+        (CHAR16 *) PcdGetPtr (PcdShellSupplier)
+       );
+
+      ShellPrintHiiEx (
+        -1,
+        -1,
+        NULL,
+        STRING_TOKEN (STR_VER_OUTPUT_MAIN_UEFI),
+        ShellInfoObject.HiiHandle,
         (gST->Hdr.Revision&0xffff0000)>>16,
         (gST->Hdr.Revision&0x0000ffff),
         gST->FirmwareVendor,
@@ -840,12 +857,12 @@ DoStartupScript(
   //
   // print out our warning and see if they press a key
   //
-  for ( Status = EFI_UNSUPPORTED, Delay = ShellInfoObject.ShellInitSettings.Delay * 10
+  for ( Status = EFI_UNSUPPORTED, Delay = ShellInfoObject.ShellInitSettings.Delay
       ; Delay != 0 && EFI_ERROR(Status)
       ; Delay--
      ){
-    ShellPrintHiiEx(0, gST->ConOut->Mode->CursorRow, NULL, STRING_TOKEN (STR_SHELL_STARTUP_QUESTION), ShellInfoObject.HiiHandle, Delay/10);
-    gBS->Stall (100000);
+    ShellPrintHiiEx(0, gST->ConOut->Mode->CursorRow, NULL, STRING_TOKEN (STR_SHELL_STARTUP_QUESTION), ShellInfoObject.HiiHandle, Delay);
+    gBS->Stall (1000000);
     if (!ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoConsoleIn) {
       Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
     }
@@ -1396,11 +1413,30 @@ RunCommand(
   if (CleanOriginal == NULL) {
     return (EFI_OUT_OF_RESOURCES);
   }
-  while (CleanOriginal[StrLen(CleanOriginal)-1] == L' ') {
-    CleanOriginal[StrLen(CleanOriginal)-1] = CHAR_NULL;
-  }
+
+  //
+  // Remove any spaces at the beginning of the string.
+  //
   while (CleanOriginal[0] == L' ') {
     CopyMem(CleanOriginal, CleanOriginal+1, StrSize(CleanOriginal) - sizeof(CleanOriginal[0]));
+  }
+
+  //
+  // Handle case that passed in command line is just 1 or more " " characters.
+  //
+  if (StrLen (CleanOriginal) == 0) {
+    if (CleanOriginal != NULL) {
+      FreePool(CleanOriginal);
+      CleanOriginal = NULL;
+    }
+    return (EFI_SUCCESS);
+  }
+
+  //
+  // Remove any spaces at the end of the string.
+  //
+  while (CleanOriginal[StrLen(CleanOriginal)-1] == L' ') {
+    CleanOriginal[StrLen(CleanOriginal)-1] = CHAR_NULL;
   }
 
   CommandName = NULL;
@@ -1892,9 +1928,15 @@ RunScriptFileHandle (
             Status = RunCommand(CommandLine3+1);
 
             //
-            // Now restore the pre-'@' echo state.
+            // If command was "@echo -off" or "@echo -on" then don't restore echo state
             //
-            ShellCommandSetEchoState(PreCommandEchoState);
+            if (StrCmp (L"@echo -off", CommandLine3) != 0 &&
+                StrCmp (L"@echo -on", CommandLine3) != 0) {
+              //
+              // Now restore the pre-'@' echo state.
+              //
+              ShellCommandSetEchoState(PreCommandEchoState);
+            }
           } else {
             if (ShellCommandGetEchoState()) {
               CurDir = ShellInfoObject.NewEfiShellProtocol->GetEnv(L"cwd");

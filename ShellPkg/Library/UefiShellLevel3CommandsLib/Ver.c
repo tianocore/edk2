@@ -1,6 +1,7 @@
 /** @file
   Main file for Ver shell level 3 function.
 
+  Copyright (c) 2013, Hewlett-Packard Development Company, L.P.
   Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -108,8 +109,9 @@ ShellCommandRunVer (
             -1,
             -1,
             NULL,
-            STRING_TOKEN (STR_VER_EXTRA_STRING),
-            gShellLevel3HiiHandle
+            STRING_TOKEN (STR_VER_OUTPUT_SUPPLIER),
+            gShellLevel3HiiHandle,
+            (CHAR16 *) PcdGetPtr (PcdShellSupplier)
            );
 
 
