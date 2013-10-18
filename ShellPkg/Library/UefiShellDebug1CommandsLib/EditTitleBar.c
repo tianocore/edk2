@@ -1,6 +1,7 @@
 /** @file
   Implements titlebar interface functions.
 
+  Copyright (c) 2013, Hewlett-Packard Development Company, L.P.
   Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -170,6 +171,8 @@ MainTitleBarRefresh (
     case FileTypeAscii:
     case FileTypeUnicode:
       if (FileType == FileTypeAscii){
+        ShellPrintEx (-1,-1, L"     ASCII     ");
+      } else {
         ShellPrintEx (-1,-1, L"     UNICODE   ");
       }
       //
