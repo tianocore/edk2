@@ -2535,7 +2535,8 @@ IScsiExecuteScsiCommand (
   Timeout       = 0;
 
   if (Session->State != SESSION_STATE_LOGGED_IN) {
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
+    goto ON_EXIT;
   }
 
   Conn = NET_LIST_USER_STRUCT_S (
@@ -2707,7 +2708,7 @@ IScsiSessionReinstatement (
   EFI_STATUS    Status;
 
   Session = &Private->Session;
-  ASSERT (Session->State == SESSION_STATE_LOGGED_IN);
+  ASSERT (Session->State != SESSION_STATE_FREE);
 
   //
   // Abort the session and re-init it.
