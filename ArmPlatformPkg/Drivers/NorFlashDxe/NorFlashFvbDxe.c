@@ -608,7 +608,7 @@ FvbWrite (
   CopyMem((BlockBuffer + Offset), Buffer, *NumBytes);
 
   // Write the modified buffer back to the NorFlash
-  Status = NorFlashWriteBlocks (Instance, Instance->StartLba + Lba, BlockSize, BlockBuffer);
+  TempStatus = NorFlashWriteBlocks (Instance, Instance->StartLba + Lba, BlockSize, BlockBuffer);
   if (EFI_ERROR (TempStatus)) {
     // Return one of the pre-approved error statuses
     Status = EFI_DEVICE_ERROR;
