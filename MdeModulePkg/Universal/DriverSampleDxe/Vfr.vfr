@@ -259,6 +259,9 @@ formset
       help        = STRING_TOKEN(STR_ONE_OF_HELP),
       option text = STRING_TOKEN(STR_ONE_OF_TEXT1), value = 0, flags = RESET_REQUIRED;
       option text = STRING_TOKEN(STR_ONE_OF_TEXT2), value = 1, flags = DEFAULT | RESET_REQUIRED;
+      warningif prompt = STRING_TOKEN(STR_WARNING_POPUP), timeout = 5,
+        ideqval MyIfrNVData.TestLateCheck == 0
+      endif
 
     endoneof;
 
