@@ -65,7 +65,6 @@ typedef struct {
   LIST_ENTRY          Entry;             // Link to VarStorage
   EFI_GUID            Guid;
   CHAR16              *Name;
-  EFI_VARSTORE_ID     VarStoreId;
   UINT16              Size;
   UINT8               Type;
   LIST_ENTRY          BlockEntry;        // Link to its Block array

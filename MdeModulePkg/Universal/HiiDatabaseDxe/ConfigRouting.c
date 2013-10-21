@@ -1109,6 +1109,7 @@ GetVarStoreType (
 {
   EFI_STATUS               Status;
   UINTN                    IfrOffset;
+  UINTN                    PackageOffset;
   EFI_IFR_OP_HEADER        *IfrOpHdr;
   CHAR16                   *VarStoreName;
   EFI_STRING               GuidStr;
@@ -1118,6 +1119,7 @@ GetVarStoreType (
   UINT8                    *HiiFormPackage;
   UINTN                    PackageSize;
   EFI_IFR_VARSTORE_EFI     *IfrEfiVarStore;
+  EFI_HII_PACKAGE_HEADER   *PackageHeader;
   
   HiiFormPackage = NULL;
   LengthString     = 0;
@@ -1132,10 +1134,26 @@ GetVarStoreType (
     return Status;
   }
 
-  IfrOffset   = sizeof (EFI_HII_PACKAGE_HEADER);
+  IfrOffset     = sizeof (EFI_HII_PACKAGE_HEADER);
+  PackageOffset = IfrOffset;
+  PackageHeader = (EFI_HII_PACKAGE_HEADER *) HiiFormPackage;
+
   while (IfrOffset < PackageSize) {
-    IfrOpHdr  = (EFI_IFR_OP_HEADER *) (HiiFormPackage + IfrOffset);    
+    //
+    // More than one form packages exist.
+    //
+    if (PackageOffset >= PackageHeader->Length) {
+        //
+        // Process the new form package.
+        //
+        PackageOffset = sizeof (EFI_HII_PACKAGE_HEADER);
+        IfrOffset    += PackageOffset;
+        PackageHeader = (EFI_HII_PACKAGE_HEADER *) (HiiFormPackage + IfrOffset);
+    }
+
+    IfrOpHdr  = (EFI_IFR_OP_HEADER *) (HiiFormPackage + IfrOffset);
     IfrOffset += IfrOpHdr->Length;
+    PackageOffset += IfrOpHdr->Length;
 
     if (IfrOpHdr->OpCode == EFI_IFR_VARSTORE_EFI_OP ) {
       IfrEfiVarStore = (EFI_IFR_VARSTORE_EFI *) IfrOpHdr;
@@ -1190,6 +1208,13 @@ GetVarStoreType (
       FreePool (GuidStr);
       FreePool (NameStr);
       FreePool (TempStr);
+
+      //
+      // Already found the varstore, break;
+      //
+      if (*IsEfiVarstore) {
+        break;
+      }
     }
   }
 Done:
@@ -1415,6 +1440,7 @@ ParseIfrData (
 {
   EFI_STATUS               Status;
   UINTN                    IfrOffset;
+  UINTN                    PackageOffset;
   EFI_IFR_VARSTORE         *IfrVarStore;
   EFI_IFR_VARSTORE_EFI     *IfrEfiVarStore;
   EFI_IFR_OP_HEADER        *IfrOpHdr;
@@ -1438,25 +1464,50 @@ ParseIfrData (
   LIST_ENTRY               *LinkData;
   LIST_ENTRY               *LinkDefault;
   EFI_IFR_VARSTORE_NAME_VALUE *IfrNameValueVarStore;
+  EFI_HII_PACKAGE_HEADER   *PackageHeader;
+  EFI_VARSTORE_ID          VarStoreId;
 
   Status           = EFI_SUCCESS;
   BlockData        = NULL;
   DefaultDataPtr   = NULL;
   FirstOneOfOption = FALSE;
+  VarStoreId       = 0;
   ZeroMem (&DefaultData, sizeof (IFR_DEFAULT_DATA));
 
   //
   // Go through the form package to parse OpCode one by one.
   //
-  IfrOffset   = sizeof (EFI_HII_PACKAGE_HEADER);
+  PackageOffset = sizeof (EFI_HII_PACKAGE_HEADER);
+  PackageHeader = (EFI_HII_PACKAGE_HEADER *) Package;
+  IfrOffset     = PackageOffset;
   while (IfrOffset < PackageLength) {
+
+    //
+    // More than one form package found.
+    //
+    if (PackageOffset >= PackageHeader->Length) {
+        //
+        // Already found varstore for this request, break;
+        //
+        if (VarStoreId != 0) {
+          VarStoreId = 0;
+        }
+
+        //
+        // Get next package header info.
+        //
+        IfrOffset    += sizeof (EFI_HII_PACKAGE_HEADER);
+        PackageOffset = sizeof (EFI_HII_PACKAGE_HEADER);
+        PackageHeader = (EFI_HII_PACKAGE_HEADER *) (Package + IfrOffset);
+    }
+
     IfrOpHdr  = (EFI_IFR_OP_HEADER *) (Package + IfrOffset);
     switch (IfrOpHdr->OpCode) {
     case EFI_IFR_VARSTORE_OP:
       //
       // VarStore is found. Don't need to search any more.
       //
-      if (VarStorageData->VarStoreId != 0) {
+      if (VarStoreId != 0) {
         break;
       }
 
@@ -1474,10 +1525,10 @@ ParseIfrData (
         // Find the matched VarStore
         //
         CopyGuid (&VarStorageData->Guid, (EFI_GUID *) (VOID *) &IfrVarStore->Guid);
-        VarStorageData->VarStoreId = IfrVarStore->VarStoreId;
         VarStorageData->Size       = IfrVarStore->Size;
         VarStorageData->Name       = VarStoreName;
         VarStorageData->Type       = EFI_HII_VARSTORE_BUFFER;
+        VarStoreId                 = IfrVarStore->VarStoreId;
       }
       break;
 
@@ -1485,7 +1536,7 @@ ParseIfrData (
       //
       // VarStore is found. Don't need to search any more.
       //
-      if (VarStorageData->VarStoreId != 0) {
+      if (VarStoreId != 0) {
         break;
       }
 
@@ -1512,10 +1563,10 @@ ParseIfrData (
         // Find the matched VarStore
         //
         CopyGuid (&VarStorageData->Guid, (EFI_GUID *) (VOID *) &IfrEfiVarStore->Guid);
-        VarStorageData->VarStoreId = IfrEfiVarStore->VarStoreId;
         VarStorageData->Size       = IfrEfiVarStore->Size;
         VarStorageData->Name       = VarStoreName;
         VarStorageData->Type       = EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER;
+        VarStoreId                 = IfrEfiVarStore->VarStoreId;
       }
       break;
 
@@ -1523,7 +1574,7 @@ ParseIfrData (
       //
       // VarStore is found. Don't need to search any more.
       //
-      if (VarStorageData->VarStoreId != 0) {
+      if (VarStoreId != 0) {
         break;
       }
 
@@ -1534,8 +1585,8 @@ ParseIfrData (
         // Find the matched VarStore
         //
         CopyGuid (&VarStorageData->Guid, (EFI_GUID *) (VOID *) &IfrNameValueVarStore->Guid);
-        VarStorageData->VarStoreId = IfrNameValueVarStore->VarStoreId;
         VarStorageData->Type       = EFI_HII_VARSTORE_NAME_VALUE;
+        VarStoreId                 = IfrNameValueVarStore->VarStoreId;
       }
       break;
 
@@ -1558,7 +1609,7 @@ ParseIfrData (
       //
       // No matched varstore is found and directly return.
       //
-      if (VarStorageData->VarStoreId == 0) {
+      if ( VarStoreId == 0) {
         Status = EFI_SUCCESS;
         goto Done;
       }
@@ -1568,7 +1619,7 @@ ParseIfrData (
       //
       // Ref question is not in IFR Form. This IFR form is not valid. 
       //
-      if (VarStorageData->VarStoreId == 0) {
+      if ( VarStoreId == 0) {
         Status = EFI_INVALID_PARAMETER;
         goto Done;
       }
@@ -1576,7 +1627,7 @@ ParseIfrData (
       // Check whether this question is for the requested varstore.
       //
       IfrRef = (EFI_IFR_REF4 *) IfrOpHdr;
-      if (IfrRef->Question.VarStoreId != VarStorageData->VarStoreId) {
+      if (IfrRef->Question.VarStoreId != VarStoreId) {
         break;
       }
       VarWidth  = (UINT16) (sizeof (EFI_HII_REF));
@@ -1596,7 +1647,7 @@ ParseIfrData (
       //
       // Numeric and OneOf question is not in IFR Form. This IFR form is not valid. 
       //
-      if (VarStorageData->VarStoreId == 0) {
+      if (VarStoreId == 0) {
         Status = EFI_INVALID_PARAMETER;
         goto Done;
       }
@@ -1604,7 +1655,7 @@ ParseIfrData (
       // Check whether this question is for the requested varstore.
       //
       IfrOneOf = (EFI_IFR_ONE_OF *) IfrOpHdr;
-      if (IfrOneOf->Question.VarStoreId != VarStorageData->VarStoreId) {
+      if (IfrOneOf->Question.VarStoreId != VarStoreId) {
         break;
       }
       VarWidth  = (UINT16) (1 << (IfrOneOf->Flags & EFI_IFR_NUMERIC_SIZE));
@@ -1673,7 +1724,7 @@ ParseIfrData (
       //
       // OrderedList question is not in IFR Form. This IFR form is not valid. 
       //
-      if (VarStorageData->VarStoreId == 0) {
+      if (VarStoreId == 0) {
         Status = EFI_INVALID_PARAMETER;
         goto Done;
       }
@@ -1681,7 +1732,7 @@ ParseIfrData (
       // Check whether this question is for the requested varstore.
       //
       IfrOrderedList = (EFI_IFR_ORDERED_LIST *) IfrOpHdr;
-      if (IfrOrderedList->Question.VarStoreId != VarStorageData->VarStoreId) {
+      if (IfrOrderedList->Question.VarStoreId != VarStoreId) {
         BlockData = NULL;
         break;
       }
@@ -1705,7 +1756,7 @@ ParseIfrData (
       //
       // CheckBox question is not in IFR Form. This IFR form is not valid. 
       //
-      if (VarStorageData->VarStoreId == 0) {
+      if (VarStoreId == 0) {
         Status = EFI_INVALID_PARAMETER;
         goto Done;
       }
@@ -1713,7 +1764,7 @@ ParseIfrData (
       // Check whether this question is for the requested varstore.
       //
       IfrCheckBox = (EFI_IFR_CHECKBOX *) IfrOpHdr;
-      if (IfrCheckBox->Question.VarStoreId != VarStorageData->VarStoreId) {
+      if (IfrCheckBox->Question.VarStoreId != VarStoreId) {
         break;
       }
       VarWidth  = (UINT16) sizeof (BOOLEAN);
@@ -1792,7 +1843,7 @@ ParseIfrData (
       //
       // Date question is not in IFR Form. This IFR form is not valid. 
       //
-      if (VarStorageData->VarStoreId == 0) {
+      if (VarStoreId == 0) {
         Status = EFI_INVALID_PARAMETER;
         goto Done;
       }
@@ -1800,7 +1851,7 @@ ParseIfrData (
       // Check whether this question is for the requested varstore.
       //
       IfrDate = (EFI_IFR_DATE *) IfrOpHdr;
-      if (IfrDate->Question.VarStoreId != VarStorageData->VarStoreId) {
+      if (IfrDate->Question.VarStoreId != VarStoreId) {
         break;
       }
 
@@ -1821,7 +1872,7 @@ ParseIfrData (
       //
       // Time question is not in IFR Form. This IFR form is not valid. 
       //
-      if (VarStorageData->VarStoreId == 0) {
+      if (VarStoreId == 0) {
         Status = EFI_INVALID_PARAMETER;
         goto Done;
       }
@@ -1829,7 +1880,7 @@ ParseIfrData (
       // Check whether this question is for the requested varstore.
       //
       IfrTime = (EFI_IFR_TIME *) IfrOpHdr;
-      if (IfrTime->Question.VarStoreId != VarStorageData->VarStoreId) {
+      if (IfrTime->Question.VarStoreId != VarStoreId) {
         break;
       }
 
@@ -1850,7 +1901,7 @@ ParseIfrData (
       //
       // String question is not in IFR Form. This IFR form is not valid. 
       //
-      if (VarStorageData->VarStoreId == 0) {
+      if (VarStoreId == 0) {
         Status = EFI_INVALID_PARAMETER;
         goto Done;
       }
@@ -1858,7 +1909,7 @@ ParseIfrData (
       // Check whether this question is for the requested varstore.
       //
       IfrString = (EFI_IFR_STRING *) IfrOpHdr;
-      if (IfrString->Question.VarStoreId != VarStorageData->VarStoreId) {
+      if (IfrString->Question.VarStoreId != VarStoreId) {
         break;
       }
 
@@ -1884,7 +1935,7 @@ ParseIfrData (
       //
       // Password question is not in IFR Form. This IFR form is not valid. 
       //
-      if (VarStorageData->VarStoreId == 0) {
+      if (VarStoreId == 0) {
         Status = EFI_INVALID_PARAMETER;
         goto Done;
       }
@@ -1892,7 +1943,7 @@ ParseIfrData (
       // Check whether this question is for the requested varstore.
       //
       IfrPassword = (EFI_IFR_PASSWORD *) IfrOpHdr;
-      if (IfrPassword->Question.VarStoreId != VarStorageData->VarStoreId) {
+      if (IfrPassword->Question.VarStoreId != VarStoreId) {
         break;
       }
 
@@ -2089,7 +2140,8 @@ ParseIfrData (
       break;
     }
 
-    IfrOffset += IfrOpHdr->Length;
+    IfrOffset     += IfrOpHdr->Length;
+    PackageOffset += IfrOpHdr->Length;
   }
 
 Done:
@@ -2990,7 +3042,7 @@ GetFullStringFromHiiFormPackages (
   //
   // No requested varstore in IFR data and directly return
   //
-  if (VarStorageData->VarStoreId == 0) {
+  if (VarStorageData->Type == 0 && VarStorageData->Name == NULL) {
     Status = EFI_SUCCESS;
     goto Done;
   }
