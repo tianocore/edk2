@@ -181,7 +181,7 @@ EfiTimeToEpoch (
 
   JulianDate = Time->Day + ((153*m + 2)/5) + (365*y) + (y/4) - (y/100) + (y/400) - 32045;
 
-  ASSERT(JulianDate > EPOCH_JULIAN_DATE);
+  ASSERT (JulianDate >= EPOCH_JULIAN_DATE);
   EpochDays = JulianDate - EPOCH_JULIAN_DATE;
 
   EpochSeconds = (EpochDays * SEC_PER_DAY) + ((UINTN)Time->Hour * SEC_PER_HOUR) + (Time->Minute * SEC_PER_MIN) + Time->Second;
@@ -420,16 +420,9 @@ LibSetTime (
   EFI_STATUS  Status;
   UINTN       EpochSeconds;
 
-  // Because the PL031 is a 32-bit counter counting seconds,
-  // the maximum time span is just over 136 years.
-  // Time is stored in Unix Epoch format, so it starts in 1970,
-  // Therefore it can not exceed the year 2106.
-  // This is not a problem for UEFI, as the current spec limits the years
-  // to the range 1998 .. 2011
-
-  // Check the input parameters' range.
-  if ((Time->Year   < 1998) ||
-       (Time->Year   > 2099) ||
+  // Check the input parameters are within the range specified by UEFI
+  if ((Time->Year   < 1900) ||
+       (Time->Year   > 9999) ||
        (Time->Month  < 1   ) ||
        (Time->Month  > 12  ) ||
        (!DayValid (Time)    ) ||
@@ -441,6 +434,15 @@ LibSetTime (
        (Time->Daylight & (~(EFI_TIME_ADJUST_DAYLIGHT | EFI_TIME_IN_DAYLIGHT)))
     ) {
     Status = EFI_INVALID_PARAMETER;
+    goto EXIT;
+  }
+
+  // Because the PL031 is a 32-bit counter counting seconds,
+  // the maximum time span is just over 136 years.
+  // Time is stored in Unix Epoch format, so it starts in 1970,
+  // Therefore it can not exceed the year 2106.
+  if ((Time->Year < 1970) || (Time->Year >= 2106)) {
+    Status = EFI_UNSUPPORTED;
     goto EXIT;
   }
 
