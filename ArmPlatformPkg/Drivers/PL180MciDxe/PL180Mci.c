@@ -336,7 +336,7 @@ MciWriteBlockData (
       Loop++;
       MmioWrite32(MCI_FIFO_REG, Buffer[Loop]);
       Loop++;
-    } else if ((Status & MCI_STATUS_CMD_TXFIFOEMPTY)) {
+    } else if (!(Status & MCI_STATUS_CMD_TXFIFOFULL)) {
         MmioWrite32(MCI_FIFO_REG, Buffer[Loop]);
         Loop++;
     } else {
