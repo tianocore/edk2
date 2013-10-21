@@ -29,6 +29,14 @@ typedef struct {
   TPM_RSP_COMMAND_HDR   Hdr;
 } TPM_RSP_START_UP;
 
+typedef struct {
+  TPM_RQU_COMMAND_HDR   Hdr;
+} TPM_CMD_SAVE_STATE;
+
+typedef struct {
+  TPM_RSP_COMMAND_HDR   Hdr;
+} TPM_RSP_SAVE_STATE;
+
 #pragma pack()
 
 /**
@@ -71,6 +79,47 @@ Tpm12Startup (
   case TPM_SUCCESS:
   case TPM_INVALID_POSTINIT:
     // In warm reset, TPM may response TPM_INVALID_POSTINIT
+    return EFI_SUCCESS;
+  default:
+    return EFI_DEVICE_ERROR;
+  }
+}
+
+/**
+  Send SaveState command to TPM1.2.
+
+  @retval EFI_SUCCESS      Operation completed successfully.
+  @retval EFI_DEVICE_ERROR Unexpected device behavior.
+**/
+EFI_STATUS
+EFIAPI
+Tpm12SaveState (
+  VOID
+  )
+{
+  EFI_STATUS                        Status;
+  UINT32                            TpmRecvSize;
+  UINT32                            TpmSendSize;
+  TPM_CMD_SAVE_STATE                SendBuffer;
+  TPM_RSP_SAVE_STATE                RecvBuffer;
+  UINT32                            ReturnCode;
+
+  //
+  // send Tpm command TPM_ORD_SaveState
+  //
+  TpmRecvSize               = sizeof (TPM_RSP_SAVE_STATE);
+  TpmSendSize               = sizeof (TPM_CMD_SAVE_STATE);
+  SendBuffer.Hdr.tag        = SwapBytes16 (TPM_TAG_RQU_COMMAND);
+  SendBuffer.Hdr.paramSize  = SwapBytes32 (TpmSendSize);
+  SendBuffer.Hdr.ordinal    = SwapBytes32 (TPM_ORD_SaveState);
+
+  Status = Tpm12SubmitCommand (TpmSendSize, (UINT8 *)&SendBuffer, &TpmRecvSize, (UINT8 *)&RecvBuffer);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  ReturnCode = SwapBytes32(RecvBuffer.Hdr.returnCode);
+  switch (ReturnCode) {
+  case TPM_SUCCESS:
     return EFI_SUCCESS;
   default:
     return EFI_DEVICE_ERROR;

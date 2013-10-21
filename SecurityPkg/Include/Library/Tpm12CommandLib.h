@@ -32,6 +32,18 @@ Tpm12Startup (
   );
 
 /**
+  Send SaveState command to TPM1.2.
+
+  @retval EFI_SUCCESS      Operation completed successfully.
+  @retval EFI_DEVICE_ERROR Unexpected device behavior.
+**/
+EFI_STATUS
+EFIAPI
+Tpm12SaveState (
+  VOID
+  );
+
+/**
   Send ForceClear command to TPM1.2.
 
   @retval EFI_SUCCESS      Operation completed successfully.
