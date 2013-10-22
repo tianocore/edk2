@@ -515,12 +515,10 @@ Returns:
 
 --*/
 {
-  EFI_PERFORMANCE_INSTANCE  *PerfInstance;
   EFI_PERF_DATA_LIST        *Node;
   UINT64                    TimerValue;
 
   TimerValue    = 0;
-  PerfInstance  = EFI_PERFORMANCE_FROM_THIS (This);
 
   Node          = GetDataNode (Handle, Token, Host, NULL, NULL);
   if (!Node) {
@@ -573,10 +571,7 @@ Returns:
 
 --*/
 {
-  EFI_PERFORMANCE_INSTANCE  *PerfInstance;
   EFI_PERF_DATA_LIST        *Node;
-
-  PerfInstance  = EFI_PERFORMANCE_FROM_THIS (This);
 
   Node          = GetDataNode (Handle, Token, Host, NULL, PrevGauge);
   if (Node != NULL) {

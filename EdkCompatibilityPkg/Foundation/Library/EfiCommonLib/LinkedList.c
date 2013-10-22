@@ -212,14 +212,12 @@ Returns:
 
 --*/
 {
-  EFI_LIST_ENTRY *Entry1ForwardLink;
   EFI_LIST_ENTRY *Entry1BackLink;
   EFI_LIST_ENTRY *Entry2ForwardLink;
   EFI_LIST_ENTRY *Entry2BackLink;
 
   Entry2ForwardLink           = Entry2->ForwardLink;          
   Entry2BackLink              = Entry2->BackLink;                
-  Entry1ForwardLink           = Entry1->ForwardLink;          
   Entry1BackLink              = Entry1->BackLink;                
   Entry2BackLink->ForwardLink = Entry2ForwardLink;    
   Entry2ForwardLink->BackLink = Entry2BackLink;       

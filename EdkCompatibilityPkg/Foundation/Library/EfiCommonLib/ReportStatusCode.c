@@ -339,6 +339,6 @@ Returns:
 #else
   *Marker = (VA_LIST) (DebugInfo + 1);
   *Format = (CHAR8 *)(((UINT64 *)*Marker) + 12);
-#endif
   return TRUE;
+#endif
 }
