@@ -2633,9 +2633,10 @@ XhcSetConfigCmd (
           if ((DeviceSpeed == EFI_USB_SPEED_FULL) || (DeviceSpeed == EFI_USB_SPEED_LOW)) {
             Interval = EpDesc->Interval;
             //
-            // Hard code the interval to MAX first, need calculate through the bInterval field of Endpoint descriptor.
+            // Calculate through the bInterval field of Endpoint descriptor.
             //
-            InputContext->EP[Dci-1].Interval = 6;
+            ASSERT (Interval != 0);
+            InputContext->EP[Dci-1].Interval = (UINT32)HighBitSet32((UINT32)Interval) + 3;
           } else if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
             Interval = EpDesc->Interval;
             ASSERT (Interval >= 1 && Interval <= 16);
@@ -2830,9 +2831,10 @@ XhcSetConfigCmd64 (
           if ((DeviceSpeed == EFI_USB_SPEED_FULL) || (DeviceSpeed == EFI_USB_SPEED_LOW)) {
             Interval = EpDesc->Interval;
             //
-            // Hard code the interval to MAX first, need calculate through the bInterval field of Endpoint descriptor.
+            // Calculate through the bInterval field of Endpoint descriptor.
             //
-            InputContext->EP[Dci-1].Interval = 6;
+            ASSERT (Interval != 0);
+            InputContext->EP[Dci-1].Interval = (UINT32)HighBitSet32((UINT32)Interval) + 3;
           } else if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
             Interval = EpDesc->Interval;
             ASSERT (Interval >= 1 && Interval <= 16);
