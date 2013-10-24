@@ -1,9 +1,8 @@
-                                    EADK
+                                     EADK
                   EDK II Standard Libraries and Applications
                                     ReadMe
-                                Beta-1 Release
-                                 27 Jan. 2012
-                                    DRAFT
+                                 Version 1.02
+                                 21 Dec. 2012
 
 
 OVERVIEW
@@ -17,8 +16,9 @@ At this time, applications developed with the EADK are intended to reside
 on, and be loaded from, storage separate from the core firmware.  This is
 primarily due to size and environmental requirements.
 
-Some components of the EADK can be built as drivers.  These will be identified
-explicitly in their documentation.
+This release of the EADK should only be used to produce UEFI Applications.  Due to the execution
+environment built by the StdLib component, execution as a UEFI driver can cause system stability
+issues.
 
 This document describes the EDK II specific aspects of installing, building,
 and using the Standard C Library component of the EDK II Application
@@ -28,7 +28,7 @@ The EADK is comprised of three packages:
         AppPkg, StdLib, and StdLibPrivateInternalFiles.
 
   AppPkg   This package contains applications which demonstrate use of the
-           Standard C Library.
+           Standard C and Sockets Libraries.
            These applications reside in AppPkg/Applications.
 
       Enquire  This is a program that determines many properties of the
@@ -43,7 +43,7 @@ The EADK is comprised of three packages:
       Main     This application is functionally identical to Hello, except that
                it uses the Standard C Library to provide a main() entry point.
 
-      Python   A port of the Python-2.7.2 interpreter for UEFI.  This
+      Python   A port of the Python-2.7.2 interpreter for UEFI.  Building this
                application is disabled by default.
                See the PythonReadMe.txt file, in the Python directory,
                for information on configuring and building Python.
@@ -51,28 +51,19 @@ The EADK is comprised of three packages:
       Sockets  A collection of applications demonstrating use of the
                EDK II Socket Libraries.  These applications include:
 
-               *   DataSink
-               *   DataSource
-               *   GetAddrInfo
-               *   GetHostByAddr
-               *   GetHostByDns
-               *   GetHostByName
-               *   GetNetByAddr
-               *   GetNetByName
-               *   GetServByName
-               *   GetServByPort
-               *   OobRx
-               *   OobTx
-               *   RawIp4Rx
-               *   RawIp4Tx
-               *   RecvDgram
-               *   SetHostName
-               *   SetSockOpt
-               *   TftpServer
+               *   DataSink                     *   DataSource
+               *   GetAddrInfo                  *   GetHostByAddr
+               *   GetHostByDns                 *   GetHostByName
+               *   GetNetByAddr                 *   GetNetByName
+               *   GetServByName                *   GetServByPort
+               *   OobRx                        *   OobTx
+               *   RawIp4Rx                     *   RawIp4Tx
+               *   RecvDgram                    *   SetHostName
+               *   SetSockOpt                   *   TftpServer
                *   WebServer
 
   StdLib   The StdLib package contains the standard header files as well as
-           implementations of standards based libraries.
+           implementations of other standards-based libraries.
 
            *   BsdSocketLib
                   Support routines above the sockets layer and C interface for
@@ -109,43 +100,30 @@ RELEASE NOTES
 =============
   Fixes and Additions
   -------------------
-Beginning with this release, applications built with the StdLib package
+Beginning with release 1.01, applications built with the StdLib package
 no longer have a dependency on the TimerLib.
 
   Known Issues
   -----------------
 This release of the EADK has some restrictions, as described below.
 
-    1.  Only the Microsoft VS2005 and VS2008, Intel C Compiler 10.1 (or later),
-        GCC 4.3 (mingw32), GCC 4.4, and GCC 4.5 C compilers are supported for
-        Ia32 or X64 CPU architectures.  Others may work but have not been tested.
-
-    2.  The target machine must be running firmware which provides the
+    1.  The target machine must be running firmware which provides the
         UEFI 2.3 HII protocol.
 
-    3.  The EADK has not been through Intel's Quality Assurance process. This
-        means that specified standards compliance has not been validated, nor
-        has it undergone formal functionality testing.
+    2.  Applications must be launched from within the EFI Shell.
 
-    4.  Applications must be launched from within the EFI Shell.
-
-    6.  Absolute file paths may optionally be prefixed by a volume specifier
+    3.  Absolute file paths may optionally be prefixed by a volume specifier
         such as "FS0:".  The volume specifier is separated from the remainder
         of the path by a single colon ':'.  The volume specifier must be one of
         the Shell's mapped volume names as shown by the "map" command.
 
-    7.  Absolute file paths that don't begin with a volume specifier;
+    4.  Absolute file paths that don't begin with a volume specifier;
         e.g. paths that begin with "/", are relative to the currently selected
         volume.  When the EFI Shell first starts, there is NO selected volume.
 
-    8.  The tmpfile(), and related, functions require that the current volume
+    5.  The tmpfile(), and related, functions require that the current volume
         have a temporary directory as specified in <paths.h>.  This directory
         is specified by macro _PATH_TMP as /Efi/StdLib/tmp.
-
-    9.  Input line editing is not supported.  Backspacing, deleting, or
-        otherwise attempting to modify interactive input will result in a
-        syntax error since the editing characters are interpreted the
-        same as any other character.
 
 The Standard C Library provided by this package is a "hosted" implementation
 conforming to the ISO/IEC 9899-1990 C Language Standard with Addendum 1. This
@@ -164,20 +142,18 @@ installed by extracting, downloading or copying them to the root of your EDK II
 source tree.  The three package directories should be peers to the Conf,
 MdePkg, Nt32Pkg, etc. directories.
 
-The Python 2.7.2 distribution must be downloaded from python.org before the
-Python application can be built.  Extracting Python-2.7.2.tgz into the
-AppPkg\Applications\Python directory will produce a Python-2.7.2 directory
-containing the Python distribution.  Python files that had to be modified for
-EDK II are in the AppPkg\Applications\Python\PyMod-2.7.2 directory.  These
-files need to be copied into the corresponding directories within Python-2.7.2.
-
-The Python 2.7.1 port was superseded before it was completed.  The PyMod-2.7.1
-directory tree will be deleted in the near future.  Use the Python 2.7.2 port,
-as described above.
-
 There are some boiler-plate declarations and definitions that need to be
 included in your application's INF and DSC build files.  These are described
 in the CONFIGURATION section, below.
+
+A subset of the Python 2.7.2 distribution is included as part of AppPkg.  If desired,
+the full Python 2.7.2 distribution may be downloaded from python.org and used instead.
+Delete or rename the existing Python-2.7.2 directory then extract the downloaded
+Python-2.7.2.tgz file into the AppPkg\Applications\Python directory.  This will produce a
+Python-2.7.2 directory containing the full Python distribution.  Python files that had to be
+modified for EDK II are in the AppPkg\Applications\Python\PyMod-2.7.2 directory.  These
+files need to be copied into the corresponding directories within the extracted Python-2.7.2
+directory before Python can be built.
 
 
 BUILDING
@@ -240,13 +216,13 @@ LibUefi     sys/EfiSysCall.h  Provides the UEFI system interface and
                               "System Calls"
 LibWchar    wchar.h           Extended multibyte and wide character utilities
 LibNetUtil                    Network address and number manipulation utilities
-DevConsole                    Automatically provided  File I/O abstractions for
+DevConsole                    Automatically provided File I/O abstractions for
                               the UEFI Console device.  No need to list this
                               library class in your INF file(s).
 DevShell    Add if desired    File I/O abstractions using UEFI shell
                               facilities.  Add this to the application's main
                               INF file if file-system access needed.
-DevUtility  -- Do Not Use --  Utility functions used by the Device abstractions
+DevUtility  -- Do Not Use --  Utility functions used internally by the Device abstractions
 LibGdtoa    -- Do Not Use --  This library is used internally and should not
                               need to be explicitly specified by an
                               application.  It must be defined as one of the
@@ -256,6 +232,10 @@ LibGdtoa    -- Do Not Use --  This library is used internally and should not
                          Table 1:  Standard Libraries
                          ============================
 
+The DevConsole and DevShell libraries provide device I/O functionality and are treated
+specially.  DevConsole is automatically included so there is no need to reference it in your
+application's DSC or INF files.  DevShell must be listed, in your application's INF file in the
+[LibraryClasses] section, if your application does file I/O.
 
 These libraries must be fully described in the [LibraryClasses] section of the
 application package's DSC file. Then, each individual application needs to
@@ -263,6 +243,11 @@ specify which libraries to link to by specifying the Library Class, from the
 above table, in the [LibraryClasses] section of the application's INF file. The
 AppPkg.dsc, StdLib.dsc, and Enquire.inf files provide good examples of this.
 More details are in the CONFIGURATION section, below.
+
+In order to simplify this process, the [LibraryClasses] definitions, and others, are
+specified in the StdLib.inc file.  If this file is included in the DSC file, usually at the
+end, then other DSC file changes or additions are unnecessary.  This is further described in
+the CONFIGURATION section, below.
 
 Within the source files of the application, use of the Standard headers and
 library functions follow standard C programming practices as formalized by
@@ -281,7 +266,43 @@ consolidated into a single file, StdLib/StdLib.inc, which can be included in
 your .dsc file using the !include directive.  The provided AppPkg.dsc and
 StdLib.dsc files do this on their last line.
 
+The "boilerplate" text can be included using a !include directive in the
+package's .dsc file.  The provided AppPkg.dsc and StdLib.dsc files include
+the following "boilerplate" text:
+
+  ##############################################################################
+  #
+  # Specify whether we are running in an emulation environment, or not.
+  # Define EMULATE if we are, else keep the DEFINE commented out.
+  #
+  # DEFINE  EMULATE = 1
+
+  ##############################################################################
+  #
+  #  Include Boilerplate text required for building with the Standard Libraries.
+  #
+  ##############################################################################
+  !include StdLib/StdLib.inc
+
+                      Figure 1: "Boilerplate" Inclusion
+                      =================================
+
+The EMULATE macro must be defined if one desires to do source-level debugging within one of
+the emulated environments such as NT32Pkg or UnixPkg.
+
+The final boilerplate line, in Figure 1, includes the StdLib.inc file.
 Each section of StdLib/StdLib.inc is described below.
+
+If desired, all of the Socket applications, in AppPkg, can be built by including Sockets.inc:
+
+  !include AppPkg/Applications/Sockets/Sockets.inc
+
+              Figure 2: Socket Applications "Boilerplate" Inclusion
+              =====================================================
+
+
+Descriptions of the Library Classes comprising the Standard Libraries,
+as shown in Figure 3: Library Class Descriptions, are provided.
 
   [LibraryClasses]
     #
@@ -318,14 +339,11 @@ Each section of StdLib/StdLib.inc is described below.
   [LibraryClasses.ARM.UEFI_APPLICATION]
     NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
-                     Figure 1: Library Class Descriptions
+                     Figure 3: Library Class Descriptions
                      ====================================
 
 
-Descriptions of the Library Classes comprising the Standard Libraries,
-as shown above in Figure 1: Library Class Descriptions, are provided.
-
-The directives in Figure 2: Package Component Descriptions will create
+The directives in Figure 4: Package Component Descriptions will create
 instances of the BaseLib and BaseMemoryLib library classes that are built
 with Link-time-Code-Generation disabled.  This is necessary when using the
 Microsoft tool chains in order to allow the library's functions to be
@@ -354,50 +372,43 @@ A DXE driver version of the Socket library is also built.
   ##########
     StdLib/SocketDxe/SocketDxe.inf
 
-                    Figure 2: Package Component Descriptions
+                    Figure 4: Package Component Descriptions
                     ========================================
 
 
 Each compiler assumes, by default, that it will be used with standard libraries
 and headers provided by the compiler vendor.  Many of these assumptions are
 incorrect for the UEFI environment.  By including a BuildOptions section, as
-shown in Figure 3: Package Build Options, these assumptions can be
+shown in Figure 5: Package Build Options, these assumptions can be
 tailored for compatibility with UEFI and the EDK II Standard Libraries.
 
+Note that the set of BuildOptions used is determined by the state of the EMULATE macro.
+
   [BuildOptions]
+  !ifndef $(EMULATE)
+    # These Build Options are used when building the Standard Libraries to be run
+    # on real hardware.
     INTEL:*_*_IA32_CC_FLAGS  = /Qfreestanding
      MSFT:*_*_IA32_CC_FLAGS  = /X /Zc:wchar_t
       GCC:*_*_IA32_CC_FLAGS  = -nostdinc -nostdlib
 
-  # The Build Options, below, are only used when building the C library
-  # to be run under an emulation environment.  They disable optimization
-  # which facillitates debugging under the Emulation environment.
+  !else
+    # The Build Options, below, are only used when building the Standard Libraries
+    # to be run under an emulation environment.
+    # They disable optimization which facillitates debugging under the Emulation environment.
+    INTEL:*_*_IA32_CC_FLAGS  = /Od
+     MSFT:*_*_IA32_CC_FLAGS  = /Od
+      GCC:*_*_IA32_CC_FLAGS  = -O0
 
-    # INTEL:*_*_IA32_CC_FLAGS  = /Od
-    #  MSFT:*_*_IA32_CC_FLAGS  = /Od
-    #   GCC:*_*_IA32_CC_FLAGS  = -O0
-
-                        Figure 4: Package Build Options
+                        Figure 5: Package Build Options
                         ===============================
-
-The "boilerplate" text can be included using a !include directive in the
-package's .dsc file.  The provided AppPkg.dsc and StdLib.dsc files include
-the "boilerplate" text as follows:
-
-  # Include Boilerplate text required for building with the Standard Libraries.
-  #
-  #############################################################################
-  !include StdLib/StdLib.inc
-
-                      Figure 5: "Boilerplate" Inclusion
-                      =================================
 
 
 INF Files
 =========
 The INF files for most modules will not require special directives in order to
-support the Standard Libraries.  The two cases which could occur are described
-below.
+support the Standard Libraries.  The two sections which require attention: LibraryClasses
+and BuildOptions, are described below.
 
   [LibraryClasses]
     UefiLib
@@ -410,9 +421,16 @@ below.
                       ================================
 
 
-Modules of type UEFI_APPLICATION that perform file I/O should include library
+Modules of type UEFI_APPLICATION that perform file I/O must include library
 class DevShell.  Including this library class will allow file operations to be
-handled by the UEFI Shell.  Without this class, only Console I/O is permitted.
+handled by the UEFI Shell.  Without this class, only Console I/O is supported.
+
+
+An application's INF file might need to include a [BuildOptions] section
+specifying additional compiler and linker flags necessary to allow the
+application to be built. Usually, this section is not needed.  When building
+code from external sources, though, it may be necessary to disable some
+warnings or enable/disable some compiler features.
 
  [BuildOptions]
   INTEL:*_*_*_CC_FLAGS          = /Qdiag-disable:181,186
@@ -421,13 +439,6 @@ handled by the UEFI Shell.  Without this class, only Console I/O is permitted.
 
                         Figure 7: Module Build Options
                         ==============================
-
-
-An application's INF file may need to include a [BuildOptions] section
-specifying additional compiler and linker flags necessary to allow the
-application to be built. Usually, this section is not needed.  When building
-code from external sources, though, it may be necessary to disable some
-warnings or enable/disable some compiler features.
 
 
 TARGET-SYSTEM INSTALLATION
@@ -444,13 +455,13 @@ the application was loaded from.  This tree structure is described below:
          |- /tmp              Temporary files created by tmpfile(), etc.
 
 
-The /Efi/StdLib/etc directory is populated from the StdLib/Efi/etc source
+The /Efi/StdLib/etc directory must be manually populated from the StdLib/Efi/etc source
 directory.
 
 IMPLEMENTATION-Specific Features
 ================================
 It is very strongly recommended that applications not use the long or
-unsigned long types. The size of this type varies between compilers and is one
+unsigned long types. The size of these types varies between compilers and is one
 of the less portable aspects of C. Instead, one should use the UEFI defined
 types whenever possible. Use of these types, listed below for reference,
 ensures that the declared objects have unambiguous, explicitly declared, sizes

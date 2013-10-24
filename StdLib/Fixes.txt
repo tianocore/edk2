@@ -1,0 +1,41 @@
+The following is a list of issues that have been fixed in the StdLib Package.
+See the file Issues.txt for a list of open, unresolved, problems.
+
+  Status Key:
+    Fixed         Problem has been resolved and changes committed.
+
+SocketLib
+=============
+ID      Category                           TOOLs       Reported       Status
+----  ------------------------            --------  --------------  -----------
+
+StdLib Issues
+=============
+ID      Category                           TOOLs       Reported       Status
+----  ------------------------            --------  --------------  -----------
+  1:  Compilation Error                    vs2010             2012  Fixed 3/2013
+      stdlib\libc\gdtoa\strtod.c(825) : warning C4789: destination of memory copy
+      is too small: runtime crashes when using floating-point formats with printf
+
+  2:  Compilation Error                     ALL               2012  Fixed 1/2012
+      StdLib/LibC/Uefi/SysCalls.c: In function 'utimes':
+                       error: 'va_start' used in function with fixed args
+
+  4:  Execution/Compile errors                                2012  Fixed 1/2013
+      Mismatch in use of EFIAPI between declaration and definition of some functions.
+
+  7:  Compilation Error                     GCC46        Jan, 2013  Fixed 1/2013
+      StdLib/LibC/Containers/Queues/Fifo.c:508:27:
+                                    error: assignment from incompatible pointer type
+
+  8:  Compilation Error                                  Jan. 2013  Fixed 1/2013
+      StdLib\LibC\Uefi\InteractiveIO\IIOutilities.c
+      IIO_CursorDelta: Declaration return type differs from definition return type.
+
+ 11:  printf("-%ls-", L"test") will only print "--"           2013  Fixed 3/2013
+
+
+PosixLib
+=============
+ID      Category                           TOOLs       Reported       Status
+----  ------------------------            --------  --------------  -----------

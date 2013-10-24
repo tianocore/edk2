@@ -1,3 +1,6 @@
+What follows is a list of currently known issues with the StdLib package.
+Please see the separate file "Fixes.txt" for a list of issues that have been fixed.
+
   Status Key:
     Open          Problem is unresolved and final disposition unknown.
     Verified      Problem has been reproduced.
@@ -7,52 +10,53 @@
 
 SocketLib
 =============
-      Category                             TOOLs       Reported       Status
-    ------------------------              --------  --------------  -----------
+ID      Category                           TOOLs       Reported       Status
+----  ------------------------            --------  --------------  -----------
+ 13:  EFIAPI usage                                      2013-01-15   Understood
+      Mismatch between functions declared EFIAPI but not defined EFIAPI.
+
+ 14:  EFIAPI usage                                      2013-01-15   Understood
+      Function pointer type PFN_NET_CONFIGURE is NOT defined as EFIAPI but is
+      used to point to EFIAPI functions.  This causes conflicts and results in
+      improper operation.
+
+ 15:  Build Error                                       2013-09-20   Open
+      Predicates in ns_addr.c and res_mkupdate.c need to also include explicit
+      comparisons if an assignment side-effect is used.  Otherwise a warning
+      will be generated which is promoted to a fatal error.
 
 StdLib Issues
 =============
-      Category                             TOOLs       Reported       Status
-    ------------------------              --------  --------------  -----------
-1:  Compilation Error                      vs2010             2012  Fixed 3/2013
-    stdlib\libc\gdtoa\strtod.c(825) : warning C4789: destination of memory copy is too small
-    runtime crashes when using floating-point formats with printf
+ID      Category                           TOOLs       Reported       Status
+----  ------------------------            --------  --------------  -----------
+  3:  Usage Clarification                                     2012   Document
+      Clarify that the current StdLib may not be used for developing drivers.
 
-2:  Compilation Error                       ALL               2012  Fixed 1/2012
-    StdLib/LibC/Uefi/SysCalls.c: In function 'utimes': error: 'va_start' used in function with fixed args
+  5:  Error message Quality during execution                  2012   Verified
+      Performing filesystem operations when a filesystem driver has not been
+      linked into the application results in hangs or error messages that are
+      misleading or unclear as to the cause.
 
-3:  Usage Clarification                                       2012  Document
-    Clarify that the current StdLib may not be used for developing drivers.
+  6:  Application error return                                2012   Verified
+      On error, applications will sometimes return large positive numbers.
 
-4:  Execution/Compile errors                                  2012  Fixed 1/2013
-    Mismatch in use of EFIAPI between declaration and definition of some functions.
+  9:  chdir/cwd not in EFI Shell                              2012   Understood
+      The chdir and getcwd functions only work if one is using the UEFI Shell.
 
-5:  Error message Quality during execution                    2012  Verified
-    Performing filesystem operations when a filesystem driver has not been
-    linked into the application results in hangs or error messages that are
-    misleading or unclear as to the cause.
+ 10:  No current volume/directory at app. startup.            2012   Understood
+      If the Shell does not have a current volume or directory, file operations
+      may hang or fail.
 
-6:  Application error return                                  2012  Verified
-    On error, applications will sometimes return large positive numbers.
+ 12:  Differentiate between binary and text streams.     Aug. 2013   Understood
+      Implement differentiated text streams as specified by section 7.19.2 Streams,
+      of the C standard.
 
-7:  Compilation Error                       GCC46        Jan, 2013  Fixed 1/2013
-    StdLib/LibC/Containers/Queues/Fifo.c:508:27: error: assignment from incompatible pointer type
-
-8:  Compilation Error
-    StdLib\LibC\Uefi\InteractiveIO\IIOutilities.c        Jan. 2013  Fixed 1/2013
-    IIO_CursorDelta: Declaration return type differs from definition return type.
-
-9:  chdir/cwd not in EFI Shell                                2012  Understood
-    The chdir and getcwd functions only work if one is using the UEFI Shell.
-
-10: No current volume/directory at app. startup.              2012  Understood
-    If the Shell does not have a current volume or directory, file operations
-    may hang or fail.
-
-11: printf("-%ls-", L"test") will only print "--"             2013  Fixed 3/2013
+ 16:  Build Error                                       2013-08-12   Understood
+      LibC/Stdio/vsnprintf_ss.c:145: (error) Uninitialized variable: n
+      _DIAGASSERT expressions not appropriate for the UEFI environment.
 
 
 PosixLib
 =============
-      Category                             TOOLs       Reported       Status
-    ------------------------              --------  --------------  -----------
+ID      Category                           TOOLs       Reported       Status
+----  ------------------------            --------  --------------  -----------
