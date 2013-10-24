@@ -1,6 +1,7 @@
 /** @file
   Provides interface to shell console logger.
 
+  Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
   Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -640,6 +641,10 @@ ConsoleLoggerDoPageBreak(
   } else if (*Resp == ShellPromptResponseQuit) {
     FreePool(Resp);
     ShellInfoObject.ConsoleInfo->Enabled = FALSE;
+    //
+    // When user wants to quit, the shell should stop running the command.
+    //
+    gBS->SignalEvent (ShellInfoObject.NewEfiShellProtocol->ExecutionBreak);
     return (EFI_DEVICE_ERROR);
   } else {
     ASSERT(FALSE);
