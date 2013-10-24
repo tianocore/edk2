@@ -378,12 +378,12 @@ InterruptDxeInitialize (
   CpuTarget = MmioRead32 (PcdGet32 (PcdGicDistributorBase) + ARM_GIC_ICDIPTR);
 
   // The CPU target is a bit field mapping each CPU to a GIC CPU Interface. This value
-  // cannot be 0.
-  ASSERT (CpuTarget != 0);
-
-  // The 8 first Interrupt Processor Targets Registers are read-only
-  for (Index = 8; Index < (mGicNumInterrupts / 4); Index++) {
-    MmioWrite32 (PcdGet32 (PcdGicDistributorBase) + ARM_GIC_ICDIPTR + (Index * 4), CpuTarget);
+  // is 0 when we run on a uniprocessor platform.
+  if (CpuTarget != 0) {
+    // The 8 first Interrupt Processor Targets Registers are read-only
+    for (Index = 8; Index < (mGicNumInterrupts / 4); Index++) {
+      MmioWrite32 (PcdGet32 (PcdGicDistributorBase) + ARM_GIC_ICDIPTR + (Index * 4), CpuTarget);
+    }
   }
 
   // Set binary point reg to 0x7 (no preemption)
