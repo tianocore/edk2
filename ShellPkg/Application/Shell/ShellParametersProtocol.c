@@ -2,6 +2,7 @@
   Member functions of EFI_SHELL_PARAMETERS_PROTOCOL and functions for creation,
   manipulation, and initialization of EFI_SHELL_PARAMETERS_PROTOCOL.
 
+  Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
   Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1008,7 +1009,7 @@ UpdateStdInStdOutStdErr(
         }
         if (!EFI_ERROR(Status)) {
           ShellParameters->StdErr = TempHandle;
-          gST->StdErr = CreateSimpleTextOutOnFile(TempHandle, &gST->StandardErrorHandle);
+          gST->StdErr = CreateSimpleTextOutOnFile(TempHandle, &gST->StandardErrorHandle, gST->StdErr);
         }
       }
 
@@ -1051,7 +1052,7 @@ UpdateStdInStdOutStdErr(
           }
           if (!EFI_ERROR(Status)) {
             ShellParameters->StdOut = TempHandle;
-            gST->ConOut = CreateSimpleTextOutOnFile(TempHandle, &gST->ConsoleOutHandle);
+            gST->ConOut = CreateSimpleTextOutOnFile(TempHandle, &gST->ConsoleOutHandle, gST->ConOut);
           }
         }
       }
@@ -1069,7 +1070,7 @@ UpdateStdInStdOutStdErr(
         TempHandle = CreateFileInterfaceEnv(StdOutVarName);
         ASSERT(TempHandle != NULL);
         ShellParameters->StdOut = TempHandle;
-        gST->ConOut = CreateSimpleTextOutOnFile(TempHandle, &gST->ConsoleOutHandle);
+        gST->ConOut = CreateSimpleTextOutOnFile(TempHandle, &gST->ConsoleOutHandle, gST->ConOut);
       }
 
       //
@@ -1085,7 +1086,7 @@ UpdateStdInStdOutStdErr(
         TempHandle = CreateFileInterfaceEnv(StdErrVarName);
         ASSERT(TempHandle != NULL);
         ShellParameters->StdErr = TempHandle;
-        gST->StdErr = CreateSimpleTextOutOnFile(TempHandle, &gST->StandardErrorHandle);
+        gST->StdErr = CreateSimpleTextOutOnFile(TempHandle, &gST->StandardErrorHandle, gST->StdErr);
       }
 
       //

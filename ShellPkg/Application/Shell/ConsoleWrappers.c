@@ -1,6 +1,7 @@
 /** @file
   Function definitions for shell simple text in and out on top of file handles.
 
+  Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
   Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -24,6 +25,7 @@ typedef struct {
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL SimpleTextOut;
   SHELL_FILE_HANDLE               FileHandle;
   EFI_HANDLE                      TheHandle;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *OriginalSimpleTextOut;
 } SHELL_EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL;
 
 /**
@@ -253,7 +255,14 @@ FileBasedSimpleTextOutQueryMode (
   OUT UINTN                           *Rows
   )
 {
-  return (EFI_UNSUPPORTED);
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *PassThruProtocol = ((SHELL_EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *)This)->OriginalSimpleTextOut;
+  
+  // Pass the QueryMode call thru to the original SimpleTextOutProtocol
+  return (PassThruProtocol->QueryMode(
+    PassThruProtocol,
+    ModeNumber,
+    Columns,
+    Rows));
 }
 
 /**
@@ -386,8 +395,9 @@ FileBasedSimpleTextOutOutputString (
   Function to create a EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL on top of a 
   SHELL_FILE_HANDLE to support redirecting output from a file.
 
-  @param[in]  FileHandleToUse The pointer to the SHELL_FILE_HANDLE to use.
-  @param[in]  HandleLocation  The pointer of a location to copy handle with protocol to.
+  @param[in]  FileHandleToUse  The pointer to the SHELL_FILE_HANDLE to use.
+  @param[in]  HandleLocation   The pointer of a location to copy handle with protocol to.
+  @param[in]  OriginalProtocol The pointer to the original output protocol for pass thru of functions.
 
   @retval NULL                There was insufficient memory available.
   @return                     A pointer to the allocated protocol structure;
@@ -395,8 +405,9 @@ FileBasedSimpleTextOutOutputString (
 EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL*
 EFIAPI
 CreateSimpleTextOutOnFile(
-  IN SHELL_FILE_HANDLE  FileHandleToUse,
-  IN EFI_HANDLE         *HandleLocation
+  IN SHELL_FILE_HANDLE               FileHandleToUse,
+  IN EFI_HANDLE                      *HandleLocation,
+  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *OriginalProtocol
   )
 {
   SHELL_EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *ProtocolToReturn;
@@ -411,6 +422,7 @@ CreateSimpleTextOutOnFile(
     return (NULL);
   }
   ProtocolToReturn->FileHandle                      = FileHandleToUse;
+  ProtocolToReturn->OriginalSimpleTextOut           = OriginalProtocol;
   ProtocolToReturn->SimpleTextOut.Reset             = FileBasedSimpleTextOutReset;
   ProtocolToReturn->SimpleTextOut.TestString        = FileBasedSimpleTextOutTestString;
   ProtocolToReturn->SimpleTextOut.QueryMode         = FileBasedSimpleTextOutQueryMode;
@@ -425,12 +437,12 @@ CreateSimpleTextOutOnFile(
     FreePool(ProtocolToReturn);
     return (NULL);
   }
-  ProtocolToReturn->SimpleTextOut.Mode->MaxMode       = 0;
-  ProtocolToReturn->SimpleTextOut.Mode->Mode          = 0;
-  ProtocolToReturn->SimpleTextOut.Mode->Attribute     = 0;
-  ProtocolToReturn->SimpleTextOut.Mode->CursorColumn  = 0;
-  ProtocolToReturn->SimpleTextOut.Mode->CursorRow     = 0;
-  ProtocolToReturn->SimpleTextOut.Mode->CursorVisible = FALSE;
+  ProtocolToReturn->SimpleTextOut.Mode->MaxMode       = OriginalProtocol->Mode->MaxMode;
+  ProtocolToReturn->SimpleTextOut.Mode->Mode          = OriginalProtocol->Mode->Mode;
+  ProtocolToReturn->SimpleTextOut.Mode->Attribute     = OriginalProtocol->Mode->Attribute;
+  ProtocolToReturn->SimpleTextOut.Mode->CursorColumn  = OriginalProtocol->Mode->CursorColumn;
+  ProtocolToReturn->SimpleTextOut.Mode->CursorRow     = OriginalProtocol->Mode->CursorRow;
+  ProtocolToReturn->SimpleTextOut.Mode->CursorVisible = OriginalProtocol->Mode->CursorVisible;
 
   Status = gBS->InstallProtocolInterface(
     &(ProtocolToReturn->TheHandle), 
