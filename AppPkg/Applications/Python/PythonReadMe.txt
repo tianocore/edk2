@@ -1,7 +1,7 @@
                                 EDK II Python
                                     ReadMe
-                                 Beta Release
-                                 23 Mar. 2012
+                                 Release 1.02
+                                 18 Jan. 2013
 
 
 1. OVERVIEW
@@ -16,18 +16,19 @@ packages within that distribution.
 
 2. Release Notes
 ================
-  1)  There is no input line editing.  Backspace, ^C, etc. do not work.
-  2)  All C extension modules must be statically linked (built in)
-  3)  The site and os modules must exist as discrete files in ...\lib\python.27
-  4)  User-specific configurations are not supported.
-  5)  Environment variables are not supported.
+  1)  All C extension modules must be statically linked (built in)
+  2)  The site and os modules must exist as discrete files in ...\lib\python.27
+  3)  User-specific configurations are not supported.
+  4)  Environment variables are not supported.
 
-3. Getting and Building the latest version of Python
+3. Getting and Building Python
 ======================================================
   3.1 Getting Python
   ==================
-  Currently only version 2.7.2 of the CPython distribution is supported.  The
-  source code can be downloaded from http://www.python.org/download/source/.
+  Currently only version 2.7.2 of the CPython distribution is supported.  For development
+  ease, a subset of the Python 2.7.2 distribution has been included in the AppPkg source
+  tree.  If a full distribution is desired, the Python-2.7.2 directory can be removed or
+  renamed and the full source code downloaded from http://www.python.org/ftp/python/2.7.2/.
 
   A.  Within your EDK II development tree, extract the Python distribution into
     AppPkg/Applications/Python.  This should create the
@@ -93,7 +94,8 @@ system as follows:
         site    types     copy_reg    linecache     genericpath
 
   * Python C Extension Modules built as dynamically loadable extensions go into
-    the \Efi\StdLib\lib\python.27\lib-dynload directory.
+    the \Efi\StdLib\lib\python.27\lib-dynload directory.  This functionality is not
+    yet implemented.
 
 
 6. Example: Enabling socket support
@@ -191,6 +193,6 @@ Library that have been tested or used in some manner.
   dummy_thread.py         random.py                 weakref.py
   fileinput.py            re.py                     xmllib.py
   formatter.py            repr.py                   zipfile.py
-  functools.py            runpy.py
+  functools.py            runpy.py                  expat
 
 # # #
