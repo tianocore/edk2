@@ -1,7 +1,7 @@
 /** @file
   The entry point of IScsi driver.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -22,6 +22,44 @@ EFI_DRIVER_BINDING_PROTOCOL gIScsiDriverBinding = {
   NULL,
   NULL
 };
+
+/**
+  Tests to see if this driver supports the RemainingDevicePath. 
+
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This 
+                                   parameter is ignored by device drivers, and is optional for bus 
+                                   drivers. For bus drivers, if this parameter is not NULL, then 
+                                   the bus driver must determine if the bus controller specified 
+                                   by ControllerHandle and the child controller specified 
+                                   by RemainingDevicePath are both supported by this 
+                                   bus driver.
+
+  @retval EFI_SUCCESS              The RemainingDevicePath is supported or NULL.
+  @retval EFI_UNSUPPORTED          The device specified by ControllerHandle and
+                                   RemainingDevicePath is not supported by the driver specified by This.
+**/
+EFI_STATUS
+IScsiIsDevicePathSupported (
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
+  )
+{
+  EFI_DEVICE_PATH_PROTOCOL  *CurrentDevicePath;
+
+  CurrentDevicePath = RemainingDevicePath;
+  if (CurrentDevicePath != NULL) {
+    while (!IsDevicePathEnd (CurrentDevicePath)) {
+      if ((CurrentDevicePath->Type == MESSAGING_DEVICE_PATH) && (CurrentDevicePath->SubType == MSG_ISCSI_DP)) {
+        return EFI_SUCCESS;
+      }
+
+      CurrentDevicePath = NextDevicePathNode (CurrentDevicePath);
+    }
+
+    return EFI_UNSUPPORTED;
+  }
+
+  return EFI_SUCCESS;
+}
 
 /**
   Tests to see if this driver supports a given controller. If a child device is provided, 
@@ -56,7 +94,6 @@ IScsiDriverBindingSupported (
   )
 {
   EFI_STATUS                Status;
-  EFI_DEVICE_PATH_PROTOCOL  *CurrentDevicePath;
 
   Status = gBS->OpenProtocol (
                   ControllerHandle,
@@ -82,17 +119,23 @@ IScsiDriverBindingSupported (
     return EFI_UNSUPPORTED;
   }
 
-  CurrentDevicePath = RemainingDevicePath;
-  if (CurrentDevicePath != NULL) {
-    while (!IsDevicePathEnd (CurrentDevicePath)) {
-      if ((CurrentDevicePath->Type == MESSAGING_DEVICE_PATH) && (CurrentDevicePath->SubType == MSG_ISCSI_DP)) {
-        return EFI_SUCCESS;
-      }
-
-      CurrentDevicePath = NextDevicePathNode (CurrentDevicePath);
-    }
-
+  Status = IScsiIsDevicePathSupported (RemainingDevicePath);
+  if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
+  }
+
+  if (IScsiDhcpIsConfigured (ControllerHandle)) {
+    Status = gBS->OpenProtocol (
+                    ControllerHandle,
+                    &gEfiDhcp4ServiceBindingProtocolGuid,
+                    NULL,
+                    This->DriverBindingHandle,
+                    ControllerHandle,
+                    EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+                    );
+    if (EFI_ERROR (Status)) {
+      return EFI_UNSUPPORTED;
+    }
   }
 
   return EFI_SUCCESS;

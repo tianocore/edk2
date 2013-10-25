@@ -1,7 +1,7 @@
 /** @file
   Miscellaneous routines for iSCSI driver.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -614,6 +614,60 @@ IScsiCleanDriverData (
   gBS->CloseEvent (Private->ExitBootServiceEvent);
 
   FreePool (Private);
+}
+
+/**
+  Check wheather the Controller is configured to use DHCP protocol.
+
+  @param[in]  Controller           The handle of the controller.
+  
+  @retval TRUE                     The handle of the controller need the Dhcp protocol.
+  @retval FALSE                    The handle of the controller does not need the Dhcp protocol.
+  
+**/
+BOOLEAN
+IScsiDhcpIsConfigured (
+  IN EFI_HANDLE  Controller
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_MAC_ADDRESS             MacAddress;
+  UINTN                       HwAddressSize;
+  UINT16                      VlanId;
+  CHAR16                      MacString[70];
+  ISCSI_SESSION_CONFIG_NVDATA *ConfigDataTmp;
+
+  //
+  // Get the mac string, it's the name of various variable
+  //
+  Status = NetLibGetMacAddress (Controller, &MacAddress, &HwAddressSize);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+  VlanId = NetLibGetVlanId (Controller);
+  IScsiMacAddrToStr (&MacAddress, (UINT32) HwAddressSize, VlanId, MacString);
+
+  //
+  // Get the normal configuration.
+  //
+  Status = GetVariable2 (
+             MacString,
+             &gEfiIScsiInitiatorNameProtocolGuid,
+             (VOID**)&ConfigDataTmp,
+             NULL
+             );
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+  
+
+  if (ConfigDataTmp->Enabled && ConfigDataTmp->InitiatorInfoFromDhcp) {
+    FreePool (ConfigDataTmp);
+    return TRUE;
+  }
+
+  FreePool (ConfigDataTmp);
+  return FALSE;
 }
 
 /**

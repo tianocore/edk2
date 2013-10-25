@@ -1,7 +1,7 @@
 /** @file
   Miscellaneous definitions for iSCSI driver.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -219,6 +219,20 @@ IScsiCreateDriverData (
 VOID
 IScsiCleanDriverData (
   IN ISCSI_DRIVER_DATA  *Private
+  );
+
+/**
+  Check wheather the Controller is configured to use DHCP protocol.
+
+  @param[in]  Controller           The handle of the controller.
+  
+  @retval TRUE                     The handle of the controller need the Dhcp protocol.
+  @retval FALSE                    The handle of the controller does not need the Dhcp protocol.
+  
+**/
+BOOLEAN
+IScsiDhcpIsConfigured (
+  IN EFI_HANDLE  Controller
   );
 
 /**
