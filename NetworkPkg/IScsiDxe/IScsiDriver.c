@@ -112,13 +112,16 @@ IScsiSupported (
   EFI_STATUS                Status;
   EFI_GUID                  *IScsiServiceBindingGuid;
   EFI_GUID                  *TcpServiceBindingGuid;
+  EFI_GUID                  *DhcpServiceBindingGuid;
 
   if (IpVersion == IP_VERSION_4) {
     IScsiServiceBindingGuid  = &gIScsiV4PrivateGuid;
     TcpServiceBindingGuid    = &gEfiTcp4ServiceBindingProtocolGuid;
+    DhcpServiceBindingGuid   = &gEfiDhcp4ServiceBindingProtocolGuid;
   } else {
     IScsiServiceBindingGuid  = &gIScsiV6PrivateGuid;
     TcpServiceBindingGuid    = &gEfiTcp6ServiceBindingProtocolGuid;
+    DhcpServiceBindingGuid   = &gEfiDhcp6ServiceBindingProtocolGuid;
   }
 
   Status = gBS->OpenProtocol (
@@ -131,24 +134,40 @@ IScsiSupported (
                   );
   if (!EFI_ERROR (Status)) {
     return EFI_ALREADY_STARTED;
-  } else {
+  }
+
+  Status = gBS->OpenProtocol (
+                  ControllerHandle,
+                  TcpServiceBindingGuid,
+                  NULL,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  Status = IScsiIsDevicePathSupported (RemainingDevicePath);
+  if (EFI_ERROR (Status)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  if (IScsiDhcpIsConfigured (ControllerHandle, IpVersion)) {
     Status = gBS->OpenProtocol (
                     ControllerHandle,
-                    TcpServiceBindingGuid,
+                    DhcpServiceBindingGuid,
                     NULL,
                     This->DriverBindingHandle,
                     ControllerHandle,
                     EFI_OPEN_PROTOCOL_TEST_PROTOCOL
                     );
-    if (!EFI_ERROR (Status)) {
-      Status = IScsiIsDevicePathSupported (RemainingDevicePath);
-      if (!EFI_ERROR (Status)) {
-        return EFI_SUCCESS;
-      }
+    if (EFI_ERROR (Status)) {
+      return EFI_UNSUPPORTED;
     }
   }
-
-  return EFI_UNSUPPORTED;
+  
+  return EFI_SUCCESS;
 }
 
 

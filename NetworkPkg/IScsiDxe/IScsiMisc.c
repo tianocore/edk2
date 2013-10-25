@@ -1,7 +1,7 @@
 /** @file
   Miscellaneous routines for iSCSI driver.
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -890,6 +890,99 @@ IScsiCleanDriverData (
   FreePool (Private);
 }
 
+/**
+  Check wheather the Controller handle is configured to use DHCP protocol.
+
+  @param[in]  Controller           The handle of the controller.
+  @param[in]  IpVersion            IP_VERSION_4 or IP_VERSION_6.
+  
+  @retval TRUE                     The handle of the controller need the Dhcp protocol.
+  @retval FALSE                    The handle of the controller does not need the Dhcp protocol.
+  
+**/
+BOOLEAN
+IScsiDhcpIsConfigured (
+  IN EFI_HANDLE  Controller,
+  IN UINT8       IpVersion
+  )
+{
+  ISCSI_ATTEMPT_CONFIG_NVDATA *AttemptTmp;
+  UINT8                       *AttemptConfigOrder;
+  UINTN                       AttemptConfigOrderSize;
+  UINTN                       Index;
+  EFI_STATUS                  Status;
+  EFI_MAC_ADDRESS             MacAddr;
+  UINTN                       HwAddressSize;
+  UINT16                      VlanId;
+  CHAR16                      MacString[ISCSI_MAX_MAC_STRING_LEN];
+  CHAR16                      AttemptName[ISCSI_NAME_IFR_MAX_SIZE];
+  
+  AttemptConfigOrder = IScsiGetVariableAndSize (
+                         L"AttemptOrder",
+                         &gIScsiConfigGuid,
+                         &AttemptConfigOrderSize
+                         );
+  if (AttemptConfigOrder == NULL || AttemptConfigOrderSize == 0) {
+    return FALSE;
+  }
+  
+  //
+  // Get MAC address of this network device.
+  //
+  Status = NetLibGetMacAddress (Controller, &MacAddr, &HwAddressSize);
+  if(EFI_ERROR (Status)) {
+    return FALSE;
+  }
+  //
+  // Get VLAN ID of this network device.
+  //
+  VlanId = NetLibGetVlanId (Controller);
+  IScsiMacAddrToStr (&MacAddr, (UINT32) HwAddressSize, VlanId, MacString);
+  
+  for (Index = 0; Index < AttemptConfigOrderSize / sizeof (UINT8); Index++) {
+    UnicodeSPrint (
+      AttemptName,
+      (UINTN) 128,
+      L"%s%d",
+      MacString,
+      (UINTN) AttemptConfigOrder[Index]
+      );
+    Status = GetVariable2 (
+               AttemptName,
+               &gEfiIScsiInitiatorNameProtocolGuid,
+               (VOID**)&AttemptTmp,
+               NULL
+               );
+    if(EFI_ERROR (Status)) {
+      continue;
+    }
+    ASSERT (AttemptConfigOrder[Index] == AttemptTmp->AttemptConfigIndex);
+
+    if (AttemptTmp->SessionConfigData.Enabled == ISCSI_DISABLED) {
+      FreePool (AttemptTmp);
+      continue;
+    }
+
+    if (AttemptTmp->SessionConfigData.IpMode != IP_MODE_AUTOCONFIG && 
+        AttemptTmp->SessionConfigData.IpMode != ((IpVersion == IP_VERSION_4) ? IP_MODE_IP4 : IP_MODE_IP6)) {
+      FreePool (AttemptTmp);
+      continue;
+    }
+    
+    if(AttemptTmp->SessionConfigData.IpMode == IP_MODE_AUTOCONFIG ||
+       AttemptTmp->SessionConfigData.InitiatorInfoFromDhcp == TRUE ||
+       AttemptTmp->SessionConfigData.TargetInfoFromDhcp == TRUE) { 
+      FreePool (AttemptTmp);
+      FreePool (AttemptConfigOrder);
+      return TRUE;
+    }
+
+    FreePool (AttemptTmp);
+  }
+  
+  FreePool (AttemptConfigOrder);
+  return FALSE;
+}
 
 /**
   Get the various configuration data.
