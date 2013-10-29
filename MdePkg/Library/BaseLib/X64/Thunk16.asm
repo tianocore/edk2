@@ -142,8 +142,8 @@ SavedCr0    DD      ?
 SavedCs     DW      ?
 @64BitCode:
     db      090h 
-    db      067h, 0bch                 ; mov esp, imm32
-SavedSp     DD   ?                     ; restore stack
+    db      048h, 0bch                 ; mov rsp, imm64
+SavedSp     DQ   ?                     ; restore stack
     nop
     ret
 _BackFromUserCode   ENDP
@@ -294,7 +294,7 @@ InternalAsmThunk16  PROC    USES    rbp rbx rsi rdi
     push    r8
     mov     r8d, cs
     mov     [rcx + (SavedCs - SavedCr4)], r8w
-    mov     [rcx + (SavedSp - SavedCr4)], esp
+    mov     [rcx + (SavedSp - SavedCr4)], rsp
     jmp     fword ptr [rcx + (_EntryPoint - SavedCr4)]
 @RetFromRealMode:
     popfq
