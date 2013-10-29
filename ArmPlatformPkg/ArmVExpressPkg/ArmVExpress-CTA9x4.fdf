@@ -166,7 +166,7 @@ READ_LOCK_STATUS   = TRUE
 
   INF MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 
-  INF ArmPkg/Drivers/PL390Gic/PL390GicDxe.inf
+  INF ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
   INF ArmPlatformPkg/Drivers/SP804TimerDxe/SP804TimerDxe.inf
   INF ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf
   INF ArmPlatformPkg/Drivers/LcdGraphicsOutputDxe/PL111LcdGraphicsOutputDxe.inf

@@ -13,15 +13,15 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = PL390GicSecLib
+  BASE_NAME                      = ArmGicSecLib
   FILE_GUID                      = 85f3cf80-b5f4-11df-9855-0002a5d5c51b
   MODULE_TYPE                    = SEC
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ArmGicLib
 
 [Sources]
-  PL390Gic.c
-  PL390GicSec.c
+  ArmGic.c
+  ArmGicSec.c
 
 [Packages]
   ArmPkg/ArmPkg.dec

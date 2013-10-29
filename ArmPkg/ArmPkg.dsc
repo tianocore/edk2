@@ -62,7 +62,7 @@
   DefaultExceptionHandlerLib|ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
 
   CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
-  ArmGicLib|ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
+  ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicLib.inf
   ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
   ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
   DmaLib|ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
@@ -119,9 +119,9 @@
 
   ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   ArmPkg/Drivers/CpuPei/CpuPei.inf
-  ArmPkg/Drivers/PL390Gic/PL390GicDxe.inf
-  ArmPkg/Drivers/PL390Gic/PL390GicLib.inf
-  ArmPkg/Drivers/PL390Gic/PL390GicSecLib.inf
+  ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
+  ArmPkg/Drivers/ArmGic/ArmGicLib.inf
+  ArmPkg/Drivers/ArmGic/ArmGicSecLib.inf
   ArmPkg/Drivers/TimerDxe/TimerDxe.inf
 
   ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf

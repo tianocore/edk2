@@ -138,7 +138,7 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
   INF EmbeddedPkg/SerialDxe/SerialDxe.inf
   
-  INF ArmPkg/Drivers/PL390Gic/PL390GicDxe.inf
+  INF ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
   INF ArmPlatformPkg/Drivers/SP804TimerDxe/SP804TimerDxe.inf
   
   INF ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf

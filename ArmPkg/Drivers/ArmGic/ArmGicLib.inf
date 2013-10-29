@@ -13,15 +13,15 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = PL390GicLib
+  BASE_NAME                      = ArmGicLib
   FILE_GUID                      = 03d05ee4-cdeb-458c-9dfc-993f09bdf405
   MODULE_TYPE                    = SEC
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ArmGicLib
 
 [Sources]
-  PL390Gic.c
-  PL390GicNonSec.c
+  ArmGic.c
+  ArmGicNonSec.c
 
 [LibraryClasses]
   IoLib

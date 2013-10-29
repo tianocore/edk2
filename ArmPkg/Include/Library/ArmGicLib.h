@@ -12,8 +12,8 @@
 *
 **/
 
-#ifndef __PL390GIC_H
-#define __PL390GIC_H
+#ifndef __ARMGIC_H
+#define __ARMGIC_H
 
 //
 // GIC definitions
