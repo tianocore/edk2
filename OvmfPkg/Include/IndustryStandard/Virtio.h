@@ -36,6 +36,13 @@
 #define VIRTIO_SUBSYSTEM_MAC80211_WLAN      10
 
 //
+// Virtio IDs
+//
+#define VIRTIO_VENDOR_ID                    0x1AF4
+#define VIRTIO_MMIO_MAGIC                   0x74726976 // "virt"
+
+
+//
 // VirtIo Device Specific Configuration Offsets
 //
 #define VIRTIO_DEVICE_SPECIFIC_CONFIGURATION_OFFSET_PCI             20
