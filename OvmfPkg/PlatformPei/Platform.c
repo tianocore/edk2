@@ -287,7 +287,7 @@ ReserveEmuVariableNvStore (
   //
   VariableStore =
     (EFI_PHYSICAL_ADDRESS)(UINTN)
-      AllocateAlignedPages (
+      AllocateAlignedRuntimePages (
         EFI_SIZE_TO_PAGES (2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize)),
         PcdGet32 (PcdFlashNvStorageFtwSpareSize)
         );
