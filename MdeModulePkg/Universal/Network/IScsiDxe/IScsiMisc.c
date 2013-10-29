@@ -656,10 +656,9 @@ IScsiDhcpIsConfigured (
              (VOID**)&ConfigDataTmp,
              NULL
              );
-  if (EFI_ERROR (Status)) {
+  if (ConfigDataTmp == NULL || EFI_ERROR (Status)) {
     return FALSE;
   }
-  
 
   if (ConfigDataTmp->Enabled && ConfigDataTmp->InitiatorInfoFromDhcp) {
     FreePool (ConfigDataTmp);
