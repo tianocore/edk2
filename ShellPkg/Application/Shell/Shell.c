@@ -1593,10 +1593,15 @@ RunCommand(
         if (!EFI_ERROR(Status))  {
           Status = ShellCommandRunCommandHandler(ShellInfoObject.NewShellParametersProtocol->Argv[0], &ShellStatus, &LastError);
           ASSERT_EFI_ERROR(Status);
-          UnicodeSPrint(LeString, sizeof(LeString), L"0x%08Lx", ShellStatus);
-          DEBUG_CODE(InternalEfiShellSetEnv(L"DebugLasterror", LeString, TRUE););
+
+          if (sizeof(EFI_STATUS) == sizeof(UINT64)) {
+            UnicodeSPrint(LeString, sizeof(LeString), L"0x%Lx", ShellStatus);
+          } else {
+            UnicodeSPrint(LeString, sizeof(LeString), L"0x%x", ShellStatus);
+          }
+          DEBUG_CODE(InternalEfiShellSetEnv(L"debuglasterror", LeString, TRUE););
           if (LastError) {
-            InternalEfiShellSetEnv(L"Lasterror", LeString, TRUE);
+            InternalEfiShellSetEnv(L"lasterror", LeString, TRUE);
           }
           //
           // Pass thru the exitcode from the app.
@@ -1622,6 +1627,14 @@ RunCommand(
         }
         if (CommandWithPath == NULL || ShellIsDirectory(CommandWithPath) == EFI_SUCCESS) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, ShellInfoObject.NewShellParametersProtocol->Argv[0]);
+
+          if (sizeof(EFI_STATUS) == sizeof(UINT64)) {
+            UnicodeSPrint(LeString, sizeof(LeString), L"0x%Lx", EFI_NOT_FOUND);
+          } else {
+            UnicodeSPrint(LeString, sizeof(LeString), L"0x%x", EFI_NOT_FOUND);
+          }
+          DEBUG_CODE(InternalEfiShellSetEnv(L"debuglasterror", LeString, TRUE););
+          InternalEfiShellSetEnv(L"lasterror", LeString, TRUE);
         } else {
           //
           // Check if it's a NSH (script) file.
@@ -1642,11 +1655,15 @@ RunCommand(
              );
 
             //
-            // Updatet last error status.
+            // Update last error status.
             //
-            UnicodeSPrint(LeString, sizeof(LeString), L"0x%08Lx", StatusCode);
-            DEBUG_CODE(InternalEfiShellSetEnv(L"DebugLasterror", LeString, TRUE););
-            InternalEfiShellSetEnv(L"Lasterror", LeString, TRUE);
+            if (sizeof(EFI_STATUS) == sizeof(UINT64)) {
+              UnicodeSPrint(LeString, sizeof(LeString), L"0x%Lx", StatusCode);
+            } else {
+              UnicodeSPrint(LeString, sizeof(LeString), L"0x%x", StatusCode);
+            }
+            DEBUG_CODE(InternalEfiShellSetEnv(L"debuglasterror", LeString, TRUE););
+            InternalEfiShellSetEnv(L"lasterror", LeString, TRUE);
           }
         }
       }
@@ -1952,9 +1969,12 @@ RunScriptFileHandle (
         }
 
         if (ShellCommandGetScriptExit()) {
+          //
+          // ShellCommandGetExitCode() always returns a UINT64
+          //
           UnicodeSPrint(LeString, sizeof(LeString), L"0x%Lx", ShellCommandGetExitCode());
-          DEBUG_CODE(InternalEfiShellSetEnv(L"DebugLasterror", LeString, TRUE););
-          InternalEfiShellSetEnv(L"Lasterror", LeString, TRUE);
+          DEBUG_CODE(InternalEfiShellSetEnv(L"debuglasterror", LeString, TRUE););
+          InternalEfiShellSetEnv(L"lasterror", LeString, TRUE);
 
           ShellCommandRegisterExit(FALSE, 0);
           Status = EFI_SUCCESS;
