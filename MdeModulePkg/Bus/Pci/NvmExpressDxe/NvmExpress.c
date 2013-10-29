@@ -129,7 +129,7 @@ EnumerateNvmeDevNamespace (
     Device->Media.WriteCaching   = FALSE;
 
     Flbas     = NamespaceData->Flbas;
-    LbaFmtIdx = Flbas & 3;
+    LbaFmtIdx = Flbas & 0xF;
     Lbads     = NamespaceData->LbaFormat[LbaFmtIdx].Lbads;
     Device->Media.BlockSize = (UINT32)1 << Lbads;
 
