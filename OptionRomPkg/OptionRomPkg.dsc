@@ -104,6 +104,7 @@
   OptionRomPkg/AtapiPassThruDxe/AtapiPassThruDxe.inf
   OptionRomPkg/CirrusLogic5430Dxe/CirrusLogic5430Dxe.inf
   OptionRomPkg/UndiRuntimeDxe/UndiRuntimeDxe.inf
+  OptionRomPkg/Usb/FtdiUsbSerialDxe/FtdiUsbSerialDxe.inf
 
 [Components.IA32, Components.X64, Components.IPF]
   OptionRomPkg/Application/BltLibSample/BltLibSample.inf

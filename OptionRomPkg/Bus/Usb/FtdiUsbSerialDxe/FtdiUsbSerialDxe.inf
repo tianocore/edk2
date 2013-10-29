@@ -1,0 +1,61 @@
+## @file
+#  USB Serial Driver that manages USB Serial device and produces Serial IO
+#  Protocol.
+#
+#  USB Serial Driver consumes USB I/O Protocol and Device Path Protocol, and
+#  produces Serial IO Protocol on USB Serial devices.
+#  It manages the USB Serial device via USB Bulk Transfer of USB I/O Protocol.
+#  This module refers to following specifications:
+#  1. UEFI Specification, v2.1
+#
+# Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD
+# License which accompanies this distribution. The full text of the license may
+# be found at http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FtdiUsbSerialDxe
+  FILE_GUID                      = A8154B55-2021-4D40-AE81-2E23A02dCC46
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = FtdiUsbSerialEntryPoint
+  UNLOAD_IMAGE                   = FtdiUsbSerialUnload
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  FtdiUsbSerialDriver.c
+  FtdiUsbSerialDriver.h
+  ComponentName.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiLib
+  DevicePathLib
+
+[Guids]
+  gEfiUartDevicePathGuid
+
+[Protocols]
+  ## TO_START
+  ## BY_START
+  gEfiDevicePathProtocolGuid
+  gEfiUsbIoProtocolGuid                         ## TO_START
+  gEfiSerialIoProtocolGuid                      ## BY_START
