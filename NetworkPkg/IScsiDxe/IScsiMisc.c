@@ -953,9 +953,10 @@ IScsiDhcpIsConfigured (
                (VOID**)&AttemptTmp,
                NULL
                );
-    if(EFI_ERROR (Status)) {
+    if(AttemptTmp == NULL || EFI_ERROR (Status)) {
       continue;
     }
+    
     ASSERT (AttemptConfigOrder[Index] == AttemptTmp->AttemptConfigIndex);
 
     if (AttemptTmp->SessionConfigData.Enabled == ISCSI_DISABLED) {
