@@ -35,6 +35,13 @@
 #define VIRTIO_SUBSYSTEM_MAC80211_WLAN      10
 
 //
+// VirtIo Device Specific Configuration Offsets
+//
+#define VIRTIO_DEVICE_SPECIFIC_CONFIGURATION_OFFSET_PCI             20
+#define VIRTIO_DEVICE_SPECIFIC_CONFIGURATION_OFFSET_PCI_WITH_MSI_X  24
+#define VIRTIO_DEVICE_SPECIFIC_CONFIGURATION_OFFSET_MMIO            0x100
+
+//
 // Data in the communication area is defined as packed and accessed as
 // volatile.
 //
