@@ -2165,10 +2165,6 @@ UiDisplayMenu (
         }
 
         MenuOption = NULL;
-
-        if (IsListEmpty (&gMenuOption)) { 
-          ControlFlag = CfReadKey;
-        }
       }
       break;
 
@@ -2185,6 +2181,14 @@ UiDisplayMenu (
         MenuOption    = SavedMenuOption;
         SkipHighLight = FALSE;
         UpdateHighlightMenuInfo (MenuOption);
+        break;
+      }
+
+      if (IsListEmpty (&gMenuOption)) {
+        //
+        // No menu option, just update the hotkey filed.
+        //
+        RefreshKeyHelp(gFormData, NULL, FALSE);
         break;
       }
 
@@ -2372,15 +2376,22 @@ UiDisplayMenu (
       }
 
       if (Repaint || NewLine) {
-        //
-        // Don't print anything if it is a NULL help token
-        //
-        ASSERT(MenuOption != NULL);
-        HelpInfo = ((EFI_IFR_STATEMENT_HEADER *) ((CHAR8 *)MenuOption->ThisTag->OpCode + sizeof (EFI_IFR_OP_HEADER)))->Help;
-        if (HelpInfo == 0 || !IsSelectable (MenuOption)) {
+        if (IsListEmpty (&gMenuOption)) {
+          //
+          // Don't print anything if no mwnu option.
+          //
           StringPtr = GetToken (STRING_TOKEN (EMPTY_STRING), gHiiHandle);
         } else {
-          StringPtr = GetToken (HelpInfo, gFormData->HiiHandle);
+          //
+          // Don't print anything if it is a NULL help token
+          //
+          ASSERT(MenuOption != NULL);
+          HelpInfo = ((EFI_IFR_STATEMENT_HEADER *) ((CHAR8 *)MenuOption->ThisTag->OpCode + sizeof (EFI_IFR_OP_HEADER)))->Help;
+          if (HelpInfo == 0 || !IsSelectable (MenuOption)) {
+            StringPtr = GetToken (STRING_TOKEN (EMPTY_STRING), gHiiHandle);
+          } else {
+            StringPtr = GetToken (HelpInfo, gFormData->HiiHandle);
+          }
         }
 
         RowCount      = BottomRow - TopRow + 1;
@@ -2706,9 +2717,9 @@ UiDisplayMenu (
       break;
 
     case CfScreenOperation:
-      if (ScreenOperation != UiReset) {
+      if ((ScreenOperation != UiReset) && (ScreenOperation != UiHotKey)) {
         //
-        // If the screen has no menu items, and the user didn't select UiReset
+        // If the screen has no menu items, and the user didn't select UiReset or UiHotKey
         // ignore the selection and go back to reading keys.
         //
         if (IsListEmpty (&gMenuOption)) {
