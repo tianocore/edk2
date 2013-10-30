@@ -988,6 +988,10 @@ UsbHubResetPort (
   for (Index = 0; Index < USB_WAIT_PORT_STS_CHANGE_LOOP; Index++) {
     Status = UsbHubGetPortStatus (HubIf, Port, &PortState);
 
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
     if (!EFI_ERROR (Status) &&
         USB_BIT_IS_SET (PortState.PortChangeStatus, USB_PORT_STAT_C_RESET)) {
       gBS->Stall (USB_SET_PORT_RECOVERY_STALL);

@@ -151,7 +151,7 @@ UsbSelectConfig (
   @return None.
 
 **/
-VOID
+EFI_STATUS
 UsbRemoveConfig (
   IN USB_DEVICE           *Device
   );

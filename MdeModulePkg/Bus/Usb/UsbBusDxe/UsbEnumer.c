@@ -450,7 +450,7 @@ UsbSelectConfig (
   @param  UsbIf                 The interface to disconnect driver from.
 
 **/
-VOID
+EFI_STATUS
 UsbDisconnectDriver (
   IN USB_INTERFACE        *UsbIf
   )
@@ -462,8 +462,9 @@ UsbDisconnectDriver (
   // Release the hub if it's a hub controller, otherwise
   // disconnect the driver if it is managed by other drivers.
   //
+  Status = EFI_SUCCESS;
   if (UsbIf->IsHub) {
-    UsbIf->HubApi->Release (UsbIf);
+    Status = UsbIf->HubApi->Release (UsbIf);
 
   } else if (UsbIf->IsManaged) {
     //
@@ -479,13 +480,17 @@ UsbDisconnectDriver (
     gBS->RestoreTPL (TPL_CALLBACK);
 
     Status = gBS->DisconnectController (UsbIf->Handle, NULL, NULL);
-    UsbIf->IsManaged = FALSE;
-
+    if (!EFI_ERROR (Status)) {
+      UsbIf->IsManaged = FALSE;
+    }
+    
     DEBUG (( EFI_D_INFO, "UsbDisconnectDriver: TPL after disconnect is %d, %d\n", (UINT32)UsbGetCurrentTpl(), Status));
     ASSERT (UsbGetCurrentTpl () == TPL_CALLBACK);
 
     gBS->RaiseTPL (OldTpl);
   }
+  
+  return Status;
 }
 
 
@@ -495,17 +500,20 @@ UsbDisconnectDriver (
   @param  Device                The USB device to remove configuration from.
 
 **/
-VOID
+EFI_STATUS
 UsbRemoveConfig (
   IN USB_DEVICE           *Device
   )
 {
   USB_INTERFACE           *UsbIf;
   UINTN                   Index;
+  EFI_STATUS              Status;
+  EFI_STATUS              ReturnStatus;
 
   //
   // Remove each interface of the device
   //
+  ReturnStatus = EFI_SUCCESS;
   for (Index = 0; Index < Device->NumOfInterface; Index++) {    
     ASSERT (Index < USB_MAX_INTERFACE);
     UsbIf = Device->Interfaces[Index];
@@ -514,13 +522,17 @@ UsbRemoveConfig (
       continue;
     }
 
-    UsbDisconnectDriver (UsbIf);
-    UsbFreeInterface (UsbIf);
-    Device->Interfaces[Index] = NULL;
+    Status = UsbDisconnectDriver (UsbIf);
+    if (!EFI_ERROR (Status)) {
+      UsbFreeInterface (UsbIf);
+      Device->Interfaces[Index] = NULL;
+    } else {
+      ReturnStatus = Status;
+    }
   }
 
   Device->ActiveConfig    = NULL;
-  Device->NumOfInterface  = 0;
+  return ReturnStatus;
 }
 
 
@@ -540,6 +552,7 @@ UsbRemoveDevice (
   USB_BUS                 *Bus;
   USB_DEVICE              *Child;
   EFI_STATUS              Status;
+  EFI_STATUS              ReturnStatus;
   UINTN                   Index;
 
   Bus = Device->Bus;
@@ -548,6 +561,7 @@ UsbRemoveDevice (
   // Remove all the devices on its downstream ports. Search from devices[1].
   // Devices[0] is the root hub.
   //
+  ReturnStatus = EFI_SUCCESS;
   for (Index = 1; Index < Bus->MaxDevices; Index++) {
     Child = Bus->Devices[Index];
 
@@ -557,21 +571,31 @@ UsbRemoveDevice (
 
     Status = UsbRemoveDevice (Child);
 
-    if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "UsbRemoveDevice: failed to remove child, ignore error\n"));
+    if (!EFI_ERROR (Status)) {
       Bus->Devices[Index] = NULL;
+    } else {
+      Bus->Devices[Index]->DisconnectFail = TRUE;
+      ReturnStatus = Status;
+      DEBUG ((EFI_D_INFO, "UsbRemoveDevice: failed to remove child %p at parent %p\n", Child, Device));
     }
   }
 
-  UsbRemoveConfig (Device);
+  if (EFI_ERROR (ReturnStatus)) {
+    return ReturnStatus;
+  }
 
-  DEBUG (( EFI_D_INFO, "UsbRemoveDevice: device %d removed\n", Device->Address));
+  Status = UsbRemoveConfig (Device);
 
-  ASSERT (Device->Address < Bus->MaxDevices);
-  Bus->Devices[Device->Address] = NULL;
-  UsbFreeDevice (Device);
+  if (!EFI_ERROR (Status)) {
+    DEBUG (( EFI_D_INFO, "UsbRemoveDevice: device %d removed\n", Device->Address));
 
-  return EFI_SUCCESS;
+    ASSERT (Device->Address < Bus->MaxDevices);
+    Bus->Devices[Device->Address] = NULL;
+    UsbFreeDevice (Device);
+  } else {
+    Bus->Devices[Device->Address]->DisconnectFail = TRUE;
+  }
+  return Status;
 }
 
 
@@ -968,10 +992,19 @@ UsbHubEnumeration (
   UINT8                   Byte;
   UINT8                   Bit;
   UINT8                   Index;
-
+  USB_DEVICE              *Child;
+  
   ASSERT (Context != NULL);
 
   HubIf = (USB_INTERFACE *) Context;
+
+  for (Index = 0; Index < HubIf->NumOfPort; Index++) {
+    Child = UsbFindChild (HubIf, Index);
+    if ((Child != NULL) && (Child->DisconnectFail == TRUE)) {
+      DEBUG (( EFI_D_INFO, "UsbEnumeratePort: The device disconnect fails at port %d from hub %p, try again\n", Index, HubIf));
+      UsbRemoveDevice (Child);
+    }
+  }
 
   if (HubIf->ChangeMap == NULL) {
     return ;
@@ -1015,10 +1048,17 @@ UsbRootHubEnumeration (
 {
   USB_INTERFACE           *RootHub;
   UINT8                   Index;
+  USB_DEVICE              *Child;
 
   RootHub = (USB_INTERFACE *) Context;
 
   for (Index = 0; Index < RootHub->NumOfPort; Index++) {
+    Child = UsbFindChild (RootHub, Index);
+    if ((Child != NULL) && (Child->DisconnectFail == TRUE)) {
+      DEBUG (( EFI_D_INFO, "UsbEnumeratePort: The device disconnect fails at port %d from root hub %p, try again\n", Index, RootHub));
+      UsbRemoveDevice (Child);
+    }
+    
     UsbEnumeratePort (RootHub, Index);
   }
 }
