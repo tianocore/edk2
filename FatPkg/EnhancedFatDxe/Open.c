@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
 distribution. The full text of the license may be found at
@@ -64,8 +64,18 @@ Returns:
 
   CopyMem (&(IFile->Handle), &FatFileInterface, sizeof (EFI_FILE_PROTOCOL));
 
+  //
+  // Report the correct revision number based on the DiskIo2 availability
+  //
+  if (OFile->Volume->DiskIo2 != NULL) {
+    IFile->Handle.Revision = EFI_FILE_PROTOCOL_REVISION2;
+  } else {
+    IFile->Handle.Revision = EFI_FILE_PROTOCOL_REVISION;
+  }
+
   IFile->OFile = OFile;
   InsertTailList (&OFile->Opens, &IFile->Link);
+  InitializeListHead (&IFile->Tasks);
 
   *PtrIFile = IFile;
   return EFI_SUCCESS;
@@ -188,6 +198,125 @@ Returns:
 }
 
 EFI_STATUS
+FatOpenEx (
+  IN  EFI_FILE_PROTOCOL       *FHand,
+  OUT EFI_FILE_PROTOCOL       **NewHandle,
+  IN  CHAR16                  *FileName,
+  IN  UINT64                  OpenMode,
+  IN  UINT64                  Attributes,
+  IN OUT EFI_FILE_IO_TOKEN    *Token
+  )
+/*++
+Routine Description:
+
+  Implements OpenEx() of Simple File System Protocol.
+
+Arguments:
+
+  FHand                 - File handle of the file serves as a starting reference point.
+  NewHandle             - Handle of the file that is newly opened.
+  FileName              - File name relative to FHand.
+  OpenMode              - Open mode.
+  Attributes            - Attributes to set if the file is created.
+  Token                 - A pointer to the token associated with the transaction.
+
+Returns:
+
+  EFI_INVALID_PARAMETER - The FileName is NULL or the file string is empty.
+                          The OpenMode is not supported.
+                          The Attributes is not the valid attributes.
+  EFI_OUT_OF_RESOURCES  - Can not allocate the memory for file string.
+  EFI_SUCCESS           - Open the file successfully.
+  Others                - The status of open file.
+
+--*/
+{
+  FAT_IFILE   *IFile;
+  FAT_IFILE   *NewIFile;
+  FAT_OFILE   *OFile;
+  EFI_STATUS  Status;
+  FAT_TASK    *Task;
+
+  //
+  // Perform some parameter checking
+  //
+  if (FileName == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  //
+  // Check for a valid mode
+  //
+  switch (OpenMode) {
+  case EFI_FILE_MODE_READ:
+  case EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE:
+  case EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE | EFI_FILE_MODE_CREATE:
+    break;
+
+  default:
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check for valid Attributes for file creation case. 
+  //
+  if (((OpenMode & EFI_FILE_MODE_CREATE) != 0) && (Attributes & (EFI_FILE_READ_ONLY | (~EFI_FILE_VALID_ATTR))) != 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  IFile = IFILE_FROM_FHAND (FHand);
+  OFile = IFile->OFile;
+  Task  = NULL;
+
+  if (Token == NULL) {
+    FatWaitNonblockingTask (IFile);
+  } else {
+    //
+    // Caller shouldn't call the non-blocking interfaces if the low layer doesn't support DiskIo2.
+    // But if it calls, the below check can avoid crash.
+    //
+    if (FHand->Revision < EFI_FILE_PROTOCOL_REVISION2) {
+      return EFI_UNSUPPORTED;
+    }
+    Task = FatCreateTask (IFile, Token);
+    if (Task == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+  }
+
+  //
+  // Lock
+  //
+  FatAcquireLock ();
+
+  //
+  // Open the file
+  //
+  Status = FatOFileOpen (OFile, &NewIFile, FileName, OpenMode, (UINT8) Attributes);
+
+  //
+  // If the file was opened, return the handle to the caller
+  //
+  if (!EFI_ERROR (Status)) {
+    *NewHandle = &NewIFile->Handle;
+  }
+  //
+  // Unlock
+  //
+  Status = FatCleanupVolume (OFile->Volume, NULL, Status, Task);
+  FatReleaseLock ();
+
+  if (Token != NULL) {
+    if (!EFI_ERROR (Status)) {
+      Status = FatQueueTask (IFile, Task);
+    } else {
+      FatDestroyTask (Task);
+    }
+  }
+
+  return Status;
+}
+
+EFI_STATUS
 EFIAPI
 FatOpen (
   IN  EFI_FILE_PROTOCOL   *FHand,
@@ -220,61 +349,5 @@ Returns:
 
 --*/
 {
-  FAT_IFILE   *IFile;
-  FAT_IFILE   *NewIFile;
-  FAT_OFILE   *OFile;
-  EFI_STATUS  Status;
-
-  //
-  // Perform some parameter checking
-  //
-  if (FileName == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-  //
-  // Check for a valid mode
-  //
-  switch (OpenMode) {
-  case EFI_FILE_MODE_READ:
-  case EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE:
-  case EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE | EFI_FILE_MODE_CREATE:
-    break;
-
-  default:
-    return EFI_INVALID_PARAMETER;
-  }
-  
-  //
-  // Check for valid Attributes for file creation case. 
-  //
-  if (((OpenMode & EFI_FILE_MODE_CREATE) != 0) && (Attributes & (EFI_FILE_READ_ONLY | (~EFI_FILE_VALID_ATTR))) != 0) {
-	return EFI_INVALID_PARAMETER;
-  }
-  
-  IFile = IFILE_FROM_FHAND (FHand);
-  OFile = IFile->OFile;
-
-  //
-  // Lock
-  //
-  FatAcquireLock ();
-
-  //
-  // Open the file
-  //
-  Status = FatOFileOpen (OFile, &NewIFile, FileName, OpenMode, (UINT8) Attributes);
-
-  //
-  // If the file was opened, return the handle to the caller
-  //
-  if (!EFI_ERROR (Status)) {
-    *NewHandle = &NewIFile->Handle;
-  }
-  //
-  // Unlock
-  //
-  Status = FatCleanupVolume (OFile->Volume, NULL, Status);
-  FatReleaseLock ();
-
-  return Status;
+  return FatOpenEx (FHand, NewHandle, FileName, OpenMode, Attributes, NULL);
 }

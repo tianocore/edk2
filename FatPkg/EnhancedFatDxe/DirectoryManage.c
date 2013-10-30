@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
 distribution. The full text of the license may be found at
@@ -67,7 +67,7 @@ Returns:
   }
 
   BufferSize = sizeof (FAT_DIRECTORY_ENTRY);
-  return FatAccessOFile (Parent, IoMode, Position, &BufferSize, Entry);
+  return FatAccessOFile (Parent, IoMode, Position, &BufferSize, Entry, NULL);
 }
 
 EFI_STATUS

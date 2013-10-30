@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
 distribution. The full text of the license may be found at
@@ -23,6 +23,221 @@ Revision History
 --*/
 
 #include "Fat.h"
+
+FAT_TASK *
+FatCreateTask (
+  FAT_IFILE           *IFile,
+  EFI_FILE_IO_TOKEN   *Token
+  )
+/*++
+
+Routine Description:
+
+  Create the task
+
+Arguments:
+
+  IFile                 - The instance of the open file.
+  Token                 - A pointer to the token associated with the transaction.
+
+Return:
+  FAT_TASK *            - Return the task instance.
+**/
+{
+  FAT_TASK            *Task;
+
+  Task = AllocateZeroPool (sizeof (*Task));
+  if (Task != NULL) {
+    Task->Signature   = FAT_TASK_SIGNATURE;
+    Task->IFile       = IFile;
+    Task->FileIoToken = Token;
+    InitializeListHead (&Task->Subtasks);
+    InitializeListHead (&Task->Link);
+  }
+  return Task;
+}
+
+VOID
+FatDestroyTask (
+  FAT_TASK            *Task
+  )
+/*++
+
+Routine Description:
+
+  Destroy the task
+
+Arguments:
+
+  Task                  - The task to be destroyed.
+**/
+{
+  LIST_ENTRY          *Link;
+  FAT_SUBTASK         *Subtask;
+
+  Link = GetFirstNode (&Task->Subtasks);
+  while (!IsNull (&Task->Subtasks, Link)) {
+    Subtask = CR (Link, FAT_SUBTASK, Link, FAT_SUBTASK_SIGNATURE);
+    Link = FatDestroySubtask (Subtask);
+  }
+  RemoveEntryList (&Task->Link);
+  FreePool (Task);
+}
+
+VOID
+FatWaitNonblockingTask (
+  FAT_IFILE           *IFile
+  )
+/*++
+
+Routine Description:
+
+  Wait all non-blocking requests complete.
+
+Arguments:
+
+  IFile                 - The instance of the open file.
+**/
+{
+  BOOLEAN             TaskQueueEmpty;
+
+  do {
+    EfiAcquireLock (&FatTaskLock);
+    TaskQueueEmpty = IsListEmpty (&IFile->Tasks);
+    EfiReleaseLock (&FatTaskLock);
+  } while (!TaskQueueEmpty);
+}
+
+LIST_ENTRY *
+FatDestroySubtask (
+  FAT_SUBTASK         *Subtask
+  )
+/*++
+
+Routine Description:
+
+  Remove the subtask from subtask list.
+
+Arguments:
+
+  Subtask               - The subtask to be removed.
+
+Returns:
+
+  LIST_ENTRY *          - The next node in the list.
+
+--*/
+{
+  LIST_ENTRY          *Link;
+
+  gBS->CloseEvent (Subtask->DiskIo2Token.Event);
+
+  Link = RemoveEntryList (&Subtask->Link);
+  FreePool (Subtask);
+
+  return Link;
+}
+
+EFI_STATUS
+FatQueueTask (
+  IN FAT_IFILE        *IFile,
+  IN FAT_TASK         *Task
+  )
+/*++
+
+Routine Description:
+
+  Execute the task
+
+Arguments:
+
+  IFile                 - The instance of the open file.
+  Task                  - The task to be executed.
+
+Returns:
+
+  EFI_SUCCESS           - The task was executed sucessfully.
+  other                 - An error occurred when executing the task.
+
+--*/
+{
+  EFI_STATUS          Status;
+  LIST_ENTRY          *Link;
+  FAT_SUBTASK         *Subtask;
+
+  //
+  // Sometimes the Task doesn't contain any subtasks, signal the event directly.
+  //
+  if (IsListEmpty (&Task->Subtasks)) {
+    Task->FileIoToken->Status = EFI_SUCCESS;
+    gBS->SignalEvent (Task->FileIoToken->Event);
+    FreePool (Task);
+    return EFI_SUCCESS;
+  }
+
+  EfiAcquireLock (&FatTaskLock);
+  InsertTailList (&IFile->Tasks, &Task->Link);
+  EfiReleaseLock (&FatTaskLock);
+
+  Status = EFI_SUCCESS;
+  for ( Link = GetFirstNode (&Task->Subtasks)
+      ; !IsNull (&Task->Subtasks, Link)
+      ; Link = GetNextNode (&Task->Subtasks, Link)
+      ) {
+    Subtask = CR (Link, FAT_SUBTASK, Link, FAT_SUBTASK_SIGNATURE);
+    if (Subtask->Write) {
+      
+      Status = IFile->OFile->Volume->DiskIo2->WriteDiskEx (
+                                                IFile->OFile->Volume->DiskIo2,
+                                                IFile->OFile->Volume->MediaId,
+                                                Subtask->Offset,
+                                                &Subtask->DiskIo2Token,
+                                                Subtask->BufferSize,
+                                                Subtask->Buffer
+                                                );
+    } else {
+      Status = IFile->OFile->Volume->DiskIo2->ReadDiskEx (
+                                                IFile->OFile->Volume->DiskIo2,
+                                                IFile->OFile->Volume->MediaId,
+                                                Subtask->Offset,
+                                                &Subtask->DiskIo2Token,
+                                                Subtask->BufferSize,
+                                                Subtask->Buffer
+                                                );
+    }
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+  }
+
+  if (EFI_ERROR (Status)) {
+    EfiAcquireLock (&FatTaskLock);
+    //
+    // Remove all the remaining subtasks when failure.
+    // We shouldn't remove all the tasks because the non-blocking requests have
+    // been submitted and cannot be canceled.
+    //
+    while (!IsNull (&Task->Subtasks, Link)) {
+      Subtask = CR (Link, FAT_SUBTASK, Link, FAT_SUBTASK_SIGNATURE);
+      Link = FatDestroySubtask (Subtask);
+    }
+
+    if (IsListEmpty (&Task->Subtasks)) {
+      RemoveEntryList (&Task->Link);
+      FreePool (Task);
+    } else {
+      //
+      // If one or more subtasks have been already submitted, set FileIoToken
+      // to NULL so that the callback won't signal the event.
+      //
+      Task->FileIoToken = NULL;
+    }
+
+    EfiReleaseLock (&FatTaskLock);
+  }
+
+  return Status;
+}
 
 EFI_STATUS
 FatAccessVolumeDirty (
@@ -52,7 +267,79 @@ Returns:
   UINTN WriteCount;
 
   WriteCount = Volume->FatEntrySize;
-  return FatDiskIo (Volume, IoMode, Volume->FatPos + WriteCount, WriteCount, DirtyValue);
+  return FatDiskIo (Volume, IoMode, Volume->FatPos + WriteCount, WriteCount, DirtyValue, NULL);
+}
+
+/**
+  Invoke a notification event
+
+  @param  Event                 Event whose notification function is being invoked.
+  @param  Context               The pointer to the notification function's context,
+                                which is implementation-dependent.
+
+**/
+VOID
+EFIAPI
+FatOnAccessComplete (
+  IN  EFI_EVENT                Event,
+  IN  VOID                     *Context
+  )
+/*++
+
+Routine Description:
+
+  Invoke a notification event
+  case #1. some subtasks are not completed when the FatOpenEx checks the Task->Subtasks
+           - sets Task->SubtaskCollected so callback to signal the event and free the task.
+  case #2. all subtasks are completed when the FatOpenEx checks the Task->Subtasks
+           - FatOpenEx signal the event and free the task.
+Arguments:
+
+  Event                 - Event whose notification function is being invoked.
+  Context               - The pointer to the notification function's context,
+                          which is implementation-dependent.
+
+--*/
+{
+  EFI_STATUS             Status;
+  FAT_SUBTASK            *Subtask;
+  FAT_TASK               *Task;
+
+  //
+  // Avoid someone in future breaks the below assumption.
+  //
+  ASSERT (EfiGetCurrentTpl () == FatTaskLock.Tpl);
+
+  Subtask = (FAT_SUBTASK *) Context;
+  Task    = Subtask->Task;
+  Status  = Subtask->DiskIo2Token.TransactionStatus;
+
+  ASSERT (Task->Signature    == FAT_TASK_SIGNATURE);
+  ASSERT (Subtask->Signature == FAT_SUBTASK_SIGNATURE);
+
+  //
+  // Remove the task unconditionally
+  //
+  FatDestroySubtask (Subtask);
+
+  //
+  // Task->FileIoToken is NULL which means the task will be ignored (just recycle the subtask and task memory).
+  //
+  if (Task->FileIoToken != NULL) {
+    if (IsListEmpty (&Task->Subtasks) || EFI_ERROR (Status)) {
+      Task->FileIoToken->Status = Status;
+      gBS->SignalEvent (Task->FileIoToken->Event);
+      //
+      // Mark Task->FileIoToken to NULL so that the subtasks belonging to the task will be ignored.
+      //
+      Task->FileIoToken = NULL;
+    }
+  }
+
+  if (IsListEmpty (&Task->Subtasks)) {
+    RemoveEntryList (&Task->Link);
+    FreePool (Task);
+  }
 }
 
 EFI_STATUS
@@ -61,7 +348,8 @@ FatDiskIo (
   IN     IO_MODE          IoMode,
   IN     UINT64           Offset,
   IN     UINTN            BufferSize,
-  IN OUT VOID             *Buffer
+  IN OUT VOID             *Buffer,
+  IN     FAT_TASK         *Task
   )
 /*++
 
@@ -88,6 +376,7 @@ Returns:
   EFI_STATUS            Status;
   EFI_DISK_IO_PROTOCOL  *DiskIo;
   EFI_DISK_READ         IoFunction;
+  FAT_SUBTASK           *Subtask;
 
   //
   // Verify the IO is in devices range
@@ -98,20 +387,52 @@ Returns:
       //
       // Access cache
       //
-      Status = FatAccessCache (Volume, CACHE_TYPE (IoMode), RAW_ACCESS (IoMode), Offset, BufferSize, Buffer);
+      Status = FatAccessCache (Volume, CACHE_TYPE (IoMode), RAW_ACCESS (IoMode), Offset, BufferSize, Buffer, Task);
     } else {
       //
       // Access disk directly
       //
-      DiskIo      = Volume->DiskIo;
-      IoFunction  = (IoMode == READ_DISK) ? DiskIo->ReadDisk : DiskIo->WriteDisk;
-      Status      = IoFunction (DiskIo, Volume->MediaId, Offset, BufferSize, Buffer);
+      if (Task == NULL) {
+        //
+        // Blocking access
+        //
+        DiskIo      = Volume->DiskIo;
+        IoFunction  = (IoMode == READ_DISK) ? DiskIo->ReadDisk : DiskIo->WriteDisk;
+        Status      = IoFunction (DiskIo, Volume->MediaId, Offset, BufferSize, Buffer);
+      } else {
+        //
+        // Non-blocking access
+        //
+        Subtask = AllocateZeroPool (sizeof (*Subtask));
+        if (Subtask == NULL) {
+          Status        = EFI_OUT_OF_RESOURCES;
+        } else {
+          Subtask->Signature  = FAT_SUBTASK_SIGNATURE;
+          Subtask->Task       = Task;
+          Subtask->Write      = (BOOLEAN) (IoMode == WRITE_DISK);
+          Subtask->Offset     = Offset;
+          Subtask->Buffer     = Buffer;
+          Subtask->BufferSize = BufferSize;
+          Status = gBS->CreateEvent (
+                          EVT_NOTIFY_SIGNAL,
+                          TPL_NOTIFY,
+                          FatOnAccessComplete,
+                          Subtask,
+                          &Subtask->DiskIo2Token.Event
+                          );
+          if (!EFI_ERROR (Status)) {
+            InsertTailList (&Task->Subtasks, &Subtask->Link);
+          } else {
+            FreePool (Subtask);
+          }
+        }
+      }
     }
   }
 
   if (EFI_ERROR (Status)) {
     Volume->DiskError = TRUE;
-    DEBUG ((EFI_D_INFO, "FatDiskIo: error %r\n", Status));
+    DEBUG ((EFI_D_ERROR, "FatDiskIo: error %r\n", Status));
   }
 
   return Status;

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
 distribution. The full text of the license may be found at
@@ -32,6 +32,7 @@ Revision History
 #include <Guid/FileSystemVolumeLabelInfo.h>
 #include <Protocol/BlockIo.h>
 #include <Protocol/DiskIo.h>
+#include <Protocol/DiskIo2.h>
 #include <Protocol/SimpleFileSystem.h>
 #include <Protocol/UnicodeCollation.h>
 
@@ -55,6 +56,8 @@ Revision History
 #define FAT_ODIR_SIGNATURE           SIGNATURE_32 ('f', 'a', 't', 'd')
 #define FAT_DIRENT_SIGNATURE         SIGNATURE_32 ('f', 'a', 't', 'e')
 #define FAT_OFILE_SIGNATURE          SIGNATURE_32 ('f', 'a', 't', 'o')
+#define FAT_TASK_SIGNATURE           SIGNATURE_32 ('f', 'a', 't', 'T')
+#define FAT_SUBTASK_SIGNATURE        SIGNATURE_32 ('f', 'a', 't', 'S')
 
 #define ASSERT_VOLUME_LOCKED(a)      ASSERT_LOCKED (&FatFsLock)
 
@@ -213,8 +216,28 @@ typedef struct {
   UINT64              Position;
   BOOLEAN             ReadOnly;
   struct _FAT_OFILE   *OFile;
-  LIST_ENTRY          Link;
+  LIST_ENTRY          Tasks;                  // List of all FAT_TASKs
+  LIST_ENTRY          Link;                   // Link to other IFiles
 } FAT_IFILE;
+
+typedef struct {
+  UINTN               Signature;
+  EFI_FILE_IO_TOKEN   *FileIoToken;
+  FAT_IFILE           *IFile;
+  LIST_ENTRY          Subtasks;               // List of all FAT_SUBTASKs
+  LIST_ENTRY          Link;                   // Link to other FAT_TASKs
+} FAT_TASK;
+
+typedef struct {
+  UINTN               Signature;
+  EFI_DISK_IO2_TOKEN  DiskIo2Token;
+  FAT_TASK            *Task;
+  BOOLEAN             Write;
+  UINT64              Offset;
+  VOID                *Buffer;
+  UINTN               BufferSize;
+  LIST_ENTRY          Link;
+} FAT_SUBTASK;
 
 //
 // FAT_OFILE - Each opened file
@@ -296,6 +319,7 @@ typedef struct _FAT_VOLUME {
   //
   EFI_BLOCK_IO_PROTOCOL           *BlockIo;
   EFI_DISK_IO_PROTOCOL            *DiskIo;
+  EFI_DISK_IO2_PROTOCOL           *DiskIo2;
   UINT32                          MediaId;
   BOOLEAN                         ReadOnly;
 
@@ -387,6 +411,41 @@ Arguments:
   FileName              - File name relative to FHand.
   OpenMode              - Open mode.
   Attributes            - Attributes to set if the file is created.
+
+Returns:
+
+  EFI_INVALID_PARAMETER - The FileName is NULL or the file string is empty.
+                          The OpenMode is not supported.
+                          The Attributes is not the valid attributes.
+  EFI_OUT_OF_RESOURCES  - Can not allocate the memory for file string.
+  EFI_SUCCESS           - Open the file successfully.
+  Others                - The status of open file.
+
+--*/
+;
+
+EFI_STATUS
+FatOpenEx (
+  IN  EFI_FILE_PROTOCOL       *FHand,
+  OUT EFI_FILE_PROTOCOL       **NewHandle,
+  IN  CHAR16                  *FileName,
+  IN  UINT64                  OpenMode,
+  IN  UINT64                  Attributes,
+  IN OUT EFI_FILE_IO_TOKEN    *Token
+  )
+/*++
+Routine Description:
+
+  Implements OpenEx() of Simple File System Protocol.
+
+Arguments:
+
+  FHand                 - File handle of the file serves as a starting reference point.
+  NewHandle             - Handle of the file that is newly opened.
+  FileName              - File name relative to FHand.
+  OpenMode              - Open mode.
+  Attributes            - Attributes to set if the file is created.
+  Token                 - A pointer to the token associated with the transaction.
 
 Returns:
 
@@ -512,6 +571,33 @@ Returns:
 
 EFI_STATUS
 EFIAPI
+FatFlushEx (
+  IN EFI_FILE_PROTOCOL  *FHand,
+  IN EFI_FILE_IO_TOKEN  *Token
+  )
+/*++
+
+Routine Description:
+
+  Flushes all data associated with the file handle.
+
+Arguments:
+
+  FHand                 - Handle to file to flush.
+  Token                 - A pointer to the token associated with the transaction.
+
+Returns:
+
+  EFI_SUCCESS           - Flushed the file successfully.
+  EFI_WRITE_PROTECTED   - The volume is read only.
+  EFI_ACCESS_DENIED     - The file is read only.
+  Others                - Flushing of the file failed.
+
+--*/
+;
+
+EFI_STATUS
+EFIAPI
 FatClose (
   IN EFI_FILE_PROTOCOL  *FHand
   )
@@ -612,6 +698,33 @@ Returns:
 
 EFI_STATUS
 EFIAPI
+FatReadEx (
+  IN     EFI_FILE_PROTOCOL  *FHand,
+  IN OUT EFI_FILE_IO_TOKEN  *Token
+  )
+/*++
+
+Routine Description:
+
+  Get the file info.
+
+Arguments:
+
+  FHand                 - The handle of the file.
+  Token                 - A pointer to the token associated with the transaction.
+
+Returns:
+
+  EFI_SUCCESS           - Get the file info successfully.
+  EFI_DEVICE_ERROR      - Can not find the OFile for the file.
+  EFI_VOLUME_CORRUPTED  - The file type of open file is error.
+  other                 - An error occurred when operation the disk.
+
+--*/
+;
+
+EFI_STATUS
+EFIAPI
 FatWrite (
   IN     EFI_FILE_PROTOCOL      *FHand,
   IN OUT UINTN                  *BufferSize,
@@ -642,6 +755,33 @@ Returns:
 --*/
 ;
 
+EFI_STATUS
+EFIAPI
+FatWriteEx (
+  IN     EFI_FILE_PROTOCOL  *FHand,
+  IN OUT EFI_FILE_IO_TOKEN  *Token
+  )
+/*++
+
+Routine Description:
+
+  Get the file info.
+
+Arguments:
+
+  FHand                 - The handle of the file.
+  Token                 - A pointer to the token associated with the transaction.
+
+Returns:
+
+  EFI_SUCCESS           - Get the file info successfully.
+  EFI_DEVICE_ERROR      - Can not find the OFile for the file.
+  EFI_VOLUME_CORRUPTED  - The file type of open file is error.
+  other                 - An error occurred when operation the disk.
+
+--*/
+;
+
 //
 // DiskCache.c
 //
@@ -657,12 +797,14 @@ FatAccessCache (
   IN     IO_MODE             IoMode,
   IN     UINT64              Offset,
   IN     UINTN               BufferSize,
-  IN OUT UINT8               *Buffer
+  IN OUT UINT8               *Buffer,
+  IN     FAT_TASK            *Task
   );
 
 EFI_STATUS
 FatVolumeFlushCache (
-  IN FAT_VOLUME              *Volume
+  IN FAT_VOLUME              *Volume,
+  IN FAT_TASK                *Task
   );
 
 //
@@ -693,7 +835,8 @@ EFI_STATUS
 FatCleanupVolume (
   IN FAT_VOLUME         *Volume,
   IN FAT_OFILE          *OFile,
-  IN EFI_STATUS         EfiStatus
+  IN EFI_STATUS         EfiStatus,
+  IN FAT_TASK           *Task
   );
 
 //
@@ -741,6 +884,7 @@ EFI_STATUS
 FatAllocateVolume (
   IN  EFI_HANDLE                     Handle,
   IN  EFI_DISK_IO_PROTOCOL           *DiskIo,
+  IN  EFI_DISK_IO2_PROTOCOL          *DiskIo2,
   IN  EFI_BLOCK_IO_PROTOCOL          *BlockIo
   );
 
@@ -757,6 +901,33 @@ FatAbandonVolume (
 //
 // Misc.c
 //
+FAT_TASK *
+FatCreateTask (
+  FAT_IFILE           *IFile,
+  EFI_FILE_IO_TOKEN   *Token
+  );
+
+VOID
+FatDestroyTask (
+  FAT_TASK            *Task
+  );
+
+VOID
+FatWaitNonblockingTask (
+  FAT_IFILE           *IFile
+  );
+
+LIST_ENTRY *
+FatDestroySubtask (
+  FAT_SUBTASK         *Subtask
+  );
+
+EFI_STATUS
+FatQueueTask (
+  IN FAT_IFILE        *IFile,
+  IN FAT_TASK         *Task
+  );
+
 EFI_STATUS
 FatAccessVolumeDirty (
   IN FAT_VOLUME         *Volume,
@@ -770,7 +941,8 @@ FatDiskIo (
   IN IO_MODE            IoMode,
   IN UINT64             Offset,
   IN UINTN              BufferSize,
-  IN OUT VOID           *Buffer
+  IN OUT VOID           *Buffer,
+  IN FAT_TASK           *Task
   );
 
 VOID
@@ -895,7 +1067,8 @@ FatAccessOFile (
   IN IO_MODE            IoMode,
   IN UINTN              Position,
   IN UINTN              *DataBufferSize,
-  IN UINT8              *UserBuffer
+  IN UINT8              *UserBuffer,
+  IN FAT_TASK           *Task
   );
 
 EFI_STATUS
@@ -1113,6 +1286,7 @@ extern EFI_DRIVER_BINDING_PROTOCOL     gFatDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL     gFatComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL    gFatComponentName2;
 extern EFI_LOCK                        FatFsLock;
+extern EFI_LOCK                        FatTaskLock;
 extern EFI_FILE_PROTOCOL               FatFileInterface;
 
 #endif

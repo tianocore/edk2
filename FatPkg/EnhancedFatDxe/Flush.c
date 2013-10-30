@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
 distribution. The full text of the license may be found at
@@ -26,6 +26,95 @@ Revision History
 
 EFI_STATUS
 EFIAPI
+FatFlushEx (
+  IN EFI_FILE_PROTOCOL  *FHand,
+  IN EFI_FILE_IO_TOKEN  *Token
+  )
+/*++
+
+Routine Description:
+
+  Flushes all data associated with the file handle.
+
+Arguments:
+
+  FHand                 - Handle to file to flush.
+  Token                 - A pointer to the token associated with the transaction.
+
+Returns:
+
+  EFI_SUCCESS           - Flushed the file successfully.
+  EFI_WRITE_PROTECTED   - The volume is read only.
+  EFI_ACCESS_DENIED     - The file is read only.
+  Others                - Flushing of the file failed.
+
+--*/
+{
+  FAT_IFILE   *IFile;
+  FAT_OFILE   *OFile;
+  FAT_VOLUME  *Volume;
+  EFI_STATUS  Status;
+  FAT_TASK    *Task;
+
+  IFile   = IFILE_FROM_FHAND (FHand);
+  OFile   = IFile->OFile;
+  Volume  = OFile->Volume;
+  Task    = NULL;
+
+  //
+  // If the file has a permanent error, return it
+  //
+  if (EFI_ERROR (OFile->Error)) {
+    return OFile->Error;
+  }
+
+  if (Volume->ReadOnly) {
+    return EFI_WRITE_PROTECTED;
+  }
+  //
+  // If read only, return error
+  //
+  if (IFile->ReadOnly) {
+    return EFI_ACCESS_DENIED;
+  }
+
+  if (Token == NULL) {
+    FatWaitNonblockingTask (IFile);
+  } else {
+    //
+    // Caller shouldn't call the non-blocking interfaces if the low layer doesn't support DiskIo2.
+    // But if it calls, the below check can avoid crash.
+    //
+    if (FHand->Revision < EFI_FILE_PROTOCOL_REVISION2) {
+      return EFI_UNSUPPORTED;
+    }
+    Task = FatCreateTask (IFile, Token);
+    if (Task == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+  }
+
+  //
+  // Flush the OFile
+  //
+  FatAcquireLock ();
+  Status  = FatOFileFlush (OFile);
+  Status  = FatCleanupVolume (OFile->Volume, OFile, Status, Task);
+  FatReleaseLock ();
+
+  if (Token != NULL) {
+    if (!EFI_ERROR (Status)) {
+      Status = FatQueueTask (IFile, Task);
+    } else {
+      FatDestroyTask (Task);
+    }
+  }
+
+  return Status;
+}
+
+EFI_STATUS
+EFIAPI
 FatFlush (
   IN EFI_FILE_PROTOCOL  *FHand
   )
@@ -48,39 +137,7 @@ Returns:
 
 --*/
 {
-  FAT_IFILE   *IFile;
-  FAT_OFILE   *OFile;
-  FAT_VOLUME  *Volume;
-  EFI_STATUS  Status;
-
-  IFile   = IFILE_FROM_FHAND (FHand);
-  OFile   = IFile->OFile;
-  Volume  = OFile->Volume;
-
-  //
-  // If the file has a permanent error, return it
-  //
-  if (EFI_ERROR (OFile->Error)) {
-    return OFile->Error;
-  }
-
-  if (Volume->ReadOnly) {
-    return EFI_WRITE_PROTECTED;
-  }
-  //
-  // If read only, return error
-  //
-  if (IFile->ReadOnly) {
-    return EFI_ACCESS_DENIED;
-  }
-  //
-  // Flush the OFile
-  //
-  FatAcquireLock ();
-  Status  = FatOFileFlush (OFile);
-  Status  = FatCleanupVolume (OFile->Volume, OFile, Status);
-  FatReleaseLock ();
-  return Status;
+  return FatFlushEx (FHand, NULL);
 }
 
 EFI_STATUS
@@ -125,7 +182,7 @@ Returns:
   //
   // Done. Unlock the volume
   //
-  FatCleanupVolume (Volume, OFile, EFI_SUCCESS);
+  FatCleanupVolume (Volume, OFile, EFI_SUCCESS, NULL);
   FatReleaseLock ();
 
   //
@@ -161,6 +218,8 @@ Returns:
   Volume  = OFile->Volume;
 
   ASSERT_VOLUME_LOCKED (Volume);
+
+  FatWaitNonblockingTask (IFile);
 
   //
   // Remove the IFile struct
@@ -359,7 +418,8 @@ EFI_STATUS
 FatCleanupVolume (
   IN FAT_VOLUME       *Volume,
   IN FAT_OFILE        *OFile,
-  IN EFI_STATUS       EfiStatus
+  IN EFI_STATUS       EfiStatus,
+  IN FAT_TASK         *Task
   )
 /*++
 
@@ -402,7 +462,7 @@ Returns:
     // indicates this a FAT32 volume
     //
     if (Volume->FreeInfoValid && Volume->FatDirty && Volume->FreeInfoPos) {
-      Status = FatDiskIo (Volume, WRITE_DISK, Volume->FreeInfoPos, sizeof (FAT_INFO_SECTOR), &Volume->FatInfoSector);
+      Status = FatDiskIo (Volume, WRITE_DISK, Volume->FreeInfoPos, sizeof (FAT_INFO_SECTOR), &Volume->FatInfoSector, Task);
       if (EFI_ERROR (Status)) {
         return Status;
       }
@@ -420,7 +480,7 @@ Returns:
     //
     // Flush all dirty cache entries to disk
     //
-    Status = FatVolumeFlushCache (Volume);
+    Status = FatVolumeFlushCache (Volume, Task);
     if (EFI_ERROR (Status)) {
       return Status;
     }

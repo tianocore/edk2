@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
 distribution. The full text of the license may be found at
@@ -101,6 +101,9 @@ Returns:
   if (OFile->Error == EFI_NOT_FOUND) {
     return EFI_DEVICE_ERROR;
   }
+
+  FatWaitNonblockingTask (IFile);
+
   //
   // If this is a directory, we can only set back to position 0
   //
@@ -207,7 +210,8 @@ FatIFileAccess (
   IN     EFI_FILE_PROTOCOL     *FHand,
   IN     IO_MODE               IoMode,
   IN OUT UINTN                 *BufferSize,
-  IN OUT VOID                  *Buffer
+  IN OUT VOID                  *Buffer,
+  IN     EFI_FILE_IO_TOKEN     *Token
   )
 /*++
 
@@ -221,6 +225,7 @@ Arguments:
   IoMode                - Indicate whether the access mode is reading or writing.
   BufferSize            - Size of Buffer.
   Buffer                - Buffer containing read data.
+  Token                 - A pointer to the token associated with the transaction.
 
 Returns:
 
@@ -238,10 +243,12 @@ Returns:
   FAT_OFILE   *OFile;
   FAT_VOLUME  *Volume;
   UINT64      EndPosition;
+  FAT_TASK    *Task;
 
   IFile  = IFILE_FROM_FHAND (FHand);
   OFile  = IFile->OFile;
   Volume = OFile->Volume;
+  Task   = NULL;
 
   if (OFile->Error == EFI_NOT_FOUND) {
     return EFI_DEVICE_ERROR;
@@ -264,6 +271,22 @@ Returns:
 
     if (IFile->ReadOnly) {
       return EFI_ACCESS_DENIED;
+    }
+  }
+
+  if (Token == NULL) {
+    FatWaitNonblockingTask (IFile);
+  } else {
+    //
+    // Caller shouldn't call the non-blocking interfaces if the low layer doesn't support DiskIo2.
+    // But if it calls, the below check can avoid crash.
+    //
+    if (FHand->Revision < EFI_FILE_PROTOCOL_REVISION2) {
+      return EFI_UNSUPPORTED;
+    }
+    Task = FatCreateTask (IFile, Token);
+    if (Task == NULL) {
+      return EFI_OUT_OF_RESOURCES;
     }
   }
 
@@ -318,15 +341,20 @@ Returns:
         }
       }
 
-      Status = FatAccessOFile (OFile, IoMode, (UINTN) IFile->Position, BufferSize, Buffer);
+      Status = FatAccessOFile (OFile, IoMode, (UINTN) IFile->Position, BufferSize, Buffer, Task);
       IFile->Position += *BufferSize;
     }
   }
 
-Done:
-  if (EFI_ERROR (Status)) {
-    Status = FatCleanupVolume (Volume, OFile, Status);
+  if (Token != NULL) {
+    if (!EFI_ERROR (Status)) {
+      Status = FatQueueTask (IFile, Task);
+    } else {
+      FatDestroyTask (Task);
+    }
   }
+
+Done:
   //
   // On EFI_SUCCESS case, not calling FatCleanupVolume():
   // 1) The Cache flush operation is avoided to enhance
@@ -336,6 +364,10 @@ Done:
   // 3) Write operation doesn't affect OFile/IFile structure, so
   // Reference checking is not necessary.
   //
+  if (EFI_ERROR (Status)) {
+    Status = FatCleanupVolume (Volume, OFile, Status, NULL);
+  }
+
   FatReleaseLock ();
   return Status;
 }
@@ -368,7 +400,36 @@ Returns:
 
 --*/
 {
-  return FatIFileAccess (FHand, READ_DATA, BufferSize, Buffer);
+  return FatIFileAccess (FHand, READ_DATA, BufferSize, Buffer, NULL);
+}
+
+EFI_STATUS
+EFIAPI
+FatReadEx (
+  IN     EFI_FILE_PROTOCOL  *FHand,
+  IN OUT EFI_FILE_IO_TOKEN  *Token
+  )
+/*++
+
+Routine Description:
+
+  Get the file info.
+
+Arguments:
+
+  FHand                 - The handle of the file.
+  Token                 - A pointer to the token associated with the transaction.
+
+Returns:
+
+  EFI_SUCCESS           - Get the file info successfully.
+  EFI_DEVICE_ERROR      - Can not find the OFile for the file.
+  EFI_VOLUME_CORRUPTED  - The file type of open file is error.
+  other                 - An error occurred when operation the disk.
+
+--*/
+{
+  return FatIFileAccess (FHand, READ_DATA, &Token->BufferSize, Token->Buffer, Token);
 }
 
 EFI_STATUS
@@ -402,7 +463,36 @@ Returns:
 
 --*/
 {
-  return FatIFileAccess (FHand, WRITE_DATA, BufferSize, Buffer);
+  return FatIFileAccess (FHand, WRITE_DATA, BufferSize, Buffer, NULL);
+}
+
+EFI_STATUS
+EFIAPI
+FatWriteEx (
+  IN     EFI_FILE_PROTOCOL  *FHand,
+  IN OUT EFI_FILE_IO_TOKEN  *Token
+  )
+/*++
+
+Routine Description:
+
+  Get the file info.
+
+Arguments:
+
+  FHand                 - The handle of the file.
+  Token                 - A pointer to the token associated with the transaction.
+
+Returns:
+
+  EFI_SUCCESS           - Get the file info successfully.
+  EFI_DEVICE_ERROR      - Can not find the OFile for the file.
+  EFI_VOLUME_CORRUPTED  - The file type of open file is error.
+  other                 - An error occurred when operation the disk.
+
+--*/
+{
+  return FatIFileAccess (FHand, WRITE_DATA, &Token->BufferSize, Token->Buffer, Token);
 }
 
 EFI_STATUS
@@ -411,7 +501,8 @@ FatAccessOFile (
   IN     IO_MODE        IoMode,
   IN     UINTN          Position,
   IN OUT UINTN          *DataBufferSize,
-  IN OUT UINT8          *UserBuffer
+  IN OUT UINT8          *UserBuffer,
+  IN FAT_TASK           *Task
   )
 /*++
 
@@ -461,7 +552,7 @@ Returns:
     //
     // Write the data
     //
-    Status = FatDiskIo (Volume, IoMode, OFile->PosDisk, Len, UserBuffer);
+    Status = FatDiskIo (Volume, IoMode, OFile->PosDisk, Len, UserBuffer, Task);
     if (EFI_ERROR (Status)) {
       break;
     }
@@ -572,7 +663,7 @@ Returns:
   do {
     WriteSize     = AppendedSize > BufferSize ? BufferSize : (UINTN) AppendedSize;
     AppendedSize -= WriteSize;
-    Status = FatAccessOFile (OFile, WRITE_DATA, WritePos, &WriteSize, ZeroBuffer);
+    Status = FatAccessOFile (OFile, WRITE_DATA, WritePos, &WriteSize, ZeroBuffer, NULL);
     if (EFI_ERROR (Status)) {
       break;
     }
