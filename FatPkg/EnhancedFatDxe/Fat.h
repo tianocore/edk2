@@ -425,6 +425,7 @@ Returns:
 ;
 
 EFI_STATUS
+EFIAPI
 FatOpenEx (
   IN  EFI_FILE_PROTOCOL       *FHand,
   OUT EFI_FILE_PROTOCOL       **NewHandle,
