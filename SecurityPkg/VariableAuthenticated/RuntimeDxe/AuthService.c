@@ -531,7 +531,8 @@ AddPubKeyInStore (
                  &mVariableModuleGlobal->NonVolatileLastVariableOffset,
                  FALSE,
                  NULL,
-                 TRUE,
+                 NULL,
+                 0,
                  TRUE
                  );
       if (EFI_ERROR (Status)) {

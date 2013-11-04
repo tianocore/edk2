@@ -402,11 +402,12 @@ VariableCommonInitialize (
   @param[in]      IsVolatile              The variable store is volatile or not;
                                           if it is non-volatile, need FTW.
   @param[in, out] UpdatingPtrTrack        Pointer to updating variable pointer track structure.
+  @param[in]      NewVariable             Pointer to new variable.
+  @param[in]      NewVariableSize         New variable size.
   @param[in]      ReclaimPubKeyStore      Reclaim for public key database or not.
-  @param[in]      ReclaimAnyway           If TRUE, do reclaim anyway.
   
   @return EFI_SUCCESS                  Reclaim operation has finished successfully.
-  @return EFI_OUT_OF_RESOURCES         No enough memory resources.
+  @return EFI_OUT_OF_RESOURCES         No enough memory resources or variable space.
   @return EFI_DEVICE_ERROR             The public key database doesn't exist.
   @return Others                       Unexpect error happened during reclaim operation.
 
@@ -417,8 +418,9 @@ Reclaim (
   OUT    UINTN                        *LastVariableOffset,
   IN     BOOLEAN                      IsVolatile,
   IN OUT VARIABLE_POINTER_TRACK       *UpdatingPtrTrack,
-  IN     BOOLEAN                      ReclaimPubKeyStore,
-  IN     BOOLEAN                      ReclaimAnyway
+  IN     VARIABLE_HEADER              *NewVariable,
+  IN     UINTN                        NewVariableSize,
+  IN     BOOLEAN                      ReclaimPubKeyStore
   );
 
 /**
