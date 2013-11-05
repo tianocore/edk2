@@ -2,7 +2,7 @@
   Common definitions in the Platform Initialization Specification version 1.2
   VOLUME 4 System Management Mode Core Interface version.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -106,6 +106,7 @@ EFI_STATUS
   The SmmRegisterProtocolNotify() function creates a registration Function that is to be 
   called whenever a protocol interface is installed for Protocol by 
   SmmInstallProtocolInterface().
+  If Function == NULL and Registration is an existing registration, then the callback is unhooked.
 
   @param[in]  Protocol          The unique ID of the protocol for which the event is to be registered.
   @param[in]  Function          Points to the notification function.
@@ -114,6 +115,7 @@ EFI_STATUS
   @retval EFI_SUCCESS           Successfully returned the registration record that has been added.
   @retval EFI_INVALID_PARAMETER One or more of Protocol, Function and Registration is NULL.
   @retval EFI_OUT_OF_RESOURCES  Not enough memory resource to finish the request.
+  @retval EFI_NOT_FOUND         If the registration is not found when Function == NULL.
 **/
 typedef
 EFI_STATUS

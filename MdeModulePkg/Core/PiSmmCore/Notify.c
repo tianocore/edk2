@@ -1,7 +1,7 @@
 /** @file
   Support functions for UEFI protocol notification infrastructure.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -94,6 +94,8 @@ SmmRemoveInterfaceFromProtocol (
   @retval EFI_INVALID_PARAMETER  Invalid parameter
   @retval EFI_SUCCESS            Successfully returned the registration record
                                  that has been added
+  @retval EFI_OUT_OF_RESOURCES   Not enough memory resource to finish the request
+  @retval EFI_NOT_FOUND          If the registration is not found when Function == NULL
 
 **/
 EFI_STATUS
@@ -109,9 +111,39 @@ SmmRegisterProtocolNotify (
   LIST_ENTRY       *Link;
   EFI_STATUS       Status;
 
-  if ((Protocol == NULL) || (Function == NULL) || (Registration == NULL))  {
+  if (Protocol == NULL || Registration == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
+  if (Function == NULL) {
+  	//
+    // Get the protocol entry per Protocol
+    //
+    ProtEntry = SmmFindProtocolEntry ((EFI_GUID *) Protocol, FALSE);
+    if (ProtEntry != NULL) {
+      ProtNotify = (PROTOCOL_NOTIFY * )*Registration;
+      for (Link = ProtEntry->Notify.ForwardLink;
+           Link != &ProtEntry->Notify;
+           Link = Link->ForwardLink) {
+        //
+        // Compare the notification record 
+        //
+        if (ProtNotify == (CR(Link, PROTOCOL_NOTIFY, Link, PROTOCOL_NOTIFY_SIGNATURE))){
+          //
+          // If Registration is an existing registration, then unhook it
+          //
+          ProtNotify->Signature = 0;
+          RemoveEntryList (&ProtNotify->Link);
+          FreePool (ProtNotify);
+          return EFI_SUCCESS;
+        }
+      }
+    }
+    //
+    // If the registration is not found
+    //
+    return EFI_NOT_FOUND;
+  } 
 
   ProtNotify = NULL;
 
