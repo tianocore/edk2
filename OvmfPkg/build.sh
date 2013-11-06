@@ -139,7 +139,12 @@ done
 case $PROCESSOR in
   IA32)
     Processor=Ia32
-    if  [ -x `which qemu-system-i386` ]; then
+    if [ -n "$QEMU_COMMAND" ]; then
+      #
+      # The user set the QEMU_COMMAND variable. We'll use it to run QEMU.
+      #
+      :
+    elif  [ -x `which qemu-system-i386` ]; then
       QEMU_COMMAND=qemu-system-i386
     elif  [ -x `which qemu-system-x86_64` ]; then
       QEMU_COMMAND=qemu-system-x86_64
@@ -152,7 +157,12 @@ case $PROCESSOR in
     ;;
   X64)
     Processor=X64
-    QEMU_COMMAND=qemu-system-x86_64
+    if [ -z "$QEMU_COMMAND" ]; then
+      #
+      # The user didn't set the QEMU_COMMAND variable.
+      #
+      QEMU_COMMAND=qemu-system-x86_64
+    fi
     ;;
   *)
     echo Unsupported processor architecture: $PROCESSOR
