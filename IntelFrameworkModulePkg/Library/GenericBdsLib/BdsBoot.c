@@ -40,7 +40,7 @@ GenericBdsLibConstructor (
 
   gBdsLibStringPackHandle = HiiAddPackages (
                               &gBdsLibStringPackageGuid,
-                              &ImageHandle,
+                              ImageHandle,
                               GenericBdsLibStrings,
                               NULL
                               );
