@@ -479,7 +479,7 @@ StrToIPv4Addr (
   UINTN  Index;
 
   for (Index = 0; Index < 4; Index++) {
-    IPv4Addr->Addr[Index] = (UINT8) StrDecimalToUintn (SplitStr (Str, L'.'));
+    IPv4Addr->Addr[Index] = (UINT8) Strtoi (SplitStr (Str, L'.'));
   }
 }
 
@@ -1055,8 +1055,8 @@ DevPathFromTextAcpiAdr (
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextAta (
-  IN CHAR16 *TextDeviceNode
-  )
+IN CHAR16 *TextDeviceNode
+)
 {
   CHAR16            *PrimarySecondaryStr;
   CHAR16            *SlaveMasterStr;
@@ -1064,18 +1064,31 @@ DevPathFromTextAta (
   ATAPI_DEVICE_PATH *Atapi;
 
   Atapi = (ATAPI_DEVICE_PATH *) CreateDeviceNode (
-                                  MESSAGING_DEVICE_PATH,
-                                  MSG_ATAPI_DP,
-                                  (UINT16) sizeof (ATAPI_DEVICE_PATH)
-                                  );
+    MESSAGING_DEVICE_PATH,
+    MSG_ATAPI_DP,
+    (UINT16) sizeof (ATAPI_DEVICE_PATH)
+    );
 
-  PrimarySecondaryStr     = GetNextParamStr (&TextDeviceNode);
-  SlaveMasterStr          = GetNextParamStr (&TextDeviceNode);
-  LunStr                  = GetNextParamStr (&TextDeviceNode);
+  PrimarySecondaryStr = GetNextParamStr (&TextDeviceNode);
+  SlaveMasterStr      = GetNextParamStr (&TextDeviceNode);
+  LunStr              = GetNextParamStr (&TextDeviceNode);
 
-  Atapi->PrimarySecondary = (UINT8) ((StrCmp (PrimarySecondaryStr, L"Primary") == 0) ? 0 : 1);
-  Atapi->SlaveMaster      = (UINT8) ((StrCmp (SlaveMasterStr, L"Master") == 0) ? 0 : 1);
-  Atapi->Lun              = (UINT16) Strtoi (LunStr);
+  if (StrCmp (PrimarySecondaryStr, L"Primary") == 0) {
+    Atapi->PrimarySecondary = 0;
+  } else if (StrCmp (PrimarySecondaryStr, L"Secondary") == 0) {
+    Atapi->PrimarySecondary = 1;
+  } else {
+    Atapi->PrimarySecondary = (UINT8) Strtoi (PrimarySecondaryStr);
+  }
+  if (StrCmp (SlaveMasterStr, L"Master") == 0) {
+    Atapi->SlaveMaster      = 0;
+  } else if (StrCmp (SlaveMasterStr, L"Slave") == 0) {
+    Atapi->SlaveMaster      = 1;
+  } else {
+    Atapi->SlaveMaster      = (UINT8) Strtoi (SlaveMasterStr);
+  }
+
+  Atapi->Lun                = (UINT16) Strtoi (LunStr);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) Atapi;
 }
@@ -1880,8 +1893,12 @@ DevPathFromTextUart (
                                            (UINT16) sizeof (UART_DEVICE_PATH)
                                            );
 
-  Uart->BaudRate  = (StrCmp (BaudStr, L"DEFAULT") == 0) ? 115200 : StrDecimalToUintn (BaudStr);
-  Uart->DataBits  = (UINT8) ((StrCmp (DataBitsStr, L"DEFAULT") == 0) ? 8 : StrDecimalToUintn (DataBitsStr));
+  if (StrCmp (BaudStr, L"DEFAULT") == 0) {
+    Uart->BaudRate = 115200;
+  } else {
+    Strtoi64 (BaudStr, &Uart->BaudRate);
+  }
+  Uart->DataBits  = (UINT8) ((StrCmp (DataBitsStr, L"DEFAULT") == 0) ? 8 : Strtoi (DataBitsStr));
   switch (*ParityStr) {
   case L'D':
     Uart->Parity = 0;
@@ -1908,7 +1925,8 @@ DevPathFromTextUart (
     break;
 
   default:
-    Uart->Parity = 0xff;
+    Uart->Parity = (UINT8) Strtoi (ParityStr);
+    break;
   }
 
   if (StrCmp (StopBitsStr, L"D") == 0) {
@@ -1920,7 +1938,7 @@ DevPathFromTextUart (
   } else if (StrCmp (StopBitsStr, L"2") == 0) {
     Uart->StopBits = (UINT8) 3;
   } else {
-    Uart->StopBits = 0xff;
+    Uart->StopBits = (UINT8) Strtoi (StopBitsStr);
   }
 
   return (EFI_DEVICE_PATH_PROTOCOL *) Uart;
@@ -2351,21 +2369,30 @@ DevPathFromTextUsbWwid (
   CHAR16                *InterfaceNumStr;
   CHAR16                *SerialNumberStr;
   USB_WWID_DEVICE_PATH  *UsbWwid;
+  UINTN                 SerialNumberStrLen;
 
-  VIDStr                    = GetNextParamStr (&TextDeviceNode);
-  PIDStr                    = GetNextParamStr (&TextDeviceNode);
-  InterfaceNumStr           = GetNextParamStr (&TextDeviceNode);
-  SerialNumberStr           = GetNextParamStr (&TextDeviceNode);
-  UsbWwid                   = (USB_WWID_DEVICE_PATH *) CreateDeviceNode (
+  VIDStr                   = GetNextParamStr (&TextDeviceNode);
+  PIDStr                   = GetNextParamStr (&TextDeviceNode);
+  InterfaceNumStr          = GetNextParamStr (&TextDeviceNode);
+  SerialNumberStr          = GetNextParamStr (&TextDeviceNode);
+  SerialNumberStrLen       = StrLen (SerialNumberStr);
+  if (SerialNumberStrLen >= 2 &&
+      SerialNumberStr[0] == L'\"' &&
+      SerialNumberStr[SerialNumberStrLen - 1] == L'\"'
+    ) {
+    SerialNumberStr[SerialNumberStrLen - 1] = L'\0';
+    SerialNumberStr++;
+    SerialNumberStrLen -= 2;
+  }
+  UsbWwid                  = (USB_WWID_DEVICE_PATH *) CreateDeviceNode (
                                                          MESSAGING_DEVICE_PATH,
                                                          MSG_USB_WWID_DP,
-                                                         (UINT16) (sizeof (USB_WWID_DEVICE_PATH) + StrSize (SerialNumberStr))
+                                                         (UINT16) (sizeof (USB_WWID_DEVICE_PATH) + SerialNumberStrLen * sizeof (CHAR16))
                                                          );
-
-  UsbWwid->VendorId         = (UINT16) Strtoi (VIDStr);
-  UsbWwid->ProductId        = (UINT16) Strtoi (PIDStr);
-  UsbWwid->InterfaceNumber  = (UINT16) Strtoi (InterfaceNumStr);
-  StrCpy ((CHAR16 *) ((UINT8 *) UsbWwid + sizeof (USB_WWID_DEVICE_PATH)), SerialNumberStr);
+  UsbWwid->VendorId        = (UINT16) Strtoi (VIDStr);
+  UsbWwid->ProductId       = (UINT16) Strtoi (PIDStr);
+  UsbWwid->InterfaceNumber = (UINT16) Strtoi (InterfaceNumStr);
+  StrnCpy ((CHAR16 *) ((UINT8 *) UsbWwid + sizeof (USB_WWID_DEVICE_PATH)), SerialNumberStr, SerialNumberStrLen);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) UsbWwid;
 }
@@ -2526,7 +2553,7 @@ DevPathFromTextHD (
                                                     (UINT16) sizeof (HARDDRIVE_DEVICE_PATH)
                                                     );
 
-  Hd->PartitionNumber = (UINT32) StrDecimalToUintn (PartitionStr);
+  Hd->PartitionNumber = (UINT32) Strtoi (PartitionStr);
 
   ZeroMem (Hd->Signature, 16);
   Hd->MBRType = (UINT8) 0;
@@ -2596,7 +2623,7 @@ DevPathFromTextCDROM (
 
 **/
 EFI_DEVICE_PATH_PROTOCOL *
-DevPathFromTextVenMEDIA (
+DevPathFromTextVenMedia (
   IN CHAR16 *TextDeviceNode
   )
 {
@@ -2818,29 +2845,18 @@ DevPathFromTextSata (
   CHAR16           *Param2;
   CHAR16           *Param3;
 
-  //
-  // The PMPN is optional.
-  //
   Param1 = GetNextParamStr (&TextDeviceNode);
   Param2 = GetNextParamStr (&TextDeviceNode);
-  Param3 = NULL;
-  if (!IS_NULL (TextDeviceNode)) {
-    Param3 = GetNextParamStr (&TextDeviceNode);
-  }
+  Param3 = GetNextParamStr (&TextDeviceNode);
 
   Sata = (SATA_DEVICE_PATH *) CreateDeviceNode (
                                 MESSAGING_DEVICE_PATH,
                                 MSG_SATA_DP,
                                 (UINT16) sizeof (SATA_DEVICE_PATH)
                                 );
-  Sata->HBAPortNumber = (UINT16) StrHexToUintn (Param1);
-  if (Param3 != NULL) {
-    Sata->PortMultiplierPortNumber = (UINT16) StrHexToUintn (Param2);
-    Param2                   = Param3;
-  } else {
-    Sata->PortMultiplierPortNumber = SATA_HBA_DIRECT_CONNECT_FLAG;
-  }
-  Sata->Lun = (UINT16) StrHexToUintn (Param2);
+  Sata->HBAPortNumber            = (UINT16) Strtoi (Param1);
+  Sata->PortMultiplierPortNumber = (UINT16) Strtoi (Param2);
+  Sata->Lun                      = (UINT16) Strtoi (Param3);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) Sata;
 }
@@ -2904,7 +2920,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE mUefiDevicePathLibDevP
   {L"Vlan",                    DevPathFromTextVlan                    },
   {L"HD",                      DevPathFromTextHD                      },
   {L"CDROM",                   DevPathFromTextCDROM                   },
-  {L"VenMEDIA",                DevPathFromTextVenMEDIA                },
+  {L"VenMedia",                DevPathFromTextVenMedia                },
   {L"Media",                   DevPathFromTextMedia                   },
   {L"Fv",                      DevPathFromTextFv                      },
   {L"FvFile",                  DevPathFromTextFvFile                  },

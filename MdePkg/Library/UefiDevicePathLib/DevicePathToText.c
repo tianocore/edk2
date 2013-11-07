@@ -990,22 +990,13 @@ DevPathToTextSata (
   SATA_DEVICE_PATH *Sata;
 
   Sata = DevPath;
-  if ((Sata->PortMultiplierPortNumber & SATA_HBA_DIRECT_CONNECT_FLAG) != 0) {
-    UefiDevicePathLibCatPrint (
-      Str,
-      L"Sata(0x%x,0x%x)",
-      Sata->HBAPortNumber,
-      Sata->Lun
-      );
-  } else {
-    UefiDevicePathLibCatPrint (
-      Str,
-      L"Sata(0x%x,0x%x,0x%x)",
-      Sata->HBAPortNumber,
-      Sata->PortMultiplierPortNumber,
-      Sata->Lun
-      );
-  }
+  UefiDevicePathLibCatPrint (
+    Str,
+    L"Sata(0x%x,0x%x,0x%x)",
+    Sata->HBAPortNumber,
+    Sata->PortMultiplierPortNumber,
+    Sata->Lun
+    );
 }
 
 /**
