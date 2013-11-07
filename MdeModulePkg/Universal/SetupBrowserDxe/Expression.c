@@ -2036,11 +2036,7 @@ GetQuestionValueFromForm (
   )
 {
   EFI_STATUS                   Status;
-  EFI_HANDLE                   DriverHandle;
-  EFI_HANDLE                   Handle;
-  EFI_HII_HANDLE               *HiiHandles;
   EFI_HII_HANDLE               HiiHandle;
-  UINTN                        Index;
   FORM_BROWSER_STATEMENT       *Question;
   FORM_BROWSER_FORMSET         *FormSet;
   FORM_BROWSER_FORM            *Form;
@@ -2054,7 +2050,6 @@ GetQuestionValueFromForm (
           (DevicePath == NULL && InputHiiHandle != NULL) );
 
   GetTheVal    = TRUE;
-  DriverHandle = NULL;
   HiiHandle    = NULL;
   Question     = NULL;
   Form         = NULL;
@@ -2063,38 +2058,10 @@ GetQuestionValueFromForm (
   // Get HiiHandle.
   //
   if (DevicePath != NULL) {
-    //
-    // 1. Get Driver handle.
-    //
-    Status = gBS->LocateDevicePath (
-                    &gEfiDevicePathProtocolGuid,
-                    &DevicePath,
-                    &DriverHandle
-                    );
-    if (EFI_ERROR (Status) || (DriverHandle == NULL)) {
+    HiiHandle = DevicePathToHiiHandle (DevicePath, FormSetGuid);
+    if (HiiHandle == NULL) {
       return FALSE;
     }
-
-    //
-    // 2. Get Hii handle
-    //
-    HiiHandles = HiiGetHiiHandles (NULL);
-    if (HiiHandles == NULL) {
-      return FALSE;
-    }
-
-    for (Index = 0; HiiHandles[Index] != NULL; Index++) {
-      Status = mHiiDatabase->GetPackageListHandle (
-                               mHiiDatabase,
-                               HiiHandles[Index],
-                               &Handle
-                               );
-      if (!EFI_ERROR (Status) && (Handle == DriverHandle)) {
-        HiiHandle = HiiHandles[Index];
-        break;
-      }
-    }
-    FreePool (HiiHandles);
   } else {
     HiiHandle = InputHiiHandle;
   } 

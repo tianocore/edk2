@@ -1040,6 +1040,87 @@ ProcessAction (
   return EFI_SUCCESS;
 }
 
+/**
+  Check whether the formset guid is in this Hii package list.
+
+  @param  HiiHandle              The HiiHandle for this HII package list.
+  @param  FormsetGuid            The formset guid for the request formset.
+
+  @retval TRUE                   Find the formset guid.
+  @retval FALSE                  Not found the formset guid.
+
+**/
+BOOLEAN
+GetFormsetGuidFromHiiHandle (
+  IN EFI_HII_HANDLE       HiiHandle,
+  IN EFI_GUID             *FormSetGuid
+  )
+{
+  EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
+  UINTN                        BufferSize;
+  UINT32                       Offset;
+  UINT32                       Offset2;
+  UINT32                       PackageListLength;
+  EFI_HII_PACKAGE_HEADER       PackageHeader;
+  UINT8                        *Package;
+  UINT8                        *OpCodeData;
+  EFI_STATUS                   Status;
+  BOOLEAN                      FindGuid;
+
+  BufferSize     = 0;
+  HiiPackageList = NULL;
+  FindGuid       = FALSE;
+  
+  Status = mHiiDatabase->ExportPackageLists (mHiiDatabase, HiiHandle, &BufferSize, HiiPackageList);
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    HiiPackageList = AllocatePool (BufferSize);
+    ASSERT (HiiPackageList != NULL);
+
+    Status = mHiiDatabase->ExportPackageLists (mHiiDatabase, HiiHandle, &BufferSize, HiiPackageList);
+  }
+  if (EFI_ERROR (Status) || HiiPackageList == NULL) {
+    return FALSE;
+  }
+
+  //
+  // Get Form package from this HII package List
+  //
+  Offset = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
+  Offset2 = 0;
+  CopyMem (&PackageListLength, &HiiPackageList->PackageLength, sizeof (UINT32)); 
+
+  while (Offset < PackageListLength) {
+    Package = ((UINT8 *) HiiPackageList) + Offset;
+    CopyMem (&PackageHeader, Package, sizeof (EFI_HII_PACKAGE_HEADER));
+    Offset += PackageHeader.Length;
+
+    if (PackageHeader.Type == EFI_HII_PACKAGE_FORMS) {
+      //
+      // Search FormSet in this Form Package
+      //
+      Offset2 = sizeof (EFI_HII_PACKAGE_HEADER);
+      while (Offset2 < PackageHeader.Length) {
+        OpCodeData = Package + Offset2;
+
+        if (((EFI_IFR_OP_HEADER *) OpCodeData)->OpCode == EFI_IFR_FORM_SET_OP) {
+          if (CompareGuid (FormSetGuid, (EFI_GUID *)(OpCodeData + sizeof (EFI_IFR_OP_HEADER)))){
+            FindGuid = TRUE;
+            break;
+          }
+        }
+
+        Offset2 += ((EFI_IFR_OP_HEADER *) OpCodeData)->Length;
+      }
+    }
+    if (FindGuid) {
+      break;
+    }
+  }
+
+  FreePool (HiiPackageList);
+
+  return FindGuid;
+}
 
 /**
   Find HII Handle in the HII database associated with given Device Path.
@@ -1048,6 +1129,7 @@ ProcessAction (
 
   @param  DevicePath             Device Path associated with the HII package list
                                  handle.
+  @param  FormsetGuid            The formset guid for this formset.
 
   @retval Handle                 HII package list Handle associated with the Device
                                         Path.
@@ -1055,15 +1137,13 @@ ProcessAction (
 
 **/
 EFI_HII_HANDLE
-EFIAPI
 DevicePathToHiiHandle (
-  IN EFI_DEVICE_PATH_PROTOCOL   *DevicePath
+  IN EFI_DEVICE_PATH_PROTOCOL   *DevicePath,
+  IN EFI_GUID                   *FormsetGuid
   )
 {
   EFI_STATUS                  Status;
   EFI_DEVICE_PATH_PROTOCOL    *TmpDevicePath;
-  UINTN                       BufferSize;
-  UINTN                       HandleCount;
   UINTN                       Index;
   EFI_HANDLE                  Handle;
   EFI_HANDLE                  DriverHandle;
@@ -1088,32 +1168,8 @@ DevicePathToHiiHandle (
   //
   // Retrieve all HII Handles from HII database
   //
-  BufferSize = 0x1000;
-  HiiHandles = AllocatePool (BufferSize);
-  ASSERT (HiiHandles != NULL);
-  Status = mHiiDatabase->ListPackageLists (
-                           mHiiDatabase,
-                           EFI_HII_PACKAGE_TYPE_ALL,
-                           NULL,
-                           &BufferSize,
-                           HiiHandles
-                           );
-  if (Status == EFI_BUFFER_TOO_SMALL) {
-    FreePool (HiiHandles);
-    HiiHandles = AllocatePool (BufferSize);
-    ASSERT (HiiHandles != NULL);
-
-    Status = mHiiDatabase->ListPackageLists (
-                             mHiiDatabase,
-                             EFI_HII_PACKAGE_TYPE_ALL,
-                             NULL,
-                             &BufferSize,
-                             HiiHandles
-                             );
-  }
-
-  if (EFI_ERROR (Status)) {
-    FreePool (HiiHandles);
+  HiiHandles = HiiGetHiiHandles (NULL);
+  if (HiiHandles == NULL) {
     return NULL;
   }
 
@@ -1121,16 +1177,21 @@ DevicePathToHiiHandle (
   // Search Hii Handle by Driver Handle
   //
   HiiHandle = NULL;
-  HandleCount = BufferSize / sizeof (EFI_HII_HANDLE);
-  for (Index = 0; Index < HandleCount; Index++) {
+  for (Index = 0; HiiHandles[Index] != NULL; Index++) {
     Status = mHiiDatabase->GetPackageListHandle (
                              mHiiDatabase,
                              HiiHandles[Index],
                              &Handle
                              );
     if (!EFI_ERROR (Status) && (Handle == DriverHandle)) {
-      HiiHandle = HiiHandles[Index];
-      break;
+      if (GetFormsetGuidFromHiiHandle(HiiHandles[Index], FormsetGuid)) {
+        HiiHandle = HiiHandles[Index];
+        break;
+      }
+
+      if (HiiHandle != NULL) {
+        break;
+      }
     }
   }
 
@@ -1157,17 +1218,8 @@ FormSetGuidToHiiHandle (
   )
 {
   EFI_HII_HANDLE               *HiiHandles;
-  UINTN                        Index;
-  EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
-  UINTN                        BufferSize;
-  UINT32                       Offset;
-  UINT32                       Offset2;
-  UINT32                       PackageListLength;
-  EFI_HII_PACKAGE_HEADER       PackageHeader;
-  UINT8                        *Package;
-  UINT8                        *OpCodeData;
-  EFI_STATUS                   Status;
   EFI_HII_HANDLE               HiiHandle;
+  UINTN                        Index;
 
   ASSERT (ComparingGuid != NULL);
 
@@ -1182,61 +1234,14 @@ FormSetGuidToHiiHandle (
   // Search for formset of each class type
   //
   for (Index = 0; HiiHandles[Index] != NULL; Index++) {
-    BufferSize = 0;
-    HiiPackageList = NULL;
-    Status = mHiiDatabase->ExportPackageLists (mHiiDatabase, HiiHandles[Index], &BufferSize, HiiPackageList);
-    if (Status == EFI_BUFFER_TOO_SMALL) {
-      HiiPackageList = AllocatePool (BufferSize);
-      ASSERT (HiiPackageList != NULL);
-
-      Status = mHiiDatabase->ExportPackageLists (mHiiDatabase, HiiHandles[Index], &BufferSize, HiiPackageList);
-    }
-    if (EFI_ERROR (Status) || HiiPackageList == NULL) {
-      return NULL;
+    if (GetFormsetGuidFromHiiHandle(HiiHandles[Index], ComparingGuid)) {
+      HiiHandle = HiiHandles[Index];
+      break;
     }
 
-    //
-    // Get Form package from this HII package List
-    //
-    Offset = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
-    Offset2 = 0;
-    CopyMem (&PackageListLength, &HiiPackageList->PackageLength, sizeof (UINT32)); 
-
-    while (Offset < PackageListLength) {
-      Package = ((UINT8 *) HiiPackageList) + Offset;
-      CopyMem (&PackageHeader, Package, sizeof (EFI_HII_PACKAGE_HEADER));
-
-      if (PackageHeader.Type == EFI_HII_PACKAGE_FORMS) {
-        //
-        // Search FormSet in this Form Package
-        //
-        Offset2 = sizeof (EFI_HII_PACKAGE_HEADER);
-        while (Offset2 < PackageHeader.Length) {
-          OpCodeData = Package + Offset2;
-
-          if (((EFI_IFR_OP_HEADER *) OpCodeData)->OpCode == EFI_IFR_FORM_SET_OP) {
-            //
-            // Try to compare against formset GUID
-            //
-            if (CompareGuid (ComparingGuid, (EFI_GUID *)(OpCodeData + sizeof (EFI_IFR_OP_HEADER)))) {
-              HiiHandle = HiiHandles[Index];
-              break;
-            }
-          }
-
-          Offset2 += ((EFI_IFR_OP_HEADER *) OpCodeData)->Length;
-        }
-      }
-      if (HiiHandle != NULL) {
-        break;
-      }
-      Offset += PackageHeader.Length;
+    if (HiiHandle != NULL) {
+      break;
     }
-    
-    FreePool (HiiPackageList);
-  	if (HiiHandle != NULL) {
-  		break;
-  	}
   }
 
   FreePool (HiiHandles);
@@ -1375,7 +1380,7 @@ ProcessGotoOpCode (
     if (mPathFromText != NULL) {
       DevicePath = mPathFromText->ConvertTextToDevicePath(StringPtr);
       if (DevicePath != NULL) {
-        HiiHandle = DevicePathToHiiHandle (DevicePath);
+        HiiHandle = DevicePathToHiiHandle (DevicePath, &Statement->HiiValue.Value.ref.FormSetGuid);
         FreePool (DevicePath);
       }
       FreePool (StringPtr);
