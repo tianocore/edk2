@@ -68,6 +68,16 @@ S3BootScriptExecutorEntryFunction (
   // for that parameter.
   //
   Status = S3BootScriptExecute ();
+  
+  //
+  // If invalid script table or opcode in S3 boot script table.
+  //
+  ASSERT_EFI_ERROR (Status);
+  
+  if (EFI_ERROR (Status)) {
+    CpuDeadLoop ();
+    return Status;
+  }
 
   AsmWbinvd ();
 
