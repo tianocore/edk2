@@ -250,7 +250,7 @@ PopulateFwData(
       Desc = &AllDesc[CurDesc];
       ExclTop = Desc->BaseAddress + Desc->Length;
 
-      if (ExclTop <= BASE_4GB) {
+      if (ExclTop <= (UINT64) PcdGet32 (PcdOvmfFdBaseAddress)) {
         switch (Desc->GcdMemoryType) {
           case EfiGcdMemoryTypeNonExistent:
             break;

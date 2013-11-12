@@ -62,6 +62,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiTableStorageFile
   gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress
   gPcAtChipsetPkgTokenSpaceGuid.Pcd8259LegacyModeEdgeLevel
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress
 
 [Depex]
   gEfiAcpiTableProtocolGuid
