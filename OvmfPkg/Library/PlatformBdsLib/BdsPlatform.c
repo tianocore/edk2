@@ -1073,11 +1073,16 @@ Returns:
 
   ConnectRootBridge ();
 
-  //
-  // Try to restore variables from the hard disk early so
-  // they can be used for the other BDS connect operations.
-  //
-  PlatformBdsRestoreNvVarsFromHardDisk ();
+  if (PcdGetBool (PcdOvmfFlashVariablesEnable)) {
+    DEBUG ((EFI_D_INFO, "PlatformBdsPolicyBehavior: not restoring NvVars "
+      "from disk since flash variables appear to be supported.\n"));
+  } else {
+    //
+    // Try to restore variables from the hard disk early so
+    // they can be used for the other BDS connect operations.
+    //
+    PlatformBdsRestoreNvVarsFromHardDisk ();
+  }
 
   //
   // Init the time out value

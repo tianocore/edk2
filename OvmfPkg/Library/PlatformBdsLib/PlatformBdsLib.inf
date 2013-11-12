@@ -57,6 +57,7 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable
 
 [Pcd.IA32, Pcd.X64]
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock
