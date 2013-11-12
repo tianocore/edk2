@@ -3,7 +3,7 @@
   Handles non-volatile variable store garbage collection, using FTW
   (Fault Tolerant Write) protocol.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -99,8 +99,7 @@ GetLbaAndOffsetByAddress (
   VariableBase. Fault Tolerant Write protocol is used for writing.
 
   @param  VariableBase   Base address of variable to write
-  @param  Buffer         Point to the data buffer.
-  @param  BufferSize     The number of bytes of the data Buffer.
+  @param  VariableBuffer Point to the variable data buffer.
 
   @retval EFI_SUCCESS    The function completed successfully.
   @retval EFI_NOT_FOUND  Fail to locate Fault Tolerant Write protocol.
@@ -110,15 +109,13 @@ GetLbaAndOffsetByAddress (
 EFI_STATUS
 FtwVariableSpace (
   IN EFI_PHYSICAL_ADDRESS   VariableBase,
-  IN UINT8                  *Buffer,
-  IN UINTN                  BufferSize
+  IN VARIABLE_STORE_HEADER  *VariableBuffer
   )
 {
   EFI_STATUS                         Status;
   EFI_HANDLE                         FvbHandle;
   EFI_LBA                            VarLba;
   UINTN                              VarOffset;
-  UINT8                              *FtwBuffer;
   UINTN                              FtwBufferSize;
   EFI_FAULT_TOLERANT_WRITE_PROTOCOL  *FtwProtocol;
 
@@ -143,17 +140,9 @@ FtwVariableSpace (
   if (EFI_ERROR (Status)) {
     return EFI_ABORTED;
   }
-  //
-  // Prepare for the variable data.
-  //
-  FtwBufferSize = ((VARIABLE_STORE_HEADER *) ((UINTN) VariableBase))->Size;
-  FtwBuffer     = AllocatePool (FtwBufferSize);
-  if (FtwBuffer == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
 
-  SetMem (FtwBuffer, FtwBufferSize, (UINT8) 0xff);
-  CopyMem (FtwBuffer, Buffer, BufferSize);
+  FtwBufferSize = ((VARIABLE_STORE_HEADER *) ((UINTN) VariableBase))->Size;
+  ASSERT (FtwBufferSize == VariableBuffer->Size);
 
   //
   // FTW write record.
@@ -165,9 +154,8 @@ FtwVariableSpace (
                           FtwBufferSize,  // NumBytes
                           NULL,           // PrivateData NULL
                           FvbHandle,      // Fvb Handle
-                          FtwBuffer       // write buffer
+                          (VOID *) VariableBuffer // write buffer
                           );
 
-  FreePool (FtwBuffer);
   return Status;
 }

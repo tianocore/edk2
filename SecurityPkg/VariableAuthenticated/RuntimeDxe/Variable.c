@@ -701,6 +701,7 @@ PubKeyStoreFilter (
   *NewPubKeyIndex = AllocateZeroPool ((PubKeyNumber + 1) * sizeof (UINT32));
   if (*NewPubKeyIndex == NULL) {
     FreePool (*NewPubKeyStore);
+    *NewPubKeyStore = NULL;
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -790,41 +791,50 @@ Reclaim (
   NewPubKeyStore = NULL;
   NewPubKeySize  = 0;
   PubKeyHeader   = NULL;
-  
-  //
-  // Start Pointers for the variable.
-  //
-  Variable          = GetStartPointer (VariableStoreHeader);
-  MaximumBufferSize = sizeof (VARIABLE_STORE_HEADER);
 
-  while (IsValidVariableHeader (Variable)) {
-    NextVariable = GetNextVariablePtr (Variable);
-    if ((Variable->State == VAR_ADDED || Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) &&
-        Variable != UpdatingVariable &&
-        Variable != UpdatingInDeletedTransition
-       ) {
-      VariableSize = (UINTN) NextVariable - (UINTN) Variable;
-      MaximumBufferSize += VariableSize;
+  if (IsVolatile) {
+    //
+    // Start Pointers for the variable.
+    //
+    Variable          = GetStartPointer (VariableStoreHeader);
+    MaximumBufferSize = sizeof (VARIABLE_STORE_HEADER);
+
+    while (IsValidVariableHeader (Variable)) {
+      NextVariable = GetNextVariablePtr (Variable);
+      if ((Variable->State == VAR_ADDED || Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) &&
+          Variable != UpdatingVariable &&
+          Variable != UpdatingInDeletedTransition
+         ) {
+        VariableSize = (UINTN) NextVariable - (UINTN) Variable;
+        MaximumBufferSize += VariableSize;
+      }
+
+      Variable = NextVariable;
     }
 
-    Variable = NextVariable;
-  }
+    if (NewVariable != NULL) {
+      //
+      // Add the new variable size.
+      //
+      MaximumBufferSize += NewVariableSize;
+    }
 
-  if (NewVariable != NULL) {
     //
-    // Add the new variable size.
+    // Reserve the 1 Bytes with Oxff to identify the
+    // end of the variable buffer.
     //
-    MaximumBufferSize += NewVariableSize;
-  }
-
-  //
-  // Reserve the 1 Bytes with Oxff to identify the
-  // end of the variable buffer.
-  //
-  MaximumBufferSize += 1;
-  ValidBuffer = AllocatePool (MaximumBufferSize);
-  if (ValidBuffer == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    MaximumBufferSize += 1;
+    ValidBuffer = AllocatePool (MaximumBufferSize);
+    if (ValidBuffer == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+  } else {
+    //
+    // For NV variable reclaim, don't allocate pool here and just use mNvVariableCache
+    // as the buffer to reduce SMRAM consumption for SMM variable driver.
+    //
+    MaximumBufferSize = mNvVariableCache->Size;
+    ValidBuffer = (UINT8 *) mNvVariableCache;
   }
 
   SetMem (ValidBuffer, MaximumBufferSize, 0xff);
@@ -848,14 +858,13 @@ Reclaim (
                &NewPubKeySize
                );
     if (EFI_ERROR (Status)) {
-      FreePool (ValidBuffer);
-      return Status;
+      goto Done;
     }
 
     //
     // Refresh the PubKeyIndex for all valid variables (ADDED and IN_DELETED_TRANSITION).
     //
-    Variable = GetStartPointer (mNvVariableCache);
+    Variable = GetStartPointer (VariableStoreHeader);
     while (IsValidVariableHeader (Variable)) {
       NextVariable = GetNextVariablePtr (Variable);
       if (Variable->State == VAR_ADDED || Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
@@ -887,10 +896,8 @@ Reclaim (
     //
     ASSERT (PubKeyHeader != NULL);
     if (PubKeyHeader == NULL) {
-      FreePool (ValidBuffer);
-      FreePool (NewPubKeyIndex);
-      FreePool (NewPubKeyStore);
-      return EFI_DEVICE_ERROR;
+      Status = EFI_DEVICE_ERROR;
+      goto Done;
     }
     CopyMem (CurrPtr, (UINT8*) PubKeyHeader, sizeof (VARIABLE_HEADER));
     Variable = (VARIABLE_HEADER*) CurrPtr;
@@ -1012,6 +1019,7 @@ Reclaim (
     //
     SetMem ((UINT8 *) (UINTN) VariableBase, VariableStoreHeader->Size, 0xff);
     CopyMem ((UINT8 *) (UINTN) VariableBase, ValidBuffer, (UINTN) (CurrPtr - ValidBuffer));
+    *LastVariableOffset = (UINTN) (CurrPtr - ValidBuffer);
     Status  = EFI_SUCCESS;
   } else {
     //
@@ -1019,42 +1027,45 @@ Reclaim (
     //
     Status = FtwVariableSpace (
               VariableBase,
-              ValidBuffer,
-              (UINTN) (CurrPtr - ValidBuffer)
+              (VARIABLE_STORE_HEADER *) ValidBuffer
               );
-    CopyMem (mNvVariableCache, (CHAR8 *)(UINTN)VariableBase, VariableStoreHeader->Size);
-  }
-  if (!EFI_ERROR (Status)) {
-    *LastVariableOffset = (UINTN) (CurrPtr - ValidBuffer);
-    if (!IsVolatile) {
+    if (!EFI_ERROR (Status)) {
+      *LastVariableOffset = (UINTN) (CurrPtr - ValidBuffer);
       mVariableModuleGlobal->HwErrVariableTotalSize = HwErrVariableTotalSize;
       mVariableModuleGlobal->CommonVariableTotalSize = CommonVariableTotalSize;
-    }
-  } else {
-    NextVariable  = GetStartPointer ((VARIABLE_STORE_HEADER *)(UINTN)VariableBase);
-    while (IsValidVariableHeader (NextVariable)) {
-      VariableSize = NextVariable->NameSize + NextVariable->DataSize + sizeof (VARIABLE_HEADER);
-      if ((!IsVolatile) && ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
-        mVariableModuleGlobal->HwErrVariableTotalSize += HEADER_ALIGN (VariableSize);
-      } else if ((!IsVolatile) && ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
-        mVariableModuleGlobal->CommonVariableTotalSize += HEADER_ALIGN (VariableSize);
+    } else {
+      NextVariable  = GetStartPointer ((VARIABLE_STORE_HEADER *)(UINTN)VariableBase);
+      while (IsValidVariableHeader (NextVariable)) {
+        VariableSize = NextVariable->NameSize + NextVariable->DataSize + sizeof (VARIABLE_HEADER);
+        if ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
+          mVariableModuleGlobal->HwErrVariableTotalSize += HEADER_ALIGN (VariableSize);
+        } else if ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
+          mVariableModuleGlobal->CommonVariableTotalSize += HEADER_ALIGN (VariableSize);
+        }
+
+        NextVariable = GetNextVariablePtr (NextVariable);
       }
-
-      NextVariable = GetNextVariablePtr (NextVariable);
+      *LastVariableOffset = (UINTN) NextVariable - (UINTN) VariableBase;
     }
-    *LastVariableOffset = (UINTN) NextVariable - (UINTN) VariableBase;
-  }
-
-  if (NewPubKeyStore != NULL) {
-    FreePool (NewPubKeyStore);
-  }
-
-  if (NewPubKeyIndex != NULL) {
-    FreePool (NewPubKeyIndex);
   }
 
 Done:
-  FreePool (ValidBuffer);
+  if (IsVolatile) {
+    FreePool (ValidBuffer);
+  } else {
+    //
+    // For NV variable reclaim, we use mNvVariableCache as the buffer, so copy the data back.
+    //
+    CopyMem (mNvVariableCache, (UINT8 *)(UINTN)VariableBase, VariableStoreHeader->Size);
+
+    if (NewPubKeyStore != NULL) {
+      FreePool (NewPubKeyStore);
+    }
+
+    if (NewPubKeyIndex != NULL) {
+      FreePool (NewPubKeyIndex);
+    }
+  }
 
   return Status;
 }
