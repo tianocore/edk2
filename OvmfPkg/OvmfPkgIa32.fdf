@@ -14,7 +14,21 @@
 ##
 
 ################################################################################
+
+#
+# Default flash size for DEBUG build is 2MB. For RELEASE it is 1MB.
+#
+# Defining FD_SIZE_1MB or FD_SIZE_2MB on the build command line can
+# override this.
+#
+[Defines]
+!if $(TARGET) == RELEASE
 !ifndef $(FD_SIZE_2MB)
+DEFINE FD_SIZE_1MB=
+!endif
+!endif
+
+!ifdef $(FD_SIZE_1MB)
 [FD.OVMF]
 BaseAddress   = 0xFFF00000
 Size          = 0x00100000
