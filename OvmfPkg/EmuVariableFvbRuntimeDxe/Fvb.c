@@ -819,6 +819,12 @@ FvbInitialize (
     return EFI_INVALID_PARAMETER;
   }
 
+  if (PcdGet64 (PcdFlashNvStorageVariableBase64) != 0) {
+    DEBUG ((EFI_D_INFO, "Disabling EMU Variable FVB since "
+                        "flash variables appear to be supported.\n"));
+    return EFI_ABORTED;
+  }
+
   //
   // By default we will initialize the FV contents.  But, if
   // PcdEmuVariableNvStoreReserved is non-zero, then we will
