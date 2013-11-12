@@ -1222,5 +1222,6 @@ Returns:
                   );
   ASSERT_EFI_ERROR (Status);
 
+  PcdSetBool (PcdOvmfFlashVariablesEnable, TRUE);
   return EFI_SUCCESS;
 }
