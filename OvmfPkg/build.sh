@@ -179,16 +179,25 @@ if [ -z "$PLATFORMFILE" ]; then
   PLATFORMFILE=$WORKSPACE/OvmfPkg/OvmfPkg$Processor.dsc
 fi
 
-ADD_QEMU_HDA=yes
-for arg in "$@"
-do
-  case $arg in
-    -hd[a-d]|-fd[ab]|-cdrom)
-      ADD_QEMU_HDA=no
-      break
+if [[ "$RUN_QEMU" == "yes" ]]; then
+  qemu_version=$($QEMU_COMMAND -version 2>&1 | tail -1 | awk '{print $4}')
+  case $qemu_version in
+    1.[6-9].*|1.[1-9][0-9].*|2.*.*)
+      ENABLE_FLASH=yes
       ;;
   esac
-done
+
+  ADD_QEMU_HDA=yes
+  for arg in "$@"
+  do
+    case $arg in
+      -hd[a-d]|-fd[ab]|-cdrom)
+        ADD_QEMU_HDA=no
+        break
+        ;;
+    esac
+  done
+fi
 
 #
 # Uncomment this block for parameter parsing debug
