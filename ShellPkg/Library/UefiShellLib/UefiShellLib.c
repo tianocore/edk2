@@ -3058,7 +3058,7 @@ ShellIsFileInPath(
 
 /**
   Function to determine whether a string is decimal or hex representation of a number
-  and return the number converted from the string.
+  and return the number converted from the string.  Spaces are always skipped.
 
   @param[in] String   String representation of a number
 
