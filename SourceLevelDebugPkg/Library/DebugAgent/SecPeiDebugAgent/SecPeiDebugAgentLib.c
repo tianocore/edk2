@@ -348,6 +348,7 @@ InitializeDebugAgent (
   )
 {
   DEBUG_AGENT_MAILBOX              *Mailbox;
+  DEBUG_AGENT_MAILBOX              *NewMailbox;
   DEBUG_AGENT_MAILBOX              MailboxInStack;
   DEBUG_AGENT_PHASE2_CONTEXT       Phase2Context;
   DEBUG_AGENT_CONTEXT_POSTMEM_SEC  *DebugAgentContext;
@@ -357,6 +358,7 @@ InitializeDebugAgent (
   UINT64                           DebugPortHandle;
   UINT64                           MailboxLocation;
   UINT64                           *MailboxLocationPointer;
+  EFI_PHYSICAL_ADDRESS             Address; 
   
   DisableInterrupts ();
 
@@ -411,19 +413,50 @@ InitializeDebugAgent (
     // Fix up Debug Port handle address and mailbox address
     //
     DebugAgentContext = (DEBUG_AGENT_CONTEXT_POSTMEM_SEC *) Context;
-    DebugPortHandle = (UINT64)(UINT32)(Mailbox->DebugPortHandle + DebugAgentContext->StackMigrateOffset);
-    UpdateMailboxContent (Mailbox, DEBUG_MAILBOX_DEBUG_PORT_HANDLE_INDEX, DebugPortHandle);
-    Mailbox = (DEBUG_AGENT_MAILBOX *) ((UINTN) Mailbox + DebugAgentContext->StackMigrateOffset);
-    MailboxLocation = (UINT64)(UINTN)Mailbox;
-    //
-    // Build mailbox location in HOB and fix-up its address
-    //
-    MailboxLocationPointer = BuildGuidDataHob (
-                               &gEfiDebugAgentGuid,
-                               &MailboxLocation,
-                               sizeof (UINT64)
-                               );
-    MailboxLocationPointer = (UINT64 *) ((UINTN) MailboxLocationPointer + DebugAgentContext->HeapMigrateOffset);
+    if (DebugAgentContext != NULL) {
+      DebugPortHandle = (UINT64)(UINT32)(Mailbox->DebugPortHandle + DebugAgentContext->StackMigrateOffset);
+      UpdateMailboxContent (Mailbox, DEBUG_MAILBOX_DEBUG_PORT_HANDLE_INDEX, DebugPortHandle);
+      Mailbox = (DEBUG_AGENT_MAILBOX *) ((UINTN) Mailbox + DebugAgentContext->StackMigrateOffset);
+      MailboxLocation = (UINT64)(UINTN)Mailbox;
+      //
+      // Build mailbox location in HOB and fix-up its address
+      //
+      MailboxLocationPointer = BuildGuidDataHob (
+                                 &gEfiDebugAgentGuid,
+                                 &MailboxLocation,
+                                 sizeof (UINT64)
+                                 );
+      MailboxLocationPointer = (UINT64 *) ((UINTN) MailboxLocationPointer + DebugAgentContext->HeapMigrateOffset);
+    } else {
+      //
+      // DebugAgentContext is NULL. Then, Mailbox can directly be copied into memory.
+      // Allocate ACPI NVS memory for new Mailbox and Debug Port Handle buffer
+      //
+      Status = PeiServicesAllocatePages (
+                 EfiACPIMemoryNVS,
+                 EFI_SIZE_TO_PAGES (sizeof(DEBUG_AGENT_MAILBOX) + PcdGet16(PcdDebugPortHandleBufferSize)),
+                 &Address
+                 );
+      ASSERT_EFI_ERROR (Status);
+      NewMailbox = (DEBUG_AGENT_MAILBOX *) (UINTN) Address;
+      //
+      // Copy Mailbox and Debug Port Handle buffer to new location in ACPI NVS memory, because original Mailbox
+      // and Debug Port Handle buffer in the allocated pool that may be marked as free by DXE Core after DXE Core
+      // reallocates the HOB.
+      //
+      CopyMem (NewMailbox, Mailbox, sizeof (DEBUG_AGENT_MAILBOX));
+      CopyMem (NewMailbox + 1, (VOID *)(UINTN)Mailbox->DebugPortHandle, PcdGet16(PcdDebugPortHandleBufferSize));
+      UpdateMailboxContent (NewMailbox, DEBUG_MAILBOX_DEBUG_PORT_HANDLE_INDEX, (UINT64)(UINTN)(NewMailbox + 1));
+      MailboxLocation = (UINT64)(UINTN)NewMailbox;
+      //
+      // Build mailbox location in HOB
+      //
+      MailboxLocationPointer = BuildGuidDataHob (
+                                 &gEfiDebugAgentGuid,
+                                 &MailboxLocation,
+                                 sizeof (UINT64)
+                                 );
+    }
     //
     // Update IDT entry to save the location saved mailbox pointer
     //
