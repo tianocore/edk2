@@ -28,6 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Ppi/LoadFile.h>
 #include <Ppi/Security2.h>
 #include <Ppi/TemporaryRamSupport.h>
+#include <Ppi/TemporaryRamDone.h>
 #include <Library/DebugLib.h>
 #include <Library/PeiCoreEntryPoint.h>
 #include <Library/BaseLib.h>
@@ -132,6 +133,14 @@ typedef struct {
   UINTN                               SectionIndex;
 } CACHE_SECTION_DATA;
 
+#define HOLE_MAX_NUMBER       0x3
+typedef struct {
+  EFI_PHYSICAL_ADDRESS               Base;
+  UINTN                              Size;
+  UINTN                              Offset;
+  BOOLEAN                            OffsetPositive;
+} HOLE_MEMORY_DATA;
+
 ///
 /// Forward declaration for PEI_CORE_INSTANCE
 ///
@@ -225,6 +234,11 @@ struct _PEI_CORE_INSTANCE {
   // This field points to the shadowed image read function
   //
   PE_COFF_LOADER_READ_FILE          ShadowedImageRead;
+  //
+  // Temp Memory Range is not covered by PeiTempMem and Stack.
+  // Those Memory Range will be migrated into phisical memory. 
+  //
+  HOLE_MEMORY_DATA                  HoleData[HOLE_MAX_NUMBER];
 };
 
 ///

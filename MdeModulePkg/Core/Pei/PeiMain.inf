@@ -84,7 +84,8 @@
   gEfiPeiFirmwareVolumeInfo2PpiGuid             ## NOTIFY   ## SOMETIMES_PRODUCES (Produce FvInfo2Ppi if the encapsulated FvImage is found)
   gEfiPeiLoadFilePpiGuid                        ## PRODUCES ## SOMETIMES_CONSUMES (The default load PeImage logic will be used when this PPI doesn't exist)
   gEfiPeiSecurity2PpiGuid                       ## NOTIFY
-  gEfiTemporaryRamSupportPpiGuid                ## CONSUMES
+  gEfiTemporaryRamSupportPpiGuid                ## SOMETIMES_CONSUMES
+  gEfiTemporaryRamDonePpiGuid                   ## SOMETIMES_CONSUMES
 
 [FixedPcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported             ## CONSUMES

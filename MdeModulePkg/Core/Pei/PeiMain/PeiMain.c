@@ -120,7 +120,7 @@ ShadowPeiCore (
   from SEC to PEI. After switching stack in the PEI core, it will restart
   with the old core data.
 
-  @param SecCoreData     Points to a data structure containing information about the PEI core's operating
+  @param SecCoreDataPtr  Points to a data structure containing information about the PEI core's operating
                          environment, such as the size and location of temporary RAM, the stack location and
                          the BFV location.
   @param PpiList         Points to a list of one or more PPI descriptors to be installed initially by the PEI core.
@@ -137,23 +137,27 @@ ShadowPeiCore (
 VOID
 EFIAPI
 PeiCore (
-  IN CONST EFI_SEC_PEI_HAND_OFF        *SecCoreData,
+  IN CONST EFI_SEC_PEI_HAND_OFF        *SecCoreDataPtr,
   IN CONST EFI_PEI_PPI_DESCRIPTOR      *PpiList,
   IN VOID                              *Data
   )
 {
   PEI_CORE_INSTANCE           PrivateData;
+  EFI_SEC_PEI_HAND_OFF        *SecCoreData;
+  EFI_SEC_PEI_HAND_OFF        NewSecCoreData;
   EFI_STATUS                  Status;
   PEI_CORE_TEMP_POINTERS      TempPtr;
   PEI_CORE_INSTANCE           *OldCoreData;
   EFI_PEI_CPU_IO_PPI          *CpuIo;
   EFI_PEI_PCI_CFG2_PPI        *PciCfg;
   EFI_HOB_HANDOFF_INFO_TABLE  *HandoffInformationTable;
-
+  EFI_PEI_TEMPORARY_RAM_DONE_PPI *TemporaryRamDonePpi;
+  
   //
   // Retrieve context passed into PEI Core
   //
-  OldCoreData = (PEI_CORE_INSTANCE *)Data;
+  OldCoreData = (PEI_CORE_INSTANCE *) Data;
+  SecCoreData = (EFI_SEC_PEI_HAND_OFF *) SecCoreDataPtr;
 
   //
   // Perform PEI Core phase specific actions.
@@ -250,9 +254,11 @@ PeiCore (
     //
     // Memory is available to the PEI Core and the PEI Core has been shadowed to memory.
     //
-    
+    CopyMem (&NewSecCoreData, SecCoreDataPtr, sizeof (NewSecCoreData));
+    SecCoreData = &NewSecCoreData;
+
     CopyMem (&PrivateData, OldCoreData, sizeof (PrivateData));
-    
+
     CpuIo = (VOID*)PrivateData.ServiceTableShadow.CpuIo;
     PciCfg = (VOID*)PrivateData.ServiceTableShadow.PciCfg;
     
@@ -328,6 +334,22 @@ PeiCore (
       ASSERT_EFI_ERROR (Status);
     }
   } else {
+    //
+    // Try to locate Temporary RAM Done Ppi.
+    //
+    Status = PeiServicesLocatePpi (
+               &gEfiTemporaryRamDonePpiGuid,
+               0,
+               NULL,
+               (VOID**)&TemporaryRamDonePpi
+               );
+    if (!EFI_ERROR (Status)) {
+      //
+      // Disable the use of Temporary RAM after the transition from Temporary RAM to Permanent RAM is complete.
+      //
+      TemporaryRamDonePpi->TemporaryRamDone ();
+    }
+
     //
     // Alert any listeners that there is permanent memory available
     //
