@@ -619,7 +619,7 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_KMS),                   &gEfiKmsProtocolGuid,                             NULL},
   {STRING_TOKEN(STR_BLK_IO2),               &gEfiBlockIo2ProtocolGuid,                        NULL},
   {STRING_TOKEN(STR_SSC),                   &gEfiStorageSecurityCommandProtocolGuid,          NULL},
-  {STRING_TOKEN(STR_UC2),                   &gEfiUserCredential2ProtocolGuid,                 NULL},
+  {STRING_TOKEN(STR_UCRED2),                &gEfiUserCredential2ProtocolGuid,                 NULL},
 
 //
 // UEFI 2.4
