@@ -254,6 +254,29 @@ InternalRemoveAliasFromList(
 }
 
 /**
+  Function to determine whether a string is decimal or hex representation of a number
+  and return the number converted from the string.
+
+  @param[in] String   String representation of a number
+
+  @return             the number
+  @retval (UINTN)(-1) An error ocurred.
+**/
+UINTN
+EFIAPI
+ReturnUintn(
+  IN CONST CHAR16 *String
+  )
+{
+  UINT64        RetVal;
+
+  if (!EFI_ERROR(ShellConvertStringToUint64(String, &RetVal, FALSE, FALSE))) {
+    return ((UINTN)RetVal);
+  }
+  return ((UINTN)(-1));
+}
+
+/**
   Function for 'for' command.
 
   @param[in] ImageHandle  Handle to the Image (NULL if Internal).
@@ -486,9 +509,9 @@ ShellCommandRunFor (
               ShellStatus = SHELL_INVALID_PARAMETER;
             } else {
               if (ArgSetWalker[0] == L'-') {
-                Info->Current = 0 - (INTN)ShellStrToUintn(ArgSetWalker+1);
+                Info->Current = 0 - (INTN)ReturnUintn(ArgSetWalker+1);
               } else {
-                Info->Current = (INTN)ShellStrToUintn(ArgSetWalker);
+                Info->Current = (INTN)ReturnUintn(ArgSetWalker);
               }
               ArgSetWalker  = StrStr(ArgSetWalker, L" ");
               while (ArgSetWalker != NULL && ArgSetWalker[0] == L' ') {
@@ -508,9 +531,9 @@ ShellCommandRunFor (
                 ShellStatus = SHELL_INVALID_PARAMETER;
               } else {
                 if (ArgSetWalker[0] == L'-') {
-                  Info->End = 0 - (INTN)ShellStrToUintn(ArgSetWalker+1);
+                  Info->End = 0 - (INTN)ReturnUintn(ArgSetWalker+1);
                 } else {
-                  Info->End = (INTN)ShellStrToUintn(ArgSetWalker);
+                  Info->End = (INTN)ReturnUintn(ArgSetWalker);
                 }
                 if (Info->Current < Info->End) {
                   Info->Step            = 1;
@@ -540,9 +563,9 @@ ShellCommandRunFor (
                       ASSERT(Info->Step == 1 || Info->Step == -1);
                     } else {
                       if (ArgSetWalker[0] == L'-') {
-                        Info->Step = 0 - (INTN)ShellStrToUintn(ArgSetWalker+1);
+                        Info->Step = 0 - (INTN)ReturnUintn(ArgSetWalker+1);
                       } else {
-                        Info->Step = (INTN)ShellStrToUintn(ArgSetWalker);
+                        Info->Step = (INTN)ReturnUintn(ArgSetWalker);
                       }
 
                       if (StrStr(ArgSetWalker, L" ") != NULL) {
