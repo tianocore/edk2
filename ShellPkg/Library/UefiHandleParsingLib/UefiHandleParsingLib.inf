@@ -1,5 +1,6 @@
 ##  @file
 #  Provides interface to advanced shell functionality for parsing both handle and protocol database.
+#  Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
 #  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved. <BR>
 #
 #  This program and the accompanying materials
@@ -47,6 +48,7 @@
   PrintLib
   UefiLib
   HiiLib
+  SortLib
 
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid                        ##CONSUMES
@@ -167,6 +169,7 @@
   gEfiTcgProtocolGuid                                     ##UNDEFINED
   gEfiHiiPackageListProtocolGuid                          ##UNDEFINED
   gEfiDriverFamilyOverrideProtocolGuid                    ##UNDEFINED
+  gEfiDiskIo2ProtocolGuid                                 ##UNDEFINED
 
 [Guids]
   gEfiFileInfoGuid                                        ##CONSUMES
