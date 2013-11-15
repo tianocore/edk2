@@ -539,6 +539,35 @@ FixFileName (
 }
 
 /**
+  Fix a string to only have the environment variable name, removing starting at the first space of whatever is quoted and removing the leading and trailing %.
+
+  @param[in]  FileName    The filename to start with.
+
+  @retval NULL  FileName was invalid.
+  @return       The modified FileName.
+**/
+CHAR16*
+EFIAPI
+FixVarName (
+  IN CHAR16 *FileName
+  )
+{
+  CHAR16  *Copy;
+  CHAR16  *TempLocation;
+
+  Copy = FileName;
+
+  if (FileName[0] == L'%') {
+    Copy = FileName+1;
+    if ((TempLocation = StrStr(Copy , L"%")) != NULL) {
+      TempLocation[0] = CHAR_NULL;
+    }    
+  }
+
+  return (FixFileName(Copy));
+}
+
+/**
   Funcion will replace the current StdIn and StdOut in the ShellParameters protocol
   structure by parsing NewCommandLine.  The current values are returned to the
   user.
@@ -914,17 +943,17 @@ UpdateStdInStdOutStdErr(
       }
     }
     if (StdErrVarName  != NULL) {
-      if ((StdErrVarName     = FixFileName(StdErrVarName)) == NULL) {
+      if ((StdErrVarName     = FixVarName(StdErrVarName)) == NULL) {
         Status = EFI_INVALID_PARAMETER;
       }
     }
     if (StdOutVarName  != NULL) {
-      if ((StdOutVarName     = FixFileName(StdOutVarName)) == NULL) {
+      if ((StdOutVarName     = FixVarName(StdOutVarName)) == NULL) {
         Status = EFI_INVALID_PARAMETER;
       }
     }
     if (StdInVarName   != NULL) {
-      if ((StdInVarName      = FixFileName(StdInVarName)) == NULL) {
+      if ((StdInVarName      = FixVarName(StdInVarName)) == NULL) {
         Status = EFI_INVALID_PARAMETER;
       }
     }
