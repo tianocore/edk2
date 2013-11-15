@@ -1,6 +1,7 @@
 /** @file
   Main file for NULL named library for level 1 shell command functions.
 
+  Copyright (c) 2013, Hewlett-Packard Development Company, L.P.
   Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -150,7 +151,11 @@ TestNodeForMove (
   }
 
   CommandNameWalker = CommandName;
-  while(CommandNameWalker[0] == L' ') {
+
+  //
+  // Skip leading spaces and tabs.
+  //
+  while ((CommandNameWalker[0] == L' ') || (CommandNameWalker[0] == L'\t')) {
     CommandNameWalker++;
   }
   TempLocation  = StrStr(CommandNameWalker, L" ");

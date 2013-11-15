@@ -1,6 +1,7 @@
 /** @file
   Main file for If and else shell level 1 function.
 
+  Copyright (c) 2013, Hewlett-Packard Development Company, L.P.
   Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -734,7 +735,11 @@ MoveToTagSpecial (
       continue;
     }
     CommandWalker = CommandName;
-    while (CommandWalker[0] == L' ') {
+
+    //
+    // Skip leading spaces and tabs.
+    //
+    while ((CommandWalker[0] == L' ') || (CommandWalker[0] == L'\t')) {
       CommandWalker++;
     }
     TempLocation  = StrStr(CommandWalker, L" ");
@@ -847,7 +852,7 @@ ShellCommandRunIf (
       NULL, 
       STRING_TOKEN (STR_SYNTAX_NO_MATCHING), 
       gShellLevel1HiiHandle, 
-      L"EnfIf", 
+      L"EndIf", 
       L"If", 
       CurrentScriptFile!=NULL 
         && CurrentScriptFile->CurrentCommand!=NULL

@@ -1415,9 +1415,9 @@ RunCommand(
   }
 
   //
-  // Remove any spaces at the beginning of the string.
+  // Remove any spaces and tabs at the beginning of the string.
   //
-  while (CleanOriginal[0] == L' ') {
+  while ((CleanOriginal[0] == L' ') || (CleanOriginal[0] == L'\t')) {
     CopyMem(CleanOriginal, CleanOriginal+1, StrSize(CleanOriginal) - sizeof(CleanOriginal[0]));
   }
 
