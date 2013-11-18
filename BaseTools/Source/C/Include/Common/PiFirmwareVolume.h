@@ -1,7 +1,7 @@
 /** @file
   The firmware volume related definitions in PI.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -54,6 +54,7 @@ typedef UINT32  EFI_FVB_ATTRIBUTES_2;
 #define EFI_FVB2_WRITE_LOCK_CAP     0x00004000
 #define EFI_FVB2_WRITE_LOCK_STATUS  0x00008000
 #define EFI_FVB2_ALIGNMENT          0x001F0000
+#define EFI_FVB2_WEAK_ALIGNMENT     0x80000000
 #define EFI_FVB2_ALIGNMENT_1        0x00000000
 #define EFI_FVB2_ALIGNMENT_2        0x00010000
 #define EFI_FVB2_ALIGNMENT_4        0x00020000

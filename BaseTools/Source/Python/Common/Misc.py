@@ -31,6 +31,7 @@ from Common import GlobalData as GlobalData
 from DataType import *
 from BuildToolError import *
 from CommonDataClass.DataClass import *
+from Parsing import GetSplitValueList
 
 ## Regular expression used to find out place holders in string template
 gPlaceholderPattern = re.compile("\$\{([^$()\s]+)\}", re.MULTILINE|re.UNICODE)
@@ -1248,8 +1249,13 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
         Size = Type = ''
         if len(FieldList) > 1:
             Type = FieldList[1]
+        else:
+            Type = DataType
         if len(FieldList) > 2:
             Size = FieldList[2]
+        else:
+            if Type == 'VOID*':
+                Size = str(len(Value))
         if DataType == 'VOID*':
             IsValid = (len(FieldList) <= 3)
         else:
@@ -1322,25 +1328,13 @@ def AnalyzePcdData(Setting):
 #  
 #  @retval   ValueList: A List contaian VariableName, VariableGuid, VariableOffset, DefaultValue. 
 #
-def AnalyzeHiiPcdData(Setting):   
-    ValueList = ['', '', '', '']    
-    
-    ValueRe  = re.compile(r'^\s*L?\".*\|.*\"')
-    PtrValue = ValueRe.findall(Setting)
-    
-    ValueUpdateFlag = False
-    
-    if len(PtrValue) >= 1:
-        Setting = re.sub(ValueRe, '', Setting)
-        ValueUpdateFlag = True   
+def AnalyzeHiiPcdData(Setting):
+    ValueList = ['', '', '', '']
 
-    TokenList = Setting.split(TAB_VALUE_SPLIT)
+    TokenList = GetSplitValueList(Setting)
     ValueList[0:len(TokenList)] = TokenList
-    
-    if ValueUpdateFlag:
-        ValueList[0] = PtrValue[0]
-        
-    return ValueList     
+
+    return ValueList
 
 ## AnalyzeVpdPcdData
 #
@@ -1679,7 +1673,60 @@ class PeImageClass():
         for index in range(len(ByteList) - 1, -1, -1):
             Value = (Value << 8) | int(ByteList[index])
         return Value
+
+
+class SkuClass():
+    
+    DEFAULT = 0
+    SINGLE = 1
+    MULTIPLE =2
+    
+    def __init__(self,SkuIdentifier='', SkuIds={}):
         
+        self.AvailableSkuIds = sdict()
+        self.SkuIdSet = []
+        
+        if SkuIdentifier == '' or SkuIdentifier is None:
+            self.SkuIdSet = ['DEFAULT']
+        elif SkuIdentifier == 'ALL':
+            self.SkuIdSet = SkuIds.keys()
+        else:
+            r = SkuIdentifier.split('|') 
+            self.SkuIdSet=[r[k].strip() for k in range(len(r))]      
+        if len(self.SkuIdSet) == 2 and 'DEFAULT' in self.SkuIdSet and SkuIdentifier != 'ALL':
+            self.SkuIdSet.remove('DEFAULT')
+                
+        for each in self.SkuIdSet:
+            if each in SkuIds:
+                self.AvailableSkuIds[each] = SkuIds[each]
+            else:
+                EdkLogger.error("build", PARAMETER_INVALID,
+                            ExtraData="SKU-ID [%s] is not supported by the platform. [Valid SKU-ID: %s]"
+                                      % (each, " ".join(SkuIds.keys())))
+        
+    def __SkuUsageType(self): 
+        
+        if len(self.SkuIdSet) == 1:
+            if self.SkuIdSet[0] == 'DEFAULT':
+                return SkuClass.DEFAULT
+            else:
+                return SkuClass.SINGLE
+        else:
+            return SkuClass.MULTIPLE
+
+    def __GetAvailableSkuIds(self):
+        return self.AvailableSkuIds
+    
+    def __GetSystemSkuID(self):
+        if self.__SkuUsageType() == SkuClass.SINGLE:
+            return self.SkuIdSet[0]
+        else:
+            return 'DEFAULT'
+            
+    SystemSkuId = property(__GetSystemSkuID)
+    AvailableSkuIdSet = property(__GetAvailableSkuIds)
+    SkuUsageType = property(__SkuUsageType)
+
 ##
 #
 # This acts like the main() function for the script, unless it is 'import'ed into another

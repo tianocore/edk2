@@ -1,6 +1,7 @@
 /** @file
 
 Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+Portions copyright (c) 2013, ARM Ltd. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
@@ -18,6 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <windows.h>
 #include <io.h>
 #endif
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -264,9 +266,12 @@ ScanSections32 (
   EFI_IMAGE_OPTIONAL_HEADER_UNION *NtHdr;
   UINT32                          CoffEntry;
   UINT32                          SectionCount;
+  BOOLEAN                         FoundText;
 
   CoffEntry = 0;
   mCoffOffset = 0;
+  mTextOffset = 0;
+  FoundText = FALSE;
 
   //
   // Coff file start with a DOS header.
@@ -291,7 +296,6 @@ ScanSections32 (
   // First text sections.
   //
   mCoffOffset = CoffAlign(mCoffOffset);
-  mTextOffset = mCoffOffset;
   SectionCount = 0;
   for (i = 0; i < mEhdr->e_shnum; i++) {
     Elf_Shdr *shdr = GetShdrByIndex(i);
@@ -315,10 +319,24 @@ ScanSections32 (
           (mEhdr->e_entry < shdr->sh_addr + shdr->sh_size)) {
         CoffEntry = mCoffOffset + mEhdr->e_entry - shdr->sh_addr;
       }
+
+      //
+      // Set mTextOffset with the offset of the first '.text' section
+      //
+      if (!FoundText) {
+        mTextOffset = mCoffOffset;
+        FoundText = TRUE;
+      }
+
       mCoffSectionsOffset[i] = mCoffOffset;
       mCoffOffset += shdr->sh_size;
       SectionCount ++;
     }
+  }
+
+  if (!FoundText) {
+    Error (NULL, 0, 3000, "Invalid", "Did not find any '.text' section.");
+    assert (FALSE);
   }
 
   if (mEhdr->e_machine != EM_ARM) {

@@ -1512,21 +1512,30 @@ CVfrDataStorage::MarkVarStoreIdUnused (
 
 EFI_VFR_RETURN_CODE
 CVfrDataStorage::DeclareNameVarStoreBegin (
-  IN CHAR8    *StoreName
+  IN CHAR8           *StoreName,
+  IN EFI_VARSTORE_ID VarStoreId
   )
 {
   SVfrVarStorageNode *pNode = NULL;
-  EFI_VARSTORE_ID    VarStoreId;
+  EFI_VARSTORE_ID    TmpVarStoreId;
 
   if (StoreName == NULL) {
     return VFR_RETURN_FATAL_ERROR;
   }
 
-  if (GetVarStoreId (StoreName, &VarStoreId) == VFR_RETURN_SUCCESS) {
+  if (GetVarStoreId (StoreName, &TmpVarStoreId) == VFR_RETURN_SUCCESS) {
     return VFR_RETURN_REDEFINED;
   }
+  
+  if (VarStoreId == EFI_VARSTORE_ID_INVALID) {
+    VarStoreId = GetFreeVarStoreId (EFI_VFR_VARSTORE_NAME);
+  } else {
+    if (ChekVarStoreIdFree (VarStoreId) == FALSE) {
+      return VFR_RETURN_VARSTOREID_REDEFINED;
+    }
+    MarkVarStoreIdUsed (VarStoreId);
+  }
 
-  VarStoreId = GetFreeVarStoreId (EFI_VFR_VARSTORE_NAME);
   if ((pNode = new SVfrVarStorageNode (StoreName, VarStoreId)) == NULL) {
     return VFR_RETURN_UNDEFINED;
   }
@@ -2619,6 +2628,14 @@ CVfrQuestionDB::RegisterNewDateQuestion (
   CHAR8                 Index;
 
   if (BaseVarId == NULL && Name == NULL) {
+    if (QuestionId == EFI_QUESTION_ID_INVALID) {
+      QuestionId = GetFreeQuestionId ();
+    } else {
+      if (ChekQuestionIdFree (QuestionId) == FALSE) {
+        goto Err;
+      }
+      MarkQuestionIdUsed (QuestionId);
+    }
     return;
   }
 
@@ -2787,6 +2804,14 @@ CVfrQuestionDB::RegisterNewTimeQuestion (
   CHAR8                 Index;
 
   if (BaseVarId == NULL && Name == NULL) {
+    if (QuestionId == EFI_QUESTION_ID_INVALID) {
+      QuestionId = GetFreeQuestionId ();
+    } else {
+      if (ChekQuestionIdFree (QuestionId) == FALSE) {
+        goto Err;
+      }
+      MarkQuestionIdUsed (QuestionId);
+    }
     return;
   }
 

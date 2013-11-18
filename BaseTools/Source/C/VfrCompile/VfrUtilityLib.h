@@ -300,7 +300,7 @@ public:
   SVfrVarStorageNode * GetEfiVarStoreList () {
     return mEfiVarStoreList;
   }
-  EFI_VFR_RETURN_CODE DeclareNameVarStoreBegin (CHAR8 *);
+  EFI_VFR_RETURN_CODE DeclareNameVarStoreBegin (CHAR8 *, EFI_VARSTORE_ID);
   EFI_VFR_RETURN_CODE NameTableAddItem (EFI_STRING_ID);
   EFI_VFR_RETURN_CODE DeclareNameVarStoreEnd (EFI_GUID *);
 

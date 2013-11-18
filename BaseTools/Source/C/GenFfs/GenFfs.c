@@ -1,6 +1,6 @@
 /**
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -119,7 +119,7 @@ Returns:
   //
   // Copyright declaration
   // 
-  fprintf (stdout, "Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.\n\n");
+  fprintf (stdout, "Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.\n\n");
 
   //
   // Details Option
@@ -284,10 +284,11 @@ Returns:
   UINT32                     Index;
   FILE                       *InFile;
   EFI_COMMON_SECTION_HEADER  *SectHeader;
-  EFI_COMMON_SECTION_HEADER  TempSectHeader;
+  EFI_COMMON_SECTION_HEADER2 TempSectHeader;
   EFI_TE_IMAGE_HEADER        TeHeader;
   UINT32                     TeOffset;
   EFI_GUID_DEFINED_SECTION   GuidSectHeader;
+  EFI_GUID_DEFINED_SECTION2  GuidSectHeader2;
   UINT32                     HeaderSize;
 
   Size          = 0;
@@ -332,8 +333,12 @@ Returns:
     // Check this section is Te/Pe section, and Calculate the numbers of Te/Pe section.
     //
     TeOffset = 0;
-    HeaderSize = sizeof (EFI_COMMON_SECTION_HEADER);
-    fread (&TempSectHeader, 1, sizeof (TempSectHeader), InFile);
+    if (FileSize >= MAX_FFS_SIZE) {
+      HeaderSize = sizeof (EFI_COMMON_SECTION_HEADER2);
+    } else {
+      HeaderSize = sizeof (EFI_COMMON_SECTION_HEADER);
+    }
+    fread (&TempSectHeader, 1, HeaderSize, InFile);
     if (TempSectHeader.Type == EFI_SECTION_TE) {
       (*PESectionNum) ++;
       fread (&TeHeader, 1, sizeof (TeHeader), InFile);
@@ -344,9 +349,16 @@ Returns:
       (*PESectionNum) ++;
     } else if (TempSectHeader.Type == EFI_SECTION_GUID_DEFINED) {
       fseek (InFile, 0, SEEK_SET);
-      fread (&GuidSectHeader, 1, sizeof (GuidSectHeader), InFile);
-      if ((GuidSectHeader.Attributes & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) == 0) {
-        HeaderSize = GuidSectHeader.DataOffset;
+      if (FileSize >= MAX_SECTION_SIZE) {
+        fread (&GuidSectHeader2, 1, sizeof (GuidSectHeader2), InFile);
+        if ((GuidSectHeader2.Attributes & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) == 0) {
+          HeaderSize = GuidSectHeader2.DataOffset;
+        }
+      } else {
+        fread (&GuidSectHeader, 1, sizeof (GuidSectHeader), InFile);
+        if ((GuidSectHeader.Attributes & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) == 0) {
+          HeaderSize = GuidSectHeader.DataOffset;
+        }
       }
       (*PESectionNum) ++;
     } else if (TempSectHeader.Type == EFI_SECTION_COMPRESSION || 
@@ -378,6 +390,9 @@ Returns:
       Offset = Offset - Size - HeaderSize - TeOffset;
        
       if (FileBuffer != NULL && ((Size + Offset) < *BufferLength)) {
+        //
+        // The maximal alignment is 64K, the raw section size must be less than 0xffffff
+        //
         memset (FileBuffer + Size, 0, Offset);
         SectHeader          = (EFI_COMMON_SECTION_HEADER *) (FileBuffer + Size);
         SectHeader->Type    = EFI_SECTION_RAW;
@@ -453,11 +468,12 @@ Returns:
   UINT8                   *FileBuffer;
   UINT32                  FileSize;
   UINT32                  MaxAlignment;
-  EFI_FFS_FILE_HEADER     FfsFileHeader;
+  EFI_FFS_FILE_HEADER2    FfsFileHeader;
   FILE                    *FfsFile;
   UINT32                  Index;
   UINT64                  LogLevel;
   UINT8                   PeSectionNum;
+  UINT32                  HeaderSize;
   
   //
   // Init local variables
@@ -816,7 +832,7 @@ Returns:
   //
   // Create Ffs file header.
   //
-  memset (&FfsFileHeader, 0, sizeof (EFI_FFS_FILE_HEADER));
+  memset (&FfsFileHeader, 0, sizeof (EFI_FFS_FILE_HEADER2));
   memcpy (&FfsFileHeader.Name, &FileGuid, sizeof (EFI_GUID));
   FfsFileHeader.Type       = FfsFiletype;
   //
@@ -832,16 +848,27 @@ Returns:
     FfsAlign = Index;
   }
   VerboseMsg ("the alignment of the generated FFS file is %u", (unsigned) mFfsValidAlign [FfsAlign + 1]);  
-  FfsFileHeader.Attributes = (EFI_FFS_FILE_ATTRIBUTES) (FfsAttrib | (FfsAlign << 3));
   
   //
   // Now FileSize includes the EFI_FFS_FILE_HEADER
   //
-  FileSize += sizeof (EFI_FFS_FILE_HEADER);
+  if (FileSize + sizeof (EFI_FFS_FILE_HEADER) >= MAX_FFS_SIZE) {
+    HeaderSize = sizeof (EFI_FFS_FILE_HEADER2);
+    FileSize += sizeof (EFI_FFS_FILE_HEADER2);
+    FfsFileHeader.ExtendedSize = FileSize;
+    memset(FfsFileHeader.Size, 0, sizeof (UINT8) * 3);
+    FfsAttrib |= FFS_ATTRIB_LARGE_FILE;
+  } else {
+    HeaderSize = sizeof (EFI_FFS_FILE_HEADER);
+    FileSize += sizeof (EFI_FFS_FILE_HEADER);
+    FfsFileHeader.Size[0]  = (UINT8) (FileSize & 0xFF);
+    FfsFileHeader.Size[1]  = (UINT8) ((FileSize & 0xFF00) >> 8);
+    FfsFileHeader.Size[2]  = (UINT8) ((FileSize & 0xFF0000) >> 16);
+  }
   VerboseMsg ("the size of the generated FFS file is %u bytes", (unsigned) FileSize);
-  FfsFileHeader.Size[0]  = (UINT8) (FileSize & 0xFF);
-  FfsFileHeader.Size[1]  = (UINT8) ((FileSize & 0xFF00) >> 8);
-  FfsFileHeader.Size[2]  = (UINT8) ((FileSize & 0xFF0000) >> 16);
+
+  FfsFileHeader.Attributes = (EFI_FFS_FILE_ATTRIBUTES) (FfsAttrib | (FfsAlign << 3));
+
   //
   // Fill in checksums and state, these must be zero for checksumming
   //
@@ -851,7 +878,7 @@ Returns:
   //
   FfsFileHeader.IntegrityCheck.Checksum.Header = CalculateChecksum8 (
                                                    (UINT8 *) &FfsFileHeader,
-                                                   sizeof (EFI_FFS_FILE_HEADER)
+                                                   HeaderSize
                                                    );
 
   if (FfsFileHeader.Attributes & FFS_ATTRIB_CHECKSUM) {
@@ -860,7 +887,7 @@ Returns:
     //
     FfsFileHeader.IntegrityCheck.Checksum.File = CalculateChecksum8 (
                                                    FileBuffer, 
-                                                   FileSize - sizeof (EFI_FFS_FILE_HEADER)
+                                                   FileSize - HeaderSize
                                                    );    
   } else {
     FfsFileHeader.IntegrityCheck.Checksum.File = FFS_FIXED_CHECKSUM;
@@ -880,11 +907,11 @@ Returns:
   //
   // write header
   //
-  fwrite (&FfsFileHeader, 1, sizeof (FfsFileHeader), FfsFile);
+  fwrite (&FfsFileHeader, 1, HeaderSize, FfsFile);
   //
   // write data
   //
-  fwrite (FileBuffer, 1, FileSize - sizeof (EFI_FFS_FILE_HEADER), FfsFile);
+  fwrite (FileBuffer, 1, FileSize - HeaderSize, FfsFile);
 
   fclose (FfsFile);
 

@@ -37,6 +37,7 @@ from GuidSection import GuidSection
 from FvImageSection import FvImageSection
 from Common.Misc import PeImageClass
 from AutoGen.GenDepex import DependencyExpression
+from PatchPcdValue.PatchPcdValue import PatchBinaryFile
 
 ## generate FFS from INF
 #
@@ -203,14 +204,80 @@ class FfsInfStatement(FfsInfStatementClassObject):
 
         if Inf._Defs != None and len(Inf._Defs) > 0:
             self.OptRomDefs.update(Inf._Defs)
-        
+        self.PatchPcds = []
+        InfPcds = Inf.Pcds
+        Platform = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, self.CurrentArch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
+        FdfPcdDict = GenFdsGlobalVariable.FdfParser.Profile.PcdDict
+        DscModules = {}
+        for DscModule in Platform.Modules:
+            DscModules[str(DscModule).lower()] = Platform.Modules[DscModule]
+        for PcdKey in InfPcds:
+            Pcd = InfPcds[PcdKey]
+            if not hasattr(Pcd, 'Offset'):
+                continue
+            if Pcd.Type != 'PatchableInModule':
+                continue
+            PatchPcd = None
+            InfLowerPath = str(PathClassObj).lower()
+            if InfLowerPath in DscModules and PcdKey in DscModules[InfLowerPath].Pcds:
+                PatchPcd = DscModules[InfLowerPath].Pcds[PcdKey]
+            elif PcdKey in Platform.Pcds:
+                PatchPcd = Platform.Pcds[PcdKey]
+            DscOverride = False
+            if PatchPcd and Pcd.Type == PatchPcd.Type:
+                DefaultValue = PatchPcd.DefaultValue
+                DscOverride = True
+            FdfOverride = False
+            if PcdKey in FdfPcdDict:
+                DefaultValue = FdfPcdDict[PcdKey]
+                FdfOverride = True
+            if not DscOverride and not FdfOverride:
+                continue
+            if Pcd.DatumType == "VOID*":
+                if Pcd.DefaultValue == DefaultValue or DefaultValue in [None, '']:
+                    continue
+                if DefaultValue[0] == 'L':
+                    MaxDatumSize = str((len(DefaultValue) - 2) * 2)
+                elif DefaultValue[0] == '{':
+                    MaxDatumSize = str(len(DefaultValue.split(',')))
+                else:
+                    MaxDatumSize = str(len(DefaultValue) - 1)
+                if DscOverride:
+                    Pcd.MaxDatumSize = PatchPcd.MaxDatumSize
+                if Pcd.MaxDatumSize in ['', None]:
+                    Pcd.MaxDatumSize = str(len(Pcd.DefaultValue.split(',')))
+            else:
+                Base1 = Base2 = 10
+                if Pcd.DefaultValue.upper().startswith('0X'):
+                    Base1 = 16
+                if DefaultValue.upper().startswith('0X'):
+                    Base2 = 16
+                try:
+                    PcdValueInImg = int(Pcd.DefaultValue, Base1)
+                    PcdValueInDscOrFdf = int(DefaultValue, Base2)
+                    if PcdValueInImg == PcdValueInDscOrFdf:
+                        continue
+                except:
+                    continue
+            if Pcd.DatumType == "VOID*":
+                if int(MaxDatumSize) > int(Pcd.MaxDatumSize):
+                    EdkLogger.error("GenFds", GENFDS_ERROR, "The size of VOID* type PCD '%s.%s' exceeds its maximum size %d bytes." \
+                                    % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName, int(MaxDatumSize) - int(Pcd.MaxDatumSize)))
+            else:
+                if PcdValueInDscOrFdf > FfsInfStatement._MAX_SIZE_TYPE[Pcd.DatumType] \
+                    or PcdValueInImg > FfsInfStatement._MAX_SIZE_TYPE[Pcd.DatumType]:
+                    EdkLogger.error("GenFds", GENFDS_ERROR, "The size of %s type PCD '%s.%s' doesn't match its data type." \
+                                    % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, Pcd.TokenCName))
+            Pcd.DefaultValue = DefaultValue
+            self.PatchPcds.append(Pcd)
         self.InfModule = Inf
-            
-        GenFdsGlobalVariable.VerboseLogger( "BaseName : %s" %self.BaseName)
-        GenFdsGlobalVariable.VerboseLogger("ModuleGuid : %s" %self.ModuleGuid)
-        GenFdsGlobalVariable.VerboseLogger("ModuleType : %s" %self.ModuleType)
-        GenFdsGlobalVariable.VerboseLogger("VersionString : %s" %self.VersionString)
-        GenFdsGlobalVariable.VerboseLogger("InfFileName :%s"  %self.InfFileName)
+        self.PcdIsDriver = Inf.PcdIsDriver
+        self.IsBinaryModule = Inf.IsBinaryModule
+        GenFdsGlobalVariable.VerboseLogger("BaseName : %s" % self.BaseName)
+        GenFdsGlobalVariable.VerboseLogger("ModuleGuid : %s" % self.ModuleGuid)
+        GenFdsGlobalVariable.VerboseLogger("ModuleType : %s" % self.ModuleType)
+        GenFdsGlobalVariable.VerboseLogger("VersionString : %s" % self.VersionString)
+        GenFdsGlobalVariable.VerboseLogger("InfFileName :%s" % self.InfFileName)
 
         #
         # Set OutputPath = ${WorkSpace}\Build\Fv\Ffs\${ModuleGuid}+ ${MdouleName}\
@@ -224,6 +291,27 @@ class FfsInfStatement(FfsInfStatementClassObject):
         self.EfiOutputPath = self.__GetEFIOutPutPath__()
         GenFdsGlobalVariable.VerboseLogger( "ModuelEFIPath: " + self.EfiOutputPath)
 
+## PatchEfiFile
+    #
+    #  Patch EFI file with patch PCD
+    #
+    #  @param EfiFile: EFI file needs to be patched.
+    #  @retval: Full path of patched EFI file: self.OutputPath + EfiFile base name
+    #           If passed in file does not end with efi, return as is
+    #
+    def PatchEfiFile(self, EfiFile):
+        if os.path.splitext(EfiFile)[1].lower() != '.efi':
+            return EfiFile
+        if not self.PatchPcds:
+            return EfiFile
+        Basename = os.path.basename(EfiFile)
+        Output = os.path.join(self.OutputPath, Basename)
+        CopyLongFilePath(EfiFile, Output)
+        for Pcd in self.PatchPcds:
+            RetVal, RetStr = PatchBinaryFile(Output, int(Pcd.Offset, 0), Pcd.DatumType, Pcd.DefaultValue, Pcd.MaxDatumSize)
+            if RetVal:
+                EdkLogger.error("GenFds", GENFDS_ERROR, RetStr, File=self.InfFileName)
+        return Output
     ## GenFfs() method
     #
     #   Generate FFS
@@ -668,6 +756,30 @@ class FfsInfStatement(FfsInfStatementClassObject):
         SectAlignments = []
         Index = 1
         HasGneratedFlag = False
+        if self.PcdIsDriver == 'PEI_PCD_DRIVER':
+            if self.IsBinaryModule:
+                PcdExDbFileName = os.path.join(GenFdsGlobalVariable.FvDir, "PEIPcdDataBase.raw")
+            else:
+                PcdExDbFileName = os.path.join(self.EfiOutputPath, "PEIPcdDataBase.raw")
+            PcdExDbSecName = os.path.join(self.OutputPath, "PEIPcdDataBaseSec.raw")
+            GenFdsGlobalVariable.GenerateSection(PcdExDbSecName,
+                                                 [PcdExDbFileName],
+                                                 "EFI_SECTION_RAW",
+                                                 )
+            SectFiles.append(PcdExDbSecName)
+            SectAlignments.append(None)
+        elif self.PcdIsDriver == 'DXE_PCD_DRIVER':
+            if self.IsBinaryModule:
+                PcdExDbFileName = os.path.join(GenFdsGlobalVariable.FvDir, "DXEPcdDataBase.raw")
+            else:
+                PcdExDbFileName = os.path.join(self.EfiOutputPath, "DXEPcdDataBase.raw")
+            PcdExDbSecName = os.path.join(self.OutputPath, "DXEPcdDataBaseSec.raw")
+            GenFdsGlobalVariable.GenerateSection(PcdExDbSecName,
+                                                 [PcdExDbFileName],
+                                                 "EFI_SECTION_RAW",
+                                                 )
+            SectFiles.append(PcdExDbSecName)
+            SectAlignments.append(None)
         for Sect in Rule.SectionList:
             SecIndex = '%d' %Index
             SectList  = []

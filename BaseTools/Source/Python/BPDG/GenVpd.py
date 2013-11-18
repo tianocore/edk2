@@ -34,9 +34,10 @@ _FORMAT_CHAR = {1: 'B',
 #  This class contain method to format and pack pcd's value.          
 #
 class PcdEntry:
-    def __init__(self, PcdCName, PcdOffset, PcdSize, PcdValue, Lineno=None, FileName=None, PcdUnpackValue=None, 
+    def __init__(self, PcdCName, SkuId,PcdOffset, PcdSize, PcdValue, Lineno=None, FileName=None, PcdUnpackValue=None, 
                  PcdBinOffset=None, PcdBinSize=None):
         self.PcdCName       = PcdCName.strip()
+        self.SkuId          = SkuId.strip()
         self.PcdOffset      = PcdOffset.strip()
         self.PcdSize        = PcdSize.strip()
         self.PcdValue       = PcdValue.strip()
@@ -284,7 +285,7 @@ class PcdEntry:
                                 "Invalid unicode character %s in unicode string %s(File: %s Line: %s)" % \
                                 (Value, UnicodeString, self.FileName, self.Lineno))
                 
-        for Index in range(len(UnicodeString) * 2, Size):
+        for Index in xrange(len(UnicodeString) * 2, Size):
             ReturnArray.append(0)
             
         self.PcdValue =  ReturnArray.tolist()    
@@ -343,7 +344,7 @@ class GenVPD :
                 #
                 # Enhanced for support "|" character in the string.
                 #
-                ValueList = ['', '', '', '']    
+                ValueList = ['', '', '', '','']    
                 
                 ValueRe  = re.compile(r'\s*L?\".*\|.*\"\s*$')
                 PtrValue = ValueRe.findall(line)
@@ -358,7 +359,7 @@ class GenVPD :
                 ValueList[0:len(TokenList)] = TokenList
                 
                 if ValueUpdateFlag:
-                    ValueList[3] = PtrValue[0]                              
+                    ValueList[4] = PtrValue[0]                              
                 self.FileLinesList[count] = ValueList
                 # Store the line number
                 self.FileLinesList[count].append(str(count+1))
@@ -393,9 +394,10 @@ class GenVPD :
         count = 0
         for line in self.FileLinesList:        
             if line != None :
-                PCD = PcdEntry(line[0], line[1], line[2], line[3], line[4], self.InputFileName)   
+                PCD = PcdEntry(line[0], line[1], line[2], line[3], line[4],line[5], self.InputFileName)   
                 # Strip the space char
                 PCD.PcdCName     = PCD.PcdCName.strip(' ')
+                PCD.SkuId        = PCD.SkuId.strip(' ')
                 PCD.PcdOffset    = PCD.PcdOffset.strip(' ')
                 PCD.PcdSize      = PCD.PcdSize.strip(' ')
                 PCD.PcdValue     = PCD.PcdValue.strip(' ')               
@@ -639,7 +641,7 @@ class GenVPD :
         for eachPcd in self.PcdFixedOffsetSizeList  :
             # write map file
             try :
-                fMapFile.write("%s | %s | %s | %s  \n" % (eachPcd.PcdCName, eachPcd.PcdOffset, eachPcd.PcdSize,eachPcd.PcdUnpackValue))
+                fMapFile.write("%s | %s | %s | %s | %s  \n" % (eachPcd.PcdCName, eachPcd.SkuId,eachPcd.PcdOffset, eachPcd.PcdSize,eachPcd.PcdUnpackValue))
             except:
                 EdkLogger.error("BPDG", BuildToolError.FILE_WRITE_FAILURE, "Write data to file %s failed, please check whether the file been locked or using by other applications." %self.MapFileName,None)                                                                      
                          

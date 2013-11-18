@@ -70,7 +70,7 @@ class DscBuildData(PlatformBuildClassObject):
         #TAB_DSC_DEFINES_OUTPUT_DIRECTORY        :   "_OutputDirectory",
         #TAB_DSC_DEFINES_SUPPORTED_ARCHITECTURES :   "_SupArchList",
         #TAB_DSC_DEFINES_BUILD_TARGETS           :   "_BuildTargets",
-        #TAB_DSC_DEFINES_SKUID_IDENTIFIER        :   "_SkuName",
+        TAB_DSC_DEFINES_SKUID_IDENTIFIER        :   "_SkuName",
         #TAB_DSC_DEFINES_FLASH_DEFINITION        :   "_FlashDefinition",
         TAB_DSC_DEFINES_BUILD_NUMBER            :   "_BuildNumber",
         TAB_DSC_DEFINES_MAKEFILE_NAME           :   "_MakefileName",
@@ -126,6 +126,8 @@ class DscBuildData(PlatformBuildClassObject):
         self._SupArchList       = None
         self._BuildTargets      = None
         self._SkuName           = None
+        self._SkuIdentifier     = None
+        self._PcdInfoFlag       = None
         self._FlashDefinition   = None
         self._BuildNumber       = None
         self._MakefileName      = None
@@ -181,10 +183,9 @@ class DscBuildData(PlatformBuildClassObject):
         for Record in RecordList:
             Name = Record[1]
             # items defined _PROPERTY_ don't need additional processing
-            if Name in self:
-                self[Name] = Record[2]
+            
             # some special items in [Defines] section need special treatment
-            elif Name == TAB_DSC_DEFINES_OUTPUT_DIRECTORY:
+            if Name == TAB_DSC_DEFINES_OUTPUT_DIRECTORY:
                 self._OutputDirectory = NormPath(Record[2], self._Macros)
                 if ' ' in self._OutputDirectory:
                     EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "No space is allowed in OUTPUT_DIRECTORY",
@@ -203,6 +204,9 @@ class DscBuildData(PlatformBuildClassObject):
             elif Name == TAB_DSC_DEFINES_SKUID_IDENTIFIER:
                 if self._SkuName == None:
                     self._SkuName = Record[2]
+                self._SkuIdentifier = Record[2]
+            elif Name == TAB_DSC_DEFINES_PCD_INFO_GENERATION:
+                self._PcdInfoFlag = Record[2]
             elif Name == TAB_FIX_LOAD_TOP_MEMORY_ADDRESS:
                 try:
                     self._LoadFixAddress = int (Record[2], 0)
@@ -247,6 +251,8 @@ class DscBuildData(PlatformBuildClassObject):
                 except:
                     EdkLogger.error("build", FORMAT_INVALID, "Invalid GUID format for VPD_TOOL_GUID", File=self.MetaFile)
                 self._VpdToolGuid = Record[2]                   
+            elif Name in self:
+                self[Name] = Record[2]                 
         # set _Header to non-None in order to avoid database re-querying
         self._Header = 'DUMMY'
 
@@ -312,7 +318,20 @@ class DscBuildData(PlatformBuildClassObject):
             if self._BuildTargets == None:
                 EdkLogger.error('build', ATTRIBUTE_NOT_AVAILABLE, "No BUILD_TARGETS", File=self.MetaFile)
         return self._BuildTargets
-
+    
+    def _GetPcdInfoFlag(self):
+        if self._PcdInfoFlag == None or self._PcdInfoFlag.upper() == 'FALSE':
+            return False
+        elif self._PcdInfoFlag.upper() == 'TRUE':
+            return True
+        else:
+            return False
+            
+    def _GetSkuIdentifier(self):
+        if self._SkuIdentifier == None:
+            if self._Header == None:
+                self._GetHeaderInfo()
+        return self._SkuIdentifier
     ## Retrieve SKUID_IDENTIFIER
     def _GetSkuName(self):
         if self._SkuName == None:
@@ -441,9 +460,11 @@ class DscBuildData(PlatformBuildClassObject):
                 if Record[1] in [None, '']:
                     EdkLogger.error('build', FORMAT_INVALID, 'No Sku ID name',
                                     File=self.MetaFile, Line=Record[-1])
-                self._SkuIds[Record[1]] = Record[0]
+                self._SkuIds[Record[1].upper()] = Record[0]
             if 'DEFAULT' not in self._SkuIds:
                 self._SkuIds['DEFAULT'] = '0'
+            if 'COMMON' not in self._SkuIds:
+                self._SkuIds['COMMON'] = '0'
         return self._SkuIds
 
     ## Retrieve [Components] section information
@@ -701,19 +722,45 @@ class DscBuildData(PlatformBuildClassObject):
         # tdict is a special dict kind of type, used for selecting correct
         # PCD settings for certain ARCH
         #
+        
+        SkuObj = SkuClass(self.SkuIdentifier,self.SkuIds)
+        
         PcdDict = tdict(True, 3)
         PcdSet = set()
         # Find out all possible PCD candidates for self._Arch
         RecordList = self._RawData[Type, self._Arch]
+        PcdValueDict = sdict()
         for TokenSpaceGuid, PcdCName, Setting, Arch, SkuName, Dummy3, Dummy4 in RecordList:
-            PcdSet.add((PcdCName, TokenSpaceGuid, Dummy4))
-            PcdDict[Arch, PcdCName, TokenSpaceGuid] = Setting
-        # Remove redundant PCD candidates
-        for PcdCName, TokenSpaceGuid, Dummy4 in PcdSet:
-            Setting = PcdDict[self._Arch, PcdCName, TokenSpaceGuid]
+            SkuName = SkuName.upper()
+            if SkuName in (SkuObj.SystemSkuId,'DEFAULT','COMMON'):
+                PcdSet.add((PcdCName, TokenSpaceGuid, SkuName,Dummy4))
+                PcdDict[Arch, PcdCName, TokenSpaceGuid,SkuName] = Setting
+        
+        #handle pcd value override        
+        for PcdCName, TokenSpaceGuid, SkuName,Dummy4 in PcdSet:
+            Setting = PcdDict[self._Arch, PcdCName, TokenSpaceGuid,SkuName]
             if Setting == None:
                 continue
             PcdValue, DatumType, MaxDatumSize = self._ValidatePcd(PcdCName, TokenSpaceGuid, Setting, Type, Dummy4)
+            if (PcdCName, TokenSpaceGuid) in PcdValueDict:
+                PcdValueDict[PcdCName, TokenSpaceGuid][SkuName] = (PcdValue,DatumType,MaxDatumSize) 
+            else:
+                PcdValueDict[PcdCName, TokenSpaceGuid] = {SkuName:(PcdValue,DatumType,MaxDatumSize)}       
+        
+        PcdsKeys = PcdValueDict.keys()
+        for PcdCName,TokenSpaceGuid in PcdsKeys:
+            
+            PcdSetting = PcdValueDict[PcdCName, TokenSpaceGuid]
+            PcdValue = None
+            DatumType = None
+            MaxDatumSize = None
+            if 'COMMON' in PcdSetting:
+                PcdValue,DatumType,MaxDatumSize = PcdSetting['COMMON']
+            if 'DEFAULT' in PcdSetting:
+                PcdValue,DatumType,MaxDatumSize = PcdSetting['DEFAULT']
+            if SkuObj.SystemSkuId in PcdSetting:
+                PcdValue,DatumType,MaxDatumSize = PcdSetting[SkuObj.SystemSkuId]
+                
             Pcds[PcdCName, TokenSpaceGuid] = PcdClassObject(
                                                 PcdCName,
                                                 TokenSpaceGuid,
@@ -735,6 +782,9 @@ class DscBuildData(PlatformBuildClassObject):
     #   @retval a dict object contains settings of given PCD type
     #
     def _GetDynamicPcd(self, Type):
+        
+        SkuObj = SkuClass(self.SkuIdentifier,self.SkuIds)
+        
         Pcds = sdict()
         #
         # tdict is a special dict kind of type, used for selecting correct
@@ -744,30 +794,68 @@ class DscBuildData(PlatformBuildClassObject):
         PcdList = []
         # Find out all possible PCD candidates for self._Arch
         RecordList = self._RawData[Type, self._Arch]
+        AvailableSkuIdSet = SkuObj.AvailableSkuIdSet.copy()
+        
+        AvailableSkuIdSet.update({'DEFAULT':0,'COMMON':0})
         for TokenSpaceGuid, PcdCName, Setting, Arch, SkuName, Dummy3, Dummy4 in RecordList:
-            PcdList.append((PcdCName, TokenSpaceGuid, Dummy4))
+            SkuName = SkuName.upper()
+            if SkuName not in AvailableSkuIdSet:
+                continue
+            
+            PcdList.append((PcdCName, TokenSpaceGuid, SkuName,Dummy4))
             PcdDict[Arch, SkuName, PcdCName, TokenSpaceGuid] = Setting
         # Remove redundant PCD candidates, per the ARCH and SKU
-        for PcdCName, TokenSpaceGuid, Dummy4 in PcdList:
-            Setting = PcdDict[self._Arch, self.SkuName, PcdCName, TokenSpaceGuid]
+        for PcdCName, TokenSpaceGuid, SkuName, Dummy4 in PcdList:
+            
+            Setting = PcdDict[self._Arch, SkuName, PcdCName, TokenSpaceGuid]
             if Setting == None:
                 continue
                       
             PcdValue, DatumType, MaxDatumSize = self._ValidatePcd(PcdCName, TokenSpaceGuid, Setting, Type, Dummy4)
+            SkuInfo = SkuInfoClass(SkuName, self.SkuIds[SkuName], '', '', '', '', '', PcdValue)
+            if (PcdCName,TokenSpaceGuid) in Pcds.keys(): 
+                pcdObject = Pcds[PcdCName,TokenSpaceGuid]
+                pcdObject.SkuInfoList[SkuName] = SkuInfo
+            else:               
+                Pcds[PcdCName, TokenSpaceGuid] = PcdClassObject(
+                                                    PcdCName,
+                                                    TokenSpaceGuid,
+                                                    self._PCD_TYPE_STRING_[Type],
+                                                    DatumType,
+                                                    PcdValue,
+                                                    '',
+                                                    MaxDatumSize,
+                                                    {SkuName : SkuInfo},
+                                                    False,
+                                                    None
+                                                    )
+        
+        for pcd in Pcds.values():
+            if 'DEFAULT' not in pcd.SkuInfoList.keys() and 'COMMON' not in pcd.SkuInfoList.keys():
+                pcdDecObject = self._DecPcds[pcd.TokenCName,pcd.TokenSpaceGuidCName]
+                valuefromDec = pcdDecObject.DefaultValue
+                SkuInfo = SkuInfoClass('DEFAULT', '0', '', '', '', '', '', valuefromDec)
+                pcd.SkuInfoList['DEFAULT'] = SkuInfo
+            elif 'DEFAULT' not in pcd.SkuInfoList.keys() and 'COMMON' in pcd.SkuInfoList.keys():
+                pcd.SkuInfoList['DEFAULT'] = pcd.SkuInfoList['COMMON']
+                del(pcd.SkuInfoList['COMMON'])
+            elif 'DEFAULT' in pcd.SkuInfoList.keys() and 'COMMON' in pcd.SkuInfoList.keys():
+                del(pcd.SkuInfoList['COMMON'])
+            if SkuObj.SkuUsageType == SkuObj.SINGLE:
+                if 'DEFAULT' in pcd.SkuInfoList.keys() and SkuObj.SystemSkuId not in pcd.SkuInfoList.keys():
+                    pcd.SkuInfoList[SkuObj.SystemSkuId] = pcd.SkuInfoList['DEFAULT']
+                del(pcd.SkuInfoList['DEFAULT'])
+            
+            if SkuObj.SkuUsageType == SkuObj.MULTIPLE:
+                    if pcd.DatumType == "VOID*": 
+                        MaxSize = int(pcd.MaxDatumSize,0)
+                        for (skuname,skuobj) in pcd.SkuInfoList.items():
+                            datalen = len(skuobj.DefaultValue)
+                            if datalen>MaxSize:
+                                MaxSize = datalen
+                        pcd.MaxDatumSize = str(MaxSize)
+                    
                 
-            SkuInfo = SkuInfoClass(self.SkuName, self.SkuIds[self.SkuName], '', '', '', '', '', PcdValue)
-            Pcds[PcdCName, TokenSpaceGuid] = PcdClassObject(
-                                                PcdCName,
-                                                TokenSpaceGuid,
-                                                self._PCD_TYPE_STRING_[Type],
-                                                DatumType,
-                                                PcdValue,
-                                                '',
-                                                MaxDatumSize,
-                                                {self.SkuName : SkuInfo},
-                                                False,
-                                                None
-                                                )
         return Pcds
 
     ## Retrieve dynamic HII PCD settings
@@ -777,6 +865,9 @@ class DscBuildData(PlatformBuildClassObject):
     #   @retval a dict object contains settings of given PCD type
     #
     def _GetDynamicHiiPcd(self, Type):
+        
+        SkuObj = SkuClass(self.SkuIdentifier,self.SkuIds)
+        
         Pcds = sdict()
         #
         # tdict is a special dict kind of type, used for selecting correct
@@ -786,17 +877,28 @@ class DscBuildData(PlatformBuildClassObject):
         PcdSet = set()
         RecordList = self._RawData[Type, self._Arch]
         # Find out all possible PCD candidates for self._Arch
+        AvailableSkuIdSet = SkuObj.AvailableSkuIdSet.copy()
+        
+        AvailableSkuIdSet.update({'DEFAULT':0,'COMMON':0})
         for TokenSpaceGuid, PcdCName, Setting, Arch, SkuName, Dummy3, Dummy4 in RecordList:
-            PcdSet.add((PcdCName, TokenSpaceGuid, Dummy4))
+            SkuName = SkuName.upper()
+            if SkuName not in AvailableSkuIdSet:
+                continue
+            PcdSet.add((PcdCName, TokenSpaceGuid, SkuName,Dummy4))
             PcdDict[Arch, SkuName, PcdCName, TokenSpaceGuid] = Setting
         # Remove redundant PCD candidates, per the ARCH and SKU
-        for PcdCName, TokenSpaceGuid, Dummy4 in PcdSet:
-            Setting = PcdDict[self._Arch, self.SkuName, PcdCName, TokenSpaceGuid]
+        for PcdCName, TokenSpaceGuid,SkuName, Dummy4 in PcdSet:
+            
+            Setting = PcdDict[self._Arch, SkuName, PcdCName, TokenSpaceGuid]
             if Setting == None:
                 continue
             VariableName, VariableGuid, VariableOffset, DefaultValue = self._ValidatePcd(PcdCName, TokenSpaceGuid, Setting, Type, Dummy4)
-            SkuInfo = SkuInfoClass(self.SkuName, self.SkuIds[self.SkuName], VariableName, VariableGuid, VariableOffset, DefaultValue)
-            Pcds[PcdCName, TokenSpaceGuid] = PcdClassObject(
+            SkuInfo = SkuInfoClass(SkuName, self.SkuIds[SkuName], VariableName, VariableGuid, VariableOffset, DefaultValue)
+            if (PcdCName,TokenSpaceGuid) in Pcds.keys():  
+                pcdObject = Pcds[PcdCName,TokenSpaceGuid]
+                pcdObject.SkuInfoList[SkuName] = SkuInfo
+            else:
+                Pcds[PcdCName, TokenSpaceGuid] = PcdClassObject(
                                                 PcdCName,
                                                 TokenSpaceGuid,
                                                 self._PCD_TYPE_STRING_[Type],
@@ -804,10 +906,29 @@ class DscBuildData(PlatformBuildClassObject):
                                                 DefaultValue,
                                                 '',
                                                 '',
-                                                {self.SkuName : SkuInfo},
+                                                {SkuName : SkuInfo},
                                                 False,
                                                 None
                                                 )
+                
+
+        for pcd in Pcds.values():
+            SkuInfoObj = pcd.SkuInfoList.values()[0]
+            if 'DEFAULT' not in pcd.SkuInfoList.keys() and 'COMMON' not in pcd.SkuInfoList.keys():
+                pcdDecObject = self._DecPcds[pcd.TokenCName,pcd.TokenSpaceGuidCName]
+                valuefromDec = pcdDecObject.DefaultValue
+                SkuInfo = SkuInfoClass('DEFAULT', '0', SkuInfoObj.VariableName, SkuInfoObj.VariableGuid, SkuInfoObj.VariableOffset, valuefromDec)
+                pcd.SkuInfoList['DEFAULT'] = SkuInfo
+            elif 'DEFAULT' not in pcd.SkuInfoList.keys() and 'COMMON' in pcd.SkuInfoList.keys():
+                pcd.SkuInfoList['DEFAULT'] = pcd.SkuInfoList['COMMON']
+                del(pcd.SkuInfoList['COMMON'])
+            elif 'DEFAULT' in pcd.SkuInfoList.keys() and 'COMMON' in pcd.SkuInfoList.keys():
+                del(pcd.SkuInfoList['COMMON'])
+                
+            if SkuObj.SkuUsageType == SkuObj.SINGLE:
+                if 'DEFAULT' in pcd.SkuInfoList.keys() and SkuObj.SystemSkuId not in pcd.SkuInfoList.keys():
+                    pcd.SkuInfoList[SkuObj.SystemSkuId] = pcd.SkuInfoList['DEFAULT']
+                del(pcd.SkuInfoList['DEFAULT'])
         return Pcds
 
     ## Retrieve dynamic VPD PCD settings
@@ -817,6 +938,9 @@ class DscBuildData(PlatformBuildClassObject):
     #   @retval a dict object contains settings of given PCD type
     #
     def _GetDynamicVpdPcd(self, Type):
+        
+        SkuObj = SkuClass(self.SkuIdentifier,self.SkuIds)
+        
         Pcds = sdict()
         #
         # tdict is a special dict kind of type, used for selecting correct
@@ -826,12 +950,19 @@ class DscBuildData(PlatformBuildClassObject):
         PcdList = []
         # Find out all possible PCD candidates for self._Arch
         RecordList = self._RawData[Type, self._Arch]
+        AvailableSkuIdSet = SkuObj.AvailableSkuIdSet.copy()
+        
+        AvailableSkuIdSet.update({'DEFAULT':0,'COMMON':0})
         for TokenSpaceGuid, PcdCName, Setting, Arch, SkuName, Dummy3, Dummy4 in RecordList:
-            PcdList.append((PcdCName, TokenSpaceGuid, Dummy4))
+            SkuName = SkuName.upper()
+            if SkuName not in AvailableSkuIdSet:
+                continue
+
+            PcdList.append((PcdCName, TokenSpaceGuid,SkuName, Dummy4))
             PcdDict[Arch, SkuName, PcdCName, TokenSpaceGuid] = Setting
         # Remove redundant PCD candidates, per the ARCH and SKU
-        for PcdCName, TokenSpaceGuid, Dummy4 in PcdList:
-            Setting = PcdDict[self._Arch, self.SkuName, PcdCName, TokenSpaceGuid]
+        for PcdCName, TokenSpaceGuid, SkuName,Dummy4 in PcdList:
+            Setting = PcdDict[self._Arch, SkuName, PcdCName, TokenSpaceGuid]
             if Setting == None:
                 continue
             #
@@ -841,9 +972,12 @@ class DscBuildData(PlatformBuildClassObject):
             # until the DEC parser has been called.
             # 
             VpdOffset, MaxDatumSize, InitialValue = self._ValidatePcd(PcdCName, TokenSpaceGuid, Setting, Type, Dummy4)
-
-            SkuInfo = SkuInfoClass(self.SkuName, self.SkuIds[self.SkuName], '', '', '', '', VpdOffset, InitialValue)
-            Pcds[PcdCName, TokenSpaceGuid] = PcdClassObject(
+            SkuInfo = SkuInfoClass(SkuName, self.SkuIds[SkuName], '', '', '', '', VpdOffset, InitialValue)
+            if (PcdCName,TokenSpaceGuid) in Pcds.keys():  
+                pcdObject = Pcds[PcdCName,TokenSpaceGuid]
+                pcdObject.SkuInfoList[SkuName] = SkuInfo
+            else:
+                Pcds[PcdCName, TokenSpaceGuid] = PcdClassObject(
                                                 PcdCName,
                                                 TokenSpaceGuid,
                                                 self._PCD_TYPE_STRING_[Type],
@@ -851,10 +985,35 @@ class DscBuildData(PlatformBuildClassObject):
                                                 '',
                                                 '',
                                                 MaxDatumSize,
-                                                {self.SkuName : SkuInfo},
+                                                {SkuName : SkuInfo},
                                                 False,
                                                 None
                                                 )
+        for pcd in Pcds.values():
+            SkuInfoObj = pcd.SkuInfoList.values()[0]
+            if 'DEFAULT' not in pcd.SkuInfoList.keys() and 'COMMON' not in pcd.SkuInfoList.keys():
+                pcdDecObject = self._DecPcds[pcd.TokenCName,pcd.TokenSpaceGuidCName]
+                valuefromDec = pcdDecObject.DefaultValue
+                SkuInfo = SkuInfoClass('DEFAULT', '0', '', '', '','',SkuInfoObj.VpdOffset, valuefromDec)
+                pcd.SkuInfoList['DEFAULT'] = SkuInfo
+            elif 'DEFAULT' not in pcd.SkuInfoList.keys() and 'COMMON' in pcd.SkuInfoList.keys():
+                pcd.SkuInfoList['DEFAULT'] = pcd.SkuInfoList['COMMON']
+                del(pcd.SkuInfoList['COMMON'])
+            elif 'DEFAULT' in pcd.SkuInfoList.keys() and 'COMMON' in pcd.SkuInfoList.keys():
+                del(pcd.SkuInfoList['COMMON'])
+            if SkuObj.SkuUsageType == SkuObj.SINGLE:
+                if 'DEFAULT' in pcd.SkuInfoList.keys() and SkuObj.SystemSkuId not in pcd.SkuInfoList.keys():
+                    pcd.SkuInfoList[SkuObj.SystemSkuId] = pcd.SkuInfoList['DEFAULT']
+                del(pcd.SkuInfoList['DEFAULT'])
+            
+            if SkuObj.SkuUsageType == SkuObj.MULTIPLE:
+                    if pcd.MaxDatumSize.strip(): 
+                        MaxSize = int(pcd.MaxDatumSize,0)
+                        for (skuname,skuobj) in pcd.SkuInfoList.items():
+                            datalen = len(skuobj.DefaultValue)
+                            if datalen>MaxSize:
+                                MaxSize = datalen
+                        pcd.MaxDatumSize = str(MaxSize)
         return Pcds
 
     ## Add external modules
@@ -896,6 +1055,8 @@ class DscBuildData(PlatformBuildClassObject):
     SupArchList         = property(_GetSupArch)
     BuildTargets        = property(_GetBuildTarget)
     SkuName             = property(_GetSkuName, _SetSkuName)
+    SkuIdentifier       = property(_GetSkuIdentifier)
+    PcdInfoFlag         = property(_GetPcdInfoFlag)
     FlashDefinition     = property(_GetFdfFile)
     BuildNumber         = property(_GetBuildNumber)
     MakefileName        = property(_GetMakefileName)
@@ -1358,6 +1519,7 @@ class InfBuildData(ModuleBuildClassObject):
 
     ## Set all internal used members of InfBuildData to None
     def _Clear(self):
+        self._HeaderComments = None
         self._Header_               = None
         self._AutoGenVersion        = None
         self._BaseName              = None
@@ -1384,11 +1546,16 @@ class InfBuildData(ModuleBuildClassObject):
         self._LibraryClasses        = None
         self._Libraries             = None
         self._Protocols             = None
+        self._ProtocolComments = None
         self._Ppis                  = None
+        self._PpiComments = None
         self._Guids                 = None
+        self._GuidsUsedByPcd = sdict()
+        self._GuidComments = None
         self._Includes              = None
         self._Packages              = None
         self._Pcds                  = None
+        self._PcdComments = None
         self._BuildOptions          = None
         self._Depex                 = None
         self._DepexExpression       = None
@@ -1438,6 +1605,13 @@ class InfBuildData(ModuleBuildClassObject):
             return
         self._Platform = Value
         self._Clear()
+    def _GetHeaderComments(self):
+        if not self._HeaderComments:
+            self._HeaderComments = []
+            RecordList = self._RawData[MODEL_META_DATA_HEADER_COMMENT]
+            for Record in RecordList:
+                self._HeaderComments.append(Record[0])
+        return self._HeaderComments
 
     ## Retrieve all information in [Defines] section
     #
@@ -1873,10 +2047,14 @@ class InfBuildData(ModuleBuildClassObject):
                     self._Libraries.append(LibraryName)
         return self._Libraries
 
+    def _GetProtocolComments(self):
+        self._GetProtocols()
+        return self._ProtocolComments
     ## Retrieve protocols consumed/produced by this module
     def _GetProtocols(self):
         if self._Protocols == None:
             self._Protocols = sdict()
+            self._ProtocolComments = sdict()
             RecordList = self._RawData[MODEL_EFI_PROTOCOL, self._Arch, self._Platform]
             for Record in RecordList:
                 CName = Record[0]
@@ -1887,12 +2065,21 @@ class InfBuildData(ModuleBuildClassObject):
                                     "Value of Protocol [%s] is not found under [Protocols] section in" % CName,
                                     ExtraData=PackageList, File=self.MetaFile, Line=Record[-1])
                 self._Protocols[CName] = Value
+                CommentRecords = self._RawData[MODEL_META_DATA_COMMENT, self._Arch, self._Platform, Record[5]]
+                Comments = []
+                for CmtRec in CommentRecords:
+                    Comments.append(CmtRec[0])
+                self._ProtocolComments[CName] = Comments
         return self._Protocols
 
+    def _GetPpiComments(self):
+        self._GetPpis()
+        return self._PpiComments
     ## Retrieve PPIs consumed/produced by this module
     def _GetPpis(self):
         if self._Ppis == None:
             self._Ppis = sdict()
+            self._PpiComments = sdict()
             RecordList = self._RawData[MODEL_EFI_PPI, self._Arch, self._Platform]
             for Record in RecordList:
                 CName = Record[0]
@@ -1903,12 +2090,21 @@ class InfBuildData(ModuleBuildClassObject):
                                     "Value of PPI [%s] is not found under [Ppis] section in " % CName,
                                     ExtraData=PackageList, File=self.MetaFile, Line=Record[-1])
                 self._Ppis[CName] = Value
+                CommentRecords = self._RawData[MODEL_META_DATA_COMMENT, self._Arch, self._Platform, Record[5]]
+                Comments = []
+                for CmtRec in CommentRecords:
+                    Comments.append(CmtRec[0])
+                self._PpiComments[CName] = Comments
         return self._Ppis
 
+    def _GetGuidComments(self):
+        self._GetGuids()
+        return self._GuidComments
     ## Retrieve GUIDs consumed/produced by this module
     def _GetGuids(self):
         if self._Guids == None:
             self._Guids = sdict()
+            self._GuidComments = sdict()
             RecordList = self._RawData[MODEL_EFI_GUID, self._Arch, self._Platform]
             for Record in RecordList:
                 CName = Record[0]
@@ -1919,6 +2115,11 @@ class InfBuildData(ModuleBuildClassObject):
                                     "Value of Guid [%s] is not found under [Guids] section in" % CName,
                                     ExtraData=PackageList, File=self.MetaFile, Line=Record[-1])
                 self._Guids[CName] = Value
+                CommentRecords = self._RawData[MODEL_META_DATA_COMMENT, self._Arch, self._Platform, Record[5]]
+                Comments = []
+                for CmtRec in CommentRecords:
+                    Comments.append(CmtRec[0])
+                self._GuidComments[CName] = Comments
         return self._Guids
 
     ## Retrieve include paths necessary for this module (for Edk.x style of modules)
@@ -1986,10 +2187,15 @@ class InfBuildData(ModuleBuildClassObject):
                 self._Packages.append(Package)
         return self._Packages
 
+    ## Retrieve PCD comments
+    def _GetPcdComments(self):
+        self._GetPcds()
+        return self._PcdComments
     ## Retrieve PCDs used in this module
     def _GetPcds(self):
         if self._Pcds == None:
             self._Pcds = sdict()
+            self._PcdComments = sdict()
             self._Pcds.update(self._GetPcd(MODEL_PCD_FIXED_AT_BUILD))
             self._Pcds.update(self._GetPcd(MODEL_PCD_PATCHABLE_IN_MODULE))
             self._Pcds.update(self._GetPcd(MODEL_PCD_FEATURE_FLAG))
@@ -2087,13 +2293,15 @@ class InfBuildData(ModuleBuildClassObject):
                 self._DepexExpression[Arch, ModuleType] = DepexExpression[Arch, ModuleType]
         return self._DepexExpression
 
+    def GetGuidsUsedByPcd(self):
+        return self._GuidsUsedByPcd
     ## Retrieve PCD for given type
     def _GetPcd(self, Type):
         Pcds = sdict()
         PcdDict = tdict(True, 4)
         PcdList = []
         RecordList = self._RawData[Type, self._Arch, self._Platform]
-        for TokenSpaceGuid, PcdCName, Setting, Arch, Platform, Dummy1, LineNo in RecordList:
+        for TokenSpaceGuid, PcdCName, Setting, Arch, Platform, Id, LineNo in RecordList:
             PcdDict[Arch, Platform, PcdCName, TokenSpaceGuid] = (Setting, LineNo)
             PcdList.append((PcdCName, TokenSpaceGuid))
             # get the guid value
@@ -2105,6 +2313,12 @@ class InfBuildData(ModuleBuildClassObject):
                                     "Value of Guid [%s] is not found under [Guids] section in" % TokenSpaceGuid,
                                     ExtraData=PackageList, File=self.MetaFile, Line=LineNo)
                 self.Guids[TokenSpaceGuid] = Value
+                self._GuidsUsedByPcd[TokenSpaceGuid] = Value
+            CommentRecords = self._RawData[MODEL_META_DATA_COMMENT, self._Arch, self._Platform, Id]
+            Comments = []
+            for CmtRec in CommentRecords:
+                Comments.append(CmtRec[0])
+            self._PcdComments[TokenSpaceGuid, PcdCName] = Comments
 
         # resolve PCD type, value, datum info, etc. by getting its definition from package
         for PcdCName, TokenSpaceGuid in PcdList:
@@ -2125,6 +2339,9 @@ class InfBuildData(ModuleBuildClassObject):
                     False,
                     self.Guids[TokenSpaceGuid]
                     )
+            if Type == MODEL_PCD_PATCHABLE_IN_MODULE and ValueList[1]:
+                # Patch PCD: TokenSpace.PcdCName|Value|Offset
+                Pcd.Offset = ValueList[1]
 
             # get necessary info from package declaring this PCD
             for Package in self.Packages:
@@ -2216,10 +2433,20 @@ class InfBuildData(ModuleBuildClassObject):
 
         return Pcds
 
-    _Macros                 = property(_GetMacros)
-    Arch                    = property(_GetArch, _SetArch)
-    Platform                = property(_GetPlatform, _SetPlatform)
+    ## check whether current module is binary module
+    def _IsBinaryModule(self):
+        if self.Binaries and not self.Sources:
+            return True
+        elif GlobalData.gIgnoreSource:
+            return True
+        else:
+            return False
 
+    _Macros = property(_GetMacros)
+    Arch = property(_GetArch, _SetArch)
+    Platform = property(_GetPlatform, _SetPlatform)
+
+    HeaderComments = property(_GetHeaderComments)
     AutoGenVersion          = property(_GetInfVersion)
     BaseName                = property(_GetBaseName)
     ModuleType              = property(_GetModuleType)
@@ -2244,14 +2471,19 @@ class InfBuildData(ModuleBuildClassObject):
     LibraryClasses          = property(_GetLibraryClassUses)
     Libraries               = property(_GetLibraryNames)
     Protocols               = property(_GetProtocols)
+    ProtocolComments = property(_GetProtocolComments)
     Ppis                    = property(_GetPpis)
+    PpiComments = property(_GetPpiComments)
     Guids                   = property(_GetGuids)
+    GuidComments = property(_GetGuidComments)
     Includes                = property(_GetIncludes)
     Packages                = property(_GetPackages)
     Pcds                    = property(_GetPcds)
+    PcdComments = property(_GetPcdComments)
     BuildOptions            = property(_GetBuildOptions)
     Depex                   = property(_GetDepex)
     DepexExpression         = property(_GetDepexExpression)
+    IsBinaryModule = property(_IsBinaryModule)
 
 ## Database
 #

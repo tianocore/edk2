@@ -1433,8 +1433,8 @@ class Build():
                                 Ma.CreateAsBuiltInf()
                             if self.Target == "genmake":
                                 continue
-                        self.Progress.Stop("done!")
                         pModules.append(Ma)
+                    self.Progress.Stop("done!")
 
                     for Ma in pModules:
                         # Generate build task for the module

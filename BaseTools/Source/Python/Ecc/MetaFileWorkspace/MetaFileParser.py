@@ -719,6 +719,7 @@ class DscParser(MetaFileParser):
         "PLATFORM_GUID",
         "PLATFORM_VERSION",
         "SKUID_IDENTIFIER",
+        "PCD_INFO_GENERATION",
         "SUPPORTED_ARCHITECTURES",
         "BUILD_TARGETS",
         "OUTPUT_DIRECTORY",

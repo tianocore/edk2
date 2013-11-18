@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
 Portions Copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -159,6 +159,7 @@ UINT8                                   m64kRecoveryStartupApDataArray[SIZEOF_ST
 
 FV_INFO                     mFvDataInfo;
 CAP_INFO                    mCapDataInfo;
+BOOLEAN                     mIsLargeFfs = FALSE;
 
 EFI_PHYSICAL_ADDRESS mFvBaseAddress[0x10];
 UINT32               mFvBaseAddressNumber = 0;
@@ -277,6 +278,19 @@ Returns:
         DebugMsg (NULL, 0, 9, "FV file alignment", "Align = %s", mFvbAlignmentName [Index]);
         break;
       }
+    }
+  }
+
+  //
+  // Read weak alignment flag
+  //
+  Status = FindToken (InfFile, ATTRIBUTES_SECTION_STRING, EFI_FV_WEAK_ALIGNMENT_STRING, 0, Value);
+  if (Status == EFI_SUCCESS) {
+    if ((strcmp (Value, TRUE_STRING) == 0) || (strcmp (Value, ONE_STRING) == 0)) {
+      FvInfo->FvAttributes |= EFI_FVB2_WEAK_ALIGNMENT;
+    } else if ((strcmp (Value, FALSE_STRING) != 0) && (strcmp (Value, ZERO_STRING) != 0)) {
+      Error (NULL, 0, 2000, "Invalid parameter", "Weak alignment value expected one of TRUE, FALSE, 1 or 0.");
+      return EFI_ABORTED;
     }
   }
 
@@ -510,7 +524,8 @@ AddPadFile (
   IN OUT MEMORY_FILE  *FvImage,
   IN UINT32           DataAlignment,
   IN VOID             *FvEnd,
-  IN EFI_FIRMWARE_VOLUME_EXT_HEADER *ExtHeader
+  IN EFI_FIRMWARE_VOLUME_EXT_HEADER *ExtHeader,
+  IN UINT32           NextFfsSize
   )
 /*++
 
@@ -538,7 +553,10 @@ Returns:
 {
   EFI_FFS_FILE_HEADER *PadFile;
   UINTN               PadFileSize;
+  UINT32              NextFfsHeaderSize;
+  UINT32              CurFfsHeaderSize;
 
+  CurFfsHeaderSize = sizeof (EFI_FFS_FILE_HEADER);
   //
   // Verify input parameters.
   //
@@ -547,42 +565,44 @@ Returns:
   }
 
   //
-  // Check if a pad file is necessary
-  //
-  if ((ExtHeader == NULL) && (((UINTN) FvImage->CurrentFilePointer - (UINTN) FvImage->FileImage + sizeof (EFI_FFS_FILE_HEADER)) % DataAlignment == 0)) {
-    return EFI_SUCCESS;
-  }
-
-  //
   // Calculate the pad file size
   //
-  //
-  // This is the earliest possible valid offset (current plus pad file header
-  // plus the next file header)
-  //
-  PadFileSize = (UINTN) FvImage->CurrentFilePointer - (UINTN) FvImage->FileImage + (sizeof (EFI_FFS_FILE_HEADER) * 2);
 
-  //
-  // Add whatever it takes to get to the next aligned address
-  //
-  while ((PadFileSize % DataAlignment) != 0) {
-    PadFileSize++;
-  }
-  //
-  // Subtract the next file header size
-  //
-  PadFileSize -= sizeof (EFI_FFS_FILE_HEADER);
-
-  //
-  // Subtract the starting offset to get size
-  //
-  PadFileSize -= (UINTN) FvImage->CurrentFilePointer - (UINTN) FvImage->FileImage;
-  
   //
   // Append extension header size
   //
   if (ExtHeader != NULL) {
-    PadFileSize = PadFileSize + ExtHeader->ExtHeaderSize;
+    PadFileSize = ExtHeader->ExtHeaderSize;
+    if (PadFileSize + sizeof (EFI_FFS_FILE_HEADER) >= MAX_FFS_SIZE) {
+      CurFfsHeaderSize = sizeof (EFI_FFS_FILE_HEADER2);
+    }
+    PadFileSize += CurFfsHeaderSize;
+  } else {
+    NextFfsHeaderSize = sizeof (EFI_FFS_FILE_HEADER);
+    if (NextFfsSize >= MAX_FFS_SIZE) {
+      NextFfsHeaderSize = sizeof (EFI_FFS_FILE_HEADER2);
+    }
+    //
+    // Check if a pad file is necessary
+    //
+    if (((UINTN) FvImage->CurrentFilePointer - (UINTN) FvImage->FileImage + NextFfsHeaderSize) % DataAlignment == 0) {
+      return EFI_SUCCESS;
+    }
+    PadFileSize = (UINTN) FvImage->CurrentFilePointer - (UINTN) FvImage->FileImage + sizeof (EFI_FFS_FILE_HEADER) + NextFfsHeaderSize;
+    //
+    // Add whatever it takes to get to the next aligned address
+    //
+    while ((PadFileSize % DataAlignment) != 0) {
+      PadFileSize++;
+    }
+    //
+    // Subtract the next file header size
+    //
+    PadFileSize -= NextFfsHeaderSize;
+    //
+    // Subtract the starting offset to get size
+    //
+    PadFileSize -= (UINTN) FvImage->CurrentFilePointer - (UINTN) FvImage->FileImage;
   }
 
   //
@@ -606,9 +626,15 @@ Returns:
   //
   // Write pad file size (calculated size minus next file header size)
   //
-  PadFile->Size[0]  = (UINT8) (PadFileSize & 0xFF);
-  PadFile->Size[1]  = (UINT8) ((PadFileSize >> 8) & 0xFF);
-  PadFile->Size[2]  = (UINT8) ((PadFileSize >> 16) & 0xFF);
+  if (PadFileSize >= MAX_FFS_SIZE) {
+    memset(PadFile->Size, 0, sizeof(UINT8) * 3);
+    ((EFI_FFS_FILE_HEADER2 *)PadFile)->ExtendedSize = PadFileSize;
+    PadFile->Attributes |= FFS_ATTRIB_LARGE_FILE;
+  } else {
+    PadFile->Size[0]  = (UINT8) (PadFileSize & 0xFF);
+    PadFile->Size[1]  = (UINT8) ((PadFileSize >> 8) & 0xFF);
+    PadFile->Size[2]  = (UINT8) ((PadFileSize >> 16) & 0xFF);
+  }
 
   //
   // Fill in checksums and state, they must be 0 for checksumming.
@@ -616,7 +642,7 @@ Returns:
   PadFile->IntegrityCheck.Checksum.Header = 0;
   PadFile->IntegrityCheck.Checksum.File   = 0;
   PadFile->State                          = 0;
-  PadFile->IntegrityCheck.Checksum.Header = CalculateChecksum8 ((UINT8 *) PadFile, sizeof (EFI_FFS_FILE_HEADER));
+  PadFile->IntegrityCheck.Checksum.Header = CalculateChecksum8 ((UINT8 *) PadFile, CurFfsHeaderSize);
   PadFile->IntegrityCheck.Checksum.File   = FFS_FIXED_CHECKSUM;
 
   PadFile->State = EFI_FILE_HEADER_CONSTRUCTION | EFI_FILE_HEADER_VALID | EFI_FILE_DATA_VALID;
@@ -634,8 +660,8 @@ Returns:
     //
     // Copy Fv Extension Header and Set Fv Extension header offset
     //
-    memcpy (PadFile + 1, ExtHeader, ExtHeader->ExtHeaderSize);
-    ((EFI_FIRMWARE_VOLUME_HEADER *) FvImage->FileImage)->ExtHeaderOffset = (UINT16) ((UINTN) (PadFile + 1) - (UINTN) FvImage->FileImage);
+    memcpy ((UINT8 *)PadFile + CurFfsHeaderSize, ExtHeader, ExtHeader->ExtHeaderSize);
+    ((EFI_FIRMWARE_VOLUME_HEADER *) FvImage->FileImage)->ExtHeaderOffset = (UINT16) ((UINTN) ((UINT8 *)PadFile + CurFfsHeaderSize) - (UINTN) FvImage->FileImage);
 	  //
 	  // Make next file start at QWord Boundry
 	  //
@@ -1078,7 +1104,7 @@ Returns:
       //
       // Sanity check. The file MUST align appropriately
       //
-      if (((UINTN) *VtfFileImage + sizeof (EFI_FFS_FILE_HEADER) - (UINTN) FvImage->FileImage) % (1 << CurrentFileAlignment)) {
+      if (((UINTN) *VtfFileImage + GetFfsHeaderLength((EFI_FFS_FILE_HEADER *)FileBuffer) - (UINTN) FvImage->FileImage) % (1 << CurrentFileAlignment)) {
         Error (NULL, 0, 3000, "Invalid", "VTF file cannot be aligned on a %u-byte boundary.", (unsigned) (1 << CurrentFileAlignment));
         free (FileBuffer);
         return EFI_ABORTED;
@@ -1116,7 +1142,7 @@ Returns:
   //
   // Add pad file if necessary
   //
-  Status = AddPadFile (FvImage, 1 << CurrentFileAlignment, *VtfFileImage, NULL);
+  Status = AddPadFile (FvImage, 1 << CurrentFileAlignment, *VtfFileImage, NULL, FileSize);
   if (EFI_ERROR (Status)) {
     Error (NULL, 0, 4002, "Resource", "FV space is full, could not add pad file for data alignment property.");
     free (FileBuffer);
@@ -1190,6 +1216,7 @@ Returns:
 {
   EFI_FFS_FILE_HEADER *PadFile;
   UINTN               FileSize;
+  UINT32              FfsHeaderSize;
 
   //
   // If there is no VTF or the VTF naturally follows the previous file without a
@@ -1219,9 +1246,18 @@ Returns:
   // FileSize includes the EFI_FFS_FILE_HEADER
   //
   FileSize          = (UINTN) VtfFileImage - (UINTN) FvImage->CurrentFilePointer;
-  PadFile->Size[0]  = (UINT8) (FileSize & 0x000000FF);
-  PadFile->Size[1]  = (UINT8) ((FileSize & 0x0000FF00) >> 8);
-  PadFile->Size[2]  = (UINT8) ((FileSize & 0x00FF0000) >> 16);
+  if (FileSize >= MAX_FFS_SIZE) {
+    PadFile->Attributes |= FFS_ATTRIB_LARGE_FILE;
+    memset(PadFile->Size, 0, sizeof(UINT8) * 3);
+    ((EFI_FFS_FILE_HEADER2 *)PadFile)->ExtendedSize = FileSize;
+    FfsHeaderSize = sizeof(EFI_FFS_FILE_HEADER2);
+    mIsLargeFfs = TRUE;
+  } else {
+    PadFile->Size[0]  = (UINT8) (FileSize & 0x000000FF);
+    PadFile->Size[1]  = (UINT8) ((FileSize & 0x0000FF00) >> 8);
+    PadFile->Size[2]  = (UINT8) ((FileSize & 0x00FF0000) >> 16);
+    FfsHeaderSize = sizeof(EFI_FFS_FILE_HEADER);
+  }
 
   //
   // Fill in checksums and state, must be zero during checksum calculation.
@@ -1229,7 +1265,7 @@ Returns:
   PadFile->IntegrityCheck.Checksum.Header = 0;
   PadFile->IntegrityCheck.Checksum.File   = 0;
   PadFile->State                          = 0;
-  PadFile->IntegrityCheck.Checksum.Header = CalculateChecksum8 ((UINT8 *) PadFile, sizeof (EFI_FFS_FILE_HEADER));
+  PadFile->IntegrityCheck.Checksum.Header = CalculateChecksum8 ((UINT8 *) PadFile, FfsHeaderSize);
   PadFile->IntegrityCheck.Checksum.File   = FFS_FIXED_CHECKSUM;
 
   PadFile->State = EFI_FILE_HEADER_CONSTRUCTION | EFI_FILE_HEADER_VALID | EFI_FILE_DATA_VALID;
@@ -1297,6 +1333,8 @@ Returns:
   UINT64                    FitAddress;
   FIT_TABLE                 *FitTablePtr;
   BOOLEAN                   Vtf0Detected;
+  UINT32                    FfsHeaderSize;
+  UINT32                    SecHeaderSize;
 
   //
   // Verify input parameters
@@ -1359,8 +1397,9 @@ Returns:
     return EFI_ABORTED;
   }
 
+  SecHeaderSize = GetSectionHeaderLength(Pe32Section.CommonHeader);
   Status = GetPe32Info (
-            (VOID *) ((UINTN) Pe32Section.Pe32Section + sizeof (EFI_SECTION_PE32)),
+            (VOID *) ((UINTN) Pe32Section.Pe32Section + SecHeaderSize),
             &EntryPoint,
             &BaseOfCode,
             &MachineType
@@ -1388,7 +1427,7 @@ Returns:
   // Physical address is FV base + offset of PE32 + offset of the entry point
   //
   SecCorePhysicalAddress = FvInfo->BaseAddress;
-  SecCorePhysicalAddress += (UINTN) Pe32Section.Pe32Section + sizeof (EFI_SECTION_PE32) - (UINTN) FvImage->FileImage;
+  SecCorePhysicalAddress += (UINTN) Pe32Section.Pe32Section + SecHeaderSize - (UINTN) FvImage->FileImage;
   SecCorePhysicalAddress += EntryPoint;
   DebugMsg (NULL, 0, 9, "SecCore physical entry point address", "Address = 0x%llX", (unsigned long long) SecCorePhysicalAddress); 
 
@@ -1413,8 +1452,9 @@ Returns:
     return EFI_ABORTED;
   }
 
+  SecHeaderSize = GetSectionHeaderLength(Pe32Section.CommonHeader);
   Status = GetPe32Info (
-            (VOID *) ((UINTN) Pe32Section.Pe32Section + sizeof (EFI_SECTION_PE32)),
+            (VOID *) ((UINTN) Pe32Section.Pe32Section + SecHeaderSize),
             &EntryPoint,
             &BaseOfCode,
             &MachineType
@@ -1428,7 +1468,7 @@ Returns:
   // Physical address is FV base + offset of PE32 + offset of the entry point
   //
   PeiCorePhysicalAddress = FvInfo->BaseAddress;
-  PeiCorePhysicalAddress += (UINTN) Pe32Section.Pe32Section + sizeof (EFI_SECTION_PE32) - (UINTN) FvImage->FileImage;
+  PeiCorePhysicalAddress += (UINTN) Pe32Section.Pe32Section + SecHeaderSize - (UINTN) FvImage->FileImage;
   PeiCorePhysicalAddress += EntryPoint;
   DebugMsg (NULL, 0, 9, "PeiCore physical entry point address", "Address = 0x%llX", (unsigned long long) PeiCorePhysicalAddress);
 
@@ -1598,9 +1638,10 @@ Returns:
   VtfFile->IntegrityCheck.Checksum.File = 0;
   VtfFile->State                        = 0;
   if (VtfFile->Attributes & FFS_ATTRIB_CHECKSUM) {
+    FfsHeaderSize = GetFfsHeaderLength(VtfFile);
     VtfFile->IntegrityCheck.Checksum.File = CalculateChecksum8 (
-                                              (UINT8 *) (VtfFile + 1),
-                                              GetLength (VtfFile->Size) - sizeof (EFI_FFS_FILE_HEADER)
+                                              (UINT8 *) ((UINT8 *)VtfFile + FfsHeaderSize),
+                                              GetFfsFileLength (VtfFile) - FfsHeaderSize
                                               );
   } else {
     VtfFile->IntegrityCheck.Checksum.File = FFS_FIXED_CHECKSUM;
@@ -1720,7 +1761,7 @@ Returns:
       }
     
       Status = GetPe32Info (
-                (VOID *) ((UINTN) Pe32Section.Pe32Section + sizeof (EFI_SECTION_PE32)),
+                (VOID *) ((UINTN) Pe32Section.Pe32Section + GetSectionHeaderLength(Pe32Section.CommonHeader)),
                 &EntryPoint,
                 &BaseOfCode,
                 &MachineType
@@ -1734,7 +1775,7 @@ Returns:
       // Physical address is FV base + offset of PE32 + offset of the entry point
       //
       PeiCorePhysicalAddress = FvInfo->BaseAddress;
-      PeiCorePhysicalAddress += (UINTN) Pe32Section.Pe32Section + sizeof (EFI_SECTION_PE32) - (UINTN) FvImage->FileImage;
+      PeiCorePhysicalAddress += (UINTN) Pe32Section.Pe32Section + GetSectionHeaderLength(Pe32Section.CommonHeader) - (UINTN) FvImage->FileImage;
       PeiCorePhysicalAddress += EntryPoint;
       DebugMsg (NULL, 0, 9, "PeiCore physical entry point address", "Address = 0x%llX", (unsigned long long) PeiCorePhysicalAddress);
 
@@ -1768,7 +1809,7 @@ Returns:
   }
 
   Status = GetPe32Info (
-            (VOID *) ((UINTN) Pe32Section.Pe32Section + sizeof (EFI_SECTION_PE32)),
+            (VOID *) ((UINTN) Pe32Section.Pe32Section + GetSectionHeaderLength(Pe32Section.CommonHeader)),
             &EntryPoint,
             &BaseOfCode,
             &MachineType
@@ -1789,7 +1830,7 @@ Returns:
   // Physical address is FV base + offset of PE32 + offset of the entry point
   //
   SecCorePhysicalAddress = FvInfo->BaseAddress;
-  SecCorePhysicalAddress += (UINTN) Pe32Section.Pe32Section + sizeof (EFI_SECTION_PE32) - (UINTN) FvImage->FileImage;
+  SecCorePhysicalAddress += (UINTN) Pe32Section.Pe32Section + GetSectionHeaderLength(Pe32Section.CommonHeader) - (UINTN) FvImage->FileImage;
   SecCorePhysicalAddress += EntryPoint;
   DebugMsg (NULL, 0, 9, "SecCore physical entry point address", "Address = 0x%llX", (unsigned long long) SecCorePhysicalAddress); 
 
@@ -1813,7 +1854,7 @@ Returns:
     }
   
     Status = GetPe32Info (
-              (VOID *) ((UINTN) Pe32Section.Pe32Section + sizeof (EFI_SECTION_PE32)),
+              (VOID *) ((UINTN) Pe32Section.Pe32Section + GetSectionHeaderLength(Pe32Section.CommonHeader)),
               &EntryPoint,
               &BaseOfCode,
               &MachineType
@@ -1827,7 +1868,7 @@ Returns:
     // Physical address is FV base + offset of PE32 + offset of the entry point
     //
     PeiCorePhysicalAddress = FvInfo->BaseAddress;
-    PeiCorePhysicalAddress += (UINTN) Pe32Section.Pe32Section + sizeof (EFI_SECTION_PE32) - (UINTN) FvImage->FileImage;
+    PeiCorePhysicalAddress += (UINTN) Pe32Section.Pe32Section + GetSectionHeaderLength(Pe32Section.CommonHeader) - (UINTN) FvImage->FileImage;
     PeiCorePhysicalAddress += EntryPoint;
     DebugMsg (NULL, 0, 9, "PeiCore physical entry point address", "Address = 0x%llX", (unsigned long long) PeiCorePhysicalAddress);
   }
@@ -2344,7 +2385,7 @@ Returns:
     //
     // Add FV Extended Header contents to the FV as a PAD file
     //
-    AddPadFile (&FvImageMemoryFile, 4, VtfFileImage, FvExtHeader);
+    AddPadFile (&FvImageMemoryFile, 4, VtfFileImage, FvExtHeader, 0);
 
     //
     // Fv Extension header change update Fv Header Check sum
@@ -2419,11 +2460,21 @@ Returns:
   //
   // Update FV Alignment attribute to the largest alignment of all the FFS files in the FV
   //
-  if ((((FvHeader->Attributes & EFI_FVB2_ALIGNMENT) >> 16)) < MaxFfsAlignment) {
+  if (((FvHeader->Attributes & EFI_FVB2_WEAK_ALIGNMENT) != EFI_FVB2_WEAK_ALIGNMENT) &&
+      (((FvHeader->Attributes & EFI_FVB2_ALIGNMENT) >> 16)) < MaxFfsAlignment) {
     FvHeader->Attributes = ((MaxFfsAlignment << 16) | (FvHeader->Attributes & 0xFFFF));
     //
     // Update Checksum for FvHeader
     //
+    FvHeader->Checksum      = 0;
+    FvHeader->Checksum      = CalculateChecksum16 ((UINT16 *) FvHeader, FvHeader->HeaderLength / sizeof (UINT16));
+  }
+
+  //
+  // If there are large FFS in FV, the file system GUID should set to system 3 GUID.
+  //
+  if (mIsLargeFfs && CompareGuid (&FvHeader->FileSystemGuid, &mEfiFirmwareFileSystem2Guid) == 0) {
+    memcpy (&FvHeader->FileSystemGuid, &mEfiFirmwareFileSystem3Guid, sizeof (EFI_GUID));
     FvHeader->Checksum      = 0;
     FvHeader->Checksum      = CalculateChecksum16 ((UINT16 *) FvHeader, FvHeader->HeaderLength / sizeof (UINT16));
   }
@@ -2564,6 +2615,7 @@ Returns:
   UINTN               FfsFileSize;
   UINTN               FvExtendHeaderSize;
   UINT32              FfsAlignment;
+  UINT32              FfsHeaderSize;
   EFI_FFS_FILE_HEADER FfsHeader;
   BOOLEAN             VtfFileFlag;
   UINTN               VtfFileSize;
@@ -2605,7 +2657,12 @@ Returns:
     }
     FvExtendHeaderSize = _filelength (fileno (fpin));
     fclose (fpin);
-    CurrentOffset += sizeof (EFI_FFS_FILE_HEADER) + FvExtendHeaderSize;
+    if (sizeof (EFI_FFS_FILE_HEADER) + FvExtendHeaderSize >= MAX_FFS_SIZE) {
+      CurrentOffset += sizeof (EFI_FFS_FILE_HEADER2) + FvExtendHeaderSize;
+      mIsLargeFfs = TRUE;
+    } else {
+      CurrentOffset += sizeof (EFI_FFS_FILE_HEADER) + FvExtendHeaderSize;
+    }
     CurrentOffset = (CurrentOffset + 7) & (~7);
   } else if (mFvDataInfo.FvNameGuidSet) {
     CurrentOffset += sizeof (EFI_FFS_FILE_HEADER) + sizeof (EFI_FIRMWARE_VOLUME_EXT_HEADER);
@@ -2629,6 +2686,12 @@ Returns:
     // Get the file size
     //
     FfsFileSize = _filelength (fileno (fpin));
+    if (FfsFileSize >= MAX_FFS_SIZE) {
+      FfsHeaderSize = sizeof(EFI_FFS_FILE_HEADER2);
+      mIsLargeFfs = TRUE;
+    } else {
+      FfsHeaderSize = sizeof(EFI_FFS_FILE_HEADER);
+    }
     //
     // Read Ffs File header
     //
@@ -2662,9 +2725,12 @@ Returns:
       //
       // Add Pad file
       //
-      if (((CurrentOffset + sizeof (EFI_FFS_FILE_HEADER)) % FfsAlignment) != 0) {
-        CurrentOffset = (CurrentOffset + sizeof (EFI_FFS_FILE_HEADER) * 2 + FfsAlignment - 1) & ~(FfsAlignment - 1);
-        CurrentOffset -= sizeof (EFI_FFS_FILE_HEADER);
+      if (((CurrentOffset + FfsHeaderSize) % FfsAlignment) != 0) {
+        //
+        // Only EFI_FFS_FILE_HEADER is needed for a pad section.
+        //
+        CurrentOffset = (CurrentOffset + FfsHeaderSize + sizeof(EFI_FFS_FILE_HEADER) + FfsAlignment - 1) & ~(FfsAlignment - 1);
+        CurrentOffset -= FfsHeaderSize;
       }
 	  }
 
@@ -2792,7 +2858,7 @@ Returns:
     if (EFI_ERROR (Status)) {
       break;
     }
-    SubFvImageHeader = (EFI_FIRMWARE_VOLUME_HEADER *) ((UINT8 *) SubFvSection.FVImageSection + sizeof (EFI_FIRMWARE_VOLUME_IMAGE_SECTION));
+    SubFvImageHeader = (EFI_FIRMWARE_VOLUME_HEADER *) ((UINT8 *) SubFvSection.FVImageSection + GetSectionHeaderLength(SubFvSection.FVImageSection));
     //
     // Rebase on Flash
     //
@@ -2854,6 +2920,8 @@ Returns:
   UINT8                                 *PeFileBuffer;
   UINT32                                PeFileSize;
   CHAR8                                 *PdbPointer;
+  UINT32                                FfsHeaderSize;
+  UINT32                                CurSecHdrSize;
 
   Index              = 0;  
   MemoryImagePointer = NULL;
@@ -2905,6 +2973,8 @@ Returns:
     default:
       return EFI_SUCCESS;
   }
+
+  FfsHeaderSize = GetFfsHeaderLength(FfsFile);
   //
   // Rebase each PE32 section
   //
@@ -2922,12 +2992,13 @@ Returns:
     if (EFI_ERROR (Status)) {
       break;
     }
+    CurSecHdrSize = GetSectionHeaderLength(CurrentPe32Section.CommonHeader);
 
     //
     // Initialize context
     //
     memset (&ImageContext, 0, sizeof (ImageContext));
-    ImageContext.Handle     = (VOID *) ((UINTN) CurrentPe32Section.Pe32Section + sizeof (EFI_PE32_SECTION));
+    ImageContext.Handle     = (VOID *) ((UINTN) CurrentPe32Section.Pe32Section + CurSecHdrSize);
     ImageContext.ImageRead  = (PE_COFF_LOADER_READ_FILE) FfsRebaseImageRead;
     Status                  = PeCoffLoaderGetImageInfo (&ImageContext);
     if (EFI_ERROR (Status)) {
@@ -2953,7 +3024,7 @@ Returns:
     //
     // Get PeHeader pointer
     //
-    ImgHdr = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)((UINTN) CurrentPe32Section.Pe32Section + sizeof (EFI_PE32_SECTION) + ImageContext.PeCoffHeaderOffset);
+    ImgHdr = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)((UINTN) CurrentPe32Section.Pe32Section + CurSecHdrSize + ImageContext.PeCoffHeaderOffset);
 
     //
     // Calculate the PE32 base address, based on file type
@@ -3030,7 +3101,7 @@ Returns:
           ImageContext.RelocationsStripped = FALSE;
         }
 
-        NewPe32BaseAddress = XipBase + (UINTN) CurrentPe32Section.Pe32Section + sizeof (EFI_PE32_SECTION) - (UINTN)FfsFile;
+        NewPe32BaseAddress = XipBase + (UINTN) CurrentPe32Section.Pe32Section + CurSecHdrSize - (UINTN)FfsFile;
         break;
 
       case EFI_FV_FILETYPE_DRIVER:
@@ -3045,7 +3116,7 @@ Returns:
           Error (NULL, 0, 3000, "Invalid", "Section-Alignment and File-Alignment do not match : %s.", FileName);
           return EFI_ABORTED;
         }
-        NewPe32BaseAddress = XipBase + (UINTN) CurrentPe32Section.Pe32Section + sizeof (EFI_PE32_SECTION) - (UINTN)FfsFile;
+        NewPe32BaseAddress = XipBase + (UINTN) CurrentPe32Section.Pe32Section + CurSecHdrSize - (UINTN)FfsFile;
         break;
 
       default:
@@ -3104,7 +3175,7 @@ Returns:
     
     for (Index = 0; Index < ImgHdr->Pe32.FileHeader.NumberOfSections; Index ++, SectionHeader ++) {
       CopyMem (
-        (UINT8 *) CurrentPe32Section.Pe32Section + sizeof (EFI_COMMON_SECTION_HEADER) + SectionHeader->PointerToRawData, 
+        (UINT8 *) CurrentPe32Section.Pe32Section + CurSecHdrSize + SectionHeader->PointerToRawData, 
         (VOID*) (UINTN) (ImageContext.ImageAddress + SectionHeader->VirtualAddress), 
         SectionHeader->SizeOfRawData
         );
@@ -3140,8 +3211,8 @@ Returns:
       FfsFile->IntegrityCheck.Checksum.File = 0;
       FfsFile->State                        = 0;
       FfsFile->IntegrityCheck.Checksum.File = CalculateChecksum8 (
-                                                (UINT8 *) (FfsFile + 1),
-                                                GetLength (FfsFile->Size) - sizeof (EFI_FFS_FILE_HEADER)
+                                                (UINT8 *) ((UINT8 *)FfsFile + FfsHeaderSize),
+                                                GetFfsFileLength (FfsFile) - FfsHeaderSize
                                                 );
       FfsFile->State = SavedState;
     }
@@ -3185,12 +3256,14 @@ Returns:
     if (EFI_ERROR (Status)) {
       break;
     }
+
+    CurSecHdrSize = GetSectionHeaderLength(CurrentPe32Section.CommonHeader);
     
     //
     // Calculate the TE base address, the FFS file base plus the offset of the TE section less the size stripped off
     // by GenTEImage
     //
-    TEImageHeader = (EFI_TE_IMAGE_HEADER *) ((UINT8 *) CurrentPe32Section.Pe32Section + sizeof (EFI_COMMON_SECTION_HEADER));
+    TEImageHeader = (EFI_TE_IMAGE_HEADER *) ((UINT8 *) CurrentPe32Section.Pe32Section + CurSecHdrSize);
 
     //
     // Initialize context, load image info.
@@ -3365,8 +3438,8 @@ Returns:
       FfsFile->IntegrityCheck.Checksum.File = 0;
       FfsFile->State                        = 0;
       FfsFile->IntegrityCheck.Checksum.File = CalculateChecksum8 (
-                                                (UINT8 *)(FfsFile + 1),
-                                                GetLength (FfsFile->Size) - sizeof (EFI_FFS_FILE_HEADER)
+                                                (UINT8 *)((UINT8 *)FfsFile + FfsHeaderSize),
+                                                GetFfsFileLength (FfsFile) - FfsHeaderSize
                                                 );
       FfsFile->State = SavedState;
     }
@@ -3436,12 +3509,12 @@ Returns:
     //
     // Get Pad file size.
     //
-    FileLength = (*(UINT32 *)(PadFile->Size)) & 0x00FFFFFF;
+    FileLength = GetFfsFileLength(PadFile);
     FileLength = (FileLength + EFI_FFS_FILE_HEADER_ALIGNMENT - 1) & ~(EFI_FFS_FILE_HEADER_ALIGNMENT - 1); 
     //
     // FixPoint must be align on 0x1000 relative to FvImage Header
     //
-    FixPoint = (UINT8*) PadFile + sizeof (EFI_FFS_FILE_HEADER);
+    FixPoint = (UINT8*) PadFile + GetFfsHeaderLength(PadFile);
     FixPoint = FixPoint + 0x1000 - (((UINTN) FixPoint - (UINTN) FvImage->FileImage) & 0xFFF);
     //
     // FixPoint be larger at the last place of one fv image.
@@ -3451,7 +3524,7 @@ Returns:
     }
     FixPoint -= 0x1000;
     
-    if ((UINTN) FixPoint < ((UINTN) PadFile + sizeof (EFI_FFS_FILE_HEADER))) {
+    if ((UINTN) FixPoint < ((UINTN) PadFile + GetFfsHeaderLength(PadFile))) {
       //
       // No alignment FixPoint in this Pad File.
       //
@@ -3554,6 +3627,19 @@ Returns:
       return EFI_ABORTED;
     }
     DebugMsg (NULL, 0, 9, "Capsule Flag", Value);
+  }
+
+  Status = FindToken (InfFile, OPTIONS_SECTION_STRING, EFI_OEM_CAPSULE_FLAGS_STRING, 0, Value);
+  if (Status == EFI_SUCCESS) {
+    Status = AsciiStringToUint64 (Value, FALSE, &Value64);
+    if (EFI_ERROR (Status) || Value64 > 0xffff) {
+      Error (NULL, 0, 2000, "Invalid parameter",
+        "invalid Flag setting for %s. Must be integer value between 0x0000 and 0xffff.",
+        EFI_OEM_CAPSULE_FLAGS_STRING);
+      return EFI_ABORTED;
+    }
+    CapInfo->Flags |= Value64;
+    DebugMsg (NULL, 0, 9, "Capsule Extend Flag", Value);
   }
 
   //

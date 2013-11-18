@@ -138,12 +138,14 @@ class VpdInfoFile:
             Pcds = self._VpdArray.keys()
             Pcds.sort()
             for Pcd in Pcds:
+                i = 0
                 for Offset in self._VpdArray[Pcd]:
-                    PcdValue = str(Pcd.SkuInfoList[Pcd.SkuInfoList.keys()[0]].DefaultValue).strip()
+                    PcdValue = str(Pcd.SkuInfoList[Pcd.SkuInfoList.keys()[i]].DefaultValue).strip()
                     if PcdValue == "" :
                         PcdValue  = Pcd.DefaultValue
                         
-                    fd.write("%s.%s|%s|%s|%s  \n" % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName, str(Offset).strip(), str(Pcd.MaxDatumSize).strip(),PcdValue))
+                    fd.write("%s.%s|%s|%s|%s|%s  \n" % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName, str(Pcd.SkuInfoList.keys()[i]),str(Offset).strip(), str(Pcd.MaxDatumSize).strip(),PcdValue))
+                    i += 1
         except:
             EdkLogger.error("VpdInfoFile",
                             BuildToolError.FILE_WRITE_FAILURE,
@@ -174,21 +176,22 @@ class VpdInfoFile:
             # the line must follow output format defined in BPDG spec.
             #
             try:
-                PcdName, Offset, Size, Value = Line.split("#")[0].split("|")
+                PcdName, SkuId,Offset, Size, Value = Line.split("#")[0].split("|")
+                PcdName, SkuId,Offset, Size, Value = PcdName.strip(), SkuId.strip(),Offset.strip(), Size.strip(), Value.strip()
                 TokenSpaceName, PcdTokenName = PcdName.split(".")
             except:
                 EdkLogger.error("BPDG", BuildToolError.PARSER_ERROR, "Fail to parse VPD information file %s" % FilePath)
             
             Found = False
+            
             for VpdObject in self._VpdArray.keys():
-                if VpdObject.TokenSpaceGuidCName == TokenSpaceName and VpdObject.TokenCName == PcdTokenName.strip():
-                    if self._VpdArray[VpdObject][0] == "*":
-                        if Offset == "*":
-                            EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, "The offset of %s has not been fixed up by third-party BPDG tool." % PcdName)
-                            
-                        self._VpdArray[VpdObject][0] = Offset
-                    Found = True
-                    break
+                for sku in VpdObject.SkuInfoList.keys(): 
+                    if VpdObject.TokenSpaceGuidCName == TokenSpaceName and VpdObject.TokenCName == PcdTokenName.strip() and sku == SkuId:
+                        if self._VpdArray[VpdObject][VpdObject.SkuInfoList.keys().index(sku)] == "*":
+                            if Offset == "*":
+                                EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, "The offset of %s has not been fixed up by third-party BPDG tool." % PcdName)                              
+                            self._VpdArray[VpdObject][VpdObject.SkuInfoList.keys().index(sku)] = Offset
+                        Found = True
             if not Found:
                 EdkLogger.error("BPDG", BuildToolError.PARSER_ERROR, "Can not find PCD defined in VPD guid file.")
                 

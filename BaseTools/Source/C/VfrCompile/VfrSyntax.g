@@ -136,6 +136,7 @@ VfrParserStart (
 #token MapTitle("maptitle")                     "maptitle"
 #token MapGuid("mapguid")                       "mapguid"
 #token Subtitle("subtitle")                     "subtitle"
+#token EndSubtitle("endsubtitle")               "endsubtitle"
 #token Help("help")                             "help"
 #token Text("text")                             "text"
 #token Option("option")                         "option"
@@ -1018,12 +1019,29 @@ vfrStatementVarStoreNameValue :
   <<
      EFI_GUID              Guid;
      CIfrVarStoreNameValue VSNVObj;
-     EFI_VARSTORE_ID       VarStoreId;
+     EFI_VARSTORE_ID       VarStoreId = EFI_VARSTORE_ID_INVALID;
+     BOOLEAN               Created    = FALSE;
   >>
   L:NameValueVarStore                               << VSNVObj.SetLineNo(L->getLine()); >>
-  SN:StringIdentifier ","                           << _PCATCH(mCVfrDataStorage.DeclareNameVarStoreBegin (SN->getText()), SN); >>
+  SN:StringIdentifier ","
+  {
+    VarId "=" ID:Number ","                         <<
+                                                       _PCATCH(
+                                                         (INTN)(VarStoreId = _STOU16(ID->getText())) != 0,
+                                                         (INTN)TRUE,
+                                                         ID,
+                                                         "varid 0 is not allowed."
+                                                         );
+                                                    >>
+  }
   (
-    Name "=" "STRING_TOKEN" "\(" N:Number "\)" ","  << _PCATCH(mCVfrDataStorage.NameTableAddItem (_STOSID(N->getText())), SN); >>
+    Name "=" "STRING_TOKEN" "\(" N:Number "\)" ","  << 
+                                                       if (!Created) {
+                                                         _PCATCH(mCVfrDataStorage.DeclareNameVarStoreBegin (SN->getText(), VarStoreId), SN);
+                                                         Created = TRUE;
+                                                       }
+                                                       _PCATCH(mCVfrDataStorage.NameTableAddItem (_STOSID(N->getText())), SN); 
+                                                    >>
   )+
   Uuid "=" guidDefinition[Guid]                     << _PCATCH(mCVfrDataStorage.DeclareNameVarStoreEnd (&Guid), SN); >>
                                                     <<
@@ -1628,8 +1646,14 @@ vfrStatementSubTitle :
   {
     "," FLAGS "=" vfrSubtitleFlags[SObj]
   }
-  { vfrStatementStatTagList "," }
-  E:";"                                                << CRT_END_OP (E); >>
+  (
+    {vfrStatementStatTagList "," }
+    E:";"                                               << CRT_END_OP (E); >>
+  |
+    { "," vfrStatementStatTagList}
+    { "," (vfrStatementStat | vfrStatementQuestions)*}
+    E: EndSubtitle ";"                                  << CRT_END_OP (E); >>
+  )
   ;
 
 vfrSubtitleFlags [CIfrSubtitle & SObj] :

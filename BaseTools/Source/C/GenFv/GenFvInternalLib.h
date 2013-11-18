@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -82,6 +82,7 @@ Abstract:
 #define EFI_CAPSULE_GUID_STRING           "EFI_CAPSULE_GUID"
 #define EFI_CAPSULE_HEADER_SIZE_STRING    "EFI_CAPSULE_HEADER_SIZE"
 #define EFI_CAPSULE_FLAGS_STRING          "EFI_CAPSULE_FLAGS"
+#define EFI_OEM_CAPSULE_FLAGS_STRING      "EFI_OEM_CAPSULE_FLAGS"
 #define EFI_CAPSULE_VERSION_STRING        "EFI_CAPSULE_VERSION"
 
 #define EFI_FV_TOTAL_SIZE_STRING    "EFI_FV_TOTAL_SIZE"
@@ -143,6 +144,8 @@ Abstract:
 #define EFI_FVB2_ALIGNMENT_512M_STRING    "EFI_FVB2_ALIGNMENT_512M"
 #define EFI_FVB2_ALIGNMENT_1G_STRING      "EFI_FVB2_ALIGNMENT_1G"  
 #define EFI_FVB2_ALIGNMENT_2G_STRING      "EFI_FVB2_ALIGNMENT_2G"  
+
+#define EFI_FV_WEAK_ALIGNMENT_STRING      "EFI_WEAK_ALIGNMENT"
 
 //
 // File sections
@@ -259,6 +262,7 @@ typedef struct {
 extern FV_INFO    mFvDataInfo;
 extern CAP_INFO   mCapDataInfo;
 extern EFI_GUID   mEfiFirmwareFileSystem2Guid;
+extern EFI_GUID   mEfiFirmwareFileSystem3Guid;
 extern UINT32     mFvTotalSize;
 extern UINT32     mFvTakenSize;
 

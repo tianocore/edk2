@@ -134,7 +134,7 @@ class ModuleTable(MetaFileTable):
     #
     # @retval:       A recordSet of all found records 
     #
-    def Query(self, Model, Arch=None, Platform=None):
+    def Query(self, Model, Arch=None, Platform=None, BelongsToItem=None):
         ConditionString = "Model=%s AND Enabled>=0" % Model
         ValueString = "Value1,Value2,Value3,Scope1,Scope2,ID,StartLine"
 
@@ -142,6 +142,8 @@ class ModuleTable(MetaFileTable):
             ConditionString += " AND (Scope1='%s' OR Scope1='COMMON')" % Arch
         if Platform != None and Platform != 'COMMON':
             ConditionString += " AND (Scope2='%s' OR Scope2='COMMON' OR Scope2='DEFAULT')" % Platform
+        if BelongsToItem != None:
+            ConditionString += " AND BelongsToItem=%s" % BelongsToItem
 
         SqlCommand = "SELECT %s FROM %s WHERE %s" % (ValueString, self.Table, ConditionString)
         return self.Exec(SqlCommand)

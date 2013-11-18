@@ -50,3 +50,22 @@ gWideStringPattern = re.compile('(\W|\A)L"')
 #
 gAutoGenPhase = False
 
+#
+# The Conf dir outside the workspace dir
+#
+gConfDirectory = ''
+
+#
+# The relative default database file path
+#
+gDatabasePath = ".cache/build.db"
+
+#
+# Build flag for binary build
+#
+gIgnoreSource = False
+
+#
+# FDF parser
+#
+gFdfParser = None

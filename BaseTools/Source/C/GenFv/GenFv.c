@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -42,6 +42,7 @@ Abstract:
 #define UTILITY_MINOR_VERSION 1
 
 EFI_GUID  mEfiFirmwareFileSystem2Guid = EFI_FIRMWARE_FILE_SYSTEM2_GUID;
+EFI_GUID  mEfiFirmwareFileSystem3Guid = EFI_FIRMWARE_FILE_SYSTEM3_GUID;
 
 STATIC
 VOID 
@@ -96,7 +97,7 @@ Returns:
   //
   // Copyright declaration
   // 
-  fprintf (stdout, "Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.\n\n");
+  fprintf (stdout, "Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.\n\n");
 
   //
   // Details Option
@@ -143,6 +144,8 @@ Returns:
                         Its format is xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\n");
   fprintf (stdout, "  --capflag CapFlag     Capsule Reset Flag can be PersistAcrossReset,\n\
                         or PopulateSystemTable or InitiateReset or not set\n");
+  fprintf (stdout, "  --capoemflag CapOEMFlag\n\
+                        Capsule OEM Flag is an integer between 0x0000 and 0xffff\n");
   fprintf (stdout, "  --capheadsize HeadSize\n\
                         HeadSize is one HEX or DEC format value\n\
                         HeadSize is required by Capsule Image.\n");                        
@@ -437,6 +440,22 @@ Returns:
       argc -= 2;
       argv += 2;
       continue; 
+    }
+
+    if (stricmp (argv[0], "--capoemflag") == 0) {
+      if (argv[1] == NULL) {
+        Error (NULL, 0, 1003, "Invalid option value", "Capsule OEM flag can't be null");
+      }
+      Status = AsciiStringToUint64(argv[1], FALSE, &TempNumber);
+      if (EFI_ERROR (Status) || TempNumber > 0xffff) {
+        Error (NULL, 0, 1003, "Invalid option value", "Capsule OEM flag value must be integer value between 0x0000 and 0xffff");
+        return STATUS_ERROR;
+      }
+      mCapDataInfo.Flags |= TempNumber;
+      DebugMsg( NULL, 0, 9, "Capsule OEM Flags", argv[1]);
+      argc -= 2;
+      argv += 2;
+      continue;
     }
 
     if (stricmp (argv[0], "--capguid") == 0) {

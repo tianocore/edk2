@@ -72,7 +72,7 @@ def PatchBinaryFile(FileName, ValueOffset, TypeName, ValueString, MaxSize=0):
     elif TypeName == 'VOID*':
         if MaxSize == 0:
             return OPTION_MISSING, "PcdMaxSize is not specified for VOID* type PCD."
-        ValueLength = MaxSize
+        ValueLength = int(MaxSize)
     else:
         return PARAMETER_INVALID,  "PCD type %s is not valid." %(CommandOptions.PcdTypeName)
     #
@@ -97,6 +97,7 @@ def PatchBinaryFile(FileName, ValueOffset, TypeName, ValueString, MaxSize=0):
     #
     # Patch value into offset
     #
+    SavedStr = ValueString
     ValueString = ValueString.upper()
     ValueNumber = 0
     if TypeName == 'BOOLEAN':
@@ -109,9 +110,9 @@ def PatchBinaryFile(FileName, ValueOffset, TypeName, ValueString, MaxSize=0):
             elif ValueString == 'FALSE':
                 ValueNumber = 0
             elif ValueString.startswith('0X'):
-                ValueNumber = int (Value, 16)
+                ValueNumber = int (ValueString, 16)
             else:
-                ValueNumber = int (Value)
+                ValueNumber = int (ValueString)
             if ValueNumber != 0:
                 ValueNumber = 1
         except:
@@ -138,12 +139,13 @@ def PatchBinaryFile(FileName, ValueOffset, TypeName, ValueString, MaxSize=0):
             ByteList[ValueOffset + Index] = ValueNumber % 0x100
             ValueNumber = ValueNumber / 0x100
     elif TypeName == 'VOID*':
-        if ValueString.startswith("L "):
+        ValueString = SavedStr
+        if ValueString.startswith('L"'):
             #
             # Patch Unicode String
             #
             Index = 0
-            for ByteString in ValueString[2:]:
+            for ByteString in ValueString[2:-1]:
                 #
                 # Reserve zero as unicode tail
                 #
@@ -177,7 +179,7 @@ def PatchBinaryFile(FileName, ValueOffset, TypeName, ValueString, MaxSize=0):
             # Patch ascii string 
             #
             Index = 0
-            for ByteString in ValueString:
+            for ByteString in ValueString[1:-1]:
                 #
                 # Reserve zero as string tail
                 #

@@ -287,7 +287,7 @@ class MetaFileParser(object):
             if self._SectionName in self.DataType:
                 self._SectionType = self.DataType[self._SectionName]
                 # Check if the section name is valid
-                if self._SectionName not in SECTIONS_HAVE_ITEM_AFTER_ARCH and len(ItemList) > 2:
+                if self._SectionName not in SECTIONS_HAVE_ITEM_AFTER_ARCH and len(ItemList) > 3:
                     EdkLogger.error("Parser", FORMAT_UNKNOWN_ERROR, "%s is not a valid section name" % Item,
                                     self.MetaFile, self._LineIndex + 1, self._CurrentLine)
             elif self._Version >= 0x00010005:
@@ -495,14 +495,18 @@ class InfParser(MetaFileParser):
 
         # parse the file line by line
         IsFindBlockComment = False
+        GetHeaderComment = False
+        Comments = []
 
         for Index in range(0, len(Content)):
             # skip empty, commented, block commented lines
-            Line = CleanString(Content[Index], AllowCppStyleComment=True)
+            Line, Comment = CleanString2(Content[Index], AllowCppStyleComment=True)
             NextLine = ''
             if Index + 1 < len(Content):
-                NextLine = CleanString(Content[Index + 1])
+                NextLine, NextComment = CleanString2(Content[Index + 1])
             if Line == '':
+                if Comment:
+                    Comments.append((Comment, Index + 1))
                 continue
             if Line.find(DataType.TAB_COMMENT_EDK_START) > -1:
                 IsFindBlockComment = True
@@ -518,6 +522,12 @@ class InfParser(MetaFileParser):
 
             # section header
             if Line[0] == TAB_SECTION_START and Line[-1] == TAB_SECTION_END:
+                if not GetHeaderComment:
+                    for Cmt, LNo in Comments:
+                        self._Store(MODEL_META_DATA_HEADER_COMMENT, Cmt, '', '', 'COMMON',
+                                    'COMMON', self._Owner[-1], LNo, -1, LNo, -1, 0)
+                    GetHeaderComment = True
+                Comments = []
                 self._SectionHeaderParser()
                 # Check invalid sections
                 if self._Version < 0x00010005:
@@ -566,13 +576,16 @@ class InfParser(MetaFileParser):
             self._SectionParser[self._SectionType](self)
             if self._ValueList == None or self._ItemType == MODEL_META_DATA_DEFINE:
                 self._ItemType = -1
+                Comments = []
                 continue
+            if Comment:
+                Comments.append((Comment, Index + 1))
             #
             # Model, Value1, Value2, Value3, Arch, Platform, BelongsToItem=-1,
             # LineBegin=-1, ColumnBegin=-1, LineEnd=-1, ColumnEnd=-1, Enabled=-1
             #
             for Arch, Platform in self._Scope:
-                self._Store(self._SectionType,
+                LastItem = self._Store(self._SectionType,
                             self._ValueList[0],
                             self._ValueList[1],
                             self._ValueList[2],
@@ -585,6 +598,10 @@ class InfParser(MetaFileParser):
                             - 1,
                             0
                             )
+                for Comment, LineNo in Comments:
+                    self._Store(MODEL_META_DATA_COMMENT, Comment, '', '', Arch, Platform,
+                                LastItem, LineNo, -1, LineNo, -1, 0)
+            Comments = []
         if IsFindBlockComment:
             EdkLogger.error("Parser", FORMAT_INVALID, "Open block comments (starting with /*) are expected to end with */",
                             File=self.MetaFile)
@@ -770,6 +787,7 @@ class DscParser(MetaFileParser):
         "PLATFORM_GUID",
         "PLATFORM_VERSION",
         "SKUID_IDENTIFIER",
+        "PCD_INFO_GENERATION",
         "SUPPORTED_ARCHITECTURES",
         "BUILD_TARGETS",
         "OUTPUT_DIRECTORY",

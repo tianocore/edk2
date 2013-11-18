@@ -1,7 +1,7 @@
 ## @file
 # parse FDF file
 #
-#  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -1423,7 +1423,15 @@ class FdfParser:
         if not Status:
             raise Warning("FD name error", self.FileName, self.CurrentLineNumber)
 
-        self.__GetTokenStatements(FdObj)
+        while self.__GetTokenStatements(FdObj):
+            pass
+        for Attr in ("BaseAddress", "Size", "ErasePolarity"):
+            if getattr(FdObj, Attr) == None:
+                self.__GetNextToken()
+                raise Warning("Keyword %s missing" % Attr, self.FileName, self.CurrentLineNumber)
+
+        if not FdObj.BlockSizeList:
+            FdObj.BlockSizeList.append((1, FdObj.Size, None))
 
         self.__GetDefineStatements(FdObj)
 
@@ -1480,58 +1488,54 @@ class FdfParser:
     #   @param  Obj         for whom token statement is got
     #
     def __GetTokenStatements(self, Obj):
-        if not self.__IsKeyword( "BaseAddress"):
-            raise Warning("BaseAddress missing", self.FileName, self.CurrentLineNumber)
+        if self.__IsKeyword( "BaseAddress"):
+            if not self.__IsToken( "="):
+                raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+    
+            if not self.__GetNextHexNumber():
+                raise Warning("expected Hex base address", self.FileName, self.CurrentLineNumber)
+    
+            Obj.BaseAddress = self.__Token
+    
+            if self.__IsToken( "|"):
+                pcdPair = self.__GetNextPcdName()
+                Obj.BaseAddressPcd = pcdPair
+                self.Profile.PcdDict[pcdPair] = Obj.BaseAddress
+                FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
+                self.Profile.PcdFileLineDict[pcdPair] = FileLineTuple
+            return True
 
-        if not self.__IsToken( "="):
-            raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+        if self.__IsKeyword( "Size"):
+            if not self.__IsToken( "="):
+                raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+    
+            if not self.__GetNextHexNumber():
+                raise Warning("expected Hex size", self.FileName, self.CurrentLineNumber)
 
-        if not self.__GetNextHexNumber():
-            raise Warning("expected Hex base address", self.FileName, self.CurrentLineNumber)
+            Size = self.__Token
+            if self.__IsToken( "|"):
+                pcdPair = self.__GetNextPcdName()
+                Obj.SizePcd = pcdPair
+                self.Profile.PcdDict[pcdPair] = Size
+                FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
+                self.Profile.PcdFileLineDict[pcdPair] = FileLineTuple
+            Obj.Size = long(Size, 0)
+            return True
 
-        Obj.BaseAddress = self.__Token
+        if self.__IsKeyword( "ErasePolarity"):
+            if not self.__IsToken( "="):
+                raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+    
+            if not self.__GetNextToken():
+                raise Warning("expected Erase Polarity", self.FileName, self.CurrentLineNumber)
+    
+            if self.__Token != "1" and self.__Token != "0":
+                raise Warning("expected 1 or 0 Erase Polarity", self.FileName, self.CurrentLineNumber)
+    
+            Obj.ErasePolarity = self.__Token
+            return True
 
-        if self.__IsToken( "|"):
-            pcdPair = self.__GetNextPcdName()
-            Obj.BaseAddressPcd = pcdPair
-            self.Profile.PcdDict[pcdPair] = Obj.BaseAddress
-            FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
-            self.Profile.PcdFileLineDict[pcdPair] = FileLineTuple
-
-        if not self.__IsKeyword( "Size"):
-            raise Warning("Size missing", self.FileName, self.CurrentLineNumber)
-
-        if not self.__IsToken( "="):
-            raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
-
-        if not self.__GetNextHexNumber():
-            raise Warning("expected Hex size", self.FileName, self.CurrentLineNumber)
-
-
-        Size = self.__Token
-        if self.__IsToken( "|"):
-            pcdPair = self.__GetNextPcdName()
-            Obj.SizePcd = pcdPair
-            self.Profile.PcdDict[pcdPair] = Size
-            FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
-            self.Profile.PcdFileLineDict[pcdPair] = FileLineTuple
-        Obj.Size = long(Size, 0)
-
-        if not self.__IsKeyword( "ErasePolarity"):
-            raise Warning("ErasePolarity missing", self.FileName, self.CurrentLineNumber)
-
-        if not self.__IsToken( "="):
-            raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
-
-        if not self.__GetNextToken():
-            raise Warning("expected Erase Polarity", self.FileName, self.CurrentLineNumber)
-
-        if self.__Token != "1" and self.__Token != "0":
-            raise Warning("expected 1 or 0 Erase Polarity", self.FileName, self.CurrentLineNumber)
-
-        Obj.ErasePolarity = self.__Token
-
-        self.__GetBlockStatements(Obj)
+        return self.__GetBlockStatements(Obj)
 
     ## __GetAddressStatements() method
     #
@@ -1572,18 +1576,14 @@ class FdfParser:
     #   @param  Obj         for whom block statement is got
     #
     def __GetBlockStatements(self, Obj):
-
-        if not self.__GetBlockStatement(Obj):
-            #set default block size is 1
-            Obj.BlockSizeList.append((1, Obj.Size, None))
-            return
-
+        IsBlock = False
         while self.__GetBlockStatement(Obj):
-            pass
+            IsBlock = True
         
-        for Item in Obj.BlockSizeList:
+            Item = Obj.BlockSizeList[-1]
             if Item[0] == None or Item[1] == None:
                 raise Warning("expected block statement", self.FileName, self.CurrentLineNumber)
+        return IsBlock
 
     ## __GetBlockStatement() method
     #
@@ -2038,27 +2038,16 @@ class FdfParser:
 
         self.__GetAddressStatements(FvObj)
 
-        while self.__GetBlockStatement(FvObj):
-            pass
-
-        self.__GetSetStatements(FvObj)
-        
-        self.__GetFvBaseAddress(FvObj)
-        
-        self.__GetFvForceRebase(FvObj)
-
-        self.__GetFvAlignment(FvObj)
-
-        self.__GetFvAttributes(FvObj)
-        
-        self.__GetFvNameGuid(FvObj)
-
         FvObj.FvExtEntryTypeValue = []
         FvObj.FvExtEntryType = []
         FvObj.FvExtEntryData = []
         while True:
-            isFvExtEntry = self.__GetFvExtEntryStatement(FvObj)
-            if not isFvExtEntry:
+            self.__GetSetStatements(FvObj)
+
+            if not (self.__GetBlockStatement(FvObj) or self.__GetFvBaseAddress(FvObj) or 
+                self.__GetFvForceRebase(FvObj) or self.__GetFvAlignment(FvObj) or 
+                self.__GetFvAttributes(FvObj) or self.__GetFvNameGuid(FvObj) or 
+                self.__GetFvExtEntryStatement(FvObj)):
                 break
 
         self.__GetAprioriSection(FvObj, FvObj.DefineVarDict.copy())
@@ -2177,9 +2166,9 @@ class FdfParser:
                            "WRITE_DISABLED_CAP", "WRITE_STATUS", "READ_ENABLED_CAP", \
                            "READ_DISABLED_CAP", "READ_STATUS", "READ_LOCK_CAP", \
                            "READ_LOCK_STATUS", "WRITE_LOCK_CAP", "WRITE_LOCK_STATUS", \
-                           "WRITE_POLICY_RELIABLE"):
+                           "WRITE_POLICY_RELIABLE", "WEAK_ALIGNMENT"):
                 self.__UndoToken()
-                return
+                return False
 
             if not self.__IsToken( "="):
                 raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
@@ -2189,7 +2178,7 @@ class FdfParser:
 
             FvObj.FvAttributeDict[name] = self.__Token
 
-        return
+        return True
     
     ## __GetFvNameGuid() method
     #
@@ -2202,7 +2191,7 @@ class FdfParser:
     def __GetFvNameGuid(self, FvObj):
 
         if not self.__IsKeyword( "FvNameGuid"):
-            return
+            return False
 
         if not self.__IsToken( "="):
             raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
@@ -2212,7 +2201,7 @@ class FdfParser:
 
         FvObj.FvNameGuid = self.__Token
 
-        return
+        return True
 
     def __GetFvExtEntryStatement(self, FvObj):
 
@@ -3058,7 +3047,7 @@ class FdfParser:
     def __GetCapsuleTokens(self, Obj):
         if not self.__GetNextToken():
             return False
-        while self.__Token in ("CAPSULE_GUID", "CAPSULE_HEADER_SIZE", "CAPSULE_FLAGS"):
+        while self.__Token in ("CAPSULE_GUID", "CAPSULE_HEADER_SIZE", "CAPSULE_FLAGS", "OEM_CAPSULE_FLAGS"):
             Name = self.__Token.strip()
             if not self.__IsToken("="):
                 raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
@@ -3075,6 +3064,15 @@ class FdfParser:
                     if not self.__Token in ("PersistAcrossReset", "PopulateSystemTable", "InitiateReset"):
                         raise Warning("expected PersistAcrossReset, PopulateSystemTable, or InitiateReset", self.FileName, self.CurrentLineNumber)
                     Value += self.__Token.strip()
+            elif Name == 'OEM_CAPSULE_FLAGS':
+                Value = self.__Token.strip()
+                try:
+                    Value = int(Value, 0)
+                except ValueError:
+                    raise Warning("expected integer value between 0x0000 and 0xFFFF", self.FileName, self.CurrentLineNumber)
+                if not 0x0000 <= Value <= 0xFFFF:
+                    raise Warning("expected integer value between 0x0000 and 0xFFFF", self.FileName, self.CurrentLineNumber)
+                Value = self.__Token.strip()
             else:
                 Value = self.__Token.strip()
             Obj.TokensDict[Name] = Value  
