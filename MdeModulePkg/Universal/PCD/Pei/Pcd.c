@@ -1,7 +1,7 @@
 /** @file 
   All Pcd Ppi services are implemented here.
   
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -116,7 +116,7 @@ PcdPeimInit (
 {
   EFI_STATUS Status;
   
-  BuildPcdDatabase ();
+  BuildPcdDatabase (FileHandle);
 
   //
   // Install PCD_PPI and EFI_PEI_PCD_PPI.
@@ -155,7 +155,7 @@ PeiPcdSetSku (
   )
 {
 
-  GetPcdDatabase()->Init.SystemSkuId = (SKU_ID) SkuId;
+  GetPcdDatabase()->SystemSkuId = (SKU_ID) SkuId;
 
   return;
 }
@@ -304,8 +304,10 @@ PeiPcdGetSize (
   PEI_PCD_DATABASE    *PeiPcdDb;
   UINTN               Size;
   UINTN               MaxSize;
+  UINT32              LocalTokenCount;
 
-  PeiPcdDb = GetPcdDatabase ();
+  PeiPcdDb        = GetPcdDatabase ();
+  LocalTokenCount = PeiPcdDb->LocalTokenCount;
   //
   // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
   // We have to decrement TokenNumber by 1 to make it usable
@@ -316,9 +318,9 @@ PeiPcdGetSize (
   // EBC compiler is very choosy. It may report warning about comparison
   // between UINTN and 0 . So we add 1 in each size of the 
   // comparison.
-  ASSERT (TokenNumber + 1 < PEI_LOCAL_TOKEN_NUMBER + 1);
+  ASSERT (TokenNumber + 1 < (LocalTokenCount + 1));
 
-  Size = (PeiPcdDb->Init.LocalTokenNumberTable[TokenNumber] & PCD_DATUM_TYPE_ALL_SET) >> PCD_DATUM_TYPE_SHIFT;
+  Size = (*((UINT32 *)((UINT8 *)PeiPcdDb + PeiPcdDb->LocalTokenNumberTableOffset) + TokenNumber) & PCD_DATUM_TYPE_ALL_SET) >> PCD_DATUM_TYPE_SHIFT;
 
   if (Size == 0) {
     //
@@ -926,10 +928,8 @@ PcdUnRegisterCallBackOnSet (
                                is being made to retrieve tokens from the default token space.
   @param[in, out]  TokenNumber A pointer to the PCD token number to use to find the subsequent token number.
                    
-  @retval EFI_SUCCESS   The PCD service has retrieved the next valid token number. 
-                        Or the input token number is already the last valid token number in the PCD database. 
-                        In the later case, *TokenNumber is updated with the value of 0.
-  @retval EFI_NOT_FOUND If this input token number and token namespace does not exist on the platform.
+  @retval EFI_SUCCESS   The PCD service has retrieved the next valid token number.
+  @retval EFI_NOT_FOUND The PCD service could not find data from the requested token number.
 
 **/
 EFI_STATUS
@@ -942,55 +942,56 @@ PeiPcdGetNextToken (
   UINTN               GuidTableIdx;
   PEI_PCD_DATABASE    *PeiPcdDb;
   EFI_GUID            *MatchGuid;
+  EFI_GUID            *GuidTable;
   DYNAMICEX_MAPPING   *ExMapTable;
   UINTN               Index;
   BOOLEAN             Found;
   BOOLEAN             PeiExMapTableEmpty;
+  UINTN               PeiNexTokenNumber; 
 
   if (!FeaturePcdGet (PcdPeiFullPcdDatabaseEnable)) {
     return EFI_UNSUPPORTED;
   }
 
-  PeiExMapTableEmpty = PEI_EXMAP_TABLE_EMPTY;
+  PeiPcdDb          = GetPcdDatabase ();
+  PeiNexTokenNumber = PeiPcdDb->LocalTokenCount - PeiPcdDb->ExTokenCount;
+  GuidTable         = (EFI_GUID *)((UINT8 *)PeiPcdDb + PeiPcdDb->GuidTableOffset);
 
+  if (PeiPcdDb->ExTokenCount == 0) {
+    PeiExMapTableEmpty = TRUE;
+  } else {
+    PeiExMapTableEmpty = FALSE;
+  }
   if (Guid == NULL) {
-    if (*TokenNumber > PEI_NEX_TOKEN_NUMBER) {
+    if (*TokenNumber > PeiNexTokenNumber) {
       return EFI_NOT_FOUND;
     }
     (*TokenNumber)++;
-    if (*TokenNumber > PEI_NEX_TOKEN_NUMBER) {
+    if (*TokenNumber > PeiNexTokenNumber) {
       *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
+      return EFI_NOT_FOUND;
     }
     return EFI_SUCCESS;
   } else {
     if (PeiExMapTableEmpty) {
-      *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
-      return EFI_SUCCESS;
-    }
-    
-    //
-    // Assume PCD Database AutoGen tool is sorting the ExMap based on the following order
-    // 1) ExGuid
-    // 2) ExTokenNumber
-    //
-    PeiPcdDb = GetPcdDatabase ();
-    
-    MatchGuid = ScanGuid (PeiPcdDb->Init.GuidTable, sizeof(PeiPcdDb->Init.GuidTable), Guid);
-
-    if (MatchGuid == NULL) {
-      *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
       return EFI_NOT_FOUND;
     }
 
-    GuidTableIdx = MatchGuid - PeiPcdDb->Init.GuidTable;
+    MatchGuid = ScanGuid (GuidTable, PeiPcdDb->GuidTableCount * sizeof(EFI_GUID), Guid);
 
-    ExMapTable = PeiPcdDb->Init.ExMapTable;
+    if (MatchGuid == NULL) {
+      return EFI_NOT_FOUND;
+    }
+
+    GuidTableIdx = MatchGuid - GuidTable;
+
+    ExMapTable = (DYNAMICEX_MAPPING *)((UINT8 *)PeiPcdDb + PeiPcdDb->ExMapTableOffset);
 
     Found = FALSE;
     //
     // Locate the GUID in ExMapTable first.
     //
-    for (Index = 0; Index < PEI_EXMAPPING_TABLE_SIZE; Index++) {
+    for (Index = 0; Index < PeiPcdDb->ExTokenCount; Index++) {
       if (ExMapTable[Index].ExGuidIndex == GuidTableIdx) {
         Found = TRUE;
         break;
@@ -1003,26 +1004,28 @@ PeiPcdGetNextToken (
          return EFI_SUCCESS;
       }
 
-      for ( ; Index < PEI_EXMAPPING_TABLE_SIZE; Index++) {
+      for ( ; Index < PeiPcdDb->ExTokenCount; Index++) {
         if (ExMapTable[Index].ExTokenNumber == *TokenNumber) {
-          Index++;
-          if (Index == PEI_EXMAPPING_TABLE_SIZE) {
-            //
-            // Exceed the length of ExMap Table
-            //
-            *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
-            return EFI_SUCCESS;
-          }
-          if (ExMapTable[Index].ExGuidIndex == GuidTableIdx) {
-            *TokenNumber = ExMapTable[Index].ExTokenNumber;
-            return EFI_SUCCESS;
-          } else {
-            *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
-            return EFI_SUCCESS;
-          }
+          break;
         }
       }
-      return EFI_NOT_FOUND;
+
+      while (Index < PeiPcdDb->ExTokenCount) {
+        Index++;
+        if (Index == PeiPcdDb->ExTokenCount) {
+          //
+          // Exceed the length of ExMap Table
+          //
+          *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
+          return EFI_NOT_FOUND;
+        } else if (ExMapTable[Index].ExGuidIndex == GuidTableIdx) {
+          //
+          // Found the next match
+          //
+          *TokenNumber = ExMapTable[Index].ExTokenNumber;
+          return EFI_SUCCESS;
+        }
+      }
     }
   }
 
@@ -1032,22 +1035,17 @@ PeiPcdGetNextToken (
 /**
   Retrieves the next valid PCD token namespace for a given namespace.
 
-  @param[in, out]  Guid An indirect pointer to EFI_GUID.  On input it designates 
-                    a known token namespace from which the search will start. On output, 
-                    it designates the next valid token namespace on the platform. If the input 
-                    token namespace does not exist on the platform, an error is returned and 
-                    the value of *Guid is undefined. If *Guid is NULL, then the GUID of the 
-                    first token space of the current platform is assigned to *Guid the function 
-                    return EFI_SUCCESS. If  *Guid is NULL  and there is no namespace exist in 
-                    the platform other than the default (NULL) tokennamespace, *Guid is unchanged 
-                    and the function return EFI_SUCCESS. If this input token namespace is the last 
-                    namespace on the platform, *Guid will be assigned to NULL and the function return 
-                    EFI_SUCCESS. 
+  Gets the next valid token namespace for a given namespace. This is useful to traverse the valid
+  token namespaces on a platform.
 
-  @retval EFI_SUCCESS  The PCD service retrieved the next valid token space Guid. 
-                        Or the input token space Guid is already the last valid token space Guid 
-                        in the PCD database. In the later case, *Guid is updated with the value of NULL.
-  @retval EFI_NOT_FOUND If the input token namespace does not exist on the platform.
+  @param[in, out]   Guid    An indirect pointer to EFI_GUID. On input it designates a known token
+                            namespace from which the search will start. On output, it designates the next valid
+                            token namespace on the platform. If *Guid is NULL, then the GUID of the first token
+                            space of the current platform is returned. If the search cannot locate the next valid
+                            token namespace, an error is returned and the value of *Guid is undefined.
+ 
+  @retval  EFI_SUCCESS      The PCD service retrieved the value requested.
+  @retval  EFI_NOT_FOUND    The PCD service could not find the next valid token namespace.
 
 **/
 EFI_STATUS
@@ -1061,8 +1059,10 @@ PeiPcdGetNextTokenSpace (
   PEI_PCD_DATABASE    *PeiPcdDb;
   DYNAMICEX_MAPPING   *ExMapTable;
   UINTN               Index;
+  UINTN               Index2;
   BOOLEAN             Found;
   BOOLEAN             PeiExMapTableEmpty;
+  EFI_GUID            *GuidTable;
 
   if (!FeaturePcdGet (PcdPeiFullPcdDatabaseEnable)) {
     return EFI_UNSUPPORTED;
@@ -1070,43 +1070,39 @@ PeiPcdGetNextTokenSpace (
 
   ASSERT (Guid != NULL);
 
-  PeiExMapTableEmpty = PEI_EXMAP_TABLE_EMPTY;
-
-  if (PeiExMapTableEmpty) {
-    if (*Guid != NULL) {
-      return EFI_NOT_FOUND;
-    } else {
-      return EFI_SUCCESS;
-    }
-  }
-
-  //
-  // Assume PCD Database AutoGen tool is sorting the ExMap based on the following order
-  // 1) ExGuid
-  // 2) ExTokenNumber
-  //
   PeiPcdDb = GetPcdDatabase ();
 
-  ExMapTable = PeiPcdDb->Init.ExMapTable;
+  if (PeiPcdDb->ExTokenCount == 0) {
+    PeiExMapTableEmpty = TRUE;
+  } else {
+    PeiExMapTableEmpty = FALSE;
+  }
+  
+  if (PeiExMapTableEmpty) {
+    return EFI_NOT_FOUND;
+  }
 
+  ExMapTable = (DYNAMICEX_MAPPING *)((UINT8 *)PeiPcdDb + PeiPcdDb->ExMapTableOffset);
+  GuidTable  = (EFI_GUID *)((UINT8 *)PeiPcdDb + PeiPcdDb->GuidTableOffset);
+  
   if (*Guid == NULL) {
     //
     // return the first Token Space Guid.
     //
-    *Guid = &PeiPcdDb->Init.GuidTable[ExMapTable[0].ExGuidIndex];
+    *Guid = GuidTable + ExMapTable[0].ExGuidIndex;
     return EFI_SUCCESS;
   }
 
-  MatchGuid = ScanGuid (PeiPcdDb->Init.GuidTable, sizeof(PeiPcdDb->Init.GuidTable), *Guid);
+  MatchGuid = ScanGuid (GuidTable, PeiPcdDb->GuidTableCount * sizeof(GuidTable[0]), *Guid);
 
   if (MatchGuid == NULL) {
     return EFI_NOT_FOUND;
   }
   
-  GuidTableIdx = MatchGuid - PeiPcdDb->Init.GuidTable;
+  GuidTableIdx = MatchGuid - GuidTable;
 
   Found = FALSE;
-  for (Index = 0; Index < PEI_EXMAPPING_TABLE_SIZE; Index++) {
+  for (Index = 0; Index < PeiPcdDb->ExTokenCount; Index++) {
     if (ExMapTable[Index].ExGuidIndex == GuidTableIdx) {
       Found = TRUE;
       break;
@@ -1115,14 +1111,25 @@ PeiPcdGetNextTokenSpace (
 
   if (Found) {
     Index++;
-    for ( ; Index < PEI_EXMAPPING_TABLE_SIZE; Index++ ) {
-      if (ExMapTable[Index].ExGuidIndex != GuidTableIdx ) {
-        *Guid = &PeiPcdDb->Init.GuidTable[ExMapTable[Index].ExGuidIndex];
-        return EFI_SUCCESS;
+    for ( ; Index < PeiPcdDb->ExTokenCount; Index++ ) {
+      if (ExMapTable[Index].ExGuidIndex != GuidTableIdx) {
+        Found = FALSE;
+        for (Index2 = 0 ; Index2 < Index; Index2++) {
+          if (ExMapTable[Index2].ExGuidIndex == ExMapTable[Index].ExGuidIndex) {
+            //
+            // This token namespace should have been found and output at preceding getting.
+            //
+            Found = TRUE;
+            break;
+          }
+        }
+        if (!Found) {
+          *Guid = (EFI_GUID *)((UINT8 *)PeiPcdDb + PeiPcdDb->GuidTableOffset) + ExMapTable[Index].ExGuidIndex;
+          return EFI_SUCCESS;
+        }
       }
     }
     *Guid = NULL;
-    return EFI_SUCCESS;
   }
 
   return EFI_NOT_FOUND;
@@ -1132,7 +1139,7 @@ PeiPcdGetNextTokenSpace (
 /**
   Get PCD value's size for POINTER type PCD.
   
-  The POINTER type PCD's value will be stored into a buffer in specificed size.
+  The POINTER type PCD's value will be stored into a buffer in specified size.
   The max size of this PCD's value is described in PCD's definition in DEC file.
 
   @param LocalTokenNumberTableIdx Index of PCD token number in PCD token table
@@ -1157,11 +1164,11 @@ GetPtrTypeSize (
 
   SizeTableIdx = GetSizeTableIndex (LocalTokenNumberTableIdx, Database);
 
-  LocalTokenNumber = Database->Init.LocalTokenNumberTable[LocalTokenNumberTableIdx];
+  LocalTokenNumber = *((UINT32 *)((UINT8 *)Database + Database->LocalTokenNumberTableOffset) + LocalTokenNumberTableIdx);
 
   ASSERT ((LocalTokenNumber & PCD_DATUM_TYPE_ALL_SET) == PCD_DATUM_TYPE_POINTER);
   
-  SizeTable = Database->Init.SizeTable;
+  SizeTable = (SIZE_INFO *)((UINT8 *)Database + Database->SizeTableOffset);
 
   *MaxSize = SizeTable[SizeTableIdx];
   //
@@ -1170,8 +1177,9 @@ GetPtrTypeSize (
   //
   if ((LocalTokenNumber & PCD_TYPE_VPD) != 0) {
       //
-      // We have only one entry for VPD enabled PCD entry:
+      // We have only two entry for VPD enabled PCD entry:
       // 1) MAX Size.
+      // 2) Current Size
       // We consider current size is equal to MAX size.
       //
       return *MaxSize;
@@ -1191,7 +1199,7 @@ GetPtrTypeSize (
       //
       SkuIdTable = GetSkuIdArray (LocalTokenNumberTableIdx, Database);
       for (Index = 0; Index < SkuIdTable[0]; Index++) {
-        if (SkuIdTable[1 + Index] == Database->Init.SystemSkuId) {
+        if (SkuIdTable[1 + Index] == Database->SystemSkuId) {
           return SizeTable[SizeTableIdx + 1 + Index];
         }
       }
@@ -1203,7 +1211,7 @@ GetPtrTypeSize (
 /**
   Set PCD value's size for POINTER type PCD.
   
-  The POINTER type PCD's value will be stored into a buffer in specificed size.
+  The POINTER type PCD's value will be stored into a buffer in specified size.
   The max size of this PCD's value is described in PCD's definition in DEC file.
 
   @param LocalTokenNumberTableIdx Index of PCD token number in PCD token table
@@ -1230,11 +1238,11 @@ SetPtrTypeSize (
   
   SizeTableIdx = GetSizeTableIndex (LocalTokenNumberTableIdx, Database);
 
-  LocalTokenNumber = Database->Init.LocalTokenNumberTable[LocalTokenNumberTableIdx];
+  LocalTokenNumber = *((UINT32 *)((UINT8 *)Database + Database->LocalTokenNumberTableOffset) + LocalTokenNumberTableIdx);
 
   ASSERT ((LocalTokenNumber & PCD_DATUM_TYPE_ALL_SET) == PCD_DATUM_TYPE_POINTER);
-  
-  SizeTable = Database->Init.SizeTable;
+
+  SizeTable = (SIZE_INFO *)((UINT8 *)Database + Database->SizeTableOffset);
 
   MaxSize = SizeTable[SizeTableIdx];
   //
@@ -1270,7 +1278,7 @@ SetPtrTypeSize (
       //
       SkuIdTable = GetSkuIdArray (LocalTokenNumberTableIdx, Database);
       for (Index = 0; Index < SkuIdTable[0]; Index++) {
-        if (SkuIdTable[1 + Index] == Database->Init.SystemSkuId) {
+        if (SkuIdTable[1 + Index] == Database->SystemSkuId) {
           SizeTable[SizeTableIdx + 1 + Index] = (SIZE_INFO) *CurrentSize;
           return TRUE;
         }

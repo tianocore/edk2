@@ -14,7 +14,7 @@
   There are no restrictions on the use of FeaturePcd(), FixedPcdGetXX(),
   PatchPcdGetXX(), and PatchPcdSetXX().
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -533,6 +533,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 /**
+  Retrieves a token number based on a GUID and a token name.
+
+  Returns the token number for the token specified by Guid and TokenName.
+
+  @param   Guid        Pointer to a 128-bit unique value that designates 
+                       which namespace to retrieve a value from.
+  @param   TokenName   The name of the PCD token to retrieve a current value for.                 
+
+  @return  Return the token number.
+
+**/
+#define PcdTokenEx(Guid,TokenName)  _PCD_TOKEN_EX_##TokenName(Guid)
+
+/**
   Retrieves an 8-bit PCD token value based on a GUID and a token name.
 
   Returns the 8-bit value for the token specified by Guid and TokenName.
@@ -548,8 +562,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @return  An 8-bit PCD token value.
 
 **/
-#define PcdGetEx8(Guid, TokenName)          LibPcdGetEx8    ((Guid), _PCD_TOKEN_##TokenName)
-
+#define PcdGetEx8(Guid, TokenName)          LibPcdGetEx8 ((Guid), PcdTokenEx(Guid,TokenName))
 
 /**
   Retrieves a 16-bit PCD token value based on a GUID and a token name.
@@ -567,7 +580,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @return  A 16-bit PCD token value.
 
 **/
-#define PcdGetEx16(Guid, TokenName)         LibPcdGetEx16   ((Guid), _PCD_TOKEN_##TokenName)
+#define PcdGetEx16(Guid, TokenName)         LibPcdGetEx16 ((Guid), PcdTokenEx(Guid,TokenName))
 
 
 /**
@@ -586,7 +599,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @return  A 32-bit PCD token value.
 
 **/
-#define PcdGetEx32(Guid, TokenName)         LibPcdGetEx32   ((Guid), _PCD_TOKEN_##TokenName)
+#define PcdGetEx32(Guid, TokenName)         LibPcdGetEx32 ((Guid), PcdTokenEx(Guid,TokenName))
 
 
 /**
@@ -605,7 +618,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @return  A 64-bit PCD token value.
 
 **/
-#define PcdGetEx64(Guid, TokenName)         LibPcdGetEx64   ((Guid), _PCD_TOKEN_##TokenName)
+#define PcdGetEx64(Guid, TokenName)         LibPcdGetEx64 ((Guid), PcdTokenEx(Guid,TokenName))
 
 
 /**
@@ -624,7 +637,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @return  A pointer to a PCD token buffer.
 
 **/
-#define PcdGetExPtr(Guid, TokenName)        LibPcdGetExPtr  ((Guid), _PCD_TOKEN_##TokenName)
+#define PcdGetExPtr(Guid, TokenName)        LibPcdGetExPtr ((Guid), PcdTokenEx(Guid,TokenName))
 
 
 /**
@@ -643,7 +656,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @return  A Boolean PCD token value.
 
 **/
-#define PcdGetExBool(Guid, TokenName)       LibPcdGetExBool ((Guid), _PCD_TOKEN_##TokenName)
+#define PcdGetExBool(Guid, TokenName)       LibPcdGetExBool  ((Guid), PcdTokenEx(Guid,TokenName))
 
 
 /**
@@ -663,7 +676,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @return Return the Value that was set.
 
 **/
-#define PcdSetEx8(Guid, TokenName, Value)   LibPcdSetEx8   ((Guid), _PCD_TOKEN_##TokenName, (Value))
+#define PcdSetEx8(Guid, TokenName, Value)   LibPcdSetEx8   ((Guid), PcdTokenEx(Guid,TokenName), (Value))
 
 
 /**
@@ -683,7 +696,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @return Return the Value that was set.
 
 **/
-#define PcdSetEx16(Guid, TokenName, Value)  LibPcdSetEx16  ((Guid), _PCD_TOKEN_##TokenName, (Value))
+#define PcdSetEx16(Guid, TokenName, Value)  LibPcdSetEx16  ((Guid), PcdTokenEx(Guid,TokenName), (Value))
 
 
 /**
@@ -703,7 +716,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @return Return the Value that was set.
 
 **/
-#define PcdSetEx32(Guid, TokenName, Value)  LibPcdSetEx32  ((Guid), _PCD_TOKEN_##TokenName, (Value))
+#define PcdSetEx32(Guid, TokenName, Value)  LibPcdSetEx32  ((Guid), PcdTokenEx(Guid,TokenName), (Value))
 
 
 /**
@@ -723,7 +736,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @return Return the Value that was set.
 
 **/
-#define PcdSetEx64(Guid, TokenName, Value)  LibPcdSetEx64  ((Guid), _PCD_TOKEN_##TokenName, (Value))
+#define PcdSetEx64(Guid, TokenName, Value)  LibPcdSetEx64  ((Guid), PcdTokenEx(Guid,TokenName), (Value))
 
 
 /**
@@ -752,7 +765,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 #define PcdSetExPtr(Guid, TokenName, SizeOfBuffer, Buffer) \
-                                            LibPcdSetExPtr ((Guid), _PCD_TOKEN_##TokenName, (SizeOfBuffer), (Buffer))
+                                            LibPcdSetExPtr ((Guid), PcdTokenEx(Guid,TokenName), (SizeOfBuffer), (Buffer))
 
 
 /**
@@ -773,7 +786,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/                                         
 #define PcdSetExBool(Guid, TokenName, Value) \
-                                            LibPcdSetExBool((Guid), _PCD_TOKEN_##TokenName, (Value))
+                                            LibPcdSetExBool((Guid), PcdTokenEx(Guid,TokenName), (Value))
 
 
 /**

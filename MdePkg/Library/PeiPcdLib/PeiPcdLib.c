@@ -1,7 +1,7 @@
 /** @file
 Implementation of PcdLib class library for PEI phase.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -962,11 +962,7 @@ LibPcdGetNextToken (
   IN UINTN                    TokenNumber
   )
 {
-  EFI_STATUS Status;
-
-  Status = (GetPiPcdPpiPointer ())->GetNextToken (Guid, &TokenNumber);
-
-  ASSERT_EFI_ERROR (Status);
+  (GetPiPcdPpiPointer ())->GetNextToken (Guid, &TokenNumber);
 
   return TokenNumber;
 }
@@ -991,11 +987,7 @@ LibPcdGetNextTokenSpace (
   IN CONST GUID  *TokenSpaceGuid
   )
 {
-  EFI_STATUS Status;
-
-  Status = (GetPiPcdPpiPointer ())->GetNextTokenSpace (&TokenSpaceGuid);
-
-  ASSERT_EFI_ERROR (Status);
+  (GetPiPcdPpiPointer ())->GetNextTokenSpace (&TokenSpaceGuid);
 
   return (GUID *) TokenSpaceGuid;
 }

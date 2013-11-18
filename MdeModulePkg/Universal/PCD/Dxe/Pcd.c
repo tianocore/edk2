@@ -3,7 +3,7 @@
   produce the implementation of native PCD protocol and EFI_PCD_PROTOCOL defined in
   PI 1.2 Vol3.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,13 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "Service.h"
-
-//
-// Just pre-allocate a memory buffer that is big enough to
-// host all distinct TokenSpace guid in both
-// PEI ExMap and DXE ExMap.
-//
-EFI_GUID *TmpTokenSpaceBuffer[PEI_EXMAPPING_TABLE_SIZE + DXE_EXMAPPING_TABLE_SIZE] = { 0 };
 
 ///
 /// PCD database lock.
@@ -170,7 +163,7 @@ DxePcdSetSku (
   IN  UINTN         SkuId
   )
 {
-  mPcdDatabase->PeiDb.Init.SystemSkuId = (SKU_ID) SkuId;
+  mPcdDatabase.PeiDb->SystemSkuId = (SKU_ID) SkuId;
   
   return;
 }
@@ -336,18 +329,18 @@ DxePcdGetSize (
   // EBC compiler is very choosy. It may report warning about comparison
   // between UINTN and 0 . So we add 1 in each size of the 
   // comparison.
-  ASSERT (TokenNumber + 1 < PCD_TOTAL_TOKEN_NUMBER + 1);
+  ASSERT (TokenNumber + 1 < mPcdTotalTokenCount + 1);
 
   // EBC compiler is very choosy. It may report warning about comparison
   // between UINTN and 0 . So we add 1 in each size of the 
   // comparison.
-  IsPeiDb = (BOOLEAN) (TokenNumber + 1 < PEI_LOCAL_TOKEN_NUMBER + 1);
+  IsPeiDb = (BOOLEAN) (TokenNumber + 1 < mPeiLocalTokenCount + 1);
   
   TokenNumber = IsPeiDb ? TokenNumber : 
-                          (TokenNumber - PEI_LOCAL_TOKEN_NUMBER);
+                          (TokenNumber - mPeiLocalTokenCount);
 
-  LocalTokenNumberTable = IsPeiDb ? mPcdDatabase->PeiDb.Init.LocalTokenNumberTable 
-                                  : mPcdDatabase->DxeDb.Init.LocalTokenNumberTable;
+  LocalTokenNumberTable = IsPeiDb ? (UINT32 *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->LocalTokenNumberTableOffset) 
+                                  : (UINT32 *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->LocalTokenNumberTableOffset);
 
   Size = (LocalTokenNumberTable[TokenNumber] & PCD_DATUM_TYPE_ALL_SET) >> PCD_DATUM_TYPE_SHIFT;
 
@@ -971,10 +964,8 @@ DxeUnRegisterCallBackOnSet (
   @param[in, out] TokenNumber 
                           A pointer to the PCD token number to use to find the subsequent token number.  
 
-  @retval EFI_SUCCESS   The PCD service retrieved the next valid token number. Or the input token number 
-                        is already the last valid token number in the PCD database. 
-                        In the later case, *TokenNumber is updated with the value of 0.
-  @retval EFI_NOT_FOUND If this input token number and token namespace does not exist on the platform.
+  @retval EFI_SUCCESS   The PCD service has retrieved the next valid token number.
+  @retval EFI_NOT_FOUND The PCD service could not find data from the requested token number.
 
 **/
 EFI_STATUS
@@ -989,8 +980,8 @@ DxePcdGetNextToken (
   BOOLEAN             DxeExMapTableEmpty;
 
   Status = EFI_NOT_FOUND;
-  PeiExMapTableEmpty = PEI_EXMAP_TABLE_EMPTY;
-  DxeExMapTableEmpty = DXE_EXMAP_TABLE_EMPTY;
+  PeiExMapTableEmpty = mPeiExMapTableEmpty;
+  DxeExMapTableEmpty = mDxeExMapTableEmpty;
 
   //
   // Scan the local token space
@@ -999,27 +990,32 @@ DxePcdGetNextToken (
     // EBC compiler is very choosy. It may report warning about comparison
     // between UINTN and 0 . So we add 1 in each size of the 
     // comparison.
-    if (((*TokenNumber + 1 > PEI_NEX_TOKEN_NUMBER + 1) && (*TokenNumber + 1 < PEI_LOCAL_TOKEN_NUMBER + 1)) ||
-        ((*TokenNumber + 1 > (PEI_LOCAL_TOKEN_NUMBER + DXE_NEX_TOKEN_NUMBER + 1)))) {
-        return EFI_NOT_FOUND;
+    if (((*TokenNumber + 1 > mPeiNexTokenCount + 1) && (*TokenNumber + 1 <= mPeiLocalTokenCount + 1)) ||
+        ((*TokenNumber + 1 > (mPeiLocalTokenCount + mDxeNexTokenCount + 1)))) {
+      return EFI_NOT_FOUND;
     }
     
     (*TokenNumber)++;
-    if ((*TokenNumber + 1 > PEI_NEX_TOKEN_NUMBER + 1) &&
-        (*TokenNumber <= PEI_LOCAL_TOKEN_NUMBER)) {
+    if ((*TokenNumber + 1 > mPeiNexTokenCount + 1) &&
+        (*TokenNumber + 1 <= mPeiLocalTokenCount + 1)) {
       //
       // The first Non-Ex type Token Number for DXE PCD 
-      // database is PEI_LOCAL_TOKEN_NUMBER
+      // database is mPeiLocalTokenCount + 1
       //
-      *TokenNumber = PEI_LOCAL_TOKEN_NUMBER;
-    } else if (*TokenNumber + 1 > DXE_NEX_TOKEN_NUMBER + PEI_LOCAL_TOKEN_NUMBER + 1) {
+      if (mDxeNexTokenCount > 0) {
+        *TokenNumber = mPeiLocalTokenCount + 1;
+      } else {
+        *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
+        return EFI_NOT_FOUND;
+      }
+    } else if (*TokenNumber + 1 > mDxeNexTokenCount + mPeiLocalTokenCount + 1) {
       *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
+      return EFI_NOT_FOUND;
     }
     return EFI_SUCCESS;
   }
 
   if (PeiExMapTableEmpty && DxeExMapTableEmpty) {
-    *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
     return EFI_NOT_FOUND;
   }
 
@@ -1027,10 +1023,10 @@ DxePcdGetNextToken (
     Status = ExGetNextTokeNumber (
                         Guid,
                         TokenNumber,
-                        mPcdDatabase->PeiDb.Init.GuidTable,
-                        sizeof(mPcdDatabase->PeiDb.Init.GuidTable),
-                        mPcdDatabase->PeiDb.Init.ExMapTable,
-                        sizeof(mPcdDatabase->PeiDb.Init.ExMapTable)
+                        (EFI_GUID *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->GuidTableOffset),
+                        mPeiGuidTableSize,
+                        (DYNAMICEX_MAPPING *)((UINT8 *) mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->ExMapTableOffset),
+                        mPeiExMapppingTableSize
                         );
   }
 
@@ -1042,10 +1038,10 @@ DxePcdGetNextToken (
     Status = ExGetNextTokeNumber (
                         Guid,
                         TokenNumber,
-                        mPcdDatabase->DxeDb.Init.GuidTable,
-                        sizeof(mPcdDatabase->DxeDb.Init.GuidTable),
-                        mPcdDatabase->DxeDb.Init.ExMapTable,
-                        sizeof(mPcdDatabase->DxeDb.Init.ExMapTable)
+                        (EFI_GUID *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->GuidTableOffset),
+                        mDxeGuidTableSize,
+                        (DYNAMICEX_MAPPING *)((UINT8 *) mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->ExMapTableOffset),
+                        mDxeExMapppingTableSize
                         );
   }
 
@@ -1055,7 +1051,7 @@ DxePcdGetNextToken (
 /**
   Get all token space guid table which is different with given token space guid.
 
-  @param ExMapTableSize  The size of guid table
+  @param ExMapTableSize  The size of ExMapTable in item
   @param ExMapTable      Token space guid table that want to be scaned.
   @param GuidTable       Guid table
 
@@ -1072,8 +1068,9 @@ GetDistinctTokenSpace (
   EFI_GUID  **DistinctTokenSpace;
   UINTN     OldGuidIndex;
   UINTN     TsIdx;
+  UINTN     TempTsIdx;
   UINTN     Idx;
-
+  BOOLEAN   Match;
 
   DistinctTokenSpace = AllocateZeroPool (*ExMapTableSize * sizeof (EFI_GUID *));
   ASSERT (DistinctTokenSpace != NULL);
@@ -1082,8 +1079,18 @@ GetDistinctTokenSpace (
   OldGuidIndex = ExMapTable[0].ExGuidIndex;
   DistinctTokenSpace[TsIdx] = &GuidTable[OldGuidIndex];
   for (Idx = 1; Idx < *ExMapTableSize; Idx++) {
-    if (ExMapTable[Idx].ExGuidIndex != OldGuidIndex) {
-      OldGuidIndex = ExMapTable[Idx].ExGuidIndex;
+    Match = FALSE;
+    OldGuidIndex = ExMapTable[Idx].ExGuidIndex;
+    for (TempTsIdx = 0; TempTsIdx <= TsIdx; TempTsIdx++) {
+      if (&GuidTable[OldGuidIndex] == DistinctTokenSpace[TempTsIdx]) {
+        //
+        // Have recorded this GUID.
+        //
+        Match = TRUE;
+        break;
+      }
+    }
+    if (!Match) {
       DistinctTokenSpace[++TsIdx] = &GuidTable[OldGuidIndex];
     }
   }
@@ -1099,16 +1106,20 @@ GetDistinctTokenSpace (
 }
   
 /**
-  Get next token space in PCD database according to given token space guid.
-  
-  @param Guid            Given token space guid. If NULL, then Guid will be set to 
-                         the first PCD token space in PCD database, If not NULL, then
-                         Guid will be set to next PCD token space.
+  Retrieves the next valid PCD token namespace for a given namespace.
 
-  @retval EFI_UNSUPPORTED 
-  @retval EFI_NOT_FOUND   If PCD database has no token space table or can not find given
-                          token space in PCD database.
-  @retval EFI_SUCCESS     Success to get next token space guid.
+  Gets the next valid token namespace for a given namespace. This is useful to traverse the valid
+  token namespaces on a platform.
+
+  @param[in, out]   Guid    An indirect pointer to EFI_GUID. On input it designates a known token
+                            namespace from which the search will start. On output, it designates the next valid
+                            token namespace on the platform. If *Guid is NULL, then the GUID of the first token
+                            space of the current platform is returned. If the search cannot locate the next valid
+                            token namespace, an error is returned and the value of *Guid is undefined.
+ 
+  @retval  EFI_SUCCESS      The PCD service retrieved the value requested.
+  @retval  EFI_NOT_FOUND    The PCD service could not find the next valid token namespace.
+
 **/
 EFI_STATUS
 EFIAPI
@@ -1129,35 +1140,31 @@ DxePcdGetNextTokenSpace (
 
   ASSERT (Guid != NULL);
   
-  PeiExMapTableEmpty = PEI_EXMAP_TABLE_EMPTY;
-  DxeExMapTableEmpty = DXE_EXMAP_TABLE_EMPTY;
+  PeiExMapTableEmpty = mPeiExMapTableEmpty;
+  DxeExMapTableEmpty = mDxeExMapTableEmpty;
 
   if (PeiExMapTableEmpty && DxeExMapTableEmpty) {
-    if (*Guid != NULL) {
-      return EFI_NOT_FOUND;
-    } else {
-      return EFI_SUCCESS;
-    }
+    return EFI_NOT_FOUND;
   }
-  
   
   if (TmpTokenSpaceBuffer[0] == NULL) {
     PeiTokenSpaceTableSize = 0;
 
     if (!PeiExMapTableEmpty) {
-      PeiTokenSpaceTableSize = PEI_EXMAPPING_TABLE_SIZE;
+      PeiTokenSpaceTableSize = mPeiExMapppingTableSize / sizeof(DYNAMICEX_MAPPING);
       PeiTokenSpaceTable = GetDistinctTokenSpace (&PeiTokenSpaceTableSize,
-                            mPcdDatabase->PeiDb.Init.ExMapTable,
-                            mPcdDatabase->PeiDb.Init.GuidTable
+                            (DYNAMICEX_MAPPING *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->ExMapTableOffset),
+                            (EFI_GUID *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->GuidTableOffset)
                             );
       CopyMem (TmpTokenSpaceBuffer, PeiTokenSpaceTable, sizeof (EFI_GUID*) * PeiTokenSpaceTableSize);
+      FreePool (PeiTokenSpaceTable);
     }
 
     if (!DxeExMapTableEmpty) {
-      DxeTokenSpaceTableSize = DXE_EXMAPPING_TABLE_SIZE;
+      DxeTokenSpaceTableSize = mDxeExMapppingTableSize / sizeof(DYNAMICEX_MAPPING);
       DxeTokenSpaceTable = GetDistinctTokenSpace (&DxeTokenSpaceTableSize,
-                            mPcdDatabase->DxeDb.Init.ExMapTable,
-                            mPcdDatabase->DxeDb.Init.GuidTable
+                            (DYNAMICEX_MAPPING *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->ExMapTableOffset),
+                            (EFI_GUID *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->GuidTableOffset)
                             );
 
       //
@@ -1175,6 +1182,9 @@ DxePcdGetNextTokenSpace (
           TmpTokenSpaceBuffer[Idx3++] = DxeTokenSpaceTable[Idx2];
         }
       }
+
+      TmpTokenSpaceBufferCount = Idx3;
+      FreePool (DxeTokenSpaceTable);
     }
   }
 
@@ -1183,11 +1193,19 @@ DxePcdGetNextTokenSpace (
     return EFI_SUCCESS;
   }
   
-  for (Idx = 0; Idx < (PEI_EXMAPPING_TABLE_SIZE + DXE_EXMAPPING_TABLE_SIZE); Idx++) {
-    if(CompareGuid (*Guid, TmpTokenSpaceBuffer[Idx])) {
-      Idx++;
-      *Guid = TmpTokenSpaceBuffer[Idx];
-      return EFI_SUCCESS;
+  for (Idx = 0; Idx < TmpTokenSpaceBufferCount; Idx++) {
+    if (CompareGuid (*Guid, TmpTokenSpaceBuffer[Idx])) {
+      if (Idx == TmpTokenSpaceBufferCount - 1) {
+        //
+        // It has been the last token namespace.
+        //
+        *Guid = NULL;
+        return EFI_NOT_FOUND;
+      } else {
+        Idx++;
+        *Guid = TmpTokenSpaceBuffer[Idx];
+        return EFI_SUCCESS;
+      }
     }
   }
 

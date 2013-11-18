@@ -1,7 +1,7 @@
 /** @file
 Private functions used by PCD DXE driver.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -17,6 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <PiDxe.h>
 #include <Guid/PcdDataBaseHobGuid.h>
+#include <Guid/PcdDataBaseSignatureGuid.h>
 #include <Protocol/Pcd.h>
 #include <Protocol/PiPcd.h>
 #include <Library/BaseLib.h>
@@ -34,7 +35,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Please make sure the PCD Serivce DXE Version is consistent with
 // the version of the generated DXE PCD Database by build tool.
 //
-#define PCD_SERVICE_DXE_VERSION      2
+#define PCD_SERVICE_DXE_VERSION      4
 
 //
 // PCD_DXE_SERVICE_DRIVER_VERSION is defined in Autogen.h.
@@ -995,16 +996,16 @@ BuildPcdDxeDataBase (
   );
 
 /**
-  Get local token number according to dynamic-ex PCD's {token space guid:token number}
+  Get Token Number according to dynamic-ex PCD's {token space guid:token number}
 
   A dynamic-ex type PCD, developer must provide pair of token space guid: token number
   in DEC file. PCD database maintain a mapping table that translate pair of {token
-  space guid: token number} to local token number.
+  space guid: token number} to Token Number.
   
   @param Guid            Token space guid for dynamic-ex PCD entry.
   @param ExTokenNumber   Dynamic-ex PCD token number.
 
-  @return local token number for dynamic-ex PCD.
+  @return Token Number for dynamic-ex PCD.
 
 **/
 UINTN
@@ -1079,9 +1080,24 @@ SetPtrTypeSize (
   IN    OUT   UINTN             *CurrentSize
   );
 
-extern PCD_DATABASE * mPcdDatabase;
+extern  PCD_DATABASE   mPcdDatabase;
 
-extern DXE_PCD_DATABASE_INIT gDXEPcdDbInit;
+extern  UINT32         mPcdTotalTokenCount; 
+extern  UINT32         mPeiLocalTokenCount; 
+extern  UINT32         mDxeLocalTokenCount; 
+extern  UINT32         mPeiNexTokenCount;   
+extern  UINT32         mDxeNexTokenCount;  
+extern  UINT32         mPeiExMapppingTableSize;
+extern  UINT32         mDxeExMapppingTableSize;
+extern  UINT32         mPeiGuidTableSize;
+extern  UINT32         mDxeGuidTableSize;
+
+extern  BOOLEAN        mPeiExMapTableEmpty; 
+extern  BOOLEAN        mDxeExMapTableEmpty; 
+extern  BOOLEAN        mPeiDatabaseEmpty;
+
+extern  EFI_GUID     **TmpTokenSpaceBuffer;
+extern  UINTN          TmpTokenSpaceBufferCount;
 
 extern EFI_LOCK mPcdDatabaseLock;
 

@@ -6,7 +6,7 @@
   The interfaces for dynamic type PCD do not require the token space guid as parameter,
   but interfaces for dynamic-ex type PCD require token space guid as parameter.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -775,10 +775,8 @@ EFI_STATUS
                                is being made to retrieve tokens from the default token space.
   @param[in, out]  TokenNumber A pointer to the PCD token number to use to find the subsequent token number.
                    
-  @retval EFI_SUCCESS   The PCD service has retrieved the next valid token number. 
-                        Or the input token number is already the last valid token number in the PCD database. 
-                        In the later case, *TokenNumber is updated with the value of 0.
-  @retval EFI_NOT_FOUND If this input token number and token namespace does not exist on the platform.
+  @retval EFI_SUCCESS   The PCD service has retrieved the next valid token number.
+  @retval EFI_NOT_FOUND The PCD service could not find data from the requested token number.
 
 **/
 typedef 
@@ -793,25 +791,17 @@ EFI_STATUS
 /**
   Retrieves the next valid PCD token namespace for a given namespace.
 
-  If *Guid is NULL, then the GUID of the first token space of the 
-  current platform is assigned to *Guid the function return EFI_SUCCESS. 
-  If  *Guid is NULL  and there is no namespace exist in the platform other than the default 
-  (NULL) tokennamespace, *Guid is unchanged and the function return EFI_SUCCESS. 
-  If this input token namespace is the last namespace on the platform, 
-  *Guid will be assigned to NULL and the function return EFI_SUCCESS.
+  Gets the next valid token namespace for a given namespace. This is useful to traverse the valid
+  token namespaces on a platform.
 
-  @param[in, out]  Guid An indirect pointer to EFI_GUID.  On input it designates a known 
-                        token namespace from which the search will start. On output, it designates 
-                        the next valid token namespace on the platform. If the input token namespace 
-                        does not exist on the platform, an error is returned, and the value of *Guid is 
-                        undefined.
-
-  @retval EFI_SUCCESS  The PCD service has retrieved the next valid token namespace. 
-                        Or the input token namespace is already the last valid token 
-                        number in the PCD database. In the later case, *Guid is updated 
-                        with the value of NULL. Or the input token name space is NULL and there 
-                        is no valid token namespace other than the default namespace (NULL).
-  @retval EFI_NOT_FOUND If the input token namespace does not exist on the platform.
+  @param[in, out]   Guid    An indirect pointer to EFI_GUID. On input it designates a known token
+                            namespace from which the search will start. On output, it designates the next valid
+                            token namespace on the platform. If *Guid is NULL, then the GUID of the first token
+                            space of the current platform is returned. If the search cannot locate the next valid
+                            token namespace, an error is returned and the value of *Guid is undefined.
+ 
+  @retval  EFI_SUCCESS      The PCD service retrieved the value requested.
+  @retval  EFI_NOT_FOUND    The PCD service could not find the next valid token namespace.
 
 **/
 typedef

@@ -1,18 +1,17 @@
 /** @file
-  Platform Configuration Database (PCD) Protocol defined in PI 1.2 Vol3
+  Platform Configuration Database (PCD) PPI defined in PI 1.2 Vol3
 
   A platform database that contains a variety of current platform settings or
   directives that can be accessed by a driver or application.
-  PI PCD protocol only provide the accessing interfaces for Dynamic-Ex type PCD.
+  PI PCD ppi only provide the accessing interfaces for Dynamic-Ex type PCD.
 
-  Callers to this protocol must be at a TPL_APPLICATION task priority level.
   This is the base PCD service API that provides an abstraction for accessing configuration content in
   the platform. It a seamless mechanism for extracting information regardless of where the
   information is stored (such as in Read-only data, or an EFI Variable).
   This protocol allows access to data through size-granular APIs and provides a mechanism for a
   firmware component to monitor specific settings and be alerted when a setting is changed.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -73,7 +72,7 @@ UINT8
 );
 
 /**
-  Retrieves the current byte-sized value for a PCD token number. If the TokenNumber is invalid,
+  Retrieves the current word-sized value for a PCD token number. If the TokenNumber is invalid,
   the results are unpredictable.
 
   @param[in]    Guid          The 128-bit unique value that designates which namespace to extract the value from.
@@ -375,7 +374,8 @@ EFI_STATUS
   know what token numbers are valid in the database.
 
   @param[in]    Guid          The 128-bit unique value that designates which namespace to extract the value from.
-  @param[in]    TokenNumber   The PCD token number.
+  @param[in]    TokenNumber   A pointer to the PCD token number to use to find the subsequent token number. To
+                              retrieve the "first" token, have the pointer reference a TokenNumber value of 0.
 
   @retval   EFI_SUCCESS       The PCD service has retrieved the value requested.
   @retval   EFI_NOT_FOUND     The PCD service could not find data from the requested token number.

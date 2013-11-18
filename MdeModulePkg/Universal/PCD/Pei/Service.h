@@ -1,7 +1,7 @@
 /** @file
   The internal header file declares the private functions used by PeiPcd driver.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -20,6 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Ppi/Pcd.h>
 #include <Ppi/PiPcd.h>
 #include <Guid/PcdDataBaseHobGuid.h>
+#include <Guid/PcdDataBaseSignatureGuid.h>
 #include <Library/DebugLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/BaseLib.h>
@@ -33,7 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Please make sure the PCD Serivce PEIM Version is consistent with
 // the version of the generated PEIM PCD Database by build tool.
 //
-#define PCD_SERVICE_PEIM_VERSION      2
+#define PCD_SERVICE_PEIM_VERSION      4
 
 //
 // PCD_PEI_SERVICE_DRIVER_VERSION is defined in Autogen.h.
@@ -896,16 +897,16 @@ typedef struct {
 } EX_PCD_ENTRY_ATTRIBUTE;
 
 /**
-  Get local token number according to dynamic-ex PCD's {token space guid:token number}
+  Get Token Number according to dynamic-ex PCD's {token space guid:token number}
 
   A dynamic-ex type PCD, developer must provide pair of token space guid: token number
   in DEC file. PCD database maintain a mapping table that translate pair of {token
-  space guid: token number} to local token number.
+  space guid: token number} to Token Number.
   
   @param Guid            Token space guid for dynamic-ex PCD entry.
   @param ExTokenNumber   Token number for dynamic-ex PCD.
 
-  @return local token number for dynamic-ex PCD.
+  @return Token Number for dynamic-ex PCD.
 
 **/
 UINTN
@@ -938,10 +939,13 @@ PeiRegisterCallBackWorker (
 
 /**
   The function builds the PCD database.
+
+  @param  FileHandle  Handle of the file the external PCD database binary located.
+
 **/
 VOID
 BuildPcdDatabase (
-  VOID
+  IN EFI_PEI_FILE_HANDLE    FileHandle
   );
 
 /**
@@ -1014,11 +1018,6 @@ SetPtrTypeSize (
   IN    OUT   UINTN             *CurrentSize,
   IN          PEI_PCD_DATABASE  *Database
   );
-
-//
-// The init Database created by PCD Database generation tool
-//
-extern PEI_PCD_DATABASE_INIT gPEIPcdDbInit;
 
 #endif
 
