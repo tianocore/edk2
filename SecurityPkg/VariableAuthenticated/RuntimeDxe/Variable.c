@@ -1752,7 +1752,9 @@ UpdateVariable (
   VARIABLE_POINTER_TRACK              NvVariable;
   VARIABLE_STORE_HEADER               *VariableStoreHeader;
   UINTN                               CacheOffset;
-  UINTN                               BufSize;
+  UINT8                               *BufferForMerge;
+  UINTN                               MergedBufSize;
+  BOOLEAN                             DataReady;
   UINTN                               DataOffset;
 
   if (mVariableModuleGlobal->FvbInstance == NULL) {
@@ -1802,7 +1804,8 @@ UpdateVariable (
   //
   NextVariable = GetEndPointer ((VARIABLE_STORE_HEADER *) ((UINTN) mVariableModuleGlobal->VariableGlobal.VolatileVariableBase));
   ScratchSize = MAX (PcdGet32 (PcdMaxVariableSize), PcdGet32 (PcdMaxHardwareErrorVariableSize));
-
+  SetMem (NextVariable, ScratchSize, 0xff);
+  DataReady = FALSE;
 
   if (Variable->CurrPtr != NULL) {
     //
@@ -1894,7 +1897,7 @@ UpdateVariable (
     // then return to the caller immediately.
     //
     if (DataSizeOfVariable (Variable->CurrPtr) == DataSize &&
-        (CompareMem (Data, GetVariableDataPtr (Variable->CurrPtr), DataSize) == 0)  &&
+        (CompareMem (Data, GetVariableDataPtr (Variable->CurrPtr), DataSize) == 0) &&
         ((Attributes & EFI_VARIABLE_APPEND_WRITE) == 0) &&
         (TimeStamp == NULL)) {
       //
@@ -1911,42 +1914,42 @@ UpdateVariable (
       //
       if ((Attributes & EFI_VARIABLE_APPEND_WRITE) != 0) {
         //
-        // Cache the previous variable data into StorageArea.
+        // NOTE: From 0 to DataOffset of NextVariable is reserved for Variable Header and Name.
+        // From DataOffset of NextVariable is to save the existing variable data.
         //
         DataOffset = sizeof (VARIABLE_HEADER) + Variable->CurrPtr->NameSize + GET_PAD_SIZE (Variable->CurrPtr->NameSize);
-        CopyMem (mStorageArea, (UINT8*)((UINTN) Variable->CurrPtr + DataOffset), Variable->CurrPtr->DataSize);
+        BufferForMerge = (UINT8 *) ((UINTN) NextVariable + DataOffset);
+        CopyMem (BufferForMerge, (UINT8 *) ((UINTN) Variable->CurrPtr + DataOffset), Variable->CurrPtr->DataSize);
 
         //
         // Set Max Common Variable Data Size as default MaxDataSize 
         //
-        MaxDataSize = PcdGet32 (PcdMaxVariableSize) - sizeof (VARIABLE_HEADER) - StrSize (VariableName) - GET_PAD_SIZE (StrSize (VariableName));
-
+        MaxDataSize = PcdGet32 (PcdMaxVariableSize) - DataOffset;
 
         if ((CompareGuid (VendorGuid, &gEfiImageSecurityDatabaseGuid) &&
             ((StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE) == 0) || (StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE1) == 0))) ||
             (CompareGuid (VendorGuid, &gEfiGlobalVariableGuid) && (StrCmp (VariableName, EFI_KEY_EXCHANGE_KEY_NAME) == 0))) {
-
           //
           // For variables with formatted as EFI_SIGNATURE_LIST, the driver shall not perform an append of
           // EFI_SIGNATURE_DATA values that are already part of the existing variable value.
           //
           Status = AppendSignatureList (
-                     mStorageArea, 
+                     BufferForMerge,
                      Variable->CurrPtr->DataSize, 
                      MaxDataSize - Variable->CurrPtr->DataSize,
-                     Data, 
-                     DataSize, 
-                     &BufSize
+                     Data,
+                     DataSize,
+                     &MergedBufSize
                      );
           if (Status == EFI_BUFFER_TOO_SMALL) {
             //
-            // Signture List is too long, Failed to Append
+            // Signature List is too long, Failed to Append.
             //
             Status = EFI_INVALID_PARAMETER;
             goto Done;
           }
 
-          if (BufSize == Variable->CurrPtr->DataSize) {
+          if (MergedBufSize == Variable->CurrPtr->DataSize) {
             if ((TimeStamp == NULL) || CompareTimeStamp (TimeStamp, &Variable->CurrPtr->TimeStamp)) {
               //
               // New EFI_SIGNATURE_DATA is not found and timestamp is not later
@@ -1959,29 +1962,30 @@ UpdateVariable (
           }
         } else {
           //
-          // For other Variables, append the new data to the end of previous data.
+          // For other Variables, append the new data to the end of existing data.
           // Max Harware error record variable data size is different from common variable
           //
           if ((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
-            MaxDataSize = PcdGet32 (PcdMaxHardwareErrorVariableSize) - sizeof (VARIABLE_HEADER) - StrSize (VariableName) - GET_PAD_SIZE (StrSize (VariableName));
+            MaxDataSize = PcdGet32 (PcdMaxHardwareErrorVariableSize) - DataOffset;
           }
 
           if (Variable->CurrPtr->DataSize + DataSize > MaxDataSize) {
             //
-            // Exsiting data + Appended data exceed maximum variable size limitation 
+            // Existing data size + new data size exceed maximum variable size limitation.
             //
             Status = EFI_INVALID_PARAMETER;
             goto Done;
           }
-          CopyMem ((UINT8*)((UINTN) mStorageArea + Variable->CurrPtr->DataSize), Data, DataSize);
-          BufSize = Variable->CurrPtr->DataSize + DataSize;
+          CopyMem ((UINT8*) ((UINTN) BufferForMerge + Variable->CurrPtr->DataSize), Data, DataSize);
+          MergedBufSize = Variable->CurrPtr->DataSize + DataSize;
         }
 
         //
-        // Override Data and DataSize which are used for combined data area including previous and new data.
+        // BufferForMerge(from DataOffset of NextVariable) has included the merged existing and new data.
         //
-        Data     = mStorageArea;
-        DataSize = BufSize;
+        Data      = BufferForMerge;
+        DataSize  = MergedBufSize;
+        DataReady = TRUE;
       }
 
       //
@@ -2038,9 +2042,7 @@ UpdateVariable (
   //
   // Function part - create a new variable and copy the data.
   // Both update a variable and create a variable will come here.
-
-  SetMem (NextVariable, ScratchSize, 0xff);
-
+  //
   NextVariable->StartId     = VARIABLE_DATA;
   //
   // NextVariable->State = VAR_ADDED;
@@ -2082,11 +2084,19 @@ UpdateVariable (
     VarNameSize
     );
   VarDataOffset = VarNameOffset + VarNameSize + GET_PAD_SIZE (VarNameSize);
-  CopyMem (
-    (UINT8 *) ((UINTN) NextVariable + VarDataOffset),
-    Data,
-    DataSize
-    );
+
+  //
+  // If DataReady is TRUE, it means the variable data has been saved into
+  // NextVariable during EFI_VARIABLE_APPEND_WRITE operation preparation.
+  //
+  if (!DataReady) {
+    CopyMem (
+      (UINT8 *) ((UINTN) NextVariable + VarDataOffset),
+      Data,
+      DataSize
+      );
+  }
+
   CopyMem (&NextVariable->VendorGuid, VendorGuid, sizeof (EFI_GUID));
   //
   // There will be pad bytes after Data, the NextVariable->NameSize and

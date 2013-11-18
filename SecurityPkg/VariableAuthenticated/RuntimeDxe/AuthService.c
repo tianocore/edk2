@@ -49,14 +49,6 @@ CONST UINT8 mRsaE[] = { 0x01, 0x00, 0x01 };
 VOID  *mHashCtx = NULL;
 
 //
-// Pointer to runtime buffer.
-// For "Append" operation to an existing variable, a read/modify/write operation
-// is supported by firmware internally. Reserve runtime buffer to cache previous
-// variable data in runtime phase because memory allocation is forbidden in virtual mode.
-//
-VOID  *mStorageArea = NULL;
-
-//
 // The serialization of the values of the VariableName, VendorGuid and Attributes
 // parameters of the SetVariable() call and the TimeStamp component of the
 // EFI_VARIABLE_AUTHENTICATION_2 descriptor followed by the variable's new value
@@ -188,14 +180,6 @@ AutenticatedVariableServiceInitialize (
   CtxSize   = Sha256GetContextSize ();
   mHashCtx  = AllocateRuntimePool (CtxSize);
   if (mHashCtx == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  //
-  // Reserved runtime buffer for "Append" operation in virtual mode.
-  //
-  mStorageArea  = AllocateRuntimePool (MAX (PcdGet32 (PcdMaxVariableSize), PcdGet32 (PcdMaxHardwareErrorVariableSize)));
-  if (mStorageArea == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 

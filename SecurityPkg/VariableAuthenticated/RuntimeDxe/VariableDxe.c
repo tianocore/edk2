@@ -241,7 +241,6 @@ VariableClassAddressChangeEvent (
   EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->VariableGlobal.VolatileVariableBase);
   EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal);
   EfiConvertPointer (0x0, (VOID **) &mHashCtx);
-  EfiConvertPointer (0x0, (VOID **) &mStorageArea);
   EfiConvertPointer (0x0, (VOID **) &mSerializationRuntimeBuffer);
   EfiConvertPointer (0x0, (VOID **) &mNvVariableCache);
 

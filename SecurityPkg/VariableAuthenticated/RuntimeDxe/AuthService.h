@@ -329,7 +329,6 @@ VerifyTimeBasedPayload (
 extern UINT8  mPubKeyStore[MAX_KEYDB_SIZE];
 extern UINT32 mPubKeyNumber;
 extern VOID   *mHashCtx;
-extern VOID   *mStorageArea;
 extern UINT8  *mSerializationRuntimeBuffer;
 
 #endif
