@@ -27,11 +27,18 @@
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 
+#
+#  Debug output control
+#
+  DEFINE DEBUG_ENABLE_OUTPUT      = FALSE       # Set to TRUE to enable debug output
+  DEFINE DEBUG_PRINT_ERROR_LEVEL  = 0x80000040  # Flags to control amount of debug output
+  DEFINE DEBUG_PROPERTY_MASK      = 0
+
 [PcdsFeatureFlag]
 
 [PcdsFixedAtBuild]
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x00
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000040
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|$(DEBUG_PROPERTY_MASK)
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|$(DEBUG_PRINT_ERROR_LEVEL)
 
 [PcdsFixedAtBuild.IPF]
 
@@ -53,12 +60,12 @@
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
-  #
-  # To enable debugging:
-  #   Enable ONE of the following DebugLib instances, as appropriate for your platform.
-  #
-  DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
-#  DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
+  !if $(DEBUG_ENABLE_OUTPUT)
+    DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
+    DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
+  !else   ## DEBUG_ENABLE_OUTPUT
+    DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+  !endif  ## DEBUG_ENABLE_OUTPUT
 
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
