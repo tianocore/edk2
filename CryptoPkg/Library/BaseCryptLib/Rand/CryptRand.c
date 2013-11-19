@@ -1,7 +1,7 @@
 /** @file
   Pseudorandom Number Generator Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -14,6 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "InternalCryptLib.h"
 #include <openssl/rand.h>
+#include <openssl/evp.h>
 
 //
 // Default seed for UEFI Crypto Library
@@ -44,6 +45,14 @@ RandomSeed (
   )
 {
   if (SeedSize > INT_MAX) {
+    return FALSE;
+  }
+
+  //
+  // The software PRNG implementation built in OpenSSL depends on message digest algorithm.
+  // Make sure SHA-1 digest algorithm is available here.
+  //
+  if (EVP_add_digest (EVP_sha1 ()) == 0) {
     return FALSE;
   }
 
