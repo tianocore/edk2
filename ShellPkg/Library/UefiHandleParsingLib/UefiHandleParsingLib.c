@@ -627,6 +627,11 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_DISK_IO2),              &gEfiDiskIo2ProtocolGuid,                         NULL},
 
 //
+// PI Spec ones
+//
+  {STRING_TOKEN(STR_IDE_CONT_INIT),         &gEfiIdeControllerInitProtocolGuid,               NULL},
+
+//
 // terminator
 //
   {STRING_TOKEN(STR_UNKNOWN_DEVICE),        NULL,                                             NULL},
