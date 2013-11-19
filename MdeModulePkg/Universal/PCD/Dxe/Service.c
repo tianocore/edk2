@@ -501,6 +501,7 @@ BuildPcdDxeDataBase (
   ASSERT(mPcdDatabase.DxeDb != NULL);
   PcdDxeDbLen = mPcdDatabase.DxeDb->Length + mPcdDatabase.DxeDb->UninitDataBaseSize;
   PcdDxeDb = AllocateZeroPool (PcdDxeDbLen);
+  ASSERT (PcdDxeDb != NULL);
   CopyMem (PcdDxeDb, mPcdDatabase.DxeDb, mPcdDatabase.DxeDb->Length);
   FreePool (mPcdDatabase.DxeDb);
   mPcdDatabase.DxeDb = PcdDxeDb;
