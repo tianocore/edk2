@@ -142,15 +142,15 @@ UsbFreeDevDesc (
 VOID *
 UsbCreateDesc (
   IN  UINT8               *DescBuf,
-  IN  INTN                Len,
+  IN  UINTN               Len,
   IN  UINT8               Type,
-  OUT INTN                *Consumed
+  OUT UINTN               *Consumed
   )
 {
   USB_DESC_HEAD           *Head;
-  INTN                    DescLen;
-  INTN                    CtrlLen;
-  INTN                    Offset;
+  UINTN                   DescLen;
+  UINTN                   CtrlLen;
+  UINTN                   Offset;
   VOID                    *Desc;
 
   DescLen   = 0;
@@ -188,7 +188,15 @@ UsbCreateDesc (
 
   while ((Offset < Len) && (Head->Type != Type)) {
     Offset += Head->Len;
+    if (Len <= Offset) {
+      DEBUG (( EFI_D_ERROR, "UsbCreateDesc: met mal-format descriptor, Beyond boundary!\n"));
+      return NULL;
+    }
     Head    = (USB_DESC_HEAD*)(DescBuf + Offset);
+    if (Head->Len == 0) {
+      DEBUG (( EFI_D_ERROR, "UsbCreateDesc: met mal-format descriptor, Head->Len = 0!\n"));
+      return NULL;
+    }
   }
 
   if ((Len <= Offset)      || (Len < Offset + DescLen) ||
@@ -223,16 +231,16 @@ UsbCreateDesc (
 USB_INTERFACE_SETTING *
 UsbParseInterfaceDesc (
   IN  UINT8               *DescBuf,
-  IN  INTN                Len,
-  OUT INTN                *Consumed
+  IN  UINTN               Len,
+  OUT UINTN               *Consumed
   )
 {
   USB_INTERFACE_SETTING   *Setting;
   USB_ENDPOINT_DESC       *Ep;
   UINTN                   Index;
   UINTN                   NumEp;
-  INTN                    Used;
-  INTN                    Offset;
+  UINTN                   Used;
+  UINTN                   Offset;
 
   *Consumed = 0;
   Setting   = UsbCreateDesc (DescBuf, Len, USB_DESC_TYPE_INTERFACE, &Used);
@@ -265,7 +273,7 @@ UsbParseInterfaceDesc (
   //
   // Create the endpoints for this interface
   //
-  for (Index = 0; Index < NumEp; Index++) {
+  for (Index = 0; (Index < NumEp) && (Offset < Len); Index++) {
     Ep = UsbCreateDesc (DescBuf + Offset, Len - Offset, USB_DESC_TYPE_ENDPOINT, &Used);
 
     if (Ep == NULL) {
@@ -300,7 +308,7 @@ ON_ERROR:
 USB_CONFIG_DESC *
 UsbParseConfigDesc (
   IN UINT8                *DescBuf,
-  IN INTN                 Len
+  IN UINTN                Len
   )
 {
   USB_CONFIG_DESC         *Config;
@@ -308,7 +316,7 @@ UsbParseConfigDesc (
   USB_INTERFACE_DESC      *Interface;
   UINTN                   Index;
   UINTN                   NumIf;
-  INTN                    Consumed;
+  UINTN                   Consumed;
 
   ASSERT (DescBuf != NULL);
 
