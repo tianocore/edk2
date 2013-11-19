@@ -2657,7 +2657,7 @@ PciExplainData (
   //
   // Print register Revision ID
   //
-  ShellPrintEx(-1, -1, L"/r/n");
+  ShellPrintEx(-1, -1, L"\r\n");
   ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_PCI_LINE_RID), gShellDebug1HiiHandle,
     INDEX_OF (&(Common->RevisionId)),
     Common->RevisionId
