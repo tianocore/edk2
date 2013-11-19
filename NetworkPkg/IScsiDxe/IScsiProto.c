@@ -228,7 +228,7 @@ IScsiCreateConnection (
   Conn->PartialRspRcvd  = FALSE;
   Conn->ParamNegotiated = FALSE;
   Conn->Cid             = Session->NextCid++;
-  Conn->Ipv6Flag        = mPrivate->Ipv6Flag;
+  Conn->Ipv6Flag        = NvData->IpMode == IP_MODE_IP6 || Session->ConfigData->AutoConfigureMode == IP_MODE_AUTOCONFIG_IP6;
 
   Status = gBS->CreateEvent (
                   EVT_TIMER,
@@ -472,7 +472,7 @@ IScsiSessionLogin (
   if (!EFI_ERROR (Status)) {
     Session->State = SESSION_STATE_LOGGED_IN;
 
-    if (!mPrivate->Ipv6Flag) {
+    if (!Conn->Ipv6Flag) {
       ProtocolGuid = &gEfiTcp4ProtocolGuid;      
     } else {
       ProtocolGuid = &gEfiTcp6ProtocolGuid;
@@ -489,7 +489,7 @@ IScsiSessionLogin (
 
     ASSERT_EFI_ERROR (Status);
 
-    if (mPrivate->Ipv6Flag) {
+    if (Conn->Ipv6Flag) {
       Status = IScsiGetIp6NicInfo (Conn);
     }
   }
