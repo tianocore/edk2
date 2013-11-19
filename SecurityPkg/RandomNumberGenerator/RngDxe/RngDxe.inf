@@ -1,0 +1,75 @@
+## @file
+#  Module that produces the UEFI Random Number Generator protocol.
+#
+#  This module will leverage Intel Secure Key technology to produce the Random
+#  Number Generator protocol, which is used to provide high-quality random numbers
+#  for use in applications, or entropy for seeding other random number generators.
+#  Refer to http://software.intel.com/en-us/articles/intel-digital-random-number
+#  -generator-drng-software-implementation-guide/ for more information about Intel
+#  Secure Key technology.
+#
+#  Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = RngDxe
+  FILE_GUID                      = B981A835-6EE8-4f4c-AE0B-210AA0BFBF01
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = RngDriverEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources.common]
+  RngDxe.c
+  RdRand.c
+  AesCore.c
+
+[Sources.IA32]
+  IA32/RdRandWord.c
+  IA32/AsmRdRand.asm        | MSFT
+  IA32/GccRdRand.c          | GCC
+
+[Sources.X64]
+  X64/RdRandWord.c
+  X64/AsmRdRand.asm         | MSFT
+  X64/GccRdRand.c           | GCC
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  UefiLib
+  UefiBootServicesTableLib
+  BaseLib
+  DebugLib	
+  UefiDriverEntryPoint
+  TimerLib
+
+[Guids]
+  gEfiRngAlgorithmSp80090Hash256Guid
+  gEfiRngAlgorithmSp80090Hmac256Guid
+  gEfiRngAlgorithmSp80090Ctr256Guid
+  gEfiRngAlgorithmX9313DesGuid
+  gEfiRngAlgorithmX931AesGuid
+  gEfiRngAlgorithmRaw
+
+[Protocols]
+  gEfiRngProtocolGuid             ## PRODUCES
+
+[Depex]
+  TRUE

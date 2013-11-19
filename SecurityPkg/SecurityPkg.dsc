@@ -129,6 +129,7 @@
   # Application
   #
   SecurityPkg/Application/VariableInfo/VariableInfo.inf
+  SecurityPkg/Application/RngTest/RngTest.inf
 
   #
   # TPM
@@ -214,6 +215,10 @@
   SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableSmmRuntimeDxe.inf
   SecurityPkg/Tcg/TcgSmm/TcgSmm.inf
   SecurityPkg/Tcg/TrEESmm/TrEESmm.inf
+  #
+  # Random Number Generator
+  #
+  SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
 
 [Components.IPF]
   SecurityPkg/VariableAuthenticated/EsalVariableDxeSal/EsalVariableDxeSal.inf 
