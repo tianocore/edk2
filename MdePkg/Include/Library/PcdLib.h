@@ -1516,4 +1516,89 @@ LibPatchPcdSetPtr (
   IN CONST  VOID        *Buffer
   );
 
+typedef enum {
+  PCD_TYPE_8,
+  PCD_TYPE_16,
+  PCD_TYPE_32,
+  PCD_TYPE_64,
+  PCD_TYPE_BOOL,
+  PCD_TYPE_PTR
+} PCD_TYPE;
+
+typedef struct {
+  ///
+  /// The returned information associated with the requested TokenNumber. If
+  /// TokenNumber is 0, then PcdType is set to PCD_TYPE_8.
+  ///
+  PCD_TYPE          PcdType;
+  ///
+  /// The size of the data in bytes associated with the TokenNumber specified. If
+  /// TokenNumber is 0, then PcdSize is set 0.
+  ///
+  UINTN             PcdSize;
+  ///
+  /// The null-terminated ASCII string associated with a given token. If the
+  /// TokenNumber specified was 0, then this field corresponds to the null-terminated
+  /// ASCII string associated with the token's namespace Guid. If NULL, there is no
+  /// name associated with this request.
+  ///
+  CHAR8             *PcdName;
+} PCD_INFO;
+
+
+/**
+  Retrieve additional information associated with a PCD token.
+
+  This includes information such as the type of value the TokenNumber is associated with as well as possible
+  human readable name that is associated with the token.
+
+  If TokenNumber is not in the default token space specified, then ASSERT().
+
+  @param[in]    TokenNumber The PCD token number.
+  @param[out]   PcdInfo     The returned information associated with the requested TokenNumber.
+                            The caller is responsible for freeing the buffer that is allocated by callee for PcdInfo->PcdName.
+**/
+VOID
+EFIAPI
+LibPcdGetInfo (
+  IN        UINTN           TokenNumber,
+  OUT       PCD_INFO        *PcdInfo
+  );
+
+/**
+  Retrieve additional information associated with a PCD token.
+
+  This includes information such as the type of value the TokenNumber is associated with as well as possible
+  human readable name that is associated with the token.
+
+  If TokenNumber is not in the token space specified by Guid, then ASSERT().
+
+  @param[in]    Guid        The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]    TokenNumber The PCD token number.
+  @param[out]   PcdInfo     The returned information associated with the requested TokenNumber.
+                            The caller is responsible for freeing the buffer that is allocated by callee for PcdInfo->PcdName.
+**/
+VOID
+EFIAPI
+LibPcdGetInfoEx (
+  IN CONST  GUID            *Guid,
+  IN        UINTN           TokenNumber,
+  OUT       PCD_INFO        *PcdInfo
+  );
+
+/**
+  Retrieve the currently set SKU Id.
+
+  If the sku id got >= PCD_MAX_SKU_ID, then ASSERT().
+
+  @return   The currently set SKU Id. If the platform has not set at a SKU Id, then the
+            default SKU Id value of 0 is returned. If the platform has set a SKU Id, then the currently set SKU
+            Id is returned.
+**/
+UINTN
+EFIAPI
+LibPcdGetSku (
+  VOID
+  );
+
 #endif

@@ -83,6 +83,25 @@ EFI_PEI_PCD_PPI  mEfiPcdPpiInstance = {
   PeiPcdGetNextTokenSpace
 };
 
+///
+/// Instance of GET_PCD_INFO_PPI protocol is EDKII native implementation.
+/// This protocol instance support dynamic and dynamicEx type PCDs.
+///
+GET_PCD_INFO_PPI mGetPcdInfoInstance = {
+  PeiGetPcdInfoGetInfo,
+  PeiGetPcdInfoGetInfoEx,
+  PeiGetPcdInfoGetSku
+};
+
+///
+/// Instance of EFI_GET_PCD_INFO_PPI which is defined in PI 1.2.1 Vol 3.
+/// This PPI instance only support dyanmicEx type PCD.
+///
+EFI_GET_PCD_INFO_PPI  mEfiGetPcdInfoInstance = {
+  PeiGetPcdInfoGetInfoEx,
+  PeiGetPcdInfoGetSku
+};
+
 EFI_PEI_PPI_DESCRIPTOR  mPpiList[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
@@ -93,6 +112,19 @@ EFI_PEI_PPI_DESCRIPTOR  mPpiList[] = {
     (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
     &gEfiPeiPcdPpiGuid,
     &mEfiPcdPpiInstance
+  }
+};
+
+EFI_PEI_PPI_DESCRIPTOR  mPpiList2[] = {
+  {
+    EFI_PEI_PPI_DESCRIPTOR_PPI,
+    &gGetPcdInfoPpiGuid,
+    &mGetPcdInfoInstance
+  },
+  {
+    (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+    &gEfiGetPcdInfoPpiGuid,
+    &mEfiGetPcdInfoInstance
   }
 };
 
@@ -114,17 +146,96 @@ PcdPeimInit (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_STATUS Status;
-  
-  BuildPcdDatabase (FileHandle);
+  EFI_STATUS        Status;
+  PEI_PCD_DATABASE  *DataBase;
+
+  DataBase = BuildPcdDatabase (FileHandle);
 
   //
   // Install PCD_PPI and EFI_PEI_PCD_PPI.
   //
   Status = PeiServicesInstallPpi (&mPpiList[0]);
   ASSERT_EFI_ERROR (Status);
-  
+
+  //
+  // Only install PcdInfo PPI when the feature is enabled and PCD info content is present. 
+  //
+  if (FeaturePcdGet (PcdPcdInfoGeneration) && (DataBase->PcdNameTableOffset != 0)) {
+    //
+    // Install GET_PCD_INFO_PPI and EFI_GET_PCD_INFO_PPI.
+    //
+    Status = PeiServicesInstallPpi (&mPpiList2[0]);
+    ASSERT_EFI_ERROR (Status);
+  }
+
   return Status;
+}
+
+/**
+  Retrieve additional information associated with a PCD token in the default token space.
+
+  This includes information such as the type of value the TokenNumber is associated with as well as possible
+  human readable name that is associated with the token.
+
+  @param[in]    TokenNumber The PCD token number.
+  @param[out]   PcdInfo     The returned information associated with the requested TokenNumber.
+                            The caller is responsible for freeing the buffer that is allocated by callee for PcdInfo->PcdName.
+
+  @retval  EFI_SUCCESS      The PCD information was returned successfully.
+  @retval  EFI_NOT_FOUND    The PCD service could not find the requested token number.
+**/
+EFI_STATUS
+EFIAPI
+PeiGetPcdInfoGetInfo (
+  IN        UINTN           TokenNumber,
+  OUT       EFI_PCD_INFO    *PcdInfo
+  )
+{
+  return PeiGetPcdInfo (NULL, TokenNumber, PcdInfo);
+}
+
+/**
+  Retrieve additional information associated with a PCD token.
+
+  This includes information such as the type of value the TokenNumber is associated with as well as possible
+  human readable name that is associated with the token.
+
+  @param[in]    Guid        The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]    TokenNumber The PCD token number.
+  @param[out]   PcdInfo     The returned information associated with the requested TokenNumber.
+                            The caller is responsible for freeing the buffer that is allocated by callee for PcdInfo->PcdName.
+
+  @retval  EFI_SUCCESS      The PCD information was returned successfully.
+  @retval  EFI_NOT_FOUND    The PCD service could not find the requested token number.
+**/
+EFI_STATUS
+EFIAPI
+PeiGetPcdInfoGetInfoEx (
+  IN CONST  EFI_GUID        *Guid,
+  IN        UINTN           TokenNumber,
+  OUT       EFI_PCD_INFO    *PcdInfo
+  )
+{
+  return PeiGetPcdInfo (Guid, TokenNumber, PcdInfo);
+}
+
+/**
+  Retrieve the currently set SKU Id.
+
+  @return   The currently set SKU Id. If the platform has not set at a SKU Id, then the
+            default SKU Id value of 0 is returned. If the platform has set a SKU Id, then the currently set SKU
+            Id is returned.
+**/
+UINTN
+EFIAPI
+PeiGetPcdInfoGetSku (
+  VOID
+  )
+{
+  if (!FeaturePcdGet (PcdPcdInfoGeneration)) {
+    return EFI_UNSUPPORTED;
+  }
+  return GetPcdDatabase()->SystemSkuId;
 }
 
 /**

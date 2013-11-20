@@ -919,3 +919,69 @@ LibPatchPcdSetPtr (
   return (VOID *) Buffer;
 }
 
+/**
+  Retrieve additional information associated with a PCD token.
+
+  This includes information such as the type of value the TokenNumber is associated with as well as possible
+  human readable name that is associated with the token.
+
+  If TokenNumber is not in the default token space specified, then ASSERT().
+
+  @param[in]    TokenNumber The PCD token number.
+  @param[out]   PcdInfo     The returned information associated with the requested TokenNumber.
+                            The caller is responsible for freeing the buffer that is allocated by callee for PcdInfo->PcdName.
+**/
+VOID
+EFIAPI
+LibPcdGetInfo (
+  IN        UINTN           TokenNumber,
+  OUT       PCD_INFO        *PcdInfo
+  )
+{
+  ASSERT (FALSE);
+}
+
+/**
+  Retrieve additional information associated with a PCD token.
+
+  This includes information such as the type of value the TokenNumber is associated with as well as possible
+  human readable name that is associated with the token.
+
+  If TokenNumber is not in the token space specified by Guid, then ASSERT().
+
+  @param[in]    Guid        The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]    TokenNumber The PCD token number.
+  @param[out]   PcdInfo     The returned information associated with the requested TokenNumber.
+                            The caller is responsible for freeing the buffer that is allocated by callee for PcdInfo->PcdName.
+**/
+VOID
+EFIAPI
+LibPcdGetInfoEx (
+  IN CONST  GUID            *Guid,
+  IN        UINTN           TokenNumber,
+  OUT       PCD_INFO        *PcdInfo
+  )
+{
+  ASSERT (FALSE);
+}
+
+/**
+  Retrieve the currently set SKU Id.
+
+  If the sku id got >= PCD_MAX_SKU_ID, then ASSERT().
+
+  @return   The currently set SKU Id. If the platform has not set at a SKU Id, then the
+            default SKU Id value of 0 is returned. If the platform has set a SKU Id, then the currently set SKU
+            Id is returned.
+**/
+UINTN
+EFIAPI
+LibPcdGetSku (
+  VOID
+  )
+{
+  ASSERT (FALSE);
+
+  return 0;
+}
+

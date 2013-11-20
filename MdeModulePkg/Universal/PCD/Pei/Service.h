@@ -19,6 +19,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Ppi/ReadOnlyVariable2.h>
 #include <Ppi/Pcd.h>
 #include <Ppi/PiPcd.h>
+#include <Ppi/PcdInfo.h>
+#include <Ppi/PiPcdInfo.h>
 #include <Guid/PcdDataBaseHobGuid.h>
 #include <Guid/PcdDataBaseSignatureGuid.h>
 #include <Library/DebugLib.h>
@@ -28,7 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PeiServicesLib.h>
 #include <Library/PcdLib.h>
 #include <Library/BaseMemoryLib.h>
-
+#include <Library/MemoryAllocationLib.h>
 
 //
 // Please make sure the PCD Serivce PEIM Version is consistent with
@@ -42,6 +44,61 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #if (PCD_SERVICE_PEIM_VERSION != PCD_PEI_SERVICE_DRIVER_VERSION)
   #error "Please make sure the version of PCD PEIM Service and the generated PCD PEI Database match."
 #endif
+
+/**
+  Retrieve additional information associated with a PCD token in the default token space.
+
+  This includes information such as the type of value the TokenNumber is associated with as well as possible
+  human readable name that is associated with the token.
+
+  @param[in]    TokenNumber The PCD token number.
+  @param[out]   PcdInfo     The returned information associated with the requested TokenNumber.
+                            The caller is responsible for freeing the buffer that is allocated by callee for PcdInfo->PcdName.
+
+  @retval  EFI_SUCCESS      The PCD information was returned successfully.
+  @retval  EFI_NOT_FOUND    The PCD service could not find the requested token number.
+**/
+EFI_STATUS
+EFIAPI
+PeiGetPcdInfoGetInfo (
+  IN        UINTN           TokenNumber,
+  OUT       EFI_PCD_INFO    *PcdInfo
+  );
+
+/**
+  Retrieve additional information associated with a PCD token.
+
+  This includes information such as the type of value the TokenNumber is associated with as well as possible
+  human readable name that is associated with the token.
+
+  @param[in]    Guid        The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]    TokenNumber The PCD token number.
+  @param[out]   PcdInfo     The returned information associated with the requested TokenNumber.
+                            The caller is responsible for freeing the buffer that is allocated by callee for PcdInfo->PcdName.
+
+  @retval  EFI_SUCCESS      The PCD information was returned successfully.
+  @retval  EFI_NOT_FOUND    The PCD service could not find the requested token number.
+**/
+EFI_STATUS
+EFIAPI
+PeiGetPcdInfoGetInfoEx (
+  IN CONST  EFI_GUID        *Guid,
+  IN        UINTN           TokenNumber,
+  OUT       EFI_PCD_INFO    *PcdInfo
+  );
+
+/**
+  Retrieve the currently set SKU Id.
+
+  @return   The currently set SKU Id. If the platform has not set at a SKU Id, then the
+            default SKU Id value of 0 is returned. If the platform has set a SKU Id, then the currently set SKU
+            Id is returned.
+**/
+UINTN
+EFIAPI
+PeiGetPcdInfoGetSku (
+  VOID
+  );
 
 //
 // PPI Interface Implementation Declaration.
@@ -753,6 +810,27 @@ PeiPcdGetNextTokenSpace (
   IN OUT CONST EFI_GUID           **Guid
   );
 
+/**
+  Retrieve additional information associated with a PCD token.
+
+  This includes information such as the type of value the TokenNumber is associated with as well as possible
+  human readable name that is associated with the token.
+
+  @param[in]    Guid        The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]    TokenNumber The PCD token number.
+  @param[out]   PcdInfo     The returned information associated with the requested TokenNumber.
+                            The caller is responsible for freeing the buffer that is allocated by callee for PcdInfo->PcdName. 
+
+  @retval  EFI_SUCCESS      The PCD information was returned successfully
+  @retval  EFI_NOT_FOUND    The PCD service could not find the requested token number.
+**/
+EFI_STATUS
+EFIAPI
+PeiGetPcdInfo (
+  IN CONST  EFI_GUID        *Guid,
+  IN        UINTN           TokenNumber,
+  OUT       EFI_PCD_INFO    *PcdInfo
+  );
 
 /* Internal Function definitions */
 /**
@@ -916,6 +994,21 @@ GetExPcdTokenNumber (
   );
 
 /**
+  Find the local token number according to system SKU ID.
+
+  @param LocalTokenNumber PCD token number
+  @param Size             The size of PCD entry.
+
+  @return Token number according to system SKU ID.
+
+**/
+UINT32
+GetSkuEnabledTokenNumber (
+  UINT32 LocalTokenNumber,
+  UINTN  Size
+  );
+
+/**
   The function registers the CallBackOnSet fucntion
   according to TokenNumber and EFI_GUID space.
 
@@ -942,8 +1035,10 @@ PeiRegisterCallBackWorker (
 
   @param  FileHandle  Handle of the file the external PCD database binary located.
 
+  @return Pointer to PCD database.
+
 **/
-VOID
+PEI_PCD_DATABASE *
 BuildPcdDatabase (
   IN EFI_PEI_FILE_HANDLE    FileHandle
   );

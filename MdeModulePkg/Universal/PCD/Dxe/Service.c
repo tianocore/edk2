@@ -35,6 +35,317 @@ LIST_ENTRY    *mCallbackFnTable;
 EFI_GUID     **TmpTokenSpaceBuffer;
 UINTN          TmpTokenSpaceBufferCount; 
 
+/**
+  Get Local Token Number by Token Number.
+
+  @param[in]    IsPeiDb     If TRUE, the pcd entry is initialized in PEI phase,
+                            If FALSE, the pcd entry is initialized in DXE phase.
+  @param[in]    TokenNumber The PCD token number.
+
+  @return       Local Token Number.
+**/
+UINT32
+GetLocalTokenNumber (
+  IN BOOLEAN            IsPeiDb,
+  IN UINTN              TokenNumber
+  )
+{
+  UINT32                *LocalTokenNumberTable;
+  UINT32                LocalTokenNumber;
+  UINTN                 Size;
+  UINTN                 MaxSize;
+
+  //
+  // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
+  // We have to decrement TokenNumber by 1 to make it usable
+  // as the array index.
+  //
+  TokenNumber--;
+
+  LocalTokenNumberTable  = IsPeiDb ? (UINT32 *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->LocalTokenNumberTableOffset) : 
+                                     (UINT32 *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->LocalTokenNumberTableOffset);
+  TokenNumber            = IsPeiDb ? TokenNumber : TokenNumber - mPeiLocalTokenCount;
+
+  LocalTokenNumber = LocalTokenNumberTable[TokenNumber];
+
+  Size = (LocalTokenNumber & PCD_DATUM_TYPE_ALL_SET) >> PCD_DATUM_TYPE_SHIFT;
+
+  if ((LocalTokenNumber & PCD_TYPE_SKU_ENABLED) == PCD_TYPE_SKU_ENABLED) {
+    if (Size == 0) {
+      GetPtrTypeSize (TokenNumber, &MaxSize);
+    } else {
+      MaxSize = Size;
+    }
+    LocalTokenNumber = GetSkuEnabledTokenNumber (LocalTokenNumber & ~PCD_TYPE_SKU_ENABLED, MaxSize, IsPeiDb);
+  }
+
+  return LocalTokenNumber;
+}
+
+/**
+  Get PCD type by Local Token Number.
+
+  @param[in]    LocalTokenNumber The PCD local token number.
+
+  @return       PCD type.
+**/
+EFI_PCD_TYPE
+GetPcdType (
+  IN UINT32             LocalTokenNumber
+  )
+{
+  switch (LocalTokenNumber & PCD_DATUM_TYPE_ALL_SET) {
+    case PCD_DATUM_TYPE_POINTER:
+      return EFI_PCD_TYPE_PTR;
+    case PCD_DATUM_TYPE_UINT8:
+      if (LocalTokenNumber & PCD_DATUM_TYPE_UINT8_BOOLEAN) {
+        return EFI_PCD_TYPE_BOOL;
+      } else {
+        return EFI_PCD_TYPE_8;
+      }
+    case PCD_DATUM_TYPE_UINT16:
+      return EFI_PCD_TYPE_16;
+    case PCD_DATUM_TYPE_UINT32:
+      return EFI_PCD_TYPE_32;
+    case PCD_DATUM_TYPE_UINT64:
+      return EFI_PCD_TYPE_64;
+    default:
+      ASSERT (FALSE);
+      return EFI_PCD_TYPE_8;
+  }
+}
+
+/**
+  Get PCD name.
+
+  @param[in]    OnlyTokenSpaceName  If TRUE, only need to get the TokenSpaceCName.
+                                    If FALSE, need to get the full PCD name.
+  @param[in]    IsPeiDb             If TRUE, the pcd entry is initialized in PEI phase,
+                                    If FALSE, the pcd entry is initialized in DXE phase.
+  @param[in]    TokenNumber         The PCD token number.
+
+  @return       The TokenSpaceCName or full PCD name.
+**/
+CHAR8 *
+GetPcdName (
+  IN BOOLEAN            OnlyTokenSpaceName,
+  IN BOOLEAN            IsPeiDb,
+  IN UINTN              TokenNumber
+  )
+{
+  PCD_DATABASE_INIT *Database;
+  UINT8             *StringTable;
+  PCD_NAME_INDEX    *PcdNameIndex;
+  CHAR8             *TokenSpaceName;
+  CHAR8             *PcdName;
+  CHAR8             *Name;
+
+  //
+  // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
+  // We have to decrement TokenNumber by 1 to make it usable
+  // as the array index.
+  //
+  TokenNumber--;
+
+  Database = IsPeiDb ? mPcdDatabase.PeiDb: mPcdDatabase.DxeDb;
+  TokenNumber = IsPeiDb ? TokenNumber : TokenNumber - mPeiLocalTokenCount;
+
+  StringTable = (UINT8 *) Database + Database->StringTableOffset;
+
+  //
+  // Get the PCD name index.
+  //
+  PcdNameIndex = (PCD_NAME_INDEX *)((UINT8 *) Database + Database->PcdNameTableOffset) + TokenNumber;
+  TokenSpaceName = (CHAR8 *)&StringTable[PcdNameIndex->TokenSpaceCNameIndex];
+  PcdName = (CHAR8 *)&StringTable[PcdNameIndex->PcdCNameIndex];
+
+  if (OnlyTokenSpaceName) {
+    //
+    // Only need to get the TokenSpaceCName.
+    //
+    Name = AllocateCopyPool (AsciiStrSize (TokenSpaceName), TokenSpaceName);
+  } else {
+    //
+    // Need to get the full PCD name.
+    //
+    Name = AllocateZeroPool (AsciiStrSize (TokenSpaceName) + AsciiStrSize (PcdName));
+    //
+    // Catenate TokenSpaceCName and PcdCName with a '.' to form the full PCD name.
+    //
+    AsciiStrCat (Name, TokenSpaceName);
+    Name[AsciiStrSize (TokenSpaceName) - sizeof (CHAR8)] = '.';
+    AsciiStrCat (Name, PcdName);  
+  }
+
+  return Name;
+}
+
+/**
+  Retrieve additional information associated with a PCD token.
+
+  This includes information such as the type of value the TokenNumber is associated with as well as possible
+  human readable name that is associated with the token.
+
+  @param[in]    IsPeiDb     If TRUE, the pcd entry is initialized in PEI phase,
+                            If FALSE, the pcd entry is initialized in DXE phase.
+  @param[in]    Guid        The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]    TokenNumber The PCD token number.
+  @param[out]   PcdInfo     The returned information associated with the requested TokenNumber.
+                            The caller is responsible for freeing the buffer that is allocated by callee for PcdInfo->PcdName. 
+
+  @retval  EFI_SUCCESS      The PCD information was returned successfully
+  @retval  EFI_NOT_FOUND    The PCD service could not find the requested token number.
+**/
+EFI_STATUS
+ExGetPcdInfo (
+  IN        BOOLEAN             IsPeiDb,
+  IN CONST  EFI_GUID            *Guid,
+  IN        UINTN               TokenNumber,
+  OUT       EFI_PCD_INFO        *PcdInfo
+  )
+{
+  PCD_DATABASE_INIT     *Database;
+  UINTN                 GuidTableIdx;
+  EFI_GUID              *MatchGuid;
+  EFI_GUID              *GuidTable;
+  DYNAMICEX_MAPPING     *ExMapTable;
+  UINTN                 Index;
+  UINT32                LocalTokenNumber;
+
+  Database = IsPeiDb ? mPcdDatabase.PeiDb: mPcdDatabase.DxeDb;
+
+  GuidTable = (EFI_GUID *)((UINT8 *)Database + Database->GuidTableOffset);
+  MatchGuid = ScanGuid (GuidTable, Database->GuidTableCount * sizeof(EFI_GUID), Guid);
+
+  if (MatchGuid == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  GuidTableIdx = MatchGuid - GuidTable;
+
+  ExMapTable = (DYNAMICEX_MAPPING *)((UINT8 *)Database + Database->ExMapTableOffset);
+
+  //
+  // Find the PCD by GuidTableIdx and ExTokenNumber in ExMapTable.
+  //
+  for (Index = 0; Index < Database->ExTokenCount; Index++) {
+    if (ExMapTable[Index].ExGuidIndex == GuidTableIdx) {
+      if (TokenNumber == PCD_INVALID_TOKEN_NUMBER) {
+        //
+        // TokenNumber is 0, follow spec to set PcdType to EFI_PCD_TYPE_8,
+        // PcdSize to 0 and PcdName to the null-terminated ASCII string
+        // associated with the token's namespace Guid.
+        //
+        PcdInfo->PcdType = EFI_PCD_TYPE_8;
+        PcdInfo->PcdSize = 0;
+        //
+        // Here use one representative in the token space to get the TokenSpaceCName.
+        // 
+        PcdInfo->PcdName = GetPcdName (TRUE, IsPeiDb, ExMapTable[Index].TokenNumber);
+        return EFI_SUCCESS;
+      } else if (ExMapTable[Index].ExTokenNumber == TokenNumber) {
+        PcdInfo->PcdSize = DxePcdGetSize (ExMapTable[Index].TokenNumber);
+        LocalTokenNumber = GetLocalTokenNumber (IsPeiDb, ExMapTable[Index].TokenNumber);
+        PcdInfo->PcdType = GetPcdType (LocalTokenNumber);
+        PcdInfo->PcdName = GetPcdName (FALSE, IsPeiDb, ExMapTable[Index].TokenNumber);
+        return EFI_SUCCESS;
+      }
+    }
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+/**
+  Retrieve additional information associated with a PCD token.
+
+  This includes information such as the type of value the TokenNumber is associated with as well as possible
+  human readable name that is associated with the token.
+
+  @param[in]    Guid        The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]    TokenNumber The PCD token number.
+  @param[out]   PcdInfo     The returned information associated with the requested TokenNumber.
+                            The caller is responsible for freeing the buffer that is allocated by callee for PcdInfo->PcdName.
+
+  @retval  EFI_SUCCESS      The PCD information was returned successfully.
+  @retval  EFI_NOT_FOUND    The PCD service could not find the requested token number.
+**/
+EFI_STATUS
+DxeGetPcdInfo (
+  IN CONST  EFI_GUID        *Guid,
+  IN        UINTN           TokenNumber,
+  OUT       EFI_PCD_INFO    *PcdInfo
+  )
+{
+  EFI_STATUS            Status;
+  BOOLEAN               PeiExMapTableEmpty;
+  BOOLEAN               DxeExMapTableEmpty;
+  UINT32                LocalTokenNumber;
+  BOOLEAN               IsPeiDb;
+
+  if (!FeaturePcdGet (PcdPcdInfoGeneration)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  ASSERT (PcdInfo != NULL);
+
+  Status = EFI_NOT_FOUND;
+  PeiExMapTableEmpty = mPeiExMapTableEmpty;
+  DxeExMapTableEmpty = mDxeExMapTableEmpty;
+
+  if (Guid == NULL) {
+    if (((TokenNumber + 1 > mPeiNexTokenCount + 1) && (TokenNumber + 1 <= mPeiLocalTokenCount + 1)) ||
+        ((TokenNumber + 1 > (mPeiLocalTokenCount + mDxeNexTokenCount + 1)))) {
+      return EFI_NOT_FOUND;
+    } else if (TokenNumber == PCD_INVALID_TOKEN_NUMBER) {
+      //
+      // TokenNumber is 0, follow spec to set PcdType to EFI_PCD_TYPE_8,
+      // PcdSize to 0 and PcdName to NULL for default Token Space.
+      //
+      PcdInfo->PcdType = EFI_PCD_TYPE_8;
+      PcdInfo->PcdSize = 0;
+      PcdInfo->PcdName = NULL;
+    } else {
+      PcdInfo->PcdSize = DxePcdGetSize (TokenNumber);
+      IsPeiDb = FALSE;
+      if ((TokenNumber + 1 <= mPeiNexTokenCount + 1)) {
+        IsPeiDb = TRUE;
+      }
+      LocalTokenNumber = GetLocalTokenNumber (IsPeiDb, TokenNumber);
+      PcdInfo->PcdType = GetPcdType (LocalTokenNumber);
+      PcdInfo->PcdName = GetPcdName (FALSE, IsPeiDb, TokenNumber);
+    }
+    return EFI_SUCCESS;
+  }
+
+  if (PeiExMapTableEmpty && DxeExMapTableEmpty) {
+    return EFI_NOT_FOUND;
+  }
+
+  if (!PeiExMapTableEmpty) {
+    Status = ExGetPcdInfo (
+               TRUE,
+               Guid,
+               TokenNumber,
+               PcdInfo
+               );
+  }
+
+  if (Status == EFI_SUCCESS) {
+    return Status;
+  }
+
+  if (!DxeExMapTableEmpty) {
+    Status = ExGetPcdInfo (
+               FALSE,
+               Guid,
+               TokenNumber,
+               PcdInfo
+               );
+  }
+
+  return Status;
+}
 
 /**
   Get the PCD entry pointer in PCD database.
@@ -56,7 +367,6 @@ GetWorker (
   IN UINTN             GetSize
   )
 {
-  UINT32              *LocalTokenNumberTable;
   EFI_GUID            *GuidTable;
   UINT8               *StringTable;
   EFI_GUID            *Guid;
@@ -67,7 +377,6 @@ GetWorker (
   VPD_HEAD            *VpdHead;
   UINT8               *PcdDb;
   VOID                *RetPtr;
-  UINTN               MaxSize;
   UINTN               TmpTokenNumber;
   UINTN               DataSize;
   EFI_STATUS          Status;
@@ -107,22 +416,7 @@ GetWorker (
   // comparison.
   IsPeiDb = (BOOLEAN) ((TokenNumber + 1 < mPeiLocalTokenCount + 1) ? TRUE : FALSE);
 
-  LocalTokenNumberTable  = IsPeiDb ? (UINT32 *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->LocalTokenNumberTableOffset) : 
-                                     (UINT32 *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->LocalTokenNumberTableOffset);
-
-  TokenNumber            = IsPeiDb ? TokenNumber :
-                                     TokenNumber - mPeiLocalTokenCount;
-
-  LocalTokenNumber = LocalTokenNumberTable[TokenNumber];
-  
-  if ((LocalTokenNumber & PCD_TYPE_SKU_ENABLED) == PCD_TYPE_SKU_ENABLED) {
-    if (GetSize == 0) {
-      GetPtrTypeSize (TmpTokenNumber, &MaxSize);
-    } else {
-      MaxSize = GetSize;
-    }
-    LocalTokenNumber = GetSkuEnabledTokenNumber (LocalTokenNumber & ~PCD_TYPE_SKU_ENABLED, MaxSize, IsPeiDb);
-  }
+  LocalTokenNumber = GetLocalTokenNumber (IsPeiDb, TokenNumber + 1);
 
   PcdDb = IsPeiDb ? ((UINT8 *) mPcdDatabase.PeiDb) : ((UINT8 *) mPcdDatabase.DxeDb);
                                     
@@ -792,7 +1086,6 @@ SetWorker (
   IN          BOOLEAN                 PtrType
   )
 {
-  UINT32              *LocalTokenNumberTable;
   BOOLEAN             IsPeiDb;
   UINT32              LocalTokenNumber;
   EFI_GUID            *GuidTable;
@@ -861,22 +1154,7 @@ SetWorker (
   //
   IsPeiDb = (BOOLEAN) ((TokenNumber + 1 < mPeiLocalTokenCount + 1) ? TRUE : FALSE);
 
-  LocalTokenNumberTable  = IsPeiDb ? (UINT32 *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->LocalTokenNumberTableOffset) : 
-                                     (UINT32 *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->LocalTokenNumberTableOffset) ;
-
-  TokenNumber = IsPeiDb ? TokenNumber
-                        : TokenNumber - mPeiLocalTokenCount;
-
-  LocalTokenNumber = LocalTokenNumberTable[TokenNumber];
-  
-  if ((LocalTokenNumber & PCD_TYPE_SKU_ENABLED) == PCD_TYPE_SKU_ENABLED) {
-    if (PtrType) {
-      GetPtrTypeSize (TmpTokenNumber, &MaxSize);
-    } else {
-      MaxSize = *Size;
-    }
-    LocalTokenNumber = GetSkuEnabledTokenNumber (LocalTokenNumber & ~PCD_TYPE_SKU_ENABLED, MaxSize, IsPeiDb);
-  }
+  LocalTokenNumber = GetLocalTokenNumber (IsPeiDb, TokenNumber + 1);
 
   Offset = LocalTokenNumber & PCD_DATABASE_OFFSET_MASK;
 

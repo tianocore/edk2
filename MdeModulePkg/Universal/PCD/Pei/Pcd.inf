@@ -322,6 +322,7 @@
   BaseLib
   PeimEntryPoint
   DebugLib
+  MemoryAllocationLib
 
 [Guids]
   ## PRODUCES            ## HOB
@@ -333,13 +334,16 @@
   gEfiPeiReadOnlyVariable2PpiGuid               ## SOMETIMES_CONSUMES
   gPcdPpiGuid                                   ## PRODUCES
   gEfiPeiPcdPpiGuid                             ## PRODUCES
-  
+  gGetPcdInfoPpiGuid                            ## SOMETIMES_PRODUCES
+  gEfiGetPcdInfoPpiGuid                         ## SOMETIMES_PRODUCES
+
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiFullPcdDatabaseEnable  ## CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPcdCallBackNumberPerPcdEntry || gEfiMdeModulePkgTokenSpaceGuid.PcdPeiFullPcdDatabaseEnable ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPcdInfoGeneration
 
 [Depex]
   TRUE

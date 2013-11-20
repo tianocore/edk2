@@ -18,17 +18,23 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Protocol/Pcd.h>
 #include <Protocol/PiPcd.h>
+#include <Protocol/PcdInfo.h>
+#include <Protocol/PiPcdInfo.h>
 
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseMemoryLib.h>
 
-PCD_PROTOCOL     *mPcd   = NULL;
-EFI_PCD_PROTOCOL *mPiPcd = NULL;
+PCD_PROTOCOL                *mPcd       = NULL;
+EFI_PCD_PROTOCOL            *mPiPcd     = NULL;
+GET_PCD_INFO_PROTOCOL       *mPcdInfo   = NULL;
+EFI_GET_PCD_INFO_PROTOCOL   *mPiPcdInfo = NULL;
 
 /**
   Retrieves the PI PCD protocol from the handle database.
+
+  @retval EFI_PCD_PROTOCOL * The pointer to the EFI_PCD_PROTOCOL.
 **/
 EFI_PCD_PROTOCOL *
 EFIAPI
@@ -52,6 +58,8 @@ GetPiPcdProtocol (
 
 /**
   Retrieves the PCD protocol from the handle database.
+
+  @retval PCD_PROTOCOL * The pointer to the PCD_PROTOCOL.
 **/
 PCD_PROTOCOL *
 EFIAPI
@@ -73,6 +81,45 @@ GetPcdProtocol (
   return mPcd;
 }
 
+/**
+  Retrieves the PI PCD info protocol from the handle database.
+
+  @retval EFI_GET_PCD_INFO_PROTOCOL * The pointer to the EFI_GET_PCD_INFO_PROTOCOL defined in PI 1.2.1 Vol 3.
+**/
+EFI_GET_PCD_INFO_PROTOCOL *
+GetPiPcdInfoProtocolPointer (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+
+  if (mPiPcdInfo == NULL) {
+    Status = gBS->LocateProtocol (&gEfiGetPcdInfoProtocolGuid, NULL, (VOID **)&mPiPcdInfo);
+    ASSERT_EFI_ERROR (Status);
+    ASSERT (mPiPcdInfo != NULL);
+  }
+  return mPiPcdInfo;
+}
+
+/**
+  Retrieves the PCD info protocol from the handle database.
+
+  @retval GET_PCD_INFO_PROTOCOL * The pointer to the GET_PCD_INFO_PROTOCOL.
+**/
+GET_PCD_INFO_PROTOCOL *
+GetPcdInfoProtocolPointer (
+  VOID
+  ) 
+{
+  EFI_STATUS  Status;
+
+  if (mPcdInfo == NULL) {
+    Status = gBS->LocateProtocol (&gGetPcdInfoProtocolGuid, NULL, (VOID **)&mPcdInfo);
+    ASSERT_EFI_ERROR (Status);
+    ASSERT (mPcdInfo != NULL);
+  }
+  return mPcdInfo;
+}
 
 /**
   This function provides a means by which SKU support can be established in the PCD infrastructure.
@@ -1037,5 +1084,78 @@ LibPatchPcdSetPtr (
   return (VOID *) Buffer;
 }
 
+/**
+  Retrieve additional information associated with a PCD token.
 
+  This includes information such as the type of value the TokenNumber is associated with as well as possible
+  human readable name that is associated with the token.
+
+  If TokenNumber is not in the default token space specified, then ASSERT().
+
+  @param[in]    TokenNumber The PCD token number.
+  @param[out]   PcdInfo     The returned information associated with the requested TokenNumber.
+                            The caller is responsible for freeing the buffer that is allocated by callee for PcdInfo->PcdName.
+**/
+VOID
+EFIAPI
+LibPcdGetInfo (
+  IN        UINTN           TokenNumber,
+  OUT       PCD_INFO        *PcdInfo
+  )
+{
+  EFI_STATUS Status;
+
+  Status = GetPcdInfoProtocolPointer()->GetInfo (TokenNumber, (EFI_PCD_INFO *) PcdInfo);
+  ASSERT_EFI_ERROR (Status);
+}
+
+/**
+  Retrieve additional information associated with a PCD token.
+
+  This includes information such as the type of value the TokenNumber is associated with as well as possible
+  human readable name that is associated with the token.
+
+  If TokenNumber is not in the token space specified by Guid, then ASSERT().
+
+  @param[in]    Guid        The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]    TokenNumber The PCD token number.
+  @param[out]   PcdInfo     The returned information associated with the requested TokenNumber.
+                            The caller is responsible for freeing the buffer that is allocated by callee for PcdInfo->PcdName.
+**/
+VOID
+EFIAPI
+LibPcdGetInfoEx (
+  IN CONST  GUID            *Guid,
+  IN        UINTN           TokenNumber,
+  OUT       PCD_INFO        *PcdInfo
+  )
+{
+  EFI_STATUS Status;
+
+  Status = GetPiPcdInfoProtocolPointer()->GetInfo (Guid, TokenNumber, (EFI_PCD_INFO *) PcdInfo);
+  ASSERT_EFI_ERROR (Status);
+}
+
+/**
+  Retrieve the currently set SKU Id.
+
+  If the sku id got >= PCD_MAX_SKU_ID, then ASSERT().
+
+  @return   The currently set SKU Id. If the platform has not set at a SKU Id, then the
+            default SKU Id value of 0 is returned. If the platform has set a SKU Id, then the currently set SKU
+            Id is returned.
+**/
+UINTN
+EFIAPI
+LibPcdGetSku (
+  VOID
+  )
+{
+  UINTN SkuId;
+
+  SkuId = GetPiPcdInfoProtocolPointer()->GetSku ();
+  ASSERT (SkuId < PCD_MAX_SKU_ID);
+
+  return SkuId;
+}
 

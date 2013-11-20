@@ -89,6 +89,25 @@ EFI_PCD_PROTOCOL mEfiPcdInstance = {
   DxePcdGetNextTokenSpace
 };
 
+///
+/// Instance of GET_PCD_INFO_PROTOCOL protocol is EDKII native implementation.
+/// This protocol instance support dynamic and dynamicEx type PCDs.
+///
+GET_PCD_INFO_PROTOCOL mGetPcdInfoInstance = {
+  DxeGetPcdInfoGetInfo,
+  DxeGetPcdInfoGetInfoEx,
+  DxeGetPcdInfoGetSku
+};
+
+///
+/// Instance of EFI_GET_PCD_INFO_PROTOCOL which is defined in PI 1.2.1 Vol 3.
+/// This PPI instance only support dyanmicEx type PCD.
+///
+EFI_GET_PCD_INFO_PROTOCOL  mEfiGetPcdInfoInstance = {
+  DxeGetPcdInfoGetInfoEx,
+  DxeGetPcdInfoGetSku
+};
+
 EFI_HANDLE mPcdHandle = NULL;
 
 /**
@@ -129,11 +148,90 @@ PcdDxeInit (
                   &gEfiPcdProtocolGuid,  &mEfiPcdInstance,
                   NULL
                   );
-                 
   ASSERT_EFI_ERROR (Status);
 
-  return Status;
+  if (FeaturePcdGet (PcdPcdInfoGeneration) && mPcdDatabase.DxeDb->PcdNameTableOffset != 0) {
+    //
+    // Install GET_PCD_INFO_PROTOCOL to handle dynamic type PCD
+    // Install EFI_GET_PCD_INFO_PROTOCOL to handle dynamicEx type PCD
+    //
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &mPcdHandle,
+                    &gGetPcdInfoProtocolGuid,     &mGetPcdInfoInstance,
+                    &gEfiGetPcdInfoProtocolGuid,  &mEfiGetPcdInfoInstance,
+                    NULL
+                    );
+    ASSERT_EFI_ERROR (Status);
+  }
 
+  return Status;
+}
+
+/**
+  Retrieve additional information associated with a PCD token in the default token space.
+
+  This includes information such as the type of value the TokenNumber is associated with as well as possible
+  human readable name that is associated with the token.
+
+  @param[in]    TokenNumber The PCD token number.
+  @param[out]   PcdInfo     The returned information associated with the requested TokenNumber.
+                            The caller is responsible for freeing the buffer that is allocated by callee for PcdInfo->PcdName.
+
+  @retval  EFI_SUCCESS      The PCD information was returned successfully.
+  @retval  EFI_NOT_FOUND    The PCD service could not find the requested token number.
+**/
+EFI_STATUS
+EFIAPI
+DxeGetPcdInfoGetInfo (
+  IN        UINTN           TokenNumber,
+  OUT       EFI_PCD_INFO    *PcdInfo
+  )
+{
+  return DxeGetPcdInfo (NULL, TokenNumber, PcdInfo);
+}
+
+/**
+  Retrieve additional information associated with a PCD token.
+
+  This includes information such as the type of value the TokenNumber is associated with as well as possible
+  human readable name that is associated with the token.
+
+  @param[in]    Guid        The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]    TokenNumber The PCD token number.
+  @param[out]   PcdInfo     The returned information associated with the requested TokenNumber.
+                            The caller is responsible for freeing the buffer that is allocated by callee for PcdInfo->PcdName.
+
+  @retval  EFI_SUCCESS      The PCD information was returned successfully.
+  @retval  EFI_NOT_FOUND    The PCD service could not find the requested token number.
+**/
+EFI_STATUS
+EFIAPI
+DxeGetPcdInfoGetInfoEx (
+  IN CONST  EFI_GUID        *Guid,
+  IN        UINTN           TokenNumber,
+  OUT       EFI_PCD_INFO    *PcdInfo
+  )
+{
+  return DxeGetPcdInfo (Guid, TokenNumber, PcdInfo);
+}
+
+/**
+  Retrieve the currently set SKU Id.
+
+  @return   The currently set SKU Id. If the platform has not set at a SKU Id, then the
+            default SKU Id value of 0 is returned. If the platform has set a SKU Id, then the currently set SKU
+            Id is returned.
+**/
+UINTN
+EFIAPI
+DxeGetPcdInfoGetSku (
+  VOID
+  )
+{
+  if (!FeaturePcdGet (PcdPcdInfoGeneration)) {
+    return EFI_UNSUPPORTED;
+  }
+  return mPcdDatabase.PeiDb->SystemSkuId;
 }
 
 /**

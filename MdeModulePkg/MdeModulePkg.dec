@@ -376,6 +376,12 @@
   gEdkiiFormBrowserEx2ProtocolGuid = { 0xa770c357, 0xb693, 0x4e6d, { 0xa6, 0xcf, 0xd2, 0x1c, 0x72, 0x8e, 0x55, 0xb } }
 
 [PcdsFeatureFlag]
+  ## Indicates if the Pcd Info Ppi and Protocol should be produced.<BR><BR>
+  #  It can be disabled to save size.<BR><BR>
+  #   TRUE  - Pcd Info Ppi and Protocol will be produced.<BR>
+  #   FALSE - Pcd Info Ppi and Protocol will not be produced.<BR>
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPcdInfoGeneration|TRUE|BOOLEAN|0x0001001C
+
   ## Indicate whether platform can support update capsule across a system reset
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset|FALSE|BOOLEAN|0x0001001d
 

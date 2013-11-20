@@ -1,7 +1,7 @@
 /** @file
   Include file matches things in PI for multiple module types.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -132,5 +132,34 @@ typedef struct {
   ///
   UINT64                RegionState;
 } EFI_SMRAM_DESCRIPTOR;
+
+typedef enum {
+  EFI_PCD_TYPE_8,
+  EFI_PCD_TYPE_16,
+  EFI_PCD_TYPE_32,
+  EFI_PCD_TYPE_64,
+  EFI_PCD_TYPE_BOOL,
+  EFI_PCD_TYPE_PTR
+} EFI_PCD_TYPE;
+
+typedef struct {
+  ///
+  /// The returned information associated with the requested TokenNumber. If
+  /// TokenNumber is 0, then PcdType is set to EFI_PCD_TYPE_8.
+  ///
+  EFI_PCD_TYPE      PcdType;
+  ///
+  /// The size of the data in bytes associated with the TokenNumber specified. If
+  /// TokenNumber is 0, then PcdSize is set 0.
+  ///
+  UINTN             PcdSize;
+  ///
+  /// The null-terminated ASCII string associated with a given token. If the
+  /// TokenNumber specified was 0, then this field corresponds to the null-terminated
+  /// ASCII string associated with the token's namespace Guid. If NULL, there is no
+  /// name associated with this request.
+  ///
+  CHAR8             *PcdName;
+} EFI_PCD_INFO;
 
 #endif

@@ -335,9 +335,12 @@
 [Protocols]
   gPcdProtocolGuid                              ## PRODUCES
   gEfiPcdProtocolGuid                           ## PRODUCES
-  
+  gGetPcdInfoProtocolGuid                       ## SOMETIMES_PRODUCES
+  gEfiGetPcdInfoProtocolGuid                    ## SOMETIMES_PRODUCES
+
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress  ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPcdInfoGeneration
 
 [Depex]
   TRUE
