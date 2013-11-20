@@ -1,7 +1,7 @@
 /** @file
   Main file for Mm shell Debug1 function.
 
-  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -315,7 +315,10 @@ ShellCommandRunMm (
       }
     }
 
-    if (ShellCommandLineGetFlag (Package, L"-n")) {
+    //
+    // Non interactive for a script file or for the specific parameter
+    //
+    if (gEfiShellProtocol->BatchIsActive() || ShellCommandLineGetFlag (Package, L"-n")) {
       Interactive = FALSE;
     }
 
@@ -360,6 +363,11 @@ ShellCommandRunMm (
 
     Temp = ShellCommandLineGetRawValue(Package, 2);
     if (Temp != NULL) {
+      //
+      // Per spec if value is specified, then -n is assumed.
+      //
+      Interactive = FALSE;
+
       if (!ShellIsHexOrDecimalNumber(Temp, TRUE, FALSE) || EFI_ERROR(ShellConvertStringToUint64(Temp, &Value, TRUE, FALSE))) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Temp);
         ShellStatus = SHELL_INVALID_PARAMETER;
@@ -489,23 +497,34 @@ ShellCommandRunMm (
     if (!Interactive) {
       Buffer = 0;
       if (AccessType == EFIMemoryMappedIo) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_MMIO), gShellDebug1HiiHandle);
+        if (!gEfiShellProtocol->BatchIsActive()) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_MMIO), gShellDebug1HiiHandle);
+        }
         IoDev->Mem.Read (IoDev, Width, Address, 1, &Buffer);
       } else if (AccessType == EfiIo) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_IO), gShellDebug1HiiHandle);
+        if (!gEfiShellProtocol->BatchIsActive()) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_IO), gShellDebug1HiiHandle);
+        }
         IoDev->Io.Read (IoDev, Width, Address, 1, &Buffer);
       } else if (AccessType == EfiPciConfig) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_PCI), gShellDebug1HiiHandle);
+        if (!gEfiShellProtocol->BatchIsActive()) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_PCI), gShellDebug1HiiHandle);
+        }
         IoDev->Pci.Read (IoDev, Width, Address, 1, &Buffer);
       } else if (AccessType == EfiPciEConfig) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_PCIE), gShellDebug1HiiHandle);
+        if (!gEfiShellProtocol->BatchIsActive()) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_PCIE), gShellDebug1HiiHandle);
+        }
         IoDev->Pci.Read (IoDev, Width, PciEAddress, 1, &Buffer);
       } else {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_MEM), gShellDebug1HiiHandle);
+        if (!gEfiShellProtocol->BatchIsActive()) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_MEM), gShellDebug1HiiHandle);
+        }
         ReadMem (Width, Address, 1, &Buffer);
       }
-
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_ADDRESS), gShellDebug1HiiHandle, Address);
+      if (!gEfiShellProtocol->BatchIsActive()) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_ADDRESS), gShellDebug1HiiHandle, Address);
+      }
       if (Size == 1) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MM_BUF2), gShellDebug1HiiHandle, (UINTN)Buffer);
       } else if (Size == 2) {
