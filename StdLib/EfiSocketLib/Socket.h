@@ -921,6 +921,25 @@ VOID
   );
 
 /**
+  Verify the adapter's IP address
+
+  This support routine is called by EslSocketBindTest.
+
+  @param [in] pPort       Address of an ::ESL_PORT structure.
+  @param [in] pConfigData Address of the configuration data
+
+  @retval EFI_SUCCESS - The IP address is valid
+  @retval EFI_NOT_STARTED - The IP address is invalid
+
+ **/
+typedef
+EFI_STATUS
+(* PFN_API_VERIFY_LOCAL_IP_ADDRESS) (
+  IN ESL_PORT * pPort,
+  IN VOID * pConfigData
+  );
+
+/**
   Socket type control structure
 
   This driver uses this structure to define the API for the socket type.
@@ -960,6 +979,7 @@ typedef struct {
   PFN_API_TRANSMIT pfnTransmit;             ///<  Attempt to buffer a packet for transmit
   PFN_API_TX_COMPLETE pfnTxComplete;        ///<  TX completion for normal data
   PFN_API_TX_COMPLETE pfnTxOobComplete;     ///<  TX completion for urgent data
+  PFN_API_VERIFY_LOCAL_IP_ADDRESS pfnVerifyLocalIpAddress;  ///< Verify the local IP address
 } ESL_PROTOCOL_API;
 
 

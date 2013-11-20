@@ -52,6 +52,8 @@
   UefiLib
 
 [Protocols]
+  gEfiIp4ConfigProtocolGuid
+  gEfiIp6ConfigProtocolGuid
   gEfiIp4ProtocolGuid
   gEfiIp4ServiceBindingProtocolGuid
   gEfiIp6ProtocolGuid

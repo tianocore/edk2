@@ -1336,27 +1336,40 @@ EslSocketBindTest (
   pConfigData = (VOID *)pBuffer;
 
   //
-  //  Attempt to use this configuration
+  //  Validate that the port is connected
   //
-  Status = pPort->pfnConfigure ( pPort->pProtocol.v, pConfigData );
+  Status = pPort->pSocket->pApi->pfnVerifyLocalIpAddress ( pPort, pBuffer );
   if ( EFI_ERROR ( Status )) {
     DEBUG (( DEBUG_WARN | DEBUG_BIND,
-              "WARNING - Port 0x%08x failed configuration, Status: %r\r\n",
+              "WARNING - Port 0x%08x invalid IP address: %r\r\n",
               pPort,
               Status ));
     pPort->pSocket->errno = ErrnoValue;
   }
   else {
     //
-    //  Reset the port
+    //  Attempt to use this configuration
     //
-    Status = pPort->pfnConfigure ( pPort->pProtocol.v, NULL );
+    Status = pPort->pfnConfigure ( pPort->pProtocol.v, pConfigData );
     if ( EFI_ERROR ( Status )) {
-      DEBUG (( DEBUG_ERROR | DEBUG_BIND,
-                "ERROR - Port 0x%08x failed configuration reset, Status: %r\r\n",
+      DEBUG (( DEBUG_WARN | DEBUG_BIND,
+                "WARNING - Port 0x%08x failed configuration, Status: %r\r\n",
                 pPort,
                 Status ));
-      ASSERT ( EFI_SUCCESS == Status );
+      pPort->pSocket->errno = ErrnoValue;
+    }
+    else {
+      //
+      //  Reset the port
+      //
+      Status = pPort->pfnConfigure ( pPort->pProtocol.v, NULL );
+      if ( EFI_ERROR ( Status )) {
+        DEBUG (( DEBUG_ERROR | DEBUG_BIND,
+                  "ERROR - Port 0x%08x failed configuration reset, Status: %r\r\n",
+                  pPort,
+                  Status ));
+        ASSERT ( EFI_SUCCESS == Status );
+      }
     }
   }
 
@@ -5924,9 +5937,23 @@ EslSocketTxStart (
       *ppActive = pIo;
     }
     else {
+      //
+      //  Display the transmit error
+      //
+      DEBUG (( DEBUG_TX | DEBUG_INFO,
+                "0x%08x, 0x%08x: pIo, pPacket transmit failure: %r\r\n",
+                pIo,
+                pPacket,
+                Status ));
       if ( EFI_SUCCESS == pSocket->TxError ) {
         pSocket->TxError = Status;
       }
+
+      //
+      //  Free the IO structure
+      //
+      pIo->pNext = *ppFree;
+      *ppFree = pIo;
 
       //
       //  Discard the transmit buffer

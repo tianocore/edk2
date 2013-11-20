@@ -2226,6 +2226,159 @@ EslTcp4TxOobComplete (
 
 
 /**
+  Verify the adapter's IP address
+
+  This support routine is called by EslSocketBindTest.
+
+  @param [in] pPort       Address of an ::ESL_PORT structure.
+  @param [in] pConfigData Address of the configuration data
+
+  @retval EFI_SUCCESS - The IP address is valid
+  @retval EFI_NOT_STARTED - The IP address is invalid
+
+ **/
+EFI_STATUS
+EslTcp4VerifyLocalIpAddress (
+  IN ESL_PORT * pPort,
+  IN EFI_TCP4_CONFIG_DATA * pConfigData
+  )
+{
+  UINTN DataSize;
+  EFI_TCP4_ACCESS_POINT * pAccess;
+  EFI_IP4_IPCONFIG_DATA * pIpConfigData;
+  EFI_IP4_CONFIG_PROTOCOL * pIpConfigProtocol;
+  ESL_SERVICE * pService;
+  EFI_STATUS Status;
+
+  DBG_ENTER ( );
+
+  //
+  //  Use break instead of goto
+  //
+  pIpConfigData = NULL;
+  for ( ; ; ) {
+    //
+    //  Determine if the IP address is specified
+    //
+    pAccess = &pConfigData->AccessPoint;
+    DEBUG (( DEBUG_BIND,
+              "UseDefaultAddress: %s\r\n",
+              pAccess->UseDefaultAddress ? L"TRUE" : L"FALSE" ));
+    DEBUG (( DEBUG_BIND,
+              "Requested IP address: %d.%d.%d.%d\r\n",
+              pAccess->StationAddress.Addr [ 0 ],
+              pAccess->StationAddress.Addr [ 1 ],
+              pAccess->StationAddress.Addr [ 2 ],
+              pAccess->StationAddress.Addr [ 3 ]));
+    if ( pAccess->UseDefaultAddress
+      || (( 0 == pAccess->StationAddress.Addr [ 0 ])
+      && ( 0 == pAccess->StationAddress.Addr [ 1 ])
+      && ( 0 == pAccess->StationAddress.Addr [ 2 ])
+      && ( 0 == pAccess->StationAddress.Addr [ 3 ])))
+    {
+      Status = EFI_SUCCESS;
+      break;
+    }
+
+    //
+    //  Open the configuration protocol
+    //
+    pService = pPort->pService;
+    Status = gBS->OpenProtocol ( pService->Controller,
+                                 &gEfiIp4ConfigProtocolGuid,
+                                 (VOID **)&pIpConfigProtocol,
+                                 NULL,
+                                 NULL,
+                                 EFI_OPEN_PROTOCOL_GET_PROTOCOL );
+    if ( EFI_ERROR ( Status )) {
+      DEBUG (( DEBUG_ERROR,
+                "ERROR - IP Configuration Protocol not available, Status: %r\r\n",
+                Status ));
+      break;
+    }
+
+    //
+    //  Get the IP configuration data size
+    //
+    DataSize = 0;
+    Status = pIpConfigProtocol->GetData ( pIpConfigProtocol,
+                                          &DataSize,
+                                          NULL );
+    if ( EFI_BUFFER_TOO_SMALL != Status ) {
+      DEBUG (( DEBUG_ERROR,
+                "ERROR - Failed to get IP Configuration data size, Status: %r\r\n",
+                Status ));
+      break;
+    }
+
+    //
+    //  Allocate the configuration data buffer
+    //
+    pIpConfigData = AllocatePool ( DataSize );
+    if ( NULL == pIpConfigData ) {
+      DEBUG (( DEBUG_ERROR,
+                "ERROR - Not enough memory to allocate IP Configuration data!\r\n" ));
+      Status = EFI_OUT_OF_RESOURCES;
+      break;
+    }
+
+    //
+    //  Get the IP configuration
+    //
+    Status = pIpConfigProtocol->GetData ( pIpConfigProtocol,
+                                          &DataSize,
+                                          pIpConfigData );
+    if ( EFI_ERROR ( Status )) {
+      DEBUG (( DEBUG_ERROR,
+                "ERROR - Failed to return IP Configuration data, Status: %r\r\n",
+                Status ));
+      break;
+    }
+
+    //
+    //  Display the current configuration
+    //
+    DEBUG (( DEBUG_BIND,
+              "Actual adapter IP address: %d.%d.%d.%d\r\n",
+              pIpConfigData->StationAddress.Addr [ 0 ],
+              pIpConfigData->StationAddress.Addr [ 1 ],
+              pIpConfigData->StationAddress.Addr [ 2 ],
+              pIpConfigData->StationAddress.Addr [ 3 ]));
+
+    //
+    //  Assume the port is not configured
+    //
+    Status = EFI_SUCCESS;
+    if (( pAccess->StationAddress.Addr [ 0 ] == pIpConfigData->StationAddress.Addr [ 0 ])
+      && ( pAccess->StationAddress.Addr [ 1 ] == pIpConfigData->StationAddress.Addr [ 1 ])
+      && ( pAccess->StationAddress.Addr [ 2 ] == pIpConfigData->StationAddress.Addr [ 2 ])
+      && ( pAccess->StationAddress.Addr [ 3 ] == pIpConfigData->StationAddress.Addr [ 3 ])) {
+      break;
+    }
+
+    //
+    //  The IP address did not match
+    //
+    Status = EFI_NOT_STARTED;
+    break;
+  }
+
+  //
+  //  Free the buffer if necessary
+  //
+  if ( NULL != pIpConfigData ) {
+    FreePool ( pIpConfigData );
+  }
+
+  //
+  //  Return the IP address status
+  //
+  DBG_EXIT_STATUS ( Status );
+  return Status;
+}
+
+
+/**
   Interface between the socket layer and the network specific
   code that supports SOCK_STREAM and SOCK_SEQPACKET sockets
   over TCPv4.
@@ -2264,5 +2417,6 @@ CONST ESL_PROTOCOL_API cEslTcp4Api = {
   EslTcp4RxStart,
   EslTcp4TxBuffer,
   EslTcp4TxComplete,
-  EslTcp4TxOobComplete
+  EslTcp4TxOobComplete,
+  EslTcp4VerifyLocalIpAddress
 };

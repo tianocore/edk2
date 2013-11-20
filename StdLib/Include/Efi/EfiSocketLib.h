@@ -24,6 +24,8 @@
 #include <Library/UefiLib.h>
 
 #include <Protocol/EfiSocket.h>
+#include <Protocol/Ip4Config.h>
+#include <Protocol/Ip6Config.h>
 #include <Protocol/ServiceBinding.h>
 #include <Protocol/Tcp4.h>
 #include <Protocol/Tcp6.h>
