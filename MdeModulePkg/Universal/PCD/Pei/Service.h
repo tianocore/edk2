@@ -825,7 +825,6 @@ PeiPcdGetNextTokenSpace (
   @retval  EFI_NOT_FOUND    The PCD service could not find the requested token number.
 **/
 EFI_STATUS
-EFIAPI
 PeiGetPcdInfo (
   IN CONST  EFI_GUID        *Guid,
   IN        UINTN           TokenNumber,
