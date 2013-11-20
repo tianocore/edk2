@@ -158,9 +158,9 @@ PcdPeimInit (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Only install PcdInfo PPI when the feature is enabled and PCD info content is present. 
+  // Only install PcdInfo PPI when PCD info content is present. 
   //
-  if (FeaturePcdGet (PcdPcdInfoGeneration) && (DataBase->PcdNameTableOffset != 0)) {
+  if (DataBase->PcdNameTableOffset != 0) {
     //
     // Install GET_PCD_INFO_PPI and EFI_GET_PCD_INFO_PPI.
     //
@@ -232,9 +232,6 @@ PeiGetPcdInfoGetSku (
   VOID
   )
 {
-  if (!FeaturePcdGet (PcdPcdInfoGeneration)) {
-    return EFI_UNSUPPORTED;
-  }
   return GetPcdDatabase()->SystemSkuId;
 }
 

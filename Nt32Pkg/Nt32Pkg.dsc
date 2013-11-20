@@ -31,6 +31,12 @@
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = Nt32Pkg/Nt32Pkg.fdf
+  //
+  // This flag is to control tool to generate PCD info for dynamic(ex) PCD,
+  // then enable or disable PCD info feature. TRUE is enable, and FLASE is disable.
+  // If the flag is absent, it will be same as FALSE.
+  //
+  PCD_INFO_GENERATION            = TRUE
 
   #
   # Defines for default states.  These can be changed on the command line.

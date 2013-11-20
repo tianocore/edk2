@@ -283,10 +283,6 @@ DxeGetPcdInfo (
   UINT32                LocalTokenNumber;
   BOOLEAN               IsPeiDb;
 
-  if (!FeaturePcdGet (PcdPcdInfoGeneration)) {
-    return EFI_UNSUPPORTED;
-  }
-
   ASSERT (PcdInfo != NULL);
 
   Status = EFI_NOT_FOUND;

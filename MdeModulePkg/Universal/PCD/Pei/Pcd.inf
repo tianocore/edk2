@@ -343,7 +343,6 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPcdCallBackNumberPerPcdEntry || gEfiMdeModulePkgTokenSpaceGuid.PcdPeiFullPcdDatabaseEnable ## SOMETIMES_CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPcdInfoGeneration
 
 [Depex]
   TRUE

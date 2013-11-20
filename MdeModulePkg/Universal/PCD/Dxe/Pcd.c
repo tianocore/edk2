@@ -150,7 +150,10 @@ PcdDxeInit (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  if (FeaturePcdGet (PcdPcdInfoGeneration) && mPcdDatabase.DxeDb->PcdNameTableOffset != 0) {
+  //
+  // Only install PcdInfo PROTOCOL when PCD info content is present. 
+  //
+  if (mPcdDatabase.DxeDb->PcdNameTableOffset != 0) {
     //
     // Install GET_PCD_INFO_PROTOCOL to handle dynamic type PCD
     // Install EFI_GET_PCD_INFO_PROTOCOL to handle dynamicEx type PCD
@@ -228,9 +231,6 @@ DxeGetPcdInfoGetSku (
   VOID
   )
 {
-  if (!FeaturePcdGet (PcdPcdInfoGeneration)) {
-    return EFI_UNSUPPORTED;
-  }
   return mPcdDatabase.PeiDb->SystemSkuId;
 }
 

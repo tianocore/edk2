@@ -247,10 +247,6 @@ PeiGetPcdInfo (
   UINTN                 PeiNexTokenNumber;
   UINT32                LocalTokenNumber;
 
-  if (!FeaturePcdGet (PcdPcdInfoGeneration)) {
-    return EFI_UNSUPPORTED;
-  }
-
   ASSERT (PcdInfo != NULL);
 
   PeiPcdDb          = GetPcdDatabase ();

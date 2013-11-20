@@ -340,7 +340,6 @@
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress  ## SOMETIMES_CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPcdInfoGeneration
 
 [Depex]
   TRUE
