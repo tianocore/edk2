@@ -72,6 +72,7 @@ QemuVideoCompleteModeData (
   Mode->FrameBufferSize = Mode->FrameBufferSize * ((ModeData->ColorDepth + 7) / 8);
   DEBUG ((EFI_D_INFO, "FrameBufferBase: 0x%x, FrameBufferSize: 0x%x\n", Mode->FrameBufferBase, Mode->FrameBufferSize));
 
+  FreePool (FrameBufDesc);
   return EFI_SUCCESS;
 }
 

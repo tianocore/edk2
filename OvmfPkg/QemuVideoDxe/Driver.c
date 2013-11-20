@@ -305,6 +305,10 @@ QemuVideoControllerDriverStart (
       DEBUG ((EFI_D_INFO, "QemuVideo: Using mmio bar @ 0x%lx\n",
               MmioDesc->AddrRangeMin));
     }
+
+    if (!EFI_ERROR (Status)) {
+      FreePool (MmioDesc);
+    }
   }
 
   //
