@@ -380,7 +380,7 @@
   #  It can be disabled to save size.<BR><BR>
   #   TRUE  - Pcd Info Ppi and Protocol will be produced.<BR>
   #   FALSE - Pcd Info Ppi and Protocol will not be produced.<BR>
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPcdInfoGeneration|TRUE|BOOLEAN|0x0001001C
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPcdInfoGeneration|FALSE|BOOLEAN|0x0001001C
 
   ## Indicate whether platform can support update capsule across a system reset
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset|FALSE|BOOLEAN|0x0001001d
