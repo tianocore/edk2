@@ -2590,5 +2590,5 @@ CONST ESL_PROTOCOL_API cEslTcp6Api = {
   EslTcp6TxBuffer,
   EslTcp6TxComplete,
   EslTcp6TxOobComplete,
-  EslTcp6VerifyLocalIpAddress
+  (PFN_API_VERIFY_LOCAL_IP_ADDRESS)EslTcp6VerifyLocalIpAddress
 };

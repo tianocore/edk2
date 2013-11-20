@@ -1375,5 +1375,5 @@ CONST ESL_PROTOCOL_API cEslUdp6Api = {
   EslUdp6TxBuffer,
   EslUdp6TxComplete,
   NULL,   //  TxOobComplete
-  EslUdp6VerifyLocalIpAddress
+  (PFN_API_VERIFY_LOCAL_IP_ADDRESS)EslUdp6VerifyLocalIpAddress
 };

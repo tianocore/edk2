@@ -2418,5 +2418,5 @@ CONST ESL_PROTOCOL_API cEslTcp4Api = {
   EslTcp4TxBuffer,
   EslTcp4TxComplete,
   EslTcp4TxOobComplete,
-  EslTcp4VerifyLocalIpAddress
+  (PFN_API_VERIFY_LOCAL_IP_ADDRESS)EslTcp4VerifyLocalIpAddress
 };
