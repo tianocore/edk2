@@ -1044,7 +1044,7 @@ ProcessAction (
   Check whether the formset guid is in this Hii package list.
 
   @param  HiiHandle              The HiiHandle for this HII package list.
-  @param  FormsetGuid            The formset guid for the request formset.
+  @param  FormSetGuid            The formset guid for the request formset.
 
   @retval TRUE                   Find the formset guid.
   @retval FALSE                  Not found the formset guid.
