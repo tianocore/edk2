@@ -1,6 +1,7 @@
 /** @file
   Main file for Pci shell Debug1 function.
 
+  Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
   Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1388,7 +1389,6 @@ PciPrintClassCode (
 {
   UINT32            ClassCode;
   PCI_CLASS_STRINGS ClassStrings;
-  CHAR16            OutputString[PCI_CLASS_STRING_LIMIT + 1];
 
   ClassCode = 0;
   ClassCode |= ClassCodePtr[0];
@@ -1402,9 +1402,9 @@ PciPrintClassCode (
 
   if (IncludePIF) {
     //
-    // Only print base class and sub class name
+    // Print base class, sub class, and programming inferface name
     //
-    ShellPrintEx(-1,-1, L"%s - %s - %s",
+    ShellPrintEx (-1, -1, L"%s - %s - %s",
       ClassStrings.BaseClass,
       ClassStrings.SubClass,
       ClassStrings.PIFClass
@@ -1412,18 +1412,12 @@ PciPrintClassCode (
 
   } else {
     //
-    // Print base class, sub class, and programming inferface name
+    // Only print base class and sub class name
     //
-    UnicodeSPrint (
-      OutputString,
-      PCI_CLASS_STRING_LIMIT * sizeof (CHAR16),
-      L"%s - %s",
+    ShellPrintEx (-1, -1, L"%s - %s",
       ClassStrings.BaseClass,
       ClassStrings.SubClass
-     );
-
-    OutputString[PCI_CLASS_STRING_LIMIT] = 0;
-    ShellPrintEx(-1,-1, L"%s", OutputString);
+    );
   }
 }
 
@@ -2359,7 +2353,6 @@ ShellCommandRunPci (
     if (EFI_ERROR (Status)) {
       ShellPrintHiiEx(
         -1, -1, NULL, STRING_TOKEN (STR_PCI_NO_FIND), gShellDebug1HiiHandle,
-        gShellDebug1HiiHandle,
         Segment,
         Bus
        );
@@ -2632,7 +2625,7 @@ PciExplainData (
 
   Common = &(ConfigSpace->Common);
 
-  Print (L"\n");
+  ShellPrintEx (-1, -1, L"\r\n");
 
   //
   // Print Vendor Id and Device Id
@@ -2733,7 +2726,7 @@ PciExplainData (
   //
   ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_CLASS), gShellDebug1HiiHandle);
   PciPrintClassCode ((UINT8 *) Common->ClassCode, TRUE);
-  Print (L"\n");
+  ShellPrintEx (-1, -1, L"\r\n");
 
   if (ShellGetExecutionBreakFlag()) {
     return EFI_SUCCESS;
@@ -2824,7 +2817,7 @@ PciExplainDeviceData (
     if (!BarExist) {
       BarExist = TRUE;
       ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_START_TYPE), gShellDebug1HiiHandle);
-      Print (L"  --------------------------------------------------------------------------");
+      ShellPrintEx (-1, -1, L"  --------------------------------------------------------------------------");
     }
 
     Status = PciExplainBar (
@@ -2844,7 +2837,7 @@ PciExplainDeviceData (
     ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_NONE), gShellDebug1HiiHandle);
 
   } else {
-    Print (L"\n  --------------------------------------------------------------------------");
+    ShellPrintEx (-1, -1, L"\r\n  --------------------------------------------------------------------------");
   }
 
   //
@@ -2975,7 +2968,7 @@ PciExplainBridgeData (
     if (!BarExist) {
       BarExist = TRUE;
       ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_START_TYPE_2), gShellDebug1HiiHandle);
-      Print (L"  --------------------------------------------------------------------------");
+      ShellPrintEx (-1, -1, L"  --------------------------------------------------------------------------");
     }
 
     Status = PciExplainBar (
@@ -2994,7 +2987,7 @@ PciExplainBridgeData (
   if (!BarExist) {
     ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_NONE), gShellDebug1HiiHandle);
   } else {
-    Print (L"\n  --------------------------------------------------------------------------");
+    ShellPrintEx (-1, -1, L"\r\n  --------------------------------------------------------------------------");
   }
 
   //
@@ -3022,7 +3015,7 @@ PciExplainBridgeData (
     INDEX_OF (&(Bridge->SubordinateBus))
    );
 
-  Print (L"               ------------------------------------------------------\n");
+  ShellPrintEx (-1, -1, L"               ------------------------------------------------------\r\n");
 
   ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_BRIDGE), gShellDebug1HiiHandle, Bridge->PrimaryBus);
   ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_BRIDGE), gShellDebug1HiiHandle, Bridge->SecondaryBus);
@@ -3049,7 +3042,7 @@ PciExplainBridgeData (
   // base and limit address are listed.
   //
   ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_RESOURCE_TYPE), gShellDebug1HiiHandle);
-  Print (L"----------------------------------------------------------------------\n");
+  ShellPrintEx (-1, -1, L"----------------------------------------------------------------------\r\n");
 
   //
   // IO Base & Limit
@@ -3218,7 +3211,7 @@ PciExplainBar (
     //
     IsMem = FALSE;
     ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_ONE_VAR_4), gShellDebug1HiiHandle, *Bar & 0xfffffffc);
-    Print (L"I/O                               ");
+    ShellPrintEx (-1, -1, L"I/O                               ");
   }
 
   //
@@ -3292,7 +3285,7 @@ PciExplainBar (
     } else {
       ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_RSHIFT), gShellDebug1HiiHandle, (UINT32) RShiftU64 (NewBar64, 32));
       ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_RSHIFT), gShellDebug1HiiHandle, (UINT32) NewBar64);
-      Print (L"  ");
+      ShellPrintEx (-1, -1, L"  ");
       ShellPrintHiiEx(-1, -1, NULL,
         STRING_TOKEN (STR_PCI2_RSHIFT),
         gShellDebug1HiiHandle,
@@ -3352,7 +3345,7 @@ PciExplainCardBusData (
     INDEX_OF (&(CardBus->SubordinateBusNumber))
    );
 
-  Print (L"               ------------------------------------------------------\n");
+  ShellPrintEx (-1, -1, L"               ------------------------------------------------------\r\n");
 
   ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_CARDBUS), gShellDebug1HiiHandle, CardBus->PciBusNumber);
   ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_CARDBUS_2), gShellDebug1HiiHandle, CardBus->CardBusBusNumber);
@@ -3372,7 +3365,7 @@ PciExplainCardBusData (
   // Print Memory/Io ranges this cardbus bridge forwards
   //
   ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_RESOURCE_TYPE_2), gShellDebug1HiiHandle);
-  Print (L"----------------------------------------------------------------------\n");
+  ShellPrintEx (-1, -1, L"----------------------------------------------------------------------\r\n");
 
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_MEM_3),
@@ -3805,8 +3798,8 @@ ExplainPcieCapReg (
   CHAR16 *DevicePortType;
 
   PcieCapReg = PciExpressCap->PcieCapReg;
-  Print (
-    L"  Capability Version(3:0):          %E0x%04x%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Capability Version(3:0):          %E0x%04x%N\r\n",
     PCIE_CAP_VERSION (PcieCapReg)
    );
   if ((UINT8) PCIE_CAP_DEVICEPORT_TYPE (PcieCapReg) < PCIE_DEVICE_PORT_TYPE_MAX) {
@@ -3814,8 +3807,8 @@ ExplainPcieCapReg (
   } else {
     DevicePortType = L"Unknown Type";
   }
-  Print (
-    L"  Device/PortType(7:4):             %E%s%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Device/PortType(7:4):             %E%s%N\r\n",
     DevicePortType
    );
   //
@@ -3825,13 +3818,13 @@ ExplainPcieCapReg (
   //
   if (PCIE_CAP_DEVICEPORT_TYPE (PcieCapReg) == PCIE_ROOT_COMPLEX_ROOT_PORT ||
       PCIE_CAP_DEVICEPORT_TYPE (PcieCapReg) == PCIE_SWITCH_DOWNSTREAM_PORT) {
-    Print (
-      L"  Slot Implemented(8):              %E%d%N\n",
+    ShellPrintEx (-1, -1,
+      L"  Slot Implemented(8):              %E%d%N\r\n",
       PCIE_CAP_SLOT_IMPLEMENTED (PcieCapReg)
      );
   }
-  Print (
-    L"  Interrupt Message Number(13:9):   %E0x%05x%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Interrupt Message Number(13:9):   %E0x%05x%N\r\n",
     PCIE_CAP_INT_MSG_NUM (PcieCapReg)
    );
   return EFI_SUCCESS;
@@ -3858,18 +3851,18 @@ ExplainPcieDeviceCap (
   PcieCapReg     = PciExpressCap->PcieCapReg;
   PcieDeviceCap  = PciExpressCap->PcieDeviceCap;
   DevicePortType = (UINT8) PCIE_CAP_DEVICEPORT_TYPE (PcieCapReg);
-  Print (L"  Max_Payload_Size Supported(2:0):          ");
+  ShellPrintEx (-1, -1, L"  Max_Payload_Size Supported(2:0):          ");
   if (PCIE_CAP_MAX_PAYLOAD (PcieDeviceCap) < 6) {
-    Print (L"%E%d bytes%N\n", 1 << (PCIE_CAP_MAX_PAYLOAD (PcieDeviceCap) + 7));
+    ShellPrintEx (-1, -1, L"%E%d bytes%N\r\n", 1 << (PCIE_CAP_MAX_PAYLOAD (PcieDeviceCap) + 7));
   } else {
-    Print (L"%EUnknown%N\n");
+    ShellPrintEx (-1, -1, L"%EUnknown%N\r\n");
   }
-  Print (
-    L"  Phantom Functions Supported(4:3):         %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Phantom Functions Supported(4:3):         %E%d%N\r\n",
     PCIE_CAP_PHANTOM_FUNC (PcieDeviceCap)
    );
-  Print (
-    L"  Extended Tag Field Supported(5):          %E%d-bit Tag field supported%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Extended Tag Field Supported(5):          %E%d-bit Tag field supported%N\r\n",
     PCIE_CAP_EXTENDED_TAG (PcieDeviceCap) ? 8 : 5
    );
   //
@@ -3878,25 +3871,25 @@ ExplainPcieDeviceCap (
   if (IS_PCIE_ENDPOINT (DevicePortType)) {
     L0sLatency = (UINT8) PCIE_CAP_L0SLATENCY (PcieDeviceCap);
     L1Latency  = (UINT8) PCIE_CAP_L1LATENCY (PcieDeviceCap);
-    Print (L"  Endpoint L0s Acceptable Latency(8:6):     ");
+    ShellPrintEx (-1, -1, L"  Endpoint L0s Acceptable Latency(8:6):     ");
     if (L0sLatency < 4) {
-      Print (L"%EMaximum of %d ns%N\n", 1 << (L0sLatency + 6));
+      ShellPrintEx (-1, -1, L"%EMaximum of %d ns%N\r\n", 1 << (L0sLatency + 6));
     } else {
       if (L0sLatency < 7) {
-        Print (L"%EMaximum of %d us%N\n", 1 << (L0sLatency - 3));
+        ShellPrintEx (-1, -1, L"%EMaximum of %d us%N\r\n", 1 << (L0sLatency - 3));
       } else {
-        Print (L"%ENo limit%N\n");
+        ShellPrintEx (-1, -1, L"%ENo limit%N\r\n");
       }
     }
-    Print (L"  Endpoint L1 Acceptable Latency(11:9):     ");
+    ShellPrintEx (-1, -1, L"  Endpoint L1 Acceptable Latency(11:9):     ");
     if (L1Latency < 7) {
-      Print (L"%EMaximum of %d us%N\n", 1 << (L1Latency + 1));
+      ShellPrintEx (-1, -1, L"%EMaximum of %d us%N\r\n", 1 << (L1Latency + 1));
     } else {
-      Print (L"%ENo limit%N\n");
+      ShellPrintEx (-1, -1, L"%ENo limit%N\r\n");
     }
   }
-  Print (
-    L"  Role-based Error Reporting(15):           %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Role-based Error Reporting(15):           %E%d%N\r\n",
     PCIE_CAP_ERR_REPORTING (PcieDeviceCap)
    );
   //
@@ -3905,12 +3898,12 @@ ExplainPcieDeviceCap (
   // b) Captured Slot Power Scale
   //
   if (DevicePortType == PCIE_SWITCH_UPSTREAM_PORT) {
-    Print (
-      L"  Captured Slot Power Limit Value(25:18):   %E0x%02x%N\n",
+    ShellPrintEx (-1, -1,
+      L"  Captured Slot Power Limit Value(25:18):   %E0x%02x%N\r\n",
       PCIE_CAP_SLOT_POWER_VALUE (PcieDeviceCap)
      );
-    Print (
-      L"  Captured Slot Power Limit Scale(27:26):   %E%s%N\n",
+    ShellPrintEx (-1, -1,
+      L"  Captured Slot Power Limit Scale(27:26):   %E%s%N\r\n",
       SlotPwrLmtScaleTable[PCIE_CAP_SLOT_POWER_SCALE (PcieDeviceCap)]
      );
   }
@@ -3918,8 +3911,8 @@ ExplainPcieDeviceCap (
   // Function Level Reset Capability is only valid for Endpoint
   //
   if (IS_PCIE_ENDPOINT (DevicePortType)) {
-    Print (
-      L"  Function Level Reset Capability(28):      %E%d%N\n",
+    ShellPrintEx (-1, -1,
+      L"  Function Level Reset Capability(28):      %E%d%N\r\n",
       PCIE_CAP_FUNC_LEVEL_RESET (PcieDeviceCap)
      );
   }
@@ -3943,60 +3936,60 @@ ExplainPcieDeviceControl (
 
   PcieCapReg        = PciExpressCap->PcieCapReg;
   PcieDeviceControl = PciExpressCap->DeviceControl;
-  Print (
-    L"  Correctable Error Reporting Enable(0):    %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Correctable Error Reporting Enable(0):    %E%d%N\r\n",
     PCIE_CAP_COR_ERR_REPORTING_ENABLE (PcieDeviceControl)
    );
-  Print (
-    L"  Non-Fatal Error Reporting Enable(1):      %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Non-Fatal Error Reporting Enable(1):      %E%d%N\r\n",
     PCIE_CAP_NONFAT_ERR_REPORTING_ENABLE (PcieDeviceControl)
    );
-  Print (
-    L"  Fatal Error Reporting Enable(2):          %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Fatal Error Reporting Enable(2):          %E%d%N\r\n",
     PCIE_CAP_FATAL_ERR_REPORTING_ENABLE (PcieDeviceControl)
    );
-  Print (
-    L"  Unsupported Request Reporting Enable(3):  %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Unsupported Request Reporting Enable(3):  %E%d%N\r\n",
     PCIE_CAP_UNSUP_REQ_REPORTING_ENABLE (PcieDeviceControl)
    );
-  Print (
-    L"  Enable Relaxed Ordering(4):               %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Enable Relaxed Ordering(4):               %E%d%N\r\n",
     PCIE_CAP_RELAXED_ORDERING_ENABLE (PcieDeviceControl)
    );
-  Print (L"  Max_Payload_Size(7:5):                    ");
+  ShellPrintEx (-1, -1, L"  Max_Payload_Size(7:5):                    ");
   if (PCIE_CAP_MAX_PAYLOAD_SIZE (PcieDeviceControl) < 6) {
-    Print (L"%E%d bytes%N\n", 1 << (PCIE_CAP_MAX_PAYLOAD_SIZE (PcieDeviceControl) + 7));
+    ShellPrintEx (-1, -1, L"%E%d bytes%N\r\n", 1 << (PCIE_CAP_MAX_PAYLOAD_SIZE (PcieDeviceControl) + 7));
   } else {
-    Print (L"%EUnknown%N\n");
+    ShellPrintEx (-1, -1, L"%EUnknown%N\r\n");
   }
-  Print (
-    L"  Extended Tag Field Enable(8):             %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Extended Tag Field Enable(8):             %E%d%N\r\n",
     PCIE_CAP_EXTENDED_TAG_ENABLE (PcieDeviceControl)
    );
-  Print (
-    L"  Phantom Functions Enable(9):              %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Phantom Functions Enable(9):              %E%d%N\r\n",
     PCIE_CAP_PHANTOM_FUNC_ENABLE (PcieDeviceControl)
    );
-  Print (
-    L"  Auxiliary (AUX) Power PM Enable(10):      %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Auxiliary (AUX) Power PM Enable(10):      %E%d%N\r\n",
     PCIE_CAP_AUX_PM_ENABLE (PcieDeviceControl)
    );
-  Print (
-    L"  Enable No Snoop(11):                      %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Enable No Snoop(11):                      %E%d%N\r\n",
     PCIE_CAP_NO_SNOOP_ENABLE (PcieDeviceControl)
    );
-  Print (L"  Max_Read_Request_Size(14:12):             ");
+  ShellPrintEx (-1, -1, L"  Max_Read_Request_Size(14:12):             ");
   if (PCIE_CAP_MAX_READ_REQ_SIZE (PcieDeviceControl) < 6) {
-    Print (L"%E%d bytes%N\n", 1 << (PCIE_CAP_MAX_READ_REQ_SIZE (PcieDeviceControl) + 7));
+    ShellPrintEx (-1, -1, L"%E%d bytes%N\r\n", 1 << (PCIE_CAP_MAX_READ_REQ_SIZE (PcieDeviceControl) + 7));
   } else {
-    Print (L"%EUnknown%N\n");
+    ShellPrintEx (-1, -1, L"%EUnknown%N\r\n");
   }
   //
   // Read operation is only valid for PCI Express to PCI/PCI-X Bridges
   //
   if (PCIE_CAP_DEVICEPORT_TYPE (PcieCapReg) == PCIE_PCIE_TO_PCIX_BRIDGE) {
-    Print (
-      L"  Bridge Configuration Retry Enable(15):  %E%d%N\n",
+    ShellPrintEx (-1, -1,
+      L"  Bridge Configuration Retry Enable(15):  %E%d%N\r\n",
       PCIE_CAP_BRG_CONF_RETRY (PcieDeviceControl)
      );
   }
@@ -4018,28 +4011,28 @@ ExplainPcieDeviceStatus (
   UINT16 PcieDeviceStatus;
 
   PcieDeviceStatus = PciExpressCap->DeviceStatus;
-  Print (
-    L"  Correctable Error Detected(0):            %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Correctable Error Detected(0):            %E%d%N\r\n",
     PCIE_CAP_COR_ERR_DETECTED (PcieDeviceStatus)
    );
-  Print (
-    L"  Non-Fatal Error Detected(1):              %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Non-Fatal Error Detected(1):              %E%d%N\r\n",
     PCIE_CAP_NONFAT_ERR_DETECTED (PcieDeviceStatus)
    );
-  Print (
-    L"  Fatal Error Detected(2):                  %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Fatal Error Detected(2):                  %E%d%N\r\n",
     PCIE_CAP_FATAL_ERR_DETECTED (PcieDeviceStatus)
    );
-  Print (
-    L"  Unsupported Request Detected(3):          %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Unsupported Request Detected(3):          %E%d%N\r\n",
     PCIE_CAP_UNSUP_REQ_DETECTED (PcieDeviceStatus)
    );
-  Print (
-    L"  AUX Power Detected(4):                    %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  AUX Power Detected(4):                    %E%d%N\r\n",
     PCIE_CAP_AUX_POWER_DETECTED (PcieDeviceStatus)
    );
-  Print (
-    L"  Transactions Pending(5):                  %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Transactions Pending(5):                  %E%d%N\r\n",
     PCIE_CAP_TRANSACTION_PENDING (PcieDeviceStatus)
    );
   return EFI_SUCCESS;
@@ -4073,12 +4066,12 @@ ExplainPcieLinkCap (
       SupLinkSpeeds = L"Unknown";
       break;
   }
-  Print (
-    L"  Supported Link Speeds(3:0):                         %E%s supported%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Supported Link Speeds(3:0):                         %E%s supported%N\r\n",
     SupLinkSpeeds
    );
-  Print (
-    L"  Maximum Link Width(9:4):                            %Ex%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Maximum Link Width(9:4):                            %Ex%d%N\r\n",
     PCIE_CAP_MAX_LINK_WIDTH (PcieLinkCap)
    );
   switch (PCIE_CAP_ASPM_SUPPORT (PcieLinkCap)) {
@@ -4092,36 +4085,36 @@ ExplainPcieLinkCap (
       AspmValue = L"Reserved";
       break;
   }
-  Print (
-    L"  Active State Power Management Support(11:10):       %E%s Supported%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Active State Power Management Support(11:10):       %E%s Supported%N\r\n",
     AspmValue
    );
-  Print (
-    L"  L0s Exit Latency(14:12):                            %E%s%N\n",
+  ShellPrintEx (-1, -1,
+    L"  L0s Exit Latency(14:12):                            %E%s%N\r\n",
     L0sLatencyStrTable[PCIE_CAP_L0S_LATENCY (PcieLinkCap)]
    );
-  Print (
-    L"  L1 Exit Latency(17:15):                             %E%s%N\n",
+  ShellPrintEx (-1, -1,
+    L"  L1 Exit Latency(17:15):                             %E%s%N\r\n",
     L1LatencyStrTable[PCIE_CAP_L0S_LATENCY (PcieLinkCap)]
    );
-  Print (
-    L"  Clock Power Management(18):                         %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Clock Power Management(18):                         %E%d%N\r\n",
     PCIE_CAP_CLOCK_PM (PcieLinkCap)
    );
-  Print (
-    L"  Surprise Down Error Reporting Capable(19):          %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Surprise Down Error Reporting Capable(19):          %E%d%N\r\n",
     PCIE_CAP_SUP_DOWN_ERR_REPORTING (PcieLinkCap)
    );
-  Print (
-    L"  Data Link Layer Link Active Reporting Capable(20):  %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Data Link Layer Link Active Reporting Capable(20):  %E%d%N\r\n",
     PCIE_CAP_LINK_ACTIVE_REPORTING (PcieLinkCap)
    );
-  Print (
-    L"  Link Bandwidth Notification Capability(21):         %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Link Bandwidth Notification Capability(21):         %E%d%N\r\n",
     PCIE_CAP_LINK_BWD_NOTIF_CAP (PcieLinkCap)
    );
-  Print (
-    L"  Port Number(31:24):                                 %E0x%02x%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Port Number(31:24):                                 %E0x%02x%N\r\n",
     PCIE_CAP_PORT_NUMBER (PcieLinkCap)
    );
   return EFI_SUCCESS;
@@ -4144,16 +4137,16 @@ ExplainPcieLinkControl (
 
   PcieLinkControl = PciExpressCap->LinkControl;
   DevicePortType  = (UINT8) PCIE_CAP_DEVICEPORT_TYPE (PciExpressCap->PcieCapReg);
-  Print (
-    L"  Active State Power Management Control(1:0):         %E%s%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Active State Power Management Control(1:0):         %E%s%N\r\n",
     ASPMCtrlStrTable[PCIE_CAP_ASPM_CONTROL (PcieLinkControl)]
    );
   //
   // RCB is not applicable to switches
   //
   if (!IS_PCIE_SWITCH(DevicePortType)) {
-    Print (
-      L"  Read Completion Boundary (RCB)(3):                  %E%d byte%N\n",
+    ShellPrintEx (-1, -1,
+      L"  Read Completion Boundary (RCB)(3):                  %E%d byte%N\r\n",
       1 << (PCIE_CAP_RCB (PcieLinkControl) + 6)
      );
   }
@@ -4166,33 +4159,33 @@ ExplainPcieLinkControl (
   if (!IS_PCIE_ENDPOINT (DevicePortType) &&
       DevicePortType != PCIE_SWITCH_UPSTREAM_PORT &&
       DevicePortType != PCIE_PCIE_TO_PCIX_BRIDGE) {
-    Print (
-      L"  Link Disable(4):                                    %E%d%N\n",
+    ShellPrintEx (-1, -1,
+      L"  Link Disable(4):                                    %E%d%N\r\n",
       PCIE_CAP_LINK_DISABLE (PcieLinkControl)
      );
   }
-  Print (
-    L"  Common Clock Configuration(6):                      %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Common Clock Configuration(6):                      %E%d%N\r\n",
     PCIE_CAP_COMMON_CLK_CONF (PcieLinkControl)
    );
-  Print (
-    L"  Extended Synch(7):                                  %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Extended Synch(7):                                  %E%d%N\r\n",
     PCIE_CAP_EXT_SYNC (PcieLinkControl)
    );
-  Print (
-    L"  Enable Clock Power Management(8):                   %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Enable Clock Power Management(8):                   %E%d%N\r\n",
     PCIE_CAP_CLK_PWR_MNG (PcieLinkControl)
    );
-  Print (
-    L"  Hardware Autonomous Width Disable(9):               %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Hardware Autonomous Width Disable(9):               %E%d%N\r\n",
     PCIE_CAP_HW_AUTO_WIDTH_DISABLE (PcieLinkControl)
    );
-  Print (
-    L"  Link Bandwidth Management Interrupt Enable(10):     %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Link Bandwidth Management Interrupt Enable(10):     %E%d%N\r\n",
     PCIE_CAP_LINK_BDW_MNG_INT_EN (PcieLinkControl)
    );
-  Print (
-    L"  Link Autonomous Bandwidth Interrupt Enable(11):     %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Link Autonomous Bandwidth Interrupt Enable(11):     %E%d%N\r\n",
     PCIE_CAP_LINK_AUTO_BDW_INT_EN (PcieLinkControl)
    );
   return EFI_SUCCESS;
@@ -4225,32 +4218,32 @@ ExplainPcieLinkStatus (
       SupLinkSpeeds = L"Reserved";
       break;
   }
-  Print (
-    L"  Current Link Speed(3:0):                            %E%s%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Current Link Speed(3:0):                            %E%s%N\r\n",
     SupLinkSpeeds
    );
-  Print (
-    L"  Negotiated Link Width(9:4):                         %Ex%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Negotiated Link Width(9:4):                         %Ex%d%N\r\n",
     PCIE_CAP_NEGO_LINK_WIDTH (PcieLinkStatus)
    );
-  Print (
-    L"  Link Training(11):                                  %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Link Training(11):                                  %E%d%N\r\n",
     PCIE_CAP_LINK_TRAINING (PcieLinkStatus)
    );
-  Print (
-    L"  Slot Clock Configuration(12):                       %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Slot Clock Configuration(12):                       %E%d%N\r\n",
     PCIE_CAP_SLOT_CLK_CONF (PcieLinkStatus)
    );
-  Print (
-    L"  Data Link Layer Link Active(13):                    %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Data Link Layer Link Active(13):                    %E%d%N\r\n",
     PCIE_CAP_DATA_LINK_ACTIVE (PcieLinkStatus)
    );
-  Print (
-    L"  Link Bandwidth Management Status(14):               %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Link Bandwidth Management Status(14):               %E%d%N\r\n",
     PCIE_CAP_LINK_BDW_MNG_STAT (PcieLinkStatus)
    );
-  Print (
-    L"  Link Autonomous Bandwidth Status(15):               %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Link Autonomous Bandwidth Status(15):               %E%d%N\r\n",
     PCIE_CAP_LINK_AUTO_BDW_STAT (PcieLinkStatus)
    );
   return EFI_SUCCESS;
@@ -4272,52 +4265,52 @@ ExplainPcieSlotCap (
 
   PcieSlotCap = PciExpressCap->SlotCap;
 
-  Print (
-    L"  Attention Button Present(0):                        %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Attention Button Present(0):                        %E%d%N\r\n",
     PCIE_CAP_ATT_BUT_PRESENT (PcieSlotCap)
    );
-  Print (
-    L"  Power Controller Present(1):                        %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Power Controller Present(1):                        %E%d%N\r\n",
     PCIE_CAP_PWR_CTRLLER_PRESENT (PcieSlotCap)
    );
-  Print (
-    L"  MRL Sensor Present(2):                              %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  MRL Sensor Present(2):                              %E%d%N\r\n",
     PCIE_CAP_MRL_SENSOR_PRESENT (PcieSlotCap)
    );
-  Print (
-    L"  Attention Indicator Present(3):                     %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Attention Indicator Present(3):                     %E%d%N\r\n",
     PCIE_CAP_ATT_IND_PRESENT (PcieSlotCap)
    );
-  Print (
-    L"  Power Indicator Present(4):                         %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Power Indicator Present(4):                         %E%d%N\r\n",
     PCIE_CAP_PWD_IND_PRESENT (PcieSlotCap)
    );
-  Print (
-    L"  Hot-Plug Surprise(5):                               %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Hot-Plug Surprise(5):                               %E%d%N\r\n",
     PCIE_CAP_HOTPLUG_SUPPRISE (PcieSlotCap)
    );
-  Print (
-    L"  Hot-Plug Capable(6):                                %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Hot-Plug Capable(6):                                %E%d%N\r\n",
     PCIE_CAP_HOTPLUG_CAPABLE (PcieSlotCap)
    );
-  Print (
-    L"  Slot Power Limit Value(14:7):                       %E0x%02x%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Slot Power Limit Value(14:7):                       %E0x%02x%N\r\n",
     PCIE_CAP_SLOT_PWR_LIMIT_VALUE (PcieSlotCap)
    );
-  Print (
-    L"  Slot Power Limit Scale(16:15):                      %E%s%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Slot Power Limit Scale(16:15):                      %E%s%N\r\n",
     SlotPwrLmtScaleTable[PCIE_CAP_SLOT_PWR_LIMIT_SCALE (PcieSlotCap)]
    );
-  Print (
-    L"  Electromechanical Interlock Present(17):            %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Electromechanical Interlock Present(17):            %E%d%N\r\n",
     PCIE_CAP_ELEC_INTERLOCK_PRESENT (PcieSlotCap)
    );
-  Print (
-    L"  No Command Completed Support(18):                   %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  No Command Completed Support(18):                   %E%d%N\r\n",
     PCIE_CAP_NO_COMM_COMPLETED_SUP (PcieSlotCap)
    );
-  Print (
-    L"  Physical Slot Number(31:19):                        %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Physical Slot Number(31:19):                        %E%d%N\r\n",
     PCIE_CAP_PHY_SLOT_NUM (PcieSlotCap)
    );
 
@@ -4339,50 +4332,50 @@ ExplainPcieSlotControl (
   UINT16 PcieSlotControl;
 
   PcieSlotControl = PciExpressCap->SlotControl;
-  Print (
-    L"  Attention Button Pressed Enable(0):                 %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Attention Button Pressed Enable(0):                 %E%d%N\r\n",
     PCIE_CAP_ATT_BUT_ENABLE (PcieSlotControl)
    );
-  Print (
-    L"  Power Fault Detected Enable(1):                     %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Power Fault Detected Enable(1):                     %E%d%N\r\n",
     PCIE_CAP_PWR_FLT_DETECT_ENABLE (PcieSlotControl)
    );
-  Print (
-    L"  MRL Sensor Changed Enable(2):                       %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  MRL Sensor Changed Enable(2):                       %E%d%N\r\n",
     PCIE_CAP_MRL_SENSOR_CHANGE_ENABLE (PcieSlotControl)
    );
-  Print (
-    L"  Presence Detect Changed Enable(3):                  %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Presence Detect Changed Enable(3):                  %E%d%N\r\n",
     PCIE_CAP_PRES_DETECT_CHANGE_ENABLE (PcieSlotControl)
    );
-  Print (
-    L"  Command Completed Interrupt Enable(4):              %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Command Completed Interrupt Enable(4):              %E%d%N\r\n",
     PCIE_CAP_COMM_CMPL_INT_ENABLE (PcieSlotControl)
    );
-  Print (
-    L"  Hot-Plug Interrupt Enable(5):                       %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Hot-Plug Interrupt Enable(5):                       %E%d%N\r\n",
     PCIE_CAP_HOTPLUG_INT_ENABLE (PcieSlotControl)
    );
-  Print (
-    L"  Attention Indicator Control(7:6):                   %E%s%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Attention Indicator Control(7:6):                   %E%s%N\r\n",
     IndicatorTable[PCIE_CAP_ATT_IND_CTRL (PcieSlotControl)]
    );
-  Print (
-    L"  Power Indicator Control(9:8):                       %E%s%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Power Indicator Control(9:8):                       %E%s%N\r\n",
     IndicatorTable[PCIE_CAP_PWR_IND_CTRL (PcieSlotControl)]
    );
-  Print (L"  Power Controller Control(10):                       %EPower ");
+  ShellPrintEx (-1, -1, L"  Power Controller Control(10):                       %EPower ");
   if (PCIE_CAP_PWR_CTRLLER_CTRL (PcieSlotControl)) {
-    Print (L"Off%N\n");
+    ShellPrintEx (-1, -1, L"Off%N\r\n");
   } else {
-    Print (L"On%N\n");
+    ShellPrintEx (-1, -1, L"On%N\r\n");
   }
-  Print (
-    L"  Electromechanical Interlock Control(11):            %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Electromechanical Interlock Control(11):            %E%d%N\r\n",
     PCIE_CAP_ELEC_INTERLOCK_CTRL (PcieSlotControl)
    );
-  Print (
-    L"  Data Link Layer State Changed Enable(12):           %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Data Link Layer State Changed Enable(12):           %E%d%N\r\n",
     PCIE_CAP_DLINK_STAT_CHANGE_ENABLE (PcieSlotControl)
    );
   return EFI_SUCCESS;
@@ -4404,46 +4397,46 @@ ExplainPcieSlotStatus (
 
   PcieSlotStatus = PciExpressCap->SlotStatus;
 
-  Print (
-    L"  Attention Button Pressed(0):           %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Attention Button Pressed(0):           %E%d%N\r\n",
     PCIE_CAP_ATT_BUT_PRESSED (PcieSlotStatus)
    );
-  Print (
-    L"  Power Fault Detected(1):               %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Power Fault Detected(1):               %E%d%N\r\n",
     PCIE_CAP_PWR_FLT_DETECTED (PcieSlotStatus)
    );
-  Print (
-    L"  MRL Sensor Changed(2):                 %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  MRL Sensor Changed(2):                 %E%d%N\r\n",
     PCIE_CAP_MRL_SENSOR_CHANGED (PcieSlotStatus)
    );
-  Print (
-    L"  Presence Detect Changed(3):            %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Presence Detect Changed(3):            %E%d%N\r\n",
     PCIE_CAP_PRES_DETECT_CHANGED (PcieSlotStatus)
    );
-  Print (
-    L"  Command Completed(4):                  %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Command Completed(4):                  %E%d%N\r\n",
     PCIE_CAP_COMM_COMPLETED (PcieSlotStatus)
    );
-  Print (L"  MRL Sensor State(5):                   %EMRL ");
+  ShellPrintEx (-1, -1, L"  MRL Sensor State(5):                   %EMRL ");
   if (PCIE_CAP_MRL_SENSOR_STATE (PcieSlotStatus)) {
-    Print (L" Opened%N\n");
+    ShellPrintEx (-1, -1, L" Opened%N\r\n");
   } else {
-    Print (L" Closed%N\n");
+    ShellPrintEx (-1, -1, L" Closed%N\r\n");
   }
-  Print (L"  Presence Detect State(6):              ");
+  ShellPrintEx (-1, -1, L"  Presence Detect State(6):              ");
   if (PCIE_CAP_PRES_DETECT_STATE (PcieSlotStatus)) {
-    Print (L"%ECard Present in slot%N\n");
+    ShellPrintEx (-1, -1, L"%ECard Present in slot%N\r\n");
   } else {
-    Print (L"%ESlot Empty%N\n");
+    ShellPrintEx (-1, -1, L"%ESlot Empty%N\r\n");
   }
-  Print (L"  Electromechanical Interlock Status(7): %EElectromechanical Interlock ");
+  ShellPrintEx (-1, -1, L"  Electromechanical Interlock Status(7): %EElectromechanical Interlock ");
   if (PCIE_CAP_ELEC_INTERLOCK_STATE (PcieSlotStatus)) {
-    Print (L"Engaged%N\n");
+    ShellPrintEx (-1, -1, L"Engaged%N\r\n");
   } else {
-    Print (L"Disengaged%N\n");
+    ShellPrintEx (-1, -1, L"Disengaged%N\r\n");
   }
-  Print (
-    L"  Data Link Layer State Changed(8):      %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  Data Link Layer State Changed(8):      %E%d%N\r\n",
     PCIE_CAP_DLINK_STAT_CHANGED (PcieSlotStatus)
    );
   return EFI_SUCCESS;
@@ -4465,24 +4458,24 @@ ExplainPcieRootControl (
 
   PcieRootControl = PciExpressCap->RootControl;
 
-  Print (
-    L"  System Error on Correctable Error Enable(0):  %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  System Error on Correctable Error Enable(0):  %E%d%N\r\n",
     PCIE_CAP_SYSERR_ON_CORERR_EN (PcieRootControl)
    );
-  Print (
-    L"  System Error on Non-Fatal Error Enable(1):    %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  System Error on Non-Fatal Error Enable(1):    %E%d%N\r\n",
     PCIE_CAP_SYSERR_ON_NONFATERR_EN (PcieRootControl)
    );
-  Print (
-    L"  System Error on Fatal Error Enable(2):        %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  System Error on Fatal Error Enable(2):        %E%d%N\r\n",
     PCIE_CAP_SYSERR_ON_FATERR_EN (PcieRootControl)
    );
-  Print (
-    L"  PME Interrupt Enable(3):                      %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  PME Interrupt Enable(3):                      %E%d%N\r\n",
     PCIE_CAP_PME_INT_ENABLE (PcieRootControl)
    );
-  Print (
-    L"  CRS Software Visibility Enable(4):            %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  CRS Software Visibility Enable(4):            %E%d%N\r\n",
     PCIE_CAP_CRS_SW_VIS_ENABLE (PcieRootControl)
    );
 
@@ -4505,8 +4498,8 @@ ExplainPcieRootCap (
 
   PcieRootCap = PciExpressCap->RsvdP;
 
-  Print (
-    L"  CRS Software Visibility(0):                   %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  CRS Software Visibility(0):                   %E%d%N\r\n",
     PCIE_CAP_CRS_SW_VIS (PcieRootCap)
    );
 
@@ -4529,16 +4522,16 @@ ExplainPcieRootStatus (
 
   PcieRootStatus = PciExpressCap->RootStatus;
 
-  Print (
-    L"  PME Requester ID(15:0):                       %E0x%04x%N\n",
+  ShellPrintEx (-1, -1,
+    L"  PME Requester ID(15:0):                       %E0x%04x%N\r\n",
     PCIE_CAP_PME_REQ_ID (PcieRootStatus)
    );
-  Print (
-    L"  PME Status(16):                               %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  PME Status(16):                               %E%d%N\r\n",
     PCIE_CAP_PME_STATUS (PcieRootStatus)
    );
-  Print (
-    L"  PME Pending(17):                              %E%d%N\n",
+  ShellPrintEx (-1, -1,
+    L"  PME Pending(17):                              %E%d%N\r\n",
     PCIE_CAP_PME_PENDING (PcieRootStatus)
    );
   return EFI_SUCCESS;
@@ -4584,7 +4577,7 @@ PciExplainPciExpress (
 
   DevicePortType = (UINT8) PCIE_CAP_DEVICEPORT_TYPE (PciExpressCap.PcieCapReg);
 
-  Print (L"\nPci Express device capability structure:\n");
+  ShellPrintEx (-1, -1, L"\r\nPci Express device capability structure:\r\n");
 
   for (Index = 0; PcieExplainList[Index].Type < PcieExplainTypeMax; Index++) {
     if (ShellGetExecutionBreakFlag()) {
@@ -4682,7 +4675,7 @@ PciExplainPciExpress (
   //
   // Start outputing PciEx extend space( 0xFF-0xFFF)
   //
-  Print (L"\n%HStart dumping PCIex extended configuration space (0x100 - 0xFFF).%N\n\n");
+  ShellPrintEx (-1, -1, L"\r\n%HStart dumping PCIex extended configuration space (0x100 - 0xFFF).%N\r\n\r\n");
 
   if (ExRegBuffer != NULL) {
     DumpHex (
