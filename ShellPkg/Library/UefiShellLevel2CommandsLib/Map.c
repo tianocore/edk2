@@ -397,10 +397,14 @@ PerformSingleMappingDisplay(
   CHAR16                    *MediaType;
   CHAR16                    *DevPathString;
   CHAR16                    *TempSpot;
+  CHAR16                    *Alias;
   UINTN                     TempLen;
   BOOLEAN                   Removable;
   CONST CHAR16              *TempSpot2;
 
+  Alias       = NULL;
+  TempSpot2   = NULL;
+  CurrentName = NULL;
   DevPath = DevicePathFromHandle(Handle);
   DevPathCopy = DevPath;
   MapList = gEfiShellProtocol->GetMapFromDevicePath(&DevPathCopy);
@@ -412,14 +416,74 @@ PerformSingleMappingDisplay(
     return EFI_NOT_FOUND;
   }
 
-  CurrentName = NULL;
-  CurrentName = StrnCatGrow(&CurrentName, 0, MapList, 0);
-  if (CurrentName == NULL) {
-    return (EFI_OUT_OF_RESOURCES);
-  }
-  TempSpot = StrStr(CurrentName, L";");
-  if (TempSpot != NULL) {
-    *TempSpot = CHAR_NULL;
+  if (Normal) {
+    //
+    // Allocate a name
+    //
+    CurrentName = NULL;
+    CurrentName = StrnCatGrow(&CurrentName, 0, MapList, 0);
+    if (CurrentName == NULL) {
+      return (EFI_OUT_OF_RESOURCES);
+    }
+
+    //
+    // Chop off the other names that become "Alias(s)"
+    // leaving just the normal name
+    //
+    TempSpot = StrStr(CurrentName, L";");
+    if (TempSpot != NULL) {
+      *TempSpot = CHAR_NULL;
+    }
+  } else if (Consist) {
+    CurrentName = NULL;
+
+    //
+    // Skip the first name.  This is the standard name.
+    //
+    TempSpot = StrStr(MapList, L";");
+    if (TempSpot != NULL) {
+      TempSpot++;
+    }
+    SearchList(TempSpot, L"HD*", &CurrentName, TRUE, FALSE, L";");
+    if (CurrentName == NULL) {
+      SearchList(TempSpot, L"CD*", &CurrentName, TRUE, FALSE, L";");
+    }
+    if (CurrentName == NULL) {
+      SearchList(TempSpot, L"FP*", &CurrentName, TRUE, FALSE, L";");
+    }
+    if (CurrentName == NULL) {
+      SearchList(TempSpot, L"F*",  &CurrentName, TRUE, FALSE, L";");
+    }
+    if (CurrentName == NULL) {
+      //
+      // We didnt find anything, so just the first one in the list...
+      //
+      CurrentName = StrnCatGrow(&CurrentName, 0, MapList, 0);
+      if (CurrentName == NULL) {
+        return (EFI_OUT_OF_RESOURCES);
+      }
+      TempSpot = StrStr(CurrentName, L";");
+      if (TempSpot != NULL) {
+        *TempSpot = CHAR_NULL;
+      }
+    } else {
+      Alias = StrnCatGrow(&Alias, 0, MapList, 0);
+      TempSpot = StrStr(Alias, CurrentName);
+      if (TempSpot != NULL) {
+        TempSpot2 = StrStr(TempSpot, L";");
+        if (TempSpot2 != NULL) {
+          TempSpot2++; // Move past ";" from CurrentName
+          CopyMem(TempSpot, TempSpot2, StrSize(TempSpot2));
+        } else {
+          *TempSpot = CHAR_NULL;
+        }
+      }
+      if (Alias[StrLen(Alias)-1] == L';') {
+        Alias[StrLen(Alias)-1] = CHAR_NULL;
+      }
+    }
+  } else {
+    CurrentName = NULL;
   }
   DevPathString = ConvertDevicePathToText(DevPath, TRUE, FALSE);
   if (!SFO) {
@@ -431,7 +495,7 @@ PerformSingleMappingDisplay(
       STRING_TOKEN (STR_MAP_ENTRY),
       gShellLevel2HiiHandle,
       CurrentName,
-      TempLen < StrLen(MapList)?MapList + TempLen+1:L"",
+      Alias!=NULL?Alias:(TempLen < StrLen(MapList)?MapList + TempLen+1:L""),
       DevPathString
      );
     if (Verbose) {
@@ -454,7 +518,7 @@ PerformSingleMappingDisplay(
           TempSpot2
          );
       }
-      FreePool(MediaType);
+      SHELL_FREE_NON_NULL(MediaType);
     }
   } else {
     TempLen = StrLen(CurrentName);
@@ -466,11 +530,12 @@ PerformSingleMappingDisplay(
       gShellLevel2HiiHandle,
       CurrentName,
       DevPathString,
-      TempLen < StrLen(MapList)?MapList + TempLen+1:L""
+      Consist?L"":(TempLen < StrLen(MapList)?MapList + TempLen+1:L"")
      );
   }
-  FreePool(DevPathString);
-  FreePool(CurrentName);
+  SHELL_FREE_NON_NULL(DevPathString);
+  SHELL_FREE_NON_NULL(CurrentName);
+  SHELL_FREE_NON_NULL(Alias);
   return EFI_SUCCESS;
 }
 
