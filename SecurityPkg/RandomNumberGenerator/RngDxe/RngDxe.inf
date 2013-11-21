@@ -36,7 +36,9 @@
 [Sources.common]
   RngDxe.c
   RdRand.c
+  RdRand.h
   AesCore.c
+  AesCore.h
 
 [Sources.IA32]
   IA32/RdRandWord.c

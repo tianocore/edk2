@@ -103,6 +103,9 @@ UefiMain (
   //
   RandSize = 32;
   Rand     = AllocatePool (RandSize);
+  if (Rand == NULL) {
+    goto Exit;
+  }
   
   //
   // RNG with default algorithm
