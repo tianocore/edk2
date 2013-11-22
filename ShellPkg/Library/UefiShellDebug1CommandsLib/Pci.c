@@ -4051,32 +4051,41 @@ ExplainPcieLinkCap (
   )
 {
   UINT32 PcieLinkCap;
-  CHAR16 *SupLinkSpeeds;
+  CHAR16 *MaxLinkSpeed;
   CHAR16 *AspmValue;
 
   PcieLinkCap = PciExpressCap->LinkCap;
-  switch (PCIE_CAP_SUP_LINK_SPEEDS (PcieLinkCap)) {
+  switch (PCIE_CAP_MAX_LINK_SPEED (PcieLinkCap)) {
     case 1:
-      SupLinkSpeeds = L"2.5 GT/s";
+      MaxLinkSpeed = L"2.5 GT/s";
       break;
     case 2:
-      SupLinkSpeeds = L"5.0 GT/s and 2.5 GT/s";
+      MaxLinkSpeed = L"5.0 GT/s";
+      break;
+    case 3:
+      MaxLinkSpeed = L"8.0 GT/s";
       break;
     default:
-      SupLinkSpeeds = L"Unknown";
+      MaxLinkSpeed = L"Unknown";
       break;
   }
   ShellPrintEx (-1, -1,
-    L"  Supported Link Speeds(3:0):                         %E%s supported%N\r\n",
-    SupLinkSpeeds
+    L"  Maximum Link Speed(3:0):                            %E%s%N\r\n",
+    MaxLinkSpeed
    );
   ShellPrintEx (-1, -1,
     L"  Maximum Link Width(9:4):                            %Ex%d%N\r\n",
     PCIE_CAP_MAX_LINK_WIDTH (PcieLinkCap)
    );
   switch (PCIE_CAP_ASPM_SUPPORT (PcieLinkCap)) {
+    case 0:
+      AspmValue = L"Not";
+      break;
     case 1:
-      AspmValue = L"L0s Entry";
+      AspmValue = L"L0s";
+      break;
+    case 2:
+      AspmValue = L"L1";
       break;
     case 3:
       AspmValue = L"L0s and L1";
@@ -4204,23 +4213,26 @@ ExplainPcieLinkStatus (
   )
 {
   UINT16 PcieLinkStatus;
-  CHAR16 *SupLinkSpeeds;
+  CHAR16 *CurLinkSpeed;
 
   PcieLinkStatus = PciExpressCap->LinkStatus;
   switch (PCIE_CAP_CUR_LINK_SPEED (PcieLinkStatus)) {
     case 1:
-      SupLinkSpeeds = L"2.5 GT/s";
+      CurLinkSpeed = L"2.5 GT/s";
       break;
     case 2:
-      SupLinkSpeeds = L"5.0 GT/s";
+      CurLinkSpeed = L"5.0 GT/s";
+      break;
+    case 3:
+      CurLinkSpeed = L"8.0 GT/s";
       break;
     default:
-      SupLinkSpeeds = L"Reserved";
+      CurLinkSpeed = L"Reserved";
       break;
   }
   ShellPrintEx (-1, -1,
     L"  Current Link Speed(3:0):                            %E%s%N\r\n",
-    SupLinkSpeeds
+    CurLinkSpeed
    );
   ShellPrintEx (-1, -1,
     L"  Negotiated Link Width(9:4):                         %Ex%d%N\r\n",

@@ -1,6 +1,7 @@
 /** @file
   Header file for Pci shell Debug1 function.
 
+  Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
   Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -157,7 +158,7 @@ typedef enum {
 //
 // Link Capabilities Register
 //
-#define PCIE_CAP_SUP_LINK_SPEEDS(PcieLinkCap) \
+#define PCIE_CAP_MAX_LINK_SPEED(PcieLinkCap) \
     ((PcieLinkCap) & 0x0f)
 #define PCIE_CAP_MAX_LINK_WIDTH(PcieLinkCap) \
     (((PcieLinkCap) >> 4) & 0x3f)
