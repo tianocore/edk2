@@ -1,5 +1,5 @@
 # Ebc, Ia32, Ipf, X64
-  The binaries in this package currently are built from EDK2 release: MdePkg and BaseTools (r14830), FatPkg (r79)
+  The binaries in this package currently are built from EDK2 release: MdePkg and BaseTools (r14889), FatPkg (r80)
   The binaries are built with no debug info (RELEASE TARGET).
   The Component Name 2 Protocol and Unicode Collation 2 Protocol are supported.
 
