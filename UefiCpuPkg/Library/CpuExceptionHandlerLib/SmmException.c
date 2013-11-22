@@ -1,49 +1,21 @@
 /** @file
-  CPU exception handler library implemenation for SEC/PEIM modules.
+  CPU exception handler library implemenation for SMM modules.
 
-Copyright (c) 2012 - 2013, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under
-the terms and conditions of the BSD License that accompanies this distribution.
-The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.
+  Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <PiPei.h>
+#include <PiSmm.h>
 #include "CpuExceptionCommon.h"
 
-//
-// Image Aglinment size for SEC/PEI phase
-//
-CONST UINTN    mImageAlignSize   = 4;
-CONST UINTN    mDoFarReturnFlag  = 0;
-
-/**
-  Common exception handler.
-
-  @param ExceptionType  Exception type.
-  @param SystemContext  Pointer to EFI_SYSTEM_CONTEXT.
-**/
-VOID
-EFIAPI
-CommonExceptionHandler (
-  IN EFI_EXCEPTION_TYPE   ExceptionType, 
-  IN EFI_SYSTEM_CONTEXT   SystemContext
-  )
-{
-  //
-  // Display ExceptionType, CPU information and Image information
-  //  
-  DumpCpuContent (ExceptionType, SystemContext);
-  
-  //
-  // Enter a dead loop.
-  //
-  CpuDeadLoop ();
-}
+CONST UINTN   mDoFarReturnFlag   = 1; 
 
 /**
   Initializes all CPU exceptions entries and provides the default exception handlers.
@@ -52,8 +24,6 @@ CommonExceptionHandler (
   persist by EFI_VECTOR_HANDOFF_INFO defined in PI 1.3 specification.
   If caller cannot get reserved vector list or it does not exists, set VectorInfo to NULL. 
   If VectorInfo is not NULL, the exception vectors will be initialized per vector attribute accordingly.
-  Note: Before invoking this API, caller must allocate memory for IDT table and load 
-        IDTR by AsmWriteIdtr().
 
   @param[in]  VectorInfo    Pointer to reserved vector list.
   
@@ -69,59 +39,7 @@ InitializeCpuExceptionHandlers (
   IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
   )
 {
-  EFI_STATUS                       Status;  
-  RESERVED_VECTORS_DATA            ReservedVectorData[CPU_EXCEPTION_NUM];
-  IA32_DESCRIPTOR                  IdtDescriptor;
-  UINTN                            IdtEntryCount;
-  UINT16                           CodeSegment;
-  EXCEPTION_HANDLER_TEMPLATE_MAP   TemplateMap;
-  IA32_IDT_GATE_DESCRIPTOR         *IdtTable;
-  UINTN                            Index;
-  UINTN                            InterruptHandler;
-
-  if (VectorInfo != NULL) {
-    SetMem ((VOID *) ReservedVectorData, sizeof (RESERVED_VECTORS_DATA) * CPU_EXCEPTION_NUM, 0xff);
-    Status = ReadAndVerifyVectorInfo (VectorInfo, ReservedVectorData, CPU_EXCEPTION_NUM);
-    if (EFI_ERROR (Status)) {
-      return EFI_INVALID_PARAMETER;
-    }
-  }
-  //
-  // Read IDT descriptor and calculate IDT size
-  //
-  AsmReadIdtr (&IdtDescriptor);
-  IdtEntryCount = (IdtDescriptor.Limit + 1) / sizeof (IA32_IDT_GATE_DESCRIPTOR);
-  if (IdtEntryCount > CPU_EXCEPTION_NUM) {
-    //
-    // CPU exeption library only setup CPU_EXCEPTION_NUM exception handler at most
-    //
-    IdtEntryCount = CPU_EXCEPTION_NUM;
-  }
-  //
-  // Use current CS as the segment selector of interrupt gate in IDT
-  //
-  CodeSegment = AsmReadCs ();
-
-  AsmGetTemplateAddressMap (&TemplateMap);
-  IdtTable = (IA32_IDT_GATE_DESCRIPTOR *)IdtDescriptor.Base;
-  for (Index = 0; Index < IdtEntryCount; Index ++) {
-    IdtTable[Index].Bits.Selector = CodeSegment;
-    //
-    // Check reserved vectors attributes if has, only EFI_VECTOR_HANDOFF_DO_NOT_HOOK
-    // supported in this instance
-    //
-    if (VectorInfo != NULL) {
-      if (ReservedVectorData[Index].Attribute == EFI_VECTOR_HANDOFF_DO_NOT_HOOK) {
-        continue;
-      }
-    }
-    //
-    // Update IDT entry
-    //
-    InterruptHandler = TemplateMap.ExceptionStart + Index * TemplateMap.ExceptionStubHeaderSize;
-    ArchUpdateIdtEntry (&IdtTable[Index], InterruptHandler);
-  }
-  return EFI_SUCCESS;
+  return InitializeCpuExceptionHandlersWorker (VectorInfo);
 }
 
 /**
@@ -179,5 +97,5 @@ RegisterCpuInterruptHandler (
   IN EFI_CPU_INTERRUPT_HANDLER     InterruptHandler
   )
 {
-  return EFI_UNSUPPORTED;
+  return RegisterCpuInterruptHandlerWorker (InterruptType, InterruptHandler);
 }

@@ -1,7 +1,7 @@
 /** @file
   CPU DXE Module.
 
-  Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -30,12 +30,10 @@
 #include <Library/MtrrLib.h>
 #include <Library/LocalApicLib.h>
 #include <Library/UefiCpuLib.h>
+#include <Library/UefiLib.h>
+#include <Library/CpuExceptionHandlerLib.h>
 #include <Guid/IdleLoopEvent.h>
-
-//
-//
-//
-#define INTERRUPT_VECTOR_NUMBER   256
+#include <Guid/VectorHandoffTable.h>
 
 #define EFI_MEMORY_CACHETYPE_MASK     (EFI_MEMORY_UC  | \
                                        EFI_MEMORY_WC  | \
@@ -221,30 +219,6 @@ CpuSetMemoryAttributes (
   );
 
 /**
-  Label of base address of IDT vector 0.
-
-  This is just a label of base address of IDT vector 0.
-
-**/
-VOID
-EFIAPI
-AsmIdtVector00 (
-  VOID
-  );
-
-/**
-  Initializes the pointer to the external interrupt vector table.
-
-  @param  VectorTable  Address of the external interrupt vector table.
-
-**/
-VOID
-EFIAPI
-InitializeExternalVectorTablePtr (
-  EFI_CPU_INTERRUPT_HANDLER  *VectorTable
-  );
-
-/**
   Initialize Global Descriptor Table.
 
 **/
@@ -275,17 +249,6 @@ VOID
 EFIAPI
 SetDataSelectors (
   UINT16 Selector
-  );
-
-/**
-  Restore original Interrupt Descriptor Table Handler Address.
-
-  @param Index        The Index of the interrupt descriptor table handle.
-
-**/
-VOID
-RestoreInterruptDescriptorTableHandlerAddress (
-  IN UINTN       Index
   );
 
 #endif

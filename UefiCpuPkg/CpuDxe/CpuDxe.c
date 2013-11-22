@@ -1,7 +1,7 @@
 /** @file
   CPU DXE Module.
 
-  Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -17,16 +17,11 @@
 //
 // Global Variables
 //
-IA32_IDT_GATE_DESCRIPTOR  gIdtTable[INTERRUPT_VECTOR_NUMBER] = { { { 0 } } };
-
-EFI_CPU_INTERRUPT_HANDLER ExternalVectorTable[0x100];
 BOOLEAN                   InterruptState = FALSE;
 EFI_HANDLE                mCpuHandle = NULL;
 BOOLEAN                   mIsFlushingGCD;
 UINT64                    mValidMtrrAddressMask = MTRR_LIB_CACHE_VALID_ADDRESS;
 UINT64                    mValidMtrrBitsMask    = MTRR_LIB_MSR_VALID_MASK;
-IA32_IDT_GATE_DESCRIPTOR  *mOrigIdtEntry        = NULL;
-UINT16                    mOrigIdtEntryCount    = 0;
 
 FIXED_MTRR    mFixedMtrrTable[] = {
   {
@@ -101,257 +96,8 @@ EFI_CPU_ARCH_PROTOCOL  gCpu = {
 };
 
 //
-// Error code flag indicating whether or not an error code will be
-// pushed on the stack if an exception occurs.
-//
-// 1 means an error code will be pushed, otherwise 0
-//
-// bit 0 - exception 0
-// bit 1 - exception 1
-// etc.
-//
-UINT32 mErrorCodeFlag = 0x00027d00;
-
-//
-// Local function prototypes
-//
-
-/**
-  Set Interrupt Descriptor Table Handler Address.
-
-  @param Index        The Index of the interrupt descriptor table handle.
-  @param Handler      Handler address.
-
-**/
-VOID
-SetInterruptDescriptorTableHandlerAddress (
-  IN UINTN Index,
-  IN VOID  *Handler  OPTIONAL
-  );
-
-//
 // CPU Arch Protocol Functions
 //
-
-
-/**
-  Common exception handler.
-
-  @param  InterruptType  Exception type
-  @param  SystemContext  EFI_SYSTEM_CONTEXT
-
-**/
-VOID
-EFIAPI
-CommonExceptionHandler (
-  IN EFI_EXCEPTION_TYPE   InterruptType,
-  IN EFI_SYSTEM_CONTEXT   SystemContext
-  )
-{
-#if defined (MDE_CPU_IA32)
-  DEBUG ((
-    EFI_D_ERROR,
-    "!!!! IA32 Exception Type - %08x !!!!\n",
-    InterruptType
-    ));
-  if ((mErrorCodeFlag & (1 << InterruptType)) != 0) {
-    DEBUG ((
-      EFI_D_ERROR,
-      "ExceptionData - %08x\n",
-      SystemContext.SystemContextIa32->ExceptionData
-      ));
-  }
-  DEBUG ((
-    EFI_D_ERROR,
-    "CS  - %04x,     EIP - %08x, EFL - %08x, SS  - %04x\n",
-    SystemContext.SystemContextIa32->Cs,
-    SystemContext.SystemContextIa32->Eip,
-    SystemContext.SystemContextIa32->Eflags,
-    SystemContext.SystemContextIa32->Ss
-    ));
-  DEBUG ((
-    EFI_D_ERROR,
-    "DS  - %04x,     ES  - %04x,     FS  - %04x,     GS  - %04x\n",
-    SystemContext.SystemContextIa32->Ds,
-    SystemContext.SystemContextIa32->Es,
-    SystemContext.SystemContextIa32->Fs,
-    SystemContext.SystemContextIa32->Gs
-    ));
-  DEBUG ((
-    EFI_D_ERROR,
-    "EAX - %08x, EBX - %08x, ECX - %08x, EDX - %08x\n",
-    SystemContext.SystemContextIa32->Eax,
-    SystemContext.SystemContextIa32->Ebx,
-    SystemContext.SystemContextIa32->Ecx,
-    SystemContext.SystemContextIa32->Edx
-    ));
-  DEBUG ((
-    EFI_D_ERROR,
-    "ESP - %08x, EBP - %08x, ESI - %08x, EDI - %08x\n",
-    SystemContext.SystemContextIa32->Esp,
-    SystemContext.SystemContextIa32->Ebp,
-    SystemContext.SystemContextIa32->Esi,
-    SystemContext.SystemContextIa32->Edi
-    ));
-  DEBUG ((
-    EFI_D_ERROR,
-    "GDT - %08x  LIM - %04x,     IDT - %08x  LIM - %04x\n",
-    SystemContext.SystemContextIa32->Gdtr[0],
-    SystemContext.SystemContextIa32->Gdtr[1],
-    SystemContext.SystemContextIa32->Idtr[0],
-    SystemContext.SystemContextIa32->Idtr[1]
-    ));
-  DEBUG ((
-    EFI_D_ERROR,
-    "LDT - %08x, TR  - %08x\n",
-    SystemContext.SystemContextIa32->Ldtr,
-    SystemContext.SystemContextIa32->Tr
-    ));
-  DEBUG ((
-    EFI_D_ERROR,
-    "CR0 - %08x, CR2 - %08x, CR3 - %08x, CR4 - %08x\n",
-    SystemContext.SystemContextIa32->Cr0,
-    SystemContext.SystemContextIa32->Cr2,
-    SystemContext.SystemContextIa32->Cr3,
-    SystemContext.SystemContextIa32->Cr4
-    ));
-  DEBUG ((
-    EFI_D_ERROR,
-    "DR0 - %08x, DR1 - %08x, DR2 - %08x, DR3 - %08x\n",
-    SystemContext.SystemContextIa32->Dr0,
-    SystemContext.SystemContextIa32->Dr1,
-    SystemContext.SystemContextIa32->Dr2,
-    SystemContext.SystemContextIa32->Dr3
-    ));
-  DEBUG ((
-    EFI_D_ERROR,
-    "DR6 - %08x, DR7 - %08x\n",
-    SystemContext.SystemContextIa32->Dr6,
-    SystemContext.SystemContextIa32->Dr7
-    ));
-#elif defined (MDE_CPU_X64)
-  DEBUG ((
-    EFI_D_ERROR,
-    "!!!! X64 Exception Type - %016lx !!!!\n",
-    (UINT64)InterruptType
-    ));
-  if ((mErrorCodeFlag & (1 << InterruptType)) != 0) {
-    DEBUG ((
-      EFI_D_ERROR,
-      "ExceptionData - %016lx\n",
-      SystemContext.SystemContextX64->ExceptionData
-      ));
-  }
-  DEBUG ((
-    EFI_D_ERROR,
-    "RIP - %016lx, RFL - %016lx\n",
-    SystemContext.SystemContextX64->Rip,
-    SystemContext.SystemContextX64->Rflags
-    ));
-  DEBUG ((
-    EFI_D_ERROR,
-    "RAX - %016lx, RCX - %016lx, RDX - %016lx\n",
-    SystemContext.SystemContextX64->Rax,
-    SystemContext.SystemContextX64->Rcx,
-    SystemContext.SystemContextX64->Rdx
-    ));
-  DEBUG ((
-    EFI_D_ERROR,
-    "RBX - %016lx, RSP - %016lx, RBP - %016lx\n",
-    SystemContext.SystemContextX64->Rbx,
-    SystemContext.SystemContextX64->Rsp,
-    SystemContext.SystemContextX64->Rbp
-    ));
-  DEBUG ((
-    EFI_D_ERROR,
-    "RSI - %016lx, RDI - %016lx\n",
-    SystemContext.SystemContextX64->Rsi,
-    SystemContext.SystemContextX64->Rdi
-    ));
-  DEBUG ((
-    EFI_D_ERROR,
-    "R8  - %016lx, R9  - %016lx, R10 - %016lx\n",
-    SystemContext.SystemContextX64->R8,
-    SystemContext.SystemContextX64->R9,
-    SystemContext.SystemContextX64->R10
-    ));
-  DEBUG ((
-    EFI_D_ERROR,
-    "R11 - %016lx, R12 - %016lx, R13 - %016lx\n",
-    SystemContext.SystemContextX64->R11,
-    SystemContext.SystemContextX64->R12,
-    SystemContext.SystemContextX64->R13
-    ));
-  DEBUG ((
-    EFI_D_ERROR,
-    "R14 - %016lx, R15 - %016lx\n",
-    SystemContext.SystemContextX64->R14,
-    SystemContext.SystemContextX64->R15
-    ));
-  DEBUG ((
-    EFI_D_ERROR,
-    "CS  - %04lx, DS  - %04lx, ES  - %04lx, FS  - %04lx, GS  - %04lx, SS  - %04lx\n",
-    SystemContext.SystemContextX64->Cs,
-    SystemContext.SystemContextX64->Ds,
-    SystemContext.SystemContextX64->Es,
-    SystemContext.SystemContextX64->Fs,
-    SystemContext.SystemContextX64->Gs,
-    SystemContext.SystemContextX64->Ss
-    ));
-  DEBUG ((
-    EFI_D_ERROR,
-    "GDT - %016lx; %04lx,                   IDT - %016lx; %04lx\n",
-    SystemContext.SystemContextX64->Gdtr[0],
-    SystemContext.SystemContextX64->Gdtr[1],
-    SystemContext.SystemContextX64->Idtr[0],
-    SystemContext.SystemContextX64->Idtr[1]
-    ));
-  DEBUG ((
-    EFI_D_ERROR,
-    "LDT - %016lx, TR  - %016lx\n",
-    SystemContext.SystemContextX64->Ldtr,
-    SystemContext.SystemContextX64->Tr
-    ));
-  DEBUG ((
-    EFI_D_ERROR,
-    "CR0 - %016lx, CR2 - %016lx, CR3 - %016lx\n",
-    SystemContext.SystemContextX64->Cr0,
-    SystemContext.SystemContextX64->Cr2,
-    SystemContext.SystemContextX64->Cr3
-    ));
-  DEBUG ((
-    EFI_D_ERROR,
-    "CR4 - %016lx, CR8 - %016lx\n",
-    SystemContext.SystemContextX64->Cr4,
-    SystemContext.SystemContextX64->Cr8
-    ));
-  DEBUG ((
-    EFI_D_ERROR,
-    "DR0 - %016lx, DR1 - %016lx, DR2 - %016lx\n",
-    SystemContext.SystemContextX64->Dr0,
-    SystemContext.SystemContextX64->Dr1,
-    SystemContext.SystemContextX64->Dr2
-    ));
-  DEBUG ((
-    EFI_D_ERROR,
-    "DR3 - %016lx, DR6 - %016lx, DR7 - %016lx\n",
-    SystemContext.SystemContextX64->Dr3,
-    SystemContext.SystemContextX64->Dr6,
-    SystemContext.SystemContextX64->Dr7
-    ));
-#else
-#error CPU type not supported for exception information dump!
-#endif
-
-  //
-  // Hang the system with CpuSleep so the processor will enter a lower power
-  // state.
-  //
-  while (TRUE) {
-    CpuSleep ();
-  };
-}
-
 
 /**
   Flush CPU data cache. If the instruction cache is fully coherent
@@ -510,29 +256,7 @@ CpuRegisterInterruptHandler (
   IN EFI_CPU_INTERRUPT_HANDLER     InterruptHandler
   )
 {
-  if (InterruptType < 0 || InterruptType > 0xff) {
-    return EFI_UNSUPPORTED;
-  }
-
-  if (InterruptHandler == NULL && ExternalVectorTable[InterruptType] == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (InterruptHandler != NULL && ExternalVectorTable[InterruptType] != NULL) {
-    return EFI_ALREADY_STARTED;
-  }
-
-  if (InterruptHandler != NULL) {
-    SetInterruptDescriptorTableHandlerAddress ((UINTN)InterruptType, NULL);
-  } else {
-    //
-    // Restore the original IDT handler address if InterruptHandler is NULL.
-    //
-    RestoreInterruptDescriptorTableHandlerAddress ((UINTN)InterruptType);
-  }
-
-  ExternalVectorTable[InterruptType] = InterruptHandler;
-  return EFI_SUCCESS;
+  return RegisterCpuInterruptHandler (InterruptType, InterruptHandler);
 }
 
 
@@ -1061,57 +785,6 @@ RefreshGcdMemoryAttributes (
 }
 
 /**
-  Set Interrupt Descriptor Table Handler Address.
-
-  @param Index        The Index of the interrupt descriptor table handle.
-  @param Handler      Handler address.
-
-**/
-VOID
-SetInterruptDescriptorTableHandlerAddress (
-  IN UINTN Index,
-  IN VOID  *Handler  OPTIONAL
-  )
-{
-  UINTN                     UintnHandler;
-
-  if (Handler != NULL) {
-    UintnHandler = (UINTN) Handler;
-  } else {
-    UintnHandler = ((UINTN) AsmIdtVector00) + (8 * Index);
-  }
-
-  gIdtTable[Index].Bits.OffsetLow   = (UINT16)UintnHandler;
-  gIdtTable[Index].Bits.Reserved_0  = 0;
-  gIdtTable[Index].Bits.GateType    = IA32_IDT_GATE_TYPE_INTERRUPT_32;
-  gIdtTable[Index].Bits.OffsetHigh  = (UINT16)(UintnHandler >> 16);
-#if defined (MDE_CPU_X64)
-  gIdtTable[Index].Bits.OffsetUpper = (UINT32)(UintnHandler >> 32);
-  gIdtTable[Index].Bits.Reserved_1  = 0;
-#endif
-}
-
-/**
-  Restore original Interrupt Descriptor Table Handler Address.
-
-  @param Index        The Index of the interrupt descriptor table handle.
-
-**/
-VOID
-RestoreInterruptDescriptorTableHandlerAddress (
-  IN UINTN       Index
-  )
-{
-  if (Index < mOrigIdtEntryCount) {
-    gIdtTable[Index].Bits.OffsetLow   = mOrigIdtEntry[Index].Bits.OffsetLow;
-    gIdtTable[Index].Bits.OffsetHigh  = mOrigIdtEntry[Index].Bits.OffsetHigh;
-#if defined (MDE_CPU_X64)
-    gIdtTable[Index].Bits.OffsetUpper = mOrigIdtEntry[Index].Bits.OffsetUpper;
-#endif
-  }
-}
-
-/**
   Initialize Interrupt Descriptor Table for interrupt handling.
 
 **/
@@ -1120,90 +793,17 @@ InitInterruptDescriptorTable (
   VOID
   )
 {
-  EFI_STATUS                Status;
-  IA32_DESCRIPTOR           OldIdtPtr;
-  IA32_IDT_GATE_DESCRIPTOR  *OldIdt;
-  UINTN                     OldIdtSize;
-  VOID                      *IdtPtrAlignmentBuffer;
-  IA32_DESCRIPTOR           *IdtPtr;
-  UINTN                     Index;
-  UINT16                    CurrentCs;
-  VOID                      *IntHandler;
+  EFI_STATUS                     Status;
+  EFI_VECTOR_HANDOFF_INFO        *VectorInfoList;
+  EFI_VECTOR_HANDOFF_INFO        *VectorInfo;
 
-  SetMem (ExternalVectorTable, sizeof(ExternalVectorTable), 0);
-
-  //
-  // Get original IDT address and size.
-  //
-  AsmReadIdtr ((IA32_DESCRIPTOR *) &OldIdtPtr);
-
-  if ((OldIdtPtr.Base != 0) && ((OldIdtPtr.Limit & 7) == 7)) {
-    OldIdt = (IA32_IDT_GATE_DESCRIPTOR*) OldIdtPtr.Base;
-    OldIdtSize = (OldIdtPtr.Limit + 1) / sizeof (IA32_IDT_GATE_DESCRIPTOR);
-    //
-    // Save original IDT entry and IDT entry count.
-    //
-    mOrigIdtEntry = AllocateCopyPool (OldIdtPtr.Limit + 1, (VOID *) OldIdtPtr.Base);
-    ASSERT (mOrigIdtEntry != NULL);
-    mOrigIdtEntryCount = (UINT16) OldIdtSize;
-  } else {
-    OldIdt = NULL;
-    OldIdtSize = 0;
+  VectorInfo = NULL;
+  Status = EfiGetSystemConfigurationTable (&gEfiVectorHandoffTableGuid, (VOID **) &VectorInfoList);
+  if (Status == EFI_SUCCESS && VectorInfoList != NULL) {
+    VectorInfo = VectorInfoList;
   }
-
-  //
-  // Intialize IDT
-  //
-  CurrentCs = AsmReadCs();
-  for (Index = 0; Index < INTERRUPT_VECTOR_NUMBER; Index ++) {
-    //
-    // If the old IDT had a handler for this interrupt, then
-    // preserve it.
-    //
-    if (Index < OldIdtSize) {
-      IntHandler =
-        (VOID*) (
-          OldIdt[Index].Bits.OffsetLow +
-          (((UINTN) OldIdt[Index].Bits.OffsetHigh) << 16)
-#if defined (MDE_CPU_X64)
-            + (((UINTN) OldIdt[Index].Bits.OffsetUpper) << 32)
-#endif
-          );
-    } else {
-      IntHandler = NULL;
-    }
-
-    gIdtTable[Index].Bits.Selector    = CurrentCs;
-    gIdtTable[Index].Bits.Reserved_0  = 0;
-    gIdtTable[Index].Bits.GateType    = IA32_IDT_GATE_TYPE_INTERRUPT_32;
-    SetInterruptDescriptorTableHandlerAddress (Index, IntHandler);
-  }
-
-  //
-  // Load IDT Pointer
-  //
-  IdtPtrAlignmentBuffer = AllocatePool (sizeof (*IdtPtr) + 16);
-  IdtPtr = ALIGN_POINTER (IdtPtrAlignmentBuffer, 16);
-  IdtPtr->Base = (UINT32)(((UINTN)(VOID*) gIdtTable) & (BASE_4GB-1));
-  IdtPtr->Limit = (UINT16) (sizeof (gIdtTable) - 1);
-
-  AsmWriteIdtr (IdtPtr);
-
-  FreePool (IdtPtrAlignmentBuffer);
-
-  //
-  // Initialize Exception Handlers
-  //
-  for (Index = OldIdtSize; Index < 32; Index++) {
-    Status = CpuRegisterInterruptHandler (&gCpu, Index, CommonExceptionHandler);
-    ASSERT_EFI_ERROR (Status);
-  }
-
-  //
-  // Set the pointer to the array of C based exception handling routines.
-  //
-  InitializeExternalVectorTablePtr (ExternalVectorTable);
-
+  Status = InitializeCpuInterruptHandlers (VectorInfo);
+  ASSERT_EFI_ERROR (Status);
 }
 
 

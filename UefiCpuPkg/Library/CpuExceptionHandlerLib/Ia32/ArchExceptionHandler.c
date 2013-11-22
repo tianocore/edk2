@@ -1,7 +1,7 @@
 /** @file
   IA32 CPU Exception Hanlder functons.
 
-  Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,49 +15,87 @@
 #include "CpuExceptionCommon.h"
 
 /**
-  Internal function to setup CPU exception handlers.
+  Return address map of exception handler template so that C code can generate
+  exception tables.
+
+  @param IdtEntry          Pointer to IDT entry to be updated.
+  @param InterruptHandler  IDT handler value.
 
 **/
 VOID
-InternalSetupCpuExceptionHandlers (
-  VOID
+ArchUpdateIdtEntry (
+  IN IA32_IDT_GATE_DESCRIPTOR        *IdtEntry,
+  IN UINTN                           InterruptHandler
   )
 {
-  IA32_DESCRIPTOR                     IdtDescriptor;
-  UINTN                               IdtSize;
-  EXCEPTION_HANDLER_TEMPLATE_MAP      TemplateMap;
-  UINT16                              CodeSegment;
-  IA32_IDT_GATE_DESCRIPTOR            *IdtEntry;
-  UINTN                               Index;
-  UINTN                               InterruptHandler;;
+  IdtEntry->Bits.OffsetLow   = (UINT16)(UINTN)InterruptHandler;
+  IdtEntry->Bits.OffsetHigh  = (UINT16)((UINTN)InterruptHandler >> 16);
+  IdtEntry->Bits.GateType    = IA32_IDT_GATE_TYPE_INTERRUPT_32;
+}
 
-  //
-  // Read IDT descriptor and calculate IDT size
-  //
-  AsmReadIdtr (&IdtDescriptor);
-  IdtSize = (IdtDescriptor.Limit + 1) / sizeof (IA32_IDT_GATE_DESCRIPTOR);
-  if (IdtSize > CPU_EXCEPTION_NUM) {
-    //
-    // CPU exeption library only setup CPU_EXCEPTION_NUM exception handler at most
-    //
-    IdtSize = CPU_EXCEPTION_NUM;
-  }
+/**
+  Read IDT handler value from IDT entry.
 
-  //
-  // Use current CS as the segment selector of interrupt gate in IDT
-  //
-  CodeSegment = AsmReadCs ();
-  IdtEntry = (IA32_IDT_GATE_DESCRIPTOR *) IdtDescriptor.Base;
+  @param IdtEntry          Pointer to IDT entry to be read.
 
-  GetTemplateAddressMap (&TemplateMap);
+**/
+UINTN
+ArchGetIdtHandler (
+  IN IA32_IDT_GATE_DESCRIPTOR        *IdtEntry
+  )
+{
+  return (UINTN)IdtEntry->Bits.OffsetLow + (((UINTN)IdtEntry->Bits.OffsetHigh) << 16);
+}
 
-  for (Index = 0; Index < IdtSize; Index ++) {
-    InterruptHandler = TemplateMap.ExceptionStart + Index * TemplateMap.ExceptionStubHeaderSize;
-    IdtEntry[Index].Bits.OffsetLow  = (UINT16)(UINTN)InterruptHandler;
-    IdtEntry[Index].Bits.OffsetHigh = (UINT16)((UINTN)InterruptHandler >> 16);
-    IdtEntry[Index].Bits.Selector   = CodeSegment;
-    IdtEntry[Index].Bits.GateType   = IA32_IDT_GATE_TYPE_INTERRUPT_32;
-  }
+/**
+  Save CPU exception context when handling EFI_VECTOR_HANDOFF_HOOK_AFTER case.
+
+  @param ExceptionType  Exception type.
+  @param SystemContext  Pointer to EFI_SYSTEM_CONTEXT.
+
+**/
+VOID
+ArchSaveExceptionContext (
+  IN UINTN                ExceptionType,
+  IN EFI_SYSTEM_CONTEXT   SystemContext 
+  )
+{
+  IA32_EFLAGS32           Eflags;
+  //
+  // Save Exception context in global variable
+  //
+  mReservedVectors[ExceptionType].OldFlags      = SystemContext.SystemContextIa32->Eflags;
+  mReservedVectors[ExceptionType].OldCs         = SystemContext.SystemContextIa32->Cs;
+  mReservedVectors[ExceptionType].OldIp         = SystemContext.SystemContextIa32->Eip;
+  mReservedVectors[ExceptionType].ExceptionData = SystemContext.SystemContextIa32->ExceptionData;
+  //
+  // Clear IF flag to avoid old IDT handler enable interrupt by IRET
+  //
+  Eflags.UintN = SystemContext.SystemContextIa32->Eflags;
+  Eflags.Bits.IF = 0; 
+  SystemContext.SystemContextIa32->Eflags = Eflags.UintN;
+  //
+  // Modify the EIP in stack, then old IDT handler will return to the stub code
+  //
+  SystemContext.SystemContextIa32->Eip    = (UINTN) mReservedVectors[ExceptionType].HookAfterStubHeaderCode;
+}
+
+/**
+  Restore CPU exception context when handling EFI_VECTOR_HANDOFF_HOOK_AFTER case.
+
+  @param ExceptionType  Exception type.
+  @param SystemContext  Pointer to EFI_SYSTEM_CONTEXT.
+**/
+VOID
+ArchRestoreExceptionContext (
+  IN UINTN                ExceptionType,
+  IN EFI_SYSTEM_CONTEXT   SystemContext 
+  )
+{
+  SystemContext.SystemContextIa32->Eflags        = mReservedVectors[ExceptionType].OldFlags;
+  SystemContext.SystemContextIa32->Cs            = mReservedVectors[ExceptionType].OldCs;
+  SystemContext.SystemContextIa32->Eip           = mReservedVectors[ExceptionType].OldIp;
+  SystemContext.SystemContextIa32->ExceptionData = mReservedVectors[ExceptionType].ExceptionData;
 }
 
 /**
@@ -68,7 +106,7 @@ InternalSetupCpuExceptionHandlers (
 **/
 VOID
 DumpCpuContent (
-  IN UINTN                ExceptionType,
+  IN EFI_EXCEPTION_TYPE   ExceptionType,
   IN EFI_SYSTEM_CONTEXT   SystemContext
   )
 {

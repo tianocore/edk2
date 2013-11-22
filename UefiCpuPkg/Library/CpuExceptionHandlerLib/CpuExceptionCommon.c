@@ -1,7 +1,7 @@
 /** @file
   CPU Exception Hanlder Library common functions.
 
-  Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,12 +15,13 @@
 #include "CpuExceptionCommon.h"
 
 //
-// Error code flag indicating whether or not an error code will be 
+// Error code flag indicating whether or not an error code will be
 // pushed on the stack if an exception occurs.
 //
 // 1 means an error code will be pushed, otherwise 0
 //
-UINT32 mErrorCodeFlag = 0x00027d00;
+CONST UINT32 mErrorCodeFlag             = 0x00027d00;
+RESERVED_VECTORS_DATA *mReservedVectors = NULL;
 
 //
 // Define the maximum message length 
@@ -133,3 +134,35 @@ FindModuleImageBase (
   return Pe32Data;
 }
 
+/**
+  Read and save reserved vector information
+  
+  @param[in]  VectorInfo        Pointer to reserved vector list.
+  @param[out] ReservedVector    Pointer to reserved vector data buffer.
+  @param[in]  VectorCount       Vector number to be updated.
+  
+  @return EFI_SUCCESS           Read and save vector info successfully.
+  @retval EFI_INVALID_PARAMETER VectorInfo includes the invalid content if VectorInfo is not NULL.
+
+**/
+EFI_STATUS
+ReadAndVerifyVectorInfo (
+  IN  EFI_VECTOR_HANDOFF_INFO       *VectorInfo,
+  OUT RESERVED_VECTORS_DATA         *ReservedVector,
+  IN  UINTN                         VectorCount
+  )
+{
+  while (VectorInfo->Attribute != EFI_VECTOR_HANDOFF_LAST_ENTRY) {
+    if (VectorInfo->Attribute > EFI_VECTOR_HANDOFF_HOOK_AFTER) {
+      //
+      // If vector attrubute is invalid
+      //
+      return EFI_INVALID_PARAMETER;
+    }
+    if (VectorInfo->VectorNumber < VectorCount) {
+      ReservedVector[VectorInfo->VectorNumber].Attribute = VectorInfo->Attribute;
+    }
+    VectorInfo ++;
+  }
+  return EFI_SUCCESS;
+}

@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2012 - 2013, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -30,133 +30,77 @@ CommonExceptionHandler             PROTO   C
 
 .data
 
-CommonEntryAddr           DD    CommonInterruptEntry
-
-EXTRN mErrorCodeFlag:DWORD             ; Error code flags for exceptions
+EXTRN mErrorCodeFlag:DWORD            ; Error code flags for exceptions
+EXTRN mDoFarReturnFlag:DWORD          ; Do far return flag
 
 .code
+
+ALIGN   8
 
 ;
 ; exception handler stub table
 ;
-Exception0Handle:
-    push    0
-    jmp     dword ptr [CommonEntryAddr]
-Exception1Handle:
-    push    1
-    jmp     dword ptr [CommonEntryAddr]
-Exception2Handle:
-    push    2
-    jmp     dword ptr [CommonEntryAddr]
-Exception3Handle:
-    push    3
-    jmp     dword ptr [CommonEntryAddr]
-Exception4Handle:
-    push    4
-    jmp     dword ptr [CommonEntryAddr]
-Exception5Handle:
-    push    5
-    jmp     dword ptr [CommonEntryAddr]
-Exception6Handle:
-    push    6
-    jmp     dword ptr [CommonEntryAddr]
-Exception7Handle:
-    push    7
-    jmp     dword ptr [CommonEntryAddr]
-Exception8Handle:
-    push    8
-    jmp     dword ptr [CommonEntryAddr]
-Exception9Handle:
-    push    9
-    jmp     dword ptr [CommonEntryAddr]
-Exception10Handle:
-    push    10
-    jmp     dword ptr [CommonEntryAddr]
-Exception11Handle:
-    push    11
-    jmp     dword ptr [CommonEntryAddr]
-Exception12Handle:
-    push    12
-    jmp     dword ptr [CommonEntryAddr]
-Exception13Handle:
-    push    13
-    jmp     dword ptr [CommonEntryAddr]
-Exception14Handle:
-    push    14
-    jmp     dword ptr [CommonEntryAddr]
-Exception15Handle:
-    push    15
-    jmp     dword ptr [CommonEntryAddr]
-Exception16Handle:
-    push    16
-    jmp     dword ptr [CommonEntryAddr]
-Exception17Handle:
-    push    17
-    jmp     dword ptr [CommonEntryAddr]
-Exception18Handle:
-    push    18
-    jmp     dword ptr [CommonEntryAddr]
-Exception19Handle:
-    push    19
-    jmp     dword ptr [CommonEntryAddr]
-Exception20Handle:
-    push    20
-    jmp     dword ptr [CommonEntryAddr]
-Exception21Handle:
-    push    21
-    jmp     dword ptr [CommonEntryAddr]
-Exception22Handle:
-    push    22
-    jmp     dword ptr [CommonEntryAddr]
-Exception23Handle:
-    push    23
-    jmp     dword ptr [CommonEntryAddr]
-Exception24Handle:
-    push    24
-    jmp     dword ptr [CommonEntryAddr]
-Exception25Handle:
-    push    25
-    jmp     dword ptr [CommonEntryAddr]
-Exception26Handle:
-    push    26
-    jmp     dword ptr [CommonEntryAddr]
-Exception27Handle:
-    push    27
-    jmp     dword ptr [CommonEntryAddr]
-Exception28Handle:
-    push    28
-    jmp     dword ptr [CommonEntryAddr]
-Exception29Handle:
-    push    29
-    jmp     dword ptr [CommonEntryAddr]
-Exception30Handle:
-    push    30
-    jmp     dword ptr [CommonEntryAddr]
-Exception31Handle:
-    push    31
-    jmp     dword ptr [CommonEntryAddr]
+AsmIdtVectorBegin:
+REPEAT  32
+    db      6ah        ; push  #VectorNum
+    db      ($ - AsmIdtVectorBegin) / ((AsmIdtVectorEnd - AsmIdtVectorBegin) / 32) ; VectorNum
+    push    eax
+    mov     eax, CommonInterruptEntry
+    jmp     eax
+ENDM
+AsmIdtVectorEnd:
+
+HookAfterStubBegin:
+    db      6ah        ; push
+VectorNum:
+    db      0          ; 0 will be fixed 
+    push    eax
+    mov     eax, HookAfterStubHeaderEnd
+    jmp     eax
+HookAfterStubHeaderEnd:
+    pop     eax
+    sub     esp, 8     ; reserve room for filling exception data later
+    push    [esp + 8]
+    xchg    ecx, [esp] ; get vector number
+    bt      mErrorCodeFlag, ecx
+    jnc     @F
+    push    [esp]      ; addition push if exception data needed
+@@:
+    xchg    ecx, [esp] ; restore ecx
+    push    eax
 
 ;----------------------------------------------------------------------------;
 ; CommonInterruptEntry                                                               ;
 ;----------------------------------------------------------------------------;
 ; The follow algorithm is used for the common interrupt routine.
 ; Entry from each interrupt with a push eax and eax=interrupt number
-
+; Stack:
+; +---------------------+
+; +    EFlags           +
+; +---------------------+
+; +    CS               +
+; +---------------------+
+; +    EIP              +
+; +---------------------+
+; +    Error Code       +
+; +---------------------+
+; +    Vector Number    +
+; +---------------------+
+; +    EBP              +
+; +---------------------+ <-- EBP
 CommonInterruptEntry PROC PUBLIC
     cli
+    pop    eax
     ;
     ; All interrupt handlers are invoked through interrupt gates, so
     ; IF flag automatically cleared at the entry point
     ;
 
     ;
-    ; Calculate vector number
-    ;
-    ; Get the return address of call, actually, it is the
-    ; address of vector number.
+    ; Get vector number from top of stack
     ;
     xchg    ecx, [esp]
-    and     ecx, 0FFFFh
+    and     ecx, 0FFh       ; Vector number should be less than 256
     cmp     ecx, 32         ; Intel reserved vector for exceptions?
     jae     NoErrorCode
     bt      mErrorCodeFlag, ecx
@@ -246,6 +190,10 @@ ErrorCodeAndVectorOnStack:
     and     esp, 0fffffff0h
     sub     esp, 12
 
+    sub     esp, 8
+    push    0            ; clear EXCEPTION_HANDLER_CONTEXT.OldIdtHandler
+    push    0            ; clear EXCEPTION_HANDLER_CONTEXT.ExceptionDataFlag
+       
 ;; UINT32  Edi, Esi, Ebp, Esp, Ebx, Edx, Ecx, Eax;
     push    eax
     push    ecx
@@ -411,19 +359,42 @@ ErrorCodeAndVectorOnStack:
     pop     ecx
     pop     eax
 
+    pop     dword ptr [ebp - 8]
+    pop     dword ptr [ebp - 4]
     mov     esp, ebp
     pop     ebp
     add     esp, 8
+    cmp     dword ptr [esp - 16], 0   ; check EXCEPTION_HANDLER_CONTEXT.OldIdtHandler
+    jz      DoReturn
+    cmp     dword ptr [esp - 20], 1   ; check EXCEPTION_HANDLER_CONTEXT.ExceptionDataFlag
+    jz      ErrorCode
+    jmp     dword ptr [esp - 16]
+ErrorCode:
+    sub     esp, 4
+    jmp     dword ptr [esp - 12]
+
+DoReturn:    
+    cmp     mDoFarReturnFlag, 0   ; Check if need to do far return instead of IRET
+    jz      DoIret
+    push    [esp + 8]    ; save EFLAGS
+    add     esp, 16
+    push    [esp - 8]    ; save CS in new location
+    push    [esp - 8]    ; save EIP in new location
+    push    [esp - 8]    ; save EFLAGS in new location
+    popfd                ; restore EFLAGS
+    retf                 ; far return
+
+DoIret:
     iretd
 
 CommonInterruptEntry ENDP
 
 ;---------------------------------------;
-; _GetTemplateAddressMap                  ;
+; _AsmGetTemplateAddressMap                  ;
 ;----------------------------------------------------------------------------;
 ; 
 ; Protocol prototype
-;   GetTemplateAddressMap (
+;   AsmGetTemplateAddressMap (
 ;     EXCEPTION_HANDLER_TEMPLATE_MAP *AddressMap
 ;   );
 ;           
@@ -447,18 +418,28 @@ CommonInterruptEntry ENDP
 ;           
 ; Destroys: Nothing
 ;-----------------------------------------------------------------------------;
-GetTemplateAddressMap  proc near public
+AsmGetTemplateAddressMap  proc near public
     push    ebp                 ; C prolog
     mov     ebp, esp
     pushad
 
-    mov ebx, dword ptr [ebp+08h]
-    mov dword ptr [ebx],    Exception0Handle
-    mov dword ptr [ebx+4h], Exception1Handle - Exception0Handle
+    mov ebx, dword ptr [ebp + 08h]
+    mov dword ptr [ebx],      AsmIdtVectorBegin
+    mov dword ptr [ebx + 4h], (AsmIdtVectorEnd - AsmIdtVectorBegin) / 32
+    mov dword ptr [ebx + 8h], HookAfterStubBegin
   
     popad
     pop     ebp
     ret
-GetTemplateAddressMap  ENDP
+AsmGetTemplateAddressMap  ENDP
 
+;-------------------------------------------------------------------------------------
+;  AsmVectorNumFixup (*VectorBase, VectorNum);
+;-------------------------------------------------------------------------------------
+AsmVectorNumFixup   proc near public
+    mov     eax, dword ptr [esp + 8]
+    mov     ecx, [esp + 4]
+    mov     [ecx + (VectorNum - HookAfterStubBegin)], al
+    ret
+AsmVectorNumFixup   ENDP
 END

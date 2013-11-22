@@ -25,133 +25,79 @@
 ;
 externdef CommonExceptionHandler:near
 
-EXTRN mErrorCodeFlag:DWORD ; Error code flags for exceptions
+EXTRN mErrorCodeFlag:DWORD    ; Error code flags for exceptions
+EXTRN mDoFarReturnFlag:QWORD  ; Do far return flag
 
 data SEGMENT
 
-CommonEntryAddr                dq      CommonInterruptEntry;
-
 .code
 
-Exception0Handle:
-    push    0
-    jmp     qword ptr [CommonEntryAddr]
-Exception1Handle:
-    push    1
-    jmp     qword ptr [CommonEntryAddr]
-Exception2Handle:
-    push    2
-    jmp     qword ptr [CommonEntryAddr]
-Exception3Handle:
-    push    3
-    jmp     qword ptr [CommonEntryAddr]
-Exception4Handle:
-    push    4
-    jmp     qword ptr [CommonEntryAddr]
-Exception5Handle:
-    push    5
-    jmp     qword ptr [CommonEntryAddr]
-Exception6Handle:
-    push    6
-    jmp     qword ptr [CommonEntryAddr]
-Exception7Handle:
-    push    7
-    jmp     qword ptr [CommonEntryAddr]
-Exception8Handle:
-    push    8
-    jmp     qword ptr [CommonEntryAddr]
-Exception9Handle:
-    push    9
-    jmp     qword ptr [CommonEntryAddr]
-Exception10Handle:
-    push    10
-    jmp     qword ptr [CommonEntryAddr]
-Exception11Handle:
-    push    11
-    jmp     qword ptr [CommonEntryAddr]
-Exception12Handle:
-    push    12
-    jmp     qword ptr [CommonEntryAddr]
-Exception13Handle:
-    push    13
-    jmp     qword ptr [CommonEntryAddr]
-Exception14Handle:
-    push    14
-    jmp     qword ptr [CommonEntryAddr]
-Exception15Handle:
-    push    15
-    jmp     qword ptr [CommonEntryAddr]
-Exception16Handle:
-    push    16
-    jmp     qword ptr [CommonEntryAddr]
-Exception17Handle:
-    push    17
-    jmp     qword ptr [CommonEntryAddr]
-Exception18Handle:
-    push    18
-    jmp     qword ptr [CommonEntryAddr]
-Exception19Handle:
-    push    19
-    jmp     qword ptr [CommonEntryAddr]
-Exception20Handle:
-    push    20
-    jmp     qword ptr [CommonEntryAddr]
-Exception21Handle:
-    push    21
-    jmp     qword ptr [CommonEntryAddr]
-Exception22Handle:
-    push    22
-    jmp     qword ptr [CommonEntryAddr]
-Exception23Handle:
-    push    23
-    jmp     qword ptr [CommonEntryAddr]
-Exception24Handle:
-    push    24
-    jmp     qword ptr [CommonEntryAddr]
-Exception25Handle:
-    push    25
-    jmp     qword ptr [CommonEntryAddr]
-Exception26Handle:
-    push    26
-    jmp     qword ptr [CommonEntryAddr]
-Exception27Handle:
-    push    27
-    jmp     qword ptr [CommonEntryAddr]
-Exception28Handle:
-    push    28
-    jmp     qword ptr [CommonEntryAddr]
-Exception29Handle:
-    push    29
-    jmp     qword ptr [CommonEntryAddr]
-Exception30Handle:
-    push    30
-    jmp     qword ptr [CommonEntryAddr]
-Exception31Handle:
-    push    31
-    jmp     qword ptr [CommonEntryAddr]
+ALIGN   8
 
-;CommonInterruptEntrypoint:
-;---------------------------------------;
-; _CommonEntry                  ;
-;----------------------------------------------------------------------------;
-; The follow algorithm is used for the common interrupt routine.
-; Entry from each interrupt with a push eax and eax=interrupt number
+AsmIdtVectorBegin:
+REPEAT  32
+    db      6ah        ; push  #VectorNum
+    db      ($ - AsmIdtVectorBegin) / ((AsmIdtVectorEnd - AsmIdtVectorBegin) / 32) ; VectorNum
+    push    rax
+    mov     rax, CommonInterruptEntry
+    jmp     rax
+ENDM
+AsmIdtVectorEnd:
+
+HookAfterStubHeaderBegin:
+    db      6ah        ; push
+@VectorNum:
+    db      0          ; 0 will be fixed 
+    push    rax
+    mov     rax, HookAfterStubHeaderEnd
+    jmp     rax
+HookAfterStubHeaderEnd:
+    mov     rax, rsp
+    sub     rsp, 8h
+    and     sp, 0fff0h
+    push    rcx
+    mov     rcx, [rax + 8]
+    bt      mErrorCodeFlag, ecx
+    jc      @F
+    push    [rsp]             ; push additional rcx to make stack alignment
+@@:
+    xchg    rcx, [rsp]        ; restore rcx, save Exception Number in stack
+    push    [rax]             ; push rax into stack to keep code consistence
 
 ;---------------------------------------;
 ; CommonInterruptEntry                  ;
 ;---------------------------------------;
 ; The follow algorithm is used for the common interrupt routine.
-
+; Entry from each interrupt with a push eax and eax=interrupt number
+; Stack frame would be as follows as specified in IA32 manuals:
+;
+; +---------------------+ <-- 16-byte aligned ensured by processor
+; +    Old SS           +
+; +---------------------+
+; +    Old RSP          +
+; +---------------------+
+; +    RFlags           +
+; +---------------------+
+; +    CS               +
+; +---------------------+
+; +    RIP              +
+; +---------------------+
+; +    Error Code       +
+; +---------------------+
+; +   Vector Number     +
+; +---------------------+
+; +    RBP              +
+; +---------------------+ <-- RBP, 16-byte aligned
+; The follow algorithm is used for the common interrupt routine.
 CommonInterruptEntry PROC PUBLIC  
     cli
+    pop     rax
     ;
     ; All interrupt handlers are invoked through interrupt gates, so
     ; IF flag automatically cleared at the entry point
     ;
-    ;
-    ; Calculate vector number
-    ;
-    xchg    rcx, [rsp] ; get the return address of call, actually, it is the address of vector number.
+    xchg    rcx, [rsp]      ; Save rcx into stack and save vector number into rcx
+    and     rcx, 0FFh
     cmp     ecx, 32         ; Intel reserved vector for exceptions?
     jae     NoErrorCode
     bt      mErrorCodeFlag, ecx
@@ -168,6 +114,8 @@ NoErrorCode:
 @@:       
     push    rbp
     mov     rbp, rsp
+    push    0             ; clear EXCEPTION_HANDLER_CONTEXT.OldIdtHandler
+    push    0             ; clear EXCEPTION_HANDLER_CONTEXT.ExceptionDataFlag
 
     ;
     ; Stack:
@@ -389,6 +337,29 @@ NoErrorCode:
     mov     rsp, rbp
     pop     rbp
     add     rsp, 16
+    cmp     qword ptr [rsp - 32], 0  ; check EXCEPTION_HANDLER_CONTEXT.OldIdtHandler
+    jz      DoReturn
+    cmp     qword ptr [rsp - 40], 1  ; check EXCEPTION_HANDLER_CONTEXT.ExceptionDataFlag
+    jz      ErrorCode
+    jmp     qword ptr [rsp - 32]
+ErrorCode:
+    sub     rsp, 8
+    jmp     qword ptr [rsp - 24]
+
+DoReturn:
+    cmp     mDoFarReturnFlag, 0   ; Check if need to do far return instead of IRET
+    jz      DoIret
+    push    rax
+    mov     rax, rsp          ; save old RSP to rax
+    mov     rsp, [rsp + 20h]   
+    push    [rax + 10h]       ; save CS in new location
+    push    [rax + 8h]        ; save EIP in new location
+    push    [rax + 18h]       ; save EFLAGS in new location
+    mov     rax, [rax]        ; restore rax
+    popfq                     ; restore EFLAGS
+    DB      48h               ; prefix to composite "retq" with next "retf"
+    retf                      ; far return
+DoIret:
     iretq
 
 CommonInterruptEntry ENDP
@@ -397,11 +368,22 @@ CommonInterruptEntry ENDP
 ;  GetTemplateAddressMap (&AddressMap);
 ;-------------------------------------------------------------------------------------
 ; comments here for definition of address map
-GetTemplateAddressMap   PROC
-        mov         rax, offset Exception0Handle
-        mov         qword ptr [rcx], rax
-        mov         qword ptr [rcx+8h], Exception1Handle - Exception0Handle
-        ret
-GetTemplateAddressMap   ENDP
+AsmGetTemplateAddressMap   PROC
+    mov     rax, offset AsmIdtVectorBegin
+    mov     qword ptr [rcx], rax
+    mov     qword ptr [rcx + 8h],  (AsmIdtVectorEnd - AsmIdtVectorBegin) / 32
+    mov     rax, offset HookAfterStubHeaderBegin
+    mov     qword ptr [rcx + 10h], rax
+    ret
+AsmGetTemplateAddressMap   ENDP
+
+;-------------------------------------------------------------------------------------
+;  AsmVectorNumFixup (*VectorBase, VectorNum);
+;-------------------------------------------------------------------------------------
+AsmVectorNumFixup   PROC
+    mov     rax, rdx
+    mov     [rcx + (@VectorNum - HookAfterStubHeaderBegin)], al
+    ret
+AsmVectorNumFixup   ENDP
 
 END
