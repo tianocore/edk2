@@ -3057,6 +3057,32 @@ ShellIsFileInPath(
 }
 
 /**
+  Function return the number converted from a hex representation of a number.
+
+  Note: this function cannot be used when (UINTN)(-1), (0xFFFFFFFF) may be a valid
+  result.  Use ShellConvertStringToUint64 instead.
+
+  @param[in] String   String representation of a number.
+
+  @return             The unsigned integer result of the conversion.
+  @retval (UINTN)(-1) An error occured.
+**/
+UINTN
+EFIAPI
+ShellHexStrToUintn(
+  IN CONST CHAR16 *String
+  )
+{
+  UINT64        RetVal;
+
+  if (!EFI_ERROR(ShellConvertStringToUint64(String, &RetVal, TRUE, TRUE))) {
+    return ((UINTN)RetVal);
+  }
+  
+  return ((UINTN)(-1));
+}
+
+/**
   Function to determine whether a string is decimal or hex representation of a number
   and return the number converted from the string.  Spaces are always skipped.
 

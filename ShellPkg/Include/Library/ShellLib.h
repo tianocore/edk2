@@ -1008,6 +1008,23 @@ ShellStrToUintn(
   );
 
 /**
+  Function return the number converted from a hex representation of a number.
+
+  Note: this function cannot be used when (UINTN)(-1), (0xFFFFFFFF) may be a valid
+  result.  Use ShellConvertStringToUint64 instead.
+
+  @param[in] String   String representation of a number.
+
+  @return             The unsigned integer result of the conversion.
+  @retval (UINTN)(-1) An error occured.
+**/
+UINTN
+EFIAPI
+ShellHexStrToUintn(
+  IN CONST CHAR16 *String
+  );
+
+/**
   Safely append with automatic string resizing given length of Destination and
   desired length of copy from Source.
 
