@@ -1855,6 +1855,12 @@ DisplayOneMenu (
       if (StrLen (&StringPtr[Index]) != 0) {
         if (Temp3 == 0) {
           Row++;
+          //
+          // If the rows for text two is greater than or equal to the skip value, increase the skip value
+          //
+          if ((Row - MenuOption->Row) >= MenuOption->Skip) {
+            MenuOption->Skip++;
+          }
         }
       }
   
