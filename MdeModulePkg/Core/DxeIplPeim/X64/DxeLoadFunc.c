@@ -1,7 +1,7 @@
 /** @file
   x64-specifc functionality for DxeLoad.
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -34,10 +34,37 @@ HandOffToDxeCore (
   IN EFI_PEI_HOB_POINTERS   HobList
   )
 {
-  VOID                *BaseOfStack;
-  VOID                *TopOfStack;
-  EFI_STATUS          Status;
-  UINTN               PageTables;
+  VOID                            *BaseOfStack;
+  VOID                            *TopOfStack;
+  EFI_STATUS                      Status;
+  UINTN                           PageTables;
+  UINT32                          Index;
+  EFI_VECTOR_HANDOFF_INFO         *VectorInfo;
+  EFI_PEI_VECTOR_HANDOFF_INFO_PPI *VectorHandoffInfoPpi;
+
+  //
+  // Get Vector Hand-off Info PPI and build Guided HOB
+  //
+  Status = PeiServicesLocatePpi (
+             &gEfiVectorHandoffInfoPpiGuid,
+             0,
+             NULL,
+             (VOID **)&VectorHandoffInfoPpi
+             );
+  if (Status == EFI_SUCCESS) {
+    DEBUG ((EFI_D_INFO, "Vector Hand-off Info PPI is gotten, GUIDed HOB is created!\n"));
+    VectorInfo = VectorHandoffInfoPpi->Info;
+    Index = 1;
+    while (VectorInfo->Attribute != EFI_VECTOR_HANDOFF_LAST_ENTRY) {
+      VectorInfo ++;
+      Index ++;
+    }
+    BuildGuidDataHob (
+      &gEfiVectorHandoffInfoPpiGuid,
+      VectorHandoffInfoPpi->Info,
+      sizeof (EFI_VECTOR_HANDOFF_INFO) * Index
+      );
+  }
 
   //
   // Allocate 128KB for the Stack

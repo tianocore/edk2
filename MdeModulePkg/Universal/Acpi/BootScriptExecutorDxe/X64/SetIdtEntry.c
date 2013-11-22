@@ -99,6 +99,7 @@ SetIdtEntry (
   IA32_IDT_GATE_DESCRIPTOR                      *IdtEntry;
   IA32_DESCRIPTOR                               *IdtDescriptor;
   UINTN                                         S3DebugBuffer;
+  EFI_STATUS                                    Status;
 
   //
   // Restore IDT for debug
@@ -109,7 +110,8 @@ SetIdtEntry (
   //
   // Setup the default CPU exception handlers
   //
-  SetupCpuExceptionHandlers ();
+  Status = InitializeCpuExceptionHandlers (NULL);
+  ASSERT_EFI_ERROR (Status);
 
   DEBUG_CODE (
     //

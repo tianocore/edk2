@@ -1,7 +1,7 @@
 /** @file
   The X64 entrypoint is used to process capsule in long mode.
 
-Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -58,7 +58,8 @@ _ModuleEntryPoint (
   //
   // Setup the default CPU exception handlers
   //
-  SetupCpuExceptionHandlers ();                
+  Status = InitializeCpuExceptionHandlers (NULL);
+  ASSERT_EFI_ERROR (Status);
   
   //
   // Initialize Debug Agent to support source level debug

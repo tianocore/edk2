@@ -1,7 +1,7 @@
 /** @file
   DXE Core Main Entry Point
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -242,11 +242,21 @@ DxeMain (
   EFI_PHYSICAL_ADDRESS          MemoryBaseAddress;
   UINT64                        MemoryLength;
   PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext;
+  UINTN                         Index;
+  EFI_HOB_GUID_TYPE             *GuidHob;
+  EFI_VECTOR_HANDOFF_INFO       *VectorInfoList;
+  EFI_VECTOR_HANDOFF_INFO       *VectorInfo;
 
   //
   // Setup the default exception handlers
   //
-  SetupCpuExceptionHandlers ();
+  VectorInfoList = NULL;
+  GuidHob = GetNextGuidHob (&gEfiVectorHandoffInfoPpiGuid, HobStart);
+  if (GuidHob != NULL) {
+    VectorInfoList = (EFI_VECTOR_HANDOFF_INFO *) (GET_GUID_HOB_DATA(GuidHob));
+  }
+  Status = InitializeCpuExceptionHandlers (VectorInfoList);
+  ASSERT_EFI_ERROR (Status);
   
   //
   // Initialize Debug Agent to support source level debug in DXE phase
@@ -371,6 +381,24 @@ DxeMain (
   Status = CoreInitializeEventServices ();
   ASSERT_EFI_ERROR (Status);
 
+  //
+  // Get persisted vector hand-off info from GUIDeed HOB again due to HobStart may be updated,
+  // and install configuration table
+  //
+  GuidHob = GetNextGuidHob (&gEfiVectorHandoffInfoPpiGuid, HobStart);
+  if (GuidHob != NULL) {
+    VectorInfoList = (EFI_VECTOR_HANDOFF_INFO *) (GET_GUID_HOB_DATA(GuidHob));
+    VectorInfo = VectorInfoList;
+    Index = 1;
+    while (VectorInfo->Attribute != EFI_VECTOR_HANDOFF_LAST_ENTRY) {
+      VectorInfo ++;
+      Index ++;
+    }
+    VectorInfo = AllocateCopyPool (sizeof (EFI_VECTOR_HANDOFF_INFO) * Index, (VOID *) VectorInfoList);
+    ASSERT (VectorInfo != NULL);
+    Status = CoreInstallConfigurationTable (&gEfiVectorHandoffTableGuid, (VOID *) VectorInfo);
+    ASSERT_EFI_ERROR (Status);
+  }
 
   //
   // Get the Protocols that were passed in from PEI to DXE through GUIDed HOBs

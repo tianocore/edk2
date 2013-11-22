@@ -67,6 +67,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/EventExitBootServiceFailed.h>
 #include <Guid/LoadModuleAtFixedAddress.h>
 #include <Guid/IdleLoopEvent.h>
+#include <Guid/VectorHandoffTable.h>
+#include <Ppi/VectorHandoffInfo.h>
 
 #include <Library/DxeCoreEntryPoint.h>
 #include <Library/DebugLib.h>

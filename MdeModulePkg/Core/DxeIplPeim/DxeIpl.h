@@ -2,7 +2,7 @@
   Master header file for DxeIpl PEIM. All source files in this module should
   include this file for common definitions.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -27,6 +27,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Ppi/LoadFile.h>
 #include <Ppi/S3Resume2.h>
 #include <Ppi/RecoveryModule.h>
+#include <Ppi/VectorHandoffInfo.h>
 
 #include <Guid/MemoryTypeInformation.h>
 #include <Guid/MemoryAllocationHob.h>

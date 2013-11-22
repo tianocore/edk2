@@ -1,7 +1,7 @@
 ## @file
 # Null instance of CPU Exception Handler Library with empty functions.
 #
-#  Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2012 - 2013, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,7 +16,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = CpuExceptionHandlerLibNull
   FILE_GUID                      = 3175E6B9-4B01-496a-9A2B-64AF02D87E34
-  MODULE_TYPE                    = BASE
+  MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = CpuExceptionHandlerLib
 

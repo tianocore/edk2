@@ -3,7 +3,7 @@
 
   Set a IDT entry for interrupt vector 3 for debug purpose for IA32 platform
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -30,6 +30,7 @@ SetIdtEntry (
   IA32_IDT_GATE_DESCRIPTOR                      *IdtEntry;
   IA32_DESCRIPTOR                               *IdtDescriptor;
   UINTN                                         S3DebugBuffer;
+  EFI_STATUS                                    Status;
 
   //
   // Restore IDT for debug
@@ -40,7 +41,8 @@ SetIdtEntry (
   //
   // Setup the default CPU exception handlers
   //
-  SetupCpuExceptionHandlers ();
+  Status = InitializeCpuExceptionHandlers (NULL);
+  ASSERT_EFI_ERROR (Status);
 
   DEBUG_CODE (
     //

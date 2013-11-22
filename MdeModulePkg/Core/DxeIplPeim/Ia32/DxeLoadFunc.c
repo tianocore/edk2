@@ -1,7 +1,7 @@
 /** @file
   Ia32-specific functionality for DxeLoad.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -83,6 +83,8 @@ HandOffToDxeCore (
   EFI_PHYSICAL_ADDRESS      VectorAddress;
   UINT32                    Index;
   X64_IDT_TABLE             *IdtTableForX64;
+  EFI_VECTOR_HANDOFF_INFO   *VectorInfo;
+  EFI_PEI_VECTOR_HANDOFF_INFO_PPI *VectorHandoffInfoPpi;
 
   Status = PeiServicesAllocatePages (EfiBootServicesData, EFI_SIZE_TO_PAGES (STACK_SIZE), &BaseOfStack);
   ASSERT_EFI_ERROR (Status);
@@ -182,6 +184,30 @@ HandOffToDxeCore (
       TopOfStack
       );
   } else {
+    //
+    // Get Vector Hand-off Info PPI and build Guided HOB
+    //
+    Status = PeiServicesLocatePpi (
+               &gEfiVectorHandoffInfoPpiGuid,
+               0,
+               NULL,
+               (VOID **)&VectorHandoffInfoPpi
+               );
+    if (Status == EFI_SUCCESS) {
+      DEBUG ((EFI_D_INFO, "Vector Hand-off Info PPI is gotten, GUIDed HOB is created!\n"));
+      VectorInfo = VectorHandoffInfoPpi->Info;
+      Index = 1;
+      while (VectorInfo->Attribute != EFI_VECTOR_HANDOFF_LAST_ENTRY) {
+        VectorInfo ++;
+        Index ++;
+      }
+      BuildGuidDataHob (
+        &gEfiVectorHandoffInfoPpiGuid,
+        VectorHandoffInfoPpi->Info,
+        sizeof (EFI_VECTOR_HANDOFF_INFO) * Index
+        );
+    }
+
     //
     // Compute the top of the stack we were allocated. Pre-allocate a UINTN
     // for safety.
