@@ -399,7 +399,9 @@ Returns:
   EFI_STATUS                      Status;
   EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *FileSystem;
   FAT_VOLUME                      *Volume;
+  EFI_DISK_IO2_PROTOCOL           *DiskIo2;
 
+  DiskIo2 = NULL;
   //
   // Get our context back
   //
@@ -413,25 +415,29 @@ Returns:
                   );
 
   if (!EFI_ERROR (Status)) {
-    Volume = VOLUME_FROM_VOL_INTERFACE (FileSystem);
-    Status = FatAbandonVolume (Volume);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+    Volume  = VOLUME_FROM_VOL_INTERFACE (FileSystem);
+    DiskIo2 = Volume->DiskIo2;
+    Status  = FatAbandonVolume (Volume);
   }
 
-  Status = gBS->CloseProtocol (
-                  ControllerHandle,
-                  &gEfiDiskIoProtocolGuid,
-                  This->DriverBindingHandle,
-                  ControllerHandle
-                  );
-  Status = gBS->CloseProtocol (
-                  ControllerHandle,
-                  &gEfiDiskIo2ProtocolGuid,
-                  This->DriverBindingHandle,
-                  ControllerHandle
-                  );
+  if (!EFI_ERROR (Status)) {
+    if (DiskIo2 != NULL) {
+      Status = gBS->CloseProtocol (
+        ControllerHandle,
+        &gEfiDiskIo2ProtocolGuid,
+        This->DriverBindingHandle,
+        ControllerHandle
+        );
+      ASSERT_EFI_ERROR (Status);
+    }
+    Status = gBS->CloseProtocol (
+      ControllerHandle,
+      &gEfiDiskIoProtocolGuid,
+      This->DriverBindingHandle,
+      ControllerHandle
+      );
+    ASSERT_EFI_ERROR (Status);
+  }
 
   return Status;
 }
