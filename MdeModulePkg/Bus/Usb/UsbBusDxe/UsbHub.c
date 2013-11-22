@@ -968,6 +968,15 @@ UsbHubResetPort (
   UINTN                   Index;
   EFI_STATUS              Status;
 
+  Status = UsbHubGetPortStatus (HubIf, Port, &PortState);
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  } else if (USB_BIT_IS_SET (PortState.PortChangeStatus, USB_PORT_STAT_C_RESET)) {
+    DEBUG (( EFI_D_INFO, "UsbHubResetPort: skip reset on hub %p port %d\n", HubIf, Port));
+    return EFI_SUCCESS;
+  }
+
   Status  = UsbHubSetPortFeature (HubIf, Port, (EFI_USB_PORT_FEATURE) USB_HUB_PORT_RESET);
 
   if (EFI_ERROR (Status)) {
@@ -1272,6 +1281,16 @@ UsbRootHubResetPort (
   // should be handled in the EHCI driver.
   //
   Bus     = RootIf->Device->Bus;
+
+  Status = UsbHcGetRootHubPortStatus (Bus, Port, &PortState);
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  } else if (USB_BIT_IS_SET (PortState.PortChangeStatus, USB_PORT_STAT_C_RESET)) {
+    DEBUG (( EFI_D_INFO, "UsbRootHubResetPort: skip reset on root port %d\n", Port));
+    return EFI_SUCCESS;
+  }
+
   Status  = UsbHcSetRootHubPortFeature (Bus, Port, EfiUsbPortReset);
 
   if (EFI_ERROR (Status)) {

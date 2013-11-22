@@ -2,7 +2,7 @@
 
   This file contains the register definition of XHCI host controller.
 
-Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -169,7 +169,7 @@ typedef union {
 #define XHC_PORTSC_RESET                   BIT4  // Port Reset
 #define XHC_PORTSC_PLS                     (BIT5|BIT6|BIT7|BIT8)     // Port Link State
 #define XHC_PORTSC_PP                      BIT9  // Port Power
-#define XHC_PORTSC_PS                      (BIT10|BIT11|BIT12|BIT13) // Port Speed
+#define XHC_PORTSC_PS                      (BIT10|BIT11|BIT12)       // Port Speed
 #define XHC_PORTSC_LWS                     BIT16 // Port Link State Write Strobe
 #define XHC_PORTSC_CSC                     BIT17 // Connect Status Change
 #define XHC_PORTSC_PEC                     BIT18 // Port Enabled/Disabled Change
@@ -189,11 +189,17 @@ typedef union {
 #define XHC_HUB_PORTSC_PEC                 BIT17 // Hub's Port Enabled/Disabled Change
 #define XHC_HUB_PORTSC_OCC                 BIT19 // Hub's Over-Current Change
 #define XHC_HUB_PORTSC_PRC                 BIT20 // Hub's Port Reset Change
+#define XHC_HUB_PORTSC_BHRC                BIT21 // Hub's Port Warm Reset Change
 #define XHC_IMAN_IP                        BIT0  // Interrupt Pending
 #define XHC_IMAN_IE                        BIT1  // Interrupt Enable
 
 #define XHC_IMODI_MASK                     0x0000FFFF  // Interrupt Moderation Interval
 #define XHC_IMODC_MASK                     0xFFFF0000  // Interrupt Moderation Counter
+
+//
+//  Hub Class Feature Selector for Clear Port Feature Request
+//
+#define Usb3PortBHPortResetChange          29
 
 //
 // Structure to map the hardware port states to the
@@ -203,6 +209,14 @@ typedef struct {
   UINT32                  HwState;
   UINT16                  UefiState;
 } USB_PORT_STATE_MAP;
+
+//
+// Structure to map the hardware port states to feature selector for clear port feature request.
+//
+typedef struct {
+  UINT32                  HwState;
+  UINT16                  Selector;
+} USB_CLEAR_PORT_MAP;
 
 /**
   Read 1-byte width XHCI capability register.

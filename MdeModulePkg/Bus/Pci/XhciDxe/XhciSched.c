@@ -1105,25 +1105,25 @@ XhcCheckUrbResult (
         CheckedUrb->Result  |= EFI_USB_ERR_STALL;
         CheckedUrb->Finished = TRUE;
         DEBUG ((EFI_D_ERROR, "XhcCheckUrbResult: STALL_ERROR! Completecode = %x\n",EvtTrb->Completecode));
-        break;
+        goto EXIT;
 
       case TRB_COMPLETION_BABBLE_ERROR:
         CheckedUrb->Result  |= EFI_USB_ERR_BABBLE;
         CheckedUrb->Finished = TRUE;
         DEBUG ((EFI_D_ERROR, "XhcCheckUrbResult: BABBLE_ERROR! Completecode = %x\n",EvtTrb->Completecode));
-        break;
+        goto EXIT;
 
       case TRB_COMPLETION_DATA_BUFFER_ERROR:
         CheckedUrb->Result  |= EFI_USB_ERR_BUFFER;
         CheckedUrb->Finished = TRUE;
         DEBUG ((EFI_D_ERROR, "XhcCheckUrbResult: ERR_BUFFER! Completecode = %x\n",EvtTrb->Completecode));
-        break;
+        goto EXIT;
 
       case TRB_COMPLETION_USB_TRANSACTION_ERROR:
         CheckedUrb->Result  |= EFI_USB_ERR_TIMEOUT;
         CheckedUrb->Finished = TRUE;
         DEBUG ((EFI_D_ERROR, "XhcCheckUrbResult: TRANSACTION_ERROR! Completecode = %x\n",EvtTrb->Completecode));
-        break;
+        goto EXIT;
 
       case TRB_COMPLETION_SHORT_PACKET:
       case TRB_COMPLETION_SUCCESS:
@@ -1144,7 +1144,7 @@ XhcCheckUrbResult (
         DEBUG ((EFI_D_ERROR, "Transfer Default Error Occur! Completecode = 0x%x!\n",EvtTrb->Completecode));
         CheckedUrb->Result  |= EFI_USB_ERR_TIMEOUT;
         CheckedUrb->Finished = TRUE;
-        break;
+        goto EXIT;
     }
 
     //
@@ -1535,6 +1535,10 @@ XhcPollPortStatusChange (
 
   Status = EFI_SUCCESS;
 
+  if ((PortState->PortChangeStatus & (USB_PORT_STAT_C_CONNECTION | USB_PORT_STAT_C_ENABLE | USB_PORT_STAT_C_OVERCURRENT | USB_PORT_STAT_C_RESET)) == 0) {
+    return EFI_SUCCESS;
+  }
+
   if (ParentRouteChart.Dword == 0) {
     RouteChart.Route.RouteString = 0;
     RouteChart.Route.RootPortNum = Port + 1;
@@ -1547,6 +1551,15 @@ XhcPollPortStatusChange (
     }
     RouteChart.Route.RootPortNum   = ParentRouteChart.Route.RootPortNum;
     RouteChart.Route.TierNum       = ParentRouteChart.Route.TierNum + 1;
+  }
+
+  SlotId = XhcRouteStringToSlotId (Xhc, RouteChart);
+  if (SlotId != 0) {
+    if (Xhc->HcCParams.Data.Csz == 0) {
+      Status = XhcDisableSlotCmd (Xhc, SlotId);
+    } else {
+      Status = XhcDisableSlotCmd64 (Xhc, SlotId);
+    }
   }
 
   if (((PortState->PortStatus & USB_PORT_STAT_ENABLE) != 0) &&
@@ -1566,26 +1579,15 @@ XhcPollPortStatusChange (
     // Execute Enable_Slot cmd for attached device, initialize device context and assign device address.
     //
     SlotId = XhcRouteStringToSlotId (Xhc, RouteChart);
-    if (SlotId == 0) {
+    if ((SlotId == 0) && ((PortState->PortChangeStatus & USB_PORT_STAT_C_RESET) != 0)) {
       if (Xhc->HcCParams.Data.Csz == 0) {
         Status = XhcInitializeDeviceSlot (Xhc, ParentRouteChart, Port, RouteChart, Speed);
       } else {
         Status = XhcInitializeDeviceSlot64 (Xhc, ParentRouteChart, Port, RouteChart, Speed);
       }
     }
-  } else if ((PortState->PortStatus & USB_PORT_STAT_CONNECTION) == 0) {
-    //
-    // Device is detached. Disable the allocated device slot and release resource.
-    //
-    SlotId = XhcRouteStringToSlotId (Xhc, RouteChart);
-    if (SlotId != 0) {
-      if (Xhc->HcCParams.Data.Csz == 0) {
-        Status = XhcDisableSlotCmd (Xhc, SlotId);
-      } else {
-        Status = XhcDisableSlotCmd64 (Xhc, SlotId);
-      }
-    }
-  }
+  } 
+
   return Status;
 }
 

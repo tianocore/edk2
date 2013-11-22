@@ -32,6 +32,13 @@ USB_PORT_STATE_MAP  mUsbPortChangeMap[] = {
   {XHC_PORTSC_PRC, USB_PORT_STAT_C_RESET}
 };
 
+USB_CLEAR_PORT_MAP mUsbClearPortChangeMap[] = {
+  {XHC_PORTSC_CSC, EfiUsbPortConnectChange},
+  {XHC_PORTSC_PEC, EfiUsbPortEnableChange},
+  {XHC_PORTSC_OCC, EfiUsbPortOverCurrentChange},
+  {XHC_PORTSC_PRC, EfiUsbPortResetChange}
+};
+
 USB_PORT_STATE_MAP  mUsbHubPortStateMap[] = {
   {XHC_HUB_PORTSC_CCS,   USB_PORT_STAT_CONNECTION},
   {XHC_HUB_PORTSC_PED,   USB_PORT_STAT_ENABLE},
@@ -44,6 +51,14 @@ USB_PORT_STATE_MAP  mUsbHubPortChangeMap[] = {
   {XHC_HUB_PORTSC_PEC, USB_PORT_STAT_C_ENABLE},
   {XHC_HUB_PORTSC_OCC, USB_PORT_STAT_C_OVERCURRENT},
   {XHC_HUB_PORTSC_PRC, USB_PORT_STAT_C_RESET}
+};
+
+USB_CLEAR_PORT_MAP mUsbHubClearPortChangeMap[] = {
+  {XHC_HUB_PORTSC_CSC, EfiUsbPortConnectChange},
+  {XHC_HUB_PORTSC_PEC, EfiUsbPortEnableChange},
+  {XHC_HUB_PORTSC_OCC, EfiUsbPortOverCurrentChange},
+  {XHC_HUB_PORTSC_PRC, EfiUsbPortResetChange},
+  {XHC_HUB_PORTSC_BHRC, Usb3PortBHPortResetChange}
 };
 
 EFI_DRIVER_BINDING_PROTOCOL  gXhciDriverBinding = {
@@ -432,6 +447,14 @@ XhcGetRootHubPortStatus (
     }
   }
 
+  MapSize = sizeof (mUsbClearPortChangeMap) / sizeof (USB_CLEAR_PORT_MAP);
+
+  for (Index = 0; Index < MapSize; Index++) {
+    if (XHC_BIT_IS_SET (State, mUsbClearPortChangeMap[Index].HwState)) {
+      XhcClearRootHubPortFeature (This, PortNumber, mUsbClearPortChangeMap[Index].Selector);
+    }
+  }
+
   //
   // Poll the root port status register to enable/disable corresponding device slot if there is a device attached/detached.
   // For those devices behind hub, we get its attach/detach event by hooking Get_Port_Status request at control transfer for those hub.
@@ -469,8 +492,6 @@ XhcSetRootHubPortFeature (
   UINT32                  Offset;
   UINT32                  State;
   UINT32                  TotalPort;
-  UINT8                   SlotId;
-  USB_DEV_ROUTE           RouteChart;
   EFI_STATUS              Status;
   EFI_TPL                 OldTpl;
 
@@ -526,24 +547,13 @@ XhcSetRootHubPortFeature (
       }
     }
 
-    RouteChart.Route.RouteString = 0;
-    RouteChart.Route.RootPortNum = PortNumber + 1;
-    RouteChart.Route.TierNum     = 1;
     //
-    // If the port reset operation happens after the usb super speed device is enabled,
-    // The subsequent configuration, such as getting device descriptor, will fail.
-    // So here a workaround is introduced to skip the reset operation if the device is enabled.
+    // 4.3.1 Resetting a Root Hub Port
+    // 1) Write the PORTSC register with the Port Reset (PR) bit set to '1'.
     //
-    SlotId = XhcRouteStringToSlotId (Xhc, RouteChart);
-    if (SlotId == 0) {
-      //
-      // 4.3.1 Resetting a Root Hub Port
-      // 1) Write the PORTSC register with the Port Reset (PR) bit set to '1'.
-      //
-      State |= XHC_PORTSC_RESET;
-      XhcWriteOpReg (Xhc, Offset, State);
-      XhcWaitOpRegBit(Xhc, Offset, XHC_PORTSC_PRC, TRUE, XHC_GENERIC_TIMEOUT);
-    }
+    State |= XHC_PORTSC_RESET;
+    XhcWriteOpReg (Xhc, Offset, State);
+    XhcWaitOpRegBit(Xhc, Offset, XHC_PORTSC_PRC, TRUE, XHC_GENERIC_TIMEOUT);
     break;
 
   case EfiUsbPortPower:
@@ -763,6 +773,8 @@ XhcControlTransfer (
   UINTN                   MapSize;
   EFI_USB_PORT_STATUS     PortStatus;
   UINT32                  State;
+  EFI_USB_DEVICE_REQUEST  ClearPortRequest;
+  UINTN                   Len;
 
   //
   // Validate parameters
@@ -808,6 +820,7 @@ XhcControlTransfer (
 
   Status          = EFI_DEVICE_ERROR;
   *TransferResult = EFI_USB_ERR_SYSTEM;
+  Len             = 0;
 
   if (XhcIsHalt (Xhc) || XhcIsSysError (Xhc)) {
     DEBUG ((EFI_D_ERROR, "XhcControlTransfer: HC halted at entrance\n"));
@@ -839,6 +852,11 @@ XhcControlTransfer (
         Xhc->UsbDevContext[Index + 1].BusDevAddr = 0;
       }
     }
+
+    if (Xhc->UsbDevContext[SlotId].XhciDevAddr == 0) {
+      Status = EFI_DEVICE_ERROR;
+      goto ON_EXIT;
+    }
     //
     // The actual device address has been assigned by XHCI during initializing the device slot.
     // So we just need establish the mapping relationship between the device address requested from UsbBus
@@ -848,20 +866,6 @@ XhcControlTransfer (
     Xhc->UsbDevContext[SlotId].BusDevAddr = (UINT8)Request->Value;
     Status = EFI_SUCCESS;
     goto ON_EXIT;
-  }
-  
-  //
-  // If the port reset operation happens after the usb super speed device is enabled,
-  // The subsequent configuration, such as getting device descriptor, will fail.
-  // So here a workaround is introduced to skip the reset operation if the device is enabled.
-  //
-  if ((Request->Request     == USB_REQ_SET_FEATURE) &&
-      (Request->RequestType == USB_REQUEST_TYPE (EfiUsbNoData, USB_REQ_TYPE_CLASS, USB_TARGET_OTHER)) &&
-      (Request->Value       == EfiUsbPortReset)) {
-    if (DeviceSpeed == EFI_USB_SPEED_SUPER) {
-      Status = EFI_SUCCESS;
-      goto ON_EXIT;
-    }
   }
 
   //
@@ -1047,6 +1051,33 @@ XhcControlTransfer (
     for (Index = 0; Index < MapSize; Index++) {
       if (XHC_BIT_IS_SET (State, mUsbHubPortChangeMap[Index].HwState)) {
         PortStatus.PortChangeStatus = (UINT16) (PortStatus.PortChangeStatus | mUsbHubPortChangeMap[Index].UefiState);
+      }
+    }
+
+    MapSize = sizeof (mUsbHubClearPortChangeMap) / sizeof (USB_CLEAR_PORT_MAP);
+
+    for (Index = 0; Index < MapSize; Index++) {
+      if (XHC_BIT_IS_SET (State, mUsbHubClearPortChangeMap[Index].HwState)) {
+        ZeroMem (&ClearPortRequest, sizeof (EFI_USB_DEVICE_REQUEST));
+        ClearPortRequest.RequestType  = USB_REQUEST_TYPE (EfiUsbNoData, USB_REQ_TYPE_CLASS, USB_TARGET_OTHER);
+        ClearPortRequest.Request      = (UINT8) USB_REQ_CLEAR_FEATURE;
+        ClearPortRequest.Value        = mUsbHubClearPortChangeMap[Index].Selector;
+        ClearPortRequest.Index        = Request->Index;
+        ClearPortRequest.Length       = 0;
+
+        XhcControlTransfer (
+          This, 
+          DeviceAddress,
+          DeviceSpeed,
+          MaximumPacketLength,
+          &ClearPortRequest,
+          EfiUsbNoData,
+          NULL,
+          &Len,
+          Timeout,
+          Translator,
+          TransferResult
+          );
       }
     }
 
