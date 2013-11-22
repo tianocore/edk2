@@ -16,9 +16,9 @@
 #define _DEBUG_AGENT_H_
 
 #include <Register/LocalApic.h>
-
 #include <Guid/DebugAgentGuid.h>
-
+#include <Guid/VectorHandoffTable.h>
+#include <Ppi/VectorHandoffInfo.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/ResetSystemLib.h>
@@ -41,6 +41,7 @@
 #include "DebugMp.h"
 #include "DebugTimer.h"
 #include "ArchDebugSupport.h"
+#include "DebugException.h"
 
 //
 // These macros may be already defined in DebugAgentLib.h
@@ -50,8 +51,8 @@
 #define DEBUG_AGENT_INIT_DXE_UNLOAD             11
 #define DEBUG_AGENT_INIT_THUNK_PEI_IA32TOX64    12
 
-#define DEBUG_INT1_VECTOR               1
-#define DEBUG_INT3_VECTOR               3
+#define DEBUG_INT1_VECTOR               DEBUG_EXCEPT_DEBUG
+#define DEBUG_INT3_VECTOR               DEBUG_EXCEPT_BREAKPOINT
 #define DEBUG_TIMER_VECTOR              32
 #define DEBUG_MAILBOX_VECTOR            33
 
@@ -67,8 +68,9 @@
 extern UINTN  Exception0Handle;
 extern UINTN  TimerInterruptHandle;
 extern UINT16 ExceptionStubHeaderSize;
-
 extern BOOLEAN mSkipBreakpoint;
+extern EFI_VECTOR_HANDOFF_INFO mVectorHandoffInfoDebugAgent[];
+extern UINTN                   mVectorHandoffInfoCount;
 
 //
 // CPU exception information issued by debug agent

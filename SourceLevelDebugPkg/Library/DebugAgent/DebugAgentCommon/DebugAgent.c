@@ -24,6 +24,114 @@ CHAR8 mErrorMsgConnectOK[]          = "HOST connection is successful!\r\n";
 CHAR8 mErrorMsgConnectFail[]        = "HOST connection is failed!\r\n";
 CHAR8 mWarningMsgIngoreBreakpoint[] = "Ignore break point in SMM for SMI issued during DXE debugging!\r\n";
 
+//
+// Vector Handoff Info list used by Debug Agent for persist
+//
+EFI_VECTOR_HANDOFF_INFO mVectorHandoffInfoDebugAgent[] = {
+  {
+    DEBUG_EXCEPT_DIVIDE_ERROR,         // Vector 0
+    EFI_VECTOR_HANDOFF_HOOK_BEFORE,
+    EFI_DEBUG_AGENT_GUID
+  },
+  {
+    DEBUG_EXCEPT_DEBUG,                // Vector 1
+    EFI_VECTOR_HANDOFF_DO_NOT_HOOK,
+    EFI_DEBUG_AGENT_GUID
+  },
+  {
+    DEBUG_EXCEPT_NMI,                  // Vector 2
+    EFI_VECTOR_HANDOFF_HOOK_BEFORE,
+    EFI_DEBUG_AGENT_GUID
+  },
+  {
+    DEBUG_EXCEPT_BREAKPOINT,           // Vector 3
+    EFI_VECTOR_HANDOFF_DO_NOT_HOOK,
+    EFI_DEBUG_AGENT_GUID
+  },
+  {
+    DEBUG_EXCEPT_OVERFLOW,             // Vector 4
+    EFI_VECTOR_HANDOFF_HOOK_BEFORE,
+    EFI_DEBUG_AGENT_GUID
+  },
+  {
+    DEBUG_EXCEPT_BOUND,                // Vector 5
+    EFI_VECTOR_HANDOFF_HOOK_BEFORE,
+    EFI_DEBUG_AGENT_GUID
+  },
+  {
+    DEBUG_EXCEPT_INVALID_OPCODE,       // Vector 6
+    EFI_VECTOR_HANDOFF_HOOK_BEFORE,
+    EFI_DEBUG_AGENT_GUID
+  },
+  {
+    DEBUG_EXCEPT_DOUBLE_FAULT,         // Vector 8
+    EFI_VECTOR_HANDOFF_HOOK_BEFORE,
+    EFI_DEBUG_AGENT_GUID
+  },
+  {
+    DEBUG_EXCEPT_INVALID_TSS,          // Vector 10
+    EFI_VECTOR_HANDOFF_HOOK_BEFORE,
+    EFI_DEBUG_AGENT_GUID
+  },
+  {
+    DEBUG_EXCEPT_SEG_NOT_PRESENT,      // Vector 11
+    EFI_VECTOR_HANDOFF_HOOK_BEFORE,
+    EFI_DEBUG_AGENT_GUID
+  },
+  {
+    DEBUG_EXCEPT_STACK_FAULT,          // Vector 12
+    EFI_VECTOR_HANDOFF_HOOK_BEFORE,
+    EFI_DEBUG_AGENT_GUID
+  },
+  {
+    DEBUG_EXCEPT_GP_FAULT,             // Vector 13
+    EFI_VECTOR_HANDOFF_HOOK_BEFORE,
+    EFI_DEBUG_AGENT_GUID
+  },
+    {
+    DEBUG_EXCEPT_PAGE_FAULT,           // Vector 14
+    EFI_VECTOR_HANDOFF_HOOK_BEFORE,
+    EFI_DEBUG_AGENT_GUID
+  },
+  {
+    DEBUG_EXCEPT_FP_ERROR,             // Vector 16
+    EFI_VECTOR_HANDOFF_HOOK_BEFORE,
+    EFI_DEBUG_AGENT_GUID
+  },
+  {
+    DEBUG_EXCEPT_ALIGNMENT_CHECK,      // Vector 17
+    EFI_VECTOR_HANDOFF_HOOK_BEFORE,
+    EFI_DEBUG_AGENT_GUID
+  },
+  {
+    DEBUG_EXCEPT_MACHINE_CHECK,        // Vector 18
+    EFI_VECTOR_HANDOFF_HOOK_BEFORE,
+    EFI_DEBUG_AGENT_GUID
+  },
+  {
+    DEBUG_EXCEPT_SIMD,                 // Vector 19
+    EFI_VECTOR_HANDOFF_HOOK_BEFORE,
+    EFI_DEBUG_AGENT_GUID
+  },
+  {
+    DEBUG_TIMER_VECTOR,                // Vector 32
+    EFI_VECTOR_HANDOFF_DO_NOT_HOOK,
+    EFI_DEBUG_AGENT_GUID
+  },
+  {
+    DEBUG_MAILBOX_VECTOR,              // Vector 33
+    EFI_VECTOR_HANDOFF_DO_NOT_HOOK,
+    EFI_DEBUG_AGENT_GUID
+  },
+  {
+    0,
+    EFI_VECTOR_HANDOFF_LAST_ENTRY,
+    { 0 }
+  }
+};
+
+UINTN mVectorHandoffInfoCount = sizeof (mVectorHandoffInfoDebugAgent) / sizeof (EFI_VECTOR_HANDOFF_INFO);
+
 /**
   Calculate CRC16 for target data.
 

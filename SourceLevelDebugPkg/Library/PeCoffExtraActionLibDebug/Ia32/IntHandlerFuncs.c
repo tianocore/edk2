@@ -18,6 +18,7 @@
   Read IDT entry to check if IDT entries are setup by Debug Agent.
 
   @param[in]  IdtDescriptor      Pointer to IDT Descriptor.
+  @param[in]  InterruptType      Interrupt type.
 
   @retval  TRUE     IDT entries were setup by Debug Agent.
   @retval  FALSE    IDT entries were not setuo by Debug Agent.
@@ -25,7 +26,8 @@
 **/
 BOOLEAN 
 CheckDebugAgentHandler (
-  IN  IA32_DESCRIPTOR            *IdtDescriptor
+  IN  IA32_DESCRIPTOR            *IdtDescriptor,
+  IN  UINTN                      InterruptType
   )
 {
   IA32_IDT_GATE_DESCRIPTOR   *IdtEntry;
@@ -36,8 +38,9 @@ CheckDebugAgentHandler (
     return FALSE;
   }
 
-  InterruptHandler = IdtEntry[0].Bits.OffsetLow + (IdtEntry[0].Bits.OffsetHigh << 16);
-  if (InterruptHandler >= 4 &&  *(UINT32 *)(InterruptHandler - 4) == AGENT_HANDLER_SIGNATURE) {
+  InterruptHandler = IdtEntry[InterruptType].Bits.OffsetLow +
+                    (IdtEntry[InterruptType].Bits.OffsetHigh << 16);
+  if (InterruptHandler >= sizeof (UINT32) &&  *(UINT32 *)(InterruptHandler - sizeof (UINT32)) == AGENT_HANDLER_SIGNATURE) {
     return TRUE;
   } else {
     return FALSE;

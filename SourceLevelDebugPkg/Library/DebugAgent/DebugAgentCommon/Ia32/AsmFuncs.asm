@@ -32,6 +32,10 @@ InterruptProcess                 PROTO   C
 
 public    Exception0Handle, TimerInterruptHandle, ExceptionStubHeaderSize
 
+AGENT_HANDLER_SIGNATURE  MACRO
+  db   41h, 47h, 54h, 48h       ; SIGNATURE_32('A','G','T','H')
+ENDM
+
 .data
 
 ExceptionStubHeaderSize   DW    Exception1Handle - Exception0Handle
@@ -39,108 +43,127 @@ CommonEntryAddr           DD    CommonEntry
 
 .code
 
-db   41h, 47h, 54h, 48h  ; AGENT_HANDLER_SIGNATURE     SIGNATURE_32('A','G','T','H')
+AGENT_HANDLER_SIGNATURE
 Exception0Handle:
     cli
     push    eax
     mov     eax, 0
     jmp     dword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception1Handle:
     cli
     push    eax
     mov     eax, 1
     jmp     dword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception2Handle:
     cli
     push    eax
     mov     eax, 2
     jmp     dword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception3Handle:
     cli
     push    eax
     mov     eax, 3
     jmp     dword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception4Handle:
     cli
     push    eax
     mov     eax, 4
     jmp     dword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception5Handle:
     cli
     push    eax
     mov     eax, 5
     jmp     dword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception6Handle:
     cli
     push    eax
     mov     eax, 6
     jmp     dword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception7Handle:
     cli
     push    eax
     mov     eax, 7
     jmp     dword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception8Handle:
     cli
     push    eax
     mov     eax, 8
     jmp     dword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception9Handle:
     cli
     push    eax
     mov     eax, 9
     jmp     dword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception10Handle:
     cli
     push    eax
     mov     eax, 10
     jmp     dword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception11Handle:
     cli
     push    eax
     mov     eax, 11
     jmp     dword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception12Handle:
     cli
     push    eax
     mov     eax, 12
     jmp     dword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception13Handle:
     cli
     push    eax
     mov     eax, 13
     jmp     dword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception14Handle:
     cli
     push    eax
     mov     eax, 14
     jmp     dword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception15Handle:
     cli
     push    eax
     mov     eax, 15
     jmp     dword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception16Handle:
     cli
     push    eax
     mov     eax, 16
     jmp     dword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception17Handle:
     cli
     push    eax
     mov     eax, 17
     jmp     dword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception18Handle:
     cli
     push    eax
     mov     eax, 18
     jmp     dword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception19Handle:
     cli
     push    eax
     mov     eax, 19
     jmp     dword ptr [CommonEntryAddr]
-
+AGENT_HANDLER_SIGNATURE
 TimerInterruptHandle:
     cli
     push    eax

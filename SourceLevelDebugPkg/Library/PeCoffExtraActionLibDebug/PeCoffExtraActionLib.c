@@ -80,18 +80,21 @@ PeCoffLoaderExtraActionCommon (
   IdtEntryHooked  = FALSE;
   LoadImageMethod = PcdGet8 (PcdDebugLoadImageMethod);
   AsmReadIdtr (&IdtDescriptor);
-  if (!CheckDebugAgentHandler (&IdtDescriptor)) {
-    if (LoadImageMethod == DEBUG_LOAD_IMAGE_METHOD_SOFT_INT3) {
+  if (LoadImageMethod == DEBUG_LOAD_IMAGE_METHOD_SOFT_INT3) {
+    if (!CheckDebugAgentHandler (&IdtDescriptor, SOFT_INT_VECTOR_NUM)) {
       //
       // Do not trigger INT3 if Debug Agent did not setup IDT entries.
       //
       return;
     }
-    //
-    // Save and update IDT entry for INT1
-    //
-    SaveAndUpdateIdtEntry1 (&IdtDescriptor, &OriginalIdtEntry);
-    IdtEntryHooked = TRUE;
+  } else {
+    if (!CheckDebugAgentHandler (&IdtDescriptor, IO_HW_BREAKPOINT_VECTOR_NUM)) {
+      //
+      // Save and update IDT entry for INT1
+      //
+      SaveAndUpdateIdtEntry1 (&IdtDescriptor, &OriginalIdtEntry);
+      IdtEntryHooked = TRUE;
+    }
   }
   
   //

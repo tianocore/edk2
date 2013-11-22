@@ -193,6 +193,19 @@ InitializeDebugAgent (
   switch (InitFlag) {
   case DEBUG_AGENT_INIT_SMM:
     //
+    // Install configuration table for persisted vector handoff info
+    //
+    Status = gSmst->SmmInstallConfigurationTable (
+                      gSmst,
+                      &gEfiVectorHandoffTableGuid,
+                      (VOID *) &mVectorHandoffInfoDebugAgent[0],
+                      sizeof (EFI_VECTOR_HANDOFF_INFO) * mVectorHandoffInfoCount
+                      );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "DebugAgent: Cannot install configuration table for persisted vector handoff info!\n"));
+      CpuDeadLoop ();
+    }
+    //
     // Check if Debug Agent initialized in DXE phase
     //
     Status = EfiGetSystemConfigurationTable (&gEfiDebugAgentGuid, (VOID **) &Mailbox);
@@ -210,7 +223,7 @@ InitializeDebugAgent (
       break;
     }
     //
-    // Debug Agent was not initialized before, uset the local mailbox.
+    // Debug Agent was not initialized before, use the local mailbox.
     //
     ZeroMem (&mLocalMailbox, sizeof (DEBUG_AGENT_MAILBOX));
     Mailbox = &mLocalMailbox;

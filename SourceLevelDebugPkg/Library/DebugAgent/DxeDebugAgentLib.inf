@@ -82,7 +82,11 @@
 [Guids]
   gEfiDebugAgentGuid                            ## PRODUCES ## Configuration Table
   gEfiDebugAgentGuid                            ## CONSUMES ## HOB
-
+  gEfiVectorHandoffTableGuid                    ## SOMETIMES_PRODUCES ## Configuration Table
+  
+[Ppis]
+  gEfiVectorHandoffInfoPpiGuid                  ## UNDEFINED
+  
 [Protocols]
   gEfiSerialIoProtocolGuid                      ## PRODUCES
   gEfiDevicePathProtocolGuid                    ## PRODUCES 

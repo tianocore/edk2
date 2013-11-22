@@ -57,6 +57,32 @@ InternalConstructorWorker (
   BOOLEAN                     DebugTimerInterruptState;
   DEBUG_AGENT_MAILBOX         *Mailbox;
   DEBUG_AGENT_MAILBOX         *NewMailbox;
+  EFI_HOB_GUID_TYPE           *GuidHob;
+  EFI_VECTOR_HANDOFF_INFO     *VectorHandoffInfo;
+
+  //
+  // Check persisted vector handoff info
+  //
+  Status = EFI_SUCCESS;
+  GuidHob = GetFirstGuidHob (&gEfiVectorHandoffInfoPpiGuid);
+  if (GuidHob != NULL && !mDxeCoreFlag) {
+    //
+    // Check if configuration table is installed or not if GUIDed HOB existed,
+    // only when Debug Agent is not linked by DXE Core
+    //
+    Status = EfiGetSystemConfigurationTable (&gEfiVectorHandoffTableGuid, (VOID **) &VectorHandoffInfo);
+  }
+  if (GuidHob == NULL || Status != EFI_SUCCESS) {
+    //
+    // Install configuration table for persisted vector handoff info if GUIDed HOB cannot be found or
+    // configuration table does not exist
+    //
+    Status = gBS->InstallConfigurationTable (&gEfiVectorHandoffTableGuid, (VOID *) &mVectorHandoffInfoDebugAgent[0]);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "DebugAgent: Cannot install configuration table for persisted vector handoff info!\n"));
+      CpuDeadLoop ();
+    }
+  }
 
   //
   // Install EFI Serial IO protocol on debug port
@@ -70,7 +96,10 @@ InternalConstructorWorker (
                   EFI_SIZE_TO_PAGES (sizeof(DEBUG_AGENT_MAILBOX) + PcdGet16(PcdDebugPortHandleBufferSize)),
                   &Address
                   );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "DebugAgent: Cannot install configuration table for mailbox!\n"));
+    CpuDeadLoop ();
+  }
 
   DebugTimerInterruptState = SaveAndSetDebugTimerInterrupt (FALSE);
 
@@ -91,7 +120,10 @@ InternalConstructorWorker (
   DebugTimerInterruptState = SaveAndSetDebugTimerInterrupt (DebugTimerInterruptState);
 
   Status = gBS->InstallConfigurationTable (&gEfiDebugAgentGuid, (VOID *) mMailboxPointer);
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "DebugAgent: Failed to install configuration for mailbox!\n"));
+    CpuDeadLoop ();
+  }
 }
 
 /**
@@ -233,9 +265,16 @@ SetupDebugAgentEnviroment (
   AsmReadIdtr ((IA32_DESCRIPTOR *) &Idtr);
   IdtEntryCount = (UINT16) ((Idtr.Limit + 1) / sizeof (IA32_IDT_GATE_DESCRIPTOR));
   if (IdtEntryCount < 33) {
+    ZeroMem (&mIdtEntryTable, sizeof (IA32_IDT_GATE_DESCRIPTOR) * 33);
+    //
+    // Copy original IDT table into new one
+    //
+    CopyMem (&mIdtEntryTable, (VOID *) Idtr.Base, Idtr.Limit + 1);
+    //
+    // Load new IDT table
+    //
     Idtr.Limit = (UINT16) (sizeof (IA32_IDT_GATE_DESCRIPTOR) * 33 - 1);
     Idtr.Base  = (UINTN) &mIdtEntryTable;
-    ZeroMem (&mIdtEntryTable, Idtr.Limit + 1);
     AsmWriteIdtr ((IA32_DESCRIPTOR *) &Idtr);
   }
 

@@ -27,114 +27,137 @@ ASM_GLOBAL ASM_PFX(ExceptionStubHeaderSize)
 ASM_GLOBAL ASM_PFX(TimerInterruptHandle)
 ASM_GLOBAL ASM_PFX(CommonEntry)
 
+.macro  AGENT_HANDLER_SIGNATURE
+  .byte 0x41, 0x47, 0x54, 0x48   # AGENT_HANDLER_SIGNATURE     SIGNATURE_32('A','G','T','H')
+.endm
+
 .data
 
 ASM_PFX(ExceptionStubHeaderSize):  .word     ASM_PFX(Exception1Handle) - ASM_PFX(Exception0Handle)
 
 .text
 
-.byte 0x41, 0x47, 0x54, 0x48  # AGENT_HANDLER_SIGNATURE     SIGNATURE_32('A','G','T','H')
+AGENT_HANDLER_SIGNATURE
 ASM_PFX(Exception0Handle):
    cli
    pushl %eax
    mov   $0, %eax
    jmp   ASM_PFX(CommonEntry)
+AGENT_HANDLER_SIGNATURE
 ASM_PFX(Exception1Handle):
    cli
    pushl %eax
    mov   $1, %eax
    jmp   ASM_PFX(CommonEntry)
+AGENT_HANDLER_SIGNATURE
 ASM_PFX(Exception2Handle):
    cli
    pushl %eax
    mov   $2, %eax
    jmp   ASM_PFX(CommonEntry)
+AGENT_HANDLER_SIGNATURE
 ASM_PFX(Exception3Handle):
    cli
    pushl %eax
    mov   $3, %eax
    jmp   ASM_PFX(CommonEntry)
+AGENT_HANDLER_SIGNATURE
 ASM_PFX(Exception4Handle):
    cli
    pushl %eax
    mov   $4, %eax
    jmp   ASM_PFX(CommonEntry)
+AGENT_HANDLER_SIGNATURE
 ASM_PFX(Exception5Handle):
    cli
    pushl %eax
    mov   $5, %eax
    jmp   ASM_PFX(CommonEntry)
+AGENT_HANDLER_SIGNATURE
 ASM_PFX(Exception6Handle):
    cli
    pushl %eax
    mov   $6, %eax
    jmp   ASM_PFX(CommonEntry)
+AGENT_HANDLER_SIGNATURE
 ASM_PFX(Exception7Handle):
    cli
    pushl %eax
    mov   $7, %eax
    jmp   ASM_PFX(CommonEntry)
+AGENT_HANDLER_SIGNATURE
 ASM_PFX(Exception8Handle):
    cli
    pushl %eax
    mov   $8, %eax
    jmp   ASM_PFX(CommonEntry)
+AGENT_HANDLER_SIGNATURE
 ASM_PFX(Exception9Handle):
    cli
    pushl %eax
    mov   $9, %eax
    jmp   ASM_PFX(CommonEntry)
+AGENT_HANDLER_SIGNATURE
 ASM_PFX(Exception10Handle):
    cli
    pushl %eax
    mov   $10, %eax
    jmp   ASM_PFX(CommonEntry)
+AGENT_HANDLER_SIGNATURE
 ASM_PFX(Exception11Handle):
    cli
    pushl %eax
    mov   $11, %eax
    jmp   ASM_PFX(CommonEntry)
+AGENT_HANDLER_SIGNATURE
 ASM_PFX(Exception12Handle):
    cli
    pushl %eax
    mov   $12, %eax
    jmp   ASM_PFX(CommonEntry)
+AGENT_HANDLER_SIGNATURE
 ASM_PFX(Exception13Handle):
    cli
    pushl %eax
    mov   $13, %eax
    jmp   ASM_PFX(CommonEntry)
+AGENT_HANDLER_SIGNATURE
 ASM_PFX(Exception14Handle):
    cli
    pushl %eax
    mov   $14, %eax
    jmp   ASM_PFX(CommonEntry)
+AGENT_HANDLER_SIGNATURE
 ASM_PFX(Exception15Handle):
    cli
    pushl %eax
    mov   $15, %eax
    jmp   ASM_PFX(CommonEntry)
+AGENT_HANDLER_SIGNATURE
 ASM_PFX(Exception16Handle):
    cli
    pushl %eax
    mov   $16, %eax
    jmp   ASM_PFX(CommonEntry)
+AGENT_HANDLER_SIGNATURE
 ASM_PFX(Exception17Handle):
    cli
    pushl %eax
    mov   $17, %eax
    jmp   ASM_PFX(CommonEntry)
+AGENT_HANDLER_SIGNATURE
 ASM_PFX(Exception18Handle):
    cli
    pushl %eax
    mov   $18, %eax
    jmp   ASM_PFX(CommonEntry)
+AGENT_HANDLER_SIGNATURE
 ASM_PFX(Exception19Handle):
    cli
    pushl %eax
    mov   $19, %eax
    jmp   ASM_PFX(CommonEntry)
-
+AGENT_HANDLER_SIGNATURE
 ASM_PFX(TimerInterruptHandle):
    cli
    pushl %eax

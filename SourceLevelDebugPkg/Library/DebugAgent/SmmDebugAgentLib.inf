@@ -71,9 +71,11 @@
   PrintLib
   PeCoffExtraActionLib
   PeCoffGetEntryPointLib
+  SmmServicesTableLib
 
 [Guids]
   gEfiDebugAgentGuid                            ## CONSUMES ## Configuration Table
+  gEfiVectorHandoffTableGuid                    ## SOMETIMES_PRODUCES ## Configuration Table
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock                                             ## CONSUMES

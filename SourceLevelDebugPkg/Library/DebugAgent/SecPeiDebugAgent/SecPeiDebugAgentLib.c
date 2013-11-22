@@ -16,6 +16,22 @@
 
 BOOLEAN  mSkipBreakpoint = FALSE;
 
+
+EFI_PEI_VECTOR_HANDOFF_INFO_PPI mVectorHandoffInfoPpi = {
+  &mVectorHandoffInfoDebugAgent[0]
+};
+
+//
+// Ppis to be installed
+//
+EFI_PEI_PPI_DESCRIPTOR           mVectorHandoffInfoPpiList[] = { 
+  {
+    (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+    &gEfiVectorHandoffInfoPpiGuid,
+    &mVectorHandoffInfoPpi
+  }
+};
+
 EFI_PEI_NOTIFY_DESCRIPTOR mMemoryDiscoveredNotifyList[1] = {
   {
     (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
@@ -408,7 +424,14 @@ InitializeDebugAgent (
       //
       TriggerSoftInterrupt (MEMORY_READY_SIGNATURE);
     }
-
+    //
+    // Install Vector Handoff Info PPI to persist vectors used by Debug Agent
+    //
+    Status = PeiServicesInstallPpi (&mVectorHandoffInfoPpiList[0]);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "DebugAgent: Failed to install Vector Handoff Info PPI!\n"));
+      CpuDeadLoop ();
+    }
     //
     // Fix up Debug Port handle address and mailbox address
     //
@@ -437,7 +460,10 @@ InitializeDebugAgent (
                  EFI_SIZE_TO_PAGES (sizeof(DEBUG_AGENT_MAILBOX) + PcdGet16(PcdDebugPortHandleBufferSize)),
                  &Address
                  );
-      ASSERT_EFI_ERROR (Status);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((EFI_D_ERROR, "DebugAgent: Failed to allocate pages!\n"));
+        CpuDeadLoop ();
+      }
       NewMailbox = (DEBUG_AGENT_MAILBOX *) (UINTN) Address;
       //
       // Copy Mailbox and Debug Port Handle buffer to new location in ACPI NVS memory, because original Mailbox
@@ -477,6 +503,14 @@ InitializeDebugAgent (
       break;
     }
     //
+    // Install Vector Handoff Info PPI to persist vectors used by Debug Agent
+    //
+    Status = PeiServicesInstallPpi (&mVectorHandoffInfoPpiList[0]);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "DebugAgent: Failed to install Vector Handoff Info PPI!\n"));
+      CpuDeadLoop ();
+    }
+    //
     // Set up IDT entries
     //
     InitializeDebugIdt ();
@@ -505,7 +539,10 @@ InitializeDebugAgent (
     // If memery has been ready, the callback funtion will be invoked immediately
     //
     Status = PeiServicesNotifyPpi (&mMemoryDiscoveredNotifyList[0]);
-    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "DebugAgent: Failed to register memory discovered callback function!\n"));
+      CpuDeadLoop ();
+    }
     //
     // Set HOB check flag if memory has not been ready yet
     //

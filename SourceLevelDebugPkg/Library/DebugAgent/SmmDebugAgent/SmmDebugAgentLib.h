@@ -1,7 +1,7 @@
 /** @file
   Header file for Smm Debug Agent Library instance.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -18,6 +18,7 @@
 #include <PiDxe.h>
 
 #include <Library/UefiLib.h>
+#include <Library/SmmServicesTableLib.h>
 
 #include "DebugAgent.h"
 

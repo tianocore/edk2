@@ -28,113 +28,136 @@ data SEGMENT
 
 public          Exception0Handle, TimerInterruptHandle, ExceptionStubHeaderSize
 
+AGENT_HANDLER_SIGNATURE  MACRO
+  db   41h, 47h, 54h, 48h       ; SIGNATURE_32('A','G','T','H')
+ENDM
+
 ExceptionStubHeaderSize        dw      Exception1Handle - Exception0Handle ;
 CommonEntryAddr                dq      CommonEntry ;
 
 .code
 
-db   41h, 47h, 54h, 48h  ; AGENT_HANDLER_SIGNATURE     SIGNATURE_32('A','G','T','H')
+AGENT_HANDLER_SIGNATURE
 Exception0Handle:
     cli
     push    rcx
     mov     rcx, 0
     jmp     qword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE	
 Exception1Handle:
     cli
     push    rcx
     mov     rcx, 1
     jmp     qword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception2Handle:
     cli
     push    rcx
     mov     rcx, 2
     jmp     qword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception3Handle:
     cli
     push    rcx
     mov     rcx, 3
     jmp     qword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception4Handle:
     cli
     push    rcx
     mov     rcx, 4
     jmp     qword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception5Handle:
     cli
     push    rcx
     mov     rcx, 5
     jmp     qword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception6Handle:
     cli
     push    rcx
     mov     rcx, 6
     jmp     qword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception7Handle:
     cli
     push    rcx
     mov     rcx, 7
     jmp     qword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception8Handle:
     cli
     push    rcx
     mov     rcx, 8
     jmp     qword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception9Handle:
     cli
     push    rcx
     mov     rcx, 9
     jmp     qword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception10Handle:
     cli
     push    rcx
     mov     rcx, 10
     jmp     qword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception11Handle:
     cli
     push    rcx
     mov     rcx, 11
     jmp     qword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception12Handle:
     cli
     push    rcx
     mov     rcx, 12
     jmp     qword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception13Handle:
     cli
     push    rcx
     mov     rcx, 13
     jmp     qword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception14Handle:
     cli
     push    rcx
     mov     rcx, 14
     jmp     qword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception15Handle:
     cli
     push    rcx
     mov     rcx, 15
     jmp     qword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception16Handle:
     cli
     push    rcx
     mov     rcx, 16
     jmp     qword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception17Handle:
     cli
     push    rcx
     mov     rcx, 17
     jmp     qword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception18Handle:
     cli
     push    rcx
     mov     rcx, 18
     jmp     qword ptr [CommonEntryAddr]
+AGENT_HANDLER_SIGNATURE
 Exception19Handle:
     cli
     push    rcx
     mov     rcx, 19
     jmp     qword ptr [CommonEntryAddr]
-
+AGENT_HANDLER_SIGNATURE
 TimerInterruptHandle:
     cli
     push    rcx

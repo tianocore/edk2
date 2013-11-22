@@ -77,6 +77,7 @@
 
 [Ppis]
   gEfiPeiMemoryDiscoveredPpiGuid
+  gEfiVectorHandoffInfoPpiGuid                  ## PRODUCES
 
 [Guids]
   gEfiDebugAgentGuid                            ## PRODUCES ## HOB
