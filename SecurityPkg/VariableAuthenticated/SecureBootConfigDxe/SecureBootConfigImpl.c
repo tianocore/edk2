@@ -2537,7 +2537,7 @@ SecureBootCallback (
 
   Status = EFI_SUCCESS;
 
-  HiiGetBrowserData (NULL, NULL, BufferSize, (UINT8 *) IfrNvData);
+  HiiGetBrowserData (&gSecureBootConfigFormSetGuid, mSecureBootStorageName, BufferSize, (UINT8 *) IfrNvData);
   
   if (Action == EFI_BROWSER_ACTION_CHANGING) {
 
@@ -2850,7 +2850,7 @@ SecureBootCallback (
   
   if (!EFI_ERROR (Status)) {
     BufferSize = sizeof (SECUREBOOT_CONFIGURATION);
-    HiiSetBrowserData (NULL, NULL, BufferSize, (UINT8*) IfrNvData, NULL);
+    HiiSetBrowserData (&gSecureBootConfigFormSetGuid, mSecureBootStorageName, BufferSize, (UINT8*) IfrNvData, NULL);
   }
   FreePool (IfrNvData);
   
