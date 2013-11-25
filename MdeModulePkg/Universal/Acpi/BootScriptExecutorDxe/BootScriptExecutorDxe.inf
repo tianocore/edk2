@@ -4,7 +4,7 @@
 # This is a standalone Boot Script Executor. Standalone means it does not
 # depends on any PEI or DXE service.
 #
-# Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are
 # licensed and made available under the terms and conditions of the BSD License
@@ -74,6 +74,9 @@
   gEfiBootScriptExecutorContextGuid
   gPerformanceProtocolGuid
   gEfiEventExitBootServicesGuid
+
+[Protocols]
+  gEfiDxeSmmReadyToLockProtocolGuid
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode

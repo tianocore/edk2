@@ -1,10 +1,10 @@
 /** @file
   This is the code for Boot Script Executer module.
 
-  This driver is dispatched by Dxe core and the driver will reload itself to ACPI NVS memory
+  This driver is dispatched by Dxe core and the driver will reload itself to ACPI reserved memory
   in the entry point. The functionality is to interpret and restore the S3 boot script
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -21,6 +21,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 EFI_GUID              mBootScriptExecutorImageGuid = {
   0x9a8d3433, 0x9fe8, 0x42b6, { 0x87, 0xb, 0x1e, 0x31, 0xc8, 0x4e, 0xbe, 0x3b }
 };
+
+BOOLEAN               mPage1GSupport = FALSE;
 
 /**
   Entry function of Boot script exector. This function will be executed in
@@ -205,6 +207,121 @@ S3BootScriptExecutorEntryFunction (
   CpuDeadLoop();
   return EFI_UNSUPPORTED;
 }
+
+/**
+  This is the Event notification function to reload BootScriptExecutor image
+  to RESERVED mem and save it to LockBox.
+  
+  @param    Event   Pointer to this event
+  @param    Context Event hanlder private data 
+ **/
+VOID
+EFIAPI
+ReadyToLockEventNotify (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  EFI_STATUS                                    Status;
+  VOID                                          *Interface;
+  UINT8                                         *Buffer;
+  UINTN                                         BufferSize;
+  EFI_HANDLE                                    NewImageHandle;
+  UINTN                                         Pages;
+  EFI_PHYSICAL_ADDRESS                          FfsBuffer;
+  PE_COFF_LOADER_IMAGE_CONTEXT                  ImageContext;
+
+  Status = gBS->LocateProtocol (&gEfiDxeSmmReadyToLockProtocolGuid, NULL, &Interface);
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  //
+  // A workaround: Here we install a dummy handle
+  //
+  NewImageHandle = NULL;
+  Status = gBS->InstallProtocolInterface (
+                  &NewImageHandle,
+                  &gEfiCallerIdGuid,
+                  EFI_NATIVE_INTERFACE,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Reload BootScriptExecutor image itself to RESERVED mem
+  //
+  Status = GetSectionFromAnyFv  (
+             &gEfiCallerIdGuid,
+             EFI_SECTION_PE32,
+             0,
+             (VOID **) &Buffer,
+             &BufferSize
+             );
+  ASSERT_EFI_ERROR (Status);
+  ImageContext.Handle    = Buffer;
+  ImageContext.ImageRead = PeCoffLoaderImageReadFromMemory;
+  //
+  // Get information about the image being loaded
+  //
+  Status = PeCoffLoaderGetImageInfo (&ImageContext);
+  ASSERT_EFI_ERROR (Status);
+  Pages = EFI_SIZE_TO_PAGES(BufferSize + ImageContext.SectionAlignment);
+  FfsBuffer = 0xFFFFFFFF;
+  Status = gBS->AllocatePages (
+                  AllocateMaxAddress,
+                  EfiReservedMemoryType,
+                  Pages,
+                  &FfsBuffer
+                  );
+  ASSERT_EFI_ERROR (Status);
+  ImageContext.ImageAddress = (PHYSICAL_ADDRESS)(UINTN)FfsBuffer;
+  //
+  // Align buffer on section boundry
+  //
+  ImageContext.ImageAddress += ImageContext.SectionAlignment - 1;
+  ImageContext.ImageAddress &= ~(ImageContext.SectionAlignment - 1);
+  //
+  // Load the image to our new buffer
+  //
+  Status = PeCoffLoaderLoadImage (&ImageContext);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Relocate the image in our new buffer
+  //
+  Status = PeCoffLoaderRelocateImage (&ImageContext);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Free the buffer allocated by ReadSection since the image has been relocated in the new buffer
+  //
+  gBS->FreePool (Buffer);
+
+  //
+  // Flush the instruction cache so the image data is written before we execute it
+  //
+  InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
+  Status = ((EFI_IMAGE_ENTRY_POINT)(UINTN)(ImageContext.EntryPoint)) (NewImageHandle, gST);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Additional step for BootScript integrity
+  // Save BootScriptExecutor image
+  //
+  Status = SaveLockBox (
+             &mBootScriptExecutorImageGuid,
+             (VOID *)(UINTN)ImageContext.ImageAddress,
+             (UINTN)ImageContext.ImageSize
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = SetLockBoxAttributes (&mBootScriptExecutorImageGuid, LOCK_BOX_ATTRIBUTE_RESTORE_IN_PLACE);
+  ASSERT_EFI_ERROR (Status);
+
+  gBS->CloseEvent (Event);
+}
+
 /**
   Entrypoint of Boot script exector driver, this function will be executed in
   normal boot phase and invoked by DXE dispatch.
@@ -222,16 +339,16 @@ BootScriptExecutorEntryPoint (
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
 {
-  UINT8                                         *Buffer;
   UINTN                                         BufferSize;
   UINTN                                         Pages;
-  EFI_PHYSICAL_ADDRESS                          FfsBuffer;
-  PE_COFF_LOADER_IMAGE_CONTEXT                  ImageContext;
   BOOT_SCRIPT_EXECUTOR_VARIABLE                 *EfiBootScriptExecutorVariable;
   EFI_PHYSICAL_ADDRESS                          BootScriptExecutorBuffer;
   EFI_STATUS                                    Status;
   VOID                                          *DevicePath;
-  EFI_HANDLE                                    NewImageHandle;
+  EFI_EVENT                                     ReadyToLockEvent;
+  VOID                                          *Registration;
+  UINT32                                        RegEax;
+  UINT32                                        RegEdx;
 
   //
   // Test if the gEfiCallerIdGuid of this image is already installed. if not, the entry
@@ -240,94 +357,32 @@ BootScriptExecutorEntryPoint (
   //
   Status = gBS->LocateProtocol (&gEfiCallerIdGuid, NULL, &DevicePath);
   if (EFI_ERROR (Status)) {
-
       //
-      // This is the first-time loaded by DXE core. reload itself to RESERVED mem
+      // Create ReadyToLock event to reload BootScriptExecutor image
+      // to RESERVED mem and save it to LockBox.
       //
-      //
-      // A workaround: Here we install a dummy handle
-      //
-      NewImageHandle = NULL;
-      Status = gBS->InstallProtocolInterface (
-                  &NewImageHandle,
-                  &gEfiCallerIdGuid,
-                  EFI_NATIVE_INTERFACE,
-                  NULL
-                  );
-      ASSERT_EFI_ERROR (Status);
-
-      Status = GetSectionFromAnyFv  (
-                 &gEfiCallerIdGuid,
-                 EFI_SECTION_PE32,
-                 0,
-                 (VOID **) &Buffer,
-                 &BufferSize
-                 );
-      ASSERT_EFI_ERROR (Status);
-      ImageContext.Handle    = Buffer;
-      ImageContext.ImageRead = PeCoffLoaderImageReadFromMemory;
-      //
-      // Get information about the image being loaded
-      //
-      Status = PeCoffLoaderGetImageInfo (&ImageContext);
-      ASSERT_EFI_ERROR (Status);
-      Pages = EFI_SIZE_TO_PAGES(BufferSize + ImageContext.SectionAlignment);
-      FfsBuffer = 0xFFFFFFFF;
-      Status = gBS->AllocatePages (
-                    AllocateMaxAddress,
-                    EfiReservedMemoryType,
-                    Pages,
-                    &FfsBuffer
-                    );
-      ASSERT_EFI_ERROR (Status);
-      ImageContext.ImageAddress = (PHYSICAL_ADDRESS)(UINTN)FfsBuffer;
-      //
-      // Align buffer on section boundry
-      //
-      ImageContext.ImageAddress += ImageContext.SectionAlignment - 1;
-      ImageContext.ImageAddress &= ~(ImageContext.SectionAlignment - 1);
-      //
-      // Load the image to our new buffer
-      //
-      Status = PeCoffLoaderLoadImage (&ImageContext);
-      ASSERT_EFI_ERROR (Status);
-
-      //
-      // Relocate the image in our new buffer
-      //
-      Status = PeCoffLoaderRelocateImage (&ImageContext);
-      ASSERT_EFI_ERROR (Status);
-
-      //
-      // Free the buffer allocated by ReadSection since the image has been relocated in the new buffer
-      //
-      gBS->FreePool (Buffer);
-
-      //
-      // Flush the instruction cache so the image data is written before we execute it
-      //
-      InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
-      Status = ((EFI_IMAGE_ENTRY_POINT)(UINTN)(ImageContext.EntryPoint)) (NewImageHandle, SystemTable);
-      ASSERT_EFI_ERROR (Status);
-
-      //
-      // Additional step for BootScript integrity
-      // Save BootScriptExecutor image
-      //
-      Status = SaveLockBox (
-                 &mBootScriptExecutorImageGuid,
-                 (VOID *)(UINTN)ImageContext.ImageAddress,
-                 (UINTN)ImageContext.ImageSize
-                 );
-      ASSERT_EFI_ERROR (Status);
-
-      Status = SetLockBoxAttributes (&mBootScriptExecutorImageGuid, LOCK_BOX_ATTRIBUTE_RESTORE_IN_PLACE);
-      ASSERT_EFI_ERROR (Status);
-
+      ReadyToLockEvent = EfiCreateProtocolNotifyEvent  (
+                           &gEfiDxeSmmReadyToLockProtocolGuid,
+                           TPL_NOTIFY,
+                           ReadyToLockEventNotify,
+                           NULL,
+                           &Registration
+                           );
+      ASSERT (ReadyToLockEvent != NULL);
     } else {
       //
       // the entry point is invoked after reloading. following code only run in RESERVED mem
       //
+      if (PcdGetBool(PcdUse1GPageTable)) {
+        AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+        if (RegEax >= 0x80000001) {
+          AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
+          if ((RegEdx & BIT26) != 0) {
+            mPage1GSupport = TRUE;
+          }
+        }
+      }
+
       BufferSize = sizeof (BOOT_SCRIPT_EXECUTOR_VARIABLE);
 
       BootScriptExecutorBuffer = 0xFFFFFFFF;
@@ -363,11 +418,8 @@ BootScriptExecutorEntryPoint (
 
       Status = SetLockBoxAttributes (&gEfiBootScriptExecutorContextGuid, LOCK_BOX_ATTRIBUTE_RESTORE_IN_PLACE);
       ASSERT_EFI_ERROR (Status);
-
     }
 
     return EFI_SUCCESS;
 }
-
-
 
