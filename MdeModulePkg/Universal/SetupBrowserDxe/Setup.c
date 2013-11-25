@@ -645,6 +645,17 @@ BrowserCallback (
         }
       }
 
+      if (Storage->Type == EFI_HII_VARSTORE_NAME_VALUE ||
+          Storage->Type == EFI_HII_VARSTORE_BUFFER) {
+        if (mSystemLevelFormSet == NULL || mSystemLevelFormSet->HiiHandle == NULL) {
+          return EFI_NOT_FOUND;
+        }
+
+        if (Storage->HiiHandle != mSystemLevelFormSet->HiiHandle) {
+          continue;
+        }
+      }
+
       Status = ProcessStorage (&TotalSize, &ResultsData, RetrieveData, Storage);
       if (EFI_ERROR (Status)) {
         return Status;
@@ -3880,18 +3891,20 @@ CleanBrowserStorage (
     Storage = FORMSET_STORAGE_FROM_LINK (Link);
     Link = GetNextNode (&FormSet->StorageListHead, Link);
 
-    if ((Storage->BrowserStorage->Type != EFI_HII_VARSTORE_BUFFER) && 
-        (Storage->BrowserStorage->Type != EFI_HII_VARSTORE_NAME_VALUE) && 
-        (Storage->BrowserStorage->Type != EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER)) {
-      continue;
-    }
+    if (Storage->BrowserStorage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) {
+      if (Storage->ConfigRequest == NULL || Storage->BrowserStorage->ConfigRequest == NULL) {
+        continue;
+      }
 
-    if (Storage->ConfigRequest == NULL || Storage->BrowserStorage->ConfigRequest == NULL) {
-      continue;
+      ConfigRequest = FormSet->QuestionInited ? Storage->ConfigRequest : Storage->ConfigElements;
+      RemoveConfigRequest (Storage->BrowserStorage, ConfigRequest);
+    } else if (Storage->BrowserStorage->Type == EFI_HII_VARSTORE_BUFFER ||
+               Storage->BrowserStorage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
+      if (Storage->BrowserStorage->ConfigRequest != NULL) { 
+        FreePool (Storage->BrowserStorage->ConfigRequest);
+      }
+      Storage->BrowserStorage->Initialized = FALSE;
     }
-
-    ConfigRequest = FormSet->QuestionInited ? Storage->ConfigRequest : Storage->ConfigElements;
-    RemoveConfigRequest (Storage->BrowserStorage, ConfigRequest);
   }
 }
 
@@ -4269,21 +4282,11 @@ LoadStorage (
     case EFI_HII_VARSTORE_BUFFER:
     case EFI_HII_VARSTORE_NAME_VALUE:
       //
-      // Skip if there is no RequestElement
+      // Skip if there is no RequestElement or data has initilized.
       //
-      if (Storage->ElementCount == 0) {
+      if (Storage->ElementCount == 0 || Storage->BrowserStorage->Initialized) {
         return;
       }
-
-      //
-      // Adjust the ConfigRequest string, only the field not saved in BrowserStorage->AllConfig
-      // will used to call ExtractConfig.
-      // If not elements need to udpate, return.
-      //
-      if (!ConfigRequestAdjust(Storage)) {
-        return;
-      }
-      ASSERT (Storage->ConfigElements != NULL);
 
       Status = EFI_NOT_FOUND;
       if (FormSet->ConfigAccess != NULL) { 
@@ -4292,7 +4295,7 @@ LoadStorage (
         //
         Status = FormSet->ConfigAccess->ExtractConfig (
                                           FormSet->ConfigAccess,
-                                          Storage->ConfigElements,
+                                          Storage->ConfigRequest,
                                           &Progress,
                                           &Result
                                           );
@@ -4315,10 +4318,13 @@ LoadStorage (
         //
         // Base on the configRequest string to get default value.
         //
-        GetDefaultForFormset (FormSet, Storage->BrowserStorage, Storage->ConfigElements);
+        GetDefaultForFormset (FormSet, Storage->BrowserStorage, Storage->ConfigRequest);
       }
 
-      SynchronizeStorage(FormSet, Storage->BrowserStorage, Storage->ConfigElements, TRUE);
+      SynchronizeStorage(FormSet, Storage->BrowserStorage, Storage->ConfigRequest, TRUE);
+
+      Storage->BrowserStorage->ConfigRequest = AllocateCopyPool (StrSize (Storage->ConfigRequest), Storage->ConfigRequest);
+      Storage->BrowserStorage->Initialized = TRUE;
       break;
 
     default:

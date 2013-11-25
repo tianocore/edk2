@@ -348,9 +348,19 @@ InitializeConfigHdr (
 /**
   Find the global storage link base on the input storate type, name and guid.
 
+  For EFI_HII_VARSTORE_EFI_VARIABLE and EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER,
+  same guid + name = same storage
+
+  For EFI_HII_VARSTORE_NAME_VALUE:
+  same guid + HiiHandle = same storage
+
+  For EFI_HII_VARSTORE_BUFFER:
+  same guid + name + HiiHandle = same storage
+
   @param  StorageType                Storage type.
   @param  StorageGuid                Storage guid.
   @param  StorageName                Storage Name.
+  @param  HiiHandle                  HiiHandle for this varstore.
 
   @return Pointer to a GLOBAL_STORAGE data structure.
 
@@ -359,7 +369,8 @@ BROWSER_STORAGE *
 FindStorageInList (
   IN UINT8                 StorageType,
   IN EFI_GUID              *StorageGuid,
-  IN CHAR16                *StorageName
+  IN CHAR16                *StorageName,
+  IN EFI_HII_HANDLE        HiiHandle
   )
 {
   LIST_ENTRY       *Link;
@@ -370,12 +381,16 @@ FindStorageInList (
     BrowserStorage = BROWSER_STORAGE_FROM_LINK (Link);
 
     if ((BrowserStorage->Type == StorageType) && CompareGuid (&BrowserStorage->Guid, StorageGuid)) {
-      if (StorageType == EFI_HII_VARSTORE_NAME_VALUE) {
+      if (StorageType == EFI_HII_VARSTORE_NAME_VALUE && BrowserStorage->HiiHandle == HiiHandle) {
         return BrowserStorage;
       }
 
       if (StrCmp (BrowserStorage->Name, StorageName) == 0) {
-        return BrowserStorage;
+        if (StorageType == EFI_HII_VARSTORE_EFI_VARIABLE || StorageType == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) {
+          return BrowserStorage;
+        } else if (StorageType == EFI_HII_VARSTORE_BUFFER && BrowserStorage->HiiHandle == HiiHandle) {
+          return BrowserStorage;
+        }
       }
     }
 
@@ -494,7 +509,7 @@ CreateStorage (
   Storage->Signature = FORMSET_STORAGE_SIGNATURE;
   InsertTailList (&FormSet->StorageListHead, &Storage->Link);
 
-  BrowserStorage = FindStorageInList(StorageType, StorageGuid, UnicodeString);
+  BrowserStorage = FindStorageInList(StorageType, StorageGuid, UnicodeString, FormSet->HiiHandle);
   if (BrowserStorage == NULL) {
     BrowserStorage = AllocateZeroPool (sizeof (BROWSER_STORAGE));
     ASSERT (BrowserStorage != NULL);
@@ -508,7 +523,10 @@ CreateStorage (
       BrowserStorage->Name = UnicodeString;
     }
 
+    BrowserStorage->HiiHandle = FormSet->HiiHandle;
     InitializeConfigHdr (FormSet, BrowserStorage);
+
+    BrowserStorage->Initialized = FALSE;
   }
 
   Storage->BrowserStorage = BrowserStorage;

@@ -136,6 +136,9 @@ typedef struct {
 
   UINT8            Type;           // Storage type
 
+  BOOLEAN          Initialized;    // Whether this varstore is initialized, efi varstore not used.
+
+  EFI_HII_HANDLE   HiiHandle;      // HiiHandle for this varstore, efi varstore not used.
   EFI_GUID         Guid;
 
   CHAR16           *Name;          // For EFI_IFR_VARSTORE
