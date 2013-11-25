@@ -1799,6 +1799,55 @@ ExtendValueToU64 (
   Value->Value.u64 = Temp;
 }
 
+/**
+  Get UINT64 type value.
+
+  @param  Value                  Input Hii value.
+
+  @retval UINT64                 Return the UINT64 type value.
+
+**/
+UINT64
+HiiValueToUINT64 (
+  IN EFI_HII_VALUE      *Value
+  )
+{
+  UINT64  RetVal;
+
+  RetVal = 0;
+
+  switch (Value->Type) {
+  case EFI_IFR_TYPE_NUM_SIZE_8:
+    RetVal = Value->Value.u8;
+    break;
+
+  case EFI_IFR_TYPE_NUM_SIZE_16:
+    RetVal = Value->Value.u16;
+    break;
+
+  case EFI_IFR_TYPE_NUM_SIZE_32:
+    RetVal = Value->Value.u32;
+    break;
+
+  case EFI_IFR_TYPE_BOOLEAN:
+    RetVal = Value->Value.b;
+    break;
+
+  case EFI_IFR_TYPE_DATE:
+    RetVal = *(UINT64*) &Value->Value.date;
+    break;
+
+  case EFI_IFR_TYPE_TIME:
+    RetVal = (*(UINT64*) &Value->Value.time) & 0xffffff;
+    break;
+
+  default:
+    RetVal = Value->Value.u64;
+    break;
+  }
+
+  return RetVal;
+}
 
 /**
   Compare two Hii value.
@@ -1899,7 +1948,7 @@ CompareHiiValue (
   //
   // Take remain types(integer, boolean, date/time) as integer
   //
-  Temp64 = (INT64) (Value1->Value.u64 - Value2->Value.u64);
+  Temp64 = HiiValueToUINT64(Value1) - HiiValueToUINT64(Value2);
   if (Temp64 > 0) {
     *Result = 1;
   } else if (Temp64 < 0) {

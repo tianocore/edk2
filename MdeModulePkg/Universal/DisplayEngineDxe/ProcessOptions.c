@@ -55,6 +55,56 @@ NewStrCat (
 }
 
 /**
+  Get UINT64 type value.
+
+  @param  Value                  Input Hii value.
+
+  @retval UINT64                 Return the UINT64 type value.
+
+**/
+UINT64
+HiiValueToUINT64 (
+  IN EFI_HII_VALUE      *Value
+  )
+{
+  UINT64  RetVal;
+
+  RetVal = 0;
+
+  switch (Value->Type) {
+  case EFI_IFR_TYPE_NUM_SIZE_8:
+    RetVal = Value->Value.u8;
+    break;
+
+  case EFI_IFR_TYPE_NUM_SIZE_16:
+    RetVal = Value->Value.u16;
+    break;
+
+  case EFI_IFR_TYPE_NUM_SIZE_32:
+    RetVal = Value->Value.u32;
+    break;
+
+  case EFI_IFR_TYPE_BOOLEAN:
+    RetVal = Value->Value.b;
+    break;
+
+  case EFI_IFR_TYPE_DATE:
+    RetVal = *(UINT64*) &Value->Value.date;
+    break;
+
+  case EFI_IFR_TYPE_TIME:
+    RetVal = (*(UINT64*) &Value->Value.time) & 0xffffff;
+    break;
+
+  default:
+    RetVal = Value->Value.u64;
+    break;
+  }
+
+  return RetVal;
+}
+
+/**
   Compare two Hii value.
 
   @param  Value1                 Expression value to compare on left-hand.
@@ -153,7 +203,7 @@ CompareHiiValue (
   //
   // Take remain types(integer, boolean, date/time) as integer
   //
-  Temp64 = (INT64) (Value1->Value.u64 - Value2->Value.u64);
+  Temp64 = HiiValueToUINT64(Value1) - HiiValueToUINT64(Value2);
   if (Temp64 > 0) {
     *Result = 1;
   } else if (Temp64 < 0) {
@@ -1178,8 +1228,24 @@ ProcessOptions (
           Link = GetFirstNode (&Question->OptionListHead);
           Option = DISPLAY_QUESTION_OPTION_FROM_LINK (Link);
 
-          CopyMem (&gUserInput->InputValue.Value, &Option->OptionOpCode->Value, sizeof (EFI_IFR_TYPE_VALUE));
           gUserInput->InputValue.Type = Option->OptionOpCode->Type;
+          switch (gUserInput->InputValue.Type) {
+          case EFI_IFR_TYPE_NUM_SIZE_8:
+            gUserInput->InputValue.Value.u8 = Option->OptionOpCode->Value.u8;
+            break;
+          case EFI_IFR_TYPE_NUM_SIZE_16:
+            CopyMem (&gUserInput->InputValue.Value.u16, &Option->OptionOpCode->Value.u16, sizeof (UINT16));
+            break;
+          case EFI_IFR_TYPE_NUM_SIZE_32:
+            CopyMem (&gUserInput->InputValue.Value.u32, &Option->OptionOpCode->Value.u32, sizeof (UINT32));
+            break;
+          case EFI_IFR_TYPE_NUM_SIZE_64:
+            CopyMem (&gUserInput->InputValue.Value.u64, &Option->OptionOpCode->Value.u64, sizeof (UINT64));
+            break;
+          default:
+            ASSERT (FALSE);
+            break;
+          }
           gUserInput->SelectedStatement = Question;
 
           FreePool (*OptionString);
