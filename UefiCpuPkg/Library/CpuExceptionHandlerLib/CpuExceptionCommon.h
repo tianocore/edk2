@@ -22,7 +22,6 @@
 #include <Library/PrintLib.h>
 #include <Library/LocalApicLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
-#include <Library/ReportStatusCodeLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/SynchronizationLib.h>
 

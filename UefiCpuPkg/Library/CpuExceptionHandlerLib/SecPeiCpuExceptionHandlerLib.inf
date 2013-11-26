@@ -56,7 +56,6 @@
   PrintLib
   LocalApicLib
   PeCoffGetEntryPointLib
-  ReportStatusCodeLib
 
 [Ppis]
   gEfiVectorHandoffInfoPpiGuid

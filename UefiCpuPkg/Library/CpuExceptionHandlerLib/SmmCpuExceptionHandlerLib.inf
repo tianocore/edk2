@@ -58,7 +58,6 @@
   SynchronizationLib
   LocalApicLib
   PeCoffGetEntryPointLib
-  ReportStatusCodeLib
   DebugLib
  
 [Ppis]
