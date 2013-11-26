@@ -85,7 +85,7 @@ DEFINE GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x00020000 -DPI_S
   ReportStatusCodeLib|MdeModulePkg/Library/SmmReportStatusCodeLib/SmmReportStatusCodeLib.inf
   MemoryAllocationLib|MdePkg/Library/SmmMemoryAllocationLib/SmmMemoryAllocationLib.inf
 
-[BuildOptions]
+[BuildOptions.Common.EDK]
   GCC:*_*_IA32_CC_FLAGS     = -DEFI32 $(GCC_MACRO)
   GCC:*_*_IA32_ASM_FLAGS    =
   GCC:*_*_IA32_VFRPP_FLAGS  = -DEFI32 $(GCC_MACRO)
