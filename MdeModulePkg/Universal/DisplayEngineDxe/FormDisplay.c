@@ -853,6 +853,54 @@ UpdateOptionSkipLines (
 }
 
 /**
+  Check whether this Menu Option could be print.
+
+  Check Prompt string, option string or text two string not NULL.
+
+  This is an internal function.
+
+  @param  MenuOption             The MenuOption to be checked.
+
+  @retval TRUE                   This Menu Option is printable.
+  @retval FALSE                  This Menu Option could not be printable.
+
+**/
+BOOLEAN
+PrintableMenu (
+  UI_MENU_OPTION   *MenuOption
+  )
+{
+  EFI_STATUS    Status;
+  EFI_STRING    OptionString;
+
+  OptionString = NULL;
+
+  if (MenuOption->Description[0] != '\0') {
+    return TRUE;
+  }
+
+  Status = ProcessOptions (MenuOption, FALSE, &OptionString, FALSE);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+  if (OptionString != NULL && OptionString[0] != '\0') {
+    FreePool (OptionString);
+    return TRUE;
+  }
+
+  if ((MenuOption->ThisTag->OpCode->OpCode  == EFI_IFR_TEXT_OP) && (((EFI_IFR_TEXT*)MenuOption->ThisTag->OpCode)->TextTwo != 0)) {
+    OptionString   = GetToken (((EFI_IFR_TEXT*)MenuOption->ThisTag->OpCode)->TextTwo, gFormData->HiiHandle);
+    ASSERT (OptionString != NULL);
+    if (OptionString[0] != '\0'){
+      FreePool (OptionString);
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
   Check whether this Menu Option could be highlighted.
 
   This is an internal function.
@@ -869,7 +917,7 @@ IsSelectable (
   )
 {
   if ((MenuOption->ThisTag->OpCode->OpCode == EFI_IFR_SUBTITLE_OP) ||
-      MenuOption->GrayOut || MenuOption->ReadOnly) {
+      MenuOption->GrayOut || MenuOption->ReadOnly || !PrintableMenu (MenuOption)) {
     return FALSE;
   } else {
     return TRUE;
@@ -884,19 +932,24 @@ IsSelectable (
   @param  GoUp                   The navigation direction. TRUE: up, FALSE: down.
   @param  CurrentPosition        Current position.
   @param  GapToTop               Gap position to top or bottom.
+  @param  FindInForm             Whether find menu in current form or beyond.
 
   @return The row distance from current MenuOption to next selectable MenuOption.
 
   @retval -1       Reach the begin of the menu, still can't find the selectable menu.
-  @retval Value    Find the selectable menu, maybe the truly selectable, maybe the l
-                   last menu showing at current form.
+  @retval Value    Find the selectable menu, maybe the truly selectable, maybe the 
+                   first menu showing beyond current form or last menu showing in 
+                   current form.
+                   The value is the line number between the new selected menu and the
+                   current select menu, not include the new selected menu.
 
 **/
 INTN
 MoveToNextStatement (
   IN     BOOLEAN                   GoUp,
   IN OUT LIST_ENTRY                **CurrentPosition,
-  IN     UINTN                     GapToTop
+  IN     UINTN                     GapToTop,
+  IN     BOOLEAN                   FindInForm
   )
 {
   INTN             Distance;
@@ -906,6 +959,11 @@ MoveToNextStatement (
 
   Distance      = 0;
   Pos           = *CurrentPosition;
+
+  if (Pos == &gMenuOption) {
+    return -1;
+  }
+
   PreMenuOption = MENU_OPTION_FROM_LINK (Pos);
 
   while (TRUE) {
@@ -917,27 +975,23 @@ MoveToNextStatement (
     if (NextMenuOption->Row == 0) {
       UpdateOptionSkipLines (NextMenuOption);
     }
-    
-    if (GoUp && (PreMenuOption != NextMenuOption)) {
-      //
-      // In this case, still can't find the selectable menu,
-      // return the last one in the showing form.
-      //
-      if ((UINTN) Distance + NextMenuOption->Skip > GapToTop) {
-        NextMenuOption = PreMenuOption;
-        break;
-      }
-
-      //
-      // Current Position doesn't need to be caculated when go up.
-      // Caculate distanct at first when go up
-      //      
-      Distance += NextMenuOption->Skip;
-    }
 
     if (IsSelectable (NextMenuOption)) {
       break;
     }
+
+    //
+    // In this case, still can't find the selectable menu,
+    // return the first one beyond the showing form.
+    //
+    if ((UINTN) Distance + NextMenuOption->Skip > GapToTop) {
+      if (FindInForm) {
+        NextMenuOption = PreMenuOption;
+      }
+      break;
+    }
+
+    Distance += NextMenuOption->Skip;
 
     //
     // Arrive at begin of the menu list.
@@ -947,21 +1001,8 @@ MoveToNextStatement (
       break;
     }
 
-    if (!GoUp) {
-      //
-      // In this case, still can't find the selectable menu,
-      // return the last one in the showing form.
-      //
-      if ((UINTN) Distance + NextMenuOption->Skip > GapToTop) {
-        NextMenuOption = PreMenuOption;
-        break;
-      }
-
-      Distance += NextMenuOption->Skip;
-    }
-
-    PreMenuOption = NextMenuOption;
     Pos = (GoUp ? Pos->BackLink : Pos->ForwardLink);
+    PreMenuOption = NextMenuOption;
   }
 
   *CurrentPosition = &NextMenuOption->Link;
@@ -1355,6 +1396,58 @@ GetQuestionIdInfo (
   return QuestionHeader->QuestionId;
 }
 
+
+/**
+  Find the top of screen menu base on the current menu.
+
+  @param  CurPos                 Current input menu.
+  @param  Rows                   Totol screen rows.
+  @param  SkipValue              SkipValue for this new form.
+
+  @retval TopOfScreen            Top of screen menu for the new form.
+
+**/
+LIST_ENTRY *
+FindTopOfScreenMenu (
+  IN  LIST_ENTRY                      *CurPos,
+  IN  UINTN                           Rows,
+  OUT UINTN                           *SkipValue
+  )
+{
+  LIST_ENTRY        *Link;
+  LIST_ENTRY        *TopOfScreen;
+  UI_MENU_OPTION    *PreviousMenuOption;
+
+  Link = CurPos;
+  PreviousMenuOption = NULL;
+
+  while (Link->BackLink != &gMenuOption) {
+    Link = Link->BackLink;
+    PreviousMenuOption = MENU_OPTION_FROM_LINK (Link);
+    if (PreviousMenuOption->Row == 0) {
+      UpdateOptionSkipLines (PreviousMenuOption);
+    }
+    if (Rows <= PreviousMenuOption->Skip) {
+      break;
+    }
+    Rows = Rows - PreviousMenuOption->Skip;
+  }
+
+  if (Link->BackLink == &gMenuOption) {
+    TopOfScreen = gMenuOption.ForwardLink;
+    if (PreviousMenuOption != NULL && Rows < PreviousMenuOption->Skip) {
+      *SkipValue = PreviousMenuOption->Skip - Rows;
+    } else {
+      *SkipValue = 0;
+    }
+  } else {
+    TopOfScreen = Link;
+    *SkipValue = PreviousMenuOption->Skip - Rows;
+  }
+
+  return TopOfScreen;
+}
+
 /**
   Find the first menu which will be show at the top.
 
@@ -1369,16 +1462,14 @@ FindTopMenu (
   IN  FORM_DISPLAY_ENGINE_FORM  *FormData,
   OUT LIST_ENTRY                **TopOfScreen,
   OUT LIST_ENTRY                **HighlightMenu,
-  OUT INTN                      *SkipValue
+  OUT UINTN                     *SkipValue
   )
 {
-  LIST_ENTRY                      *Link;
   LIST_ENTRY                      *NewPos;
   UINTN                           TopRow;
   UINTN                           BottomRow;
-  UINTN                           Index;
   UI_MENU_OPTION                  *SavedMenuOption;
-  UINTN                           EndRow;
+  UINTN                           TmpValue;
 
   TopRow    = gStatementDimensions.TopRow    + SCROLL_ARROW_HEIGHT;
   BottomRow = gStatementDimensions.BottomRow - SCROLL_ARROW_HEIGHT;
@@ -1390,7 +1481,7 @@ FindTopMenu (
     *TopOfScreen   = gMenuOption.ForwardLink;
     *HighlightMenu = gMenuOption.ForwardLink;
     if (!IsListEmpty (&gMenuOption)) {
-      MoveToNextStatement (FALSE, HighlightMenu, BottomRow - TopRow);
+      MoveToNextStatement (FALSE, HighlightMenu, BottomRow - TopRow, TRUE);
     }
     *SkipValue     = 0;
     return;
@@ -1431,53 +1522,17 @@ FindTopMenu (
     //
     // Still show the highlight menu before exit from display engine.
     //
-    EndRow = gHighligthMenuInfo.DisplayRow + SavedMenuOption->Skip;
-  } else {
-    EndRow = BottomRow;
+    BottomRow = gHighligthMenuInfo.DisplayRow + SavedMenuOption->Skip;
   }
 
-  //
-  // Base on the selected menu will show at the bottome of next page, 
-  // select the menu show at the top of the next page. 
-  //
-  Link    = NewPos;
-  for (Index = TopRow + SavedMenuOption->Skip; Index <= EndRow; ) {
-    Link = Link->BackLink;
-    //
-    // Already find the first menu in this form, means highlight menu 
-    // will show in first page of this form.
-    //
-    if (Link == &gMenuOption) {
-      *TopOfScreen   = gMenuOption.ForwardLink;
-      *SkipValue     = 0;
-      return;
-    }
-    SavedMenuOption = MENU_OPTION_FROM_LINK (Link);
-    UpdateOptionSkipLines (SavedMenuOption);
-    Index += SavedMenuOption->Skip;
+  if (SavedMenuOption->Skip >= BottomRow - TopRow) {
+    TmpValue = 0;
+    *TopOfScreen = NewPos;
+  } else {
+    *TopOfScreen = FindTopOfScreenMenu(NewPos, BottomRow - TopRow - SavedMenuOption->Skip, &TmpValue);
   }
 
-  //
-  // Found the menu which will show at the top of the page.
-  //
-  if (Link == NewPos) {
-    //
-    // The menu can show more than one pages, just show the menu at the top of the page.
-    //
-    *SkipValue    = 0;
-    *TopOfScreen  = Link;
-  } else {
-    //
-    // Check whether need to skip some line for menu shows at the top of the page.
-    //
-    *SkipValue = Index - EndRow;
-    if (*SkipValue > 0 && *SkipValue < (INTN) SavedMenuOption->Skip) {
-      *TopOfScreen     = Link;
-    } else {
-      *SkipValue       = 0;
-      *TopOfScreen     = Link->ForwardLink;
-    }
-  }
+  *SkipValue   = TmpValue;
 }
 
 /**
@@ -1907,7 +1962,7 @@ UiDisplayMenu (
   IN  FORM_DISPLAY_ENGINE_FORM  *FormData
   )
 {
-  INTN                            SkipValue;
+  UINTN                           SkipValue;
   INTN                            Difference;
   UINTN                           DistanceValue;
   UINTN                           Row;
@@ -1916,7 +1971,6 @@ UiDisplayMenu (
   UINTN                           Temp2;
   UINTN                           TopRow;
   UINTN                           BottomRow;
-  UINTN                           OriginalRow;
   UINTN                           Index;
   UINT16                          Width;
   CHAR16                          *StringPtr;
@@ -1951,7 +2005,6 @@ UiDisplayMenu (
   UINTN                           HelpHeaderLine;
   UINTN                           HelpBottomLine;
   BOOLEAN                         MultiHelpPage;
-  UINT16                          GlyphWidth;
   UINT16                          EachLineWidth;
   UINT16                          HeaderLineWidth;
   UINT16                          BottomLineWidth;
@@ -2212,79 +2265,15 @@ UiDisplayMenu (
       if (NewPos != NULL && (MenuOption == NULL || NewPos != &MenuOption->Link)) {
         if (MenuOption != NULL) {
           //
-          // Remove highlight on last Menu Option
+          // Remove the old highlight menu.
           //
-          gST->ConOut->SetCursorPosition (gST->ConOut, MenuOption->Col, MenuOption->Row);
-          ProcessOptions (MenuOption, FALSE, &OptionString, TRUE);
-          gST->ConOut->SetAttribute (gST->ConOut, GetFieldTextColor ());
-          if (OptionString != NULL) {
-            if ((MenuOption->ThisTag->OpCode->OpCode == EFI_IFR_DATE_OP) ||
-                (MenuOption->ThisTag->OpCode->OpCode == EFI_IFR_TIME_OP)
-               ) {
-              ProcessStringForDateTime(MenuOption, OptionString, FALSE);
-            }
-
-            Width               = (UINT16) gOptionBlockWidth - 1;
-            OriginalRow         = MenuOption->Row;
-            GlyphWidth          = 1;
-
-            for (Index = 0; GetLineByWidth (OptionString, Width, &GlyphWidth, &Index, &OutputString) != 0x0000;) {
-              if ((Temp == 0) && (MenuOption->Row >= TopRow) && (MenuOption->Row <= BottomRow)) {
-                PrintStringAt (MenuOption->OptCol, MenuOption->Row, OutputString);
-              }
-              //
-              // If there is more string to process print on the next row and increment the Skip value
-              //
-              if (StrLen (&OptionString[Index]) != 0) {
-                if (Temp == 0) {
-                  MenuOption->Row++;
-                }
-              }
-
-              FreePool (OutputString);
-              if (Temp != 0) {
-                Temp--;
-              }
-            }
-
-            MenuOption->Row = OriginalRow;
-
-            FreePool (OptionString);
-          } else {
-            if (NewLine) {
-              if (MenuOption->GrayOut) {
-                gST->ConOut->SetAttribute (gST->ConOut, GetGrayedTextColor ());
-              } else if (MenuOption->ThisTag->OpCode->OpCode == EFI_IFR_SUBTITLE_OP) {
-                gST->ConOut->SetAttribute (gST->ConOut, GetSubTitleTextColor ());
-              }
-
-              OriginalRow = MenuOption->Row;
-              Width       = GetWidth (MenuOption, NULL);
-              GlyphWidth  = 1;
-
-              for (Index = 0; GetLineByWidth (MenuOption->Description, Width, &GlyphWidth, &Index, &OutputString) != 0x0000;) {
-                if ((Temp == 0) && (MenuOption->Row >= TopRow) && (MenuOption->Row <= BottomRow)) {
-                  PrintStringAt (MenuOption->Col, MenuOption->Row, OutputString);
-                }
-                //
-                // If there is more string to process print on the next row and increment the Skip value
-                //
-                if (StrLen (&MenuOption->Description[Index]) != 0) {
-                  if (Temp == 0) {
-                    MenuOption->Row++;
-                  }
-                }
-
-                FreePool (OutputString);
-                if (Temp != 0) {
-                  Temp--;
-                }
-              }
-
-              MenuOption->Row = OriginalRow;
-              gST->ConOut->SetAttribute (gST->ConOut, GetFieldTextColor ());
-            }
-          }
+          Status = DisplayOneMenu (MenuOption, 
+                          MenuOption->Col - gStatementDimensions.LeftColumn,
+                          gStatementDimensions.LeftColumn, 
+                          Temp, 
+                          BottomRow,
+                          FALSE
+                          );
         }
 
         //
@@ -2299,79 +2288,13 @@ UiDisplayMenu (
           break;
         }
 
-        //
-        // Set reverse attribute
-        //
-        gST->ConOut->SetAttribute (gST->ConOut, GetHighlightTextColor ());
-        gST->ConOut->SetCursorPosition (gST->ConOut, MenuOption->Col, MenuOption->Row);
-
-        ProcessOptions (MenuOption, FALSE, &OptionString, TRUE);
-        if (OptionString != NULL) {
-          if (Statement->OpCode->OpCode == EFI_IFR_DATE_OP || Statement->OpCode->OpCode == EFI_IFR_TIME_OP) {
-            ProcessStringForDateTime(MenuOption, OptionString, FALSE);
-          }
-          Width               = (UINT16) gOptionBlockWidth - 1;
-
-          OriginalRow         = MenuOption->Row;
-          GlyphWidth          = 1;
-
-          for (Index = 0; GetLineByWidth (OptionString, Width, &GlyphWidth, &Index, &OutputString) != 0x0000;) {
-            if ((Temp2 == 0) && (MenuOption->Row >= TopRow) && (MenuOption->Row <= BottomRow) ) {
-              PrintStringAt (MenuOption->OptCol, MenuOption->Row, OutputString);
-            }
-            //
-            // If there is more string to process print on the next row and increment the Skip value
-            //
-            if (StrLen (&OptionString[Index]) != 0) {
-              if (Temp2 == 0) {
-              MenuOption->Row++;
-              }
-            }
-
-            FreePool (OutputString);
-            if (Temp2 != 0) {
-              Temp2--;
-            }
-          }
-
-          MenuOption->Row = OriginalRow;
-
-          FreePool (OptionString);
-        } else {
-          if (NewLine) {
-            OriginalRow = MenuOption->Row;
-
-            Width       = GetWidth (MenuOption, NULL);
-            GlyphWidth          = 1;
-
-            for (Index = 0; GetLineByWidth (MenuOption->Description, Width, &GlyphWidth, &Index, &OutputString) != 0x0000;) {
-              if ((Temp2 == 0) && (MenuOption->Row >= TopRow) && (MenuOption->Row <= BottomRow) ) {
-                PrintStringAt (MenuOption->Col, MenuOption->Row, OutputString);
-              }
-              //
-              // If there is more string to process print on the next row and increment the Skip value
-              //
-              if (StrLen (&MenuOption->Description[Index]) != 0) {
-                if (Temp2 == 0) {
-                  MenuOption->Row++;
-                }
-              }
-
-              FreePool (OutputString);
-              if (Temp2 != 0) {
-                Temp2--;
-              }
-            }
-
-            MenuOption->Row = OriginalRow;
-
-          }
-        }
-
-        //
-        // Clear reverse attribute
-        //
-        gST->ConOut->SetAttribute (gST->ConOut, GetFieldTextColor ());
+        Status = DisplayOneMenu (MenuOption, 
+                        MenuOption->Col - gStatementDimensions.LeftColumn,
+                        gStatementDimensions.LeftColumn, 
+                        Temp2, 
+                        BottomRow,
+                        TRUE
+                        );
       }
       break;
 
@@ -2381,6 +2304,10 @@ UiDisplayMenu (
         break;
       }
 
+      //
+      // NewLine means only update highlight menu (remove old highlight and highlith
+      // the new one), not need to full repain the form.
+      //
       if (Repaint || NewLine) {
         if (IsListEmpty (&gMenuOption)) {
           //
@@ -2844,6 +2771,7 @@ UiDisplayMenu (
 
     case CfUiUp:
       ControlFlag = CfRepaint;
+      NewLine     = TRUE;
 
       SavedListEntry = NewPos;
 
@@ -2852,191 +2780,99 @@ UiDisplayMenu (
       // Adjust Date/Time position before we advance forward.
       //
       AdjustDateAndTimePosition (TRUE, &NewPos);
-      if (NewPos->BackLink != &gMenuOption) {
-        MenuOption = MENU_OPTION_FROM_LINK (NewPos);
-        ASSERT (MenuOption != NULL);
-        NewLine    = TRUE;
-        NewPos     = NewPos->BackLink;
 
-        PreviousMenuOption = MENU_OPTION_FROM_LINK (NewPos);
-        if (PreviousMenuOption->Row == 0) {
-          UpdateOptionSkipLines (PreviousMenuOption);
+      MenuOption = MENU_OPTION_FROM_LINK (NewPos);
+      ASSERT (MenuOption != NULL);
+
+      NewPos     = NewPos->BackLink;
+      //
+      // Find next selectable menu or the first menu beyond current form.
+      //
+      Difference = MoveToNextStatement (TRUE, &NewPos, MenuOption->Row - TopRow, FALSE);
+      if (Difference < 0) {
+        //
+        // We hit the begining MenuOption that can be focused
+        // so we simply scroll to the top.
+        //
+        Repaint     = TRUE;
+        if (TopOfScreen != gMenuOption.ForwardLink || SkipValue != 0) {
+          TopOfScreen = gMenuOption.ForwardLink;
+          NewPos      = SavedListEntry;
+          SkipValue = 0;
+        } else {
+          //
+          // Scroll up to the last page when we have arrived at top page.
+          //
+          TopOfScreen = FindTopOfScreenMenu (gMenuOption.BackLink, BottomRow - TopRow, &SkipValue);
+          NewPos = gMenuOption.BackLink;
+          MoveToNextStatement (TRUE, &NewPos, BottomRow - TopRow, TRUE);
         }
-        DistanceValue = PreviousMenuOption->Skip;
-        Difference    = 0;
-        if (MenuOption->Row >= DistanceValue + TopRow) {
-          Difference = MoveToNextStatement (TRUE, &NewPos, MenuOption->Row - TopRow - DistanceValue);
-        }
+      } else {
         NextMenuOption = MENU_OPTION_FROM_LINK (NewPos);
-       
-        if (Difference < 0) {
-          //
-          // We hit the begining MenuOption that can be focused
-          // so we simply scroll to the top.
-          //
-          if (TopOfScreen != gMenuOption.ForwardLink) {
-            TopOfScreen = gMenuOption.ForwardLink;
-            Repaint     = TRUE;
-          } else {
-            //
-            // Scroll up to the last page when we have arrived at top page.
-            //
-            NewPos          = &gMenuOption;
-            TopOfScreen     = &gMenuOption;
-            MenuOption      = MENU_OPTION_FROM_LINK (SavedListEntry);
-            ScreenOperation = UiPageUp;
-            ControlFlag     = CfScreenOperation;
-            break;
-          }
-        } else if (MenuOption->Row < TopRow + DistanceValue + Difference) {
+
+        if (MenuOption->Row < TopRow + Difference + NextMenuOption->Skip) {
           //
           // Previous focus MenuOption is above the TopOfScreen, so we need to scroll
           //
           TopOfScreen = NewPos;
           Repaint     = TRUE;
-          SkipValue = 0;
-        } else if (!IsSelectable (NextMenuOption)) {
-          //
-          // Continue to go up until scroll to next page or the selectable option is found.
-          //
-          ScreenOperation = UiUp;
-          ControlFlag     = CfScreenOperation;
+          SkipValue   = 0;
         }
 
         //
-        // If we encounter a Date/Time op-code set, rewind to the first op-code of the set.
+        // Check whether new highlight menu is selectable, if not, keep highlight on the old one.
         //
-        AdjustDateAndTimePosition (TRUE, &TopOfScreen);
-        AdjustDateAndTimePosition (TRUE, &NewPos);
-        MenuOption = MENU_OPTION_FROM_LINK (SavedListEntry);
-        UpdateStatusBar (INPUT_ERROR, FALSE);
-      } else {
-        if (NewPos->ForwardLink == &gMenuOption) {
-          NewLine   = FALSE;
-          Repaint   = FALSE;
-          break;
+        // BottomRow - TopRow + 1 means the total rows current forms supported.
+        // Difference + NextMenuOption->Skip + 1 means the distance between last highlight menu 
+        // and new top menu. New top menu will all shows in next form, but last highlight menu 
+        // may only shows 1 line. + 1 at right part means at least need to keep 1 line for the 
+        // last highlight menu.
+        // 
+        if (!IsSelectable(NextMenuOption) && IsSelectable(MenuOption) && 
+            (BottomRow - TopRow + 1 >= Difference + NextMenuOption->Skip + 1)) {
+          NewPos = SavedListEntry;
         }
-        //
-        // Scroll up to the last page.
-        //
-        NewPos          = &gMenuOption;
-        TopOfScreen     = &gMenuOption;
-        MenuOption      = MENU_OPTION_FROM_LINK (SavedListEntry);
-        ScreenOperation = UiPageUp;
-        ControlFlag     = CfScreenOperation;
-        SkipValue       = 0;
       }
+
+      UpdateStatusBar (INPUT_ERROR, FALSE);
+
+      //
+      // If we encounter a Date/Time op-code set, rewind to the first op-code of the set.
+      //
+      AdjustDateAndTimePosition (TRUE, &TopOfScreen);
+      AdjustDateAndTimePosition (TRUE, &NewPos);
       break;
 
     case CfUiPageUp:
       //
       // SkipValue means lines is skipped when show the top menu option.
       //
-      ControlFlag     = CfRepaint;
-
-      ASSERT(NewPos != NULL);
-      //
-      // Already at the first menu option, Check the skip value.
-      //
-      if (NewPos->BackLink == &gMenuOption) {
-        if (SkipValue == 0) {
-          NewLine = FALSE;
-          Repaint = FALSE;
-        } else {
-          NewLine = TRUE;
-          Repaint = TRUE;
-          SkipValue = 0;
-        }
-        break;
-      }
-
-      NewLine   = TRUE;
-      Repaint   = TRUE;
-
-      //
-      // SkipValue > (BottomRow - TopRow + 1) means current menu has more than one
-      // form of options to be show, so just update the SkipValue to show the next
-      // parts of options.
-      //
-      if (SkipValue > (INTN) (BottomRow - TopRow + 1)) {
-        SkipValue -= BottomRow - TopRow + 1;
-        break;
-      }
+      ControlFlag = CfRepaint;
+      NewLine     = TRUE;
+      Repaint     = TRUE;
 
       Link      = TopOfScreen;
       //
       // First minus the menu of the top screen, it's value is SkipValue.
       //
-      Index     = (BottomRow + 1) - SkipValue;
-      while ((Index > TopRow) && (Link->BackLink != &gMenuOption)) {
-        Link = Link->BackLink;
-        PreviousMenuOption = MENU_OPTION_FROM_LINK (Link);
-        if (PreviousMenuOption->Row == 0) {
-          UpdateOptionSkipLines (PreviousMenuOption);
-        }        
-        if (Index < PreviousMenuOption->Skip) {
-          break;
-        }
-        Index = Index - PreviousMenuOption->Skip;
+      if (SkipValue >= (INTN) (BottomRow - TopRow + 1)) {
+        //
+        // SkipValue > (BottomRow - TopRow + 1) means current menu has more than one
+        // form of options to be show, so just update the SkipValue to show the next
+        // parts of options.
+        //
+        SkipValue -= BottomRow - TopRow + 1;
+        NewPos     = TopOfScreen;
+        break;
+      } else {
+        Index     = (BottomRow + 1) - SkipValue - TopRow;
       }
       
-      if ((Link->BackLink == &gMenuOption) && (Index >= TopRow)) {
-        if (TopOfScreen == &gMenuOption) {
-          TopOfScreen = gMenuOption.ForwardLink;
-          NewPos      = gMenuOption.BackLink;
-          MoveToNextStatement (TRUE, &NewPos, BottomRow - TopRow);
-          if (Index < PreviousMenuOption->Skip) {
-            Repaint = TRUE;
-            SkipValue = PreviousMenuOption->Skip - (Index - TopRow);
-          } else {
-            Repaint = FALSE;
-            SkipValue = 0;
-          }
-        } else if (TopOfScreen != Link) {
-          TopOfScreen = Link;
-          NewPos      = Link;
-          MoveToNextStatement (FALSE, &NewPos, BottomRow - TopRow);
-          SkipValue = 0;
-        } else {
-          //
-          // Finally we know that NewPos is the last MenuOption can be focused.
-          //
-          if (SkipValue == 0) {
-            Repaint = FALSE;
-          }
-          NewPos  = Link;
-          MoveToNextStatement (FALSE, &NewPos, BottomRow - TopRow);
-          SkipValue = 0;
-        }
-      } else {
-        if (Index > TopRow) {
-          //
-          // At here, only case "Index < PreviousMenuOption->Skip" can reach here.
-          //
-          SkipValue = PreviousMenuOption->Skip - (Index - TopRow);
-        } else if (Index == TopRow) {
-          SkipValue = 0;
-        } else {
-          SkipValue = TopRow - Index;
-        }
-
-        //
-        // Move to the option in Next page.
-        //
-        if (TopOfScreen == &gMenuOption) {
-          NewPos = gMenuOption.BackLink;
-          MoveToNextStatement (TRUE, &NewPos, BottomRow - TopRow);
-        } else {
-          NewPos = Link;
-          MoveToNextStatement (FALSE, &NewPos, BottomRow - TopRow);
-        }
-
-        //
-        // There are more MenuOption needing scrolling up.
-        //
-        TopOfScreen = Link;
-        MenuOption  = NULL;
-      }
+      TopOfScreen = FindTopOfScreenMenu(TopOfScreen, Index, &SkipValue);
+      NewPos = TopOfScreen;
+      MoveToNextStatement (FALSE, &NewPos, BottomRow - TopRow, FALSE);
+      
+      UpdateStatusBar (INPUT_ERROR, FALSE);
 
       //
       // If we encounter a Date/Time op-code set, rewind to the first op-code of the set.
@@ -3050,24 +2886,10 @@ UiDisplayMenu (
       //
       // SkipValue means lines is skipped when show the top menu option.
       //
-      ControlFlag     = CfRepaint;
+      ControlFlag = CfRepaint;
+      NewLine     = TRUE;
+      Repaint     = TRUE;
 
-      ASSERT (NewPos != NULL);
-      if (NewPos->ForwardLink == &gMenuOption) {
-        MenuOption = MENU_OPTION_FROM_LINK (NewPos);
-        if (SkipValue + BottomRow - TopRow + 1 < MenuOption->Skip) {
-          SkipValue += BottomRow - TopRow + 1;
-          NewLine = TRUE;
-          Repaint = TRUE;
-          break;
-        }
-        NewLine = FALSE;
-        Repaint = FALSE;
-        break;
-      }
-
-      NewLine = TRUE;
-      Repaint = TRUE;
       Link    = TopOfScreen;
       NextMenuOption = MENU_OPTION_FROM_LINK (Link);
       Index = TopRow + NextMenuOption->Skip - SkipValue;
@@ -3082,10 +2904,10 @@ UiDisplayMenu (
 
       if ((Link->ForwardLink == &gMenuOption) && (Index <= BottomRow + 1)) {
         //
-        // Finally we know that NewPos is the last MenuOption can be focused.
+        // Highlight on the last menu which can be highlight.
         //
         Repaint = FALSE;
-        MoveToNextStatement (TRUE, &Link, Index - TopRow);
+        MoveToNextStatement (TRUE, &Link, Index - TopRow, TRUE);
       } else {
         //
         // Calculate the skip line for top of screen menu.
@@ -3098,19 +2920,20 @@ UiDisplayMenu (
         } else {
           SkipValue = NextMenuOption->Skip - (Index - (BottomRow + 1));
         }
-
         TopOfScreen = Link;
         MenuOption = NULL;
         //
         // Move to the Next selectable menu.
         //
-        MoveToNextStatement (FALSE, &Link, BottomRow - TopRow);
+        MoveToNextStatement (FALSE, &Link, BottomRow - TopRow, TRUE);
       }
 
       //
       // Save the menu as the next highlight menu.
       //
       NewPos  = Link;
+
+      UpdateStatusBar (INPUT_ERROR, FALSE);
 
       //
       // If we encounter a Date/Time op-code set, rewind to the first op-code of the set.
@@ -3126,7 +2949,15 @@ UiDisplayMenu (
       // NewPos  points to the menu which is highlighted now.
       //
       ControlFlag = CfRepaint;
+      NewLine     = TRUE;
 
+      if (NewPos == TopOfScreen) {
+        Temp2 = SkipValue;
+      } else {
+        Temp2 = 0;
+      }
+
+      SavedListEntry = NewPos;
       //
       // Since the behavior of hitting the down arrow on a Date/Time op-code is intended
       // to be one that progresses to the next set of op-codes, we need to advance to the last
@@ -3135,181 +2966,133 @@ UiDisplayMenu (
       // op-code is the last entry in the menu, we need to rewind back to the first op-code of
       // the Date/Time op-code.
       //
-      SavedListEntry = NewPos;
       AdjustDateAndTimePosition (FALSE, &NewPos);
 
-      if (NewPos->ForwardLink != &gMenuOption) {
-        if (NewPos == TopOfScreen) {
-          Temp2 = SkipValue;
+      MenuOption = MENU_OPTION_FROM_LINK (NewPos);
+      NewPos     = NewPos->ForwardLink;
+      //
+      // Find the next selectable menu.
+      //
+      if (MenuOption->Row + MenuOption->Skip - Temp2 > BottomRow + 1) {
+        if (gMenuOption.ForwardLink == NewPos || &gMenuOption == NewPos) {
+          Difference = -1;
         } else {
-          Temp2 = 0;
+          Difference = 0;
         }
-
-        MenuOption      = MENU_OPTION_FROM_LINK (NewPos);
-        NewLine         = TRUE;
-        NewPos          = NewPos->ForwardLink;
-
-        Difference      = 0;
-        //
-        // Current menu not at the bottom of the form.
-        //
-        if (BottomRow >= MenuOption->Row + MenuOption->Skip - Temp2) {
-          //
-          // Find the next selectable menu.
-          //
-          Difference = MoveToNextStatement (FALSE, &NewPos, BottomRow - MenuOption->Row - MenuOption->Skip + Temp2);
-          //
-          // We hit the end of MenuOption that can be focused
-          // so we simply scroll to the first page.
-          //
-          if (Difference < 0) {
-            //
-            // Scroll to the first page.
-            //
-            if (TopOfScreen != gMenuOption.ForwardLink) {
-              TopOfScreen = gMenuOption.ForwardLink;
-              Repaint     = TRUE;
-              MenuOption  = NULL;
-            } else {
-              MenuOption = MENU_OPTION_FROM_LINK (SavedListEntry);
-            }
-            NewPos        = gMenuOption.ForwardLink;
-            MoveToNextStatement (FALSE, &NewPos, BottomRow - TopRow);
-
-            SkipValue = 0;
-            //
-            // If we are at the end of the list and sitting on a Date/Time op, rewind to the head.
-            //
-            AdjustDateAndTimePosition (TRUE, &TopOfScreen);
-            AdjustDateAndTimePosition (TRUE, &NewPos);
-            break;
-          }
-        }
-        NextMenuOption  = MENU_OPTION_FROM_LINK (NewPos);
-        if (NextMenuOption->Row == 0) {
-          UpdateOptionSkipLines (NextMenuOption);
-        }
-        DistanceValue  = Difference + NextMenuOption->Skip - Temp2;
-
-        Temp = MenuOption->Row + MenuOption->Skip + DistanceValue - 1;
-        if ((MenuOption->Row + MenuOption->Skip - Temp2 == BottomRow + 1) &&
-            (NextMenuOption->ThisTag->OpCode->OpCode == EFI_IFR_DATE_OP ||
-             NextMenuOption->ThisTag->OpCode->OpCode == EFI_IFR_TIME_OP)
-            ) {
-          Temp ++;
-        }
-
-        //
-        // If we are going to scroll, update TopOfScreen
-        //
-        if (Temp > BottomRow) {
-          do {
-            //
-            // Is the current top of screen a zero-advance op-code?
-            // If so, keep moving forward till we hit a >0 advance op-code
-            //
-            SavedMenuOption = MENU_OPTION_FROM_LINK (TopOfScreen);
-
-            //
-            // If bottom op-code is more than one line or top op-code is more than one line
-            //
-            if ((DistanceValue > 1) || (SavedMenuOption->Skip > 1)) {
-              //
-              // Is the bottom op-code greater than or equal in size to the top op-code?
-              //
-              if ((Temp - BottomRow) >= (SavedMenuOption->Skip - SkipValue)) {
-                //
-                // Skip the top op-code
-                //
-                TopOfScreen     = TopOfScreen->ForwardLink;
-                Difference      = (Temp - BottomRow) - (SavedMenuOption->Skip - SkipValue);
-
-                SavedMenuOption = MENU_OPTION_FROM_LINK (TopOfScreen);
-
-                //
-                // If we have a remainder, skip that many more op-codes until we drain the remainder
-                //
-                while (Difference >= (INTN) SavedMenuOption->Skip) {
-                  //
-                  // Since the Difference is greater than or equal to this op-code's skip value, skip it
-                  //
-                  Difference      = Difference - (INTN) SavedMenuOption->Skip;
-                  TopOfScreen     = TopOfScreen->ForwardLink;
-                  SavedMenuOption = MENU_OPTION_FROM_LINK (TopOfScreen);
-                }
-                //
-                // Since we will act on this op-code in the next routine, and increment the
-                // SkipValue, set the skips to one less than what is required.
-                //
-                SkipValue = Difference - 1;
-              } else {
-                //
-                // Since we will act on this op-code in the next routine, and increment the
-                // SkipValue, set the skips to one less than what is required.
-                //
-                SkipValue += (Temp - BottomRow) - 1;
-              }
-            } else {
-              if ((SkipValue + 1) == (INTN) SavedMenuOption->Skip) {
-                TopOfScreen = TopOfScreen->ForwardLink;
-                break;
-              }
-            }
-            //
-            // If the op-code at the top of the screen is more than one line, let's not skip it yet
-            // Let's set a skip flag to smoothly scroll the top of the screen.
-            //
-            if (SavedMenuOption->Skip > 1) {
-              if (SavedMenuOption == NextMenuOption) {
-                SkipValue = 0;
-              } else {
-                SkipValue++;
-              }
-            } else if (SavedMenuOption->Skip == 1) {
-              SkipValue   = 0;
-            } else {
-              SkipValue   = 0;
-              TopOfScreen = TopOfScreen->ForwardLink;
-            }
-          } while (SavedMenuOption->Skip == 0);
-
-          Repaint       = TRUE;
-        } else if (!IsSelectable (NextMenuOption)) {
-          //
-          // Continue to go down until scroll to next page or the selectable option is found.
-          //
-          ScreenOperation = UiDown;
-          ControlFlag     = CfScreenOperation;
-        }
-
-        MenuOption = MENU_OPTION_FROM_LINK (SavedListEntry);
-
-        UpdateStatusBar (INPUT_ERROR, FALSE);
-
       } else {
+        Difference = MoveToNextStatement (FALSE, &NewPos, BottomRow + 1 - (MenuOption->Row + MenuOption->Skip - Temp2), FALSE);
+      }
+      if (Difference < 0) {
         //
         // Scroll to the first page.
         //
-        if (TopOfScreen != gMenuOption.ForwardLink || SkipValue != 0) {
+        if (TopOfScreen != gMenuOption.ForwardLink || SkipValue != 0) { 
           TopOfScreen = gMenuOption.ForwardLink;
           Repaint     = TRUE;
           MenuOption  = NULL;
         } else {
-          //
-          // Need to remove the current highlight menu.
-          // MenuOption saved the last highlight menu info.
-          //
           MenuOption = MENU_OPTION_FROM_LINK (SavedListEntry);
         }
-
-        SkipValue     = 0;
-        NewLine       = TRUE;
-        //
-        // Get the next highlight menu.
-        //
         NewPos        = gMenuOption.ForwardLink;
-        MoveToNextStatement (FALSE, &NewPos, BottomRow - TopRow);
+        MoveToNextStatement (FALSE, &NewPos, BottomRow - TopRow, TRUE);
+
+        SkipValue = 0;
+        //
+        // If we are at the end of the list and sitting on a Date/Time op, rewind to the head.
+        //
+        AdjustDateAndTimePosition (TRUE, &TopOfScreen);
+        AdjustDateAndTimePosition (TRUE, &NewPos);
+        break;
+      }        
+
+      //
+      // Get next selected menu info.
+      //
+      AdjustDateAndTimePosition (FALSE, &NewPos);
+      NextMenuOption  = MENU_OPTION_FROM_LINK (NewPos);
+      if (NextMenuOption->Row == 0) {
+        UpdateOptionSkipLines (NextMenuOption);
       }
+
+      //
+      // Calculate new highlight menu end row.
+      //
+      Temp = (MenuOption->Row + MenuOption->Skip - Temp2) + Difference + NextMenuOption->Skip - 1;
+      if (Temp > BottomRow) {
+        //
+        // Get the top screen menu info.
+        //
+        AdjustDateAndTimePosition (FALSE, &TopOfScreen);
+        SavedMenuOption = MENU_OPTION_FROM_LINK (TopOfScreen);
+
+        //
+        // Current Top screen menu occupy (SavedMenuOption->Skip - SkipValue) rows.
+        // Full shows the new selected menu need to skip (Temp - BottomRow - 1) rows.
+        //
+        if ((Temp - BottomRow) >= (SavedMenuOption->Skip - SkipValue)) {
+          //
+          // Skip the top op-code
+          //
+          TopOfScreen   = TopOfScreen->ForwardLink;
+          DistanceValue = (Temp - BottomRow) - (SavedMenuOption->Skip - SkipValue);
+
+          SavedMenuOption = MENU_OPTION_FROM_LINK (TopOfScreen);
+
+          //
+          // If we have a remainder, skip that many more op-codes until we drain the remainder
+          // Special case is the selected highlight menu has more than one form of menus.
+          //
+          while (DistanceValue >= SavedMenuOption->Skip && TopOfScreen != NewPos) {
+            //
+            // Since the Difference is greater than or equal to this op-code's skip value, skip it
+            //
+            DistanceValue   = DistanceValue - (INTN) SavedMenuOption->Skip;
+            TopOfScreen     = TopOfScreen->ForwardLink;
+            SavedMenuOption = MENU_OPTION_FROM_LINK (TopOfScreen);
+          }
+          //
+          // Since we will act on this op-code in the next routine, and increment the
+          // SkipValue, set the skips to one less than what is required.
+          //
+          if (TopOfScreen != NewPos) {
+            SkipValue = DistanceValue;
+          } else {
+            SkipValue = 0;
+          }
+        } else {
+          //
+          // Since we will act on this op-code in the next routine, and increment the
+          // SkipValue, set the skips to one less than what is required.
+          //
+          SkipValue += Temp - BottomRow;
+        }
+        Repaint       = TRUE;
+      } else if (!IsSelectable (NextMenuOption)) {
+        //
+        // Continue to go down until scroll to next page or the selectable option is found.
+        //
+        ScreenOperation = UiDown;
+        ControlFlag     = CfScreenOperation;
+        break;
+      }
+
+      MenuOption = MENU_OPTION_FROM_LINK (SavedListEntry);
+
+      //
+      // Check whether new highlight menu is selectable, if not, keep highlight on the old one.
+      //
+      // BottomRow - TopRow + 1 means the total rows current forms supported.
+      // Difference + NextMenuOption->Skip + 1 means the distance between last highlight menu 
+      // and new top menu. New top menu will all shows in next form, but last highlight menu 
+      // may only shows 1 line. + 1 at right part means at least need to keep 1 line for the 
+      // last highlight menu.
+      // 
+      if (!IsSelectable (NextMenuOption) && IsSelectable (MenuOption) && 
+         (BottomRow - TopRow + 1 >= Difference + NextMenuOption->Skip + 1)) {
+        NewPos = SavedListEntry;
+      }
+
+      UpdateStatusBar (INPUT_ERROR, FALSE);
 
       //
       // If we are at the end of the list and sitting on a Date/Time op, rewind to the head.
