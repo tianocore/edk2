@@ -2250,7 +2250,7 @@ NetLibGetMacAddress (
     // Try to get SNP mode from MNP
     //
     Status = Mnp->GetModeData (Mnp, NULL, &SnpModeData);
-    if (EFI_ERROR (Status)) {
+    if (EFI_ERROR (Status) && (Status != EFI_NOT_STARTED)) {
       MnpSb->DestroyChild (MnpSb, MnpChildHandle);
       return Status;
     }
