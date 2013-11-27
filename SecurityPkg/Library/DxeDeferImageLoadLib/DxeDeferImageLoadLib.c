@@ -1,7 +1,7 @@
 /** @file
   Implement defer image load services for user identification in UEFI2.2.
 
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -263,57 +263,107 @@ GetAccessControl (
   return EFI_NOT_FOUND;
 }
 
-
 /**
-  Convert the '/' to '\' in the specified string.
+  Get file name from device path.
 
-  @param[in, out]  Str       Points to the string to convert.
+  The file name may contain one or more device path node. Save the file name in a 
+  buffer if file name is found. The caller is responsible to free the buffer.  
+  
+  @param[in]  DevicePath     A pointer to a device path.
+  @param[out] FileName       The callee allocated buffer to save the file name if file name is found.
+  @param[out] FileNameOffset The offset of file name in device path if file name is found.
+  
+  @retval     UINTN          The file name length. 0 means file name is not found.
 
 **/
-VOID
-ConvertDPStr (
-  IN OUT EFI_STRING                     Str 
+UINTN 
+GetFileName (
+  IN  CONST EFI_DEVICE_PATH_PROTOCOL          *DevicePath,
+  OUT UINT8                                   **FileName,
+  OUT UINTN                                   *FileNameOffset
   )
 {
-  INTN                                  Count;
-  INTN                                  Index;
-  
-  Count = StrSize(Str) / 2 - 1;
+  UINTN                                       Length;
+  EFI_DEVICE_PATH_PROTOCOL                    *TmpDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL                    *RootDevicePath;
+  CHAR8                                       *NodeStr;
+  UINTN                                       NodeStrLength;
+  CHAR16                                      LastNodeChar;
+  CHAR16                                      FirstNodeChar;
 
-  if (Count < 4) {
-    return;
+  //
+  // Get the length of DevicePath before file name.
+  //
+  Length = 0;
+  RootDevicePath = (EFI_DEVICE_PATH_PROTOCOL *)DevicePath;
+  while (!IsDevicePathEnd (RootDevicePath)) {
+    if ((DevicePathType(RootDevicePath) == MEDIA_DEVICE_PATH) && (DevicePathSubType(RootDevicePath) == MEDIA_FILEPATH_DP)) {
+      break;
+    }
+    Length += DevicePathNodeLength (RootDevicePath);
+    RootDevicePath = NextDevicePathNode (RootDevicePath);
   }
-  
+
+  *FileNameOffset = Length;
+  if (Length == 0) {
+    return 0;
+  }
+
   //
-  // Convert device path string.
+  // Get the file name length.
   //
-  Index = Count - 1;
-  while (Index > 0) {
-    //
-    // Find the last '/'.
-    //
-    for (Index = Count - 1; Index > 0; Index--) {
-      if (Str[Index] == L'/')
-        break;
+  Length = 0;
+  TmpDevicePath = RootDevicePath;
+  while (!IsDevicePathEnd (TmpDevicePath)) {
+    if ((DevicePathType(TmpDevicePath) != MEDIA_DEVICE_PATH) || (DevicePathSubType(TmpDevicePath) != MEDIA_FILEPATH_DP)) {
+      break;
+    }
+    Length += DevicePathNodeLength (TmpDevicePath) - sizeof (EFI_DEVICE_PATH_PROTOCOL);
+    TmpDevicePath = NextDevicePathNode (TmpDevicePath);
+  }
+  if (Length == 0) {
+    return 0;
+  }
+
+  *FileName = AllocateZeroPool (Length);
+  ASSERT (*FileName != NULL);
+
+  //
+  // Copy the file name to the buffer.
+  //
+  Length = 0;
+  LastNodeChar = '\\';
+  TmpDevicePath = RootDevicePath;
+  while (!IsDevicePathEnd (TmpDevicePath)) {
+    if ((DevicePathType(TmpDevicePath) != MEDIA_DEVICE_PATH) || (DevicePathSubType(TmpDevicePath) != MEDIA_FILEPATH_DP)) {
+      break;
     }
 
-    //
-    // Check next char.
-    //
-    if (Str[Index + 1] == L'\\')
-      return;
+    FirstNodeChar = (CHAR16) ReadUnaligned16 ((UINT16 *)((UINT8 *)TmpDevicePath + sizeof (EFI_DEVICE_PATH_PROTOCOL)));
+    NodeStr = (CHAR8 *)TmpDevicePath + sizeof (EFI_DEVICE_PATH_PROTOCOL);
+    NodeStrLength = DevicePathNodeLength (TmpDevicePath) - sizeof (EFI_DEVICE_PATH_PROTOCOL) - sizeof(CHAR16);
     
-    Str[Index] = L'\\';
+    if ((FirstNodeChar == '\\') && (LastNodeChar == '\\')) {
+      //
+      // Skip separator "\" when there are two separators.
+      //
+      NodeStr += sizeof (CHAR16);
+      NodeStrLength -= sizeof (CHAR16);      
+    } else if ((FirstNodeChar != '\\') && (LastNodeChar != '\\')) {
+      //
+      // Add separator "\" when there is no separator.
+      //
+      WriteUnaligned16 ((UINT16 *)(*FileName + Length), '\\');
+      Length += sizeof (CHAR16);
+    } 
+    CopyMem (*FileName + Length, NodeStr, NodeStrLength);
+    Length += NodeStrLength;
     
-    //
-    // Check previous char.
-    //
-    if ((Index > 0) && (Str[Index - 1] == L'\\')) {
-      CopyMem (&Str[Index - 1], &Str[Index], (UINTN) ((Count - Index + 1) * sizeof (CHAR16)));
-      return;
-    }
-    Index--;
-  }
+    LastNodeChar  = (CHAR16) ReadUnaligned16 ((UINT16 *) (NodeStr + NodeStrLength - sizeof(CHAR16)));
+    TmpDevicePath = NextDevicePathNode (TmpDevicePath);
+  }    
+
+  return Length;
 }
 
 
@@ -342,54 +392,72 @@ CheckDevicePath (
   IN  CONST EFI_DEVICE_PATH_PROTOCOL          *DevicePath2
   )
 {
-  EFI_STATUS                            Status;
-  EFI_STRING                            DevicePathStr1;
-  EFI_STRING                            DevicePathStr2;
-  UINTN                                 StrLen1;
-  UINTN                                 StrLen2;
-  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL      *DevicePathText;
-  BOOLEAN                               DevicePathEqual;
+  UINTN                                       DevicePathSize;
+  UINTN                                       FileNameSize1;
+  UINTN                                       FileNameSize2;
+  UINT8                                       *FileName1;
+  UINT8                                       *FileName2;
+  UINTN                                       FileNameOffset1;
+  UINTN                                       FileNameOffset2;
+  BOOLEAN                                     DevicePathEqual;
+
+  FileName1       = NULL;
+  FileName2       = NULL;
+  DevicePathEqual = TRUE;
 
   ASSERT (DevicePath1 != NULL);
   ASSERT (DevicePath2 != NULL);
-  
-  DevicePathEqual = FALSE;
-  DevicePathText  = NULL;
-  Status = gBS->LocateProtocol ( 
-                  &gEfiDevicePathToTextProtocolGuid,
-                  NULL,
-                  (VOID **) &DevicePathText
-                  );
-  ASSERT (Status == EFI_SUCCESS);
+  if (IsDevicePathEnd (DevicePath1)) {
+    return FALSE;
+  }
   
   //
-  // Get first device path string.
+  // The file name may contain one or more device path node. 
+  // To compare the file name, copy file name to a buffer and compare the buffer.
   //
-  DevicePathStr1 = DevicePathText->ConvertDevicePathToText (DevicePath1, TRUE, TRUE);
-  ConvertDPStr (DevicePathStr1);
-  //
-  // Get second device path string.
-  //
-  DevicePathStr2 = DevicePathText->ConvertDevicePathToText (DevicePath2, TRUE, TRUE);
-  ConvertDPStr (DevicePathStr2);
-  
-  //
-  // Compare device path string.
-  //
-  StrLen1 = StrSize (DevicePathStr1);
-  StrLen2 = StrSize (DevicePathStr2);
-  if (StrLen1 > StrLen2) {
-    DevicePathEqual = FALSE;
+  FileNameSize1 = GetFileName (DevicePath1, &FileName1, &FileNameOffset1);
+  if (FileNameSize1 != 0) {
+    FileNameSize2 = GetFileName (DevicePath2, &FileName2, &FileNameOffset2);
+    if (FileNameOffset1 != FileNameOffset2) {
+      DevicePathEqual = FALSE;
+      goto Done;
+    }
+    if (CompareMem (DevicePath1, DevicePath2, FileNameOffset1) != 0) {      
+      DevicePathEqual = FALSE;
+      goto Done;
+    }
+    if (FileNameSize1 > FileNameSize2) {
+      DevicePathEqual = FALSE;
+      goto Done;
+    }
+    if (CompareMem (FileName1, FileName2, FileNameSize1) != 0) {      
+      DevicePathEqual = FALSE;
+      goto Done;
+    }
+    DevicePathEqual = TRUE;
     goto Done;
   }
-  
-  if (CompareMem (DevicePathStr1, DevicePathStr2, StrLen1) == 0) {
-    DevicePathEqual = TRUE;
+
+  DevicePathSize = GetDevicePathSize (DevicePath1);
+  if (DevicePathSize > GetDevicePathSize (DevicePath2)) {
+    return FALSE;
   }
 
-Done:
-  FreePool (DevicePathStr1);
-  FreePool (DevicePathStr2);
+  //
+  // Exclude the end of device path node.
+  //
+  DevicePathSize -= sizeof (EFI_DEVICE_PATH_PROTOCOL);
+  if (CompareMem (DevicePath1, DevicePath2, DevicePathSize) != 0) {
+    DevicePathEqual = FALSE;
+  } 
+  
+Done: 
+  if (FileName1 != NULL) {
+    FreePool (FileName1);
+  }
+  if (FileName2 != NULL) {
+    FreePool (FileName2);
+  }
   return DevicePathEqual;
 }
 
