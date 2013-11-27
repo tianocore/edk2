@@ -2855,7 +2855,7 @@ UiDisplayMenu (
       //
       // First minus the menu of the top screen, it's value is SkipValue.
       //
-      if (SkipValue >= (INTN) (BottomRow - TopRow + 1)) {
+      if (SkipValue >= BottomRow - TopRow + 1) {
         //
         // SkipValue > (BottomRow - TopRow + 1) means current menu has more than one
         // form of options to be show, so just update the SkipValue to show the next
