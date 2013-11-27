@@ -1499,7 +1499,6 @@ ProcessQuestionConfig (
   EFI_STATUS                      Status;
   CHAR16                          *ConfigResp;
   CHAR16                          *Progress;
-  EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
 
   if (Question->QuestionConfig == 0) {
     return EFI_SUCCESS;
@@ -1516,12 +1515,8 @@ ProcessQuestionConfig (
   //
   // Send config to Configuration Driver
   //
-  ConfigAccess = Selection->FormSet->ConfigAccess;
-  if (ConfigAccess == NULL) {
-    return EFI_UNSUPPORTED;
-  }
-  Status = ConfigAccess->RouteConfig (
-                           ConfigAccess,
+  Status = mHiiConfigRouting->RouteConfig (
+                           mHiiConfigRouting,
                            ConfigResp,
                            &Progress
                            );
