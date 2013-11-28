@@ -87,14 +87,14 @@ PeCoffLoaderRelocateImageExtraAction (
 #ifdef __CC_ARM
 #if (__ARMCC_VERSION < 500000)
     // Print out the command for the RVD debugger to load symbols for this image
-    DEBUG ((EFI_D_ERROR, "load /a /ni /np %a &0x%08x\n", DeCygwinPathIfNeeded (ImageContext->PdbPointer, Temp, sizeof (Temp)), (UINTN)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders)));
+    DEBUG ((EFI_D_ERROR, "load /a /ni /np %a &0x%p\n", DeCygwinPathIfNeeded (ImageContext->PdbPointer, Temp, sizeof (Temp)), (UINTN)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders)));
 #else
     // Print out the command for the DS-5 to load symbols for this image
-    DEBUG ((EFI_D_ERROR, "add-symbol-file %a 0x%08x\n", DeCygwinPathIfNeeded (ImageContext->PdbPointer, Temp, sizeof (Temp)), (UINTN)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders)));
+    DEBUG ((EFI_D_ERROR, "add-symbol-file %a 0x%p\n", DeCygwinPathIfNeeded (ImageContext->PdbPointer, Temp, sizeof (Temp)), (UINTN)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders)));
 #endif
 #elif __GNUC__
     // This may not work correctly if you generate PE/COFF directlyas then the Offset would not be required
-    DEBUG ((EFI_D_ERROR, "add-symbol-file %a 0x%08x\n", DeCygwinPathIfNeeded (ImageContext->PdbPointer, Temp, sizeof (Temp)), (UINTN)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders)));
+    DEBUG ((EFI_D_ERROR, "add-symbol-file %a 0x%p\n", DeCygwinPathIfNeeded (ImageContext->PdbPointer, Temp, sizeof (Temp)), (UINTN)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders)));
 #else
     DEBUG ((EFI_D_ERROR, "Loading driver at 0x%11p EntryPoint=0x%11p\n", (VOID *)(UINTN) ImageContext->ImageAddress, FUNCTION_ENTRY_POINT (ImageContext->EntryPoint)));
 #endif
