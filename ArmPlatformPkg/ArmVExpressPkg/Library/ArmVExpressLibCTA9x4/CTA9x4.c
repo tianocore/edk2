@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -16,7 +16,6 @@
 #include <Library/ArmPlatformLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
-#include <Library/SerialPortLib.h>
 
 #include <Drivers/PL341Dmc.h>
 #include <Drivers/PL301Axi.h>
@@ -25,8 +24,6 @@
 #include <Ppi/ArmMpCoreInfo.h>
 
 #include <ArmPlatform.h>
-
-#define SerialPrint(txt)  SerialPortWrite ((UINT8*)(txt), AsciiStrLen(txt)+1);
 
 ARM_CORE_INFO mVersatileExpressMpCoreInfoCTA9x4[] = {
   {
@@ -163,19 +160,8 @@ ArmPlatformInitializeSystemMemory (
   VOID
   )
 {
-  UINT32 Value;
-
-  // Memory Map remapping
-  if (FeaturePcdGet(PcdNorFlashRemapping)) {
-    SerialPrint ("Secure ROM at 0x0\n\r");
-  } else {
-    Value = MmioRead32(ARM_VE_SYS_CFGRW1_REG); //Scc - CFGRW1
-    // Remap the DRAM to 0x0
-    MmioWrite32(ARM_VE_SYS_CFGRW1_REG, (Value & 0x0FFFFFFF) | ARM_VE_CFGRW1_REMAP_DRAM);
-  }
-
-  PL341DmcInit(ARM_VE_DMC_BASE, &DDRTimings);
-  PL301AxiInit(ARM_VE_FAXI_BASE);
+  PL341DmcInit (ARM_VE_DMC_BASE, &DDRTimings);
+  PL301AxiInit (ARM_VE_FAXI_BASE);
 }
 
 EFI_STATUS

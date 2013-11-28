@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -17,11 +17,14 @@
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
 #include <Library/PcdLib.h>
+#include <Library/SerialPortLib.h>
 
 #include <Drivers/ArmTrustzone.h>
 #include <Drivers/PL310L2Cache.h>
 
 #include <ArmPlatform.h>
+
+#define SerialPrint(txt)  SerialPortWrite ((UINT8*)(txt), AsciiStrLen(txt)+1)
 
 /**
   Initialize the Secure peripherals and memory regions
@@ -119,6 +122,22 @@ ArmPlatformSecInitialize (
   IN  UINTN                     MpId
   )
 {
+  UINT32 Value;
+
+  // If the DRAM is remapped at 0x0 then we need to wake up the secondary cores from wfe
+  // (waiting for the memory to be initialized) as the instruction is still in the remapped
+  // flash region at 0x0 to jump in the C-code which lives in the NOR1 at 0x44000000 before
+  // the region 0x0 is remapped as DRAM.
+  if (!FeaturePcdGet (PcdNorFlashRemapping)) {
+    if (!ArmPlatformIsPrimaryCore (MpId)) {
+      // Replaced ArmCallWFE () in ArmPlatformPkg/Sec/SecEntryPoint.(S|asm)
+      ArmCallWFE ();
+    } else {
+      // Wake up the secondary core from ArmCallWFE () in ArmPlatformPkg/Sec/SecEntryPoint.(S|asm)
+      ArmCallSEV ();
+    }
+  }
+
   // If it is not the primary core then there is nothing to do
   if (!ArmPlatformIsPrimaryCore (MpId)) {
     return RETURN_SUCCESS;
@@ -142,6 +161,15 @@ ArmPlatformSecInitialize (
 
     // Initialize system memory (DRAM)
     ArmPlatformInitializeSystemMemory ();
+  }
+
+  // Memory Map remapping
+  if (FeaturePcdGet (PcdNorFlashRemapping)) {
+    SerialPrint ("Secure ROM at 0x0\n\r");
+  } else {
+    Value = MmioRead32 (ARM_VE_SYS_CFGRW1_REG); //Scc - CFGRW1
+    // Remap the DRAM to 0x0
+    MmioWrite32 (ARM_VE_SYS_CFGRW1_REG, (Value & 0x0FFFFFFF) | ARM_VE_CFGRW1_REMAP_DRAM);
   }
 
   return RETURN_SUCCESS;
