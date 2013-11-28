@@ -115,7 +115,6 @@ UndefinedInstructionEntry
   bx        R1
 
 SoftwareInterruptEntry
-  sub       LR, LR, #4                ; Only -2 for Thumb, adjust in CommonExceptionEntry
   srsfd     #0x13!                    ; Store return state on SVC stack
                                       ; We are already in SVC mode
   stmfd     SP!,{LR}                  ; Store the link register for the current mode
