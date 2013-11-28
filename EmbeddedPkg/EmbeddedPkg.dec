@@ -82,8 +82,6 @@
   gEmbeddedTokenSpaceGuid.PcdPrePiHobBase|131072|UINT32|0x00000040
   gEmbeddedTokenSpaceGuid.PcdPrePiStackBase|0|UINT32|0x0000000b
   gEmbeddedTokenSpaceGuid.PcdPrePiStackSize|131072|UINT32|0x0000000c
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|32|UINT8|0x00000010
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0|UINT8|0x00000011
   
   gEmbeddedTokenSpaceGuid.PcdMemoryBase|0x0|UINT32|0x0000004e
   gEmbeddedTokenSpaceGuid.PcdMemorySize|0x0|UINT32|0x0000004f
@@ -126,6 +124,19 @@
   gEmbeddedTokenSpaceGuid.PcdGdbUartPort|0x3f8|UINT32|0x0000004b
   gEmbeddedTokenSpaceGuid.PcdGdbMaxPacketRetryCount|10000000|UINT32|0x0000004c
   gEmbeddedTokenSpaceGuid.PcdGdbTimerPeriodMilliseconds|250|UINT32|0x0000004d
-  
-  
 
+[PcdsFixedAtBuild.ARM]
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|32|UINT8|0x00000010
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0|UINT8|0x00000011
+
+[PcdsFixedAtBuild.AARCH64]
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|48|UINT8|0x00000010
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0|UINT8|0x00000011
+
+[PcdsFixedAtBuild.IA32]
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|36|UINT8|0x00000010
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16|UINT8|0x00000011
+
+[PcdsFixedAtBuild.X64]
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|52|UINT8|0x00000010
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16|UINT8|0x00000011

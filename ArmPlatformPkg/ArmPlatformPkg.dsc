@@ -258,8 +258,6 @@
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Platform"
   
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ArmPlatform"
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|32
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000
   gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|1000000
   gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|1000000

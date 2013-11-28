@@ -202,21 +202,6 @@
   gEmbeddedTokenSpaceGuid.PcdTimerVector|7
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000
 
-
-[PcdsFixedAtBuild.ARM]
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|32
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0
-
-[PcdsFixedAtBuild.IA32]
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|36
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16
-
-[PcdsFixedAtBuild.X64]
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|52
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16
-
-
-
 [PcdsFixedAtBuild.IPF]
   gEfiMdePkgTokenSpaceGuid.PcdIoBlockBaseAddressForIpf|0x0ffffc000000
 
