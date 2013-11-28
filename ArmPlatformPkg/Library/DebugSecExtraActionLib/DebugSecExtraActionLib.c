@@ -23,8 +23,6 @@
 #include <Library/PrintLib.h>
 #include <Library/SerialPortLib.h>
 
-#include <Chipset/ArmV7.h>
-
 // When the firmware is built as not Standalone, the secondary cores need to wait the firmware
 // entirely written into DRAM. It is the firmware from DRAM which will wake up the secondary cores.
 VOID

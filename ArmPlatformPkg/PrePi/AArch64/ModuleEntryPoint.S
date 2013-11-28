@@ -16,8 +16,6 @@
 #include <Library/PcdLib.h>
 #include <AutoGen.h>
 
-#include <Chipset/ArmV7.h>
-
 .text
 .align 3
 
