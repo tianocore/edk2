@@ -101,18 +101,6 @@ ArmWriteTpidrurw (
   UINTN Value
   );
 
-UINTN
-EFIAPI
-ArmIsArchTimerImplemented (
-  VOID
-  );
-
-UINTN
-EFIAPI
-ArmReadIdPfr1 (
-  VOID
-  );
-
 UINT32
 EFIAPI
 ArmReadNsacr (

@@ -1,7 +1,7 @@
 /** @file
   Generic ARM implementation of TimerLib.h
 
-  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
   
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -15,12 +15,12 @@
 
 
 #include <Base.h>
+#include <Library/ArmLib.h>
 #include <Library/BaseLib.h>
 #include <Library/TimerLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 #include <Library/ArmArchTimerLib.h>
-#include <Chipset/ArmV7.h>
 
 #define TICKS_PER_MICRO_SEC     (PcdGet32 (PcdArmArchTimerFreqInHz)/1000000U)
 

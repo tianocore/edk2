@@ -193,7 +193,25 @@ EFIAPI
 ArmInstructionCacheLineLength (
   VOID
   );
-  
+
+UINTN
+EFIAPI
+ArmIsArchTimerImplemented (
+  VOID
+  );
+
+UINTN
+EFIAPI
+ArmReadIdPfr0 (
+  VOID
+  );
+
+UINTN
+EFIAPI
+ArmReadIdPfr1 (
+  VOID
+  );
+
 UINT32
 EFIAPI
 Cp15IdCode (
