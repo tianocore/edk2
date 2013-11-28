@@ -81,7 +81,7 @@
 ################################################################################
 
 [PcdsFeatureFlag.common]
-!ifdef EDK2_ARMVE_STANDALONE
+!if $(EDK2_ARMVE_STANDALONE) == 1
   gArmPlatformTokenSpaceGuid.PcdStandalone|TRUE
 !else
   gArmPlatformTokenSpaceGuid.PcdStandalone|FALSE
