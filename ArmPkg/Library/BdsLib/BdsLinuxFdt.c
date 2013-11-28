@@ -264,7 +264,7 @@ RelocateFdt (
 {
   EFI_STATUS            Status;
   INTN                  Error;
-  UINT32                FdtAlignment;
+  UINT64                FdtAlignment;
 
   *RelocatedFdtSize = OriginalFdtSize + FDT_ADDITIONAL_ENTRIES_SIZE;
 
