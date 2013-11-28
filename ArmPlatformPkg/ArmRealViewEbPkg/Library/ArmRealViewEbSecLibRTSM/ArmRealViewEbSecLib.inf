@@ -36,9 +36,6 @@
   ArmRealViewEbBoot.asm     | RVCT
   ArmRealViewEbBoot.S       | GCC
 
-[FeaturePcd]
-  gEmbeddedTokenSpaceGuid.PcdCacheEnable
-
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFvBaseAddress
 

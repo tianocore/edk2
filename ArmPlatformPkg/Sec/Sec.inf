@@ -55,9 +55,6 @@
   PrintLib
   SerialPortLib
   
-[FeaturePcd]
-  gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec
-  
 [FixedPcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
 

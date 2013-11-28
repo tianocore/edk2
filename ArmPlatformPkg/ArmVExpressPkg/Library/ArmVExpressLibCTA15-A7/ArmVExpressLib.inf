@@ -41,13 +41,10 @@
 
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdCacheEnable
-  gArmPlatformTokenSpaceGuid.PcdNorFlashRemapping
-  gArmPlatformTokenSpaceGuid.PcdStandalone
 
 [FixedPcd]
   gArmPlatformTokenSpaceGuid.PcdCoreCount
 
-  gArmTokenSpaceGuid.PcdTrustzoneSupport
   gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmTokenSpaceGuid.PcdSystemMemorySize
   gArmTokenSpaceGuid.PcdFvBaseAddress

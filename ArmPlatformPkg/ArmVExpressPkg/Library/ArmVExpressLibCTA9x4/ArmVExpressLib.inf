@@ -49,11 +49,8 @@
   gArmPlatformTokenSpaceGuid.PcdNorFlashRemapping
 
 [FixedPcd]
-  gArmTokenSpaceGuid.PcdTrustzoneSupport
   gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmTokenSpaceGuid.PcdSystemMemorySize
-
-  gArmTokenSpaceGuid.PcdL2x0ControllerBase
 
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
   gArmTokenSpaceGuid.PcdArmPrimaryCore

@@ -45,8 +45,6 @@
   CTA9x4Boot.S       | GCC
 
 [FeaturePcd]
-  gEmbeddedTokenSpaceGuid.PcdCacheEnable
-  gArmPlatformTokenSpaceGuid.PcdNorFlashRemapping
   gArmPlatformTokenSpaceGuid.PcdStandalone
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec
 

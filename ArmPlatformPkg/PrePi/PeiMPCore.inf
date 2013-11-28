@@ -70,7 +70,6 @@
   gArmMpCoreInfoGuid
 
 [FeaturePcd]  
-  gEmbeddedTokenSpaceGuid.PcdCacheEnable
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob
   gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores
 
