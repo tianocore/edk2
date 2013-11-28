@@ -29,14 +29,17 @@ class DebugInfoTable:
     def get_debug_info(self):
         # Get the information from EFI_DEBUG_IMAGE_INFO_TABLE_HEADER
         count = self.ec.getMemoryService().readMemory32(self.base + 0x4)
-        debug_info_table_base = self.ec.getMemoryService().readMemory32(self.base + 0x8)
+        if edk2_debugger.is_aarch64(self.ec):
+            debug_info_table_base = self.ec.getMemoryService().readMemory64(self.base + 0x8)
+        else:
+            debug_info_table_base = self.ec.getMemoryService().readMemory32(self.base + 0x8)
         
         self.DebugInfos = []
         
         for i in range(0, count):
             # Get the address of the structure EFI_DEBUG_IMAGE_INFO
             if edk2_debugger.is_aarch64(self.ec):
-                debug_info = self.ec.getMemoryService().readMemory32(debug_info_table_base + (i * 8))
+                debug_info = self.ec.getMemoryService().readMemory64(debug_info_table_base + (i * 8))
             else:
                 debug_info = self.ec.getMemoryService().readMemory32(debug_info_table_base + (i * 4))
 
@@ -46,9 +49,9 @@ class DebugInfoTable:
                 if debug_info_type == 1:
                     if edk2_debugger.is_aarch64(self.ec):
                         # Get the base address of the structure EFI_LOADED_IMAGE_PROTOCOL
-                        loaded_image_protocol = self.ec.getMemoryService().readMemory32(debug_info + 0x8)
+                        loaded_image_protocol = self.ec.getMemoryService().readMemory64(debug_info + 0x8)
 
-                        image_base = self.ec.getMemoryService().readMemory32(loaded_image_protocol + 0x40)
+                        image_base = self.ec.getMemoryService().readMemory64(loaded_image_protocol + 0x40)
                         image_size = self.ec.getMemoryService().readMemory32(loaded_image_protocol + 0x48)
                     else:
                         # Get the base address of the structure EFI_LOADED_IMAGE_PROTOCOL
@@ -135,7 +138,10 @@ class SystemTable:
                 raise Exception('SystemTable','Fail to access System Memory. Ensure all the memory in the region [0x%x;0x%X] is accessible.' % (membase,membase+memsize))
             if signature == SystemTable.CONST_ST_SIGNATURE:
                 found = True
-                self.system_table_base = self.ec.getMemoryService().readMemory32(offset + 0x8)
+                if edk2_debugger.is_aarch64(self.ec):
+                    self.system_table_base = self.ec.getMemoryService().readMemory64(offset + 0x8)
+                else:
+                    self.system_table_base = self.ec.getMemoryService().readMemory32(offset + 0x8)
                 break
             offset = offset - 0x400000
             
@@ -148,7 +154,7 @@ class SystemTable:
             conf_table_entry_count = self.ec.getMemoryService().readMemory32(self.system_table_base + 0x68)
 
             # Get location of the Configuration Table entries
-            conf_table_offset = self.ec.getMemoryService().readMemory32(self.system_table_base + 0x70)
+            conf_table_offset = self.ec.getMemoryService().readMemory64(self.system_table_base + 0x70)
         else:
             # Number of configuration Table entry
             conf_table_entry_count = self.ec.getMemoryService().readMemory32(self.system_table_base + 0x40)
@@ -163,6 +169,9 @@ class SystemTable:
                 offset = conf_table_offset + (i * 0x14)
             guid = struct.unpack("<IIII", self.ec.getMemoryService().read(str(offset), 16, 32))
             if guid == conf_table_guid:
-                return self.ec.getMemoryService().readMemory32(offset + 0x10)
+                if edk2_debugger.is_aarch64(self.ec):
+                    return self.ec.getMemoryService().readMemory64(offset + 0x10)
+                else:
+                    return self.ec.getMemoryService().readMemory32(offset + 0x10)
             
         raise Exception('SystemTable','Configuration Table not found')
