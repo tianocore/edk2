@@ -23,7 +23,7 @@
 
 ASM_GLOBAL ASM_PFX(CommonExceptionHandler)
 ASM_GLOBAL ASM_PFX(CommonInterruptEntry)
-ASM_GLOBAL ASM_PFX(HookAfterStubEnd)
+ASM_GLOBAL ASM_PFX(HookAfterStubHeaderEnd)
 
 #EXTRN ASM_PFX(mErrorCodeFlag):DWORD           # Error code flags for exceptions
 #EXTRN ASM_PFX(mDoFarReturnFlag):DWORD         # Do far return flag
