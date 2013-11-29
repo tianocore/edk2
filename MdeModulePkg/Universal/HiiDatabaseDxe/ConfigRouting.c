@@ -3771,7 +3771,7 @@ HiiConfigRoutingExtractConfig (
       if ((DevicePathPkg = Database->PackageList->DevicePathPkg) != NULL) {
         CurrentDevicePath = DevicePathPkg + sizeof (EFI_HII_PACKAGE_HEADER);
         DevicePathSize    = GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *) CurrentDevicePath);
-        if ((CompareMem (DevicePath,CurrentDevicePath,DevicePathSize) == 0) && IsThisPackageList(Database, Request)) {
+        if ((CompareMem (DevicePath,CurrentDevicePath,DevicePathSize) == 0) && IsThisPackageList(Database, ConfigRequest)) {
           DriverHandle = Database->DriverHandle;
           HiiHandle    = Database->Handle;
           break;
@@ -4278,7 +4278,7 @@ HiiConfigRoutingRouteConfig (
       if ((DevicePathPkg = Database->PackageList->DevicePathPkg) != NULL) {
         CurrentDevicePath = DevicePathPkg + sizeof (EFI_HII_PACKAGE_HEADER);
         DevicePathSize    = GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *) CurrentDevicePath);
-        if ((CompareMem (DevicePath,CurrentDevicePath,DevicePathSize) == 0) && IsThisPackageList(Database, Configuration)) {
+        if ((CompareMem (DevicePath,CurrentDevicePath,DevicePathSize) == 0) && IsThisPackageList(Database, ConfigResp)) {
           DriverHandle = Database->DriverHandle;
           break;
         }
