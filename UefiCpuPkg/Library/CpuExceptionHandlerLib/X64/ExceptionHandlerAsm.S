@@ -273,7 +273,10 @@ ASM_PFX(HookAfterStubHeaderEnd):
     andl    $0x0fffffff0, %esp
     pushq   %rcx
     movq    8(%rax), %rcx
-    bt      %ecx, ASM_PFX(mErrorCodeFlag)
+    pushq   %rax
+    movabsl ASM_PFX(mErrorCodeFlag), %eax
+    bt      %ecx, %eax
+    popq    %rax
     jc      NoErrorData
     pushq   (%rsp)            # push additional rcx to make stack alignment
 NoErrorData:
@@ -301,8 +304,8 @@ ASM_PFX(CommonInterruptEntry):
     cmp     $32, %ecx          # Intel reserved vector for exceptions?
     jae     NoErrorCode
     pushq   %rax
-    leaq    ASM_PFX(mErrorCodeFlag)(%rip), %rax
-    bt      %ecx, (%rax) 
+    movabsl ASM_PFX(mErrorCodeFlag), %eax
+    bt      %ecx, %eax
     popq    %rax
     jc      CommonInterruptEntry_al_0000
 
@@ -549,7 +552,10 @@ ErrorCode:
     jmp     *-24(%rsp)
 
 DoReturn:
-    cmpq    $0, ASM_PFX(mDoFarReturnFlag)   # Check if need to do far return instead of IRET
+    pushq   %rax
+    movabsq ASM_PFX(mDoFarReturnFlag), %rax
+    cmpq    $0, %rax          # Check if need to do far return instead of IRET
+    popq    %rax
     jz      DoIret
     pushq   %rax
     movq    %rsp, %rax        # save old RSP to rax
