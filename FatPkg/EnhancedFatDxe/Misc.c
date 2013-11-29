@@ -80,7 +80,6 @@ Arguments:
     Subtask = CR (Link, FAT_SUBTASK, Link, FAT_SUBTASK_SIGNATURE);
     Link = FatDestroySubtask (Subtask);
   }
-  RemoveEntryList (&Task->Link);
   FreePool (Task);
 }
 
