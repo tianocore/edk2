@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 DefinitionBlock (
   "Tpm.aml",
   "SSDT",
-  1,
+  2,
   "INTEL ",
   "Tpm2Tabl",
   0x1000
