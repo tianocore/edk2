@@ -267,7 +267,7 @@ VectorNum:
     .long   ASM_PFX(HookAfterStubHeaderEnd)
     jmp     *%eax
 ASM_GLOBAL ASM_PFX(HookAfterStubHeaderEnd)
-HookAfterStubHeaderEnd:
+ASM_PFX(HookAfterStubHeaderEnd):
     popl    %eax
     subl    $8, %esp        # reserve room for filling exception data later
     pushl   8(%esp)
