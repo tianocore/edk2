@@ -2049,6 +2049,7 @@ ShellCommandRunPci (
   CHAR16                            *ProblemParam;
   SHELL_STATUS                      ShellStatus;
   CONST CHAR16                      *Temp;
+  UINT64                            RetVal;
 
   ShellStatus         = SHELL_SUCCESS;
   Status              = EFI_SUCCESS;
@@ -2302,7 +2303,16 @@ ShellCommandRunPci (
 
     Temp = ShellCommandLineGetValue(Package, L"-s");
     if (Temp != NULL) {
-      Segment = (UINT16) ShellStrToUintn (Temp);
+      //
+      // Input converted to hexadecimal number.
+      //
+      if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
+        Segment = (UINT16) RetVal;
+      } else {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto Done;
+      }
     }
 
     //
@@ -2311,7 +2321,17 @@ ShellCommandRunPci (
     //
     Temp = ShellCommandLineGetRawValue(Package, 1);
     if (Temp != NULL) {
-      Bus = (UINT16)ShellStrToUintn(Temp);
+      //
+      // Input converted to hexadecimal number.
+      //
+      if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
+        Bus = (UINT16) RetVal;
+      } else {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto Done;
+      }
+
       if (Bus > MAX_BUS_NUMBER) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Temp);
         ShellStatus = SHELL_INVALID_PARAMETER;
@@ -2320,7 +2340,17 @@ ShellCommandRunPci (
     }
     Temp = ShellCommandLineGetRawValue(Package, 2);
     if (Temp != NULL) {
-      Device = (UINT16) ShellStrToUintn(Temp);
+      //
+      // Input converted to hexadecimal number.
+      //
+      if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
+        Device = (UINT16) RetVal;
+      } else {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto Done;
+      }
+
       if (Device > MAX_DEVICE_NUMBER){
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Temp);
         ShellStatus = SHELL_INVALID_PARAMETER;
@@ -2330,7 +2360,17 @@ ShellCommandRunPci (
 
     Temp = ShellCommandLineGetRawValue(Package, 3);
     if (Temp != NULL) {
-      Func = (UINT16) ShellStrToUintn(Temp);
+      //
+      // Input converted to hexadecimal number.
+      //
+      if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
+        Func = (UINT16) RetVal;
+      } else {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto Done;
+      }
+
       if (Func > MAX_FUNCTION_NUMBER){
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, Temp);
         ShellStatus = SHELL_INVALID_PARAMETER;
