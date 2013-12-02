@@ -131,7 +131,7 @@ InternalEfiShellStartCtrlSMonitor(
       SimpleEx,
       &KeyData,
       NotificationFunction,
-      &ShellInfoObject.CtrlSNotifyHandle2);
+      &ShellInfoObject.CtrlSNotifyHandle3);
   }  
   KeyData.KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED;
   if (!EFI_ERROR(Status)) {
@@ -139,7 +139,7 @@ InternalEfiShellStartCtrlSMonitor(
       SimpleEx,
       &KeyData,
       NotificationFunction,
-      &ShellInfoObject.CtrlSNotifyHandle2);
+      &ShellInfoObject.CtrlSNotifyHandle4);
   }
   return (Status);
 }
