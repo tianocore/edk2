@@ -98,7 +98,7 @@ GetPcdType (
     case PCD_DATUM_TYPE_POINTER:
       return EFI_PCD_TYPE_PTR;
     case PCD_DATUM_TYPE_UINT8:
-      if (LocalTokenNumber & PCD_DATUM_TYPE_UINT8_BOOLEAN) {
+      if ((LocalTokenNumber & PCD_DATUM_TYPE_UINT8_BOOLEAN) == PCD_DATUM_TYPE_UINT8_BOOLEAN) {
         return EFI_PCD_TYPE_BOOL;
       } else {
         return EFI_PCD_TYPE_8;
