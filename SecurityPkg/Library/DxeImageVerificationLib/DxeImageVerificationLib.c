@@ -1108,10 +1108,11 @@ DxeImageVerificationHandler (
   }
 
   //
-  // The policy QUERY_USER_ON_SECURITY_VIOLATION violates the UEFI spec and has been removed.
+  // The policy QUERY_USER_ON_SECURITY_VIOLATION and ALLOW_EXECUTE_ON_SECURITY_VIOLATION 
+  // violates the UEFI spec and has been removed.
   //
-  ASSERT (Policy != QUERY_USER_ON_SECURITY_VIOLATION);
-  if (Policy == QUERY_USER_ON_SECURITY_VIOLATION) {
+  ASSERT (Policy != QUERY_USER_ON_SECURITY_VIOLATION && Policy != ALLOW_EXECUTE_ON_SECURITY_VIOLATION);
+  if (Policy == QUERY_USER_ON_SECURITY_VIOLATION || Policy == ALLOW_EXECUTE_ON_SECURITY_VIOLATION) {
     CpuDeadLoop ();
   }
 
