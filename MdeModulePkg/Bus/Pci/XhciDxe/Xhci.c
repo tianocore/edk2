@@ -2129,6 +2129,16 @@ XhcDriverBindingStop (
     return Status;
   }
 
+  Status = gBS->UninstallProtocolInterface (
+                  Controller,
+                  &gEfiUsb2HcProtocolGuid,
+                  Usb2Hc
+                  );
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   Xhc   = XHC_FROM_THIS (Usb2Hc);
   PciIo = Xhc->PciIo;
 
@@ -2154,19 +2164,6 @@ XhcDriverBindingStop (
     }
   }
 
-  XhcHaltHC (Xhc, XHC_GENERIC_TIMEOUT);
-  XhcClearBiosOwnership (Xhc);
-
-  Status = gBS->UninstallProtocolInterface (
-                  Controller,
-                  &gEfiUsb2HcProtocolGuid,
-                  Usb2Hc
-                  );
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
   if (Xhc->PollTimer != NULL) {
     gBS->CloseEvent (Xhc->PollTimer);
   }
@@ -2175,6 +2172,8 @@ XhcDriverBindingStop (
     gBS->CloseEvent (Xhc->ExitBootServiceEvent);
   }
 
+  XhcHaltHC (Xhc, XHC_GENERIC_TIMEOUT);
+  XhcClearBiosOwnership (Xhc);
   XhciDelAllAsyncIntTransfers (Xhc);
   XhcFreeSched (Xhc);
 
