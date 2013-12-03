@@ -870,52 +870,16 @@ AtaAtapiPassThruStop (
 
   Instance = ATA_PASS_THRU_PRIVATE_DATA_FROM_THIS (AtaPassThru);
 
-  //
-  // Close Non-Blocking timer and free Task list.
-  //
-  if (Instance->TimerEvent != NULL) {
-    gBS->CloseEvent (Instance->TimerEvent);
-    Instance->TimerEvent = NULL;
+  Status = gBS->UninstallMultipleProtocolInterfaces (
+                  Controller,
+                  &gEfiAtaPassThruProtocolGuid, &(Instance->AtaPassThru),
+                  &gEfiExtScsiPassThruProtocolGuid, &(Instance->ExtScsiPassThru),
+                  NULL
+                  );
+
+  if (EFI_ERROR (Status)) {
+    return EFI_DEVICE_ERROR;
   }
-  DestroyAsynTaskList (Instance, FALSE);
-
-  //
-  // Disable this ATA host controller.
-  //
-  PciIo  = Instance->PciIo;
-  Status = PciIo->Attributes (
-                    PciIo,
-                    EfiPciIoAttributeOperationSupported,
-                    0,
-                    &Supports
-                    );
-  if (!EFI_ERROR (Status)) {
-    Supports &= EFI_PCI_DEVICE_ENABLE;
-    PciIo->Attributes (
-             PciIo,
-             EfiPciIoAttributeOperationDisable,
-             Supports,
-             NULL
-             );
-  }
-
-  //
-  // Restore original PCI attributes
-  //
-  Status = PciIo->Attributes (
-                    PciIo,
-                    EfiPciIoAttributeOperationSet,
-                    Instance->OriginalPciAttributes,
-                    NULL
-                    );
-  ASSERT_EFI_ERROR (Status);
-
-  gBS->UninstallMultipleProtocolInterfaces (
-         Controller,
-         &gEfiAtaPassThruProtocolGuid, &(Instance->AtaPassThru),
-         &gEfiExtScsiPassThruProtocolGuid, &(Instance->ExtScsiPassThru),
-         NULL
-         );
 
   //
   // Close protocols opened by AtaAtapiPassThru controller driver
@@ -928,14 +892,24 @@ AtaAtapiPassThruStop (
          );
 
   //
+  // Close Non-Blocking timer and free Task list.
+  //
+  if (Instance->TimerEvent != NULL) {
+    gBS->CloseEvent (Instance->TimerEvent);
+    Instance->TimerEvent = NULL;
+  }
+  DestroyAsynTaskList (Instance, FALSE);
+  //
   // Free allocated resource
   //
-  DestroyDeviceInfoList(Instance);
+  DestroyDeviceInfoList (Instance);
 
   //
   // If the current working mode is AHCI mode, then pre-allocated resource
   // for AHCI initialization should be released.
   //
+  PciIo = Instance->PciIo;
+
   if (Instance->Mode == EfiAtaAhciMode) {
     AhciRegisters = &Instance->AhciRegisters;
     PciIo->Unmap (
@@ -966,6 +940,37 @@ AtaAtapiPassThruStop (
              AhciRegisters->AhciRFis
              );
   }
+
+  //
+  // Disable this ATA host controller.
+  //
+  Status = PciIo->Attributes (
+                    PciIo,
+                    EfiPciIoAttributeOperationSupported,
+                    0,
+                    &Supports
+                    );
+  if (!EFI_ERROR (Status)) {
+    Supports &= EFI_PCI_DEVICE_ENABLE;
+    PciIo->Attributes (
+             PciIo,
+             EfiPciIoAttributeOperationDisable,
+             Supports,
+             NULL
+             );
+  }
+
+  //
+  // Restore original PCI attributes
+  //
+  Status = PciIo->Attributes (
+                    PciIo,
+                    EfiPciIoAttributeOperationSet,
+                    Instance->OriginalPciAttributes,
+                    NULL
+                    );
+  ASSERT_EFI_ERROR (Status);
+
   FreePool (Instance);
 
   return Status;
