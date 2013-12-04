@@ -402,6 +402,7 @@ InitializeDebugAgent (
 
     InitializeDebugTimer ();
 
+    Phase2Context.InitFlag = InitFlag;
     Phase2Context.Context  = Context;
     Phase2Context.Function = Function;
     DebugPortInitialize ((VOID *) &Phase2Context, InitializeDebugAgentPhase2);
@@ -487,14 +488,13 @@ InitializeDebugAgent (
     // Update IDT entry to save the location saved mailbox pointer
     //
     SetLocationSavedMailboxPointerInIdtEntry (MailboxLocationPointer);
-    //
-    // Enable CPU interrupts so debug timer interrupts can be delivered
-    //
-    EnableInterrupts ();
-
     break;
 
   case DEBUG_AGENT_INIT_PEI:
+    if (Context == NULL) {
+      DEBUG ((EFI_D_ERROR, "DebugAgent: Input parameter Context cannot be NULL!\n"));
+      CpuDeadLoop ();
+    }
     //
     // Check if Debug Agent has initialized before
     //
@@ -550,6 +550,7 @@ InitializeDebugAgent (
       SetDebugFlag (DEBUG_AGENT_FLAG_CHECK_MAILBOX_IN_HOB, 1);
     }
 
+    Phase2Context.InitFlag = InitFlag;
     Phase2Context.Context  = Context;
     Phase2Context.Function = Function;
     DebugPortInitialize ((VOID *) &Phase2Context, InitializeDebugAgentPhase2);
@@ -598,6 +599,9 @@ InitializeDebugAgent (
     break;
   }
 
+  //
+  // Enable CPU interrupts so debug timer interrupts can be delivered
+  //
   EnableInterrupts ();
 
   //
@@ -605,6 +609,12 @@ InitializeDebugAgent (
   //
   if (Function != NULL) {
     Function (Context);
+  }
+  //
+  // Set return status for DEBUG_AGENT_INIT_PEI
+  //
+  if (InitFlag == DEBUG_AGENT_INIT_PEI) {
+    *(EFI_STATUS *)Context = EFI_SUCCESS;
   }
 }
 
@@ -635,7 +645,7 @@ InitializeDebugAgentPhase2 (
   MailboxLocation = GetLocationSavedMailboxPointerInIdtEntry ();
   Mailbox = (DEBUG_AGENT_MAILBOX *)(UINTN)(*MailboxLocation);
   BufferSize = PcdGet16(PcdDebugPortHandleBufferSize);
-  if (Phase2Context->Function == NULL && DebugPortHandle != NULL && BufferSize != 0) {
+  if (Phase2Context->InitFlag == DEBUG_AGENT_INIT_PEI) {
     NewDebugPortHandle = (UINT64)(UINTN)AllocateCopyPool (BufferSize, DebugPortHandle);
   } else {
     NewDebugPortHandle = (UINT64)(UINTN)DebugPortHandle;
@@ -647,25 +657,23 @@ InitializeDebugAgentPhase2 (
   //
   TriggerSoftInterrupt (SYSTEM_RESET_SIGNATURE);
 
-  //
-  // If Temporary RAM region is below 128 MB, then send message to 
-  // host to disable low memory filtering.
-  //
-  SecCoreData = (EFI_SEC_PEI_HAND_OFF *)Phase2Context->Context;
-  if ((UINTN)SecCoreData->TemporaryRamBase < BASE_128MB && IsHostAttached ()) {
-    SetDebugFlag (DEBUG_AGENT_FLAG_MEMORY_READY, 1);
-    TriggerSoftInterrupt (MEMORY_READY_SIGNATURE);
-  }
-
-  //
-  // Enable CPU interrupts so debug timer interrupts can be delivered
-  //
-  EnableInterrupts ();
-
-  //
-  // Call continuation function if it is not NULL.
-  //
-  if (Phase2Context->Function != NULL) {
+  if (Phase2Context->InitFlag == DEBUG_AGENT_INIT_PREMEM_SEC) {
+    //
+    // If Temporary RAM region is below 128 MB, then send message to 
+    // host to disable low memory filtering.
+    //
+    SecCoreData = (EFI_SEC_PEI_HAND_OFF *)Phase2Context->Context;
+    if ((UINTN)SecCoreData->TemporaryRamBase < BASE_128MB && IsHostAttached ()) {
+      SetDebugFlag (DEBUG_AGENT_FLAG_MEMORY_READY, 1);
+      TriggerSoftInterrupt (MEMORY_READY_SIGNATURE);
+    }
+    //
+    // Enable CPU interrupts so debug timer interrupts can be delivered
+    //
+    EnableInterrupts ();
+    //
+    // Call continuation function if it is not NULL.
+    //
     Phase2Context->Function (Phase2Context->Context);
   }
 }

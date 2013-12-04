@@ -22,6 +22,7 @@
 #include "DebugAgent.h"
 
 typedef struct {
+  UINT32                  InitFlag;
   VOID                    *Context;
   DEBUG_AGENT_CONTINUE    Function;
 } DEBUG_AGENT_PHASE2_CONTEXT;
