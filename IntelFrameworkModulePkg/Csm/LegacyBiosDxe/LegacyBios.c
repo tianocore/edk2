@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -28,6 +28,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //  protocol you are not required to dynamically allocate the PrivateData.
 //
 LEGACY_BIOS_INSTANCE  mPrivateData;
+
+//
+// The SMBIOS table in EfiRuntimeServicesData memory
+//
+VOID                  *mRuntimeSmbiosEntryPoint = NULL;
+
+//
+// The SMBIOS table in EfiReservedMemoryType memory
+//
+EFI_PHYSICAL_ADDRESS  mReserveSmbiosEntryPoint = 0;
+EFI_PHYSICAL_ADDRESS  mStructureTableAddress   = 0;
+UINTN                 mStructureTablePages     = 0;
 
 /**
   Do an AllocatePages () of type AllocateMaxAddress for EfiBootServicesCode
@@ -662,6 +674,98 @@ GetPciInterfaceVersion (
 }
 
 /**
+  Callback function to calculate SMBIOS table size, and allocate memory for SMBIOS table.
+  SMBIOS table will be copied into EfiReservedMemoryType memory in legacy boot path.
+
+  @param  Event                 Event whose notification function is being invoked.
+  @param  Context               The pointer to the notification function's context,
+                                which is implementation-dependent.
+
+**/
+VOID
+EFIAPI
+InstallSmbiosEventCallback (
+  IN EFI_EVENT                Event,
+  IN VOID                     *Context
+  )
+{
+  EFI_STATUS                  Status;
+  SMBIOS_TABLE_ENTRY_POINT    *EntryPointStructure;
+  
+  //
+  // Get SMBIOS table from EFI configuration table
+  //
+  Status = EfiGetSystemConfigurationTable (
+            &gEfiSmbiosTableGuid,
+            &mRuntimeSmbiosEntryPoint
+            );
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+  
+  EntryPointStructure = (SMBIOS_TABLE_ENTRY_POINT *) mRuntimeSmbiosEntryPoint;
+
+  //
+  // Allocate memory for SMBIOS Entry Point Structure.
+  // CSM framework spec requires SMBIOS table below 4GB in EFI_TO_COMPATIBILITY16_BOOT_TABLE.
+  //
+  if (mReserveSmbiosEntryPoint == 0) {
+    //
+    // Entrypoint structure with fixed size is allocated only once.
+    //
+    mReserveSmbiosEntryPoint = SIZE_4GB - 1;
+    Status = gBS->AllocatePages (
+                    AllocateMaxAddress,
+                    EfiReservedMemoryType,
+                    EFI_SIZE_TO_PAGES ((UINTN) (EntryPointStructure->EntryPointLength)),
+                    &mReserveSmbiosEntryPoint
+                    );
+    if (EFI_ERROR (Status)) {
+      mReserveSmbiosEntryPoint = 0;
+      return;
+    }
+    DEBUG ((EFI_D_INFO, "Allocate memory for Smbios Entry Point Structure\n"));
+  }
+  
+  if ((mStructureTableAddress != 0) && 
+      (mStructureTablePages < (UINTN) EFI_SIZE_TO_PAGES (EntryPointStructure->TableLength))) {
+    //
+    // If original buffer is not enough for the new SMBIOS table, free original buffer and re-allocate
+    //
+    gBS->FreePages (mStructureTableAddress, mStructureTablePages);
+    mStructureTableAddress = 0;
+    mStructureTablePages   = 0;
+    DEBUG ((EFI_D_INFO, "Original size is not enough. Re-allocate the memory.\n"));
+  }
+  
+  if (mStructureTableAddress == 0) {
+    //
+    // Allocate reserved memory below 4GB.
+    // Smbios spec requires the structure table is below 4GB.
+    //
+    mStructureTableAddress = SIZE_4GB - 1;
+    mStructureTablePages   = EFI_SIZE_TO_PAGES (EntryPointStructure->TableLength);
+    Status = gBS->AllocatePages (
+                    AllocateMaxAddress,
+                    EfiReservedMemoryType,
+                    mStructureTablePages,
+                    &mStructureTableAddress
+                    );
+    if (EFI_ERROR (Status)) {
+      gBS->FreePages (
+        mReserveSmbiosEntryPoint, 
+        EFI_SIZE_TO_PAGES ((UINTN) (EntryPointStructure->EntryPointLength))
+        );
+      mReserveSmbiosEntryPoint = 0;
+      mStructureTableAddress   = 0;
+      mStructureTablePages     = 0;
+      return;
+    }
+    DEBUG ((EFI_D_INFO, "Allocate memory for Smbios Structure Table\n"));
+  }
+}
+
+/**
   Install Driver to produce Legacy BIOS protocol.
 
   @param  ImageHandle  Handle of driver image.
@@ -697,6 +801,7 @@ LegacyBiosInstall (
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR    Descriptor;
   UINT64                             Length;
   UINT8                              *SecureBoot;
+  EFI_EVENT                          InstallSmbiosEvent;
 
   //
   // Load this driver's image to memory
@@ -1009,6 +1114,24 @@ LegacyBiosInstall (
   // Save EFI value
   //
   Private->ThunkSeg = (UINT16) (EFI_SEGMENT (IntRedirCode));
+  
+  //
+  // Allocate reserved memory for SMBIOS table used in legacy boot if SMBIOS table exists
+  //
+  InstallSmbiosEventCallback (NULL, NULL);
+
+  //
+  // Create callback function to update the size of reserved memory after LegacyBiosDxe starts
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  InstallSmbiosEventCallback,
+                  NULL,
+                  &gEfiSmbiosTableGuid,
+                  &InstallSmbiosEvent
+                  );
+  ASSERT_EFI_ERROR (Status);  
 
   //
   // Make a new handle and install the protocol

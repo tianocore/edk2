@@ -19,6 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <FrameworkDxe.h>
 #include <IndustryStandard/Pci.h>
+#include <IndustryStandard/SmBios.h>
 
 #include <Guid/SmBios.h>
 #include <Guid/Acpi.h>

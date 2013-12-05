@@ -981,7 +981,7 @@ SmbiosCreateTable (
     PhysicalAddress = 0xffffffff;
     Status = gBS->AllocatePages (
                     AllocateMaxAddress,
-                    EfiReservedMemoryType,
+                    EfiRuntimeServicesData,
                     EFI_SIZE_TO_PAGES (EntryPointStructure->TableLength),
                     &PhysicalAddress
                     );
@@ -1093,7 +1093,7 @@ SmbiosDriverEntryPoint (
   PhysicalAddress = 0xffffffff;
   Status = gBS->AllocatePages (
                   AllocateMaxAddress,
-                  EfiReservedMemoryType,
+                  EfiRuntimeServicesData,
                   EFI_SIZE_TO_PAGES (sizeof (SMBIOS_TABLE_ENTRY_POINT)),
                   &PhysicalAddress
                   );
@@ -1101,7 +1101,7 @@ SmbiosDriverEntryPoint (
     DEBUG ((EFI_D_ERROR, "SmbiosDriverEntryPoint() could not allocate EntryPointStructure < 4GB\n"));
     Status = gBS->AllocatePages (
                     AllocateAnyPages,
-                    EfiReservedMemoryType,
+                    EfiRuntimeServicesData,
                     EFI_SIZE_TO_PAGES (sizeof (SMBIOS_TABLE_ENTRY_POINT)),
                     &PhysicalAddress
                     );
@@ -1127,7 +1127,7 @@ SmbiosDriverEntryPoint (
   PhysicalAddress = 0xffffffff;
   Status = gBS->AllocatePages (
                   AllocateMaxAddress,
-                  EfiReservedMemoryType,
+                  EfiRuntimeServicesData,
                   1,
                   &PhysicalAddress
                   );
