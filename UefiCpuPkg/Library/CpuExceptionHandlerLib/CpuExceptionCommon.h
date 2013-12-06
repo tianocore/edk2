@@ -115,7 +115,7 @@ FindModuleImageBase (
 /**
   Display CPU information.
 
-  @param InterruptType  Exception type.
+  @param ExceptionType  Exception type.
   @param SystemContext  Pointer to EFI_SYSTEM_CONTEXT.
 **/
 VOID
@@ -155,7 +155,7 @@ InitializeCpuExceptionHandlersWorker (
                                 previously installed.
   @retval EFI_UNSUPPORTED       The interrupt specified by InterruptType is not supported,
                                 or this function is not supported.
-*/
+**/
 EFI_STATUS
 RegisterCpuInterruptHandlerWorker (
   IN EFI_EXCEPTION_TYPE            InterruptType,

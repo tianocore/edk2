@@ -171,7 +171,7 @@ InitializeCpuInterruptHandlers (
                                 previously installed.
   @retval EFI_UNSUPPORTED       The interrupt specified by InterruptType is not supported,
                                 or this function is not supported.
-*/
+**/
 EFI_STATUS
 EFIAPI
 RegisterCpuInterruptHandler (

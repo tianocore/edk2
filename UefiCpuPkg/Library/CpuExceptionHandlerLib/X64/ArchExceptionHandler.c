@@ -103,7 +103,7 @@ ArchRestoreExceptionContext (
 }
 
 /**
-  Dump CPU content information.
+  Display CPU information.
 
   @param ExceptionType  Exception type.
   @param SystemContext  Pointer to EFI_SYSTEM_CONTEXT.

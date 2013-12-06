@@ -262,7 +262,7 @@ InitializeCpuExceptionHandlersWorker (
                                 previously installed.
   @retval EFI_UNSUPPORTED       The interrupt specified by InterruptType is not supported,
                                 or this function is not supported.
-*/
+**/
 EFI_STATUS
 RegisterCpuInterruptHandlerWorker (
   IN EFI_EXCEPTION_TYPE            InterruptType,
