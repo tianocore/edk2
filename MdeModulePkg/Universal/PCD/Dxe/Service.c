@@ -50,6 +50,7 @@ GetLocalTokenNumber (
   IN UINTN              TokenNumber
   )
 {
+  UINTN                 TmpTokenNumber;
   UINT32                *LocalTokenNumberTable;
   UINT32                LocalTokenNumber;
   UINTN                 Size;
@@ -62,6 +63,11 @@ GetLocalTokenNumber (
   //
   TokenNumber--;
 
+  //
+  // Backup the TokenNumber passed in as GetPtrTypeSize need the original TokenNumber
+  // 
+  TmpTokenNumber = TokenNumber;
+
   LocalTokenNumberTable  = IsPeiDb ? (UINT32 *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->LocalTokenNumberTableOffset) : 
                                      (UINT32 *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->LocalTokenNumberTableOffset);
   TokenNumber            = IsPeiDb ? TokenNumber : TokenNumber - mPeiLocalTokenCount;
@@ -72,7 +78,7 @@ GetLocalTokenNumber (
 
   if ((LocalTokenNumber & PCD_TYPE_SKU_ENABLED) == PCD_TYPE_SKU_ENABLED) {
     if (Size == 0) {
-      GetPtrTypeSize (TokenNumber, &MaxSize);
+      GetPtrTypeSize (TmpTokenNumber, &MaxSize);
     } else {
       MaxSize = Size;
     }
