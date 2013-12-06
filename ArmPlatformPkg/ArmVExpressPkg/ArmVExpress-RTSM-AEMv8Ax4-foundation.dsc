@@ -76,12 +76,8 @@
   gArmTokenSpaceGuid.PcdVFPEnabled|1
 
   # Stacks for MPCores in Secure World (No SRAM on foundation model, put in RAM at 64MB)
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0xA4009000
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0xA4008000
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecPrimaryStackSize|0x1000
-
-  # Stacks for MPCores in Monitor Mod (No SRAM on foundation model, put in RAM at 64MB)
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase|0xA4008000
-  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize|0x100
 
   # Stacks for MPCores in Normal World (No SRAM on foundation model, put in RAM at 64MB)
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0xA4000000
