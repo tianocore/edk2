@@ -21,6 +21,7 @@
   EXPORT  ArmPlatformPeiBootAction
   EXPORT  ArmPlatformGetCorePosition
   EXPORT  ArmPlatformIsPrimaryCore
+  EXPORT  ArmPlatformGetPrimaryCoreMpId
 
   PRESERVE8
   AREA    CTA15A7Helper, CODE, READONLY
@@ -68,6 +69,28 @@ ArmPlatformIsPrimaryCore FUNCTION
   cmp   r0, r1
   moveq r0, #1
   movne r0, #0
+  bx    lr
+  ENDFUNC
+
+//UINTN
+//ArmPlatformGetPrimaryCoreMpId (
+//  VOID
+//  );
+ArmPlatformGetPrimaryCoreMpId FUNCTION
+  // Extract cpu_id and cluster_id from ARM_SCC_CFGREG48
+  // with cpu_id[0:3] and cluster_id[4:7]
+  LoadConstantToReg (ARM_CTA15A7_SCC_CFGREG48, r0)
+  ldr   r0, [r0]
+  lsr   r0, #24
+
+  // Shift the SCC value to get the cluster ID at the offset #8
+  lsl   r1, r0, #4
+  and   r1, r1, #0xF00
+
+  // Keep only the cpu ID from the original SCC
+  and   r0, r0, #0x0F
+  // Add the Cluster ID to the Cpu ID
+  orr   r0, r0, r1
   bx    lr
   ENDFUNC
 

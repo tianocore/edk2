@@ -20,6 +20,9 @@
 
   EXPORT    ArmPlatformPeiBootAction
   EXPORT    ArmPlatformIsPrimaryCore
+  EXPORT    ArmPlatformGetPrimaryCoreMpId
+
+  IMPORT	ArmReadMpidr
 
   AREA BeagleBoardHelper, CODE, READONLY
 
@@ -35,6 +38,16 @@ ArmPlatformIsPrimaryCore FUNCTION
 
 ArmPlatformPeiBootAction FUNCTION
   bx    lr
+  ENDFUNC
+
+//UINTN
+//ArmPlatformGetPrimaryCoreMpId (
+//  VOID
+//  );
+ArmPlatformGetPrimaryCoreMpId FUNCTION
+  // The BeagleBoard is a uniprocessor platform. The MPIDR of primary core is
+  // always the MPIDR of the calling CPU.
+  b		ArmReadMpidr
   ENDFUNC
 
   END

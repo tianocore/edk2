@@ -49,7 +49,7 @@ ASM_PFX(ArmGetScuBaseAddress):
 //  VOID
 //  );
 ASM_PFX(ArmPlatformGetPrimaryCoreMpId):
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask, r0)
+  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCore, r0)
   ldr   r0, [r0]
   bx    lr
 

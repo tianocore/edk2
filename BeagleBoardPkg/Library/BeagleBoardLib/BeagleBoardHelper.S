@@ -18,7 +18,10 @@
 .align 2
 
 GCC_ASM_EXPORT(ArmPlatformIsPrimaryCore)
+GCC_ASM_EXPORT(ArmPlatformGetPrimaryCoreMpId)
 GCC_ASM_EXPORT(ArmPlatformPeiBootAction)
+
+GCC_ASM_IMPORT(ArmReadMpidr)
 
 //UINTN
 //ArmPlatformIsPrimaryCore (
@@ -31,5 +34,14 @@ ASM_PFX(ArmPlatformIsPrimaryCore):
 
 ASM_PFX(ArmPlatformPeiBootAction):
   bx    lr
+
+//UINTN
+//ArmPlatformGetPrimaryCoreMpId (
+//  VOID
+//  );
+ASM_PFX(ArmPlatformGetPrimaryCoreMpId):
+  // The BeagleBoard is a uniprocessor platform. The MPIDR of primary core is
+  // always the MPIDR of the calling CPU.
+  b	ASM_PFX(ArmReadMpidr)
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED 

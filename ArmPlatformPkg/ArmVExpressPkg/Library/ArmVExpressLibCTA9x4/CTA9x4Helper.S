@@ -19,6 +19,7 @@
 
 GCC_ASM_EXPORT(ArmPlatformPeiBootAction)
 GCC_ASM_EXPORT(ArmPlatformIsPrimaryCore)
+GCC_ASM_EXPORT(ArmPlatformGetPrimaryCoreMpId)
 GCC_ASM_EXPORT(ArmPlatformGetCorePosition)
 
 GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCore)
@@ -29,7 +30,7 @@ GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask)
 //  VOID
 //  );
 ASM_PFX(ArmPlatformGetPrimaryCoreMpId):
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask, r0)
+  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCore, r0)
   ldr   r0, [r0]
   bx    lr
 

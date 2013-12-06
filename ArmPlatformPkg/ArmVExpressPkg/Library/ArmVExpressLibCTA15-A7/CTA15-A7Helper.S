@@ -22,6 +22,7 @@
 GCC_ASM_EXPORT(ArmPlatformPeiBootAction)
 GCC_ASM_EXPORT(ArmPlatformGetCorePosition)
 GCC_ASM_EXPORT(ArmPlatformIsPrimaryCore)
+GCC_ASM_EXPORT(ArmPlatformGetPrimaryCoreMpId)
 
 ASM_PFX(ArmPlatformPeiBootAction):
   bx    lr
@@ -66,3 +67,23 @@ ASM_PFX(ArmPlatformIsPrimaryCore):
   movne r0, #0
   bx    lr
 
+//UINTN
+//ArmPlatformGetPrimaryCoreMpId (
+//  VOID
+//  );
+ASM_PFX(ArmPlatformGetPrimaryCoreMpId):
+  // Extract cpu_id and cluster_id from ARM_SCC_CFGREG48
+  // with cpu_id[0:3] and cluster_id[4:7]
+  LoadConstantToReg (ARM_CTA15A7_SCC_CFGREG48, r0)
+  ldr   r0, [r0]
+  lsr   r0, #24
+
+  // Shift the SCC value to get the cluster ID at the offset #8
+  lsl   r1, r0, #4
+  and   r1, r1, #0xF00
+
+  // Keep only the cpu ID from the original SCC
+  and   r0, r0, #0x0F
+  // Add the Cluster ID to the Cpu ID
+  orr   r0, r0, r1
+  bx    lr
