@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2012, ARM Limited. All rights reserved.
+//  Copyright (c) 2012-2013, ARM Limited. All rights reserved.
 //
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
@@ -21,10 +21,11 @@
   EXPORT  ArmPlatformStackSetPrimary
   EXPORT  ArmPlatformStackSetSecondary
 
+  IMPORT  ArmPlatformIsPrimaryCore
   IMPORT  ArmPlatformGetCorePosition
+  IMPORT  ArmPlatformGetPrimaryCoreMpId
 
   IMPORT  _gPcd_FixedAtBuild_PcdCoreCount
-  IMPORT  _gPcd_FixedAtBuild_PcdArmPrimaryCore
 
   PRESERVE8
   AREA    ArmPlatformStackLib, CODE, READONLY
@@ -37,14 +38,29 @@
 //  IN UINTN SecondaryStackSize
 //  );
 ArmPlatformStackSet FUNCTION
+  // Save parameters
+  mov   r6, r3
+  mov   r5, r2
+  mov   r4, r1
+  mov   r3, r0
+
+  // Save the Link register
+  mov   r7, lr
+
   // Identify Stack
-  // Mask for ClusterId|CoreId
-  LoadConstantToReg (0xFFFF, r4)
-  and	r1, r1, r4
-  // Is it the Primary Core ?
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCore, r4)
-  ldr	r4, [r4]
-  cmp   r1, r4
+  mov   r0, r1
+  bl    ArmPlatformIsPrimaryCore
+  cmp   r0, #1
+
+  // Restore parameters
+  mov   r0, r3
+  mov   r1, r4
+  mov   r2, r5
+  mov   r3, r6
+
+  // Restore the Link register
+  mov   lr, r7
+
   beq	ArmPlatformStackSetPrimary
   bne   ArmPlatformStackSetSecondary
   ENDFUNC
@@ -91,8 +107,7 @@ ArmPlatformStackSetSecondary FUNCTION
   mov	r5, r0
 
   // Get Primary Core Position
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCore, r0)
-  ldr	r0, [r0]
+  bl ArmPlatformGetPrimaryCoreMpId
   bl ArmPlatformGetCorePosition
 
   // Get Secondary Core Position. We should get consecutive secondary stack number from 1...(CoreCount-1)

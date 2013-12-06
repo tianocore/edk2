@@ -22,10 +22,11 @@ GCC_ASM_EXPORT(ArmPlatformStackSet)
 GCC_ASM_EXPORT(ArmPlatformStackSetPrimary)
 GCC_ASM_EXPORT(ArmPlatformStackSetSecondary)
 
+GCC_ASM_IMPORT(ArmPlatformIsPrimaryCore)
 GCC_ASM_IMPORT(ArmPlatformGetCorePosition)
+GCC_ASM_IMPORT(ArmPlatformGetPrimaryCoreMpId)
 
 GCC_ASM_IMPORT(gPcd_FixedAtBuild_PcdCoreCount)
-GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCore)
 
 //VOID
 //ArmPlatformStackSet (
@@ -35,14 +36,29 @@ GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCore)
 //  IN UINTN SecondaryStackSize
 //  );
 ASM_PFX(ArmPlatformStackSet):
+  // Save parameters
+  mov   r6, r3
+  mov   r5, r2
+  mov   r4, r1
+  mov   r3, r0
+
+  // Save the Link register
+  mov   r7, lr
+
   // Identify Stack
-  // Mask for ClusterId|CoreId
-  LoadConstantToReg (0xFFFF, r4)
-  and   r1, r1, r4
-  // Is it the Primary Core ?
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCore, r4)
-  ldr   r4, [r4]
-  cmp   r1, r4
+  mov   r0, r1
+  bl    ASM_PFX(ArmPlatformIsPrimaryCore)
+  cmp   r0, #1
+
+  // Restore parameters
+  mov   r0, r3
+  mov   r1, r4
+  mov   r2, r5
+  mov   r3, r6
+
+  // Restore the Link register
+  mov   lr, r7
+
   beq   ASM_PFX(ArmPlatformStackSetPrimary)
   bne   ASM_PFX(ArmPlatformStackSetSecondary)
 
@@ -87,8 +103,7 @@ ASM_PFX(ArmPlatformStackSetSecondary):
   mov   r5, r0
 
   // Get Primary Core Position
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCore, r0)
-  ldr   r0, [r0]
+  bl    ASM_PFX(ArmPlatformGetPrimaryCoreMpId)
   bl    ASM_PFX(ArmPlatformGetCorePosition)
 
   // Get Secondary Core Position. We should get consecutive secondary stack number from 1...(CoreCount-1)
