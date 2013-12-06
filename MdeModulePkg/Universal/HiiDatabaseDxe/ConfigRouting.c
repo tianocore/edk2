@@ -1432,13 +1432,11 @@ IsThisPackageList (
       // No matched varstore is found and directly return.
       //
       goto Done;
-      break;
 
     default:
       break;
     }
   }
-
 Done:
   if (HiiFormPackage != NULL) {
     FreePool (HiiFormPackage);
