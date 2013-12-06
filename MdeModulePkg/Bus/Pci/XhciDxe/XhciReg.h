@@ -198,8 +198,13 @@ typedef union {
 
 //
 //  Hub Class Feature Selector for Clear Port Feature Request
+//  It's the extension of hub class feature selector of USB 2.0 in USB 3.0 Spec.
+//  For more details, Please refer to USB 3.0 Spec Table 10-7.
 //
-#define Usb3PortBHPortResetChange          29
+typedef enum {
+  Usb3PortBHPortReset          = 28,
+  Usb3PortBHPortResetChange    = 29
+} XHC_PORT_FEATURE;
 
 //
 // Structure to map the hardware port states to the
