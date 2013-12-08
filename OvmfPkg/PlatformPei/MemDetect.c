@@ -83,11 +83,45 @@ GetSystemMemorySizeAbove4gb (
   return LShiftU64 (Size, 16);
 }
 
+/**
+  Publish PEI core memory
+
+  @return EFI_SUCCESS     The PEIM initialized successfully.
+
+**/
+EFI_STATUS
+PublishPeiMemory (
+  VOID
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_PHYSICAL_ADDRESS        MemoryBase;
+  UINT64                      MemorySize;
+  UINT64                      LowerMemorySize;
+
+  LowerMemorySize = GetSystemMemorySizeBelow4gb ();
+
+  MemoryBase = PcdGet32 (PcdOvmfMemFvBase) + PcdGet32 (PcdOvmfMemFvSize);
+  MemorySize = LowerMemorySize - MemoryBase;
+  if (MemorySize > SIZE_64MB) {
+    MemoryBase = LowerMemorySize - SIZE_64MB;
+    MemorySize = SIZE_64MB;
+  }
+
+  //
+  // Publish this memory to the PEI Core
+  //
+  Status = PublishSystemMemory(MemoryBase, MemorySize);
+  ASSERT_EFI_ERROR (Status);
+
+  return Status;
+}
+
 
 /**
   Peform Memory Detection
 
-  @return EFI_SUCCESS     The PEIM initialized successfully.
+  @return Top of memory
 
 **/
 EFI_PHYSICAL_ADDRESS

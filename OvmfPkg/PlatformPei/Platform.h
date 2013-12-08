@@ -57,6 +57,11 @@ AddUntestedMemoryRangeHob (
   EFI_PHYSICAL_ADDRESS        MemoryLimit
   );
 
+EFI_STATUS
+PublishPeiMemory (
+  VOID
+  );
+
 EFI_PHYSICAL_ADDRESS
 MemDetect (
   VOID
