@@ -65,6 +65,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
   gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress
 
 [Ppis]

@@ -412,13 +412,20 @@ InitializePlatform (
   EFI_PHYSICAL_ADDRESS  TopOfMemory;
   UINT32 XenLeaf;
 
+  TopOfMemory = 0;
+
   DEBUG ((EFI_D_ERROR, "Platform PEIM Loaded\n"));
 
   DebugDumpCmos ();
 
   XenLeaf = XenDetect ();
 
-  TopOfMemory = MemDetect ();
+  if (XenLeaf != 0) {
+    PublishPeiMemory ();
+    PcdSetBool (PcdPciDisableBusEnumeration, TRUE);
+  } else {
+    TopOfMemory = MemDetect ();
+  }
 
   if (XenLeaf != 0) {
     DEBUG ((EFI_D_INFO, "Xen was detected\n"));
@@ -429,7 +436,11 @@ InitializePlatform (
 
   PeiFvInitialization ();
 
-  MemMapInitialization (TopOfMemory);
+  if (XenLeaf != 0) {
+    XenMemMapInitialization ();
+  } else {
+    MemMapInitialization (TopOfMemory);
+  }
 
   MiscInitialization ();
 
