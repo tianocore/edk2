@@ -119,19 +119,9 @@ XenDetect (
 **/
 EFI_STATUS
 InitializeXen (
-  VOID
+  UINT32 XenLeaf
   )
 {
-  UINT32 XenLeaf;
-
-  XenLeaf = XenDetect ();
-
-  if (XenLeaf == 0) {
-    return EFI_NOT_FOUND;
-  }
-
-  DEBUG ((EFI_D_INFO, "Xen was detected\n"));
-
   XenConnect (XenLeaf);
 
   //

@@ -338,14 +338,20 @@ InitializePlatform (
   )
 {
   EFI_PHYSICAL_ADDRESS  TopOfMemory;
+  UINT32 XenLeaf;
 
   DEBUG ((EFI_D_ERROR, "Platform PEIM Loaded\n"));
 
   DebugDumpCmos ();
 
+  XenLeaf = XenDetect ();
+
   TopOfMemory = MemDetect ();
 
-  InitializeXen ();
+  if (XenLeaf != 0) {
+    DEBUG ((EFI_D_INFO, "Xen was detected\n"));
+    InitializeXen (XenLeaf);
+  }
 
   ReserveEmuVariableNvStore ();
 

@@ -69,6 +69,11 @@ PeiFvInitialization (
 
 EFI_STATUS
 InitializeXen (
+  UINT32 XenLeaf
+  );
+
+UINT32
+XenDetect (
   VOID
   );
 
