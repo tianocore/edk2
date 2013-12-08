@@ -34,6 +34,10 @@
 #include <Guid/MemoryTypeInformation.h>
 #include <Ppi/MasterBootMode.h>
 #include <IndustryStandard/Pci22.h>
+#include <Guid/XenInfo.h>
+#include <IndustryStandard/E820.h>
+#include <Library/ResourcePublicationLib.h>
+#include <Library/MtrrLib.h>
 
 #include "Platform.h"
 #include "Cmos.h"
@@ -161,6 +165,74 @@ AddUntestedMemoryRangeHob (
   )
 {
   AddUntestedMemoryBaseSizeHob (MemoryBase, (UINT64)(MemoryLimit - MemoryBase));
+}
+
+VOID
+XenMemMapInitialization (
+  VOID
+  )
+{
+  EFI_E820_ENTRY64 *E820Map;
+  UINT32 E820EntriesCount;
+  EFI_STATUS Status;
+
+  DEBUG ((EFI_D_INFO, "Using memory map provided by Xen\n"));
+
+  //
+  // Create Memory Type Information HOB
+  //
+  BuildGuidDataHob (
+    &gEfiMemoryTypeInformationGuid,
+    mDefaultMemoryTypeInformation,
+    sizeof(mDefaultMemoryTypeInformation)
+    );
+
+  //
+  // Add PCI IO Port space available for PCI resource allocations.
+  //
+  BuildResourceDescriptorHob (
+    EFI_RESOURCE_IO,
+    EFI_RESOURCE_ATTRIBUTE_PRESENT     |
+    EFI_RESOURCE_ATTRIBUTE_INITIALIZED,
+    0xC000,
+    0x4000
+    );
+
+  //
+  // Video memory + Legacy BIOS region
+  //
+  AddIoMemoryRangeHob (0x0A0000, BASE_1MB);
+
+  //
+  // Parse RAM in E820 map
+  //
+  Status = XenGetE820Map(&E820Map, &E820EntriesCount);
+
+  ASSERT_EFI_ERROR (Status);
+
+  if (E820EntriesCount > 0) {
+    EFI_E820_ENTRY64 *Entry;
+    UINT32 Loop;
+
+    for (Loop = 0; Loop < E820EntriesCount; Loop++) {
+      Entry = E820Map + Loop;
+
+      //
+      // Only care about RAM
+      //
+      if (Entry->Type != EfiAcpiAddressRangeMemory) {
+        continue;
+      }
+
+      if (Entry->BaseAddr >= BASE_4GB) {
+        AddUntestedMemoryBaseSizeHob (Entry->BaseAddr, Entry->Length);
+      } else {
+        AddMemoryBaseSizeHob (Entry->BaseAddr, Entry->Length);
+      }
+
+      MtrrSetMemoryAttribute (Entry->BaseAddr, Entry->Length, CacheWriteBack);
+    }
+  }
 }
 
 
