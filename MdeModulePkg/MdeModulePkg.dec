@@ -878,6 +878,9 @@
   ## This PCD specified whether the S.M.A.R.T feature of attached ATA hard disks are enabled.
   gEfiMdeModulePkgTokenSpaceGuid.PcdAtaSmartEnable|TRUE|BOOLEAN|0x00010065
 
+  ## This PCD specifies whether full PCI enumeration is disabled.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|FALSE|BOOLEAN|0x10000048
+
 [PcdsPatchableInModule]
   ## Specify  memory size with page number for PEI code when 
   #  the feature of Loading Module at Fixed Address is enabled

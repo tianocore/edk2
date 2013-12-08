@@ -108,6 +108,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSupport
   gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport
   gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
 
 # [Event]
 #   ##
