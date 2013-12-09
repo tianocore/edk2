@@ -2548,12 +2548,12 @@ UiDisplayMenu (
         // If the screen has no menu items, and the user didn't select UiReset
         // ignore the selection and go back to reading keys.
         //
+        ASSERT(MenuOption != NULL);
         if(IsListEmpty (&gMenuOption) || MenuOption->GrayOut || MenuOption->ReadOnly) {
           ControlFlag = CfReadKey;
           break;
         }
 
-        ASSERT(MenuOption != NULL);
         Statement = MenuOption->ThisTag;
         if ((Statement->OpCode->OpCode == EFI_IFR_DATE_OP)
           || (Statement->OpCode->OpCode == EFI_IFR_TIME_OP)
@@ -2736,7 +2736,8 @@ UiDisplayMenu (
 
     case CfUiHotKey:
       ControlFlag = CfRepaint;
-      
+
+      ASSERT (HotKey != NULL);
       gUserInput->Action = HotKey->Action;
       ControlFlag = CfExit;
       break;
