@@ -3296,6 +3296,10 @@ ShellPromptForResponse (
       //
       *Resp = ShellPromptResponseMax;
       while (*Resp == ShellPromptResponseMax) {
+        if (ShellGetExecutionBreakFlag()) {
+          Status = EFI_ABORTED;
+          break;
+        }
         gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
         Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
         ASSERT_EFI_ERROR(Status);
@@ -3324,6 +3328,10 @@ ShellPromptForResponse (
       //
       *Resp = ShellPromptResponseMax;
       while (*Resp == ShellPromptResponseMax) {
+        if (ShellGetExecutionBreakFlag()) {
+          Status = EFI_ABORTED;
+          break;
+        }
         gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
         Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
         ASSERT_EFI_ERROR(Status);
@@ -3358,6 +3366,10 @@ ShellPromptForResponse (
       //
       *Resp = ShellPromptResponseMax;
       while (*Resp == ShellPromptResponseMax) {
+        if (ShellGetExecutionBreakFlag()) {
+          Status = EFI_ABORTED;
+          break;
+        }
         gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
         if (Type == ShellPromptResponseTypeEnterContinue) {
           Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
@@ -3385,6 +3397,10 @@ ShellPromptForResponse (
       //
       *Resp = ShellPromptResponseMax;
       while (*Resp == ShellPromptResponseMax) {
+        if (ShellGetExecutionBreakFlag()) {
+          Status = EFI_ABORTED;
+          break;
+        }
         gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
         Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
         ASSERT_EFI_ERROR(Status);
@@ -3406,6 +3422,10 @@ ShellPromptForResponse (
         ShellPrintEx(-1, -1, L"%s", Prompt);
       }
       while(1) {
+        if (ShellGetExecutionBreakFlag()) {
+          Status = EFI_ABORTED;
+          break;
+        }
         gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
         Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
         ASSERT_EFI_ERROR(Status);
@@ -3419,6 +3439,7 @@ ShellPromptForResponse (
       break;
     //
     // This is the location to add new prompt types.
+    // If your new type loops remember to add ExecutionBreak support.
     //
     default:
       ASSERT(FALSE);
