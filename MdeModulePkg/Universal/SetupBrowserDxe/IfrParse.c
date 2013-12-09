@@ -379,12 +379,18 @@ FindStorageInList (
   Link  = GetFirstNode (&gBrowserStorageList);
   while (!IsNull (&gBrowserStorageList, Link)) {
     BrowserStorage = BROWSER_STORAGE_FROM_LINK (Link);
+    Link = GetNextNode (&gBrowserStorageList, Link);
 
     if ((BrowserStorage->Type == StorageType) && CompareGuid (&BrowserStorage->Guid, StorageGuid)) {
-      if (StorageType == EFI_HII_VARSTORE_NAME_VALUE && BrowserStorage->HiiHandle == HiiHandle) {
-        return BrowserStorage;
+      if (StorageType == EFI_HII_VARSTORE_NAME_VALUE) {
+        if (BrowserStorage->HiiHandle == HiiHandle) {
+          return BrowserStorage;
+        }
+
+        continue;
       }
 
+      ASSERT (StorageName != NULL);
       if (StrCmp (BrowserStorage->Name, StorageName) == 0) {
         if (StorageType == EFI_HII_VARSTORE_EFI_VARIABLE || StorageType == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) {
           return BrowserStorage;
@@ -393,11 +399,6 @@ FindStorageInList (
         }
       }
     }
-
-    //
-    // Get Next Storage.
-    //
-    Link = GetNextNode (&gBrowserStorageList, Link);
   }
 
   return NULL;

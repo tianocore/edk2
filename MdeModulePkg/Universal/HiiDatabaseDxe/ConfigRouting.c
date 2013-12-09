@@ -1287,7 +1287,7 @@ IsThisVarstore (
   //
   // If ConfigHdr has name field and varstore not has name, return FALSE.
   //
-  if (Name == NULL && StrStr (ConfigHdr, L"NAME=&") == NULL) {
+  if (Name == NULL && ConfigHdr != NULL && StrStr (ConfigHdr, L"NAME=&") == NULL) {
     return FALSE;
   }
 
