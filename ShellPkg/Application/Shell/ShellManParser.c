@@ -492,19 +492,6 @@ ManFileFindTitleSection(
   StrCpy(TitleString, L".TH ");
   StrCat(TitleString, Command);
 
-  //
-  // If the "name" ends with .efi we can safely chop that off since "help foo.efi" and "help foo" 
-  // should produce the same results.
-  //
-  if ((StrLen(Command)> 4)
-    && (TitleString[StrLen(TitleString)-1] == L'i' || TitleString[StrLen(TitleString)-1] == L'I')
-    && (TitleString[StrLen(TitleString)-2] == L'f' || TitleString[StrLen(TitleString)-2] == L'F')
-    && (TitleString[StrLen(TitleString)-3] == L'e' || TitleString[StrLen(TitleString)-2] == L'E')
-    && (TitleString[StrLen(TitleString)-4] == L'.')
-    ) {
-    TitleString[StrLen(TitleString)-4] = CHAR_NULL;
-  }
-
   TitleLen = StrLen(TitleString);
   for (;!ShellFileHandleEof(Handle);Size = 1024) {
    Status = ShellFileHandleReadLine(Handle, ReadLine, &Size, TRUE, Ascii);
