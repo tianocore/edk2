@@ -92,7 +92,6 @@ CascadeDelete(
       if (!Quiet) {
         Status = ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN(STR_RM_LOG_DELETE_CONF), gShellLevel2HiiHandle, Node->FullName);
         Status = ShellPromptForResponse(ShellPromptResponseTypeYesNo, NULL, (VOID**)&Resp);
-        ASSERT_EFI_ERROR(Status);
         ASSERT(Resp != NULL);
         if (EFI_ERROR(Status) || *Resp != ShellPromptResponseYes) {
           SHELL_FREE_NON_NULL(Resp);
