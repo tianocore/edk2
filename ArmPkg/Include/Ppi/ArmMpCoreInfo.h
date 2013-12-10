@@ -13,7 +13,7 @@
 **/
 
 #ifndef __ARM_MP_CORE_INFO_PPI_H__
-#define __ARM_MP_CORE_INFO_PPI_H_
+#define __ARM_MP_CORE_INFO_PPI_H__
 
 #include <Guid/ArmMpCoreInfo.h>
 
