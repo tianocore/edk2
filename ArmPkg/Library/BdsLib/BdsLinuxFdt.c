@@ -25,7 +25,7 @@
 #define PALIGN(p, a)    ((void *)(ALIGN((unsigned long)(p), (a))))
 #define GET_CELL(p)     (p += 4, *((const UINT32 *)(p-4)))
 
-STATIC inline
+STATIC
 UINTN
 cpu_to_fdtn (UINTN x) {
   if (sizeof (UINTN) == sizeof (UINT32)) {

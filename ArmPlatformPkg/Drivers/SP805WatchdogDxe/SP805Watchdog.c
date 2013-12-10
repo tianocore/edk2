@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -36,7 +36,7 @@ EFI_EVENT                           EfiExitBootServicesEvent = (EFI_EVENT)NULL;
   i.e. it inhibits all writes to avoid rogue software accidentally
   corrupting their contents.
 **/
-inline
+STATIC
 VOID
 SP805Unlock (
   VOID
@@ -54,7 +54,7 @@ SP805Unlock (
   i.e. it inhibits all writes to avoid rogue software accidentally
   corrupting their contents.
 **/
-inline
+STATIC
 VOID
 SP805Lock (
   VOID
@@ -69,7 +69,7 @@ SP805Lock (
 /**
   Stop the SP805 watchdog timer from counting down by disabling interrupts.
 **/
-inline
+STATIC
 VOID
 SP805Stop (
   VOID
@@ -86,7 +86,7 @@ SP805Stop (
   The count down will start from the value stored in the Load register,
   not from the value where it was previously stopped.
 **/
-inline
+STATIC
 VOID
 SP805Start (
   VOID
