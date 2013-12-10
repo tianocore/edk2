@@ -19,7 +19,6 @@
 
 #include  <LibConfig.h>
 
-#include  <errno.h>
 #include  <wchar.h>
 
 /* Data initialized by the library constructor */
@@ -44,9 +43,7 @@ __wchar_construct(
     ASSERT(__wchar_bitmap != NULL);
     if (EFI_ERROR (Status)) {
       __wchar_bitmap = NULL;
-      EFIerrno = Status;
-      errno = ENOMEM;
-      return EFIerrno;
+      return Status;
     }
     return  RETURN_SUCCESS;
   }
