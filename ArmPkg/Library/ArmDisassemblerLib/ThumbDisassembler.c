@@ -773,17 +773,17 @@ DisassembleThumbInstruction (
       case LDM_REG_INDIRECT_LSL:
         // <rt>, [<rn>, <rm> {, LSL #<imm2>]}
         Offset += AsciiSPrint (&Buf[Offset], Size - Offset, " %a, [%a, %a", gReg[Rt], gReg[Rn], gReg[Rm]);
-        if (((OpCode32 >> 4) && 3) == 0) {
+        if (((OpCode32 >> 4) & 3) == 0) {
           AsciiSPrint (&Buf[Offset], Size - Offset, "]");
         } else {
-          AsciiSPrint (&Buf[Offset], Size - Offset, ", LSL #%d]", (OpCode32 >> 4) && 3);
+          AsciiSPrint (&Buf[Offset], Size - Offset, ", LSL #%d]", (OpCode32 >> 4) & 3);
         }
         return;
       
       case LDM_REG_IMM12:
         // <rt>, [<rn>, {, #<imm12>]}
         Offset += AsciiSPrint (&Buf[Offset], Size - Offset, " %a, [%a", gReg[Rt], gReg[Rn]);
-        if ((OpCode32 && 0xfff) == 0) {
+        if ((OpCode32 & 0xfff) == 0) {
           AsciiSPrint (&Buf[Offset], Size - Offset, "]");
         } else {
           AsciiSPrint (&Buf[Offset], Size - Offset, ", #0x%x]", OpCode32 & 0xfff);
@@ -797,7 +797,7 @@ DisassembleThumbInstruction (
         P = (OpCode32 & BIT10) == BIT10;
         Offset += AsciiSPrint (&Buf[Offset], Size - Offset, " %a, [%a", gReg[Rt], gReg[Rn]);
         if (P) {
-          if ((OpCode32 && 0xff) == 0) {
+          if ((OpCode32 & 0xff) == 0) {
             AsciiSPrint (&Buf[Offset], Size - Offset, "]%a", W?"!":"");
           } else {
             AsciiSPrint (&Buf[Offset], Size - Offset, ", #%a0x%x]%a", U?"":"-" , OpCode32 & 0xff, W?"!":"");
@@ -814,13 +814,13 @@ DisassembleThumbInstruction (
         W = (OpCode32 & BIT21) == BIT21;
         Offset += AsciiSPrint (&Buf[Offset], Size - Offset, " %a, %a, [%a", gReg[Rt], gReg[Rt2], gReg[Rn]);
         if (P) {
-          if ((OpCode32 && 0xff) == 0) {
+          if ((OpCode32 & 0xff) == 0) {
             AsciiSPrint (&Buf[Offset], Size - Offset, "]");
           } else {
             AsciiSPrint (&Buf[Offset], Size - Offset, ", #%a0x%x]%a", U?"":"-", (OpCode32 & 0xff) << 2, W?"!":"");
           }
         } else {
-          if ((OpCode32 && 0xff) != 0) {
+          if ((OpCode32 & 0xff) != 0) {
             AsciiSPrint (&Buf[Offset], Size - Offset, ", #%a0x%x", U?"":"-", (OpCode32 & 0xff) << 2);
           }
         }
