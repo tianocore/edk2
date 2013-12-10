@@ -1,7 +1,7 @@
 /** @file
   Implementation for iSCSI Boot Firmware Table publication.
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -359,9 +359,13 @@ IScsiFillNICAndTargetSections (
     Target->Port                = NvData->TargetPort;
 
     if (Attempt->AuthenticationType == ISCSI_AUTH_TYPE_CHAP) {
-      Target->CHAPType          = AuthConfig->CHAPType;
+      if (AuthConfig->CHAPType == ISCSI_CHAP_UNI) {
+        Target->CHAPType = EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_CHAP_TYPE_CHAP;
+      } else if (AuthConfig->CHAPType == ISCSI_CHAP_MUTUAL) {
+        Target->CHAPType = EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_CHAP_TYPE_MUTUAL_CHAP;
+      }
     } else if (Attempt->AuthenticationType == ISCSI_AUTH_TYPE_NONE) {
-      Target->CHAPType          = ISCSI_AUTH_TYPE_NONE;
+      Target->CHAPType = EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_CHAP_TYPE_NO_CHAP;
     }
 
     Target->NicIndex            = (UINT8) Index;
@@ -402,7 +406,7 @@ IScsiFillNICAndTargetSections (
       Target->CHAPSecretLength  = Length;
       Target->CHAPSecretOffset  = (UINT16) ((UINTN) *Heap - (UINTN) Table);
 
-      if (Target->CHAPType == ISCSI_CHAP_MUTUAL) {
+      if (Target->CHAPType == EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_CHAP_TYPE_MUTUAL_CHAP) {
         //
         // Reverse CHAP Name.
         //

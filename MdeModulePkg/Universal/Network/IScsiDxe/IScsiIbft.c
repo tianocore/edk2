@@ -349,8 +349,15 @@ IScsiFillNICAndTargetSections (
     Target->Header.Index        = (UINT8) Index;
     Target->Header.Flags        = EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_FLAG_BLOCK_VALID | EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_FLAG_BOOT_SELECTED;
     Target->Port                = SessionConfigData->NvData.TargetPort;
-    Target->CHAPType            = AuthConfig->CHAPType;
     Target->NicIndex            = (UINT8) Index;
+
+    if (AuthConfig->CHAPType == ISCSI_CHAP_NONE) {
+      Target->CHAPType = EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_CHAP_TYPE_NO_CHAP;
+    } if (AuthConfig->CHAPType == ISCSI_CHAP_UNI) {
+      Target->CHAPType = EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_CHAP_TYPE_CHAP;
+    } else if (AuthConfig->CHAPType == ISCSI_CHAP_MUTUAL) {
+      Target->CHAPType = EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_CHAP_TYPE_MUTUAL_CHAP;
+    }
 
     IScsiMapV4ToV6Addr (&SessionConfigData->NvData.TargetIp, &Target->Ip);
     CopyMem (Target->BootLun, SessionConfigData->NvData.BootLun, sizeof (Target->BootLun));
@@ -364,7 +371,7 @@ IScsiFillNICAndTargetSections (
     Target->IScsiNameLength = Length;
     Target->IScsiNameOffset = (UINT16) ((UINTN) *Heap - (UINTN) Table);
 
-    if (Target->CHAPType != ISCSI_CHAP_NONE) {
+    if (Target->CHAPType != EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_CHAP_TYPE_NO_CHAP) {
       //
       // CHAP Name
       //
@@ -381,7 +388,7 @@ IScsiFillNICAndTargetSections (
       Target->CHAPSecretLength  = Length;
       Target->CHAPSecretOffset  = (UINT16) ((UINTN) *Heap - (UINTN) Table);
 
-      if (Target->CHAPType == ISCSI_CHAP_MUTUAL) {
+      if (Target->CHAPType == EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_TARGET_STRUCTURE_CHAP_TYPE_MUTUAL_CHAP) {
         //
         // Reverse CHAP Name
         //
