@@ -930,6 +930,7 @@ I2cHostQueueRequest (
   I2C_HOST_CONTEXT  *I2cHostContext;
   BOOLEAN           FirstRequest;
   UINTN             RequestPacketSize;
+  UINTN             StartBit;
 
   SyncEvent    = NULL;
   FirstRequest = FALSE;
@@ -937,6 +938,27 @@ I2cHostQueueRequest (
 
   if (RequestPacket == NULL) {
     return EFI_INVALID_PARAMETER;
+  }
+  
+  if ((SlaveAddress & I2C_ADDRESSING_10_BIT) != 0) {
+    //
+    // 10-bit address, bits 0-9 are used for 10-bit I2C slave addresses,
+    // bits 10-30 are reserved bits and must be zero
+    //
+    StartBit = 10;
+  } else {
+    //
+    // 7-bit address, Bits 0-6 are used for 7-bit I2C slave addresses,
+    // bits 7-30 are reserved bits and must be zero
+    //
+    StartBit = 7;
+  }
+
+  if (BitFieldRead32 ((UINT32)SlaveAddress, StartBit, 30) != 0) {
+    //
+    // Reserved bit set in the SlaveAddress parameter
+    //
+    return EFI_NOT_FOUND;
   }
 
   I2cHostContext = I2C_HOST_CONTEXT_FROM_PROTOCOL (This);
