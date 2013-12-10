@@ -71,6 +71,34 @@ STATIC CONST CHAR16 mExecutableExtensions[] = L".NSH;.EFI";
 STATIC CONST CHAR16 mStartupScript[]        = L"startup.nsh";
 
 /**
+  Determine if a command line contains a valid split operation
+
+  @param[in] CmdLine      The command line to parse.
+
+  @retval TRUE            CmdLine has a valid split.
+  @retval FALSE           CmdLine does not have a valid split.
+**/
+BOOLEAN
+EFIAPI
+ContainsSplit(
+  IN CONST CHAR16 *CmdLine
+  )
+{
+  CONST CHAR16 *TempSpot;
+  TempSpot = NULL;
+  if (StrStr(CmdLine, L"|") != NULL) {
+    for (TempSpot = CmdLine ; TempSpot != NULL && *TempSpot != CHAR_NULL ; TempSpot++) {
+      if (*TempSpot == L'^' && *(TempSpot+1) == L'|') {
+        TempSpot++;
+      } else if (*TempSpot == L'|') {
+        break;
+      }
+    }
+  }
+  return (TempSpot != NULL && *TempSpot != CHAR_NULL);
+}
+
+/**
   Function to start monitoring for CTRL-S using SimpleTextInputEx.  This 
   feature's enabled state was not known when the shell initially launched.
 
@@ -1389,7 +1417,6 @@ RunCommand(
   SHELL_FILE_HANDLE         OriginalStdOut;
   SHELL_FILE_HANDLE         OriginalStdErr;
   SYSTEM_TABLE_INFO         OriginalSystemTableInfo;
-  CHAR16                    *TempLocation3;
   UINTN                     Count;
   UINTN                     Count2;
   CHAR16                    *CleanOriginal;
@@ -1494,17 +1521,7 @@ RunCommand(
   //
   // We dont do normal processing with a split command line (output from one command input to another)
   //
-  TempLocation3 = NULL;
-  if (StrStr(PostVariableCmdLine, L"|") != NULL) {
-    for (TempLocation3 = PostVariableCmdLine ; TempLocation3 != NULL && *TempLocation3 != CHAR_NULL ; TempLocation3++) {
-      if (*TempLocation3 == L'^' && *(TempLocation3+1) == L'|') {
-        TempLocation3++;
-      } else if (*TempLocation3 == L'|') {
-        break;
-      }
-    }
-  }
-  if (TempLocation3 != NULL && *TempLocation3 != CHAR_NULL) {
+  if (ContainsSplit(PostVariableCmdLine)) {
     //
     // are we in an existing split???
     //
