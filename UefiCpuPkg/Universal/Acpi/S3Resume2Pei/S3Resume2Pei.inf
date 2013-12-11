@@ -34,11 +34,11 @@
   S3Resume.c
 
 [Sources.IA32]
-  Ia32/AsmFuncs.asm  | MSFT
+  Ia32/AsmFuncs.asm
   Ia32/AsmFuncs.S    | GCC
 
 [Sources.X64]
-  X64/AsmFuncs.asm   | MSFT
+  X64/AsmFuncs.asm
   X64/AsmFuncs.S     | GCC
 
 [Packages]

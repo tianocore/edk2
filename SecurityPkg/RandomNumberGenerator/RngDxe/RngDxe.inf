@@ -42,12 +42,12 @@
 
 [Sources.IA32]
   IA32/RdRandWord.c
-  IA32/AsmRdRand.asm        | MSFT
+  IA32/AsmRdRand.asm
   IA32/GccRdRand.c          | GCC
 
 [Sources.X64]
   X64/RdRandWord.c
-  X64/AsmRdRand.asm         | MSFT
+  X64/AsmRdRand.asm
   X64/GccRdRand.c           | GCC
 
 [Packages]

@@ -42,14 +42,14 @@
 
 [Sources.Ia32]
   DebugAgentCommon/Ia32/AsmFuncs.S     | GCC
-  DebugAgentCommon/Ia32/AsmFuncs.asm   | MSFT
+  DebugAgentCommon/Ia32/AsmFuncs.asm
   DebugAgentCommon/Ia32/ArchDebugSupport.h
   DebugAgentCommon/Ia32/ArchDebugSupport.c
   DebugAgentCommon/Ia32/DebugException.h
 
 [Sources.X64]
   DebugAgentCommon/X64/AsmFuncs.S      | GCC
-  DebugAgentCommon/X64/AsmFuncs.asm    | MSFT
+  DebugAgentCommon/X64/AsmFuncs.asm
   DebugAgentCommon/X64/ArchDebugSupport.h
   DebugAgentCommon/X64/ArchDebugSupport.c
   DebugAgentCommon/X64/DebugException.h

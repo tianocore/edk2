@@ -33,12 +33,12 @@
 
 [Sources.IA32]
   Ia32/IntHandlerFuncs.c
-  Ia32/IntHandler.asm     | MSFT
+  Ia32/IntHandler.asm
   Ia32/IntHandler.S       | GCC
 
 [Sources.X64]
   X64/IntHandlerFuncs.c
-  X64/IntHandler.asm      | MSFT
+  X64/IntHandler.asm
   X64/IntHandler.S        | GCC
 
 [Packages]
