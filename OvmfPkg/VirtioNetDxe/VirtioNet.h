@@ -107,19 +107,19 @@ typedef struct {
 #define VIRTIO_NET_FROM_SNP(SnpPointer) \
         CR (SnpPointer, VNET_DEV, Snp, VNET_SIG)
 
-#define VIRTIO_CFG_WRITE(Dev, Field, Value)  (VirtioWriteDevice (       \
-                                                (Dev)->VirtIo,          \
-                                                OFFSET_OF_VNET (Field), \
-                                                SIZE_OF_VNET (Field),   \
-                                                (Value)                 \
+#define VIRTIO_CFG_WRITE(Dev, Field, Value)  ((Dev)->VirtIo->WriteDevice (  \
+                                                (Dev)->VirtIo,              \
+                                                OFFSET_OF_VNET (Field),     \
+                                                SIZE_OF_VNET (Field),       \
+                                                (Value)                     \
                                                 ))
 
-#define VIRTIO_CFG_READ(Dev, Field, Pointer) (VirtioReadDevice (        \
-                                                (Dev)->VirtIo,          \
-                                                OFFSET_OF_VNET (Field), \
-                                                SIZE_OF_VNET (Field),   \
-                                                sizeof *(Pointer),      \
-                                                (Pointer)               \
+#define VIRTIO_CFG_READ(Dev, Field, Pointer) ((Dev)->VirtIo->ReadDevice (   \
+                                                (Dev)->VirtIo,              \
+                                                OFFSET_OF_VNET (Field),     \
+                                                SIZE_OF_VNET (Field),       \
+                                                sizeof *(Pointer),          \
+                                                (Pointer)                   \
                                                 ))
 
 //

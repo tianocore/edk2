@@ -56,23 +56,23 @@
                        one of UINT8, UINT16, UINT32, UINT64.
 
 
-  @return  Status code returned by VirtioWriteDevice() / VirtioReadDevice().
+  @return  Status code returned by Virtio->WriteDevice() / Virtio->ReadDevice().
 
 **/
 
-#define VIRTIO_CFG_WRITE(Dev, Field, Value)  (VirtioWriteDevice (       \
-                                                (Dev)->VirtIo,          \
-                                                OFFSET_OF_VBLK (Field), \
-                                                SIZE_OF_VBLK (Field),   \
-                                                (Value)                 \
+#define VIRTIO_CFG_WRITE(Dev, Field, Value)  ((Dev)->VirtIo->WriteDevice ( \
+                                                (Dev)->VirtIo,             \
+                                                OFFSET_OF_VBLK (Field),    \
+                                                SIZE_OF_VBLK (Field),      \
+                                                (Value)                    \
                                                 ))
 
-#define VIRTIO_CFG_READ(Dev, Field, Pointer) (VirtioReadDevice (        \
-                                                (Dev)->VirtIo,          \
-                                                OFFSET_OF_VBLK (Field), \
-                                                SIZE_OF_VBLK (Field),   \
-                                                sizeof *(Pointer),      \
-                                                (Pointer)               \
+#define VIRTIO_CFG_READ(Dev, Field, Pointer) ((Dev)->VirtIo->ReadDevice (  \
+                                                (Dev)->VirtIo,             \
+                                                OFFSET_OF_VBLK (Field),    \
+                                                SIZE_OF_VBLK (Field),      \
+                                                sizeof *(Pointer),         \
+                                                (Pointer)                  \
                                                 ))
 
 
