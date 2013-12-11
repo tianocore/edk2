@@ -1,5 +1,4 @@
 /** @file
-
   Virtio Network Device specific type and macro definitions corresponding to
   the virtio-0.9.5 specification.
 
@@ -25,14 +24,13 @@
 //
 #pragma pack(1)
 typedef struct {
-  VIRTIO_HDR Generic;
-  UINT8      VhdrMac[6];
-  UINT16     VhdrLinkStatus;
-} VNET_HDR;
+  UINT8      Mac[6];
+  UINT16     LinkStatus;
+} VIRTIO_NET_CONFIG;
 #pragma pack()
 
-#define OFFSET_OF_VNET(Field) OFFSET_OF (VNET_HDR, Field)
-#define SIZE_OF_VNET(Field)   (sizeof ((VNET_HDR *) 0)->Field)
+#define OFFSET_OF_VNET(Field) OFFSET_OF (VIRTIO_NET_CONFIG, Field)
+#define SIZE_OF_VNET(Field)   (sizeof ((VIRTIO_NET_CONFIG *) 0)->Field)
 
 //
 // Queue Identifiers
@@ -91,7 +89,7 @@ typedef struct {
 #define VIRTIO_NET_HDR_GSO_ECN   BIT7
 
 //
-// Link Status Bits in VNET_HDR.VhdrLinkStatus
+// Link Status Bits in VIRTIO_NET_CONFIG.LinkStatus
 //
 #define VIRTIO_NET_S_LINK_UP  BIT0
 #define VIRTIO_NET_S_ANNOUNCE BIT1

@@ -63,7 +63,7 @@ VirtioNetShutdown (
     break;
   }
 
-  VIRTIO_CFG_WRITE (Dev, Generic.VhdrDeviceStatus, 0);
+  Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, 0);
   VirtioNetShutdownRx (Dev);
   VirtioNetShutdownTx (Dev);
   VirtioRingUninit (&Dev->TxRing);

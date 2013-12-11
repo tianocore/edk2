@@ -21,7 +21,6 @@
 #include <Protocol/BlockIo.h>
 #include <Protocol/ComponentName.h>
 #include <Protocol/DriverBinding.h>
-#include <Protocol/PciIo.h>
 
 #include <IndustryStandard/Virtio.h>
 
@@ -34,14 +33,13 @@ typedef struct {
   // at various call depths. The table to the right should make it easier to
   // track them.
   //
-  //                    field                     init function       init dpth
-  //                    ----------------------    ------------------  ---------
-  UINT32                Signature;             // DriverBindingStart  0
-  EFI_PCI_IO_PROTOCOL   *PciIo;                // DriverBindingStart  0
-  UINT64                OriginalPciAttributes; // DriverBindingStart  0
-  VRING                 Ring;                  // VirtioRingInit      2
-  EFI_BLOCK_IO_PROTOCOL BlockIo;               // VirtioBlkInit       1
-  EFI_BLOCK_IO_MEDIA    BlockIoMedia;          // VirtioBlkInit       1
+  //                     field                    init function       init dpth
+  //                     ---------------------    ------------------  ---------
+  UINT32                 Signature;            // DriverBindingStart  0
+  VIRTIO_DEVICE_PROTOCOL *VirtIo;              // DriverBindingStart  0
+  VRING                  Ring;                 // VirtioRingInit      2
+  EFI_BLOCK_IO_PROTOCOL  BlockIo;              // VirtioBlkInit       1
+  EFI_BLOCK_IO_MEDIA     BlockIoMedia;         // VirtioBlkInit       1
 } VBLK_DEV;
 
 #define VIRTIO_BLK_FROM_BLOCK_IO(BlockIoPointer) \
@@ -66,11 +64,6 @@ typedef struct {
       underlying device
     - 9 Driver Binding Protocol -- for exporting ourselves
 
-  Specs relevant in the specific sense:
-  - UEFI Spec 2.3.1 + Errata C, 13.4 EFI PCI I/O Protocol
-  - Driver Writer's Guide for UEFI 2.3.1 v1.01, 18 PCI Driver Design
-    Guidelines, 18.3 PCI drivers.
-
   @param[in]  This                The EFI_DRIVER_BINDING_PROTOCOL object
                                   incorporating this driver (independently of
                                   any device).
@@ -82,11 +75,10 @@ typedef struct {
 
   @retval EFI_SUCCESS      The driver supports the device being probed.
 
-  @retval EFI_UNSUPPORTED  Based on virtio-blk PCI discovery, we do not support
+  @retval EFI_UNSUPPORTED  Based on virtio-blk discovery, we do not support
                            the device.
 
-  @return                  Error codes from the OpenProtocol() boot service or
-                           the PciIo protocol.
+  @return                  Error codes from the OpenProtocol() boot service.
 
 **/
 
@@ -117,14 +109,14 @@ VirtioBlkDriverBindingSupported (
 
 
   @retval EFI_SUCCESS           Driver instance has been created and
-                                initialized  for the virtio-blk PCI device, it
+                                initialized  for the virtio-blk device, it
                                 is now accessibla via EFI_BLOCK_IO_PROTOCOL.
 
   @retval EFI_OUT_OF_RESOURCES  Memory allocation failed.
 
   @return                       Error codes from the OpenProtocol() boot
-                                service, the PciIo protocol, VirtioBlkInit(),
-                                or the InstallProtocolInterface() boot service.
+                                service, VirtioBlkInit(), or the
+                                InstallProtocolInterface() boot service.
 
 **/
 

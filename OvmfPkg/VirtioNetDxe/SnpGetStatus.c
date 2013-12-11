@@ -90,7 +90,7 @@ VirtioNetGetStatus (
   if (Dev->Snm.MediaPresentSupported) {
     UINT16 LinkStatus;
 
-    Status = VIRTIO_CFG_READ (Dev, VhdrLinkStatus, &LinkStatus);
+    Status = VIRTIO_CFG_READ (Dev, LinkStatus, &LinkStatus);
     if (EFI_ERROR (Status)) {
       goto Exit;
     }

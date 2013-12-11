@@ -17,17 +17,19 @@
 #ifndef _VIRTIO_LIB_H_
 #define _VIRTIO_LIB_H_
 
-#include <Protocol/PciIo.h>
+#include <Protocol/VirtioDevice.h>
+
 #include <IndustryStandard/Virtio.h>
 
 /**
 
-  Write a word into Region 0 of the device specified by PciIo.
+  Write a word into VirtIo Device Specific Region
 
-  Region 0 must be an iomem region. This is an internal function for the
-  driver-specific VIRTIO_CFG_WRITE() macros.
+  The VirtIo Device Specific Region must be an iomem region.
+  This is an internal function for the driver-specific VIRTIO_CFG_WRITE()
+  macros.
 
-  @param[in] PciIo        Target PCI device.
+  @param[in] VirtIo       Target Virtio device.
 
   @param[in] FieldOffset  Destination offset.
 
@@ -37,27 +39,28 @@
                           The least significant FieldSize bytes will be used.
 
 
-  @return  Status code returned by PciIo->Io.Write().
+  @return  Status code returned by VirtIo->WriteDevice().
 
 **/
 EFI_STATUS
 EFIAPI
-VirtioWrite (
-  IN EFI_PCI_IO_PROTOCOL *PciIo,
-  IN UINTN               FieldOffset,
-  IN UINTN               FieldSize,
-  IN UINT64              Value
+VirtioWriteDevice (
+  IN VIRTIO_DEVICE_PROTOCOL *VirtIo,
+  IN UINTN                  FieldOffset,
+  IN UINTN                  FieldSize,
+  IN UINT64                 Value
   );
 
 
 /**
 
-  Read a word from Region 0 of the device specified by PciIo.
+  Read a word from VirtIo Device Specific Region
 
-  Region 0 must be an iomem region. This is an internal function for the
-  driver-specific VIRTIO_CFG_READ() macros.
+  The VirtIo Device Specific Region must be an iomem region.
+  This is an internal function for the driver-specific VIRTIO_CFG_READ()
+  macros.
 
-  @param[in] PciIo        Source PCI device.
+  @param[in] VirtIo       Source Virtio device.
 
   @param[in] FieldOffset  Source offset.
 
@@ -69,17 +72,17 @@ VirtioWrite (
   @param[out] Buffer      Target buffer.
 
 
-  @return  Status code returned by PciIo->Io.Read().
+  @return  Status code returned by VirtIo->ReadDevice().
 
 **/
 EFI_STATUS
 EFIAPI
-VirtioRead (
-  IN  EFI_PCI_IO_PROTOCOL *PciIo,
-  IN  UINTN               FieldOffset,
-  IN  UINTN               FieldSize,
-  IN  UINTN               BufferSize,
-  OUT VOID                *Buffer
+VirtioReadDevice (
+  IN  VIRTIO_DEVICE_PROTOCOL *VirtIo,
+  IN  UINTN                  FieldOffset,
+  IN  UINTN                  FieldSize,
+  IN  UINTN                  BufferSize,
+  OUT VOID                   *Buffer
   );
 
 
@@ -218,7 +221,7 @@ VirtioAppendDesc (
   Notify the host about the descriptor chain just built, and wait until the
   host processes it.
 
-  @param[in] PciIo        The target virtio PCI device to notify.
+  @param[in] VirtIo       The target virtio device to notify.
 
   @param[in] VirtQueueId  Identifies the queue for the target device.
 
@@ -229,7 +232,7 @@ VirtioAppendDesc (
                           of the descriptor chain.
 
 
-  @return              Error code from VirtioWrite() if it fails.
+  @return              Error code from VirtIo->SetQueueNotify() if it fails.
 
   @retval EFI_SUCCESS  Otherwise, the host processed all descriptors.
 
@@ -237,10 +240,10 @@ VirtioAppendDesc (
 EFI_STATUS
 EFIAPI
 VirtioFlush (
-  IN     EFI_PCI_IO_PROTOCOL *PciIo,
-  IN     UINT16              VirtQueueId,
-  IN OUT VRING               *Ring,
-  IN     DESC_INDICES        *Indices
+  IN     VIRTIO_DEVICE_PROTOCOL *VirtIo,
+  IN     UINT16                 VirtQueueId,
+  IN OUT VRING                  *Ring,
+  IN     DESC_INDICES           *Indices
   );
 
 #endif // _VIRTIO_LIB_H_

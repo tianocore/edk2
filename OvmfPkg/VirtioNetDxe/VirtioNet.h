@@ -24,7 +24,6 @@
 #include <Protocol/ComponentName2.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/DriverBinding.h>
-#include <Protocol/PciIo.h>
 #include <Protocol/SimpleNetwork.h>
 
 #define VNET_SIG SIGNATURE_32 ('V', 'N', 'E', 'T')
@@ -75,8 +74,7 @@ typedef struct {
   //                          field              init function
   //                          ------------------ ------------------------------
   UINT32                      Signature;         // VirtioNetDriverBindingStart
-  EFI_PCI_IO_PROTOCOL         *PciIo;            // VirtioNetDriverBindingStart
-  UINT64                      OrigPciAttributes; // VirtioNetDriverBindingStart
+  VIRTIO_DEVICE_PROTOCOL      *VirtIo;           // VirtioNetDriverBindingStart
   EFI_SIMPLE_NETWORK_PROTOCOL Snp;               // VirtioNetSnpPopulate
   EFI_SIMPLE_NETWORK_MODE     Snm;               // VirtioNetSnpPopulate
   EFI_EVENT                   ExitBoot;          // VirtioNetSnpPopulate
@@ -109,15 +107,15 @@ typedef struct {
 #define VIRTIO_NET_FROM_SNP(SnpPointer) \
         CR (SnpPointer, VNET_DEV, Snp, VNET_SIG)
 
-#define VIRTIO_CFG_WRITE(Dev, Field, Value)  (VirtioWrite (             \
-                                                (Dev)->PciIo,           \
+#define VIRTIO_CFG_WRITE(Dev, Field, Value)  (VirtioWriteDevice (       \
+                                                (Dev)->VirtIo,          \
                                                 OFFSET_OF_VNET (Field), \
                                                 SIZE_OF_VNET (Field),   \
                                                 (Value)                 \
                                                 ))
 
-#define VIRTIO_CFG_READ(Dev, Field, Pointer) (VirtioRead (              \
-                                                (Dev)->PciIo,           \
+#define VIRTIO_CFG_READ(Dev, Field, Pointer) (VirtioReadDevice (        \
+                                                (Dev)->VirtIo,          \
                                                 OFFSET_OF_VNET (Field), \
                                                 SIZE_OF_VNET (Field),   \
                                                 sizeof *(Pointer),      \

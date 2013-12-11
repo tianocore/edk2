@@ -23,7 +23,6 @@
 
 **/
 
-#include <IndustryStandard/Pci.h>
 #include <IndustryStandard/VirtioBlk.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
@@ -37,14 +36,14 @@
 /**
 
   Convenience macros to read and write region 0 IO space elements of the
-  virtio-blk PCI device, for configuration purposes.
+  virtio-blk device, for configuration purposes.
 
   The following macros make it possible to specify only the "core parameters"
   for such accesses and to derive the rest. By the time VIRTIO_CFG_WRITE()
   returns, the transaction will have been completed.
 
-  @param[in] Dev       Pointer to the VBLK_DEV structure whose PCI IO space
-                       we're accessing. Dev->PciIo must be valid.
+  @param[in] Dev       Pointer to the VBLK_DEV structure whose VirtIo space
+                       we're accessing. Dev->VirtIo must be valid.
 
   @param[in] Field     A field name from VBLK_HDR, identifying the virtio-blk
                        configuration item to access.
@@ -57,19 +56,19 @@
                        one of UINT8, UINT16, UINT32, UINT64.
 
 
-  @return  Status code returned by VirtioWrite() / VirtioRead().
+  @return  Status code returned by VirtioWriteDevice() / VirtioReadDevice().
 
 **/
 
-#define VIRTIO_CFG_WRITE(Dev, Field, Value)  (VirtioWrite (             \
-                                                (Dev)->PciIo,           \
+#define VIRTIO_CFG_WRITE(Dev, Field, Value)  (VirtioWriteDevice (       \
+                                                (Dev)->VirtIo,          \
                                                 OFFSET_OF_VBLK (Field), \
                                                 SIZE_OF_VBLK (Field),   \
                                                 (Value)                 \
                                                 ))
 
-#define VIRTIO_CFG_READ(Dev, Field, Pointer) (VirtioRead (              \
-                                                (Dev)->PciIo,           \
+#define VIRTIO_CFG_READ(Dev, Field, Pointer) (VirtioReadDevice (        \
+                                                (Dev)->VirtIo,          \
                                                 OFFSET_OF_VBLK (Field), \
                                                 SIZE_OF_VBLK (Field),   \
                                                 sizeof *(Pointer),      \
@@ -229,7 +228,7 @@ VerifyReadWriteRequest (
 
   @retval EFI_SUCCESS          Transfer complete.
 
-  @retval EFI_DEVICE_ERROR     Failed to notify host side via PCI write, or
+  @retval EFI_DEVICE_ERROR     Failed to notify host side via VirtIo write, or
                                unable to parse host response, or host response
                                is not VIRTIO_BLK_S_OK.
 
@@ -324,7 +323,7 @@ SynchronousRequest (
   //
   // virtio-blk's only virtqueue is #0, called "requestq" (see Appendix D).
   //
-  if (VirtioFlush (Dev->PciIo, 0, &Dev->Ring, &Indices) == EFI_SUCCESS &&
+  if (VirtioFlush (Dev->VirtIo, 0, &Dev->Ring, &Indices) == EFI_SUCCESS &&
       HostStatus == VIRTIO_BLK_S_OK) {
     return EFI_SUCCESS;
   }
@@ -500,11 +499,6 @@ VirtioBlkFlushBlocks (
       underlying device
     - 9 Driver Binding Protocol -- for exporting ourselves
 
-  Specs relevant in the specific sense:
-  - UEFI Spec 2.3.1 + Errata C, 13.4 EFI PCI I/O Protocol
-  - Driver Writer's Guide for UEFI 2.3.1 v1.01, 18 PCI Driver Design
-    Guidelines, 18.3 PCI drivers.
-
   @param[in]  This                The EFI_DRIVER_BINDING_PROTOCOL object
                                   incorporating this driver (independently of
                                   any device).
@@ -516,11 +510,11 @@ VirtioBlkFlushBlocks (
 
   @retval EFI_SUCCESS      The driver supports the device being probed.
 
-  @retval EFI_UNSUPPORTED  Based on virtio-blk PCI discovery, we do not support
+  @retval EFI_UNSUPPORTED  Based on virtio-blk discovery, we do not support
                            the device.
 
   @return                  Error codes from the OpenProtocol() boot service or
-                           the PciIo protocol.
+                           the VirtIo protocol.
 
 **/
 
@@ -533,56 +527,36 @@ VirtioBlkDriverBindingSupported (
   )
 {
   EFI_STATUS          Status;
-  EFI_PCI_IO_PROTOCOL *PciIo;
-  PCI_TYPE00          Pci;
+  VIRTIO_DEVICE_PROTOCOL *VirtIo;
 
   //
-  // Attempt to open the device with the PciIo set of interfaces. On success,
-  // the protocol is "instantiated" for the PCI device. Covers duplicate open
+  // Attempt to open the device with the VirtIo set of interfaces. On success,
+  // the protocol is "instantiated" for the VirtIo device. Covers duplicate open
   // attempts (EFI_ALREADY_STARTED).
   //
   Status = gBS->OpenProtocol (
                   DeviceHandle,               // candidate device
-                  &gEfiPciIoProtocolGuid,     // for generic PCI access
-                  (VOID **)&PciIo,            // handle to instantiate
+                  &gVirtioDeviceProtocolGuid, // for generic VirtIo access
+                  (VOID **)&VirtIo,           // handle to instantiate
                   This->DriverBindingHandle,  // requestor driver identity
                   DeviceHandle,               // ControllerHandle, according to
                                               // the UEFI Driver Model
-                  EFI_OPEN_PROTOCOL_BY_DRIVER // get exclusive PciIo access to
+                  EFI_OPEN_PROTOCOL_BY_DRIVER // get exclusive VirtIo access to
                                               // the device; to be released
                   );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  //
-  // Read entire PCI configuration header for more extensive check ahead.
-  //
-  Status = PciIo->Pci.Read (
-                        PciIo,                        // (protocol, device)
-                                                      // handle
-                        EfiPciIoWidthUint32,          // access width & copy
-                                                      // mode
-                        0,                            // Offset
-                        sizeof Pci / sizeof (UINT32), // Count
-                        &Pci                          // target buffer
-                        );
-
-  if (Status == EFI_SUCCESS) {
-    //
-    // virtio-0.9.5, 2.1 PCI Discovery
-    //
-    Status = (Pci.Hdr.VendorId == 0x1AF4 &&
-              Pci.Hdr.DeviceId >= 0x1000 && Pci.Hdr.DeviceId <= 0x103F &&
-              Pci.Hdr.RevisionID == 0x00 &&
-              Pci.Device.SubsystemID == VIRTIO_SUBSYSTEM_BLOCK_DEVICE) ? EFI_SUCCESS : EFI_UNSUPPORTED;
+  if (VirtIo->SubSystemDeviceId != VIRTIO_SUBSYSTEM_BLOCK_DEVICE) {
+    Status = EFI_UNSUPPORTED;
   }
 
   //
-  // We needed PCI IO access only transitorily, to see whether we support the
+  // We needed VirtIo access only transitorily, to see whether we support the
   // device or not.
   //
-  gBS->CloseProtocol (DeviceHandle, &gEfiPciIoProtocolGuid,
+  gBS->CloseProtocol (DeviceHandle, &gVirtioDeviceProtocolGuid,
          This->DriverBindingHandle, DeviceHandle);
   return Status;
 }
@@ -594,8 +568,8 @@ VirtioBlkDriverBindingSupported (
   device.
 
   @param[in out] Dev  The driver instance to configure. The caller is
-                      responsible for Dev->PciIo's validity (ie. working IO
-                      access to the underlying virtio-blk PCI device).
+                      responsible for Dev->VirtIo's validity (ie. working IO
+                      access to the underlying virtio-blk device).
 
   @retval EFI_SUCCESS      Setup complete.
 
@@ -626,19 +600,27 @@ VirtioBlkInit (
   // Execute virtio-0.9.5, 2.2.1 Device Initialization Sequence.
   //
   NextDevStat = 0;             // step 1 -- reset device
-  Status = VIRTIO_CFG_WRITE (Dev, Generic.VhdrDeviceStatus, NextDevStat);
+  Status = Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, NextDevStat);
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
 
   NextDevStat |= VSTAT_ACK;    // step 2 -- acknowledge device presence
-  Status = VIRTIO_CFG_WRITE (Dev, Generic.VhdrDeviceStatus, NextDevStat);
+  Status = Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, NextDevStat);
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
 
   NextDevStat |= VSTAT_DRIVER; // step 3 -- we know how to drive it
-  Status = VIRTIO_CFG_WRITE (Dev, Generic.VhdrDeviceStatus, NextDevStat);
+  Status = Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, NextDevStat);
+  if (EFI_ERROR (Status)) {
+    goto Failed;
+  }
+
+  //
+  // Set Page Size - MMIO VirtIo Specific
+  //
+  Status = Dev->VirtIo->SetPageSize (Dev->VirtIo, EFI_PAGE_SIZE);
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
@@ -646,11 +628,12 @@ VirtioBlkInit (
   //
   // step 4a -- retrieve and validate features
   //
-  Status = VIRTIO_CFG_READ (Dev, Generic.VhdrDeviceFeatureBits, &Features);
+  Status = Dev->VirtIo->GetDeviceFeatures (Dev->VirtIo, &Features);
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
-  Status = VIRTIO_CFG_READ (Dev, VhdrCapacity, &NumSectors);
+
+  Status = VIRTIO_CFG_READ (Dev, Capacity, &NumSectors);
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
@@ -660,7 +643,7 @@ VirtioBlkInit (
   }
 
   if (Features & VIRTIO_BLK_F_BLK_SIZE) {
-    Status = VIRTIO_CFG_READ (Dev, VhdrBlkSize, &BlockSize);
+    Status = VIRTIO_CFG_READ (Dev, BlkSize, &BlockSize);
     if (EFI_ERROR (Status)) {
       goto Failed;
     }
@@ -681,11 +664,11 @@ VirtioBlkInit (
   //
   // step 4b -- allocate virtqueue
   //
-  Status = VIRTIO_CFG_WRITE (Dev, Generic.VhdrQueueSelect, 0);
+  Status = Dev->VirtIo->SetQueueSel (Dev->VirtIo, 0);
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
-  Status = VIRTIO_CFG_READ (Dev, Generic.VhdrQueueSize, &QueueSize);
+  Status = Dev->VirtIo->GetQueueNumMax (Dev->VirtIo, &QueueSize);
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
@@ -700,14 +683,28 @@ VirtioBlkInit (
   }
 
   //
-  // step 4c -- Report GPFN (guest-physical frame number) of queue. If anything
-  // fails from here on, we must release the ring resources.
+  // Additional steps for MMIO: align the queue appropriately, and set the
+  // size. If anything fails from here on, we must release the ring resources.
   //
-  Status = VIRTIO_CFG_WRITE (Dev, Generic.VhdrQueueAddress,
-             (UINTN) Dev->Ring.Base >> EFI_PAGE_SHIFT);
+  Status = Dev->VirtIo->SetQueueNum (Dev->VirtIo, QueueSize);
   if (EFI_ERROR (Status)) {
     goto ReleaseQueue;
   }
+
+  Status = Dev->VirtIo->SetQueueAlign (Dev->VirtIo, EFI_PAGE_SIZE);
+  if (EFI_ERROR (Status)) {
+    goto ReleaseQueue;
+  }
+
+  //
+  // step 4c -- Report GPFN (guest-physical frame number) of queue.
+  //
+  Status = Dev->VirtIo->SetQueueAddress (Dev->VirtIo,
+      (UINT32)(UINTN) Dev->Ring.Base >> EFI_PAGE_SHIFT);
+  if (EFI_ERROR (Status)) {
+    goto ReleaseQueue;
+  }
+
 
   //
   // step 5 -- Report understood features. There are no virtio-blk specific
@@ -715,7 +712,7 @@ VirtioBlkInit (
   // device-independent (known or unknown) VIRTIO_F_* capabilities (see
   // Appendix B).
   //
-  Status = VIRTIO_CFG_WRITE (Dev, Generic.VhdrGuestFeatureBits, 0);
+  Status = Dev->VirtIo->SetGuestFeatures (Dev->VirtIo, 0);
   if (EFI_ERROR (Status)) {
     goto ReleaseQueue;
   }
@@ -724,7 +721,7 @@ VirtioBlkInit (
   // step 6 -- initialization complete
   //
   NextDevStat |= VSTAT_DRIVER_OK;
-  Status = VIRTIO_CFG_WRITE (Dev, Generic.VhdrDeviceStatus, NextDevStat);
+  Status = Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, NextDevStat);
   if (EFI_ERROR (Status)) {
     goto ReleaseQueue;
   }
@@ -758,10 +755,10 @@ ReleaseQueue:
 Failed:
   //
   // Notify the host about our failure to setup: virtio-0.9.5, 2.2.2.1 Device
-  // Status. PCI IO access failure here should not mask the original error.
+  // Status. VirtIo access failure here should not mask the original error.
   //
   NextDevStat |= VSTAT_FAILED;
-  VIRTIO_CFG_WRITE (Dev, Generic.VhdrDeviceStatus, NextDevStat);
+  Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, NextDevStat);
 
   return Status; // reached only via Failed above
 }
@@ -788,7 +785,7 @@ VirtioBlkUninit (
   // VIRTIO_CFG_WRITE() returns, the host will have learned to stay away from
   // the old comms area.
   //
-  VIRTIO_CFG_WRITE (Dev, Generic.VhdrDeviceStatus, 0);
+  Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, 0);
 
   VirtioRingUninit (&Dev->Ring);
 
@@ -815,13 +812,13 @@ VirtioBlkUninit (
 
 
   @retval EFI_SUCCESS           Driver instance has been created and
-                                initialized  for the virtio-blk PCI device, it
+                                initialized  for the virtio-blk device, it
                                 is now accessibla via EFI_BLOCK_IO_PROTOCOL.
 
   @retval EFI_OUT_OF_RESOURCES  Memory allocation failed.
 
   @return                       Error codes from the OpenProtocol() boot
-                                service, the PciIo protocol, VirtioBlkInit(),
+                                service, the VirtIo protocol, VirtioBlkInit(),
                                 or the InstallProtocolInterface() boot service.
 
 **/
@@ -842,43 +839,19 @@ VirtioBlkDriverBindingStart (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Status = gBS->OpenProtocol (DeviceHandle, &gEfiPciIoProtocolGuid,
-                  (VOID **)&Dev->PciIo, This->DriverBindingHandle,
+  Status = gBS->OpenProtocol (DeviceHandle, &gVirtioDeviceProtocolGuid,
+                  (VOID **)&Dev->VirtIo, This->DriverBindingHandle,
                   DeviceHandle, EFI_OPEN_PROTOCOL_BY_DRIVER);
   if (EFI_ERROR (Status)) {
     goto FreeVirtioBlk;
   }
 
   //
-  // We must retain and ultimately restore the original PCI attributes of the
-  // device. See Driver Writer's Guide for UEFI 2.3.1 v1.01, 18.3 PCI drivers /
-  // 18.3.2 Start() and Stop().
-  //
-  // The third parameter ("Attributes", input) is ignored by the Get operation.
-  // The fourth parameter ("Result", output) is ignored by the Enable and Set
-  // operations.
-  //
-  // For virtio-blk we only need IO space access.
-  //
-  Status = Dev->PciIo->Attributes (Dev->PciIo, EfiPciIoAttributeOperationGet,
-                         0, &Dev->OriginalPciAttributes);
-  if (EFI_ERROR (Status)) {
-    goto ClosePciIo;
-  }
-
-  Status = Dev->PciIo->Attributes (Dev->PciIo,
-                         EfiPciIoAttributeOperationEnable,
-                         EFI_PCI_IO_ATTRIBUTE_IO, NULL);
-  if (EFI_ERROR (Status)) {
-    goto ClosePciIo;
-  }
-
-  //
-  // PCI IO access granted, configure virtio-blk device.
+  // VirtIo access granted, configure virtio-blk device.
   //
   Status = VirtioBlkInit (Dev);
   if (EFI_ERROR (Status)) {
-    goto RestorePciAttributes;
+    goto CloseVirtIo;
   }
 
   //
@@ -897,12 +870,8 @@ VirtioBlkDriverBindingStart (
 UninitDev:
   VirtioBlkUninit (Dev);
 
-RestorePciAttributes:
-  Dev->PciIo->Attributes (Dev->PciIo, EfiPciIoAttributeOperationSet,
-                Dev->OriginalPciAttributes, NULL);
-
-ClosePciIo:
-  gBS->CloseProtocol (DeviceHandle, &gEfiPciIoProtocolGuid,
+CloseVirtIo:
+  gBS->CloseProtocol (DeviceHandle, &gVirtioDeviceProtocolGuid,
          This->DriverBindingHandle, DeviceHandle);
 
 FreeVirtioBlk:
@@ -973,10 +942,7 @@ VirtioBlkDriverBindingStop (
 
   VirtioBlkUninit (Dev);
 
-  Dev->PciIo->Attributes (Dev->PciIo, EfiPciIoAttributeOperationSet,
-                Dev->OriginalPciAttributes, NULL);
-
-  gBS->CloseProtocol (DeviceHandle, &gEfiPciIoProtocolGuid,
+  gBS->CloseProtocol (DeviceHandle, &gVirtioDeviceProtocolGuid,
          This->DriverBindingHandle, DeviceHandle);
 
   FreePool (Dev);

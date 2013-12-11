@@ -57,14 +57,15 @@ VirtioNetInitRing (
   //
   // step 4b -- allocate selected queue
   //
-  Status = VIRTIO_CFG_WRITE (Dev, Generic.VhdrQueueSelect, Selector);
+  Status = Dev->VirtIo->SetQueueSel (Dev->VirtIo, Selector);
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  Status = VIRTIO_CFG_READ (Dev, Generic.VhdrQueueSize, &QueueSize);
+  Status = Dev->VirtIo->GetQueueNumMax (Dev->VirtIo, &QueueSize);
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   //
   // For each packet (RX and TX alike), we need two descriptors:
   // one for the virtio-net request header, and another one for the data
@@ -78,13 +79,33 @@ VirtioNetInitRing (
   }
 
   //
+  // Additional steps for MMIO: align the queue appropriately, and set the
+  // size. If anything fails from here on, we must release the ring resources.
+  //
+  Status = Dev->VirtIo->SetQueueNum (Dev->VirtIo, QueueSize);
+  if (EFI_ERROR (Status)) {
+    goto ReleaseQueue;
+  }
+
+  Status = Dev->VirtIo->SetQueueAlign (Dev->VirtIo, EFI_PAGE_SIZE);
+  if (EFI_ERROR (Status)) {
+    goto ReleaseQueue;
+  }
+
+  //
   // step 4c -- report GPFN (guest-physical frame number) of queue
   //
-  Status = VIRTIO_CFG_WRITE (Dev, Generic.VhdrQueueAddress,
-             (UINTN) Ring->Base >> EFI_PAGE_SHIFT);
+  Status = Dev->VirtIo->SetQueueAddress (Dev->VirtIo,
+      (UINT32)(UINTN) Ring->Base >> EFI_PAGE_SHIFT);
   if (EFI_ERROR (Status)) {
-    VirtioRingUninit (Ring);
+    goto ReleaseQueue;
   }
+
+  return EFI_SUCCESS;
+
+ReleaseQueue:
+  VirtioRingUninit (Ring);
+
   return Status;
 }
 
@@ -287,10 +308,9 @@ VirtioNetInitRx (
   // virtio-0.9.5, 2.4.1.4 Notifying the Device
   //
   MemoryFence ();
-  Status = VIRTIO_CFG_WRITE (Dev, Generic.VhdrQueueNotify, VIRTIO_NET_Q_RX);
-
+  Status = Dev->VirtIo->SetQueueNotify (Dev->VirtIo, VIRTIO_NET_Q_RX);
   if (EFI_ERROR (Status)) {
-    VIRTIO_CFG_WRITE (Dev, Generic.VhdrDeviceStatus, 0);
+    Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, 0);
     FreePool (Dev->RxBuf);
   }
 
@@ -366,13 +386,21 @@ VirtioNetInitialize (
   // virtio-0.9.5 spec, 2.2.1 Device Initialization Sequence.
   //
   NextDevStat = VSTAT_ACK;    // step 2 -- acknowledge device presence
-  Status = VIRTIO_CFG_WRITE (Dev, Generic.VhdrDeviceStatus, NextDevStat);
+  Status = Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, NextDevStat);
   if (EFI_ERROR (Status)) {
     goto InitFailed;
   }
 
   NextDevStat |= VSTAT_DRIVER; // step 3 -- we know how to drive it
-  Status = VIRTIO_CFG_WRITE (Dev, Generic.VhdrDeviceStatus, NextDevStat);
+  Status = Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, NextDevStat);
+  if (EFI_ERROR (Status)) {
+    goto DeviceFailed;
+  }
+
+  //
+  // Set Page Size - MMIO VirtIo Specific
+  //
+  Status = Dev->VirtIo->SetPageSize (Dev->VirtIo, EFI_PAGE_SIZE);
   if (EFI_ERROR (Status)) {
     goto DeviceFailed;
   }
@@ -381,10 +409,11 @@ VirtioNetInitialize (
   // step 4a -- retrieve features. Note that we're past validating required
   // features in VirtioNetGetFeatures().
   //
-  Status = VIRTIO_CFG_READ (Dev, Generic.VhdrDeviceFeatureBits, &Features);
+  Status = Dev->VirtIo->GetDeviceFeatures (Dev->VirtIo, &Features);
   if (EFI_ERROR (Status)) {
     goto DeviceFailed;
   }
+
   ASSERT (Features & VIRTIO_NET_F_MAC);
   ASSERT (Dev->Snm.MediaPresentSupported ==
     !!(Features & VIRTIO_NET_F_STATUS));
@@ -406,7 +435,7 @@ VirtioNetInitialize (
   // step 5 -- keep only the features we want
   //
   Features &= VIRTIO_NET_F_MAC | VIRTIO_NET_F_STATUS;
-  Status = VIRTIO_CFG_WRITE (Dev, Generic.VhdrGuestFeatureBits, Features);
+  Status = Dev->VirtIo->SetGuestFeatures (Dev->VirtIo, Features);
   if (EFI_ERROR (Status)) {
     goto ReleaseTxRing;
   }
@@ -415,7 +444,7 @@ VirtioNetInitialize (
   // step 6 -- virtio-net initialization complete
   //
   NextDevStat |= VSTAT_DRIVER_OK;
-  Status = VIRTIO_CFG_WRITE (Dev, Generic.VhdrDeviceStatus, NextDevStat);
+  Status = Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, NextDevStat);
   if (EFI_ERROR (Status)) {
     goto ReleaseTxRing;
   }
@@ -441,7 +470,7 @@ ReleaseTxAux:
   VirtioNetShutdownTx (Dev);
 
 AbortDevice:
-  VIRTIO_CFG_WRITE (Dev, Generic.VhdrDeviceStatus, 0);
+  Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, 0);
 
 ReleaseTxRing:
   VirtioRingUninit (&Dev->TxRing);
@@ -453,7 +482,7 @@ DeviceFailed:
   //
   // restore device status invariant for the EfiSimpleNetworkStarted state
   //
-  VIRTIO_CFG_WRITE (Dev, Generic.VhdrDeviceStatus, 0);
+  Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, 0);
 
 InitFailed:
   gBS->RestoreTPL (OldTpl);

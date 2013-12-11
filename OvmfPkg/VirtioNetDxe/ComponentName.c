@@ -139,20 +139,20 @@ VirtioNetGetControllerName (
   }
 
   //
-  // confirm that the device is managed by this driver, using the PCI IO
+  // confirm that the device is managed by this driver, using the VirtIo
   // Protocol
   //
   Status = EfiTestManagedDevice (
              ControllerHandle,
              gVirtioNetDriverBinding.DriverBindingHandle,
-             &gEfiPciIoProtocolGuid
+             &gVirtioDeviceProtocolGuid
              );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   //
-  // we don't give different names to the bus (= parent, = PCI) handle and the
+  // we don't give different names to the bus (= parent) handle and the
   // child (= MAC) handle
   //
   return LookupUnicodeString2 (

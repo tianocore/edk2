@@ -127,15 +127,15 @@ VirtioNetTransmit (
       goto Exit;
     }
     Ptr = Buffer;
-    ASSERT (SIZE_OF_VNET (VhdrMac) <= sizeof (EFI_MAC_ADDRESS));
+    ASSERT (SIZE_OF_VNET (Mac) <= sizeof (EFI_MAC_ADDRESS));
 
-    CopyMem (Ptr, DestAddr, SIZE_OF_VNET (VhdrMac));
-    Ptr += SIZE_OF_VNET (VhdrMac);
+    CopyMem (Ptr, DestAddr, SIZE_OF_VNET (Mac));
+    Ptr += SIZE_OF_VNET (Mac);
 
     CopyMem (Ptr,
       (SrcAddr == NULL) ? &Dev->Snm.CurrentAddress : SrcAddr,
-      SIZE_OF_VNET (VhdrMac));
-    Ptr += SIZE_OF_VNET (VhdrMac);
+      SIZE_OF_VNET (Mac));
+    Ptr += SIZE_OF_VNET (Mac);
 
     *Ptr++ = (UINT8) (*Protocol >> 8);
     *Ptr++ = (UINT8) *Protocol;
@@ -161,7 +161,7 @@ VirtioNetTransmit (
   *Dev->TxRing.Avail.Idx = AvailIdx;
 
   MemoryFence ();
-  Status = VIRTIO_CFG_WRITE (Dev, Generic.VhdrQueueNotify, VIRTIO_NET_Q_TX);
+  Status = Dev->VirtIo->SetQueueNotify (Dev->VirtIo, VIRTIO_NET_Q_TX);
 
 Exit:
   gBS->RestoreTPL (OldTpl);

@@ -26,22 +26,21 @@
 //
 #pragma pack(1)
 typedef struct {
-  VIRTIO_HDR Generic;
-  UINT32     VhdrNumQueues;
-  UINT32     VhdrSegMax;
-  UINT32     VhdrMaxSectors;
-  UINT32     VhdrCmdPerLun;
-  UINT32     VhdrEventInfoSize;
-  UINT32     VhdrSenseSize;
-  UINT32     VhdrCdbSize;
-  UINT16     VhdrMaxChannel;
-  UINT16     VhdrMaxTarget;
-  UINT32     VhdrMaxLun;
-} VSCSI_HDR;
+  UINT32     NumQueues;
+  UINT32     SegMax;
+  UINT32     MaxSectors;
+  UINT32     CmdPerLun;
+  UINT32     EventInfoSize;
+  UINT32     SenseSize;
+  UINT32     CdbSize;
+  UINT16     MaxChannel;
+  UINT16     MaxTarget;
+  UINT32     MaxLun;
+} VIRTIO_SCSI_CONFIG;
 #pragma pack()
 
-#define OFFSET_OF_VSCSI(Field) OFFSET_OF (VSCSI_HDR, Field)
-#define SIZE_OF_VSCSI(Field)   (sizeof ((VSCSI_HDR *) 0)->Field)
+#define OFFSET_OF_VSCSI(Field) OFFSET_OF (VIRTIO_SCSI_CONFIG, Field)
+#define SIZE_OF_VSCSI(Field)   (sizeof ((VIRTIO_SCSI_CONFIG *) 0)->Field)
 
 #define VIRTIO_SCSI_F_INOUT   BIT0
 #define VIRTIO_SCSI_F_HOTPLUG BIT1

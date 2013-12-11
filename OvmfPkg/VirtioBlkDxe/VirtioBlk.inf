@@ -38,5 +38,5 @@
   VirtioLib
 
 [Protocols]
-  gEfiBlockIoProtocolGuid  ## BY_START
-  gEfiPciIoProtocolGuid    ## TO_START
+  gEfiBlockIoProtocolGuid   ## BY_START
+  gVirtioDeviceProtocolGuid ## TO_START

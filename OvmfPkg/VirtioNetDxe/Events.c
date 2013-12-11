@@ -86,6 +86,6 @@ VirtioNetExitBoot (
 
   Dev = Context;
   if (Dev->Snm.State == EfiSimpleNetworkInitialized) {
-    VIRTIO_CFG_WRITE (Dev, Generic.VhdrDeviceStatus, 0);
+    Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, 0);
   }
 }

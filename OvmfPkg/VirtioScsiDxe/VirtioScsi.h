@@ -20,7 +20,6 @@
 
 #include <Protocol/ComponentName.h>
 #include <Protocol/DriverBinding.h>
-#include <Protocol/PciIo.h>
 #include <Protocol/ScsiPassThruExt.h>
 
 #include <IndustryStandard/Virtio.h>
@@ -49,18 +48,17 @@ typedef struct {
   // at various call depths. The table to the right should make it easier to
   // track them.
   //
-  //                              field                     init function       init depth
-  //                              ----------------------    ------------------  ----------
-  UINT32                          Signature;             // DriverBindingStart  0
-  EFI_PCI_IO_PROTOCOL             *PciIo;                // DriverBindingStart  0
-  UINT64                          OriginalPciAttributes; // DriverBindingStart  0
-  BOOLEAN                         InOutSupported;        // VirtioScsiInit      1
-  UINT16                          MaxTarget;             // VirtioScsiInit      1
-  UINT32                          MaxLun;                // VirtioScsiInit      1
-  UINT32                          MaxSectors;            // VirtioScsiInit      1
-  VRING                           Ring;                  // VirtioRingInit      2
-  EFI_EXT_SCSI_PASS_THRU_PROTOCOL PassThru;              // VirtioScsiInit      1
-  EFI_EXT_SCSI_PASS_THRU_MODE     PassThruMode;          // VirtioScsiInit      1
+  //                              field              init function       init depth
+  //                              ----------------   ------------------  ----------
+  UINT32                          Signature;      // DriverBindingStart  0
+  VIRTIO_DEVICE_PROTOCOL          *VirtIo;        // DriverBindingStart  0
+  BOOLEAN                         InOutSupported; // VirtioScsiInit      1
+  UINT16                          MaxTarget;      // VirtioScsiInit      1
+  UINT32                          MaxLun;         // VirtioScsiInit      1
+  UINT32                          MaxSectors;     // VirtioScsiInit      1
+  VRING                           Ring;           // VirtioRingInit      2
+  EFI_EXT_SCSI_PASS_THRU_PROTOCOL PassThru;       // VirtioScsiInit      1
+  EFI_EXT_SCSI_PASS_THRU_MODE     PassThruMode;   // VirtioScsiInit      1
 } VSCSI_DEV;
 
 #define VIRTIO_SCSI_FROM_PASS_THRU(PassThruPointer) \

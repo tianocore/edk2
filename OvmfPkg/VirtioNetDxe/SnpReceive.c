@@ -147,14 +147,14 @@ VirtioNetReceive (
   CopyMem (Buffer, RxPtr, RxLen);
 
   if (DestAddr != NULL) {
-    CopyMem (DestAddr, RxPtr, SIZE_OF_VNET (VhdrMac));
+    CopyMem (DestAddr, RxPtr, SIZE_OF_VNET (Mac));
   }
-  RxPtr += SIZE_OF_VNET (VhdrMac);
+  RxPtr += SIZE_OF_VNET (Mac);
 
   if (SrcAddr != NULL) {
-    CopyMem (SrcAddr, RxPtr, SIZE_OF_VNET (VhdrMac));
+    CopyMem (SrcAddr, RxPtr, SIZE_OF_VNET (Mac));
   }
-  RxPtr += SIZE_OF_VNET (VhdrMac);
+  RxPtr += SIZE_OF_VNET (Mac);
 
   if (Protocol != NULL) {
     *Protocol = (UINT16) ((RxPtr[0] << 8) | RxPtr[1]);
@@ -177,9 +177,7 @@ RecycleDesc:
   *Dev->RxRing.Avail.Idx = AvailIdx;
 
   MemoryFence ();
-  NotifyStatus = VIRTIO_CFG_WRITE (Dev, Generic.VhdrQueueNotify,
-                   VIRTIO_NET_Q_RX);
-
+  NotifyStatus = Dev->VirtIo->SetQueueNotify (Dev->VirtIo, VIRTIO_NET_Q_RX);
   if (!EFI_ERROR (Status)) { // earlier error takes precedence
     Status = NotifyStatus;
   }

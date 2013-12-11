@@ -57,4 +57,4 @@
 [Protocols]
   gEfiSimpleNetworkProtocolGuid  ## BY_START
   gEfiDevicePathProtocolGuid     ## BY_START
-  gEfiPciIoProtocolGuid          ## TO_START
+  gVirtioDeviceProtocolGuid      ## TO_START

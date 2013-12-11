@@ -26,19 +26,18 @@
 //
 #pragma pack(1)
 typedef struct {
-  VIRTIO_HDR Generic;
-  UINT64     VhdrCapacity;
-  UINT32     VhdrSizeMax;
-  UINT32     VhdrSegMax;
-  UINT16     VhdrCylinders;
-  UINT8      VhdrHeads;
-  UINT8      VhdrSectors;
-  UINT32     VhdrBlkSize;
-} VBLK_HDR;
+  UINT64     Capacity;
+  UINT32     SizeMax;
+  UINT32     SegMax;
+  UINT16     Cylinders;
+  UINT8      Heads;
+  UINT8      Sectors;
+  UINT32     BlkSize;
+} VIRTIO_BLK_CONFIG;
 #pragma pack()
 
-#define OFFSET_OF_VBLK(Field) OFFSET_OF (VBLK_HDR, Field)
-#define SIZE_OF_VBLK(Field)   (sizeof ((VBLK_HDR *) 0)->Field)
+#define OFFSET_OF_VBLK(Field) OFFSET_OF (VIRTIO_BLK_CONFIG, Field)
+#define SIZE_OF_VBLK(Field)   (sizeof ((VIRTIO_BLK_CONFIG *) 0)->Field)
 
 #define VIRTIO_BLK_F_BARRIER  BIT0
 #define VIRTIO_BLK_F_SIZE_MAX BIT1

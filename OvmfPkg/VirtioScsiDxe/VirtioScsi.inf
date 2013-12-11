@@ -40,7 +40,7 @@
 
 [Protocols]
   gEfiExtScsiPassThruProtocolGuid  ## BY_START
-  gEfiPciIoProtocolGuid            ## TO_START
+  gVirtioDeviceProtocolGuid        ## TO_START
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdVirtioScsiMaxTargetLimit ## CONSUMES
