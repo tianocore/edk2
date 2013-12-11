@@ -699,7 +699,7 @@ InstallSmbiosEventCallback (
             &gEfiSmbiosTableGuid,
             &mRuntimeSmbiosEntryPoint
             );
-  if (EFI_ERROR (Status)) {
+  if ((EFI_ERROR (Status)) || (mRuntimeSmbiosEntryPoint == NULL)) {
     return;
   }
   
