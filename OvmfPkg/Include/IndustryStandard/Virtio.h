@@ -156,24 +156,6 @@ typedef struct {
   UINT16              QueueSize;
 } VRING;
 
-
-//
-// virtio-0.9.5, 2.2.2 Virtio Header -- no MSI-X
-//
-#pragma pack(1)
-typedef struct {
-  UINT32 VhdrDeviceFeatureBits;
-  UINT32 VhdrGuestFeatureBits;
-  UINT32 VhdrQueueAddress;
-  UINT16 VhdrQueueSize;
-  UINT16 VhdrQueueSelect;
-  UINT16 VhdrQueueNotify;
-  UINT8  VhdrDeviceStatus;
-  UINT8  VhdrISR;
-} VIRTIO_HDR;
-#pragma pack()
-
-
 //
 // virtio-0.9.5, 2.2.2.1 Device Status
 //
