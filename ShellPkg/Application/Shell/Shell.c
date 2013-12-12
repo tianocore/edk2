@@ -77,7 +77,8 @@ STATIC CONST CHAR16 mStartupScript[]        = L"startup.nsh";
 
   @retval                 A pointer to the | character in CmdLine or NULL if not present.
 **/
-BOOLEAN
+CONST
+CHAR16*
 EFIAPI
 FindSplit(
   IN CONST CHAR16 *CmdLine
