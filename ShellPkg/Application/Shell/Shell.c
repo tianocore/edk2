@@ -71,16 +71,15 @@ STATIC CONST CHAR16 mExecutableExtensions[] = L".NSH;.EFI";
 STATIC CONST CHAR16 mStartupScript[]        = L"startup.nsh";
 
 /**
-  Determine if a command line contains a valid split operation
+  Find a command line contains a split operation
 
   @param[in] CmdLine      The command line to parse.
 
-  @retval TRUE            CmdLine has a valid split.
-  @retval FALSE           CmdLine does not have a valid split.
+  @retval                 A pointer to the | character in CmdLine or NULL if not present.
 **/
 BOOLEAN
 EFIAPI
-ContainsSplit(
+FindSplit(
   IN CONST CHAR16 *CmdLine
   )
 {
@@ -95,6 +94,25 @@ ContainsSplit(
       }
     }
   }
+  return (TempSpot);
+}
+
+/**
+  Determine if a command line contains a split operation
+
+  @param[in] CmdLine      The command line to parse.
+
+  @retval TRUE            CmdLine has a valid split.
+  @retval FALSE           CmdLine does not have a valid split.
+**/
+BOOLEAN
+EFIAPI
+ContainsSplit(
+  IN CONST CHAR16 *CmdLine
+  )
+{
+  CONST CHAR16 *TempSpot;
+  TempSpot = FindSplit(CmdLine);
   return (TempSpot != NULL && *TempSpot != CHAR_NULL);
 }
 
