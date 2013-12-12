@@ -1431,6 +1431,77 @@ RunSplitCommand(
 }
 
 /**
+  Take the original command line, substitute any alias in the first group of space delimited characters, free 
+  the original string, return the modified copy
+
+  @param[in] CmdLine  pointer to the command line to update
+  @param[out]CmdName  upon successful return the name of the command to be run
+
+  @retval EFI_SUCCESS           the function was successful
+  @retval EFI_OUT_OF_RESOURCES  a memory allocation failed
+**/
+EFI_STATUS
+EFIAPI
+ShellSubstituteAliases(
+  IN CHAR16 **CmdLine
+  )
+{
+  CHAR16      *NewCmdLine;
+  CHAR16      *CommandName;
+  EFI_STATUS  Status;
+  UINTN       PostAliasSize;
+  ASSERT(CmdLine != NULL);
+  ASSERT(*CmdLine!= NULL);
+
+
+  CommandName = NULL;
+  if (StrStr((*CmdLine), L" ") == NULL){
+    StrnCatGrow(&CommandName, NULL, (*CmdLine), 0);
+  } else {
+    StrnCatGrow(&CommandName, NULL, (*CmdLine), StrStr((*CmdLine), L" ") - (*CmdLine));
+  }
+
+  //
+  // This cannot happen 'inline' since the CmdLine can need extra space.
+  //
+  NewCmdLine = NULL;
+  if (!ShellCommandIsCommandOnList(CommandName)) {
+    //
+    // Convert via alias
+    //
+    Status = ShellConvertAlias(&CommandName);
+    if (EFI_ERROR(Status)){
+      return (Status);
+    }
+    PostAliasSize = 0;
+    NewCmdLine = StrnCatGrow(&NewCmdLine, &PostAliasSize, CommandName, 0);
+    if (NewCmdLine == NULL) {
+      SHELL_FREE_NON_NULL(CommandName);
+      SHELL_FREE_NON_NULL(*CmdLine);
+      return (EFI_OUT_OF_RESOURCES);
+    }
+    NewCmdLine = StrnCatGrow(&NewCmdLine, &PostAliasSize, StrStr((*CmdLine), L" "), 0);
+    if (NewCmdLine == NULL) {
+      SHELL_FREE_NON_NULL(CommandName);
+      SHELL_FREE_NON_NULL(*CmdLine);
+      return (EFI_OUT_OF_RESOURCES);
+    }
+  } else {
+    NewCmdLine = StrnCatGrow(&NewCmdLine, NULL, (*CmdLine), 0);
+  }
+
+  SHELL_FREE_NON_NULL(*CmdLine);
+  SHELL_FREE_NON_NULL(CommandName);
+ 
+  //
+  // re-assign the passed in double pointer to point to our newly allocated buffer
+  //
+  *CmdLine = NewCmdLine;
+
+  return (EFI_SUCCESS);
+}
+
+/**
   Function will process and run a command line.
 
   This will determine if the command line represents an internal shell 
@@ -1455,8 +1526,6 @@ RunCommand(
   CHAR16                    **Argv;
   BOOLEAN                   LastError;
   CHAR16                    LeString[19];
-  CHAR16                    *PostAliasCmdLine;
-  UINTN                     PostAliasSize;
   CHAR16                    *PostVariableCmdLine;
   CHAR16                    *CommandWithPath;
   CONST EFI_DEVICE_PATH_PROTOCOL  *DevPath;
@@ -1478,7 +1547,6 @@ RunCommand(
 
   CommandName         = NULL;
   PostVariableCmdLine = NULL;
-  PostAliasCmdLine    = NULL;
   CommandWithPath     = NULL;
   DevPath             = NULL;
   Status              = EFI_SUCCESS;
@@ -1503,46 +1571,12 @@ RunCommand(
     return (EFI_SUCCESS);
   }
 
-  CommandName = NULL;
-  if (StrStr(CleanOriginal, L" ") == NULL){
-    StrnCatGrow(&CommandName, NULL, CleanOriginal, 0);
-  } else {
-    StrnCatGrow(&CommandName, NULL, CleanOriginal, StrStr(CleanOriginal, L" ") - CleanOriginal);
+  Status = ShellSubstituteAliases(&CleanOriginal);
+  if (EFI_ERROR(Status)) {
+    return (Status);
   }
 
-  ASSERT(PostAliasCmdLine == NULL);
-  if (!ShellCommandIsCommandOnList(CommandName)) {
-    //
-    // Convert via alias
-    //
-    Status = ShellConvertAlias(&CommandName);
-    PostAliasSize = 0;
-    PostAliasCmdLine = StrnCatGrow(&PostAliasCmdLine, &PostAliasSize, CommandName, 0);
-    PostAliasCmdLine = StrnCatGrow(&PostAliasCmdLine, &PostAliasSize, StrStr(CleanOriginal, L" "), 0);
-    ASSERT_EFI_ERROR(Status);
-  } else {
-    PostAliasCmdLine = StrnCatGrow(&PostAliasCmdLine, NULL, CleanOriginal, 0);
-  }
-
-  if (CleanOriginal != NULL) {
-    FreePool(CleanOriginal);
-    CleanOriginal = NULL;
-  }
-
-  if (CommandName != NULL) {
-    FreePool(CommandName);
-    CommandName = NULL;
-  }
-
-  PostVariableCmdLine = ShellConvertVariables(PostAliasCmdLine);
-
-  //
-  // we can now free the modified by alias command line
-  //
-  if (PostAliasCmdLine != NULL) {
-    FreePool(PostAliasCmdLine);
-    PostAliasCmdLine = NULL;
-  }
+  PostVariableCmdLine = ShellConvertVariables(CleanOriginal);
 
   if (PostVariableCmdLine == NULL) {
     return (EFI_OUT_OF_RESOURCES);
@@ -1739,6 +1773,7 @@ RunCommand(
   SHELL_FREE_NON_NULL(CommandName);
   SHELL_FREE_NON_NULL(CommandWithPath);
   SHELL_FREE_NON_NULL(PostVariableCmdLine);
+  SHELL_FREE_NON_NULL(CleanOriginal);
 
   return (Status);
 }
