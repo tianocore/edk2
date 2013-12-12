@@ -96,7 +96,7 @@ VirtioNetInitRing (
   // step 4c -- report GPFN (guest-physical frame number) of queue
   //
   Status = Dev->VirtIo->SetQueueAddress (Dev->VirtIo,
-      (UINT32)(UINTN) Ring->Base >> EFI_PAGE_SHIFT);
+      (UINT32) ((UINTN) Ring->Base >> EFI_PAGE_SHIFT));
   if (EFI_ERROR (Status)) {
     goto ReleaseQueue;
   }
