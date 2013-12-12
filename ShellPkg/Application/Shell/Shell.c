@@ -71,6 +71,36 @@ STATIC CONST CHAR16 mExecutableExtensions[] = L".NSH;.EFI";
 STATIC CONST CHAR16 mStartupScript[]        = L"startup.nsh";
 
 /**
+  Cleans off leading and trailing spaces and tabs
+
+  @param[in] String pointer to the string to trim them off
+**/
+EFI_STATUS
+EFIAPI
+TrimSpaces(
+  IN CHAR16 **String
+  )
+{
+  ASSERT(String != NULL);
+  ASSERT(*String!= NULL);
+  //
+  // Remove any spaces and tabs at the beginning of the (*String).
+  //
+  while (((*String)[0] == L' ') || ((*String)[0] == L'\t')) {
+    CopyMem((*String), (*String)+1, StrSize((*String)) - sizeof((*String)[0]));
+  }
+
+  //
+  // Remove any spaces at the end of the (*String).
+  //
+  while ((*String)[StrLen((*String))-1] == L' ') {
+    (*String)[StrLen((*String))-1] = CHAR_NULL;
+  }
+
+  return (EFI_SUCCESS);
+}
+
+/**
   Find a command line contains a split operation
 
   @param[in] CmdLine      The command line to parse.
@@ -1460,12 +1490,7 @@ RunCommand(
     return (EFI_OUT_OF_RESOURCES);
   }
 
-  //
-  // Remove any spaces and tabs at the beginning of the string.
-  //
-  while ((CleanOriginal[0] == L' ') || (CleanOriginal[0] == L'\t')) {
-    CopyMem(CleanOriginal, CleanOriginal+1, StrSize(CleanOriginal) - sizeof(CleanOriginal[0]));
-  }
+  TrimSpaces(&CleanOriginal);
 
   //
   // Handle case that passed in command line is just 1 or more " " characters.
@@ -1476,13 +1501,6 @@ RunCommand(
       CleanOriginal = NULL;
     }
     return (EFI_SUCCESS);
-  }
-
-  //
-  // Remove any spaces at the end of the string.
-  //
-  while (CleanOriginal[StrLen(CleanOriginal)-1] == L' ') {
-    CleanOriginal[StrLen(CleanOriginal)-1] = CHAR_NULL;
   }
 
   CommandName = NULL;
@@ -1530,12 +1548,7 @@ RunCommand(
     return (EFI_OUT_OF_RESOURCES);
   }
 
-  while (PostVariableCmdLine[StrLen(PostVariableCmdLine)-1] == L' ') {
-    PostVariableCmdLine[StrLen(PostVariableCmdLine)-1] = CHAR_NULL;
-  }
-  while (PostVariableCmdLine[0] == L' ') {
-    CopyMem(PostVariableCmdLine, PostVariableCmdLine+1, StrSize(PostVariableCmdLine) - sizeof(PostVariableCmdLine[0]));
-  }
+  TrimSpaces(&PostVariableCmdLine);
 
   //
   // We dont do normal processing with a split command line (output from one command input to another)
@@ -1583,13 +1596,8 @@ RunCommand(
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_INVALID_REDIR), ShellInfoObject.HiiHandle);
       }
     } else {
-      while (PostVariableCmdLine[StrLen(PostVariableCmdLine)-1] == L' ') {
-        PostVariableCmdLine[StrLen(PostVariableCmdLine)-1] = CHAR_NULL;
-      }
-      while (PostVariableCmdLine[0] == L' ') {
-        CopyMem(PostVariableCmdLine, PostVariableCmdLine+1, StrSize(PostVariableCmdLine) - sizeof(PostVariableCmdLine[0]));
-      }
-
+      TrimSpaces(&PostVariableCmdLine);
+    
       //
       // get the argc and argv updated for internal commands
       //
