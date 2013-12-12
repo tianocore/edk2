@@ -1431,6 +1431,32 @@ RunSplitCommand(
 }
 
 /**
+  Take the original command line, substitute any variables, free 
+  the original string, return the modified copy
+
+  @param[in] CmdLine  pointer to the command line to update
+  @param[out]CmdName  upon successful return the name of the command to be run
+
+  @retval EFI_SUCCESS           the function was successful
+  @retval EFI_OUT_OF_RESOURCES  a memory allocation failed
+**/
+EFI_STATUS
+EFIAPI
+ShellSubstituteVariables(
+  IN CHAR16 **CmdLine
+  )
+{
+  CHAR16      *NewCmdLine;
+  NewCmdLine = ShellConvertVariables(*CmdLine);
+  SHELL_FREE_NON_NULL(*CmdLine);
+  if (NewCmdLine == NULL) {
+    return (EFI_OUT_OF_RESOURCES);
+  }
+  *CmdLine = NewCmdLine;
+  return (EFI_SUCCESS);
+}
+
+/**
   Take the original command line, substitute any alias in the first group of space delimited characters, free 
   the original string, return the modified copy
 
@@ -1526,7 +1552,6 @@ RunCommand(
   CHAR16                    **Argv;
   BOOLEAN                   LastError;
   CHAR16                    LeString[19];
-  CHAR16                    *PostVariableCmdLine;
   CHAR16                    *CommandWithPath;
   CONST EFI_DEVICE_PATH_PROTOCOL  *DevPath;
   CONST CHAR16              *TempLocation;
@@ -1546,7 +1571,6 @@ RunCommand(
   }
 
   CommandName         = NULL;
-  PostVariableCmdLine = NULL;
   CommandWithPath     = NULL;
   DevPath             = NULL;
   Status              = EFI_SUCCESS;
@@ -1576,18 +1600,17 @@ RunCommand(
     return (Status);
   }
 
-  PostVariableCmdLine = ShellConvertVariables(CleanOriginal);
-
-  if (PostVariableCmdLine == NULL) {
-    return (EFI_OUT_OF_RESOURCES);
+  Status = ShellSubstituteVariables(&CleanOriginal);
+  if (EFI_ERROR(Status)) {
+    return (Status);
   }
 
-  TrimSpaces(&PostVariableCmdLine);
+  TrimSpaces(&CleanOriginal);
 
   //
   // We dont do normal processing with a split command line (output from one command input to another)
   //
-  if (ContainsSplit(PostVariableCmdLine)) {
+  if (ContainsSplit(CleanOriginal)) {
     //
     // are we in an existing split???
     //
@@ -1596,24 +1619,24 @@ RunCommand(
     }
 
     if (Split == NULL) {
-      Status = RunSplitCommand(PostVariableCmdLine, NULL, NULL);
+      Status = RunSplitCommand(CleanOriginal, NULL, NULL);
     } else {
-      Status = RunSplitCommand(PostVariableCmdLine, Split->SplitStdIn, Split->SplitStdOut);
+      Status = RunSplitCommand(CleanOriginal, Split->SplitStdIn, Split->SplitStdOut);
     }
     if (EFI_ERROR(Status)) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_INVALID_SPLIT), ShellInfoObject.HiiHandle, PostVariableCmdLine);
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_INVALID_SPLIT), ShellInfoObject.HiiHandle, CleanOriginal);
     }
   } else {
 
     //
     // If this is a mapped drive change handle that...
     //
-    if (PostVariableCmdLine[(StrLen(PostVariableCmdLine)-1)] == L':' && StrStr(PostVariableCmdLine, L" ") == NULL) {
-      Status = ShellInfoObject.NewEfiShellProtocol->SetCurDir(NULL, PostVariableCmdLine);
+    if (CleanOriginal[(StrLen(CleanOriginal)-1)] == L':' && StrStr(CleanOriginal, L" ") == NULL) {
+      Status = ShellInfoObject.NewEfiShellProtocol->SetCurDir(NULL, CleanOriginal);
       if (EFI_ERROR(Status)) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_INVALID_MAPPING), ShellInfoObject.HiiHandle, PostVariableCmdLine);
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_INVALID_MAPPING), ShellInfoObject.HiiHandle, CleanOriginal);
       }
-      FreePool(PostVariableCmdLine);
+      FreePool(CleanOriginal);
       return (Status);
     }
 
@@ -1622,7 +1645,7 @@ RunCommand(
 
 
 
-    Status = UpdateStdInStdOutStdErr(ShellInfoObject.NewShellParametersProtocol, PostVariableCmdLine, &OriginalStdIn, &OriginalStdOut, &OriginalStdErr, &OriginalSystemTableInfo);
+    Status = UpdateStdInStdOutStdErr(ShellInfoObject.NewShellParametersProtocol, CleanOriginal, &OriginalStdIn, &OriginalStdOut, &OriginalStdErr, &OriginalSystemTableInfo);
     if (EFI_ERROR(Status)) {
       if (Status == EFI_NOT_FOUND) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_REDUNDA_REDIR), ShellInfoObject.HiiHandle);
@@ -1630,12 +1653,12 @@ RunCommand(
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_INVALID_REDIR), ShellInfoObject.HiiHandle);
       }
     } else {
-      TrimSpaces(&PostVariableCmdLine);
+      TrimSpaces(&CleanOriginal);
     
       //
       // get the argc and argv updated for internal commands
       //
-      Status = UpdateArgcArgv(ShellInfoObject.NewShellParametersProtocol, PostVariableCmdLine, &Argv, &Argc);
+      Status = UpdateArgcArgv(ShellInfoObject.NewShellParametersProtocol, CleanOriginal, &Argv, &Argc);
       ASSERT_EFI_ERROR(Status);
 
       for (Count = 0 ; Count < ShellInfoObject.NewShellParametersProtocol->Argc ; Count++) {
@@ -1727,7 +1750,7 @@ RunCommand(
             Status = InternalShellExecuteDevicePath(
               &gImageHandle,
               DevPath,
-              PostVariableCmdLine,
+              CleanOriginal,
               NULL,
               &StatusCode
              );
@@ -1772,7 +1795,6 @@ RunCommand(
 
   SHELL_FREE_NON_NULL(CommandName);
   SHELL_FREE_NON_NULL(CommandWithPath);
-  SHELL_FREE_NON_NULL(PostVariableCmdLine);
   SHELL_FREE_NON_NULL(CleanOriginal);
 
   return (Status);
