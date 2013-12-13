@@ -48,6 +48,16 @@
 #include <Library/LockBoxLib.h>
 #include <IndustryStandard/Acpi.h>
 
+/**
+  This macro aligns the address of a variable with auto storage
+  duration down to CPU_STACK_ALIGNMENT.
+
+  Since the stack grows downward, the result preserves more of the
+  stack than the original address (or the same amount), not less.
+**/
+#define STACK_ALIGN_DOWN(Ptr) \
+          ((UINTN)(Ptr) & ~(UINTN)(CPU_STACK_ALIGNMENT - 1))
+
 #pragma pack(1)
 typedef union {
   struct {
@@ -846,7 +856,7 @@ S3ResumeExecuteBootScript (
   DEBUG (( EFI_D_ERROR, "PeiS3ResumeState - %x\r\n", PeiS3ResumeState));
   PeiS3ResumeState->ReturnCs           = 0x10;
   PeiS3ResumeState->ReturnEntryPoint   = (EFI_PHYSICAL_ADDRESS)(UINTN)S3ResumeBootOs;
-  PeiS3ResumeState->ReturnStackPointer = (EFI_PHYSICAL_ADDRESS)(UINTN)&Status;
+  PeiS3ResumeState->ReturnStackPointer = (EFI_PHYSICAL_ADDRESS)STACK_ALIGN_DOWN (&Status);
   //
   // Save IDT
   //
@@ -1038,7 +1048,7 @@ S3RestoreConfig2 (
     SmmS3ResumeState->ReturnEntryPoint   = (EFI_PHYSICAL_ADDRESS)(UINTN)S3ResumeExecuteBootScript;
     SmmS3ResumeState->ReturnContext1     = (EFI_PHYSICAL_ADDRESS)(UINTN)AcpiS3Context;
     SmmS3ResumeState->ReturnContext2     = (EFI_PHYSICAL_ADDRESS)(UINTN)EfiBootScriptExecutorVariable;
-    SmmS3ResumeState->ReturnStackPointer = (EFI_PHYSICAL_ADDRESS)(UINTN)&Status;
+    SmmS3ResumeState->ReturnStackPointer = (EFI_PHYSICAL_ADDRESS)STACK_ALIGN_DOWN (&Status);
 
     DEBUG (( EFI_D_ERROR, "SMM S3 Signature                = %x\n", SmmS3ResumeState->Signature));
     DEBUG (( EFI_D_ERROR, "SMM S3 Stack Base               = %x\n", SmmS3ResumeState->SmmS3StackBase));
