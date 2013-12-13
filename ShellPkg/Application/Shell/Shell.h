@@ -124,6 +124,14 @@ typedef struct {
 
 extern SHELL_INFO ShellInfoObject;
 
+typedef enum {
+  INTERNAL_COMMAND,
+  SCRIPT_FILE_NAME,
+  EFI_APPLICATION,
+  FILE_SYS_CHANGE,
+  UNKNOWN_INVALID
+} SHELL_OPERATION_TYPES;
+
 /**
   Sets all the alias' that were registered with the ShellCommandLib library.
 

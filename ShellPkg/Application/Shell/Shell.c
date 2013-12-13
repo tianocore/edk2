@@ -1528,6 +1528,67 @@ ShellSubstituteAliases(
 }
 
 /**
+  Takes the Argv[0] part of the command line and determine the meaning of it.
+**/
+SHELL_OPERATION_TYPES
+EFIAPI
+GetOperationType(
+  IN CONST CHAR16 *CmdName
+  )
+{
+        CHAR16* FileWithPath;
+  CONST CHAR16* TempLocation;
+  CONST CHAR16* TempLocation2;
+
+  FileWithPath = NULL;
+  //
+  // test for an internal command.
+  //
+  if (ShellCommandIsCommandOnList(CmdName)) {
+    return (INTERNAL_COMMAND);
+  }
+
+  //
+  // Test for file system change request.  anything ending with : and cant have spaces.
+  //
+  if (CmdName[(StrLen(CmdName)-1)] == L':') {
+    if (StrStr(CmdName, L" ") != NULL) {
+      return (UNKNOWN_INVALID);
+    }
+    return (FILE_SYS_CHANGE);
+  }
+
+  //
+  // Test for a file
+  //
+  if ((FileWithPath = ShellFindFilePathEx(CmdName, mExecutableExtensions)) != NULL) {
+    //
+    // See if that file has a script file extension
+    //
+    if (StrLen(FileWithPath) > 4) {
+      TempLocation = FileWithPath+StrLen(FileWithPath)-4;
+      TempLocation2 = mScriptExtension;
+      if (StringNoCaseCompare((VOID*)(&TempLocation), (VOID*)(&TempLocation2)) == 0) {
+        SHELL_FREE_NON_NULL(FileWithPath);
+        return (SCRIPT_FILE_NAME);
+      }
+    }
+
+    //
+    // Was a file, but not a script.  we treat this as an application.
+    //
+    SHELL_FREE_NON_NULL(FileWithPath);
+    return (EFI_APPLICATION);
+  }
+  
+  SHELL_FREE_NON_NULL(FileWithPath);
+  //
+  // No clue what this is... return invalid flag...
+  //
+  return (UNKNOWN_INVALID);
+}
+
+/**
   Function will process and run a command line.
 
   This will determine if the command line represents an internal shell 
