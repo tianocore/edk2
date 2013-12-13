@@ -168,6 +168,7 @@ READ_LOCK_STATUS   = TRUE
   # Platform Driver
   #
   INF ArmPlatformPkg/ArmVExpressPkg/ArmFvpDxe/ArmFvpDxe.inf
+  INF OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
 
   #
   # UEFI application (Shell Embedded Boot Loader)

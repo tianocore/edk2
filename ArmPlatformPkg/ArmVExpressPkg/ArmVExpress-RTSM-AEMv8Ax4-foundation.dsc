@@ -34,6 +34,10 @@
   ArmCpuLib|ArmPkg/Drivers/ArmCpuLib/ArmCortexAEMv8Lib/ArmCortexAEMv8Lib.inf
   ArmPlatformLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressLibRTSM/ArmVExpressFoundationLib.inf
 
+  # Virtio Support
+  VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
+  VirtioMmioDeviceLib|OvmfPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
+
   ArmPlatformSysConfigLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressSysConfigLib/ArmVExpressSysConfigLib.inf
 
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
@@ -224,6 +228,7 @@
   # Platform Driver
   #
   ArmPlatformPkg/ArmVExpressPkg/ArmFvpDxe/ArmFvpDxe.inf
+  OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
 
   #
   # FAT filesystem + GPT/MBR partitioning

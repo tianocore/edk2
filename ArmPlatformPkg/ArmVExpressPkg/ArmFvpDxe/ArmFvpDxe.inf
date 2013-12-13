@@ -26,7 +26,10 @@
 [Packages]
   MdePkg/MdePkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
+  OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
   UefiDriverEntryPoint
   UefiBootServicesTableLib
+  VirtioMmioDeviceLib
+  BaseMemoryLib
