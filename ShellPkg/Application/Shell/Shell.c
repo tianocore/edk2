@@ -1656,6 +1656,57 @@ ChangeMappedDrive(
 }
 
 /**
+  Reprocess the command line to direct all -? to the help command.
+
+  if found, will add "help" as argv[0], and move the rest later.
+
+  @param[in,out] Argc  The pointer to argc to update 
+  @param[in,out] Argv  The pointer to argv to update (this is a pointer to an array of string pointers)
+**/
+EFI_STATUS
+EFIAPI
+DoHelpUpdateArgcArgv(
+  IN OUT UINTN *Argc,
+  IN OUT CHAR16 ***Argv
+  )
+{
+  UINTN Count;
+  UINTN Count2;
+  //
+  // Check each parameter
+  //
+  for (Count = 0 ; Count < (*Argc) ; Count++) {
+    //
+    // if it's "-?" or if the first parameter is "?"
+    //
+    if (StrStr((*Argv)[Count], L"-?") == (*Argv)[Count] 
+    ||  ((*Argv)[0][0] == L'?' && (*Argv)[0][1] == CHAR_NULL)
+      ) {
+      //
+      // We need to redo the arguments since a parameter was -?
+      // move them all down 1 to the end, then up one then replace the first with help
+      //
+      FreePool((*Argv)[Count]);
+      (*Argv)[Count] = NULL;
+      for (Count2 = Count ; (Count2 + 1) < (*Argc) ; Count2++) {
+        (*Argv)[Count2] = (*Argv)[Count2+1];
+      }
+      (*Argv)[Count2] = NULL;
+      for (Count2 = (*Argc) -1 ; Count2 > 0 ; Count2--) {
+        (*Argv)[Count2] = (*Argv)[Count2-1];
+      }
+      (*Argv)[0] = NULL;
+      (*Argv)[0] = StrnCatGrow(&(*Argv)[0], NULL, L"help", 0);
+      if ((*Argv)[0] == NULL) {
+        return (EFI_OUT_OF_RESOURCES);
+      }
+      break;
+    }
+  }
+  return (EFI_SUCCESS);
+}
+
+/**
   Function will process and run a command line.
 
   This will determine if the command line represents an internal shell 
@@ -1688,8 +1739,6 @@ RunCommand(
   SHELL_FILE_HANDLE         OriginalStdOut;
   SHELL_FILE_HANDLE         OriginalStdErr;
   SYSTEM_TABLE_INFO         OriginalSystemTableInfo;
-  UINTN                     Count;
-  UINTN                     Count2;
   CHAR16                    *CleanOriginal;
 
   ASSERT(CmdLine != NULL);
@@ -1770,27 +1819,10 @@ RunCommand(
       Status = UpdateArgcArgv(ShellInfoObject.NewShellParametersProtocol, CleanOriginal, &Argv, &Argc);
       ASSERT_EFI_ERROR(Status);
 
-      for (Count = 0 ; Count < ShellInfoObject.NewShellParametersProtocol->Argc ; Count++) {
-        if (StrStr(ShellInfoObject.NewShellParametersProtocol->Argv[Count], L"-?") == ShellInfoObject.NewShellParametersProtocol->Argv[Count]
-        ||  (ShellInfoObject.NewShellParametersProtocol->Argv[0][0] == L'?' && ShellInfoObject.NewShellParametersProtocol->Argv[0][1] == CHAR_NULL)
-          ) {
-          //
-          // We need to redo the arguments since a parameter was -?
-          // move them all down 1 to the end, then up one then replace the first with help
-          //
-          FreePool(ShellInfoObject.NewShellParametersProtocol->Argv[Count]);
-          ShellInfoObject.NewShellParametersProtocol->Argv[Count] = NULL;
-          for (Count2 = Count ; (Count2 + 1) < ShellInfoObject.NewShellParametersProtocol->Argc ; Count2++) {
-            ShellInfoObject.NewShellParametersProtocol->Argv[Count2] = ShellInfoObject.NewShellParametersProtocol->Argv[Count2+1];
-          }
-          ShellInfoObject.NewShellParametersProtocol->Argv[Count2] = NULL;
-          for (Count2 = ShellInfoObject.NewShellParametersProtocol->Argc -1 ; Count2 > 0 ; Count2--) {
-            ShellInfoObject.NewShellParametersProtocol->Argv[Count2] = ShellInfoObject.NewShellParametersProtocol->Argv[Count2-1];
-          }
-          ShellInfoObject.NewShellParametersProtocol->Argv[0] = NULL;
-          ShellInfoObject.NewShellParametersProtocol->Argv[0] = StrnCatGrow(&ShellInfoObject.NewShellParametersProtocol->Argv[0], NULL, L"help", 0);
-          break;
-        }
+      if (StrStr(CleanOriginal, L"?") != NULL) {
+        Status = DoHelpUpdateArgcArgv(
+          &ShellInfoObject.NewShellParametersProtocol->Argc,
+          &ShellInfoObject.NewShellParametersProtocol->Argv);
       }
 
       //
