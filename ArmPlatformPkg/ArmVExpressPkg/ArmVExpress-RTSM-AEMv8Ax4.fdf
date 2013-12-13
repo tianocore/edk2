@@ -163,7 +163,12 @@ READ_LOCK_STATUS   = TRUE
   #
   INF EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
   INF ArmPlatformPkg/Drivers/PL180MciDxe/PL180MciDxe.inf
- 
+
+  #
+  # Platform Driver
+  #
+  INF ArmPlatformPkg/ArmVExpressPkg/ArmFvpDxe/ArmFvpDxe.inf
+
   #
   # UEFI application (Shell Embedded Boot Loader)
   #

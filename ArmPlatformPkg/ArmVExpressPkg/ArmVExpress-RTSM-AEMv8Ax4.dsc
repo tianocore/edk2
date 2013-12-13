@@ -255,6 +255,11 @@
   ArmPlatformPkg/Drivers/PL180MciDxe/PL180MciDxe.inf
  
   #
+  # Platform Driver
+  #
+  ArmPlatformPkg/ArmVExpressPkg/ArmFvpDxe/ArmFvpDxe.inf
+
+  #
   # FAT filesystem + GPT/MBR partitioning
   #
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
