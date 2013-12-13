@@ -1589,6 +1589,36 @@ GetOperationType(
 }
 
 /**
+**/
+EFI_STATUS
+EFIAPI
+ProcessNewSplitCommandLine(
+  IN CONST CHAR16 *CmdLine
+  )
+{
+  SPLIT_LIST                *Split;
+  EFI_STATUS                Status;
+
+  Split = NULL;
+
+  //
+  // are we in an existing split???
+  //
+  if (!IsListEmpty(&ShellInfoObject.SplitList.Link)) {
+    Split = (SPLIT_LIST*)GetFirstNode(&ShellInfoObject.SplitList.Link);
+  }
+
+  if (Split == NULL) {
+    Status = RunSplitCommand(CmdLine, NULL, NULL);
+  } else {
+    Status = RunSplitCommand(CmdLine, Split->SplitStdIn, Split->SplitStdOut);
+  }
+  if (EFI_ERROR(Status)) {
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_INVALID_SPLIT), ShellInfoObject.HiiHandle, CmdLine);
+  }
+  return (Status);
+}
+/**
   Function will process and run a command line.
 
   This will determine if the command line represents an internal shell 
@@ -1624,7 +1654,6 @@ RunCommand(
   UINTN                     Count;
   UINTN                     Count2;
   CHAR16                    *CleanOriginal;
-  SPLIT_LIST                *Split;
 
   ASSERT(CmdLine != NULL);
   if (StrLen(CmdLine) == 0) {
@@ -1636,7 +1665,6 @@ RunCommand(
   DevPath             = NULL;
   Status              = EFI_SUCCESS;
   CleanOriginal       = NULL;
-  Split               = NULL;
 
   CleanOriginal = StrnCatGrow(&CleanOriginal, NULL, CmdLine, 0);
   if (CleanOriginal == NULL) {
@@ -1672,21 +1700,7 @@ RunCommand(
   // We dont do normal processing with a split command line (output from one command input to another)
   //
   if (ContainsSplit(CleanOriginal)) {
-    //
-    // are we in an existing split???
-    //
-    if (!IsListEmpty(&ShellInfoObject.SplitList.Link)) {
-      Split = (SPLIT_LIST*)GetFirstNode(&ShellInfoObject.SplitList.Link);
-    }
-
-    if (Split == NULL) {
-      Status = RunSplitCommand(CleanOriginal, NULL, NULL);
-    } else {
-      Status = RunSplitCommand(CleanOriginal, Split->SplitStdIn, Split->SplitStdOut);
-    }
-    if (EFI_ERROR(Status)) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_INVALID_SPLIT), ShellInfoObject.HiiHandle, CleanOriginal);
-    }
+    Status = ProcessNewSplitCommandLine(CleanOriginal);
   } else {
 
     //
