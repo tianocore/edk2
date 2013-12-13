@@ -451,7 +451,7 @@ XhcGetRootHubPortStatus (
 
   for (Index = 0; Index < MapSize; Index++) {
     if (XHC_BIT_IS_SET (State, mUsbClearPortChangeMap[Index].HwState)) {
-      XhcClearRootHubPortFeature (This, PortNumber, mUsbClearPortChangeMap[Index].Selector);
+      XhcClearRootHubPortFeature (This, PortNumber, (EFI_USB_PORT_FEATURE)mUsbClearPortChangeMap[Index].Selector);
     }
   }
 
