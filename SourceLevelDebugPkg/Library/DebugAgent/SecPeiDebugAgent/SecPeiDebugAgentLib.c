@@ -613,7 +613,7 @@ InitializeDebugAgent (
   //
   // Set return status for DEBUG_AGENT_INIT_PEI
   //
-  if (InitFlag == DEBUG_AGENT_INIT_PEI) {
+  if (InitFlag == DEBUG_AGENT_INIT_PEI && Context != NULL) {
     *(EFI_STATUS *)Context = EFI_SUCCESS;
   }
 }
