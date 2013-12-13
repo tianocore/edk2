@@ -233,6 +233,13 @@ EslTcp4ConnectComplete (
               pTcp4->ConfigData.AccessPoint.RemotePort ));
 
     //
+    //  Start the receive operations
+    //
+    pSocket->bConfigured = TRUE;
+    pSocket->State = SOCKET_STATE_CONNECTED;
+    EslSocketRxStart ( pPort );
+
+    //
     //  Remove the rest of the ports
     //
     bRemovePorts = TRUE;
@@ -416,7 +423,6 @@ EslTcp4ConnectPoll (
 
     case EFI_SUCCESS:
       pSocket->errno = 0;
-      pSocket->bConfigured = TRUE;
       break;
 
     case EFI_TIMEOUT:

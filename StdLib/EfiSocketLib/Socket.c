@@ -1825,15 +1825,7 @@ EslSocketConnect (
           //  Set the next state if connected
           //
           if ( EFI_NOT_READY != Status ) {
-            if ( !EFI_ERROR ( Status )) {
-              pSocket->State = SOCKET_STATE_CONNECTED;
-
-              //
-              //  Start the receive operations
-              //
-              EslSocketRxStart ( pSocket->pPortList );
-            }
-            else {
+            if ( EFI_ERROR ( Status )) {
               pSocket->State = SOCKET_STATE_BOUND;
             }
           }
@@ -5141,7 +5133,7 @@ EslSocketRxPoll (
   <ul>
     <li>::EslIp4Receive to restart the receive engine to release flow control.</li>
     <li>::EslIp4RxComplete to continue the operation of the receive engine if flow control is not being applied.</li>
-    <li>::EslIp4SocketIsConfigured to start the recevie engine for the new socket.</li>
+    <li>::EslIp4SocketIsConfigured to start the receive engine for the new socket.</li>
     <li>::EslTcp4ListenComplete to start the recevie engine for the new socket.</li>
     <li>::EslTcp4Receive to restart the receive engine to release flow control.</li>
     <li>::EslTcp4RxComplete to continue the operation of the receive engine if flow control is not being applied.</li>
