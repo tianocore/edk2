@@ -1163,8 +1163,15 @@ UpdateStdInStdOutStdErr(
   CalculateEfiHdrCrc(&gST->Hdr);
 
   if (gST->ConIn == NULL ||gST->ConOut == NULL) {
-    return (EFI_OUT_OF_RESOURCES);
+    Status = EFI_OUT_OF_RESOURCES;
   }
+
+  if (Status == EFI_NOT_FOUND) {
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_REDUNDA_REDIR), ShellInfoObject.HiiHandle);
+  } else if (EFI_ERROR(Status)) {
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_INVALID_REDIR), ShellInfoObject.HiiHandle);
+  }
+
   return (Status);
 }
 
