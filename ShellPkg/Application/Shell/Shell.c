@@ -1618,6 +1618,43 @@ ProcessNewSplitCommandLine(
   }
   return (Status);
 }
+
+/**
+  Handle a request to change the current file system
+
+  @param[in] CmdLine  The passed in command line
+
+  @retval EFI_SUCCESS The operation was successful
+**/
+EFI_STATUS
+EFIAPI
+ChangeMappedDrive(
+  IN CONST CHAR16 *CmdLine
+  )
+{
+  EFI_STATUS Status;
+  Status = EFI_SUCCESS;
+
+  //
+  // make sure we are the right operation
+  //
+  ASSERT(CmdLine[(StrLen(CmdLine)-1)] == L':' && StrStr(CmdLine, L" ") == NULL);
+  
+  //
+  // Call the protocol API to do the work
+  //
+  Status = ShellInfoObject.NewEfiShellProtocol->SetCurDir(NULL, CmdLine);
+
+  //
+  // Report any errors
+  //
+  if (EFI_ERROR(Status)) {
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_INVALID_MAPPING), ShellInfoObject.HiiHandle, CmdLine);
+  }
+
+  return (Status);
+}
+
 /**
   Function will process and run a command line.
 
@@ -1702,18 +1739,15 @@ RunCommand(
   if (ContainsSplit(CleanOriginal)) {
     Status = ProcessNewSplitCommandLine(CleanOriginal);
   } else {
-
     //
     // If this is a mapped drive change handle that...
     //
     if (CleanOriginal[(StrLen(CleanOriginal)-1)] == L':' && StrStr(CleanOriginal, L" ") == NULL) {
-      Status = ShellInfoObject.NewEfiShellProtocol->SetCurDir(NULL, CleanOriginal);
-      if (EFI_ERROR(Status)) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_INVALID_MAPPING), ShellInfoObject.HiiHandle, CleanOriginal);
-      }
-      FreePool(CleanOriginal);
+      Status = ChangeMappedDrive(CleanOriginal);
+      SHELL_FREE_NON_NULL(CleanOriginal);
       return (Status);
     }
+
 
     ///@todo update this section to divide into 3 ways - run internal command, run split (above), and run an external file...
     ///      We waste a lot of time doing processing like StdIn,StdOut,Argv,Argc for things that are external files...
