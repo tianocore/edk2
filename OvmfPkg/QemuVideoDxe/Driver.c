@@ -209,6 +209,7 @@ QemuVideoControllerDriverStart (
   PCI_TYPE00                        Pci;
   QEMU_VIDEO_CARD                   *Card;
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *MmioDesc;
+  EFI_PCI_IO_PROTOCOL               *ChildPciIo;
 
   PciAttributesSaved = FALSE;
   //
@@ -419,6 +420,22 @@ QemuVideoControllerDriverStart (
                     &Private->GraphicsOutput,
                     NULL
                     );
+    if (EFI_ERROR (Status)) {
+      goto Error;
+    }
+
+    Status = gBS->OpenProtocol (
+                  Controller,
+                  &gEfiPciIoProtocolGuid,
+                  (VOID **) &ChildPciIo,
+                  This->DriverBindingHandle,
+                  Private->Handle,
+                  EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+                  );
+
+    if (EFI_ERROR (Status)) {
+      goto Error;
+    }
   }
 
 Error:
@@ -440,7 +457,14 @@ Error:
         // Close the PCI I/O Protocol
         //
         gBS->CloseProtocol (
-              Private->Handle,
+              Controller,
+              &gEfiPciIoProtocolGuid,
+              This->DriverBindingHandle,
+              Controller
+              );
+
+        gBS->CloseProtocol (
+              Controller,
               &gEfiPciIoProtocolGuid,
               This->DriverBindingHandle,
               Private->Handle
@@ -531,6 +555,13 @@ QemuVideoControllerDriverStop (
         &gEfiPciIoProtocolGuid,
         This->DriverBindingHandle,
         Controller
+        );
+
+  gBS->CloseProtocol (
+        Controller,
+        &gEfiPciIoProtocolGuid,
+        This->DriverBindingHandle,
+        Private->Handle
         );
 
   //
