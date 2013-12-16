@@ -41,6 +41,9 @@ EFI_HANDLE  mNewHandle = NULL;
 //
 UINTN       mTimes      = 0;
 
+UINT32      mMaxSizePopulateCapsule     = 0;
+UINT32      mMaxSizeNonPopulateCapsule  = 0;
+
 /**
   Create the variable to save the base address of page table and stack
   for transferring into long mode in IA32 PEI.
@@ -339,13 +342,13 @@ QueryCapsuleCapabilities (
       return EFI_UNSUPPORTED;
     }
     *ResetType = EfiResetWarm;
-    *MaxiumCapsuleSize = FixedPcdGet32(PcdMaxSizePopulateCapsule);
+    *MaxiumCapsuleSize = (UINT64) mMaxSizePopulateCapsule;
   } else {
     //
     // For non-reset capsule image.
     //
     *ResetType = EfiResetCold;
-    *MaxiumCapsuleSize = FixedPcdGet32(PcdMaxSizeNonPopulateCapsule);
+    *MaxiumCapsuleSize = (UINT64) mMaxSizeNonPopulateCapsule;
   }
 
   return EFI_SUCCESS;
@@ -370,7 +373,10 @@ CapsuleServiceInitialize (
   )
 {
   EFI_STATUS  Status;
-  
+
+  mMaxSizePopulateCapsule = PcdGet32(PcdMaxSizePopulateCapsule);
+  mMaxSizeNonPopulateCapsule = PcdGet32(PcdMaxSizeNonPopulateCapsule);
+
   //
   // When PEI phase is IA32, DXE phase is X64, it is possible that capsule data are 
   // put above 4GB, so capsule PEI will transfer to long mode to get capsule data.
