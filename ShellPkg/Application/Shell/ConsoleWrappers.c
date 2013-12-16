@@ -255,7 +255,9 @@ FileBasedSimpleTextOutQueryMode (
   OUT UINTN                           *Rows
   )
 {
-  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *PassThruProtocol = ((SHELL_EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *)This)->OriginalSimpleTextOut;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *PassThruProtocol;
+  
+  PassThruProtocol = ((SHELL_EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *)This)->OriginalSimpleTextOut;
   
   // Pass the QueryMode call thru to the original SimpleTextOutProtocol
   return (PassThruProtocol->QueryMode(
