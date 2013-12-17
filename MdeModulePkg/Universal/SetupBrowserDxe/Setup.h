@@ -288,9 +288,11 @@ typedef enum {
   ExpressOption
 } EXPRESS_LEVEL;
 
+typedef struct _FORM_BROWSER_STATEMENT FORM_BROWSER_STATEMENT;
+
 #define FORM_BROWSER_STATEMENT_SIGNATURE  SIGNATURE_32 ('F', 'S', 'T', 'A')
 
-typedef struct {
+struct _FORM_BROWSER_STATEMENT{
   UINTN                 Signature;
   LIST_ENTRY            Link;
 
@@ -352,7 +354,8 @@ typedef struct {
 
   EFI_IMAGE_ID          ImageId;             // nested EFI_IFR_IMAGE
   UINT8                 RefreshInterval;     // nested EFI_IFR_REFRESH, refresh interval(in seconds) for Question value, 0 means no refresh
-  BOOLEAN               InSubtitle;          // nesting inside of EFI_IFR_SUBTITLE
+
+  FORM_BROWSER_STATEMENT *ParentStatement;
 
   LIST_ENTRY            InconsistentListHead;// nested inconsistent expression list (FORM_EXPRESSION)
   LIST_ENTRY            NoSubmitListHead;    // nested nosubmit expression list (FORM_EXPRESSION)
@@ -361,7 +364,7 @@ typedef struct {
 
   FORM_EXPRESSION       *ReadExpression;     // nested EFI_IFR_READ, provide this question value by read expression.
   FORM_EXPRESSION       *WriteExpression;    // nested EFI_IFR_WRITE, evaluate write expression after this question value is set.
-} FORM_BROWSER_STATEMENT;
+};
 
 #define FORM_BROWSER_STATEMENT_FROM_LINK(a)  CR (a, FORM_BROWSER_STATEMENT, Link, FORM_BROWSER_STATEMENT_SIGNATURE)
 

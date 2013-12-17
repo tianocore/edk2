@@ -387,18 +387,17 @@ QuestionCheck (
 
   @param DisplayStatement      Pointer to the display Statement data strucure.
   @param Statement             The statement need to check.
-  @param HostDisplayStatement  Pointer to the display Statement data strucure which is an host statement.
 **/
 VOID
 InitializeDisplayStatement (
   IN OUT FORM_DISPLAY_ENGINE_STATEMENT *DisplayStatement,
-  IN     FORM_BROWSER_STATEMENT        *Statement,
-  IN     FORM_DISPLAY_ENGINE_STATEMENT *HostDisplayStatement
+  IN     FORM_BROWSER_STATEMENT        *Statement
   )
 {
   LIST_ENTRY                 *Link;
   QUESTION_OPTION            *Option;
   DISPLAY_QUESTION_OPTION    *DisplayOption;
+  FORM_DISPLAY_ENGINE_STATEMENT *ParentStatement;
 
   DisplayStatement->Signature = FORM_DISPLAY_ENGINE_STATEMENT_SIGNATURE;
   DisplayStatement->Version   = FORM_DISPLAY_ENGINE_STATEMENT_VERSION_1;
@@ -502,8 +501,10 @@ InitializeDisplayStatement (
   // If this statement is nest in the subtitle, insert to the host statement.
   // else insert to the form it belongs to.
   //
-  if (Statement->InSubtitle) {
-    InsertTailList(&HostDisplayStatement->NestStatementList, &DisplayStatement->DisplayLink);
+  if (Statement->ParentStatement != NULL) {
+    ParentStatement = GetDisplayStatement(Statement->ParentStatement->OpCode);
+    ASSERT (ParentStatement != NULL);
+    InsertTailList(&ParentStatement->NestStatementList, &DisplayStatement->DisplayLink);
   } else {
     InsertTailList(&gDisplayFormData.StatementListHead, &DisplayStatement->DisplayLink);
   }
@@ -625,14 +626,12 @@ AddStatementToDisplayForm (
   LIST_ENTRY                    *Link;
   FORM_BROWSER_STATEMENT        *Statement;
   FORM_DISPLAY_ENGINE_STATEMENT *DisplayStatement;
-  FORM_DISPLAY_ENGINE_STATEMENT *HostDisplayStatement;
   UINT8                         MinRefreshInterval;
   EFI_EVENT                     RefreshIntervalEvent;
   FORM_BROWSER_REFRESH_EVENT_NODE *EventNode;
   BOOLEAN                       FormEditable;
   UINT32                        ExtraAttribute;
 
-  HostDisplayStatement = NULL;
   MinRefreshInterval   = 0;
   FormEditable         = FALSE;
 
@@ -686,20 +685,12 @@ AddStatementToDisplayForm (
     //
     // Initialize this statement and add it to the display form.
     //
-    InitializeDisplayStatement(DisplayStatement, Statement, HostDisplayStatement);
+    InitializeDisplayStatement(DisplayStatement, Statement);
 
     //
     // Set the extra attribute.
     //
     DisplayStatement->Attribute |= ExtraAttribute;
-
-    //
-    // Save the Host statement info.
-    // Host statement may has nest statement follow it.
-    //
-    if (!Statement->InSubtitle) {
-      HostDisplayStatement = DisplayStatement;
-    }
 
     if (Statement->Storage != NULL) {
       FormEditable = TRUE;

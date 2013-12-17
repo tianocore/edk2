@@ -54,9 +54,6 @@
   gEdkiiFormDisplayEngineProtocolGuid
   gEdkiiFormBrowserEx2ProtocolGuid
 
-[Guids]
-  gEfiIfrTianoGuid                              ## CONSUMES  ## GUID  
-  
 [Depex]
   gEfiHiiDatabaseProtocolGuid AND gEfiHiiConfigRoutingProtocolGuid AND gEdkiiFormBrowserEx2ProtocolGuid
   

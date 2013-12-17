@@ -699,6 +699,13 @@ ConvertStatementToMenu (
       NestStatement = FORM_DISPLAY_ENGINE_STATEMENT_FROM_LINK (NestLink);
       NestLink = GetNextNode (&Statement->NestStatementList, NestLink);
 
+      //
+      // Skip the opcode not recognized by Display core.
+      //
+      if (NestStatement->OpCode->OpCode == EFI_IFR_GUID_OP) {
+        continue;
+      }
+
       UiAddMenuOption (NestStatement, &MenuItemCount, TRUE);
     }
   }

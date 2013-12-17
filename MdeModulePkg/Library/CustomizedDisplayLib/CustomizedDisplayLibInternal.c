@@ -322,7 +322,9 @@ ProcessExternedOpcode (
   )
 {
   LIST_ENTRY                    *Link;
+  LIST_ENTRY                    *NestLink;
   FORM_DISPLAY_ENGINE_STATEMENT *Statement;
+  FORM_DISPLAY_ENGINE_STATEMENT *NestStatement;
 
   Link = GetFirstNode (&FormData->StatementListOSF);
   while (!IsNull (&FormData->StatementListOSF, Link)) {
@@ -338,6 +340,15 @@ ProcessExternedOpcode (
     Link = GetNextNode (&FormData->StatementListHead, Link);
 
     ProcessUserOpcode(Statement->OpCode);
+
+    NestLink = GetFirstNode (&Statement->NestStatementList);
+    while (!IsNull (&Statement->NestStatementList, NestLink)) {
+      NestStatement = FORM_DISPLAY_ENGINE_STATEMENT_FROM_LINK (NestLink);
+      NestLink = GetNextNode (&Statement->NestStatementList, NestLink);
+
+      ProcessUserOpcode(NestStatement->OpCode);
+    }
+
   }
 }
 

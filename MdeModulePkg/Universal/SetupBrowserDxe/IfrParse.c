@@ -17,7 +17,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 UINT16           mStatementIndex;
 UINT16           mExpressionOpCodeIndex;
 EFI_QUESTION_ID  mUsedQuestionId;
-BOOLEAN          mInScopeSubtitle;
 extern LIST_ENTRY      gBrowserStorageList;
 /**
   Initialize Statement header members.
@@ -78,8 +77,6 @@ CreateStatement (
     Statement->Expression->Signature = FORM_EXPRESSION_LIST_SIGNATURE;
     CopyMem (Statement->Expression->Expression, GetConditionalExpressionList(ExpressStatement), (UINTN) (sizeof (FORM_EXPRESSION *) * ConditionalExprCount));
   }
-
-  Statement->InSubtitle = mInScopeSubtitle;
 
   //
   // Insert this Statement into current Form
@@ -1039,6 +1036,39 @@ IsExpressionOpCode (
   }
 }
 
+/**
+  Tell whether this Operand is an Statement OpCode.
+
+  @param  Operand                Operand of an IFR OpCode.
+
+  @retval TRUE                   This is an Statement OpCode.
+  @retval FALSE                  Not an Statement OpCode.
+
+**/
+BOOLEAN
+IsStatementOpCode (
+  IN UINT8              Operand
+  )
+{
+  if ((Operand == EFI_IFR_SUBTITLE_OP) ||
+      (Operand == EFI_IFR_TEXT_OP) ||
+      (Operand == EFI_IFR_RESET_BUTTON_OP) ||
+      (Operand == EFI_IFR_REF_OP) ||
+      (Operand == EFI_IFR_ACTION_OP) ||
+      (Operand == EFI_IFR_NUMERIC_OP) ||
+      (Operand == EFI_IFR_ORDERED_LIST_OP) ||
+      (Operand == EFI_IFR_CHECKBOX_OP) ||
+      (Operand == EFI_IFR_STRING_OP) ||
+      (Operand == EFI_IFR_PASSWORD_OP) ||
+      (Operand == EFI_IFR_DATE_OP) ||
+      (Operand == EFI_IFR_TIME_OP) ||
+      (Operand == EFI_IFR_GUID_OP) ||
+      (Operand == EFI_IFR_ONE_OF_OP)) {
+    return TRUE;
+  } else {
+    return FALSE;
+  }
+}
 
 /**
   Calculate number of Statemens(Questions) and Expression OpCodes.
@@ -1100,6 +1130,7 @@ ParseOpCodes (
   EFI_STATUS              Status;
   FORM_BROWSER_FORM       *CurrentForm;
   FORM_BROWSER_STATEMENT  *CurrentStatement;
+  FORM_BROWSER_STATEMENT  *ParentStatement;
   EXPRESSION_OPCODE       *ExpressionOpCode;
   FORM_EXPRESSION         *CurrentExpression;
   UINT8                   Operand;
@@ -1132,7 +1163,6 @@ ParseOpCodes (
   BOOLEAN                 InScopeDisable;
   INTN                    ConditionalExprCount;
 
-  mInScopeSubtitle         = FALSE;
   SuppressForQuestion      = FALSE;
   SuppressForOption        = FALSE;
   InScopeDisable           = FALSE;
@@ -1180,6 +1210,7 @@ ParseOpCodes (
 
   CurrentForm = NULL;
   CurrentStatement = NULL;
+  ParentStatement  = NULL;
 
   ResetScopeStack ();
 
@@ -1270,8 +1301,8 @@ ParseOpCodes (
         break;
 
       case EFI_IFR_THIS_OP:
-        ASSERT (CurrentStatement != NULL);
-        ExpressionOpCode->QuestionId = CurrentStatement->QuestionId;
+        ASSERT (ParentStatement != NULL);
+        ExpressionOpCode->QuestionId = ParentStatement->QuestionId;
         break;
 
       case EFI_IFR_SECURITY_OP:
@@ -1685,9 +1716,6 @@ ParseOpCodes (
 
       CurrentStatement->Flags = ((EFI_IFR_SUBTITLE *) OpCodeData)->Flags;
       CurrentStatement->FakeQuestionId = mUsedQuestionId++;
-      if (Scope != 0) {
-        mInScopeSubtitle = TRUE;
-      }
       break;
 
     case EFI_IFR_TEXT_OP:
@@ -1927,7 +1955,7 @@ ParseOpCodes (
       //
       // Insert to Default Value list of current Question
       //
-      InsertTailList (&CurrentStatement->DefaultListHead, &CurrentDefault->Link);
+      InsertTailList (&ParentStatement->DefaultListHead, &CurrentDefault->Link);
 
       if (Scope != 0) {
         InScopeDefault = TRUE;
@@ -1966,16 +1994,15 @@ ParseOpCodes (
         CopyMem (CurrentOption->SuppressExpression->Expression, GetConditionalExpressionList(ExpressOption), (UINTN) (sizeof (FORM_EXPRESSION *) * ConditionalExprCount));
       }
 
+      ASSERT (ParentStatement != NULL);
       //
       // Insert to Option list of current Question
       //
-      InsertTailList (&CurrentStatement->OptionListHead, &CurrentOption->Link);
-
+      InsertTailList (&ParentStatement->OptionListHead, &CurrentOption->Link);
       //
       // Now we know the Storage width of nested Ordered List
       //
-      ASSERT (CurrentStatement != NULL);
-      if ((CurrentStatement->Operand == EFI_IFR_ORDERED_LIST_OP) && (CurrentStatement->BufferValue == NULL)) {
+      if ((ParentStatement->Operand == EFI_IFR_ORDERED_LIST_OP) && (ParentStatement->BufferValue == NULL)) {
         Width = 1;
         switch (CurrentOption->Value.Type) {
         case EFI_IFR_TYPE_NUM_SIZE_8:
@@ -2001,15 +2028,15 @@ ParseOpCodes (
           break;
         }
 
-        CurrentStatement->StorageWidth = (UINT16) (CurrentStatement->MaxContainers * Width);
-        CurrentStatement->BufferValue = AllocateZeroPool (CurrentStatement->StorageWidth);
-        CurrentStatement->ValueType = CurrentOption->Value.Type;
-        if (CurrentStatement->HiiValue.Type == EFI_IFR_TYPE_BUFFER) {
-          CurrentStatement->HiiValue.Buffer = CurrentStatement->BufferValue;
-          CurrentStatement->HiiValue.BufferLen = CurrentStatement->StorageWidth;
+        ParentStatement->StorageWidth = (UINT16) (ParentStatement->MaxContainers * Width);
+        ParentStatement->BufferValue = AllocateZeroPool (ParentStatement->StorageWidth);
+        ParentStatement->ValueType = CurrentOption->Value.Type;
+        if (ParentStatement->HiiValue.Type == EFI_IFR_TYPE_BUFFER) {
+          ParentStatement->HiiValue.Buffer = ParentStatement->BufferValue;
+          ParentStatement->HiiValue.BufferLen = ParentStatement->StorageWidth;
         }
 
-        InitializeRequestElement (FormSet, CurrentStatement, CurrentForm);
+        InitializeRequestElement (FormSet, ParentStatement, CurrentForm);
       }
       break;
 
@@ -2026,10 +2053,10 @@ ParseOpCodes (
 
       if (Operand == EFI_IFR_NO_SUBMIT_IF_OP) {
         CurrentExpression->Type = EFI_HII_EXPRESSION_NO_SUBMIT_IF;
-        InsertTailList (&CurrentStatement->NoSubmitListHead, &CurrentExpression->Link);
+        InsertTailList (&ParentStatement->NoSubmitListHead, &CurrentExpression->Link);
       } else {
         CurrentExpression->Type = EFI_HII_EXPRESSION_INCONSISTENT_IF;
-        InsertTailList (&CurrentStatement->InconsistentListHead, &CurrentExpression->Link);
+        InsertTailList (&ParentStatement->InconsistentListHead, &CurrentExpression->Link);
       }
 
       //
@@ -2049,7 +2076,7 @@ ParseOpCodes (
       CopyMem (&CurrentExpression->Error, &((EFI_IFR_WARNING_IF *) OpCodeData)->Warning, sizeof (EFI_STRING_ID));
       CurrentExpression->TimeOut = ((EFI_IFR_WARNING_IF *) OpCodeData)->TimeOut;
       CurrentExpression->Type    = EFI_HII_EXPRESSION_WARNING_IF;
-      InsertTailList (&CurrentStatement->WarningListHead, &CurrentExpression->Link);
+      InsertTailList (&ParentStatement->WarningListHead, &CurrentExpression->Link);
 
       //
       // Take a look at next OpCode to see whether current expression consists
@@ -2160,8 +2187,8 @@ ParseOpCodes (
         // If it is NULL, 1) ParseOpCodes functions may parse the IFR wrongly. Or 2) the IFR
         // file is wrongly generated by tools such as VFR Compiler. There may be a bug in VFR Compiler.
         //
-        ASSERT (CurrentStatement != NULL);
-        CurrentStatement->ValueExpression = CurrentExpression;
+        ASSERT (ParentStatement != NULL);
+        ParentStatement->ValueExpression = CurrentExpression;
       }
 
       //
@@ -2199,8 +2226,8 @@ ParseOpCodes (
       // If it is NULL, 1) ParseOpCodes functions may parse the IFR wrongly. Or 2) the IFR
       // file is wrongly generated by tools such as VFR Compiler. There may be a bug in VFR Compiler.
       //
-      ASSERT (CurrentStatement != NULL);
-      CurrentStatement->ReadExpression = CurrentExpression;
+      ASSERT (ParentStatement != NULL);
+      ParentStatement->ReadExpression = CurrentExpression;
 
       //
       // Take a look at next OpCode to see whether current expression consists
@@ -2221,8 +2248,8 @@ ParseOpCodes (
       // If it is NULL, 1) ParseOpCodes functions may parse the IFR wrongly. Or 2) the IFR
       // file is wrongly generated by tools such as VFR Compiler. There may be a bug in VFR Compiler.
       //
-      ASSERT (CurrentStatement != NULL);
-      CurrentStatement->WriteExpression = CurrentExpression;
+      ASSERT (ParentStatement != NULL);
+      ParentStatement->WriteExpression = CurrentExpression;
 
       //
       // Take a look at next OpCode to see whether current expression consists
@@ -2264,8 +2291,8 @@ ParseOpCodes (
         // If it is NULL, 1) ParseOpCodes functions may parse the IFR wrongly. Or 2) the IFR
         // file is wrongly generated by tools such as VFR Compiler.
         //
-        ASSERT (CurrentStatement != NULL);
-        ImageId = &CurrentStatement->ImageId;
+        ASSERT (ParentStatement != NULL);
+        ImageId = &ParentStatement->ImageId;
         break;
       }
 
@@ -2277,16 +2304,16 @@ ParseOpCodes (
     // Refresh
     //
     case EFI_IFR_REFRESH_OP:
-      ASSERT (CurrentStatement != NULL);
-      CurrentStatement->RefreshInterval = ((EFI_IFR_REFRESH *) OpCodeData)->RefreshInterval;
+      ASSERT (ParentStatement != NULL);
+      ParentStatement->RefreshInterval = ((EFI_IFR_REFRESH *) OpCodeData)->RefreshInterval;
       break;
 
     //
     // Refresh guid.
     //
     case EFI_IFR_REFRESH_ID_OP:
-      ASSERT (CurrentStatement != NULL);
-      CopyMem (&CurrentStatement->RefreshGuid, &((EFI_IFR_REFRESH_ID *) OpCodeData)->RefreshEventGroupId, sizeof (EFI_GUID));
+      ASSERT (ParentStatement != NULL);
+      CopyMem (&ParentStatement->RefreshGuid, &((EFI_IFR_REFRESH_ID *) OpCodeData)->RefreshEventGroupId, sizeof (EFI_GUID));
       break;
 
     //
@@ -2314,8 +2341,8 @@ ParseOpCodes (
         break;
 
       default:
-        ASSERT (CurrentStatement != NULL);
-        CurrentStatement->Locked = TRUE;
+        ASSERT (ParentStatement != NULL);
+        ParentStatement->Locked = TRUE;
       }      
       break;
 
@@ -2334,6 +2361,13 @@ ParseOpCodes (
       if (EFI_ERROR (Status)) {
         ResetScopeStack ();
         return Status;
+      }
+      
+      //
+      // Parent statement end tag found, update ParentStatement info.
+      //
+      if (IsStatementOpCode(ScopeOpCode) && ParentStatement->Operand == ScopeOpCode) {
+        ParentStatement  = ParentStatement->ParentStatement;
       }
 
       switch (ScopeOpCode) {
@@ -2359,10 +2393,6 @@ ParseOpCodes (
         // End of Option
         //
         CurrentOption = NULL;
-        break;
-
-      case EFI_IFR_SUBTITLE_OP:
-        mInScopeSubtitle = FALSE;
         break;
 
       case EFI_IFR_NO_SUBMIT_IF_OP:
@@ -2455,6 +2485,17 @@ ParseOpCodes (
 
     default:
       break;
+    }
+
+    if (IsStatementOpCode(Operand)) {
+      CurrentStatement->ParentStatement = ParentStatement;
+      if (Scope != 0) {
+        //
+        // Scope != 0, other statements or options may nest in this statement.
+        // Update the ParentStatement info.
+        //
+        ParentStatement = CurrentStatement;
+      }
     }
   }
 
