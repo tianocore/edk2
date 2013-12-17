@@ -270,7 +270,7 @@ ReturnUintn(
 {
   UINT64        RetVal;
 
-  if (!EFI_ERROR(ShellConvertStringToUint64(String, &RetVal, FALSE, FALSE))) {
+  if (!EFI_ERROR(ShellConvertStringToUint64(String, &RetVal, FALSE, TRUE))) {
     return ((UINTN)RetVal);
   }
   return ((UINTN)(-1));
@@ -370,11 +370,7 @@ ShellCommandRunFor (
         gEfiShellParametersProtocol->Argv[2]) == 0) {
       for (LoopVar = 0x3 ; LoopVar < gEfiShellParametersProtocol->Argc ; LoopVar++) {
         ASSERT((ArgSet == NULL && ArgSize == 0) || (ArgSet != NULL));
-        if (ArgSet == NULL) {
-  //        ArgSet = StrnCatGrow(&ArgSet, &ArgSize, L"\"", 0);
-        } else {
-          ArgSet = StrnCatGrow(&ArgSet, &ArgSize, L" \"", 0);
-        }
+        ArgSet = StrnCatGrow(&ArgSet, &ArgSize, L" \"", 0);
         if (StrStr(gEfiShellParametersProtocol->Argv[LoopVar], L"*") != NULL
           ||StrStr(gEfiShellParametersProtocol->Argv[LoopVar], L"?") != NULL
           ||StrStr(gEfiShellParametersProtocol->Argv[LoopVar], L"[") != NULL
