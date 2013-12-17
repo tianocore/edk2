@@ -49,7 +49,7 @@ DiscoverPeimsAndOrderWithApriori (
   UINTN                               PeimIndex;
   UINTN                               PeimCount;
   EFI_GUID                            *Guid;
-  EFI_PEI_FILE_HANDLE                 TempFileHandles[FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)];
+  EFI_PEI_FILE_HANDLE                 TempFileHandles[FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv) + 1];
   EFI_GUID                            FileGuid[FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)];
   EFI_PEI_FIRMWARE_VOLUME_PPI         *FvPpi;
   EFI_FV_FILE_INFO                    FileInfo;
@@ -75,20 +75,21 @@ DiscoverPeimsAndOrderWithApriori (
   //
   // Go ahead to scan this Fv, and cache FileHandles within it.
   //
-  for (PeimCount = 0; PeimCount < FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv); PeimCount++) {
+  Status = EFI_NOT_FOUND;
+  for (PeimCount = 0; PeimCount <= FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv); PeimCount++) {
     Status = FvPpi->FindFileByType (FvPpi, PEI_CORE_INTERNAL_FFS_FILE_DISPATCH_TYPE, CoreFileHandle->FvHandle, &FileHandle);
-    if (Status != EFI_SUCCESS) {
+    if (Status != EFI_SUCCESS || PeimCount == FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)) {
       break;
     }
 
     Private->CurrentFvFileHandles[PeimCount] = FileHandle;
   }
-  
+
   //
   // Check whether the count of Peims exceeds the max support PEIMs in a FV image
   // If more Peims are required in a FV image, PcdPeiCoreMaxPeimPerFv can be set to a larger value in DSC file.
   //
-  ASSERT (PeimCount < FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv));
+  ASSERT ((Status != EFI_SUCCESS) || (PeimCount < FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)));
 
   //
   // Get Apriori File handle
@@ -1001,7 +1002,10 @@ PeiDispatcher (
                 HoleMemBase   = TopOfNewStack;
                 HoleMemSize   = TemporaryRamSize - PeiTemporaryRamSize - TemporaryStackSize;
                 if (HoleMemSize != 0) {
-                  BaseOfNewHeap = BaseOfNewHeap + HoleMemSize;
+                  //
+                  // Make sure HOB List start address is 8 byte alignment.
+                  //
+                  BaseOfNewHeap = ALIGN_VALUE (BaseOfNewHeap + HoleMemSize, 8);
                 }
                 if (BaseOfNewHeap >= (UINTN)SecCoreData->PeiTemporaryRamBase) {
                   Private->HeapOffsetPositive = TRUE;
