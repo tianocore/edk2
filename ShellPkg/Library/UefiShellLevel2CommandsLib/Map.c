@@ -468,6 +468,9 @@ PerformSingleMappingDisplay(
       }
     } else {
       Alias = StrnCatGrow(&Alias, 0, MapList, 0);
+      if (Alias == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
       TempSpot = StrStr(Alias, CurrentName);
       if (TempSpot != NULL) {
         TempSpot2 = StrStr(TempSpot, L";");
@@ -484,6 +487,10 @@ PerformSingleMappingDisplay(
     }
   } else {
     CurrentName = NULL;
+    CurrentName = StrnCatGrow(&CurrentName, 0, L"", 0);
+    if (CurrentName == NULL) {
+      return (EFI_OUT_OF_RESOURCES);
+    }
   }
   DevPathString = ConvertDevicePathToText(DevPath, TRUE, FALSE);
   if (!SFO) {
