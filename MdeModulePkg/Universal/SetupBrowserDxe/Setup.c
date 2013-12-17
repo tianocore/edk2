@@ -4085,6 +4085,10 @@ LoadStorage (
   EFI_STRING  Progress;
   EFI_STRING  Result;
   CHAR16      *StrPtr;
+  EFI_STRING  ConfigRequest;
+  UINTN       StrLen;
+
+  ConfigRequest = NULL;
 
   switch (Storage->BrowserStorage->Type) {
     case EFI_HII_VARSTORE_EFI_VARIABLE:
@@ -4095,6 +4099,21 @@ LoadStorage (
         ConfigRequestAdjust(Storage);
         return;
       }
+
+      //
+      // Create the config request string to get all fields for this storage.
+      // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
+      // followed by "&OFFSET=0&WIDTH=WWWW"followed by a Null-terminator
+      //
+      StrLen = StrSize (Storage->BrowserStorage->ConfigHdr) + 20 * sizeof (CHAR16);
+      ConfigRequest = AllocateZeroPool (StrLen);
+      ASSERT (ConfigRequest != NULL);
+      UnicodeSPrint (
+                 ConfigRequest, 
+                 StrLen, 
+                 L"%s&OFFSET=0&WIDTH=%04x", 
+                 Storage->BrowserStorage->ConfigHdr,
+                 Storage->BrowserStorage->Size);
       break;
 
     case EFI_HII_VARSTORE_BUFFER:
@@ -4106,6 +4125,7 @@ LoadStorage (
         return;
       }
       Storage->BrowserStorage->Initialized = TRUE;
+      ConfigRequest = Storage->ConfigRequest;
       break;
 
     default:
@@ -4117,7 +4137,7 @@ LoadStorage (
   //
   Status = mHiiConfigRouting->ExtractConfig (
                                     mHiiConfigRouting,
-                                    Storage->ConfigRequest,
+                                    ConfigRequest,
                                     &Progress,
                                     &Result
                                     );
@@ -4146,6 +4166,12 @@ LoadStorage (
   // Input NULL for ConfigRequest field means sync all fields from editbuffer to buffer. 
   //
   SynchronizeStorage(FormSet, Storage->BrowserStorage, NULL, TRUE);
+
+  if (Storage->BrowserStorage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) {
+    if (ConfigRequest != NULL) {
+      FreePool (ConfigRequest);
+    }
+  }
 }
 
 /**
