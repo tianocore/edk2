@@ -1434,8 +1434,8 @@ RunSplitCommand(
   Take the original command line, substitute any variables, free 
   the original string, return the modified copy
 
-  @param[in] CmdLine  pointer to the command line to update
-  @param[out]CmdName  upon successful return the name of the command to be run
+  @param[in,out] CmdLine  pointer to the command line to update
+  @param[out]CmdName      upon successful return the name of the command to be run
 
   @retval EFI_SUCCESS           the function was successful
   @retval EFI_OUT_OF_RESOURCES  a memory allocation failed
@@ -1529,6 +1529,14 @@ ShellSubstituteAliases(
 
 /**
   Takes the Argv[0] part of the command line and determine the meaning of it.
+
+  @param[in] CmdLine  pointer to the command line to update
+  
+  @retval INTERNAL_COMMAND    The name is an internal command
+  @retval FILE_SYS_CHANGE     the name is a file system change
+  @retval SCRIPT_FILE_NAME    the name is a NSH script file
+  @retval UNKNOWN_INVALID     the name is unknown
+  @retval EFI_APPLICATION     the name is an application (.EFI)
 **/
 SHELL_OPERATION_TYPES
 EFIAPI
@@ -1589,6 +1597,12 @@ GetOperationType(
 }
 
 /**
+  Process a split based operation.
+
+  @param[in] CmdLine    pointer to the command line to process
+
+  @retval EFI_SUCCESS   The operation was successful
+  @return               an error occured.
 **/
 EFI_STATUS
 EFIAPI
