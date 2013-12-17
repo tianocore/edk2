@@ -208,7 +208,7 @@ QemuFlashWrite (
   // Restore flash to read mode
   //
   if (*NumBytes > 0) {
-    *Ptr = READ_ARRAY_CMD;
+    *(Ptr - 1) = READ_ARRAY_CMD;
   }
 
   return EFI_SUCCESS;
