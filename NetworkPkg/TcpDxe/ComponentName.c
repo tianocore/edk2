@@ -2,7 +2,7 @@
   Implementation of protocols EFI_COMPONENT_NAME_PROTOCOL and
   EFI_COMPONENT_NAME2_PROTOCOL.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -256,7 +256,7 @@ UpdateTcp4Name (
   Status = Tcp4->GetModeData (Tcp4, NULL, &Tcp4ConfigData, NULL, NULL, NULL);
   if (!EFI_ERROR (Status)) {
     UnicodeSPrint (HandleName, sizeof (HandleName),
-      L"TCPv4 (SrcPort=%d, DestPort=&d, ActiveFlag=%s)",
+      L"TCPv4 (SrcPort=%d, DestPort=%d, ActiveFlag=%s)",
       Tcp4ConfigData.AccessPoint.StationPort,
       Tcp4ConfigData.AccessPoint.RemotePort,
       (Tcp4ConfigData.AccessPoint.ActiveFlag ? L"TRUE" : L"FALSE")
