@@ -1111,6 +1111,7 @@ DiskIo2FlushDiskEx (
       return Status;
     }
     Task->Signature = DISK_IO2_FLUSH_TASK_SIGNATURE;
+    Task->Token     = Token;
     Status = Private->BlockIo2->FlushBlocksEx (Private->BlockIo2, &Task->BlockIo2Token);
     if (EFI_ERROR (Status)) {
       gBS->CloseEvent (Task->BlockIo2Token.Event);
