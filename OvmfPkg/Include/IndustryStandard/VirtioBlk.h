@@ -26,6 +26,13 @@
 //
 #pragma pack(1)
 typedef struct {
+  UINT8  PhysicalBlockExp; // # of logical blocks per physical block (log2)
+  UINT8  AlignmentOffset;  // offset of first aligned logical block
+  UINT16 MinIoSize;        // suggested minimum I/O size in blocks
+  UINT32 OptIoSize;        // optimal (suggested maximum) I/O size in blocks
+} VIRTIO_BLK_TOPOLOGY;
+
+typedef struct {
   UINT64              Capacity;
   UINT32              SizeMax;
   UINT32              SegMax;
@@ -33,6 +40,7 @@ typedef struct {
   UINT8               Heads;
   UINT8               Sectors;
   UINT32              BlkSize;
+  VIRTIO_BLK_TOPOLOGY Topology;
 } VIRTIO_BLK_CONFIG;
 #pragma pack()
 
@@ -47,9 +55,11 @@ typedef struct {
 #define VIRTIO_BLK_F_BLK_SIZE BIT6  // treated as "logical block size" in
                                     // practice; actual host side
                                     // implementation negotiates "optimal"
-                                    // block size separately
+                                    // block size separately, via
+                                    // VIRTIO_BLK_F_TOPOLOGY
 #define VIRTIO_BLK_F_SCSI     BIT7
 #define VIRTIO_BLK_F_FLUSH    BIT9  // identical to "write cache enabled"
+#define VIRTIO_BLK_F_TOPOLOGY BIT10 // information on optimal I/O alignment
 
 //
 // We keep the status byte separate from the rest of the virtio-blk request
