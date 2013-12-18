@@ -48,16 +48,6 @@ typedef struct {
 } BGFG_OPERATION;
 
 /**
-  Get the actual number of entries in EFI_KEY_OPTION.Keys, from 0-3.
-
-  @param   KeyOption  Pointer to the EFI_KEY_OPTION structure. 
-
-  @return  Actual number of entries in EFI_KEY_OPTION.Keys.
-**/
-#define KEY_OPTION_INPUT_KEY_COUNT(KeyOption) \
-  (((KeyOption)->KeyData & EFI_KEY_OPTION_INPUT_KEY_COUNT_MASK) >> LowBitSet32 (EFI_KEY_OPTION_INPUT_KEY_COUNT_MASK))
-
-/**
   Update the optional data for a boot or driver option.
 
   If optional data exists it will be changed.
@@ -841,7 +831,7 @@ BcfgAddOptInstall1(
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellInstall1HiiHandle, Walker);
           ShellStatus = SHELL_INVALID_PARAMETER;
         }
-        NewKeyOption.KeyData = (UINT32)Intermediate;
+        NewKeyOption.KeyData.PackedValue = (UINT32)Intermediate;
         Temp = StrStr(Walker, L" ");
         if (Temp != NULL) {
           Walker = Temp;
@@ -856,13 +846,13 @@ BcfgAddOptInstall1(
         // Now we know how many EFI_INPUT_KEY structs we need to attach to the end of the EFI_KEY_OPTION struct.  
         // Re-allocate with the added information.
         //
-        KeyOptionBuffer = AllocateCopyPool(sizeof(EFI_KEY_OPTION) + (sizeof(EFI_INPUT_KEY) * KEY_OPTION_INPUT_KEY_COUNT (&NewKeyOption)), &NewKeyOption);
+        KeyOptionBuffer = AllocateCopyPool(sizeof(EFI_KEY_OPTION) + (sizeof(EFI_INPUT_KEY) * NewKeyOption.KeyData.Options.InputKeyCount), &NewKeyOption);
         if (KeyOptionBuffer == NULL) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_MEM), gShellInstall1HiiHandle);
           ShellStatus = SHELL_OUT_OF_RESOURCES;
         }
       }
-      for (LoopCounter = 0 ; ShellStatus == SHELL_SUCCESS && LoopCounter < KEY_OPTION_INPUT_KEY_COUNT (&NewKeyOption); LoopCounter++) {
+      for (LoopCounter = 0 ; ShellStatus == SHELL_SUCCESS && LoopCounter < NewKeyOption.KeyData.Options.InputKeyCount; LoopCounter++) {
         //
         // ScanCode
         //
@@ -928,7 +918,7 @@ BcfgAddOptInstall1(
           VariableName,
           (EFI_GUID*)&gEfiGlobalVariableGuid,
           EFI_VARIABLE_NON_VOLATILE|EFI_VARIABLE_BOOTSERVICE_ACCESS|EFI_VARIABLE_RUNTIME_ACCESS,
-          sizeof(EFI_KEY_OPTION) + (sizeof(EFI_INPUT_KEY) * KEY_OPTION_INPUT_KEY_COUNT (&NewKeyOption)),
+          sizeof(EFI_KEY_OPTION) + (sizeof(EFI_INPUT_KEY) * NewKeyOption.KeyData.Options.InputKeyCount),
           KeyOptionBuffer);
         if (EFI_ERROR(Status)) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_SET_VAR_FAIL), gShellInstall1HiiHandle, VariableName, Status);

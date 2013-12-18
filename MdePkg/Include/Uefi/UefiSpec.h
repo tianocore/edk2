@@ -2043,41 +2043,46 @@ EFI_STATUS
 ///
 /// EFI Boot Key Data
 ///
-typedef UINT32 EFI_BOOT_KEY_DATA;
-///
-/// Indicates the revision of the EFI_KEY_OPTION structure. This revision level should be 0.
-///
-#define EFI_KEY_OPTION_REVISION_MASK        0x000000FF
-///
-/// Either the left or right Shift keys must be pressed (1) or must not be pressed (0).
-///
-#define EFI_KEY_OPTION_SHIFT_PRESSED_MASK   BIT8
-///
-/// Either the left or right Control keys must be pressed (1) or must not be pressed (0).
-///
-#define EFI_KEY_OPTION_CONTROL_PRESSED_MASK BIT9
-///
-/// Either the left or right Alt keys must be pressed (1) or must not be pressed (0).
-///
-#define EFI_KEY_OPTION_ALT_PRESSED_MASK     BIT10
-///
-/// Either the left or right Logo keys must be pressed (1) or must not be pressed (0).
-///
-#define EFI_KEY_OPTION_LOGO_PRESSED_MASK    BIT11
-///
-/// The Menu key must be pressed (1) or must not be pressed (0).
-///
-#define EFI_KEY_OPTION_MENU_PRESSED_MASK    BIT12
-///
-/// The SysReq key must be pressed (1) or must not be pressed (0).
-///
-#define EFI_KEY_OPTION_SYS_REQ_PRESSED_MASK BIT13
-///
-/// Specifies the actual number of entries in EFI_KEY_OPTION.Keys, from 0-3. If
-/// zero, then only the shift state is considered. If more than one, then the boot option will
-/// only be launched if all of the specified keys are pressed with the same shift state.
-///
-#define EFI_KEY_OPTION_INPUT_KEY_COUNT_MASK (BIT30 | BIT31)
+typedef union {
+  struct {
+    ///
+    /// Indicates the revision of the EFI_KEY_OPTION structure. This revision level should be 0.
+    ///
+    UINT32  Revision        : 8;
+    ///
+    /// Either the left or right Shift keys must be pressed (1) or must not be pressed (0).
+    ///
+    UINT32  ShiftPressed    : 1;
+    ///
+    /// Either the left or right Control keys must be pressed (1) or must not be pressed (0).
+    ///
+    UINT32  ControlPressed  : 1;
+    ///
+    /// Either the left or right Alt keys must be pressed (1) or must not be pressed (0).
+    ///
+    UINT32  AltPressed      : 1;
+    ///
+    /// Either the left or right Logo keys must be pressed (1) or must not be pressed (0).
+    ///
+    UINT32  LogoPressed     : 1;
+    ///
+    /// The Menu key must be pressed (1) or must not be pressed (0).
+    ///
+    UINT32  MenuPressed     : 1;
+    ///
+    /// The SysReq key must be pressed (1) or must not be pressed (0).
+    ///
+    UINT32  SysReqPressed    : 1;
+    UINT32  Reserved        : 16;
+    ///
+    /// Specifies the actual number of entries in EFI_KEY_OPTION.Keys, from 0-3. If
+    /// zero, then only the shift state is considered. If more than one, then the boot option will
+    /// only be launched if all of the specified keys are pressed with the same shift state.
+    ///
+    UINT32  InputKeyCount   : 2;
+  } Options;
+  UINT32  PackedValue;
+} EFI_BOOT_KEY_DATA;
 
 ///
 /// EFI Key Option.
