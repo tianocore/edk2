@@ -26,13 +26,13 @@
 //
 #pragma pack(1)
 typedef struct {
-  UINT64     Capacity;
-  UINT32     SizeMax;
-  UINT32     SegMax;
-  UINT16     Cylinders;
-  UINT8      Heads;
-  UINT8      Sectors;
-  UINT32     BlkSize;
+  UINT64              Capacity;
+  UINT32              SizeMax;
+  UINT32              SegMax;
+  UINT16              Cylinders;
+  UINT8               Heads;
+  UINT8               Sectors;
+  UINT32              BlkSize;
 } VIRTIO_BLK_CONFIG;
 #pragma pack()
 
@@ -44,12 +44,12 @@ typedef struct {
 #define VIRTIO_BLK_F_SEG_MAX  BIT2
 #define VIRTIO_BLK_F_GEOMETRY BIT4
 #define VIRTIO_BLK_F_RO       BIT5
-#define VIRTIO_BLK_F_BLK_SIZE BIT6 // treated as "logical block size" in
-                                   // practice; actual host side implementation
-                                   // negotiates "optimal" block size
-                                   // separately
+#define VIRTIO_BLK_F_BLK_SIZE BIT6  // treated as "logical block size" in
+                                    // practice; actual host side
+                                    // implementation negotiates "optimal"
+                                    // block size separately
 #define VIRTIO_BLK_F_SCSI     BIT7
-#define VIRTIO_BLK_F_FLUSH    BIT9 // identical to "write cache enabled"
+#define VIRTIO_BLK_F_FLUSH    BIT9  // identical to "write cache enabled"
 
 //
 // We keep the status byte separate from the rest of the virtio-blk request
