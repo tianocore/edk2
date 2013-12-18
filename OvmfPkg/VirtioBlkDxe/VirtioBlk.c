@@ -56,7 +56,8 @@
                        one of UINT8, UINT16, UINT32, UINT64.
 
 
-  @return  Status code returned by Virtio->WriteDevice() / Virtio->ReadDevice().
+  @return  Status code returned by Virtio->WriteDevice() /
+           Virtio->ReadDevice().
 
 **/
 
@@ -531,8 +532,8 @@ VirtioBlkDriverBindingSupported (
 
   //
   // Attempt to open the device with the VirtIo set of interfaces. On success,
-  // the protocol is "instantiated" for the VirtIo device. Covers duplicate open
-  // attempts (EFI_ALREADY_STARTED).
+  // the protocol is "instantiated" for the VirtIo device. Covers duplicate
+  // open attempts (EFI_ALREADY_STARTED).
   //
   Status = gBS->OpenProtocol (
                   DeviceHandle,               // candidate device
