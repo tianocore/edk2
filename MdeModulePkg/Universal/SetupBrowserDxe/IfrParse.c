@@ -2366,7 +2366,7 @@ ParseOpCodes (
       //
       // Parent statement end tag found, update ParentStatement info.
       //
-      if (IsStatementOpCode(ScopeOpCode) && ParentStatement->Operand == ScopeOpCode) {
+      if (IsStatementOpCode(ScopeOpCode) && (ParentStatement != NULL) && (ParentStatement->Operand == ScopeOpCode)) {
         ParentStatement  = ParentStatement->ParentStatement;
       }
 
