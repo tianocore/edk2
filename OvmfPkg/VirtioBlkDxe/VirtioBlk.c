@@ -777,12 +777,22 @@ VirtioBlkInit (
   Dev->BlockIoMedia.LastBlock        = DivU64x32 (NumSectors,
                                          BlockSize / 512) - 1;
 
+  DEBUG ((DEBUG_INFO, "%a: LbaSize=0x%x[B] NumBlocks=0x%Lx[Lba]\n",
+    __FUNCTION__, Dev->BlockIoMedia.BlockSize,
+    Dev->BlockIoMedia.LastBlock + 1));
+
   if (Features & VIRTIO_BLK_F_TOPOLOGY) {
     Dev->BlockIo.Revision = EFI_BLOCK_IO_PROTOCOL_REVISION3;
 
     Dev->BlockIoMedia.LowestAlignedLba = AlignmentOffset;
     Dev->BlockIoMedia.LogicalBlocksPerPhysicalBlock = 1u << PhysicalBlockExp;
     Dev->BlockIoMedia.OptimalTransferLengthGranularity = OptIoSize;
+
+    DEBUG ((DEBUG_INFO, "%a: FirstAligned=0x%Lx[Lba] PhysBlkSize=0x%x[Lba]\n",
+      __FUNCTION__, Dev->BlockIoMedia.LowestAlignedLba,
+      Dev->BlockIoMedia.LogicalBlocksPerPhysicalBlock));
+    DEBUG ((DEBUG_INFO, "%a: OptimalTransferLengthGranularity=0x%x[Lba]\n",
+      __FUNCTION__, Dev->BlockIoMedia.OptimalTransferLengthGranularity));
   }
   return EFI_SUCCESS;
 
