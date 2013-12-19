@@ -1840,8 +1840,19 @@ RunInternalCommand(
       // Pass thru the exitcode from the app.
       //
       if (ShellCommandGetExit()) {
+        //
+        // An Exit was requested ("exit" command), pass its value up.
+        //
         Status = CommandReturnedStatus;
-      } else if (CommandReturnedStatus != 0 && IsScriptOnlyCommand(FirstParameter)) {
+      } else if (CommandReturnedStatus != SHELL_SUCCESS && IsScriptOnlyCommand(FirstParameter)) {
+        //
+        // Always abort when a script only command fails for any reason
+        //
+        Status = EFI_ABORTED;
+      } else if (ShellCommandGetCurrentScriptFile() != NULL && CommandReturnedStatus == SHELL_ABORTED) {
+        //
+        // Abort when in a script and a command aborted
+        //
         Status = EFI_ABORTED;
       }
     }
@@ -1853,11 +1864,17 @@ RunInternalCommand(
   //
   RestoreArgcArgv(ParamProtocol, &Argv, &Argc);
 
-  if (ShellCommandGetCurrentScriptFile() != NULL &&  !IsScriptOnlyCommand(FirstParameter)) {
-    //
-    // if this is NOT a scipt only command return success so the script won't quit.
-    // prevent killing the script - this is the only place where we know the actual command name (after alias and variable replacement...)
-    //
+  //
+  // If a script is running and the command is not a scipt only command, then
+  // change return value to success so the script won't halt (unless aborted).
+  //
+  // Script only commands have to be able halt the script since the script will
+  // not operate if they are failing.
+  //
+  if ( ShellCommandGetCurrentScriptFile() != NULL
+    && !IsScriptOnlyCommand(FirstParameter)
+    && Status != EFI_ABORTED
+    ) {
     Status = EFI_SUCCESS;
   }
 
