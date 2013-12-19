@@ -144,7 +144,7 @@ ContainsSplit(
 {
   CONST CHAR16 *TempSpot;
   TempSpot = FindSplit(CmdLine);
-  return (TempSpot != NULL && *TempSpot != CHAR_NULL);
+  return (BOOLEAN) ((TempSpot != NULL) && (*TempSpot != CHAR_NULL));
 }
 
 /**
