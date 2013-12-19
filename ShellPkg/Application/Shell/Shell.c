@@ -91,9 +91,9 @@ TrimSpaces(
   }
 
   //
-  // Remove any spaces at the end of the (*String).
+  // Remove any spaces and tabs at the end of the (*String).
   //
-  while ((*String)[StrLen((*String))-1] == L' ') {
+  while ((StrLen (*String) > 0) && (((*String)[StrLen((*String))-1] == L' ') || ((*String)[StrLen((*String))-1] == L'\t'))) {
     (*String)[StrLen((*String))-1] = CHAR_NULL;
   }
 
