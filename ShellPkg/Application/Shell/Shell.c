@@ -1754,7 +1754,7 @@ SetLastError(
 **/
 EFI_STATUS
 EFIAPI
-ProcessCommandLineAliasVariable(
+ProcessCommandLineToFinal(
   IN OUT CHAR16 **CmdLine
   )
 {
@@ -2086,7 +2086,7 @@ RunCommand(
     return (EFI_SUCCESS);
   }
 
-  Status = ProcessCommandLineAliasVariable(&CleanOriginal);
+  Status = ProcessCommandLineToFinal(&CleanOriginal);
   if (EFI_ERROR(Status)) {
     SHELL_FREE_NON_NULL(CleanOriginal);
     return (Status);
