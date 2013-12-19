@@ -1674,50 +1674,353 @@ ChangeMappedDrive(
 
   if found, will add "help" as argv[0], and move the rest later.
 
-  @param[in,out] Argc  The pointer to argc to update 
-  @param[in,out] Argv  The pointer to argv to update (this is a pointer to an array of string pointers)
+  @param[in,out] CmdLine        pointer to the command line to update
 **/
 EFI_STATUS
 EFIAPI
-DoHelpUpdateArgcArgv(
-  IN OUT UINTN *Argc,
-  IN OUT CHAR16 ***Argv
+DoHelpUpdate(
+  IN OUT CHAR16 **CmdLine
   )
 {
-  UINTN Count;
-  UINTN Count2;
-  //
-  // Check each parameter
-  //
-  for (Count = 0 ; Count < (*Argc) ; Count++) {
-    //
-    // if it's "-?" or if the first parameter is "?"
-    //
-    if (StrStr((*Argv)[Count], L"-?") == (*Argv)[Count] 
-    ||  ((*Argv)[0][0] == L'?' && (*Argv)[0][1] == CHAR_NULL)
-      ) {
-      //
-      // We need to redo the arguments since a parameter was -?
-      // move them all down 1 to the end, then up one then replace the first with help
-      //
-      FreePool((*Argv)[Count]);
-      (*Argv)[Count] = NULL;
-      for (Count2 = Count ; (Count2 + 1) < (*Argc) ; Count2++) {
-        (*Argv)[Count2] = (*Argv)[Count2+1];
+  CHAR16 *CurrentParameter;
+  CHAR16 *Walker;
+  CHAR16 *LastWalker;
+  CHAR16 *NewCommandLine;
+  EFI_STATUS Status;
+
+  Status = EFI_SUCCESS;
+
+  CurrentParameter = AllocateZeroPool(StrSize(*CmdLine));
+  if (CurrentParameter == NULL) {
+    return (EFI_OUT_OF_RESOURCES);
+  }
+
+  Walker = *CmdLine;
+  while(Walker != NULL && *Walker != CHAR_NULL) {
+    LastWalker = Walker;
+    GetNextParameter(&Walker, &CurrentParameter);
+    if (StrStr(CurrentParameter, L"-?") == CurrentParameter) {
+      LastWalker[0] = L' ';
+      LastWalker[1] = L' ';
+      NewCommandLine = AllocateZeroPool(StrSize(L"help ") + StrSize(*CmdLine));
+      if (NewCommandLine == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        break;
       }
-      (*Argv)[Count2] = NULL;
-      for (Count2 = (*Argc) -1 ; Count2 > 0 ; Count2--) {
-        (*Argv)[Count2] = (*Argv)[Count2-1];
-      }
-      (*Argv)[0] = NULL;
-      (*Argv)[0] = StrnCatGrow(&(*Argv)[0], NULL, L"help", 0);
-      if ((*Argv)[0] == NULL) {
-        return (EFI_OUT_OF_RESOURCES);
-      }
+      StrCpy(NewCommandLine, L"help ");
+      StrCat(NewCommandLine, *CmdLine);
+      SHELL_FREE_NON_NULL(*CmdLine);
+      *CmdLine = NewCommandLine;
       break;
     }
   }
+
+  SHELL_FREE_NON_NULL(CurrentParameter);
+
+  return (Status);
+}
+
+/**
+  Function to update the shell variable "lasterror"
+
+  @param[in] ErrorCode      the error code to put into lasterror
+**/
+EFI_STATUS
+EFIAPI
+SetLastError(
+  IN CONST UINT64   ErrorCode
+  )
+{
+  CHAR16 LeString[19];
+  if (sizeof(EFI_STATUS) == sizeof(UINT64)) {
+    UnicodeSPrint(LeString, sizeof(LeString), L"0x%Lx", ErrorCode);
+  } else {
+    UnicodeSPrint(LeString, sizeof(LeString), L"0x%x", ErrorCode);
+  }
+  DEBUG_CODE(InternalEfiShellSetEnv(L"debuglasterror", LeString, TRUE););
+  InternalEfiShellSetEnv(L"lasterror", LeString, TRUE);
+
   return (EFI_SUCCESS);
+}
+
+/**
+  Converts the command line to it's post-processed form.  this replaces variables and alias' per UEFI Shell spec.
+
+  @param[in,out] CmdLine        pointer to the command line to update
+
+  @retval EFI_SUCCESS           The operation was successful
+  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
+  @return                       some other error occured
+**/
+EFI_STATUS
+EFIAPI
+ProcessCommandLineAliasVariable(
+  IN OUT CHAR16 **CmdLine
+  )
+{
+  EFI_STATUS                Status;
+  TrimSpaces(CmdLine);
+
+  Status = ShellSubstituteAliases(CmdLine);
+  if (EFI_ERROR(Status)) {
+    return (Status);
+  }
+
+  TrimSpaces(CmdLine);
+
+  Status = ShellSubstituteVariables(CmdLine);
+  if (EFI_ERROR(Status)) {
+    return (Status);
+  }
+
+  TrimSpaces(CmdLine);
+
+  //
+  // update for help parsing
+  //
+  if (StrStr(*CmdLine, L"?") != NULL) {
+    //
+    // This may do nothing if the ? does not indicate help.
+    // Save all the details for in the API below.
+    //
+    Status = DoHelpUpdate(CmdLine);
+  }
+
+  TrimSpaces(CmdLine);
+
+  return (EFI_SUCCESS);
+}
+
+/**
+  Run an internal shell command.
+
+  This API will upadate the shell's environment since these commands are libraries.
+  
+  @param[in] CmdLine          the command line to run.
+  @param[in] FirstParameter   the first parameter on the command line
+  @param[in] ParamProtocol    the shell parameters protocol pointer
+
+  @retval EFI_SUCCESS     The command was completed.
+  @retval EFI_ABORTED     The command's operation was aborted.
+**/
+EFI_STATUS
+EFIAPI
+RunInternalCommand(
+  IN CONST CHAR16                   *CmdLine,
+  IN       CHAR16                   *FirstParameter,
+  IN EFI_SHELL_PARAMETERS_PROTOCOL  *ParamProtocol
+)
+{
+  EFI_STATUS                Status;
+  UINTN                     Argc;
+  CHAR16                    **Argv;
+  SHELL_STATUS              CommandReturnedStatus;
+  BOOLEAN                   LastError;
+
+  //
+  // get the argc and argv updated for internal commands
+  //
+  Status = UpdateArgcArgv(ParamProtocol, CmdLine, &Argv, &Argc);
+  if (!EFI_ERROR(Status)) {
+    //
+    // Run the internal command.
+    //
+    Status = ShellCommandRunCommandHandler(FirstParameter, &CommandReturnedStatus, &LastError);
+
+    if (!EFI_ERROR(Status)) {
+      //
+      // Update last error status.
+      // some commands do not update last error.
+      //
+      if (LastError) {
+        SetLastError(CommandReturnedStatus);
+      }
+
+      //
+      // Pass thru the exitcode from the app.
+      //
+      if (ShellCommandGetExit()) {
+        Status = CommandReturnedStatus;
+      } else if (CommandReturnedStatus != 0 && IsScriptOnlyCommand(FirstParameter)) {
+        Status = EFI_ABORTED;
+      }
+    }
+  }
+
+  //
+  // This is guarenteed to be called after UpdateArgcArgv no matter what else happened.
+  // This is safe even if the update API failed.  In this case, it may be a no-op.
+  //
+  RestoreArgcArgv(ParamProtocol, &Argv, &Argc);
+
+  if (ShellCommandGetCurrentScriptFile() != NULL &&  !IsScriptOnlyCommand(FirstParameter)) {
+    //
+    // if this is NOT a scipt only command return success so the script won't quit.
+    // prevent killing the script - this is the only place where we know the actual command name (after alias and variable replacement...)
+    //
+    Status = EFI_SUCCESS;
+  }
+
+  return (Status);
+}
+
+/**
+  Function to run the command or file.
+
+  @param[in] Type             the type of operation being run.
+  @param[in] CmdLine          the command line to run.
+  @param[in] FirstParameter   the first parameter on the command line
+  @param[in] ParamProtocol    the shell parameters protocol pointer
+
+  @retval EFI_SUCCESS     The command was completed.
+  @retval EFI_ABORTED     The command's operation was aborted.
+**/
+EFI_STATUS
+EFIAPI
+RunCommandOrFile(
+  IN       SHELL_OPERATION_TYPES    Type,
+  IN CONST CHAR16                   *CmdLine,
+  IN       CHAR16                   *FirstParameter,
+  IN EFI_SHELL_PARAMETERS_PROTOCOL  *ParamProtocol
+)
+{
+  EFI_STATUS                Status;
+  EFI_STATUS                StatusCode;
+  CHAR16                    *CommandWithPath;
+  EFI_DEVICE_PATH_PROTOCOL  *DevPath;
+
+  Status            = EFI_SUCCESS;
+  CommandWithPath   = NULL;
+  DevPath           = NULL;
+
+  switch (Type) {
+    case   INTERNAL_COMMAND:
+      Status = RunInternalCommand(CmdLine, FirstParameter, ParamProtocol);
+      break;
+    case   SCRIPT_FILE_NAME:
+    case   EFI_APPLICATION:
+      //
+      // Process a fully qualified path
+      //
+      if (StrStr(FirstParameter, L":") != NULL) {
+        ASSERT (CommandWithPath == NULL);
+        if (ShellIsFile(FirstParameter) == EFI_SUCCESS) {
+          CommandWithPath = StrnCatGrow(&CommandWithPath, NULL, FirstParameter, 0);
+        }
+      }
+
+      //
+      // Process a relative path and also check in the path environment variable
+      //
+      if (CommandWithPath == NULL) {
+        CommandWithPath = ShellFindFilePathEx(FirstParameter, mExecutableExtensions);
+      }
+
+      //
+      // This should be impossible now.
+      //
+      ASSERT(CommandWithPath != NULL);
+
+      //
+      // Make sure that path is not just a directory (or not found)
+      //
+      if (!EFI_ERROR(ShellIsDirectory(CommandWithPath))) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
+        SetLastError(EFI_NOT_FOUND);
+      }
+      switch (Type) {
+        case   SCRIPT_FILE_NAME:
+          Status = RunScriptFile (CommandWithPath);
+          break;
+        case   EFI_APPLICATION:
+          //
+          // Get the device path of the application image
+          //
+          DevPath = ShellInfoObject.NewEfiShellProtocol->GetDevicePathFromFilePath(CommandWithPath);
+          if (DevPath == NULL){
+            Status = EFI_OUT_OF_RESOURCES;
+            break;
+          }
+
+          //
+          // Execute the device path
+          //
+          Status = InternalShellExecuteDevicePath(
+            &gImageHandle,
+            DevPath,
+            CmdLine,
+            NULL,
+            &StatusCode
+           );
+
+          SHELL_FREE_NON_NULL(DevPath);
+
+          //
+          // Update last error status.
+          //
+          SetLastError(StatusCode);
+          break;
+      }
+      break;
+  }
+
+  SHELL_FREE_NON_NULL(CommandWithPath);
+
+  return (Status);
+}
+
+/**
+  Function to setup StdIn, StdErr, StdOut, and then run the command or file.
+
+  @param[in] Type             the type of operation being run.
+  @param[in] CmdLine          the command line to run.
+  @param[in] FirstParameter   the first parameter on the command line.
+  @param[in] ParamProtocol    the shell parameters protocol pointer
+
+  @retval EFI_SUCCESS     The command was completed.
+  @retval EFI_ABORTED     The command's operation was aborted.
+**/
+EFI_STATUS
+EFIAPI
+SetupAndRunCommandOrFile(
+  IN SHELL_OPERATION_TYPES          Type,
+  IN CHAR16                         *CmdLine,
+  IN CHAR16                         *FirstParameter,
+  IN EFI_SHELL_PARAMETERS_PROTOCOL  *ParamProtocol
+)
+{
+  EFI_STATUS                Status;
+  SHELL_FILE_HANDLE         OriginalStdIn;
+  SHELL_FILE_HANDLE         OriginalStdOut;
+  SHELL_FILE_HANDLE         OriginalStdErr;
+  SYSTEM_TABLE_INFO         OriginalSystemTableInfo;
+
+  //
+  // Update the StdIn, StdOut, and StdErr for redirection to environment variables, files, etc... unicode and ASCII
+  //
+  Status = UpdateStdInStdOutStdErr(ParamProtocol, CmdLine, &OriginalStdIn, &OriginalStdOut, &OriginalStdErr, &OriginalSystemTableInfo);
+
+  //
+  // The StdIn, StdOut, and StdErr are set up.
+  // Now run the command, script, or application
+  //
+  if (!EFI_ERROR(Status)) {
+    Status = RunCommandOrFile(Type, CmdLine, FirstParameter, ParamProtocol);
+  }
+
+  //
+  // Now print errors
+  //
+  if (EFI_ERROR(Status)) {
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_ERROR), ShellInfoObject.HiiHandle, (VOID*)(Status));
+  }
+
+  //
+  // put back the original StdIn, StdOut, and StdErr
+  //
+  RestoreStdInStdOutStdErr(ParamProtocol, &OriginalStdIn, &OriginalStdOut, &OriginalStdErr, &OriginalSystemTableInfo);
+
+  return (Status);
 }
 
 /**
@@ -1738,31 +2041,16 @@ RunCommand(
   )
 {
   EFI_STATUS                Status;
-  EFI_STATUS                StatusCode;
-  CHAR16                    *CommandName;
-  SHELL_STATUS              ShellStatus;
-  UINTN                     Argc;
-  CHAR16                    **Argv;
-  BOOLEAN                   LastError;
-  CHAR16                    LeString[19];
-  CHAR16                    *CommandWithPath;
-  CONST EFI_DEVICE_PATH_PROTOCOL  *DevPath;
-  CONST CHAR16              *TempLocation;
-  CONST CHAR16              *TempLocation2;
-  SHELL_FILE_HANDLE         OriginalStdIn;
-  SHELL_FILE_HANDLE         OriginalStdOut;
-  SHELL_FILE_HANDLE         OriginalStdErr;
-  SYSTEM_TABLE_INFO         OriginalSystemTableInfo;
   CHAR16                    *CleanOriginal;
+  CHAR16                    *FirstParameter;
+  CHAR16                    *TempWalker;
+  SHELL_OPERATION_TYPES     Type;
 
   ASSERT(CmdLine != NULL);
   if (StrLen(CmdLine) == 0) {
     return (EFI_SUCCESS);
   }
 
-  CommandName         = NULL;
-  CommandWithPath     = NULL;
-  DevPath             = NULL;
   Status              = EFI_SUCCESS;
   CleanOriginal       = NULL;
 
@@ -1777,180 +2065,59 @@ RunCommand(
   // Handle case that passed in command line is just 1 or more " " characters.
   //
   if (StrLen (CleanOriginal) == 0) {
-    if (CleanOriginal != NULL) {
-      FreePool(CleanOriginal);
-      CleanOriginal = NULL;
-    }
+    SHELL_FREE_NON_NULL(CleanOriginal);
     return (EFI_SUCCESS);
   }
 
-  Status = ShellSubstituteAliases(&CleanOriginal);
+  Status = ProcessCommandLineAliasVariable(&CleanOriginal);
   if (EFI_ERROR(Status)) {
+    SHELL_FREE_NON_NULL(CleanOriginal);
     return (Status);
   }
-
-  Status = ShellSubstituteVariables(&CleanOriginal);
-  if (EFI_ERROR(Status)) {
-    return (Status);
-  }
-
-  TrimSpaces(&CleanOriginal);
 
   //
   // We dont do normal processing with a split command line (output from one command input to another)
   //
   if (ContainsSplit(CleanOriginal)) {
     Status = ProcessNewSplitCommandLine(CleanOriginal);
-  } else {
-    //
-    // If this is a mapped drive change handle that...
-    //
-    if (CleanOriginal[(StrLen(CleanOriginal)-1)] == L':' && StrStr(CleanOriginal, L" ") == NULL) {
-      Status = ChangeMappedDrive(CleanOriginal);
-      SHELL_FREE_NON_NULL(CleanOriginal);
-      return (Status);
-    }
+    SHELL_FREE_NON_NULL(CleanOriginal);
+    return (Status);
+  } 
 
-
-    ///@todo update this section to divide into 3 ways - run internal command, run split (above), and run an external file...
-    ///      We waste a lot of time doing processing like StdIn,StdOut,Argv,Argc for things that are external files...
-
-
-
-    Status = UpdateStdInStdOutStdErr(ShellInfoObject.NewShellParametersProtocol, CleanOriginal, &OriginalStdIn, &OriginalStdOut, &OriginalStdErr, &OriginalSystemTableInfo);
-    if (EFI_ERROR(Status)) {
-      if (Status == EFI_NOT_FOUND) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_REDUNDA_REDIR), ShellInfoObject.HiiHandle);
-      } else {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_INVALID_REDIR), ShellInfoObject.HiiHandle);
-      }
-    } else {
-      TrimSpaces(&CleanOriginal);
-    
-      //
-      // get the argc and argv updated for internal commands
-      //
-      Status = UpdateArgcArgv(ShellInfoObject.NewShellParametersProtocol, CleanOriginal, &Argv, &Argc);
-      ASSERT_EFI_ERROR(Status);
-
-      if (StrStr(CleanOriginal, L"?") != NULL) {
-        Status = DoHelpUpdateArgcArgv(
-          &ShellInfoObject.NewShellParametersProtocol->Argc,
-          &ShellInfoObject.NewShellParametersProtocol->Argv);
-      }
-
-      //
-      // command or file?
-      //
-      if (ShellCommandIsCommandOnList(ShellInfoObject.NewShellParametersProtocol->Argv[0])) {
-        //
-        // Run the command (which was converted if it was an alias)
-        //
-        if (!EFI_ERROR(Status))  {
-          Status = ShellCommandRunCommandHandler(ShellInfoObject.NewShellParametersProtocol->Argv[0], &ShellStatus, &LastError);
-          ASSERT_EFI_ERROR(Status);
-
-          if (sizeof(EFI_STATUS) == sizeof(UINT64)) {
-            UnicodeSPrint(LeString, sizeof(LeString), L"0x%Lx", ShellStatus);
-          } else {
-            UnicodeSPrint(LeString, sizeof(LeString), L"0x%x", ShellStatus);
-          }
-          DEBUG_CODE(InternalEfiShellSetEnv(L"debuglasterror", LeString, TRUE););
-          if (LastError) {
-            InternalEfiShellSetEnv(L"lasterror", LeString, TRUE);
-          }
-          //
-          // Pass thru the exitcode from the app.
-          //
-          if (ShellCommandGetExit()) {
-            Status = ShellStatus;
-          } else if (ShellStatus != 0 && IsScriptOnlyCommand(ShellInfoObject.NewShellParametersProtocol->Argv[0])) {
-            Status = EFI_ABORTED;
-          }
-        }
-      } else {
-        //
-        // run an external file (or script)
-        //
-        if (StrStr(ShellInfoObject.NewShellParametersProtocol->Argv[0], L":") != NULL) {
-          ASSERT (CommandWithPath == NULL);
-          if (ShellIsFile(ShellInfoObject.NewShellParametersProtocol->Argv[0]) == EFI_SUCCESS) {
-            CommandWithPath = StrnCatGrow(&CommandWithPath, NULL, ShellInfoObject.NewShellParametersProtocol->Argv[0], 0);
-          }
-        }
-        if (CommandWithPath == NULL) {
-          CommandWithPath = ShellFindFilePathEx(ShellInfoObject.NewShellParametersProtocol->Argv[0], mExecutableExtensions);
-        }
-        if (CommandWithPath == NULL || ShellIsDirectory(CommandWithPath) == EFI_SUCCESS) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, ShellInfoObject.NewShellParametersProtocol->Argv[0]);
-
-          if (sizeof(EFI_STATUS) == sizeof(UINT64)) {
-            UnicodeSPrint(LeString, sizeof(LeString), L"0x%Lx", EFI_NOT_FOUND);
-          } else {
-            UnicodeSPrint(LeString, sizeof(LeString), L"0x%x", EFI_NOT_FOUND);
-          }
-          DEBUG_CODE(InternalEfiShellSetEnv(L"debuglasterror", LeString, TRUE););
-          InternalEfiShellSetEnv(L"lasterror", LeString, TRUE);
-        } else {
-          //
-          // Check if it's a NSH (script) file.
-          //
-          TempLocation = CommandWithPath+StrLen(CommandWithPath)-4;
-          TempLocation2 = mScriptExtension;
-          if ((StrLen(CommandWithPath) > 4) && (StringNoCaseCompare((VOID*)(&TempLocation), (VOID*)(&TempLocation2)) == 0)) {
-            Status = RunScriptFile (CommandWithPath);
-          } else {
-            DevPath = ShellInfoObject.NewEfiShellProtocol->GetDevicePathFromFilePath(CommandWithPath);
-            ASSERT(DevPath != NULL);
-            Status = InternalShellExecuteDevicePath(
-              &gImageHandle,
-              DevPath,
-              CleanOriginal,
-              NULL,
-              &StatusCode
-             );
-
-            //
-            // Update last error status.
-            //
-            if (sizeof(EFI_STATUS) == sizeof(UINT64)) {
-              UnicodeSPrint(LeString, sizeof(LeString), L"0x%Lx", StatusCode);
-            } else {
-              UnicodeSPrint(LeString, sizeof(LeString), L"0x%x", StatusCode);
-            }
-            DEBUG_CODE(InternalEfiShellSetEnv(L"debuglasterror", LeString, TRUE););
-            InternalEfiShellSetEnv(L"lasterror", LeString, TRUE);
-          }
-        }
-      }
-
-      //
-      // Print some error info.
-      //
-      if (EFI_ERROR(Status)) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_ERROR), ShellInfoObject.HiiHandle, (VOID*)(Status));
-      }
-
-      CommandName = StrnCatGrow(&CommandName, NULL, ShellInfoObject.NewShellParametersProtocol->Argv[0], 0);
-
-      RestoreArgcArgv(ShellInfoObject.NewShellParametersProtocol, &Argv, &Argc);
-
-      RestoreStdInStdOutStdErr(ShellInfoObject.NewShellParametersProtocol, &OriginalStdIn, &OriginalStdOut, &OriginalStdErr, &OriginalSystemTableInfo);
-    }
-    if (CommandName != NULL) {
-      if (ShellCommandGetCurrentScriptFile() != NULL &&  !IsScriptOnlyCommand(CommandName)) {
-        //
-        // if this is NOT a scipt only command return success so the script won't quit.
-        // prevent killing the script - this is the only place where we know the actual command name (after alias and variable replacement...)
-        //
-        Status = EFI_SUCCESS;
-      }
-    }
+  //
+  // We need the first parameter information so we can determine the operation type
+  //
+  FirstParameter = AllocateZeroPool(StrSize(CleanOriginal));
+  if (FirstParameter == NULL) {
+    SHELL_FREE_NON_NULL(CleanOriginal);
+    return (EFI_OUT_OF_RESOURCES);
   }
+  TempWalker = CleanOriginal;
+  GetNextParameter(&TempWalker, &FirstParameter);
 
-  SHELL_FREE_NON_NULL(CommandName);
-  SHELL_FREE_NON_NULL(CommandWithPath);
+  //
+  // Depending on the first parameter we change the behavior
+  //
+  switch (Type = GetOperationType(FirstParameter)) {
+    case   FILE_SYS_CHANGE:
+      Status = ChangeMappedDrive(CleanOriginal);
+      break;
+    case   INTERNAL_COMMAND:
+    case   SCRIPT_FILE_NAME:
+    case   EFI_APPLICATION:
+      Status = SetupAndRunCommandOrFile(Type, CleanOriginal, FirstParameter, ShellInfoObject.NewShellParametersProtocol);
+      break;
+    default:
+      //
+      // Whatever was typed, it was invalid.
+      //
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
+      SetLastError(EFI_NOT_FOUND);
+      break;
+  }
+ 
   SHELL_FREE_NON_NULL(CleanOriginal);
+  SHELL_FREE_NON_NULL(FirstParameter);
 
   return (Status);
 }
