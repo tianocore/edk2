@@ -1596,6 +1596,96 @@ GetOperationType(
   return (UNKNOWN_INVALID);
 }
 
+EFI_STATUS 
+EFIAPI
+IsValidSplit(
+  IN CONST CHAR16 *CmdLine
+  )
+{
+  CHAR16        *Temp;
+  CHAR16        *FirstParameter;
+  CHAR16        *TempWalker;
+  EFI_STATUS    Status;
+
+  Temp           = NULL;
+
+  Temp = StrnCatGrow(&Temp, NULL, CmdLine, 0);
+  if (Temp == NULL) {
+    return (EFI_OUT_OF_RESOURCES);
+  }
+
+  FirstParameter = StrStr(Temp, L"|");
+  if (FirstParameter != NULL) {
+    *FirstParameter = CHAR_NULL;
+  }
+
+  FirstParameter = NULL;
+
+  //
+  // Process the command line
+  //
+  Status = ProcessCommandLineToFinal(&Temp);
+
+  if (!EFI_ERROR(Status)) {
+    FirstParameter = AllocateZeroPool(StrSize(CmdLine));
+    if (FirstParameter == NULL) {
+      SHELL_FREE_NON_NULL(Temp);
+      return (EFI_OUT_OF_RESOURCES);
+    }
+    TempWalker = (CHAR16*)Temp;
+    GetNextParameter(&TempWalker, &FirstParameter);
+
+    if (GetOperationType(FirstParameter) == UNKNOWN_INVALID) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
+      SetLastError(SHELL_NOT_FOUND);
+      Status = EFI_NOT_FOUND;
+    }
+  }
+
+  SHELL_FREE_NON_NULL(Temp);
+  SHELL_FREE_NON_NULL(FirstParameter);
+  return Status;
+}
+
+/**
+  Determine if a command line contains with a split contains only valid commands
+
+  @param[in] CmdLine      The command line to parse.
+
+  @retval EFI_SUCCESS     CmdLine has only valid commands, application, or has no split.
+  @retval EFI_ABORTED     CmdLine has at least one invalid command or application.
+**/
+EFI_STATUS
+EFIAPI
+VerifySplit(
+  IN CONST CHAR16 *CmdLine
+  )
+{
+  CONST CHAR16  *TempSpot;
+  EFI_STATUS    Status;
+
+  //
+  // Verify up to the pipe or end character
+  //
+  Status = IsValidSplit(CmdLine);
+  if (EFI_ERROR(Status)) {
+    return (Status);
+  }
+
+  //
+  // If this was the only item, then get out
+  //
+  if (!ContainsSplit(CmdLine)) {
+    return (EFI_SUCCESS);
+  }
+
+  //
+  // recurse to verify the next item
+  //
+  TempSpot = FindSplit(CmdLine)+1;
+  return (VerifySplit(TempSpot));
+}
+
 /**
   Process a split based operation.
 
@@ -1612,6 +1702,11 @@ ProcessNewSplitCommandLine(
 {
   SPLIT_LIST                *Split;
   EFI_STATUS                Status;
+
+  Status = VerifySplit(CmdLine);
+  if (EFI_ERROR(Status)) {
+    return (Status);
+  }
 
   Split = NULL;
 
@@ -1728,7 +1823,7 @@ DoHelpUpdate(
 EFI_STATUS
 EFIAPI
 SetLastError(
-  IN CONST UINT64   ErrorCode
+  IN CONST SHELL_STATUS   ErrorCode
   )
 {
   CHAR16 LeString[19];
@@ -1943,7 +2038,7 @@ RunCommandOrFile(
       //
       if (!EFI_ERROR(ShellIsDirectory(CommandWithPath))) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
-        SetLastError(EFI_NOT_FOUND);
+        SetLastError(SHELL_NOT_FOUND);
       }
       switch (Type) {
         case   SCRIPT_FILE_NAME:
@@ -2129,7 +2224,7 @@ RunCommand(
       // Whatever was typed, it was invalid.
       //
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
-      SetLastError(EFI_NOT_FOUND);
+      SetLastError(SHELL_NOT_FOUND);
       break;
   }
  
