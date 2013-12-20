@@ -14,10 +14,6 @@
 
 #include "UefiShellDebug1CommandsLib.h"
 
-
-#define INIT_NAME_BUFFER_SIZE  128
-#define INIT_DATA_BUFFER_SIZE  1024
-
 /**
   Base on the input attribute value to return the attribute string.
 
@@ -67,7 +63,169 @@ GetAttrType (
 }
 
 /**
-  Function to display or delete variables.
+  Recursive function to display or delete variables.
+
+  This function will call itself to create a stack-based list of allt he variables to process, 
+  then fromt he last to the first, they will do either printing or deleting.
+
+  This is necessary since once a delete happens GetNextVariableName() will work.
+
+  @param[in] VariableName   The variable name of the EFI variable (or NULL).
+  @param[in] Guid           The GUID of the variable set (or NULL).
+  @param[in] Delete         TRUE to delete, FALSE otherwise.
+  @param[in] PrevName       The previous variable name from GetNextVariableName. L"" to start.
+  @param[in] FoundVarGuid   The previous GUID from GetNextVariableName. ignored at start.
+  @param[in] FoundOne       If a VariableName or Guid was specified and one was printed or
+                            deleted, then set this to TRUE, otherwise ignored.
+
+  @retval SHELL_SUCCESS           The operation was successful.
+  @retval SHELL_OUT_OF_RESOURCES  A memorty allocation failed.
+  @retval SHELL_ABORTED           The abort message was received.
+  @retval SHELL_DEVICE_ERROR      UEFI Variable Services returned an error.
+  @retval SHELL_NOT_FOUND         the Name/Guid pair could not be found.
+**/
+SHELL_STATUS
+EFIAPI
+CascadeProcessVariables (
+  IN CONST CHAR16   *VariableName OPTIONAL,
+  IN CONST EFI_GUID *Guid OPTIONAL,
+  IN BOOLEAN        Delete,
+  IN CONST CHAR16   * CONST PrevName,
+  IN EFI_GUID       FoundVarGuid,
+  IN BOOLEAN        *FoundOne
+  )
+{
+  EFI_STATUS                Status;
+  CHAR16                    *FoundVarName;
+  UINT8                     *DataBuffer;
+  UINTN                     DataSize;
+  UINT32                    Atts;
+  SHELL_STATUS              ShellStatus;
+  UINTN                     NameSize;
+  CHAR16                    *RetString;
+
+  if (ShellGetExecutionBreakFlag()) {
+    return (SHELL_ABORTED);
+  }
+
+  NameSize      = 0;
+  FoundVarName  = NULL;
+
+  if (PrevName!=NULL) {
+    StrnCatGrow(&FoundVarName, &NameSize, PrevName, 0);
+  } else {
+    FoundVarName = AllocateZeroPool(sizeof(CHAR16));
+  }
+
+  Status = gRT->GetNextVariableName (&NameSize, FoundVarName, &FoundVarGuid);
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    SHELL_FREE_NON_NULL(FoundVarName);
+    FoundVarName = AllocateZeroPool (NameSize);
+    if (PrevName != NULL) {
+      StrCpy(FoundVarName, PrevName);
+    }
+
+    Status = gRT->GetNextVariableName (&NameSize, FoundVarName, &FoundVarGuid);
+  }
+
+  //
+  // No more is fine.
+  //
+  if (Status == EFI_NOT_FOUND) {
+    SHELL_FREE_NON_NULL(FoundVarName);
+    return (SHELL_SUCCESS);
+  } else if (EFI_ERROR(Status)) {
+    SHELL_FREE_NON_NULL(FoundVarName);
+    return (SHELL_DEVICE_ERROR);
+  }
+
+  //
+  // Recurse to the next iteration.  We know "our" variable's name.
+  //
+  ShellStatus = CascadeProcessVariables(VariableName, Guid, Delete, FoundVarName, FoundVarGuid, FoundOne);
+
+  //
+  // No matter what happened we process our own variable
+  // Only continue if Guid and VariableName are each either NULL or a match
+  //
+  if ( ( VariableName == NULL 
+      || gUnicodeCollation->MetaiMatch(gUnicodeCollation, FoundVarName, (CHAR16*)VariableName) )
+     && ( Guid == NULL 
+      || CompareGuid(&FoundVarGuid, Guid) )
+      ) {
+    DataSize      = 0;
+    DataBuffer    = NULL;
+    //
+    // do the print or delete
+    //
+    *FoundOne = TRUE;
+    Status = gRT->GetVariable (FoundVarName, &FoundVarGuid, &Atts, &DataSize, DataBuffer);
+    if (Status == EFI_BUFFER_TOO_SMALL) {
+      SHELL_FREE_NON_NULL (DataBuffer);
+      DataBuffer = AllocatePool (DataSize);
+      if (DataBuffer == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+      } else {
+        Status = gRT->GetVariable (FoundVarName, &FoundVarGuid, &Atts, &DataSize, DataBuffer);
+      }
+    }
+    if (!Delete) {
+      //
+      // Last error check then print this variable out.
+      //
+      if (!EFI_ERROR(Status)) {
+        RetString = GetAttrType(Atts);
+        ShellPrintHiiEx(
+          -1,
+          -1,
+          NULL,
+          STRING_TOKEN(STR_DMPSTORE_HEADER_LINE),
+          gShellDebug1HiiHandle,
+          RetString,
+          &FoundVarGuid,
+          FoundVarName,
+          DataSize);
+        DumpHex(2, 0, DataSize, DataBuffer);
+        SHELL_FREE_NON_NULL(RetString);
+      }
+    } else {
+      //
+      // We only need name to delete it...
+      //
+      ShellPrintHiiEx(
+        -1,
+        -1,
+        NULL,
+        STRING_TOKEN(STR_DMPSTORE_DELETE_LINE),
+        gShellDebug1HiiHandle,
+        &FoundVarGuid,
+        FoundVarName);
+      ShellPrintHiiEx(
+        -1,
+        -1,
+        NULL,
+        STRING_TOKEN(STR_DMPSTORE_DELETE_DONE),
+        gShellDebug1HiiHandle,
+        gRT->SetVariable(FoundVarName, &FoundVarGuid, Atts, 0, NULL));
+    }
+    SHELL_FREE_NON_NULL(DataBuffer);
+  }
+
+  SHELL_FREE_NON_NULL(FoundVarName);
+
+  if (Status == EFI_DEVICE_ERROR) {
+    ShellStatus = SHELL_DEVICE_ERROR;
+  } else if (Status == EFI_SECURITY_VIOLATION) {
+    ShellStatus = SHELL_SECURITY_VIOLATION;
+  } else if (EFI_ERROR(Status)) {
+    ShellStatus = SHELL_NOT_READY;
+  }
+
+  return (ShellStatus);
+}
+
+/**
+  Function to display or delete variables.  This will set up and call into the recursive function.
 
   @param[in] VariableName   The variable name of the EFI variable (or NULL).
   @param[in] Guid           The GUID of the variable set (or NULL).
@@ -87,157 +245,21 @@ ProcessVariables (
   IN BOOLEAN        Delete
   )
 {
-  EFI_STATUS                Status;
-  CHAR16                    *FoundVarName;
-  EFI_GUID                  FoundVarGuid;
-  UINT8                     *DataBuffer;
-  UINTN                     DataSize;
-  UINT32                    Atts;
   SHELL_STATUS              ShellStatus;
   BOOLEAN                   Found;
-  UINTN                     NameBufferSize; // Allocated Name buffer size
-  UINTN                     NameSize;
-  CHAR16                    *OldName;
-  UINTN                     OldNameBufferSize;
-  UINTN                     DataBufferSize; // Allocated data buffer size
-  CHAR16                    *RetString;
+  EFI_GUID                  FoundVarGuid;
 
   Found         = FALSE;
   ShellStatus   = SHELL_SUCCESS;
-  Status        = EFI_SUCCESS;
+  ZeroMem (&FoundVarGuid, sizeof(EFI_GUID));
 
-  NameBufferSize = INIT_NAME_BUFFER_SIZE;
-  DataBufferSize = INIT_DATA_BUFFER_SIZE;
-  FoundVarName   = AllocateZeroPool (NameBufferSize);
-  if (FoundVarName == NULL) {
-    return (SHELL_OUT_OF_RESOURCES);
-  }  
-  DataBuffer     = AllocatePool (DataBufferSize);
-  if (DataBuffer == NULL) {
-    FreePool (FoundVarName);
-    return (SHELL_OUT_OF_RESOURCES);
-  }
+  ShellStatus = CascadeProcessVariables(VariableName, Guid, Delete, NULL, FoundVarGuid, &Found);
 
-  for (;;){
-    if (ShellGetExecutionBreakFlag()) {
-      ShellStatus = SHELL_ABORTED;
-      break;
-    }
-
-    NameSize  = NameBufferSize;
-    Status    = gRT->GetNextVariableName (&NameSize, FoundVarName, &FoundVarGuid);
-    if (Status == EFI_BUFFER_TOO_SMALL) {
-      OldName           = FoundVarName;
-      OldNameBufferSize = NameBufferSize;
-      //
-      // Expand at least twice to avoid reallocate many times
-      //
-      NameBufferSize = NameSize > NameBufferSize * 2 ? NameSize : NameBufferSize * 2;
-      FoundVarName           = AllocateZeroPool (NameBufferSize);
-      if (FoundVarName == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
-        FreePool (OldName);
-        break;
-      }
-      //
-      // Preserve the original content to get correct iteration for GetNextVariableName() call
-      //
-      CopyMem (FoundVarName, OldName, OldNameBufferSize);
-      FreePool (OldName);
-      NameSize = NameBufferSize;
-      Status = gRT->GetNextVariableName (&NameSize, FoundVarName, &FoundVarGuid);
-    }
-    if (Status == EFI_NOT_FOUND) {
-      break;
-    }
-    ASSERT_EFI_ERROR(Status);
-
-    //
-    // Check if it matches
-    //
-    if (VariableName != NULL) {
-      if (!gUnicodeCollation->MetaiMatch(gUnicodeCollation, FoundVarName, (CHAR16*)VariableName)) {
-        continue;
-      }
-    }
-    if (Guid != NULL) {
-      if (!CompareGuid(&FoundVarGuid, Guid)) {
-        continue;
-      }
-    }
-
-    DataSize  = DataBufferSize;
-    Status    = gRT->GetVariable (FoundVarName, &FoundVarGuid, &Atts, &DataSize, DataBuffer);
-    if (Status == EFI_BUFFER_TOO_SMALL) {
-      //
-      // Expand at least twice to avoid reallocate many times
-      //
-      FreePool (DataBuffer);
-      DataBufferSize = DataSize > DataBufferSize * 2 ? DataSize : DataBufferSize * 2;
-      DataBuffer           = AllocatePool (DataBufferSize);
-      if (DataBuffer == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
-        break;
-      }
-      DataSize = DataBufferSize;
-      Status   = gRT->GetVariable (FoundVarName, &FoundVarGuid, &Atts, &DataSize, DataBuffer);
-    }    
-    ASSERT_EFI_ERROR(Status);
-
-    //
-    // do the print or delete
-    //
-    Found = TRUE;
-    RetString = GetAttrType(Atts);
-    if (!Delete) {
-      ShellPrintHiiEx(
-        -1,
-        -1,
-        NULL,
-        STRING_TOKEN(STR_DMPSTORE_HEADER_LINE),
-        gShellDebug1HiiHandle,
-        RetString,
-        &FoundVarGuid,
-        FoundVarName,
-        DataSize);
-      DumpHex(2, 0, DataSize, DataBuffer);
-    } else {
-      ShellPrintHiiEx(
-        -1,
-        -1,
-        NULL,
-        STRING_TOKEN(STR_DMPSTORE_DELETE_LINE),
-        gShellDebug1HiiHandle,
-        &FoundVarGuid,
-        FoundVarName);
-      ShellPrintHiiEx(
-        -1,
-        -1,
-        NULL,
-        STRING_TOKEN(STR_DMPSTORE_DELETE_DONE),
-        gShellDebug1HiiHandle,
-        gRT->SetVariable(FoundVarName, &FoundVarGuid, Atts, 0, NULL));
-        FoundVarName[0] = CHAR_NULL;
-    }
-
-    if (RetString != NULL) {
-      FreePool (RetString);
-    }
-  }
-
-  if (FoundVarName != NULL) {
-    FreePool(FoundVarName);
-  }
-  if (DataBuffer != NULL) {
-    FreePool(DataBuffer);
-  }
   if (!Found) {
-    if (Status == EFI_OUT_OF_RESOURCES) {
+    if (ShellStatus == SHELL_OUT_OF_RESOURCES) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle);
-      return SHELL_OUT_OF_RESOURCES;
-    }
-
-    if (VariableName != NULL && Guid == NULL) {
+      return (ShellStatus);
+    } else if (VariableName != NULL && Guid == NULL) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_DMPSTORE_NO_VAR_FOUND_N), gShellDebug1HiiHandle, VariableName);
     } else if (VariableName != NULL && Guid != NULL) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_DMPSTORE_NO_VAR_FOUND_GN), gShellDebug1HiiHandle, Guid, VariableName);
