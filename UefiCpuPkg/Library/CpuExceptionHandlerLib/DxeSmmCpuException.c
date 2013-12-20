@@ -100,7 +100,7 @@ CommonExceptionHandler (
   
   if (mExternalInterruptHandler[ExceptionType] != NULL) {
     (mExternalInterruptHandler[ExceptionType]) (ExceptionType, SystemContext);
-  } else {
+  } else if (ExceptionType < CPU_EXCEPTION_NUM) {
     //
     // Get Spinlock to display CPU information
     //
@@ -269,7 +269,7 @@ RegisterCpuInterruptHandlerWorker (
   IN EFI_CPU_INTERRUPT_HANDLER     InterruptHandler
   )
 {
-  if (InterruptType < 0 || InterruptType > (EFI_EXCEPTION_TYPE)mEnabledInterruptNum ||
+  if (InterruptType < 0 || InterruptType >= (EFI_EXCEPTION_TYPE)mEnabledInterruptNum ||
       mReservedVectors[InterruptType].Attribute == EFI_VECTOR_HANDOFF_DO_NOT_HOOK) {
     return EFI_UNSUPPORTED;
   }
