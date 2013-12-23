@@ -522,11 +522,6 @@
   #  for a dynamic PCD used in PEI phase.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPcdCallBackNumberPerPcdEntry|0x08|UINT32|0x0001000f
 
-  ## VPD type PCD allow developer point an absoluted physical address PcdVpdBaseAddress
-  #  to store PCD value.
-  #
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0|UINT32|0x00010010
-
   ## Maximum number of FV is supported by PeiCore's dispatching.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported|6|UINT32|0x00010030
 
@@ -608,6 +603,11 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeS3SuspendEnd|0x03078001|UINT32|0x30001033
 
 [PcdsFixedAtBuild,PcdsPatchableInModule]
+  ## VPD type PCD allow developer point an absoluted physical address PcdVpdBaseAddress
+  #  to store PCD value.
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0|UINT32|0x00010010
+
   ## Maximun number of performance log entries during PEI phase.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries|40|UINT8|0x0001002f
 
