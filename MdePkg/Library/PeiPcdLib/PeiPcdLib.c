@@ -1010,7 +1010,10 @@ LibPcdGetNextToken (
   IN UINTN                    TokenNumber
   )
 {
-  (GetPiPcdPpiPointer ())->GetNextToken (Guid, &TokenNumber);
+  EFI_STATUS    Status;
+
+  Status = (GetPiPcdPpiPointer ())->GetNextToken (Guid, &TokenNumber);
+  ASSERT (!EFI_ERROR (Status) || TokenNumber == 0);
 
   return TokenNumber;
 }
