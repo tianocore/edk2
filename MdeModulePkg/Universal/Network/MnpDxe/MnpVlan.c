@@ -1,7 +1,7 @@
 /** @file
   VLAN Config Protocol implementation and VLAN packet process routine.
 
-Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -171,7 +171,7 @@ MnpRemoveVlanTag (
 
 
 /**
-  Build the packet to transmit from the TxData passed in.
+  Build the vlan packet to transmit from the TxData passed in.
 
   @param  MnpServiceData         Pointer to the mnp service context data.
   @param  TxData                 Pointer to the transmit data containing the
@@ -196,11 +196,6 @@ MnpInsertVlanTag (
   UINT16                  *EtherType;
   MNP_DEVICE_DATA         *MnpDeviceData;
   EFI_SIMPLE_NETWORK_MODE *SnpMode;
-
-  if (MnpServiceData->VlanId == 0) {
-    *ProtocolType = TxData->ProtocolType;
-    return ;
-  }
 
   MnpDeviceData = MnpServiceData->MnpDeviceData;
   SnpMode       = MnpDeviceData->Snp->Mode;
