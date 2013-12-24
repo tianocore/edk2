@@ -2072,7 +2072,17 @@ RunCommandOrFile(
           //
           SetLastError(StatusCode);
           break;
+        default:
+          //
+          // Do nothing.
+          //
+          break;
       }
+      break;
+    default:
+      //
+      // Do nothing.
+      //
       break;
   }
 
