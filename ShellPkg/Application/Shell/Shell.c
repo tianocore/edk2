@@ -71,9 +71,9 @@ STATIC CONST CHAR16 mExecutableExtensions[] = L".NSH;.EFI";
 STATIC CONST CHAR16 mStartupScript[]        = L"startup.nsh";
 
 /**
-  Cleans off leading and trailing spaces and tabs
+  Cleans off leading and trailing spaces and tabs.
 
-  @param[in] String pointer to the string to trim them off
+  @param[in] String pointer to the string to trim them off.
 **/
 EFI_STATUS
 EFIAPI
@@ -107,8 +107,7 @@ TrimSpaces(
 
   @retval                 A pointer to the | character in CmdLine or NULL if not present.
 **/
-CONST
-CHAR16*
+CONST CHAR16*
 EFIAPI
 FindSplit(
   IN CONST CHAR16 *CmdLine
@@ -1432,13 +1431,12 @@ RunSplitCommand(
 
 /**
   Take the original command line, substitute any variables, free 
-  the original string, return the modified copy
+  the original string, return the modified copy.
 
-  @param[in,out] CmdLine  pointer to the command line to update
-  @param[out]CmdName      upon successful return the name of the command to be run
+  @param[in] CmdLine  pointer to the command line to update.
 
-  @retval EFI_SUCCESS           the function was successful
-  @retval EFI_OUT_OF_RESOURCES  a memory allocation failed
+  @retval EFI_SUCCESS           the function was successful.
+  @retval EFI_OUT_OF_RESOURCES  a memory allocation failed.
 **/
 EFI_STATUS
 EFIAPI
@@ -1458,13 +1456,12 @@ ShellSubstituteVariables(
 
 /**
   Take the original command line, substitute any alias in the first group of space delimited characters, free 
-  the original string, return the modified copy
+  the original string, return the modified copy.
 
-  @param[in] CmdLine  pointer to the command line to update
-  @param[out]CmdName  upon successful return the name of the command to be run
+  @param[in] CmdLine  pointer to the command line to update.
 
-  @retval EFI_SUCCESS           the function was successful
-  @retval EFI_OUT_OF_RESOURCES  a memory allocation failed
+  @retval EFI_SUCCESS           the function was successful.
+  @retval EFI_OUT_OF_RESOURCES  a memory allocation failed.
 **/
 EFI_STATUS
 EFIAPI
@@ -1530,13 +1527,13 @@ ShellSubstituteAliases(
 /**
   Takes the Argv[0] part of the command line and determine the meaning of it.
 
-  @param[in] CmdLine  pointer to the command line to update
+  @param[in] CmdName  pointer to the command line to update.
   
-  @retval INTERNAL_COMMAND    The name is an internal command
-  @retval FILE_SYS_CHANGE     the name is a file system change
-  @retval SCRIPT_FILE_NAME    the name is a NSH script file
-  @retval UNKNOWN_INVALID     the name is unknown
-  @retval EFI_APPLICATION     the name is an application (.EFI)
+  @retval Internal_Command    The name is an internal command.
+  @retval File_Sys_Change     the name is a file system change.
+  @retval Script_File_Name    the name is a NSH script file.
+  @retval Unknown_Invalid     the name is unknown.
+  @retval Efi_Application     the name is an application (.EFI).
 **/
 SHELL_OPERATION_TYPES
 EFIAPI
@@ -1553,7 +1550,7 @@ GetOperationType(
   // test for an internal command.
   //
   if (ShellCommandIsCommandOnList(CmdName)) {
-    return (INTERNAL_COMMAND);
+    return (Internal_Command);
   }
 
   //
@@ -1561,9 +1558,9 @@ GetOperationType(
   //
   if (CmdName[(StrLen(CmdName)-1)] == L':') {
     if (StrStr(CmdName, L" ") != NULL) {
-      return (UNKNOWN_INVALID);
+      return (Unknown_Invalid);
     }
-    return (FILE_SYS_CHANGE);
+    return (File_Sys_Change);
   }
 
   //
@@ -1578,7 +1575,7 @@ GetOperationType(
       TempLocation2 = mScriptExtension;
       if (StringNoCaseCompare((VOID*)(&TempLocation), (VOID*)(&TempLocation2)) == 0) {
         SHELL_FREE_NON_NULL(FileWithPath);
-        return (SCRIPT_FILE_NAME);
+        return (Script_File_Name);
       }
     }
 
@@ -1586,14 +1583,14 @@ GetOperationType(
     // Was a file, but not a script.  we treat this as an application.
     //
     SHELL_FREE_NON_NULL(FileWithPath);
-    return (EFI_APPLICATION);
+    return (Efi_Application);
   }
   
   SHELL_FREE_NON_NULL(FileWithPath);
   //
   // No clue what this is... return invalid flag...
   //
-  return (UNKNOWN_INVALID);
+  return (Unknown_Invalid);
 }
 
 EFI_STATUS 
@@ -1635,7 +1632,7 @@ IsValidSplit(
     TempWalker = (CHAR16*)Temp;
     GetNextParameter(&TempWalker, &FirstParameter);
 
-    if (GetOperationType(FirstParameter) == UNKNOWN_INVALID) {
+    if (GetOperationType(FirstParameter) == Unknown_Invalid) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
       SetLastError(SHELL_NOT_FOUND);
       Status = EFI_NOT_FOUND;
@@ -1648,7 +1645,7 @@ IsValidSplit(
 }
 
 /**
-  Determine if a command line contains with a split contains only valid commands
+  Determine if a command line contains with a split contains only valid commands.
 
   @param[in] CmdLine      The command line to parse.
 
@@ -1729,11 +1726,11 @@ ProcessNewSplitCommandLine(
 }
 
 /**
-  Handle a request to change the current file system
+  Handle a request to change the current file system.
 
-  @param[in] CmdLine  The passed in command line
+  @param[in] CmdLine  The passed in command line.
 
-  @retval EFI_SUCCESS The operation was successful
+  @retval EFI_SUCCESS The operation was successful.
 **/
 EFI_STATUS
 EFIAPI
@@ -1816,9 +1813,9 @@ DoHelpUpdate(
 }
 
 /**
-  Function to update the shell variable "lasterror"
+  Function to update the shell variable "lasterror".
 
-  @param[in] ErrorCode      the error code to put into lasterror
+  @param[in] ErrorCode      the error code to put into lasterror.
 **/
 EFI_STATUS
 EFIAPI
@@ -2006,11 +2003,11 @@ RunCommandOrFile(
   DevPath           = NULL;
 
   switch (Type) {
-    case   INTERNAL_COMMAND:
+    case   Internal_Command:
       Status = RunInternalCommand(CmdLine, FirstParameter, ParamProtocol);
       break;
-    case   SCRIPT_FILE_NAME:
-    case   EFI_APPLICATION:
+    case   Script_File_Name:
+    case   Efi_Application:
       //
       // Process a fully qualified path
       //
@@ -2041,10 +2038,10 @@ RunCommandOrFile(
         SetLastError(SHELL_NOT_FOUND);
       }
       switch (Type) {
-        case   SCRIPT_FILE_NAME:
+        case   Script_File_Name:
           Status = RunScriptFile (CommandWithPath);
           break;
-        case   EFI_APPLICATION:
+        case   Efi_Application:
           //
           // Get the device path of the application image
           //
@@ -2221,12 +2218,12 @@ RunCommand(
   // Depending on the first parameter we change the behavior
   //
   switch (Type = GetOperationType(FirstParameter)) {
-    case   FILE_SYS_CHANGE:
+    case   File_Sys_Change:
       Status = ChangeMappedDrive(CleanOriginal);
       break;
-    case   INTERNAL_COMMAND:
-    case   SCRIPT_FILE_NAME:
-    case   EFI_APPLICATION:
+    case   Internal_Command:
+    case   Script_File_Name:
+    case   Efi_Application:
       Status = SetupAndRunCommandOrFile(Type, CleanOriginal, FirstParameter, ShellInfoObject.NewShellParametersProtocol);
       break;
     default:

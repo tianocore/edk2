@@ -125,11 +125,11 @@ typedef struct {
 extern SHELL_INFO ShellInfoObject;
 
 typedef enum {
-  INTERNAL_COMMAND,
-  SCRIPT_FILE_NAME,
-  EFI_APPLICATION,
-  FILE_SYS_CHANGE,
-  UNKNOWN_INVALID
+  Internal_Command,
+  Script_File_Name,
+  Efi_Application,
+  File_Sys_Change,
+  Unknown_Invalid
 } SHELL_OPERATION_TYPES;
 
 /**
@@ -148,7 +148,7 @@ ProcessCommandLineToFinal(
   );
 
 /**
-  Function to update the shell variable "lasterror"
+  Function to update the shell variable "lasterror".
 
   @param[in] ErrorCode      the error code to put into lasterror
 **/
