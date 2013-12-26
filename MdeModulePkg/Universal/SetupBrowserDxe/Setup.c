@@ -5062,6 +5062,8 @@ SaveReminder (
     } else if (DataSavedAction == BROWSER_DISCARD_CHANGES) {
       DiscardForm (NULL, NULL, SystemLevel);
       break;
+    } else if (DataSavedAction == BROWSER_NO_CHANGES) {
+      break;
     }
   } while (1);
 

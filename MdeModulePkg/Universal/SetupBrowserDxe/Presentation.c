@@ -1263,15 +1263,15 @@ ProcessChangedData (
 
   RetValue = TRUE;
   switch (mFormDisplay->ConfirmDataChange()) {
-    case BROWSER_ACTION_DISCARD:
+    case BROWSER_DISCARD_CHANGES:
       DiscardForm (Selection->FormSet, Selection->Form, Scope);
       break;
   
-    case BROWSER_ACTION_SUBMIT:
+    case BROWSER_SAVE_CHANGES:
       SubmitForm (Selection->FormSet, Selection->Form, Scope);
       break;
 
-    case BROWSER_ACTION_NONE:
+    case BROWSER_NO_CHANGES:
       RetValue = FALSE;
       break;
 

@@ -116,7 +116,7 @@ CreateDialog (
 /**
   Confirm how to handle the changed data. 
   
-  @return Action BROWSER_ACTION_SUBMIT, BROWSER_ACTION_DISCARD or other values.
+  @return Action BROWSER_SAVE_CHANGES, BROWSER_DISCARD_CHANGES or other values.
 **/
 UINTN
 EFIAPI
