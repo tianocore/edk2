@@ -161,11 +161,10 @@ MemDetect (
   //
   // Create memory HOBs
   //
-  AddMemoryBaseSizeHob (MemoryBase, MemorySize);
-  AddMemoryRangeHob (BASE_1MB, MemoryBase);
+  AddMemoryRangeHob (BASE_1MB, LowerMemorySize);
   AddMemoryRangeHob (0, BASE_512KB + BASE_128KB);
 
-  MtrrSetMemoryAttribute (BASE_1MB, MemoryBase + MemorySize - BASE_1MB, CacheWriteBack);
+  MtrrSetMemoryAttribute (BASE_1MB, LowerMemorySize - BASE_1MB, CacheWriteBack);
 
   MtrrSetMemoryAttribute (0, BASE_512KB + BASE_128KB, CacheWriteBack);
 
@@ -175,6 +174,6 @@ MemDetect (
     MtrrSetMemoryAttribute (BASE_4GB, UpperMemorySize, CacheWriteBack);
   }
 
-  return MemoryBase + MemorySize;
+  return LowerMemorySize;
 }
 
