@@ -101,6 +101,9 @@ PublishPeiMemory (
 
   LowerMemorySize = GetSystemMemorySizeBelow4gb ();
 
+  //
+  // Determine the range of memory to use during PEI
+  //
   MemoryBase = PcdGet32 (PcdOvmfMemFvBase) + PcdGet32 (PcdOvmfMemFvSize);
   MemorySize = LowerMemorySize - MemoryBase;
   if (MemorySize > SIZE_64MB) {
@@ -128,9 +131,6 @@ EFI_PHYSICAL_ADDRESS
 MemDetect (
   )
 {
-  EFI_STATUS                  Status;
-  EFI_PHYSICAL_ADDRESS        MemoryBase;
-  UINT64                      MemorySize;
   UINT64                      LowerMemorySize;
   UINT64                      UpperMemorySize;
 
@@ -142,21 +142,7 @@ MemDetect (
   LowerMemorySize = GetSystemMemorySizeBelow4gb ();
   UpperMemorySize = GetSystemMemorySizeAbove4gb ();
 
-  //
-  // Determine the range of memory to use during PEI
-  //
-  MemoryBase = PcdGet32 (PcdOvmfMemFvBase) + PcdGet32 (PcdOvmfMemFvSize);
-  MemorySize = LowerMemorySize - MemoryBase;
-  if (MemorySize > SIZE_64MB) {
-    MemoryBase = LowerMemorySize - SIZE_64MB;
-    MemorySize = SIZE_64MB;
-  }
-
-  //
-  // Publish this memory to the PEI Core
-  //
-  Status = PublishSystemMemory(MemoryBase, MemorySize);
-  ASSERT_EFI_ERROR (Status);
+  PublishPeiMemory ();
 
   //
   // Create memory HOBs
