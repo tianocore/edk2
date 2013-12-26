@@ -49,5 +49,4 @@
   DebugLib
   IoLib
   MemoryAllocationLib
-  UefiBootServicesTableLib
 
