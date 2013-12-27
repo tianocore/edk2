@@ -374,7 +374,6 @@ UpdateMailboxContent (
     Mailbox->SequenceNo = (UINT8) Value;
     break;
   case DEBUG_MAILBOX_HOST_SEQUENCE_NO_INDEX:
-    DebugAgentMsgPrint (DEBUG_AGENT_INFO, "Update HostSequenceNo to %x\n", Value);
     Mailbox->ToBeCheckSum = Mailbox->CheckSum + CalculateSum8 ((UINT8 *)&Mailbox->HostSequenceNo, sizeof(UINT8))
                                               - CalculateSum8 ((UINT8 *)&Value, sizeof(UINT8));
     Mailbox->HostSequenceNo = (UINT8) Value;
