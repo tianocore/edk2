@@ -603,7 +603,7 @@ ReadRemainingBreakPacket (
     return EFI_CRC_ERROR;
   }
   Mailbox = GetMailboxPointer();
-  if (((DebugHeader->Command & DEBUG_COMMAND_RESPONSE) != 0) &&
+  if (((DebugHeader->Command & DEBUG_COMMAND_RESPONSE) == 0) &&
        (DebugHeader->SequenceNo == (UINT8) (Mailbox->HostSequenceNo + 1))) {
     //
     // Only updagte HostSequenceNo for new command packet 
