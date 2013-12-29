@@ -231,7 +231,7 @@ DxeGetPcdInfoGetSku (
   VOID
   )
 {
-  return mPcdDatabase.PeiDb->SystemSkuId;
+  return mPcdDatabase.DxeDb->SystemSkuId;
 }
 
 /**
@@ -261,7 +261,7 @@ DxePcdSetSku (
   IN  UINTN         SkuId
   )
 {
-  mPcdDatabase.PeiDb->SystemSkuId = (SKU_ID) SkuId;
+  mPcdDatabase.DxeDb->SystemSkuId = (SKU_ID) SkuId;
   
   return;
 }
