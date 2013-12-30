@@ -543,7 +543,7 @@ CreateDialog (
 /**
   Confirm how to handle the changed data. 
   
-  @return Action BROWSER_SAVE_CHANGES, BROWSER_DISCARD_CHANGES or other values.
+  @return Action BROWSER_ACTION_SUBMIT, BROWSER_ACTION_DISCARD or other values.
 **/
 UINTN
 EFIAPI
@@ -573,11 +573,11 @@ ConfirmDataChange (
   );
   
   if (Key.ScanCode == SCAN_ESC) {
-    return BROWSER_NO_CHANGES;
+    return BROWSER_ACTION_NONE;
   } else if ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) == (YesResponse | UPPER_LOWER_CASE_OFFSET)) {
-    return BROWSER_SAVE_CHANGES;
+    return BROWSER_ACTION_SUBMIT;
   } else {
-    return BROWSER_DISCARD_CHANGES;
+    return BROWSER_ACTION_DISCARD;
   }
 }
 
