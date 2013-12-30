@@ -24,6 +24,28 @@
 ASM_GLOBAL ASM_PFX(m16Start), ASM_PFX(m16Size), ASM_PFX(mThunk16Attr), ASM_PFX(m16Gdt), ASM_PFX(m16GdtrBase), ASM_PFX(mTransition)
 ASM_GLOBAL ASM_PFX(InternalAsmThunk16)
 
+# define the structure of IA32_REGS
+.set  _EDI, 0       #size 4
+.set  _ESI, 4       #size 4
+.set  _EBP, 8       #size 4
+.set  _ESP, 12      #size 4
+.set  _EBX, 16      #size 4
+.set  _EDX, 20      #size 4
+.set  _ECX, 24      #size 4
+.set  _EAX, 28      #size 4
+.set  _DS,  32      #size 2
+.set  _ES,  34      #size 2
+.set  _FS,  36      #size 2
+.set  _GS,  38      #size 2
+.set  _EFLAGS, 40   #size 4
+.set  _EIP, 44      #size 4
+.set  _CS, 48       #size 2
+.set  _SS, 50       #size 2
+.set  IA32_REGS_SIZE, 52
+
+    .text
+    .code16
+
 ASM_PFX(m16Start):
 
 SavedGdt:     .space  6
@@ -31,21 +53,22 @@ SavedGdt:     .space  6
 ASM_PFX(BackFromUserCode):
     push    %ss
     push    %cs
-    .byte   0x66
-    call    L_Base1                     # push eip
+
+    calll   L_Base1                     # push eip
 L_Base1:
-    pushfw                              # pushfd actually
+    pushfl
     cli                                 # disable interrupts
     push    %gs
     push    %fs
     push    %es
     push    %ds
-    pushaw                              # pushad actually
+    pushal
     .byte   0x66, 0xba                  # mov edx, imm32
 ASM_PFX(ThunkAttr): .space  4
     testb   $THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15, %dl
     jz      1f
-    movl    $0x15cd2401, %eax           # mov ax, 2401h & int 15h
+    movw    $0x2401, %ax
+    int     $0x15
     cli                                 # disable interrupts
     jnc     2f
 1:
@@ -55,27 +78,26 @@ ASM_PFX(ThunkAttr): .space  4
     orb     $2, %al
     outb    %al, $0x92                  # deactivate A20M#
 2:
-    xorw    %ax, %ax                    # xor eax, eax
-    movl    %ss, %eax                   # mov ax, ss
-    .byte   0x67, 0x66, 0x8d, 0x6c, 0x24, 0x34, 0x66
-    mov     %ebp, 0xffffffd8(%esi)
-    mov     0xfffffff8(%esi), %ebx
-    shlw    $4, %ax                     # shl eax, 4
-    addw    %ax, %bp                    # add ebp, eax
-    .byte   0x66, 0xb8                   # mov eax, imm32
+    xorl    %eax, %eax
+    movw    %ss, %ax
+    leal    IA32_REGS_SIZE(%esp), %ebp
+    mov     %ebp, (_ESP - IA32_REGS_SIZE)(%bp)
+    mov     (_EIP - IA32_REGS_SIZE)(%bp), %bx
+    shll    $4, %eax
+    addl    %eax, %ebp
+    .byte   0x66, 0xb8                  # mov eax, imm32
 SavedCr4:   .space  4
     movl    %eax, %cr4
-    lgdtw   %cs:0xfffffff2(%edi)
-    .byte   0x66, 0xb8                   # mov eax, imm32
+    lgdtl   %cs:(SavedGdt - L_Base1)(%bx)
+    .byte   0x66, 0xb8                  # mov eax, imm32
 SavedCr0:   .space  4
     movl    %eax, %cr0
     .byte   0xb8                        # mov ax, imm16
 SavedSs:    .space  2
     movl    %eax, %ss
-    .byte   0x66, 0xbc                   # mov esp, imm32
+    .byte   0x66, 0xbc                  # mov esp, imm32
 SavedEsp:   .space  4
-    .byte   0x66
-    lret                                # return to protected mode
+    lretl                               # return to protected mode
 
 _EntryPoint:    .long      ASM_PFX(ToUserCode) - ASM_PFX(m16Start)
                 .word      0x8
@@ -85,37 +107,35 @@ _16Gdtr:        .word      GdtEnd - _NullSegDesc - 1
 _16GdtrBase:    .long      _NullSegDesc
 
 ASM_PFX(ToUserCode):
-    movl    %ss, %edx
-    movl    %ecx, %ss                   # set new segment selectors
-    movl    %ecx, %ds
-    movl    %ecx, %es
-    movl    %ecx, %fs
-    movl    %ecx, %gs
+    movw    %ss, %dx
+    movw    %cx, %ss                    # set new segment selectors
+    movw    %cx, %ds
+    movw    %cx, %es
+    movw    %cx, %fs
+    movw    %cx, %gs
     movl    %eax, %cr0
     movl    %ebp, %cr4                  # real mode starts at next instruction
-    movl    %esi, %ss                   # set up 16-bit stack segment
-    xchgw   %bx, %sp                    # set up 16-bit stack pointer
-    .byte   0x66
-    call    L_Base                      # push eip
+    movw    %si, %ss                    # set up 16-bit stack segment
+    xchgl   %ebx, %esp                  # set up 16-bit stack pointer
+    calll   L_Base                      # push eip
 L_Base:
-    popw    %bp                         # ebp <- offset L_Base
-    .byte   0x67;                       # address size override
-    push    54(%esp)
-    lea     0xc(%esi), %eax
-    push    %eax
+    popl    %ebp                        # ebp <- offset L_Base
+    push    (IA32_REGS_SIZE + 2)(%esp)
+    lea (L_RealMode - L_Base)(%bp), %ax
+    push    %ax
     lret
 
 L_RealMode:
-    mov     %edx, %cs:0xffffffc5(%esi)
-    mov     %bx, %cs:0xffffffcb(%esi)
-    lidtw   %cs:0xffffffd7(%esi)
-    popaw                               # popad actually
+    mov     %dx, %cs:(SavedSs - L_Base)(%bp)
+    mov     %ebx, %cs:(SavedEsp - L_Base)(%bp)
+    lidtl   %cs:(_16Idtr - L_Base)(%bp)
+    popal
     pop     %ds
     pop     %es
     pop     %fs
     pop     %gs
-    popfw                               # popfd
-    lretw                               # transfer control to user code
+    popfl
+    lretl                               # transfer control to user code
 
 _NullSegDesc:   .quad   0
 _16CsDesc:
@@ -134,6 +154,7 @@ _16DsDesc:
                 .byte   0
 GdtEnd:
 
+    .code32
 #
 #   @param  RegSet  The pointer to a IA32_DWORD_REGS structure
 #   @param  Transition  The pointer to the transition code
@@ -149,41 +170,41 @@ ASM_PFX(InternalAsmThunk16):
     push    %fs
     push    %gs
     movl    36(%esp), %esi              # esi <- RegSet
-    movzwl  0x32(%esi), %edx
-    mov     0xc(%esi), %edi
-    add     $0xffffffc8, %edi
+    movzwl  _SS(%esi), %edx
+    mov     _ESP(%esi), %edi
+    add     $(-(IA32_REGS_SIZE + 4)), %edi
     movl    %edi, %ebx                  # ebx <- stack offset
     imul    $0x10, %edx, %eax
-    push    $0xd
+    push    $(IA32_REGS_SIZE / 4)
     addl    %eax, %edi                  # edi <- linear address of 16-bit stack
     pop     %ecx
     rep
     movsl                               # copy RegSet
     movl    40(%esp), %eax              # eax <- address of transition code
     movl    %edx, %esi                  # esi <- 16-bit stack segment
-    lea     0x61(%eax), %edx
+    lea     (SavedCr0 - ASM_PFX(m16Start))(%eax), %edx
     movl    %eax, %ecx
     andl    $0xf, %ecx
     shll    $12, %eax
-    lea     0x6(%ecx), %ecx
+    lea     (ASM_PFX(BackFromUserCode) - ASM_PFX(m16Start))(%ecx), %ecx
     movw    %cx, %ax
     stosl                               # [edi] <- return address of user code
-    sgdtl   0xffffff9f(%edx)
+    sgdtl   (SavedGdt - SavedCr0)(%edx)
     sidtl   0x24(%esp)
     movl    %cr0, %eax
     movl    %eax, (%edx)                # save CR0 in SavedCr0
     andl    $0x7ffffffe, %eax           # clear PE, PG bits
     movl    %cr4, %ebp
-    mov     %ebp, 0xfffffff1(%edx)
+    mov     %ebp, (SavedCr4 - SavedCr0)(%edx)
     andl    $0xffffffcf, %ebp           # clear PAE, PSE bits
     pushl   $0x10
     pop     %ecx                        # ecx <- selector for data segments
-    lgdtl   0x20(%edx)
+    lgdtl   (_16Gdtr - SavedCr0)(%edx)
     pushfl
-    lcall   *0x14(%edx)
+    lcall   *(_EntryPoint - SavedCr0)(%edx)
     popfl
     lidtl   0x24(%esp)
-    lea     0xffffffcc(%ebp), %eax
+    lea     -IA32_REGS_SIZE(%ebp), %eax
     pop     %gs
     pop     %fs
     pop     %es
