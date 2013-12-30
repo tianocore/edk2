@@ -157,24 +157,30 @@ _ToUserCode PROC
     mov     es, ecx
     mov     fs, ecx
     mov     gs, ecx
-    mov     cr0, eax
-    mov     cr4, ebp                    ; real mode starts at next instruction
+    mov     cr0, eax                    ; real mode starts at next instruction
+                                        ;  which (per SDM) *must* be a far JMP.
+    DB      0eah
+_RealAddr DW 0,0                       ; filled in by InternalAsmThunk16
+
+    mov     cr4, ebp
     mov     ss, esi                     ; set up 16-bit stack segment
     xchg    sp, bx                      ; set up 16-bit stack pointer
-    DB      66h
-    call    @Base                       ; push eip
-@Base:
-    pop     bp                          ; ebp <- address of @Base
-    DB      67h                         ; address size override
-    push    [esp + sizeof (IA32_REGS) + 2]
-    lea     eax, [esi + (@RealMode - @Base)]
-    push    eax
-    retf
-@RealMode:
-    mov     cs:[esi + (SavedSs - @Base)], edx
-    mov     cs:[esi + (SavedEsp - @Base)], bx
-    DB      66h
-    lidt    fword ptr cs:[esi + (_16Idtr - @Base)]
+
+;   mov     bp, [esp + sizeof(IA32_REGS)
+    DB      67h
+    mov     ebp, [esp + sizeof(IA32_REGS)] ; BackFromUserCode address from stack
+
+;   mov     cs:[bp + (SavedSs - _BackFromUserCode)], dx
+    mov     cs:[esi + (SavedSs - _BackFromUserCode)], edx
+
+;   mov     cs:[bp + (SavedEsp - _BackFromUserCode)], ebx
+    DB      2eh, 66h, 89h, 9eh
+    DW      SavedEsp - _BackFromUserCode
+
+;   lidt    cs:[bp + (_16Idtr - _BackFromUserCode)]
+    DB      2eh, 66h, 0fh, 01h, 9eh
+    DW      _16Idtr - _BackFromUserCode
+
     popaw                               ; popad actually
     pop     ds
     pop     es
@@ -230,6 +236,8 @@ InternalAsmThunk16  PROC    USES    ebp ebx esi edi ds  es  fs  gs
     lea     ecx, [ecx + (_BackFromUserCode - m16Start)]
     mov     ax, cx
     stosd                               ; [edi] <- return address of user code
+    add     eax, _RealAddr + 4 - _BackFromUserCode
+    mov     dword ptr [edx + (_RealAddr - SavedCr0)], eax
     sgdt    fword ptr [edx + (SavedGdt - SavedCr0)]
     sidt    fword ptr [esp + 36]        ; save IDT stack in argument space
     mov     eax, cr0

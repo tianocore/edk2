@@ -113,22 +113,18 @@ ASM_PFX(ToUserCode):
     movw    %cx, %es
     movw    %cx, %fs
     movw    %cx, %gs
-    movl    %eax, %cr0
-    movl    %ebp, %cr4                  # real mode starts at next instruction
+    movl    %eax, %cr0                  # real mode starts at next instruction
+                                        #  which (per SDM) *must* be a far JMP.
+    ljmpw   $0,$0                       # will be filled in by InternalAsmThunk16
+L_Base:                                 #  to point here.
+    movl    %ebp, %cr4
     movw    %si, %ss                    # set up 16-bit stack segment
     xchgl   %ebx, %esp                  # set up 16-bit stack pointer
-    calll   L_Base                      # push eip
-L_Base:
-    popl    %ebp                        # ebp <- offset L_Base
-    push    (IA32_REGS_SIZE + 2)(%esp)
-    lea (L_RealMode - L_Base)(%bp), %ax
-    push    %ax
-    lret
 
-L_RealMode:
-    mov     %dx, %cs:(SavedSs - L_Base)(%bp)
-    mov     %ebx, %cs:(SavedEsp - L_Base)(%bp)
-    lidtl   %cs:(_16Idtr - L_Base)(%bp)
+    movw    IA32_REGS_SIZE(%esp), %bp   # get BackToUserCode address from stack
+    mov     %dx, %cs:(SavedSs - ASM_PFX(BackFromUserCode))(%bp)
+    mov     %ebx, %cs:(SavedEsp - ASM_PFX(BackFromUserCode))(%bp)
+    lidtl   %cs:(_16Idtr - ASM_PFX(BackFromUserCode))(%bp)
     popal
     pop     %ds
     pop     %es
@@ -189,6 +185,8 @@ ASM_PFX(InternalAsmThunk16):
     lea     (ASM_PFX(BackFromUserCode) - ASM_PFX(m16Start))(%ecx), %ecx
     movw    %cx, %ax
     stosl                               # [edi] <- return address of user code
+    addl    $(L_Base - ASM_PFX(BackFromUserCode)), %eax
+    movl    %eax, (L_Base - SavedCr0 - 4)(%edx)
     sgdtl   (SavedGdt - SavedCr0)(%edx)
     sidtl   0x24(%esp)
     movl    %cr0, %eax
