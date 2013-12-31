@@ -2067,7 +2067,7 @@ RunCommandOrFile(
           //
           // Update last error status.
           //
-          SetLastError(StatusCode);
+          SetLastError((SHELL_STATUS) StatusCode);
           break;
         default:
           //
