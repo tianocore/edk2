@@ -27,6 +27,7 @@ typedef struct _EFI_FORM_BROWSER_EXTENSION_PROTOCOL   EFI_FORM_BROWSER_EXTENSION
 #define BROWSER_NO_CHANGES          0
 #define BROWSER_SAVE_CHANGES        1
 #define BROWSER_DISCARD_CHANGES     2
+#define BROWSER_KEEP_CURRENT        3
 
 //
 // Browser actions. They can be cominbed together. 
@@ -126,6 +127,7 @@ VOID
   @retval BROWSER_NO_CHANGES       No browser data is changed.
   @retval BROWSER_SAVE_CHANGES     The changed browser data is saved.
   @retval BROWSER_DISCARD_CHANGES  The changed browser data is discard.
+  @retval BROWSER_KEEP_CURRENT     Browser keep current changes.
 
 **/
 typedef
