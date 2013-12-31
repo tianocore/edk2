@@ -2,7 +2,7 @@
   Support routines for memory allocation routines based 
   on boot services for Dxe phase drivers.
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -160,6 +160,7 @@ FreePages (
   If there is not enough memory at the specified alignment remaining to satisfy the request, then
   NULL is returned.
   If Alignment is not a power of two and Alignment is not zero, then ASSERT().
+  If Pages plus EFI_SIZE_TO_PAGES (Alignment) overflows, then ASSERT().
 
   @param  MemoryType            The type of memory to allocate.
   @param  Pages                 The number of 4 KB pages to allocate.
@@ -246,6 +247,7 @@ InternalAllocateAlignedPages (
   request, then NULL is returned.
   
   If Alignment is not a power of two and Alignment is not zero, then ASSERT().
+  If Pages plus EFI_SIZE_TO_PAGES (Alignment) overflows, then ASSERT().
 
   @param  Pages                 The number of 4 KB pages to allocate.
   @param  Alignment             The requested alignment of the allocation.  Must be a power of two.
@@ -273,6 +275,7 @@ AllocateAlignedPages (
   request, then NULL is returned.
   
   If Alignment is not a power of two and Alignment is not zero, then ASSERT().
+  If Pages plus EFI_SIZE_TO_PAGES (Alignment) overflows, then ASSERT().
 
   @param  Pages                 The number of 4 KB pages to allocate.
   @param  Alignment             The requested alignment of the allocation.  Must be a power of two.
@@ -300,6 +303,7 @@ AllocateAlignedRuntimePages (
   request, then NULL is returned.
   
   If Alignment is not a power of two and Alignment is not zero, then ASSERT().
+  If Pages plus EFI_SIZE_TO_PAGES (Alignment) overflows, then ASSERT().
 
   @param  Pages                 The number of 4 KB pages to allocate.
   @param  Alignment             The requested alignment of the allocation.  Must be a power of two.
