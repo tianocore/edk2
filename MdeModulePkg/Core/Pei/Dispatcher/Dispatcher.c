@@ -661,6 +661,7 @@ PeiDispatcher (
   PEIM_FILE_HANDLE_EXTENDED_DATA      ExtendedData;
   EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI   *TemporaryRamSupportPpi;
   UINT64                              NewStackSize;
+  UINTN                               HeapTemporaryRamSize;
   EFI_PHYSICAL_ADDRESS                BaseOfNewHeap;
   EFI_PHYSICAL_ADDRESS                TopOfNewStack;
   EFI_PHYSICAL_ADDRESS                TopOfOldStack;
@@ -1018,7 +1019,9 @@ PeiDispatcher (
                 //
                 // Migrate Heap
                 //
-                CopyMem ((UINT8 *) (UINTN) BaseOfNewHeap, (UINT8 *) PeiTemporaryRamBase, PeiTemporaryRamSize);
+                HeapTemporaryRamSize = (UINTN) (Private->HobList.HandoffInformationTable->EfiFreeMemoryBottom - Private->HobList.HandoffInformationTable->EfiMemoryBottom);
+                ASSERT (BaseOfNewHeap + HeapTemporaryRamSize <= Private->FreePhysicalMemoryTop);
+                CopyMem ((UINT8 *) (UINTN) BaseOfNewHeap, (UINT8 *) PeiTemporaryRamBase, HeapTemporaryRamSize);
                 
                 //
                 // Migrate Stack
