@@ -60,12 +60,23 @@ http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=How_to_build_OVM
 
 === RUNNING OVMF on QEMU ===
 
-* QEMU 0.9.1 or later is required.
-* Either copy, rename or symlink OVMF.FD => bios.bin
+* QEMU 0.12.2 or later is required.
 * Be sure to use qemu-system-x86_64, if you are using and X64 firmware.
   (qemu-system-x86_64 works for the IA32 firmware as well, of course.)
-* Use the QEMU -L parameter to specify the directory where the bios.bin
-  file is located.
+* Use OVMF for QEMU firmware (3 options available)
+  - Option 1: QEMU 1.6 or newer; Use QEMU -pflash parameter
+    * QEMU/OVMF will use emulated flash, and fully support UEFI variables
+    * Run qemu with: -pflash path/to/OVMF.fd
+  - Option 2: Use QEMU -bios parameter
+    * Note that UEFI variables will be partially emulated, and non-volatile
+      variables may lose their contents after a reboot
+    * Run qemu with: -bios path/to/OVMF.fd
+  - Option 3: Use QEMU -L parameter
+    * Note that UEFI variables will be partially emulated, and non-volatile
+      variables may lose their contents after a reboot
+    * Either copy, rename or symlink OVMF.fd => bios.bin
+    * Use the QEMU -L parameter to specify the directory where the bios.bin
+      file is located.
 * The EFI shell is built into OVMF builds at this time, so it should
   run automatically if a UEFI boot application is not found on the
   removable media.
