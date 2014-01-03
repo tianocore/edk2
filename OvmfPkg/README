@@ -9,8 +9,6 @@ http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=OVMF
 
 === STATUS ===
 
-Current status: Alpha
-
 Current capabilities:
 * IA32 and X64 architectures
 * QEMU (0.10.0 or later)
@@ -22,7 +20,6 @@ Current capabilities:
 
 === FUTURE PLANS ===
 
-* Stabilize UEFI Linux boot
 * Test/Stabilize UEFI Self-Certification Tests (SCT) results
 
 === BUILDING OVMF ===
