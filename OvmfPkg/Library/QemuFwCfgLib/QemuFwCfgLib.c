@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (C) 2013, Red Hat, Inc.
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -81,6 +82,8 @@ IoWriteFifo8 (
   Returns a boolean indicating if the firmware configuration interface
   is available or not.
 
+  This function may change fw_cfg state.
+
   @retval    TRUE   The interface is available
   @retval    FALSE  The interface is not available
 
@@ -91,7 +94,7 @@ QemuFwCfgIsAvailable (
   VOID
   )
 {
-  return mQemuFwCfgSupported;
+  return InternalQemuFwCfgIsAvailable ();
 }
 
 
@@ -151,7 +154,7 @@ QemuFwCfgReadBytes (
   IN VOID                   *Buffer
   )
 {
-  if (mQemuFwCfgSupported) {
+  if (InternalQemuFwCfgIsAvailable ()) {
     InternalQemuFwCfgReadBytes (Size, Buffer);
   } else {
     ZeroMem (Buffer, Size);
@@ -176,7 +179,7 @@ QemuFwCfgWriteBytes (
   IN VOID                   *Buffer
   )
 {
-  if (mQemuFwCfgSupported) {
+  if (InternalQemuFwCfgIsAvailable ()) {
     IoWriteFifo8 (0x511, Size, Buffer);
   }
 }
@@ -319,7 +322,7 @@ QemuFwCfgFindFile (
   UINT32 Count;
   UINT32 Idx;
 
-  if (!mQemuFwCfgSupported) {
+  if (!InternalQemuFwCfgIsAvailable ()) {
     return RETURN_UNSUPPORTED;
   }
 
@@ -345,4 +348,23 @@ QemuFwCfgFindFile (
   }
 
   return RETURN_NOT_FOUND;
+}
+
+
+/**
+  Returns a boolean indicating if the firmware configuration interface is
+  available for library-internal purposes.
+
+  This function never changes fw_cfg state.
+
+  @retval    TRUE   The interface is available internally.
+  @retval    FALSE  The interface is not available internally.
+**/
+BOOLEAN
+EFIAPI
+InternalQemuFwCfgIsAvailable (
+  VOID
+  )
+{
+  return mQemuFwCfgSupported;
 }
