@@ -54,12 +54,22 @@ else:
     minor = max(4, min(7, gcc_version[1]))
     TOOLCHAIN = 'GCC4' + str(minor)
 
-def git_svn_info():
+def git_based_version():
     dir = os.getcwd()
-    os.chdir('OvmfPkg')
-    stdout = run_and_capture_output(args=('git', 'svn', 'info'))
+    if not os.path.exists('.git'):
+        os.chdir('OvmfPkg')
+    stdout = run_and_capture_output(args=('git', 'log',
+                                          '-n', '1',
+                                          '--abbrev-commit'))
+    regex = re.compile(r'^\s*git-svn-id:\s+\S+@(\d+)\s+[0-9a-f\-]+$',
+                       re.MULTILINE)
+    mo = regex.search(stdout)
+    if mo:
+        version = 'r' + mo.group(1)
+    else:
+        version = stdout.split(None, 3)[1]
     os.chdir(dir)
-    return stdout
+    return version
 
 def svn_info():
     dir = os.getcwd()
@@ -68,18 +78,18 @@ def svn_info():
     os.chdir(dir)
     return stdout
 
-def get_svn_info_output():
-    if os.path.exists(os.path.join('OvmfPkg', '.svn')):
-        return svn_info()
-    else:
-        return git_svn_info()
+def svn_based_version():
+        buf = svn_info()
+        revision_re = re.compile('^Revision\:\s*([\da-f]+)$', re.MULTILINE)
+        mo = revision_re.search(buf)
+        assert(mo is not None)
+        return 'r' + mo.group(1)
 
 def get_revision():
-    buf = get_svn_info_output()
-    revision_re = re.compile('^Revision\:\s*(\d+)$', re.MULTILINE)
-    mo = revision_re.search(buf)
-    if mo is not None:
-        return int(mo.group(1))
+    if os.path.exists(os.path.join('OvmfPkg', '.svn')):
+        return svn_based_version()
+    else:
+        return git_based_version()
 
 revision = get_revision()
 
@@ -102,7 +112,7 @@ def gen_build_info():
     iasl_version = iasl_version.split(' version ')[1].strip()
 
     sb = StringIO.StringIO()
-    print >> sb, 'edk2:    ', 'r%d' % revision
+    print >> sb, 'edk2:    ', revision
     print >> sb, 'compiler: GCC', gcc_version_str, '(' + TOOLCHAIN + ')'
     print >> sb, 'binutils:', ld_version
     print >> sb, 'iasl:    ', iasl_version
@@ -217,7 +227,7 @@ def build(arch):
 
 def create_zip(arch):
     global build_info
-    filename = 'OVMF-%s-r%d.zip' % (arch, revision)
+    filename = 'OVMF-%s-%s.zip' % (arch, revision)
     print 'Creating', filename, '...',
     sys.stdout.flush()
     if os.path.exists(filename):
