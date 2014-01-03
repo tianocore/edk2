@@ -31,11 +31,6 @@ if not os.path.exists(os.path.join('OvmfPkg', 'OvmfPkgX64.dsc')):
     print "OvmfPkg/OvmfPkgX64.dsc doesn't exist"
     sys.exit(-1)
 
-if 'TOOLCHAIN' in os.environ:
-    TOOLCHAIN = os.environ['TOOLCHAIN']
-else:
-    TOOLCHAIN = 'GCC44'
-
 def run_and_capture_output(args, checkExitCode = True):
     p = subprocess.Popen(args=args, stdout=subprocess.PIPE)
     stdout = p.stdout.read()
@@ -43,6 +38,21 @@ def run_and_capture_output(args, checkExitCode = True):
     if checkExitCode:
         assert ret_code == 0
     return stdout
+
+gcc_version = run_and_capture_output(args=('gcc', '--version'))
+gcc_re = re.compile(r'\s*\S+\s+\([^\)]+?\)\s+(\d+(?:\.\d+)*)(?:\s+.*)?')
+mo = gcc_re.match(gcc_version)
+if not mo:
+    print "Unable to find GCC version"
+    sys.exit(-1)
+gcc_version = map(lambda n: int(n), mo.group(1).split('.'))
+
+if 'TOOLCHAIN' in os.environ:
+    TOOLCHAIN = os.environ['TOOLCHAIN']
+else:
+    assert(gcc_version[0] == 4)
+    minor = max(4, min(7, gcc_version[1]))
+    TOOLCHAIN = 'GCC4' + str(minor)
 
 def git_svn_info():
     dir = os.getcwd()
@@ -82,8 +92,7 @@ def gen_build_info():
 
     machine = run_and_capture_output(args=('uname', '-m')).strip()
 
-    gcc_version = run_and_capture_output(args=('gcc', '--version'))
-    gcc_version = gcc_version.split('\n')[0].split()[-1]
+    gcc_version_str = '.'.join(map(lambda v: str(v), gcc_version))
 
     ld_version = run_and_capture_output(args=('ld', '--version'))
     ld_version = ld_version.split('\n')[0].split()[-1]
@@ -94,7 +103,7 @@ def gen_build_info():
 
     sb = StringIO.StringIO()
     print >> sb, 'edk2:    ', 'r%d' % revision
-    print >> sb, 'compiler: GCC', gcc_version
+    print >> sb, 'compiler: GCC', gcc_version_str, '(' + TOOLCHAIN + ')'
     print >> sb, 'binutils:', ld_version
     print >> sb, 'iasl:    ', iasl_version
     print >> sb, 'system:  ', distro, machine.replace('_', '-')
