@@ -5,7 +5,7 @@
   be provided in the Framework version library instance, which means some of these 
   APIs cannot be used if the underlying firmware is Framework and not PI.
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -281,7 +281,7 @@ S3BootScriptSaveStall (
   );
 
 /**
-  Adds a record for an execution stall on the processor into a specified boot script table.
+  Adds a record for dispatching specified arbitrary code into a specified boot script table.
 
   @param[in] EntryPoint   The entry point of the code to be dispatched.
   @param[in] Context      The argument to be passed into the EntryPoint of the code 
