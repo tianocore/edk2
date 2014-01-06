@@ -1,7 +1,7 @@
 /** @file
   Source file for CD recovery PEIM
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -259,7 +259,7 @@ FindRecoveryCapsules (
   while (TRUE) {
     SetMem (Buffer, BufferSize, 0);
     Status = BlockIoPpi->ReadBlocks (
-                          PrivateData->PeiServices,
+                          (EFI_PEI_SERVICES **) GetPeiServicesTablePointer (),
                           BlockIoPpi,
                           IndexBlockDevice,
                           Lba,
@@ -350,7 +350,7 @@ RetrieveCapsuleFileFromRoot (
   SetMem (Buffer, BufferSize, 0);
 
   Status = BlockIoPpi->ReadBlocks (
-                        PrivateData->PeiServices,
+                        (EFI_PEI_SERVICES **) GetPeiServicesTablePointer (),
                         BlockIoPpi,
                         IndexBlockDevice,
                         Lba,
@@ -566,7 +566,7 @@ LoadRecoveryCapsule (
   BlockIoPpi  = PrivateData->CapsuleData[CapsuleInstance - 1].BlockIo;
 
   Status = BlockIoPpi->ReadBlocks (
-                        PrivateData->PeiServices,
+                        PeiServices,
                         BlockIoPpi,
                         PrivateData->CapsuleData[CapsuleInstance - 1].IndexBlock,
                         PrivateData->CapsuleData[CapsuleInstance - 1].CapsuleStartLBA,

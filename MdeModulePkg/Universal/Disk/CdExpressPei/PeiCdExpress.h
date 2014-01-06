@@ -1,7 +1,7 @@
 /** @file
   Header file for CD recovery PEIM
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -74,7 +74,6 @@ typedef struct {
 typedef struct {
 
   UINTN                                 Signature;
-  EFI_PEI_SERVICES                      **PeiServices;
   EFI_PEI_DEVICE_RECOVERY_MODULE_PPI    DeviceRecoveryPpi;
   EFI_PEI_PPI_DESCRIPTOR                PpiDescriptor;
   EFI_PEI_NOTIFY_DESCRIPTOR             NotifyDescriptor;
