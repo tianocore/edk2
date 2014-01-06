@@ -1,7 +1,7 @@
 /** @file
   Boot functions implementation for UefiPxeBc Driver.
 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -468,7 +468,9 @@ PxeBcDhcp4BootInfo (
   EFI_STATUS                  Status;
   PXEBC_DHCP4_PACKET_CACHE    *Cache4;
   UINT16                      Value;
-
+  PXEBC_VENDOR_OPTION         *VendorOpt;
+  PXEBC_BOOT_SVR_ENTRY        *Entry;
+  
   PxeBc       = &Private->PxeBc;
   Mode        = PxeBc->Mode;
   Status      = EFI_SUCCESS;
@@ -485,17 +487,40 @@ PxeBcDhcp4BootInfo (
     Cache4 = &Private->DhcpAck.Dhcp4;
   }
 
-  //
-  // Parse the boot server Ipv4 address by next server address.
-  // If this field isn't available, use option 54 instead.
-  //
-  CopyMem (
-    &Private->ServerIp,
-    &Cache4->Packet.Offer.Dhcp4.Header.ServerAddr,
-    sizeof (EFI_IPv4_ADDRESS)
-    );
+  ASSERT (Cache4->OptList[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] != NULL);
 
+  //
+  // Parse the boot server address.
+  // If prompt/discover is disabled, get the first boot server from the boot servers list.
+  // Otherwise, parse the boot server Ipv4 address from next server address field in DHCP header.
+  // If all these fields are not available, use option 54 instead.
+  //
+  VendorOpt = &Cache4->VendorOpt;
+  if (IS_DISABLE_PROMPT_MENU (VendorOpt->DiscoverCtrl) && IS_VALID_BOOT_SERVERS (VendorOpt->BitMap)) {
+    Entry = VendorOpt->BootSvr;
+    if (VendorOpt->BootSvrLen >= sizeof (PXEBC_BOOT_SVR_ENTRY) && Entry->IpCnt > 0) {
+      CopyMem (
+        &Private->ServerIp,
+        &Entry->IpAddr[0],
+        sizeof (EFI_IPv4_ADDRESS)
+        );
+    }
+  }
   if (Private->ServerIp.Addr[0] == 0) {
+    //
+    // ServerIp.Addr[0] equals zero means we failed to get IP address from boot server list.
+    // Try to use next server address field.
+    //
+    CopyMem (
+      &Private->ServerIp,
+      &Cache4->Packet.Offer.Dhcp4.Header.ServerAddr,
+      sizeof (EFI_IPv4_ADDRESS)
+      );
+  }
+  if (Private->ServerIp.Addr[0] == 0) {
+    //
+    // Still failed , use the IP address from option 54.
+    //
     CopyMem (
       &Private->ServerIp,
       Cache4->OptList[PXEBC_DHCP4_TAG_INDEX_SERVER_ID]->Data,
@@ -506,7 +531,6 @@ PxeBcDhcp4BootInfo (
   //
   // Parse the boot file name by option.
   //
-  ASSERT (Cache4->OptList[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] != NULL);
   Private->BootFileName = Cache4->OptList[PXEBC_DHCP4_TAG_INDEX_BOOTFILE]->Data;
 
   if (Cache4->OptList[PXEBC_DHCP4_TAG_INDEX_BOOTFILE_LEN] != NULL) {
