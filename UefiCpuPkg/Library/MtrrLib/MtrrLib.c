@@ -1,7 +1,7 @@
 /** @file
   MTRR setting library
 
-  Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -808,7 +808,7 @@ GetMemoryCacheTypeFromMtrrType (
     // MtrrType is MTRR_CACHE_INVALID_TYPE, that means
     // no mtrr covers the range
     //
-    return CacheUncacheable;
+    return MtrrGetDefaultMemoryType ();
   }
 }
 
@@ -1609,6 +1609,12 @@ MtrrDebugPrintAllMtrrs (
 
     VariableMtrrCount = GetVariableMtrrCount ();
 
+    Limit        = BIT36 - 1;
+    AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+    if (RegEax >= 0x80000008) {
+      AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
+      Limit = LShiftU64 (1, RegEax & 0xff) - 1;
+    }
     Base = BASE_1MB;
     PreviousMemoryType = MTRR_CACHE_INVALID_TYPE;
     do {
@@ -1627,12 +1633,6 @@ MtrrDebugPrintAllMtrrs (
       
       RangeBase    = BASE_1MB;        
       NoRangeBase  = BASE_1MB;
-      Limit        = BIT36 - 1;
-      AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
-      if (RegEax >= 0x80000008) {
-        AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
-        Limit = LShiftU64 (1, RegEax & 0xff) - 1;
-      }
       RangeLimit   = Limit;
       NoRangeLimit = Limit;
       
@@ -1676,7 +1676,7 @@ MtrrDebugPrintAllMtrrs (
       } else {
         Base = NoRangeLimit + 1;
       }
-    } while (Found);
+    } while (Base < Limit);
     DEBUG((DEBUG_CACHE, "%016lx\n\n", Base - 1));
   );
 }
