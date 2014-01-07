@@ -1,7 +1,7 @@
 /** @file
   This is THE shell (application)
 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2013, Hewlett-Packard Development Company, L.P.
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1593,6 +1593,15 @@ GetOperationType(
   return (Unknown_Invalid);
 }
 
+/**
+  Determine if the first item in a command line is valid.
+
+  @param[in] CmdLine            The command line to parse.
+
+  @retval EFI_SUCCESS           The item is valid.
+  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
+  @retval EFI_NOT_FOUND         The operation type is unknown or invalid.
+**/
 EFI_STATUS 
 EFIAPI
 IsValidSplit(
