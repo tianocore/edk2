@@ -1,7 +1,7 @@
 /** @file
   Internal file explorer functions for SecureBoot configuration module.
 
-Copyright (c) 2012 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1133,9 +1133,6 @@ UpdateFileExplorer (
     NewFileContext = (SECUREBOOT_FILE_CONTEXT *) NewMenuEntry->FileContext;
 
     if (NewFileContext->IsDir ) {
-      PrivateData->FeDisplayContext = FileExplorerDisplayDirectory;
-
-      RemoveEntryList (&NewMenuEntry->Link);
       FreeMenu (&DirectoryMenu);
       Status = FindFiles (NewMenuEntry);
        if (EFI_ERROR (Status)) {
@@ -1143,10 +1140,9 @@ UpdateFileExplorer (
          goto OnExit;
        }
       CreateMenuStringToken (PrivateData->HiiHandle, &DirectoryMenu);
-      DestroyMenuEntry (NewMenuEntry);
-
       UpdateFileExplorePage (PrivateData->HiiHandle, &DirectoryMenu, PrivateData->FeCurrentState);
 
+      PrivateData->FeDisplayContext = FileExplorerDisplayDirectory;
     } else {
       if (PrivateData->FeCurrentState == FileExplorerStateEnrollPkFile) {
         FormId = SECUREBOOT_ADD_PK_FILE_FORM_ID;
