@@ -2,7 +2,7 @@
   Provides interface to shell console logger.
 
   Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -819,22 +819,41 @@ ConsoleLoggerOutputString (
   IN  CHAR16                          *WString
   )
 {
-  EFI_INPUT_KEY               Key;
-  UINTN                       EventIndex;
-  CONSOLE_LOGGER_PRIVATE_DATA *ConsoleInfo;
+  EFI_STATUS                        Status;
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *TxtInEx;
+  EFI_KEY_DATA                      KeyData;
+  UINTN                             EventIndex;
+  CONSOLE_LOGGER_PRIVATE_DATA       *ConsoleInfo;
+
   ConsoleInfo = CONSOLE_LOGGER_PRIVATE_DATA_FROM_THIS(This);
   if (ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoConsoleOut) {
     return (EFI_UNSUPPORTED);
   }
   ASSERT(ShellInfoObject.ConsoleInfo == ConsoleInfo);
-  if (ShellInfoObject.HaltOutput) {
-    //
-    // just get some key
-    //
-    gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
-    gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-    ShellInfoObject.HaltOutput = FALSE;
+
+  Status = gBS->HandleProtocol (gST->ConsoleInHandle, &gEfiSimpleTextInputExProtocolGuid, (VOID **) &TxtInEx);
+  if (!EFI_ERROR (Status)) {
+    while (ShellInfoObject.HaltOutput) {
+
+      ShellInfoObject.HaltOutput = FALSE;
+      //
+      // just get some key
+      //
+      Status = gBS->WaitForEvent (1, &TxtInEx->WaitForKeyEx, &EventIndex);
+      ASSERT_EFI_ERROR (Status);
+      Status = TxtInEx->ReadKeyStrokeEx (TxtInEx, &KeyData);
+      ASSERT_EFI_ERROR (Status);
+
+      if ((KeyData.Key.UnicodeChar == L's') && (KeyData.Key.ScanCode == SCAN_NULL) &&
+          ((KeyData.KeyState.KeyShiftState == (EFI_SHIFT_STATE_VALID | EFI_LEFT_CONTROL_PRESSED)) ||
+           (KeyData.KeyState.KeyShiftState == (EFI_SHIFT_STATE_VALID | EFI_RIGHT_CONTROL_PRESSED))
+          )
+         ) {
+        ShellInfoObject.HaltOutput = TRUE;
+      }
+    }
   }
+
   if (!ShellInfoObject.ConsoleInfo->Enabled) {
     return (EFI_DEVICE_ERROR);
   } else if (ShellInfoObject.PageBreakEnabled) {
