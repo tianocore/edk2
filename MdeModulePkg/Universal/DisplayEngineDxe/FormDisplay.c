@@ -1,7 +1,7 @@
 /** @file
 Entry and initialization module for the browser.
 
-Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1720,6 +1720,7 @@ HasOptionString (
   @param  SkipLine                 The skip line for this menu. 
   @param  BottomRow                The bottom row for this form.
   @param  Highlight                Whether this menu will be highlight.
+  @param  UpdateCol                Whether need to update the column info for Date/Time.
 
   @retval EFI_SUCESSS              Process the user selection success.
 
@@ -1731,7 +1732,8 @@ DisplayOneMenu (
   IN UINTN                           BeginCol,
   IN UINTN                           SkipLine,
   IN UINTN                           BottomRow,
-  IN BOOLEAN                         Highlight
+  IN BOOLEAN                         Highlight,
+  IN BOOLEAN                         UpdateCol
   )
 {
   FORM_DISPLAY_ENGINE_STATEMENT   *Statement;
@@ -1780,7 +1782,7 @@ DisplayOneMenu (
       //
       // Adjust option string for date/time opcode.
       //
-      ProcessStringForDateTime(MenuOption, OptionString, TRUE);
+      ProcessStringForDateTime(MenuOption, OptionString, UpdateCol);
     }
   
     Width       = (UINT16) gOptionBlockWidth - 1;
@@ -1805,8 +1807,9 @@ DisplayOneMenu (
           } else {
             //
             // For date/ time, print the first and second past (year for date and second for time)
-            //                
-            DisplayMenuString (MenuOption, MenuOption->OptCol, Row, OutputString, StrLen (OutputString), Highlight);
+            // The OutputString has a NARROW_CHAR or WIDE_CHAR at the begin of the string, 
+            // so need to - 1 to remove it, otherwise, it will clean 1 extr char follow it.
+            DisplayMenuString (MenuOption, MenuOption->OptCol, Row, OutputString, StrLen (OutputString) - 1, Highlight);
           }
         } else {
           DisplayMenuString (MenuOption, MenuOption->OptCol, Row, OutputString, Width + 1, Highlight);
@@ -2167,7 +2170,8 @@ UiDisplayMenu (
                             gStatementDimensions.LeftColumn + gModalSkipColumn, 
                             Link == TopOfScreen ? SkipValue : 0, 
                             BottomRow,
-                            (BOOLEAN) ((Link == NewPos) && IsSelectable(MenuOption))
+                            (BOOLEAN) ((Link == NewPos) && IsSelectable(MenuOption)),
+                            TRUE
                             );
           } else {
             Status = DisplayOneMenu (MenuOption, 
@@ -2175,8 +2179,9 @@ UiDisplayMenu (
                             gStatementDimensions.LeftColumn, 
                             Link == TopOfScreen ? SkipValue : 0, 
                             BottomRow,
-                            (BOOLEAN) ((Link == NewPos) && IsSelectable(MenuOption))
-                            );         
+                            (BOOLEAN) ((Link == NewPos) && IsSelectable(MenuOption)),
+                            TRUE
+                            );
           }
 
           if (EFI_ERROR (Status)) {
@@ -2279,6 +2284,7 @@ UiDisplayMenu (
                           gStatementDimensions.LeftColumn, 
                           Temp, 
                           BottomRow,
+                          FALSE,
                           FALSE
                           );
         }
@@ -2300,7 +2306,8 @@ UiDisplayMenu (
                         gStatementDimensions.LeftColumn, 
                         Temp2, 
                         BottomRow,
-                        TRUE
+                        TRUE,
+                        FALSE
                         );
       }
       break;
@@ -2782,15 +2789,15 @@ UiDisplayMenu (
       NewLine     = TRUE;
 
       SavedListEntry = NewPos;
-
       ASSERT(NewPos != NULL);
+
+      MenuOption = MENU_OPTION_FROM_LINK (NewPos);
+      ASSERT (MenuOption != NULL);
+
       //
       // Adjust Date/Time position before we advance forward.
       //
       AdjustDateAndTimePosition (TRUE, &NewPos);
-
-      MenuOption = MENU_OPTION_FROM_LINK (NewPos);
-      ASSERT (MenuOption != NULL);
 
       NewPos     = NewPos->BackLink;
       //
