@@ -2,7 +2,7 @@
   This file implements I2C Host Protocol which provides callers with the ability to 
   do I/O transactions to all of the devices on the I2C bus.
 
-  Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1131,6 +1131,8 @@ I2cHostUnload (
   EFI_HANDLE                        *DeviceHandleBuffer;
   UINTN                             DeviceHandleCount;
   UINTN                             Index;
+  EFI_COMPONENT_NAME_PROTOCOL       *ComponentName;
+  EFI_COMPONENT_NAME2_PROTOCOL      *ComponentName2;
 
   //
   // Get the list of all I2C Controller handles in the handle database.
@@ -1171,13 +1173,46 @@ I2cHostUnload (
                   gI2cHostDriverBinding.DriverBindingHandle,
                   &gEfiDriverBindingProtocolGuid,
                   &gI2cHostDriverBinding,
-                  &gEfiComponentNameProtocolGuid,
-                  &gI2cHostComponentName,
-                  &gEfiComponentName2ProtocolGuid,
-                  &gI2cHostComponentName2,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
+
+  //
+  // Note we have to one by one uninstall the following protocols.
+  // It's because some of them are optionally installed based on
+  // the following PCD settings.
+  //   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable
+  //   gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable
+  //   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable
+  //   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable
+  //
+  Status = gBS->HandleProtocol (
+                  gI2cHostDriverBinding.DriverBindingHandle,
+                  &gEfiComponentNameProtocolGuid,
+                  (VOID **) &ComponentName
+                  );
+  if (!EFI_ERROR (Status)) {
+    gBS->UninstallProtocolInterface (
+           gI2cHostDriverBinding.DriverBindingHandle,
+           &gEfiComponentNameProtocolGuid,
+           ComponentName
+           );
+  }
+
+  Status = gBS->HandleProtocol (
+                  gI2cHostDriverBinding.DriverBindingHandle,
+                  &gEfiComponentName2ProtocolGuid,
+                  (VOID **) &ComponentName2
+                  );
+  if (!EFI_ERROR (Status)) {
+    gBS->UninstallProtocolInterface (
+           gI2cHostDriverBinding.DriverBindingHandle,
+           &gEfiComponentName2ProtocolGuid,
+           ComponentName2
+           );
+  }
+
+  Status = EFI_SUCCESS;
 
 Done:
   //
