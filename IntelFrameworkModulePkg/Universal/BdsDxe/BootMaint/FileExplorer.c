@@ -1,7 +1,7 @@
 /** @file
   File explorer related functions.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -140,6 +140,9 @@ UpdateFileExplorer (
     NewFileContext                  = (BM_FILE_CONTEXT *) NewMenuEntry->VariableContext;
 
     if (NewFileContext->IsDir ) {
+      CallbackData->FeDisplayContext = FileExplorerDisplayDirectory;
+
+      RemoveEntryList (&NewMenuEntry->Link);
       BOpt_FreeMenu (&DirectoryMenu);
       Status = BOpt_FindFiles (CallbackData, NewMenuEntry);
        if (EFI_ERROR (Status)) {
@@ -147,10 +150,10 @@ UpdateFileExplorer (
          goto exit;
        }
       CreateMenuStringToken (CallbackData, CallbackData->FeHiiHandle, &DirectoryMenu);
+      BOpt_DestroyMenuEntry (NewMenuEntry);
 
       UpdateFileExplorePage (CallbackData, &DirectoryMenu);
 
-      CallbackData->FeDisplayContext = FileExplorerDisplayDirectory;
     } else {
       switch (CallbackData->FeCurrentState) {
       case FileExplorerStateBootFromFile:
