@@ -2,7 +2,7 @@
   Member functions of EFI_SHELL_PROTOCOL and functions for creation,
   manipulation, and initialization of EFI_SHELL_PROTOCOL.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -555,7 +555,6 @@ EfiShellRemoveDupInFileList(
 
   @param[in] BasePath         the Path to prepend onto filename for FullPath
   @param[in] Status           Status member initial value.
-  @param[in] FullName         FullName member initial value.
   @param[in] FileName         FileName member initial value.
   @param[in] Handle           Handle member initial value.
   @param[in] Info             Info struct to copy.
@@ -566,7 +565,6 @@ EFIAPI
 CreateAndPopulateShellFileInfo(
   IN CONST CHAR16 *BasePath,
   IN CONST EFI_STATUS Status,
-  IN CONST CHAR16 *FullName,
   IN CONST CHAR16 *FileName,
   IN CONST SHELL_FILE_HANDLE Handle,
   IN CONST EFI_FILE_INFO *Info

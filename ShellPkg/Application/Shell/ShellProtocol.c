@@ -2,7 +2,7 @@
   Member functions of EFI_SHELL_PROTOCOL and functions for creation,
   manipulation, and initialization of EFI_SHELL_PROTOCOL.
 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1619,6 +1619,7 @@ EfiShellFreeFileList(
     RemoveEntryList(&ShellFileListItem->Link);
     InternalFreeShellFileInfoNode(ShellFileListItem);
   }
+  InternalFreeShellFileInfoNode(*FileList);
   return(EFI_SUCCESS);
 }
 
@@ -1714,7 +1715,6 @@ InternalDuplicateShellFileInfo(
 
   @param[in] BasePath         the Path to prepend onto filename for FullPath
   @param[in] Status           Status member initial value.
-  @param[in] FullName         FullName member initial value.
   @param[in] FileName         FileName member initial value.
   @param[in] Handle           Handle member initial value.
   @param[in] Info             Info struct to copy.
@@ -1727,7 +1727,6 @@ EFIAPI
 CreateAndPopulateShellFileInfo(
   IN CONST CHAR16 *BasePath,
   IN CONST EFI_STATUS Status,
-  IN CONST CHAR16 *FullName,
   IN CONST CHAR16 *FileName,
   IN CONST SHELL_FILE_HANDLE Handle,
   IN CONST EFI_FILE_INFO *Info
@@ -1836,6 +1835,7 @@ EfiShellFindFilesInDir(
     Size              = 0;
     TempString        = StrnCatGrow(&TempString, &Size, ShellFileHandleGetPath(FileDirHandle), 0);
     if (TempString == NULL) {
+      SHELL_FREE_NON_NULL(BasePath);
       return (EFI_OUT_OF_RESOURCES);
     }
     TempSpot          = StrStr(TempString, L";");
@@ -1846,8 +1846,10 @@ EfiShellFindFilesInDir(
 
     TempString        = StrnCatGrow(&TempString, &Size, BasePath, 0);
     if (TempString == NULL) {
+      SHELL_FREE_NON_NULL(BasePath);
       return (EFI_OUT_OF_RESOURCES);
     }
+    SHELL_FREE_NON_NULL(BasePath);
     BasePath          = TempString;
   }
 
@@ -1862,20 +1864,14 @@ EfiShellFindFilesInDir(
       ; !EFI_ERROR(Status) && !NoFile
       ; Status = FileHandleFindNextFile(FileDirHandle, FileInfo, &NoFile)
      ){
-    TempString  = NULL;
-    Size        = 0;
     //
     // allocate a new EFI_SHELL_FILE_INFO and populate it...
     //
-    ASSERT((TempString == NULL && Size == 0) || (TempString != NULL));
-    TempString = StrnCatGrow(&TempString, &Size, BasePath, 0);
-    TempString = StrnCatGrow(&TempString, &Size, FileInfo->FileName, 0);
     ShellFileListItem = CreateAndPopulateShellFileInfo(
       BasePath,
-      EFI_SUCCESS, // success since we didnt fail to open it...
-      TempString,
+      EFI_SUCCESS,  // success since we didnt fail to open it...
       FileInfo->FileName,
-      NULL, // no handle since not open
+      NULL,         // no handle since not open
       FileInfo);
 
     if (ShellFileList == NULL) {
