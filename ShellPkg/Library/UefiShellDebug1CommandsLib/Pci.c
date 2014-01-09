@@ -2,7 +2,7 @@
   Main file for Pci shell Debug1 function.
 
   Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
-  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1499,7 +1499,8 @@ EFI_STATUS
 PciExplainData (
   IN PCI_CONFIG_SPACE                       *ConfigSpace,
   IN UINT64                                 Address,
-  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *IoDev
+  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *IoDev,
+  IN CONST UINT16                           EnhancedDump
   );
 
 /**
@@ -1627,7 +1628,8 @@ EFI_STATUS
 PciExplainCapabilityStruct (
   IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL         *IoDev,
   IN UINT64                                   Address,
-  IN  UINT8                                   CapPtr
+  IN  UINT8                                   CapPtr,
+  IN CONST UINT16                            EnhancedDump
   );
 
 /**
@@ -1641,7 +1643,8 @@ EFI_STATUS
 PciExplainPciExpress (
   IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL         *IoDev,
   IN  UINT64                                  Address,
-  IN  UINT8                                   CapabilityPtr
+  IN  UINT8                                   CapabilityPtr,
+  IN CONST UINT16                            EnhancedDump
   );
 
 /**
@@ -2050,6 +2053,7 @@ ShellCommandRunPci (
   SHELL_STATUS                      ShellStatus;
   CONST CHAR16                      *Temp;
   UINT64                            RetVal;
+  UINT16                            EnhancedDump;
 
   ShellStatus         = SHELL_SUCCESS;
   Status              = EFI_SUCCESS;
@@ -2454,7 +2458,15 @@ ShellCommandRunPci (
     // If "-i" appears in command line, interpret data in configuration space
     //
     if (ExplainData) {
-      Status = PciExplainData (&ConfigSpace, Address, IoDev);
+      EnhancedDump = 0;
+      if (ShellCommandLineGetFlag(Package, L"-_e")) {
+        EnhancedDump = 0xFFFF;
+        Temp = ShellCommandLineGetValue(Package, L"-_e");
+        if (Temp != NULL) {
+          EnhancedDump = (UINT16) ShellHexStrToUintn (Temp);
+        }
+      }
+      Status = PciExplainData (&ConfigSpace, Address, IoDev, EnhancedDump);
     }
   }
 Done:
@@ -2655,7 +2667,8 @@ EFI_STATUS
 PciExplainData (
   IN PCI_CONFIG_SPACE                       *ConfigSpace,
   IN UINT64                                 Address,
-  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *IoDev
+  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *IoDev,
+  IN CONST UINT16                           EnhancedDump
   )
 {
   PCI_COMMON_HEADER *Common;
@@ -2813,7 +2826,7 @@ PciExplainData (
   // If Status bit4 is 1, dump or explain capability structure
   //
   if ((Common->Status) & EFI_PCI_STATUS_CAPABILITY) {
-    PciExplainCapabilityStruct (IoDev, Address, CapPtr);
+    PciExplainCapabilityStruct (IoDev, Address, CapPtr, EnhancedDump);
   }
 
   return Status;
@@ -3787,7 +3800,8 @@ EFI_STATUS
 PciExplainCapabilityStruct (
   IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL         *IoDev,
   IN UINT64                                   Address,
-  IN  UINT8                                   CapPtr
+  IN  UINT8                                   CapPtr,
+  IN CONST UINT16                            EnhancedDump
   )
 {
   UINT8   CapabilityPtr;
@@ -3810,7 +3824,7 @@ PciExplainCapabilityStruct (
     // Explain PciExpress data
     //
     if (EFI_PCI_CAPABILITY_ID_PCIEXP == CapabilityID) {
-      PciExplainPciExpress (IoDev, Address, CapabilityPtr);
+      PciExplainPciExpress (IoDev, Address, CapabilityPtr, EnhancedDump);
       return EFI_SUCCESS;
     }
     //
@@ -4590,6 +4604,528 @@ ExplainPcieRootStatus (
 }
 
 /**
+  Function to interpret and print out the link control structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+EFIAPI
+PrintInterpretedExtendedCompatibilityLinkControl (
+  IN CONST PCI_EXP_EXT_HDR *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR *HeadersBaseAddress
+  )
+{
+  CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_INTERNAL_LINK_CONTROL *Header;
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_INTERNAL_LINK_CONTROL*)HeaderAddress;
+
+  ShellPrintHiiEx(
+    -1, -1, NULL, 
+    STRING_TOKEN (STR_PCI_EXT_CAP_LINK_CONTROL), 
+    gShellDebug1HiiHandle, 
+    Header->RootComplexLinkCapabilities,
+    Header->RootComplexLinkControl,
+    Header->RootComplexLinkStatus
+    ); 
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8*)HeaderAddress - (UINT8*)HeadersBaseAddress),
+    sizeof(PCI_EXPRESS_EXTENDED_CAPABILITIES_INTERNAL_LINK_CONTROL),
+    (VOID *) (HeaderAddress)
+    );
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the power budgeting structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+EFIAPI
+PrintInterpretedExtendedCompatibilityPowerBudgeting (
+  IN CONST PCI_EXP_EXT_HDR *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR *HeadersBaseAddress
+  )
+{
+  CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_POWER_BUDGETING *Header;
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_POWER_BUDGETING*)HeaderAddress;
+
+  ShellPrintHiiEx(
+    -1, -1, NULL, 
+    STRING_TOKEN (STR_PCI_EXT_CAP_POWER), 
+    gShellDebug1HiiHandle, 
+    Header->DataSelect,
+    Header->Data,
+    Header->PowerBudgetCapability
+    ); 
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8*)HeaderAddress - (UINT8*)HeadersBaseAddress),
+    sizeof(PCI_EXPRESS_EXTENDED_CAPABILITIES_POWER_BUDGETING),
+    (VOID *) (HeaderAddress)
+    );
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the ACS structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+EFIAPI
+PrintInterpretedExtendedCompatibilityAcs (
+  IN CONST PCI_EXP_EXT_HDR *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR *HeadersBaseAddress
+  )
+{
+  CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_ACS_EXTENDED  *Header;
+  UINT16                                                VectorSize;
+  UINT16                                                LoopCounter;
+
+  Header      = (PCI_EXPRESS_EXTENDED_CAPABILITIES_ACS_EXTENDED*)HeaderAddress;
+  VectorSize  = 0;
+
+  ShellPrintHiiEx(
+    -1, -1, NULL, 
+    STRING_TOKEN (STR_PCI_EXT_CAP_ACS), 
+    gShellDebug1HiiHandle, 
+    Header->AcsCapability,
+    Header->AcsControl
+    ); 
+  if (PCI_EXPRESS_EXTENDED_CAPABILITY_ACS_EXTENDED_GET_EGRES_CONTROL(Header)) {
+    VectorSize = PCI_EXPRESS_EXTENDED_CAPABILITY_ACS_EXTENDED_GET_EGRES_VECTOR_SIZE(Header);
+    if (VectorSize == 0) {
+      VectorSize = 256;
+    }
+    for (LoopCounter = 0 ; LoopCounter * 8 < VectorSize ; LoopCounter++) {
+      ShellPrintHiiEx(
+        -1, -1, NULL, 
+        STRING_TOKEN (STR_PCI_EXT_CAP_ACS2), 
+        gShellDebug1HiiHandle, 
+        LoopCounter + 1,
+        Header->EgressControlVectorArray[LoopCounter]
+        ); 
+    }
+  }
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8*)HeaderAddress - (UINT8*)HeadersBaseAddress),
+    sizeof(PCI_EXPRESS_EXTENDED_CAPABILITIES_ACS_EXTENDED) + (VectorSize / 8) - 1,
+    (VOID *) (HeaderAddress)
+    );
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the latency tolerance reporting structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+EFIAPI
+PrintInterpretedExtendedCompatibilityLatencyToleranceReporting (
+  IN CONST PCI_EXP_EXT_HDR *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR *HeadersBaseAddress
+  )
+{
+  CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_LATENCE_TOLERANCE_REPORTING *Header;
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_LATENCE_TOLERANCE_REPORTING*)HeaderAddress;
+
+  ShellPrintHiiEx(
+    -1, -1, NULL, 
+    STRING_TOKEN (STR_PCI_EXT_CAP_LAT), 
+    gShellDebug1HiiHandle, 
+    Header->MaxSnoopLatency,
+    Header->MaxNoSnoopLatency
+    ); 
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8*)HeaderAddress - (UINT8*)HeadersBaseAddress),
+    sizeof(PCI_EXPRESS_EXTENDED_CAPABILITIES_LATENCE_TOLERANCE_REPORTING),
+    (VOID *) (HeaderAddress)
+    );
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the serial number structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+EFIAPI
+PrintInterpretedExtendedCompatibilitySerialNumber (
+  IN CONST PCI_EXP_EXT_HDR *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR *HeadersBaseAddress
+  )
+{
+  CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_SERIAL_NUMBER *Header;
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_SERIAL_NUMBER*)HeaderAddress;
+
+  ShellPrintHiiEx(
+    -1, -1, NULL, 
+    STRING_TOKEN (STR_PCI_EXT_CAP_SN), 
+    gShellDebug1HiiHandle, 
+    Header->SerialNumber
+    ); 
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8*)HeaderAddress - (UINT8*)HeadersBaseAddress),
+    sizeof(PCI_EXPRESS_EXTENDED_CAPABILITIES_SERIAL_NUMBER),
+    (VOID *) (HeaderAddress)
+    );
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the RCRB structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+EFIAPI
+PrintInterpretedExtendedCompatibilityRcrb (
+  IN CONST PCI_EXP_EXT_HDR *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR *HeadersBaseAddress
+  )
+{
+  CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_RCRB_HEADER *Header;
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_RCRB_HEADER*)HeaderAddress;
+
+  ShellPrintHiiEx(
+    -1, -1, NULL, 
+    STRING_TOKEN (STR_PCI_EXT_CAP_RCRB), 
+    gShellDebug1HiiHandle, 
+    Header->VendorId,
+    Header->DeviceId,
+    Header->RcrbCapabilities,
+    Header->RcrbControl
+    ); 
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8*)HeaderAddress - (UINT8*)HeadersBaseAddress),
+    sizeof(PCI_EXPRESS_EXTENDED_CAPABILITIES_RCRB_HEADER),
+    (VOID *) (HeaderAddress)
+    );
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the vendor specific structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+EFIAPI
+PrintInterpretedExtendedCompatibilityVendorSpecific (
+  IN CONST PCI_EXP_EXT_HDR *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR *HeadersBaseAddress
+  )
+{
+  CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_VENDOR_SPECIFIC *Header;
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_VENDOR_SPECIFIC*)HeaderAddress;
+
+  ShellPrintHiiEx(
+    -1, -1, NULL, 
+    STRING_TOKEN (STR_PCI_EXT_CAP_VEN), 
+    gShellDebug1HiiHandle, 
+    Header->VendorSpecificHeader
+    ); 
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8*)HeaderAddress - (UINT8*)HeadersBaseAddress),
+    PCI_EXPRESS_EXTENDED_CAPABILITY_VENDOR_SPECIFIC_GET_SIZE(Header),
+    (VOID *) (HeaderAddress)
+    );
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the Event Collector Endpoint Association structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+EFIAPI
+PrintInterpretedExtendedCompatibilityECEA (
+  IN CONST PCI_EXP_EXT_HDR *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR *HeadersBaseAddress
+  )
+{
+  CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_EVENT_COLLECTOR_ENDPOINT_ASSOCIATION *Header;
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_EVENT_COLLECTOR_ENDPOINT_ASSOCIATION*)HeaderAddress;
+
+  ShellPrintHiiEx(
+    -1, -1, NULL, 
+    STRING_TOKEN (STR_PCI_EXT_CAP_ECEA), 
+    gShellDebug1HiiHandle, 
+    Header->AssociationBitmap
+    ); 
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8*)HeaderAddress - (UINT8*)HeadersBaseAddress),
+    sizeof(PCI_EXPRESS_EXTENDED_CAPABILITIES_EVENT_COLLECTOR_ENDPOINT_ASSOCIATION),
+    (VOID *) (HeaderAddress)
+    );
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the ARI structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+EFIAPI
+PrintInterpretedExtendedCompatibilityAri (
+  IN CONST PCI_EXP_EXT_HDR *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR *HeadersBaseAddress
+  )
+{
+  CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_ARI_CAPABILITY *Header;
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_ARI_CAPABILITY*)HeaderAddress;
+
+  ShellPrintHiiEx(
+    -1, -1, NULL, 
+    STRING_TOKEN (STR_PCI_EXT_CAP_ARI), 
+    gShellDebug1HiiHandle, 
+    Header->AriCapability,
+    Header->AriControl
+    ); 
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8*)HeaderAddress - (UINT8*)HeadersBaseAddress),
+    sizeof(PCI_EXPRESS_EXTENDED_CAPABILITIES_ARI_CAPABILITY),
+    (VOID *) (HeaderAddress)
+    );
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the DPA structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+EFIAPI
+PrintInterpretedExtendedCompatibilityDynamicPowerAllocation (
+  IN CONST PCI_EXP_EXT_HDR *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR *HeadersBaseAddress
+  )
+{
+  CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_DYNAMIC_POWER_ALLOCATION *Header;
+  UINT8                                                            LinkCount;
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_DYNAMIC_POWER_ALLOCATION*)HeaderAddress;
+
+  ShellPrintHiiEx(
+    -1, -1, NULL, 
+    STRING_TOKEN (STR_PCI_EXT_CAP_DPA), 
+    gShellDebug1HiiHandle, 
+    Header->DpaCapability,
+    Header->DpaLatencyIndicator,
+    Header->DpaStatus,
+    Header->DpaControl
+    ); 
+  for (LinkCount = 0 ; LinkCount < PCI_EXPRESS_EXTENDED_CAPABILITY_DYNAMIC_POWER_ALLOCATION_GET_SUBSTATE_MAX(Header) + 1 ; LinkCount++) {
+    ShellPrintHiiEx(
+      -1, -1, NULL, 
+      STRING_TOKEN (STR_PCI_EXT_CAP_DPA2), 
+      gShellDebug1HiiHandle, 
+      LinkCount+1,
+      Header->DpaPowerAllocationArray[LinkCount]
+      );
+  }
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8*)HeaderAddress - (UINT8*)HeadersBaseAddress),
+    sizeof(PCI_EXPRESS_EXTENDED_CAPABILITIES_DYNAMIC_POWER_ALLOCATION) - 1 + PCI_EXPRESS_EXTENDED_CAPABILITY_DYNAMIC_POWER_ALLOCATION_GET_SUBSTATE_MAX(Header),
+    (VOID *) (HeaderAddress)
+    );
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the link declaration structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+EFIAPI
+PrintInterpretedExtendedCompatibilityLinkDeclaration (
+  IN CONST PCI_EXP_EXT_HDR *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR *HeadersBaseAddress
+  )
+{
+  CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_LINK_DECLARATION  *Header;
+  UINT8                                                     LinkCount;
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_LINK_DECLARATION*)HeaderAddress;
+
+  ShellPrintHiiEx(
+    -1, -1, NULL, 
+    STRING_TOKEN (STR_PCI_EXT_CAP_LINK_DECLAR), 
+    gShellDebug1HiiHandle, 
+    Header->ElementSelfDescription
+    );
+
+  for (LinkCount = 0 ; LinkCount < PCI_EXPRESS_EXTENDED_CAPABILITY_LINK_DECLARATION_GET_LINK_COUNT(Header) ; LinkCount++) {
+    ShellPrintHiiEx(
+      -1, -1, NULL, 
+      STRING_TOKEN (STR_PCI_EXT_CAP_LINK_DECLAR2), 
+      gShellDebug1HiiHandle, 
+      LinkCount+1,
+      Header->LinkEntry[LinkCount]
+      );
+  }
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8*)HeaderAddress - (UINT8*)HeadersBaseAddress),
+    sizeof(PCI_EXPRESS_EXTENDED_CAPABILITIES_LINK_DECLARATION) + (PCI_EXPRESS_EXTENDED_CAPABILITY_LINK_DECLARATION_GET_LINK_COUNT(Header)-1)*sizeof(UINT32),
+    (VOID *) (HeaderAddress)
+    );
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the Advanced Error Reporting structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+EFIAPI
+PrintInterpretedExtendedCompatibilityAer (
+  IN CONST PCI_EXP_EXT_HDR *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR *HeadersBaseAddress
+  )
+{
+  CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_ADVANCED_ERROR_REPORTING *Header;
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_ADVANCED_ERROR_REPORTING*)HeaderAddress;
+
+  ShellPrintHiiEx(
+    -1, -1, NULL, 
+    STRING_TOKEN (STR_PCI_EXT_CAP_AER), 
+    gShellDebug1HiiHandle, 
+    Header->UncorrectableErrorStatus,
+    Header->UncorrectableErrorMask,
+    Header->UncorrectableErrorSeverity,
+    Header->CorrectableErrorStatus,
+    Header->CorrectableErrorMask,
+    Header->AdvancedErrorCapabilitiesAndControl,
+    Header->HeaderLog,
+    Header->RootErrorCommand,
+    Header->RootErrorStatus,
+    Header->ErrorSourceIdentification,
+    Header->CorrectableErrorSourceIdentification,
+    Header->TlpPrefixLog[0],
+    Header->TlpPrefixLog[1],
+    Header->TlpPrefixLog[2],
+    Header->TlpPrefixLog[3]
+    );
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8*)HeaderAddress - (UINT8*)HeadersBaseAddress),
+    sizeof(PCI_EXPRESS_EXTENDED_CAPABILITIES_ADVANCED_ERROR_REPORTING),
+    (VOID *) (HeaderAddress)
+    );
+  return (EFI_SUCCESS);
+}
+
+/**
+  Display Pcie extended capability details
+
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+  @param[in] HeaderAddress        The address of this capability header.
+  @param[in] PciExpressCapPtr     The address of the PCIe capabilities structure.
+**/
+EFI_STATUS
+EFIAPI
+PrintPciExtendedCapabilityDetails(
+  IN CONST PCI_EXP_EXT_HDR    *HeadersBaseAddress, 
+  IN CONST PCI_EXP_EXT_HDR    *HeaderAddress,
+  IN CONST PCIE_CAP_STURCTURE *PciExpressCapPtr
+  )
+{
+  switch (HeaderAddress->CapabilityId){
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_ADVANCED_ERROR_REPORTING_ID:
+      return PrintInterpretedExtendedCompatibilityAer(HeaderAddress, HeadersBaseAddress);
+      break;
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_LINK_CONTROL_ID:
+      return PrintInterpretedExtendedCompatibilityLinkControl(HeaderAddress, HeadersBaseAddress);
+      break;
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_LINK_DECLARATION_ID:
+      return PrintInterpretedExtendedCompatibilityLinkDeclaration(HeaderAddress, HeadersBaseAddress);
+      break;
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_SERIAL_NUMBER_ID:
+      return PrintInterpretedExtendedCompatibilitySerialNumber(HeaderAddress, HeadersBaseAddress);
+      break;
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_POWER_BUDGETING_ID:
+      return PrintInterpretedExtendedCompatibilityPowerBudgeting(HeaderAddress, HeadersBaseAddress);
+      break;
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_ACS_EXTENDED_ID:
+      return PrintInterpretedExtendedCompatibilityAcs(HeaderAddress, HeadersBaseAddress);
+      break;
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_LATENCE_TOLERANCE_REPORTING_ID:
+      return PrintInterpretedExtendedCompatibilityLatencyToleranceReporting(HeaderAddress, HeadersBaseAddress);
+      break;
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_ARI_CAPABILITY_ID:
+      return PrintInterpretedExtendedCompatibilityAri(HeaderAddress, HeadersBaseAddress);
+      break;
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_RCRB_HEADER_ID:
+      return PrintInterpretedExtendedCompatibilityRcrb(HeaderAddress, HeadersBaseAddress);
+      break;
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_VENDOR_SPECIFIC_ID:
+      return PrintInterpretedExtendedCompatibilityVendorSpecific(HeaderAddress, HeadersBaseAddress);
+      break;
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_DYNAMIC_POWER_ALLOCATION_ID:
+      return PrintInterpretedExtendedCompatibilityDynamicPowerAllocation(HeaderAddress, HeadersBaseAddress);
+      break;
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_EVENT_COLLECTOR_ENDPOINT_ASSOCIATION_ID:
+      return PrintInterpretedExtendedCompatibilityECEA(HeaderAddress, HeadersBaseAddress);
+      break;
+/**
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_VIRTUAL_CHANNEL_ID:
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_MULTI_FUNCTION_VIRTUAL_CHANNEL_ID:
+      ASSERT(FALSE);
+      break;
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_MULTICAST_ID: 
+// use PCIE_CAP_DEVICEPORT_TYPE(PciExpressCapPtr->PcieCapReg) == 0100b, 0101b, or 0110b
+      ASSERT(FALSE);
+      break;
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_RESIZABLE_BAR_ID:
+      ASSERT(FALSE);
+      break;
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_TPH_ID:
+      ASSERT(FALSE);
+      break;
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_SECONDARY_PCIE_ID:
+ // use PciExpressCapPtr link capabilities register
+     ASSERT(FALSE);
+      break;
+//**/
+    default:
+      ShellPrintEx (-1, -1,
+        L"Unknown PCIe extended capability ID (%04xh).  No interpretation available.\r\n",
+        HeaderAddress->CapabilityId
+        );
+      return EFI_SUCCESS;
+      break;
+  };
+
+}
+
+/**
   Display Pcie device structure.
 
   @param[in] IoDev          The pointer to the root pci protocol.
@@ -4600,7 +5136,8 @@ EFI_STATUS
 PciExplainPciExpress (
   IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL         *IoDev,
   IN  UINT64                                  Address,
-  IN  UINT8                                   CapabilityPtr
+  IN  UINT8                                   CapabilityPtr,
+  IN CONST UINT16                            EnhancedDump
   )
 {
 
@@ -4617,6 +5154,7 @@ PciExplainPciExpress (
   UINTN               Index;
   UINT8               *RegAddr;
   UINTN               RegValue;
+  PCI_EXP_EXT_HDR     *ExtHdr;
 
   CapRegAddress = Address + CapabilityPtr;
   IoDev->Pci.Read (
@@ -4703,15 +5241,15 @@ PciExplainPciExpress (
   Dev           = (UINT8) (RShiftU64 (Address, 16));
   Func          = (UINT8) (RShiftU64 (Address, 8));
 
-  Pciex_Address = CALC_EFI_PCIEX_ADDRESS (Bus, Dev, Func, 0x100);
+  Pciex_Address = CALC_EFI_PCIEX_ADDRESS (Bus, Dev, Func, EFI_PCIE_CAPABILITY_BASE_OFFSET);
 
-  ExtendRegSize = 0x1000 - 0x100;
+  ExtendRegSize = 0x1000 - EFI_PCIE_CAPABILITY_BASE_OFFSET;
 
   ExRegBuffer   = (UINT8 *) AllocateZeroPool (ExtendRegSize);
 
   //
   // PciRootBridgeIo protocol should support pci express extend space IO
-  // (Begins at offset 0x100)
+  // (Begins at offset EFI_PCIE_CAPABILITY_BASE_OFFSET)
   //
   Status = IoDev->Pci.Read (
                         IoDev,
@@ -4720,25 +5258,47 @@ PciExplainPciExpress (
                         (ExtendRegSize) / sizeof (UINT32),
                         (VOID *) (ExRegBuffer)
                        );
-  if (EFI_ERROR (Status)) {
-    FreePool ((VOID *) ExRegBuffer);
+  if (EFI_ERROR (Status) || ExRegBuffer == NULL) {
+    SHELL_FREE_NON_NULL(ExRegBuffer);
     return EFI_UNSUPPORTED;
   }
-  //
-  // Start outputing PciEx extend space( 0xFF-0xFFF)
-  //
-  ShellPrintEx (-1, -1, L"\r\n%HStart dumping PCIex extended configuration space (0x100 - 0xFFF).%N\r\n\r\n");
 
-  if (ExRegBuffer != NULL) {
+  if (EnhancedDump == 0) {
+    //
+    // Print the PciEx extend space in raw bytes ( 0xFF-0xFFF)
+    //
+    ShellPrintEx (-1, -1, L"\r\n%HStart dumping PCIex extended configuration space (0x100 - 0xFFF).%N\r\n\r\n");
+
     DumpHex (
       2,
-      0x100,
+      EFI_PCIE_CAPABILITY_BASE_OFFSET,
       ExtendRegSize,
       (VOID *) (ExRegBuffer)
-     );
+      );
+  } else {
+    ExtHdr = (PCI_EXP_EXT_HDR*)ExRegBuffer;
+    while (ExtHdr->CapabilityId != 0 && ExtHdr->CapabilityVersion != 0) {
+      //
+      // Process this item
+      //
+      if (EnhancedDump == 0xFFFF || EnhancedDump == ExtHdr->CapabilityId) {
+        //
+        // Print this item
+        //
+        PrintPciExtendedCapabilityDetails((PCI_EXP_EXT_HDR*)ExRegBuffer, ExtHdr, &PciExpressCap);
+      }
 
-    FreePool ((VOID *) ExRegBuffer);
+      //
+      // Advance to the next item if it exists
+      //
+      if (ExtHdr->NextCapabilityOffset != 0) {
+        ExtHdr = (PCI_EXP_EXT_HDR*)((UINT8*)ExRegBuffer + ExtHdr->NextCapabilityOffset);
+      } else {
+        break;
+      }
+    }
   }
+  SHELL_FREE_NON_NULL(ExRegBuffer);
 
 Done:
   return EFI_SUCCESS;
