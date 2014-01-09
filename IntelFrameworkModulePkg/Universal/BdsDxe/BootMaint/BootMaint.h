@@ -1,7 +1,7 @@
 /** @file
   Header file for boot maintenance module.
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -124,8 +124,9 @@ typedef enum _FILE_EXPLORER_DISPLAY_CONTEXT {
 #define FD_OPTION_OFFSET        0xC000
 #define HD_OPTION_OFFSET        0xB000
 #define CD_OPTION_OFFSET        0xA000
+#define FILE_OPTION_GOTO_OFFSET 0xC000
 #define FILE_OPTION_OFFSET      0x8000
-#define FILE_OPTION_MASK        0x7FFF
+#define FILE_OPTION_MASK        0x3FFF
 #define HANDLE_OPTION_OFFSET    0x7000
 #define CONSOLE_OPTION_OFFSET   0x6000
 #define TERMINAL_OPTION_OFFSET  0x5000

@@ -1,7 +1,7 @@
 /** @file
   HII Config Access protocol implementation of SecureBoot configuration module.
 
-Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2714,7 +2714,7 @@ SecureBootCallback (
       break;
 
     default:
-      if (QuestionId >= FILE_OPTION_OFFSET) {
+      if (QuestionId >= FILE_OPTION_GOTO_OFFSET) {
         UpdateFileExplorer (Private, QuestionId);
       } else if ((QuestionId >= OPTION_DEL_KEK_QUESTION_ID) &&
                  (QuestionId < (OPTION_DEL_KEK_QUESTION_ID + OPTION_CONFIG_RANGE))) {
@@ -2821,7 +2821,14 @@ SecureBootCallback (
       if (SetupMode != NULL) {
         FreePool (SetupMode);
       }
-      break;  
+      break;
+    default:
+      if (QuestionId >= FILE_OPTION_OFFSET && QuestionId < FILE_OPTION_GOTO_OFFSET) {
+        if (UpdateFileExplorer (Private, QuestionId)) {
+          *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+        }
+      }
+      break;
     }
   } else if (Action == EFI_BROWSER_ACTION_DEFAULT_STANDARD) {
     if (QuestionId == KEY_HIDE_SECURE_BOOT) {

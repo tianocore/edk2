@@ -1,7 +1,7 @@
 /** @file
   Header file for NV data structure definition.
 
-Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -95,9 +95,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 #define OPTION_DEL_DBX_QUESTION_ID            0x4000 
 
-
+#define FILE_OPTION_GOTO_OFFSET               0xC000
 #define FILE_OPTION_OFFSET                    0x8000
-#define FILE_OPTION_MASK                      0x7FFF
+#define FILE_OPTION_MASK                      0x3FFF
 
 #define SECURE_BOOT_GUID_SIZE                 36
 #define SECURE_BOOT_GUID_STORAGE_SIZE         37

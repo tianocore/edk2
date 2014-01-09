@@ -1,7 +1,7 @@
 /** @file
   File explorer related functions.
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -75,7 +75,7 @@ UpdateFileExplorePage (
         NewMenuEntry->DisplayStringToken,
         STRING_TOKEN (STR_NULL_STRING),
         EFI_IFR_FLAG_CALLBACK,
-        (UINT16) (FILE_OPTION_OFFSET + Index)
+        (UINT16) (FILE_OPTION_GOTO_OFFSET + Index)
         );
     }
   }
@@ -320,13 +320,23 @@ FileExplorerCallback (
       // Exit File Explorer formset
       //
       *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+    } else if (QuestionId >= FILE_OPTION_OFFSET && QuestionId < FILE_OPTION_GOTO_OFFSET) {
+      //
+      // Update forms may return TRUE or FALSE, need to check here.
+      //
+      if (UpdateFileExplorer (Private, QuestionId)) {
+        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+      }
     }
   } else if (Action == EFI_BROWSER_ACTION_CHANGING) {
     if (Value == NULL) {
       return EFI_INVALID_PARAMETER;
     }
     
-    if (QuestionId >= FILE_OPTION_OFFSET) {
+    if (QuestionId >= FILE_OPTION_GOTO_OFFSET) {
+      //
+      // function will always return FALSE, no need to check here.
+      //
       UpdateFileExplorer (Private, QuestionId);
     }
   }
