@@ -455,7 +455,7 @@ S3BootScriptSaveInformationAsciiString (
   how to get the script to run on an S3 resume because the boot script maintained by the lib will be 
   destroyed.
  
-  @return the base address of the new copy of the boot script tble.   
+  @return the base address of the new copy of the boot script table.   
 
 **/
 UINT8*
