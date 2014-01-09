@@ -1,7 +1,7 @@
 /** @file
   Main Header file for the MMC DXE driver
 
-  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
   
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
@@ -58,6 +58,7 @@ typedef enum {
   UNKNOWN_CARD,
   MMC_CARD,              //MMC card
   MMC_CARD_HIGH,         //MMC Card with High capacity
+  EMMC_CARD,             //eMMC 4.41 card
   SD_CARD,               //SD 1.1 card
   SD_CARD_2,             //SD 2.0 or above standard card
   SD_CARD_2_HIGH         //SD 2.0 or above high capacity card
@@ -289,8 +290,15 @@ MmcFlushBlocks (
   IN EFI_BLOCK_IO_PROTOCOL  *This
   );
 
-EFI_STATUS InitializeMmcDevice (
-  IN  MMC_HOST_INSTANCE   *MmcHost
+EFI_STATUS
+MmcNotifyState (
+  IN MMC_HOST_INSTANCE      *MmcHostInstance,
+  IN MMC_STATE               State
+  );
+
+EFI_STATUS
+InitializeMmcDevice (
+  IN  MMC_HOST_INSTANCE     *MmcHost
   );
 
 VOID
