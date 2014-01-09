@@ -121,11 +121,15 @@ CascadeProcessVariables (
   if (Status == EFI_BUFFER_TOO_SMALL) {
     SHELL_FREE_NON_NULL(FoundVarName);
     FoundVarName = AllocateZeroPool (NameSize);
-    if (PrevName != NULL) {
-      StrCpy(FoundVarName, PrevName);
-    }
+    if (FoundVarName != NULL) {
+      if (PrevName != NULL) {
+        StrCpy(FoundVarName, PrevName);
+      }
 
-    Status = gRT->GetNextVariableName (&NameSize, FoundVarName, &FoundVarGuid);
+      Status = gRT->GetNextVariableName (&NameSize, FoundVarName, &FoundVarGuid);
+    } else {
+      Status = EFI_OUT_OF_RESOURCES;
+    }
   }
 
   //

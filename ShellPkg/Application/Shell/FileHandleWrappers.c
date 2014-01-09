@@ -2,7 +2,7 @@
   EFI_FILE_PROTOCOL wrappers for other items (Like Environment Variables,
   StdIn, StdOut, StdErr, etc...).
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2013, Hewlett-Packard Development Company, L.P.
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -973,7 +973,7 @@ FileInterfaceEnvClose(
     Status = SHELL_GET_ENVIRONMENT_VARIABLE(((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name, &NewSize, NewBuffer);
   }
   
-  if (!EFI_ERROR(Status)) {
+  if (!EFI_ERROR(Status) && NewBuffer != NULL) {
     
     if (StrSize(NewBuffer) > 6)
     {
