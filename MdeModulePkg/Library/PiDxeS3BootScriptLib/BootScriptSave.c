@@ -1,7 +1,7 @@
 /** @file
   Save the S3 data to S3 boot script. 
  
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -62,7 +62,7 @@ EFI_GUID                         mBootScriptHeaderDataGuid = {
   This is an internal function to add a terminate node the entry, recalculate the table 
   length and fill into the table. 
   
-  @return the base address of the boot script tble.   
+  @return the base address of the boot script table.   
  **/
 UINT8*
 S3BootScriptInternalCloseTable (
@@ -651,7 +651,7 @@ SyncBootScript (
   how to get the script to run on an S3 resume because the boot script maintained by the lib will be 
   destroyed.
  
-  @return the base address of the new copy of the boot script tble.   
+  @return the base address of the new copy of the boot script table.   
   @note this function could only called in boot time phase
 
 **/
