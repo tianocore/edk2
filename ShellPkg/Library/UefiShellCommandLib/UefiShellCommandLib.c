@@ -1,7 +1,7 @@
 /** @file
   Provides interface to shell internal functions for shell commands.
 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -101,6 +101,37 @@ ShellCommandLibConstructor (
 }
 
 /**
+  Frees list of file handles.
+
+  @param[in] List     The list to free.
+**/
+VOID
+EFIAPI
+FreeFileHandleList (
+  IN BUFFER_LIST *List
+  )
+{
+  BUFFER_LIST               *BufferListEntry;
+
+  if (List == NULL){
+    return;
+  }
+  //
+  // enumerate through the buffer list and free all memory
+  //
+  for ( BufferListEntry = ( BUFFER_LIST *)GetFirstNode(&List->Link)
+      ; !IsListEmpty (&List->Link)
+      ; BufferListEntry = (BUFFER_LIST *)GetFirstNode(&List->Link)
+     ){
+    RemoveEntryList(&BufferListEntry->Link);
+    ASSERT(BufferListEntry->Buffer != NULL);
+    SHELL_FREE_NON_NULL(((SHELL_COMMAND_FILE_HANDLE*)(BufferListEntry->Buffer))->Path);
+    SHELL_FREE_NON_NULL(BufferListEntry->Buffer);
+    SHELL_FREE_NON_NULL(BufferListEntry);
+  }
+}
+
+/**
   Destructor for the library.  free any resources.
 
   @param ImageHandle    the image handle of the process
@@ -169,7 +200,7 @@ ShellCommandLibDestructor (
     }
   }
   if (!IsListEmpty(&mFileHandleList.Link)){
-    FreeBufferList(&mFileHandleList);
+    FreeFileHandleList(&mFileHandleList);
   }
 
   if (mProfileList != NULL) {
