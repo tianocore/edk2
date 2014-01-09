@@ -4,7 +4,7 @@
 #   depends on the full functionality SMM FVB protocol that support read, write/erase 
 #   flash access.
 #
-# Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -73,6 +73,12 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
 
+#
+# gBS->CalculateCrc32() is consumed in EntryPoint.
+# PI spec said: When the DXE Foundation is notified that the EFI_RUNTIME_ARCH_PROTOCOL
+# has been installed, then the Boot Service CalculateCrc32() is available.
+# So add gEfiRuntimeArchProtocolGuid Depex here.
+#
 [Depex]
-  gEfiSmmFirmwareVolumeBlockProtocolGuid
+  gEfiSmmFirmwareVolumeBlockProtocolGuid AND gEfiRuntimeArchProtocolGuid
 
