@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
 distribution. The full text of the license may be found at
@@ -140,6 +140,8 @@ Returns:
   EFI_HANDLE  *DeviceHandleBuffer;
   UINTN       DeviceHandleCount;
   UINTN       Index;
+  VOID        *ComponentName;
+  VOID        *ComponentName2;
 
   Status = gBS->LocateHandleBuffer (
                   AllHandles,
@@ -148,18 +150,75 @@ Returns:
                   &DeviceHandleCount,
                   &DeviceHandleBuffer
                   );
-  if (!EFI_ERROR (Status)) {
-    for (Index = 0; Index < DeviceHandleCount; Index++) {
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  for (Index = 0; Index < DeviceHandleCount; Index++) {
+    Status = EfiTestManagedDevice (DeviceHandleBuffer[Index], ImageHandle, &gEfiDiskIoProtocolGuid);
+    if (!EFI_ERROR (Status)) {
       Status = gBS->DisconnectController (
                       DeviceHandleBuffer[Index],
                       ImageHandle,
                       NULL
                       );
+      if (EFI_ERROR (Status)) {
+        break;
+      }
+    }
+  }
+
+  if (Index == DeviceHandleCount) {
+    //
+    // Driver is stopped successfully.
+    //
+    Status = gBS->HandleProtocol (ImageHandle, &gEfiComponentNameProtocolGuid, &ComponentName);
+    if (EFI_ERROR (Status)) {
+      ComponentName = NULL;
     }
 
-    if (DeviceHandleBuffer != NULL) {
-      FreePool (DeviceHandleBuffer);
+    Status = gBS->HandleProtocol (ImageHandle, &gEfiComponentName2ProtocolGuid, &ComponentName2);
+    if (EFI_ERROR (Status)) {
+      ComponentName2 = NULL;
     }
+
+    if (ComponentName == NULL) {
+      if (ComponentName2 == NULL) {
+        Status = gBS->UninstallMultipleProtocolInterfaces (
+                        ImageHandle,
+                        &gEfiDriverBindingProtocolGuid,  &gFatDriverBinding,
+                        NULL
+                        );
+      } else {
+        Status = gBS->UninstallMultipleProtocolInterfaces (
+                        ImageHandle,
+                        &gEfiDriverBindingProtocolGuid,  &gFatDriverBinding,
+                        &gEfiComponentName2ProtocolGuid, ComponentName2,
+                        NULL
+                        );
+      }
+    } else {
+      if (ComponentName2 == NULL) {
+        Status = gBS->UninstallMultipleProtocolInterfaces (
+                        ImageHandle,
+                        &gEfiDriverBindingProtocolGuid,  &gFatDriverBinding,
+                        &gEfiComponentNameProtocolGuid,  ComponentName,
+                        NULL
+                        );
+      } else {
+        Status = gBS->UninstallMultipleProtocolInterfaces (
+                        ImageHandle,
+                        &gEfiDriverBindingProtocolGuid,  &gFatDriverBinding,
+                        &gEfiComponentNameProtocolGuid,  ComponentName,
+                        &gEfiComponentName2ProtocolGuid, ComponentName2,
+                        NULL
+                        );
+      }
+    }
+  }
+
+  if (DeviceHandleBuffer != NULL) {
+    FreePool (DeviceHandleBuffer);
   }
 
   return Status;
