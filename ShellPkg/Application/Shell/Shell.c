@@ -1067,7 +1067,7 @@ DoShellPrompt (
   if (!EFI_ERROR (Status)) {
     CmdLine[BufferSize / sizeof (CHAR16)] = CHAR_NULL;
     Status = RunCommand(CmdLine);
-  }
+    }
 
   //
   // Done with this command
@@ -2362,11 +2362,13 @@ RunScriptFileHandle (
   while(!ShellFileHandleEof(Handle)) {
     CommandLine = ShellFileHandleReturnLine(Handle, &Ascii);
     LineCount++;
-    if (CommandLine == NULL || StrLen(CommandLine) == 0) {
+    if (CommandLine == NULL || StrLen(CommandLine) == 0 || CommandLine[0] == '#') {
+      SHELL_FREE_NON_NULL(CommandLine);
       continue;
     }
     NewScriptFile->CurrentCommand = AllocateZeroPool(sizeof(SCRIPT_COMMAND_LIST));
     if (NewScriptFile->CurrentCommand == NULL) {
+      SHELL_FREE_NON_NULL(CommandLine);
       DeleteScriptFileStruct(NewScriptFile);
       return (EFI_OUT_OF_RESOURCES);
     }
