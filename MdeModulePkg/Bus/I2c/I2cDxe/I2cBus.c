@@ -1424,22 +1424,20 @@ I2cBusUnload (
                   &DeviceHandleBuffer
                   );
 
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Disconnect the driver specified by Driver BindingHandle from all
-  // the devices in the handle database.
-  //
-  for (Index = 0; Index < DeviceHandleCount; Index++) {
-    Status = gBS->DisconnectController (
-                    DeviceHandleBuffer[Index],
-                    gI2cBusDriverBinding.DriverBindingHandle,
-                    NULL
-                    );
-    if (EFI_ERROR (Status)) {
-      goto Done;
+  if (!EFI_ERROR (Status)) {
+    //
+    // Disconnect the driver specified by Driver BindingHandle from all
+    // the devices in the handle database.
+    //
+    for (Index = 0; Index < DeviceHandleCount; Index++) {
+      Status = gBS->DisconnectController (
+                      DeviceHandleBuffer[Index],
+                      gI2cBusDriverBinding.DriverBindingHandle,
+                      NULL
+                      );
+      if (EFI_ERROR (Status)) {
+        goto Done;
+      }
     }
   }
 
