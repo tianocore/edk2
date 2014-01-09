@@ -1,7 +1,7 @@
 /** @file
   Industry Standard Definitions of SMBIOS Table Specification v2.7.1
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -564,6 +564,22 @@ typedef enum {
   ProcessorFamilyIndicatorFamily2       = 0xFE,
   ProcessorFamilyReserved1              = 0xFF
 } PROCESSOR_FAMILY_DATA;
+
+///
+/// Processor Information2 - Processor Family2.
+///
+typedef enum {
+  ProcessorFamilySH3                   = 0x0104,
+  ProcessorFamilySH4                   = 0x0105,
+  ProcessorFamilyARM                   = 0x0118,
+  ProcessorFamilyStrongARM             = 0x0119,
+  ProcessorFamily6x86                  = 0x012C,
+  ProcessorFamilyMediaGX               = 0x012D,
+  ProcessorFamilyMII                   = 0x012E,
+  ProcessorFamilyWinChip               = 0x0140,
+  ProcessorFamilyDSP                   = 0x015E,
+  ProcessorFamilyVideoProcessor        = 0x01F4
+} PROCESSOR_FAMILY2_DATA;
 
 ///
 /// Processor Information - Voltage. 
