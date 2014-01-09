@@ -3,9 +3,9 @@
 # This Package provides all definitions(including functions, MACROs, structures and library classes)
 # and libraries instances, which are defined in MDE Specification.
 # It also provides the definitions(including PPIs/PROTOCOLs/GUIDs) of
-# EFI1.10/UEFI2.3.1/PI1.2 and some Industry Standards.
+# EFI1.10/UEFI2.4/PI1.3 and some Industry Standards.
 #
-# Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available under
@@ -23,7 +23,7 @@
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = MdePkg
   PACKAGE_GUID                   = 1E73767F-8F52-4603-AEB4-F29B510B6766
-  PACKAGE_VERSION                = 1.03
+  PACKAGE_VERSION                = 1.04
 
 
 [Includes]

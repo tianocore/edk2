@@ -1,7 +1,7 @@
 ## @file
 # EFI/PI MdePkg Package
 #
-# Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
@@ -17,7 +17,7 @@
 [Defines]
   PLATFORM_NAME                  = Mde
   PLATFORM_GUID                  = 082F8BFC-0455-4859-AE3C-ECD64FB81642
-  PLATFORM_VERSION               = 1.03
+  PLATFORM_VERSION               = 1.04
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/Mde
   SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC|ARM|AARCH64
