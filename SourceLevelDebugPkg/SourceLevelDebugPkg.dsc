@@ -2,7 +2,7 @@
 #
 # Source Level Debug Package.
 #
-# Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -22,7 +22,7 @@
 [Defines]
   PLATFORM_NAME                  = SourceLevelDebugPkg
   PLATFORM_GUID                  = 38C85805-883F-4ee8-A854-95B966ED73AA
-  PLATFORM_VERSION               = 0.85
+  PLATFORM_VERSION               = 0.86
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/SourceLevelDebugPkg
   SUPPORTED_ARCHITECTURES        = IA32|X64
