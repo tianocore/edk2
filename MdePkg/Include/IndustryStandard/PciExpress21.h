@@ -241,6 +241,8 @@ typedef struct {
   PCI_EXPRESS_EXTENDED_CAPABILITIES_RESIZABLE_BAR_ENTRY  Capability[1];
 } PCI_EXPRESS_EXTENDED_CAPABILITIES_RESIZABLE_BAR;
 
+#define GET_NUMBER_RESIZABLE_BARS(x) (((x->Capability[0].ResizableBarControl) & 0xE0) >> 5)
+
 #define PCI_EXPRESS_EXTENDED_CAPABILITY_ARI_CAPABILITY_ID    0x000E
 #define PCI_EXPRESS_EXTENDED_CAPABILITY_ARI_CAPABILITY_VER1  0x1
 
@@ -283,5 +285,7 @@ typedef struct {
   UINT32                                                  TphRequesterControl;
   UINT16                                                  TphStTable[1];
 } PCI_EXPRESS_EXTENDED_CAPABILITIES_TPH;
+
+#define GET_TPH_TABLE_SIZE(x) ((x->TphRequesterCapability & 0x7FF0000)>>16) * sizeof(UINT16)
 
 #endif
