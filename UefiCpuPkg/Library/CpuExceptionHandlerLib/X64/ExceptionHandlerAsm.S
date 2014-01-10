@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------ ;
-# Copyright (c) 2012 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2012 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -269,15 +269,15 @@ VectorNum:
 ASM_GLOBAL ASM_PFX(HookAfterStubHeaderEnd)
 ASM_PFX(HookAfterStubHeaderEnd):
     movq    %rsp, %rax
-    subq    $8, %rsp
-    andl    $0x0fffffff0, %esp
+    andl    $0x0fffffff0, %esp  # make sure 16-byte aligned for exception context
+    subq    $0x18, %rsp         # reserve room for filling exception data later
     pushq   %rcx
     movq    8(%rax), %rcx
     pushq   %rax
     movabsl ASM_PFX(mErrorCodeFlag), %eax
     bt      %ecx, %eax
     popq    %rax
-    jc      NoErrorData
+    jnc     NoErrorData
     pushq   (%rsp)            # push additional rcx to make stack alignment
 NoErrorData:
     xchgq   (%rsp), %rcx      # restore rcx, save Exception Number in stack
