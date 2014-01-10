@@ -2,7 +2,7 @@
 #  This package includes the security drivers, defintions(including PPIs/PROTOCOLs/GUIDs  
 #  and library classes) and libraries instances.
 #
-# Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License which accompanies this distribution.
 # The full text of the license may be found at
@@ -17,7 +17,7 @@
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = SecurityPkg
   PACKAGE_GUID                   = 24369CAC-6AA6-4fb8-88DB-90BF061668AD
-  PACKAGE_VERSION                = 0.92
+  PACKAGE_VERSION                = 0.93
 
 [Includes]
   Include
