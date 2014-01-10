@@ -76,7 +76,7 @@ typedef enum {
 typedef struct {
   EFI_PHYSICAL_ADDRESS          PhysicalBase;
   EFI_VIRTUAL_ADDRESS           VirtualBase;
-  UINTN                         Length;
+  UINT64                        Length;
   ARM_MEMORY_REGION_ATTRIBUTES  Attributes;
 } ARM_MEMORY_REGION_DESCRIPTOR;
 

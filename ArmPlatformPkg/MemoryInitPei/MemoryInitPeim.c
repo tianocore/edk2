@@ -104,10 +104,10 @@ InitializeMemory (
   DEBUG ((EFI_D_ERROR, "Memory Init PEIM Loaded\n"));
 
   // Ensure PcdSystemMemorySize has been set
-  ASSERT (FixedPcdGet32 (PcdSystemMemorySize) != 0);
+  ASSERT (FixedPcdGet64 (PcdSystemMemorySize) != 0);
 
-  SystemMemoryBase = (UINTN)FixedPcdGet32 (PcdSystemMemoryBase);
-  SystemMemoryTop = SystemMemoryBase + (UINTN)FixedPcdGet32 (PcdSystemMemorySize);
+  SystemMemoryBase = (UINTN)FixedPcdGet64 (PcdSystemMemoryBase);
+  SystemMemoryTop = SystemMemoryBase + (UINTN)FixedPcdGet64 (PcdSystemMemorySize);
   FdBase = (UINTN)PcdGet32 (PcdFdBaseAddress);
   FdTop = FdBase + (UINTN)PcdGet32 (PcdFdSize);
 

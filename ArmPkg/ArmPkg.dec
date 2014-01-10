@@ -114,8 +114,8 @@
   # System Memory (DRAM): These PCDs define the region of in-built system memory
   # Some platforms can get DRAM extensions, these additional regions will be declared
   # to UEFI by ArmPLatformPlib   
-  gArmTokenSpaceGuid.PcdSystemMemoryBase|0|UINT32|0x00000029
-  gArmTokenSpaceGuid.PcdSystemMemorySize|0|UINT32|0x0000002A
+  gArmTokenSpaceGuid.PcdSystemMemoryBase|0|UINT64|0x00000029
+  gArmTokenSpaceGuid.PcdSystemMemorySize|0|UINT64|0x0000002A
 
   # Use ClusterId + CoreId to identify the PrimaryCore
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask|0xF03|UINT32|0x00000031

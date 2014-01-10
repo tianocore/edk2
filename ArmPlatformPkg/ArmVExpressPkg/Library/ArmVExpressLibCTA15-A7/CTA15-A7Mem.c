@@ -136,18 +136,18 @@ ArmPlatformGetVirtualMemoryMap (
 
 #ifndef ARM_BIGLITTLE_TC2
   // Workaround for SRAM bug in RTSM
-  if (PcdGet32 (PcdSystemMemoryBase) != 0x80000000) {
+  if (PcdGet64 (PcdSystemMemoryBase) != 0x80000000) {
     VirtualMemoryTable[++Index].PhysicalBase  = 0x80000000;
     VirtualMemoryTable[Index].VirtualBase     = 0x80000000;
-    VirtualMemoryTable[Index].Length          = PcdGet32 (PcdSystemMemoryBase) - 0x80000000;
+    VirtualMemoryTable[Index].Length          = PcdGet64 (PcdSystemMemoryBase) - 0x80000000;
     VirtualMemoryTable[Index].Attributes      = CacheAttributes;
   }
 #endif
 
   // DDR
-  VirtualMemoryTable[++Index].PhysicalBase  = PcdGet32 (PcdSystemMemoryBase);
-  VirtualMemoryTable[Index].VirtualBase     = PcdGet32 (PcdSystemMemoryBase);
-  VirtualMemoryTable[Index].Length          = PcdGet32 (PcdSystemMemorySize);
+  VirtualMemoryTable[++Index].PhysicalBase  = PcdGet64 (PcdSystemMemoryBase);
+  VirtualMemoryTable[Index].VirtualBase     = PcdGet64 (PcdSystemMemoryBase);
+  VirtualMemoryTable[Index].Length          = PcdGet64 (PcdSystemMemorySize);
   VirtualMemoryTable[Index].Attributes      = CacheAttributes;
 
   // Detect if it is a 1GB or 2GB Test Chip
@@ -159,13 +159,13 @@ ArmPlatformGetVirtualMemoryMap (
         EFI_RESOURCE_ATTRIBUTE_PRESENT | EFI_RESOURCE_ATTRIBUTE_INITIALIZED | EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
           EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE | EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE | EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
           EFI_RESOURCE_ATTRIBUTE_TESTED,
-        PcdGet32 (PcdSystemMemoryBase) + PcdGet32 (PcdSystemMemorySize),
+        PcdGet64 (PcdSystemMemoryBase) + PcdGet64 (PcdSystemMemorySize),
         SIZE_1GB
     );
 
     // Map the additional 1GB into the MMU
-    VirtualMemoryTable[++Index].PhysicalBase  = PcdGet32 (PcdSystemMemoryBase) + PcdGet32 (PcdSystemMemorySize);
-    VirtualMemoryTable[Index].VirtualBase     = PcdGet32 (PcdSystemMemoryBase) + PcdGet32 (PcdSystemMemorySize);
+    VirtualMemoryTable[++Index].PhysicalBase  = PcdGet64 (PcdSystemMemoryBase) + PcdGet64 (PcdSystemMemorySize);
+    VirtualMemoryTable[Index].VirtualBase     = PcdGet64 (PcdSystemMemoryBase) + PcdGet64 (PcdSystemMemorySize);
     VirtualMemoryTable[Index].Length          = SIZE_1GB;
     VirtualMemoryTable[Index].Attributes      = CacheAttributes;
   }

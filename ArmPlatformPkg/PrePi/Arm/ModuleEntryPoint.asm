@@ -52,8 +52,8 @@ _SetSVCMode
 // at the top of the DRAM)
 _SetupStackPosition
   // Compute Top of System Memory
-  LoadConstantToReg (FixedPcdGet32(PcdSystemMemoryBase), r1)
-  LoadConstantToReg (FixedPcdGet32(PcdSystemMemorySize), r2)
+  LoadConstantToReg (FixedPcdGet64 (PcdSystemMemoryBase), r1)
+  LoadConstantToReg (FixedPcdGet64 (PcdSystemMemorySize), r2)
   sub   r2, r2, #1
   add   r1, r1, r2      // r1 = SystemMemoryTop = PcdSystemMemoryBase + PcdSystemMemorySize
 

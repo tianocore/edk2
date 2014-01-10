@@ -78,7 +78,7 @@ MemoryPeim (
   BOOLEAN                     Found;
 
   // Ensure PcdSystemMemorySize has been set
-  ASSERT (PcdGet32 (PcdSystemMemorySize) != 0);
+  ASSERT (PcdGet64 (PcdSystemMemorySize) != 0);
 
   //
   // Now, the permanent memory has been installed, we can call AllocatePages()
@@ -97,16 +97,16 @@ MemoryPeim (
   BuildResourceDescriptorHob (
       EFI_RESOURCE_SYSTEM_MEMORY,
       ResourceAttributes,
-      PcdGet32 (PcdSystemMemoryBase),
-      PcdGet32 (PcdSystemMemorySize)
+      PcdGet64 (PcdSystemMemoryBase),
+      PcdGet64 (PcdSystemMemorySize)
   );
 
-  SystemMemoryTop = (EFI_PHYSICAL_ADDRESS)PcdGet32 (PcdSystemMemoryBase) + (EFI_PHYSICAL_ADDRESS)PcdGet32 (PcdSystemMemorySize);
+  SystemMemoryTop = (EFI_PHYSICAL_ADDRESS)PcdGet64 (PcdSystemMemoryBase) + (EFI_PHYSICAL_ADDRESS)PcdGet64 (PcdSystemMemorySize);
   FdTop = (EFI_PHYSICAL_ADDRESS)PcdGet32(PcdFdBaseAddress) + (EFI_PHYSICAL_ADDRESS)PcdGet32(PcdFdSize);
 
   // EDK2 does not have the concept of boot firmware copied into DRAM. To avoid the DXE
   // core to overwrite this area we must mark the region with the attribute non-present
-  if ((PcdGet32 (PcdFdBaseAddress) >= PcdGet32 (PcdSystemMemoryBase)) && (FdTop <= SystemMemoryTop)) {
+  if ((PcdGet32 (PcdFdBaseAddress) >= PcdGet64 (PcdSystemMemoryBase)) && (FdTop <= SystemMemoryTop)) {
     Found = FALSE;
 
     // Search for System Memory Hob that contains the firmware

@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -16,9 +16,9 @@
 #define __BDSLINUXLOADER_H
 
 #define LINUX_UIMAGE_SIGNATURE    0x56190527
-#define LINUX_KERNEL_MAX_OFFSET   (PcdGet32(PcdSystemMemoryBase) + PcdGet32(PcdArmLinuxKernelMaxOffset))
-#define LINUX_ATAG_MAX_OFFSET     (PcdGet32(PcdSystemMemoryBase) + PcdGet32(PcdArmLinuxAtagMaxOffset))
-#define LINUX_FDT_MAX_OFFSET      (PcdGet32(PcdSystemMemoryBase) + PcdGet32(PcdArmLinuxFdtMaxOffset))
+#define LINUX_KERNEL_MAX_OFFSET   (PcdGet64 (PcdSystemMemoryBase) + PcdGet32(PcdArmLinuxKernelMaxOffset))
+#define LINUX_ATAG_MAX_OFFSET     (PcdGet64 (PcdSystemMemoryBase) + PcdGet32(PcdArmLinuxAtagMaxOffset))
+#define LINUX_FDT_MAX_OFFSET      (PcdGet64 (PcdSystemMemoryBase) + PcdGet32(PcdArmLinuxFdtMaxOffset))
 
 // Additional size that could be used for FDT entries added by the UEFI OS Loader
 // Estimation based on: EDID (300bytes) + bootargs (200bytes) + initrd region (20bytes)

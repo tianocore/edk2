@@ -55,9 +55,9 @@ ArmPlatformGetVirtualMemoryMap (
   }
 
   // ReMap (Either NOR Flash or DRAM)
-  VirtualMemoryTable[Index].PhysicalBase = PcdGet32(PcdSystemMemoryBase);
-  VirtualMemoryTable[Index].VirtualBase  = PcdGet32(PcdSystemMemoryBase);
-  VirtualMemoryTable[Index].Length       = PcdGet32(PcdSystemMemorySize);
+  VirtualMemoryTable[Index].PhysicalBase = PcdGet64 (PcdSystemMemoryBase);
+  VirtualMemoryTable[Index].VirtualBase  = PcdGet64 (PcdSystemMemoryBase);
+  VirtualMemoryTable[Index].Length       = PcdGet64 (PcdSystemMemorySize);
   VirtualMemoryTable[Index].Attributes   = CacheAttributes;
 
   // SOC Registers. L3 interconnects

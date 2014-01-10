@@ -52,8 +52,8 @@
 #define ARM_VE_SMB_PERIPH_SZ                    SIZE_64MB
 
 // DRAM
-#define ARM_VE_DRAM_BASE                        PcdGet32 (PcdSystemMemoryBase)
-#define ARM_VE_DRAM_SZ                          PcdGet32 (PcdSystemMemorySize)
+#define ARM_VE_DRAM_BASE                        PcdGet64 (PcdSystemMemoryBase)
+#define ARM_VE_DRAM_SZ                          PcdGet64 (PcdSystemMemorySize)
 // Inside the DRAM we allocate a section for the VRAM (Video RAM)
 #define LCD_VRAM_CORE_TILE_BASE                     0x64000000
 
