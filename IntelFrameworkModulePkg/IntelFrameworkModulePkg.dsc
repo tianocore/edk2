@@ -3,7 +3,7 @@
 #
 # This file is used to build all modules in IntelFrameworkModulePkg.
 #
-#Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+#Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #This program and the accompanying materials are licensed and made available under 
 #the terms and conditions of the BSD License that accompanies this distribution.  
 #The full text of the license may be found at
@@ -22,7 +22,7 @@
 [Defines]
   PLATFORM_NAME                  = IntelFrameworkModuleAll
   PLATFORM_GUID                  = FFF87D9A-E5BB-4AFF-9ADE-8645492E8087
-  PLATFORM_VERSION               = 0.92
+  PLATFORM_VERSION               = 0.93
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/IntelFrameworkModuleAll
   SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC|ARM

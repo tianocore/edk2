@@ -2,7 +2,7 @@
 # Intel Framework Module Package contains the definitions and module implementation
 # which follows Intel EFI Framework Specification.
 #
-# Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -18,7 +18,7 @@
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = IntelFrameworkModulePkg
   PACKAGE_GUID                   = 88894582-7553-4822-B484-624E24B6DECF
-  PACKAGE_VERSION                = 0.92
+  PACKAGE_VERSION                = 0.93
 
 [Includes]
   Include                        # Root include for the package
