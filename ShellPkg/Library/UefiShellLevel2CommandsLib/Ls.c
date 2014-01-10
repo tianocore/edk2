@@ -393,7 +393,6 @@ PrintLsOutput(
 
   FreePool(CorrectedPath);
   ShellCloseFileMetaArg(&ListHead);
-  FreePool(ListHead);
   return (ShellStatus);
 }
 
