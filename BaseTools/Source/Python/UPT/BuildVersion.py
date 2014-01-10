@@ -17,4 +17,4 @@
 Build version information
 '''
 
-gBUILD_VERSION = "Build 2610"
+gBUILD_VERSION = "Build 2640"

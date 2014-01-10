@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create a database used by build tool
 #
-# Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -36,6 +36,7 @@ from MetaFileParser import *
 from BuildClassObject import *
 from WorkspaceCommon import GetDeclaredPcd
 from Common.Misc import AnalyzeDscPcd
+import re
 
 ## Platform build information from DSC file
 #
@@ -328,6 +329,8 @@ class DscBuildData(PlatformBuildClassObject):
             return False
             
     def _GetSkuIdentifier(self):
+        if self._SkuName:
+            return self._SkuName
         if self._SkuIdentifier == None:
             if self._Header == None:
                 self._GetHeaderInfo()
@@ -337,16 +340,14 @@ class DscBuildData(PlatformBuildClassObject):
         if self._SkuName == None:
             if self._Header == None:
                 self._GetHeaderInfo()
-            if self._SkuName == None or self._SkuName not in self.SkuIds:
+            if (self._SkuName == None or self._SkuName not in self.SkuIds):
                 self._SkuName = 'DEFAULT'
         return self._SkuName
 
     ## Override SKUID_IDENTIFIER
     def _SetSkuName(self, Value):
-        if Value in self.SkuIds:
-            self._SkuName = Value
-            # Needs to re-retrieve the PCD information
-            self._Pcds = None
+        self._SkuName = Value
+        self._Pcds = None
 
     def _GetFdfFile(self):
         if self._FlashDefinition == None:
@@ -460,7 +461,7 @@ class DscBuildData(PlatformBuildClassObject):
                 if Record[1] in [None, '']:
                     EdkLogger.error('build', FORMAT_INVALID, 'No Sku ID name',
                                     File=self.MetaFile, Line=Record[-1])
-                self._SkuIds[Record[1].upper()] = Record[0]
+                self._SkuIds[Record[1]] = Record[0]
             if 'DEFAULT' not in self._SkuIds:
                 self._SkuIds['DEFAULT'] = '0'
             if 'COMMON' not in self._SkuIds:
@@ -731,7 +732,6 @@ class DscBuildData(PlatformBuildClassObject):
         RecordList = self._RawData[Type, self._Arch]
         PcdValueDict = sdict()
         for TokenSpaceGuid, PcdCName, Setting, Arch, SkuName, Dummy3, Dummy4 in RecordList:
-            SkuName = SkuName.upper()
             if SkuName in (SkuObj.SystemSkuId,'DEFAULT','COMMON'):
                 PcdSet.add((PcdCName, TokenSpaceGuid, SkuName,Dummy4))
                 PcdDict[Arch, PcdCName, TokenSpaceGuid,SkuName] = Setting
@@ -798,7 +798,6 @@ class DscBuildData(PlatformBuildClassObject):
         
         AvailableSkuIdSet.update({'DEFAULT':0,'COMMON':0})
         for TokenSpaceGuid, PcdCName, Setting, Arch, SkuName, Dummy3, Dummy4 in RecordList:
-            SkuName = SkuName.upper()
             if SkuName not in AvailableSkuIdSet:
                 continue
             
@@ -816,6 +815,16 @@ class DscBuildData(PlatformBuildClassObject):
             if (PcdCName,TokenSpaceGuid) in Pcds.keys(): 
                 pcdObject = Pcds[PcdCName,TokenSpaceGuid]
                 pcdObject.SkuInfoList[SkuName] = SkuInfo
+                if MaxDatumSize.strip():
+                    CurrentMaxSize = int(MaxDatumSize.strip(),0)
+                else:
+                    CurrentMaxSize = 0
+                if pcdObject.MaxDatumSize:
+                    PcdMaxSize = int(pcdObject.MaxDatumSize,0)
+                else:
+                    PcdMaxSize = 0
+                if CurrentMaxSize > PcdMaxSize:
+                    pcdObject.MaxDatumSize = str(CurrentMaxSize)
             else:               
                 Pcds[PcdCName, TokenSpaceGuid] = PcdClassObject(
                                                     PcdCName,
@@ -831,8 +840,8 @@ class DscBuildData(PlatformBuildClassObject):
                                                     )
         
         for pcd in Pcds.values():
-            if 'DEFAULT' not in pcd.SkuInfoList.keys() and 'COMMON' not in pcd.SkuInfoList.keys():
-                pcdDecObject = self._DecPcds[pcd.TokenCName,pcd.TokenSpaceGuidCName]
+            pcdDecObject = self._DecPcds[pcd.TokenCName,pcd.TokenSpaceGuidCName]
+            if 'DEFAULT' not in pcd.SkuInfoList.keys() and 'COMMON' not in pcd.SkuInfoList.keys():                
                 valuefromDec = pcdDecObject.DefaultValue
                 SkuInfo = SkuInfoClass('DEFAULT', '0', '', '', '', '', '', valuefromDec)
                 pcd.SkuInfoList['DEFAULT'] = SkuInfo
@@ -845,17 +854,7 @@ class DscBuildData(PlatformBuildClassObject):
                 if 'DEFAULT' in pcd.SkuInfoList.keys() and SkuObj.SystemSkuId not in pcd.SkuInfoList.keys():
                     pcd.SkuInfoList[SkuObj.SystemSkuId] = pcd.SkuInfoList['DEFAULT']
                 del(pcd.SkuInfoList['DEFAULT'])
-            
-            if SkuObj.SkuUsageType == SkuObj.MULTIPLE:
-                    if pcd.DatumType == "VOID*": 
-                        MaxSize = int(pcd.MaxDatumSize,0)
-                        for (skuname,skuobj) in pcd.SkuInfoList.items():
-                            datalen = len(skuobj.DefaultValue)
-                            if datalen>MaxSize:
-                                MaxSize = datalen
-                        pcd.MaxDatumSize = str(MaxSize)
-                    
-                
+               
         return Pcds
 
     ## Retrieve dynamic HII PCD settings
@@ -881,7 +880,6 @@ class DscBuildData(PlatformBuildClassObject):
         
         AvailableSkuIdSet.update({'DEFAULT':0,'COMMON':0})
         for TokenSpaceGuid, PcdCName, Setting, Arch, SkuName, Dummy3, Dummy4 in RecordList:
-            SkuName = SkuName.upper()
             if SkuName not in AvailableSkuIdSet:
                 continue
             PcdSet.add((PcdCName, TokenSpaceGuid, SkuName,Dummy4))
@@ -893,6 +891,20 @@ class DscBuildData(PlatformBuildClassObject):
             if Setting == None:
                 continue
             VariableName, VariableGuid, VariableOffset, DefaultValue = self._ValidatePcd(PcdCName, TokenSpaceGuid, Setting, Type, Dummy4)
+            
+            ExceedMax = False
+            if VariableOffset.isdigit():
+                if int(VariableOffset,10) > 0xFFFF:
+                    ExceedMax = True
+            elif re.match(r'[\t\s]*0[xX][a-fA-F0-9]+$',VariableOffset):
+                if int(VariableOffset,16) > 0xFFFF:
+                    ExceedMax = True
+            else:
+                EdkLogger.error('Build', FORMAT_INVALID, "Invalid syntax or format of the variable offset value is incorrect for %s." % ".".join((TokenSpaceGuid,PcdCName)))
+            
+            if ExceedMax:
+                EdkLogger.error('Build', OPTION_VALUE_INVALID, "The variable offset value must not exceed the maximum value of 0xFFFF (UINT16) for %s." % ".".join((TokenSpaceGuid,PcdCName)))
+            
             SkuInfo = SkuInfoClass(SkuName, self.SkuIds[SkuName], VariableName, VariableGuid, VariableOffset, DefaultValue)
             if (PcdCName,TokenSpaceGuid) in Pcds.keys():  
                 pcdObject = Pcds[PcdCName,TokenSpaceGuid]
@@ -914,8 +926,12 @@ class DscBuildData(PlatformBuildClassObject):
 
         for pcd in Pcds.values():
             SkuInfoObj = pcd.SkuInfoList.values()[0]
-            if 'DEFAULT' not in pcd.SkuInfoList.keys() and 'COMMON' not in pcd.SkuInfoList.keys():
-                pcdDecObject = self._DecPcds[pcd.TokenCName,pcd.TokenSpaceGuidCName]
+            pcdDecObject = self._DecPcds[pcd.TokenCName,pcd.TokenSpaceGuidCName]
+            # Only fix the value while no value provided in DSC file.
+            for sku in pcd.SkuInfoList.values():
+                if (sku.HiiDefaultValue == "" or sku.HiiDefaultValue==None):
+                    sku.HiiDefaultValue = pcdDecObject.DefaultValue
+            if 'DEFAULT' not in pcd.SkuInfoList.keys() and 'COMMON' not in pcd.SkuInfoList.keys():              
                 valuefromDec = pcdDecObject.DefaultValue
                 SkuInfo = SkuInfoClass('DEFAULT', '0', SkuInfoObj.VariableName, SkuInfoObj.VariableGuid, SkuInfoObj.VariableOffset, valuefromDec)
                 pcd.SkuInfoList['DEFAULT'] = SkuInfo
@@ -929,6 +945,24 @@ class DscBuildData(PlatformBuildClassObject):
                 if 'DEFAULT' in pcd.SkuInfoList.keys() and SkuObj.SystemSkuId not in pcd.SkuInfoList.keys():
                     pcd.SkuInfoList[SkuObj.SystemSkuId] = pcd.SkuInfoList['DEFAULT']
                 del(pcd.SkuInfoList['DEFAULT'])
+            
+            
+            if pcd.MaxDatumSize.strip(): 
+                MaxSize = int(pcd.MaxDatumSize,0)
+            else:
+                MaxSize = 0
+            if pcdDecObject.DatumType == 'VOID*':
+                for (skuname,skuobj) in pcd.SkuInfoList.items():
+                    datalen = 0
+                    if skuobj.HiiDefaultValue.startswith("L"):
+                        datalen = (len(skuobj.HiiDefaultValue)- 3 + 1) * 2
+                    elif skuobj.HiiDefaultValue.startswith("{"):
+                        datalen = len(skuobj.HiiDefaultValue.split(","))
+                    else:
+                        datalen = len(skuobj.HiiDefaultValue) -2 + 1 
+                    if datalen>MaxSize:
+                        MaxSize = datalen
+                pcd.MaxDatumSize = str(MaxSize)
         return Pcds
 
     ## Retrieve dynamic VPD PCD settings
@@ -954,7 +988,6 @@ class DscBuildData(PlatformBuildClassObject):
         
         AvailableSkuIdSet.update({'DEFAULT':0,'COMMON':0})
         for TokenSpaceGuid, PcdCName, Setting, Arch, SkuName, Dummy3, Dummy4 in RecordList:
-            SkuName = SkuName.upper()
             if SkuName not in AvailableSkuIdSet:
                 continue
 
@@ -976,6 +1009,16 @@ class DscBuildData(PlatformBuildClassObject):
             if (PcdCName,TokenSpaceGuid) in Pcds.keys():  
                 pcdObject = Pcds[PcdCName,TokenSpaceGuid]
                 pcdObject.SkuInfoList[SkuName] = SkuInfo
+                if MaxDatumSize.strip():
+                    CurrentMaxSize = int(MaxDatumSize.strip(),0)
+                else:
+                    CurrentMaxSize = 0
+                if pcdObject.MaxDatumSize:
+                    PcdMaxSize = int(pcdObject.MaxDatumSize,0)
+                else:
+                    PcdMaxSize = 0
+                if CurrentMaxSize > PcdMaxSize:
+                    pcdObject.MaxDatumSize = str(CurrentMaxSize)
             else:
                 Pcds[PcdCName, TokenSpaceGuid] = PcdClassObject(
                                                 PcdCName,
@@ -991,8 +1034,8 @@ class DscBuildData(PlatformBuildClassObject):
                                                 )
         for pcd in Pcds.values():
             SkuInfoObj = pcd.SkuInfoList.values()[0]
+            pcdDecObject = self._DecPcds[pcd.TokenCName,pcd.TokenSpaceGuidCName]
             if 'DEFAULT' not in pcd.SkuInfoList.keys() and 'COMMON' not in pcd.SkuInfoList.keys():
-                pcdDecObject = self._DecPcds[pcd.TokenCName,pcd.TokenSpaceGuidCName]
                 valuefromDec = pcdDecObject.DefaultValue
                 SkuInfo = SkuInfoClass('DEFAULT', '0', '', '', '','',SkuInfoObj.VpdOffset, valuefromDec)
                 pcd.SkuInfoList['DEFAULT'] = SkuInfo
@@ -1006,14 +1049,6 @@ class DscBuildData(PlatformBuildClassObject):
                     pcd.SkuInfoList[SkuObj.SystemSkuId] = pcd.SkuInfoList['DEFAULT']
                 del(pcd.SkuInfoList['DEFAULT'])
             
-            if SkuObj.SkuUsageType == SkuObj.MULTIPLE:
-                    if pcd.MaxDatumSize.strip(): 
-                        MaxSize = int(pcd.MaxDatumSize,0)
-                        for (skuname,skuobj) in pcd.SkuInfoList.items():
-                            datalen = len(skuobj.DefaultValue)
-                            if datalen>MaxSize:
-                                MaxSize = datalen
-                        pcd.MaxDatumSize = str(MaxSize)
         return Pcds
 
     ## Add external modules
@@ -1520,6 +1555,7 @@ class InfBuildData(ModuleBuildClassObject):
     ## Set all internal used members of InfBuildData to None
     def _Clear(self):
         self._HeaderComments = None
+        self._TailComments = None
         self._Header_               = None
         self._AutoGenVersion        = None
         self._BaseName              = None
@@ -1612,7 +1648,13 @@ class InfBuildData(ModuleBuildClassObject):
             for Record in RecordList:
                 self._HeaderComments.append(Record[0])
         return self._HeaderComments
-
+    def _GetTailComments(self):
+        if not self._TailComments:
+            self._TailComments = []
+            RecordList = self._RawData[MODEL_META_DATA_TAIL_COMMENT]
+            for Record in RecordList:
+                self._TailComments.append(Record[0])
+        return self._TailComments
     ## Retrieve all information in [Defines] section
     #
     #   (Retriving all [Defines] information in one-shot is just to save time.)
@@ -1769,7 +1811,7 @@ class InfBuildData(ModuleBuildClassObject):
                         else:
                             Tool = ToolList[0]
                         ToolChain = "*_*_*_%s_FLAGS" % Tool
-                        ToolChainFamily = 'MSFT'    # Edk.x only support MSFT tool chain
+                        ToolChainFamily = '' 
                         #ignore not replaced macros in value
                         ValueList = GetSplitList(' ' + Value, '/D')
                         Dummy = ValueList[0]
@@ -2447,6 +2489,7 @@ class InfBuildData(ModuleBuildClassObject):
     Platform = property(_GetPlatform, _SetPlatform)
 
     HeaderComments = property(_GetHeaderComments)
+    TailComments = property(_GetTailComments)
     AutoGenVersion          = property(_GetInfVersion)
     BaseName                = property(_GetBaseName)
     ModuleType              = property(_GetModuleType)

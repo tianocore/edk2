@@ -401,16 +401,6 @@ def CleanString2(Line, CommentCharacter=DataType.TAB_COMMENT_SPLIT, AllowCppStyl
             Comment = Line[Index:].strip()
             Line = Line[0:Index].strip()
             break
-    if Comment:
-        # Remove prefixed and trailing comment characters
-        Start = 0
-        End = len(Comment)
-        while Start < End and Comment.startswith(CommentCharacter, Start, End):
-            Start += 1
-        while End >= 0 and Comment.endswith(CommentCharacter, Start, End):
-            End -= 1
-        Comment = Comment[Start:End]
-        Comment = Comment.strip()
 
     return Line, Comment
 
@@ -811,11 +801,25 @@ def StringToArray(String):
             return "{%s, 0x00, 0x00}" % ", ".join(["0x%02x, 0x00" % ord(C) for C in String[2:-1]])
     elif String.startswith('"'):
         if String == "\"\"":
-            return "{0x00}";
+            return "{0x00,0x00}"
         else:
-            return "{%s, 0x00}" % ", ".join(["0x%02x" % ord(C) for C in String[1:-1]])
+            StringLen = len(String[1:-1])
+            if StringLen % 2:
+                return "{%s, 0x00}" % ", ".join(["0x%02x" % ord(C) for C in String[1:-1]])
+            else:
+                return "{%s, 0x00,0x00}" % ", ".join(["0x%02x" % ord(C) for C in String[1:-1]])
+    elif String.startswith('{'):
+        StringLen = len(String.split(","))
+        if StringLen % 2:
+            return "{%s, 0x00}" % ", ".join([ C for C in String[1:-1].split(',')])
+        else:
+            return "{%s}" % ", ".join([ C for C in String[1:-1].split(',')])
+        
     else:
-        return '{%s, 0}' % ', '.join(String.split())
+        if len(String.split()) % 2:
+            return '{%s, 0}' % ', '.join(String.split())
+        else:
+            return '{%s, 0,0}' % ', '.join(String.split())
 
 def StringArrayLength(String):
     if isinstance(String, unicode):

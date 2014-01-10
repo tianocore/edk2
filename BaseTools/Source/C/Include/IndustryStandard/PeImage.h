@@ -4,7 +4,7 @@
 
   @bug Fix text - doc as defined in MSFT EFI specification.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
@@ -648,7 +648,7 @@ typedef struct {
 ///
 /// Debug Data Structure defined by Apple Mach-O to Coff utility
 ///
-#define CODEVIEW_SIGNATURE_MTOC  EFI_SIGNATURE_32('M', 'T', 'O', 'C')
+#define CODEVIEW_SIGNATURE_MTOC  SIGNATURE_32('M', 'T', 'O', 'C')
 typedef struct {
   UINT32    Signature;                       ///< "MTOC"
   EFI_GUID  MachOUuid;

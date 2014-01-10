@@ -1,7 +1,7 @@
 ## @file
 # generate capsule
 #
-#  Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007-2013, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -129,6 +129,26 @@ class CapsuleAnyFile (CapsuleData):
         self.FileName = None
 
     ## generate AnyFile capsule data
+    #
+    #   @param  self        The object pointer
+    #   @retval string      Generated file name
+    #
+    def GenCapsuleSubItem(self):
+        return self.FileName
+    
+## Afile class for capsule data
+#
+#
+class CapsuleAfile (CapsuleData):
+    ## The constructor
+    #
+    #   @param  self        The object pointer
+    #
+    def __init__(self) :
+        self.Ffs = None
+        self.FileName = None
+
+    ## generate Afile capsule data
     #
     #   @param  self        The object pointer
     #   @retval string      Generated file name

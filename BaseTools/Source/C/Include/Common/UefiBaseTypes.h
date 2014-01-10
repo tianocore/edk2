@@ -1,7 +1,7 @@
 /** @file
   Defines data types and constants introduced in UEFI.
 
-  Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -146,10 +146,10 @@ typedef union {
 //
 // Define macros to build data structure signatures from characters.
 //
-#define EFI_SIGNATURE_16(A, B)        ((A) | (B << 8))
-#define EFI_SIGNATURE_32(A, B, C, D)  (EFI_SIGNATURE_16 (A, B) | (EFI_SIGNATURE_16 (C, D) << 16))
-#define EFI_SIGNATURE_64(A, B, C, D, E, F, G, H) \
-    (EFI_SIGNATURE_32 (A, B, C, D) | ((UINT64) (EFI_SIGNATURE_32 (E, F, G, H)) << 32))
+#define SIGNATURE_16(A, B)        ((A) | (B << 8))
+#define SIGNATURE_32(A, B, C, D)  (SIGNATURE_16 (A, B) | (SIGNATURE_16 (C, D) << 16))
+#define SIGNATURE_64(A, B, C, D, E, F, G, H) \
+    (SIGNATURE_32 (A, B, C, D) | ((UINT64) (SIGNATURE_32 (E, F, G, H)) << 32))
 
 
 //

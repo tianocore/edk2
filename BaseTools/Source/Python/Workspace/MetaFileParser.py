@@ -278,7 +278,7 @@ class MetaFileParser(object):
         for Item in GetSplitValueList(self._CurrentLine[1:-1], TAB_COMMA_SPLIT):
             if Item == '':
                 continue
-            ItemList = GetSplitValueList(Item, TAB_SPLIT)
+            ItemList = GetSplitValueList(Item, TAB_SPLIT,2)
             # different section should not mix in one section
             if self._SectionName != '' and self._SectionName != ItemList[0].upper():
                 EdkLogger.error('Parser', FORMAT_INVALID, "Different section names in the same section",
@@ -305,7 +305,10 @@ class MetaFileParser(object):
 
             # S2 may be Platform or ModuleType
             if len(ItemList) > 2:
-                S2 = ItemList[2].upper()
+                if self._SectionName.upper() in SECTIONS_HAVE_ITEM_PCD:
+                    S2 = ItemList[2]
+                else:
+                    S2 = ItemList[2].upper()
             else:
                 S2 = 'COMMON'
             self._Scope.append([S1, S2])
@@ -496,6 +499,8 @@ class InfParser(MetaFileParser):
         # parse the file line by line
         IsFindBlockComment = False
         GetHeaderComment = False
+        TailComments = []
+        SectionComments = []
         Comments = []
 
         for Index in range(0, len(Content)):
@@ -507,6 +512,9 @@ class InfParser(MetaFileParser):
             if Line == '':
                 if Comment:
                     Comments.append((Comment, Index + 1))
+                elif GetHeaderComment:
+                    SectionComments.extend(Comments)
+                    Comments = []
                 continue
             if Line.find(DataType.TAB_COMMENT_EDK_START) > -1:
                 IsFindBlockComment = True
@@ -527,6 +535,8 @@ class InfParser(MetaFileParser):
                         self._Store(MODEL_META_DATA_HEADER_COMMENT, Cmt, '', '', 'COMMON',
                                     'COMMON', self._Owner[-1], LNo, -1, LNo, -1, 0)
                     GetHeaderComment = True
+                else:
+                    TailComments.extend(SectionComments + Comments)
                 Comments = []
                 self._SectionHeaderParser()
                 # Check invalid sections
@@ -602,9 +612,16 @@ class InfParser(MetaFileParser):
                     self._Store(MODEL_META_DATA_COMMENT, Comment, '', '', Arch, Platform,
                                 LastItem, LineNo, -1, LineNo, -1, 0)
             Comments = []
+            SectionComments = []
+        TailComments.extend(SectionComments + Comments)
         if IsFindBlockComment:
             EdkLogger.error("Parser", FORMAT_INVALID, "Open block comments (starting with /*) are expected to end with */",
                             File=self.MetaFile)
+
+        # If there are tail comments in INF file, save to database whatever the comments are
+        for Comment in TailComments:
+            self._Store(MODEL_META_DATA_TAIL_COMMENT, Comment[0], '', '', 'COMMON',
+                                'COMMON', self._Owner[-1], -1, -1, -1, -1, 0)
         self._Done()
 
     ## Data parser for the format in which there's path

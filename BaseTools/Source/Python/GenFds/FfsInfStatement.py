@@ -43,6 +43,8 @@ from PatchPcdValue.PatchPcdValue import PatchBinaryFile
 #
 #
 class FfsInfStatement(FfsInfStatementClassObject):
+    ## The mapping dictionary from datum type to its maximum number.
+    _MAX_SIZE_TYPE = {"BOOLEAN":0x01, "UINT8":0xFF, "UINT16":0xFFFF, "UINT32":0xFFFFFFFF, "UINT64":0xFFFFFFFFFFFFFFFF}
     ## The constructor
     #
     #   @param  self        The object pointer
@@ -204,10 +206,15 @@ class FfsInfStatement(FfsInfStatementClassObject):
 
         if Inf._Defs != None and len(Inf._Defs) > 0:
             self.OptRomDefs.update(Inf._Defs)
+
         self.PatchPcds = []
         InfPcds = Inf.Pcds
         Platform = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, self.CurrentArch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
         FdfPcdDict = GenFdsGlobalVariable.FdfParser.Profile.PcdDict
+
+        # Workaround here: both build and GenFds tool convert the workspace path to lower case
+        # But INF file path in FDF and DSC file may have real case characters.
+        # Try to convert the path to lower case to see if PCDs value are override by DSC.
         DscModules = {}
         for DscModule in Platform.Modules:
             DscModules[str(DscModule).lower()] = Platform.Modules[DscModule]
@@ -217,6 +224,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
                 continue
             if Pcd.Type != 'PatchableInModule':
                 continue
+            # Override Patchable PCD value by the value from DSC
             PatchPcd = None
             InfLowerPath = str(PathClassObj).lower()
             if InfLowerPath in DscModules and PcdKey in DscModules[InfLowerPath].Pcds:
@@ -227,16 +235,22 @@ class FfsInfStatement(FfsInfStatementClassObject):
             if PatchPcd and Pcd.Type == PatchPcd.Type:
                 DefaultValue = PatchPcd.DefaultValue
                 DscOverride = True
+
+            # Override Patchable PCD value by the value from FDF
             FdfOverride = False
             if PcdKey in FdfPcdDict:
                 DefaultValue = FdfPcdDict[PcdKey]
                 FdfOverride = True
+
             if not DscOverride and not FdfOverride:
                 continue
+            # Check value, if value are equal, no need to patch
             if Pcd.DatumType == "VOID*":
                 if Pcd.DefaultValue == DefaultValue or DefaultValue in [None, '']:
                     continue
+                # Get the string size from FDF or DSC
                 if DefaultValue[0] == 'L':
+                    # Remove L"", but the '\0' must be appended
                     MaxDatumSize = str((len(DefaultValue) - 2) * 2)
                 elif DefaultValue[0] == '{':
                     MaxDatumSize = str(len(DefaultValue.split(',')))
@@ -244,6 +258,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
                     MaxDatumSize = str(len(DefaultValue) - 1)
                 if DscOverride:
                     Pcd.MaxDatumSize = PatchPcd.MaxDatumSize
+                # If no defined the maximum size in DSC, try to get current size from INF
                 if Pcd.MaxDatumSize in ['', None]:
                     Pcd.MaxDatumSize = str(len(Pcd.DefaultValue.split(',')))
             else:
@@ -259,6 +274,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
                         continue
                 except:
                     continue
+            # Check the Pcd size and data type
             if Pcd.DatumType == "VOID*":
                 if int(MaxDatumSize) > int(Pcd.MaxDatumSize):
                     EdkLogger.error("GenFds", GENFDS_ERROR, "The size of VOID* type PCD '%s.%s' exceeds its maximum size %d bytes." \
@@ -306,7 +322,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
             return EfiFile
         Basename = os.path.basename(EfiFile)
         Output = os.path.join(self.OutputPath, Basename)
-        CopyLongFilePath(EfiFile, Output)
+        shutil.copy(EfiFile, Output)
         for Pcd in self.PatchPcds:
             RetVal, RetStr = PatchBinaryFile(Output, int(Pcd.Offset, 0), Pcd.DatumType, Pcd.DefaultValue, Pcd.MaxDatumSize)
             if RetVal:

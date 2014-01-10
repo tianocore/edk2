@@ -1238,9 +1238,16 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
         Value = FieldList[0]
         Size = ''
         if len(FieldList) > 1:
-            Size = FieldList[1]
+            Type = FieldList[1]
+            # Fix the PCD type when no DataType input
+            if Type == 'VOID*':
+                DataType = 'VOID*'
+            else:
+                Size = FieldList[1]
+        if len(FieldList) > 2:
+            Size = FieldList[2]
         if DataType == 'VOID*':
-            IsValid = (len(FieldList) <= 2)
+            IsValid = (len(FieldList) <= 3)
         else:
             IsValid = (len(FieldList) <= 1)
         return [Value, '', Size], IsValid, 0
@@ -1255,7 +1262,12 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
             Size = FieldList[2]
         else:
             if Type == 'VOID*':
-                Size = str(len(Value))
+                if Value.startswith("L"):
+                    Size = str((len(Value)- 3 + 1) * 2)
+                elif Value.startswith("{"):
+                    Size = str(len(Value.split(",")))
+                else:
+                    Size = str(len(Value) -2 + 1 )
         if DataType == 'VOID*':
             IsValid = (len(FieldList) <= 3)
         else:

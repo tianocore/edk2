@@ -1,7 +1,7 @@
 ## @file
 # This file is used to parse DEC file. It will consumed by DecParser
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -19,6 +19,7 @@ import Logger.Log as Logger
 from Logger.ToolError import FILE_PARSE_FAILURE
 from Logger.ToolError import FILE_OPEN_FAILURE
 from Logger import StringTable as ST
+from Logger.ToolError import FORMAT_INVALID
 
 import Library.DataType as DT
 from Library.ParserValidate import IsValidToken
@@ -735,6 +736,7 @@ class Dec(_DecBase, _DecComments):
         _DecComments.__init__(self)
         _DecBase.__init__(self, RawData)
         
+        self.BinaryHeadComment = []        
         self._Define    = _DecDefine(RawData)
         self._Include   = _DecInclude(RawData)
         self._Guid      = _DecGuid(RawData)
@@ -778,8 +780,13 @@ class Dec(_DecBase, _DecComments):
     # Parse DEC file
     #
     def ParseDecComment(self):
+        IsFileHeader = False
+        IsBinaryHeader = False
+        FileHeaderLineIndex = -1
+        BinaryHeaderLineIndex = -1
         while not self._RawData.IsEndOfFile():
             Line, Comment = CleanString(self._RawData.GetNextLine())
+
             #
             # Header must be pure comment
             #
@@ -787,14 +794,55 @@ class Dec(_DecBase, _DecComments):
                 self._RawData.UndoNextLine()
                 break
             
-            if Comment:
+            if Comment and Comment.startswith(DT.TAB_SPECIAL_COMMENT) and Comment.find(DT.TAB_HEADER_COMMENT) > 0 \
+                and not Comment[2:Comment.find(DT.TAB_HEADER_COMMENT)].strip():
+                IsFileHeader = True
+                IsBinaryHeader = False
+                FileHeaderLineIndex = self._RawData.LineIndex
+                
+            #
+            # Get license information before '@file' 
+            #   
+            if not IsFileHeader and not IsBinaryHeader and Comment and Comment.startswith(DT.TAB_COMMENT_SPLIT) and \
+            DT.TAB_BINARY_HEADER_COMMENT not in Comment:
+                self._HeadComment.append((Comment, self._RawData.LineIndex))
+            
+            if Comment and IsFileHeader and \
+            not(Comment.startswith(DT.TAB_SPECIAL_COMMENT) \
+            and Comment.find(DT.TAB_BINARY_HEADER_COMMENT) > 0):
                 self._HeadComment.append((Comment, self._RawData.LineIndex))
             #
             # Double '#' indicates end of header comments
             #
-            if not Comment or Comment == DT.TAB_SPECIAL_COMMENT:
+            if (not Comment or Comment == DT.TAB_SPECIAL_COMMENT) and IsFileHeader:
+                IsFileHeader = False  
+                continue
+            
+            if Comment and Comment.startswith(DT.TAB_SPECIAL_COMMENT) \
+            and Comment.find(DT.TAB_BINARY_HEADER_COMMENT) > 0:
+                IsBinaryHeader = True
+                IsFileHeader = False
+                BinaryHeaderLineIndex = self._RawData.LineIndex
+                
+            if Comment and IsBinaryHeader:
+                self.BinaryHeadComment.append((Comment, self._RawData.LineIndex))
+            #
+            # Double '#' indicates end of header comments
+            #
+            if (not Comment or Comment == DT.TAB_SPECIAL_COMMENT) and IsBinaryHeader:
+                IsBinaryHeader = False
                 break
-        
+            
+            if FileHeaderLineIndex > -1 and not IsFileHeader and not IsBinaryHeader:
+                break
+
+        if FileHeaderLineIndex > BinaryHeaderLineIndex and FileHeaderLineIndex > -1 and BinaryHeaderLineIndex > -1:
+            self._LoggerError(ST.ERR_BINARY_HEADER_ORDER)
+            
+        if FileHeaderLineIndex == -1:
+            Logger.Error(TOOL_NAME, FORMAT_INVALID, 
+                         ST.ERR_NO_SOURCE_HEADER,
+                         File=self._RawData.Filename)        
         return
     
     def _StopCurrentParsing(self, Line):

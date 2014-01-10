@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define strings used in the UPT tool
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -42,7 +42,7 @@ MSG_USAGE_STRING = _("\n"
 MSG_VERSION_NUMBER = _("1.0")
 MSG_VERSION = _("Intel(r) UEFI Packaging Tool (Intel(r) UEFIPT) - Revision " + \
                 MSG_VERSION_NUMBER)
-MSG_COPYRIGHT = _("Copyright (c) 2011 Intel Corporation All Rights Reserved.")
+MSG_COPYRIGHT = _("Copyright (c) 2011 - 2013 Intel Corporation All Rights Reserved.")
 MSG_VERSION_COPYRIGHT = _("\n  %s\n  %s" % (MSG_VERSION, MSG_COPYRIGHT))
 MSG_USAGE = _("%s [options]\n%s" % ("upt.exe", MSG_VERSION_COPYRIGHT))
 MSG_DESCRIPTION = _("The Intel(r) UEFIUPT is used to create, " + \
@@ -530,6 +530,10 @@ ERR_COPYRIGHT_MISSING            = \
 _("Header comment section must have copyright information")
 ERR_LICENSE_MISSING              = \
 _("Header comment section must have license information")
+ERR_INVALID_BINARYHEADER_FORMAT  = \
+_("Binary Header comment section must have abstract,description,copyright,license information")
+ERR_MULTIPLE_BINARYHEADER_EXIST = \
+_("the inf file at most support one BinaryHeader at the fileheader section.")
 ERR_INVALID_COMMENT_FORMAT       = _("Comment must start with #")
 ERR_USER_ABORT                   = _("User has stopped the application")
 ERR_DIST_EXT_ERROR               = \
@@ -547,6 +551,8 @@ ERR_INSTALL_FILE_DEC_FILE_ERROR = _("Could not obtain the TokenSpaceGuidCName an
 ERR_NOT_SUPPORTED_SA_MODULE = _("Stand-alone module distribution does not allow EDK 1 INF")
 ERR_INSTALL_DIST_NOT_FOUND               = \
 _("Distribution file to be installed is not found in current working directory or workspace: %s")
+ERR_BINARY_HEADER_ORDER           = _("Binary header must follow the file header.")
+ERR_NO_SOURCE_HEADER              = _("File header statement \"## @file\" must exist at the first place.")
 
 #
 # Expression error message

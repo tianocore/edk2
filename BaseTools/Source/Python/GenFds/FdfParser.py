@@ -1,7 +1,7 @@
 ## @file
 # parse FDF file
 #
-#  Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -77,6 +77,7 @@ SEPERATOR_TUPLE = ('=', '|', ',', '{', '}')
 
 RegionSizePattern = re.compile("\s*(?P<base>(?:0x|0X)?[a-fA-F0-9]+)\s*\|\s*(?P<size>(?:0x|0X)?[a-fA-F0-9]+)\s*")
 RegionSizeGuidPattern = re.compile("\s*(?P<base>\w+\.\w+)\s*\|\s*(?P<size>\w+\.\w+)\s*")
+RegionOffsetPcdPattern = re.compile("\s*(?P<base>\w+\.\w+)\s*$")
 ShortcutPcdPattern = re.compile("\s*\w+\s*=\s*(?P<value>(?:0x|0X)?[a-fA-F0-9]+)\s*\|\s*(?P<name>\w+\.\w+)\s*")
 
 IncludeFileList = []
@@ -1732,8 +1733,7 @@ class FdfParser:
         try:
             return long(
                 ValueExpression(Expr,
-                                dict(['%s.%s' % (Pcd[1], Pcd[0]), Val] 
-                                     for Pcd, Val in self.Profile.PcdDict.iteritems())
+                                self.__CollectMacroPcd()
                                 )(True),0)
         except Exception:
             self.SetFileBufferPos(StartPos)
@@ -1769,16 +1769,26 @@ class FdfParser:
             return True
 
         if not self.__Token in ("SET", "FV", "FILE", "DATA", "CAPSULE"):
+            #
+            # If next token is a word which is not a valid FV type, it might be part of [PcdOffset[|PcdSize]]
+            # Or it might be next region's offset described by an expression which starts with a PCD.
+            #    PcdOffset[|PcdSize] or OffsetPcdExpression|Size
+            #
             self.__UndoToken()
-            RegionObj.PcdOffset = self.__GetNextPcdName()
-            self.Profile.PcdDict[RegionObj.PcdOffset] = "0x%08X" % (RegionObj.Offset + long(Fd.BaseAddress, 0))
-            FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
-            self.Profile.PcdFileLineDict[RegionObj.PcdOffset] = FileLineTuple
-            if self.__IsToken( "|"):
-                RegionObj.PcdSize = self.__GetNextPcdName()
-                self.Profile.PcdDict[RegionObj.PcdSize] = "0x%08X" % RegionObj.Size
+            IsRegionPcd = (RegionSizeGuidPattern.match(self.__CurrentLine()[self.CurrentOffsetWithinLine:]) or
+                           RegionOffsetPcdPattern.match(self.__CurrentLine()[self.CurrentOffsetWithinLine:]))
+            if IsRegionPcd:
+                RegionObj.PcdOffset = self.__GetNextPcdName()
+                self.Profile.PcdDict[RegionObj.PcdOffset] = "0x%08X" % (RegionObj.Offset + long(Fd.BaseAddress, 0))
+                self.__PcdDict['%s.%s' % (RegionObj.PcdOffset[1], RegionObj.PcdOffset[0])] = "0x%x" % RegionObj.Offset
                 FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
-                self.Profile.PcdFileLineDict[RegionObj.PcdSize] = FileLineTuple
+                self.Profile.PcdFileLineDict[RegionObj.PcdOffset] = FileLineTuple
+                if self.__IsToken( "|"):
+                    RegionObj.PcdSize = self.__GetNextPcdName()
+                    self.Profile.PcdDict[RegionObj.PcdSize] = "0x%08X" % RegionObj.Size
+                    self.__PcdDict['%s.%s' % (RegionObj.PcdSize[1], RegionObj.PcdSize[0])] = "0x%x" % RegionObj.Size
+                    FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
+                    self.Profile.PcdFileLineDict[RegionObj.PcdSize] = FileLineTuple
 
             if not self.__GetNextWord():
                 return True
@@ -1805,6 +1815,9 @@ class FdfParser:
             self.__UndoToken()
             self.__GetRegionDataType( RegionObj)
         else:
+            self.__UndoToken()
+            if self.__GetRegionLayout(Fd):
+                return True
             raise Warning("A valid region type was not found. "
                           "Valid types are [SET, FV, CAPSULE, FILE, DATA]. This error occurred",
                           self.FileName, self.CurrentLineNumber)
@@ -2158,8 +2171,9 @@ class FdfParser:
     #   @retval None
     #
     def __GetFvAttributes(self, FvObj):
-
+        IsWordToken = False
         while self.__GetNextWord():
+            IsWordToken = True
             name = self.__Token
             if name not in ("ERASE_POLARITY", "MEMORY_MAPPED", \
                            "STICKY_WRITE", "LOCK_CAP", "LOCK_STATUS", "WRITE_ENABLED_CAP", \
@@ -2178,7 +2192,7 @@ class FdfParser:
 
             FvObj.FvAttributeDict[name] = self.__Token
 
-        return True
+        return IsWordToken
     
     ## __GetFvNameGuid() method
     #
@@ -2562,22 +2576,7 @@ class FdfParser:
             FfsFileObj.CurrentLineNum = self.CurrentLineNumber
             FfsFileObj.CurrentLineContent = self.__CurrentLine()
             FfsFileObj.FileName = self.__Token
-            if FfsFileObj.FileName.replace('$(WORKSPACE)', '').find('$') == -1:
-                #
-                # For file in OUTPUT_DIRECTORY will not check whether it exist or not at AutoGen phase.
-                #
-                if not GlobalData.gAutoGenPhase:
-                    #do case sensitive check for file path
-                    ErrorCode, ErrorInfo = PathClass(NormPath(FfsFileObj.FileName), GenFdsGlobalVariable.WorkSpaceDir).Validate()
-                    if ErrorCode != 0:
-                        EdkLogger.error("GenFds", ErrorCode, ExtraData=ErrorInfo)
-                else:
-                    if not self.__GetMacroValue("OUTPUT_DIRECTORY") in FfsFileObj.FileName:
-                        #do case sensitive check for file path
-                        ErrorCode, ErrorInfo = PathClass(NormPath(FfsFileObj.FileName), GenFdsGlobalVariable.WorkSpaceDir).Validate()
-                        if ErrorCode != 0:
-                            EdkLogger.error("GenFds", ErrorCode, ExtraData=ErrorInfo)                    
-
+            self.__VerifyFile(FfsFileObj.FileName)
 
         if not self.__IsToken( "}"):
             raise Warning("expected '}'", self.FileName, self.CurrentLineNumber)
@@ -2823,11 +2822,7 @@ class FdfParser:
                 if not self.__GetNextToken():
                     raise Warning("expected section file path", self.FileName, self.CurrentLineNumber)
                 DataSectionObj.SectFileName = self.__Token
-                if DataSectionObj.SectFileName.replace('$(WORKSPACE)', '').find('$') == -1:
-                    #do case sensitive check for file path
-                    ErrorCode, ErrorInfo = PathClass(NormPath(DataSectionObj.SectFileName), GenFdsGlobalVariable.WorkSpaceDir).Validate()
-                    if ErrorCode != 0:
-                        EdkLogger.error("GenFds", ErrorCode, ExtraData=ErrorInfo)
+                self.__VerifyFile(DataSectionObj.SectFileName)
             else:
                 if not self.__GetCglSection(DataSectionObj):
                     return False
@@ -2835,6 +2830,21 @@ class FdfParser:
             Obj.SectionList.append(DataSectionObj)
 
         return True
+
+    ## __VerifyFile
+    #
+    #    Check if file exists or not:
+    #      If current phase if GenFds, the file must exist;
+    #      If current phase is AutoGen and the file is not in $(OUTPUT_DIRECTORY), the file must exist
+    #    @param FileName: File path to be verified.
+    #
+    def __VerifyFile(self, FileName):
+        if FileName.replace('$(WORKSPACE)', '').find('$') != -1:
+            return
+        if not GlobalData.gAutoGenPhase or not self.__GetMacroValue("OUTPUT_DIRECTORY") in FileName:
+            ErrorCode, ErrorInfo = PathClass(NormPath(FileName), GenFdsGlobalVariable.WorkSpaceDir).Validate()
+            if ErrorCode != 0:
+                EdkLogger.error("GenFds", ErrorCode, ExtraData=ErrorInfo)
 
     ## __GetCglSection() method
     #
@@ -3066,12 +3076,14 @@ class FdfParser:
                     Value += self.__Token.strip()
             elif Name == 'OEM_CAPSULE_FLAGS':
                 Value = self.__Token.strip()
+                if not Value.upper().startswith('0X'):
+                    raise Warning("expected hex value between 0x0000 and 0xFFFF", self.FileName, self.CurrentLineNumber)
                 try:
                     Value = int(Value, 0)
                 except ValueError:
-                    raise Warning("expected integer value between 0x0000 and 0xFFFF", self.FileName, self.CurrentLineNumber)
+                    raise Warning("expected hex value between 0x0000 and 0xFFFF", self.FileName, self.CurrentLineNumber)
                 if not 0x0000 <= Value <= 0xFFFF:
-                    raise Warning("expected integer value between 0x0000 and 0xFFFF", self.FileName, self.CurrentLineNumber)
+                    raise Warning("expected hex value between 0x0000 and 0xFFFF", self.FileName, self.CurrentLineNumber)
                 Value = self.__Token.strip()
             else:
                 Value = self.__Token.strip()
@@ -3095,7 +3107,8 @@ class FdfParser:
             IsFv = self.__GetFvStatement(Obj)
             IsFd = self.__GetFdStatement(Obj)
             IsAnyFile = self.__GetAnyFileStatement(Obj)
-            if not (IsInf or IsFile or IsFv or IsFd or IsAnyFile):
+            IsAfile = self.__GetAfileStatement(Obj)
+            if not (IsInf or IsFile or IsFv or IsFd or IsAnyFile or IsAfile):
                 break
 
     ## __GetFvStatement() method
@@ -3186,6 +3199,47 @@ class FdfParser:
         CapsuleAnyFile = CapsuleData.CapsuleAnyFile()
         CapsuleAnyFile.FileName = AnyFileName
         CapsuleObj.CapsuleDataList.append(CapsuleAnyFile)
+        return True
+    
+    ## __GetAfileStatement() method
+    #
+    #   Get Afile for capsule
+    #
+    #   @param  self        The object pointer
+    #   @param  CapsuleObj  for whom Afile is got
+    #   @retval True        Successfully find a Afile statement
+    #   @retval False       Not able to find a Afile statement
+    #
+    def __GetAfileStatement(self, CapsuleObj):
+
+        if not self.__IsKeyword("APPEND"):
+            return False
+
+        if not self.__IsToken("="):
+            raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+
+        if not self.__GetNextToken():
+            raise Warning("expected Afile name", self.FileName, self.CurrentLineNumber)
+        
+        AfileName = self.__Token
+        AfileBaseName = os.path.basename(AfileName)
+        
+        if os.path.splitext(AfileBaseName)[1]  not in [".bin",".BIN",".Bin",".dat",".DAT",".Dat",".data",".DATA",".Data"]:
+            raise Warning('invalid binary file type, should be one of "bin","BIN","Bin","dat","DAT","Dat","data","DATA","Data"', \
+                          self.FileName, self.CurrentLineNumber)
+        
+        if not os.path.isabs(AfileName):
+            AfileName = GenFdsGlobalVariable.ReplaceWorkspaceMacro(AfileName)
+            self.__VerifyFile(AfileName)
+        else:
+            if not os.path.exists(AfileName):
+                raise Warning('%s does not exist' % AfileName, self.FileName, self.CurrentLineNumber)
+            else:
+                pass
+
+        CapsuleAfile = CapsuleData.CapsuleAfile()
+        CapsuleAfile.FileName = AfileName
+        CapsuleObj.CapsuleDataList.append(CapsuleAfile)
         return True
 
     ## __GetRule() method

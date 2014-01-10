@@ -458,9 +458,9 @@ Returns:
 
   case 0:
     //
-    // 8 byte alignment, mini alignment requirement for FFS file. 
+    // 1 byte alignment
     //
-    *Alignment = 3;
+    *Alignment = 0;
     break;
 
   case 1:
@@ -2212,7 +2212,8 @@ Returns:
                   mFvDataInfo.FvNameGuid.Data4[7]);
   }
 
-  if (CompareGuid (&mFvDataInfo.FvFileSystemGuid, &mEfiFirmwareFileSystem2Guid) == 0) {
+  if (CompareGuid (&mFvDataInfo.FvFileSystemGuid, &mEfiFirmwareFileSystem2Guid) == 0 ||
+    CompareGuid (&mFvDataInfo.FvFileSystemGuid, &mEfiFirmwareFileSystem3Guid) == 0) {
     mFvDataInfo.IsPiFvImage = TRUE;
   }
 

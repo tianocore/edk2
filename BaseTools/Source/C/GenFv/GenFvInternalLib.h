@@ -168,7 +168,7 @@ Abstract:
 // VTF (Firmware Volume Top File) signatures
 //
 #define IA32_X64_VTF_SIGNATURE_OFFSET    0x14
-#define IA32_X64_VTF0_SIGNATURE EFI_SIGNATURE_32('V','T','F',0)
+#define IA32_X64_VTF0_SIGNATURE SIGNATURE_32('V','T','F',0)
 
 //
 // Defines to calculate the offset for PEI CORE entry points

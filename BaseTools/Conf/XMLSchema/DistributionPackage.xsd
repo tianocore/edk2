@@ -1613,7 +1613,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                                                             </xs:restriction>
                                                             </xs:simpleType>
                                                             </xs:element>
-                                                            <xs:element minOccurs="1" maxOccurs="1" name="DatumType"
+                                                            <xs:element minOccurs="1" maxOccurs="1" name="DatumType" 
                                                             type="PcdDatumTypes"/>
                                                             <xs:element minOccurs="0" maxOccurs="1" name="MaxDatumSize">
                                                             <xs:annotation>
@@ -1653,6 +1653,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                                                             </xs:annotation>
                                                             <xs:complexType>
                                                             <xs:sequence>
+                                                            <xs:choice>
+                                                              <xs:element minOccurs="0" maxOccurs="1" name="ValidValueList">
+                                                                <xs:complexType>
+                                                                  <xs:simpleContent>
+                                                                    <xs:extension base="xs:normalizedString">
+                                                                    <xs:attribute name="Lang" type="xs:language" default="en-us" use="optional"/>
+                                                                    </xs:extension>
+                                                                  </xs:simpleContent>
+                                                                </xs:complexType>
+                                                              </xs:element>
+                                                              <xs:element minOccurs="0" maxOccurs="1" name="ValidValueRange" type="xs:normalizedString"/>
+                                                              <xs:element minOccurs="0" maxOccurs="1" name="Expression" type="xs:normalizedString"/>
+                                                            </xs:choice>
                                                             <xs:element minOccurs="1" maxOccurs="1" name="ErrorNumber">
                                                             <xs:annotation>
                                                             <xs:documentation xml:lang="en-us"> The minLength of 3 is
@@ -1731,6 +1744,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                                                             </xs:annotation>
                                                             <xs:complexType>
                                                             <xs:sequence>
+                                                            <xs:choice>
+                                                              <xs:element minOccurs="0" maxOccurs="1" name="ValidValueList">
+                                                                <xs:complexType>
+                                                                  <xs:simpleContent>
+                                                                    <xs:extension base="xs:normalizedString">
+                                                                    <xs:attribute name="Lang" type="xs:language" default="en-us" use="optional"/>
+                                                                      </xs:extension>
+                                                                  </xs:simpleContent>
+                                                                </xs:complexType>
+                                                              </xs:element>
+                                                              <xs:element minOccurs="0" maxOccurs="1" name="ValidValueRange" type="xs:normalizedString"/>
+                                                              <xs:element minOccurs="0" maxOccurs="1" name="Expression" type="xs:normalizedString"/>
+                                                            </xs:choice>
                                                             <xs:element minOccurs="1" maxOccurs="1" name="ErrorNumber">
                                                             <xs:annotation>
                                                             <xs:documentation xml:lang="en-us"> The minLength of 3 is
@@ -1877,6 +1903,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                                 <xs:complexType>
                                     <xs:sequence>
                                         <xs:element minOccurs="1" maxOccurs="1" name="CName" type="xs:NCName"/>
+                                        <xs:element minOccurs="0" maxOccurs="1" name="GUID" type="RegistryFormatGuid"/>
                                         <xs:element minOccurs="0" maxOccurs="1" name="VariableName"
                                             type="xs:normalizedString">
                                             <xs:annotation>
@@ -1948,6 +1975,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                                 <xs:complexType>
                                     <xs:sequence>
                                         <xs:element minOccurs="1" maxOccurs="1" name="CName" type="xs:NCName"/>
+                                        <xs:element minOccurs="0" maxOccurs="1" name="GUID" type="RegistryFormatGuid"/>                                       
                                         <xs:element ref="HelpText" minOccurs="0" maxOccurs="unbounded"/>
                                     </xs:sequence>
                                     <xs:attribute name="Usage" use="required">
@@ -1985,6 +2013,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                                 <xs:complexType>
                                     <xs:sequence>
                                         <xs:element minOccurs="1" maxOccurs="1" name="CName" type="xs:NCName"/>
+                                        <xs:element minOccurs="0" maxOccurs="1" name="GUID" type="RegistryFormatGuid"/>                                        
                                         <xs:element ref="HelpText" minOccurs="0" maxOccurs="unbounded"/>
                                     </xs:sequence>
                                     <xs:attribute name="Usage" use="required">
@@ -2272,17 +2301,32 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                                         different from the Distribution Package license. </xs:documentation>
                                 </xs:annotation>
                             </xs:element>
-                            <xs:element minOccurs="0" maxOccurs="1" name="Abstract" type="xs:normalizedString">
+                            <xs:element minOccurs="0" maxOccurs="1" name="Abstract">
                                 <xs:annotation>
                                     <xs:documentation xml:lang="en-us"> This is only required if the Abstract is
                                         different from the Distribution Package Abstract. </xs:documentation>
                                 </xs:annotation>
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="xs:normalizedString">
+                                            <xs:attribute name="Lang" type="xs:language" default="en-us" use="optional"/>
+                                        </xs:extension>                                        
+                                    </xs:simpleContent>
+                                </xs:complexType>
                             </xs:element>
-                            <xs:element minOccurs="0" maxOccurs="1" name="Description" type="xs:string">
+                            <xs:element minOccurs="0" maxOccurs="1" name="Description">
                                 <xs:annotation>
                                     <xs:documentation xml:lang="en-us"> This is only required if the Description is
                                         different from the Distribution Package Description. </xs:documentation>
                                 </xs:annotation>
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="xs:string">
+                                            <xs:attribute name="Lang" type="xs:language" default="en-us" use="optional"/>
+                                        </xs:extension>                                        
+                                    </xs:simpleContent>
+                                </xs:complexType>
+                                
                             </xs:element>
                         </xs:sequence>
                     </xs:complexType>
@@ -2474,6 +2518,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <xs:enumeration value="File"/>
             <xs:enumeration value="FV"/>
             <xs:enumeration value="GUID"/>
+            <xs:enumeration value="HII"/>
             <xs:enumeration value="Hii"/>
             <xs:enumeration value="HOB"/>
             <xs:enumeration value="SystemTable"/>
@@ -2694,10 +2739,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                     </xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
+            <xs:enumeration value="RedHat32"/>
+            <xs:enumeration value="RedHat64"/>
+            <xs:enumeration value="SuSE32"/>
+            <xs:enumeration value="SuSE64"/>
             <xs:enumeration value="Linux32"/>
             <xs:enumeration value="Linux64"/>
             <xs:enumeration value="OS/X32"/>
             <xs:enumeration value="OS/X64"/>
+            <xs:enumeration value="Generic"/>
             <xs:enumeration value="GenericWin">
                 <xs:annotation>
                     <xs:documentation xml:lang="en-us"> Typically, this is used for Windows Batch files.

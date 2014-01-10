@@ -1,7 +1,7 @@
 ## @file
 # This file is used to parse a PCD file of .PKG file
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -357,8 +357,10 @@ class MiscellaneousFileXml(object):
             Executable = XmlAttribute(XmlNode(SubItem, '%s/Filename' % Key), 'Executable')
             if Executable.upper() == "TRUE":
                 Executable = True
-            else:
+            elif Executable.upper() == "FALSE":
                 Executable = False
+            else:
+                Executable = ''
             self.Files.append([Filename, Executable])
 
         MiscFile = MiscFileObject()
@@ -392,8 +394,10 @@ class MiscellaneousFileXml(object):
             OsType = XmlAttribute(XmlNode(SubItem, '%s/Filename' % Key), 'OS')
             if Executable.upper() == "TRUE":
                 Executable = True
-            else:
+            elif Executable.upper() == "FALSE":
                 Executable = False
+            else:
+                Executable = ''
             self.Files.append([Filename, Executable, OsType])
 
         MiscFile = MiscFileObject()

@@ -86,6 +86,8 @@ class FV (FvClassObject):
                                 GenFdsGlobalVariable.ErrorLogger("Capsule %s in FD region can't contain a FV %s in FD region." % (self.CapsuleName, self.UiFvName.upper()))
 
         GenFdsGlobalVariable.InfLogger( "\nGenerating %s FV" %self.UiFvName)
+        GenFdsGlobalVariable.LargeFileInFvFlags.append(False)
+        FFSGuid = None
         
         if self.FvBaseAddress != None:
             BaseAddress = self.FvBaseAddress
@@ -130,12 +132,15 @@ class FV (FvClassObject):
         OrigFvInfo = None
         if os.path.exists (FvInfoFileName):
             OrigFvInfo = open(FvInfoFileName, 'r').read()
+        if GenFdsGlobalVariable.LargeFileInFvFlags[-1]:
+            FFSGuid = GenFdsGlobalVariable.EFI_FIRMWARE_FILE_SYSTEM3_GUID;
         GenFdsGlobalVariable.GenerateFirmwareVolume(
                                 FvOutputFile,
                                 [self.InfFileName],
                                 AddressFile=FvInfoFileName,
                                 FfsList=FfsFileList,
-                                ForceRebase=self.FvForceRebase
+                                ForceRebase=self.FvForceRebase,
+                                FileSystemGuid=FFSGuid
                                 )
 
         NewFvInfo = None
@@ -159,13 +164,16 @@ class FV (FvClassObject):
                 for FfsFile in self.FfsList :
                     FileName = FfsFile.GenFfs(MacroDict, FvChildAddr, BaseAddress)
                 
+                if GenFdsGlobalVariable.LargeFileInFvFlags[-1]:
+                    FFSGuid = GenFdsGlobalVariable.EFI_FIRMWARE_FILE_SYSTEM3_GUID;
                 #Update GenFv again
                 GenFdsGlobalVariable.GenerateFirmwareVolume(
                                         FvOutputFile,
                                         [self.InfFileName],
                                         AddressFile=FvInfoFileName,
                                         FfsList=FfsFileList,
-                                        ForceRebase=self.FvForceRebase
+                                        ForceRebase=self.FvForceRebase,
+                                        FileSystemGuid=FFSGuid
                                         )
 
         #
@@ -194,6 +202,7 @@ class FV (FvClassObject):
             self.FvAlignment = str (FvAlignmentValue)
         FvFileObj.close()
         GenFds.ImageBinDict[self.UiFvName.upper() + 'fv'] = FvOutputFile
+        GenFdsGlobalVariable.LargeFileInFvFlags.pop()
         return FvOutputFile
 
     ## __InitializeInf__()

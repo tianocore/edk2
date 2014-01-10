@@ -1,7 +1,7 @@
 ## @file
 # Generate AutoGen.h, AutoGen.c and *.depex files
 #
-# Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -334,6 +334,7 @@ class WorkspaceAutoGen(AutoGen):
             # Explicitly collect platform's dynamic PCDs
             #
             Pa.CollectPlatformDynamicPcds()
+            Pa.CollectFixedAtBuildPcds()
             self.AutoGenObjectList.append(Pa)
         
         #
@@ -785,6 +786,7 @@ class PlatformAutoGen(AutoGen):
         self._PcdTokenNumber = None    # (TokenCName, TokenSpaceGuidCName) : GeneratedTokenNumber
         self._DynamicPcdList = None    # [(TokenCName1, TokenSpaceGuidCName1), (TokenCName2, TokenSpaceGuidCName2), ...]
         self._NonDynamicPcdList = None # [(TokenCName1, TokenSpaceGuidCName1), (TokenCName2, TokenSpaceGuidCName2), ...]
+        self._NonDynamicPcdDict = {}
 
         self._ToolDefinitions = None
         self._ToolDefFile = None          # toolcode : tool path
@@ -850,6 +852,32 @@ class PlatformAutoGen(AutoGen):
             EdkLogger.debug(EdkLogger.DEBUG_9, "Skipped the generation of makefile for platform [%s] [%s]\n" %
                             (self.MetaFile, self.Arch))
         self.IsMakeFileCreated = True
+
+    ## Deal with Shared FixedAtBuild Pcds
+    #
+    def CollectFixedAtBuildPcds(self):
+        for LibAuto in self.LibraryAutoGenList:
+            FixedAtBuildPcds = {}  
+            ShareFixedAtBuildPcdsSameValue = {} 
+            for Module in LibAuto._ReferenceModules:                
+                for Pcd in Module.FixedAtBuildPcds + LibAuto.FixedAtBuildPcds:
+                    key = ".".join((Pcd.TokenSpaceGuidCName,Pcd.TokenCName))  
+                    if key not in FixedAtBuildPcds:
+                        ShareFixedAtBuildPcdsSameValue[key] = True
+                        FixedAtBuildPcds[key] = Pcd.DefaultValue
+                    else:
+                        if FixedAtBuildPcds[key] != Pcd.DefaultValue:
+                            ShareFixedAtBuildPcdsSameValue[key] = False      
+            for Pcd in LibAuto.FixedAtBuildPcds:
+                key = ".".join((Pcd.TokenSpaceGuidCName,Pcd.TokenCName))
+                if (Pcd.TokenCName,Pcd.TokenSpaceGuidCName) not in self.NonDynamicPcdDict:
+                    continue
+                else:
+                    DscPcd = self.NonDynamicPcdDict[(Pcd.TokenCName,Pcd.TokenSpaceGuidCName)]
+                    if DscPcd.Type != "FixedAtBuild":
+                        continue
+                if key in ShareFixedAtBuildPcdsSameValue and ShareFixedAtBuildPcdsSameValue[key]:                    
+                    LibAuto.ConstPcd[key] = Pcd.DefaultValue
 
     ## Collect dynamic PCDs
     #
@@ -1296,6 +1324,13 @@ class PlatformAutoGen(AutoGen):
             self._PackageList = list(self._PackageList)
         return self._PackageList
 
+    def _GetNonDynamicPcdDict(self):
+        if self._NonDynamicPcdDict:
+            return self._NonDynamicPcdDict
+        for Pcd in self.NonDynamicPcdList:
+            self._NonDynamicPcdDict[(Pcd.TokenCName,Pcd.TokenSpaceGuidCName)] = Pcd
+        return self._NonDynamicPcdDict
+
     ## Get list of non-dynamic PCDs
     def _GetNonDynamicPcdList(self):
         if self._NonDynamicPcdList == None:
@@ -1373,6 +1408,8 @@ class PlatformAutoGen(AutoGen):
             for La in Ma.LibraryAutoGenList:
                 if La not in self._LibraryAutoGenList:
                     self._LibraryAutoGenList.append(La)
+                if Ma not in La._ReferenceModules:
+                    La._ReferenceModules.append(Ma)
 
     ## Summarize ModuleAutoGen objects of all modules to be built for this platform
     def _GetModuleAutoGenList(self):
@@ -1911,6 +1948,7 @@ class PlatformAutoGen(AutoGen):
     PcdTokenNumber      = property(_GetPcdTokenNumbers)    # (TokenCName, TokenSpaceGuidCName) : GeneratedTokenNumber
     DynamicPcdList      = property(_GetDynamicPcdList)    # [(TokenCName1, TokenSpaceGuidCName1), (TokenCName2, TokenSpaceGuidCName2), ...]
     NonDynamicPcdList   = property(_GetNonDynamicPcdList)    # [(TokenCName1, TokenSpaceGuidCName1), (TokenCName2, TokenSpaceGuidCName2), ...]
+    NonDynamicPcdDict   = property(_GetNonDynamicPcdDict)
     PackageList         = property(_GetPackageList)
 
     ToolDefinition      = property(_GetToolDefinition)    # toolcode : tool path
@@ -2027,11 +2065,34 @@ class ModuleAutoGen(AutoGen):
         self._FinalBuildTargetList    = None
         self._FileTypes               = None
         self._BuildRules              = None
-
+        
+        ## The Modules referenced to this Library
+        #  Only Library has this attribute
+        self._ReferenceModules        = []        
+        
+        ## Store the FixedAtBuild Pcds
+        #  
+        self._FixedAtBuildPcds         = []
+        self.ConstPcd                  = {}
         return True
 
     def __repr__(self):
         return "%s [%s]" % (self.MetaFile, self.Arch)
+
+    # Get FixedAtBuild Pcds of this Module
+    def _GetFixedAtBuildPcds(self):
+        if self._FixedAtBuildPcds:
+            return self._FixedAtBuildPcds
+        for Pcd in self.ModulePcdList:
+            if self.IsLibrary:
+                if not (Pcd.Pending == False and Pcd.Type == "FixedAtBuild"):
+                    continue
+            elif Pcd.Type != "FixedAtBuild":
+                continue
+            if Pcd not in self._FixedAtBuildPcds:
+                self._FixedAtBuildPcds.append(Pcd)
+                
+        return self._FixedAtBuildPcds        
 
     # Macros could be used in build_rule.txt (also Makefile)
     def _GetMacros(self):
@@ -3102,6 +3163,8 @@ class ModuleAutoGen(AutoGen):
     BuildOption             = property(_GetModuleBuildOption)
     BuildOptionIncPathList  = property(_GetBuildOptionIncPathList)
     BuildCommand            = property(_GetBuildCommand)
+    
+    FixedAtBuildPcds         = property(_GetFixedAtBuildPcds)
 
 # This acts like the main() function for the script, unless it is 'import'ed into another script.
 if __name__ == '__main__':
