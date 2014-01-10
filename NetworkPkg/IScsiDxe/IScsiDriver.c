@@ -1,7 +1,7 @@
 /** @file
   The entry point of IScsi driver.
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1245,10 +1245,12 @@ IScsiUnload (
   IN EFI_HANDLE  ImageHandle
   )
 {
-  EFI_STATUS  Status;
-  UINTN       DeviceHandleCount;
-  EFI_HANDLE  *DeviceHandleBuffer;
-  UINTN       Index;
+  EFI_STATUS                        Status;
+  UINTN                             DeviceHandleCount;
+  EFI_HANDLE                        *DeviceHandleBuffer;
+  UINTN                             Index;
+  EFI_COMPONENT_NAME_PROTOCOL       *ComponentName;
+  EFI_COMPONENT_NAME2_PROTOCOL      *ComponentName2;
 
   //
   // Try to disonnect the driver from the devices it's controlling.
@@ -1264,64 +1266,184 @@ IScsiUnload (
     return Status;
   }
 
+  //
+  // Disconnect the iSCSI4 driver from the controlled device.
+  //
   for (Index = 0; Index < DeviceHandleCount; Index++) {
-    gBS->DisconnectController (
-           DeviceHandleBuffer[Index],
-           gIScsiIp4DriverBinding.DriverBindingHandle,
-           NULL
-           );
-    gBS->DisconnectController (
-           DeviceHandleBuffer[Index],
-           gIScsiIp6DriverBinding.DriverBindingHandle,
-           NULL
-           );
+    Status = IScsiTestManagedDevice (
+               DeviceHandleBuffer[Index],
+               gIScsiIp4DriverBinding.DriverBindingHandle,
+               &gEfiTcp4ProtocolGuid)
+               ;
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+    Status = gBS->DisconnectController (
+                    DeviceHandleBuffer[Index],
+                    gIScsiIp4DriverBinding.DriverBindingHandle,
+                    NULL
+                    );
+    if (EFI_ERROR (Status)) {
+      goto ON_EXIT;
+    }
+  }
+
+  //
+  // Disconnect the iSCSI6 driver from the controlled device.
+  //
+  for (Index = 0; Index < DeviceHandleCount; Index++) {
+    Status = IScsiTestManagedDevice (
+               DeviceHandleBuffer[Index],
+               gIScsiIp6DriverBinding.DriverBindingHandle,
+               &gEfiTcp6ProtocolGuid
+               );
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+    Status = gBS->DisconnectController (
+                    DeviceHandleBuffer[Index],
+                    gIScsiIp6DriverBinding.DriverBindingHandle,
+                    NULL
+                    );
+    if (EFI_ERROR (Status)) {
+      goto ON_EXIT;
+    }
   }
 
   //
   // Unload the iSCSI configuration form.
   //
-  IScsiConfigFormUnload (gIScsiIp4DriverBinding.DriverBindingHandle);
-
+  Status = IScsiConfigFormUnload (gIScsiIp4DriverBinding.DriverBindingHandle);
+  if (EFI_ERROR (Status)) {
+    goto ON_EXIT;
+  }
+  
   //
   // Uninstall the protocols installed by iSCSI driver.
   //
-  gBS->UninstallMultipleProtocolInterfaces (
-         ImageHandle,
-         &gEfiAuthenticationInfoProtocolGuid,
-         &gIScsiAuthenticationInfo,
-         NULL
-         );
-
-  if (gIScsiControllerNameTable!= NULL) {
-    FreeUnicodeStringTable (gIScsiControllerNameTable);
-    gIScsiControllerNameTable = NULL;
+  Status = gBS->UninstallMultipleProtocolInterfaces (
+                  ImageHandle,
+                  &gEfiAuthenticationInfoProtocolGuid,
+                  &gIScsiAuthenticationInfo,
+                  NULL
+                  );
+  if (EFI_ERROR (Status)) {
+    goto ON_EXIT;
   }
   
-  gBS->UninstallMultipleProtocolInterfaces (
-         gIScsiIp4DriverBinding.DriverBindingHandle,
-         &gEfiDriverBindingProtocolGuid,
-         &gIScsiIp4DriverBinding,
-         &gEfiComponentName2ProtocolGuid,
-         &gIScsiComponentName2,
-         &gEfiComponentNameProtocolGuid,
-         &gIScsiComponentName,
-         &gEfiIScsiInitiatorNameProtocolGuid,
-         &gIScsiInitiatorName,
-         NULL
-         );
+  if (gIScsiControllerNameTable!= NULL) {
+    Status = FreeUnicodeStringTable (gIScsiControllerNameTable);
+    if (EFI_ERROR (Status)) {
+      goto ON_EXIT;
+    }
+    gIScsiControllerNameTable = NULL;
+  }
 
-  gBS->UninstallMultipleProtocolInterfaces (
-         gIScsiIp6DriverBinding.DriverBindingHandle,
-         &gEfiDriverBindingProtocolGuid,
-         &gIScsiIp6DriverBinding,
-         &gEfiComponentName2ProtocolGuid,
-         &gIScsiComponentName2,
-         &gEfiComponentNameProtocolGuid,
-         &gIScsiComponentName,
-         NULL
-         );
+  //
+  // Uninstall the ComponentName and ComponentName2 protocol from iSCSI4 driver binding handle
+  // if it has been installed.
+  //
+  Status = gBS->HandleProtocol (
+                  gIScsiIp4DriverBinding.DriverBindingHandle,
+                  &gEfiComponentNameProtocolGuid,
+                  (VOID **) &ComponentName
+                  );
+  if (!EFI_ERROR (Status)) {
+    Status = gBS->UninstallMultipleProtocolInterfaces (
+           gIScsiIp4DriverBinding.DriverBindingHandle,
+           &gEfiComponentNameProtocolGuid,
+           ComponentName,
+           NULL
+           );
+    if (EFI_ERROR (Status)) {
+      goto ON_EXIT;
+    }
+  }
+  
+  Status = gBS->HandleProtocol (
+                  gIScsiIp4DriverBinding.DriverBindingHandle,
+                  &gEfiComponentName2ProtocolGuid,
+                  (VOID **) &ComponentName2
+                  );
+  if (!EFI_ERROR (Status)) {
+    gBS->UninstallMultipleProtocolInterfaces (
+           gIScsiIp4DriverBinding.DriverBindingHandle,
+           &gEfiComponentName2ProtocolGuid,
+           ComponentName2,
+           NULL
+           );
+    if (EFI_ERROR (Status)) {
+      goto ON_EXIT;
+    }
+  }
 
-  return EFI_SUCCESS;
+  //
+  // Uninstall the ComponentName and ComponentName2 protocol from iSCSI6 driver binding handle
+  // if it has been installed.
+  //
+  Status = gBS->HandleProtocol (
+                  gIScsiIp6DriverBinding.DriverBindingHandle,
+                  &gEfiComponentNameProtocolGuid,
+                  (VOID **) &ComponentName
+                  );
+  if (!EFI_ERROR (Status)) {
+    Status = gBS->UninstallMultipleProtocolInterfaces (
+           gIScsiIp6DriverBinding.DriverBindingHandle,
+           &gEfiComponentNameProtocolGuid,
+           ComponentName,
+           NULL
+           );
+    if (EFI_ERROR (Status)) {
+      goto ON_EXIT;
+    }
+  }
+  
+  Status = gBS->HandleProtocol (
+                  gIScsiIp6DriverBinding.DriverBindingHandle,
+                  &gEfiComponentName2ProtocolGuid,
+                  (VOID **) &ComponentName2
+                  );
+  if (!EFI_ERROR (Status)) {
+    gBS->UninstallMultipleProtocolInterfaces (
+           gIScsiIp6DriverBinding.DriverBindingHandle,
+           &gEfiComponentName2ProtocolGuid,
+           ComponentName2,
+           NULL
+           );
+    if (EFI_ERROR (Status)) {
+      goto ON_EXIT;
+    }
+  }
+
+  //
+  // Uninstall the IScsiInitiatorNameProtocol and all the driver binding protocols.
+  //
+  Status = gBS->UninstallMultipleProtocolInterfaces (
+                  gIScsiIp4DriverBinding.DriverBindingHandle,
+                  &gEfiDriverBindingProtocolGuid,
+                  &gIScsiIp4DriverBinding,
+                  &gEfiIScsiInitiatorNameProtocolGuid,
+                  &gIScsiInitiatorName,
+                  NULL
+                  );
+  if (EFI_ERROR (Status)) {
+    goto ON_EXIT;
+  }
+
+  Status = gBS->UninstallMultipleProtocolInterfaces (
+                  gIScsiIp6DriverBinding.DriverBindingHandle,
+                  &gEfiDriverBindingProtocolGuid,
+                  &gIScsiIp6DriverBinding,
+                  NULL
+                  );
+
+ON_EXIT:
+
+  if (DeviceHandleBuffer != NULL) {
+    FreePool (DeviceHandleBuffer);
+  }
+  
+  return Status;
 }
 
 /**

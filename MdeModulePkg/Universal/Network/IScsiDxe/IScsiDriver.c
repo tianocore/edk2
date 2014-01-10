@@ -1,7 +1,7 @@
 /** @file
   The entry point of IScsi driver.
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -439,10 +439,12 @@ EfiIScsiUnload (
   IN EFI_HANDLE  ImageHandle
   )
 {
-  EFI_STATUS  Status;
-  UINTN       DeviceHandleCount;
-  EFI_HANDLE  *DeviceHandleBuffer;
-  UINTN       Index;
+  EFI_STATUS                        Status;
+  UINTN                             DeviceHandleCount;
+  EFI_HANDLE                        *DeviceHandleBuffer;
+  UINTN                             Index;
+  EFI_COMPONENT_NAME_PROTOCOL       *ComponentName;
+  EFI_COMPONENT_NAME2_PROTOCOL      *ComponentName2;
 
   //
   // Try to disonnect the driver from the devices it's controlling.
@@ -454,40 +456,89 @@ EfiIScsiUnload (
                   &DeviceHandleCount,
                   &DeviceHandleBuffer
                   );
-  if (!EFI_ERROR (Status)) {
-    for (Index = 0; Index < DeviceHandleCount; Index++) {
-      Status = gBS->DisconnectController (
-                      DeviceHandleBuffer[Index],
-                      ImageHandle,
-                      NULL
-                      );
-    }
-
-    if (DeviceHandleBuffer != NULL) {
-      FreePool (DeviceHandleBuffer);
-    }
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
+
+  for (Index = 0; Index < DeviceHandleCount; Index++) {
+    Status = IScsiTestManagedDevice (
+               DeviceHandleBuffer[Index],
+               gIScsiDriverBinding.DriverBindingHandle,
+               &gEfiTcp4ProtocolGuid
+               );
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+    Status = gBS->DisconnectController (
+                    DeviceHandleBuffer[Index],
+                    gIScsiDriverBinding.DriverBindingHandle,
+                    NULL
+                    );
+    if (EFI_ERROR (Status)) {
+      goto ON_EXIT;
+    }
+  }  
+
   //
   // Unload the iSCSI configuration form.
   //
-  IScsiConfigFormUnload (gIScsiDriverBinding.DriverBindingHandle);
+  Status = IScsiConfigFormUnload (gIScsiDriverBinding.DriverBindingHandle);
+  if (EFI_ERROR (Status)) {
+    goto ON_EXIT;
+  }
 
   //
-  // Uninstall the protocols installed by iSCSI driver.
+  // Uninstall the ComponentName and ComponentName2 protocol from iSCSI4 driver binding handle
+  // if it has been installed.
   //
+  Status = gBS->HandleProtocol (
+                  gIScsiDriverBinding.DriverBindingHandle,
+                  &gEfiComponentNameProtocolGuid,
+                  (VOID **) &ComponentName
+                  );
+  if (!EFI_ERROR (Status)) {
+    Status = gBS->UninstallMultipleProtocolInterfaces (
+           gIScsiDriverBinding.DriverBindingHandle,
+           &gEfiComponentNameProtocolGuid,
+           ComponentName,
+           NULL
+           );
+    if (EFI_ERROR (Status)) {
+      goto ON_EXIT;
+    }
+  }
+  
+  Status = gBS->HandleProtocol (
+                  gIScsiDriverBinding.DriverBindingHandle,
+                  &gEfiComponentName2ProtocolGuid,
+                  (VOID **) &ComponentName2
+                  );
+  if (!EFI_ERROR (Status)) {
+    gBS->UninstallMultipleProtocolInterfaces (
+           gIScsiDriverBinding.DriverBindingHandle,
+           &gEfiComponentName2ProtocolGuid,
+           ComponentName2,
+           NULL
+           );
+    if (EFI_ERROR (Status)) {
+      goto ON_EXIT;
+    }
+  }
+
   Status = gBS->UninstallMultipleProtocolInterfaces (
                   ImageHandle,
                   &gEfiDriverBindingProtocolGuid,
                   &gIScsiDriverBinding,
-                  &gEfiComponentName2ProtocolGuid,
-                  &gIScsiComponentName2,
-                  &gEfiComponentNameProtocolGuid,
-                  &gIScsiComponentName,
                   &gEfiIScsiInitiatorNameProtocolGuid,
                   &gIScsiInitiatorName,
                   NULL
                   );
+ON_EXIT:
 
+  if (DeviceHandleBuffer != NULL) {
+    FreePool (DeviceHandleBuffer);
+  }
+  
   return Status;
 }
 

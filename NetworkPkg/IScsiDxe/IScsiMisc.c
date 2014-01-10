@@ -1,7 +1,7 @@
 /** @file
   Miscellaneous routines for iSCSI driver.
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1435,4 +1435,71 @@ IScsiOnExitBootService (
   if (Private->Session != NULL) {
     IScsiSessionAbort (Private->Session);
   }
+}
+
+/**
+  Tests whether a controller handle is being managed by IScsi driver.
+
+  This function tests whether the driver specified by DriverBindingHandle is
+  currently managing the controller specified by ControllerHandle.  This test
+  is performed by evaluating if the the protocol specified by ProtocolGuid is
+  present on ControllerHandle and is was opened by DriverBindingHandle and Nic
+  Device handle with an attribute of EFI_OPEN_PROTOCOL_BY_DRIVER. 
+  If ProtocolGuid is NULL, then ASSERT().
+
+  @param  ControllerHandle     A handle for a controller to test.
+  @param  DriverBindingHandle  Specifies the driver binding handle for the
+                               driver.
+  @param  ProtocolGuid         Specifies the protocol that the driver specified
+                               by DriverBindingHandle opens in its Start()
+                               function.
+
+  @retval EFI_SUCCESS          ControllerHandle is managed by the driver
+                               specified by DriverBindingHandle.
+  @retval EFI_UNSUPPORTED      ControllerHandle is not managed by the driver
+                               specified by DriverBindingHandle.
+
+**/
+EFI_STATUS
+EFIAPI
+IScsiTestManagedDevice (
+  IN  EFI_HANDLE       ControllerHandle,
+  IN  EFI_HANDLE       DriverBindingHandle,
+  IN  EFI_GUID         *ProtocolGuid
+  )
+{
+  EFI_STATUS     Status;
+  VOID           *ManagedInterface;
+  EFI_HANDLE     NicControllerHandle;
+
+  ASSERT (ProtocolGuid != NULL);
+
+  NicControllerHandle = NetLibGetNicHandle (ControllerHandle, ProtocolGuid);
+  if (NicControllerHandle == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+
+  Status = gBS->OpenProtocol (
+                  ControllerHandle,
+                  (EFI_GUID *) ProtocolGuid,
+                  &ManagedInterface,
+                  DriverBindingHandle,
+                  NicControllerHandle,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
+  if (!EFI_ERROR (Status)) {
+    gBS->CloseProtocol (
+           ControllerHandle,
+           (EFI_GUID *) ProtocolGuid,
+           DriverBindingHandle,
+           NicControllerHandle
+           );
+    return EFI_UNSUPPORTED;
+  }
+
+  if (Status != EFI_ALREADY_STARTED) {
+    return EFI_UNSUPPORTED;
+  }
+
+  return EFI_SUCCESS;
 }
