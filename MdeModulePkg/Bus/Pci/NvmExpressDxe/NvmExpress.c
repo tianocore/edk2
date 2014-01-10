@@ -928,97 +928,102 @@ NvmExpressUnload (
   EFI_HANDLE                        *DeviceHandleBuffer;
   UINTN                             DeviceHandleCount;
   UINTN                             Index;
-  EFI_DRIVER_BINDING_PROTOCOL       *DriverBinding;
   EFI_COMPONENT_NAME_PROTOCOL       *ComponentName;
   EFI_COMPONENT_NAME2_PROTOCOL      *ComponentName2;
 
   //
-  // Get the list of all the handles in the handle database.
-  // If there is an error getting the list, then the unload
-  // operation fails.
+  // Get the list of the device handles managed by this driver.
+  // If there is an error getting the list, then means the driver
+  // doesn't manage any device. At this way, we would only close
+  // those protocols installed at image handle.
   //
+  DeviceHandleBuffer = NULL;
   Status = gBS->LocateHandleBuffer (
-                  AllHandles,
-                  NULL,
+                  ByProtocol,
+                  &gEfiCallerIdGuid,
                   NULL,
                   &DeviceHandleCount,
                   &DeviceHandleBuffer
                   );
 
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Disconnect the driver specified by ImageHandle from all
-  // the devices in the handle database.
-  //
-  for (Index = 0; Index < DeviceHandleCount; Index++) {
-    Status = gBS->DisconnectController (
-                    DeviceHandleBuffer[Index],
-                    ImageHandle,
-                    NULL
-                    );
+  if (!EFI_ERROR (Status)) {
+    //
+    // Disconnect the driver specified by ImageHandle from all
+    // the devices in the handle database.
+    //
+    for (Index = 0; Index < DeviceHandleCount; Index++) {
+      Status = gBS->DisconnectController (
+                      DeviceHandleBuffer[Index],
+                      ImageHandle,
+                      NULL
+                      );
+      if (EFI_ERROR (Status)) {
+        goto EXIT;
+      }
+    }
   }
 
   //
   // Uninstall all the protocols installed in the driver entry point
   //
-  for (Index = 0; Index < DeviceHandleCount; Index++) {
-    Status = gBS->HandleProtocol (
-                    DeviceHandleBuffer[Index],
-                    &gEfiDriverBindingProtocolGuid,
-                    (VOID **) &DriverBinding
-                    );
+  Status = gBS->UninstallMultipleProtocolInterfaces (
+                  ImageHandle,
+                  &gEfiDriverBindingProtocolGuid,
+                  &gNvmExpressDriverBinding,
+                  &gEfiDriverSupportedEfiVersionProtocolGuid,
+                  &gNvmExpressDriverSupportedEfiVersion,
+                  NULL
+                  );
 
-    if (EFI_ERROR (Status)) {
-      continue;
-    }
-
-    if (DriverBinding->ImageHandle != ImageHandle) {
-      continue;
-    }
-
-    gBS->UninstallProtocolInterface (
-           ImageHandle,
-           &gEfiDriverBindingProtocolGuid,
-           DriverBinding
-           );
-
-    Status = gBS->HandleProtocol (
-                    DeviceHandleBuffer[Index],
-                    &gEfiComponentNameProtocolGuid,
-                    (VOID **) &ComponentName
-                    );
-    if (!EFI_ERROR (Status)) {
-      gBS->UninstallProtocolInterface (
-             ImageHandle,
-             &gEfiComponentNameProtocolGuid,
-             ComponentName
-             );
-    }
-
-    Status = gBS->HandleProtocol (
-                    DeviceHandleBuffer[Index],
-                    &gEfiComponentName2ProtocolGuid,
-                    (VOID **) &ComponentName2
-                    );
-    if (!EFI_ERROR (Status)) {
-      gBS->UninstallProtocolInterface (
-             ImageHandle,
-             &gEfiComponentName2ProtocolGuid,
-             ComponentName2
-             );
-    }
+  if (EFI_ERROR (Status)) {
+    goto EXIT;
   }
 
+  //
+  // Note we have to one by one uninstall the following protocols.
+  // It's because some of them are optionally installed based on
+  // the following PCD settings.
+  //   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable
+  //   gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable
+  //   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable
+  //   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable
+  //
+  Status = gBS->HandleProtocol (
+                  ImageHandle,
+                  &gEfiComponentNameProtocolGuid,
+                  (VOID **) &ComponentName
+                  );
+  if (!EFI_ERROR (Status)) {
+    gBS->UninstallProtocolInterface (
+           ImageHandle,
+           &gEfiComponentNameProtocolGuid,
+           ComponentName
+           );
+  }
+
+  Status = gBS->HandleProtocol (
+                  ImageHandle,
+                  &gEfiComponentName2ProtocolGuid,
+                  (VOID **) &ComponentName2
+                  );
+  if (!EFI_ERROR (Status)) {
+    gBS->UninstallProtocolInterface (
+           ImageHandle,
+           &gEfiComponentName2ProtocolGuid,
+           ComponentName2
+           );
+  }
+
+  Status = EFI_SUCCESS;
+
+EXIT:
   //
   // Free the buffer containing the list of handles from the handle database
   //
   if (DeviceHandleBuffer != NULL) {
     gBS->FreePool (DeviceHandleBuffer);
   }
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
