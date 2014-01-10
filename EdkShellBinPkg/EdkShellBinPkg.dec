@@ -2,7 +2,7 @@
 # Reference package showing multiple binaries
 #
 # This package contains multiple binary shell applications that follow UEFI specification. Now there are three binary shell modules, which are for bin (original module), normal shell and full shell.
-# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #    This program and the accompanying materials are licensed and made available 
 #    under the terms and conditions of the BSD License which accompanies this distribution.
@@ -16,5 +16,5 @@
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = EdkShellBinPkg
   PACKAGE_GUID                   = d4266a1b-1d38-4116-93ae-60dc3e2012a6
-  PACKAGE_VERSION                = 0.4
+  PACKAGE_VERSION                = 0.5
 
