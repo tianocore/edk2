@@ -1,7 +1,7 @@
 ## @file
 #  PC/AT Chipset Package
 #
-#  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,7 +16,7 @@
 [Defines]
   PLATFORM_NAME                  = PcAtChipset
   PLATFORM_GUID                  = a653167b-34d7-4b91-bfe3-f0c7608f48da
-  PLATFORM_VERSION               = 0.2
+  PLATFORM_VERSION               = 0.3
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/PcAtChipset
   SUPPORTED_ARCHITECTURES        = IA32|X64
