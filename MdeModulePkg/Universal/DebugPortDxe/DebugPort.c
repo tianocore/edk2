@@ -65,7 +65,7 @@ GetDebugPortVariable (
   EFI_DEVICE_PATH_PROTOCOL  *DebugPortVariable;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
 
-  GetVariable2 (EFI_DEBUGPORT_VARIABLE_NAME, &gEfiDebugPortVariableGuid, &DebugPortVariable, &DataSize);
+  GetVariable2 (EFI_DEBUGPORT_VARIABLE_NAME, &gEfiDebugPortVariableGuid, (VOID **) &DebugPortVariable, &DataSize);
   if (DebugPortVariable == NULL) {
     return NULL;
   }
