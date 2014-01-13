@@ -3,7 +3,7 @@
   manipulation, and initialization of EFI_SHELL_PARAMETERS_PROTOCOL.
 
   Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -565,6 +565,28 @@ FixVarName (
   }
 
   return (FixFileName(Copy));
+}
+
+/**
+  Remove the unicode file tag from the begining of the file buffer since that will not be
+  used by StdIn.
+**/
+EFI_STATUS
+EFIAPI
+RemoveFileTag(
+  IN SHELL_FILE_HANDLE *Handle
+  )
+{
+  UINTN             CharSize;
+  CHAR16            CharBuffer;
+
+  CharSize    = sizeof(CHAR16);
+  CharBuffer  = 0;
+  gEfiShellProtocol->ReadFile(*Handle, &CharSize, &CharBuffer);
+  if (CharBuffer != gUnicodeFileTag) {
+    gEfiShellProtocol->SetFilePosition(*Handle, 0);
+  }
+  return (EFI_SUCCESS);
 }
 
 /**
@@ -1148,7 +1170,15 @@ UpdateStdInStdOutStdErr(
           &TempHandle,
           EFI_FILE_MODE_READ,
           0);
-        if (!InUnicode && !EFI_ERROR(Status)) {
+        if (InUnicode) {
+          //
+          // Chop off the 0xFEFF if it's there...
+          //
+          RemoveFileTag(&TempHandle);
+        } else if (!EFI_ERROR(Status)) {
+          //
+          // Create the ASCII->Unicode conversion layer
+          //
           TempHandle = CreateFileInterfaceFile(TempHandle, FALSE);
         }
         if (!EFI_ERROR(Status)) {
