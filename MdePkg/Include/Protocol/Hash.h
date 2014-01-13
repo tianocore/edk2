@@ -5,7 +5,7 @@
   provided by a driver and to create and destroy instances of the EFI Hash Protocol 
   so that a multiple drivers can use the underlying hashing services.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -68,6 +68,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   { \
     0x8628752a, 0x6cb7, 0x4814, {0x96, 0xfc, 0x24, 0xa8, 0x15, 0xac, 0x22, 0x26 } \
   }
+
+//
+// Note: Use of the following algorithms with EFI_HASH_PROTOCOL is deprecated.
+//       EFI_HASH_ALGORITHM_SHA1_GUID
+//       EFI_HASH_ALGORITHM_SHA224_GUID
+//       EFI_HASH_ALGORITHM_SHA256_GUID
+//       EFI_HASH_ALGORITHM_SHA384_GUID
+//       EFI_HASH_ALGORITHM_SHA512_GUID
+//       EFI_HASH_ALGORTIHM_MD5_GUID
+//
 
 typedef struct _EFI_HASH_PROTOCOL EFI_HASH_PROTOCOL;
 
