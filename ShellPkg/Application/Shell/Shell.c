@@ -990,7 +990,7 @@ DoStartupScript(
   // If we got a file, run it
   //
   if (!EFI_ERROR(Status) && FileHandle != NULL) {
-    Status = RunScriptFileHandle (FileHandle, mStartupScript);
+    Status = RunScriptFile (mStartupScript, FileHandle, L"", ShellInfoObject.NewShellParametersProtocol);
     ShellInfoObject.NewEfiShellProtocol->CloseFile(FileHandle);
   } else {
     FileStringPath = ShellFindFilePath(mStartupScript);
@@ -1001,7 +1001,7 @@ DoStartupScript(
       Status = EFI_SUCCESS;
       ASSERT(FileHandle == NULL);
     } else {
-      Status = RunScriptFile(FileStringPath);
+      Status = RunScriptFile(FileStringPath, NULL, L"", ShellInfoObject.NewShellParametersProtocol);
       FreePool(FileStringPath);
     }
   }
@@ -2048,7 +2048,7 @@ RunCommandOrFile(
       }
       switch (Type) {
         case   Script_File_Name:
-          Status = RunScriptFile (CommandWithPath);
+          Status = RunScriptFile (CommandWithPath, NULL, CmdLine, ParamProtocol);
           break;
         case   Efi_Application:
           //
@@ -2578,30 +2578,62 @@ RunScriptFileHandle (
   Function to process a NSH script file.
 
   @param[in] ScriptPath         Pointer to the script file name (including file system path).
+  @param[in] Handle             the handle of the script file already opened.
+  @param[in] CmdLine            the command line to run.
+  @param[in] ParamProtocol      the shell parameters protocol pointer
 
   @retval EFI_SUCCESS           the script completed sucessfully
 **/
 EFI_STATUS
 EFIAPI
 RunScriptFile (
-  IN CONST CHAR16 *ScriptPath
+  IN CONST CHAR16                   *ScriptPath,
+  IN SHELL_FILE_HANDLE              Handle OPTIONAL,
+  IN CONST CHAR16                   *CmdLine,
+  IN EFI_SHELL_PARAMETERS_PROTOCOL  *ParamProtocol
   )
 {
   EFI_STATUS          Status;
   SHELL_FILE_HANDLE   FileHandle;
+  UINTN                     Argc;
+  CHAR16                    **Argv;
 
   if (ShellIsFile(ScriptPath) != EFI_SUCCESS) {
     return (EFI_INVALID_PARAMETER);
   }
 
-  Status = ShellOpenFileByName(ScriptPath, &FileHandle, EFI_FILE_MODE_READ, 0);
-  if (EFI_ERROR(Status)) {
-    return (Status);
+  //
+  // get the argc and argv updated for scripts
+  //
+  Status = UpdateArgcArgv(ParamProtocol, CmdLine, &Argv, &Argc);
+  if (!EFI_ERROR(Status)) {
+
+    if (Handle == NULL) {
+      //
+      // open the file
+      //
+      Status = ShellOpenFileByName(ScriptPath, &FileHandle, EFI_FILE_MODE_READ, 0);
+      if (!EFI_ERROR(Status)) {
+        //
+        // run it
+        //
+        Status = RunScriptFileHandle(FileHandle, ScriptPath);
+
+        //
+        // now close the file
+        //
+        ShellCloseFile(&FileHandle);
+      }
+    } else {
+      Status = RunScriptFileHandle(Handle, ScriptPath);
+    }
   }
 
-  Status = RunScriptFileHandle(FileHandle, ScriptPath);
-
-  ShellCloseFile(&FileHandle);
+  //
+  // This is guarenteed to be called after UpdateArgcArgv no matter what else happened.
+  // This is safe even if the update API failed.  In this case, it may be a no-op.
+  //
+  RestoreArgcArgv(ParamProtocol, &Argv, &Argc);
 
   return (Status);
 }
