@@ -199,13 +199,13 @@
   ## This PCD indicates if debugger exists.
   gEfiSecurityPkgTokenSpaceGuid.PcdFirmwareDebuggerInitialized|FALSE|BOOLEAN|0x00010009
 
-  ## This PCD indicates the TPM2 initializatin policy.
-  ## 0: No initialization needed - most likely used for chipset SRTM sloution, in which TPM is already initialized.
+  ## This PCD indicates the TPM2 initialization policy.
+  ## 0: No initialization needed - most likely used for chipset SRTM solution, in which TPM is already initialized.
   ## 1: Initialization needed.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2InitializationPolicy|1|UINT8|0x0001000A
 
-  ## This PCD indicates the TPM initializatin policy.
-  ## 0: No initialization needed - most likely used for chipset SRTM sloution, in which TPM is already initialized.
+  ## This PCD indicates the TPM initialization policy.
+  ## 0: No initialization needed - most likely used for chipset SRTM solution, in which TPM is already initialized.
   ## 1: Initialization needed.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInitializationPolicy|1|UINT8|0x0001000B
 
