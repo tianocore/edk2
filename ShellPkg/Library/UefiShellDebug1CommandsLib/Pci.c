@@ -5274,66 +5274,48 @@ PrintPciExtendedCapabilityDetails(
   switch (HeaderAddress->CapabilityId){
     case PCI_EXPRESS_EXTENDED_CAPABILITY_ADVANCED_ERROR_REPORTING_ID:
       return PrintInterpretedExtendedCompatibilityAer(HeaderAddress, HeadersBaseAddress);
-      break;
     case PCI_EXPRESS_EXTENDED_CAPABILITY_LINK_CONTROL_ID:
       return PrintInterpretedExtendedCompatibilityLinkControl(HeaderAddress, HeadersBaseAddress);
-      break;
     case PCI_EXPRESS_EXTENDED_CAPABILITY_LINK_DECLARATION_ID:
       return PrintInterpretedExtendedCompatibilityLinkDeclaration(HeaderAddress, HeadersBaseAddress);
-      break;
     case PCI_EXPRESS_EXTENDED_CAPABILITY_SERIAL_NUMBER_ID:
       return PrintInterpretedExtendedCompatibilitySerialNumber(HeaderAddress, HeadersBaseAddress);
-      break;
     case PCI_EXPRESS_EXTENDED_CAPABILITY_POWER_BUDGETING_ID:
       return PrintInterpretedExtendedCompatibilityPowerBudgeting(HeaderAddress, HeadersBaseAddress);
-      break;
     case PCI_EXPRESS_EXTENDED_CAPABILITY_ACS_EXTENDED_ID:
       return PrintInterpretedExtendedCompatibilityAcs(HeaderAddress, HeadersBaseAddress);
-      break;
     case PCI_EXPRESS_EXTENDED_CAPABILITY_LATENCE_TOLERANCE_REPORTING_ID:
       return PrintInterpretedExtendedCompatibilityLatencyToleranceReporting(HeaderAddress, HeadersBaseAddress);
-      break;
     case PCI_EXPRESS_EXTENDED_CAPABILITY_ARI_CAPABILITY_ID:
       return PrintInterpretedExtendedCompatibilityAri(HeaderAddress, HeadersBaseAddress);
-      break;
     case PCI_EXPRESS_EXTENDED_CAPABILITY_RCRB_HEADER_ID:
       return PrintInterpretedExtendedCompatibilityRcrb(HeaderAddress, HeadersBaseAddress);
-      break;
     case PCI_EXPRESS_EXTENDED_CAPABILITY_VENDOR_SPECIFIC_ID:
       return PrintInterpretedExtendedCompatibilityVendorSpecific(HeaderAddress, HeadersBaseAddress);
-      break;
     case PCI_EXPRESS_EXTENDED_CAPABILITY_DYNAMIC_POWER_ALLOCATION_ID:
       return PrintInterpretedExtendedCompatibilityDynamicPowerAllocation(HeaderAddress, HeadersBaseAddress);
-      break;
     case PCI_EXPRESS_EXTENDED_CAPABILITY_EVENT_COLLECTOR_ENDPOINT_ASSOCIATION_ID:
       return PrintInterpretedExtendedCompatibilityECEA(HeaderAddress, HeadersBaseAddress);
-      break;
     case PCI_EXPRESS_EXTENDED_CAPABILITY_VIRTUAL_CHANNEL_ID:
     case PCI_EXPRESS_EXTENDED_CAPABILITY_MULTI_FUNCTION_VIRTUAL_CHANNEL_ID:
       return PrintInterpretedExtendedCompatibilityVirtualChannel(HeaderAddress, HeadersBaseAddress);
-      break;
     case PCI_EXPRESS_EXTENDED_CAPABILITY_MULTICAST_ID: 
       //
       // should only be present if PCIE_CAP_DEVICEPORT_TYPE(PciExpressCapPtr->PcieCapReg) == 0100b, 0101b, or 0110b
       //
       return PrintInterpretedExtendedCompatibilityMulticast(HeaderAddress, HeadersBaseAddress, PciExpressCapPtr);
-      break;
     case PCI_EXPRESS_EXTENDED_CAPABILITY_RESIZABLE_BAR_ID:
       return PrintInterpretedExtendedCompatibilityResizeableBar(HeaderAddress, HeadersBaseAddress);
-      break;
     case PCI_EXPRESS_EXTENDED_CAPABILITY_TPH_ID:
       return PrintInterpretedExtendedCompatibilityTph(HeaderAddress, HeadersBaseAddress);
-      break;
     case PCI_EXPRESS_EXTENDED_CAPABILITY_SECONDARY_PCIE_ID:
       return PrintInterpretedExtendedCompatibilitySecondary(HeaderAddress, HeadersBaseAddress, PciExpressCapPtr);
-      break;
     default:
       ShellPrintEx (-1, -1,
         L"Unknown PCIe extended capability ID (%04xh).  No interpretation available.\r\n",
         HeaderAddress->CapabilityId
         );
       return EFI_SUCCESS;
-      break;
   };
 
 }
