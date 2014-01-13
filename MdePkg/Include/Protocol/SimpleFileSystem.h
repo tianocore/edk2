@@ -7,7 +7,7 @@
 
   UEFI 2.0 can boot from any valid EFI image contained in a SimpleFileSystem.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -517,8 +517,10 @@ EFI_STATUS
   IN OUT EFI_FILE_IO_TOKEN    *Token
   );
 
-#define EFI_FILE_PROTOCOL_REVISION    0x00010000
-#define EFI_FILE_PROTOCOL_REVISION2   0x00020000
+#define EFI_FILE_PROTOCOL_REVISION        0x00010000
+#define EFI_FILE_PROTOCOL_REVISION2       0x00020000
+#define EFI_FILE_PROTOCOL_LATEST_REVISION EFI_FILE_PROTOCOL_REVISION2
+
 //
 // Revision defined in EFI1.1.
 // 
@@ -534,8 +536,8 @@ EFI_STATUS
 struct _EFI_FILE_PROTOCOL {
   ///
   /// The version of the EFI_FILE_PROTOCOL interface. The version specified 
-  /// by this specification is 0x00010000. Future versions are required 
-  /// to be backward compatible to version 1.0.
+  /// by this specification is EFI_FILE_PROTOCOL_LATEST_REVISION.
+  /// Future versions are required to be backward compatible to version 1.0.
   ///
   UINT64                Revision;
   EFI_FILE_OPEN         Open;
