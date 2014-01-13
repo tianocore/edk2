@@ -1620,6 +1620,7 @@ EfiShellFreeFileList(
     InternalFreeShellFileInfoNode(ShellFileListItem);
   }
   InternalFreeShellFileInfoNode(*FileList);
+  *FileList = NULL;
   return(EFI_SUCCESS);
 }
 
