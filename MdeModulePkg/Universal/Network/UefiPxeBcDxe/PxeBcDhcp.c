@@ -2,7 +2,7 @@
   Support for PxeBc dhcp functions.
 
 Copyright (c) 2013, Red Hat, Inc.
-Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -147,13 +147,43 @@ PxeBcParseCachedDhcpPacket (
 
   //
   // Parse interested dhcp options and store their pointers in CachedPacket->Dhcp4Option.
+  // First, try to parse DHCPv4 options from the DHCP optional parameters field.
   //
   for (Index = 0; Index < PXEBC_DHCP4_TAG_INDEX_MAX; Index++) {
     Options[Index] = PxeBcParseExtendOptions (
-                      Offer->Dhcp4.Option,
-                      GET_OPTION_BUFFER_LEN (Offer),
-                      mInterestedDhcp4Tags[Index]
-                      );
+                       Offer->Dhcp4.Option,
+                       GET_OPTION_BUFFER_LEN (Offer),
+                       mInterestedDhcp4Tags[Index]
+                       );
+  }
+  //
+  // Second, Check if bootfilename and serverhostname is overloaded to carry DHCP options refers to rfc-2132. 
+  // If yes, try to parse options from the BootFileName field, then ServerName field.
+  //
+  Option = Options[PXEBC_DHCP4_TAG_INDEX_OVERLOAD];
+  if (Option != NULL) {
+    if ((Option->Data[0] & PXEBC_DHCP4_OVERLOAD_FILE) != 0) {
+      for (Index = 0; Index < PXEBC_DHCP4_TAG_INDEX_MAX; Index++) {
+        if (Options[Index] == NULL) {
+          Options[Index] = PxeBcParseExtendOptions (
+                             (UINT8 *) Offer->Dhcp4.Header.BootFileName,
+                             sizeof (Offer->Dhcp4.Header.BootFileName),
+                             mInterestedDhcp4Tags[Index]
+                             );
+        }
+      }
+    }
+    if ((Option->Data[0] & PXEBC_DHCP4_OVERLOAD_SERVER_NAME) != 0) {
+      for (Index = 0; Index < PXEBC_DHCP4_TAG_INDEX_MAX; Index++) {
+        if (Options[Index] == NULL) {
+          Options[Index] = PxeBcParseExtendOptions (
+                             (UINT8 *) Offer->Dhcp4.Header.ServerName,
+                             sizeof (Offer->Dhcp4.Header.ServerName),
+                             mInterestedDhcp4Tags[Index]
+                             );
+        }
+      }
+    }
   }
 
   //
@@ -177,31 +207,23 @@ PxeBcParseCachedDhcpPacket (
     }
   }
 
-  //
-  // Check whether bootfilename/serverhostname overloaded (See details in dhcp spec).
-  // If overloaded, parse this buffer as nested dhcp options, or just parse bootfilename/
-  // serverhostname option.
-  //
-  Option = Options[PXEBC_DHCP4_TAG_INDEX_OVERLOAD];
-  if ((Option != NULL) && ((Option->Data[0] & PXEBC_DHCP4_OVERLOAD_FILE) != 0)) {
 
-    Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] = PxeBcParseExtendOptions (
-                                                (UINT8 *) Offer->Dhcp4.Header.BootFileName,
-                                                sizeof (Offer->Dhcp4.Header.BootFileName),
-                                                PXEBC_DHCP4_TAG_BOOTFILE
-                                                );
+  //
+  // Parse PXE boot file name:
+  // According to PXE spec, boot file name should be read from DHCP option 67 (bootfile name) if present.
+  // Otherwise, read from boot file field in DHCP header.
+  //
+  if (Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] != NULL) {
     //
     // RFC 2132, Section 9.5 does not strictly state Bootfile name (option 67) is null 
     // terminated string. So force to append null terminated character at the end of string.
     //
-    if (Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] != NULL) {
-      Ptr8 =  (UINT8*)&Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE]->Data[0];
-      Ptr8 += Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE]->Length;
-      *Ptr8 =  '\0';
+    Ptr8 =  (UINT8*)&Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE]->Data[0];
+    Ptr8 += Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE]->Length;
+    if (*(Ptr8 - 1) != '\0') {
+      *Ptr8 = '\0';
     }
-
-  } else if ((Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] == NULL) &&
-            (Offer->Dhcp4.Header.BootFileName[0] != 0)) {
+  } else if (Offer->Dhcp4.Header.BootFileName[0] != 0) {
     //
     // If the bootfile is not present and bootfilename is present in dhcp packet, just parse it.
     // And do not count dhcp option header, or else will destroy the serverhostname.

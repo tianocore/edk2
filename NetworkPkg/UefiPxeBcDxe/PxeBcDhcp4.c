@@ -1,7 +1,7 @@
 /** @file
   Functions implementation related with DHCPv4 for UefiPxeBc Driver.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -472,6 +472,7 @@ PxeBcParseDhcp4Packet (
 
   //
   // Parse DHCPv4 options in this offer, and store the pointers.
+  // First, try to parse DHCPv4 options from the DHCP optional parameters field.
   //
   for (Index = 0; Index < PXEBC_DHCP4_TAG_INDEX_MAX; Index++) {
     Options[Index] = PxeBcParseDhcp4Options (
@@ -479,6 +480,35 @@ PxeBcParseDhcp4Packet (
                        GET_OPTION_BUFFER_LEN (Offer),
                        mInterestedDhcp4Tags[Index]
                        );
+  }
+  //
+  // Second, Check if bootfilename and serverhostname is overloaded to carry DHCP options refers to rfc-2132. 
+  // If yes, try to parse options from the BootFileName field, then ServerName field.
+  //
+  Option = Options[PXEBC_DHCP4_TAG_INDEX_OVERLOAD];
+  if (Option != NULL) {
+    if ((Option->Data[0] & PXEBC_DHCP4_OVERLOAD_FILE) != 0) {
+      for (Index = 0; Index < PXEBC_DHCP4_TAG_INDEX_MAX; Index++) {
+        if (Options[Index] == NULL) {
+          Options[Index] = PxeBcParseDhcp4Options (
+                             (UINT8 *) Offer->Dhcp4.Header.BootFileName,
+                             sizeof (Offer->Dhcp4.Header.BootFileName),
+                             mInterestedDhcp4Tags[Index]
+                             );
+        }
+      }
+    }
+    if ((Option->Data[0] & PXEBC_DHCP4_OVERLOAD_SERVER_NAME) != 0) {
+      for (Index = 0; Index < PXEBC_DHCP4_TAG_INDEX_MAX; Index++) {
+        if (Options[Index] == NULL) {
+          Options[Index] = PxeBcParseDhcp4Options (
+                             (UINT8 *) Offer->Dhcp4.Header.ServerName,
+                             sizeof (Offer->Dhcp4.Header.ServerName),
+                             mInterestedDhcp4Tags[Index]
+                             );
+        }
+      }
+    }
   }
 
   //
@@ -506,30 +536,21 @@ PxeBcParseDhcp4Packet (
   }
 
   //
-  // Check whether bootfilename and serverhostname overloaded, refers to rfc-2132 in details.
-  // If overloaded, parse the buffer as nested DHCPv4 options, or else just parse as bootfilename
-  // and serverhostname option.
+  // Parse PXE boot file name:
+  // According to PXE spec, boot file name should be read from DHCP option 67 (bootfile name) if present.
+  // Otherwise, read from boot file field in DHCP header.
   //
-  Option = Options[PXEBC_DHCP4_TAG_INDEX_OVERLOAD];
-  if (Option != NULL && (Option->Data[0] & PXEBC_DHCP4_OVERLOAD_FILE) != 0) {
-
-    Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] = PxeBcParseDhcp4Options (
-                                                (UINT8 *) Offer->Dhcp4.Header.BootFileName,
-                                                sizeof (Offer->Dhcp4.Header.BootFileName),
-                                                PXEBC_DHCP4_TAG_BOOTFILE
-                                                );
+  if (Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] != NULL) {
     //
     // RFC 2132, Section 9.5 does not strictly state Bootfile name (option 67) is null
     // terminated string. So force to append null terminated character at the end of string.
     //
-    if (Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] != NULL) {
-      Ptr8 =  (UINT8*)&Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE]->Data[0];
-      Ptr8 += Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE]->Length;
-      *Ptr8 =  '\0';
+    Ptr8 =  (UINT8*)&Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE]->Data[0];
+    Ptr8 += Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE]->Length;
+    if (*(Ptr8 - 1) != '\0') {
+      *Ptr8 = '\0';
     }
-
-  } else if ((Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] == NULL) &&
-            (Offer->Dhcp4.Header.BootFileName[0] != 0)) {
+  } else if (Offer->Dhcp4.Header.BootFileName[0] != 0) {
     //
     // If the bootfile is not present and bootfilename is present in DHCPv4 packet, just parse it.
     // Do not count dhcp option header here, or else will destroy the serverhostname.
