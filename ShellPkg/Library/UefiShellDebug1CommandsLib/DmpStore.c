@@ -546,7 +546,7 @@ ProcessVariables (
   ZeroMem (&FoundVarGuid, sizeof(EFI_GUID));
 
   if (Type == DmpStoreLoad) {
-    ShellStatus = LoadVariablesFromFile (FileHandle, Name, Guid, &Found);
+    ShellStatus = (SHELL_STATUS) LoadVariablesFromFile (FileHandle, Name, Guid, &Found);
   } else {
     ShellStatus = CascadeProcessVariables(Name, Guid, Type, FileHandle, NULL, FoundVarGuid, &Found);
   }
