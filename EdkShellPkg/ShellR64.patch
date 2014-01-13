@@ -64,6 +64,24 @@ Index: EfiCompress/compress.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -64,11 +64,13 @@
+ # we will specify some additional DEFINEs on the compile command line.
+ #
+ [nmake.common]
++  IMAGE_ENTRY_POINT=InitializeCompress
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_PROJ_FLAGS = $(C_PROJ_FLAGS) /Zm500
+-  IMAGE_ENTRY_POINT=InitializeCompress
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
+-
+- 
+\ No newline at end of file
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: EfiCompress/compress.c
 ===================================================================
 --- EfiCompress/compress.c	(revision 64)
@@ -139,6 +157,18 @@ Index: load/load.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -70,6 +70,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=InitializeLoad
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
++
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: drvdiag/drvdiag.c
 ===================================================================
 --- drvdiag/drvdiag.c	(revision 64)
@@ -212,6 +242,18 @@ Index: drvdiag/drvdiag.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -73,7 +73,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=DrvdiagMain
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: cls/cls.c
 ===================================================================
 --- cls/cls.c	(revision 64)
@@ -284,6 +326,19 @@ Index: cls/cls.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -72,7 +72,12 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=InitializeCls
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
++
 Index: newshell/nshell.inf
 ===================================================================
 --- newshell/nshell.inf	(revision 64)
@@ -325,6 +380,25 @@ Index: newshell/nshell.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -63,11 +63,13 @@
+ # we will specify some additional DEFINEs on the compile command line.
+ #
+ [nmake.common]
++  IMAGE_ENTRY_POINT=InitializeShell
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_PROJ_FLAGS = $(C_PROJ_FLAGS) /Zm500
+-  IMAGE_ENTRY_POINT=InitializeShell
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+-  C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_MONOSHELL=2
++  C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
+-
+- 
+\ No newline at end of file
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: newshell/FakeHii.c
 ===================================================================
 --- newshell/FakeHii.c	(revision 64)
@@ -532,6 +606,18 @@ Index: type/type.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -72,7 +72,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=InitializeType
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: dmem/MemCommonPart.c
 ===================================================================
 --- dmem/MemCommonPart.c	(revision 64)
@@ -732,6 +818,21 @@ Index: dmem/dmem.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -64,9 +64,13 @@
+ # we will specify some additional DEFINEs on the compile command line.
+ #
+ [nmake.common]
++  IMAGE_ENTRY_POINT=DumpMem
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_PROJ_FLAGS = $(C_PROJ_FLAGS) /Zm500
+-  IMAGE_ENTRY_POINT=DumpMem
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: devices/devices.c
 ===================================================================
 --- devices/devices.c	(revision 64)
@@ -803,6 +904,18 @@ Index: devices/devices.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -72,7 +72,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=DevicesMain
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: mv/mv.c
 ===================================================================
 --- mv/mv.c	(revision 64)
@@ -877,6 +990,18 @@ Index: mv/mv.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -72,7 +72,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=InitializeMv
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: unload/unload.c
 ===================================================================
 --- unload/unload.c	(revision 64)
@@ -1010,6 +1135,18 @@ Index: unload/unload.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -70,6 +70,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=InitializeUnload
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
++
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: mode/mode.inf
 ===================================================================
 --- mode/mode.inf	(revision 64)
@@ -1051,6 +1188,18 @@ Index: mode/mode.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -72,7 +72,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=InitializeMode
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: mode/mode.c
 ===================================================================
 --- mode/mode.c	(revision 64)
@@ -1114,6 +1263,18 @@ Index: attrib/attrib.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -73,7 +73,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=InitializeAttrib
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: attrib/attrib.c
 ===================================================================
 --- attrib/attrib.c	(revision 64)
@@ -1199,6 +1360,24 @@ Index: err/err.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -63,11 +63,14 @@
+ # we will specify some additional DEFINEs on the compile command line.
+ #
+ [nmake.common]
++  IMAGE_ENTRY_POINT=InitializeError
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_PROJ_FLAGS = $(C_PROJ_FLAGS) /Zm500
+-  IMAGE_ENTRY_POINT=InitializeError
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
+-
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
+  
+\ No newline at end of file
 Index: err/DebugMask.h
 ===================================================================
 --- err/DebugMask.h	(revision 64)
@@ -1324,6 +1503,25 @@ Index: EfiDecompress/Decompress.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -63,11 +63,14 @@
+ # we will specify some additional DEFINEs on the compile command line.
+ #
+ [nmake.common]
++  IMAGE_ENTRY_POINT=InitializeDecompress
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_PROJ_FLAGS = $(C_PROJ_FLAGS) /Zm500
+-  IMAGE_ENTRY_POINT=InitializeDecompress
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
+-
+- 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
++ 
+\ No newline at end of file
 Index: EfiDecompress/Decompress.c
 ===================================================================
 --- EfiDecompress/Decompress.c	(revision 64)
@@ -1960,6 +2158,24 @@ Index: hexedit/hexedit.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -75,11 +75,14 @@
+ # we will specify some additional DEFINEs on the compile command line.
+ #
+ [nmake.common]
++  IMAGE_ENTRY_POINT=InitializeEFIHexEditor
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_PROJ_FLAGS = $(C_PROJ_FLAGS) /Zm500
+-  IMAGE_ENTRY_POINT=InitializeEFIHexEditor
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
+-
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
+  
+\ No newline at end of file
 Index: hexedit/libdiskimage.c
 ===================================================================
 --- hexedit/libdiskimage.c	(revision 64)
@@ -2527,6 +2743,21 @@ Index: Ping/Ping.inf
  
  [libraries.Ia32]
    CpuIA32Lib
+@@ -64,9 +63,12 @@
+   CpuIA32Lib
+ 
+ [nmake.common]
+-  C_PROJ_FLAGS = $(C_PROJ_FLAGS)
+   IMAGE_ENTRY_POINT=Ping
+-  C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
++  C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: Ping/Ping.c
 ===================================================================
 --- Ping/Ping.c	(revision 64)
@@ -2684,6 +2915,18 @@ Index: time/time.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -72,7 +72,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=InitializeTime
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: mount/mount.c
 ===================================================================
 --- mount/mount.c	(revision 64)
@@ -2756,6 +2999,18 @@ Index: mount/mount.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -72,7 +72,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=MountMain
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: mkdir/mkdir.inf
 ===================================================================
 --- mkdir/mkdir.inf	(revision 64)
@@ -2796,6 +3051,18 @@ Index: mkdir/mkdir.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -72,7 +72,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=InitializeMkDir
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: mkdir/mkdir.c
 ===================================================================
 --- mkdir/mkdir.c	(revision 64)
@@ -2903,6 +3170,18 @@ Index: pci/pci.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -74,7 +74,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=PciDump
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: pci/pci_class.h
 ===================================================================
 --- pci/pci_class.h	(revision 64)
@@ -3058,6 +3337,18 @@ Index: memmap/memmap.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -73,7 +73,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=InitializeMemmap
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: memmap/memmap.c
 ===================================================================
 --- memmap/memmap.c	(revision 64)
@@ -3138,6 +3429,25 @@ Index: dblk/dblk.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -61,11 +61,16 @@
+ # we will specify some additional DEFINEs on the compile command line.
+ #
+ [nmake.common]
++  IMAGE_ENTRY_POINT=DumpBlockDev
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_PROJ_FLAGS = $(C_PROJ_FLAGS) /Zm500
+-  IMAGE_ENTRY_POINT=DumpBlockDev
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
+ 
++
+  
+\ No newline at end of file
 Index: dblk/efidump.c
 ===================================================================
 --- dblk/efidump.c	(revision 64)
@@ -3270,6 +3580,19 @@ Index: date/date.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -71,7 +71,12 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=InitializeDate
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
++
 Index: date/date.c
 ===================================================================
 --- date/date.c	(revision 64)
@@ -3367,6 +3690,18 @@ Index: rm/rm.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -72,7 +72,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=InitializeRM
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: mem/MemCommonPart.c
 ===================================================================
 --- mem/MemCommonPart.c	(revision 64)
@@ -3487,6 +3822,21 @@ Index: mem/mem.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -63,9 +63,13 @@
+ # we will specify some additional DEFINEs on the compile command line.
+ #
+ [nmake.common]
++  IMAGE_ENTRY_POINT=DumpMm
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_PROJ_FLAGS = $(C_PROJ_FLAGS) /Zm500
+-  IMAGE_ENTRY_POINT=DumpMm
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: mem/efidump.c
 ===================================================================
 --- mem/efidump.c	(revision 64)
@@ -3683,6 +4033,18 @@ Index: ls/ls.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -72,7 +72,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=InitializeLS
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: stall/stall.c
 ===================================================================
 --- stall/stall.c	(revision 64)
@@ -3746,6 +4108,18 @@ Index: stall/stall.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -72,7 +72,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=InitializeStall
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: DeviceTree/devicetree.c
 ===================================================================
 --- DeviceTree/devicetree.c	(revision 64)
@@ -3818,6 +4192,18 @@ Index: DeviceTree/devicetree.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -72,7 +72,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=DevicetreeMain
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: TelnetMgmt/TelnetMgmt.c
 ===================================================================
 --- TelnetMgmt/TelnetMgmt.c	(revision 64)
@@ -3900,6 +4286,18 @@ Index: TelnetMgmt/TelnetMgmt.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -55,6 +55,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=InitializeTelnetMgmt
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
++
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: shellenv/if.c
 ===================================================================
 --- shellenv/if.c	(revision 64)
@@ -4637,6 +5035,18 @@ Index: reset/reset.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -72,7 +72,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=InitializeReset
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: touch/touch.c
 ===================================================================
 --- touch/touch.c	(revision 64)
@@ -4701,6 +5111,18 @@ Index: touch/touch.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -70,6 +70,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=InitializeTouch
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
++
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: Shell.inf
 ===================================================================
 --- Shell.inf	(revision 64)
@@ -5032,13 +5454,32 @@ Index: Shell.inf
    $(DEST_DIR)
  
  [libraries.common]
-@@ -229,4 +239,4 @@
+@@ -216,17 +226,18 @@
+ # we will specify some additional DEFINEs on the compile command line.
+ #
+ [nmake.common]
++  IMAGE_ENTRY_POINT=InitializeShell
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_PROJ_FLAGS = $(C_PROJ_FLAGS) /Zm500
+-  IMAGE_ENTRY_POINT=InitializeShell
+-  C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_MONOSHELL
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
++  C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_MONOSHELL
  
- 
- 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_MONOSHELL
++
+ [nmake.ebc]
+   EBC_C_STD_FLAGS = $(EBC_C_STD_FLAGS) /DEFI_MONOSHELL
+   EBC_C_STD_FLAGS = $(EBC_C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   EBC_C_STD_FLAGS = $(EBC_C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+-
+-
+-
 - 
 \ No newline at end of file
-+ 
 Index: IfConfig/IfConfig.inf
 ===================================================================
 --- IfConfig/IfConfig.inf	(revision 64)
@@ -5052,7 +5493,7 @@ Index: IfConfig/IfConfig.inf
    IfConfigStrings.uni
    IfConfig.c
    IfConfig.h
-@@ -33,25 +33,24 @@
+@@ -33,30 +33,32 @@
    ShellNetHelper.h
    
  [includes.common]
@@ -5089,7 +5530,17 @@ Index: IfConfig/IfConfig.inf
 -  EfiDriverLib
  
  [nmake.common]
-   C_PROJ_FLAGS = $(C_PROJ_FLAGS)
+-  C_PROJ_FLAGS = $(C_PROJ_FLAGS)
+   IMAGE_ENTRY_POINT=IfConfig
+-  C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
++  C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: IfConfig/ShellNetHelper.h
 ===================================================================
 --- IfConfig/ShellNetHelper.h	(revision 64)
@@ -5471,6 +5922,24 @@ Index: edit/edit.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -70,11 +70,13 @@
+ # we will specify some additional DEFINEs on the compile command line.
+ #
+ [nmake.common]
++  IMAGE_ENTRY_POINT=InitializeEFIEditor
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_PROJ_FLAGS = $(C_PROJ_FLAGS) /Zm500
+-  IMAGE_ENTRY_POINT=InitializeEFIEditor
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
+-
+- 
+\ No newline at end of file
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: edit/libMenuBar.c
 ===================================================================
 --- edit/libMenuBar.c	(revision 64)
@@ -5852,6 +6321,22 @@ Index: SmbiosView/LibSmbiosView.c
  
    if (mSmbiosTable == NULL) {
      PrintToken (STRING_TOKEN (STR_SMBIOSVIEW_LIBSMBIOSVIEW_CANNOT_GET_TABLE), HiiHandle);
+@@ -110,13 +110,13 @@
+ 
+ VOID
+ LibSmbiosGetStructHead (
+-  SMBIOS_STRUCTURE_POINTER *pHead
++  SMBIOS_STRUCTURE_POINTER **pHead
+   )
+ {
+   //
+   // return SMBIOS structure table address
+   //
+-  pHead = mSmbiosStruct;
++  *pHead = mSmbiosStruct;
+ }
+ 
+ EFI_STATUS
 Index: SmbiosView/Smbiosview.inf
 ===================================================================
 --- SmbiosView/Smbiosview.inf	(revision 64)
@@ -5898,6 +6383,19 @@ Index: SmbiosView/Smbiosview.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -70,7 +70,12 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=InitializeSmbiosViewApplication
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   L_PROJ_FLAGS=/align:4096
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
++
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: SmbiosView/QueryTable.h
 ===================================================================
 --- SmbiosView/QueryTable.h	(revision 64)
@@ -5911,6 +6409,15 @@ Index: SmbiosView/LibSmbiosView.h
 ===================================================================
 --- SmbiosView/LibSmbiosView.h	(revision 64)
 +++ SmbiosView/LibSmbiosView.h	(working copy)
+@@ -66,7 +66,7 @@
+ 
+ VOID
+ LibSmbiosGetStructHead (
+-  SMBIOS_STRUCTURE_POINTER *pHead
++  SMBIOS_STRUCTURE_POINTER **pHead
+   );
+ 
+ EFI_STATUS
 @@ -128,3 +128,4 @@
    );
  
@@ -5996,6 +6503,24 @@ Index: guid/guid.inf
  [libraries.common]
    EfiShellLib
    EdkProtocolLib
+@@ -63,8 +63,15 @@
+   EdkGuidLib
+   EdkFrameworkGuidLib
+   EfiGuidLib
++
+ [nmake.common]
+   IMAGE_ENTRY_POINT=GuidMain
+-  C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
++  C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
++
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
++ 
+\ No newline at end of file
 Index: guid/guid.c
 ===================================================================
 --- guid/guid.c	(revision 64)
@@ -6078,6 +6603,18 @@ Index: LoadPciRom/LoadPciRom.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -72,7 +72,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=InitializeLoadPciRom
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: LoadPciRom/LoadPciRom.c
 ===================================================================
 --- LoadPciRom/LoadPciRom.c	(revision 64)
@@ -6181,6 +6718,18 @@ Index: ver/Ver.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -82,7 +82,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=InitializeVer
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: ver/Ebc/verEbc.c
 ===================================================================
 --- ver/Ebc/verEbc.c	(revision 64)
@@ -6257,6 +6806,24 @@ Index: dmpstore/dmpstore.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -61,11 +61,14 @@
+ # we will specify some additional DEFINEs on the compile command line.
+ #
+ [nmake.common]
++  IMAGE_ENTRY_POINT=InitializeDumpStore
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_PROJ_FLAGS = $(C_PROJ_FLAGS) /Zm500
+-  IMAGE_ENTRY_POINT=InitializeDumpStore
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
+-
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
+  
+\ No newline at end of file
 Index: dmpstore/dmpstore.c
 ===================================================================
 --- dmpstore/dmpstore.c	(revision 64)
@@ -6341,6 +6908,25 @@ Index: comp/comp.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -61,11 +61,16 @@
+ # we will specify some additional DEFINEs on the compile command line.
+ #
+ [nmake.common]
++  IMAGE_ENTRY_POINT=InitializeComp
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_PROJ_FLAGS = $(C_PROJ_FLAGS) /Zm500
+-  IMAGE_ENTRY_POINT=InitializeComp
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
+ 
++
+  
+\ No newline at end of file
 Index: IpConfig/IpConfig.c
 ===================================================================
 --- IpConfig/IpConfig.c	(revision 64)
@@ -6415,6 +7001,20 @@ Index: IpConfig/IpConfig.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -56,9 +56,12 @@
+ 
+ 
+ [nmake.common]
+-  C_PROJ_FLAGS = $(C_PROJ_FLAGS) /Zm500
+   IMAGE_ENTRY_POINT=InitializeIpConfig
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: sermode/sermode.c
 ===================================================================
 --- sermode/sermode.c	(revision 64)
@@ -6505,6 +7105,18 @@ Index: sermode/sermode.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -72,7 +72,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=InitializeSerialMode
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: tzone/tzone.c
 ===================================================================
 --- tzone/tzone.c	(revision 64)
@@ -6575,6 +7187,24 @@ Index: tzone/timezone.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -62,11 +62,13 @@
+ # we will specify some additional DEFINEs on the compile command line.
+ #
+ [nmake.common]
++  IMAGE_ENTRY_POINT=InitializeTZone
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_PROJ_FLAGS = $(C_PROJ_FLAGS) /Zm500
+-  IMAGE_ENTRY_POINT=InitializeTZone
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
+-
+- 
+\ No newline at end of file
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: tzone/tzone.h
 ===================================================================
 --- tzone/tzone.h	(revision 64)
@@ -6656,6 +7286,18 @@ Index: vol/Vol.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -72,7 +72,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=InitializeVol
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: cp/cp.c
 ===================================================================
 --- cp/cp.c	(revision 64)
@@ -6764,6 +7406,19 @@ Index: cp/cp.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -72,7 +72,12 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=InitializeCP
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
++
 Index: Library/EfiPart.h
 ===================================================================
 --- Library/EfiPart.h	(revision 64)
@@ -6920,49 +7575,6 @@ Index: Library/FileIO.c
    SrcArg  = NULL;
    DstArg  = NULL;
    InitializeListHead (&SrcList);
-Index: Library/Aarch64/efilibplat.h
-===================================================================
---- Library/Aarch64/efilibplat.h	(revision 0)
-+++ Library/Aarch64/efilibplat.h	(revision 0)
-@@ -0,0 +1,38 @@
-+/*++
-+
-+Copyright (c) 2005, Intel Corporation
-+All rights reserved. This program and the accompanying materials
-+are licensed and made available under the terms and conditions of the BSD License
-+which accompanies this distribution. The full text of the license may be found at
-+http://opensource.org/licenses/bsd-license.php
-+
-+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-+
-+Module Name:
-+
-+    efilibplat.h
-+
-+Abstract:
-+
-+    EFI to compile bindings
-+
-+
-+
-+Revision History
-+
-+--*/
-+
-+#ifndef _EFI_LIB_PLAT_H
-+#define _EFI_LIB_PLAT_H
-+
-+VOID
-+InitializeLibPlatform (
-+  IN EFI_HANDLE           ImageHandle,
-+  IN EFI_SYSTEM_TABLE     *SystemTable
-+  );
-+
-+#define MIN_ALIGNMENT_SIZE  8
-+
-+#endif
-+
 Index: Library/Ebc/EfiLibPlat.h
 ===================================================================
 --- Library/Ebc/EfiLibPlat.h	(revision 64)
@@ -7339,50 +7951,6 @@ Index: Library/IPF/libsalpal.h
 -#endif
 \ No newline at end of file
 +#endif
-Index: Library/Arm/efilibplat.h
-===================================================================
---- Library/Arm/efilibplat.h	(revision 0)
-+++ Library/Arm/efilibplat.h	(revision 0)
-@@ -0,0 +1,39 @@
-+/*++
-+
-+Copyright (c) 2005, Intel Corporation                                                         
-+All rights reserved. This program and the accompanying materials                          
-+are licensed and made available under the terms and conditions of the BSD License         
-+which accompanies this distribution. The full text of the license may be found at         
-+http://opensource.org/licenses/bsd-license.php                                            
-+                                                                                          
-+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-+
-+Module Name:
-+
-+    efilibplat.h
-+
-+Abstract:
-+
-+    EFI to compile bindings
-+
-+
-+
-+
-+Revision History
-+
-+--*/
-+#ifndef _EFI_LIB_PLAT_H_
-+#define _EFI_LIB_PLAT_H_
-+
-+VOID
-+InitializeLibPlatform (
-+  IN EFI_HANDLE           ImageHandle,
-+  IN EFI_SYSTEM_TABLE     *SystemTable
-+  );
-+
-+#define MIN_ALIGNMENT_SIZE  4
-+
-+#endif
-+
-+
 Index: Library/ConsistMapping.c
 ===================================================================
 --- Library/ConsistMapping.c	(revision 64)
@@ -7618,16 +8186,12 @@ Index: Library/EfiShellLib.inf
  
  [libraries.common]
    EdkFrameworkProtocolLib
-@@ -81,4 +89,11 @@
+@@ -81,4 +89,7 @@
    EfiGuidLib
    EdkGuidLib
  
 +[libraries.ARM]
-+  CompilerIntrinsicsLib
-+
-+[libraries.AARCH64]
-+  CompilerIntrinsicsLib
-+
++  CompilerIntrinsicsLib, CompilerIntrinsicsLib
 +
  [nmake.common]
 Index: Library/IA32/efilibplat.h
@@ -8278,13 +8842,31 @@ Index: ShellFull.inf
    $(DEST_DIR)
  
  [libraries.common]
-@@ -353,4 +363,4 @@
+@@ -341,16 +351,18 @@
+ # we will specify some additional DEFINEs on the compile command line.
+ #
+ [nmake.common]
++  IMAGE_ENTRY_POINT=InitializeShell
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_PROJ_FLAGS = $(C_PROJ_FLAGS) /Zm500
+-  IMAGE_ENTRY_POINT=InitializeShell
+-  C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_MONOSHELL /DEFI_FULLSHELL
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
++  C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_MONOSHELL /DEFI_FULLSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_MONOSHELL -DEFI_FULLSHELL
++
+ [nmake.ebc]
+   EBC_C_STD_FLAGS = $(EBC_C_STD_FLAGS) /DEFI_MONOSHELL /DEFI_FULLSHELL
+   EBC_C_STD_FLAGS = $(EBC_C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
    EBC_C_STD_FLAGS = $(EBC_C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
- 
- 
+-
+-
 - 
 \ No newline at end of file
-+ 
 Index: inc/shelltypes.h
 ===================================================================
 --- inc/shelltypes.h	(revision 64)
@@ -8361,6 +8943,18 @@ Index: mm/mm.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -72,7 +72,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=DumpIoModify
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: mm/mm.c
 ===================================================================
 --- mm/mm.c	(revision 64)
@@ -8572,6 +9166,18 @@ Index: drvcfg/drvcfg.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -72,7 +72,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=DrvcfgMain
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: drvcfg/drvcfg.c
 ===================================================================
 --- drvcfg/drvcfg.c	(revision 64)
@@ -8644,6 +9250,18 @@ Index: openinfo/openinfo.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -73,7 +73,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=OpeninfoMain
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
 Index: openinfo/openinfo.c
 ===================================================================
 --- openinfo/openinfo.c	(revision 64)
@@ -8755,3 +9373,15 @@ Index: drivers/drivers.inf
  
  [libraries.common]  
    EfiShellLib
+@@ -73,7 +73,11 @@
+ 
+ [nmake.common]
+   IMAGE_ENTRY_POINT=DriversMain
++
++[nmake.IA32, nmake.EBC, nmake.X64, nmake.IPF]
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_ARRAY_NAME=$(BASE_NAME)Strings 
+   C_STD_FLAGS = $(C_STD_FLAGS) /DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\"
+   C_STD_FLAGS = $(C_STD_FLAGS) /DEFI_BOOTSHELL
+ 
++[nmake.ARM, nmake.AARCH64]
++  C_STD_FLAGS = $(C_STD_FLAGS) -DEFI_BOOTSHELL
