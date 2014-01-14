@@ -89,11 +89,12 @@ GetAttrType (
   @param[in]  Guid           The guid of the variables to be loaded.
   @param[out] Found          TRUE when at least one variable was loaded and set.
 
-  @retval EFI_VOLUME_CORRUPTED  The file is in bad format.
-  @retval EFI_OUT_OF_RESOURCES  There is not enough memory to perform the operation.
-  @retval EFI_SUCCESS           Successfully load and set the variables.
+  @retval SHELL_DEVICE_ERROR      Cannot access the file.
+  @retval SHELL_VOLUME_CORRUPTED  The file is in bad format.
+  @retval SHELL_OUT_OF_RESOURCES  There is not enough memory to perform the operation.
+  @retval SHELL_SUCCESS           Successfully load and set the variables.
 **/
-EFI_STATUS
+SHELL_STATUS
 LoadVariablesFromFile (
   IN SHELL_FILE_HANDLE FileHandle,
   IN CONST CHAR16      *Name,
@@ -102,6 +103,7 @@ LoadVariablesFromFile (
   )
 {
   EFI_STATUS           Status;
+  SHELL_STATUS         ShellStatus;
   UINT32               NameSize;
   UINT32               DataSize;
   UINTN                BufferSize;
@@ -117,9 +119,11 @@ LoadVariablesFromFile (
 
   Status = ShellGetFileSize (FileHandle, &FileSize);
   if (EFI_ERROR (Status)) {
-    return Status;
+    return SHELL_DEVICE_ERROR;
   }
-
+  
+  ShellStatus = SHELL_SUCCESS;
+  
   InitializeListHead (&List);
   
   Position = 0;
@@ -130,7 +134,7 @@ LoadVariablesFromFile (
     BufferSize = sizeof (NameSize);
     Status = ShellReadFile (FileHandle, &BufferSize, &NameSize);
     if (EFI_ERROR (Status) || (BufferSize != sizeof (NameSize))) {
-      Status = EFI_VOLUME_CORRUPTED;
+      ShellStatus = SHELL_VOLUME_CORRUPTED;
       break;
     }
 
@@ -140,7 +144,7 @@ LoadVariablesFromFile (
     BufferSize = sizeof (DataSize);
     Status = ShellReadFile (FileHandle, &BufferSize, &DataSize);
     if (EFI_ERROR (Status) || (BufferSize != sizeof (DataSize))) {
-      Status = EFI_VOLUME_CORRUPTED;
+      ShellStatus = SHELL_VOLUME_CORRUPTED;
       break;
     }
 
@@ -151,13 +155,13 @@ LoadVariablesFromFile (
     BufferSize    = sizeof (NameSize) + sizeof (DataSize) + RemainingSize;
     Buffer        = AllocatePool (BufferSize);
     if (Buffer == NULL) {
-      Status = EFI_OUT_OF_RESOURCES;
+      ShellStatus = SHELL_OUT_OF_RESOURCES;
       break;
     }
     BufferSize    = RemainingSize;
     Status = ShellReadFile (FileHandle, &BufferSize, (UINT32 *) Buffer + 2);
     if (EFI_ERROR (Status) || (BufferSize != RemainingSize)) {
-      Status = EFI_VOLUME_CORRUPTED;
+      ShellStatus = SHELL_VOLUME_CORRUPTED;
       FreePool (Buffer);
       break;
     }
@@ -175,7 +179,7 @@ LoadVariablesFromFile (
            );
     if (Crc32 != * (UINT32 *) (Buffer + BufferSize)) {
       FreePool (Buffer);
-      Status = EFI_VOLUME_CORRUPTED;
+      ShellStatus = SHELL_VOLUME_CORRUPTED;
       break;
     }
 
@@ -184,7 +188,7 @@ LoadVariablesFromFile (
     Variable = AllocateZeroPool (sizeof (*Variable) + NameSize + DataSize);
     if (Variable == NULL) {
       FreePool (Buffer);
-      Status = EFI_OUT_OF_RESOURCES;
+      ShellStatus = SHELL_OUT_OF_RESOURCES;
       break;
     }
     Variable->Signature = DMP_STORE_VARIABLE_SIGNATURE;
@@ -200,13 +204,15 @@ LoadVariablesFromFile (
     FreePool (Buffer);
   }
     
-  if ((Position != FileSize) || EFI_ERROR (Status)) {
+  if ((Position != FileSize) || (ShellStatus != SHELL_SUCCESS)) {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_DMPSTORE_LOAD_BAD_FILE), gShellDebug1HiiHandle);
-    Status = EFI_VOLUME_CORRUPTED;
+    if (Position != FileSize) {
+      ShellStatus = SHELL_VOLUME_CORRUPTED;
+    }
   }
   
   for ( Link = GetFirstNode (&List)
-      ; !IsNull (&List, Link) && !EFI_ERROR (Status)
+      ; !IsNull (&List, Link) && (ShellStatus == SHELL_SUCCESS)
       ; Link = GetNextNode (&List, Link)
       ) {
     Variable = CR (Link, DMP_STORE_VARIABLE, Link, DMP_STORE_VARIABLE_SIGNATURE);
@@ -231,10 +237,6 @@ LoadVariablesFromFile (
                       );
       if (EFI_ERROR (Status)) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_DMPSTORE_LOAD_GEN_FAIL), gShellDebug1HiiHandle, Variable->Name, Status);
-        //
-        // continue set variable upon failure
-        //
-        Status = EFI_SUCCESS;
       }
     }
   }
@@ -245,7 +247,7 @@ LoadVariablesFromFile (
     FreePool (Variable);
   }
 
-  return Status;
+  return ShellStatus;
 }
 
 /**
@@ -457,7 +459,7 @@ CascadeProcessVariables (
       //
       // Last error check then print this variable out.
       //
-      if (!EFI_ERROR(Status) && DataBuffer != NULL) {
+      if (!EFI_ERROR(Status) && (DataBuffer != NULL) && (FoundVarName != NULL)) {
         RetString = GetAttrType(Atts);
         ShellPrintHiiEx(
           -1,
@@ -546,7 +548,7 @@ ProcessVariables (
   ZeroMem (&FoundVarGuid, sizeof(EFI_GUID));
 
   if (Type == DmpStoreLoad) {
-    ShellStatus = (SHELL_STATUS) LoadVariablesFromFile (FileHandle, Name, Guid, &Found);
+    ShellStatus = LoadVariablesFromFile (FileHandle, Name, Guid, &Found);
   } else {
     ShellStatus = CascadeProcessVariables(Name, Guid, Type, FileHandle, NULL, FoundVarGuid, &Found);
   }
