@@ -1,7 +1,7 @@
 /** @file
   Definition for Device Path library.
 
-Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -67,6 +67,11 @@ typedef struct {
   UINT8                SubType;
   DEVICE_PATH_TO_TEXT  Function;
 } DEVICE_PATH_TO_TEXT_TABLE;
+
+typedef struct {
+  UINT8                Type;
+  CHAR16               *Text;
+} DEVICE_PATH_TO_TEXT_GENERIC_TABLE;
 
 typedef struct {
   CHAR16                    *DevicePathNodeText;

@@ -1,7 +1,7 @@
 /** @file
   DevicePathFromText protocol as defined in the UEFI 2.0 specification.
 
-Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -535,6 +535,79 @@ StrToAscii (
 }
 
 /**
+  Converts a generic text device path node to device path structure.
+
+  @param Type            The type of the device path node.
+  @param TextDeviceNode  The input text device path node.
+
+  @return A pointer to device path structure.
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextGenericPath (
+  IN UINT8  Type,
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  EFI_DEVICE_PATH_PROTOCOL *Node;
+  CHAR16                   *SubtypeStr;
+  CHAR16                   *DataStr;
+  UINTN                    DataLength;
+
+  SubtypeStr = GetNextParamStr (&TextDeviceNode);
+  DataStr    = GetNextParamStr (&TextDeviceNode);
+
+  if (DataStr == NULL) {
+    DataLength = 0;
+  } else {
+    DataLength = StrLen (DataStr) / 2;
+  }
+  Node = CreateDeviceNode (
+           Type,
+           (UINT8) Strtoi (SubtypeStr),
+           (UINT16) (sizeof (EFI_DEVICE_PATH_PROTOCOL) + DataLength)
+           );
+
+  StrToBuf ((UINT8 *) (Node + 1), DataLength, DataStr);
+  return Node;
+}
+
+/**
+  Converts a generic text device path node to device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextPath (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  CHAR16                   *TypeStr;
+
+  TypeStr    = GetNextParamStr (&TextDeviceNode);
+
+  return DevPathFromTextGenericPath ((UINT8) Strtoi (TypeStr), TextDeviceNode);
+}
+
+/**
+  Converts a generic hardware text device path node to Hardware device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to Hardware device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextHardwarePath (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  return DevPathFromTextGenericPath (HARDWARE_DEVICE_PATH, TextDeviceNode);
+}
+
+/**
   Converts a text device path node to Hardware PCI device path structure.
 
   @param TextDeviceNode  The input Text device path node.
@@ -716,6 +789,22 @@ DevPathFromTextCtrl (
   Controller->ControllerNumber = (UINT32) Strtoi (ControllerStr);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) Controller;
+}
+
+/**
+  Converts a generic ACPI text device path node to ACPI device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to ACPI device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextAcpiPath (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  return DevPathFromTextGenericPath (ACPI_DEVICE_PATH, TextDeviceNode);
 }
 
 /**
@@ -1043,6 +1132,22 @@ DevPathFromTextAcpiAdr (
   }
 
   return (EFI_DEVICE_PATH_PROTOCOL *) AcpiAdr;
+}
+
+/**
+  Converts a generic messaging text device path node to messaging device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to messaging device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextMsg (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  return DevPathFromTextGenericPath (MESSAGING_DEVICE_PATH, TextDeviceNode);
 }
 
 /**
@@ -2521,6 +2626,22 @@ DevPathFromTextVlan (
 }
 
 /**
+  Converts a media text device path node to media device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to media device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextMediaPath (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  return DevPathFromTextGenericPath (MEDIA_DEVICE_PATH, TextDeviceNode);
+}
+
+/**
   Converts a text device path node to HD device path structure.
 
   @param TextDeviceNode  The input Text device path node.
@@ -2775,6 +2896,23 @@ DevPathFromTextRelativeOffsetRange (
   return (EFI_DEVICE_PATH_PROTOCOL *) Offset;
 }
 
+
+/**
+  Converts a BBS text device path node to BBS device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to BBS device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextBbsPath (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  return DevPathFromTextGenericPath (BBS_DEVICE_PATH, TextDeviceNode);
+}
+
 /**
   Converts a text device path node to BIOS Boot Specification device path structure.
 
@@ -2862,11 +3000,16 @@ DevPathFromTextSata (
 }
 
 GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE mUefiDevicePathLibDevPathFromTextTable[] = {
+  {L"Path",                    DevPathFromTextPath                    },
+
+  {L"HardwarePath",            DevPathFromTextHardwarePath            },
   {L"Pci",                     DevPathFromTextPci                     },
   {L"PcCard",                  DevPathFromTextPcCard                  },
   {L"MemoryMapped",            DevPathFromTextMemoryMapped            },
   {L"VenHw",                   DevPathFromTextVenHw                   },
   {L"Ctrl",                    DevPathFromTextCtrl                    },
+
+  {L"AcpiPath",                DevPathFromTextAcpiPath                },
   {L"Acpi",                    DevPathFromTextAcpi                    },
   {L"PciRoot",                 DevPathFromTextPciRoot                 },
   {L"PcieRoot",                DevPathFromTextPcieRoot                },
@@ -2877,6 +3020,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE mUefiDevicePathLibDevP
   {L"AcpiEx",                  DevPathFromTextAcpiEx                  },
   {L"AcpiExp",                 DevPathFromTextAcpiExp                 },
   {L"AcpiAdr",                 DevPathFromTextAcpiAdr                 },
+
+  {L"Msg",                     DevPathFromTextMsg                     },
   {L"Ata",                     DevPathFromTextAta                     },
   {L"Scsi",                    DevPathFromTextScsi                    },
   {L"Fibre",                   DevPathFromTextFibre                   },
@@ -2918,6 +3063,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE mUefiDevicePathLibDevP
   {L"Unit",                    DevPathFromTextUnit                    },
   {L"iSCSI",                   DevPathFromTextiSCSI                   },
   {L"Vlan",                    DevPathFromTextVlan                    },
+
+  {L"MediaPath",               DevPathFromTextMediaPath               },
   {L"HD",                      DevPathFromTextHD                      },
   {L"CDROM",                   DevPathFromTextCDROM                   },
   {L"VenMedia",                DevPathFromTextVenMedia                },
@@ -2925,6 +3072,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE mUefiDevicePathLibDevP
   {L"Fv",                      DevPathFromTextFv                      },
   {L"FvFile",                  DevPathFromTextFvFile                  },
   {L"Offset",                  DevPathFromTextRelativeOffsetRange     },
+
+  {L"BbsPath",                 DevPathFromTextBbsPath                 },
   {L"BBS",                     DevPathFromTextBBS                     },
   {L"Sata",                    DevPathFromTextSata                    },
   {NULL, NULL}
