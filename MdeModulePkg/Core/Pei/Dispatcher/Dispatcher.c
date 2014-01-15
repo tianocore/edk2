@@ -997,6 +997,11 @@ PeiDispatcher (
                 PeiCore (SecCoreData, NULL, Private);
               } else {
                 //
+                // Migrate the PEI Services Table pointer from temporary RAM to permanent RAM.
+                //
+                MigratePeiServicesTablePointer ();
+                
+                //
                 // Heap Offset
                 //
                 BaseOfNewHeap = TopOfNewStack;
