@@ -1,4 +1,4 @@
-#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------
 #
 # Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 #
@@ -14,21 +14,19 @@
 
   .text
   .align 2
+  GCC_ASM_EXPORT(__aeabi_memcpy)
   GCC_ASM_EXPORT(memcpy)
 
+ASM_PFX(__aeabi_memcpy):
 ASM_PFX(memcpy):
-  stmfd  sp!, {r7, lr}
-  mov  ip, #0
-  add  r7, sp, #0
-  mov  lr, r0
-  b  L4
+  cmp     r2, #0
+  bxeq    lr
+  push    {lr}
+  mov     lr, r0
 L5:
   ldrb  r3, [r1], #1  @ zero_extendqisi2
-  add  ip, ip, #1
-  and  r3, r3, #255
   strb  r3, [lr], #1
-L4:
-  cmp  ip, r2
+  subs r2, r2, #1
   bne  L5
-  ldmfd  sp!, {r7, pc}
+  pop  {pc}
 

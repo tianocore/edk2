@@ -1,4 +1,4 @@
-//------------------------------------------------------------------------------ 
+//------------------------------------------------------------------------------
 //
 // Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 //
@@ -27,14 +27,15 @@
 ; );
 ;
 __aeabi_memcpy
-    CMP     r2, #0
-    BXEQ    r14
-loop
-    LDRB    r3, [r1], #1
-    STRB    r3, [r0], #1
-    SUBS    r2, r2, #1
-    BXEQ    r14
-    B       loop
-        
-    END
+  cmp     r2, #0
+  bxeq    lr
+  push    {lr}
+  mov     lr, r0
+L5
+  ldrb  r3, [r1], #1
+  strb  r3, [lr], #1
+  subs r2, r2, #1
+  bne  L5
+  pop  {pc}
 
+  END
