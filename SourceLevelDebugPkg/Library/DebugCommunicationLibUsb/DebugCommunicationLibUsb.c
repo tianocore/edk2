@@ -1,7 +1,7 @@
 /** @file
   Debug Port Library implementation based on usb debug port.
 
-  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -58,7 +58,7 @@ typedef struct _USB_DEBUG_PORT_DESCRIPTOR {
   UINT8          DebugOutEndpoint;
 }USB_DEBUG_PORT_DESCRIPTOR;
 
-USB_DEVICE_REQUEST mGetDebugDescriptor = {
+USB_DEVICE_REQUEST mDebugCommunicationLibUsbGetDebugDescriptor = {
   0x80,
   USB_REQ_GET_DESCRIPTOR,
   (UINT16)(0x0A << 8),
@@ -66,7 +66,7 @@ USB_DEVICE_REQUEST mGetDebugDescriptor = {
   sizeof(USB_DEBUG_PORT_DESCRIPTOR)
   };
 
-USB_DEVICE_REQUEST mSetDebugFeature = {
+USB_DEVICE_REQUEST mDebugCommunicationLibUsbSetDebugFeature = {
   0x0,
   USB_REQ_SET_FEATURE,
   (UINT16)(0x06),
@@ -74,7 +74,7 @@ USB_DEVICE_REQUEST mSetDebugFeature = {
   0x0
   };
 
-USB_DEVICE_REQUEST mSetDebugAddress = {
+USB_DEVICE_REQUEST mDebugCommunicationLibUsbSetDebugAddress = {
   0x0,
   USB_REQ_SET_ADDRESS,
   (UINT16)(0x7F),
@@ -159,7 +159,7 @@ typedef struct _USB_DEBUG_PORT_HANDLE{
 //
 // The global variable which can be used after memory is ready.
 //
-USB_DEBUG_PORT_HANDLE     mUsbDebugPortHandle;
+USB_DEBUG_PORT_HANDLE     mDebugCommunicationLibUsbDebugPortHandle;
 
 /**
   Check if the timer is timeout.
@@ -751,7 +751,7 @@ InitializeUsbDebugHardware (
     //
     // set usb debug device address as 0x7F.
     //
-    Status = UsbDebugPortControlTransfer (UsbDebugPortRegister, &mSetDebugAddress, 0x0, 0x0, NULL, NULL);
+    Status = UsbDebugPortControlTransfer (UsbDebugPortRegister, &mDebugCommunicationLibUsbSetDebugAddress, 0x0, 0x0, NULL, NULL);
     if (RETURN_ERROR(Status)) {
       //
       // The device can not work well.
@@ -768,7 +768,7 @@ InitializeUsbDebugHardware (
     //
     // Get debug descriptor.
     //
-    Status = UsbDebugPortControlTransfer (UsbDebugPortRegister, &mGetDebugDescriptor, 0x7F, 0x0, (UINT8*)&UsbDebugPortDescriptor, &Length);
+    Status = UsbDebugPortControlTransfer (UsbDebugPortRegister, &mDebugCommunicationLibUsbGetDebugDescriptor, 0x7F, 0x0, (UINT8*)&UsbDebugPortDescriptor, &Length);
     if (RETURN_ERROR(Status)) {
       //
       // The device is not a usb debug device.
@@ -785,7 +785,7 @@ InitializeUsbDebugHardware (
     //
     // enable the usb debug feature.
     //
-    Status = UsbDebugPortControlTransfer (UsbDebugPortRegister, &mSetDebugFeature, 0x7F, 0x0, NULL, NULL);
+    Status = UsbDebugPortControlTransfer (UsbDebugPortRegister, &mDebugCommunicationLibUsbSetDebugFeature, 0x7F, 0x0, NULL, NULL);
     if (RETURN_ERROR(Status)) {
       //
       // The device can not work well.
@@ -856,7 +856,7 @@ DebugPortReadBuffer (
   // Use global variable to store handle value.
   //
   if (Handle == NULL) {
-    UsbDebugPortHandle = &mUsbDebugPortHandle;
+    UsbDebugPortHandle = &mDebugCommunicationLibUsbDebugPortHandle;
   } else {
     UsbDebugPortHandle = (USB_DEBUG_PORT_HANDLE *)Handle;
   }
@@ -1028,7 +1028,7 @@ DebugPortWriteBuffer (
   // Use global variable to store handle value.
   //
   if (Handle == NULL) {
-    UsbDebugPortHandle = &mUsbDebugPortHandle;
+    UsbDebugPortHandle = &mDebugCommunicationLibUsbDebugPortHandle;
   } else {
     UsbDebugPortHandle = (USB_DEBUG_PORT_HANDLE *)Handle;
   }
@@ -1100,7 +1100,7 @@ DebugPortPollBuffer (
   // Use global variable to store handle value.
   //
   if (Handle == NULL) {
-    UsbDebugPortHandle = &mUsbDebugPortHandle;
+    UsbDebugPortHandle = &mDebugCommunicationLibUsbDebugPortHandle;
   } else {
     UsbDebugPortHandle = (USB_DEBUG_PORT_HANDLE *)Handle;
   }
@@ -1210,7 +1210,8 @@ DebugPortInitialize (
   USB_DEBUG_PORT_HANDLE     *UsbDebugPortHandle;
   UINT64                    TimerStartValue;
   UINT64                    TimerEndValue;
-  //
+
+  //
   // Validate the PCD PcdDebugPortHandleBufferSize value 
   //
   ASSERT (PcdGet16 (PcdDebugPortHandleBufferSize) == sizeof (USB_DEBUG_PORT_HANDLE));
@@ -1284,9 +1285,9 @@ Exit:
   if (Function != NULL) {
     Function (Context, &Handle);
   } else {
-    CopyMem(&mUsbDebugPortHandle, &Handle, sizeof (USB_DEBUG_PORT_HANDLE));
+    CopyMem(&mDebugCommunicationLibUsbDebugPortHandle, &Handle, sizeof (USB_DEBUG_PORT_HANDLE));
   }
 
-  return (DEBUG_PORT_HANDLE)(UINTN)&mUsbDebugPortHandle;
+  return (DEBUG_PORT_HANDLE)(UINTN)&mDebugCommunicationLibUsbDebugPortHandle;
 }
 
