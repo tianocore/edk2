@@ -4,7 +4,7 @@
   read/write debug packet to communication with HOST based on transfer
   protocol.
 
-  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -19,7 +19,7 @@
 #include "Ia32/DebugException.h"
 
 CHAR8 mErrorMsgVersionAlert[]       = "\rThe SourceLevelDebugPkg you are using requires a newer version of the Intel(R) UDK Debugger Tool.\r\n";
-CHAR8 mErrorMsgSendInitPacket[]     = "\rSend INIT break packet and try to connect the HOST (Intel(R) UDK Debugger Tool v1.3.1) ...\r\n";
+CHAR8 mErrorMsgSendInitPacket[]     = "\rSend INIT break packet and try to connect the HOST (Intel(R) UDK Debugger Tool v1.4) ...\r\n";
 CHAR8 mErrorMsgConnectOK[]          = "HOST connection is successful!\r\n";
 CHAR8 mErrorMsgConnectFail[]        = "HOST connection is failed!\r\n";
 CHAR8 mWarningMsgIngoreBreakpoint[] = "Ignore break point in SMM for SMI issued during DXE debugging!\r\n";
