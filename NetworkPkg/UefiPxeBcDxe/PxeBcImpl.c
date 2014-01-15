@@ -1,7 +1,7 @@
 /** @file
   This implementation of EFI_PXE_BASE_CODE_PROTOCOL and EFI_LOAD_FILE_PROTOCOL.
 
-  Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -345,6 +345,10 @@ EfiPxeBcStop (
   Private->BootFileSize = 0;
   Private->SolicitTimes = 0;
   Private->ElapsedTime  = 0;
+  ZeroMem (&Private->StationIp, sizeof (EFI_IP_ADDRESS));
+  ZeroMem (&Private->SubnetMask, sizeof (EFI_IP_ADDRESS));
+  ZeroMem (&Private->GatewayIp, sizeof (EFI_IP_ADDRESS));
+  ZeroMem (&Private->ServerIp, sizeof (EFI_IP_ADDRESS));
 
   //
   // Reset the mode data.
