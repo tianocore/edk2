@@ -40,6 +40,11 @@
 
   #DebugAgentTimerLib|ArmPlatformPkg/ArmVExpressPkg/Library/DebugAgentTimerLib/DebugAgentTimerLib.inf
 
+
+  # Virtio Support
+  VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
+  VirtioMmioDeviceLib|OvmfPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
+
 [LibraryClasses.common.SEC]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
   ArmPlatformSecLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressSecLibRTSM/ArmVExpressSecLib.inf
@@ -264,6 +269,12 @@
   #
   EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
   ArmPlatformPkg/Drivers/PL180MciDxe/PL180MciDxe.inf
+
+  #
+  # Platform Driver
+  #
+  ArmPlatformPkg/ArmVExpressPkg/ArmFvpDxe/ArmFvpDxe.inf
+  OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
   
   #
   # FAT filesystem + GPT/MBR partitioning
