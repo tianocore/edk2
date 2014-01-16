@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 #  
 #  This program and the accompanying materials                          
 #  are licensed and made available under the terms and conditions of the BSD License         
@@ -328,6 +328,13 @@
   #
 
   #
+  # FileSystem
+  #
+
+  # List of Device Paths that support BootMonFs
+  gArmPlatformTokenSpaceGuid.PcdBootMonFsSupportedDevicePaths|L"VenHw(1F15DA3C-37FF-4070-B471-BB4AF12A724A)"
+
+  #
   # ARM OS Loader
   #
   # Versatile Express machine type (ARM VERSATILE EXPRESS = 2272) required for ARM Linux: 
@@ -342,3 +349,6 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenPcAnsi()"
   gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut|10
 
+[Components.common]
+  # Versatile Express FileSystem
+  ArmPlatformPkg/FileSystem/BootMonFs/BootMonFs.inf
