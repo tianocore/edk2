@@ -3280,7 +3280,9 @@ ShellPromptForResponse (
       //
       gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
       Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-      ASSERT_EFI_ERROR(Status);
+      if (EFI_ERROR(Status)) {
+        break;
+      }
       ShellPrintEx(-1, -1, L"%c", Key.UnicodeChar);
       if (Key.UnicodeChar == L'Q' || Key.UnicodeChar ==L'q') {
         *Resp = ShellPromptResponseQuit;
@@ -3303,7 +3305,9 @@ ShellPromptForResponse (
         }
         gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
         Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-        ASSERT_EFI_ERROR(Status);
+        if (EFI_ERROR(Status)) {
+          break;
+        }
         ShellPrintEx(-1, -1, L"%c", Key.UnicodeChar);
         switch (Key.UnicodeChar) {
           case L'Y':
@@ -3335,7 +3339,9 @@ ShellPromptForResponse (
         }
         gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
         Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-        ASSERT_EFI_ERROR(Status);
+        if (EFI_ERROR(Status)) {
+          break;
+        }
         ShellPrintEx(-1, -1, L"%c", Key.UnicodeChar);
         switch (Key.UnicodeChar) {
           case L'Y':
@@ -3374,7 +3380,9 @@ ShellPromptForResponse (
         gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
         if (Type == ShellPromptResponseTypeEnterContinue) {
           Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-          ASSERT_EFI_ERROR(Status);
+          if (EFI_ERROR(Status)) {
+            break;
+          }
           ShellPrintEx(-1, -1, L"%c", Key.UnicodeChar);
           if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
             *Resp = ShellPromptResponseContinue;
@@ -3404,7 +3412,9 @@ ShellPromptForResponse (
         }
         gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
         Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-        ASSERT_EFI_ERROR(Status);
+        if (EFI_ERROR(Status)) {
+          break;
+        }
         ShellPrintEx(-1, -1, L"%c", Key.UnicodeChar);
         switch (Key.UnicodeChar) {
           case L'Y':
@@ -3429,7 +3439,9 @@ ShellPromptForResponse (
         }
         gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
         Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-        ASSERT_EFI_ERROR(Status);
+        if (EFI_ERROR(Status)) {
+          break;
+        }
         ShellPrintEx(-1, -1, L"%c", Key.UnicodeChar);
         if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
           break;
