@@ -105,7 +105,7 @@ typedef union {
   @param[out] HashSize              Holds the returned size of the algorithm's hash.
 
   @retval EFI_SUCCESS           Hash size returned successfully.
-  @retval EFI_INVALID_PARAMETER HashSize is NULL
+  @retval EFI_INVALID_PARAMETER HashSize is NULL or HashAlgorithm is NULL.
   @retval EFI_UNSUPPORTED       The algorithm specified by HashAlgorithm is not supported 
                                 by this driver.
 
@@ -135,7 +135,8 @@ EFI_STATUS
                             array will contain the result of the hash computation.
   
   @retval EFI_SUCCESS           Hash returned successfully.
-  @retval EFI_INVALID_PARAMETER Message or Hash is NULL
+  @retval EFI_INVALID_PARAMETER Message or Hash, HashAlgorithm is NULL or MessageSize is 0.
+                                MessageSize is not an integer multiple of block size.
   @retval EFI_UNSUPPORTED       The algorithm specified by HashAlgorithm is not supported by this
                                  driver. Or, Extend is TRUE, and the algorithm doesn't support extending the hash.
 
