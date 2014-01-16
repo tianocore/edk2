@@ -2,7 +2,7 @@
   Provides interface to shell console logger.
 
   Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -842,7 +842,9 @@ ConsoleLoggerOutputString (
       Status = gBS->WaitForEvent (1, &TxtInEx->WaitForKeyEx, &EventIndex);
       ASSERT_EFI_ERROR (Status);
       Status = TxtInEx->ReadKeyStrokeEx (TxtInEx, &KeyData);
-      ASSERT_EFI_ERROR (Status);
+      if (EFI_ERROR(Status)) {
+        break;
+      }
 
       if ((KeyData.Key.UnicodeChar == L's') && (KeyData.Key.ScanCode == SCAN_NULL) &&
           ((KeyData.KeyState.KeyShiftState == (EFI_SHIFT_STATE_VALID | EFI_LEFT_CONTROL_PRESSED)) ||
