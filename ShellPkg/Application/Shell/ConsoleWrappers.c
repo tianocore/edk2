@@ -2,7 +2,7 @@
   Function definitions for shell simple text in and out on top of file handles.
 
   Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +19,7 @@ typedef struct {
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL  SimpleTextIn;
   SHELL_FILE_HANDLE               FileHandle;
   EFI_HANDLE                      TheHandle;
+  UINT64                          RemainingBytesOfInputFile;
 } SHELL_EFI_SIMPLE_TEXT_INPUT_PROTOCOL;
 
 typedef struct {
@@ -43,19 +44,7 @@ ConInWaitForKey (
   IN  VOID            *Context
   )
 {
-  UINT64 Position;
-  UINT64 Size;
-  //
-  // Someone is waiting on the keystroke event, if there's
-  // a key pending, signal the event
-  //
-  // Context is the pointer to EFI_SIMPLE_TEXT_INPUT_PROTOCOL
-  //
-  ShellInfoObject.NewEfiShellProtocol->GetFilePosition(((SHELL_EFI_SIMPLE_TEXT_INPUT_PROTOCOL *)Context)->FileHandle, &Position);
-  ShellInfoObject.NewEfiShellProtocol->GetFileSize    (((SHELL_EFI_SIMPLE_TEXT_INPUT_PROTOCOL *)Context)->FileHandle, &Size    );
-  if (Position < Size) {
-    gBS->SignalEvent (Event);
-  }
+  gBS->SignalEvent (Event);
 }
 
 /**
@@ -92,10 +81,32 @@ FileBasedSimpleTextInReadKeyStroke(
   )
 {
   UINTN Size;
-  Size = sizeof(CHAR16);
+
+  //
+  // Verify the parameters
+  //
   if (Key == NULL || This == NULL) {
     return (EFI_INVALID_PARAMETER);
   }
+
+  //
+  // Check if we have any characters left in the stream.
+  //
+  if (((SHELL_EFI_SIMPLE_TEXT_INPUT_PROTOCOL *)This)->RemainingBytesOfInputFile == 0) {
+    return (EFI_NOT_READY);
+  }
+
+  Size = sizeof(CHAR16);
+
+  //
+  // Decrement the amount of free space by Size or set to zero (for odd length files)
+  //
+  if (((SHELL_EFI_SIMPLE_TEXT_INPUT_PROTOCOL *)This)->RemainingBytesOfInputFile > Size) {
+    ((SHELL_EFI_SIMPLE_TEXT_INPUT_PROTOCOL *)This)->RemainingBytesOfInputFile -= Size;
+  } else {
+    ((SHELL_EFI_SIMPLE_TEXT_INPUT_PROTOCOL *)This)->RemainingBytesOfInputFile = 0;
+  }
+
   Key->ScanCode = 0;
   return (ShellInfoObject.NewEfiShellProtocol->ReadFile(
     ((SHELL_EFI_SIMPLE_TEXT_INPUT_PROTOCOL *)This)->FileHandle,
@@ -122,6 +133,8 @@ CreateSimpleTextInOnFile(
 {
   SHELL_EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *ProtocolToReturn;
   EFI_STATUS                            Status;
+  UINT64                                CurrentPosition;
+  UINT64                                FileSize;
 
   if (HandleLocation == NULL || FileHandleToUse == NULL) {
     return (NULL);
@@ -131,7 +144,15 @@ CreateSimpleTextInOnFile(
   if (ProtocolToReturn == NULL) {
     return (NULL);
   }
-  ProtocolToReturn->FileHandle                  = FileHandleToUse;
+
+  ShellGetFileSize    (FileHandleToUse, &FileSize);
+  ShellGetFilePosition(FileHandleToUse, &CurrentPosition);
+
+  //
+  // Initialize the protocol members
+  //
+  ProtocolToReturn->RemainingBytesOfInputFile  = FileSize - CurrentPosition;
+  ProtocolToReturn->FileHandle                 = FileHandleToUse;
   ProtocolToReturn->SimpleTextIn.Reset         = FileBasedSimpleTextInReset;
   ProtocolToReturn->SimpleTextIn.ReadKeyStroke = FileBasedSimpleTextInReadKeyStroke;
   
