@@ -105,6 +105,7 @@ PeiServicesTablePointerLibConstructor (
 VOID
 EFIAPI
 MigratePeiServicesTablePointer (
+  VOID
   )
 {
   //

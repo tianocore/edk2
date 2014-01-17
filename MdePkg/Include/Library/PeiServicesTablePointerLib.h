@@ -67,6 +67,7 @@ SetPeiServicesTablePointer (
 VOID
 EFIAPI
 MigratePeiServicesTablePointer (
+  VOID
   );
 
 #endif

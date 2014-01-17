@@ -94,6 +94,7 @@ SetPeiServicesTablePointer (
 VOID
 EFIAPI
 MigratePeiServicesTablePointer (
+  VOID
   )
 {
   EFI_STATUS             Status;
