@@ -1,7 +1,7 @@
 /** @file
   Capsule update PEIM for UEFI2.0
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -987,25 +987,28 @@ CreateState (
   EFI_CAPSULE_PEIM_PRIVATE_DATA *PrivateData;
   UINTN                         Size;
   EFI_PHYSICAL_ADDRESS          NewBuffer;
-  UINT32                        *DataPtr;
-  UINT32                        CapsuleNumber;
+  UINTN                         CapsuleNumber;
   UINT32                        Index;
   EFI_PHYSICAL_ADDRESS          BaseAddress;
   UINT64                        Length;
  
-  DataPtr        = NULL;
-  CapsuleNumber  = 0;
   PrivateData    = (EFI_CAPSULE_PEIM_PRIVATE_DATA *) CapsuleBase;
   if (PrivateData->Signature != EFI_CAPSULE_PEIM_PRIVATE_DATA_SIGNATURE) {
     return EFI_VOLUME_CORRUPTED;
   }
+  if (PrivateData->CapsuleAllImageSize >= MAX_ADDRESS) {
+    DEBUG ((EFI_D_ERROR, "CapsuleAllImageSize too big - 0x%lx\n", PrivateData->CapsuleAllImageSize));
+    return EFI_OUT_OF_RESOURCES;
+  }
+  if (PrivateData->CapsuleNumber >= MAX_ADDRESS) {
+    DEBUG ((EFI_D_ERROR, "CapsuleNumber too big - 0x%lx\n", PrivateData->CapsuleNumber));
+    return EFI_OUT_OF_RESOURCES;
+  }
   //
   // Capsule Number and Capsule Offset is in the tail of Capsule data.
   //
-  Size    = (UINTN) PrivateData->CapsuleSize;
-  DataPtr = (UINT32*)((UINTN)CapsuleBase + (UINTN)sizeof(EFI_CAPSULE_PEIM_PRIVATE_DATA)+ Size);
-  DataPtr = (UINT32*)(((UINTN) DataPtr + sizeof(UINT32) - 1) & ~(sizeof (UINT32) - 1));
-  CapsuleNumber = *DataPtr++;
+  Size          = (UINTN)PrivateData->CapsuleAllImageSize;
+  CapsuleNumber = (UINTN)PrivateData->CapsuleNumber;
   //
   // Allocate the memory so that it gets preserved into DXE
   //
@@ -1022,8 +1025,8 @@ CreateState (
   //
   // Copy to our new buffer for DXE
   //
-  DEBUG ((EFI_D_INFO, "Capsule copy from 0x%8X to 0x%8X with size 0x%8X\n", (UINTN) (PrivateData + 1), (UINTN) NewBuffer, Size));
-  CopyMem ((VOID *) (UINTN) NewBuffer, (VOID *) (UINTN) (PrivateData + 1), Size);
+  DEBUG ((EFI_D_INFO, "Capsule copy from 0x%8X to 0x%8X with size 0x%8X\n", (UINTN)((UINT8 *)PrivateData + sizeof(EFI_CAPSULE_PEIM_PRIVATE_DATA) + (CapsuleNumber - 1) * sizeof(UINT64)), (UINTN) NewBuffer, Size));
+  CopyMem ((VOID *) (UINTN) NewBuffer, (VOID *) (UINTN) ((UINT8 *)PrivateData + sizeof(EFI_CAPSULE_PEIM_PRIVATE_DATA) + (CapsuleNumber - 1) * sizeof(UINT64)), Size);
   //
   // Check for test data pattern. If it is the test pattern, then we'll
   // test it ans still create the HOB so that it can be used to verify
@@ -1039,7 +1042,7 @@ CreateState (
   // Build the UEFI Capsule Hob for each capsule image.
   //
   for (Index = 0; Index < CapsuleNumber; Index ++) {
-    BaseAddress = NewBuffer + DataPtr[Index];
+    BaseAddress = NewBuffer + PrivateData->CapsuleOffset[Index];
     Length      = ((EFI_CAPSULE_HEADER *)((UINTN) BaseAddress))->CapsuleImageSize;
 
     BuildCvHob (BaseAddress, Length);
