@@ -4,7 +4,7 @@
   It consumes FV HOBs and creates read-only Firmare Volume Block protocol
   instances for each of them.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -524,9 +524,14 @@ ProduceFVBProtocolOnBuffer (
        PtrBlockMapEntry++) {
     FvbDev->NumBlocks += PtrBlockMapEntry->NumBlocks;
   }
+
   //
   // Second, allocate the cache
   //
+  if (FvbDev->NumBlocks >= (MAX_ADDRESS / sizeof (LBA_CACHE))) {
+    CoreFreePool (FvbDev);
+    return EFI_OUT_OF_RESOURCES;
+  }
   FvbDev->LbaCache = AllocatePool (FvbDev->NumBlocks * sizeof (LBA_CACHE));
   if (FvbDev->LbaCache == NULL) {
     CoreFreePool (FvbDev);
@@ -640,6 +645,10 @@ FwVolBlockDriverInit (
   This DXE service routine is used to process a firmware volume. In
   particular, it can be called by BDS to process a single firmware
   volume found in a capsule.
+
+  Caution: The caller need validate the input firmware volume to follow
+  PI specification.
+  DxeCore will trust the input data and process firmware volume directly.
 
   @param  FvHeader               pointer to a firmware volume header
   @param  Size                   the size of the buffer pointed to by FvHeader
