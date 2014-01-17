@@ -84,6 +84,7 @@ GetPeiServicesTablePointer (
 VOID
 EFIAPI
 MigratePeiServicesTablePointer (
+  VOID
   )
 {
   return;
