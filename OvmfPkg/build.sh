@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -82,8 +82,11 @@ case `uname` in
       4.6.*)
         TARGET_TOOLS=GCC46
         ;;
-      4.[789].*)
+      4.7.*)
         TARGET_TOOLS=GCC47
+        ;;
+      4.[8-9].*)
+        TARGET_TOOLS=GCC48
         ;;
       *)
         TARGET_TOOLS=GCC44
