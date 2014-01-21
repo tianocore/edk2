@@ -129,13 +129,14 @@ FV = SECFV
 ################################################################################
 
 [FD.MEMFD]
-BaseAddress   = 0x800000|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvBase
-Size          = 0x800000|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvSize
+BaseAddress   = 0x800000
+Size          = 0x800000
 ErasePolarity = 1
 BlockSize     = 0x10000
 NumBlocks     = 0x80
 
-0x0|0x800000
+0x020000|0x7E0000
+gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvSize
 FV = MAINFV
 
 ################################################################################
