@@ -80,6 +80,8 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress|0x0|UINT32|0xf
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase|0x0|UINT32|0x11
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesSize|0x0|UINT32|0x12
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase|0x0|UINT32|0x13
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize|0x0|UINT32|0x14
 
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2

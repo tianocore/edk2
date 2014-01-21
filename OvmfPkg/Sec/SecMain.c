@@ -631,12 +631,16 @@ SecCoreStartupWithStack (
   // |-------------|       <-- SecCoreData.TemporaryRamBase
   //
 
+  ASSERT ((UINTN) (PcdGet32 (PcdOvmfSecPeiTempRamBase) +
+                   PcdGet32 (PcdOvmfSecPeiTempRamSize)) ==
+          (UINTN) TopOfCurrentStack);
+
   //
   // Initialize SEC hand-off state
   //
   SecCoreData.DataSize = sizeof(EFI_SEC_PEI_HAND_OFF);
 
-  SecCoreData.TemporaryRamSize       = SIZE_64KB;
+  SecCoreData.TemporaryRamSize       = (UINTN) PcdGet32 (PcdOvmfSecPeiTempRamSize);
   SecCoreData.TemporaryRamBase       = (VOID*)((UINT8 *)TopOfCurrentStack - SecCoreData.TemporaryRamSize);
 
   SecCoreData.PeiTemporaryRamBase    = SecCoreData.TemporaryRamBase;

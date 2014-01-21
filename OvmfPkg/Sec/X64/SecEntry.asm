@@ -1,7 +1,7 @@
       TITLE   SecEntry.asm
 ;------------------------------------------------------------------------------
 ;*
-;*   Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+;*   Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 ;*   This program and the accompanying materials
 ;*   are licensed and made available under the terms and conditions of the BSD License
 ;*   which accompanies this distribution.  The full text of the license may be found at
@@ -36,10 +36,11 @@ EXTERN SecCoreStartupWithStack:PROC
 _ModuleEntryPoint PROC PUBLIC
 
     ;
-    ; Load temporary stack top at very low memory.  The C code
-    ; can reload to a better address.
+    ; Load temporary RAM stack based on PCDs
     ;
-    mov     rsp, BASE_512KB
+    SEC_TOP_OF_STACK EQU (FixedPcdGet32 (PcdOvmfSecPeiTempRamBase) + \
+                          FixedPcdGet32 (PcdOvmfSecPeiTempRamSize))
+    mov     rsp, SEC_TOP_OF_STACK
     nop
 
     ;

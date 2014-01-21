@@ -67,3 +67,5 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
