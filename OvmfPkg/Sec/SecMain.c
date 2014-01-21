@@ -205,7 +205,6 @@ FindFfsSectionInSections (
 
 **/
 EFI_STATUS
-EFIAPI
 FindFfsFileAndSection (
   IN  EFI_FIRMWARE_VOLUME_HEADER       *Fv,
   IN  EFI_FV_FILETYPE                  FileType,
@@ -280,7 +279,6 @@ FindFfsFileAndSection (
 
 **/
 EFI_STATUS
-EFIAPI
 DecompressGuidedFv (
   IN OUT EFI_FIRMWARE_VOLUME_HEADER       **Fv
   )
@@ -370,7 +368,6 @@ DecompressGuidedFv (
 
 **/
 EFI_STATUS
-EFIAPI
 FindPeiCoreImageBaseInFv (
   IN  EFI_FIRMWARE_VOLUME_HEADER       *Fv,
   OUT  EFI_PHYSICAL_ADDRESS             *PeiCoreImageBase
@@ -414,7 +411,6 @@ FindPeiCoreImageBaseInFv (
 
 **/
 VOID
-EFIAPI
 FindPeiCoreImageBase (
   IN OUT  EFI_FIRMWARE_VOLUME_HEADER       **BootFv,
      OUT  EFI_PHYSICAL_ADDRESS             *PeiCoreImageBase
@@ -434,7 +430,6 @@ FindPeiCoreImageBase (
 
 **/
 EFI_STATUS
-EFIAPI
 FindImageBase (
   IN  EFI_FIRMWARE_VOLUME_HEADER       *BootFirmwareVolumePtr,
   OUT EFI_PHYSICAL_ADDRESS             *SecCoreImageBase
@@ -527,7 +522,6 @@ FindImageBase (
 
 **/
 VOID
-EFIAPI
 FindAndReportEntryPoints (
   IN  EFI_FIRMWARE_VOLUME_HEADER       **BootFirmwareVolumePtr,
   OUT EFI_PEI_CORE_ENTRY_POINT         *PeiCoreEntryPoint
