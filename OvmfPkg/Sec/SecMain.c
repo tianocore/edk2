@@ -615,6 +615,14 @@ SecCoreStartupWithStack (
 
   AsmWriteIdtr (&IdtDescriptor);
 
+#if defined (MDE_CPU_X64)
+  //
+  // ASSERT that the Page Tables were set by the reset vector code to
+  // the address we expect.
+  //
+  ASSERT (AsmReadCr3 () == (UINTN) PcdGet32 (PcdOvmfSecPageTablesBase));
+#endif
+
   //
   // |-------------|       <-- TopOfCurrentStack
   // |   Stack     | 32k

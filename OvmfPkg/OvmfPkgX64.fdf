@@ -135,6 +135,9 @@ ErasePolarity = 1
 BlockSize     = 0x10000
 NumBlocks     = 0x80
 
+0x000000|0x006000
+gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesSize
+
 0x020000|0x7E0000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvSize
 FV = MAINFV

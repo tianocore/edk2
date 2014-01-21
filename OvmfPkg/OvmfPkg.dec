@@ -78,6 +78,8 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageFtwSpareBase|0x0|UINT32|0xd
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageFtwWorkingBase|0x0|UINT32|0xe
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress|0x0|UINT32|0xf
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase|0x0|UINT32|0x11
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesSize|0x0|UINT32|0x12
 
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
