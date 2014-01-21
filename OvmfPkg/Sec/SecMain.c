@@ -1,7 +1,7 @@
 /** @file
   Main SEC phase code.  Transitions to PEI.
 
-  Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2013, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -167,7 +167,6 @@ FindFfsSectionInSections (
     }
 
     Section = (EFI_COMMON_SECTION_HEADER*)(UINTN) CurrentAddress;
-    DEBUG ((EFI_D_INFO, "Section->Type: 0x%x\n", Section->Type));
 
     Size = SECTION_SIZE (Section);
     if (Size < sizeof (*Section)) {
@@ -186,7 +185,6 @@ FindFfsSectionInSections (
       *FoundSection = Section;
       return EFI_SUCCESS;
     }
-    DEBUG ((EFI_D_INFO, "Section->Type (0x%x) != SectionType (0x%x)\n", Section->Type, SectionType));
   }
 
   return EFI_NOT_FOUND;
@@ -223,7 +221,7 @@ FindFfsFileAndSection (
   EFI_PHYSICAL_ADDRESS        EndOfFile;
 
   if (Fv->Signature != EFI_FVH_SIGNATURE) {
-    DEBUG ((EFI_D_INFO, "FV at %p does not have FV header signature\n", Fv));
+    DEBUG ((EFI_D_ERROR, "FV at %p does not have FV header signature\n", Fv));
     return EFI_VOLUME_CORRUPTED;
   }
 
@@ -245,7 +243,6 @@ FindFfsFileAndSection (
     if (Size < (sizeof (*File) + sizeof (EFI_COMMON_SECTION_HEADER))) {
       return EFI_VOLUME_CORRUPTED;
     }
-    DEBUG ((EFI_D_INFO, "File->Type: 0x%x\n", File->Type));
 
     EndOfFile = CurrentAddress + Size;
     if (EndOfFile > EndOfFirmwareVolume) {
@@ -256,7 +253,6 @@ FindFfsFileAndSection (
     // Look for the request file type
     //
     if (File->Type != FileType) {
-      DEBUG ((EFI_D_INFO, "File->Type (0x%x) != FileType (0x%x)\n", File->Type, FileType));
       continue;
     }
 
@@ -590,7 +586,7 @@ SecCoreStartupWithStack (
 
   ProcessLibraryConstructorList (NULL, NULL);
 
-  DEBUG ((EFI_D_ERROR,
+  DEBUG ((EFI_D_INFO,
     "SecCoreStartupWithStack(0x%x, 0x%x)\n",
     (UINT32)(UINTN)BootFv,
     (UINT32)(UINTN)TopOfCurrentStack
@@ -725,7 +721,12 @@ TemporaryRamMigration (
   BOOLEAN                          OldStatus;
   BASE_LIBRARY_JUMP_BUFFER         JumpBuffer;
   
-  DEBUG ((EFI_D_ERROR, "TemporaryRamMigration(0x%x, 0x%x, 0x%x)\n", (UINTN)TemporaryMemoryBase, (UINTN)PermanentMemoryBase, CopySize));
+  DEBUG ((EFI_D_INFO,
+    "TemporaryRamMigration(0x%x, 0x%x, 0x%x)\n",
+    (UINTN) TemporaryMemoryBase,
+    (UINTN) PermanentMemoryBase,
+    CopySize
+    ));
   
   OldHeap = (VOID*)(UINTN)TemporaryMemoryBase;
   NewHeap = (VOID*)((UINTN)PermanentMemoryBase + (CopySize >> 1));
