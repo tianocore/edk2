@@ -567,7 +567,9 @@ DevPathFromTextGenericPath (
            (UINT16) (sizeof (EFI_DEVICE_PATH_PROTOCOL) + DataLength)
            );
 
-  StrToBuf ((UINT8 *) (Node + 1), DataLength, DataStr);
+  if (DataLength != 0) {
+    StrToBuf ((UINT8 *) (Node + 1), DataLength, DataStr);
+  }
   return Node;
 }
 
