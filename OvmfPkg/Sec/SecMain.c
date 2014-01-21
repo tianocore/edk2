@@ -128,9 +128,13 @@ FindMainFv (
   Locates a section within a series of sections
   with the specified section type.
 
+  The Instance parameter indicates which instance of the section
+  type to return. (0 is first instance, 1 is second...)
+
   @param[in]   Sections        The sections to search
   @param[in]   SizeOfSections  Total size of all sections
   @param[in]   SectionType     The section type to locate
+  @param[in]   Instance        The section instance number
   @param[out]  FoundSection    The FFS section if found
 
   @retval EFI_SUCCESS           The file and section was found
@@ -139,10 +143,11 @@ FindMainFv (
 
 **/
 EFI_STATUS
-FindFfsSectionInSections (
+FindFfsSectionInstance (
   IN  VOID                             *Sections,
   IN  UINTN                            SizeOfSections,
   IN  EFI_SECTION_TYPE                 SectionType,
+  IN  UINTN                            Instance,
   OUT EFI_COMMON_SECTION_HEADER        **FoundSection
   )
 {
@@ -182,12 +187,47 @@ FindFfsSectionInSections (
     // Look for the requested section type
     //
     if (Section->Type == SectionType) {
-      *FoundSection = Section;
-      return EFI_SUCCESS;
+      if (Instance == 0) {
+        *FoundSection = Section;
+        return EFI_SUCCESS;
+      } else {
+        Instance--;
+      }
     }
   }
 
   return EFI_NOT_FOUND;
+}
+
+/**
+  Locates a section within a series of sections
+  with the specified section type.
+
+  @param[in]   Sections        The sections to search
+  @param[in]   SizeOfSections  Total size of all sections
+  @param[in]   SectionType     The section type to locate
+  @param[out]  FoundSection    The FFS section if found
+
+  @retval EFI_SUCCESS           The file and section was found
+  @retval EFI_NOT_FOUND         The file and section was not found
+  @retval EFI_VOLUME_CORRUPTED  The firmware volume was corrupted
+
+**/
+EFI_STATUS
+FindFfsSectionInSections (
+  IN  VOID                             *Sections,
+  IN  UINTN                            SizeOfSections,
+  IN  EFI_SECTION_TYPE                 SectionType,
+  OUT EFI_COMMON_SECTION_HEADER        **FoundSection
+  )
+{
+  return FindFfsSectionInstance (
+           Sections,
+           SizeOfSections,
+           SectionType,
+           0,
+           FoundSection
+           );
 }
 
 /**
