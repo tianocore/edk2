@@ -1,7 +1,7 @@
 /** @file
   Build FV related hobs for platform.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -20,10 +20,8 @@
 
 
 /**
-  Perform a call-back into the SEC simulator to get address of the Firmware Hub
-
-  @param  FfsHeader     Ffs Header availible to every PEIM
-  @param  PeiServices   General purpose services available to every PEIM.
+  Publish PEI & DXE (Decompressed) Memory based FVs to let PEI
+  and DXE know about them.
 
   @retval EFI_SUCCESS   Platform PEI FVs were initialized successfully.
 
@@ -33,24 +31,42 @@ PeiFvInitialization (
   VOID
   )
 {
-  DEBUG ((EFI_D_ERROR, "Platform PEI Firmware Volume Initialization\n"));
-
-  DEBUG (
-    (EFI_D_ERROR, "Firmware Volume HOB: 0x%x 0x%x\n",
-      PcdGet32 (PcdOvmfMemFvBase),
-      PcdGet32 (PcdOvmfMemFvSize)
-      )
-    );
-
-  BuildFvHob (PcdGet32 (PcdOvmfMemFvBase), PcdGet32 (PcdOvmfMemFvSize));
+  DEBUG ((EFI_D_INFO, "Platform PEI Firmware Volume Initialization\n"));
 
   //
-  // Create a memory allocation HOB.
+  // Create a memory allocation HOB for the PEI FV.
+  //
+  // This is marked as ACPI NVS so it will still be available on S3 resume.
   //
   BuildMemoryAllocationHob (
-    PcdGet32 (PcdOvmfMemFvBase),
-    PcdGet32 (PcdOvmfMemFvSize),
+    PcdGet32 (PcdOvmfPeiMemFvBase),
+    PcdGet32 (PcdOvmfPeiMemFvSize),
+    EfiACPIMemoryNVS
+    );
+
+  //
+  // Let DXE know about the DXE FV
+  //
+  BuildFvHob (PcdGet32 (PcdOvmfDxeMemFvBase), PcdGet32 (PcdOvmfDxeMemFvSize));
+
+  //
+  // Create a memory allocation HOB for the DXE FV.
+  //
+  BuildMemoryAllocationHob (
+    PcdGet32 (PcdOvmfDxeMemFvBase),
+    PcdGet32 (PcdOvmfDxeMemFvSize),
     EfiBootServicesData
+    );
+
+  //
+  // Let PEI know about the DXE FV so it can find the DXE Core
+  //
+  PeiServicesInstallFvInfoPpi (
+    NULL,
+    (VOID *)(UINTN) PcdGet32 (PcdOvmfDxeMemFvBase),
+    PcdGet32 (PcdOvmfDxeMemFvSize),
+    NULL,
+    NULL
     );
 
   return EFI_SUCCESS;

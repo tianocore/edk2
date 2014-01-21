@@ -48,8 +48,10 @@
   gBlockMmioProtocolGuid          = {0x6b558ce3, 0x69e5, 0x4c67, {0xa6, 0x34, 0xf7, 0xfe, 0x72, 0xad, 0xbe, 0x84}}
 
 [PcdsFixedAtBuild]
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvBase|0x0|UINT32|0
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvSize|0x0|UINT32|1
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase|0x0|UINT32|0
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvSize|0x0|UINT32|1
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase|0x0|UINT32|0x15
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize|0x0|UINT32|0x16
 
   ## This flag is used to control the destination port for PlatformDebugLibIoPort
   gUefiOvmfPkgTokenSpaceGuid.PcdDebugIoPort|0x402|UINT16|4

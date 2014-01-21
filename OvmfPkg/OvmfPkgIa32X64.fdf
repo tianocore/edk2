@@ -141,9 +141,13 @@ gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase|gUefiOvmfPkgTokenSpaceGuid.P
 0x010000|0x008000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
 
-0x020000|0x7E0000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvSize
-FV = MAINFV
+0x020000|0x0E0000
+gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvSize
+FV = PEIFV
+
+0x100000|0x700000
+gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
+FV = DXEFV
 
 ################################################################################
 
@@ -170,14 +174,14 @@ READ_LOCK_STATUS   = TRUE
 # SEC Phase modules
 #
 # The code in this FV handles the initial firmware startup, and
-# decompresses the MAINFV which handles the majority of the boot sequence.
+# decompresses the PEI and DXE FVs which handles the rest of the boot sequence.
 #
 INF  OvmfPkg/Sec/SecMain.inf
 
 INF  RuleOverride=RESET_VECTOR USE = IA32 UefiCpuPkg/ResetVector/Vtf0/Bin/ResetVector.inf
 
 ################################################################################
-[FV.MAINFV]
+[FV.PEIFV]
 BlockSize          = 0x10000
 FvAlignment        = 16
 ERASE_POLARITY     = 1
@@ -196,15 +200,6 @@ READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
-#
-# Files to be placed in MAIN FV
-#
-# This firmware volume will have files placed in it uncompressed,
-# and then then entire firmware volume will be compressed in a
-# single compression operation in order to achieve better
-# overall compression.
-#
-
 APRIORI PEI {
   INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 }
@@ -217,12 +212,6 @@ INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 INF  IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
 INF  OvmfPkg/PlatformPei/PlatformPei.inf
 INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
-
-FILE FV_IMAGE = A4EF5A93-3F1B-4232-A1C4-F0910E6D1D9C {
-  SECTION COMPRESS PI_NONE {
-    SECTION FV_IMAGE = DXEFV
-  }
-}
 
 ################################################################################
 
@@ -400,7 +389,13 @@ READ_LOCK_STATUS   = TRUE
 
 FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
    SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
-     SECTION FV_IMAGE = MAINFV
+     #
+     # These firmware volumes will have files placed in them uncompressed,
+     # and then both firmware volumes will be compressed in a single
+     # compression operation in order to achieve better overall compression.
+     #
+     SECTION FV_IMAGE = PEIFV
+     SECTION FV_IMAGE = DXEFV
    }
  }
 

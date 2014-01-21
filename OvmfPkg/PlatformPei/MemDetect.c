@@ -1,7 +1,7 @@
 /**@file
   Memory Detection for Virtual Machines.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -104,7 +104,7 @@ PublishPeiMemory (
   //
   // Determine the range of memory to use during PEI
   //
-  MemoryBase = PcdGet32 (PcdOvmfMemFvBase) + PcdGet32 (PcdOvmfMemFvSize);
+  MemoryBase = PcdGet32 (PcdOvmfDxeMemFvBase) + PcdGet32 (PcdOvmfDxeMemFvSize);
   MemorySize = LowerMemorySize - MemoryBase;
   if (MemorySize > SIZE_64MB) {
     MemoryBase = LowerMemorySize - SIZE_64MB;
