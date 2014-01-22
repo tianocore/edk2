@@ -36,7 +36,7 @@ Ia32Jump:
   nop
 
 OemId             db  "INTEL   "    ; OemId               - 8 bytes
-; BPB data below will be fixed by tool
+; BPB data below will be fixed by tool
 SectorSize        dw  0             ; Sector Size         - 16 bits
 SectorsPerCluster db  0             ; Sector Per Cluster  - 8 bits
 ReservedSectors   dw  0             ; Reserved Sectors    - 16 bits

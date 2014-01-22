@@ -31,7 +31,7 @@
 .equ                      LOADER_FILENAME_PART3, 0x20202030    # "0___"
 
         .org 0x0
-.global _start
+.global _start
 _start:
 Ia32Jump: 
   jmp   BootSectorEntryPoint  # JMP inst                  - 3 bytes
