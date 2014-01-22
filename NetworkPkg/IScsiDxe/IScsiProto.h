@@ -1,7 +1,7 @@
 /** @file
   The header file of iSCSI Protocol that defines many specific data structures.
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -982,6 +982,7 @@ IScsiNormalizeName (
                                the Packet.
   @retval EFI_DEVICE_ERROR     Session state was not as required.
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
+  @retval EFI_NOT_READY        The target can not accept new commands.
   @retval Others               Other errors as indicated.
 
 **/
