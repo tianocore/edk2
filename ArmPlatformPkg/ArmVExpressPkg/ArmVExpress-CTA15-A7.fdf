@@ -25,7 +25,7 @@
 ################################################################################
 
 [FD.ARM_VEXPRESS_CTA15A7_EFI]
-BaseAddress   = 0x81000000|gArmTokenSpaceGuid.PcdFdBaseAddress  # The base address of the Firmware in remapped DRAM.
+BaseAddress   = 0xB0000000|gArmTokenSpaceGuid.PcdFdBaseAddress  # The base address of the Firmware in remapped DRAM.
 Size          = 0x000B0000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the FLASH Device
 ErasePolarity = 1
 BlockSize     = 0x00001000
@@ -138,7 +138,7 @@ READ_LOCK_STATUS   = TRUE
   INF ArmPlatformPkg/Bds/Bds.inf
 
 [FV.FVMAIN_COMPACT]
-FvBaseAddress      = 0x81000000
+FvBaseAddress      = 0xB0000000
 FvForceRebase      = TRUE
 FvAlignment        = 8
 ERASE_POLARITY     = 1
