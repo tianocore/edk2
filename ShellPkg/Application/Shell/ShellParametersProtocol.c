@@ -570,6 +570,10 @@ FixVarName (
 /**
   Remove the unicode file tag from the begining of the file buffer since that will not be
   used by StdIn.
+  
+  @param[in]  Handle    Pointer to the handle of the file to be processed.
+  
+  @retval EFI_SUCCESS   The unicode file tag has been moved successfully.
 **/
 EFI_STATUS
 EFIAPI

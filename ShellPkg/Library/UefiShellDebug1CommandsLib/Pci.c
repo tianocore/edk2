@@ -1492,6 +1492,7 @@ PciGetNextBusRange (
   @param[in] ConfigSpace     Data in PCI configuration space.
   @param[in] Address         Address used to access configuration space of this PCI device.
   @param[in] IoDev           Handle used to access configuration space of PCI device.
+  @param[in] EnhancedDump    The print format for the dump data.
 
   @retval EFI_SUCCESS     The command completed successfully.
 **/
@@ -1618,11 +1619,12 @@ PciExplainBridgeControl (
 /**
   Print each capability structure.
 
-  @param[in] IoDev      The pointer to the deivce.
-  @param[in] Address    The address to start at.
-  @param[in] CapPtr     The offset from the address.
+  @param[in] IoDev            The pointer to the deivce.
+  @param[in] Address          The address to start at.
+  @param[in] CapPtr           The offset from the address.
+  @param[in] EnhancedDump     The print format for the dump data.
 
-  @retval EFI_SUCCESS     The operation was successful.
+  @retval EFI_SUCCESS         The operation was successful.
 **/
 EFI_STATUS
 PciExplainCapabilityStruct (
@@ -1635,9 +1637,13 @@ PciExplainCapabilityStruct (
 /**
   Display Pcie device structure.
 
-  @param[in] IoDev          The pointer to the root pci protocol.
-  @param[in] Address        The Address to start at.
-  @param[in] CapabilityPtr  The offset from the address to start.
+  @param[in] IoDev            The pointer to the root pci protocol.
+  @param[in] Address          The Address to start at.
+  @param[in] CapabilityPtr    The offset from the address to start.
+  @param[in] EnhancedDump     The print format for the dump data.
+  
+  @retval EFI_SUCCESS           The command completed successfully.
+  @retval @retval EFI_SUCCESS   Pci express extend space IO is not suppoted.   
 **/
 EFI_STATUS
 PciExplainPciExpress (
@@ -2660,6 +2666,7 @@ PciGetNextBusRange (
   @param[in] ConfigSpace     Data in PCI configuration space.
   @param[in] Address         Address used to access configuration space of this PCI device.
   @param[in] IoDev           Handle used to access configuration space of PCI device.
+  @param[in] EnhancedDump    The print format for the dump data.
 
   @retval EFI_SUCCESS     The command completed successfully.
 **/
@@ -3790,9 +3797,10 @@ PciExplainBridgeControl (
 /**
   Print each capability structure.
 
-  @param[in] IoDev      The pointer to the deivce.
-  @param[in] Address    The address to start at.
-  @param[in] CapPtr     The offset from the address.
+  @param[in] IoDev            The pointer to the deivce.
+  @param[in] Address          The address to start at.
+  @param[in] CapPtr           The offset from the address.
+  @param[in] EnhancedDump     The print format for the dump data.
 
   @retval EFI_SUCCESS     The operation was successful.
 **/
@@ -5326,6 +5334,8 @@ PrintPciExtendedCapabilityDetails(
   @param[in] IoDev          The pointer to the root pci protocol.
   @param[in] Address        The Address to start at.
   @param[in] CapabilityPtr  The offset from the address to start.
+  @param[in] EnhancedDump   The print format for the dump data.
+  
 **/
 EFI_STATUS
 PciExplainPciExpress (
