@@ -1,7 +1,7 @@
 /** @file
 Entry and initialization module for the browser.
 
-Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -4673,7 +4673,21 @@ PasswordCheck (
     if (PasswordString == NULL) {
       return EFI_SUCCESS;
     } 
-    
+
+    //
+    // Check whether has preexisted password.
+    //
+    if (PasswordString[0] == 0) {
+      if (*((CHAR16 *) Question->BufferValue) == 0) {
+        return EFI_SUCCESS;
+      } else {
+        return EFI_NOT_READY;
+      }
+    }
+
+    //
+    // Check whether the input password is same as preexisted password.
+    //
     if (StrnCmp (PasswordString, (CHAR16 *) Question->BufferValue, Question->StorageWidth/sizeof (CHAR16)) == 0) {
       return EFI_SUCCESS;
     } else {
