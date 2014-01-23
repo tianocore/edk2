@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+//  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 //
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
@@ -40,7 +40,7 @@ _ModuleEntryPoint
   // Get ID of this CPU in Multicore system
   bl    ArmReadMpidr
   // Keep a copy of the MpId register value
-  mov   r6, r0
+  mov   r8, r0
 
 _SetSVCMode
   // Enter SVC mode, Disable FIQ and IRQ
@@ -85,47 +85,47 @@ _SetupStack
   // Because the 'push' instruction is equivalent to 'stmdb' (decrement before), we need to increment
   // one to the top of the stack. We check if incrementing one does not overflow (case of DRAM at the
   // top of the memory space)
-  adds  r7, r1, #1
+  adds  r9, r1, #1
   bcs   _SetupOverflowStack
 
 _SetupAlignedStack
-  mov   r1, r7
+  mov   r1, r9
   b     _GetBaseUefiMemory
 
 _SetupOverflowStack
   // Case memory at the top of the address space. Ensure the top of the stack is EFI_PAGE_SIZE
   // aligned (4KB)
-  LoadConstantToReg (EFI_PAGE_MASK, r7)
-  and   r7, r7, r1
-  sub   r1, r1, r7
+  LoadConstantToReg (EFI_PAGE_MASK, r9)
+  and   r9, r9, r1
+  sub   r1, r1, r9
 
 _GetBaseUefiMemory
   // Calculate the Base of the UEFI Memory
-  sub   r7, r1, r4
+  sub   r9, r1, r4
 
 _GetStackBase
   // r1 = The top of the Mpcore Stacks
   // Stack for the primary core = PrimaryCoreStack
   LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), r2)
-  sub   r8, r1, r2
+  sub   r10, r1, r2
 
   // Stack for the secondary core = Number of Cores - 1
   LoadConstantToReg (FixedPcdGet32(PcdCoreCount), r0)
   sub	r0, r0, #1
   LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecondaryStackSize), r1)
   mul   r1, r1, r0
-  sub   r8, r8, r1
+  sub   r10, r10, r1
 
-  // r8 = The base of the MpCore Stacks (primary stack & secondary stacks)
-  mov	r0, r8
-  mov	r1, r6
+  // r10 = The base of the MpCore Stacks (primary stack & secondary stacks)
+  mov	r0, r10
+  mov	r1, r8
   //ArmPlatformStackSet(StackBase, MpId, PrimaryStackSize, SecondaryStackSize)
   LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), r2)
   LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecondaryStackSize), r3)
   bl	ArmPlatformStackSet
 
   // Is it the Primary Core ?
-  mov   r0, r6
+  mov   r0, r8
   bl    ArmPlatformIsPrimaryCore
   cmp   r0, #1
   bne   _PrepareArguments
@@ -136,9 +136,9 @@ _ReserveGlobalVariable
   InitializePrimaryStack r0, r1
 
 _PrepareArguments
-  mov   r0, r6
-  mov   r1, r7
-  mov   r2, r8
+  mov   r0, r8
+  mov   r1, r9
+  mov   r2, r10
   mov   r3, sp
 
   // Move sec startup address into a data register
