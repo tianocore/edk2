@@ -40,7 +40,7 @@
   ArmPlatformLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/ArmRealViewEbLibRTSM/ArmRealViewEbLibSec.inf
 
 [BuildOptions]
-  RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A9 --fpu=softvfp -I$(WORKSPACE)/ArmPlatformPkg/ArmRealViewEbPkg/Include/Platform
+  RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A9 -I$(WORKSPACE)/ArmPlatformPkg/ArmRealViewEbPkg/Include/Platform
 
   GCC:*_*_ARM_PLATFORM_FLAGS == -mcpu=cortex-a9 -I$(WORKSPACE)/ArmPlatformPkg/ArmRealViewEbPkg/Include/Platform
 
