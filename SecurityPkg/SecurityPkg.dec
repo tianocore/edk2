@@ -24,7 +24,7 @@
 
 [LibraryClasses]
   ##  @libraryclass  Definitions for common TPM commands as library API for TPM
-  #                  module use.
+  #   module use.
   HashLib|Include/Library/HashLib.h
   PlatformSecureLib|Include/Library/PlatformSecureLib.h
   TcgPhysicalPresenceLib|Include/Library/TcgPhysicalPresenceLib.h
@@ -182,17 +182,17 @@
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD indicates whether to set TPM physicalPresenceLifetimeLock bit.
-  ## Once this bit is set, it can not be cleared (It is locked for TPM life time).
+  #  Once this bit is set, it can not be cleared (It is locked for TPM life time).
   gEfiSecurityPkgTokenSpaceGuid.PcdPhysicalPresenceLifetimeLock|FALSE|BOOLEAN|0x00010003
   
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD is used to specify the default value for physicalPresenceCMDEnable bit when setting physicalPresenceLifetimeLock bit.
-  ## If PcdPhysicalPresenceCmdEnable is set to TRUE, physicalPresenceCMDEnable bit will be set, else this bit will be cleared.
+  #  If PcdPhysicalPresenceCmdEnable is set to TRUE, physicalPresenceCMDEnable bit will be set, else this bit will be cleared.
   gEfiSecurityPkgTokenSpaceGuid.PcdPhysicalPresenceCmdEnable|TRUE|BOOLEAN|0x00010004
   
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD is used to specify the default value for physicalPresenceHWEnable bit when setting physicalPresenceLifetimeLock bit.
-  ## If PcdPhysicalPresenceHwEnable is set to TRUE, physicalPresenceHWEnable bit will be set, else this bit will be cleared.
+  #  If PcdPhysicalPresenceHwEnable is set to TRUE, physicalPresenceHWEnable bit will be set, else this bit will be cleared.
   gEfiSecurityPkgTokenSpaceGuid.PcdPhysicalPresenceHwEnable|TRUE|BOOLEAN|0x00010005
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
@@ -200,49 +200,49 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdFirmwareDebuggerInitialized|FALSE|BOOLEAN|0x00010009
 
   ## This PCD indicates the TPM2 initialization policy.
-  ## 0: No initialization needed - most likely used for chipset SRTM solution, in which TPM is already initialized.
-  ## 1: Initialization needed.
+  #  0: No initialization needed - most likely used for chipset SRTM solution, in which TPM is already initialized.
+  #  1: Initialization needed.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2InitializationPolicy|1|UINT8|0x0001000A
 
   ## This PCD indicates the TPM initialization policy.
-  ## 0: No initialization needed - most likely used for chipset SRTM solution, in which TPM is already initialized.
-  ## 1: Initialization needed.
+  #  0: No initialization needed - most likely used for chipset SRTM solution, in which TPM is already initialized.
+  #  1: Initialization needed.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInitializationPolicy|1|UINT8|0x0001000B
 
   ## This PCD indicates the TPM2 SelfTest policy.
-  ## 0: No SelfTest needed - most likely used for fTPM, because it might already be tested.
-  ## 1: SelfTest needed.
+  #  0: No SelfTest needed - most likely used for fTPM, because it might already be tested.
+  #  1: SelfTest needed.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2SelfTestPolicy|1|UINT8|0x0001000C
 
   ## This PCD indicates the TPM2 SCRTM policy.
-  ##   0: No SCRTM needed - In this case, it is already done.
-  ##   1: SCRTM done by BIOS.
+  #    0: No SCRTM needed - In this case, it is already done.
+  #    1: SCRTM done by BIOS.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2ScrtmPolicy|1|UINT8|0x0001000D
 
   ## This PCD indicates the TPM SCRTM policy.
-  ##   0: No SCRTM needed - In this case, it is already done.
-  ##   1: SCRTM done by BIOS.
+  #    0: No SCRTM needed - In this case, it is already done.
+  #    1: SCRTM done by BIOS.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmScrtmPolicy|1|UINT8|0x0001000E
 
   ## Guid name to identify TPM instance
-  ## TPM_DEVICE_INTERFACE_NONE means disable
-  ## TPM_DEVICE_INTERFACE_TPM12 means TPM1.2 DTPM
-  ## TPM_DEVICE_INTERFACE_DTPM2 means TPM2 DTPM
+  #  TPM_DEVICE_INTERFACE_NONE means disable
+  #  TPM_DEVICE_INTERFACE_TPM12 means TPM1.2 DTPM
+  #  TPM_DEVICE_INTERFACE_DTPM2 means TPM2 DTPM
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid |{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }|VOID*|0x0001000F
 
   ## This PCD indicates the TPM2 Hash mask.
-  ##   BIT0: SHA1
-  ##   BIT1: SHA256
-  ##   BIT2: SHA384
-  ##   BIT3: SHA512
-  ## If this bit is set, that means this algorithm is needed to extend to PCR.
-  ## If this bit is clear, that means this algorithm is NOT needed to extend to PCR.
-  ## 0xFFFFFFFF means extend all.
+  #    BIT0: SHA1
+  #    BIT1: SHA256
+  #    BIT2: SHA384
+  #    BIT3: SHA512
+  #  If this bit is set, that means this algorithm is needed to extend to PCR.
+  #  If this bit is clear, that means this algorithm is NOT needed to extend to PCR.
+  #  0xFFFFFFFF means extend all.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0xFFFFFFFF|UINT32|0x00010010
 
   ## This PCD indicates if BIOS auto detect TPM1.2 or dTPM2.0.
-  ## 0: No auto detection.
-  ## 1: Auto detection.
+  #  0: No auto detection.
+  #  1: Auto detection.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmAutoDetection|TRUE|BOOLEAN|0x00010011
 
   ## This PCD indicates TPM base address.
