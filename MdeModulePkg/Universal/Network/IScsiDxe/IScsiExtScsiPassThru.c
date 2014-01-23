@@ -1,7 +1,7 @@
 /** @file
   The IScsi's EFI_EXT_SCSI_PASS_THRU_PROTOCOL driver.
 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -67,6 +67,7 @@ IScsiExtScsiPassThruFunction (
 {
   ISCSI_DRIVER_DATA           *Private;
   ISCSI_SESSION_CONFIG_NVDATA *ConfigNvData;
+  EFI_STATUS                  Status; 
 
   Private       = ISCSI_DRIVER_DATA_FROM_EXT_SCSI_PASS_THRU (This);
   ConfigNvData  = &Private->Session.ConfigData.NvData;
@@ -79,7 +80,19 @@ IScsiExtScsiPassThruFunction (
     return EFI_INVALID_PARAMETER;
   }
 
-  return IScsiExecuteScsiCommand (This, Target, Lun, Packet);
+  Status = IScsiExecuteScsiCommand (This, Target, Lun, Packet);
+  if ((Status != EFI_SUCCESS) && (Status != EFI_NOT_READY)) {
+    //
+    // Try to reinstate the session and re-execute the Scsi command.
+    //
+    if (EFI_ERROR (IScsiSessionReinstatement (Private))) {
+      return EFI_DEVICE_ERROR;
+    }
+
+    Status = IScsiExecuteScsiCommand (This, Target, Lun, Packet);
+  }
+
+  return Status;
 }
 
 /**
