@@ -56,7 +56,7 @@ GetAttrType (
     StrnCatGrow (&RetString, &BufLen, L"+NV", 0);
   }
   if ((Atts & EFI_VARIABLE_RUNTIME_ACCESS) != 0) {
-    StrnCatGrow (&RetString, &BufLen, L"+RS+BS", 0);
+    StrnCatGrow (&RetString, &BufLen, L"+RT+BS", 0);
   } else if ((Atts & EFI_VARIABLE_BOOTSERVICE_ACCESS) != 0) {
     StrnCatGrow (&RetString, &BufLen, L"+BS", 0);
   }
