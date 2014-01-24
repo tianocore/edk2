@@ -1379,6 +1379,7 @@ InternalShellExecuteDevicePath(
   )
 {
   EFI_STATUS                    Status;
+  EFI_STATUS                    CleanupStatus;
   EFI_HANDLE                    NewHandle;
   EFI_LOADED_IMAGE_PROTOCOL     *LoadedImage;
   LIST_ENTRY                    OrigEnvs;
@@ -1473,18 +1474,29 @@ InternalShellExecuteDevicePath(
     // Cleanup (and dont overwrite errors)
     //
     if (EFI_ERROR(Status)) {
-      gBS->UninstallProtocolInterface(NewHandle, &gEfiShellParametersProtocolGuid, &ShellParamsProtocol);
+      CleanupStatus = gBS->UninstallProtocolInterface(
+                            NewHandle,
+                            &gEfiShellParametersProtocolGuid,
+                            &ShellParamsProtocol
+                            );
+      ASSERT_EFI_ERROR(CleanupStatus);
     } else {
-      Status = gBS->UninstallProtocolInterface(NewHandle, &gEfiShellParametersProtocolGuid, &ShellParamsProtocol);
-      ASSERT_EFI_ERROR(Status);
+      CleanupStatus = gBS->UninstallProtocolInterface(
+                            NewHandle,
+                            &gEfiShellParametersProtocolGuid,
+                            &ShellParamsProtocol
+                            );
+      ASSERT_EFI_ERROR(CleanupStatus);
     }
   }
 
   if (!IsListEmpty(&OrigEnvs)) {
     if (EFI_ERROR(Status)) {
-      SetEnvironmentVariableList(&OrigEnvs);
+      CleanupStatus = SetEnvironmentVariableList(&OrigEnvs);
+      ASSERT_EFI_ERROR(CleanupStatus);
     } else {
-      Status = SetEnvironmentVariableList(&OrigEnvs);
+      CleanupStatus = SetEnvironmentVariableList(&OrigEnvs);
+      ASSERT_EFI_ERROR (CleanupStatus);
     }
   }
 
