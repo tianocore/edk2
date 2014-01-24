@@ -2,7 +2,7 @@
   Main file for ls shell level 2 function.
 
   Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,6 +15,310 @@
 
 #include "UefiShellLevel2CommandsLib.h"
 #include <Guid/FileSystemInfo.h>
+
+/**
+  print out the standard format output volume entry.
+
+  @param[in] TheList           a list of files from the volume.
+**/
+EFI_STATUS
+EFIAPI
+PrintSfoVolumeInfoTableEntry(
+  IN CONST EFI_SHELL_FILE_INFO *TheList
+  )
+{
+  EFI_STATUS            Status;
+  EFI_SHELL_FILE_INFO   *Node;
+  CHAR16                *DirectoryName;
+  EFI_FILE_SYSTEM_INFO  *SysInfo;
+  UINTN                 SysInfoSize;
+  SHELL_FILE_HANDLE     ShellFileHandle;
+  EFI_FILE_PROTOCOL     *EfiFpHandle;
+
+  //
+  // Get the first valid handle (directories)
+  //
+  for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode(&TheList->Link)
+      ; !IsNull(&TheList->Link, &Node->Link) && Node->Handle == NULL
+      ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode(&TheList->Link, &Node->Link)
+     );
+
+  if (Node->Handle == NULL) {
+    DirectoryName = GetFullyQualifiedPath(((EFI_SHELL_FILE_INFO *)GetFirstNode(&TheList->Link))->FullName);
+
+    //
+    // We need to open something up to get system information
+    //
+    Status = gEfiShellProtocol->OpenFileByName(
+      DirectoryName,
+      &ShellFileHandle,
+      EFI_FILE_MODE_READ
+      );
+
+    ASSERT_EFI_ERROR(Status);
+    FreePool(DirectoryName);
+
+    //
+    // Get the Volume Info from ShellFileHandle
+    //
+    SysInfo     = NULL;
+    SysInfoSize = 0;
+    EfiFpHandle = ConvertShellHandleToEfiFileProtocol(ShellFileHandle);
+    Status = EfiFpHandle->GetInfo(
+      EfiFpHandle,
+      &gEfiFileSystemInfoGuid,
+      &SysInfoSize,
+      SysInfo
+      );
+
+    if (Status == EFI_BUFFER_TOO_SMALL) {
+      SysInfo = AllocateZeroPool(SysInfoSize);
+      Status = EfiFpHandle->GetInfo(
+        EfiFpHandle,
+        &gEfiFileSystemInfoGuid,
+        &SysInfoSize,
+        SysInfo
+        );
+    }
+
+    ASSERT_EFI_ERROR(Status);
+
+    gEfiShellProtocol->CloseFile(ShellFileHandle);
+  } else {
+    //
+    // Get the Volume Info from Node->Handle
+    //
+    SysInfo = NULL;
+    SysInfoSize = 0;
+    EfiFpHandle = ConvertShellHandleToEfiFileProtocol(Node->Handle);
+    Status = EfiFpHandle->GetInfo(
+      EfiFpHandle,
+      &gEfiFileSystemInfoGuid,
+      &SysInfoSize,
+      SysInfo
+      );
+
+    if (Status == EFI_BUFFER_TOO_SMALL) {
+      SysInfo = AllocateZeroPool(SysInfoSize);
+      Status = EfiFpHandle->GetInfo(
+        EfiFpHandle,
+        &gEfiFileSystemInfoGuid,
+        &SysInfoSize,
+        SysInfo
+        );
+    }
+
+    ASSERT_EFI_ERROR(Status);
+  }
+
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_GEN_SFO_HEADER),
+    gShellLevel2HiiHandle,
+    L"ls"
+    );
+  //
+  // print VolumeInfo table
+  //
+  ASSERT(SysInfo != NULL);
+  ShellPrintHiiEx (
+    0,
+    gST->ConOut->Mode->CursorRow,
+    NULL,
+    STRING_TOKEN (STR_LS_SFO_VOLINFO),
+    gShellLevel2HiiHandle,
+    SysInfo->VolumeLabel,
+    SysInfo->VolumeSize,
+    SysInfo->ReadOnly?L"TRUE":L"FALSE",
+    SysInfo->FreeSpace,
+    SysInfo->BlockSize
+    );
+
+  SHELL_FREE_NON_NULL(SysInfo);
+
+  return (Status);
+}
+
+/**
+  print out the info on a single file.
+
+  @param[in] Sfo      TRUE if in SFO, false otherwise.
+  @param[in] TheNode  the EFI_SHELL_FILE_INFO node to print out information on.
+  @param[in] Files    incremented if a file is printed.
+  @param[in] Size     incremented by file size.
+  @param[in] Dirs     incremented if a directory is printed.
+
+**/
+VOID
+EFIAPI
+PrintFileInformation(
+  IN CONST BOOLEAN              Sfo, 
+  IN CONST EFI_SHELL_FILE_INFO  *TheNode, 
+  IN UINT64                     *Files, 
+  IN UINT64                     *Size, 
+  IN UINT64                     *Dirs
+  )
+{
+  ASSERT(Files    != NULL);
+  ASSERT(Size     != NULL);
+  ASSERT(Dirs     != NULL);
+  ASSERT(TheNode  != NULL);
+
+  if (Sfo) {
+    //
+    // Print the FileInfo Table
+    //
+    ShellPrintHiiEx (
+      0,
+      gST->ConOut->Mode->CursorRow,
+      NULL,
+      STRING_TOKEN (STR_LS_SFO_FILEINFO),
+      gShellLevel2HiiHandle,
+      TheNode->FullName,
+      TheNode->Info->FileSize,
+      TheNode->Info->PhysicalSize,
+      (TheNode->Info->Attribute & EFI_FILE_ARCHIVE)   != 0?L"a":L"",
+      (TheNode->Info->Attribute & EFI_FILE_DIRECTORY) != 0?L"d":L"",
+      (TheNode->Info->Attribute & EFI_FILE_HIDDEN)    != 0?L"h":L"",
+      (TheNode->Info->Attribute & EFI_FILE_READ_ONLY) != 0?L"r":L"",
+      (TheNode->Info->Attribute & EFI_FILE_SYSTEM)    != 0?L"s":L"",
+      TheNode->Info->CreateTime.Hour,
+      TheNode->Info->CreateTime.Minute,
+      TheNode->Info->CreateTime.Second,
+      TheNode->Info->CreateTime.Day,
+      TheNode->Info->CreateTime.Month,
+      TheNode->Info->CreateTime.Year,
+      TheNode->Info->LastAccessTime.Hour,
+      TheNode->Info->LastAccessTime.Minute,
+      TheNode->Info->LastAccessTime.Second,
+      TheNode->Info->LastAccessTime.Day,
+      TheNode->Info->LastAccessTime.Month,
+      TheNode->Info->LastAccessTime.Year,
+      TheNode->Info->ModificationTime.Hour,
+      TheNode->Info->ModificationTime.Minute,
+      TheNode->Info->ModificationTime.Second,
+      TheNode->Info->ModificationTime.Day,
+      TheNode->Info->ModificationTime.Month,
+      TheNode->Info->ModificationTime.Year
+      );
+  } else {
+    //
+    // print this one out...
+    // first print the universal start, next print the type specific name format, last print the CRLF
+    //
+    ShellPrintHiiEx (
+      -1,
+      -1,
+      NULL,
+      STRING_TOKEN (STR_LS_LINE_START_ALL),
+      gShellLevel2HiiHandle,
+      &TheNode->Info->ModificationTime,
+      (TheNode->Info->Attribute & EFI_FILE_DIRECTORY) != 0?L"<DIR>":L"",
+      (TheNode->Info->Attribute & EFI_FILE_READ_ONLY) != 0?L'r':L' ',
+      TheNode->Info->FileSize
+      );
+    if (TheNode->Info->Attribute & EFI_FILE_DIRECTORY) {
+      (*Dirs)++;
+      ShellPrintHiiEx (
+        -1,
+        -1,
+        NULL,
+        STRING_TOKEN (STR_LS_LINE_END_DIR),
+        gShellLevel2HiiHandle,
+        TheNode->FileName
+        );
+    } else {
+      (*Files)++;
+      (*Size) += TheNode->Info->FileSize;
+      if ( (gUnicodeCollation->StriColl(gUnicodeCollation, (CHAR16*)L".nsh", (CHAR16*)&(TheNode->FileName[StrLen (TheNode->FileName) - 4])) == 0)
+        || (gUnicodeCollation->StriColl(gUnicodeCollation, (CHAR16*)L".efi", (CHAR16*)&(TheNode->FileName[StrLen (TheNode->FileName) - 4])) == 0)
+       ){
+        ShellPrintHiiEx (
+          -1,
+          -1,
+          NULL,
+          STRING_TOKEN (STR_LS_LINE_END_EXE),
+          gShellLevel2HiiHandle,
+          TheNode->FileName
+          );
+      } else {
+        ShellPrintHiiEx (
+          -1,
+          -1,
+          NULL,
+          STRING_TOKEN (STR_LS_LINE_END_FILE),
+          gShellLevel2HiiHandle,
+          TheNode->FileName
+          );
+      }
+    }
+  }
+}
+
+/**
+  print out the header when not using standard format output.
+
+  @param[in] Path           String with starting path.
+**/
+VOID
+EFIAPI
+PrintNonSfoHeader(
+  IN CONST CHAR16 *Path
+  )
+{
+  CHAR16 *DirectoryName;
+
+  //
+  // get directory name from path...
+  //
+  DirectoryName = GetFullyQualifiedPath(Path);
+
+  if (DirectoryName != NULL) {
+    //
+    // print header
+    //
+    ShellPrintHiiEx (
+      0,
+      gST->ConOut->Mode->CursorRow,
+      NULL,
+      STRING_TOKEN (STR_LS_HEADER_LINE1),
+      gShellLevel2HiiHandle,
+      DirectoryName
+      );
+
+    SHELL_FREE_NON_NULL(DirectoryName);
+  }
+}
+
+/**
+  print out the footer when not using standard format output.
+
+  @param[in] Path           String with starting path.
+**/
+VOID
+EFIAPI
+PrintNonSfoFooter(
+  IN UINT64                     Files, 
+  IN UINT64                     Size, 
+  IN UINT64                     Dirs
+  )
+{
+  //
+  // print footer
+  //
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_LS_FOOTER_LINE),
+    gShellLevel2HiiHandle,
+    Files,
+    Size,
+    Dirs
+   );
+}
 
 /**
   print out the list of files and directories from the LS command
@@ -52,11 +356,7 @@ PrintLsOutput(
   UINT64                FileSize;
   CHAR16                *DirectoryName;
   UINTN                 LongestPath;
-  EFI_FILE_SYSTEM_INFO  *SysInfo;
-  UINTN                 SysInfoSize;
-  SHELL_FILE_HANDLE     ShellFileHandle;
   CHAR16                *CorrectedPath;
-  EFI_FILE_PROTOCOL     *EfiFpHandle;
 
   FileCount     = 0;
   DirCount      = 0;
@@ -74,23 +374,7 @@ PrintLsOutput(
   PathCleanUpDirectories(CorrectedPath);
 
   if (!Sfo) {
-    //
-    // get directory name from path...
-    //
-    DirectoryName = GetFullyQualifiedPath(CorrectedPath);
-
-    //
-    // print header
-    //
-    ShellPrintHiiEx (
-      0,
-      gST->ConOut->Mode->CursorRow,
-      NULL,
-      STRING_TOKEN (STR_LS_HEADER_LINE1),
-      gShellLevel2HiiHandle,
-      DirectoryName
-     );
-    FreePool(DirectoryName);
+    PrintNonSfoHeader(CorrectedPath);
   }
 
   Status = ShellOpenFileMetaArg((CHAR16*)CorrectedPath, EFI_FILE_MODE_READ, &ListHead);
@@ -114,109 +398,13 @@ PrintLsOutput(
   }
 
   if (Sfo && First) {
-    //
-    // Get the first valid handle (directories)
-    //
-    for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode(&ListHead->Link)
-        ; !IsNull(&ListHead->Link, &Node->Link) && Node->Handle == NULL
-        ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode(&ListHead->Link, &Node->Link)
-       );
-
-    if (Node->Handle == NULL) {
-      DirectoryName = GetFullyQualifiedPath(((EFI_SHELL_FILE_INFO *)GetFirstNode(&ListHead->Link))->FullName);
-
-      //
-      // We need to open something up to get system information
-      //
-      Status = gEfiShellProtocol->OpenFileByName(
-        DirectoryName,
-        &ShellFileHandle,
-        EFI_FILE_MODE_READ);
-
-      ASSERT_EFI_ERROR(Status);
-      FreePool(DirectoryName);
-
-      //
-      // Get the Volume Info from ShellFileHandle
-      //
-      SysInfo     = NULL;
-      SysInfoSize = 0;
-      EfiFpHandle = ConvertShellHandleToEfiFileProtocol(ShellFileHandle);
-      Status = EfiFpHandle->GetInfo(
-        EfiFpHandle,
-        &gEfiFileSystemInfoGuid,
-        &SysInfoSize,
-        SysInfo);
-
-      if (Status == EFI_BUFFER_TOO_SMALL) {
-        SysInfo = AllocateZeroPool(SysInfoSize);
-        Status = EfiFpHandle->GetInfo(
-          EfiFpHandle,
-          &gEfiFileSystemInfoGuid,
-          &SysInfoSize,
-          SysInfo);
-      }
-
-      ASSERT_EFI_ERROR(Status);
-
-      gEfiShellProtocol->CloseFile(ShellFileHandle);
-    } else {
-      //
-      // Get the Volume Info from Node->Handle
-      //
-      SysInfo = NULL;
-      SysInfoSize = 0;
-      EfiFpHandle = ConvertShellHandleToEfiFileProtocol(Node->Handle);
-      Status = EfiFpHandle->GetInfo(
-        EfiFpHandle,
-        &gEfiFileSystemInfoGuid,
-        &SysInfoSize,
-        SysInfo);
-
-      if (Status == EFI_BUFFER_TOO_SMALL) {
-        SysInfo = AllocateZeroPool(SysInfoSize);
-        Status = EfiFpHandle->GetInfo(
-          EfiFpHandle,
-          &gEfiFileSystemInfoGuid,
-          &SysInfoSize,
-          SysInfo);
-      }
-
-      ASSERT_EFI_ERROR(Status);
-    }
-
-    ShellPrintHiiEx (
-      -1,
-      -1,
-      NULL,
-      STRING_TOKEN (STR_GEN_SFO_HEADER),
-      gShellLevel2HiiHandle,
-      L"ls");
-    //
-    // print VolumeInfo table
-    //
-    ASSERT(SysInfo != NULL);
-    ShellPrintHiiEx (
-      0,
-      gST->ConOut->Mode->CursorRow,
-      NULL,
-      STRING_TOKEN (STR_LS_SFO_VOLINFO),
-      gShellLevel2HiiHandle,
-      SysInfo->VolumeLabel,
-      SysInfo->VolumeSize,
-      SysInfo->ReadOnly?L"TRUE":L"FALSE",
-      SysInfo->FreeSpace,
-      SysInfo->BlockSize
-     );
-    if (SysInfo != NULL) {
-      FreePool(SysInfo);
-    }
+    PrintSfoVolumeInfoTableEntry(ListHead);
   }
 
   for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode(&ListHead->Link)
       ; !IsNull(&ListHead->Link, &Node->Link)
       ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode(&ListHead->Link, &Node->Link)
-     ){
+      ){
     ASSERT(Node != NULL);
     if (LongestPath < StrSize(Node->FullName)) {
       LongestPath = StrSize(Node->FullName);
@@ -246,111 +434,11 @@ PrintLsOutput(
       }
     }
 
-    if (Sfo) {
-      //
-      // Print the FileInfo Table
-      //
-    ShellPrintHiiEx (
-      0,
-      gST->ConOut->Mode->CursorRow,
-      NULL,
-      STRING_TOKEN (STR_LS_SFO_FILEINFO),
-      gShellLevel2HiiHandle,
-      Node->FullName,
-      Node->Info->FileSize,
-      Node->Info->PhysicalSize,
-      (Node->Info->Attribute & EFI_FILE_ARCHIVE)   != 0?L"a":L"",
-      (Node->Info->Attribute & EFI_FILE_DIRECTORY) != 0?L"d":L"",
-      (Node->Info->Attribute & EFI_FILE_HIDDEN)    != 0?L"h":L"",
-      (Node->Info->Attribute & EFI_FILE_READ_ONLY) != 0?L"r":L"",
-      (Node->Info->Attribute & EFI_FILE_SYSTEM)    != 0?L"s":L"",
-      Node->Info->CreateTime.Hour,
-      Node->Info->CreateTime.Minute,
-      Node->Info->CreateTime.Second,
-      Node->Info->CreateTime.Day,
-      Node->Info->CreateTime.Month,
-      Node->Info->CreateTime.Year,
-      Node->Info->LastAccessTime.Hour,
-      Node->Info->LastAccessTime.Minute,
-      Node->Info->LastAccessTime.Second,
-      Node->Info->LastAccessTime.Day,
-      Node->Info->LastAccessTime.Month,
-      Node->Info->LastAccessTime.Year,
-      Node->Info->ModificationTime.Hour,
-      Node->Info->ModificationTime.Minute,
-      Node->Info->ModificationTime.Second,
-      Node->Info->ModificationTime.Day,
-      Node->Info->ModificationTime.Month,
-      Node->Info->ModificationTime.Year
-     );
-    } else {
-      //
-      // print this one out...
-      // first print the universal start, next print the type specific name format, last print the CRLF
-      //
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
-        STRING_TOKEN (STR_LS_LINE_START_ALL),
-        gShellLevel2HiiHandle,
-        &Node->Info->ModificationTime,
-        (Node->Info->Attribute & EFI_FILE_DIRECTORY) != 0?L"<DIR>":L"",
-        (Node->Info->Attribute & EFI_FILE_READ_ONLY) != 0?L'r':L' ',
-        Node->Info->FileSize
-       );
-      if (Node->Info->Attribute & EFI_FILE_DIRECTORY) {
-        DirCount++;
-        ShellPrintHiiEx (
-          -1,
-          -1,
-          NULL,
-          STRING_TOKEN (STR_LS_LINE_END_DIR),
-          gShellLevel2HiiHandle,
-          Node->FileName
-         );
-      } else {
-        FileCount++;
-        FileSize += Node->Info->FileSize;
-        if ( (gUnicodeCollation->StriColl(gUnicodeCollation, (CHAR16*)L".nsh", (CHAR16*)&(Node->FileName[StrLen (Node->FileName) - 4])) == 0)
-          || (gUnicodeCollation->StriColl(gUnicodeCollation, (CHAR16*)L".efi", (CHAR16*)&(Node->FileName[StrLen (Node->FileName) - 4])) == 0)
-         ){
-          ShellPrintHiiEx (
-            -1,
-            -1,
-            NULL,
-            STRING_TOKEN (STR_LS_LINE_END_EXE),
-            gShellLevel2HiiHandle,
-            Node->FileName
-           );
-        } else {
-          ShellPrintHiiEx (
-            -1,
-            -1,
-            NULL,
-            STRING_TOKEN (STR_LS_LINE_END_FILE),
-            gShellLevel2HiiHandle,
-            Node->FileName
-           );
-        }
-      }
-    }
+    PrintFileInformation(Sfo, Node, &FileCount, &FileSize, &DirCount);
   }
 
   if (!Sfo) {
-    //
-    // print footer
-    //
-    ShellPrintHiiEx (
-      -1,
-      -1,
-      NULL,
-      STRING_TOKEN (STR_LS_FOOTER_LINE),
-      gShellLevel2HiiHandle,
-      FileCount,
-      FileSize,
-      DirCount
-     );
+    PrintNonSfoFooter(FileCount, FileSize, DirCount);
   }
 
   if (Rec){
