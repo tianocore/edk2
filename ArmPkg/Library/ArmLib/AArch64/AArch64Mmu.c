@@ -401,6 +401,8 @@ GetBlockEntryListFromAddress (
 
         // Fill the new BlockEntry with the TranslationTable
         *BlockEntry = ((UINTN)TranslationTable & TT_ADDRESS_MASK_DESCRIPTION_TABLE) | TT_TYPE_TABLE_ENTRY;
+        // Update the last block entry with the newly created translation table
+        *LastBlockEntry = TT_LAST_BLOCK_ADDRESS(TranslationTable, TT_ENTRY_COUNT);
       }
     }
   }
