@@ -1175,7 +1175,7 @@ ShellSetEnvironmentVariable (
   The CommandLine is executed from the current working directory on the current
   device.
 
-  The EnvironmentVariables and Status parameters are ignored in a pre-UEFI Shell 2.0
+  The EnvironmentVariables pararemeter is ignored in a pre-UEFI Shell 2.0
   environment.  The values pointed to by the parameters will be unchanged by the
   ShellExecute() function.  The Output parameter has no effect in a
   UEFI Shell 2.0 environment.
@@ -1203,6 +1203,7 @@ ShellExecute (
   OUT EFI_STATUS                *Status OPTIONAL
   )
 {
+  EFI_STATUS                CmdStatus;
   //
   // Check for UEFI Shell 2.0 protocols
   //
@@ -1221,16 +1222,29 @@ ShellExecute (
   //
   if (mEfiShellEnvironment2 != NULL) {
     //
-    // Call EFI Shell version (not using EnvironmentVariables or Status parameters)
+    // Call EFI Shell version.
     // Due to oddity in the EFI shell we want to dereference the ParentHandle here
     //
-    return (mEfiShellEnvironment2->Execute(*ParentHandle,
+    CmdStatus = (mEfiShellEnvironment2->Execute(*ParentHandle,
                                           CommandLine,
                                           Output));
+    //
+    // No Status output parameter so just use the returned status
+    //
+    if (Status != NULL) {
+      *Status = CmdStatus;
+    }
+    //
+    // If there was an error, we can't tell if it was from the command or from
+    // the Execute() function, so we'll just assume the shell ran successfully
+    // and the error came from the command.
+    //
+    return EFI_SUCCESS;
   }
 
   return (EFI_UNSUPPORTED);
 }
+
 /**
   Retreives the current directory path
 
