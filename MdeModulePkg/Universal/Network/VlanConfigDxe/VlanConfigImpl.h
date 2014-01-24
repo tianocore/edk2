@@ -1,7 +1,7 @@
 /** @file
   Header file for driver binding protocol and HII config access protocol.
 
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -282,8 +282,11 @@ InstallVlanConfigForm (
 
   @param[in, out]  PrivateData   Points to VLAN configuration private data.
 
+  @retval EFI_SUCCESS            HII Form has been uninstalled successfully.
+  @retval Others                 Other errors as indicated.
+
 **/
-VOID
+EFI_STATUS
 UninstallVlanConfigForm (
   IN OUT VLAN_CONFIG_PRIVATE_DATA    *PrivateData
   );
