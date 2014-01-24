@@ -1,7 +1,7 @@
 ## @file
 #  The component description for PEI variable driver. 
 #
-# Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -13,7 +13,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = PeiVariable
+  BASE_NAME                      = PeiVariableAuth
   FILE_GUID                      = B1F7AF2F-2807-478c-A893-2BF4DDD1F62B
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
