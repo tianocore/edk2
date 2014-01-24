@@ -443,6 +443,9 @@ EfiShellEnablePageBreak (
                             variables with the format 'x=y', where x is the
                             environment variable name and y is the value. If this
                             is NULL, then the current shell environment is used.
+  @param[out] ExitDataSize  ExitDataSize as returned from gBS->StartImage
+  @param[out] ExitData      ExitData as returned from gBS->StartImage
+
   @param StatusCode         Points to the status code returned by the command.
 
   @retval EFI_SUCCESS       The command executed successfully. The  status code
@@ -458,7 +461,8 @@ InternalShellExecuteDevicePath(
   IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath,
   IN CONST CHAR16 *CommandLine OPTIONAL,
   IN CONST CHAR16 **Environment OPTIONAL,
-  OUT EFI_STATUS *StatusCode OPTIONAL
+  OUT UINTN                         *ExitDataSize OPTIONAL,
+  OUT CHAR16                        **ExitData OPTIONAL
   );
 
 /**
