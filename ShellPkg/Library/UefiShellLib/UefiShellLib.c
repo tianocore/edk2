@@ -1447,8 +1447,8 @@ InternalShellConvertFileListType (
   Opens a group of files based on a path.
 
   This function uses the Arg to open all the matching files. Each matched
-  file has a SHELL_FILE_ARG structure to record the file information. These
-  structures are placed on the list ListHead. Users can get the SHELL_FILE_ARG
+  file has a SHELL_FILE_INFO structure to record the file information. These
+  structures are placed on the list ListHead. Users can get the SHELL_FILE_INFO
   structures from ListHead to access each file. This function supports wildcards
   and will process '?' and '*' as such.  the list must be freed with a call to
   ShellCloseFileMetaArg().
