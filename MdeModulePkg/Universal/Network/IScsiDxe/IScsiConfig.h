@@ -24,6 +24,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/NetLib.h>
 
 extern UINT8  IScsiConfigDxeBin[];
+extern UINT8  IScsi4DxeStrings[];
 
 #define ISCSI_INITATOR_NAME_VAR_NAME        L"I_NAME"
 
