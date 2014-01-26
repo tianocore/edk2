@@ -1,7 +1,7 @@
 /** @file
 Common Libarary for PEI USB
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved. <BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -185,25 +185,6 @@ EFI_STATUS
 PeiUsbSetConfiguration (
   IN EFI_PEI_SERVICES         **PeiServices,
   IN PEI_USB_IO_PPI           *UsbIoPpi
-  );
-
-/**
-  Clear Endpoint Halt.
-
-  @param  PeiServices       General-purpose services that are available to every PEIM.
-  @param  UsbIoPpi          Indicates the PEI_USB_IO_PPI instance.
-  @param  EndpointAddress   The endpoint address.
-
-  @retval EFI_SUCCESS       Endpoint halt is cleared successfully.
-  @retval EFI_DEVICE_ERROR  Cannot clear the endpoint halt status due to a hardware error.
-  @retval Others            Other failure occurs.
-
-**/
-EFI_STATUS
-PeiUsbClearEndpointHalt (
-  IN EFI_PEI_SERVICES         **PeiServices,
-  IN PEI_USB_IO_PPI           *UsbIoPpi,
-  IN UINT8                    EndpointAddress
   );
 
 /**

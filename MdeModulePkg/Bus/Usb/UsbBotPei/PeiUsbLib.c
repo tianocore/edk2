@@ -1,7 +1,7 @@
 /** @file
 Common Libarary  for PEI USB.
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -215,15 +215,24 @@ PeiUsbClearEndpointHalt (
   IN UINT8                    EndpointAddress
   )
 {
-  EFI_STATUS                  Status;
-  PEI_USB_DEVICE              *PeiUsbDev;
-  EFI_USB_ENDPOINT_DESCRIPTOR *EndpointDescriptor;
-  UINT8                       EndpointIndex;
+  EFI_STATUS                    Status;
+  EFI_USB_INTERFACE_DESCRIPTOR  *InterfaceDesc;
+  EFI_USB_ENDPOINT_DESCRIPTOR   *EndpointDescriptor;
+  UINT8                         EndpointIndex;
 
-  EndpointIndex = 0;
-  PeiUsbDev     = PEI_USB_DEVICE_FROM_THIS (UsbIoPpi);
 
-  while (EndpointIndex < MAX_ENDPOINT) {
+  //
+  // Check its interface
+  //
+  Status = UsbIoPpi->UsbGetInterfaceDescriptor (
+                      PeiServices,
+                      UsbIoPpi,
+                      &InterfaceDesc
+                      );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  for (EndpointIndex = 0; EndpointIndex < InterfaceDesc->NumEndpoints; EndpointIndex++) {
     Status = UsbIoPpi->UsbGetEndpointDescriptor (PeiServices, UsbIoPpi, EndpointIndex, &EndpointDescriptor);
     if (EFI_ERROR (Status)) {
       return EFI_INVALID_PARAMETER;
@@ -232,11 +241,9 @@ PeiUsbClearEndpointHalt (
     if (EndpointDescriptor->EndpointAddress == EndpointAddress) {
       break;
     }
-
-    EndpointIndex++;
   }
 
-  if (EndpointIndex == MAX_ENDPOINT) {
+  if (EndpointIndex == InterfaceDesc->NumEndpoints) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -247,13 +254,6 @@ PeiUsbClearEndpointHalt (
             EfiUsbEndpointHalt,
             EndpointAddress
             );
-
-  //
-  // set data toggle to zero.
-  //
-  if ((PeiUsbDev->DataToggle & (1 << EndpointIndex)) != 0) {
-    PeiUsbDev->DataToggle = (UINT8) (PeiUsbDev->DataToggle ^ (1 << EndpointIndex));
-  }
 
   return Status;
 }

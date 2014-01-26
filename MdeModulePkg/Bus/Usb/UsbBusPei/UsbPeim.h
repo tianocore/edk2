@@ -1,7 +1,7 @@
 /** @file
 Usb Peim definition.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved. <BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -47,10 +47,10 @@ typedef struct {
   UINT8                         DeviceAddress;
   UINT8                         MaxPacketSize0;
   UINT8                         DeviceSpeed;
-  UINT8                         DataToggle;
   UINT8                         IsHub;
+  UINT16                        DataToggle;
   UINT8                         DownStreamPortNo;
-  UINT8                         Reserved[2];  // Padding for IPF
+  UINT8                         Reserved;  // Padding for IPF
   UINTN                         AllocateAddress;
   PEI_USB_HOST_CONTROLLER_PPI   *UsbHcPpi;
   PEI_USB2_HOST_CONTROLLER_PPI  *Usb2HcPpi;

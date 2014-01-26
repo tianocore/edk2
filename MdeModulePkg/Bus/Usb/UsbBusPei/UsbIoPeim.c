@@ -1,7 +1,7 @@
 /** @file
 The module is used to implement Usb Io PPI interfaces.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved. <BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -52,8 +52,37 @@ PeiUsbControlTransfer (
   EFI_STATUS                  Status;
   PEI_USB_DEVICE              *PeiUsbDev;
   UINT32                      TransferResult;
+  EFI_USB_ENDPOINT_DESCRIPTOR *EndpointDescriptor;
+  UINT8                       EndpointIndex;
 
   PeiUsbDev = PEI_USB_DEVICE_FROM_THIS (This);
+
+  EndpointDescriptor = NULL;
+  EndpointIndex = 0;
+
+  if ((Request->Request     == USB_REQ_CLEAR_FEATURE) &&
+      (Request->RequestType == USB_DEV_CLEAR_FEATURE_REQ_TYPE_E) &&
+      (Request->Value       == USB_FEATURE_ENDPOINT_HALT)) {
+    //
+    // Request->Index is the Endpoint Address, use it to get the Endpoint Index.
+    //
+    while (EndpointIndex < MAX_ENDPOINT) {
+      Status = PeiUsbGetEndpointDescriptor (PeiServices, This, EndpointIndex, &EndpointDescriptor);
+      if (EFI_ERROR (Status)) {
+        return EFI_INVALID_PARAMETER;
+      }
+
+      if (EndpointDescriptor->EndpointAddress == Request->Index) {
+        break;
+      }
+
+      EndpointIndex++;
+    }
+
+    if (EndpointIndex == MAX_ENDPOINT) {
+      return EFI_INVALID_PARAMETER;
+    }
+  }
 
   if (PeiUsbDev->Usb2HcPpi != NULL) {
     Status = PeiUsbDev->Usb2HcPpi->ControlTransfer (
@@ -85,6 +114,18 @@ PeiUsbControlTransfer (
                         &TransferResult
                         );
   }
+
+  //
+  // Reset the endpoint toggle when endpoint stall is cleared
+  //
+  if ((Request->Request     == USB_REQ_CLEAR_FEATURE) &&
+      (Request->RequestType == USB_DEV_CLEAR_FEATURE_REQ_TYPE_E) &&
+      (Request->Value       == USB_FEATURE_ENDPOINT_HALT)) {
+    if ((PeiUsbDev->DataToggle & (1 << EndpointIndex)) != 0) {
+      PeiUsbDev->DataToggle = (UINT16) (PeiUsbDev->DataToggle ^ (1 << EndpointIndex));
+    }
+  }
+
   return Status;
 }
 
@@ -194,7 +235,7 @@ PeiUsbBulkTransfer (
   }
 
   if (OldToggle != DataToggle) {
-    PeiUsbDev->DataToggle = (UINT8) (PeiUsbDev->DataToggle ^ (1 << EndpointIndex));
+    PeiUsbDev->DataToggle = (UINT16) (PeiUsbDev->DataToggle ^ (1 << EndpointIndex));
   }
 
   return Status;
