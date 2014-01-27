@@ -82,7 +82,7 @@ SPendingAssign::AssignValue (
   IN UINT32 Len
   )
 {
-  memcpy (mAddr, Addr, (mLen < Len ? mLen : Len));
+  memmove (mAddr, Addr, (mLen < Len ? mLen : Len));
   mFlag = ASSIGNED;
 }
 
@@ -685,7 +685,7 @@ CFormPkg::AdjustDynamicInsertOpcode (
     //
     // Override the restore buffer data.
     //
-    memcpy (LastFormEndAddr, InsertOpcodeAddr, InsertOpcodeNode->mBufferFree - InsertOpcodeAddr);
+    memmove (LastFormEndAddr, InsertOpcodeAddr, InsertOpcodeNode->mBufferFree - InsertOpcodeAddr);
     InsertOpcodeNode->mBufferFree -= NeedRestoreCodeLen;
     memset (InsertOpcodeNode->mBufferFree, 0, NeedRestoreCodeLen);
   } else {
@@ -733,7 +733,7 @@ CFormPkg::AdjustDynamicInsertOpcode (
       //
       // Override the restore buffer data.
       //
-      memcpy (InsertOpcodeNode->mBufferStart, InsertOpcodeAddr, InsertOpcodeNode->mBufferFree - InsertOpcodeAddr);
+      memmove (InsertOpcodeNode->mBufferStart, InsertOpcodeAddr, InsertOpcodeNode->mBufferFree - InsertOpcodeAddr);
       InsertOpcodeNode->mBufferFree -= InsertOpcodeAddr - InsertOpcodeNode->mBufferStart;
 
       //
@@ -1542,7 +1542,7 @@ CIfrObj::_EMIT_PENDING_OBJ (
   //
   ObjBinBuf  = gCFormPkg.IfrBinBufferGet (mObjBinLen);
   if (ObjBinBuf != NULL) {
-    memcpy (ObjBinBuf, mObjBinBuf, mObjBinLen);
+    memmove (ObjBinBuf, mObjBinBuf, mObjBinLen);
   }
   
   //

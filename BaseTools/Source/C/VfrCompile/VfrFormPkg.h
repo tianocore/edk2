@@ -368,7 +368,7 @@ public:
   VOID VARSTORE_INFO (OUT EFI_VARSTORE_INFO *Info) {
     if (Info != NULL) {
       Info->mVarStoreId   = mHeader->VarStoreId;
-      memcpy (&Info->mVarStoreId, &mHeader->VarStoreInfo, sizeof (Info->mVarStoreId));
+      memmove (&Info->mVarStoreId, &mHeader->VarStoreInfo, sizeof (Info->mVarStoreId));
     }
   }
 
@@ -615,7 +615,7 @@ public:
   }
 
   VOID SetGuid (IN EFI_GUID *Guid) {
-    memcpy (&mFormSet->Guid, Guid, sizeof (EFI_GUID));
+    memmove (&mFormSet->Guid, Guid, sizeof (EFI_GUID));
   }
 
   VOID SetFormSetTitle (IN EFI_STRING_ID FormSetTitle) {
@@ -627,7 +627,7 @@ public:
   }
 
   VOID SetClassGuid (IN EFI_GUID *Guid) {
-    memcpy (&(mClassGuid[mFormSet->Flags++]), Guid, sizeof (EFI_GUID));
+    memmove (&(mClassGuid[mFormSet->Flags++]), Guid, sizeof (EFI_GUID));
   }
 
   UINT8 GetFlags() {
@@ -749,7 +749,7 @@ public:
       IncLength (sizeof (EFI_IFR_FORM_MAP_METHOD));
 
       mMethodMap->MethodTitle = MethodTitle;
-      memcpy (&(mMethodMap->MethodIdentifier), MethodGuid, sizeof (EFI_GUID));
+      memmove (&(mMethodMap->MethodIdentifier), MethodGuid, sizeof (EFI_GUID));
       mMethodMap ++;
     }
   }
@@ -769,7 +769,7 @@ public:
   }
 
   VOID SetGuid (IN EFI_GUID *Guid) {
-    memcpy (&mVarStore->Guid, Guid, sizeof (EFI_GUID));
+    memmove (&mVarStore->Guid, Guid, sizeof (EFI_GUID));
   }
 
   VOID SetVarStoreId (IN EFI_VARSTORE_ID VarStoreId) {
@@ -809,7 +809,7 @@ public:
   }
 
   VOID SetGuid (IN EFI_GUID *Guid) {
-    memcpy (&mVarStoreEfi->Guid, Guid, sizeof (EFI_GUID));
+    memmove (&mVarStoreEfi->Guid, Guid, sizeof (EFI_GUID));
   }
 
   VOID SetVarStoreId (IN UINT16 VarStoreId) {
@@ -863,7 +863,7 @@ public:
   }
 
   VOID SetGuid (IN EFI_GUID *Guid) {
-    memcpy (&mVarStoreNameValue->Guid, Guid, sizeof (EFI_GUID));
+    memmove (&mVarStoreNameValue->Guid, Guid, sizeof (EFI_GUID));
   }
 
   VOID SetVarStoreId (IN UINT16 VarStoreId) {
@@ -938,7 +938,7 @@ public:
         CIfrOpHeader (EFI_IFR_DEFAULT_OP, &mDefault->Header, Size) {
     mDefault->Type      = Type;
     mDefault->DefaultId = DefaultId;
-    memcpy (&(mDefault->Value), &Value, Size - OFFSET_OF (EFI_IFR_DEFAULT, Value));
+    memmove (&(mDefault->Value), &Value, Size - OFFSET_OF (EFI_IFR_DEFAULT, Value));
   }
 
   VOID SetDefaultId (IN UINT16 DefaultId) {
@@ -950,7 +950,7 @@ public:
   }
 
   VOID SetValue (IN EFI_IFR_TYPE_VALUE Value) {
-    memcpy (&mDefault->Value, &Value, mDefault->Header.Length - OFFSET_OF (EFI_IFR_DEFAULT, Value));
+    memmove (&mDefault->Value, &Value, mDefault->Header.Length - OFFSET_OF (EFI_IFR_DEFAULT, Value));
   }
 };
 
@@ -1673,7 +1673,7 @@ public:
   }
 
   VOID SetRefreshEventGroutId (IN EFI_GUID *RefreshEventGroupId) {
-    memcpy (&mRefreshId->RefreshEventGroupId, RefreshEventGroupId, sizeof (EFI_GUID));
+    memmove (&mRefreshId->RefreshEventGroupId, RefreshEventGroupId, sizeof (EFI_GUID));
   }
 };
 
@@ -1755,7 +1755,7 @@ public:
   }
 
   VOID SetValue (IN EFI_IFR_TYPE_VALUE Value) {
-    memcpy (&mOneOfOption->Value, &Value, mOneOfOption->Header.Length - OFFSET_OF (EFI_IFR_ONE_OF_OPTION, Value));
+    memmove (&mOneOfOption->Value, &Value, mOneOfOption->Header.Length - OFFSET_OF (EFI_IFR_ONE_OF_OPTION, Value));
   }
 
   UINT8 GetFlags (VOID) {
@@ -1904,11 +1904,11 @@ public:
   }
 
   VOID SetGuid (IN EFI_GUID *Guid) {
-    memcpy (&mGuid->Guid, Guid, sizeof (EFI_GUID));
+    memmove (&mGuid->Guid, Guid, sizeof (EFI_GUID));
   }
 
   VOID SetData (IN UINT8* DataBuff, IN UINT8 Size) {
-    memcpy ((UINT8 *)mGuid + sizeof (EFI_IFR_GUID), DataBuff, Size);
+    memmove ((UINT8 *)mGuid + sizeof (EFI_IFR_GUID), DataBuff, Size);
   }
 };
 
@@ -2214,7 +2214,7 @@ public:
   }
 
   VOID SetPermissions (IN EFI_GUID *Permissions) {
-    memcpy (&mSecurity->Permissions, Permissions, sizeof (EFI_GUID));
+    memmove (&mSecurity->Permissions, Permissions, sizeof (EFI_GUID));
   }
 };
 

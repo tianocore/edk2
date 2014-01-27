@@ -1811,7 +1811,7 @@ class InfBuildData(ModuleBuildClassObject):
                         else:
                             Tool = ToolList[0]
                         ToolChain = "*_*_*_%s_FLAGS" % Tool
-                        ToolChainFamily = '' 
+                        ToolChainFamily = 'MSFT'    # Edk.x only support MSFT tool chain
                         #ignore not replaced macros in value
                         ValueList = GetSplitList(' ' + Value, '/D')
                         Dummy = ValueList[0]
