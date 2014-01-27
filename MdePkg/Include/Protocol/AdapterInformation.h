@@ -63,7 +63,7 @@ typedef struct {
   ///
   /// TRUE if the adapter supports booting from iSCSI IPv4 targets.
   ///
-  BOOLEAN                       iSsciIpv4BootCapablity;
+  BOOLEAN                       iScsiIpv4BootCapablity;
   ///
   /// TRUE if the adapter supports booting from iSCSI IPv6 targets.
   ///
