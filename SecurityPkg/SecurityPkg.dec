@@ -23,76 +23,137 @@
   Include
 
 [LibraryClasses]
-  ##  @libraryclass  Definitions for common TPM commands as library API for TPM
-  #   module use.
+  ##  @libraryclass  Provides hash interfaces from different implementations.
+  # 
   HashLib|Include/Library/HashLib.h
+  
+  ##  @libraryclass  Provides a platform specific interface to detect physically present user.
+  #
   PlatformSecureLib|Include/Library/PlatformSecureLib.h
+  
+  ##  @libraryclass  Provides interfaces to handle TPM 1.2 request.
+  #
   TcgPhysicalPresenceLib|Include/Library/TcgPhysicalPresenceLib.h
+  
+  ##  @libraryclass  Provides interfaces for other modules to send TPM 2.0 command.
+  #
   Tpm2CommandLib|Include/Library/Tpm2CommandLib.h
+  
+  ##  @libraryclass  Provides interfaces on how to access TPM 2.0 hardware device.
+  #
   Tpm2DeviceLib|Include/Library/Tpm2DeviceLib.h
+  
+  ##  @libraryclass  Provides interfaces for other modules to send TPM 1.2 command.
+  #
   Tpm12CommandLib|Include/Library/Tpm12CommandLib.h
+  
+  ##  @libraryclass  Provides interfaces on how to access TPM 1.2 hardware device.
+  #
   Tpm12DeviceLib|Include/Library/Tpm12DeviceLib.h
+  
+  ##  @libraryclass  Provides TPM Interface Specification (TIS) interfaces for TPM command.
+  #
   TpmCommLib|Include/Library/TpmCommLib.h
+    
+  ##  @libraryclass  Provides common interfaces about TPM measurement for other modules.
+  #
   TpmMeasurementLib|Include/Library/TpmMeasurementLib.h
+  
+  ##  @libraryclass  Provides interfaces to handle TPM 2.0 request.
+  #
   TrEEPhysicalPresenceLib|Include/Library/TrEEPhysicalPresenceLib.h
 
 [Guids]
   ## Security package token space guid
   # Include/Guid/SecurityPkgTokenSpace.h
   gEfiSecurityPkgTokenSpaceGuid      = { 0xd3fb176, 0x9569, 0x4d51, { 0xa3, 0xef, 0x7d, 0x61, 0xc6, 0x4f, 0xea, 0xba }}
+  
   ## Guid acted as the authenticated variable store header's signature, and to specify the variable list entries put in the EFI system table.
   #  Include/Guid/AuthenticatedVariableFormat.h
   gEfiAuthenticatedVariableGuid      = { 0xaaf32c78, 0x947b, 0x439a, { 0xa1, 0x80, 0x2e, 0x14, 0x4e, 0xc3, 0x77, 0x92 } }
 
+  ## GUID used to "SecureBootEnable" variable for the Secure Boot feature enable/disable.
+  #  This variable is used for allowing a physically present user to disable Secure Boot via firmware setup without the possession of PKpriv.
   #  Include/Guid/AuthenticatedVariableFormat.h
   gEfiSecureBootEnableDisableGuid    = { 0xf0a30bc7, 0xaf08, 0x4556, { 0x99, 0xc4, 0x0, 0x10, 0x9, 0xc9, 0x3a, 0x44 } }
 
+  ## GUID used to "CustomMode" variable for two Secure Boot modes feature: "Custom" and "Standard".
+  #  Standard Secure Boot mode is the default mode as UEFI Spec's description.
+  #  Custom Secure Boot mode allows for more flexibility as specified in the following:
+  #  Can enroll or delete PK without existing PK's private key.
+  #  Can enroll or delete KEK without existing PK's private key.
+  #  Can enroll or delete signature from DB/DBX without KEK's private key.
   #  Include/Guid/AuthenticatedVariableFormat.h
   gEfiCustomModeEnableGuid           = { 0xc076ec0c, 0x7028, 0x4399, { 0xa0, 0x72, 0x71, 0xee, 0x5c, 0x44, 0x8b, 0x9f } }
 
+  ## GUID used to "VendorKeysNv" variable to record the out of band secure boot keys modification.
+  #  This variable is a read-only NV varaible that indicates whether someone other than the platform vendor has used a 
+  #  mechanism not defined by the UEFI Specification to transition the system to setup mode or to update secure boot keys.
   #  Include/Guid/AuthenticatedVariableFormat.h
   gEfiVendorKeysNvGuid               = { 0x9073e4e0, 0x60ec, 0x4b6e, { 0x99, 0x3, 0x4c, 0x22, 0x3c, 0x26, 0xf, 0x3c } }
 
+  ## GUID used to "certdb" variable to store the signer's certificates for common variables with EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS attribute.
   #  Include/Guid/AuthenticatedVariableFormat.h
   gEfiCertDbGuid                     = { 0xd9bee56e, 0x75dc, 0x49d9, { 0xb4, 0xd7, 0xb5, 0x34, 0x21, 0xf, 0x63, 0x7a } }
   
-  ## Include/Guid/TcgEventHob.h
+  ## Hob GUID used to pass a TCG_PCR_EVENT from a TPM PEIM to a TPM DXE Driver.
+  #  Include/Guid/TcgEventHob.h
   gTcgEventEntryHobGuid              = { 0x2b9ffb52, 0x1b13, 0x416f, { 0xa8, 0x7b, 0xbc, 0x93, 0xd, 0xef, 0x92, 0xa8 }}
 
-  ## Include/Guid/MeasuredFvHob.h
+  ## HOB GUID used to pass all PEI measured FV info to DXE Driver.
+  #  Include/Guid/MeasuredFvHob.h
   gMeasuredFvHobGuid                 = { 0xb2360b42, 0x7173, 0x420a, { 0x86, 0x96, 0x46, 0xca, 0x6b, 0xab, 0x10, 0x60 }}
 
-  ## Include/Guid/PhysicalPresenceData.h
+  ## GUID used to "PhysicalPresence" variable and "PhysicalPresenceFlags" variable for TPM request and response.
+  #  Include/Guid/PhysicalPresenceData.h
   gEfiPhysicalPresenceGuid           = { 0xf6499b1, 0xe9ad, 0x493d, { 0xb9, 0xc2, 0x2f, 0x90, 0x81, 0x5c, 0x6c, 0xbc }}
   
-  ## Include/Guid/PwdCredentialProviderHii.h
+  ## GUID used for form browser, password credential and provider identifier.
+  # Include/Guid/PwdCredentialProviderHii.h
   gPwdCredentialProviderGuid         = { 0x78b9ec8b, 0xc000, 0x46c5, { 0xac, 0x93, 0x24, 0xa0, 0xc1, 0xbb, 0x0, 0xce }}
 
-  ## Include/Guid/UsbCredentialProviderHii.h
+  ## GUID used for form browser, USB credential and provider identifier.
+  #  Include/Guid/UsbCredentialProviderHii.h
   gUsbCredentialProviderGuid         = { 0xd0849ed1, 0xa88c, 0x4ba6, { 0xb1, 0xd6, 0xab, 0x50, 0xe2, 0x80, 0xb7, 0xa9 }}
 
-  ## Include/Guid/UserIdentifyManagerHii.h
+  ## GUID used for FormSet guid and user profile variable.
+  # Include/Guid/UserIdentifyManagerHii.h
   gUserIdentifyManagerGuid           = { 0x3ccd3dd8, 0x8d45, 0x4fed, { 0x96, 0x2d, 0x2b, 0x38, 0xcd, 0x82, 0xb3, 0xc4 }}
 
-  ## Include/Guid/UserProfileManagerHii.h
+  ## GUID used for FormSet.
+  #  Include/Guid/UserProfileManagerHii.h
   gUserProfileManagerGuid            = { 0xc35f272c, 0x97c2, 0x465a, { 0xa2, 0x16, 0x69, 0x6b, 0x66, 0x8a, 0x8c, 0xfe }}
 
-  ## Include/Guid/TcgConfigHii.h
+  ## GUID used for FormSet.
+  #  Include/Guid/TcgConfigHii.h
   gTcgConfigFormSetGuid              = { 0xb0f901e4, 0xc424, 0x45de, { 0x90, 0x81, 0x95, 0xe2, 0xb, 0xde, 0x6f, 0xb5 }}
   
-  ## Include/Guid/SecureBootConfigHii.h
+  ## GUID used for FormSet.
+  #  Include/Guid/SecureBootConfigHii.h
   gSecureBootConfigFormSetGuid       = { 0x5daf50a5, 0xea81, 0x4de2, {0x8f, 0x9b, 0xca, 0xbd, 0xa9, 0xcf, 0x5c, 0x14}}
-                                      
-  ## Include/Guid/TrEEPhysicalPresenceData.h
+
+  ## GUID used to "TrEEPhysicalPresence" variable and "TrEEPhysicalPresenceFlags" variable for TPM2 request and response.
+  #  Include/Guid/TrEEPhysicalPresenceData.h
   gEfiTrEEPhysicalPresenceGuid = { 0xf24643c2, 0xc622, 0x494e, { 0x8a, 0xd, 0x46, 0x32, 0x57, 0x9c, 0x2d, 0x5b }}
 
-  ## Include/Guid/TpmInstance.h
+  ## GUID value used for PcdTpmInstanceGuid to indicate TPM is disabled.
+  #  Include/Guid/TpmInstance.h
   gEfiTpmDeviceInstanceNoneGuid      = { 0x00000000, 0x0000, 0x0000, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } }
+  
+  ## GUID value used for PcdTpmInstanceGuid to indicate TPM 1.2 device is selected to support.
+  #  Include/Guid/TpmInstance.h
   gEfiTpmDeviceInstanceTpm12Guid     = { 0x8b01e5b6, 0x4f19, 0x46e8, { 0xab, 0x93, 0x1c, 0x53, 0x67, 0x1b, 0x90, 0xcc } }
+  
+  ## GUID value used for PcdTpmInstanceGuid to indicate discrete TPM 2.0 device is selected to support.
+  #  Include/Guid/TpmInstance.h
   gEfiTpmDeviceInstanceTpm20DtpmGuid = { 0x286bf25a, 0xc2c3, 0x408c, { 0xb3, 0xb4, 0x25, 0xe6, 0x75, 0x8b, 0x73, 0x17 } }
+  
+  ## GUID used to select supported TPM instance from UI.
+  #  Include/Guid/TpmInstance.h
   gEfiTpmDeviceSelectedGuid          = { 0x7f4158d3, 0x74d, 0x456d, { 0x8c, 0xb2, 0x1, 0xf9, 0xc8, 0xf7, 0x9d, 0xaa } }
 
-  ## Include/Guid/TrEEConfigHii.h
+  ## GUID used for FormSet and config variable.
+  #  Include/Guid/TrEEConfigHii.h
   gTrEEConfigFormSetGuid              = {0xc54b425f, 0xaa79, 0x48b4, { 0x98, 0x1f, 0x99, 0x8b, 0x3c, 0x4b, 0x64, 0x1c }}
 
 [Ppis]
