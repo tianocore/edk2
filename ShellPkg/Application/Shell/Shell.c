@@ -300,6 +300,12 @@ UefiMain (
   // install our console logger.  This will keep a log of the output for back-browsing
   //
   Status = ConsoleLoggerInstall(ShellInfoObject.LogScreenCount, &ShellInfoObject.ConsoleInfo);
+  if(EFI_ERROR (Status)) {
+    ExitStatus = (SHELL_STATUS) (Status & (~MAX_BIT));
+  } else {
+    ExitStatus = SHELL_SUCCESS;
+  }
+	
   if (!EFI_ERROR(Status)) {
     //
     // Enable the cursor to be visible
@@ -2074,6 +2080,7 @@ RunCommandOrFile(
   Status            = EFI_SUCCESS;
   CommandWithPath   = NULL;
   DevPath           = NULL;
+  CalleeExitStatus  = SHELL_INVALID_PARAMETER;
 
   switch (Type) {
     case   Internal_Command:
@@ -2149,11 +2156,17 @@ RunCommandOrFile(
 
           SHELL_FREE_NON_NULL(DevPath);
 
+          if(EFI_ERROR (Status)) {
+            CalleeExitStatus = (SHELL_STATUS) (Status & (~MAX_BIT));
+          } else {
+            CalleeExitStatus = SHELL_SUCCESS;
+          }
+
           //
           // Update last error status.
           //
           // Status is an EFI_STATUS. Clear top bit to convert to SHELL_STATUS
-          SetLastError((SHELL_STATUS) (Status & (~MAX_BIT)));
+          SetLastError(CalleeExitStatus);
           break;
         default:
           //
