@@ -1367,7 +1367,6 @@ EfiShellEnablePageBreak (
                             variables with the format 'x=y', where x is the
                             environment variable name and y is the value. If this
                             is NULL, then the current shell environment is used.
-  @param StatusCode         Points to the status code returned by the command.
 
   @param[out] ExitDataSize  ExitDataSize as returned from gBS->StartImage
   @param[out] ExitData      ExitData as returned from gBS->StartImage

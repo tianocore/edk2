@@ -295,7 +295,9 @@ PrintNonSfoHeader(
 /**
   print out the footer when not using standard format output.
 
-  @param[in] Path           String with starting path.
+  @param[in] Files            The number of files.
+  @param[in] Size             The size of files in bytes.
+  @param[in] Dirs             The number of directories.
 **/
 VOID
 EFIAPI

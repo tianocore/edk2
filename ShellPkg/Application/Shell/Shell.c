@@ -2412,9 +2412,11 @@ RunScriptFileHandle (
   CONST CHAR16        *CurDir;
   UINTN               LineCount;
   CHAR16              LeString[50];
-  SHELL_STATUS        CalleeExitStatus = SHELL_SUCCESS;
+  SHELL_STATUS        CalleeExitStatus;
 
   ASSERT(!ShellCommandGetScriptExit());
+  
+  CalleeExitStatus = SHELL_SUCCESS;
 
   PreScriptEchoState = ShellCommandGetEchoState();
 

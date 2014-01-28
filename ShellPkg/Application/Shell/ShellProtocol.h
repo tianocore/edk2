@@ -446,8 +446,6 @@ EfiShellEnablePageBreak (
   @param[out] ExitDataSize  ExitDataSize as returned from gBS->StartImage
   @param[out] ExitData      ExitData as returned from gBS->StartImage
 
-  @param StatusCode         Points to the status code returned by the command.
-
   @retval EFI_SUCCESS       The command executed successfully. The  status code
                             returned by the command is pointed to by StatusCode.
   @retval EFI_INVALID_PARAMETER The parameters are invalid.
