@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ; @file
-; First code exectuted by processor after resetting.
+; First code executed by processor after resetting.
 ;
 ; Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
