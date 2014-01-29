@@ -849,8 +849,11 @@ TranslateOfwNodes (
                                     the current implementation. Further calls
                                     to this function are possible.
 
-  @retval RETURN_NOT_FOUND          Translation terminated, *Ptr was (and is)
-                                    pointing to an empty string.
+  @retval RETURN_NOT_FOUND          Translation terminated. On input, *Ptr was
+                                    pointing to the empty string or "HALT". On
+                                    output, *Ptr points to the empty string
+                                    (ie. "HALT" is consumed transparently when
+                                    present).
 
   @retval RETURN_INVALID_PARAMETER  Parse error. This is a permanent error.
 
@@ -870,7 +873,12 @@ TranslateOfwPath (
   OFW_NODE      Skip;
 
   NumNodes = 0;
-  Status = ParseOfwNode (Ptr, &Node[NumNodes], &IsFinal);
+  if (AsciiStrCmp (*Ptr, "HALT") == 0) {
+    *Ptr += 4;
+    Status = RETURN_NOT_FOUND;
+  } else {
+    Status = ParseOfwNode (Ptr, &Node[NumNodes], &IsFinal);
+  }
 
   if (Status == RETURN_NOT_FOUND) {
     DEBUG ((DEBUG_VERBOSE, "%a: no more nodes\n", __FUNCTION__));
