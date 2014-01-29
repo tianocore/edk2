@@ -420,8 +420,9 @@ InitializePlatform (
 
   XenLeaf = XenDetect ();
 
+  PublishPeiMemory ();
+
   if (XenLeaf != 0) {
-    PublishPeiMemory ();
     PcdSetBool (PcdPciDisableBusEnumeration, TRUE);
   } else {
     TopOfMemory = MemDetect ();

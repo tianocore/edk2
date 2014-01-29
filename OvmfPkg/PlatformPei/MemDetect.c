@@ -142,8 +142,6 @@ MemDetect (
   LowerMemorySize = GetSystemMemorySizeBelow4gb ();
   UpperMemorySize = GetSystemMemorySizeAbove4gb ();
 
-  PublishPeiMemory ();
-
   //
   // Create memory HOBs
   //
