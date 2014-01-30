@@ -30,6 +30,7 @@ function HelpMsg()
   echo Please note: This script must be \'sourced\' so the environment can be changed.
   echo ". edksetup.sh" 
   echo "source edksetup.sh"
+  return 1
 }
 
 function SetupEnv()
@@ -51,7 +52,6 @@ function SourceEnv()
      ]
   then
     HelpMsg
-    return
   else
     SetupEnv "$*"
   fi
@@ -60,11 +60,15 @@ function SourceEnv()
 if [ $# -gt 1 ]
 then
   HelpMsg
-  return
-elif [ $# -eq 1 ] && [ "$1" != "BaseTool" ]
+elif [ $# -eq 1 ] && [ "$1" != "BaseTools" ]
 then
   HelpMsg
-  return
+fi
+
+RETVAL=$?
+if [ $RETVAL -ne 0 ]
+then
+  return $RETVAL
 fi
 
 SourceEnv "$*"
