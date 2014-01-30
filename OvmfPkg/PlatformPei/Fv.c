@@ -36,12 +36,12 @@ PeiFvInitialization (
   //
   // Create a memory allocation HOB for the PEI FV.
   //
-  // This is marked as ACPI NVS so it will still be available on S3 resume.
+  // Note: This should be changed to ACPI NVS when S3 resume is enabled.
   //
   BuildMemoryAllocationHob (
     PcdGet32 (PcdOvmfPeiMemFvBase),
     PcdGet32 (PcdOvmfPeiMemFvSize),
-    EfiACPIMemoryNVS
+    EfiBootServicesData
     );
 
   //
