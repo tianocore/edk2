@@ -44,19 +44,20 @@ function SetupEnv()
 
 function SourceEnv()
 {
-if [ \
-     "$1" = "-?" -o \
-     "$1" = "-h" -o \
-     "$1" = "--help" \
-   ]
-then
-  HelpMsg
-  return
-else
-  SetupEnv "$*"
-fi
+  if [ \
+       "$1" = "-?" -o \
+       "$1" = "-h" -o \
+       "$1" = "--help" \
+     ]
+  then
+    HelpMsg
+    return
+  else
+    SetupEnv "$*"
+  fi
 }
-if [ $# -gt 1 ] 
+
+if [ $# -gt 1 ]
 then
   HelpMsg
   return
@@ -64,6 +65,7 @@ elif [ $# -eq 1 ] && [ "$1" != "BaseTool" ]
 then
   HelpMsg
   return
-fi 
+fi
+
 SourceEnv "$*"
 
