@@ -1,7 +1,7 @@
 /**@file
   Memory Detection for Virtual Machines.
 
-  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -35,9 +35,9 @@ Module Name:
 #include "Platform.h"
 #include "Cmos.h"
 
-STATIC
-UINTN
+UINT32
 GetSystemMemorySizeBelow4gb (
+  VOID
   )
 {
   UINT8 Cmos0x34;

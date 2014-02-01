@@ -64,6 +64,11 @@ PublishPeiMemory (
   VOID
   );
 
+UINT32
+GetSystemMemorySizeBelow4gb (
+  VOID
+  );
+
 EFI_PHYSICAL_ADDRESS
 MemDetect (
   VOID

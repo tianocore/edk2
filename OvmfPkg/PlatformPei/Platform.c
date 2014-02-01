@@ -164,7 +164,7 @@ AddUntestedMemoryRangeHob (
 }
 
 VOID
-XenMemMapInitialization (
+MemMapInitialization (
   VOID
   )
 {
@@ -193,55 +193,29 @@ XenMemMapInitialization (
   //
   AddIoMemoryRangeHob (0x0A0000, BASE_1MB);
 
-  XenPublishRamRegions ();
-}
+  if (!mXen) {
+    UINT32  TopOfLowRam;
+    TopOfLowRam = GetSystemMemorySizeBelow4gb ();
 
-
-VOID
-MemMapInitialization (
-  EFI_PHYSICAL_ADDRESS  TopOfMemory
-  )
-{
-  //
-  // Create Memory Type Information HOB
-  //
-  BuildGuidDataHob (
-    &gEfiMemoryTypeInformationGuid,
-    mDefaultMemoryTypeInformation,
-    sizeof(mDefaultMemoryTypeInformation)
-    );
-
-  //
-  // Add PCI IO Port space available for PCI resource allocations.
-  //
-  BuildResourceDescriptorHob (
-    EFI_RESOURCE_IO,
-    EFI_RESOURCE_ATTRIBUTE_PRESENT     |
-    EFI_RESOURCE_ATTRIBUTE_INITIALIZED,
-    0xC000,
-    0x4000
-    );
-
-  //
-  // Video memory + Legacy BIOS region
-  //
-  AddIoMemoryRangeHob (0x0A0000, BASE_1MB);
-
-  //
-  // address       purpose   size
-  // ------------  --------  -------------------------
-  // max(top, 2g)  PCI MMIO  0xFC000000 - max(top, 2g)
-  // 0xFC000000    gap                           44 MB
-  // 0xFEC00000    IO-APIC                        4 KB
-  // 0xFEC01000    gap                         1020 KB
-  // 0xFED00000    HPET                           1 KB
-  // 0xFED00400    gap                         1023 KB
-  // 0xFEE00000    LAPIC                          1 MB
-  //
-  AddIoMemoryRangeHob (TopOfMemory < BASE_2GB ? BASE_2GB : TopOfMemory, 0xFC000000);
-  AddIoMemoryBaseSizeHob (0xFEC00000, SIZE_4KB);
-  AddIoMemoryBaseSizeHob (0xFED00000, SIZE_1KB);
-  AddIoMemoryBaseSizeHob (PcdGet32(PcdCpuLocalApicBaseAddress), SIZE_1MB);
+    //
+    // address       purpose   size
+    // ------------  --------  -------------------------
+    // max(top, 2g)  PCI MMIO  0xFC000000 - max(top, 2g)
+    // 0xFC000000    gap                           44 MB
+    // 0xFEC00000    IO-APIC                        4 KB
+    // 0xFEC01000    gap                         1020 KB
+    // 0xFED00000    HPET                           1 KB
+    // 0xFED00400    gap                         1023 KB
+    // 0xFEE00000    LAPIC                          1 MB
+    //
+    AddIoMemoryRangeHob (TopOfLowRam < BASE_2GB ?
+                         BASE_2GB : TopOfLowRam, 0xFC000000);
+    AddIoMemoryBaseSizeHob (0xFEC00000, SIZE_4KB);
+    AddIoMemoryBaseSizeHob (0xFED00000, SIZE_1KB);
+    AddIoMemoryBaseSizeHob (PcdGet32(PcdCpuLocalApicBaseAddress), SIZE_1MB);
+  } else {
+    XenPublishRamRegions ();
+  }
 }
 
 
@@ -370,10 +344,6 @@ InitializePlatform (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_PHYSICAL_ADDRESS  TopOfMemory;
-
-  TopOfMemory = 0;
-
   DEBUG ((EFI_D_ERROR, "Platform PEIM Loaded\n"));
 
   DebugDumpCmos ();
@@ -385,7 +355,7 @@ InitializePlatform (
   PublishPeiMemory ();
 
   if (!mXen) {
-    TopOfMemory = MemDetect ();
+    MemDetect ();
   }
 
   if (mXen) {
@@ -397,11 +367,7 @@ InitializePlatform (
 
   PeiFvInitialization ();
 
-  if (mXen) {
-    XenMemMapInitialization ();
-  } else {
-    MemMapInitialization (TopOfMemory);
-  }
+  MemMapInitialization ();
 
   MiscInitialization ();
 
