@@ -86,10 +86,9 @@ XenDetect (
 
 extern BOOLEAN mXen;
 
-EFI_STATUS
-XenGetE820Map (
-  EFI_E820_ENTRY64 **Entries,
-  UINT32 *Count
+VOID
+XenPublishRamRegions (
+  VOID
   );
 
 #endif // _PLATFORM_PEI_H_INCLUDED_
