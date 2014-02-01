@@ -213,8 +213,6 @@ MemMapInitialization (
     AddIoMemoryBaseSizeHob (0xFEC00000, SIZE_4KB);
     AddIoMemoryBaseSizeHob (0xFED00000, SIZE_1KB);
     AddIoMemoryBaseSizeHob (PcdGet32(PcdCpuLocalApicBaseAddress), SIZE_1MB);
-  } else {
-    XenPublishRamRegions ();
   }
 }
 
@@ -354,9 +352,7 @@ InitializePlatform (
 
   PublishPeiMemory ();
 
-  if (!mXen) {
-    InitializeRamRegions ();
-  }
+  InitializeRamRegions ();
 
   if (mXen) {
     DEBUG ((EFI_D_INFO, "Xen was detected\n"));
