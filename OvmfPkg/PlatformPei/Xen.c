@@ -225,5 +225,7 @@ InitializeXen (
   //
   AddReservedMemoryBaseSizeHob (0xFC000000, 0x1000000);
 
+  PcdSetBool (PcdPciDisableBusEnumeration, TRUE);
+
   return EFI_SUCCESS;
 }

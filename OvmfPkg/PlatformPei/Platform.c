@@ -384,9 +384,7 @@ InitializePlatform (
 
   PublishPeiMemory ();
 
-  if (mXen) {
-    PcdSetBool (PcdPciDisableBusEnumeration, TRUE);
-  } else {
+  if (!mXen) {
     TopOfMemory = MemDetect ();
   }
 
