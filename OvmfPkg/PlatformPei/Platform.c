@@ -410,7 +410,6 @@ InitializePlatform (
   )
 {
   EFI_PHYSICAL_ADDRESS  TopOfMemory;
-  UINT32 XenLeaf;
 
   TopOfMemory = 0;
 
@@ -418,7 +417,7 @@ InitializePlatform (
 
   DebugDumpCmos ();
 
-  XenLeaf = XenDetect ();
+  XenDetect ();
 
   BootModeInitialization ();
 
@@ -432,7 +431,7 @@ InitializePlatform (
 
   if (mXen) {
     DEBUG ((EFI_D_INFO, "Xen was detected\n"));
-    InitializeXen (XenLeaf);
+    InitializeXen ();
   }
 
   ReserveEmuVariableNvStore ();

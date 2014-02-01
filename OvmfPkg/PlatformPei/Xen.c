@@ -33,6 +33,8 @@
 
 BOOLEAN mXen = FALSE;
 
+STATIC UINT32 mXenLeaf = 0;
+
 EFI_XEN_INFO mXenInfo;
 
 /**
@@ -114,31 +116,37 @@ XenConnect (
 /**
   Figures out if we are running inside Xen HVM.
 
-  @return UINT32     CPUID index used to connect to HV.
+  @retval TRUE   Xen was detected
+  @retval FALSE  Xen was not detected
 
 **/
-UINT32
+BOOLEAN
 XenDetect (
   VOID
   )
 {
-
-  UINT32 XenLeaf;
   UINT8 Signature[13];
 
-  for (XenLeaf = 0x40000000; XenLeaf < 0x40010000; XenLeaf += 0x100) {
-    AsmCpuid (XenLeaf, NULL, (UINT32 *) &Signature[0],
+  if (mXenLeaf != 0) {
+    return TRUE;
+  }
+
+  Signature[12] = '\0';
+  for (mXenLeaf = 0x40000000; mXenLeaf < 0x40010000; mXenLeaf += 0x100) {
+    AsmCpuid (mXenLeaf,
+              NULL,
+              (UINT32 *) &Signature[0],
               (UINT32 *) &Signature[4],
               (UINT32 *) &Signature[8]);
-    Signature[12] = '\0';
 
     if (!AsciiStrCmp ((CHAR8 *) Signature, "XenVMMXenVMM")) {
       mXen = TRUE;
-      return XenLeaf;
+      return TRUE;
     }
   }
 
-  return 0;
+  mXenLeaf = 0;
+  return FALSE;
 }
 
 /**
@@ -150,10 +158,14 @@ XenDetect (
 **/
 EFI_STATUS
 InitializeXen (
-  UINT32 XenLeaf
+  VOID
   )
 {
-  XenConnect (XenLeaf);
+  if (mXenLeaf == 0) {
+    return EFI_NOT_FOUND;
+  }
+
+  XenConnect (mXenLeaf);
 
   //
   // Reserve away HVMLOADER reserved memory [0xFC000000,0xFD000000).
