@@ -355,7 +355,7 @@ InitializePlatform (
   PublishPeiMemory ();
 
   if (!mXen) {
-    MemDetect ();
+    InitializeRamRegions ();
   }
 
   if (mXen) {

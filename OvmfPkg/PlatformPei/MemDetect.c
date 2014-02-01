@@ -122,19 +122,19 @@ PublishPeiMemory (
 
 
 /**
-  Peform Memory Detection
-
-  @return Top of memory
+  Peform Memory Detection for QEMU / KVM
 
 **/
-EFI_PHYSICAL_ADDRESS
-MemDetect (
+STATIC
+VOID
+QemuInitializeRam (
+  VOID
   )
 {
   UINT64                      LowerMemorySize;
   UINT64                      UpperMemorySize;
 
-  DEBUG ((EFI_D_ERROR, "MemDetect called\n"));
+  DEBUG ((EFI_D_INFO, "%a called\n", __FUNCTION__));
 
   //
   // Determine total memory size available
@@ -157,7 +157,16 @@ MemDetect (
 
     MtrrSetMemoryAttribute (BASE_4GB, UpperMemorySize, CacheWriteBack);
   }
-
-  return LowerMemorySize;
 }
 
+/**
+  Publish system RAM and reserve memory regions
+
+**/
+VOID
+InitializeRamRegions (
+  VOID
+  )
+{
+  QemuInitializeRam ();
+}

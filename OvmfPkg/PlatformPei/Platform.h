@@ -69,8 +69,8 @@ GetSystemMemorySizeBelow4gb (
   VOID
   );
 
-EFI_PHYSICAL_ADDRESS
-MemDetect (
+VOID
+InitializeRamRegions (
   VOID
   );
 
