@@ -424,13 +424,13 @@ InitializePlatform (
 
   PublishPeiMemory ();
 
-  if (XenLeaf != 0) {
+  if (mXen) {
     PcdSetBool (PcdPciDisableBusEnumeration, TRUE);
   } else {
     TopOfMemory = MemDetect ();
   }
 
-  if (XenLeaf != 0) {
+  if (mXen) {
     DEBUG ((EFI_D_INFO, "Xen was detected\n"));
     InitializeXen (XenLeaf);
   }
@@ -439,7 +439,7 @@ InitializePlatform (
 
   PeiFvInitialization ();
 
-  if (XenLeaf != 0) {
+  if (mXen) {
     XenMemMapInitialization ();
   } else {
     MemMapInitialization (TopOfMemory);

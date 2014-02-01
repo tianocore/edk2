@@ -1,7 +1,7 @@
 /**@file
   Xen Platform PEI support
 
-  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2011, Andrei Warkentin <andreiw@motorola.com>
 
   This program and the accompanying materials
@@ -30,6 +30,8 @@
 
 #include "Platform.h"
 #include "Xen.h"
+
+BOOLEAN mXen = FALSE;
 
 EFI_XEN_INFO mXenInfo;
 
@@ -131,6 +133,7 @@ XenDetect (
     Signature[12] = '\0';
 
     if (!AsciiStrCmp ((CHAR8 *) Signature, "XenVMMXenVMM")) {
+      mXen = TRUE;
       return XenLeaf;
     }
   }
