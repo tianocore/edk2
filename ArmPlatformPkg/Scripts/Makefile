@@ -1,5 +1,5 @@
 #/* @file
-#  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 #  
 #  This program and the accompanying materials                          
 #  are licensed and made available under the terms and conditions of the BSD License         
@@ -43,7 +43,7 @@ all: $(EDK2_CONF)
 ifeq ("$(OS)","Windows_NT")
 	build -a $(EDK2_ARCH) -p $(EDK2_DSC) -t $(EDK2_TOOLCHAIN) -b $(EDK2_BUILD) $(EDK2_MACROS)
 else
-	. ./edksetup.sh `pwd`/BaseTools; build -a $(EDK2_ARCH) -p $(EDK2_DSC) -t $(EDK2_TOOLCHAIN) -b $(EDK2_BUILD) $(EDK2_MACROS)
+	. ./edksetup.sh; build -a $(EDK2_ARCH) -p $(EDK2_DSC) -t $(EDK2_TOOLCHAIN) -b $(EDK2_BUILD) $(EDK2_MACROS)
 endif
 
 $(EDK2_CONF):
@@ -53,13 +53,13 @@ ifeq ("$(OS)","Windows_NT")
 	copy $(EDK_TOOLS_PATH)\Conf\target.template Conf\target.txt
 	copy $(EDK_TOOLS_PATH)\Conf\tools_def.template Conf\tools_def.txt
 else
-	. ./edksetup.sh `pwd`/BaseTools; $(MAKE) -C BaseTools
+	. ./edksetup.sh; $(MAKE) -C BaseTools
 endif
 
 clean:
 ifeq ("$(OS)","Windows_NT")
 	build -a $(EDK2_ARCH) -p $(EDK2_DSC) -t $(EDK2_TOOLCHAIN) -b $(EDK2_BUILD) $(EDK2_MACROS) cleanall
 else
-	. ./edksetup.sh `pwd`/BaseTools; build -a $(EDK2_ARCH) -p $(EDK2_DSC) -t $(EDK2_TOOLCHAIN) -b $(EDK2_BUILD) $(EDK2_MACROS) cleanall; \
+	. ./edksetup.sh; build -a $(EDK2_ARCH) -p $(EDK2_DSC) -t $(EDK2_TOOLCHAIN) -b $(EDK2_BUILD) $(EDK2_MACROS) cleanall; \
 	rm -Rf $(EDK2_CONF) Conf/.cache
 endif
