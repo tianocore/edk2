@@ -338,7 +338,7 @@
   #
 
   # List of Device Paths that support BootMonFs
-  gArmPlatformTokenSpaceGuid.PcdBootMonFsSupportedDevicePaths|L"VenHw(1F15DA3C-37FF-4070-B471-BB4AF12A724A)"
+  gArmPlatformTokenSpaceGuid.PcdBootMonFsSupportedDevicePaths|L"VenHw(E7223039-5836-41E1-B542-D7EC736C5E59);VenHw(1F15DA3C-37FF-4070-B471-BB4AF12A724A)"
 
   #
   # ARM OS Loader
