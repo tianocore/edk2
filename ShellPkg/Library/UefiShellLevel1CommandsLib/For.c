@@ -370,7 +370,6 @@ ShellCommandRunFor (
         gEfiShellParametersProtocol->Argv[2]) == 0) {
       for (LoopVar = 0x3 ; LoopVar < gEfiShellParametersProtocol->Argc ; LoopVar++) {
         ASSERT((ArgSet == NULL && ArgSize == 0) || (ArgSet != NULL));
-        ArgSet = StrnCatGrow(&ArgSet, &ArgSize, L" \"", 0);
         if (StrStr(gEfiShellParametersProtocol->Argv[LoopVar], L"*") != NULL
           ||StrStr(gEfiShellParametersProtocol->Argv[LoopVar], L"?") != NULL
           ||StrStr(gEfiShellParametersProtocol->Argv[LoopVar], L"[") != NULL
@@ -378,7 +377,9 @@ ShellCommandRunFor (
           FileList = NULL;
           Status = ShellOpenFileMetaArg ((CHAR16*)gEfiShellParametersProtocol->Argv[LoopVar], EFI_FILE_MODE_READ, &FileList);
           if (EFI_ERROR(Status) || FileList == NULL || IsListEmpty(&FileList->Link)) {
+            ArgSet = StrnCatGrow(&ArgSet, &ArgSize, L" \"", 0);
             ArgSet = StrnCatGrow(&ArgSet, &ArgSize, gEfiShellParametersProtocol->Argv[LoopVar], 0);
+            ArgSet = StrnCatGrow(&ArgSet, &ArgSize, L"\"", 0);
           } else {
             for (Node = (EFI_SHELL_FILE_INFO *)GetFirstNode(&FileList->Link)
               ;  !IsNull(&FileList->Link, &Node->Link)
@@ -391,9 +392,10 @@ ShellCommandRunFor (
             ShellCloseFileMetaArg(&FileList);
           }
         } else {
+          ArgSet = StrnCatGrow(&ArgSet, &ArgSize, L" \"", 0);
           ArgSet = StrnCatGrow(&ArgSet, &ArgSize, gEfiShellParametersProtocol->Argv[LoopVar], 0);
+          ArgSet = StrnCatGrow(&ArgSet, &ArgSize, L"\"", 0);
         }
-        ArgSet = StrnCatGrow(&ArgSet, &ArgSize, L"\"", 0);
       }
       if (ArgSet == NULL) {
         ShellStatus = SHELL_OUT_OF_RESOURCES;
