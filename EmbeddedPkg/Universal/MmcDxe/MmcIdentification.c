@@ -222,7 +222,8 @@ MmcIdentificationMode (
     return Status;
   }
 
-  // Send CMD1 to get OCR (SD / MMC)
+  // Send CMD1 to get OCR (MMC)
+  // This command only valid for MMC and eMMC
   Status = MmcHost->SendCommand (MmcHost, MMC_CMD1, EMMC_CMD1_CAPACITY_GREATER_THAN_2GB);
   if (Status == EFI_SUCCESS) {
     Status = MmcHost->ReceiveResponse (MmcHost, MMC_RESPONSE_TYPE_OCR, (UINT32 *)&OcrResponse);
@@ -242,13 +243,11 @@ MmcIdentificationMode (
     else {
       MmcHostInstance->CardInfo.OCRData.AccessMode = 0x0;
     }
+    // Check whether MMC or eMMC
     if (OcrResponse.Raw == EMMC_CMD1_CAPACITY_GREATER_THAN_2GB ||
         OcrResponse.Raw == EMMC_CMD1_CAPACITY_LESS_THAN_2GB) {
       return EmmcIdentificationMode (MmcHostInstance, OcrResponse);
     }
-  } else {
-    DEBUG ((EFI_D_ERROR, "MmcIdentificationMode(MMC_CMD1) : Failed to send command, Status=%r.\n", Status));
-    return Status;
   }
 
   // Are we using SDIO ?
