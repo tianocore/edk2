@@ -872,6 +872,7 @@ TranslateOfwPath (
   BOOLEAN       IsFinal;
   OFW_NODE      Skip;
 
+  IsFinal = FALSE;
   NumNodes = 0;
   if (AsciiStrCmp (*Ptr, "HALT") == 0) {
     *Ptr += 4;
