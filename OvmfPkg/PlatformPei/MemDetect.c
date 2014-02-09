@@ -171,7 +171,6 @@ InitializeRamRegions (
   if (!mXen) {
     QemuInitializeRam ();
   } else {
-    DEBUG ((EFI_D_INFO, "Using memory map provided by Xen\n"));
     XenPublishRamRegions ();
   }
 }
