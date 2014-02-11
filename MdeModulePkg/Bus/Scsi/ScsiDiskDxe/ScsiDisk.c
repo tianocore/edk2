@@ -1,7 +1,7 @@
 /** @file
   SCSI disk driver that layers on every SCSI IO protocol in the system.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2085,25 +2085,81 @@ ScsiDiskRead10 (
 {
   UINT8       SenseDataLength;
   EFI_STATUS  Status;
+  EFI_STATUS  ReturnStatus;
   UINT8       HostAdapterStatus;
   UINT8       TargetStatus;
+  UINTN       Action;
 
   *NeedRetry          = FALSE;
   *NumberOfSenseKeys  = 0;
-  SenseDataLength     = 0;
-  Status = ScsiRead10Command (
-            ScsiDiskDevice->ScsiIo,
-            Timeout,
-            NULL,
-            &SenseDataLength,
-            &HostAdapterStatus,
-            &TargetStatus,
-            DataBuffer,
-            DataLength,
-            StartLba,
-            SectorSize
-            );
-  return Status;
+  Action              = ACTION_NO_ACTION;
+  SenseDataLength     = (UINT8) (ScsiDiskDevice->SenseDataNumber * sizeof (EFI_SCSI_SENSE_DATA));
+  ReturnStatus = ScsiRead10Command (
+                   ScsiDiskDevice->ScsiIo,
+                   Timeout,
+                   ScsiDiskDevice->SenseData,
+                   &SenseDataLength,
+                   &HostAdapterStatus,
+                   &TargetStatus,
+                   DataBuffer,
+                   DataLength,
+                   StartLba,
+                   SectorSize
+                   );
+
+  if (ReturnStatus == EFI_NOT_READY) {
+    *NeedRetry = TRUE;
+    return EFI_DEVICE_ERROR;
+  } else if ((ReturnStatus == EFI_INVALID_PARAMETER) || (ReturnStatus == EFI_UNSUPPORTED)) {
+    *NeedRetry = FALSE;
+    return ReturnStatus;
+  }
+
+  //
+  // go ahead to check HostAdapterStatus and TargetStatus
+  // (EFI_TIMEOUT, EFI_DEVICE_ERROR, EFI_WARN_BUFFER_TOO_SMALL)
+  //
+  Status = CheckHostAdapterStatus (HostAdapterStatus);
+  if ((Status == EFI_TIMEOUT) || (Status == EFI_NOT_READY)) {
+    *NeedRetry = TRUE;
+    return EFI_DEVICE_ERROR;
+  } else if (Status == EFI_DEVICE_ERROR) {
+    //
+    // reset the scsi channel
+    //
+    ScsiDiskDevice->ScsiIo->ResetBus (ScsiDiskDevice->ScsiIo);
+    *NeedRetry = FALSE;
+    return EFI_DEVICE_ERROR;
+  }
+
+  Status = CheckTargetStatus (TargetStatus);
+  if (Status == EFI_NOT_READY) {
+    //
+    // reset the scsi device
+    //
+    ScsiDiskDevice->ScsiIo->ResetDevice (ScsiDiskDevice->ScsiIo);
+    *NeedRetry = TRUE;
+    return EFI_DEVICE_ERROR;
+  } else if (Status == EFI_DEVICE_ERROR) {
+    *NeedRetry = FALSE;
+    return EFI_DEVICE_ERROR;
+  }
+
+  if (TargetStatus == EFI_EXT_SCSI_STATUS_TARGET_CHECK_CONDITION) {
+    DEBUG ((EFI_D_VERBOSE, "ScsiDiskRead10: Check Condition happened!\n"));
+    Status = DetectMediaParsingSenseKeys (ScsiDiskDevice, ScsiDiskDevice->SenseData, SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA), &Action);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    } else if (Action == ACTION_RETRY_COMMAND_LATER) {
+      *NeedRetry = TRUE;
+      return EFI_DEVICE_ERROR;
+    } else {
+      *NeedRetry = FALSE;
+      return EFI_DEVICE_ERROR;
+    }
+  }
+
+  return ReturnStatus;
 }
 
 
@@ -2137,26 +2193,81 @@ ScsiDiskWrite10 (
   )
 {
   EFI_STATUS  Status;
+  EFI_STATUS  ReturnStatus;
   UINT8       SenseDataLength;
   UINT8       HostAdapterStatus;
   UINT8       TargetStatus;
+  UINTN       Action;
 
   *NeedRetry          = FALSE;
   *NumberOfSenseKeys  = 0;
-  SenseDataLength     = 0;
-  Status = ScsiWrite10Command (
-            ScsiDiskDevice->ScsiIo,
-            Timeout,
-            NULL,
-            &SenseDataLength,
-            &HostAdapterStatus,
-            &TargetStatus,
-            DataBuffer,
-            DataLength,
-            StartLba,
-            SectorSize
-            );
-  return Status;
+  Action              = ACTION_NO_ACTION;
+  SenseDataLength     = (UINT8) (ScsiDiskDevice->SenseDataNumber * sizeof (EFI_SCSI_SENSE_DATA));
+  ReturnStatus = ScsiWrite10Command (
+                   ScsiDiskDevice->ScsiIo,
+                   Timeout,
+                   ScsiDiskDevice->SenseData,
+                   &SenseDataLength,
+                   &HostAdapterStatus,
+                   &TargetStatus,
+                   DataBuffer,
+                   DataLength,
+                   StartLba,
+                   SectorSize
+                   );
+  if (ReturnStatus == EFI_NOT_READY) {
+    *NeedRetry = TRUE;
+    return EFI_DEVICE_ERROR;
+  } else if ((ReturnStatus == EFI_INVALID_PARAMETER) || (ReturnStatus == EFI_UNSUPPORTED)) {
+    *NeedRetry = FALSE;
+    return ReturnStatus;
+  }
+
+  //
+  // go ahead to check HostAdapterStatus and TargetStatus
+  // (EFI_TIMEOUT, EFI_DEVICE_ERROR, EFI_WARN_BUFFER_TOO_SMALL)
+  //
+  Status = CheckHostAdapterStatus (HostAdapterStatus);
+  if ((Status == EFI_TIMEOUT) || (Status == EFI_NOT_READY)) {
+    *NeedRetry = TRUE;
+    return EFI_DEVICE_ERROR;
+  } else if (Status == EFI_DEVICE_ERROR) {
+    //
+    // reset the scsi channel
+    //
+    ScsiDiskDevice->ScsiIo->ResetBus (ScsiDiskDevice->ScsiIo);
+    *NeedRetry = FALSE;
+    return EFI_DEVICE_ERROR;
+  }
+
+  Status = CheckTargetStatus (TargetStatus);
+  if (Status == EFI_NOT_READY) {
+    //
+    // reset the scsi device
+    //
+    ScsiDiskDevice->ScsiIo->ResetDevice (ScsiDiskDevice->ScsiIo);
+    *NeedRetry = TRUE;
+    return EFI_DEVICE_ERROR;
+  } else if (Status == EFI_DEVICE_ERROR) {
+    *NeedRetry = FALSE;
+    return EFI_DEVICE_ERROR;
+  }
+
+  if (TargetStatus == EFI_EXT_SCSI_STATUS_TARGET_CHECK_CONDITION) {
+    DEBUG ((EFI_D_VERBOSE, "ScsiDiskWrite10: Check Condition happened!\n"));
+    Status = DetectMediaParsingSenseKeys (ScsiDiskDevice, ScsiDiskDevice->SenseData, SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA), &Action);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    } else if (Action == ACTION_RETRY_COMMAND_LATER) {
+      *NeedRetry = TRUE;
+      return EFI_DEVICE_ERROR;
+    } else {
+      *NeedRetry = FALSE;
+      return EFI_DEVICE_ERROR;
+    }
+  }
+
+  return ReturnStatus;
 }
 
 
@@ -2190,25 +2301,80 @@ ScsiDiskRead16 (
 {
   UINT8       SenseDataLength;
   EFI_STATUS  Status;
+  EFI_STATUS  ReturnStatus;
   UINT8       HostAdapterStatus;
   UINT8       TargetStatus;
+  UINTN       Action;
 
   *NeedRetry          = FALSE;
   *NumberOfSenseKeys  = 0;
-  SenseDataLength     = 0;
-  Status = ScsiRead16Command (
-            ScsiDiskDevice->ScsiIo,
-            Timeout,
-            NULL,
-            &SenseDataLength,
-            &HostAdapterStatus,
-            &TargetStatus,
-            DataBuffer,
-            DataLength,
-            StartLba,
-            SectorSize
-            );
-  return Status;
+  Action              = ACTION_NO_ACTION;
+  SenseDataLength     = (UINT8) (ScsiDiskDevice->SenseDataNumber * sizeof (EFI_SCSI_SENSE_DATA));
+  ReturnStatus = ScsiRead16Command (
+                   ScsiDiskDevice->ScsiIo,
+                   Timeout,
+                   ScsiDiskDevice->SenseData,
+                   &SenseDataLength,
+                   &HostAdapterStatus,
+                   &TargetStatus,
+                   DataBuffer,
+                   DataLength,
+                   StartLba,
+                   SectorSize
+                   );
+  if (ReturnStatus == EFI_NOT_READY) {
+    *NeedRetry = TRUE;
+    return EFI_DEVICE_ERROR;
+  } else if ((ReturnStatus == EFI_INVALID_PARAMETER) || (ReturnStatus == EFI_UNSUPPORTED)) {
+    *NeedRetry = FALSE;
+    return ReturnStatus;
+  }
+
+  //
+  // go ahead to check HostAdapterStatus and TargetStatus
+  // (EFI_TIMEOUT, EFI_DEVICE_ERROR, EFI_WARN_BUFFER_TOO_SMALL)
+  //
+  Status = CheckHostAdapterStatus (HostAdapterStatus);
+  if ((Status == EFI_TIMEOUT) || (Status == EFI_NOT_READY)) {
+    *NeedRetry = TRUE;
+    return EFI_DEVICE_ERROR;
+  } else if (Status == EFI_DEVICE_ERROR) {
+    //
+    // reset the scsi channel
+    //
+    ScsiDiskDevice->ScsiIo->ResetBus (ScsiDiskDevice->ScsiIo);
+    *NeedRetry = FALSE;
+    return EFI_DEVICE_ERROR;
+  }
+
+  Status = CheckTargetStatus (TargetStatus);
+  if (Status == EFI_NOT_READY) {
+    //
+    // reset the scsi device
+    //
+    ScsiDiskDevice->ScsiIo->ResetDevice (ScsiDiskDevice->ScsiIo);
+    *NeedRetry = TRUE;
+    return EFI_DEVICE_ERROR;
+  } else if (Status == EFI_DEVICE_ERROR) {
+    *NeedRetry = FALSE;
+    return EFI_DEVICE_ERROR;
+  }
+
+  if (TargetStatus == EFI_EXT_SCSI_STATUS_TARGET_CHECK_CONDITION) {
+    DEBUG ((EFI_D_VERBOSE, "ScsiDiskRead16: Check Condition happened!\n"));
+    Status = DetectMediaParsingSenseKeys (ScsiDiskDevice, ScsiDiskDevice->SenseData, SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA), &Action);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    } else if (Action == ACTION_RETRY_COMMAND_LATER) {
+      *NeedRetry = TRUE;
+      return EFI_DEVICE_ERROR;
+    } else {
+      *NeedRetry = FALSE;
+      return EFI_DEVICE_ERROR;
+    }
+  }
+
+  return ReturnStatus;
 }
 
 
@@ -2242,26 +2408,81 @@ ScsiDiskWrite16 (
   )
 {
   EFI_STATUS  Status;
+  EFI_STATUS  ReturnStatus;
   UINT8       SenseDataLength;
   UINT8       HostAdapterStatus;
   UINT8       TargetStatus;
+  UINTN       Action;
 
   *NeedRetry          = FALSE;
   *NumberOfSenseKeys  = 0;
-  SenseDataLength     = 0;
-  Status = ScsiWrite16Command (
-            ScsiDiskDevice->ScsiIo,
-            Timeout,
-            NULL,
-            &SenseDataLength,
-            &HostAdapterStatus,
-            &TargetStatus,
-            DataBuffer,
-            DataLength,
-            StartLba,
-            SectorSize
-            );
-  return Status;
+  Action              = ACTION_NO_ACTION;
+  SenseDataLength     = (UINT8) (ScsiDiskDevice->SenseDataNumber * sizeof (EFI_SCSI_SENSE_DATA));
+  ReturnStatus = ScsiWrite16Command (
+                   ScsiDiskDevice->ScsiIo,
+                   Timeout,
+                   ScsiDiskDevice->SenseData,
+                   &SenseDataLength,
+                   &HostAdapterStatus,
+                   &TargetStatus,
+                   DataBuffer,
+                   DataLength,
+                   StartLba,
+                   SectorSize
+                   );
+  if (ReturnStatus == EFI_NOT_READY) {
+    *NeedRetry = TRUE;
+    return EFI_DEVICE_ERROR;
+  } else if ((ReturnStatus == EFI_INVALID_PARAMETER) || (ReturnStatus == EFI_UNSUPPORTED)) {
+    *NeedRetry = FALSE;
+    return ReturnStatus;
+  }
+
+  //
+  // go ahead to check HostAdapterStatus and TargetStatus
+  // (EFI_TIMEOUT, EFI_DEVICE_ERROR, EFI_WARN_BUFFER_TOO_SMALL)
+  //
+  Status = CheckHostAdapterStatus (HostAdapterStatus);
+  if ((Status == EFI_TIMEOUT) || (Status == EFI_NOT_READY)) {
+    *NeedRetry = TRUE;
+    return EFI_DEVICE_ERROR;
+  } else if (Status == EFI_DEVICE_ERROR) {
+    //
+    // reset the scsi channel
+    //
+    ScsiDiskDevice->ScsiIo->ResetBus (ScsiDiskDevice->ScsiIo);
+    *NeedRetry = FALSE;
+    return EFI_DEVICE_ERROR;
+  }
+
+  Status = CheckTargetStatus (TargetStatus);
+  if (Status == EFI_NOT_READY) {
+    //
+    // reset the scsi device
+    //
+    ScsiDiskDevice->ScsiIo->ResetDevice (ScsiDiskDevice->ScsiIo);
+    *NeedRetry = TRUE;
+    return EFI_DEVICE_ERROR;
+  } else if (Status == EFI_DEVICE_ERROR) {
+    *NeedRetry = FALSE;
+    return EFI_DEVICE_ERROR;
+  }
+
+  if (TargetStatus == EFI_EXT_SCSI_STATUS_TARGET_CHECK_CONDITION) {
+    DEBUG ((EFI_D_VERBOSE, "ScsiDiskWrite16: Check Condition happened!\n"));
+    Status = DetectMediaParsingSenseKeys (ScsiDiskDevice, ScsiDiskDevice->SenseData, SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA), &Action);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    } else if (Action == ACTION_RETRY_COMMAND_LATER) {
+      *NeedRetry = TRUE;
+      return EFI_DEVICE_ERROR;
+    } else {
+      *NeedRetry = FALSE;
+      return EFI_DEVICE_ERROR;
+    }
+  }
+
+  return ReturnStatus;
 }
 
 
