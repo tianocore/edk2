@@ -1,7 +1,7 @@
 /** @file
   Implementation for EFI_SIMPLE_TEXT_INPUT_PROTOCOL protocol.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -942,15 +942,14 @@ UnicodeFiFoInsertOneKey (
 
 /**
   Remove one pre-fetched key out of the Unicode FIFO buffer.
+  The caller should guarantee that Unicode FIFO buffer is not empty 
+  by IsUnicodeFiFoEmpty ().
 
   @param  TerminalDevice       Terminal driver private structure.
   @param  Output               The key will be removed.
 
-  @retval TRUE                 If insert successfully.
-  @retval FLASE                If Unicode FIFO buffer is empty before remove operation.
-
 **/
-BOOLEAN
+VOID
 UnicodeFiFoRemoveOneKey (
   TERMINAL_DEV  *TerminalDevice,
   UINT16        *Output
@@ -961,19 +960,9 @@ UnicodeFiFoRemoveOneKey (
   Head = TerminalDevice->UnicodeFiFo->Head;
   ASSERT (Head < FIFO_MAX_NUMBER + 1);
 
-  if (IsUnicodeFiFoEmpty (TerminalDevice)) {
-    //
-    //  FIFO is empty
-    //
-    Output = NULL;
-    return FALSE;
-  }
-
   *Output = TerminalDevice->UnicodeFiFo->Data[Head];
 
   TerminalDevice->UnicodeFiFo->Head = (UINT8) ((Head + 1) % (FIFO_MAX_NUMBER + 1));
-
-  return TRUE;
 }
 
 /**

@@ -1,7 +1,7 @@
 /** @file
   Header file for Terminal driver.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1013,15 +1013,14 @@ UnicodeFiFoInsertOneKey (
 
 /**
   Remove one pre-fetched key out of the Unicode FIFO buffer.
+  The caller should guarantee that Unicode FIFO buffer is not empty 
+  by IsUnicodeFiFoEmpty ().
 
   @param  TerminalDevice       Terminal driver private structure.
   @param  Output               The key will be removed.
 
-  @retval TRUE                 If insert successfully.
-  @retval FLASE                If Unicode FIFO buffer is empty before remove operation.
-
 **/
-BOOLEAN
+VOID
 UnicodeFiFoRemoveOneKey (
   TERMINAL_DEV  *TerminalDevice,
   UINT16        *Output
