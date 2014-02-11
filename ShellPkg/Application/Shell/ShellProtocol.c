@@ -1397,6 +1397,7 @@ InternalShellExecuteDevicePath(
   UINTN                         InternalExitDataSize;
   UINTN                         *ExitDataSizePtr;
   CHAR16                        *ImagePath;
+  UINTN                         Index;
 
   // ExitDataSize is not OPTIONAL for gBS->BootServices, provide somewhere for
   // it to be dumped if the caller doesn't want it.
@@ -1482,7 +1483,7 @@ InternalShellExecuteDevicePath(
         ShellParamsProtocol.Argv = AllocatePool (sizeof (CHAR16 *));
         if (ShellParamsProtocol.Argv == NULL) {
           Status = EFI_OUT_OF_RESOURCES;
-          goto Cleanup;
+          goto UnloadImage;
         }
         ShellParamsProtocol.Argc = 1;
       } else {
@@ -1506,36 +1507,37 @@ InternalShellExecuteDevicePath(
                           ExitDataSizePtr,
                           ExitData
                           );
+
+      CleanupStatus = gBS->UninstallProtocolInterface(
+                            NewHandle,
+                            &gEfiShellParametersProtocolGuid,
+                            &ShellParamsProtocol
+                            );
+      ASSERT_EFI_ERROR(CleanupStatus);
+
+      goto FreeAlloc;
     }
 
-    //
-    // Cleanup (and dont overwrite errors)
-    //
-    if (EFI_ERROR(Status)) {
-      CleanupStatus = gBS->UninstallProtocolInterface(
-                            NewHandle,
-                            &gEfiShellParametersProtocolGuid,
-                            &ShellParamsProtocol
-                            );
-      ASSERT_EFI_ERROR(CleanupStatus);
-    } else {
-      CleanupStatus = gBS->UninstallProtocolInterface(
-                            NewHandle,
-                            &gEfiShellParametersProtocolGuid,
-                            &ShellParamsProtocol
-                            );
-      ASSERT_EFI_ERROR(CleanupStatus);
+UnloadImage:
+    // Unload image - We should only get here if we didn't call StartImage
+    gBS->UnloadImage (NewHandle);
+
+FreeAlloc:
+    // Free Argv (Allocated in UpdateArgcArgv)
+    if (ShellParamsProtocol.Argv != NULL) {
+      for (Index = 0; Index < ShellParamsProtocol.Argc; Index++) {
+        if (ShellParamsProtocol.Argv[Index] != NULL) {
+          FreePool (ShellParamsProtocol.Argv[Index]);
+        }
+      }
+      FreePool (ShellParamsProtocol.Argv);
     }
   }
 
+  // Restore environment variables
   if (!IsListEmpty(&OrigEnvs)) {
-    if (EFI_ERROR(Status)) {
-      CleanupStatus = SetEnvironmentVariableList(&OrigEnvs);
-      ASSERT_EFI_ERROR(CleanupStatus);
-    } else {
-      CleanupStatus = SetEnvironmentVariableList(&OrigEnvs);
-      ASSERT_EFI_ERROR (CleanupStatus);
-    }
+    CleanupStatus = SetEnvironmentVariableList(&OrigEnvs);
+    ASSERT_EFI_ERROR (CleanupStatus);
   }
 
   return(Status);
