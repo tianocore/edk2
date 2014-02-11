@@ -328,7 +328,8 @@ UefiMain (
         ///@todo Add our package into Framework HII
       }
       if (ShellInfoObject.HiiHandle == NULL) {
-        return (EFI_NOT_STARTED);
+        Status = EFI_NOT_STARTED;
+        goto FreeResources;
       }
     }
 
@@ -528,6 +529,7 @@ UefiMain (
     }
   }
 
+FreeResources:
   //
   // uninstall protocols / free memory / etc...
   //
@@ -589,29 +591,33 @@ UefiMain (
     DEBUG_CODE(ShellInfoObject.ConsoleInfo = NULL;);
   }
 
-  // If the command exited with an error, we pass this error out in the ExitData
-  // so that it can be retrieved by the EfiShellExecute function (which may
-  // start the shell with gBS->StartImage)
-  if (ExitStatus != SHELL_SUCCESS) {
-    // Allocate a buffer for exit data to pass to gBS->Exit().
-    // This buffer will contain the empty string immediately followed by
-    // the shell's exit status. (The empty string is required by the UEFI spec)
-    ExitDataSize = (sizeof (CHAR16) + sizeof (SHELL_STATUS));
-    ExitData = AllocatePool (ExitDataSize);
-    if (ExitData == NULL) {
-      return EFI_OUT_OF_RESOURCES;
+  if (!EFI_ERROR (Status)) {
+    // If the command exited with an error, we pass this error out in the ExitData
+    // so that it can be retrieved by the EfiShellExecute function (which may
+    // start the shell with gBS->StartImage)
+    if (ExitStatus != SHELL_SUCCESS) {
+      // Allocate a buffer for exit data to pass to gBS->Exit().
+      // This buffer will contain the empty string immediately followed by
+      // the shell's exit status. (The empty string is required by the UEFI spec)
+      ExitDataSize = (sizeof (CHAR16) + sizeof (SHELL_STATUS));
+      ExitData = AllocatePool (ExitDataSize);
+      if (ExitData == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+      ExitData[0] = '\0';
+      // Use CopyMem to avoid alignment faults
+      CopyMem ((ExitData + 1), &ExitStatus, sizeof (ExitStatus));
+
+      gBS->Exit (ImageHandle, EFI_ABORTED, ExitDataSize, ExitData);
+
+      ASSERT (FALSE);
+      return EFI_SUCCESS;
+    } else {
+      return EFI_SUCCESS;
     }
-    ExitData[0] = '\0';
-    // Use CopyMem to avoid alignment faults
-    CopyMem ((ExitData + 1), &ExitStatus, sizeof (ExitStatus));
-
-    gBS->Exit (ImageHandle, EFI_ABORTED, ExitDataSize, ExitData);
   } else {
-    return EFI_SUCCESS;
+    return Status;
   }
-
-  ASSERT (FALSE);
-  return EFI_SUCCESS;
 }
 
 /**
