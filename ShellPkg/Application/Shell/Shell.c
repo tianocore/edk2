@@ -1677,10 +1677,12 @@ GetOperationType(
   }
 
   //
-  // Test for file system change request.  anything ending with : and cant have spaces.
+  // Test for file system change request.  anything ending with first : and cant have spaces.
   //
   if (CmdName[(StrLen(CmdName)-1)] == L':') {
-    if (StrStr(CmdName, L" ") != NULL) {
+    if ( StrStr(CmdName, L" ") != NULL 
+      || StrLen(StrStr(CmdName, L":")) > 1
+      ) {
       return (Unknown_Invalid);
     }
     return (File_Sys_Change);
