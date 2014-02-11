@@ -359,7 +359,10 @@ UefiMain (
     //
     // Check the command line
     //
-    Status = ProcessCommandLine();
+    Status = ProcessCommandLine ();
+    if (EFI_ERROR (Status)) {
+      goto FreeResources;
+    }
 
     //
     // If shell support level is >= 1 create the mappings and paths
