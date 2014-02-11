@@ -1,7 +1,7 @@
 /** @file
 The module to produce Usb Bus PPI.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -222,6 +222,8 @@ PeiHubEnumeration (
   UINTN                 MemPages;
   EFI_PHYSICAL_ADDRESS  AllocateAddress;
   PEI_USB_DEVICE        *NewPeiUsbDevice;
+  UINTN                 InterfaceIndex;
+  UINTN                 EndpointIndex;
 
 
   UsbIoPpi    = &PeiUsbDevice->UsbIoPpi;
@@ -341,8 +343,43 @@ PeiHubEnumeration (
 
           PeiHubEnumeration (PeiServices, NewPeiUsbDevice, CurrentAddress);
         }
-      }
 
+        for (InterfaceIndex = 1; InterfaceIndex < NewPeiUsbDevice->ConfigDesc->NumInterfaces; InterfaceIndex++) {
+          //
+          // Begin to deal with the new device
+          //
+          MemPages = sizeof (PEI_USB_DEVICE) / EFI_PAGE_SIZE + 1;
+          Status = PeiServicesAllocatePages (
+                     EfiBootServicesCode,
+                     MemPages,
+                     &AllocateAddress
+                     );
+          if (EFI_ERROR (Status)) {
+            return EFI_OUT_OF_RESOURCES;
+          }
+          CopyMem ((VOID *)(UINTN)AllocateAddress, NewPeiUsbDevice, sizeof (PEI_USB_DEVICE));
+          NewPeiUsbDevice = (PEI_USB_DEVICE *) ((UINTN) AllocateAddress);
+          NewPeiUsbDevice->AllocateAddress  = (UINTN) AllocateAddress;
+          NewPeiUsbDevice->UsbIoPpiList.Ppi = &NewPeiUsbDevice->UsbIoPpi;
+          NewPeiUsbDevice->InterfaceDesc = NewPeiUsbDevice->InterfaceDescList[InterfaceIndex];
+          for (EndpointIndex = 0; EndpointIndex < NewPeiUsbDevice->InterfaceDesc->NumEndpoints; EndpointIndex++) {
+            NewPeiUsbDevice->EndpointDesc[EndpointIndex] = NewPeiUsbDevice->EndpointDescList[InterfaceIndex][EndpointIndex];
+          }
+
+          Status = PeiServicesInstallPpi (&NewPeiUsbDevice->UsbIoPpiList);
+
+          if (NewPeiUsbDevice->InterfaceDesc->InterfaceClass == 0x09) {
+            NewPeiUsbDevice->IsHub  = 0x1;
+
+            Status = PeiDoHubConfig (PeiServices, NewPeiUsbDevice);
+            if (EFI_ERROR (Status)) {
+              return Status;
+            }
+
+            PeiHubEnumeration (PeiServices, NewPeiUsbDevice, CurrentAddress);
+          }
+        }
+      }
     }
   }
 
@@ -377,7 +414,8 @@ PeiUsbEnumeration (
   UINTN                 MemPages;
   EFI_PHYSICAL_ADDRESS  AllocateAddress;
   UINT8                 CurrentAddress;
-
+  UINTN                 InterfaceIndex;
+  UINTN                 EndpointIndex;
 
   CurrentAddress = 0;
   if (Usb2HcPpi != NULL) {
@@ -546,6 +584,42 @@ PeiUsbEnumeration (
 
           PeiHubEnumeration (PeiServices, PeiUsbDevice, &CurrentAddress);
         }
+
+        for (InterfaceIndex = 1; InterfaceIndex < PeiUsbDevice->ConfigDesc->NumInterfaces; InterfaceIndex++) {
+          //
+          // Begin to deal with the new device
+          //
+          MemPages = sizeof (PEI_USB_DEVICE) / EFI_PAGE_SIZE + 1;
+          Status = PeiServicesAllocatePages (
+                     EfiBootServicesCode,
+                     MemPages,
+                     &AllocateAddress
+                     );
+          if (EFI_ERROR (Status)) {
+            return EFI_OUT_OF_RESOURCES;
+          }
+          CopyMem ((VOID *)(UINTN)AllocateAddress, PeiUsbDevice, sizeof (PEI_USB_DEVICE));
+          PeiUsbDevice = (PEI_USB_DEVICE *) ((UINTN) AllocateAddress);
+          PeiUsbDevice->AllocateAddress  = (UINTN) AllocateAddress;
+          PeiUsbDevice->UsbIoPpiList.Ppi = &PeiUsbDevice->UsbIoPpi;
+          PeiUsbDevice->InterfaceDesc = PeiUsbDevice->InterfaceDescList[InterfaceIndex];
+          for (EndpointIndex = 0; EndpointIndex < PeiUsbDevice->InterfaceDesc->NumEndpoints; EndpointIndex++) {
+            PeiUsbDevice->EndpointDesc[EndpointIndex] = PeiUsbDevice->EndpointDescList[InterfaceIndex][EndpointIndex];
+          }
+
+          Status = PeiServicesInstallPpi (&PeiUsbDevice->UsbIoPpiList);
+
+          if (PeiUsbDevice->InterfaceDesc->InterfaceClass == 0x09) {
+            PeiUsbDevice->IsHub = 0x1;
+
+            Status = PeiDoHubConfig (PeiServices, PeiUsbDevice);
+            if (EFI_ERROR (Status)) {
+              return Status;
+            }
+
+            PeiHubEnumeration (PeiServices, PeiUsbDevice, &CurrentAddress);
+          }
+        }
       } else {
         //
         // Disconnect change happen, currently we don't support
@@ -647,6 +721,7 @@ PeiConfigureUsbDevice (
     DEBUG ((EFI_D_ERROR, "PeiUsbGetDescriptor First Failed\n"));
     return Status;
   }
+
   //
   // Get its default configuration and its first interface
   //
@@ -654,7 +729,6 @@ PeiConfigureUsbDevice (
             PeiServices,
             PeiUsbDevice
             );
-
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -695,6 +769,7 @@ PeiUsbGetAllConfiguration (
   UINT8                     *Ptr;
   UINTN                     SkipBytes;
   UINTN                     LengthLeft;
+  UINTN                     InterfaceIndex;
   UINTN                     Index;
   UINTN                     NumOfEndpoint;
 
@@ -758,43 +833,16 @@ PeiUsbGetAllConfiguration (
   Ptr += sizeof (EFI_USB_CONFIG_DESCRIPTOR);
   LengthLeft = ConfigDescLength - SkipBytes - sizeof (EFI_USB_CONFIG_DESCRIPTOR);
 
-  //
-  // Get the first interface descriptor
-  //
-  Status = GetExpectedDescriptor (
-            Ptr,
-            LengthLeft,
-            USB_DT_INTERFACE,
-            (UINT8) sizeof (EFI_USB_INTERFACE_DESCRIPTOR),
-            &SkipBytes
-            );
+  for (InterfaceIndex = 0; InterfaceIndex < PeiUsbDevice->ConfigDesc->NumInterfaces; InterfaceIndex++) {
 
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Ptr += SkipBytes;
-  PeiUsbDevice->InterfaceDesc = (EFI_USB_INTERFACE_DESCRIPTOR *) Ptr;
-
-  Ptr += sizeof (EFI_USB_INTERFACE_DESCRIPTOR);
-  LengthLeft -= SkipBytes;
-  LengthLeft -= sizeof (EFI_USB_INTERFACE_DESCRIPTOR);
-
-  //
-  // Parse all the endpoint descriptor within this interface
-  //
-  NumOfEndpoint = PeiUsbDevice->InterfaceDesc->NumEndpoints;
-  ASSERT (NumOfEndpoint <= MAX_ENDPOINT);
-
-  for (Index = 0; Index < NumOfEndpoint; Index++) {
     //
-    // Get the endpoint descriptor
+    // Get the interface descriptor
     //
     Status = GetExpectedDescriptor (
               Ptr,
               LengthLeft,
-              USB_DT_ENDPOINT,
-              (UINT8) sizeof (EFI_USB_ENDPOINT_DESCRIPTOR),
+              USB_DT_INTERFACE,
+              (UINT8) sizeof (EFI_USB_INTERFACE_DESCRIPTOR),
               &SkipBytes
               );
 
@@ -803,11 +851,47 @@ PeiUsbGetAllConfiguration (
     }
 
     Ptr += SkipBytes;
-    PeiUsbDevice->EndpointDesc[Index] = (EFI_USB_ENDPOINT_DESCRIPTOR *) Ptr;
+    if (InterfaceIndex == 0) {
+      PeiUsbDevice->InterfaceDesc = (EFI_USB_INTERFACE_DESCRIPTOR *) Ptr;
+    }
+    PeiUsbDevice->InterfaceDescList[InterfaceIndex] = (EFI_USB_INTERFACE_DESCRIPTOR *) Ptr;
 
-    Ptr += sizeof (EFI_USB_ENDPOINT_DESCRIPTOR);
+    Ptr += sizeof (EFI_USB_INTERFACE_DESCRIPTOR);
     LengthLeft -= SkipBytes;
-    LengthLeft -= sizeof (EFI_USB_ENDPOINT_DESCRIPTOR);
+    LengthLeft -= sizeof (EFI_USB_INTERFACE_DESCRIPTOR);
+
+    //
+    // Parse all the endpoint descriptor within this interface
+    //
+    NumOfEndpoint = PeiUsbDevice->InterfaceDescList[InterfaceIndex]->NumEndpoints;
+    ASSERT (NumOfEndpoint <= MAX_ENDPOINT);
+
+    for (Index = 0; Index < NumOfEndpoint; Index++) {
+      //
+      // Get the endpoint descriptor
+      //
+      Status = GetExpectedDescriptor (
+                Ptr,
+                LengthLeft,
+                USB_DT_ENDPOINT,
+                (UINT8) sizeof (EFI_USB_ENDPOINT_DESCRIPTOR),
+                &SkipBytes
+                );
+
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+
+      Ptr += SkipBytes;
+      if (InterfaceIndex == 0) {
+        PeiUsbDevice->EndpointDesc[Index] = (EFI_USB_ENDPOINT_DESCRIPTOR *) Ptr;
+      }
+      PeiUsbDevice->EndpointDescList[InterfaceIndex][Index] = (EFI_USB_ENDPOINT_DESCRIPTOR *) Ptr;
+
+      Ptr += sizeof (EFI_USB_ENDPOINT_DESCRIPTOR);
+      LengthLeft -= SkipBytes;
+      LengthLeft -= sizeof (EFI_USB_ENDPOINT_DESCRIPTOR);
+    }
   }
 
   return EFI_SUCCESS;
