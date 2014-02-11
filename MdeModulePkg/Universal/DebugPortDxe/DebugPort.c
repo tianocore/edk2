@@ -142,7 +142,7 @@ InitializeDebugPortDriver (
              );
   ASSERT_EFI_ERROR (Status);
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
@@ -241,14 +241,14 @@ DebugPortSupported (
     return Status;
   }
 
-  gBS->CloseProtocol (
-        ControllerHandle,
-        &gEfiSerialIoProtocolGuid,
-        This->DriverBindingHandle,
-        ControllerHandle
-        );
+  Status = gBS->CloseProtocol (
+                  ControllerHandle,
+                  &gEfiSerialIoProtocolGuid,
+                  This->DriverBindingHandle,
+                  ControllerHandle
+                  );
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
