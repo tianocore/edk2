@@ -938,7 +938,7 @@ ProcessCommandLine(
       LoopVar++;
 
       // Add `file-name-options`
-      for ( ; LoopVar < gEfiShellParametersProtocol->Argc ; LoopVar++) {
+      for (Size = 0 ; LoopVar < gEfiShellParametersProtocol->Argc ; LoopVar++) {
         ASSERT((ShellInfoObject.ShellInitSettings.FileOptions == NULL && Size == 0) || (ShellInfoObject.ShellInitSettings.FileOptions != NULL));
         StrnCatGrow(&ShellInfoObject.ShellInitSettings.FileOptions,
                     &Size,
