@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -18,6 +18,10 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 
+typedef UINT16 fdt16_t;
+typedef UINT32 fdt32_t;
+typedef UINT64 fdt64_t;
+
 typedef UINT8 uint8_t;
 typedef UINT16 uint16_t;
 typedef UINT32 uint32_t;
@@ -25,19 +29,19 @@ typedef UINT64 uint64_t;
 typedef UINTN uintptr_t;
 typedef UINTN size_t;
 
-static inline uint16_t fdt16_to_cpu(uint16_t x)
+static inline uint16_t fdt16_to_cpu(fdt16_t x)
 {
   return SwapBytes16 (x);
 }
 #define cpu_to_fdt16(x) fdt16_to_cpu(x)
 
-static inline uint32_t fdt32_to_cpu(uint32_t x)
+static inline uint32_t fdt32_to_cpu(fdt32_t x)
 {
   return SwapBytes32 (x);
 }
 #define cpu_to_fdt32(x) fdt32_to_cpu(x)
 
-static inline uint64_t fdt64_to_cpu(uint64_t x)
+static inline uint64_t fdt64_to_cpu(fdt64_t x)
 {
   return SwapBytes64 (x);
 }
