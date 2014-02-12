@@ -52,7 +52,7 @@ EditHIInputStr (
 
     if ((Char == CHAR_LINEFEED) || (Char == CHAR_CARRIAGE_RETURN) || (Char == 0x7f)) {
       CmdLine[CmdLineIndex] = '\0';
-      Print (L"\n\r");
+      Print (L"\r\n");
 
       return EFI_SUCCESS;
     } else if ((Key.UnicodeChar == L'\b') || (Key.ScanCode == SCAN_LEFT) || (Key.ScanCode == SCAN_DELETE)){
@@ -187,7 +187,9 @@ GetHIInputBoolean (
 
   while(1) {
     Print (L"[y/n] ");
-    Status = GetHIInputStr (CmdBoolean, 2);
+    // Set MaxCmdLine to 3 to give space for carriage return (when the user
+    // hits enter) and terminal '\0'.
+    Status = GetHIInputStr (CmdBoolean, 3);
     if (EFI_ERROR(Status)) {
       return Status;
     } else if ((CmdBoolean[0] == L'y') || (CmdBoolean[0] == L'Y')) {
