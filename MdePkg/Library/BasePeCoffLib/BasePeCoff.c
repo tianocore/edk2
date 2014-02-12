@@ -15,7 +15,7 @@
   PeCoffLoaderGetPeHeader() routine will do basic check for PE/COFF header.
   PeCoffLoaderGetImageInfo() routine will do basic check for whole PE/COFF image.
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -249,6 +249,10 @@ PeCoffLoaderGetPeHeader (
       //
       // 3. Check the FileHeader.NumberOfSections field.
       //
+      if (Hdr.Pe32->OptionalHeader.SizeOfImage <= SectionHeaderOffset) {
+        ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+        return RETURN_UNSUPPORTED;
+      }
       if ((Hdr.Pe32->OptionalHeader.SizeOfImage - SectionHeaderOffset) / EFI_IMAGE_SIZEOF_SECTION_HEADER <= Hdr.Pe32->FileHeader.NumberOfSections) {
         ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
         return RETURN_UNSUPPORTED;
@@ -257,6 +261,14 @@ PeCoffLoaderGetPeHeader (
       //
       // 4. Check the OptionalHeader.SizeOfHeaders field.
       //
+      if (Hdr.Pe32->OptionalHeader.SizeOfHeaders <= SectionHeaderOffset) {
+        ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+        return RETURN_UNSUPPORTED;
+      }
+      if (Hdr.Pe32->OptionalHeader.SizeOfHeaders >= Hdr.Pe32->OptionalHeader.SizeOfImage) {
+        ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+        return RETURN_UNSUPPORTED;
+      }
       if ((Hdr.Pe32->OptionalHeader.SizeOfHeaders - SectionHeaderOffset) / EFI_IMAGE_SIZEOF_SECTION_HEADER < (UINT32)Hdr.Pe32->FileHeader.NumberOfSections) {
         ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
         return RETURN_UNSUPPORTED;
@@ -351,6 +363,10 @@ PeCoffLoaderGetPeHeader (
       //
       // 3. Check the FileHeader.NumberOfSections field.
       //
+      if (Hdr.Pe32Plus->OptionalHeader.SizeOfImage <= SectionHeaderOffset) {
+        ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+        return RETURN_UNSUPPORTED;
+      }
       if ((Hdr.Pe32Plus->OptionalHeader.SizeOfImage - SectionHeaderOffset) / EFI_IMAGE_SIZEOF_SECTION_HEADER <= Hdr.Pe32Plus->FileHeader.NumberOfSections) {
         ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
         return RETURN_UNSUPPORTED;
@@ -359,6 +375,14 @@ PeCoffLoaderGetPeHeader (
       //
       // 4. Check the OptionalHeader.SizeOfHeaders field.
       //
+      if (Hdr.Pe32Plus->OptionalHeader.SizeOfHeaders <= SectionHeaderOffset) {
+        ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+        return RETURN_UNSUPPORTED;
+      }
+      if (Hdr.Pe32Plus->OptionalHeader.SizeOfHeaders >= Hdr.Pe32Plus->OptionalHeader.SizeOfImage) {
+        ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
+        return RETURN_UNSUPPORTED;
+      }
       if ((Hdr.Pe32Plus->OptionalHeader.SizeOfHeaders - SectionHeaderOffset) / EFI_IMAGE_SIZEOF_SECTION_HEADER < (UINT32)Hdr.Pe32Plus->FileHeader.NumberOfSections) {
         ImageContext->ImageError = IMAGE_ERROR_UNSUPPORTED;
         return RETURN_UNSUPPORTED;
