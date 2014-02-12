@@ -87,8 +87,7 @@ StartLinux (
   IN  EFI_PHYSICAL_ADDRESS  LinuxImage,
   IN  UINTN                 LinuxImageSize,
   IN  EFI_PHYSICAL_ADDRESS  FdtBlobBase,
-  IN  UINTN                 FdtBlobSize,
-  IN  UINT32                MachineType
+  IN  UINTN                 FdtBlobSize
   )
 {
   EFI_STATUS            Status;
@@ -196,7 +195,6 @@ BdsBootLinuxFdt (
   UINTN                 InitrdImageBaseSize;
   UINTN                 FdtBlobSize;
   EFI_PHYSICAL_ADDRESS  FdtBlobBase;
-  UINT32                FdtMachineType;
   EFI_PHYSICAL_ADDRESS  LinuxImage;
   EFI_PHYSICAL_ADDRESS  InitrdImage;
   EFI_PHYSICAL_ADDRESS  InitrdImageBase;
@@ -209,7 +207,6 @@ BdsBootLinuxFdt (
 
   PenBaseStatus = EFI_UNSUPPORTED;
   PenSize = 0;
-  FdtMachineType = 0xFFFFFFFF;
   InitrdImage = 0;
   InitrdImageSize = 0;
   InitrdImageBase = 0;
@@ -331,7 +328,7 @@ BdsBootLinuxFdt (
     goto EXIT_FREE_FDT;
   }
 
-  return StartLinux (LinuxImage, LinuxImageSize, FdtBlobBase, FdtBlobSize, FdtMachineType);
+  return StartLinux (LinuxImage, LinuxImageSize, FdtBlobBase, FdtBlobSize);
 
 EXIT_FREE_FDT:
   if (!EFI_ERROR (PenBaseStatus)) {
