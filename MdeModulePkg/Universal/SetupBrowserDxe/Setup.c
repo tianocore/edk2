@@ -1787,14 +1787,6 @@ SetQuestionValue (
         //     
         CopyMem (Storage->Buffer + Question->VarStoreInfo.VarOffset, Src, StorageWidth);
       }
-      //
-      // Check whether question value has been changed.
-      //
-      if (CompareMem (Storage->Buffer + Question->VarStoreInfo.VarOffset, Storage->EditBuffer + Question->VarStoreInfo.VarOffset, StorageWidth) != 0) {
-        Question->ValueChanged = TRUE;
-      } else {
-        Question->ValueChanged = FALSE;
-      }
     } else {
       if (IsString) {
         //
@@ -1830,14 +1822,6 @@ SetQuestionValue (
       FreePool (Value);
       if (EFI_ERROR (Status)) {
         return Status;
-      }
-      //
-      // Check whether question value has been changed.
-      //
-      if (StrCmp (Node->Value, Node->EditValue) != 0) {
-        Question->ValueChanged = TRUE;
-      } else {
-        Question->ValueChanged = FALSE;
       }
     }
   } else if (SetValueTo == GetSetValueWithHiiDriver) {
@@ -3453,6 +3437,8 @@ IsQuestionValueChanged (
     FreePool (BackUpBuffer);
   }
 
+  Question->ValueChanged = ValueChanged;
+
   return ValueChanged;
 }
 
@@ -3533,11 +3519,6 @@ LoadFormConfig (
 
       Status = ProcessCallBackFunction(Selection, FormSet, Form, Question, EFI_BROWSER_ACTION_RETRIEVE, TRUE);
     }
-
-    //
-    // Update Question Value changed flag.
-    //
-    Question->ValueChanged = IsQuestionValueChanged(FormSet, Form, Question, GetSetValueWithBuffer);
 
     Link = GetNextNode (&Form->StatementListHead, Link);
   }
@@ -4175,6 +4156,94 @@ LoadStorage (
 }
 
 /**
+  Get Value changed status from old question.
+
+  @param  NewFormSet                FormSet data structure.
+  @param  OldQuestion               Old question which has value changed.
+
+**/
+VOID
+SyncStatusForQuestion (
+  IN OUT FORM_BROWSER_FORMSET             *NewFormSet,
+  IN     FORM_BROWSER_STATEMENT           *OldQuestion
+  )
+{
+  LIST_ENTRY                  *Link;
+  LIST_ENTRY                  *QuestionLink;
+  FORM_BROWSER_FORM           *Form;
+  FORM_BROWSER_STATEMENT      *Question;
+
+  //
+  // For each form in one formset.
+  //
+  Link = GetFirstNode (&NewFormSet->FormListHead);
+  while (!IsNull (&NewFormSet->FormListHead, Link)) {
+    Form = FORM_BROWSER_FORM_FROM_LINK (Link);
+    Link = GetNextNode (&NewFormSet->FormListHead, Link);
+
+    //
+    // for each question in one form.
+    //
+    QuestionLink = GetFirstNode (&Form->StatementListHead);
+    while (!IsNull (&Form->StatementListHead, QuestionLink)) {
+      Question = FORM_BROWSER_STATEMENT_FROM_LINK (QuestionLink);
+      QuestionLink = GetNextNode (&Form->StatementListHead, QuestionLink);
+
+      if (Question->QuestionId == OldQuestion->QuestionId) {
+        Question->ValueChanged = TRUE;
+        return;
+      }
+    }
+  }
+}
+
+/**
+  Get Value changed status from old formset.
+
+  @param  NewFormSet                FormSet data structure.
+  @param  OldFormSet                FormSet data structure.
+
+**/
+VOID
+SyncStatusForFormSet (
+  IN OUT FORM_BROWSER_FORMSET             *NewFormSet,
+  IN     FORM_BROWSER_FORMSET             *OldFormSet
+  )
+{
+  LIST_ENTRY                  *Link;
+  LIST_ENTRY                  *QuestionLink;
+  FORM_BROWSER_FORM           *Form;
+  FORM_BROWSER_STATEMENT      *Question;
+
+  //
+  // For each form in one formset.
+  //
+  Link = GetFirstNode (&OldFormSet->FormListHead);
+  while (!IsNull (&OldFormSet->FormListHead, Link)) {
+    Form = FORM_BROWSER_FORM_FROM_LINK (Link);
+    Link = GetNextNode (&OldFormSet->FormListHead, Link);
+
+    //
+    // for each question in one form.
+    //
+    QuestionLink = GetFirstNode (&Form->StatementListHead);
+    while (!IsNull (&Form->StatementListHead, QuestionLink)) {
+      Question = FORM_BROWSER_STATEMENT_FROM_LINK (QuestionLink);
+      QuestionLink = GetNextNode (&Form->StatementListHead, QuestionLink);
+
+      if (!Question->ValueChanged) {
+        continue;
+      }
+
+      //
+      // Find the same question in new formset and update the value changed flag.
+      //
+      SyncStatusForQuestion (NewFormSet, Question);
+    }
+  }
+}
+
+/**
   Get current setting of Questions.
 
   @param  FormSet                FormSet data structure.
@@ -4195,6 +4264,7 @@ InitializeCurrentSetting (
   //
   OldFormSet = GetFormSetFromHiiHandle (FormSet->HiiHandle);
   if (OldFormSet != NULL) {
+    SyncStatusForFormSet (FormSet, OldFormSet);
     RemoveEntryList (&OldFormSet->Link);
     DestroyFormSet (OldFormSet);
   }
@@ -5000,6 +5070,7 @@ ExecuteAction (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+    UpdateStatementStatus (FormSet, Form, gBrowserSettingScope);
   }
 
   //

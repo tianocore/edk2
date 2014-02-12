@@ -1,7 +1,7 @@
 /** @file
 Utility functions for UI presentation.
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -964,6 +964,99 @@ GetBrowserStatement (
 }
 
 /**
+  Update the ValueChanged status for questions in this form.
+
+  @param  FormSet                FormSet data structure.
+  @param  Form                   Form data structure.
+
+**/
+VOID 
+UpdateStatementStatusForForm (
+  IN FORM_BROWSER_FORMSET             *FormSet,
+  IN FORM_BROWSER_FORM                *Form
+  )
+{
+  LIST_ENTRY                  *Link;
+  FORM_BROWSER_STATEMENT      *Question;
+
+  Link = GetFirstNode (&Form->StatementListHead);
+  while (!IsNull (&Form->StatementListHead, Link)) {
+    Question = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
+    Link = GetNextNode (&Form->StatementListHead, Link);
+
+    IsQuestionValueChanged(FormSet, Form, Question, GetSetValueWithBuffer);
+  }
+}
+
+/**
+  Update the ValueChanged status for questions in this formset.
+
+  @param  FormSet                FormSet data structure.
+
+**/
+VOID 
+UpdateStatementStatusForFormSet (
+  IN FORM_BROWSER_FORMSET                *FormSet
+  )
+{
+  LIST_ENTRY                  *Link;
+  FORM_BROWSER_FORM           *Form;
+
+  Link = GetFirstNode (&FormSet->FormListHead);
+  while (!IsNull (&FormSet->FormListHead, Link)) {
+    Form = FORM_BROWSER_FORM_FROM_LINK (Link);
+    Link = GetNextNode (&FormSet->FormListHead, Link);
+
+    UpdateStatementStatusForForm (FormSet, Form);
+  }
+}
+
+/**
+  Update the ValueChanged status for questions.
+
+  @param  FormSet                FormSet data structure.
+  @param  Form                   Form data structure.
+  @param  SettingScope           Setting Scope for Default action.
+
+**/
+VOID 
+UpdateStatementStatus (
+  IN FORM_BROWSER_FORMSET             *FormSet,
+  IN FORM_BROWSER_FORM                *Form, 
+  IN BROWSER_SETTING_SCOPE            SettingScope
+  )
+{
+  LIST_ENTRY                  *Link;
+  FORM_BROWSER_FORMSET        *LocalFormSet;
+
+  switch (SettingScope) {
+  case SystemLevel:
+    Link = GetFirstNode (&gBrowserFormSetList);
+    while (!IsNull (&gBrowserFormSetList, Link)) {
+      LocalFormSet = FORM_BROWSER_FORMSET_FROM_LINK (Link);
+      Link = GetNextNode (&gBrowserFormSetList, Link);
+      if (!ValidateFormSet(LocalFormSet)) {
+        continue;
+      }
+
+      UpdateStatementStatusForFormSet (LocalFormSet);
+    }
+    break;
+
+  case FormSetLevel:
+    UpdateStatementStatusForFormSet (FormSet);
+    break;
+
+  case FormLevel:
+    UpdateStatementStatusForForm (FormSet, Form);
+    break;
+
+  default:
+    break;
+  }
+}
+
+/**
 
   Process the action request in user input.
 
@@ -998,6 +1091,7 @@ ProcessAction (
 
   if ((Action & BROWSER_ACTION_DEFAULT) == BROWSER_ACTION_DEFAULT) {
     ExtractDefault (gCurrentSelection->FormSet, gCurrentSelection->Form, DefaultId, gBrowserSettingScope, GetDefaultForAll, NULL, FALSE);
+    UpdateStatementStatus (gCurrentSelection->FormSet, gCurrentSelection->Form, gBrowserSettingScope);
   }
 
   if ((Action & BROWSER_ACTION_SUBMIT) == BROWSER_ACTION_SUBMIT) {
@@ -1618,6 +1712,7 @@ ProcessUserInput (
       // Reset Question to default value specified by DefaultId
       //
       Status = ExtractDefault (gCurrentSelection->FormSet, NULL, Statement->DefaultId, FormSetLevel, GetDefaultForAll, NULL, FALSE);
+      UpdateStatementStatus (gCurrentSelection->FormSet, NULL, FormSetLevel);
       break;
 
     default:
@@ -2493,6 +2588,11 @@ SetupBrowser (
       } else if (Statement->Operand != EFI_IFR_PASSWORD_OP) {
         SetQuestionValue (gCurrentSelection->FormSet, gCurrentSelection->Form, Statement, GetSetValueWithEditBuffer);
       }
+
+      //
+      // Verify whether question value has checked, update the ValueChanged flag in Question.
+      //
+      IsQuestionValueChanged(gCurrentSelection->FormSet, gCurrentSelection->Form, Statement, GetSetValueWithBuffer);
     }
 
     //

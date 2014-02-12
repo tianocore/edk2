@@ -1,7 +1,7 @@
 /** @file
 Private MACRO, structure and function definitions for Setup Browser module.
 
-Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -710,6 +710,35 @@ IsQuestionValueChanged (
   IN FORM_BROWSER_FORM                *Form,
   IN OUT FORM_BROWSER_STATEMENT       *Question,
   IN GET_SET_QUESTION_VALUE_WITH      GetValueFrom
+  );
+
+/**
+  Validate the FormSet. If the formset is not validate, remove it from the list.
+
+  @param  FormSet                The input FormSet which need to validate.
+
+  @retval TRUE                   The handle is validate.
+  @retval FALSE                  The handle is invalidate.
+
+**/
+BOOLEAN
+ValidateFormSet (
+  FORM_BROWSER_FORMSET    *FormSet
+  );
+
+/**
+  Update the ValueChanged status for questions.
+
+  @param  FormSet                FormSet data structure.
+  @param  Form                   Form data structure.
+  @param  SettingScope           Setting Scope for Default action.
+
+**/
+VOID 
+UpdateStatementStatus (
+  IN FORM_BROWSER_FORMSET             *FormSet,
+  IN FORM_BROWSER_FORM                *Form, 
+  IN BROWSER_SETTING_SCOPE            SettingScope
   );
 
 /**
