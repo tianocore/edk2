@@ -224,12 +224,23 @@ CopySingleFile(
       ASSERT(Buffer != NULL);
       while (ReadSize == PcdGet32(PcdShellFileOperationSize) && !EFI_ERROR(Status)) {
         Status = ShellReadFile(SourceHandle, &ReadSize, Buffer);
-        Status = ShellWriteFile(DestHandle, &ReadSize, Buffer);
+        if (!EFI_ERROR(Status)) {
+          Status = ShellWriteFile(DestHandle, &ReadSize, Buffer);
+          if (EFI_ERROR(Status)) {
+            ShellStatus = (SHELL_STATUS) (Status & (~MAX_BIT));
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_CPY_WRITE_ERROR), gShellLevel2HiiHandle, Dest);
+            break;
+          }
+        } else {
+          ShellStatus = (SHELL_STATUS) (Status & (~MAX_BIT));
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_CPY_READ_ERROR), gShellLevel2HiiHandle, Source);
+          break;
+        }
       }
     }
     SHELL_FREE_NON_NULL(DestVolumeInfo);
   }
-
+  
   //
   // close files
   //
