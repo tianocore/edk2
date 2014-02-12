@@ -1277,6 +1277,113 @@ ShellConvertAlias(
 }
 
 /**
+  Parse for the next instance of one string within another string. Can optionally make sure that 
+  the string was not escaped (^ character) per the shell specification.
+
+  @param[in] SourceString             The string to search within
+  @param[in] FindString               The string to look for
+  @param[in] CheckForEscapeCharacter  TRUE to skip escaped instances of FinfString, otherwise will return even escaped instances
+**/
+CHAR16*
+EFIAPI
+FindNextInstance(
+  IN CONST CHAR16   *SourceString,
+  IN CONST CHAR16   *FindString,
+  IN CONST BOOLEAN  CheckForEscapeCharacter
+  )
+{
+  CHAR16 *Temp;
+  if (SourceString == NULL) {
+    return (NULL);
+  }
+  Temp = StrStr(SourceString, FindString);
+
+  //
+  // If nothing found, or we dont care about escape characters
+  //
+  if (Temp == NULL || !CheckForEscapeCharacter) {
+    return (Temp);
+  }
+
+  //
+  // If we found an escaped character, try again on the remainder of the string
+  //
+  if ((Temp > (SourceString)) && *(Temp-1) == L'^') {
+    return FindNextInstance(Temp+1, FindString, CheckForEscapeCharacter);
+  }
+
+  //
+  // we found the right character
+  //
+  return (Temp);
+}
+
+/**
+  This function will eliminate unreplaced (and therefore non-found) environment variables.
+
+  @param[in,out] CmdLine   The command line to update.
+**/
+EFI_STATUS
+EFIAPI
+StripUnreplacedEnvironmentVariables(
+  IN OUT CHAR16 *CmdLine
+  )
+{
+  CHAR16 *FirstPercent;
+  CHAR16 *FirstQuote;
+  CHAR16 *SecondPercent;
+  CHAR16 *SecondQuote;
+  CHAR16 *CurrentLocator;
+
+  for (CurrentLocator = CmdLine ; CurrentLocator != NULL ; ) {
+    FirstQuote = FindNextInstance(CurrentLocator, L"\"", TRUE);
+    FirstPercent = FindNextInstance(CurrentLocator, L"%", TRUE);
+    SecondPercent = FirstPercent!=NULL?FindNextInstance(FirstPercent+1, L"%", TRUE):NULL;
+    if (FirstPercent == NULL || SecondPercent == NULL) {
+      //
+      // If we ever dont have 2 % we are done.
+      //
+      break;
+    }
+
+    if (FirstQuote < FirstPercent) {
+      SecondQuote = FirstQuote!= NULL?FindNextInstance(FirstQuote+1, L"\"", TRUE):NULL;
+      //
+      // Quote is first found
+      //
+
+      if (SecondQuote < FirstPercent) {
+        //
+        // restart after the pair of "
+        //
+        CurrentLocator = SecondQuote + 1;
+      } else /* FirstPercent < SecondQuote */{
+        //
+        // Restart on the first percent
+        //
+        CurrentLocator = FirstPercent;
+      }
+      continue;
+    }
+    ASSERT(FirstPercent < FirstQuote);
+    if (SecondPercent < FirstQuote) {
+      //
+      // We need to remove from FirstPercent to SecondPercent
+      //
+      CopyMem(FirstPercent, SecondPercent + 1, StrSize(SecondPercent + 1));
+
+      //
+      // dont need to update the locator.  both % characters are gone.
+      //
+      continue;
+    }
+    ASSERT(FirstQuote < SecondPercent);
+    CurrentLocator = FirstQuote;
+  }
+  return (EFI_SUCCESS);
+}
+
+/**
   Function allocates a new command line and replaces all instances of environment
   variable names that are correctly preset to their values.
 
@@ -1298,7 +1405,6 @@ ShellConvertVariables (
   CHAR16              *NewCommandLine1;
   CHAR16              *NewCommandLine2;
   CHAR16              *Temp;
-  CHAR16              *Temp2;
   UINTN               ItemSize;
   CHAR16              *ItemTemp;
   SCRIPT_FILE         *CurrentScriptFile;
@@ -1391,39 +1497,7 @@ ShellConvertVariables (
     //
     // Remove non-existant environment variables in scripts only
     //
-    for (Temp = NewCommandLine1 ; Temp != NULL ; ) {
-      Temp = StrStr(Temp, L"%");
-      if (Temp == NULL) {
-        break;
-      }
-      while (*(Temp - 1) == L'^') {
-        Temp = StrStr(Temp + 1, L"%");
-        if (Temp == NULL) {
-          break;
-       }
-      }
-      if (Temp == NULL) {
-        break;
-      }
-      
-      Temp2 = StrStr(Temp + 1, L"%");
-      if (Temp2 == NULL) {
-        break;
-      }
-      while (*(Temp2 - 1) == L'^') {
-        Temp2 = StrStr(Temp2 + 1, L"%");
-        if (Temp2 == NULL) {
-          break;
-        }
-      }
-      if (Temp2 == NULL) {
-        break;
-      }
-      
-      Temp2++;
-      CopyMem(Temp, Temp2, StrSize(Temp2));
-    }
-
+    StripUnreplacedEnvironmentVariables(NewCommandLine1);
   }
 
   //
