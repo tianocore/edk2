@@ -1538,6 +1538,7 @@ FindTopMenu (
   } else {
     *TopOfScreen = FindTopOfScreenMenu(NewPos, BottomRow - TopRow - SavedMenuOption->Skip, &TmpValue);
   }
+  AdjustDateAndTimePosition(TRUE, TopOfScreen);
 
   *SkipValue   = TmpValue;
 }
