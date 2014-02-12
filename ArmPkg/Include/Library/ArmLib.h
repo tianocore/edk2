@@ -535,6 +535,12 @@ ArmReadMpidr (
   VOID
   );
 
+UINTN
+EFIAPI
+ArmReadMidr (
+  VOID
+  );
+
 UINT32
 EFIAPI
 ArmReadCpacr (

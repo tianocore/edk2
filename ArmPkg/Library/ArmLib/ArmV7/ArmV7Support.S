@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------ 
 #
 # Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2011, ARM Limited. All rights reserved.
+# Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -49,6 +49,7 @@ GCC_ASM_EXPORT (ArmCallWFI)
 GCC_ASM_EXPORT (ArmReadCbar)
 GCC_ASM_EXPORT (ArmInvalidateInstructionAndDataTlb)
 GCC_ASM_EXPORT (ArmReadMpidr)
+GCC_ASM_EXPORT (ArmReadMidr)
 GCC_ASM_EXPORT (ArmReadTpidrurw)
 GCC_ASM_EXPORT (ArmWriteTpidrurw)
 GCC_ASM_EXPORT (ArmIsArchTimerImplemented)
@@ -376,7 +377,11 @@ ASM_PFX(ArmInvalidateInstructionAndDataTlb):
 ASM_PFX(ArmReadMpidr):
   mrc     p15, 0, r0, c0, c0, 5       @ read MPIDR
   bx      lr
-  
+
+ASM_PFX(ArmReadMidr):
+  mrc     p15, 0, r0, c0, c0, 0       @ Read Main ID Register
+  bx      lr
+
 ASM_PFX(ArmReadTpidrurw):
   mrc     p15, 0, r0, c13, c0, 2    @ read TPIDRURW
   bx      lr

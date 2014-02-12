@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------ 
 //
 // Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-// Copyright (c) 2011, ARM Limited. All rights reserved.
+// Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
 //
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -46,6 +46,7 @@
     EXPORT  ArmReadCbar
     EXPORT  ArmInvalidateInstructionAndDataTlb
     EXPORT  ArmReadMpidr
+    EXPORT  ArmReadMidr
     EXPORT  ArmReadTpidrurw
     EXPORT  ArmWriteTpidrurw
     EXPORT  ArmIsArchTimerImplemented
@@ -369,6 +370,10 @@ ArmInvalidateInstructionAndDataTlb
 
 ArmReadMpidr
   mrc     p15, 0, r0, c0, c0, 5     ; read MPIDR
+  bx      lr
+
+ArmReadMidr
+  mrc     p15, 0, r0, c0, c0, 0      ; Read Main ID Register
   bx      lr
 
 ArmReadTpidrurw

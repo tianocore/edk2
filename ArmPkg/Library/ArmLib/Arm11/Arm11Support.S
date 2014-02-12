@@ -43,6 +43,7 @@ GCC_ASM_EXPORT(ArmSetHighVectors)
 GCC_ASM_EXPORT(ArmIsMpCore)
 GCC_ASM_EXPORT(ArmCallWFI)
 GCC_ASM_EXPORT(ArmReadMpidr)
+GCC_ASM_EXPORT(ArmReadMidr)
 GCC_ASM_EXPORT(ArmUpdateTranslationTableEntry)
 GCC_ASM_EXPORT(ArmEnableFiq)
 GCC_ASM_EXPORT(ArmDisableFiq)
@@ -214,6 +215,10 @@ ASM_PFX(ArmCallWFI):
 
 ASM_PFX(ArmReadMpidr):
   mrc     p15, 0, r0, c0, c0, 5       @ read MPIDR
+  bx      lr
+
+ASM_PFX(ArmReadMpidr):
+  mrc     p15, 0, r0, c0, c0, 0       @ Read Main ID Register
   bx      lr
 
 ASM_PFX(ArmEnableFiq):
