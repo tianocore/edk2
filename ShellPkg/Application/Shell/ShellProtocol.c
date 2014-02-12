@@ -467,7 +467,9 @@ EfiShellGetFilePathFromDevicePath(
           // If necessary, add a "\", but otherwise don't
           // (This is specified in the above section, and also implied by the
           //  UEFI Shell spec section 3.7)
-          if ((PathForReturn[PathSize - 1] != L'\\') &&
+          if ((PathSize != 0)                        &&
+              (PathForReturn != NULL)                &&
+              (PathForReturn[PathSize - 1] != L'\\') &&
               (AlignedNode->PathName[0]    != L'\\')) {
             PathForReturn = StrnCatGrow (&PathForReturn, &PathSize, L"\\", 1);
           }
