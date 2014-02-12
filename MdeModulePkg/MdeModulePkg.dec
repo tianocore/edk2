@@ -882,6 +882,11 @@
   ## This PCD specifies whether full PCI enumeration is disabled.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|FALSE|BOOLEAN|0x10000048
 
+  ## Disk I/O - Number of Data Buffer block
+  # Define the size in block of the pre-allocated buffer. It provide better
+  # performance for large Disk I/O requests
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDiskIoDataBufferBlockNum|64|UINT32|0x30001039
+
 [PcdsPatchableInModule]
   ## Specify  memory size with page number for PEI code when 
   #  the feature of Loading Module at Fixed Address is enabled

@@ -183,7 +183,7 @@ DiskIoDriverBindingStart (
   InitializeListHead (&Instance->TaskQueue);
   EfiInitializeLock (&Instance->TaskQueueLock, TPL_NOTIFY);
   Instance->SharedWorkingBuffer = AllocateAlignedPages (
-                                    EFI_SIZE_TO_PAGES (DATA_BUFFER_BLOCK_NUM * Instance->BlockIo->Media->BlockSize),
+                                    EFI_SIZE_TO_PAGES (PcdGet32 (PcdDiskIoDataBufferBlockNum) * Instance->BlockIo->Media->BlockSize),
                                     Instance->BlockIo->Media->IoAlign
                                     );
   if (Instance->SharedWorkingBuffer == NULL) {
@@ -214,7 +214,7 @@ ErrorExit:
     if (Instance != NULL && Instance->SharedWorkingBuffer != NULL) {
       FreeAlignedPages (
         Instance->SharedWorkingBuffer,
-        EFI_SIZE_TO_PAGES (DATA_BUFFER_BLOCK_NUM * Instance->BlockIo->Media->BlockSize)
+        EFI_SIZE_TO_PAGES (PcdGet32 (PcdDiskIoDataBufferBlockNum) * Instance->BlockIo->Media->BlockSize)
         );
     }
 
@@ -324,7 +324,7 @@ DiskIoDriverBindingStop (
 
     FreeAlignedPages (
       Instance->SharedWorkingBuffer,
-      EFI_SIZE_TO_PAGES (DATA_BUFFER_BLOCK_NUM * Instance->BlockIo->Media->BlockSize)
+      EFI_SIZE_TO_PAGES (PcdGet32 (PcdDiskIoDataBufferBlockNum) * Instance->BlockIo->Media->BlockSize)
       );
 
     Status = gBS->CloseProtocol (
@@ -655,8 +655,8 @@ DiskIoCreateSubtaskList (
         // Use the allocated buffer instead of the original buffer
         // to avoid alignment issue.
         //
-        for (; Lba < OverRunLba; Lba += DATA_BUFFER_BLOCK_NUM) {
-          DataBufferSize = MIN (BufferSize, DATA_BUFFER_BLOCK_NUM * BlockSize);
+        for (; Lba < OverRunLba; Lba += PcdGet32 (PcdDiskIoDataBufferBlockNum)) {
+          DataBufferSize = MIN (BufferSize, PcdGet32 (PcdDiskIoDataBufferBlockNum) * BlockSize);
 
           Subtask = DiskIoCreateSubtask (Write, Lba, 0, DataBufferSize, SharedWorkingBuffer, BufferPtr, Blocking);
           if (Subtask == NULL) {

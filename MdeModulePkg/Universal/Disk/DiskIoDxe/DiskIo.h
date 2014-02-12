@@ -30,13 +30,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
-//
-// Pre-allocate an aligned buffer of 64 blocks so very large Disk I/O requests
-// will be broken up into 64 * BlockSize chunks to provide better performance
-// than allocating an aligned 1 block buffer.
-//
-#define DATA_BUFFER_BLOCK_NUM             64
-
 #define DISK_IO_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('d', 's', 'k', 'I')
 typedef struct {
   UINT32                          Signature;

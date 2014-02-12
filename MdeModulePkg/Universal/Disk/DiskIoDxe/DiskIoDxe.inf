@@ -45,7 +45,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   UefiBootServicesTableLib
@@ -55,7 +55,7 @@
   UefiLib
   UefiDriverEntryPoint
   DebugLib
-
+  PcdLib
 
 [Protocols]
   gEfiDiskIoProtocolGuid                        ## BY_START
@@ -63,3 +63,5 @@
   gEfiBlockIoProtocolGuid                       ## TO_START
   gEfiBlockIo2ProtocolGuid                      ## TO_START
 
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDiskIoDataBufferBlockNum
