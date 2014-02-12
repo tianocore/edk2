@@ -1,7 +1,7 @@
 /** @file
   FormDiplay protocol to show Form
 
-Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -194,8 +194,11 @@ typedef struct {
 } SCREEN_OPERATION_T0_CONTROL_FLAG;
 
 typedef struct {
+  EFI_HII_HANDLE     HiiHandle;
   EFI_QUESTION_ID    QuestionId;
+  EFI_IFR_OP_HEADER  *OpCode;
   UINT16             DisplayRow;
+  UINT16             SkipValue;
 } DISPLAY_HIGHLIGHT_MENU_INFO;
 
 #define UI_MENU_OPTION_SIGNATURE  SIGNATURE_32 ('u', 'i', 'm', 'm')

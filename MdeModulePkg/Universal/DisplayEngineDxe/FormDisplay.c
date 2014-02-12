@@ -1478,6 +1478,7 @@ FindTopMenu (
   UI_MENU_OPTION                  *SavedMenuOption;
   UINTN                           TmpValue;
 
+  TmpValue  = 0;
   TopRow    = gStatementDimensions.TopRow    + SCROLL_ARROW_HEIGHT;
   BottomRow = gStatementDimensions.BottomRow - SCROLL_ARROW_HEIGHT;
 
@@ -1521,19 +1522,37 @@ FindTopMenu (
   UpdateOptionSkipLines (SavedMenuOption);
 
   //
-  // If highlight opcode is date/time, keep the highlight row info not change.
+  // FormRefreshEvent != NULL means this form will auto exit at an interval, display engine 
+  // will try to keep highlight on the current position after this form exit and re-enter.
   //
-  if ((SavedMenuOption->ThisTag->OpCode->OpCode == EFI_IFR_DATE_OP || SavedMenuOption->ThisTag->OpCode->OpCode == EFI_IFR_TIME_OP) &&
-      (gHighligthMenuInfo.QuestionId != 0) && 
-      (gHighligthMenuInfo.QuestionId == GetQuestionIdInfo(SavedMenuOption->ThisTag->OpCode))) {
-    //
-    // Still show the highlight menu before exit from display engine.
-    //
-    BottomRow = gHighligthMenuInfo.DisplayRow + SavedMenuOption->Skip;
+  // HiiHandle + QuestionId can find the only one question in the system.
+  //
+  // If this question has question id, save the question id info to find the question.
+  // else save the opcode buffer to find it.
+  //
+  if (gFormData->FormRefreshEvent != NULL && gFormData->HiiHandle == gHighligthMenuInfo.HiiHandle) {
+    if (gHighligthMenuInfo.QuestionId != 0) { 
+      if (gHighligthMenuInfo.QuestionId == GetQuestionIdInfo(SavedMenuOption->ThisTag->OpCode)) {
+        BottomRow = gHighligthMenuInfo.DisplayRow + SavedMenuOption->Skip;
+        //
+        // SkipValue only used for menu at the top of the form.
+        // If Highlight menu is not at the top, this value will be update later.
+        //
+        TmpValue = gHighligthMenuInfo.SkipValue;
+      }
+    } else if (gHighligthMenuInfo.OpCode != NULL){
+      if (!CompareMem (gHighligthMenuInfo.OpCode, SavedMenuOption->ThisTag->OpCode, gHighligthMenuInfo.OpCode->Length)) {
+        BottomRow = gHighligthMenuInfo.DisplayRow + SavedMenuOption->Skip;
+        //
+        // SkipValue only used for menu at the top of the form.
+        // If Highlight menu is not at the top, this value will be update later.
+        //
+        TmpValue = gHighligthMenuInfo.SkipValue;
+      }
+    }
   }
 
   if (SavedMenuOption->Skip >= BottomRow - TopRow) {
-    TmpValue = 0;
     *TopOfScreen = NewPos;
   } else {
     *TopOfScreen = FindTopOfScreenMenu(NewPos, BottomRow - TopRow - SavedMenuOption->Skip, &TmpValue);
@@ -1547,11 +1566,14 @@ FindTopMenu (
   Update highlight menu info.
 
   @param  MenuOption               The menu opton which is highlight.
+  @param  SkipValue                The skipvalue info for this menu.
+                                   SkipValue only used for the menu at the top of the form.
 
 **/
 VOID
 UpdateHighlightMenuInfo (
-  IN UI_MENU_OPTION            *MenuOption
+  IN UI_MENU_OPTION            *MenuOption,
+  IN UINTN                     SkipValue
   )
 {
   FORM_DISPLAY_ENGINE_STATEMENT   *Statement;
@@ -1568,14 +1590,39 @@ UpdateHighlightMenuInfo (
   gSequence = (UINT16) MenuOption->Sequence;
 
   //
-  // Record highlight row info for date/time opcode.
+  // FormRefreshEvent != NULL means this form will auto exit at an interval, display engine 
+  // will try to keep highlight on the current position after this form exit and re-enter.
   //
-  if (Statement->OpCode->OpCode == EFI_IFR_DATE_OP || Statement->OpCode->OpCode == EFI_IFR_TIME_OP) {
+  // HiiHandle + QuestionId can find the only one question in the system.
+  //
+  // If this question has question id, base on the question id info to find the question.
+  // else base on the opcode buffer to find it.
+  //
+  if (gFormData->FormRefreshEvent != NULL) {
+    gHighligthMenuInfo.HiiHandle  = gFormData->HiiHandle;
     gHighligthMenuInfo.QuestionId = GetQuestionIdInfo(Statement->OpCode);
+
+    //
+    // if question id == 0, save the opcode buffer for later use.
+    //
+    if (gHighligthMenuInfo.QuestionId == 0) {
+      if (gHighligthMenuInfo.OpCode != NULL) {
+        FreePool (gHighligthMenuInfo.OpCode);
+      }
+      gHighligthMenuInfo.OpCode = AllocateCopyPool (Statement->OpCode->Length, Statement->OpCode);
+      ASSERT (gHighligthMenuInfo.OpCode != NULL);
+    }
     gHighligthMenuInfo.DisplayRow = (UINT16) MenuOption->Row;
+    gHighligthMenuInfo.SkipValue  = (UINT16) SkipValue;
   } else {
+    gHighligthMenuInfo.HiiHandle  = NULL;
     gHighligthMenuInfo.QuestionId = 0;
+    if (gHighligthMenuInfo.OpCode != NULL) {
+      FreePool (gHighligthMenuInfo.OpCode);
+      gHighligthMenuInfo.OpCode = NULL;
+    }
     gHighligthMenuInfo.DisplayRow = 0;
+    gHighligthMenuInfo.SkipValue  = 0;
   }
 
   RefreshKeyHelp(gFormData, Statement, FALSE);
@@ -2252,7 +2299,7 @@ UiDisplayMenu (
       if (SkipHighLight) {
         MenuOption    = SavedMenuOption;
         SkipHighLight = FALSE;
-        UpdateHighlightMenuInfo (MenuOption);
+        UpdateHighlightMenuInfo (MenuOption, TopOfScreen == &MenuOption->Link ? SkipValue : 0);
         break;
       }
 
@@ -2296,7 +2343,7 @@ UiDisplayMenu (
         MenuOption = MENU_OPTION_FROM_LINK (NewPos);
         Statement = MenuOption->ThisTag;
 
-        UpdateHighlightMenuInfo (MenuOption);
+        UpdateHighlightMenuInfo (MenuOption, Temp2);
 
         if (!IsSelectable (MenuOption)) {
           break;
@@ -3392,6 +3439,10 @@ UnloadDisplayEngine (
   HiiRemovePackages(gHiiHandle);
 
   FreeDisplayStrings ();
+
+  if (gHighligthMenuInfo.OpCode != NULL) {
+    FreePool (gHighligthMenuInfo.OpCode);
+  }
 
   return EFI_SUCCESS;
 }
