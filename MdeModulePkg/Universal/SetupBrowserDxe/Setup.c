@@ -3721,6 +3721,7 @@ CleanBrowserStorage (
                Storage->BrowserStorage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
       if (Storage->BrowserStorage->ConfigRequest != NULL) { 
         FreePool (Storage->BrowserStorage->ConfigRequest);
+        Storage->BrowserStorage->ConfigRequest = NULL;
       }
       Storage->BrowserStorage->Initialized = FALSE;
     }
