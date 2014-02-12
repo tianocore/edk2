@@ -157,7 +157,7 @@ TerminalConInReadKeyStroke (
                                    pressed.
 
   @retval TRUE                     Key be pressed matches a registered key.
-  @retval FLASE                    Match failed.
+  @retval FALSE                    Match failed.
 
 **/
 BOOLEAN
@@ -647,7 +647,7 @@ GetOneKeyFromSerial (
   @param  Input                The key will be input.
 
   @retval TRUE                 If insert successfully.
-  @retval FLASE                If Raw Data buffer is full before key insertion,
+  @retval FALSE                If Raw Data buffer is full before key insertion,
                                and the key is lost.
 
 **/
@@ -682,7 +682,7 @@ RawFiFoInsertOneKey (
   @param  Output               The key will be removed.
 
   @retval TRUE                 If insert successfully.
-  @retval FLASE                If Raw Data FIFO buffer is empty before remove operation.
+  @retval FALSE                If Raw Data FIFO buffer is empty before remove operation.
 
 **/
 BOOLEAN
@@ -716,7 +716,7 @@ RawFiFoRemoveOneKey (
   @param  TerminalDevice       Terminal driver private structure
 
   @retval TRUE                 If Raw Data FIFO buffer is empty.
-  @retval FLASE                If Raw Data FIFO buffer is not empty.
+  @retval FALSE                If Raw Data FIFO buffer is not empty.
 
 **/
 BOOLEAN
@@ -737,7 +737,7 @@ IsRawFiFoEmpty (
   @param  TerminalDevice       Terminal driver private structure
 
   @retval TRUE                 If Raw Data FIFO buffer is full.
-  @retval FLASE                If Raw Data FIFO buffer is not full.
+  @retval FALSE                If Raw Data FIFO buffer is not full.
 
 **/
 BOOLEAN
@@ -766,7 +766,7 @@ IsRawFiFoFull (
   @param  Key                  The key will be input.
 
   @retval TRUE                 If insert successfully.
-  @retval FLASE                If FIFO buffer is full before key insertion,
+  @retval FALSE                If FIFO buffer is full before key insertion,
                                and the key is lost.
 
 **/
@@ -824,7 +824,7 @@ EfiKeyFiFoInsertOneKey (
   @param  Output               The key will be removed.
 
   @retval TRUE                 If insert successfully.
-  @retval FLASE                If FIFO buffer is empty before remove operation.
+  @retval FALSE                If FIFO buffer is empty before remove operation.
 
 **/
 BOOLEAN
@@ -860,7 +860,7 @@ EfiKeyFiFoRemoveOneKey (
   @param  TerminalDevice       Terminal driver private structure
 
   @retval TRUE                 If FIFO buffer is empty.
-  @retval FLASE                If FIFO buffer is not empty.
+  @retval FALSE                If FIFO buffer is not empty.
 
 **/
 BOOLEAN
@@ -881,7 +881,7 @@ IsEfiKeyFiFoEmpty (
   @param  TerminalDevice       Terminal driver private structure
 
   @retval TRUE                 If FIFO buffer is full.
-  @retval FLASE                If FIFO buffer is not full.
+  @retval FALSE                If FIFO buffer is not full.
 
 **/
 BOOLEAN
@@ -910,7 +910,7 @@ IsEfiKeyFiFoFull (
   @param  Input                The key will be input.
 
   @retval TRUE                 If insert successfully.
-  @retval FLASE                If Unicode FIFO buffer is full before key insertion,
+  @retval FALSE                If Unicode FIFO buffer is full before key insertion,
                                and the key is lost.
 
 **/
@@ -971,7 +971,7 @@ UnicodeFiFoRemoveOneKey (
   @param  TerminalDevice       Terminal driver private structure
 
   @retval TRUE                 If Unicode FIFO buffer is empty.
-  @retval FLASE                If Unicode FIFO buffer is not empty.
+  @retval FALSE                If Unicode FIFO buffer is not empty.
 
 **/
 BOOLEAN
@@ -992,7 +992,7 @@ IsUnicodeFiFoEmpty (
   @param  TerminalDevice       Terminal driver private structure
 
   @retval TRUE                 If Unicode FIFO buffer is full.
-  @retval FLASE                If Unicode FIFO buffer is not full.
+  @retval FALSE                If Unicode FIFO buffer is not full.
 
 **/
 BOOLEAN
