@@ -2593,6 +2593,16 @@ SetupBrowser (
       // Verify whether question value has checked, update the ValueChanged flag in Question.
       //
       IsQuestionValueChanged(gCurrentSelection->FormSet, gCurrentSelection->Form, Statement, GetSetValueWithBuffer);
+
+      //
+      // If question has EFI_IFR_FLAG_RESET_REQUIRED flag and without storage and process question success till here, 
+      // trig the gResetFlag.
+      //
+      if ((Status == EFI_SUCCESS) && 
+          (Statement->Storage == NULL) && 
+          ((Statement->QuestionFlags & EFI_IFR_FLAG_RESET_REQUIRED) != 0)) {
+        gResetRequired = TRUE;
+      }
     }
 
     //
