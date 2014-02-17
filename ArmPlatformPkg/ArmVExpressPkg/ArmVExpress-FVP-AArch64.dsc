@@ -27,6 +27,11 @@
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = ArmPlatformPkg/ArmVExpressPkg/ArmVExpress-FVP-AArch64.fdf
 
+!ifndef ARM_FVP_RUN_NORFLASH
+  DEFINE EDK2_SKIP_PEICORE=1
+!endif
+
+
 !include ArmPlatformPkg/ArmVExpressPkg/ArmVExpress.dsc.inc
 
 [LibraryClasses.common]
@@ -101,7 +106,7 @@
   # Non-Trusted SRAM
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x2E000000
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x4000
-  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize|0x800
+  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize|0x1000
 
   # System Memory (2GB)
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x80000000
@@ -193,6 +198,16 @@
   #
   # PEI Phase modules
   #
+!ifdef EDK2_SKIP_PEICORE
+  # UEFI is placed in RAM by bootloader
+  ArmPlatformPkg/PrePi/PeiMPCore.inf {
+    <LibraryClasses>
+      ArmLib|ArmPkg/Library/ArmLib/AArch64/AArch64Lib.inf
+      ArmPlatformLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressLibRTSM/ArmVExpressLib.inf
+      ArmPlatformGlobalVariableLib|ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/PrePi/PrePiArmPlatformGlobalVariableLib.inf
+  }
+!else
+  # UEFI lives in FLASH and copies itself to RAM
   ArmPlatformPkg/PrePeiCore/PrePeiCoreMPCore.inf {
     <LibraryClasses>
       ArmPlatformGlobalVariableLib|ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/Pei/PeiArmPlatformGlobalVariableLib.inf
@@ -212,6 +227,7 @@
     <LibraryClasses>
       NULL|IntelFrameworkModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   }
+!endif
 
   #
   # DXE
