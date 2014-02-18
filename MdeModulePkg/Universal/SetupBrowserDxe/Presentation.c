@@ -2582,17 +2582,21 @@ SetupBrowser (
           }
         }
 
+        //
+        // Verify whether question value has checked, update the ValueChanged flag in Question.
+        //
+        IsQuestionValueChanged(gCurrentSelection->FormSet, gCurrentSelection->Form, Statement, GetSetValueWithBuffer);
+
         if (!EFI_ERROR (Status) && Statement->Operand != EFI_IFR_REF_OP) {
           ProcessCallBackFunction(Selection, Selection->FormSet, Selection->Form, Statement, EFI_BROWSER_ACTION_CHANGED, FALSE);
         }
       } else if (Statement->Operand != EFI_IFR_PASSWORD_OP) {
         SetQuestionValue (gCurrentSelection->FormSet, gCurrentSelection->Form, Statement, GetSetValueWithEditBuffer);
+        //
+        // Verify whether question value has checked, update the ValueChanged flag in Question.
+        //
+        IsQuestionValueChanged(gCurrentSelection->FormSet, gCurrentSelection->Form, Statement, GetSetValueWithBuffer);
       }
-
-      //
-      // Verify whether question value has checked, update the ValueChanged flag in Question.
-      //
-      IsQuestionValueChanged(gCurrentSelection->FormSet, gCurrentSelection->Form, Statement, GetSetValueWithBuffer);
 
       //
       // If question has EFI_IFR_FLAG_RESET_REQUIRED flag and without storage and process question success till here, 
