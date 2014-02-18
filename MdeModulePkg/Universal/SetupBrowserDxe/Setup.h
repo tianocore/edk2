@@ -1173,19 +1173,6 @@ IsNvUpdateRequiredForFormSet (
   );
 
 /**
-  Check whether the storage data for current form set is changed.
-
-  @param  FormSet           FormSet data structure.
-
-  @retval TRUE              Data is changed.
-  @retval FALSE             Data is not changed.
-**/
-BOOLEAN 
-IsStorageDataChangedForFormSet (
-  IN FORM_BROWSER_FORMSET             *FormSet
-  );
-
-/**
   Call the call back function for the question and process the return action.
 
   @param Selection             On input, Selection tell setup browser the information

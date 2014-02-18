@@ -417,7 +417,7 @@ SendForm (
       //
       // If no data is changed, don't need to save current FormSet into the maintain list.
       //
-      if (!IsNvUpdateRequiredForFormSet (FormSet) && !IsStorageDataChangedForFormSet(FormSet)) {
+      if (!IsNvUpdateRequiredForFormSet (FormSet)) {
         CleanBrowserStorage(FormSet);
         RemoveEntryList (&FormSet->Link);
         DestroyFormSet (FormSet);
@@ -4081,37 +4081,49 @@ LoadStorage (
         ConfigRequestAdjust(Storage);
         return;
       }
-
-      //
-      // Create the config request string to get all fields for this storage.
-      // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
-      // followed by "&OFFSET=0&WIDTH=WWWW"followed by a Null-terminator
-      //
-      StrLen = StrSize (Storage->BrowserStorage->ConfigHdr) + 20 * sizeof (CHAR16);
-      ConfigRequest = AllocateZeroPool (StrLen);
-      ASSERT (ConfigRequest != NULL);
-      UnicodeSPrint (
-                 ConfigRequest, 
-                 StrLen, 
-                 L"%s&OFFSET=0&WIDTH=%04x", 
-                 Storage->BrowserStorage->ConfigHdr,
-                 Storage->BrowserStorage->Size);
       break;
 
     case EFI_HII_VARSTORE_BUFFER:
     case EFI_HII_VARSTORE_NAME_VALUE:
       //
-      // Skip if there is no RequestElement or data has initilized.
+      // Skip if there is no RequestElement.
       //
-      if (Storage->ElementCount == 0 || Storage->BrowserStorage->Initialized) {
+      if (Storage->ElementCount == 0) {
         return;
       }
+
+      //
+      // Just update the ConfigRequest, if storage already initialized. 
+      //
+      if (Storage->BrowserStorage->Initialized) {
+        ConfigRequestAdjust(Storage);
+        return;
+      }
+
       Storage->BrowserStorage->Initialized = TRUE;
-      ConfigRequest = Storage->ConfigRequest;
       break;
 
     default:
       return;
+  }
+
+  if (Storage->BrowserStorage->Type != EFI_HII_VARSTORE_NAME_VALUE) {
+    //
+    // Create the config request string to get all fields for this storage.
+    // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
+    // followed by "&OFFSET=0&WIDTH=WWWW"followed by a Null-terminator
+    //
+    StrLen = StrSize (Storage->BrowserStorage->ConfigHdr) + 20 * sizeof (CHAR16);
+    ConfigRequest = AllocateZeroPool (StrLen);
+    ASSERT (ConfigRequest != NULL);
+    UnicodeSPrint (
+               ConfigRequest, 
+               StrLen, 
+               L"%s&OFFSET=0&WIDTH=%04x", 
+               Storage->BrowserStorage->ConfigHdr,
+               Storage->BrowserStorage->Size);
+  } else {
+    ConfigRequest = Storage->ConfigRequest;
   }
 
   //
@@ -4149,7 +4161,7 @@ LoadStorage (
   //
   SynchronizeStorage(FormSet, Storage->BrowserStorage, NULL, TRUE);
 
-  if (Storage->BrowserStorage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) {
+  if (Storage->BrowserStorage->Type != EFI_HII_VARSTORE_NAME_VALUE) {
     if (ConfigRequest != NULL) {
       FreePool (ConfigRequest);
     }
