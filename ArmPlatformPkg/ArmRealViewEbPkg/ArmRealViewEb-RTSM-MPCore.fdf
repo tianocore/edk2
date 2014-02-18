@@ -1,6 +1,6 @@
 # FLASH layout file for ARM RealView EB.
 #
-#  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 #  
 #  This program and the accompanying materials                          
 #  are licensed and made available under the terms and conditions of the BSD License         
@@ -147,7 +147,13 @@ READ_LOCK_STATUS   = TRUE
   # Semi-hosting filesystem
   #
   INF ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
-  
+
+  #
+  # Multimedia Card Interface
+  #
+  INF EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
+  INF ArmPlatformPkg/Drivers/PL180MciDxe/PL180MciDxe.inf
+
   #
   # FAT filesystem + GPT/MBR partitioning
   #
