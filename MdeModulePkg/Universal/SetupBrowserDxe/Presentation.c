@@ -2294,8 +2294,8 @@ ProcessRetrieveForQuestion (
 
   Status                = EFI_SUCCESS;
   ActionRequest         = EFI_BROWSER_ACTION_REQUEST_NONE;
-    
-  if ((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != EFI_IFR_FLAG_CALLBACK) {
+
+  if (((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != EFI_IFR_FLAG_CALLBACK) || ConfigAccess == NULL) {
     return EFI_UNSUPPORTED;
   }
 
@@ -2433,8 +2433,7 @@ SetupBrowser (
     // for each question with callback flag.
     // New form may be the first form, or the different form after another form close.
     //
-    if ((ConfigAccess != NULL) &&
-        ((Selection->Handle != mCurrentHiiHandle) ||
+    if (((Selection->Handle != mCurrentHiiHandle) ||
         (!CompareGuid (&Selection->FormSetGuid, &mCurrentFormSetGuid)) ||
         (Selection->FormId != mCurrentFormId))) {
       //
@@ -2444,18 +2443,20 @@ SetupBrowser (
       CopyGuid (&mCurrentFormSetGuid, &Selection->FormSetGuid);
       mCurrentFormId      = Selection->FormId;
 
-      Status = ProcessCallBackFunction (Selection, gCurrentSelection->FormSet, Selection->Form, NULL, EFI_BROWSER_ACTION_FORM_OPEN, FALSE);
-      if (EFI_ERROR (Status)) {
-        goto Done;
-      }
+      if (ConfigAccess != NULL) {
+        Status = ProcessCallBackFunction (Selection, gCurrentSelection->FormSet, Selection->Form, NULL, EFI_BROWSER_ACTION_FORM_OPEN, FALSE);
+        if (EFI_ERROR (Status)) {
+          goto Done;
+        }
 
-      //
-      // IFR is updated during callback of open form, force to reparse the IFR binary
-      //
-      if (mHiiPackageListUpdated) {
-        Selection->Action = UI_ACTION_REFRESH_FORMSET;
-        mHiiPackageListUpdated = FALSE;
-        break;
+        //
+        // IFR is updated during callback of open form, force to reparse the IFR binary
+        //
+        if (mHiiPackageListUpdated) {
+          Selection->Action = UI_ACTION_REFRESH_FORMSET;
+          mHiiPackageListUpdated = FALSE;
+          break;
+        }
       }
     }
 

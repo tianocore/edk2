@@ -2132,6 +2132,10 @@ SendDiscardInfoToDriver (
   EFI_IFR_TYPE_VALUE          *TypeValue;
   EFI_BROWSER_ACTION_REQUEST  ActionRequest;
 
+  if (FormSet->ConfigAccess == NULL) {
+    return;
+  }
+
   Link = GetFirstNode (&Form->StatementListHead);
   while (!IsNull (&Form->StatementListHead, Link)) {
     Question = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
