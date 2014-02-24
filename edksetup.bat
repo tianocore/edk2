@@ -31,12 +31,12 @@ pushd .
 cd %~dp0
 
 if not defined WORKSPACE (
-  @goto SetWorkSpace
+  goto SetWorkSpace
 )
 
 if %WORKSPACE% == %CD% (
   @REM Workspace is not changed.
-  @goto ParseArgs
+  goto ParseArgs
 )
 
 :SetWorkSpace
@@ -47,14 +47,14 @@ set EFI_SOURCE=
 set EDK_SOURCE=
 
 :ParseArgs
-@if /I "%1"=="-h" goto Usage
-@if /I "%1"=="-help" goto Usage
-@if /I "%1"=="--help" goto Usage
-@if /I "%1"=="/h" goto Usage
-@if /I "%1"=="/?" goto Usage
-@if /I "%1"=="/help" goto Usage
+if /I "%1"=="-h" goto Usage
+if /I "%1"=="-help" goto Usage
+if /I "%1"=="--help" goto Usage
+if /I "%1"=="/h" goto Usage
+if /I "%1"=="/?" goto Usage
+if /I "%1"=="/help" goto Usage
 
-@if /I not "%1"=="--nt32" goto no_nt32
+if /I not "%1"=="--nt32" goto no_nt32
 
 @REM Flag, --nt32 is set
 @REM The Nt32 Emluation Platform requires Microsoft Libraries
@@ -88,38 +88,38 @@ if not defined VCINSTALLDIR (
 shift
 
 :no_nt32
-@if /I "%1"=="NewBuild" shift
-@if not defined EDK_TOOLS_PATH set EDK_TOOLS_PATH=%WORKSPACE%\BaseTools
-@IF NOT EXIST "%EDK_TOOLS_PATH%\toolsetup.bat" goto BadBaseTools
-@call %EDK_TOOLS_PATH%\toolsetup.bat %*
-@if /I "%1"=="Reconfig" shift
-@goto check_cygwin
+if /I "%1"=="NewBuild" shift
+if not defined EDK_TOOLS_PATH set EDK_TOOLS_PATH=%WORKSPACE%\BaseTools
+IF NOT EXIST "%EDK_TOOLS_PATH%\toolsetup.bat" goto BadBaseTools
+call %EDK_TOOLS_PATH%\toolsetup.bat %*
+if /I "%1"=="Reconfig" shift
+goto check_cygwin
 
 :BadBaseTools
   @REM
-  @REM Need the BaseTools Package in order to build
+  REM Need the BaseTools Package in order to build
   @REM
-  echo.
-  echo !!! ERROR !!! The BaseTools Package was not found !!!
-  echo.
-  echo Set the system environment variable, EDK_TOOLS_PATH to the BaseTools,
-  echo For example,
-  echo   set EDK_TOOLS_PATH=C:\MyTools\BaseTools
-  echo The setup script, toolsetup.bat must reside in this folder.
-  echo.
-  @goto end
+  @echo.
+  @echo !!! ERROR !!! The BaseTools Package was not found !!!
+  @echo.
+  @echo Set the system environment variable, EDK_TOOLS_PATH to the BaseTools,
+  @echo For example,
+  @echo   set EDK_TOOLS_PATH=C:\MyTools\BaseTools
+  @echo The setup script, toolsetup.bat must reside in this folder.
+  @echo.
+  goto end
 
 :check_cygwin
-  @if exist c:\cygwin (
-    @set CYGWIN_HOME=c:\cygwin
+  if exist c:\cygwin (
+    set CYGWIN_HOME=c:\cygwin
   ) else (
     @echo.
     @echo !!! WARNING !!! No CYGWIN_HOME set, gcc build may not be used !!!
     @echo.
   )
 
-@if NOT "%1"=="" goto Usage
-@goto end
+if NOT "%1"=="" goto Usage
+goto end
 
 :Usage
   @echo.
@@ -132,9 +132,8 @@ shift
   @echo  will be only copied to target.txt, tools_def.txt and build_rule.txt
   @echo  respectively if they do not exist. Using option [Reconfig] to force the copy. 
   @echo.
-  @goto end
+  goto end
 
 :end
-  @popd
-  @echo on
+  popd
 
