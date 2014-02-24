@@ -2,7 +2,7 @@
   Macros to work around lack of Apple support for LDR register, =expr
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Portions copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
+  Portions copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -22,31 +22,31 @@
 
 #define MmioWrite32(Address, Data) \
   ldr  x1, =Address ;              \
-  ldr  x0, =Data    ;              \
-  str  x0, [x1]
+  ldr  w0, =Data    ;              \
+  str  w0, [x1]
 
 #define MmioOr32(Address, OrData) \
   ldr  x1, =Address ;             \
-  ldr  x2, =OrData  ;             \
-  ldr  x0, [x1]     ;             \
-  orr  x0, x0, x2   ;             \
-  str  x0, [x1]
+  ldr  w2, =OrData  ;             \
+  ldr  w0, [x1]     ;             \
+  orr  w0, w0, w2   ;             \
+  str  w0, [x1]
 
 #define MmioAnd32(Address, AndData) \
   ldr  x1, =Address ;               \
-  ldr  x2, =AndData ;               \
-  ldr  x0, [x1]     ;               \
-  and  x0, x0, x2   ;               \
-  str  x0, [x1]
+  ldr  w2, =AndData ;               \
+  ldr  w0, [x1]     ;               \
+  and  w0, w0, w2   ;               \
+  str  w0, [x1]
 
 #define MmioAndThenOr32(Address, AndData, OrData) \
   ldr  x1, =Address ;                             \
-  ldr  x0, [x1]     ;                             \
-  ldr  x2, =AndData ;                             \
-  and  x0, x0, x2   ;                             \
-  ldr  x2, =OrData  ;                             \
-  orr  x0, x0, x2   ;                             \
-  str  x0, [x1]
+  ldr  w0, [x1]     ;                             \
+  ldr  w2, =AndData ;                             \
+  and  w0, w0, w2   ;                             \
+  ldr  w2, =OrData  ;                             \
+  orr  w0, w0, w2   ;                             \
+  str  w0, [x1]
 
 #define MmioWriteFromReg32(Address, Reg) \
   ldr  x1, =Address ;                    \
@@ -54,7 +54,7 @@
 
 #define MmioRead32(Address) \
   ldr  x1, =Address ;       \
-  ldr  x0, [x1]
+  ldr  w0, [x1]
 
 #define MmioReadToReg32(Address, Reg) \
   ldr  x1, =Address ;                 \
@@ -127,74 +127,9 @@ _InitializePrimaryStackEnd:
 
 #else
 
-//
-// Use ARM assembly macros, form armasm
-//
-//  Less magic in the macros if ldr reg, =expr works
-//
+#error RVCT AArch64 tool chain is not supported
 
-// returns _Data in X0 and _Address in X1
-
-
-
-#define MmioWrite32(Address, Data) MmioWrite32Macro Address, Data
-
-
-
-
-// returns Data in X0 and Address in X1, and OrData in X2
-#define MmioOr32(Address, OrData) MmioOr32Macro Address, OrData
-
-
-// returns _Data in X0 and _Address in X1, and _OrData in X2
-
-
-#define MmioAnd32(Address, AndData)  MmioAnd32Macro Address, AndData
-
-// returns result in X0, _Address in X1, and _OrData in X2
-
-
-#define MmioAndThenOr32(Address, AndData, OrData) MmioAndThenOr32Macro Address, AndData, OrData
-
-
-// returns _Data in _Reg and _Address in X1
-
-
-#define MmioWriteFromReg32(Address, Reg) MmioWriteFromReg32Macro Address, Reg
-
-// returns _Data in X0 and _Address in X1
-
-
-#define MmioRead32(Address)  MmioRead32Macro Address
-
-// returns _Data in Reg and _Address in X1
-
-
-#define MmioReadToReg32(Address, Reg) MmioReadToReg32Macro Address, Reg
-
-
-// load X0 with _Data
-
-
-#define LoadConstant(Data)  LoadConstantMacro Data
-
-// load _Reg with _Data
-
-
-#define LoadConstantToReg(Data, Reg)  LoadConstantToRegMacro Data, Reg
-
-// conditional load testing eq flag
-#define LoadConstantToRegIfEq(Data, Reg)  LoadConstantToRegIfEqMacro Data, Reg
-
-#define SetPrimaryStack(StackTop,GlobalSize,Tmp, Tmp1) SetPrimaryStack StackTop, GlobalSize, Tmp, Tmp1
-
-#define InitializePrimaryStack(GlobalSize, Tmp1, Tmp2) InitializePrimaryStack GlobalSize, Tmp1, Tmp2
-
-#define EL1_OR_EL2(SAFE_XREG)  EL1_OR_EL2 SAFE_XREG
-
-#define EL1_OR_EL2_OR_EL3(SAFE_XREG)  EL1_OR_EL2_OR_EL3 SAFE_XREG
-
-#endif
+#endif // __GNUC__ 
 
 #endif // __MACRO_IO_LIBV8_H__
 
