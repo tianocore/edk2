@@ -207,6 +207,7 @@ IsLinuxReservedRegion (
   case EfiUnusableMemory:
   case EfiACPIReclaimMemory:
   case EfiACPIMemoryNVS:
+  case EfiReservedMemoryType:
     return TRUE;
   default:
     return FALSE;
@@ -500,7 +501,7 @@ PrepareFdt (
     MemoryMapPtr = MemoryMap;
     for (Index = 0; Index < (MemoryMapSize / DescriptorSize); Index++) {
       if (IsLinuxReservedRegion ((EFI_MEMORY_TYPE)MemoryMapPtr->Type)) {
-        DEBUG((DEBUG_VERBOSE, "Reserved region of type %d [0x%X, 0x%X]\n",
+        DEBUG((DEBUG_VERBOSE, "Reserved region of type %d [0x%lX, 0x%lX]\n",
             MemoryMapPtr->Type,
             (UINTN)MemoryMapPtr->PhysicalStart,
             (UINTN)(MemoryMapPtr->PhysicalStart + MemoryMapPtr->NumberOfPages * EFI_PAGE_SIZE)));
