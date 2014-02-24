@@ -110,6 +110,13 @@ goto check_cygwin
   goto end
 
 :check_cygwin
+if defined CYGWIN_HOME (
+  if not exist "%CYGWIN_HOME%" (
+    @echo.
+    @echo !!! WARNING !!! CYGWIN_HOME not found, gcc build may not be used !!!
+    @echo.
+  )
+) else (
   if exist c:\cygwin (
     set CYGWIN_HOME=c:\cygwin
   ) else (
@@ -117,9 +124,10 @@ goto check_cygwin
     @echo !!! WARNING !!! No CYGWIN_HOME set, gcc build may not be used !!!
     @echo.
   )
+)
 
-if NOT "%1"=="" goto Usage
-goto end
+:cygwin_done
+if "%1"=="" goto end
 
 :Usage
   @echo.
@@ -129,8 +137,8 @@ goto end
   @echo         Reconfig       Reinstall target.txt, tools_def.txt and build_rule.txt.
   @echo.
   @echo  Note that target.template, tools_def.template and build_rules.template
-  @echo  will be only copied to target.txt, tools_def.txt and build_rule.txt
-  @echo  respectively if they do not exist. Using option [Reconfig] to force the copy. 
+  @echo  will only be copied to target.txt, tools_def.txt and build_rule.txt
+  @echo  respectively if they do not exist. Use option [Reconfig] to force the copy.
   @echo.
   goto end
 
