@@ -379,6 +379,9 @@ PrintLsOutput(
   }
 
   CorrectedPath = StrnCatGrow(&CorrectedPath, &LongestPath, RootPath,     0);
+  if (CorrectedPath == NULL) {
+    return SHELL_OUT_OF_RESOURCES;
+  }
   if (CorrectedPath[StrLen(CorrectedPath)-1] != L'\\'
     &&CorrectedPath[StrLen(CorrectedPath)-1] != L'/') {
     CorrectedPath = StrnCatGrow(&CorrectedPath, &LongestPath, L"\\",     0);
@@ -666,8 +669,17 @@ ShellCommandRunLs (
             ASSERT((FullPath == NULL && Size == 0) || (FullPath != NULL));
             if (StrStr(PathName, L":") == NULL) {
               StrnCatGrow(&FullPath, &Size, gEfiShellProtocol->GetCurDir(NULL), 0);
+              if (FullPath == NULL) {
+                ShellCommandLineFreeVarList (Package);
+                return SHELL_OUT_OF_RESOURCES;
+              }
             }
             StrnCatGrow(&FullPath, &Size, PathName, 0);
+            if (FullPath == NULL) {
+                ShellCommandLineFreeVarList (Package);
+                return SHELL_OUT_OF_RESOURCES;
+            }
+               
             if  (ShellIsDirectory(PathName) == EFI_SUCCESS) {
               //
               // is listing ends with a directory, then we list all files in that directory
