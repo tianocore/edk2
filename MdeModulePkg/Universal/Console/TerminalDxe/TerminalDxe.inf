@@ -55,6 +55,7 @@
   DebugLib
   PcdLib
   BaseLib
+  PrintLib
 
 [Guids]
   ## SOMETIMES_PRODUCES ## Variable:L"ConInDev"
@@ -87,6 +88,7 @@
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType           ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdErrorCodeSetVariable    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdResizeXterm             ## CONSUMES
 
 # [Event]
 # # Relative timer event set by UnicodeToEfiKey(), used to be one 2 seconds input timeout.

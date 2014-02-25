@@ -2102,6 +2102,10 @@
   # @Prompt The shared bit mask when Intel Tdx is enabled.
   gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask|0x0|UINT64|0x10000025
 
+  ## Controls whether TerminalDxe outputs an XTerm resize sequence on terminal
+  #  mode change.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdResizeXterm|FALSE|BOOLEAN|0x00010080
+
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
   #  Loading Module at Fixed Address feature is enabled.
