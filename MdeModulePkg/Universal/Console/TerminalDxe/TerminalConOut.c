@@ -7,6 +7,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
+#include <Library/PrintLib.h>
+
 #include "Terminal.h"
 
 //
@@ -79,6 +81,15 @@ CHAR16  mClearScreenString[]       = { ESC, '[', '2', 'J', 0 };
 CHAR16  mSetCursorPositionString[] = { ESC, '[', '0', '0', ';', '0', '0', 'H', 0 };
 CHAR16  mCursorForwardString[]     = { ESC, '[', '0', '0', 'C', 0 };
 CHAR16  mCursorBackwardString[]    = { ESC, '[', '0', '0', 'D', 0 };
+
+//
+// Note that this is an ASCII format string, taking two INT32 arguments:
+// rows, columns.
+//
+// A %d (INT32) format specification can expand to at most 11 characters.
+//
+CHAR8  mResizeTextAreaFormatString[] = "\x1B[8;%d;%dt";
+#define RESIZE_SEQ_SIZE  (sizeof mResizeTextAreaFormatString + 2 * (11 - 2))
 
 //
 // Body of the ConOut functions
@@ -496,6 +507,24 @@ TerminalConOutSetMode (
 
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
+  }
+
+  if (PcdGetBool (PcdResizeXterm)) {
+    CHAR16  ResizeSequence[RESIZE_SEQ_SIZE];
+
+    UnicodeSPrintAsciiFormat (
+      ResizeSequence,
+      sizeof ResizeSequence,
+      mResizeTextAreaFormatString,
+      (INT32)TerminalDevice->TerminalConsoleModeData[ModeNumber].Rows,
+      (INT32)TerminalDevice->TerminalConsoleModeData[ModeNumber].Columns
+      );
+    TerminalDevice->OutputEscChar = TRUE;
+    Status                        = This->OutputString (This, ResizeSequence);
+    TerminalDevice->OutputEscChar = FALSE;
+    if (EFI_ERROR (Status)) {
+      return EFI_DEVICE_ERROR;
+    }
   }
 
   This->Mode->Mode = (INT32)ModeNumber;
