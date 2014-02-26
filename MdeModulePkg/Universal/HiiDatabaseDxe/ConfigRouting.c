@@ -3083,7 +3083,7 @@ GetFullStringFromHiiFormPackages (
 
   Status = GetFormPackageData (DataBaseRecord, &HiiFormPackage, &PackageSize);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
 
   //

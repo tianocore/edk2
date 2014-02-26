@@ -207,7 +207,7 @@ EFI_STATUS
 /// - Sets device information for adapter.
 /// - Gets a list of supported information types for this instance of the protocol.
 ///
-typedef struct _EFI_ADAPTER_INFORMATION_PROTOCOL {
+struct _EFI_ADAPTER_INFORMATION_PROTOCOL {
   EFI_ADAPTER_INFO_GET_INFO              GetInformation;
   EFI_ADAPTER_INFO_SET_INFO              SetInformation;
   EFI_ADAPTER_INFO_GET_SUPPORTED_TYPES   GetSupportedTypes;
