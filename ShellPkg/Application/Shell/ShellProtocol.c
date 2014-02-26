@@ -2993,6 +2993,26 @@ InternalEfiShellGetListAlias(
 }
 
 /**
+  Convert a null-terminated unicode string, in-place, to all lowercase.
+  Then return it.
+**/
+STATIC
+CHAR16 *
+ToLower (
+  CHAR16 *Str
+  )
+{
+  UINTN Index;
+
+  for (Index = 0; Str[Index] != L'\0'; Index++) {
+    if (Str[Index] >= L'A' && Str[Index] <= L'Z') {
+      Str[Index] -= (L'A' - L'a');
+    }
+  }
+  return Str;
+}
+
+/**
   This function returns the command associated with a alias or a list of all
   alias'.
 
@@ -3021,17 +3041,23 @@ EfiShellGetAlias(
   UINTN       RetSize;
   UINT32      Attribs;
   EFI_STATUS  Status;
+  CHAR16      *AliasLower;
 
+  // Convert to lowercase to make aliases case-insensitive
   if (Alias != NULL) {
+    AliasLower = AllocateCopyPool (StrSize (Alias), Alias);
+    ASSERT (AliasLower != NULL);
+    ToLower (AliasLower);
+
     if (Volatile == NULL) {
-      return (AddBufferToFreeList(GetVariable((CHAR16*)Alias, &gShellAliasGuid)));
+      return (AddBufferToFreeList(GetVariable(AliasLower, &gShellAliasGuid)));
     }
     RetSize = 0;
     RetVal = NULL;
-    Status = gRT->GetVariable((CHAR16*)Alias, &gShellAliasGuid, &Attribs, &RetSize, RetVal);
+    Status = gRT->GetVariable(AliasLower, &gShellAliasGuid, &Attribs, &RetSize, RetVal);
     if (Status == EFI_BUFFER_TOO_SMALL) {
       RetVal = AllocateZeroPool(RetSize);
-      Status = gRT->GetVariable((CHAR16*)Alias, &gShellAliasGuid, &Attribs, &RetSize, RetVal);
+      Status = gRT->GetVariable(AliasLower, &gShellAliasGuid, &Attribs, &RetSize, RetVal);
     }
     if (EFI_ERROR(Status)) {
       if (RetVal != NULL) {
@@ -3045,6 +3071,7 @@ EfiShellGetAlias(
       *Volatile = TRUE;
     }
 
+    FreePool (AliasLower);
     return (AddBufferToFreeList(RetVal));
   }
   return (AddBufferToFreeList(InternalEfiShellGetListAlias()));
@@ -3074,6 +3101,18 @@ InternalSetAlias(
   IN BOOLEAN Volatile
   )
 {
+  EFI_STATUS  Status;
+  CHAR16      *AliasLower;
+
+  // Convert to lowercase to make aliases case-insensitive
+  if (Alias != NULL) {
+    AliasLower = AllocateCopyPool (StrSize (Alias), Alias);
+    ASSERT (AliasLower != NULL);
+    ToLower (AliasLower);
+  } else {
+    AliasLower = NULL;
+  }
+
   //
   // We must be trying to remove one if Alias is NULL
   //
@@ -3081,7 +3120,7 @@ InternalSetAlias(
     //
     // remove an alias (but passed in COMMAND parameter)
     //
-    return (gRT->SetVariable((CHAR16*)Command, &gShellAliasGuid, 0, 0, NULL));
+    Status = (gRT->SetVariable((CHAR16*)Command, &gShellAliasGuid, 0, 0, NULL));
   } else {
     //
     // Add and replace are the same
@@ -3090,8 +3129,13 @@ InternalSetAlias(
     // We dont check the error return on purpose since the variable may not exist.
     gRT->SetVariable((CHAR16*)Command, &gShellAliasGuid, 0, 0, NULL);
 
-    return (gRT->SetVariable((CHAR16*)Alias, &gShellAliasGuid, EFI_VARIABLE_BOOTSERVICE_ACCESS|(Volatile?0:EFI_VARIABLE_NON_VOLATILE), StrSize(Command), (VOID*)Command));
+    Status = (gRT->SetVariable((CHAR16*)Alias, &gShellAliasGuid, EFI_VARIABLE_BOOTSERVICE_ACCESS|(Volatile?0:EFI_VARIABLE_NON_VOLATILE), StrSize(Command), (VOID*)Command));
   }
+
+  if (Alias != NULL) {
+    FreePool (AliasLower);
+  }
+  return Status;
 }
 
 /**
@@ -3113,6 +3157,7 @@ InternalSetAlias(
   @retval EFI_NOT_FOUND         the Alias intended to be deleted was not found
   @retval EFI_ACCESS_DENIED     The alias is a built-in alias or already existed and Replace was set to
                                 FALSE.
+  @retval EFI_INVALID_PARAMETER Command is null or the empty string.
 **/
 EFI_STATUS
 EFIAPI
@@ -3123,21 +3168,24 @@ EfiShellSetAlias(
   IN BOOLEAN Volatile
   )
 {
-  //
-  // cant set over a built in alias
-  //
   if (ShellCommandIsOnAliasList(Alias==NULL?Command:Alias)) {
+    //
+    // cant set over a built in alias
+    //
     return (EFI_ACCESS_DENIED);
-  }
-  if (Command == NULL || *Command == CHAR_NULL || StrLen(Command) == 0) {
+  } else if (Command == NULL || *Command == CHAR_NULL || StrLen(Command) == 0) {
+    //
+    // Command is null or empty
+    //
     return (EFI_INVALID_PARAMETER);
-  }
-
-  if (EfiShellGetAlias(Command, NULL) != NULL && !Replace) {
+  } else if (EfiShellGetAlias(Command, NULL) != NULL && !Replace) {
+    //
+    // Alias already exists, Replace not set
+    //
     return (EFI_ACCESS_DENIED);
+  } else {
+    return (InternalSetAlias(Command, Alias, Volatile));
   }
-
-  return (InternalSetAlias(Command, Alias, Volatile));
 }
 
 // Pure FILE_HANDLE operations are passed to FileHandleLib
