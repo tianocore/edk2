@@ -3006,7 +3006,7 @@ ToLower (
 
   for (Index = 0; Str[Index] != L'\0'; Index++) {
     if (Str[Index] >= L'A' && Str[Index] <= L'Z') {
-      Str[Index] -= (L'A' - L'a');
+      Str[Index] -= (CHAR16)(L'A' - L'a');
     }
   }
   return Str;
