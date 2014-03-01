@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -12,7 +12,7 @@
 *
 **/
 
-#include <Uefi.h> 
+#include <Uefi.h>
 #include <Chipset/ArmV7.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -32,58 +32,56 @@ ArmArchTimerReadReg (
 {
   // Check if the Generic/Architecture timer is implemented
   if (ArmIsArchTimerImplemented ()) {
-
     switch (Reg) {
-
     case CntFrq:
       *((UINTN *)DstBuf) = ArmReadCntFrq ();
-      break;
+      return;
 
     case CntPct:
       *((UINT64 *)DstBuf) = ArmReadCntPct ();
-      break;
+      return;
 
     case CntkCtl:
       *((UINTN *)DstBuf) = ArmReadCntkCtl();
-      break;
+      return;
 
     case CntpTval:
       *((UINTN *)DstBuf) = ArmReadCntpTval ();
-      break;
+      return;
 
     case CntpCtl:
       *((UINTN *)DstBuf) = ArmReadCntpCtl ();
-      break;
+      return;
 
     case CntvTval:
       *((UINTN *)DstBuf) = ArmReadCntvTval ();
-      break;
+      return;
 
     case CntvCtl:
       *((UINTN *)DstBuf) = ArmReadCntvCtl ();
-      break;
+      return;
 
     case CntvCt:
       *((UINT64 *)DstBuf) = ArmReadCntvCt ();
-      break;
+      return;
 
     case CntpCval:
       *((UINT64 *)DstBuf) = ArmReadCntpCval ();
-      break;
+      return;
 
     case CntvCval:
       *((UINT64 *)DstBuf) = ArmReadCntvCval ();
-      break;
+      return;
 
     case CntvOff:
       *((UINT64 *)DstBuf) = ArmReadCntvOff ();
-      break;
+      return;
 
     case CnthCtl:
     case CnthpTval:
     case CnthpCtl:
     case CnthpCval:
-    DEBUG ((EFI_D_ERROR, "The register is related to Hypervisor Mode. Can't perform requested operation\n "));
+      DEBUG ((EFI_D_ERROR, "The register is related to Hypervisor Mode. Can't perform requested operation\n "));
       break;
 
     default:
@@ -93,6 +91,8 @@ ArmArchTimerReadReg (
     DEBUG ((EFI_D_ERROR, "Attempt to read ARM Generic Timer registers. But ARM Generic Timer extension is not implemented \n "));
     ASSERT (0);
   }
+
+  *((UINT64 *)DstBuf) = 0;
 }
 
 VOID
@@ -208,7 +208,7 @@ ArmArchTimerGetTimerFreq (
     VOID
     )
 {
-  UINTN ArchTimerFreq = 0;
+  UINTN ArchTimerFreq;
   ArmArchTimerReadReg (CntFrq, (VOID *)&ArchTimerFreq);
   return ArchTimerFreq;
 }
