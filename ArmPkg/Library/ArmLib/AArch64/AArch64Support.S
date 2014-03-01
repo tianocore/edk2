@@ -45,6 +45,7 @@ GCC_ASM_EXPORT (ArmDataMemoryBarrier)
 GCC_ASM_EXPORT (ArmDataSyncronizationBarrier)
 GCC_ASM_EXPORT (ArmInstructionSynchronizationBarrier)
 GCC_ASM_EXPORT (ArmWriteVBar)
+GCC_ASM_EXPORT (ArmReadVBar)
 GCC_ASM_EXPORT (ArmVFPImplemented)
 GCC_ASM_EXPORT (ArmEnableVFP)
 GCC_ASM_EXPORT (ArmCallWFI)
@@ -410,6 +411,16 @@ ASM_PFX(ArmWriteVBar):
 3: msr   vbar_el3, x0            // Set the Address of the EL3 Vector Table in the VBAR register
 4: isb
    ret
+
+ASM_PFX(ArmReadVBar):
+   EL1_OR_EL2_OR_EL3(x1)
+1: mrs   x0, vbar_el1            // Set the Address of the EL1 Vector Table in the VBAR register
+   ret
+2: mrs   x0, vbar_el2            // Set the Address of the EL2 Vector Table in the VBAR register
+   ret
+3: mrs   x0, vbar_el3            // Set the Address of the EL3 Vector Table in the VBAR register
+   ret
+
 
 ASM_PFX(ArmEnableVFP):
   // Check whether floating-point is implemented in the processor.
