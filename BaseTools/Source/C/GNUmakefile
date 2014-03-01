@@ -12,6 +12,19 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
+ifdef ARCH
+  #
+  # ARCH is expected to be a particular string
+  # all other strings will potentially fail build
+  #
+  ifneq ($(ARCH),X64)
+    ifneq ($(ARCH),IA32)
+      $(info ERROR: ARCH must be set to X64 or IA32)
+      $(error ARCH set to invalid/unknown string)
+    endif
+  endif
+endif
+
 ifndef ARCH
   #
   # If ARCH is not defined, then we use 'uname -m' to attempt
