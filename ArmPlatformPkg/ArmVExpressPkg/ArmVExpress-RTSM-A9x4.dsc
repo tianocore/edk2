@@ -273,7 +273,7 @@
   #
   # Platform Driver
   #
-  ArmPlatformPkg/ArmVExpressPkg/ArmFvpDxe/ArmFvpDxe.inf
+  ArmPlatformPkg/ArmVExpressPkg/ArmVExpressDxe/ArmFvpDxe.inf
   OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
   
   #

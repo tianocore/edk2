@@ -100,6 +100,11 @@ READ_LOCK_STATUS   = TRUE
   INF ArmPlatformPkg/Drivers/SP805WatchdogDxe/SP805WatchdogDxe.inf
 
   #
+  # Platform
+  #
+  INF ArmPlatformPkg/ArmVExpressPkg/ArmVExpressDxe/ArmHwDxe.inf
+
+  #
   # Multimedia Card Interface
   #
   INF EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf

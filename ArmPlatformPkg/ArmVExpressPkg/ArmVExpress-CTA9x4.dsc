@@ -277,6 +277,11 @@
   ArmPlatformPkg/Drivers/SP805WatchdogDxe/SP805WatchdogDxe.inf
 
   #
+  # Platform
+  #
+  ArmPlatformPkg/ArmVExpressPkg/ArmVExpressDxe/ArmHwDxe.inf
+
+  #
   # Filesystems
   #
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf

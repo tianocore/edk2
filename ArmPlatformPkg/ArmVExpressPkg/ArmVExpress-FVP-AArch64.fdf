@@ -183,7 +183,7 @@ READ_LOCK_STATUS   = TRUE
   #
   # Platform Driver
   #
-  INF ArmPlatformPkg/ArmVExpressPkg/ArmFvpDxe/ArmFvpDxe.inf
+  INF ArmPlatformPkg/ArmVExpressPkg/ArmVExpressDxe/ArmFvpDxe.inf
   INF OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
 
   #
