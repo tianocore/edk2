@@ -17,47 +17,6 @@
 
 typedef VOID (*ARM_V7_CACHE_OPERATION)(UINT32);
 
-VOID
-EFIAPI
-ArmDrainWriteBuffer (
-  VOID
-  );
-
-VOID
-EFIAPI
-ArmInvalidateDataCacheEntryBySetWay (
-  IN  UINT32  SetWayFormat
-  );
-
-VOID
-EFIAPI
-ArmCleanDataCacheEntryBySetWay (
-  IN  UINT32  SetWayFormat
-  );
-
-VOID
-EFIAPI
-ArmCleanDataCacheToPoUEntryBySetWay (
-  IN  UINT32  SetWayFormat
-  );
-
-VOID
-EFIAPI
-ArmCleanInvalidateDataCacheEntryBySetWay (
-  IN  UINT32   SetWayFormat
-  );
-
-VOID
-EFIAPI
-ArmEnableAsynchronousAbort (
-  VOID
-  );
-
-UINTN
-EFIAPI
-ArmDisableAsynchronousAbort (
-  VOID
-  );
 
 VOID
 ArmV7PerformPoUDataCacheOperation (

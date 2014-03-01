@@ -281,6 +281,24 @@ ArmCleanInvalidateDataCacheEntryByMVA (
 
 VOID
 EFIAPI
+ArmInvalidateDataCacheEntryBySetWay (
+  IN  UINTN  SetWayFormat
+  );
+
+VOID
+EFIAPI
+ArmCleanDataCacheEntryBySetWay (
+  IN  UINTN  SetWayFormat
+  );
+
+VOID
+EFIAPI
+ArmCleanInvalidateDataCacheEntryBySetWay (
+  IN  UINTN   SetWayFormat
+  );
+
+VOID
+EFIAPI
 ArmEnableDataCache (
   VOID
   );
@@ -317,6 +335,12 @@ ArmDisableMmu (
 
 VOID
 EFIAPI
+ArmEnableCachesAndMmu (
+  VOID
+  );
+
+VOID
+EFIAPI
 ArmDisableCachesAndMmu (
   VOID
   );
@@ -345,15 +369,27 @@ ArmGetInterruptState (
   VOID
   );
 
+VOID
+EFIAPI
+ArmEnableAsynchronousAbort (
+  VOID
+  );
+
 UINTN
 EFIAPI
-ArmDisableIrq (
+ArmDisableAsynchronousAbort (
   VOID
   );
 
 VOID
 EFIAPI
 ArmEnableIrq (
+  VOID
+  );
+
+UINTN
+EFIAPI
+ArmDisableIrq (
   VOID
   );
 
@@ -453,6 +489,12 @@ ArmSetLowVectors (
 VOID
 EFIAPI
 ArmSetHighVectors (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmDrainWriteBuffer (
   VOID
   );
 
