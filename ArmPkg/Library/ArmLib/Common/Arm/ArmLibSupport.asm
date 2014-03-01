@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------ 
 //
 // Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-// Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+// Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
 //
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -23,7 +23,7 @@
 #define dsb
 #endif
 
-    EXPORT Cp15IdCode
+    EXPORT ArmReadMidr
     EXPORT Cp15CacheInfo
     EXPORT ArmGetInterruptState
     EXPORT ArmGetFiqState
@@ -50,7 +50,7 @@
 
     AREA ArmLibSupport, CODE, READONLY
 
-Cp15IdCode
+ArmReadMidr
   mrc     p15,0,R0,c0,c0,0
   bx      LR
 

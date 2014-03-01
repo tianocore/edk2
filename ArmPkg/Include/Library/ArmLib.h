@@ -214,12 +214,6 @@ ArmReadIdPfr1 (
 
 UINT32
 EFIAPI
-Cp15IdCode (
-  VOID
-  );
-  
-UINT32
-EFIAPI
 Cp15CacheInfo (
   VOID
   );

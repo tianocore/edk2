@@ -51,7 +51,6 @@ GCC_ASM_EXPORT (ArmEnableVFP)
 GCC_ASM_EXPORT (ArmCallWFI)
 GCC_ASM_EXPORT (ArmInvalidateInstructionAndDataTlb)
 GCC_ASM_EXPORT (ArmReadMpidr)
-GCC_ASM_EXPORT (ArmReadMidr)
 GCC_ASM_EXPORT (ArmReadTpidrurw)
 GCC_ASM_EXPORT (ArmWriteTpidrurw)
 GCC_ASM_EXPORT (ArmIsArchTimerImplemented)
@@ -469,9 +468,6 @@ ASM_PFX(ArmReadMpidr):
   mrs   x0, mpidr_el1           // read EL1 MPIDR
   ret
 
-ASM_PFX(ArmReadMidr):
-  mrs   x0, midr_el1            // Read Main ID Register
-  ret
 
 // Keep old function names for C compatibilty for now. Change later?
 ASM_PFX(ArmReadTpidrurw):

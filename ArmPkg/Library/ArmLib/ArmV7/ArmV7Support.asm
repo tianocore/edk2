@@ -46,7 +46,6 @@
     EXPORT  ArmReadCbar
     EXPORT  ArmInvalidateInstructionAndDataTlb
     EXPORT  ArmReadMpidr
-    EXPORT  ArmReadMidr
     EXPORT  ArmReadTpidrurw
     EXPORT  ArmWriteTpidrurw
     EXPORT  ArmIsArchTimerImplemented
@@ -370,10 +369,6 @@ ArmInvalidateInstructionAndDataTlb
 
 ArmReadMpidr
   mrc     p15, 0, r0, c0, c0, 5     ; read MPIDR
-  bx      lr
-
-ArmReadMidr
-  mrc     p15, 0, r0, c0, c0, 0      ; Read Main ID Register
   bx      lr
 
 ArmReadTpidrurw

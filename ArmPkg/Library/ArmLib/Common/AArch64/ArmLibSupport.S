@@ -17,7 +17,7 @@
 
 .text
 .align 3
-GCC_ASM_EXPORT (ArmMainIdCode)
+GCC_ASM_EXPORT (ArmReadMidr)
 GCC_ASM_EXPORT (ArmCacheInfo)
 GCC_ASM_EXPORT (ArmGetInterruptState)
 GCC_ASM_EXPORT (ArmGetFiqState)
@@ -43,7 +43,7 @@ GCC_ASM_EXPORT (ArmCallSEV)
 .set DAIF_FIQ_BIT,   (1 << 0)
 .set DAIF_IRQ_BIT,   (1 << 1)
 
-ASM_PFX(ArmiMainIdCode):
+ASM_PFX(ArmReadMidr):
   mrs     x0, midr_el1        // Read from Main ID Register (MIDR)
   ret
 
