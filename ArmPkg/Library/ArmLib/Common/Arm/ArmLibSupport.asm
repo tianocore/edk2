@@ -171,14 +171,14 @@ ArmWriteMVBar
   
 ArmCallWFE
   wfe
-  blx   lr
+  bx      lr
 
 ArmCallSEV
   sev
-  blx   lr
+  bx      lr
 
 ArmReadSctlr
-  mrc     p15, 0, R0, c1, c0, 0      // Read SCTLR into R0 (Read control register configuration data)
-  bx	  lr
+  mrc     p15, 0, r0, c1, c0, 0      // Read SCTLR into R0 (Read control register configuration data)
+  bx	    lr
 
   END

@@ -74,16 +74,16 @@ ASM_PFX(ArmWriteCpacr):
 ASM_PFX(ArmWriteAuxCr):
   EL1_OR_EL2(x1)
 1:msr     actlr_el1, x0      // Aux Control Reg (ACTLR) at EL1. Also available in EL2 and EL3
-  b       3f
+  ret
 2:msr     actlr_el2, x0      // Aux Control Reg (ACTLR) at EL1. Also available in EL2 and EL3
-3:ret
+  ret
 
 ASM_PFX(ArmReadAuxCr):
   EL1_OR_EL2(x1)
 1:mrs     x0, actlr_el1      // Aux Control Reg (ACTLR) at EL1. Also available in EL2 and EL3
-  b       3f
+  ret
 2:mrs     x0, actlr_el2      // Aux Control Reg (ACTLR) at EL1. Also available in EL2 and EL3
-3:ret
+  ret
 
 ASM_PFX(ArmSetTTBR0):
   EL1_OR_EL2_OR_EL3(x1)
@@ -185,7 +185,7 @@ ASM_PFX(ArmWriteScr):
   ret
 
 ASM_PFX(ArmWriteMVBar):
-  msr    vbar_el3, x0            // Excpetion Vector Base address for Monitor on EL3
+  msr    vbar_el3, x0            // Exception Vector Base address for Monitor on EL3
   ret
 
 ASM_PFX(ArmCallWFE):

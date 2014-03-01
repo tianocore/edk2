@@ -92,7 +92,4 @@ ASM_PFX(set_non_secure_mode):
    msr     spsr_el3, x0
    ret
 
-dead:
-   b       dead
-
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED

@@ -376,6 +376,3 @@ ASM_PFX(AsmCommonExceptionEntry):
 
 #undef REG_PAIR
 #undef REG_ONE
-
-dead:
-  b        dead

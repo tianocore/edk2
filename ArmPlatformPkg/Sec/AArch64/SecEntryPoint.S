@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+//  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 //
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
@@ -141,6 +141,3 @@ _PrepareArguments:
 ASM_PFX(JumpToPEI):
   LoadConstantToReg (FixedPcdGet32(PcdFvBaseAddress), x0)
   blr   x0
-
-dead:
-  b     dead

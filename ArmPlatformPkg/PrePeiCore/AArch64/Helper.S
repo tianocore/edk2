@@ -45,7 +45,4 @@ ASM_PFX(SetupExceptionLevel2):
 
    ret
 
-dead:
-   b       dead
-
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED

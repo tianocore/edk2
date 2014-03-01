@@ -87,7 +87,7 @@ ASM_PFX(CPSRMaskInsert):    @ on entry, r0 is the mask and r1 is the field to in
   isb
   mov     sp, r3            @ restore stack pointer
   ldmfd   sp!, {r4-r12, lr} @ restore registers
-  bx      lr                @ return (hopefully thumb-safe!)             @ return (hopefully thumb-safe!)
+  bx      lr                @ return (hopefully thumb-safe!)
 
 ASM_PFX(CPSRRead):
   mrs     r0, cpsr
