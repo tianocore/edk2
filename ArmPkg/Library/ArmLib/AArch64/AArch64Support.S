@@ -503,7 +503,4 @@ ASM_PFX(ArmReadCurrentEL):
   mrs   x0, CurrentEL
   ret
 
-dead:
-  b     dead
-
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED

@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+//  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 //
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
@@ -43,13 +43,12 @@ ASM_PFX(_ModuleEntryPoint):
 // changes.
 
 // Which EL are we running at? Every EL needs some level of setup...
-  EL1_OR_EL2_OR_EL3(x0)
+// We should not run this code in EL3
+  EL1_OR_EL2(x0)
 1:bl    ASM_PFX(SetupExceptionLevel1)
   b     ASM_PFX(MainEntryPoint)
 2:bl    ASM_PFX(SetupExceptionLevel2)
   b     ASM_PFX(MainEntryPoint)
-3:// If we are at EL3 we die.
-  b     dead
 
 ASM_PFX(MainEntryPoint):
   // Identify CPU ID
@@ -109,6 +108,3 @@ _SetupPrimaryCoreStack:
   // 128-bit variable on the stack
   SetPrimaryStack (x1, x2, x3, x4)
   b     _PrepareArguments
-
-dead:
-  b     dead
