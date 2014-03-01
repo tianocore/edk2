@@ -3,7 +3,7 @@
 #
 #
 # Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
-# Copyright (c) 2012, ARM Ltd. All rights reserved.<BR>
+# Copyright (c) 2012-2014, ARM Ltd. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -26,7 +26,7 @@
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/Embedded
-  SUPPORTED_ARCHITECTURES        = IA32|X64|IPF|ARM
+  SUPPORTED_ARCHITECTURES        = IA32|X64|IPF|ARM|AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = EmbeddedPkg/EmbeddedPkg.fdf
@@ -116,10 +116,8 @@
 [LibraryClasses.common.SEC]
   ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
 
-[LibraryClasses.ARM]
+[LibraryClasses.ARM, LibraryClasses.AARCH64]
   SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf
-
-[LibraryClasses.ARM]
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
 
@@ -236,7 +234,6 @@
   EmbeddedPkg/Ebl/Ebl.inf
 ####  EmbeddedPkg/EblExternCmd/EblExternCmd.inf
   EmbeddedPkg/EmbeddedMonotonicCounter/EmbeddedMonotonicCounter.inf
-  EmbeddedPkg/GdbStub/GdbStub.inf
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
   EmbeddedPkg/SerialDxe/SerialDxe.inf
@@ -244,6 +241,6 @@
   EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
 
   EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
-  
-  
 
+[Components.IA32, Components.X64, Components.IPF, Components.ARM]
+  EmbeddedPkg/GdbStub/GdbStub.inf
