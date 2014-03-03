@@ -114,10 +114,6 @@ Routine Description:
 
   Private = QEMU_VIDEO_PRIVATE_DATA_FROM_GRAPHICS_OUTPUT_THIS (This);
 
-  if (Private->HardwareNeedsStarting) {
-    return EFI_NOT_STARTED;
-  }
-
   if (Info == NULL || SizeOfInfo == NULL || ModeNumber >= This->Mode->MaxMode) {
     return EFI_INVALID_PARAMETER;
   }
@@ -208,8 +204,6 @@ Routine Description:
     (VOID*)(UINTN) This->Mode->FrameBufferBase,
     This->Mode->Info
     );
-
-  Private->HardwareNeedsStarting  = FALSE;
 
   return EFI_SUCCESS;
 }
@@ -331,7 +325,6 @@ QemuVideoGraphicsOutputConstructor (
   }
   Private->GraphicsOutput.Mode->MaxMode = (UINT32) Private->MaxMode;
   Private->GraphicsOutput.Mode->Mode    = GRAPHICS_OUTPUT_INVALIDE_MODE_NUMBER;
-  Private->HardwareNeedsStarting        = TRUE;
   Private->LineBuffer                   = NULL;
 
   //

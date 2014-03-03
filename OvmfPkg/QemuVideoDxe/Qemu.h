@@ -111,7 +111,6 @@ typedef struct {
   UINTN                                 MaxMode;
   QEMU_VIDEO_MODE_DATA                  *ModeData;
   UINT8                                 *LineBuffer;
-  BOOLEAN                               HardwareNeedsStarting;
   QEMU_VIDEO_VARIANT                    Variant;
 } QEMU_VIDEO_PRIVATE_DATA;
 
