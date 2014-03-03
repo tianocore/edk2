@@ -180,11 +180,11 @@ Routine Description:
   switch (Private->Variant) {
   case QEMU_VIDEO_CIRRUS_5430:
   case QEMU_VIDEO_CIRRUS_5446:
-    InitializeCirrusGraphicsMode (Private, &QemuVideoCirrusModes[ModeData->ModeNumber]);
+    InitializeCirrusGraphicsMode (Private, &QemuVideoCirrusModes[ModeData->InternalModeIndex]);
     break;
   case QEMU_VIDEO_BOCHS_MMIO:
   case QEMU_VIDEO_BOCHS:
-    InitializeBochsGraphicsMode (Private, &QemuVideoBochsModes[ModeData->ModeNumber]);
+    InitializeBochsGraphicsMode (Private, &QemuVideoBochsModes[ModeData->InternalModeIndex]);
     break;
   default:
     ASSERT (FALSE);

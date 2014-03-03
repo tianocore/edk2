@@ -50,7 +50,7 @@
 // QEMU Vide Graphical Mode Data
 //
 typedef struct {
-  UINT32  ModeNumber;
+  UINT32  InternalModeIndex; // points into card-specific mode table
   UINT32  HorizontalResolution;
   UINT32  VerticalResolution;
   UINT32  ColorDepth;
@@ -107,15 +107,22 @@ typedef struct {
   UINT64                                OriginalPciAttributes;
   EFI_GRAPHICS_OUTPUT_PROTOCOL          GraphicsOutput;
   EFI_DEVICE_PATH_PROTOCOL              *GopDevicePath;
+
+  //
+  // The next three fields match the client-visible
+  // EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE.Mode and
+  // EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE.MaxMode fields.
+  //
   UINTN                                 CurrentMode;
   UINTN                                 MaxMode;
   QEMU_VIDEO_MODE_DATA                  *ModeData;
+
   UINT8                                 *LineBuffer;
   QEMU_VIDEO_VARIANT                    Variant;
 } QEMU_VIDEO_PRIVATE_DATA;
 
 ///
-/// Video Mode structure
+/// Card-specific Video Mode structures
 ///
 typedef struct {
   UINT32  Width;

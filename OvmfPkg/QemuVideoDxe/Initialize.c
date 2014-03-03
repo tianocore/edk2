@@ -182,14 +182,15 @@ QemuVideoCirrusModeSetup (
   ModeData = Private->ModeData;
   VideoMode = &QemuVideoCirrusModes[0];
   for (Index = 0; Index < QEMU_VIDEO_CIRRUS_MODE_COUNT; Index ++) {
-    ModeData->ModeNumber = Index;
+    ModeData->InternalModeIndex = Index;
     ModeData->HorizontalResolution          = VideoMode->Width;
     ModeData->VerticalResolution            = VideoMode->Height;
     ModeData->ColorDepth                    = VideoMode->ColorDepth;
     ModeData->RefreshRate                   = VideoMode->RefreshRate;
     DEBUG ((EFI_D_INFO,
-      "Adding Cirrus Video Mode %d: %dx%d, %d-bit, %d Hz\n",
-      ModeData->ModeNumber,
+      "Adding Mode %d as Cirrus Internal Mode %d: %dx%d, %d-bit, %d Hz\n",
+      (INT32) (ModeData - Private->ModeData),
+      ModeData->InternalModeIndex,
       ModeData->HorizontalResolution,
       ModeData->VerticalResolution,
       ModeData->ColorDepth,
@@ -237,14 +238,15 @@ QemuVideoBochsModeSetup (
   ModeData = Private->ModeData;
   VideoMode = &QemuVideoBochsModes[0];
   for (Index = 0; Index < QEMU_VIDEO_BOCHS_MODE_COUNT; Index ++) {
-    ModeData->ModeNumber = Index;
+    ModeData->InternalModeIndex = Index;
     ModeData->HorizontalResolution          = VideoMode->Width;
     ModeData->VerticalResolution            = VideoMode->Height;
     ModeData->ColorDepth                    = VideoMode->ColorDepth;
     ModeData->RefreshRate                   = 60;
     DEBUG ((EFI_D_INFO,
-      "Adding Bochs Video Mode %d: %dx%d, %d-bit, %d Hz\n",
-      ModeData->ModeNumber,
+      "Adding Mode %d as Bochs Internal Mode %d: %dx%d, %d-bit, %d Hz\n",
+      (INT32) (ModeData - Private->ModeData),
+      ModeData->InternalModeIndex,
       ModeData->HorizontalResolution,
       ModeData->VerticalResolution,
       ModeData->ColorDepth,
