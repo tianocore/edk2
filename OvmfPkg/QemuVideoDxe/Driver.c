@@ -97,7 +97,6 @@ QemuVideoControllerDriverSupported (
   EFI_STATUS          Status;
   EFI_PCI_IO_PROTOCOL *PciIo;
   PCI_TYPE00          Pci;
-  EFI_DEV_PATH        *Node;
   QEMU_VIDEO_CARD     *Card;
 
   //
@@ -130,40 +129,10 @@ QemuVideoControllerDriverSupported (
   }
 
   Status = EFI_UNSUPPORTED;
-  //
-  // See if the I/O enable is on.  Most systems only allow one VGA device to be turned on
-  // at a time, so see if this is one that is turned on.
-  //
-  //  if (((Pci.Hdr.Command & 0x01) == 0x01)) {
-  //
-  // See if this is a Cirrus Logic PCI controller
-  //
   Card = QemuVideoDetect(Pci.Hdr.VendorId, Pci.Hdr.DeviceId);
   if (Card != NULL) {
     DEBUG ((EFI_D_INFO, "QemuVideo: %s detected\n", Card->Name));
     Status = EFI_SUCCESS;
-    //
-    // If this is an Intel 945 graphics controller,
-    // go further check RemainingDevicePath validation
-    //
-    if (RemainingDevicePath != NULL) {
-      Node = (EFI_DEV_PATH *) RemainingDevicePath;
-      //
-      // Check if RemainingDevicePath is the End of Device Path Node, 
-      // if yes, return EFI_SUCCESS
-      //
-      if (!IsDevicePathEnd (Node)) {
-        //
-        // If RemainingDevicePath isn't the End of Device Path Node,
-        // check its validation
-        //
-        if (Node->DevPath.Type != ACPI_DEVICE_PATH ||
-            Node->DevPath.SubType != ACPI_ADR_DP ||
-            DevicePathNodeLength(&Node->DevPath) != sizeof(ACPI_ADR_DEVICE_PATH)) {
-          Status = EFI_UNSUPPORTED;
-        }
-      }
-    }
   }
 
 Done:
@@ -204,6 +173,7 @@ QemuVideoControllerDriverStart (
   EFI_STATUS                        Status;
   QEMU_VIDEO_PRIVATE_DATA           *Private;
   EFI_DEVICE_PATH_PROTOCOL          *ParentDevicePath;
+  ACPI_ADR_DEVICE_PATH              AcpiDeviceNode;
   PCI_TYPE00                        Pci;
   QEMU_VIDEO_CARD                   *Card;
   EFI_PCI_IO_PROTOCOL               *ChildPciIo;
@@ -342,50 +312,32 @@ QemuVideoControllerDriverStart (
   //
   // Set Gop Device Path
   //
-  if (RemainingDevicePath == NULL) {
-    ACPI_ADR_DEVICE_PATH AcpiDeviceNode;
+  ZeroMem (&AcpiDeviceNode, sizeof (ACPI_ADR_DEVICE_PATH));
+  AcpiDeviceNode.Header.Type = ACPI_DEVICE_PATH;
+  AcpiDeviceNode.Header.SubType = ACPI_ADR_DP;
+  AcpiDeviceNode.ADR = ACPI_DISPLAY_ADR (1, 0, 0, 1, 0, ACPI_ADR_DISPLAY_TYPE_VGA, 0, 0);
+  SetDevicePathNodeLength (&AcpiDeviceNode.Header, sizeof (ACPI_ADR_DEVICE_PATH));
 
-    ZeroMem (&AcpiDeviceNode, sizeof (ACPI_ADR_DEVICE_PATH));
-    AcpiDeviceNode.Header.Type = ACPI_DEVICE_PATH;
-    AcpiDeviceNode.Header.SubType = ACPI_ADR_DP;
-    AcpiDeviceNode.ADR = ACPI_DISPLAY_ADR (1, 0, 0, 1, 0, ACPI_ADR_DISPLAY_TYPE_VGA, 0, 0);
-    SetDevicePathNodeLength (&AcpiDeviceNode.Header, sizeof (ACPI_ADR_DEVICE_PATH));
-
-    Private->GopDevicePath = AppendDevicePathNode (
-                                        ParentDevicePath,
-                                        (EFI_DEVICE_PATH_PROTOCOL *) &AcpiDeviceNode
-                                        );
-    if (Private->GopDevicePath == NULL) {
-      Status = EFI_OUT_OF_RESOURCES;
-      goto RestoreAttributes;
-    }
-  } else if (!IsDevicePathEnd (RemainingDevicePath)) {
-    //
-    // If RemainingDevicePath isn't the End of Device Path Node, 
-    // only scan the specified device by RemainingDevicePath
-    //
-    Private->GopDevicePath = AppendDevicePathNode (ParentDevicePath, RemainingDevicePath);
-    if (Private->GopDevicePath == NULL) {
-      Status = EFI_OUT_OF_RESOURCES;
-      goto RestoreAttributes;
-    }
+  Private->GopDevicePath = AppendDevicePathNode (
+                                      ParentDevicePath,
+                                      (EFI_DEVICE_PATH_PROTOCOL *) &AcpiDeviceNode
+                                      );
+  if (Private->GopDevicePath == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto RestoreAttributes;
   }
 
   //
-  // Create new child handle and install the device path protocol on it only if
-  // RemainingDevicePath equals NULL, or doesn't point to the End of Device
-  // Path Node.
+  // Create new child handle and install the device path protocol on it.
   //
-  if (Private->GopDevicePath != NULL) {
-    Status = gBS->InstallMultipleProtocolInterfaces (
-                    &Private->Handle,
-                    &gEfiDevicePathProtocolGuid,
-                    Private->GopDevicePath,
-                    NULL
-                    );
-    if (EFI_ERROR (Status)) {
-      goto FreeGopDevicePath;
-    }
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &Private->Handle,
+                  &gEfiDevicePathProtocolGuid,
+                  Private->GopDevicePath,
+                  NULL
+                  );
+  if (EFI_ERROR (Status)) {
+    goto FreeGopDevicePath;
   }
 
   //
@@ -407,14 +359,6 @@ QemuVideoControllerDriverStart (
   }
   if (EFI_ERROR (Status)) {
     goto UninstallGopDevicePath;
-  }
-
-  //
-  // If RemainingDevicePath points to the End of Device Path Node, then we
-  // haven't created a child handle, and we're done.
-  //
-  if (Private->GopDevicePath == NULL) {
-    return EFI_SUCCESS;
   }
 
   //
@@ -463,17 +407,11 @@ FreeModeData:
   FreePool (Private->ModeData);
 
 UninstallGopDevicePath:
-  //
-  // Handles the case transparently when Private->Handle and
-  // Private->GopDevicePath are NULL.
-  //
   gBS->UninstallProtocolInterface (Private->Handle,
          &gEfiDevicePathProtocolGuid, Private->GopDevicePath);
 
 FreeGopDevicePath:
-  if (Private->GopDevicePath != NULL) {
-    FreePool (Private->GopDevicePath);
-  }
+  FreePool (Private->GopDevicePath);
 
 RestoreAttributes:
   Private->PciIo->Attributes (Private->PciIo, EfiPciIoAttributeOperationSet,
