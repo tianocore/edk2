@@ -278,7 +278,12 @@ S3BootScriptSaveDispatch2 (
 /**
   Adds a record for memory reads of the memory location and continues when the exit criteria is
   satisfied or after a defined duration.
-  
+ 
+  Please aware, below interface is different with PI specification, Vol 5:
+  EFI_S3_SAVE_STATE_PROTOCOL.Write() for EFI_BOOT_SCRIPT_MEM_POLL_OPCODE.
+  "Duration" below is microseconds, while "Delay" in PI specification means
+  the number of 100ns units to poll.
+
   @param Width     The width of the memory operations.
   @param Address   The base address of the memory operations.
   @param BitMask   A pointer to the bit mask to be AND-ed with the data read from the register.
