@@ -176,7 +176,6 @@ Routine Description:
     gBS->FreePool (Private->LineBuffer);
   }
 
-  Private->LineBuffer = NULL;
   Private->LineBuffer = AllocatePool (4 * ModeData->HorizontalResolution);
   if (Private->LineBuffer == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -321,13 +320,14 @@ QemuVideoGraphicsOutputConstructor (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   Status = gBS->AllocatePool (
                   EfiBootServicesData,
                   sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION),
                   (VOID **) &Private->GraphicsOutput.Mode->Info
                   );
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto FreeMode;
   }
   Private->GraphicsOutput.Mode->MaxMode = (UINT32) Private->MaxMode;
   Private->GraphicsOutput.Mode->Mode    = GRAPHICS_OUTPUT_INVALIDE_MODE_NUMBER;
@@ -337,7 +337,11 @@ QemuVideoGraphicsOutputConstructor (
   //
   // Initialize the hardware
   //
-  GraphicsOutput->SetMode (GraphicsOutput, 0);
+  Status = GraphicsOutput->SetMode (GraphicsOutput, 0);
+  if (EFI_ERROR (Status)) {
+    goto FreeInfo;
+  }
+
   DrawLogo (
     Private,
     Private->ModeData[Private->GraphicsOutput.Mode->Mode].HorizontalResolution,
@@ -345,6 +349,15 @@ QemuVideoGraphicsOutputConstructor (
     );
 
   return EFI_SUCCESS;
+
+FreeInfo:
+  FreePool (Private->GraphicsOutput.Mode->Info);
+
+FreeMode:
+  FreePool (Private->GraphicsOutput.Mode);
+  Private->GraphicsOutput.Mode = NULL;
+
+  return Status;
 }
 
 EFI_STATUS
@@ -363,6 +376,10 @@ Returns:
 
 --*/
 {
+  if (Private->LineBuffer != NULL) {
+    FreePool (Private->LineBuffer);
+  }
+
   if (Private->GraphicsOutput.Mode != NULL) {
     if (Private->GraphicsOutput.Mode->Info != NULL) {
       gBS->FreePool (Private->GraphicsOutput.Mode->Info);

@@ -176,6 +176,9 @@ QemuVideoCirrusModeSetup (
   Private->ModeData = AllocatePool (
                         sizeof (Private->ModeData[0]) * QEMU_VIDEO_CIRRUS_MODE_COUNT
                         );
+  if (Private->ModeData == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
   ModeData = Private->ModeData;
   VideoMode = &QemuVideoCirrusModes[0];
   for (Index = 0; Index < QEMU_VIDEO_CIRRUS_MODE_COUNT; Index ++) {
@@ -228,6 +231,9 @@ QemuVideoBochsModeSetup (
   Private->ModeData = AllocatePool (
                         sizeof (Private->ModeData[0]) * QEMU_VIDEO_BOCHS_MODE_COUNT
                         );
+  if (Private->ModeData == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
   ModeData = Private->ModeData;
   VideoMode = &QemuVideoBochsModes[0];
   for (Index = 0; Index < QEMU_VIDEO_BOCHS_MODE_COUNT; Index ++) {

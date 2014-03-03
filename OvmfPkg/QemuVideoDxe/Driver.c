@@ -203,29 +203,23 @@ QemuVideoControllerDriverStart (
 {
   EFI_STATUS                        Status;
   QEMU_VIDEO_PRIVATE_DATA           *Private;
-  BOOLEAN                           PciAttributesSaved;
   EFI_DEVICE_PATH_PROTOCOL          *ParentDevicePath;
-  ACPI_ADR_DEVICE_PATH              AcpiDeviceNode;
   PCI_TYPE00                        Pci;
   QEMU_VIDEO_CARD                   *Card;
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *MmioDesc;
   EFI_PCI_IO_PROTOCOL               *ChildPciIo;
 
-  PciAttributesSaved = FALSE;
   //
   // Allocate Private context data for GOP inteface.
   //
   Private = AllocateZeroPool (sizeof (QEMU_VIDEO_PRIVATE_DATA));
   if (Private == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto Error;
+    return EFI_OUT_OF_RESOURCES;
   }
 
   //
   // Set up context record
   //
   Private->Signature  = QEMU_VIDEO_PRIVATE_DATA_SIGNATURE;
-  Private->Handle     = NULL;
 
   //
   // Open PCI I/O Protocol
@@ -239,7 +233,7 @@ QemuVideoControllerDriverStart (
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status)) {
-    goto Error;
+    goto FreePrivate;
   }
 
   //
@@ -253,13 +247,16 @@ QemuVideoControllerDriverStart (
                         &Pci
                         );
   if (EFI_ERROR (Status)) {
-    goto Error;
+    goto ClosePciIo;
   }
 
+  //
+  // Determine card variant.
+  //
   Card = QemuVideoDetect(Pci.Hdr.VendorId, Pci.Hdr.DeviceId);
   if (Card == NULL) {
     Status = EFI_DEVICE_ERROR;
-    goto Error;
+    goto ClosePciIo;
   }
   Private->Variant = Card->Variant;
 
@@ -274,10 +271,12 @@ QemuVideoControllerDriverStart (
                     );
 
   if (EFI_ERROR (Status)) {
-    goto Error;
+    goto ClosePciIo;
   }
-  PciAttributesSaved = TRUE;
 
+  //
+  // Set new PCI attributes
+  //
   Status = Private->PciIo->Attributes (
                             Private->PciIo,
                             EfiPciIoAttributeOperationEnable,
@@ -285,13 +284,15 @@ QemuVideoControllerDriverStart (
                             NULL
                             );
   if (EFI_ERROR (Status)) {
-    goto Error;
+    goto ClosePciIo;
   }
 
   //
   // Check whenever the qemu stdvga mmio bar is present (qemu 1.3+).
   //
   if (Private->Variant == QEMU_VIDEO_BOCHS_MMIO) {
+    EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *MmioDesc;
+
     Status = Private->PciIo->GetBarAttributes (
                         Private->PciIo,
                         PCI_BAR_IDX2,
@@ -322,7 +323,7 @@ QemuVideoControllerDriverStart (
     if ((BochsId & 0xFFF0) != VBE_DISPI_ID0) {
       DEBUG ((EFI_D_INFO, "QemuVideo: BochsID mismatch (got 0x%x)\n", BochsId));
       Status = EFI_DEVICE_ERROR;
-      goto Error;
+      goto RestoreAttributes;
     }
   }
 
@@ -335,13 +336,15 @@ QemuVideoControllerDriverStart (
                   (VOID **) &ParentDevicePath
                   );
   if (EFI_ERROR (Status)) {
-    goto Error;
+    goto RestoreAttributes;
   }
 
   //
   // Set Gop Device Path
   //
   if (RemainingDevicePath == NULL) {
+    ACPI_ADR_DEVICE_PATH AcpiDeviceNode;
+
     ZeroMem (&AcpiDeviceNode, sizeof (ACPI_ADR_DEVICE_PATH));
     AcpiDeviceNode.Header.Type = ACPI_DEVICE_PATH;
     AcpiDeviceNode.Header.SubType = ACPI_ADR_DP;
@@ -352,31 +355,37 @@ QemuVideoControllerDriverStart (
                                         ParentDevicePath,
                                         (EFI_DEVICE_PATH_PROTOCOL *) &AcpiDeviceNode
                                         );
+    if (Private->GopDevicePath == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto RestoreAttributes;
+    }
   } else if (!IsDevicePathEnd (RemainingDevicePath)) {
     //
     // If RemainingDevicePath isn't the End of Device Path Node, 
     // only scan the specified device by RemainingDevicePath
     //
     Private->GopDevicePath = AppendDevicePathNode (ParentDevicePath, RemainingDevicePath);
-  } else {
-    //
-    // If RemainingDevicePath is the End of Device Path Node, 
-    // don't create child device and return EFI_SUCCESS
-    //
-    Private->GopDevicePath = NULL;
+    if (Private->GopDevicePath == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto RestoreAttributes;
+    }
   }
-    
+
+  //
+  // Create new child handle and install the device path protocol on it only if
+  // RemainingDevicePath equals NULL, or doesn't point to the End of Device
+  // Path Node.
+  //
   if (Private->GopDevicePath != NULL) {
-    //
-    // Creat child handle and device path protocol firstly
-    //
-    Private->Handle = NULL;
     Status = gBS->InstallMultipleProtocolInterfaces (
                     &Private->Handle,
                     &gEfiDevicePathProtocolGuid,
                     Private->GopDevicePath,
                     NULL
                     );
+    if (EFI_ERROR (Status)) {
+      goto FreeGopDevicePath;
+    }
   }
 
   //
@@ -397,83 +406,85 @@ QemuVideoControllerDriverStart (
     break;
   }
   if (EFI_ERROR (Status)) {
-    goto Error;
+    goto UninstallGopDevicePath;
   }
 
+  //
+  // If RemainingDevicePath points to the End of Device Path Node, then we
+  // haven't created a child handle, and we're done.
+  //
   if (Private->GopDevicePath == NULL) {
-    //
-    // If RemainingDevicePath is the End of Device Path Node, 
-    // don't create child device and return EFI_SUCCESS
-    //
-    Status = EFI_SUCCESS;
-  } else {
-
-    //
-    // Start the GOP software stack.
-    //
-    Status = QemuVideoGraphicsOutputConstructor (Private);
-    ASSERT_EFI_ERROR (Status);
-
-    Status = gBS->InstallMultipleProtocolInterfaces (
-                    &Private->Handle,
-                    &gEfiGraphicsOutputProtocolGuid,
-                    &Private->GraphicsOutput,
-                    NULL
-                    );
-    if (EFI_ERROR (Status)) {
-      goto Error;
-    }
-
-    Status = gBS->OpenProtocol (
-                  Controller,
-                  &gEfiPciIoProtocolGuid,
-                  (VOID **) &ChildPciIo,
-                  This->DriverBindingHandle,
-                  Private->Handle,
-                  EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
-                  );
-
-    if (EFI_ERROR (Status)) {
-      goto Error;
-    }
+    return EFI_SUCCESS;
   }
 
-Error:
+  //
+  // Start the GOP software stack.
+  //
+  Status = QemuVideoGraphicsOutputConstructor (Private);
   if (EFI_ERROR (Status)) {
-    if (Private) {
-      if (Private->PciIo) {
-        if (PciAttributesSaved == TRUE) {
-          //
-          // Restore original PCI attributes
-          //
-          Private->PciIo->Attributes (
-                          Private->PciIo,
-                          EfiPciIoAttributeOperationSet,
-                          Private->OriginalPciAttributes,
-                          NULL
-                          );
-        }
-        //
-        // Close the PCI I/O Protocol
-        //
-        gBS->CloseProtocol (
-              Controller,
-              &gEfiPciIoProtocolGuid,
-              This->DriverBindingHandle,
-              Controller
-              );
-
-        gBS->CloseProtocol (
-              Controller,
-              &gEfiPciIoProtocolGuid,
-              This->DriverBindingHandle,
-              Private->Handle
-              );
-      }
-
-      gBS->FreePool (Private);
-    }
+    goto FreeModeData;
   }
+
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &Private->Handle,
+                  &gEfiGraphicsOutputProtocolGuid,
+                  &Private->GraphicsOutput,
+                  NULL
+                  );
+  if (EFI_ERROR (Status)) {
+    goto DestructQemuVideoGraphics;
+  }
+
+  //
+  // Reference parent handle from child handle.
+  //
+  Status = gBS->OpenProtocol (
+                Controller,
+                &gEfiPciIoProtocolGuid,
+                (VOID **) &ChildPciIo,
+                This->DriverBindingHandle,
+                Private->Handle,
+                EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+                );
+  if (EFI_ERROR (Status)) {
+    goto UninstallGop;
+  }
+
+  return EFI_SUCCESS;
+
+UninstallGop:
+  gBS->UninstallProtocolInterface (Private->Handle,
+         &gEfiGraphicsOutputProtocolGuid, &Private->GraphicsOutput);
+
+DestructQemuVideoGraphics:
+  QemuVideoGraphicsOutputDestructor (Private);
+
+FreeModeData:
+  FreePool (Private->ModeData);
+
+UninstallGopDevicePath:
+  //
+  // Handles the case transparently when Private->Handle and
+  // Private->GopDevicePath are NULL.
+  //
+  gBS->UninstallProtocolInterface (Private->Handle,
+         &gEfiDevicePathProtocolGuid, Private->GopDevicePath);
+
+FreeGopDevicePath:
+  if (Private->GopDevicePath != NULL) {
+    FreePool (Private->GopDevicePath);
+  }
+
+RestoreAttributes:
+  Private->PciIo->Attributes (Private->PciIo, EfiPciIoAttributeOperationSet,
+                    Private->OriginalPciAttributes, NULL);
+
+ClosePciIo:
+  gBS->CloseProtocol (Controller, &gEfiPciIoProtocolGuid,
+         This->DriverBindingHandle, Controller);
+
+FreePrivate:
+  FreePool (Private);
 
   return Status;
 }
