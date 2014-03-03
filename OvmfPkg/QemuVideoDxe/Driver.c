@@ -454,8 +454,26 @@ QemuVideoControllerDriverStop (
   EFI_STATUS                      Status;
   QEMU_VIDEO_PRIVATE_DATA  *Private;
 
+  if (NumberOfChildren == 0) {
+    //
+    // Close the PCI I/O Protocol
+    //
+    gBS->CloseProtocol (
+          Controller,
+          &gEfiPciIoProtocolGuid,
+          This->DriverBindingHandle,
+          Controller
+          );
+    return EFI_SUCCESS;
+  }
+
+  //
+  // free all resources for whose access we need the child handle, because the
+  // child handle is going away
+  //
+  ASSERT (NumberOfChildren == 1);
   Status = gBS->OpenProtocol (
-                  Controller,
+                  ChildHandleBuffer[0],
                   &gEfiGraphicsOutputProtocolGuid,
                   (VOID **) &GraphicsOutput,
                   This->DriverBindingHandle,
@@ -470,6 +488,7 @@ QemuVideoControllerDriverStop (
   // Get our private context information
   //
   Private = QEMU_VIDEO_PRIVATE_DATA_FROM_GRAPHICS_OUTPUT_THIS (GraphicsOutput);
+  ASSERT (Private->Handle == ChildHandleBuffer[0]);
 
   QemuVideoGraphicsOutputDestructor (Private);
   //
@@ -495,16 +514,6 @@ QemuVideoControllerDriverStop (
                   Private->OriginalPciAttributes,
                   NULL
                   );
-
-  //
-  // Close the PCI I/O Protocol
-  //
-  gBS->CloseProtocol (
-        Controller,
-        &gEfiPciIoProtocolGuid,
-        This->DriverBindingHandle,
-        Controller
-        );
 
   gBS->CloseProtocol (
         Controller,
