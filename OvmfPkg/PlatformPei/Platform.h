@@ -98,4 +98,6 @@ XenPublishRamRegions (
 
 extern EFI_BOOT_MODE mBootMode;
 
+extern BOOLEAN mS3Supported;
+
 #endif // _PLATFORM_PEI_H_INCLUDED_

@@ -30,6 +30,7 @@
 #include <Library/PciLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
+#include <Library/QemuFwCfgLib.h>
 #include <Library/ResourcePublicationLib.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <Ppi/MasterBootMode.h>
@@ -60,6 +61,8 @@ EFI_PEI_PPI_DESCRIPTOR   mPpiBootMode[] = {
 
 
 EFI_BOOT_MODE mBootMode = BOOT_WITH_FULL_CONFIGURATION;
+
+BOOLEAN mS3Supported = FALSE;
 
 
 VOID
@@ -355,6 +358,11 @@ InitializePlatform (
   DebugDumpCmos ();
 
   XenDetect ();
+
+  if (QemuFwCfgS3Enabled ()) {
+    DEBUG ((EFI_D_INFO, "S3 support was detected on QEMU\n"));
+    mS3Supported = TRUE;
+  }
 
   BootModeInitialization ();
 

@@ -54,6 +54,7 @@
   PeiServicesLib
   PeiServicesTablePointerLib
   PeimEntryPoint
+  QemuFwCfgLib
   MtrrLib
   PcdLib
 
