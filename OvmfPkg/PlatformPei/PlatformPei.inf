@@ -66,6 +66,8 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
   gUefiOvmfPkgTokenSpaceGuid.PcdAcpiPmBaseAddress
   gUefiOvmfPkgTokenSpaceGuid.PcdS3AcpiReservedMemoryBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdS3AcpiReservedMemorySize
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
