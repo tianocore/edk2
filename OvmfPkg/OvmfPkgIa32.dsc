@@ -99,7 +99,7 @@
   QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgLib.inf
   VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
   LoadLinuxLib|OvmfPkg/Library/LoadLinuxLib/LoadLinuxLib.inf
-  LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
+  LockBoxLib|OvmfPkg/Library/LockBoxLib/LockBoxBaseLib.inf
   CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
 
 !ifdef $(SOURCE_DEBUG_ENABLE)
@@ -244,6 +244,7 @@
   DpcLib|MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
   PlatformBdsLib|OvmfPkg/Library/PlatformBdsLib/PlatformBdsLib.inf
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
+  LockBoxLib|OvmfPkg/Library/LockBoxLib/LockBoxDxeLib.inf
 
 [LibraryClasses.common.UEFI_APPLICATION]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf

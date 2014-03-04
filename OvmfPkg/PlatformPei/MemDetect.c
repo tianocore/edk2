@@ -24,6 +24,7 @@ Module Name:
 //
 // The Library classes this module consumes
 //
+#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/IoLib.h>
@@ -217,5 +218,21 @@ InitializeRamRegions (
       EfiACPIMemoryNVS
       );
 #endif
+
+    //
+    // Reserve the lock box storage area
+    //
+    // Since this memory range will be used on S3 resume, it must be
+    // reserved as ACPI NVS.
+    //
+    ZeroMem (
+      (VOID*)(UINTN) PcdGet32 (PcdOvmfLockBoxStorageBase),
+      (UINTN) PcdGet32 (PcdOvmfLockBoxStorageSize)
+      );
+    BuildMemoryAllocationHob (
+      (EFI_PHYSICAL_ADDRESS)(UINTN) PcdGet32 (PcdOvmfLockBoxStorageBase),
+      (UINT64)(UINTN) PcdGet32 (PcdOvmfLockBoxStorageSize),
+      EfiACPIMemoryNVS
+      );
   }
 }

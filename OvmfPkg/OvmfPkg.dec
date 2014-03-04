@@ -85,6 +85,8 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase|0x0|UINT32|0x13
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize|0x0|UINT32|0x14
   gUefiOvmfPkgTokenSpaceGuid.PcdS3AcpiReservedMemoryBase|0x0|UINT32|0x17
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase|0x0|UINT32|0x18
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize|0x0|UINT32|0x19
 
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2

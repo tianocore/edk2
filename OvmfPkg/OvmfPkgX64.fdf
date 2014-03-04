@@ -138,6 +138,9 @@ NumBlocks     = 0x80
 0x000000|0x006000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesSize
 
+0x006000|0x001000
+gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize
+
 0x010000|0x008000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
 
