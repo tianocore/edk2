@@ -62,6 +62,8 @@
   gEfiLegacyBiosProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
   gEfiLegacyRegion2ProtocolGuid                 # PROTOCOL SOMETIMES_CONSUMED
   gFrameworkEfiMpServiceProtocolGuid            # PROTOCOL SOMETIMES_CONSUMED
+  gEfiS3SaveStateProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
+  gEfiDxeSmmReadyToLockProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
 
 [FeaturePcd]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformCsmSupport          ## CONSUMES
@@ -73,4 +75,4 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable
 
 [Depex]
-  gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
+  gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid AND gEfiS3SaveStateProtocolGuid

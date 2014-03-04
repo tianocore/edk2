@@ -28,6 +28,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/AcpiS3Context.h>
 #include <Guid/Acpi.h>
 #include <Protocol/AcpiS3Save.h>
+#include <Protocol/S3SaveState.h>
+#include <Protocol/DxeSmmReadyToLock.h>
 #include <IndustryStandard/Acpi.h>
 
 #include "AcpiS3Save.h"
@@ -407,6 +409,48 @@ LegacyGetS3MemorySize (
 }
 
 /**
+  Save the S3 boot script.
+
+  Note that we trigger DxeSmmReadyToLock here -- otherwise the script wouldn't
+  be saved actually. Triggering this protocol installation event in turn locks
+  down SMM, so no further changes to LockBoxes or SMRAM are possible
+  afterwards.
+**/
+STATIC
+VOID
+EFIAPI
+SaveS3BootScript (
+  VOID
+  )
+{
+  EFI_STATUS                 Status;
+  EFI_S3_SAVE_STATE_PROTOCOL *BootScript;
+  EFI_HANDLE                 Handle;
+  STATIC CONST UINT8         Info[] = { 0xDE, 0xAD, 0xBE, 0xEF };
+
+  Status = gBS->LocateProtocol (&gEfiS3SaveStateProtocolGuid, NULL,
+                  (VOID **) &BootScript);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Despite the opcode documentation in the PI spec, the protocol
+  // implementation embeds a deep copy of the info in the boot script, rather
+  // than storing just a pointer to runtime or NVS storage.
+  //
+  Status = BootScript->Write(BootScript, EFI_BOOT_SCRIPT_INFORMATION_OPCODE,
+                         (UINT32) sizeof Info,
+                         (EFI_PHYSICAL_ADDRESS)(UINTN) &Info);
+  ASSERT_EFI_ERROR (Status);
+
+  Handle = NULL;
+  Status = gBS->InstallProtocolInterface (&Handle,
+                  &gEfiDxeSmmReadyToLockProtocolGuid, EFI_NATIVE_INTERFACE,
+                  NULL);
+  ASSERT_EFI_ERROR (Status);
+}
+
+
+/**
   Prepares all information that is needed in the S3 resume boot path.
   
   Allocate the resources or prepare informations and save in ACPI variable set for S3 resume boot path  
@@ -511,6 +555,11 @@ S3Ready (
   Status = SetLockBoxAttributes (&gEfiAcpiS3ContextGuid, LOCK_BOX_ATTRIBUTE_RESTORE_IN_PLACE);
   ASSERT_EFI_ERROR (Status);
 
+  //
+  // Save the boot script too. Note that this requires/includes emitting the
+  // DxeSmmReadyToLock event, which in turn locks down SMM.
+  //
+  SaveS3BootScript ();
   return EFI_SUCCESS;
 }
 
