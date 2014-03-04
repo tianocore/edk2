@@ -469,6 +469,50 @@ FindPeiCoreImageBaseInFv (
   return EFI_SUCCESS;
 }
 
+
+/**
+  Reads 8-bits of CMOS data.
+
+  Reads the 8-bits of CMOS data at the location specified by Index.
+  The 8-bit read value is returned.
+
+  @param  Index  The CMOS location to read.
+
+  @return The value read.
+
+**/
+STATIC
+UINT8
+CmosRead8 (
+  IN      UINTN                     Index
+  )
+{
+  IoWrite8 (0x70, (UINT8) Index);
+  return IoRead8 (0x71);
+}
+
+
+STATIC
+BOOLEAN
+IsS3Resume (
+  VOID
+  )
+{
+  return (CmosRead8 (0xF) == 0xFE);
+}
+
+
+STATIC
+EFI_STATUS
+GetS3ResumePeiFv (
+  IN OUT EFI_FIRMWARE_VOLUME_HEADER       **PeiFv
+  )
+{
+  *PeiFv = (EFI_FIRMWARE_VOLUME_HEADER*)(UINTN) PcdGet32 (PcdOvmfPeiMemFvBase);
+  return EFI_SUCCESS;
+}
+
+
 /**
   Locates the PEI Core entry point address
 
@@ -488,9 +532,15 @@ FindPeiCoreImageBase (
 {
   *PeiCoreImageBase = 0;
 
-  FindMainFv (BootFv);
+  if (IsS3Resume ()) {
+    DEBUG ((EFI_D_VERBOSE, "SEC: S3 resume\n"));
+    GetS3ResumePeiFv (BootFv);
+  } else {
+    DEBUG ((EFI_D_VERBOSE, "SEC: Normal boot\n"));
+    FindMainFv (BootFv);
 
-  DecompressMemFvs (BootFv);
+    DecompressMemFvs (BootFv);
+  }
 
   FindPeiCoreImageBaseInFv (*BootFv, PeiCoreImageBase);
 }
