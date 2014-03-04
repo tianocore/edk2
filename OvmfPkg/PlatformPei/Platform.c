@@ -375,11 +375,13 @@ InitializePlatform (
     InitializeXen ();
   }
 
-  ReserveEmuVariableNvStore ();
+  if (mBootMode != BOOT_ON_S3_RESUME) {
+    ReserveEmuVariableNvStore ();
 
-  PeiFvInitialization ();
+    PeiFvInitialization ();
 
-  MemMapInitialization ();
+    MemMapInitialization ();
+  }
 
   MiscInitialization ();
 

@@ -147,18 +147,22 @@ QemuInitializeRam (
   LowerMemorySize = GetSystemMemorySizeBelow4gb ();
   UpperMemorySize = GetSystemMemorySizeAbove4gb ();
 
-  //
-  // Create memory HOBs
-  //
-  AddMemoryRangeHob (BASE_1MB, LowerMemorySize);
-  AddMemoryRangeHob (0, BASE_512KB + BASE_128KB);
+  if (mBootMode != BOOT_ON_S3_RESUME) {
+    //
+    // Create memory HOBs
+    //
+    AddMemoryRangeHob (BASE_1MB, LowerMemorySize);
+    AddMemoryRangeHob (0, BASE_512KB + BASE_128KB);
+  }
 
   MtrrSetMemoryAttribute (BASE_1MB, LowerMemorySize - BASE_1MB, CacheWriteBack);
 
   MtrrSetMemoryAttribute (0, BASE_512KB + BASE_128KB, CacheWriteBack);
 
   if (UpperMemorySize != 0) {
-    AddUntestedMemoryBaseSizeHob (BASE_4GB, UpperMemorySize);
+    if (mBootMode != BOOT_ON_S3_RESUME) {
+      AddUntestedMemoryBaseSizeHob (BASE_4GB, UpperMemorySize);
+    }
 
     MtrrSetMemoryAttribute (BASE_4GB, UpperMemorySize, CacheWriteBack);
   }
