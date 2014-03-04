@@ -13,6 +13,7 @@
 **/
 
 #include "PiPei.h"
+#include "Platform.h"
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/PeiServicesLib.h>
@@ -36,12 +37,12 @@ PeiFvInitialization (
   //
   // Create a memory allocation HOB for the PEI FV.
   //
-  // Note: This should be changed to ACPI NVS when S3 resume is enabled.
+  // Allocate as ACPI NVS is S3 is supported
   //
   BuildMemoryAllocationHob (
     PcdGet32 (PcdOvmfPeiMemFvBase),
     PcdGet32 (PcdOvmfPeiMemFvSize),
-    EfiBootServicesData
+    mS3Supported ? EfiACPIMemoryNVS : EfiBootServicesData
     );
 
   //
