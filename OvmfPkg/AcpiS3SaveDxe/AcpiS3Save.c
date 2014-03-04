@@ -30,6 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/AcpiS3Save.h>
 #include <Protocol/S3SaveState.h>
 #include <Protocol/DxeSmmReadyToLock.h>
+#include <Protocol/LockBox.h>
 #include <IndustryStandard/Acpi.h>
 
 #include "AcpiS3Save.h"
@@ -594,11 +595,11 @@ InstallAcpiS3Save (
     mLegacyRegionSize = 0x100;
   }
 
-  Status = gBS->InstallProtocolInterface (
+  Status = gBS->InstallMultipleProtocolInterfaces (
                   &ImageHandle,
-                  &gEfiAcpiS3SaveProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &mS3Save
+                  &gEfiAcpiS3SaveProtocolGuid, &mS3Save,
+                  &gEfiLockBoxProtocolGuid, NULL,
+                  NULL
                   );
   ASSERT_EFI_ERROR (Status);
   return Status;
