@@ -203,5 +203,19 @@ InitializeRamRegions (
       PcdGet32 (PcdOvmfSecPeiTempRamSize),
       EfiACPIMemoryNVS
       );
+
+#ifdef MDE_CPU_X64
+    //
+    // Reserve the initial page tables built by the reset vector code.
+    //
+    // Since this memory range will be used by the Reset Vector on S3
+    // resume, it must be reserved as ACPI NVS.
+    //
+    BuildMemoryAllocationHob (
+      (EFI_PHYSICAL_ADDRESS)(UINTN) PcdGet32 (PcdOvmfSecPageTablesBase),
+      (UINT64)(UINTN) PcdGet32 (PcdOvmfSecPageTablesSize),
+      EfiACPIMemoryNVS
+      );
+#endif
   }
 }
