@@ -474,6 +474,7 @@
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
   OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
   OvmfPkg/AcpiTables/AcpiTables.inf
+  OvmfPkg/AcpiS3SaveDxe/AcpiS3SaveDxe.inf
 
   #
   # Network Support
