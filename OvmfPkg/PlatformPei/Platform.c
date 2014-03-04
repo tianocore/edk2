@@ -59,6 +59,9 @@ EFI_PEI_PPI_DESCRIPTOR   mPpiBootMode[] = {
 };
 
 
+EFI_BOOT_MODE mBootMode = BOOT_WITH_FULL_CONFIGURATION;
+
+
 VOID
 AddIoMemoryBaseSizeHob (
   EFI_PHYSICAL_ADDRESS        MemoryBase,
@@ -269,16 +272,13 @@ BootModeInitialization (
   VOID
   )
 {
-  EFI_BOOT_MODE BootMode;
   EFI_STATUS    Status;
 
   if (CmosRead8 (0xF) == 0xFE) {
-    BootMode = BOOT_ON_S3_RESUME;
-  } else {
-    BootMode = BOOT_WITH_FULL_CONFIGURATION;
+    mBootMode = BOOT_ON_S3_RESUME;
   }
 
-  Status = PeiServicesSetBootMode (BootMode);
+  Status = PeiServicesSetBootMode (mBootMode);
   ASSERT_EFI_ERROR (Status);
 
   Status = PeiServicesInstallPpi (mPpiBootMode);
