@@ -266,11 +266,19 @@ MiscInitialization (
 
 VOID
 BootModeInitialization (
+  VOID
   )
 {
-  EFI_STATUS Status;
+  EFI_BOOT_MODE BootMode;
+  EFI_STATUS    Status;
 
-  Status = PeiServicesSetBootMode (BOOT_WITH_FULL_CONFIGURATION);
+  if (CmosRead8 (0xF) == 0xFE) {
+    BootMode = BOOT_ON_S3_RESUME;
+  } else {
+    BootMode = BOOT_WITH_FULL_CONFIGURATION;
+  }
+
+  Status = PeiServicesSetBootMode (BootMode);
   ASSERT_EFI_ERROR (Status);
 
   Status = PeiServicesInstallPpi (mPpiBootMode);
