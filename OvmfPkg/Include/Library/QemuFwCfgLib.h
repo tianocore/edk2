@@ -214,5 +214,19 @@ InternalQemuFwCfgIsAvailable (
   VOID
   );
 
+
+/**
+  Determine if S3 support is explicitly enabled.
+
+  @retval  TRUE   if S3 support is explicitly enabled.
+           FALSE  otherwise. This includes unavailability of the firmware
+                  configuration interface.
+**/
+BOOLEAN
+EFIAPI
+QemuFwCfgS3Enabled (
+  VOID
+  );
+
 #endif
 
