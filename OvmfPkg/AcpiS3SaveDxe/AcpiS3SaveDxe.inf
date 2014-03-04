@@ -1,0 +1,76 @@
+## @file
+# Component description file for AcpiS3Save module.
+#
+# This is an implementation of the ACPI S3 Save protocol.
+# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials are
+# licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AcpiS3SaveDxe
+  FILE_GUID                      = 6B79BBC0-26B9-4FE9-B631-551D8AB078C6
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InstallAcpiS3Save
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  AcpiS3Save.h
+  AcpiS3Save.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+
+[LibraryClasses]
+  PcdLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  HobLib
+  UefiLib
+  LockBoxLib
+  DebugLib
+  DxeServicesLib
+
+[Guids]
+  gEfiAcpiVariableGuid                          # ALWAYS_CONSUMED
+  gEfiAcpiS3ContextGuid                         # ALWAYS_CONSUMED
+  gEfiAcpi20TableGuid                           # ALWAYS_CONSUMED  System Table
+  gEfiAcpi10TableGuid                           # ALWAYS_CONSUMED  System Table
+
+[Protocols]
+  gEfiAcpiS3SaveProtocolGuid                    # PROTOCOL ALWAYS_PRODUCED
+  gEfiLegacyBiosProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+  gEfiLegacyRegion2ProtocolGuid                 # PROTOCOL SOMETIMES_CONSUMED
+  gFrameworkEfiMpServiceProtocolGuid            # PROTOCOL SOMETIMES_CONSUMED
+
+[FeaturePcd]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformCsmSupport          ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
+
+[Pcd]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdS3AcpiReservedMemorySize    ## CONSUMES
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdS3BootScriptStackSize       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable
+
+[Depex]
+  gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
