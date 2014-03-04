@@ -84,6 +84,7 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesSize|0x0|UINT32|0x12
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase|0x0|UINT32|0x13
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize|0x0|UINT32|0x14
+  gUefiOvmfPkgTokenSpaceGuid.PcdS3AcpiReservedMemoryBase|0x0|UINT32|0x17
 
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
