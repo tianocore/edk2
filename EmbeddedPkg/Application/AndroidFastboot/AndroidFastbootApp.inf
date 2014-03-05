@@ -1,0 +1,60 @@
+#/** @file
+#
+#  Copyright (c) 2013-2014, ARM Ltd. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AndroidFastbootApp
+  FILE_GUID                      = 9588502a-5370-11e3-8631-d7c5951364c8
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = FastbootAppEntryPoint
+
+[Sources.common]
+  AndroidFastbootApp.c
+  AndroidBootImg.c
+
+[Sources.ARM, Sources.AARCH64]
+  Arm/BootAndroidBootImg.c
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  BdsLib
+  DebugLib
+  DevicePathLib
+  DxeServicesTableLib
+  MemoryAllocationLib
+  PcdLib
+  PrintLib
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+
+[Protocols]
+  gAndroidFastbootTransportProtocolGuid
+  gAndroidFastbootPlatformProtocolGuid
+  gEfiSimpleTextOutProtocolGuid
+  gEfiSimpleTextInProtocolGuid
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[Packages.ARM, Packages.AARCH64]
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+
+[Guids.ARM, Guids.AARCH64]
+  gArmGlobalVariableGuid

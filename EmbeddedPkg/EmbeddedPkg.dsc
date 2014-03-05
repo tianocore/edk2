@@ -93,12 +93,12 @@
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
 
-
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   EblCmdLib|EmbeddedPkg/Library/EblCmdLibNull/EblCmdLibNull.inf
   
   EblNetworkLib|EmbeddedPkg/Library/EblNetworkLib/EblNetworkLib.inf
-  
+
+  FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
@@ -117,8 +117,17 @@
   ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
+  ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicLib.inf
+  ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
+  BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
   SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
+
+[LibraryClasses.ARM]
+  ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
+
+[LibraryClasses.AARCH64]
+  ArmLib|ArmPkg/Library/ArmLib/AArch64/AArch64Lib.inf
 
 
 ################################################################################
@@ -211,6 +220,9 @@
 #  RELEASE_*_IA32_DLINK_FLAGS = /ALIGN:4096
 #  *_*_IA32_CC_FLAGS = /D EFI_SPECIFICATION_VERSION=0x0002000A /D TIANO_RELEASE_VERSION=0x00080006
 
+[BuildOptions]
+  RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu=7-A.security
+
 
 ################################################################################
 #
@@ -241,6 +253,8 @@
   EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
 
   EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
+
+  EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf
 
 [Components.IA32, Components.X64, Components.IPF, Components.ARM]
   EmbeddedPkg/GdbStub/GdbStub.inf
