@@ -323,12 +323,16 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesData|20000
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderCode|20
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderData|0
-    
+
+  # Device path of block device on which Android Fastboot should flash
+  # partitions. We just use the SD card on VExpress.
+  gArmVExpressTokenSpaceGuid.PcdAndroidFastbootNvmDevicePath|L"VenHw(09831032-6FA3-4484-AF4F-0A000A8D3A82)"
+
   #
   # ARM Pcds
   #
   gArmTokenSpaceGuid.PcdArmUncachedMemoryMask|0x0000000000000000
-  
+
   #
   # ARM PrimeCell
   #
@@ -377,3 +381,10 @@
 
   # ISP1761 USB OTG Controller
   EmbeddedPkg/Drivers/Isp1761UsbDxe/Isp1761UsbDxe.inf
+
+  #
+  # Android Fastboot
+  #
+  EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf
+  EmbeddedPkg/Drivers/AndroidFastbootTransportUsbDxe/FastbootTransportUsbDxe.inf
+  ArmPlatformPkg/ArmVExpressPkg/ArmVExpressFastBootDxe/ArmVExpressFastBootDxe.inf

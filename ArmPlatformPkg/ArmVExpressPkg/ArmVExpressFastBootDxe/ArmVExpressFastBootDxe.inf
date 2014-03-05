@@ -1,0 +1,54 @@
+#/** @file
+#
+#  Copyright (c) 2014, ARM Ltd. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmVExpressFastBootDxe
+  FILE_GUID                      = 4004e454-89a0-11e3-89aa-97ef9d942abc
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = ArmAndroidFastbootPlatformEntryPoint
+
+[Sources.common]
+  ArmVExpressFastBoot.c
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  MemoryAllocationLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gAndroidFastbootPlatformProtocolGuid
+  gEfiBlockIoProtocolGuid
+  gEfiDiskIoProtocolGuid
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPlatformPkg/ArmVExpressPkg/ArmVExpressPkg.dec
+  ArmPkg/ArmPkg.dec
+
+[Guids]
+  gArmGlobalVariableGuid
+
+[Pcd]
+  gArmVExpressTokenSpaceGuid.PcdAndroidFastbootNvmDevicePath
+  gArmPlatformTokenSpaceGuid.PcdFirmwareVendor
