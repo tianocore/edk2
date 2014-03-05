@@ -129,6 +129,16 @@
   gEmbeddedTokenSpaceGuid.PcdGdbMaxPacketRetryCount|10000000|UINT32|0x0000004c
   gEmbeddedTokenSpaceGuid.PcdGdbTimerPeriodMilliseconds|250|UINT32|0x0000004d
 
+  #
+  # Android FastBoot
+  #
+
+  # The Android FastBoot utility has hard-coded USB Vendor IDs that it recognises
+  # (and 0xf00d isn't one of them!).
+  # You'll need to pass it "-i 0xf00d" to get it to recognise this device.
+  gEmbeddedTokenSpaceGuid.PcdAndroidFastbootUsbVendorId|0xf00d|UINT32|0x00000022
+  gEmbeddedTokenSpaceGuid.PcdAndroidFastbootUsbProductId|0xbeef|UINT32|0x00000023
+
 [PcdsFixedAtBuild.ARM]
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|32|UINT8|0x00000010
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0|UINT8|0x00000011
