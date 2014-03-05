@@ -3,6 +3,7 @@
 #
 # This Package provides headers and libraries that conform to EFI/PI Industry standards.
 # Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2012-2014, ARM Ltd. All rights reserved.<BR>
 #
 #    This program and the accompanying materials are licensed and made available under
 #    the terms and conditions of the BSD License which accompanies this distribution.
@@ -57,6 +58,7 @@
   gEmbeddedGpioProtocolGuid           = { 0x17a0a3d7, 0xc0a5, 0x4635, { 0xbb, 0xd5, 0x07, 0x21, 0x87, 0xdf, 0xe2, 0xee }}
   gPeCoffLoaderProtocolGuid =  { 0xB323179B, 0x97FB, 0x477E, { 0xB0, 0xFE, 0xD8, 0x85, 0x91, 0xFA, 0x11, 0xAB } }
   gEfiMmcHostProtocolGuid              = { 0x3e591c00, 0x9e4a, 0x11df, {0x92, 0x44, 0x00, 0x02, 0xA5, 0xD5, 0xC5, 0x1B }}
+  gAndroidFastbootTransportProtocolGuid = { 0x74bd9fe0, 0x8902, 0x11e3, {0xb9, 0xd3, 0xf7, 0x22, 0x38, 0xfc, 0x9a, 0x31}}
 
 [PcdsFeatureFlag.common]
   gEmbeddedTokenSpaceGuid.PcdEmbeddedMacBoot|FALSE|BOOLEAN|0x00000001
