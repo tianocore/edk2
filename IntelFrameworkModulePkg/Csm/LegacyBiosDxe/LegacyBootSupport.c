@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -2101,7 +2101,7 @@ LegacyBiosCompleteStandardCmosBeforeBoot (
   //
   // redo memory size since it can change
   //
-  Size = 15 * SIZE_1MB;
+  Size = (15 * SIZE_1MB) >> 10;
   if (Private->IntThunk->EfiToLegacy16InitTable.OsMemoryAbove1Mb < (15 * SIZE_1MB)) {
     Size  = Private->IntThunk->EfiToLegacy16InitTable.OsMemoryAbove1Mb >> 10;
   }
