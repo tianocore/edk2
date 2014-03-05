@@ -191,6 +191,9 @@
   #
   gArmTokenSpaceGuid.PcdL2x0ControllerBase|0x1E00A000
 
+  # ISP1761 USB OTG Controller
+  gEmbeddedTokenSpaceGuid.PcdIsp1761BaseAddress|0x4f000000
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform

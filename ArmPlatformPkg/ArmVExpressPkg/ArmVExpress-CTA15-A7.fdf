@@ -128,6 +128,11 @@ READ_LOCK_STATUS   = TRUE
   # Versatile Express FileSystem
   INF ArmPlatformPkg/FileSystem/BootMonFs/BootMonFs.inf
 
+  #
+  # USB support
+  #
+  INF EmbeddedPkg/Drivers/Isp1761UsbDxe/Isp1761UsbDxe.inf
+
   # ACPI Support
   INF MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
   
