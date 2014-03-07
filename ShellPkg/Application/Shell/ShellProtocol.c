@@ -2995,9 +2995,12 @@ InternalEfiShellGetListAlias(
 /**
   Convert a null-terminated unicode string, in-place, to all lowercase.
   Then return it.
+  
+  @param  Str    The null-terminated string to be converted to all lowercase.
+  
+  @return        The null-terminated string converted into all lowercase.  
 **/
-STATIC
-CHAR16 *
+STATIC CHAR16 *
 ToLower (
   CHAR16 *Str
   )
@@ -3538,3 +3541,4 @@ InernalEfiShellStartMonitor(
   }
   return (Status);
 }
+

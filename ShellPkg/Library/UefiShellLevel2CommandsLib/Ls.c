@@ -437,7 +437,7 @@ PrintLsOutput(
         }
       }
 
-      if (!Sfo && HeaderPrinted == FALSE) {
+      if (!Sfo && !HeaderPrinted) {
         PrintNonSfoHeader(CorrectedPath);
       }
       PrintFileInformation(Sfo, Node, &FileCount, &FileSize, &DirCount);
@@ -457,6 +457,9 @@ PrintLsOutput(
     ShellCloseFileMetaArg(&ListHead);
     CorrectedPath[0] = CHAR_NULL;
     CorrectedPath = StrnCatGrow(&CorrectedPath, &LongestPath, RootPath, 0);
+    if (CorrectedPath == NULL) {
+      return SHELL_OUT_OF_RESOURCES;
+    }
     if (CorrectedPath[StrLen(CorrectedPath)-1] != L'\\'
       &&CorrectedPath[StrLen(CorrectedPath)-1] != L'/') {
       CorrectedPath = StrnCatGrow(&CorrectedPath, &LongestPath, L"\\",     0);
@@ -498,7 +501,7 @@ PrintLsOutput(
   SHELL_FREE_NON_NULL(CorrectedPath);
   ShellCloseFileMetaArg(&ListHead);
 
-  if (Found == NULL && FoundOne == FALSE) {
+  if (Found == NULL && !FoundOne) {
     return (SHELL_NOT_FOUND);
   }
 
