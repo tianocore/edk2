@@ -296,7 +296,7 @@ TrEERouteConfig (
   Status = gRT->SetVariable (
                   TREE_STORAGE_NAME,
                   &gTrEEConfigFormSetGuid,
-                  EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                  EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
                   sizeof(TrEEConfiguration),
                   &TrEEConfiguration
                   );
