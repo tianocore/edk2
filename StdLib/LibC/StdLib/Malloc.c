@@ -14,20 +14,19 @@
   either a null pointer or a unique pointer.  The value of a pointer that
   refers to freed space is indeterminate.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
  */
-#include  <Base.h>
 #include  <Uefi.h>
 #include  <Library/MemoryAllocationLib.h>
 #include  <Library/UefiBootServicesTableLib.h>
+#include  <Library/BaseLib.h>
 #include  <Library/BaseMemoryLib.h>
 #include  <Library/DebugLib.h>
 
@@ -37,23 +36,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include  <stdlib.h>
 #include  <errno.h>
 
+#define CPOOL_HEAD_SIGNATURE   SIGNATURE_32('C','p','h','d')
+
 /** The UEFI functions do not provide a way to determine the size of an
     allocated region of memory given just a pointer to the start of that
     region.  Since this is required for the implementation of realloc,
-    the memory head structure from Core/Dxe/Mem/Pool.c has been reproduced
-    here.
+    the memory head structure, CPOOL_HEAD, containing the necessary
+    information is prepended to the requested space.
 
-    NOTE: If the UEFI implementation is changed, the realloc function may cease
-          to function properly.
+    The order of members is important.  This structure is 8-byte aligned,
+    as per the UEFI specification for memory allocation functions.  By
+    specifying Size as a 64-bit value and placing it immediately before
+    Data, it ensures that Data will always be 8-byte aligned.
+
+    On IA32 systems, this structure is 24 bytes long, excluding Data.
+    On X64  systems, this structure is 32 bytes long, excluding Data.
 **/
-#define POOL_HEAD_SIGNATURE   SIGNATURE_32('p','h','d','0')
 typedef struct {
+  LIST_ENTRY      List;
   UINT32          Signature;
-  UINT32          Size;
-  EFI_MEMORY_TYPE Type;
-  UINTN           Reserved;
+  UINT64          Size;
   CHAR8           Data[1];
-} POOL_HEAD;
+} CPOOL_HEAD;
+
+// List of memory allocated by malloc/calloc/etc.
+static  LIST_ENTRY      MemPoolHead = INITIALIZE_LIST_HEAD_VARIABLE(MemPoolHead);
 
 /****************************/
 
@@ -76,19 +83,41 @@ typedef struct {
 void *
 malloc(size_t Size)
 {
+  CPOOL_HEAD   *Head;
   void       *RetVal;
   EFI_STATUS  Status;
+  UINTN         NodeSize;
 
   if( Size == 0) {
     errno = EINVAL;   // Make errno diffenent, just in case of a lingering ENOMEM.
+    DEBUG((DEBUG_ERROR, "ERROR malloc: Zero Size\n"));
     return NULL;
   }
 
-  Status = gBS->AllocatePool( EfiLoaderData, (UINTN)Size, &RetVal);
+  NodeSize = (UINTN)(Size + sizeof(CPOOL_HEAD));
+
+  DEBUG((DEBUG_POOL, "malloc(%d): NodeSz: %d", Size, NodeSize));
+
+  Status = gBS->AllocatePool( EfiLoaderData, NodeSize, &Head);
   if( Status != EFI_SUCCESS) {
     RetVal  = NULL;
     errno   = ENOMEM;
+    DEBUG((DEBUG_ERROR, "\nERROR malloc: AllocatePool returned %r\n", Status));
   }
+  else {
+    assert(Head != NULL);
+    // Fill out the pool header
+    Head->Signature = CPOOL_HEAD_SIGNATURE;
+    Head->Size      = NodeSize;
+
+    // Add this node to the list
+    (void)InsertTailList(&MemPoolHead, (LIST_ENTRY *)Head);
+
+    // Return a pointer to the data
+    RetVal          = (void*)Head->Data;
+    DEBUG((DEBUG_POOL, " Head: %p, Returns %p\n", Head, RetVal));
+  }
+
   return RetVal;
 }
 
@@ -113,13 +142,15 @@ calloc(size_t Num, size_t Size)
   size_t      NumSize;
 
   NumSize = Num * Size;
-  if (NumSize == 0) {
-      return NULL;
-  }
+  RetVal  = NULL;
+  if (NumSize != 0) {
   RetVal = malloc(NumSize);
   if( RetVal != NULL) {
     (VOID)ZeroMem( RetVal, NumSize);
   }
+  }
+  DEBUG((DEBUG_POOL, "0x%p = calloc(%d, %d)\n", RetVal, Num, Size));
+
   return RetVal;
 }
 
@@ -137,9 +168,24 @@ calloc(size_t Num, size_t Size)
 void
 free(void *Ptr)
 {
+  CPOOL_HEAD   *Head;
+
+  Head = BASE_CR(Ptr, CPOOL_HEAD, Data);
+  assert(Head != NULL);
+  DEBUG((DEBUG_POOL, "free(%p): Head: %p\n", Ptr, Head));
+
   if(Ptr != NULL) {
-    (void) gBS->FreePool (Ptr);
+    if (Head->Signature == CPOOL_HEAD_SIGNATURE) {
+      (void) RemoveEntryList((LIST_ENTRY *)Head);   // Remove this node from the malloc pool
+      (void) gBS->FreePool (Head);                  // Now free the associated memory
+    }
+    else {
+      errno = EFAULT;
+      DEBUG((DEBUG_ERROR, "ERROR free(0x%p): Signature is 0x%8X, expected 0x%8X\n",
+             Ptr, Head->Signature, CPOOL_HEAD_SIGNATURE));
   }
+  }
+  DEBUG((DEBUG_POOL, "free Done\n"));
 }
 
 /** The realloc function changes the size of the object pointed to by Ptr to
@@ -185,27 +231,31 @@ free(void *Ptr)
               NULL is returned and errno will be unchanged.
 **/
 void *
-realloc(void *Ptr, size_t NewSize)
+realloc(void *Ptr, size_t ReqSize)
 {
   void       *RetVal = NULL;
-  POOL_HEAD  *Head;
-  UINTN       OldSize = 0;
-  UINTN       NumCpy;
+  CPOOL_HEAD *Head    = NULL;
+  size_t      OldSize = 0;
+  size_t      NewSize;
+  size_t      NumCpy;
 
   // Find out the size of the OLD memory region
   if( Ptr != NULL) {
-    Head = BASE_CR (Ptr, POOL_HEAD, Data);
+    Head = BASE_CR (Ptr, CPOOL_HEAD, Data);
     assert(Head != NULL);
-    if (Head->Signature != POOL_HEAD_SIGNATURE) {
+    if (Head->Signature != CPOOL_HEAD_SIGNATURE) {
       errno = EFAULT;
+      DEBUG((DEBUG_ERROR, "ERROR realloc(0x%p): Signature is 0x%8X, expected 0x%8X\n",
+             Ptr, Head->Signature, CPOOL_HEAD_SIGNATURE));
       return NULL;
     }
-    OldSize = Head->Size;
+    OldSize = (size_t)Head->Size;
   }
 
   // At this point, Ptr is either NULL or a valid pointer to an allocated space
+  NewSize = (size_t)(ReqSize + (sizeof(CPOOL_HEAD)));
 
-  if( NewSize > 0) {
+  if( ReqSize > 0) {
     RetVal = malloc(NewSize); // Get the NEW memory region
     if( Ptr != NULL) {          // If there is an OLD region...
       if( RetVal != NULL) {     // and the NEW region was successfully allocated
@@ -216,13 +266,16 @@ realloc(void *Ptr, size_t NewSize)
         (VOID)CopyMem( RetVal, Ptr, NumCpy);  // Copy old data to the new region.
         free( Ptr);                           // and reclaim the old region.
       }
+      else {
+        errno = ENOMEM;
+      }
     }
   }
   else {
-    if( Ptr != NULL) {
       free( Ptr);                           // Reclaim the old region.
     }
-  }
+  DEBUG((DEBUG_POOL, "0x%p = realloc(%p, %d): Head: %p NewSz: %d\n",
+         RetVal, Ptr, ReqSize, Head, NewSize));
 
   return RetVal;
 }
