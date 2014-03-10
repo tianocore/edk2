@@ -139,7 +139,8 @@ ShellCommandRunSetVar (
           Attributes |= EFI_VARIABLE_BOOTSERVICE_ACCESS;
         }
         if (ShellCommandLineGetFlag(Package, L"-rt")) {
-          Attributes |= EFI_VARIABLE_RUNTIME_ACCESS;
+          Attributes |= EFI_VARIABLE_RUNTIME_ACCESS |
+                        EFI_VARIABLE_BOOTSERVICE_ACCESS;
         }
         if (ShellCommandLineGetFlag(Package, L"-nv")) {
           Attributes |= EFI_VARIABLE_NON_VOLATILE;
