@@ -35,7 +35,7 @@ EditHIInputStr (
   Print (CmdLine);
 
   // To prevent a buffer overflow, we only allow to enter (MaxCmdLine-1) characters
-  for (CmdLineIndex = StrLen (CmdLine); CmdLineIndex < MaxCmdLine - 1; ) {
+  for (CmdLineIndex = StrLen (CmdLine); CmdLineIndex < MaxCmdLine; ) {
     Status = gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &WaitIndex);
     ASSERT_EFI_ERROR (Status);
 
@@ -62,7 +62,7 @@ EditHIInputStr (
       }
     } else if ((Key.ScanCode == SCAN_ESC) || (Char == 0x1B) || (Char == 0x0)) {
       return EFI_INVALID_PARAMETER;
-    } else {
+    } else if (CmdLineIndex < (MaxCmdLine-1)) {
       CmdLine[CmdLineIndex++] = Key.UnicodeChar;
       Print (L"%c", Key.UnicodeChar);
     }
@@ -187,9 +187,7 @@ GetHIInputBoolean (
 
   while(1) {
     Print (L"[y/n] ");
-    // Set MaxCmdLine to 3 to give space for carriage return (when the user
-    // hits enter) and terminal '\0'.
-    Status = GetHIInputStr (CmdBoolean, 3);
+    Status = GetHIInputStr (CmdBoolean, 2);
     if (EFI_ERROR(Status)) {
       return Status;
     } else if ((CmdBoolean[0] == L'y') || (CmdBoolean[0] == L'Y')) {
