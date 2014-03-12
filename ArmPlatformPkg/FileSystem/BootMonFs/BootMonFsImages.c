@@ -109,11 +109,15 @@ BootMonFsImageInThisBlock (
     return FALSE;
   }
 
-  if (Ptr->Version != HW_IMAGE_FOOTER_VERSION) {
-    return FALSE;
-  }
-
-  if (Ptr->Offset != HW_IMAGE_FOOTER_OFFSET) {
+  if (Ptr->Version == HW_IMAGE_FOOTER_VERSION) {
+    if (Ptr->Offset != HW_IMAGE_FOOTER_OFFSET) {
+      return FALSE;
+    }
+  } else if (Ptr->Version == HW_IMAGE_FOOTER_VERSION2) {
+    if (Ptr->Offset != HW_IMAGE_FOOTER_OFFSET2) {
+      return FALSE;
+    }
+  } else {
     return FALSE;
   }
 

@@ -100,8 +100,13 @@ FlushAppendRegion (
   Description->BlockEnd = Description->BlockStart + (NewFileSize / BlockSize);
   Description->Footer.FooterSignature1 = HW_IMAGE_FOOTER_SIGNATURE_1;
   Description->Footer.FooterSignature2 = HW_IMAGE_FOOTER_SIGNATURE_2;
+#ifdef MDE_CPU_ARM
   Description->Footer.Version = HW_IMAGE_FOOTER_VERSION;
   Description->Footer.Offset = HW_IMAGE_FOOTER_OFFSET;
+#else
+  Description->Footer.Version = HW_IMAGE_FOOTER_VERSION2;
+  Description->Footer.Offset = HW_IMAGE_FOOTER_OFFSET2;
+#endif
   Description->RegionCount = 1;
   Description->Region[0].Checksum = 0;
   Description->Region[0].Offset = Description->BlockStart * BlockSize;
