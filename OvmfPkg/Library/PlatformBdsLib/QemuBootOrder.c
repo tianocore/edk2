@@ -1121,6 +1121,47 @@ BootOrderComplete (
 
 
 /**
+  Delete Boot#### variables that stand for such active boot options that have
+  been dropped (ie. have not been selected by either matching or "survival
+  policy").
+
+  @param[in]  ActiveOption  The array of active boot options to scan. Each
+                            entry not marked as appended will trigger the
+                            deletion of the matching Boot#### variable.
+
+  @param[in]  ActiveCount   Number of elements in ActiveOption.
+**/
+STATIC
+VOID
+PruneBootVariables (
+  IN  CONST ACTIVE_OPTION *ActiveOption,
+  IN  UINTN               ActiveCount
+  )
+{
+  UINTN Idx;
+
+  for (Idx = 0; Idx < ActiveCount; ++Idx) {
+    if (!ActiveOption[Idx].Appended) {
+      CHAR16 VariableName[9];
+
+      UnicodeSPrintAsciiFormat (VariableName, sizeof VariableName, "Boot%04x",
+        ActiveOption[Idx].BootOption->BootCurrent);
+
+      //
+      // "The space consumed by the deleted variable may not be available until
+      // the next power cycle", but that's good enough.
+      //
+      gRT->SetVariable (VariableName, &gEfiGlobalVariableGuid,
+             0,   // Attributes, 0 means deletion
+             0,   // DataSize, 0 means deletion
+             NULL // Data
+             );
+    }
+  }
+}
+
+
+/**
 
   Set the boot order based on configuration retrieved from QEMU.
 
@@ -1269,12 +1310,13 @@ SetBootOrderFromQemu (
                     BootOrder.Produced * sizeof (*BootOrder.Data),
                     BootOrder.Data
                     );
-    DEBUG ((
-      DEBUG_INFO,
-      "%a: setting BootOrder: %a\n",
-      __FUNCTION__,
-      Status == EFI_SUCCESS ? "success" : "error"
-      ));
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: setting BootOrder: %r\n", __FUNCTION__, Status));
+      goto ErrorFreeActiveOption;
+    }
+
+    DEBUG ((DEBUG_INFO, "%a: setting BootOrder: success\n", __FUNCTION__));
+    PruneBootVariables (ActiveOption, ActiveCount);
   }
 
 ErrorFreeActiveOption:
