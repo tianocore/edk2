@@ -1156,25 +1156,11 @@ Returns:
   BdsLibEnumerateAllBootOption (BootOptionList);
 
   SetBootOrderFromQemu (BootOptionList);
-
   //
-  // Please uncomment above ConnectAll and EnumerateAll code and remove following first boot
-  // checking code in real production tip.
+  // The BootOrder variable may have changed, reload the in-memory list with
+  // it.
   //
-  // In BOOT_WITH_FULL_CONFIGURATION boot mode, should always connect every device
-  // and do enumerate all the default boot options. But in development system board, the boot mode
-  // cannot be BOOT_ASSUMING_NO_CONFIGURATION_CHANGES because the machine box
-  // is always open. So the following code only do the ConnectAll and EnumerateAll at first boot.
-  //
-  Status = BdsLibBuildOptionFromVar (BootOptionList, L"BootOrder");
-  if (EFI_ERROR(Status)) {
-    //
-    // If cannot find "BootOrder" variable,  it may be first boot.
-    // Try to connect all devices and enumerate all boot options here.
-    //
-    BdsLibConnectAll ();
-    BdsLibEnumerateAllBootOption (BootOptionList);
-  }
+  BdsLibBuildOptionFromVar (BootOptionList, L"BootOrder");
 
   //
   // To give the User a chance to enter Setup here, if user set TimeOut is 0.
