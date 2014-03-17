@@ -651,7 +651,9 @@ IScsiStart (
                            &gIScsiConfigGuid,
                            &AttemptConfigOrderSize
                            );
-    ASSERT (AttemptConfigOrder != NULL);
+    if (AttemptConfigOrder == NULL) {
+      goto ON_ERROR;
+    }
     for (Index = 0; Index < AttemptConfigOrderSize / sizeof (UINT8); Index++) {
       if (AttemptConfigOrder[Index] == mPrivate->BootSelectedIndex ||
           AttemptConfigOrder[Index] == BootSelected) {
@@ -689,7 +691,9 @@ IScsiStart (
 
         goto ON_EXIT;
       } else {
-        ASSERT (AttemptConfigOrder[Index] == BootSelected);
+        if (AttemptConfigOrder[Index] != BootSelected) {
+          goto ON_ERROR;
+        }
         mPrivate->BootSelectedIndex = BootSelected;
         //
         // Clear the resource in ExistPrivate.
