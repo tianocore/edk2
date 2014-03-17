@@ -102,7 +102,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics  ## SOMETIME_CONSUMES (statistic the information of variable.)
 
 [Depex]
-  gEfiFirmwareVolumeBlockProtocolGuid AND gEfiFaultTolerantWriteProtocolGuid
+  TRUE
 
 # [Event]
 #   ##
