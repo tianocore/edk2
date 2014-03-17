@@ -9,7 +9,7 @@
 
   PhysicalPresenceCallback() and MemoryClearCallback() will receive untrusted input and do some check.
 
-Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -84,6 +84,8 @@ PhysicalPresenceCallback (
                            &PpData
                            );
   if (EFI_ERROR (Status)) {
+    mTcgNvs->PhysicalPresence.ReturnCode = PP_SUBMIT_REQUEST_GENERAL_FAILURE;
+    DEBUG ((EFI_D_ERROR, "[TPM] Get PP variable failure! Status = %r\n", Status));
     return EFI_SUCCESS;
   }
 
@@ -116,6 +118,7 @@ PhysicalPresenceCallback (
 
     if (EFI_ERROR (Status)) { 
       mTcgNvs->PhysicalPresence.ReturnCode = PP_SUBMIT_REQUEST_GENERAL_FAILURE;
+      DEBUG ((EFI_D_ERROR, "[TPM] Set PP variable failure! Status = %r\n", Status));
       return EFI_SUCCESS;
     }
     mTcgNvs->PhysicalPresence.ReturnCode = PP_SUBMIT_REQUEST_SUCCESS;
@@ -133,6 +136,7 @@ PhysicalPresenceCallback (
                              );
     if (EFI_ERROR (Status)) {
       mTcgNvs->PhysicalPresence.ReturnCode = PP_SUBMIT_REQUEST_GENERAL_FAILURE;
+      DEBUG ((EFI_D_ERROR, "[TPM] Get PP flags failure! Status = %r\n", Status));
       return EFI_SUCCESS;
     }
 
@@ -220,6 +224,8 @@ MemoryClearCallback (
                              &MorControl
                              );
     if (EFI_ERROR (Status)) {
+      mTcgNvs->MemoryClear.ReturnCode = MOR_REQUEST_GENERAL_FAILURE;
+      DEBUG ((EFI_D_ERROR, "[TPM] Get MOR variable failure! Status = %r\n", Status));
       return EFI_SUCCESS;
     }
 
@@ -239,6 +245,7 @@ MemoryClearCallback (
                            );
   if (EFI_ERROR (Status)) { 
     mTcgNvs->MemoryClear.ReturnCode = MOR_REQUEST_GENERAL_FAILURE;
+    DEBUG ((EFI_D_ERROR, "[TPM] Set MOR variable failure! Status = %r\n", Status));
   }
 
   return EFI_SUCCESS;
