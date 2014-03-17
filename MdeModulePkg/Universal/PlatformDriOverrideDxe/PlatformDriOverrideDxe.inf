@@ -16,7 +16,9 @@
 #  4. It save all the mapping info in NV variables for the following boot, 
 #     which will be consumed by GetDriver API of the produced the platform override protocol.
 #
-# Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+# Caution: This module is a sample implementation for the test purpose.
+#
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
