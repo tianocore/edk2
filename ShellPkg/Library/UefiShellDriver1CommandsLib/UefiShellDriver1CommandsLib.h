@@ -203,5 +203,18 @@ ShellCommandRunUnload (
   IN EFI_SYSTEM_TABLE  *SystemTable
   );
 
+/**
+  Function to translate the EFI_MEMORY_TYPE into a string.
+
+  @param[in] Memory     The memory type.
+
+  @retval               A string representation of the type allocated from BS Pool.
+**/
+CHAR16*
+EFIAPI
+ConvertMemoryType (
+  IN CONST EFI_MEMORY_TYPE Memory
+  );
+
 #endif
 
