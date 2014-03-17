@@ -231,6 +231,7 @@
 
   ## The PCD is used to control whether to support hiding the TPM.
   #  If TRUE, PcdHideTpm controls whether to hide the TPM.
+  #  This pcd is only for validation purpose. It should be set to false in production.
   gEfiSecurityPkgTokenSpaceGuid.PcdHideTpmSupport|FALSE|BOOLEAN|0x00000007
   
 [PcdsDynamic, PcdsDynamicEx]
