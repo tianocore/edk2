@@ -1,7 +1,7 @@
 /** @file
   This is an implementation of the AcpiVariable platform field for ECP platform.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -39,7 +39,9 @@ typedef struct {
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
+#include <Library/UefiLib.h>
 #include <Protocol/FrameworkMpService.h>
+#include <Protocol/VariableLock.h>
 #include <Guid/AcpiVariableCompatibility.h>
 #include <Guid/AcpiS3Context.h>
 
@@ -80,6 +82,10 @@ S3ReadyThunkPlatform (
 
   DEBUG ((EFI_D_INFO, "S3ReadyThunkPlatform\n"));
 
+  if (mAcpiVariableSetCompatibility == NULL) {
+    return;
+  }
+
   //
   // Allocate ACPI reserved memory under 4G
   //
@@ -118,6 +124,32 @@ S3ReadyThunkPlatform (
 }
 
 /**
+  Register callback function upon VariableLockProtocol
+  to lock ACPI_GLOBAL_VARIABLE variable to avoid malicious code to update it.
+
+  @param[in] Event    Event whose notification function is being invoked.
+  @param[in] Context  Pointer to the notification function's context.
+**/
+VOID
+EFIAPI
+VariableLockAcpiGlobalVariable (
+  IN  EFI_EVENT                             Event,
+  IN  VOID                                  *Context
+  )
+{
+  EFI_STATUS                    Status;
+  EDKII_VARIABLE_LOCK_PROTOCOL  *VariableLock;
+  //
+  // Mark ACPI_GLOBAL_VARIABLE variable to read-only if the Variable Lock protocol exists
+  //
+  Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **) &VariableLock);
+  if (!EFI_ERROR (Status)) {
+    Status = VariableLock->RequestToLock (VariableLock, ACPI_GLOBAL_VARIABLE, &gEfiAcpiVariableCompatiblityGuid);
+    ASSERT_EFI_ERROR (Status);
+  }
+}
+
+/**
   Hook point for AcpiVariableThunkPlatform for InstallAcpiS3Save.
 **/
 VOID
@@ -128,6 +160,7 @@ InstallAcpiS3SaveThunk (
   EFI_STATUS                           Status;
   FRAMEWORK_EFI_MP_SERVICES_PROTOCOL   *FrameworkMpService;
   UINTN                                VarSize;
+  VOID                                 *Registration;
 
   Status = gBS->LocateProtocol (
                   &gFrameworkEfiMpServiceProtocolGuid,
@@ -147,21 +180,44 @@ InstallAcpiS3SaveThunk (
                     &VarSize,
                     &mAcpiVariableSetCompatibility
                     );
-    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status) || (VarSize != sizeof (mAcpiVariableSetCompatibility))) {
+      DEBUG ((EFI_D_ERROR, "FATAL ERROR: AcpiVariableSetCompatibility was not saved by CPU driver correctly. OS S3 may fail!\n"));
+      mAcpiVariableSetCompatibility = NULL;
+    }
   } else {
     //
     // Allocate/initialize the compatible version of Acpi Variable Set since Framework chipset/platform 
-    // driver need this variable
+    // driver need this variable. ACPI_GLOBAL_VARIABLE variable is not used in runtime phase,
+    // so RT attribute is not needed for it.
     //
     mAcpiVariableSetCompatibility = AllocateMemoryBelow4G (EfiACPIMemoryNVS, sizeof(ACPI_VARIABLE_SET_COMPATIBILITY));
     Status = gRT->SetVariable (
                     ACPI_GLOBAL_VARIABLE,
                     &gEfiAcpiVariableCompatiblityGuid,
-                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                     sizeof(mAcpiVariableSetCompatibility),
                     &mAcpiVariableSetCompatibility
                     );
-    ASSERT_EFI_ERROR (Status);
+    if (!EFI_ERROR (Status)) {
+      //
+      // Register callback function upon VariableLockProtocol
+      // to lock ACPI_GLOBAL_VARIABLE variable to avoid malicious code to update it.
+      //
+      EfiCreateProtocolNotifyEvent (
+        &gEdkiiVariableLockProtocolGuid,
+        TPL_CALLBACK,
+        VariableLockAcpiGlobalVariable,
+        NULL,
+        &Registration
+        );
+    } else {
+      DEBUG ((EFI_D_ERROR, "FATAL ERROR: AcpiVariableSetCompatibility cannot be saved: %r. OS S3 may fail!\n", Status));
+      gBS->FreePages (
+             (EFI_PHYSICAL_ADDRESS) (UINTN) mAcpiVariableSetCompatibility,
+             EFI_SIZE_TO_PAGES (sizeof (ACPI_VARIABLE_SET_COMPATIBILITY))
+             );
+      mAcpiVariableSetCompatibility = NULL;
+    }
   }
 
   DEBUG((EFI_D_INFO, "AcpiVariableSetCompatibility is 0x%8x\n", mAcpiVariableSetCompatibility));
