@@ -3,7 +3,7 @@
   and volatile storage space and install variable architecture protocol.
 
 Copyright (C) 2013, Red Hat, Inc.
-Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -388,7 +388,9 @@ FtwNotificationEvent (
   }
 
   Status = VariableWriteServiceInitialize ();
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Variable write service initialization failed. Status = %r\n", Status));
+  }
 
   //
   // Install the Variable Write Architectural protocol.
