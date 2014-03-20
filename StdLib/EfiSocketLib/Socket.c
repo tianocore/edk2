@@ -1834,10 +1834,9 @@ EslSocketConnect (
 
       case SOCKET_STATE_CONNECTED:
         //
-        //  Already connected
+        //  Connected
         //
-        pSocket->errno = EISCONN;
-        Status = EFI_ALREADY_STARTED;
+        Status = EFI_SUCCESS;
         break;
       }
 
