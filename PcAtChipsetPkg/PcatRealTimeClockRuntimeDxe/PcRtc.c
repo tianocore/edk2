@@ -1,7 +1,7 @@
 /** @file
   RTC Architectural Protocol GUID as defined in DxeCis 0.96.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -392,6 +392,26 @@ PcRtcSetTime (
      }
     return Status;
   }
+  
+  //
+  // Write timezone and daylight to RTC variable
+  //
+  TimerVar = Time->Daylight;
+  TimerVar = (UINT32) ((TimerVar << 16) | (UINT16)(Time->TimeZone));
+  Status =  EfiSetVariable (
+              L"RTC",
+              &gEfiCallerIdGuid,
+              EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+              sizeof (TimerVar),
+              &TimerVar
+              );
+  if (EFI_ERROR (Status)) {
+    if (!EfiAtRuntime ()) {
+      EfiReleaseLock (&Global->RtcLock);
+    }
+    return EFI_DEVICE_ERROR;
+  }
+
   //
   // Read Register B, and inhibit updates of the RTC
   //
@@ -426,17 +446,6 @@ PcRtcSetTime (
   //
   Global->SavedTimeZone = Time->TimeZone;
   Global->Daylight      = Time->Daylight;
-
-  TimerVar = Time->Daylight;
-  TimerVar = (UINT32) ((TimerVar << 16) | (UINT16)(Time->TimeZone));
-  Status =  EfiSetVariable (
-              L"RTC",
-              &gEfiCallerIdGuid,
-              EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-              sizeof (TimerVar),
-              &TimerVar
-              );
-  ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;
 }
@@ -635,27 +644,13 @@ PcRtcSetWakeupTime (
     return EFI_DEVICE_ERROR;
   }
   //
-  // Read Register B, and inhibit updates of the RTC
+  // Read Register B
   //
-  RegisterB.Data      = RtcRead (RTC_ADDRESS_REGISTER_B);
-
-  RegisterB.Bits.Set  = 1;
-  RtcWrite (RTC_ADDRESS_REGISTER_B, RegisterB.Data);
+  RegisterB.Data = RtcRead (RTC_ADDRESS_REGISTER_B);
 
   if (Enable) {
     ConvertEfiTimeToRtcTime (&RtcTime, RegisterB, &Century);
-
-    //
-    // Set RTC alarm time
-    //
-    RtcWrite (RTC_ADDRESS_SECONDS_ALARM, RtcTime.Second);
-    RtcWrite (RTC_ADDRESS_MINUTES_ALARM, RtcTime.Minute);
-    RtcWrite (RTC_ADDRESS_HOURS_ALARM, RtcTime.Hour);
-
-    RegisterB.Bits.Aie = 1;
-
   } else {
-    RegisterB.Bits.Aie = 0;
     //
     // if the alarm is disable, record the current setting.
     //
@@ -668,11 +663,6 @@ PcRtcSetWakeupTime (
     RtcTime.TimeZone = Global->SavedTimeZone;
     RtcTime.Daylight = Global->Daylight;
   }
-  //
-  // Allow updates of the RTC registers
-  //
-  RegisterB.Bits.Set = 0;
-  RtcWrite (RTC_ADDRESS_REGISTER_B, RegisterB.Data);
 
   //
   // Set the Y/M/D info to variable as it has no corresponding hw registers.
@@ -685,8 +675,36 @@ PcRtcSetWakeupTime (
               &RtcTime
               );
   if (EFI_ERROR (Status)) {
+    if (!EfiAtRuntime ()) {
+      EfiReleaseLock (&Global->RtcLock);
+    }
     return EFI_DEVICE_ERROR;
   }
+  
+  //
+  // Inhibit updates of the RTC
+  //
+  RegisterB.Bits.Set  = 1;
+  RtcWrite (RTC_ADDRESS_REGISTER_B, RegisterB.Data);
+
+  if (Enable) {
+    //
+    // Set RTC alarm time
+    //
+    RtcWrite (RTC_ADDRESS_SECONDS_ALARM, RtcTime.Second);
+    RtcWrite (RTC_ADDRESS_MINUTES_ALARM, RtcTime.Minute);
+    RtcWrite (RTC_ADDRESS_HOURS_ALARM, RtcTime.Hour);
+
+    RegisterB.Bits.Aie = 1;
+
+  } else {
+    RegisterB.Bits.Aie = 0;
+  }
+  //
+  // Allow updates of the RTC registers
+  //
+  RegisterB.Bits.Set = 0;
+  RtcWrite (RTC_ADDRESS_REGISTER_B, RegisterB.Data);
 
   //
   // Release RTC Lock.
