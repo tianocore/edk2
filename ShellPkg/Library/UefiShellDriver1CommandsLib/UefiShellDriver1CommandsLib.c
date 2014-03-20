@@ -1,7 +1,7 @@
 /** @file
   Main file for NULL named library for level 1 shell command functions.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -17,43 +17,6 @@
 STATIC CONST CHAR16 mFileName[] = L"Driver1Commands";
 EFI_HANDLE gShellDriver1HiiHandle = NULL;
 BOOLEAN    gInReconnect = FALSE;
-
-/**
-  Function to translate the EFI_MEMORY_TYPE into a string.
-
-  @param[in] Memory     The memory type.
-
-  @retval               A string representation of the type allocated from BS Pool.
-**/
-CHAR16*
-EFIAPI
-ConvertMemoryType (
-  IN CONST EFI_MEMORY_TYPE Memory
-  )
-{
-  CHAR16 *RetVal;
-  RetVal = NULL;
-
-  switch (Memory) {
-  case EfiReservedMemoryType:       StrnCatGrow(&RetVal, NULL, L"EfiReservedMemoryType", 0);        break;
-  case EfiLoaderCode:               StrnCatGrow(&RetVal, NULL, L"EfiLoaderCode", 0);                break;
-  case EfiLoaderData:               StrnCatGrow(&RetVal, NULL, L"EfiLoaderData", 0);                break;
-  case EfiBootServicesCode:         StrnCatGrow(&RetVal, NULL, L"EfiBootServicesCode", 0);          break;
-  case EfiBootServicesData:         StrnCatGrow(&RetVal, NULL, L"EfiBootServicesData", 0);          break;
-  case EfiRuntimeServicesCode:      StrnCatGrow(&RetVal, NULL, L"EfiRuntimeServicesCode", 0);       break;
-  case EfiRuntimeServicesData:      StrnCatGrow(&RetVal, NULL, L"EfiRuntimeServicesData", 0);       break;
-  case EfiConventionalMemory:       StrnCatGrow(&RetVal, NULL, L"EfiConventionalMemory", 0);        break;
-  case EfiUnusableMemory:           StrnCatGrow(&RetVal, NULL, L"EfiUnusableMemory", 0);            break;
-  case EfiACPIReclaimMemory:        StrnCatGrow(&RetVal, NULL, L"EfiACPIReclaimMemory", 0);         break;
-  case EfiACPIMemoryNVS:            StrnCatGrow(&RetVal, NULL, L"EfiACPIMemoryNVS", 0);             break;
-  case EfiMemoryMappedIO:           StrnCatGrow(&RetVal, NULL, L"EfiMemoryMappedIO", 0);            break;
-  case EfiMemoryMappedIOPortSpace:  StrnCatGrow(&RetVal, NULL, L"EfiMemoryMappedIOPortSpace", 0);   break;
-  case EfiPalCode:                  StrnCatGrow(&RetVal, NULL, L"EfiPalCode", 0);                   break;
-  case EfiMaxMemoryType:            StrnCatGrow(&RetVal, NULL, L"EfiMaxMemoryType", 0);             break;
-  default: ASSERT(FALSE);
-  }
-  return (RetVal);
-}
 
 /**
   Function to return the name of the file containing help if HII will not be used.

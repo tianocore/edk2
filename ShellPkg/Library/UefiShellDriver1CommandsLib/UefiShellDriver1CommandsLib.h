@@ -1,7 +1,7 @@
 /** @file
   Main file for NULL named library for Profile1 shell command functions.
 
-  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -201,19 +201,6 @@ EFIAPI
 ShellCommandRunUnload (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
-  );
-
-/**
-  Function to translate the EFI_MEMORY_TYPE into a string.
-
-  @param[in] Memory     The memory type.
-
-  @retval               A string representation of the type allocated from BS Pool.
-**/
-CHAR16*
-EFIAPI
-ConvertMemoryType (
-  IN CONST EFI_MEMORY_TYPE Memory
   );
 
 #endif
