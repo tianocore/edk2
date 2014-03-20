@@ -3,7 +3,7 @@
   The common variable operation routines shared by DXE_RUNTIME variable 
   module and DXE_SMM variable module.
   
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -1272,8 +1272,13 @@ VariableGetBestLanguage (
 
   @param[in] DataSize           Size of data. 0 means delete.
 
+  @retval EFI_SUCCESS           The update operation is successful or ignored.
+  @retval EFI_WRITE_PROTECTED   Update PlatformLangCodes/LangCodes at runtime.
+  @retval EFI_OUT_OF_RESOURCES  No enough variable space to do the update operation.
+  @retval Others                Other errors happened during the update operation.
+
 **/
-VOID
+EFI_STATUS
 AutoUpdateLangVariable (
   IN  CHAR16             *VariableName,
   IN  VOID               *Data,
@@ -1292,7 +1297,7 @@ AutoUpdateLangVariable (
   // Don't do updates for delete operation
   //
   if (DataSize == 0) {
-    return;
+    return EFI_SUCCESS;
   }
 
   SetLanguageCodes = FALSE;
@@ -1302,7 +1307,7 @@ AutoUpdateLangVariable (
     // PlatformLangCodes is a volatile variable, so it can not be updated at runtime.
     //
     if (AtRuntime ()) {
-      return;
+      return EFI_WRITE_PROTECTED;
     }
 
     SetLanguageCodes = TRUE;
@@ -1332,7 +1337,7 @@ AutoUpdateLangVariable (
     // LangCodes is a volatile variable, so it can not be updated at runtime.
     //
     if (AtRuntime ()) {
-      return;
+      return EFI_WRITE_PROTECTED;
     }
 
     SetLanguageCodes = TRUE;
@@ -1376,11 +1381,13 @@ AutoUpdateLangVariable (
         //
         // Neither PlatformLang nor Lang is set, directly return
         //
-        return;
+        return EFI_SUCCESS;
       }
     }
   }
-  
+
+  Status = EFI_SUCCESS;
+
   //
   // According to UEFI spec, "Lang" and "PlatformLang" is NV|BS|RT attributions.
   //
@@ -1414,9 +1421,7 @@ AutoUpdateLangVariable (
         Status = UpdateVariable (EFI_LANG_VARIABLE_NAME, &gEfiGlobalVariableGuid, BestLang,
                                  ISO_639_2_ENTRY_SIZE + 1, Attributes, &Variable);
 
-        DEBUG ((EFI_D_INFO, "Variable Driver Auto Update PlatformLang, PlatformLang:%a, Lang:%a\n", BestPlatformLang, BestLang));
-
-        ASSERT_EFI_ERROR(Status);
+        DEBUG ((EFI_D_INFO, "Variable Driver Auto Update PlatformLang, PlatformLang:%a, Lang:%a: Status: %r\n", BestPlatformLang, BestLang, Status));
       }
     }
 
@@ -1448,11 +1453,12 @@ AutoUpdateLangVariable (
         Status = UpdateVariable (EFI_PLATFORM_LANG_VARIABLE_NAME, &gEfiGlobalVariableGuid, BestPlatformLang, 
                                  AsciiStrSize (BestPlatformLang), Attributes, &Variable);
 
-        DEBUG ((EFI_D_INFO, "Variable Driver Auto Update Lang, Lang:%a, PlatformLang:%a\n", BestLang, BestPlatformLang));
-        ASSERT_EFI_ERROR (Status);
+        DEBUG ((EFI_D_INFO, "Variable Driver Auto Update Lang, Lang:%a, PlatformLang:%a Status: %r\n", BestLang, BestPlatformLang, Status));
       }
     }
   }
+
+  return Status;
 }
 
 /**
@@ -2489,7 +2495,13 @@ VariableServiceSetVariable (
   //
   // Hook the operation of setting PlatformLangCodes/PlatformLang and LangCodes/Lang.
   //
-  AutoUpdateLangVariable (VariableName, Data, DataSize);
+  Status = AutoUpdateLangVariable (VariableName, Data, DataSize);
+  if (EFI_ERROR (Status)) {
+    //
+    // The auto update operation failed, directly return to avoid inconsistency between PlatformLang and Lang.
+    //
+    goto Done;
+  }
 
   Status = UpdateVariable (VariableName, VendorGuid, Data, DataSize, Attributes, &Variable);
 
