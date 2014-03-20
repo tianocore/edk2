@@ -1,7 +1,7 @@
 /** @file
   Main file for Unload shell Driver1 function.
 
-  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -28,42 +28,14 @@ DumpLoadedImageProtocolInfo (
   IN EFI_HANDLE   TheHandle
   )
 {
-  EFI_LOADED_IMAGE_PROTOCOL         *Image;
-  EFI_STATUS                        Status;
-  CHAR16                            *DevicePathText;
-  CHAR16                            *CodeTypeText;
-  CHAR16                            *DataTypeText;
-  CHAR8                             *PdbPointer;
+  CHAR16 *TheString;
 
-  Image = NULL;
+  TheString = GetProtocolInformationDump(TheHandle, &gEfiLoadedImageProtocolGuid, TRUE);
+  
+  ShellPrintEx(-1, -1, L"%s", TheString);
 
-  Status = gBS->OpenProtocol(TheHandle, &gEfiLoadedImageProtocolGuid, (VOID**)&Image, gImageHandle, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-  if (EFI_ERROR(Status)) {
-    return (EFI_INVALID_PARAMETER);
-  }
-  DevicePathText = ConvertDevicePathToText(Image->FilePath, TRUE, TRUE);
-  CodeTypeText   = ConvertMemoryType(Image->ImageCodeType);
-  DataTypeText   = ConvertMemoryType(Image->ImageDataType);
-  PdbPointer     = (CHAR8*)PeCoffLoaderGetPdbPointer(Image->ImageBase);
-  ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_UNLOAD_VERBOSE), gShellDriver1HiiHandle,
-    ConvertHandleToHandleIndex(TheHandle),
-    TheHandle,
-    Image,
-    Image->ParentHandle,
-    Image->SystemTable,
-    Image->DeviceHandle,
-    DevicePathText,
-    PdbPointer,
-    Image->ImageBase,
-    Image->ImageSize,
-    CodeTypeText,
-    DataTypeText
-    );
-
-  SHELL_FREE_NON_NULL(DevicePathText);
-  SHELL_FREE_NON_NULL(CodeTypeText);
-  SHELL_FREE_NON_NULL(DataTypeText);
-
+  SHELL_FREE_NON_NULL(TheString);
+  
   return (EFI_SUCCESS);
 }
 
