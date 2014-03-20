@@ -1,7 +1,7 @@
 /** @file
     Implementation of reading the MAC address of a network adapter.
  
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed 
 and made available under the terms and conditions of the BSD License which 
 accompanies this distribution. The full text of the license may be found at 
@@ -117,10 +117,9 @@ PxeSetStnAddr (
     Snp->Cdb.CPBsize  = PXE_CPBSIZE_NOT_USED;
     Snp->Cdb.CPBaddr  = PXE_CPBADDR_NOT_USED;
   } else {
-    Snp->Cdb.OpFlags = PXE_OPFLAGS_STATION_ADDRESS_READ;
+    Snp->Cdb.OpFlags = PXE_OPFLAGS_STATION_ADDRESS_WRITE;
     //
-    // even though the OPFLAGS are set to READ, supplying a new address
-    // in the CPB will make undi change the mac address to the new one.
+    // Supplying a new address in the CPB will make undi change the mac address to the new one.
     //
     CopyMem (&Cpb->StationAddr, NewMacAddr, Snp->Mode.HwAddressSize);
 
