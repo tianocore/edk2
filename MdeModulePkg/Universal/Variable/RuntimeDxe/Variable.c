@@ -2583,6 +2583,135 @@ ReclaimForOS(
 }
 
 /**
+  Init non-volatile variable store.
+
+  @retval EFI_SUCCESS           Function successfully executed.
+  @retval EFI_OUT_OF_RESOURCES  Fail to allocate enough memory resource.
+  @retval EFI_VOLUME_CORRUPTED  Variable Store or Firmware Volume for Variable Store is corrupted.
+
+**/
+EFI_STATUS
+InitNonVolatileVariableStore (
+  VOID
+  )
+{
+  EFI_FIRMWARE_VOLUME_HEADER            *FvHeader;
+  VARIABLE_HEADER                       *NextVariable;
+  EFI_PHYSICAL_ADDRESS                  VariableStoreBase;
+  UINT64                                VariableStoreLength;
+  UINTN                                 VariableSize;
+  EFI_HOB_GUID_TYPE                     *GuidHob;
+  EFI_PHYSICAL_ADDRESS                  NvStorageBase;
+  UINT8                                 *NvStorageData;
+  UINT32                                NvStorageSize;
+  FAULT_TOLERANT_WRITE_LAST_WRITE_DATA  *FtwLastWriteData;
+  UINT32                                BackUpOffset;
+  UINT32                                BackUpSize;
+
+  mVariableModuleGlobal->FvbInstance = NULL;
+
+  //
+  // Note that in EdkII variable driver implementation, Hardware Error Record type variable
+  // is stored with common variable in the same NV region. So the platform integrator should
+  // ensure that the value of PcdHwErrStorageSize is less than or equal to the value of
+  // PcdFlashNvStorageVariableSize.
+  //
+  ASSERT (PcdGet32 (PcdHwErrStorageSize) <= PcdGet32 (PcdFlashNvStorageVariableSize));
+
+  //
+  // Allocate runtime memory used for a memory copy of the FLASH region.
+  // Keep the memory and the FLASH in sync as updates occur.
+  //
+  NvStorageSize = PcdGet32 (PcdFlashNvStorageVariableSize);
+  NvStorageData = AllocateRuntimeZeroPool (NvStorageSize);
+  if (NvStorageData == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  NvStorageBase = (EFI_PHYSICAL_ADDRESS) PcdGet64 (PcdFlashNvStorageVariableBase64);
+  if (NvStorageBase == 0) {
+    NvStorageBase = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageVariableBase);
+  }
+  //
+  // Copy NV storage data to the memory buffer.
+  //
+  CopyMem (NvStorageData, (UINT8 *) (UINTN) NvStorageBase, NvStorageSize);
+
+  //
+  // Check the FTW last write data hob.
+  //
+  GuidHob = GetFirstGuidHob (&gEdkiiFaultTolerantWriteGuid);
+  if (GuidHob != NULL) {
+    FtwLastWriteData = (FAULT_TOLERANT_WRITE_LAST_WRITE_DATA *) GET_GUID_HOB_DATA (GuidHob);
+    if (FtwLastWriteData->TargetAddress == NvStorageBase) {
+      DEBUG ((EFI_D_INFO, "Variable: NV storage is backed up in spare block: 0x%x\n", (UINTN) FtwLastWriteData->SpareAddress));
+      //
+      // Copy the backed up NV storage data to the memory buffer from spare block.
+      //
+      CopyMem (NvStorageData, (UINT8 *) (UINTN) (FtwLastWriteData->SpareAddress), NvStorageSize);
+    } else if ((FtwLastWriteData->TargetAddress > NvStorageBase) &&
+               (FtwLastWriteData->TargetAddress < (NvStorageBase + NvStorageSize))) {
+      //
+      // Flash NV storage from the offset is backed up in spare block.
+      //
+      BackUpOffset = (UINT32) (FtwLastWriteData->TargetAddress - NvStorageBase);
+      BackUpSize = NvStorageSize - BackUpOffset;
+      DEBUG ((EFI_D_INFO, "Variable: High partial NV storage from offset: %x is backed up in spare block: 0x%x\n", BackUpOffset, (UINTN) FtwLastWriteData->SpareAddress));
+      //
+      // Copy the partial backed up NV storage data to the memory buffer from spare block.
+      //
+      CopyMem (NvStorageData + BackUpOffset, (UINT8 *) (UINTN) FtwLastWriteData->SpareAddress, BackUpSize);
+    }
+  }
+
+  FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) NvStorageData;
+
+  //
+  // Check if the Firmware Volume is not corrupted
+  //
+  if ((FvHeader->Signature != EFI_FVH_SIGNATURE) || (!CompareGuid (&gEfiSystemNvDataFvGuid, &FvHeader->FileSystemGuid))) {
+    FreePool (NvStorageData);
+    DEBUG ((EFI_D_ERROR, "Firmware Volume for Variable Store is corrupted\n"));
+    return EFI_VOLUME_CORRUPTED;
+  }
+
+  VariableStoreBase = (EFI_PHYSICAL_ADDRESS) ((UINTN) FvHeader + FvHeader->HeaderLength);
+  VariableStoreLength = (UINT64) (NvStorageSize - FvHeader->HeaderLength);
+
+  mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase = VariableStoreBase;
+  mNvVariableCache = (VARIABLE_STORE_HEADER *) (UINTN) VariableStoreBase;
+  if (GetVariableStoreStatus (mNvVariableCache) != EfiValid) {
+    FreePool (NvStorageData);
+    DEBUG((EFI_D_ERROR, "Variable Store header is corrupted\n"));
+    return EFI_VOLUME_CORRUPTED;
+  }
+  ASSERT(mNvVariableCache->Size == VariableStoreLength);
+
+  //
+  // The max variable or hardware error variable size should be < variable store size.
+  //
+  ASSERT(MAX (PcdGet32 (PcdMaxVariableSize), PcdGet32 (PcdMaxHardwareErrorVariableSize)) < VariableStoreLength);
+
+  //
+  // Parse non-volatile variable data and get last variable offset.
+  //
+  NextVariable  = GetStartPointer ((VARIABLE_STORE_HEADER *)(UINTN)VariableStoreBase);
+  while (IsValidVariableHeader (NextVariable)) {
+    VariableSize = NextVariable->NameSize + NextVariable->DataSize + sizeof (VARIABLE_HEADER);
+    if ((NextVariable->Attributes & (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) == (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
+      mVariableModuleGlobal->HwErrVariableTotalSize += HEADER_ALIGN (VariableSize);
+    } else {
+      mVariableModuleGlobal->CommonVariableTotalSize += HEADER_ALIGN (VariableSize);
+    }
+
+    NextVariable = GetNextVariablePtr (NextVariable);
+  }
+  mVariableModuleGlobal->NonVolatileLastVariableOffset = (UINTN) NextVariable - (UINTN) VariableStoreBase;
+
+  return EFI_SUCCESS;
+}
+
+/**
   Flush the HOB variable to flash.
 
   @param[in] VariableName       Name of variable has been updated or deleted.
@@ -2673,7 +2802,7 @@ FlushHobVariableToFlash (
 }
 
 /**
-  Initializes variable write service after FVB was ready.
+  Initializes variable write service after FTW was ready.
 
   @retval EFI_SUCCESS          Function successfully executed.
   @retval Others               Fail to initialize the variable service.
@@ -2689,8 +2818,18 @@ VariableWriteServiceInitialize (
   UINTN                           Index;
   UINT8                           Data;
   EFI_PHYSICAL_ADDRESS            VariableStoreBase;
+  EFI_PHYSICAL_ADDRESS            NvStorageBase;
 
-  VariableStoreBase   = mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase;
+  NvStorageBase = (EFI_PHYSICAL_ADDRESS) PcdGet64 (PcdFlashNvStorageVariableBase64);
+  if (NvStorageBase == 0) {
+    NvStorageBase = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageVariableBase);
+  }
+  VariableStoreBase = NvStorageBase + (((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)(NvStorageBase))->HeaderLength);
+
+  //
+  // Let NonVolatileVariableBase point to flash variable store base directly after FTW ready.
+  //
+  mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase = VariableStoreBase;
   VariableStoreHeader = (VARIABLE_STORE_HEADER *)(UINTN)VariableStoreBase;
  
   //
@@ -2737,12 +2876,8 @@ VariableCommonInitialize (
   EFI_STATUS                      Status;
   VARIABLE_STORE_HEADER           *VolatileVariableStore;
   VARIABLE_STORE_HEADER           *VariableStoreHeader;
-  VARIABLE_HEADER                 *NextVariable;
-  EFI_PHYSICAL_ADDRESS            TempVariableStoreHeader;
-  EFI_PHYSICAL_ADDRESS            VariableStoreBase;
   UINT64                          VariableStoreLength;
   UINTN                           ScratchSize;
-  UINTN                           VariableSize;
   EFI_HOB_GUID_TYPE               *GuidHob;
 
   //
@@ -2756,14 +2891,6 @@ VariableCommonInitialize (
   InitializeLock (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock, TPL_NOTIFY);
 
   //
-  // Note that in EdkII variable driver implementation, Hardware Error Record type variable
-  // is stored with common variable in the same NV region. So the platform integrator should
-  // ensure that the value of PcdHwErrStorageSize is less than or equal to the value of 
-  // PcdFlashNvStorageVariableSize.
-  //
-  ASSERT (PcdGet32 (PcdHwErrStorageSize) <= PcdGet32 (PcdFlashNvStorageVariableSize));
-
-  //
   // Get HOB variable store.
   //
   GuidHob = GetFirstGuidHob (&gEfiVariableGuid);
@@ -2773,6 +2900,7 @@ VariableCommonInitialize (
     if (GetVariableStoreStatus (VariableStoreHeader) == EfiValid) {
       mVariableModuleGlobal->VariableGlobal.HobVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) AllocateRuntimeCopyPool ((UINTN) VariableStoreLength, (VOID *) VariableStoreHeader);
       if (mVariableModuleGlobal->VariableGlobal.HobVariableBase == 0) {
+        FreePool (mVariableModuleGlobal);
         return EFI_OUT_OF_RESOURCES;
       }
     } else {
@@ -2786,6 +2914,9 @@ VariableCommonInitialize (
   ScratchSize = MAX (PcdGet32 (PcdMaxVariableSize), PcdGet32 (PcdMaxHardwareErrorVariableSize));
   VolatileVariableStore = AllocateRuntimePool (PcdGet32 (PcdVariableStoreSize) + ScratchSize);
   if (VolatileVariableStore == NULL) {
+    if (mVariableModuleGlobal->VariableGlobal.HobVariableBase != 0) {
+      FreePool ((VOID *) (UINTN) mVariableModuleGlobal->VariableGlobal.HobVariableBase);
+    }
     FreePool (mVariableModuleGlobal);
     return EFI_OUT_OF_RESOURCES;
   }
@@ -2797,7 +2928,6 @@ VariableCommonInitialize (
   //
   mVariableModuleGlobal->VariableGlobal.VolatileVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) VolatileVariableStore;
   mVariableModuleGlobal->VolatileLastVariableOffset = (UINTN) GetStartPointer (VolatileVariableStore) - (UINTN) VolatileVariableStore;
-  mVariableModuleGlobal->FvbInstance = NULL;
 
   CopyGuid (&VolatileVariableStore->Signature, &gEfiVariableGuid);
   VolatileVariableStore->Size        = PcdGet32 (PcdVariableStoreSize);
@@ -2807,74 +2937,13 @@ VariableCommonInitialize (
   VolatileVariableStore->Reserved1   = 0;
 
   //
-  // Get non-volatile variable store.
+  // Init non-volatile variable store.
   //
-
-  TempVariableStoreHeader = (EFI_PHYSICAL_ADDRESS) PcdGet64 (PcdFlashNvStorageVariableBase64);
-  if (TempVariableStoreHeader == 0) {
-    TempVariableStoreHeader = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageVariableBase);
-  }
-
-  //
-  // Check if the Firmware Volume is not corrupted
-  //
-  if ((((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)(TempVariableStoreHeader))->Signature != EFI_FVH_SIGNATURE) ||
-      (!CompareGuid (&gEfiSystemNvDataFvGuid, &((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)(TempVariableStoreHeader))->FileSystemGuid))) {
-    Status = EFI_VOLUME_CORRUPTED;
-    DEBUG ((EFI_D_ERROR, "Firmware Volume for Variable Store is corrupted\n"));
-    goto Done;
-  }
-
-  VariableStoreBase       = TempVariableStoreHeader + \
-                              (((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)(TempVariableStoreHeader)) -> HeaderLength);
-  VariableStoreLength     = (UINT64) PcdGet32 (PcdFlashNvStorageVariableSize) - \
-                              (((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)(TempVariableStoreHeader)) -> HeaderLength);
-
-  mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase = VariableStoreBase;
-  VariableStoreHeader = (VARIABLE_STORE_HEADER *)(UINTN)VariableStoreBase;
-  if (GetVariableStoreStatus (VariableStoreHeader) != EfiValid) {
-    Status = EFI_VOLUME_CORRUPTED;
-    DEBUG((EFI_D_INFO, "Variable Store header is corrupted\n"));
-    goto Done;
-  }  
-  ASSERT(VariableStoreHeader->Size == VariableStoreLength);
-    
-  //
-  // The max variable or hardware error variable size should be < variable store size.
-  //
-  ASSERT(MAX (PcdGet32 (PcdMaxVariableSize), PcdGet32 (PcdMaxHardwareErrorVariableSize)) < VariableStoreLength);
-
-  //
-  // Parse non-volatile variable data and get last variable offset.
-  //
-  NextVariable  = GetStartPointer ((VARIABLE_STORE_HEADER *)(UINTN)VariableStoreBase);
-  while (IsValidVariableHeader (NextVariable)) {
-    VariableSize = NextVariable->NameSize + NextVariable->DataSize + sizeof (VARIABLE_HEADER);
-    if ((NextVariable->Attributes & (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) == (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
-      mVariableModuleGlobal->HwErrVariableTotalSize += HEADER_ALIGN (VariableSize);
-    } else {
-      mVariableModuleGlobal->CommonVariableTotalSize += HEADER_ALIGN (VariableSize);
-    }
-
-    NextVariable = GetNextVariablePtr (NextVariable);
-  }
-
-  mVariableModuleGlobal->NonVolatileLastVariableOffset = (UINTN) NextVariable - (UINTN) VariableStoreBase;
-    
-  //
-  // Allocate runtime memory used for a memory copy of the FLASH region.
-  // Keep the memory and the FLASH in sync as updates occur
-  //
-  mNvVariableCache = AllocateRuntimeZeroPool ((UINTN)VariableStoreLength);
-  if (mNvVariableCache == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto Done;
-  }
-  CopyMem (mNvVariableCache, (CHAR8 *)(UINTN)VariableStoreBase, (UINTN)VariableStoreLength);
-  Status = EFI_SUCCESS;
-
-Done:
+  Status = InitNonVolatileVariableStore ();
   if (EFI_ERROR (Status)) {
+    if (mVariableModuleGlobal->VariableGlobal.HobVariableBase != 0) {
+      FreePool ((VOID *) (UINTN) mVariableModuleGlobal->VariableGlobal.HobVariableBase);
+    }
     FreePool (mVariableModuleGlobal);
     FreePool (VolatileVariableStore);
   }

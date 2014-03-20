@@ -11,7 +11,6 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-Module Name:
 
 **/
 
@@ -174,7 +173,6 @@ GetVariableNamePtr (
   IN  VARIABLE_HEADER   *Variable
   )
 {
-
   return (CHAR16 *) (Variable + 1);
 }
 
@@ -182,14 +180,16 @@ GetVariableNamePtr (
 /**
   This code gets the pointer to the variable data.
 
-  @param   Variable  Pointer to the Variable Header.
+  @param   Variable         Pointer to the Variable Header.
+  @param   VariableHeader   Pointer to the Variable Header that has consecutive content.
 
   @return  A UINT8* pointer to Variable Data.
 
 **/
 UINT8 *
 GetVariableDataPtr (
-  IN  VARIABLE_HEADER   *Variable
+  IN  VARIABLE_HEADER   *Variable,
+  IN  VARIABLE_HEADER   *VariableHeader
   )
 {
   UINTN Value;
@@ -198,8 +198,8 @@ GetVariableDataPtr (
   // Be careful about pad size for alignment
   //
   Value =  (UINTN) GetVariableNamePtr (Variable);
-  Value += NameSizeOfVariable (Variable);
-  Value += GET_PAD_SIZE (NameSizeOfVariable (Variable));
+  Value += NameSizeOfVariable (VariableHeader);
+  Value += GET_PAD_SIZE (NameSizeOfVariable (VariableHeader));
 
   return (UINT8 *) Value;
 }
@@ -208,34 +208,48 @@ GetVariableDataPtr (
 /**
   This code gets the pointer to the next variable header.
 
-  @param  Variable  Pointer to the Variable Header.
+  @param  StoreInfo         Pointer to variable store info structure.
+  @param  Variable          Pointer to the Variable Header.
+  @param  VariableHeader    Pointer to the Variable Header that has consecutive content.
 
   @return  A VARIABLE_HEADER* pointer to next variable header.
 
 **/
 VARIABLE_HEADER *
 GetNextVariablePtr (
-  IN  VARIABLE_HEADER   *Variable
+  IN  VARIABLE_STORE_INFO   *StoreInfo,
+  IN  VARIABLE_HEADER       *Variable,
+  IN  VARIABLE_HEADER       *VariableHeader
   )
 {
-  UINTN Value;
+  EFI_PHYSICAL_ADDRESS  TargetAddress;
+  EFI_PHYSICAL_ADDRESS  SpareAddress;
+  UINTN                 Value;
 
-  if (!IsValidVariableHeader (Variable)) {
-    return NULL;
-  }
-
-  Value =  (UINTN) GetVariableDataPtr (Variable);
-  Value += DataSizeOfVariable (Variable);
-  Value += GET_PAD_SIZE (DataSizeOfVariable (Variable));
-
+  Value =  (UINTN) GetVariableDataPtr (Variable, VariableHeader);
+  Value += DataSizeOfVariable (VariableHeader);
+  Value += GET_PAD_SIZE (DataSizeOfVariable (VariableHeader));
   //
   // Be careful about pad size for alignment
   //
-  return (VARIABLE_HEADER *) HEADER_ALIGN (Value);
+  Value = HEADER_ALIGN (Value);
+
+  if (StoreInfo->FtwLastWriteData != NULL) {
+    TargetAddress = StoreInfo->FtwLastWriteData->TargetAddress;
+    SpareAddress = StoreInfo->FtwLastWriteData->SpareAddress;
+    if (((UINTN) Variable < (UINTN) TargetAddress) && (Value >= (UINTN) TargetAddress)) {
+      //
+      // Next variable is in spare block.
+      //
+      Value = (UINTN) SpareAddress + (Value - (UINTN) TargetAddress);
+    }
+  }
+
+  return (VARIABLE_HEADER *) Value;
 }
 
 /**
-  This code gets the pointer to the variable name.
+  Get variable store status.
 
   @param  VarStoreHeader  Pointer to the Variable Store Header.
 
@@ -249,7 +263,6 @@ GetVariableStoreStatus (
   IN VARIABLE_STORE_HEADER *VarStoreHeader
   )
 {
-	
   if (CompareGuid (&VarStoreHeader->Signature, &gEfiVariableGuid) &&
       VarStoreHeader->Format == VARIABLE_STORE_FORMATTED &&
       VarStoreHeader->State == VARIABLE_STORE_HEALTHY
@@ -273,11 +286,85 @@ GetVariableStoreStatus (
   }
 }
 
+/**
+  Compare two variable names, one of them may be inconsecutive.
+
+  @param StoreInfo      Pointer to variable store info structure.
+  @param Name1          Pointer to one variable name.
+  @param Name2          Pointer to another variable name.
+  @param NameSize       Variable name size.
+
+  @retval TRUE          Name1 and Name2 are identical.
+  @retval FALSE         Name1 and Name2 are not identical.
+
+**/
+BOOLEAN
+CompareVariableName (
+  IN VARIABLE_STORE_INFO    *StoreInfo,
+  IN CONST CHAR16           *Name1,
+  IN CONST CHAR16           *Name2,
+  IN UINTN                  NameSize
+  )
+{
+  EFI_PHYSICAL_ADDRESS  TargetAddress;
+  EFI_PHYSICAL_ADDRESS  SpareAddress;
+  UINTN                 PartialNameSize;
+
+  if (StoreInfo->FtwLastWriteData != NULL) {
+    TargetAddress = StoreInfo->FtwLastWriteData->TargetAddress;
+    SpareAddress = StoreInfo->FtwLastWriteData->SpareAddress;
+    if (((UINTN) Name1 < (UINTN) TargetAddress) && (((UINTN) Name1 + NameSize) > (UINTN) TargetAddress)) {
+      //
+      // Name1 is inconsecutive.
+      //
+      PartialNameSize = (UINTN) TargetAddress - (UINTN) Name1;
+      //
+      // Partial content is in NV storage.
+      //
+      if (CompareMem ((UINT8 *) Name1, (UINT8 *) Name2, PartialNameSize) == 0) {
+        //
+        // Another partial content is in spare block.
+        //
+        if (CompareMem ((UINT8 *) (UINTN) SpareAddress, (UINT8 *) Name2 + PartialNameSize, NameSize - PartialNameSize) == 0) {
+          return TRUE;
+        }
+      }
+      return FALSE;
+    } else if (((UINTN) Name2 < (UINTN) TargetAddress) && (((UINTN) Name2 + NameSize) > (UINTN) TargetAddress)) {
+      //
+      // Name2 is inconsecutive.
+      //
+      PartialNameSize = (UINTN) TargetAddress - (UINTN) Name2;
+      //
+      // Partial content is in NV storage.
+      //
+      if (CompareMem ((UINT8 *) Name2, (UINT8 *) Name1, PartialNameSize) == 0) {
+        //
+        // Another partial content is in spare block.
+        //
+        if (CompareMem ((UINT8 *) (UINTN) SpareAddress, (UINT8 *) Name1 + PartialNameSize, NameSize - PartialNameSize) == 0) {
+          return TRUE;
+        }
+      }
+      return FALSE;
+    }
+  }
+
+  //
+  // Both Name1 and Name2 are consecutive.
+  //
+  if (CompareMem ((UINT8 *) Name1, (UINT8 *) Name2, NameSize) == 0) {
+    return TRUE;
+  }
+  return FALSE;
+}
 
 /**
   This function compares a variable with variable entries in database.
 
+  @param  StoreInfo     Pointer to variable store info structure.
   @param  Variable      Pointer to the variable in our database
+  @param  VariableHeader Pointer to the Variable Header that has consecutive content.
   @param  VariableName  Name of the variable to compare to 'Variable'
   @param  VendorGuid    GUID of the variable to compare to 'Variable'
   @param  PtrTrack      Variable Track Pointer structure that contains Variable Information.
@@ -288,7 +375,9 @@ GetVariableStoreStatus (
 **/
 EFI_STATUS
 CompareWithValidVariable (
+  IN  VARIABLE_STORE_INFO           *StoreInfo,
   IN  VARIABLE_HEADER               *Variable,
+  IN  VARIABLE_HEADER               *VariableHeader,
   IN  CONST CHAR16                  *VariableName,
   IN  CONST EFI_GUID                *VendorGuid,
   OUT VARIABLE_POINTER_TRACK        *PtrTrack
@@ -305,14 +394,14 @@ CompareWithValidVariable (
     // Instead we compare the GUID a UINT32 at a time and branch
     // on the first failed comparison.
     //
-    if ((((INT32 *) VendorGuid)[0] == ((INT32 *) &Variable->VendorGuid)[0]) &&
-        (((INT32 *) VendorGuid)[1] == ((INT32 *) &Variable->VendorGuid)[1]) &&
-        (((INT32 *) VendorGuid)[2] == ((INT32 *) &Variable->VendorGuid)[2]) &&
-        (((INT32 *) VendorGuid)[3] == ((INT32 *) &Variable->VendorGuid)[3])
+    if ((((INT32 *) VendorGuid)[0] == ((INT32 *) &VariableHeader->VendorGuid)[0]) &&
+        (((INT32 *) VendorGuid)[1] == ((INT32 *) &VariableHeader->VendorGuid)[1]) &&
+        (((INT32 *) VendorGuid)[2] == ((INT32 *) &VariableHeader->VendorGuid)[2]) &&
+        (((INT32 *) VendorGuid)[3] == ((INT32 *) &VariableHeader->VendorGuid)[3])
         ) {
-      ASSERT (NameSizeOfVariable (Variable) != 0);
+      ASSERT (NameSizeOfVariable (VariableHeader) != 0);
       Point = (VOID *) GetVariableNamePtr (Variable);
-      if (CompareMem (VariableName, Point, NameSizeOfVariable (Variable)) == 0) {
+      if (CompareVariableName (StoreInfo, VariableName, Point, NameSizeOfVariable (VariableHeader))) {
         PtrTrack->CurrPtr = Variable;
         return EFI_SUCCESS;
       }
@@ -323,26 +412,29 @@ CompareWithValidVariable (
 }
 
 /**
-  Return the variable store header and the index table based on the Index.
+  Return the variable store header and the store info based on the Index.
 
   @param Type       The type of the variable store.
-  @param IndexTable Return the index table.
+  @param StoreInfo  Return the store info.
 
   @return  Pointer to the variable store header.
 **/
 VARIABLE_STORE_HEADER *
 GetVariableStore (
   IN VARIABLE_STORE_TYPE         Type,
-  OUT VARIABLE_INDEX_TABLE       **IndexTable  OPTIONAL
+  OUT VARIABLE_STORE_INFO        *StoreInfo
   )
 {
-  EFI_HOB_GUID_TYPE           *GuidHob;
-  EFI_FIRMWARE_VOLUME_HEADER  *FvHeader;
-  VARIABLE_STORE_HEADER       *VariableStoreHeader;
+  EFI_HOB_GUID_TYPE                     *GuidHob;
+  EFI_FIRMWARE_VOLUME_HEADER            *FvHeader;
+  VARIABLE_STORE_HEADER                 *VariableStoreHeader;
+  EFI_PHYSICAL_ADDRESS                  NvStorageBase;
+  UINT32                                NvStorageSize;
+  FAULT_TOLERANT_WRITE_LAST_WRITE_DATA  *FtwLastWriteData;
+  UINT32                                BackUpOffset;
 
-  if (IndexTable != NULL) {
-    *IndexTable       = NULL;
-  }
+  StoreInfo->IndexTable = NULL;
+  StoreInfo->FtwLastWriteData = NULL;
   VariableStoreHeader = NULL;
   switch (Type) {
     case VariableStoreTypeHob:
@@ -357,10 +449,42 @@ GetVariableStore (
         //
         // The content of NV storage for variable is not reliable in recovery boot mode.
         //
-        FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) (PcdGet64 (PcdFlashNvStorageVariableBase64) != 0 ? 
-                                                           PcdGet64 (PcdFlashNvStorageVariableBase64) : 
-                                                           PcdGet32 (PcdFlashNvStorageVariableBase)
-                                                          );
+
+        NvStorageSize = PcdGet32 (PcdFlashNvStorageVariableSize);
+        NvStorageBase = (EFI_PHYSICAL_ADDRESS) (PcdGet64 (PcdFlashNvStorageVariableBase64) != 0 ? 
+                                                PcdGet64 (PcdFlashNvStorageVariableBase64) : 
+                                                PcdGet32 (PcdFlashNvStorageVariableBase)
+                                               );
+        //
+        // First let FvHeader point to NV storage base.
+        //
+        FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) NvStorageBase;
+
+        //
+        // Check the FTW last write data hob.
+        //
+        BackUpOffset = 0;
+        GuidHob = GetFirstGuidHob (&gEdkiiFaultTolerantWriteGuid);
+        if (GuidHob != NULL) {
+          FtwLastWriteData = (FAULT_TOLERANT_WRITE_LAST_WRITE_DATA *) GET_GUID_HOB_DATA (GuidHob);
+          if (FtwLastWriteData->TargetAddress == NvStorageBase) {
+            //
+            // Let FvHeader point to spare block.
+            //
+            FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) FtwLastWriteData->SpareAddress;
+            DEBUG ((EFI_D_INFO, "PeiVariable: NV storage is backed up in spare block: 0x%x\n", (UINTN) FtwLastWriteData->SpareAddress));
+          } else if ((FtwLastWriteData->TargetAddress > NvStorageBase) && (FtwLastWriteData->TargetAddress < (NvStorageBase + NvStorageSize))) {
+            StoreInfo->FtwLastWriteData = FtwLastWriteData;
+            //
+            // Flash NV storage from the offset is backed up in spare block.
+            //
+            BackUpOffset = (UINT32) (FtwLastWriteData->TargetAddress - NvStorageBase);
+            DEBUG ((EFI_D_INFO, "PeiVariable: High partial NV storage from offset: %x is backed up in spare block: 0x%x\n", BackUpOffset, (UINTN) FtwLastWriteData->SpareAddress));
+            //
+            // At least one block data in flash NV storage is still valid, so still leave FvHeader point to NV storage base.
+            //
+          }
+        }
 
         //
         // Check if the Firmware Volume is not corrupted
@@ -372,23 +496,21 @@ GetVariableStore (
 
         VariableStoreHeader = (VARIABLE_STORE_HEADER *) ((UINT8 *) FvHeader + FvHeader->HeaderLength);
 
-        if (IndexTable != NULL) {
-          GuidHob = GetFirstGuidHob (&gEfiVariableIndexTableGuid);
-          if (GuidHob != NULL) {
-            *IndexTable = GET_GUID_HOB_DATA (GuidHob);
-          } else {
-            //
-            // If it's the first time to access variable region in flash, create a guid hob to record
-            // VAR_ADDED type variable info.
-            // Note that as the resource of PEI phase is limited, only store the limited number of 
-            // VAR_ADDED type variables to reduce access time.
-            //
-            *IndexTable = BuildGuidHob (&gEfiVariableIndexTableGuid, sizeof (VARIABLE_INDEX_TABLE));
-            (*IndexTable)->Length      = 0;
-            (*IndexTable)->StartPtr    = GetStartPointer (VariableStoreHeader);
-            (*IndexTable)->EndPtr      = GetEndPointer   (VariableStoreHeader);
-            (*IndexTable)->GoneThrough = 0;
-          }
+        GuidHob = GetFirstGuidHob (&gEfiVariableIndexTableGuid);
+        if (GuidHob != NULL) {
+          StoreInfo->IndexTable = GET_GUID_HOB_DATA (GuidHob);
+        } else {
+          //
+          // If it's the first time to access variable region in flash, create a guid hob to record
+          // VAR_ADDED type variable info.
+          // Note that as the resource of PEI phase is limited, only store the limited number of 
+          // VAR_ADDED type variables to reduce access time.
+          //
+          StoreInfo->IndexTable = (VARIABLE_INDEX_TABLE *) BuildGuidHob (&gEfiVariableIndexTableGuid, sizeof (VARIABLE_INDEX_TABLE));
+          StoreInfo->IndexTable->Length      = 0;
+          StoreInfo->IndexTable->StartPtr    = GetStartPointer (VariableStoreHeader);
+          StoreInfo->IndexTable->EndPtr      = GetEndPointer   (VariableStoreHeader);
+          StoreInfo->IndexTable->GoneThrough = 0;
         }
       }
       break;
@@ -398,14 +520,118 @@ GetVariableStore (
       break;
   }
 
+  StoreInfo->VariableStoreHeader = VariableStoreHeader;
   return VariableStoreHeader;
+}
+
+/**
+  Get variable header that has consecutive content.
+
+  @param StoreInfo      Pointer to variable store info structure.
+  @param Variable       Pointer to the Variable Header.
+  @param VariableHeader Pointer to Pointer to the Variable Header that has consecutive content.
+
+  @retval TRUE          Variable header is valid.
+  @retval FALSE         Variable header is not valid.
+
+**/
+BOOLEAN
+GetVariableHeader (
+  IN VARIABLE_STORE_INFO    *StoreInfo,
+  IN VARIABLE_HEADER        *Variable,
+  OUT VARIABLE_HEADER       **VariableHeader
+  )
+{
+  EFI_PHYSICAL_ADDRESS  TargetAddress;
+  EFI_PHYSICAL_ADDRESS  SpareAddress;
+  EFI_HOB_GUID_TYPE     *GuidHob;
+  UINTN                 PartialHeaderSize;
+
+   //
+   // First assume variable header pointed by Variable is consecutive.
+   //
+  *VariableHeader = Variable;
+
+  if ((Variable != NULL) && (StoreInfo->FtwLastWriteData != NULL)) {
+    TargetAddress = StoreInfo->FtwLastWriteData->TargetAddress;
+    SpareAddress = StoreInfo->FtwLastWriteData->SpareAddress;
+    if (((UINTN) Variable < (UINTN) TargetAddress) && (((UINTN) Variable + sizeof (VARIABLE_HEADER)) > (UINTN) TargetAddress)) {
+      //
+      // Variable header pointed by Variable is inconsecutive,
+      // create a guid hob to combine the two partial variable header content together.
+      //
+      GuidHob = GetFirstGuidHob (&gEfiCallerIdGuid);
+      if (GuidHob != NULL) {
+        *VariableHeader = (VARIABLE_HEADER *) GET_GUID_HOB_DATA (GuidHob);
+      } else {
+        *VariableHeader = (VARIABLE_HEADER *) BuildGuidHob (&gEfiCallerIdGuid, sizeof (VARIABLE_HEADER));
+        PartialHeaderSize = (UINTN) TargetAddress - (UINTN) Variable;
+        //
+        // Partial content is in NV storage.
+        //
+        CopyMem ((UINT8 *) *VariableHeader, (UINT8 *) Variable, PartialHeaderSize);
+        //
+        // Another partial content is in spare block.
+        //
+        CopyMem ((UINT8 *) *VariableHeader + PartialHeaderSize, (UINT8 *) (UINTN) SpareAddress, sizeof (VARIABLE_HEADER) - PartialHeaderSize);
+      }
+    }
+  }
+
+  return IsValidVariableHeader (*VariableHeader);
+}
+
+/**
+  Get variable name or data to output buffer.
+
+  @param  StoreInfo     Pointer to variable store info structure.
+  @param  NameOrData    Pointer to the variable name/data that may be inconsecutive.
+  @param  Size          Variable name/data size.
+  @param  Buffer        Pointer to output buffer to hold the variable name/data.
+
+**/
+VOID
+GetVariableNameOrData (
+  IN VARIABLE_STORE_INFO    *StoreInfo,
+  IN UINT8                  *NameOrData,
+  IN UINTN                  Size,
+  OUT UINT8                 *Buffer
+  )
+{
+  EFI_PHYSICAL_ADDRESS  TargetAddress;
+  EFI_PHYSICAL_ADDRESS  SpareAddress;
+  UINTN                 PartialSize;
+ 
+  if (StoreInfo->FtwLastWriteData != NULL) {
+    TargetAddress = StoreInfo->FtwLastWriteData->TargetAddress;
+    SpareAddress = StoreInfo->FtwLastWriteData->SpareAddress;
+    if (((UINTN) NameOrData < (UINTN) TargetAddress) && (((UINTN) NameOrData + Size) > (UINTN) TargetAddress)) {
+      //
+      // Variable name/data is inconsecutive.
+      //
+      PartialSize = (UINTN) TargetAddress - (UINTN) NameOrData;
+      //
+      // Partial content is in NV storage.
+      //
+      CopyMem (Buffer, NameOrData, PartialSize);
+      //
+      // Another partial content is in spare block.
+      //
+      CopyMem (Buffer + PartialSize, (UINT8 *) (UINTN) SpareAddress, Size - PartialSize);
+      return;
+    }
+  }
+
+  //
+  // Variable name/data is consecutive.
+  //
+  CopyMem (Buffer, NameOrData, Size);
 }
 
 /**
   Find the variable in the specified variable store.
 
-  @param  VariableStoreHeader Pointer to the variable store header.
-  @param  IndexTable          Pointer to the index table.
+  @param  StoreInfo           Pointer to the store info structure.
   @param  VariableName        Name of the variable to be found
   @param  VendorGuid          Vendor GUID to be found.
   @param  PtrTrack            Variable Track Pointer structure that contains Variable Information.
@@ -417,8 +643,7 @@ GetVariableStore (
 **/
 EFI_STATUS
 FindVariableEx (
-  IN VARIABLE_STORE_HEADER       *VariableStoreHeader,
-  IN VARIABLE_INDEX_TABLE        *IndexTable,
+  IN VARIABLE_STORE_INFO         *StoreInfo,
   IN CONST CHAR16                *VariableName,
   IN CONST EFI_GUID              *VendorGuid,
   OUT VARIABLE_POINTER_TRACK     *PtrTrack
@@ -431,6 +656,11 @@ FindVariableEx (
   UINTN                   Offset;
   BOOLEAN                 StopRecord;
   VARIABLE_HEADER         *InDeletedVariable;
+  VARIABLE_STORE_HEADER   *VariableStoreHeader;
+  VARIABLE_INDEX_TABLE    *IndexTable;
+  VARIABLE_HEADER         *VariableHeader;
+
+  VariableStoreHeader = StoreInfo->VariableStoreHeader;
 
   if (VariableStoreHeader == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -444,6 +674,7 @@ FindVariableEx (
     return EFI_NOT_FOUND;
   }
 
+  IndexTable = StoreInfo->IndexTable;
   PtrTrack->StartPtr = GetStartPointer (VariableStoreHeader);
   PtrTrack->EndPtr   = GetEndPointer   (VariableStoreHeader);
 
@@ -453,6 +684,7 @@ FindVariableEx (
   // No Variable Address equals zero, so 0 as initial value is safe.
   //
   MaxIndex   = NULL;
+  VariableHeader = NULL;
 
   if (IndexTable != NULL) {
     //
@@ -463,8 +695,9 @@ FindVariableEx (
       ASSERT (Index < sizeof (IndexTable->Index) / sizeof (IndexTable->Index[0]));
       Offset   += IndexTable->Index[Index];
       MaxIndex  = (VARIABLE_HEADER *) ((UINT8 *) IndexTable->StartPtr + Offset);
-      if (CompareWithValidVariable (MaxIndex, VariableName, VendorGuid, PtrTrack) == EFI_SUCCESS) {
-        if (PtrTrack->CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
+      GetVariableHeader (StoreInfo, MaxIndex, &VariableHeader);
+      if (CompareWithValidVariable (StoreInfo, MaxIndex, VariableHeader, VariableName, VendorGuid, PtrTrack) == EFI_SUCCESS) {
+        if (VariableHeader->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
           InDeletedVariable = PtrTrack->CurrPtr;
         } else {
           return EFI_SUCCESS;
@@ -486,7 +719,7 @@ FindVariableEx (
     // HOB exists but the variable cannot be found in HOB
     // If not found in HOB, then let's start from the MaxIndex we've found.
     //
-    Variable     = GetNextVariablePtr (MaxIndex);
+    Variable     = GetNextVariablePtr (StoreInfo, MaxIndex, VariableHeader);
     LastVariable = MaxIndex;
   } else {
     //
@@ -501,8 +734,8 @@ FindVariableEx (
   // Find the variable by walk through variable store
   //
   StopRecord = FALSE;
-  while ((Variable < PtrTrack->EndPtr) && IsValidVariableHeader (Variable)) {
-    if (Variable->State == VAR_ADDED || Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
+  while (GetVariableHeader (StoreInfo, Variable, &VariableHeader)) {
+    if (VariableHeader->State == VAR_ADDED || VariableHeader->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
       //
       // Record Variable in VariableIndex HOB
       //
@@ -520,8 +753,8 @@ FindVariableEx (
         }
       }
 
-      if (CompareWithValidVariable (Variable, VariableName, VendorGuid, PtrTrack) == EFI_SUCCESS) {
-        if (PtrTrack->CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
+      if (CompareWithValidVariable (StoreInfo, Variable, VariableHeader, VariableName, VendorGuid, PtrTrack) == EFI_SUCCESS) {
+        if (VariableHeader->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
           InDeletedVariable = PtrTrack->CurrPtr;
         } else {
           return EFI_SUCCESS;
@@ -529,7 +762,7 @@ FindVariableEx (
       }
     }
 
-    Variable = GetNextVariablePtr (Variable);
+    Variable = GetNextVariablePtr (StoreInfo, Variable, VariableHeader);
   }
   //
   // If gone through the VariableStore, that means we never find in Firmware any more.
@@ -549,6 +782,7 @@ FindVariableEx (
   @param  VariableName  Name of the variable to be found
   @param  VendorGuid    Vendor GUID to be found.
   @param  PtrTrack      Variable Track Pointer structure that contains Variable Information.
+  @param  StoreInfo     Return the store info.
 
   @retval  EFI_SUCCESS            Variable found successfully
   @retval  EFI_NOT_FOUND          Variable not found
@@ -558,12 +792,11 @@ EFI_STATUS
 FindVariable (
   IN CONST  CHAR16            *VariableName,
   IN CONST  EFI_GUID          *VendorGuid,
-  OUT VARIABLE_POINTER_TRACK  *PtrTrack
+  OUT VARIABLE_POINTER_TRACK  *PtrTrack,
+  OUT VARIABLE_STORE_INFO     *StoreInfo
   )
 {
   EFI_STATUS                  Status;
-  VARIABLE_STORE_HEADER       *VariableStoreHeader;
-  VARIABLE_INDEX_TABLE        *IndexTable;
   VARIABLE_STORE_TYPE         Type;
 
   if (VariableName[0] != 0 && VendorGuid == NULL) {
@@ -571,10 +804,9 @@ FindVariable (
   }
 
   for (Type = (VARIABLE_STORE_TYPE) 0; Type < VariableStoreTypeMax; Type++) {
-    VariableStoreHeader = GetVariableStore (Type, &IndexTable);
+    GetVariableStore (Type, StoreInfo);
     Status = FindVariableEx (
-               VariableStoreHeader,
-               IndexTable,
+               StoreInfo,
                VariableName,
                VendorGuid, 
                PtrTrack
@@ -627,6 +859,8 @@ PeiGetVariable (
   VARIABLE_POINTER_TRACK  Variable;
   UINTN                   VarDataSize;
   EFI_STATUS              Status;
+  VARIABLE_STORE_INFO     StoreInfo;
+  VARIABLE_HEADER         *VariableHeader;
 
   if (VariableName == NULL || VariableGuid == NULL || DataSize == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -635,23 +869,25 @@ PeiGetVariable (
   //
   // Find existing variable
   //
-  Status = FindVariable (VariableName, VariableGuid, &Variable);
+  Status = FindVariable (VariableName, VariableGuid, &Variable, &StoreInfo);
   if (EFI_ERROR (Status)) {
     return Status;
   }
+  GetVariableHeader (&StoreInfo, Variable.CurrPtr, &VariableHeader);
+
   //
   // Get data size
   //
-  VarDataSize = DataSizeOfVariable (Variable.CurrPtr);
+  VarDataSize = DataSizeOfVariable (VariableHeader);
   if (*DataSize >= VarDataSize) {
     if (Data == NULL) {
       return EFI_INVALID_PARAMETER;
     }
 
-    CopyMem (Data, GetVariableDataPtr (Variable.CurrPtr), VarDataSize);
+    GetVariableNameOrData (&StoreInfo, GetVariableDataPtr (Variable.CurrPtr, VariableHeader), VarDataSize, Data);
 
     if (Attributes != NULL) {
-      *Attributes = Variable.CurrPtr->Attributes;
+      *Attributes = VariableHeader->Attributes;
     }
 
     *DataSize = VarDataSize;
@@ -704,16 +940,19 @@ PeiGetNextVariableName (
   VARIABLE_POINTER_TRACK  Variable;
   VARIABLE_POINTER_TRACK  VariableInHob;
   VARIABLE_POINTER_TRACK  VariablePtrTrack;
-  VARIABLE_INDEX_TABLE    *IndexTable;
   UINTN                   VarNameSize;
   EFI_STATUS              Status;
   VARIABLE_STORE_HEADER   *VariableStoreHeader[VariableStoreTypeMax];
+  VARIABLE_HEADER         *VariableHeader;
+  VARIABLE_STORE_INFO     StoreInfo;
+  VARIABLE_STORE_INFO     StoreInfoForNv;
+  VARIABLE_STORE_INFO     StoreInfoForHob;
 
   if (VariableName == NULL || VariableGuid == NULL || VariableNameSize == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = FindVariable (VariableName, VariableGuid, &Variable);
+  Status = FindVariable (VariableName, VariableGuid, &Variable, &StoreInfo);
   if (Variable.CurrPtr == NULL || Status != EFI_SUCCESS) {
     return Status;
   }
@@ -722,20 +961,18 @@ PeiGetNextVariableName (
     //
     // If variable name is not NULL, get next variable
     //
-    Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr);
+    GetVariableHeader (&StoreInfo, Variable.CurrPtr, &VariableHeader);
+    Variable.CurrPtr = GetNextVariablePtr (&StoreInfo, Variable.CurrPtr, VariableHeader);
   }
 
-  VariableStoreHeader[VariableStoreTypeHob] = GetVariableStore (VariableStoreTypeHob, NULL);
-  VariableStoreHeader[VariableStoreTypeNv]  = GetVariableStore (VariableStoreTypeNv, NULL);
+  VariableStoreHeader[VariableStoreTypeHob] = GetVariableStore (VariableStoreTypeHob, &StoreInfoForHob);
+  VariableStoreHeader[VariableStoreTypeNv]  = GetVariableStore (VariableStoreTypeNv, &StoreInfoForNv);
 
   while (TRUE) {
     //
     // Switch from HOB to Non-Volatile.
     //
-    while ((Variable.CurrPtr >= Variable.EndPtr) ||
-           (Variable.CurrPtr == NULL)            ||
-           !IsValidVariableHeader (Variable.CurrPtr)
-          ) {
+    while (!GetVariableHeader (&StoreInfo, Variable.CurrPtr, &VariableHeader)) {
       //
       // Find current storage index
       //
@@ -764,31 +1001,24 @@ PeiGetNextVariableName (
       Variable.StartPtr = GetStartPointer (VariableStoreHeader[Type]);
       Variable.EndPtr   = GetEndPointer   (VariableStoreHeader[Type]);
       Variable.CurrPtr  = Variable.StartPtr;
+      GetVariableStore (Type, &StoreInfo);
     }
 
-    if (Variable.CurrPtr->State == VAR_ADDED || Variable.CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
-      if (Variable.CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
+    if (VariableHeader->State == VAR_ADDED || VariableHeader->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
+      if (VariableHeader->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
         //
         // If it is a IN_DELETED_TRANSITION variable,
         // and there is also a same ADDED one at the same time,
         // don't return it.
         //
-        for (Type = (VARIABLE_STORE_TYPE) 0; Type < VariableStoreTypeMax; Type++) {
-          if ((VariableStoreHeader[Type] != NULL) && (Variable.StartPtr == GetStartPointer (VariableStoreHeader[Type]))) {
-            break;
-          }
-        }
-        ASSERT (Type < VariableStoreTypeMax);
-        GetVariableStore (Type, &IndexTable);
         Status = FindVariableEx (
-                   VariableStoreHeader[Type],
-                   IndexTable,
+                   &StoreInfo,
                    GetVariableNamePtr (Variable.CurrPtr),
-                   &Variable.CurrPtr->VendorGuid,
+                   &VariableHeader->VendorGuid,
                    &VariablePtrTrack
                    );
-        if (!EFI_ERROR (Status) && VariablePtrTrack.CurrPtr->State == VAR_ADDED) {
-          Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr);
+        if (!EFI_ERROR (Status) && VariablePtrTrack.CurrPtr != Variable.CurrPtr) {
+          Variable.CurrPtr = GetNextVariablePtr (&StoreInfo, Variable.CurrPtr, VariableHeader);
           continue;
         }
       }
@@ -800,25 +1030,24 @@ PeiGetNextVariableName (
           (Variable.StartPtr == GetStartPointer (VariableStoreHeader[VariableStoreTypeNv]))
          ) {
         Status = FindVariableEx (
-                   VariableStoreHeader[VariableStoreTypeHob],
-                   NULL,
+                   &StoreInfoForHob,
                    GetVariableNamePtr (Variable.CurrPtr),
-                   &Variable.CurrPtr->VendorGuid, 
+                   &VariableHeader->VendorGuid, 
                    &VariableInHob
                    );
         if (!EFI_ERROR (Status)) {
-          Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr);
+          Variable.CurrPtr = GetNextVariablePtr (&StoreInfo, Variable.CurrPtr, VariableHeader);
           continue;
         }
       }
 
-      VarNameSize = NameSizeOfVariable (Variable.CurrPtr);
+      VarNameSize = NameSizeOfVariable (VariableHeader);
       ASSERT (VarNameSize != 0);
 
       if (VarNameSize <= *VariableNameSize) {
-        CopyMem (VariableName, GetVariableNamePtr (Variable.CurrPtr), VarNameSize);
+        GetVariableNameOrData (&StoreInfo, (UINT8 *) GetVariableNamePtr (Variable.CurrPtr), VarNameSize, (UINT8 *) VariableName);
 
-        CopyMem (VariableGuid, &Variable.CurrPtr->VendorGuid, sizeof (EFI_GUID));
+        CopyMem (VariableGuid, &VariableHeader->VendorGuid, sizeof (EFI_GUID));
 
         Status = EFI_SUCCESS;
       } else {
@@ -831,7 +1060,7 @@ PeiGetNextVariableName (
       //
       return Status;
     } else {
-      Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr);
+      Variable.CurrPtr = GetNextVariablePtr (&StoreInfo, Variable.CurrPtr, VariableHeader);
     }
   }
 }

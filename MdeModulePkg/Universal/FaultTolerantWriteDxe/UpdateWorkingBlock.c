@@ -2,7 +2,7 @@
 
    Internal functions to operate Working Block Space.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -32,9 +32,9 @@ InitializeLocalWorkSpaceHeader (
   EFI_STATUS                              Status;
 
   //
-  // Check signature with gEfiSystemNvDataFvGuid.
+  // Check signature with gEdkiiWorkingBlockSignatureGuid.
   //
-  if (CompareGuid (&gEfiSystemNvDataFvGuid, &mWorkingBlockHeader.Signature)) {
+  if (CompareGuid (&gEdkiiWorkingBlockSignatureGuid, &mWorkingBlockHeader.Signature)) {
     //
     // The local work space header has been initialized.
     //
@@ -48,11 +48,11 @@ InitializeLocalWorkSpaceHeader (
     );
 
   //
-  // Here using gEfiSystemNvDataFvGuid as the signature.
+  // Here using gEdkiiWorkingBlockSignatureGuid as the signature.
   //
   CopyMem (
     &mWorkingBlockHeader.Signature,
-    &gEfiSystemNvDataFvGuid,
+    &gEdkiiWorkingBlockSignatureGuid,
     sizeof (EFI_GUID)
     );
   mWorkingBlockHeader.WriteQueueSize = (UINT64) (PcdGet32 (PcdFlashNvStorageFtwWorkingSize) - sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER));
@@ -322,7 +322,7 @@ FtwReclaimWorkSpace (
       CopyMem (
         Ptr + sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER),
         FtwDevice->FtwLastWriteHeader,
-        WRITE_TOTAL_SIZE (Header->NumberOfWrites, Header->PrivateDataSize)
+        FTW_WRITE_TOTAL_SIZE (Header->NumberOfWrites, Header->PrivateDataSize)
         );
     }
   }

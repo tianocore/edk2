@@ -3,7 +3,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by PeiVariable module.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -31,12 +31,24 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/VariableFormat.h>
 #include <Guid/VariableIndexTable.h>
 #include <Guid/SystemNvDataGuid.h>
+#include <Guid/FaultTolerantWrite.h>
 
 typedef enum {
   VariableStoreTypeHob,
   VariableStoreTypeNv,
   VariableStoreTypeMax
 } VARIABLE_STORE_TYPE;
+
+typedef struct {
+  VARIABLE_STORE_HEADER                   *VariableStoreHeader;
+  VARIABLE_INDEX_TABLE                    *IndexTable;
+  //
+  // If it is not NULL, it means there may be an inconsecutive variable whose
+  // partial content is still in NV storage, but another partial content is backed up
+  // in spare block.
+  //
+  FAULT_TOLERANT_WRITE_LAST_WRITE_DATA    *FtwLastWriteData;
+} VARIABLE_STORE_INFO;
 
 //
 // Functions
