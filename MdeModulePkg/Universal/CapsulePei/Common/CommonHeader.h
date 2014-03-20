@@ -1,7 +1,7 @@
 /** @file
   Common header file.
 
-Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -19,12 +19,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // This capsule PEIM puts its private data at the start of the
 // coalesced capsule. Here's the structure definition.
 //
-#define EFI_CAPSULE_PEIM_PRIVATE_DATA_SIGNATURE SIGNATURE_32 ('C', 'a', 'p', 'D')
+#define EFI_CAPSULE_PEIM_PRIVATE_DATA_SIGNATURE SIGNATURE_32 ('C', 'a', 'p', 'P')
 
+#pragma pack(1)
 typedef struct {
-  UINT32  Signature;
-  UINTN   CapsuleSize;
+  UINT64  Signature;
+  UINT64  CapsuleAllImageSize;
+  UINT64  CapsuleNumber;
+  UINT64  CapsuleOffset[1];
 } EFI_CAPSULE_PEIM_PRIVATE_DATA;
+#pragma pack()
 
 #define CAPSULE_TEST_SIGNATURE SIGNATURE_32('T', 'E', 'S', 'T')
 
