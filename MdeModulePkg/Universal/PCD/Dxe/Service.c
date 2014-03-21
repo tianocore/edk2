@@ -1,7 +1,7 @@
 /** @file
     Help functions used by PCD DXE driver.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -457,25 +457,33 @@ GetWorker (
         // string array in string table.
         //
         StringTableIdx = *(STRING_HEAD*)((UINT8 *) PcdDb + VariableHead->DefaultValueOffset);   
-        VaraiableDefaultBuffer = (VOID *) (StringTable + StringTableIdx);     
+        VaraiableDefaultBuffer = (UINT8 *) (StringTable + StringTableIdx);     
       } else {
         VaraiableDefaultBuffer = (UINT8 *) PcdDb + VariableHead->DefaultValueOffset;
       }
       Status = GetHiiVariable (Guid, Name, &Data, &DataSize);
       if (Status == EFI_SUCCESS) {
-        if (GetSize == 0) {
+        if (DataSize >= (VariableHead->Offset + GetSize)) {
+          if (GetSize == 0) {
+            //
+            // It is a pointer type. So get the MaxSize reserved for
+            // this PCD entry.
+            //
+            GetPtrTypeSize (TmpTokenNumber, &GetSize);
+            if (GetSize > (DataSize - VariableHead->Offset)) {
+              //
+              // Use actual valid size.
+              //
+              GetSize = DataSize - VariableHead->Offset;
+            }
+          }
           //
-          // It is a pointer type. So get the MaxSize reserved for
-          // this PCD entry.
+          // If the operation is successful, we copy the data
+          // to the default value buffer in the PCD Database.
+          // So that we can free the Data allocated in GetHiiVariable.
           //
-          GetPtrTypeSize (TmpTokenNumber, &GetSize);
+          CopyMem (VaraiableDefaultBuffer, Data + VariableHead->Offset, GetSize);
         }
-        //
-        // If the operation is successful, we copy the data
-        // to the default value buffer in the PCD Database.
-        // So that we can free the Data allocated in GetHiiVariable.
-        //
-        CopyMem (VaraiableDefaultBuffer, Data + VariableHead->Offset, GetSize);
         FreePool (Data);
       }
       RetPtr = (VOID *) VaraiableDefaultBuffer;
