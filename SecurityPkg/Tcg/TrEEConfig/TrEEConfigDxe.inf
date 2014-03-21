@@ -62,6 +62,7 @@
 [Protocols]
   gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
   gEfiHiiConfigRoutingProtocolGuid              ## CONSUMES
+  gEdkiiVariableLockProtocolGuid                ## CONSUMES
 
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid

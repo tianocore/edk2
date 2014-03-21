@@ -20,8 +20,9 @@ formset
   help      = STRING_TOKEN(STR_TREE_HELP),
   classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
 
-  varstore TREE_CONFIGURATION,
+  efivarstore TREE_CONFIGURATION,
     varid = TREE_CONFIGURATION_VARSTORE_ID,
+    attribute = 0x03,  // EFI variable attribures  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE
     name  = TREE_CONFIGURATION,
     guid  = TREE_CONFIG_FORM_SET_GUID;
 
@@ -40,7 +41,6 @@ formset
           prompt = STRING_TOKEN(STR_TREE_DEVICE_PROMPT),
           help   = STRING_TOKEN(STR_TREE_DEVICE_HELP),
           flags  = INTERACTIVE,
-            option text = STRING_TOKEN(STR_TREE_TPM_DISABLE),      value = TPM_DEVICE_NULL,         flags = RESET_REQUIRED;
             option text = STRING_TOKEN(STR_TREE_TPM_1_2),          value = TPM_DEVICE_1_2,          flags = DEFAULT | MANUFACTURING | RESET_REQUIRED;
             option text = STRING_TOKEN(STR_TREE_TPM_2_0_DTPM),     value = TPM_DEVICE_2_0_DTPM,     flags = RESET_REQUIRED;
     endoneof;
@@ -52,10 +52,11 @@ formset
     subtitle text = STRING_TOKEN(STR_NULL);
     subtitle text = STRING_TOKEN(STR_TREE_PP_OPERATION);
 
-    oneof varid  = TREE_CONFIGURATION.Tpm2Operation,
+    oneof name = Tpm2Operation,
+          questionid = KEY_TPM2_OPERATION,
           prompt = STRING_TOKEN(STR_TREE_OPERATION),
           help   = STRING_TOKEN(STR_TREE_OPERATION_HELP),
-          flags  = INTERACTIVE,
+          flags  = INTERACTIVE | NUMERIC_SIZE_1,
             option text = STRING_TOKEN(STR_TREE_NO_ACTION), value = TREE_PHYSICAL_PRESENCE_NO_ACTION, flags = DEFAULT | MANUFACTURING | RESET_REQUIRED;
             option text = STRING_TOKEN(STR_TREE_CLEAR), value = TREE_PHYSICAL_PRESENCE_CLEAR_CONTROL_CLEAR, flags = RESET_REQUIRED;
     endoneof;

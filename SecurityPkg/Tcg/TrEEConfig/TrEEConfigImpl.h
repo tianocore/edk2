@@ -21,6 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/HiiConfigAccess.h>
 #include <Protocol/HiiConfigRouting.h>
 #include <Protocol/TrEEProtocol.h>
+#include <Protocol/VariableLock.h>
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -60,6 +61,7 @@ typedef struct {
   EFI_HII_HANDLE                    HiiHandle;
   EFI_HANDLE                        DriverHandle;  
 
+  UINT8                             TpmDeviceDetected;
 } TREE_CONFIG_PRIVATE_DATA;
 
 extern TREE_CONFIG_PRIVATE_DATA      mTrEEConfigPrivateDateTemplate;
