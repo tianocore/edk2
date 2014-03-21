@@ -135,41 +135,30 @@ GetWorker (
       Name = (UINT16*)(StringTable + VariableHead->StringIndex);
       
       if ((LocalTokenNumber & PCD_TYPE_ALL_SET) == (PCD_TYPE_HII|PCD_TYPE_STRING)) {
-	    //
-		// If a HII type PCD's datum type is VOID*, the DefaultValueOffset is the index of 
-		// string array in string table.
-		//
+        //
+        // If a HII type PCD's datum type is VOID*, the DefaultValueOffset is the index of 
+        // string array in string table.
+        //
         StringTableIdx = *(UINT16*)((UINT8 *) PcdDb + VariableHead->DefaultValueOffset);   
-        VaraiableDefaultBuffer = (VOID *) (StringTable + StringTableIdx);     
-        Status = GetHiiVariable (Guid, Name, &Data, &DataSize);
-        if (Status == EFI_SUCCESS) {
-          if (GetSize == 0) {
-            //
-            // It is a pointer type. So get the MaxSize reserved for
-            // this PCD entry.
-            //
-            GetPtrTypeSize (TmpTokenNumber, &GetSize);
-          }
-          //
-          // If the operation is successful, we copy the data
-          // to the default value buffer in the PCD Database.
-          // So that we can free the Data allocated in GetHiiVariable.
-          //
-          CopyMem (VaraiableDefaultBuffer, Data + VariableHead->Offset, GetSize);
-          FreePool (Data);
-        }
-        RetPtr = (VOID *) VaraiableDefaultBuffer;                
+        VaraiableDefaultBuffer = (UINT8 *) (StringTable + StringTableIdx);     
       } else {
         VaraiableDefaultBuffer = (UINT8 *) PcdDb + VariableHead->DefaultValueOffset;
-  
-        Status = GetHiiVariable (Guid, Name, &Data, &DataSize);
-        if (Status == EFI_SUCCESS) {
+      }
+      Status = GetHiiVariable (Guid, Name, &Data, &DataSize);
+      if (Status == EFI_SUCCESS) {
+        if (DataSize >= (VariableHead->Offset + GetSize)) {
           if (GetSize == 0) {
             //
             // It is a pointer type. So get the MaxSize reserved for
             // this PCD entry.
             //
             GetPtrTypeSize (TmpTokenNumber, &GetSize);
+            if (GetSize > (DataSize - VariableHead->Offset)) {
+              //
+              // Use actual valid size.
+              //
+              GetSize = DataSize - VariableHead->Offset;
+            }
           }
           //
           // If the operation is successful, we copy the data
@@ -177,10 +166,10 @@ GetWorker (
           // So that we can free the Data allocated in GetHiiVariable.
           //
           CopyMem (VaraiableDefaultBuffer, Data + VariableHead->Offset, GetSize);
-          FreePool (Data);
         }
-        RetPtr = (VOID *) VaraiableDefaultBuffer;
+        FreePool (Data);
       }
+      RetPtr = (VOID *) VaraiableDefaultBuffer;
       break;
 
     case PCD_TYPE_STRING:

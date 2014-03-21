@@ -598,6 +598,7 @@ GetWorker (
   PEI_PCD_DATABASE    *PeiPcdDb;
   UINT32              LocalTokenNumber;
   UINTN               MaxSize;
+  UINT8               *VaraiableDefaultBuffer;
 
   //
   // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
@@ -645,20 +646,37 @@ GetWorker (
       Guid = &(PeiPcdDb->Init.GuidTable[VariableHead->GuidTableIndex]);
       Name = (UINT16*)&StringTable[VariableHead->StringIndex];
 
-      Status = GetHiiVariable (Guid, Name, &Data, &DataSize);
-
-      if (Status == EFI_SUCCESS) {
-        return (VOID *) ((UINT8 *) Data + VariableHead->Offset);
+      if ((LocalTokenNumber & PCD_TYPE_ALL_SET) == (PCD_TYPE_HII|PCD_TYPE_STRING)) {
+        //
+        // If a HII type PCD's datum type is VOID*, the DefaultValueOffset is the index of 
+        // string array in string table.
+        //
+        VaraiableDefaultBuffer = (UINT8 *) &StringTable[*(UINT16*)((UINT8*) PeiPcdDb + VariableHead->DefaultValueOffset)];   
       } else {
-        //
-        // Return the default value specified by Platform Integrator 
-        //
-        if ((LocalTokenNumber & PCD_TYPE_ALL_SET) == (PCD_TYPE_HII|PCD_TYPE_STRING)) {
-          return (VOID*)&StringTable[*(UINT16*)((UINT8*)PeiPcdDb + VariableHead->DefaultValueOffset)];
-        } else {
-          return (VOID *) ((UINT8 *) PeiPcdDb + VariableHead->DefaultValueOffset);
-        }
+        VaraiableDefaultBuffer = (UINT8 *) PeiPcdDb + VariableHead->DefaultValueOffset;
       }
+      Status = GetHiiVariable (Guid, Name, &Data, &DataSize);
+      if ((Status == EFI_SUCCESS) && (DataSize >= (VariableHead->Offset + GetSize))) {
+        if (GetSize == 0) {
+          //
+          // It is a pointer type. So get the MaxSize reserved for
+          // this PCD entry.
+          //
+          GetPtrTypeSize (TokenNumber, &GetSize, PeiPcdDb);
+          if (GetSize > (DataSize - VariableHead->Offset)) {
+            //
+            // Use actual valid size.
+            //
+            GetSize = DataSize - VariableHead->Offset;
+          }
+        }
+        //
+        // If the operation is successful, we copy the data
+        // to the default value buffer in the PCD Database.
+        //
+        CopyMem (VaraiableDefaultBuffer, (UINT8 *) Data + VariableHead->Offset, GetSize);
+      }
+      return (VOID *) VaraiableDefaultBuffer;
     }
 
     case PCD_TYPE_DATA:
