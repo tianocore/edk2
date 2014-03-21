@@ -1,7 +1,7 @@
 /** @file
   Usb Credential Provider driver implemenetation.
     
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -1375,6 +1375,11 @@ UsbProviderInit (
   )
 {
   EFI_STATUS  Status;
+
+  //
+  // It is NOT robust enough to be included in production.
+  //
+  #error "This implementation is just a sample, please comment this line if you really want to use this driver."
 
   //
   // Init credential table.
