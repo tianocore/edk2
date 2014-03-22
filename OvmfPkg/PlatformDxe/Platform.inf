@@ -42,6 +42,10 @@
   UefiRuntimeServicesTableLib
   UefiDriverEntryPoint
 
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
+
 [Guids]
   gOvmfPlatformConfigGuid
 

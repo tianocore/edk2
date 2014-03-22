@@ -17,6 +17,46 @@
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
+#include "PlatformConfig.h"
+
+/**
+  Load and execute the platform configuration.
+
+  @retval EFI_SUCCESS            Configuration loaded and executed.
+  @return                        Status codes from PlatformConfigLoad().
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+ExecutePlatformConfig (
+  VOID
+  )
+{
+  EFI_STATUS      Status;
+  PLATFORM_CONFIG PlatformConfig;
+  UINT64          OptionalElements;
+
+  Status = PlatformConfigLoad (&PlatformConfig, &OptionalElements);
+  if (EFI_ERROR (Status)) {
+    DEBUG (((Status == EFI_NOT_FOUND) ? EFI_D_VERBOSE : EFI_D_ERROR,
+      "%a: failed to load platform config: %r\n", __FUNCTION__, Status));
+    return Status;
+  }
+
+  if (OptionalElements & PLATFORM_CONFIG_F_GRAPHICS_RESOLUTION) {
+    //
+    // Pass the preferred resolution to GraphicsConsoleDxe via dynamic PCDs.
+    //
+    PcdSet32 (PcdVideoHorizontalResolution,
+      PlatformConfig.HorizontalResolution);
+    PcdSet32 (PcdVideoVerticalResolution,
+      PlatformConfig.VerticalResolution);
+  }
+
+  return EFI_SUCCESS;
+}
+
+
 /**
   Entry point for this driver.
 
@@ -33,6 +73,7 @@ PlatformInit (
   IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
+  ExecutePlatformConfig ();
   return EFI_SUCCESS;
 }
 
