@@ -36,12 +36,14 @@
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  BaseLib
   BaseMemoryLib
   DebugLib
   DevicePathLib
   HiiLib
   MemoryAllocationLib
   UefiBootServicesTableLib
+  UefiHiiServicesLib
   UefiLib
   UefiRuntimeServicesTableLib
   UefiDriverEntryPoint
@@ -55,9 +57,11 @@
   gEfiHiiConfigAccessProtocolGuid ## PRODUCES
 
 [Guids]
+  gEfiIfrTianoGuid
   gOvmfPlatformConfigGuid
 
 [Depex]
+  gEfiHiiConfigRoutingProtocolGuid  AND
   gEfiHiiDatabaseProtocolGuid       AND
   gEfiVariableArchProtocolGuid      AND
   gEfiVariableWriteArchProtocolGuid

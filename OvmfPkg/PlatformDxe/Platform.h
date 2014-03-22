@@ -22,7 +22,11 @@
 #define FORMSTATEID_MAIN_FORM  1
 #define FORMID_MAIN_FORM       1
 
+#define QUESTION_RES_CUR       1
 #define MAXSIZE_RES_CUR       16
+
+#define LABEL_RES_NEXT         1
+#define QUESTION_RES_NEXT      2
 
 //
 // This structure describes the form state. Its fields relate strictly to the

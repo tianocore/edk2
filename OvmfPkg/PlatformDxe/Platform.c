@@ -14,13 +14,18 @@
   WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/HiiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiHiiServicesLib.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/HiiConfigAccess.h>
+#include <Guid/MdeModuleHii.h>
+#include <Guid/OvmfPlatformConfig.h>
 
+#include "Platform.h"
 #include "PlatformConfig.h"
 
 //
@@ -94,6 +99,26 @@ extern UINT8 PlatformDxeStrings[];
 extern UINT8 PlatformFormsBin[];
 
 
+/**
+  This function is called by the HII machinery when it fetches the form state.
+
+  See the precise documentation in the UEFI spec.
+
+  @param[in]  This      The Config Access Protocol instance.
+
+  @param[in]  Request   A <ConfigRequest> format UCS-2 string describing the
+                        query.
+
+  @param[out] Progress  A pointer into Request on output, identifying the query
+                        element where processing failed.
+
+  @param[out] Results   A <MultiConfigAltResp> format UCS-2 string that has
+                        all values filled in for the names in the Request
+                        string.
+
+  @return  Status codes from gHiiConfigRouting->BlockToConfig().
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -104,7 +129,24 @@ ExtractConfig (
   OUT       EFI_STRING                      *Results
 )
 {
-  return EFI_SUCCESS;
+  MAIN_FORM_STATE MainFormState;
+  EFI_STATUS      Status;
+
+  DEBUG ((EFI_D_VERBOSE, "%a: Request=\"%s\"\n", __FUNCTION__, Request));
+
+  StrnCpy ((CHAR16 *) MainFormState.CurrentPreferredResolution,
+           L"Unset", MAXSIZE_RES_CUR);
+  MainFormState.NextPreferredResolution = 0;
+  Status = gHiiConfigRouting->BlockToConfig (gHiiConfigRouting, Request,
+                                (VOID *) &MainFormState, sizeof MainFormState,
+                                Results, Progress);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "%a: BlockToConfig(): %r, Progress=\"%s\"\n",
+      __FUNCTION__, Status, (Status == EFI_DEVICE_ERROR) ? NULL : *Progress));
+  } else {
+    DEBUG ((EFI_D_VERBOSE, "%a: Results=\"%s\"\n", __FUNCTION__, *Results));
+  }
+  return Status;
 }
 
 
@@ -134,6 +176,168 @@ Callback (
   )
 {
   return EFI_SUCCESS;
+}
+
+
+/**
+  Create a set of "one-of-many" (ie. "drop down list") option IFR opcodes,
+  based on available GOP resolutions, to be placed under a "one-of-many" (ie.
+  "drop down list") opcode.
+
+  @param[in]  PackageList   The package list with the formset and form for
+                            which the drop down options are produced. Option
+                            names are added as new strings to PackageList.
+
+  @param[out] OpCodeBuffer  On output, a dynamically allocated opcode buffer
+                            with drop down list options corresponding to GOP
+                            resolutions. The caller is responsible for freeing
+                            OpCodeBuffer with HiiFreeOpCodeHandle() after use.
+
+  @retval EFI_SUCESS  Opcodes have been successfully produced.
+
+  @return             Status codes from underlying functions. PackageList may
+                      have been extended with new strings. OpCodeBuffer is
+                      unchanged.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+CreateResolutionOptions (
+  IN  EFI_HII_HANDLE  *PackageList,
+  OUT VOID            **OpCodeBuffer
+  )
+{
+  EFI_STATUS                   Status;
+  VOID                         *OutputBuffer;
+  EFI_STRING_ID                NewString;
+  VOID                         *OpCode;
+
+  OutputBuffer = HiiAllocateOpCodeHandle ();
+  if (OutputBuffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  NewString = HiiSetString (PackageList, 0 /* new string */, L"800x600",
+                NULL /* for all languages */);
+  if (NewString == 0) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto FreeOutputBuffer;
+  }
+  OpCode = HiiCreateOneOfOptionOpCode (OutputBuffer, NewString,
+             0 /* Flags */, EFI_IFR_NUMERIC_SIZE_4, 0 /* Value */);
+  if (OpCode == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto FreeOutputBuffer;
+  }
+
+  *OpCodeBuffer = OutputBuffer;
+  return EFI_SUCCESS;
+
+FreeOutputBuffer:
+  HiiFreeOpCodeHandle (OutputBuffer);
+
+  return Status;
+}
+
+
+/**
+  Populate the form identified by the (PackageList, FormSetGuid, FormId)
+  triplet.
+
+  @retval EFI_SUCESS  Form successfully updated.
+  @return             Status codes from underlying functions.
+
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+PopulateForm (
+  IN  EFI_HII_HANDLE  *PackageList,
+  IN  EFI_GUID        *FormSetGuid,
+  IN  EFI_FORM_ID     FormId
+  )
+{
+  EFI_STATUS         Status;
+  VOID               *OpCodeBuffer;
+  VOID               *OpCode;
+  EFI_IFR_GUID_LABEL *Anchor;
+  VOID               *OpCodeBuffer2;
+
+  //
+  // 1. Allocate an empty opcode buffer.
+  //
+  OpCodeBuffer = HiiAllocateOpCodeHandle ();
+  if (OpCodeBuffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // 2. Create a label opcode (which is a Tiano extension) inside the buffer.
+  // The label's number must match the "anchor" label in the form.
+  //
+  OpCode = HiiCreateGuidOpCode (OpCodeBuffer, &gEfiIfrTianoGuid,
+             NULL /* optional copy origin */, sizeof *Anchor);
+  if (OpCode == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto FreeOpCodeBuffer;
+  }
+  Anchor               = OpCode;
+  Anchor->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+  Anchor->Number       = LABEL_RES_NEXT;
+
+  //
+  // 3. Create the opcodes inside the buffer that are to be inserted into the
+  // form.
+  //
+  // 3.1. Get a list of resolutions.
+  //
+  Status = CreateResolutionOptions (PackageList, &OpCodeBuffer2);
+  if (EFI_ERROR (Status)) {
+    goto FreeOpCodeBuffer;
+  }
+
+  //
+  // 3.2. Create a one-of-many question with the above options.
+  //
+  OpCode = HiiCreateOneOfOpCode (
+             OpCodeBuffer,                        // create opcode inside this
+                                                  //   opcode buffer,
+             QUESTION_RES_NEXT,                   // ID of question,
+             FORMSTATEID_MAIN_FORM,               // identifies form state
+                                                  //   storage,
+             (UINT16) OFFSET_OF (MAIN_FORM_STATE, // value of question stored
+                        NextPreferredResolution), //   at this offset,
+             STRING_TOKEN (STR_RES_NEXT),         // Prompt,
+             STRING_TOKEN (STR_RES_NEXT_HELP),    // Help,
+             0,                                   // QuestionFlags,
+             EFI_IFR_NUMERIC_SIZE_4,              // see sizeof
+                                                  //   NextPreferredResolution,
+             OpCodeBuffer2,                       // buffer with possible
+                                                  //   choices,
+             NULL                                 // DEFAULT opcodes
+             );
+  if (OpCode == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto FreeOpCodeBuffer2;
+  }
+
+  //
+  // 4. Update the form with the opcode buffer.
+  //
+  Status = HiiUpdateForm (PackageList, FormSetGuid, FormId,
+             OpCodeBuffer, // buffer with head anchor, and new contents to be
+                           // inserted at it
+             NULL          // buffer with tail anchor, for deleting old
+                           // contents up to it
+             );
+
+FreeOpCodeBuffer2:
+  HiiFreeOpCodeHandle (OpCodeBuffer2);
+
+FreeOpCodeBuffer:
+  HiiFreeOpCodeHandle (OpCodeBuffer);
+
+  return Status;
 }
 
 
@@ -227,7 +431,16 @@ PlatformInit (
     goto UninstallProtocols;
   }
 
+  Status = PopulateForm (mInstalledPackages, &gOvmfPlatformConfigGuid,
+             FORMID_MAIN_FORM);
+  if (EFI_ERROR (Status)) {
+    goto RemovePackages;
+  }
+
   return EFI_SUCCESS;
+
+RemovePackages:
+  HiiRemovePackages (mInstalledPackages);
 
 UninstallProtocols:
   gBS->UninstallMultipleProtocolInterfaces (ImageHandle,

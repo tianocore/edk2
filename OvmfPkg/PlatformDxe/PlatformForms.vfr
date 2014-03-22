@@ -38,6 +38,24 @@ formset
   form
     formid = FORMID_MAIN_FORM,
     title  = STRING_TOKEN(STR_MAIN_FORM_TITLE);
+
+    //
+    // Display the current preference in a read-only string field.
+    //
+    string
+      varid      = MainFormState.CurrentPreferredResolution,
+      questionid = QUESTION_RES_CUR,
+      prompt     = STRING_TOKEN(STR_RES_CUR),
+      help       = STRING_TOKEN(STR_RES_CUR_HELP),
+      flags      = READ_ONLY,
+      minsize    = 0,
+      maxsize    = MAXSIZE_RES_CUR,
+    endstring;
+
+    //
+    // We'll dynamically generate a one-of-many selection at this label.
+    //
+    label LABEL_RES_NEXT;
   endform;
 
 endformset;
