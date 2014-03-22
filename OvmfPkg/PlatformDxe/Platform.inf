@@ -26,7 +26,9 @@
 
 [Sources]
   Platform.c
+  Platform.uni
   PlatformConfig.c
+  PlatformForms.vfr
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -36,6 +38,8 @@
 [LibraryClasses]
   BaseMemoryLib
   DebugLib
+  DevicePathLib
+  HiiLib
   MemoryAllocationLib
   UefiBootServicesTableLib
   UefiLib
@@ -46,9 +50,14 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
 
+[Protocols]
+  gEfiDevicePathProtocolGuid      ## PRODUCES
+  gEfiHiiConfigAccessProtocolGuid ## PRODUCES
+
 [Guids]
   gOvmfPlatformConfigGuid
 
 [Depex]
+  gEfiHiiDatabaseProtocolGuid       AND
   gEfiVariableArchProtocolGuid      AND
   gEfiVariableWriteArchProtocolGuid
