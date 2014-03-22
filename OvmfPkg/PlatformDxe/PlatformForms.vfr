@@ -30,6 +30,11 @@ formset
   title = STRING_TOKEN(STR_FORMSET_TITLE),
   help  = STRING_TOKEN(STR_FORMSET_HELP),
 
+  varstore MAIN_FORM_STATE,
+    varid = FORMSTATEID_MAIN_FORM,
+    name  = MainFormState,
+    guid  = OVMF_PLATFORM_CONFIG_GUID;
+
   form
     formid = FORMID_MAIN_FORM,
     title  = STRING_TOKEN(STR_MAIN_FORM_TITLE);

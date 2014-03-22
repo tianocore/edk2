@@ -19,6 +19,18 @@
 //
 // Macro and type definitions that connect the form with the HII driver code.
 //
+#define FORMSTATEID_MAIN_FORM  1
 #define FORMID_MAIN_FORM       1
+
+#define MAXSIZE_RES_CUR       16
+
+//
+// This structure describes the form state. Its fields relate strictly to the
+// visual widgets on the form.
+//
+typedef struct {
+  UINT16 CurrentPreferredResolution[MAXSIZE_RES_CUR];
+  UINT32 NextPreferredResolution;
+} MAIN_FORM_STATE;
 
 #endif // _PLATFORM_H_
