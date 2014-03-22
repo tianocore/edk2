@@ -26,6 +26,7 @@
 
 [Sources]
   Platform.c
+  PlatformConfig.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -33,9 +34,17 @@
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  BaseMemoryLib
   DebugLib
+  MemoryAllocationLib
   UefiBootServicesTableLib
+  UefiLib
+  UefiRuntimeServicesTableLib
   UefiDriverEntryPoint
 
+[Guids]
+  gOvmfPlatformConfigGuid
+
 [Depex]
-  TRUE
+  gEfiVariableArchProtocolGuid      AND
+  gEfiVariableWriteArchProtocolGuid
