@@ -258,6 +258,62 @@ ExtractConfig (
 }
 
 
+/**
+  Interpret the binary form state and save it as persistent platform
+  configuration.
+
+  @param[in] MainFormState  Binary form/widget state to verify and save.
+
+  @retval EFI_SUCCESS  Platform configuration saved.
+  @return              Error codes from underlying functions.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+FormStateToPlatformConfig (
+  IN CONST MAIN_FORM_STATE *MainFormState
+  )
+{
+  EFI_STATUS      Status;
+  PLATFORM_CONFIG PlatformConfig;
+  CONST GOP_MODE  *GopMode;
+
+  //
+  // There's nothing to do with the textual CurrentPreferredResolution field.
+  // We verify and translate the selection in the drop-down list.
+  //
+  if (MainFormState->NextPreferredResolution >= mNumGopModes) {
+    return EFI_INVALID_PARAMETER;
+  }
+  GopMode = mGopModes + MainFormState->NextPreferredResolution;
+
+  ZeroMem (&PlatformConfig, sizeof PlatformConfig);
+  PlatformConfig.HorizontalResolution = GopMode->X;
+  PlatformConfig.VerticalResolution   = GopMode->Y;
+
+  Status = PlatformConfigSave (&PlatformConfig);
+  return Status;
+}
+
+
+/**
+  This function is called by the HII machinery when it wants the driver to
+  interpret and persist the form state.
+
+  See the precise documentation in the UEFI spec.
+
+  @param[in]  This           The Config Access Protocol instance.
+
+  @param[in]  Configuration  A <ConfigResp> format UCS-2 string describing the
+                             form state.
+
+  @param[out] Progress       A pointer into Configuration on output,
+                             identifying the element where processing failed.
+
+  @retval EFI_SUCCESS  Configuration verified, state permanent.
+
+  @return              Status codes from underlying functions.
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -267,9 +323,46 @@ RouteConfig (
   OUT       EFI_STRING                      *Progress
 )
 {
+  MAIN_FORM_STATE MainFormState;
+  UINTN           BlockSize;
+  EFI_STATUS      Status;
+
   DEBUG ((EFI_D_VERBOSE, "%a: Configuration=\"%s\"\n", __FUNCTION__,
     Configuration));
-  return EFI_SUCCESS;
+
+  //
+  // the "read" step in RMW
+  //
+  Status = PlatformConfigToFormState (&MainFormState);
+  if (EFI_ERROR (Status)) {
+    *Progress = Configuration;
+    return Status;
+  }
+
+  //
+  // the "modify" step in RMW
+  //
+  // (Update the binary form state. This update may be partial, which is why in
+  // general we must pre-load the form state from the platform config.)
+  //
+  BlockSize = sizeof MainFormState;
+  Status = gHiiConfigRouting->ConfigToBlock (gHiiConfigRouting, Configuration,
+                                (VOID *) &MainFormState, &BlockSize, Progress);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "%a: ConfigToBlock(): %r, Progress=\"%s\"\n",
+      __FUNCTION__, Status,
+      (Status == EFI_BUFFER_TOO_SMALL) ? NULL : *Progress));
+    return Status;
+  }
+
+  //
+  // the "write" step in RMW
+  //
+  Status = FormStateToPlatformConfig (&MainFormState);
+  if (EFI_ERROR (Status)) {
+    *Progress = Configuration;
+  }
+  return Status;
 }
 
 
