@@ -185,6 +185,8 @@ RouteConfig (
   OUT       EFI_STRING                      *Progress
 )
 {
+  DEBUG ((EFI_D_VERBOSE, "%a: Configuration=\"%s\"\n", __FUNCTION__,
+    Configuration));
   return EFI_SUCCESS;
 }
 
@@ -201,6 +203,26 @@ Callback (
   OUT    EFI_BROWSER_ACTION_REQUEST             *ActionRequest
   )
 {
+  DEBUG ((EFI_D_VERBOSE, "%a: Action=0x%Lx QuestionId=%d Type=%d\n",
+    __FUNCTION__, (UINT64) Action, QuestionId, Type));
+
+  if (Action != EFI_BROWSER_ACTION_CHANGED) {
+    return EFI_UNSUPPORTED;
+  }
+
+  switch (QuestionId) {
+  case QUESTION_SAVE_EXIT:
+    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_SUBMIT_EXIT;
+    break;
+
+  case QUESTION_DISCARD_EXIT:
+    *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD_EXIT;
+    break;
+
+  default:
+    break;
+  }
+
   return EFI_SUCCESS;
 }
 

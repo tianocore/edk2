@@ -28,6 +28,9 @@
 #define LABEL_RES_NEXT         1
 #define QUESTION_RES_NEXT      2
 
+#define QUESTION_SAVE_EXIT     3
+#define QUESTION_DISCARD_EXIT  4
+
 //
 // This structure describes the form state. Its fields relate strictly to the
 // visual widgets on the form.

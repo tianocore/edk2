@@ -56,6 +56,19 @@ formset
     // We'll dynamically generate a one-of-many selection at this label.
     //
     label LABEL_RES_NEXT;
+
+    text
+      help  = STRING_TOKEN(STR_SAVE_EXIT),
+      text  = STRING_TOKEN(STR_SAVE_EXIT),
+      flags = INTERACTIVE,
+      key   = QUESTION_SAVE_EXIT;
+
+    text
+      help  = STRING_TOKEN(STR_DISCARD_EXIT),
+      text  = STRING_TOKEN(STR_DISCARD_EXIT),
+      flags = INTERACTIVE,
+      key   = QUESTION_DISCARD_EXIT;
+
   endform;
 
 endformset;
