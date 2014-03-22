@@ -3,7 +3,7 @@
   them via HII.
 
   Copyright (C) 2014, Red Hat, Inc.
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -262,6 +262,8 @@ PopulateForm (
   VOID               *OpCode;
   EFI_IFR_GUID_LABEL *Anchor;
   VOID               *OpCodeBuffer2;
+
+  OpCodeBuffer2 = NULL;
 
   //
   // 1. Allocate an empty opcode buffer.
