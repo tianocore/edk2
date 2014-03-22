@@ -18,9 +18,12 @@
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/HiiLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/PrintLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiHiiServicesLib.h>
 #include <Protocol/DevicePath.h>
+#include <Protocol/GraphicsOutput.h>
 #include <Protocol/HiiConfigAccess.h>
 #include <Guid/MdeModuleHii.h>
 #include <Guid/OvmfPlatformConfig.h>
@@ -97,6 +100,29 @@ STATIC EFI_HII_HANDLE mInstalledPackages;
 //
 extern UINT8 PlatformDxeStrings[];
 extern UINT8 PlatformFormsBin[];
+
+//
+// We want to be notified about GOP installations until we find one GOP
+// interface that lets us populate the form.
+//
+STATIC EFI_EVENT mGopEvent;
+
+//
+// The registration record underneath this pointer allows us to iterate through
+// the GOP instances one by one.
+//
+STATIC VOID *mGopTracker;
+
+//
+// Cache the resolutions we get from the GOP.
+//
+typedef struct {
+  UINT32 X;
+  UINT32 Y;
+} GOP_MODE;
+
+STATIC UINTN    mNumGopModes;
+STATIC GOP_MODE *mGopModes;
 
 
 /**
@@ -180,6 +206,68 @@ Callback (
 
 
 /**
+  Query and save all resolutions supported by the GOP.
+
+  @param[in]  Gop          The Graphics Output Protocol instance to query.
+
+  @param[out] NumGopModes  The number of modes supported by the GOP. On output,
+                           this parameter will be positive.
+
+  @param[out] GopModes     On output, a dynamically allocated array containing
+                           the resolutions returned by the GOP. The caller is
+                           responsible for freeing the array after use.
+
+  @retval EFI_UNSUPPORTED       No modes found.
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate GopModes.
+  @return                       Error codes from Gop->QueryMode().
+
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+QueryGopModes (
+  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL *Gop,
+  OUT UINTN                        *NumGopModes,
+  OUT GOP_MODE                     **GopModes
+  )
+{
+  EFI_STATUS Status;
+  UINT32     ModeNumber;
+
+  if (Gop->Mode->MaxMode == 0) {
+    return EFI_UNSUPPORTED;
+  }
+  *NumGopModes = Gop->Mode->MaxMode;
+
+  *GopModes = AllocatePool (Gop->Mode->MaxMode * sizeof **GopModes);
+  if (*GopModes == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  for (ModeNumber = 0; ModeNumber < Gop->Mode->MaxMode; ++ModeNumber) {
+    EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *Info;
+    UINTN                                SizeOfInfo;
+
+    Status = Gop->QueryMode (Gop, ModeNumber, &SizeOfInfo, &Info);
+    if (EFI_ERROR (Status)) {
+      goto FreeGopModes;
+    }
+
+    (*GopModes)[ModeNumber].X = Info->HorizontalResolution;
+    (*GopModes)[ModeNumber].Y = Info->VerticalResolution;
+    FreePool (Info);
+  }
+
+  return EFI_SUCCESS;
+
+FreeGopModes:
+  FreePool (*GopModes);
+
+  return Status;
+}
+
+
+/**
   Create a set of "one-of-many" (ie. "drop down list") option IFR opcodes,
   based on available GOP resolutions, to be placed under a "one-of-many" (ie.
   "drop down list") opcode.
@@ -193,6 +281,10 @@ Callback (
                             resolutions. The caller is responsible for freeing
                             OpCodeBuffer with HiiFreeOpCodeHandle() after use.
 
+  @param[in]  NumGopModes   Number of entries in GopModes.
+
+  @param[in]  GopModes      Array of resolutions retrieved from the GOP.
+
   @retval EFI_SUCESS  Opcodes have been successfully produced.
 
   @return             Status codes from underlying functions. PackageList may
@@ -204,30 +296,39 @@ EFI_STATUS
 EFIAPI
 CreateResolutionOptions (
   IN  EFI_HII_HANDLE  *PackageList,
-  OUT VOID            **OpCodeBuffer
+  OUT VOID            **OpCodeBuffer,
+  IN  UINTN           NumGopModes,
+  IN  GOP_MODE        *GopModes
   )
 {
-  EFI_STATUS                   Status;
-  VOID                         *OutputBuffer;
-  EFI_STRING_ID                NewString;
-  VOID                         *OpCode;
+  EFI_STATUS Status;
+  VOID       *OutputBuffer;
+  UINTN      ModeNumber;
 
   OutputBuffer = HiiAllocateOpCodeHandle ();
   if (OutputBuffer == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NewString = HiiSetString (PackageList, 0 /* new string */, L"800x600",
-                NULL /* for all languages */);
-  if (NewString == 0) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto FreeOutputBuffer;
-  }
-  OpCode = HiiCreateOneOfOptionOpCode (OutputBuffer, NewString,
-             0 /* Flags */, EFI_IFR_NUMERIC_SIZE_4, 0 /* Value */);
-  if (OpCode == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto FreeOutputBuffer;
+  for (ModeNumber = 0; ModeNumber < NumGopModes; ++ModeNumber) {
+    CHAR16        Desc[MAXSIZE_RES_CUR];
+    EFI_STRING_ID NewString;
+    VOID          *OpCode;
+
+    UnicodeSPrintAsciiFormat (Desc, sizeof Desc, "%Ldx%Ld",
+      (INT64) GopModes[ModeNumber].X, (INT64) GopModes[ModeNumber].Y);
+    NewString = HiiSetString (PackageList, 0 /* new string */, Desc,
+                  NULL /* for all languages */);
+    if (NewString == 0) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto FreeOutputBuffer;
+    }
+    OpCode = HiiCreateOneOfOptionOpCode (OutputBuffer, NewString,
+               0 /* Flags */, EFI_IFR_NUMERIC_SIZE_4, ModeNumber);
+    if (OpCode == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto FreeOutputBuffer;
+    }
   }
 
   *OpCodeBuffer = OutputBuffer;
@@ -244,6 +345,9 @@ FreeOutputBuffer:
   Populate the form identified by the (PackageList, FormSetGuid, FormId)
   triplet.
 
+  The drop down list of video resolutions is generated from (NumGopModes,
+  GopModes).
+
   @retval EFI_SUCESS  Form successfully updated.
   @return             Status codes from underlying functions.
 
@@ -254,7 +358,9 @@ EFIAPI
 PopulateForm (
   IN  EFI_HII_HANDLE  *PackageList,
   IN  EFI_GUID        *FormSetGuid,
-  IN  EFI_FORM_ID     FormId
+  IN  EFI_FORM_ID     FormId,
+  IN  UINTN           NumGopModes,
+  IN  GOP_MODE        *GopModes
   )
 {
   EFI_STATUS         Status;
@@ -293,7 +399,8 @@ PopulateForm (
   //
   // 3.1. Get a list of resolutions.
   //
-  Status = CreateResolutionOptions (PackageList, &OpCodeBuffer2);
+  Status = CreateResolutionOptions (PackageList, &OpCodeBuffer2,
+             NumGopModes, GopModes);
   if (EFI_ERROR (Status)) {
     goto FreeOpCodeBuffer;
   }
@@ -382,6 +489,66 @@ ExecutePlatformConfig (
 
 
 /**
+  Notification callback for GOP interface installation.
+
+  @param[in] Event    Event whose notification function is being invoked.
+
+  @param[in] Context  The pointer to the notification function's context, which
+                      is implementation-dependent.
+**/
+STATIC
+VOID
+EFIAPI
+GopInstalled (
+  IN EFI_EVENT Event,
+  IN VOID      *Context
+  )
+{
+  EFI_STATUS                   Status;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL *Gop;
+
+  ASSERT (Event == mGopEvent);
+
+  //
+  // Check further GOPs.
+  //
+  for (;;) {
+    mNumGopModes = 0;
+    mGopModes = NULL;
+
+    Status = gBS->LocateProtocol (&gEfiGraphicsOutputProtocolGuid, mGopTracker,
+                    (VOID **) &Gop);
+    if (EFI_ERROR (Status)) {
+      return;
+    }
+
+    Status = QueryGopModes (Gop, &mNumGopModes, &mGopModes);
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    Status = PopulateForm (mInstalledPackages, &gOvmfPlatformConfigGuid,
+               FORMID_MAIN_FORM, mNumGopModes, mGopModes);
+    if (EFI_ERROR (Status)) {
+      FreePool (mGopModes);
+      continue;
+    }
+
+    break;
+  }
+
+  //
+  // Success -- so uninstall this callback. Closing the event removes all
+  // pending notifications and all protocol registrations.
+  //
+  Status = gBS->CloseEvent (mGopEvent);
+  ASSERT_EFI_ERROR (Status);
+  mGopEvent = NULL;
+  mGopTracker = NULL;
+}
+
+
+/**
   Entry point for this driver.
 
   @param[in] ImageHandle  Image handle of this driver.
@@ -433,13 +600,28 @@ PlatformInit (
     goto UninstallProtocols;
   }
 
-  Status = PopulateForm (mInstalledPackages, &gOvmfPlatformConfigGuid,
-             FORMID_MAIN_FORM);
+  Status = gBS->CreateEvent (EVT_NOTIFY_SIGNAL, TPL_CALLBACK, &GopInstalled,
+                  NULL /* Context */, &mGopEvent);
   if (EFI_ERROR (Status)) {
     goto RemovePackages;
   }
 
+  Status = gBS->RegisterProtocolNotify (&gEfiGraphicsOutputProtocolGuid,
+                  mGopEvent, &mGopTracker);
+  if (EFI_ERROR (Status)) {
+    goto CloseGopEvent;
+  }
+
+  //
+  // Check already installed GOPs.
+  //
+  Status = gBS->SignalEvent (mGopEvent);
+  ASSERT_EFI_ERROR (Status);
+
   return EFI_SUCCESS;
+
+CloseGopEvent:
+  gBS->CloseEvent (mGopEvent);
 
 RemovePackages:
   HiiRemovePackages (mInstalledPackages);
@@ -465,6 +647,24 @@ PlatformUnload (
   IN  EFI_HANDLE  ImageHandle
   )
 {
+  if (mGopEvent == NULL) {
+    //
+    // The GOP callback ran successfully and unregistered itself. Release the
+    // resources allocated there.
+    //
+    ASSERT (mGopModes != NULL);
+    FreePool (mGopModes);
+  } else {
+    //
+    // Otherwise we need to unregister the callback.
+    //
+    ASSERT (mGopModes == NULL);
+    gBS->CloseEvent (mGopEvent);
+  }
+
+  //
+  // Release resources allocated by the entry point.
+  //
   HiiRemovePackages (mInstalledPackages);
   gBS->UninstallMultipleProtocolInterfaces (ImageHandle,
          &gEfiDevicePathProtocolGuid,      &mPkgDevicePath,

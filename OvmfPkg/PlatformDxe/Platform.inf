@@ -42,6 +42,7 @@
   DevicePathLib
   HiiLib
   MemoryAllocationLib
+  PrintLib
   UefiBootServicesTableLib
   UefiHiiServicesLib
   UefiLib
@@ -54,6 +55,7 @@
 
 [Protocols]
   gEfiDevicePathProtocolGuid      ## PRODUCES
+  gEfiGraphicsOutputProtocolGuid  ## CONSUMES
   gEfiHiiConfigAccessProtocolGuid ## PRODUCES
 
 [Guids]
