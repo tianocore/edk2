@@ -170,6 +170,7 @@ QemuVideoControllerDriverStart (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
 {
+  EFI_TPL                           OldTpl;
   EFI_STATUS                        Status;
   QEMU_VIDEO_PRIVATE_DATA           *Private;
   EFI_DEVICE_PATH_PROTOCOL          *ParentDevicePath;
@@ -178,12 +179,15 @@ QemuVideoControllerDriverStart (
   QEMU_VIDEO_CARD                   *Card;
   EFI_PCI_IO_PROTOCOL               *ChildPciIo;
 
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+
   //
   // Allocate Private context data for GOP inteface.
   //
   Private = AllocateZeroPool (sizeof (QEMU_VIDEO_PRIVATE_DATA));
   if (Private == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto RestoreTpl;
   }
 
   //
@@ -394,6 +398,7 @@ QemuVideoControllerDriverStart (
     goto UninstallGop;
   }
 
+  gBS->RestoreTPL (OldTpl);
   return EFI_SUCCESS;
 
 UninstallGop:
@@ -423,6 +428,9 @@ ClosePciIo:
 
 FreePrivate:
   FreePool (Private);
+
+RestoreTpl:
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
