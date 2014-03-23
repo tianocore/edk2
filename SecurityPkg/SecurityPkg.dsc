@@ -163,7 +163,7 @@
   SecurityPkg/Library/HashLibTpm2/HashLibTpm2.inf
 
 [Components.IA32, Components.X64, Components.IPF]
-  SecurityPkg/UserIdentification/PwdCredentialProviderDxe/PwdCredentialProviderDxe.inf
+#  SecurityPkg/UserIdentification/PwdCredentialProviderDxe/PwdCredentialProviderDxe.inf
 #  SecurityPkg/UserIdentification/UsbCredentialProviderDxe/UsbCredentialProviderDxe.inf
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
   SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableRuntimeDxe.inf
