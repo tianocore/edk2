@@ -24,6 +24,7 @@
 
 [Sources.AARCH64]
   AArch64/memcpy.S        | GCC
+  AArch64/memset.c
 
 [Sources.ARM]
   Arm/mullu.asm        | RVCT
