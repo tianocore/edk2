@@ -24,7 +24,7 @@
 #endif
 
     EXPORT ArmReadMidr
-    EXPORT Cp15CacheInfo
+    EXPORT ArmCacheInfo
     EXPORT ArmGetInterruptState
     EXPORT ArmGetFiqState
     EXPORT ArmGetTTBR0BaseAddress
@@ -54,7 +54,7 @@ ArmReadMidr
   mrc     p15,0,R0,c0,c0,0
   bx      LR
 
-Cp15CacheInfo
+ArmCacheInfo
   mrc     p15,0,R0,c0,c0,1
   bx      LR
 

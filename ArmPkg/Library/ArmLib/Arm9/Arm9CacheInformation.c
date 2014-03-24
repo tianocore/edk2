@@ -1,7 +1,8 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+  Copyright (c) 2014, ARM Limited. All rights reserved.
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -21,7 +22,7 @@ ArmCacheType (
   VOID
   )
 {
-  switch (CACHE_TYPE(Cp15CacheInfo()))
+  switch (CACHE_TYPE (ArmCacheInfo ()))
   {
     case CACHE_TYPE_WRITE_BACK: return ARM_CACHE_TYPE_WRITE_BACK;
     default:                    return ARM_CACHE_TYPE_UNKNOWN;
@@ -34,7 +35,7 @@ ArmCacheArchitecture (
   VOID
   )
 {
-  switch (CACHE_ARCHITECTURE(Cp15CacheInfo()))
+  switch (CACHE_ARCHITECTURE (ArmCacheInfo ()))
   {
     case CACHE_ARCHITECTURE_UNIFIED:  return ARM_CACHE_ARCHITECTURE_UNIFIED;
     case CACHE_ARCHITECTURE_SEPARATE: return ARM_CACHE_ARCHITECTURE_SEPARATE;
@@ -48,7 +49,7 @@ ArmDataCachePresent (
   VOID
   )
 {
-  switch (DATA_CACHE_PRESENT(Cp15CacheInfo()))
+  switch (DATA_CACHE_PRESENT (ArmCacheInfo ()))
   {
     case CACHE_PRESENT:     return TRUE;
     case CACHE_NOT_PRESENT: return FALSE;
@@ -62,7 +63,7 @@ ArmDataCacheSize (
   VOID
   )
 {
-  switch (DATA_CACHE_SIZE(Cp15CacheInfo()))
+  switch (DATA_CACHE_SIZE (ArmCacheInfo ()))
   {
     case CACHE_SIZE_4_KB:   return   4 * 1024;      
     case CACHE_SIZE_8_KB:   return   8 * 1024;
@@ -80,7 +81,7 @@ ArmDataCacheAssociativity (
   VOID
   )
 {
-  switch (DATA_CACHE_ASSOCIATIVITY(Cp15CacheInfo()))
+  switch (DATA_CACHE_ASSOCIATIVITY (ArmCacheInfo ()))
   {
     case CACHE_ASSOCIATIVITY_4_WAY:   return 4;
     case CACHE_ASSOCIATIVITY_DIRECT:  return 1;
@@ -94,7 +95,7 @@ ArmDataCacheLineLength (
   VOID
   )
 {
-  switch (DATA_CACHE_LINE_LENGTH(Cp15CacheInfo()))
+  switch (DATA_CACHE_LINE_LENGTH (ArmCacheInfo ()))
   {
     case CACHE_LINE_LENGTH_32_BYTES: return 32;
     default:                         return  0;
@@ -107,7 +108,7 @@ ArmInstructionCachePresent (
   VOID
   )
 {
-  switch (INSTRUCTION_CACHE_PRESENT(Cp15CacheInfo()))
+  switch (INSTRUCTION_CACHE_PRESENT (ArmCacheInfo ()))
   {
     case CACHE_PRESENT:     return TRUE;
     case CACHE_NOT_PRESENT: return FALSE;
@@ -121,7 +122,7 @@ ArmInstructionCacheSize (
   VOID
   )
 {
-  switch (INSTRUCTION_CACHE_SIZE(Cp15CacheInfo()))
+  switch (INSTRUCTION_CACHE_SIZE (ArmCacheInfo ()))
   {
     case CACHE_SIZE_4_KB:   return   4 * 1024;      
     case CACHE_SIZE_8_KB:   return   8 * 1024;
@@ -139,7 +140,7 @@ ArmInstructionCacheAssociativity (
   VOID
   )
 {
-  switch (INSTRUCTION_CACHE_ASSOCIATIVITY(Cp15CacheInfo()))
+  switch (INSTRUCTION_CACHE_ASSOCIATIVITY (ArmCacheInfo ()))
   {
     case CACHE_ASSOCIATIVITY_8_WAY:   return 8;
     case CACHE_ASSOCIATIVITY_4_WAY:   return 4;
@@ -154,7 +155,7 @@ ArmInstructionCacheLineLength (
   VOID
   )
 {
-  switch (INSTRUCTION_CACHE_LINE_LENGTH(Cp15CacheInfo()))
+  switch (INSTRUCTION_CACHE_LINE_LENGTH (ArmCacheInfo ()))
   {
     case CACHE_LINE_LENGTH_32_BYTES: return 32;
     default:                         return  0;

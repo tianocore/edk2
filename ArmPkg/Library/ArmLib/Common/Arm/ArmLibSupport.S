@@ -24,7 +24,7 @@
 .text
 .align 2
 GCC_ASM_EXPORT(ArmReadMidr)
-GCC_ASM_EXPORT(Cp15CacheInfo)
+GCC_ASM_EXPORT(ArmCacheInfo)
 GCC_ASM_EXPORT(ArmGetInterruptState)
 GCC_ASM_EXPORT(ArmGetFiqState)
 GCC_ASM_EXPORT(ArmGetTTBR0BaseAddress)
@@ -54,7 +54,7 @@ ASM_PFX(ArmReadMidr):
   mrc     p15,0,R0,c0,c0,0
   bx      LR
 
-ASM_PFX(Cp15CacheInfo):
+ASM_PFX(ArmCacheInfo):
   mrc     p15,0,R0,c0,c0,1
   bx      LR
 
