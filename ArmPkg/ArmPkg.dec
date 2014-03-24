@@ -2,7 +2,7 @@
 # ARM processor package.
 #
 # Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2011 - 2013, ARM Limited. All rights reserved.
+# Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -38,7 +38,7 @@
   UncachedMemoryAllocationLib|Include/Library/UncachedMemoryAllocationLib.h
   DefaultExceptionHandlerLib|Include/Library/DefaultExceptionHandlerLib.h
   ArmDisassemblerLib|Include/Library/ArmDisassemblerLib.h
-  
+
 [Guids.common]
   gArmTokenSpaceGuid       = { 0xBB11ECFE, 0x820F, 0x4968, { 0xBB, 0xA6, 0xF7, 0x6A, 0xFE, 0x30, 0x25, 0x96 } }
 
@@ -64,10 +64,10 @@
   # Set this PCD to TRUE if the Exception Vector is changed to add debugger support before
   # it has been configured by the CPU DXE
   gArmTokenSpaceGuid.PcdDebuggerExceptionSupport|FALSE|BOOLEAN|0x00000032
-  
+
   # Define if the Power State Coordination Interface (PSCI) is supported by the Platform Trusted Firmware
   gArmTokenSpaceGuid.PcdArmPsciSupport|FALSE|BOOLEAN|0x00000033
-  
+
 [PcdsFixedAtBuild.common]
   gArmTokenSpaceGuid.PcdTrustzoneSupport|FALSE|BOOLEAN|0x00000006
 
@@ -79,9 +79,9 @@
   gArmTokenSpaceGuid.PcdArmCacheOperationThreshold|1024|UINT32|0x00000003
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0xffff0000|UINT32|0x00000004
   gArmTokenSpaceGuid.PcdCpuResetAddress|0x00000000|UINT32|0x00000005
-  
+
   #
-  # ARM General Interrupt Controller
+  # ARM Generic Interrupt Controller
   #
   gArmTokenSpaceGuid.PcdGicDistributorBase|0|UINT32|0x0000000C
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0|UINT32|0x0000000D
@@ -102,10 +102,10 @@
   gArmTokenSpaceGuid.PcdFdSize|0|UINT32|0x0000002C
   gArmTokenSpaceGuid.PcdFvBaseAddress|0|UINT32|0x0000002D
   gArmTokenSpaceGuid.PcdFvSize|0|UINT32|0x0000002E
- 
+
   #
   # ARM Hypervisor Firmware PCDs
-  #  
+  #
   gArmTokenSpaceGuid.PcdHypFdBaseAddress|0|UINT32|0x0000003A
   gArmTokenSpaceGuid.PcdHypFdSize|0|UINT32|0x0000003B
   gArmTokenSpaceGuid.PcdHypFvBaseAddress|0|UINT32|0x0000003C
@@ -113,21 +113,21 @@
 
   # System Memory (DRAM): These PCDs define the region of in-built system memory
   # Some platforms can get DRAM extensions, these additional regions will be declared
-  # to UEFI by ArmPLatformPlib   
+  # to UEFI by ArmPlatformLib
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0|UINT64|0x00000029
   gArmTokenSpaceGuid.PcdSystemMemorySize|0|UINT64|0x0000002A
 
   # Use ClusterId + CoreId to identify the PrimaryCore
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask|0xF03|UINT32|0x00000031
-  # The Primary Core is ClusterId[0] & CoreId[0] 
+  # The Primary Core is ClusterId[0] & CoreId[0]
   gArmTokenSpaceGuid.PcdArmPrimaryCore|0|UINT32|0x00000037
 
   #
   # ARM L2x0 PCDs
   #
   gArmTokenSpaceGuid.PcdL2x0ControllerBase|0|UINT32|0x0000001B
-  
-  # 
+
+  #
   # BdsLib
   #
   gArmTokenSpaceGuid.PcdArmMachineType|0|UINT32|0x0000001E
@@ -139,7 +139,7 @@
   #
   gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|0|UINT32|0x00000034
   # ARM Architectural Timer Interrupt(GIC PPI) number
-  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|29|UINT32|0x00000035  
+  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|29|UINT32|0x00000035
   gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|30|UINT32|0x00000036
 
 [PcdsFixedAtBuild.ARM]
@@ -207,8 +207,8 @@
 
   # By default we do transition to EL2 non-secure mode with Stack for EL2.
   #        Mode Description              Bits
-  # NS EL2 SP2 all interupts disabled =  0x3c9
-  # NS EL1 SP1 all interupts disabled =  0x3c5
+  # NS EL2 SP2 all interrupts disabled =  0x3c9
+  # NS EL1 SP1 all interrupts disabled =  0x3c5
   # Other modes include using SP0 or switching to Aarch32, but these are
   # not currently supported.
   gArmTokenSpaceGuid.PcdArmNonSecModeTransition|0x3c9|UINT32|0x0000003E
