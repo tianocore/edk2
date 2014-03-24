@@ -452,18 +452,6 @@ ArmMmuEnabled (
   
 VOID
 EFIAPI
-ArmSwitchProcessorMode (
-  IN ARM_PROCESSOR_MODE Mode
-  );
-
-ARM_PROCESSOR_MODE
-EFIAPI
-ArmProcessorMode (
-  VOID
-  );
-  
-VOID
-EFIAPI
 ArmEnableBranchPrediction (
   VOID
   );

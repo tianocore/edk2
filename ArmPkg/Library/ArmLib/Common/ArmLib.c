@@ -43,25 +43,6 @@ ArmCacheInformation (
 
 VOID
 EFIAPI
-ArmSwitchProcessorMode (
-  IN ARM_PROCESSOR_MODE Mode
-  )
-{
-  CPSRMaskInsert(ARM_PROCESSOR_MODE_MASK, Mode);
-}
-
-
-ARM_PROCESSOR_MODE
-EFIAPI
-ArmProcessorMode (
-  VOID
-  )
-{
-  return (ARM_PROCESSOR_MODE)(CPSRRead() & (UINT32)ARM_PROCESSOR_MODE_MASK);
-}
-
-VOID
-EFIAPI
 ArmSetAuxCrBit (
   IN  UINT32    Bits
   )
