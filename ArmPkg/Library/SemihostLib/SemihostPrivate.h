@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2013 - 2014, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -17,29 +18,29 @@
 
 typedef struct {
   CHAR8   *FileName;
-  UINT32  Mode;
-  UINT32  NameLength;
+  UINTN    Mode;
+  UINTN    NameLength;
 } SEMIHOST_FILE_OPEN_BLOCK;
 
 typedef struct {
-  UINT32  Handle;
+  UINTN    Handle;
   VOID    *Buffer;
-  UINT32  Length;
+  UINTN    Length;
 } SEMIHOST_FILE_READ_WRITE_BLOCK;
 
 typedef struct {
-  UINT32  Handle;
-  UINT32  Location;
+  UINTN    Handle;
+  UINTN    Location;
 } SEMIHOST_FILE_SEEK_BLOCK;
 
 typedef struct {
   CHAR8   *FileName;
-  UINT32  NameLength;
+  UINTN    NameLength;
 } SEMIHOST_FILE_REMOVE_BLOCK;
 
 typedef struct {
   CHAR8   *CommandLine;
-  UINT32  CommandLength;
+  UINTN    CommandLength;
 } SEMIHOST_SYSTEM_BLOCK;
 
 #if defined(__CC_ARM) 
