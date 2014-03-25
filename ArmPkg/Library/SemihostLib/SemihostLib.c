@@ -1,7 +1,8 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  
+  Copyright (c) 2013 - 2014, ARM Ltd. All rights reserved.<BR>
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -73,10 +74,12 @@ SemihostFileSeek (
 
   Result = Semihost_SYS_SEEK(&SeekBlock);
 
-  if (Result == 0) {
-    return RETURN_SUCCESS;
-  } else {
+  // Semihosting does not behave as documented. It returns the offset on
+  // success.
+  if (Result < 0) {
     return RETURN_ABORTED;
+  } else {
+    return RETURN_SUCCESS;
   }
 }
 
@@ -100,7 +103,7 @@ SemihostFileRead (
 
   Result = Semihost_SYS_READ(&ReadBlock);
 
-  if (Result == *Length) {
+  if ((*Length != 0) && (Result == *Length)) {
     return RETURN_ABORTED;
   } else {
     *Length -= Result;
@@ -126,8 +129,11 @@ SemihostFileWrite (
   WriteBlock.Length = *Length;
 
   *Length = Semihost_SYS_WRITE(&WriteBlock);
-  
-  return RETURN_SUCCESS;
+
+  if (*Length != 0)
+    return RETURN_ABORTED;
+  else
+    return RETURN_SUCCESS;
 }
 
 RETURN_STATUS
@@ -173,6 +179,11 @@ SemihostFileRemove (
 {
   SEMIHOST_FILE_REMOVE_BLOCK  RemoveBlock;
   UINT32                      Result;
+
+  // Remove any leading separator (e.g.: '\'). EFI Shell adds one.
+  if (*FileName == '\\') {
+    FileName++;
+  }
 
   RemoveBlock.FileName    = FileName;
   RemoveBlock.NameLength  = AsciiStrLen(FileName);
