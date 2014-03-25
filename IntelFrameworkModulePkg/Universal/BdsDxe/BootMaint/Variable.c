@@ -1,7 +1,7 @@
 /** @file
   Variable operation that will be used by bootmaint
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -165,9 +165,10 @@ Var_ChangeBootOrder (
                     BootOrderListSize * sizeof (UINT16),
                     BootOrderList
                     );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+    //
+    // Changing variable without increasing its size with current variable implementation shouldn't fail.
+    //
+    ASSERT_EFI_ERROR (Status);
   }
   return EFI_SUCCESS;
 }
@@ -303,9 +304,10 @@ Var_ChangeDriverOrder (
                     DriverOrderListSize * sizeof (UINT16),
                     DriverOrderList
                     );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+    //
+    // Changing variable without increasing its size with current variable implementation shouldn't fail.
+    //
+    ASSERT_EFI_ERROR (Status);
   }
   return EFI_SUCCESS;
 }
@@ -338,7 +340,10 @@ Var_UpdateAllConsoleOption (
                     GetDevicePathSize (OutDevicePath),
                     OutDevicePath
                     );
-    ASSERT (!EFI_ERROR (Status));
+    //
+    // Changing variable without increasing its size with current variable implementation shouldn't fail.
+    //
+    ASSERT_EFI_ERROR (Status);
   }
 
   if (InpDevicePath != NULL) {
@@ -350,7 +355,10 @@ Var_UpdateAllConsoleOption (
                     GetDevicePathSize (InpDevicePath),
                     InpDevicePath
                     );
-    ASSERT (!EFI_ERROR (Status));
+    //
+    // Changing variable without increasing its size with current variable implementation shouldn't fail.
+    //
+    ASSERT_EFI_ERROR (Status);
   }
 
   if (ErrDevicePath != NULL) {
@@ -362,7 +370,10 @@ Var_UpdateAllConsoleOption (
                     GetDevicePathSize (ErrDevicePath),
                     ErrDevicePath
                     );
-    ASSERT (!EFI_ERROR (Status));
+    //
+    // Changing variable without increasing its size with current variable implementation shouldn't fail.
+    //
+    ASSERT_EFI_ERROR (Status);
   }
 }
 
@@ -667,38 +678,40 @@ Var_UpdateDriverOption (
                   BufferSize,
                   Buffer
                   );
-  ASSERT_EFI_ERROR (Status);
-  DriverOrderList = BdsLibGetVariableAndSize (
-                      L"DriverOrder",
-                      &gEfiGlobalVariableGuid,
-                      &DriverOrderListSize
-                      );
-  NewDriverOrderList = AllocateZeroPool (DriverOrderListSize + sizeof (UINT16));
-  ASSERT (NewDriverOrderList != NULL);
-  if (DriverOrderList != NULL) {
-    CopyMem (NewDriverOrderList, DriverOrderList, DriverOrderListSize);
-    EfiLibDeleteVariable (L"DriverOrder", &gEfiGlobalVariableGuid);
-  }
-  NewDriverOrderList[DriverOrderListSize / sizeof (UINT16)] = Index;
+  if (!EFI_ERROR (Status)) {
+    DriverOrderList = BdsLibGetVariableAndSize (
+                        L"DriverOrder",
+                        &gEfiGlobalVariableGuid,
+                        &DriverOrderListSize
+                        );
+    NewDriverOrderList = AllocateZeroPool (DriverOrderListSize + sizeof (UINT16));
+    ASSERT (NewDriverOrderList != NULL);
+    if (DriverOrderList != NULL) {
+      CopyMem (NewDriverOrderList, DriverOrderList, DriverOrderListSize);
+      EfiLibDeleteVariable (L"DriverOrder", &gEfiGlobalVariableGuid);
+    }
+    NewDriverOrderList[DriverOrderListSize / sizeof (UINT16)] = Index;
 
-  Status = gRT->SetVariable (
-                  L"DriverOrder",
-                  &gEfiGlobalVariableGuid,
-                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-                  DriverOrderListSize + sizeof (UINT16),
-                  NewDriverOrderList
-                  );
-  ASSERT_EFI_ERROR (Status);
-  if (DriverOrderList != NULL) {
-    FreePool (DriverOrderList);
-  }
-  DriverOrderList = NULL;
-  FreePool (NewDriverOrderList);
-  InsertTailList (&DriverOptionMenu.Head, &NewMenuEntry->Link);
-  DriverOptionMenu.MenuNumber++;
+    Status = gRT->SetVariable (
+                    L"DriverOrder",
+                    &gEfiGlobalVariableGuid,
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                    DriverOrderListSize + sizeof (UINT16),
+                    NewDriverOrderList
+                    );
+    if (DriverOrderList != NULL) {
+      FreePool (DriverOrderList);
+    }
+    DriverOrderList = NULL;
+    FreePool (NewDriverOrderList);
+    if (!EFI_ERROR (Status)) {
+      InsertTailList (&DriverOptionMenu.Head, &NewMenuEntry->Link);
+      DriverOptionMenu.MenuNumber++;
 
-  *DescriptionData  = 0x0000;
-  *OptionalData     = 0x0000;
+      *DescriptionData  = 0x0000;
+      *OptionalData     = 0x0000;
+    }
+  }
   return EFI_SUCCESS;
 }
 
@@ -835,39 +848,41 @@ Var_UpdateBootOption (
                   BufferSize,
                   Buffer
                   );
-  ASSERT_EFI_ERROR (Status);
+  if (!EFI_ERROR (Status)) {
 
-  BootOrderList = BdsLibGetVariableAndSize (
+    BootOrderList = BdsLibGetVariableAndSize (
+                      L"BootOrder",
+                      &gEfiGlobalVariableGuid,
+                      &BootOrderListSize
+                      );
+    ASSERT (BootOrderList != NULL);
+    NewBootOrderList = AllocateZeroPool (BootOrderListSize + sizeof (UINT16));
+    ASSERT (NewBootOrderList != NULL);
+    CopyMem (NewBootOrderList, BootOrderList, BootOrderListSize);
+    NewBootOrderList[BootOrderListSize / sizeof (UINT16)] = Index;
+
+    if (BootOrderList != NULL) {
+      FreePool (BootOrderList);
+    }
+
+    Status = gRT->SetVariable (
                     L"BootOrder",
                     &gEfiGlobalVariableGuid,
-                    &BootOrderListSize
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                    BootOrderListSize + sizeof (UINT16),
+                    NewBootOrderList
                     );
-  ASSERT (BootOrderList != NULL);
-  NewBootOrderList = AllocateZeroPool (BootOrderListSize + sizeof (UINT16));
-  ASSERT (NewBootOrderList != NULL);
-  CopyMem (NewBootOrderList, BootOrderList, BootOrderListSize);
-  NewBootOrderList[BootOrderListSize / sizeof (UINT16)] = Index;
+    if (!EFI_ERROR (Status)) {
 
-  if (BootOrderList != NULL) {
-    FreePool (BootOrderList);
+      FreePool (NewBootOrderList);
+      NewBootOrderList = NULL;
+      InsertTailList (&BootOptionMenu.Head, &NewMenuEntry->Link);
+      BootOptionMenu.MenuNumber++;
+
+      NvRamMap->DescriptionData[0]  = 0x0000;
+      NvRamMap->OptionalData[0]     = 0x0000;
+    }
   }
-
-  Status = gRT->SetVariable (
-                  L"BootOrder",
-                  &gEfiGlobalVariableGuid,
-                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-                  BootOrderListSize + sizeof (UINT16),
-                  NewBootOrderList
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  FreePool (NewBootOrderList);
-  NewBootOrderList = NULL;
-  InsertTailList (&BootOptionMenu.Head, &NewMenuEntry->Link);
-  BootOptionMenu.MenuNumber++;
-
-  NvRamMap->DescriptionData[0]  = 0x0000;
-  NvRamMap->OptionalData[0]     = 0x0000;
   return EFI_SUCCESS;
 }
 
@@ -987,6 +1002,10 @@ Var_UpdateBootOrder (
                   BootOrderListSize,
                   BootOrderList
                   );
+  //
+  // Changing the content without increasing its size with current variable implementation shouldn't fail.
+  //
+  ASSERT_EFI_ERROR (Status);
   FreePool (BootOrderList);
 
   GroupMultipleLegacyBootOption4SameType ();
@@ -1058,10 +1077,11 @@ Var_UpdateDriverOrder (
                   DriverOrderListSize,
                   NewDriverOrderList
                   );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
+  //
+  // Changing the content without increasing its size with current variable implementation shouldn't fail.
+  //
+  ASSERT_EFI_ERROR (Status);
+  
   BOpt_FreeMenu (&DriverOptionMenu);
   BOpt_GetDriverOptions (CallbackData);
   return EFI_SUCCESS;
@@ -1258,6 +1278,10 @@ Var_UpdateBBSOption (
                       OptionSize,
                       BootOptionVar
                       );
+      //
+      // Changing the content without increasing its size with current variable implementation shouldn't fail.
+      //
+      ASSERT_EFI_ERROR (Status);
 
       FreePool (BootOptionVar);
     }
@@ -1281,6 +1305,10 @@ Var_UpdateBBSOption (
                       OptionSize,
                       BootOptionVar
                       );
+      //
+      // Changing the content without increasing its size with current variable implementation shouldn't fail.
+      //
+      ASSERT_EFI_ERROR (Status);
 
       FreePool (BootOptionVar);
     }

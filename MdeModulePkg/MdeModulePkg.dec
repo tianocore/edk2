@@ -270,6 +270,9 @@
   ## Include/Guid/ConnectConInEvent.h
   gConnectConInEventGuid             = { 0xdb4e8151, 0x57ed, 0x4bed, { 0x88, 0x33, 0x67, 0x51, 0xb5, 0xd1, 0xa8, 0xd7 }}
 
+  ## Include/Guid/StatusCodeDataTypeVariable.h
+  gEdkiiStatusCodeDataTypeVariableGuid = { 0xf6ee6dbb, 0xd67f, 0x4ea0, { 0x8b, 0x96, 0x6a, 0x71, 0xb1, 0x9d, 0x84, 0xad }}
+
 [Ppis]
   ## Include/Ppi/AtaController.h
   gPeiAtaControllerPpiGuid       = { 0xa45e60d1, 0xc719, 0x44aa, { 0xb0, 0x7a, 0xaa, 0x77, 0x7f, 0x85, 0x90, 0x6d }}
@@ -602,6 +605,10 @@
   ## Progress Code for S3 Suspend end.
   #  PROGRESS_CODE_S3_SUSPEND_END   = (EFI_SOFTWARE_SMM_DRIVER | (EFI_OEM_SPECIFIC | 0x00000001))    = 0x03078001
   gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeS3SuspendEnd|0x03078001|UINT32|0x30001033
+
+  ## Error Code for SetVariable failure.
+  #  EDKII_ERROR_CODE_SET_VARIABLE  = (EFI_SOFTWARE_DXE_BS_DRIVER | (EFI_OEM_SPECIFIC | 0x00000002)) = 0x03058002
+  gEfiMdeModulePkgTokenSpaceGuid.PcdErrorCodeSetVariable|0x03058002|UINT32|0x30001040
 
 [PcdsFixedAtBuild,PcdsPatchableInModule]
   ## VPD type PCD allow developer point an absoluted physical address PcdVpdBaseAddress
