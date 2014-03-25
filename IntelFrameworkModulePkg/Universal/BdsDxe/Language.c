@@ -462,7 +462,7 @@ InitializeLanguage (
   if (LangCodesSettingRequired) {
     if (!FeaturePcdGet (PcdUefiVariableDefaultLangDeprecate)) {
       //
-      // UEFI 2.1 depricated this variable so we support turning it off
+      // UEFI 2.0 depricated this variable so we support turning it off
       //
       Status = gRT->SetVariable (
                       L"LangCodes",
@@ -492,7 +492,7 @@ InitializeLanguage (
 
   if (!FeaturePcdGet (PcdUefiVariableDefaultLangDeprecate)) {
     //
-    // UEFI 2.1 depricated this variable so we support turning it off
+    // UEFI 2.0 depricated this variable so we support turning it off
     //
     InitializeLangVariable (L"Lang", LangCodes, (CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultLang), TRUE);
   }
