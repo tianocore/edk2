@@ -1,7 +1,7 @@
 /** @file
 *  File managing the MMU for ARMv8 architecture
 *
-*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -264,13 +264,22 @@ GetBlockEntryListFromAddress (
   BlockEntry = NULL;
 
   // Ensure the parameters are valid
-  ASSERT (TableLevel && BlockEntrySize && LastBlockEntry);
+  if (!(TableLevel && BlockEntrySize && LastBlockEntry)) {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return NULL;
+  }
 
   // Ensure the Region is aligned on 4KB boundary
-  ASSERT ((RegionStart & (SIZE_4KB - 1)) == 0);
+  if ((RegionStart & (SIZE_4KB - 1)) != 0) {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return NULL;
+  }
 
   // Ensure the required size is aligned on 4KB boundary
-  ASSERT ((*BlockEntrySize & (SIZE_4KB - 1)) == 0);
+  if ((*BlockEntrySize & (SIZE_4KB - 1)) != 0) {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return NULL;
+  }
 
   //
   // Calculate LastBlockEntry from T0SZ - this is the last block entry of the root Translation table
@@ -427,7 +436,10 @@ FillTranslationTable (
   UINTN   TableLevel;
 
   // Ensure the Length is aligned on 4KB boundary
-  ASSERT ((MemoryRegion->Length > 0) && ((MemoryRegion->Length & (SIZE_4KB - 1)) == 0));
+  if ((MemoryRegion->Length == 0) || ((MemoryRegion->Length & (SIZE_4KB - 1)) != 0)) {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return RETURN_INVALID_PARAMETER;
+  }
 
   // Variable initialization
   Attributes = ArmMemoryAttributeToPageAttribute (MemoryRegion->Attributes) | TT_AF;
@@ -519,7 +531,11 @@ ArmConfigureMmu (
   UINT64                        TCR;
   RETURN_STATUS                 Status;
 
-  ASSERT (MemoryTable != NULL);
+  if(MemoryTable == NULL)
+  {
+    ASSERT (MemoryTable != NULL);
+    return RETURN_INVALID_PARAMETER;
+  }
 
   // Identify the highest address of the memory table
   MaxAddress = MemoryTable->PhysicalBase + MemoryTable->Length - 1;
