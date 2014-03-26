@@ -48,3 +48,27 @@ ArmCpuSetupSmpNonSecure (
   )
 {
 }
+
+VOID
+EFIAPI
+ArmSetCpuExCrBit (
+  IN  UINT64    Bits
+  )
+{
+  UINT64 Value;
+  Value =  ArmReadCpuExCr ();
+  Value |= Bits;
+  ArmWriteCpuExCr (Value);
+}
+
+VOID
+EFIAPI
+ArmUnsetCpuExCrBit (
+  IN  UINT64    Bits
+  )
+{
+  UINT64 Value;
+  Value = ArmReadCpuExCr ();
+  Value &= ~Bits;
+  ArmWriteCpuExCr (Value);
+}

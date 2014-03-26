@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2012-2013, ARM Limited. All rights reserved.
+  Copyright (c) 2012-2014, ARM Limited. All rights reserved.
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -19,5 +19,32 @@
 // Cortex A5x feature bit definitions
 //
 #define A5X_FEATURE_SMP     (1 << 6)
+
+//
+// Helper functions to access CPU Extended Control Register
+//
+UINT64
+EFIAPI
+ArmReadCpuExCr (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmWriteCpuExCr (
+  IN  UINT64 Val
+  );
+
+VOID
+EFIAPI
+ArmSetCpuExCrBit (
+  IN  UINT64    Bits
+  );
+
+VOID
+EFIAPI
+ArmUnsetCpuExCrBit (
+  IN  UINT64    Bits
+  );
 
 #endif
