@@ -1,7 +1,7 @@
 /** @file
 *  Header defining Versatile Express constants (Base addresses, sizes, flags)
 *
-*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -59,6 +59,8 @@
 #define ARM_VE_SYS_PROC_ID_CORTEX_A9              (UINT32)(0x0CU << 24)
 #define ARM_VE_SYS_PROC_ID_CORTEX_A5              (UINT32)(0x12U << 24)
 #define ARM_VE_SYS_PROC_ID_CORTEX_A15             (UINT32)(0x14U << 24)
+#define ARM_VE_SYS_PROC_ID_CORTEX_A7              (UINT32)(0x18U << 24)
+#define ARM_VE_SYS_PROC_ID_CORTEX_A12             (UINT32)(0x1CU << 24)
 
 // Boot Master Select:
 // 0 = Site 1 boot master
