@@ -40,6 +40,14 @@ ArmCpuSetup (
     ArmSetCpuExCrBit (A5X_FEATURE_SMP);
   }
 
+  //
+  // If CPU is CortexA57 r0p0 apply Errata: 806969
+  //
+  if ((ArmReadMidr () & ((ARM_CPU_TYPE_MASK << 4) | ARM_CPU_REV_MASK)) ==
+                         ((ARM_CPU_TYPE_A57 << 4) | ARM_CPU_REV(0,0))) {
+    // DisableLoadStoreWB
+    ArmSetCpuActlrBit (1ULL << 49);
+  }
 }
 
 VOID
