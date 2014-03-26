@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011-2013, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011-2014, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -71,9 +71,15 @@
 
 // MIDR - Main ID Register definitions
 #define ARM_CPU_TYPE_MASK       0xFFF
+#define ARM_CPU_TYPE_AEMv8      0xD0F
+#define ARM_CPU_TYPE_A53        0xD03
+#define ARM_CPU_TYPE_A57        0xD07
 #define ARM_CPU_TYPE_A15        0xC0F
 #define ARM_CPU_TYPE_A9         0xC09
 #define ARM_CPU_TYPE_A5         0xC05
+
+#define ARM_CPU_REV_MASK        ((0xF << 20) | (0xF) )
+#define ARM_CPU_REV(rn, pn)     ((((rn) & 0xF) << 20) | ((pn) & 0xF))
 
 #define ARM_VECTOR_TABLE_ALIGNMENT ((1 << 5)-1)
 
