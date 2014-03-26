@@ -47,6 +47,8 @@ GCC_ASM_EXPORT(ArmWriteHVBar)
 GCC_ASM_EXPORT(ArmCallWFE)
 GCC_ASM_EXPORT(ArmCallSEV)
 GCC_ASM_EXPORT(ArmReadSctlr)
+GCC_ASM_EXPORT(ArmReadCpuActlr)
+GCC_ASM_EXPORT(ArmWriteCpuActlr)
 
 #------------------------------------------------------------------------------
 
@@ -161,7 +163,6 @@ ASM_PFX(ArmWriteHVBar):
   mcr     p15, 4, r0, c12, c0, 0
   bx      lr
 
-
 ASM_PFX(ArmReadMVBar):
   mrc     p15, 0, r0, c12, c0, 1
   bx      lr
@@ -179,7 +180,17 @@ ASM_PFX(ArmCallSEV):
   bx      lr
 
 ASM_PFX(ArmReadSctlr):
-  mrc     p15, 0, R0, c1, c0, 0      @ Read SCTLR into R0 (Read control register configuration data)
-  bx	  lr
+  mrc     p15, 0, r0, c1, c0, 0      @ Read SCTLR into R0 (Read control register configuration data)
+  bx      lr
+
+ASM_PFX(ArmReadCpuActlr):
+  mrc     p15, 0, r0, c1, c0, 1
+  bx      lr
+
+ASM_PFX(ArmWriteCpuActlr):
+  mcr     p15, 0, r0, c1, c0, 1
+  dsb
+  isb
+  bx      lr
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED

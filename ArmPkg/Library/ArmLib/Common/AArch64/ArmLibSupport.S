@@ -37,6 +37,10 @@ GCC_ASM_EXPORT (ArmWriteScr)
 GCC_ASM_EXPORT (ArmWriteMVBar)
 GCC_ASM_EXPORT (ArmCallWFE)
 GCC_ASM_EXPORT (ArmCallSEV)
+GCC_ASM_EXPORT (ArmReadCpuExCr)
+GCC_ASM_EXPORT (ArmWriteCpuExCr)
+GCC_ASM_EXPORT (ArmReadCpuActlr)
+GCC_ASM_EXPORT (ArmWriteCpuActlr)
 
 #------------------------------------------------------------------------------
 
@@ -196,5 +200,24 @@ ASM_PFX(ArmCallSEV):
   sev
   ret
 
+ASM_PFX(ArmReadCpuExCr):
+  mrs   x0, S3_1_c15_c2_1
+  ret
+
+ASM_PFX(ArmWriteCpuExCr):
+  msr   S3_1_c15_c2_1, x0
+  dsb   sy
+  isb
+  ret
+
+ASM_PFX(ArmReadCpuActlr):
+  mrs   x0, S3_1_c15_c2_0
+  ret
+
+ASM_PFX(ArmWriteCpuActlr):
+  msr   S3_1_c15_c2_0, x0
+  dsb   sy
+  isb
+  ret
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED

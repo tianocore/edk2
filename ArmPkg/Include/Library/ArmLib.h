@@ -625,4 +625,33 @@ ArmWriteHVBar (
   IN  UINTN   HypModeVectorBase
   );
 
+
+//
+// Helper functions for accessing CPU ACTLR
+//
+
+UINTN
+EFIAPI
+ArmReadCpuActlr (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmWriteCpuActlr (
+  IN  UINTN Val
+  );
+
+VOID
+EFIAPI
+ArmSetCpuActlrBit (
+  IN  UINTN    Bits
+  );
+
+VOID
+EFIAPI
+ArmUnsetCpuActlrBit (
+  IN  UINTN    Bits
+  );
+
 #endif // __ARM_LIB__

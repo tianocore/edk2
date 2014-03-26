@@ -47,6 +47,8 @@
     EXPORT ArmCallWFE
     EXPORT ArmCallSEV
     EXPORT ArmReadSctlr
+    EXPORT ArmReadCpuActlr
+    EXPORT ArmWriteCpuActlr
 
     AREA ArmLibSupport, CODE, READONLY
 
@@ -179,6 +181,17 @@ ArmCallSEV
 
 ArmReadSctlr
   mrc     p15, 0, r0, c1, c0, 0      // Read SCTLR into R0 (Read control register configuration data)
-  bx	    lr
+  bx	  lr
+
+
+ArmReadCpuActlr
+  mrc     p15, 0, r0, c1, c0, 1
+  bx      lr
+
+ArmWriteCpuActlr
+  mcr     p15, 0, r0, c1, c0, 1
+  dsb
+  isb
+  bx      lr
 
   END
