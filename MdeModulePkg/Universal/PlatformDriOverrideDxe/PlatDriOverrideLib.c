@@ -912,7 +912,7 @@ DeleteOverridesVariables (
   Status = gRT->SetVariable (
                   L"PlatDriOver",
                   &gEfiCallerIdGuid,
-                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                   0,
                   NULL
                   );
@@ -922,7 +922,7 @@ DeleteOverridesVariables (
     Status = gRT->SetVariable (
                     OverrideVariableName,
                     &gEfiCallerIdGuid,
-                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                     0,
                     NULL
                     );
@@ -977,7 +977,7 @@ SaveOverridesMapping (
   // Get the the maximum size of an individual EFI variable in current system
   //
   gRT->QueryVariableInfo (
-          EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+          EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
           &MaximumVariableStorageSize,
           &RemainingVariableStorageSize,
           &MaximumVariableSize
@@ -1086,7 +1086,7 @@ SaveOverridesMapping (
     Status = gRT->SetVariable (
                     OverrideVariableName,
                     &gEfiCallerIdGuid,
-                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                     VariableNeededSize,
                     VariableBuffer
                     );
