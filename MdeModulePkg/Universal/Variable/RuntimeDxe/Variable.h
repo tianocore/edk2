@@ -101,10 +101,6 @@ typedef struct {
 typedef struct {
   EFI_GUID    *Guid;
   CHAR16      *Name;
-//  UINT32      Attributes;
-  //
-  // Variable size include variable header, name and data.
-  //
   UINTN       VariableSize;
 } VARIABLE_ENTRY_CONSISTENCY;
 

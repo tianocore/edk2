@@ -610,7 +610,7 @@ IsValidPubKeyIndex (
     return FALSE;
   }
   
-  Variable = GetStartPointer (mNvVariableCache);
+  Variable = GetStartPointer ((VARIABLE_STORE_HEADER *) (UINTN) mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase);
   
   while (IsValidVariableHeader (Variable)) {
     if ((Variable->State == VAR_ADDED || Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) && 
@@ -1518,8 +1518,10 @@ VariableGetBestLanguage (
   so follow the argument sequence to check the Variables.
 
   @param[in] Attributes         Variable attributes for Variable entries.
-  @param     ...                Variable argument list with type VARIABLE_ENTRY_CONSISTENCY *.
-                                A NULL terminates the list.
+  @param ...                    The variable argument list with type VARIABLE_ENTRY_CONSISTENCY *.
+                                A NULL terminates the list. The VariableSize of 
+                                VARIABLE_ENTRY_CONSISTENCY is the variable data size as input.
+                                It will be changed to variable total size as output.
 
   @retval TRUE                  Have enough variable space to set the Variables successfully.
   @retval FALSE                 No enough variable space to set the Variables successfully.
@@ -1543,6 +1545,8 @@ CheckRemainingSpaceForConsistency (
   VARIABLE_STORE_HEADER         *VariableStoreHeader;
   VARIABLE_POINTER_TRACK        VariablePtrTrack;
   VARIABLE_HEADER               *NextVariable;
+  UINTN                         VarNameSize;
+  UINTN                         VarDataSize;
 
   //
   // Non-Volatile related.
@@ -1561,6 +1565,15 @@ CheckRemainingSpaceForConsistency (
   VA_START (Args, Attributes);
   VariableEntry = VA_ARG (Args, VARIABLE_ENTRY_CONSISTENCY *);
   while (VariableEntry != NULL) {
+    //
+    // Calculate variable total size.
+    //
+    VarNameSize  = StrSize (VariableEntry->Name);
+    VarNameSize += GET_PAD_SIZE (VarNameSize);
+    VarDataSize  = VariableEntry->VariableSize;
+    VarDataSize += GET_PAD_SIZE (VarDataSize);
+    VariableEntry->VariableSize = HEADER_ALIGN (sizeof (VARIABLE_HEADER) + VarNameSize + VarDataSize);
+
     TotalNeededSize += VariableEntry->VariableSize;
     VariableEntry = VA_ARG (Args, VARIABLE_ENTRY_CONSISTENCY *);
   }
@@ -1657,8 +1670,6 @@ AutoUpdateLangVariable (
   UINT32                 Attributes;
   VARIABLE_POINTER_TRACK Variable;
   BOOLEAN                SetLanguageCodes;
-  UINTN                  VarNameSize;
-  UINTN                  VarDataSize;
   VARIABLE_ENTRY_CONSISTENCY VariableEntry[2];
 
   //
@@ -1782,21 +1793,13 @@ AutoUpdateLangVariable (
         BestLang = GetLangFromSupportedLangCodes (mVariableModuleGlobal->LangCodes, Index, TRUE);
 
         //
-        // Calculate the needed variable size for Lang variable.
+        // Check the variable space for both Lang and PlatformLang variable.
         //
-        VarNameSize = StrSize (EFI_LANG_VARIABLE_NAME);
-        VarDataSize = ISO_639_2_ENTRY_SIZE + 1;
-        VariableEntry[0].VariableSize = sizeof (VARIABLE_HEADER) + VarNameSize + GET_PAD_SIZE (VarNameSize) + VarDataSize + GET_PAD_SIZE (VarDataSize);
-        VariableEntry[0].VariableSize = HEADER_ALIGN (VariableEntry[0].VariableSize);
+        VariableEntry[0].VariableSize = ISO_639_2_ENTRY_SIZE + 1;
         VariableEntry[0].Guid = &gEfiGlobalVariableGuid;
         VariableEntry[0].Name = EFI_LANG_VARIABLE_NAME;
-        //
-        // Calculate the needed variable size for PlatformLang variable.
-        //
-        VarNameSize = StrSize (EFI_PLATFORM_LANG_VARIABLE_NAME);
-        VarDataSize = AsciiStrSize (BestPlatformLang);
-        VariableEntry[1].VariableSize = sizeof (VARIABLE_HEADER) + VarNameSize + GET_PAD_SIZE (VarNameSize) + VarDataSize + GET_PAD_SIZE (VarDataSize);
-        VariableEntry[1].VariableSize = HEADER_ALIGN (VariableEntry[1].VariableSize);
+        
+        VariableEntry[1].VariableSize = AsciiStrSize (BestPlatformLang);
         VariableEntry[1].Guid = &gEfiGlobalVariableGuid;
         VariableEntry[1].Name = EFI_PLATFORM_LANG_VARIABLE_NAME;
         if (!CheckRemainingSpaceForConsistency (VARIABLE_ATTRIBUTE_NV_BS_RT, &VariableEntry[0], &VariableEntry[1], NULL)) {
@@ -1839,21 +1842,13 @@ AutoUpdateLangVariable (
         BestPlatformLang = GetLangFromSupportedLangCodes (mVariableModuleGlobal->PlatformLangCodes, Index, FALSE);
 
         //
-        // Calculate the needed variable size for PlatformLang variable.
+        // Check the variable space for both PlatformLang and Lang variable.
         //
-        VarNameSize = StrSize (EFI_PLATFORM_LANG_VARIABLE_NAME);
-        VarDataSize = AsciiStrSize (BestPlatformLang);
-        VariableEntry[0].VariableSize = sizeof (VARIABLE_HEADER) + VarNameSize + GET_PAD_SIZE (VarNameSize) + VarDataSize + GET_PAD_SIZE (VarDataSize);
-        VariableEntry[0].VariableSize = HEADER_ALIGN (VariableEntry[0].VariableSize);
+        VariableEntry[0].VariableSize = AsciiStrSize (BestPlatformLang);
         VariableEntry[0].Guid = &gEfiGlobalVariableGuid;
         VariableEntry[0].Name = EFI_PLATFORM_LANG_VARIABLE_NAME;
-        //
-        // Calculate the needed variable size for Lang variable.
-        //
-        VarNameSize = StrSize (EFI_LANG_VARIABLE_NAME);
-        VarDataSize = ISO_639_2_ENTRY_SIZE + 1;
-        VariableEntry[1].VariableSize = sizeof (VARIABLE_HEADER) + VarNameSize + GET_PAD_SIZE (VarNameSize) + VarDataSize + GET_PAD_SIZE (VarDataSize);
-        VariableEntry[1].VariableSize = HEADER_ALIGN (VariableEntry[1].VariableSize);
+
+        VariableEntry[1].VariableSize = ISO_639_2_ENTRY_SIZE + 1;
         VariableEntry[1].Guid = &gEfiGlobalVariableGuid;
         VariableEntry[1].Name = EFI_LANG_VARIABLE_NAME;
         if (!CheckRemainingSpaceForConsistency (VARIABLE_ATTRIBUTE_NV_BS_RT, &VariableEntry[0], &VariableEntry[1], NULL)) {
