@@ -1,7 +1,7 @@
 ## @file
 #  This module will initialize TPM device and measure FVs in PEI phase.
 #
-# Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -63,7 +63,6 @@
   gEfiEndOfPeiSignalPpiGuid
 
 [Pcd]
-  gEfiSecurityPkgTokenSpaceGuid.PcdHideTpm
   gEfiSecurityPkgTokenSpaceGuid.PcdPhysicalPresenceLifetimeLock
   gEfiSecurityPkgTokenSpaceGuid.PcdPhysicalPresenceCmdEnable
   gEfiSecurityPkgTokenSpaceGuid.PcdPhysicalPresenceHwEnable
@@ -73,7 +72,6 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmScrtmPolicy
 
 [FixedPcd]
-  gEfiSecurityPkgTokenSpaceGuid.PcdHideTpmSupport
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported             ## CONSUMES
 
 [Depex]

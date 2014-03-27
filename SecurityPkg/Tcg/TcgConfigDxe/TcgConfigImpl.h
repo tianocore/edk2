@@ -2,7 +2,7 @@
   The header file of HII Config Access protocol implementation of TCG
   configuration module.
 
-Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -62,8 +62,6 @@ typedef struct {
   EFI_HANDLE                        DriverHandle;  
 
   EFI_TCG_PROTOCOL                  *TcgProtocol;
-
-  BOOLEAN                           HideTpm;
 } TCG_CONFIG_PRIVATE_DATA;
 
 extern TCG_CONFIG_PRIVATE_DATA      mTcgConfigPrivateDateTemplate;

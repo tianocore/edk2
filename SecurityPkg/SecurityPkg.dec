@@ -229,15 +229,7 @@
   #  If 1, TCG platform type is server.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmPlatformClass|0|UINT8|0x00000006
 
-  ## The PCD is used to control whether to support hiding the TPM.
-  #  If TRUE, PcdHideTpm controls whether to hide the TPM.
-  #  This pcd is only for validation purpose. It should be set to false in production.
-  gEfiSecurityPkgTokenSpaceGuid.PcdHideTpmSupport|FALSE|BOOLEAN|0x00000007
-  
 [PcdsDynamic, PcdsDynamicEx]
-  ## The PCD is used to control whether to hide the TPM.
-  gEfiSecurityPkgTokenSpaceGuid.PcdHideTpm|FALSE|BOOLEAN|0x00010002
-
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD indicates the presence or absence of the platform operator.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmPhysicalPresence|TRUE|BOOLEAN|0x00010001
