@@ -1,7 +1,7 @@
 /** @file
   Debug Agent library implementition for Dxe Core and Dxr modules.
 
-  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -283,16 +283,21 @@ SetupDebugAgentEnviroment (
   //
   InitializeDebugIdt ();
 
-  if (Mailbox != NULL) {
-    //
-    // If Mailbox exists, copy it into one global variable,
-    //
-    CopyMem (&mMailbox, Mailbox, sizeof (DEBUG_AGENT_MAILBOX));
-  } else {
-    ZeroMem (&mMailbox, sizeof (DEBUG_AGENT_MAILBOX));
-  }  
+  //
+  // If mMailboxPointer is not set before, set it
+  //
+  if (mMailboxPointer == NULL) {
+    if (Mailbox != NULL) {
+      //
+      // If Mailbox exists, copy it into one global variable
+      //
+      CopyMem (&mMailbox, Mailbox, sizeof (DEBUG_AGENT_MAILBOX));
+    } else {
+      ZeroMem (&mMailbox, sizeof (DEBUG_AGENT_MAILBOX));
+    }
+    mMailboxPointer = &mMailbox;
+  }
 
-  mMailboxPointer = &mMailbox;
   //
   // Initialize debug communication port
   //
@@ -520,6 +525,10 @@ InitializeDebugAgent (
       Mailbox = (DEBUG_AGENT_MAILBOX *)(UINTN)(*MailboxLocation);
       VerifyMailboxChecksum (Mailbox);
     }
+    //
+    // Save Mailbox pointer in global variable
+    //
+    mMailboxPointer = Mailbox;
     //
     // Set up IDT table and prepare for IDT entries
     //
