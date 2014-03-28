@@ -1012,6 +1012,7 @@ I2cHostQueueRequest (
   //
   RequestPacketSize = sizeof (UINTN) + RequestPacket->OperationCount * sizeof (EFI_I2C_OPERATION);
   I2cRequest->RequestPacket = AllocateZeroPool (RequestPacketSize);
+  ASSERT (I2cRequest->RequestPacket != NULL);
   CopyMem (I2cRequest->RequestPacket, RequestPacket, RequestPacketSize);
 
   //
