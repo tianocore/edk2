@@ -2,7 +2,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by Variable modules.
 
-Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -43,6 +43,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/SystemNvDataGuid.h>
 #include <Guid/FaultTolerantWrite.h>
 #include <Guid/HardwareErrorVariable.h>
+
+#define VARIABLE_ATTRIBUTE_BS_RT        (EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS)
+#define VARIABLE_ATTRIBUTE_NV_BS_RT     (VARIABLE_ATTRIBUTE_BS_RT | EFI_VARIABLE_NON_VOLATILE)
 
 #define VARIABLE_RECLAIM_THRESHOLD (1024)
 #define EFI_VARIABLE_ATTRIBUTES_MASK (EFI_VARIABLE_NON_VOLATILE | \
@@ -103,10 +106,8 @@ typedef struct {
 typedef struct {
   EFI_GUID    *Guid;
   CHAR16      *Name;
-  UINT32      Attributes;
-  UINTN       DataSize;
-  VOID        *Data;
-} VARIABLE_CACHE_ENTRY;
+  UINTN       VariableSize;
+} VARIABLE_ENTRY_CONSISTENCY;
 
 typedef struct {
   EFI_GUID    Guid;
@@ -213,6 +214,32 @@ DataSizeOfVariable (
   IN  VARIABLE_HEADER   *Variable
   );
 
+/**
+  This function is to check if the remaining variable space is enough to set
+  all Variables from argument list successfully. The purpose of the check
+  is to keep the consistency of the Variables to be in variable storage.
+
+  Note: Variables are assumed to be in same storage.
+  The set sequence of Variables will be same with the sequence of VariableEntry from argument list,
+  so follow the argument sequence to check the Variables.
+
+  @param[in] Attributes         Variable attributes for Variable entries.
+  @param ...                    The variable argument list with type VARIABLE_ENTRY_CONSISTENCY *.
+                                A NULL terminates the list. The VariableSize of 
+                                VARIABLE_ENTRY_CONSISTENCY is the variable data size as input.
+                                It will be changed to variable total size as output.
+
+  @retval TRUE                  Have enough variable space to set the Variables successfully.
+  @retval FALSE                 No enough variable space to set the Variables successfully.
+
+**/
+BOOLEAN
+EFIAPI
+CheckRemainingSpaceForConsistency (
+  IN UINT32                     Attributes,
+  ...
+  );
+  
 /**
   Update the variable region with Variable information. If EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS is set,
   index of associated public key is needed.
@@ -554,6 +581,34 @@ VariableServiceSetVariable (
   IN UINT32                  Attributes,
   IN UINTN                   DataSize,
   IN VOID                    *Data
+  );
+
+/**
+
+  This code returns information about the EFI variables.
+
+  Caution: This function may receive untrusted input.
+  This function may be invoked in SMM mode. This function will do basic validation, before parse the data.
+
+  @param Attributes                     Attributes bitmask to specify the type of variables
+                                        on which to return information.
+  @param MaximumVariableStorageSize     Pointer to the maximum size of the storage space available
+                                        for the EFI variables associated with the attributes specified.
+  @param RemainingVariableStorageSize   Pointer to the remaining size of the storage space available
+                                        for EFI variables associated with the attributes specified.
+  @param MaximumVariableSize            Pointer to the maximum size of an individual EFI variables
+                                        associated with the attributes specified.
+
+  @return EFI_SUCCESS                   Query successfully.
+
+**/
+EFI_STATUS
+EFIAPI
+VariableServiceQueryVariableInfoInternal (
+  IN  UINT32                 Attributes,
+  OUT UINT64                 *MaximumVariableStorageSize,
+  OUT UINT64                 *RemainingVariableStorageSize,
+  OUT UINT64                 *MaximumVariableSize
   );
 
 /**

@@ -1308,7 +1308,8 @@
   ## If TRUE, the driver diagnostics2 protocol will not be installed.
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|FALSE|BOOLEAN|0x00000011
 
-  ## Indicates whether EFI 1.1 ISO 639-2 language supports are obsolete
+  ## Indicates whether EFI 1.1 ISO 639-2 language supports are obsolete.
+  #  If TRUE, Variable driver will be also not to auto update between PlatformLang and Lang variables.
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate|FALSE|BOOLEAN|0x00000012
 
   ## If TRUE, UGA Draw Protocol is still consumed.
