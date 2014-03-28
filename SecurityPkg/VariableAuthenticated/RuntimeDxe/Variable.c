@@ -860,6 +860,7 @@ Reclaim (
     if (EFI_ERROR (Status)) {
       goto Done;
     }
+    ASSERT ((NewPubKeyIndex != NULL) && (NewPubKeyStore != NULL));
 
     //
     // Refresh the PubKeyIndex for all valid variables (ADDED and IN_DELETED_TRANSITION).
