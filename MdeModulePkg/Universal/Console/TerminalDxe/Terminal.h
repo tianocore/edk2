@@ -20,6 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Guid/GlobalVariable.h>
 #include <Guid/PcAnsi.h>
+#include <Guid/StatusCodeDataTypeVariable.h>
 
 #include <Protocol/SimpleTextOut.h>
 #include <Protocol/SerialIo.h>

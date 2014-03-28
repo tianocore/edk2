@@ -14,7 +14,7 @@
 #  BDSDxe also maintain the UI for "Boot Manager, Boot Maintaince Manager, Device Manager" which
 #  is used for user to configure boot option or maintain hardware device.
 #  
-#  Copyright (c) 2008 - 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -141,6 +141,7 @@
   gDeviceManagerFormSetGuid                     ## SOMETIMES_PRODUCES ## DeviceManager HII Package
   gDriverHealthFormSetGuid                      ## SOMETIMES_PRODUCES ## DriverHealth HII Package
   gConnectConInEventGuid                        ## CONSUMES ## GUID (Connect ConIn Event)
+  gEdkiiStatusCodeDataTypeVariableGuid          ## SOMETIMES_CONSUMES
 
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid              ## PROTOCOL CONSUMES
@@ -187,6 +188,7 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile
+  gEfiMdeModulePkgTokenSpaceGuid.PcdErrorCodeSetVariable
 
 [Depex]
   TRUE

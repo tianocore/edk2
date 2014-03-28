@@ -13,7 +13,7 @@
   4. It save all the mapping info in NV variables which will be consumed
      by platform override protocol driver to publish the platform override protocol.
 
-Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1240,6 +1240,7 @@ PlatOverMngrRouteConfig (
   EFI_CALLBACK_INFO                         *Private;
   UINT16                                    KeyValue;
   PLAT_OVER_MNGR_DATA                       *FakeNvData;
+  EFI_STATUS                                Status;
 
   if (Configuration == NULL || Progress == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1260,11 +1261,12 @@ PlatOverMngrRouteConfig (
     return EFI_SUCCESS;
   }
 
+  Status = EFI_SUCCESS;
   if (mCurrentPage == FORM_ID_DRIVER) {
     KeyValue = KEY_VALUE_DRIVER_GOTO_ORDER;
     UpdatePrioritySelectPage (Private, KeyValue, FakeNvData);
     KeyValue = KEY_VALUE_ORDER_SAVE_AND_EXIT;
-    CommintChanges (Private, KeyValue, FakeNvData);
+    Status = CommintChanges (Private, KeyValue, FakeNvData);
     //
     // Since UpdatePrioritySelectPage will change mCurrentPage,
     // should ensure the mCurrentPage still indicate the second page here
@@ -1274,10 +1276,10 @@ PlatOverMngrRouteConfig (
 
   if (mCurrentPage == FORM_ID_ORDER) {
     KeyValue = KEY_VALUE_ORDER_SAVE_AND_EXIT;
-    CommintChanges (Private, KeyValue, FakeNvData);
+    Status = CommintChanges (Private, KeyValue, FakeNvData);
   }
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
