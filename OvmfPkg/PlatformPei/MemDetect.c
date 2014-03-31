@@ -218,12 +218,18 @@ InitializeRamRegions (
       EfiACPIMemoryNVS
       );
 #endif
+  }
 
+  if (mBootMode != BOOT_ON_S3_RESUME) {
     //
     // Reserve the lock box storage area
     //
     // Since this memory range will be used on S3 resume, it must be
     // reserved as ACPI NVS.
+    //
+    // If S3 is unsupported, then various drivers might still write to the
+    // LockBox area. We ought to prevent DXE from serving allocation requests
+    // such that they would overlap the LockBox storage.
     //
     ZeroMem (
       (VOID*)(UINTN) PcdGet32 (PcdOvmfLockBoxStorageBase),
@@ -232,7 +238,7 @@ InitializeRamRegions (
     BuildMemoryAllocationHob (
       (EFI_PHYSICAL_ADDRESS)(UINTN) PcdGet32 (PcdOvmfLockBoxStorageBase),
       (UINT64)(UINTN) PcdGet32 (PcdOvmfLockBoxStorageSize),
-      EfiACPIMemoryNVS
+      mS3Supported ? EfiACPIMemoryNVS : EfiBootServicesData
       );
   }
 }
