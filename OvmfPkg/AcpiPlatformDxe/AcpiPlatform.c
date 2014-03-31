@@ -256,16 +256,14 @@ AcpiPlatformEntryPoint (
 
   if (XenDetected ()) {
     Status = InstallXenTables (AcpiTable);
-    if (EFI_ERROR (Status)) {
-      Status = FindAcpiTablesInFv (AcpiTable);
-    }
   } else {
-    Status = FindAcpiTablesInFv (AcpiTable);
-  }
-  if (EFI_ERROR (Status)) {
-    return Status;
+    Status = InstallQemuLinkedTables (AcpiTable);
   }
 
-  return EFI_SUCCESS;
+  if (EFI_ERROR (Status)) {
+    Status = FindAcpiTablesInFv (AcpiTable);
+  }
+
+  return Status;
 }
 

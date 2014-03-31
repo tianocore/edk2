@@ -515,3 +515,156 @@ QemuInstallAcpiTable (
            );
 }
 
+
+/**
+  Download the ACPI table data file from QEMU and interpret it.
+
+  @param[in] AcpiProtocol  The ACPI table protocol used to install tables.
+
+  @retval  EFI_UNSUPPORTED       Firmware configuration is unavailable.
+
+  @retval  EFI_NOT_FOUND         The host doesn't export the required fw_cfg
+                                 files.
+
+  @retval  EFI_OUT_OF_RESOURCES  Memory allocation failed.
+
+  @retval  EFI_PROTOCOL_ERROR    Found truncated or invalid ACPI table header
+                                 in the fw_cfg contents.
+
+  @return                        Status codes returned by
+                                 AcpiProtocol->InstallAcpiTable().
+
+**/
+
+//
+// We'll be saving the keys of installed tables so that we can roll them back
+// in case of failure. 128 tables should be enough for anyone (TM).
+//
+#define INSTALLED_TABLES_MAX 128
+
+EFI_STATUS
+EFIAPI
+InstallQemuLinkedTables (
+  IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol
+  )
+{
+  EFI_STATUS           Status;
+  FIRMWARE_CONFIG_ITEM TablesFile;
+  UINTN                TablesFileSize;
+  UINT8                *Tables;
+  UINTN                *InstalledKey;
+  UINTN                Processed;
+  INT32                Installed;
+
+  Status = QemuFwCfgFindFile ("etc/acpi/tables", &TablesFile, &TablesFileSize);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_INFO, "%a: \"etc/acpi/tables\" interface unavailable: %r\n",
+      __FUNCTION__, Status));
+    return Status;
+  }
+
+  Tables = AllocatePool (TablesFileSize);
+  if (Tables == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  QemuFwCfgSelectItem (TablesFile);
+  QemuFwCfgReadBytes (TablesFileSize, Tables);
+
+  InstalledKey = AllocatePool (INSTALLED_TABLES_MAX * sizeof *InstalledKey);
+  if (InstalledKey == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto FreeTables;
+  }
+
+  Processed = 0;
+  Installed = 0;
+  while (Processed < TablesFileSize) {
+    UINTN                       Remaining;
+    EFI_ACPI_DESCRIPTION_HEADER *Probe;
+
+    Remaining = TablesFileSize - Processed;
+    if (Remaining < sizeof *Probe) {
+      Status = EFI_PROTOCOL_ERROR;
+      break;
+    }
+
+    Probe = (EFI_ACPI_DESCRIPTION_HEADER *) (Tables + Processed);
+    if (Remaining < Probe->Length || Probe->Length < sizeof *Probe) {
+      Status = EFI_PROTOCOL_ERROR;
+      break;
+    }
+
+    DEBUG ((EFI_D_VERBOSE, "%a: offset 0x%016Lx:"
+      " Signature=\"%-4.4a\" Length=0x%08x\n",
+      __FUNCTION__, (UINT64) Processed,
+      (CONST CHAR8 *) &Probe->Signature, Probe->Length));
+
+    //
+    // skip automatically handled "root" tables: RSDT, XSDT
+    //
+    if (Probe->Signature !=
+                        EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_TABLE_SIGNATURE &&
+        Probe->Signature !=
+                    EFI_ACPI_2_0_EXTENDED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE) {
+      if (Installed == INSTALLED_TABLES_MAX) {
+        DEBUG ((EFI_D_ERROR, "%a: can't install more than %d tables\n",
+          __FUNCTION__, INSTALLED_TABLES_MAX));
+        Status = EFI_OUT_OF_RESOURCES;
+        break;
+      }
+
+      Status = AcpiProtocol->InstallAcpiTable (AcpiProtocol, Probe,
+                 Probe->Length, &InstalledKey[Installed]);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((EFI_D_ERROR,
+          "%a: failed to install table \"%-4.4a\" at offset 0x%Lx: %r\n",
+          __FUNCTION__, (CONST CHAR8 *) &Probe->Signature, (UINT64) Processed,
+          Status));
+        break;
+      }
+
+      ++Installed;
+    }
+
+    Processed += Probe->Length;
+  }
+
+  //
+  // NUL-padding at the end is accepted
+  //
+  if (Status == EFI_PROTOCOL_ERROR) {
+    UINTN ErrorLocation;
+
+    ErrorLocation = Processed;
+    while (Processed < TablesFileSize && Tables[Processed] == '\0') {
+      ++Processed;
+    }
+    if (Processed < TablesFileSize) {
+      DEBUG ((EFI_D_ERROR, "%a: truncated or invalid ACPI table header at "
+        "offset 0x%Lx\n", __FUNCTION__, (UINT64) ErrorLocation));
+    }
+  }
+
+  if (Processed == TablesFileSize) {
+    DEBUG ((EFI_D_INFO, "%a: installed %d tables\n", __FUNCTION__, Installed));
+    Status = EFI_SUCCESS;
+  } else {
+    ASSERT (EFI_ERROR (Status));
+
+    //
+    // Roll back partial installation.
+    //
+    while (Installed > 0) {
+      --Installed;
+      AcpiProtocol->UninstallAcpiTable (AcpiProtocol, InstalledKey[Installed]);
+    }
+  }
+
+  FreePool (InstalledKey);
+
+FreeTables:
+  FreePool (Tables);
+
+  return Status;
+}
