@@ -38,6 +38,7 @@
   MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
   PcdLib
@@ -50,6 +51,7 @@
   LockBoxLib
   DebugLib
   DxeServicesLib
+  QemuFwCfgLib
 
 [Guids]
   gEfiAcpiVariableGuid                          # ALWAYS_CONSUMED

@@ -24,6 +24,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/LockBoxLib.h>
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
+#include <Library/QemuFwCfgLib.h>
 #include <Guid/AcpiVariableCompatibility.h>
 #include <Guid/AcpiS3Context.h>
 #include <Guid/Acpi.h>
@@ -585,6 +586,10 @@ InstallAcpiS3Save (
   )
 {
   EFI_STATUS        Status;
+
+  if (!QemuFwCfgS3Enabled()) {
+    return EFI_LOAD_ERROR;
+  }
 
   if (!FeaturePcdGet(PcdPlatformCsmSupport)) {
     //
