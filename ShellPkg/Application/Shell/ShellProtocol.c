@@ -1770,6 +1770,19 @@ EfiShellRemoveDupInFileList(
   }
   return (EFI_SUCCESS);
 }
+
+//
+// This is the same structure as the external version, but it has no CONST qualifiers.
+//
+typedef struct {
+  LIST_ENTRY        Link;       ///< Linked list members.
+  EFI_STATUS        Status;     ///< Status of opening the file.  Valid only if Handle != NULL.
+        CHAR16      *FullName;  ///< Fully qualified filename.
+        CHAR16      *FileName;  ///< name of this file.
+  SHELL_FILE_HANDLE Handle;     ///< Handle for interacting with the opened file or NULL if closed.
+  EFI_FILE_INFO     *Info;      ///< Pointer to the FileInfo struct for this file or NULL.
+} EFI_SHELL_FILE_INFO_NO_CONST;
+
 /**
   Allocates and duplicates a EFI_SHELL_FILE_INFO node.
 
@@ -1786,7 +1799,12 @@ InternalDuplicateShellFileInfo(
   IN BOOLEAN                   Save
   )
 {
-  EFI_SHELL_FILE_INFO *NewNode;
+  EFI_SHELL_FILE_INFO_NO_CONST *NewNode;
+
+  //
+  // try to confirm that the objects are in sync
+  //
+  ASSERT(sizeof(EFI_SHELL_FILE_INFO_NO_CONST) == sizeof(EFI_SHELL_FILE_INFO));
 
   NewNode = AllocateZeroPool(sizeof(EFI_SHELL_FILE_INFO));
   if (NewNode == NULL) {
@@ -1799,7 +1817,11 @@ InternalDuplicateShellFileInfo(
   if ( NewNode->FullName == NULL
     || NewNode->FileName == NULL
     || NewNode->Info == NULL
-   ){
+  ){
+    SHELL_FREE_NON_NULL(NewNode->FullName);
+    SHELL_FREE_NON_NULL(NewNode->FileName);
+    SHELL_FREE_NON_NULL(NewNode->Info);
+    SHELL_FREE_NON_NULL(NewNode);
     return(NULL);
   }
   NewNode->Status = Node->Status;
@@ -1811,7 +1833,7 @@ InternalDuplicateShellFileInfo(
   StrCpy((CHAR16*)NewNode->FileName, Node->FileName);
   CopyMem(NewNode->Info, Node->Info, (UINTN)Node->Info->Size);
 
-  return(NewNode);
+  return((EFI_SHELL_FILE_INFO*)NewNode);
 }
 
 /**
