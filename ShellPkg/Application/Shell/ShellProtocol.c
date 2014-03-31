@@ -1898,7 +1898,7 @@ CreateAndPopulateShellFileInfo(
     TempString = StrnCatGrow(&TempString, &Size, BasePath, 0);
     if (TempString == NULL) {
       FreePool((VOID*)ShellFileListItem->FileName);
-      FreePool(ShellFileListItem->Info);
+      SHELL_FREE_NON_NULL(ShellFileListItem->Info);
       FreePool(ShellFileListItem);
       return (NULL);
     }
@@ -2105,6 +2105,7 @@ ShellSearchHandle(
   EFI_SHELL_FILE_INFO *ShellInfo;
   EFI_SHELL_FILE_INFO *ShellInfoNode;
   EFI_SHELL_FILE_INFO *NewShellNode;
+  EFI_FILE_INFO       *FileInfo;
   BOOLEAN             Directory;
   CHAR16              *NewFullName;
   UINTN               Size;
@@ -2132,30 +2133,44 @@ ShellSearchHandle(
 
   if (CurrentFilePattern[0]   == CHAR_NULL
     &&NextFilePatternStart[0] == CHAR_NULL
-   ){
+    ){
     //
-    // Add the current parameter FileHandle to the list, then end...
+    // we want the parent or root node (if no parent)
     //
     if (ParentNode == NULL) {
-      Status = EFI_INVALID_PARAMETER;
+      //
+      // We want the root node.  create the node.
+      //
+      FileInfo = FileHandleGetInfo(FileHandle);
+      NewShellNode = CreateAndPopulateShellFileInfo(
+        L":",
+        EFI_SUCCESS,
+        L"\\",
+        FileHandle,
+        FileInfo
+        );
+      SHELL_FREE_NON_NULL(FileInfo);
     } else {
+      //
+      // Add the current parameter FileHandle to the list, then end...
+      //
       NewShellNode = InternalDuplicateShellFileInfo((EFI_SHELL_FILE_INFO*)ParentNode, TRUE);
-      if (NewShellNode == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
-      } else {
-        NewShellNode->Handle = NULL;
-        if (*FileList == NULL) {
-          *FileList = AllocateZeroPool(sizeof(EFI_SHELL_FILE_INFO));
-          InitializeListHead(&((*FileList)->Link));
-        }
-
-        //
-        // Add to the returning to use list
-        //
-        InsertTailList(&(*FileList)->Link, &NewShellNode->Link);
-
-        Status = EFI_SUCCESS;
+    }
+    if (NewShellNode == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+    } else {
+      NewShellNode->Handle = NULL;
+      if (*FileList == NULL) {
+        *FileList = AllocateZeroPool(sizeof(EFI_SHELL_FILE_INFO));
+        InitializeListHead(&((*FileList)->Link));
       }
+
+      //
+      // Add to the returning to use list
+      //
+      InsertTailList(&(*FileList)->Link, &NewShellNode->Link);
+
+      Status = EFI_SUCCESS;
     }
   } else {
     Status = EfiShellFindFilesInDir(FileHandle, &ShellInfo);
