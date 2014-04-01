@@ -450,6 +450,7 @@ AutenticatedVariableServiceInitialize (
   Add public key in store and return its index.
 
   @param[in]  PubKey                  Input pointer to Public Key data
+  @param[in]  VariableDataEntry       The variable data entry 
 
   @return                             Index of new added item
 
