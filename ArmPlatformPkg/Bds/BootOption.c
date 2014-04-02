@@ -86,6 +86,7 @@ BootOptionStart (
                                 (CHAR8*)(LinuxArguments + 1),
                                 FdtDevicePath);
 
+      FreePool (DefaultFdtDevicePath);
       FreePool (FdtDevicePath);
     }
   } else {

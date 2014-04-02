@@ -118,6 +118,8 @@ BootAndroidBootImg (
     FreePool (RamdiskDevicePath);
   }
 
+  FreePool (FdtDevicePath);
+
   // If we got here we do a confused face because BootLinuxFdt returned,
   // reporting success.
   DEBUG ((EFI_D_ERROR, "WARNING: BdsBootLinuxFdt returned EFI_SUCCESS.\n"));
