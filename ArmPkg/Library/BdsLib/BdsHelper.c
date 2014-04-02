@@ -331,7 +331,7 @@ GetEnvironmentVariable (
                     *Size,
                     DefaultValue
                     );
-      *Value = DefaultValue;
+      *Value = AllocateCopyPool (*Size, DefaultValue);
     } else {
       return EFI_NOT_FOUND;
     }
@@ -352,7 +352,7 @@ GetEnvironmentVariable (
       *Size = VariableSize;
     }
   } else {
-    *Value = DefaultValue;
+    *Value = AllocateCopyPool (*Size, DefaultValue);
     return Status;
   }
 
