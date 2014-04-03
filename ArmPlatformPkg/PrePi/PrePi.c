@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -139,7 +139,8 @@ PrePiMain (
 
   // Create the Stacks HOB (reserve the memory for all stacks)
   if (ArmIsMpCore ()) {
-    StacksSize = PcdGet32 (PcdCPUCorePrimaryStackSize) + (FixedPcdGet32(PcdClusterCount) * 4 * FixedPcdGet32(PcdCPUCoreSecondaryStackSize));
+    StacksSize = PcdGet32 (PcdCPUCorePrimaryStackSize) +
+                 ((FixedPcdGet32 (PcdCoreCount) - 1) * FixedPcdGet32 (PcdCPUCoreSecondaryStackSize));
   } else {
     StacksSize = PcdGet32 (PcdCPUCorePrimaryStackSize);
   }
