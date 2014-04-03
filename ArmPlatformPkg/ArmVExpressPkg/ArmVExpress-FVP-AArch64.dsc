@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -80,8 +80,14 @@
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Fixed Virtual Platform"
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ARM-FVP"
 
+!ifndef ARM_FOUNDATION_FVP
   # Up to 8 cores on Base models. This works fine if model happens to have less.
   gArmPlatformTokenSpaceGuid.PcdCoreCount|8
+  gArmPlatformTokenSpaceGuid.PcdClusterCount|2
+!else
+  # Up to 4 cores on Foundation models. This works fine if model happens to have less.
+  gArmPlatformTokenSpaceGuid.PcdCoreCount|4
+!endif
 
   #
   # NV Storage PCDs. Use base of 0x0C000000 for NOR1
