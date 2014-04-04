@@ -835,9 +835,13 @@ ProcessCommandLine(
   ShellInfoObject.ShellInitSettings.BitUnion.Bits.Exit         = FALSE;
   ShellInfoObject.ShellInitSettings.Delay = 5;
 
-  // Start LoopVar at 1 to ignore Argv[0] which is the name of this binary
-  // (probably "Shell.efi")
-  for (LoopVar = 1 ; LoopVar < gEfiShellParametersProtocol->Argc ; LoopVar++) {
+  //
+  // Start LoopVar at 0 to parse only optional arguments at Argv[0]
+  // and parse other parameters from Argv[1].  This is for use case that
+  // UEFI Shell boot option is created, and OptionalData is provided
+  // that starts with shell command-line options.
+  //
+  for (LoopVar = 0 ; LoopVar < gEfiShellParametersProtocol->Argc ; LoopVar++) {
     CurrentArg = gEfiShellParametersProtocol->Argv[LoopVar];
     if (UnicodeCollation->StriColl (
                             UnicodeCollation,
@@ -925,6 +929,13 @@ ProcessCommandLine(
         );
       return EFI_INVALID_PARAMETER;
     } else {
+      //
+      // First argument should be Shell.efi image name
+      //
+      if (LoopVar == 0) {
+        continue;
+      }
+
       ShellInfoObject.ShellInitSettings.FileName = AllocateZeroPool(StrSize(CurrentArg));
       if (ShellInfoObject.ShellInitSettings.FileName == NULL) {
         return (EFI_OUT_OF_RESOURCES);
