@@ -205,6 +205,15 @@ InitializeRamRegions (
       EfiACPIMemoryNVS
       );
 
+    //
+    // SEC stores its table of GUIDed section handlers here.
+    //
+    BuildMemoryAllocationHob (
+      PcdGet64 (PcdGuidedExtractHandlerTableAddress),
+      PcdGet32 (PcdGuidedExtractHandlerTableSize),
+      EfiACPIMemoryNVS
+      );
+
 #ifdef MDE_CPU_X64
     //
     // Reserve the initial page tables built by the reset vector code.
