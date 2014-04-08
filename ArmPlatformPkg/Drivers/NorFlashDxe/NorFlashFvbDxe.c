@@ -1,6 +1,6 @@
 /*++ @file  NorFlashFvbDxe.c
 
- Copyright (c) 2011-201333, ARM Ltd. All rights reserved.<BR>
+ Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
 
  This program and the accompanying materials
  are licensed and made available under the terms and conditions of the BSD License
@@ -417,7 +417,6 @@ FvbRead (
   EFI_STATUS    Status;
   EFI_STATUS    TempStatus;
   UINTN         BlockSize;
-  UINT8         *BlockBuffer;
   NOR_FLASH_INSTANCE *Instance;
 
   Instance = INSTANCE_FROM_FVB_THIS(This);
@@ -450,32 +449,24 @@ FvbRead (
     return EFI_BAD_BUFFER_SIZE;
   }
 
-  // FixMe: Allow an arbitrary number of bytes to be read out, not just a multiple of block size.
-
-  // Allocate runtime memory to read in the NOR Flash data. Variable Services are runtime.
-  BlockBuffer = AllocateRuntimePool (BlockSize);
-
-  // Check if the memory allocation was successful
-  if (BlockBuffer == NULL) {
-    DEBUG ((EFI_D_ERROR, "FvbRead: ERROR - Could not allocate BlockBuffer @ 0x%08x.\n", BlockBuffer));
+  // Check we did get some memory
+  if (Instance->FvbBuffer == NULL) {
+    DEBUG ((EFI_D_ERROR, "FvbRead: ERROR - Buffer not ready\n"));
     return EFI_DEVICE_ERROR;
   }
 
   // Read NOR Flash data into shadow buffer
-  TempStatus = NorFlashReadBlocks (Instance, Instance->StartLba + Lba, BlockSize, BlockBuffer);
+  TempStatus = NorFlashReadBlocks (Instance, Instance->StartLba + Lba, BlockSize, Instance->FvbBuffer);
   if (EFI_ERROR (TempStatus)) {
     // Return one of the pre-approved error statuses
-    Status = EFI_DEVICE_ERROR;
-    goto FREE_MEMORY;
+    return EFI_DEVICE_ERROR;
   }
 
   // Put the data at the appropriate location inside the buffer area
-  DEBUG ((DEBUG_BLKIO, "FvbRead: CopyMem( Dst=0x%08x, Src=0x%08x, Size=0x%x ).\n", Buffer, BlockBuffer + Offset, *NumBytes));
+  DEBUG ((DEBUG_BLKIO, "FvbRead: CopyMem( Dst=0x%08x, Src=0x%08x, Size=0x%x ).\n", Buffer, (UINTN)Instance->FvbBuffer + Offset, *NumBytes));
 
-  CopyMem(Buffer, BlockBuffer + Offset, *NumBytes);
+  CopyMem (Buffer, (VOID*)((UINTN)Instance->FvbBuffer + Offset), *NumBytes);
 
-FREE_MEMORY:
-  FreePool(BlockBuffer);
   return Status;
 }
 
@@ -546,7 +537,6 @@ FvbWrite (
   EFI_STATUS  Status;
   EFI_STATUS  TempStatus;
   UINTN       BlockSize;
-  UINT8       *BlockBuffer;
   NOR_FLASH_INSTANCE *Instance;
 
   Instance = INSTANCE_FROM_FVB_THIS(This);
@@ -585,38 +575,29 @@ FvbWrite (
     return EFI_BAD_BUFFER_SIZE;
   }
 
-  // Allocate runtime memory to read in the NOR Flash data.
-  // Since the intention is to use this with Variable Services and since these are runtime,
-  // allocate the memory from the runtime pool.
-  BlockBuffer = AllocateRuntimePool (BlockSize);
-
   // Check we did get some memory
-  if( BlockBuffer == NULL ) {
-    DEBUG ((EFI_D_ERROR, "FvbWrite: ERROR - Can not allocate BlockBuffer @ 0x%08x.\n", BlockBuffer));
+  if (Instance->FvbBuffer == NULL) {
+    DEBUG ((EFI_D_ERROR, "FvbWrite: ERROR - Buffer not ready\n"));
     return EFI_DEVICE_ERROR;
   }
 
   // Read NOR Flash data into shadow buffer
-  TempStatus = NorFlashReadBlocks (Instance, Instance->StartLba + Lba, BlockSize, BlockBuffer);
+  TempStatus = NorFlashReadBlocks (Instance, Instance->StartLba + Lba, BlockSize, Instance->FvbBuffer);
   if (EFI_ERROR (TempStatus)) {
     // Return one of the pre-approved error statuses
-    Status = EFI_DEVICE_ERROR;
-    goto FREE_MEMORY;
+    return EFI_DEVICE_ERROR;
   }
 
   // Put the data at the appropriate location inside the buffer area
-  CopyMem((BlockBuffer + Offset), Buffer, *NumBytes);
+  CopyMem ((VOID*)((UINTN)Instance->FvbBuffer + Offset), Buffer, *NumBytes);
 
   // Write the modified buffer back to the NorFlash
-  TempStatus = NorFlashWriteBlocks (Instance, Instance->StartLba + Lba, BlockSize, BlockBuffer);
+  TempStatus = NorFlashWriteBlocks (Instance, Instance->StartLba + Lba, BlockSize, Instance->FvbBuffer);
   if (EFI_ERROR (TempStatus)) {
     // Return one of the pre-approved error statuses
-    Status = EFI_DEVICE_ERROR;
-    goto FREE_MEMORY;
+    return EFI_DEVICE_ERROR;
   }
 
-FREE_MEMORY:
-  FreePool(BlockBuffer);
   return Status;
 }
 

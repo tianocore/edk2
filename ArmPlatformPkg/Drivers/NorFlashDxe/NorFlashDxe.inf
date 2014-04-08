@@ -41,6 +41,7 @@
   UefiLib
   UefiDriverEntryPoint
   UefiBootServicesTableLib
+  UefiRuntimeLib
 
 [Guids]
   gEfiSystemNvDataFvGuid

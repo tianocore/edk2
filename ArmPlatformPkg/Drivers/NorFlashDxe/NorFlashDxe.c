@@ -1,6 +1,6 @@
 /** @file  NorFlashDxe.c
 
-  Copyright (c) 2011-2013, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -72,7 +72,7 @@ NOR_FLASH_INSTANCE  mNorFlashInstanceTemplate = {
     FvbEraseBlocks, // EraseBlocks
     NULL, //ParentHandle
   }, //  FvbProtoccol;
-
+  NULL, // FvbBuffer
   {
     {
       {
@@ -109,7 +109,7 @@ NorFlashCreateInstance (
 
   ASSERT(NorFlashInstance != NULL);
 
-  Instance = AllocateCopyPool (sizeof(NOR_FLASH_INSTANCE),&mNorFlashInstanceTemplate);
+  Instance = AllocateRuntimeCopyPool (sizeof(NOR_FLASH_INSTANCE),&mNorFlashInstanceTemplate);
   if (Instance == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -123,11 +123,15 @@ NorFlashCreateInstance (
   Instance->Media.BlockSize = BlockSize;
   Instance->Media.LastBlock = (NorFlashSize / BlockSize)-1;
 
-  CopyGuid (&Instance->DevicePath.Vendor.Guid,NorFlashGuid);
+  CopyGuid (&Instance->DevicePath.Vendor.Guid, NorFlashGuid);
 
   if (SupportFvb) {
     Instance->SupportFvb = TRUE;
     Instance->Initialize = NorFlashFvbInitialize;
+    Instance->FvbBuffer = AllocateRuntimePool (BlockSize);;
+    if (Instance->FvbBuffer == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
 
     Status = gBS->InstallMultipleProtocolInterfaces (
                   &Instance->Handle,
@@ -137,7 +141,7 @@ NorFlashCreateInstance (
                   NULL
                   );
     if (EFI_ERROR(Status)) {
-      FreePool(Instance);
+      FreePool (Instance);
       return Status;
     }
   } else {
@@ -150,7 +154,7 @@ NorFlashCreateInstance (
                     NULL
                     );
     if (EFI_ERROR(Status)) {
-      FreePool(Instance);
+      FreePool (Instance);
       return Status;
     }
   }
@@ -340,8 +344,14 @@ NorFlashUnlockAndEraseSingleBlock (
   UINTN           Index;
   EFI_TPL         OriginalTPL;
 
-  // Raise TPL to TPL_HIGH to stop anyone from interrupting us.
-  OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+  if (!EfiAtRuntime ()) {
+    // Raise TPL to TPL_HIGH to stop anyone from interrupting us.
+    OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+  } else {
+    // This initialization is only to prevent the compiler to complain about the
+    // use of uninitialized variables
+    OriginalTPL = TPL_HIGH_LEVEL;
+  }
 
   Index = 0;
   // The block erase might fail a first time (SW bug ?). Retry it ...
@@ -358,8 +368,10 @@ NorFlashUnlockAndEraseSingleBlock (
     DEBUG((EFI_D_ERROR,"EraseSingleBlock(BlockAddress=0x%08x: Block Locked Error (try to erase %d times)\n", BlockAddress,Index));
   }
 
-  // Interruptions can resume.
-  gBS->RestoreTPL (OriginalTPL);
+  if (!EfiAtRuntime ()) {
+    // Interruptions can resume.
+    gBS->RestoreTPL (OriginalTPL);
+  }
 
   return Status;
 }
@@ -581,8 +593,14 @@ NorFlashWriteSingleBlock (
   // Start writing from the first address at the start of the block
   WordAddress = BlockAddress;
 
-  // Raise TPL to TPL_HIGH to stop anyone from interrupting us.
-  OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+  if (!EfiAtRuntime ()) {
+    // Raise TPL to TPL_HIGH to stop anyone from interrupting us.
+    OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+  } else {
+    // This initialization is only to prevent the compiler to complain about the
+    // use of uninitialized variables
+    OriginalTPL = TPL_HIGH_LEVEL;
+  }
 
   Status = NorFlashUnlockAndEraseSingleBlock (Instance, BlockAddress);
   if (EFI_ERROR(Status)) {
@@ -632,8 +650,10 @@ NorFlashWriteSingleBlock (
   }
 
 EXIT:
-  // Interruptions can resume.
-  gBS->RestoreTPL (OriginalTPL);
+  if (!EfiAtRuntime ()) {
+    // Interruptions can resume.
+    gBS->RestoreTPL (OriginalTPL);
+  }
 
   if (EFI_ERROR(Status)) {
     DEBUG((EFI_D_ERROR, "NOR FLASH Programming [WriteSingleBlock] failed at address 0x%08x. Exit Status = \"%r\".\n", WordAddress, Status));
@@ -797,7 +817,7 @@ NorFlashInitialise (
     return Status;
   }
 
-  mNorFlashInstances = AllocatePool (sizeof(NOR_FLASH_INSTANCE*) * NorFlashDeviceCount);
+  mNorFlashInstances = AllocateRuntimePool (sizeof(NOR_FLASH_INSTANCE*) * NorFlashDeviceCount);
 
   for (Index = 0; Index < NorFlashDeviceCount; Index++) {
     // Check if this NOR Flash device contain the variable storage region
