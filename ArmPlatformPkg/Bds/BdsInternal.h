@@ -39,7 +39,10 @@
 
 #define ARM_BDS_OPTIONAL_DATA_SIGNATURE   SIGNATURE_32('a', 'b', 'o', 'd')
 
-#define IS_ARM_BDS_BOOTENTRY(ptr)  (ReadUnaligned32 ((CONST UINT32*)&((ARM_BDS_LOADER_OPTIONAL_DATA*)((ptr)->OptionalData))->Header.Signature) == ARM_BDS_OPTIONAL_DATA_SIGNATURE)
+#define IS_ARM_BDS_BOOTENTRY(ptr)  \
+  (((ptr)->OptionalData != NULL) && \
+   (ReadUnaligned32 ((CONST UINT32*)&((ARM_BDS_LOADER_OPTIONAL_DATA*)((ptr)->OptionalData))->Header.Signature) \
+      == ARM_BDS_OPTIONAL_DATA_SIGNATURE))
 
 #define UPDATE_BOOT_ENTRY L"Update entry: "
 #define DELETE_BOOT_ENTRY L"Delete entry: "
