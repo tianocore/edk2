@@ -608,14 +608,6 @@ BrowserCallback (
   Found     = FALSE;
   Status    = EFI_SUCCESS;
 
-  //
-  // If set browser data, pre load all hii formset to avoid set the varstore which is not 
-  // saved in browser.
-  //
-  if (!RetrieveData && (gBrowserSettingScope == SystemLevel)) {
-    LoadAllHiiFormset();
-  }
-
   if (VariableGuid != NULL) {
     //
     // Try to find target storage in the current formset.
@@ -659,6 +651,10 @@ BrowserCallback (
       Status = ProcessStorage (&TotalSize, &ResultsData, RetrieveData, Storage);
       if (EFI_ERROR (Status)) {
         return Status;
+      }
+
+      if (Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) {
+        ConfigRequestAdjust (Storage, ResultsData, TRUE);
       }
 
       //
@@ -3707,7 +3703,6 @@ CleanBrowserStorage (
 {
   LIST_ENTRY            *Link;
   FORMSET_STORAGE       *Storage;
-  CHAR16                *ConfigRequest;
 
   Link = GetFirstNode (&FormSet->StorageListHead);
   while (!IsNull (&FormSet->StorageListHead, Link)) {
@@ -3719,8 +3714,7 @@ CleanBrowserStorage (
         continue;
       }
 
-      ConfigRequest = FormSet->QuestionInited ? Storage->ConfigRequest : Storage->ConfigElements;
-      RemoveConfigRequest (Storage->BrowserStorage, ConfigRequest);
+      RemoveConfigRequest (Storage->BrowserStorage, Storage->ConfigRequest);
     } else if (Storage->BrowserStorage->Type == EFI_HII_VARSTORE_BUFFER ||
                Storage->BrowserStorage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
       if (Storage->BrowserStorage->ConfigRequest != NULL) { 
@@ -3799,6 +3793,8 @@ AppendConfigRequest (
   Adjust the config request info, remove the request elements which already in AllConfigRequest string.
 
   @param  Storage                Form set Storage.
+  @param  Request                The input request string.
+  @param  RespString             Whether the input is ConfigRequest or ConfigResp format.
 
   @retval TRUE                   Has element not covered by current used elements, need to continue to call ExtractConfig
   @retval FALSE                  All elements covered by current used elements.
@@ -3806,30 +3802,37 @@ AppendConfigRequest (
 **/
 BOOLEAN 
 ConfigRequestAdjust (
-  IN  FORMSET_STORAGE         *Storage
+  IN  BROWSER_STORAGE         *Storage,
+  IN  CHAR16                  *Request,
+  IN  BOOLEAN                 RespString
   )
 {
   CHAR16       *RequestElement;
   CHAR16       *NextRequestElement;
-  CHAR16       *RetBuf;
+  CHAR16       *NextElementBakup;
   UINTN        SpareBufLen;
   CHAR16       *SearchKey;
+  CHAR16       *ValueKey;
   BOOLEAN      RetVal;
+  CHAR16       *ConfigRequest;
 
   SpareBufLen    = 0;
-  RetBuf         = NULL;
   RetVal         = FALSE;
+  NextElementBakup = NULL;
+  ValueKey         = NULL;
 
-  if (Storage->BrowserStorage->ConfigRequest == NULL) {
-    Storage->BrowserStorage->ConfigRequest = AllocateCopyPool (StrSize (Storage->ConfigRequest), Storage->ConfigRequest);
-    if (Storage->ConfigElements != NULL) {
-      FreePool (Storage->ConfigElements);
-    }
-    Storage->ConfigElements = AllocateCopyPool (StrSize (Storage->ConfigRequest), Storage->ConfigRequest);
+  if (Request != NULL) {
+    ConfigRequest = Request;
+  } else {
+    ConfigRequest = Storage->ConfigRequest;
+  }
+
+  if (Storage->ConfigRequest == NULL) {
+    Storage->ConfigRequest = AllocateCopyPool (StrSize (ConfigRequest), ConfigRequest);
     return TRUE;
   }
 
-  if (Storage->BrowserStorage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
+  if (Storage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
     //
     // "&Name1&Name2" section for EFI_HII_VARSTORE_NAME_VALUE storage
     //
@@ -3839,26 +3842,22 @@ ConfigRequestAdjust (
     // "&OFFSET=####&WIDTH=####" section for EFI_HII_VARSTORE_BUFFER storage
     //
     SearchKey = L"&OFFSET";
+    ValueKey  = L"&VALUE";
   }
-
-  //
-  // Prepare the config header.
-  // 
-  RetBuf = AllocateCopyPool(StrSize (Storage->BrowserStorage->ConfigHdr), Storage->BrowserStorage->ConfigHdr);
-  ASSERT (RetBuf != NULL);
 
   //
   // Find SearchKey storage
   //
-  if (Storage->BrowserStorage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
-    RequestElement = StrStr (Storage->ConfigRequest, L"PATH");
+  if (Storage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
+    RequestElement = StrStr (ConfigRequest, L"PATH");
     ASSERT (RequestElement != NULL);
     RequestElement = StrStr (RequestElement, SearchKey);    
   } else {
-    RequestElement = StrStr (Storage->ConfigRequest, SearchKey);
+    RequestElement = StrStr (ConfigRequest, SearchKey);
   }
 
   while (RequestElement != NULL) {
+
     //
     // +1 to avoid find header itself.
     //
@@ -3868,18 +3867,30 @@ ConfigRequestAdjust (
     // The last Request element in configRequest string.
     //
     if (NextRequestElement != NULL) {
+      if (RespString && (Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER)) {
+        NextElementBakup = NextRequestElement;
+        NextRequestElement = StrStr (RequestElement, ValueKey);
+      }
       //
       // Replace "&" with '\0'.
       //
       *NextRequestElement = L'\0';
+    } else {
+      if (RespString && (Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER)) {
+        NextElementBakup = NextRequestElement;
+        NextRequestElement = StrStr (RequestElement, ValueKey);
+        //
+        // Replace "&" with '\0'.
+        //
+        *NextRequestElement = L'\0';
+      }
     }
  
-    if (!ElementValidation (Storage->BrowserStorage, RequestElement)) {
+    if (!ElementValidation (Storage, RequestElement)) {
       //
       // Add this element to the Storage->BrowserStorage->AllRequestElement.
       //
-      AppendConfigRequest(&Storage->BrowserStorage->ConfigRequest, &Storage->BrowserStorage->SpareStrLen, RequestElement);
-      AppendConfigRequest (&RetBuf, &SpareBufLen, RequestElement);
+      AppendConfigRequest(&Storage->ConfigRequest, &Storage->SpareStrLen, RequestElement);
       RetVal = TRUE;
     }
 
@@ -3890,16 +3901,11 @@ ConfigRequestAdjust (
       *NextRequestElement = L'&';
     }
 
-    RequestElement = NextRequestElement;
-  }
-
-  if (RetVal) {
-    if (Storage->ConfigElements != NULL) {
-      FreePool (Storage->ConfigElements);
+    if (RespString && (Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER)) {
+      RequestElement = NextElementBakup;
+    } else {
+      RequestElement = NextRequestElement;
     }
-    Storage->ConfigElements = RetBuf;
-  } else {
-    FreePool (RetBuf);
   }
 
   return RetVal;
@@ -4082,7 +4088,7 @@ LoadStorage (
 
     case EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER:
       if (Storage->BrowserStorage->ConfigRequest != NULL) {
-        ConfigRequestAdjust(Storage);
+        ConfigRequestAdjust(Storage->BrowserStorage, Storage->ConfigRequest, FALSE);
         return;
       }
       break;
@@ -4100,7 +4106,7 @@ LoadStorage (
       // Just update the ConfigRequest, if storage already initialized. 
       //
       if (Storage->BrowserStorage->Initialized) {
-        ConfigRequestAdjust(Storage);
+        ConfigRequestAdjust(Storage->BrowserStorage, Storage->ConfigRequest, FALSE);
         return;
       }
 

@@ -169,7 +169,6 @@ typedef struct {
   BROWSER_STORAGE  *BrowserStorage;
 
   CHAR16           *ConfigRequest; // <ConfigRequest> = <ConfigHdr> + <RequestElement>
-  CHAR16           *ConfigElements;// Elements need to load initial data.
   UINTN            ElementCount;   // Number of <RequestElement> in the <ConfigRequest>
   UINTN            SpareStrLen;    // Spare length of ConfigRequest string buffer
 } FORMSET_STORAGE;
@@ -1655,6 +1654,24 @@ EFI_HII_HANDLE
 DevicePathToHiiHandle (
   IN EFI_DEVICE_PATH_PROTOCOL   *DevicePath,
   IN EFI_GUID                   *FormsetGuid
+  );
+
+/**
+  Adjust the config request info, remove the request elements which already in AllConfigRequest string.
+
+  @param  Storage                Form set Storage.
+  @param  Request                The input request string.
+  @param  RespString             Whether the input is ConfigRequest or ConfigResp format.
+
+  @retval TRUE                   Has element not covered by current used elements, need to continue to call ExtractConfig
+  @retval FALSE                  All elements covered by current used elements.
+
+**/
+BOOLEAN 
+ConfigRequestAdjust (
+  IN  BROWSER_STORAGE         *Storage,
+  IN  CHAR16                  *Request,
+  IN  BOOLEAN                 RespString
   );
 
 #endif
