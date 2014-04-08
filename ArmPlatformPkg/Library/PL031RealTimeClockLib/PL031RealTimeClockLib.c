@@ -4,7 +4,7 @@
   Currently this driver does not support runtime virtual calling.
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011-2013, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -26,10 +26,16 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/ArmPlatformSysConfigLib.h>
+#include <Library/DxeServicesTableLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/UefiRuntimeLib.h>
+
 #include <Protocol/RealTimeClock.h>
+
 #include <Guid/GlobalVariable.h>
+#include <Guid/EventGroup.h>
+
 #include <Drivers/PL031RealTimeClock.h>
 
 #include <ArmPlatform.h>
@@ -37,6 +43,8 @@
 STATIC CONST CHAR16  mTimeZoneVariableName[] = L"PL031RtcTimeZone";
 STATIC CONST CHAR16  mDaylightVariableName[] = L"PL031RtcDaylight";
 STATIC BOOLEAN       mPL031Initialized = FALSE;
+STATIC EFI_EVENT     mRtcVirtualAddrChangeEvent;
+STATIC UINTN         mPL031RtcBase;
 
 EFI_STATUS
 IdentifyPL031 (
@@ -46,19 +54,19 @@ IdentifyPL031 (
   EFI_STATUS    Status;
 
   // Check if this is a PrimeCell Peripheral
-  if (  (MmioRead8 (PL031_RTC_PCELL_ID0) != 0x0D)
-      || (MmioRead8 (PL031_RTC_PCELL_ID1) != 0xF0)
-      || (MmioRead8 (PL031_RTC_PCELL_ID2) != 0x05)
-      || (MmioRead8 (PL031_RTC_PCELL_ID3) != 0xB1)) {
+  if (  (MmioRead8 (mPL031RtcBase + PL031_RTC_PCELL_ID0) != 0x0D)
+      || (MmioRead8 (mPL031RtcBase + PL031_RTC_PCELL_ID1) != 0xF0)
+      || (MmioRead8 (mPL031RtcBase + PL031_RTC_PCELL_ID2) != 0x05)
+      || (MmioRead8 (mPL031RtcBase + PL031_RTC_PCELL_ID3) != 0xB1)) {
     Status = EFI_NOT_FOUND;
     goto EXIT;
   }
 
   // Check if this PrimeCell Peripheral is the PL031 Real Time Clock
-  if (  (MmioRead8 (PL031_RTC_PERIPH_ID0) != 0x31)
-      || (MmioRead8 (PL031_RTC_PERIPH_ID1) != 0x10)
-      || ((MmioRead8 (PL031_RTC_PERIPH_ID2) & 0xF) != 0x04)
-      || (MmioRead8 (PL031_RTC_PERIPH_ID3) != 0x00)) {
+  if (  (MmioRead8 (mPL031RtcBase + PL031_RTC_PERIPH_ID0) != 0x31)
+      || (MmioRead8 (mPL031RtcBase + PL031_RTC_PERIPH_ID1) != 0x10)
+      || ((MmioRead8 (mPL031RtcBase + PL031_RTC_PERIPH_ID2) & 0xF) != 0x04)
+      || (MmioRead8 (mPL031RtcBase + PL031_RTC_PERIPH_ID3) != 0x00)) {
     Status = EFI_NOT_FOUND;
     goto EXIT;
   }
@@ -83,18 +91,18 @@ InitializePL031 (
   }
 
   // Ensure interrupts are masked. We do not want RTC interrupts in UEFI
-  if ((MmioRead32 (PL031_RTC_IMSC_IRQ_MASK_SET_CLEAR_REGISTER) & PL031_SET_IRQ_MASK) != PL031_SET_IRQ_MASK) {
-    MmioOr32 (PL031_RTC_IMSC_IRQ_MASK_SET_CLEAR_REGISTER, PL031_SET_IRQ_MASK);
+  if ((MmioRead32 (mPL031RtcBase + PL031_RTC_IMSC_IRQ_MASK_SET_CLEAR_REGISTER) & PL031_SET_IRQ_MASK) != PL031_SET_IRQ_MASK) {
+    MmioOr32 (mPL031RtcBase + PL031_RTC_IMSC_IRQ_MASK_SET_CLEAR_REGISTER, PL031_SET_IRQ_MASK);
   }
 
   // Clear any existing interrupts
-  if ((MmioRead32 (PL031_RTC_RIS_RAW_IRQ_STATUS_REGISTER) & PL031_IRQ_TRIGGERED) == PL031_IRQ_TRIGGERED) {
-    MmioOr32 (PL031_RTC_ICR_IRQ_CLEAR_REGISTER, PL031_CLEAR_IRQ);
+  if ((MmioRead32 (mPL031RtcBase + PL031_RTC_RIS_RAW_IRQ_STATUS_REGISTER) & PL031_IRQ_TRIGGERED) == PL031_IRQ_TRIGGERED) {
+    MmioOr32 (mPL031RtcBase + PL031_RTC_ICR_IRQ_CLEAR_REGISTER, PL031_CLEAR_IRQ);
   }
 
   // Start the clock counter
-  if ((MmioRead32 (PL031_RTC_CR_CONTROL_REGISTER) & PL031_RTC_ENABLED) != PL031_RTC_ENABLED) {
-    MmioOr32 (PL031_RTC_CR_CONTROL_REGISTER, PL031_RTC_ENABLED);
+  if ((MmioRead32 (mPL031RtcBase + PL031_RTC_CR_CONTROL_REGISTER) & PL031_RTC_ENABLED) != PL031_RTC_ENABLED) {
+    MmioOr32 (mPL031RtcBase + PL031_RTC_CR_CONTROL_REGISTER, PL031_RTC_ENABLED);
   }
 
   mPL031Initialized = TRUE;
@@ -267,7 +275,7 @@ LibGetTime (
   Status = ArmPlatformSysConfigGet (SYS_CFG_RTC, &EpochSeconds);
   if (Status == EFI_UNSUPPORTED) {
     // Battery backed up hardware RTC does not exist, revert to PL031
-    EpochSeconds = MmioRead32 (PL031_RTC_DR_DATA_REGISTER);
+    EpochSeconds = MmioRead32 (mPL031RtcBase + PL031_RTC_DR_DATA_REGISTER);
     Status = EFI_SUCCESS;
   } else if (EFI_ERROR (Status)) {
     // Battery backed up hardware RTC exists but could not be read due to error. Abort.
@@ -275,7 +283,7 @@ LibGetTime (
   } else {
     // Battery backed up hardware RTC exists and we read the time correctly from it.
     // Now sync the PL031 to the new time.
-    MmioWrite32 (PL031_RTC_LR_LOAD_REGISTER, EpochSeconds);
+    MmioWrite32 (mPL031RtcBase + PL031_RTC_LR_LOAD_REGISTER, EpochSeconds);
   }
 
   // Ensure Time is a valid pointer
@@ -484,7 +492,7 @@ LibSetTime (
 
 
   // Set the PL031
-  MmioWrite32 (PL031_RTC_LR_LOAD_REGISTER, EpochSeconds);
+  MmioWrite32 (mPL031RtcBase + PL031_RTC_LR_LOAD_REGISTER, EpochSeconds);
 
   // The accesses to Variable Services can be very slow, because we may be writing to Flash.
   // Do this after having set the RTC.
@@ -579,46 +587,6 @@ LibSetWakeupTime (
   return EFI_UNSUPPORTED;
 }
 
-
-
-/**
-  This is the declaration of an EFI image entry point. This can be the entry point to an application
-  written to this specification, an EFI boot service driver, or an EFI runtime driver.
-
-  @param  ImageHandle           Handle that identifies the loaded image.
-  @param  SystemTable           System Table for this image.
-
-  @retval EFI_SUCCESS           The operation completed successfully.
-
-**/
-EFI_STATUS
-EFIAPI
-LibRtcInitialize (
-  IN EFI_HANDLE                            ImageHandle,
-  IN EFI_SYSTEM_TABLE                      *SystemTable
-  )
-{
-  EFI_STATUS    Status;
-  EFI_HANDLE    Handle;
-
-  // Setup the setters and getters
-  gRT->GetTime       = LibGetTime;
-  gRT->SetTime       = LibSetTime;
-  gRT->GetWakeupTime = LibGetWakeupTime;
-  gRT->SetWakeupTime = LibSetWakeupTime;
-
-  // Install the protocol
-  Handle = NULL;
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &Handle,
-                  &gEfiRealTimeClockArchProtocolGuid,  NULL,
-                  NULL
-                 );
-
-  return Status;
-}
-
-
 /**
   Fixup internal data so that EFI can be call in virtual mode.
   Call the passed in Child Notify event and convert any pointers in
@@ -640,5 +608,75 @@ LibRtcVirtualNotifyEvent (
   // to virtual address. After the OS transitions to calling in virtual mode, all future
   // runtime calls will be made in virtual mode.
   //
+  EfiConvertPointer (0x0, (VOID**)&mPL031RtcBase);
   return;
+}
+
+/**
+  This is the declaration of an EFI image entry point. This can be the entry point to an application
+  written to this specification, an EFI boot service driver, or an EFI runtime driver.
+
+  @param  ImageHandle           Handle that identifies the loaded image.
+  @param  SystemTable           System Table for this image.
+
+  @retval EFI_SUCCESS           The operation completed successfully.
+
+**/
+EFI_STATUS
+EFIAPI
+LibRtcInitialize (
+  IN EFI_HANDLE                            ImageHandle,
+  IN EFI_SYSTEM_TABLE                      *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  EFI_HANDLE    Handle;
+
+  // Initialize RTC Base Address
+  mPL031RtcBase = PcdGet32 (PcdPL031RtcBase);
+
+  // Declare the controller as EFI_MEMORY_RUNTIME
+  Status = gDS->AddMemorySpace (
+                  EfiGcdMemoryTypeMemoryMappedIo,
+                  mPL031RtcBase, SIZE_4KB,
+                  EFI_MEMORY_UC | EFI_MEMORY_RUNTIME
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = gDS->SetMemorySpaceAttributes (mPL031RtcBase, SIZE_4KB, EFI_MEMORY_UC | EFI_MEMORY_RUNTIME);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // Setup the setters and getters
+  gRT->GetTime       = LibGetTime;
+  gRT->SetTime       = LibSetTime;
+  gRT->GetWakeupTime = LibGetWakeupTime;
+  gRT->SetWakeupTime = LibSetWakeupTime;
+
+  // Install the protocol
+  Handle = NULL;
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &Handle,
+                  &gEfiRealTimeClockArchProtocolGuid,  NULL,
+                  NULL
+                 );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Register for the virtual address change event
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  LibRtcVirtualNotifyEvent,
+                  NULL,
+                  &gEfiEventVirtualAddressChangeGuid,
+                  &mRtcVirtualAddrChangeEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  return Status;
 }

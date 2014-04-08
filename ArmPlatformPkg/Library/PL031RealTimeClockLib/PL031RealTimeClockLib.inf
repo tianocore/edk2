@@ -1,7 +1,7 @@
 #/** @file
 #
 # Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
-# Copyright (c) 2011-2013, ARM Ltd. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -35,6 +35,11 @@
   DebugLib
   PcdLib
   ArmPlatformSysConfigLib
+  DxeServicesTableLib
+  UefiRuntimeLib
+
+[Guids]
+  gEfiEventVirtualAddressChangeGuid
 
 [Pcd]
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase
