@@ -20,6 +20,7 @@
 #include <Library/UefiLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/DxeServicesTableLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
 #include <Guid/VariableFormat.h>
@@ -27,6 +28,8 @@
 
 #include "NorFlashDxe.h"
 
+STATIC EFI_EVENT mFvbVirtualAddrChangeEvent;
+STATIC UINTN     mFlashNvStorageVariableBase;
 
 ///
 /// The Firmware Volume Block Protocol is the low-level interface
@@ -301,7 +304,7 @@ FvbGetPhysicalAddress (
 
   ASSERT(Address != NULL);
 
-  *Address = PcdGet32 (PcdFlashNvStorageVariableBase);
+  *Address = mFlashNvStorageVariableBase;
   return EFI_SUCCESS;
 }
 
@@ -745,6 +748,25 @@ EXIT:
   return Status;
 }
 
+/**
+  Fixup internal data so that EFI can be call in virtual mode.
+  Call the passed in Child Notify event and convert any pointers in
+  lib to virtual mode.
+
+  @param[in]    Event   The Event that is being processed
+  @param[in]    Context Event Context
+**/
+VOID
+EFIAPI
+FvbVirtualNotifyEvent (
+  IN EFI_EVENT        Event,
+  IN VOID             *Context
+  )
+{
+  EfiConvertPointer (0x0, (VOID**)&mFlashNvStorageVariableBase);
+  return;
+}
+
 EFI_STATUS
 EFIAPI
 NorFlashFvbInitialize (
@@ -754,10 +776,12 @@ NorFlashFvbInitialize (
   EFI_STATUS  Status;
   UINT32      FvbNumLba;
   EFI_BOOT_MODE BootMode;
+  UINTN       RuntimeMmioRegionSize;
 
   DEBUG((DEBUG_BLKIO,"NorFlashFvbInitialize\n"));
 
   Instance->Initialized = TRUE;
+  mFlashNvStorageVariableBase = FixedPcdGet32 (PcdFlashNvStorageVariableBase);
 
   // Set the index of the first LBA for the FVB
   Instance->StartLba = (PcdGet32 (PcdFlashNvStorageVariableBase) - Instance->RegionBaseAddress) / Instance->Media.BlockSize;
@@ -789,5 +813,41 @@ NorFlashFvbInitialize (
       return Status;
     }
   }
+
+  //
+  // Declare the Non-Volatile storage as EFI_MEMORY_RUNTIME
+  //
+
+  // Note: all the NOR Flash region needs to be reserved into the UEFI Runtime memory;
+  //       even if we only use the small block region at the top of the NOR Flash.
+  //       The reason is when the NOR Flash memory is set into program mode, the command
+  //       is written as the base of the flash region (ie: Instance->DeviceBaseAddress)
+  RuntimeMmioRegionSize = (Instance->RegionBaseAddress - Instance->DeviceBaseAddress) + Instance->Size;
+
+  Status = gDS->AddMemorySpace (
+      EfiGcdMemoryTypeMemoryMappedIo,
+      Instance->DeviceBaseAddress, RuntimeMmioRegionSize,
+      EFI_MEMORY_UC | EFI_MEMORY_RUNTIME
+      );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gDS->SetMemorySpaceAttributes (
+      Instance->DeviceBaseAddress, RuntimeMmioRegionSize,
+      EFI_MEMORY_UC | EFI_MEMORY_RUNTIME);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Register for the virtual address change event
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  FvbVirtualNotifyEvent,
+                  NULL,
+                  &gEfiEventVirtualAddressChangeGuid,
+                  &mFvbVirtualAddrChangeEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
+
   return Status;
 }

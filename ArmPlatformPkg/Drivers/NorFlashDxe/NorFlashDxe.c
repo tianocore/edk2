@@ -20,11 +20,13 @@
 
 #include "NorFlashDxe.h"
 
+STATIC EFI_EVENT mNorFlashVirtualAddrChangeEvent;
 
 //
 // Global variable declarations
 //
 NOR_FLASH_INSTANCE **mNorFlashInstances;
+UINT32               mNorFlashDeviceCount;
 
 NOR_FLASH_INSTANCE  mNorFlashInstanceTemplate = {
   NOR_FLASH_SIGNATURE, // Signature
@@ -792,6 +794,50 @@ NorFlashReset (
   return EFI_SUCCESS;
 }
 
+/**
+  Fixup internal data so that EFI can be call in virtual mode.
+  Call the passed in Child Notify event and convert any pointers in
+  lib to virtual mode.
+
+  @param[in]    Event   The Event that is being processed
+  @param[in]    Context Event Context
+**/
+VOID
+EFIAPI
+NorFlashVirtualNotifyEvent (
+  IN EFI_EVENT        Event,
+  IN VOID             *Context
+  )
+{
+  UINTN Index;
+
+  for (Index = 0; Index < mNorFlashDeviceCount; Index++) {
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->DeviceBaseAddress);
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->RegionBaseAddress);
+
+    // Convert BlockIo protocol
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->BlockIoProtocol.FlushBlocks);
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->BlockIoProtocol.ReadBlocks);
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->BlockIoProtocol.Reset);
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->BlockIoProtocol.WriteBlocks);
+
+    // Convert Fvb
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->FvbProtocol.EraseBlocks);
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->FvbProtocol.GetAttributes);
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->FvbProtocol.GetBlockSize);
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->FvbProtocol.GetPhysicalAddress);
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->FvbProtocol.Read);
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->FvbProtocol.SetAttributes);
+    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->FvbProtocol.Write);
+
+    if (mNorFlashInstances[Index]->FvbBuffer != NULL) {
+      EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->FvbBuffer);
+    }
+  }
+
+  return;
+}
+
 EFI_STATUS
 EFIAPI
 NorFlashInitialise (
@@ -802,7 +848,6 @@ NorFlashInitialise (
   EFI_STATUS              Status;
   UINT32                  Index;
   NOR_FLASH_DESCRIPTION*  NorFlashDevices;
-  UINT32                  NorFlashDeviceCount;
   BOOLEAN                 ContainVariableStorage;
 
   Status = NorFlashPlatformInitialization ();
@@ -811,15 +856,15 @@ NorFlashInitialise (
     return Status;
   }
 
-  Status = NorFlashPlatformGetDevices (&NorFlashDevices,&NorFlashDeviceCount);
+  Status = NorFlashPlatformGetDevices (&NorFlashDevices, &mNorFlashDeviceCount);
   if (EFI_ERROR(Status)) {
     DEBUG((EFI_D_ERROR,"NorFlashInitialise: Fail to get Nor Flash devices\n"));
     return Status;
   }
 
-  mNorFlashInstances = AllocateRuntimePool (sizeof(NOR_FLASH_INSTANCE*) * NorFlashDeviceCount);
+  mNorFlashInstances = AllocateRuntimePool (sizeof(NOR_FLASH_INSTANCE*) * mNorFlashDeviceCount);
 
-  for (Index = 0; Index < NorFlashDeviceCount; Index++) {
+  for (Index = 0; Index < mNorFlashDeviceCount; Index++) {
     // Check if this NOR Flash device contain the variable storage region
     ContainVariableStorage =
         (NorFlashDevices[Index].RegionBaseAddress <= PcdGet32 (PcdFlashNvStorageVariableBase)) &&
@@ -839,6 +884,19 @@ NorFlashInitialise (
       DEBUG((EFI_D_ERROR,"NorFlashInitialise: Fail to create instance for NorFlash[%d]\n",Index));
     }
   }
+
+  //
+  // Register for the virtual address change event
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  NorFlashVirtualNotifyEvent,
+                  NULL,
+                  &gEfiEventVirtualAddressChangeGuid,
+                  &mNorFlashVirtualAddrChangeEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
 
   return Status;
 }

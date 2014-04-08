@@ -42,10 +42,12 @@
   UefiDriverEntryPoint
   UefiBootServicesTableLib
   UefiRuntimeLib
+  DxeServicesTableLib
 
 [Guids]
   gEfiSystemNvDataFvGuid
   gEfiVariableGuid
+  gEfiEventVirtualAddressChangeGuid
 
 [Protocols]
   gEfiBlockIoProtocolGuid

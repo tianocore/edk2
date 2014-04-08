@@ -19,6 +19,8 @@
 #include <Base.h>
 #include <PiDxe.h>
 
+#include <Guid/EventGroup.h>
+
 #include <Protocol/BlockIo.h>
 #include <Protocol/FirmwareVolumeBlock.h>
 
