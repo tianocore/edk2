@@ -1,7 +1,7 @@
 /** @file
   Dhcp6 support functions implementation.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -157,7 +157,10 @@ Dhcp6GenerateClientId (
                   Duid->Length + 2,
                   (VOID *) Duid
                   );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    FreePool (Duid);
+    return NULL;
+  }
 
   return Duid;
 }

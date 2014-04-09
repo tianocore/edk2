@@ -1,7 +1,7 @@
 /** @file
   Misc BDS library function
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1422,19 +1422,23 @@ BdsSetMemoryTypeInformationVariable (
     Status = gRT->SetVariable (
                     EFI_MEMORY_TYPE_INFORMATION_VARIABLE_NAME,
                     &gEfiMemoryTypeInformationGuid,
-                    EFI_VARIABLE_NON_VOLATILE  | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                    EFI_VARIABLE_NON_VOLATILE  | EFI_VARIABLE_BOOTSERVICE_ACCESS,
                     VariableSize,
                     PreviousMemoryTypeInformation
                     );
 
-    //
-    // If the Memory Type Information settings have been modified, then reset the platform
-    // so the new Memory Type Information setting will be used to guarantee that an S4
-    // entry/resume cycle will not fail.
-    //
-    if (MemoryTypeInformationModified && PcdGetBool (PcdResetOnMemoryTypeInformationChange)) {
-      DEBUG ((EFI_D_INFO, "Memory Type Information settings change. Warm Reset!!!\n"));
-      gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
+    if (!EFI_ERROR (Status)) {
+      //
+      // If the Memory Type Information settings have been modified, then reset the platform
+      // so the new Memory Type Information setting will be used to guarantee that an S4
+      // entry/resume cycle will not fail.
+      //
+      if (MemoryTypeInformationModified && PcdGetBool (PcdResetOnMemoryTypeInformationChange)) {
+        DEBUG ((EFI_D_INFO, "Memory Type Information settings change. Warm Reset!!!\n"));
+        gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
+      }
+    } else {
+      DEBUG ((EFI_D_ERROR, "Memory Type Information settings cannot be saved. OS S4 may fail!\n"));
     }
   }
 }

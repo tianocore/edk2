@@ -120,10 +120,10 @@
 [Components]
   SecurityPkg/VariableAuthenticated/Pei/VariablePei.inf
   SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
-  SecurityPkg/Library/DxeDeferImageLoadLib/DxeDeferImageLoadLib.inf
+  #SecurityPkg/Library/DxeDeferImageLoadLib/DxeDeferImageLoadLib.inf
   SecurityPkg/Library/DxeImageAuthenticationStatusLib/DxeImageAuthenticationStatusLib.inf
-  SecurityPkg/UserIdentification/UserIdentifyManagerDxe/UserIdentifyManagerDxe.inf
-  SecurityPkg/UserIdentification/UserProfileManagerDxe/UserProfileManagerDxe.inf
+  #SecurityPkg/UserIdentification/UserIdentifyManagerDxe/UserIdentifyManagerDxe.inf
+  #SecurityPkg/UserIdentification/UserProfileManagerDxe/UserProfileManagerDxe.inf
 
   #
   # Application
@@ -164,7 +164,7 @@
 
 [Components.IA32, Components.X64, Components.IPF]
   SecurityPkg/UserIdentification/PwdCredentialProviderDxe/PwdCredentialProviderDxe.inf
-  SecurityPkg/UserIdentification/UsbCredentialProviderDxe/UsbCredentialProviderDxe.inf
+#  SecurityPkg/UserIdentification/UsbCredentialProviderDxe/UsbCredentialProviderDxe.inf
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
   SecurityPkg/VariableAuthenticated/RuntimeDxe/VariableRuntimeDxe.inf
 

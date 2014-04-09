@@ -5,7 +5,7 @@
   for Firmware Basic Boot Performance Record and other boot performance records, 
   and install FPDT to ACPI table.
 
-  Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -488,15 +488,15 @@ InstallFirmwarePerformanceDataTable (
   mFirmwarePerformanceTableTemplate.S3PointerRecord.S3PerformanceTablePointer = (UINT64) (UINTN) mAcpiS3PerformanceTable;
   //
   // Save Runtime Performance Table pointers to Variable.
+  // Don't check SetVariable return status. It doesn't impact FPDT table generation. 
   //
-  Status = gRT->SetVariable (
-                  EFI_FIRMWARE_PERFORMANCE_VARIABLE_NAME,
-                  &gEfiFirmwarePerformanceGuid,
-                  EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                  sizeof (PerformanceVariable),
-                  &PerformanceVariable
-                  );
-  ASSERT_EFI_ERROR (Status);
+  gRT->SetVariable (
+        EFI_FIRMWARE_PERFORMANCE_VARIABLE_NAME,
+        &gEfiFirmwarePerformanceGuid,
+        EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+        sizeof (PerformanceVariable),
+        &PerformanceVariable
+        );
 
   //
   // Publish Firmware Performance Data Table.
