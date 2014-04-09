@@ -1419,13 +1419,13 @@ BdsSetMemoryTypeInformationVariable (
   // Or create the variable in first boot.
   //
   if (MemoryTypeInformationModified || !MemoryTypeInformationVariableExists) {
-    Status = gRT->SetVariable (
-                    EFI_MEMORY_TYPE_INFORMATION_VARIABLE_NAME,
-                    &gEfiMemoryTypeInformationGuid,
-                    EFI_VARIABLE_NON_VOLATILE  | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                    VariableSize,
-                    PreviousMemoryTypeInformation
-                    );
+    Status = SetVariableAndReportStatusCodeOnError (
+               EFI_MEMORY_TYPE_INFORMATION_VARIABLE_NAME,
+               &gEfiMemoryTypeInformationGuid,
+               EFI_VARIABLE_NON_VOLATILE  | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+               VariableSize,
+               PreviousMemoryTypeInformation
+               );
 
     if (!EFI_ERROR (Status)) {
       //
@@ -1484,5 +1484,89 @@ BdsLibUserIdentify (
   }
 
   return Manager->Identify (Manager, User);
+}
+
+/**
+  Set the variable and report the error through status code upon failure.
+
+  @param  VariableName           A Null-terminated string that is the name of the vendor's variable.
+                                 Each VariableName is unique for each VendorGuid. VariableName must
+                                 contain 1 or more characters. If VariableName is an empty string,
+                                 then EFI_INVALID_PARAMETER is returned.
+  @param  VendorGuid             A unique identifier for the vendor.
+  @param  Attributes             Attributes bitmask to set for the variable.
+  @param  DataSize               The size in bytes of the Data buffer. Unless the EFI_VARIABLE_APPEND_WRITE, 
+                                 EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS, or 
+                                 EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS attribute is set, a size of zero 
+                                 causes the variable to be deleted. When the EFI_VARIABLE_APPEND_WRITE attribute is 
+                                 set, then a SetVariable() call with a DataSize of zero will not cause any change to 
+                                 the variable value (the timestamp associated with the variable may be updated however 
+                                 even if no new data value is provided,see the description of the 
+                                 EFI_VARIABLE_AUTHENTICATION_2 descriptor below. In this case the DataSize will not 
+                                 be zero since the EFI_VARIABLE_AUTHENTICATION_2 descriptor will be populated). 
+  @param  Data                   The contents for the variable.
+
+  @retval EFI_SUCCESS            The firmware has successfully stored the variable and its data as
+                                 defined by the Attributes.
+  @retval EFI_INVALID_PARAMETER  An invalid combination of attribute bits, name, and GUID was supplied, or the
+                                 DataSize exceeds the maximum allowed.
+  @retval EFI_INVALID_PARAMETER  VariableName is an empty string.
+  @retval EFI_OUT_OF_RESOURCES   Not enough storage is available to hold the variable and its data.
+  @retval EFI_DEVICE_ERROR       The variable could not be retrieved due to a hardware error.
+  @retval EFI_WRITE_PROTECTED    The variable in question is read-only.
+  @retval EFI_WRITE_PROTECTED    The variable in question cannot be deleted.
+  @retval EFI_SECURITY_VIOLATION The variable could not be written due to EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS 
+                                 or EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACESS being set, but the AuthInfo 
+                                 does NOT pass the validation check carried out by the firmware.
+
+  @retval EFI_NOT_FOUND          The variable trying to be updated or deleted was not found.
+**/
+EFI_STATUS
+SetVariableAndReportStatusCodeOnError (
+  IN CHAR16     *VariableName,
+  IN EFI_GUID   *VendorGuid,
+  IN UINT32     Attributes,
+  IN UINTN      DataSize,
+  IN VOID       *Data
+  )
+{
+  EFI_STATUS                 Status;
+  EDKII_SET_VARIABLE_STATUS  *SetVariableStatus;
+  UINTN                      NameSize;
+
+  Status = gRT->SetVariable (
+                  VariableName,
+                  VendorGuid,
+                  Attributes,
+                  DataSize,
+                  Data
+                  );
+  if (EFI_ERROR (Status)) {
+    NameSize = StrSize (VariableName);
+    SetVariableStatus = AllocatePool (sizeof (EDKII_SET_VARIABLE_STATUS) + NameSize + DataSize);
+    if (SetVariableStatus != NULL) {
+      CopyGuid (&SetVariableStatus->Guid, VendorGuid);
+      SetVariableStatus->NameSize   = NameSize;
+      SetVariableStatus->DataSize   = DataSize;
+      SetVariableStatus->SetStatus  = Status;
+      SetVariableStatus->Attributes = Attributes;
+      CopyMem (SetVariableStatus + 1,                          VariableName, NameSize);
+      CopyMem (((UINT8 *) (SetVariableStatus + 1)) + NameSize, Data,         DataSize);
+
+      REPORT_STATUS_CODE_EX (
+        EFI_ERROR_CODE,
+        PcdGet32 (PcdErrorCodeSetVariable),
+        0,
+        NULL,
+        &gEdkiiStatusCodeDataTypeVariableGuid,
+        SetVariableStatus,
+        sizeof (EDKII_SET_VARIABLE_STATUS) + NameSize + DataSize
+        );
+
+      FreePool (SetVariableStatus);
+    }
+  }
+
+  return Status;
 }
 

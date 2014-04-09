@@ -2,7 +2,7 @@
   Provides a way for 3rd party applications to register themselves for launch by the
   Boot Manager based on hot key
 
-Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -550,6 +550,9 @@ InitializeHotkeyService (
                   sizeof (UINT32),
                   &BootOptionSupport
                   );
+  //
+  // Platform needs to make sure setting volatile variable before calling 3rd party code shouldn't fail.
+  //
   ASSERT_EFI_ERROR (Status);
 
   KeyOptionNumbers = HotkeyGetOptionNumbers (&KeyOptionCount);

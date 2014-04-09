@@ -2,7 +2,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by Variable modules.
 
-Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -111,10 +111,12 @@ typedef struct {
 typedef struct {
   EFI_GUID    *Guid;
   CHAR16      *Name;
-  UINT32      Attributes;
-  UINTN       DataSize;
-  VOID        *Data;
-} VARIABLE_CACHE_ENTRY;
+//  UINT32      Attributes;
+  //
+  // Variable size include variable header, name and data.
+  //
+  UINTN       VariableSize;
+} VARIABLE_ENTRY_CONSISTENCY;
 
 typedef struct {
   EFI_GUID    Guid;
@@ -562,6 +564,34 @@ VariableServiceSetVariable (
   IN UINT32                  Attributes,
   IN UINTN                   DataSize,
   IN VOID                    *Data
+  );
+
+/**
+
+  This code returns information about the EFI variables.
+
+  Caution: This function may receive untrusted input.
+  This function may be invoked in SMM mode. This function will do basic validation, before parse the data.
+
+  @param Attributes                     Attributes bitmask to specify the type of variables
+                                        on which to return information.
+  @param MaximumVariableStorageSize     Pointer to the maximum size of the storage space available
+                                        for the EFI variables associated with the attributes specified.
+  @param RemainingVariableStorageSize   Pointer to the remaining size of the storage space available
+                                        for EFI variables associated with the attributes specified.
+  @param MaximumVariableSize            Pointer to the maximum size of an individual EFI variables
+                                        associated with the attributes specified.
+
+  @return EFI_SUCCESS                   Query successfully.
+
+**/
+EFI_STATUS
+EFIAPI
+VariableServiceQueryVariableInfoInternal (
+  IN  UINT32                 Attributes,
+  OUT UINT64                 *MaximumVariableStorageSize,
+  OUT UINT64                 *RemainingVariableStorageSize,
+  OUT UINT64                 *MaximumVariableSize
   );
 
 /**

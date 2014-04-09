@@ -1422,11 +1422,13 @@ TerminalUpdateConsoleDevVariable (
   )
 {
   EFI_STATUS                Status;
+  UINTN                     NameSize;
   UINTN                     VariableSize;
   UINT8                     TerminalType;
   EFI_DEVICE_PATH_PROTOCOL  *Variable;
   EFI_DEVICE_PATH_PROTOCOL  *NewVariable;
   EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
+  EDKII_SET_VARIABLE_STATUS *SetVariableStatus;
 
   //
   // Get global variable and its size according to the name given.
@@ -1462,6 +1464,33 @@ TerminalUpdateConsoleDevVariable (
                   VariableSize,
                   Variable
                   );
+
+  if (EFI_ERROR (Status)) {
+    NameSize = StrSize (VariableName);
+    SetVariableStatus = AllocatePool (sizeof (EDKII_SET_VARIABLE_STATUS) + NameSize + VariableSize);
+    if (SetVariableStatus != NULL) {
+      CopyGuid (&SetVariableStatus->Guid, &gEfiGlobalVariableGuid);
+      SetVariableStatus->NameSize   = NameSize;
+      SetVariableStatus->DataSize   = VariableSize;
+      SetVariableStatus->SetStatus  = Status;
+      SetVariableStatus->Attributes = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS;
+      CopyMem (SetVariableStatus + 1,                          VariableName, NameSize);
+      CopyMem (((UINT8 *) (SetVariableStatus + 1)) + NameSize, Variable,     VariableSize);
+
+      REPORT_STATUS_CODE_EX (
+        EFI_ERROR_CODE,
+        PcdGet32 (PcdErrorCodeSetVariable),
+        0,
+        NULL,
+        &gEdkiiStatusCodeDataTypeVariableGuid,
+        SetVariableStatus,
+        sizeof (EDKII_SET_VARIABLE_STATUS) + NameSize + VariableSize
+        );
+
+      FreePool (SetVariableStatus);
+    }
+  }
+
   FreePool (Variable);
 
   return ;
@@ -1569,6 +1598,10 @@ TerminalRemoveConsoleDevVariable (
                     VariableSize,
                     NewVariable
                     );
+    //
+    // Shrinking variable with existing variable driver implementation shouldn't fail.
+    //
+    ASSERT_EFI_ERROR (Status);
   }
 
   if (NewVariable != NULL) {

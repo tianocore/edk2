@@ -102,7 +102,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics  ## SOMETIME_CONSUMES (statistic the information of variable.)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics  ## CONSUMES # statistic the information of variable.
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate ## CONSUMES
 
 [Depex]
   TRUE

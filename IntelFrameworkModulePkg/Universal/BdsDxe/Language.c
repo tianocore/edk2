@@ -1,7 +1,7 @@
 /** @file
   Language settings
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -425,7 +425,7 @@ InitializeLangVariable (
     // The default language code should be one of the supported language codes.
     //
     ASSERT (IsLangInSupportedLangCodes (SupportedLang, DefaultLang, Iso639Language));
-    Status = gRT->SetVariable (
+    BdsDxeSetVariableAndReportStatusCodeOnError (
                     LangName,
                     &gEfiGlobalVariableGuid,
                     EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
@@ -462,7 +462,7 @@ InitializeLanguage (
   if (LangCodesSettingRequired) {
     if (!FeaturePcdGet (PcdUefiVariableDefaultLangDeprecate)) {
       //
-      // UEFI 2.1 depricated this variable so we support turning it off
+      // UEFI 2.0 depricated this variable so we support turning it off
       //
       Status = gRT->SetVariable (
                       L"LangCodes",
@@ -471,6 +471,10 @@ InitializeLanguage (
                       AsciiStrSize (LangCodes),
                       LangCodes
                       );
+      //
+      // Platform needs to make sure setting volatile variable before calling 3rd party code shouldn't fail.
+      //
+      ASSERT_EFI_ERROR (Status);
     }
 
     Status = gRT->SetVariable (
@@ -480,11 +484,15 @@ InitializeLanguage (
                     AsciiStrSize (PlatformLangCodes),
                     PlatformLangCodes
                     );
+    //
+    // Platform needs to make sure setting volatile variable before calling 3rd party code shouldn't fail.
+    //
+    ASSERT_EFI_ERROR (Status);
   }
 
   if (!FeaturePcdGet (PcdUefiVariableDefaultLangDeprecate)) {
     //
-    // UEFI 2.1 depricated this variable so we support turning it off
+    // UEFI 2.0 depricated this variable so we support turning it off
     //
     InitializeLangVariable (L"Lang", LangCodes, (CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultLang), TRUE);
   }

@@ -38,8 +38,10 @@ TrEEConfigDriverEntryPoint (
   EFI_STATUS                    Status;
   TREE_CONFIG_PRIVATE_DATA      *PrivateData;
   TREE_CONFIGURATION            TrEEConfiguration;
+  TREE_DEVICE_DETECTION         TrEEDeviceDetection;
   UINTN                         Index;
   UINTN                         DataSize;
+  EDKII_VARIABLE_LOCK_PROTOCOL  *VariableLockProtocol;
 
   Status = gBS->OpenProtocol (
                   ImageHandle,
@@ -79,24 +81,17 @@ TrEEConfigDriverEntryPoint (
                   &TrEEConfiguration
                   );
   if (EFI_ERROR (Status)) {
+    //
+    // Variable not ready, set default value
+    //
+    TrEEConfiguration.TpmDevice           = TPM_DEVICE_DEFAULT;
   }
-  //
-  // We should always reinit PP request.
-  //
-  TrEEConfiguration.Tpm2Operation = TREE_PHYSICAL_PRESENCE_NO_ACTION;
 
   //
-  // Sync data from PCD to variable, so that we do not need detect again in S3 phase.
+  // Validation
   //
-
-  //
-  // Get data from PCD to make sure data consistant - platform driver is suppose to construct this PCD accroding to Variable
-  //
-  for (Index = 0; Index < sizeof(mTpmInstanceId)/sizeof(mTpmInstanceId[0]); Index++) {
-    if (CompareGuid (PcdGetPtr(PcdTpmInstanceGuid), &mTpmInstanceId[Index].TpmInstanceGuid)) {
-      TrEEConfiguration.TpmDevice = mTpmInstanceId[Index].TpmDevice;
-      break;
-    }
+  if ((TrEEConfiguration.TpmDevice > TPM_DEVICE_MAX) || (TrEEConfiguration.TpmDevice < TPM_DEVICE_MIN)) {
+    TrEEConfiguration.TpmDevice   = TPM_DEVICE_DEFAULT;
   }
 
   //
@@ -109,7 +104,57 @@ TrEEConfigDriverEntryPoint (
                   sizeof(TrEEConfiguration),
                   &TrEEConfiguration
                   );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "TrEEConfigDriver: Fail to set TREE_STORAGE_NAME\n"));
+  }
+
+  //
+  // Sync data from PCD to variable, so that we do not need detect again in S3 phase.
+  //
+  TrEEDeviceDetection.TpmDeviceDetected = TPM_DEVICE_NULL;
+  for (Index = 0; Index < sizeof(mTpmInstanceId)/sizeof(mTpmInstanceId[0]); Index++) {
+    if (CompareGuid (PcdGetPtr(PcdTpmInstanceGuid), &mTpmInstanceId[Index].TpmInstanceGuid)) {
+      TrEEDeviceDetection.TpmDeviceDetected = mTpmInstanceId[Index].TpmDevice;
+      break;
+    }
+  }
+
+  PrivateData->TpmDeviceDetected = TrEEDeviceDetection.TpmDeviceDetected;
+
+  //
+  // Save to variable so platform driver can get it.
+  //
+  Status = gRT->SetVariable (
+                  TREE_DEVICE_DETECTION_NAME,
+                  &gTrEEConfigFormSetGuid,
+                  EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                  sizeof(TrEEDeviceDetection),
+                  &TrEEDeviceDetection
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "TrEEConfigDriver: Fail to set TREE_DEVICE_DETECTION_NAME\n"));
+    Status = gRT->SetVariable (
+                    TREE_DEVICE_DETECTION_NAME,
+                    &gTrEEConfigFormSetGuid,
+                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                    0,
+                    NULL
+                    );
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  //
+  // We should lock TrEEDeviceDetection, because it contains information needed at S3.
+  //
+  Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **)&VariableLockProtocol);
+  if (!EFI_ERROR (Status)) {
+    Status = VariableLockProtocol->RequestToLock (
+                                     VariableLockProtocol,
+                                     TREE_DEVICE_DETECTION_NAME,
+                                     &gTrEEConfigFormSetGuid
+                                     );
+    ASSERT_EFI_ERROR (Status);
+  }
   
   //
   // Install TrEE configuration form

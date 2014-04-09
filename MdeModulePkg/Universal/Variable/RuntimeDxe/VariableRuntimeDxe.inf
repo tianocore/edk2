@@ -2,7 +2,7 @@
 # Component description file for Variable module.
 #
 # This module installs three EFI_RUNTIME_SERVICES: SetVariable, GetVariable, GetNextVariableName.
-# Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -80,7 +80,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize
   
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics  ## SOMETIME_CONSUMES (statistic the information of variable.)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics  ## CONSUMES # statistic the information of variable.
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate ## CONSUMES
 
 [Depex]
   TRUE

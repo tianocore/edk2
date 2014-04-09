@@ -86,96 +86,7 @@ TrEEExtractConfig (
        OUT EFI_STRING                            *Results
   )
 {
-  EFI_STATUS                 Status;
-  UINTN                      BufferSize;
-  TREE_CONFIGURATION         Configuration;
-  TREE_CONFIG_PRIVATE_DATA   *PrivateData;
-  EFI_STRING                 ConfigRequestHdr;
-  EFI_STRING                 ConfigRequest;
-  BOOLEAN                    AllocatedRequest;
-  UINTN                      Size;
-  UINTN                      Index;
-
-  if (Progress == NULL || Results == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  *Progress = Request;
-  if ((Request != NULL) && !HiiIsConfigHdrMatch (Request, &gTrEEConfigFormSetGuid, TREE_STORAGE_NAME)) {
-    return EFI_NOT_FOUND;
-  }
-
-  ConfigRequestHdr = NULL;
-  ConfigRequest    = NULL;
-  AllocatedRequest = FALSE;
-  Size             = 0;
-
-  PrivateData = TREE_CONFIG_PRIVATE_DATA_FROM_THIS (This);
-
-  //
-  // Convert buffer data to <ConfigResp> by helper function BlockToConfig()
-  //  
-  BufferSize = sizeof (Configuration);
-  Status = gRT->GetVariable (
-                  TREE_STORAGE_NAME,
-                  &gTrEEConfigFormSetGuid,
-                  NULL,
-                  &BufferSize,
-                  &Configuration
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Get data from PCD to make sure data consistant - platform driver is suppose to construct this PCD accroding to Variable
-  //
-  for (Index = 0; Index < sizeof(mTpmInstanceId)/sizeof(mTpmInstanceId[0]); Index++) {
-    if (CompareGuid (PcdGetPtr(PcdTpmInstanceGuid), &mTpmInstanceId[Index].TpmInstanceGuid)) {
-      Configuration.TpmDevice = mTpmInstanceId[Index].TpmDevice;
-      break;
-    }
-  }
-
-  BufferSize = sizeof (Configuration);
-  ConfigRequest = Request;
-  if ((Request == NULL) || (StrStr (Request, L"OFFSET") == NULL)) {
-    //
-    // Request has no request element, construct full request string.
-    // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
-    // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
-    //
-    ConfigRequestHdr = HiiConstructConfigHdr (&gTrEEConfigFormSetGuid, TREE_STORAGE_NAME, PrivateData->DriverHandle);
-    Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
-    ConfigRequest = AllocateZeroPool (Size);
-    ASSERT (ConfigRequest != NULL);
-    AllocatedRequest = TRUE;
-    UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64) BufferSize);
-    FreePool (ConfigRequestHdr);
-  }
-
-  Status = gHiiConfigRouting->BlockToConfig (
-                                gHiiConfigRouting,
-                                ConfigRequest,
-                                (UINT8 *) &Configuration,
-                                BufferSize,
-                                Results,
-                                Progress
-                                );
-  //
-  // Free the allocated config request string.
-  //
-  if (AllocatedRequest) {
-    FreePool (ConfigRequest);
-  }
-  //
-  // Set Progress string to the original request string.
-  //
-  if (Request == NULL) {
-    *Progress = NULL;
-  } else if (StrStr (Request, L"OFFSET") == NULL) {
-    *Progress = Request + StrLen (Request);
-  }
-
-  return Status;
+  return EFI_UNSUPPORTED;
 }
 
 /**
@@ -252,59 +163,7 @@ TrEERouteConfig (
        OUT EFI_STRING                          *Progress
   )
 {
-  EFI_STATUS                       Status;
-  UINTN                            BufferSize;
-  TREE_CONFIGURATION               TrEEConfiguration;
-
-  if (Configuration == NULL || Progress == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  *Progress = Configuration;
-  if (!HiiIsConfigHdrMatch (Configuration, &gTrEEConfigFormSetGuid, TREE_STORAGE_NAME)) {
-    return EFI_NOT_FOUND;
-  }
-
-  BufferSize = sizeof (TrEEConfiguration);
-  Status = gRT->GetVariable (
-                  TREE_STORAGE_NAME,
-                  &gTrEEConfigFormSetGuid,
-                  NULL,
-                  &BufferSize,
-                  &TrEEConfiguration
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Convert <ConfigResp> to buffer data by helper function ConfigToBlock()
-  //
-  BufferSize = sizeof (TREE_CONFIGURATION);
-  Status = gHiiConfigRouting->ConfigToBlock (
-                                gHiiConfigRouting,
-                                Configuration,
-                                (UINT8 *) &TrEEConfiguration,
-                                &BufferSize,
-                                Progress
-                                );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Save to variable so platform driver can get it.
-  //
-  Status = gRT->SetVariable (
-                  TREE_STORAGE_NAME,
-                  &gTrEEConfigFormSetGuid,
-                  EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                  sizeof(TrEEConfiguration),
-                  &TrEEConfiguration
-                  );
-
-  SaveTrEEPpRequest (TrEEConfiguration.Tpm2Operation
-                     );
-
-  return Status;
+  return EFI_UNSUPPORTED;
 }
 
 /**
@@ -343,13 +202,17 @@ TrEECallback (
   if ((This == NULL) || (Value == NULL) || (ActionRequest == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
-
-  if ((Action != EFI_BROWSER_ACTION_CHANGED) ||
-      (QuestionId != KEY_TPM_DEVICE)) {
-    return EFI_UNSUPPORTED;
+  
+  if (Action == EFI_BROWSER_ACTION_CHANGED) {
+    if (QuestionId == KEY_TPM_DEVICE) {
+      return EFI_SUCCESS;
+    }
+    if (QuestionId == KEY_TPM2_OPERATION) {
+      return SaveTrEEPpRequest (Value->u8);
+    }
   }
 
-  return EFI_SUCCESS;
+  return EFI_UNSUPPORTED;
 }
 
 /**
@@ -412,6 +275,24 @@ InstallTrEEConfigForm (
   }
   
   PrivateData->HiiHandle = HiiHandle;
+
+  //
+  // Update static data
+  //
+  switch (PrivateData->TpmDeviceDetected) {
+  case TPM_DEVICE_NULL:
+    HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TREE_DEVICE_STATE_CONTENT), L"Not Found", NULL);
+    break;
+  case TPM_DEVICE_1_2:
+    HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TREE_DEVICE_STATE_CONTENT), L"TPM 1.2", NULL);
+    break;
+  case TPM_DEVICE_2_0_DTPM:
+    HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TREE_DEVICE_STATE_CONTENT), L"TPM 2.0 (DTPM)", NULL);
+    break;
+  default:
+    HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TREE_DEVICE_STATE_CONTENT), L"Unknown", NULL);
+    break;
+  }
 
   return EFI_SUCCESS;  
 }

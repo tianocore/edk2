@@ -5,7 +5,7 @@
 #  2) BDS boot device connect interface;
 #  3) BDS Misc interfaces for mainting boot variable, ouput string, etc.
 #  
-#  Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -79,6 +79,7 @@
   gHdBootDevicePathVariablGuid                  ## SOMETIMES_PRODUCES ## Variable:L"HDDP" (The device path of Boot file on Hard device.)
   gBdsLibStringPackageGuid                      ## PRODUCES ## GUID (HII String PackageList Guid)
   gEfiLegacyDevOrderVariableGuid                ## CONSUMES ## GUID
+  gEdkiiStatusCodeDataTypeVariableGuid          ## SOMETIMES_CONSUMES
 
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid              # PROTOCOL CONSUMES
@@ -111,4 +112,5 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange
   gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderLoad
   gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderStart
+  gEfiMdeModulePkgTokenSpaceGuid.PcdErrorCodeSetVariable
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile

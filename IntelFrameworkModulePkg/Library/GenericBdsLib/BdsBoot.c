@@ -1,7 +1,7 @@
 /** @file
   BDS Lib functions which relate with create or process the boot option.
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -82,6 +82,10 @@ BdsDeleteBootOption (
                   0,
                   NULL
                   );
+  //
+  // Deleting variable with existing variable implementation shouldn't fail.
+  //
+  ASSERT_EFI_ERROR (Status);
 
   //
   // adjust boot order array
@@ -626,6 +630,10 @@ BdsDeleteAllInvalidLegacyBootOptions (
                   BootOrderSize,
                   BootOrder
                   );
+  //
+  // Shrinking variable with existing variable implementation shouldn't fail.
+  //
+  ASSERT_EFI_ERROR (Status);
   if (BootOrder != NULL) {
     FreePool (BootOrder);
   }
@@ -857,11 +865,10 @@ BdsAddNonExistingLegacyBootOptions (
                 &BootOrder,
                 &BootOrderSize
                 );
-      if (EFI_ERROR (Status)) {
-        break;
+      if (!EFI_ERROR (Status)) {
+        BbsIndex     = Index;
+        OptionNumber = BootOrder[BootOrderSize / sizeof (UINT16) - 1];
       }
-      BbsIndex     = Index;
-      OptionNumber = BootOrder[BootOrderSize / sizeof (UINT16) - 1];
     }
 
     ASSERT (BbsIndex == Index);
@@ -2265,7 +2272,7 @@ BdsLibBootViaBootOption (
     // In this case, "BootCurrent" is not created.
     // Only create the BootCurrent variable when it points to a valid Boot#### variable.
     //
-    gRT->SetVariable (
+    SetVariableAndReportStatusCodeOnError (
           L"BootCurrent",
           &gEfiGlobalVariableGuid,
           EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
@@ -2463,13 +2470,14 @@ Done:
 
   //
   // Clear Boot Current
+  // Deleting variable with current implementation shouldn't fail.
   //
   gRT->SetVariable (
         L"BootCurrent",
         &gEfiGlobalVariableGuid,
         EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
         0,
-        &Option->BootCurrent
+        NULL
         );
 
   return Status;
@@ -2580,6 +2588,7 @@ BdsExpandPartitionPartialDevicePathToFull (
         FreePool (TempNewDevicePath);
         //
         // Save the matching Device Path so we don't need to do a connect all next time
+        // Failure to set the variable only impacts the performance when next time expanding the short-form device path.
         //
         Status = gRT->SetVariable (
                         HD_BOOT_DEVICE_PATH_VARIABLE_NAME,
@@ -2678,6 +2687,7 @@ BdsExpandPartitionPartialDevicePathToFull (
 
       //
       // Save the matching Device Path so we don't need to do a connect all next time
+      // Failure to set the variable only impacts the performance when next time expanding the short-form device path.
       //
       Status = gRT->SetVariable (
                       HD_BOOT_DEVICE_PATH_VARIABLE_NAME,
@@ -2887,6 +2897,10 @@ BdsLibDeleteOptionFromHandle (
                   BootOrderSize,
                   BootOrder
                   );
+  //
+  // Shrinking variable with existing variable implementation shouldn't fail.
+  //
+  ASSERT_EFI_ERROR (Status);
 
   FreePool (BootOrder);
 
@@ -2985,6 +2999,10 @@ BdsDeleteAllInvalidEfiBootOption (
                       NULL
                       );
       //
+      // Deleting variable with current variable implementation shouldn't fail.
+      //
+      ASSERT_EFI_ERROR (Status);
+      //
       // Mark this boot option in boot order as deleted
       //
       BootOrder[Index] = 0xffff;
@@ -3012,6 +3030,10 @@ BdsDeleteAllInvalidEfiBootOption (
                   Index2 * sizeof (UINT16),
                   BootOrder
                   );
+  //
+  // Shrinking variable with current variable implementation shouldn't fail.
+  //
+  ASSERT_EFI_ERROR (Status);
 
   FreePool (BootOrder);
 
@@ -3135,7 +3157,9 @@ BdsLibEnumerateAllBootOption (
         AsciiStrSize (PlatLang),
         PlatLang
         );
-      ASSERT_EFI_ERROR (Status);
+      //
+      // Failure to set the variable only impacts the performance next time enumerating the boot options.
+      //
 
       if (LastLang != NULL) {
         FreePool (LastLang);
@@ -3478,6 +3502,7 @@ BdsLibBootNext (
   VOID
   )
 {
+  EFI_STATUS        Status;
   UINT16            *BootNext;
   UINTN             BootNextSize;
   CHAR16            Buffer[20];
@@ -3502,13 +3527,17 @@ BdsLibBootNext (
   // Clear the boot next variable first
   //
   if (BootNext != NULL) {
-    gRT->SetVariable (
-          L"BootNext",
-          &gEfiGlobalVariableGuid,
-          EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-          0,
-          BootNext
-          );
+    Status = gRT->SetVariable (
+                    L"BootNext",
+                    &gEfiGlobalVariableGuid,
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                    0,
+                    NULL
+                    );
+    //
+    // Deleting variable with current variable implementation shouldn't fail.
+    //
+    ASSERT_EFI_ERROR (Status);
 
     //
     // Start to build the boot option and try to boot
