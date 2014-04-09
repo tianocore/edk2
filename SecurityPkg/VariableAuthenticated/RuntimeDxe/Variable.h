@@ -111,10 +111,6 @@ typedef struct {
 typedef struct {
   EFI_GUID    *Guid;
   CHAR16      *Name;
-//  UINT32      Attributes;
-  //
-  // Variable size include variable header, name and data.
-  //
   UINTN       VariableSize;
 } VARIABLE_ENTRY_CONSISTENCY;
 
@@ -221,6 +217,32 @@ DataSizeOfVariable (
   IN  VARIABLE_HEADER   *Variable
   );
 
+/**
+  This function is to check if the remaining variable space is enough to set
+  all Variables from argument list successfully. The purpose of the check
+  is to keep the consistency of the Variables to be in variable storage.
+
+  Note: Variables are assumed to be in same storage.
+  The set sequence of Variables will be same with the sequence of VariableEntry from argument list,
+  so follow the argument sequence to check the Variables.
+
+  @param[in] Attributes         Variable attributes for Variable entries.
+  @param ...                    The variable argument list with type VARIABLE_ENTRY_CONSISTENCY *.
+                                A NULL terminates the list. The VariableSize of 
+                                VARIABLE_ENTRY_CONSISTENCY is the variable data size as input.
+                                It will be changed to variable total size as output.
+
+  @retval TRUE                  Have enough variable space to set the Variables successfully.
+  @retval FALSE                 No enough variable space to set the Variables successfully.
+
+**/
+BOOLEAN
+EFIAPI
+CheckRemainingSpaceForConsistency (
+  IN UINT32                     Attributes,
+  ...
+  );
+  
 /**
   Update the variable region with Variable information. If EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS is set,
   index of associated public key is needed.

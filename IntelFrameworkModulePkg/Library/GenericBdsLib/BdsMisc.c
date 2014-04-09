@@ -217,6 +217,9 @@ BdsLibRegisterNewOption (
   UINT16                    BootOrderEntry;
   UINTN                     OrderItemNum;
 
+  if (DevicePath == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   OptionPtr             = NULL;
   OptionSize            = 0;
@@ -1551,7 +1554,9 @@ SetVariableAndReportStatusCodeOnError (
       SetVariableStatus->SetStatus  = Status;
       SetVariableStatus->Attributes = Attributes;
       CopyMem (SetVariableStatus + 1,                          VariableName, NameSize);
-      CopyMem (((UINT8 *) (SetVariableStatus + 1)) + NameSize, Data,         DataSize);
+      if ((Data != NULL) && (DataSize != 0)) {
+        CopyMem (((UINT8 *) (SetVariableStatus + 1)) + NameSize, Data,         DataSize);
+      }
 
       REPORT_STATUS_CODE_EX (
         EFI_ERROR_CODE,

@@ -1444,6 +1444,7 @@ TerminalUpdateConsoleDevVariable (
   for (TerminalType = PCANSITYPE; TerminalType <= VTUTF8TYPE; TerminalType++) {
     SetTerminalDevicePath (TerminalType, ParentDevicePath, &TempDevicePath);
     NewVariable = AppendDevicePathInstance (Variable, TempDevicePath);
+    ASSERT (NewVariable != NULL);
     if (Variable != NULL) {
       FreePool (Variable);
     }

@@ -1,7 +1,7 @@
 /** @file
   Initialize TPM device and measure FVs before handing off control to DXE.
 
-Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -708,10 +708,6 @@ PeimEntryMA (
 
   if (!CompareGuid (PcdGetPtr(PcdTpmInstanceGuid), &gEfiTpmDeviceInstanceTpm12Guid)){
     DEBUG ((EFI_D_ERROR, "No TPM12 instance required!\n"));
-    return EFI_UNSUPPORTED;
-  }
-
-  if (PcdGetBool (PcdHideTpmSupport) && PcdGetBool (PcdHideTpm)) {
     return EFI_UNSUPPORTED;
   }
 

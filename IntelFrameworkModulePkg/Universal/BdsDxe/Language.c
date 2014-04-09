@@ -408,19 +408,18 @@ InitializeLangVariable (
   IN BOOLEAN    Iso639Language
   )
 {
-  EFI_STATUS  Status;
   CHAR8       *Lang;
 
   //
   // Find current Lang or PlatformLang from EFI Variable.
   //
-  Status = GetEfiGlobalVariable2 (LangName, (VOID **) &Lang, NULL);
+  GetEfiGlobalVariable2 (LangName, (VOID **) &Lang, NULL);
   //
   // If Lang or PlatformLang variable is not found,
   // or it has been set to an unsupported value(not one of the supported language codes),
   // set the default language code to it.
   //
-  if (EFI_ERROR (Status) || !IsLangInSupportedLangCodes (SupportedLang, Lang, Iso639Language)) {
+  if ((Lang == NULL) || !IsLangInSupportedLangCodes (SupportedLang, Lang, Iso639Language)) {
     //
     // The default language code should be one of the supported language codes.
     //
