@@ -1,7 +1,7 @@
 /** @file
   IP6 internal functions to process the incoming packets.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -243,7 +243,7 @@ Ip6Reassemble (
   // check whether THIS.Start < PREV.End for overlap. If two fragments
   // overlaps, trim the overlapped part off THIS fragment.
   //
-  if ((Cur != ListHead) && ((Prev = Cur->BackLink) != ListHead)) {
+  if ((Prev = Cur->BackLink) != ListHead) {
     Fragment  = NET_LIST_USER_STRUCT (Prev, NET_BUF, List);
     Node      = IP6_GET_CLIP_INFO (Fragment);
 
