@@ -3870,6 +3870,7 @@ ConfigRequestAdjust (
       if (RespString && (Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER)) {
         NextElementBakup = NextRequestElement;
         NextRequestElement = StrStr (RequestElement, ValueKey);
+        ASSERT (NextRequestElement != NULL);
       }
       //
       // Replace "&" with '\0'.
@@ -3879,6 +3880,7 @@ ConfigRequestAdjust (
       if (RespString && (Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER)) {
         NextElementBakup = NextRequestElement;
         NextRequestElement = StrStr (RequestElement, ValueKey);
+        ASSERT (NextRequestElement != NULL);
         //
         // Replace "&" with '\0'.
         //
