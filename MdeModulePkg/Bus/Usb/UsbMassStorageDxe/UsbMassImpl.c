@@ -1,7 +1,7 @@
 /** @file
   USB Mass Storage Driver that manages USB Mass Storage Device and produces Block I/O Protocol.
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -464,8 +464,7 @@ ON_EXIT:
   @param  MaxLun               The max LUN number.
 
   @retval EFI_SUCCESS          At least one LUN is initialized successfully.
-  @retval EFI_OUT_OF_RESOURCES Out of resource while creating device path node.
-  @retval Other                Initialization fails.
+  @retval EFI_NOT_FOUND        Fail to initialize any of multiple LUNs.
 
 **/
 EFI_STATUS
@@ -483,8 +482,10 @@ UsbMassInitMultiLun (
   DEVICE_LOGICAL_UNIT_DEVICE_PATH  LunNode;
   UINT8                            Index;
   EFI_STATUS                       Status;
+  EFI_STATUS                       ReturnStatus;
 
   ASSERT (MaxLun > 0);
+  ReturnStatus = EFI_NOT_FOUND;
 
   for (Index = 0; Index <= MaxLun; Index++) { 
 
@@ -510,21 +511,10 @@ UsbMassInitMultiLun (
     // Initialize the media parameter data for EFI_BLOCK_IO_MEDIA of Block I/O Protocol.
     //
     Status = UsbMassInitMedia (UsbMass);
-    if (!EFI_ERROR (Status)) {
-      //
-      // According to USB Mass Storage Specification for Bootability, only following
-      // 4 Peripheral Device Types are in spec.
-      //
-      if ((UsbMass->Pdt != USB_PDT_DIRECT_ACCESS) && 
-           (UsbMass->Pdt != USB_PDT_CDROM) &&
-           (UsbMass->Pdt != USB_PDT_OPTICAL) && 
-           (UsbMass->Pdt != USB_PDT_SIMPLE_DIRECT)) {
-        DEBUG ((EFI_D_ERROR, "UsbMassInitMultiLun: Found an unsupported peripheral type[%d]\n", UsbMass->Pdt));
-        goto ON_ERROR;
-      }
-    } else if (Status != EFI_NO_MEDIA){
+    if ((EFI_ERROR (Status)) && (Status != EFI_NO_MEDIA)) {
       DEBUG ((EFI_D_ERROR, "UsbMassInitMultiLun: UsbMassInitMedia (%r)\n", Status));
-      goto ON_ERROR;
+      FreePool (UsbMass);
+      continue;
     }
 
     //
@@ -540,9 +530,9 @@ UsbMassInitMultiLun (
   
     if (UsbMass->DevicePath == NULL) {
       DEBUG ((EFI_D_ERROR, "UsbMassInitMultiLun: failed to create device logic unit device path\n"));
-  
       Status = EFI_OUT_OF_RESOURCES;
-      goto ON_ERROR;
+      FreePool (UsbMass);
+      continue;
     }
 
     InitializeDiskInfo (UsbMass);
@@ -563,7 +553,9 @@ UsbMassInitMultiLun (
     
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "UsbMassInitMultiLun: InstallMultipleProtocolInterfaces (%r)\n", Status));
-      goto ON_ERROR;
+      FreePool (UsbMass->DevicePath);
+      FreePool (UsbMass);
+      continue;
     }
 
     //
@@ -590,38 +582,15 @@ UsbMassInitMultiLun (
              &UsbMass->DiskInfo,
              NULL
              );
-      goto ON_ERROR;
+      FreePool (UsbMass->DevicePath);
+      FreePool (UsbMass);
+      continue;
     }
-    
+    ReturnStatus = EFI_SUCCESS;
     DEBUG ((EFI_D_INFO, "UsbMassInitMultiLun: Success to initialize No.%d logic unit\n", Index));
   }
   
-  return EFI_SUCCESS;
-
-ON_ERROR:
-  if (UsbMass != NULL) {
-    if (UsbMass->DevicePath != NULL) {
-      FreePool (UsbMass->DevicePath);
-    }
-    FreePool (UsbMass);
-  }
-  if (UsbIo != NULL) {
-    gBS->CloseProtocol (
-           Controller,
-           &gEfiUsbIoProtocolGuid,
-           This->DriverBindingHandle,
-           UsbMass->Controller
-           );
-  }
-
-  //
-  // Return EFI_SUCCESS if at least one LUN is initialized successfully.
-  //
-  if (Index > 0) {
-    return EFI_SUCCESS; 
-  } else {
-    return Status;
-  } 
+  return ReturnStatus;
 }
 
 /**
@@ -682,19 +651,7 @@ UsbMassInitNonLun (
   // Initialize the media parameter data for EFI_BLOCK_IO_MEDIA of Block I/O Protocol.
   //
   Status = UsbMassInitMedia (UsbMass);
-  if (!EFI_ERROR (Status)) {
-    //
-    // According to USB Mass Storage Specification for Bootability, only following
-    // 4 Peripheral Device Types are in spec.
-    //
-    if ((UsbMass->Pdt != USB_PDT_DIRECT_ACCESS) && 
-         (UsbMass->Pdt != USB_PDT_CDROM) &&
-         (UsbMass->Pdt != USB_PDT_OPTICAL) && 
-         (UsbMass->Pdt != USB_PDT_SIMPLE_DIRECT)) {
-      DEBUG ((EFI_D_ERROR, "UsbMassInitNonLun: Found an unsupported peripheral type[%d]\n", UsbMass->Pdt));
-      goto ON_ERROR;
-    }
-  } else if (Status != EFI_NO_MEDIA){
+  if ((EFI_ERROR (Status)) && (Status != EFI_NO_MEDIA)) {
     DEBUG ((EFI_D_ERROR, "UsbMassInitNonLun: UsbMassInitMedia (%r)\n", Status));
     goto ON_ERROR;
   }
@@ -901,7 +858,7 @@ USBMassDriverBindingStart (
     }
 
     //
-    // Initialize data for device that supports multiple LUNSs.
+    // Initialize data for device that supports multiple LUNs.
     // EFI_SUCCESS is returned if at least 1 LUN is initialized successfully.
     //
     Status = UsbMassInitMultiLun (This, Controller, Transport, Context, DevicePath, MaxLun);

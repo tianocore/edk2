@@ -2,7 +2,7 @@
   Implementation of the command set of USB Mass Storage Specification
   for Bootability, Revision 1.0.
 
-Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -626,6 +626,18 @@ UsbBootGetParams (
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "UsbBootGetParams: UsbBootInquiry (%r)\n", Status));
     return Status;
+  }
+
+  //
+  // According to USB Mass Storage Specification for Bootability, only following
+  // 4 Peripheral Device Types are in spec.
+  //
+  if ((UsbMass->Pdt != USB_PDT_DIRECT_ACCESS) &&
+       (UsbMass->Pdt != USB_PDT_CDROM) &&
+       (UsbMass->Pdt != USB_PDT_OPTICAL) &&
+       (UsbMass->Pdt != USB_PDT_SIMPLE_DIRECT)) {
+    DEBUG ((EFI_D_ERROR, "UsbBootGetParams: Found an unsupported peripheral type[%d]\n", UsbMass->Pdt));
+    return EFI_UNSUPPORTED;
   }
 
   //
