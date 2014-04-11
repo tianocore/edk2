@@ -243,4 +243,9 @@ BootMenuMain (
   VOID
   );
 
+BOOLEAN
+IsUnicodeString (
+  IN VOID* String
+  );
+
 #endif /* _BDSINTERNAL_H_ */

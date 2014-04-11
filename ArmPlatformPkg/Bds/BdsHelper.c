@@ -323,3 +323,18 @@ GetAlignedDevicePath (
   }
 }
 
+BOOLEAN
+IsUnicodeString (
+  IN VOID* String
+  )
+{
+  // We do not support NULL pointer
+  ASSERT (String != NULL);
+
+  if (*(CHAR16*)String < 0x100) {
+    //Note: We could get issue if the string is an empty Ascii string...
+    return TRUE;
+  } else {
+    return FALSE;
+  }
+}
