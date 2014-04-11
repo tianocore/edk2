@@ -41,8 +41,10 @@ BootOptionStart (
     LoaderType = ReadUnaligned32 ((CONST UINT32*)&OptionalData->Header.LoaderType);
 
     if (LoaderType == BDS_LOADER_EFI_APPLICATION) {
-      // Need to connect every drivers to ensure no dependencies are missing for the application
-      BdsConnectAllDrivers();
+      if ((BootOption->Attributes & LOAD_OPTION_CATEGORY_BOOT) == 0) {
+        // Need to connect every drivers to ensure no dependencies are missing for the application
+        BdsConnectAllDrivers ();
+      }
 
       Status = BdsStartEfiApplication (mImageHandle, BootOption->FilePathList, 0, NULL);
     } else if (LoaderType == BDS_LOADER_KERNEL_LINUX_ATAG) {
@@ -90,6 +92,11 @@ BootOptionStart (
       FreePool (FdtDevicePath);
     }
   } else {
+    // Connect all the drivers if the EFI Application is not a EFI OS Loader
+    if ((BootOption->Attributes & LOAD_OPTION_CATEGORY_BOOT) == 0) {
+      BdsConnectAllDrivers ();
+    }
+
     // Set BootCurrent variable
     LoadOptionIndexSize = sizeof(UINT16);
     gRT->SetVariable (L"BootCurrent", &gEfiGlobalVariableGuid,
