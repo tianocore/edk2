@@ -102,8 +102,8 @@ typedef struct _BDS_LOAD_OPTION_SUPPORT {
   BDS_SUPPORTED_DEVICE_TYPE   Type;
   EFI_STATUS    (*ListDevices)(IN OUT LIST_ENTRY* BdsLoadOptionList);
   BOOLEAN       (*IsSupported)(IN  EFI_DEVICE_PATH *DevicePath);
-  EFI_STATUS    (*CreateDevicePathNode)(IN CHAR16* FileName, OUT EFI_DEVICE_PATH_PROTOCOL **DevicePathNodes, OUT ARM_BDS_LOADER_TYPE *BootType, OUT UINT32 *Attributes);
-  EFI_STATUS    (*UpdateDevicePathNode)(IN EFI_DEVICE_PATH *OldDevicePath, IN CHAR16* FileName, OUT EFI_DEVICE_PATH_PROTOCOL** NewDevicePath, OUT ARM_BDS_LOADER_TYPE *BootType, OUT UINT32 *Attributes);
+  EFI_STATUS    (*CreateDevicePathNode)(IN CHAR16* FileName, OUT EFI_DEVICE_PATH_PROTOCOL **DevicePathNodes, OUT BOOLEAN *RequestBootType);
+  EFI_STATUS    (*UpdateDevicePathNode)(IN EFI_DEVICE_PATH *OldDevicePath, IN CHAR16* FileName, OUT EFI_DEVICE_PATH_PROTOCOL** NewDevicePath, OUT BOOLEAN *RequestBootType);
 } BDS_LOAD_OPTION_SUPPORT;
 
 #define LOAD_OPTION_ENTRY_FROM_LINK(a)  BASE_CR(a, BDS_LOAD_OPTION_ENTRY, Link)
@@ -238,6 +238,13 @@ BootOptionUpdate (
 EFI_STATUS
 BootOptionDelete (
   IN  BDS_LOAD_OPTION *BootOption
+  );
+
+EFI_STATUS
+BootDeviceGetType (
+  IN  EFI_DEVICE_PATH* DevicePath,
+  OUT ARM_BDS_LOADER_TYPE *BootType,
+  OUT UINT32 *Attributes
   );
 
 EFI_STATUS
