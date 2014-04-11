@@ -351,7 +351,6 @@
   gArmTokenSpaceGuid.PcdArmMachineType|2272
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Linux from NorFlash"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(E7223039-5836-41E1-B542-D7EC736C5E59)/MemoryMapped(0x0,0xED000000,0xED400000)"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|""
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|1
   
   # Use the serial console (ConIn & ConOut) and the Graphic driver (ConOut)

@@ -296,7 +296,6 @@
   gArmTokenSpaceGuid.PcdArmMachineType|827
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"SemiHosting"
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(C5B9C74A-6D72-4719-99AB-C59F199091EB)/zImage-RTSM"
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|""
   gArmPlatformTokenSpaceGuid.PcdDefaultBootType|1
   
   # Use the Serial console (ConIn & ConOut) and the Graphic driver (ConOut)
