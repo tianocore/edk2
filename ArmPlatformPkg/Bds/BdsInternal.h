@@ -257,4 +257,25 @@ IsUnicodeString (
   IN VOID* String
   );
 
+/*
+ * Try to detect if the given string is an ASCII or Unicode string
+ *
+ * There are actually few limitation to this function but it is mainly to give
+ * a user friendly output.
+ *
+ * Some limitations:
+ *   - it only supports unicode string that use ASCII character (< 0x100)
+ *   - single character ASCII strings are interpreted as Unicode string
+ *   - string cannot be longer than 2 x BOOT_DEVICE_OPTION_MAX (600 bytes)
+ *
+ * @param String    Buffer that might contain a Unicode or Ascii string
+ * @param IsUnicode If not NULL this boolean value returns if the string is an
+ *                  ASCII or Unicode string.
+ */
+BOOLEAN
+IsPrintableString (
+  IN  VOID*    String,
+  OUT BOOLEAN *IsUnicode
+  );
+
 #endif /* _BDSINTERNAL_H_ */
