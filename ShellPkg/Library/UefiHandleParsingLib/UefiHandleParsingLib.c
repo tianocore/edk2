@@ -145,6 +145,12 @@ LoadedImageProtocolDumpInformation(
                 EFI_OPEN_PROTOCOL_GET_PROTOCOL
                );
 
+  if (EFI_ERROR (Status)) {
+    SHELL_FREE_NON_NULL (Temp);
+    SHELL_FREE_NON_NULL (RetVal);
+    return NULL;
+  }
+
   DataType = ConvertMemoryType(LoadedImage->ImageDataType);
   CodeType = ConvertMemoryType(LoadedImage->ImageCodeType);
 
