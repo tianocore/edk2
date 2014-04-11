@@ -1914,6 +1914,8 @@ CreateAndPopulateShellFileInfo(
     }
   }
 
+  TempString = PathCleanUpDirectories(TempString);
+
   ShellFileListItem->FullName = TempString;
   ShellFileListItem->Status   = Status;
   ShellFileListItem->Handle   = Handle;
@@ -2143,7 +2145,7 @@ ShellSearchHandle(
       //
       FileInfo = FileHandleGetInfo(FileHandle);
       NewShellNode = CreateAndPopulateShellFileInfo(
-        L":",
+        MapName,
         EFI_SUCCESS,
         L"\\",
         FileHandle,
