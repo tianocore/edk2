@@ -2141,6 +2141,10 @@ SendDiscardInfoToDriver (
       continue;
     }
 
+    if ((Question->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != EFI_IFR_FLAG_CALLBACK) {
+      continue;
+    }
+
     if (Question->Operand == EFI_IFR_PASSWORD_OP) {
       continue;
     }
