@@ -150,36 +150,37 @@ BootOptionSetFields (
   IN CHAR16*                    BootDescription,
   IN EFI_DEVICE_PATH_PROTOCOL*  DevicePath,
   IN ARM_BDS_LOADER_TYPE        BootType,
-  IN ARM_BDS_LOADER_ARGUMENTS*  BootArguments
+  IN UINT8*                     OptionalData,
+  IN UINTN                      OptionalDataSize
   )
 {
   EFI_LOAD_OPTION               EfiLoadOption;
   UINTN                         EfiLoadOptionSize;
   UINTN                         BootDescriptionSize;
-  UINTN                         BootOptionalDataSize;
   UINT16                        FilePathListLength;
   UINT8*                        EfiLoadOptionPtr;
   UINT8*                        InitrdPathListPtr;
-  UINTN                         OptionalDataSize;
   ARM_BDS_LINUX_ARGUMENTS*      DestLinuxArguments;
   ARM_BDS_LINUX_ARGUMENTS*      SrcLinuxArguments;
+  ARM_BDS_LOADER_ARGUMENTS*     BootArguments;
 
   // If we are overwriting an existent Boot Option then we have to free previously allocated memory
   if (BootOption->LoadOption) {
-    FreePool(BootOption->LoadOption);
+    FreePool (BootOption->LoadOption);
   }
 
   BootDescriptionSize = StrSize (BootDescription);
-  BootOptionalDataSize = sizeof(ARM_BDS_LOADER_OPTIONAL_DATA_HEADER);
+
+  // Fixup the size in case of entry specific to ArmPlatformPkg/Bds
   if ((BootType == BDS_LOADER_KERNEL_LINUX_ATAG) || (BootType == BDS_LOADER_KERNEL_LINUX_FDT)) {
-    BootOptionalDataSize += sizeof(ARM_BDS_LINUX_ARGUMENTS) + BootArguments->LinuxArguments.CmdLineSize + BootArguments->LinuxArguments.InitrdSize;
+    OptionalDataSize += sizeof(ARM_BDS_LOADER_OPTIONAL_DATA_HEADER);
   }
 
   // Compute the size of the FilePath list
   FilePathListLength = GetUnalignedDevicePathSize (DevicePath);
 
   // Allocate the memory for the EFI Load Option
-  EfiLoadOptionSize = sizeof(UINT32) + sizeof(UINT16) + BootDescriptionSize + FilePathListLength + BootOptionalDataSize;
+  EfiLoadOptionSize = sizeof(UINT32) + sizeof(UINT16) + BootDescriptionSize + FilePathListLength + OptionalDataSize;
   EfiLoadOption = (EFI_LOAD_OPTION)AllocatePool(EfiLoadOptionSize);
   EfiLoadOptionPtr = EfiLoadOption;
 
@@ -209,28 +210,29 @@ BootOptionSetFields (
 
   // Optional Data fields, Do unaligned writes
   BootOption->OptionalData = EfiLoadOptionPtr;
-  WriteUnaligned32 ((UINT32 *)EfiLoadOptionPtr, ARM_BDS_OPTIONAL_DATA_SIGNATURE);
-  WriteUnaligned32 ((UINT32 *)(EfiLoadOptionPtr + 4), BootType);
-
-  OptionalDataSize = sizeof(ARM_BDS_LOADER_OPTIONAL_DATA_HEADER);
 
   if ((BootType == BDS_LOADER_KERNEL_LINUX_ATAG) || (BootType == BDS_LOADER_KERNEL_LINUX_FDT)) {
+    // Write the header
+    WriteUnaligned32 ((UINT32 *)EfiLoadOptionPtr, ARM_BDS_OPTIONAL_DATA_SIGNATURE);
+    WriteUnaligned32 ((UINT32 *)(EfiLoadOptionPtr + 4), BootType);
+
+    BootArguments = (ARM_BDS_LOADER_ARGUMENTS*)OptionalData;
     SrcLinuxArguments = &(BootArguments->LinuxArguments);
     DestLinuxArguments = &((ARM_BDS_LOADER_OPTIONAL_DATA*)EfiLoadOptionPtr)->Arguments.LinuxArguments;
 
     WriteUnaligned16 ((UINT16 *)&(DestLinuxArguments->CmdLineSize), SrcLinuxArguments->CmdLineSize);
     WriteUnaligned16 ((UINT16 *)&(DestLinuxArguments->InitrdSize), SrcLinuxArguments->InitrdSize);
-    OptionalDataSize += sizeof (ARM_BDS_LINUX_ARGUMENTS);
 
     if (SrcLinuxArguments->CmdLineSize > 0) {
       CopyMem ((VOID*)(DestLinuxArguments + 1), (VOID*)(SrcLinuxArguments + 1), SrcLinuxArguments->CmdLineSize);
-      OptionalDataSize += SrcLinuxArguments->CmdLineSize;
     }
 
     if (SrcLinuxArguments->InitrdSize > 0) {
       InitrdPathListPtr = (UINT8*)((UINTN)(DestLinuxArguments + 1) + SrcLinuxArguments->CmdLineSize);
       CopyMem (InitrdPathListPtr, (VOID*)((UINTN)(SrcLinuxArguments + 1) + SrcLinuxArguments->CmdLineSize), SrcLinuxArguments->InitrdSize);
     }
+  } else {
+    CopyMem (BootOption->OptionalData, OptionalData, OptionalDataSize);
   }
   BootOption->OptionalDataSize = OptionalDataSize;
 
@@ -253,7 +255,8 @@ BootOptionCreate (
   IN  CHAR16*                   BootDescription,
   IN  EFI_DEVICE_PATH_PROTOCOL* DevicePath,
   IN  ARM_BDS_LOADER_TYPE       BootType,
-  IN  ARM_BDS_LOADER_ARGUMENTS* BootArguments,
+  IN  UINT8*                    OptionalData,
+  IN  UINTN                     OptionalDataSize,
   OUT BDS_LOAD_OPTION**         BdsLoadOption
   )
 {
@@ -272,7 +275,7 @@ BootOptionCreate (
   BootOptionEntry->BdsLoadOption = (BDS_LOAD_OPTION*)AllocateZeroPool (sizeof(BDS_LOAD_OPTION));
 
   BootOption = BootOptionEntry->BdsLoadOption;
-  BootOptionSetFields (BootOption, Attributes, BootDescription, DevicePath, BootType, BootArguments);
+  BootOptionSetFields (BootOption, Attributes, BootDescription, DevicePath, BootType, OptionalData, OptionalDataSize);
 
   //
   // Set the related environment variables
@@ -326,14 +329,15 @@ BootOptionUpdate (
   IN  CHAR16*                   BootDescription,
   IN  EFI_DEVICE_PATH_PROTOCOL* DevicePath,
   IN  ARM_BDS_LOADER_TYPE       BootType,
-  IN  ARM_BDS_LOADER_ARGUMENTS* BootArguments
+  IN UINT8*                     OptionalData,
+  IN UINTN                      OptionalDataSize
   )
 {
   EFI_STATUS      Status;
   CHAR16          BootVariableName[9];
 
   // Update the BDS Load Option structure
-  BootOptionSetFields (BdsLoadOption, Attributes, BootDescription, DevicePath, BootType, BootArguments);
+  BootOptionSetFields (BdsLoadOption, Attributes, BootDescription, DevicePath, BootType, OptionalData, OptionalDataSize);
 
   // Update the related environment variables
   UnicodeSPrint (BootVariableName, 9 * sizeof(CHAR16), L"Boot%04X", BdsLoadOption->LoadOptionIndex);

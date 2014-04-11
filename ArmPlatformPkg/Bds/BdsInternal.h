@@ -219,7 +219,8 @@ BootOptionCreate (
   IN  CHAR16*                   BootDescription,
   IN  EFI_DEVICE_PATH_PROTOCOL* DevicePath,
   IN  ARM_BDS_LOADER_TYPE       BootType,
-  IN  ARM_BDS_LOADER_ARGUMENTS* BootArguments,
+  IN  UINT8*                    OptionalData,
+  IN  UINTN                     OptionalDataSize,
   OUT BDS_LOAD_OPTION**         BdsLoadOption
   );
 
@@ -230,7 +231,8 @@ BootOptionUpdate (
   IN  CHAR16*                   BootDescription,
   IN  EFI_DEVICE_PATH_PROTOCOL* DevicePath,
   IN  ARM_BDS_LOADER_TYPE       BootType,
-  IN  ARM_BDS_LOADER_ARGUMENTS* BootArguments
+  IN UINT8*                     OptionalData,
+  IN UINTN                      OptionalDataSize
   );
 
 EFI_STATUS

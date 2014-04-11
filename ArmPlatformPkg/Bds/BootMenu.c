@@ -131,6 +131,8 @@ BootMenuAddBootOption (
   UINTN                     CmdLineSize;
   BOOLEAN                   InitrdSupport;
   UINTN                     InitrdSize;
+  UINT8*                    OptionalData;
+  UINTN                     OptionalDataSize;
 
   Attributes                = 0;
   SupportedBootDevice = NULL;
@@ -195,14 +197,18 @@ BootMenuAddBootOption (
     CmdLineSize = AsciiStrSize (CmdLine);
     InitrdSize = GetDevicePathSize (InitrdPath);
 
-    BootArguments = (ARM_BDS_LOADER_ARGUMENTS*)AllocatePool (sizeof(ARM_BDS_LOADER_ARGUMENTS) + CmdLineSize + InitrdSize);
+    OptionalDataSize = sizeof(ARM_BDS_LOADER_ARGUMENTS) + CmdLineSize + InitrdSize;
+    BootArguments = (ARM_BDS_LOADER_ARGUMENTS*)AllocatePool (OptionalDataSize);
 
     BootArguments->LinuxArguments.CmdLineSize = CmdLineSize;
     BootArguments->LinuxArguments.InitrdSize = InitrdSize;
     CopyMem ((VOID*)(&BootArguments->LinuxArguments + 1), CmdLine, CmdLineSize);
     CopyMem ((VOID*)((UINTN)(&BootArguments->LinuxArguments + 1) + CmdLineSize), InitrdPath, InitrdSize);
+
+    OptionalData = (UINT8*)BootArguments;
   } else {
-    BootArguments = NULL;
+    OptionalData = NULL;
+    OptionalDataSize = 0;
   }
 
   Print(L"Description for this new Entry: ");
@@ -214,7 +220,7 @@ BootMenuAddBootOption (
 
   // Create new entry
   BdsLoadOptionEntry = (BDS_LOAD_OPTION_ENTRY*)AllocatePool (sizeof(BDS_LOAD_OPTION_ENTRY));
-  Status = BootOptionCreate (Attributes, BootDescription, DevicePath, BootType, BootArguments, &BdsLoadOptionEntry->BdsLoadOption);
+  Status = BootOptionCreate (Attributes, BootDescription, DevicePath, BootType, OptionalData, OptionalDataSize, &BdsLoadOptionEntry->BdsLoadOption);
   if (!EFI_ERROR(Status)) {
     InsertTailList (BootOptionsList, &BdsLoadOptionEntry->Link);
   }
@@ -367,13 +373,15 @@ BootMenuUpdateBootOption (
   EFI_DEVICE_PATH               *DevicePath;
   EFI_DEVICE_PATH               *TempInitrdPath;
   ARM_BDS_LOADER_TYPE           BootType;
-  ARM_BDS_LOADER_OPTIONAL_DATA* OptionalData;
+  ARM_BDS_LOADER_OPTIONAL_DATA* LoaderOptionalData;
   ARM_BDS_LINUX_ARGUMENTS*      LinuxArguments;
   EFI_DEVICE_PATH               *InitrdPathNodes;
   EFI_DEVICE_PATH               *InitrdPath;
   UINTN                         InitrdSize;
   UINTN                         CmdLineSize;
   BOOLEAN                       InitrdSupport;
+  UINT8*                        OptionalData;
+  UINTN                         OptionalDataSize;
 
   Status = BootMenuSelectBootOption (BootOptionsList, UPDATE_BOOT_ENTRY, TRUE, &BootOptionEntry);
   if (EFI_ERROR(Status)) {
@@ -394,11 +402,11 @@ BootMenuUpdateBootOption (
     goto EXIT;
   }
 
-  OptionalData = BootOption->OptionalData;
-  BootType = (ARM_BDS_LOADER_TYPE)ReadUnaligned32 ((UINT32 *)(&OptionalData->Header.LoaderType));
+  LoaderOptionalData = BootOption->OptionalData;
+  BootType = (ARM_BDS_LOADER_TYPE)ReadUnaligned32 ((UINT32 *)(&LoaderOptionalData->Header.LoaderType));
 
   if ((BootType == BDS_LOADER_KERNEL_LINUX_ATAG) || (BootType == BDS_LOADER_KERNEL_LINUX_FDT)) {
-    LinuxArguments = &OptionalData->Arguments.LinuxArguments;
+    LinuxArguments = &LoaderOptionalData->Arguments.LinuxArguments;
 
     CmdLineSize = ReadUnaligned16 ((CONST UINT16*)&LinuxArguments->CmdLineSize);
 
@@ -467,13 +475,17 @@ BootMenuUpdateBootOption (
 
     CmdLineSize = AsciiStrSize (CmdLine);
 
-    BootArguments = (ARM_BDS_LOADER_ARGUMENTS*)AllocatePool(sizeof(ARM_BDS_LOADER_ARGUMENTS) + CmdLineSize + InitrdSize);
+    OptionalDataSize = sizeof(ARM_BDS_LOADER_ARGUMENTS) + CmdLineSize + InitrdSize;
+    BootArguments = (ARM_BDS_LOADER_ARGUMENTS*)AllocatePool (OptionalDataSize);
     BootArguments->LinuxArguments.CmdLineSize = CmdLineSize;
     BootArguments->LinuxArguments.InitrdSize = InitrdSize;
     CopyMem (&BootArguments->LinuxArguments + 1, CmdLine, CmdLineSize);
     CopyMem ((VOID*)((UINTN)(&BootArguments->LinuxArguments + 1) + CmdLineSize), InitrdPath, InitrdSize);
+
+    OptionalData = (UINT8*)BootArguments;
   } else {
-    BootArguments = NULL;
+    OptionalData     = NULL;
+    OptionalDataSize = 0;
   }
 
   Print(L"Description for this new Entry: ");
@@ -485,7 +497,7 @@ BootMenuUpdateBootOption (
   }
 
   // Update the entry
-  Status = BootOptionUpdate (BootOption, BootOption->Attributes, BootDescription, DevicePath, BootType, BootArguments);
+  Status = BootOptionUpdate (BootOption, BootOption->Attributes, BootDescription, DevicePath, BootType, OptionalData, OptionalDataSize);
 
 FREE_DEVICE_PATH:
   FreePool (DevicePath);

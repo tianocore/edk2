@@ -220,6 +220,8 @@ DefineDefaultBootEntries (
   EFI_STATUS                          Status;
   EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL* EfiDevicePathFromTextProtocol;
   EFI_DEVICE_PATH*                    BootDevicePath;
+  UINT8*                              OptionalData;
+  UINTN                               OptionalDataSize;
   ARM_BDS_LOADER_ARGUMENTS*           BootArguments;
   ARM_BDS_LOADER_TYPE                 BootType;
   EFI_DEVICE_PATH*                    InitrdPath;
@@ -306,7 +308,8 @@ DefineDefaultBootEntries (
         InitrdPath = EfiDevicePathFromTextProtocol->ConvertTextToDevicePath ((CHAR16*)PcdGetPtr(PcdDefaultBootInitrdPath));
         InitrdSize = GetDevicePathSize (InitrdPath);
 
-        BootArguments = (ARM_BDS_LOADER_ARGUMENTS*)AllocatePool (sizeof(ARM_BDS_LOADER_ARGUMENTS) + CmdLineAsciiSize + InitrdSize);
+        OptionalDataSize = sizeof(ARM_BDS_LOADER_ARGUMENTS) + CmdLineAsciiSize + InitrdSize;
+        BootArguments = (ARM_BDS_LOADER_ARGUMENTS*)AllocatePool (OptionalDataSize);
         if (BootArguments == NULL) {
           return EFI_OUT_OF_RESOURCES;
         }
@@ -315,15 +318,19 @@ DefineDefaultBootEntries (
 
         CopyMem ((VOID*)(BootArguments + 1), AsciiDefaultBootArgument, CmdLineAsciiSize);
         CopyMem ((VOID*)((UINTN)(BootArguments + 1) + CmdLineAsciiSize), InitrdPath, InitrdSize);
+
+        OptionalData = (UINT8*)BootArguments;
       } else {
-        BootArguments = NULL;
+        OptionalData = NULL;
+        OptionalDataSize = 0;
       }
 
       BootOptionCreate (LOAD_OPTION_ACTIVE | LOAD_OPTION_CATEGORY_BOOT,
         (CHAR16*)PcdGetPtr(PcdDefaultBootDescription),
         BootDevicePath,
         BootType,
-        BootArguments,
+        OptionalData,
+        OptionalDataSize,
         &BdsLoadOption
         );
       FreePool (BdsLoadOption);
