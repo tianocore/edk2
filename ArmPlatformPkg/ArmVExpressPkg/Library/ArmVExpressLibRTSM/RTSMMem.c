@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -19,7 +19,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <ArmPlatform.h>
 
-// Number of Virtual Memory Map Descriptors without a Logic Tile
+// Number of Virtual Memory Map Descriptors
 #define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS          5
 
 // DDR attributes
@@ -104,19 +104,6 @@ ArmPlatformGetVirtualMemoryMap (
   VirtualMemoryTable[Index].VirtualBase  = ARM_VE_SMB_PERIPH_BASE;
   VirtualMemoryTable[Index].Length       = 2 * ARM_VE_SMB_PERIPH_SZ;
   VirtualMemoryTable[Index].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
-
-//TODO:This should be enabled for final release. Right now, ARM VE RTSM crashes.
-//  // If a Logic Tile is connected to The ARM Versatile Express Motherboard
-//  if (MmioRead32(ARM_VE_SYS_PROCID1_REG) != 0) {
-//      VirtualMemoryTable[++Index].PhysicalBase = ARM_VE_EXT_AXI_BASE;
-//      VirtualMemoryTable[Index].VirtualBase  = ARM_VE_EXT_AXI_BASE;
-//      VirtualMemoryTable[Index].Length       = ARM_VE_EXT_AXI_SZ;
-//      VirtualMemoryTable[Index].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
-//
-//      ASSERT((Index + 1) == (MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS + 1));
-//  } else {
-//    ASSERT((Index + 1) == MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS);
-//  }
 
   // End of Table
   VirtualMemoryTable[++Index].PhysicalBase = 0;
