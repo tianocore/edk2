@@ -2993,6 +2993,7 @@ GetQuestionDefault (
   EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
   EFI_BROWSER_ACTION_REQUEST      ActionRequest;
   INTN                            Action;
+  CHAR16                          *NewString;
 
   Status   = EFI_NOT_FOUND;
   StrValue = NULL;
@@ -3030,6 +3031,19 @@ GetQuestionDefault (
                              &ActionRequest
                              );
     if (!EFI_ERROR (Status)) {
+      if (HiiValue->Type == EFI_IFR_TYPE_STRING) {
+        NewString = GetToken (Question->HiiValue.Value.string, FormSet->HiiHandle);
+        ASSERT (NewString != NULL);
+
+        ASSERT (StrLen (NewString) * sizeof (CHAR16) <= Question->StorageWidth);
+        if (StrLen (NewString) * sizeof (CHAR16) <= Question->StorageWidth) {
+          CopyMem (Question->BufferValue, NewString, StrSize (NewString));
+        } else {
+          CopyMem (Question->BufferValue, NewString, Question->StorageWidth);
+        }
+
+        FreePool (NewString);
+      }
       return Status;
     }
   }
@@ -3307,7 +3321,7 @@ ExtractDefault (
         //
         // Call the Retrieve call back to get the initial question value.
         //
-        Status = ProcessRetrieveForQuestion(FormSet->ConfigAccess, Question);
+        Status = ProcessRetrieveForQuestion(FormSet->ConfigAccess, Question, FormSet);
       }
 
       //

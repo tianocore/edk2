@@ -1205,6 +1205,7 @@ ProcessCallBackFunction (
 
   @param ConfigAccess          The config access protocol produced by the hii driver.
   @param Statement             The Question which need to call.
+  @param FormSet               The formset this question belong to.
 
   @retval EFI_SUCCESS          The call back function excutes successfully.
   @return Other value if the call back function failed to excute.  
@@ -1212,7 +1213,8 @@ ProcessCallBackFunction (
 EFI_STATUS 
 ProcessRetrieveForQuestion (
   IN     EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess,
-  IN     FORM_BROWSER_STATEMENT          *Statement
+  IN     FORM_BROWSER_STATEMENT          *Statement,
+  IN     FORM_BROWSER_FORMSET            *FormSet
   );
 
 /**

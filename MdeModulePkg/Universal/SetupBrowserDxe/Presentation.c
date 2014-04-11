@@ -2092,6 +2092,7 @@ ProcessCallBackFunction (
   BROWSER_SETTING_SCOPE           SettingLevel;
   EFI_IFR_TYPE_VALUE              BackUpValue;
   UINT8                           *BackUpBuffer;
+  CHAR16                          *NewString;
 
   ConfigAccess = FormSet->ConfigAccess;
   SubmitFormIsRequired  = FALSE;
@@ -2210,6 +2211,22 @@ ProcessCallBackFunction (
       }
 
       //
+      // Need to sync the value between Statement->HiiValue->Value and Statement->BufferValue
+      //
+      if (HiiValue->Type == EFI_IFR_TYPE_STRING) {
+        NewString = GetToken (Statement->HiiValue.Value.string, FormSet->HiiHandle);
+        ASSERT (NewString != NULL);
+
+        ASSERT (StrLen (NewString) * sizeof (CHAR16) <= Statement->StorageWidth);
+        if (StrLen (NewString) * sizeof (CHAR16) <= Statement->StorageWidth) {
+          CopyMem (Statement->BufferValue, NewString, StrSize (NewString));
+        } else {
+          CopyMem (Statement->BufferValue, NewString, Statement->StorageWidth);
+        }
+        FreePool (NewString);
+      }
+
+      //
       // According the spec, return value from call back of "changing" and 
       // "retrieve" should update to the question's temp buffer.
       //
@@ -2277,6 +2294,7 @@ ProcessCallBackFunction (
 
   @param ConfigAccess          The config access protocol produced by the hii driver.
   @param Statement             The Question which need to call.
+  @param FormSet               The formset this question belong to.
 
   @retval EFI_SUCCESS          The call back function excutes successfully.
   @return Other value if the call back function failed to excute.  
@@ -2284,13 +2302,15 @@ ProcessCallBackFunction (
 EFI_STATUS 
 ProcessRetrieveForQuestion (
   IN     EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess,
-  IN     FORM_BROWSER_STATEMENT          *Statement
+  IN     FORM_BROWSER_STATEMENT          *Statement,
+  IN     FORM_BROWSER_FORMSET            *FormSet
   )
 {
   EFI_STATUS                      Status;
   EFI_BROWSER_ACTION_REQUEST      ActionRequest;
   EFI_HII_VALUE                   *HiiValue;
   EFI_IFR_TYPE_VALUE              *TypeValue;
+  CHAR16                          *NewString;
 
   Status                = EFI_SUCCESS;
   ActionRequest         = EFI_BROWSER_ACTION_REQUEST_NONE;
@@ -2317,6 +2337,19 @@ ProcessRetrieveForQuestion (
                            TypeValue,
                            &ActionRequest
                            );
+  if (!EFI_ERROR (Status) && HiiValue->Type == EFI_IFR_TYPE_STRING) {
+    NewString = GetToken (Statement->HiiValue.Value.string, FormSet->HiiHandle);
+    ASSERT (NewString != NULL);
+
+    ASSERT (StrLen (NewString) * sizeof (CHAR16) <= Statement->StorageWidth);
+    if (StrLen (NewString) * sizeof (CHAR16) <= Statement->StorageWidth) {
+      CopyMem (Statement->BufferValue, NewString, StrSize (NewString));
+    } else {
+      CopyMem (Statement->BufferValue, NewString, Statement->StorageWidth);
+    }
+    FreePool (NewString);
+  }
+
   return Status;
 }
 
