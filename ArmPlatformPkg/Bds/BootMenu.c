@@ -679,8 +679,9 @@ BootMenuMain (
   UINTN                         BootOptionSelected;
   UINTN                         Index;
   UINTN                         BootMainEntryCount;
+  BOOLEAN                       IsUnicode;
 
-  BootOption              = NULL;
+  BootOption         = NULL;
   BootMainEntryCount = sizeof(BootMainEntries) / sizeof(struct BOOT_MAIN_ENTRY);
 
   while (TRUE) {
@@ -745,6 +746,14 @@ BootMenuMain (
 
             default:
               Print(L"\t- LoaderType: Not recognized (%d)\n", LoaderType);
+          }
+        } else if (BootOption->OptionalData != NULL) {
+          if (IsPrintableString (BootOption->OptionalData, &IsUnicode)) {
+            if (IsUnicode) {
+              Print (L"\t- Arguments: %s\n", BootOption->OptionalData);
+            } else {
+              AsciiPrint ("\t- Arguments: %a\n", BootOption->OptionalData);
+            }
           }
         }
         FreePool(DevicePathTxt);
