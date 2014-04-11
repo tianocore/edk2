@@ -367,8 +367,11 @@ StartDefaultBootOnTimeout (
 
   Size = sizeof(UINT16);
   Timeout = (UINT16)PcdGet16 (PcdPlatformBootTimeOut);
-  TimeoutPtr = &Timeout;
-  GetGlobalEnvironmentVariable (L"Timeout", &Timeout, &Size, (VOID**)&TimeoutPtr);
+  Status = GetGlobalEnvironmentVariable (L"Timeout", &Timeout, &Size, (VOID**)&TimeoutPtr);
+  if (!EFI_ERROR (Status)) {
+    Timeout = *TimeoutPtr;
+    FreePool (TimeoutPtr);
+  }
 
   if (Timeout != 0xFFFF) {
     if (Timeout > 0) {
