@@ -120,7 +120,8 @@ BootMenuAddBootOption (
   BDS_SUPPORTED_DEVICE*     SupportedBootDevice;
   ARM_BDS_LOADER_ARGUMENTS* BootArguments;
   CHAR16                    BootDescription[BOOT_DEVICE_DESCRIPTION_MAX];
-  CHAR8                     CmdLine[BOOT_DEVICE_OPTION_MAX];
+  CHAR8                     AsciiCmdLine[BOOT_DEVICE_OPTION_MAX];
+  CHAR16                    CmdLine[BOOT_DEVICE_OPTION_MAX];
   UINT32                    Attributes;
   ARM_BDS_LOADER_TYPE       BootType;
   BDS_LOAD_OPTION_ENTRY     *BdsLoadOptionEntry;
@@ -188,13 +189,13 @@ BootMenuAddBootOption (
     }
 
     Print(L"Arguments to pass to the binary: ");
-    Status = GetHIInputAscii (CmdLine,BOOT_DEVICE_OPTION_MAX);
+    Status = GetHIInputAscii (AsciiCmdLine, BOOT_DEVICE_OPTION_MAX);
     if (EFI_ERROR(Status)) {
       Status = EFI_ABORTED;
       goto FREE_DEVICE_PATH;
     }
 
-    CmdLineSize = AsciiStrSize (CmdLine);
+    CmdLineSize = AsciiStrSize (AsciiCmdLine);
     InitrdSize = GetDevicePathSize (InitrdPath);
 
     OptionalDataSize = sizeof(ARM_BDS_LOADER_ARGUMENTS) + CmdLineSize + InitrdSize;
@@ -207,8 +208,15 @@ BootMenuAddBootOption (
 
     OptionalData = (UINT8*)BootArguments;
   } else {
-    OptionalData = NULL;
-    OptionalDataSize = 0;
+    Print (L"Arguments to pass to the EFI Application: ");
+    Status = GetHIInputStr (CmdLine, BOOT_DEVICE_OPTION_MAX);
+    if (EFI_ERROR (Status)) {
+      Status = EFI_ABORTED;
+      goto EXIT;
+    }
+
+    OptionalData = (UINT8*)CmdLine;
+    OptionalDataSize = StrSize (CmdLine);
   }
 
   Print(L"Description for this new Entry: ");

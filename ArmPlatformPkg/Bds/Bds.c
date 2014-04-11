@@ -321,8 +321,8 @@ DefineDefaultBootEntries (
 
         OptionalData = (UINT8*)BootArguments;
       } else {
-        OptionalData = NULL;
-        OptionalDataSize = 0;
+        OptionalData = (UINT8*)DefaultBootArgument;
+        OptionalDataSize = CmdLineSize;
       }
 
       BootOptionCreate (LOAD_OPTION_ACTIVE | LOAD_OPTION_CATEGORY_BOOT,
