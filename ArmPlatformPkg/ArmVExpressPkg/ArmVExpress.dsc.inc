@@ -317,8 +317,8 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS|0
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|50
-  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|20
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|80
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|65
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesCode|400
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesData|20000
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderCode|20
