@@ -546,7 +546,6 @@ extern EDKII_FORM_DISPLAY_ENGINE_PROTOCOL *mFormDisplay;
 
 extern BOOLEAN               gResetRequired;
 extern BOOLEAN               gExitRequired;
-extern BOOLEAN               gFinishRetrieveCall;
 extern LIST_ENTRY            gBrowserFormSetList;
 extern LIST_ENTRY            gBrowserHotKeyList;
 extern BROWSER_SETTING_SCOPE gBrowserSettingScope;

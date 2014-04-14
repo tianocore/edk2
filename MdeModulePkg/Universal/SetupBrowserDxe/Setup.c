@@ -48,7 +48,6 @@ LIST_ENTRY      gBrowserFormSetList = INITIALIZE_LIST_HEAD_VARIABLE (gBrowserFor
 LIST_ENTRY      gBrowserHotKeyList  = INITIALIZE_LIST_HEAD_VARIABLE (gBrowserHotKeyList);
 LIST_ENTRY      gBrowserStorageList = INITIALIZE_LIST_HEAD_VARIABLE (gBrowserStorageList);
 
-BOOLEAN               gFinishRetrieveCall;
 BOOLEAN               gResetRequired;
 BOOLEAN               gExitRequired;
 BROWSER_SETTING_SCOPE gBrowserSettingScope = FormSetLevel;
@@ -258,11 +257,8 @@ LoadAllHiiFormset (
   EFI_GUID                ZeroGuid;
   EFI_STATUS              Status;
   FORM_BROWSER_FORMSET    *OldFormset;
-  BOOLEAN                 OldRetrieveValue;
 
   OldFormset = mSystemLevelFormSet;
-  OldRetrieveValue = gFinishRetrieveCall;
-  gFinishRetrieveCall = FALSE;
 
   //
   // Get all the Hii handles
@@ -311,7 +307,6 @@ LoadAllHiiFormset (
   //
   FreePool (HiiHandles);
 
-  gFinishRetrieveCall = OldRetrieveValue;
   mSystemLevelFormSet = OldFormset;
 }
 
@@ -370,7 +365,6 @@ SendForm (
   //
   SaveBrowserContext ();
 
-  gFinishRetrieveCall = FALSE;
   gResetRequired = FALSE;
   gExitRequired  = FALSE;
   Status         = EFI_SUCCESS;
@@ -3483,8 +3477,6 @@ LoadFormConfig (
   EFI_STATUS                  Status;
   LIST_ENTRY                  *Link;
   FORM_BROWSER_STATEMENT      *Question;
-  UINT8                       *BufferValue;
-  UINTN                       StorageWidth;
   
   Link = GetFirstNode (&Form->StatementListHead);
   while (!IsNull (&Form->StatementListHead, Link)) {
@@ -3504,38 +3496,6 @@ LoadFormConfig (
 
     if ((Question->Operand == EFI_IFR_STRING_OP) || (Question->Operand == EFI_IFR_PASSWORD_OP)) {
       HiiSetString (FormSet->HiiHandle, Question->HiiValue.Value.string, (CHAR16*)Question->BufferValue, NULL);
-    }
-
-    //
-    // Call the Retrieve call back function for all questions.
-    //
-    if ((FormSet->ConfigAccess != NULL) && (Selection != NULL) &&
-        ((Question->QuestionFlags & EFI_IFR_FLAG_CALLBACK) == EFI_IFR_FLAG_CALLBACK) &&
-        !gFinishRetrieveCall) {
-      //
-      // Check QuestionValue does exist.
-      //
-      StorageWidth = Question->StorageWidth;
-      if (Question->BufferValue != NULL) {
-        BufferValue  = Question->BufferValue;
-      } else {
-        BufferValue = (UINT8 *) &Question->HiiValue.Value;
-      }
-
-      //
-      // For efivarstore storage, initial question value first.
-      //
-      if ((Question->Storage != NULL) && (Question->Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE)) {
-        Status = gRT->GetVariable (
-                         Question->VariableName,
-                         &Question->Storage->Guid,
-                         NULL,
-                         &StorageWidth,
-                         BufferValue
-                         );
-      }
-
-      Status = ProcessCallBackFunction(Selection, FormSet, Form, Question, EFI_BROWSER_ACTION_RETRIEVE, TRUE);
     }
 
     Link = GetNextNode (&Form->StatementListHead, Link);

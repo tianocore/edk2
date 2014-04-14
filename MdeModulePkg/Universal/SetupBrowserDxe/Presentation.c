@@ -25,6 +25,7 @@ UINT32             gBrowserStatus = BROWSER_SUCCESS;
 CHAR16             *gErrorInfo;
 UINT16             mCurFakeQestId;
 FORM_DISPLAY_ENGINE_FORM gDisplayFormData;
+BOOLEAN            mFinishRetrieveCall = FALSE;
 
 /**
   Evaluate all expressions in a Form.
@@ -2394,11 +2395,6 @@ SetupBrowser (
     return Status;
   }
 
-  if ((Selection->Handle != mCurrentHiiHandle) ||
-      (!CompareGuid (&Selection->FormSetGuid, &mCurrentFormSetGuid))) {
-    gFinishRetrieveCall = FALSE;
-  }
-
   //
   // Initialize current settings of Questions in this FormSet
   //
@@ -2470,6 +2466,11 @@ SetupBrowser (
         (!CompareGuid (&Selection->FormSetGuid, &mCurrentFormSetGuid)) ||
         (Selection->FormId != mCurrentFormId))) {
       //
+      // Update Retrieve flag.
+      //
+      mFinishRetrieveCall = FALSE;
+
+      //
       // Keep current form information
       //
       mCurrentHiiHandle   = Selection->Handle;
@@ -2477,7 +2478,7 @@ SetupBrowser (
       mCurrentFormId      = Selection->FormId;
 
       if (ConfigAccess != NULL) {
-        Status = ProcessCallBackFunction (Selection, gCurrentSelection->FormSet, Selection->Form, NULL, EFI_BROWSER_ACTION_FORM_OPEN, FALSE);
+        Status = ProcessCallBackFunction (Selection, Selection->FormSet, Selection->Form, NULL, EFI_BROWSER_ACTION_FORM_OPEN, FALSE);
         if (EFI_ERROR (Status)) {
           goto Done;
         }
@@ -2501,18 +2502,27 @@ SetupBrowser (
       goto Done;
     }
 
-    //
-    // Finish call RETRIEVE callback for this formset.
-    //
-    gFinishRetrieveCall = TRUE;
+    if (!mFinishRetrieveCall) {
+      //
+      // Finish call RETRIEVE callback for this form.
+      //
+      mFinishRetrieveCall = TRUE;
 
-    //
-    // IFR is updated during callback of read value, force to reparse the IFR binary
-    //
-    if (mHiiPackageListUpdated) {
-      Selection->Action = UI_ACTION_REFRESH_FORMSET;
-      mHiiPackageListUpdated = FALSE;
-      break;
+      if (ConfigAccess != NULL) {
+        Status = ProcessCallBackFunction (Selection, Selection->FormSet, Selection->Form, NULL, EFI_BROWSER_ACTION_RETRIEVE, FALSE);
+        if (EFI_ERROR (Status)) {
+          goto Done;
+        }
+
+        //
+        // IFR is updated during callback of open form, force to reparse the IFR binary
+        //
+        if (mHiiPackageListUpdated) {
+          Selection->Action = UI_ACTION_REFRESH_FORMSET;
+          mHiiPackageListUpdated = FALSE;
+          break;
+        }
+      }
     }
 
     //
