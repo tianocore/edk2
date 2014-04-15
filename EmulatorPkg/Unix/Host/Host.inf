@@ -130,7 +130,7 @@
    GCC:*_*_X64_PP_FLAGS == -m64 -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
    GCC:*_*_X64_ASM_FLAGS == -m64 -c -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h
 
-   GCC:*_*_*_DLINK2_FLAGS == -lpthread -lc
+   GCC:*_*_*_DLINK2_FLAGS == -lpthread -lc -ldl
 
 #
 # Need to do this link via gcc and not ld as the pathing to libraries changes from OS version to OS version
