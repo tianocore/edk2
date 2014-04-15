@@ -1,7 +1,7 @@
 /** @file
   Pei Core Firmware File System service routines.
   
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -525,6 +525,7 @@ FirmwareVolmeInfoPpiNotifyCallback (
   UINTN                                 FvIndex;
   EFI_PEI_FILE_HANDLE                   FileHandle;
   VOID                                  *DepexData;
+  BOOLEAN                               IsFvInfo2;
   
   Status       = EFI_SUCCESS;
   PrivateData  = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
@@ -540,12 +541,14 @@ FirmwareVolmeInfoPpiNotifyCallback (
     // It is FvInfo2PPI.
     //
     CopyMem (&FvInfo2Ppi, Ppi, sizeof (EFI_PEI_FIRMWARE_VOLUME_INFO2_PPI));
+    IsFvInfo2 = TRUE;
   } else {
     //
     // It is FvInfoPPI.
     //
     CopyMem (&FvInfo2Ppi, Ppi, sizeof (EFI_PEI_FIRMWARE_VOLUME_INFO_PPI));
     FvInfo2Ppi.AuthenticationStatus = 0;
+    IsFvInfo2 = FALSE;
   }
 
   //
@@ -572,6 +575,10 @@ FirmwareVolmeInfoPpiNotifyCallback (
     //
     for (FvIndex = 0; FvIndex < PrivateData->FvCount; FvIndex ++) {
       if (PrivateData->Fv[FvIndex].FvHandle == FvHandle) {
+        if (IsFvInfo2 && (FvInfo2Ppi.AuthenticationStatus != PrivateData->Fv[FvIndex].AuthenticationStatus)) {
+          PrivateData->Fv[FvIndex].AuthenticationStatus = FvInfo2Ppi.AuthenticationStatus;
+          DEBUG ((EFI_D_INFO, "Update AuthenticationStatus of the %dth FV to 0x%x!\n", FvIndex, FvInfo2Ppi.AuthenticationStatus));          
+        }
         DEBUG ((EFI_D_INFO, "The Fv %p has already been processed!\n", FvInfo2Ppi.FvInfo));
         return EFI_SUCCESS;
       }
@@ -1337,8 +1344,16 @@ ProcessFvFile (
   ASSERT_EFI_ERROR (Status);
   
   //
-  // Install FvInfo2 Ppi and Build FvHob
+  // Install FvInfo(2) Ppi
   //
+  PeiServicesInstallFvInfoPpi (
+    &FvHeader->FileSystemGuid,
+    (VOID**) FvHeader,
+    (UINT32) FvHeader->FvLength,
+    &ParentFvImageInfo.FvName,
+    &FileInfo.FileName
+    );
+
   PeiServicesInstallFvInfo2Ppi (
     &FvHeader->FileSystemGuid,
     (VOID**) FvHeader,

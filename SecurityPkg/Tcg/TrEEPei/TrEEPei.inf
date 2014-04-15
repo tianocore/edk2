@@ -53,6 +53,7 @@
 
 [Ppis]
   gEfiPeiFirmwareVolumeInfoPpiGuid
+  gEfiPeiFirmwareVolumeInfo2PpiGuid
   gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid
   gPeiTpmInitializedPpiGuid
   gEfiEndOfPeiSignalPpiGuid
