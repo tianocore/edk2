@@ -3197,23 +3197,58 @@ BrowserStatusProcess (
   VOID
   )
 {
-  CHAR16         *ErrorInfo;
-  EFI_INPUT_KEY  Key;
+  CHAR16             *ErrorInfo;
+  EFI_INPUT_KEY      Key;
+  EFI_EVENT          WaitList[2];
+  EFI_EVENT          RefreshIntervalEvent;
+  EFI_EVENT          TimeOutEvent;
+  UINT8              TimeOut;
+  EFI_STATUS         Status;
+  UINTN              Index;
+  WARNING_IF_CONTEXT EventContext;
+  EFI_IFR_OP_HEADER  *OpCodeBuf;
+  EFI_STRING_ID      StringToken;
 
   if (gFormData->BrowserStatus == BROWSER_SUCCESS) {
     return;
   }
 
-  if (gFormData->ErrorString != NULL) {
+  StringToken          = 0;
+  TimeOutEvent         = NULL;
+  RefreshIntervalEvent = NULL;
+  OpCodeBuf            = NULL;
+  if (gFormData->HighLightedStatement != NULL) {
+    OpCodeBuf = gFormData->HighLightedStatement->OpCode;
+  }
+
+  if (gFormData->BrowserStatus == (BROWSER_WARNING_IF)) {
+    ASSERT (OpCodeBuf != NULL && OpCodeBuf->OpCode == EFI_IFR_WARNING_IF_OP);
+
+    TimeOut     = ((EFI_IFR_WARNING_IF *) OpCodeBuf)->TimeOut;
+    StringToken = ((EFI_IFR_WARNING_IF *) OpCodeBuf)->Warning;
+  } else {
+    TimeOut = 0;
+    if ((gFormData->BrowserStatus == (BROWSER_NO_SUBMIT_IF)) &&
+        (OpCodeBuf != NULL && OpCodeBuf->OpCode == EFI_IFR_NO_SUBMIT_IF_OP)) {
+      StringToken = ((EFI_IFR_NO_SUBMIT_IF *) OpCodeBuf)->Error;
+    } else if ((gFormData->BrowserStatus == (BROWSER_INCONSISTENT_IF)) &&
+               (OpCodeBuf != NULL && OpCodeBuf->OpCode == EFI_IFR_INCONSISTENT_IF_OP)) {
+      StringToken = ((EFI_IFR_INCONSISTENT_IF *) OpCodeBuf)->Error;
+    }
+  }
+
+  if (StringToken != 0) {
+    ErrorInfo = GetToken (StringToken, gFormData->HiiHandle);
+  } else if (gFormData->ErrorString != NULL) {
+    //
+    // Only used to compatible with old setup browser.
+    // Not use this field in new browser core.
+    //
     ErrorInfo = gFormData->ErrorString;
   } else {
     switch (gFormData->BrowserStatus) {
     case BROWSER_SUBMIT_FAIL:
       ErrorInfo = gSaveFailed;
-      break;
-
-    case BROWSER_NO_SUBMIT_IF:
-      ErrorInfo = gNoSubmitIf;
       break;
 
     case BROWSER_FORM_NOT_FOUND:
@@ -3234,12 +3269,60 @@ BrowserStatusProcess (
     }
   }
 
-  //
-  // Error occur, prompt error message.
-  //
-  do {
-    CreateDialog (&Key, gEmptyString, ErrorInfo, gPressEnter, gEmptyString, NULL);
-  } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+  if (TimeOut == 0) {
+    do {
+      CreateDialog (&Key, gEmptyString, ErrorInfo, gPressEnter, gEmptyString, NULL);
+    } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+  } else {
+    Status = gBS->CreateEvent (EVT_NOTIFY_WAIT, TPL_CALLBACK, EmptyEventProcess, NULL, &TimeOutEvent);
+    ASSERT_EFI_ERROR (Status);
+
+    EventContext.SyncEvent = TimeOutEvent;
+    EventContext.TimeOut   = &TimeOut;
+    EventContext.ErrorInfo = ErrorInfo;
+
+    Status = gBS->CreateEvent (EVT_TIMER | EVT_NOTIFY_SIGNAL, TPL_CALLBACK, RefreshTimeOutProcess, &EventContext, &RefreshIntervalEvent);
+    ASSERT_EFI_ERROR (Status);
+
+    //
+    // Show the dialog first to avoid long time not reaction.
+    //
+    gBS->SignalEvent (RefreshIntervalEvent);
+
+    Status = gBS->SetTimer (RefreshIntervalEvent, TimerPeriodic, ONE_SECOND);
+    ASSERT_EFI_ERROR (Status);
+
+    while (TRUE) {
+      Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+      if (!EFI_ERROR (Status) && Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
+        break;
+      }
+
+      if (Status != EFI_NOT_READY) {
+        continue;
+      }
+
+      WaitList[0] = TimeOutEvent;
+      WaitList[1] = gST->ConIn->WaitForKey;
+
+      Status = gBS->WaitForEvent (2, WaitList, &Index);
+      ASSERT_EFI_ERROR (Status);
+
+      if (Index == 0) {
+        //
+        // Timeout occur, close the hoot time out event.
+        //
+        break;
+      }
+    }
+  }
+
+  gBS->CloseEvent (TimeOutEvent);
+  gBS->CloseEvent (RefreshIntervalEvent);
+
+  if (StringToken != 0) {
+    FreePool (ErrorInfo);
+  }
 }
 
 /**

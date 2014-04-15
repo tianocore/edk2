@@ -21,8 +21,6 @@ EFI_GUID           mCurrentFormSetGuid = {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
 UINT16             mCurrentFormId = 0;
 EFI_EVENT          mValueChangedEvent = NULL;
 LIST_ENTRY         mRefreshEventList = INITIALIZE_LIST_HEAD_VARIABLE (mRefreshEventList);
-UINT32             gBrowserStatus = BROWSER_SUCCESS;
-CHAR16             *gErrorInfo;
 UINT16             mCurFakeQestId;
 FORM_DISPLAY_ENGINE_FORM gDisplayFormData;
 BOOLEAN            mFinishRetrieveCall = FALSE;
@@ -227,162 +225,6 @@ CreateRefreshEvent (
 }
 
 /**
-  Perform value check for a question.
-  
-  @param  Question       The question need to do check.
-  @param  Type           Condition type need to check.
-  @param  ErrorInfo      Return info about the error.
-  
-  @retval  The check result.
-**/
-UINT32
-ConditionCheck (
-  IN  FORM_BROWSER_STATEMENT        *Question,
-  IN  UINT8                         Type,
-  OUT STATEMENT_ERROR_INFO          *ErrorInfo
-  )
-{
-  EFI_STATUS              Status;
-  LIST_ENTRY              *Link;
-  FORM_EXPRESSION         *Expression;
-  LIST_ENTRY              *ListHead;
-  UINT32                  RetVal;
-
-  RetVal     = STATEMENT_VALID;
-  ListHead   = NULL;
-
-  switch (Type) {
-  case EFI_HII_EXPRESSION_INCONSISTENT_IF:
-    ListHead = &Question->InconsistentListHead;
-    break;
-
-  case EFI_HII_EXPRESSION_WARNING_IF:
-    ListHead = &Question->WarningListHead;
-    break;
-
-  default:
-    ASSERT (FALSE);
-    return RetVal;
-  }
-
-  ASSERT (ListHead != NULL);
-  Link = GetFirstNode (ListHead);
-  while (!IsNull (ListHead, Link)) {
-    Expression = FORM_EXPRESSION_FROM_LINK (Link);
-    Link = GetNextNode (ListHead, Link);
-
-    //
-    // Evaluate the expression
-    //
-    Status = EvaluateExpression (gCurrentSelection->FormSet, gCurrentSelection->Form, Expression);
-    if (EFI_ERROR (Status)) {
-      continue;
-    }
-
-    if ((Expression->Result.Type == EFI_IFR_TYPE_BOOLEAN) && Expression->Result.Value.b) {
-      ErrorInfo->StringId = Expression->Error;
-      switch (Type) {
-      case EFI_HII_EXPRESSION_INCONSISTENT_IF:
-        ErrorInfo->TimeOut  = 0;
-        RetVal              = INCOSISTENT_IF_TRUE;
-        break;
-
-      case EFI_HII_EXPRESSION_WARNING_IF:
-        ErrorInfo->TimeOut  = Expression->TimeOut;
-        RetVal              = WARNING_IF_TRUE;
-        break;
-
-      default:
-        ASSERT (FALSE);
-        break;
-      }
-      break;
-    }
-  }
-
-  return RetVal;
-}
-
-/**
-  Perform value check for a question.
-  
-  @param  Form       Form where Statement is in.
-  @param  Statement  Value will check for it.
-  @param  InputValue New value will be checked.
-  @param  ErrorInfo  Return the error info for this check.
-  
-  @retval TRUE   Input Value is valid.
-  @retval FALSE  Input Value is invalid.
-**/
-UINT32
-EFIAPI
-QuestionCheck (
-  IN  FORM_DISPLAY_ENGINE_FORM      *Form,
-  IN  FORM_DISPLAY_ENGINE_STATEMENT *Statement,
-  IN  EFI_HII_VALUE                 *InputValue,
-  OUT STATEMENT_ERROR_INFO          *ErrorInfo
-  )
-{
-  FORM_BROWSER_STATEMENT  *Question;
-  EFI_HII_VALUE           BackUpValue;
-  UINT8                   *BackUpBuffer;
-  UINT32                  RetVal;
-
-  BackUpBuffer = NULL;
-  RetVal       = STATEMENT_VALID;
-
-  ASSERT (Form != NULL && Statement != NULL && InputValue != NULL && ErrorInfo != NULL);
-
-  Question = GetBrowserStatement(Statement);
-  ASSERT (Question != NULL);
-
-  //
-  // Back up the quesion value.
-  //
-  switch (Question->Operand) {
-  case EFI_IFR_ORDERED_LIST_OP:
-    BackUpBuffer = AllocateCopyPool (Question->StorageWidth, Question->BufferValue);
-    ASSERT (BackUpBuffer != NULL);
-    CopyMem (Question->BufferValue, InputValue->Buffer, Question->StorageWidth);
-    break;
-
-  default:
-    CopyMem (&BackUpValue, &Question->HiiValue, sizeof (EFI_HII_VALUE));
-    CopyMem (&Question->HiiValue, InputValue, sizeof (EFI_HII_VALUE));
-    break;
-  }
-
-  //
-  // Do the inconsistentif check.
-  //
-  if (!IsListEmpty (&Question->InconsistentListHead)) {
-    RetVal = ConditionCheck(Question, EFI_HII_EXPRESSION_INCONSISTENT_IF, ErrorInfo);
-  }
-
-  //
-  // Do the warningif check.
-  //
-  if (RetVal == STATEMENT_VALID && !IsListEmpty (&Question->WarningListHead)) {
-    RetVal = ConditionCheck(Question, EFI_HII_EXPRESSION_WARNING_IF, ErrorInfo);
-  }
-
-  //
-  // Restore the quesion value.
-  //
-  switch (Question->Operand) {
-  case EFI_IFR_ORDERED_LIST_OP:
-    CopyMem (Question->BufferValue, BackUpBuffer, Question->StorageWidth);
-    break;
-
-  default:
-    CopyMem (&Question->HiiValue, &BackUpValue, sizeof (EFI_HII_VALUE));
-    break;
-  }
-
-  return RetVal;
-}
-
-/**
 
   Initialize the Display statement structure data.
 
@@ -489,13 +331,6 @@ InitializeDisplayStatement (
   //
   if (Statement->Operand == EFI_IFR_PASSWORD_OP) {
     DisplayStatement->PasswordCheck = PasswordCheck;
-  }
-
-  //
-  // Save the validate check question for later use.
-  //
-  if (!IsListEmpty (&Statement->InconsistentListHead) || !IsListEmpty (&Statement->WarningListHead)) {
-    DisplayStatement->ValidateQuestion = QuestionCheck;
   }
 
   //
@@ -858,12 +693,6 @@ UpdateDisplayFormData (
   gDisplayFormData.FormRefreshEvent     = NULL;
   gDisplayFormData.HighLightedStatement = NULL;
 
-  gDisplayFormData.BrowserStatus = gBrowserStatus;
-  gDisplayFormData.ErrorString   = gErrorInfo;
-
-  gBrowserStatus = BROWSER_SUCCESS;
-  gErrorInfo     = NULL;
-
   UpdateDataChangedFlag ();
 
   AddStatementToDisplayForm ();
@@ -1098,7 +927,7 @@ ProcessAction (
   if ((Action & BROWSER_ACTION_SUBMIT) == BROWSER_ACTION_SUBMIT) {
     Status = SubmitForm (gCurrentSelection->FormSet, gCurrentSelection->Form, gBrowserSettingScope);
     if (EFI_ERROR (Status)) {
-      gBrowserStatus = BROWSER_SUBMIT_FAIL;
+      PopupErrorMessage(BROWSER_SUBMIT_FAIL, NULL, NULL);
     }
   }
 
@@ -1474,7 +1303,7 @@ ProcessGotoOpCode (
       //
       // Not found the EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL protocol.
       //
-      gBrowserStatus = BROWSER_PROTOCOL_NOT_FOUND;
+      PopupErrorMessage(BROWSER_PROTOCOL_NOT_FOUND, NULL, NULL);
       FreePool (StringPtr);
       return Status;
     }
@@ -1551,7 +1380,7 @@ ProcessGotoOpCode (
         //
         // Form is suppressed. 
         //
-        gBrowserStatus = BROWSER_FORM_SUPPRESS;
+        PopupErrorMessage(BROWSER_FORM_SUPPRESS, NULL, NULL);
         return EFI_SUCCESS;
       }
     }
@@ -2164,9 +1993,26 @@ ProcessCallBackFunction (
                              );
     if (!EFI_ERROR (Status)) {
       //
+      // Need to sync the value between Statement->HiiValue->Value and Statement->BufferValue
+      //
+      if (HiiValue->Type == EFI_IFR_TYPE_STRING) {
+        NewString = GetToken (Statement->HiiValue.Value.string, FormSet->HiiHandle);
+        ASSERT (NewString != NULL);
+
+        ASSERT (StrLen (NewString) * sizeof (CHAR16) <= Statement->StorageWidth);
+        if (StrLen (NewString) * sizeof (CHAR16) <= Statement->StorageWidth) {
+          CopyMem (Statement->BufferValue, NewString, StrSize (NewString));
+        } else {
+          CopyMem (Statement->BufferValue, NewString, Statement->StorageWidth);
+        }
+        FreePool (NewString);
+      }
+
+      //
       // Only for EFI_BROWSER_ACTION_CHANGED need to handle this ActionRequest.
       //
-      if (Action == EFI_BROWSER_ACTION_CHANGED) {
+      switch (Action) {
+      case EFI_BROWSER_ACTION_CHANGED:
         switch (ActionRequest) {
         case EFI_BROWSER_ACTION_REQUEST_RESET:
           DiscardFormIsRequired = TRUE;
@@ -2209,30 +2055,32 @@ ProcessCallBackFunction (
         default:
           break;
         }
-      }
+        break;
 
-      //
-      // Need to sync the value between Statement->HiiValue->Value and Statement->BufferValue
-      //
-      if (HiiValue->Type == EFI_IFR_TYPE_STRING) {
-        NewString = GetToken (Statement->HiiValue.Value.string, FormSet->HiiHandle);
-        ASSERT (NewString != NULL);
-
-        ASSERT (StrLen (NewString) * sizeof (CHAR16) <= Statement->StorageWidth);
-        if (StrLen (NewString) * sizeof (CHAR16) <= Statement->StorageWidth) {
-          CopyMem (Statement->BufferValue, NewString, StrSize (NewString));
-        } else {
-          CopyMem (Statement->BufferValue, NewString, Statement->StorageWidth);
+      case EFI_BROWSER_ACTION_CHANGING:
+        //
+        // Do the question validation.
+        //
+        Status = ValueChangedValidation (gCurrentSelection->FormSet, gCurrentSelection->Form, Statement);
+        if (!EFI_ERROR (Status)) {
+          //
+          // According the spec, return value from call back of "changing" and 
+          // "retrieve" should update to the question's temp buffer.
+          //
+          SetQuestionValue(FormSet, Form, Statement, GetSetValueWithEditBuffer);
         }
-        FreePool (NewString);
-      }
+        break;
 
-      //
-      // According the spec, return value from call back of "changing" and 
-      // "retrieve" should update to the question's temp buffer.
-      //
-      if (Action == EFI_BROWSER_ACTION_CHANGING || Action == EFI_BROWSER_ACTION_RETRIEVE) {
+      case EFI_BROWSER_ACTION_RETRIEVE:
+        //
+        // According the spec, return value from call back of "changing" and 
+        // "retrieve" should update to the question's temp buffer.
+        //
         SetQuestionValue(FormSet, Form, Statement, GetSetValueWithEditBuffer);
+        break;
+
+      default:
+        break;
       }
     } else {
       //
@@ -2246,8 +2094,14 @@ ProcessCallBackFunction (
         } else {
           CopyMem (&HiiValue->Value, &BackUpValue, sizeof (EFI_IFR_TYPE_VALUE));
         }
-
-        SetQuestionValue(FormSet, Form, Statement, GetSetValueWithEditBuffer);
+        
+        //
+        // Do the question validation.
+        //
+        Status = ValueChangedValidation (gCurrentSelection->FormSet, gCurrentSelection->Form, Statement);
+        if (!EFI_ERROR (Status)) {
+          SetQuestionValue(FormSet, Form, Statement, GetSetValueWithEditBuffer);
+        }
       }
 
       //
@@ -2451,7 +2305,7 @@ SetupBrowser (
         //
         // Form is suppressed. 
         //
-        gBrowserStatus = BROWSER_FORM_SUPPRESS;
+        PopupErrorMessage(BROWSER_FORM_SUPPRESS, NULL, NULL);
         Status = EFI_NOT_FOUND;
         goto Done;
       }
@@ -2570,12 +2424,18 @@ SetupBrowser (
         if (!EFI_ERROR (Status) && Statement->Operand != EFI_IFR_REF_OP) {
           ProcessCallBackFunction(Selection, Selection->FormSet, Selection->Form, Statement, EFI_BROWSER_ACTION_CHANGED, FALSE);
         }
-      } else if (Statement->Operand != EFI_IFR_PASSWORD_OP) {
-        SetQuestionValue (gCurrentSelection->FormSet, gCurrentSelection->Form, Statement, GetSetValueWithEditBuffer);
+      } else {
         //
-        // Verify whether question value has checked, update the ValueChanged flag in Question.
+        // Do the question validation.
         //
-        IsQuestionValueChanged(gCurrentSelection->FormSet, gCurrentSelection->Form, Statement, GetSetValueWithBuffer);
+        Status = ValueChangedValidation (gCurrentSelection->FormSet, gCurrentSelection->Form, Statement);
+        if (!EFI_ERROR (Status) && (Statement->Operand != EFI_IFR_PASSWORD_OP)) {
+          SetQuestionValue (gCurrentSelection->FormSet, gCurrentSelection->Form, Statement, GetSetValueWithEditBuffer);
+          //
+          // Verify whether question value has checked, update the ValueChanged flag in Question.
+          //
+          IsQuestionValueChanged(gCurrentSelection->FormSet, gCurrentSelection->Form, Statement, GetSetValueWithBuffer);
+        }
       }
 
       //

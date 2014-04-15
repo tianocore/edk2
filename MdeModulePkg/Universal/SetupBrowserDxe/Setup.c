@@ -63,8 +63,6 @@ CHAR16            *mUnknownString = L"!";
 
 EFI_GUID  gZeroGuid = {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
 
-extern UINT32          gBrowserStatus;
-extern CHAR16          *gErrorInfo;
 extern EFI_GUID        mCurrentFormSetGuid;
 extern EFI_HII_HANDLE  mCurrentHiiHandle;
 extern UINT16          mCurrentFormId;
@@ -311,6 +309,49 @@ LoadAllHiiFormset (
 }
 
 /**
+  Pop up the error info.
+
+  @param      BrowserStatus    The input browser status.
+  @param      OpCode           The opcode use to get the erro info and timeout value.
+  @param      ErrorString      Error string used by BROWSER_NO_SUBMIT_IF.
+
+**/
+VOID
+PopupErrorMessage (
+  IN UINT32                BrowserStatus,
+  IN EFI_IFR_OP_HEADER     *OpCode, OPTIONAL
+  IN CHAR16                *ErrorString
+  )
+{
+  FORM_DISPLAY_ENGINE_STATEMENT *Statement;
+
+  Statement = NULL;
+
+  if (OpCode != NULL) {
+    Statement = AllocateZeroPool (sizeof(FORM_DISPLAY_ENGINE_STATEMENT));
+    ASSERT (Statement != NULL);
+    Statement->OpCode = OpCode;
+    gDisplayFormData.HighLightedStatement = Statement;
+  }
+
+  //
+  // Used to compatible with old display engine.
+  // New display engine not use this field.
+  //
+  gDisplayFormData.ErrorString   = ErrorString;
+  gDisplayFormData.BrowserStatus = BrowserStatus;
+  
+  mFormDisplay->FormDisplay (&gDisplayFormData, NULL);
+
+  gDisplayFormData.BrowserStatus = BROWSER_SUCCESS;
+  gDisplayFormData.ErrorString   = NULL;
+
+  if (OpCode != NULL) {
+    FreePool (Statement);
+  }
+}
+
+/**
   This is the routine which an external caller uses to direct the browser
   where to obtain it's information.
 
@@ -423,19 +464,6 @@ SendForm (
     } while (Selection->Action == UI_ACTION_REFRESH_FORMSET);
 
     FreePool (Selection);
-  }
-
-  //
-  // Still has error info, pop up a message.
-  //
-  if (gBrowserStatus != BROWSER_SUCCESS) {
-    gDisplayFormData.BrowserStatus = gBrowserStatus;
-    gDisplayFormData.ErrorString   = gErrorInfo;
-
-    gBrowserStatus = BROWSER_SUCCESS;
-    gErrorInfo     = NULL;
-
-    mFormDisplay->FormDisplay (&gDisplayFormData, NULL);
   }
 
   if (ActionRequest != NULL) {
@@ -1920,12 +1948,28 @@ ValidateQuestion (
   EFI_STATUS              Status;
   LIST_ENTRY              *Link;
   LIST_ENTRY              *ListHead;
-  EFI_STRING              PopUp;
   FORM_EXPRESSION         *Expression;
+  UINT32                  BrowserStatus;
+  CHAR16                  *ErrorStr;
 
-  if (Type == EFI_HII_EXPRESSION_NO_SUBMIT_IF) {
+  BrowserStatus = BROWSER_SUCCESS;
+  ErrorStr      = NULL;
+
+  switch (Type) {
+  case EFI_HII_EXPRESSION_INCONSISTENT_IF:
+    ListHead = &Question->InconsistentListHead;
+    break;
+
+  case EFI_HII_EXPRESSION_WARNING_IF:
+    ListHead = &Question->WarningListHead;
+    break;
+
+  case EFI_HII_EXPRESSION_NO_SUBMIT_IF:
     ListHead = &Question->NoSubmitListHead;
-  } else {
+    break;
+
+  default:
+    ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
 
@@ -1942,18 +1986,42 @@ ValidateQuestion (
     }
 
     if ((Expression->Result.Type == EFI_IFR_TYPE_BOOLEAN) && Expression->Result.Value.b) {
-      //
-      // Condition meet, show up error message
-      //
-      if (Expression->Error != 0) {
-        PopUp = GetToken (Expression->Error, FormSet->HiiHandle);
-        if (Type == EFI_HII_EXPRESSION_NO_SUBMIT_IF) {
-          gBrowserStatus = BROWSER_NO_SUBMIT_IF;
-          gErrorInfo     = PopUp;
+      switch (Type) {
+      case EFI_HII_EXPRESSION_INCONSISTENT_IF:
+        BrowserStatus = BROWSER_INCONSISTENT_IF;
+        break;
+
+      case EFI_HII_EXPRESSION_WARNING_IF:
+        BrowserStatus = BROWSER_WARNING_IF;
+        break;
+
+      case EFI_HII_EXPRESSION_NO_SUBMIT_IF:
+        BrowserStatus = BROWSER_NO_SUBMIT_IF;
+        //
+        // This code only used to compatible with old display engine,
+        // New display engine will not use this field.
+        //
+        if (Expression->Error != 0) {
+          ErrorStr = GetToken (Expression->Error, FormSet->HiiHandle);
         }
+        break;
+
+      default:
+        ASSERT (FALSE);
+        break;
       }
 
-      return EFI_NOT_READY;
+      PopupErrorMessage(BrowserStatus, Expression->OpCode, ErrorStr);
+
+      if (ErrorStr != NULL) {
+        FreePool (ErrorStr);
+      }
+
+      if (Type == EFI_HII_EXPRESSION_WARNING_IF) {
+        return EFI_SUCCESS;
+      } else {
+        return EFI_NOT_READY;
+      }
     }
 
     Link = GetNextNode (ListHead, Link);
@@ -1962,6 +2030,50 @@ ValidateQuestion (
   return EFI_SUCCESS;
 }
 
+/**
+  Perform question check. 
+  
+  If one question has more than one check, process form high priority to low. 
+  Only one error info will be popup.
+
+  @param  FormSet                FormSet data structure.
+  @param  Form                   Form data structure.
+  @param  Question               The Question to be validated.
+
+  @retval EFI_SUCCESS            Form validation pass.
+  @retval other                  Form validation failed.
+
+**/
+EFI_STATUS
+ValueChangedValidation (
+  IN  FORM_BROWSER_FORMSET            *FormSet,
+  IN  FORM_BROWSER_FORM               *Form,
+  IN  FORM_BROWSER_STATEMENT          *Question
+  )
+{
+  EFI_STATUS   Status;
+
+  Status = EFI_SUCCESS;
+
+  //
+  // Do the inconsistentif check.
+  //
+  if (!IsListEmpty (&Question->InconsistentListHead)) {
+    Status = ValidateQuestion (FormSet, Form, Question, EFI_HII_EXPRESSION_INCONSISTENT_IF);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  //
+  // Do the warningif check.
+  //
+  if (!IsListEmpty (&Question->WarningListHead)) {
+    Status = ValidateQuestion (FormSet, Form, Question, EFI_HII_EXPRESSION_WARNING_IF);
+  }
+
+  return Status;
+}
 
 /**
   Perform NoSubmit check for each Form in FormSet.

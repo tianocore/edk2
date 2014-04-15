@@ -872,7 +872,7 @@ EnterCarriageReturn:
         AdjustQuestionValue (QuestionValue, (UINT8)MenuOption->Sequence);
       }
 
-      return ValidateQuestion (Question);
+      return EFI_SUCCESS;
       break;
 
     case CHAR_BACKSPACE:
@@ -1520,7 +1520,7 @@ TheKey:
 
       gST->ConOut->SetAttribute (gST->ConOut, SavedAttribute);
 
-      return ValidateQuestion (Question);
+      return EFI_SUCCESS;
       
     default:
       break;

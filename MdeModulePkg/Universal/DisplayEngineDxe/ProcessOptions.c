@@ -15,12 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "FormDisplay.h"
 
-typedef struct {
-  EFI_EVENT   SyncEvent;
-  UINT8       *TimeOut;
-  CHAR16      *ErrorInfo;
-} WARNING_IF_CONTEXT;
-
 #define MAX_TIME_OUT_LEN  0x10
 
 /**
@@ -668,143 +662,6 @@ RefreshTimeOutProcess (
 }
 
 /**
-  Show the warning message.
-
-  @param   RetInfo    The input warning string and timeout info.
-
-**/
-VOID
-WarningIfCheck (
-  IN STATEMENT_ERROR_INFO  *RetInfo
-  )
-{
-  CHAR16             *ErrorInfo;
-  EFI_EVENT          WaitList[2];
-  EFI_EVENT          RefreshIntervalEvent;
-  EFI_EVENT          TimeOutEvent;
-  UINT8              TimeOut;
-  EFI_STATUS         Status;
-  UINTN              Index;
-  WARNING_IF_CONTEXT EventContext;
-  EFI_INPUT_KEY      Key;
-
-  TimeOutEvent         = NULL;
-  RefreshIntervalEvent = NULL;
-
-  ASSERT (RetInfo->StringId != 0);
-  ErrorInfo = GetToken (RetInfo->StringId, gFormData->HiiHandle);
-  TimeOut   = RetInfo->TimeOut;
-  if (RetInfo->TimeOut == 0) {
-    do {
-      CreateDialog (&Key, gEmptyString, ErrorInfo, gPressEnter, gEmptyString, NULL);
-    } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
-  } else {
-    Status = gBS->CreateEvent (EVT_NOTIFY_WAIT, TPL_CALLBACK, EmptyEventProcess, NULL, &TimeOutEvent);
-    ASSERT_EFI_ERROR (Status);
-
-    EventContext.SyncEvent = TimeOutEvent;
-    EventContext.TimeOut   = &TimeOut;
-    EventContext.ErrorInfo = ErrorInfo;
-
-    Status = gBS->CreateEvent (EVT_TIMER | EVT_NOTIFY_SIGNAL, TPL_CALLBACK, RefreshTimeOutProcess, &EventContext, &RefreshIntervalEvent);
-    ASSERT_EFI_ERROR (Status);
-
-    //
-    // Show the dialog first to avoid long time not reaction.
-    //
-    gBS->SignalEvent (RefreshIntervalEvent);
-
-    Status = gBS->SetTimer (RefreshIntervalEvent, TimerPeriodic, ONE_SECOND);
-    ASSERT_EFI_ERROR (Status);
-
-    while (TRUE) {
-      Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-      if (!EFI_ERROR (Status) && Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
-        break;
-      }
-
-      if (Status != EFI_NOT_READY) {
-        continue;
-      }
-
-      WaitList[0] = TimeOutEvent;
-      WaitList[1] = gST->ConIn->WaitForKey;
-
-      Status = gBS->WaitForEvent (2, WaitList, &Index);
-      ASSERT_EFI_ERROR (Status);
-
-      if (Index == 0) {
-        //
-        // Timeout occur, close the hoot time out event.
-        //
-        break;
-      }
-    }
-  }
-
-  gBS->CloseEvent (TimeOutEvent);
-  gBS->CloseEvent (RefreshIntervalEvent);
-
-  FreePool (ErrorInfo);
-}
-
-/**
-  Process validate for one question.
-
-  @param  Question               The question need to be validate.
-
-  @retval EFI_SUCCESS            Question Option process success.
-  @retval EFI_INVALID_PARAMETER  Question Option process fail.
-
-**/
-EFI_STATUS 
-ValidateQuestion (
-  IN FORM_DISPLAY_ENGINE_STATEMENT   *Question
-  )
-{
-  CHAR16                          *ErrorInfo;
-  EFI_INPUT_KEY                   Key;
-  EFI_STATUS                      Status;
-  STATEMENT_ERROR_INFO            RetInfo;
-  UINT32                          RetVal;
-
-  if (Question->ValidateQuestion == NULL) {
-    return EFI_SUCCESS;
-  }
-
-  Status = EFI_SUCCESS; 
-  RetVal = Question->ValidateQuestion(gFormData, Question, &gUserInput->InputValue, &RetInfo);
- 
-  switch (RetVal) {
-  case INCOSISTENT_IF_TRUE:
-    //
-    // Condition meet, show up error message
-    //
-    ASSERT (RetInfo.StringId != 0);
-    ErrorInfo = GetToken (RetInfo.StringId, gFormData->HiiHandle);
-    do {
-      CreateDialog (&Key, gEmptyString, ErrorInfo, gPressEnter, gEmptyString, NULL);
-    } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
-    FreePool (ErrorInfo);
-
-    Status = EFI_INVALID_PARAMETER;
-    break;
-
-  case WARNING_IF_TRUE:
-    //
-    // Condition meet, show up warning message
-    //
-    WarningIfCheck (&RetInfo);
-    break;
-
-  default:
-    break;
-  }
-
-  return Status;
-}
-
-/**
   Display error message for invalid password.
 
 **/
@@ -935,7 +792,7 @@ PasswordProcess (
     gUserInput->InputValue.Value.string = HiiSetString(gFormData->HiiHandle, gUserInput->InputValue.Value.string, StringPtr, NULL);
     FreePool (StringPtr); 
 
-    Status = ValidateQuestion (Question);
+    Status = EFI_SUCCESS;
 
     if (EFI_ERROR (Status)) {
       //
@@ -1277,7 +1134,7 @@ ProcessOptions (
       //
       // Perform inconsistent check
       //
-      return ValidateQuestion (Question);
+      return EFI_SUCCESS;
     } else {    
       *OptionString = AllocateZeroPool (BufferSize);
       ASSERT (*OptionString);
@@ -1397,7 +1254,7 @@ ProcessOptions (
       gUserInput->InputValue.Type = Question->CurrentValue.Type;
       gUserInput->InputValue.Value.string = HiiSetString(gFormData->HiiHandle, gUserInput->InputValue.Value.string, StringPtr, NULL);
       FreePool (StringPtr);
-      return ValidateQuestion (Question);
+      return EFI_SUCCESS;
     } else {
       *OptionString = AllocateZeroPool (BufferSize);
       ASSERT (*OptionString);

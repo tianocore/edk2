@@ -286,13 +286,15 @@ CreateQuestion (
   Allocate a FORM_EXPRESSION node.
 
   @param  Form                   The Form associated with this Expression
+  @param  OpCode                 The binary opcode data.
 
   @return Pointer to a FORM_EXPRESSION data structure.
 
 **/
 FORM_EXPRESSION *
 CreateExpression (
-  IN OUT FORM_BROWSER_FORM        *Form
+  IN OUT FORM_BROWSER_FORM        *Form,
+  IN     UINT8                    *OpCode
   )
 {
   FORM_EXPRESSION  *Expression;
@@ -301,6 +303,7 @@ CreateExpression (
   ASSERT (Expression != NULL);
   Expression->Signature = FORM_EXPRESSION_SIGNATURE;
   InitializeListHead (&Expression->OpCodeListHead);
+  Expression->OpCode = (EFI_IFR_OP_HEADER *) OpCode;
 
   return Expression;
 }
@@ -1466,7 +1469,7 @@ ParseOpCodes (
       // Create sub expression nested in MAP opcode
       //
       if (CurrentExpression == NULL && MapScopeDepth > 0) {
-        CurrentExpression = CreateExpression (CurrentForm);
+        CurrentExpression = CreateExpression (CurrentForm, OpCodeData);
         ASSERT (MapExpressionList != NULL);
         InsertTailList (MapExpressionList, &CurrentExpression->Link);
         if (Scope == 0) {
@@ -2048,7 +2051,7 @@ ParseOpCodes (
       //
       // Create an Expression node
       //
-      CurrentExpression = CreateExpression (CurrentForm);
+      CurrentExpression = CreateExpression (CurrentForm, OpCodeData);
       CopyMem (&CurrentExpression->Error, &((EFI_IFR_INCONSISTENT_IF *) OpCodeData)->Error, sizeof (EFI_STRING_ID));
 
       if (Operand == EFI_IFR_NO_SUBMIT_IF_OP) {
@@ -2072,7 +2075,7 @@ ParseOpCodes (
       //
       // Create an Expression node
       //
-      CurrentExpression = CreateExpression (CurrentForm);
+      CurrentExpression = CreateExpression (CurrentForm, OpCodeData);
       CopyMem (&CurrentExpression->Error, &((EFI_IFR_WARNING_IF *) OpCodeData)->Warning, sizeof (EFI_STRING_ID));
       CurrentExpression->TimeOut = ((EFI_IFR_WARNING_IF *) OpCodeData)->TimeOut;
       CurrentExpression->Type    = EFI_HII_EXPRESSION_WARNING_IF;
@@ -2091,7 +2094,7 @@ ParseOpCodes (
       //
       // Question and Option will appear in scope of this OpCode
       //
-      CurrentExpression = CreateExpression (CurrentForm);
+      CurrentExpression = CreateExpression (CurrentForm, OpCodeData);
       CurrentExpression->Type = EFI_HII_EXPRESSION_SUPPRESS_IF;
 
       if (CurrentForm == NULL) {
@@ -2121,7 +2124,7 @@ ParseOpCodes (
       //
       // Questions will appear in scope of this OpCode
       //
-      CurrentExpression = CreateExpression (CurrentForm);
+      CurrentExpression = CreateExpression (CurrentForm, OpCodeData);
       CurrentExpression->Type = EFI_HII_EXPRESSION_GRAY_OUT_IF;
       InsertTailList (&CurrentForm->ExpressionListHead, &CurrentExpression->Link);
       PushConditionalExpression(CurrentExpression, ExpressStatement);
@@ -2169,7 +2172,7 @@ ParseOpCodes (
     // Expression
     //
     case EFI_IFR_VALUE_OP:
-      CurrentExpression = CreateExpression (CurrentForm);
+      CurrentExpression = CreateExpression (CurrentForm, OpCodeData);
       CurrentExpression->Type = EFI_HII_EXPRESSION_VALUE;
       InsertTailList (&CurrentForm->ExpressionListHead, &CurrentExpression->Link);
 
@@ -2201,7 +2204,7 @@ ParseOpCodes (
       break;
 
     case EFI_IFR_RULE_OP:
-      CurrentExpression = CreateExpression (CurrentForm);
+      CurrentExpression = CreateExpression (CurrentForm, OpCodeData);
       CurrentExpression->Type = EFI_HII_EXPRESSION_RULE;
 
       CurrentExpression->RuleId = ((EFI_IFR_RULE *) OpCodeData)->RuleId;
@@ -2217,7 +2220,7 @@ ParseOpCodes (
       break;
 
     case EFI_IFR_READ_OP:
-      CurrentExpression = CreateExpression (CurrentForm);
+      CurrentExpression = CreateExpression (CurrentForm, OpCodeData);
       CurrentExpression->Type = EFI_HII_EXPRESSION_READ;
       InsertTailList (&CurrentForm->ExpressionListHead, &CurrentExpression->Link);
 
@@ -2239,7 +2242,7 @@ ParseOpCodes (
       break;
 
     case EFI_IFR_WRITE_OP:
-      CurrentExpression = CreateExpression (CurrentForm);
+      CurrentExpression = CreateExpression (CurrentForm, OpCodeData);
       CurrentExpression->Type = EFI_HII_EXPRESSION_WRITE;
       InsertTailList (&CurrentForm->ExpressionListHead, &CurrentExpression->Link);
 

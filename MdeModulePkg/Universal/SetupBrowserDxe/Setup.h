@@ -227,6 +227,7 @@ typedef struct {
   EFI_HII_VALUE     Result;          // Expression evaluation result
 
   UINT8             TimeOut;         // For EFI_IFR_WARNING_IF
+  EFI_IFR_OP_HEADER *OpCode;         // Save the opcode buffer.
 
   LIST_ENTRY        OpCodeListHead;  // OpCodes consist of this expression (EXPRESSION_OPCODE)
 } FORM_EXPRESSION;
@@ -1673,6 +1674,41 @@ ConfigRequestAdjust (
   IN  BROWSER_STORAGE         *Storage,
   IN  CHAR16                  *Request,
   IN  BOOLEAN                 RespString
+  );
+
+/**
+  Perform question check. 
+  
+  If one question has more than one check, process form high priority to low.
+
+  @param  FormSet                FormSet data structure.
+  @param  Form                   Form data structure.
+  @param  Question               The Question to be validated.
+
+  @retval EFI_SUCCESS            Form validation pass.
+  @retval other                  Form validation failed.
+
+**/
+EFI_STATUS
+ValueChangedValidation (
+  IN  FORM_BROWSER_FORMSET            *FormSet,
+  IN  FORM_BROWSER_FORM               *Form,
+  IN  FORM_BROWSER_STATEMENT          *Question
+  );
+
+/**
+  Pop up the error info.
+
+  @param      BrowserStatus    The input browser status.
+  @param      OpCode           The opcode use to get the erro info and timeout value.
+  @param      ErrorString      Error string used by BROWSER_NO_SUBMIT_IF.
+
+**/
+VOID
+PopupErrorMessage (
+  IN UINT32                BrowserStatus,
+  IN EFI_IFR_OP_HEADER     *OpCode, OPTIONAL
+  IN CHAR16                *ErrorString
   );
 
 #endif
