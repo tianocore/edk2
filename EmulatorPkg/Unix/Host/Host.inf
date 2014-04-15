@@ -116,12 +116,12 @@
 
 
 [BuildOptions]
-   GCC:*_*_IA32_DLINK_FLAGS == -o $(BIN_DIR)/Host -m elf_i386 -dynamic-linker $(HOST_DLINK_PATHS) -L/usr/X11R6/lib -lXext -lX11
+   GCC:*_*_IA32_DLINK_FLAGS == -o $(BIN_DIR)/Host -m elf_i386 -dynamic-linker $(HOST_DLINK_PATHS) -L/usr/lib/i386-linux-gnu -L/usr/X11R6/lib -lXext -lX11
    GCC:*_*_IA32_CC_FLAGS == -m32 -g -fshort-wchar -fno-strict-aliasing -Wall -malign-double -idirafter/usr/include -c -include $(DEST_DIR_DEBUG)/AutoGen.h -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
    GCC:*_*_IA32_PP_FLAGS == -m32 -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
    GCC:*_*_IA32_ASM_FLAGS == -m32 -c -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h
 
-   GCC:*_*_X64_DLINK_FLAGS == -o $(BIN_DIR)/Host -m elf_x86_64 -dynamic-linker $(HOST_DLINK_PATHS) -L/usr/X11R6/lib -lXext -lX11
+   GCC:*_*_X64_DLINK_FLAGS == -o $(BIN_DIR)/Host -m elf_x86_64 -dynamic-linker $(HOST_DLINK_PATHS) -L/usr/lib/x86_64-linux-gnu -L/usr/X11R6/lib -lXext -lX11
    GCC:*_*_X64_CC_FLAGS == -m64 -g -fshort-wchar -fno-strict-aliasing -Wall -malign-double -idirafter/usr/include -c -include $(DEST_DIR_DEBUG)/AutoGen.h -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
    GCC:*_GCC44_X64_CC_FLAGS = "-DEFIAPI=__attribute__((ms_abi))"
    GCC:*_GCC45_X64_CC_FLAGS = "-DEFIAPI=__attribute__((ms_abi))"
