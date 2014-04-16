@@ -461,6 +461,7 @@ FirmwareVolmeInfoPpiNotifyCallback (
   EFI_PEI_FIRMWARE_VOLUME_INFO_PPI  *Fv;
   EFI_STATUS                        Status;
   EFI_PEI_FIRMWARE_VOLUME_PPI       *FvPpi;
+  UINTN                             Index;
 
   Fv = (EFI_PEI_FIRMWARE_VOLUME_INFO_PPI *) Ppi;
 
@@ -485,6 +486,14 @@ FirmwareVolmeInfoPpiNotifyCallback (
     
     ASSERT (mMeasuredChildFvIndex < FixedPcdGet32 (PcdPeiCoreMaxFvSupported));
     if (mMeasuredChildFvIndex < FixedPcdGet32 (PcdPeiCoreMaxFvSupported)) {
+      //
+      // Check whether FV is in the measured child FV list.
+      //
+      for (Index = 0; Index < mMeasuredChildFvIndex; Index++) {
+        if (mMeasuredChildFvInfo[Index].BlobBase == (EFI_PHYSICAL_ADDRESS) (UINTN) Fv->FvInfo) {
+          return EFI_SUCCESS;
+        }
+      }
       mMeasuredChildFvInfo[mMeasuredChildFvIndex].BlobBase   = (EFI_PHYSICAL_ADDRESS) (UINTN) Fv->FvInfo;
       mMeasuredChildFvInfo[mMeasuredChildFvIndex].BlobLength = Fv->FvInfoSize;
       mMeasuredChildFvIndex++;
