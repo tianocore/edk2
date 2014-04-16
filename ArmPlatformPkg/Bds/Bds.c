@@ -337,7 +337,7 @@ DefineDefaultBootEntries (
 
       if (DefaultBootArgument == (CHAR16*)PcdGetPtr (PcdDefaultBootArgument)) {
         FreePool (AsciiDefaultBootArgument);
-      } else {
+      } else if (DefaultBootArgument != NULL) {
         FreePool (DefaultBootArgument);
       }
     } else {
