@@ -1711,4 +1711,21 @@ PopupErrorMessage (
   IN CHAR16                *ErrorString
   );
 
+/**
+  Check whether the result is TRUE or FALSE.
+
+  For the EFI_HII_VALUE value type is numeric, return TRUE if the
+  value is not 0.
+
+  @param  Result             Input the result data.
+
+  @retval TRUE               The result is TRUE.
+  @retval FALSE              The result is FALSE.
+
+**/
+BOOLEAN
+IsTrue (
+  IN EFI_HII_VALUE     *Result
+  );
+
 #endif

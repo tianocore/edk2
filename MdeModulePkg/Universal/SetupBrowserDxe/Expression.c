@@ -3281,6 +3281,44 @@ Done:
 }
 
 /**
+  Check whether the result is TRUE or FALSE.
+  
+  For the EFI_HII_VALUE value type is numeric, return TRUE if the
+  value is not 0.
+
+  @param  Result             Input the result data.
+
+  @retval TRUE               The result is TRUE.
+  @retval FALSE              The result is FALSE.
+
+**/
+BOOLEAN
+IsTrue (
+  IN EFI_HII_VALUE     *Result
+  )
+{
+  switch (Result->Type) {
+  case EFI_IFR_TYPE_BOOLEAN:
+    return Result->Value.b;
+
+  case EFI_IFR_TYPE_NUM_SIZE_8:
+    return Result->Value.u8 != 0;
+
+  case EFI_IFR_TYPE_NUM_SIZE_16:
+    return Result->Value.u16 != 0;
+
+  case EFI_IFR_TYPE_NUM_SIZE_32:
+    return Result->Value.u32 != 0;
+
+  case EFI_IFR_TYPE_NUM_SIZE_64:
+    return Result->Value.u64 != 0;
+
+  default:
+    return FALSE;
+  }
+}
+
+/**
   Return the result of the expression list. Check the expression list and 
   return the highest priority express result.  
   Priority: DisableIf > SuppressIf > GrayOutIf > FALSE
@@ -3331,8 +3369,7 @@ EvaluateExpressionList (
   //
   ReturnVal = ExpressFalse;
   for (Index = 0; Index < ExpList->Count; Index++) {
-    if (ExpList->Expression[Index]->Result.Type == EFI_IFR_TYPE_BOOLEAN &&
-        ExpList->Expression[Index]->Result.Value.b) {
+    if (IsTrue (&ExpList->Expression[Index]->Result)) {
       switch (ExpList->Expression[Index]->Type) {
         case EFI_HII_EXPRESSION_SUPPRESS_IF:
           CompareOne = ExpressSuppress;

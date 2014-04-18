@@ -1985,7 +1985,7 @@ ValidateQuestion (
       return Status;
     }
 
-    if ((Expression->Result.Type == EFI_IFR_TYPE_BOOLEAN) && Expression->Result.Value.b) {
+    if (IsTrue (&Expression->Result)) {
       switch (Type) {
       case EFI_HII_EXPRESSION_INCONSISTENT_IF:
         BrowserStatus = BROWSER_INCONSISTENT_IF;

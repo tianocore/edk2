@@ -1559,11 +1559,7 @@ ParseOpCodes (
             return Status;
           }
 
-          if (CurrentExpression->Result.Type != EFI_IFR_TYPE_BOOLEAN) {
-            return EFI_INVALID_PARAMETER;
-          }
-
-          OpCodeDisabled = CurrentExpression->Result.Value.b;
+          OpCodeDisabled = IsTrue(&CurrentExpression->Result);
         }
 
         CurrentExpression = NULL;
@@ -2512,11 +2508,8 @@ ParseOpCodes (
               return Status;
             }
 
-            if (CurrentExpression->Result.Type != EFI_IFR_TYPE_BOOLEAN) {
-              return EFI_INVALID_PARAMETER;
-            }
+            OpCodeDisabled = IsTrue (&CurrentExpression->Result);
 
-            OpCodeDisabled = CurrentExpression->Result.Value.b;
             //
             // DisableIf Expression is only used once and not queued, free it
             //
