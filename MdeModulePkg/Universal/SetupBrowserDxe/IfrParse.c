@@ -1074,6 +1074,23 @@ IsStatementOpCode (
 }
 
 /**
+  Tell whether this Operand is an known OpCode.
+
+  @param  Operand                Operand of an IFR OpCode.
+
+  @retval TRUE                   This is an Statement OpCode.
+  @retval FALSE                  Not an Statement OpCode.
+
+**/
+BOOLEAN
+IsUnKnownOpCode (
+  IN UINT8              Operand
+  )
+{
+  return Operand > EFI_IFR_WARNING_IF_OP ? TRUE : FALSE;
+}
+
+/**
   Calculate number of Statemens(Questions) and Expression OpCodes.
 
   @param  FormSet                The FormSet to be counted.
@@ -1165,6 +1182,8 @@ ParseOpCodes (
   EFI_VARSTORE_ID         TempVarstoreId;
   BOOLEAN                 InScopeDisable;
   INTN                    ConditionalExprCount;
+  BOOLEAN                 InUnknownScope;
+  UINT8                   UnknownDepth;
 
   SuppressForQuestion      = FALSE;
   SuppressForOption        = FALSE;
@@ -1184,6 +1203,8 @@ ParseOpCodes (
   MapExpressionList        = NULL;
   TempVarstoreId           = 0;
   ConditionalExprCount     = 0;
+  InUnknownScope           = FALSE;
+  UnknownDepth             = 0;
 
   //
   // Get the number of Statements and Expressions
@@ -1225,6 +1246,31 @@ ParseOpCodes (
     OpCodeOffset += OpCodeLength;
     Operand = ((EFI_IFR_OP_HEADER *) OpCodeData)->OpCode;
     Scope = ((EFI_IFR_OP_HEADER *) OpCodeData)->Scope;
+
+    if (InUnknownScope) {
+      if (Operand == EFI_IFR_END_OP) {
+        UnknownDepth --;
+
+        if (UnknownDepth == 0) {
+          InUnknownScope = FALSE;
+        }
+      } else {
+        if (Scope != 0) {
+          UnknownDepth ++;
+        }
+      }
+
+      continue;
+    }
+
+    if (IsUnKnownOpCode(Operand)) {
+      if (Scope != 0) {
+        InUnknownScope = TRUE;
+        UnknownDepth ++;
+      }
+
+      continue;
+    }
 
     //
     // If scope bit set, push onto scope stack
