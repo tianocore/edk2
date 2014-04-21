@@ -3302,16 +3302,16 @@ IsTrue (
     return Result->Value.b;
 
   case EFI_IFR_TYPE_NUM_SIZE_8:
-    return Result->Value.u8 != 0;
+    return (BOOLEAN)(Result->Value.u8 != 0);
 
   case EFI_IFR_TYPE_NUM_SIZE_16:
-    return Result->Value.u16 != 0;
+    return (BOOLEAN)(Result->Value.u16 != 0);
 
   case EFI_IFR_TYPE_NUM_SIZE_32:
-    return Result->Value.u32 != 0;
+    return (BOOLEAN)(Result->Value.u32 != 0);
 
   case EFI_IFR_TYPE_NUM_SIZE_64:
-    return Result->Value.u64 != 0;
+    return (BOOLEAN)(Result->Value.u64 != 0);
 
   default:
     return FALSE;
