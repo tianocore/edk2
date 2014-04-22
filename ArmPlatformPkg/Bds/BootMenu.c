@@ -782,7 +782,9 @@ BootMenuMain (
                   GetAlignedDevicePath ((EFI_DEVICE_PATH*)((UINTN)(&OptionalData->Arguments.LinuxArguments + 1) + CmdLineSize)), TRUE, TRUE);
               Print(L"\t- Initrd: %s\n", DevicePathTxt);
             }
-            Print(L"\t- Arguments: %a\n", (&OptionalData->Arguments.LinuxArguments + 1));
+            if (ReadUnaligned16 (&OptionalData->Arguments.LinuxArguments.CmdLineSize) > 0) {
+              Print(L"\t- Arguments: %a\n", (&OptionalData->Arguments.LinuxArguments + 1));
+            }
           }
 
           switch (LoaderType) {
