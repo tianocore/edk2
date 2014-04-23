@@ -1,7 +1,7 @@
 /** @file
   Functions implementation related with DHCPv6 for UefiPxeBc Driver.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1852,7 +1852,7 @@ PxeBcDhcp6Sarr (
     return Status;
   }
 
-  Status = PxeBcFlushStaionIp (Private, &Private->StationIp, NULL);
+  Status = PxeBcFlushStationIp (Private, &Private->StationIp, NULL);
   if (EFI_ERROR (Status)) {
     PxeBcUnregisterIp6Address (Private);
     Dhcp6->Stop (Dhcp6);

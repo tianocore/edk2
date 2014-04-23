@@ -1595,7 +1595,7 @@ PxeBcDhcp4Dora (
   CopyMem (&PxeMode->StationIp, &Private->StationIp, sizeof (EFI_IPv4_ADDRESS));
   CopyMem (&PxeMode->SubnetMask, &Private->SubnetMask, sizeof (EFI_IPv4_ADDRESS));
 
-  Status = PxeBcFlushStaionIp (Private, &Private->StationIp, &Private->SubnetMask);
+  Status = PxeBcFlushStationIp (Private, &Private->StationIp, &Private->SubnetMask);
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }

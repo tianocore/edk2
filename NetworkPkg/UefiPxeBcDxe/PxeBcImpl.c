@@ -2024,7 +2024,7 @@ EfiPxeBcSetStationIP (
     CopyMem (&Private->SubnetMask ,NewSubnetMask, sizeof (EFI_IP_ADDRESS));
   }
 
-  Status = PxeBcFlushStaionIp (Private, NewStationIp, NewSubnetMask);
+  Status = PxeBcFlushStationIp (Private, NewStationIp, NewSubnetMask);
 ON_EXIT:
   return Status;
 }
