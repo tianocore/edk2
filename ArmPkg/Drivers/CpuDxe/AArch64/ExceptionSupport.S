@@ -1,5 +1,6 @@
 //
 // Copyright (c) 2011 - 2013 ARM LTD. All rights reserved.<BR>
+// Portion of Copyright (c) 2014 NVIDIA Corporation. All rights reserved.<BR>
 //
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -358,9 +359,25 @@ ASM_PFX(AsmCommonExceptionEntry):
 
 #define REG_ONE(REG1, OFFSET, CONTEXT_SIZE)           ldr REG1, [sp, #(OFFSET-CONTEXT_SIZE)]
 
+  // Adjust SP to pop system registers
+  add     sp, sp, GP_CONTEXT_SIZE + FP_CONTEXT_SIZE + SYS_CONTEXT_SIZE
+  ALL_SYS_REGS
 
-  // pop all regs and return from exception.
-  add      sp, sp, GP_CONTEXT_SIZE
+  EL1_OR_EL2(x6)
+1:msr      elr_el1, x1   // Exception Link Register
+  msr      spsr_el1,x2   // Saved Processor Status Register 32bit
+  msr      fpsr, x3      // Floating point Status Register  32bit
+  msr      esr_el1, x4   // EL1 Exception syndrome register 32bit
+  msr      far_el1, x5   // EL1 Fault Address Register
+  b        3f
+2:msr      elr_el2, x1   // Exception Link Register
+  msr      spsr_el2,x2   // Saved Processor Status Register 32bit
+  msr      fpsr, x3      // Floating point Status Register  32bit
+  msr      esr_el2, x4   // EL1 Exception syndrome register 32bit
+  msr      far_el2, x5   // EL1 Fault Address Register
+
+3:// pop all regs and return from exception.
+  sub     sp, sp, FP_CONTEXT_SIZE + SYS_CONTEXT_SIZE
   ALL_GP_REGS
 
   // Adjust SP to pop next set
