@@ -193,6 +193,9 @@
   # ISP1761 USB OTG Controller
   gEmbeddedTokenSpaceGuid.PcdIsp1761BaseAddress|0x4f000000
 
+  # LAN9118 Ethernet Driver PCDs
+  gEmbeddedTokenSpaceGuid.PcdLan9118DxeBaseAddress|0x4E000000
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform
@@ -293,7 +296,10 @@
   #
   EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
   ArmPlatformPkg/Drivers/PL180MciDxe/PL180MciDxe.inf
-  
+
+  # SMSC LAN 9118
+  EmbeddedPkg/Drivers/Lan9118Dxe/Lan9118Dxe.inf
+
   #
   # FAT filesystem + GPT/MBR partitioning
   #
