@@ -256,6 +256,7 @@
 
   EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf
   EmbeddedPkg/Drivers/AndroidFastbootTransportUsbDxe/FastbootTransportUsbDxe.inf
+  EmbeddedPkg/Drivers/AndroidFastbootTransportTcpDxe/FastbootTransportTcpDxe.inf
 
   # Drivers
   EmbeddedPkg/Drivers/Isp1761UsbDxe/Isp1761UsbDxe.inf

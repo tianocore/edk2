@@ -138,6 +138,7 @@
   # You'll need to pass it "-i 0xf00d" to get it to recognise this device.
   gEmbeddedTokenSpaceGuid.PcdAndroidFastbootUsbVendorId|0xf00d|UINT32|0x00000022
   gEmbeddedTokenSpaceGuid.PcdAndroidFastbootUsbProductId|0xbeef|UINT32|0x00000023
+  gEmbeddedTokenSpaceGuid.PcdAndroidFastbootTcpPort|1234|UINT32|0x00000024
 
 [PcdsFixedAtBuild.ARM]
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|32|UINT8|0x00000010
