@@ -397,8 +397,11 @@ GetBlockEntryListFromAddress (
         BlockEntry = TranslationTable;
       }
     } else {
-      // Case of Invalid Entry and we are at a page level above of the one targetted.
       if (IndexLevel != PageLevel) {
+        //
+        // Case when we have an Invalid Entry and we are at a page level above of the one targetted.
+        //
+
         // Create a new translation table
         TranslationTable = (UINT64*)AllocatePages (EFI_SIZE_TO_PAGES((TT_ENTRY_COUNT * sizeof(UINT64)) + TT_ALIGNMENT_DESCRIPTION_TABLE));
         if (TranslationTable == NULL) {
@@ -411,6 +414,11 @@ GetBlockEntryListFromAddress (
         // Fill the new BlockEntry with the TranslationTable
         *BlockEntry = ((UINTN)TranslationTable & TT_ADDRESS_MASK_DESCRIPTION_TABLE) | TT_TYPE_TABLE_ENTRY;
         // Update the last block entry with the newly created translation table
+        *LastBlockEntry = TT_LAST_BLOCK_ADDRESS(TranslationTable, TT_ENTRY_COUNT);
+      } else {
+        //
+        // Case when the new region is part of an existing page table
+        //
         *LastBlockEntry = TT_LAST_BLOCK_ADDRESS(TranslationTable, TT_ENTRY_COUNT);
       }
     }
@@ -531,8 +539,7 @@ ArmConfigureMmu (
   UINT64                        TCR;
   RETURN_STATUS                 Status;
 
-  if(MemoryTable == NULL)
-  {
+  if(MemoryTable == NULL) {
     ASSERT (MemoryTable != NULL);
     return RETURN_INVALID_PARAMETER;
   }
