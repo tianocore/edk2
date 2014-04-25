@@ -1,7 +1,7 @@
 /** @file
   Functions declaration related with DHCPv4 for UefiPxeBc Driver.
 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -127,7 +127,7 @@ typedef enum {
 
 #define BIT(x)                (1 << x)
 #define CTRL(x)               (0x1F & (x))
-#define DEFAULT_CLASS_ID_DATA "PXEClient:Arch:?????:????:??????"
+#define DEFAULT_CLASS_ID_DATA "PXEClient:Arch:xxxxx:UNDI:003000"
 #define DEFAULT_UNDI_TYPE     1
 #define DEFAULT_UNDI_MAJOR    3
 #define DEFAULT_UNDI_MINOR    0
