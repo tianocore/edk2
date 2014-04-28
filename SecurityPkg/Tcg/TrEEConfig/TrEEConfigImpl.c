@@ -2,7 +2,7 @@
   HII Config Access protocol implementation of TREE configuration module.
   NOTE: This module is only for reference only, each platform should have its own setup page.
 
-Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -86,7 +86,12 @@ TrEEExtractConfig (
        OUT EFI_STRING                            *Results
   )
 {
-  return EFI_UNSUPPORTED;
+  if (Progress == NULL || Results == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *Progress = Request;
+  return EFI_NOT_FOUND;
 }
 
 /**
@@ -163,7 +168,11 @@ TrEERouteConfig (
        OUT EFI_STRING                          *Progress
   )
 {
-  return EFI_UNSUPPORTED;
+  if (Configuration == NULL || Progress == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  return EFI_NOT_FOUND;
 }
 
 /**
