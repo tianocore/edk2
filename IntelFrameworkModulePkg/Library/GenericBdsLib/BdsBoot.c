@@ -521,6 +521,15 @@ BdsDeleteAllInvalidLegacyBootOptions (
     return Status;
   }
 
+  BootOrder = BdsLibGetVariableAndSize (
+                L"BootOrder",
+                &gEfiGlobalVariableGuid,
+                &BootOrderSize
+                );
+  if (BootOrder == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
   LegacyBios->GetBbsInfo (
                 LegacyBios,
                 &HddCount,
@@ -528,15 +537,6 @@ BdsDeleteAllInvalidLegacyBootOptions (
                 &BbsCount,
                 &LocalBbsTable
                 );
-
-  BootOrder = BdsLibGetVariableAndSize (
-                L"BootOrder",
-                &gEfiGlobalVariableGuid,
-                &BootOrderSize
-                );
-  if (BootOrder == NULL) {
-    BootOrderSize = 0;
-  }
 
   Index = 0;
   while (Index < BootOrderSize / sizeof (UINT16)) {
@@ -634,9 +634,7 @@ BdsDeleteAllInvalidLegacyBootOptions (
   // Shrinking variable with existing variable implementation shouldn't fail.
   //
   ASSERT_EFI_ERROR (Status);
-  if (BootOrder != NULL) {
-    FreePool (BootOrder);
-  }
+  FreePool (BootOrder);
 
   return Status;
 }
