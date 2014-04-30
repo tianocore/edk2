@@ -874,7 +874,7 @@ ScsiReadCapacity16Command (
   @param[in, out] DataBuffer           Read 10 command data.
   @param[in, out] DataLength           The length of data buffer.
   @param[in]      StartLba             The start address of LBA.
-  @param[in]      SectorSize           The sector size.
+  @param[in]      SectorSize           The number of contiguous logical blocks of data that shall be transferred.
 
   @retval  EFI_SUCCESS          The command is executed successfully.
   @retval  EFI_BAD_BUFFER_SIZE  The SCSI Request Packet was executed, but the entire DataBuffer could
@@ -972,7 +972,7 @@ ScsiRead10Command (
   @param[in, out] DataBuffer           A pointer to a data buffer.
   @param[in, out] DataLength           The length of data buffer.
   @param[in]      StartLba             The start address of LBA.
-  @param[in]      SectorSize           The sector size.
+  @param[in]      SectorSize           The number of contiguous logical blocks of data that shall be transferred.
 
   @retval  EFI_SUCCESS          The command executed successfully.
   @retval  EFI_BAD_BUFFER_SIZE  The SCSI Request Packet was executed, but the entire DataBuffer could
@@ -1070,7 +1070,7 @@ ScsiWrite10Command (
   @param[in, out] DataBuffer           Read 16 command data.
   @param[in, out] DataLength           The length of data buffer.
   @param[in]      StartLba             The start address of LBA.
-  @param[in]      SectorSize           The sector size.
+  @param[in]      SectorSize           The number of contiguous logical blocks of data that shall be transferred.
 
   @retval  EFI_SUCCESS          The command executed successfully.
   @retval  EFI_BAD_BUFFER_SIZE  The SCSI Request Packet was executed, but the entire DataBuffer could
@@ -1168,7 +1168,7 @@ ScsiRead16Command (
   @param[in, out] DataBuffer           A pointer to a data buffer.
   @param[in, out] DataLength           The length of data buffer.
   @param[in]      StartLba             The start address of LBA.
-  @param[in]      SectorSize           The sector size.
+  @param[in]      SectorSize           The number of contiguous logical blocks of data that shall be transferred.
 
   @retval  EFI_SUCCESS          The command is executed successfully.
   @retval  EFI_BAD_BUFFER_SIZE  The SCSI Request Packet was executed, but the entire DataBuffer could
