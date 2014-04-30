@@ -57,6 +57,33 @@ ConvertMemoryType (
 }
 
 /**
+  Function to translate the EFI_GRAPHICS_PIXEL_FORMAT into a string.
+
+  @param[in] Memory     The format type.
+
+  @retval               A string representation of the type allocated from BS Pool.
+**/
+CHAR16*
+EFIAPI
+ConvertPixelFormat (
+  IN CONST EFI_GRAPHICS_PIXEL_FORMAT Fmt
+  )
+{
+  CHAR16 *RetVal;
+  RetVal = NULL;
+
+  switch (Fmt) {
+  case PixelRedGreenBlueReserved8BitPerColor: StrnCatGrow(&RetVal, NULL, L"PixelRedGreenBlueReserved8BitPerColor", 0);  break;
+  case PixelBlueGreenRedReserved8BitPerColor: StrnCatGrow(&RetVal, NULL, L"PixelBlueGreenRedReserved8BitPerColor", 0);  break;
+  case PixelBitMask:                          StrnCatGrow(&RetVal, NULL, L"PixelBitMask", 0);                           break;
+  case PixelBltOnly:                          StrnCatGrow(&RetVal, NULL, L"PixelBltOnly", 0);                           break;
+  case PixelFormatMax:                        StrnCatGrow(&RetVal, NULL, L"PixelFormatMax", 0);                         break;
+  default: ASSERT(FALSE);
+  }
+  return (RetVal);
+}
+
+/**
   Constructor for the library.
 
   @param[in] ImageHandle    Ignored.
@@ -173,6 +200,81 @@ LoadedImageProtocolDumpInformation(
   SHELL_FREE_NON_NULL(Temp);
   SHELL_FREE_NON_NULL(CodeType);
   SHELL_FREE_NON_NULL(DataType);
+
+  return RetVal;
+}
+
+/**
+  Function to dump information about GOP.
+
+  This will allocate the return buffer from boot services pool.
+
+  @param[in] TheHandle      The handle that has LoadedImage installed.
+  @param[in] Verbose        TRUE for additional information, FALSE otherwise.
+
+  @retval A poitner to a string containing the information.
+**/
+CHAR16*
+EFIAPI
+GraphicsOutputProtocolDumpInformation(
+  IN CONST EFI_HANDLE TheHandle,
+  IN CONST BOOLEAN    Verbose
+  )
+{
+  EFI_GRAPHICS_OUTPUT_PROTOCOL      *GraphicsOutput;
+  EFI_STATUS                        Status;
+  CHAR16                            *RetVal;
+  CHAR16                            *Temp;
+  CHAR16                            *Fmt;
+
+  if (!Verbose) {
+    return (CatSPrint(NULL, L"GraphicsOutput"));
+  }
+
+  Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_GOP_DUMP_MAIN), NULL);
+  RetVal = AllocateZeroPool (PcdGet16 (PcdShellPrintBufferSize));
+  if (Temp == NULL || RetVal == NULL) {
+    SHELL_FREE_NON_NULL(Temp);
+    SHELL_FREE_NON_NULL(RetVal);
+    return NULL;
+  }
+
+  Status = gBS->OpenProtocol (
+                TheHandle,
+                &gEfiGraphicsOutputProtocolGuid,
+                (VOID**)&GraphicsOutput,
+                gImageHandle,
+                NULL,
+                EFI_OPEN_PROTOCOL_GET_PROTOCOL
+               );
+
+  if (EFI_ERROR (Status)) {
+    SHELL_FREE_NON_NULL (Temp);
+    SHELL_FREE_NON_NULL (RetVal);
+    return NULL;
+  }
+
+  Fmt = ConvertPixelFormat(GraphicsOutput->Mode->Info->PixelFormat);
+
+  RetVal = CatSPrint(RetVal,
+                      Temp,
+                      GraphicsOutput->Mode->MaxMode,
+                      GraphicsOutput->Mode->Mode,
+                      GraphicsOutput->Mode->FrameBufferBase,
+                      (UINT64)GraphicsOutput->Mode->FrameBufferSize,
+                      (UINT64)GraphicsOutput->Mode->SizeOfInfo,
+                      GraphicsOutput->Mode->Info->Version,
+                      GraphicsOutput->Mode->Info->HorizontalResolution,
+                      GraphicsOutput->Mode->Info->VerticalResolution,
+                      Fmt,
+                      GraphicsOutput->Mode->Info->PixelsPerScanLine,
+                      GraphicsOutput->Mode->Info->PixelFormat!=PixelBitMask?0:GraphicsOutput->Mode->Info->PixelInformation.RedMask,
+                      GraphicsOutput->Mode->Info->PixelFormat!=PixelBitMask?0:GraphicsOutput->Mode->Info->PixelInformation.GreenMask,
+                      GraphicsOutput->Mode->Info->PixelFormat!=PixelBitMask?0:GraphicsOutput->Mode->Info->PixelInformation.BlueMask
+                      );
+  
+  SHELL_FREE_NON_NULL(Temp);
+  SHELL_FREE_NON_NULL(Fmt);
 
   return RetVal;
 }
@@ -503,7 +605,7 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_SIM_POINTER),           &gEfiSimplePointerProtocolGuid,                   NULL},
   {STRING_TOKEN(STR_ABS_POINTER),           &gEfiAbsolutePointerProtocolGuid,                 NULL},
   {STRING_TOKEN(STR_SERIAL_IO),             &gEfiSerialIoProtocolGuid,                        NULL},
-  {STRING_TOKEN(STR_GRAPHICS_OUTPUT),       &gEfiGraphicsOutputProtocolGuid,                  NULL},
+  {STRING_TOKEN(STR_GRAPHICS_OUTPUT),       &gEfiGraphicsOutputProtocolGuid,                  GraphicsOutputProtocolDumpInformation},
   {STRING_TOKEN(STR_EDID_DISCOVERED),       &gEfiEdidDiscoveredProtocolGuid,                  NULL},
   {STRING_TOKEN(STR_EDID_ACTIVE),           &gEfiEdidActiveProtocolGuid,                      NULL},
   {STRING_TOKEN(STR_EDID_OVERRIDE),         &gEfiEdidOverrideProtocolGuid,                    NULL},
