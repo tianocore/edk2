@@ -1772,6 +1772,44 @@ DevPathFromTextSasEx (
 }
 
 /**
+  Converts a text device path node to NVM Express Namespace device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created NVM Express Namespace device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextNVMe (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  CHAR16                     *NamespaceIdStr;
+  CHAR16                     *NamespaceUuidStr;
+  NVME_NAMESPACE_DEVICE_PATH *Nvme;
+  UINT8                      *Uuid;
+  UINTN                      Index;
+
+  NamespaceIdStr   = GetNextParamStr (&TextDeviceNode);
+  NamespaceUuidStr = GetNextParamStr (&TextDeviceNode);
+  Nvme = (NVME_NAMESPACE_DEVICE_PATH *) CreateDeviceNode (
+    MESSAGING_DEVICE_PATH,
+    MSG_NVME_NAMESPACE_DP,
+    (UINT16) sizeof (NVME_NAMESPACE_DEVICE_PATH)
+    );
+
+  Nvme->NamespaceId = (UINT32) Strtoi (NamespaceIdStr);
+  Uuid = (UINT8 *) &Nvme->NamespaceUuid;
+
+  Index = sizeof (Nvme->NamespaceUuid) / sizeof (UINT8);
+  while (Index-- != 0) {
+    Uuid[Index] = (UINT8) StrHexToUintn (SplitStr (&NamespaceUuidStr, L'-'));
+  }
+
+  return (EFI_DEVICE_PATH_PROTOCOL *) Nvme;
+}
+
+/**
   Converts a text device path node to Debug Port device path structure.
 
   @param TextDeviceNode  The input Text device path node.
@@ -3040,6 +3078,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE mUefiDevicePathLibDevP
   {L"UartFlowCtrl",            DevPathFromTextUartFlowCtrl            },
   {L"SAS",                     DevPathFromTextSAS                     },
   {L"SasEx",                   DevPathFromTextSasEx                   },
+  {L"NVMe",                    DevPathFromTextNVMe                    },
   {L"DebugPort",               DevPathFromTextDebugPort               },
   {L"MAC",                     DevPathFromTextMAC                     },
   {L"IPv4",                    DevPathFromTextIPv4                    },
