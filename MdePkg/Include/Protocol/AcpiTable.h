@@ -2,7 +2,7 @@
   The file provides the protocol to install or remove an ACPI
   table from a platform. 
   
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -31,7 +31,12 @@ typedef struct _EFI_ACPI_TABLE_PROTOCOL EFI_ACPI_TABLE_PROTOCOL;
   copy into the RSDT/XSDT. InstallAcpiTable() must insert the new   
   table at the end of the RSDT/XSDT. To prevent namespace   
   collision, ACPI tables may be created using UEFI ACPI table   
-  format. On successful output, TableKey is   
+  format. If this protocol is used to install a table with a
+  signature already present in the system, the new table will not
+  replace the existing table. It is a platform implementation
+  decision to add a new table with a signature matching an
+  existing table or disallow duplicate table signatures and
+  return EFI_ACCESS_DENIED. On successful output, TableKey is   
   initialized with a unique key. Its value may be used in a   
   subsequent call to UninstallAcpiTable to remove an ACPI table.   
   If an EFI application is running at the time of this call, the   
@@ -61,7 +66,10 @@ typedef struct _EFI_ACPI_TABLE_PROTOCOL EFI_ACPI_TABLE_PROTOCOL;
   
   @retval EFI_OUT_OF_RESOURCES  Insufficient resources exist to
                                 complete the request.
-  
+  @retval EFI_ACCESS_DENIED     The table signature matches a table already
+                                present in the system and platform policy
+                                does not allow duplicate tables of this type.
+
 **/
 typedef
 EFI_STATUS

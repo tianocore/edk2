@@ -1,7 +1,7 @@
 /** @file
   ACPI Table Protocol Implementation
 
-  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -97,109 +97,6 @@ ChecksumCommonTables (
 //
 // Protocol function implementations.
 //
-
-/**
-  This function adds, removes, or updates ACPI tables.  If the address is not
-  null and the handle value is null, the table is added.  If both the address and 
-  handle are not null, the table at handle is updated with the table at address.
-  If the address is null and the handle is not, the table at handle is deleted.
-
-  @param  AcpiTableInstance  Instance of the protocol.
-  @param  Table              Pointer to a table.
-  @param  Checksum           Boolean indicating if the checksum should be calculated.
-  @param  Version            Version(s) to set.
-  @param  Handle             Handle of the table.
-
-  @return EFI_SUCCESS             The function completed successfully.
-  @return EFI_INVALID_PARAMETER   Both the Table and *Handle were NULL.
-  @return EFI_ABORTED             Could not complete the desired request.
-
-**/
-EFI_STATUS
-EFIAPI
-SetAcpiTable (
-  IN EFI_ACPI_TABLE_INSTANCE              *AcpiTableInstance,
-  IN VOID                                 *Table OPTIONAL,
-  IN BOOLEAN                              Checksum,
-  IN EFI_ACPI_TABLE_VERSION               Version,
-  IN OUT UINTN                            *Handle
-  )
-{
-  UINTN                     SavedHandle;
-  EFI_STATUS                Status;
-
-  //
-  // Check for invalid input parameters
-  //
-  ASSERT (Handle);
-
-  //
-  // Initialize locals
-  //
-  //
-  // Determine desired action
-  //
-  if (*Handle == 0) {
-    if (Table == NULL) {
-      //
-      // Invalid parameter combination
-      //
-      return EFI_INVALID_PARAMETER;
-    } else {
-      //
-      // Add table
-      //
-      Status = AddTableToList (AcpiTableInstance, Table, Checksum, Version, Handle);
-    }
-  } else {
-    if (Table != NULL) {
-      //
-      // Update table
-      //
-      //
-      // Delete the table list entry
-      //
-      Status = RemoveTableFromList (AcpiTableInstance, Version, *Handle);
-      if (EFI_ERROR (Status)) {
-        //
-        // Should not get an error here ever, but abort if we do.
-        //
-        return EFI_ABORTED;
-      }
-      //
-      // Set the handle to replace the table at the same handle
-      //
-      SavedHandle                         = AcpiTableInstance->CurrentHandle;
-      AcpiTableInstance->CurrentHandle  = *Handle;
-
-      //
-      // Add the table
-      //
-      Status = AddTableToList (AcpiTableInstance, Table, Checksum, Version, Handle);
-
-      //
-      // Restore the saved current handle
-      //
-      AcpiTableInstance->CurrentHandle = SavedHandle;
-    } else {
-      //
-      // Delete table
-      //
-      Status = RemoveTableFromList (AcpiTableInstance, Version, *Handle);
-    }
-  }
-
-  if (EFI_ERROR (Status)) {
-    //
-    // Should not get an error here ever, but abort if we do.
-    //
-    return EFI_ABORTED;
-  }
-  //
-  // Done
-  //
-  return EFI_SUCCESS;
-}
 
 /**
   This function publishes the specified versions of the ACPI tables by
@@ -303,6 +200,9 @@ PublishTables (
                                  and the size field embedded in the ACPI table pointed to by AcpiTableBuffer
                                  are not in sync.
   @return EFI_OUT_OF_RESOURCES   Insufficient resources exist to complete the request.
+  @retval EFI_ACCESS_DENIED      The table signature matches a table already
+                                 present in the system and platform policy
+                                 does not allow duplicate tables of this type.
 
 **/
 EFI_STATUS
@@ -336,7 +236,7 @@ InstallAcpiTable (
   //
   AcpiTableBufferConst = AllocateCopyPool (AcpiTableBufferSize,AcpiTableBuffer);
   *TableKey = 0;
-  Status = SetAcpiTable (
+  Status = AddTableToList (
              AcpiTableInstance,
              AcpiTableBufferConst,
              TRUE,
@@ -396,12 +296,10 @@ UninstallAcpiTable (
   //
   // Uninstall the ACPI table
   //
-  Status = SetAcpiTable (
+  Status = RemoveTableFromList (
              AcpiTableInstance,
-             NULL,
-             FALSE,
              EFI_ACPI_TABLE_VERSION_1_0B | EFI_ACPI_TABLE_VERSION_2_0 | EFI_ACPI_TABLE_VERSION_3_0,
-             &TableKey
+             TableKey
              );
   if (!EFI_ERROR (Status)) {
     Status = PublishTables (
@@ -528,8 +426,9 @@ ReallocateAcpiTableBuffer (
 
   @return EFI_SUCCESS               The function completed successfully.
   @return EFI_OUT_OF_RESOURCES      Could not allocate a required resource.
-  @return EFI_ABORTED               The table is a duplicate of a table that is required
-                                    to be unique.
+  @retval EFI_ACCESS_DENIED         The table signature matches a table already
+                                    present in the system and platform policy
+                                    does not allow duplicate tables of this type.
 
 **/
 EFI_STATUS
@@ -665,7 +564,7 @@ AddTableToList (
         ) {
       gBS->FreePages (CurrentTableList->PageAddress, CurrentTableList->NumberOfPages);
       gBS->FreePool (CurrentTableList);
-      return EFI_ABORTED;
+      return EFI_ACCESS_DENIED;
     }
     //
     // Add the table to the appropriate table version
@@ -800,7 +699,7 @@ AddTableToList (
         ) {
       gBS->FreePages (CurrentTableList->PageAddress, CurrentTableList->NumberOfPages);
       gBS->FreePool (CurrentTableList);
-      return EFI_ABORTED;
+      return EFI_ACCESS_DENIED;
     }
     //
     // FACS is referenced by FADT and is not part of RSDT
@@ -884,7 +783,7 @@ AddTableToList (
         ) {
       gBS->FreePages (CurrentTableList->PageAddress, CurrentTableList->NumberOfPages);
       gBS->FreePool (CurrentTableList);
-      return EFI_ABORTED;
+      return EFI_ACCESS_DENIED;
     }
     //
     // DSDT is referenced by FADT and is not part of RSDT
