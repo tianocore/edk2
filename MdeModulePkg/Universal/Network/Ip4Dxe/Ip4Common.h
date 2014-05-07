@@ -1,7 +1,7 @@
 /** @file
   Common definition for IP4.
   
-Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -199,35 +199,6 @@ Ip4GetMulticastMac (
 IP4_HEAD *
 Ip4NtohHead (
   IN IP4_HEAD           *Head
-  );
-
-/**
-  Set the Ip4 variable data.
-  
-  Save the list of all of the IPv4 addresses and subnet masks that are currently
-  being used to volatile variable storage.
-
-  @param[in]  IpSb                  Ip4 service binding instance
-
-  @retval EFI_SUCCESS           Successfully set variable.
-  @retval EFI_OUT_OF_RESOURCES  There are not enough resources to set the variable.
-  @retval other                 Set variable failed.
-
-**/
-EFI_STATUS
-Ip4SetVariableData (
-  IN IP4_SERVICE  *IpSb
-  );
-
-/**
-  Clear the variable and free the resource.
-
-  @param[in]  IpSb                  Ip4 service binding instance
-
-**/
-VOID
-Ip4ClearVariableData (
-  IN IP4_SERVICE  *IpSb
   );
 
 #endif

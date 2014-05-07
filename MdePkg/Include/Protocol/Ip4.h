@@ -3,14 +3,14 @@
   Protocol interface. It is split into the following three main
   sections:
   - EFI IPv4 Service Binding Protocol
-  - EFI IPv4 Variable
+  - EFI IPv4 Variable (deprecated in UEFI 2.4B)
   - EFI IPv4 Protocol.
   The EFI IPv4 Protocol provides basic network IPv4 packet I/O services,
   which includes support foR a subset of the Internet Control Message 
   Protocol (ICMP) and may include support for the Internet Group Management
   Protocol (IGMP).
   
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -40,13 +40,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   }
 
 typedef struct _EFI_IP4_PROTOCOL EFI_IP4_PROTOCOL;
-  
+
+///
+/// EFI_IP4_ADDRESS_PAIR is deprecated in the UEFI 2.4B and should not be used any more.
+/// The definition in here is only present to provide backwards compatability.
+///
 typedef struct {
   EFI_HANDLE              InstanceHandle;
   EFI_IPv4_ADDRESS        Ip4Address;
   EFI_IPv4_ADDRESS        SubnetMask;
 } EFI_IP4_ADDRESS_PAIR; 
 
+///
+/// EFI_IP4_VARIABLE_DATA is deprecated in the UEFI 2.4B and should not be used any more.
+/// The definition in here is only present to provide backwards compatability.
+///
 typedef struct {
   EFI_HANDLE              DriverHandle;
   UINT32                  AddressCount;

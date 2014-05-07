@@ -3,14 +3,14 @@
   Protocol interface. It is split into the following three main
   sections:
   - EFI IPv6 Service Binding Protocol
-  - EFI IPv6 Variable
+  - EFI IPv6 Variable (deprecated in UEFI 2.4B)
   - EFI IPv6 Protocol
   The EFI IPv6 Protocol provides basic network IPv6 packet I/O services,
   which includes support for Neighbor Discovery Protocol (ND), Multicast
   Listener Discovery Protocol (MLD), and a subset of the Internet Control
   Message Protocol (ICMPv6).
 
-  Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -43,7 +43,8 @@
 typedef struct _EFI_IP6_PROTOCOL EFI_IP6_PROTOCOL;
 
 ///
-/// EFI_IP6_ADDRESS_PAIR
+/// EFI_IP6_ADDRESS_PAIR is deprecated in the UEFI 2.4B and should not be used any more.
+/// The definition in here is only present to provide backwards compatability.
 ///
 typedef struct{
   ///
@@ -61,7 +62,8 @@ typedef struct{
 } EFI_IP6_ADDRESS_PAIR;
 
 ///
-/// EFI_IP6_VARIABLE_DATA
+/// EFI_IP6_VARIABLE_DATA is deprecated in the UEFI 2.4B and should not be used any more.
+/// The definition in here is only present to provide backwards compatability.
 ///
 typedef struct {
   ///

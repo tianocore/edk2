@@ -1,7 +1,7 @@
 /** @file
   The driver binding and service binding protocol for IP4 driver.
 
-Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -297,8 +297,6 @@ Ip4CreateService (
     IpSb->MaxPacketSize -= NET_VLAN_TAG_LEN;
   }
   IpSb->OldMaxPacketSize = IpSb->MaxPacketSize;
-  IpSb->MacString = NULL;
-
   *Service = IpSb;
   return EFI_SUCCESS;
 
@@ -519,8 +517,6 @@ Ip4DriverBindingStart (
   //
   mIp4Id = (UINT16)NET_RANDOM (NetRandomInitSeed ());
 
-  Ip4SetVariableData (IpSb);
-
   return Status;
 
 UNINSTALL_PROTOCOL:
@@ -715,11 +711,6 @@ Ip4DriverBindingStop (
   } else if (IsListEmpty (&IpSb->Children)) {
     State           = IpSb->State;
     IpSb->State     = IP4_SERVICE_DESTROY;
-
-    //
-    // Clear the variable data.
-    //
-    Ip4ClearVariableData (IpSb);
 
     //
     // OK, clean other resources then uninstall the service binding protocol.
@@ -975,9 +966,6 @@ Ip4ServiceBindingDestroyChild (
   }
 
   Status = Ip4CleanProtocol (IpInstance);
-
-  Ip4SetVariableData (IpSb);
-
   if (EFI_ERROR (Status)) {
     gBS->InstallMultipleProtocolInterfaces (
            &ChildHandle,

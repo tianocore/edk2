@@ -4,7 +4,7 @@
   The EFI UDPv4 Protocol provides simple packet-oriented services 
   to transmit and receive UDP packets.  
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -37,6 +37,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 typedef struct _EFI_UDP4_PROTOCOL EFI_UDP4_PROTOCOL; 
   
+///
+/// EFI_UDP4_SERVICE_POINT is deprecated in the UEFI 2.4B and should not be used any more.
+/// The definition in here is only present to provide backwards compatability.
+///
 typedef struct {
   EFI_HANDLE              InstanceHandle;
   EFI_IPv4_ADDRESS        LocalAddress;
@@ -45,6 +49,10 @@ typedef struct {
   UINT16                  RemotePort;
 } EFI_UDP4_SERVICE_POINT; 
 
+///
+/// EFI_UDP4_VARIABLE_DATA is deprecated in the UEFI 2.4B and should not be used any more.
+/// The definition in here is only present to provide backwards compatability.
+///
 typedef struct {
   EFI_HANDLE              DriverHandle;
   UINT32                  ServiceCount;

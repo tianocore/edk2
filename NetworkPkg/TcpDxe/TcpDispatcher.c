@@ -1,7 +1,7 @@
 /** @file
   The implementation of a dispatch routine for processing TCP requests.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -327,8 +327,6 @@ TcpFlushPcb (
       FreePool (Sock->DevicePath);
       Sock->DevicePath = NULL;
     }
-
-    TcpSetVariableData (TcpProto->TcpService);
   }
 
   NetbufFreeList (&Tcb->SndQue);

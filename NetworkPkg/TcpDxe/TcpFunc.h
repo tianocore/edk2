@@ -1,7 +1,7 @@
 /** @file
   Declaration of external functions shared in TCP driver.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -274,31 +274,6 @@ TcpOnAppAbort (
 VOID
 TcpResetConnection (
   IN TCP_CB *Tcb
-  );
-
-/**
-  Set the Tcp variable data.
-
-  @param[in]  TcpService        Tcp service data.
-
-  @retval EFI_OUT_OF_RESOURCES  There are not enough resources to set the variable.
-  @retval other                 Set variable failed.
-
-**/
-EFI_STATUS
-TcpSetVariableData (
-  IN TCP_SERVICE_DATA  *TcpService
-  );
-
-/**
-  Clear the variable and free the resource.
-
-  @param[in]  TcpService            Tcp service data.
-
-**/
-VOID
-TcpClearVariableData (
-  IN TCP_SERVICE_DATA  *TcpService
   );
 
 /**

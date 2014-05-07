@@ -4,7 +4,7 @@
   and destroy child of the driver to communicate with other host using TCP protocol.
   The EFI TCPv6 Protocol provides services to send and receive data stream.
 
-  Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -38,7 +38,8 @@
 typedef struct _EFI_TCP6_PROTOCOL EFI_TCP6_PROTOCOL;
 
 ///
-/// EFI_TCP6_SERVICE_POINT
+/// EFI_TCP6_SERVICE_POINT is deprecated in the UEFI 2.4B and should not be used any more.
+/// The definition in here is only present to provide backwards compatability.
 ///
 typedef struct {
   ///
@@ -69,7 +70,8 @@ typedef struct {
 } EFI_TCP6_SERVICE_POINT;
 
 ///
-/// EFI_TCP6_VARIABLE_DATA
+/// EFI_TCP6_VARIABLE_DATA is deprecated in the UEFI 2.4B and should not be used any more.
+/// The definition in here is only present to provide backwards compatability.
 ///
 typedef struct {
   EFI_HANDLE             DriverHandle; ///< The handle of the driver that creates this entry.

@@ -1,7 +1,7 @@
 /** @file
   Tcp function header file.
 
-Copyright (c) 2005 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -762,31 +762,6 @@ TcpSetKeepaliveTimer (
 VOID
 TcpBackoffRto (
   IN OUT TCP_CB *Tcb
-  );
-
-/**
-  Set the Tdp4 variable data.
-
-  @param  Tcp4Service           Pointer to Tcp4 service data.
-
-  @retval EFI_OUT_OF_RESOURCES  There are not enough resources to set the variable.
-  @retval other                 Set variable failed.
-
-**/
-EFI_STATUS
-TcpSetVariableData (
-  IN TCP4_SERVICE_DATA  *Tcp4Service
-  );
-
-/**
-  Clear the variable and free the resource.
-
-  @param  Tcp4Service           Pointer to Tcp4 service data.
-
-**/
-VOID
-TcpClearVariableData (
-  IN TCP4_SERVICE_DATA  *Tcp4Service
   );
 
 /**

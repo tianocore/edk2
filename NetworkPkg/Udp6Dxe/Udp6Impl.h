@@ -1,7 +1,7 @@
 /** @file
   Udp6 driver's whole implementation and internal data structures.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -79,8 +79,7 @@ typedef struct _UDP6_SERVICE_DATA {
   UINTN                         ChildrenNumber;
   IP_IO                         *IpIo;
   EFI_EVENT                     TimeoutEvent;
-  CHAR16                        *MacString;
-} UDP6_SERVICE_DATA;
+ } UDP6_SERVICE_DATA;
 
 typedef struct _UDP6_INSTANCE_DATA {
   UINT32                Signature;
@@ -145,22 +144,7 @@ Udp6CreateService (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_HANDLE         ControllerHandle
   );
-
-/**
-  Set the Udp6 variable data.
-
-  @param[in]  Udp6Service            Udp6 service data.
-
-  @retval     EFI_OUT_OF_RESOURCES   There are not enough resources to set the
-                                     variable.
-  @retval     other                  Set variable failed.
-
-**/
-EFI_STATUS
-Udp6SetVariableData (
-  IN UDP6_SERVICE_DATA  *Udp6Service
-  );
-
+ 
 /**
   This function cleans the udp instance.
 
@@ -171,18 +155,7 @@ VOID
 Udp6CleanInstance (
   IN OUT UDP6_INSTANCE_DATA  *Instance
   );
-
-/**
-  Clear the variable and free the resource.
-
-  @param[in, out]  Udp6Service            Udp6 service data.
-
-**/
-VOID
-Udp6ClearVariableData (
-  IN OUT UDP6_SERVICE_DATA  *Udp6Service
-  );
-
+ 
 /**
   This function intializes the new created udp instance.
 

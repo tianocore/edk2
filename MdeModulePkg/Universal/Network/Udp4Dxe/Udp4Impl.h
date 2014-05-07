@@ -1,7 +1,7 @@
 /** @file
   EFI UDPv4 protocol implementation.
    
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -72,8 +72,6 @@ typedef struct _UDP4_SERVICE_DATA_ {
   IP_IO                         *IpIo;
 
   EFI_EVENT                     TimeoutEvent;
-
-  CHAR16                        *MacString;
 } UDP4_SERVICE_DATA;
 
 #define UDP4_INSTANCE_DATA_SIGNATURE  SIGNATURE_32('U', 'd', 'p', 'I')
@@ -693,33 +691,5 @@ EFIAPI
 Udp4NetVectorExtFree (
   VOID  *Context
   );
-
-/**
-  Set the Udp4 variable data.
-
-  @param[in] Udp4Service         Udp4 service data.
-
-  @retval EFI_OUT_OF_RESOURCES   There are not enough resources to set the
-                                 variable.
-  @retval EFI_SUCCESS            Set variable successfully.
-  @retval other                  Set variable failed.
-
-**/
-EFI_STATUS
-Udp4SetVariableData (
-  IN UDP4_SERVICE_DATA  *Udp4Service
-  );
-
-/**
-  Clear the variable and free the resource.
-
-  @param[[in]  Udp4Service            Udp4 service data.
-
-**/
-VOID
-Udp4ClearVariableData (
-  IN UDP4_SERVICE_DATA  *Udp4Service
-  );
-
+ 
 #endif
-

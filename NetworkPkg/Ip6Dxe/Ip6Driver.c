@@ -1,7 +1,7 @@
 /** @file
   The driver binding and service binding protocol for IP6 driver.
 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -573,8 +573,6 @@ Ip6DriverBindingStart (
     //
     mIp6Id = NET_RANDOM (NetRandomInitSeed ());
 
-    Ip6SetVariableData (IpSb);
-
     return EFI_SUCCESS;
   }
 
@@ -700,11 +698,6 @@ Ip6DriverBindingStop (
   } else if (IsListEmpty (&IpSb->Children)) {
     State           = IpSb->State;
     IpSb->State     = IP6_SERVICE_DESTROY;
-
-    //
-    // Clear the variable data.
-    //
-    Ip6ClearVariableData (IpSb);
 
     Status = Ip6CleanService (IpSb);
     if (EFI_ERROR (Status)) {
@@ -943,9 +936,6 @@ Ip6ServiceBindingDestroyChild (
   }
 
   Status = Ip6CleanProtocol (IpInstance);
-
-  Ip6SetVariableData (IpSb);
-
   if (EFI_ERROR (Status)) {
     gBS->InstallMultipleProtocolInterfaces (
            &ChildHandle,

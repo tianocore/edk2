@@ -1,7 +1,7 @@
 /** @file
   Driver Binding functions and Service Binding functions for the Network driver module.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -165,8 +165,6 @@ Udp6DriverBindingStart (
   if (EFI_ERROR (Status)) {
     Udp6CleanService (Udp6Service);
     goto EXIT;
-  } else {
-    Status = Udp6SetVariableData (Udp6Service);
   }
 
 EXIT:
@@ -298,9 +296,7 @@ Udp6DriverBindingStop (
            &Udp6Service->ServiceBinding,
            NULL
            );
-
-    Udp6ClearVariableData (Udp6Service);
-
+ 
     Udp6CleanService (Udp6Service);
 
     FreePool (Udp6Service);

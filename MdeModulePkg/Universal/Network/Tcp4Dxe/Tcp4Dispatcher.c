@@ -1,7 +1,7 @@
 /** @file
   Tcp request dispatcher implementation.
 
-Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -237,8 +237,6 @@ Tcp4FlushPcb (
              );
       FreePool (Sock->DevicePath);
     }
-
-    TcpSetVariableData (TcpProto->TcpService);
   }
 
   NetbufFreeList (&Tcb->SndQue);

@@ -1,7 +1,7 @@
 /** @file
   The prototype of driver binding and service binding protocol for TCP driver.
 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -33,7 +33,6 @@ typedef struct _TCP_SERVICE_DATA {
   UINT8                         IpVersion;
   IP_IO                         *IpIo;
   EFI_SERVICE_BINDING_PROTOCOL  ServiceBinding;
-  CHAR16                        *MacString;
   LIST_ENTRY                    SocketList;
 } TCP_SERVICE_DATA;
 

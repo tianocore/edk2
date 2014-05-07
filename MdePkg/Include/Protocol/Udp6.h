@@ -3,7 +3,7 @@
   the EFI IPv6 Protocol and provides simple packet-oriented services to transmit and receive
   UDP packets.
 
-  Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -32,6 +32,10 @@
     0x4f948815, 0xb4b9, 0x43cb, {0x8a, 0x33, 0x90, 0xe0, 0x60, 0xb3, 0x49, 0x55 } \
   }
 
+///
+/// EFI_UDP6_SERVICE_POINT is deprecated in the UEFI 2.4B and should not be used any more.
+/// The definition in here is only present to provide backwards compatability.
+///
 typedef struct {
   ///
   /// The EFI UDPv6 Protocol instance handle that is using this address/port pair.
@@ -59,6 +63,10 @@ typedef struct {
   UINT16              RemotePort;
 } EFI_UDP6_SERVICE_POINT;
 
+///
+/// EFI_UDP6_VARIABLE_DATA is deprecated in the UEFI 2.4B and should not be used any more.
+/// The definition in here is only present to provide backwards compatability.
+///
 typedef struct {
   ///
   /// The handle of the driver that creates this entry.

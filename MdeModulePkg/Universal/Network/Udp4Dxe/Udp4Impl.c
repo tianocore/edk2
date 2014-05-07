@@ -1,7 +1,7 @@
 /** @file
   The implementation of the Udp4 protocol.
   
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1633,8 +1633,6 @@ Udp4Demultiplex (
     }
   }
 
-  gRT->GetTime (&RxData.TimeStamp, NULL);
-
   Udp4Session                  = &RxData.UdpSession;
   Udp4Session->SourcePort      = NTOHS (Udp4Header->SrcPort);
   Udp4Session->DestinationPort = NTOHS (Udp4Header->DstPort);
@@ -1896,166 +1894,4 @@ Udp4NetVectorExtFree (
   VOID  *Context
   )
 {
-}
-
-
-/**
-  Set the Udp4 variable data.
-
-  @param[in] Udp4Service         Udp4 service data.
-
-  @retval EFI_OUT_OF_RESOURCES   There are not enough resources to set the
-                                 variable.
-  @retval EFI_SUCCESS            Set variable successfully.
-  @retval other                  Set variable failed.
-
-**/
-EFI_STATUS
-Udp4SetVariableData (
-  IN UDP4_SERVICE_DATA  *Udp4Service
-  )
-{
-  UINT32                  NumConfiguredInstance;
-  LIST_ENTRY              *Entry;
-  UINTN                   VariableDataSize;
-  EFI_UDP4_VARIABLE_DATA  *Udp4VariableData;
-  EFI_UDP4_SERVICE_POINT  *Udp4ServicePoint;
-  UDP4_INSTANCE_DATA      *Udp4Instance;
-  CHAR16                  *NewMacString;
-  EFI_STATUS              Status;
-
-  NumConfiguredInstance = 0;
-
-  //
-  // Go through the children list to count the configured children.
-  //
-  NET_LIST_FOR_EACH (Entry, &Udp4Service->ChildrenList) {
-    Udp4Instance = NET_LIST_USER_STRUCT_S (
-                     Entry,
-                     UDP4_INSTANCE_DATA,
-                     Link,
-                     UDP4_INSTANCE_DATA_SIGNATURE
-                     );
-
-    if (Udp4Instance->Configured) {
-      NumConfiguredInstance++;
-    }
-  }
-
-  //
-  // Calculate the size of the Udp4VariableData. As there may be no Udp4 child,
-  // we should add extra buffer for the service points only if the number of configured
-  // children is more than 1.
-  //
-  VariableDataSize = sizeof (EFI_UDP4_VARIABLE_DATA);
-
-  if (NumConfiguredInstance > 1) {
-    VariableDataSize += sizeof (EFI_UDP4_SERVICE_POINT) * (NumConfiguredInstance - 1);
-  }
-
-  Udp4VariableData = AllocatePool (VariableDataSize);
-  if (Udp4VariableData == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  Udp4VariableData->DriverHandle = Udp4Service->ImageHandle;
-  Udp4VariableData->ServiceCount = NumConfiguredInstance;
-
-  Udp4ServicePoint = &Udp4VariableData->Services[0];
-
-  //
-  // Go through the children list to fill the configured children's address pairs.
-  //
-  NET_LIST_FOR_EACH (Entry, &Udp4Service->ChildrenList) {
-    Udp4Instance = NET_LIST_USER_STRUCT_S (
-                     Entry,
-                     UDP4_INSTANCE_DATA,
-                     Link,
-                     UDP4_INSTANCE_DATA_SIGNATURE
-                     );
-
-    if (Udp4Instance->Configured) {
-      Udp4ServicePoint->InstanceHandle = Udp4Instance->ChildHandle;
-      Udp4ServicePoint->LocalAddress   = Udp4Instance->ConfigData.StationAddress;
-      Udp4ServicePoint->LocalPort      = Udp4Instance->ConfigData.StationPort;
-      Udp4ServicePoint->RemoteAddress  = Udp4Instance->ConfigData.RemoteAddress;
-      Udp4ServicePoint->RemotePort     = Udp4Instance->ConfigData.RemotePort;
-
-      Udp4ServicePoint++;
-    }
-  }
-
-  //
-  // Get the mac string.
-  //
-  Status = NetLibGetMacString (
-             Udp4Service->ControllerHandle,
-             Udp4Service->ImageHandle,
-             &NewMacString
-             );
-  if (EFI_ERROR (Status)) {
-    goto ON_ERROR;
-  }
-
-  if (Udp4Service->MacString != NULL) {
-    //
-    // The variable is set already, we're going to update it.
-    //
-    if (StrCmp (Udp4Service->MacString, NewMacString) != 0) {
-      //
-      // The mac address is changed, delete the previous variable first.
-      //
-      gRT->SetVariable (
-             Udp4Service->MacString,
-             &gEfiUdp4ServiceBindingProtocolGuid,
-             EFI_VARIABLE_BOOTSERVICE_ACCESS,
-             0,
-             NULL
-             );
-    }
-
-    FreePool (Udp4Service->MacString);
-  }
-
-  Udp4Service->MacString = NewMacString;
-
-  Status = gRT->SetVariable (
-                  Udp4Service->MacString,
-                  &gEfiUdp4ServiceBindingProtocolGuid,
-                  EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                  VariableDataSize,
-                  (VOID *) Udp4VariableData
-                  );
-
-ON_ERROR:
-
-  FreePool (Udp4VariableData);
-
-  return Status;
-}
-
-
-/**
-  Clear the variable and free the resource.
-
-  @param[[in]  Udp4Service            Udp4 service data.
-
-**/
-VOID
-Udp4ClearVariableData (
-  IN UDP4_SERVICE_DATA  *Udp4Service
-  )
-{
-  ASSERT (Udp4Service->MacString != NULL);
-
-  gRT->SetVariable (
-         Udp4Service->MacString,
-         &gEfiUdp4ServiceBindingProtocolGuid,
-         EFI_VARIABLE_BOOTSERVICE_ACCESS,
-         0,
-         NULL
-         );
-
-  FreePool (Udp4Service->MacString);
-  Udp4Service->MacString = NULL;
 }

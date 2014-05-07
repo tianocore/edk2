@@ -1,7 +1,7 @@
 /** @file
   Udp6 driver's whole implementation.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1623,8 +1623,6 @@ Udp6Demultiplex (
     }
   }
 
-  gRT->GetTime (&RxData.TimeStamp, NULL);
-
   Udp6Session                  = &RxData.UdpSession;
   Udp6Session->SourcePort      = NTOHS (Udp6Header->SrcPort);
   Udp6Session->DestinationPort = NTOHS (Udp6Header->DstPort);
@@ -1933,175 +1931,7 @@ Udp6NetVectorExtFree (
   IN VOID  *Context
   )
 {
-}
-
-
-/**
-  Set the Udp6 variable data.
-
-  @param[in]  Udp6Service            Udp6 service data.
-
-  @retval     EFI_OUT_OF_RESOURCES   There are not enough resources to set the
-                                     variable.
-  @retval     other                  Set variable failed.
-
-**/
-EFI_STATUS
-Udp6SetVariableData (
-  IN UDP6_SERVICE_DATA  *Udp6Service
-  )
-{
-  UINT32                  NumConfiguredInstance;
-  LIST_ENTRY              *Entry;
-  UINTN                   VariableDataSize;
-  EFI_UDP6_VARIABLE_DATA  *Udp6VariableData;
-  EFI_UDP6_SERVICE_POINT  *Udp6ServicePoint;
-  UDP6_INSTANCE_DATA      *Udp6Instance;
-  CHAR16                  *NewMacString;
-  EFI_STATUS              Status;
-
-  NumConfiguredInstance = 0;
-
-  //
-  // Go through the children list to count the configured children.
-  //
-  NET_LIST_FOR_EACH (Entry, &Udp6Service->ChildrenList) {
-    Udp6Instance = NET_LIST_USER_STRUCT_S (
-                     Entry,
-                     UDP6_INSTANCE_DATA,
-                     Link,
-                     UDP6_INSTANCE_DATA_SIGNATURE
-                     );
-
-    if (Udp6Instance->Configured) {
-      NumConfiguredInstance++;
-    }
-  }
-
-  //
-  // Calculate the size of the Udp6VariableData. As there may be no Udp6 child,
-  // we should add extra buffer for the service points only if the number of configured
-  // children is more than 1.
-  //
-  VariableDataSize = sizeof (EFI_UDP6_VARIABLE_DATA);
-
-  if (NumConfiguredInstance > 1) {
-    VariableDataSize += sizeof (EFI_UDP6_SERVICE_POINT) * (NumConfiguredInstance - 1);
-  }
-
-  Udp6VariableData = AllocateZeroPool (VariableDataSize);
-  if (Udp6VariableData == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  Udp6VariableData->DriverHandle = Udp6Service->ImageHandle;
-  Udp6VariableData->ServiceCount = NumConfiguredInstance;
-
-  Udp6ServicePoint = &Udp6VariableData->Services[0];
-
-  //
-  // Go through the children list to fill the configured children's address pairs.
-  //
-  NET_LIST_FOR_EACH (Entry, &Udp6Service->ChildrenList) {
-    Udp6Instance = NET_LIST_USER_STRUCT_S (
-                     Entry,
-                     UDP6_INSTANCE_DATA,
-                     Link,
-                     UDP6_INSTANCE_DATA_SIGNATURE
-                     );
-
-    if (Udp6Instance->Configured) {
-      Udp6ServicePoint->InstanceHandle = Udp6Instance->ChildHandle;
-      Udp6ServicePoint->LocalPort      = Udp6Instance->ConfigData.StationPort;
-      Udp6ServicePoint->RemotePort     = Udp6Instance->ConfigData.RemotePort;
-
-      IP6_COPY_ADDRESS (
-        &Udp6ServicePoint->LocalAddress,
-        &Udp6Instance->ConfigData.StationAddress
-        );
-      IP6_COPY_ADDRESS (
-        &Udp6ServicePoint->RemoteAddress,
-        &Udp6Instance->ConfigData.RemoteAddress
-        );
-      Udp6ServicePoint++;
-    }
-  }
-
-  //
-  // Get the MAC string.
-  //
-  Status = NetLibGetMacString (
-             Udp6Service->ControllerHandle,
-             Udp6Service->ImageHandle,
-             &NewMacString
-             );
-  if (EFI_ERROR (Status)) {
-    goto EXIT;
-  }
-
-  if (Udp6Service->MacString != NULL) {
-    //
-    // The variable is set already, we're going to update it.
-    //
-    if (StrCmp (Udp6Service->MacString, NewMacString) != 0) {
-      //
-      // The MAC address is changed, delete the previous variable first.
-      //
-      gRT->SetVariable (
-             Udp6Service->MacString,
-             &gEfiUdp6ServiceBindingProtocolGuid,
-             EFI_VARIABLE_BOOTSERVICE_ACCESS,
-             0,
-             NULL
-             );
-    }
-
-    FreePool (Udp6Service->MacString);
-  }
-
-  Udp6Service->MacString = NewMacString;
-
-  Status = gRT->SetVariable (
-                  Udp6Service->MacString,
-                  &gEfiUdp6ServiceBindingProtocolGuid,
-                  EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                  VariableDataSize,
-                  (VOID *) Udp6VariableData
-                  );
-
-EXIT:
-
-  FreePool (Udp6VariableData);
-
-  return Status;
-}
-
-
-/**
-  Clear the variable and free the resource.
-
-  @param[in, out]  Udp6Service            Udp6 service data.
-
-**/
-VOID
-Udp6ClearVariableData (
-  IN OUT UDP6_SERVICE_DATA  *Udp6Service
-  )
-{
-  ASSERT (Udp6Service->MacString != NULL);
-
-  gRT->SetVariable (
-         Udp6Service->MacString,
-         &gEfiUdp6ServiceBindingProtocolGuid,
-         EFI_VARIABLE_BOOTSERVICE_ACCESS,
-         0,
-         NULL
-         );
-
-  FreePool (Udp6Service->MacString);
-  Udp6Service->MacString = NULL;
-}
-
+} 
 
 /**
   Find the key in the netmap.

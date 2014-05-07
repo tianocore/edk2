@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -701,8 +701,6 @@ Ip4AutoConfigCallBackDpc (
 
   IpSb->State = IP4_SERVICE_CONFIGED;
 
-  Ip4SetVariableData (IpSb);
-
 ON_EXIT:
   FreePool (Data);
 }
@@ -1311,11 +1309,6 @@ EfiIp4Configure (
   // whether it is necessary to reconfigure the MNP.
   //
   Ip4ServiceConfigMnp (IpInstance->Service, FALSE);
-
-  //
-  // Update the variable data.
-  //
-  Ip4SetVariableData (IpInstance->Service);
 
 ON_EXIT:
   gBS->RestoreTPL (OldTpl);

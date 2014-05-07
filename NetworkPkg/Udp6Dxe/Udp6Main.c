@@ -1,7 +1,7 @@
 /** @file
   Contains all EFI_UDP6_PROTOCOL interfaces.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -275,7 +275,7 @@ Udp6Configure (
     //
     // Cancel all the user tokens.
     //
-    Status = Instance->Udp6Proto.Cancel (&Instance->Udp6Proto, NULL);
+    Instance->Udp6Proto.Cancel (&Instance->Udp6Proto, NULL);
 
     //
     // Remove the buffered RxData for this instance.
@@ -284,9 +284,7 @@ Udp6Configure (
 
     ASSERT (IsListEmpty (&Instance->DeliveredDgramQue));
   }
-
-  Status = Udp6SetVariableData (Instance->Udp6Service);
-
+ 
 ON_EXIT:
 
   gBS->RestoreTPL (OldTpl);

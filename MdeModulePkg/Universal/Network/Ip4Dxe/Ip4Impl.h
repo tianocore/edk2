@@ -1,7 +1,7 @@
 /** @file
   Ip4 internal functions and type defintions.
   
-Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -202,11 +202,6 @@ struct _IP4_SERVICE {
   EFI_EVENT                       ReconfigEvent;
   EFI_EVENT                       ActiveEvent;
 
-  //
-  // The string representation of the current mac address of the
-  // NIC this IP4_SERVICE works on.
-  //
-  CHAR16                          *MacString;
   UINT32                          MaxPacketSize;
   UINT32                          OldMaxPacketSize; ///< The MTU before IPsec enable.
 };
