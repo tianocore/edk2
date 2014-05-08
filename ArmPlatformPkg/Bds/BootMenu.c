@@ -215,7 +215,7 @@ BootMenuAddBootOption (
 
     BootArguments->LinuxArguments.CmdLineSize = CmdLineSize;
     BootArguments->LinuxArguments.InitrdSize = InitrdSize;
-    CopyMem ((VOID*)(&BootArguments->LinuxArguments + 1), CmdLine, CmdLineSize);
+    CopyMem ((VOID*)(&BootArguments->LinuxArguments + 1), AsciiCmdLine, CmdLineSize);
     CopyMem ((VOID*)((UINTN)(&BootArguments->LinuxArguments + 1) + CmdLineSize), InitrdPath, InitrdSize);
 
     OptionalData = (UINT8*)BootArguments;
