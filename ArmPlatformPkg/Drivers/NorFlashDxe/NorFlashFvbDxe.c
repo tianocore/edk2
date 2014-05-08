@@ -417,7 +417,6 @@ FvbRead (
   IN OUT    UINT8                                 *Buffer
   )
 {
-  EFI_STATUS    Status;
   EFI_STATUS    TempStatus;
   UINTN         BlockSize;
   NOR_FLASH_INSTANCE *Instance;
@@ -430,8 +429,7 @@ FvbRead (
     Instance->Initialize(Instance);
   }
 
-  Status = EFI_SUCCESS;
-  TempStatus = Status;
+  TempStatus = EFI_SUCCESS;
 
   // Cache the block size to avoid de-referencing pointers all the time
   BlockSize = Instance->Media.BlockSize;
@@ -452,25 +450,21 @@ FvbRead (
     return EFI_BAD_BUFFER_SIZE;
   }
 
-  // Check we did get some memory
-  if (Instance->FvbBuffer == NULL) {
-    DEBUG ((EFI_D_ERROR, "FvbRead: ERROR - Buffer not ready\n"));
-    return EFI_DEVICE_ERROR;
+  // Decide if we are doing full block reads or not.
+  if (*NumBytes % BlockSize != 0) {
+    TempStatus = NorFlashRead (Instance, Instance->StartLba + Lba, Offset, *NumBytes, Buffer);
+    if (EFI_ERROR (TempStatus)) {
+      return EFI_DEVICE_ERROR;
+    }
+  } else {
+    // Read NOR Flash data into shadow buffer
+    TempStatus = NorFlashReadBlocks (Instance, Instance->StartLba + Lba, BlockSize, Buffer);
+    if (EFI_ERROR (TempStatus)) {
+      // Return one of the pre-approved error statuses
+      return EFI_DEVICE_ERROR;
+    }
   }
-
-  // Read NOR Flash data into shadow buffer
-  TempStatus = NorFlashReadBlocks (Instance, Instance->StartLba + Lba, BlockSize, Instance->FvbBuffer);
-  if (EFI_ERROR (TempStatus)) {
-    // Return one of the pre-approved error statuses
-    return EFI_DEVICE_ERROR;
-  }
-
-  // Put the data at the appropriate location inside the buffer area
-  DEBUG ((DEBUG_BLKIO, "FvbRead: CopyMem( Dst=0x%08x, Src=0x%08x, Size=0x%x ).\n", Buffer, (UINTN)Instance->FvbBuffer + Offset, *NumBytes));
-
-  CopyMem (Buffer, (VOID*)((UINTN)Instance->FvbBuffer + Offset), *NumBytes);
-
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /**
@@ -537,10 +531,21 @@ FvbWrite (
   IN        UINT8                                 *Buffer
   )
 {
-  EFI_STATUS  Status;
   EFI_STATUS  TempStatus;
+  UINT32      Tmp;
+  UINT32      TmpBuf;
+  UINT32      WordToWrite;
+  UINT32      Mask;
+  UINTN       DoErase;
+  UINTN       BytesToWrite;
+  UINTN       CurOffset;
+  UINTN       WordAddr;
   UINTN       BlockSize;
   NOR_FLASH_INSTANCE *Instance;
+  UINTN       BlockAddress;
+  UINTN       PrevBlockAddress;
+
+  PrevBlockAddress = 0;
 
   Instance = INSTANCE_FROM_FVB_THIS(This);
 
@@ -549,9 +554,6 @@ FvbWrite (
   }
 
   DEBUG ((DEBUG_BLKIO, "FvbWrite(Parameters: Lba=%ld, Offset=0x%x, *NumBytes=0x%x, Buffer @ 0x%08x)\n", Instance->StartLba + Lba, Offset, *NumBytes, Buffer));
-
-  Status = EFI_SUCCESS;
-  TempStatus = Status;
 
   // Detect WriteDisabled state
   if (Instance->Media.ReadOnly == TRUE) {
@@ -578,7 +580,129 @@ FvbWrite (
     return EFI_BAD_BUFFER_SIZE;
   }
 
-  // Check we did get some memory
+  // Pick 128bytes as a good start for word operations as opposed to erasing the
+  // block and writing the data regardless if an erase is really needed.
+  // It looks like most individual NV variable writes are smaller than 128bytes.
+  if (*NumBytes <= 128) {
+    // Check to see if we need to erase before programming the data into NOR.
+    // If the destination bits are only changing from 1s to 0s we can just write.
+    // After a block is erased all bits in the block is set to 1.
+    // If any byte requires us to erase we just give up and rewrite all of it.
+    DoErase = 0;
+    BytesToWrite = *NumBytes;
+    CurOffset = Offset;
+
+    while (BytesToWrite > 0) {
+      // Read full word from NOR, splice as required. A word is the smallest
+      // unit we can write.
+      TempStatus = NorFlashRead (Instance, Instance->StartLba + Lba,
+                                 CurOffset & ~(0x3), sizeof(Tmp), &Tmp);
+      if (EFI_ERROR (TempStatus)) {
+        return EFI_DEVICE_ERROR;
+      }
+
+      // Physical address of word in NOR to write.
+      WordAddr = (CurOffset & ~(0x3)) + GET_NOR_BLOCK_ADDRESS (Instance->RegionBaseAddress,
+                                                               Lba, BlockSize);
+      // The word of data that is to be written.
+      TmpBuf = *((UINT32*)(Buffer + (*NumBytes - BytesToWrite)));
+
+      // First do word aligned chunks.
+      if ((CurOffset & 0x3) == 0) {
+        if (BytesToWrite >= 4) {
+          // Is the destination still in 'erased' state?
+          if (~Tmp != 0) {
+            // Check to see if we are only changing bits to zero.
+            if ((Tmp ^ TmpBuf) & TmpBuf) {
+              DoErase = 1;
+              break;
+            }
+          }
+          // Write this word to NOR
+          WordToWrite = TmpBuf;
+          CurOffset += sizeof(TmpBuf);
+          BytesToWrite -= sizeof(TmpBuf);
+        } else {
+          // BytesToWrite < 4. Do small writes and left-overs
+          Mask = ~((~0) << (BytesToWrite * 8));
+          // Mask out the bytes we want.
+          TmpBuf &= Mask;
+          // Is the destination still in 'erased' state?
+          if ((Tmp & Mask) != Mask) {
+            // Check to see if we are only changing bits to zero.
+            if ((Tmp ^ TmpBuf) & TmpBuf) {
+              DoErase = 1;
+              break;
+            }
+          }
+          // Merge old and new data. Write merged word to NOR
+          WordToWrite = (Tmp & ~Mask) | TmpBuf;
+          CurOffset += BytesToWrite;
+          BytesToWrite = 0;
+        }
+      } else {
+        // Do multiple words, but starting unaligned.
+        if (BytesToWrite > (4 - (CurOffset & 0x3))) {
+          Mask = ~((~0) << ((CurOffset & 0x3) * 8));
+          // Mask out the bytes we want.
+          TmpBuf = (TmpBuf << ((CurOffset & 0x3) * 8)) & Mask;
+          // Is the destination still in 'erased' state?
+          if ((Tmp & Mask) != Mask) {
+            // Check to see if we are only changing bits to zero.
+            if ((Tmp ^ TmpBuf) & TmpBuf) {
+              DoErase = 1;
+              break;
+            }
+          }
+          // Merge old and new data. Write merged word to NOR
+          WordToWrite = (Tmp & ~Mask) | TmpBuf;
+          BytesToWrite -= (4 - (CurOffset & 0x3));
+          CurOffset += (4 - (CurOffset & 0x3));
+        } else {
+          // Unaligned and fits in one word.
+          Mask = (~((~0) << (BytesToWrite * 8))) << ((CurOffset & 0x3) * 8);
+          // Mask out the bytes we want.
+          TmpBuf = (TmpBuf << ((CurOffset & 0x3) * 8)) & Mask;
+          // Is the destination still in 'erased' state?
+          if ((Tmp & Mask) != Mask) {
+            // Check to see if we are only changing bits to zero.
+            if ((Tmp ^ TmpBuf) & TmpBuf) {
+              DoErase = 1;
+              break;
+            }
+          }
+          // Merge old and new data. Write merged word to NOR
+          WordToWrite = (Tmp & ~Mask) | TmpBuf;
+          CurOffset += BytesToWrite;
+          BytesToWrite = 0;
+        }
+      }
+
+      //
+      // Write the word to NOR.
+      //
+
+      BlockAddress = GET_NOR_BLOCK_ADDRESS (Instance->RegionBaseAddress, Lba, BlockSize);
+      if (BlockAddress != PrevBlockAddress) {
+        TempStatus = NorFlashUnlockSingleBlockIfNecessary (Instance, BlockAddress);
+        if (EFI_ERROR (TempStatus)) {
+          return EFI_DEVICE_ERROR;
+        }
+        PrevBlockAddress = BlockAddress;
+      }
+      TempStatus = NorFlashWriteSingleWord (Instance, WordAddr, WordToWrite);
+      if (EFI_ERROR (TempStatus)) {
+        return EFI_DEVICE_ERROR;
+      }
+    }
+    // Exit if we got here and could write all the data. Otherwise do the
+    // Erase-Write cycle.
+    if (!DoErase) {
+      return EFI_SUCCESS;
+    }
+  }
+
+  // Check we did get some memory. Buffer is BlockSize.
   if (Instance->FvbBuffer == NULL) {
     DEBUG ((EFI_D_ERROR, "FvbWrite: ERROR - Buffer not ready\n"));
     return EFI_DEVICE_ERROR;
@@ -601,7 +725,7 @@ FvbWrite (
     return EFI_DEVICE_ERROR;
   }
 
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /**

@@ -586,6 +586,7 @@ NorFlashWriteSingleBlock (
   UINTN         BuffersInBlock;
   UINTN         RemainingWords;
   EFI_TPL       OriginalTPL;
+  UINTN         Cnt;
 
   Status = EFI_SUCCESS;
 
@@ -619,13 +620,22 @@ NorFlashWriteSingleBlock (
     BuffersInBlock = (UINTN)(BlockSizeInWords * 4) / P30_MAX_BUFFER_SIZE_IN_BYTES;
 
     // Then feed each buffer chunk to the NOR Flash
+    // If a buffer does not contain any data, don't write it.
     for(BufferIndex=0;
          BufferIndex < BuffersInBlock;
          BufferIndex++, WordAddress += P30_MAX_BUFFER_SIZE_IN_BYTES, DataBuffer += P30_MAX_BUFFER_SIZE_IN_WORDS
       ) {
-      Status = NorFlashWriteBuffer (Instance, WordAddress, P30_MAX_BUFFER_SIZE_IN_BYTES, DataBuffer);
-      if (EFI_ERROR(Status)) {
-        goto EXIT;
+      // Check the buffer to see if it contains any data (not set all 1s).
+      for (Cnt = 0; Cnt < P30_MAX_BUFFER_SIZE_IN_WORDS; Cnt++) {
+        if (~DataBuffer[Cnt] != 0 ) {
+          // Some data found, write the buffer.
+          Status = NorFlashWriteBuffer (Instance, WordAddress, P30_MAX_BUFFER_SIZE_IN_BYTES,
+                                        DataBuffer);
+          if (EFI_ERROR(Status)) {
+            goto EXIT;
+          }
+          break;
+        }
       }
     }
 
@@ -783,6 +793,57 @@ NorFlashReadBlocks (
 
   return EFI_SUCCESS;
 }
+
+EFI_STATUS
+NorFlashRead (
+  IN NOR_FLASH_INSTANCE   *Instance,
+  IN EFI_LBA              Lba,
+  IN UINTN                Offset,
+  IN UINTN                BufferSizeInBytes,
+  OUT VOID                *Buffer
+  )
+{
+  UINT32              NumBlocks;
+  UINTN               StartAddress;
+
+  // The buffer must be valid
+  if (Buffer == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Return if we have not any byte to read
+  if (BufferSizeInBytes == 0) {
+    return EFI_SUCCESS;
+  }
+
+  // All blocks must be within the device
+  NumBlocks = ((UINT32)BufferSizeInBytes) / Instance->Media.BlockSize ;
+
+  if ((Lba + NumBlocks) > (Instance->Media.LastBlock + 1)) {
+    DEBUG ((EFI_D_ERROR, "NorFlashRead: ERROR - Read will exceed last block\n"));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Offset + BufferSizeInBytes >= Instance->Size) {
+    DEBUG ((EFI_D_ERROR, "NorFlashRead: ERROR - Read will exceed device size.\n"));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Get the address to start reading from
+  StartAddress = GET_NOR_BLOCK_ADDRESS (Instance->RegionBaseAddress,
+                                        Lba,
+                                        Instance->Media.BlockSize
+                                       );
+
+  // Put the device into Read Array mode
+  SEND_NOR_COMMAND (Instance->DeviceBaseAddress, 0, P30_CMD_READ_ARRAY);
+
+  // Readout the data
+  CopyMem (Buffer, (UINTN *)(StartAddress + Offset), BufferSizeInBytes);
+
+  return EFI_SUCCESS;
+}
+
 
 EFI_STATUS
 NorFlashReset (

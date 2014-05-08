@@ -305,6 +305,13 @@ NorFlashWriteBlocks (
   );
 
 EFI_STATUS
+NorFlashWriteSingleWord (
+  IN NOR_FLASH_INSTANCE     *Instance,
+  IN UINTN                  WordAddress,
+  IN UINT32                 WriteData
+  );
+
+EFI_STATUS
 NorFlashReadBlocks (
   IN NOR_FLASH_INSTANCE   *Instance,
   IN EFI_LBA              Lba,
@@ -313,8 +320,23 @@ NorFlashReadBlocks (
   );
 
 EFI_STATUS
+NorFlashRead (
+  IN NOR_FLASH_INSTANCE   *Instance,
+  IN EFI_LBA              Lba,
+  IN UINTN                Offset,
+  IN UINTN                BufferSizeInBytes,
+  OUT VOID                *Buffer
+  );
+
+EFI_STATUS
 NorFlashReset (
   IN  NOR_FLASH_INSTANCE *Instance
+  );
+
+EFI_STATUS
+NorFlashUnlockSingleBlockIfNecessary (
+  IN NOR_FLASH_INSTANCE     *Instance,
+  IN UINTN                  BlockAddress
   );
 
 #endif /* __NOR_FLASH_DXE_H__ */
