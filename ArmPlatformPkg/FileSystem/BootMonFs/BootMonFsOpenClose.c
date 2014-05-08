@@ -309,8 +309,8 @@ BootMonFsFlushFile (
     FileStart = File->HwDescription.BlockStart * BlockSize;
   }
 
-  // FileEnd is the NOR address of the end of the file's data
-  FileEnd = FileStart + BootMonFsGetImageLength (File);
+  // FileEnd is the current NOR address of the end of the file's data
+  FileEnd = FileStart + File->HwDescription.Region[0].Size;
 
   for (RegionToFlushLink = GetFirstNode (&File->RegionToFlushLink);
        !IsNull (&File->RegionToFlushLink, RegionToFlushLink);
