@@ -1,5 +1,5 @@
 #========================================================================================
-#  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -31,9 +31,7 @@ ASM_PFX(SwitchToNSExceptionLevel1):
    orr     x0, x0, #(1 << 31)     // Set EL1 to be 64bit
 
    // Send all interrupts to their respective Exception levels for EL2
-   bic     x0, x0, #(1 << 3)      // Disable virtual FIQ
-   bic     x0, x0, #(1 << 4)      // Disable virtual IRQ
-   bic     x0, x0, #(1 << 5)      // Disable virtual SError and Abort
+   and     x0, x0, #~(ARM_HCR_FMO | ARM_HCR_IMO | ARM_HCR_AMO) // Disable virtual FIQ, IRQ, SError and Abort
    msr     hcr_el2, x0            // Write back our settings
 
    msr     cptr_el2, xzr          // Disable copro traps to EL2
