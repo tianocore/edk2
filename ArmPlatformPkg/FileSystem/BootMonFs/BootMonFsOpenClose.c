@@ -204,6 +204,11 @@ BootMonFsFindSpaceForNewFile (
          )
   {
     FileEntry = BOOTMON_FS_FILE_FROM_LINK_THIS (FileLink);
+    // Skip files that aren't on disk yet
+    if (FileEntry->HwDescription.RegionCount == 0) {
+      continue;
+    }
+
     // If the free space preceding the file is big enough to contain the new
     // file then use it!
     if (((FileEntry->HwDescription.BlockStart * BlockSize) - *FileStart)
