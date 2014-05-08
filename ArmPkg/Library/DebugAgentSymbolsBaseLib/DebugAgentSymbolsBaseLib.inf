@@ -27,7 +27,7 @@
   Arm/DebugAgentException.S          | GCC
 
 [Sources.AARCH64]
-  AArch64/DebugAgentException.S      | GCC
+  AArch64/DebugAgentException.S
 
 [Packages]
   MdePkg/MdePkg.dec

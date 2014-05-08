@@ -41,8 +41,8 @@
   Arm/GicV3.S          | GCC
 
 [Sources.AARCH64]
-  AArch64/RTSMBoot.S   | GCC
-  AArch64/GicV3.S      | GCC
+  AArch64/RTSMBoot.S
+  AArch64/GicV3.S
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFvBaseAddress

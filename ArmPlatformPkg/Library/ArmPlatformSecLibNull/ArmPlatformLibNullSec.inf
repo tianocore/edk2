@@ -37,7 +37,7 @@
   Arm/ArmPlatformLibNullBoot.S       | GCC
 
 [Sources.AARCH64]
-  AArch64/ArmPlatformLibNullBoot.S   | GCC
+  AArch64/ArmPlatformLibNullBoot.S
 
 
 [FixedPcd]

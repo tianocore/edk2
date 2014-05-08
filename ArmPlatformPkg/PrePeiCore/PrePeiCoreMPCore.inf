@@ -35,10 +35,10 @@
 
 [Sources.AARCH64]
   AArch64/ArchPrePeiCore.c
-  AArch64/PrePeiCoreEntryPoint.S   | GCC
-  AArch64/SwitchStack.S            | GCC
-  AArch64/Exception.S              | GCC
-  AArch64/Helper.S                 | GCC
+  AArch64/PrePeiCoreEntryPoint.S
+  AArch64/SwitchStack.S
+  AArch64/Exception.S
+  AArch64/Helper.S
 
 [Packages]
   MdePkg/MdePkg.dec

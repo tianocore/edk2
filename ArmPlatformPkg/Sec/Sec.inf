@@ -32,8 +32,8 @@
   
 [Sources.AARCH64]
   AArch64/Arch.c
-  AArch64/Helper.S        | GCC
-  AArch64/SecEntryPoint.S | GCC
+  AArch64/Helper.S
+  AArch64/SecEntryPoint.S
 
 [Packages]
   MdePkg/MdePkg.dec

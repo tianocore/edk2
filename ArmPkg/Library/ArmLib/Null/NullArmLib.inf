@@ -32,7 +32,7 @@
   ../Common/Arm/ArmLibSupport.asm  | RVCT
 
 [Sources.AARCH64]
-  ../Common/AArch64/ArmLibSupport.S    | GCC
+  ../Common/AArch64/ArmLibSupport.S
 
 [Packages]
   ArmPkg/ArmPkg.dec

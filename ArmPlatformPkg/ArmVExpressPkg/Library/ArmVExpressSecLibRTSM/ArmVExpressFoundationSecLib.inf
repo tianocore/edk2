@@ -36,7 +36,7 @@
   RTSMFoundationSec.c
 
 [Sources.AARCH64]
-  AArch64/RTSMFoundationBoot.S  | GCC
+  AArch64/RTSMFoundationBoot.S
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFvBaseAddress

@@ -23,7 +23,7 @@
   LIBRARY_CLASS                  = CompilerIntrinsicsLib 
 
 [Sources.AARCH64]
-  AArch64/memcpy.S        | GCC
+  AArch64/memcpy.S
   AArch64/memset.c
 
 [Sources.ARM]

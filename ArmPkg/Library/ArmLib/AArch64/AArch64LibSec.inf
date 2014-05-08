@@ -21,16 +21,16 @@
   LIBRARY_CLASS                  = ArmLib
 
 [Sources.common]
-  ArmLibSupportV8.S                   | GCC
-  AArch64Support.S                    | GCC
+  ArmLibSupportV8.S
+  AArch64Support.S
 
-  ../Common/AArch64/ArmLibSupport.S   | GCC
+  ../Common/AArch64/ArmLibSupport.S
   ../Common/ArmLib.c
 
   AArch64Lib.c
 
   AArch64ArchTimer.c
-  AArch64ArchTimerSupport.S           | GCC
+  AArch64ArchTimerSupport.S
 
 [Packages]
   ArmPkg/ArmPkg.dec

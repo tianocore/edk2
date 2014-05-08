@@ -33,7 +33,7 @@
 
 [Sources.AARCH64]
   AArch64/BdsLinuxLoader.c
-  AArch64/BdsLinuxLoaderHelper.S  | GCC
+  AArch64/BdsLinuxLoaderHelper.S
 
 [Packages]
   MdePkg/MdePkg.dec

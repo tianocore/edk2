@@ -24,7 +24,7 @@
   Arm/ArmSmc.S      | GCC
 
 [Sources.AARCH64]
-  AArch64/ArmSmc.S    | GCC
+  AArch64/ArmSmc.S
 
 [Packages]
   MdePkg/MdePkg.dec

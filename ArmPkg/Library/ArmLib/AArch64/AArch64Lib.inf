@@ -25,11 +25,11 @@
   AArch64Lib.c
   AArch64Mmu.c
   AArch64ArchTimer.c
-  ArmLibSupportV8.S                   | GCC
-  AArch64Support.S                    | GCC
-  AArch64ArchTimerSupport.S           | GCC
+  ArmLibSupportV8.S
+  AArch64Support.S
+  AArch64ArchTimerSupport.S
 
-  ../Common/AArch64/ArmLibSupport.S   | GCC
+  ../Common/AArch64/ArmLibSupport.S
   ../Common/ArmLib.c
 
 [Packages]

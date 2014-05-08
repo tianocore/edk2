@@ -30,7 +30,7 @@
 
 [Sources.AArch64]
   AArch64/ArchPrePi.c
-  AArch64/ModuleEntryPoint.S   | GCC
+  AArch64/ModuleEntryPoint.S
   
 [Packages]
   MdePkg/MdePkg.dec

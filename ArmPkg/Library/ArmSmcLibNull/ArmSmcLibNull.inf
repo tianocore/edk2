@@ -27,7 +27,7 @@
   Arm/ArmSmcNull.S      | GCC
 
 [Sources.AARCH64]
-  AArch64/ArmSmcNull.S    | GCC
+  AArch64/ArmSmcNull.S
 
 [Packages]
   MdePkg/MdePkg.dec

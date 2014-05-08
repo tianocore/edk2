@@ -39,7 +39,7 @@
   RTSMFoundationMem.c
 
 [Sources.AARCH64]
-  AArch64/RTSMHelper.S      | GCC
+  AArch64/RTSMHelper.S
 
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdCacheEnable

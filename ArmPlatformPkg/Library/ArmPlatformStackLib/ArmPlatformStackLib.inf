@@ -31,7 +31,7 @@
   Arm/ArmPlatformStackLib.S       | GCC
 
 [Sources.AARCH64]
-  AArch64/ArmPlatformStackLib.S     | GCC
+  AArch64/ArmPlatformStackLib.S
 
 [LibraryClasses]
   ArmPlatformLib
