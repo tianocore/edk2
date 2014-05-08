@@ -48,6 +48,7 @@ typedef struct {
   LIST_ENTRY            Link;
   BOOTMON_FS_INSTANCE   *Instance;
 
+  UINTN                 HwDescAddress;
   HW_IMAGE_DESCRIPTION  HwDescription;
 
   EFI_FILE_PROTOCOL     File;

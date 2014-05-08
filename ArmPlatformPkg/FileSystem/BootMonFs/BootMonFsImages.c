@@ -135,11 +135,12 @@ BootMonFsIsImageValid (
   return TRUE;
 }
 
+STATIC
 EFI_STATUS
 BootMonFsDiscoverNextImage (
-  IN BOOTMON_FS_INSTANCE      *Instance,
-  IN EFI_LBA                  *LbaStart,
-  OUT HW_IMAGE_DESCRIPTION    *ImageDescription
+  IN     BOOTMON_FS_INSTANCE      *Instance,
+  IN OUT EFI_LBA                  *LbaStart,
+  IN OUT BOOTMON_FS_FILE          *File
   )
 {
   EFI_DISK_IO_PROTOCOL  *DiskIo;
@@ -162,17 +163,21 @@ BootMonFsDiscoverNextImage (
                        Instance->Media->MediaId,
                        DescOffset,
                        sizeof (HW_IMAGE_DESCRIPTION),
-                       ImageDescription
+                       &File->HwDescription
                        );
     if (EFI_ERROR (Status)) {
       return Status;
     }
 
     // If we found a valid image description...
-    if (BootMonFsIsImageValid (ImageDescription, (CurrentLba - Instance->Media->LowestAlignedLba))) {
-      DEBUG ((EFI_D_ERROR, "Found image: %a in block %d.\n", &(ImageDescription->Footer.Filename), (UINTN)(CurrentLba - Instance->Media->LowestAlignedLba)));
+    if (BootMonFsIsImageValid (&File->HwDescription, (CurrentLba - Instance->Media->LowestAlignedLba))) {
+      DEBUG ((EFI_D_ERROR, "Found image: %a in block %d.\n",
+        &(File->HwDescription.Footer.Filename),
+        (UINTN)(CurrentLba - Instance->Media->LowestAlignedLba)
+        ));
+      File->HwDescAddress = DescOffset;
 
-      *LbaStart = ImageDescription->BlockEnd + 1;
+      *LbaStart = CurrentLba + 1;
       return EFI_SUCCESS;
     } else {
       CurrentLba++;
@@ -202,7 +207,7 @@ BootMonFsInitialize (
       return Status;
     }
 
-    Status = BootMonFsDiscoverNextImage (Instance, &Lba, &(NewFile->HwDescription));
+    Status = BootMonFsDiscoverNextImage (Instance, &Lba, NewFile);
     if (EFI_ERROR (Status)) {
       // Free NewFile allocated by BootMonFsCreateFile ()
       FreePool (NewFile);

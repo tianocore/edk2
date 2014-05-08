@@ -29,24 +29,18 @@ InvalidateImageDescription (
   EFI_DISK_IO_PROTOCOL   *DiskIo;
   EFI_BLOCK_IO_PROTOCOL  *BlockIo;
   UINT32                  MediaId;
-  UINT32                  BlockSize;
   VOID                   *Buffer;
   EFI_STATUS              Status;
-  UINT64                  DescriptionAddress;
 
   DiskIo = File->Instance->DiskIo;
   BlockIo = File->Instance->BlockIo;
   MediaId = BlockIo->Media->MediaId;
-  BlockSize = BlockIo->Media->BlockSize;
-
-  DescriptionAddress = (File->HwDescription.BlockEnd * BlockSize)
-                       - sizeof (HW_IMAGE_DESCRIPTION);
 
   Buffer = AllocateZeroPool (sizeof (HW_IMAGE_DESCRIPTION));
 
   Status = DiskIo->WriteDisk (DiskIo,
                     MediaId,
-                    DescriptionAddress,
+                    File->HwDescAddress,
                     sizeof (HW_IMAGE_DESCRIPTION),
                     Buffer
                     );
@@ -86,7 +80,7 @@ FlushAppendRegion (
 
   // Only invalidate the Image Description of files that have already been
   // written in Flash
-  if (File->HwDescription.RegionCount > 0) {
+  if (File->HwDescAddress != 0) {
     Status = InvalidateImageDescription (File);
     ASSERT_EFI_ERROR (Status);
   }
@@ -131,11 +125,14 @@ FlushAppendRegion (
   if ((NewFileSize % BlockSize) > 0) {
     NewFileSize += BlockSize - (NewFileSize % BlockSize);
   }
+
+  File->HwDescAddress = (FileStart + NewFileSize) - sizeof (HW_IMAGE_DESCRIPTION);
+
   // Update the file description on the media
   Status = DiskIo->WriteDisk (
                     DiskIo,
                     File->Instance->Media->MediaId,
-                    (FileStart + NewFileSize) - sizeof (HW_IMAGE_DESCRIPTION),
+                    File->HwDescAddress,
                     sizeof (HW_IMAGE_DESCRIPTION),
                     Description
                     );
@@ -585,7 +582,6 @@ BootMonFsDelete (
   BOOTMON_FS_FILE         *File;
   LIST_ENTRY              *RegionToFlushLink;
   BOOTMON_FS_FILE_REGION  *Region;
-  HW_IMAGE_DESCRIPTION    *Description;
   EFI_BLOCK_IO_PROTOCOL   *BlockIo;
   UINT8                   *EmptyBuffer;
 
@@ -613,7 +609,6 @@ BootMonFsDelete (
 
   // If (RegionCount is greater than 0) then the file already exists
   if (File->HwDescription.RegionCount > 0) {
-    Description = &File->HwDescription;
     BlockIo = File->Instance->BlockIo;
 
     // Create an empty buffer
@@ -624,7 +619,7 @@ BootMonFsDelete (
     }
 
     // Invalidate the last Block
-    Status = BlockIo->WriteBlocks (BlockIo, BlockIo->Media->MediaId, Description->BlockEnd, BlockIo->Media->BlockSize, EmptyBuffer);
+    Status = InvalidateImageDescription (File);
     ASSERT_EFI_ERROR (Status);
 
     FreePool (EmptyBuffer);

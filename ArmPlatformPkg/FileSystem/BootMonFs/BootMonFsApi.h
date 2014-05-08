@@ -18,13 +18,6 @@
 #include <Protocol/SimpleFileSystem.h>
 
 EFI_STATUS
-BootMonFsDiscoverNextImage (
-  IN BOOTMON_FS_INSTANCE      *Flash,
-  IN EFI_LBA                  *LbaStart,
-  OUT HW_IMAGE_DESCRIPTION    *Image
-  );
-
-EFI_STATUS
 BootMonFsInitialize (
   IN BOOTMON_FS_INSTANCE *Instance
   );
