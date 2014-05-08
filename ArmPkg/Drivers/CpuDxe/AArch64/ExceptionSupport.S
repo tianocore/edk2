@@ -241,8 +241,8 @@ ASM_PFX(SErrorA32):
 
 #undef  REG_PAIR
 #undef  REG_ONE
-#define REG_PAIR(REG1, REG2, OFFSET, CONTEXT_SIZE)  stp REG1, REG2, [sp, #(OFFSET-CONTEXT_SIZE)]
-#define REG_ONE(REG1, OFFSET, CONTEXT_SIZE)         str REG1, [sp, #(OFFSET-CONTEXT_SIZE)]
+#define REG_PAIR(REG1, REG2, OFFSET, CONTEXT_SIZE)  stp  REG1, REG2, [sp, #(OFFSET-CONTEXT_SIZE)]
+#define REG_ONE(REG1, OFFSET, CONTEXT_SIZE)         stur REG1, [sp, #(OFFSET-CONTEXT_SIZE)]
 
 ASM_PFX(SynchronousExceptionEntry):
   // Move the stackpointer so we can reach our structure with the str instruction.
@@ -355,9 +355,9 @@ ASM_PFX(AsmCommonExceptionEntry):
 
 #undef REG_PAIR
 #undef REG_ONE
-#define REG_PAIR(REG1, REG2, OFFSET, CONTEXT_SIZE)    ldp REG1, REG2, [sp, #(OFFSET-CONTEXT_SIZE)]
+#define REG_PAIR(REG1, REG2, OFFSET, CONTEXT_SIZE)    ldp  REG1, REG2, [sp, #(OFFSET-CONTEXT_SIZE)]
 
-#define REG_ONE(REG1, OFFSET, CONTEXT_SIZE)           ldr REG1, [sp, #(OFFSET-CONTEXT_SIZE)]
+#define REG_ONE(REG1, OFFSET, CONTEXT_SIZE)           ldur REG1, [sp, #(OFFSET-CONTEXT_SIZE)]
 
   // Adjust SP to pop system registers
   add     sp, sp, #(GP_CONTEXT_SIZE + FP_CONTEXT_SIZE + SYS_CONTEXT_SIZE)
