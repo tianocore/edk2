@@ -22,6 +22,7 @@
 #include <Guid/EventGroup.h>
 
 #include <Protocol/BlockIo.h>
+#include <Protocol/DiskIo.h>
 #include <Protocol/FirmwareVolumeBlock.h>
 
 #include <Library/DebugLib.h>
@@ -117,6 +118,7 @@
 #define NOR_FLASH_SIGNATURE                       SIGNATURE_32('n', 'o', 'r', '0')
 #define INSTANCE_FROM_FVB_THIS(a)                 CR(a, NOR_FLASH_INSTANCE, FvbProtocol, NOR_FLASH_SIGNATURE)
 #define INSTANCE_FROM_BLKIO_THIS(a)               CR(a, NOR_FLASH_INSTANCE, BlockIoProtocol, NOR_FLASH_SIGNATURE)
+#define INSTANCE_FROM_DISKIO_THIS(a)              CR(a, NOR_FLASH_INSTANCE, DiskIoProtocol, NOR_FLASH_SIGNATURE)
 
 typedef struct _NOR_FLASH_INSTANCE                NOR_FLASH_INSTANCE;
 
@@ -141,10 +143,11 @@ struct _NOR_FLASH_INSTANCE {
 
   EFI_BLOCK_IO_PROTOCOL               BlockIoProtocol;
   EFI_BLOCK_IO_MEDIA                  Media;
+  EFI_DISK_IO_PROTOCOL                DiskIoProtocol;
 
   BOOLEAN                             SupportFvb;
   EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL FvbProtocol;
-  VOID*                               FvbBuffer;
+  VOID*                               ShadowBuffer;
 
   NOR_FLASH_DEVICE_PATH	              DevicePath;
 };
@@ -210,6 +213,31 @@ NorFlashBlockIoFlushBlocks (
   IN EFI_BLOCK_IO_PROTOCOL    *This
 );
 
+//
+// DiskIO Protocol function EFI_DISK_IO_PROTOCOL.ReadDisk
+//
+EFI_STATUS
+EFIAPI
+NorFlashDiskIoReadDisk (
+  IN EFI_DISK_IO_PROTOCOL         *This,
+  IN UINT32                       MediaId,
+  IN UINT64                       Offset,
+  IN UINTN                        BufferSize,
+  OUT VOID                        *Buffer
+  );
+
+//
+// DiskIO Protocol function EFI_DISK_IO_PROTOCOL.WriteDisk
+//
+EFI_STATUS
+EFIAPI
+NorFlashDiskIoWriteDisk (
+  IN EFI_DISK_IO_PROTOCOL         *This,
+  IN UINT32                       MediaId,
+  IN UINT64                       Offset,
+  IN UINTN                        BufferSize,
+  IN VOID                         *Buffer
+  );
 
 //
 // NorFlashFvbDxe.c
@@ -290,10 +318,11 @@ NorFlashUnlockAndEraseSingleBlock (
 
 EFI_STATUS
 NorFlashWriteSingleBlock (
-  IN NOR_FLASH_INSTANCE     *Instance,
-  IN EFI_LBA                Lba,
-  IN UINT32                 *DataBuffer,
-  IN UINT32                 BlockSizeInWords
+  IN        NOR_FLASH_INSTANCE   *Instance,
+  IN        EFI_LBA               Lba,
+  IN        UINTN                 Offset,
+  IN OUT    UINTN                *NumBytes,
+  IN        UINT8                *Buffer
   );
 
 EFI_STATUS
@@ -302,13 +331,6 @@ NorFlashWriteBlocks (
   IN  EFI_LBA           Lba,
   IN  UINTN             BufferSizeInBytes,
   IN  VOID              *Buffer
-  );
-
-EFI_STATUS
-NorFlashWriteSingleWord (
-  IN NOR_FLASH_INSTANCE     *Instance,
-  IN UINTN                  WordAddress,
-  IN UINT32                 WriteData
   );
 
 EFI_STATUS
@@ -326,6 +348,15 @@ NorFlashRead (
   IN UINTN                Offset,
   IN UINTN                BufferSizeInBytes,
   OUT VOID                *Buffer
+  );
+
+EFI_STATUS
+NorFlashWrite (
+  IN        NOR_FLASH_INSTANCE   *Instance,
+  IN        EFI_LBA               Lba,
+  IN        UINTN                 Offset,
+  IN OUT    UINTN                *NumBytes,
+  IN        UINT8                *Buffer
   );
 
 EFI_STATUS

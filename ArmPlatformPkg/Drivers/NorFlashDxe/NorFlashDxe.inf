@@ -53,6 +53,7 @@
   gEfiBlockIoProtocolGuid
   gEfiDevicePathProtocolGuid
   gEfiFirmwareVolumeBlockProtocolGuid
+  gEfiDiskIoProtocolGuid
   
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
