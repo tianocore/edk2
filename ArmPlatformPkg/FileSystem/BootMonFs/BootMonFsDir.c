@@ -389,12 +389,8 @@ SetFileInfo (
   )
 {
   EFI_STATUS             Status;
-  EFI_BLOCK_IO_PROTOCOL *BlockIo;
-  UINT8                 *DataBuffer;
-  UINTN                  BlockSize;
 
-  Status  = EFI_SUCCESS;
-  BlockIo = Instance->BlockIo;
+  Status = EFI_SUCCESS;
 
   // Note that a call to this function on a file opened read-only is only
   // invalid if it actually changes fields, so  we don't immediately fail if the
@@ -417,25 +413,6 @@ SetFileInfo (
     if (EFI_ERROR (Status)) {
       return Status;
     }
-
-    //
-    // Update the last block
-    //
-    BlockSize = BlockIo->Media->BlockSize;
-    DataBuffer = AllocatePool (BlockSize);
-    if (DataBuffer == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-    Status = BlockIo->ReadBlocks (BlockIo, Instance->Media->MediaId,
-        File->HwDescription.BlockEnd, BlockSize, DataBuffer);
-    if (EFI_ERROR (Status)) {
-      FreePool (DataBuffer);
-      return Status;
-    }
-    CopyMem (DataBuffer + BlockSize - sizeof (File->HwDescription), &File->HwDescription, sizeof (File->HwDescription));
-    Status = BlockIo->WriteBlocks (BlockIo, Instance->Media->MediaId,
-            File->HwDescription.BlockEnd, BlockSize, DataBuffer);
-    FreePool (DataBuffer);
   }
   return Status;
 }
