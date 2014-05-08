@@ -26,7 +26,7 @@ GCC_ASM_IMPORT(ArmReadMpidr)
 GCC_ASM_IMPORT(ArmPlatformPeiBootAction)
 GCC_ASM_EXPORT(_ModuleEntryPoint)
 
-StartupAddr: .dword    CEntryPoint
+StartupAddr: .8byte CEntryPoint
 
 ASM_PFX(_ModuleEntryPoint):
   // Do early platform specific actions

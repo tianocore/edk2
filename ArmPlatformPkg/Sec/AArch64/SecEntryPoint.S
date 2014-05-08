@@ -29,7 +29,7 @@ GCC_ASM_IMPORT(ArmReadMpidr)
 GCC_ASM_IMPORT(ArmCallWFE)
 GCC_ASM_EXPORT(_ModuleEntryPoint)
 
-StartupAddr:        .dword       ASM_PFX(CEntryPoint)
+StartupAddr:        .8byte       ASM_PFX(CEntryPoint)
 
 ASM_PFX(_ModuleEntryPoint):
 

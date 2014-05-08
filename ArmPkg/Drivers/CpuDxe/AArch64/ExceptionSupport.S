@@ -286,7 +286,7 @@ ASM_PFX(SErrorEntry):
 //
 .align 3
 ASM_PFX(CommonExceptionEntry):
-  .dword       ASM_PFX(AsmCommonExceptionEntry)
+  .8byte ASM_PFX(AsmCommonExceptionEntry)
 
 ASM_PFX(ExceptionHandlersEnd):
 
