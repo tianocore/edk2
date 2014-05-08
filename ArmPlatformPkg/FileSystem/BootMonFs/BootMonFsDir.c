@@ -288,19 +288,21 @@ SetFileName (
   }
 
   // If we're changing the file name
-  if (AsciiStrCmp (FileNameAscii, File->HwDescription.Footer.Filename)) {
-    // Check a file with that filename doesn't already exist
-    if (BootMonGetFileFromAsciiFileName (
-          File->Instance,
-          File->HwDescription.Footer.Filename,
-          &SameFile) != EFI_NOT_FOUND) {
-      Status = EFI_ACCESS_DENIED;
-    } else {
-      AsciiStrCpy (FileNameAscii, File->HwDescription.Footer.Filename);
-      Status = EFI_SUCCESS;
-    }
+  if (AsciiStrCmp (FileNameAscii, File->HwDescription.Footer.Filename) == 0) {
+    // No change to filename.
+    Status = EFI_SUCCESS;
+  } else if (!(File->OpenMode & EFI_FILE_MODE_WRITE)) {
+    // You can only change the filename if you open the file for write.
+    Status = EFI_ACCESS_DENIED;
+  } else if (BootMonGetFileFromAsciiFileName (
+                File->Instance,
+                File->HwDescription.Footer.Filename,
+                &SameFile) != EFI_NOT_FOUND) {
+    // A file with that name already exists.
+    Status = EFI_ACCESS_DENIED;
   } else {
-    // No change to filename
+    // OK, change the filename.
+    AsciiStrCpy (FileNameAscii, File->HwDescription.Footer.Filename);
     Status = EFI_SUCCESS;
   }
 
@@ -316,7 +318,7 @@ EFI_STATUS
 SetFileSize (
   IN BOOTMON_FS_INSTANCE *Instance,
   IN BOOTMON_FS_FILE     *BootMonFsFile,
-  IN UINTN               Size
+  IN UINTN                NewSize
   )
 {
   UINT64             StoredPosition;
@@ -324,6 +326,13 @@ SetFileSize (
   EFI_FILE_PROTOCOL *File;
   CHAR8              Buffer;
   UINTN              BufferSize;
+  UINT32             OldSize;
+
+  OldSize = BootMonFsFile->HwDescription.Region[0].Size;
+
+  if (OldSize == NewSize) {
+    return EFI_SUCCESS;
+  }
 
   Buffer = 0;
   BufferSize = sizeof (Buffer);
@@ -334,8 +343,8 @@ SetFileSize (
     return EFI_ACCESS_DENIED;
   }
 
-  if (Size <= BootMonFsFile->HwDescription.Region[0].Size) {
-    BootMonFsFile->HwDescription.Region[0].Size = Size;
+  if (NewSize <= OldSize) {
+    OldSize = NewSize;
   } else {
     // Increasing a file's size is potentially complicated as it may require
     // moving the image description on media. The simplest way to do it is to
@@ -348,7 +357,7 @@ SetFileSize (
       return Status;
     }
 
-    Status = File->SetPosition (File, Size - 1);
+    Status = File->SetPosition (File, NewSize - 1);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -358,7 +367,7 @@ SetFileSize (
     }
 
     // Restore saved position
-    Status = File->SetPosition (File, Size - 1);
+    Status = File->SetPosition (File, NewSize - 1);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -398,7 +407,7 @@ SetFileInfo (
       return EFI_ACCESS_DENIED;
     }
 
-    SetFileName (File, Info->FileName);
+    Status = SetFileName (File, Info->FileName);
     if (EFI_ERROR (Status)) {
       return Status;
     }
