@@ -25,7 +25,7 @@
 .text
 .align 3
 
-ASM_GLOBAL ASM_PFX(SecondariesPenStart)
+GCC_ASM_EXPORT(SecondariesPenStart)
 ASM_GLOBAL SecondariesPenEnd
 
 ASM_PFX(SecondariesPenStart):

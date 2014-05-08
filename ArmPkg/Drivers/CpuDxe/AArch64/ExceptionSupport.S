@@ -95,11 +95,11 @@
   UINT64  Padding;0x328   // Required for stack alignment
 */
 
-ASM_GLOBAL ASM_PFX(ExceptionHandlersStart)
-ASM_GLOBAL ASM_PFX(ExceptionHandlersEnd)
-ASM_GLOBAL ASM_PFX(CommonExceptionEntry)
-ASM_GLOBAL ASM_PFX(AsmCommonExceptionEntry)
-ASM_GLOBAL ASM_PFX(CommonCExceptionHandler)
+GCC_ASM_EXPORT(ExceptionHandlersStart)
+GCC_ASM_EXPORT(ExceptionHandlersEnd)
+GCC_ASM_EXPORT(CommonExceptionEntry)
+GCC_ASM_EXPORT(AsmCommonExceptionEntry)
+GCC_ASM_EXPORT(CommonCExceptionHandler)
 
 .text
 .align 11

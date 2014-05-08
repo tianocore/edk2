@@ -20,10 +20,10 @@
 .text
 .align 3
 
-ASM_GLOBAL ASM_PFX(ArmPlatformSecBootAction)
-ASM_GLOBAL ASM_PFX(ArmPlatformSecBootMemoryInit)
-ASM_GLOBAL ASM_PFX(ArmSecMpCoreSecondariesWrite)
-ASM_GLOBAL ASM_PFX(ArmSecMpCoreSecondariesRead)
+GCC_ASM_EXPORT(ArmPlatformSecBootAction)
+GCC_ASM_EXPORT(ArmPlatformSecBootMemoryInit)
+GCC_ASM_EXPORT(ArmSecMpCoreSecondariesWrite)
+GCC_ASM_EXPORT(ArmSecMpCoreSecondariesRead)
 
 /**
   Call at the beginning of the platform boot up

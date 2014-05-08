@@ -18,7 +18,7 @@
 .text
 .align 11
 
-ASM_GLOBAL ASM_PFX(PeiVectorTable)
+GCC_ASM_EXPORT(PeiVectorTable)
 
 //============================================================
 //Default Exception Handlers

@@ -31,7 +31,7 @@
 .align 2
 
 
-ASM_GLOBAL ASM_PFX(memcpy)
+GCC_ASM_EXPORT(memcpy)
 
 
 // Taken from Newlib BSD implementation.

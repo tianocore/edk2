@@ -17,7 +17,7 @@
 .text
 .align 3
 
-ASM_GLOBAL ASM_PFX(SecSwitchStack)
+GCC_ASM_EXPORT(SecSwitchStack)
 
 
 

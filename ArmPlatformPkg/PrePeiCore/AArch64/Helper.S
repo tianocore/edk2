@@ -18,8 +18,8 @@
 .text
 .align 3
 
-ASM_GLOBAL ASM_PFX(SetupExceptionLevel1)
-ASM_GLOBAL ASM_PFX(SetupExceptionLevel2)
+GCC_ASM_EXPORT(SetupExceptionLevel1)
+GCC_ASM_EXPORT(SetupExceptionLevel2)
 
 // Setup EL1 while in EL1
 ASM_PFX(SetupExceptionLevel1):

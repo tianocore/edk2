@@ -18,11 +18,11 @@
 .text
 .align 3
 
-ASM_GLOBAL ASM_PFX(SwitchToNSExceptionLevel1)
-ASM_GLOBAL ASM_PFX(enter_monitor_mode)
-ASM_GLOBAL ASM_PFX(return_from_exception)
-ASM_GLOBAL ASM_PFX(copy_cpsr_into_spsr)
-ASM_GLOBAL ASM_PFX(set_non_secure_mode)
+GCC_ASM_EXPORT(SwitchToNSExceptionLevel1)
+GCC_ASM_EXPORT(enter_monitor_mode)
+GCC_ASM_EXPORT(return_from_exception)
+GCC_ASM_EXPORT(copy_cpsr_into_spsr)
+GCC_ASM_EXPORT(set_non_secure_mode)
 
 // Switch from EL3 to NS-EL1
 ASM_PFX(SwitchToNSExceptionLevel1):
