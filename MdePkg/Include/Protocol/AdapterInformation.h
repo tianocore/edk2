@@ -179,9 +179,9 @@ EFI_STATUS
   InfoTypesBufferCount.
 
   @param[in]  This                  A pointer to the EFI_ADAPTER_INFORMATION_PROTOCOL instance.
-  @param[out] InfoTypesBuffer       A pointer to the list of InformationType GUID pointers that are supported
+  @param[out] InfoTypesBuffer       A pointer to the array of InformationType GUIDs that are supported
                                     by This.
-  @param[out] InfoTypesBufferCount  A pointer to the number of GUID pointers present in InfoTypesBuffer.
+  @param[out] InfoTypesBufferCount  A pointer to the number of GUIDs present in InfoTypesBuffer.
 
   @retval EFI_SUCCESS               The list of information type GUIDs that are supported on this adapter was
                                     returned in InfoTypesBuffer. The number of information type GUIDs was
