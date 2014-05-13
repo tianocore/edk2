@@ -59,7 +59,7 @@ ConvertMemoryType (
 /**
   Function to translate the EFI_GRAPHICS_PIXEL_FORMAT into a string.
 
-  @param[in] Memory     The format type.
+  @param[in] Fmt     The format type.
 
   @retval               A string representation of the type allocated from BS Pool.
 **/
