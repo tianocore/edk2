@@ -5,7 +5,7 @@
   If a code construct is defined in the UEFI 2.4 specification it must be included
   by this include file.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -457,11 +457,11 @@ typedef enum {
   ///
   TimerCancel,
   ///
-  /// An event is to be signalled periodically at a specified interval from the current time.
+  /// An event is to be signaled periodically at a specified interval from the current time.
   ///
   TimerPeriodic,
   ///
-  /// An event is to be signalled once at a specified interval from the current time.
+  /// An event is to be signaled once at a specified interval from the current time.
   ///
   TimerRelative
 } EFI_TIMER_DELAY;

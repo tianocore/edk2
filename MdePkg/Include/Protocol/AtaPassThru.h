@@ -3,7 +3,7 @@
   to send ATA Command Blocks to any ATA device attached to that ATA controller. The information
   includes the attributes of the ATA controller.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -212,7 +212,7 @@ EFI_STATUS
   );
 
 /**
-  Used to retrieve the lis t of legal port numbers for ATA devices on an ATA controller.
+  Used to retrieve the list of legal port numbers for ATA devices on an ATA controller.
   These can either be the list of ports where ATA devices are actually present or the
   list of legal port numbers for the ATA controller. Regardless, the caller of this
   function must probe the port number returned to see if an ATA device is actually

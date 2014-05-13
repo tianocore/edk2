@@ -1,7 +1,7 @@
 /** @file
   The Decompress Protocol Interface as defined in UEFI spec
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -75,7 +75,7 @@ EFI_STATUS
   to allocate and free the Destination and Scratch buffers.
 
   If the compressed source data specified by Source and SourceSize is 
-  sucessfully decompressed into Destination, then EFI_SUCCESS is returned.  
+  successfully decompressed into Destination, then EFI_SUCCESS is returned.  
   If the compressed source data specified by Source and SourceSize is not in 
   a valid compressed data format, then EFI_INVALID_PARAMETER is returned.
 
