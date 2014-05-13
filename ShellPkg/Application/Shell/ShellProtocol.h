@@ -455,10 +455,11 @@ EfiShellEnablePageBreak (
 EFI_STATUS
 EFIAPI
 InternalShellExecuteDevicePath(
-  IN CONST EFI_HANDLE *ParentImageHandle,
+  IN CONST EFI_HANDLE               *ParentImageHandle,
   IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath,
-  IN CONST CHAR16 *CommandLine OPTIONAL,
-  IN CONST CHAR16 **Environment OPTIONAL,
+  IN CONST CHAR16                   *CommandLine OPTIONAL,
+  IN CONST CHAR16                   **Environment OPTIONAL,
+  OUT EFI_STATUS                    *StartImageStatus OPTIONAL,
   OUT UINTN                         *ExitDataSize OPTIONAL,
   OUT CHAR16                        **ExitData OPTIONAL
   );

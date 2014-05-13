@@ -1386,11 +1386,13 @@ InternalShellExecuteDevicePath(
   IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath,
   IN CONST CHAR16                   *CommandLine OPTIONAL,
   IN CONST CHAR16                   **Environment OPTIONAL,
+  OUT EFI_STATUS                    *StartImageStatus OPTIONAL,
   OUT UINTN                         *ExitDataSize OPTIONAL,
   OUT CHAR16                        **ExitData OPTIONAL
   )
 {
   EFI_STATUS                    Status;
+  EFI_STATUS                    StartStatus;
   EFI_STATUS                    CleanupStatus;
   EFI_HANDLE                    NewHandle;
   EFI_LOADED_IMAGE_PROTOCOL     *LoadedImage;
@@ -1504,11 +1506,14 @@ InternalShellExecuteDevicePath(
     // now start the image, passing up exit data if the caller requested it
     //
     if (!EFI_ERROR(Status)) {
-      Status      = gBS->StartImage(
+      StartStatus      = gBS->StartImage(
                           NewHandle,
                           ExitDataSizePtr,
                           ExitData
                           );
+      if (StartImageStatus != NULL) {
+        *StartImageStatus = StartStatus;
+      }
 
       CleanupStatus = gBS->UninstallProtocolInterface(
                             NewHandle,
@@ -1620,6 +1625,7 @@ EfiShellExecute(
     DevPath,
     Temp,
     (CONST CHAR16**)Environment,
+    StatusCode,
     &ExitDataSize,
     &ExitData);
 
@@ -1644,8 +1650,6 @@ EfiShellExecute(
       }
       FreePool (ExitData);
       Status = EFI_SUCCESS;
-    } else if ((StatusCode != NULL) && !EFI_ERROR(Status)) {
-      *StatusCode = EFI_SUCCESS;
     }
 
   //

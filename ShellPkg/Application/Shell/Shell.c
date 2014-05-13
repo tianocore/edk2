@@ -2231,6 +2231,7 @@ RunCommandOrFile(
 )
 {
   EFI_STATUS                Status;
+  EFI_STATUS                StartStatus;
   CHAR16                    *CommandWithPath;
   EFI_DEVICE_PATH_PROTOCOL  *DevPath;
   SHELL_STATUS              CalleeExitStatus;
@@ -2308,6 +2309,7 @@ RunCommandOrFile(
             DevPath,
             CmdLine,
             NULL,
+            &StartStatus,
             NULL,
             NULL
            );
@@ -2317,7 +2319,7 @@ RunCommandOrFile(
           if(EFI_ERROR (Status)) {
             CalleeExitStatus = (SHELL_STATUS) (Status & (~MAX_BIT));
           } else {
-            CalleeExitStatus = SHELL_SUCCESS;
+            CalleeExitStatus = (SHELL_STATUS) StartStatus;
           }
 
           //
