@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -227,7 +227,7 @@ BdsBootLinuxFdt (
     LinuxImage = LINUX_KERNEL_MAX_OFFSET;
     Status = BdsLoadImage (LinuxKernelDevicePath, AllocateMaxAddress, &LinuxImage, &LinuxImageSize);
     if (EFI_ERROR(Status)) {
-      Print (L"ERROR: Did not find Linux kernel.\n");
+      Print (L"ERROR: Did not find Linux kernel (%r).\n", Status);
       return Status;
     }
   }
@@ -244,7 +244,7 @@ BdsBootLinuxFdt (
       Status = BdsLoadImage (InitrdDevicePath, AllocateAnyPages, &InitrdImageBase, &InitrdImageBaseSize);
     }
     if (EFI_ERROR (Status)) {
-      Print (L"ERROR: Did not find initrd image.\n");
+      Print (L"ERROR: Did not find initrd image (%r).\n", Status);
       goto EXIT_FREE_LINUX;
     }
 
@@ -264,7 +264,7 @@ BdsBootLinuxFdt (
   FdtBlobBase = LINUX_KERNEL_MAX_OFFSET;
   Status = BdsLoadImage (FdtDevicePath, AllocateMaxAddress, &FdtBlobBase, &FdtBlobSize);
   if (EFI_ERROR(Status)) {
-    Print (L"ERROR: Did not find Device Tree blob.\n");
+    Print (L"ERROR: Did not find Device Tree blob (%r).\n", Status);
     goto EXIT_FREE_INITRD;
   }
 
