@@ -1,7 +1,7 @@
 /** @file
   Main file for cp shell level 2 function.
 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -131,6 +131,7 @@ CopySingleFile(
   if (ShellIsDirectory(Source) == EFI_SUCCESS) {
     Status = ShellCreateDirectory(Dest, &DestHandle);
     if (EFI_ERROR(Status)) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_DEST_DIR_FAIL), gShellLevel2HiiHandle, Dest);
       return (SHELL_ACCESS_DENIED);
     }
 
@@ -159,6 +160,7 @@ CopySingleFile(
     //
     Status = ShellOpenFileByName(Dest, &DestHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE|EFI_FILE_MODE_CREATE, 0);
     if (EFI_ERROR(Status)) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_DEST_OPEN_FAIL), gShellLevel2HiiHandle, Dest);
       return (SHELL_ACCESS_DENIED);
     }
 
