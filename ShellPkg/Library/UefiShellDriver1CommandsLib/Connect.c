@@ -1,7 +1,7 @@
 /** @file
   Main file for connect shell Driver1 function.
 
-  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,10 +15,85 @@
 #include "UefiShellDriver1CommandsLib.h"
 
 /**
+  Create all handles associate with every device path node.
+
+  @param  DevicePathToConnect           The device path which will be connected.
+
+  @retval EFI_SUCCESS                   All handles associate with every device path node
+                                        have been created.
+  @retval EFI_INVALID_PARAMETER         DevicePathToConnect is NULL.
+  @retval EFI_NOT_FOUND                 Create the handle associate with one device path
+                                        node failed
+
+**/
+EFI_STATUS
+ShellConnectDevicePath (
+  IN EFI_DEVICE_PATH_PROTOCOL   *DevicePathToConnect
+  )
+{
+  EFI_DEVICE_PATH_PROTOCOL  *RemainingDevicePath;
+  EFI_STATUS                Status;
+  EFI_HANDLE                Handle;
+  
+  if (DevicePathToConnect == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  do{
+    RemainingDevicePath = DevicePathToConnect;
+    Status = gBS->LocateDevicePath (&gEfiDevicePathProtocolGuid, &RemainingDevicePath, &Handle);
+    if (!EFI_ERROR (Status) && (Handle != NULL)) {
+      Status = gBS->ConnectController (Handle, NULL, RemainingDevicePath, FALSE);
+    }
+  } while (!EFI_ERROR (Status) && !IsDevicePathEnd (RemainingDevicePath));
+
+  return Status;
+   
+}
+
+/**
+  Connect drivers for PCI root bridge.
+  
+  @retval EFI_SUCCESS                     Connect drivers successfully.
+  @retval EFI_NOT_FOUND                   Cannot find PCI root bridge device.
+
+**/
+EFI_STATUS
+ShellConnectPciRootBridge (
+  VOID
+  )
+{  
+  UINTN               RootBridgeHandleCount;
+  EFI_HANDLE          *RootBridgeHandleBuffer;
+  UINTN               RootBridgeIndex;
+  EFI_STATUS          Status;
+  
+  RootBridgeHandleCount = 0;
+  
+  Status = gBS->LocateHandleBuffer (  
+              ByProtocol,  
+              &gEfiPciRootBridgeIoProtocolGuid, 
+              NULL,  
+              &RootBridgeHandleCount,  
+              &RootBridgeHandleBuffer  
+              );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  for (RootBridgeIndex = 0; RootBridgeIndex < RootBridgeHandleCount; RootBridgeIndex++) {    
+    gBS->ConnectController (RootBridgeHandleBuffer[RootBridgeIndex], NULL, NULL, FALSE);    
+  }  
+  
+  return EFI_SUCCESS;
+}
+
+
+/**
   Connect controller(s) and driver(s).
 
-  @param[in] ControllerHandle     The handle to the controller.  Should have driver binding on it.
-  @param[in] DriverHandle         The handle to the driver.  Should have driver binding.
+  @param[in] ControllerHandle     The handle to the controller. Should have driver binding on it.
+  @param[in] DriverHandle         The handle to the driver. Should have driver binding.
   @param[in] Recursive            TRUE to connect recursively, FALSE otherwise.
   @param[in] Output               TRUE to have info on the screen, FALSE otherwise.
   @param[in] AlwaysOutput         Override Output for errors.
@@ -114,19 +189,29 @@ ConnectFromDevPaths (
 {
   EFI_DEVICE_PATH_PROTOCOL  *DevPath;
   EFI_DEVICE_PATH_PROTOCOL  *DevPathWalker;
+  EFI_DEVICE_PATH_PROTOCOL  *Instance;
   UINTN                     Length;
-  EFI_HANDLE                Handle;
+  UINTN                     Index;
+  UINTN                     HandleArrayCount;
+  EFI_HANDLE                *HandleArray;
   EFI_STATUS                Status;
-
+  BOOLEAN                   AtLeastOneConnected;
+  EFI_PCI_IO_PROTOCOL       *PciIo;
+  UINT8                     Class[3];
+  
   DevPath = NULL;
   Length  = 0;
-
+  AtLeastOneConnected = FALSE;
+  
   //
   // Get the DevicePath buffer from the variable...
   //
   Status = gRT->GetVariable((CHAR16*)Key, (EFI_GUID*)&gEfiGlobalVariableGuid, NULL, &Length, DevPath);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     DevPath = AllocateZeroPool(Length);
+    if (DevPath == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
     Status = gRT->GetVariable((CHAR16*)Key, (EFI_GUID*)&gEfiGlobalVariableGuid, NULL, &Length, DevPath);
   }
 
@@ -139,31 +224,94 @@ ConnectFromDevPaths (
     ;  DevPathWalker += GetDevicePathSize(DevPathWalker)
    ){
     //
-    // get the correct handle from a given device path
+    // connect short form device path
     //
-    if ((StrCmp(Key, L"ConInDev") == 0)
-      ||(StrCmp(Key, L"ConIn") == 0)
-    ){
-      Status = gBS->LocateDevicePath((EFI_GUID*)&gEfiConsoleInDeviceGuid, &DevPathWalker, &Handle);
-      if (!EFI_ERROR(Status)) {
-        Status = ConnectControllers(NULL, Handle, FALSE, TRUE, FALSE);
+    if ((DevicePathType (DevPathWalker) == MESSAGING_DEVICE_PATH) &&
+      ((DevicePathSubType (DevPathWalker) == MSG_USB_CLASS_DP)
+      || (DevicePathSubType (DevPathWalker) == MSG_USB_WWID_DP)
+      )) {
+      Instance = DuplicateDevicePath (DevPathWalker);
+      if (Instance == NULL) {
+        FreePool(DevPath);
+        return EFI_OUT_OF_RESOURCES;
       }
-    } else if ((StrCmp(Key, L"ConOutDev") == 0) 
-            || (StrCmp(Key, L"ErrOutDev") == 0) 
-            || (StrCmp(Key, L"ConOut")    == 0) 
-            || (StrCmp(Key, L"ErrOut")    == 0)
-            ){
-      Status = gBS->LocateDevicePath((EFI_GUID*)&gEfiConsoleOutDeviceGuid, &DevPathWalker, &Handle);
-      if (!EFI_ERROR(Status)) {
-        Status = ConnectControllers(NULL, Handle, FALSE, TRUE, FALSE);
+      
+      Status = ShellConnectPciRootBridge ();
+      if (EFI_ERROR(Status)) {
+        FreePool(DevPath);
+        return Status;
       }
-    }
-  }
+      
+      Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiPciIoProtocolGuid,
+                  NULL,
+                  &HandleArrayCount,
+                  &HandleArray
+                  );
+      
+      if (!EFI_ERROR (Status)) {
+        for (Index = 0; Index < HandleArrayCount; Index++) {
+          Status = gBS->HandleProtocol (
+                      HandleArray[Index],
+                      &gEfiPciIoProtocolGuid,
+                      (VOID **)&PciIo
+                      );
+          
+          if (!EFI_ERROR (Status)) {
+            Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, 0x09, 3, &Class);
+            if (!EFI_ERROR (Status)) {
+              if ((PCI_CLASS_SERIAL == Class[2]) &&
+                  (PCI_CLASS_SERIAL_USB == Class[1])) {
+                Status = gBS->ConnectController (
+                              HandleArray[Index],
+                              NULL,
+                              Instance,
+                              FALSE
+                              );
+                if (!EFI_ERROR(Status)) {
+                  AtLeastOneConnected = TRUE;
+                }
+              }
+            }
+          }
+        }
+      }
 
+      if (HandleArray != NULL) {
+        FreePool (HandleArray);
+      }
+      FreePool (Instance);       
+    } else { 
+      //
+      // connect the entire device path
+      //
+      Instance = DuplicateDevicePath (DevPathWalker);      
+      if (Instance == NULL) {
+        FreePool(DevPath);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      Status = ShellConnectDevicePath (Instance);
+      if (!EFI_ERROR (Status)) {
+        AtLeastOneConnected = TRUE;
+      }
+      
+      FreePool (Instance);
+    }
+    
+  }
+  
   if (DevPath != NULL) {
     FreePool(DevPath);
   }
-  return (Status);
+
+  if (AtLeastOneConnected) {
+    return EFI_SUCCESS;
+  } else {
+    return EFI_NOT_FOUND;
+  }
+  
 }
 
 /**

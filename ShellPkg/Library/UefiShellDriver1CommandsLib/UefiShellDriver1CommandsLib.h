@@ -23,6 +23,8 @@
 #include <Guid/ConsoleOutDevice.h>
 #include <Guid/ShellLibHiiGuid.h>
 
+#include <IndustryStandard/Pci.h>
+
 #include <Protocol/EfiShell.h>
 #include <Protocol/EfiShellParameters.h>
 #include <Protocol/DevicePath.h>
@@ -36,6 +38,8 @@
 #include <Protocol/DriverSupportedEfiVersion.h>
 #include <Protocol/DriverFamilyOverride.h>
 #include <Protocol/DriverHealth.h>
+#include <Protocol/PciIo.h>
+#include <Protocol/PciRootBridgeIo.h>
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
