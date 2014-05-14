@@ -886,7 +886,7 @@ NorFlashWriteSingleBlock (
     Instance->Initialize(Instance);
   }
 
-  DEBUG ((DEBUG_BLKIO, "NorFlashWriteSingleBlock(Parameters: Lba=%ld, Offset=0x%x, *NumBytes=0x%x, Buffer @ 0x%08x)\n", Instance->StartLba + Lba, Offset, *NumBytes, Buffer));
+  DEBUG ((DEBUG_BLKIO, "NorFlashWriteSingleBlock(Parameters: Lba=%ld, Offset=0x%x, *NumBytes=0x%x, Buffer @ 0x%08x)\n", Lba, Offset, *NumBytes, Buffer));
 
   // Detect WriteDisabled state
   if (Instance->Media.ReadOnly == TRUE) {
@@ -928,8 +928,7 @@ NorFlashWriteSingleBlock (
     while (BytesToWrite > 0) {
       // Read full word from NOR, splice as required. A word is the smallest
       // unit we can write.
-      TempStatus = NorFlashRead (Instance, Instance->StartLba + Lba,
-                                 CurOffset & ~(0x3), sizeof(Tmp), &Tmp);
+      TempStatus = NorFlashRead (Instance, Lba, CurOffset & ~(0x3), sizeof(Tmp), &Tmp);
       if (EFI_ERROR (TempStatus)) {
         return EFI_DEVICE_ERROR;
       }
@@ -1042,7 +1041,7 @@ NorFlashWriteSingleBlock (
   }
 
   // Read NOR Flash data into shadow buffer
-  TempStatus = NorFlashReadBlocks (Instance, Instance->StartLba + Lba, BlockSize, Instance->ShadowBuffer);
+  TempStatus = NorFlashReadBlocks (Instance, Lba, BlockSize, Instance->ShadowBuffer);
   if (EFI_ERROR (TempStatus)) {
     // Return one of the pre-approved error statuses
     return EFI_DEVICE_ERROR;
@@ -1052,7 +1051,7 @@ NorFlashWriteSingleBlock (
   CopyMem ((VOID*)((UINTN)Instance->ShadowBuffer + Offset), Buffer, *NumBytes);
 
   // Write the modified buffer back to the NorFlash
-  TempStatus = NorFlashWriteBlocks (Instance, Instance->StartLba + Lba, BlockSize, Instance->ShadowBuffer);
+  TempStatus = NorFlashWriteBlocks (Instance, Lba, BlockSize, Instance->ShadowBuffer);
   if (EFI_ERROR (TempStatus)) {
     // Return one of the pre-approved error statuses
     return EFI_DEVICE_ERROR;

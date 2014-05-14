@@ -535,7 +535,7 @@ FvbWrite (
 
   Instance = INSTANCE_FROM_FVB_THIS (This);
 
-  return NorFlashWriteSingleBlock (Instance, Lba, Offset, NumBytes, Buffer);
+  return NorFlashWriteSingleBlock (Instance, Instance->StartLba + Lba, Offset, NumBytes, Buffer);
 }
 
 /**
