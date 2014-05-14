@@ -756,7 +756,6 @@ BdsTftpLoadImage (
   EFI_STATUS                  Status;
   EFI_PXE_BASE_CODE_PROTOCOL  *Pxe;
   UINT64                      TftpBufferSize;
-  VOID*                       TftpBuffer;
   EFI_IP_ADDRESS              ServerIp;
   IPv4_DEVICE_PATH*           IPv4DevicePathNode;
   FILEPATH_DEVICE_PATH*       FilePathDevicePath;
@@ -838,16 +837,21 @@ BdsTftpLoadImage (
   }
 
   // Allocate a buffer to hold the whole file.
-  TftpBuffer = AllocatePool (TftpBufferSize);
-  if (TftpBuffer == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
+  Status = gBS->AllocatePages (
+                  Type,
+                  EfiBootServicesCode,
+                  EFI_SIZE_TO_PAGES (TftpBufferSize),
+                  Image
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "Failed to allocate space for kernel image: %r\n", Status));
     goto EXIT;
   }
 
   Status = Pxe->Mtftp (
                   Pxe,
                   EFI_PXE_BASE_CODE_TFTP_READ_FILE,
-                  TftpBuffer,
+                  (VOID *)(UINTN)*Image,
                   FALSE,
                   &TftpBufferSize,
                   NULL,
@@ -857,9 +861,8 @@ BdsTftpLoadImage (
                   FALSE
                   );
   if (EFI_ERROR (Status)) {
-    FreePool (TftpBuffer);
-  } else if (ImageSize != NULL) {
-    *Image = (UINTN)TftpBuffer;
+    gBS->FreePages (*Image, EFI_SIZE_TO_PAGES (TftpBufferSize));
+  } else {
     *ImageSize = (UINTN)TftpBufferSize;
   }
 
