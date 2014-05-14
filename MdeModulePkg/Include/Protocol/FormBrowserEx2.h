@@ -2,7 +2,7 @@
   Extension Form Browser Protocol provides the services that can be used to 
   register the different hot keys for the standard Browser actions described in UEFI specification.
 
-Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -23,7 +23,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 typedef struct _EDKII_FORM_BROWSER_EXTENSION2_PROTOCOL   EDKII_FORM_BROWSER_EXTENSION2_PROTOCOL;
 
-#define BROWSER_EXTENSION2_VERSION_1  0x10000
+#define BROWSER_EXTENSION2_VERSION_1    0x10000
+#define BROWSER_EXTENSION2_VERSION_1_1  0x10001
 
 /**
   Check whether the browser data has been modified.
@@ -52,6 +53,19 @@ EFI_STATUS
 (EFIAPI *EXECUTE_ACTION) (
   IN UINT32        Action,
   IN UINT16        DefaultId
+  );
+
+/**
+  Check whether required reset when exit the browser
+
+  @retval TRUE      Browser required to reset after exit.
+  @retval FALSE     Browser not need to reset after exit.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *IS_RESET_REQUIRED) (
+  VOID
   );
 
 #define FORM_ENTRY_INFO_SIGNATURE    SIGNATURE_32 ('f', 'e', 'i', 's')
@@ -101,6 +115,8 @@ struct _EDKII_FORM_BROWSER_EXTENSION2_PROTOCOL {
   /// A list of type QUESTION_ATTRIBUTE_OVERRIDE.
   ///
   LIST_ENTRY                OverrideQestListHead;
+
+  IS_RESET_REQUIRED         IsResetRequired;
 };
 
 extern EFI_GUID gEdkiiFormBrowserEx2ProtocolGuid;

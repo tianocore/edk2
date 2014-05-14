@@ -28,12 +28,15 @@ SETUP_DRIVER_PRIVATE_DATA  mPrivateData = {
     SaveReminder
   },
   {
-    BROWSER_EXTENSION2_VERSION_1,
+    BROWSER_EXTENSION2_VERSION_1_1,
     SetScope,
     RegisterHotKey,
     RegiserExitHandler,
     IsBrowserDataModified,
     ExecuteAction,
+    {NULL,NULL},
+    {NULL,NULL},
+    IsResetRequired
   }
 };
 
@@ -5288,3 +5291,20 @@ SaveReminder (
 
   return DataSavedAction;
 }
+
+/**
+  Check whether the Reset Required for the browser
+
+  @retval TRUE      Browser required to reset after exit.
+  @retval FALSE     Browser not need to reset after exit.
+
+**/
+BOOLEAN
+EFIAPI
+IsResetRequired (
+  VOID
+  )
+{
+  return gResetRequired;
+}
+

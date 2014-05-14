@@ -1354,6 +1354,19 @@ SaveReminder (
   );
 
 /**
+  Check whether the Reset Required for the browser
+
+  @retval TRUE      Browser required to reset after exit.
+  @retval FALSE     Browser not need to reset after exit.
+
+**/
+BOOLEAN
+EFIAPI
+IsResetRequired (
+  VOID
+  );
+
+/**
   Find the registered HotKey based on KeyData.
   
   @param[in] KeyData     A pointer to a buffer that describes the keystroke
