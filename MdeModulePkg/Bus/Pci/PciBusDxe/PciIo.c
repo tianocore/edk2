@@ -1,7 +1,7 @@
 /** @file
   EFI PCI IO protocol functions implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1779,14 +1779,10 @@ PciIoGetBarAttributes (
   OUT VOID                           **Resources OPTIONAL
   )
 {
-
   UINT8                             *Configuration;
-  UINT8                             NumConfig;
   PCI_IO_DEVICE                     *PciIoDevice;
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Ptr;
-  EFI_ACPI_END_TAG_DESCRIPTOR       *PtrEnd;
-
-  NumConfig   = 0;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *AddressSpace;
+  EFI_ACPI_END_TAG_DESCRIPTOR       *End;
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
 
@@ -1794,7 +1790,7 @@ PciIoGetBarAttributes (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (BarIndex >= PCI_MAX_BAR) {
+  if ((BarIndex >= PCI_MAX_BAR) || (PciIoDevice->PciBar[BarIndex].BarType == PciBarTypeUnknown)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -1807,102 +1803,93 @@ PciIoGetBarAttributes (
   }
 
   if (Resources != NULL) {
-
-    if (PciIoDevice->PciBar[BarIndex].BarType != PciBarTypeUnknown) {
-      NumConfig = 1;
-    }
-
-    Configuration = AllocateZeroPool (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) * NumConfig + sizeof (EFI_ACPI_END_TAG_DESCRIPTOR));
+    Configuration = AllocateZeroPool (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) + sizeof (EFI_ACPI_END_TAG_DESCRIPTOR));
     if (Configuration == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
 
-    Ptr = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) Configuration;
+    AddressSpace = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) Configuration;
 
-    if (NumConfig == 1) {
-      Ptr->Desc         = ACPI_ADDRESS_SPACE_DESCRIPTOR;
-      Ptr->Len          = (UINT16) (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3);
+    AddressSpace->Desc         = ACPI_ADDRESS_SPACE_DESCRIPTOR;
+    AddressSpace->Len          = (UINT16) (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3);
 
-      Ptr->AddrRangeMin = PciIoDevice->PciBar[BarIndex].BaseAddress;
-      Ptr->AddrLen      = PciIoDevice->PciBar[BarIndex].Length;
-      Ptr->AddrRangeMax = PciIoDevice->PciBar[BarIndex].Alignment;
+    AddressSpace->AddrRangeMin = PciIoDevice->PciBar[BarIndex].BaseAddress;
+    AddressSpace->AddrLen      = PciIoDevice->PciBar[BarIndex].Length;
+    AddressSpace->AddrRangeMax = PciIoDevice->PciBar[BarIndex].Alignment;
 
-      switch (PciIoDevice->PciBar[BarIndex].BarType) {
-      case PciBarTypeIo16:
-      case PciBarTypeIo32:
-        //
-        // Io
-        //
-        Ptr->ResType = ACPI_ADDRESS_SPACE_TYPE_IO;
-        break;
+    switch (PciIoDevice->PciBar[BarIndex].BarType) {
+    case PciBarTypeIo16:
+    case PciBarTypeIo32:
+      //
+      // Io
+      //
+      AddressSpace->ResType = ACPI_ADDRESS_SPACE_TYPE_IO;
+      break;
 
-      case PciBarTypeMem32:
-        //
-        // Mem
-        //
-        Ptr->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
-        //
-        // 32 bit
-        //
-        Ptr->AddrSpaceGranularity = 32;
-        break;
+    case PciBarTypeMem32:
+      //
+      // Mem
+      //
+      AddressSpace->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
+      //
+      // 32 bit
+      //
+      AddressSpace->AddrSpaceGranularity = 32;
+      break;
 
-      case PciBarTypePMem32:
-        //
-        // Mem
-        //
-        Ptr->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
-        //
-        // prefechable
-        //
-        Ptr->SpecificFlag = 0x6;
-        //
-        // 32 bit
-        //
-        Ptr->AddrSpaceGranularity = 32;
-        break;
+    case PciBarTypePMem32:
+      //
+      // Mem
+      //
+      AddressSpace->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
+      //
+      // prefechable
+      //
+      AddressSpace->SpecificFlag = 0x6;
+      //
+      // 32 bit
+      //
+      AddressSpace->AddrSpaceGranularity = 32;
+      break;
 
-      case PciBarTypeMem64:
-        //
-        // Mem
-        //
-        Ptr->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
-        //
-        // 64 bit
-        //
-        Ptr->AddrSpaceGranularity = 64;
-        break;
+    case PciBarTypeMem64:
+      //
+      // Mem
+      //
+      AddressSpace->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
+      //
+      // 64 bit
+      //
+      AddressSpace->AddrSpaceGranularity = 64;
+      break;
 
-      case PciBarTypePMem64:
-        //
-        // Mem
-        //
-        Ptr->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
-        //
-        // prefechable
-        //
-        Ptr->SpecificFlag = 0x6;
-        //
-        // 64 bit
-        //
-        Ptr->AddrSpaceGranularity = 64;
-        break;
+    case PciBarTypePMem64:
+      //
+      // Mem
+      //
+      AddressSpace->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
+      //
+      // prefechable
+      //
+      AddressSpace->SpecificFlag = 0x6;
+      //
+      // 64 bit
+      //
+      AddressSpace->AddrSpaceGranularity = 64;
+      break;
 
-      default:
-        break;
-      }
-
-      Ptr = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) ((UINT8 *) Ptr + sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR));
+    default:
+      break;
     }
 
     //
     // put the checksum
     //
-    PtrEnd            = (EFI_ACPI_END_TAG_DESCRIPTOR *) ((UINT8 *) Ptr);
-    PtrEnd->Desc      = ACPI_END_TAG_DESCRIPTOR;
-    PtrEnd->Checksum  = 0;
+    End           = (EFI_ACPI_END_TAG_DESCRIPTOR *) (AddressSpace + 1);
+    End->Desc     = ACPI_END_TAG_DESCRIPTOR;
+    End->Checksum = 0;
 
-    *Resources        = Configuration;
+    *Resources    = Configuration;
   }
 
   return EFI_SUCCESS;
