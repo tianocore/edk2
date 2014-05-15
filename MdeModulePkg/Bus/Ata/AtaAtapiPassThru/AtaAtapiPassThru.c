@@ -1339,7 +1339,12 @@ AtaPassThruPassThru (
     Task->Packet         = Packet;
     Task->Event          = Event;
     Task->IsStart        = FALSE;
-    Task->RetryTimes     = 0;
+    Task->RetryTimes     = DivU64x32(Packet->Timeout, 1000) + 1;
+    if (Packet->Timeout == 0) {
+      Task->InfiniteWait = TRUE;
+    } else {
+      Task->InfiniteWait = FALSE;
+    }
 
     OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
     InsertTailList (&Instance->NonBlockingTaskList, &Task->Link);

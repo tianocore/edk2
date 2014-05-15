@@ -353,13 +353,20 @@ DRQClear (
   IN  UINT64                    Timeout
   )
 {
-  UINT32  Delay;
+  UINT64  Delay;
   UINT8   StatusRegister;
+  BOOLEAN InfiniteWait;
 
   ASSERT (PciIo != NULL);
   ASSERT (IdeRegisters != NULL);
 
-  Delay = (UINT32) (DivU64x32(Timeout, 1000) + 1);
+  if (Timeout == 0) {
+    InfiniteWait = TRUE;
+  } else {
+    InfiniteWait = FALSE;
+  }
+
+  Delay = DivU64x32(Timeout, 1000) + 1;
   do {
     StatusRegister = IdeReadPortB (PciIo, IdeRegisters->CmdOrStatus);
 
@@ -381,7 +388,7 @@ DRQClear (
 
     Delay--;
 
-  } while (Delay > 0);
+  } while (InfiniteWait || (Delay > 0));
 
   return EFI_TIMEOUT;
 }
@@ -409,13 +416,20 @@ DRQClear2 (
   IN  UINT64               Timeout
   )
 {
-  UINT32  Delay;
+  UINT64  Delay;
   UINT8   AltRegister;
+  BOOLEAN InfiniteWait;
 
   ASSERT (PciIo != NULL);
   ASSERT (IdeRegisters != NULL);
 
-  Delay = (UINT32) (DivU64x32(Timeout, 1000) + 1);
+  if (Timeout == 0) {
+    InfiniteWait = TRUE;
+  } else {
+    InfiniteWait = FALSE;
+  }
+
+  Delay = DivU64x32(Timeout, 1000) + 1;
   do {
     AltRegister = IdeReadPortB (PciIo, IdeRegisters->AltOrDev);
 
@@ -437,7 +451,7 @@ DRQClear2 (
 
     Delay--;
 
-  } while (Delay > 0);
+  } while (InfiniteWait || (Delay > 0));
 
   return EFI_TIMEOUT;
 }
@@ -468,14 +482,21 @@ DRQReady (
   IN  UINT64               Timeout
   )
 {
-  UINT32  Delay;
+  UINT64  Delay;
   UINT8   StatusRegister;
   UINT8   ErrorRegister;
+  BOOLEAN InfiniteWait;
 
   ASSERT (PciIo != NULL);
   ASSERT (IdeRegisters != NULL);
 
-  Delay = (UINT32) (DivU64x32(Timeout, 1000) + 1);
+  if (Timeout == 0) {
+    InfiniteWait = TRUE;
+  } else {
+    InfiniteWait = FALSE;
+  }
+
+  Delay = DivU64x32(Timeout, 1000) + 1;
   do {
     //
     // Read Status Register will clear interrupt
@@ -508,7 +529,7 @@ DRQReady (
     MicroSecondDelay (100);
 
     Delay--;
-  } while (Delay > 0);
+  } while (InfiniteWait || (Delay > 0));
 
   return EFI_TIMEOUT;
 }
@@ -535,14 +556,21 @@ DRQReady2 (
   IN  UINT64               Timeout
   )
 {
-  UINT32  Delay;
+  UINT64  Delay;
   UINT8   AltRegister;
   UINT8   ErrorRegister;
+  BOOLEAN InfiniteWait;
 
   ASSERT (PciIo != NULL);
   ASSERT (IdeRegisters != NULL);
 
-  Delay = (UINT32) (DivU64x32(Timeout, 1000) + 1);
+  if (Timeout == 0) {
+    InfiniteWait = TRUE;
+  } else {
+    InfiniteWait = FALSE;
+  }
+
+  Delay = DivU64x32(Timeout, 1000) + 1;
 
   do {
     //
@@ -575,7 +603,7 @@ DRQReady2 (
     MicroSecondDelay (100);
 
     Delay--;
-  } while (Delay > 0);
+  } while (InfiniteWait || (Delay > 0));
 
   return EFI_TIMEOUT;
 }
@@ -602,14 +630,21 @@ DRDYReady (
   IN  UINT64               Timeout
   )
 {
-  UINT32  Delay;
+  UINT64  Delay;
   UINT8   StatusRegister;
   UINT8   ErrorRegister;
+  BOOLEAN InfiniteWait;
 
   ASSERT (PciIo != NULL);
   ASSERT (IdeRegisters != NULL);
 
-  Delay = (UINT32) (DivU64x32(Timeout, 1000) + 1);
+  if (Timeout == 0) {
+    InfiniteWait = TRUE;
+  } else {
+    InfiniteWait = FALSE;
+  }
+
+  Delay = DivU64x32(Timeout, 1000) + 1;
   do {
     StatusRegister = IdeReadPortB (PciIo, IdeRegisters->CmdOrStatus);
     //
@@ -638,7 +673,7 @@ DRDYReady (
     MicroSecondDelay (100);
 
     Delay--;
-  } while (Delay > 0);
+  } while (InfiniteWait || (Delay > 0));
 
   return EFI_TIMEOUT;
 }
@@ -666,14 +701,21 @@ DRDYReady2 (
   IN  UINT64               Timeout
   )
 {
-  UINT32  Delay;
+  UINT64  Delay;
   UINT8   AltRegister;
   UINT8   ErrorRegister;
+  BOOLEAN InfiniteWait;
 
   ASSERT (PciIo != NULL);
   ASSERT (IdeRegisters != NULL);
 
-  Delay = (UINT32) (DivU64x32(Timeout, 1000) + 1);
+  if (Timeout == 0) {
+    InfiniteWait = TRUE;
+  } else {
+    InfiniteWait = FALSE;
+  }
+
+  Delay = DivU64x32(Timeout, 1000) + 1;
   do {
     AltRegister = IdeReadPortB (PciIo, IdeRegisters->AltOrDev);
     //
@@ -702,7 +744,7 @@ DRDYReady2 (
     MicroSecondDelay (100);
 
     Delay--;
-  } while (Delay > 0);
+  } while (InfiniteWait || (Delay > 0));
 
   return EFI_TIMEOUT;
 }
@@ -728,13 +770,20 @@ WaitForBSYClear (
   IN  UINT64               Timeout
   )
 {
-  UINT32  Delay;
+  UINT64  Delay;
   UINT8   StatusRegister;
+  BOOLEAN InfiniteWait;
 
   ASSERT (PciIo != NULL);
   ASSERT (IdeRegisters != NULL);
 
-  Delay = (UINT32) (DivU64x32(Timeout, 1000) + 1);
+  if (Timeout == 0) {
+    InfiniteWait = TRUE;
+  } else {
+    InfiniteWait = FALSE;
+  }
+
+  Delay = DivU64x32(Timeout, 1000) + 1;
   do {
     StatusRegister = IdeReadPortB (PciIo, IdeRegisters->CmdOrStatus);
 
@@ -749,7 +798,7 @@ WaitForBSYClear (
 
     Delay--;
 
-  } while (Delay > 0);
+  } while (InfiniteWait || (Delay > 0));
 
   return EFI_TIMEOUT;
 }
@@ -775,13 +824,20 @@ WaitForBSYClear2 (
   IN  UINT64               Timeout
   )
 {
-  UINT32  Delay;
+  UINT64  Delay;
   UINT8   AltStatusRegister;
+  BOOLEAN InfiniteWait;
 
   ASSERT (PciIo != NULL);
   ASSERT (IdeRegisters != NULL);
 
-  Delay = (UINT32) (DivU64x32(Timeout, 1000) + 1);
+  if (Timeout == 0) {
+    InfiniteWait = TRUE;
+  } else {
+    InfiniteWait = FALSE;
+  }
+
+  Delay = DivU64x32(Timeout, 1000) + 1;
   do {
     AltStatusRegister = IdeReadPortB (PciIo, IdeRegisters->AltOrDev);
 
@@ -796,7 +852,7 @@ WaitForBSYClear2 (
 
     Delay--;
 
-  } while (Delay > 0);
+  } while (InfiniteWait || (Delay > 0));
 
   return EFI_TIMEOUT;
 }
@@ -1312,6 +1368,7 @@ Exit:
 
   @param[in]  PciIo           The PCI IO protocol instance.
   @param[in]  IdeRegisters    A pointer to EFI_IDE_REGISTERS data structure.
+  @param[in]  Timeout         The time to complete the command, uses 100ns as a unit.
 
   @retval EFI_DEVICE_ERROR  The memory is not set.
   @retval EFI_TIMEOUT       The memory setting is time out.
@@ -1320,18 +1377,26 @@ Exit:
 **/
 EFI_STATUS
 AtaUdmStatusWait (
-  IN     EFI_PCI_IO_PROTOCOL       *PciIo,
-  IN     EFI_IDE_REGISTERS         *IdeRegisters
+  IN  EFI_PCI_IO_PROTOCOL       *PciIo,
+  IN  EFI_IDE_REGISTERS         *IdeRegisters,
+  IN  UINT64                    Timeout
  )
 {
   UINT8                         RegisterValue;
   EFI_STATUS                    Status;
   UINT16                        IoPortForBmis;
-  UINT64                        Timeout;
+  UINT64                        Delay;
+  BOOLEAN                       InfiniteWait;
 
-  Timeout = 2000;
+  if (Timeout == 0) {
+    InfiniteWait = TRUE;
+  } else {
+    InfiniteWait = FALSE;
+  }
 
-  while (TRUE) {
+  Delay = DivU64x32 (Timeout, 1000) + 1;
+
+  do {
     Status = CheckStatusRegister (PciIo, IdeRegisters);
     if (EFI_ERROR (Status)) {
       Status = EFI_DEVICE_ERROR;
@@ -1351,11 +1416,11 @@ AtaUdmStatusWait (
       break;
     }
     //
-    // Stall for 1 milliseconds.
+    // Stall for 100 microseconds.
     //
-    MicroSecondDelay (1000);
-    Timeout--;
-  }
+    MicroSecondDelay (100);
+    Delay--;
+  } while (InfiniteWait || (Delay > 0));
 
   return Status;
 }
@@ -1404,7 +1469,7 @@ AtaUdmStatusCheck (
     return EFI_SUCCESS;
   }
 
-  if (Task->RetryTimes == 0) {
+  if (!Task->InfiniteWait && (Task->RetryTimes == 0)) {
     return EFI_TIMEOUT;
   } else {
     //
@@ -1664,12 +1729,6 @@ AtaUdmaInOut (
     IdeWritePortB (PciIo, IoPortForBmic, RegisterValue);
 
     if (Task != NULL) {
-      //
-      // Max transfer number of sectors for one command is 65536(32Mbyte),
-      // it will cost 1 second to transfer these data in UDMA mode 2(33.3MBps).
-      // So set the variable Count to 2000, for about 2 second Timeout time.
-      //
-      Task->RetryTimes     = 2000;
       Task->Map            = BufferMap;
       Task->TableMap       = PrdTableMap;
       Task->MapBaseAddress = PrdBaseAddr;
@@ -1703,14 +1762,11 @@ AtaUdmaInOut (
 
   //
   // Check the INTERRUPT and ERROR bit of BMIS
-  // Max transfer number of sectors for one command is 65536(32Mbyte),
-  // it will cost 1 second to transfer these data in UDMA mode 2(33.3MBps).
-  // So set the variable Count to 2000, for about 2 second Timeout time.
   //
   if (Task != NULL) {
     Status = AtaUdmStatusCheck (PciIo, Task, IdeRegisters);
   } else {
-    Status = AtaUdmStatusWait (PciIo, IdeRegisters);
+    Status = AtaUdmStatusWait (PciIo, IdeRegisters, Timeout);
   }
 
   //

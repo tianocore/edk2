@@ -135,10 +135,11 @@ struct _ATA_NONBLOCK_TASK {
   BOOLEAN                           IsStart;
   EFI_EVENT                         Event;
   UINT64                            RetryTimes;
-  VOID                              *Map; // Pointer to map.
-  VOID                              *TableMap;// Pointer to PRD table map.
+  BOOLEAN                           InfiniteWait;
+  VOID                              *Map;            // Pointer to map.
+  VOID                              *TableMap;       // Pointer to PRD table map.
   EFI_ATA_DMA_PRD                   *MapBaseAddress; //  Pointer to range Base address for Map.
-  UINTN                             PageCount;      //  The page numbers used by PCIO freebuffer.
+  UINTN                             PageCount;       //  The page numbers used by PCIO freebuffer.
 };
 
 //
