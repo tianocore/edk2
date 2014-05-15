@@ -356,7 +356,6 @@ TcpInsertTcb (
   LIST_ENTRY       *Entry;
   LIST_ENTRY       *Head;
   TCP_CB           *Node;
-  TCP4_PROTO_DATA  *TcpProto;
 
   ASSERT (
     (Tcb != NULL) &&
@@ -390,8 +389,6 @@ TcpInsertTcb (
   }
 
   InsertHeadList (Head, &Tcb->List);
-
-  TcpProto = (TCP4_PROTO_DATA *) Tcb->Sk->ProtoReserved;
 
   return 0;
 }

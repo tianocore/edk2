@@ -304,12 +304,10 @@ TcpFlushPcb (
   )
 {
   SOCKET                    *Sock;
-  TCP_PROTO_DATA            *TcpProto;
 
   IpIoConfigIp (Tcb->IpInfo, NULL);
 
   Sock     = Tcb->Sk;
-  TcpProto = (TCP_PROTO_DATA *) Sock->ProtoReserved;
 
   if (SOCK_IS_CONFIGURED (Sock)) {
     RemoveEntryList (&Tcb->List);
