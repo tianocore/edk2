@@ -23,8 +23,6 @@
 #include <Guid/StatusCodeDataTypeDebug.h>
 #include <FrameworkPei.h>
 
-#define EFI_STATUS_CODE_DATA_MAX_SIZE 200
-
 EFI_STATUS
 EFIAPI
 SerialReportStatusCode (
