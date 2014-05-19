@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *  
 *  This program and the accompanying materials                          
 *  are licensed and made available under the terms and conditions of the BSD License         
@@ -817,6 +817,7 @@ BdsTftpLoadImage (
   }
   UnicodeStrToAsciiStr (FilePathDevicePath->PathName, AsciiPathName);
 
+  // Try to get the size (required the TFTP server to have "tsize" extension)
   Status = Pxe->Mtftp (
                   Pxe,
                   EFI_PXE_BASE_CODE_TFTP_GET_FILE_SIZE,
@@ -829,41 +830,82 @@ BdsTftpLoadImage (
                   NULL,
                   FALSE
                   );
-  if (EFI_ERROR(Status)) {
+  // Pxe.Mtftp replies EFI_PROTOCOL_ERROR if tsize is not supported by the TFTP server
+  if (EFI_ERROR (Status) && (Status != EFI_PROTOCOL_ERROR)) {
     if (Status == EFI_TFTP_ERROR) {
       DEBUG((EFI_D_ERROR, "TFTP Error: Fail to get the size of the file\n"));
     }
     goto EXIT;
   }
 
-  // Allocate a buffer to hold the whole file.
-  Status = gBS->AllocatePages (
-                  Type,
-                  EfiBootServicesCode,
-                  EFI_SIZE_TO_PAGES (TftpBufferSize),
-                  Image
-                  );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Failed to allocate space for kernel image: %r\n", Status));
-    goto EXIT;
-  }
+  //
+  // Two cases:
+  //   1) the file size is unknown (tsize extension not supported)
+  //   2) tsize returned the file size
+  //
+  if (Status == EFI_PROTOCOL_ERROR) {
+    for (TftpBufferSize = SIZE_8MB; TftpBufferSize <= FixedPcdGet32 (PcdMaxTftpFileSize); TftpBufferSize += SIZE_8MB) {
+      // Allocate a buffer to hold the whole file.
+      Status = gBS->AllocatePages (
+                      Type,
+                      EfiBootServicesCode,
+                      EFI_SIZE_TO_PAGES (TftpBufferSize),
+                      Image
+                      );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((EFI_D_ERROR, "Failed to allocate space for image: %r\n", Status));
+        goto EXIT;
+      }
 
-  Status = Pxe->Mtftp (
-                  Pxe,
-                  EFI_PXE_BASE_CODE_TFTP_READ_FILE,
-                  (VOID *)(UINTN)*Image,
-                  FALSE,
-                  &TftpBufferSize,
-                  NULL,
-                  &ServerIp,
-                  (UINT8*)AsciiPathName,
-                  NULL,
-                  FALSE
-                  );
-  if (EFI_ERROR (Status)) {
-    gBS->FreePages (*Image, EFI_SIZE_TO_PAGES (TftpBufferSize));
+      Status = Pxe->Mtftp (
+                      Pxe,
+                      EFI_PXE_BASE_CODE_TFTP_READ_FILE,
+                      (VOID *)(UINTN)*Image,
+                      FALSE,
+                      &TftpBufferSize,
+                      NULL,
+                      &ServerIp,
+                      (UINT8*)AsciiPathName,
+                      NULL,
+                      FALSE
+                      );
+      if (EFI_ERROR (Status)) {
+        gBS->FreePages (*Image, EFI_SIZE_TO_PAGES (TftpBufferSize));
+      } else {
+        *ImageSize = (UINTN)TftpBufferSize;
+        break;
+      }
+    }
   } else {
-    *ImageSize = (UINTN)TftpBufferSize;
+    // Allocate a buffer to hold the whole file.
+    Status = gBS->AllocatePages (
+                    Type,
+                    EfiBootServicesCode,
+                    EFI_SIZE_TO_PAGES (TftpBufferSize),
+                    Image
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "Failed to allocate space for kernel image: %r\n", Status));
+      goto EXIT;
+    }
+
+    Status = Pxe->Mtftp (
+                    Pxe,
+                    EFI_PXE_BASE_CODE_TFTP_READ_FILE,
+                    (VOID *)(UINTN)*Image,
+                    FALSE,
+                    &TftpBufferSize,
+                    NULL,
+                    &ServerIp,
+                    (UINT8*)AsciiPathName,
+                    NULL,
+                    FALSE
+                    );
+    if (EFI_ERROR (Status)) {
+      gBS->FreePages (*Image, EFI_SIZE_TO_PAGES (TftpBufferSize));
+    } else {
+      *ImageSize = (UINTN)TftpBufferSize;
+    }
   }
 
 EXIT:

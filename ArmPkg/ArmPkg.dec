@@ -133,6 +133,8 @@
   gArmTokenSpaceGuid.PcdArmMachineType|0|UINT32|0x0000001E
   # The compressed Linux kernel is expected to be under 128MB from the beginning of the System Memory
   gArmTokenSpaceGuid.PcdArmLinuxKernelMaxOffset|0x08000000|UINT32|0x0000001F
+  # Maximum file size for TFTP servers that do not support 'tsize' extension
+  gArmTokenSpaceGuid.PcdMaxTftpFileSize|0x01000000|UINT32|0x00000000
 
   #
   # ARM Architectural Timer
