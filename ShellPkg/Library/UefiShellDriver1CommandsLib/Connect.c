@@ -34,19 +34,28 @@ ShellConnectDevicePath (
   EFI_DEVICE_PATH_PROTOCOL  *RemainingDevicePath;
   EFI_STATUS                Status;
   EFI_HANDLE                Handle;
+  EFI_HANDLE                PreviousHandle;
   
   if (DevicePathToConnect == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
-  do{
+
+  PreviousHandle = NULL;
+  do{    
     RemainingDevicePath = DevicePathToConnect;
     Status = gBS->LocateDevicePath (&gEfiDevicePathProtocolGuid, &RemainingDevicePath, &Handle);
+    
     if (!EFI_ERROR (Status) && (Handle != NULL)) {
-      Status = gBS->ConnectController (Handle, NULL, RemainingDevicePath, FALSE);
+      if (PreviousHandle == Handle) {
+        Status = EFI_NOT_FOUND;
+      } else {
+        PreviousHandle = Handle;
+        Status = gBS->ConnectController (Handle, NULL, RemainingDevicePath, FALSE);
+      }
     }
-  } while (!EFI_ERROR (Status) && !IsDevicePathEnd (RemainingDevicePath));
-
+    
+  } while (!EFI_ERROR (Status) && !IsDevicePathEnd (RemainingDevicePath) );
+  
   return Status;
    
 }
@@ -188,11 +197,13 @@ ConnectFromDevPaths (
   )
 {
   EFI_DEVICE_PATH_PROTOCOL  *DevPath;
-  EFI_DEVICE_PATH_PROTOCOL  *DevPathWalker;
-  EFI_DEVICE_PATH_PROTOCOL  *Instance;
+  EFI_DEVICE_PATH_PROTOCOL  *CopyOfDevPath;
+  EFI_DEVICE_PATH_PROTOCOL  *Instance;  
+  EFI_DEVICE_PATH_PROTOCOL  *Next;
   UINTN                     Length;
   UINTN                     Index;
   UINTN                     HandleArrayCount;
+  UINTN                     Size;
   EFI_HANDLE                *HandleArray;
   EFI_STATUS                Status;
   BOOLEAN                   AtLeastOneConnected;
@@ -202,7 +213,7 @@ ConnectFromDevPaths (
   DevPath = NULL;
   Length  = 0;
   AtLeastOneConnected = FALSE;
-  
+
   //
   // Get the DevicePath buffer from the variable...
   //
@@ -213,31 +224,51 @@ ConnectFromDevPaths (
       return EFI_OUT_OF_RESOURCES;
     }
     Status = gRT->GetVariable((CHAR16*)Key, (EFI_GUID*)&gEfiGlobalVariableGuid, NULL, &Length, DevPath);
+    if (EFI_ERROR (Status)) {
+      if (DevPath != NULL) {
+        FreePool (DevPath);
+      }
+      return Status;
+    }
+  } else if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   Status = EFI_NOT_FOUND;
+
+  CopyOfDevPath = DevPath;
   //
   // walk the list of devices and connect them
   //
-  for (DevPathWalker = DevPath
-    ;  DevPathWalker < (DevPath + Length) && EFI_ERROR(Status) && DevPath != NULL
-    ;  DevPathWalker += GetDevicePathSize(DevPathWalker)
-   ){
+  do {
+    //
+    // Check every instance of the console variable
+    //
+    Instance = GetNextDevicePathInstance (&CopyOfDevPath, &Size);
+    if (Instance == NULL) {
+      if (DevPath != NULL) {
+        FreePool (DevPath);
+      }
+      return EFI_UNSUPPORTED;
+    }
+
+    Next = Instance;
+    while (!IsDevicePathEndType (Next)) {
+      Next = NextDevicePathNode (Next);
+    }
+
+    SetDevicePathEndNode (Next);
     //
     // connect short form device path
     //
-    if ((DevicePathType (DevPathWalker) == MESSAGING_DEVICE_PATH) &&
-      ((DevicePathSubType (DevPathWalker) == MSG_USB_CLASS_DP)
-      || (DevicePathSubType (DevPathWalker) == MSG_USB_WWID_DP)
+    if ((DevicePathType (Instance) == MESSAGING_DEVICE_PATH) &&
+      ((DevicePathSubType (Instance) == MSG_USB_CLASS_DP)
+      || (DevicePathSubType (Instance) == MSG_USB_WWID_DP)
       )) {
-      Instance = DuplicateDevicePath (DevPathWalker);
-      if (Instance == NULL) {
-        FreePool(DevPath);
-        return EFI_OUT_OF_RESOURCES;
-      }
       
       Status = ShellConnectPciRootBridge ();
       if (EFI_ERROR(Status)) {
+        FreePool(Instance);
         FreePool(DevPath);
         return Status;
       }
@@ -281,26 +312,18 @@ ConnectFromDevPaths (
       if (HandleArray != NULL) {
         FreePool (HandleArray);
       }
-      FreePool (Instance);       
     } else { 
       //
       // connect the entire device path
       //
-      Instance = DuplicateDevicePath (DevPathWalker);      
-      if (Instance == NULL) {
-        FreePool(DevPath);
-        return EFI_OUT_OF_RESOURCES;
-      }
-
       Status = ShellConnectDevicePath (Instance);
       if (!EFI_ERROR (Status)) {
         AtLeastOneConnected = TRUE;
       }
-      
-      FreePool (Instance);
     }
+    FreePool (Instance);
     
-  }
+  } while (CopyOfDevPath != NULL);
   
   if (DevPath != NULL) {
     FreePool(DevPath);
@@ -399,7 +422,6 @@ ShellCommandRunConnect (
   UINT64              Intermediate;
 
   ShellStatus         = SHELL_SUCCESS;
-
   //
   // initialize the shell lib (we must be in non-auto-init...)
   //
