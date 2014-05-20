@@ -17,6 +17,7 @@ Current capabilities:
   - Optional NIC support.  Requires QEMU (0.12.2 or later)
 * UEFI Linux boots
 * UEFI Windows 8 boots
+* UEFI Windows 7 & Windows 2008 Server boot (see important notes below!)
 
 === FUTURE PLANS ===
 
@@ -243,3 +244,13 @@ selectively. For example:
       GCC:*_*_*_CC_FLAGS             = -UMDEPKG_NDEBUG
   }
 
+=== UEFI Windows 7 & Windows 2008 Server ===
+
+* One of the '-vga std' and '-vga qxl' QEMU options should be used.
+* Only one video mode, 1024x768x32, is supported at OS runtime.
+* The '-vga qxl' QEMU option is recommended. After booting the installed
+  guest OS, select the video card in Device Manager, and upgrade its driver
+  to the QXL XDDM one. Download location:
+  <http://www.spice-space.org/download.html>, Guest | Windows binaries.
+  This enables further resolutions at OS runtime, and provides S3
+  (suspend/resume) capability.

@@ -38,10 +38,12 @@
   DriverSupportedEfiVersion.c
   Gop.c
   Initialize.c
+  VbeShim.c
 
 [Packages]
   MdePkg/MdePkg.dec
   OptionRomPkg/OptionRomPkg.dec
+  OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
   BaseMemoryLib
@@ -49,6 +51,8 @@
   DebugLib
   DevicePathLib
   MemoryAllocationLib
+  PciLib
+  PrintLib
   TimerLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint

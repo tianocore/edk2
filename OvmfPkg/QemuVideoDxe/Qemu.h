@@ -502,4 +502,9 @@ QemuVideoBochsModeSetup (
   QEMU_VIDEO_PRIVATE_DATA  *Private
   );
 
+VOID
+InstallVbeShim (
+  IN CONST CHAR16         *CardName,
+  IN EFI_PHYSICAL_ADDRESS FrameBufferBase
+  );
 #endif

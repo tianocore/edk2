@@ -398,6 +398,11 @@ QemuVideoControllerDriverStart (
     goto UninstallGop;
   }
 
+  if (Private->Variant == QEMU_VIDEO_BOCHS_MMIO ||
+      Private->Variant == QEMU_VIDEO_BOCHS) {
+    InstallVbeShim (Card->Name, Private->GraphicsOutput.Mode->FrameBufferBase);
+  }
+
   gBS->RestoreTPL (OldTpl);
   return EFI_SUCCESS;
 
