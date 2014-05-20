@@ -106,7 +106,7 @@ InstallAllStructures (
     //
     // Log the SMBIOS data for this structure
     //
-    SmbiosHandle = SMBIOS_HANDLE_PI_RESERVED;
+    SmbiosHandle = SmbiosTable.Hdr->Handle;
     Status = Smbios->Add (
                        Smbios,
                        NULL,
