@@ -84,20 +84,20 @@ SmbiosTableLength (
   Install all structures from the given SMBIOS structures block
 
   @param  Smbios               SMBIOS protocol
-  @param  EntryPointStructure  SMBIOS entry point structures block
+  @param  TableAddress         SMBIOS tables starting address
 
 **/
 EFI_STATUS
 InstallAllStructures (
   IN EFI_SMBIOS_PROTOCOL       *Smbios,
-  IN SMBIOS_TABLE_ENTRY_POINT  *EntryPointStructure
+  IN UINT8                     *TableAddress
   )
 {
   EFI_STATUS                Status;
   SMBIOS_STRUCTURE_POINTER  SmbiosTable;
   EFI_SMBIOS_HANDLE         SmbiosHandle;
 
-  SmbiosTable.Raw = (UINT8*)(UINTN) EntryPointStructure->TableAddress;
+  SmbiosTable.Raw = TableAddress;
   if (SmbiosTable.Raw == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -145,6 +145,7 @@ SmbiosTablePublishEntry (
   EFI_STATUS                Status;
   EFI_SMBIOS_PROTOCOL       *Smbios;
   SMBIOS_TABLE_ENTRY_POINT  *EntryPointStructure;
+  UINT8                     *SmbiosTables;
 
   //
   // Find the SMBIOS protocol
@@ -159,11 +160,24 @@ SmbiosTablePublishEntry (
   }
 
   //
-  // Add Xen SMBIOS data if found
+  // Add Xen or QEMU SMBIOS data if found
   //
   EntryPointStructure = GetXenSmbiosTables ();
   if (EntryPointStructure != NULL) {
-    Status = InstallAllStructures (Smbios, EntryPointStructure);
+    SmbiosTables = (UINT8*)(UINTN)EntryPointStructure->TableAddress;
+  } else {
+    SmbiosTables = GetQemuSmbiosTables ();
+  }
+
+  if (SmbiosTables != NULL) {
+    Status = InstallAllStructures (Smbios, SmbiosTables);
+
+    //
+    // Free SmbiosTables if allocated by Qemu (i.e., NOT by Xen):
+    //
+    if (EntryPointStructure == NULL) {
+      FreePool (SmbiosTables);
+    }
   }
 
   return Status;
