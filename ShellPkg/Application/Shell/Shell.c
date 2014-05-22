@@ -1378,14 +1378,14 @@ StripUnreplacedEnvironmentVariables(
     }
     ASSERT(FirstPercent < FirstQuote);
     if (SecondPercent < FirstQuote) {
+      FirstPercent[0] = L'\"';
+      SecondPercent[0] = L'\"';
+
       //
       // We need to remove from FirstPercent to SecondPercent
       //
-      CopyMem(FirstPercent, SecondPercent + 1, StrSize(SecondPercent + 1));
-
-      //
-      // dont need to update the locator.  both % characters are gone.
-      //
+      CopyMem(FirstPercent + 1, SecondPercent, StrSize(SecondPercent));
+      CurrentLocator = FirstPercent + 2;
       continue;
     }
     ASSERT(FirstQuote < SecondPercent);
