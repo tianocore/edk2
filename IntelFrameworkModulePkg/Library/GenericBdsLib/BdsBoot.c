@@ -2524,11 +2524,28 @@ BdsExpandPartitionPartialDevicePathToFull (
   // If exist, search the front path which point to partition node in the variable instants.
   // If fail to find or HD_BOOT_DEVICE_PATH_VARIABLE_NAME not exist, reconnect all and search in all system
   //
-  CachedDevicePath = BdsLibGetVariableAndSize (
-                      HD_BOOT_DEVICE_PATH_VARIABLE_NAME,
-                      &gHdBootDevicePathVariablGuid,
-                      &CachedDevicePathSize
-                      );
+  GetVariable2 (
+    HD_BOOT_DEVICE_PATH_VARIABLE_NAME,
+    &gHdBootDevicePathVariablGuid,
+    (VOID **) &CachedDevicePath,
+    &CachedDevicePathSize
+    );
+
+  //
+  // Delete the invalid HD_BOOT_DEVICE_PATH_VARIABLE_NAME variable.
+  //
+  if ((CachedDevicePath != NULL) && !IsDevicePathValid (CachedDevicePath, CachedDevicePathSize)) {
+    FreePool (CachedDevicePath);
+    CachedDevicePath = NULL;
+    Status = gRT->SetVariable (
+                    HD_BOOT_DEVICE_PATH_VARIABLE_NAME,
+                    &gHdBootDevicePathVariablGuid,
+                    0,
+                    0,
+                    NULL
+                    );
+    ASSERT_EFI_ERROR (Status);
+  }
 
   if (CachedDevicePath != NULL) {
     TempNewDevicePath = CachedDevicePath;
@@ -2591,7 +2608,7 @@ BdsExpandPartitionPartialDevicePathToFull (
         Status = gRT->SetVariable (
                         HD_BOOT_DEVICE_PATH_VARIABLE_NAME,
                         &gHdBootDevicePathVariablGuid,
-                        EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                        EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                         GetDevicePathSize (CachedDevicePath),
                         CachedDevicePath
                         );
@@ -2690,7 +2707,7 @@ BdsExpandPartitionPartialDevicePathToFull (
       Status = gRT->SetVariable (
                       HD_BOOT_DEVICE_PATH_VARIABLE_NAME,
                       &gHdBootDevicePathVariablGuid,
-                      EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                      EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                       GetDevicePathSize (CachedDevicePath),
                       CachedDevicePath
                       );
