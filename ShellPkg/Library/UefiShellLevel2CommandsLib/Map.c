@@ -1,7 +1,7 @@
 /** @file
   Main file for map shell level 2 command.
 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -345,6 +345,7 @@ MappingListHasType(
     FreePool(NewSpecific);
   }
   if (  Consist
+    && !Specific
     && (SearchList(MapList, L"HD*",  NULL, TRUE, TRUE, L";")
       ||SearchList(MapList, L"CD*",  NULL, TRUE, TRUE, L";")
       ||SearchList(MapList, L"F*",   NULL, TRUE, TRUE, L";")
@@ -353,6 +354,7 @@ MappingListHasType(
   }
 
   if (  Normal
+    && !Specific
     && (SearchList(MapList, L"FS",  NULL, FALSE, TRUE, L";")
       ||SearchList(MapList, L"BLK", NULL, FALSE, TRUE, L";"))){
     return (TRUE);
@@ -416,7 +418,11 @@ PerformSingleMappingDisplay(
     return EFI_NOT_FOUND;
   }
 
-  if (Normal) {
+  if (Normal || !Consist) {
+    //
+    // need the Normal here since people can use both on command line.  otherwise unused.
+    //
+
     //
     // Allocate a name
     //
@@ -434,7 +440,7 @@ PerformSingleMappingDisplay(
     if (TempSpot != NULL) {
       *TempSpot = CHAR_NULL;
     }
-  } else if (Consist) {
+  } else {
     CurrentName = NULL;
 
     //
@@ -485,16 +491,10 @@ PerformSingleMappingDisplay(
         Alias[StrLen(Alias)-1] = CHAR_NULL;
       }
     }
-  } else {
-    CurrentName = NULL;
-    CurrentName = StrnCatGrow(&CurrentName, 0, L"", 0);
-    if (CurrentName == NULL) {
-      return (EFI_OUT_OF_RESOURCES);
-    }
   }
   DevPathString = ConvertDevicePathToText(DevPath, TRUE, FALSE);
+  TempLen = StrLen(CurrentName);
   if (!SFO) {
-    TempLen = StrLen(CurrentName);
     ShellPrintHiiEx (
       -1,
       -1,
@@ -528,7 +528,6 @@ PerformSingleMappingDisplay(
       SHELL_FREE_NON_NULL(MediaType);
     }
   } else {
-    TempLen = StrLen(CurrentName);
     ShellPrintHiiEx (
       -1,
       -1,
