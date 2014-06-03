@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
   
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -28,6 +29,7 @@ CacheRangeOperation (
   UINTN ArmCacheOperationThreshold = PcdGet32(PcdArmCacheOperationThreshold);
   
   if ((CacheOperation != NULL) && (Length >= ArmCacheOperationThreshold)) {
+    ArmDrainWriteBuffer ();
     CacheOperation ();
   } else {
     // Align address (rounding down)

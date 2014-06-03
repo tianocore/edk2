@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
   
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -233,6 +234,7 @@ ArmInvalidateDataCache (
   VOID
   )
 {
+  ArmDrainWriteBuffer ();
   ArmV7DataCacheOperation (ArmInvalidateDataCacheEntryBySetWay);
 }
 
@@ -242,6 +244,7 @@ ArmCleanInvalidateDataCache (
   VOID
   )
 {
+  ArmDrainWriteBuffer ();
   ArmV7DataCacheOperation (ArmCleanInvalidateDataCacheEntryBySetWay);
 }
 
@@ -251,6 +254,7 @@ ArmCleanDataCache (
   VOID
   )
 {
+  ArmDrainWriteBuffer ();
   ArmV7DataCacheOperation (ArmCleanDataCacheEntryBySetWay);
 }
 
@@ -260,5 +264,6 @@ ArmCleanDataCacheToPoU (
   VOID
   )
 {
+  ArmDrainWriteBuffer ();
   ArmV7PoUDataCacheOperation (ArmCleanDataCacheEntryBySetWay);
 }
