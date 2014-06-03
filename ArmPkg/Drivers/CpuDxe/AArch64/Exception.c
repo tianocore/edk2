@@ -133,7 +133,7 @@ InitializeExceptions (
 
   // AArch64 alignment? The Vector table must be 2k-byte aligned (bottom 11 bits zero)?
   //DEBUG ((EFI_D_ERROR, "vbar set addr: 0x%016lx\n",(UINTN)ExceptionHandlersStart));
-  //ASSERT(((UINTN)ExceptionHandlersStart & ((1 << 11)-1)) == 0);
+  //ASSERT(((UINTN)ExceptionHandlersStart & ARM_VECTOR_TABLE_ALIGNMENT) == 0);
 
   // We do not copy the Exception Table at PcdGet32(PcdCpuVectorBaseAddress). We just set Vector Base Address to point into CpuDxe code.
   ArmWriteVBar ((UINTN)ExceptionHandlersStart);

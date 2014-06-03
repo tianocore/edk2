@@ -3,6 +3,7 @@
 # Use ARMv6 instruction to operate on a single stack
 #
 # Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+# Copyright (c) 2014, ARM Limited. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -35,7 +36,7 @@ This is the stack constructed by the exception handler (low address to high addr
   R10   0x28
   R11   0x2c
   R12   0x30
-  SP    0x34    # reserved via adding 0x20 (32) to the SP
+  SP    0x34    # reserved via subtraction 0x20 (32) from SP
   LR    0x38
   PC    0x3c
   CPSR  0x40
@@ -220,7 +221,7 @@ ASM_PFX(AsmCommonExceptionEntry):
 
   add       R2, SP, #0x38           @ Make R2 point to EFI_SYSTEM_CONTEXT_ARM.LR
   and       R3, R1, #0x1f           @ Check CPSR to see if User or System Mode
-  cmp       R3, #0x1f               @ if ((CPSR == 0x10) || (CPSR == 0x1df))
+  cmp       R3, #0x1f               @ if ((CPSR == 0x10) || (CPSR == 0x1f))
   cmpne     R3, #0x10               @   
   stmeqed   R2, {lr}^               @   save unbanked lr
                                     @ else 
@@ -229,13 +230,13 @@ ASM_PFX(AsmCommonExceptionEntry):
 
   ldr       R5, [SP, #0x58]         @ PC is the LR pushed by srsfd 
                                     @ Check to see if we have to adjust for Thumb entry
-  sub       r4, r0, #1              @ if (ExceptionType == 1 || ExceptionType ==2)) {
+  sub       r4, r0, #1              @ if (ExceptionType == 1 || ExceptionType == 2)) {
   cmp       r4, #1                  @   // UND & SVC have differnt LR adjust for Thumb 
   bhi       NoAdjustNeeded
   
   tst       r1, #0x20               @   if ((CPSR & T)) == T) {  // Thumb Mode on entry 
-  addne     R5, R5, #2              @     PC += 2@
-  str       R5,[SP,#0x58]           @ Update LR value pused by srsfd 
+  addne     R5, R5, #2              @     PC += 2;
+  strne     R5,[SP,#0x58]           @ Update LR value pushed by srsfd
   
 NoAdjustNeeded:
 
@@ -251,6 +252,10 @@ NoAdjustNeeded:
   vpush     {d0-d15}                @ save vstm registers in case they are used in optimizations
 #endif
 
+  mov       R4, SP                  @ Save current SP
+  tst       R4, #4
+  subne     SP, SP, #4              @ Adjust SP if not 8-byte aligned
+
 /* 
 VOID
 EFIAPI
@@ -262,6 +267,8 @@ CommonCExceptionHandler (
 */  
   blx       ASM_PFX(CommonCExceptionHandler)  @ Call exception handler
 
+  mov       SP, R4                  @ Restore SP
+
 #if (FixedPcdGet32(PcdVFPEnabled))
   vpop      {d0-d15}  
 #endif
@@ -269,7 +276,7 @@ CommonCExceptionHandler (
   ldr       R1, [SP, #0x4c]         @ Restore EFI_SYSTEM_CONTEXT_ARM.IFSR
   mcr       p15, 0, R1, c5, c0, 1   @ Write IFSR
 
-  ldr       R1, [SP, #0x44]         @ sRestore EFI_SYSTEM_CONTEXT_ARM.DFSR
+  ldr       R1, [SP, #0x44]         @ Restore EFI_SYSTEM_CONTEXT_ARM.DFSR
   mcr       p15, 0, R1, c5, c0, 0   @ Write DFSR
   
   ldr       R1,[SP,#0x3c]           @ EFI_SYSTEM_CONTEXT_ARM.PC

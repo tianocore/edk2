@@ -209,7 +209,7 @@ InitializeExceptions (
     ArmWriteVBar (PcdGet32(PcdCpuVectorBaseAddress));
   } else {
     // The Vector table must be 32-byte aligned
-    ASSERT(((UINT32)ExceptionHandlersStart & ((1 << 5)-1)) == 0);
+    ASSERT(((UINT32)ExceptionHandlersStart & ARM_VECTOR_TABLE_ALIGNMENT) == 0);
 
     // We do not copy the Exception Table at PcdGet32(PcdCpuVectorBaseAddress). We just set Vector Base Address to point into CpuDxe code.
     ArmWriteVBar ((UINT32)ExceptionHandlersStart);
