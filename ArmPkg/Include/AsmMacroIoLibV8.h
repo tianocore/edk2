@@ -1,5 +1,5 @@
 /** @file
-  Macros to work around lack of Apple support for LDR register, =expr
+  Macros to work around lack of Clang support for LDR register, =expr
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Portions copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
@@ -17,54 +17,6 @@
 
 #ifndef __MACRO_IO_LIBV8_H__
 #define __MACRO_IO_LIBV8_H__
-
-#if defined (__GNUC__)
-
-#define MmioWrite32(Address, Data) \
-  ldr  x1, =Address ;              \
-  ldr  w0, =Data    ;              \
-  str  w0, [x1]
-
-#define MmioOr32(Address, OrData) \
-  ldr  x1, =Address ;             \
-  ldr  w2, =OrData  ;             \
-  ldr  w0, [x1]     ;             \
-  orr  w0, w0, w2   ;             \
-  str  w0, [x1]
-
-#define MmioAnd32(Address, AndData) \
-  ldr  x1, =Address ;               \
-  ldr  w2, =AndData ;               \
-  ldr  w0, [x1]     ;               \
-  and  w0, w0, w2   ;               \
-  str  w0, [x1]
-
-#define MmioAndThenOr32(Address, AndData, OrData) \
-  ldr  x1, =Address ;                             \
-  ldr  w0, [x1]     ;                             \
-  ldr  w2, =AndData ;                             \
-  and  w0, w0, w2   ;                             \
-  ldr  w2, =OrData  ;                             \
-  orr  w0, w0, w2   ;                             \
-  str  w0, [x1]
-
-#define MmioWriteFromReg32(Address, Reg) \
-  ldr  x1, =Address ;                    \
-  str  Reg, [x1]
-
-#define MmioRead32(Address) \
-  ldr  x1, =Address ;       \
-  ldr  w0, [x1]
-
-#define MmioReadToReg32(Address, Reg) \
-  ldr  x1, =Address ;                 \
-  ldr  Reg, [x1]
-
-#define LoadConstant(Data) \
-  ldr  x0, =Data
-
-#define LoadConstantToReg(Data, Reg) \
-  ldr  Reg, =Data
 
 #define SetPrimaryStack(StackTop, GlobalSize, Tmp, Tmp1)  \
   ands    Tmp, GlobalSize, #15        ;                   \
@@ -124,12 +76,35 @@ _InitializePrimaryStackEnd:
         cmp    SAFE_XREG, #0x4      ;\
         b.ne   .                    ;// We should never get here
 // EL1 code starts here
+#if defined(__clang__)
 
-#else
+// load x0 with _Data
+#define LoadConstant(_Data)              \
+  ldr  x0, 1f                          ; \
+  b    2f                              ; \
+.align(8)                              ; \
+1:                                       \
+  .8byte (_Data)                       ; \
+2:
 
-#error RVCT AArch64 tool chain is not supported
+// load _Reg with _Data
+#define LoadConstantToReg(_Data, _Reg)    \
+  ldr  _Reg, 1f                         ; \
+  b    2f                               ; \
+.align(8)                               ; \
+1:                                        \
+  .8byte (_Data)                        ; \
+2:
 
-#endif // __GNUC__ 
+#elif defined (__GNUC__)
+
+#define LoadConstant(Data) \
+  ldr  x0, =Data
+
+#define LoadConstantToReg(Data, Reg) \
+  ldr  Reg, =Data
+
+#endif // __GNUC__
 
 #endif // __MACRO_IO_LIBV8_H__
 
