@@ -1,8 +1,8 @@
 /** @file
   Generic ARM implementation of TimerLib.h
 
-  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
-  
+  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -46,7 +46,7 @@ TimerConstructor (
 #ifdef MDE_CPU_ARM
     // Only set the frequency for ARMv7. We expect the secure firmware to have already do it
     // If the security extensions are not implemented set Timer Frequency
-    if ((ArmReadIdPfr1 () & 0xF0) == 0x0) {
+    if ((ArmReadIdPfr1 () & ARM_PFR1_SEC) == 0x0) {
       ArmArchTimerSetTimerFreq (PcdGet32 (PcdArmArchTimerFreqInHz));
     }
 #endif

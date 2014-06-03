@@ -33,6 +33,7 @@
 
 // ID_AA64PFR0 - AArch64 Processor Feature Register 0 definitions
 #define AARCH64_PFR0_FP         (0xF << 16)
+#define AARCH64_PFR0_GIC        (0xF << 24)
 
 // SCR - Secure Configuration Register definitions
 #define SCR_NS                  (1 << 0)

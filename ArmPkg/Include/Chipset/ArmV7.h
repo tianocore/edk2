@@ -22,6 +22,11 @@
 // ARM Interrupt ID in Exception Table
 #define ARM_ARCH_EXCEPTION_IRQ            EXCEPT_ARM_IRQ
 
+// ID_PFR1 - ARM Processor Feature Register 1 definitions
+#define ARM_PFR1_SEC        (0xFUL << 4)
+#define ARM_PFR1_TIMER      (0xFUL << 16)
+#define ARM_PFR1_GIC        (0xFUL << 28)
+
 // Domain Access Control Register
 #define DOMAIN_ACCESS_CONTROL_MASK(a)     (3UL << (2 * (a)))
 #define DOMAIN_ACCESS_CONTROL_NONE(a)     (0UL << (2 * (a)))
