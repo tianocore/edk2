@@ -2,7 +2,7 @@
   Default exception handler
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -43,6 +43,82 @@ GetImageName (
   OUT UINTN  *PeCoffSizeOfHeaders
   );
 
+STATIC
+VOID
+DescribeInstructionOrDataAbort (
+  IN CHAR8 *AbortType,
+  IN UINTN Iss
+  )
+{
+  CHAR8 *AbortCause;
+
+  switch (Iss & 0x3f) {
+    case 0x0: AbortCause = "Address size fault, zeroth level of translation or translation table base register";  break;
+    case 0x1: AbortCause = "Address size fault, first level";  break;
+    case 0x2: AbortCause = "Address size fault, second level";  break;
+    case 0x3: AbortCause = "Address size fault, third level";  break;
+    case 0x4: AbortCause = "Translation fault, zeroth level";  break;
+    case 0x5: AbortCause = "Translation fault, first level";  break;
+    case 0x6: AbortCause = "Translation fault, second level";  break;
+    case 0x7: AbortCause = "Translation fault, third level";  break;
+    case 0x9: AbortCause = "Access flag fault, first level";  break;
+    case 0xa: AbortCause = "Access flag fault, second level";  break;
+    case 0xb: AbortCause = "Access flag fault, third level";  break;
+    case 0xd: AbortCause = "Permission fault, first level";  break;
+    case 0xe: AbortCause = "Permission fault, second level";  break;
+    case 0xf: AbortCause = "Permission fault, third level";  break;
+    case 0x10: AbortCause = "Synchronous external abort";  break;
+    case 0x18: AbortCause = "Synchronous parity error on memory access";  break;
+    case 0x11: AbortCause = "Asynchronous external abort";  break;
+    case 0x19: AbortCause = "Asynchronous parity error on memory access";  break;
+    case 0x14: AbortCause = "Synchronous external abort on translation table walk, zeroth level";  break;
+    case 0x15: AbortCause = "Synchronous external abort on translation table walk, first level";  break;
+    case 0x16: AbortCause = "Synchronous external abort on translation table walk, second level";  break;
+    case 0x17: AbortCause = "Synchronous external abort on translation table walk, third level";  break;
+    case 0x1c: AbortCause = "Synchronous parity error on memory access on translation table walk, zeroth level";  break;
+    case 0x1d: AbortCause = "Synchronous parity error on memory access on translation table walk, first level";  break;
+    case 0x1e: AbortCause = "Synchronous parity error on memory access on translation table walk, second level";  break;
+    case 0x1f: AbortCause = "Synchronous parity error on memory access on translation table walk, third level";  break;
+    case 0x21: AbortCause = "Alignment fault";  break;
+    case 0x22: AbortCause = "Debug event";  break;
+    case 0x30: AbortCause = "TLB conflict abort";  break;
+    case 0x33:
+    case 0x34: AbortCause = "IMPLEMENTATION DEFINED";  break;
+    case 0x35:
+    case 0x36: AbortCause = "Domain fault"; break;
+    default: AbortCause = ""; break;
+  }
+
+  DEBUG ((EFI_D_ERROR, "\n%a: %a\n", AbortType, AbortCause));
+}
+
+STATIC
+VOID
+DescribeExceptionSyndrome (
+  IN UINT32 Esr
+  )
+{
+  CHAR8 *Message;
+  UINTN Ec;
+  UINTN Iss;
+
+  Ec = Esr >> 26;
+  Iss = Esr & 0x00ffffff;
+
+  switch (Ec) {
+    case 0x15: Message = "SVC executed in AArch64"; break;
+    case 0x20:
+    case 0x21: DescribeInstructionOrDataAbort ("Instruction abort", Iss); return;
+    case 0x22: Message = "PC alignment fault"; break;
+    case 0x23: Message = "SP alignment fault"; break;
+    case 0x24:
+    case 0x25: DescribeInstructionOrDataAbort ("Data abort", Iss); return;
+    default: return;
+  }
+
+  DEBUG ((EFI_D_ERROR, "\n %a \n", Message));
+}
+
 /**
   This is the default action to take on an unexpected exception
 
@@ -61,7 +137,7 @@ DefaultExceptionHandler (
   CHAR8  Buffer[100];
   UINTN  CharCount;
 
-  CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"\n\n%a Exception: \n", gExceptionTypeString[ExceptionType]);
+  CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"\n\n%a Exception at 0x%016lx\n", gExceptionTypeString[ExceptionType], SystemContext.SystemContextAArch64->ELR);
   SerialPortWrite ((UINT8 *) Buffer, CharCount);
 
   DEBUG_CODE_BEGIN ();
@@ -106,7 +182,6 @@ DefaultExceptionHandler (
 
   DEBUG ((EFI_D_ERROR, "\n ESR : EC 0x%02x  IL 0x%x  ISS 0x%08x\n", (SystemContext.SystemContextAArch64->ESR & 0xFC000000) >> 26, (SystemContext.SystemContextAArch64->ESR >> 25) & 0x1, SystemContext.SystemContextAArch64->ESR & 0x1FFFFFF ));
 
-  DEBUG ((EFI_D_ERROR, "\n"));
+  DescribeExceptionSyndrome (SystemContext.SystemContextAArch64->ESR);
   ASSERT (FALSE);
 }
-
