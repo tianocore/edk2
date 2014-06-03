@@ -131,10 +131,10 @@
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(38400,8,N,1)/VenPcAnsi()"
 
   #
-  # ARM Architectual Timer Frequency
+  # ARM Architectural Timer Frequency
   #
-  # Set model tick to 120Mhz. This depends a lot on workstation performance.
-  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|120000000
+  # Set model tick to 100Mhz. This depends a lot on workstation performance.
+  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|100000000
 
 ################################################################################
 #
