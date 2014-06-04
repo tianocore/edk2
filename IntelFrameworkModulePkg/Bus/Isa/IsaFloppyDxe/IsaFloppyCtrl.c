@@ -1,7 +1,7 @@
 /** @file
   Internal floppy disk controller programming functions for the floppy driver.
   
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1083,17 +1083,17 @@ DataOutByte (
   Detect the specified floppy logic drive is busy or not within a period of time.
   
   @param FdcDev           Indicate it is drive A or drive B
-  @param TimeoutInSeconds the time period for waiting
+  @param Timeout          The time period for waiting
   
   @retval EFI_SUCCESS:  The drive and command are not busy
   @retval EFI_TIMEOUT:  The drive or command is still busy after a period time that
-                        set by TimeoutInSeconds
+                        set by Timeout
 
 **/
 EFI_STATUS
 FddWaitForBSYClear (
   IN FDC_BLK_IO_DEV  *FdcDev,
-  IN UINTN           TimeoutInSeconds
+  IN UINTN           Timeout
   )
 {
   UINTN Delay;
@@ -1112,7 +1112,7 @@ FddWaitForBSYClear (
   //
   Mask  = (UINT8) ((FdcDev->Disk == FdcDisk0 ? MSR_DAB : MSR_DBB) | MSR_CB);
 
-  Delay = ((TimeoutInSeconds * STALL_1_MSECOND) / 50) + 1;
+  Delay = ((Timeout * STALL_1_MSECOND) / 50) + 1;
   do {
     StatusRegister = FdcReadPort (FdcDev, FDC_REGISTER_MSR);
     if ((StatusRegister & Mask) == 0x00) {
@@ -1134,12 +1134,11 @@ FddWaitForBSYClear (
 }
 
 /**
-
-  Routine Description:  Determine whether FDC is ready to write or read.
+  Determine whether FDC is ready to write or read.
   
   @param  FdcDev Pointer to instance of FDC_BLK_IO_DEV
   @param  Dio BOOLEAN:      Indicate the FDC is waiting to write or read
-  @param  TimeoutInSeconds UINTN: The time period for waiting
+  @param  Timeout           The time period for waiting
   
   @retval EFI_SUCCESS:  FDC is ready to write or read
   @retval EFI_NOT_READY:  FDC is not ready within the specified time period
@@ -1149,7 +1148,7 @@ EFI_STATUS
 FddDRQReady (
   IN FDC_BLK_IO_DEV  *FdcDev,
   IN BOOLEAN         Dio,
-  IN  UINTN          TimeoutInSeconds
+  IN UINTN           Timeout
   )
 {
   UINTN Delay;
@@ -1169,7 +1168,7 @@ FddDRQReady (
   //
   // in order to compare bit6
   //
-  Delay = ((TimeoutInSeconds * STALL_1_MSECOND) / 50) + 1;
+  Delay = ((Timeout * STALL_1_MSECOND) / 50) + 1;
   do {
     StatusRegister = FdcReadPort (FdcDev, FDC_REGISTER_MSR);
     if ((StatusRegister & MSR_RQM) == MSR_RQM && (StatusRegister & MSR_DIO) == DataInOut) {
