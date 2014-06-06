@@ -345,7 +345,7 @@ MappingListHasType(
     FreePool(NewSpecific);
   }
   if (  Consist
-    && !Specific
+    && Specific == NULL
     && (SearchList(MapList, L"HD*",  NULL, TRUE, TRUE, L";")
       ||SearchList(MapList, L"CD*",  NULL, TRUE, TRUE, L";")
       ||SearchList(MapList, L"F*",   NULL, TRUE, TRUE, L";")
@@ -354,7 +354,7 @@ MappingListHasType(
   }
 
   if (  Normal
-    && !Specific
+    && Specific == NULL
     && (SearchList(MapList, L"FS",  NULL, FALSE, TRUE, L";")
       ||SearchList(MapList, L"BLK", NULL, FALSE, TRUE, L";"))){
     return (TRUE);
