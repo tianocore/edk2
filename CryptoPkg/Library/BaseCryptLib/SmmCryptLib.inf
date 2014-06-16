@@ -108,4 +108,4 @@
 #
 [BuildOptions]
   GCC:*_GCC44_IA32_CC_FLAGS = "-D__cdecl=__attribute__((cdecl))" "-D__declspec(t)=__attribute__((t))"
-  
+  XCODE:*_*_*_CC_FLAGS = -mmmx -msse
