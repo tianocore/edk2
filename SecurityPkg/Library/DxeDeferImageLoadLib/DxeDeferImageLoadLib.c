@@ -246,7 +246,7 @@ GetAccessControl (
     CheckLen  = 0;
     while (CheckLen < Info->InfoSize - sizeof (EFI_USER_INFO)) {
       Access = (EFI_USER_INFO_ACCESS_CONTROL *) ((UINT8 *) (Info + 1) + CheckLen);
-      if ((Access->Type == AccessType)) {
+      if (Access->Type == AccessType) {
         *AccessControl = AllocateZeroPool (Access->Size);
         ASSERT (*AccessControl != NULL);
         CopyMem (*AccessControl, Access, Access->Size);
