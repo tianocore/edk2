@@ -89,7 +89,7 @@ shift
 
 :no_nt32
 if /I "%1"=="NewBuild" shift
-if not defined EDK_TOOLS_PATH set EDK_TOOLS_PATH=%WORKSPACE%\BaseTools
+set EDK_TOOLS_PATH=%WORKSPACE%\BaseTools
 IF NOT EXIST "%EDK_TOOLS_PATH%\toolsetup.bat" goto BadBaseTools
 call %EDK_TOOLS_PATH%\toolsetup.bat %*
 if /I "%1"=="Reconfig" shift
