@@ -1,7 +1,7 @@
 /** @file
   Provides interface to EFI_FILE_HANDLE functionality.
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -119,11 +119,9 @@ FileHandleSetInfo (
   )
 {
 
-  //
-  // ASSERT if the FileHandle or FileInfo is NULL
-  //
-  ASSERT (FileHandle != NULL);
-  ASSERT (FileInfo   != NULL);
+  if (FileHandle == NULL || FileInfo == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
 
   //
   // Set the info
@@ -171,10 +169,9 @@ FileHandleRead(
   OUT VOID                      *Buffer
   )
 {
-  //
-  // ASSERT if FileHandle is NULL
-  //
-  ASSERT (FileHandle != NULL);
+  if (FileHandle == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
 
   //
   // Perform the read based on EFI_FILE_PROTOCOL
@@ -215,10 +212,10 @@ FileHandleWrite(
   IN VOID                       *Buffer
   )
 {
-  //
-  // ASSERT if FileHandle is NULL
-  //
-  ASSERT (FileHandle != NULL);
+  if (FileHandle == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
+
   //
   // Perform the write based on EFI_FILE_PROTOCOL
   //
@@ -243,10 +240,11 @@ FileHandleClose (
   )
 {
   EFI_STATUS Status;
-  //
-  // ASSERT if FileHandle is NULL
-  //
-  ASSERT (FileHandle != NULL);
+
+  if (FileHandle == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
+
   //
   // Perform the Close based on EFI_FILE_PROTOCOL
   //
@@ -275,10 +273,11 @@ FileHandleDelete (
   )
 {
   EFI_STATUS Status;
-  //
-  // ASSERT if FileHandle is NULL
-  //
-  ASSERT (FileHandle != NULL);
+
+  if (FileHandle == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
+
   //
   // Perform the Delete based on EFI_FILE_PROTOCOL
   //
@@ -312,10 +311,10 @@ FileHandleSetPosition (
   IN UINT64             Position
   )
 {
-  //
-  // ASSERT if FileHandle is NULL
-  //
-  ASSERT (FileHandle != NULL);
+  if (FileHandle == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
+
   //
   // Perform the SetPosition based on EFI_FILE_PROTOCOL
   //
@@ -344,13 +343,10 @@ FileHandleGetPosition (
   OUT UINT64                    *Position
   )
 {
-  if (Position == NULL) {
+  if (Position == NULL || FileHandle == NULL) {
     return (EFI_INVALID_PARAMETER);
   }
-  //
-  // ASSERT if FileHandle is NULL
-  //
-  ASSERT (FileHandle != NULL);
+
   //
   // Perform the GetPosition based on EFI_FILE_PROTOCOL
   //
@@ -376,10 +372,10 @@ FileHandleFlush (
   IN EFI_FILE_HANDLE            FileHandle
   )
 {
-  //
-  // ASSERT if FileHandle is NULL
-  //
-  ASSERT (FileHandle != NULL);
+  if (FileHandle == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
+
   //
   // Perform the Flush based on EFI_FILE_PROTOCOL
   //
@@ -389,7 +385,7 @@ FileHandleFlush (
 /**
   function to determine if a given handle is a directory handle
 
-  if DirHandle is NULL then ASSERT()
+  if DirHandle is NULL then return error
 
   open the file information on the DirHandle and verify that the Attribute
   includes EFI_FILE_DIRECTORY bit set.
@@ -408,10 +404,9 @@ FileHandleIsDirectory (
 {
   EFI_FILE_INFO *DirInfo;
 
-  //
-  // ASSERT if DirHandle is NULL
-  //
-  ASSERT(DirHandle != NULL);
+  if (DirHandle == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
 
   //
   // get the file information for DirHandle
@@ -549,12 +544,9 @@ FileHandleFindNextFile(
   EFI_STATUS    Status;
   UINTN         BufferSize;
 
-  //
-  // ASSERTs for DirHandle or Buffer or NoFile poitners being NULL
-  //
-  ASSERT (DirHandle != NULL);
-  ASSERT (Buffer    != NULL);
-  ASSERT (NoFile    != NULL);
+  if (DirHandle == NULL || Buffer == NULL || NoFile == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
 
   //
   // This BufferSize MUST stay equal to the originally allocated one in GetFirstFile
@@ -584,8 +576,8 @@ FileHandleFindNextFile(
 /**
   Retrieve the size of a file.
 
-  if FileHandle is NULL then ASSERT()
-  if Size is NULL then ASSERT()
+  if FileHandle is NULL then return error
+  if Size is NULL then return error
 
   This function extracts the file size info from the FileHandle's EFI_FILE_INFO
   data.
@@ -605,11 +597,9 @@ FileHandleGetSize (
 {
   EFI_FILE_INFO                 *FileInfo;
 
-  //
-  // ASSERT for FileHandle or Size being NULL
-  //
-  ASSERT (FileHandle != NULL);
-  ASSERT (Size != NULL);
+  if (FileHandle == NULL || Size == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
 
   //
   // get the FileInfo structure
@@ -635,7 +625,7 @@ FileHandleGetSize (
 /**
   Set the size of a file.
 
-  If FileHandle is NULL then ASSERT().
+  If FileHandle is NULL then return error.
 
   This function changes the file size info from the FileHandle's EFI_FILE_INFO
   data.
@@ -656,10 +646,9 @@ FileHandleSetSize (
   EFI_FILE_INFO                 *FileInfo;
   EFI_STATUS                    Status;
 
-  //
-  // ASSERT for FileHandle or Size being NULL
-  //
-  ASSERT (FileHandle != NULL);
+  if (FileHandle == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
 
   //
   // get the FileInfo structure
@@ -701,7 +690,7 @@ FileHandleSetSize (
   If Source is NULL, there is nothing to append, just return the current buffer in
   Destination.
 
-  if Destination is NULL, then ASSERT()
+  if Destination is NULL, then return error
   if Destination's current length (including NULL terminator) is already more then
   CurrentSize, then ASSERT()
 
@@ -728,10 +717,9 @@ StrnCatGrowLeft (
   UINTN NewSize;
   UINTN CopySize;
 
-  //
-  // ASSERTs
-  //
-  ASSERT(Destination != NULL);
+  if (Destination == NULL) {
+    return (NULL);
+  }
 
   //
   // If there's nothing to do then just return Destination
@@ -964,12 +952,11 @@ FileHandleReadLine(
 
   if (Handle == NULL
     ||Size   == NULL
+    ||(Buffer==NULL&&*Size!=0)
    ){
     return (EFI_INVALID_PARAMETER);
   }
-  if (Buffer == NULL) {
-    ASSERT(*Size == 0);
-  } else {
+  if (Buffer != NULL) {
     *Buffer = CHAR_NULL;
   }
   FileHandleGetPosition(Handle, &OriginalFilePosition);
@@ -1032,7 +1019,7 @@ FileHandleReadLine(
 /**
   function to write a line of unicode text to a file.
 
-  if Handle is NULL, ASSERT.
+  if Handle is NULL, return error.
   if Buffer is NULL, do nothing.  (return SUCCESS)
 
   @param[in]     Handle         FileHandle to write to
@@ -1053,10 +1040,12 @@ FileHandleWriteLine(
   EFI_STATUS Status;
   UINTN      Size;
 
-  ASSERT(Handle != NULL);
-
   if (Buffer == NULL) {
     return (EFI_SUCCESS);
+  }
+
+  if (Handle == NULL) {
+    return (EFI_INVALID_PARAMETER);
   }
 
   Size = StrSize(Buffer) - sizeof(Buffer[0]);
@@ -1096,7 +1085,9 @@ FileHandlePrintLine(
   // Get a buffer to print into
   //
   Buffer = AllocateZeroPool (PcdGet16 (PcdShellPrintBufferSize));
-  ASSERT (Buffer != NULL);
+  if (Buffer == NULL) {
+    return (EFI_OUT_OF_RESOURCES);
+  }
 
   //
   // Print into our buffer
@@ -1122,7 +1113,7 @@ FileHandlePrintLine(
 
   This will NOT work on directories.
 
-  If Handle is NULL, then ASSERT.
+  If Handle is NULL, then return False.
 
   @param[in] Handle     the file handle
 
@@ -1139,19 +1130,18 @@ FileHandleEof(
   UINT64        Pos;
   BOOLEAN       RetVal;
 
-  //
-  // ASSERT if Handle is NULL
-  //
-  ASSERT(Handle != NULL);
+  if (Handle == NULL) {
+    return (FALSE);
+  }
 
   FileHandleGetPosition(Handle, &Pos);
   Info = FileHandleGetInfo (Handle);
-  ASSERT(Info != NULL);
-  FileHandleSetPosition(Handle, Pos);
 
   if (Info == NULL) {
     return (FALSE);
   }
+
+  FileHandleSetPosition(Handle, Pos);
 
   if (Pos == Info->FileSize) {
     RetVal = TRUE;
