@@ -5,7 +5,7 @@
 
   Boot option manipulation
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1621,3 +1621,207 @@ BOpt_GetDriverOptions (
 
 }
 
+/**
+  Get option number according to Boot#### and BootOrder variable.
+  The value is saved as #### + 1.
+
+  @param CallbackData    The BMM context data.
+**/
+VOID
+GetBootOrder (
+  IN  BMM_CALLBACK_DATA    *CallbackData
+  )
+{
+  BMM_FAKE_NV_DATA          *BmmConfig;
+  UINT16                    Index;
+  UINT16                    OptionOrderIndex;
+  UINTN                     DeviceType;
+  BM_MENU_ENTRY             *NewMenuEntry;
+  BM_LOAD_CONTEXT           *NewLoadContext;
+
+  ASSERT (CallbackData != NULL);
+
+  DeviceType = (UINTN) -1;
+  BmmConfig  = &CallbackData->BmmFakeNvData;
+  ZeroMem (BmmConfig->BootOptionOrder, sizeof (BmmConfig->BootOptionOrder));
+
+  for (Index = 0, OptionOrderIndex = 0; ((Index < BootOptionMenu.MenuNumber) &&
+       (OptionOrderIndex < (sizeof (BmmConfig->BootOptionOrder) / sizeof (BmmConfig->BootOptionOrder[0]))));
+       Index++) {
+    NewMenuEntry   = BOpt_GetMenuEntry (&BootOptionMenu, Index);
+    NewLoadContext = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
+
+    if (NewLoadContext->IsLegacy) {
+      if (((BBS_BBS_DEVICE_PATH *) NewLoadContext->FilePathList)->DeviceType != DeviceType) {
+        DeviceType = ((BBS_BBS_DEVICE_PATH *) NewLoadContext->FilePathList)->DeviceType;
+      } else {
+        //
+        // Only show one legacy boot option for the same device type
+        // assuming the boot options are grouped by the device type
+        //
+        continue;
+      }
+    }
+    BmmConfig->BootOptionOrder[OptionOrderIndex++] = (UINT32) (NewMenuEntry->OptionNumber + 1);
+  }
+}
+
+/**
+  According to LegacyDevOrder variable to get legacy FD\HD\CD\NET\BEV
+  devices list .
+
+  @param CallbackData    The BMM context data.
+**/
+VOID
+GetLegacyDeviceOrder (
+  IN  BMM_CALLBACK_DATA    *CallbackData
+  )
+{
+  UINTN                     Index;
+  UINTN                     OptionIndex;
+  UINT16                    PageIdList [] = {FORM_SET_FD_ORDER_ID, FORM_SET_HD_ORDER_ID,
+                                             FORM_SET_CD_ORDER_ID, FORM_SET_NET_ORDER_ID,
+                                             FORM_SET_BEV_ORDER_ID};
+  UINTN                     PageNum;  
+  UINTN                     VarSize;
+  UINT8                     *VarData;     
+  UINT8                     *WorkingVarData; 
+  LEGACY_DEV_ORDER_ENTRY    *DevOrder;
+  UINT16                    VarDevOrder;  
+  UINT8                     *DisMap;  
+  BM_MENU_OPTION            *OptionMenu;
+  BBS_TYPE                  BbsType;
+  UINT8                     *LegacyOrder;
+  UINT8                     *OldData;  
+  UINTN                     Pos;
+  UINTN                     Bit;
+  
+  ASSERT (CallbackData != NULL);
+  
+  OptionMenu  = NULL;
+  BbsType     = 0;
+  LegacyOrder = NULL;
+  OldData     = NULL;
+  DisMap      = ZeroMem (CallbackData->BmmFakeNvData.DisableMap, sizeof (CallbackData->BmmFakeNvData.DisableMap));
+  PageNum     = sizeof (PageIdList) / sizeof (PageIdList[0]);
+  VarData     = BdsLibGetVariableAndSize (
+                  VAR_LEGACY_DEV_ORDER,
+                  &gEfiLegacyDevOrderVariableGuid,
+                  &VarSize
+                  );
+
+  for (Index = 0; Index < PageNum; Index++) {
+    switch (PageIdList[Index]) {
+      
+    case FORM_SET_FD_ORDER_ID:
+      OptionMenu  = (BM_MENU_OPTION *) &LegacyFDMenu;
+      BbsType     = BBS_FLOPPY;
+      LegacyOrder = CallbackData->BmmFakeNvData.LegacyFD;
+      OldData     = CallbackData->BmmOldFakeNVData.LegacyFD;
+      break;
+
+    case FORM_SET_HD_ORDER_ID:
+      OptionMenu  = (BM_MENU_OPTION *) &LegacyHDMenu;
+      BbsType     = BBS_HARDDISK;
+      LegacyOrder = CallbackData->BmmFakeNvData.LegacyHD;
+      OldData     = CallbackData->BmmOldFakeNVData.LegacyHD;
+      break;
+    
+    case FORM_SET_CD_ORDER_ID:
+      OptionMenu  = (BM_MENU_OPTION *) &LegacyCDMenu;
+      BbsType     = BBS_CDROM;
+      LegacyOrder = CallbackData->BmmFakeNvData.LegacyCD;
+      OldData     = CallbackData->BmmOldFakeNVData.LegacyCD;
+      break;
+    
+    case FORM_SET_NET_ORDER_ID:
+      OptionMenu  = (BM_MENU_OPTION *) &LegacyNETMenu;
+      BbsType     = BBS_EMBED_NETWORK;
+      LegacyOrder = CallbackData->BmmFakeNvData.LegacyNET;
+      OldData     = CallbackData->BmmOldFakeNVData.LegacyNET;
+      break;
+    
+    case FORM_SET_BEV_ORDER_ID:
+      OptionMenu  = (BM_MENU_OPTION *) &LegacyBEVMenu;
+      BbsType     = BBS_BEV_DEVICE;
+      LegacyOrder = CallbackData->BmmFakeNvData.LegacyBEV;
+      OldData     = CallbackData->BmmOldFakeNVData.LegacyBEV;
+      break;
+      
+    default:
+      DEBUG ((DEBUG_ERROR, "Invalid command ID for updating page!\n"));
+      break;
+    }
+    
+    if (NULL != VarData) {
+      WorkingVarData = VarData;
+      DevOrder    = (LEGACY_DEV_ORDER_ENTRY *) WorkingVarData;
+      while (WorkingVarData < VarData + VarSize) {
+        if (DevOrder->BbsType == BbsType) {
+          break;
+        }
+    
+        WorkingVarData += sizeof (BBS_TYPE);
+        WorkingVarData += *(UINT16 *) WorkingVarData;
+        DevOrder = (LEGACY_DEV_ORDER_ENTRY *) WorkingVarData;
+      } 
+      for (OptionIndex = 0; OptionIndex < OptionMenu->MenuNumber; OptionIndex++) {
+        VarDevOrder = *(UINT16 *) ((UINT8 *) DevOrder + sizeof (BBS_TYPE) + sizeof (UINT16) + OptionIndex * sizeof (UINT16));
+         if (0xFF00 == (VarDevOrder & 0xFF00)) {
+          LegacyOrder[OptionIndex]  = 0xFF;
+          Pos                       = (VarDevOrder & 0xFF) / 8;
+          Bit                       = 7 - ((VarDevOrder & 0xFF) % 8);
+          DisMap[Pos] = (UINT8) (DisMap[Pos] | (UINT8) (1 << Bit));
+        } else {
+          LegacyOrder[OptionIndex] = (UINT8) (VarDevOrder & 0xFF);
+        }
+      } 
+      CopyMem (OldData, LegacyOrder, 100);
+    }
+  }  
+}
+
+/**
+  Get driver option order from globalc DriverOptionMenu.
+
+  @param CallbackData    The BMM context data.
+  
+**/
+VOID
+GetDriverOrder (
+  IN  BMM_CALLBACK_DATA    *CallbackData
+  )
+{
+  BMM_FAKE_NV_DATA          *BmmConfig;
+  UINT16                    Index;
+  UINT16                    OptionOrderIndex;
+  UINTN                     DeviceType;
+  BM_MENU_ENTRY             *NewMenuEntry;
+  BM_LOAD_CONTEXT           *NewLoadContext;
+
+  ASSERT (CallbackData != NULL);
+
+  DeviceType = (UINTN) -1;
+  BmmConfig  = &CallbackData->BmmFakeNvData;
+  ZeroMem (BmmConfig->DriverOptionOrder, sizeof (BmmConfig->DriverOptionOrder));
+
+  for (Index = 0, OptionOrderIndex = 0; ((Index < DriverOptionMenu.MenuNumber) &&
+       (OptionOrderIndex < (sizeof (BmmConfig->DriverOptionOrder) / sizeof (BmmConfig->DriverOptionOrder[0]))));
+       Index++) {
+    NewMenuEntry   = BOpt_GetMenuEntry (&DriverOptionMenu, Index);
+    NewLoadContext = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
+
+    if (NewLoadContext->IsLegacy) {
+      if (((BBS_BBS_DEVICE_PATH *) NewLoadContext->FilePathList)->DeviceType != DeviceType) {
+        DeviceType = ((BBS_BBS_DEVICE_PATH *) NewLoadContext->FilePathList)->DeviceType;
+      } else {
+        //
+        // Only show one legacy boot option for the same device type
+        // assuming the boot options are grouped by the device type
+        //
+        continue;
+      }
+    }
+    BmmConfig->DriverOptionOrder[OptionOrderIndex++] = (UINT32) (NewMenuEntry->OptionNumber + 1);
+  }
+}

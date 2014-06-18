@@ -378,3 +378,34 @@ EfiLibStrFromDatahub (
 {
   return NULL;
 }
+
+/**
+
+  Find the first instance of this Protocol
+  in the system and return it's interface.
+
+
+  @param ProtocolGuid    Provides the protocol to search for
+  @param Interface       On return, a pointer to the first interface
+                         that matches ProtocolGuid
+
+  @retval  EFI_SUCCESS      A protocol instance matching ProtocolGuid was found
+  @retval  EFI_NOT_FOUND    No protocol instances were found that match ProtocolGuid
+
+**/
+EFI_STATUS
+EfiLibLocateProtocol (
+  IN  EFI_GUID    *ProtocolGuid,
+  OUT VOID        **Interface
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = gBS->LocateProtocol (
+                  ProtocolGuid,
+                  NULL,
+                  (VOID **) Interface
+                  );
+  return Status;
+}
+

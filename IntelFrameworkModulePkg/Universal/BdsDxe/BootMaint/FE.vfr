@@ -2,7 +2,7 @@
 //  
 //    File Explorer Formset
 //  
-//  Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+//  Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
 //  which accompanies this distribution.  The full text of the license may be found at
@@ -43,14 +43,14 @@ formset
 
        subtitle text = STRING_TOKEN(STR_NULL_STRING);
 
-       string    varid    = FeData.DescriptionData,
+       string    varid    = FeData.BootDescriptionData,
                  prompt   = STRING_TOKEN(STR_LOAD_OPTION_DESC),
                  help     = STRING_TOKEN(STR_NULL_STRING),
                  minsize  = 6,
                  maxsize  = 75,
        endstring;
 
-       string    varid    = FeData.OptionalData,
+       string    varid    = FeData.BootOptionalData,
        		prompt   = STRING_TOKEN(STR_OPTIONAL_DATA),
        		help     = STRING_TOKEN(STR_NULL_STRING),
        		minsize  = 0,
@@ -83,14 +83,14 @@ formset
 
        subtitle text = STRING_TOKEN(STR_NULL_STRING);
 
-       string    varid    = FeData.DescriptionData,
+       string    varid    = FeData.DriverDescriptionData,
                  prompt   = STRING_TOKEN(STR_LOAD_OPTION_DESC),
                  help     = STRING_TOKEN(STR_NULL_STRING),
                  minsize  = 6,
                  maxsize  = 75,
        endstring;
 
-       string    varid    = FeData.OptionalData,
+       string    varid    = FeData.DriverOptionalData,
                  prompt   = STRING_TOKEN(STR_OPTIONAL_DATA),
                  help     = STRING_TOKEN(STR_NULL_STRING),
                  minsize  = 0,

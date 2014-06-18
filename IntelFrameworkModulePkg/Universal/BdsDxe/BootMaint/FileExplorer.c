@@ -217,6 +217,127 @@ UpdateFileExplorer (
 }
 
 /**
+  This function applies changes in a driver's configuration.
+  Input is a Configuration, which has the routing data for this
+  driver followed by name / value configuration pairs. The driver
+  must apply those pairs to its configurable storage. If the
+  driver's configuration is stored in a linear block of data
+  and the driver's name / value pairs are in <BlockConfig>
+  format, it may use the ConfigToBlock helper function (above) to
+  simplify the job. Currently not implemented.
+
+  @param[in]  This                Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
+  @param[in]  Configuration       A null-terminated Unicode string in
+                                  <ConfigString> format.   
+  @param[out] Progress            A pointer to a string filled in with the
+                                  offset of the most recent '&' before the
+                                  first failing name / value pair (or the
+                                  beginn ing of the string if the failure
+                                  is in the first name / value pair) or
+                                  the terminating NULL if all was
+                                  successful.
+
+  @retval EFI_SUCCESS             The results have been distributed or are
+                                  awaiting distribution.  
+  @retval EFI_OUT_OF_RESOURCES    Not enough memory to store the
+                                  parts of the results that must be
+                                  stored awaiting possible future
+                                  protocols.
+  @retval EFI_INVALID_PARAMETERS  Passing in a NULL for the
+                                  Results parameter would result
+                                  in this type of error.
+  @retval EFI_NOT_FOUND           Target for the specified routing data
+                                  was not found.
+**/
+EFI_STATUS
+EFIAPI
+FileExplorerRouteConfig (
+  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL *This,
+  IN CONST EFI_STRING                     Configuration,
+  OUT EFI_STRING                          *Progress
+  )
+{
+  EFI_STATUS                      Status;
+  UINTN                           BufferSize;
+  EFI_HII_CONFIG_ROUTING_PROTOCOL *ConfigRouting;
+  FILE_EXPLORER_NV_DATA           *FeData;
+  BMM_CALLBACK_DATA               *Private;
+
+  if (Progress == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  *Progress = Configuration;
+
+  if (Configuration == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check routing data in <ConfigHdr>.
+  // Note: there is no name for Name/Value storage, only GUID will be checked
+  //
+  if (!HiiIsConfigHdrMatch (Configuration, &gFileExploreFormSetGuid, mFileExplorerStorageName)) {
+    return EFI_NOT_FOUND;
+  }
+
+  Status = gBS->LocateProtocol (
+                  &gEfiHiiConfigRoutingProtocolGuid, 
+                  NULL, 
+                  &ConfigRouting
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Private = FE_CALLBACK_DATA_FROM_THIS (This);
+  //
+  // Get Buffer Storage data from EFI variable
+  //
+  BufferSize = sizeof (FILE_EXPLORER_NV_DATA );
+  FeData = &Private->FeFakeNvData;
+
+  //
+  // Convert <ConfigResp> to buffer data by helper function ConfigToBlock()
+  //
+  Status = ConfigRouting->ConfigToBlock (
+                            ConfigRouting,
+                            Configuration,
+                            (UINT8 *) FeData,
+                            &BufferSize,
+                            Progress
+                            );
+  ASSERT_EFI_ERROR (Status);
+
+  if (FeData->BootDescriptionData[0] != 0x00 || FeData->BootOptionalData[0] != 0x00) {
+    Status = Var_UpdateBootOption (Private, FeData);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    BOpt_GetBootOptions (Private);
+    CreateMenuStringToken (Private, Private->FeHiiHandle, &BootOptionMenu);
+  }
+
+  if (FeData->DriverDescriptionData[0] != 0x00 || FeData->DriverOptionalData[0] != 0x00) {
+    Status = Var_UpdateDriverOption (
+              Private,
+              Private->FeHiiHandle,
+              FeData->DriverDescriptionData,
+              FeData->DriverOptionalData,
+              FeData->ForceReconnect
+              );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    BOpt_GetDriverOptions (Private);
+    CreateMenuStringToken (Private, Private->FeHiiHandle, &DriverOptionMenu);
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   This function processes the results of changes in configuration.
   When user select a interactive opcode, this callback will be triggered.
   Based on the Question(QuestionId) that triggers the callback, the corresponding
@@ -295,8 +416,8 @@ FileExplorerCallback (
         Status = Var_UpdateDriverOption (
                   Private,
                   Private->FeHiiHandle,
-                  NvRamMap->DescriptionData,
-                  NvRamMap->OptionalData,
+                  NvRamMap->DriverDescriptionData,
+                  NvRamMap->DriverOptionalData,
                   NvRamMap->ForceReconnect
                   );
         if (EFI_ERROR (Status)) {
@@ -308,14 +429,21 @@ FileExplorerCallback (
       }
 
       *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-    } else if (QuestionId == KEY_VALUE_NO_SAVE_AND_EXIT_BOOT || QuestionId == KEY_VALUE_NO_SAVE_AND_EXIT_DRIVER) {
+    } else if (QuestionId == KEY_VALUE_NO_SAVE_AND_EXIT_DRIVER) {
       //
       // Discard changes and exit formset
       //
-      NvRamMap->OptionalData[0]     = 0x0000;
-      NvRamMap->DescriptionData[0]  = 0x0000;
+      NvRamMap->DriverOptionalData[0]     = 0x0000;
+      NvRamMap->DriverDescriptionData[0]  = 0x0000;
       *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-    } else if (QuestionId < FILE_OPTION_OFFSET) {
+    } else if (QuestionId == KEY_VALUE_NO_SAVE_AND_EXIT_BOOT) {
+      //
+      // Discard changes and exit formset
+      //
+      NvRamMap->BootOptionalData[0]     = 0x0000;
+      NvRamMap->BootDescriptionData[0]  = 0x0000;
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+    }else if (QuestionId < FILE_OPTION_OFFSET) {
       //
       // Exit File Explorer formset
       //

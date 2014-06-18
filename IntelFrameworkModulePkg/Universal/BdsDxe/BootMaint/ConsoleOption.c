@@ -1,7 +1,7 @@
 /** @file
   handles console redirection from boot manager
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1049,3 +1049,150 @@ GetConsoleOutMode (
     }
   }
 }
+
+/**
+
+  Initialize console input device check box to ConsoleInCheck[MAX_MENU_NUMBER]
+  in BMM_FAKE_NV_DATA structure.
+
+  @param CallbackData    The BMM context data.
+
+**/  
+VOID  
+GetConsoleInCheck (
+  IN  BMM_CALLBACK_DATA    *CallbackData
+  )
+{
+  UINT16              Index;
+  BM_MENU_ENTRY       *NewMenuEntry; 
+  UINT8               *ConInCheck;
+  BM_CONSOLE_CONTEXT  *NewConsoleContext;
+  
+  ASSERT (CallbackData != NULL);
+    
+  ConInCheck = &CallbackData->BmmFakeNvData.ConsoleInCheck[0];
+  for (Index = 0; ((Index < ConsoleInpMenu.MenuNumber) && \
+       (Index < MAX_MENU_NUMBER)) ; Index++) {  
+    NewMenuEntry      = BOpt_GetMenuEntry (&ConsoleInpMenu, Index);
+    NewConsoleContext = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;  
+    ConInCheck[Index] = NewConsoleContext->IsActive;
+  }
+}
+
+/**
+
+  Initialize console output device check box to ConsoleOutCheck[MAX_MENU_NUMBER]
+  in BMM_FAKE_NV_DATA structure.
+
+  @param CallbackData    The BMM context data.
+
+**/      
+VOID    
+GetConsoleOutCheck (
+  IN  BMM_CALLBACK_DATA    *CallbackData
+  )
+{
+  UINT16              Index;
+  BM_MENU_ENTRY       *NewMenuEntry; 
+  UINT8               *ConOutCheck;
+  BM_CONSOLE_CONTEXT  *NewConsoleContext;
+  
+  ASSERT (CallbackData != NULL);
+  ConOutCheck = &CallbackData->BmmFakeNvData.ConsoleOutCheck[0];
+  for (Index = 0; ((Index < ConsoleOutMenu.MenuNumber) && \
+       (Index < MAX_MENU_NUMBER)) ; Index++) {  
+    NewMenuEntry      = BOpt_GetMenuEntry (&ConsoleOutMenu, Index);
+    NewConsoleContext = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;  
+    ConOutCheck[Index] = NewConsoleContext->IsActive;
+  }
+}
+  
+/**
+
+  Initialize standard error output device check box to ConsoleErrCheck[MAX_MENU_NUMBER]
+  in BMM_FAKE_NV_DATA structure.
+
+  @param CallbackData    The BMM context data.
+
+**/        
+VOID  
+GetConsoleErrCheck (
+  IN  BMM_CALLBACK_DATA    *CallbackData
+  )
+{
+  UINT16              Index;
+  BM_MENU_ENTRY       *NewMenuEntry; 
+  UINT8               *ConErrCheck;
+  BM_CONSOLE_CONTEXT  *NewConsoleContext;
+  
+  ASSERT (CallbackData != NULL);
+  ConErrCheck = &CallbackData->BmmFakeNvData.ConsoleErrCheck[0];
+  for (Index = 0; ((Index < ConsoleErrMenu.MenuNumber) && \
+       (Index < MAX_MENU_NUMBER)) ; Index++) {  
+    NewMenuEntry      = BOpt_GetMenuEntry (&ConsoleErrMenu, Index);
+    NewConsoleContext = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;  
+    ConErrCheck[Index] = NewConsoleContext->IsActive;
+  }
+}
+
+/**
+
+  Initialize terminal attributes (baudrate, data rate, stop bits, parity and terminal type)
+  to BMM_FAKE_NV_DATA structure.
+
+  @param CallbackData    The BMM context data.
+
+**/        
+VOID  
+GetTerminalAttribute (
+  IN  BMM_CALLBACK_DATA    *CallbackData
+  )
+{
+  BMM_FAKE_NV_DATA     *CurrentFakeNVMap;
+  BM_MENU_ENTRY        *NewMenuEntry;
+  BM_TERMINAL_CONTEXT  *NewTerminalContext;    
+  UINT16               TerminalIndex;  
+  UINT8                AttributeIndex;
+
+  ASSERT (CallbackData != NULL);
+  
+  CurrentFakeNVMap = &CallbackData->BmmFakeNvData;     
+  for (TerminalIndex = 0; ((TerminalIndex < TerminalMenu.MenuNumber) && \
+       (TerminalIndex < MAX_MENU_NUMBER)); TerminalIndex++) {  
+    NewMenuEntry        = BOpt_GetMenuEntry (&TerminalMenu, TerminalIndex);
+    NewTerminalContext  = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
+    for (AttributeIndex = 0; AttributeIndex < sizeof (BaudRateList) / sizeof (BaudRateList [0]); AttributeIndex++) {
+      if (NewTerminalContext->BaudRate == (UINT64) (BaudRateList[AttributeIndex].Value)) {
+        NewTerminalContext->BaudRateIndex = AttributeIndex;
+        break;
+      }
+    }
+    for (AttributeIndex = 0; AttributeIndex < sizeof (DataBitsList) / sizeof (DataBitsList[0]); AttributeIndex++) {
+      if (NewTerminalContext->DataBits == (UINT64) (DataBitsList[AttributeIndex].Value)) {
+        NewTerminalContext->DataBitsIndex = AttributeIndex;
+        break;
+      }
+    }    
+    
+    for (AttributeIndex = 0; AttributeIndex < sizeof (ParityList) / sizeof (ParityList[0]); AttributeIndex++) {
+      if (NewTerminalContext->Parity == (UINT64) (ParityList[AttributeIndex].Value)) {
+        NewTerminalContext->ParityIndex = AttributeIndex;
+        break;
+      }
+    }            
+    
+    for (AttributeIndex = 0; AttributeIndex < sizeof (StopBitsList) / sizeof (StopBitsList[0]); AttributeIndex++) {
+      if (NewTerminalContext->StopBits == (UINT64) (StopBitsList[AttributeIndex].Value)) {
+        NewTerminalContext->StopBitsIndex = AttributeIndex;
+        break;
+      }
+    }        
+    CurrentFakeNVMap->COMBaudRate[TerminalIndex]     = NewTerminalContext->BaudRateIndex;
+    CurrentFakeNVMap->COMDataRate[TerminalIndex]     = NewTerminalContext->DataBitsIndex;
+    CurrentFakeNVMap->COMStopBits[TerminalIndex]     = NewTerminalContext->StopBitsIndex;
+    CurrentFakeNVMap->COMParity[TerminalIndex]       = NewTerminalContext->ParityIndex; 
+    CurrentFakeNVMap->COMTerminalType[TerminalIndex] = NewTerminalContext->TerminalType;
+    CurrentFakeNVMap->COMFlowControl[TerminalIndex]  = NewTerminalContext->FlowControl;
+  } 
+}
+
