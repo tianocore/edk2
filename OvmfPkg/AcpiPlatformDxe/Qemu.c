@@ -516,6 +516,80 @@ QemuInstallAcpiTable (
 }
 
 
+/**
+  Check if an array of bytes starts with an RSD PTR structure.
+
+  Checksum is ignored.
+
+  @param[in] Buffer     The array to check.
+
+  @param[in] Size       Number of bytes in Buffer.
+
+  @param[out] RsdpSize  If the function returns EFI_SUCCESS, this parameter
+                        contains the size of the detected RSD PTR structure.
+
+  @retval  EFI_SUCCESS         RSD PTR structure detected at the beginning of
+                               Buffer, and its advertised size does not exceed
+                               Size.
+
+  @retval  EFI_PROTOCOL_ERROR  RSD PTR structure detected at the beginning of
+                               Buffer, but it has inconsistent size.
+
+  @retval  EFI_NOT_FOUND       RSD PTR structure not found.
+
+**/
+
+STATIC
+EFI_STATUS
+CheckRsdp (
+  IN  CONST VOID *Buffer,
+  IN  UINTN      Size,
+  OUT UINTN      *RsdpSize
+  )
+{
+  CONST UINT64                                       *Signature;
+  CONST EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER *Rsdp1;
+  CONST EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER *Rsdp2;
+
+  if (Size < sizeof *Signature) {
+    return EFI_NOT_FOUND;
+  }
+  Signature = Buffer;
+
+  if (*Signature != EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER_SIGNATURE) {
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // Signature found -- from this point on we can only report
+  // EFI_PROTOCOL_ERROR or EFI_SUCCESS.
+  //
+  if (Size < sizeof *Rsdp1) {
+    return EFI_PROTOCOL_ERROR;
+  }
+  Rsdp1 = Buffer;
+
+  if (Rsdp1->Reserved == 0) {
+    //
+    // ACPI 1.0 doesn't include the Length field
+    //
+    *RsdpSize = sizeof *Rsdp1;
+    return EFI_SUCCESS;
+  }
+
+  if (Size < sizeof *Rsdp2) {
+    return EFI_PROTOCOL_ERROR;
+  }
+  Rsdp2 = Buffer;
+
+  if (Size < Rsdp2->Length || Rsdp2->Length < sizeof *Rsdp2) {
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  *RsdpSize = Rsdp2->Length;
+  return EFI_SUCCESS;
+}
+
 //
 // We'll be saving the keys of installed tables so that we can roll them back
 // in case of failure. 128 tables should be enough for anyone (TM).
@@ -602,9 +676,39 @@ InstallQemuLinkedTables (
   Processed = 0;
   while (Processed < TablesFileSize) {
     UINTN                       Remaining;
+    UINTN                       RsdpSize;
     EFI_ACPI_DESCRIPTION_HEADER *Probe;
 
     Remaining = TablesFileSize - Processed;
+
+    //
+    // See if we're looking at an RSD PTR structure.
+    //
+    RsdpSize = 0;
+    Status = CheckRsdp (Tables + Processed, Remaining, &RsdpSize);
+    if (Status == EFI_PROTOCOL_ERROR) {
+      //
+      // RSD PTR found but its size is inconsistent; abort processing. (Note
+      // that "RSD PTR found" excludes the NUL-padding case by definition.)
+      //
+      break;
+    }
+    if (!EFI_ERROR (Status)) {
+      //
+      // Consistent RSD PTR found, skip it.
+      //
+      DEBUG ((EFI_D_VERBOSE, "%a: \"%a\" offset 0x%016Lx: RSD PTR "
+        "Length=0x%08x\n", __FUNCTION__, FwCfgFile, (UINT64)Processed,
+        (UINT32)RsdpSize));
+      Processed += RsdpSize;
+      continue;
+    }
+    ASSERT (Status == EFI_NOT_FOUND);
+
+    //
+    // What we're looking at is not an RSD PTR structure; attempt to parse it
+    // as an ACPI table.
+    //
     if (Remaining < sizeof *Probe) {
       Status = EFI_PROTOCOL_ERROR;
       break;
