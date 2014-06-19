@@ -3,7 +3,7 @@
 
   Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
 
-  Copyright (C) 2012, Red Hat, Inc.
+  Copyright (C) 2012-2014, Red Hat, Inc.
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -516,50 +516,78 @@ QemuInstallAcpiTable (
 }
 
 
-/**
-  Download the ACPI table data file from QEMU and interpret it.
-
-  @param[in] AcpiProtocol  The ACPI table protocol used to install tables.
-
-  @retval  EFI_UNSUPPORTED       Firmware configuration is unavailable.
-
-  @retval  EFI_NOT_FOUND         The host doesn't export the required fw_cfg
-                                 files.
-
-  @retval  EFI_OUT_OF_RESOURCES  Memory allocation failed.
-
-  @retval  EFI_PROTOCOL_ERROR    Found truncated or invalid ACPI table header
-                                 in the fw_cfg contents.
-
-  @return                        Status codes returned by
-                                 AcpiProtocol->InstallAcpiTable().
-
-**/
-
 //
 // We'll be saving the keys of installed tables so that we can roll them back
 // in case of failure. 128 tables should be enough for anyone (TM).
 //
 #define INSTALLED_TABLES_MAX 128
 
+/**
+  Download one ACPI table data file from QEMU and interpret it.
+
+  @param[in] FwCfgFile         The NUL-terminated name of the fw_cfg file to
+                               download and interpret.
+
+  @param[in] AcpiProtocol      The ACPI table protocol used to install tables.
+
+  @param[in,out] InstalledKey  On input, an array of INSTALLED_TABLES_MAX UINTN
+                               elements, allocated by the caller. On output,
+                               the function will have stored (appended) the
+                               AcpiProtocol-internal keys of the ACPI tables
+                               that the function has installed from the fw_cfg
+                               file. The array reflects installed tables even
+                               if the function returns with an error.
+
+  @param[in,out] NumInstalled  On input, the number of entries already used in
+                               InstalledKey; it must be in [0,
+                               INSTALLED_TABLES_MAX] inclusive. On output, the
+                               parameter is updated to the new cumulative count
+                               of the keys stored in InstalledKey; the value
+                               reflects installed tables even if the function
+                               returns with an error.
+
+  @retval  EFI_INVALID_PARAMETER  NumInstalled is outside the allowed range on
+                                  input.
+
+  @retval  EFI_UNSUPPORTED        Firmware configuration is unavailable.
+
+  @retval  EFI_NOT_FOUND          The host doesn't export the requested fw_cfg
+                                  file.
+
+  @retval  EFI_OUT_OF_RESOURCES   Memory allocation failed, or no more room in
+                                  InstalledKey.
+
+  @retval  EFI_PROTOCOL_ERROR     Found truncated or invalid ACPI table header
+                                  in the fw_cfg contents.
+
+  @return                         Status codes returned by
+                                  AcpiProtocol->InstallAcpiTable().
+
+**/
+
+STATIC
 EFI_STATUS
-EFIAPI
 InstallQemuLinkedTables (
-  IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol
+  IN     CONST CHAR8             *FwCfgFile,
+  IN     EFI_ACPI_TABLE_PROTOCOL *AcpiProtocol,
+  IN OUT UINTN                   InstalledKey[INSTALLED_TABLES_MAX],
+  IN OUT INT32                   *NumInstalled
   )
 {
   EFI_STATUS           Status;
   FIRMWARE_CONFIG_ITEM TablesFile;
   UINTN                TablesFileSize;
   UINT8                *Tables;
-  UINTN                *InstalledKey;
   UINTN                Processed;
-  INT32                Installed;
 
-  Status = QemuFwCfgFindFile ("etc/acpi/tables", &TablesFile, &TablesFileSize);
+  if (*NumInstalled < 0 || *NumInstalled > INSTALLED_TABLES_MAX) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = QemuFwCfgFindFile (FwCfgFile, &TablesFile, &TablesFileSize);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_INFO, "%a: \"etc/acpi/tables\" interface unavailable: %r\n",
-      __FUNCTION__, Status));
+    DEBUG ((EFI_D_ERROR, "%a: \"%a\" unavailable: %r\n", __FUNCTION__,
+      FwCfgFile, Status));
     return Status;
   }
 
@@ -571,14 +599,7 @@ InstallQemuLinkedTables (
   QemuFwCfgSelectItem (TablesFile);
   QemuFwCfgReadBytes (TablesFileSize, Tables);
 
-  InstalledKey = AllocatePool (INSTALLED_TABLES_MAX * sizeof *InstalledKey);
-  if (InstalledKey == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto FreeTables;
-  }
-
   Processed = 0;
-  Installed = 0;
   while (Processed < TablesFileSize) {
     UINTN                       Remaining;
     EFI_ACPI_DESCRIPTION_HEADER *Probe;
@@ -595,9 +616,9 @@ InstallQemuLinkedTables (
       break;
     }
 
-    DEBUG ((EFI_D_VERBOSE, "%a: offset 0x%016Lx:"
+    DEBUG ((EFI_D_VERBOSE, "%a: \"%a\" offset 0x%016Lx:"
       " Signature=\"%-4.4a\" Length=0x%08x\n",
-      __FUNCTION__, (UINT64) Processed,
+      __FUNCTION__, FwCfgFile, (UINT64) Processed,
       (CONST CHAR8 *) &Probe->Signature, Probe->Length));
 
     //
@@ -607,7 +628,7 @@ InstallQemuLinkedTables (
                         EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_TABLE_SIGNATURE &&
         Probe->Signature !=
                     EFI_ACPI_2_0_EXTENDED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE) {
-      if (Installed == INSTALLED_TABLES_MAX) {
+      if (*NumInstalled == INSTALLED_TABLES_MAX) {
         DEBUG ((EFI_D_ERROR, "%a: can't install more than %d tables\n",
           __FUNCTION__, INSTALLED_TABLES_MAX));
         Status = EFI_OUT_OF_RESOURCES;
@@ -615,16 +636,16 @@ InstallQemuLinkedTables (
       }
 
       Status = AcpiProtocol->InstallAcpiTable (AcpiProtocol, Probe,
-                 Probe->Length, &InstalledKey[Installed]);
+                 Probe->Length, &InstalledKey[*NumInstalled]);
       if (EFI_ERROR (Status)) {
         DEBUG ((EFI_D_ERROR,
-          "%a: failed to install table \"%-4.4a\" at offset 0x%Lx: %r\n",
-          __FUNCTION__, (CONST CHAR8 *) &Probe->Signature, (UINT64) Processed,
-          Status));
+          "%a: failed to install table \"%-4.4a\" at \"%a\" offset 0x%Lx: "
+          "%r\n", __FUNCTION__, (CONST CHAR8 *)&Probe->Signature, FwCfgFile,
+          (UINT64) Processed, Status));
         break;
       }
 
-      ++Installed;
+      ++*NumInstalled;
     }
 
     Processed += Probe->Length;
@@ -642,16 +663,62 @@ InstallQemuLinkedTables (
     }
     if (Processed < TablesFileSize) {
       DEBUG ((EFI_D_ERROR, "%a: truncated or invalid ACPI table header at "
-        "offset 0x%Lx\n", __FUNCTION__, (UINT64) ErrorLocation));
+        "\"%a\" offset 0x%Lx\n", __FUNCTION__, FwCfgFile,
+        (UINT64)ErrorLocation));
     }
   }
 
   if (Processed == TablesFileSize) {
-    DEBUG ((EFI_D_INFO, "%a: installed %d tables\n", __FUNCTION__, Installed));
     Status = EFI_SUCCESS;
   } else {
     ASSERT (EFI_ERROR (Status));
+  }
 
+  FreePool (Tables);
+  return Status;
+}
+
+/**
+  Download all ACPI table data files from QEMU and interpret them.
+
+  @param[in] AcpiProtocol  The ACPI table protocol used to install tables.
+
+  @retval  EFI_UNSUPPORTED       Firmware configuration is unavailable.
+
+  @retval  EFI_NOT_FOUND         The host doesn't export the required fw_cfg
+                                 files.
+
+  @retval  EFI_OUT_OF_RESOURCES  Memory allocation failed, or more than
+                                 INSTALLED_TABLES_MAX tables found.
+
+  @retval  EFI_PROTOCOL_ERROR    Found truncated or invalid ACPI table header
+                                 in the fw_cfg contents.
+
+  @return                        Status codes returned by
+                                 AcpiProtocol->InstallAcpiTable().
+
+**/
+
+EFI_STATUS
+EFIAPI
+InstallAllQemuLinkedTables (
+  IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol
+  )
+{
+  UINTN                *InstalledKey;
+  INT32                Installed;
+  EFI_STATUS           Status;
+
+  InstalledKey = AllocatePool (INSTALLED_TABLES_MAX * sizeof *InstalledKey);
+  if (InstalledKey == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  Installed = 0;
+
+  Status = InstallQemuLinkedTables ("etc/acpi/tables", AcpiProtocol,
+             InstalledKey, &Installed);
+  if (EFI_ERROR (Status)) {
+    ASSERT (Status != EFI_INVALID_PARAMETER);
     //
     // Roll back partial installation.
     //
@@ -659,12 +726,10 @@ InstallQemuLinkedTables (
       --Installed;
       AcpiProtocol->UninstallAcpiTable (AcpiProtocol, InstalledKey[Installed]);
     }
+  } else {
+    DEBUG ((EFI_D_INFO, "%a: installed %d tables\n", __FUNCTION__, Installed));
   }
 
   FreePool (InstalledKey);
-
-FreeTables:
-  FreePool (Tables);
-
   return Status;
 }
