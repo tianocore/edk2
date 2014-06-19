@@ -16,6 +16,7 @@
 **/
 
 #include "AcpiPlatform.h"
+#include "QemuLoader.h"
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/QemuFwCfgLib.h>
@@ -795,8 +796,7 @@ InstallQemuLinkedTables (
   @retval  EFI_OUT_OF_RESOURCES  Memory allocation failed, or more than
                                  INSTALLED_TABLES_MAX tables found.
 
-  @retval  EFI_PROTOCOL_ERROR    Found truncated or invalid ACPI table header
-                                 in the fw_cfg contents.
+  @retval  EFI_PROTOCOL_ERROR    Found invalid fw_cfg contents.
 
   @return                        Status codes returned by
                                  AcpiProtocol->InstallAcpiTable().
@@ -812,6 +812,10 @@ InstallAllQemuLinkedTables (
   UINTN                *InstalledKey;
   INT32                Installed;
   EFI_STATUS           Status;
+  FIRMWARE_CONFIG_ITEM LoaderItem;
+  UINTN                LoaderSize;
+  UINT8                *Loader;
+  QEMU_LOADER_ENTRY    *Entry, *End;
 
   InstalledKey = AllocatePool (INSTALLED_TABLES_MAX * sizeof *InstalledKey);
   if (InstalledKey == NULL) {
@@ -819,10 +823,49 @@ InstallAllQemuLinkedTables (
   }
   Installed = 0;
 
-  Status = InstallQemuLinkedTables ("etc/acpi/tables", AcpiProtocol,
-             InstalledKey, &Installed);
+  Status = QemuFwCfgFindFile ("etc/table-loader", &LoaderItem, &LoaderSize);
   if (EFI_ERROR (Status)) {
-    ASSERT (Status != EFI_INVALID_PARAMETER);
+    goto FreeInstalledKey;
+  }
+  if (LoaderSize % sizeof *Entry != 0) {
+    Status = EFI_PROTOCOL_ERROR;
+    goto FreeInstalledKey;
+  }
+
+  Loader = AllocatePool (LoaderSize);
+  if (Loader == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto FreeInstalledKey;
+  }
+
+  QemuFwCfgSelectItem (LoaderItem);
+  QemuFwCfgReadBytes (LoaderSize, Loader);
+
+  Entry = (QEMU_LOADER_ENTRY *)Loader;
+  End   = (QEMU_LOADER_ENTRY *)(Loader + LoaderSize);
+  while (Entry < End) {
+    if (Entry->Type == QemuLoaderCmdAllocate) {
+      QEMU_LOADER_ALLOCATE *Allocate;
+
+      Allocate = &Entry->Command.Allocate;
+      if (Allocate->File[sizeof Allocate->File - 1] != '\0') {
+        Status = EFI_PROTOCOL_ERROR;
+        break;
+      }
+
+      Status = InstallQemuLinkedTables ((CHAR8 *)Allocate->File, AcpiProtocol,
+                 InstalledKey, &Installed);
+      if (EFI_ERROR (Status)) {
+        ASSERT (Status != EFI_INVALID_PARAMETER);
+        break;
+      }
+    }
+    ++Entry;
+  }
+
+  FreePool (Loader);
+
+  if (EFI_ERROR (Status)) {
     //
     // Roll back partial installation.
     //
@@ -834,6 +877,7 @@ InstallAllQemuLinkedTables (
     DEBUG ((EFI_D_INFO, "%a: installed %d tables\n", __FUNCTION__, Installed));
   }
 
+FreeInstalledKey:
   FreePool (InstalledKey);
   return Status;
 }
