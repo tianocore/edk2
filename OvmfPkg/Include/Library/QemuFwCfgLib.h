@@ -17,6 +17,12 @@
 #ifndef __FW_CFG_LIB__
 #define __FW_CFG_LIB__
 
+//
+// The size, in bytes, of names of firmware configuration files, including at
+// least one terminating NUL byte.
+//
+#define QEMU_FW_CFG_FNAME_SIZE 56
+
 typedef enum {
   QemuFwCfgItemSignature            = 0x0000,
   QemuFwCfgItemInterfaceVersion     = 0x0001,

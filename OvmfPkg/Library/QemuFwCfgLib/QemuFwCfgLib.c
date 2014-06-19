@@ -278,7 +278,7 @@ QemuFwCfgFindFile (
     UINT32 FileSize;
     UINT16 FileSelect;
     UINT16 FileReserved;
-    CHAR8  FName[56];
+    CHAR8  FName[QEMU_FW_CFG_FNAME_SIZE];
 
     FileSize     = QemuFwCfgRead32 ();
     FileSelect   = QemuFwCfgRead16 ();
