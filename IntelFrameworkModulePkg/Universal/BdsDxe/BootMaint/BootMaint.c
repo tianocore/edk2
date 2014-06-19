@@ -376,7 +376,7 @@ BootMaintRouteConfig (
   Status = gBS->LocateProtocol (
                   &gEfiHiiConfigRoutingProtocolGuid, 
                   NULL, 
-                  &ConfigRouting
+                  (VOID**) &ConfigRouting
                   );
   if (EFI_ERROR (Status)) {
     return Status;
