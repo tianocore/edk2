@@ -1,6 +1,6 @@
 /** @file
 
- Copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR>
+ Copyright (c) 2011-2014, ARM Ltd. All rights reserved.<BR>
 
  This program and the accompanying materials
  are licensed and made available under the terms and conditions of the BSD License
@@ -25,7 +25,7 @@ NOR_FLASH_DESCRIPTION mNorFlashDevices[NOR_FLASH_DEVICE_COUNT] = {
     ARM_EB_SMB_NOR_BASE,
     SIZE_128KB * 512,
     SIZE_128KB,
-    {0xE7223039, 0x5836, 0x41E1, 0xB5, 0x42, 0xD7, 0xEC, 0x73, 0x6C, 0x5E, 0x59}
+    {0xE7223039, 0x5836, 0x41E1, { 0xB5, 0x42, 0xD7, 0xEC, 0x73, 0x6C, 0x5E, 0x59 } }
   }
 };
 

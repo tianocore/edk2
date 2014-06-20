@@ -1,15 +1,15 @@
 /** @file
 *
 *  Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
-*  
-*  This program and the accompanying materials                          
-*  are licensed and made available under the terms and conditions of the BSD License         
-*  which accompanies this distribution.  The full text of the license may be found at        
-*  http://opensource.org/licenses/bsd-license.php                                            
+*  Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
 *
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+*  This program and the accompanying materials
+*  are licensed and made available under the terms and conditions of the BSD License
+*  which accompanies this distribution.  The full text of the license may be found at
+*  http://opensource.org/licenses/bsd-license.php
+*
+*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 *
 **/
 
@@ -28,17 +28,17 @@ typedef struct {
 
 MMCHS_DEVICE_PATH gMMCDevicePath = {
   {
-    HARDWARE_DEVICE_PATH,
-    HW_VENDOR_DP,
-    (UINT8)(sizeof(VENDOR_DEVICE_PATH)),
-    (UINT8)((sizeof(VENDOR_DEVICE_PATH)) >> 8),
-    0xb615f1f5, 0x5088, 0x43cd, 0x80, 0x9c, 0xa1, 0x6e, 0x52, 0x48, 0x7d, 0x00 
+    {
+      HARDWARE_DEVICE_PATH,
+      HW_VENDOR_DP,
+      { (UINT8)(sizeof(VENDOR_DEVICE_PATH)), (UINT8)((sizeof(VENDOR_DEVICE_PATH)) >> 8) },
+    },
+    { 0xb615f1f5, 0x5088, 0x43cd, { 0x80, 0x9c, 0xa1, 0x6e, 0x52, 0x48, 0x7d, 0x00 } }
   },
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    sizeof (EFI_DEVICE_PATH_PROTOCOL),
-    0
+    { sizeof (EFI_DEVICE_PATH_PROTOCOL), 0 }
   }
 };
 

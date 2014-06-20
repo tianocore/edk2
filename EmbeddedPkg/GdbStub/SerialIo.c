@@ -475,15 +475,17 @@ GDB_SERIAL_DEV gdbSerialDevTemplate = {
     0,      // Parity
     0       // StopBits
   },
-  { 
+  {
     {
-      HARDWARE_DEVICE_PATH,
-      HW_VENDOR_DP,
       {
-        (UINT8) (sizeof (VENDOR_DEVICE_PATH) + sizeof (UINT32)),
-        (UINT8) ((sizeof (VENDOR_DEVICE_PATH) + sizeof (UINT32)) >> 8)
+        HARDWARE_DEVICE_PATH,
+        HW_VENDOR_DP,
+        {
+          (UINT8) (sizeof (VENDOR_DEVICE_PATH) + sizeof (UINT32)),
+          (UINT8) ((sizeof (VENDOR_DEVICE_PATH) + sizeof (UINT32)) >> 8)
+        },
       },
-      EFI_SERIAL_IO_PROTOCOL_GUID,
+      EFI_SERIAL_IO_PROTOCOL_GUID
     },
     0,
     {

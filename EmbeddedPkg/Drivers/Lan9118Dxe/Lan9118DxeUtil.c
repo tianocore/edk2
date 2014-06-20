@@ -14,7 +14,7 @@
 
 #include "Lan9118Dxe.h"
 
-STATIC EFI_MAC_ADDRESS mZeroMac = { 0 };
+STATIC EFI_MAC_ADDRESS mZeroMac = { { 0 } };
 
 /**
   This internal function reverses bits for 32bit data.

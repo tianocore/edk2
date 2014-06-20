@@ -39,16 +39,16 @@ typedef struct {
 EFI_PCI_IO_DEVICE_PATH PciIoDevicePathTemplate = 
 {
   {
-    { ACPI_DEVICE_PATH, ACPI_DP, sizeof (ACPI_HID_DEVICE_PATH), 0},
+    { ACPI_DEVICE_PATH, ACPI_DP, { sizeof (ACPI_HID_DEVICE_PATH), 0 } },
     EISA_PNP_ID(0x0A03),  // HID
     0                     // UID
   },
   {
-    { HARDWARE_DEVICE_PATH, HW_PCI_DP, sizeof (PCI_DEVICE_PATH), 0},
+    { HARDWARE_DEVICE_PATH, HW_PCI_DP, { sizeof (PCI_DEVICE_PATH), 0 } },
     0,
     0
   },
-  { END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE, sizeof (EFI_DEVICE_PATH_PROTOCOL), 0}
+  { END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE, { sizeof (EFI_DEVICE_PATH_PROTOCOL), 0} }
 };
 
 STATIC
@@ -422,12 +422,9 @@ EFI_PCI_IO_PROTOCOL PciIoTemplate =
 {
   PciIoPollMem,
   PciIoPollIo,
-  PciIoMemRead,
-  PciIoMemWrite,
-  PciIoIoRead,
-  PciIoIoWrite,
-  PciIoPciRead,
-  PciIoPciWrite,
+  { PciIoMemRead, PciIoMemWrite },
+  { PciIoIoRead,  PciIoIoWrite },
+  { PciIoPciRead, PciIoPciWrite },
   PciIoCopyMem,
   PciIoMap,
   PciIoUnmap,

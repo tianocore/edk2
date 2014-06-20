@@ -1,6 +1,6 @@
 /** @file
 
- Copyright (c) 2011, ARM Ltd. All rights reserved.<BR>
+ Copyright (c) 2011-2014, ARM Ltd. All rights reserved.<BR>
  This program and the accompanying materials
  are licensed and made available under the terms and conditions of the BSD License
  which accompanies this distribution.  The full text of the license may be found at
@@ -43,7 +43,7 @@ LCD_INSTANCE mLcdTemplate = {
     0, // HorizontalResolution
     0, // VerticalResolution
     PixelBltOnly, // PixelFormat
-    0, // PixelInformation
+    { 0 }, // PixelInformation
     0, // PixelsPerScanLine
   },
   {
@@ -64,8 +64,7 @@ LCD_INSTANCE mLcdTemplate = {
     {
       {
         HARDWARE_DEVICE_PATH, HW_VENDOR_DP,
-        (UINT8) (sizeof(VENDOR_DEVICE_PATH)),
-        (UINT8) ((sizeof(VENDOR_DEVICE_PATH)) >> 8),
+        { (UINT8) (sizeof(VENDOR_DEVICE_PATH)), (UINT8) ((sizeof(VENDOR_DEVICE_PATH)) >> 8) },
       },
       // Hardware Device Path for Lcd
       EFI_CALLER_ID_GUID // Use the driver's GUID
@@ -74,8 +73,7 @@ LCD_INSTANCE mLcdTemplate = {
     {
       END_DEVICE_PATH_TYPE,
       END_ENTIRE_DEVICE_PATH_SUBTYPE,
-      sizeof(EFI_DEVICE_PATH_PROTOCOL),
-      0
+      { sizeof(EFI_DEVICE_PATH_PROTOCOL), 0 }
     }
   },
   (EFI_EVENT) NULL // ExitBootServicesEvent

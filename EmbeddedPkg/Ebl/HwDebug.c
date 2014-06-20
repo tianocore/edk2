@@ -297,10 +297,12 @@ EblPciCmd (
 
 
 GLOBAL_REMOVE_IF_UNREFERENCED const EBL_COMMAND_TABLE mCmdPciDebugTemplate[] = {
-  "pci",
-  " [bus] [dev] [func]; Dump PCI",
-  NULL,
-  EblPciCmd
+  {
+    "pci",
+    " [bus] [dev] [func]; Dump PCI",
+    NULL,
+    EblPciCmd
+  }
 };
 
 

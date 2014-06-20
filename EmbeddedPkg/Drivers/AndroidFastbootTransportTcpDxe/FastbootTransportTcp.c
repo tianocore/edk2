@@ -318,10 +318,10 @@ TcpFastbootTransportStart (
     255,                                            // IPv4 Time to Live
     {                                               // AccessPoint:
       TRUE,                                         // Use default address
-      {0, 0, 0, 0},                                 // IP Address  (ignored - use default)
-      {0, 0, 0, 0},                                 // Subnet mask (ignored - use default)
+      { {0, 0, 0, 0} },                             // IP Address  (ignored - use default)
+      { {0, 0, 0, 0} },                             // Subnet mask (ignored - use default)
       FixedPcdGet32 (PcdAndroidFastbootTcpPort),    // Station port
-      {0, 0, 0, 0},                                 // Remote address: accept any
+      { {0, 0, 0, 0} },                             // Remote address: accept any
       0,                                            // Remote Port: accept any
       FALSE                                         // ActiveFlag: be a "server"
     },

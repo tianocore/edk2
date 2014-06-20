@@ -1,14 +1,13 @@
 /** @file
   Serial IO Abstraction for GDB stub. This allows an EFI consoles that shows up on the system 
   running GDB. One console for error information and another console for user input/output.
-  
+
   Basic packet format is $packet-data#checksum. So every command has 4 bytes of overhead: $,
   #, 0, 0. The 0 and 0 are the ascii characters for the checksum. 
-  
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2013, ARM Ltd. All rights reserved.<BR>
-  
+  Copyright (c) 2013-2014, ARM Ltd. All rights reserved.<BR>
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -37,18 +36,18 @@ typedef struct {
 
 SIMPLE_TEXT_OUT_DEVICE_PATH mDevicePath = {
   {
-    { HARDWARE_DEVICE_PATH, HW_VENDOR_DP, sizeof (VENDOR_DEVICE_PATH), 0},
+    { HARDWARE_DEVICE_PATH, HW_VENDOR_DP, { sizeof (VENDOR_DEVICE_PATH), 0} },
     EFI_CALLER_ID_GUID // Use the drivers GUID
   },
   {
-    { MESSAGING_DEVICE_PATH, MSG_UART_DP, sizeof (UART_DEVICE_PATH), 0},
+    { MESSAGING_DEVICE_PATH, MSG_UART_DP, { sizeof (UART_DEVICE_PATH), 0} },
     0,        // Reserved
     FixedPcdGet64 (PcdUartDefaultBaudRate),   // BaudRate
     FixedPcdGet8 (PcdUartDefaultDataBits),    // DataBits
     FixedPcdGet8 (PcdUartDefaultParity),      // Parity (N)
     FixedPcdGet8 (PcdUartDefaultStopBits)     // StopBits
   },
-  { END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE, sizeof (EFI_DEVICE_PATH_PROTOCOL), 0}
+  { END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE, { sizeof (EFI_DEVICE_PATH_PROTOCOL), 0 } }
 };
 
 EFI_HANDLE  gHandle = NULL;

@@ -26,14 +26,13 @@ LAN9118_DEVICE_PATH Lan9118PathTemplate =  {
       MESSAGING_DEVICE_PATH, MSG_MAC_ADDR_DP,
       { (UINT8) (sizeof(MAC_ADDR_DEVICE_PATH)), (UINT8) ((sizeof(MAC_ADDR_DEVICE_PATH)) >> 8) }
     },
-    { 0 },
+    { { 0 } },
     0
   },
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    sizeof(EFI_DEVICE_PATH_PROTOCOL),
-    0
+    { sizeof(EFI_DEVICE_PATH_PROTOCOL), 0 }
   }
 };
 
