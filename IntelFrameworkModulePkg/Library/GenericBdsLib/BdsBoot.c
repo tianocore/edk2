@@ -3219,9 +3219,16 @@ BdsLibEnumerateAllBootOption (
                       (VOID **) &BlkIo
                       );
       //
-      // skip the fixed block io then the removable block io
+      // skip the logical partition
       //
-      if (EFI_ERROR (Status) || (BlkIo->Media->RemovableMedia == Removable[RemovableIndex])) {
+      if (EFI_ERROR (Status) || BlkIo->Media->LogicalPartition) {
+        continue;
+      }
+
+      //
+      // firstly fixed block io then the removable block io
+      //
+      if (BlkIo->Media->RemovableMedia == Removable[RemovableIndex]) {
         continue;
       }
       DevicePath  = DevicePathFromHandle (BlockIoHandles[Index]);
