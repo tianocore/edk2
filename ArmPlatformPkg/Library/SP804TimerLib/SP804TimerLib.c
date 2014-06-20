@@ -1,8 +1,8 @@
 /** @file
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011, ARM Limited. All rights reserved.
-  
+  Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -34,9 +34,7 @@ TimerConstructor (
   )
 {
   // Check if the Metronome Timer is already initialized
-  if (MmioRead32(SP804_TIMER_METRONOME_BASE + SP804_TIMER_CONTROL_REG) & SP804_TIMER_CTRL_ENABLE) {
-    return RETURN_SUCCESS;
-  } else {
+  if ((MmioRead32 (SP804_TIMER_METRONOME_BASE + SP804_TIMER_CONTROL_REG) & SP804_TIMER_CTRL_ENABLE) == 0) {
     // Configure the Metronome Timer for free running operation, 32 bits, no prescaler, and interrupt disabled
     MmioWrite32 (SP804_TIMER_METRONOME_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_32BIT | SP804_PRESCALE_DIV_1);
 
@@ -45,9 +43,7 @@ TimerConstructor (
   }
 
   // Check if the Performance Timer is already initialized
-  if (MmioRead32(SP804_TIMER_PERFORMANCE_BASE + SP804_TIMER_CONTROL_REG) & SP804_TIMER_CTRL_ENABLE) {
-    return RETURN_SUCCESS;
-  } else {
+  if ((MmioRead32 (SP804_TIMER_PERFORMANCE_BASE + SP804_TIMER_CONTROL_REG) & SP804_TIMER_CTRL_ENABLE) == 0) {
     // Configure the Performance timer for free running operation, 32 bits, no prescaler, interrupt disabled
     MmioWrite32 (SP804_TIMER_PERFORMANCE_BASE + SP804_TIMER_CONTROL_REG, SP804_TIMER_CTRL_32BIT | SP804_PRESCALE_DIV_1);
 
