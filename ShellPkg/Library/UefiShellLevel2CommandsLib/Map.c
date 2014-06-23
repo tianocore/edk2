@@ -1,6 +1,7 @@
 /** @file
   Main file for map shell level 2 command.
 
+  (C) Copyright 2013-2014, Hewlett-Packard Development Company, L.P.
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -115,108 +116,6 @@ SearchList(
   }
 
   return (FALSE);
-}
-
-/**
-  Add mappings for any devices without one.  Do not change any existing maps.
-
-  @retval EFI_SUCCESS   The operation was successful.
-**/
-EFI_STATUS
-EFIAPI
-UpdateMapping (
-  VOID
-  )
-{
-  EFI_STATUS                Status;
-  EFI_HANDLE                *HandleList;
-  UINTN                     Count;
-  EFI_DEVICE_PATH_PROTOCOL  **DevicePathList;
-  CHAR16                    *NewDefaultName;
-  CHAR16                    *NewConsistName;
-  EFI_DEVICE_PATH_PROTOCOL  **ConsistMappingTable;
-
-  HandleList  = NULL;
-  Status      = EFI_SUCCESS;
-
-  //
-  // remove mappings that represent removed devices.
-  //
-
-  //
-  // Find each handle with Simple File System
-  //
-  HandleList = GetHandleListByProtocol(&gEfiSimpleFileSystemProtocolGuid);
-  if (HandleList != NULL) {
-    //
-    // Do a count of the handles
-    //
-    for (Count = 0 ; HandleList[Count] != NULL ; Count++);
-
-    //
-    // Get all Device Paths
-    //
-    DevicePathList = AllocateZeroPool(sizeof(EFI_DEVICE_PATH_PROTOCOL*) * Count);
-    ASSERT(DevicePathList != NULL);
-
-    for (Count = 0 ; HandleList[Count] != NULL ; Count++) {
-      DevicePathList[Count] = DevicePathFromHandle(HandleList[Count]);
-    }
-
-    //
-    // Sort all DevicePaths
-    //
-    PerformQuickSort(DevicePathList, Count, sizeof(EFI_DEVICE_PATH_PROTOCOL*), DevicePathCompare);
-
-    ShellCommandConsistMappingInitialize(&ConsistMappingTable);
-
-    //
-    // Assign new Mappings to remainders
-    //
-    for (Count = 0 ; HandleList[Count] != NULL && !EFI_ERROR(Status); Count++) {
-      //
-      // Skip ones that already have
-      //
-      if (gEfiShellProtocol->GetMapFromDevicePath(&DevicePathList[Count]) != NULL) {
-        continue;
-      }
-      //
-      // Get default name
-      //
-      NewDefaultName = ShellCommandCreateNewMappingName(MappingTypeFileSystem);
-      ASSERT(NewDefaultName != NULL);
-
-      //
-      // Call shell protocol SetMap function now...
-      //
-      Status = gEfiShellProtocol->SetMap(DevicePathList[Count], NewDefaultName);
-
-      if (!EFI_ERROR(Status)) {
-        //
-        // Now do consistent name
-        //
-        NewConsistName = ShellCommandConsistMappingGenMappingName(DevicePathList[Count], ConsistMappingTable);
-        if (NewConsistName != NULL) {
-          Status = gEfiShellProtocol->SetMap(DevicePathList[Count], NewConsistName);
-          FreePool(NewConsistName);
-        }
-      }
-
-      FreePool(NewDefaultName);
-    }
-    ShellCommandConsistMappingUnInitialize(ConsistMappingTable);
-    SHELL_FREE_NON_NULL(HandleList);
-    SHELL_FREE_NON_NULL(DevicePathList);
-
-    HandleList = NULL;
-  } else {
-    Count = (UINTN)-1;
-  }
-  //
-  // Do it all over again for gEfiBlockIoProtocolGuid
-  //
-
-  return (Status);
 }
 
 /**
@@ -1199,7 +1098,7 @@ ShellCommandRunMap (
           //
           // Do the Update
           //
-          Status = UpdateMapping();
+          Status = ShellCommandUpdateMapping ();
           if (EFI_ERROR(Status)) {
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel2HiiHandle, Status);
             ShellStatus = SHELL_UNSUPPORTED;
