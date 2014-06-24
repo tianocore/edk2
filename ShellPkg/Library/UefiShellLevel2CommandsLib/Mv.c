@@ -1,8 +1,8 @@
 /** @file
   Main file for mv shell level 2 function.
 
-  Copyright (c) 2013, Hewlett-Packard Development Company, L.P.
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2013-2014, Hewlett-Packard Development Company, L.P.
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -29,6 +29,7 @@
   @param Cwd      [in]    The current working directory
   @param DestPath [in]    The target location to move to
   @param Attribute[in]    The Attribute of the file
+  @param FileStatus[in]   The Status of the file when opened
 
   @retval TRUE        The move is valid
   @retval FALSE       The move is not
@@ -36,10 +37,11 @@
 BOOLEAN
 EFIAPI
 IsValidMove(
-  IN CONST CHAR16   *FullName,
-  IN CONST CHAR16   *Cwd,
-  IN CONST CHAR16   *DestPath,
-  IN CONST UINT64   Attribute
+  IN CONST CHAR16     *FullName,
+  IN CONST CHAR16     *Cwd,
+  IN CONST CHAR16     *DestPath,
+  IN CONST UINT64     Attribute,
+  IN CONST EFI_STATUS FileStatus
   )
 {
   CHAR16  *Test;
@@ -87,11 +89,11 @@ IsValidMove(
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MV_INV_SUB), gShellLevel2HiiHandle);
     return (FALSE);
   }
-  if ((Attribute & EFI_FILE_READ_ONLY) != 0) {
+  if (((Attribute & EFI_FILE_READ_ONLY) != 0) || (FileStatus == EFI_WRITE_PROTECTED)) {
     //
     // invalid to move read only
     //
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MV_INV_RO), gShellLevel2HiiHandle);
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MV_INV_RO), gShellLevel2HiiHandle, FullName);
     return (FALSE);
   }
   Test  = StrStr(FullName, L":");
@@ -290,7 +292,6 @@ ValidateAndMoveFiles(
   ASSERT  (DestPath     != NULL);
   ASSERT  (HiiResultOk  != NULL);
   ASSERT  (HiiOutput    != NULL);
-//  ASSERT  (Cwd          != NULL);
 
   //
   // Go through the list of files and directories to move...
@@ -302,8 +303,13 @@ ValidateAndMoveFiles(
     if (ShellGetExecutionBreakFlag()) {
       break;
     }
+
+    //
+    // These should never be NULL
+    //
     ASSERT(Node->FileName != NULL);
     ASSERT(Node->FullName != NULL);
+    ASSERT(Node->Info     != NULL);
 
     //
     // skip the directory traversing stuff...
@@ -315,7 +321,7 @@ ValidateAndMoveFiles(
     //
     // Validate that the move is valid
     //
-    if (!IsValidMove(Node->FullName, Cwd, DestPath, Node->Info->Attribute)) {
+    if (!IsValidMove(Node->FullName, Cwd, DestPath, Node->Info->Attribute, Node->Status)) {
       ShellStatus = SHELL_INVALID_PARAMETER;
       continue;
     }
