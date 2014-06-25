@@ -12,7 +12,7 @@
   DxeImageVerificationHandler(), HashPeImageByType(), HashPeImage() function will accept
   untrusted PE/COFF image and validate its data structure within this image buffer before use.
 
-Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -768,7 +768,7 @@ AddImageExeInfo (
   NewImageExeInfoTable->NumberOfImages++;
   ImageExeInfoEntry = (EFI_IMAGE_EXECUTION_INFO *) ((UINT8 *) NewImageExeInfoTable + ImageExeInfoTableSize);
   //
-  // Update new item's infomation.
+  // Update new item's information.
   //
   WriteUnaligned32 ((UINT32 *) &ImageExeInfoEntry->Action, Action);
   WriteUnaligned32 ((UINT32 *) &ImageExeInfoEntry->InfoSize, (UINT32) NewImageExeInfoEntrySize);
@@ -1378,6 +1378,41 @@ Done:
 }
 
 /**
+  On Ready To Boot Services Event notification handler.
+
+  Add the image execution information table if it is not in system configuration table.
+
+  @param[in]  Event     Event whose notification function is being invoked
+  @param[in]  Context   Pointer to the notification function's context
+
+**/
+VOID
+EFIAPI
+OnReadyToBoot (
+  IN      EFI_EVENT               Event,
+  IN      VOID                    *Context
+  )
+{
+  EFI_IMAGE_EXECUTION_INFO_TABLE  *ImageExeInfoTable;
+  UINTN                           ImageExeInfoTableSize;
+
+  EfiGetSystemConfigurationTable (&gEfiImageSecurityDatabaseGuid, (VOID **) &ImageExeInfoTable);
+  if (ImageExeInfoTable != NULL) {
+    return;
+  }
+
+  ImageExeInfoTableSize = sizeof (EFI_IMAGE_EXECUTION_INFO_TABLE);
+  ImageExeInfoTable     = (EFI_IMAGE_EXECUTION_INFO_TABLE *) AllocateRuntimePool (ImageExeInfoTableSize);
+  if (ImageExeInfoTable == NULL) {
+    return ;
+  }
+
+  ImageExeInfoTable->NumberOfImages = 0;  
+  gBS->InstallConfigurationTable (&gEfiImageSecurityDatabaseGuid, (VOID *) ImageExeInfoTable);
+
+}
+
+/**
   Register security measurement handler.
 
   @param  ImageHandle   ImageHandle of the loaded driver.
@@ -1392,6 +1427,18 @@ DxeImageVerificationLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
+  EFI_EVENT            Event;
+
+  //
+  // Register the event to publish the image execution table.
+  //
+  EfiCreateEventReadyToBootEx (
+    TPL_CALLBACK,
+    OnReadyToBoot, 
+    NULL, 
+    &Event
+    ); 
+
   return RegisterSecurity2Handler (
           DxeImageVerificationHandler,
           EFI_AUTH_OPERATION_VERIFY_IMAGE | EFI_AUTH_OPERATION_IMAGE_REQUIRED
