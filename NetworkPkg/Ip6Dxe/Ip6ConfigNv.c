@@ -1,7 +1,7 @@
 /** @file
   Helper functions for configuring or obtaining the parameters relating to IP6.
 
-  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -600,6 +600,7 @@ Ip6ParseAddressListFromString (
     return EFI_INVALID_PARAMETER;
   }
 
+  ZeroMem (&AddressInfo, sizeof (EFI_IP6_ADDRESS_INFO));
   LocalString = (CHAR16 *) AllocateCopyPool (StrSize (String), String);
   if (LocalString == NULL) {
     return EFI_OUT_OF_RESOURCES;

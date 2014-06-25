@@ -600,6 +600,7 @@ EfiPxeBcDiscover (
     if (EFI_ERROR (Status)) {
       goto ON_EXIT;
     }
+    ASSERT (NewCreatedInfo != NULL);
     Info = NewCreatedInfo;
   } else {
     //
