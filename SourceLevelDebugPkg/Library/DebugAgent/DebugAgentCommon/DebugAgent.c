@@ -587,7 +587,7 @@ ReadRemainingBreakPacket (
   //
   // Has received start symbol, try to read the rest part
   //
-  if (DebugPortReadBuffer (Handle, &DebugHeader->Command, sizeof (DEBUG_PACKET_HEADER) - 1, READ_PACKET_TIMEOUT) == 0) {
+  if (DebugPortReadBuffer (Handle, (UINT8 *)DebugHeader + OFFSET_OF (DEBUG_PACKET_HEADER, Command), sizeof (DEBUG_PACKET_HEADER) - OFFSET_OF (DEBUG_PACKET_HEADER, Command), READ_PACKET_TIMEOUT) == 0) {
     //
     // Timeout occur, exit
     //
@@ -1014,7 +1014,7 @@ ReceivePacket (
     //
     Received = DebugPortReadBuffer (
                  Handle,
-                 &DebugHeader->Command,
+                 (UINT8 *)DebugHeader + OFFSET_OF (DEBUG_PACKET_HEADER, Command),
                  OFFSET_OF (DEBUG_PACKET_HEADER, Length) + sizeof (DebugHeader->Length) - sizeof (DebugHeader->StartSymbol),
                  Timeout
                  );
@@ -2104,6 +2104,7 @@ InterruptProcess (
   UINT32                           IssuedViewPoint;
   DEBUG_AGENT_EXCEPTION_BUFFER     *ExceptionBuffer;
 
+  InputCharacter  = 0;
   ProcessorIndex  = 0;
   IssuedViewPoint = 0;
   BreakReceived   = FALSE;

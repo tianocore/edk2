@@ -1,7 +1,7 @@
 /** @file
   Initialize Debug Agent in DXE by invoking Debug Agent Library.
 
-Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -58,6 +58,7 @@ DebugAgentDxeInitialize(
 {
   EFI_STATUS      Status;
 
+  Status = EFI_UNSUPPORTED;
   InitializeDebugAgent (DEBUG_AGENT_INIT_DXE_LOAD, &Status, NULL);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -95,6 +96,7 @@ DebugAgentDxeUnload (
 {
   EFI_STATUS          Status;
 
+  Status = EFI_UNSUPPORTED;
   InitializeDebugAgent (DEBUG_AGENT_INIT_DXE_UNLOAD, &Status, NULL);
 
   return Status;
