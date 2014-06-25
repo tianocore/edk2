@@ -1,7 +1,7 @@
 /** @file
 Floppy Peim to support Recovery function from Floppy device.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -1610,6 +1610,7 @@ FdcReadBlocks (
   VOID                  *MemPage;
 
   FdcBlkIoDev = NULL;
+  ZeroMem (&MediaInfo, sizeof (EFI_PEI_BLOCK_IO_MEDIA));
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;

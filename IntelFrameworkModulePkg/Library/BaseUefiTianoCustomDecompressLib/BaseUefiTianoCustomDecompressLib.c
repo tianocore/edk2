@@ -2,7 +2,7 @@
   UEFI and Tiano Custom Decompress Library 
   It will do Tiano or UEFI decompress with different verison parameter.
   
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -323,6 +323,7 @@ ReadPTLen (
   UINT16  Index;
   UINT32  Mask;
 
+  ASSERT (nn < NPT);
   //
   // Read Extra Set Code Length Array size 
   //

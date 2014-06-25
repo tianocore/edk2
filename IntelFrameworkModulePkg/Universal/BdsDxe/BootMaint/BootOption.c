@@ -1740,16 +1740,13 @@ GetLegacyDeviceOrder (
       LegacyOrder = CallbackData->BmmFakeNvData.LegacyNET;
       OldData     = CallbackData->BmmOldFakeNVData.LegacyNET;
       break;
-    
-    case FORM_SET_BEV_ORDER_ID:
+
+    default:
+      ASSERT (PageIdList[Index] == FORM_SET_BEV_ORDER_ID);
       OptionMenu  = (BM_MENU_OPTION *) &LegacyBEVMenu;
       BbsType     = BBS_BEV_DEVICE;
       LegacyOrder = CallbackData->BmmFakeNvData.LegacyBEV;
       OldData     = CallbackData->BmmOldFakeNVData.LegacyBEV;
-      break;
-      
-    default:
-      DEBUG ((DEBUG_ERROR, "Invalid command ID for updating page!\n"));
       break;
     }
     

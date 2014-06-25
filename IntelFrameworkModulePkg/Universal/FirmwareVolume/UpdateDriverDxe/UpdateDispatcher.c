@@ -3,7 +3,7 @@
   for the image to be programmed, and the flash area that is going to be
   programed.
 
-  Copyright (c) 2002 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2002 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -755,6 +755,7 @@ InitializeUpdateDriver (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+  ASSERT (ConfigData != NULL);
 
   //
   // Now find the update image. The update image should be put in a FV, and then

@@ -864,6 +864,7 @@ BdsAddNonExistingLegacyBootOptions (
                 &BootOrderSize
                 );
       if (!EFI_ERROR (Status)) {
+        ASSERT (BootOrder != NULL);
         BbsIndex     = Index;
         OptionNumber = BootOrder[BootOrderSize / sizeof (UINT16) - 1];
       }
@@ -4352,6 +4353,7 @@ BdsLibUpdateFvFileDevicePath (
     NewDevicePath = DevicePathFromHandle (FoundFvHandle);
     EfiInitializeFwVolDevicepathNode (&FvFileNode, FileGuid);
     NewDevicePath = AppendDevicePathNode (NewDevicePath, (EFI_DEVICE_PATH_PROTOCOL *) &FvFileNode);
+    ASSERT (NewDevicePath != NULL);
     *DevicePath = NewDevicePath;
     return EFI_SUCCESS;
   }
