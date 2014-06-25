@@ -90,17 +90,21 @@ EFI_FVB_MEDIA_INFO  mPlatformFvbMediaInfo[] = {
       },  // Reserved[1]
       2,  // Revision
       {
-       (FixedPcdGet32 (PcdFlashNvStorageVariableSize) +
-        FixedPcdGet32 (PcdFlashNvStorageFtwWorkingSize) +
-        FixedPcdGet32 (PcdFlashNvStorageFtwSpareSize) +
-        FixedPcdGet32 (PcdOvmfFlashNvStorageEventLogSize)) / FixedPcdGet32 (PcdOvmfFirmwareBlockSize),
-        FixedPcdGet32 (PcdOvmfFirmwareBlockSize),
-      }
+        {
+          (FixedPcdGet32 (PcdFlashNvStorageVariableSize) +
+           FixedPcdGet32 (PcdFlashNvStorageFtwWorkingSize) +
+           FixedPcdGet32 (PcdFlashNvStorageFtwSpareSize) +
+           FixedPcdGet32 (PcdOvmfFlashNvStorageEventLogSize)) / FixedPcdGet32 (PcdOvmfFirmwareBlockSize),
+          FixedPcdGet32 (PcdOvmfFirmwareBlockSize),
+        }
+      } // BlockMap[1]
     },
     {
-      0,
-      0
-    }
+      {
+        0,
+        0
+      }
+    }  // End[1]
   }
 };
 
