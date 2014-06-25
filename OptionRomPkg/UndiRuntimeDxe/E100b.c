@@ -1,7 +1,7 @@
 /** @file
   Provides basic function upon network adapter card.
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1607,6 +1607,7 @@ CheckCBList (
       // check if Q is full
       //
       if (next (AdapterInfo->xmit_done_tail) != AdapterInfo->xmit_done_head) {
+        ASSERT (AdapterInfo->xmit_done_tail < TX_BUFFER_COUNT << 1);
         AdapterInfo->xmit_done[AdapterInfo->xmit_done_tail] = Tmp_ptr->free_data_ptr;
 
         UnMapIt (
