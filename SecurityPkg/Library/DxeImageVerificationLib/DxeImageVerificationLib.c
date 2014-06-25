@@ -770,22 +770,22 @@ AddImageExeInfo (
   //
   // Update new item's information.
   //
-  WriteUnaligned32 ((UINT32 *) &ImageExeInfoEntry->Action, Action);
-  WriteUnaligned32 ((UINT32 *) &ImageExeInfoEntry->InfoSize, (UINT32) NewImageExeInfoEntrySize);
+  WriteUnaligned32 ((UINT32 *) ImageExeInfoEntry, Action);
+  WriteUnaligned32 ((UINT32 *) ((UINT8 *) ImageExeInfoEntry + sizeof (EFI_IMAGE_EXECUTION_ACTION)), (UINT32) NewImageExeInfoEntrySize);
 
   if (Name != NULL) {
-    CopyMem ((UINT8 *) &ImageExeInfoEntry->InfoSize + sizeof (UINT32), Name, NameStringLen);
+    CopyMem ((UINT8 *) ImageExeInfoEntry + sizeof (EFI_IMAGE_EXECUTION_ACTION) + sizeof (UINT32), Name, NameStringLen);
   } else {
-    ZeroMem ((UINT8 *) &ImageExeInfoEntry->InfoSize + sizeof (UINT32), sizeof (CHAR16));
+    ZeroMem ((UINT8 *) ImageExeInfoEntry + sizeof (EFI_IMAGE_EXECUTION_ACTION) + sizeof (UINT32), sizeof (CHAR16));
   }
   CopyMem (
-    (UINT8 *) &ImageExeInfoEntry->InfoSize + sizeof (UINT32) + NameStringLen,
+    (UINT8 *) ImageExeInfoEntry + sizeof (EFI_IMAGE_EXECUTION_ACTION) + sizeof (UINT32) + NameStringLen,
     DevicePath,
     DevicePathSize
     );
   if (Signature != NULL) {
     CopyMem (
-      (UINT8 *) &ImageExeInfoEntry->InfoSize + sizeof (UINT32) + NameStringLen + DevicePathSize,
+      (UINT8 *) ImageExeInfoEntry + sizeof (EFI_IMAGE_EXECUTION_ACTION) + sizeof (UINT32) + NameStringLen + DevicePathSize,
       Signature,
       SignatureSize
       );

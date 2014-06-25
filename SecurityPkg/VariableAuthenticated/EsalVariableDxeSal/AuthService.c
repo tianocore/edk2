@@ -2,7 +2,7 @@
   Implement authentication services for the authenticated variable
   service in UEFI2.2.
 
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -47,6 +47,8 @@ AutenticatedVariableServiceInitialize (
   UINTN                   CtxSize;
   VARIABLE_HEADER         VariableHeader;
   BOOLEAN                 Valid;
+
+  ZeroMem (&VariableHeader, sizeof (VARIABLE_HEADER));
 
   mVariableModuleGlobal->AuthenticatedVariableGuid[Physical] = &gEfiAuthenticatedVariableGuid;
   mVariableModuleGlobal->CertRsa2048Sha256Guid[Physical]     = &gEfiCertRsa2048Sha256Guid;
@@ -484,6 +486,7 @@ ProcessVarWithPk (
   BOOLEAN                     Valid;
 
   OldPkList = NULL;
+  ZeroMem (&VariableHeader, sizeof (VARIABLE_HEADER));
 
   if ((Attributes & EFI_VARIABLE_NON_VOLATILE) == 0) {
     //
@@ -623,6 +626,7 @@ ProcessVarWithKek (
   BOOLEAN                         Valid;
 
   KekList = NULL;
+  ZeroMem (&VariableHeader, sizeof (VARIABLE_HEADER));
 
   if (mPlatformMode == USER_MODE) {
     if ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) == 0) {
