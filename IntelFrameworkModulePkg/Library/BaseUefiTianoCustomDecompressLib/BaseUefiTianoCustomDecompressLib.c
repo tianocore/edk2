@@ -323,7 +323,7 @@ ReadPTLen (
   UINT16  Index;
   UINT32  Mask;
 
-  ASSERT (nn < NPT);
+  ASSERT (nn <= NPT);
   //
   // Read Extra Set Code Length Array size 
   //
