@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -88,7 +88,7 @@ Returns:
     if (GET_HOB_TYPE (GuidHob) == EFI_HOB_TYPE_GUID_EXTENSION) {
       if (EfiCompareGuid (ProtocolGuid, &GuidHob.Guid->Name)) {
         Status     = EFI_SUCCESS;
-        *Interface = (VOID *) *(UINTN *) ((UINT8 *) (&GuidHob.Guid->Name) + sizeof (EFI_GUID));
+        *Interface = (VOID *) *(UINTN *) (GuidHob.Guid + 1);
       }
     }
 

@@ -1,7 +1,7 @@
 /** @file
 Parser for IFR binary encoding.
 
-Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1024,10 +1024,12 @@ ParseOpCodes (
 
       case EFI_IFR_FORM_OP:
       case EFI_IFR_FORM_MAP_OP:
+        ASSERT (CurrentForm != NULL);
         ImageId = &CurrentForm->ImageId;
         break;
 
       case EFI_IFR_ONE_OF_OPTION_OP:
+        ASSERT (CurrentOption != NULL);
         ImageId = &CurrentOption->ImageId;
         break;
 

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -213,6 +213,8 @@ Arguments:
   UINTN         i;
   UINTN         Rem;
   static CHAR16 *SizeUnits[] = { L" B", L" kB", L" MB", L" GB", L" TB", L" PB" };
+
+  Rem = 0;
 
   for (i = 0; i < (sizeof (SizeUnits) / sizeof (SizeUnits)[0]); i++) {
 

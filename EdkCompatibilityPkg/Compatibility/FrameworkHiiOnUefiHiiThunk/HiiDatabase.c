@@ -2,7 +2,7 @@
 Framework to UEFI 2.1 HII Thunk. The driver consume UEFI HII protocols
 to produce a Framework HII protocol.
 
-Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -158,6 +158,7 @@ InitializeHiiDatabase (
 
   Status = ListPackageLists (EFI_HII_PACKAGE_STRINGS, NULL, &BufferLength, &Buffer);
   if (Status == EFI_SUCCESS) {
+    ASSERT (Buffer != NULL);
     for (Index = 0; Index < BufferLength / sizeof (EFI_HII_HANDLE); Index++) {
       ThunkContext = CreateThunkContextForUefiHiiHandle (Buffer[Index]);
       ASSERT (ThunkContext!= NULL);
