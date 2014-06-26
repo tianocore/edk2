@@ -227,6 +227,7 @@ IScsiUpdateDeviceList (
                   );
   if (Status == EFI_BUFFER_TOO_SMALL) {
     DeviceList = (ISCSI_DEVICE_LIST *) AllocatePool (DataSize);
+    ASSERT (DeviceList != NULL);
 
     gRT->GetVariable (
           L"iSCSIDeviceList",
@@ -291,6 +292,7 @@ IScsiUpdateDeviceList (
   //
   DeviceListSize        = sizeof (ISCSI_DEVICE_LIST) + (NumHandles - 1) * sizeof (ISCSI_MAC_INFO);
   DeviceList            = (ISCSI_DEVICE_LIST *) AllocatePool (DeviceListSize);
+  ASSERT (DeviceList != NULL);
   DeviceList->NumDevice = (UINT8) NumHandles;
 
   for (Index = 0; Index < NumHandles; Index++) {

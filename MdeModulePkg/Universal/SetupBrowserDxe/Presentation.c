@@ -397,8 +397,11 @@ UpdateHotkeyList (
     HotKey = BROWSER_HOT_KEY_FROM_LINK (Link);
 
     CopyKey             = AllocateCopyPool(sizeof (BROWSER_HOT_KEY), HotKey);
+    ASSERT (CopyKey != NULL);
     CopyKey->KeyData    = AllocateCopyPool(sizeof (EFI_INPUT_KEY), HotKey->KeyData);
+    ASSERT (CopyKey->KeyData != NULL);
     CopyKey->HelpString = AllocateCopyPool(StrSize (HotKey->HelpString), HotKey->HelpString);
+    ASSERT (CopyKey->HelpString != NULL);
 
     InsertTailList(&gDisplayFormData.HotKeyListHead, &CopyKey->Link);
 
@@ -1977,6 +1980,7 @@ ProcessCallBackFunction (
     if (Action == EFI_BROWSER_ACTION_CHANGING) {
       if (HiiValue->Type == EFI_IFR_TYPE_BUFFER) {
         BackUpBuffer = AllocateCopyPool(Statement->StorageWidth + sizeof(CHAR16), Statement->BufferValue);
+        ASSERT (BackUpBuffer != NULL);
       } else {
         CopyMem (&BackUpValue, &HiiValue->Value, sizeof (EFI_IFR_TYPE_VALUE));
       }

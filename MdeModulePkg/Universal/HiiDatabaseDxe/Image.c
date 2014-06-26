@@ -2,7 +2,7 @@
 Implementation for EFI_HII_IMAGE_PROTOCOL.
 
 
-Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1237,6 +1237,7 @@ HiiDrawImage (
     return EFI_INVALID_PARAMETER;
   }
 
+  FontInfo = NULL;
   ImageIn = (EFI_IMAGE_INPUT *) Image;
 
   //
@@ -1383,6 +1384,7 @@ HiiDrawImage (
       FreePool (ImageOut);
       return Status;
     }
+    ASSERT (FontInfo != NULL);
     for (Index = 0; Index < Width * Height; Index++) {
       BltBuffer[Index] = FontInfo->BackgroundColor;
     }

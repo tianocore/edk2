@@ -477,6 +477,7 @@ PxeBcCheckSelectedOffer (
         //
         Status = EFI_NO_RESPONSE;
 
+        ASSERT (Private->NumOffers < PXEBC_MAX_OFFER_NUM);
         for (Index = 0; Index < Private->NumOffers; Index++) {
 
           Offer = &Private->Dhcp4Offers[Index].Packet.Offer;

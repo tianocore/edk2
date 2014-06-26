@@ -1,7 +1,7 @@
 /** @file
   Implements functions to read firmware file
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -447,6 +447,7 @@ FvReadFileSection (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+  ASSERT (FileBuffer != NULL);
 
   //
   // Check to see that the file actually HAS sections before we go any further.

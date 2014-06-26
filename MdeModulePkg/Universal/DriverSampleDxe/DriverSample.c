@@ -388,7 +388,7 @@ SetPassword (
   //
   // Get user input password
   //
-  Password = &PrivateData->Configuration.WhatIsThePassword2[0];
+  Password = PrivateData->Configuration.WhatIsThePassword2;
   PasswordSize = sizeof (PrivateData->Configuration.WhatIsThePassword2);
   ZeroMem (Password, PasswordSize);
 

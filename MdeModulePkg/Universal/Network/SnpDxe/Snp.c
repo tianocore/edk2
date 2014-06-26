@@ -1,7 +1,7 @@
 /** @file
   Implementation of driver entry point and driver binding protocol.
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed
 and made available under the terms and conditions of the BSD License which
 accompanies this distribution. The full text of the license may be found at
@@ -545,8 +545,8 @@ SimpleNetworkDriverStart (
   // the IO BAR.  Save the index of the BAR into the adapter info structure.
   // for  regular 32bit BARs, 0 is memory mapped, 1 is io mapped
   //
-  ConfigHeader  = (PCI_TYPE00 *) &ConfigInfo.Config.Byte[0];
-  TempBar       = (UINT32 *) &ConfigHeader->Device.Bar[0];
+  ConfigHeader  = (PCI_TYPE00 *) ConfigInfo.Config.Byte;
+  TempBar       = (UINT32 *) ConfigHeader->Device.Bar;
   for (BarIndex = 0; BarIndex <= 5; BarIndex++) {
     if ((*TempBar & PCI_BAR_MEM_MASK) == PCI_BAR_MEM_64BIT) {
       //

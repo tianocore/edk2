@@ -4060,8 +4060,11 @@ GetDefaultForFormset (
       }
 
       TmpNode = AllocateCopyPool (sizeof (NAME_VALUE_NODE), Node);
+      ASSERT (TmpNode != NULL);
       TmpNode->Name = AllocateCopyPool (StrSize(Node->Name) * sizeof (CHAR16), Node->Name);
+      ASSERT (TmpNode->Name != NULL);
       TmpNode->EditValue = AllocateCopyPool (StrSize(Node->EditValue) * sizeof (CHAR16), Node->EditValue);
+      ASSERT (TmpNode->EditValue != NULL);
 
       InsertTailList(&BackUpList, &TmpNode->Link);
     }

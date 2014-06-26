@@ -1,7 +1,7 @@
 /** @file
   Routines to process Rrq (download).
   
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -704,6 +704,7 @@ Mtftp4RrqInput (
 
   } else {
     Packet = (EFI_MTFTP4_PACKET *) NetbufGetByte (UdpPacket, 0, NULL);
+    ASSERT (Packet != NULL);
   }
 
   Opcode = NTOHS (Packet->OpCode);

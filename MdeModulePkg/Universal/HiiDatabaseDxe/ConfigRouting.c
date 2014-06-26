@@ -4339,6 +4339,7 @@ HiiConfigRoutingRouteConfig (
                                );
     }
     if (EFI_ERROR (Status)) {
+      ASSERT (AccessProgress != NULL);
       //
       // AccessProgress indicates the parsing progress on <ConfigResp>.
       // Map it to the progress on <MultiConfigResp> then return it.

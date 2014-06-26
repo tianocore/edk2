@@ -1,7 +1,7 @@
 /** @file
 Parser for IFR binary encoding.
 
-Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -663,6 +663,7 @@ InitializeRequestElement (
     ASSERT (ConfigInfo != NULL);
     ConfigInfo->Signature     = FORM_BROWSER_CONFIG_REQUEST_SIGNATURE;
     ConfigInfo->ConfigRequest = AllocateCopyPool (StrSize (Storage->ConfigHdr), Storage->ConfigHdr);
+    ASSERT (ConfigInfo->ConfigRequest != NULL);
     ConfigInfo->SpareStrLen   = 0;
     ConfigInfo->Storage       = Storage;
     InsertTailList(&Form->ConfigRequestHead, &ConfigInfo->Link);
@@ -2327,6 +2328,7 @@ ParseOpCodes (
         break;
 
       case EFI_IFR_ONE_OF_OPTION_OP:
+        ASSERT (CurrentOption != NULL);
         ImageId = &CurrentOption->ImageId;
         break;
 

@@ -1,7 +1,7 @@
 /** @file
   Implement IP4 pesudo interface.
   
-Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -582,6 +582,7 @@ Ip4SetAddress (
 
   Type                      = NetGetIpClass (IpAddr);
   Len                       = NetGetMaskLength (SubnetMask);
+  ASSERT (Len >= 1);
   Netmask                   = gIp4AllMasks[MIN ((Len - 1), Type << 3)];
   Interface->NetBrdcast     = (IpAddr | ~Netmask);
 

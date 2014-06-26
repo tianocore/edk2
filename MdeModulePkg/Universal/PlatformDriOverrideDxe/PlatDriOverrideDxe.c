@@ -123,10 +123,11 @@ DevicePathToStr (
            TRUE
            );
   if (Text == NULL) {
-    return AllocateCopyPool (sizeof (L"?"), L"?");
-  } else {
-    return Text;
+    Text = AllocateCopyPool (sizeof (L"?"), L"?");
+    ASSERT (Text != NULL);
   }
+
+  return Text;
 }
 
 /**

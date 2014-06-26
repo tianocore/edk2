@@ -3,7 +3,7 @@ PEIM to produce gEfiPeiVirtualBlockIoPpiGuid PPI for ATA controllers in the plat
 This PPI canl be consumed by PEIM which produce gEfiPeiDeviceRecoveryModulePpiGuid
 for Atapi CD ROM device.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -1442,6 +1442,7 @@ Inquiry (
   // prepare command packet for the ATAPI Inquiry Packet Command.
   //
   ZeroMem (&Packet, sizeof (ATAPI_PACKET_COMMAND));
+  ZeroMem (&Idata, sizeof (ATAPI_INQUIRY_DATA));
 
   Packet.Inquiry.opcode             = ATA_CMD_INQUIRY;
   Packet.Inquiry.page_code          = 0;
