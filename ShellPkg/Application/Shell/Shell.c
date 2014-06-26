@@ -509,6 +509,7 @@ UefiMain (
           // Reset page break back to default.
           //
           ShellInfoObject.PageBreakEnabled        = PcdGetBool(PcdShellPageBreakDefault);
+          ASSERT (ShellInfoObject.ConsoleInfo != NULL);
           ShellInfoObject.ConsoleInfo->Enabled    = TRUE;
           ShellInfoObject.ConsoleInfo->RowCounter = 0;
 
@@ -2091,6 +2092,7 @@ ProcessCommandLineToFinal(
   if (EFI_ERROR(Status)) {
     return (Status);
   }
+  ASSERT (*CmdLine != NULL);
 
   TrimSpaces(CmdLine);
 

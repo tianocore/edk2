@@ -1,7 +1,7 @@
 /** @file
   Main file for bcfg shell Install1 function.
 
-  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1040,8 +1040,12 @@ BcfgDisplayDumpInstall1(
 
     if ((*(UINT16*)(Buffer+4)) != 0) {
       DevPath = AllocateZeroPool(*(UINT16*)(Buffer+4));
-      CopyMem(DevPath, Buffer+6+StrSize((CHAR16*)(Buffer+6)), *(UINT16*)(Buffer+4));
-      DevPathString = ConvertDevicePathToText(DevPath, TRUE, FALSE);
+      if (DevPath == NULL) {
+        DevPathString = NULL;
+      } else {
+        CopyMem(DevPath, Buffer+6+StrSize((CHAR16*)(Buffer+6)), *(UINT16*)(Buffer+4));
+        DevPathString = ConvertDevicePathToText(DevPath, TRUE, FALSE);
+      }
     } else {
       DevPath       = NULL;
       DevPathString = NULL;
@@ -1211,12 +1215,16 @@ ShellCommandRunBcfgInstall (
         CurrentOperation.Order);
       if (Status == EFI_BUFFER_TOO_SMALL) {
         CurrentOperation.Order = AllocateZeroPool(Length+(4*sizeof(CurrentOperation.Order[0])));
-        Status = gRT->GetVariable(
-          CurrentOperation.Target == BcfgTargetBootOrder?(CHAR16*)L"BootOrder":(CHAR16*)L"DriverOrder",
-          (EFI_GUID*)&gEfiGlobalVariableGuid,
-          NULL,
-          &Length,
-          CurrentOperation.Order);
+        if (CurrentOperation.Order == NULL) {
+          ShellStatus = SHELL_OUT_OF_RESOURCES;
+        } else {
+          Status = gRT->GetVariable(
+            CurrentOperation.Target == BcfgTargetBootOrder?(CHAR16*)L"BootOrder":(CHAR16*)L"DriverOrder",
+            (EFI_GUID*)&gEfiGlobalVariableGuid,
+            NULL,
+            &Length,
+            CurrentOperation.Order);
+        }
       }
     }
 

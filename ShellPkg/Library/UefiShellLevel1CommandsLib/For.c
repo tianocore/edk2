@@ -1,7 +1,7 @@
 /** @file
   Main file for endfor and for shell level 1 functions.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -333,7 +333,7 @@ ShellCommandRunFor (
   CurrentScriptFile = ShellCommandGetCurrentScriptFile();
   ASSERT(CurrentScriptFile != NULL);
 
-  if (CurrentScriptFile->CurrentCommand->Data == NULL) {
+  if ((CurrentScriptFile->CurrentCommand != NULL) && (CurrentScriptFile->CurrentCommand->Data == NULL)) {
     FirstPass = TRUE;
 
     //
@@ -348,8 +348,7 @@ ShellCommandRunFor (
         gShellLevel1HiiHandle, 
         L"EndFor", 
         L"For", 
-        CurrentScriptFile->CurrentCommand!=NULL
-          ?CurrentScriptFile->CurrentCommand->Line:0);
+        CurrentScriptFile->CurrentCommand->Line);
       return (SHELL_DEVICE_ERROR);
     }
 
@@ -459,9 +458,7 @@ ShellCommandRunFor (
             STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT), 
             gShellLevel1HiiHandle, 
             ArgSet, 
-            CurrentScriptFile!=NULL 
-              && CurrentScriptFile->CurrentCommand!=NULL
-              ? CurrentScriptFile->CurrentCommand->Line:0);
+            CurrentScriptFile->CurrentCommand->Line);
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
           TempSpot = StrStr(ArgSetWalker, L")");
@@ -483,9 +480,7 @@ ShellCommandRunFor (
               NULL, 
               STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT), 
               gShellLevel1HiiHandle, 
-              CurrentScriptFile!=NULL 
-                && CurrentScriptFile->CurrentCommand!=NULL
-                ? CurrentScriptFile->CurrentCommand->Line:0);
+              CurrentScriptFile->CurrentCommand->Line);
             ShellStatus = SHELL_INVALID_PARAMETER;
           } else {
             *TempSpot = CHAR_NULL;
@@ -501,9 +496,7 @@ ShellCommandRunFor (
                 STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT), 
                 gShellLevel1HiiHandle, 
                 ArgSet, 
-                CurrentScriptFile!=NULL 
-                  && CurrentScriptFile->CurrentCommand!=NULL
-                  ? CurrentScriptFile->CurrentCommand->Line:0);
+                CurrentScriptFile->CurrentCommand->Line);
               ShellStatus = SHELL_INVALID_PARAMETER;
             } else {
               if (ArgSetWalker[0] == L'-') {
@@ -523,9 +516,7 @@ ShellCommandRunFor (
                   STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT), 
                   gShellLevel1HiiHandle, 
                   ArgSet, 
-                  CurrentScriptFile!=NULL 
-                    && CurrentScriptFile->CurrentCommand!=NULL
-                    ? CurrentScriptFile->CurrentCommand->Line:0);
+                  CurrentScriptFile->CurrentCommand->Line);
                 ShellStatus = SHELL_INVALID_PARAMETER;
               } else {
                 if (ArgSetWalker[0] == L'-') {
@@ -552,9 +543,7 @@ ShellCommandRunFor (
                       STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT), 
                       gShellLevel1HiiHandle, 
                       ArgSet, 
-                      CurrentScriptFile!=NULL 
-                        && CurrentScriptFile->CurrentCommand!=NULL
-                        ? CurrentScriptFile->CurrentCommand->Line:0);
+                      CurrentScriptFile->CurrentCommand->Line);
                     ShellStatus = SHELL_INVALID_PARAMETER;
                   } else {
                     if (*ArgSetWalker == L')') {
@@ -574,9 +563,7 @@ ShellCommandRunFor (
                           STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT), 
                           gShellLevel1HiiHandle, 
                           ArgSet, 
-                          CurrentScriptFile!=NULL 
-                            && CurrentScriptFile->CurrentCommand!=NULL
-                            ? CurrentScriptFile->CurrentCommand->Line:0);
+                          CurrentScriptFile->CurrentCommand->Line);
                         ShellStatus = SHELL_INVALID_PARAMETER;
                       }
                     }

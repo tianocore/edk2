@@ -460,6 +460,7 @@ EfiShellGetFilePathFromDevicePath(
           ASSERT((PathForReturn == NULL && PathSize == 0) || (PathForReturn != NULL));
 
           AlignedNode = AllocateCopyPool (DevicePathNodeLength(FilePath), FilePath);
+          ASSERT (AlignedNode != NULL);
 
           // File Path Device Path Nodes 'can optionally add a "\" separator to
           //  the beginning and/or the end of the Path Name string.'
