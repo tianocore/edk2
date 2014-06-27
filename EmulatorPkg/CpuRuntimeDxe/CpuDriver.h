@@ -236,7 +236,7 @@ CpuMpServicesWhoAmI (
   OUT UINTN                    *ProcessorNumber
   );
 
-extern EFI_MP_SERVICES_PROTOCOL  mMpSercicesTemplate;
+extern EFI_MP_SERVICES_PROTOCOL  mMpServicesTemplate;
 
 
 #endif

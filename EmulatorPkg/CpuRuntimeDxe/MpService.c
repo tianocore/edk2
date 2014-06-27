@@ -59,7 +59,7 @@ IsBSP (
   EFI_STATUS  Status;
   UINTN       ProcessorNumber;
 
-  Status = CpuMpServicesWhoAmI (&mMpSercicesTemplate, &ProcessorNumber);
+  Status = CpuMpServicesWhoAmI (&mMpServicesTemplate, &ProcessorNumber);
   if (EFI_ERROR (Status)) {
     return FALSE;
   }
@@ -936,7 +936,7 @@ CpuMpServicesWhoAmI (
 
 
 
-EFI_MP_SERVICES_PROTOCOL  mMpSercicesTemplate = {
+EFI_MP_SERVICES_PROTOCOL  mMpServicesTemplate = {
   CpuMpServicesGetNumberOfProcessors,
   CpuMpServicesGetProcessorInfo,
   CpuMpServicesStartupAllAps,
@@ -1348,7 +1348,7 @@ CpuMpServicesInit (
   Handle = NULL;
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Handle,
-                  &gEfiMpServiceProtocolGuid,   &mMpSercicesTemplate,
+                  &gEfiMpServiceProtocolGuid,   &mMpServicesTemplate,
                   NULL
                   );
   return Status;
