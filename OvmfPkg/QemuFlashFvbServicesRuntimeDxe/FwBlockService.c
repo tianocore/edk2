@@ -197,6 +197,7 @@ Returns:
 {
   EFI_FW_VOL_INSTANCE *FwhRecord;
 
+  *FwhInstance = NULL;
   if (Instance >= Global->NumFv) {
     return EFI_INVALID_PARAMETER;
   }
