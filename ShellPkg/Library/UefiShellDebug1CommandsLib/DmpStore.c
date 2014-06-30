@@ -1,6 +1,7 @@
 /** @file
   Main file for DmpStore shell Debug1 function.
-
+   
+  (C) Copyright 2013-2014, Hewlett-Packard Development Company, L.P.
   Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -429,6 +430,11 @@ CascadeProcessVariables (
   // Recurse to the next iteration.  We know "our" variable's name.
   //
   ShellStatus = CascadeProcessVariables(Name, Guid, Type, FileHandle, FoundVarName, FoundVarGuid, FoundOne);
+
+  if (ShellGetExecutionBreakFlag() || (ShellStatus == SHELL_ABORTED)) {
+    SHELL_FREE_NON_NULL(FoundVarName);
+    return (SHELL_ABORTED);
+  }
 
   //
   // No matter what happened we process our own variable
