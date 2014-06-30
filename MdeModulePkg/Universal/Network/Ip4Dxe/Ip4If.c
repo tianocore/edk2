@@ -581,9 +581,10 @@ Ip4SetAddress (
   Interface->SubnetBrdcast  = (IpAddr | ~SubnetMask);
 
   Type                      = NetGetIpClass (IpAddr);
+  ASSERT (Type <= IP4_ADDR_CLASSC);
   Len                       = NetGetMaskLength (SubnetMask);
-  ASSERT (Len >= 1);
-  Netmask                   = gIp4AllMasks[MIN ((Len - 1), Type << 3)];
+  ASSERT (Len < IP4_MASK_NUM);
+  Netmask                   = gIp4AllMasks[MIN (Len, Type << 3)];
   Interface->NetBrdcast     = (IpAddr | ~Netmask);
 
   //
