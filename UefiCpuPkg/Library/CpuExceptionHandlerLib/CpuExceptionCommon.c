@@ -1,7 +1,7 @@
 /** @file
   CPU Exception Hanlder Library common functions.
 
-  Copyright (c) 2012 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -90,13 +90,18 @@ FindModuleImageBase (
       // DOS image header is present, so read the PE header after the DOS image header.
       //
       Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)(Pe32Data + (UINTN) ((DosHdr->e_lfanew) & 0x0ffff));
-      if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE) {
-        //
-        // It's PE image.
-        //
-        InternalPrintMessage ("!!!! Find PE image ");
-        *EntryPoint = (UINTN)Pe32Data + (UINTN)(Hdr.Pe32->OptionalHeader.AddressOfEntryPoint & 0x0ffffffff);
-        break;
+      //
+      // Make sure PE header address does not overflow and is less than the initial address.
+      //
+      if (((UINTN)Hdr.Pe32 > Pe32Data) && ((UINTN)Hdr.Pe32 < CurrentEip)) {
+        if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE) {
+          //
+          // It's PE image.
+          //
+          InternalPrintMessage ("!!!! Find PE image ");
+          *EntryPoint = (UINTN)Pe32Data + (UINTN)(Hdr.Pe32->OptionalHeader.AddressOfEntryPoint & 0x0ffffffff);
+          break;
+        }
       }
     } else {
       //

@@ -214,10 +214,12 @@ FindAndReportModuleImageInfo (
     if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
       //
       // DOS image header is present, so read the PE header after the DOS image header.
-      // Check if address overflow firstly.
       //
-      if ((MAX_ADDRESS - (UINTN)DosHdr->e_lfanew) > Pe32Data) {
-        Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)(Pe32Data + (UINTN)(DosHdr->e_lfanew));
+      Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)(Pe32Data + (UINTN) ((DosHdr->e_lfanew) & 0x0ffff));
+      //
+      // Make sure PE header address does not overflow and is less than the initial address.
+      //
+      if (((UINTN)Hdr.Pe32 > Pe32Data) && ((UINTN)Hdr.Pe32 < (UINTN)mErrorMsgVersionAlert)) {
         if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE) {
           //
           // It's PE image.
