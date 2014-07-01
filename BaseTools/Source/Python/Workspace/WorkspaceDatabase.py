@@ -37,6 +37,7 @@ from BuildClassObject import *
 from WorkspaceCommon import GetDeclaredPcd
 from Common.Misc import AnalyzeDscPcd
 import re
+from Common.Parsing import IsValidWord
 
 ## Platform build information from DSC file
 #
@@ -893,13 +894,23 @@ class DscBuildData(PlatformBuildClassObject):
             VariableName, VariableGuid, VariableOffset, DefaultValue = self._ValidatePcd(PcdCName, TokenSpaceGuid, Setting, Type, Dummy4)
             
             ExceedMax = False
+            FormatCorrect = True
             if VariableOffset.isdigit():
                 if int(VariableOffset,10) > 0xFFFF:
                     ExceedMax = True
             elif re.match(r'[\t\s]*0[xX][a-fA-F0-9]+$',VariableOffset):
                 if int(VariableOffset,16) > 0xFFFF:
                     ExceedMax = True
+            # For Offset written in "A.B"
+            elif VariableOffset.find('.') > -1:
+                VariableOffsetList = VariableOffset.split(".")
+                if not (len(VariableOffsetList) == 2
+                        and IsValidWord(VariableOffsetList[0])
+                        and IsValidWord(VariableOffsetList[1])):
+                    FormatCorrect = False
             else:
+                FormatCorrect = False
+            if not FormatCorrect:
                 EdkLogger.error('Build', FORMAT_INVALID, "Invalid syntax or format of the variable offset value is incorrect for %s." % ".".join((TokenSpaceGuid,PcdCName)))
             
             if ExceedMax:

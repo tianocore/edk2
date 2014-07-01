@@ -1,7 +1,7 @@
 ## @file
 # This file is used to parse meta files
 #
-# Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -1054,7 +1054,7 @@ class DscParser(MetaFileParser):
 
     ## Override parent's method since we'll do all macro replacements in parser
     def _GetMacros(self):
-        Macros = {}
+        Macros = dict( [('ARCH','IA32'), ('FAMILY','MSFT'),('TOOL_CHAIN_TAG','VS2008x86'),('TARGET','DEBUG')])
         Macros.update(self._FileLocalMacros)
         Macros.update(self._GetApplicableSectionMacro())
         Macros.update(GlobalData.gEdkGlobal)

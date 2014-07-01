@@ -2,7 +2,7 @@
 # This file is used to define common string related functions used in parsing 
 # process
 #
-# Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -937,3 +937,29 @@ def SplitPcdEntry(String):
             return ['', '', ''], False
         
     return ['', '', ''], False
+
+## Check if two arches matched?
+#
+# @param Arch1
+# @param Arch2
+#
+def IsMatchArch(Arch1, Arch2):
+    if 'COMMON' in Arch1 or 'COMMON' in Arch2:
+        return True
+    if isinstance(Arch1, basestring) and isinstance(Arch2, basestring):
+        if Arch1 == Arch2:
+            return True
+
+    if isinstance(Arch1, basestring) and isinstance(Arch2, list):
+        return Arch1 in Arch2
+
+    if isinstance(Arch2, basestring) and isinstance(Arch1, list):
+        return Arch2 in Arch1
+
+    if isinstance(Arch1, list) and isinstance(Arch2, list):
+        for Item1 in Arch1:
+            for Item2 in Arch2:
+                if Item1 == Item2:
+                    return True
+
+    return False

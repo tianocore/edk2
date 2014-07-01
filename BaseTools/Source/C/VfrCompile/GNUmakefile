@@ -53,10 +53,10 @@ VfrLexer.cpp VfrLexer.h: Pccts/dlg/dlg VfrParser.dlg
 	Pccts/dlg/dlg -C2 -i -CC -cl VfrLexer -o . VfrParser.dlg
 
 Pccts/antlr/antlr:
-	BIN_DIR='.' make -C Pccts/antlr
+	BIN_DIR='.' $(MAKE) -C Pccts/antlr
 
 Pccts/dlg/dlg:
-	BIN_DIR='.' make -C Pccts/dlg
+	BIN_DIR='.' $(MAKE) -C Pccts/dlg
 
 ATokenBuffer.o: Pccts/h/ATokenBuffer.cpp
 	$(CXX) -c $(VFR_CPPFLAGS) $(INC) $? -o $@
@@ -73,7 +73,7 @@ VfrSyntax.o: VfrSyntax.cpp
 clean: localClean
 
 localClean:
-	BIN_DIR='.' make -C Pccts/antlr clean
-	BIN_DIR='.' make -C Pccts/dlg clean
+	BIN_DIR='.' $(MAKE) -C Pccts/antlr clean
+	BIN_DIR='.' $(MAKE) -C Pccts/dlg clean
 	rm -f $(EXTRA_CLEAN_OBJECTS)
 

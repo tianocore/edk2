@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 1999 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -32,6 +32,37 @@ Abstract:
         ) \
     )
 
+STATIC
+UINT32
+FvBufGetSecHdrLen(
+   IN EFI_COMMON_SECTION_HEADER *SectionHeader
+   )
+{
+  if (SectionHeader == NULL) {
+    return 0;
+  }
+  if (FvBufExpand3ByteSize(SectionHeader->Size) == 0xffffff) {
+    return sizeof(EFI_COMMON_SECTION_HEADER2);
+  }
+  return sizeof(EFI_COMMON_SECTION_HEADER);
+}
+
+STATIC
+UINT32
+FvBufGetSecFileLen (
+  IN EFI_COMMON_SECTION_HEADER *SectionHeader
+  )
+{
+  UINT32 Length;
+  if (SectionHeader == NULL) {
+    return 0;
+  }
+  Length = FvBufExpand3ByteSize(SectionHeader->Size);
+  if (Length == 0xffffff) {
+    Length = ((EFI_COMMON_SECTION_HEADER2 *)SectionHeader)->ExtendedSize;
+  }
+  return Length;
+}
 
 //
 // Local prototypes
@@ -92,7 +123,7 @@ Returns:
     return Status;
   }
 
-  FileToRmLength = FvBufExpand3ByteSize (FileToRm->Size);
+  FileToRmLength = FvBufGetFfsFileSize (FileToRm);
 
   CommonLibBinderSetMem (
     FileToRm,
@@ -218,7 +249,7 @@ Returns:
   EFI_FFS_FILE_STATE StateBackup;
   UINT32 FileSize;
 
-  FileSize = FvBufExpand3ByteSize (File->Size);
+  FileSize = FvBufGetFfsFileSize (File);
 
   //
   // Fill in checksums and state, they must be 0 for checksumming.
@@ -231,13 +262,13 @@ Returns:
   File->IntegrityCheck.Checksum.Header =
     FvBufCalculateChecksum8 (
       (UINT8 *) File,
-      sizeof (EFI_FFS_FILE_HEADER)
+      FvBufGetFfsHeaderSize (File)
       );
 
   if (File->Attributes & FFS_ATTRIB_CHECKSUM) {
     File->IntegrityCheck.Checksum.File = FvBufCalculateChecksum8 (
-                                                (VOID*)(File + 1),
-                                                FileSize - sizeof (EFI_FFS_FILE_HEADER)
+                                                (VOID*)((UINT8 *)File + FvBufGetFfsHeaderSize (File)),
+                                                FileSize - FvBufGetFfsHeaderSize (File)
                                                 );
   } else {
     File->IntegrityCheck.Checksum.File = FFS_FIXED_CHECKSUM;
@@ -568,7 +599,7 @@ Returns:
   }
 
   FvbAttributes = hdr->Attributes;
-  newSize = FvBufExpand3ByteSize (((EFI_FFS_FILE_HEADER*)File)->Size);
+  newSize = FvBufGetFfsFileSize ((EFI_FFS_FILE_HEADER*)File);
 
   for(
       offset = (UINTN)ALIGN_POINTER (hdr->HeaderLength, 8);
@@ -587,7 +618,7 @@ Returns:
       // BUGBUG: Need to make sure that the new file does not already
       // exist.
 
-      fsize = FvBufExpand3ByteSize (fhdr->Size);
+      fsize = FvBufGetFfsFileSize (fhdr);
       if (fsize == 0 || (offset + fsize > fvSize)) {
         return EFI_VOLUME_CORRUPTED;
       }
@@ -725,7 +756,7 @@ Returns:
   }
 
   erasedUint8 = (UINT8)((hdr->Attributes & EFI_FVB2_ERASE_POLARITY) ? 0xFF : 0);
-  NewFileSize = FvBufExpand3ByteSize (((EFI_FFS_FILE_HEADER*)File)->Size);
+  NewFileSize = FvBufGetFfsFileSize ((EFI_FFS_FILE_HEADER*)File);
 
   if (NewFileSize != (UINTN)ALIGN_POINTER (NewFileSize, 8)) {
     return EFI_INVALID_PARAMETER;
@@ -739,7 +770,7 @@ Returns:
   LastFileSize = 0;
   do {
     Status = FvBufFindNextFile (Fv, &Key, (VOID **)&LastFile);
-    LastFileSize = FvBufExpand3ByteSize (((EFI_FFS_FILE_HEADER*)File)->Size);
+    LastFileSize = FvBufGetFfsFileSize ((EFI_FFS_FILE_HEADER*)File);
   } while (!EFI_ERROR (Status));
 
   //
@@ -809,6 +840,64 @@ Returns:
   ((UINT8*)SizeDest)[0] = (UINT8)Size;
   ((UINT8*)SizeDest)[1] = (UINT8)(Size >> 8);
   ((UINT8*)SizeDest)[2] = (UINT8)(Size >> 16);
+}
+
+UINT32
+FvBufGetFfsFileSize (
+  IN EFI_FFS_FILE_HEADER *Ffs
+  )
+/*++
+
+Routine Description:
+
+  Get the FFS file size.
+
+Arguments:
+
+  Ffs - Pointer to FFS header
+
+Returns:
+
+  UINT32
+
+--*/
+{
+  if (Ffs == NULL) {
+    return 0;
+  }
+  if (Ffs->Attributes & FFS_ATTRIB_LARGE_FILE) {
+    return ((EFI_FFS_FILE_HEADER2 *)Ffs)->ExtendedSize;
+  }
+  return FvBufExpand3ByteSize(Ffs->Size);
+}
+
+UINT32
+FvBufGetFfsHeaderSize (
+  IN EFI_FFS_FILE_HEADER *Ffs
+  )
+/*++
+
+Routine Description:
+
+  Get the FFS header size.
+
+Arguments:
+
+  Ffs - Pointer to FFS header
+
+Returns:
+
+  UINT32
+
+--*/
+{
+  if (Ffs == NULL) {
+    return 0;
+  }
+  if (Ffs->Attributes & FFS_ATTRIB_LARGE_FILE) {
+    return sizeof(EFI_FFS_FILE_HEADER2);
+  }
+  return sizeof(EFI_FFS_FILE_HEADER);
 }
 
 UINT32
@@ -897,7 +986,7 @@ Returns:
     ) {
 
     fhdr = (EFI_FFS_FILE_HEADER*) ((UINT8*)hdr + *Key);
-    fsize = FvBufExpand3ByteSize (fhdr->Size);
+    fsize = FvBufGetFfsFileSize (fhdr);
 
     if (!EFI_TEST_FFS_ATTRIBUTES_BIT(
           FvbAttributes,
@@ -1089,8 +1178,8 @@ Returns:
     //
     // Raw filetypes don't have sections, so we just return the raw data
     //
-    *RawData = (VOID*)(File + 1);
-    *RawDataSize = FvBufExpand3ByteSize (File->Size) - sizeof (*File);
+    *RawData = (VOID*)((UINT8 *)File + FvBufGetFfsHeaderSize (File));
+    *RawDataSize = FvBufGetFfsFileSize (File) - FvBufGetFfsHeaderSize (File);
     return EFI_SUCCESS;
   }
 
@@ -1102,9 +1191,9 @@ Returns:
     return Status;
   }
 
-  *RawData = (VOID*)(Section + 1);
+  *RawData = (VOID*)((UINT8 *)Section + FvBufGetSecHdrLen(Section));
   *RawDataSize =
-    FvBufExpand3ByteSize (Section->Size) - sizeof (*Section);
+    FvBufGetSecFileLen (Section) - FvBufGetSecHdrLen(Section);
 
   return EFI_SUCCESS;
 
@@ -1144,16 +1233,28 @@ Returns:
   UINT32 NewFileSize;
   EFI_RAW_SECTION* NewSection;
   UINT32 NewSectionSize;
+  UINT32 FfsHdrLen;
+  UINT32 SecHdrLen;
 
   //
   // The section size is the DataSize + the size of the section header
   //
   NewSectionSize = (UINT32)sizeof (EFI_RAW_SECTION) + (UINT32)RawDataSize;
+  SecHdrLen = sizeof (EFI_RAW_SECTION);
+  if (NewSectionSize >= MAX_SECTION_SIZE) {
+    NewSectionSize = (UINT32)sizeof (EFI_RAW_SECTION2) + (UINT32)RawDataSize;
+    SecHdrLen = sizeof (EFI_RAW_SECTION2);
+  }
 
   //
   // The file size is the size of the file header + the section size
   //
   NewFileSize = sizeof (EFI_FFS_FILE_HEADER) + NewSectionSize;
+  FfsHdrLen = sizeof (EFI_FFS_FILE_HEADER);
+  if (NewFileSize >= MAX_FFS_SIZE) {
+    NewFileSize = sizeof (EFI_FFS_FILE_HEADER2) + NewSectionSize;
+    FfsHdrLen = sizeof (EFI_FFS_FILE_HEADER2);
+  }
 
   //
   // Try to allocate a buffer to build the new FFS file in
@@ -1167,24 +1268,35 @@ Returns:
   //
   // The NewSection follow right after the FFS file header
   //
-  NewSection = (EFI_RAW_SECTION*)(NewFile + 1);
-  FvBufCompact3ByteSize (NewSection->Size, NewSectionSize);
+  NewSection = (EFI_RAW_SECTION*)((UINT8*)NewFile + FfsHdrLen);
+  if (NewSectionSize >= MAX_SECTION_SIZE) {
+    FvBufCompact3ByteSize (NewSection->Size, 0xffffff);
+    ((EFI_RAW_SECTION2 *)NewSection)->ExtendedSize = NewSectionSize;
+  } else {
+    FvBufCompact3ByteSize (NewSection->Size, NewSectionSize);
+  }
   NewSection->Type = EFI_SECTION_RAW;
 
   //
   // Copy the actual file data into the buffer
   //
-  CommonLibBinderCopyMem (NewSection + 1, RawData, RawDataSize);
+  CommonLibBinderCopyMem ((UINT8 *)NewSection + SecHdrLen, RawData, RawDataSize);
 
   //
   // Initialize the FFS file header
   //
   CommonLibBinderCopyMem (&NewFile->Name, Filename, sizeof (EFI_GUID));
-  FvBufCompact3ByteSize (NewFile->Size, NewFileSize);
-  NewFile->Type = EFI_FV_FILETYPE_FREEFORM;
   NewFile->Attributes = 0;
+  if (NewFileSize >= MAX_FFS_SIZE) {
+    FvBufCompact3ByteSize (NewFile->Size, 0x0);
+    ((EFI_FFS_FILE_HEADER2 *)NewFile)->ExtendedSize = NewFileSize;
+    NewFile->Attributes |= FFS_ATTRIB_LARGE_FILE;
+  } else {
+    FvBufCompact3ByteSize (NewFile->Size, NewFileSize);
+  }
+  NewFile->Type = EFI_FV_FILETYPE_FREEFORM;
   NewFile->IntegrityCheck.Checksum.Header =
-    FvBufCalculateChecksum8 ((UINT8*)NewFile, sizeof (*NewFile));
+    FvBufCalculateChecksum8 ((UINT8*)NewFile, FfsHdrLen);
   NewFile->IntegrityCheck.Checksum.File = FFS_FIXED_CHECKSUM;
   NewFile->State = (UINT8)~( EFI_FILE_HEADER_CONSTRUCTION |
                              EFI_FILE_HEADER_VALID |
@@ -1239,7 +1351,7 @@ Returns:
   }
 
   sectionHdr = (EFI_COMMON_SECTION_HEADER*)((UINT8*)SectionsStart + *Key);
-  sectionSize = FvBufExpand3ByteSize (sectionHdr->Size);
+  sectionSize = FvBufGetSecFileLen (sectionHdr);
 
   if (sectionSize < sizeof (EFI_COMMON_SECTION_HEADER)) {
     return EFI_NOT_FOUND;
@@ -1287,10 +1399,10 @@ Returns:
   UINTN                      TotalSectionsSize;
   EFI_COMMON_SECTION_HEADER* NextSection;
 
-  SectionStart = (VOID*)((UINTN)FfsFile + sizeof (EFI_FFS_FILE_HEADER));
+  SectionStart = (VOID*)((UINTN)FfsFile + FvBufGetFfsHeaderSize(FfsFile));
   TotalSectionsSize =
-    FvBufExpand3ByteSize (((EFI_FFS_FILE_HEADER*)FfsFile)->Size) -
-    sizeof (EFI_FFS_FILE_HEADER);
+    FvBufGetFfsFileSize ((EFI_FFS_FILE_HEADER*)FfsFile) -
+    FvBufGetFfsHeaderSize(FfsFile);
   Key = 0;
   *Count = 0;
   while (TRUE) {
@@ -1352,10 +1464,10 @@ Returns:
   UINTN                      TotalSectionsSize;
   EFI_COMMON_SECTION_HEADER* NextSection;
 
-  SectionStart = (VOID*)((UINTN)FfsFile + sizeof (EFI_FFS_FILE_HEADER));
+  SectionStart = (VOID*)((UINTN)FfsFile + FvBufGetFfsHeaderSize(FfsFile));
   TotalSectionsSize =
-    FvBufExpand3ByteSize (((EFI_FFS_FILE_HEADER*)FfsFile)->Size) -
-    sizeof (EFI_FFS_FILE_HEADER);
+    FvBufGetFfsFileSize ((EFI_FFS_FILE_HEADER*)FfsFile) -
+    FvBufGetFfsHeaderSize(FfsFile);
   Key = 0;
   while (TRUE) {
     Status = FvBufFindNextSection (
@@ -1436,7 +1548,7 @@ Returns:
   EndOfLastFile = (UINT8*)FvHdr + FvHdr->FvLength;
   while (!EFI_ERROR (FvBufFindNextFile (Fv, &Key, (VOID **)&FileIt))) {
     EndOfLastFile =
-      (VOID*)((UINT8*)FileIt + FvBufExpand3ByteSize (FileIt->Size));
+      (VOID*)((UINT8*)FileIt + FvBufGetFfsFileSize (FileIt));
   }
 
   //

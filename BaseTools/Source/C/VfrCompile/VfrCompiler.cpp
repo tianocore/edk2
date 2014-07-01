@@ -372,6 +372,8 @@ CVfrCompiler::CVfrCompiler (
   mPreProcessCmd = (CHAR8 *) PREPROCESSOR_COMMAND;
   mPreProcessOpt = (CHAR8 *) PREPROCESSOR_OPTIONS;
 
+  SET_RUN_STATUS (STATUS_STARTED);
+
   OptionInitialization(Argc, Argv);
 
   if ((IS_RUN_STATUS(STATUS_FAILED)) || (IS_RUN_STATUS(STATUS_DEAD))) {

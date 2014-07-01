@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define common parsing related functions used in parsing INF/DEC/DSC process
 #
-# Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -877,3 +877,38 @@ def GenMetaDatSectionItem(Key, Value, List):
         List[Key] = [Value]
     else:
         List[Key].append(Value)
+
+## IsValidWord
+#
+# Check whether the word is valid.
+# <Word>   ::=  (a-zA-Z0-9_)(a-zA-Z0-9_-){0,} Alphanumeric characters with
+#               optional
+#               dash "-" and/or underscore "_" characters. No whitespace
+#               characters are permitted.
+#
+# @param Word:  The word string need to be checked.
+#
+def IsValidWord(Word):
+    if not Word:
+        return False
+    #
+    # The first char should be alpha, _ or Digit.
+    #
+    if not Word[0].isalnum() and \
+       not Word[0] == '_' and \
+       not Word[0].isdigit():
+        return False
+
+    LastChar = ''
+    for Char in Word[1:]:
+        if (not Char.isalpha()) and \
+           (not Char.isdigit()) and \
+           Char != '-' and \
+           Char != '_' and \
+           Char != '.':
+            return False
+        if Char == '.' and LastChar == '.':
+            return False
+        LastChar = Char
+
+    return True

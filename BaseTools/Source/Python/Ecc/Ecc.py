@@ -1,7 +1,7 @@
 ## @file
 # This file is used to be the main entrance of ECC tool
 #
-# Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -59,6 +59,7 @@ class Ecc(object):
         self.ScanSourceCode = True
         self.ScanMetaData = True
         self.MetaFile = ''
+        self.OnlyScan = None
 
         # Parse the options and args
         self.ParseOption()
@@ -113,8 +114,9 @@ class Ecc(object):
         GlobalData.gAllFiles = DirCache(GlobalData.gWorkspace)
          
         # Build ECC database
-        self.BuildDatabase()
-
+#         self.BuildDatabase()
+        self.DetectOnlyScanDirs()
+        
         # Start to check
         self.Check()
 
@@ -133,11 +135,30 @@ class Ecc(object):
                 return
         self.ConfigFile = 'config.ini'
 
+
+    ## DetectOnlyScan
+    #
+    # Detect whether only scanned folders have been enabled
+    #
+    def DetectOnlyScanDirs(self):
+        if self.OnlyScan == True:
+            OnlyScanDirs = []
+            # Use regex here if multiple spaces or TAB exists in ScanOnlyDirList in config.ini file
+            for folder in re.finditer(r'\S+', EccGlobalData.gConfig.ScanOnlyDirList):
+                OnlyScanDirs.append(folder.group())
+            if len(OnlyScanDirs) != 0:
+                self.BuildDatabase(OnlyScanDirs)
+            else:
+                EdkLogger.error("ECC", BuildToolError.OPTION_VALUE_INVALID, ExtraData="Use -f option need to fill specific folders in config.ini file")
+        else:
+            self.BuildDatabase()
+            
+    
     ## BuildDatabase
     #
     # Build the database for target
     #
-    def BuildDatabase(self):
+    def BuildDatabase(self, SpeciDirs = None):
         # Clean report table
         EccGlobalData.gDb.TblReport.Drop()
         EccGlobalData.gDb.TblReport.Create()
@@ -146,10 +167,14 @@ class Ecc(object):
         if self.IsInit:            
             if self.ScanMetaData:
                 EdkLogger.quiet("Building database for Meta Data File ...")
-                self.BuildMetaDataFileDatabase()
+                self.BuildMetaDataFileDatabase(SpeciDirs)
             if self.ScanSourceCode:
                 EdkLogger.quiet("Building database for Meta Data File Done!")
-                c.CollectSourceCodeDataIntoDB(EccGlobalData.gTarget)
+                if SpeciDirs == None:
+                    c.CollectSourceCodeDataIntoDB(EccGlobalData.gTarget)
+                else:
+                    for specificDir in SpeciDirs:
+                        c.CollectSourceCodeDataIntoDB(os.path.join(EccGlobalData.gTarget, specificDir))
 
         EccGlobalData.gIdentifierTableList = GetTableList((MODEL_FILE_C, MODEL_FILE_H), 'Identifier', EccGlobalData.gDb)
         EccGlobalData.gCFileList = GetFileList(MODEL_FILE_C, EccGlobalData.gDb)
@@ -159,59 +184,67 @@ class Ecc(object):
     #
     # Build the database for meta data files
     #
-    def BuildMetaDataFileDatabase(self):
+    def BuildMetaDataFileDatabase(self, SpecificDirs = None):
+        ScanFolders = []
+        if SpecificDirs == None:
+            ScanFolders.append(EccGlobalData.gTarget)
+        else:
+            for specificDir in SpecificDirs:    
+                ScanFolders.append(os.path.join(EccGlobalData.gTarget, specificDir))
         EdkLogger.quiet("Building database for meta data files ...")
         Op = open(EccGlobalData.gConfig.MetaDataFileCheckPathOfGenerateFileList, 'w+')
         #SkipDirs = Read from config file
         SkipDirs = EccGlobalData.gConfig.SkipDirList
         SkipDirString = string.join(SkipDirs, '|')
-        p = re.compile(r'.*[\\/](?:%s)[\\/]?.*' % SkipDirString)
-        for Root, Dirs, Files in os.walk(EccGlobalData.gTarget):
-            if p.match(Root.upper()):
-                continue
-            for Dir in Dirs:
-                Dirname = os.path.join(Root, Dir)
-                if os.path.islink(Dirname):
-                    Dirname = os.path.realpath(Dirname)
-                    if os.path.isdir(Dirname):
-                        # symlinks to directories are treated as directories
-                        Dirs.remove(Dir)
-                        Dirs.append(Dirname)
-
-            for File in Files:
-                if len(File) > 4 and File[-4:].upper() == ".DEC":
-                    Filename = os.path.normpath(os.path.join(Root, File))
-                    EdkLogger.quiet("Parsing %s" % Filename)
-                    Op.write("%s\r" % Filename)
-                    #Dec(Filename, True, True, EccGlobalData.gWorkspace, EccGlobalData.gDb)
-                    self.MetaFile = DecParser(Filename, MODEL_FILE_DEC, EccGlobalData.gDb.TblDec)
-                    self.MetaFile.Start()
+#         p = re.compile(r'.*[\\/](?:%s)[\\/]?.*' % SkipDirString)
+        p = re.compile(r'.*[\\/](?:%s^\S)[\\/]?.*' % SkipDirString)
+        for scanFolder in ScanFolders:
+            for Root, Dirs, Files in os.walk(scanFolder):
+                if p.match(Root.upper()):
                     continue
-                if len(File) > 4 and File[-4:].upper() == ".DSC":
-                    Filename = os.path.normpath(os.path.join(Root, File))
-                    EdkLogger.quiet("Parsing %s" % Filename)
-                    Op.write("%s\r" % Filename)
-                    #Dsc(Filename, True, True, EccGlobalData.gWorkspace, EccGlobalData.gDb)
-                    self.MetaFile = DscParser(PathClass(Filename, Root), MODEL_FILE_DSC, MetaFileStorage(EccGlobalData.gDb.TblDsc.Cur, Filename, MODEL_FILE_DSC, True))
-                    # alwasy do post-process, in case of macros change
-                    self.MetaFile.DoPostProcess()
-                    self.MetaFile.Start()
-                    self.MetaFile._PostProcess()
-                    continue
-                if len(File) > 4 and File[-4:].upper() == ".INF":
-                    Filename = os.path.normpath(os.path.join(Root, File))
-                    EdkLogger.quiet("Parsing %s" % Filename)
-                    Op.write("%s\r" % Filename)
-                    #Inf(Filename, True, True, EccGlobalData.gWorkspace, EccGlobalData.gDb)
-                    self.MetaFile = InfParser(Filename, MODEL_FILE_INF, EccGlobalData.gDb.TblInf)
-                    self.MetaFile.Start()
-                    continue
-                if len(File) > 4 and File[-4:].upper() == ".FDF":
-                    Filename = os.path.normpath(os.path.join(Root, File))
-                    EdkLogger.quiet("Parsing %s" % Filename)
-                    Op.write("%s\r" % Filename)
-                    Fdf(Filename, True, EccGlobalData.gWorkspace, EccGlobalData.gDb)
-                    continue
+                for Dir in Dirs:
+                    Dirname = os.path.join(Root, Dir)
+                    if os.path.islink(Dirname):
+                        Dirname = os.path.realpath(Dirname)
+                        if os.path.isdir(Dirname):
+                            # symlinks to directories are treated as directories
+                            Dirs.remove(Dir)
+                            Dirs.append(Dirname)
+    
+                for File in Files:
+                    if len(File) > 4 and File[-4:].upper() == ".DEC":
+                        Filename = os.path.normpath(os.path.join(Root, File))
+                        EdkLogger.quiet("Parsing %s" % Filename)
+                        Op.write("%s\r" % Filename)
+                        #Dec(Filename, True, True, EccGlobalData.gWorkspace, EccGlobalData.gDb)
+                        self.MetaFile = DecParser(Filename, MODEL_FILE_DEC, EccGlobalData.gDb.TblDec)
+                        self.MetaFile.Start()
+                        continue
+                    if len(File) > 4 and File[-4:].upper() == ".DSC":
+                        Filename = os.path.normpath(os.path.join(Root, File))
+                        EdkLogger.quiet("Parsing %s" % Filename)
+                        Op.write("%s\r" % Filename)
+                        #Dsc(Filename, True, True, EccGlobalData.gWorkspace, EccGlobalData.gDb)
+                        self.MetaFile = DscParser(PathClass(Filename, Root), MODEL_FILE_DSC, MetaFileStorage(EccGlobalData.gDb.TblDsc.Cur, Filename, MODEL_FILE_DSC, True))
+                        # alwasy do post-process, in case of macros change
+                        self.MetaFile.DoPostProcess()
+                        self.MetaFile.Start()
+                        self.MetaFile._PostProcess()
+                        continue
+                    if len(File) > 4 and File[-4:].upper() == ".INF":
+                        Filename = os.path.normpath(os.path.join(Root, File))
+                        EdkLogger.quiet("Parsing %s" % Filename)
+                        Op.write("%s\r" % Filename)
+                        #Inf(Filename, True, True, EccGlobalData.gWorkspace, EccGlobalData.gDb)
+                        self.MetaFile = InfParser(Filename, MODEL_FILE_INF, EccGlobalData.gDb.TblInf)
+                        self.MetaFile.Start()
+                        continue
+                    if len(File) > 4 and File[-4:].upper() == ".FDF":
+                        Filename = os.path.normpath(os.path.join(Root, File))
+                        EdkLogger.quiet("Parsing %s" % Filename)
+                        Op.write("%s\r" % Filename)
+                        Fdf(Filename, True, EccGlobalData.gWorkspace, EccGlobalData.gDb)
+                        continue
         Op.close()
 
         # Commit to database
@@ -321,6 +354,8 @@ class Ecc(object):
             self.ScanSourceCode = False
         if Options.sourcecode != None:
             self.ScanMetaData = False
+        if Options.folders != None:
+            self.OnlyScan = True
 
     ## SetLogLevel
     #
@@ -371,6 +406,7 @@ class Ecc(object):
                                                                                    "and warning messages, etc.")
         Parser.add_option("-d", "--debug", action="store", type="int", help="Enable debug messages at specified level.")
         Parser.add_option("-w", "--workspace", action="store", type="string", dest='Workspace', help="Specify workspace.")
+        Parser.add_option("-f", "--folders", action="store_true", type=None, help="Only scanning specified folders which are recorded in config.ini file.")
 
         (Opt, Args)=Parser.parse_args()
 

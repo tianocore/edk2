@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 1999 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -975,22 +975,24 @@ Returns:
   UINT32              FileLength;
   UINT8               FileState;
   UINT8               Checksum;
-  EFI_FFS_FILE_HEADER BlankHeader;
+  EFI_FFS_FILE_HEADER2 BlankHeader;
   EFI_STATUS          Status;
   UINT8               GuidBuffer[PRINTED_GUID_BUFFER_SIZE];
+  UINT32              HeaderSize;
 #if (PI_SPECIFICATION_VERSION < 0x00010000) 
   UINT16              *Tail;
 #endif
   //
   // Check if we have free space
   //
+  HeaderSize = FvBufGetFfsHeaderSize(FileHeader);
   if (ErasePolarity) {
-    memset (&BlankHeader, -1, sizeof (EFI_FFS_FILE_HEADER));
+    memset (&BlankHeader, -1, HeaderSize);
   } else {
-    memset (&BlankHeader, 0, sizeof (EFI_FFS_FILE_HEADER));
+    memset (&BlankHeader, 0, HeaderSize);
   }
 
-  if (memcmp (&BlankHeader, FileHeader, sizeof (EFI_FFS_FILE_HEADER)) == 0) {
+  if (memcmp (&BlankHeader, FileHeader, HeaderSize) == 0) {
     return EFI_SUCCESS;
   }
   //
@@ -1008,7 +1010,7 @@ Returns:
   //  PrintGuid (&FileHeader->Name);
   //  printf ("\n");
   //
-  FileLength = GetLength (FileHeader->Size);
+  FileLength = FvBufGetFfsFileSize (FileHeader);
   printf ("File Offset:      0x%08X\n", (unsigned) ((UINTN) FileHeader - (UINTN) FvImage));
   printf ("File Length:      0x%08X\n", (unsigned) FileLength);
   printf ("File Attributes:  0x%02X\n", FileHeader->Attributes);
@@ -1031,7 +1033,7 @@ Returns:
 
   case EFI_FILE_HEADER_VALID:
     printf ("        EFI_FILE_HEADER_VALID\n");
-    Checksum  = CalculateSum8 ((UINT8 *) FileHeader, sizeof (EFI_FFS_FILE_HEADER));
+    Checksum  = CalculateSum8 ((UINT8 *) FileHeader, HeaderSize);
     Checksum  = (UINT8) (Checksum - FileHeader->IntegrityCheck.Checksum.File);
     Checksum  = (UINT8) (Checksum - FileHeader->State);
     if (Checksum != 0) {
@@ -1053,7 +1055,7 @@ Returns:
     //
     // Calculate header checksum
     //
-    Checksum  = CalculateSum8 ((UINT8 *) FileHeader, sizeof (EFI_FFS_FILE_HEADER));
+    Checksum  = CalculateSum8 ((UINT8 *) FileHeader, HeaderSize);
     Checksum  = (UINT8) (Checksum - FileHeader->IntegrityCheck.Checksum.File);
     Checksum  = (UINT8) (Checksum - FileHeader->State);
     if (Checksum != 0) {
@@ -1061,13 +1063,13 @@ Returns:
       return EFI_ABORTED;
     }
 
-    FileLength = GetLength (FileHeader->Size);
+    FileLength = FvBufGetFfsFileSize (FileHeader);
 
     if (FileHeader->Attributes & FFS_ATTRIB_CHECKSUM) {
       //
       // Calculate file checksum
       //
-      Checksum  = CalculateSum8 ((UINT8 *) (FileHeader + 1), FileLength - sizeof (EFI_FFS_FILE_HEADER));
+      Checksum  = CalculateSum8 ((UINT8 *)FileHeader + HeaderSize, FileLength - HeaderSize);
       Checksum  = Checksum + FileHeader->IntegrityCheck.Checksum.File;
       if (Checksum != 0) {
         Error (NULL, 0, 0003, "error parsing FFS file", "FFS file with Guid %s has invalid file checksum", GuidBuffer);
@@ -1180,8 +1182,8 @@ Returns:
     // All other files have sections
     //
     Status = ParseSection (
-              (UINT8 *) ((UINTN) FileHeader + sizeof (EFI_FFS_FILE_HEADER)),
-              GetLength (FileHeader->Size) - sizeof (EFI_FFS_FILE_HEADER)
+              (UINT8 *) ((UINTN) FileHeader + HeaderSize),
+              FvBufGetFfsFileSize (FileHeader) - HeaderSize
               );
     if (EFI_ERROR (Status)) {
       //
@@ -1225,6 +1227,7 @@ Returns:
   EFI_SECTION_TYPE    Type;
   UINT8               *Ptr;
   UINT32              SectionLength;
+  UINT32              SectionHeaderLen;
   CHAR8               *SectionName;
   EFI_STATUS          Status;
   UINT32              ParsedLength;
@@ -1246,6 +1249,10 @@ Returns:
   CHAR8               *ToolOutputFile;
   CHAR8               *SystemCommandFormatString;
   CHAR8               *SystemCommand;
+  EFI_GUID            *EfiGuid;
+  UINT16              DataOffset;
+  UINT16              Attributes;
+  UINT32              RealHdrLen;
 
   ParsedLength = 0;
   while (ParsedLength < BufferLength) {
@@ -1263,6 +1270,12 @@ Returns:
       ParsedLength += 4;
       continue;
     }
+
+    //
+    // Get real section file size
+    //
+    SectionLength = GetSectionFileLength ((EFI_COMMON_SECTION_HEADER *) Ptr);
+    SectionHeaderLen = GetSectionHeaderLength((EFI_COMMON_SECTION_HEADER *)Ptr);
 
     SectionName = SectionNameToStr (Type);
     printf ("------------------------------------------------------------\n");
@@ -1283,7 +1296,7 @@ Returns:
       break;
 
     case EFI_SECTION_FIRMWARE_VOLUME_IMAGE:
-      Status = PrintFvInfo (((EFI_FIRMWARE_VOLUME_IMAGE_SECTION*)Ptr) + 1, TRUE);
+      Status = PrintFvInfo (Ptr + SectionHeaderLen, TRUE);
       if (EFI_ERROR (Status)) {
         Error (NULL, 0, 0003, "printing of FV section contents failed", NULL);
         return EFI_SECTION_ERROR;
@@ -1304,15 +1317,22 @@ Returns:
       break;
 
     case EFI_SECTION_VERSION:
-      printf ("  Build Number:  0x%02X\n", ((EFI_VERSION_SECTION *) Ptr)->BuildNumber);
-      printf ("  Version Strg:  %s\n", (char*) ((EFI_VERSION_SECTION *) Ptr)->VersionString);
+      printf ("  Build Number:  0x%02X\n", *(UINT16 *)(Ptr + SectionHeaderLen));
+      printf ("  Version Strg:  %s\n", (char*) (Ptr + SectionHeaderLen + sizeof (UINT16)));
       break;
 
     case EFI_SECTION_COMPRESSION:
       UncompressedBuffer  = NULL;
-      CompressedLength    = SectionLength - sizeof (EFI_COMPRESSION_SECTION);
-      UncompressedLength  = ((EFI_COMPRESSION_SECTION *) Ptr)->UncompressedLength;
-      CompressionType     = ((EFI_COMPRESSION_SECTION *) Ptr)->CompressionType;
+      if (SectionHeaderLen == sizeof (EFI_COMMON_SECTION_HEADER)) {
+        RealHdrLen = sizeof(EFI_COMPRESSION_SECTION);
+        UncompressedLength  = ((EFI_COMPRESSION_SECTION *)Ptr)->UncompressedLength;
+        CompressionType     = ((EFI_COMPRESSION_SECTION *)Ptr)->CompressionType;
+      } else {
+        RealHdrLen = sizeof(EFI_COMPRESSION_SECTION2);
+        UncompressedLength  = ((EFI_COMPRESSION_SECTION2 *)Ptr)->UncompressedLength;
+        CompressionType     = ((EFI_COMPRESSION_SECTION2 *)Ptr)->CompressionType;
+      }
+      CompressedLength    = SectionLength - RealHdrLen;
       printf ("  Uncompressed Length:  0x%08X\n", (unsigned) UncompressedLength);
 
       if (CompressionType == EFI_NOT_COMPRESSED) {
@@ -1328,13 +1348,13 @@ Returns:
           return EFI_SECTION_ERROR;
         }
 
-        UncompressedBuffer = Ptr + sizeof (EFI_COMPRESSION_SECTION);
+        UncompressedBuffer = Ptr + RealHdrLen;
       } else if (CompressionType == EFI_STANDARD_COMPRESSION) {
         GetInfoFunction     = EfiGetInfo;
         DecompressFunction  = EfiDecompress;
         printf ("  Compression Type:  EFI_STANDARD_COMPRESSION\n");
 
-        CompressedBuffer  = Ptr + sizeof (EFI_COMPRESSION_SECTION);
+        CompressedBuffer  = Ptr + RealHdrLen;
 
         Status            = GetInfoFunction (CompressedBuffer, CompressedLength, &DstSize, &ScratchSize);
         if (EFI_ERROR (Status)) {
@@ -1387,16 +1407,25 @@ Returns:
       break;
 
     case EFI_SECTION_GUID_DEFINED:
+      if (SectionHeaderLen == sizeof(EFI_COMMON_SECTION_HEADER)) {
+        EfiGuid = &((EFI_GUID_DEFINED_SECTION *) Ptr)->SectionDefinitionGuid;
+        DataOffset = ((EFI_GUID_DEFINED_SECTION *) Ptr)->DataOffset;
+        Attributes = ((EFI_GUID_DEFINED_SECTION *) Ptr)->Attributes;
+      } else {
+        EfiGuid = &((EFI_GUID_DEFINED_SECTION2 *) Ptr)->SectionDefinitionGuid;
+        DataOffset = ((EFI_GUID_DEFINED_SECTION2 *) Ptr)->DataOffset;
+        Attributes = ((EFI_GUID_DEFINED_SECTION2 *) Ptr)->Attributes;
+      }
       printf ("  SectionDefinitionGuid:  ");
-      PrintGuid (&((EFI_GUID_DEFINED_SECTION *) Ptr)->SectionDefinitionGuid);
+      PrintGuid (EfiGuid);
       printf ("\n");
-      printf ("  DataOffset:             0x%04X\n", (unsigned) ((EFI_GUID_DEFINED_SECTION *) Ptr)->DataOffset);
-      printf ("  Attributes:             0x%04X\n", (unsigned) ((EFI_GUID_DEFINED_SECTION *) Ptr)->Attributes);
+      printf ("  DataOffset:             0x%04X\n", (unsigned) DataOffset);
+      printf ("  Attributes:             0x%04X\n", (unsigned) Attributes);
 
       ExtractionTool =
         LookupGuidedSectionToolPath (
           mParsedGuidedSectionTools,
-          &((EFI_GUID_DEFINED_SECTION *) Ptr)->SectionDefinitionGuid
+          EfiGuid
           );
 
       if (ExtractionTool != NULL) {
@@ -1427,8 +1456,8 @@ Returns:
         Status =
           PutFileImage (
             ToolInputFile,
-            (CHAR8*) SectionBuffer + ((EFI_GUID_DEFINED_SECTION *) Ptr)->DataOffset,
-            BufferLength - ((EFI_GUID_DEFINED_SECTION *) Ptr)->DataOffset
+            (CHAR8*) SectionBuffer + DataOffset,
+            BufferLength - DataOffset
             );
 
         system (SystemCommand);
@@ -1461,7 +1490,7 @@ Returns:
       // Check for CRC32 sections which we can handle internally if needed.
       //
       } else if (!CompareGuid (
-                   &((EFI_GUID_DEFINED_SECTION *) Ptr)->SectionDefinitionGuid,
+                   EfiGuid,
                    &gEfiCrc32GuidedSectionExtractionProtocolGuid
                    )
           ) {
@@ -1469,8 +1498,8 @@ Returns:
         // CRC32 guided section
         //
         Status = ParseSection (
-                  SectionBuffer + ((EFI_GUID_DEFINED_SECTION *) Ptr)->DataOffset,
-                  BufferLength - ((EFI_GUID_DEFINED_SECTION *) Ptr)->DataOffset
+                  SectionBuffer + DataOffset,
+                  BufferLength - DataOffset
                   );
         if (EFI_ERROR (Status)) {
           Error (NULL, 0, 0003, "parse of CRC32 GUIDED section failed", NULL);
@@ -1540,8 +1569,8 @@ Returns:
     return EFI_SUCCESS;
   }
 
-  Ptr += sizeof (EFI_COMMON_SECTION_HEADER);
-  SectionLength -= sizeof (EFI_COMMON_SECTION_HEADER);
+  Ptr += GetSectionHeaderLength((EFI_COMMON_SECTION_HEADER *)Ptr);
+  SectionLength -= GetSectionHeaderLength((EFI_COMMON_SECTION_HEADER *)Ptr);
   while (SectionLength > 0) {
     printf ("        ");
     switch (*Ptr) {
@@ -1809,7 +1838,7 @@ Returns:
   //
   // Copyright declaration
   // 
-  fprintf (stdout, "Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.\n\n");
+  fprintf (stdout, "Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.\n\n");
 
   //
   // Details Option

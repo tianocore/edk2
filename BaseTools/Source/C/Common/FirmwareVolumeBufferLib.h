@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 1999 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -80,6 +80,16 @@ FvBufDuplicate (
 UINT32
 FvBufExpand3ByteSize (
   IN VOID* Size
+  );
+
+UINT32
+FvBufGetFfsFileSize (
+  IN EFI_FFS_FILE_HEADER *Ffs
+  );
+
+UINT32
+FvBufGetFfsHeaderSize (
+  IN EFI_FFS_FILE_HEADER *Ffs
   );
 
 EFI_STATUS

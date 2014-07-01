@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 #  Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 #  Portions copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 #
@@ -162,8 +162,7 @@ DEFINE GCC47_X64_PREFIX        = /usr/bin/
 DEFINE GCC48_IA32_PREFIX       = /usr/bin/
 DEFINE GCC48_X64_PREFIX        = /usr/bin/
 
-DEFINE UNIX_IASL_BIN           = /usr/bin/iasl
-#DEFINE UNIX_IASL_BIN           = $(HOME)/programs/iasl
+DEFINE UNIX_IASL_BIN           = ENV(IASL_PREFIX)iasl
 DEFINE WIN_ASL_BIN_DIR         = C:\ASL
 DEFINE WIN_IASL_BIN            = DEF(WIN_ASL_BIN_DIR)\iasl.exe
 DEFINE WIN_ASL_BIN             = DEF(WIN_ASL_BIN_DIR)\asl.exe
@@ -2875,6 +2874,7 @@ NOOPT_VS2012x86xASL_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT
 #   ASL  - Intel ACPI Source Language Compiler (iasl.exe)
 *_DDK3790_*_*_FAMILY        = MSFT
 
+*_DDK3790_*_*_DLL           = DEF(WINDDK_BIN32)
 *_DDK3790_*_MAKE_PATH       = DEF(WINDDK_BIN32)\nmake.exe
 *_DDK3790_*_MAKE_FLAGS           = /nologo
 *_DDK3790_*_RC_PATH         = DEF(WINDDK_BIN32)\rc.exe
@@ -3000,6 +3000,7 @@ NOOPT_DDK3790_IPF_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF
 #   ASL          - Microsoft ACPI Source Language Compiler (asl.exe)
 *_DDK3790xASL_*_*_FAMILY        = MSFT
 
+*_DDK3790xASL_*_*_DLL           = DEF(WINDDK_BIN32)
 *_DDK3790xASL_*_MAKE_PATH       = DEF(WINDDK_BIN32)\nmake.exe
 *_DDK3790xASL_*_MAKE_FLAGS           = /nologo
 *_DDK3790xASL_*_RC_PATH         = DEF(WINDDK_BIN32)\rc.exe
@@ -3127,7 +3128,7 @@ NOOPT_DDK3790xASL_IPF_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF
 DEBUG_*_*_OBJCOPY_ADDDEBUGFLAG     = --add-gnu-debuglink=$(DEBUG_DIR)\$(MODULE_NAME).debug
 RELEASE_*_*_OBJCOPY_ADDDEBUGFLAG   =
 
-DEFINE GCC_ALL_CC_FLAGS            = -g -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -Wno-array-bounds -c -include AutoGen.h
+DEFINE GCC_ALL_CC_FLAGS            = -g -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -c -include AutoGen.h
 DEFINE GCC_IA32_CC_FLAGS           = DEF(GCC_ALL_CC_FLAGS) -m32 -malign-double -freorder-blocks -freorder-blocks-and-partition -O2 -mno-stack-arg-probe
 DEFINE GCC_X64_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -mno-red-zone -Wno-address -mno-stack-arg-probe
 DEFINE GCC_IPF_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -minline-int-divide-min-latency
@@ -3154,7 +3155,7 @@ DEFINE GCC_IPF_RC_FLAGS            = -I binary -O elf64-ia64-little   -B ia64   
 DEFINE GCC_ARM_RC_FLAGS            = -I binary -O elf32-littlearm     -B arm     --rename-section .data=.hii
 DEFINE GCC_AARCH64_RC_FLAGS        = -I binary -O elf64-littleaarch64 -B aarch64 --rename-section .data=.hii
 
-DEFINE GCC44_ALL_CC_FLAGS            = -g -fshort-wchar -fno-stack-protector -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -Wno-array-bounds -ffunction-sections -fdata-sections -c -include AutoGen.h -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
+DEFINE GCC44_ALL_CC_FLAGS            = -g -fshort-wchar -fno-stack-protector -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -ffunction-sections -fdata-sections -c -include AutoGen.h -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
 DEFINE GCC44_IA32_CC_FLAGS           = DEF(GCC44_ALL_CC_FLAGS) -m32 -malign-double -D EFI32
 DEFINE GCC44_X64_CC_FLAGS            = DEF(GCC44_ALL_CC_FLAGS) -m64 "-DEFIAPI=__attribute__((ms_abi))" -DNO_BUILTIN_VA_FUNCS -mno-red-zone -Wno-address -mcmodel=large
 DEFINE GCC44_IA32_X64_DLINK_COMMON   = -nostdlib -n -q --gc-sections --script=$(EDK_TOOLS_PATH)/Scripts/gcc4.4-ld-script
@@ -4036,7 +4037,7 @@ RELEASE_GCC48_AARCH64_CC_FLAGS   = DEF(GCC48_AARCH64_CC_FLAGS) -Wno-unused-but-s
 *_ELFGCC_X64_VFRPP_PATH            = DEF(ELFGCC_BIN)/gcc
 *_ELFGCC_X64_RC_PATH               = DEF(ELFGCC_BIN)/objcopy
 
-*_ELFGCC_X64_CC_FLAGS              = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -Wno-address -Wno-array-bounds -c -include AutoGen.h -D_EFI_P64
+*_ELFGCC_X64_CC_FLAGS              = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-address -Wno-array-bounds -c -include AutoGen.h -D_EFI_P64
 *_ELFGCC_X64_DLINK_FLAGS           = -nostdlib --shared --entry $(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
 *_ELFGCC_X64_SLINK_FLAGS           =
 *_ELFGCC_X64_ASM_FLAGS             = -c -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h

@@ -36,6 +36,7 @@ from Common import EdkLogger
 from Common.String import *
 from Common.Misc import DirCache,PathClass
 from Common.Misc import SaveFileOnChange
+from Common.Misc import GuidStructureStringToGuidString
 from Common.BuildVersion import gBUILD_VERSION
 
 ## Version and Copyright
@@ -511,11 +512,23 @@ class GenFds :
     def GenerateGuidXRefFile(BuildDb, ArchList):
         GuidXRefFileName = os.path.join(GenFdsGlobalVariable.FvDir, "Guid.xref")
         GuidXRefFile = StringIO.StringIO('')
+        GuidDict = {}
         for Arch in ArchList:
             PlatformDataBase = BuildDb.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
             for ModuleFile in PlatformDataBase.Modules:
                 Module = BuildDb.BuildObject[ModuleFile, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
                 GuidXRefFile.write("%s %s\n" % (Module.Guid, Module.BaseName))
+                for key, item in Module.Protocols.items():
+                    GuidDict[key] = item
+                for key, item in Module.Guids.items():
+                    GuidDict[key] = item
+                for key, item in Module.Ppis.items():
+                    GuidDict[key] = item
+       # Append GUIDs, Protocols, and PPIs to the Xref file
+        GuidXRefFile.write("\n")
+        for key, item in GuidDict.items():
+            GuidXRefFile.write("%s %s\n" % (GuidStructureStringToGuidString(item).upper(), key))
+
         if GuidXRefFile.getvalue():
             SaveFileOnChange(GuidXRefFileName, GuidXRefFile.getvalue(), False)
             GenFdsGlobalVariable.InfLogger("\nGUID cross reference file can be found at %s" % GuidXRefFileName)

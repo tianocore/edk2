@@ -22,32 +22,32 @@ pushd .
 @REM # You should not have to modify anything below this line
 @REM #
 
-@if /I "%1"=="-h" goto Usage
-@if /I "%1"=="-help" goto Usage
-@if /I "%1"=="--help" goto Usage
-@if /I "%1"=="/h" goto Usage
-@if /I "%1"=="/help" goto Usage
-@if /I "%1"=="/?" goto Usage
+if /I "%1"=="-h" goto Usage
+if /I "%1"=="-help" goto Usage
+if /I "%1"=="--help" goto Usage
+if /I "%1"=="/h" goto Usage
+if /I "%1"=="/help" goto Usage
+if /I "%1"=="/?" goto Usage
 
 
 :loop
-  @if "%1"=="" goto setup_workspace
-  @if /I "%1"=="--nt32" (
+  if "%1"=="" goto setup_workspace
+  if /I "%1"=="--nt32" (
     @REM Ignore --nt32 flag
     shift
     goto loop
   )
-  @if /I "%1"=="Reconfig" (
+  if /I "%1"=="Reconfig" (
     shift
     set RECONFIG=TRUE
     goto loop
   )
-  @if /I "%1"=="Rebuild" (
+  if /I "%1"=="Rebuild" (
     shift
     set REBUILD=TRUE
     goto loop
   )
-  @if /I "%1"=="ForceRebuild" (
+  if /I "%1"=="ForceRebuild" (
     shift
     set FORCE_REBUILD=TRUE
     goto loop
@@ -246,7 +246,8 @@ goto end
   )
   set PATH=%BASE_TOOLS_PATH%\Bin\Win32;%PATH%
 
-  set PYTHONPATH=%BASE_TOOLS_PATH%\Source\Python
+  set BASETOOLS_PYTHON_SOURCE=%BASE_TOOLS_PATH%\Source\Python
+  set PYTHONPATH=%BASETOOLS_PYTHON_SOURCE%;%PYTHONPATH%
 
   if not defined PYTHON_HOME (
     if defined PYTHONHOME (
@@ -279,8 +280,9 @@ goto end
       echo !!! WARNING !!! Will not be able to compile Python programs to .exe
       echo Will setup environment to run Python scripts directly.
       echo.
-      set PYTHONPATH=%BASE_TOOLS_PATH%\Source\Python
-      set PATH=%PYTHONPATH%\build;%PYTHONPATH%\GenFds;%PYTHONPATH%\Trim;%PATH%
+      set PATH=%BASETOOLS_PYTHON_SOURCE%\Trim;%PATH%
+      set PATH=%BASETOOLS_PYTHON_SOURCE%\GenFds;%PATH%
+      set PATH=%BASETOOLS_PYTHON_SOURCE%\build;%PATH%
       set PATHEXT=%PATHEXT%;.py
     )
   )
@@ -290,31 +292,16 @@ goto end
   echo PYTHON_FREEZER_PATH = %PYTHON_FREEZER_PATH%
   echo.
 
-  if defined VCINSTALLDIR goto VisualStudioAvailable
-  if defined VS100COMNTOOLS (
-    call "%VS100COMNTOOLS%\vsvars32.bat"
-  ) else (
-    if defined VS90COMNTOOLS (
-      call "%VS90COMNTOOLS%\vsvars32.bat"
-    ) else (
-      if defined VS80COMNTOOLS (
-        call "%VS80COMNTOOLS%\vsvars32.bat"
-      ) else (
-        if defined VS71COMNTOOLS (
-          call "%VS71COMNTOOLS%\vsvars32.bat"
-        ) else (
-          echo.
-          echo !!! ERROR !!!! Cannot find Visual Studio, required to build C tools !!!
-          echo.
-          goto end
-        )
-      )
-    )
+  call "%EDK_TOOLS_PATH%\get_vsvars.bat"
+  if not defined VCINSTALLDIR (
+    @echo.
+    @echo !!! ERROR !!!! Cannot find Visual Studio, required to build C tools !!!
+    @echo.
+    goto end
   )
 
 :VisualStudioAvailable
-  if defined FORCE_REBUILD goto CleanAndBuild
-  goto IncrementalBuild
+  if not defined FORCE_REBUILD goto IncrementalBuild
 
 :CleanAndBuild
   pushd .
@@ -352,23 +339,21 @@ goto end
   goto end
 
 :Usage
-  echo.
+  @echo.
   echo  Usage: "%0 [-h | -help | --help | /h | /help | /?] [ Rebuild | ForceRebuild ] [Reconfig] [base_tools_path [edk_tools_path]]"
-  echo.
-  echo         base_tools_path   BaseTools project path, BASE_TOOLS_PATH will be set to this path. 
-  echo         edk_tools_path    EDK_TOOLS_PATH will be set to this path.
-  echo         Rebuild           If sources are available perform an Incremental build, only 
-  echo                           build those updated tools.
-  echo         ForceRebuild      If sources are available, rebuild all tools regardless of 
-  echo                           whether they have been updated or not.
-  echo         Reconfig          Reinstall target.txt, tools_def.txt and build_rule.txt.
-echo.
+  @echo.
+  @echo         base_tools_path   BaseTools project path, BASE_TOOLS_PATH will be set to this path. 
+  @echo         edk_tools_path    EDK_TOOLS_PATH will be set to this path.
+  @echo         Rebuild           If sources are available perform an Incremental build, only 
+  @echo                           build those updated tools.
+  @echo         ForceRebuild      If sources are available, rebuild all tools regardless of 
+  @echo                           whether they have been updated or not.
+  @echo         Reconfig          Reinstall target.txt, tools_def.txt and build_rule.txt.
+  @echo.
 
 :end
 set REBUILD=
 set FORCE_REBUILD=
 set RECONFIG=
 popd
-
-@echo on
 

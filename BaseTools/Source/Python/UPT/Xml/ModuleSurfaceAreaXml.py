@@ -1,7 +1,7 @@
 ## @file
 # This file is used to parse a Module file of .PKG file
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -20,6 +20,7 @@ from xml.dom import minidom
 from Library.String import ConvertNEToNOTEQ
 from Library.String import ConvertNOTEQToNE
 from Library.String import GetStringOfList
+from Library.String import IsMatchArch
 from Library.Xml.XmlRoutines import XmlElement
 from Library.Xml.XmlRoutines import XmlAttribute
 from Library.Xml.XmlRoutines import XmlNode
@@ -128,9 +129,11 @@ class BinaryFileXml(object):
             pass
         NodeList = []
         FilenameList = BinaryFile.GetFileNameList()
+        SupportArch = None
         for Filename in FilenameList:
             Tmp = FilenameXml()
             NodeList.append(Tmp.ToXml(Filename, 'Filename'))
+            SupportArch = Filename.SupArchList
 
         if GlobalData.gIS_BINARY_INF:
             AsBuildList = BinaryFile.GetAsBuiltList()
@@ -142,12 +145,14 @@ class BinaryFileXml(object):
             AsBuiltNodeList = []
 
             for Pcd in PatchPcdValueList:
-                Tmp = PcdEntryXml()
-                AsBuiltNodeList.append(Tmp.ToXml4(Pcd, 'PatchPcdValue'))
+                if IsMatchArch(Pcd.SupArchList, SupportArch):
+                    Tmp = PcdEntryXml()
+                    AsBuiltNodeList.append(Tmp.ToXml4(Pcd, 'PatchPcdValue'))
 
             for Pcd in PcdExList:
-                Tmp = PcdEntryXml()
-                AsBuiltNodeList.append(Tmp.ToXml4(Pcd, 'PcdExValue'))
+                if IsMatchArch(Pcd.SupArchList, SupportArch):
+                    Tmp = PcdEntryXml()
+                    AsBuiltNodeList.append(Tmp.ToXml4(Pcd, 'PcdExValue'))
 
             GuiVerElemList = []
             for LibGuidVer in LibGuidVerList:

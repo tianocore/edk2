@@ -53,7 +53,9 @@ def parsePcdInfoFromMapFile(mapfilepath, efifilepath):
         return None
     
     if len(lines) == 0: return None
-    if lines[0].strip().find("Archive member included because of file (symbol)") != -1:
+    firstline = lines[0].strip()
+    if (firstline.startswith("Archive member included ") and
+        firstline.endswith(" file (symbol)")):
         return _parseForGCC(lines, efifilepath)
     return _parseGeneral(lines, efifilepath)
 

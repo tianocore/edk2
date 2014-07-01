@@ -2,7 +2,7 @@
   
   The definition of CFormPkg's member function
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -1343,7 +1343,7 @@ public:
     UpdateCIfrMinMaxStepData(&mNumeric->data);
   }
 
-  EFI_VFR_RETURN_CODE SetFlags (IN UINT8 HFlags, IN UINT8 LFlags) {
+  EFI_VFR_RETURN_CODE SetFlags (IN UINT8 HFlags, IN UINT8 LFlags, BOOLEAN DisplaySettingsSpecified = FALSE) {
     EFI_VFR_RETURN_CODE Ret;
 
     Ret = CIfrQuestionHeader::SetFlags (HFlags);
@@ -1351,10 +1351,10 @@ public:
       return Ret;
     }
 
-    if (LFlags & EFI_IFR_DISPLAY) {
-      mNumeric->Flags = LFlags;
-    } else {
+    if (DisplaySettingsSpecified == FALSE) {
       mNumeric->Flags = LFlags | EFI_IFR_DISPLAY_UINT_DEC;
+    } else {
+      mNumeric->Flags = LFlags;
     }
     return VFR_RETURN_SUCCESS;
   }
