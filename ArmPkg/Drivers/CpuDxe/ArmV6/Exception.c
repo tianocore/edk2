@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2014, ARM Limited. All rights reserved.<BR>
   
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -209,7 +210,10 @@ InitializeExceptions (
     ArmWriteVBar (PcdGet32(PcdCpuVectorBaseAddress));
   } else {
     // The Vector table must be 32-byte aligned
-    ASSERT(((UINT32)ExceptionHandlersStart & ARM_VECTOR_TABLE_ALIGNMENT) == 0);
+    if (((UINT32)ExceptionHandlersStart & ARM_VECTOR_TABLE_ALIGNMENT) != 0) {
+      ASSERT (0);
+      return EFI_INVALID_PARAMETER;
+    }
 
     // We do not copy the Exception Table at PcdGet32(PcdCpuVectorBaseAddress). We just set Vector Base Address to point into CpuDxe code.
     ArmWriteVBar ((UINT32)ExceptionHandlersStart);
