@@ -756,6 +756,7 @@ BdsTftpLoadImage (
   EFI_STATUS                  Status;
   EFI_PXE_BASE_CODE_PROTOCOL  *Pxe;
   UINT64                      TftpBufferSize;
+  UINT64                      TftpTransferSize;
   EFI_IP_ADDRESS              ServerIp;
   IPv4_DEVICE_PATH*           IPv4DevicePathNode;
   FILEPATH_DEVICE_PATH*       FilePathDevicePath;
@@ -857,12 +858,13 @@ BdsTftpLoadImage (
         goto EXIT;
       }
 
+      TftpTransferSize = TftpBufferSize;
       Status = Pxe->Mtftp (
                       Pxe,
                       EFI_PXE_BASE_CODE_TFTP_READ_FILE,
                       (VOID *)(UINTN)*Image,
                       FALSE,
-                      &TftpBufferSize,
+                      &TftpTransferSize,
                       NULL,
                       &ServerIp,
                       (UINT8*)AsciiPathName,
