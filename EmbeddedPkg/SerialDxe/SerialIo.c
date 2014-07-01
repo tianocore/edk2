@@ -162,12 +162,13 @@ SerialSetAttributes (
   IN EFI_STOP_BITS_TYPE      StopBits
   )
 {
-  EFI_STATUS  Status;
-  EFI_TPL     Tpl;
+  RETURN_STATUS  ReturnStatus;
+  EFI_STATUS     Status;
+  EFI_TPL        Tpl;
 
-  Status = SerialPortSetAttributes (&BaudRate, &ReceiveFifoDepth, &Timeout, &Parity, &DataBits, &StopBits);
-  if (EFI_ERROR(Status)) {
-    return Status;
+  ReturnStatus = SerialPortSetAttributes (&BaudRate, &ReceiveFifoDepth, &Timeout, &Parity, &DataBits, &StopBits);
+  if (RETURN_ERROR (ReturnStatus)) {
+    return EFI_DEVICE_ERROR;
   }
 
   //
