@@ -3,7 +3,7 @@
   via PcdTpmInstanceGuid. Platform need make choice that which one will be final one.
   At most one TPM2 instance can be finally registered, and other will return unsupported.
 
-Copyright (c) 2013, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -22,7 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/Tpm2DeviceLib.h>
 
 EFI_GUID mInternalTpm2DeviceInterfaceGuid = {
-  0x349cf818, 0xc0ba, 0x4c43, 0x92, 0x9a, 0xc8, 0xa1, 0xb1, 0xb3, 0xd2, 0x55
+  0x349cf818, 0xc0ba, 0x4c43, { 0x92, 0x9a, 0xc8, 0xa1, 0xb1, 0xb3, 0xd2, 0x55 }
 };
 
 /**

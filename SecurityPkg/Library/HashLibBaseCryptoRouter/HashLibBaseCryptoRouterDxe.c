@@ -3,7 +3,7 @@
   hash handler registerd, such as SHA1, SHA256.
   Platform can use PcdTpm2HashMask to mask some hash engines.
 
-Copyright (c) 2013, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -25,7 +25,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "HashLibBaseCryptoRouterCommon.h"
 
-HASH_INTERFACE   mHashInterface[HASH_COUNT] = {0};
+HASH_INTERFACE   mHashInterface[HASH_COUNT] = {{{0}, NULL, NULL, NULL}};
 UINTN            mHashInterfaceCount = 0;
 
 /**
