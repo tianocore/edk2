@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -267,7 +267,15 @@ SaveLockBox (
   LockBox->Length      = (UINT64)Length;
   LockBox->Attributes  = 0;
   LockBox->SmramBuffer = SmramBuffer;
-  
+
+  DEBUG ((
+    EFI_D_INFO,
+    "LockBoxGuid - %g, SmramBuffer - 0x%lx, Length - 0x%lx\n",
+    &LockBox->Guid,
+    LockBox->SmramBuffer,
+    LockBox->Length
+    ));
+
   LockBoxQueue = InternalGetLockBoxQueue ();
   ASSERT (LockBoxQueue != NULL);
   InsertTailList (LockBoxQueue, &LockBox->Link);
