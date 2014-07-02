@@ -2,7 +2,7 @@
   Define APIs to retrieve USB Host Controller Info such as controller type and 
   I/O Port Base Address.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -48,6 +48,12 @@ typedef struct _PEI_USB_CONTROLLER_PPI PEI_USB_CONTROLLER_PPI;
 /// to identify the USB Host Controller type as EHCI
 ///
 #define PEI_EHCI_CONTROLLER 0x03
+
+///
+/// This bit is used in the ControllerType return parameter of GetUsbController()
+/// to identify the USB Host Controller type as XHCI
+///
+#define PEI_XHCI_CONTROLLER 0x04
 
 /**
   Retrieve USB Host Controller Info such as controller type and I/O Base Address.

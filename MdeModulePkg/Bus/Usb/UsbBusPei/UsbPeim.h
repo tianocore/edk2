@@ -33,25 +33,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <IndustryStandard/Usb.h>
 
-#define MAX_ROOT_PORT             2
 #define MAX_INTERFACE             8
 #define MAX_ENDPOINT              16
-
-#define USB_SLOW_SPEED_DEVICE     0x01
-#define USB_FULL_SPEED_DEVICE     0x02
 
 #define PEI_USB_DEVICE_SIGNATURE  SIGNATURE_32 ('U', 's', 'b', 'D')
 typedef struct {
   UINTN                         Signature;
   PEI_USB_IO_PPI                UsbIoPpi;
   EFI_PEI_PPI_DESCRIPTOR        UsbIoPpiList;
+  UINT16                        MaxPacketSize0;
+  UINT16                        DataToggle;
   UINT8                         DeviceAddress;
-  UINT8                         MaxPacketSize0;
   UINT8                         DeviceSpeed;
   UINT8                         IsHub;
-  UINT16                        DataToggle;
   UINT8                         DownStreamPortNo;
-  UINT8                         Reserved;  // Padding for IPF
   UINTN                         AllocateAddress;
   PEI_USB_HOST_CONTROLLER_PPI   *UsbHcPpi;
   PEI_USB2_HOST_CONTROLLER_PPI  *Usb2HcPpi;
@@ -61,11 +56,48 @@ typedef struct {
   EFI_USB_INTERFACE_DESCRIPTOR  *InterfaceDescList[MAX_INTERFACE];
   EFI_USB_ENDPOINT_DESCRIPTOR   *EndpointDesc[MAX_ENDPOINT];
   EFI_USB_ENDPOINT_DESCRIPTOR   *EndpointDescList[MAX_INTERFACE][MAX_ENDPOINT];
-  EFI_USB2_HC_TRANSACTION_TRANSLATOR Translator;  
+  EFI_USB2_HC_TRANSACTION_TRANSLATOR Translator;
+  UINT8                          Tier;
 } PEI_USB_DEVICE;
 
 #define PEI_USB_DEVICE_FROM_THIS(a) CR (a, PEI_USB_DEVICE, UsbIoPpi, PEI_USB_DEVICE_SIGNATURE)
 
+#define USB_BIT_IS_SET(Data, Bit)   ((BOOLEAN)(((Data) & (Bit)) == (Bit)))
+
+#define USB_BUS_1_MILLISECOND       1000
+
+//
+// Wait for port reset, refers to specification
+// [USB20-7.1.7.5, it says 10ms for hub and 50ms for
+// root hub]
+//
+// According to USB2.0, Chapter 11.5.1.5 Resetting,
+// the worst case for TDRST is 20ms
+//
+#define USB_SET_PORT_RESET_STALL        (20 * USB_BUS_1_MILLISECOND)
+#define USB_SET_ROOT_PORT_RESET_STALL   (50 * USB_BUS_1_MILLISECOND)
+
+//
+// Wait for clear roothub port reset, set by experience
+//
+#define USB_CLR_ROOT_PORT_RESET_STALL   (20 * USB_BUS_1_MILLISECOND)
+
+//
+// Wait for port statue reg change, set by experience
+//
+#define USB_WAIT_PORT_STS_CHANGE_STALL  (100)
+
+//
+// Host software return timeout if port status doesn't change 
+// after 500ms(LOOP * STALL = 5000 * 0.1ms), set by experience
+//
+#define USB_WAIT_PORT_STS_CHANGE_LOOP   5000
+
+//
+// Wait for hub port power-on, refers to specification
+// [USB20-11.23.2]
+//
+#define USB_SET_PORT_POWER_STALL        (2 * USB_BUS_1_MILLISECOND)
 
 /**
   Submits control transfer to a target USB device.

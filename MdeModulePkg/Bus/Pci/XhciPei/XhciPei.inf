@@ -1,0 +1,59 @@
+## @file
+# Component description file for XhcPeim PEIM to produce gPeiUsb2HostControllerPpiGuid
+# based on gPeiUsbControllerPpiGuid which is used to enable recovery function from USB Drivers.
+#
+# Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions
+# of the BSD License which accompanies this distribution.  The
+# full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = XhciPei
+  FILE_GUID                      = 65E5746E-9C14-467d-B5B3-932A66D59F79
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = XhcPeimEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  XhcPeim.c
+  XhcPeim.h
+  XhciSched.c
+  UsbHcMem.c
+  XhciReg.h
+  XhciSched.h
+  UsbHcMem.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  IoLib
+  TimerLib
+  BaseMemoryLib
+  PeimEntryPoint
+  PeiServicesLib
+  MemoryAllocationLib
+
+[Ppis]
+  gPeiUsb2HostControllerPpiGuid                 ## PRODUCES
+  gPeiUsbControllerPpiGuid                      ## CONSUMES
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid AND gPeiUsbControllerPpiGuid AND gEfiPeiBootInRecoveryModePpiGuid
+

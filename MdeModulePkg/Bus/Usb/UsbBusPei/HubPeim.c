@@ -1,7 +1,7 @@
 /** @file
 Usb Hub Request Support In PEI Phase
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -320,6 +320,139 @@ PeiGetHubDescriptor (
 }
 
 /**
+  Get a given SuperSpeed hub descriptor.
+
+  @param  PeiServices       General-purpose services that are available to every PEIM.
+  @param  UsbIoPpi          Indicates the PEI_USB_IO_PPI instance.
+  @param  HubDescriptor     Caller allocated buffer to store the hub descriptor if
+                            successfully returned.
+
+  @retval EFI_SUCCESS       Hub descriptor is obtained successfully.
+  @retval EFI_DEVICE_ERROR  Cannot get the hub descriptor due to a hardware error.
+  @retval Others            Other failure occurs.
+
+**/
+EFI_STATUS
+PeiGetSuperSpeedHubDesc (
+  IN  EFI_PEI_SERVICES          **PeiServices,
+  IN  PEI_USB_IO_PPI            *UsbIoPpi,
+  OUT EFI_USB_HUB_DESCRIPTOR    *HubDescriptor
+  )
+{
+  EFI_USB_DEVICE_REQUEST        DevReq;
+  ZeroMem (&DevReq, sizeof (EFI_USB_DEVICE_REQUEST));
+
+  //
+  // Fill Device request packet
+  //
+  DevReq.RequestType = USB_RT_HUB | 0x80;
+  DevReq.Request     = USB_HUB_GET_DESCRIPTOR;
+  DevReq.Value       = USB_DT_SUPERSPEED_HUB << 8;
+  DevReq.Length      = 12;
+
+  return  UsbIoPpi->UsbControlTransfer (
+                      PeiServices,
+                      UsbIoPpi,
+                      &DevReq,
+                      EfiUsbDataIn,
+                      PcdGet32 (PcdUsbTransferTimeoutValue),
+                      HubDescriptor,
+                      12
+                      );
+}
+
+/**
+  Read the whole usb hub descriptor. It is necessary
+  to do it in two steps because hub descriptor is of
+  variable length.
+
+  @param  PeiServices       General-purpose services that are available to every PEIM.
+  @param  PeiUsbDevice      Indicates the hub controller device.
+  @param  UsbIoPpi          Indicates the PEI_USB_IO_PPI instance.
+  @param  HubDescriptor     Caller allocated buffer to store the hub descriptor if
+                            successfully returned.
+
+  @retval EFI_SUCCESS       Hub descriptor is obtained successfully.
+  @retval EFI_DEVICE_ERROR  Cannot get the hub descriptor due to a hardware error.
+  @retval Others            Other failure occurs.
+
+**/
+EFI_STATUS
+PeiUsbHubReadDesc (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN PEI_USB_DEVICE             *PeiUsbDevice,
+  IN PEI_USB_IO_PPI             *UsbIoPpi,
+  OUT EFI_USB_HUB_DESCRIPTOR    *HubDescriptor
+  )
+{
+  EFI_STATUS Status;
+
+  if (PeiUsbDevice->DeviceSpeed == EFI_USB_SPEED_SUPER) {
+    //
+    // Get the super speed hub descriptor
+    //
+    Status = PeiGetSuperSpeedHubDesc (PeiServices, UsbIoPpi, HubDescriptor);
+  } else {
+
+    //
+    // First get the hub descriptor length
+    //
+    Status = PeiGetHubDescriptor (PeiServices, UsbIoPpi, 2, HubDescriptor);
+
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // Get the whole hub descriptor
+    //
+    Status = PeiGetHubDescriptor (PeiServices, UsbIoPpi, HubDescriptor->Length, HubDescriptor);
+  }
+
+  return Status;
+}
+
+/**
+  USB hub control transfer to set the hub depth.
+
+  @param  PeiServices       General-purpose services that are available to every PEIM.
+  @param  PeiUsbDevice      Indicates the hub controller device.
+  @param  UsbIoPpi          Indicates the PEI_USB_IO_PPI instance.
+
+  @retval EFI_SUCCESS       Depth of the hub is set.
+  @retval Others            Failed to set the depth.
+
+**/
+EFI_STATUS
+PeiUsbHubCtrlSetHubDepth (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN PEI_USB_DEVICE             *PeiUsbDevice,
+  IN PEI_USB_IO_PPI             *UsbIoPpi
+  )
+{
+  EFI_USB_DEVICE_REQUEST        DevReq;
+  ZeroMem (&DevReq, sizeof (EFI_USB_DEVICE_REQUEST));
+
+  //
+  // Fill Device request packet
+  //
+  DevReq.RequestType = USB_RT_HUB;
+  DevReq.Request     = USB_HUB_REQ_SET_DEPTH;
+  DevReq.Value       = PeiUsbDevice->Tier;
+  DevReq.Length      = 0;
+
+  return  UsbIoPpi->UsbControlTransfer (
+                      PeiServices,
+                      UsbIoPpi,
+                      &DevReq,
+                      EfiUsbNoData,
+                      PcdGet32 (PcdUsbTransferTimeoutValue),
+                      NULL,
+                      0
+                      );
+}
+
+/**
   Configure a given hub.
 
   @param  PeiServices    General-purpose services that are available to every PEIM.
@@ -339,32 +472,18 @@ PeiDoHubConfig (
   EFI_STATUS              Status;
   EFI_USB_HUB_STATUS      HubStatus;
   UINTN                   Index;
-  UINT32                  PortStatus;
   PEI_USB_IO_PPI          *UsbIoPpi;
 
   ZeroMem (&HubDescriptor, sizeof (HubDescriptor));
   UsbIoPpi = &PeiUsbDevice->UsbIoPpi;
 
   //
-  // First get the hub descriptor length
+  // Get the hub descriptor 
   //
-  Status = PeiGetHubDescriptor (
+  Status = PeiUsbHubReadDesc (
             PeiServices,
+            PeiUsbDevice,
             UsbIoPpi,
-            2,
-            &HubDescriptor
-            );
-  if (EFI_ERROR (Status)) {
-    return EFI_DEVICE_ERROR;
-  }
-  //
-  // First get the whole descriptor, then
-  // get the number of hub ports
-  //
-  Status = PeiGetHubDescriptor (
-            PeiServices,
-            UsbIoPpi,
-            HubDescriptor.Length,
             &HubDescriptor
             );
   if (EFI_ERROR (Status)) {
@@ -373,74 +492,66 @@ PeiDoHubConfig (
 
   PeiUsbDevice->DownStreamPortNo = HubDescriptor.NbrPorts;
 
-  Status = PeiHubGetHubStatus (
-            PeiServices,
-            UsbIoPpi,
-            (UINT32 *) &HubStatus
-            );
-
-  if (EFI_ERROR (Status)) {
-    return EFI_DEVICE_ERROR;
-  }
-  //
-  //  Get all hub ports status
-  //
-  for (Index = 0; Index < PeiUsbDevice->DownStreamPortNo; Index++) {
-
-    Status = PeiHubGetPortStatus (
-              PeiServices,
-              UsbIoPpi,
-              (UINT8) (Index + 1),
-              &PortStatus
-              );
-    if (EFI_ERROR (Status)) {
-      continue;
-    }
-  }
-  //
-  //  Power all the hub ports
-  //
-  for (Index = 0; Index < PeiUsbDevice->DownStreamPortNo; Index++) {
-    Status = PeiHubSetPortFeature (
-              PeiServices,
-              UsbIoPpi,
-              (UINT8) (Index + 1),
-              EfiUsbPortPower
-              );
-    if (EFI_ERROR (Status)) {
-      continue;
-    }
-  }
-  //
-  // Clear Hub Status Change
-  //
-  Status = PeiHubGetHubStatus (
-            PeiServices,
-            UsbIoPpi,
-            (UINT32 *) &HubStatus
-            );
-  if (EFI_ERROR (Status)) {
-    return EFI_DEVICE_ERROR;
+  if (PeiUsbDevice->DeviceSpeed == EFI_USB_SPEED_SUPER) {
+    DEBUG ((EFI_D_INFO, "PeiDoHubConfig: Set Hub Depth as 0x%x\n", PeiUsbDevice->Tier));
+    PeiUsbHubCtrlSetHubDepth (
+      PeiServices,
+      PeiUsbDevice,
+      UsbIoPpi
+      );
   } else {
     //
-    // Hub power supply change happens
+    //  Power all the hub ports
     //
-    if ((HubStatus.HubChangeStatus & HUB_CHANGE_LOCAL_POWER) != 0) {
-      PeiHubClearHubFeature (
-        PeiServices,
-        UsbIoPpi,
-        C_HUB_LOCAL_POWER
-        );
+    for (Index = 0; Index < PeiUsbDevice->DownStreamPortNo; Index++) {
+      Status = PeiHubSetPortFeature (
+                PeiServices,
+                UsbIoPpi,
+                (UINT8) (Index + 1),
+                EfiUsbPortPower
+                );
+      if (EFI_ERROR (Status)) {
+        DEBUG (( EFI_D_ERROR, "PeiDoHubConfig: PeiHubSetPortFeature EfiUsbPortPower failed %x\n", Index));
+        continue;
+      }
     }
+
+    DEBUG (( EFI_D_INFO, "PeiDoHubConfig: HubDescriptor.PwrOn2PwrGood: 0x%x\n", HubDescriptor.PwrOn2PwrGood));
+    if (HubDescriptor.PwrOn2PwrGood > 0) {
+      MicroSecondDelay (HubDescriptor.PwrOn2PwrGood * USB_SET_PORT_POWER_STALL);
+    }
+
     //
-    // Hub change overcurrent happens
+    // Clear Hub Status Change
     //
-    if ((HubStatus.HubChangeStatus & HUB_CHANGE_OVERCURRENT) != 0) {
-      PeiHubClearHubFeature (
-        PeiServices,
-        UsbIoPpi,
-        C_HUB_OVER_CURRENT
-        );
+    Status = PeiHubGetHubStatus (
+              PeiServices,
+              UsbIoPpi,
+              (UINT32 *) &HubStatus
+              );
+    if (EFI_ERROR (Status)) {
+      return EFI_DEVICE_ERROR;
+    } else {
+      //
+      // Hub power supply change happens
+      //
+      if ((HubStatus.HubChangeStatus & HUB_CHANGE_LOCAL_POWER) != 0) {
+        PeiHubClearHubFeature (
+          PeiServices,
+          UsbIoPpi,
+          C_HUB_LOCAL_POWER
+          );
+      }
+      //
+      // Hub change overcurrent happens
+      //
+      if ((HubStatus.HubChangeStatus & HUB_CHANGE_OVERCURRENT) != 0) {
+        PeiHubClearHubFeature (
+          PeiServices,
+          UsbIoPpi,
+          C_HUB_OVER_CURRENT
+          );
+      }
     }
   }
 
@@ -462,9 +573,9 @@ PeiResetHubPort (
   IN UINT8               PortNum
   )
 {
-  UINT8               Try;
+  EFI_STATUS          Status;
+  UINTN               Index;
   EFI_USB_PORT_STATUS HubPortStatus;
-
 
   MicroSecondDelay (100 * 1000);
 
@@ -478,27 +589,49 @@ PeiResetHubPort (
     EfiUsbPortReset
     );
 
-  Try = 10;
-  do {
-    PeiHubGetPortStatus (
-      PeiServices,
-      UsbIoPpi,
-      PortNum,
-      (UINT32 *) &HubPortStatus
-      );
-
-    MicroSecondDelay (2 * 1000);
-    Try -= 1;
-  } while ((HubPortStatus.PortChangeStatus & USB_PORT_STAT_C_RESET) == 0 && Try > 0);
+  //
+  // Drive the reset signal for worst 20ms. Check USB 2.0 Spec
+  // section 7.1.7.5 for timing requirements.
+  //
+  MicroSecondDelay (USB_SET_PORT_RESET_STALL);
 
   //
-  // clear reset root port
+  // Check USB_PORT_STAT_C_RESET bit to see if the resetting state is done.
+  //
+  ZeroMem (&HubPortStatus, sizeof (EFI_USB_PORT_STATUS));
+
+  for (Index = 0; Index < USB_WAIT_PORT_STS_CHANGE_LOOP; Index++) {
+    Status = PeiHubGetPortStatus (
+               PeiServices,
+               UsbIoPpi,
+               PortNum,
+               (UINT32 *) &HubPortStatus
+               );
+
+    if (EFI_ERROR (Status)) {
+      return;
+    }
+
+    if (USB_BIT_IS_SET (HubPortStatus.PortChangeStatus, USB_PORT_STAT_C_RESET)) {
+      break;
+    }
+
+    MicroSecondDelay (USB_WAIT_PORT_STS_CHANGE_STALL);
+  }
+
+  if (Index == USB_WAIT_PORT_STS_CHANGE_LOOP) {
+    DEBUG ((EFI_D_ERROR, "PeiResetHubPort: reset not finished in time on port %d\n", PortNum));
+    return;
+  }
+
+  //
+  // clear reset change root port
   //
   PeiHubClearPortFeature (
     PeiServices,
     UsbIoPpi,
     PortNum,
-    EfiUsbPortReset
+    EfiUsbPortResetChange
     );
 
   MicroSecondDelay (1 * 1000);

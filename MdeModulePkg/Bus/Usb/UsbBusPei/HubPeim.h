@@ -1,7 +1,7 @@
 /** @file
 Constants definitions for Usb Hub Peim
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -79,6 +79,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define USB_RT_HUB        (USB_TYPE_CLASS | USB_RECIP_DEVICE)
 #define USB_RT_PORT       (USB_TYPE_CLASS | USB_RECIP_OTHER)
+
+#define USB_HUB_REQ_SET_DEPTH               12
 
 #define MAXBYTES  8
 #pragma pack(1)
