@@ -255,7 +255,7 @@ EmuSimpleFileSystemWrite (
 
 
 /**
-  Set a files current position
+  Get a file's current position
 
   @param  This            Protocol instance pointer.
   @param  Position        Byte position from the start of the file.
@@ -292,7 +292,7 @@ EmuSimpleFileSystemGetPosition (
 
 
 /**
-  Get a file's current position
+  Set file's current position
 
   @param  This            Protocol instance pointer.
   @param  Position        Byte position from the start of the file.
