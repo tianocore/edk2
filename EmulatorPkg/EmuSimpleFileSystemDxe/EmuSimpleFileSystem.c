@@ -501,6 +501,7 @@ EmuSimpleFileSystemOpenVolume (
 
   PrivateFile = AllocatePool (sizeof (EMU_EFI_FILE_PRIVATE));
   if (PrivateFile == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
 
@@ -722,6 +723,7 @@ EmuSimpleFileSystemDriverBindingStart (
 
   Private = AllocateZeroPool (sizeof (EMU_SIMPLE_FILE_SYSTEM_PRIVATE));
   if (Private == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
 
