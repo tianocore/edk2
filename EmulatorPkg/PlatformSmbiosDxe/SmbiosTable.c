@@ -169,7 +169,7 @@ SMBIOS_TABLE_TYPE3  gSmbiosType3Template = {
   0,    // NumberofPowerCords;
   0,    // ContainedElementCount;
   0,    // ContainedElementRecordLength;
-  { 0 },    // ContainedElements[1];
+  { { 0 } },    // ContainedElements[1];
 };
 CHAR8  *gSmbiosType3Strings[] = {
   "edk2.sourceforge.net",
