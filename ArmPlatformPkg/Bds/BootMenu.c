@@ -648,6 +648,54 @@ EXIT:
   return Status;
 }
 
+/**
+  Set boot timeout
+
+  Ask for the boot timeout in seconds and if the input succeeds assign the
+  input value to the UEFI global variable "Timeout". This function is called
+  when the user selects the "Set Boot Timeout" of the boot manager menu.
+
+  @param[in]  BootOptionsList  List of the boot devices, not used here
+
+  @retval  EFI_SUCCESS   Boot timeout in second retrieved from the standard
+                         input and assigned to the UEFI "Timeout" global
+                         variable
+  @retval  !EFI_SUCCESS  Either the input or the setting of the UEFI global
+                         variable "Timeout" has failed.
+**/
+EFI_STATUS
+STATIC
+BootMenuSetBootTimeout (
+  IN LIST_ENTRY *BootOptionsList
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       Input;
+  UINT16      Timeout;
+
+  Print (L"Timeout duration (in seconds): ");
+  Status = GetHIInputInteger (&Input);
+  if (EFI_ERROR (Status)) {
+    Print (L"\n");
+    goto ErrorExit;
+  }
+
+  Timeout = Input;
+  Status = gRT->SetVariable (
+                 (CHAR16*)L"Timeout",
+                 &gEfiGlobalVariableGuid,
+                 EFI_VARIABLE_NON_VOLATILE       |
+                 EFI_VARIABLE_BOOTSERVICE_ACCESS |
+                 EFI_VARIABLE_RUNTIME_ACCESS,
+                 sizeof (UINT16),
+                 &Timeout
+                 );
+  ASSERT_EFI_ERROR (Status);
+
+ErrorExit:
+  return Status;
+}
+
 struct BOOT_MANAGER_ENTRY {
   CONST CHAR16* Description;
   EFI_STATUS (*Callback) (IN LIST_ENTRY *BootOptionsList);
@@ -656,6 +704,7 @@ struct BOOT_MANAGER_ENTRY {
     { L"Update Boot Device Entry", BootMenuUpdateBootOption },
     { L"Remove Boot Device Entry", BootMenuRemoveBootOption },
     { L"Update FDT path", UpdateFdtPath },
+    { L"Set Boot Timeout", BootMenuSetBootTimeout },
 };
 
 EFI_STATUS
