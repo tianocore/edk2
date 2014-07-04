@@ -55,7 +55,7 @@ ArmGicAcknowledgeInterrupt (
   // Check if it is a valid interrupt ID
   if ((Interrupt & 0x3FF) < ArmGicGetMaxNumInterrupts (GicDistributorBase)) {
     // Got a valid SGI number hence signal End of Interrupt by writing to ICCEOIR
-    MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCEIOR, Interrupt);
+    ArmGicEndOfInterrupt (GicInterruptInterfaceBase, Interrupt);
 
     if (CoreId) {
       *CoreId = (Interrupt >> 10) & 0x7;
@@ -67,4 +67,14 @@ ArmGicAcknowledgeInterrupt (
   } else {
     return RETURN_INVALID_PARAMETER;
   }
+}
+
+VOID
+EFIAPI
+ArmGicEndOfInterrupt (
+  IN  UINTN                 GicInterruptInterfaceBase,
+  IN UINTN                  Source
+  )
+{
+  MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCEIOR, Source);
 }

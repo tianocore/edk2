@@ -137,6 +137,13 @@ ArmGicAcknowledgeInterrupt (
   OUT UINTN          *InterruptId
   );
 
+VOID
+EFIAPI
+ArmGicEndOfInterrupt (
+  IN  UINTN                 GicInterruptInterfaceBase,
+  IN UINTN                  Source
+  );
+
 UINTN
 EFIAPI
 ArmGicSetPriorityMask (

@@ -227,7 +227,7 @@ EndOfInterrupt (
     return EFI_UNSUPPORTED;
   }
 
-  MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + ARM_GIC_ICCEIOR, Source);
+  ArmGicEndOfInterrupt (PcdGet32(PcdGicInterruptInterfaceBase), Source);
   return EFI_SUCCESS;
 }
 

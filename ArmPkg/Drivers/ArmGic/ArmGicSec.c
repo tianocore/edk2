@@ -45,7 +45,7 @@ ArmGicSetupNonSecure (
   // Only try to clear valid interrupts. Ignore spurious interrupts.
   while ((InterruptId & 0x3FF) < ArmGicGetMaxNumInterrupts (GicDistributorBase))   {
     // Some of the SGI's are still pending, read Ack register and send End of Interrupt Signal
-    MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCEIOR, InterruptId);
+    ArmGicEndOfInterrupt (GicInterruptInterfaceBase, InterruptId);
 
     // Next
     InterruptId = MmioRead32 (GicInterruptInterfaceBase + ARM_GIC_ICCIAR);
