@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2014, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -52,14 +52,4 @@ ArmGicEnableDistributor (
    * Note: The ICDDCR register is banked when Security extensions are implemented
    */
   MmioWrite32 (GicDistributorBase + ARM_GIC_ICDDCR, 0x1);
-}
-
-VOID
-EFIAPI
-ArmGicDisableDistributor (
-  IN  INTN          GicDistributorBase
-  )
-{
-  // Disable Gic Distributor
-  MmioWrite32 (GicDistributorBase + ARM_GIC_ICDDCR, 0x0);
 }

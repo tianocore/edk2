@@ -12,10 +12,9 @@
 *
 **/
 
-#include <Uefi.h>
-#include <Library/IoLib.h>
+#include <Base.h>
 #include <Library/ArmGicLib.h>
-#include <Library/PcdLib.h>
+#include <Library/IoLib.h>
 
 UINTN
 EFIAPI
@@ -119,4 +118,14 @@ ArmGicIsInterruptEnabled (
   RegShift = Source % 32;
 
   return ((MmioRead32 (GicDistributorBase + ARM_GIC_ICDISER + (4 * RegOffset)) & (1 << RegShift)) != 0);
+}
+
+VOID
+EFIAPI
+ArmGicDisableDistributor (
+  IN  INTN          GicDistributorBase
+  )
+{
+  // Disable Gic Distributor
+  MmioWrite32 (GicDistributorBase + ARM_GIC_ICDDCR, 0x0);
 }
