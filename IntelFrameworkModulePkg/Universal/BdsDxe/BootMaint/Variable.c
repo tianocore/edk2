@@ -708,6 +708,16 @@ Var_UpdateDriverOption (
       InsertTailList (&DriverOptionMenu.Head, &NewMenuEntry->Link);
       DriverOptionMenu.MenuNumber++;
 
+      //
+      // Update "change boot order" page used data, append the new add boot
+      // option at the end.
+      //
+      Index = 0;
+      while (CallbackData->BmmFakeNvData.DriverOptionOrder[Index] != 0) {
+        Index++;
+      }
+      CallbackData->BmmFakeNvData.DriverOptionOrder[Index] = (UINT32) (NewMenuEntry->OptionNumber + 1);
+
       *DescriptionData  = 0x0000;
       *OptionalData     = 0x0000;
     }
@@ -878,6 +888,16 @@ Var_UpdateBootOption (
       NewBootOrderList = NULL;
       InsertTailList (&BootOptionMenu.Head, &NewMenuEntry->Link);
       BootOptionMenu.MenuNumber++;
+
+      //
+      // Update "change driver order" page used data, append the new add driver
+      // option at the end.
+      //
+      Index = 0;
+      while (CallbackData->BmmFakeNvData.BootOptionOrder[Index] != 0) {
+        Index++;
+      }
+      CallbackData->BmmFakeNvData.BootOptionOrder[Index] = (UINT32) (NewMenuEntry->OptionNumber + 1);
 
       NvRamMap->BootDescriptionData[0]  = 0x0000;
       NvRamMap->BootOptionalData[0]     = 0x0000;

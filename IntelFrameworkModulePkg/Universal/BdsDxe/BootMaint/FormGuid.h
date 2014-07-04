@@ -66,6 +66,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define KEY_VALUE_SAVE_AND_EXIT              0x110B
 #define KEY_VALUE_NO_SAVE_AND_EXIT           0x110C
 #define KEY_VALUE_BOOT_FROM_FILE             0x110D
+#define KEY_VALUE_BOOT_DESCRIPTION           0x110E
+#define KEY_VALUE_BOOT_OPTION                0x110F
+#define KEY_VALUE_DRIVER_DESCRIPTION         0x1110
+#define KEY_VALUE_DRIVER_OPTION              0x1111
 
 #define MAXIMUM_NORMAL_KEY_VALUE             0x11FF
 
@@ -162,11 +166,13 @@ typedef struct {
   // Boot Option Delete storage
   //
   BOOLEAN BootOptionDel[MAX_MENU_NUMBER];
+  BOOLEAN BootOptionDelMark[MAX_MENU_NUMBER];
 
   //
   // Driver Option Delete storage
   //
   BOOLEAN DriverOptionDel[MAX_MENU_NUMBER];
+  BOOLEAN DriverOptionDelMark[MAX_MENU_NUMBER];
 
   //
   // This is the Terminal Attributes value storage
@@ -221,6 +227,8 @@ typedef struct {
   UINT16  BootOptionalData[127];
   UINT16  DriverDescriptionData[75];
   UINT16  DriverOptionalData[127];
+  BOOLEAN BootOptionChanged;
+  BOOLEAN DriverOptionChanged;
   UINT8   Active;
   UINT8   ForceReconnect;
 } FILE_EXPLORER_NV_DATA;

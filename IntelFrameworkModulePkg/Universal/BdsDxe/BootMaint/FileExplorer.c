@@ -177,8 +177,16 @@ UpdateFileExplorer (
       case FileExplorerStateAddDriverOptionState:
         if (FileExplorerStateAddBootOption == CallbackData->FeCurrentState) {
           FormId = FORM_BOOT_ADD_DESCRIPTION_ID;
+          if (!CallbackData->FeFakeNvData.BootOptionChanged) {
+            ZeroMem (CallbackData->FeFakeNvData.BootOptionalData, sizeof (CallbackData->FeFakeNvData.BootOptionalData));
+            ZeroMem (CallbackData->FeFakeNvData.BootDescriptionData, sizeof (CallbackData->FeFakeNvData.BootDescriptionData));
+          }
         } else {
           FormId = FORM_DRIVER_ADD_FILE_DESCRIPTION_ID;
+          if (!CallbackData->FeFakeNvData.DriverOptionChanged) {
+            ZeroMem (CallbackData->FeFakeNvData.DriverOptionalData, sizeof (CallbackData->FeFakeNvData.DriverOptionalData));
+            ZeroMem (CallbackData->FeFakeNvData.DriverDescriptionData, sizeof (CallbackData->FeFakeNvData.DriverDescriptionData));
+          }
         }
 
         CallbackData->MenuEntry = NewMenuEntry;
@@ -400,41 +408,19 @@ FileExplorerCallback (
       return EFI_INVALID_PARAMETER;
     }
     
-    if (QuestionId == KEY_VALUE_SAVE_AND_EXIT_BOOT || QuestionId == KEY_VALUE_SAVE_AND_EXIT_DRIVER) {
-      //
-      // Apply changes and exit formset
-      //
-      if (FileExplorerStateAddBootOption == Private->FeCurrentState) {
-        Status = Var_UpdateBootOption (Private, NvRamMap);
-        if (EFI_ERROR (Status)) {
-          return Status;
-        }
-
-        BOpt_GetBootOptions (Private);
-        CreateMenuStringToken (Private, Private->FeHiiHandle, &BootOptionMenu);
-      } else if (FileExplorerStateAddDriverOptionState == Private->FeCurrentState) {
-        Status = Var_UpdateDriverOption (
-                  Private,
-                  Private->FeHiiHandle,
-                  NvRamMap->DriverDescriptionData,
-                  NvRamMap->DriverOptionalData,
-                  NvRamMap->ForceReconnect
-                  );
-        if (EFI_ERROR (Status)) {
-          return Status;
-        }
-
-        BOpt_GetDriverOptions (Private);
-        CreateMenuStringToken (Private, Private->FeHiiHandle, &DriverOptionMenu);
-      }
-
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+    if (QuestionId == KEY_VALUE_SAVE_AND_EXIT_BOOT) {
+      NvRamMap->BootOptionChanged = FALSE;
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+    } else if (QuestionId == KEY_VALUE_SAVE_AND_EXIT_DRIVER) {
+      NvRamMap->DriverOptionChanged = FALSE;
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
     } else if (QuestionId == KEY_VALUE_NO_SAVE_AND_EXIT_DRIVER) {
       //
       // Discard changes and exit formset
       //
       NvRamMap->DriverOptionalData[0]     = 0x0000;
       NvRamMap->DriverDescriptionData[0]  = 0x0000;
+      NvRamMap->DriverOptionChanged = FALSE;
       *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
     } else if (QuestionId == KEY_VALUE_NO_SAVE_AND_EXIT_BOOT) {
       //
@@ -442,8 +428,13 @@ FileExplorerCallback (
       //
       NvRamMap->BootOptionalData[0]     = 0x0000;
       NvRamMap->BootDescriptionData[0]  = 0x0000;
+      NvRamMap->BootOptionChanged = FALSE;
       *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-    }else if (QuestionId < FILE_OPTION_OFFSET) {
+    } else if (QuestionId == KEY_VALUE_BOOT_DESCRIPTION || QuestionId == KEY_VALUE_BOOT_OPTION) {
+      NvRamMap->BootOptionChanged = TRUE;
+    } else if (QuestionId == KEY_VALUE_DRIVER_DESCRIPTION || QuestionId == KEY_VALUE_DRIVER_OPTION) {
+      NvRamMap->DriverOptionChanged = TRUE;
+    } else if (QuestionId < FILE_OPTION_OFFSET) {
       //
       // Exit File Explorer formset
       //
@@ -468,6 +459,11 @@ FileExplorerCallback (
       UpdateFileExplorer (Private, QuestionId);
     }
   }
+
+  //
+  // Pass changed uncommitted data back to Form Browser
+  //
+  HiiSetBrowserData (&gFileExploreFormSetGuid, mFileExplorerStorageName, sizeof (FILE_EXPLORER_NV_DATA), (UINT8 *) NvRamMap, NULL);
 
   return Status;
 }
