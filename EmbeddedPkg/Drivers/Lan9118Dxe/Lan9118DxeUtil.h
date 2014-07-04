@@ -119,7 +119,7 @@ SoftReset (
 #define PHY_SOFT_RESET_CLEAR_INT                        BIT3
 
 // Perform PHY software reset
-INT32
+EFI_STATUS
 PhySoftReset (
   UINT32 Flags,
   EFI_SIMPLE_NETWORK_PROTOCOL *Snp

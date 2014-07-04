@@ -485,7 +485,7 @@ SoftReset (
 
 
 // Perform PHY software reset
-INT32
+EFI_STATUS
 PhySoftReset (
   UINT32 Flags,
   EFI_SIMPLE_NETWORK_PROTOCOL *Snp
@@ -524,7 +524,7 @@ PhySoftReset (
 
     // Timed out
     if (LinkTo <= 0) {
-      return -1;
+      return EFI_TIMEOUT;
     }
   }
 
@@ -535,7 +535,7 @@ PhySoftReset (
     MmioWrite32 (LAN9118_INT_STS, 0xFFFFFFFF);
   }
 
-  return 0;
+  return EFI_SUCCESS;
 }
 
 
