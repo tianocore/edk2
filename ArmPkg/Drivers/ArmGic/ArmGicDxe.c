@@ -24,33 +24,18 @@ Abstract:
 
 #include <PiDxe.h>
 
-#include <Library/ArmLib.h>
 #include <Library/BaseLib.h>
-#include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Library/PcdLib.h>
 #include <Library/IoLib.h>
 #include <Library/ArmGicLib.h>
 
-#include <Protocol/Cpu.h>
-#include <Protocol/HardwareInterrupt.h>
+#include "ArmGicDxe.h"
 
 #define ARM_GIC_DEFAULT_PRIORITY  0x80
 
 extern EFI_HARDWARE_INTERRUPT_PROTOCOL gHardwareInterruptProtocol;
-
-//
-// Notifications
-//
-EFI_EVENT EfiExitBootServicesEvent      = (EFI_EVENT)NULL;
-
-// Maximum Number of Interrupts
-UINTN mGicNumInterrupts                 = 0;
-
-HARDWARE_INTERRUPT_HANDLER  *gRegisteredInterruptHandlers = NULL;
 
 /**
   Register Handler for the specified interrupt source.
@@ -245,11 +230,6 @@ IrqInterruptHandler (
 }
 
 //
-// Making this global saves a few bytes in image size
-//
-EFI_HANDLE  gHardwareInterruptHandle = NULL;
-
-//
 // The protocol instance produced by this driver
 //
 EFI_HARDWARE_INTERRUPT_PROTOCOL gHardwareInterruptProtocol = {
@@ -315,7 +295,6 @@ InterruptDxeInitialize (
   UINTN                   Index;
   UINT32                  RegOffset;
   UINTN                   RegShift;
-  EFI_CPU_ARCH_PROTOCOL   *Cpu;
   UINT32                  CpuTarget;
   
   // Make sure the Interrupt Controller Protocol is not already installed in the system.
@@ -370,37 +349,8 @@ InterruptDxeInitialize (
   // Enable gic distributor
   ArmGicEnableDistributor (PcdGet32(PcdGicDistributorBase));
 
-  // Initialize the array for the Interrupt Handlers
-  gRegisteredInterruptHandlers = (HARDWARE_INTERRUPT_HANDLER*)AllocateZeroPool (sizeof(HARDWARE_INTERRUPT_HANDLER) * mGicNumInterrupts);
-
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &gHardwareInterruptHandle,
-                  &gHardwareInterruptProtocolGuid,   &gHardwareInterruptProtocol,
-                  NULL
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Get the CPU protocol that this driver requires.
-  //
-  Status = gBS->LocateProtocol(&gEfiCpuArchProtocolGuid, NULL, (VOID **)&Cpu);
-  ASSERT_EFI_ERROR(Status);
-
-  //
-  // Unregister the default exception handler.
-  //
-  Status = Cpu->RegisterInterruptHandler(Cpu, ARM_ARCH_EXCEPTION_IRQ, NULL);
-  ASSERT_EFI_ERROR(Status);
-
-  //
-  // Register to receive interrupts
-  //
-  Status = Cpu->RegisterInterruptHandler(Cpu, ARM_ARCH_EXCEPTION_IRQ, IrqInterruptHandler);
-  ASSERT_EFI_ERROR(Status);
-
-  // Register for an ExitBootServicesEvent
-  Status = gBS->CreateEvent (EVT_SIGNAL_EXIT_BOOT_SERVICES, TPL_NOTIFY, ExitBootServicesEvent, NULL, &EfiExitBootServicesEvent);
-  ASSERT_EFI_ERROR (Status);
+  Status = InstallAndRegisterInterruptService (
+      &gHardwareInterruptProtocol, IrqInterruptHandler, ExitBootServicesEvent);
 
   return Status;
 }

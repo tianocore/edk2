@@ -24,6 +24,7 @@
 
 [Sources.common]
   ArmGicDxe.c
+  ArmGicCommonDxe.c
 
 [Packages]
   MdePkg/MdePkg.dec
