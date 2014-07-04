@@ -2,19 +2,19 @@
 
 Copyright (c) 2009, Hewlett-Packard Company. All rights reserved.<BR>
 Portions copyright (c) 2010, Apple Inc. All rights reserved.<BR>
-Portions copyright (c) 2011-2013, ARM Ltd. All rights reserved.<BR> 
+Portions copyright (c) 2011-2014, ARM Ltd. All rights reserved.<BR>
 
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.   
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
-  Gic.c
+  ArmGicDxe.c
 
 Abstract:
 
@@ -111,21 +111,13 @@ EnableInterruptSource (
   IN HARDWARE_INTERRUPT_SOURCE          Source
   )
 {
-  UINT32    RegOffset;
-  UINTN     RegShift;
-  
   if (Source > mGicNumInterrupts) {
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
   }
-  
-  // Calculate enable register offset and bit position
-  RegOffset = Source / 32;
-  RegShift = Source % 32;
 
-  // Write set-enable register
-  MmioWrite32 (PcdGet32(PcdGicDistributorBase) + ARM_GIC_ICDISER + (4*RegOffset), 1 << RegShift);
-  
+  ArmGicEnableInterrupt (FixedPcdGet32 (PcdGicDistributorBase), Source);
+
   return EFI_SUCCESS;
 }
 
@@ -146,21 +138,13 @@ DisableInterruptSource (
   IN HARDWARE_INTERRUPT_SOURCE          Source
   )
 {
-  UINT32    RegOffset;
-  UINTN     RegShift;
-  
   if (Source > mGicNumInterrupts) {
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
   }
-  
-  // Calculate enable register offset and bit position
-  RegOffset = Source / 32;
-  RegShift = Source % 32;
 
-  // Write set-enable register
-  MmioWrite32 (PcdGet32(PcdGicDistributorBase) + ARM_GIC_ICDICER + (4*RegOffset), 1 << RegShift);
-  
+  ArmGicDisableInterrupt (PcdGet32(PcdGicDistributorBase), Source);
+
   return EFI_SUCCESS;
 }
 
@@ -183,24 +167,13 @@ GetInterruptSourceState (
   IN BOOLEAN                            *InterruptState
   )
 {
-  UINT32    RegOffset;
-  UINTN     RegShift;
-  
   if (Source > mGicNumInterrupts) {
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
   }
-  
-  // calculate enable register offset and bit position
-  RegOffset = Source / 32;
-  RegShift = Source % 32;
-    
-  if ((MmioRead32 (PcdGet32(PcdGicDistributorBase) + ARM_GIC_ICDISER + (4*RegOffset)) & (1<<RegShift)) == 0) {
-    *InterruptState = FALSE;
-  } else {
-    *InterruptState = TRUE;
-  }
-  
+
+  *InterruptState = ArmGicIsInterruptEnabled (PcdGet32(PcdGicDistributorBase), Source);
+
   return EFI_SUCCESS;
 }
 
@@ -315,11 +288,10 @@ ExitBootServicesEvent (
   }
 
   // Disable Gic Interface
-  MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + ARM_GIC_ICCICR, 0x0);
-  MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + ARM_GIC_ICCPMR, 0x0);
+  ArmGicDisableInterruptInterface (PcdGet32(PcdGicInterruptInterfaceBase));
 
   // Disable Gic Distributor
-  MmioWrite32 (PcdGet32(PcdGicDistributorBase) + ARM_GIC_ICDDCR, 0x0);
+  ArmGicDisableDistributor (PcdGet32(PcdGicDistributorBase));
 }
 
 /**
@@ -391,23 +363,23 @@ InterruptDxeInitialize (
 
   // Set priority mask reg to 0xff to allow all priorities through
   MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + ARM_GIC_ICCPMR, 0xff);
-  
+
   // Enable gic cpu interface
-  MmioWrite32 (PcdGet32(PcdGicInterruptInterfaceBase) + ARM_GIC_ICCICR, 0x1);
+  ArmGicEnableInterruptInterface (PcdGet32(PcdGicInterruptInterfaceBase));
 
   // Enable gic distributor
-  MmioWrite32 (PcdGet32(PcdGicDistributorBase) + ARM_GIC_ICDDCR, 0x1);
-  
+  ArmGicEnableDistributor (PcdGet32(PcdGicDistributorBase));
+
   // Initialize the array for the Interrupt Handlers
   gRegisteredInterruptHandlers = (HARDWARE_INTERRUPT_HANDLER*)AllocateZeroPool (sizeof(HARDWARE_INTERRUPT_HANDLER) * mGicNumInterrupts);
-  
+
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &gHardwareInterruptHandle,
                   &gHardwareInterruptProtocolGuid,   &gHardwareInterruptProtocol,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
-  
+
   //
   // Get the CPU protocol that this driver requires.
   //

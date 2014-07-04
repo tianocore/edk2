@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -73,10 +73,10 @@ ArmPlatformSecInitialize (
   MmioAndThenOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, ~SP810_SYS_CTRL_TIMER3_EN, SP810_SYS_CTRL_TIMER3_TIMCLK);
 
   // Read the GIC Identification Register
-  Identification = MmioRead32 (PcdGet32(PcdGicInterruptInterfaceBase) + ARM_GIC_ICCIDR);
+  Identification = ArmGicGetInterfaceIdentification (PcdGet32 (PcdGicInterruptInterfaceBase));
 
   // Check if we are GICv3
-  if (ARM_GIC_ICCIDR_GET_ARCH_VERSION(Identification) >= 0x3) {
+  if (ARM_GIC_ICCIIDR_GET_ARCH_VERSION(Identification) >= 0x3) {
     InitializeGicV3 ();
   }
 
