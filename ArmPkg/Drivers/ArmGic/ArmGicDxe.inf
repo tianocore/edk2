@@ -26,6 +26,8 @@
   ArmGicDxe.c
   ArmGicCommonDxe.c
 
+  GicV2/ArmGicV2Dxe.c
+
 [Packages]
   MdePkg/MdePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
@@ -45,11 +47,11 @@
 [Protocols]
   gHardwareInterruptProtocolGuid
   gEfiCpuArchProtocolGuid
-  
+
 [FixedPcd.common]
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
-  
+
   gArmTokenSpaceGuid.PcdArmPrimaryCore
 
 [Depex]

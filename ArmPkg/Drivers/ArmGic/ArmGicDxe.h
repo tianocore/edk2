@@ -15,8 +15,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __ARM_GIC_DXE_H__
 #define __ARM_GIC_DXE_H__
 
+#include <Library/ArmGicLib.h>
 #include <Library/ArmLib.h>
 #include <Library/DebugLib.h>
+#include <Library/IoLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
@@ -42,6 +44,15 @@ RegisterInterruptSource (
   IN EFI_HARDWARE_INTERRUPT_PROTOCOL    *This,
   IN HARDWARE_INTERRUPT_SOURCE          Source,
   IN HARDWARE_INTERRUPT_HANDLER         Handler
+  );
+
+//
+// GicV2 API
+//
+EFI_STATUS
+GicV2DxeInitialize (
+  IN EFI_HANDLE         ImageHandle,
+  IN EFI_SYSTEM_TABLE   *SystemTable
   );
 
 #endif
