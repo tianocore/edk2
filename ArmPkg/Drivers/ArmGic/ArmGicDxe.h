@@ -36,4 +36,12 @@ InstallAndRegisterInterruptService (
   IN EFI_EVENT_NOTIFY                   ExitBootServicesEvent
   );
 
+EFI_STATUS
+EFIAPI
+RegisterInterruptSource (
+  IN EFI_HARDWARE_INTERRUPT_PROTOCOL    *This,
+  IN HARDWARE_INTERRUPT_SOURCE          Source,
+  IN HARDWARE_INTERRUPT_HANDLER         Handler
+  );
+
 #endif
