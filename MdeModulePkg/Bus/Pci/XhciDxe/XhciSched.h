@@ -2,7 +2,7 @@
 
   This file contains the definition for XHCI host controller schedule routines.
 
-Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1041,6 +1041,49 @@ XhcSetConfigCmd64 (
   IN USB_CONFIG_DESCRIPTOR    *ConfigDesc
   );
 
+/**
+  Set interface through XHCI's Configure_Endpoint cmd.
+
+  @param  Xhc           The XHCI Instance.
+  @param  SlotId        The slot id to be configured.
+  @param  DeviceSpeed   The device's speed.
+  @param  ConfigDesc    The pointer to the usb device configuration descriptor.
+  @param  Request       USB device request to send.
+
+  @retval EFI_SUCCESS   Successfully set interface.
+
+**/
+EFI_STATUS
+EFIAPI
+XhcSetInterface (
+  IN USB_XHCI_INSTANCE        *Xhc,
+  IN UINT8                    SlotId,
+  IN UINT8                    DeviceSpeed,
+  IN USB_CONFIG_DESCRIPTOR    *ConfigDesc,
+  IN EFI_USB_DEVICE_REQUEST   *Request
+  );
+
+/**
+  Set interface through XHCI's Configure_Endpoint cmd.
+
+  @param  Xhc           The XHCI Instance.
+  @param  SlotId        The slot id to be configured.
+  @param  DeviceSpeed   The device's speed.
+  @param  ConfigDesc    The pointer to the usb device configuration descriptor.
+  @param  Request       USB device request to send.
+
+  @retval EFI_SUCCESS   Successfully set interface.
+
+**/
+EFI_STATUS
+EFIAPI
+XhcSetInterface64 (
+  IN USB_XHCI_INSTANCE        *Xhc,
+  IN UINT8                    SlotId,
+  IN UINT8                    DeviceSpeed,
+  IN USB_CONFIG_DESCRIPTOR    *ConfigDesc,
+  IN EFI_USB_DEVICE_REQUEST   *Request
+  );
 
 /**
   Find out the actual device address according to the requested device address from UsbBus.

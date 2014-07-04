@@ -2,7 +2,7 @@
 
   Provides some data structure definitions used by the XHCI host controller driver.
 
-Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -196,6 +196,14 @@ struct _USB_DEV_CONTEXT {
   // These information is used to support XHCI's Config_Endpoint cmd.
   //
   EFI_USB_CONFIG_DESCRIPTOR **ConfDesc;
+  //
+  // A device has an active Configuration.
+  //
+  UINT8                     ActiveConfiguration;
+  //
+  // Every interface has an active AlternateSetting.
+  //
+  UINT8                     *ActiveAlternateSetting;
 };
 
 struct _USB_XHCI_INSTANCE {

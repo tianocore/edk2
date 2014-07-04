@@ -2,7 +2,7 @@
 
   XHCI transfer scheduling routines.
 
-Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -750,7 +750,7 @@ CreateEventRing (
   //
   EventRing->EventRingCCS = 1;
 
-  Size = EFI_SIZE_TO_PAGES (sizeof (EVENT_RING_SEG_TABLE_ENTRY) * ERST_NUMBER);
+  Size = sizeof (EVENT_RING_SEG_TABLE_ENTRY) * ERST_NUMBER;
   Buf = UsbHcAllocateMem (Xhc->MemPool, Size);
   ASSERT (Buf != NULL);
   ASSERT (((UINTN) Buf & 0x3F) == 0);
@@ -2385,6 +2385,10 @@ XhcDisableSlotCmd (
     }
   }
 
+  if (Xhc->UsbDevContext[SlotId].ActiveAlternateSetting != NULL) {
+    FreePool (Xhc->UsbDevContext[SlotId].ActiveAlternateSetting);
+  }
+
   if (Xhc->UsbDevContext[SlotId].InputContext != NULL) {
     UsbHcFreeMem (Xhc->MemPool, Xhc->UsbDevContext[SlotId].InputContext, sizeof (INPUT_CONTEXT));
   }
@@ -2488,6 +2492,10 @@ XhcDisableSlotCmd64 (
     }
   }
 
+  if (Xhc->UsbDevContext[SlotId].ActiveAlternateSetting != NULL) {
+    FreePool (Xhc->UsbDevContext[SlotId].ActiveAlternateSetting);
+  }
+
   if (Xhc->UsbDevContext[SlotId].InputContext != NULL) {
     UsbHcFreeMem (Xhc->MemPool, Xhc->UsbDevContext[SlotId].InputContext, sizeof (INPUT_CONTEXT_64));
   }
@@ -2506,6 +2514,311 @@ XhcDisableSlotCmd64 (
   return Status;
 }
 
+/**
+  Initialize endpoint context in input context.
+
+  @param Xhc            The XHCI Instance.
+  @param SlotId         The slot id to be configured.
+  @param DeviceSpeed    The device's speed.
+  @param InputContext   The pointer to the input context.
+  @param IfDesc         The pointer to the usb device interface descriptor.
+
+  @return The maximum device context index of endpoint.
+
+**/
+UINT8
+EFIAPI
+XhcInitializeEndpointContext (
+  IN USB_XHCI_INSTANCE          *Xhc,
+  IN UINT8                      SlotId,
+  IN UINT8                      DeviceSpeed,
+  IN INPUT_CONTEXT              *InputContext,
+  IN USB_INTERFACE_DESCRIPTOR   *IfDesc
+  )
+{
+  USB_ENDPOINT_DESCRIPTOR       *EpDesc;
+  UINTN                         NumEp;
+  UINTN                         EpIndex;
+  UINT8                         EpAddr;
+  UINT8                         Direction;
+  UINT8                         Dci;
+  UINT8                         MaxDci;
+  EFI_PHYSICAL_ADDRESS          PhyAddr;
+  UINT8                         Interval;
+  TRANSFER_RING                 *EndpointTransferRing;
+
+  MaxDci = 0;
+
+  NumEp = IfDesc->NumEndpoints;
+
+  EpDesc = (USB_ENDPOINT_DESCRIPTOR *)(IfDesc + 1);
+  for (EpIndex = 0; EpIndex < NumEp; EpIndex++) {
+    while (EpDesc->DescriptorType != USB_DESC_TYPE_ENDPOINT) {
+      EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
+    }
+
+    EpAddr    = (UINT8)(EpDesc->EndpointAddress & 0x0F);
+    Direction = (UINT8)((EpDesc->EndpointAddress & 0x80) ? EfiUsbDataIn : EfiUsbDataOut);
+
+    Dci = XhcEndpointToDci (EpAddr, Direction);
+    ASSERT (Dci < 32);
+    if (Dci > MaxDci) {
+      MaxDci = Dci;
+    }
+
+    InputContext->InputControlContext.Dword2 |= (BIT0 << Dci);
+    InputContext->EP[Dci-1].MaxPacketSize     = EpDesc->MaxPacketSize;
+
+    if (DeviceSpeed == EFI_USB_SPEED_SUPER) {
+      //
+      // 6.2.3.4, shall be set to the value defined in the bMaxBurst field of the SuperSpeed Endpoint Companion Descriptor.
+      //
+      InputContext->EP[Dci-1].MaxBurstSize = 0x0;
+    } else {
+      InputContext->EP[Dci-1].MaxBurstSize = 0x0;
+    }
+
+    switch (EpDesc->Attributes & USB_ENDPOINT_TYPE_MASK) {
+      case USB_ENDPOINT_BULK:
+        if (Direction == EfiUsbDataIn) {
+          InputContext->EP[Dci-1].CErr   = 3;
+          InputContext->EP[Dci-1].EPType = ED_BULK_IN;
+        } else {
+          InputContext->EP[Dci-1].CErr   = 3;
+          InputContext->EP[Dci-1].EPType = ED_BULK_OUT;
+        }
+
+        InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
+        if (Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1] == NULL) {
+          EndpointTransferRing = AllocateZeroPool(sizeof (TRANSFER_RING));
+          Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1] = (VOID *) EndpointTransferRing;
+          CreateTransferRing(Xhc, TR_RING_TRB_NUMBER, (TRANSFER_RING *)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1]);
+        }
+
+        break;
+      case USB_ENDPOINT_ISO:
+        if (Direction == EfiUsbDataIn) {
+          InputContext->EP[Dci-1].CErr   = 0;
+          InputContext->EP[Dci-1].EPType = ED_ISOCH_IN;
+        } else {
+          InputContext->EP[Dci-1].CErr   = 0;
+          InputContext->EP[Dci-1].EPType = ED_ISOCH_OUT;
+        }
+        break;
+      case USB_ENDPOINT_INTERRUPT:
+        if (Direction == EfiUsbDataIn) {
+          InputContext->EP[Dci-1].CErr   = 3;
+          InputContext->EP[Dci-1].EPType = ED_INTERRUPT_IN;
+        } else {
+          InputContext->EP[Dci-1].CErr   = 3;
+          InputContext->EP[Dci-1].EPType = ED_INTERRUPT_OUT;
+        }
+        InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
+        InputContext->EP[Dci-1].MaxESITPayload   = EpDesc->MaxPacketSize;
+        //
+        // Get the bInterval from descriptor and init the the interval field of endpoint context
+        //
+        if ((DeviceSpeed == EFI_USB_SPEED_FULL) || (DeviceSpeed == EFI_USB_SPEED_LOW)) {
+          Interval = EpDesc->Interval;
+          //
+          // Calculate through the bInterval field of Endpoint descriptor.
+          //
+          ASSERT (Interval != 0);
+          InputContext->EP[Dci-1].Interval = (UINT32)HighBitSet32((UINT32)Interval) + 3;
+        } else if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
+          Interval = EpDesc->Interval;
+          ASSERT (Interval >= 1 && Interval <= 16);
+          //
+          // Refer to XHCI 1.0 spec section 6.2.3.6, table 61
+          //
+          InputContext->EP[Dci-1].Interval         = Interval - 1;
+          InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
+          InputContext->EP[Dci-1].MaxESITPayload   = 0x0002;
+          InputContext->EP[Dci-1].MaxBurstSize     = 0x0;
+          InputContext->EP[Dci-1].CErr             = 3;
+        }
+
+        if (Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1] == NULL) {
+          EndpointTransferRing = AllocateZeroPool(sizeof (TRANSFER_RING));
+          Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1] = (VOID *) EndpointTransferRing;
+          CreateTransferRing(Xhc, TR_RING_TRB_NUMBER, (TRANSFER_RING *)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1]);
+        }
+        break;
+
+      case USB_ENDPOINT_CONTROL:
+      default:
+        ASSERT (0);
+        break;
+    }
+
+    PhyAddr = UsbHcGetPciAddrForHostAddr (
+                Xhc->MemPool,
+                ((TRANSFER_RING *)(UINTN)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1])->RingSeg0,
+                sizeof (TRB_TEMPLATE) * TR_RING_TRB_NUMBER
+                );
+    PhyAddr &= ~(0x0F);
+    PhyAddr |= ((TRANSFER_RING *)(UINTN)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1])->RingPCS;
+    InputContext->EP[Dci-1].PtrLo = XHC_LOW_32BIT (PhyAddr);
+    InputContext->EP[Dci-1].PtrHi = XHC_HIGH_32BIT (PhyAddr);
+
+    EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
+  }
+
+  return MaxDci;
+}
+
+/**
+  Initialize endpoint context in input context.
+
+  @param Xhc            The XHCI Instance.
+  @param SlotId         The slot id to be configured.
+  @param DeviceSpeed    The device's speed.
+  @param InputContext   The pointer to the input context.
+  @param IfDesc         The pointer to the usb device interface descriptor.
+
+  @return The maximum device context index of endpoint.
+
+**/
+UINT8
+EFIAPI
+XhcInitializeEndpointContext64 (
+  IN USB_XHCI_INSTANCE          *Xhc,
+  IN UINT8                      SlotId,
+  IN UINT8                      DeviceSpeed,
+  IN INPUT_CONTEXT_64           *InputContext,
+  IN USB_INTERFACE_DESCRIPTOR   *IfDesc
+  )
+{
+  USB_ENDPOINT_DESCRIPTOR       *EpDesc;
+  UINTN                         NumEp;
+  UINTN                         EpIndex;
+  UINT8                         EpAddr;
+  UINT8                         Direction;
+  UINT8                         Dci;
+  UINT8                         MaxDci;
+  EFI_PHYSICAL_ADDRESS          PhyAddr;
+  UINT8                         Interval;
+  TRANSFER_RING                 *EndpointTransferRing;
+
+  MaxDci = 0;
+
+  NumEp = IfDesc->NumEndpoints;
+
+  EpDesc = (USB_ENDPOINT_DESCRIPTOR *)(IfDesc + 1);
+  for (EpIndex = 0; EpIndex < NumEp; EpIndex++) {
+    while (EpDesc->DescriptorType != USB_DESC_TYPE_ENDPOINT) {
+      EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
+    }
+
+    EpAddr    = (UINT8)(EpDesc->EndpointAddress & 0x0F);
+    Direction = (UINT8)((EpDesc->EndpointAddress & 0x80) ? EfiUsbDataIn : EfiUsbDataOut);
+
+    Dci = XhcEndpointToDci (EpAddr, Direction);
+    ASSERT (Dci < 32);
+    if (Dci > MaxDci) {
+      MaxDci = Dci;
+    }
+
+    InputContext->InputControlContext.Dword2 |= (BIT0 << Dci);
+    InputContext->EP[Dci-1].MaxPacketSize     = EpDesc->MaxPacketSize;
+
+    if (DeviceSpeed == EFI_USB_SPEED_SUPER) {
+      //
+      // 6.2.3.4, shall be set to the value defined in the bMaxBurst field of the SuperSpeed Endpoint Companion Descriptor.
+      //
+      InputContext->EP[Dci-1].MaxBurstSize = 0x0;
+    } else {
+      InputContext->EP[Dci-1].MaxBurstSize = 0x0;
+    }
+
+    switch (EpDesc->Attributes & USB_ENDPOINT_TYPE_MASK) {
+      case USB_ENDPOINT_BULK:
+        if (Direction == EfiUsbDataIn) {
+          InputContext->EP[Dci-1].CErr   = 3;
+          InputContext->EP[Dci-1].EPType = ED_BULK_IN;
+        } else {
+          InputContext->EP[Dci-1].CErr   = 3;
+          InputContext->EP[Dci-1].EPType = ED_BULK_OUT;
+        }
+
+        InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
+        if (Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1] == NULL) {
+          EndpointTransferRing = AllocateZeroPool(sizeof (TRANSFER_RING));
+          Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1] = (VOID *) EndpointTransferRing;
+          CreateTransferRing(Xhc, TR_RING_TRB_NUMBER, (TRANSFER_RING *)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1]);
+        }
+
+        break;
+      case USB_ENDPOINT_ISO:
+        if (Direction == EfiUsbDataIn) {
+          InputContext->EP[Dci-1].CErr   = 0;
+          InputContext->EP[Dci-1].EPType = ED_ISOCH_IN;
+        } else {
+          InputContext->EP[Dci-1].CErr   = 0;
+          InputContext->EP[Dci-1].EPType = ED_ISOCH_OUT;
+        }
+        break;
+      case USB_ENDPOINT_INTERRUPT:
+        if (Direction == EfiUsbDataIn) {
+          InputContext->EP[Dci-1].CErr   = 3;
+          InputContext->EP[Dci-1].EPType = ED_INTERRUPT_IN;
+        } else {
+          InputContext->EP[Dci-1].CErr   = 3;
+          InputContext->EP[Dci-1].EPType = ED_INTERRUPT_OUT;
+        }
+        InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
+        InputContext->EP[Dci-1].MaxESITPayload   = EpDesc->MaxPacketSize;
+        //
+        // Get the bInterval from descriptor and init the the interval field of endpoint context
+        //
+        if ((DeviceSpeed == EFI_USB_SPEED_FULL) || (DeviceSpeed == EFI_USB_SPEED_LOW)) {
+          Interval = EpDesc->Interval;
+          //
+          // Calculate through the bInterval field of Endpoint descriptor.
+          //
+          ASSERT (Interval != 0);
+          InputContext->EP[Dci-1].Interval = (UINT32)HighBitSet32((UINT32)Interval) + 3;
+        } else if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
+          Interval = EpDesc->Interval;
+          ASSERT (Interval >= 1 && Interval <= 16);
+          //
+          // Refer to XHCI 1.0 spec section 6.2.3.6, table 61
+          //
+          InputContext->EP[Dci-1].Interval         = Interval - 1;
+          InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
+          InputContext->EP[Dci-1].MaxESITPayload   = 0x0002;
+          InputContext->EP[Dci-1].MaxBurstSize     = 0x0;
+          InputContext->EP[Dci-1].CErr             = 3;
+        }
+
+        if (Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1] == NULL) {
+          EndpointTransferRing = AllocateZeroPool(sizeof (TRANSFER_RING));
+          Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1] = (VOID *) EndpointTransferRing;
+          CreateTransferRing(Xhc, TR_RING_TRB_NUMBER, (TRANSFER_RING *)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1]);
+        }
+        break;
+
+      case USB_ENDPOINT_CONTROL:
+      default:
+        ASSERT (0);
+        break;
+    }
+
+    PhyAddr = UsbHcGetPciAddrForHostAddr (
+                Xhc->MemPool,
+                ((TRANSFER_RING *)(UINTN)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1])->RingSeg0,
+                sizeof (TRB_TEMPLATE) * TR_RING_TRB_NUMBER
+                );
+    PhyAddr &= ~(0x0F);
+    PhyAddr |= ((TRANSFER_RING *)(UINTN)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1])->RingPCS;
+    InputContext->EP[Dci-1].PtrLo = XHC_LOW_32BIT (PhyAddr);
+    InputContext->EP[Dci-1].PtrHi = XHC_HIGH_32BIT (PhyAddr);
+
+    EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
+  }
+
+  return MaxDci;
+}
 
 /**
   Configure all the device endpoints through XHCI's Configure_Endpoint cmd.
@@ -2529,18 +2842,11 @@ XhcSetConfigCmd (
 {
   EFI_STATUS                  Status;
   USB_INTERFACE_DESCRIPTOR    *IfDesc;
-  USB_ENDPOINT_DESCRIPTOR     *EpDesc;
   UINT8                       Index;
-  UINTN                       NumEp;
-  UINTN                       EpIndex;
-  UINT8                       EpAddr;
-  UINT8                       Direction;
   UINT8                       Dci;
   UINT8                       MaxDci;
   EFI_PHYSICAL_ADDRESS        PhyAddr;
-  UINT8                       Interval;
 
-  TRANSFER_RING               *EndpointTransferRing;
   CMD_TRB_CONFIG_ENDPOINT     CmdTrbCfgEP;
   INPUT_CONTEXT               *InputContext;
   DEVICE_CONTEXT              *OutputContext;
@@ -2559,124 +2865,15 @@ XhcSetConfigCmd (
 
   IfDesc = (USB_INTERFACE_DESCRIPTOR *)(ConfigDesc + 1);
   for (Index = 0; Index < ConfigDesc->NumInterfaces; Index++) {
-    while (IfDesc->DescriptorType != USB_DESC_TYPE_INTERFACE) {
+    while ((IfDesc->DescriptorType != USB_DESC_TYPE_INTERFACE) || (IfDesc->AlternateSetting != 0)) {
       IfDesc = (USB_INTERFACE_DESCRIPTOR *)((UINTN)IfDesc + IfDesc->Length);
     }
 
-    NumEp = IfDesc->NumEndpoints;
-
-    EpDesc = (USB_ENDPOINT_DESCRIPTOR *)(IfDesc + 1);
-    for (EpIndex = 0; EpIndex < NumEp; EpIndex++) {
-      while (EpDesc->DescriptorType != USB_DESC_TYPE_ENDPOINT) {
-        EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
-      }
-
-      EpAddr    = (UINT8)(EpDesc->EndpointAddress & 0x0F);
-      Direction = (UINT8)((EpDesc->EndpointAddress & 0x80) ? EfiUsbDataIn : EfiUsbDataOut);
-
-      Dci = XhcEndpointToDci (EpAddr, Direction);
-      ASSERT (Dci < 32);
-      if (Dci > MaxDci) {
-        MaxDci = Dci;
-      }
-
-      InputContext->InputControlContext.Dword2 |= (BIT0 << Dci);
-      InputContext->EP[Dci-1].MaxPacketSize     = EpDesc->MaxPacketSize;
-
-      if (DeviceSpeed == EFI_USB_SPEED_SUPER) {
-        //
-        // 6.2.3.4, shall be set to the value defined in the bMaxBurst field of the SuperSpeed Endpoint Companion Descriptor.
-        //
-        InputContext->EP[Dci-1].MaxBurstSize = 0x0;
-      } else {
-        InputContext->EP[Dci-1].MaxBurstSize = 0x0;
-      }
-
-      switch (EpDesc->Attributes & USB_ENDPOINT_TYPE_MASK) {
-        case USB_ENDPOINT_BULK:
-          if (Direction == EfiUsbDataIn) {
-            InputContext->EP[Dci-1].CErr   = 3;
-            InputContext->EP[Dci-1].EPType = ED_BULK_IN;
-          } else {
-            InputContext->EP[Dci-1].CErr   = 3;
-            InputContext->EP[Dci-1].EPType = ED_BULK_OUT;
-          }
-
-          InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
-          if (Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1] == NULL) {
-            EndpointTransferRing = AllocateZeroPool(sizeof (TRANSFER_RING));
-            Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1] = (VOID *) EndpointTransferRing;
-            CreateTransferRing(Xhc, TR_RING_TRB_NUMBER, (TRANSFER_RING *)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1]);
-          }
-
-          break;
-        case USB_ENDPOINT_ISO:
-          if (Direction == EfiUsbDataIn) {
-            InputContext->EP[Dci-1].CErr   = 0;
-            InputContext->EP[Dci-1].EPType = ED_ISOCH_IN;
-          } else {
-            InputContext->EP[Dci-1].CErr   = 0;
-            InputContext->EP[Dci-1].EPType = ED_ISOCH_OUT;
-          }
-          break;
-        case USB_ENDPOINT_INTERRUPT:
-          if (Direction == EfiUsbDataIn) {
-            InputContext->EP[Dci-1].CErr   = 3;
-            InputContext->EP[Dci-1].EPType = ED_INTERRUPT_IN;
-          } else {
-            InputContext->EP[Dci-1].CErr   = 3;
-            InputContext->EP[Dci-1].EPType = ED_INTERRUPT_OUT;
-          }
-          InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
-          InputContext->EP[Dci-1].MaxESITPayload   = EpDesc->MaxPacketSize;
-          //
-          // Get the bInterval from descriptor and init the the interval field of endpoint context
-          //
-          if ((DeviceSpeed == EFI_USB_SPEED_FULL) || (DeviceSpeed == EFI_USB_SPEED_LOW)) {
-            Interval = EpDesc->Interval;
-            //
-            // Calculate through the bInterval field of Endpoint descriptor.
-            //
-            ASSERT (Interval != 0);
-            InputContext->EP[Dci-1].Interval = (UINT32)HighBitSet32((UINT32)Interval) + 3;
-          } else if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
-            Interval = EpDesc->Interval;
-            ASSERT (Interval >= 1 && Interval <= 16);
-            //
-            // Refer to XHCI 1.0 spec section 6.2.3.6, table 61
-            //
-            InputContext->EP[Dci-1].Interval         = Interval - 1;
-            InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
-            InputContext->EP[Dci-1].MaxESITPayload   = 0x0002;
-            InputContext->EP[Dci-1].MaxBurstSize     = 0x0;
-            InputContext->EP[Dci-1].CErr             = 3;
-          }
-
-          if (Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1] == NULL) {
-            EndpointTransferRing = AllocateZeroPool(sizeof (TRANSFER_RING));
-            Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1] = (VOID *) EndpointTransferRing;
-            CreateTransferRing(Xhc, TR_RING_TRB_NUMBER, (TRANSFER_RING *)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1]);
-          }
-          break;
-
-        case USB_ENDPOINT_CONTROL:
-        default:
-          ASSERT (0);
-          break;
-      }
-
-      PhyAddr = UsbHcGetPciAddrForHostAddr (
-                  Xhc->MemPool,
-                  ((TRANSFER_RING *)(UINTN)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1])->RingSeg0,
-                  sizeof (TRB_TEMPLATE) * TR_RING_TRB_NUMBER
-                  );
-      PhyAddr &= ~(0x0F);
-      PhyAddr |= ((TRANSFER_RING *)(UINTN)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1])->RingPCS;
-      InputContext->EP[Dci-1].PtrLo = XHC_LOW_32BIT (PhyAddr);
-      InputContext->EP[Dci-1].PtrHi = XHC_HIGH_32BIT (PhyAddr);
-
-      EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
+    Dci = XhcInitializeEndpointContext (Xhc, SlotId, DeviceSpeed, InputContext, IfDesc);
+    if (Dci > MaxDci) {
+      MaxDci = Dci;
     }
+
     IfDesc = (USB_INTERFACE_DESCRIPTOR *)((UINTN)IfDesc + IfDesc->Length);
   }
 
@@ -2701,7 +2898,10 @@ XhcSetConfigCmd (
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "XhcSetConfigCmd: Config Endpoint Failed, Status = %r\n", Status));
+  } else {
+    Xhc->UsbDevContext[SlotId].ActiveConfiguration = ConfigDesc->ConfigurationValue;
   }
+
   return Status;
 }
 
@@ -2727,18 +2927,11 @@ XhcSetConfigCmd64 (
 {
   EFI_STATUS                  Status;
   USB_INTERFACE_DESCRIPTOR    *IfDesc;
-  USB_ENDPOINT_DESCRIPTOR     *EpDesc;
   UINT8                       Index;
-  UINTN                       NumEp;
-  UINTN                       EpIndex;
-  UINT8                       EpAddr;
-  UINT8                       Direction;
   UINT8                       Dci;
   UINT8                       MaxDci;
   EFI_PHYSICAL_ADDRESS        PhyAddr;
-  UINT8                       Interval;
 
-  TRANSFER_RING               *EndpointTransferRing;
   CMD_TRB_CONFIG_ENDPOINT     CmdTrbCfgEP;
   INPUT_CONTEXT_64            *InputContext;
   DEVICE_CONTEXT_64           *OutputContext;
@@ -2757,126 +2950,15 @@ XhcSetConfigCmd64 (
 
   IfDesc = (USB_INTERFACE_DESCRIPTOR *)(ConfigDesc + 1);
   for (Index = 0; Index < ConfigDesc->NumInterfaces; Index++) {
-    while (IfDesc->DescriptorType != USB_DESC_TYPE_INTERFACE) {
+    while ((IfDesc->DescriptorType != USB_DESC_TYPE_INTERFACE) || (IfDesc->AlternateSetting != 0)) {
       IfDesc = (USB_INTERFACE_DESCRIPTOR *)((UINTN)IfDesc + IfDesc->Length);
     }
 
-    NumEp = IfDesc->NumEndpoints;
-
-    EpDesc = (USB_ENDPOINT_DESCRIPTOR *)(IfDesc + 1);
-    for (EpIndex = 0; EpIndex < NumEp; EpIndex++) {
-      while (EpDesc->DescriptorType != USB_DESC_TYPE_ENDPOINT) {
-        EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
-      }
-
-      EpAddr    = (UINT8)(EpDesc->EndpointAddress & 0x0F);
-      Direction = (UINT8)((EpDesc->EndpointAddress & 0x80) ? EfiUsbDataIn : EfiUsbDataOut);
-
-      Dci = XhcEndpointToDci (EpAddr, Direction);
-      ASSERT (Dci < 32);
-      if (Dci > MaxDci) {
-        MaxDci = Dci;
-      }
-
-      InputContext->InputControlContext.Dword2 |= (BIT0 << Dci);
-      InputContext->EP[Dci-1].MaxPacketSize     = EpDesc->MaxPacketSize;
-
-      if (DeviceSpeed == EFI_USB_SPEED_SUPER) {
-        //
-        // 6.2.3.4, shall be set to the value defined in the bMaxBurst field of the SuperSpeed Endpoint Companion Descriptor.
-        //
-        InputContext->EP[Dci-1].MaxBurstSize = 0x0;
-      } else {
-        InputContext->EP[Dci-1].MaxBurstSize = 0x0;
-      }
-
-      switch (EpDesc->Attributes & USB_ENDPOINT_TYPE_MASK) {
-        case USB_ENDPOINT_BULK:
-          if (Direction == EfiUsbDataIn) {
-            InputContext->EP[Dci-1].CErr   = 3;
-            InputContext->EP[Dci-1].EPType = ED_BULK_IN;
-          } else {
-            InputContext->EP[Dci-1].CErr   = 3;
-            InputContext->EP[Dci-1].EPType = ED_BULK_OUT;
-          }
-
-          InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
-          if (Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1] == NULL) {
-            EndpointTransferRing = AllocateZeroPool(sizeof (TRANSFER_RING));
-            Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1] = (VOID *) EndpointTransferRing;
-            CreateTransferRing(Xhc, TR_RING_TRB_NUMBER, (TRANSFER_RING *)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1]);
-          }
-
-          break;
-        case USB_ENDPOINT_ISO:
-          if (Direction == EfiUsbDataIn) {
-            InputContext->EP[Dci-1].CErr   = 0;
-            InputContext->EP[Dci-1].EPType = ED_ISOCH_IN;
-          } else {
-            InputContext->EP[Dci-1].CErr   = 0;
-            InputContext->EP[Dci-1].EPType = ED_ISOCH_OUT;
-          }
-          break;
-        case USB_ENDPOINT_INTERRUPT:
-          if (Direction == EfiUsbDataIn) {
-            InputContext->EP[Dci-1].CErr   = 3;
-            InputContext->EP[Dci-1].EPType = ED_INTERRUPT_IN;
-          } else {
-            InputContext->EP[Dci-1].CErr   = 3;
-            InputContext->EP[Dci-1].EPType = ED_INTERRUPT_OUT;
-          }
-          InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
-          InputContext->EP[Dci-1].MaxESITPayload   = EpDesc->MaxPacketSize;
-          //
-          // Get the bInterval from descriptor and init the the interval field of endpoint context
-          //
-          if ((DeviceSpeed == EFI_USB_SPEED_FULL) || (DeviceSpeed == EFI_USB_SPEED_LOW)) {
-            Interval = EpDesc->Interval;
-            //
-            // Calculate through the bInterval field of Endpoint descriptor.
-            //
-            ASSERT (Interval != 0);
-            InputContext->EP[Dci-1].Interval = (UINT32)HighBitSet32((UINT32)Interval) + 3;
-          } else if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
-            Interval = EpDesc->Interval;
-            ASSERT (Interval >= 1 && Interval <= 16);
-            //
-            // Refer to XHCI 1.0 spec section 6.2.3.6, table 61
-            //
-            InputContext->EP[Dci-1].Interval         = Interval - 1;
-            InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
-            InputContext->EP[Dci-1].MaxESITPayload   = 0x0002;
-            InputContext->EP[Dci-1].MaxBurstSize     = 0x0;
-            InputContext->EP[Dci-1].CErr             = 3;
-          }
-
-          if (Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1] == NULL) {
-            EndpointTransferRing = AllocateZeroPool(sizeof (TRANSFER_RING));
-            Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1] = (VOID *) EndpointTransferRing;
-            CreateTransferRing(Xhc, TR_RING_TRB_NUMBER, (TRANSFER_RING *)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1]);
-          }
-          break;
-
-        case USB_ENDPOINT_CONTROL:
-        default:
-          ASSERT (0);
-          break;
-      }
-
-      PhyAddr = UsbHcGetPciAddrForHostAddr (
-                  Xhc->MemPool,
-                  ((TRANSFER_RING *)(UINTN)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1])->RingSeg0,
-                  sizeof (TRB_TEMPLATE) * TR_RING_TRB_NUMBER
-                  );
-
-      PhyAddr &= ~(0x0F);
-      PhyAddr |= ((TRANSFER_RING *)(UINTN)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1])->RingPCS;
-
-      InputContext->EP[Dci-1].PtrLo = XHC_LOW_32BIT (PhyAddr);
-      InputContext->EP[Dci-1].PtrHi = XHC_HIGH_32BIT (PhyAddr);
-
-      EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
+    Dci = XhcInitializeEndpointContext64 (Xhc, SlotId, DeviceSpeed, InputContext, IfDesc);
+    if (Dci > MaxDci) {
+      MaxDci = Dci;
     }
+ 
     IfDesc = (USB_INTERFACE_DESCRIPTOR *)((UINTN)IfDesc + IfDesc->Length);
   }
 
@@ -2901,11 +2983,452 @@ XhcSetConfigCmd64 (
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "XhcSetConfigCmd64: Config Endpoint Failed, Status = %r\n", Status));
+  } else {
+    Xhc->UsbDevContext[SlotId].ActiveConfiguration = ConfigDesc->ConfigurationValue;
   }
 
   return Status;
 }
 
+/**
+  Stop endpoint through XHCI's Stop_Endpoint cmd.
+
+  @param  Xhc                   The XHCI Instance.
+  @param  SlotId                The slot id to be configured.
+  @param  Dci                   The device context index of endpoint.
+
+  @retval EFI_SUCCESS           Stop endpoint successfully.
+  @retval Others                Failed to stop endpoint.
+
+**/
+EFI_STATUS
+EFIAPI
+XhcStopEndpoint (
+  IN USB_XHCI_INSTANCE      *Xhc,
+  IN UINT8                  SlotId,
+  IN UINT8                  Dci
+  )
+{
+  EFI_STATUS                    Status;
+  EVT_TRB_COMMAND_COMPLETION    *EvtTrb;
+  CMD_TRB_STOP_ENDPOINT         CmdTrbStopED;
+
+  DEBUG ((EFI_D_INFO, "XhcStopEndpoint: Slot = 0x%x, Dci = 0x%x\n", SlotId, Dci));
+
+  //
+  // Send stop endpoint command to transit Endpoint from running to stop state
+  //
+  ZeroMem (&CmdTrbStopED, sizeof (CmdTrbStopED));
+  CmdTrbStopED.CycleBit = 1;
+  CmdTrbStopED.Type     = TRB_TYPE_STOP_ENDPOINT;
+  CmdTrbStopED.EDID     = Dci;
+  CmdTrbStopED.SlotId   = SlotId;
+  Status = XhcCmdTransfer (
+             Xhc,
+             (TRB_TEMPLATE *) (UINTN) &CmdTrbStopED,
+             XHC_GENERIC_TIMEOUT,
+             (TRB_TEMPLATE **) (UINTN) &EvtTrb
+             );
+  if (EFI_ERROR(Status)) {
+    DEBUG ((EFI_D_ERROR, "XhcStopEndpoint: Stop Endpoint Failed, Status = %r\n", Status));
+  }
+
+  return Status;
+}
+
+/**
+  Set interface through XHCI's Configure_Endpoint cmd.
+
+  @param  Xhc           The XHCI Instance.
+  @param  SlotId        The slot id to be configured.
+  @param  DeviceSpeed   The device's speed.
+  @param  ConfigDesc    The pointer to the usb device configuration descriptor.
+  @param  Request       USB device request to send.
+
+  @retval EFI_SUCCESS   Successfully set interface.
+
+**/
+EFI_STATUS
+EFIAPI
+XhcSetInterface (
+  IN USB_XHCI_INSTANCE        *Xhc,
+  IN UINT8                    SlotId,
+  IN UINT8                    DeviceSpeed,
+  IN USB_CONFIG_DESCRIPTOR    *ConfigDesc,
+  IN EFI_USB_DEVICE_REQUEST   *Request
+  )
+{
+  EFI_STATUS                  Status;
+  USB_INTERFACE_DESCRIPTOR    *IfDescActive;
+  USB_INTERFACE_DESCRIPTOR    *IfDescSet;
+  USB_INTERFACE_DESCRIPTOR    *IfDesc;
+  USB_ENDPOINT_DESCRIPTOR     *EpDesc;
+  UINTN                       NumEp;
+  UINTN                       EpIndex;
+  UINT8                       EpAddr;
+  UINT8                       Direction;
+  UINT8                       Dci;
+  UINT8                       MaxDci;
+  EFI_PHYSICAL_ADDRESS        PhyAddr;
+  VOID                        *RingSeg;
+
+  CMD_TRB_CONFIG_ENDPOINT     CmdTrbCfgEP;
+  INPUT_CONTEXT               *InputContext;
+  DEVICE_CONTEXT              *OutputContext;
+  EVT_TRB_COMMAND_COMPLETION  *EvtTrb;
+
+  Status = EFI_SUCCESS;
+
+  InputContext  = Xhc->UsbDevContext[SlotId].InputContext;
+  OutputContext = Xhc->UsbDevContext[SlotId].OutputContext;
+  //
+  // XHCI 4.6.6 Configure Endpoint
+  // When this command is used to "Set an Alternate Interface on a device", software shall set the Drop
+  // Context and Add Context flags as follows:
+  // 1) If an endpoint is not modified by the Alternate Interface setting, then software shall set the Drop
+  // Context and Add Context flags to '0'.
+  //
+  // Except the interface indicated by Reqeust->Index, no impact to other interfaces.
+  // So the default Drop Context and Add Context flags can be '0' to cover 1).
+  //
+  ZeroMem (InputContext, sizeof (INPUT_CONTEXT));
+  CopyMem (&InputContext->Slot, &OutputContext->Slot, sizeof (SLOT_CONTEXT));
+
+  ASSERT (ConfigDesc != NULL);
+
+  MaxDci = 0;
+
+  IfDescActive = NULL;
+  IfDescSet = NULL;
+
+  IfDesc = (USB_INTERFACE_DESCRIPTOR *)(ConfigDesc + 1);
+  while ((UINTN) IfDesc < ((UINTN) ConfigDesc + ConfigDesc->TotalLength)) {
+    if (IfDesc->DescriptorType == USB_DESC_TYPE_INTERFACE) {
+      if (IfDesc->InterfaceNumber == (UINT8) Request->Index) {
+        if (IfDesc->AlternateSetting == Xhc->UsbDevContext[SlotId].ActiveAlternateSetting[IfDesc->InterfaceNumber]) {
+          //
+          // Find out the active interface descriptor.
+          //
+          IfDescActive = IfDesc;
+        } else if (IfDesc->AlternateSetting == (UINT8) Request->Value) {
+          //
+          // Find out the interface descriptor to set.
+          //
+          IfDescSet = IfDesc;
+        }
+      }
+    }
+    IfDesc = (USB_INTERFACE_DESCRIPTOR *)((UINTN)IfDesc + IfDesc->Length);
+  }
+
+  //
+  // XHCI 4.6.6 Configure Endpoint
+  // When this command is used to "Set an Alternate Interface on a device", software shall set the Drop
+  // Context and Add Context flags as follows:
+  // 2) If an endpoint previously disabled, is enabled by the Alternate Interface setting, then software shall set
+  // the Drop Context flag to '0' and Add Context flag to '1', and initialize the Input Endpoint Context.
+  // 3) If an endpoint previously enabled, is disabled by the Alternate Interface setting, then software shall set
+  // the Drop Context flag to '1' and Add Context flag to '0'.
+  // 4) If a parameter of an enabled endpoint is modified by an Alternate Interface setting, the Drop Context
+  // and Add Context flags shall be set to '1'.
+  //
+  // Below codes are to cover 2), 3) and 4).
+  //
+
+  if ((IfDescActive != NULL) && (IfDescSet != NULL)) {
+    NumEp = IfDescActive->NumEndpoints;
+    EpDesc = (USB_ENDPOINT_DESCRIPTOR *) (IfDescActive + 1);
+    for (EpIndex = 0; EpIndex < NumEp; EpIndex++) {
+      while (EpDesc->DescriptorType != USB_DESC_TYPE_ENDPOINT) {
+        EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
+      }
+
+      EpAddr    = (UINT8) (EpDesc->EndpointAddress & 0x0F);
+      Direction = (UINT8) ((EpDesc->EndpointAddress & 0x80) ? EfiUsbDataIn : EfiUsbDataOut);
+
+      Dci = XhcEndpointToDci (EpAddr, Direction);
+      ASSERT (Dci < 32);
+      if (Dci > MaxDci) {
+        MaxDci = Dci;
+      }
+      //
+      // XHCI 4.3.6 - Setting Alternate Interfaces
+      // 1) Stop any Running Transfer Rings affected by the Alternate Interface setting.
+      //
+      Status = XhcStopEndpoint (Xhc, SlotId, Dci);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+      //
+      // XHCI 4.3.6 - Setting Alternate Interfaces
+      // 2) Free Transfer Rings of all endpoints that will be affected by the Alternate Interface setting.
+      //
+      if (Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci - 1] != NULL) {
+        RingSeg = ((TRANSFER_RING *)(UINTN)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci - 1])->RingSeg0;
+        if (RingSeg != NULL) {
+          UsbHcFreeMem (Xhc->MemPool, RingSeg, sizeof (TRB_TEMPLATE) * TR_RING_TRB_NUMBER);
+        }
+        FreePool (Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci - 1]);
+        Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci - 1] = NULL;
+      }
+
+      //
+      // Set the Drop Context flag to '1'.
+      //
+      InputContext->InputControlContext.Dword1 |= (BIT0 << Dci);
+
+      EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
+    }
+
+    //
+    // XHCI 4.3.6 - Setting Alternate Interfaces
+    // 3) Clear all the Endpoint Context fields of each endpoint that will be disabled by the Alternate
+    // Interface setting, to '0'.
+    //
+    // The step 3) has been covered by the ZeroMem () to InputContext at the start of the function.
+    //
+
+    //
+    // XHCI 4.3.6 - Setting Alternate Interfaces
+    // 4) For each endpoint enabled by the Configure Endpoint Command:
+    //   a. Allocate a Transfer Ring.
+    //   b. Initialize the Transfer Ring Segment(s) by clearing all fields of all TRBs to '0'.
+    //   c. Initialize the Endpoint Context data structure.
+    //
+    Dci = XhcInitializeEndpointContext (Xhc, SlotId, DeviceSpeed, InputContext, IfDescSet);
+    if (Dci > MaxDci) {
+      MaxDci = Dci;
+    }
+
+    InputContext->InputControlContext.Dword2 |= BIT0;
+    InputContext->Slot.ContextEntries         = MaxDci;
+    //
+    // XHCI 4.3.6 - Setting Alternate Interfaces
+    // 5) Issue and successfully complete a Configure Endpoint Command.
+    //
+    ZeroMem (&CmdTrbCfgEP, sizeof (CmdTrbCfgEP));
+    PhyAddr = UsbHcGetPciAddrForHostAddr (Xhc->MemPool, InputContext, sizeof (INPUT_CONTEXT));
+    CmdTrbCfgEP.PtrLo    = XHC_LOW_32BIT (PhyAddr);
+    CmdTrbCfgEP.PtrHi    = XHC_HIGH_32BIT (PhyAddr);
+    CmdTrbCfgEP.CycleBit = 1;
+    CmdTrbCfgEP.Type     = TRB_TYPE_CON_ENDPOINT;
+    CmdTrbCfgEP.SlotId   = Xhc->UsbDevContext[SlotId].SlotId;
+    DEBUG ((EFI_D_INFO, "SetInterface: Configure Endpoint\n"));
+    Status = XhcCmdTransfer (
+               Xhc,
+               (TRB_TEMPLATE *) (UINTN) &CmdTrbCfgEP,
+               XHC_GENERIC_TIMEOUT,
+               (TRB_TEMPLATE **) (UINTN) &EvtTrb
+               );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "SetInterface: Config Endpoint Failed, Status = %r\n", Status));
+    } else {
+      //
+      // Update the active AlternateSetting.
+      //
+      Xhc->UsbDevContext[SlotId].ActiveAlternateSetting[(UINT8) Request->Index] = (UINT8) Request->Value;
+    }
+  }
+
+  return Status;
+}
+
+/**
+  Set interface through XHCI's Configure_Endpoint cmd.
+
+  @param  Xhc           The XHCI Instance.
+  @param  SlotId        The slot id to be configured.
+  @param  DeviceSpeed   The device's speed.
+  @param  ConfigDesc    The pointer to the usb device configuration descriptor.
+  @param  Request       USB device request to send.
+
+  @retval EFI_SUCCESS   Successfully set interface.
+
+**/
+EFI_STATUS
+EFIAPI
+XhcSetInterface64 (
+  IN USB_XHCI_INSTANCE        *Xhc,
+  IN UINT8                    SlotId,
+  IN UINT8                    DeviceSpeed,
+  IN USB_CONFIG_DESCRIPTOR    *ConfigDesc,
+  IN EFI_USB_DEVICE_REQUEST   *Request
+  )
+{
+  EFI_STATUS                  Status;
+  USB_INTERFACE_DESCRIPTOR    *IfDescActive;
+  USB_INTERFACE_DESCRIPTOR    *IfDescSet;
+  USB_INTERFACE_DESCRIPTOR    *IfDesc;
+  USB_ENDPOINT_DESCRIPTOR     *EpDesc;
+  UINTN                       NumEp;
+  UINTN                       EpIndex;
+  UINT8                       EpAddr;
+  UINT8                       Direction;
+  UINT8                       Dci;
+  UINT8                       MaxDci;
+  EFI_PHYSICAL_ADDRESS        PhyAddr;
+  VOID                        *RingSeg;
+
+  CMD_TRB_CONFIG_ENDPOINT     CmdTrbCfgEP;
+  INPUT_CONTEXT_64            *InputContext;
+  DEVICE_CONTEXT_64           *OutputContext;
+  EVT_TRB_COMMAND_COMPLETION  *EvtTrb;
+
+  Status = EFI_SUCCESS;
+
+  InputContext  = Xhc->UsbDevContext[SlotId].InputContext;
+  OutputContext = Xhc->UsbDevContext[SlotId].OutputContext;
+  //
+  // XHCI 4.6.6 Configure Endpoint
+  // When this command is used to "Set an Alternate Interface on a device", software shall set the Drop
+  // Context and Add Context flags as follows:
+  // 1) If an endpoint is not modified by the Alternate Interface setting, then software shall set the Drop
+  // Context and Add Context flags to '0'.
+  //
+  // Except the interface indicated by Reqeust->Index, no impact to other interfaces.
+  // So the default Drop Context and Add Context flags can be '0' to cover 1).
+  //
+  ZeroMem (InputContext, sizeof (INPUT_CONTEXT_64));
+  CopyMem (&InputContext->Slot, &OutputContext->Slot, sizeof (SLOT_CONTEXT_64));
+
+  ASSERT (ConfigDesc != NULL);
+
+  MaxDci = 0;
+
+  IfDescActive = NULL;
+  IfDescSet = NULL;
+
+  IfDesc = (USB_INTERFACE_DESCRIPTOR *)(ConfigDesc + 1);
+  while ((UINTN) IfDesc < ((UINTN) ConfigDesc + ConfigDesc->TotalLength)) {
+    if (IfDesc->DescriptorType == USB_DESC_TYPE_INTERFACE) {
+      if (IfDesc->InterfaceNumber == (UINT8) Request->Index) {
+        if (IfDesc->AlternateSetting == Xhc->UsbDevContext[SlotId].ActiveAlternateSetting[IfDesc->InterfaceNumber]) {
+          //
+          // Find out the active interface descriptor.
+          //
+          IfDescActive = IfDesc;
+        } else if (IfDesc->AlternateSetting == (UINT8) Request->Value) {
+          //
+          // Find out the interface descriptor to set.
+          //
+          IfDescSet = IfDesc;
+        }
+      }
+    }
+    IfDesc = (USB_INTERFACE_DESCRIPTOR *)((UINTN)IfDesc + IfDesc->Length);
+  }
+
+  //
+  // XHCI 4.6.6 Configure Endpoint
+  // When this command is used to "Set an Alternate Interface on a device", software shall set the Drop
+  // Context and Add Context flags as follows:
+  // 2) If an endpoint previously disabled, is enabled by the Alternate Interface setting, then software shall set
+  // the Drop Context flag to '0' and Add Context flag to '1', and initialize the Input Endpoint Context.
+  // 3) If an endpoint previously enabled, is disabled by the Alternate Interface setting, then software shall set
+  // the Drop Context flag to '1' and Add Context flag to '0'.
+  // 4) If a parameter of an enabled endpoint is modified by an Alternate Interface setting, the Drop Context
+  // and Add Context flags shall be set to '1'.
+  //
+  // Below codes are to cover 2), 3) and 4).
+  //
+
+  if ((IfDescActive != NULL) && (IfDescSet != NULL)) {
+    NumEp = IfDescActive->NumEndpoints;
+    EpDesc = (USB_ENDPOINT_DESCRIPTOR *) (IfDescActive + 1);
+    for (EpIndex = 0; EpIndex < NumEp; EpIndex++) {
+      while (EpDesc->DescriptorType != USB_DESC_TYPE_ENDPOINT) {
+        EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
+      }
+
+      EpAddr    = (UINT8) (EpDesc->EndpointAddress & 0x0F);
+      Direction = (UINT8) ((EpDesc->EndpointAddress & 0x80) ? EfiUsbDataIn : EfiUsbDataOut);
+
+      Dci = XhcEndpointToDci (EpAddr, Direction);
+      ASSERT (Dci < 32);
+      if (Dci > MaxDci) {
+        MaxDci = Dci;
+      }
+      //
+      // XHCI 4.3.6 - Setting Alternate Interfaces
+      // 1) Stop any Running Transfer Rings affected by the Alternate Interface setting.
+      //
+      Status = XhcStopEndpoint (Xhc, SlotId, Dci);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+      //
+      // XHCI 4.3.6 - Setting Alternate Interfaces
+      // 2) Free Transfer Rings of all endpoints that will be affected by the Alternate Interface setting.
+      //
+      if (Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci - 1] != NULL) {
+        RingSeg = ((TRANSFER_RING *)(UINTN)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci - 1])->RingSeg0;
+        if (RingSeg != NULL) {
+          UsbHcFreeMem (Xhc->MemPool, RingSeg, sizeof (TRB_TEMPLATE) * TR_RING_TRB_NUMBER);
+        }
+        FreePool (Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci - 1]);
+        Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci - 1] = NULL;
+      }
+
+      //
+      // Set the Drop Context flag to '1'.
+      //
+      InputContext->InputControlContext.Dword1 |= (BIT0 << Dci);
+
+      EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
+    }
+
+    //
+    // XHCI 4.3.6 - Setting Alternate Interfaces
+    // 3) Clear all the Endpoint Context fields of each endpoint that will be disabled by the Alternate
+    // Interface setting, to '0'.
+    //
+    // The step 3) has been covered by the ZeroMem () to InputContext at the start of the function.
+    //
+
+    //
+    // XHCI 4.3.6 - Setting Alternate Interfaces
+    // 4) For each endpoint enabled by the Configure Endpoint Command:
+    //   a. Allocate a Transfer Ring.
+    //   b. Initialize the Transfer Ring Segment(s) by clearing all fields of all TRBs to '0'.
+    //   c. Initialize the Endpoint Context data structure.
+    //
+    Dci = XhcInitializeEndpointContext64 (Xhc, SlotId, DeviceSpeed, InputContext, IfDescSet);
+    if (Dci > MaxDci) {
+      MaxDci = Dci;
+    }
+
+    InputContext->InputControlContext.Dword2 |= BIT0;
+    InputContext->Slot.ContextEntries         = MaxDci;
+    //
+    // XHCI 4.3.6 - Setting Alternate Interfaces
+    // 5) Issue and successfully complete a Configure Endpoint Command.
+    //
+    ZeroMem (&CmdTrbCfgEP, sizeof (CmdTrbCfgEP));
+    PhyAddr = UsbHcGetPciAddrForHostAddr (Xhc->MemPool, InputContext, sizeof (INPUT_CONTEXT_64));
+    CmdTrbCfgEP.PtrLo    = XHC_LOW_32BIT (PhyAddr);
+    CmdTrbCfgEP.PtrHi    = XHC_HIGH_32BIT (PhyAddr);
+    CmdTrbCfgEP.CycleBit = 1;
+    CmdTrbCfgEP.Type     = TRB_TYPE_CON_ENDPOINT;
+    CmdTrbCfgEP.SlotId   = Xhc->UsbDevContext[SlotId].SlotId;
+    DEBUG ((EFI_D_INFO, "SetInterface64: Configure Endpoint\n"));
+    Status = XhcCmdTransfer (
+               Xhc,
+               (TRB_TEMPLATE *) (UINTN) &CmdTrbCfgEP,
+               XHC_GENERIC_TIMEOUT,
+               (TRB_TEMPLATE **) (UINTN) &EvtTrb
+               );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "SetInterface64: Config Endpoint Failed, Status = %r\n", Status));
+    } else {
+      //
+      // Update the active AlternateSetting.
+      //
+      Xhc->UsbDevContext[SlotId].ActiveAlternateSetting[(UINT8) Request->Index] = (UINT8) Request->Value;
+    }
+  }
+
+  return Status;
+}
 
 /**
   Evaluate the endpoint 0 context through XHCI's Evaluate_Context cmd.
