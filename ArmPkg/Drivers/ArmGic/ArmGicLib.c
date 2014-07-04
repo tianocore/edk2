@@ -14,6 +14,7 @@
 
 #include <Base.h>
 #include <Library/ArmGicLib.h>
+#include <Library/DebugLib.h>
 #include <Library/IoLib.h>
 
 #include "GicV2/ArmGicV2Lib.h"
@@ -49,13 +50,39 @@ ArmGicSendSgiTo (
   MmioWrite32 (GicDistributorBase + ARM_GIC_ICDSGIR, ((TargetListFilter & 0x3) << 24) | ((CPUTargetList & 0xFF) << 16) | SgiId);
 }
 
+/*
+ * Acknowledge and return the value of the Interrupt Acknowledge Register
+ *
+ * InterruptId is returned separately from the register value because in
+ * the GICv2 the register value contains the CpuId and InterruptId while
+ * in the GICv3 the register value is only the InterruptId.
+ *
+ * @param GicInterruptInterfaceBase   Base Address of the GIC CPU Interface
+ * @param InterruptId                 InterruptId read from the Interrupt Acknowledge Register
+ *
+ * @retval value returned by the Interrupt Acknowledge Register
+ *
+ */
 UINTN
 EFIAPI
 ArmGicAcknowledgeInterrupt (
-  IN  UINTN          GicInterruptInterfaceBase
+  IN  UINTN          GicInterruptInterfaceBase,
+  OUT UINTN          *InterruptId
   )
 {
-  return ArmGicV2AcknowledgeInterrupt (GicInterruptInterfaceBase);
+  UINTN Value;
+
+  Value = ArmGicV2AcknowledgeInterrupt (GicInterruptInterfaceBase);
+
+  // InterruptId is required for the caller to know if a valid or spurious
+  // interrupt has been read
+  ASSERT (InterruptId != NULL);
+
+  if (InterruptId != NULL) {
+    *InterruptId = Value & ARM_GIC_ICCIAR_ACKINTID;
+  }
+
+  return Value;
 }
 
 VOID

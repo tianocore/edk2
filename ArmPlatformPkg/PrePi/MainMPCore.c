@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -55,7 +55,8 @@ SecondaryMain (
   UINT32                  CoreId;
   VOID                    (*SecondaryStart)(VOID);
   UINTN                   SecondaryEntryAddr;
-  UINTN                   Interrupt;
+  UINTN                   AcknowledgeInterrupt;
+  UINTN                   InterruptId;
 
   ClusterId = GET_CLUSTER_ID(MpId);
   CoreId    = GET_CORE_ID(MpId);
@@ -88,11 +89,11 @@ SecondaryMain (
     SecondaryEntryAddr = MmioRead32 (ArmCoreInfoTable[Index].MailboxGetAddress);
 
     // Acknowledge the interrupt and send End of Interrupt signal.
-    Interrupt = ArmGicAcknowledgeInterrupt (PcdGet32 (PcdGicInterruptInterfaceBase));
+    AcknowledgeInterrupt = ArmGicAcknowledgeInterrupt (PcdGet32 (PcdGicInterruptInterfaceBase), &InterruptId);
     // Check if it is a valid interrupt ID
-    if ((Interrupt & ARM_GIC_ICCIAR_ACKINTID) < ArmGicGetMaxNumInterrupts (PcdGet32 (PcdGicDistributorBase))) {
+    if (InterruptId < ArmGicGetMaxNumInterrupts (PcdGet32 (PcdGicDistributorBase))) {
       // Got a valid SGI number hence signal End of Interrupt
-      ArmGicEndOfInterrupt (PcdGet32 (PcdGicInterruptInterfaceBase), Interrupt);
+      ArmGicEndOfInterrupt (PcdGet32 (PcdGicInterruptInterfaceBase), AcknowledgeInterrupt);
     }
   } while (SecondaryEntryAddr == 0);
 
