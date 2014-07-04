@@ -16,6 +16,8 @@
 #include <Library/ArmGicLib.h>
 #include <Library/IoLib.h>
 
+#include "GicV2/ArmGicV2Lib.h"
+
 UINTN
 EFIAPI
 ArmGicGetInterfaceIdentification (
@@ -53,8 +55,7 @@ ArmGicAcknowledgeInterrupt (
   IN  UINTN          GicInterruptInterfaceBase
   )
 {
-  // Read the Interrupt Acknowledge Register
-  return MmioRead32 (GicInterruptInterfaceBase + ARM_GIC_ICCIAR);
+  return ArmGicV2AcknowledgeInterrupt (GicInterruptInterfaceBase);
 }
 
 VOID
@@ -64,7 +65,7 @@ ArmGicEndOfInterrupt (
   IN UINTN                  Source
   )
 {
-  MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCEIOR, Source);
+  ArmGicV2EndOfInterrupt (GicInterruptInterfaceBase, Source);
 }
 
 VOID
@@ -128,4 +129,22 @@ ArmGicDisableDistributor (
 {
   // Disable Gic Distributor
   MmioWrite32 (GicDistributorBase + ARM_GIC_ICDDCR, 0x0);
+}
+
+VOID
+EFIAPI
+ArmGicEnableInterruptInterface (
+  IN  INTN          GicInterruptInterfaceBase
+  )
+{
+  return ArmGicV2EnableInterruptInterface (GicInterruptInterfaceBase);
+}
+
+VOID
+EFIAPI
+ArmGicDisableInterruptInterface (
+  IN  INTN          GicInterruptInterfaceBase
+  )
+{
+  return ArmGicV2DisableInterruptInterface (GicInterruptInterfaceBase);
 }

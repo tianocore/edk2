@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+*  Copyright (c) 2013-2014, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -12,8 +12,8 @@
 *
 **/
 
-#ifndef __ARMGIC_H
-#define __ARMGIC_H
+#ifndef _ARM_GIC_V2_H_
+#define _ARM_GIC_V2_H_
 
 //
 // GIC definitions
@@ -59,35 +59,15 @@
 #define ARM_GIC_ICCABPR         0x1C  // Aliased Binary Point Register
 #define ARM_GIC_ICCIIDR         0xFC  // Identification Register
 
-#define ARM_GIC_ICDSGIR_FILTER_TARGETLIST       0x0
-#define ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE     0x1
-#define ARM_GIC_ICDSGIR_FILTER_ITSELF           0x2
+// Bit Mask for
+#define ARM_GIC_ICCIAR_ACKINTID                 0x3FF
 
-// Bit-masks to configure the CPU Interface Control register
-#define ARM_GIC_ICCICR_ENABLE_SECURE            0x01
-#define ARM_GIC_ICCICR_ENABLE_NS                0x02
-#define ARM_GIC_ICCICR_ACK_CTL                  0x04
-#define ARM_GIC_ICCICR_SIGNAL_SECURE_TO_FIQ     0x08
-#define ARM_GIC_ICCICR_USE_SBPR                 0x10
+// Interrupts from 1020 to 1023 are considered as special interrupts (eg: spurious interrupts)
+#define ARM_GIC_IS_SPECIAL_INTERRUPTS(Interrupt) (((Interrupt) >= 1020) && ((Interrupt) <= 1023))
 
-// Bit Mask for GICC_IIDR
-#define ARM_GIC_ICCIIDR_GET_PRODUCT_ID(IccIidr)   (((IccIidr) >> 20) & 0xFFF)
-#define ARM_GIC_ICCIIDR_GET_ARCH_VERSION(IccIidr) (((IccIidr) >> 16) & 0xF)
-#define ARM_GIC_ICCIIDR_GET_REVISION(IccIidr)     (((IccIidr) >> 12) & 0xF)
-#define ARM_GIC_ICCIIDR_GET_IMPLEMENTER(IccIidr)  ((IccIidr) & 0xFFF)
-
-UINTN
-EFIAPI
-ArmGicGetInterfaceIdentification (
-  IN  INTN          GicInterruptInterfaceBase
-  );
-
-//
-// GIC Secure interfaces
-//
 VOID
 EFIAPI
-ArmGicSetupNonSecure (
+ArmGicV2SetupNonSecure (
   IN  UINTN         MpId,
   IN  INTN          GicDistributorBase,
   IN  INTN          GicInterruptInterfaceBase
@@ -95,89 +75,26 @@ ArmGicSetupNonSecure (
 
 VOID
 EFIAPI
-ArmGicSetSecureInterrupts (
-  IN  UINTN         GicDistributorBase,
-  IN  UINTN*        GicSecureInterruptMask,
-  IN  UINTN         GicSecureInterruptMaskSize
-  );
-
-VOID
-EFIAPI
-ArmGicEnableInterruptInterface (
+ArmGicV2EnableInterruptInterface (
   IN  INTN          GicInterruptInterfaceBase
   );
 
 VOID
 EFIAPI
-ArmGicDisableInterruptInterface (
+ArmGicV2DisableInterruptInterface (
   IN  INTN          GicInterruptInterfaceBase
   );
 
-VOID
-EFIAPI
-ArmGicEnableDistributor (
-  IN  INTN          GicDistributorBase
-  );
-
-VOID
-EFIAPI
-ArmGicDisableDistributor (
-  IN  INTN          GicDistributorBase
-  );
-
 UINTN
 EFIAPI
-ArmGicGetMaxNumInterrupts (
-  IN  INTN          GicDistributorBase
-  );
-
-VOID
-EFIAPI
-ArmGicSendSgiTo (
-  IN  INTN          GicDistributorBase,
-  IN  INTN          TargetListFilter,
-  IN  INTN          CPUTargetList,
-  IN  INTN          SgiId
-  );
-
-UINTN
-EFIAPI
-ArmGicAcknowledgeInterrupt (
+ArmGicV2AcknowledgeInterrupt (
   IN  UINTN          GicInterruptInterfaceBase
   );
 
 VOID
 EFIAPI
-ArmGicEndOfInterrupt (
-  IN  UINTN                 GicInterruptInterfaceBase,
-  IN UINTN                  Source
-  );
-
-UINTN
-EFIAPI
-ArmGicSetPriorityMask (
-  IN  INTN          GicInterruptInterfaceBase,
-  IN  INTN          PriorityMask
-  );
-
-VOID
-EFIAPI
-ArmGicEnableInterrupt (
-  IN UINTN                  GicDistributorBase,
-  IN UINTN                  Source
-  );
-
-VOID
-EFIAPI
-ArmGicDisableInterrupt (
-  IN UINTN                  GicDistributorBase,
-  IN UINTN                  Source
-  );
-
-BOOLEAN
-EFIAPI
-ArmGicIsInterruptEnabled (
-  IN UINTN                  GicDistributorBase,
+ArmGicV2EndOfInterrupt (
+  IN UINTN                  GicInterruptInterfaceBase,
   IN UINTN                  Source
   );
 

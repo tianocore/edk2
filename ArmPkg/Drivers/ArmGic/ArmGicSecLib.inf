@@ -23,6 +23,9 @@
   ArmGicLib.c
   ArmGicSecLib.c
 
+  GicV2/ArmGicV2Lib.c
+  GicV2/ArmGicV2SecLib.c
+
 [Packages]
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec

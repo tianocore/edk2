@@ -16,15 +16,27 @@
 #include <Library/IoLib.h>
 #include <Library/ArmGicLib.h>
 
+
 VOID
 EFIAPI
-ArmGicEnableDistributor (
-  IN  INTN          GicDistributorBase
+ArmGicV2EnableInterruptInterface (
+  IN  INTN          GicInterruptInterfaceBase
   )
 {
   /*
-   * Enable GIC distributor in Non-Secure world.
-   * Note: The ICDDCR register is banked when Security extensions are implemented
-   */
-  MmioWrite32 (GicDistributorBase + ARM_GIC_ICDDCR, 0x1);
+  * Enable the CPU interface in Non-Secure world
+  * Note: The ICCICR register is banked when Security extensions are implemented
+  */
+  MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCICR, 0x1);
+}
+
+VOID
+EFIAPI
+ArmGicV2DisableInterruptInterface (
+  IN  INTN          GicInterruptInterfaceBase
+  )
+{
+  // Disable Gic Interface
+  MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCICR, 0x0);
+  MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCPMR, 0x0);
 }
