@@ -31,6 +31,7 @@ NonSecureWaitForFirmware (
   )
 {
   VOID (*secondary_start)(VOID);
+  UINTN Interrupt;
 
   // The secondary cores will execute the firmware once wake from WFI.
   secondary_start = (VOID (*)())PcdGet32(PcdFvBaseAddress);
@@ -38,7 +39,12 @@ NonSecureWaitForFirmware (
   ArmCallWFI();
 
   // Acknowledge the interrupt and send End of Interrupt signal.
-  ArmGicAcknowledgeInterrupt (PcdGet32(PcdGicDistributorBase), PcdGet32(PcdGicInterruptInterfaceBase), NULL, NULL);
+  Interrupt = ArmGicAcknowledgeInterrupt (PcdGet32 (PcdGicInterruptInterfaceBase));
+  // Check if it is a valid interrupt ID
+  if ((Interrupt & ARM_GIC_ICCIAR_ACKINTID) < ArmGicGetMaxNumInterrupts (PcdGet32 (PcdGicDistributorBase))) {
+    // Got a valid SGI number hence signal End of Interrupt
+    ArmGicEndOfInterrupt (PcdGet32 (PcdGicInterruptInterfaceBase), Interrupt);
+  }
 
   // Jump to secondary core entry point.
   secondary_start ();

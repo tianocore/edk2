@@ -76,6 +76,9 @@
 #define ARM_GIC_ICCIDR_GET_REVISION(IccIdr)     (((IccIdr) >> 12) & 0xF)
 #define ARM_GIC_ICCIDR_GET_IMPLEMENTER(IccIdr)  ((IccIdr) & 0xFFF)
 
+// Bit Mask for
+#define ARM_GIC_ICCIAR_ACKINTID                 0x3FF
+
 //
 // GIC Secure interfaces
 //
@@ -128,13 +131,10 @@ ArmGicSendSgiTo (
   IN  INTN          SgiId
   );
 
-RETURN_STATUS
+UINTN
 EFIAPI
 ArmGicAcknowledgeInterrupt (
-  IN  UINTN          GicDistributorBase,
-  IN  UINTN          GicInterruptInterfaceBase,
-  OUT UINTN          *CoreId,
-  OUT UINTN          *InterruptId
+  IN  UINTN          GicInterruptInterfaceBase
   );
 
 VOID
