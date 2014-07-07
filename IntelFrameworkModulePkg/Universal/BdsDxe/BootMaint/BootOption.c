@@ -1679,9 +1679,7 @@ GetLegacyDeviceOrder (
 {
   UINTN                     Index;
   UINTN                     OptionIndex;
-  UINT16                    PageIdList [] = {FORM_SET_FD_ORDER_ID, FORM_SET_HD_ORDER_ID,
-                                             FORM_SET_CD_ORDER_ID, FORM_SET_NET_ORDER_ID,
-                                             FORM_SET_BEV_ORDER_ID};
+  UINT16                    PageIdList[5];
   UINTN                     PageNum;  
   UINTN                     VarSize;
   UINT8                     *VarData;     
@@ -1697,7 +1695,12 @@ GetLegacyDeviceOrder (
   UINTN                     Bit;
   
   ASSERT (CallbackData != NULL);
-  
+
+  PageIdList[0] = FORM_SET_FD_ORDER_ID;
+  PageIdList[1] = FORM_SET_HD_ORDER_ID;
+  PageIdList[2] = FORM_SET_CD_ORDER_ID;
+  PageIdList[3] = FORM_SET_NET_ORDER_ID;
+  PageIdList[4] = FORM_SET_BEV_ORDER_ID;
   OptionMenu  = NULL;
   BbsType     = 0;
   LegacyOrder = NULL;
