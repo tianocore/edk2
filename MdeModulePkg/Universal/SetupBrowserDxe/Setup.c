@@ -2262,6 +2262,11 @@ SendDiscardInfoToDriver (
       continue;
     }
 
+    //
+    // Restore the question value before call the CHANGED callback type.
+    //
+    GetQuestionValue (FormSet, Form, Question, GetSetValueWithEditBuffer);
+
     if (Question->HiiValue.Type == EFI_IFR_TYPE_BUFFER) {
       TypeValue = (EFI_IFR_TYPE_VALUE *) Question->BufferValue;
     } else {
