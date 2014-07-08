@@ -1450,7 +1450,7 @@ XhcPeimEntry (
 
     XhcDev->Signature = USB_XHC_DEV_SIGNATURE;
     XhcDev->UsbHostControllerBaseAddress = (UINT32) BaseAddress;
-    XhcDev->CapLength           = XhcPeiReadCapRegister (XhcDev, XHC_CAPLENGTH_OFFSET) & 0x0FF;
+    XhcDev->CapLength           = (UINT8) (XhcPeiReadCapRegister (XhcDev, XHC_CAPLENGTH_OFFSET) & 0x0FF);
     XhcDev->HcSParams1.Dword    = XhcPeiReadCapRegister (XhcDev, XHC_HCSPARAMS1_OFFSET);
     XhcDev->HcSParams2.Dword    = XhcPeiReadCapRegister (XhcDev, XHC_HCSPARAMS2_OFFSET);
     XhcDev->HcCParams.Dword     = XhcPeiReadCapRegister (XhcDev, XHC_HCCPARAMS_OFFSET);
