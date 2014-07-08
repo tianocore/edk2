@@ -1,7 +1,7 @@
 ## @file
 # OpenSSL Library implementation.
 # 
-#  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -19,9 +19,9 @@
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = OpensslLib
-  DEFINE OPENSSL_PATH            = openssl-0.9.8w
+  DEFINE OPENSSL_PATH            = openssl-0.9.8za
   DEFINE OPENSSL_FLAGS           = -DOPENSSL_SYSNAME_UWIN -DOPENSSL_SYS_UEFI -DL_ENDIAN -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -DOPENSSL_NO_CAMELLIA -DOPENSSL_NO_SEED -DOPENSSL_NO_RC5 -DOPENSSL_NO_MDC2 -DOPENSSL_NO_SOCK -DOPENSSL_NO_CMS -DOPENSSL_NO_JPAKE -DOPENSSL_NO_CAPIENG -DOPENSSL_NO_ERR -DOPENSSL_NO_KRB5 -DOPENSSL_NO_DYNAMIC_ENGINE -DGETPID_IS_MEANINGLESS -DOPENSSL_NO_STDIO -DOPENSSL_NO_FP_API -DOPENSSL_NO_DGRAM -DOPENSSL_NO_ASM
-  DEFINE OPENSSL_EXFLAGS         = -DOPENSSL_SMALL_FOOTPRINT -DOPENSSL_NO_SHA0 -DOPENSSL_NO_SHA512 -DOPENSSL_NO_LHASH -DOPENSSL_NO_HW -DOPENSSL_NO_OCSP -DOPENSSL_NO_LOCKING -DOPENSSL_NO_DEPRECATED
+  DEFINE OPENSSL_EXFLAGS         = -DOPENSSL_SMALL_FOOTPRINT -DOPENSSL_NO_SHA0 -DOPENSSL_NO_SHA512 -DOPENSSL_NO_LHASH -DOPENSSL_NO_HW -DOPENSSL_NO_OCSP -DOPENSSL_NO_LOCKING -DOPENSSL_NO_DEPRECATED -DOPENSSL_NO_RIPEMD -DOPENSSL_NO_RC2 -DOPENSSL_NO_IDEA -DOPENSSL_NO_BF -DOPENSSL_NO_CAST -DOPENSSL_NO_WHIRLPOOL -DOPENSSL_NO_DSA -DOPENSSL_NO_EC -DOPENSSL_NO_ECDH -DOPENSSL_NO_ECDSA -DOPENSSL_NO_ENGINE
   
 #
 # OPENSSL_FLAGS is set to define the following flags to be compatible with 
@@ -77,8 +77,12 @@
   $(OPENSSL_PATH)/crypto/o_dir.c
   $(OPENSSL_PATH)/crypto/o_init.c
   $(OPENSSL_PATH)/crypto/fips_err.c
-  $(OPENSSL_PATH)/crypto/md2/md2_dgst.c
-  $(OPENSSL_PATH)/crypto/md2/md2_one.c
+
+  #
+  # DIsabled by OPENSSL_NO_MD2
+  #
+  # $(OPENSSL_PATH)/crypto/md2/md2_dgst.c
+  # $(OPENSSL_PATH)/crypto/md2/md2_one.c
   $(OPENSSL_PATH)/crypto/md4/md4_dgst.c
   $(OPENSSL_PATH)/crypto/md4/md4_one.c
   $(OPENSSL_PATH)/crypto/md5/md5_dgst.c
@@ -90,8 +94,13 @@
   $(OPENSSL_PATH)/crypto/sha/sha256.c
   $(OPENSSL_PATH)/crypto/sha/sha512.c
   $(OPENSSL_PATH)/crypto/hmac/hmac.c
-  $(OPENSSL_PATH)/crypto/ripemd/rmd_dgst.c
-  $(OPENSSL_PATH)/crypto/ripemd/rmd_one.c
+
+  #
+  # Disabled by OPENSSL_NO_RIPEMD
+  #
+  # $(OPENSSL_PATH)/crypto/ripemd/rmd_dgst.c
+  # $(OPENSSL_PATH)/crypto/ripemd/rmd_one.c
+
   $(OPENSSL_PATH)/crypto/des/des_lib.c
   $(OPENSSL_PATH)/crypto/des/set_key.c
   $(OPENSSL_PATH)/crypto/des/ecb_enc.c
@@ -119,29 +128,45 @@
   $(OPENSSL_PATH)/crypto/des/des_old.c
   $(OPENSSL_PATH)/crypto/des/des_old2.c
   $(OPENSSL_PATH)/crypto/des/read2pwd.c
-  $(OPENSSL_PATH)/crypto/rc2/rc2_ecb.c
-  $(OPENSSL_PATH)/crypto/rc2/rc2_skey.c
-  $(OPENSSL_PATH)/crypto/rc2/rc2_cbc.c
-  $(OPENSSL_PATH)/crypto/rc2/rc2cfb64.c
-  $(OPENSSL_PATH)/crypto/rc2/rc2ofb64.c
+
+  #
+  # Disabled by OPENSSL_NO_RC2
+  #
+  # $(OPENSSL_PATH)/crypto/rc2/rc2_ecb.c
+  # $(OPENSSL_PATH)/crypto/rc2/rc2_skey.c
+  # $(OPENSSL_PATH)/crypto/rc2/rc2_cbc.c
+  # $(OPENSSL_PATH)/crypto/rc2/rc2cfb64.c
+  # $(OPENSSL_PATH)/crypto/rc2/rc2ofb64.c
+
   $(OPENSSL_PATH)/crypto/rc4/rc4_enc.c
   $(OPENSSL_PATH)/crypto/rc4/rc4_skey.c
   $(OPENSSL_PATH)/crypto/rc4/rc4_fblk.c
-  $(OPENSSL_PATH)/crypto/idea/i_cbc.c
-  $(OPENSSL_PATH)/crypto/idea/i_cfb64.c
-  $(OPENSSL_PATH)/crypto/idea/i_ofb64.c
-  $(OPENSSL_PATH)/crypto/idea/i_ecb.c
-  $(OPENSSL_PATH)/crypto/idea/i_skey.c
-  $(OPENSSL_PATH)/crypto/bf/bf_skey.c
-  $(OPENSSL_PATH)/crypto/bf/bf_ecb.c
-  $(OPENSSL_PATH)/crypto/bf/bf_enc.c
-  $(OPENSSL_PATH)/crypto/bf/bf_cfb64.c
-  $(OPENSSL_PATH)/crypto/bf/bf_ofb64.c
-  $(OPENSSL_PATH)/crypto/cast/c_skey.c
-  $(OPENSSL_PATH)/crypto/cast/c_ecb.c
-  $(OPENSSL_PATH)/crypto/cast/c_enc.c
-  $(OPENSSL_PATH)/crypto/cast/c_cfb64.c
-  $(OPENSSL_PATH)/crypto/cast/c_ofb64.c
+
+  #
+  # Disabled by OPENSSL_NO_IDEA
+  #
+  # $(OPENSSL_PATH)/crypto/idea/i_cbc.c
+  # $(OPENSSL_PATH)/crypto/idea/i_cfb64.c
+  # $(OPENSSL_PATH)/crypto/idea/i_ofb64.c
+  # $(OPENSSL_PATH)/crypto/idea/i_ecb.c
+  # $(OPENSSL_PATH)/crypto/idea/i_skey.c
+  #
+  # Disabled by OPENSSL_NO_BF
+  #
+  # $(OPENSSL_PATH)/crypto/bf/bf_skey.c
+  # $(OPENSSL_PATH)/crypto/bf/bf_ecb.c
+  # $(OPENSSL_PATH)/crypto/bf/bf_enc.c
+  # $(OPENSSL_PATH)/crypto/bf/bf_cfb64.c
+  # $(OPENSSL_PATH)/crypto/bf/bf_ofb64.c
+  #
+  # Disabled by OPENSSL_NO_CAST
+  #
+  # $(OPENSSL_PATH)/crypto/cast/c_skey.c
+  # $(OPENSSL_PATH)/crypto/cast/c_ecb.c
+  # $(OPENSSL_PATH)/crypto/cast/c_enc.c
+  # $(OPENSSL_PATH)/crypto/cast/c_cfb64.c
+  # $(OPENSSL_PATH)/crypto/cast/c_ofb64.c
+
   $(OPENSSL_PATH)/crypto/aes/aes_misc.c
   $(OPENSSL_PATH)/crypto/aes/aes_ecb.c
   $(OPENSSL_PATH)/crypto/aes/aes_cfb.c
@@ -198,16 +223,21 @@
   $(OPENSSL_PATH)/crypto/rsa/rsa_asn1.c
   $(OPENSSL_PATH)/crypto/rsa/rsa_depr.c
   $(OPENSSL_PATH)/crypto/rsa/rsa_eng.c
-  $(OPENSSL_PATH)/crypto/dsa/dsa_gen.c
-  $(OPENSSL_PATH)/crypto/dsa/dsa_key.c
-  $(OPENSSL_PATH)/crypto/dsa/dsa_lib.c
-  $(OPENSSL_PATH)/crypto/dsa/dsa_asn1.c
-  $(OPENSSL_PATH)/crypto/dsa/dsa_vrf.c
-  $(OPENSSL_PATH)/crypto/dsa/dsa_sign.c
-  $(OPENSSL_PATH)/crypto/dsa/dsa_err.c
-  $(OPENSSL_PATH)/crypto/dsa/dsa_ossl.c
-  $(OPENSSL_PATH)/crypto/dsa/dsa_depr.c
-  $(OPENSSL_PATH)/crypto/dsa/dsa_utl.c
+
+  #
+  # Disabled by OPENSSL_NO_DSA
+  #
+  # $(OPENSSL_PATH)/crypto/dsa/dsa_gen.c
+  # $(OPENSSL_PATH)/crypto/dsa/dsa_key.c
+  # $(OPENSSL_PATH)/crypto/dsa/dsa_lib.c
+  # $(OPENSSL_PATH)/crypto/dsa/dsa_asn1.c
+  # $(OPENSSL_PATH)/crypto/dsa/dsa_vrf.c
+  # $(OPENSSL_PATH)/crypto/dsa/dsa_sign.c
+  # $(OPENSSL_PATH)/crypto/dsa/dsa_err.c
+  # $(OPENSSL_PATH)/crypto/dsa/dsa_ossl.c
+  # $(OPENSSL_PATH)/crypto/dsa/dsa_depr.c
+  # $(OPENSSL_PATH)/crypto/dsa/dsa_utl.c
+
   $(OPENSSL_PATH)/crypto/dso/dso_dl.c
   $(OPENSSL_PATH)/crypto/dso/dso_dlfcn.c
   $(OPENSSL_PATH)/crypto/dso/dso_err.c
@@ -223,30 +253,41 @@
   $(OPENSSL_PATH)/crypto/dh/dh_check.c
   $(OPENSSL_PATH)/crypto/dh/dh_err.c
   $(OPENSSL_PATH)/crypto/dh/dh_depr.c
-  $(OPENSSL_PATH)/crypto/ec/ec_lib.c
-  $(OPENSSL_PATH)/crypto/ec/ecp_smpl.c
-  $(OPENSSL_PATH)/crypto/ec/ecp_mont.c
-  $(OPENSSL_PATH)/crypto/ec/ecp_nist.c
-  $(OPENSSL_PATH)/crypto/ec/ec_cvt.c
-  $(OPENSSL_PATH)/crypto/ec/ec_mult.c
-  $(OPENSSL_PATH)/crypto/ec/ec_err.c
-  $(OPENSSL_PATH)/crypto/ec/ec_curve.c
-  $(OPENSSL_PATH)/crypto/ec/ec_check.c
-  $(OPENSSL_PATH)/crypto/ec/ec_print.c
-  $(OPENSSL_PATH)/crypto/ec/ec_asn1.c
-  $(OPENSSL_PATH)/crypto/ec/ec_key.c
-  $(OPENSSL_PATH)/crypto/ec/ec2_smpl.c
-  $(OPENSSL_PATH)/crypto/ec/ec2_mult.c
-  $(OPENSSL_PATH)/crypto/ecdh/ech_lib.c
-  $(OPENSSL_PATH)/crypto/ecdh/ech_ossl.c
-  $(OPENSSL_PATH)/crypto/ecdh/ech_key.c
-  $(OPENSSL_PATH)/crypto/ecdh/ech_err.c
-  $(OPENSSL_PATH)/crypto/ecdsa/ecs_lib.c
-  $(OPENSSL_PATH)/crypto/ecdsa/ecs_asn1.c
-  $(OPENSSL_PATH)/crypto/ecdsa/ecs_ossl.c
-  $(OPENSSL_PATH)/crypto/ecdsa/ecs_sign.c
-  $(OPENSSL_PATH)/crypto/ecdsa/ecs_vrf.c
-  $(OPENSSL_PATH)/crypto/ecdsa/ecs_err.c
+
+  #
+  # Disabled by OPENSSL_NO_EC
+  #
+  # $(OPENSSL_PATH)/crypto/ec/ec_lib.c
+  # $(OPENSSL_PATH)/crypto/ec/ecp_smpl.c
+  # $(OPENSSL_PATH)/crypto/ec/ecp_mont.c
+  # $(OPENSSL_PATH)/crypto/ec/ecp_nist.c
+  # $(OPENSSL_PATH)/crypto/ec/ec_cvt.c
+  # $(OPENSSL_PATH)/crypto/ec/ec_mult.c
+  # $(OPENSSL_PATH)/crypto/ec/ec_err.c
+  # $(OPENSSL_PATH)/crypto/ec/ec_curve.c
+  # $(OPENSSL_PATH)/crypto/ec/ec_check.c
+  # $(OPENSSL_PATH)/crypto/ec/ec_print.c
+  # $(OPENSSL_PATH)/crypto/ec/ec_asn1.c
+  # $(OPENSSL_PATH)/crypto/ec/ec_key.c
+  # $(OPENSSL_PATH)/crypto/ec/ec2_smpl.c
+  # $(OPENSSL_PATH)/crypto/ec/ec2_mult.c
+  #
+  # Disabled by OPENSSL_NO_ECDH
+  #
+  # $(OPENSSL_PATH)/crypto/ecdh/ech_lib.c
+  # $(OPENSSL_PATH)/crypto/ecdh/ech_ossl.c
+  # $(OPENSSL_PATH)/crypto/ecdh/ech_key.c
+  # $(OPENSSL_PATH)/crypto/ecdh/ech_err.c
+  #
+  # Disabled by OPENSSL_NO_ECDSA
+  #
+  # $(OPENSSL_PATH)/crypto/ecdsa/ecs_lib.c
+  # $(OPENSSL_PATH)/crypto/ecdsa/ecs_asn1.c
+  # $(OPENSSL_PATH)/crypto/ecdsa/ecs_ossl.c
+  # $(OPENSSL_PATH)/crypto/ecdsa/ecs_sign.c
+  # $(OPENSSL_PATH)/crypto/ecdsa/ecs_vrf.c
+  # $(OPENSSL_PATH)/crypto/ecdsa/ecs_err.c
+
   $(OPENSSL_PATH)/crypto/buffer/buffer.c
   $(OPENSSL_PATH)/crypto/buffer/buf_str.c
   $(OPENSSL_PATH)/crypto/buffer/buf_err.c
@@ -523,38 +564,47 @@
   $(OPENSSL_PATH)/crypto/comp/comp_err.c
   $(OPENSSL_PATH)/crypto/comp/c_rle.c
   $(OPENSSL_PATH)/crypto/comp/c_zlib.c
-  $(OPENSSL_PATH)/crypto/engine/eng_err.c
-  $(OPENSSL_PATH)/crypto/engine/eng_lib.c
-  $(OPENSSL_PATH)/crypto/engine/eng_list.c
-  $(OPENSSL_PATH)/crypto/engine/eng_init.c
-  $(OPENSSL_PATH)/crypto/engine/eng_ctrl.c
-  $(OPENSSL_PATH)/crypto/engine/eng_table.c
-  $(OPENSSL_PATH)/crypto/engine/eng_pkey.c
-  $(OPENSSL_PATH)/crypto/engine/eng_fat.c
-  $(OPENSSL_PATH)/crypto/engine/eng_all.c
-  $(OPENSSL_PATH)/crypto/engine/tb_rsa.c
-  $(OPENSSL_PATH)/crypto/engine/tb_dsa.c
-  $(OPENSSL_PATH)/crypto/engine/tb_ecdsa.c
-  $(OPENSSL_PATH)/crypto/engine/tb_dh.c
-  $(OPENSSL_PATH)/crypto/engine/tb_ecdh.c
-  $(OPENSSL_PATH)/crypto/engine/tb_rand.c
-  $(OPENSSL_PATH)/crypto/engine/tb_store.c
-  $(OPENSSL_PATH)/crypto/engine/tb_cipher.c
-  $(OPENSSL_PATH)/crypto/engine/tb_digest.c
-  $(OPENSSL_PATH)/crypto/engine/eng_openssl.c
-  $(OPENSSL_PATH)/crypto/engine/eng_cnf.c
-  $(OPENSSL_PATH)/crypto/engine/eng_dyn.c
-  $(OPENSSL_PATH)/crypto/engine/eng_cryptodev.c
-  $(OPENSSL_PATH)/crypto/engine/eng_padlock.c
-  $(OPENSSL_PATH)/crypto/ocsp/ocsp_asn.c
-  $(OPENSSL_PATH)/crypto/ocsp/ocsp_ext.c
-  $(OPENSSL_PATH)/crypto/ocsp/ocsp_ht.c
-  $(OPENSSL_PATH)/crypto/ocsp/ocsp_lib.c
-  $(OPENSSL_PATH)/crypto/ocsp/ocsp_cl.c
-  $(OPENSSL_PATH)/crypto/ocsp/ocsp_srv.c
-  $(OPENSSL_PATH)/crypto/ocsp/ocsp_prn.c
-  $(OPENSSL_PATH)/crypto/ocsp/ocsp_vfy.c
-  $(OPENSSL_PATH)/crypto/ocsp/ocsp_err.c
+
+  #
+  # Disabled by OPENSSL_NO_ENGINE
+  #
+  # $(OPENSSL_PATH)/crypto/engine/eng_err.c
+  # $(OPENSSL_PATH)/crypto/engine/eng_lib.c
+  # $(OPENSSL_PATH)/crypto/engine/eng_list.c
+  # $(OPENSSL_PATH)/crypto/engine/eng_init.c
+  # $(OPENSSL_PATH)/crypto/engine/eng_ctrl.c
+  # $(OPENSSL_PATH)/crypto/engine/eng_table.c
+  # $(OPENSSL_PATH)/crypto/engine/eng_pkey.c
+  # $(OPENSSL_PATH)/crypto/engine/eng_fat.c
+  # $(OPENSSL_PATH)/crypto/engine/eng_all.c
+  # $(OPENSSL_PATH)/crypto/engine/tb_rsa.c
+  # $(OPENSSL_PATH)/crypto/engine/tb_dsa.c
+  # $(OPENSSL_PATH)/crypto/engine/tb_ecdsa.c
+  # $(OPENSSL_PATH)/crypto/engine/tb_dh.c
+  # $(OPENSSL_PATH)/crypto/engine/tb_ecdh.c
+  # $(OPENSSL_PATH)/crypto/engine/tb_rand.c
+  # $(OPENSSL_PATH)/crypto/engine/tb_store.c
+  # $(OPENSSL_PATH)/crypto/engine/tb_cipher.c
+  # $(OPENSSL_PATH)/crypto/engine/tb_digest.c
+  # $(OPENSSL_PATH)/crypto/engine/eng_openssl.c
+  # $(OPENSSL_PATH)/crypto/engine/eng_cnf.c
+  # $(OPENSSL_PATH)/crypto/engine/eng_dyn.c
+  # $(OPENSSL_PATH)/crypto/engine/eng_cryptodev.c
+  # $(OPENSSL_PATH)/crypto/engine/eng_padlock.c
+
+  #
+  # Disabled by OPENSSL_NO_OCSP
+  #
+  # $(OPENSSL_PATH)/crypto/ocsp/ocsp_asn.c
+  # $(OPENSSL_PATH)/crypto/ocsp/ocsp_ext.c
+  # $(OPENSSL_PATH)/crypto/ocsp/ocsp_ht.c
+  # $(OPENSSL_PATH)/crypto/ocsp/ocsp_lib.c
+  # $(OPENSSL_PATH)/crypto/ocsp/ocsp_cl.c
+  # $(OPENSSL_PATH)/crypto/ocsp/ocsp_srv.c
+  # $(OPENSSL_PATH)/crypto/ocsp/ocsp_prn.c
+  # $(OPENSSL_PATH)/crypto/ocsp/ocsp_vfy.c
+  # $(OPENSSL_PATH)/crypto/ocsp/ocsp_err.c
+
   $(OPENSSL_PATH)/crypto/ui/ui_err.c
   $(OPENSSL_PATH)/crypto/ui/ui_lib.c
 
