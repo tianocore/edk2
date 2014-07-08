@@ -50,7 +50,9 @@ LIST_ENTRY      gBrowserContextList = INITIALIZE_LIST_HEAD_VARIABLE (gBrowserCon
 LIST_ENTRY      gBrowserFormSetList = INITIALIZE_LIST_HEAD_VARIABLE (gBrowserFormSetList);
 LIST_ENTRY      gBrowserHotKeyList  = INITIALIZE_LIST_HEAD_VARIABLE (gBrowserHotKeyList);
 LIST_ENTRY      gBrowserStorageList = INITIALIZE_LIST_HEAD_VARIABLE (gBrowserStorageList);
+LIST_ENTRY      gBrowserSaveFailFormSetList = INITIALIZE_LIST_HEAD_VARIABLE (gBrowserSaveFailFormSetList);
 
+BOOLEAN               mSystemSubmit = FALSE;
 BOOLEAN               gResetRequired;
 BOOLEAN               gExitRequired;
 BROWSER_SETTING_SCOPE gBrowserSettingScope = FormSetLevel;
@@ -244,6 +246,45 @@ UiFreeMenuList (
 }
 
 /**
+  Copy current Menu list to the new menu list.
+  
+  @param  NewMenuListHead        New create Menu list.
+  @param  CurrentMenuListHead    Current Menu list.
+
+**/
+VOID
+UiCopyMenuList (
+  OUT LIST_ENTRY   *NewMenuListHead,
+  IN  LIST_ENTRY   *CurrentMenuListHead
+  )
+{
+  LIST_ENTRY         *Link;
+  FORM_ENTRY_INFO    *MenuList;
+  FORM_ENTRY_INFO    *NewMenuEntry;
+
+  //
+  // If new menu list not empty, free it first.
+  //
+  UiFreeMenuList (NewMenuListHead);
+
+  Link = GetFirstNode (CurrentMenuListHead);
+  while (!IsNull (CurrentMenuListHead, Link)) {
+    MenuList = FORM_ENTRY_INFO_FROM_LINK (Link);
+    Link = GetNextNode (CurrentMenuListHead, Link);
+
+    NewMenuEntry = AllocateZeroPool (sizeof (FORM_ENTRY_INFO));
+    ASSERT (NewMenuEntry != NULL);
+    NewMenuEntry->Signature  = FORM_ENTRY_INFO_SIGNATURE;
+    NewMenuEntry->HiiHandle  = MenuList->HiiHandle;
+    CopyMem (&NewMenuEntry->FormSetGuid, &MenuList->FormSetGuid, sizeof (EFI_GUID));
+    NewMenuEntry->FormId     = MenuList->FormId;
+    NewMenuEntry->QuestionId = MenuList->QuestionId;
+
+    InsertTailList (NewMenuListHead, &NewMenuEntry->Link);
+  }
+}
+
+/**
   Load all hii formset to the browser.
 
 **/
@@ -315,18 +356,21 @@ LoadAllHiiFormset (
   Pop up the error info.
 
   @param      BrowserStatus    The input browser status.
+  @param      HiiHandle        The Hiihandle for this opcode.
   @param      OpCode           The opcode use to get the erro info and timeout value.
   @param      ErrorString      Error string used by BROWSER_NO_SUBMIT_IF.
 
 **/
-VOID
+UINT32
 PopupErrorMessage (
   IN UINT32                BrowserStatus,
+  IN EFI_HII_HANDLE        HiiHandle,
   IN EFI_IFR_OP_HEADER     *OpCode, OPTIONAL
   IN CHAR16                *ErrorString
   )
 {
   FORM_DISPLAY_ENGINE_STATEMENT *Statement;
+  USER_INPUT                    UserInputData;
 
   Statement = NULL;
 
@@ -343,8 +387,12 @@ PopupErrorMessage (
   //
   gDisplayFormData.ErrorString   = ErrorString;
   gDisplayFormData.BrowserStatus = BrowserStatus;
-  
-  mFormDisplay->FormDisplay (&gDisplayFormData, NULL);
+
+  if (HiiHandle != NULL) {
+    gDisplayFormData.HiiHandle     = HiiHandle;
+  }
+
+  mFormDisplay->FormDisplay (&gDisplayFormData, &UserInputData);
 
   gDisplayFormData.BrowserStatus = BROWSER_SUCCESS;
   gDisplayFormData.ErrorString   = NULL;
@@ -352,6 +400,8 @@ PopupErrorMessage (
   if (OpCode != NULL) {
     FreePool (Statement);
   }
+
+  return UserInputData.Action;
 }
 
 /**
@@ -2014,7 +2064,13 @@ ValidateQuestion (
         break;
       }
 
-      PopupErrorMessage(BrowserStatus, Expression->OpCode, ErrorStr);
+      if (!((Type == EFI_HII_EXPRESSION_NO_SUBMIT_IF) && mSystemSubmit)) {
+        //
+        // If in system submit process and for no_submit_if check, not popup this error message.
+        // Will process this fail again later in not system submit process.
+        //
+        PopupErrorMessage(BrowserStatus, FormSet->HiiHandle, Expression->OpCode, ErrorStr);
+      }
 
       if (ErrorStr != NULL) {
         FreePool (ErrorStr);
@@ -2083,6 +2139,7 @@ ValueChangedValidation (
 
   @param  FormSet                FormSet data structure.
   @param  CurrentForm            Current input form data structure.
+  @param  Statement              The statement for this check.
 
   @retval EFI_SUCCESS            Form validation pass.
   @retval other                  Form validation failed.
@@ -2090,8 +2147,9 @@ ValueChangedValidation (
 **/
 EFI_STATUS
 NoSubmitCheck (
-  IN  FORM_BROWSER_FORMSET            *FormSet,
-  IN  FORM_BROWSER_FORM               *CurrentForm
+  IN      FORM_BROWSER_FORMSET            *FormSet,
+  IN OUT  FORM_BROWSER_FORM               **CurrentForm,
+  OUT     FORM_BROWSER_STATEMENT          **Statement
   )
 {
   EFI_STATUS              Status;
@@ -2105,16 +2163,21 @@ NoSubmitCheck (
     Form = FORM_BROWSER_FORM_FROM_LINK (LinkForm);
     LinkForm = GetNextNode (&FormSet->FormListHead, LinkForm);
 
-    if (CurrentForm != NULL && CurrentForm != Form) {
+    if (*CurrentForm != NULL && *CurrentForm != Form) {
       continue;
     }
 
     Link = GetFirstNode (&Form->StatementListHead);
     while (!IsNull (&Form->StatementListHead, Link)) {
       Question = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
-
       Status = ValidateQuestion (FormSet, Form, Question, EFI_HII_EXPRESSION_NO_SUBMIT_IF);
       if (EFI_ERROR (Status)) {
+        if (*CurrentForm == NULL) {
+          *CurrentForm = Form;
+        }
+        if (Statement != NULL) {
+          *Statement = Question;
+        }
         return Status;
       }
 
@@ -2128,7 +2191,6 @@ NoSubmitCheck (
 /**
   Fill storage's edit copy with settings requested from Configuration Driver.
 
-  @param  FormSet                FormSet data structure.
   @param  Storage                The storage which need to sync.
   @param  ConfigRequest          The config request string which used to sync storage.
   @param  SyncOrRestore          Sync the buffer to editbuffer or Restore  the 
@@ -2141,7 +2203,6 @@ NoSubmitCheck (
 **/
 EFI_STATUS
 SynchronizeStorage (
-  IN  FORM_BROWSER_FORMSET        *FormSet,
   OUT BROWSER_STORAGE             *Storage,
   IN  CHAR16                      *ConfigRequest,
   IN  BOOLEAN                     SyncOrRestore
@@ -2336,33 +2397,43 @@ ValidateFormSet (
   Also clean all ValueChanged flag in question.
 
   @param  SetFlag                Whether need to set the Reset Flag.
+  @param  FormSet                FormSet data structure.
   @param  Form                   Form data structure.
 
 **/
 VOID
 UpdateFlagForForm (
   IN BOOLEAN                          SetFlag,
+  IN FORM_BROWSER_FORMSET             *FormSet,
   IN FORM_BROWSER_FORM                *Form
   )
 {
   LIST_ENTRY              *Link;
   FORM_BROWSER_STATEMENT  *Question;
-  BOOLEAN                 FindOne;
+  BOOLEAN                 OldValue;
 
-  FindOne = FALSE;
   Link = GetFirstNode (&Form->StatementListHead);
   while (!IsNull (&Form->StatementListHead, Link)) {
     Question = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
-  
-    if (SetFlag && Question->ValueChanged && ((Question->QuestionFlags & EFI_IFR_FLAG_RESET_REQUIRED) != 0)) {
+    Link = GetNextNode (&Form->StatementListHead, Link);
+
+    if (!Question->ValueChanged) {
+      continue;
+    }
+
+    OldValue = Question->ValueChanged;
+
+    //
+    // Compare the buffer and editbuffer data to see whether the data has been saved.
+    //
+    Question->ValueChanged = IsQuestionValueChanged(FormSet, Form, Question, GetSetValueWithBothBuffer);
+
+    //
+    // Only the changed data has been saved, then need to set the reset flag.
+    //
+    if (SetFlag && OldValue && !Question->ValueChanged && ((Question->QuestionFlags & EFI_IFR_FLAG_RESET_REQUIRED) != 0)) {
       gResetRequired = TRUE;
     } 
-
-    if (Question->ValueChanged) {
-      Question->ValueChanged = FALSE;
-    }
-  
-    Link = GetNextNode (&Form->StatementListHead, Link);
   }
 }
 
@@ -2387,11 +2458,8 @@ ValueChangeResetFlagUpdate (
   FORM_BROWSER_FORM       *CurrentForm;
   LIST_ENTRY              *Link;
 
-  //
-  // Form != NULL means only check form level.
-  //
   if (Form != NULL) {
-    UpdateFlagForForm(SetFlag, Form);
+    UpdateFlagForForm(SetFlag, FormSet, Form);
     return;
   }
 
@@ -2400,8 +2468,233 @@ ValueChangeResetFlagUpdate (
     CurrentForm = FORM_BROWSER_FORM_FROM_LINK (Link);
     Link = GetNextNode (&FormSet->FormListHead, Link);
 
-    UpdateFlagForForm(SetFlag, CurrentForm);
+    UpdateFlagForForm(SetFlag, FormSet, CurrentForm);
   }
+}
+
+/**
+  Base on the return Progress string to find the form. 
+  
+  Base on the first return Offset/Width (Name) string to find the form
+  which keep this string.
+
+  @param  FormSet                FormSet data structure.
+  @param  Storage                Storage which has this Progress string.
+  @param  Progress               The Progress string which has the first fail string.
+  @param  RetForm                The return form for this progress string.
+  @param  RetQuestion            The return question for the error progress string.
+
+  @retval TRUE                   Find the error form and statement for this error progress string.
+  @retval FALSE                  Not find the error form.
+
+**/
+BOOLEAN
+FindQuestionFromProgress (
+  IN FORM_BROWSER_FORMSET             *FormSet,
+  IN BROWSER_STORAGE                  *Storage,
+  IN EFI_STRING                       Progress,
+  OUT FORM_BROWSER_FORM               **RetForm,
+  OUT FORM_BROWSER_STATEMENT          **RetQuestion
+  )
+{
+  LIST_ENTRY                   *Link;
+  LIST_ENTRY                   *LinkStorage;
+  LIST_ENTRY                   *LinkStatement;
+  FORM_BROWSER_CONFIG_REQUEST  *ConfigInfo;
+  FORM_BROWSER_FORM            *Form;
+  EFI_STRING                   EndStr;
+  FORM_BROWSER_STATEMENT       *Statement;
+
+  ASSERT ((*Progress == '&') || (*Progress == 'G'));
+
+  ConfigInfo   = NULL;
+  *RetForm     = NULL;
+  *RetQuestion = NULL;
+
+  //
+  // Skip the first "&" or the ConfigHdr part.
+  //
+  if (*Progress == '&') {
+    Progress++;
+  } else {
+    //
+    // Prepare the "NAME" or "OFFSET=0x####&WIDTH=0x####" string.
+    //
+    if (Storage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
+      //
+      // For Name/Value type, Skip the ConfigHdr part.
+      //
+      EndStr = StrStr (Progress, L"PATH=");
+      while (*EndStr != '&') {
+        EndStr++;
+      }
+
+      *EndStr = '\0';
+    } else {
+      //
+      // For Buffer type, Skip the ConfigHdr part.
+      //
+      EndStr = StrStr (Progress, L"&OFFSET=");
+      *EndStr = '\0';
+    }
+
+    Progress = EndStr + 1;
+  }
+
+  //
+  // Prepare the "NAME" or "OFFSET=0x####&WIDTH=0x####" string.
+  //
+  if (Storage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
+    //
+    // For Name/Value type, the data is "&Fred=16&George=16&Ron=12" formset,
+    // here, just keep the "Fred" string.
+    //
+    EndStr = StrStr (Progress, L"=");
+    *EndStr = '\0';
+  } else {
+    //
+    // For Buffer type, the data is "OFFSET=0x####&WIDTH=0x####&VALUE=0x####",
+    // here, just keep the "OFFSET=0x####&WIDTH=0x####" string.
+    //
+    EndStr = StrStr (Progress, L"&VALUE=");
+    *EndStr = '\0';
+  }
+
+  //
+  // Search in the form list.
+  //
+  Link = GetFirstNode (&FormSet->FormListHead);
+  while (!IsNull (&FormSet->FormListHead, Link)) {
+    Form = FORM_BROWSER_FORM_FROM_LINK (Link);
+    Link = GetNextNode (&FormSet->FormListHead, Link);
+
+    //
+    // Search in the ConfigReqeust list in this form.
+    //
+    LinkStorage = GetFirstNode (&Form->ConfigRequestHead);
+    while (!IsNull (&Form->ConfigRequestHead, LinkStorage)) {
+      ConfigInfo = FORM_BROWSER_CONFIG_REQUEST_FROM_LINK (LinkStorage);
+      LinkStorage = GetNextNode (&Form->ConfigRequestHead, LinkStorage);
+
+      if (Storage != ConfigInfo->Storage) {
+        continue;
+      }
+
+      if (StrStr (ConfigInfo->ConfigRequest, Progress) != NULL) {
+        //
+        // Find the OffsetWidth string in this form.
+        //
+        *RetForm = Form;
+        break;
+      }
+    }
+
+    if (*RetForm != NULL) {
+      LinkStatement = GetFirstNode (&Form->StatementListHead);
+      while (!IsNull (&Form->StatementListHead, LinkStatement)) {
+        Statement = FORM_BROWSER_STATEMENT_FROM_LINK (LinkStatement);
+        LinkStatement = GetNextNode (&Form->StatementListHead, LinkStatement);
+
+        if (Statement->BlockName != NULL && StrStr (Statement->BlockName, Progress) != NULL) {
+          *RetQuestion = Statement;
+          break;
+        }
+      }
+    }
+
+    if (*RetForm != NULL) {
+      break;
+    }
+  }
+
+  //
+  // restore the OffsetWidth string to the original format.
+  //
+  if (Storage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
+    *EndStr = '=';
+  } else {
+    *EndStr = '&';
+  }
+
+  return *RetForm != NULL;
+}
+
+/**
+  Popup an save error info and get user input.
+
+  @param  TitleId                The form title id.
+  @param  HiiHandle              The hii handle for this package.
+
+  @retval UINT32                 The user select option for the save fail.
+                                 BROWSER_ACTION_DISCARD or BROWSER_ACTION_JUMP_TO_FORMSET
+**/
+UINT32
+ConfirmSaveFail (
+  IN EFI_STRING_ID    TitleId,
+  IN EFI_HII_HANDLE   HiiHandle
+  )
+{
+  CHAR16                  *FormTitle;
+  CHAR16                  *StringBuffer;
+  UINT32                  RetVal;
+
+  FormTitle = GetToken (TitleId, HiiHandle);
+
+  StringBuffer = AllocateZeroPool (256 * sizeof (CHAR16));
+  ASSERT (StringBuffer != NULL);
+
+  UnicodeSPrint (
+    StringBuffer, 
+    24 * sizeof (CHAR16) + StrSize (FormTitle), 
+    L"Submit Fail For Form: %s.", 
+    FormTitle
+    );
+
+  RetVal = PopupErrorMessage(BROWSER_SUBMIT_FAIL, NULL, NULL, StringBuffer);
+
+  FreePool (StringBuffer);
+  FreePool (FormTitle);
+
+  return RetVal;
+}
+
+/**
+  Popup an NO_SUBMIT_IF error info and get user input.
+
+  @param  TitleId                The form title id.
+  @param  HiiHandle              The hii handle for this package.
+
+  @retval UINT32                 The user select option for the save fail.
+                                 BROWSER_ACTION_DISCARD or BROWSER_ACTION_JUMP_TO_FORMSET
+**/
+UINT32
+ConfirmNoSubmitFail (
+  IN EFI_STRING_ID    TitleId,
+  IN EFI_HII_HANDLE   HiiHandle
+  )
+{
+  CHAR16                  *FormTitle;
+  CHAR16                  *StringBuffer;
+  UINT32                  RetVal;
+
+  FormTitle = GetToken (TitleId, HiiHandle);
+
+  StringBuffer = AllocateZeroPool (256 * sizeof (CHAR16));
+  ASSERT (StringBuffer != NULL);
+
+  UnicodeSPrint (
+    StringBuffer, 
+    24 * sizeof (CHAR16) + StrSize (FormTitle), 
+    L"NO_SUBMIT_IF error For Form: %s.", 
+    FormTitle
+    );
+
+  RetVal = PopupErrorMessage(BROWSER_SUBMIT_FAIL_NO_SUBMIT_IF, NULL, NULL, StringBuffer);
+
+  FreePool (StringBuffer);
+  FreePool (FormTitle);
+
+  return RetVal;
 }
 
 /**
@@ -2456,7 +2749,7 @@ DiscardForm (
       //
       // Prepare <ConfigResp>
       //
-      SynchronizeStorage(FormSet, ConfigInfo->Storage, ConfigInfo->ConfigRequest, FALSE);
+      SynchronizeStorage(ConfigInfo->Storage, ConfigInfo->ConfigRequest, FALSE);
 
       //
       // Call callback with Changed type to inform the driver.
@@ -2464,7 +2757,7 @@ DiscardForm (
       SendDiscardInfoToDriver (FormSet, Form);
     }
 
-    ValueChangeResetFlagUpdate (FALSE, NULL, Form);
+    ValueChangeResetFlagUpdate (FALSE, FormSet, Form);
   } else if (SettingScope == FormSetLevel && IsNvUpdateRequiredForFormSet (FormSet)) {
 
     //
@@ -2486,7 +2779,7 @@ DiscardForm (
         continue;
       }
 
-      SynchronizeStorage(FormSet, Storage->BrowserStorage, Storage->ConfigRequest, FALSE);
+      SynchronizeStorage(Storage->BrowserStorage, Storage->ConfigRequest, FALSE);
     }
 
     Link = GetFirstNode (&FormSet->FormListHead);
@@ -2538,6 +2831,435 @@ DiscardForm (
 }
 
 /**
+  Submit data for a form.
+
+  @param  FormSet                FormSet data structure.
+  @param  Form                   Form data structure.
+
+  @retval EFI_SUCCESS            The function completed successfully.
+  @retval EFI_UNSUPPORTED        Unsupport SettingScope.
+
+**/
+EFI_STATUS
+SubmitForForm (
+  IN FORM_BROWSER_FORMSET             *FormSet,
+  IN FORM_BROWSER_FORM                *Form
+  )
+{
+  EFI_STATUS              Status;
+  LIST_ENTRY              *Link;
+  EFI_STRING              ConfigResp;
+  EFI_STRING              Progress;
+  BROWSER_STORAGE         *Storage;
+  FORM_BROWSER_CONFIG_REQUEST  *ConfigInfo;
+
+  if (!IsNvUpdateRequiredForForm (Form)) {
+    return EFI_SUCCESS;
+  }
+
+  Status = NoSubmitCheck (FormSet, &Form, NULL);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Link = GetFirstNode (&Form->ConfigRequestHead);
+  while (!IsNull (&Form->ConfigRequestHead, Link)) {
+    ConfigInfo = FORM_BROWSER_CONFIG_REQUEST_FROM_LINK (Link);
+    Link = GetNextNode (&Form->ConfigRequestHead, Link);
+
+    Storage = ConfigInfo->Storage;
+    if (Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE) {
+      continue;
+    }
+
+    //
+    // Skip if there is no RequestElement
+    //
+    if (ConfigInfo->ElementCount == 0) {
+      continue;
+    }
+
+    //
+    // 1. Prepare <ConfigResp>
+    //
+    Status = StorageToConfigResp (ConfigInfo->Storage, &ConfigResp, ConfigInfo->ConfigRequest, TRUE);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // 2. Set value to hii config routine protocol.
+    //
+    Status = mHiiConfigRouting->RouteConfig (
+                                      mHiiConfigRouting,
+                                      ConfigResp,
+                                      &Progress
+                                      );
+    FreePool (ConfigResp);
+
+    if (EFI_ERROR (Status)) {
+      InsertTailList (&gBrowserSaveFailFormSetList, &ConfigInfo->SaveFailLink);
+      continue;
+    }
+
+    //
+    // 3. Config success, update storage shadow Buffer, only update the data belong to this form.
+    //
+    SynchronizeStorage (ConfigInfo->Storage, ConfigInfo->ConfigRequest, TRUE);
+  }
+
+  //
+  // 4. Process the save failed storage.
+  //
+  if (!IsListEmpty (&gBrowserSaveFailFormSetList)) {
+    if (ConfirmSaveFail (Form->FormTitle, FormSet->HiiHandle) == BROWSER_ACTION_DISCARD) {
+      Link = GetFirstNode (&gBrowserSaveFailFormSetList);
+      while (!IsNull (&gBrowserSaveFailFormSetList, Link)) {
+        ConfigInfo = FORM_BROWSER_CONFIG_REQUEST_FROM_SAVE_FAIL_LINK (Link);
+        Link = GetNextNode (&gBrowserSaveFailFormSetList, Link);
+
+        SynchronizeStorage(ConfigInfo->Storage, ConfigInfo->ConfigRequest, FALSE);
+
+        Status = EFI_SUCCESS;
+      }
+    } else {
+      Status = EFI_UNSUPPORTED;
+    }
+
+    //
+    // Free Form save fail list.
+    //
+    while (!IsListEmpty (&gBrowserSaveFailFormSetList)) {
+      Link = GetFirstNode (&gBrowserSaveFailFormSetList);
+      ConfigInfo = FORM_BROWSER_CONFIG_REQUEST_FROM_SAVE_FAIL_LINK (Link);
+      RemoveEntryList (&ConfigInfo->SaveFailLink);
+    }
+  }
+
+  //
+  // 5. Update the NV flag.
+  //
+  ValueChangeResetFlagUpdate(TRUE, FormSet, Form);
+
+  return Status;
+}
+
+/**
+  Submit data for a formset.
+
+  @param  FormSet                FormSet data structure.
+  @param  SkipProcessFail        Whether skip to process the save failed storage.
+                                 If submit formset is called when do system level save, 
+                                 set this value to true and process the failed formset 
+                                 together. 
+                                 if submit formset is called when do formset level save,
+                                 set the value to false and process the failed storage
+                                 right after process all storages for this formset.
+
+  @retval EFI_SUCCESS            The function completed successfully.
+  @retval EFI_UNSUPPORTED        Unsupport SettingScope.
+
+**/
+EFI_STATUS
+SubmitForFormSet (
+  IN FORM_BROWSER_FORMSET             *FormSet,
+  IN BOOLEAN                          SkipProcessFail
+  )
+{
+  EFI_STATUS              Status;
+  LIST_ENTRY              *Link;
+  EFI_STRING              ConfigResp;
+  EFI_STRING              Progress;
+  BROWSER_STORAGE         *Storage;
+  FORMSET_STORAGE         *FormSetStorage;
+  FORM_BROWSER_FORM       *Form;
+  BOOLEAN                 HasInserted;
+  FORM_BROWSER_STATEMENT  *Question;
+
+  HasInserted = FALSE;
+
+  if (!IsNvUpdateRequiredForFormSet (FormSet)) {
+    return EFI_SUCCESS;
+  }
+
+  Form = NULL; 
+  Status = NoSubmitCheck (FormSet, &Form, &Question);
+  if (EFI_ERROR (Status)) {
+    if (SkipProcessFail) {
+      //
+      // Process NO_SUBMIT check first, so insert it at head.
+      //
+      FormSet->SaveFailForm = Form;
+      FormSet->SaveFailStatement = Question;
+      InsertHeadList (&gBrowserSaveFailFormSetList, &FormSet->SaveFailLink);
+    }
+
+    return Status;
+  }
+
+  Form = NULL;
+  Question = NULL;
+  //
+  // Submit Buffer storage or Name/Value storage
+  //
+  Link = GetFirstNode (&FormSet->StorageListHead);
+  while (!IsNull (&FormSet->StorageListHead, Link)) {
+    FormSetStorage = FORMSET_STORAGE_FROM_LINK (Link);
+    Storage        = FormSetStorage->BrowserStorage;
+    Link = GetNextNode (&FormSet->StorageListHead, Link);
+
+    if (Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE) {
+      continue;
+    }
+
+    //
+    // Skip if there is no RequestElement
+    //
+    if (FormSetStorage->ElementCount == 0) {
+      continue;
+    }
+
+    //
+    // 1. Prepare <ConfigResp>
+    //
+    Status = StorageToConfigResp (Storage, &ConfigResp, FormSetStorage->ConfigRequest, TRUE);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // 2. Send <ConfigResp> to Routine config Protocol.
+    //
+    Status = mHiiConfigRouting->RouteConfig (
+                                      mHiiConfigRouting,
+                                      ConfigResp,
+                                      &Progress
+                                      );
+    if (EFI_ERROR (Status)) {
+      InsertTailList (&FormSet->SaveFailStorageListHead, &FormSetStorage->SaveFailLink);
+      if (!HasInserted) {
+        //
+        // Call submit formset for system level, save the formset info
+        // and process later.
+        //
+        FindQuestionFromProgress(FormSet, Storage, Progress, &Form, &Question);
+        ASSERT (Form != NULL && Question != NULL);
+        FormSet->SaveFailForm = Form;
+        FormSet->SaveFailStatement = Question;
+        if (SkipProcessFail) {
+          InsertTailList (&gBrowserSaveFailFormSetList, &FormSet->SaveFailLink);
+        }
+        HasInserted = TRUE;
+      }
+
+      FreePool (ConfigResp);
+      continue;
+    }
+
+    FreePool (ConfigResp);
+    //
+    // 3. Config success, update storage shadow Buffer
+    //
+    SynchronizeStorage (Storage, FormSetStorage->ConfigRequest, TRUE);
+  }
+
+  //
+  // 4. Has save fail storage need to handle.
+  //
+  if (Form != NULL) {
+    if (!SkipProcessFail) {
+      //
+      // If not in system level, just handl the save failed storage here.
+      //
+      if (ConfirmSaveFail (Form->FormTitle, FormSet->HiiHandle) == BROWSER_ACTION_DISCARD) {
+        Link = GetFirstNode (&FormSet->SaveFailStorageListHead);
+        while (!IsNull (&FormSet->SaveFailStorageListHead, Link)) {
+          FormSetStorage = FORMSET_STORAGE_FROM_SAVE_FAIL_LINK (Link);
+          Storage        = FormSetStorage->BrowserStorage;
+          Link = GetNextNode (&FormSet->SaveFailStorageListHead, Link);
+
+          SynchronizeStorage(FormSetStorage->BrowserStorage, FormSetStorage->ConfigRequest, FALSE);
+
+          Status = EFI_SUCCESS;
+        }
+      } else {
+        UiCopyMenuList(&mPrivateData.FormBrowserEx2.FormViewHistoryHead, &Form->FormViewListHead);
+
+        gCurrentSelection->Action = UI_ACTION_REFRESH_FORMSET;
+        gCurrentSelection->Handle = FormSet->HiiHandle;
+        CopyGuid (&gCurrentSelection->FormSetGuid, &FormSet->Guid);
+        gCurrentSelection->FormId = Form->FormId;
+        gCurrentSelection->QuestionId = Question->QuestionId;
+
+        Status = EFI_UNSUPPORTED;
+      }
+
+      //
+      // Free FormSet save fail list.
+      //
+      while (!IsListEmpty (&FormSet->SaveFailStorageListHead)) {
+        Link = GetFirstNode (&FormSet->SaveFailStorageListHead);
+        FormSetStorage = FORMSET_STORAGE_FROM_SAVE_FAIL_LINK (Link);
+        RemoveEntryList (&FormSetStorage->SaveFailLink);
+      }
+    } else {
+      //
+      // If in system level, just return error and handle the failed formset later.
+      //
+      Status = EFI_UNSUPPORTED;
+    }
+  }
+
+  //
+  // 5. Update the NV flag.
+  // 
+  ValueChangeResetFlagUpdate(TRUE, FormSet, NULL);
+
+  return Status;
+}
+
+/**
+  Submit data for all formsets.
+
+  @retval EFI_SUCCESS            The function completed successfully.
+  @retval EFI_UNSUPPORTED        Unsupport SettingScope.
+
+**/
+EFI_STATUS
+SubmitForSystem (
+  VOID
+  )
+{
+  EFI_STATUS              Status;
+  LIST_ENTRY              *Link;
+  LIST_ENTRY              *StorageLink;
+  BROWSER_STORAGE         *Storage;
+  FORMSET_STORAGE         *FormSetStorage;
+  FORM_BROWSER_FORM       *Form;
+  FORM_BROWSER_FORMSET    *LocalFormSet;
+  UINT32                  UserSelection;
+  FORM_BROWSER_STATEMENT  *Question;
+
+  mSystemSubmit = TRUE;
+  Link = GetFirstNode (&gBrowserFormSetList);
+  while (!IsNull (&gBrowserFormSetList, Link)) {
+    LocalFormSet = FORM_BROWSER_FORMSET_FROM_LINK (Link);
+    Link = GetNextNode (&gBrowserFormSetList, Link);
+    if (!ValidateFormSet(LocalFormSet)) {
+      continue;
+    }
+
+    Status = SubmitForFormSet (LocalFormSet, TRUE);
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    //
+    // Remove maintain backup list after save except for the current using FormSet.
+    //  
+    if (!IsHiiHandleInBrowserContext (LocalFormSet->HiiHandle)) {
+      CleanBrowserStorage(LocalFormSet);
+      RemoveEntryList (&LocalFormSet->Link);
+      DestroyFormSet (LocalFormSet);
+    }
+  }
+  mSystemSubmit = FALSE;
+
+  Status = EFI_SUCCESS;
+
+  //
+  // Process the save failed formsets.
+  //
+  Link = GetFirstNode (&gBrowserSaveFailFormSetList);
+  while (!IsNull (&gBrowserSaveFailFormSetList, Link)) {
+    LocalFormSet = FORM_BROWSER_FORMSET_FROM_SAVE_FAIL_LINK (Link);
+    Link = GetNextNode (&gBrowserSaveFailFormSetList, Link);
+
+    if (!ValidateFormSet(LocalFormSet)) {
+      continue;
+    }
+
+    Form = LocalFormSet->SaveFailForm;
+    Question= LocalFormSet->SaveFailStatement;
+
+    //
+    // Confirm with user, get user input.
+    //
+    if (IsListEmpty (&LocalFormSet->SaveFailStorageListHead)) {
+      //
+      // NULL for SaveFailStorageListHead means error caused by NO_SUBMIT_IF check.
+      //
+      UserSelection = ConfirmNoSubmitFail (Form->FormTitle, LocalFormSet->HiiHandle);
+    } else {
+      UserSelection = ConfirmSaveFail (Form->FormTitle, LocalFormSet->HiiHandle);
+    }
+
+    if (UserSelection == BROWSER_ACTION_DISCARD) {
+      if (IsListEmpty (&LocalFormSet->SaveFailStorageListHead)) {
+        StorageLink = GetFirstNode (&LocalFormSet->StorageListHead);
+        while (!IsNull (&LocalFormSet->StorageListHead, StorageLink)) {
+          FormSetStorage = FORMSET_STORAGE_FROM_LINK (StorageLink);
+          Storage        = FormSetStorage->BrowserStorage;
+          StorageLink = GetNextNode (&LocalFormSet->StorageListHead, StorageLink);
+
+          SynchronizeStorage(FormSetStorage->BrowserStorage, FormSetStorage->ConfigRequest, FALSE);
+        }
+      } else {
+        StorageLink = GetFirstNode (&LocalFormSet->SaveFailStorageListHead);
+        while (!IsNull (&LocalFormSet->SaveFailStorageListHead, StorageLink)) {
+          FormSetStorage = FORMSET_STORAGE_FROM_SAVE_FAIL_LINK (StorageLink);
+          Storage        = FormSetStorage->BrowserStorage;
+          StorageLink = GetNextNode (&LocalFormSet->SaveFailStorageListHead, StorageLink);
+
+          SynchronizeStorage(FormSetStorage->BrowserStorage, FormSetStorage->ConfigRequest, FALSE);
+        }
+      }
+
+      if (!IsHiiHandleInBrowserContext (LocalFormSet->HiiHandle)) {
+        CleanBrowserStorage(LocalFormSet);
+        RemoveEntryList (&LocalFormSet->Link);
+        RemoveEntryList (&LocalFormSet->SaveFailLink);
+        DestroyFormSet (LocalFormSet);
+      } else {
+        ValueChangeResetFlagUpdate(FALSE, LocalFormSet, NULL);
+      }
+    } else {
+      if (IsListEmpty (&LocalFormSet->SaveFailStorageListHead)) {
+        NoSubmitCheck (LocalFormSet, &Form, &Question);
+      }
+
+      UiCopyMenuList(&mPrivateData.FormBrowserEx2.FormViewHistoryHead, &Form->FormViewListHead);
+
+      gCurrentSelection->Action = UI_ACTION_REFRESH_FORMSET;
+      gCurrentSelection->Handle = LocalFormSet->HiiHandle;
+      CopyGuid (&gCurrentSelection->FormSetGuid, &LocalFormSet->Guid);
+      gCurrentSelection->FormId = Form->FormId;
+      gCurrentSelection->QuestionId = Question->QuestionId;
+
+      Status = EFI_UNSUPPORTED;
+      break;
+    }
+  }
+
+  //
+  // Clean the list which will not process.
+  //
+  while (!IsListEmpty (&gBrowserSaveFailFormSetList)) {
+    Link = GetFirstNode (&gBrowserSaveFailFormSetList);
+    LocalFormSet = FORM_BROWSER_FORMSET_FROM_SAVE_FAIL_LINK (Link);
+    RemoveEntryList (&LocalFormSet->SaveFailLink);
+
+    while (!IsListEmpty (&LocalFormSet->SaveFailStorageListHead)) {
+      StorageLink = GetFirstNode (&LocalFormSet->SaveFailStorageListHead);
+      FormSetStorage = FORMSET_STORAGE_FROM_SAVE_FAIL_LINK (StorageLink);
+      RemoveEntryList (&FormSetStorage->SaveFailLink);
+    }
+  }
+
+  return Status;
+}
+
+/**
   Submit data based on the input Setting level (Form, FormSet or System).
 
   @param  FormSet                FormSet data structure.
@@ -2556,166 +3278,26 @@ SubmitForm (
   )
 {
   EFI_STATUS              Status;
-  LIST_ENTRY              *Link;
-  EFI_STRING              ConfigResp;
-  EFI_STRING              Progress;
-  BROWSER_STORAGE         *Storage;
-  FORMSET_STORAGE         *FormSetStorage;
-  FORM_BROWSER_FORMSET    *LocalFormSet;
-  FORM_BROWSER_CONFIG_REQUEST  *ConfigInfo;
 
-  //
-  // Check the supported setting level.
-  //
-  if (SettingScope >= MaxLevel) {
-    return EFI_UNSUPPORTED;
+  switch (SettingScope) {
+  case FormLevel:
+    Status = SubmitForForm(FormSet, Form);
+    break;
+
+  case FormSetLevel:
+    Status = SubmitForFormSet (FormSet, FALSE);
+    break;
+
+  case SystemLevel:
+    Status = SubmitForSystem ();
+    break;
+
+  default:
+    Status = EFI_UNSUPPORTED;
+    break;
   }
 
-  //
-  // Validate the Form by NoSubmit check
-  //
-  Status = EFI_SUCCESS;
-  if (SettingScope == FormLevel) {
-    Status = NoSubmitCheck (FormSet, Form);
-  } else if (SettingScope == FormSetLevel) {
-    Status = NoSubmitCheck (FormSet, NULL);
-  }
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  if (SettingScope == FormLevel && IsNvUpdateRequiredForForm (Form)) {
-    ConfigInfo = NULL;
-    Link = GetFirstNode (&Form->ConfigRequestHead);
-    while (!IsNull (&Form->ConfigRequestHead, Link)) {
-      ConfigInfo = FORM_BROWSER_CONFIG_REQUEST_FROM_LINK (Link);
-      Link = GetNextNode (&Form->ConfigRequestHead, Link);
-
-      Storage = ConfigInfo->Storage;
-      if (Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE) {
-        continue;
-      }
-
-      //
-      // Skip if there is no RequestElement
-      //
-      if (ConfigInfo->ElementCount == 0) {
-        continue;
-      }
-
-      //
-      // 1. Prepare <ConfigResp>
-      //
-      Status = StorageToConfigResp (ConfigInfo->Storage, &ConfigResp, ConfigInfo->ConfigRequest, TRUE);
-      if (EFI_ERROR (Status)) {
-        return Status;
-      }
-
-      //
-      // 2. Set value to hii config routine protocol.
-      //
-      Status = mHiiConfigRouting->RouteConfig (
-                                        mHiiConfigRouting,
-                                        ConfigResp,
-                                        &Progress
-                                        );
-      if (EFI_ERROR (Status)) {
-        FreePool (ConfigResp);
-        return Status;
-      }
-
-      FreePool (ConfigResp);
-      //
-      // 3. Config success, update storage shadow Buffer, only update the data belong to this form.
-      //
-      SynchronizeStorage (FormSet, ConfigInfo->Storage, ConfigInfo->ConfigRequest, TRUE);
-    }
-
-    //
-    // 4. Update the NV flag.
-    // 
-    ValueChangeResetFlagUpdate(TRUE, NULL, Form);
-  } else if (SettingScope == FormSetLevel && IsNvUpdateRequiredForFormSet (FormSet)) {
-    //
-    // Submit Buffer storage or Name/Value storage
-    //
-    Link = GetFirstNode (&FormSet->StorageListHead);
-    while (!IsNull (&FormSet->StorageListHead, Link)) {
-      FormSetStorage = (FORMSET_STORAGE_FROM_LINK (Link));
-      Storage        = FormSetStorage->BrowserStorage;
-      Link = GetNextNode (&FormSet->StorageListHead, Link);
-
-      if (Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE) {
-        continue;
-      }
-
-      //
-      // Skip if there is no RequestElement
-      //
-      if (FormSetStorage->ElementCount == 0) {
-        continue;
-      }
-
-      //
-      // 1. Prepare <ConfigResp>
-      //
-      Status = StorageToConfigResp (Storage, &ConfigResp, FormSetStorage->ConfigRequest, TRUE);
-      if (EFI_ERROR (Status)) {
-        return Status;
-      }
-
-      //
-      // 2. Send <ConfigResp> to Routine config Protocol.
-      //
-      Status = mHiiConfigRouting->RouteConfig (
-                                        mHiiConfigRouting,
-                                        ConfigResp,
-                                        &Progress
-                                        );
-      if (EFI_ERROR (Status)) {
-        FreePool (ConfigResp);
-        return Status;
-      }
-
-      FreePool (ConfigResp);
-      //
-      // 3. Config success, update storage shadow Buffer
-      //
-      SynchronizeStorage (FormSet, Storage, FormSetStorage->ConfigRequest, TRUE);
-    }
-
-    //
-    // 4. Update the NV flag.
-    // 
-    ValueChangeResetFlagUpdate(TRUE, FormSet, NULL);
-  } else if (SettingScope == SystemLevel) {
-    //
-    // System Level Save.
-    //
-
-    //
-    // Save changed value for each FormSet in the maintain list.
-    //
-    Link = GetFirstNode (&gBrowserFormSetList);
-    while (!IsNull (&gBrowserFormSetList, Link)) {
-      LocalFormSet = FORM_BROWSER_FORMSET_FROM_LINK (Link);
-      Link = GetNextNode (&gBrowserFormSetList, Link);
-      if (!ValidateFormSet(LocalFormSet)) {
-        continue;
-      }
-      SubmitForm (LocalFormSet, NULL, FormSetLevel);
-      if (!IsHiiHandleInBrowserContext (LocalFormSet->HiiHandle)) {
-        //
-        // Remove maintain backup list after save except for the current using FormSet.
-        //
-        CleanBrowserStorage(LocalFormSet);
-        RemoveEntryList (&LocalFormSet->Link);
-        DestroyFormSet (LocalFormSet);
-      }
-    }
-  }
-
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
@@ -3520,6 +4102,8 @@ IsQuestionValueChanged (
 {
   EFI_HII_VALUE    BackUpValue;
   CHAR8            *BackUpBuffer;
+  EFI_HII_VALUE    BackUpValue2;
+  CHAR8            *BackUpBuffer2;
   EFI_STATUS       Status;
   BOOLEAN          ValueChanged;
   UINTN            BufferWidth;
@@ -3532,6 +4116,7 @@ IsQuestionValueChanged (
   }
 
   BackUpBuffer = NULL;
+  BackUpBuffer2 = NULL;
   ValueChanged = FALSE;
 
   switch (Question->Operand) {
@@ -3554,12 +4139,45 @@ IsQuestionValueChanged (
   }
   CopyMem (&BackUpValue, &Question->HiiValue, sizeof (EFI_HII_VALUE));
 
-  Status = GetQuestionValue (FormSet, Form, Question, GetValueFrom);
-  ASSERT_EFI_ERROR(Status);
+  if (GetValueFrom == GetSetValueWithBothBuffer) {
+    Status = GetQuestionValue (FormSet, Form, Question, GetSetValueWithEditBuffer);
+    ASSERT_EFI_ERROR(Status);
 
-  if (CompareMem (&BackUpValue, &Question->HiiValue, sizeof (EFI_HII_VALUE)) != 0 ||
-      CompareMem (BackUpBuffer, Question->BufferValue, BufferWidth) != 0) {
-    ValueChanged = TRUE;
+    switch (Question->Operand) {
+      case EFI_IFR_ORDERED_LIST_OP:
+        BufferWidth  = Question->StorageWidth;
+        BackUpBuffer2 = AllocateCopyPool (BufferWidth, Question->BufferValue);
+        ASSERT (BackUpBuffer2 != NULL);
+        break;
+
+      case EFI_IFR_STRING_OP:
+      case EFI_IFR_PASSWORD_OP:
+        BufferWidth  = (UINTN) Question->Maximum * sizeof (CHAR16);
+        BackUpBuffer2 = AllocateCopyPool (BufferWidth, Question->BufferValue);
+        ASSERT (BackUpBuffer2 != NULL);
+        break;
+
+      default:
+        BufferWidth = 0;
+        break;
+    }
+    CopyMem (&BackUpValue2, &Question->HiiValue, sizeof (EFI_HII_VALUE));
+
+    Status = GetQuestionValue (FormSet, Form, Question, GetSetValueWithBuffer);
+    ASSERT_EFI_ERROR(Status);
+
+    if (CompareMem (&BackUpValue2, &Question->HiiValue, sizeof (EFI_HII_VALUE)) != 0 ||
+        CompareMem (BackUpBuffer2, Question->BufferValue, BufferWidth) != 0) {
+      ValueChanged = TRUE;
+    }
+  } else {
+    Status = GetQuestionValue (FormSet, Form, Question, GetValueFrom);
+    ASSERT_EFI_ERROR(Status);
+
+    if (CompareMem (&BackUpValue, &Question->HiiValue, sizeof (EFI_HII_VALUE)) != 0 ||
+        CompareMem (BackUpBuffer, Question->BufferValue, BufferWidth) != 0) {
+      ValueChanged = TRUE;
+    }
   }
 
   CopyMem (&Question->HiiValue, &BackUpValue, sizeof (EFI_HII_VALUE));
@@ -3567,6 +4185,10 @@ IsQuestionValueChanged (
 
   if (BackUpBuffer != NULL) {
     FreePool (BackUpBuffer);
+  }
+
+  if (BackUpBuffer2 != NULL) {
+    FreePool (BackUpBuffer2);
   }
 
   Question->ValueChanged = ValueChanged;
@@ -4272,7 +4894,7 @@ LoadStorage (
   //
   // Input NULL for ConfigRequest field means sync all fields from editbuffer to buffer. 
   //
-  SynchronizeStorage(FormSet, Storage->BrowserStorage, NULL, TRUE);
+  SynchronizeStorage(Storage->BrowserStorage, NULL, TRUE);
 
   if (Storage->BrowserStorage->Type != EFI_HII_VARSTORE_NAME_VALUE) {
     if (ConfigRequest != NULL) {

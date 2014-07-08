@@ -913,6 +913,8 @@ DestroyForm (
     FreePool (Form->SuppressExpression);
   }
 
+  UiFreeMenuList (&Form->FormViewListHead);
+
   //
   // Free this Form
   //
@@ -1227,6 +1229,7 @@ ParseOpCodes (
 
   InitializeListHead (&FormSet->StatementListOSF);
   InitializeListHead (&FormSet->StorageListHead);
+  InitializeListHead (&FormSet->SaveFailStorageListHead);
   InitializeListHead (&FormSet->DefaultStoreListHead);
   InitializeListHead (&FormSet->FormListHead);
   InitializeListHead (&FormSet->ExpressionListHead);
@@ -1604,6 +1607,7 @@ ParseOpCodes (
       InitializeListHead (&CurrentForm->ExpressionListHead);
       InitializeListHead (&CurrentForm->StatementListHead);
       InitializeListHead (&CurrentForm->ConfigRequestHead);
+      InitializeListHead (&CurrentForm->FormViewListHead);
 
       CurrentForm->FormType = STANDARD_MAP_FORM_TYPE;
       CopyMem (&CurrentForm->FormId,    &((EFI_IFR_FORM *) OpCodeData)->FormId,    sizeof (UINT16));
@@ -1645,6 +1649,8 @@ ParseOpCodes (
       InitializeListHead (&CurrentForm->ExpressionListHead);
       InitializeListHead (&CurrentForm->StatementListHead);
       InitializeListHead (&CurrentForm->ConfigRequestHead);
+      InitializeListHead (&CurrentForm->FormViewListHead);
+
       CopyMem (&CurrentForm->FormId, &((EFI_IFR_FORM *) OpCodeData)->FormId, sizeof (UINT16));
 
       MapMethod = (EFI_IFR_FORM_MAP_METHOD *) (OpCodeData + sizeof (EFI_IFR_FORM_MAP));

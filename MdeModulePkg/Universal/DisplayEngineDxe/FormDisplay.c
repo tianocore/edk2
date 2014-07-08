@@ -117,6 +117,12 @@ CHAR16            *gFormNotFound;
 CHAR16            *gNoSubmitIf;
 CHAR16            *gBrwoserError;
 CHAR16            *gSaveFailed;
+CHAR16            *gNoSubmitIfFailed;
+CHAR16            *gSaveProcess;
+CHAR16            *gSaveNoSubmitProcess;
+CHAR16            *gDiscardChange;
+CHAR16            *gJumpToFormSet;
+CHAR16            *gCheckError;
 CHAR16            *gPromptForData;
 CHAR16            *gPromptForPassword;
 CHAR16            *gPromptForNewPassword;
@@ -186,6 +192,12 @@ InitializeDisplayStrings (
 {
   mUnknownString        = GetToken (STRING_TOKEN (UNKNOWN_STRING), gHiiHandle);
   gSaveFailed           = GetToken (STRING_TOKEN (SAVE_FAILED), gHiiHandle);
+  gNoSubmitIfFailed     = GetToken (STRING_TOKEN (NO_SUBMIT_IF_CHECK_FAILED), gHiiHandle);
+  gSaveProcess          = GetToken (STRING_TOKEN (DISCARD_OR_JUMP), gHiiHandle);
+  gSaveNoSubmitProcess  = GetToken (STRING_TOKEN (DISCARD_OR_CHECK), gHiiHandle);
+  gDiscardChange        = GetToken (STRING_TOKEN (DISCARD_OR_JUMP_DISCARD), gHiiHandle);
+  gJumpToFormSet        = GetToken (STRING_TOKEN (DISCARD_OR_JUMP_JUMP), gHiiHandle);
+  gCheckError           = GetToken (STRING_TOKEN (DISCARD_OR_CHECK_CHECK), gHiiHandle);
   gPromptForData        = GetToken (STRING_TOKEN (PROMPT_FOR_DATA), gHiiHandle);
   gPromptForPassword    = GetToken (STRING_TOKEN (PROMPT_FOR_PASSWORD), gHiiHandle);
   gPromptForNewPassword = GetToken (STRING_TOKEN (PROMPT_FOR_NEW_PASSWORD), gHiiHandle);
@@ -216,6 +228,12 @@ FreeDisplayStrings (
   FreePool (mUnknownString);
   FreePool (gEmptyString);
   FreePool (gSaveFailed);
+  FreePool (gNoSubmitIfFailed);
+  FreePool (gSaveProcess);
+  FreePool (gSaveNoSubmitProcess);
+  FreePool (gDiscardChange);
+  FreePool (gJumpToFormSet);
+  FreePool (gCheckError);
   FreePool (gPromptForData);
   FreePool (gPromptForPassword);
   FreePool (gPromptForNewPassword);
@@ -3208,6 +3226,9 @@ BrowserStatusProcess (
   WARNING_IF_CONTEXT EventContext;
   EFI_IFR_OP_HEADER  *OpCodeBuf;
   EFI_STRING_ID      StringToken;
+  CHAR16             DiscardChange;
+  CHAR16             JumpToFormSet;
+  CHAR16             *PrintString;
 
   if (gFormData->BrowserStatus == BROWSER_SUCCESS) {
     return;
@@ -3263,62 +3284,94 @@ BrowserStatusProcess (
       ErrorInfo = gProtocolNotFound;
       break;
 
+    case BROWSER_SUBMIT_FAIL_NO_SUBMIT_IF:
+      ErrorInfo = gNoSubmitIfFailed;
+      break;
+
     default:
       ErrorInfo = gBrwoserError;
       break;
     }
   }
 
-  if (TimeOut == 0) {
+  switch (gFormData->BrowserStatus) {
+  case BROWSER_SUBMIT_FAIL:
+  case BROWSER_SUBMIT_FAIL_NO_SUBMIT_IF:
+    ASSERT (gUserInput != NULL);
+    if (gFormData->BrowserStatus == (BROWSER_SUBMIT_FAIL)) {
+      PrintString = gSaveProcess;
+      JumpToFormSet = gJumpToFormSet[0];
+    } else {
+      PrintString = gSaveNoSubmitProcess;
+      JumpToFormSet = gCheckError[0];
+    }
+    DiscardChange = gDiscardChange[0];
+
     do {
-      CreateDialog (&Key, gEmptyString, ErrorInfo, gPressEnter, gEmptyString, NULL);
-    } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
-  } else {
-    Status = gBS->CreateEvent (EVT_NOTIFY_WAIT, TPL_CALLBACK, EmptyEventProcess, NULL, &TimeOutEvent);
-    ASSERT_EFI_ERROR (Status);
+      CreateDialog (&Key, gEmptyString, ErrorInfo, PrintString, gEmptyString, NULL);
+    } while (((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) != (DiscardChange | UPPER_LOWER_CASE_OFFSET)) &&
+             ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) != (JumpToFormSet | UPPER_LOWER_CASE_OFFSET)));
 
-    EventContext.SyncEvent = TimeOutEvent;
-    EventContext.TimeOut   = &TimeOut;
-    EventContext.ErrorInfo = ErrorInfo;
+    if ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) == (DiscardChange | UPPER_LOWER_CASE_OFFSET)) {
+      gUserInput->Action = BROWSER_ACTION_DISCARD;
+    } else {
+      gUserInput->Action = BROWSER_ACTION_GOTO;
+    }
+    break;
 
-    Status = gBS->CreateEvent (EVT_TIMER | EVT_NOTIFY_SIGNAL, TPL_CALLBACK, RefreshTimeOutProcess, &EventContext, &RefreshIntervalEvent);
-    ASSERT_EFI_ERROR (Status);
-
-    //
-    // Show the dialog first to avoid long time not reaction.
-    //
-    gBS->SignalEvent (RefreshIntervalEvent);
-
-    Status = gBS->SetTimer (RefreshIntervalEvent, TimerPeriodic, ONE_SECOND);
-    ASSERT_EFI_ERROR (Status);
-
-    while (TRUE) {
-      Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-      if (!EFI_ERROR (Status) && Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
-        break;
-      }
-
-      if (Status != EFI_NOT_READY) {
-        continue;
-      }
-
-      WaitList[0] = TimeOutEvent;
-      WaitList[1] = gST->ConIn->WaitForKey;
-
-      Status = gBS->WaitForEvent (2, WaitList, &Index);
+  default:
+    if (TimeOut == 0) {
+      do {
+        CreateDialog (&Key, gEmptyString, ErrorInfo, gPressEnter, gEmptyString, NULL);
+      } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+    } else {
+      Status = gBS->CreateEvent (EVT_NOTIFY_WAIT, TPL_CALLBACK, EmptyEventProcess, NULL, &TimeOutEvent);
       ASSERT_EFI_ERROR (Status);
 
-      if (Index == 0) {
-        //
-        // Timeout occur, close the hoot time out event.
-        //
-        break;
-      }
-    }
-  }
+      EventContext.SyncEvent = TimeOutEvent;
+      EventContext.TimeOut   = &TimeOut;
+      EventContext.ErrorInfo = ErrorInfo;
 
-  gBS->CloseEvent (TimeOutEvent);
-  gBS->CloseEvent (RefreshIntervalEvent);
+      Status = gBS->CreateEvent (EVT_TIMER | EVT_NOTIFY_SIGNAL, TPL_CALLBACK, RefreshTimeOutProcess, &EventContext, &RefreshIntervalEvent);
+      ASSERT_EFI_ERROR (Status);
+
+      //
+      // Show the dialog first to avoid long time not reaction.
+      //
+      gBS->SignalEvent (RefreshIntervalEvent);
+    
+      Status = gBS->SetTimer (RefreshIntervalEvent, TimerPeriodic, ONE_SECOND);
+      ASSERT_EFI_ERROR (Status);
+
+      while (TRUE) {
+        Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+        if (!EFI_ERROR (Status) && Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
+          break;
+        }
+
+        if (Status != EFI_NOT_READY) {
+          continue;
+        }
+
+        WaitList[0] = TimeOutEvent;
+        WaitList[1] = gST->ConIn->WaitForKey;
+
+        Status = gBS->WaitForEvent (2, WaitList, &Index);
+        ASSERT_EFI_ERROR (Status);
+
+        if (Index == 0) {
+          //
+          // Timeout occur, close the hoot time out event.
+          //
+          break;
+        }
+      }
+
+      gBS->CloseEvent (TimeOutEvent);
+      gBS->CloseEvent (RefreshIntervalEvent);
+    }
+    break;
+  }
 
   if (StringToken != 0) {
     FreePool (ErrorInfo);
@@ -3357,9 +3410,9 @@ FormDisplay (
   // Process the status info first.
   //
   BrowserStatusProcess();
-  if (UserInputData == NULL) {
+  if (gFormData->BrowserStatus != BROWSER_SUCCESS) {
     //
-    // UserInputData == NULL, means only need to print the error info, return here.
+    // gFormData->BrowserStatus != BROWSER_SUCCESS, means only need to print the error info, return here.
     //
     return EFI_SUCCESS;
   }
