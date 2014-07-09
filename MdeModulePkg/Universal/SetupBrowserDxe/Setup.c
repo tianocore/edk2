@@ -2616,7 +2616,7 @@ FindQuestionFromProgress (
     *EndStr = '&';
   }
 
-  return *RetForm != NULL;
+  return (*RetForm != NULL);
 }
 
 /**
