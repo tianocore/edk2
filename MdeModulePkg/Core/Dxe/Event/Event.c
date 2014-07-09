@@ -1,7 +1,7 @@
 /** @file
   UEFI Event support functions implemented in this file.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -673,6 +673,14 @@ CoreWaitForEvent (
     return EFI_UNSUPPORTED;
   }
 
+  if (NumberOfEvents == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (UserEvents == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   for(;;) {
 
     for(Index = 0; Index < NumberOfEvents; Index++) {
@@ -683,7 +691,9 @@ CoreWaitForEvent (
       // provide index of event that caused problem
       //
       if (Status != EFI_NOT_READY) {
-        *UserIndex = Index;
+        if (UserIndex != NULL) {
+          *UserIndex = Index;
+        }
         return Status;
       }
     }
