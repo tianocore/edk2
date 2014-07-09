@@ -56,42 +56,26 @@ B. Build DUET image on Linux Platform
 ======================================        
 1. Tools preparation
 
-	To build DUET image, Mingw GCC is required:
-	
-		1).  Check out build tools project from svn repository: https://svn.code.sf.net/p/edk2-buildtools/code/trunk/BaseTools
-		2).  Assume check out directory is /EDKII/BaseTools, enter /EDKII/BaseTools/gcc directory. Please refer to README.txt install all the necessary
-			 build packages following:
-			 * Python 2.5
-			 * texinfo
-             * bison
-             * flex
-             * libmpfr
-             * libgmp 
-             * As well as (possibly) others tools and development packages
-             
-		3).  Run mingw-gcc-install.py from gcc folder, this script will download/build/install MingwGCC and BinUtil automatically
-		4).  Create symbol link in linux environment at /opt to match default setting in tools_def.txt
-			 "ln -s /EDKII/BaseTools/gcc/symlinks/ar   /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin/ar"
-			 "ln -s /EDKII/BaseTools/gcc/symlinks/gcc  /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin/gcc"
-			 "ln -s /EDKII/BaseTools/gcc/symlinks/ld   /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin/ld"
-		
-	
+  To build DUET image, GCC44 is required:
+  1). Base on below link to create GCC44 build environment.
+      http://tianocore.sourceforge.net/wiki/Using_EDK_II_with_Native_GCC
+
 2. Build steps
 
 2.1 Build Duet Platform module   
 
-  1). run cmd.exe to open command line window.
-  2). enter workspace root directory such as /R9_tree
-  2). run "edksetup.sh BaseTools"
-  3). run "build -p DuetPkg/DuetPkg.dsc -a IA32 -t UNIXGCC" for IA32 architecture platform or 
-          "build -p DuetPkg/DuetPkg.dsc -a X64 -t UNIXGCC" for X64 architecture platform.
+  1). Open the terminal.
+  2). enter workspace root directory such as /edk2_tree
+  3). run ". edksetup.sh BaseTools"
+  4). run "build -p DuetPkg/DuetPkg.dsc -a IA32 -t GCC44" for IA32 architecture platform or 
+          "build -p DuetPkg/DuetPkg.dsc -a X64 -t GCC44" for X64 architecture platform.
   
 2.2 Execute post build actions  
-  1). enter /R9_tree/DuetPkg directory.
-  2). run "./PostBuild.sh IA32" for IA32 architecture platform or 
-          "./PostBuild.sh X64" for X64 architecture platform.
+  1). enter /edk2_tree/DuetPkg directory.
+  2). run "./PostBuild.sh IA32 GCC44" for IA32 architecture platform or 
+          "./PostBuild.sh X64 GCC44" for X64 architecture platform.
 
- NOTE: After post build action, you should check the size of EfiLdr at $WORKSPACE/Build/DuetPkg/DEBUG_UNIXGCC directory, it must less than 470k.
+ NOTE: After post build action, you should check the size of EfiLdr at $WORKSPACE/Build/DuetPkg/DEBUG_GCC44 directory, it must less than 470k.
        If not, you should manually remove some unnecessary drivers at DuetPkg.fdf file.
  
 3. Create bootable disk
@@ -99,7 +83,7 @@ B. Build DUET image on Linux Platform
    Now only support floopy.
    
    3.1 Create floppy boot disk
-	  1). enter /R9_tree/DuetPkg directory.
+	  1). enter /edk2_tree/DuetPkg directory.
 	  2). Insert a floppy disk to drive
 	  3). run "CreateBootDisk.sh" to build floppy drive
 		  such as "./CreateBootDisk.sh floppy /media/floppy0 /dev/fd0 FAT12 IA32"
