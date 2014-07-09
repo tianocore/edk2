@@ -528,7 +528,7 @@ IDEDiskInfoWhichIde (
   Clear pending IDE interrupt before OS loader/kernel take control of the IDE device.
 
   @param  Event   Pointer to this event
-  @param  Context Event hanlder private data
+  @param  Context Event handler private data
 
 **/
 VOID

@@ -26,7 +26,7 @@ V2P                         *mV2p = NULL; // undi3.0 map_list head
   One notified function to stop UNDI device when gBS->ExitBootServices() called.
 
   @param  Event                   Pointer to this event
-  @param  Context                 Event hanlder private data
+  @param  Context                 Event handler private data
 
 **/
 VOID

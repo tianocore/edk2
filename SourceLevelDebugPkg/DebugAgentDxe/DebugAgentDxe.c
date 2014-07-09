@@ -23,7 +23,7 @@ EFI_EVENT       mExitBootServiceEvent;
   One notified function to disable Debug Timer interrupt when gBS->ExitBootServices() called.
 
   @param[in]  Event              Pointer to this event
-  @param[in]  Context            Event hanlder private data
+  @param[in]  Context            Event handler private data
 
 **/
 VOID

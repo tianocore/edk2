@@ -1588,7 +1588,7 @@ UhciCleanDevUp (
   One notified function to stop the Host Controller when gBS->ExitBootServices() called.
 
   @param  Event                   Pointer to this event
-  @param  Context                 Event hanlder private data
+  @param  Context                 Event handler private data
 
 **/
 VOID

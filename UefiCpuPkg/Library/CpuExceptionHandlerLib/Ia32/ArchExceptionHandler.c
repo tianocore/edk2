@@ -1,5 +1,5 @@
 /** @file
-  IA32 CPU Exception Hanlder functons.
+  IA32 CPU Exception Handler functons.
 
   Copyright (c) 2012 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials

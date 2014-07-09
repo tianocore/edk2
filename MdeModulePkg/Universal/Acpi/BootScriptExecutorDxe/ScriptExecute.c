@@ -213,7 +213,7 @@ S3BootScriptExecutorEntryFunction (
   to RESERVED mem and save it to LockBox.
   
   @param    Event   Pointer to this event
-  @param    Context Event hanlder private data 
+  @param    Context Event handler private data 
  **/
 VOID
 EFIAPI

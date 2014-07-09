@@ -1,5 +1,5 @@
 /** @file
-  x64 CPU Exception Hanlder.
+  x64 CPU Exception Handler.
 
   Copyright (c) 2012 - 2013, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials

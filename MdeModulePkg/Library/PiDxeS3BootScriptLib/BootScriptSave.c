@@ -163,7 +163,7 @@ SaveBootScriptDataToLockBox (
   run time phase.
   
   @param  Event   Pointer to this event
-  @param  Context Event hanlder private data 
+  @param  Context Event handler private data 
  **/
 VOID
 EFIAPI
