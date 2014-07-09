@@ -373,17 +373,21 @@ BasePrintLibSPrintMarker (
   }
 
   LengthToReturn = 0;
+  EndBuffer = NULL;
+  OriginalBuffer = NULL;
 
   //
   // Reserve space for the Null terminator.
   //
-  BufferSize--;
-  OriginalBuffer = Buffer;
+  if (Buffer != NULL) {
+    BufferSize--;
+    OriginalBuffer = Buffer;
 
-  //
-  // Set the tag for the end of the input Buffer.
-  //
-  EndBuffer      = Buffer + BufferSize * BytesPerOutputCharacter;
+    //
+    // Set the tag for the end of the input Buffer.
+    //
+    EndBuffer = Buffer + BufferSize * BytesPerOutputCharacter;
+  }
 
   if ((Flags & FORMAT_UNICODE) != 0) {
     //
@@ -411,7 +415,10 @@ BasePrintLibSPrintMarker (
   //
   // Loop until the end of the format string is reached or the output buffer is full
   //
-  while (FormatCharacter != 0 && Buffer < EndBuffer) {
+  while (FormatCharacter != 0) {
+    if ((Buffer != NULL) && (Buffer >= EndBuffer)) {
+      break;
+    }
     //
     // Clear all the flag bits except those that may have been passed in
     //
