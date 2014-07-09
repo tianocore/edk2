@@ -53,9 +53,11 @@ goto Help
 @del FormatCommandInput.txt
 @echo Create boot sector ...
 %BASETOOLS_DIR%\Genbootsector.exe -i %EFI_BOOT_DISK% -o FDBs.com
-%BASETOOLS_DIR%\Bootsectimage.exe -g FDBs.com %BOOTSECTOR_BIN_DIR%\Bootsect.com -f
+@copy %BOOTSECTOR_BIN_DIR%\Bootsect.com FDBs-1.com
+%BASETOOLS_DIR%\Bootsectimage.exe -g FDBs.com FDBs-1.com -f
 @REM @del FDBS.com
-%BASETOOLS_DIR%\Genbootsector.exe -o %EFI_BOOT_DISK% -i %BOOTSECTOR_BIN_DIR%\Bootsect.com
+%BASETOOLS_DIR%\Genbootsector.exe -o %EFI_BOOT_DISK% -i FDBs-1.com 
+@del FDBs-1.com
 @echo Done.
 copy %BUILD_DIR%\FV\EfiLdr %EFI_BOOT_DISK%
 mkdir %EFI_BOOT_DISK%\efi\boot
@@ -68,9 +70,11 @@ mkdir %EFI_BOOT_DISK%\efi\boot
 @echo Start to create file boot disk ...
 @echo Create boot sector ...
 %BASETOOLS_DIR%\Genbootsector.exe -i %EFI_BOOT_DISK% -o FDBs.com
-%BASETOOLS_DIR%\Bootsectimage.exe -g FDBs.com %BOOTSECTOR_BIN_DIR%\Bootsect.com -f
+copy %BOOTSECTOR_BIN_DIR%\Bootsect.com FDBs-1.com
+%BASETOOLS_DIR%\Bootsectimage.exe -g FDBs.com FDBs-1.com -f
 @REM @del FDBS.com
-%BASETOOLS_DIR%\Genbootsector.exe -o %EFI_BOOT_DISK% -i %BOOTSECTOR_BIN_DIR%\Bootsect.com
+%BASETOOLS_DIR%\Genbootsector.exe -o %EFI_BOOT_DISK% -i FDBs-1.com 
+@del FDBs-1.com
 @echo Done.
 @goto end
 
@@ -88,8 +92,10 @@ mkdir %EFI_BOOT_DISK%\efi\boot
 @del FormatCommandInput.txt
 @echo Create boot sector ...
 @%BASETOOLS_DIR%\Genbootsector.exe -i %EFI_BOOT_DISK% -o UsbBs16.com
-@%BASETOOLS_DIR%\Bootsectimage.exe -g UsbBs16.com %BOOTSECTOR_BIN_DIR%\Bs16.com -f
-@%BASETOOLS_DIR%\Genbootsector.exe -o %EFI_BOOT_DISK% -i %BOOTSECTOR_BIN_DIR%\Bs16.com
+@copy %BOOTSECTOR_BIN_DIR%\Bs16.com Bs16-1.com 
+@%BASETOOLS_DIR%\Bootsectimage.exe -g UsbBs16.com Bs16-1.com -f 
+@%BASETOOLS_DIR%\Genbootsector.exe -o %EFI_BOOT_DISK% -i Bs16-1.com
+@del Bs16-1.com
 @%BASETOOLS_DIR%\Genbootsector.exe -m -o %EFI_BOOT_DISK% -i %BOOTSECTOR_BIN_DIR%\Mbr.com
 @echo Done.
 @echo PLEASE UNPLUG USB, THEN PLUG IT AGAIN!
@@ -110,9 +116,11 @@ mkdir %EFI_BOOT_DISK%\efi\boot
 @del FormatCommandInput.txt
 @echo Create boot sector ...
 @%BASETOOLS_DIR%\Genbootsector.exe -i %EFI_BOOT_DISK% -o UsbBs32.com
-@%BASETOOLS_DIR%\Bootsectimage.exe -g UsbBs32.com %BOOTSECTOR_BIN_DIR%\Bs32.com -f
+@copy %BOOTSECTOR_BIN_DIR%\Bs32.com Bs32-1.com 
+@%BASETOOLS_DIR%\Bootsectimage.exe -g UsbBs32.com Bs32-1.com -f 
 @del UsbBs32.com
-@%BASETOOLS_DIR%\Genbootsector.exe -o %EFI_BOOT_DISK% -i %BOOTSECTOR_BIN_DIR%\Bs32.com
+@%BASETOOLS_DIR%\Genbootsector.exe -o %EFI_BOOT_DISK% -i Bs32-1.com
+@del Bs32-1.com
 @%BASETOOLS_DIR%\Genbootsector.exe -m -o %EFI_BOOT_DISK% -i %BOOTSECTOR_BIN_DIR%\Mbr.com
 @echo Done.
 @echo PLEASE UNPLUG USB, THEN PLUG IT AGAIN!

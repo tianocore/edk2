@@ -79,9 +79,10 @@ then
 				echo Create boot sector ...
 				## Linux version of GenBootSector has not pass build yet.
 				$BASETOOLS_DIR/GnuGenBootSector -i $EFI_BOOT_DEVICE -o FDBs.com
-				$BASETOOLS_DIR/BootSectImage -g FDBs.com $BOOTSECTOR_BIN_DIR/bootsect.com -f
-				$BASETOOLS_DIR/GnuGenBootSector -o $EFI_BOOT_DEVICE -i $BOOTSECTOR_BIN_DIR/bootsect.com
-	
+				cp $BOOTSECTOR_BIN_DIR/bootsect.com FDBs-1.com
+				$BASETOOLS_DIR/BootSectImage -g FDBs.com FDBs-1.com -f
+				$BASETOOLS_DIR/GnuGenBootSector -o $EFI_BOOT_DEVICE -i FDBs-1.com
+				rm FDBs-1.com
 				cp $BUILD_DIR/FV/Efildr $EFI_BOOT_MEDIA
 	
 				mkdir -p $EFI_BOOT_MEDIA/efi
@@ -161,8 +162,10 @@ then
 					echo Create boot sector ...
 					## Linux version of GenBootSector & Bootsectimage has not pass build yet.
 					$BASETOOLS_DIR/GnuGenBootSector -i $EFI_BOOT_DEVICE -o UsbBs16.com
-					$BASETOOLS_DIR/BootSectImage -g UsbBs16.com $BOOTSECTOR_BIN_DIR/bs16.com -f
-					$BASETOOLS_DIR/GnuGenBootSector -o $EFI_BOOT_DEVICE -i $BOOTSECTOR_BIN_DIR/bs16.com
+					cp $BOOTSECTOR_BIN_DIR/bs16.com Bs16-1.com
+					$BASETOOLS_DIR/BootSectImage -g UsbBs16.com Bs16-1.com -f
+					$BASETOOLS_DIR/GnuGenBootSector -o $EFI_BOOT_DEVICE -i Bs16-1.com
+					rm Bs16-1.com
 					$BASETOOLS_DIR/GnuGenBootSector -m -o $EFI_BOOT_DEVICE -i $BOOTSECTOR_BIN_DIR/Mbr.com
 					echo Done.
 					echo PLEASE UNPLUG USB, THEN PLUG IT AGAIN TO DO STEP2!
@@ -191,8 +194,10 @@ then
 					echo Create boot sector ...
 					## Linux version of GenBootSector & Bootsectimage has not pass build yet.
 					$BASETOOLS_DIR/GnuGenBootSector -i $EFI_BOOT_DEVICE -o UsbBs32.com
-					$BASETOOLS_DIR/BootSectImage -g UsbBs32.com $BOOTSECTOR_BIN_DIR/bs32.com -f
-					$BASETOOLS_DIR/GnuGenBootSector -o $EFI_BOOT_DEVICE -i $BOOTSECTOR_BIN_DIR/bs32.com
+					cp $BOOTSECTOR_BIN_DIR/bs32.com Bs32-1.com
+					$BASETOOLS_DIR/BootSectImage -g UsbBs32.com Bs32-1.com -f
+					$BASETOOLS_DIR/GnuGenBootSector -o $EFI_BOOT_DEVICE -i Bs32-1.com
+					rm Bs32-1.com
 					$BASETOOLS_DIR/GnuGenBootSector -m -o $EFI_BOOT_DEVICE -i $BOOTSECTOR_BIN_DIR/Mbr.com
 					echo Done.
 					echo PLEASE UNPLUG USB, THEN PLUG IT AGAIN TO DO STEP2!
