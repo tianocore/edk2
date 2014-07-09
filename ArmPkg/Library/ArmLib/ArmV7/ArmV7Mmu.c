@@ -238,18 +238,6 @@ ArmConfigureMmu (
 
   ZeroMem (TranslationTable, TRANSLATION_TABLE_SECTION_SIZE);
 
-  ArmCleanInvalidateDataCache ();
-  ArmInvalidateInstructionCache ();
-
-  ArmDisableDataCache ();
-  ArmDisableInstructionCache();
-  // TLBs are also invalidated when calling ArmDisableMmu()
-  ArmDisableMmu ();
-
-  // Make sure nothing sneaked into the cache
-  ArmCleanInvalidateDataCache ();
-  ArmInvalidateInstructionCache ();
-
   // By default, mark the translation table as belonging to a uncached region
   TranslationTableAttribute = ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED;
   while (MemoryTable->Length != 0) {
@@ -276,6 +264,18 @@ ArmConfigureMmu (
     ASSERT (0); // No support has been found for the attributes of the memory region that the translation table belongs to.
     return RETURN_UNSUPPORTED;
   }
+
+  ArmCleanInvalidateDataCache ();
+  ArmInvalidateInstructionCache ();
+
+  ArmDisableDataCache ();
+  ArmDisableInstructionCache();
+  // TLBs are also invalidated when calling ArmDisableMmu()
+  ArmDisableMmu ();
+
+  // Make sure nothing sneaked into the cache
+  ArmCleanInvalidateDataCache ();
+  ArmInvalidateInstructionCache ();
 
   ArmSetTTBR0 ((VOID *)(UINTN)(((UINTN)TranslationTable & ~TRANSLATION_TABLE_SECTION_ALIGNMENT_MASK) | (TTBRAttributes & 0x7F)));
     
