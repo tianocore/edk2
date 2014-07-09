@@ -125,28 +125,24 @@ formset
     text
       help   = STRING_TOKEN(STR_EXIT_TEXT),
       text   = STRING_TOKEN(STR_EXIT_TEXT),
-        text   = STRING_TOKEN(STR_EXIT_TEXT),
       flags  = INTERACTIVE,   // VfrCompiler will generate opcode EFI_IFR_ACTION for Text marked as INTERACTIVE
       key    = 0x1237;
 
     text
       help   = STRING_TOKEN(STR_SAVE_TEXT),
       text   = STRING_TOKEN(STR_SAVE_TEXT),
-        text   = STRING_TOKEN(STR_SAVE_TEXT),
       flags  = INTERACTIVE,
       key    = 0x1238;
 
     text
       help   = STRING_TOKEN(STR_SAVE_CURRENT),
       text   = STRING_TOKEN(STR_SAVE_CURRENT),
-        text   = STRING_TOKEN(STR_SAVE_CURRENT),
       flags  = INTERACTIVE,
       key    = 0x1243;
 
     text
       help   = STRING_TOKEN(STR_DISCARD_CURRENT_AND_EXIT),
       text   = STRING_TOKEN(STR_DISCARD_CURRENT_AND_EXIT),
-        text   = STRING_TOKEN(STR_DISCARD_CURRENT_AND_EXIT),
       flags  = INTERACTIVE,
       key    = 0x1244;
     //
@@ -563,14 +559,12 @@ formset
       text
         help   = STRING_TOKEN(STR_SAVE_CURRENT_AND_EXIT),
         text   = STRING_TOKEN(STR_SAVE_CURRENT_AND_EXIT),
-          text   = STRING_TOKEN(STR_SAVE_CURRENT_AND_EXIT),
         flags  = INTERACTIVE,
         key    = 0x1241;
 
       text
         help   = STRING_TOKEN(STR_DISCARD_CURRENT),
         text   = STRING_TOKEN(STR_DISCARD_CURRENT),
-          text   = STRING_TOKEN(STR_DISCARD_CURRENT),
         flags  = INTERACTIVE,
         key    = 0x1242;
 
@@ -727,14 +721,12 @@ formset
     text
       help   = STRING_TOKEN(STR_EXIT_TEXT),
       text   = STRING_TOKEN(STR_EXIT_TEXT),
-        text   = STRING_TOKEN(STR_EXIT_TEXT),
       flags  = INTERACTIVE,   // VfrCompiler will generate opcode EFI_IFR_ACTION for Text marked as INTERACTIVE
       key    = 0x1245;
 
     text
       help   = STRING_TOKEN(STR_SAVE_TEXT),
       text   = STRING_TOKEN(STR_SAVE_TEXT),
-        text   = STRING_TOKEN(STR_SAVE_TEXT),
       flags  = INTERACTIVE,   // VfrCompiler will generate opcode EFI_IFR_ACTION for Text marked as INTERACTIVE
       key    = 0x1246;
   endform;
