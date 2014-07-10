@@ -140,10 +140,10 @@ LegacyBiosInt86 (
   )
 {
   UINTN                 Status;
-  UINTN                 Eflags;
   IA32_REGISTER_SET     ThunkRegSet;
   BOOLEAN               Ret;
   UINT16                *Stack16;
+  BOOLEAN               Enabled;
   
   ZeroMem (&ThunkRegSet, sizeof (ThunkRegSet));
   ThunkRegSet.E.EFLAGS.Bits.Reserved_0 = 1;
@@ -169,10 +169,7 @@ LegacyBiosInt86 (
   //
   // The call to Legacy16 is a critical section to EFI
   //
-  Eflags = AsmReadEflags ();
-  if ((Eflags | EFI_CPU_EFLAGS_IF) != 0) {
-    DisableInterrupts ();
-  }
+  Enabled = SaveAndDisableInterrupts();
 
   //
   // Set Legacy16 state. 0x08, 0x70 is legacy 8259 vector bases.
@@ -199,9 +196,7 @@ LegacyBiosInt86 (
   //
   // End critical section
   //
-  if ((Eflags | EFI_CPU_EFLAGS_IF) != 0) {
-    EnableInterrupts ();
-  }
+  SetInterruptState (Enabled);
 
   Regs->E.EDI      = ThunkRegSet.E.EDI;      
   Regs->E.ESI      = ThunkRegSet.E.ESI;  
