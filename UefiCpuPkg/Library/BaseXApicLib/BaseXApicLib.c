@@ -3,7 +3,7 @@
 
   This local APIC library instance supports xAPIC mode only.
 
-  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -438,7 +438,7 @@ SendInitSipiSipi (
   ASSERT ((StartupRoutine & 0xfff) == 0);
 
   SendInitIpi (ApicId);
-  MicroSecondDelay (10);
+  MicroSecondDelay (PcdGet32(PcdCpuInitIpiDelayInMicroSeconds));
   IcrLow.Uint32 = 0;
   IcrLow.Bits.Vector = (StartupRoutine >> 12);
   IcrLow.Bits.DeliveryMode = LOCAL_APIC_DELIVERY_MODE_STARTUP;
@@ -471,7 +471,7 @@ SendInitSipiSipiAllExcludingSelf (
   ASSERT ((StartupRoutine & 0xfff) == 0);
 
   SendInitIpiAllExcludingSelf ();
-  MicroSecondDelay (10);
+  MicroSecondDelay (PcdGet32(PcdCpuInitIpiDelayInMicroSeconds));
   IcrLow.Uint32 = 0;
   IcrLow.Bits.Vector = (StartupRoutine >> 12);
   IcrLow.Bits.DeliveryMode = LOCAL_APIC_DELIVERY_MODE_STARTUP;

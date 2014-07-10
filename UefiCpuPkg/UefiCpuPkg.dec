@@ -43,4 +43,6 @@
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress|0xfee00000|UINT32|0x00000001
+  ## Specifies delay value in microseconds after sending out an INIT IPI
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuInitIpiDelayInMicroSeconds|10000|UINT32|0x30000002
 
