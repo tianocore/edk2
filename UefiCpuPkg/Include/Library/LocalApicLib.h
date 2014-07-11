@@ -4,7 +4,7 @@
   Local APIC library assumes local APIC is enabled. It does not
   handles cases where local APIC is disabled.
 
-  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -68,6 +68,9 @@ GetApicMode (
   If the specified local APIC mode can't be set as current, then ASSERT.
 
   @param ApicMode APIC mode to be set.
+
+  @note  This API must not be called from an interrupt handler or SMI handler.
+         It may result in unpredictable behavior.
 **/
 VOID
 EFIAPI

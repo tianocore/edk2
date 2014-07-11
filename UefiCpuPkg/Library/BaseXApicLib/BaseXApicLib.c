@@ -139,18 +139,47 @@ SendIpi (
   )
 {
   LOCAL_APIC_ICR_LOW IcrLowReg;
+  UINT32             IcrHigh;
+  BOOLEAN            InterruptState;
 
   ASSERT (GetApicMode () == LOCAL_APIC_MODE_XAPIC);
   ASSERT (ApicId <= 0xff);
+
+  InterruptState = SaveAndDisableInterrupts ();
+
+  //
+  // Save existing contents of ICR high 32 bits
+  //
+  IcrHigh = ReadLocalApicReg (XAPIC_ICR_HIGH_OFFSET);
+
+  //
+  // Wait for DeliveryStatus clear in case a previous IPI
+  //  is still being sent
+  //
+  do {
+    IcrLowReg.Uint32 = ReadLocalApicReg (XAPIC_ICR_LOW_OFFSET);
+  } while (IcrLowReg.Bits.DeliveryStatus != 0);
 
   //
   // For xAPIC, the act of writing to the low doubleword of the ICR causes the IPI to be sent.
   //
   WriteLocalApicReg (XAPIC_ICR_HIGH_OFFSET, ApicId << 24);
   WriteLocalApicReg (XAPIC_ICR_LOW_OFFSET, IcrLow);
+
+  //
+  // Wait for DeliveryStatus clear again
+  //
   do {
     IcrLowReg.Uint32 = ReadLocalApicReg (XAPIC_ICR_LOW_OFFSET);
   } while (IcrLowReg.Bits.DeliveryStatus != 0);
+
+  //
+  // And restore old contents of ICR high
+  //
+  WriteLocalApicReg (XAPIC_ICR_HIGH_OFFSET, IcrHigh);
+
+  SetInterruptState (InterruptState);
+
 }
 
 //
@@ -193,6 +222,9 @@ GetApicMode (
   If the specified local APIC mode can't be set as current, then ASSERT.
 
   @param ApicMode APIC mode to be set.
+
+  @note  This API must not be called from an interrupt handler or SMI handler.
+         It may result in unpredictable behavior.
 **/
 VOID
 EFIAPI
