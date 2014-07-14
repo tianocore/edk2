@@ -1530,12 +1530,31 @@ UiFreeMenuList (
   Find parent menu for current menu.
 
   @param  CurrentMenu    Current Menu
+  @param  SettingLevel   Whether find parent menu in Form Level or Formset level.
+                         In form level, just find the parent menu; 
+                         In formset level, find the parent menu which has different
+                         formset guid value.
 
   @retval   The parent menu for current menu.
 **/
 FORM_ENTRY_INFO *
 UiFindParentMenu (
-  IN FORM_ENTRY_INFO  *CurrentMenu
+  IN FORM_ENTRY_INFO          *CurrentMenu,
+  IN BROWSER_SETTING_SCOPE    SettingLevel
+  );
+  
+/**
+  Validate the FormSet. If the formset is not validate, remove it from the list.
+
+  @param  FormSet                The input FormSet which need to validate.
+
+  @retval TRUE                   The handle is validate.
+  @retval FALSE                  The handle is invalidate.
+
+**/
+BOOLEAN
+ValidateHiiHandle (
+  EFI_HII_HANDLE          HiiHandle
   );
 
 /**

@@ -206,19 +206,56 @@ UiFindMenuList (
   Find parent menu for current menu.
 
   @param  CurrentMenu    Current Menu
+  @param  SettingLevel   Whether find parent menu in Form Level or Formset level.
+                         In form level, just find the parent menu; 
+                         In formset level, find the parent menu which has different
+                         formset guid value.
 
   @retval   The parent menu for current menu.
 **/
 FORM_ENTRY_INFO *
 UiFindParentMenu (
-  IN FORM_ENTRY_INFO  *CurrentMenu
+  IN FORM_ENTRY_INFO          *CurrentMenu,
+  IN BROWSER_SETTING_SCOPE    SettingLevel
   )
 {
   FORM_ENTRY_INFO    *ParentMenu;
+  LIST_ENTRY         *Link;
 
+  ASSERT (SettingLevel == FormLevel || SettingLevel == FormSetLevel);
+
+  if (CurrentMenu == NULL) {
+    return NULL;
+  }
+  
   ParentMenu = NULL;
-  if (CurrentMenu->Link.BackLink != &mPrivateData.FormBrowserEx2.FormViewHistoryHead) {
-    ParentMenu = FORM_ENTRY_INFO_FROM_LINK (CurrentMenu->Link.BackLink);
+  Link       = &CurrentMenu->Link;
+
+  while (Link->BackLink != &mPrivateData.FormBrowserEx2.FormViewHistoryHead) {
+    ParentMenu = FORM_ENTRY_INFO_FROM_LINK (Link->BackLink);
+
+    if (SettingLevel == FormLevel) {
+      //
+      // For FormLevel, just find the parent menu, return.
+      //
+      break;
+    }
+
+    if (!CompareGuid (&CurrentMenu->FormSetGuid, &ParentMenu->FormSetGuid)) {
+      //
+      // For SystemLevel, must find the menu which has different formset.
+      //
+      break;
+    }
+
+    Link = Link->BackLink;
+  }
+
+  //
+  // Not find the parent menu, just return NULL.
+  //
+  if (Link->BackLink == &mPrivateData.FormBrowserEx2.FormViewHistoryHead) {
+    return NULL;
   }
 
   return ParentMenu;
@@ -480,6 +517,14 @@ SendForm (
     do {
       FormSet = AllocateZeroPool (sizeof (FORM_BROWSER_FORMSET));
       ASSERT (FormSet != NULL);
+
+      //
+      // Validate the HiiHandle
+      // if validate failed, find the first validate parent HiiHandle.
+      //
+      if (!ValidateHiiHandle(Selection->Handle)) {
+        FindNextMenu (Selection, FormSetLevel);
+      }
 
       //
       // Initialize internal data structures of FormSet
@@ -2356,39 +2401,59 @@ SendDiscardInfoToDriver (
 
 **/
 BOOLEAN
-ValidateFormSet (
-  FORM_BROWSER_FORMSET    *FormSet
+ValidateHiiHandle (
+  EFI_HII_HANDLE          HiiHandle
   )
 {
   EFI_HII_HANDLE          *HiiHandles;
   UINTN                   Index;
   BOOLEAN                 Find;
 
-  ASSERT (FormSet != NULL);
+  if (HiiHandle == NULL) {
+    return FALSE;
+  }
+
   Find = FALSE;
-  //
-  // Get all the Hii handles
-  //
+
   HiiHandles = HiiGetHiiHandles (NULL);
   ASSERT (HiiHandles != NULL);
 
-  //
-  // Search for formset of each class type
-  //
   for (Index = 0; HiiHandles[Index] != NULL; Index++) {
-    if (HiiHandles[Index] == FormSet->HiiHandle) {
+    if (HiiHandles[Index] == HiiHandle) {
       Find = TRUE;
       break;
     }
   }
 
+  FreePool (HiiHandles);
+
+  return Find;
+}
+
+/**
+  Validate the FormSet. If the formset is not validate, remove it from the list.
+
+  @param  FormSet                The input FormSet which need to validate.
+
+  @retval TRUE                   The handle is validate.
+  @retval FALSE                  The handle is invalidate.
+
+**/
+BOOLEAN
+ValidateFormSet (
+  FORM_BROWSER_FORMSET    *FormSet
+  )
+{
+  BOOLEAN  Find;
+
+  ASSERT (FormSet != NULL);
+
+  Find = ValidateHiiHandle(FormSet->HiiHandle);
   if (!Find) {
     CleanBrowserStorage(FormSet);
     RemoveEntryList (&FormSet->Link);
     DestroyFormSet (FormSet);
   }
-
-  FreePool (HiiHandles);
 
   return Find;
 }
