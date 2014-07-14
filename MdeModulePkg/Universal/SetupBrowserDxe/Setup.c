@@ -2590,6 +2590,7 @@ FindQuestionFromProgress (
       // For Name/Value type, Skip the ConfigHdr part.
       //
       EndStr = StrStr (Progress, L"PATH=");
+      ASSERT (EndStr != NULL);
       while (*EndStr != '&') {
         EndStr++;
       }
@@ -2600,6 +2601,7 @@ FindQuestionFromProgress (
       // For Buffer type, Skip the ConfigHdr part.
       //
       EndStr = StrStr (Progress, L"&OFFSET=");
+      ASSERT (EndStr != NULL);
       *EndStr = '\0';
     }
 
@@ -2615,6 +2617,7 @@ FindQuestionFromProgress (
     // here, just keep the "Fred" string.
     //
     EndStr = StrStr (Progress, L"=");
+    ASSERT (EndStr != NULL);
     *EndStr = '\0';
   } else {
     //
@@ -2622,6 +2625,7 @@ FindQuestionFromProgress (
     // here, just keep the "OFFSET=0x####&WIDTH=0x####" string.
     //
     EndStr = StrStr (Progress, L"&VALUE=");
+    ASSERT (EndStr != NULL);
     *EndStr = '\0';
   }
 
@@ -4246,9 +4250,8 @@ IsQuestionValueChanged (
   }
 
   CopyMem (&Question->HiiValue, &BackUpValue, sizeof (EFI_HII_VALUE));
-  CopyMem (Question->BufferValue, BackUpBuffer, BufferWidth);
-
   if (BackUpBuffer != NULL) {
+    CopyMem (Question->BufferValue, BackUpBuffer, BufferWidth);
     FreePool (BackUpBuffer);
   }
 
