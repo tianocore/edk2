@@ -727,6 +727,17 @@ BdsLoadOptionPxeCreateDevicePath (
   return EFI_SUCCESS;
 }
 
+/**
+  Update the parameters of a Pxe boot option
+
+  @param[in]   OldDevicePath  Current complete device path of the Pxe boot option.
+                              This has to be a valid complete Pxe boot option path.
+  @param[in]   FileName       Description of the file the path is asked for
+  @param[out]  NewDevicePath  Pointer to the new complete device path.
+
+  @retval  EFI_SUCCESS            Update completed
+  @retval  EFI_OUT_OF_RESOURCES   Fail to perform the update due to lack of resource
+**/
 EFI_STATUS
 BdsLoadOptionPxeUpdateDevicePath (
   IN EFI_DEVICE_PATH            *OldDevicePath,
@@ -735,8 +746,17 @@ BdsLoadOptionPxeUpdateDevicePath (
   OUT BOOLEAN                   *RequestBootType
   )
 {
-  ASSERT (0);
-  return EFI_UNSUPPORTED;
+  //
+  // Make a copy of the complete device path that is made of :
+  // the device path of the device supporting the Pxe base code protocol
+  // followed by an end node.
+  //
+  *NewDevicePath = DuplicateDevicePath (OldDevicePath);
+  if (*NewDevicePath == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  } else {
+    return EFI_SUCCESS;
+  }
 }
 
 BOOLEAN
