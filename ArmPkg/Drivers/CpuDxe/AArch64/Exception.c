@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Portions Copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
+  Portions Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -131,11 +131,12 @@ InitializeExceptions (
   FiqEnabled = ArmGetFiqState ();
   ArmDisableFiq ();
 
-  // AArch64 alignment? The Vector table must be 2k-byte aligned (bottom 11 bits zero)?
-  //DEBUG ((EFI_D_ERROR, "vbar set addr: 0x%016lx\n",(UINTN)ExceptionHandlersStart));
-  //ASSERT(((UINTN)ExceptionHandlersStart & ARM_VECTOR_TABLE_ALIGNMENT) == 0);
+  // The AArch64 Vector table must be 2k-byte aligned - if this assertion fails ensure 'Align=4K'
+  // is defined into your FDF for this module.
+  ASSERT (((UINTN)ExceptionHandlersStart & ARM_VECTOR_TABLE_ALIGNMENT) == 0);
 
-  // We do not copy the Exception Table at PcdGet32(PcdCpuVectorBaseAddress). We just set Vector Base Address to point into CpuDxe code.
+  // We do not copy the Exception Table at PcdGet32(PcdCpuVectorBaseAddress). We just set Vector
+  // Base Address to point into CpuDxe code.
   ArmWriteVBar ((UINTN)ExceptionHandlersStart);
 
   if (FiqEnabled) {

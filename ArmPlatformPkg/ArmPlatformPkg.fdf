@@ -1,13 +1,13 @@
 #
-#  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
-#  
-#  This program and the accompanying materials                          
-#  are licensed and made available under the terms and conditions of the BSD License         
-#  which accompanies this distribution.  The full text of the license may be found at        
-#  http://opensource.org/licenses/bsd-license.php                                            
+#  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 #
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
 ################################################################################
@@ -241,9 +241,16 @@ READ_LOCK_STATUS   = TRUE
 #
 ############################################################################
 
-[Rule.Common.SEC]
+[Rule.ARM.SEC]
   FILE SEC = $(NAMED_GUID) RELOCS_STRIPPED {
     TE  TE    Align = 32                $(INF_OUTPUT)/$(MODULE_NAME).efi
+  }
+
+# The AArch64 Vector Table requires a 2K alignment that is not supported by the FDF specification.
+# It is the reason 4K is used instead of 2K for the module alignment.
+[Rule.AARCH64.SEC]
+  FILE SEC = $(NAMED_GUID) RELOCS_STRIPPED {
+    TE  TE    Align = 4K                $(INF_OUTPUT)/$(MODULE_NAME).efi
   }
 
 [Rule.Common.PEI_CORE]
