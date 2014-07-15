@@ -1,15 +1,15 @@
 /** @file
 *  Main file supporting the SEC Phase on ARM Platforms
 *
-*  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
-*  
-*  This program and the accompanying materials                          
-*  are licensed and made available under the terms and conditions of the BSD License         
-*  which accompanies this distribution.  The full text of the license may be found at        
-*  http://opensource.org/licenses/bsd-license.php                                            
+*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+*  This program and the accompanying materials
+*  are licensed and made available under the terms and conditions of the BSD License
+*  which accompanies this distribution.  The full text of the license may be found at
+*  http://opensource.org/licenses/bsd-license.php
+*
+*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 *
 **/
 
@@ -19,6 +19,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/SerialPortLib.h>
 #include <Library/ArmGicLib.h>
+#include <Library/ArmPlatformLib.h>
 
 #include "SecInternal.h"
 
@@ -106,7 +107,11 @@ CEntryPoint (
             ((PcdGet32(PcdCPUCoresSecMonStackBase) != 0) && (PcdGet32(PcdCPUCoreSecMonStackSize) != 0)));
 
     // Enter Monitor Mode
-    enter_monitor_mode ((UINTN)TrustedWorldInitialization, MpId, SecBootMode, (VOID*)(PcdGet32(PcdCPUCoresSecMonStackBase) + (PcdGet32(PcdCPUCoreSecMonStackSize) * (GET_CORE_POS(MpId) + 1))));
+    enter_monitor_mode (
+      (UINTN)TrustedWorldInitialization, MpId, SecBootMode,
+      (VOID*) (PcdGet32 (PcdCPUCoresSecMonStackBase) +
+          (PcdGet32 (PcdCPUCoreSecMonStackSize) * (ArmPlatformGetCorePosition (MpId) + 1)))
+      );
   } else {
     if (ArmPlatformIsPrimaryCore (MpId)) {
       SerialPrint ("Trust Zone Configuration is disabled\n\r");
