@@ -97,6 +97,22 @@ ArmPlatformGetBootMode (
   );
 
 /**
+  First platform specific function to be called in the PEI phase
+
+  This function is actually the first function called by the PrePi
+  or PrePeiCore modules. It allows to retrieve arguments passed to
+  the UEFI firmware through the CPU registers.
+
+  This function might be written into assembler as no stack are set
+  when the function is invoked.
+
+**/
+VOID
+ArmPlatformPeiBootAction (
+  VOID
+  );
+
+/**
   Initialize controllers that must setup in the normal world
 
   This function is called by the ArmPlatformPkg/PrePi or ArmPlatformPkg/PlatformPei
