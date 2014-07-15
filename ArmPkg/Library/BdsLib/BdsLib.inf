@@ -73,9 +73,9 @@
   gEfiUsbIoProtocolGuid
   gEfiLoadedImageProtocolGuid
   gEfiSimpleNetworkProtocolGuid
-    
+
 [FeaturePcd]
-  gArmTokenSpaceGuid.PcdArmPsciSupport
+  gArmTokenSpaceGuid.PcdArmLinuxSpinTable
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdSystemMemoryBase

@@ -60,16 +60,19 @@
 ################################################################################
 
 [PcdsFeatureFlag.common]
-
 !ifdef $(EDK2_SKIP_PEICORE)
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec|TRUE
   gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores|TRUE
 !endif
- 
+
   ## If TRUE, Graphics Output Protocol will be installed on virtual handle created by ConsplitterDxe.
   #  It could be set FALSE to save size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
- 
+
+  # UEFI firmware is responsible to park the secondary cores on this platform.
+  # This PCD ensures the secondary cores are parked into the AArch64 Linux parking protocol.
+  gArmTokenSpaceGuid.PcdArmLinuxSpinTable|TRUE
+
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Versatile Express"
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"ArmVExpress-RTSM"

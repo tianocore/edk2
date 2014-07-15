@@ -271,7 +271,7 @@ BdsBootLinuxFdt (
   //
   // Install secondary core pens if the Power State Coordination Interface is not supported
   //
-  if (FeaturePcdGet (PcdArmPsciSupport) == FALSE) {
+  if (FeaturePcdGet (PcdArmLinuxSpinTable)) {
     // Place Pen at the start of Linux memory. We can then tell Linux to not use this bit of memory
     PenBase  = LinuxImage - 0x80000;
     PenSize  = (UINTN)&SecondariesPenEnd - (UINTN)&SecondariesPenStart;

@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -15,8 +15,6 @@
 #include <Library/ArmSmcLib.h>
 #include <Library/PcdLib.h>
 #include <libfdt.h>
-
-#include <IndustryStandard/ArmSmc.h>
 
 #include "BdsInternal.h"
 #include "BdsLinuxLoader.h"
@@ -214,38 +212,6 @@ IsLinuxReservedRegion (
   }
 }
 
-
-STATIC
-BOOLEAN
-IsPsciSmcSupported (
-  VOID
-  )
-{
-  BOOLEAN               PsciSmcSupported;
-  UINTN                 Rx;
-
-  PsciSmcSupported = FALSE;
-
-  // Check the SMC response to the Presence SMC
-  Rx = ARM_SMC_ID_PRESENCE;
-  ArmCallSmc (&Rx);
-  if (Rx == 1) {
-    // Check the SMC UID
-    Rx = ARM_SMC_ID_UID;
-    ArmCallSmc (&Rx);
-    if (Rx == ARM_TRUSTZONE_UID_4LETTERID) {
-      Rx = ARM_SMC_ID_UID + 1;
-      ArmCallSmc (&Rx);
-      if (Rx == ARM_TRUSTZONE_ARM_UID) {
-        PsciSmcSupported = TRUE;
-      }
-    }
-  }
-
-  return PsciSmcSupported;
-}
-
-
 /**
 ** Relocate the FDT blob to a more appropriate location for the Linux kernel.
 ** This function will allocate memory for the relocated FDT blob.
@@ -360,11 +326,9 @@ PrepareFdt (
   UINTN                 DescriptorSize;
   UINT32                DescriptorVersion;
   UINTN                 Pages;
-  BOOLEAN               PsciSmcSupported;
   UINTN                 OriginalFdtSize;
   BOOLEAN               CpusNodeExist;
   UINTN                 CoreMpId;
-  UINTN                 Smc;
 
   NewFdtBlobAllocation = 0;
 
@@ -393,17 +357,6 @@ PrepareFdt (
              &NewFdtBlobBase, &NewFdtBlobSize, &NewFdtBlobAllocation);
   if (EFI_ERROR (Status)) {
     goto FAIL_RELOCATE_FDT;
-  }
-
-  //
-  // Ensure the Power State Coordination Interface (PSCI) SMCs are there if supported
-  //
-  PsciSmcSupported = FALSE;
-  if (FeaturePcdGet (PcdArmPsciSupport) == TRUE) {
-    PsciSmcSupported = IsPsciSmcSupported();
-    if (PsciSmcSupported == FALSE) {
-      DEBUG ((EFI_D_ERROR, "Warning: The Power State Coordination Interface (PSCI) is not supported by your platform Trusted Firmware.\n"));
-    }
   }
 
   fdt = (VOID*)(UINTN)NewFdtBlobBase;
@@ -564,65 +517,33 @@ PrepareFdt (
 
           CoreMpId = cpu_to_fdtn (CoreMpId);
           fdt_setprop (fdt, cpu_node, "reg", &CoreMpId, sizeof (CoreMpId));
-          if (PsciSmcSupported) {
-            fdt_setprop_string (fdt, cpu_node, "enable-method", "psci");
-          }
         } else {
           cpu_node = fdt_subnode_offset(fdt, node, Name);
         }
 
-        // If Power State Coordination Interface (PSCI) is not supported then it is expected the secondary
-        // cores are spinning waiting for the Operating System to release them
-        if ((PsciSmcSupported == FALSE) && (cpu_node >= 0)) {
-          // We as the bootloader are responsible for either creating or updating
-          // these entries. Do not trust the entries in the DT. We only know about
-          // 'spin-table' type. Do not try to update other types if defined.
-          Method = fdt_getprop(fdt, cpu_node, "enable-method", &lenp);
-          if ( (Method == NULL) || (!AsciiStrCmp((CHAR8 *)Method, "spin-table")) ) {
-            fdt_setprop_string(fdt, cpu_node, "enable-method", "spin-table");
-            CpuReleaseAddr = cpu_to_fdt64(ArmCoreInfoTable[Index].MailboxSetAddress);
-            fdt_setprop(fdt, cpu_node, "cpu-release-addr", &CpuReleaseAddr, sizeof(CpuReleaseAddr));
+        if (cpu_node >= 0) {
+          Method = fdt_getprop (fdt, cpu_node, "enable-method", &lenp);
+          // We only care when 'enable-method' == 'spin-table'. If the enable-method is not defined
+          // or defined as 'psci' then we ignore its properties.
+          if ((Method != NULL) && (AsciiStrCmp ((CHAR8 *)Method, "spin-table") == 0)) {
+            // There are two cases;
+            //  - UEFI firmware parked the secondary cores and/or UEFI firmware is aware of the CPU
+            //    release addresses (PcdArmLinuxSpinTable == TRUE)
+            //  - the parking of the secondary cores has been managed before starting UEFI and/or UEFI
+            //    does not anything about the CPU release addresses - in this case we do nothing
+            if (FeaturePcdGet (PcdArmLinuxSpinTable)) {
+              CpuReleaseAddr = cpu_to_fdt64 (ArmCoreInfoTable[Index].MailboxSetAddress);
+              fdt_setprop (fdt, cpu_node, "cpu-release-addr", &CpuReleaseAddr, sizeof(CpuReleaseAddr));
 
-            // If it is not the primary core than the cpu should be disabled
-            if (((ArmCoreInfoTable[Index].ClusterId != ClusterId) || (ArmCoreInfoTable[Index].CoreId != CoreId))) {
-              fdt_setprop_string(fdt, cpu_node, "status", "disabled");
+              // If it is not the primary core than the cpu should be disabled
+              if (((ArmCoreInfoTable[Index].ClusterId != ClusterId) || (ArmCoreInfoTable[Index].CoreId != CoreId))) {
+                fdt_setprop_string(fdt, cpu_node, "status", "disabled");
+              }
             }
-          } else {
-            Print(L"Warning: Unsupported enable-method type for CPU[%d] : %a\n", Index, (CHAR8 *)Method);
           }
         }
       }
       break;
-    }
-  }
-
-  // If the Power State Coordination Interface is supported then we signal it in the Device Tree
-  if (PsciSmcSupported == TRUE) {
-    // Before to create it we check if the node is not already defined in the Device Tree
-    node = fdt_subnode_offset(fdt, 0, "psci");
-    if (node < 0) {
-      // The 'psci' node does not exist, create it
-      node = fdt_add_subnode(fdt, 0, "psci");
-      if (node < 0) {
-        DEBUG((EFI_D_ERROR,"Error on creating 'psci' node\n"));
-        Status = EFI_INVALID_PARAMETER;
-        goto FAIL_COMPLETE_FDT;
-      } else {
-        fdt_setprop_string (fdt, node, "compatible", "arm,psci");
-        fdt_setprop_string (fdt, node, "method", "smc");
-
-        Smc = cpu_to_fdtn (ARM_SMC_ARM_CPU_SUSPEND);
-        fdt_setprop (fdt, node, "cpu_suspend", &Smc, sizeof (Smc));
-
-        Smc = cpu_to_fdtn (ARM_SMC_ARM_CPU_OFF);
-        fdt_setprop (fdt, node, "cpu_off", &Smc, sizeof (Smc));
-
-        Smc = cpu_to_fdtn (ARM_SMC_ARM_CPU_ON);
-        fdt_setprop (fdt, node, "cpu_on", &Smc, sizeof (Smc));
-
-        Smc = cpu_to_fdtn (ARM_SMC_ARM_MIGRATE);
-        fdt_setprop (fdt, node, "migrate", &Smc, sizeof (Smc));
-      }
     }
   }
 
