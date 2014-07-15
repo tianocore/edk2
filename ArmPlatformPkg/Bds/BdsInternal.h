@@ -161,6 +161,12 @@ GetHIInputIP (
   );
 
 EFI_STATUS
+EditHIInputIP (
+  IN  EFI_IP_ADDRESS  *InIpAddr,
+  OUT EFI_IP_ADDRESS  *OutIpAddr
+  );
+
+EFI_STATUS
 GetHIInputBoolean (
   OUT BOOLEAN *Value
   );

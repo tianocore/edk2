@@ -86,12 +86,15 @@
   EfiResetSystemLib|EmbeddedPkg/Library/TemplateResetSystemLib/TemplateResetSystemLib.inf
   RealTimeClockLib|EmbeddedPkg/Library/TemplateRealTimeClockLib/TemplateRealTimeClockLib.inf
 
-  # EBL Related Libraries  
+  # Networking Requirements for ArmPlatformPkg/Bds
+  NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
+
+  # EBL Related Libraries
   EblCmdLib|ArmPlatformPkg/Library/EblCmdLib/EblCmdLib.inf
   EfiFileLib|EmbeddedPkg/Library/EfiFileLib/EfiFileLib.inf
   EblAddExternalCommandLib|EmbeddedPkg/Library/EblAddExternalCommandLib/EblAddExternalCommandLib.inf
   EblNetworkLib|EmbeddedPkg/Library/EblNetworkLib/EblNetworkLib.inf
-  
+
   #
   # Uncomment (and comment out the next line) For RealView Debugger. The Standard IO window 
   # in the debugger will show load and unload commands for symbols. You can cut and paste this

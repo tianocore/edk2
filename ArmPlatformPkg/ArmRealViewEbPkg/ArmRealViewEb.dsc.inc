@@ -68,14 +68,17 @@
   RealTimeClockLib|ArmPlatformPkg/Library/PL031RealTimeClockLib/PL031RealTimeClockLib.inf
   SerialPortLib|ArmPlatformPkg/Library/PL011SerialPortLib/PL011SerialPortLib.inf
   SerialPortExtLib|ArmPlatformPkg/Library/PL011SerialPortLib/PL011SerialPortExtLib.inf
-  TimerLib|ArmPlatformPkg/Library/SP804TimerLib/SP804TimerLib.inf  
+  TimerLib|ArmPlatformPkg/Library/SP804TimerLib/SP804TimerLib.inf
   # ARM PL011 UART Driver
   PL011UartLib|ArmPlatformPkg/Drivers/PL011Uart/PL011Uart.inf
   NorFlashPlatformLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/NorFlashArmRealViewEbLib/NorFlashArmRealViewEbLib.inf
-  LcdPlatformLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/PL111LcdArmRealViewEbLib/PL111LcdArmRealViewEbLib.inf  
+  LcdPlatformLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/PL111LcdArmRealViewEbLib/PL111LcdArmRealViewEbLib.inf
   ArmPlatformSysConfigLib|ArmPlatformPkg/ArmRealViewEbPkg/Library/SysConfigArmRealViewEbLib/SysConfigArmRealViewEbLib.inf
 
-  # EBL Related Libraries  
+  # Networking Requirements for ArmPlatformPkg/Bds
+  NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
+
+  # EBL Related Libraries
   EblCmdLib|ArmPlatformPkg/Library/EblCmdLib/EblCmdLib.inf
   EfiFileLib|EmbeddedPkg/Library/EfiFileLib/EfiFileLib.inf
   EblAddExternalCommandLib|EmbeddedPkg/Library/EblAddExternalCommandLib/EblAddExternalCommandLib.inf

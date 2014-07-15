@@ -47,6 +47,7 @@
   DebugLib
   PrintLib
   BaseLib
+  NetLib
 
 [Guids]
   gEfiFileSystemInfoGuid
