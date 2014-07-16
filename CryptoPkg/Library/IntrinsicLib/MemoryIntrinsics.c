@@ -2,7 +2,7 @@
   Intrinsic Memory Routines Wrapper Implementation for OpenSSL-based
   Cryptographic Library.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -23,6 +23,13 @@ int _fltused = 1;
 /* Sets buffers to a specified character */
 void * memset (void *dest, char ch, unsigned int count)
 {
+  //
+  // NOTE: Here we use one base implementation for memset, instead of the direct
+  //       optimized SetMem() wrapper. Because the IntrinsicLib has to be built 
+  //       without whole program optimization option, and there will be some 
+  //       potential register usage errors when calling other optimized codes.
+  //
+
   //
   // Declare the local variables that actually move the data elements as
   // volatile to prevent the optimizer from replacing this function with
