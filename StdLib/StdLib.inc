@@ -5,7 +5,7 @@
 # The including DSC file must DEFINE the EMULATE macro if
 # the application is to be run in an emulation environment.
 #
-#  Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -50,6 +50,8 @@
   LibNetUtil|StdLib/LibC/NetUtil/NetUtil.inf
 
 # Additional libraries for POSIX functionality.
+  LibPosix|StdLib/PosixLib/PosixLib.inf   # Combines LibErr, LibGen, LibGlob, LibStringlist, GetPass into one library
+
   LibErr|StdLib/PosixLib/Err/LibErr.inf
   LibGen|StdLib/PosixLib/Gen/LibGen.inf
   LibGlob|StdLib/PosixLib/Glob/LibGlob.inf

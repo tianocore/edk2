@@ -1,7 +1,7 @@
 ## @file
 #  Standard C library: UEFI "system calls".
 #
-#  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -9,21 +9,19 @@
 #  http://opensource.org/licenses/bsd-license.php.
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#
-#
 ##
 
 [Defines]
-  INF_VERSION                    = 0x00010005
-  BASE_NAME                      = LibUefi
-  FILE_GUID                      = 1dcff17c-aa53-4b78-b234-864027555035
-  MODULE_TYPE                    = UEFI_APPLICATION
-  VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = LibUefi
+  INF_VERSION                   = 0x00010005
+  BASE_NAME                     = LibUefi
+  FILE_GUID                     = 1dcff17c-aa53-4b78-b234-864027555035
+  MODULE_TYPE                   = UEFI_APPLICATION
+  VERSION_STRING                = 1.05
+  LIBRARY_CLASS                 = LibUefi
   LIBRARY_DESTRUCTOR            = DestructMePlease
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 
 [Sources]
@@ -32,7 +30,6 @@
   writev.c
   Xform.c
   compat.c
-  GetPass.c
   StubFunctions.c
 
 [Packages]
