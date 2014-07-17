@@ -1,6 +1,6 @@
 /** @file
 
-    Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2012 - 2014, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials
     are licensed and made available under the terms and conditions of the BSD License
     which accompanies this distribution.  The full text of the license may be found at
@@ -50,6 +50,7 @@
 #define _PATH_STDLIB      "/Efi/StdLib/"
 #define _PATH_ETC         _PATH_STDLIB "etc/"
 #define _PATH_TMP         _PATH_STDLIB "tmp/"
+#define _PATH_LIB         _PATH_STDLIB "lib/"
 #define _PATH_BIN         "/Efi/Tools/"
 
 /* DOS style device paths */

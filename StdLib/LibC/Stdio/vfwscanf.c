@@ -1,5 +1,7 @@
-/*-
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+/** @file
+  valist worker function for the wide-character fscanf.
+
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at
@@ -96,10 +98,10 @@
  * The following are used in integral conversions only:
  * SIGNOK, NDIGITS, PFXOK, and NZDIGITS
  */
-#define SIGNOK    0x40  /* +/- is (still) legal */
-#define NDIGITS   0x80  /* no digits detected */
-#define PFXOK   0x100 /* 0x prefix is (still) legal */
-#define NZDIGITS  0x200 /* no zero digits detected */
+#define SIGNOK    0x40    /* +/- is (still) legal */
+#define NDIGITS   0x80    /* no digits detected */
+#define PFXOK     0x100   /* 0x prefix is (still) legal */
+#define NZDIGITS  0x200   /* no zero digits detected */
 #define HAVESIGN  0x10000 /* sign detected */
 
 /*
@@ -138,38 +140,40 @@ vfwscanf(FILE * __restrict fp, const wchar_t * __restrict fmt, va_list ap)
 int
 __vfwscanf_unlocked(FILE * __restrict fp, const wchar_t * __restrict fmt, va_list ap)
 {
-  wint_t c;   /* character from format, or conversion */
-  size_t width;   /* field width, or 0 */
-  wchar_t *p;   /* points into all kinds of strings */
-  int n;      /* handy integer */
-  int flags;    /* flags as defined above */
-  wchar_t *p0;    /* saves original value of p when necessary */
-  int nassigned;    /* number of fields assigned */
-  int nconversions; /* number of conversions */
-  int nread;    /* number of characters consumed from fp */
-  int base;   /* base argument to conversion function */
-  wchar_t buf[BUF]; /* buffer for numeric conversions */
-  const wchar_t *ccls;  /* character class start */
-  const wchar_t *ccle;  /* character class end */
-  int cclcompl;   /* ccl is complemented? */
-  wint_t wi;    /* handy wint_t */
-  char *mbp;    /* multibyte string pointer for %c %s %[ */
-  size_t nconv;   /* number of bytes in mb. conversion */
-  char mbbuf[MB_LEN_MAX]; /* temporary mb. character buffer */
-  static const mbstate_t initial = { 0 };
-  mbstate_t mbs;
+  wint_t                  c;                            /* character from format, or conversion */
+  size_t                  width;                        /* field width, or 0 */
+  wchar_t                *p                   = NULL;   /* points into all kinds of strings */
+  int                     n;                            /* handy integer */
+  int                     flags;                        /* flags as defined above */
+  wchar_t                *p0;                           /* saves original value of p when necessary */
+  int                     nassigned;                    /* number of fields assigned */
+  int                     nconversions;                 /* number of conversions */
+  int                     nread;                        /* number of characters consumed from fp */
+  int                     base;                         /* base argument to conversion function */
+  wchar_t                 buf[BUF];                     /* buffer for numeric conversions */
+  const wchar_t          *ccls;                         /* character class start */
+  const wchar_t          *ccle;                         /* character class end */
+  int                     cclcompl;                     /* ccl is complemented? */
+  wint_t                  wi;                           /* handy wint_t */
+  char                   *mbp;                          /* multibyte string pointer for %c %s %[ */
+  size_t                  nconv;                        /* number of bytes in mb. conversion */
+  char                    mbbuf[MB_LEN_MAX];            /* temporary mb. character buffer */
+  mbstate_t               mbs;
 
+  static const mbstate_t  initial             = { 0 };
   /* `basefix' is used to avoid `if' tests in the integer scanner */
-  static short basefix[17] =
+  static short            basefix[17] =
     { 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
 
-  nassigned = 0;
-  nconversions = 0;
-  nread = 0;
-  ccls = ccle = NULL;
-  base = 0;
-  cclcompl = 0;
-  mbp = NULL;
+  nassigned     = 0;
+  nconversions  = 0;
+  nread         = 0;
+  ccls          = NULL;
+  ccle          = NULL;
+  base          = 0;
+  cclcompl      = 0;
+  mbp           = NULL;
+
   for (;;) {
     c = *fmt++;
     if (c == 0)

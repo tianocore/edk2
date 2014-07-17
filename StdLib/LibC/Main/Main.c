@@ -4,7 +4,7 @@
   All of the global data in the gMD structure is initialized to 0, NULL, or
   SIG_DFL; as appropriate.
 
-  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at
@@ -81,9 +81,9 @@ ArgvConvert(UINTN Argc, CHAR16 **Argv)
   INTN    nArgvSize;  /* Cumulative size of narrow Argv[i] */
 
 DEBUG_CODE_BEGIN();
-  Print(L"ArgvConvert called with %d arguments.\n", Argc);
+  DEBUG((DEBUG_INIT, "ArgvConvert called with %d arguments.\n", Argc));
   for(count = 0; count < ((Argc > 5)? 5: Argc); ++count) {
-    Print(L"Argument[%d] = \"%s\".\n", count, Argv[count]);
+    DEBUG((DEBUG_INIT, "Argument[%d] = \"%s\".\n", count, Argv[count]));
   }
 DEBUG_CODE_END();
 
@@ -92,7 +92,7 @@ DEBUG_CODE_END();
   for(count = 0; count < Argc; ++count) {
     AVsz = (ssize_t)wcstombs(NULL, Argv[count], ARG_MAX);
     if(AVsz < 0) {
-      Print(L"ABORTING: Argv[%d] contains an unconvertable character.\n", count);
+      DEBUG((DEBUG_ERROR, "ABORTING: Argv[%d] contains an unconvertable character.\n", count));
       exit(EXIT_FAILURE);
       /* Not Reached */
     }
@@ -102,7 +102,7 @@ DEBUG_CODE_END();
   /* Reserve space for the converted strings. */
   gMD->NCmdLine = (char *)AllocateZeroPool(nArgvSize+1);
   if(gMD->NCmdLine == NULL) {
-    Print(L"ABORTING: Insufficient memory.\n");
+    DEBUG((DEBUG_ERROR, "ABORTING: Insufficient memory.\n"));
     exit(EXIT_FAILURE);
     /* Not Reached */
   }
@@ -117,7 +117,7 @@ DEBUG_CODE_END();
     string += AVsz;
     nArgvSize -= AVsz;
     if(nArgvSize < 0) {
-      Print(L"ABORTING: Internal Argv[%d] conversion error.\n", count);
+      DEBUG((DEBUG_ERROR, "ABORTING: Internal Argv[%d] conversion error.\n", count));
       exit(EXIT_FAILURE);
       /* Not Reached */
     }
@@ -158,6 +158,7 @@ ShellAppMain (
       mfd[i].MyFD = (UINT16)i;
     }
 
+    DEBUG((DEBUG_INIT, "StdLib: Open Standard IO.\n"));
     i = open("stdin:", (O_RDONLY | O_TTY_INIT), 0444);
     if(i == 0) {
       i = open("stdout:", (O_WRONLY | O_TTY_INIT), 0222);
@@ -177,6 +178,7 @@ ShellAppMain (
     }
     else {
       if( setjmp(gMD->MainExit) == 0) {
+        errno   = 0;    // Clean up any "scratch" values from startup.
         ExitVal = (INTN)main( (int)Argc, gMD->NArgV);
         exitCleanup(ExitVal);
       }
