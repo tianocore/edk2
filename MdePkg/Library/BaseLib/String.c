@@ -1,7 +1,7 @@
 /** @file
   Unicode and ASCII string primatives.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1040,7 +1040,7 @@ UnicodeStrToAsciiStr (
   //
   // Source and Destination should not overlap
   //
-  ASSERT ((UINTN) ((CHAR16 *) Destination -  Source) > StrLen (Source));
+  ASSERT ((UINTN) (Destination - (CHAR8 *) Source) >= StrSize (Source));
   ASSERT ((UINTN) ((CHAR8 *) Source - Destination) > StrLen (Source));
 
 
@@ -2008,9 +2008,9 @@ AsciiStrToUnicodeStr (
   // Source and Destination should not overlap
   //
   ASSERT ((UINTN) ((CHAR8 *) Destination - Source) > AsciiStrLen (Source));
-  ASSERT ((UINTN) (Source - (CHAR8 *) Destination) > (AsciiStrLen (Source) * sizeof (CHAR16)));
+  ASSERT ((UINTN) (Source - (CHAR8 *) Destination) >= (AsciiStrSize (Source) * sizeof (CHAR16)));
 
- 
+
   ReturnValue = Destination;
   while (*Source != '\0') {
     *(Destination++) = (CHAR16) *(Source++);
