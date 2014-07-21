@@ -1544,9 +1544,9 @@ UiFindParentMenu (
   );
   
 /**
-  Validate the FormSet. If the formset is not validate, remove it from the list.
+  Validate the HiiHandle.
 
-  @param  FormSet                The input FormSet which need to validate.
+  @param  HiiHandle              The input HiiHandle which need to validate.
 
   @retval TRUE                   The handle is validate.
   @retval FALSE                  The handle is invalidate.
