@@ -28,38 +28,52 @@ DEFINE FD_SIZE_1MB=
 !endif
 !endif
 
-!ifdef $(FD_SIZE_1MB)
+!include OvmfPkg.fdf.inc
+
+#
+# Build the variable store and the firmware code as one unified flash device
+# image.
+#
 [FD.OVMF]
-BaseAddress   = 0xFFF00000|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress
-Size          = 0x00100000|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareFdSize
+BaseAddress   = $(FW_BASE_ADDRESS)
+Size          = $(FW_SIZE)
 ErasePolarity = 1
-BlockSize     = 0x1000|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareBlockSize
-NumBlocks     = 0x100
-!else
-[FD.OVMF]
-BaseAddress   = 0xFFE00000|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress
-Size          = 0x00200000|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareFdSize
-ErasePolarity = 1
-BlockSize     = 0x1000|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareBlockSize
-NumBlocks     = 0x200
-!endif
+BlockSize     = $(BLOCK_SIZE)
+NumBlocks     = $(FW_BLOCKS)
 
 !include VarStore.fdf.inc
 
-!ifdef $(FD_SIZE_1MB)
-0x00020000|0x000CC000
+$(VARS_SIZE)|$(FVMAIN_SIZE)
 FV = FVMAIN_COMPACT
 
-0x000EC000|0x14000
+$(SECFV_OFFSET)|$(SECFV_SIZE)
 FV = SECFV
 
-!else
-0x00020000|0x001AC000
+#
+# Build the variable store and the firmware code as separate flash device
+# images.
+#
+[FD.OVMF_VARS]
+BaseAddress   = $(FW_BASE_ADDRESS)
+Size          = $(VARS_SIZE)
+ErasePolarity = 1
+BlockSize     = $(BLOCK_SIZE)
+NumBlocks     = $(VARS_BLOCKS)
+
+!include VarStore.fdf.inc
+
+[FD.OVMF_CODE]
+BaseAddress   = $(CODE_BASE_ADDRESS)
+Size          = $(CODE_SIZE)
+ErasePolarity = 1
+BlockSize     = $(BLOCK_SIZE)
+NumBlocks     = $(CODE_BLOCKS)
+
+0x00000000|$(FVMAIN_SIZE)
 FV = FVMAIN_COMPACT
 
-0x001CC000|0x34000
+$(FVMAIN_SIZE)|$(SECFV_SIZE)
 FV = SECFV
-!endif
 
 ################################################################################
 
