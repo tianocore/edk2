@@ -1,7 +1,7 @@
 /** @file
   The file for AHCI mode of ATA host controller.
 
-  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -532,7 +532,7 @@ AhciBuildCommand (
   //
   // Filling the PRDT
   //
-  PrdtNumber = (DataLength + EFI_AHCI_MAX_DATA_PER_PRDT - 1) / EFI_AHCI_MAX_DATA_PER_PRDT;
+  PrdtNumber = (UINT32)DivU64x32 (((UINT64)DataLength + EFI_AHCI_MAX_DATA_PER_PRDT - 1), EFI_AHCI_MAX_DATA_PER_PRDT);
 
   //
   // According to AHCI 1.3 spec, a PRDT entry can point to a maximum 4MB data block.
