@@ -512,11 +512,16 @@ CpuMpServicesStartupAllAps (
         if (SingleThread) {
           Status = GetNextBlockedNumber (&NextNumber);
           if (!EFI_ERROR (Status)) {
+            gThread->MutexLock (&gMPSystem.ProcessorData[NextNumber].StateLock);
             gMPSystem.ProcessorData[NextNumber].State = CPU_STATE_READY;
+            gThread->MutexUnlock (&gMPSystem.ProcessorData[NextNumber].StateLock);
           }
         }
 
+        gThread->MutexLock (ProcessorData->StateLock);
         ProcessorData->State = CPU_STATE_IDLE;
+        gThread->MutexUnlock (ProcessorData->StateLock);
+
         break;
 
       default:
