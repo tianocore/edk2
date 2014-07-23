@@ -1,7 +1,7 @@
 /** @file
   Read EDID information and parse EDID information.
 
-  Copyright (c) 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -141,7 +141,7 @@ ReadEdidData (
   }
 
   *EdidDataBlock = AllocateCopyPool (
-                     sizeof (EDID_BLOCK_SIZE),
+                     EDID_BLOCK_SIZE,
                      ValidEdid
                      );
   if (*EdidDataBlock == NULL) {
@@ -370,7 +370,7 @@ CirrusLogic5430VideoModeSetup (
     //
     // Allocate double size of VESA_BIOS_EXTENSIONS_EDID_BLOCK_SIZE to avoid overflow
     //
-    EdidOverrideDataBlock = AllocatePool (sizeof (EDID_BLOCK_SIZE * 2));
+    EdidOverrideDataBlock = AllocatePool (EDID_BLOCK_SIZE * 2);
     if (NULL == EdidOverrideDataBlock) {
   		Status = EFI_OUT_OF_RESOURCES;
       goto Done;
