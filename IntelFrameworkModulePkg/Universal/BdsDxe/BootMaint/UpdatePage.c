@@ -579,7 +579,7 @@ UpdateOrderPage (
   ASSERT (OptionsOpCodeHandle != NULL);
   
   NewMenuEntry = NULL;
-  for (OptionIndex = 0; (OptionOrder[OptionIndex] != 0 && OptionIndex < MAX_MENU_NUMBER); OptionIndex++) {
+  for (OptionIndex = 0; (OptionIndex < MAX_MENU_NUMBER && OptionOrder[OptionIndex] != 0); OptionIndex++) {
     BootOptionFound = FALSE;
     for (Index = 0; Index < OptionMenu->MenuNumber; Index++) {
       NewMenuEntry   = BOpt_GetMenuEntry (OptionMenu, Index);
