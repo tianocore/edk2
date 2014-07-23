@@ -1,7 +1,7 @@
 /** @file
   Helper Routines that use a PXE-enabled NIC option ROM.
  
-Copyright (c) 1999 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -743,6 +743,11 @@ LaunchBaseCode (
     InOutRegs.X.AX)
     );
 
+  if ((UndiLoaderTable->Status != 0) || (InOutRegs.X.AX != PXENV_EXIT_SUCCESS)) {
+    DEBUG ((DEBUG_NET, "LaunchBaseCode exits with error, RomAddress = 0x%X\n\r", RomAddress));
+    return EFI_ABORTED;
+  }
+
   DEBUG ((DEBUG_NET, "Now returned from the UNDI code\n\r"));
 
   DEBUG ((DEBUG_NET, "After the call, we have...\n\r"));
@@ -755,8 +760,9 @@ LaunchBaseCode (
   Pxe = (PXE_T *)(UINTN)((UndiLoaderTable->PXEptr.Segment << 4) + UndiLoaderTable->PXEptr.Offset);
   SimpleNetworkDevice->Nii.Id = (UINT64)(UINTN) Pxe;
 
+  gBS->FreePool (Buffer);
+
   //
-  //  FreePool (Buffer);
   // paranoia - make sure a valid !PXE structure
   //
   if (CompareMem (Pxe->Signature, PXE_SIG, sizeof Pxe->Signature) != 0) {
