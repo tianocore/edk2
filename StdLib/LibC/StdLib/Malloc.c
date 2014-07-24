@@ -84,8 +84,8 @@ void *
 malloc(size_t Size)
 {
   CPOOL_HEAD   *Head;
-  void       *RetVal;
-  EFI_STATUS  Status;
+  void         *RetVal;
+  EFI_STATUS    Status;
   UINTN         NodeSize;
 
   if( Size == 0) {
@@ -98,7 +98,7 @@ malloc(size_t Size)
 
   DEBUG((DEBUG_POOL, "malloc(%d): NodeSz: %d", Size, NodeSize));
 
-  Status = gBS->AllocatePool( EfiLoaderData, NodeSize, &Head);
+  Status = gBS->AllocatePool( EfiLoaderData, NodeSize, (void**)&Head);
   if( Status != EFI_SUCCESS) {
     RetVal  = NULL;
     errno   = ENOMEM;
