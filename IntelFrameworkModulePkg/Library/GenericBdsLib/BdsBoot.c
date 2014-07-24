@@ -1642,6 +1642,8 @@ BdsRefreshBbsTableForBoot (
     }
   }
 
+  FreePool (DeviceType);
+
   if (BootOrder != NULL) {
     FreePool (BootOrder);
   }
