@@ -58,7 +58,7 @@ AsmCpuidEx  PROC    USES    ebx
 @@:
     mov     ecx, [ebp + 28]
     jecxz   @F
-    pop     [ecx]
+    pop     DWORD [ecx]
 @@:
     mov     eax, [ebp + 12]
     leave

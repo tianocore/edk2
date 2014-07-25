@@ -33,7 +33,7 @@ InternalAssertJumpBuffer    PROTO   C
 ;   );
 ;------------------------------------------------------------------------------
 SetJump     PROC
-    push    [esp + 4]
+    push    DWORD [esp + 4]
     call    InternalAssertJumpBuffer    ; To validate JumpBuffer
     pop     ecx
     pop     ecx                         ; ecx <- return address

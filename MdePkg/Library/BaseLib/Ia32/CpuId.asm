@@ -52,7 +52,7 @@ AsmCpuid    PROC    USES    ebx
 @@:
     mov     ecx, [ebp + 24]
     jecxz   @F
-    pop     [ecx]
+    pop     DWORD [ecx]
 @@:
     mov     ecx, [ebp + 28]
     jecxz   @F

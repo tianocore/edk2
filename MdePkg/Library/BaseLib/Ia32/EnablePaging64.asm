@@ -38,7 +38,7 @@
 ;------------------------------------------------------------------------------
 InternalX86EnablePaging64 PROC
     cli
-    mov     [esp], @F                   ; offset for far retf, seg is the 1st arg
+    mov     DWORD PTR [esp], @F         ; offset for far retf, seg is the 1st arg
     mov     eax, cr4
     or      al, (1 SHL 5)
     mov     cr4, eax                    ; enable PAE
