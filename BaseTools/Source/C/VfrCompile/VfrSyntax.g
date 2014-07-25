@@ -505,10 +505,10 @@ vfrFormSetDefinition :
   {
     ClassGuid "=" guidDefinition[ClassGuid1]        << ++ClassGuidNum; >>
                   {
-                   "\|" guidDefinition[ClassGuid2]  << ++ClassGuidNum; >>
-                  }
-                  {
-                   "\|" guidDefinition[ClassGuid3]  << ++ClassGuidNum; >>
+                     "\|" guidDefinition[ClassGuid2]  << ++ClassGuidNum; >>
+                     {
+                      "\|" guidDefinition[ClassGuid3]  << ++ClassGuidNum; >>
+                     }
                   }
                   ","
   }
@@ -1652,7 +1652,7 @@ vfrStatementSubTitle :
   |
     { "," vfrStatementStatTagList}
     { "," (vfrStatementStat | vfrStatementQuestions)*}
-    E: EndSubtitle ";"                                  << CRT_END_OP (E); >>
+    D: EndSubtitle ";"                                  << CRT_END_OP (D); >>
   )
   ;
 
