@@ -1,7 +1,7 @@
 /** @file
   This is the main routine for initializing the Graphics Console support routines.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1476,7 +1476,7 @@ GraphicsConsoleConOutSetAttribute (
 {
   EFI_TPL               OldTpl;
 
-  if ((Attribute | 0xFF) != 0xFF) {
+  if ((Attribute | 0x7F) != 0x7F) {
     return EFI_UNSUPPORTED;
   }
 
