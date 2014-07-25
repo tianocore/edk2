@@ -236,6 +236,7 @@ Returns:
 {
   CHAR8   InputBuffer[_MAX_PATH];
   CHAR8   *CurrentToken;
+  CHAR8   *Delimiter;
   BOOLEAN ParseError;
   BOOLEAN ReadError;
   UINTN   Occurrance;
@@ -283,8 +284,13 @@ Returns:
       //
       // Get the first non-whitespace string
       //
+      Delimiter = strchr (InputBuffer, '=');
+      if (Delimiter != NULL) {
+        *Delimiter = 0;
+      }
+
       CurrentToken = strtok (InputBuffer, " \t\n");
-      if (CurrentToken == NULL) {
+      if (CurrentToken == NULL || Delimiter == NULL) {
         //
         // Whitespace line found (or comment) so continue
         //
@@ -311,17 +317,29 @@ Returns:
           //
           // Copy the contents following the =
           //
-          CurrentToken = strtok (NULL, "= \t\n");
-          if (CurrentToken == NULL) {
+          CurrentToken = Delimiter + 1;
+          if (*CurrentToken == 0) {
             //
             // Nothing found, parsing error
             //
             ParseError = TRUE;
           } else {
             //
+            // Strip leading white space
+            //
+            while (*CurrentToken == ' ' || *CurrentToken == '\t') {
+              CurrentToken++;
+            }
+            //
             // Copy the current token to the output value
             //
             strcpy (Value, CurrentToken);
+            //
+            // Strip trailing white space
+            //
+            while (strlen(Value) > 0 && (*(Value + strlen(Value) - 1) == ' ' || *(Value + strlen(Value) - 1) == '\t')) {
+              *(Value + strlen(Value) - 1) = 0;
+            }
             return EFI_SUCCESS;
           }
         } else {
