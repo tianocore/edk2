@@ -53,6 +53,7 @@ static SVFR_WARNING_HANDLE VFR_WARNING_HANDLE_TABLE [] = {
   { VFR_WARNING_DEFAULT_VALUE_REDEFINED, ": default value re-defined with different value"},
   { VFR_WARNING_STRING_TO_UINT_OVERFLOW, ": String to UINT* Overflow"},
   { VFR_WARNING_ACTION_WITH_TEXT_TWO, ": Action opcode should not have TextTwo part"},
+  { VFR_WARNING_OBSOLETED_FRAMEWORK_OPCODE, ": Not recommend to use obsoleted framework opcode"},
   { VFR_WARNING_CODEUNDEFINED, ": undefined Warning Code" }
 };
 
