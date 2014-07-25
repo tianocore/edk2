@@ -1685,6 +1685,13 @@ vfrStatementStaticText :
   }
                                                        <<
                                                           if (Flags & EFI_IFR_FLAG_CALLBACK) {
+                                                            if (TxtTwo != EFI_STRING_ID_INVALID) {
+                                                              gCVfrErrorHandle.HandleWarning (
+                                                                                VFR_WARNING_ACTION_WITH_TEXT_TWO,
+                                                                                S3->getLine(),
+                                                                                S3->getText()
+                                                                                );
+                                                            }
                                                             CIfrAction AObj;
                                                             mCVfrQuestionDB.RegisterQuestion (NULL, NULL, QId);
                                                             AObj.SetLineNo (F->getLine());
