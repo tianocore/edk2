@@ -301,8 +301,8 @@ FileBufferRestoreMousePosition (
       //
       Orig                  = MainEditor.ColorAttributes;
       New.Data              = 0;
-      New.Colors.Foreground = Orig.Colors.Background;
-      New.Colors.Background = Orig.Colors.Foreground;
+      New.Colors.Foreground = Orig.Colors.Background & 0xF;
+      New.Colors.Background = Orig.Colors.Foreground & 0x7;
 
       //
       // clear the old mouse position
@@ -343,7 +343,7 @@ FileBufferRestoreMousePosition (
       //
       // set the new mouse position
       //
-      gST->ConOut->SetAttribute (gST->ConOut, New.Data);
+      gST->ConOut->SetAttribute (gST->ConOut, New.Data & 0x7F);
 
       //
       // clear the old mouse position

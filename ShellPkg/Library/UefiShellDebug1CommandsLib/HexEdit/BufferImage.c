@@ -2,7 +2,7 @@
   Defines HBufferImage - the view of the file that is visible at any point,
   as well as the event handlers for editing the file
   
-  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -318,9 +318,9 @@ HBufferImagePrintLine (
     }
 
     if (BeNewColor) {
-      gST->ConOut->SetAttribute (gST->ConOut, New.Data);
+      gST->ConOut->SetAttribute (gST->ConOut, New.Data & 0x7F);
     } else {
-      gST->ConOut->SetAttribute (gST->ConOut, Orig.Data);
+      gST->ConOut->SetAttribute (gST->ConOut, Orig.Data & 0x7F);
     }
 
     Pos = 10 + (Index * 3);
@@ -337,7 +337,7 @@ HBufferImagePrintLine (
 
   }
 
-  gST->ConOut->SetAttribute (gST->ConOut, Orig.Data);
+  gST->ConOut->SetAttribute (gST->ConOut, Orig.Data & 0x7F);
   while (Index < 0x08) {
     Pos = 10 + (Index * 3);
     ShellPrintEx ((INT32)Pos - 1, (INT32)Row - 1, L"    ");
@@ -355,9 +355,9 @@ HBufferImagePrintLine (
     }
 
     if (BeNewColor) {
-      gST->ConOut->SetAttribute (gST->ConOut, New.Data);
+      gST->ConOut->SetAttribute (gST->ConOut, New.Data & 0x7F);
     } else {
-      gST->ConOut->SetAttribute (gST->ConOut, Orig.Data);
+      gST->ConOut->SetAttribute (gST->ConOut, Orig.Data & 0x7F);
     }
 
     Pos = 10 + (Index * 3) + 1;
@@ -370,7 +370,7 @@ HBufferImagePrintLine (
     Index++;
   }
 
-  gST->ConOut->SetAttribute (gST->ConOut, Orig.Data);
+  gST->ConOut->SetAttribute (gST->ConOut, Orig.Data & 0x7F);
   while (Index < 0x10) {
     Pos = 10 + (Index * 3) + 1;
     ShellPrintEx ((INT32)Pos - 1, (INT32)Row - 1, L"   ");
@@ -379,7 +379,7 @@ HBufferImagePrintLine (
   //
   // restore the original color
   //
-  gST->ConOut->SetAttribute (gST->ConOut, Orig.Data);
+  gST->ConOut->SetAttribute (gST->ConOut, Orig.Data & 0x7F);
 
   //
   // PRINT the buffer content
@@ -581,8 +581,8 @@ HBufferImageRestoreMousePosition (
       //
       Orig                  = HMainEditor.ColorAttributes;
       New.Data              = 0;
-      New.Colors.Foreground = Orig.Colors.Background;
-      New.Colors.Background = Orig.Colors.Foreground;
+      New.Colors.Foreground = Orig.Colors.Background & 0xF;
+      New.Colors.Background = Orig.Colors.Foreground & 0x7;
 
       //
       // if in selected area,
@@ -594,7 +594,7 @@ HBufferImageRestoreMousePosition (
             )) {
         gST->ConOut->SetAttribute (gST->ConOut, Orig.Data);
       } else {
-        gST->ConOut->SetAttribute (gST->ConOut, New.Data);
+        gST->ConOut->SetAttribute (gST->ConOut, New.Data & 0x7F);
       }
       //
       // clear the old mouse position
@@ -646,7 +646,7 @@ HBufferImageRestoreMousePosition (
             HBufferImage.MousePosition.Row,
             HBufferImage.MousePosition.Column
             )) {
-        gST->ConOut->SetAttribute (gST->ConOut, New.Data);
+        gST->ConOut->SetAttribute (gST->ConOut, New.Data & 0x7F);
       } else {
         gST->ConOut->SetAttribute (gST->ConOut, Orig.Data);
       }

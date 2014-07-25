@@ -1,7 +1,7 @@
 /** @file
   Main file for attrib shell level 2 function.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -111,7 +111,7 @@ ShellCommandRunCls (
               break;
           }
           ForeColor = (~ShellStrToUintn(Param1)) & 0xF;
-          Status = gST->ConOut->SetAttribute (gST->ConOut, ForeColor | Background);
+          Status = gST->ConOut->SetAttribute (gST->ConOut, (ForeColor | Background) & 0x7F );
           ASSERT_EFI_ERROR(Status);
           Status = gST->ConOut->ClearScreen (gST->ConOut);
           ASSERT_EFI_ERROR(Status);
