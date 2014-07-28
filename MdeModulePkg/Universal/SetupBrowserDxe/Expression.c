@@ -1,7 +1,7 @@
 /** @file
 Utility functions for expression evaluation.
 
-Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -988,6 +988,129 @@ IfrStrToUpper (
   }
 }
 
+/**
+  Check whether this value type can be transfer to EFI_IFR_TYPE_BUFFER type.
+
+  EFI_IFR_TYPE_REF, EFI_IFR_TYPE_DATE and EFI_IFR_TYPE_TIME are converted to 
+  EFI_IFR_TYPE_BUFFER when do the value compare.
+
+  @param  Value                  Expression value to compare on.
+
+  @retval TRUE                   This value type can be transter to EFI_IFR_TYPE_BUFFER type.
+  @retval FALSE                  This value type can't be transter to EFI_IFR_TYPE_BUFFER type.
+
+**/
+BOOLEAN
+IsTypeInBuffer (
+  IN  EFI_HII_VALUE   *Value
+  )
+{
+  switch (Value->Type) {
+  case EFI_IFR_TYPE_BUFFER:
+  case EFI_IFR_TYPE_DATE:
+  case EFI_IFR_TYPE_TIME:
+  case EFI_IFR_TYPE_REF:
+    return TRUE;
+
+  default:
+    return FALSE;
+  }
+}
+
+/**
+  Check whether this value type can be transfer to EFI_IFR_TYPE_UINT64
+
+  @param  Value                  Expression value to compare on.
+
+  @retval TRUE                   This value type can be transter to EFI_IFR_TYPE_BUFFER type.
+  @retval FALSE                  This value type can't be transter to EFI_IFR_TYPE_BUFFER type.
+
+**/
+BOOLEAN
+IsTypeInUINT64 (
+  IN  EFI_HII_VALUE   *Value
+  )
+{
+  switch (Value->Type) {
+  case EFI_IFR_TYPE_NUM_SIZE_8:
+  case EFI_IFR_TYPE_NUM_SIZE_16:
+  case EFI_IFR_TYPE_NUM_SIZE_32:
+  case EFI_IFR_TYPE_NUM_SIZE_64:
+  case EFI_IFR_TYPE_BOOLEAN:
+    return TRUE;
+
+  default:
+    return FALSE;
+  }
+}
+
+/**
+  Return the buffer length for this value.
+
+  EFI_IFR_TYPE_REF, EFI_IFR_TYPE_DATE and EFI_IFR_TYPE_TIME are converted to 
+  EFI_IFR_TYPE_BUFFER when do the value compare.
+
+  @param   Value                  Expression value to compare on.
+  
+  @retval  BufLen                 Return the buffer length.
+
+**/
+UINT16
+GetLengthForValue (
+  IN  EFI_HII_VALUE   *Value
+  )
+{
+  switch (Value->Type) {
+  case EFI_IFR_TYPE_BUFFER:
+    return Value->BufferLen;
+
+  case EFI_IFR_TYPE_DATE:
+    return (UINT16) sizeof (EFI_HII_DATE);
+
+  case EFI_IFR_TYPE_TIME:
+    return (UINT16) sizeof (EFI_HII_TIME);
+
+  case EFI_IFR_TYPE_REF:
+    return (UINT16) sizeof (EFI_HII_REF);
+
+  default:
+    return 0;
+  }
+}
+
+/**
+  Return the buffer pointer for this value.
+
+  EFI_IFR_TYPE_REF, EFI_IFR_TYPE_DATE and EFI_IFR_TYPE_TIME are converted to 
+  EFI_IFR_TYPE_BUFFER when do the value compare.
+
+  @param  Value                  Expression value to compare on.
+
+  @retval Buf                    Return the buffer pointer.
+
+**/
+UINT8 *
+GetBufferForValue (
+  IN  EFI_HII_VALUE   *Value
+  )
+{
+  switch (Value->Type) {
+  case EFI_IFR_TYPE_BUFFER:
+    return Value->Buffer;
+
+  case EFI_IFR_TYPE_DATE:
+    return (UINT8 *) (&Value->Value.date);
+
+  case EFI_IFR_TYPE_TIME:
+    return (UINT8 *) (&Value->Value.time);
+
+  case EFI_IFR_TYPE_REF:
+    return (UINT8 *) (&Value->Value.ref);
+
+  default:
+    return NULL;
+  }
+}
 
 /**
   Evaluate opcode EFI_IFR_TO_STRING.
@@ -1013,6 +1136,8 @@ IfrToString (
   CHAR16         *PrintFormat;
   CHAR16         Buffer[MAXIMUM_VALUE_CHARACTERS];
   UINT8          *TmpBuf;
+  UINT8          *SrcBuf;
+  UINTN          SrcLen;
   UINTN          BufferSize;
 
   Status = PopExpression (&Value);
@@ -1057,24 +1182,37 @@ IfrToString (
     break;
     
   case EFI_IFR_TYPE_BUFFER:
+  case EFI_IFR_TYPE_DATE:
+  case EFI_IFR_TYPE_TIME:
+  case EFI_IFR_TYPE_REF:
     //
     // + 3 is base on the unicode format, the length may be odd number, 
     // so need 1 byte to align, also need 2 bytes for L'\0'.
     //
-    TmpBuf = AllocateZeroPool (Value.BufferLen + 3);
+    if (Value.Type == EFI_IFR_TYPE_BUFFER) {
+      SrcLen = Value.BufferLen;
+      SrcBuf = Value.Buffer;
+    } else {
+      SrcBuf = GetBufferForValue(&Value);
+      SrcLen = GetLengthForValue(&Value);
+    }
+
+    TmpBuf = AllocateZeroPool (SrcLen + 3);
     ASSERT (TmpBuf != NULL);
     if (Format == EFI_IFR_STRING_ASCII) {
-      CopyMem (TmpBuf, Value.Buffer, Value.BufferLen);
+      CopyMem (TmpBuf, SrcBuf, SrcLen);
       PrintFormat = L"%a"; 
     } else {
       // Format == EFI_IFR_STRING_UNICODE
-      CopyMem (TmpBuf, Value.Buffer, Value.BufferLen * sizeof (CHAR16));
+      CopyMem (TmpBuf, SrcBuf, SrcLen * sizeof (CHAR16));
       PrintFormat = L"%s";  
     }
-    UnicodeSPrint (Buffer, sizeof (Buffer), PrintFormat, Value.Buffer);  
+    UnicodeSPrint (Buffer, sizeof (Buffer), PrintFormat, TmpBuf);
     String = Buffer; 
     FreePool (TmpBuf);
-    FreePool (Value.Buffer);
+    if (Value.Type == EFI_IFR_TYPE_BUFFER) {
+      FreePool (Value.Buffer);
+    }
     break;
     
   default:
@@ -1114,7 +1252,7 @@ IfrToUint (
     return Status;
   }
 
-  if (Value.Type >= EFI_IFR_TYPE_OTHER && Value.Type != EFI_IFR_TYPE_BUFFER) {
+  if (Value.Type >= EFI_IFR_TYPE_OTHER && !IsTypeInBuffer(&Value)) {
     Result->Type = EFI_IFR_TYPE_UNDEFINED;
     return EFI_SUCCESS;
   }
@@ -1140,14 +1278,18 @@ IfrToUint (
       Result->Value.u64 = StrDecimalToUint64 (String);
     }
     FreePool (String);
-  } else if (Value.Type == EFI_IFR_TYPE_BUFFER) {
-    if (Value.BufferLen > 8) {
-      FreePool (Value.Buffer);
+  } else if (IsTypeInBuffer(&Value)) {
+    if (GetLengthForValue (&Value) > 8) {
+      if (Value.Type == EFI_IFR_TYPE_BUFFER) {
+        FreePool (Value.Buffer);
+      }
       Result->Type = EFI_IFR_TYPE_UNDEFINED;
       return EFI_SUCCESS;
     }
-    Result->Value.u64 = *(UINT64*) Value.Buffer;
-    FreePool (Value.Buffer);
+    Result->Value.u64 = *(UINT64*) GetBufferForValue (&Value);
+    if (Value.Type == EFI_IFR_TYPE_BUFFER) {
+      FreePool (Value.Buffer);
+    }
   } else {
     CopyMem (Result, &Value, sizeof (EFI_HII_VALUE));
   }
@@ -1179,6 +1321,8 @@ IfrCatenate (
   UINTN          Index;
   CHAR16         *StringPtr;
   UINTN          Size;
+  UINT16         Length0;
+  UINT16         Length1;
 
   //
   // String[0] - The second string
@@ -1201,7 +1345,7 @@ IfrCatenate (
   }
 
   for (Index = 0; Index < 2; Index++) {
-    if (Value[Index].Type != EFI_IFR_TYPE_STRING && Value[Index].Type != EFI_IFR_TYPE_BUFFER) {
+    if (Value[Index].Type != EFI_IFR_TYPE_STRING && !IsTypeInBuffer(&Value[Index])) {
       Result->Type = EFI_IFR_TYPE_UNDEFINED;
       Status = EFI_SUCCESS;
       goto Done;
@@ -1227,13 +1371,15 @@ IfrCatenate (
     Result->Value.string = NewString (StringPtr, FormSet->HiiHandle);
   } else {
     Result->Type = EFI_IFR_TYPE_BUFFER;
-    Result->BufferLen = (UINT16) (Value[0].BufferLen + Value[1].BufferLen);
+    Length0 = GetLengthForValue(&Value[0]);
+    Length1 = GetLengthForValue(&Value[1]);
+    Result->BufferLen = (UINT16) (Length0 + Length1);
 
     Result->Buffer = AllocateZeroPool (Result->BufferLen);
     ASSERT (Result->Buffer != NULL);
 
-    CopyMem (Result->Buffer, Value[0].Buffer, Value[0].BufferLen);
-    CopyMem (&Result->Buffer[Value[0].BufferLen], Value[1].Buffer, Value[1].BufferLen);
+    CopyMem (Result->Buffer, GetBufferForValue(&Value[0]), Length0);
+    CopyMem (&Result->Buffer[Length0], GetBufferForValue(&Value[1]), Length1);
   }
 Done:
   if (Value[0].Buffer != NULL) {
@@ -1447,6 +1593,7 @@ IfrMid (
   UINTN          Length;
   CHAR16         *SubString;
   UINT16         BufferLen;
+  UINT8          *Buffer;
 
   ZeroMem (Value, sizeof (Value));
 
@@ -1477,7 +1624,7 @@ IfrMid (
   }
   Base = (UINTN) Value[1].Value.u64;
 
-  if (Value[2].Type != EFI_IFR_TYPE_STRING && Value[2].Type != EFI_IFR_TYPE_BUFFER) {
+  if (Value[2].Type != EFI_IFR_TYPE_STRING && !IsTypeInBuffer(&Value[2])) {
     Result->Type = EFI_IFR_TYPE_UNDEFINED;
     return EFI_SUCCESS;
   }
@@ -1501,8 +1648,9 @@ IfrMid (
 
     FreePool (String);
   } else {
-    BufferLen = Value[2].BufferLen;
-    
+    BufferLen = GetLengthForValue (&Value[2]);
+    Buffer = GetBufferForValue (&Value[2]);
+
     Result->Type = EFI_IFR_TYPE_BUFFER;
     if (Length == 0 || Base >= BufferLen) {
       Result->BufferLen = 0;
@@ -1511,10 +1659,12 @@ IfrMid (
       Result->BufferLen = (UINT16)((BufferLen - Base) < Length ? (BufferLen - Base) : Length);    
       Result->Buffer = AllocateZeroPool (Result->BufferLen);
       ASSERT (Result->Buffer != NULL);
-      CopyMem (Result->Buffer, &Value[2].Buffer[Base], Result->BufferLen);
+      CopyMem (Result->Buffer, &Buffer[Base], Result->BufferLen);
     }
 
-    FreePool (Value[2].Buffer);
+    if (Value[2].Type == EFI_IFR_TYPE_BUFFER) {
+      FreePool (Value[2].Buffer);
+    }
   }
   
   return Status;
@@ -1876,21 +2026,12 @@ CompareHiiValue (
   CHAR16  *Str1;
   CHAR16  *Str2;
   UINTN   Len;
+  UINT8   *Buf1;
+  UINT16  Buf1Len;
+  UINT8   *Buf2;
+  UINT16  Buf2Len;
 
-  if (Value1->Type >= EFI_IFR_TYPE_OTHER || Value2->Type >= EFI_IFR_TYPE_OTHER ) {
-    if (Value1->Type != EFI_IFR_TYPE_BUFFER && Value2->Type != EFI_IFR_TYPE_BUFFER) {
-      return EFI_UNSUPPORTED;
-    }
-  }
-
-  if (Value1->Type == EFI_IFR_TYPE_STRING || Value2->Type == EFI_IFR_TYPE_STRING ) {
-    if (Value1->Type != Value2->Type) {
-      //
-      // Both Operator should be type of String
-      //
-      return EFI_UNSUPPORTED;
-    }
-
+  if (Value1->Type == EFI_IFR_TYPE_STRING && Value2->Type == EFI_IFR_TYPE_STRING) {
     if (Value1->Value.string == 0 || Value2->Value.string == 0) {
       //
       // StringId 0 is reserved
@@ -1925,39 +2066,44 @@ CompareHiiValue (
     return EFI_SUCCESS;
   }
 
-  if (Value1->Type == EFI_IFR_TYPE_BUFFER || Value2->Type == EFI_IFR_TYPE_BUFFER ) {
-    if (Value1->Type != Value2->Type) {
-      //
-      // Both Operator should be type of Buffer.
-      //
-      return EFI_UNSUPPORTED;
-    }
-    Len = Value1->BufferLen > Value2->BufferLen ? Value2->BufferLen : Value1->BufferLen;
-    *Result = CompareMem (Value1->Buffer, Value2->Buffer, Len);
-    if ((*Result == 0) && (Value1->BufferLen != Value2->BufferLen))
-    {
+  //
+  // Take types(date, time, ref, buffer) as buffer
+  //
+  if (IsTypeInBuffer(Value1) && IsTypeInBuffer(Value2)) {
+    Buf1    = GetBufferForValue(Value1);
+    Buf1Len = GetLengthForValue(Value1);
+    Buf2    = GetBufferForValue(Value2);
+    Buf2Len = GetLengthForValue(Value2);
+    
+    Len = Buf1Len > Buf2Len ? Buf2Len : Buf1Len;
+    *Result = CompareMem (Buf1, Buf2, Len);
+    if ((*Result == 0) && (Buf1Len != Buf2Len)) {
       //
       // In this case, means base on samll number buffer, the data is same
       // So which value has more data, which value is bigger.
       //
-      *Result = Value1->BufferLen > Value2->BufferLen ? 1 : -1;
+      *Result = Buf1Len > Buf2Len ? 1 : -1;
     }
     return EFI_SUCCESS;
   }  
 
   //
-  // Take remain types(integer, boolean, date/time) as integer
+  // Take types(integer, boolean) as integer
   //
-  Temp64 = HiiValueToUINT64(Value1) - HiiValueToUINT64(Value2);
-  if (Temp64 > 0) {
-    *Result = 1;
-  } else if (Temp64 < 0) {
-    *Result = -1;
-  } else {
-    *Result = 0;
+  if (IsTypeInUINT64(Value1) && IsTypeInUINT64(Value2)) {
+    Temp64 = HiiValueToUINT64(Value1) - HiiValueToUINT64(Value2);
+    if (Temp64 > 0) {
+      *Result = 1;
+    } else if (Temp64 < 0) {
+      *Result = -1;
+    } else {
+      *Result = 0;
+    }
+
+    return EFI_SUCCESS;
   }
 
-  return EFI_SUCCESS;
+  return EFI_UNSUPPORTED;
 }
 
 /**
@@ -2572,7 +2718,7 @@ EvaluateExpression (
       if (EFI_ERROR (Status)) {
         goto Done;
       }
-      if (Value->Type != EFI_IFR_TYPE_STRING && Value->Type != EFI_IFR_TYPE_BUFFER) {
+      if (Value->Type != EFI_IFR_TYPE_STRING && !IsTypeInBuffer (Value)) {
         Value->Type = EFI_IFR_TYPE_UNDEFINED;
         break;
       }
@@ -2589,7 +2735,7 @@ EvaluateExpression (
         FreePool (StrPtr);
       } else {
         Value->Type = EFI_IFR_TYPE_NUM_SIZE_64;
-        Value->Value.u64 = Value->BufferLen;
+        Value->Value.u64 = GetLengthForValue(Value);
         FreePool (Value->Buffer);
       }
       break;
@@ -2680,7 +2826,7 @@ EvaluateExpression (
         // When converting from an unsigned integer, zero will be converted to
         // FALSE and any other value will be converted to TRUE.
         //
-        Value->Value.b = (BOOLEAN) (Value->Value.u64 != 0);
+        Value->Value.b = (BOOLEAN) (HiiValueToUINT64(Value) != 0);
 
         Value->Type = EFI_IFR_TYPE_BOOLEAN;
       } else if (Value->Type == EFI_IFR_TYPE_STRING) {
@@ -2781,7 +2927,7 @@ EvaluateExpression (
       }
 
       Value->Type = EFI_IFR_TYPE_NUM_SIZE_64;
-      Value->Value.u64 = ~Value->Value.u64;
+      Value->Value.u64 = ~ HiiValueToUINT64(Value);
       break;
 
     case EFI_IFR_SET_OP:
@@ -2945,40 +3091,40 @@ EvaluateExpression (
 
       switch (OpCode->Operand) {
         case EFI_IFR_ADD_OP:
-          Value->Value.u64 = Data1.Value.u64 + Data2.Value.u64;
+          Value->Value.u64 = HiiValueToUINT64(&Data1) + HiiValueToUINT64(&Data2);
           break;
 
         case EFI_IFR_SUBTRACT_OP:
-          Value->Value.u64 = Data1.Value.u64 - Data2.Value.u64;
+          Value->Value.u64 = HiiValueToUINT64(&Data1) - HiiValueToUINT64(&Data2);
           break;
 
         case EFI_IFR_MULTIPLY_OP:
-          Value->Value.u64 = MultU64x32 (Data1.Value.u64, (UINT32) Data2.Value.u64);
+          Value->Value.u64 = MultU64x32 (HiiValueToUINT64(&Data1), (UINT32) HiiValueToUINT64(&Data2));
           break;
 
         case EFI_IFR_DIVIDE_OP:
-          Value->Value.u64 = DivU64x32 (Data1.Value.u64, (UINT32) Data2.Value.u64);
+          Value->Value.u64 = DivU64x32 (HiiValueToUINT64(&Data1), (UINT32) HiiValueToUINT64(&Data2));
           break;
 
         case EFI_IFR_MODULO_OP:
-          DivU64x32Remainder  (Data1.Value.u64, (UINT32) Data2.Value.u64, &TempValue);
+          DivU64x32Remainder  (HiiValueToUINT64(&Data1), (UINT32) HiiValueToUINT64(&Data2), &TempValue);
           Value->Value.u64 = TempValue;
           break;
 
         case EFI_IFR_BITWISE_AND_OP:
-          Value->Value.u64 = Data1.Value.u64 & Data2.Value.u64;
+          Value->Value.u64 = HiiValueToUINT64(&Data1) & HiiValueToUINT64(&Data2);
           break;
 
         case EFI_IFR_BITWISE_OR_OP:
-          Value->Value.u64 = Data1.Value.u64 | Data2.Value.u64;
+          Value->Value.u64 = HiiValueToUINT64(&Data1) | HiiValueToUINT64(&Data2);
           break;
 
         case EFI_IFR_SHIFT_LEFT_OP:
-          Value->Value.u64 = LShiftU64 (Data1.Value.u64, (UINTN) Data2.Value.u64);
+          Value->Value.u64 = LShiftU64 (HiiValueToUINT64(&Data1), (UINTN) HiiValueToUINT64(&Data2));
           break;
 
         case EFI_IFR_SHIFT_RIGHT_OP:
-          Value->Value.u64 = RShiftU64 (Data1.Value.u64, (UINTN) Data2.Value.u64);
+          Value->Value.u64 = RShiftU64 (HiiValueToUINT64(&Data1), (UINTN) HiiValueToUINT64(&Data2));
           break;
 
         default:
@@ -3045,14 +3191,14 @@ EvaluateExpression (
 
       if (Data2.Type > EFI_IFR_TYPE_BOOLEAN && 
           Data2.Type != EFI_IFR_TYPE_STRING && 
-          Data2.Type != EFI_IFR_TYPE_BUFFER) {
+          !IsTypeInBuffer(&Data2)) {
         Value->Type = EFI_IFR_TYPE_UNDEFINED;
         break;
       }
 
       if (Data1.Type > EFI_IFR_TYPE_BOOLEAN && 
           Data1.Type != EFI_IFR_TYPE_STRING && 
-          Data1.Type != EFI_IFR_TYPE_BUFFER) {
+          !IsTypeInBuffer(&Data1)) {
         Value->Type = EFI_IFR_TYPE_UNDEFINED;
         break;
       }
@@ -3060,6 +3206,8 @@ EvaluateExpression (
       Status = CompareHiiValue (&Data1, &Data2, &Result, FormSet->HiiHandle);
       if (Data1.Type == EFI_IFR_TYPE_BUFFER) {
         FreePool (Data1.Buffer);
+      }
+      if (Data2.Type == EFI_IFR_TYPE_BUFFER) {
         FreePool (Data2.Buffer);
       }
       
