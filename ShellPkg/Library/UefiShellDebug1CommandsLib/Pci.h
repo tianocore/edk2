@@ -453,10 +453,10 @@ typedef struct {
   UINT32  SlotCap;
   UINT16  SlotControl;
   UINT16  SlotStatus;
-  UINT16  RsvdP;
   UINT16  RootControl;
+  UINT16  RsvdP;
   UINT32  RootStatus;
-} PCIE_CAP_STURCTURE;
+} PCIE_CAP_STRUCTURE;
 
 #pragma pack()
 

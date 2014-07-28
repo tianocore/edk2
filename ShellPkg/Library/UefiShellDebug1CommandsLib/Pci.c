@@ -1662,7 +1662,7 @@ PciExplainPciExpress (
 **/
 EFI_STATUS
 ExplainPcieCapReg (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
 /**
@@ -1674,7 +1674,7 @@ ExplainPcieCapReg (
 **/
 EFI_STATUS
 ExplainPcieDeviceCap (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
 /**
@@ -1686,7 +1686,7 @@ ExplainPcieDeviceCap (
 **/
 EFI_STATUS
 ExplainPcieDeviceControl (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
 /**
@@ -1698,7 +1698,7 @@ ExplainPcieDeviceControl (
 **/
 EFI_STATUS
 ExplainPcieDeviceStatus (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
 /**
@@ -1710,7 +1710,7 @@ ExplainPcieDeviceStatus (
 **/
 EFI_STATUS
 ExplainPcieLinkCap (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
 /**
@@ -1722,7 +1722,7 @@ ExplainPcieLinkCap (
 **/
 EFI_STATUS
 ExplainPcieLinkControl (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
 /**
@@ -1734,7 +1734,7 @@ ExplainPcieLinkControl (
 **/
 EFI_STATUS
 ExplainPcieLinkStatus (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
 /**
@@ -1746,7 +1746,7 @@ ExplainPcieLinkStatus (
 **/
 EFI_STATUS
 ExplainPcieSlotCap (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
 /**
@@ -1758,7 +1758,7 @@ ExplainPcieSlotCap (
 **/
 EFI_STATUS
 ExplainPcieSlotControl (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
 /**
@@ -1770,7 +1770,7 @@ ExplainPcieSlotControl (
 **/
 EFI_STATUS
 ExplainPcieSlotStatus (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
 /**
@@ -1782,7 +1782,7 @@ ExplainPcieSlotStatus (
 **/
 EFI_STATUS
 ExplainPcieRootControl (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
 /**
@@ -1794,7 +1794,7 @@ ExplainPcieRootControl (
 **/
 EFI_STATUS
 ExplainPcieRootCap (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
 /**
@@ -1806,10 +1806,10 @@ ExplainPcieRootCap (
 **/
 EFI_STATUS
 ExplainPcieRootStatus (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   );
 
-typedef EFI_STATUS (*PCIE_EXPLAIN_FUNCTION) (IN PCIE_CAP_STURCTURE *PciExpressCap);
+typedef EFI_STATUS (*PCIE_EXPLAIN_FUNCTION) (IN PCIE_CAP_STRUCTURE *PciExpressCap);
 
 typedef enum {
   FieldWidthUINT8,
@@ -3853,7 +3853,7 @@ PciExplainCapabilityStruct (
 **/
 EFI_STATUS
 ExplainPcieCapReg (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT16 PcieCapReg;
@@ -3901,7 +3901,7 @@ ExplainPcieCapReg (
 **/
 EFI_STATUS
 ExplainPcieDeviceCap (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT16 PcieCapReg;
@@ -3990,7 +3990,7 @@ ExplainPcieDeviceCap (
 **/
 EFI_STATUS
 ExplainPcieDeviceControl (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT16 PcieCapReg;
@@ -4067,7 +4067,7 @@ ExplainPcieDeviceControl (
 **/
 EFI_STATUS
 ExplainPcieDeviceStatus (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT16 PcieDeviceStatus;
@@ -4109,7 +4109,7 @@ ExplainPcieDeviceStatus (
 **/
 EFI_STATUS
 ExplainPcieLinkCap (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT32 PcieLinkCap;
@@ -4200,7 +4200,7 @@ ExplainPcieLinkCap (
 **/
 EFI_STATUS
 ExplainPcieLinkControl (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT16 PcieLinkControl;
@@ -4271,7 +4271,7 @@ ExplainPcieLinkControl (
 **/
 EFI_STATUS
 ExplainPcieLinkStatus (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT16 PcieLinkStatus;
@@ -4332,7 +4332,7 @@ ExplainPcieLinkStatus (
 **/
 EFI_STATUS
 ExplainPcieSlotCap (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT32 PcieSlotCap;
@@ -4400,7 +4400,7 @@ ExplainPcieSlotCap (
 **/
 EFI_STATUS
 ExplainPcieSlotControl (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT16 PcieSlotControl;
@@ -4464,7 +4464,7 @@ ExplainPcieSlotControl (
 **/
 EFI_STATUS
 ExplainPcieSlotStatus (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT16 PcieSlotStatus;
@@ -4525,7 +4525,7 @@ ExplainPcieSlotStatus (
 **/
 EFI_STATUS
 ExplainPcieRootControl (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT16 PcieRootControl;
@@ -4565,7 +4565,7 @@ ExplainPcieRootControl (
 **/
 EFI_STATUS
 ExplainPcieRootCap (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT16 PcieRootCap;
@@ -4589,7 +4589,7 @@ ExplainPcieRootCap (
 **/
 EFI_STATUS
 ExplainPcieRootStatus (
-  IN PCIE_CAP_STURCTURE *PciExpressCap
+  IN PCIE_CAP_STRUCTURE *PciExpressCap
   )
 {
   UINT32 PcieRootStatus;
@@ -5062,7 +5062,7 @@ EFIAPI
 PrintInterpretedExtendedCompatibilityMulticast (
   IN CONST PCI_EXP_EXT_HDR *HeaderAddress,
   IN CONST PCI_EXP_EXT_HDR *HeadersBaseAddress,
-  IN CONST PCIE_CAP_STURCTURE *PciExpressCapPtr
+  IN CONST PCIE_CAP_STRUCTURE *PciExpressCapPtr
   )
 {
   CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_MULTICAST *Header;
@@ -5234,7 +5234,7 @@ EFIAPI
 PrintInterpretedExtendedCompatibilitySecondary (
   IN CONST PCI_EXP_EXT_HDR *HeaderAddress,
   IN CONST PCI_EXP_EXT_HDR *HeadersBaseAddress,
-  IN CONST PCIE_CAP_STURCTURE *PciExpressCapPtr
+  IN CONST PCIE_CAP_STRUCTURE *PciExpressCapPtr
   )
 {
   CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_SECONDARY_PCIE *Header;
@@ -5276,7 +5276,7 @@ EFIAPI
 PrintPciExtendedCapabilityDetails(
   IN CONST PCI_EXP_EXT_HDR    *HeadersBaseAddress, 
   IN CONST PCI_EXP_EXT_HDR    *HeaderAddress,
-  IN CONST PCIE_CAP_STURCTURE *PciExpressCapPtr
+  IN CONST PCIE_CAP_STRUCTURE *PciExpressCapPtr
   )
 {
   switch (HeaderAddress->CapabilityId){
@@ -5346,7 +5346,7 @@ PciExplainPciExpress (
   )
 {
 
-  PCIE_CAP_STURCTURE  PciExpressCap;
+  PCIE_CAP_STRUCTURE  PciExpressCap;
   EFI_STATUS          Status;
   UINT64              CapRegAddress;
   UINT8               Bus;
