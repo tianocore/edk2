@@ -23,14 +23,6 @@ SetWorkspace() {
     return 0
   fi
 
-  if [ ! ${BASH_SOURCE[0]} -ef ./BaseTools/BuildEnv ]
-  then
-    echo Run this script from the base of your tree.  For example:
-    echo "  cd /Path/To/Edk/Root"
-    echo "  . BaseTools/BuildEnv"
-    return 1
-  fi
-
   #
   # Set $WORKSPACE
   #
