@@ -2,7 +2,7 @@
 
   Internal generic functions to operate flash block.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -164,6 +164,7 @@ GetFvbByAddress (
 
   *FvBlock  = NULL;
   FvbHandle = NULL;
+  HandleBuffer = NULL;
   //
   // Locate all handles of Fvb protocol
   //
@@ -1018,6 +1019,8 @@ FindFvbForFtw (
   EFI_FVB_ATTRIBUTES_2                Attributes;
   EFI_FV_BLOCK_MAP_ENTRY              *FvbMapEntry;
   UINT32                              LbaIndex;
+
+  HandleBuffer = NULL;
 
   //
   // Get all FVB handle.

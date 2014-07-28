@@ -3344,6 +3344,9 @@ GetFvbInfoByAddress (
   EFI_FIRMWARE_VOLUME_HEADER              *FwVolHeader;
   EFI_FVB_ATTRIBUTES_2                    Attributes;
  
+  Fvb = NULL;
+  HandleBuffer = NULL;
+
   //
   // Get all FVB handles.
   //

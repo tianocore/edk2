@@ -416,6 +416,8 @@ CoreConnectSingleController (
   DriverBindingHandleBuffer             = NULL;
   NumberOfSortedDriverBindingProtocols  = 0;
   SortedDriverBindingProtocols          = NULL;
+  PlatformDriverOverride                = NULL;
+  NewDriverBindingHandleBuffer          = NULL;
 
   //
   // Get list of all Driver Binding Protocol Instances

@@ -40,7 +40,7 @@
   If one of them is not satisfied, FtwWrite may fail.
   Usually, Spare area only takes one block. That's SpareAreaLength = BlockSize, NumberOfSpareBlock = 1.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -226,6 +226,8 @@ FaultTolerantWriteInitialize (
 {
   EFI_STATUS                              Status;
   EFI_FTW_DEVICE                          *FtwDevice;
+
+  FtwDevice = NULL;
 
   //
   // Allocate private data structure for FTW protocol and do some initialization

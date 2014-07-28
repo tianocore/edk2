@@ -393,6 +393,8 @@ IScsiReceiveLoginRsp (
   EFI_STATUS  Status;
   NET_BUF     *Pdu;
 
+  Pdu = NULL;
+
   //
   // Receive the iSCSI login response.
   //

@@ -2372,6 +2372,8 @@ EvaluateExpression (
   EFI_HII_VALUE           QuestionVal;
   EFI_DEVICE_PATH_PROTOCOL *DevicePath;
 
+  StrPtr = NULL;
+
   //
   // Save current stack offset.
   //

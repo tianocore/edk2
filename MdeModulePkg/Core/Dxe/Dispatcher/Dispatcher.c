@@ -26,7 +26,7 @@
   Depex - Dependency Expresion.
   SOR   - Schedule On Request - Don't schedule if this bit is set.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1141,6 +1141,8 @@ CoreFwVolEventProtocolNotify (
   UINTN                         SizeOfBuffer;
   VOID                          *DepexBuffer;
   KNOWN_HANDLE                  *KnownHandle;
+
+  FvHandle = NULL;
 
   while (TRUE) {
     BufferSize = sizeof (EFI_HANDLE);

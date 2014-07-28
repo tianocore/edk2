@@ -1,7 +1,7 @@
 /** @file
   Core image handling services to load and unload PeImage.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -853,6 +853,9 @@ CoreUnloadAndCloseImage (
   EFI_OPEN_PROTOCOL_INFORMATION_ENTRY *OpenInfo;
   UINTN                               OpenInfoCount;
   UINTN                               OpenInfoIndex;
+
+  HandleBuffer = NULL;
+  ProtocolGuidArray = NULL;
 
   if (Image->Ebc != NULL) {
     //

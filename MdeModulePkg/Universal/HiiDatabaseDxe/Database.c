@@ -2417,9 +2417,14 @@ AddPackages (
   //
   // Initialize Variables
   //
-  StringPkgIsAdd = FALSE;
-  FontPackage = NULL;
-  StringPackage = NULL;
+  StringPkgIsAdd        = FALSE;
+  FontPackage           = NULL;
+  StringPackage         = NULL;
+  GuidPackage           = NULL;
+  FormPackage           = NULL;
+  ImagePackage          = NULL;
+  SimpleFontPackage     = NULL;
+  KeyboardLayoutPackage = NULL;
 
   //
   // Process the package list header

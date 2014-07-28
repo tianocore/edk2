@@ -43,7 +43,7 @@
   Caution: This module requires additional review when modified.
   This driver need to make sure the CommBuffer is not in the SMRAM range. 
 
-Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -273,6 +273,8 @@ GetFvbByAddressAndAttribute (
   EFI_PHYSICAL_ADDRESS                FvbBaseAddress;
   EFI_FVB_ATTRIBUTES_2                FvbAttributes;
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *Fvb;
+
+  HandleBuffer = NULL;
 
   //
   // Locate all handles of SMM Fvb protocol.

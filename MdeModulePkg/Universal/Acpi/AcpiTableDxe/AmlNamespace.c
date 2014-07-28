@@ -1,7 +1,7 @@
 /** @file
   ACPI Sdt Protocol Driver
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -300,6 +300,8 @@ AmlConstructNodeListForChild (
   EFI_AML_HANDLE      *AmlChildHandle;
   EFI_STATUS          Status;
 
+  CurrentBuffer   = NULL;
+  AmlChildHandle  = NULL;
   AmlByteEncoding = AmlHandle->AmlByteEncoding;
   Buffer          = AmlHandle->Buffer;
   BufferSize      = AmlHandle->Size;

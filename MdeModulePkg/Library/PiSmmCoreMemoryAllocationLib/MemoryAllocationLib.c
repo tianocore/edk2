@@ -1,7 +1,7 @@
 /** @file
   Support routines for memory allocation routines based on SMM Core internal functions.
 
-  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -477,6 +477,8 @@ InternalAllocatePool (
 {
   EFI_STATUS  Status;
   VOID        *Memory;
+
+  Memory = NULL;
 
   Status = SmmAllocatePool (MemoryType, AllocationSize, &Memory);
   if (EFI_ERROR (Status)) {

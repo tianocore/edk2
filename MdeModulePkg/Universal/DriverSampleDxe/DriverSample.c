@@ -671,6 +671,7 @@ AppendAltCfgString (
   UINTN                               ValueWidth;
   EFI_STATUS                          Status;
 
+  TmpBuffer = NULL;
   StringPtr = *RequestResult;
   StringPtr = StrStr (StringPtr, L"OFFSET");
   BlockSize = sizeof (DRIVER_SAMPLE_CONFIGURATION);
