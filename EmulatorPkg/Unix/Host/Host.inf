@@ -127,6 +127,8 @@
    GCC:*_GCC45_X64_CC_FLAGS = "-DEFIAPI=__attribute__((ms_abi))"
    GCC:*_GCC46_X64_CC_FLAGS = "-DEFIAPI=__attribute__((ms_abi))"
    GCC:*_GCC47_X64_CC_FLAGS = "-DEFIAPI=__attribute__((ms_abi))"
+   GCC:*_GCC48_X64_CC_FLAGS = "-DEFIAPI=__attribute__((ms_abi))"
+   GCC:*_GCC49_X64_CC_FLAGS = "-DEFIAPI=__attribute__((ms_abi))"
    GCC:*_*_X64_PP_FLAGS == -m64 -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
    GCC:*_*_X64_ASM_FLAGS == -m64 -c -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h
 
