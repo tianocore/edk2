@@ -1,7 +1,7 @@
 /** @file
   Serial I/O status code reporting worker.
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -89,7 +89,7 @@ SerialStatusCodeReportWorker (
     CharCount = AsciiSPrint (
                   Buffer,
                   sizeof (Buffer),
-                  "ERROR: C%x:V%x I%x",
+                  "ERROR: C%08x:V%08x I%x",
                   CodeType,
                   Value,
                   Instance
@@ -127,7 +127,7 @@ SerialStatusCodeReportWorker (
     CharCount = AsciiSPrint (
                   Buffer,
                   sizeof (Buffer),
-                  "PROGRESS CODE: V%x I%x\n\r",
+                  "PROGRESS CODE: V%08x I%x\n\r",
                   Value,
                   Instance
                   );
@@ -150,7 +150,7 @@ SerialStatusCodeReportWorker (
     CharCount = AsciiSPrint (
                   Buffer,
                   sizeof (Buffer),
-                  "Undefined: C%x:V%x I%x\n\r",
+                  "Undefined: C%08x:V%08x I%x\n\r",
                   CodeType,
                   Value,
                   Instance
