@@ -13,7 +13,7 @@
 
   InitCommunicateBuffer() is really function to check the variable data size.
 
-Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -222,6 +222,7 @@ VariableLockRequestToLock (
   }
 
   VariableNameSize = StrSize (VariableName);
+  VariableToLock   = NULL;
 
   //
   // If VariableName exceeds SMM payload limit. Return failure
@@ -302,6 +303,7 @@ RuntimeServiceGetVariable (
 
   TempDataSize          = *DataSize;
   VariableNameSize      = StrSize (VariableName);
+  SmmVariableHeader     = NULL;
 
   //
   // If VariableName exceeds SMM payload limit. Return failure
@@ -404,6 +406,7 @@ RuntimeServiceGetNextVariableName (
 
   OutVariableNameSize   = *VariableNameSize;
   InVariableNameSize    = StrSize (VariableName);
+  SmmGetNextVariableName = NULL;
 
   //
   // If input string exceeds SMM payload limit. Return failure
@@ -523,6 +526,7 @@ RuntimeServiceSetVariable (
   }
 
   VariableNameSize      = StrSize (VariableName);
+  SmmVariableHeader     = NULL;
 
   //
   // If VariableName or DataSize exceeds SMM payload limit. Return failure
@@ -601,6 +605,8 @@ RuntimeServiceQueryVariableInfo (
   EFI_STATUS                                Status;
   UINTN                                     PayloadSize;
   SMM_VARIABLE_COMMUNICATE_QUERY_VARIABLE_INFO *SmmQueryVariableInfo;
+
+  SmmQueryVariableInfo = NULL;
 
   if(MaximumVariableStorageSize == NULL || RemainingVariableStorageSize == NULL || MaximumVariableSize == NULL || Attributes == 0) {
     return EFI_INVALID_PARAMETER;

@@ -2122,6 +2122,7 @@ VerifyTimeBasedPayload (
   WrapSigData            = NULL;
   SignerCerts            = NULL;
   RootCert               = NULL;
+  CertsInCertDb          = NULL;
 
   //
   // When the attribute EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS is
