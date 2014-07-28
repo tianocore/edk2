@@ -8,7 +8,7 @@
   environment varibles. Multi-instance device paths should never be placed
   on a Handle.
 
-  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -153,12 +153,8 @@ DevicePathNodeLength (
   IN CONST VOID  *Node
   )
 {
-  UINTN Length;
-
   ASSERT (Node != NULL);
-  Length = ReadUnaligned16 ((UINT16 *)&((EFI_DEVICE_PATH_PROTOCOL *)(Node))->Length[0]);
-  ASSERT (Length >= sizeof (EFI_DEVICE_PATH_PROTOCOL));
-  return Length;
+  return ReadUnaligned16 ((UINT16 *)&((EFI_DEVICE_PATH_PROTOCOL *)(Node))->Length[0]);
 }
 
 /**
