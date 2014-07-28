@@ -1,7 +1,7 @@
 /** @file
   Mtftp6 Rrq process functions implementation.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -457,6 +457,7 @@ Mtftp6RrqHandleOack (
   EFI_UDP6_PROTOCOL         *Udp6;
 
   *IsCompleted = FALSE;
+  Options = NULL;
 
   //
   // If already started the master download, don't change the

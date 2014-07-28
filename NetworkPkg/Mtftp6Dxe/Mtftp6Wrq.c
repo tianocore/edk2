@@ -1,7 +1,7 @@
 /** @file
   Mtftp6 Wrq process functions implementation.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -295,6 +295,7 @@ Mtftp6WrqHandleOack (
   INTN                      Expected;
 
   *IsCompleted = FALSE;
+  Options = NULL;
 
   //
   // Ignore the OACK if already started the upload
