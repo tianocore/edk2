@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -1879,6 +1879,7 @@ LegacyBiosCheckPciRomEx (
   PCI_TYPE00                      PciConfigHeader;
   VOID                            *LocalConfigUtilityCodeHeader;
 
+  LocalConfigUtilityCodeHeader = NULL;
   *Flags = NO_ROM;
   Status = gBS->HandleProtocol (
                   PciHandle,
