@@ -41,7 +41,8 @@ fi
 # Configure defaults for various options
 #
 
-PROCESSOR=X64
+ARCH_IA32=no
+ARCH_X64=no
 BUILDTARGET=DEBUG
 BUILD_OPTIONS=
 PLATFORMFILE=
@@ -123,7 +124,12 @@ do
   else
     case $LAST_ARG in
       -a)
-        PROCESSOR=$arg
+        if [[ x"$arg" != x"IA32" && x"$arg" != x"X64" ]]; then
+          echo Unsupported processor architecture: $arg
+          echo Only IA32 or X64 is supported
+          exit 1
+        fi
+        eval ARCH_$arg=yes
         ;;
       -b)
         BUILDTARGET=$arg
@@ -146,9 +152,28 @@ do
   shift
 done
 
+if [[ "$ARCH_IA32" == "yes" && "$ARCH_X64" == "yes" ]]; then
+  PROCESSOR=IA32X64
+  Processor=Ia32X64
+  BUILD_OPTIONS="$BUILD_OPTIONS -a IA32 -a X64"
+  PLATFORM_BUILD_DIR=Ovmf3264
+  BUILD_ROOT_ARCH=X64
+elif [[ "$ARCH_IA32" == "yes" && "$ARCH_X64" == "no" ]]; then
+  PROCESSOR=IA32
+  Processor=Ia32
+  BUILD_OPTIONS="$BUILD_OPTIONS -a IA32"
+  PLATFORM_BUILD_DIR=Ovmf$Processor
+  BUILD_ROOT_ARCH=$PROCESSOR
+else
+  PROCESSOR=X64
+  Processor=X64
+  BUILD_OPTIONS="$BUILD_OPTIONS -a X64"
+  PLATFORM_BUILD_DIR=Ovmf$Processor
+  BUILD_ROOT_ARCH=X64
+fi
+
 case $PROCESSOR in
   IA32)
-    Processor=Ia32
     if [ -n "$QEMU_COMMAND" ]; then
       #
       # The user set the QEMU_COMMAND variable. We'll use it to run QEMU.
@@ -165,8 +190,7 @@ case $PROCESSOR in
       exit 1
     fi
     ;;
-  X64)
-    Processor=X64
+  X64|IA32X64)
     if [ -z "$QEMU_COMMAND" ]; then
       #
       # The user didn't set the QEMU_COMMAND variable.
@@ -216,9 +240,9 @@ fi
 #echo Remaining for qemu: $*
 #exit 1
 
-BUILD_ROOT=$WORKSPACE/Build/Ovmf$Processor/"$BUILDTARGET"_"$TARGET_TOOLS"
+BUILD_ROOT=$WORKSPACE/Build/$PLATFORM_BUILD_DIR/"$BUILDTARGET"_"$TARGET_TOOLS"
 FV_DIR=$BUILD_ROOT/FV
-BUILD_ROOT_ARCH=$BUILD_ROOT/$PROCESSOR
+BUILD_ROOT_ARCH=$BUILD_ROOT/$BUILD_ROOT_ARCH
 QEMU_FIRMWARE_DIR=$BUILD_ROOT/QEMU
 
 if  [[ ! -f `which build` || ! -f `which GenFv` ]];
@@ -259,6 +283,6 @@ fi
 # Build the edk2 OvmfPkg
 #
 echo Running edk2 build for OvmfPkg$Processor
-build -p $PLATFORMFILE $BUILD_OPTIONS -a $PROCESSOR -b $BUILDTARGET -t $TARGET_TOOLS -n $THREADNUMBER
+build -p $PLATFORMFILE $BUILD_OPTIONS -b $BUILDTARGET -t $TARGET_TOOLS -n $THREADNUMBER
 exit $?
 
