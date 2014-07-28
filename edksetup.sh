@@ -35,11 +35,14 @@ function HelpMsg()
 
 function SetupEnv()
 {
-  if [ -z "$WORKSPACE" ]
+  if [ -n "$EDK_TOOLS_PATH" ]
   then
-    . BaseTools/BuildEnv $*
-  else
+    . $EDK_TOOLS_PATH/BuildEnv $*
+  elif [ -n "$WORKSPACE" ]
+  then
     . $WORKSPACE/BaseTools/BuildEnv $*
+  else
+    . BaseTools/BuildEnv $*
   fi
 }
 
