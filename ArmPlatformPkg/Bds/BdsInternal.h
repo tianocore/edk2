@@ -46,6 +46,7 @@
 
 #define UPDATE_BOOT_ENTRY L"Update entry: "
 #define DELETE_BOOT_ENTRY L"Delete entry: "
+#define MOVE_BOOT_ENTRY   L"Move entry: "
 
 typedef enum {
     BDS_LOADER_EFI_APPLICATION = 0,
