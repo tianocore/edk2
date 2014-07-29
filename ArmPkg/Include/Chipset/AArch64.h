@@ -66,6 +66,25 @@
 #define AARCH64_EL2       0x8
 #define AARCH64_EL1       0x4
 
+// Saved Program Status Register definitions
+#define SPSR_A                  BIT8
+#define SPSR_I                  BIT7
+#define SPSR_F                  BIT6
+
+#define SPSR_AARCH32            BIT4
+
+#define SPSR_AARCH32_MODE_USER  0x0
+#define SPSR_AARCH32_MODE_FIQ   0x1
+#define SPSR_AARCH32_MODE_IRQ   0x2
+#define SPSR_AARCH32_MODE_SVC   0x3
+#define SPSR_AARCH32_MODE_ABORT 0x7
+#define SPSR_AARCH32_MODE_UNDEF 0xB
+#define SPSR_AARCH32_MODE_SYS   0xF
+
+// Counter-timer Hypervisor Control register definitions
+#define CNTHCTL_EL2_EL1PCTEN    BIT0
+#define CNTHCTL_EL2_EL1PCEN     BIT1
+
 #define ARM_VECTOR_TABLE_ALIGNMENT ((1 << 11)-1)
 
 VOID
