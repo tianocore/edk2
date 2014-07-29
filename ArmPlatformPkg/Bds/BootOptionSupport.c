@@ -895,15 +895,184 @@ BdsLoadOptionTftpCreateDevicePath (
   return Status;
 }
 
+/**
+  Update the parameters of a TFTP boot option
+
+  The function asks sequentially to update the IPv4 parameters as well as the boot file path,
+  providing the previously set value if any.
+
+  @param[in]   OldDevicePath  Current complete device path of the Tftp boot option.
+                              This has to be a valid complete Tftp boot option path.
+                              By complete, we mean that it is not only the Tftp
+                              specific end part built by the
+                              "BdsLoadOptionTftpCreateDevicePath()" function.
+                              This path is handled as read only.
+  @param[in]   FileName       Description of the file the path is asked for
+  @param[out]  NewDevicePath  Pointer to the new complete device path.
+
+  @retval  EFI_SUCCESS            Update completed
+  @retval  EFI_ABORTED            Update aborted by the user
+  @retval  EFI_OUT_OF_RESOURCES   Fail to perform the update due to lack of resource
+**/
 EFI_STATUS
 BdsLoadOptionTftpUpdateDevicePath (
-  IN EFI_DEVICE_PATH            *OldDevicePath,
-  IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath
+  IN   EFI_DEVICE_PATH            *OldDevicePath,
+  IN   CHAR16                     *FileName,
+  OUT  EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath
   )
 {
-  ASSERT (0);
-  return EFI_UNSUPPORTED;
+  EFI_STATUS             Status;
+  EFI_DEVICE_PATH       *DevicePath;
+  EFI_DEVICE_PATH       *DevicePathNode;
+  UINT8                 *Ipv4NodePtr;
+  IPv4_DEVICE_PATH       Ipv4Node;
+  BOOLEAN                IsDHCP;
+  EFI_IP_ADDRESS         OldIp;
+  EFI_IP_ADDRESS         LocalIp;
+  EFI_IP_ADDRESS         RemoteIp;
+  UINT8                 *FileNodePtr;
+  CHAR16                 BootFilePath[BOOT_DEVICE_FILEPATH_MAX];
+  UINTN                  PathSize;
+  UINTN                  BootFilePathSize;
+  FILEPATH_DEVICE_PATH  *NewFilePathNode;
+
+  Ipv4NodePtr = NULL;
+
+  //
+  // Make a copy of the complete device path that is made of :
+  // the device path of the device that support the Simple Network protocol
+  // followed by an IPv4 node (type IPv4_DEVICE_PATH),
+  // followed by a file path node (type FILEPATH_DEVICE_PATH) and ended up
+  // by an end node. The IPv6 case is not handled yet.
+  //
+
+  DevicePath = DuplicateDevicePath (OldDevicePath);
+  if (DevicePath == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ErrorExit;
+  }
+
+  //
+  // Because of the check done by "BdsLoadOptionTftpIsSupported()" prior to the
+  // call to this function, we know that the device path ends with an IPv4 node
+  // followed by a file path node and finally an end node. To get the address of
+  // the last IPv4 node, we loop over the whole device path, noting down the
+  // address of each encountered IPv4 node.
+  //
+
+  for (DevicePathNode = DevicePath;
+       !IsDevicePathEnd (DevicePathNode);
+       DevicePathNode = NextDevicePathNode (DevicePathNode))
+  {
+    if (IS_DEVICE_PATH_NODE (DevicePathNode, MESSAGING_DEVICE_PATH, MSG_IPv4_DP)) {
+      Ipv4NodePtr = (UINT8*)DevicePathNode;
+    }
+  }
+
+  // Copy for alignment of the IPv4 node data
+  CopyMem (&Ipv4Node, Ipv4NodePtr, sizeof (IPv4_DEVICE_PATH));
+
+  Print (L"Get the IP address from DHCP: ");
+  Status = GetHIInputBoolean (&IsDHCP);
+  if (EFI_ERROR (Status)) {
+    goto ErrorExit;
+  }
+
+  if (!IsDHCP) {
+    Print (L"Local static IP address: ");
+    if (Ipv4Node.StaticIpAddress) {
+      // Copy local IPv4 address into IPv4 or IPv6 union
+      CopyMem (&OldIp.v4, &Ipv4Node.LocalIpAddress, sizeof (EFI_IPv4_ADDRESS));
+
+      Status = EditHIInputIP (&OldIp, &LocalIp);
+    } else {
+      Status = GetHIInputIP (&LocalIp);
+    }
+    if (EFI_ERROR (Status)) {
+      goto ErrorExit;
+    }
+  }
+
+  Print (L"TFTP server IP address: ");
+  // Copy remote IPv4 address into IPv4 or IPv6 union
+  CopyMem (&OldIp.v4, &Ipv4Node.RemoteIpAddress, sizeof (EFI_IPv4_ADDRESS));
+
+  Status = EditHIInputIP (&OldIp, &RemoteIp);
+  if (EFI_ERROR (Status)) {
+    goto ErrorExit;
+  }
+
+  // Get the path of the boot file and its size in number of bytes
+  FileNodePtr = Ipv4NodePtr + sizeof (IPv4_DEVICE_PATH);
+  BootFilePathSize = DevicePathNodeLength (FileNodePtr) - SIZE_OF_FILEPATH_DEVICE_PATH;
+
+  //
+  // Ask for update of the boot file path
+  //
+  do {
+    // Copy for 2-byte alignment of the Unicode string
+    CopyMem (
+      BootFilePath, FileNodePtr + SIZE_OF_FILEPATH_DEVICE_PATH,
+      MIN (BootFilePathSize, BOOT_DEVICE_FILEPATH_MAX)
+      );
+    BootFilePath[BOOT_DEVICE_FILEPATH_MAX - 1] = L'\0';
+
+    Print (L"File path of the %s: ", FileName);
+    Status = EditHIInputStr (BootFilePath, BOOT_DEVICE_FILEPATH_MAX);
+    if (EFI_ERROR (Status)) {
+      goto ErrorExit;
+    }
+    PathSize = StrSize (BootFilePath);
+    if (PathSize > 2) {
+      break;
+    }
+    // Empty string, give the user another try
+    Print (L"Empty string - Invalid path\n");
+  } while (PathSize <= 2) ;
+
+  //
+  // Update the IPv4 node. IPv6 case not handled yet.
+  //
+  if (IsDHCP == TRUE) {
+    Ipv4Node.StaticIpAddress = FALSE;
+  } else {
+    Ipv4Node.StaticIpAddress = TRUE;
+  }
+  CopyMem (&Ipv4Node.LocalIpAddress, &LocalIp.v4, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Ipv4Node.RemoteIpAddress, &RemoteIp.v4, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (Ipv4NodePtr, &Ipv4Node, sizeof (IPv4_DEVICE_PATH));
+
+  //
+  // Create the new file path node
+  //
+  NewFilePathNode = (FILEPATH_DEVICE_PATH*)AllocatePool (
+                                             SIZE_OF_FILEPATH_DEVICE_PATH +
+                                             PathSize
+                                             );
+  NewFilePathNode->Header.Type    = MEDIA_DEVICE_PATH;
+  NewFilePathNode->Header.SubType = MEDIA_FILEPATH_DP;
+  SetDevicePathNodeLength (
+    NewFilePathNode,
+    SIZE_OF_FILEPATH_DEVICE_PATH + PathSize
+    );
+  CopyMem (NewFilePathNode->PathName, BootFilePath, PathSize);
+
+  //
+  // Generate the new Device Path by replacing the file path node at address
+  // "FileNodePtr" by the new one "NewFilePathNode" and return its address.
+  //
+  SetDevicePathEndNode (FileNodePtr);
+  *NewDevicePath = AppendDevicePathNode (
+                     DevicePath,
+                     (CONST EFI_DEVICE_PATH_PROTOCOL*)NewFilePathNode
+                     );
+
+ErrorExit:
+  if (DevicePath != NULL) {
+    FreePool (DevicePath) ;
+  }
+
+  return Status;
 }
 
 BOOLEAN
