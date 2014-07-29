@@ -141,9 +141,12 @@
   # ARM Architectural Timer
   #
   gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|0|UINT32|0x00000034
-  # ARM Architectural Timer Interrupt(GIC PPI) number
+
+  # ARM Architectural Timer Interrupt(GIC PPI) numbers
   gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|29|UINT32|0x00000035
   gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|30|UINT32|0x00000036
+  gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|26|UINT32|0x00000040
+  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|27|UINT32|0x00000041
 
 [PcdsFixedAtBuild.ARM]
   #
