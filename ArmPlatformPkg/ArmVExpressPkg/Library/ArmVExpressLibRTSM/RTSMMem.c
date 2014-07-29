@@ -78,6 +78,8 @@ ArmPlatformGetVirtualMemoryMap (
         SparseMemorySize);
   } else {
     HasSparseMemory = FALSE;
+    SparseMemoryBase = 0x0;
+    SparseMemorySize = 0x0;
   }
 
   VirtualMemoryTable = (ARM_MEMORY_REGION_DESCRIPTOR*)AllocatePages(EFI_SIZE_TO_PAGES (sizeof(ARM_MEMORY_REGION_DESCRIPTOR) * MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS));
