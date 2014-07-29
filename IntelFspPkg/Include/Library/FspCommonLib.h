@@ -1,0 +1,173 @@
+/** @file
+
+  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php.
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
+
+#ifndef _FSP_COMMON_LIB_H_
+#define _FSP_COMMON_LIB_H_
+
+#include <FspGlobalData.h>
+#include <FspMeasurePointId.h>
+
+/**
+  This function sets the FSP global data pointer.
+
+  @param[in] FspData       Fsp global data pointer.
+
+**/
+VOID
+EFIAPI
+SetFspGlobalDataPointer (
+  IN FSP_GLOBAL_DATA   *FspData
+  );
+
+/**
+  This function gets the FSP global data pointer.
+
+**/
+FSP_GLOBAL_DATA *
+EFIAPI
+GetFspGlobalDataPointer (
+  VOID
+  );
+
+/**
+  This function gets back the FSP API paramter passed by the bootlaoder.
+
+  @retval ApiParameter FSP API paramter passed by the bootlaoder.
+**/
+UINT32
+EFIAPI
+GetFspApiParameter (
+  VOID
+  );
+
+/**
+  This function sets the FSP API paramter in the stack.
+
+   @param[in] Value       New parameter value.
+
+**/
+VOID
+EFIAPI
+SetFspApiParameter (
+  IN UINT32      Value
+  );
+
+/**
+  This function sets the FSP continuation function parameters in the stack.
+
+  @param[in] Value             New parameter value to set.
+  @param[in] Index             Parameter index.
+**/
+VOID
+EFIAPI
+SetFspContinuationFuncParameter (
+  IN UINT32      Value,
+  IN UINT32      Index
+  );
+
+/**
+  This function changes the Bootloader return address in stack.
+
+  @param[in] ReturnAddress       Address to return.
+
+**/
+VOID
+EFIAPI
+SetFspApiReturnAddress (
+  IN UINT32  ReturnAddress
+  );
+
+/**
+  This function set the API status code returned to the bootloader.
+
+  @param[in] ReturnStatus       Status code to return.
+
+**/
+VOID
+EFIAPI
+SetFspApiReturnStatus (
+  IN UINT32  ReturnStatus
+  );
+
+/**
+  This function sets the context switching stack to a new stack frame.
+
+  @param[in] NewStackTop       New core stack to be set.
+
+**/
+VOID
+EFIAPI
+SetFspCoreStackPointer (
+  IN VOID   *NewStackTop
+  );
+
+/**
+  This function sets the platform specific data pointer.
+
+  @param[in] PlatformData       Fsp platform specific data pointer.
+
+**/
+VOID
+EFIAPI
+SetFspPlatformDataPointer (
+  IN VOID   *PlatformData
+  );
+
+/**
+  This function gets the platform specific data pointer.
+
+   @param[in] PlatformData       Fsp platform specific data pointer.
+
+**/
+VOID *
+EFIAPI
+GetFspPlatformDataPointer (
+  VOID
+  );
+
+/**
+  This function sets the UPD data pointer.
+
+  @param[in] UpdDataRgnPtr   UPD data pointer.
+**/
+VOID
+EFIAPI
+SetFspUpdDataPointer (
+  IN VOID    *UpdDataRgnPtr
+  );
+
+/**
+  This function gets the UPD data pointer.
+
+  @return UpdDataRgnPtr   UPD data pointer.
+**/
+VOID *
+EFIAPI
+GetFspUpdDataPointer (
+  VOID
+  );
+
+/**
+  Set FSP measurement point timestamp.
+
+  @param[in] Id       Measurement point ID.
+
+  @return performance timestamp.
+**/
+UINT64
+EFIAPI
+SetFspMeasurePoint (
+  IN UINT8  Id
+  );
+
+#endif
