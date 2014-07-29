@@ -345,7 +345,7 @@ DefineDefaultBootEntries (
     }
   }
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 EFI_STATUS
