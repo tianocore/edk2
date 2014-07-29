@@ -56,10 +56,11 @@
 #define ARM_CPU_REV(rn, pn)     ((((rn) & 0xF) << 20) | ((pn) & 0xF))
 
 // Hypervisor Configuration Register
-#define ARM_HCR_FMO				BIT3
-#define ARM_HCR_IMO				BIT4
-#define ARM_HCR_AMO				BIT5
-#define ARM_HCR_TGE				BIT27
+#define ARM_HCR_FMO       BIT3
+#define ARM_HCR_IMO       BIT4
+#define ARM_HCR_AMO       BIT5
+#define ARM_HCR_TSC       BIT19
+#define ARM_HCR_TGE       BIT27
 
 // AArch64 Exception Level
 #define AARCH64_EL3       0xC
