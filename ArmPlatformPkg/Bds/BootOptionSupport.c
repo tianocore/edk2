@@ -458,16 +458,47 @@ BdsLoadOptionFileSystemUpdateDevicePath (
   return EFI_SUCCESS;
 }
 
+/**
+  Check if a boot option path is a file system boot option path or not.
+
+  The device specified by the beginning of the path has to support the Simple File
+  System protocol. Furthermore, the remaining part of the path has to be composed of
+  a single node of type MEDIA_DEVICE_PATH and sub-type MEDIA_FILEPATH_DP.
+
+  @param[in]  DevicePath  Complete device path of a boot option.
+
+  @retval  FALSE  The boot option path has not been identified as that of a
+                  file system boot option.
+  @retval  TRUE   The boot option path is a file system boot option.
+**/
 BOOLEAN
 BdsLoadOptionFileSystemIsSupported (
-  IN  EFI_DEVICE_PATH           *DevicePath
+  IN  EFI_DEVICE_PATH  *DevicePath
   )
 {
-  EFI_DEVICE_PATH*  DevicePathNode;
+  EFI_STATUS                        Status;
+  EFI_HANDLE                        Handle;
+  EFI_DEVICE_PATH                  *RemainingDevicePath;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  *FileProtocol;
 
-  DevicePathNode = GetLastDevicePathNode (DevicePath);
+  Status = BdsConnectDevicePath (DevicePath, &Handle, &RemainingDevicePath);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
 
-  return IS_DEVICE_PATH_NODE(DevicePathNode,MEDIA_DEVICE_PATH,MEDIA_FILEPATH_DP);
+  Status = gBS->HandleProtocol (
+                   Handle,
+                   &gEfiSimpleFileSystemProtocolGuid,
+                   (VOID **)(&FileProtocol)
+                   );
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  if (!IS_DEVICE_PATH_NODE (RemainingDevicePath, MEDIA_DEVICE_PATH, MEDIA_FILEPATH_DP))
+    return FALSE;
+
+  return TRUE;
 }
 
 STATIC
@@ -643,16 +674,47 @@ BdsLoadOptionMemMapUpdateDevicePath (
   return Status;
 }
 
+/**
+  Check if a boot option path is a memory map boot option path or not.
+
+  The device specified by the beginning of the path has to support the BlockIo
+  protocol. Furthermore, the remaining part of the path has to be composed of
+  a single node of type HARDWARE_DEVICE_PATH and sub-type HW_MEMMAP_DP.
+
+  @param[in]  DevicePath  Complete device path of a boot option.
+
+  @retval  FALSE  The boot option path has not been identified as that of a
+                  memory map boot option.
+  @retval  TRUE   The boot option path is a a memory map boot option.
+**/
 BOOLEAN
 BdsLoadOptionMemMapIsSupported (
-  IN  EFI_DEVICE_PATH           *DevicePath
+  IN  EFI_DEVICE_PATH  *DevicePath
   )
 {
-  EFI_DEVICE_PATH*  DevicePathNode;
+  EFI_STATUS              Status;
+  EFI_HANDLE              Handle;
+  EFI_DEVICE_PATH        *RemainingDevicePath;
+  EFI_BLOCK_IO_PROTOCOL  *BlockIoProtocol;
 
-  DevicePathNode = GetLastDevicePathNode (DevicePath);
+  Status = BdsConnectDevicePath (DevicePath, &Handle, &RemainingDevicePath);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
 
-  return IS_DEVICE_PATH_NODE(DevicePathNode,HARDWARE_DEVICE_PATH,HW_MEMMAP_DP);
+  Status = gBS->HandleProtocol (
+                  Handle,
+                  &gEfiBlockIoProtocolGuid,
+                  (VOID **)(&BlockIoProtocol)
+                  );
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  if (!IS_DEVICE_PATH_NODE (RemainingDevicePath, HARDWARE_DEVICE_PATH, HW_MEMMAP_DP))
+    return FALSE;
+
+  return TRUE;
 }
 
 EFI_STATUS
@@ -748,7 +810,7 @@ BdsLoadOptionPxeUpdateDevicePath (
 
 BOOLEAN
 BdsLoadOptionPxeIsSupported (
-  IN  EFI_DEVICE_PATH           *DevicePath
+  IN  EFI_DEVICE_PATH  *DevicePath
   )
 {
   EFI_STATUS  Status;
