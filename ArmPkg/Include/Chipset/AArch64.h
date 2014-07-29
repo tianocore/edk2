@@ -62,6 +62,13 @@
 #define ARM_HCR_TSC       BIT19
 #define ARM_HCR_TGE       BIT27
 
+// Exception Syndrome Register
+#define AARCH64_ESR_EC(Ecr)    ((0x3F << 26) & (Ecr))
+#define AARCH64_ESR_ISS(Ecr)   ((0x1FFFFFF) & (Ecr))
+
+#define AARCH64_ESR_EC_SMC32   (0x13 << 26)
+#define AARCH64_ESR_EC_SMC64   (0x17 << 26)
+
 // AArch64 Exception Level
 #define AARCH64_EL3       0xC
 #define AARCH64_EL2       0x8
