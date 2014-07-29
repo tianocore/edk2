@@ -136,8 +136,6 @@
   ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
   LzmaDecompressLib|IntelFrameworkModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
 
-  # Temp work around for Movt relocation issue. 
-  #PeCoffLib|ArmPkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   
   HobLib|EmbeddedPkg/Library/PrePiHobLib/PrePiHobLib.inf

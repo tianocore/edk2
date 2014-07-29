@@ -54,6 +54,7 @@
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
+  PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
 
   SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf
@@ -104,7 +105,6 @@
   ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
   ArmPkg/Library/ArmLib/Null/NullArmLib.inf
   ArmPkg/Library/BaseMemoryLibStm/BaseMemoryLibStm.inf
-  ArmPkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   ArmPkg/Library/BdsLib/BdsLib.inf
   ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
   ArmPkg/Library/DebugAgentSymbolsBaseLib/DebugAgentSymbolsBaseLib.inf
