@@ -90,8 +90,8 @@
   UINT64  ELR;    0x300   // Exception Link Register
   UINT64  SPSR;   0x308   // Saved Processor Status Register
   UINT64  FPSR;   0x310   // Floating Point Status Register
-  UINT64  ESR;    0x318   // EL1 Fault Address Register
-  UINT64  FAR;    0x320   // EL1 Exception syndrome register
+  UINT64  ESR;    0x318   // Exception syndrome register
+  UINT64  FAR;    0x320   // Fault Address Register
   UINT64  Padding;0x328   // Required for stack alignment
 */
 
@@ -127,7 +127,7 @@ GCC_ASM_EXPORT(CommonCExceptionHandler)
         REG_PAIR (x28, x29, 0x0e0, GP_CONTEXT_SIZE);    \
         REG_ONE  (x30,      0x0f0, GP_CONTEXT_SIZE);
 
-// In order to save the SP we need to put it somwhere else first.
+// In order to save the SP we need to put it somewhere else first.
 // STR only works with XZR/WZR directly
 #define SAVE_SP \
         add x1, sp, #(FP_CONTEXT_SIZE + SYS_CONTEXT_SIZE); \
@@ -252,7 +252,7 @@ ASM_PFX(SynchronousExceptionEntry):
   // This does not save r31(SP) as it is special. We do that later.
   ALL_GP_REGS
 
-  // Record the tipe of exception that occured.
+  // Record the type of exception that occurred.
   mov       x0, #EXCEPT_AARCH64_SYNCHRONOUS_EXCEPTIONS
 
   // Jump to our general handler to deal with all the common parts and process the exception.
@@ -298,8 +298,8 @@ ASM_PFX(ExceptionHandlersEnd):
 //
 ASM_PFX(AsmCommonExceptionEntry):
   /* NOTE:
-     We have to break up the save code because the immidiate value to be used
-     with the SP is to big to do it all in one step so we need to shuffle the SP
+     We have to break up the save code because the immediate value to be used
+     with the SP is too big to do it all in one step so we need to shuffle the SP
      along as we go. (we only have 9bits of immediate to work with) */
 
   // Save the current Stack pointer before we start modifying it.
@@ -317,8 +317,8 @@ ASM_PFX(AsmCommonExceptionEntry):
 2:mrs      x1, elr_el2   // Exception Link Register
   mrs      x2, spsr_el2  // Saved Processor Status Register 32bit
   mrs      x3, fpsr      // Floating point Status Register  32bit
-  mrs      x4, esr_el2   // EL1 Exception syndrome register 32bit
-  mrs      x5, far_el2   // EL1 Fault Address Register
+  mrs      x4, esr_el2   // EL2 Exception syndrome register 32bit
+  mrs      x5, far_el2   // EL2 Fault Address Register
 
   // Adjust SP to save next set
 3:add      sp, sp, #FP_CONTEXT_SIZE
@@ -356,7 +356,6 @@ ASM_PFX(AsmCommonExceptionEntry):
 #undef REG_PAIR
 #undef REG_ONE
 #define REG_PAIR(REG1, REG2, OFFSET, CONTEXT_SIZE)    ldp  REG1, REG2, [sp, #(OFFSET-CONTEXT_SIZE)]
-
 #define REG_ONE(REG1, OFFSET, CONTEXT_SIZE)           ldur REG1, [sp, #(OFFSET-CONTEXT_SIZE)]
 
   // Adjust SP to pop system registers
@@ -373,8 +372,8 @@ ASM_PFX(AsmCommonExceptionEntry):
 2:msr      elr_el2, x1   // Exception Link Register
   msr      spsr_el2,x2   // Saved Processor Status Register 32bit
   msr      fpsr, x3      // Floating point Status Register  32bit
-  msr      esr_el2, x4   // EL1 Exception syndrome register 32bit
-  msr      far_el2, x5   // EL1 Fault Address Register
+  msr      esr_el2, x4   // EL2 Exception syndrome register 32bit
+  msr      far_el2, x5   // EL2 Fault Address Register
 
 3:// pop all regs and return from exception.
   sub     sp, sp, #(FP_CONTEXT_SIZE + SYS_CONTEXT_SIZE)
