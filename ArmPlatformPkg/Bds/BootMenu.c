@@ -134,7 +134,6 @@ BootMenuAddBootOption (
   UINTN                     InitrdSize;
   UINT8*                    OptionalData;
   UINTN                     OptionalDataSize;
-  BOOLEAN                   RequestBootType;
 
   Attributes                = 0;
   SupportedBootDevice = NULL;
@@ -147,8 +146,7 @@ BootMenuAddBootOption (
   }
 
   // Create the specific device path node
-  RequestBootType = TRUE;
-  Status = SupportedBootDevice->Support->CreateDevicePathNode (L"EFI Application or the kernel", &DevicePathNodes, &RequestBootType);
+  Status = SupportedBootDevice->Support->CreateDevicePathNode (L"EFI Application or the kernel", &DevicePathNodes);
   if (EFI_ERROR(Status)) {
     Status = EFI_ABORTED;
     goto EXIT;
@@ -160,7 +158,7 @@ BootMenuAddBootOption (
     goto EXIT;
   }
 
-  if (RequestBootType) {
+  if (SupportedBootDevice->Support->RequestBootType) {
     Status = BootDeviceGetType (DevicePath, &BootType, &Attributes);
     if (EFI_ERROR(Status)) {
       Status = EFI_ABORTED;
@@ -180,7 +178,7 @@ BootMenuAddBootOption (
 
     if (InitrdSupport) {
       // Create the specific device path node
-      Status = SupportedBootDevice->Support->CreateDevicePathNode (L"initrd", &InitrdPathNodes, NULL);
+      Status = SupportedBootDevice->Support->CreateDevicePathNode (L"initrd", &InitrdPathNodes);
       if (EFI_ERROR(Status) && Status != EFI_NOT_FOUND) { // EFI_NOT_FOUND is returned on empty input string, but we can boot without an initrd
         Status = EFI_ABORTED;
         goto EXIT;
@@ -409,7 +407,6 @@ BootMenuUpdateBootOption (
   BOOLEAN                       InitrdSupport;
   UINT8*                        OptionalData;
   UINTN                         OptionalDataSize;
-  BOOLEAN                       RequestBootType;
   BOOLEAN                       IsPrintable;
   BOOLEAN                       IsUnicode;
 
@@ -426,14 +423,13 @@ BootMenuUpdateBootOption (
     return EFI_UNSUPPORTED;
   }
 
-  RequestBootType = TRUE;
-  Status = DeviceSupport->UpdateDevicePathNode (BootOption->FilePathList, L"EFI Application or the kernel", &DevicePath, &RequestBootType);
+  Status = DeviceSupport->UpdateDevicePathNode (BootOption->FilePathList, L"EFI Application or the kernel", &DevicePath);
   if (EFI_ERROR(Status)) {
     Status = EFI_ABORTED;
     goto EXIT;
   }
 
-  if (RequestBootType) {
+  if (DeviceSupport->RequestBootType) {
     Status = BootDeviceGetType (DevicePath, &BootType, &BootOption->Attributes);
     if (EFI_ERROR(Status)) {
       Status = EFI_ABORTED;
@@ -468,7 +464,7 @@ BootMenuUpdateBootOption (
     if (InitrdSupport) {
       if (InitrdSize > 0) {
         // Case we update the initrd device path
-        Status = DeviceSupport->UpdateDevicePathNode ((EFI_DEVICE_PATH*)((UINTN)(LinuxArguments + 1) + CmdLineSize), L"initrd", &InitrdPath, NULL);
+        Status = DeviceSupport->UpdateDevicePathNode ((EFI_DEVICE_PATH*)((UINTN)(LinuxArguments + 1) + CmdLineSize), L"initrd", &InitrdPath);
         if (EFI_ERROR(Status) && Status != EFI_NOT_FOUND) {// EFI_NOT_FOUND is returned on empty input string, but we can boot without an initrd
           Status = EFI_ABORTED;
           goto EXIT;
@@ -477,7 +473,7 @@ BootMenuUpdateBootOption (
       } else {
         // Case we create the initrd device path
 
-        Status = DeviceSupport->CreateDevicePathNode (L"initrd", &InitrdPathNodes, NULL);
+        Status = DeviceSupport->CreateDevicePathNode (L"initrd", &InitrdPathNodes);
         if (EFI_ERROR(Status) && Status != EFI_NOT_FOUND) { // EFI_NOT_FOUND is returned on empty input string, but we can boot without an initrd
           Status = EFI_ABORTED;
           goto EXIT;
@@ -611,7 +607,7 @@ UpdateFdtPath (
   }
 
   // Create the specific device path node
-  Status = SupportedBootDevice->Support->CreateDevicePathNode (L"FDT blob", &FdtDevicePathNodes, NULL);
+  Status = SupportedBootDevice->Support->CreateDevicePathNode (L"FDT blob", &FdtDevicePathNodes);
   if (EFI_ERROR(Status)) {
     Status = EFI_ABORTED;
     goto EXIT;

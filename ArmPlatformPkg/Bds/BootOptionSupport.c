@@ -34,16 +34,14 @@ BdsLoadOptionFileSystemList (
 EFI_STATUS
 BdsLoadOptionFileSystemCreateDevicePath (
   IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes,
-  OUT BOOLEAN                   *RequestBootType
+  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes
   );
 
 EFI_STATUS
 BdsLoadOptionFileSystemUpdateDevicePath (
   IN EFI_DEVICE_PATH            *OldDevicePath,
   IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath,
-  OUT BOOLEAN                   *RequestBootType
+  OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath
   );
 
 BOOLEAN
@@ -59,16 +57,14 @@ BdsLoadOptionMemMapList (
 EFI_STATUS
 BdsLoadOptionMemMapCreateDevicePath (
   IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes,
-  OUT BOOLEAN                   *RequestBootType
+  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes
   );
 
 EFI_STATUS
 BdsLoadOptionMemMapUpdateDevicePath (
   IN EFI_DEVICE_PATH            *OldDevicePath,
   IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath,
-  OUT BOOLEAN                   *RequestBootType
+  OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath
   );
 
 BOOLEAN
@@ -84,16 +80,14 @@ BdsLoadOptionPxeList (
 EFI_STATUS
 BdsLoadOptionPxeCreateDevicePath (
   IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes,
-  OUT BOOLEAN                   *RequestBootType
+  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes
   );
 
 EFI_STATUS
 BdsLoadOptionPxeUpdateDevicePath (
   IN EFI_DEVICE_PATH            *OldDevicePath,
   IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath,
-  OUT BOOLEAN                   *RequestBootType
+  OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath
   );
 
 BOOLEAN
@@ -109,16 +103,14 @@ BdsLoadOptionTftpList (
 EFI_STATUS
 BdsLoadOptionTftpCreateDevicePath (
   IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes,
-  OUT BOOLEAN                   *RequestBootType
+  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes
   );
 
 EFI_STATUS
 BdsLoadOptionTftpUpdateDevicePath (
   IN EFI_DEVICE_PATH            *OldDevicePath,
   IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath,
-  OUT BOOLEAN                   *RequestBootType
+  OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath
   );
 
 BOOLEAN
@@ -132,28 +124,32 @@ BDS_LOAD_OPTION_SUPPORT BdsLoadOptionSupportList[] = {
     BdsLoadOptionFileSystemList,
     BdsLoadOptionFileSystemIsSupported,
     BdsLoadOptionFileSystemCreateDevicePath,
-    BdsLoadOptionFileSystemUpdateDevicePath
+    BdsLoadOptionFileSystemUpdateDevicePath,
+    TRUE
   },
   {
     BDS_DEVICE_MEMMAP,
     BdsLoadOptionMemMapList,
     BdsLoadOptionMemMapIsSupported,
     BdsLoadOptionMemMapCreateDevicePath,
-    BdsLoadOptionMemMapUpdateDevicePath
+    BdsLoadOptionMemMapUpdateDevicePath,
+    TRUE
   },
   {
     BDS_DEVICE_PXE,
     BdsLoadOptionPxeList,
     BdsLoadOptionPxeIsSupported,
     BdsLoadOptionPxeCreateDevicePath,
-    BdsLoadOptionPxeUpdateDevicePath
+    BdsLoadOptionPxeUpdateDevicePath,
+    FALSE
   },
   {
     BDS_DEVICE_TFTP,
     BdsLoadOptionTftpList,
     BdsLoadOptionTftpIsSupported,
     BdsLoadOptionTftpCreateDevicePath,
-    BdsLoadOptionTftpUpdateDevicePath
+    BdsLoadOptionTftpUpdateDevicePath,
+    TRUE
   }
 };
 
@@ -384,8 +380,7 @@ BdsLoadOptionFileSystemList (
 EFI_STATUS
 BdsLoadOptionFileSystemCreateDevicePath (
   IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes,
-  OUT BOOLEAN                   *RequestBootType
+  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes
   )
 {
   EFI_STATUS  Status;
@@ -421,8 +416,7 @@ EFI_STATUS
 BdsLoadOptionFileSystemUpdateDevicePath (
   IN EFI_DEVICE_PATH            *OldDevicePath,
   IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath,
-  OUT BOOLEAN                   *RequestBootType
+  OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath
   )
 {
   EFI_STATUS  Status;
@@ -571,8 +565,7 @@ BdsLoadOptionMemMapList (
 EFI_STATUS
 BdsLoadOptionMemMapCreateDevicePath (
   IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes,
-  OUT BOOLEAN                   *RequestBootType
+  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes
   )
 {
   EFI_STATUS              Status;
@@ -612,8 +605,7 @@ EFI_STATUS
 BdsLoadOptionMemMapUpdateDevicePath (
   IN EFI_DEVICE_PATH            *OldDevicePath,
   IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath,
-  OUT BOOLEAN                   *RequestBootType
+  OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath
   )
 {
   EFI_STATUS          Status;
@@ -714,16 +706,12 @@ BdsLoadOptionPxeList (
 EFI_STATUS
 BdsLoadOptionPxeCreateDevicePath (
   IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes,
-  OUT BOOLEAN                   *RequestBootType
+  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes
   )
 {
   *DevicePathNodes = (EFI_DEVICE_PATH_PROTOCOL *) AllocatePool (END_DEVICE_PATH_LENGTH);
   SetDevicePathEndNode (*DevicePathNodes);
 
-  if (RequestBootType) {
-    *RequestBootType = FALSE;
-  }
   return EFI_SUCCESS;
 }
 
@@ -742,8 +730,7 @@ EFI_STATUS
 BdsLoadOptionPxeUpdateDevicePath (
   IN EFI_DEVICE_PATH            *OldDevicePath,
   IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath,
-  OUT BOOLEAN                   *RequestBootType
+  OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath
   )
 {
   //
@@ -837,8 +824,7 @@ BdsLoadOptionTftpList (
 EFI_STATUS
 BdsLoadOptionTftpCreateDevicePath (
   IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes,
-  OUT BOOLEAN                   *RequestBootType
+  OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePathNodes
   )
 {
   EFI_STATUS    Status;
@@ -913,8 +899,7 @@ EFI_STATUS
 BdsLoadOptionTftpUpdateDevicePath (
   IN EFI_DEVICE_PATH            *OldDevicePath,
   IN CHAR16*                    FileName,
-  OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath,
-  OUT BOOLEAN                   *RequestBootType
+  OUT EFI_DEVICE_PATH_PROTOCOL  **NewDevicePath
   )
 {
   ASSERT (0);
