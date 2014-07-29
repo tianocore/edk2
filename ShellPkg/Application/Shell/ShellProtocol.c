@@ -1318,6 +1318,8 @@ EfiShellDeleteFileByName(
   SHELL_FILE_HANDLE FileHandle;
   EFI_STATUS        Status;
 
+  FileHandle = NULL;
+
   //
   // get a handle to the file
   //
@@ -1960,6 +1962,7 @@ EfiShellFindFilesInDir(
   UINTN                     Size;
   CHAR16                    *TempSpot;
 
+  BasePath = NULL;
   Status = FileHandleGetFileName(FileDirHandle, &BasePath);
   if (EFI_ERROR(Status)) {
     return (Status);
