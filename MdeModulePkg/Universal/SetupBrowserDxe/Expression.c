@@ -1323,6 +1323,7 @@ IfrCatenate (
   UINTN          Size;
   UINT16         Length0;
   UINT16         Length1;
+  UINT8          *TmpBuf;
 
   //
   // String[0] - The second string
@@ -1378,8 +1379,12 @@ IfrCatenate (
     Result->Buffer = AllocateZeroPool (Result->BufferLen);
     ASSERT (Result->Buffer != NULL);
 
-    CopyMem (Result->Buffer, GetBufferForValue(&Value[0]), Length0);
-    CopyMem (&Result->Buffer[Length0], GetBufferForValue(&Value[1]), Length1);
+    TmpBuf = GetBufferForValue(&Value[0]);
+    ASSERT (TmpBuf != NULL);
+    CopyMem (Result->Buffer, TmpBuf, Length0);
+    TmpBuf = GetBufferForValue(&Value[1]);
+    ASSERT (TmpBuf != NULL);
+    CopyMem (&Result->Buffer[Length0], TmpBuf, Length1);
   }
 Done:
   if (Value[0].Buffer != NULL) {
