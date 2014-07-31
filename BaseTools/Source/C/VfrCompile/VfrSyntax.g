@@ -2577,7 +2577,7 @@ vfrStatementOrderedList :
                                                           OLObj.SetMaxContainers (_STOU8(M->getText(), M->getLine()));
                                                        >>
   }
-  { F:FLAGS "=" vfrOrderedListFlags[OLObj, F->getLine()] }
+  { F:FLAGS "=" vfrOrderedListFlags[OLObj, F->getLine()] {","}}
   vfrStatementQuestionOptionList
   E:EndList                                            << CRT_END_OP (E); >>
   ";"
