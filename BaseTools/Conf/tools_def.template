@@ -56,9 +56,21 @@ DEFINE VS2012x86_BIN    = C:\Program Files (x86)\Microsoft Visual Studio 11.0\Vc
 DEFINE VS2012x86_DLL    = C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE;DEF(VS2012x86_BIN)
 DEFINE VS2012x86_BINX64 = DEF(VS2012x86_BIN)\x86_amd64
 
+DEFINE VS2013_BIN      = C:\Program Files\Microsoft Visual Studio 12.0\Vc\bin
+DEFINE VS2013_DLL      = C:\Program Files\Microsoft Visual Studio 12.0\Common7\IDE;DEF(VS2012_BIN)
+DEFINE VS2013_BINX64   = DEF(VS2013_BIN)\x86_amd64
+
+DEFINE VS2013x86_BIN    = C:\Program Files (x86)\Microsoft Visual Studio 12.0\Vc\bin
+DEFINE VS2013x86_DLL    = C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE;DEF(VS2013x86_BIN)
+DEFINE VS2013x86_BINX64 = DEF(VS2013x86_BIN)\x86_amd64
+
 DEFINE WINSDK_VERSION   = v6.0A
 DEFINE WINSDK_BIN       = c:\Program Files\Microsoft SDKs\Windows\DEF(WINSDK_VERSION)\bin
 DEFINE WINSDKx86_BIN    = c:\Program Files (x86)\Microsoft SDKs\Windows\DEF(WINSDK_VERSION)\bin
+
+# Microsoft Visual Studio 2013 Professional Edition
+DEFINE WINSDK8_BIN       = c:\Program Files\Windows Kits\8.0\bin\x86\
+DEFINE WINSDK8x86_BIN    = c:\Program Files (x86)\Windows Kits\8.0\bin\x64
 
 # These defines are needed for certain Microsoft Visual Studio tools that
 # are used by other toolchains.  An example is that ICC on Windows normally
@@ -265,6 +277,15 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
 #                               http://www.acpica.org/downloads/previous_releases.php
+#   VS2013      -win32-  Requires:
+#                             Microsoft Visual Studio 2013 Professional Edition
+#                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
+#                        Optional:
+#                             Required to build EBC drivers:
+#                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
+#                             Required to build platforms or ACPI tables:
+#                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
+#                               http://www.acpica.org/downloads/previous_releases.php
 #   DDK3790     -win32-  Requires:
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
 #                        Optional:
@@ -409,6 +430,15 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #                             Required to build platforms or ACPI tables:
 #                               Microsoft ASL ACPI Compiler (asl.exe) v4.0.0 from
 #                               http://download.microsoft.com/download/2/c/1/2c16c7e0-96c1-40f5-81fc-3e4bf7b65496/microsoft_asl_compiler-v4-0-0.msi
+#   VS2013xASL  -win32-  Requires:
+#                             Microsoft Visual Studio 2013 Professional Edition
+#                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
+#                        Optional:
+#                             Required to build EBC drivers:
+#                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
+#                             Required to build platforms or ACPI tables:
+#                               Microsoft ASL ACPI Compiler (asl.exe) v4.0.0 from
+#                               http://download.microsoft.com/download/2/c/1/2c16c7e0-96c1-40f5-81fc-3e4bf7b65496/microsoft_asl_compiler-v4-0-0.msi
 #   DDK3790xASL -win32-  Requires:
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
 #                        Optional:
@@ -480,6 +510,13 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
 #                               http://www.acpica.org/downloads/previous_releases.php
+#   VS2013x86   -win64-  Requires:
+#                             Microsoft Visual Studio 2013 (x86) Professional Edition
+#                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
+#                        Optional:
+#                             Required to build platforms or ACPI tables:
+#                               Intel(r) ACPI Compiler (iasl.exe) v20101013 from
+#                               http://www.acpica.org/downloads/previous_releases.php
 #   ICCx86      -win64-  Requires:
 #                             Intel C Compiler V9.1(x86)
 #                        Dependencies:
@@ -529,6 +566,13 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #                               http://download.microsoft.com/download/2/c/1/2c16c7e0-96c1-40f5-81fc-3e4bf7b65496/microsoft_asl_compiler-v4-0-0.msi
 #  VS2012x86xASL -win64- Requires:
 #                             Microsoft Visual Studio 2012 (x86) Professional Edition
+#                             Microsoft Windows Server 2003 Driver Development Kit(Microsoft WINDDK) version 3790.1830 
+#                        Optional:
+#                             Required to build platforms or ACPI tables:
+#                               Microsoft ASL ACPI Compiler (asl.exe) v4.0.0 from
+#                               http://download.microsoft.com/download/2/c/1/2c16c7e0-96c1-40f5-81fc-3e4bf7b65496/microsoft_asl_compiler-v4-0-0.msi
+#  VS2013x86xASL -win64- Requires:
+#                             Microsoft Visual Studio 2013 (x86) Professional
 #                             Microsoft Windows Server 2003 Driver Development Kit(Microsoft WINDDK) version 3790.1830 
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
@@ -2871,6 +2915,440 @@ NOOPT_VS2012x86xASL_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT
 *_VS2012x86xASL_EBC_VFRPP_FLAGS         = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
 *_VS2012x86xASL_EBC_SLINK_FLAGS         = /lib /NOLOGO /MACHINE:EBC
 *_VS2012x86xASL_EBC_DLINK_FLAGS         = "C:\Program Files (x86)\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /MAP /ALIGN:32 /DRIVER
+
+####################################################################################
+#
+# Microsoft Visual Studio 2013
+#
+#   VS2013  - Microsoft Visual Studio 2013 Professional Edition with Intel ASL
+#   ASL     - Intel ACPI Source Language Compiler
+####################################################################################
+#   VS2013           - Microsoft Visual Studio 2013 Premium Edition
+*_VS2013_*_*_FAMILY               = MSFT
+
+*_VS2013_*_MAKE_PATH              = DEF(VS2013_BIN)\nmake.exe
+*_VS2013_*_MAKE_FLAGS             = /nologo
+*_VS2013_*_RC_PATH                = DEF(WINSDK8_BIN)\rc.exe
+
+*_VS2013_*_SLINK_FLAGS            = /NOLOGO /LTCG
+*_VS2013_*_APP_FLAGS              = /nologo /E /TC
+*_VS2013_*_PP_FLAGS               = /nologo /E /TC /FIAutoGen.h
+*_VS2013_*_VFRPP_FLAGS            = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+
+*_VS2013_*_ASM16_PATH             = DEF(VS2013_BIN)\ml.exe
+
+##################
+# ASL definitions
+##################
+*_VS2013_*_ASL_PATH               = DEF(DEFAULT_WIN_ASL_BIN)
+*_VS2013_*_ASL_FLAGS              = DEF(DEFAULT_WIN_ASL_FLAGS)
+*_VS2013_*_ASL_OUTFLAGS           = DEF(DEFAULT_WIN_ASL_OUTFLAGS)
+*_VS2013_*_ASLCC_FLAGS            = DEF(MSFT_ASLCC_FLAGS)
+*_VS2013_*_ASLPP_FLAGS            = DEF(MSFT_ASLPP_FLAGS)
+*_VS2013_*_ASLDLINK_FLAGS         = DEF(MSFT_ASLDLINK_FLAGS)
+
+##################
+# IA32 definitions
+##################
+*_VS2013_IA32_*_DLL               = DEF(VS2013_DLL)
+
+*_VS2013_IA32_MAKE_PATH           = DEF(VS2013_BIN)\nmake.exe
+*_VS2013_IA32_CC_PATH             = DEF(VS2013_BIN)\cl.exe
+*_VS2013_IA32_VFRPP_PATH          = DEF(VS2013_BIN)\cl.exe
+*_VS2013_IA32_SLINK_PATH          = DEF(VS2013_BIN)\lib.exe
+*_VS2013_IA32_DLINK_PATH          = DEF(VS2013_BIN)\link.exe
+*_VS2013_IA32_APP_PATH            = DEF(VS2013_BIN)\cl.exe
+*_VS2013_IA32_PP_PATH             = DEF(VS2013_BIN)\cl.exe
+*_VS2013_IA32_ASM_PATH            = DEF(VS2013_BIN)\ml.exe
+*_VS2013_IA32_ASLCC_PATH          = DEF(VS2013_BIN)\cl.exe
+*_VS2013_IA32_ASLPP_PATH          = DEF(VS2013_BIN)\cl.exe
+*_VS2013_IA32_ASLDLINK_PATH       = DEF(VS2013_BIN)\link.exe
+
+      *_VS2013_IA32_MAKE_FLAGS    = /nologo
+  DEBUG_VS2013_IA32_CC_FLAGS      = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
+RELEASE_VS2013_IA32_CC_FLAGS      = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2013_IA32_CC_FLAGS        = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
+
+  DEBUG_VS2013_IA32_ASM_FLAGS     = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
+RELEASE_VS2013_IA32_ASM_FLAGS     = /nologo /c /WX /W3 /Cx /coff /Zd
+NOOPT_VS2013_IA32_ASM_FLAGS       = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
+
+  DEBUG_VS2013_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2013_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+NOOPT_VS2013_IA32_DLINK_FLAGS     = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+
+##################
+# X64 definitions
+##################
+*_VS2013_X64_*_DLL         = DEF(VS2013_DLL)
+
+*_VS2013_X64_CC_PATH       = DEF(VS2013_BINX64)\cl.exe
+*_VS2013_X64_PP_PATH       = DEF(VS2013_BINX64)\cl.exe
+*_VS2013_X64_APP_PATH      = DEF(VS2013_BINX64)\cl.exe
+*_VS2013_X64_VFRPP_PATH    = DEF(VS2013_BINX64)\cl.exe
+*_VS2013_X64_ASM_PATH      = DEF(VS2013_BINX64)\ml64.exe
+*_VS2013_X64_SLINK_PATH    = DEF(VS2013_BINX64)\lib.exe
+*_VS2013_X64_DLINK_PATH    = DEF(VS2013_BINX64)\link.exe
+*_VS2013_X64_ASLCC_PATH    = DEF(VS2013_BINX64)\cl.exe
+*_VS2013_X64_ASLPP_PATH    = DEF(VS2013_BINX64)\cl.exe
+*_VS2013_X64_ASLDLINK_PATH = DEF(VS2013_BINX64)\link.exe
+
+  DEBUG_VS2013_X64_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
+RELEASE_VS2013_X64_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2013_X64_CC_FLAGS       = /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Od
+
+  DEBUG_VS2013_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd /Zi
+RELEASE_VS2013_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd
+NOOPT_VS2013_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd /Zi
+
+  DEBUG_VS2013_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2013_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+NOOPT_VS2013_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+
+##################
+# EBC definitions
+##################
+*_VS2013_EBC_*_FAMILY            = INTEL
+*_VS2013_EBC_*_DLL               = DEF(VS2013_DLL)
+
+*_VS2013_EBC_MAKE_PATH           = DEF(VS2013_BIN)\nmake.exe
+*_VS2013_EBC_PP_PATH             = DEF(EBC_BIN)\iec.exe
+*_VS2013_EBC_VFRPP_PATH          = DEF(EBC_BIN)\iec.exe
+*_VS2013_EBC_CC_PATH             = DEF(EBC_BIN)\iec.exe
+*_VS2013_EBC_SLINK_PATH          = DEF(VS2013_BIN)\link.exe
+*_VS2013_EBC_DLINK_PATH          = DEF(VS2013_BIN)\link.exe
+
+*_VS2013_EBC_MAKE_FLAGS          = /nologo
+*_VS2013_EBC_PP_FLAGS            = /nologo /E /TC /FIAutoGen.h
+*_VS2013_EBC_CC_FLAGS            = /nologo /c /WX /W3 /FIAutoGen.h /D$(MODULE_ENTRY_POINT)=$(ARCH_ENTRY_POINT)
+*_VS2013_EBC_VFRPP_FLAGS         = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+*_VS2013_EBC_SLINK_FLAGS         = /lib /NOLOGO /MACHINE:EBC
+*_VS2013_EBC_DLINK_FLAGS         = "C:\Program Files\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /MAP /ALIGN:32 /DRIVER
+
+
+####################################################################################
+#
+# Microsoft Visual Studio 2013
+#
+#   VS2013  - Microsoft Visual Studio 2013 Professional Edition with Microsoft ASL
+#   ASL     - Microsoft ACPI Source Language Compiler (asl.exe)
+####################################################################################
+#   VS2013xASL           - Microsoft Visual Studio 2013 Premium Edition
+*_VS2013xASL_*_*_FAMILY        = MSFT
+
+*_VS2013xASL_*_MAKE_PATH       = DEF(VS2013_BIN)\nmake.exe
+*_VS2013xASL_*_MAKE_FLAG       = /nologo
+*_VS2013xASL_*_RC_PATH         = DEF(WINSDK8_BIN)\rc.exe
+
+*_VS2013xASL_*_SLINK_FLAGS     = /NOLOGO /LTCG
+*_VS2013xASL_*_APP_FLAGS       = /nologo /E /TC
+*_VS2013xASL_*_PP_FLAGS        = /nologo /E /TC /FIAutoGen.h
+*_VS2013xASL_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+
+*_VS2013xASL_*_ASM16_PATH      = DEF(VS2013_BIN)\ml.exe
+
+##################
+# ASL definitions
+##################
+*_VS2013xASL_*_ASL_PATH        = DEF(WIN_ASL_BIN)
+*_VS2013xASL_*_ASL_FLAGS       =
+*_VS2013xASL_*_ASL_OUTFLAGS    = DEF(MS_ASL_OUTFLAGS)
+*_VS2013xASL_*_ASLCC_FLAGS     = DEF(MSFT_ASLCC_FLAGS)
+*_VS2013xASL_*_ASLPP_FLAGS     = DEF(MSFT_ASLPP_FLAGS)
+*_VS2013xASL_*_ASLDLINK_FLAGS  = DEF(MSFT_ASLDLINK_FLAGS)
+
+##################
+# IA32 definitions
+##################
+*_VS2013xASL_IA32_*_DLL        = DEF(VS2013_DLL)
+
+*_VS2013xASL_IA32_MAKE_PATH    = DEF(VS2013_BIN)\nmake.exe
+*_VS2013xASL_IA32_CC_PATH      = DEF(VS2013_BIN)\cl.exe
+*_VS2013xASL_IA32_VFRPP_PATH   = DEF(VS2013_BIN)\cl.exe
+*_VS2013xASL_IA32_SLINK_PATH   = DEF(VS2013_BIN)\lib.exe
+*_VS2013xASL_IA32_DLINK_PATH   = DEF(VS2013_BIN)\link.exe
+*_VS2013xASL_IA32_APP_PATH     = DEF(VS2013_BIN)\cl.exe
+*_VS2013xASL_IA32_PP_PATH      = DEF(VS2013_BIN)\cl.exe
+*_VS2013xASL_IA32_ASM_PATH     = DEF(VS2013_BIN)\ml.exe
+*_VS2013xASL_IA32_ASLCC_PATH    = DEF(VS2013_BIN)\cl.exe
+*_VS2013xASL_IA32_ASLPP_PATH    = DEF(VS2013_BIN)\cl.exe
+*_VS2013xASL_IA32_ASLDLINK_PATH = DEF(VS2013_BIN)\link.exe
+
+      *_VS2013xASL_IA32_MAKE_FLAGS  = /nologo
+  DEBUG_VS2013xASL_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
+RELEASE_VS2013xASL_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2013xASL_IA32_CC_FLAGS      = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
+
+  DEBUG_VS2013xASL_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
+RELEASE_VS2013xASL_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd
+NOOPT_VS2013xASL_IA32_ASM_FLAGS     = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
+
+  DEBUG_VS2013xASL_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2013xASL_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+NOOPT_VS2013xASL_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+
+##################
+# X64 definitions
+##################
+*_VS2013xASL_X64_*_DLL         = DEF(VS2013_DLL)
+
+*_VS2013xASL_X64_CC_PATH       = DEF(VS2013_BINX64)\cl.exe
+*_VS2013xASL_X64_PP_PATH       = DEF(VS2013_BINX64)\cl.exe
+*_VS2013xASL_X64_APP_PATH      = DEF(VS2013_BINX64)\cl.exe
+*_VS2013xASL_X64_VFRPP_PATH    = DEF(VS2013_BINX64)\cl.exe
+*_VS2013xASL_X64_ASM_PATH      = DEF(VS2013_BINX64)\ml64.exe
+*_VS2013xASL_X64_SLINK_PATH    = DEF(VS2013_BINX64)\lib.exe
+*_VS2013xASL_X64_DLINK_PATH    = DEF(VS2013_BINX64)\link.exe
+*_VS2013xASL_X64_ASLCC_PATH    = DEF(VS2013_BINX64)\cl.exe
+*_VS2013xASL_X64_ASLPP_PATH    = DEF(VS2013_BINX64)\cl.exe
+*_VS2013xASL_X64_ASLDLINK_PATH = DEF(VS2013_BINX64)\link.exe
+
+  DEBUG_VS2013xASL_X64_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
+RELEASE_VS2013xASL_X64_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2013xASL_X64_CC_FLAGS       = /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Od
+
+  DEBUG_VS2013xASL_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd /Zi
+RELEASE_VS2013xASL_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd
+NOOPT_VS2013xASL_X64_ASM_FLAGS      = /nologo /c /WX /W3 /Cx /Zd /Zi
+
+  DEBUG_VS2013xASL_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2013xASL_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+NOOPT_VS2013xASL_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+
+##################
+# EBC definitions
+##################
+*_VS2013xASL_EBC_*_FAMILY            = INTEL
+*_VS2013xASL_EBC_*_DLL               = DEF(VS2013_DLL)
+
+*_VS2013xASL_EBC_MAKE_PATH           = DEF(VS2013_BIN)\nmake.exe
+*_VS2013xASL_EBC_PP_PATH             = DEF(EBC_BIN)\iec.exe
+*_VS2013xASL_EBC_VFRPP_PATH          = DEF(EBC_BIN)\iec.exe
+*_VS2013xASL_EBC_CC_PATH             = DEF(EBC_BIN)\iec.exe
+*_VS2013xASL_EBC_SLINK_PATH          = DEF(VS2013_BIN)\link.exe
+*_VS2013xASL_EBC_DLINK_PATH          = DEF(VS2013_BIN)\link.exe
+
+*_VS2013xASL_EBC_MAKE_FLAGS          = /nologo
+*_VS2013xASL_EBC_PP_FLAGS            = /nologo /E /TC /FIAutoGen.h
+*_VS2013xASL_EBC_CC_FLAGS            = /nologo /c /WX /W3 /FIAutoGen.h /D$(MODULE_ENTRY_POINT)=$(ARCH_ENTRY_POINT)
+*_VS2013xASL_EBC_VFRPP_FLAGS         = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+*_VS2013xASL_EBC_SLINK_FLAGS         = /lib /NOLOGO /MACHINE:EBC
+*_VS2013xASL_EBC_DLINK_FLAGS         = "C:\Program Files\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /MAP /ALIGN:32 /DRIVER
+
+
+####################################################################################
+#   VS2013x86       - Microsoft Visual Studio 2013 (x86) professional with Intel ASL
+#   ASL  - Intel ACPI Source Language Compiler (iasl.exe)
+####################################################################################
+#   VS2013x86           - Microsoft Visual Studio 2013 (x86) professional Edition with Intel ASL
+*_VS2013x86_*_*_FAMILY        = MSFT
+
+*_VS2013x86_*_MAKE_PATH       = DEF(VS2013x86_BIN)\nmake.exe
+*_VS2013x86_*_MAKE_FLAG       = /nologo
+*_VS2013x86_*_RC_PATH         = DEF(WINSDK8x86_BIN)\rc.exe
+
+*_VS2013x86_*_MAKE_FLAGS      = /nologo
+*_VS2013x86_*_SLINK_FLAGS     = /NOLOGO /LTCG
+*_VS2013x86_*_APP_FLAGS       = /nologo /E /TC
+*_VS2013x86_*_PP_FLAGS        = /nologo /E /TC /FIAutoGen.h
+*_VS2013x86_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+
+*_VS2013x86_*_ASM16_PATH      = DEF(VS2013x86_BIN)\ml.exe
+
+##################
+# ASL definitions
+##################
+*_VS2013x86_*_ASL_PATH        = DEF(WIN_IASL_BIN)
+*_VS2013x86_*_ASL_FLAGS       = DEF(DEFAULT_WIN_ASL_FLAGS)
+*_VS2013x86_*_ASL_OUTFLAGS    = DEF(DEFAULT_WIN_ASL_OUTFLAGS)
+*_VS2013x86_*_ASLCC_FLAGS     = DEF(MSFT_ASLCC_FLAGS)
+*_VS2013x86_*_ASLPP_FLAGS     = DEF(MSFT_ASLPP_FLAGS)
+*_VS2013x86_*_ASLDLINK_FLAGS  = DEF(MSFT_ASLDLINK_FLAGS)
+
+##################
+# IA32 definitions
+##################
+*_VS2013x86_IA32_*_DLL        = DEF(VS2013x86_DLL)
+
+*_VS2013x86_IA32_MAKE_PATH    = DEF(VS2013x86_BIN)\nmake.exe
+*_VS2013x86_IA32_CC_PATH      = DEF(VS2013x86_BIN)\cl.exe
+*_VS2013x86_IA32_VFRPP_PATH   = DEF(VS2013x86_BIN)\cl.exe
+*_VS2013x86_IA32_ASLCC_PATH   = DEF(VS2013x86_BIN)\cl.exe
+*_VS2013x86_IA32_ASLPP_PATH   = DEF(VS2013x86_BIN)\cl.exe
+*_VS2013x86_IA32_SLINK_PATH   = DEF(VS2013x86_BIN)\lib.exe
+*_VS2013x86_IA32_DLINK_PATH   = DEF(VS2013x86_BIN)\link.exe
+*_VS2013x86_IA32_ASLDLINK_PATH= DEF(VS2013x86_BIN)\link.exe
+*_VS2013x86_IA32_APP_PATH     = DEF(VS2013x86_BIN)\cl.exe
+*_VS2013x86_IA32_PP_PATH      = DEF(VS2013x86_BIN)\cl.exe
+*_VS2013x86_IA32_ASM_PATH     = DEF(VS2013x86_BIN)\ml.exe
+
+      *_VS2013x86_IA32_MAKE_FLAGS  = /nologo
+  DEBUG_VS2013x86_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
+RELEASE_VS2013x86_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2013x86_IA32_CC_FLAGS      = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
+
+  DEBUG_VS2013x86_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
+RELEASE_VS2013x86_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd
+NOOPT_VS2013x86_IA32_ASM_FLAGS     = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
+
+  DEBUG_VS2013x86_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2013x86_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+NOOPT_VS2013x86_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+
+##################
+# X64 definitions
+##################
+*_VS2013x86_X64_*_DLL         = DEF(VS2013x86_DLL)
+
+*_VS2013x86_X64_CC_PATH       = DEF(VS2013x86_BINX64)\cl.exe
+*_VS2013x86_X64_PP_PATH       = DEF(VS2013x86_BINX64)\cl.exe
+*_VS2013x86_X64_APP_PATH      = DEF(VS2013x86_BINX64)\cl.exe
+*_VS2013x86_X64_VFRPP_PATH    = DEF(VS2013x86_BINX64)\cl.exe
+*_VS2013x86_X64_ASLCC_PATH    = DEF(VS2013x86_BINX64)\cl.exe
+*_VS2013x86_X64_ASLPP_PATH    = DEF(VS2013x86_BINX64)\cl.exe
+*_VS2013x86_X64_ASM_PATH      = DEF(VS2013x86_BINX64)\ml64.exe
+*_VS2013x86_X64_SLINK_PATH    = DEF(VS2013x86_BINX64)\lib.exe
+*_VS2013x86_X64_DLINK_PATH    = DEF(VS2013x86_BINX64)\link.exe
+*_VS2013x86_X64_ASLDLINK_PATH = DEF(VS2013x86_BINX64)\link.exe
+
+  DEBUG_VS2013x86_X64_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
+RELEASE_VS2013x86_X64_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2013x86_X64_CC_FLAGS       = /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Od
+
+  DEBUG_VS2013x86_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd /Zi
+RELEASE_VS2013x86_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd
+NOOPT_VS2013x86_X64_ASM_FLAGS      = /nologo /c /WX /W3 /Cx /Zd /Zi
+ 
+  DEBUG_VS2013x86_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2013x86_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+NOOPT_VS2013x86_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+
+##################
+# EBC definitions
+##################
+*_VS2013x86_EBC_*_FAMILY            = INTEL
+*_VS2013x86_EBC_*_DLL               = DEF(VS2013x86_DLL)
+
+*_VS2013x86_EBC_MAKE_PATH           = DEF(VS2013x86_BIN)\nmake.exe
+*_VS2013x86_EBC_PP_PATH             = DEF(EBC_BINx86)\iec.exe
+*_VS2013x86_EBC_VFRPP_PATH          = DEF(EBC_BINx86)\iec.exe
+*_VS2013x86_EBC_CC_PATH             = DEF(EBC_BINx86)\iec.exe
+*_VS2013x86_EBC_SLINK_PATH          = DEF(VS2013x86_BIN)\link.exe
+*_VS2013x86_EBC_DLINK_PATH          = DEF(VS2013x86_BIN)\link.exe
+
+*_VS2013x86_EBC_MAKE_FLAGS          = /nologo
+*_VS2013x86_EBC_PP_FLAGS            = /nologo /E /TC /FIAutoGen.h
+*_VS2013x86_EBC_CC_FLAGS            = /nologo /c /WX /W3 /FIAutoGen.h /D$(MODULE_ENTRY_POINT)=$(ARCH_ENTRY_POINT)
+*_VS2013x86_EBC_VFRPP_FLAGS         = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+*_VS2013x86_EBC_SLINK_FLAGS         = /lib /NOLOGO /MACHINE:EBC
+*_VS2013x86_EBC_DLINK_FLAGS         = "C:\Program Files (x86)\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /MAP /ALIGN:32 /DRIVER
+
+
+####################################################################################
+#   VS2013x86xASL     - Microsoft Visual Studio 2013 (x86) professional with Microsoft ASL
+#   ASL  - Microsoft ACPI Source Language Compiler (asl.exe)
+####################################################################################
+*_VS2013x86xASL_*_*_FAMILY        = MSFT
+
+*_VS2013x86xASL_*_MAKE_PATH       = DEF(VS2013x86_BIN)\nmake.exe
+*_VS2013x86xASL_*_MAKE_FLAG       = /nologo
+*_VS2013x86xASL_*_RC_PATH         = DEF(WINSDK8x86_BIN)\rc.exe
+
+*_VS2013x86xASL_*_MAKE_FLAGS      = /nologo
+*_VS2013x86xASL_*_SLINK_FLAGS     = /NOLOGO /LTCG
+*_VS2013x86xASL_*_APP_FLAGS       = /nologo /E /TC
+*_VS2013x86xASL_*_PP_FLAGS        = /nologo /E /TC /FIAutoGen.h
+*_VS2013x86xASL_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+
+*_VS2013x86xASL_*_ASM16_PATH      = DEF(VS2013x86_BIN)\ml.exe
+
+##################
+# ASL definitions
+##################
+*_VS2013x86xASL_*_ASL_PATH        = DEF(WIN_ASL_BIN)
+*_VS2013x86xASL_*_ASL_FLAGS       = DEF(MS_ASL_FLAGS)
+*_VS2013x86xASL_*_ASL_OUTFLAGS    = DEF(MS_ASL_OUTFLAGS)
+*_VS2013x86xASL_*_ASLCC_FLAGS     = DEF(MSFT_ASLCC_FLAGS)
+*_VS2013x86xASL_*_ASLPP_FLAGS     = DEF(MSFT_ASLPP_FLAGS)
+*_VS2013x86xASL_*_ASLDLINK_FLAGS  = DEF(MSFT_ASLDLINK_FLAGS)
+
+##################
+# IA32 definitions
+##################
+*_VS2013x86xASL_IA32_*_DLL        = DEF(VS2013x86_DLL)
+
+*_VS2013x86xASL_IA32_MAKE_PATH    = DEF(VS2013x86_BIN)\nmake.exe
+*_VS2013x86xASL_IA32_CC_PATH      = DEF(VS2013x86_BIN)\cl.exe
+*_VS2013x86xASL_IA32_VFRPP_PATH   = DEF(VS2013x86_BIN)\cl.exe
+*_VS2013x86xASL_IA32_ASLCC_PATH   = DEF(VS2013x86_BIN)\cl.exe
+*_VS2013x86xASL_IA32_ASLPP_PATH   = DEF(VS2013x86_BIN)\cl.exe
+*_VS2013x86xASL_IA32_SLINK_PATH   = DEF(VS2013x86_BIN)\lib.exe
+*_VS2013x86xASL_IA32_DLINK_PATH   = DEF(VS2013x86_BIN)\link.exe
+*_VS2013x86xASL_IA32_ASLDLINK_PATH= DEF(VS2013x86_BIN)\link.exe
+*_VS2013x86xASL_IA32_APP_PATH     = DEF(VS2013x86_BIN)\cl.exe
+*_VS2013x86xASL_IA32_PP_PATH      = DEF(VS2013x86_BIN)\cl.exe
+*_VS2013x86xASL_IA32_ASM_PATH     = DEF(VS2013x86_BIN)\ml.exe
+
+      *_VS2013x86xASL_IA32_MAKE_FLAGS  = /nologo
+  DEBUG_VS2013x86xASL_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
+RELEASE_VS2013x86xASL_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2013x86xASL_IA32_CC_FLAGS      = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
+
+  DEBUG_VS2013x86xASL_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
+RELEASE_VS2013x86xASL_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd
+NOOPT_VS2013x86xASL_IA32_ASM_FLAGS     = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
+
+  DEBUG_VS2013x86xASL_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2013x86xASL_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+NOOPT_VS2013x86xASL_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+
+##################
+# X64 definitions
+##################
+*_VS2013x86xASL_X64_*_DLL         = DEF(VS2013x86_DLL)
+
+*_VS2013x86xASL_X64_CC_PATH       = DEF(VS2013x86_BINX64)\cl.exe
+*_VS2013x86xASL_X64_PP_PATH       = DEF(VS2013x86_BINX64)\cl.exe
+*_VS2013x86xASL_X64_APP_PATH      = DEF(VS2013x86_BINX64)\cl.exe
+*_VS2013x86xASL_X64_VFRPP_PATH    = DEF(VS2013x86_BINX64)\cl.exe
+*_VS2013x86xASL_X64_ASLCC_PATH    = DEF(VS2013x86_BINX64)\cl.exe
+*_VS2013x86xASL_X64_ASLPP_PATH    = DEF(VS2013x86_BINX64)\cl.exe
+*_VS2013x86xASL_X64_ASM_PATH      = DEF(VS2013x86_BINX64)\ml64.exe
+*_VS2013x86xASL_X64_SLINK_PATH    = DEF(VS2013x86_BINX64)\lib.exe
+*_VS2013x86xASL_X64_DLINK_PATH    = DEF(VS2013x86_BINX64)\link.exe
+*_VS2013x86xASL_X64_ASLDLINK_PATH = DEF(VS2013x86_BINX64)\link.exe
+
+  DEBUG_VS2013x86xASL_X64_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
+RELEASE_VS2013x86xASL_X64_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2013x86xASL_X64_CC_FLAGS       = /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Od
+
+  DEBUG_VS2013x86xASL_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd /Zi
+RELEASE_VS2013x86xASL_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd
+NOOPT_VS2013x86xASL_X64_ASM_FLAGS      = /nologo /c /WX /W3 /Cx /Zd /Zi
+
+  DEBUG_VS2013x86xASL_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2013x86xASL_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+NOOPT_VS2013x86xASL_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+
+##################
+# EBC definitions
+##################
+*_VS2013x86xASL_EBC_*_FAMILY            = INTEL
+*_VS2013x86xASL_EBC_*_DLL               = DEF(VS2013x86_DLL)
+
+*_VS2013x86xASL_EBC_MAKE_PATH           = DEF(VS2013x86_BIN)\nmake.exe
+*_VS2013x86xASL_EBC_PP_PATH             = DEF(EBC_BINx86)\iec.exe
+*_VS2013x86xASL_EBC_VFRPP_PATH          = DEF(EBC_BINx86)\iec.exe
+*_VS2013x86xASL_EBC_CC_PATH             = DEF(EBC_BINx86)\iec.exe
+*_VS2013x86xASL_EBC_SLINK_PATH          = DEF(VS2013x86_BIN)\link.exe
+*_VS2013x86xASL_EBC_DLINK_PATH          = DEF(VS2013x86_BIN)\link.exe
+
+*_VS2013x86xASL_EBC_MAKE_FLAGS          = /nologo
+*_VS2013x86xASL_EBC_PP_FLAGS            = /nologo /E /TC /FIAutoGen.h
+*_VS2013x86xASL_EBC_CC_FLAGS            = /nologo /c /WX /W3 /FIAutoGen.h /D$(MODULE_ENTRY_POINT)=$(ARCH_ENTRY_POINT)
+*_VS2013x86xASL_EBC_VFRPP_FLAGS         = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+*_VS2013x86xASL_EBC_SLINK_FLAGS         = /lib /NOLOGO /MACHINE:EBC
+*_VS2013x86xASL_EBC_DLINK_FLAGS         = "C:\Program Files (x86)\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /MAP /ALIGN:32 /DRIVER
 
 
 ####################################################################################
