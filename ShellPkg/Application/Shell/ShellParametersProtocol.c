@@ -1111,12 +1111,18 @@ UpdateStdInStdOutStdErr(
           } else if (!OutAppend && OutUnicode && !EFI_ERROR(Status)) {
             Status = WriteFileTag (TempHandle);
           } else if (OutAppend) {
-            //
-            // Move to end of file
-            //
             Status = ShellInfoObject.NewEfiShellProtocol->GetFileSize(TempHandle, &FileSize);
             if (!EFI_ERROR(Status)) {
-              Status = ShellInfoObject.NewEfiShellProtocol->SetFilePosition(TempHandle, FileSize);
+              //
+              // When appending to a new unicode file, write the file tag.
+              // Otherwise (ie. when appending to a new ASCII file, or an
+              // existent file with any encoding), just seek to the end.
+              //
+              Status = (FileSize == 0 && OutUnicode) ?
+                         WriteFileTag (TempHandle) :
+                         ShellInfoObject.NewEfiShellProtocol->SetFilePosition (
+                                                                TempHandle,
+                                                                FileSize);
             }
           }
           if (!OutUnicode && !EFI_ERROR(Status)) {
