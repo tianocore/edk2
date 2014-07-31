@@ -1015,9 +1015,9 @@ CpuCheckAllAPsStatus (
         if (!EFI_ERROR (Status)) {
           NextData = &gMPSystem.ProcessorData[NextNumber];
 
-          gThread->MutexLock (&NextData->ProcedureLock);
+          gThread->MutexLock (&NextData->StateLock);
           NextData->State = CPU_STATE_READY;
-          gThread->MutexUnlock (&NextData->ProcedureLock);
+          gThread->MutexUnlock (&NextData->StateLock);
 
           SetApProcedure (NextData, gMPSystem.Procedure, gMPSystem.ProcedureArgument);
         }
