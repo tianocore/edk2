@@ -865,8 +865,6 @@ CpuMpServicesEnableDisableAP (
     return EFI_UNSUPPORTED;
   }
 
-  gThread->MutexLock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
-
   if (EnableAP) {
     if ((gMPSystem.ProcessorData[ProcessorNumber].Info.StatusFlag & PROCESSOR_ENABLED_BIT) == 0 ) {
       gMPSystem.NumberOfEnabledProcessors++;
@@ -883,8 +881,6 @@ CpuMpServicesEnableDisableAP (
     gMPSystem.ProcessorData[ProcessorNumber].Info.StatusFlag &= ~PROCESSOR_HEALTH_STATUS_BIT;
     gMPSystem.ProcessorData[ProcessorNumber].Info.StatusFlag |= (*HealthFlag & PROCESSOR_HEALTH_STATUS_BIT);
   }
-
-  gThread->MutexUnlock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
 
   return EFI_SUCCESS;
 }
