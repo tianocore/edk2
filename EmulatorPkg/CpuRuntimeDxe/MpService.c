@@ -437,17 +437,17 @@ CpuMpServicesStartupAllAps (
     // state 1 by 1, until the previous 1 finished its task
     // if not "SingleThread", all APs are put to ready state from the beginning
     //
+    gThread->MutexLock(ProcessorData->StateLock);
     if (ProcessorData->State == CPU_STATE_IDLE) {
-      gMPSystem.StartCount++;
-
-      gThread->MutexLock (ProcessorData->StateLock);
       ProcessorData->State = APInitialState;
       gThread->MutexUnlock (ProcessorData->StateLock);
 
+      gMPSystem.StartCount++;
       if (SingleThread) {
         APInitialState = CPU_STATE_BLOCKED;
       }
     } else {
+      gThread->MutexUnlock (ProcessorData->StateLock);
       return EFI_NOT_READY;
     }
   }
@@ -671,9 +671,12 @@ CpuMpServicesStartupThisAP (
     return EFI_INVALID_PARAMETER;
   }
 
+  gThread->MutexLock(gMPSystem.ProcessorData[ProcessorNumber].StateLock);
   if (gMPSystem.ProcessorData[ProcessorNumber].State != CPU_STATE_IDLE) {
+    gThread->MutexUnlock(gMPSystem.ProcessorData[ProcessorNumber].StateLock);
     return EFI_NOT_READY;
   }
+  gThread->MutexUnlock(gMPSystem.ProcessorData[ProcessorNumber].StateLock);
 
   if ((WaitEvent != NULL)  && gReadToBoot) {
     return EFI_UNSUPPORTED;
@@ -789,9 +792,12 @@ CpuMpServicesSwitchBSP (
   }
   ASSERT (Index != gMPSystem.NumberOfProcessors);
 
+  gThread->MutexLock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
   if (gMPSystem.ProcessorData[ProcessorNumber].State != CPU_STATE_IDLE) {
+    gThread->MutexUnlock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
     return EFI_NOT_READY;
   }
+  gThread->MutexUnlock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
 
   // Skip for now as we need switch a bunch of stack stuff around and it's complex
   // May not be worth it?
@@ -861,9 +867,12 @@ CpuMpServicesEnableDisableAP (
     return EFI_INVALID_PARAMETER;
   }
 
+  gThread->MutexLock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
   if (gMPSystem.ProcessorData[ProcessorNumber].State != CPU_STATE_IDLE) {
+    gThread->MutexUnlock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
     return EFI_UNSUPPORTED;
   }
+  gThread->MutexUnlock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
 
   if (EnableAP) {
     if ((gMPSystem.ProcessorData[ProcessorNumber].Info.StatusFlag & PROCESSOR_ENABLED_BIT) == 0 ) {
@@ -1019,7 +1028,9 @@ CpuCheckAllAPsStatus (
         }
       }
 
+      gThread->MutexLock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
       gMPSystem.ProcessorData[ProcessorNumber].State = CPU_STATE_IDLE;
+      gThread->MutexUnlock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
       gMPSystem.FinishCount++;
       break;
 
