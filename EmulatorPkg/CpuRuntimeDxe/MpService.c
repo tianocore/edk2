@@ -440,9 +440,9 @@ CpuMpServicesStartupAllAps (
     if (ProcessorData->State == CPU_STATE_IDLE) {
       gMPSystem.StartCount++;
 
-      gThread->MutexLock (&ProcessorData->StateLock);
+      gThread->MutexLock (ProcessorData->StateLock);
       ProcessorData->State = APInitialState;
-      gThread->MutexUnlock (&ProcessorData->StateLock);
+      gThread->MutexUnlock (ProcessorData->StateLock);
 
       if (SingleThread) {
         APInitialState = CPU_STATE_BLOCKED;
@@ -512,9 +512,9 @@ CpuMpServicesStartupAllAps (
         if (SingleThread) {
           Status = GetNextBlockedNumber (&NextNumber);
           if (!EFI_ERROR (Status)) {
-            gThread->MutexLock (&gMPSystem.ProcessorData[NextNumber].StateLock);
+            gThread->MutexLock (gMPSystem.ProcessorData[NextNumber].StateLock);
             gMPSystem.ProcessorData[NextNumber].State = CPU_STATE_READY;
-            gThread->MutexUnlock (&gMPSystem.ProcessorData[NextNumber].StateLock);
+            gThread->MutexUnlock (gMPSystem.ProcessorData[NextNumber].StateLock);
           }
         }
 
@@ -699,14 +699,14 @@ CpuMpServicesStartupThisAP (
 
   // Blocking
   while (TRUE) {
-    gThread->MutexLock (&gMPSystem.ProcessorData[ProcessorNumber].StateLock);
+    gThread->MutexLock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
     if (gMPSystem.ProcessorData[ProcessorNumber].State == CPU_STATE_FINISHED) {
       gMPSystem.ProcessorData[ProcessorNumber].State = CPU_STATE_IDLE;
-      gThread->MutexUnlock (&gMPSystem.ProcessorData[ProcessorNumber].StateLock);
+      gThread->MutexUnlock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
       break;
     }
 
-    gThread->MutexUnlock (&gMPSystem.ProcessorData[ProcessorNumber].StateLock);
+    gThread->MutexUnlock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
 
     if ((TimeoutInMicroseconds != 0) && (Timeout < 0)) {
       return EFI_TIMEOUT;
@@ -865,7 +865,7 @@ CpuMpServicesEnableDisableAP (
     return EFI_UNSUPPORTED;
   }
 
-  gThread->MutexLock (&gMPSystem.ProcessorData[ProcessorNumber].StateLock);
+  gThread->MutexLock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
 
   if (EnableAP) {
     if ((gMPSystem.ProcessorData[ProcessorNumber].Info.StatusFlag & PROCESSOR_ENABLED_BIT) == 0 ) {
@@ -884,7 +884,7 @@ CpuMpServicesEnableDisableAP (
     gMPSystem.ProcessorData[ProcessorNumber].Info.StatusFlag |= (*HealthFlag & PROCESSOR_HEALTH_STATUS_BIT);
   }
 
-  gThread->MutexUnlock (&gMPSystem.ProcessorData[ProcessorNumber].StateLock);
+  gThread->MutexUnlock (gMPSystem.ProcessorData[ProcessorNumber].StateLock);
 
   return EFI_SUCCESS;
 }
@@ -1015,9 +1015,9 @@ CpuCheckAllAPsStatus (
         if (!EFI_ERROR (Status)) {
           NextData = &gMPSystem.ProcessorData[NextNumber];
 
-          gThread->MutexLock (&NextData->StateLock);
+          gThread->MutexLock (NextData->StateLock);
           NextData->State = CPU_STATE_READY;
-          gThread->MutexUnlock (&NextData->StateLock);
+          gThread->MutexUnlock (NextData->StateLock);
 
           SetApProcedure (NextData, gMPSystem.Procedure, gMPSystem.ProcedureArgument);
         }
