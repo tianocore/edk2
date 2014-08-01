@@ -68,6 +68,14 @@ DEFINE WINSDK_VERSION   = v6.0A
 DEFINE WINSDK_BIN       = c:\Program Files\Microsoft SDKs\Windows\DEF(WINSDK_VERSION)\bin
 DEFINE WINSDKx86_BIN    = c:\Program Files (x86)\Microsoft SDKs\Windows\DEF(WINSDK_VERSION)\bin
 
+# Microsoft Visual Studio 2010
+DEFINE WINSDK7_BIN       = c:\Program Files\Microsoft SDKs\Windows\v7.0A\Bin
+DEFINE WINSDK7x86_BIN    = c:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin
+
+# Microsoft Visual Studio 2012 Update 1 (required for rc.exe that was not included in the initial release)
+DEFINE WINSDK71_BIN       = c:\Program Files\Microsoft SDKs\Windows\v7.1A\Bin
+DEFINE WINSDK71x86_BIN    = c:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin
+
 # Microsoft Visual Studio 2013 Professional Edition
 DEFINE WINSDK8_BIN       = c:\Program Files\Windows Kits\8.0\bin\x86\
 DEFINE WINSDK8x86_BIN    = c:\Program Files (x86)\Windows Kits\8.0\bin\x64
@@ -1947,7 +1955,7 @@ NOOPT_VS2008x86xASL_IPF_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:R
 
 *_VS2010_*_MAKE_PATH              = DEF(VS2010_BIN)\nmake.exe
 *_VS2010_*_MAKE_FLAGS             = /nologo
-*_VS2010_*_RC_PATH                = DEF(WINSDK_BIN)\rc.exe
+*_VS2010_*_RC_PATH                = DEF(WINSDK7_BIN)\rc.exe
 
 *_VS2010_*_SLINK_FLAGS            = /NOLOGO /LTCG
 *_VS2010_*_APP_FLAGS              = /nologo /E /TC
@@ -2085,7 +2093,7 @@ NOOPT_VS2010_IPF_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF 
 
 *_VS2010xASL_*_MAKE_PATH       = DEF(VS2010_BIN)\nmake.exe
 *_VS2010xASL_*_MAKE_FLAG       = /nologo
-*_VS2010xASL_*_RC_PATH         = DEF(WINSDK_BIN)\rc.exe
+*_VS2010xASL_*_RC_PATH         = DEF(WINSDK7_BIN)\rc.exe
 
 *_VS2010xASL_*_SLINK_FLAGS     = /NOLOGO /LTCG
 *_VS2010xASL_*_APP_FLAGS       = /nologo /E /TC
@@ -2220,7 +2228,7 @@ NOOPT_VS2010xASL_IPF_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,
 
 *_VS2010x86_*_MAKE_PATH       = DEF(VS2010x86_BIN)\nmake.exe
 *_VS2010x86_*_MAKE_FLAG       = /nologo
-*_VS2010x86_*_RC_PATH         = DEF(WINSDK_BIN)\rc.exe
+*_VS2010x86_*_RC_PATH         = DEF(WINSDK7x86_BIN)\rc.exe
 
 *_VS2010x86_*_MAKE_FLAGS      = /nologo
 *_VS2010x86_*_SLINK_FLAGS     = /NOLOGO /LTCG
@@ -2355,7 +2363,7 @@ NOOPT_VS2010x86_IPF_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,I
 
 *_VS2010x86xASL_*_MAKE_PATH       = DEF(VS2010x86_BIN)\nmake.exe
 *_VS2010x86xASL_*_MAKE_FLAG       = /nologo
-*_VS2010x86xASL_*_RC_PATH         = DEF(WINSDK_BIN)\rc.exe
+*_VS2010x86xASL_*_RC_PATH         = DEF(WINSDK7x86_BIN)\rc.exe
 
 *_VS2010x86xASL_*_MAKE_FLAGS      = /nologo
 *_VS2010x86xASL_*_SLINK_FLAGS     = /NOLOGO /LTCG
@@ -2494,7 +2502,7 @@ NOOPT_VS2010x86xASL_IPF_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:R
 
 *_VS2012_*_MAKE_PATH              = DEF(VS2012_BIN)\nmake.exe
 *_VS2012_*_MAKE_FLAGS             = /nologo
-*_VS2012_*_RC_PATH                = DEF(WINSDK_BIN)\rc.exe
+*_VS2012_*_RC_PATH                = DEF(WINSDK71_BIN)\rc.exe
 
 *_VS2012_*_SLINK_FLAGS            = /NOLOGO /LTCG
 *_VS2012_*_APP_FLAGS              = /nologo /E /TC
@@ -2604,7 +2612,7 @@ NOOPT_VS2012_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT
 
 *_VS2012xASL_*_MAKE_PATH       = DEF(VS2012_BIN)\nmake.exe
 *_VS2012xASL_*_MAKE_FLAG       = /nologo
-*_VS2012xASL_*_RC_PATH         = DEF(WINSDK_BIN)\rc.exe
+*_VS2012xASL_*_RC_PATH         = DEF(WINSDK71_BIN)\rc.exe
 
 *_VS2012xASL_*_SLINK_FLAGS     = /NOLOGO /LTCG
 *_VS2012xASL_*_APP_FLAGS       = /nologo /E /TC
@@ -2711,7 +2719,7 @@ NOOPT_VS2012xASL_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:RE
 
 *_VS2012x86_*_MAKE_PATH       = DEF(VS2012x86_BIN)\nmake.exe
 *_VS2012x86_*_MAKE_FLAG       = /nologo
-*_VS2012x86_*_RC_PATH         = DEF(WINSDK_BIN)\rc.exe
+*_VS2012x86_*_RC_PATH         = DEF(WINSDK71x86_BIN)\rc.exe
 
 *_VS2012x86_*_MAKE_FLAGS      = /nologo
 *_VS2012x86_*_SLINK_FLAGS     = /NOLOGO /LTCG
@@ -2818,7 +2826,7 @@ NOOPT_VS2012x86_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 
 *_VS2012x86xASL_*_MAKE_PATH       = DEF(VS2012x86_BIN)\nmake.exe
 *_VS2012x86xASL_*_MAKE_FLAG       = /nologo
-*_VS2012x86xASL_*_RC_PATH         = DEF(WINSDK_BIN)\rc.exe
+*_VS2012x86xASL_*_RC_PATH         = DEF(WINSDK71x86_BIN)\rc.exe
 
 *_VS2012x86xASL_*_MAKE_FLAGS      = /nologo
 *_VS2012x86xASL_*_SLINK_FLAGS     = /NOLOGO /LTCG
