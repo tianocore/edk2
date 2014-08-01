@@ -440,8 +440,6 @@ ArmAndroidFastbootPlatformEntryPoint (
   IN EFI_SYSTEM_TABLE                      *SystemTable
   )
 {
-  gImageHandle = ImageHandle;
-
   return gBS->InstallProtocolInterface (
                 &ImageHandle,
                 &gAndroidFastbootPlatformProtocolGuid,

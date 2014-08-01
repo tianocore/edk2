@@ -24,7 +24,6 @@
 #include "BootMonFsInternal.h"
 
 EFI_DEVICE_PATH* mBootMonFsSupportedDevicePaths;
-EFI_HANDLE       mImageHandle;
 LIST_ENTRY       mInstances;
 
 EFI_FILE_PROTOCOL mBootMonFsRootTemplate = {
@@ -217,7 +216,7 @@ BootMonFsDriverSupported (
                   ControllerHandle,
                   &gEfiDiskIoProtocolGuid,
                   (VOID **) &DiskIo,
-                  mImageHandle,
+                  gImageHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
@@ -231,7 +230,7 @@ BootMonFsDriverSupported (
   gBS->CloseProtocol (
          ControllerHandle,
          &gEfiDiskIoProtocolGuid,
-         mImageHandle,
+         gImageHandle,
          ControllerHandle
          );
 
@@ -240,7 +239,7 @@ BootMonFsDriverSupported (
                   ControllerHandle,
                   &gEfiBlockIoProtocolGuid,
                   NULL,
-                  mImageHandle,
+                  gImageHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_TEST_PROTOCOL
                   );
@@ -253,7 +252,7 @@ BootMonFsDriverSupported (
                   ControllerHandle,
                   &gEfiDevicePathProtocolGuid,
                   (VOID **)&DevicePathProtocol,
-                  mImageHandle,
+                  gImageHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
@@ -277,7 +276,7 @@ BootMonFsDriverSupported (
     }
   }
 
-  gBS->CloseProtocol (ControllerHandle, &gEfiDevicePathProtocolGuid, mImageHandle, ControllerHandle);
+  gBS->CloseProtocol (ControllerHandle, &gEfiDevicePathProtocolGuid, gImageHandle, ControllerHandle);
   return Status;
 }
 
@@ -303,7 +302,7 @@ BootMonFsDriverStart (
                   ControllerHandle,
                   &gEfiBlockIoProtocolGuid,
                   (VOID **)&(Instance->BlockIo),
-                  mImageHandle,
+                  gImageHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
@@ -316,7 +315,7 @@ BootMonFsDriverStart (
                   ControllerHandle,
                   &gEfiDiskIoProtocolGuid,
                   (VOID **)&(Instance->DiskIo),
-                  mImageHandle,
+                  gImageHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
@@ -360,7 +359,7 @@ BootMonFsDriverStart (
                   ControllerHandle,
                   &gEfiDevicePathProtocolGuid,
                   (VOID **)&(Instance->DevicePath),
-                  mImageHandle,
+                  gImageHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
@@ -459,7 +458,6 @@ BootMonFsEntryPoint (
 {
   EFI_STATUS  Status;
 
-  mImageHandle = ImageHandle;
   InitializeListHead (&mInstances);
 
   // Initialize the list of Device Paths that could support BootMonFs

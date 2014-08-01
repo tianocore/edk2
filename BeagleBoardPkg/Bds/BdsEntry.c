@@ -23,8 +23,6 @@
 
 BOOLEAN     gConsolePresent = FALSE;
 
-
-EFI_HANDLE  mBdsImageHandle = NULL;
 EFI_BDS_ARCH_PROTOCOL  gBdsProtocol = {
   BdsEntry,
 };
@@ -228,13 +226,11 @@ BdsInitialize (
 {
   EFI_STATUS  Status;
 
-  mBdsImageHandle = ImageHandle;
-
   //
   // Install protocol interface
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
-                  &mBdsImageHandle,
+                  &ImageHandle,
                   &gEfiBdsArchProtocolGuid, &gBdsProtocol,
                   NULL
                   );

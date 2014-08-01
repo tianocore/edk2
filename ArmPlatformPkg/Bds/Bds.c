@@ -21,8 +21,6 @@
 
 #define EFI_SET_TIMER_TO_SECOND   10000000
 
-EFI_HANDLE mImageHandle;
-
 STATIC
 EFI_STATUS
 GetConsoleDevicePathFromVariable (
@@ -541,8 +539,6 @@ BdsInitialize (
   )
 {
   EFI_STATUS  Status;
-
-  mImageHandle = ImageHandle;
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &ImageHandle,

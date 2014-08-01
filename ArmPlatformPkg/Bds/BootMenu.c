@@ -16,7 +16,6 @@
 
 #include <Guid/ArmGlobalVariableHob.h>
 
-extern EFI_HANDLE mImageHandle;
 extern BDS_LOAD_OPTION_SUPPORT *BdsLoadOptionSupportList;
 
 /**
@@ -954,7 +953,7 @@ BootShell (
   EFI_STATUS Status;
 
   // Start EFI Shell
-  Status = BdsLoadApplication (mImageHandle, L"Shell", 0, NULL);
+  Status = BdsLoadApplication (gImageHandle, L"Shell", 0, NULL);
   if (Status == EFI_NOT_FOUND) {
     Print (L"Error: EFI Application not found.\n");
   } else if (EFI_ERROR(Status)) {

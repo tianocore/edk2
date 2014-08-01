@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -14,8 +14,6 @@
 
 #include <Guid/ArmGlobalVariableHob.h>
 #include "BdsInternal.h"
-
-extern EFI_HANDLE mImageHandle;
 
 EFI_STATUS
 BootOptionStart (
@@ -46,7 +44,7 @@ BootOptionStart (
         BdsConnectAllDrivers ();
       }
 
-      Status = BdsStartEfiApplication (mImageHandle, BootOption->FilePathList, 0, NULL);
+      Status = BdsStartEfiApplication (gImageHandle, BootOption->FilePathList, 0, NULL);
     } else if (LoaderType == BDS_LOADER_KERNEL_LINUX_ATAG) {
       LinuxArguments = &(OptionalData->Arguments.LinuxArguments);
       CmdLineSize = ReadUnaligned16 ((CONST UINT16*)&LinuxArguments->CmdLineSize);
@@ -103,7 +101,7 @@ BootOptionStart (
               EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
               LoadOptionIndexSize, &(BootOption->LoadOptionIndex));
 
-    Status = BdsStartEfiApplication (mImageHandle, BootOption->FilePathList, BootOption->OptionalDataSize, BootOption->OptionalData);
+    Status = BdsStartEfiApplication (gImageHandle, BootOption->FilePathList, BootOption->OptionalDataSize, BootOption->OptionalData);
 
     // Clear BootCurrent variable
     LoadOptionIndexSize = sizeof(UINT16);
