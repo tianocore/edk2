@@ -3570,6 +3570,8 @@ BdsLibBootNext (
     ASSERT (BootOption != NULL);
     BdsLibConnectDevicePath (BootOption->DevicePath);
     BdsLibBootViaBootOption (BootOption, BootOption->DevicePath, &ExitDataSize, &ExitData);
+    FreePool(BootOption);
+    FreePool(BootNext);
   }
 
 }
