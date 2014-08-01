@@ -100,6 +100,7 @@ public:
   ~CVfrCompiler ();
 
   VOID                Usage (VOID);
+  VOID                Version (VOID);
 
   VOID                PreProcess (VOID);
   VOID                Compile (VOID);

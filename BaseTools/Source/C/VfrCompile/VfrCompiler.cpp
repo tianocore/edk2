@@ -96,6 +96,10 @@ CVfrCompiler::OptionInitialization (
       Usage ();
       SET_RUN_STATUS (STATUS_DEAD);
       return;
+    } else if (stricmp(Argv[Index], "--version") == 0) {
+      Version ();
+      SET_RUN_STATUS (STATUS_DEAD);
+      return;
     } else if (stricmp(Argv[Index], "-l") == 0) {
       mOptions.CreateRecordListFile = TRUE;
       gCIfrRecordInfoDB.TurnOn ();
@@ -415,6 +419,7 @@ CVfrCompiler::Usage (
     " ",
     "Options:",
     "  -h, --help     prints this help",
+    "  --version      prints version info",
     "  -l             create an output IFR listing file",
     "  -o DIR, --output-directory DIR",
     "                 deposit all output files to directory OutputDir",
@@ -432,6 +437,21 @@ CVfrCompiler::Usage (
     "                 format is xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
     "  -w  --warning-as-error",
     "                 treat warning as an error",
+    NULL
+    };
+  for (Index = 0; Help[Index] != NULL; Index++) {
+    fprintf (stdout, "%s\n", Help[Index]);
+  }
+}
+
+VOID 
+CVfrCompiler::Version (
+  VOID
+  )
+{
+  UINT32 Index;
+  CONST  CHAR8 *Help[] = {
+    "VfrCompile version " VFR_COMPILER_VERSION __BUILD_VERSION,
     NULL
     };
   for (Index = 0; Help[Index] != NULL; Index++) {
