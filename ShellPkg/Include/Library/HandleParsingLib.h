@@ -1,7 +1,7 @@
 /** @file
   Provides interface to advanced shell functionality for parsing both handle and protocol database.
 
-  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -38,9 +38,11 @@ GetStringNameFromGuid(
 /**
   Function to get the Guid for a protocol or struct based on it's string name.
 
+  Do not free or modify the returned GUID.
+
   @param[in] Name           The pointer to the string name.
   @param[in] Lang           The pointer to the language code (string).
-  @param[in] Guid           The pointer to the pointer to the Guid.
+  @param[out] Guid          The pointer to the pointer to the Guid.
 
   @retval EFI_SUCCESS       The operation was successful.
 **/
@@ -49,7 +51,7 @@ EFIAPI
 GetGuidFromStringName(
   IN CONST CHAR16 *Name,
   IN CONST CHAR8  *Lang OPTIONAL,
-  IN EFI_GUID     **Guid
+  OUT EFI_GUID    **Guid
   );
 
 /**
