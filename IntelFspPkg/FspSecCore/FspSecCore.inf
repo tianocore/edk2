@@ -44,9 +44,6 @@
 [Binaries.Ia32]
   RAW|Vtf0/Bin/ResetVec.ia32.raw |GCC
 
-[Binaries.X64]
-  RAW|Vtf0/Bin/ResetVec.x64.raw |GCC
-
 [Packages]
   MdePkg/MdePkg.dec
   IntelFspPkg/IntelFspPkg.dec
