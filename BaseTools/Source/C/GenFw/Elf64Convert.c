@@ -1,7 +1,7 @@
 /** @file
 
 Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
-Portions copyright (c) 2013, ARM Ltd. All rights reserved.<BR>
+Portions copyright (c) 2013-2014, ARM Ltd. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
@@ -690,6 +690,18 @@ WriteSections64 (
 
           switch (ELF_R_TYPE(Rel->r_info)) {
 
+          case R_AARCH64_ADR_PREL_LO21:
+            if  (Rel->r_addend != 0 ) { /* TODO */
+              Error (NULL, 0, 3000, "Invalid", "AArch64: R_AARCH64_ADR_PREL_LO21 Need to fixup with addend!.");
+            }
+            break;
+
+          case R_AARCH64_CONDBR19:
+            if  (Rel->r_addend != 0 ) { /* TODO */
+              Error (NULL, 0, 3000, "Invalid", "AArch64: R_AARCH64_CONDBR19 Need to fixup with addend!.");
+            }
+            break;
+
           case R_AARCH64_LD_PREL_LO19:
             if  (Rel->r_addend != 0 ) { /* TODO */
               Error (NULL, 0, 3000, "Invalid", "AArch64: R_AARCH64_LD_PREL_LO19 Need to fixup with addend!.");
@@ -784,6 +796,12 @@ WriteRelocations64 (
           } else if (mEhdr->e_machine == EM_AARCH64) {
             // AArch64 GCC uses RELA relocation, so all relocations has to be fixed up. ARM32 uses REL.
             switch (ELF_R_TYPE(Rel->r_info)) {
+            case R_AARCH64_ADR_PREL_LO21:
+              break;
+
+            case R_AARCH64_CONDBR19:
+              break;
+
             case R_AARCH64_LD_PREL_LO19:
               break;
 
