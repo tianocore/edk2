@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2012-2013, ARM Limited. All rights reserved.
+//  Copyright (c) 2012-2014, ARM Limited. All rights reserved.
 //
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
@@ -15,64 +15,27 @@
 .align 3
 
 GCC_ASM_EXPORT(ArmCallSmc)
-GCC_ASM_EXPORT(ArmCallSmcArg1)
-GCC_ASM_EXPORT(ArmCallSmcArg2)
-GCC_ASM_EXPORT(ArmCallSmcArg3)
 
 ASM_PFX(ArmCallSmc):
-  str   x1, [sp, #-0x10]!
-  mov   x1, x0
-  ldr   x0,[x1]
-  smc   #0
-  str   x0,[x1]
-  ldr   x1, [sp], #0x10
-  ret
+  // Push x0 on the stack
+  str   x0, [sp, #-8]!
 
-ASM_PFX(ArmCallSmcArg1):
-  stp   x2, x3, [sp, #-0x10]!
-  mov   x2, x0
-  mov   x3, x1
-  ldr   x0,[x2]
-  ldr   x1,[x3]
-  smc   #0
-  str   x0,[x2]
-  str   x1,[x3]
-  ldp   x2, x3, [sp], #0x10
-  ret
+  // Load the SMC arguments values into the appropriate registers
+  ldp   x6, x7, [x0, #48]
+  ldp   x4, x5, [x0, #32]
+  ldp   x2, x3, [x0, #16]
+  ldp   x0, x1, [x0, #0]
 
-ASM_PFX(ArmCallSmcArg2):
-  stp   x3, x4, [sp, #-0x10]!
-  str   x5, [sp, #-8]!
-  mov   x3, x0
-  mov   x4, x1
-  mov   x5, x2
-  ldr   x0,[x3]
-  ldr   x1,[x4]
-  ldr   x2,[x5]
   smc   #0
-  str   x0,[x3]
-  str   x1,[x4]
-  str   x2,[x5]
-  ldr   x5, [sp], #8
-  ldp   x3, x4, [sp], #0x10
-  ret
 
-ASM_PFX(ArmCallSmcArg3):
-  stp   x4, x5, [sp, #-0x10]!
-  stp   x6, x7, [sp, #-0x10]!
-  mov   x4, x0
-  mov   x5, x1
-  mov   x6, x2
-  mov   x7, x3
-  ldr   x0,[x4]
-  ldr   x1,[x5]
-  ldr   x2,[x6]
-  ldr   x3,[x7]
-  smc   #0
-  str   x0,[x4]
-  str   x1,[x5]
-  str   x2,[x6]
-  str   x3,[x7]
-  ldp   x4, x5, [sp], #0x10
-  ldp   x6, x7, [sp], #0x10
+  // Pop the ARM_SMC_ARGS structure address from the stack into x9
+  ldr   x9, [sp], #8
+
+  // Store the SMC returned values into the appropriate registers
+  // A SMC call can return up to 4 values - we do not need to store back x4-x7.
+  stp   x2, x3, [x9, #16]
+  stp   x0, x1, [x9, #0]
+
+  mov   x0, x9
+
   ret
