@@ -611,12 +611,13 @@ typedef struct {
 
 //
 // SRAT structure types.
-// All other values between 0x03 an 0xFF are reserved and
+// All other values between 0x04 an 0xFF are reserved and
 // will be ignored by OSPM.
 //
 #define EFI_ACPI_5_1_PROCESSOR_LOCAL_APIC_SAPIC_AFFINITY  0x00
 #define EFI_ACPI_5_1_MEMORY_AFFINITY                      0x01
 #define EFI_ACPI_5_1_PROCESSOR_LOCAL_X2APIC_AFFINITY      0x02
+#define EFI_ACPI_5_1_GICC_AFFINITY                        0x03
 
 ///
 /// Processor Local APIC/SAPIC Affinity Structure Definition
@@ -674,6 +675,23 @@ typedef struct {
   UINT32  ClockDomain;
   UINT8   Reserved2[4];
 } EFI_ACPI_5_1_PROCESSOR_LOCAL_X2APIC_AFFINITY_STRUCTURE;
+
+///
+/// GICC Affinity Structure Definition
+///
+typedef struct {
+  UINT8   Type;
+  UINT8   Length;
+  UINT32  ProximityDomain;
+  UINT32  AcpiProcessorUid;
+  UINT32  Flags;
+  UINT32  ClockDomain;
+} EFI_ACPI_5_1_GICC_AFFINITY_STRUCTURE;
+
+///
+/// GICC Flags.  All other bits are reserved and must be 0.
+///
+#define EFI_ACPI_5_1_GICC_ENABLED (1 << 0)
 
 ///
 /// System Locality Distance Information Table (SLIT).
