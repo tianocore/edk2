@@ -1,7 +1,7 @@
 /** @file
   Functions implementation related with Mtftp for UefiPxeBc Driver.
 
-  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -162,7 +162,7 @@ PxeBcMtftp6GetFileSize (
 
   Status = Mtftp6->GetInfo (
                      Mtftp6,
-                     FALSE,
+                     NULL,
                      Filename,
                      NULL,
                      (UINT8) OptCnt,
@@ -604,7 +604,7 @@ PxeBcMtftp4GetFileSize (
 
   Status = Mtftp4->GetInfo (
                      Mtftp4,
-                     FALSE,
+                     NULL,
                      Filename,
                      NULL,
                      (UINT8) OptCnt,
