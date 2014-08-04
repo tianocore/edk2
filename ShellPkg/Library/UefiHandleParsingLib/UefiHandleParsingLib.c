@@ -651,8 +651,6 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_IPV4_SB),               &gEfiIp4ServiceBindingProtocolGuid,               NULL},
   {STRING_TOKEN(STR_IPV4),                  &gEfiIp4ProtocolGuid,                             NULL},
   {STRING_TOKEN(STR_IPV4_CFG),              &gEfiIp4ConfigProtocolGuid,                       NULL},
-  {STRING_TOKEN(STR_SHELL_PARAMETERS),      &gEfiShellParametersProtocolGuid,                 NULL},
-  {STRING_TOKEN(STR_SHELL),                 &gEfiShellProtocolGuid,                           NULL},
   {STRING_TOKEN(STR_UDPV4_SB),              &gEfiUdp4ServiceBindingProtocolGuid,              NULL},
   {STRING_TOKEN(STR_UDPV4),                 &gEfiUdp4ProtocolGuid,                            NULL},
   {STRING_TOKEN(STR_MTFTPV4_SB),            &gEfiMtftp4ServiceBindingProtocolGuid,            NULL},
@@ -748,6 +746,17 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
 // PI Spec ones
 //
   {STRING_TOKEN(STR_IDE_CONT_INIT),         &gEfiIdeControllerInitProtocolGuid,               NULL},
+
+//
+// UEFI Shell Spec 2.0
+//
+  {STRING_TOKEN(STR_SHELL_PARAMETERS),      &gEfiShellParametersProtocolGuid,                 NULL},
+  {STRING_TOKEN(STR_SHELL),                 &gEfiShellProtocolGuid,                           NULL},
+
+//
+// UEFI Shell Spec 2.1
+//
+  {STRING_TOKEN(STR_SHELL_DYNAMIC),         &gEfiShellDynamicCommandProtocolGuid,             NULL},
 
 //
 // terminator
@@ -856,9 +865,11 @@ GetProtocolInformationDump(
 /**
   Function to get the Guid for a protocol or struct based on it's string name.
 
+  do not modify the returned Guid.
+
   @param[in] Name           The pointer to the string name.
   @param[in] Lang           The pointer to the language code.
-  @param[in] Guid           The pointer to the Guid.
+  @param[out] Guid          The pointer to the Guid.
 
   @retval EFI_SUCCESS       The operation was sucessful.
 **/
@@ -867,7 +878,7 @@ EFIAPI
 GetGuidFromStringName(
   IN CONST CHAR16 *Name,
   IN CONST CHAR8  *Lang OPTIONAL,
-  IN EFI_GUID     **Guid
+  OUT EFI_GUID    **Guid
   )
 {
   CONST GUID_INFO_BLOCK  *ListWalker;
