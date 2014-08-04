@@ -12,6 +12,9 @@
 
 **/
 
+#ifndef __FSP_H__
+#define __FSP_H__
+
 //
 // Fv Header
 //
@@ -41,3 +44,5 @@
 //
 #define FSP_HEADER_IMAGEBASE_OFFSET     0x1C
 #define FSP_HEADER_TEMPRAMINIT_OFFSET   0x30
+
+#endif

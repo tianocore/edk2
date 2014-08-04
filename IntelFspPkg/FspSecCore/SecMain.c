@@ -41,6 +41,7 @@ UINT64  mIdtEntryTemplate = 0xffff8e000008ffe4ULL;
   @param[in] SizeOfRam          Size of the temporary memory available for use.
   @param[in] TempRamBase        Base address of tempory ram
   @param[in] BootFirmwareVolume Base address of the Boot Firmware Volume.
+  @param[in] PeiCoreEntry       Pei Core entrypoint.
 
   @return This function never returns.
 
@@ -50,7 +51,8 @@ EFIAPI
 SecStartup (
   IN UINT32                   SizeOfRam,
   IN UINT32                   TempRamBase,
-  IN VOID                    *BootFirmwareVolume
+  IN VOID                    *BootFirmwareVolume,
+  IN UINTN                    PeiCoreEntry
   )
 {
   EFI_SEC_PEI_HAND_OFF        SecCoreData;
@@ -119,7 +121,7 @@ SecStartup (
   //
   // Call PeiCore Entry
   //
-  PeiCore = (PEI_CORE_ENTRY)(*(UINTN *)((&BootFirmwareVolume) + 1));
+  PeiCore = (PEI_CORE_ENTRY)(PeiCoreEntry);
   PeiCore (&SecCoreData, mPeiSecPlatformInformationPpi);
 
   //

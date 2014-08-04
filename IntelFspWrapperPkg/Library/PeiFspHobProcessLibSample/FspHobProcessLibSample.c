@@ -244,6 +244,8 @@ FspHobProcess (
       LowMemorySize
       );
 
+    S3PeiMemBase = 0;
+    S3PeiMemSize = 0;
     Status = GetS3MemoryInfo (&S3PeiMemBase, &S3PeiMemSize);
     ASSERT_EFI_ERROR (Status);
     DEBUG((DEBUG_INFO, "S3 memory %Xh - %Xh bytes\n", S3PeiMemBase, S3PeiMemSize));

@@ -107,6 +107,7 @@ InitializeFloatingPointUnits (
   @param[in] SizeOfRam          Size of the temporary memory available for use.
   @param[in] TempRamBase        Base address of tempory ram
   @param[in] BootFirmwareVolume Base address of the Boot Firmware Volume.
+  @param[in] PeiCoreEntry       Pei Core entrypoint.
 
   @return This function never returns.
 
@@ -116,7 +117,8 @@ EFIAPI
 SecStartup (
   IN UINT32                   SizeOfRam,
   IN UINT32                   TempRamBase,
-  IN VOID                    *BootFirmwareVolume
+  IN VOID                    *BootFirmwareVolume,
+  IN UINTN                    PeiCoreEntry
   );
 
 /**
