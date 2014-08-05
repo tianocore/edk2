@@ -175,7 +175,9 @@ CascadeDelete(
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_RM_LOG_DELETE_ERR), gShellLevel2HiiHandle, Status);
     return (SHELL_ACCESS_DENIED);
   } else {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_RM_LOG_DELETE_COMP), gShellLevel2HiiHandle);
+    if (!Quiet) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_RM_LOG_DELETE_COMP), gShellLevel2HiiHandle);
+    }
     return (SHELL_SUCCESS);
   }
 }

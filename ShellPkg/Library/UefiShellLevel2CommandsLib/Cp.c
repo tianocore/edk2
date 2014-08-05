@@ -501,7 +501,9 @@ ValidateAndCopyFiles(
 
     PathCleanUpDirectories(DestPath);
 
-    ShellPrintEx(-1, -1, HiiOutput, Node->FullName, DestPath);
+    if (!SilentMode) {
+      ShellPrintEx(-1, -1, HiiOutput, Node->FullName, DestPath);
+    }
 
     //
     // copy single file...
