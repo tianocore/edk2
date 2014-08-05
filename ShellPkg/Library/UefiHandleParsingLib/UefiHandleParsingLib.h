@@ -2,7 +2,7 @@
   Provides interface to advanced shell functionality for parsing both handle and protocol database.
 
   Copyright (c) 2013 - 2014, Hewlett-Packard Development Company, L.P.
-  Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -134,6 +134,7 @@
 #include <Protocol/IdeControllerInit.h>
 #include <Protocol/DiskIo2.h>
 #include <Protocol/AdapterInformation.h>
+#include <Protocol/EfiShellDynamicCommand.h>
 
 #include <Library/HandleParsingLib.h>
 #include <Library/UefiBootServicesTableLib.h>

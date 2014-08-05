@@ -16,9 +16,10 @@
 #include "UefiHandleParsingLib.h"
 #include "IndustryStandard/Acpi10.h"
 
-EFI_HANDLE mHandleParsingHiiHandle;
+EFI_HANDLE        mHandleParsingHiiHandle;
 HANDLE_INDEX_LIST mHandleList = {{{NULL,NULL},0,0},0};
-
+GUID_INFO_BLOCK   *GuidList;
+UINTN             GuidListCount;
 /**
   Function to translate the EFI_MEMORY_TYPE into a string.
 
@@ -98,6 +99,9 @@ HandleParsingLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
+  GuidListCount = 0;
+  GuidList      = NULL;
+
   mHandleParsingHiiHandle = HiiAddPackages (&gHandleParsingHiiGuid, gImageHandle, UefiHandleParsingLibStrings, NULL);
   if (mHandleParsingHiiHandle == NULL) {
     return (EFI_DEVICE_ERROR);
@@ -121,6 +125,13 @@ HandleParsingLibDestructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
+  UINTN                 LoopCount;
+
+  for (LoopCount = 0; GuidList != NULL && LoopCount < GuidListCount; LoopCount++) {
+    SHELL_FREE_NON_NULL(GuidList[LoopCount].GuidId);
+  }
+
+  SHELL_FREE_NON_NULL(GuidList);
   if (mHandleParsingHiiHandle != NULL) {
     HiiRemovePackages(mHandleParsingHiiHandle);
   }
@@ -780,8 +791,15 @@ InternalShellGetNodeFromGuid(
   )
 {
   CONST GUID_INFO_BLOCK *ListWalker;
+  UINTN                 LoopCount;
 
   ASSERT(Guid != NULL);
+
+  for (LoopCount = 0, ListWalker = GuidList; GuidList != NULL && LoopCount < GuidListCount; LoopCount++, ListWalker++) {
+    if (CompareGuid(ListWalker->GuidId, Guid)) {
+      return (ListWalker);
+    }
+  }
 
   if (PcdGetBool(PcdShellIncludeNtGuids)) {
     for (ListWalker = mGuidStringListNT ; ListWalker != NULL && ListWalker->GuidId != NULL ; ListWalker++) {
@@ -795,7 +813,90 @@ InternalShellGetNodeFromGuid(
       return (ListWalker);
     }
   }
-  return (ListWalker);
+  return (NULL);
+}
+
+/**
+Function to add a new GUID/Name mapping.
+
+@param[in] Guid       The Guid
+@param[in] NameId     The STRING id of the HII string to use
+@param[in] Dump       The pointer to the dump function
+
+
+@retval EFI_SUCCESS           The operation was sucessful
+@retval EFI_OUT_OF_RESOURCES  A memory allocation failed
+@retval EFI_INVALID_PARAMETER Guid NameId was invalid
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+InsertNewGuidNameMapping(
+  IN CONST EFI_GUID           *Guid,
+  IN CONST EFI_STRING_ID      NameID,
+  IN CONST DUMP_PROTOCOL_INFO DumpFunc OPTIONAL
+  )
+{
+  ASSERT(Guid   != NULL);
+  ASSERT(NameID != 0);
+
+  GuidList = ReallocatePool(GuidListCount * sizeof(GUID_INFO_BLOCK), GuidListCount+1 * sizeof(GUID_INFO_BLOCK), GuidList);
+  if (GuidList == NULL) {
+    GuidListCount = 0;
+    return (EFI_OUT_OF_RESOURCES);
+  }
+  GuidListCount++;
+
+  GuidList[GuidListCount - 1].GuidId   = AllocateCopyPool(sizeof(EFI_GUID), Guid);
+  GuidList[GuidListCount - 1].StringId = NameID;
+  GuidList[GuidListCount - 1].DumpInfo = DumpFunc;
+
+  if (GuidList[GuidListCount - 1].GuidId == NULL) {
+    return (EFI_OUT_OF_RESOURCES);
+  }
+
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to add a new GUID/Name mapping.
+
+  This cannot overwrite an existing mapping.
+
+  @param[in] Guid       The Guid
+  @param[in] TheName    The Guid's name
+  @param[in] Lang       RFC4646 language code list or NULL
+
+  @retval EFI_SUCCESS           The operation was sucessful
+  @retval EFI_ACCESS_DENIED     There was a duplicate
+  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed
+  @retval EFI_INVALID_PARAMETER Guid or TheName was NULL
+**/
+EFI_STATUS
+EFIAPI
+AddNewGuidNameMapping(
+  IN CONST EFI_GUID *Guid,
+  IN CONST CHAR16   *TheName,
+  IN CONST CHAR8    *Lang OPTIONAL
+  )
+{
+  CONST GUID_INFO_BLOCK *Temp;
+  EFI_STRING_ID         NameID;
+
+  if (Guid == NULL || TheName == NULL){
+    return (EFI_INVALID_PARAMETER);
+  }
+
+  if ((Temp = InternalShellGetNodeFromGuid(Guid)) != NULL) {
+    return (EFI_ACCESS_DENIED);
+  }
+
+  NameID = HiiSetString(mHandleParsingHiiHandle, 0, (CHAR16*)TheName, Lang);
+  if (NameID == 0) {
+    return (EFI_OUT_OF_RESOURCES);
+  }
+
+  return (InsertNewGuidNameMapping(Guid, NameID, NULL));
 }
 
 /**
@@ -819,7 +920,7 @@ GetStringNameFromGuid(
   CONST GUID_INFO_BLOCK *Id;
 
   Id = InternalShellGetNodeFromGuid(Guid);
-  return (HiiGetString(mHandleParsingHiiHandle, Id->StringId, Lang));
+  return (HiiGetString(mHandleParsingHiiHandle, Id==NULL?STRING_TOKEN(STR_UNKNOWN_DEVICE):Id->StringId, Lang));
 }
 
 /**
@@ -883,6 +984,7 @@ GetGuidFromStringName(
 {
   CONST GUID_INFO_BLOCK  *ListWalker;
   CHAR16                     *String;
+  UINTN                  LoopCount;
 
   ASSERT(Guid != NULL);
   if (Guid == NULL) {
@@ -912,6 +1014,18 @@ GetGuidFromStringName(
       return (EFI_SUCCESS);
     }
   }
+
+  for (LoopCount = 0, ListWalker = GuidList; GuidList != NULL && LoopCount < GuidListCount; LoopCount++, ListWalker++) {
+    String = HiiGetString(mHandleParsingHiiHandle, ListWalker->StringId, Lang);
+    if (Name != NULL && String != NULL && StringNoCaseCompare (&Name, &String) == 0) {
+      *Guid = ListWalker->GuidId;
+    }
+    SHELL_FREE_NON_NULL(String);
+    if (*Guid != NULL) {
+      return (EFI_SUCCESS);
+    }
+  }
+
   return (EFI_NOT_FOUND);
 }
 

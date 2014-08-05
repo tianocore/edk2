@@ -18,6 +18,27 @@
 #include <Uefi.h>
 
 /**
+  Function to add a new GUID/Name mapping.
+
+  This cannot overwrite an existing mapping.
+
+  @param[in] Guid       The Guid
+  @param[in] TheName    The Guid's name
+  @param[in] Lang       RFC4646 language code list or NULL
+
+  @retval EFI_SUCCESS           The operation was sucessful
+  @retval EFI_ACCESS_DENIED     There was a duplicate
+  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed
+**/
+EFI_STATUS
+EFIAPI
+AddNewGuidNameMapping(
+  IN CONST EFI_GUID *Guid,
+  IN CONST CHAR16   *TheName,
+  IN CONST CHAR8    *Lang OPTIONAL
+  );
+
+/**
   Function to get the name of a protocol or struct from it's GUID.
 
   If Guid is NULL, then ASSERT.
