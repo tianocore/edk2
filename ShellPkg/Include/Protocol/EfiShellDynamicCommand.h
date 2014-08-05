@@ -73,13 +73,13 @@ CHAR16*
   );
 
 /// EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL protocol structure.
-typedef struct _EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL {
+struct _EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL {
   
   CONST CHAR16           *CommandName;
   SHELL_COMMAND_HANDLER  Handler;
   SHELL_COMMAND_GETHELP  GetHelp;
 
-} EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL;
+};
 
 extern EFI_GUID gEfiShellDynamicCommandProtocolGuid;
 
