@@ -1392,7 +1392,9 @@ ShellCommandUpdateMapping (
     // Get all Device Paths
     //
     DevicePathList = AllocateZeroPool(sizeof(EFI_DEVICE_PATH_PROTOCOL*) * Count);
-    ASSERT(DevicePathList != NULL);
+    if (DevicePathList == NULL) {
+      return (EFI_OUT_OF_RESOURCES);
+    }
 
     for (Count = 0 ; HandleList[Count] != NULL ; Count++) {
       DevicePathList[Count] = DevicePathFromHandle(HandleList[Count]);
@@ -1408,7 +1410,7 @@ ShellCommandUpdateMapping (
     //
     // Assign new Mappings to remainders
     //
-    for (Count = 0 ; HandleList[Count] != NULL && !EFI_ERROR(Status); Count++) {
+    for (Count = 0 ; !EFI_ERROR(Status) && HandleList[Count] != NULL && !EFI_ERROR(Status); Count++) {
       //
       // Skip ones that already have
       //
@@ -1419,7 +1421,10 @@ ShellCommandUpdateMapping (
       // Get default name
       //
       NewDefaultName = ShellCommandCreateNewMappingName(MappingTypeFileSystem);
-      ASSERT(NewDefaultName != NULL);
+      if (NewDefaultName == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        break;
+      }
 
       //
       // Call shell protocol SetMap function now...
@@ -1496,11 +1501,14 @@ ConvertEfiFileProtocolToShellHandle(
     }
     NewNode             = AllocateZeroPool(sizeof(BUFFER_LIST));
     if (NewNode == NULL) {
+      SHELL_FREE_NON_NULL(Buffer);
       return (NULL);
     }
     Buffer->FileHandle  = (EFI_FILE_PROTOCOL*)Handle;
     Buffer->Path        = StrnCatGrow(&Buffer->Path, NULL, Path, 0);
     if (Buffer->Path == NULL) {
+      SHELL_FREE_NON_NULL(NewNode);
+      SHELL_FREE_NON_NULL(Buffer);
       return (NULL);
     }
     NewNode->Buffer     = Buffer;
@@ -1638,7 +1646,6 @@ FreeBufferList (
       ; BufferListEntry = (BUFFER_LIST *)GetFirstNode(&List->Link)
      ){
     RemoveEntryList(&BufferListEntry->Link);
-    ASSERT(BufferListEntry->Buffer != NULL);
     if (BufferListEntry->Buffer != NULL) {
       FreePool(BufferListEntry->Buffer);
     }
