@@ -19,11 +19,10 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = SecPlatformSecLibNull
-  FILE_GUID                      = 6695974D-968C-420b-80B9-7870CD20118F
+  FILE_GUID                      = 03DA99B3-DDF4-4c7e-8CCA-216FC3F1F311
   MODULE_TYPE                    = SEC
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = NULL
-
 
 #
 # The following information is for reference only and not required by the build tools.

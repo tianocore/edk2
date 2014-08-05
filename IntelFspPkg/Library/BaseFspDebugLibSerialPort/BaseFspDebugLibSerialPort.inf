@@ -14,7 +14,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BaseFspDebugLibSerialPort
-  FILE_GUID                      = BB83F95F-EDBC-4884-A520-CD42AF388FAE
+  FILE_GUID                      = 9D52E46E-F07E-44e8-9A90-F8576C91C211
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = DebugLib
