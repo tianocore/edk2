@@ -1,7 +1,7 @@
 /** @file
   Main file for devices shell Driver1 function.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -203,8 +203,11 @@ ShellCommandRunDevices (
 
       //
       // Print Header
+      // only in non SFO mode.
       //
-      ShellPrintHiiEx(-1, -1, Language, STRING_TOKEN (STR_DEVICES_HEADER_LINES), gShellDriver1HiiHandle);
+      if (!ShellCommandLineGetFlag(Package, L"-sfo")){
+        ShellPrintHiiEx(-1, -1, Language, STRING_TOKEN (STR_DEVICES_HEADER_LINES), gShellDriver1HiiHandle);
+      }
 
       //
       // loop through each handle
@@ -222,20 +225,37 @@ ShellCommandRunDevices (
         Name = NULL;
         Status = GetDeviceHandleInfo(*HandleListWalker, &Type, &Cfg, &Diag, &Parents, &Devices, &Children, &Name, Language);
         if (Name != NULL && (Parents != 0 || Devices != 0 || Children != 0)) {
-          ShellPrintHiiEx(
-            -1,
-            -1,
-            Language,
-            STRING_TOKEN (STR_DEVICES_ITEM_LINE),
-            gShellDriver1HiiHandle,
-            ConvertHandleToHandleIndex(*HandleListWalker),
-            Type,
-            Cfg?L'X':L'-',
-            Diag?L'X':L'-',
-            Parents,
-            Devices,
-            Children,
-            Name!=NULL?Name:L"<UNKNOWN>");
+          if (!ShellCommandLineGetFlag(Package, L"-sfo")){
+            ShellPrintHiiEx(
+              -1,
+              -1,
+              Language,
+              STRING_TOKEN(STR_DEVICES_ITEM_LINE),
+              gShellDriver1HiiHandle,
+              ConvertHandleToHandleIndex(*HandleListWalker),
+              Type,
+              Cfg?L'X':L'-',
+              Diag?L'X':L'-',
+              Parents,
+              Devices,
+              Children,
+              Name != NULL ? Name : L"<UNKNOWN>");
+          } else {
+            ShellPrintHiiEx(
+              -1,
+              -1,
+              Language,
+              STRING_TOKEN(STR_DEVICES_ITEM_LINE_SFO),
+              gShellDriver1HiiHandle,
+              ConvertHandleToHandleIndex(*HandleListWalker),
+              Type,
+              Cfg?L'Y':L'N',
+              Diag?L'Y':L'N',
+              Parents,
+              Devices,
+              Children,
+              Name != NULL ? Name : L"<UNKNOWN>");
+          }
         }
         if (Name != NULL) {
           FreePool(Name);
