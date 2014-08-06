@@ -1145,10 +1145,37 @@ EfiShellCreateFile(
     return (EFI_NOT_FOUND);
   }
 
-  Status = InternalOpenFileDevicePath(DevicePath, FileHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE|EFI_FILE_MODE_CREATE, FileAttribs); // 0 = no specific file attributes
+  Status = InternalOpenFileDevicePath(DevicePath, FileHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE|EFI_FILE_MODE_CREATE, FileAttribs);
   FreePool(DevicePath);
 
   return(Status);
+}
+
+/**
+  Register a GUID and a localized human readable name for it.
+
+  If Guid is not assigned a name, then assign GuidName to Guid.  This list of GUID
+  names must be used whenever a shell command outputs GUID information.
+
+  This function is only available when the major and minor versions in the
+  EfiShellProtocol are greater than or equal to 2 and 1, respectively.
+
+  @param[in] Guid       A pointer to the GUID being registered.
+  @param[in] GuidName   A pointer to the localized name for the GUID being registered.
+
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_INVALID_PARAMETER   Guid was NULL.
+  @retval EFI_INVALID_PARAMETER   GuidName was NULL.
+  @retval EFI_ACCESS_DENIED       Guid already is assigned a name.
+**/
+EFI_STATUS
+EFIAPI 
+EfiShellRegisterGuidName(
+  IN CONST EFI_GUID *Guid,
+  IN CONST CHAR16   *GuidName
+  )
+{
+  return (AddNewGuidNameMapping(Guid, GuidName, NULL));
 }
 
 /**
@@ -2027,6 +2054,87 @@ EfiShellFindFilesInDir(
   }
   SHELL_FREE_NON_NULL(BasePath);
   return(Status);
+  }
+
+/**
+  Get the GUID value from a human readable name.
+
+  If GuidName is a known GUID name, then update Guid to have the correct value for
+  that GUID.
+
+  This function is only available when the major and minor versions in the
+  EfiShellProtocol are greater than or equal to 2 and 1, respectively.
+
+  @param[in]  GuidName   A pointer to the localized name for the GUID being queried.
+  @param[out] Guid       A pointer to the GUID structure to be filled in.
+
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_INVALID_PARAMETER   Guid was NULL.
+  @retval EFI_INVALID_PARAMETER   GuidName was NULL.
+  @retval EFI_NOT_FOUND           GuidName is not a known GUID Name.
+**/
+EFI_STATUS
+EFIAPI 
+EfiShellGetGuidFromName(
+  IN  CONST CHAR16   *GuidName,
+  OUT       EFI_GUID *Guid
+  )
+{
+  EFI_GUID    *NewGuid;
+  EFI_STATUS  Status;
+
+  if (Guid == NULL || GuidName == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
+ 
+  Status = GetGuidFromStringName(GuidName, NULL, &NewGuid);
+
+  if (!EFI_ERROR(Status)) {
+    CopyGuid(NewGuid, Guid);
+  }
+
+  return (Status);
+}
+
+/**
+  Get the human readable name for a GUID from the value.
+
+  If Guid is assigned a name, then update *GuidName to point to the name. The callee
+  should not modify the value.
+
+  This function is only available when the major and minor versions in the
+  EfiShellProtocol are greater than or equal to 2 and 1, respectively.
+
+  @param[in]  Guid       A pointer to the GUID being queried.
+  @param[out] GuidName   A pointer to a pointer the localized to name for the GUID being requested
+
+  @retval EFI_SUCCESS             The operation was successful.
+  @retval EFI_INVALID_PARAMETER   Guid was NULL.
+  @retval EFI_INVALID_PARAMETER   GuidName was NULL.
+  @retval EFI_NOT_FOUND           Guid is not assigned a name.
+**/
+EFI_STATUS
+EFIAPI 
+EfiShellGetGuidName(
+  IN  CONST EFI_GUID *Guid,
+  OUT CONST CHAR16   **GuidName
+  )
+{
+  CHAR16   *Name;
+
+  if (Guid == NULL || GuidName == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
+
+  Name = GetStringNameFromGuid(Guid, NULL);
+  if (Name == NULL || StrLen(Name) == 0) {
+    SHELL_FREE_NON_NULL(Name);
+    return (EFI_NOT_FOUND);
+  }
+
+  *GuidName = AddBufferToFreeList(Name);
+
+  return (EFI_SUCCESS);
 }
 
 /**
@@ -2461,34 +2569,32 @@ EfiShellOpenFileList(
 }
 
 /**
-  This function updated with errata.
+  Gets the environment variable and Attributes, or list of environment variables.  Can be
+  used instead of GetEnv().
 
-  Gets either a single or list of environment variables.
+  This function returns the current value of the specified environment variable and
+  the Attributes. If no variable name was specified, then all of the known
+  variables will be returned.
 
-  If name is not NULL then this function returns the current value of the specified
-  environment variable.
+  @param[in] Name               A pointer to the environment variable name. If Name is NULL,
+                                then the function will return all of the defined shell
+                                environment variables. In the case where multiple environment
+                                variables are being returned, each variable will be terminated
+                                by a NULL, and the list will be terminated by a double NULL.
+  @param[out] Attributes        If not NULL, a pointer to the returned attributes bitmask for
+                                the environment variable. In the case where Name is NULL, and
+                                multiple environment variables are being returned, Attributes
+                                is undefined.
 
-  If Name is NULL, then a list of all environment variable names is returned.  Each is a
-  NULL terminated string with a double NULL terminating the list.
-
-  @param Name                   A pointer to the environment variable name.  If
-                                Name is NULL, then the function will return all
-                                of the defined shell environment variables.  In
-                                the case where multiple environment variables are
-                                being returned, each variable will be terminated by
-                                a NULL, and the list will be terminated by a double
-                                NULL.
-
-  @return !=NULL                A pointer to the returned string.
-                                The returned pointer does not need to be freed by the caller.
-
-  @retval NULL                  The environment variable doesn't exist or there are
-                                no environment variables.
+  @retval NULL                  The environment variable doesn’t exist.
+  @return                       A non-NULL value points to the variable’s value. The returned
+                                pointer does not need to be freed by the caller.
 **/
 CONST CHAR16 *
-EFIAPI
-EfiShellGetEnv(
-  IN CONST CHAR16 *Name
+EFIAPI 
+EfiShellGetEnvEx(
+  IN  CONST CHAR16 *Name,
+  OUT       UINT32 *Attributes OPTIONAL
   )
 {
   EFI_STATUS  Status;
@@ -2556,14 +2662,14 @@ EfiShellGetEnv(
     //
     // get the size we need for this EnvVariable
     //
-    Status = SHELL_GET_ENVIRONMENT_VARIABLE(Name, &Size, Buffer);
+    Status = SHELL_GET_ENVIRONMENT_VARIABLE_AND_ATTRIBUTES(Name, Attributes, &Size, Buffer);
     if (Status == EFI_BUFFER_TOO_SMALL) {
       //
       // Allocate the space and recall the get function
       //
       Buffer = AllocateZeroPool(Size);
       ASSERT(Buffer != NULL);
-      Status = SHELL_GET_ENVIRONMENT_VARIABLE(Name, &Size, Buffer);
+      Status = SHELL_GET_ENVIRONMENT_VARIABLE_AND_ATTRIBUTES(Name, Attributes, &Size, Buffer);
     }
     //
     // we didnt get it (might not exist)
@@ -2581,6 +2687,38 @@ EfiShellGetEnv(
   // return the buffer
   //
   return (AddBufferToFreeList(Buffer));
+}
+
+/**
+  Gets either a single or list of environment variables.
+
+  If name is not NULL then this function returns the current value of the specified
+  environment variable.
+
+  If Name is NULL, then a list of all environment variable names is returned.  Each is a
+  NULL terminated string with a double NULL terminating the list.
+
+  @param Name                   A pointer to the environment variable name.  If
+                                Name is NULL, then the function will return all
+                                of the defined shell environment variables.  In
+                                the case where multiple environment variables are
+                                being returned, each variable will be terminated by
+                                a NULL, and the list will be terminated by a double
+                                NULL.
+
+  @retval !=NULL                A pointer to the returned string.
+                                The returned pointer does not need to be freed by the caller.
+
+  @retval NULL                  The environment variable doesn't exist or there are
+                                no environment variables.
+**/
+CONST CHAR16 *
+EFIAPI
+EfiShellGetEnv(
+  IN CONST CHAR16 *Name
+  )
+{
+  return (EfiShellGetEnvEx(Name, NULL));
 }
 
 /**
@@ -3241,7 +3379,7 @@ EfiShellSetAlias(
 
 // Pure FILE_HANDLE operations are passed to FileHandleLib
 // these functions are indicated by the *
-EFI_SHELL_PROTOCOL         mShellProtocol = {
+EFI_SHELL_PROTOCOL21         mShellProtocol = {
   EfiShellExecute,
   EfiShellGetEnv,
   EfiShellSetEnv,
@@ -3282,8 +3420,14 @@ EFI_SHELL_PROTOCOL         mShellProtocol = {
   EfiShellOpenRoot,
   EfiShellOpenRootByHandle,
   NULL,
-  SHELL_MAJOR_VERSION,
-  SHELL_MINOR_VERSION
+  2, // SHELL_MAJOR_VERSION,
+  1, // SHELL_MINOR_VERSION,
+
+  // New for UEFI Shell 2.1
+  EfiShellRegisterGuidName,
+  EfiShellGetGuidName,
+  EfiShellGetGuidFromName,
+  EfiShellGetEnvEx
 };
 
 /**
@@ -3303,7 +3447,7 @@ EFI_SHELL_PROTOCOL         mShellProtocol = {
 EFI_STATUS
 EFIAPI
 CreatePopulateInstallShellProtocol (
-  IN OUT EFI_SHELL_PROTOCOL  **NewShell
+  IN OUT EFI_SHELL_PROTOCOL21  **NewShell
   )
 {
   EFI_STATUS                  Status;
@@ -3430,7 +3574,7 @@ CreatePopulateInstallShellProtocol (
 EFI_STATUS
 EFIAPI
 CleanUpShellProtocol (
-  IN OUT EFI_SHELL_PROTOCOL  *NewShell
+  IN OUT EFI_SHELL_PROTOCOL21  *NewShell
   )
 {
   EFI_STATUS                        Status;

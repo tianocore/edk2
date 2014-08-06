@@ -44,7 +44,7 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 CreatePopulateInstallShellProtocol (
-  IN OUT EFI_SHELL_PROTOCOL  **NewShell
+  IN OUT EFI_SHELL_PROTOCOL21  **NewShell
   );
 
 /**
@@ -60,7 +60,7 @@ CreatePopulateInstallShellProtocol (
 EFI_STATUS
 EFIAPI
 CleanUpShellProtocol (
-  IN OUT EFI_SHELL_PROTOCOL  *NewShell
+  IN OUT EFI_SHELL_PROTOCOL21  *NewShell
   );
 
 /**
@@ -657,7 +657,7 @@ EfiShellOpenFileList(
 
   @param Name                   A pointer to the environment variable name
 
-  @return !=NULL                The environment variable's value. The returned
+  @retval !=NULL                The environment variable's value. The returned
                                 pointer does not need to be freed by the caller.
   @retval NULL                  The environment variable doesn't exist.
 **/

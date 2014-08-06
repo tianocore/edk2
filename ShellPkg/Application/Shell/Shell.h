@@ -96,7 +96,7 @@ typedef struct {
 
 typedef struct {
   EFI_SHELL_PARAMETERS_PROTOCOL *NewShellParametersProtocol;
-  EFI_SHELL_PROTOCOL            *NewEfiShellProtocol;
+  EFI_SHELL_PROTOCOL21          *NewEfiShellProtocol;
   BOOLEAN                       PageBreakEnabled;
   BOOLEAN                       RootShellInstance;
   SHELL_INIT_SETTINGS           ShellInitSettings;
