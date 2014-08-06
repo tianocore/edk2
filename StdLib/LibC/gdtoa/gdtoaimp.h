@@ -9,7 +9,7 @@
   Please send bug reports to David M. Gay (dmg at acm dot org,
   with " at " changed at "@" and " dot " changed to ".").
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at
@@ -179,8 +179,8 @@ $NetBSD: gdtoaimp.h,v 1.5.4.1 2007/05/07 19:49:06 pavel Exp
 #include <stdint.h>
 #define Short   int16_t
 #define UShort uint16_t
-#define Long   EFI_LONG_T
-#define ULong  EFI_ULONG_T
+#define Long    int32_t
+#define ULong  uint32_t
 #define LLong   int64_t
 #define ULLong uint64_t
 
@@ -283,6 +283,13 @@ extern "C" {
 Exactly one of IEEE_LITTLE_ENDIAN, IEEE_BIG_ENDIAN, VAX, or IBM should be defined.
 #endif
 
+/*  This union assumes that:
+      sizeof(double) == 8
+      sizeof(UINT32) == 4
+
+    If this is not the case, the type and dimension of the L member will
+    have to be modified.
+*/
 typedef union { double d; UINT32 L[2]; } U;
 
 #ifdef YES_ALIAS
@@ -296,13 +303,13 @@ typedef union { double d; UINT32 L[2]; } U;
 #endif
 #else /* !YES_ALIAS */
 #ifdef IEEE_LITTLE_ENDIAN
-#define word0(x) ( /* LINTED */ (U*)&x)->L[1]
-#define word1(x) ( /* LINTED */ (U*)&x)->L[0]
+#define word0(x)  ( /* LINTED */ (U*)&x)->L[1]
+#define word1(x)  ( /* LINTED */ (U*)&x)->L[0]
 #else
-#define word0(x) ( /* LINTED */ (U*)&x)->L[0]
-#define word1(x) ( /* LINTED */ (U*)&x)->L[1]
+#define word0(x)  ( /* LINTED */ (U*)&x)->L[0]
+#define word1(x)  ( /* LINTED */ (U*)&x)->L[1]
 #endif
-#define dval(x) ( /* LINTED */ (U*)&x)->d
+#define dval(x)   ( /* LINTED */ (U*)&x)->d
 #endif /* YES_ALIAS */
 
 /* The following definition of Storeinc is appropriate for MIPS processors.
