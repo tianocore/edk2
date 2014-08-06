@@ -1394,23 +1394,23 @@ ParseHandleDatabaseByRelationshipWithType (
       // Set the bit describing what this handle has
       //
       if        (CompareGuid (ProtocolGuidArray[ProtocolIndex], &gEfiLoadedImageProtocolGuid)         ) {
-        (*HandleType)[HandleIndex] |= HR_IMAGE_HANDLE;
+        (*HandleType)[HandleIndex] |= (UINTN)HR_IMAGE_HANDLE;
       } else if (CompareGuid (ProtocolGuidArray[ProtocolIndex], &gEfiDriverBindingProtocolGuid)       ) {
-        (*HandleType)[HandleIndex] |= HR_DRIVER_BINDING_HANDLE;
+        (*HandleType)[HandleIndex] |= (UINTN)HR_DRIVER_BINDING_HANDLE;
       } else if (CompareGuid (ProtocolGuidArray[ProtocolIndex], &gEfiDriverConfiguration2ProtocolGuid)) {
-        (*HandleType)[HandleIndex] |= HR_DRIVER_CONFIGURATION_HANDLE;
+        (*HandleType)[HandleIndex] |= (UINTN)HR_DRIVER_CONFIGURATION_HANDLE;
       } else if (CompareGuid (ProtocolGuidArray[ProtocolIndex], &gEfiDriverConfigurationProtocolGuid) ) {
-        (*HandleType)[HandleIndex] |= HR_DRIVER_CONFIGURATION_HANDLE;
+        (*HandleType)[HandleIndex] |= (UINTN)HR_DRIVER_CONFIGURATION_HANDLE;
       } else if (CompareGuid (ProtocolGuidArray[ProtocolIndex], &gEfiDriverDiagnostics2ProtocolGuid)  ) {
-        (*HandleType)[HandleIndex] |= HR_DRIVER_DIAGNOSTICS_HANDLE;
+        (*HandleType)[HandleIndex] |= (UINTN)HR_DRIVER_DIAGNOSTICS_HANDLE;
       } else if (CompareGuid (ProtocolGuidArray[ProtocolIndex], &gEfiDriverDiagnosticsProtocolGuid)   ) {
-        (*HandleType)[HandleIndex] |= HR_DRIVER_DIAGNOSTICS_HANDLE;
+        (*HandleType)[HandleIndex] |= (UINTN)HR_DRIVER_DIAGNOSTICS_HANDLE;
       } else if (CompareGuid (ProtocolGuidArray[ProtocolIndex], &gEfiComponentName2ProtocolGuid)      ) {
-        (*HandleType)[HandleIndex] |= HR_COMPONENT_NAME_HANDLE;
+        (*HandleType)[HandleIndex] |= (UINTN)HR_COMPONENT_NAME_HANDLE;
       } else if (CompareGuid (ProtocolGuidArray[ProtocolIndex], &gEfiComponentNameProtocolGuid)       ) {
-        (*HandleType)[HandleIndex] |= HR_COMPONENT_NAME_HANDLE;
+        (*HandleType)[HandleIndex] |= (UINTN)HR_COMPONENT_NAME_HANDLE;
       } else if (CompareGuid (ProtocolGuidArray[ProtocolIndex], &gEfiDevicePathProtocolGuid)          ) {
-        (*HandleType)[HandleIndex] |= HR_DEVICE_HANDLE;
+        (*HandleType)[HandleIndex] |= (UINTN)HR_DEVICE_HANDLE;
       } else {
         DEBUG_CODE_BEGIN();
         ASSERT((*HandleType)[HandleIndex] == (*HandleType)[HandleIndex]);
@@ -1436,19 +1436,19 @@ ParseHandleDatabaseByRelationshipWithType (
         //
         for (OpenInfoIndex = 0; OpenInfoIndex < OpenInfoCount; OpenInfoIndex++) {
           if (OpenInfo[OpenInfoIndex].AgentHandle == DriverBindingHandle && (OpenInfo[OpenInfoIndex].Attributes & EFI_OPEN_PROTOCOL_BY_DRIVER) != 0) {
-            (*HandleType)[HandleIndex] |= (HR_DEVICE_HANDLE | HR_CONTROLLER_HANDLE);
+            (*HandleType)[HandleIndex] |= (UINTN)(HR_DEVICE_HANDLE | HR_CONTROLLER_HANDLE);
             if (DriverBindingHandleIndex != -1) {
-              (*HandleType)[DriverBindingHandleIndex] |= HR_DEVICE_DRIVER;
+              (*HandleType)[DriverBindingHandleIndex] |= (UINTN)HR_DEVICE_DRIVER;
             }
           }
           if (OpenInfo[OpenInfoIndex].AgentHandle == DriverBindingHandle && (OpenInfo[OpenInfoIndex].Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) != 0) {
-            (*HandleType)[HandleIndex] |= (HR_DEVICE_HANDLE | HR_CONTROLLER_HANDLE);
+            (*HandleType)[HandleIndex] |= (UINTN)(HR_DEVICE_HANDLE | HR_CONTROLLER_HANDLE);
             if (DriverBindingHandleIndex != -1) {
-              (*HandleType)[DriverBindingHandleIndex] |= (HR_BUS_DRIVER | HR_DEVICE_DRIVER);
+              (*HandleType)[DriverBindingHandleIndex] |= (UINTN)(HR_BUS_DRIVER | HR_DEVICE_DRIVER);
             }
             for (ChildIndex = 0; ChildIndex < *HandleCount; ChildIndex++) {
               if (OpenInfo[OpenInfoIndex].ControllerHandle == (*HandleBuffer)[ChildIndex]) {
-                (*HandleType)[ChildIndex] |= (HR_DEVICE_HANDLE | HR_CHILD_HANDLE);
+                (*HandleType)[ChildIndex] |= (UINTN)(HR_DEVICE_HANDLE | HR_CHILD_HANDLE);
               }
             }
           }
@@ -1456,22 +1456,22 @@ ParseHandleDatabaseByRelationshipWithType (
       }
       if (DriverBindingHandle == NULL && ControllerHandle != NULL) {
         if (ControllerHandle == (*HandleBuffer)[HandleIndex]) {
-          (*HandleType)[HandleIndex] |= (HR_DEVICE_HANDLE | HR_CONTROLLER_HANDLE);
+          (*HandleType)[HandleIndex] |= (UINTN)(HR_DEVICE_HANDLE | HR_CONTROLLER_HANDLE);
           for (OpenInfoIndex = 0; OpenInfoIndex < OpenInfoCount; OpenInfoIndex++) {
             if ((OpenInfo[OpenInfoIndex].Attributes & EFI_OPEN_PROTOCOL_BY_DRIVER) != 0) {
               for (ChildIndex = 0; ChildIndex < *HandleCount; ChildIndex++) {
                 if (OpenInfo[OpenInfoIndex].AgentHandle == (*HandleBuffer)[ChildIndex]) {
-                  (*HandleType)[ChildIndex] |= HR_DEVICE_DRIVER;
+                  (*HandleType)[ChildIndex] |= (UINTN)HR_DEVICE_DRIVER;
                 }
               }
             }
             if ((OpenInfo[OpenInfoIndex].Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) != 0) {
               for (ChildIndex = 0; ChildIndex < *HandleCount; ChildIndex++) {
                 if (OpenInfo[OpenInfoIndex].AgentHandle == (*HandleBuffer)[ChildIndex]) {
-                  (*HandleType)[ChildIndex] |= (HR_BUS_DRIVER | HR_DEVICE_DRIVER);
+                  (*HandleType)[ChildIndex] |= (UINTN)(HR_BUS_DRIVER | HR_DEVICE_DRIVER);
                 }
                 if (OpenInfo[OpenInfoIndex].ControllerHandle == (*HandleBuffer)[ChildIndex]) {
-                  (*HandleType)[ChildIndex] |= (HR_DEVICE_HANDLE | HR_CHILD_HANDLE);
+                  (*HandleType)[ChildIndex] |= (UINTN)(HR_DEVICE_HANDLE | HR_CHILD_HANDLE);
                 }
               }
             }
@@ -1480,7 +1480,7 @@ ParseHandleDatabaseByRelationshipWithType (
           for (OpenInfoIndex = 0; OpenInfoIndex < OpenInfoCount; OpenInfoIndex++) {
             if ((OpenInfo[OpenInfoIndex].Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) != 0) {
               if (OpenInfo[OpenInfoIndex].ControllerHandle == ControllerHandle) {
-                (*HandleType)[HandleIndex] |= (HR_DEVICE_HANDLE | HR_PARENT_HANDLE);
+                (*HandleType)[HandleIndex] |= (UINTN)(HR_DEVICE_HANDLE | HR_PARENT_HANDLE);
               }
             }
           }
@@ -1488,12 +1488,12 @@ ParseHandleDatabaseByRelationshipWithType (
       }
       if (DriverBindingHandle != NULL && ControllerHandle != NULL) {
         if (ControllerHandle == (*HandleBuffer)[HandleIndex]) {
-          (*HandleType)[HandleIndex] |= (HR_DEVICE_HANDLE | HR_CONTROLLER_HANDLE);
+          (*HandleType)[HandleIndex] |= (UINTN)(HR_DEVICE_HANDLE | HR_CONTROLLER_HANDLE);
           for (OpenInfoIndex = 0; OpenInfoIndex < OpenInfoCount; OpenInfoIndex++) {
             if ((OpenInfo[OpenInfoIndex].Attributes & EFI_OPEN_PROTOCOL_BY_DRIVER) != 0) {
               if (OpenInfo[OpenInfoIndex].AgentHandle == DriverBindingHandle) {
                 if (DriverBindingHandleIndex != -1) {
-                  (*HandleType)[DriverBindingHandleIndex] |= HR_DEVICE_DRIVER;
+                  (*HandleType)[DriverBindingHandleIndex] |= (UINTN)HR_DEVICE_DRIVER;
                 }
               }
             }
@@ -1501,14 +1501,14 @@ ParseHandleDatabaseByRelationshipWithType (
               if (OpenInfo[OpenInfoIndex].AgentHandle == DriverBindingHandle) {
                 for (ChildIndex = 0; ChildIndex < *HandleCount; ChildIndex++) {
                   if (OpenInfo[OpenInfoIndex].ControllerHandle == (*HandleBuffer)[ChildIndex]) {
-                    (*HandleType)[ChildIndex] |= (HR_DEVICE_HANDLE | HR_CHILD_HANDLE);
+                    (*HandleType)[ChildIndex] |= (UINTN)(HR_DEVICE_HANDLE | HR_CHILD_HANDLE);
                   }
                 }
               }
 
               for (ChildIndex = 0; ChildIndex < *HandleCount; ChildIndex++) {
                 if (OpenInfo[OpenInfoIndex].AgentHandle == (*HandleBuffer)[ChildIndex]) {
-                  (*HandleType)[ChildIndex] |= (HR_BUS_DRIVER | HR_DEVICE_DRIVER);
+                  (*HandleType)[ChildIndex] |= (UINTN)(HR_BUS_DRIVER | HR_DEVICE_DRIVER);
                 }
               }
             }
@@ -1517,7 +1517,7 @@ ParseHandleDatabaseByRelationshipWithType (
           for (OpenInfoIndex = 0; OpenInfoIndex < OpenInfoCount; OpenInfoIndex++) {
             if ((OpenInfo[OpenInfoIndex].Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) != 0) {
               if (OpenInfo[OpenInfoIndex].ControllerHandle == ControllerHandle) {
-                (*HandleType)[HandleIndex] |= (HR_DEVICE_HANDLE | HR_PARENT_HANDLE);
+                (*HandleType)[HandleIndex] |= (UINTN)(HR_DEVICE_HANDLE | HR_PARENT_HANDLE);
               }
             }
           }
