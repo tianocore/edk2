@@ -22,6 +22,9 @@
 
 #include "Fsp.h"
 
+ASM_GLOBAL    ASM_PFX(_gPcd_FixedAtBuild_PcdFlashFvFspBase)
+ASM_GLOBAL    ASM_PFX(_gPcd_FixedAtBuild_PcdFlashFvFspSize)
+
 ASM_GLOBAL ASM_PFX(_TEXT_REALMODE)
 ASM_PFX(_TEXT_REALMODE):
 #----------------------------------------------------------------------------
@@ -103,7 +106,7 @@ ASM_PFX(_ModuleEntryPoint):
   # Transition to Flat 32 bit protected mode
   # The jump to a far pointer causes the transition to 32 bit mode
   #
-  movl    $ProtectedModeEntryLinearAddress, %esi
+  movl    ASM_PFX(ProtectedModeEntryLinearAddress), %esi
   jmp     *%cs:(%si)
 
 ASM_GLOBAL ASM_PFX(_TEXT_PROTECTED_MODE)
@@ -134,8 +137,8 @@ ASM_GLOBAL ASM_PFX(ProtectedModeEntryPoint)
 ASM_PFX(ProtectedModeEntryPoint):
 
   # Find the fsp info header
-  movl PcdGet32 (PcdFlashFvFspBase), %edi
-  movl PcdGet32 (PcdFlashFvFspSize), %ecx
+  movl ASM_PFX(_gPcd_FixedAtBuild_PcdFlashFvFspBase), %edi
+  movl ASM_PFX(_gPcd_FixedAtBuild_PcdFlashFvFspSize), %ecx
 
   movl FVH_SIGINATURE_OFFSET(%edi), %eax
   cmp  $FVH_SIGINATURE_VALID_VALUE, %eax
@@ -224,7 +227,7 @@ FspApiFailed:
 .align 0x10
 TempRamInitStack:
     .long  TempRamInitDone
-    .long  TempRamInitParams
+    .long  ASM_PFX(TempRamInitParams)
 
 #
 # ROM-based Global-Descriptor Table for the Tiano PEI Phase
@@ -321,5 +324,5 @@ GdtDesc:                                # GDT descriptor
 
 ASM_PFX(ProtectedModeEntryLinearAddress):
 ProtectedModeEntryLinearOffset:
-  .long      ProtectedModeEntryPoint  # Offset of our 32 bit code
+  .long      ASM_PFX(ProtectedModeEntryPoint)  # Offset of our 32 bit code
   .word      LINEAR_CODE_SEL

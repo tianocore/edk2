@@ -159,7 +159,7 @@ EfiRecoverCacheMtrr (
   //
   if (EnableMtrr) {
     TempQword = AsmReadMsr64(EFI_MSR_CACHE_IA32_MTRR_DEF_TYPE);
-    TempQword |= (B_EFI_MSR_GLOBAL_MTRR_ENABLE | B_EFI_MSR_FIXED_MTRR_ENABLE);
+    TempQword |= (UINT64)(B_EFI_MSR_GLOBAL_MTRR_ENABLE | B_EFI_MSR_FIXED_MTRR_ENABLE);
   } else {
     TempQword = OldMtrr;
   }

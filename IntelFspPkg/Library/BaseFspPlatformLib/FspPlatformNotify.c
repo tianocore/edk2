@@ -141,7 +141,7 @@ FspWaitForNotify (
   NotificatonCount = 0;
   while (NotificatonCount < sizeof(mFspNotfifySequence) / sizeof(UINT32)) {
 
-    Count = (NotificatonCount << 1) & 0x07;
+    Count = (UINT8)((NotificatonCount << 1) & 0x07);
     SetFspMeasurePoint (FSP_PERF_ID_API_NOTIFY_POSTPCI_ENTRY + Count);
 
     NotificatonValue = ((NOTIFY_PHASE_PARAMS *)(UINTN)GetFspApiParameter ())->Phase;
