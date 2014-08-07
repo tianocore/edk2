@@ -146,8 +146,8 @@ AuthenticodeVerify (
     //
     // Long Form of Length Encoding, only support two bytes.
     //
-    ContentSize  = (UINTN) (*(SpcIndirectDataContent + 2));
-    ContentSize = (ContentSize << 8) + (UINTN)(*(SpcIndirectDataContent + 3));
+    ContentSize = (UINTN) (*(UINT8 *)(SpcIndirectDataContent + 2));
+    ContentSize = (ContentSize << 8) + (UINTN)(*(UINT8 *)(SpcIndirectDataContent + 3));
     //
     // Skip the SEQUENCE Tag;
     //
