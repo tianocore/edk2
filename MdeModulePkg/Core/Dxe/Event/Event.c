@@ -204,7 +204,7 @@ CoreDispatchEventNotifies (
     CoreAcquireEventLock ();
   }
 
-  gEventPending &= ~(1 << Priority);
+  gEventPending &= ~(UINTN)(1 << Priority);
   CoreReleaseEventLock ();
 }
 

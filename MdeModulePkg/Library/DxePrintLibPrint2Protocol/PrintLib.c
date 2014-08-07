@@ -6,7 +6,7 @@
   protocol related to this implementation, not in the public spec. So, this 
   library instance is only for this code base.
 
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1235,7 +1235,7 @@ InternalPrintLibSPrintMarker (
     //
     // Clear all the flag bits except those that may have been passed in
     //
-    Flags &= (OUTPUT_UNICODE | FORMAT_UNICODE | COUNT_ONLY_NO_PRINT);
+    Flags &= (UINTN)(OUTPUT_UNICODE | FORMAT_UNICODE | COUNT_ONLY_NO_PRINT);
 
     //
     // Set the default width to zero, and the default precision to 1
@@ -1343,7 +1343,7 @@ InternalPrintLibSPrintMarker (
         //
         // Flag space, +, 0, L & l are invalid for type p.
         //
-        Flags &= ~(PREFIX_BLANK | PREFIX_SIGN | PREFIX_ZERO | LONG_TYPE);
+        Flags &= ~(UINTN)(PREFIX_BLANK | PREFIX_SIGN | PREFIX_ZERO | LONG_TYPE);
         if (sizeof (VOID *) > 4) {
           Flags |= LONG_TYPE;
         }
@@ -1391,7 +1391,7 @@ InternalPrintLibSPrintMarker (
         if ((Flags & RADIX_HEX) == 0) {
           Radix = 10;
           if (Comma) {
-            Flags &= (~PREFIX_ZERO);
+            Flags &= (~(UINTN)PREFIX_ZERO);
             Precision = 1;
           }
           if (Value < 0) {
@@ -1460,7 +1460,7 @@ InternalPrintLibSPrintMarker (
           ArgumentString = BASE_ARG (BaseListMarker, CHAR8 *);
         }
         if (ArgumentString == NULL) {
-          Flags &= (~ARGUMENT_UNICODE);
+          Flags &= (~(UINTN)ARGUMENT_UNICODE);
           ArgumentString = "<null string>";
         }
         //

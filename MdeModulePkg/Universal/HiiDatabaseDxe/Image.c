@@ -79,13 +79,13 @@ GetImageIdOrAddress (
     }
     switch (((EFI_HII_IMAGE_BLOCK *) ImageBlock)->BlockType) {
     case EFI_HII_IIBT_EXT1:
-      Length8 = *(ImageBlock + sizeof (EFI_HII_IMAGE_BLOCK) + sizeof (UINT8));
+      Length8 = *(UINT8*)((UINTN)ImageBlock + sizeof (EFI_HII_IMAGE_BLOCK) + sizeof (UINT8));
       ImageBlock += Length8;
       break;
     case EFI_HII_IIBT_EXT2:
       CopyMem (
         &Length16,
-        ImageBlock + sizeof (EFI_HII_IMAGE_BLOCK) + sizeof (UINT8),
+        (UINT8*)((UINTN)ImageBlock + sizeof (EFI_HII_IMAGE_BLOCK) + sizeof (UINT8)),
         sizeof (UINT16)
         );
       ImageBlock += Length16;
@@ -93,7 +93,7 @@ GetImageIdOrAddress (
     case EFI_HII_IIBT_EXT4:
       CopyMem (
         &Length32,
-        ImageBlock + sizeof (EFI_HII_IMAGE_BLOCK) + sizeof (UINT8),
+        (UINT8*)((UINTN)ImageBlock + sizeof (EFI_HII_IMAGE_BLOCK) + sizeof (UINT8)),
         sizeof (UINT32)
         );
       ImageBlock += Length32;
@@ -920,19 +920,19 @@ HiiGetImage (
     if (BlockType == EFI_HII_IIBT_IMAGE_1BIT || BlockType == EFI_HII_IIBT_IMAGE_1BIT_TRANS) {
       Output1bitPixel (
         Image,
-        (UINT8 *) (ImageBlock + sizeof (EFI_HII_IIBT_IMAGE_1BIT_BLOCK) - sizeof (UINT8)),
+        (UINT8 *) ((UINTN)ImageBlock + sizeof (EFI_HII_IIBT_IMAGE_1BIT_BLOCK) - sizeof (UINT8)),
         (EFI_HII_IMAGE_PALETTE_INFO *) PaletteInfo
         );
     } else if (BlockType == EFI_HII_IIBT_IMAGE_4BIT || BlockType == EFI_HII_IIBT_IMAGE_4BIT_TRANS) {
       Output4bitPixel (
         Image,
-        (UINT8 *) (ImageBlock + sizeof (EFI_HII_IIBT_IMAGE_4BIT_BLOCK) - sizeof (UINT8)),
+        (UINT8 *) ((UINTN)ImageBlock + sizeof (EFI_HII_IIBT_IMAGE_4BIT_BLOCK) - sizeof (UINT8)),
         (EFI_HII_IMAGE_PALETTE_INFO *) PaletteInfo
         );
     } else {
       Output8bitPixel (
         Image,
-        (UINT8 *) (ImageBlock + sizeof (EFI_HII_IIBT_IMAGE_8BIT_BLOCK) - sizeof (UINT8)),
+        (UINT8 *) ((UINTN)ImageBlock + sizeof (EFI_HII_IIBT_IMAGE_8BIT_BLOCK) - sizeof (UINT8)),
         (EFI_HII_IMAGE_PALETTE_INFO *) PaletteInfo
         );
     }

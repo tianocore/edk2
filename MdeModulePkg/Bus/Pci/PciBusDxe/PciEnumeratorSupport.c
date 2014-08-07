@@ -947,12 +947,12 @@ PciSetDeviceAttribute (
 
   if (Option == EFI_SET_SUPPORTS) {
 
-    Attributes |= EFI_PCI_IO_ATTRIBUTE_MEMORY_WRITE_COMBINE |
+    Attributes |= (UINT64) (EFI_PCI_IO_ATTRIBUTE_MEMORY_WRITE_COMBINE |
                   EFI_PCI_IO_ATTRIBUTE_MEMORY_CACHED        |
                   EFI_PCI_IO_ATTRIBUTE_MEMORY_DISABLE       |
                   EFI_PCI_IO_ATTRIBUTE_EMBEDDED_DEVICE      |
                   EFI_PCI_IO_ATTRIBUTE_EMBEDDED_ROM         |
-                  EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE;
+                  EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE);
 
     if (IS_PCI_LPC (&PciIoDevice->Pci)) {
         Attributes |= EFI_PCI_IO_ATTRIBUTE_ISA_MOTHERBOARD_IO;
@@ -1120,7 +1120,7 @@ DetermineDeviceAttribute (
     //
     // Assume the PCI Root Bridge supports DAC
     //
-    PciIoDevice->Supports |= (EFI_PCI_IO_ATTRIBUTE_EMBEDDED_DEVICE |
+    PciIoDevice->Supports |= (UINT64)(EFI_PCI_IO_ATTRIBUTE_EMBEDDED_DEVICE |
                               EFI_PCI_IO_ATTRIBUTE_EMBEDDED_ROM |
                               EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE);
 

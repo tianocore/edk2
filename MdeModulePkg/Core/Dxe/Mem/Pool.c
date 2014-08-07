@@ -1,7 +1,7 @@
 /** @file
   UEFI Memory pool management functions.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -274,7 +274,7 @@ CoreAllocatePoolI (
   //
   if (Index >= MAX_POOL_LIST) {
     NoPages = EFI_SIZE_TO_PAGES(Size) + EFI_SIZE_TO_PAGES (DEFAULT_PAGE_ALLOCATION) - 1;
-    NoPages &= ~(EFI_SIZE_TO_PAGES (DEFAULT_PAGE_ALLOCATION) - 1);
+    NoPages &= ~(UINTN)(EFI_SIZE_TO_PAGES (DEFAULT_PAGE_ALLOCATION) - 1);
     Head = CoreAllocatePoolPages (PoolType, NoPages, DEFAULT_PAGE_ALLOCATION);
     goto Done;
   }
@@ -473,7 +473,7 @@ CoreFreePoolI (
     // Return the memory pages back to free memory
     //
     NoPages = EFI_SIZE_TO_PAGES(Size) + EFI_SIZE_TO_PAGES (DEFAULT_PAGE_ALLOCATION) - 1;
-    NoPages &= ~(EFI_SIZE_TO_PAGES (DEFAULT_PAGE_ALLOCATION) - 1);
+    NoPages &= ~(UINTN)(EFI_SIZE_TO_PAGES (DEFAULT_PAGE_ALLOCATION) - 1);
     CoreFreePoolPages ((EFI_PHYSICAL_ADDRESS) (UINTN) Head, NoPages);
 
   } else {

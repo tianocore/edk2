@@ -519,7 +519,7 @@ SmmLoadImage (
   // Align buffer on section boundry
   //
   ImageContext.ImageAddress += ImageContext.SectionAlignment - 1;
-  ImageContext.ImageAddress &= ~(ImageContext.SectionAlignment - 1);
+  ImageContext.ImageAddress &= ~((EFI_PHYSICAL_ADDRESS)(ImageContext.SectionAlignment - 1));
 
   //
   // Load the image to our new buffer

@@ -1,7 +1,7 @@
 /** @file
   16550 UART Serial Port library functions
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -177,7 +177,7 @@ SerialPortInitialize (
   }
   SerialPortWriteRegister (R_UART_LCR, (UINT8)(SerialPortReadRegister (R_UART_LCR) | B_UART_LCR_DLAB));
   Divisor =  SerialPortReadRegister (R_UART_BAUD_HIGH) << 8;
-  Divisor |= SerialPortReadRegister (R_UART_BAUD_LOW);
+  Divisor |= (UINTN)SerialPortReadRegister (R_UART_BAUD_LOW);
   SerialPortWriteRegister (R_UART_LCR, (UINT8)(SerialPortReadRegister (R_UART_LCR) & ~B_UART_LCR_DLAB));
   if (Divisor != 115200 / PcdGet32 (PcdSerialBaudRate)) {
     Initialized = FALSE;

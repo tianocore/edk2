@@ -3269,7 +3269,7 @@ ExecuteCMP (
   if (Flag != 0) {
     VMFLAG_SET (VmPtr, VMFLAGS_CC);
   } else {
-    VMFLAG_CLEAR (VmPtr, VMFLAGS_CC);
+    VMFLAG_CLEAR (VmPtr, (UINT64)VMFLAGS_CC);
   }
   //
   // Advance the IP
@@ -3448,7 +3448,7 @@ ExecuteCMPI (
   if (Flag != 0) {
     VMFLAG_SET (VmPtr, VMFLAGS_CC);
   } else {
-    VMFLAG_CLEAR (VmPtr, VMFLAGS_CC);
+    VMFLAG_CLEAR (VmPtr, (UINT64)VMFLAGS_CC);
   }
   //
   // Advance the IP

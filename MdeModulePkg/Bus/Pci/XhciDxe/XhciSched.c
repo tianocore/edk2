@@ -2658,8 +2658,8 @@ XhcInitializeEndpointContext (
                 ((TRANSFER_RING *)(UINTN)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1])->RingSeg0,
                 sizeof (TRB_TEMPLATE) * TR_RING_TRB_NUMBER
                 );
-    PhyAddr &= ~(0x0F);
-    PhyAddr |= ((TRANSFER_RING *)(UINTN)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1])->RingPCS;
+    PhyAddr &= ~((EFI_PHYSICAL_ADDRESS)0x0F);
+    PhyAddr |= (EFI_PHYSICAL_ADDRESS)((TRANSFER_RING *)(UINTN)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1])->RingPCS;
     InputContext->EP[Dci-1].PtrLo = XHC_LOW_32BIT (PhyAddr);
     InputContext->EP[Dci-1].PtrHi = XHC_HIGH_32BIT (PhyAddr);
 
@@ -2811,8 +2811,8 @@ XhcInitializeEndpointContext64 (
                 ((TRANSFER_RING *)(UINTN)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1])->RingSeg0,
                 sizeof (TRB_TEMPLATE) * TR_RING_TRB_NUMBER
                 );
-    PhyAddr &= ~(0x0F);
-    PhyAddr |= ((TRANSFER_RING *)(UINTN)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1])->RingPCS;
+    PhyAddr &= ~((EFI_PHYSICAL_ADDRESS)0x0F);
+    PhyAddr |= (EFI_PHYSICAL_ADDRESS)((TRANSFER_RING *)(UINTN)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1])->RingPCS;
     InputContext->EP[Dci-1].PtrLo = XHC_LOW_32BIT (PhyAddr);
     InputContext->EP[Dci-1].PtrHi = XHC_HIGH_32BIT (PhyAddr);
 

@@ -816,7 +816,7 @@ NvmeControllerInit (
                     );
 
   if (!EFI_ERROR (Status)) {
-    Supports &= EFI_PCI_DEVICE_ENABLE;
+    Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
     Status    = PciIo->Attributes (
                          PciIo,
                          EfiPciIoAttributeOperationEnable,

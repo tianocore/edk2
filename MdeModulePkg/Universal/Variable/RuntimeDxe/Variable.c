@@ -139,9 +139,9 @@ UpdateVariableInfo (
       ASSERT (gVariableInfo != NULL);
 
       CopyGuid (&gVariableInfo->VendorGuid, VendorGuid);
-      gVariableInfo->Name = AllocatePool (StrSize (VariableName));
+      gVariableInfo->Name = AllocateZeroPool (StrSize (VariableName));
       ASSERT (gVariableInfo->Name != NULL);
-      StrCpy (gVariableInfo->Name, VariableName);
+      StrnCpy (gVariableInfo->Name, VariableName, StrLen (VariableName));
       gVariableInfo->Volatile = Volatile;
     }
 
@@ -175,9 +175,9 @@ UpdateVariableInfo (
         ASSERT (Entry->Next != NULL);
 
         CopyGuid (&Entry->Next->VendorGuid, VendorGuid);
-        Entry->Next->Name = AllocatePool (StrSize (VariableName));
+        Entry->Next->Name = AllocateZeroPool (StrSize (VariableName));
         ASSERT (Entry->Next->Name != NULL);
-        StrCpy (Entry->Next->Name, VariableName);
+        StrnCpy (Entry->Next->Name, VariableName, StrLen (VariableName));
         Entry->Next->Volatile = Volatile;
       }
 
@@ -2251,7 +2251,7 @@ VariableLockRequestToLock (
     return EFI_ACCESS_DENIED;
   }
 
-  Entry = AllocateRuntimePool (sizeof (*Entry) + StrSize (VariableName));
+  Entry = AllocateRuntimeZeroPool (sizeof (*Entry) + StrSize (VariableName));
   if (Entry == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -2261,7 +2261,7 @@ VariableLockRequestToLock (
   AcquireLockOnlyAtBootTime(&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
 
   Entry->Name = (CHAR16 *) (Entry + 1);
-  StrCpy   (Entry->Name, VariableName);
+  StrnCpy   (Entry->Name, VariableName, StrLen (VariableName));
   CopyGuid (&Entry->Guid, VendorGuid);
   InsertTailList (&mLockedVariableList, &Entry->Link);
 

@@ -2,7 +2,7 @@
 Implementation for EFI_HII_STRING_PROTOCOL.
 
 
-Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -335,7 +335,7 @@ FindStringBlock (
 
     case EFI_HII_SIBT_STRINGS_SCSU:
       CopyMem (&StringCount, BlockHdr + sizeof (EFI_HII_STRING_BLOCK), sizeof (UINT16));
-      StringTextPtr = BlockHdr + sizeof (EFI_HII_SIBT_STRINGS_SCSU_BLOCK) - sizeof (UINT8);
+      StringTextPtr = (UINT8*)((UINTN)BlockHdr + sizeof (EFI_HII_SIBT_STRINGS_SCSU_BLOCK) - sizeof (UINT8));
       BlockSize += StringTextPtr - BlockHdr;
 
       for (Index = 0; Index < StringCount; Index++) {
@@ -355,10 +355,10 @@ FindStringBlock (
     case EFI_HII_SIBT_STRINGS_SCSU_FONT:
       CopyMem (
         &StringCount,
-        BlockHdr + sizeof (EFI_HII_STRING_BLOCK) + sizeof (UINT8),
+        (UINT8*)((UINTN)BlockHdr + sizeof (EFI_HII_STRING_BLOCK) + sizeof (UINT8)),
         sizeof (UINT16)
         );
-      StringTextPtr = BlockHdr + sizeof (EFI_HII_SIBT_STRINGS_SCSU_FONT_BLOCK) - sizeof (UINT8);
+      StringTextPtr = (UINT8*)((UINTN)BlockHdr + sizeof (EFI_HII_SIBT_STRINGS_SCSU_FONT_BLOCK) - sizeof (UINT8));
       BlockSize += StringTextPtr - BlockHdr;
 
       for (Index = 0; Index < StringCount; Index++) {
@@ -425,7 +425,7 @@ FindStringBlock (
       BlockSize += Offset;
       CopyMem (
         &StringCount,
-        BlockHdr + sizeof (EFI_HII_STRING_BLOCK) + sizeof (UINT8),
+        (UINT8*)((UINTN)BlockHdr + sizeof (EFI_HII_STRING_BLOCK) + sizeof (UINT8)),
         sizeof (UINT16)
         );
       for (Index = 0; Index < StringCount; Index++) {
@@ -465,7 +465,7 @@ FindStringBlock (
       break;
 
     case EFI_HII_SIBT_SKIP1:
-      SkipCount = (UINT16) (*(BlockHdr + sizeof (EFI_HII_STRING_BLOCK)));
+      SkipCount = (UINT16) (*(UINT8*)((UINTN)BlockHdr + sizeof (EFI_HII_STRING_BLOCK)));
       CurrentStringId = (UINT16) (CurrentStringId + SkipCount);
       BlockSize       +=  sizeof (EFI_HII_SIBT_SKIP1_BLOCK);
       break;
@@ -479,7 +479,7 @@ FindStringBlock (
     case EFI_HII_SIBT_EXT1:
       CopyMem (
         &Length8,
-        BlockHdr + sizeof (EFI_HII_STRING_BLOCK) + sizeof (UINT8),
+        (UINT8*)((UINTN)BlockHdr + sizeof (EFI_HII_STRING_BLOCK) + sizeof (UINT8)),
         sizeof (UINT8)
         );
       BlockSize += Length8;
@@ -494,7 +494,7 @@ FindStringBlock (
         //
         BlockHdr += sizeof (EFI_HII_SIBT_EXT2_BLOCK);
         CopyMem (&FontId, BlockHdr, sizeof (UINT8));
-        BlockHdr += sizeof (UINT8);
+        BlockHdr ++;
         CopyMem (&FontSize, BlockHdr, sizeof (UINT16));
         BlockHdr += sizeof (UINT16);
         CopyMem (&FontStyle, BlockHdr, sizeof (EFI_HII_FONT_STYLE));
@@ -535,7 +535,7 @@ FindStringBlock (
     case EFI_HII_SIBT_EXT4:
       CopyMem (
         &Length32,
-        BlockHdr + sizeof (EFI_HII_STRING_BLOCK) + sizeof (UINT8),
+        (UINT8*)((UINTN)BlockHdr + sizeof (EFI_HII_STRING_BLOCK) + sizeof (UINT8)),
         sizeof (UINT32)
         );
 
@@ -1080,7 +1080,7 @@ SetStringWorker (
   BlockPtr += sizeof (EFI_HII_SIBT_EXT2_BLOCK);
 
   *BlockPtr = LocalFont->FontId;
-  BlockPtr += sizeof (UINT8);
+  BlockPtr ++;
   CopyMem (BlockPtr, &GlobalFont->FontInfo->FontSize, sizeof (UINT16));
   BlockPtr += sizeof (UINT16);
   CopyMem (BlockPtr, &GlobalFont->FontInfo->FontStyle, sizeof (UINT32));
@@ -1442,7 +1442,7 @@ HiiNewString (
       *BlockPtr = EFI_HII_SIBT_STRING_UCS2_FONT;
       BlockPtr  += sizeof (EFI_HII_STRING_BLOCK);
       *BlockPtr = LocalFont->FontId;
-      BlockPtr  += sizeof (UINT8);
+      BlockPtr ++;
       CopyMem (BlockPtr, (EFI_STRING) String, StrSize ((EFI_STRING) String));
       BlockPtr += StrSize ((EFI_STRING) String);
 
@@ -1486,7 +1486,7 @@ HiiNewString (
       BlockPtr += sizeof (EFI_HII_SIBT_EXT2_BLOCK);
 
       *BlockPtr = LocalFont->FontId;
-      BlockPtr += sizeof (UINT8);
+      BlockPtr ++;
       CopyMem (BlockPtr, &((EFI_FONT_INFO *) StringFontInfo)->FontSize, sizeof (UINT16));
       BlockPtr += sizeof (UINT16);
       CopyMem (BlockPtr, &((EFI_FONT_INFO *) StringFontInfo)->FontStyle, sizeof (EFI_HII_FONT_STYLE));
@@ -1503,7 +1503,7 @@ HiiNewString (
       *BlockPtr = EFI_HII_SIBT_STRING_UCS2_FONT;
       BlockPtr  += sizeof (EFI_HII_STRING_BLOCK);
       *BlockPtr = LocalFont->FontId;
-      BlockPtr  += sizeof (UINT8);
+      BlockPtr  ++;
       CopyMem (BlockPtr, (EFI_STRING) String, StrSize ((EFI_STRING) String));
       BlockPtr += StrSize ((EFI_STRING) String);
 

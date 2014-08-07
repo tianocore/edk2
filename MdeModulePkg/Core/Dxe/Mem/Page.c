@@ -1,7 +1,7 @@
 /** @file
   UEFI Memory page management functions.
 
-Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -930,7 +930,7 @@ CoreFindFreePagesI (
     //
     // Set MaxAddress to a page boundary
     //
-    MaxAddress &= ~EFI_PAGE_MASK;
+    MaxAddress &= ~(UINT64)EFI_PAGE_MASK;
 
     //
     // Set MaxAddress to end of the page

@@ -1448,7 +1448,7 @@ SupportPaletteSnoopAttributes (
     //
     if (Operation == EfiPciIoAttributeOperationEnable) {
       PCI_DISABLE_COMMAND_REGISTER (Temp, EFI_PCI_COMMAND_VGA_PALETTE_SNOOP);
-      Temp->Attributes &= (~EFI_PCI_COMMAND_VGA_PALETTE_SNOOP);
+      Temp->Attributes &= (~(UINT64)EFI_PCI_COMMAND_VGA_PALETTE_SNOOP);
     } else {
       return EFI_UNSUPPORTED;
     }

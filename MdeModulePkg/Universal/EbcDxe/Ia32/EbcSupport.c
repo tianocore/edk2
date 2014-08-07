@@ -2,7 +2,7 @@
   This module contains EBC support routines that are customized based on
   the target ia32 processor.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -267,7 +267,7 @@ EbcInterpret (
   VmContext.StackTop = (UINT8*)VmContext.StackPool + (STACK_REMAIN_SIZE);
   VmContext.Gpr[0] = (UINT64)(UINTN) ((UINT8*)VmContext.StackPool + STACK_POOL_SIZE);
   VmContext.HighStackBottom = (UINTN)VmContext.Gpr[0];
-  VmContext.Gpr[0] &= ~(sizeof (UINTN) - 1);
+  VmContext.Gpr[0] &= ~((VM_REGISTER)(sizeof (UINTN) - 1));
   VmContext.Gpr[0] -= sizeof (UINTN);
 
   //

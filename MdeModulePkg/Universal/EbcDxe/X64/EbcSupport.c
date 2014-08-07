@@ -2,7 +2,7 @@
   This module contains EBC support routines that are customized based on
   the target x64 processor.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -215,7 +215,7 @@ EbcInterpret (
   //
   // Align the stack on a natural boundary.
   //
-  VmContext.Gpr[0] &= ~(sizeof (UINTN) - 1);
+  VmContext.Gpr[0] &= ~(VM_REGISTER)(sizeof (UINTN) - 1);
 
   //
   // Put a magic value in the stack gap, then adjust down again.
@@ -359,7 +359,7 @@ ExecuteEbcImageEntryPoint (
 
   //
   // Align the stack on a natural boundary
-  VmContext.Gpr[0] &= ~(sizeof(UINTN) - 1);
+  VmContext.Gpr[0] &= ~(VM_REGISTER)(sizeof(UINTN) - 1);
   //
   VmContext.LowStackTop   = (UINTN) VmContext.Gpr[0];
 

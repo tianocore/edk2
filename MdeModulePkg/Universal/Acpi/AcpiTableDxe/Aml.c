@@ -1,7 +1,7 @@
 /** @file
   ACPI Sdt Protocol Driver
 
-  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -282,13 +282,13 @@ AmlGetPkgLength (
     break;
   case 2:
     RealLength = *(Buffer + 1);
-    RealLength |= (*(Buffer + 2)) << 8;
+    RealLength |= (UINTN)((*(Buffer + 2)) << 8);
     RealLength = (RealLength << 4) | (LeadByte & 0xF);
     break;
   case 3:
     RealLength = *(Buffer + 1);
-    RealLength |= (*(Buffer + 2)) << 8;
-    RealLength |= (*(Buffer + 3)) << 16;
+    RealLength |= (UINTN)((*(Buffer + 2)) << 8);
+    RealLength |= (UINTN)((*(Buffer + 3)) << 16);
     RealLength = (RealLength << 4) | (LeadByte & 0xF);
     break;
   default:

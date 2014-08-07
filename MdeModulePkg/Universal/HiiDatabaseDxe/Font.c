@@ -757,12 +757,12 @@ FindGlyphBlock (
       break;
 
     case EFI_HII_GIBT_EXT1:
-      BlockPtr += *(BlockPtr + sizeof (EFI_HII_GLYPH_BLOCK) + sizeof (UINT8));
+      BlockPtr += *(UINT8*)((UINTN)BlockPtr + sizeof (EFI_HII_GLYPH_BLOCK) + sizeof (UINT8));
       break;
     case EFI_HII_GIBT_EXT2:
       CopyMem (
         &Length16,
-        BlockPtr + sizeof (EFI_HII_GLYPH_BLOCK) + sizeof (UINT8),
+        (UINT8*)((UINTN)BlockPtr + sizeof (EFI_HII_GLYPH_BLOCK) + sizeof (UINT8)),
         sizeof (UINT16)
         );
       BlockPtr += Length16;
@@ -770,7 +770,7 @@ FindGlyphBlock (
     case EFI_HII_GIBT_EXT4:
       CopyMem (
         &Length32,
-        BlockPtr + sizeof (EFI_HII_GLYPH_BLOCK) + sizeof (UINT8),
+        (UINT8*)((UINTN)BlockPtr + sizeof (EFI_HII_GLYPH_BLOCK) + sizeof (UINT8)),
         sizeof (UINT32)
         );
       BlockPtr += Length32;
@@ -793,7 +793,7 @@ FindGlyphBlock (
       BufferLen = BITMAP_LEN_1_BIT (LocalCell.Width, LocalCell.Height);
       if (CharCurrent == CharValue) {
         return WriteOutputParam (
-                 BlockPtr + sizeof (EFI_HII_GIBT_GLYPH_BLOCK) - sizeof (UINT8),
+                 (UINT8*)((UINTN)BlockPtr + sizeof (EFI_HII_GIBT_GLYPH_BLOCK) - sizeof (UINT8)),
                  BufferLen,
                  &LocalCell,
                  GlyphBuffer,

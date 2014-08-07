@@ -1,7 +1,7 @@
 /** @file
   Interpret and execute the S3 data in S3 boot script. 
 
-  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -1312,7 +1312,7 @@ CheckAndOrMask (
 
   switch (ScriptHeader->Width) {
   case S3BootScriptWidthUint8:
-    *AndMask  = (UINT64) *(DataPtr + 1);
+    *AndMask  = (UINT64) (*(UINT8*) (DataPtr + 1));
     *OrMask   = (UINT64) (*DataPtr);
     break;
 
