@@ -1,7 +1,7 @@
 /** @file
   Implement TPM2 Hierarchy related command.
 
-Copyright (c) 2013, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -228,7 +228,7 @@ Tpm2ClearControl (
 
   // disable
   *(UINT8 *)Buffer = Disable;
-  Buffer += sizeof(UINT8);
+  Buffer++;
 
   CmdSize = (UINT32)(Buffer - (UINT8 *)&Cmd);
   Cmd.Header.paramSize   = SwapBytes32(CmdSize);
@@ -591,7 +591,7 @@ Tpm2HierarchyControl (
   Buffer += sizeof(UINT32);
 
   *(UINT8 *)Buffer = State;
-  Buffer += sizeof(UINT8);
+  Buffer++;
 
   CmdSize = (UINT32)(Buffer - (UINT8 *)&Cmd);
   Cmd.Header.paramSize = SwapBytes32(CmdSize);

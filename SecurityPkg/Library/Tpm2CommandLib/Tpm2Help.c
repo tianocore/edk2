@@ -1,7 +1,7 @@
 /** @file
   Implement TPM2 help.
 
-Copyright (c) 2013, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -91,7 +91,7 @@ CopyAuthSessionCommand (
 
     // sessionAttributes
     *(UINT8 *)Buffer = *(UINT8 *)&AuthSessionIn->sessionAttributes;
-    Buffer += sizeof(UINT8);
+    Buffer++;
 
     // hmac
     WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (AuthSessionIn->hmac.size));
@@ -110,7 +110,7 @@ CopyAuthSessionCommand (
 
     // sessionAttributes = 0
     *(UINT8 *)Buffer = 0x00;
-    Buffer += sizeof(UINT8);
+    Buffer++;
 
     // hmac = nullAuth
     WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(0));
@@ -153,7 +153,7 @@ CopyAuthSessionResponse (
 
   // sessionAttributes
   *(UINT8 *)&AuthSessionOut->sessionAttributes = *(UINT8 *)Buffer;
-  Buffer += sizeof(UINT8);
+  Buffer++;
 
   // hmac
   AuthSessionOut->hmac.size = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));

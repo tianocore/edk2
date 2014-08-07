@@ -1,7 +1,7 @@
 /** @file
   Implement TPM2 Integrity related command.
 
-Copyright (c) 2013, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -470,7 +470,7 @@ Tpm2PcrAllocate (
     WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(PcrAllocation->pcrSelections[Index].hash));
     Buffer += sizeof(UINT16);
     *(UINT8 *)Buffer = PcrAllocation->pcrSelections[Index].sizeofSelect;
-    Buffer += sizeof(UINT8);
+    Buffer++;
     CopyMem (Buffer, PcrAllocation->pcrSelections[Index].pcrSelect, PcrAllocation->pcrSelections[Index].sizeofSelect);
     Buffer += PcrAllocation->pcrSelections[Index].sizeofSelect;
   }
