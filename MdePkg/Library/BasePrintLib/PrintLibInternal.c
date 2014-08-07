@@ -213,7 +213,7 @@ BasePrintLibConvertValueToString (
   // Width is 0 or COMMA_TYPE is set, PREFIX_ZERO is ignored.
   //
   if (Width == 0 || (Flags & COMMA_TYPE) != 0) {
-    Flags &= (~PREFIX_ZERO);
+    Flags &= ~((UINTN) PREFIX_ZERO);
   }
   //
   // If Width is 0 then a width of  MAXIMUM_VALUE_CHARACTERS is assumed.
@@ -422,7 +422,7 @@ BasePrintLibSPrintMarker (
     //
     // Clear all the flag bits except those that may have been passed in
     //
-    Flags &= (OUTPUT_UNICODE | FORMAT_UNICODE | COUNT_ONLY_NO_PRINT);
+    Flags &= (UINTN) (OUTPUT_UNICODE | FORMAT_UNICODE | COUNT_ONLY_NO_PRINT);
 
     //
     // Set the default width to zero, and the default precision to 1
@@ -530,7 +530,7 @@ BasePrintLibSPrintMarker (
         //
         // Flag space, +, 0, L & l are invalid for type p.
         //
-        Flags &= ~(PREFIX_BLANK | PREFIX_SIGN | PREFIX_ZERO | LONG_TYPE);
+        Flags &= ~((UINTN) (PREFIX_BLANK | PREFIX_SIGN | PREFIX_ZERO | LONG_TYPE));
         if (sizeof (VOID *) > 4) {
           Flags |= LONG_TYPE;
         }
@@ -581,7 +581,7 @@ BasePrintLibSPrintMarker (
         if ((Flags & RADIX_HEX) == 0) {
           Radix = 10;
           if (Comma) {
-            Flags &= (~PREFIX_ZERO);
+            Flags &= ~((UINTN) PREFIX_ZERO);
             Precision = 1;
           }
           if (Value < 0) {
@@ -650,7 +650,7 @@ BasePrintLibSPrintMarker (
           ArgumentString = BASE_ARG (BaseListMarker, CHAR8 *);
         }
         if (ArgumentString == NULL) {
-          Flags &= (~ARGUMENT_UNICODE);
+          Flags &= ~((UINTN) ARGUMENT_UNICODE);
           ArgumentString = "<null string>";
         }
         //

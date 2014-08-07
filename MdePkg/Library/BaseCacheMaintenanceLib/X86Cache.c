@@ -142,7 +142,7 @@ WriteBackInvalidateDataCacheRange (
   // Calculate the cache line alignment
   // 
   End = (Start + Length + (CACHE_LINE_SIZE - 1)) & ~(CACHE_LINE_SIZE - 1);
-  Start &= ~(CACHE_LINE_SIZE - 1);
+  Start &= ~((UINTN) CACHE_LINE_SIZE - 1);
 
   do {
     Start = (UINTN)AsmFlushCacheLine ((VOID*)Start) + CACHE_LINE_SIZE;
