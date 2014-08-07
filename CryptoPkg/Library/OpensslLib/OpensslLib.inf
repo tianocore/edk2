@@ -21,7 +21,7 @@
   LIBRARY_CLASS                  = OpensslLib
   DEFINE OPENSSL_PATH            = openssl-0.9.8za
   DEFINE OPENSSL_FLAGS           = -DOPENSSL_SYSNAME_UWIN -DOPENSSL_SYS_UEFI -DL_ENDIAN -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -DOPENSSL_NO_CAMELLIA -DOPENSSL_NO_SEED -DOPENSSL_NO_RC5 -DOPENSSL_NO_MDC2 -DOPENSSL_NO_SOCK -DOPENSSL_NO_CMS -DOPENSSL_NO_JPAKE -DOPENSSL_NO_CAPIENG -DOPENSSL_NO_ERR -DOPENSSL_NO_KRB5 -DOPENSSL_NO_DYNAMIC_ENGINE -DGETPID_IS_MEANINGLESS -DOPENSSL_NO_STDIO -DOPENSSL_NO_FP_API -DOPENSSL_NO_DGRAM -DOPENSSL_NO_ASM
-  DEFINE OPENSSL_EXFLAGS         = -DOPENSSL_SMALL_FOOTPRINT -DOPENSSL_NO_SHA0 -DOPENSSL_NO_SHA512 -DOPENSSL_NO_LHASH -DOPENSSL_NO_HW -DOPENSSL_NO_OCSP -DOPENSSL_NO_LOCKING -DOPENSSL_NO_DEPRECATED -DOPENSSL_NO_RIPEMD -DOPENSSL_NO_RC2 -DOPENSSL_NO_IDEA -DOPENSSL_NO_BF -DOPENSSL_NO_CAST -DOPENSSL_NO_WHIRLPOOL -DOPENSSL_NO_DSA -DOPENSSL_NO_EC -DOPENSSL_NO_ECDH -DOPENSSL_NO_ECDSA -DOPENSSL_NO_ENGINE
+  DEFINE OPENSSL_EXFLAGS         = -DOPENSSL_SMALL_FOOTPRINT -DOPENSSL_NO_MD2 -DOPENSSL_NO_SHA0 -DOPENSSL_NO_SHA512 -DOPENSSL_NO_LHASH -DOPENSSL_NO_HW -DOPENSSL_NO_OCSP -DOPENSSL_NO_LOCKING -DOPENSSL_NO_DEPRECATED -DOPENSSL_NO_RIPEMD -DOPENSSL_NO_RC2 -DOPENSSL_NO_IDEA -DOPENSSL_NO_BF -DOPENSSL_NO_CAST -DOPENSSL_NO_WHIRLPOOL -DOPENSSL_NO_DSA -DOPENSSL_NO_EC -DOPENSSL_NO_ECDH -DOPENSSL_NO_ECDSA -DOPENSSL_NO_ENGINE
   
 #
 # OPENSSL_FLAGS is set to define the following flags to be compatible with 
@@ -656,8 +656,17 @@
    GCC:*_*_IA32_CC_FLAGS                  = -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) -w -DTHIRTY_TWO_BIT
    GCC:*_*_X64_CC_FLAGS                   = -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) -w -DSIXTY_FOUR_BIT
    GCC:*_*_IPF_CC_FLAGS                   = -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) -w -DSIXTY_FOUR_BIT
-   RVCT:*_*_IA32_CC_FLAGS                 = $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) --library_interface=aeabi_clib99 --fpu=vfpv3 -DTHIRTY_TWO_BIT
-   RVCT:*_*_X64_CC_FLAGS                  = $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) --library_interface=aeabi_clib99 --fpu=vfpv3 -DSIXTY_FOUR_BIT
-   RVCT:*_*_IPF_CC_FLAGS                  = $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) --library_interface=aeabi_clib99 --fpu=vfpv3 -DSIXTY_FOUR_BIT
+   # suppress the following warnings in openssl so we don't break the build with warnings-as-errors:
+   # 1295: Deprecated declaration <entity> - give arg types
+   #  550: <entity> was set but never used
+   # 1293: assignment in condition
+   #  111: statement is unreachable (invariably "break;" after "return X;" in case statement)
+   #   68: integer conversion resulted in a change of sign ("if (Status == -1)")
+   #  177: <entity> was declared but never referenced
+   #  223: function <entity> declared implicitly
+   #  144: a value of type <type> cannot be used to initialize an entity of type <type>
+   #  513: a value of type <type> cannot be assigned to an entity of type <type>
+   #  188: enumerated type mixed with another type (i.e. passing an integer as an enum without a cast)
+   RVCT:*_*_ARM_CC_FLAGS                  = $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) --library_interface=aeabi_clib99 --fpu=vfpv3 -DTHIRTY_TWO_BIT --diag_suppress=1295,550,1293,111,68,177,223,144,513,188
    XCODE:*_*_IA32_CC_FLAGS                = -mmmx -msse -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) -w -DTHIRTY_TWO_BIT
    XCODE:*_*_X64_CC_FLAGS                 = -mmmx -msse -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) $(OPENSSL_EXFLAGS) -w -DSIXTY_FOUR_BIT
