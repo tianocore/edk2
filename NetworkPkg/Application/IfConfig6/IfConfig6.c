@@ -136,7 +136,7 @@ SplitStrToList (
   //
   Str     = (CHAR16 *) AllocateZeroPool (StrSize (String));
   ASSERT (Str != NULL);
-  Str     = StrCpy (Str, String);
+  Str     = StrnCpy (Str, String, StrLen (String));
   ArgStr  = Str;
 
   //
@@ -1720,7 +1720,7 @@ IfConfig6Initialize (
       Str             = (CHAR16 *) AllocateZeroPool (StrSize (ValueStr));
       ASSERT (Str != NULL);
 
-      Str             = StrCpy (Str, ValueStr);
+      Str             = StrnCpy (Str, ValueStr, StrLen (ValueStr));
       Private->IfName = Str;
     }
   }
@@ -1734,7 +1734,7 @@ IfConfig6Initialize (
       Str             = (CHAR16 *) AllocateZeroPool (StrSize (ValueStr));
       ASSERT (Str != NULL);
 
-      Str             = StrCpy (Str, ValueStr);
+      Str             = StrnCpy (Str, ValueStr, StrLen (ValueStr));
       Private->IfName = Str;
     }
   }

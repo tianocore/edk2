@@ -209,7 +209,7 @@ IScsiLunToUnicodeStr (
   for (Index = 0; Index < 4; Index++) {
 
     if ((Lun[2 * Index] | Lun[2 * Index + 1]) == 0) {
-      StrCpy (TempStr, L"0-");
+      StrnCpy (TempStr, L"0-", StrLen (L"0-"));
     } else {
       TempStr[0]  = (CHAR16) IScsiHexString[Lun[2 * Index] >> 4];
       TempStr[1]  = (CHAR16) IScsiHexString[Lun[2 * Index] & 0x0F];
