@@ -14,7 +14,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = FspSecCore
-  FILE_GUID                      = 207CE046-0ADF-47c3-B9E3-844F12C398DD
+  FILE_GUID                      = 1BA0062E-C779-4582-8566-336AE8F78F09
   MODULE_TYPE                    = SEC
   VERSION_STRING                 = 1.0
 

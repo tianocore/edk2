@@ -15,7 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = FspWrapperSecCore
-  FILE_GUID                      = 4BAEF5C9-3247-4eab-801A-32A7F330D330
+  FILE_GUID                      = 1BA0062E-C779-4582-8566-336AE8F78F09
   MODULE_TYPE                    = SEC
   VERSION_STRING                 = 1.0
 
