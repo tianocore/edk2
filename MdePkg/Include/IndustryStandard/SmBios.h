@@ -1,5 +1,5 @@
 /** @file
-  Industry Standard Definitions of SMBIOS Table Specification v2.7.1
+  Industry Standard Definitions of SMBIOS Table Specification v2.8.0.
 
 Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
@@ -422,7 +422,7 @@ typedef enum {
   ProcessorFamilyIntelCoreDuoMobile     = 0x29,
   ProcessorFamilyIntelCoreSoloMobile    = 0x2A,
   ProcessorFamilyIntelAtom              = 0x2B,
-  ProcessorFamilyAlpha3                 = 0x30,
+  ProcessorFamilyAlpha                  = 0x30,
   ProcessorFamilyAlpha21064             = 0x31,
   ProcessorFamilyAlpha21066             = 0x32,
   ProcessorFamilyAlpha21164             = 0x33,
@@ -437,6 +437,7 @@ typedef enum {
   ProcessorFamilyAmdOpteron4100Series   = 0x3C,
   ProcessorFamilyAmdOpteron6200Series   = 0x3D,
   ProcessorFamilyAmdOpteron4200Series   = 0x3E,
+  ProcessorFamilyAmdFxSeries            = 0x3F,
   ProcessorFamilyMips                   = 0x40,
   ProcessorFamilyMIPSR4000              = 0x41,
   ProcessorFamilyMIPSR4200              = 0x42,
@@ -445,15 +446,21 @@ typedef enum {
   ProcessorFamilyMIPSR10000             = 0x45,
   ProcessorFamilyAmdCSeries             = 0x46,
   ProcessorFamilyAmdESeries             = 0x47,
-  ProcessorFamilyAmdSSeries             = 0x48,
+  ProcessorFamilyAmdASeries             = 0x48,    ///< SMBIOS spec 2.8.0 updated the name
   ProcessorFamilyAmdGSeries             = 0x49,
+  ProcessorFamilyAmdZSeries             = 0x4A,
+  ProcessorFamilyAmdRSeries             = 0x4B,
+  ProcessorFamilyAmdOpteron4300         = 0x4C,
+  ProcessorFamilyAmdOpteron6300         = 0x4D,
+  ProcessorFamilyAmdOpteron3300         = 0x4E,
+  ProcessorFamilyAmdFireProSeries       = 0x4F,
   ProcessorFamilySparc                  = 0x50,
   ProcessorFamilySuperSparc             = 0x51,
   ProcessorFamilymicroSparcII           = 0x52,
   ProcessorFamilymicroSparcIIep         = 0x53,
   ProcessorFamilyUltraSparc             = 0x54,
   ProcessorFamilyUltraSparcII           = 0x55,
-  ProcessorFamilyUltraSparcIIi          = 0x56,
+  ProcessorFamilyUltraSparcIii          = 0x56,
   ProcessorFamilyUltraSparcIII          = 0x57,
   ProcessorFamilyUltraSparcIIIi         = 0x58,
   ProcessorFamily68040                  = 0x60,
@@ -517,7 +524,7 @@ typedef enum {
   ProcessorFamilyIntelCeleronD          = 0xBA,
   ProcessorFamilyIntelPentiumD          = 0xBB,
   ProcessorFamilyIntelPentiumEx         = 0xBC,
-  ProcessorFamilyIntelCoreSolo          = 0xBD,  ///< SMBIOS spec 2.6 correct this value
+  ProcessorFamilyIntelCoreSolo          = 0xBD,  ///< SMBIOS spec 2.6 updated this value
   ProcessorFamilyReserved               = 0xBE,
   ProcessorFamilyIntelCore2             = 0xBF,
   ProcessorFamilyIntelCore2Solo         = 0xC0,
@@ -532,7 +539,7 @@ typedef enum {
   ProcessorFamilyG4                     = 0xC9,
   ProcessorFamilyG5                     = 0xCA,
   ProcessorFamilyG6                     = 0xCB,
-  ProcessorFamilyzArchitectur           = 0xCC,
+  ProcessorFamilyzArchitecture          = 0xCC,
   ProcessorFamilyIntelCoreI5            = 0xCD,
   ProcessorFamilyIntelCoreI3            = 0xCE,
   ProcessorFamilyViaC7M                 = 0xD2,
@@ -549,6 +556,8 @@ typedef enum {
   ProcessorFamilyQuadCoreIntelXeon7Series     = 0xDE,
   ProcessorFamilyMultiCoreIntelXeon7Series    = 0xDF,
   ProcessorFamilyMultiCoreIntelXeon3400Series = 0xE0,
+  ProcessorFamilyAmdOpteron3000Series         = 0xE4,
+  ProcessorFamilyAmdSempronII                 = 0xE5,
   ProcessorFamilyEmbeddedAmdOpteronQuadCore   = 0xE6,
   ProcessorFamilyAmdPhenomTripleCore          = 0xE7,
   ProcessorFamilyAmdTurionUltraDualCoreMobile = 0xE8,
@@ -632,13 +641,15 @@ typedef enum {
   ProcessorUpgradeSocketrPGA988B = 0x21,
   ProcessorUpgradeSocketBGA1023 = 0x22,
   ProcessorUpgradeSocketBGA1224 = 0x23,
-  ProcessorUpgradeSocketBGA1155 = 0x24,
+  ProcessorUpgradeSocketLGA1155 = 0x24,  ///< SMBIOS spec 2.8.0 updated the name
   ProcessorUpgradeSocketLGA1356 = 0x25,
   ProcessorUpgradeSocketLGA2011 = 0x26,
   ProcessorUpgradeSocketFS1     = 0x27,
   ProcessorUpgradeSocketFS2     = 0x28,
   ProcessorUpgradeSocketFM1     = 0x29,
-  ProcessorUpgradeSocketFM2     = 0x2A
+  ProcessorUpgradeSocketFM2     = 0x2A,
+  ProcessorUpgradeSocketLGA2011_3 = 0x2B,
+  ProcessorUpgradeSocketLGA1356_3 = 0x2C
 } PROCESSOR_UPGRADE;
 
 ///
@@ -1485,7 +1496,7 @@ typedef struct {
   UINT16    Nonvolatile     :1;
   UINT16    Registered      :1;
   UINT16    Unbuffered      :1;
-  UINT16    Reserved1       :1;
+  UINT16    LrDimm          :1;
 } MEMORY_DEVICE_TYPE_DETAIL;
 
 ///
@@ -1524,6 +1535,12 @@ typedef struct {
   //
   UINT32                    ExtendedSize;
   UINT16                    ConfiguredMemoryClockSpeed;
+  //
+  // Add for smbios 2.8.0
+  //
+  UINT16                    MinimumVoltage;
+  UINT16                    MaximumVoltage;
+  UINT16                    ConfiguredVoltage;
 } SMBIOS_TABLE_TYPE17;
 
 ///

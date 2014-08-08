@@ -583,7 +583,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable|0|UINT64|0x30001015
 
   ## Smbios version
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0207|UINT16|0x00010055
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0208|UINT16|0x00010055
 
   ## TFTP BlockSize. Initial value 0 means using default block size which is (MTU-IP_HEADER-UDP_HEADER-TFTP_HEADER)
   #  to handle all link layers. If the value is non zero, the PCD value will be used as block size.
