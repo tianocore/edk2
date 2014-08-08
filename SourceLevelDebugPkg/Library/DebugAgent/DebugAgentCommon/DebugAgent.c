@@ -153,7 +153,7 @@ CalculateCrc16 (
   UINTN  BitIndex;
 
   for (Index = 0; Index < DataSize; Index++) {
-    Crc ^= Data[Index];
+    Crc ^= (UINT16)Data[Index];
     for (BitIndex = 0; BitIndex < 8; BitIndex++) {
       if ((Crc & 0x8000) != 0) {
         Crc <<= 1;
@@ -747,11 +747,11 @@ SetDebugRegister (
   //
   // Enable Gx, Lx
   //
-  Dr7Value |= 0x3 << (RegisterIndex * 2);
+  Dr7Value |= (UINTN) (0x3 << (RegisterIndex * 2));
   //
   // Set RWx and Lenx
   //
-  Dr7Value &= ~(0xf << (16 + RegisterIndex * 4));
+  Dr7Value &= (UINTN) (~(0xf << (16 + RegisterIndex * 4)));
   Dr7Value |= (UINTN) ((SetHwBreakpoint->Type.Length << 2) | SetHwBreakpoint->Type.Access) << (16 + RegisterIndex * 4);
   //
   // Enable GE, LE
@@ -776,19 +776,19 @@ ClearDebugRegister (
 {
   if ((ClearHwBreakpoint->IndexMask & BIT0) != 0) {
     CpuContext->Dr0 = 0;
-    CpuContext->Dr7 &= ~(0x3 << 0);
+    CpuContext->Dr7 &= (UINTN)(~(0x3 << 0));
   }
   if ((ClearHwBreakpoint->IndexMask & BIT1) != 0) {
     CpuContext->Dr1 = 0;
-    CpuContext->Dr7 &= ~(0x3 << 2);
+    CpuContext->Dr7 &= (UINTN)(~(0x3 << 2));
   }
   if ((ClearHwBreakpoint->IndexMask & BIT2) != 0) {
     CpuContext->Dr2 = 0;
-    CpuContext->Dr7 &= ~(0x3 << 4);
+    CpuContext->Dr7 &= (UINTN)(~(0x3 << 4));
   }
   if ((ClearHwBreakpoint->IndexMask & BIT3) != 0) {
     CpuContext->Dr3 = 0;
-    CpuContext->Dr7 &= ~(0x3 << 6);
+    CpuContext->Dr7 &= (UINTN)(~(0x3 << 6));
   }
 }
 
