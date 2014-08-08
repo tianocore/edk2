@@ -1085,7 +1085,7 @@ PlatformBdsEnterFrontPage (
     //
     // Clear EFI_OS_INDICATIONS_BOOT_TO_FW_UI to acknowledge OS
     // 
-    OsIndication &= ~EFI_OS_INDICATIONS_BOOT_TO_FW_UI;
+    OsIndication &= ~((UINT64)EFI_OS_INDICATIONS_BOOT_TO_FW_UI);
     Status = gRT->SetVariable (
                     L"OsIndications",
                     &gEfiGlobalVariableGuid,

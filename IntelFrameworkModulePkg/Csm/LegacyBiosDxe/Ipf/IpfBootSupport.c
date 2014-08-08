@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -226,7 +226,7 @@ RelocateImageUnder4GIfNeeded (
       // Align buffer on section boundry
       //
       ImageContext.ImageAddress += ImageContext.SectionAlignment - 1;
-      ImageContext.ImageAddress &= ~(ImageContext.SectionAlignment - 1);
+     ImageContext.ImageAddress &= ~((PHYSICAL_ADDRESS)ImageContext.SectionAlignment - 1);
 
       //
       // Load the image to our new buffer

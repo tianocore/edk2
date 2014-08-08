@@ -1303,7 +1303,7 @@ UpdateSetLegacyDeviceOrderPage (
         break;
       }
 
-      VarData += sizeof (BBS_TYPE);
+      VarData  = (UINT8 *)((UINTN)VarData + sizeof (BBS_TYPE));
       VarData += *(UINT16 *) VarData;
       DevOrder = (LEGACY_DEV_ORDER_ENTRY *) VarData;
     }
@@ -1333,7 +1333,7 @@ UpdateSetLegacyDeviceOrderPage (
         NULL
         );
 
-      VarDevOrder = *(UINT16 *) ((UINT8 *) DevOrder + sizeof (BBS_TYPE) + sizeof (UINT16) + Index * sizeof (UINT16));
+      VarDevOrder = *(UINT16 *) ((UINTN) DevOrder + sizeof (BBS_TYPE) + sizeof (UINT16) + Index * sizeof (UINT16));
 
       if (0xFF00 == (VarDevOrder & 0xFF00)) {
         LegacyOrder[Index]  = 0xFF;

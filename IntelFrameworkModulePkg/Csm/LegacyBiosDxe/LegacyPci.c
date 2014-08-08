@@ -1198,7 +1198,7 @@ PciProgramAllInterruptLineRegisters (
                       &Supports
                       );
     if (!EFI_ERROR (Status)) {
-      Supports &= EFI_PCI_DEVICE_ENABLE;
+      Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
       Status = PciIo->Attributes (
                         PciIo,
                         EfiPciIoAttributeOperationEnable,
@@ -1772,7 +1772,7 @@ PciShadowRoms (
                           &Supports
                           );
         if (!EFI_ERROR (Status)) {
-          Supports &= EFI_PCI_DEVICE_ENABLE;
+          Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
           Status = PciIo->Attributes (
                             PciIo,
                             EfiPciIoAttributeOperationEnable,
@@ -1895,7 +1895,7 @@ LegacyBiosCheckPciRomEx (
   //
   Status = IsLegacyRom (PciHandle);
   if (!EFI_ERROR (Status)) {
-    *Flags |= (ROM_FOUND | VALID_LEGACY_ROM);
+    *Flags |= (UINTN)(ROM_FOUND | VALID_LEGACY_ROM);
     return EFI_SUCCESS;
   }
   //
@@ -2187,8 +2187,8 @@ LegacyBiosInstallVgaRom (
                     &Supports
                     );
   if (!EFI_ERROR (Status)) {
-    Supports &= EFI_PCI_DEVICE_ENABLE | EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY | \
-                EFI_PCI_IO_ATTRIBUTE_VGA_IO | EFI_PCI_IO_ATTRIBUTE_VGA_IO_16;
+    Supports &= (UINT64)(EFI_PCI_DEVICE_ENABLE | EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY | \
+                         EFI_PCI_IO_ATTRIBUTE_VGA_IO | EFI_PCI_IO_ATTRIBUTE_VGA_IO_16);
     Status = PciIo->Attributes (
                       PciIo,
                       EfiPciIoAttributeOperationEnable,

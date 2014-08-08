@@ -4,7 +4,7 @@
   BugBug: Thunker does A20 gate. Can we get rid of this code or
           put it into Legacy16 code.
 
-Copyright (c) 1999 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -67,7 +67,7 @@ BiosIntCall (
   UINT64          IntTypeVariable;
 
   IntTypeVariable = 0x8000000000000000;
-  IntTypeVariable |= BiosInt;
+  IntTypeVariable |= (UINT64)BiosInt;
 
   DwordRegs.Cs    = Segment;
   DwordRegs.Eip   = Offset;

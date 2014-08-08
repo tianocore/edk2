@@ -1761,12 +1761,12 @@ GetLegacyDeviceOrder (
           break;
         }
     
-        WorkingVarData += sizeof (BBS_TYPE);
+        WorkingVarData  = (UINT8 *)((UINTN)WorkingVarData + sizeof (BBS_TYPE));
         WorkingVarData += *(UINT16 *) WorkingVarData;
         DevOrder = (LEGACY_DEV_ORDER_ENTRY *) WorkingVarData;
       } 
       for (OptionIndex = 0; OptionIndex < OptionMenu->MenuNumber; OptionIndex++) {
-        VarDevOrder = *(UINT16 *) ((UINT8 *) DevOrder + sizeof (BBS_TYPE) + sizeof (UINT16) + OptionIndex * sizeof (UINT16));
+        VarDevOrder = *(UINT16 *) ((UINTN) DevOrder + sizeof (BBS_TYPE) + sizeof (UINT16) + OptionIndex * sizeof (UINT16));
          if (0xFF00 == (VarDevOrder & 0xFF00)) {
           LegacyOrder[OptionIndex]  = 0xFF;
           Pos                       = (VarDevOrder & 0xFF) / 8;

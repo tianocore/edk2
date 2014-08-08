@@ -358,7 +358,7 @@ BiosSnp16DriverBindingStart (
                     &Supports
                     );
   if (!EFI_ERROR (Status)) {
-    Supports &= EFI_PCI_DEVICE_ENABLE;
+    Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
     Status = PciIo->Attributes (
                       PciIo,
                       EfiPciIoAttributeOperationEnable,
@@ -793,7 +793,7 @@ Done:
                         &Supports
                         );
       if (!EFI_ERROR (Status)) {
-        Supports &= EFI_PCI_DEVICE_ENABLE;
+        Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
         Status = PciIo->Attributes (
                           PciIo,
                           EfiPciIoAttributeOperationDisable,
@@ -876,7 +876,7 @@ BiosSnp16DriverBindingStop (
                         &Supports
                         );
       if (!EFI_ERROR (Status)) {
-        Supports &= EFI_PCI_DEVICE_ENABLE;
+        Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
         Status = PciIo->Attributes (
                           PciIo,
                           EfiPciIoAttributeOperationDisable,
