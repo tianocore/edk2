@@ -12,7 +12,7 @@
 
 **/
 
-#ifndef __EFI_DEBUG_AGNET_GUID_H__
+#ifndef __EFI_DEBUG_AGENT_GUID_H__
 #define __EFI_DEBUG_AGENT_GUID_H__
 
 ///
