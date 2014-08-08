@@ -81,7 +81,7 @@ typedef struct {
   //
   BASE_LIBRARY_JUMP_BUFFER            JumpBuffer;
   //
-  // This filed returens the exception information issued by HOST command
+  // This field returns the exception information issued by the HOST command
   //
   DEBUG_DATA_RESPONSE_GET_EXCEPTION   ExceptionContent;
 } DEBUG_AGENT_EXCEPTION_BUFFER;
