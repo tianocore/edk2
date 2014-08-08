@@ -171,7 +171,6 @@ typedef enum {
   CfUiPageUp,
   CfUiPageDown,
   CfUiDown,
-  CfUiDefault,
   CfUiNoOperation,
   CfExit,
   CfUiHotKey,
