@@ -903,6 +903,10 @@ CreateChildNode (
           //
           AuthenticationStatus = Stream->AuthenticationStatus;
 
+          if ((GuidedSectionAttributes & EFI_GUIDED_SECTION_AUTH_STATUS_VALID) == EFI_GUIDED_SECTION_AUTH_STATUS_VALID) {
+            AuthenticationStatus |= EFI_AUTH_STATUS_IMAGE_SIGNED | EFI_AUTH_STATUS_NOT_TESTED;
+          }
+
           if (IS_SECTION2 (GuidedHeader)) {
             Status = OpenSectionStreamEx (
                        SECTION2_SIZE (GuidedHeader) - ((EFI_GUID_DEFINED_SECTION2 *) GuidedHeader)->DataOffset,
