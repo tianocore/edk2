@@ -49,7 +49,7 @@ ASM_PFX(InternalMemSetMem16):
 L0:
     movq    %mm0, (%edi)
     addl    $8, %edi
-    loopl   L0
+    loop    L0
 L1:
     movl    %edx, %ecx
     rep

@@ -43,7 +43,7 @@ ASM_PFX(InternalMemSetMem):
     andl    $7, %edx
     shrl    $3, %ecx                    # # of Qwords to set
     jz      L1
-    addl    $0x-10, %esp
+    addl    $-16, %esp
     movq    %mm0, (%esp)                # save mm0
     movq    %mm1, 8(%esp)               # save mm1
     movd    %eax, %mm0
@@ -53,7 +53,7 @@ ASM_PFX(InternalMemSetMem):
 L0:
     movq    %mm0, (%edi)
     addl    $8, %edi
-    loopl   L0
+    loop    L0
     movq    (%esp), %mm0                # restore mm0
     movq    8(%esp), %mm1               # restore mm1
     addl    $0x10, %esp                 # stack cleanup

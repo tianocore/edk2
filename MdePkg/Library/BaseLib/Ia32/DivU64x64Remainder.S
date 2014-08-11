@@ -37,7 +37,7 @@ ASM_PFX(InternalMathDivRemU64x64):
     jnz     Hard                        # call _@DivRemU64x64 if Divisor > 2^32
     movl    20(%esp), %ecx
     jecxz   L1
-    and     $0, 4(%ecx)                 # zero high dword of remainder
+    andl     $0, 4(%ecx)                # zero high dword of remainder
     movl    %ecx, 16(%esp)              # set up stack frame to match DivRemU64x32
 L1:
     jmp     ASM_PFX(InternalMathDivRemU64x32)

@@ -58,6 +58,6 @@ LongStart:                              # long mode starts here
     .byte   0x67, 0x48
     movl    0x18(%esp), %esp            # mov rsp, [esp + 18h]
     .byte   0x48
-    addl    $0x-0x20, %esp              # add rsp, -20h
+    addl    $-0x20, %esp                # add rsp, -20h
     call    *%ebx                       # call rbx
     jmp     .                           # no one should get here
