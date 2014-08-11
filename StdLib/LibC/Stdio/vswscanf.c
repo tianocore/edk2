@@ -72,7 +72,7 @@ vswscanf(
   size_t mlen;
   int r;
   const wchar_t *rstr = str;
-  struct __sfileext fext = { 0 };
+  struct __sfileext fext = { { 0 } };
 
   /*
    * XXX Convert the wide character string to multibyte, which
