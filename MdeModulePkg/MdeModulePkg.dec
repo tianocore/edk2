@@ -695,6 +695,26 @@
   ## Default Creator Revision for ACPI table creation.
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision|0x01000013|UINT32|0x30001038
 
+  ## UART clock frequency is for the baud rate configuration.
+  # @Prompt Serial Port Clock Rate
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate|1843200|UINT32|0x00010066
+  
+  ## PCI Serial Device Info. It is an array of Device, Function, and Power Management
+  #  information that describes the path that contains zero or more PCI to PCI briges 
+  #  followed by a PCI serial device.  Each array entry is 4-bytes in length.  The 
+  #  first byte is the PCI Device Number, then second byte is the PCI Function Number, 
+  #  and the last two bytes are the offset to the PCI power management capabilities 
+  #  register used to manage the D0-D3 states.  If a PCI power management capabilities 
+  #  register is not present, then the last two bytes in the offset is set to 0.  The 
+  #  array is terminated by an array entry with a PCI Device Number of 0xFF.  For a 
+  #  non-PCI fixed address serial device, such as an ISA serial device, the value is 0xFF.
+  # @Prompt Pci Serial Device Info
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialPciDeviceInfo|{0xFF}|VOID*|0x00010067
+
+  ## Serial Port Extended Transmit FIFO Size.  The default is 64 bytes. 
+  # @Prompt Pci Port Extended Transmit FIFO Size in Bytes
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialExtendedTxFifoSize|64|UINT32|0x00010068
+  
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output column and the default value is 25 according to UEFI spec.
   #  This PCD could be set to 0 then console output could be at max column and max row.
