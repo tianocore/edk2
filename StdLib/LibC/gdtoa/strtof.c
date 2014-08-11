@@ -50,7 +50,7 @@ strtof(CONST char *s, char **sp)
   ULong bits[1];
   Long expt;
   int k;
-  union { ULong L[1]; float f; } u = { 0 };
+  union { ULong L[1]; float f; } u = { { 0 } };
 
   k = strtodg(s, sp, &fpi, &expt, bits);
   if (k == STRTOG_NoMemory) {
