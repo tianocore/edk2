@@ -307,6 +307,9 @@
   ## Include/Ppi/PostBootScriptTable.h
   gPeiPostScriptTablePpiGuid    =  { 0x88c9d306, 0x900, 0x4eb5, { 0x82, 0x60, 0x3e, 0x2d, 0xbe, 0xda, 0x1f, 0x89}}
 
+  ## Include/Ppi/SerialPortPei.h
+  gPeiSerialPortPpiGuid         =  { 0x490e9d85, 0x8aef, 0x4193, { 0x8e, 0x56, 0xf7, 0x34, 0xa9, 0xff, 0xac, 0x8b}}
+
 [Protocols]
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.
   #  Include/Protocol/LoadPe32Image.h
