@@ -927,8 +927,6 @@ PeiDispatcher (
               Private->StackOffsetPositive = StackOffsetPositive;
               Private->StackOffset = StackOffset;
 
-              DEBUG ((EFI_D_INFO, "Heap Offset = 0x%lX Stack Offset = 0x%lX\n", (UINT64)Private->HeapOffset, (UINT64)(StackOffset)));
-
               //
               // Build Stack HOB that describes the permanent memory stack
               //
@@ -966,7 +964,9 @@ PeiDispatcher (
                   Private->HeapOffsetPositive = FALSE;
                   Private->HeapOffset = (UINTN)((UINTN)SecCoreData->PeiTemporaryRamBase - BaseOfNewHeap);
                 }
-                
+
+                DEBUG ((EFI_D_INFO, "Heap Offset = 0x%lX Stack Offset = 0x%lX\n", (UINT64) Private->HeapOffset, (UINT64) Private->StackOffset));
+
                 //
                 // Caculate new HandOffTable and PrivateData address in permanent memory's stack
                 //
@@ -1020,6 +1020,8 @@ PeiDispatcher (
                   Private->HeapOffsetPositive = FALSE;
                   Private->HeapOffset = (UINTN)((UINTN)SecCoreData->PeiTemporaryRamBase - BaseOfNewHeap);
                 }
+
+                DEBUG ((EFI_D_INFO, "Heap Offset = 0x%lX Stack Offset = 0x%lX\n", (UINT64) Private->HeapOffset, (UINT64) Private->StackOffset));
 
                 //
                 // Migrate Heap
