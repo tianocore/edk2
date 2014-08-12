@@ -62,6 +62,7 @@
   MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
   MdePkg/Library/BaseLib/BaseLib.inf
   MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
+  MdePkg/Library/BaseOrderedCollectionRedBlackTreeLib/BaseOrderedCollectionRedBlackTreeLib.inf
   MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
   MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
