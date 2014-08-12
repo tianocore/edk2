@@ -1005,10 +1005,10 @@ LegacyBiosInstall (
                AllocateAddress,
                MemStart,
                1,
-               &MemoryAddress
+               &StartAddress
                );
     if (!EFI_ERROR (Status)) {
-      MemoryPtr = (VOID *) ((UINTN) MemoryAddress);
+      MemoryPtr = (VOID *) ((UINTN) StartAddress);
       ZeroMem (MemoryPtr, 0x1000);
     } else {
       DEBUG ((EFI_D_ERROR, "WARNING: Allocate legacy memory fail for SCSI card - %x\n", MemStart));
