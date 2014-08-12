@@ -48,6 +48,12 @@ The EADK is comprised of three packages:
                See the PythonReadMe.txt file, in the Python directory,
                for information on configuring and building Python.
 
+      OrderedCollectionTest  A small Standard C Library application that
+               demonstrates the use of the OrderedCollectionLib library class
+               (provided by the BaseOrderedCollectionRedBlackTreeLib library
+               instance in this application), and allows the user to "fuzz" the
+               library with interactive or scripted API calls.
+
       Sockets  A collection of applications demonstrating use of the
                EDK II Socket Libraries.  These applications include:
 

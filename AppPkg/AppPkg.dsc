@@ -112,6 +112,20 @@
   AppPkg/Applications/Main/Main.inf          # Simple invocation. No other LibC functions.
   AppPkg/Applications/Enquire/Enquire.inf    #
 
+#### A simple fuzzer for OrderedCollectionLib, in particular for
+#### BaseOrderedCollectionRedBlackTreeLib.
+  AppPkg/Applications/OrderedCollectionTest/OrderedCollectionTest.inf {
+    <LibraryClasses>
+      OrderedCollectionLib|MdePkg/Library/BaseOrderedCollectionRedBlackTreeLib/BaseOrderedCollectionRedBlackTreeLib.inf
+      DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
+      DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
+    <PcdsFeatureFlag>
+      gEfiMdePkgTokenSpaceGuid.PcdValidateOrderedCollection|TRUE
+    <PcdsFixedAtBuild>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2F
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80400040
+  }
+
 #### After extracting the Python distribution, un-comment the following line to build Python.
 #  AppPkg/Applications/Python/PythonCore.inf
 
