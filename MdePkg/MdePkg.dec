@@ -100,6 +100,9 @@
   ##
   PrintLib|Include/Library/PrintLib.h
 
+  ##  @libraryclass  Provides an ordered collection data structure.
+  OrderedCollectionLib|Include/Library/OrderedCollectionLib.h
+
   ##  @libraryclass  Provides services to send progress/error codes to a POST card.
   PostCodeLib|Include/Library/PostCodeLib.h
 
@@ -1386,6 +1389,12 @@
   #  in the following BaseLib fucntions: GetNextNode(), IsNull(), IsNodeAtEnd(),
   #  SwapListEntries()
   gEfiMdePkgTokenSpaceGuid.PcdVerifyNodeInList|FALSE|BOOLEAN|0x00000028
+
+  ## If TRUE, OrderedCollectionLib is instructed to validate the
+  #  ORDERED_COLLECTION structure at the end of such operations (typically
+  #  structure modifications) that justify validation of the structure for unit
+  #  testing purposes.
+  gEfiMdePkgTokenSpaceGuid.PcdValidateOrderedCollection|FALSE|BOOLEAN|0x0000002a
 
 [PcdsFixedAtBuild]
   ## Indicates the maximum length of unicode string
