@@ -13,8 +13,8 @@
 
 **/
 
-#ifndef _PEI_SERIAL_PORT_PPI_H
-#define _PEI_SERIAL_PORT_PPI_H
+#ifndef __PEI_SERIAL_PORT_PPI_H__
+#define __PEI_SERIAL_PORT_PPI_H__
 
 #define PEI_SERIAL_PORT_PPI \
   { \

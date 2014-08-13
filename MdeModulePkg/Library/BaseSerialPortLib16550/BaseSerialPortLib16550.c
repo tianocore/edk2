@@ -63,6 +63,7 @@ typedef struct {
   parameter Offset is added to the base address of the 16550 registers that is specified 
   by PcdSerialRegisterBase. 
   
+  @param  Base    The base address register of UART device.
   @param  Offset  The offset of the 16550 register to read.
 
   @return The value read from the 16550 register.
@@ -87,6 +88,7 @@ SerialPortReadRegister (
   parameter Offset is added to the base address of the 16550 registers that is specified 
   by PcdSerialRegisterBase. 
   
+  @param  Base    The base address register of UART device.
   @param  Offset  The offset of the 16550 register to write.
   @param  Value   The value to write to the 16550 register specified by Offset.
 
@@ -173,7 +175,7 @@ SerialPortLibUpdatePciRegister32 (
   This function assumes Root Bus Numer is Zero, and enables I/O and MMIO in PCI UART 
   Device if they are not already enabled. 
   
-  @return  The base address register of the PCI UART device.
+  @return  The base address register of the UART device.
 
 **/
 UINTN
@@ -410,6 +412,8 @@ GetSerialRegisterBase (
 
 /**
   Return whether the hardware flow control signal allows writing.
+
+  @param  SerialRegisterBase The base address register of UART device.
 
   @retval TRUE  The serial port is writable.
   @retval FALSE The serial port is not writable.
