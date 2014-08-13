@@ -268,8 +268,8 @@ InstallVbeShim (
   //
   // Second, point the Int10h vector at the shim.
   //
-  Int0x10->Segment = SegmentC >> 4;
-  Int0x10->Offset  = (EFI_PHYSICAL_ADDRESS)(UINTN)(VbeModeInfo + 1) - SegmentC;
+  Int0x10->Segment = (UINT16) (SegmentC >> 4);
+  Int0x10->Offset  = (UINT16) ((UINTN) (VbeModeInfo + 1) - SegmentC);
 
   DEBUG ((EFI_D_INFO, "%a: VBE shim installed\n", __FUNCTION__));
 }
