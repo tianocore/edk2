@@ -6520,6 +6520,32 @@ RELEASE_ARMLINUXGCC_AARCH64_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC
 *_*_*_CRC32_GUID          = FC1BCDB0-7D31-49AA-936A-A4600D9DD083
 
 ##################
+# Rsa2048Sha256Sign tool definitions
+#
+# Notes: This tool defintion uses a test signing key for development purposes only.
+#        The tool Rsa2048Sha256GenerateKeys can be used to generate a new private/public key
+#        and the gEfiSecurityPkgTokenSpaceGuid.PcdRsa2048Sha256PublicKeyBuffer PCD value.
+#        A custom tool/script can be implemented using the new private/public key with
+#        the Rsa2048Sha256Sign tool and this tool defintiion can be updated to use a
+#        custom tool/script.
+#
+#   Generate new private/public key and gEfiSecurityPkgTokenSpaceGuid.PcdRsa2048Sha256PublicKeyBuffer PCD value
+#
+#       Rsa2048Sha256GenerateKeys.py -o MyKey.pem --public-key-hash-c MyKey.pcd
+#
+#   Custom script example (MyRsa2048Sha256Sign.cmd):
+#
+#       Rsa2048Sha256Sign --private-key MyKey.pem %1 %2 %3 %4 %5 %6 %7 %8 %9
+#
+#   WARNING: Vendors that uses private keys are responsible for proper management and protection 
+#            of private keys.  Vendors may choose to use infrastructure such as signing servers 
+#            or signing portals to support the management and protection of private keys.
+#
+##################
+*_*_*_RSA2048SHA256SIGN_PATH = Rsa2048Sha256Sign
+*_*_*_RSA2048SHA256SIGN_GUID = A7717414-C616-4977-9420-844712A735BF
+
+##################
 # LzmaCompress tool definitions
 ##################
 *_*_*_LZMA_PATH          = LzmaCompress
@@ -6544,3 +6570,4 @@ RELEASE_ARMLINUXGCC_AARCH64_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC
 ##################
 *_*_*_VPDTOOL_PATH         = BPDG
 *_*_*_VPDTOOL_GUID         = 8C3D856A-9BE6-468E-850A-24F7A8D38E08
+

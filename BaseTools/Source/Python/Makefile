@@ -1,7 +1,7 @@
 ## @file
 # Windows makefile for Python tools build.
 #
-# Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -27,7 +27,7 @@ MODULES=encodings.cp437,encodings.gbk,encodings.utf_16,encodings.utf_8,encodings
 
 BIN_DIR=$(EDK_TOOLS_PATH)\Bin\Win32
 
-APPLICATIONS=$(BIN_DIR)\build.exe $(BIN_DIR)\GenFds.exe $(BIN_DIR)\Trim.exe $(BIN_DIR)\TargetTool.exe $(BIN_DIR)\GenDepex.exe $(BIN_DIR)\GenPatchPcdTable.exe $(BIN_DIR)\PatchPcdValue.exe $(BIN_DIR)\BPDG.exe $(BIN_DIR)\UPT.exe
+APPLICATIONS=$(BIN_DIR)\build.exe $(BIN_DIR)\GenFds.exe $(BIN_DIR)\Trim.exe $(BIN_DIR)\TargetTool.exe $(BIN_DIR)\GenDepex.exe $(BIN_DIR)\GenPatchPcdTable.exe $(BIN_DIR)\PatchPcdValue.exe $(BIN_DIR)\BPDG.exe $(BIN_DIR)\UPT.exe $(BIN_DIR)\Rsa2048Sha256Sign.exe $(BIN_DIR)\Rsa2048Sha256GenerateKeys.exe
 
 COMMON_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\Common\BuildToolError.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\Database.py \
@@ -101,6 +101,13 @@ $(BIN_DIR)\BPDG.exe: $(BASE_TOOLS_PATH)\Source\Python\BPDG\BPDG.py $(COMMON_PYTH
 $(BIN_DIR)\UPT.exe: $(BASE_TOOLS_PATH)\Source\Python\UPT\UPT.py $(UPT_BUILDVERSION_PYTHON)
   @pushd . & @cd UPT & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) UPT.py & @popd
 
+$(BIN_DIR)\Rsa2048Sha256Sign.exe: $(BASE_TOOLS_PATH)\Source\Python\Rsa2048Sha256Sign\Rsa2048Sha256Sign.py
+  @pushd . & @cd Rsa2048Sha256Sign & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) Rsa2048Sha256Sign.py & @popd
+  @pushd . & @copy /Y /B $(BASE_TOOLS_PATH)\Source\Python\Rsa2048Sha256Sign\TestSigningPrivateKey.pem $(BIN_DIR)\TestSigningPrivateKey.pem & @popd
+  
+$(BIN_DIR)\Rsa2048Sha256GenerateKeys.exe: $(BASE_TOOLS_PATH)\Source\Python\Rsa2048Sha256Sign\Rsa2048Sha256GenerateKeys.py
+  @pushd . & @cd Rsa2048Sha256Sign & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) Rsa2048Sha256GenerateKeys.py & @popd
+  
 clean:
 cleanall:  
   @del /f /q $(BIN_DIR)\*.pyd $(BIN_DIR)\*.dll
