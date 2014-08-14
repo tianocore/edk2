@@ -32,7 +32,7 @@
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
-  TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
+  TimerLib|PcAtChipsetPkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
@@ -56,5 +56,7 @@
   PcAtChipsetPkg/Library/SerialIoLib/SerialIoLib.inf
   PcAtChipsetPkg/Library/ResetSystemLib/ResetSystemLib.inf
   PcAtChipsetPkg/Library/BaseIoApicLib/BaseIoApicLib.inf
+  PcAtChipsetPkg/Library/AcpiTimerLib/BaseAcpiTimerLib.inf
+  PcAtChipsetPkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
   PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
   PcAtChipsetPkg/PciHostBridgeDxe/PciHostBridgeDxe.inf

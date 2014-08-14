@@ -1,0 +1,51 @@
+## @file
+#  ACPI Timer Library
+#
+#  Provides basic timer support using the ACPI timer hardware.  The performance
+#  counter features are provided by the processors time stamp counter. 
+#
+#  Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AcpiTimerLib
+  FILE_GUID                      = 564DE85F-049E-4481-BF7A-CA04D2788CF9
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TimerLib|SEC PEI_CORE PEIM
+  CONSTRUCTOR                    = AcpiTimerLibConstructor
+  MODULE_UNI_FILE                = AcpiTimerLibModStrs.uni
+
+[Sources]
+  AcpiTimerLib.c
+  BaseAcpiTimerLib.c
+  
+[Packages]
+  MdePkg/MdePkg.dec
+  PcAtChipsetPkg/PcAtChipsetPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  PciLib
+  IoLib
+  DebugLib
+
+[Pcd]
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPciBusNumber             ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPciDeviceNumber          ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPciFunctionNumber        ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPciEnableRegisterOffset  ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoBarEnableMask            ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPciBarRegisterOffset     ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPortBaseAddress          ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiPm1TmrOffset               ## CONSUMES
