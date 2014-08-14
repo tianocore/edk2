@@ -25,6 +25,15 @@ import subprocess
 import uuid
 import struct
 import collections
+from Common.BuildVersion import gBUILD_VERSION
+
+#
+# Globals for help information
+#
+__prog__      = 'Rsa2048Sha256Sign'
+__version__   = '%s Version %s' % (__prog__, '0.9 ' + gBUILD_VERSION)
+__copyright__ = 'Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.'
+__usage__     = '%s -e|-d [options] <input_file>' % (__prog__)
 
 #
 # GUID for SHA 256 Hash Algorithm from UEFI Specification
@@ -50,19 +59,9 @@ TEST_SIGNING_PRIVATE_KEY_FILENAME = 'TestSigningPrivateKey.pem'
 
 if __name__ == '__main__':
   #
-  # Save name of the program
-  #
-  ProgramName = sys.argv[0]
-  
-  #
-  # Print copyright 
-  #
-  print '%s - Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.' % (ProgramName)
-  
-  #
   # Create command line argument parser object
   #  
-  parser = argparse.ArgumentParser(prog=ProgramName, usage='%(prog)s -e|-d [options] <input_file>', add_help=False)
+  parser = argparse.ArgumentParser(prog=__prog__, version=__version__, usage=__usage__, description=__copyright__, conflict_handler='resolve')
   group = parser.add_mutually_exclusive_group(required=True)
   group.add_argument("-e", action="store_true", dest='Encode', help='encode file')
   group.add_argument("-d", action="store_true", dest='Decode', help='decode file')
@@ -71,8 +70,6 @@ if __name__ == '__main__':
   parser.add_argument("-v", "--verbose", dest='Verbose', action="store_true", help="increase output messages")
   parser.add_argument("-q", "--quiet", dest='Quiet', action="store_true", help="reduce output messages")
   parser.add_argument("--debug", dest='Debug', type=int, metavar='[0-9]', choices=range(0,10), default=0, help="set debug level")
-  parser.add_argument("--version", dest='Version', action="store_true", help="display the program version and exit")
-  parser.add_argument("-h", "--help", dest='Help', action="help", help="display this help text")
   parser.add_argument(metavar="input_file", dest='InputFile', type=argparse.FileType('rb'), help="specify the input filename")
 
   #
