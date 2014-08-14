@@ -1378,7 +1378,7 @@ PciGetClassStrings (
   Print strings that represent PCI device class, subclass and programmed I/F.
 
   @param[in] ClassCodePtr   Points to the memory which stores register Class Code in PCI
-                 configuation space.
+                            configuration space.
   @param[in] IncludePIF     If the printed string should include the programming I/F part
 **/
 VOID
@@ -1391,9 +1391,9 @@ PciPrintClassCode (
   PCI_CLASS_STRINGS ClassStrings;
 
   ClassCode = 0;
-  ClassCode |= ClassCodePtr[0];
-  ClassCode |= (ClassCodePtr[1] << 8);
-  ClassCode |= (ClassCodePtr[2] << 16);
+  ClassCode |= (UINT32)ClassCodePtr[0];
+  ClassCode |= (UINT32)(ClassCodePtr[1] << 8);
+  ClassCode |= (UINT32)(ClassCodePtr[2] << 16);
 
   //
   // Get name from class code
