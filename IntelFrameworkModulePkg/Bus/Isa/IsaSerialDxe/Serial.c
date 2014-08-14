@@ -1,7 +1,7 @@
 /** @file
   Serial driver for standard UARTS on an ISA bus.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -43,11 +43,11 @@ SERIAL_DEV  gSerialDevTempate = {
   { // SerialMode
     SERIAL_PORT_SUPPORT_CONTROL_MASK,
     SERIAL_PORT_DEFAULT_TIMEOUT,
-    FixedPcdGet64 (PcdUartDefaultBaudRate),     // BaudRate
+    0,
     SERIAL_PORT_DEFAULT_RECEIVE_FIFO_DEPTH,
-    FixedPcdGet8 (PcdUartDefaultDataBits),      // DataBits
-    FixedPcdGet8 (PcdUartDefaultParity),        // Parity
-    FixedPcdGet8 (PcdUartDefaultStopBits)       // StopBits
+    0,
+    0,
+    0
   },
   NULL,
   NULL,
@@ -61,10 +61,10 @@ SERIAL_DEV  gSerialDevTempate = {
       }
     },
     0,
-    FixedPcdGet64 (PcdUartDefaultBaudRate),    
-    FixedPcdGet8 (PcdUartDefaultDataBits),
-    FixedPcdGet8 (PcdUartDefaultParity),
-    FixedPcdGet8 (PcdUartDefaultStopBits)
+    0,
+    0,
+    0,
+    0
   },
   NULL,
   0,    //BaseAddress
@@ -163,6 +163,17 @@ InitializeIsaSerial (
              );
   ASSERT_EFI_ERROR (Status);
 
+  //
+  // Initialize UART default setting in gSerialDevTempate
+  //
+  gSerialDevTempate.SerialMode.BaudRate = PcdGet64 (PcdUartDefaultBaudRate);
+  gSerialDevTempate.SerialMode.DataBits = PcdGet8 (PcdUartDefaultDataBits);
+  gSerialDevTempate.SerialMode.Parity   = PcdGet8 (PcdUartDefaultParity);
+  gSerialDevTempate.SerialMode.StopBits = PcdGet8 (PcdUartDefaultStopBits);
+  gSerialDevTempate.UartDevicePath.BaudRate = PcdGet64 (PcdUartDefaultBaudRate);
+  gSerialDevTempate.UartDevicePath.DataBits = PcdGet8 (PcdUartDefaultDataBits);
+  gSerialDevTempate.UartDevicePath.Parity   = PcdGet8 (PcdUartDefaultParity);
+  gSerialDevTempate.UartDevicePath.StopBits = PcdGet8 (PcdUartDefaultStopBits);
 
   return Status;
 }

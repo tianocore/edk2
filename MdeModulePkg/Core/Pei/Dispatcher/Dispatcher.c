@@ -49,8 +49,8 @@ DiscoverPeimsAndOrderWithApriori (
   UINTN                               PeimIndex;
   UINTN                               PeimCount;
   EFI_GUID                            *Guid;
-  EFI_PEI_FILE_HANDLE                 TempFileHandles[FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv) + 1];
-  EFI_GUID                            FileGuid[FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)];
+  EFI_PEI_FILE_HANDLE                 *TempFileHandles;
+  EFI_GUID                            *FileGuid;
   EFI_PEI_FIRMWARE_VOLUME_PPI         *FvPpi;
   EFI_FV_FILE_INFO                    FileInfo;
   
@@ -63,12 +63,14 @@ DiscoverPeimsAndOrderWithApriori (
   Private->CurrentFvFileHandles[0] = NULL;
   Guid = NULL;
   FileHandle = NULL;
+  TempFileHandles = Private->FileHandles;
+  FileGuid        = Private->FileGuid;
 
   //
   // If the current Fv has been scanned, directly get its cachable record.
   //
   if (Private->Fv[Private->CurrentPeimFvCount].ScanFv) {
-    CopyMem (Private->CurrentFvFileHandles, Private->Fv[Private->CurrentPeimFvCount].FvFileHandles, sizeof (Private->CurrentFvFileHandles));
+    CopyMem (Private->CurrentFvFileHandles, Private->Fv[Private->CurrentPeimFvCount].FvFileHandles, sizeof (EFI_PEI_FILE_HANDLE) * PcdGet32 (PcdPeiCoreMaxPeimPerFv));
     return;
   }
 
@@ -76,9 +78,9 @@ DiscoverPeimsAndOrderWithApriori (
   // Go ahead to scan this Fv, and cache FileHandles within it.
   //
   Status = EFI_NOT_FOUND;
-  for (PeimCount = 0; PeimCount <= FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv); PeimCount++) {
+  for (PeimCount = 0; PeimCount <= PcdGet32 (PcdPeiCoreMaxPeimPerFv); PeimCount++) {
     Status = FvPpi->FindFileByType (FvPpi, PEI_CORE_INTERNAL_FFS_FILE_DISPATCH_TYPE, CoreFileHandle->FvHandle, &FileHandle);
-    if (Status != EFI_SUCCESS || PeimCount == FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)) {
+    if (Status != EFI_SUCCESS || PeimCount == PcdGet32 (PcdPeiCoreMaxPeimPerFv)) {
       break;
     }
 
@@ -89,7 +91,7 @@ DiscoverPeimsAndOrderWithApriori (
   // Check whether the count of files exceeds the max support files in a FV image
   // If more files are required in a FV image, PcdPeiCoreMaxPeimPerFv can be set to a larger value in DSC file.
   //
-  ASSERT ((Status != EFI_SUCCESS) || (PeimCount < FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)));
+  ASSERT ((Status != EFI_SUCCESS) || (PeimCount < PcdGet32 (PcdPeiCoreMaxPeimPerFv)));
 
   //
   // Get Apriori File handle
@@ -115,7 +117,6 @@ DiscoverPeimsAndOrderWithApriori (
       }
       Private->AprioriCount /= sizeof (EFI_GUID);
 
-      ZeroMem (FileGuid, sizeof (FileGuid));
       for (Index = 0; Index < PeimCount; Index++) {
         //
         // Make an array of file name guids that matches the FileHandle array so we can convert
@@ -176,7 +177,7 @@ DiscoverPeimsAndOrderWithApriori (
       // We need to update it to start with files in the A Priori list and
       // then the remaining files in PEIM order.
       //
-      CopyMem (Private->CurrentFvFileHandles, TempFileHandles, sizeof (Private->CurrentFvFileHandles));
+      CopyMem (Private->CurrentFvFileHandles, TempFileHandles, sizeof (EFI_PEI_FILE_HANDLE) * PcdGet32 (PcdPeiCoreMaxPeimPerFv));
     }
   }
   //
@@ -184,7 +185,7 @@ DiscoverPeimsAndOrderWithApriori (
   // Instead, we can retrieve the file handles within this Fv from cachable data.
   //
   Private->Fv[Private->CurrentPeimFvCount].ScanFv = TRUE;
-  CopyMem (Private->Fv[Private->CurrentPeimFvCount].FvFileHandles, Private->CurrentFvFileHandles, sizeof (Private->CurrentFvFileHandles));
+  CopyMem (Private->Fv[Private->CurrentPeimFvCount].FvFileHandles, Private->CurrentFvFileHandles, sizeof (EFI_PEI_FILE_HANDLE) * PcdGet32 (PcdPeiCoreMaxPeimPerFv));
 
 }
 
@@ -699,7 +700,7 @@ PeiDispatcher (
     SaveCurrentFileHandle =  Private->CurrentFileHandle;
 
     for (Index1 = 0; Index1 <= SaveCurrentFvCount; Index1++) {
-      for (Index2 = 0; (Index2 < FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)) && (Private->Fv[Index1].FvFileHandles[Index2] != NULL); Index2++) {
+      for (Index2 = 0; (Index2 < PcdGet32 (PcdPeiCoreMaxPeimPerFv)) && (Private->Fv[Index1].FvFileHandles[Index2] != NULL); Index2++) {
         if (Private->Fv[Index1].PeimState[Index2] == PEIM_STATE_REGISITER_FOR_SHADOW) {
           PeimFileHandle = Private->Fv[Index1].FvFileHandles[Index2];
           Status = PeiLoadImage (
@@ -785,7 +786,7 @@ PeiDispatcher (
       // Start to dispatch all modules within the current Fv.
       //
       for (PeimCount = Private->CurrentPeimCount;
-           (PeimCount < FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)) && (Private->CurrentFvFileHandles[PeimCount] != NULL);
+           (PeimCount < PcdGet32 (PcdPeiCoreMaxPeimPerFv)) && (Private->CurrentFvFileHandles[PeimCount] != NULL);
            PeimCount++) {
         Private->CurrentPeimCount  = PeimCount;
         PeimFileHandle = Private->CurrentFileHandle = Private->CurrentFvFileHandles[PeimCount];
@@ -1144,7 +1145,7 @@ PeiDispatcher (
       //
       // Before walking through the next FV,Private->CurrentFvFileHandles[]should set to NULL
       //
-      SetMem (Private->CurrentFvFileHandles, sizeof (Private->CurrentFvFileHandles), 0);
+      SetMem (Private->CurrentFvFileHandles, sizeof (EFI_PEI_FILE_HANDLE) * PcdGet32 (PcdPeiCoreMaxPeimPerFv), 0);
     }
 
     //

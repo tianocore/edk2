@@ -2,7 +2,7 @@
   This code produces the Smbios protocol. It also responsible for constructing 
   SMBIOS table into system table.
   
-Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -49,11 +49,11 @@ SMBIOS_TABLE_ENTRY_POINT EntryPointStructureData = {
   //
   // MajorVersion
   //
-  (UINT8) (FixedPcdGet16 (PcdSmbiosVersion) >> 8),
+  0,
   //
   // MinorVersion
   //
-  (UINT8) (FixedPcdGet16 (PcdSmbiosVersion) & 0x00ff),
+  0,
   //
   // MaxStructureSize, TO BE FILLED
   //
@@ -101,8 +101,7 @@ SMBIOS_TABLE_ENTRY_POINT EntryPointStructureData = {
   //
   // SmbiosBcdRevision
   //
-  (UINT8) ((FixedPcdGet16 (PcdSmbiosVersion) >> 4) & 0xf0)
-  | (UINT8) (FixedPcdGet16 (PcdSmbiosVersion) & 0x0f)
+  0
 };
 
 
@@ -1079,8 +1078,11 @@ SmbiosDriverEntryPoint (
   mPrivateData.Smbios.UpdateString      = SmbiosUpdateString;
   mPrivateData.Smbios.Remove            = SmbiosRemove;
   mPrivateData.Smbios.GetNext           = SmbiosGetNext;
-  mPrivateData.Smbios.MajorVersion      = (UINT8) (FixedPcdGet16 (PcdSmbiosVersion) >> 8);
-  mPrivateData.Smbios.MinorVersion      = (UINT8) (FixedPcdGet16 (PcdSmbiosVersion) & 0x00ff);
+  mPrivateData.Smbios.MajorVersion      = (UINT8) (PcdGet16 (PcdSmbiosVersion) >> 8);
+  mPrivateData.Smbios.MinorVersion      = (UINT8) (PcdGet16 (PcdSmbiosVersion) & 0x00ff);
+  EntryPointStructureData.MajorVersion  = mPrivateData.Smbios.MajorVersion;
+  EntryPointStructureData.MinorVersion  = mPrivateData.Smbios.MinorVersion;
+  EntryPointStructureData.SmbiosBcdRevision = (UINT8) ((PcdGet16 (PcdSmbiosVersion) >> 4) & 0xf0) | (UINT8) (PcdGet16 (PcdSmbiosVersion) & 0x0f);
 
   InitializeListHead (&mPrivateData.DataListHead);
   InitializeListHead (&mPrivateData.AllocatedHandleListHead);

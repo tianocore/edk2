@@ -1,7 +1,7 @@
 /** @file
   EFI PEI Core PPI services
   
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -30,9 +30,9 @@ InitializePpiServices (
   )
 {
   if (OldCoreData == NULL) {
-    PrivateData->PpiData.NotifyListEnd = FixedPcdGet32 (PcdPeiCoreMaxPpiSupported)-1;
-    PrivateData->PpiData.DispatchListEnd = FixedPcdGet32 (PcdPeiCoreMaxPpiSupported)-1;
-    PrivateData->PpiData.LastDispatchedNotify = FixedPcdGet32 (PcdPeiCoreMaxPpiSupported)-1;
+    PrivateData->PpiData.NotifyListEnd = PcdGet32 (PcdPeiCoreMaxPpiSupported)-1;
+    PrivateData->PpiData.DispatchListEnd = PcdGet32 (PcdPeiCoreMaxPpiSupported)-1;
+    PrivateData->PpiData.LastDispatchedNotify = PcdGet32 (PcdPeiCoreMaxPpiSupported)-1;
   }
 }
 
@@ -119,7 +119,7 @@ ConvertPpiPointers (
   UINT8                 Index;
   UINT8                 IndexHole;
 
-  for (Index = 0; Index < FixedPcdGet32 (PcdPeiCoreMaxPpiSupported); Index++) {
+  for (Index = 0; Index < PcdGet32 (PcdPeiCoreMaxPpiSupported); Index++) {
     if (Index < PrivateData->PpiData.PpiListEnd || Index > PrivateData->PpiData.NotifyListEnd) {
       //
       // Convert PPI pointer in old Heap
@@ -312,7 +312,7 @@ PeiReInstallPpi (
   // Remove the old PPI from the database, add the new one.
   //
   DEBUG((EFI_D_INFO, "Reinstall PPI: %g\n", NewPpi->Guid));
-  ASSERT (Index < (INTN)(FixedPcdGet32 (PcdPeiCoreMaxPpiSupported)));
+  ASSERT (Index < (INTN)(PcdGet32 (PcdPeiCoreMaxPpiSupported)));
   PrivateData->PpiData.PpiListPtrs[Index].Ppi = (EFI_PEI_PPI_DESCRIPTOR *) NewPpi;
 
   //
@@ -570,7 +570,7 @@ ProcessNotifyList (
         EFI_PEI_PPI_DESCRIPTOR_NOTIFY_DISPATCH,
         PrivateData->PpiData.LastDispatchedInstall,
         PrivateData->PpiData.PpiListEnd,
-        FixedPcdGet32 (PcdPeiCoreMaxPpiSupported)-1,
+        PcdGet32 (PcdPeiCoreMaxPpiSupported)-1,
         PrivateData->PpiData.DispatchListEnd
         );
       PrivateData->PpiData.LastDispatchedInstall = TempValue;

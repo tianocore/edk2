@@ -1,7 +1,7 @@
 /** @file
   Pei Core Main Entry Point
   
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -152,6 +152,7 @@ PeiCore (
   EFI_PEI_PCI_CFG2_PPI        *PciCfg;
   EFI_HOB_HANDOFF_INFO_TABLE  *HandoffInformationTable;
   EFI_PEI_TEMPORARY_RAM_DONE_PPI *TemporaryRamDonePpi;
+  UINTN                       Index;
   
   //
   // Retrieve context passed into PEI Core
@@ -181,8 +182,28 @@ PeiCore (
       OldCoreData->CpuIo = &OldCoreData->ServiceTableShadow.CpuIo;
       if (OldCoreData->HeapOffsetPositive) {
         OldCoreData->HobList.Raw = (VOID *)(OldCoreData->HobList.Raw + OldCoreData->HeapOffset);
+        OldCoreData->UnknownFvInfo        = (PEI_CORE_UNKNOW_FORMAT_FV_INFO *) ((UINT8 *) OldCoreData->UnknownFvInfo + OldCoreData->HeapOffset);
+        OldCoreData->CurrentFvFileHandles = (EFI_PEI_FILE_HANDLE *) ((UINT8 *) OldCoreData->CurrentFvFileHandles + OldCoreData->HeapOffset);
+        OldCoreData->PpiData.PpiListPtrs  = (PEI_PPI_LIST_POINTERS *) ((UINT8 *) OldCoreData->PpiData.PpiListPtrs + OldCoreData->HeapOffset);
+        OldCoreData->Fv                   = (PEI_CORE_FV_HANDLE *) ((UINT8 *) OldCoreData->Fv + OldCoreData->HeapOffset);
+        for (Index = 0; Index < PcdGet32 (PcdPeiCoreMaxFvSupported); Index ++) {
+          OldCoreData->Fv[Index].PeimState     = (UINT8 *) OldCoreData->Fv[Index].PeimState + OldCoreData->HeapOffset;
+          OldCoreData->Fv[Index].FvFileHandles = (EFI_PEI_FILE_HANDLE *) ((UINT8 *) OldCoreData->Fv[Index].FvFileHandles + OldCoreData->HeapOffset);
+        }
+        OldCoreData->FileGuid             = (EFI_GUID *) ((UINT8 *) OldCoreData->FileGuid + OldCoreData->HeapOffset);
+        OldCoreData->FileHandles          = (EFI_PEI_FILE_HANDLE *) ((UINT8 *) OldCoreData->FileHandles + OldCoreData->HeapOffset);
       } else {
         OldCoreData->HobList.Raw = (VOID *)(OldCoreData->HobList.Raw - OldCoreData->HeapOffset);
+        OldCoreData->UnknownFvInfo        = (PEI_CORE_UNKNOW_FORMAT_FV_INFO *) ((UINT8 *) OldCoreData->UnknownFvInfo - OldCoreData->HeapOffset);
+        OldCoreData->CurrentFvFileHandles = (EFI_PEI_FILE_HANDLE *) ((UINT8 *) OldCoreData->CurrentFvFileHandles - OldCoreData->HeapOffset);
+        OldCoreData->PpiData.PpiListPtrs  = (PEI_PPI_LIST_POINTERS *) ((UINT8 *) OldCoreData->PpiData.PpiListPtrs - OldCoreData->HeapOffset);
+        OldCoreData->Fv                   = (PEI_CORE_FV_HANDLE *) ((UINT8 *) OldCoreData->Fv - OldCoreData->HeapOffset);
+        for (Index = 0; Index < PcdGet32 (PcdPeiCoreMaxFvSupported); Index ++) {
+          OldCoreData->Fv[Index].PeimState     = (UINT8 *) OldCoreData->Fv[Index].PeimState - OldCoreData->HeapOffset;
+          OldCoreData->Fv[Index].FvFileHandles = (EFI_PEI_FILE_HANDLE *) ((UINT8 *) OldCoreData->Fv[Index].FvFileHandles - OldCoreData->HeapOffset);
+        }
+        OldCoreData->FileGuid             = (EFI_GUID *) ((UINT8 *) OldCoreData->FileGuid - OldCoreData->HeapOffset);
+        OldCoreData->FileHandles          = (EFI_PEI_FILE_HANDLE *) ((UINT8 *) OldCoreData->FileHandles - OldCoreData->HeapOffset);
       }
 
       //
@@ -285,8 +306,25 @@ PeiCore (
 
   //
   // Initialize PEI Core Services
-  //  
+  //
   InitializeMemoryServices   (&PrivateData,    SecCoreData, OldCoreData);
+  if (OldCoreData == NULL) {
+    //
+    // Initialize PEI Core Private Data Buffer
+    //
+    PrivateData.PpiData.PpiListPtrs  = AllocateZeroPool (sizeof (PEI_PPI_LIST_POINTERS) * PcdGet32 (PcdPeiCoreMaxPpiSupported));
+    PrivateData.Fv                   = AllocateZeroPool (sizeof (PEI_CORE_FV_HANDLE) * PcdGet32 (PcdPeiCoreMaxFvSupported));
+    PrivateData.Fv[0].PeimState      = AllocateZeroPool (sizeof (UINT8) * PcdGet32 (PcdPeiCoreMaxPeimPerFv) * PcdGet32 (PcdPeiCoreMaxFvSupported));
+    PrivateData.Fv[0].FvFileHandles  = AllocateZeroPool (sizeof (EFI_PEI_FILE_HANDLE) * PcdGet32 (PcdPeiCoreMaxPeimPerFv) * PcdGet32 (PcdPeiCoreMaxFvSupported));
+    for (Index = 1; Index < PcdGet32 (PcdPeiCoreMaxFvSupported); Index ++) {
+      PrivateData.Fv[Index].PeimState     = PrivateData.Fv[Index - 1].PeimState + PcdGet32 (PcdPeiCoreMaxPeimPerFv);
+      PrivateData.Fv[Index].FvFileHandles = PrivateData.Fv[Index - 1].FvFileHandles + PcdGet32 (PcdPeiCoreMaxPeimPerFv);
+    }
+    PrivateData.UnknownFvInfo        = AllocateZeroPool (sizeof (PEI_CORE_UNKNOW_FORMAT_FV_INFO) * PcdGet32 (PcdPeiCoreMaxFvSupported));
+    PrivateData.CurrentFvFileHandles = AllocateZeroPool (sizeof (EFI_PEI_FILE_HANDLE) * PcdGet32 (PcdPeiCoreMaxPeimPerFv));
+    PrivateData.FileGuid             = AllocatePool (sizeof (EFI_GUID) * PcdGet32 (PcdPeiCoreMaxPeimPerFv));
+    PrivateData.FileHandles          = AllocatePool (sizeof (EFI_PEI_FILE_HANDLE) * (PcdGet32 (PcdPeiCoreMaxPeimPerFv) + 1));
+  }
   InitializePpiServices      (&PrivateData,    OldCoreData);
   
   //

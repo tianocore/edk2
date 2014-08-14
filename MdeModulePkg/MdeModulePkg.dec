@@ -528,18 +528,8 @@
   #  for a dynamic PCD used in PEI phase.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPcdCallBackNumberPerPcdEntry|0x08|UINT32|0x0001000f
 
-  ## Maximum number of FV is supported by PeiCore's dispatching.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported|6|UINT32|0x00010030
-
-  ## Maximum File count in every FV is supported by PeiCore's dispatching.
-  #  PeiCore supported File type includes PEIM, Combined PEIM and FV.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv|32|UINT32|0x00010031
-
   ## Maximum stack size for PeiCore.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeiStackSize|0x20000|UINT32|0x00010032
-
-  ## Maximum PPI count is supported by PeiCore's PPI database.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPpiSupported|64|UINT32|0x00010033
 
   ## Size of the NV variable range. Note that this value should less than or equal to PcdFlashNvStorageFtwSpareSize
   #  The root cause is that variable driver will use FTW protocol to reclaim variable region.
@@ -585,9 +575,6 @@
   #  Other Value:        Enable the feature as fixed absolute address, and the value is the top memory address 
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable|0|UINT64|0x30001015
 
-  ## Smbios version
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0208|UINT16|0x00010055
-
   ## TFTP BlockSize. Initial value 0 means using default block size which is (MTU-IP_HEADER-UDP_HEADER-TFTP_HEADER)
   #  to handle all link layers. If the value is non zero, the PCD value will be used as block size.
   #
@@ -618,6 +605,19 @@
   #  to store PCD value.
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0|UINT32|0x00010010
+
+  ## Maximum number of FV is supported by PeiCore's dispatching.
+  # @Prompt Maximum number of FV supported by PeiCore.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported|6|UINT32|0x00010030
+
+  ## Maximum File count in every FV is supported by PeiCore's dispatching.
+  #  PeiCore supported File type includes PEIM, Combined PEIM and FV.
+  # @Prompt Maximum File count per FV supported by PeiCore.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv|32|UINT32|0x00010031
+
+  ## Maximum PPI count is supported by PeiCore's PPI database.
+  # @Prompt Maximum PPI count supported by PeiCore.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPpiSupported|64|UINT32|0x00010033
 
   ## Maximun number of performance log entries during PEI phase.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries|40|UINT8|0x0001002f
@@ -896,6 +896,10 @@
 
   ## This PCD specifies whether 1G page table is enabled.
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable|FALSE|BOOLEAN|0x0001005E
+
+  ## Smbios version.
+  # @Prompt Smbios version.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0208|UINT16|0x00010055
 
   ## This PCD specifies the additional pad size in FPDT Basic Boot Performance Table for 
   #  the extension FPDT boot records got after ReadyToBoot and before ExitBootService.
