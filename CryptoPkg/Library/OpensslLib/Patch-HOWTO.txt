@@ -17,36 +17,36 @@ cryptography. This patch will enable openssl building under UEFI environment.
 ================================================================================
                                 OpenSSL-Version
 ================================================================================
-  Current supported OpenSSL version for UEFI Crypto Library is 0.9.8za.
-    http://www.openssl.org/source/openssl-0.9.8za.tar.gz
+  Current supported OpenSSL version for UEFI Crypto Library is 0.9.8zb.
+    http://www.openssl.org/source/openssl-0.9.8zb.tar.gz
 
 
 ================================================================================
                       HOW to Install Openssl for UEFI Building
 ================================================================================
-1.  Download OpenSSL 0.9.8za from official website:
-   	http://www.openssl.org/source/openssl-0.9.8za.tar.gz
+1.  Download OpenSSL 0.9.8zb from official website:
+   	http://www.openssl.org/source/openssl-0.9.8zb.tar.gz
 
-    NOTE: Some web browsers may rename the downloaded TAR file to openssl-0.9.8za.tar.tar.
-          When you do the download, rename the "openssl-0.9.8za.tar.tar" to
-          "openssl-0.9.8za.tar.gz" or rename the local downloaded file with ".tar.tar"
+    NOTE: Some web browsers may rename the downloaded TAR file to openssl-0.9.8zb.tar.tar.
+          When you do the download, rename the "openssl-0.9.8zb.tar.tar" to
+          "openssl-0.9.8zb.tar.gz" or rename the local downloaded file with ".tar.tar"
           extension to ".tar.gz".
 
-2.  Extract TAR into CryptoPkg/Library/OpenSslLib/openssl-0.9.8za
+2.  Extract TAR into CryptoPkg/Library/OpenSslLib/openssl-0.9.8zb
 
     NOTE: If you use WinZip to unpack the openssl source in Windows, please 
           uncheck the WinZip smart CR/LF conversion option (WINZIP: Options --> 
           Configuration --> Miscellaneous --> "TAR file smart CR/LF conversion").
   
-3.  Apply this patch: EDKII_openssl-0.9.8za.patch, and make installation
+3.  Apply this patch: EDKII_openssl-0.9.8zb.patch, and make installation
 
     For Windows Environment:
     ------------------------
     1) Make sure the patch utility has been installed in your machine.
        Install Cygwin or get the patch utility binary from 
           http://gnuwin32.sourceforge.net/packages/patch.htm
-    2) cd $(WORKSPACE)\CryptoPkg\Library\OpensslLib\openssl-0.9.8za
-    3) patch -p0 -i ..\EDKII_openssl-0.9.8za.patch
+    2) cd $(WORKSPACE)\CryptoPkg\Library\OpensslLib\openssl-0.9.8zb
+    3) patch -p0 -i ..\EDKII_openssl-0.9.8zb.patch
     4) cd ..
     5) Install.cmd
 
@@ -54,8 +54,8 @@ cryptography. This patch will enable openssl building under UEFI environment.
     -----------------------
     1) Make sure the patch utility has been installed in your machine.
        Patch utility is available from http://directory.fsf.org/project/patch/
-    2) cd $(WORKSPACE)/CryptoPkg/Library/OpensslLib/openssl-0.9.8za
-    3) patch -p0 -i ../EDKII_openssl-0.9.8za.patch
+    2) cd $(WORKSPACE)/CryptoPkg/Library/OpensslLib/openssl-0.9.8zb
+    3) patch -p0 -i ../EDKII_openssl-0.9.8zb.patch
     4) cd ..
     5) ./Install.sh
 
