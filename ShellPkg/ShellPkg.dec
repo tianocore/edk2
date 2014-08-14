@@ -2,7 +2,7 @@
 #
 # This Package provides all definitions for EFI and UEFI Shell
 #
-# Copyright (c) 2013, Hewlett-Packard Development Company, L.P.
+# (C) Copyright 2013-2014, Hewlett-Packard Development Company, L.P.
 # Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available under
@@ -66,7 +66,7 @@
   gEfiShellParametersProtocolGuid     = {0x752f3136, 0x4e16, 0x4fdc, {0xa2, 0x2a, 0xe5, 0xf4, 0x68, 0x12, 0xf4, 0xca}}
   gEfiShellEnvironment2Guid           = {0x47c7b221, 0xc42a, 0x11d2, {0x8e, 0x57, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}}
   gEfiShellInterfaceGuid              = {0x47c7b223, 0xc42a, 0x11d2, {0x8e, 0x57, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}}
-  gEfiShellDynamicCommandProtocolGuid = {0xcd3258c, 0xd677, 0x4fcc, { 0xb3, 0x43, 0x93, 0x4d, 0x30, 0x98, 0x38, 0x88}}
+  gEfiShellDynamicCommandProtocolGuid = {0x3c7200e9, 0x005f, 0x4ea4, {0x87, 0xde, 0xa3, 0xdf, 0xac, 0x8a, 0x27, 0xc3}}
 
 [PcdsFeatureFlag]
   ## This flag is used to control whether the shell includes NT32 platform Guids

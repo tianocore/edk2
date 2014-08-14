@@ -1,7 +1,7 @@
 /** @file
   EFI Shell Dynamic Command registration protocol
 
-  Copyright (c) 2012 Hewlett-Packard Company. All rights reserved.<BR>
+  (C) Copyright 2012-2014, Hewlett-Packard Development Company, L.P.
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -20,10 +20,10 @@
 #include <Protocol/EfiShell.h>
 
 
-// {0CD3258C-D677-4fcc-B343-934D30983888}
+// {3C7200E9-005F-4EA4-87DE-A3DFAC8A27C3}
 #define EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL_GUID \
   { \
-  0xcd3258c, 0xd677, 0x4fcc, { 0xb3, 0x43, 0x93, 0x4d, 0x30, 0x98, 0x38, 0x88 } \
+  0x3c7200e9, 0x005f, 0x4ea4, { 0x87, 0xde, 0xa3, 0xdf, 0xac, 0x8a, 0x27, 0xc3 } \
   }
 
 
