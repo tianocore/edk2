@@ -589,7 +589,6 @@ OrderedCollectionInsert (
 
   Tmp = Tree->Root;
   Parent = NULL;
-  Result = 0;
 
   //
   // First look for a collision, saving the last examined node for the case
