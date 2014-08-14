@@ -1,7 +1,7 @@
 /** @file
   Perform the platform memory test
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -230,11 +230,13 @@ BdsMemoryTest (
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL     Color;
   BOOLEAN                           IsFirstBoot;
   UINT32                            TempData;
+  UINTN                             StrTotalMemorySize;
 
   ReturnStatus = EFI_SUCCESS;
   ZeroMem (&Key, sizeof (EFI_INPUT_KEY));
 
-  Pos = AllocatePool (128);
+  StrTotalMemorySize = 128;
+  Pos = AllocateZeroPool (StrTotalMemorySize);
 
   if (Pos == NULL) {
     return ReturnStatus;
@@ -322,7 +324,7 @@ BdsMemoryTest (
           //
           // TmpStr size is 64, StrPercent is reserved to 16.
           //
-          StrCat (StrPercent, TmpStr);
+          StrnCat (StrPercent, TmpStr, sizeof (StrPercent) / sizeof (CHAR16) - StrLen (StrPercent) - 1);
           PrintXY (10, 10, NULL, NULL, StrPercent);
           FreePool (TmpStr);
         }
@@ -382,11 +384,12 @@ Done:
     UnicodeValueToString (StrTotalMemory, COMMA_TYPE, TotalMemorySize, 0);
     if (StrTotalMemory[0] == L',') {
       StrTotalMemory++;
+      StrTotalMemorySize -= sizeof (CHAR16);
     }
 
     TmpStr = GetStringById (STRING_TOKEN (STR_MEM_TEST_COMPLETED));
     if (TmpStr != NULL) {
-      StrCat (StrTotalMemory, TmpStr);
+      StrnCat (StrTotalMemory, TmpStr, StrTotalMemorySize / sizeof (CHAR16) - StrLen (StrTotalMemory) - 1);
       FreePool (TmpStr);
     }
 

@@ -1,7 +1,7 @@
 /** @file
   The platform device manager reference implementation
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1260,6 +1260,7 @@ CallDriverHealth (
   LIST_ENTRY                  *Link;
   EFI_DEVICE_PATH_PROTOCOL    *DriverDevicePath;
   BOOLEAN                     RebootRequired;
+  UINTN                       StringSize;
 
   Index               = 0;
   DriverHealthInfo    = NULL;  
@@ -1341,7 +1342,8 @@ CallDriverHealth (
     //
     // Assume no line strings is longer than 512 bytes.
     //
-    String = (EFI_STRING) AllocateZeroPool (0x200);
+    StringSize = 0x200;
+    String = (EFI_STRING) AllocateZeroPool (StringSize);
     ASSERT (String != NULL);
 
     Status = DriverHealthGetDriverName (DriverHealthInfo->DriverHandle, &DriverName);
@@ -1410,7 +1412,7 @@ CallDriverHealth (
     }
 
     ASSERT (TmpString != NULL);
-    StrCat (String, TmpString);
+    StrnCat (String, TmpString, StringSize / sizeof (CHAR16) - StrLen (String) - 1);
     FreePool (TmpString);
 
     Token = HiiSetString (HiiHandle, 0, String, NULL);
