@@ -718,9 +718,9 @@ Ip6ConvertInterfaceInfoToString (
   // Print the interface type.
   //
   if (IfInfo->IfType == Ip6InterfaceTypeEthernet) {
-    StrnCpy (PortString, IP6_ETHERNET, sizeof (PortString) / sizeof (CHAR16) - 1);
+    CopyMem (PortString, IP6_ETHERNET, sizeof (IP6_ETHERNET));
   } else if (IfInfo->IfType == Ip6InterfaceTypeExperimentalEthernet) {
-    StrnCpy (PortString, IP6_EXPERIMENTAL_ETHERNET, sizeof (PortString) / sizeof (CHAR16) - 1);
+    CopyMem (PortString, IP6_EXPERIMENTAL_ETHERNET, sizeof (IP6_EXPERIMENTAL_ETHERNET));
   } else {
     //
     // Refer to RFC1700, chapter Number Hardware Type.
@@ -747,9 +747,9 @@ Ip6ConvertInterfaceInfoToString (
   for (Index = 0; Index < IfInfo->HwAddressSize; Index++) {
 
     if (IfInfo->HwAddress.Addr[Index] < 0x10) {
-      StrnCpy (FormatString, L"0%x-", sizeof (FormatString) / sizeof (CHAR16) - 1);
+      CopyMem (FormatString, L"0%x-", sizeof (L"0%x-"));
     } else {
-      StrnCpy (FormatString, L"%x-", sizeof (FormatString) / sizeof (CHAR16) - 1);
+      CopyMem (FormatString, L"%x-", sizeof (L"%x-"));
     }
 
     Number = UnicodeSPrint (

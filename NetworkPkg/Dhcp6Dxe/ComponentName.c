@@ -259,7 +259,7 @@ UpdateName (
 {
   EFI_STATUS                       Status;
   EFI_DHCP6_MODE_DATA              Dhcp6ModeData;
-  CHAR16                           HandleName[64];
+  CHAR16                           *HandleName;
 
   if (Dhcp6 == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -279,9 +279,12 @@ UpdateName (
   }
   
   if (Dhcp6ModeData.Ia == NULL) {
-    UnicodeSPrint (HandleName, sizeof (HandleName), L"DHCPv6 (No configured IA)");
+    HandleName = L"DHCPv6 (No configured IA)";
   } else {
-    StrnCpy (HandleName, mDhcp6ControllerName[Dhcp6ModeData.Ia->State], sizeof (HandleName) / sizeof (CHAR16) - 1);
+    if (Dhcp6ModeData.Ia->State > Dhcp6Rebinding) {
+      return EFI_DEVICE_ERROR;
+    }
+    HandleName = mDhcp6ControllerName[Dhcp6ModeData.Ia->State];
   }
   
   Status = AddUnicodeString2 (
