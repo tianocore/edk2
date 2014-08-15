@@ -478,7 +478,7 @@ GetToken (
 
   BufSize = 0;
   Buffer  = NULL;
-  TokenFile = FixedPcdGetPtr (PcdFixedUsbCredentialProviderTokenFileName);
+  TokenFile = PcdGetPtr (PcdFixedUsbCredentialProviderTokenFileName);
   Status = GetFileData (TokenFile, (VOID *)&Buffer, &BufSize);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Read file %s from USB error! Status=(%r)\n", TokenFile, Status));

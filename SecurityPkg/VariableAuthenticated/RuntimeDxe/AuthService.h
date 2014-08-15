@@ -2,7 +2,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by AuthService module.
 
-Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -38,18 +38,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define AUTHVAR_KEYDB_NAME      L"AuthVarKeyDatabase"
 
 ///
-/// Max size of public key database, restricted by max individal EFI varible size, exclude variable header and name size.
-///
-#define MAX_KEYDB_SIZE  (FixedPcdGet32 (PcdMaxVariableSize) - sizeof (VARIABLE_HEADER) - sizeof (AUTHVAR_KEYDB_NAME))
-#define MAX_KEY_NUM     (MAX_KEYDB_SIZE / EFI_CERT_TYPE_RSA2048_SIZE)
-
-///
 /// "certdb" variable stores the signer's certificates for non PK/KEK/DB/DBX
 /// variables with EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set.
 /// 
 ///
 #define EFI_CERT_DB_NAME        L"certdb"
-#define MAX_CERTDB_SIZE (FixedPcdGet32 (PcdMaxVariableSize) - sizeof (VARIABLE_HEADER) - sizeof (EFI_CERT_DB_NAME))
 
 ///
 /// Struct to record signature requirement defined by UEFI spec.
@@ -326,7 +319,8 @@ VerifyTimeBasedPayload (
   OUT    BOOLEAN                            *VarDel
   );
 
-extern UINT8  mPubKeyStore[MAX_KEYDB_SIZE];
+extern UINT8  *mPubKeyStore;
+extern UINT8  *mCertDbStore;
 extern UINT32 mPubKeyNumber;
 extern VOID   *mHashCtx;
 extern UINT8  *mSerializationRuntimeBuffer;

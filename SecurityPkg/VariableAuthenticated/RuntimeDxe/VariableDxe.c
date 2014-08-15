@@ -243,6 +243,8 @@ VariableClassAddressChangeEvent (
   EfiConvertPointer (0x0, (VOID **) &mHashCtx);
   EfiConvertPointer (0x0, (VOID **) &mSerializationRuntimeBuffer);
   EfiConvertPointer (0x0, (VOID **) &mNvVariableCache);
+  EfiConvertPointer (0x0, (VOID **) &mPubKeyStore);
+  EfiConvertPointer (0x0, (VOID **) &mCertDbStore);
 
   //
   // in the list of locked variables, convert the name pointers first

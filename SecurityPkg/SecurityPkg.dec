@@ -216,10 +216,6 @@
   # IMAGE_FROM_FIXED_MEDIA                0x00000010
   gEfiSecurityPkgTokenSpaceGuid.PcdDeferImageLoadPolicy|0x0000001F|UINT32|0x0000004
   
-  ## The token file name used to save credential in USB credential provider driver.
-  #  The specified file should be saved at the root directory of USB storage disk.
-  gEfiSecurityPkgTokenSpaceGuid.PcdFixedUsbCredentialProviderTokenFileName|L"Token.bin"|VOID*|0x00000005
-
   ## The size of Append variable buffer. This buffer is reserved for runtime use, OS can append data into one existing variable.
   gEfiSecurityPkgTokenSpaceGuid.PcdMaxAppendVariableSize|0x2000|UINT32|0x30000005  
 
@@ -229,6 +225,12 @@
   #  If 1, TCG platform type is server.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmPlatformClass|0|UINT8|0x00000006
 
+[PcdsFixedAtBuild, PcdsPatchableInModule]
+  ## Null-terminated Unicode string of the file name that is the default name to save USB credential.
+  #  The specified file should be saved at the root directory of USB storage disk.
+  # @Prompt File name to save credential.
+  gEfiSecurityPkgTokenSpaceGuid.PcdFixedUsbCredentialProviderTokenFileName|L"Token.bin"|VOID*|0x00000005
+  
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD indicates the presence or absence of the platform operator.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmPhysicalPresence|TRUE|BOOLEAN|0x00010001

@@ -32,9 +32,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///
 /// Global database array for scratch
 ///
-UINT8    mPubKeyStore[MAX_KEYDB_SIZE];
+UINT8    *mPubKeyStore;
 UINT32   mPubKeyNumber;
-UINT8    mCertDbStore[MAX_CERTDB_SIZE];
+UINT32   mMaxKeyNumber;
+UINT32   mMaxKeyDbSize;
+UINT8    *mCertDbStore;
+UINT32   mMaxCertDbSize;
 UINT32   mPlatformMode;
 UINT8    mVendorKeyState;
 
@@ -180,6 +183,25 @@ AutenticatedVariableServiceInitialize (
   CtxSize   = Sha256GetContextSize ();
   mHashCtx  = AllocateRuntimePool (CtxSize);
   if (mHashCtx == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Reserve runtime buffer for public key database. The size excludes variable header and name size.
+  //
+  mMaxKeyDbSize = PcdGet32 (PcdMaxVariableSize) - sizeof (VARIABLE_HEADER) - sizeof (AUTHVAR_KEYDB_NAME);
+  mMaxKeyNumber = mMaxKeyDbSize / EFI_CERT_TYPE_RSA2048_SIZE;
+  mPubKeyStore  = AllocateRuntimePool (mMaxKeyDbSize);
+  if (mPubKeyStore == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Reserve runtime buffer for certificate database. The size excludes variable header and name size.
+  //
+  mMaxCertDbSize = PcdGet32 (PcdMaxVariableSize) - sizeof (VARIABLE_HEADER) - sizeof (EFI_CERT_DB_NAME);
+  mCertDbStore   = AllocateRuntimePool (mMaxCertDbSize);
+  if (mCertDbStore == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -503,7 +525,7 @@ AddPubKeyInStore (
     //
     // Add public key in database.
     //
-    if (mPubKeyNumber == MAX_KEY_NUM) {
+    if (mPubKeyNumber == mMaxKeyNumber) {
       //
       // Public key dadatase is full, try to reclaim invalid key.
       //
@@ -545,7 +567,7 @@ AddPubKeyInStore (
       CopyMem (mPubKeyStore, (UINT8 *) Data, DataSize);
       mPubKeyNumber = (UINT32) (DataSize / EFI_CERT_TYPE_RSA2048_SIZE);
 
-      if (mPubKeyNumber == MAX_KEY_NUM) {
+      if (mPubKeyNumber == mMaxKeyNumber) {
         return 0;
       }     
     }
@@ -1996,7 +2018,7 @@ InsertCertsToDb (
   NameSize      = (UINT32) StrLen (VariableName);
   CertNodeSize  = sizeof (AUTH_CERT_DB_DATA) + (UINT32) CertDataSize + NameSize * sizeof (CHAR16); 
   NewCertDbSize = (UINT32) DataSize + CertNodeSize;
-  if (NewCertDbSize > MAX_CERTDB_SIZE) {
+  if (NewCertDbSize > mMaxCertDbSize) {
     return EFI_OUT_OF_RESOURCES;
   }
   NewCertDb     = (UINT8*) mCertDbStore;
