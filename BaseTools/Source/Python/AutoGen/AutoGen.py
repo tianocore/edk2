@@ -13,7 +13,7 @@
 
 ## Import Modules
 #
-import os
+import Common.LongFilePathOs as os
 import re
 import os.path as path
 import copy
@@ -26,6 +26,7 @@ from StringIO import StringIO
 from StrGather import *
 from BuildEngine import BuildRule
 
+from Common.LongFilePathSupport import CopyLongFilePath
 from Common.BuildToolError import *
 from Common.DataType import *
 from Common.Misc import *

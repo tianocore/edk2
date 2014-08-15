@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -25,6 +25,12 @@ Abstract:
 #include <Common/UefiBaseTypes.h>
 #include <Common/BuildVersion.h>
 #define PRINTED_GUID_BUFFER_SIZE  37  // including null-termination
+
+#define MAX_LONG_FILE_PATH 500
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 //
 // Function declarations
 //
@@ -144,6 +150,27 @@ PrintGuidToBuffer (
   IN BOOLEAN      Uppercase
   )
 ;
+
+CHAR8 *
+LongFilePath (
+ IN CHAR8 *FileName
+);
+/*++
+
+Routine Description:
+  Convert FileName to the long file path, which can support larger than 260 length. 
+
+Arguments:
+  FileName         - FileName. 
+
+Returns:
+  LongFilePath      A pointer to the converted long file path.
+  
+--*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #define ASSERT(x) assert(x)
 

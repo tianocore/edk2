@@ -15,8 +15,7 @@
 # Import Modules
 #
 import sqlite3
-import os
-import os.path
+import Common.LongFilePathOs as os
 import pickle
 import uuid
 

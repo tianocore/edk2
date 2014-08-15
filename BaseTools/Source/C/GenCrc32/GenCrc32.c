@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -282,7 +282,7 @@ Returns:
   //
   // Open Input file and read file data.
   //
-  InFile = fopen (InputFileName, "rb");
+  InFile = fopen (LongFilePath (InputFileName), "rb");
   if (InFile == NULL) {
     Error (NULL, 0, 0001, "Error opening file", InputFileName);
     return STATUS_ERROR;
@@ -305,7 +305,7 @@ Returns:
   //
   // Open output file
   //
-  OutFile = fopen (OutputFileName, "wb");
+  OutFile = fopen (LongFilePath (OutputFileName), "wb");
   if (OutFile == NULL) {
     Error (NULL, 0, 0001, "Error opening file", OutputFileName);
     goto Finish;

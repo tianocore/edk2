@@ -1,6 +1,6 @@
 /**
 
-Copyright (c) 1999 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available 
 under the terms and conditions of the BSD License which accompanies this 
 distribution.  The full text of the license may be found at
@@ -1070,7 +1070,7 @@ Returns:
   CHAR8   Buff5[10];
   CHAR8   Token[50];
 
-  Fp = fopen (VtfInfo->CompSymName, "rb");
+  Fp = fopen (LongFilePath (VtfInfo->CompSymName), "rb");
 
   if (Fp == NULL) {
     Error (NULL, 0, 0001, "Error opening file", VtfInfo->CompSymName);
@@ -1152,7 +1152,7 @@ Returns:
     return EFI_SUCCESS;
   }
 
-  Fp = fopen (VtfInfo->CompBinName, "rb");
+  Fp = fopen (LongFilePath (VtfInfo->CompBinName), "rb");
 
   if (Fp == NULL) {
     Error (NULL, 0, 0001, "Error opening file", VtfInfo->CompBinName);
@@ -1332,7 +1332,7 @@ Returns:
   FILE        *Fp;
   FIT_TABLE   *PalFitPtr;
 
-  Fp = fopen (VtfInfo->CompBinName, "rb");
+  Fp = fopen (LongFilePath (VtfInfo->CompBinName), "rb");
 
   if (Fp == NULL) {
     Error (NULL, 0, 0001, "Error opening file", VtfInfo->CompBinName);
@@ -1551,7 +1551,7 @@ Returns:
     VtfBuffer = (VOID *) RelativeAddress;
   }
 
-  Fp = fopen (FileName, "wb");
+  Fp = fopen (LongFilePath (FileName), "wb");
   if (Fp == NULL) {
     Error (NULL, 0, 0001, "Error opening file", FileName);
     return EFI_ABORTED;
@@ -1763,7 +1763,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  Fp = fopen (FileName, "rb");
+  Fp = fopen (LongFilePath (FileName), "rb");
 
   if (Fp == NULL) {
     Error (NULL, 0, 0001, "Error opening file", FileName);
@@ -2125,7 +2125,7 @@ Returns:
   }
   *StartAddressPtr = StartAddress;
 
-  Fp = fopen (OutFileName1, "rb");
+  Fp = fopen (LongFilePath (OutFileName1), "rb");
 
   if (Fp == NULL) {
     Error (NULL, 0, 0001, "Error opening file", OutFileName1);
@@ -2183,12 +2183,12 @@ Returns:
 {
   FILE    *SourceFile;
   FILE    *DestFile;
-  CHAR8   Buffer[_MAX_PATH];
-  CHAR8   Type[_MAX_PATH];
-  CHAR8   Address[_MAX_PATH];
-  CHAR8   Section[_MAX_PATH];
-  CHAR8   Token[_MAX_PATH];
-  CHAR8   BaseToken[_MAX_PATH];
+  CHAR8   Buffer[MAX_LONG_FILE_PATH];
+  CHAR8   Type[MAX_LONG_FILE_PATH];
+  CHAR8   Address[MAX_LONG_FILE_PATH];
+  CHAR8   Section[MAX_LONG_FILE_PATH];
+  CHAR8   Token[MAX_LONG_FILE_PATH];
+  CHAR8   BaseToken[MAX_LONG_FILE_PATH];
   UINT64  TokenAddress;
   long    StartLocation;
 
@@ -2202,7 +2202,7 @@ Returns:
   //
   // Open the source file
   //
-  SourceFile = fopen (SourceFileName, "r");
+  SourceFile = fopen (LongFilePath (SourceFileName), "r");
   if (SourceFile == NULL) {
 
     //
@@ -2221,7 +2221,7 @@ Returns:
   //
   // Open the destination file
   //
-  DestFile = fopen (DestFileName, "a+");
+  DestFile = fopen (LongFilePath (DestFileName), "a+");
   if (DestFile == NULL) {
     fclose (SourceFile);
     Error (NULL, 0, 0001, "Error opening file", DestFileName);
@@ -2252,7 +2252,7 @@ Returns:
   //
   // Read the first line
   //
-  if (fgets (Buffer, _MAX_PATH, SourceFile) == NULL) {
+  if (fgets (Buffer, MAX_LONG_FILE_PATH, SourceFile) == NULL) {
     Buffer[0] = 0;
   }
 
@@ -2410,7 +2410,7 @@ Returns:
   //
   // Copyright declaration
   //
-  fprintf (stdout, "Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.\n\n");
+  fprintf (stdout, "Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.\n\n");
   //
   // Details Option
   //
@@ -2546,7 +2546,7 @@ Returns:
       // Get the input VTF file name
       //
       VtfFileName = argv[Index+1];
-      VtfFP = fopen(VtfFileName, "rb");
+      VtfFP = fopen (LongFilePath (VtfFileName), "rb");
       if (VtfFP == NULL) {
         Error (NULL, 0, 0001, "Error opening file", VtfFileName);
         goto ERROR;

@@ -55,7 +55,8 @@ from Common.String import ReplaceMacro
 from Common.Misc import tdict
 
 import re
-import os
+import Common.LongFilePathOs as os
+from Common.LongFilePathSupport import OpenLongFilePath as open
 
 ##define T_CHAR_SPACE                ' '
 ##define T_CHAR_NULL                 '\0'

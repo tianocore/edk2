@@ -1,7 +1,7 @@
 ## @file
 # Create makefile for MS nmake and GNU make
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -13,11 +13,12 @@
 
 ## Import Modules
 #
-import os
+import Common.LongFilePathOs as os
 import sys
 import string
 import re
 import os.path as path
+from Common.LongFilePathSupport import OpenLongFilePath as open
 
 from Common.BuildToolError import *
 from Common.Misc import *

@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -23,6 +23,11 @@ Abstract:
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#ifdef __GNUC__
+#include <unistd.h>
+#else
+#include <direct.h>
+#endif
 #include "CommonLib.h"
 #include "EfiUtilityMsgs.h"
 
@@ -196,7 +201,7 @@ Returns:
   //
   // Open the file
   //
-  InputFile = fopen (InputFileName, "rb");
+  InputFile = fopen (LongFilePath (InputFileName), "rb");
   if (InputFile == NULL) {
     Error (NULL, 0, 0001, "Error opening the input file", InputFileName);
     return EFI_ABORTED;
@@ -297,7 +302,7 @@ Returns:
   //
   // Open the file
   //
-  OutputFile = fopen (OutputFileName, "wb");
+  OutputFile = fopen (LongFilePath (OutputFileName), "wb");
   if (OutputFile == NULL) {
     Error (NULL, 0, 0001, "Error opening the output file", OutputFileName);
     return EFI_ABORTED;
@@ -582,3 +587,124 @@ char *strlwr(char *s)
 }
 #endif
 #endif
+
+#define WINDOWS_EXTENSION_PATH "\\\\?\\"
+#define WINDOWS_UNC_EXTENSION_PATH "\\\\?\\UNC"
+
+//
+// Global data to store full file path. It is not required to be free. 
+//
+CHAR8 mCommonLibFullPath[MAX_LONG_FILE_PATH];
+
+CHAR8 *
+LongFilePath (
+ IN CHAR8 *FileName
+ )
+/*++
+
+Routine Description:
+  Convert FileName to the long file path, which can support larger than 260 length. 
+
+Arguments:
+  FileName         - FileName. 
+
+Returns:
+  LongFilePath      A pointer to the converted long file path.
+  
+--*/
+{
+#ifdef __GNUC__
+  //
+  // __GNUC__ may not be good way to differentiate unix and windows. Need more investigation here. 
+  // unix has no limitation on file path. Just return FileName. 
+  //
+  return FileName;
+#else
+  CHAR8 *RootPath;
+  CHAR8 *PathPointer;
+  CHAR8 *NextPointer;
+  
+  PathPointer = (CHAR8 *) FileName;
+  
+  if (FileName != NULL) {
+    //
+    // Add the extension string first to support long file path. 
+    //
+    mCommonLibFullPath[0] = 0;
+    strcpy (mCommonLibFullPath, WINDOWS_EXTENSION_PATH);
+
+    if (strlen (FileName) > 1 && FileName[0] == '\\' && FileName[1] == '\\') {
+      //
+      // network path like \\server\share to \\?\UNC\server\share
+      //
+      strcpy (mCommonLibFullPath, WINDOWS_UNC_EXTENSION_PATH);
+      FileName ++;
+    } else if (strlen (FileName) < 3 || FileName[1] != ':' || (FileName[2] != '\\' && FileName[2] != '/')) {
+      //
+      // Relative file path. Convert it to absolute path. 
+      //
+      RootPath = getcwd (NULL, 0);
+      if (RootPath != NULL) {
+        strcat (mCommonLibFullPath, RootPath);
+        if (FileName[0] != '\\' && FileName[0] != '/') {
+          //
+          // Attach directory separator
+          //
+          strcat (mCommonLibFullPath, "\\");
+        }
+        free (RootPath);
+      }
+    }
+
+    //
+    // Construct the full file path
+    //
+    strcat (mCommonLibFullPath, FileName);
+    
+    //
+    // Convert directory separator '/' to '\\'
+    //
+    PathPointer = (CHAR8 *) mCommonLibFullPath;
+    do {
+      if (*PathPointer == '/') {
+        *PathPointer = '\\';
+      }
+    } while (*PathPointer ++ != '\0');
+    
+    //
+    // Convert "\\.\\" to "\\", because it doesn't work with WINDOWS_EXTENSION_PATH.
+    //
+    while ((PathPointer = strstr (mCommonLibFullPath, "\\.\\")) != NULL) {
+      *PathPointer = '\0';
+      strcat (mCommonLibFullPath, PathPointer + 2);
+    }
+    
+    //
+    // Convert "\\..\\" to last directory, because it doesn't work with WINDOWS_EXTENSION_PATH.
+    //
+    while ((PathPointer = strstr (mCommonLibFullPath, "\\..\\")) != NULL) {
+      NextPointer = PathPointer + 3;
+      do {
+        PathPointer --;
+      } while (PathPointer > mCommonLibFullPath && *PathPointer != ':' && *PathPointer != '\\');
+
+      if (*PathPointer == '\\') {
+        //
+        // Skip one directory
+        //
+        *PathPointer = '\0';
+        strcat (mCommonLibFullPath, NextPointer);
+      } else {
+        //
+        // No directory is found. Just break.
+        //
+        break;
+      }
+    }
+    
+    PathPointer = mCommonLibFullPath;
+  }
+  
+  return PathPointer;
+#endif
+}

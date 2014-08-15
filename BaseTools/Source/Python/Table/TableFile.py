@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create/update/query/erase table for files
 #
-# Copyright (c) 2008, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -17,7 +17,7 @@
 import Common.EdkLogger as EdkLogger
 from Table import Table
 from Common.String import ConvertToSqlString
-import os
+import Common.LongFilePathOs as os
 from CommonDataClass.DataClass import FileClass
 
 ## TableFile

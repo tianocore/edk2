@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -153,7 +153,7 @@ GetPathInfo (
     }  
      
     // Try to open the device.   
-    f = fopen(PathInfo->Path,"r");
+    f = fopen (LongFilePath (PathInfo->Path),"r");
     if (f == NULL) {
       printf ("error :open device failed!\n");
       return ErrorPath;
@@ -167,7 +167,7 @@ GetPathInfo (
   if (PathInfo->Input) {
     // If path is file path, check whether file is valid.
     printf("Path = %s\n",PathInfo->Path);
-    f = fopen (PathInfo->Path, "r");
+    f = fopen (LongFilePath (PathInfo->Path), "r");
     if (f == NULL) {
       fprintf (stderr, "Test error E2003: File was not provided!\n");
       return ErrorPath;
@@ -211,7 +211,7 @@ ProcessBsOrMbr (
   FILE *OutputFile;
   
   
-  InputFile = fopen(InputInfo->PhysicalPath, "r");
+  InputFile = fopen (LongFilePath (InputInfo->PhysicalPath), "r");
   if (InputFile == NULL) {
     return ErrorFileReadWrite;
   }
@@ -235,9 +235,9 @@ ProcessBsOrMbr (
   } 
   
   //Process Floppy Disk
-  OutputFile = fopen(OutputInfo->PhysicalPath, "r+");
+  OutputFile = fopen (LongFilePath (OutputInfo->PhysicalPath), "r+");
   if (OutputFile == NULL) {
-    OutputFile = fopen(OutputInfo->PhysicalPath, "w");
+    OutputFile = fopen (LongFilePath (OutputInfo->PhysicalPath), "w");
     if (OutputFile == NULL) {
       return ErrorFileReadWrite;
     }
@@ -276,7 +276,7 @@ Version (
   )
 {
   printf ("%s v%d.%d %s-Utility to retrieve and update the boot sector or MBR.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
-  printf ("Copyright (c) 2007-2010 Intel Corporation. All rights reserved.\n");
+  printf ("Copyright (c) 2007-2014 Intel Corporation. All rights reserved.\n");
 }
 
 

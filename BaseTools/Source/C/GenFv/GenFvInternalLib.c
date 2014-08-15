@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 Portions Copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -187,7 +187,7 @@ Returns:
   EFI_NOT_FOUND     A required string was not found in the INF file.
 --*/
 {
-  CHAR8       Value[_MAX_PATH];
+  CHAR8       Value[MAX_LONG_FILE_PATH];
   UINT64      Value64;
   UINTN       Index;
   UINTN       Number;
@@ -730,7 +730,7 @@ Returns:
 
 --*/
 {
-  CHAR8                               PeMapFileName [_MAX_PATH];
+  CHAR8                               PeMapFileName [MAX_LONG_FILE_PATH];
   CHAR8                               *Cptr, *Cptr2;
   CHAR8                               FileGuidName [MAX_LINE_LEN];
   FILE                                *PeMapFile;
@@ -866,7 +866,7 @@ Returns:
   //
   // Open PeMapFile
   //
-  PeMapFile = fopen (PeMapFileName, "r");
+  PeMapFile = fopen (LongFilePath (PeMapFileName), "r");
   if (PeMapFile == NULL) {
     // fprintf (stdout, "can't open %s file to reading\n", PeMapFileName);
     return EFI_ABORTED;
@@ -992,7 +992,7 @@ Returns:
   //
   // Read the file to add
   //
-  NewFile = fopen (FvInfo->FvFiles[Index], "rb");
+  NewFile = fopen (LongFilePath (FvInfo->FvFiles[Index]), "rb");
 
   if (NewFile == NULL) {
     Error (NULL, 0, 0001, "Error opening file", FvInfo->FvFiles[Index]);
@@ -2077,12 +2077,12 @@ Returns:
   UINT8                           *FvImage;
   UINTN                           FvImageSize;
   FILE                            *FvFile;
-  CHAR8                           FvMapName [_MAX_PATH];
+  CHAR8                           FvMapName [MAX_LONG_FILE_PATH];
   FILE                            *FvMapFile;
   EFI_FIRMWARE_VOLUME_EXT_HEADER  *FvExtHeader;
   FILE                            *FvExtHeaderFile;
   UINTN                           FileSize;
-  CHAR8                           FvReportName[_MAX_PATH];
+  CHAR8                           FvReportName[MAX_LONG_FILE_PATH];
   FILE                            *FvReportFile;
 
   FvBufferHeader = NULL;
@@ -2152,7 +2152,7 @@ Returns:
     //
     // Open the FV Extension Header file
     //
-    FvExtHeaderFile = fopen (mFvDataInfo.FvExtHeaderFile, "rb");
+    FvExtHeaderFile = fopen (LongFilePath (mFvDataInfo.FvExtHeaderFile), "rb");
 
     //
     // Get the file size
@@ -2343,7 +2343,7 @@ Returns:
   //
   // Open FvMap file
   //
-  FvMapFile = fopen (FvMapName, "w");
+  FvMapFile = fopen (LongFilePath (FvMapName), "w");
   if (FvMapFile == NULL) {
     Error (NULL, 0, 0001, "Error opening file", FvMapName);
     return EFI_ABORTED;
@@ -2352,7 +2352,7 @@ Returns:
   //
   // Open FvReport file
   //
-  FvReportFile = fopen(FvReportName, "w");
+  FvReportFile = fopen (LongFilePath (FvReportName), "w");
   if (FvReportFile == NULL) {
     Error (NULL, 0, 0001, "Error opening file", FvReportName);
     return EFI_ABORTED;
@@ -2484,7 +2484,7 @@ WriteFile:
   //
   // Write fv file
   //
-  FvFile = fopen (FvFileName, "wb");
+  FvFile = fopen (LongFilePath (FvFileName), "wb");
   if (FvFile == NULL) {
     Error (NULL, 0, 0001, "Error opening file", FvFileName);
     Status = EFI_ABORTED;
@@ -2651,7 +2651,7 @@ Returns:
   // Calculate PI extension header
   //
   if (mFvDataInfo.FvExtHeaderFile[0] != '\0') {
-    fpin = fopen (mFvDataInfo.FvExtHeaderFile, "rb");
+    fpin = fopen (LongFilePath (mFvDataInfo.FvExtHeaderFile), "rb");
     if (fpin == NULL) {
       Error (NULL, 0, 0001, "Error opening file", mFvDataInfo.FvExtHeaderFile);
       return EFI_ABORTED;
@@ -2678,7 +2678,7 @@ Returns:
     // Open FFS file
     //
     fpin = NULL;
-    fpin = fopen (FvInfoPtr->FvFiles[Index], "rb");
+    fpin = fopen (LongFilePath (FvInfoPtr->FvFiles[Index]), "rb");
     if (fpin == NULL) {
       Error (NULL, 0, 0001, "Error opening file", FvInfoPtr->FvFiles[Index]);
       return EFI_ABORTED;
@@ -2915,7 +2915,7 @@ Returns:
   EFI_TE_IMAGE_HEADER                   *TEImageHeader;
   UINT8                                 *MemoryImagePointer;
   EFI_IMAGE_SECTION_HEADER              *SectionHeader;
-  CHAR8                                 PeFileName [_MAX_PATH];
+  CHAR8                                 PeFileName [MAX_LONG_FILE_PATH];
   CHAR8                                 *Cptr;
   FILE                                  *PeFile;
   UINT8                                 *PeFileBuffer;
@@ -3066,7 +3066,7 @@ Returns:
             *(Cptr + 3) = 'i';
             *(Cptr + 4) = '\0';
           }
-          PeFile = fopen (PeFileName, "rb");
+          PeFile = fopen (LongFilePath (PeFileName), "rb");
           if (PeFile == NULL) {
             Warning (NULL, 0, 0, "Invalid", "The file %s has no .reloc section.", FileName);
             //Error (NULL, 0, 3000, "Invalid", "The file %s has no .reloc section.", FileName);
@@ -3322,7 +3322,7 @@ Returns:
         *(Cptr + 4) = '\0';
       }
 
-      PeFile = fopen (PeFileName, "rb");
+      PeFile = fopen (LongFilePath (PeFileName), "rb");
       if (PeFile == NULL) {
         Warning (NULL, 0, 0, "Invalid", "The file %s has no .reloc section.", FileName);
         //Error (NULL, 0, 3000, "Invalid", "The file %s has no .reloc section.", FileName);
@@ -3567,7 +3567,7 @@ Returns:
   EFI_NOT_FOUND     A required string was not found in the INF file.
 --*/
 {
-  CHAR8       Value[_MAX_PATH];
+  CHAR8       Value[MAX_LONG_FILE_PATH];
   UINT64      Value64;
   UINTN       Index, Number;
   EFI_STATUS  Status;
@@ -3773,7 +3773,7 @@ Returns:
   FileSize = 0;
   CapSize  = mCapDataInfo.HeaderSize;
   while (mCapDataInfo.CapFiles [Index][0] != '\0') {
-    fpin = fopen (mCapDataInfo.CapFiles[Index], "rb");
+    fpin = fopen (LongFilePath (mCapDataInfo.CapFiles[Index]), "rb");
     if (fpin == NULL) {
       Error (NULL, 0, 0001, "Error opening file", mCapDataInfo.CapFiles[Index]);
       return EFI_ABORTED;
@@ -3811,7 +3811,7 @@ Returns:
   FileSize = 0;
   CapSize  = CapsuleHeader->HeaderSize;
   while (mCapDataInfo.CapFiles [Index][0] != '\0') {
-    fpin = fopen (mCapDataInfo.CapFiles[Index], "rb");
+    fpin = fopen (LongFilePath (mCapDataInfo.CapFiles[Index]), "rb");
     if (fpin == NULL) {
       Error (NULL, 0, 0001, "Error opening file", mCapDataInfo.CapFiles[Index]);
       free (CapBuffer);
@@ -3827,7 +3827,7 @@ Returns:
   //
   // write capsule data into the output file
   //
-  fpout = fopen (CapFileName, "wb");
+  fpout = fopen (LongFilePath (CapFileName), "wb");
   if (fpout == NULL) {
     Error (NULL, 0, 0001, "Error opening file", CapFileName);
     free (CapBuffer);

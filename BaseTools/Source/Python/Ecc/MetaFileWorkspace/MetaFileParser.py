@@ -14,7 +14,7 @@
 ##
 # Import Modules
 #
-import os
+import Common.LongFilePathOs as os
 import re
 import time
 import copy
@@ -31,7 +31,8 @@ from Common.Expression import *
 from CommonDataClass.Exceptions import *
 
 from MetaFileTable import MetaFileStorage
-from GenFds.FdfParser import FdfParser  
+from GenFds.FdfParser import FdfParser
+from Common.LongFilePathSupport import OpenLongFilePath as open
 
 ## A decorator used to parse macro definition
 def ParseMacro(Parser):

@@ -1,7 +1,7 @@
 ## @file
 # process Version section generation
 #
-#  Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,10 +17,11 @@
 #
 from Ffs import Ffs
 import Section
-import os
+import Common.LongFilePathOs as os
 import subprocess
 from GenFdsGlobalVariable import GenFdsGlobalVariable
 from CommonDataClass.FdfClass import VerSectionClassObject
+from Common.LongFilePathSupport import OpenLongFilePath as open
 
 ## generate version section
 #

@@ -2,7 +2,7 @@
 
   Split a file into two pieces at the request offset.
 
-Copyright (c) 1999 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
 distribution.  The full text of the license may be found at
@@ -58,7 +58,7 @@ Returns:
 --*/
 {
   printf ("%s v%d.%d %s -Utility to break a file into two pieces at the request offset.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
-  printf ("Copyright (c) 1999-2010 Intel Corporation. All rights reserved.\n");
+  printf ("Copyright (c) 1999-2014 Intel Corporation. All rights reserved.\n");
 }
 
 void
@@ -348,7 +348,7 @@ Returns:
     return STATUS_ERROR;
   }
 
-  In = fopen (InputFileName, "rb");
+  In = fopen (LongFilePath (InputFileName), "rb");
   if (In == NULL) {
     // ("Unable to open file \"%s\"\n", InputFileName);
     Error (InputFileName, 0, 1, "File open failure", NULL);
@@ -400,14 +400,14 @@ Returns:
   chdir(CurrentDir);
   free(CurrentDir);
 
-  Out1 = fopen (OutFileName1, "wb");
+  Out1 = fopen (LongFilePath (OutFileName1), "wb");
   if (Out1 == NULL) {
     // ("Unable to open file \"%s\"\n", OutFileName1);
     Error (OutFileName1, 0, 1, "File open failure", NULL);
     return STATUS_ERROR;
   }
 
-  Out2 = fopen (OutFileName2, "wb");
+  Out2 = fopen (LongFilePath (OutFileName2), "wb");
   if (Out2 == NULL) {
     // ("Unable to open file \"%s\"\n", OutFileName2);
     Error (OutFileName2, 0, 1, "File open failure", NULL);

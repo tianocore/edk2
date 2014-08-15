@@ -1,7 +1,7 @@
 ## @file
 # generate flash image
 #
-#  Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,7 +17,7 @@
 #
 from optparse import OptionParser
 import sys
-import os
+import Common.LongFilePathOs as os
 import linecache
 import FdfParser
 import Common.BuildToolError as BuildToolError
@@ -42,7 +42,7 @@ from Common.BuildVersion import gBUILD_VERSION
 ## Version and Copyright
 versionNumber = "1.0" + ' ' + gBUILD_VERSION
 __version__ = "%prog Version " + versionNumber
-__copyright__ = "Copyright (c) 2007 - 2013, Intel Corporation  All rights reserved."
+__copyright__ = "Copyright (c) 2007 - 2014, Intel Corporation  All rights reserved."
 
 ## Tool entrance method
 #

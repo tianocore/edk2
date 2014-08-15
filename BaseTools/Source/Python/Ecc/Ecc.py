@@ -14,7 +14,7 @@
 ##
 # Import Modules
 #
-import os, time, glob, sys
+import Common.LongFilePathOs as os, time, glob, sys
 import Common.EdkLogger as EdkLogger
 import Database
 import EccGlobalData
@@ -37,6 +37,7 @@ from MetaFileWorkspace.MetaFileTable import MetaFileStorage
 import c
 import re, string
 from Exception import *
+from Common.LongFilePathSupport import OpenLongFilePath as open
 
 ## Ecc
 #

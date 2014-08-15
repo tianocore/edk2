@@ -1,7 +1,7 @@
 ## @file
 # parse FDF file
 #
-#  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,9 +16,10 @@
 # Import Modules
 #
 import re
-import os
+import Common.LongFilePathOs as os
 
 import CommonDataClass.FdfClass
+from Common.LongFilePathSupport import OpenLongFilePath as open
 
 ##define T_CHAR_SPACE                ' '
 ##define T_CHAR_NULL                 '\0'

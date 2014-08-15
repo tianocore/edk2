@@ -2,7 +2,7 @@
 #  This file include GenVpd class for fix the Vpd type PCD offset, and PcdEntry for describe
 #  and process each entry of vpd type PCD.
 #
-#  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -13,12 +13,12 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
-import os
+import Common.LongFilePathOs as os
 import StringIO
 import StringTable as st
 import array
 import re
-
+from Common.LongFilePathSupport import OpenLongFilePath as open
 from struct import *
 import Common.EdkLogger as EdkLogger
 import Common.BuildToolError as BuildToolError

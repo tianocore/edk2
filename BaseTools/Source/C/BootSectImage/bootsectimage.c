@@ -4,7 +4,7 @@ Abstract:
   Patch the BPB information in boot sector image file.
   Patch the MBR code in MBR image file.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -116,7 +116,7 @@ Return:
   FILE *FileHandle;
   int  result;
 
-  FileHandle = fopen (FileName, "r+b");
+  FileHandle = fopen (LongFilePath (FileName), "r+b");
   if (FileHandle == NULL) {
     DebugMsg (NULL, 0, DEBUG_ERROR, NULL, "Open file: %s", FileName);
     return 0;
@@ -154,7 +154,7 @@ Return:
   FILE *FileHandle;
   int  result;
 
-  FileHandle = fopen (FileName, "rb");
+  FileHandle = fopen (LongFilePath (FileName), "rb");
   if (FileHandle == NULL) {
     DebugMsg (NULL, 0, DEBUG_ERROR, NULL, "ERROR: E0001: Error opening file: %s", FileName);
     return 0;

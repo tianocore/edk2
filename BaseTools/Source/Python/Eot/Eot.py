@@ -1,7 +1,7 @@
 ## @file
 # This file is used to be the main entrance of EOT tool
 #
-# Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -14,7 +14,7 @@
 ##
 # Import Modules
 #
-import os, time, glob
+import Common.LongFilePathOs as os, time, glob
 import Common.EdkLogger as EdkLogger
 import EotGlobalData
 from optparse import OptionParser
@@ -30,6 +30,7 @@ from Report import Report
 from Common.Misc import ParseConsoleLog
 from Common.BuildVersion import gBUILD_VERSION
 from Parser import ConvertGuid
+from Common.LongFilePathSupport import OpenLongFilePath as open
 
 ## Class Eot
 #

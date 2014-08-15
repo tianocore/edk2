@@ -1,7 +1,7 @@
 ## @file
 # Contains several utilitities shared by migration tools.
 #
-# Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -14,13 +14,14 @@
 ##
 # Import Modules
 #
-import os
+import Common.LongFilePathOs as os
 import re
 import EdkLogger
 from optparse import OptionParser
 from Common.BuildToolError import *
 from XmlRoutines import *
 from CommonDataClass.CommonClass import *
+from Common.LongFilePathSupport import OpenLongFilePath as open
 
 ## Set all fields of CommonClass object.
 #

@@ -20,12 +20,13 @@ import Section
 from GenFdsGlobalVariable import GenFdsGlobalVariable
 import subprocess
 from Ffs import Ffs
-import os
+import Common.LongFilePathOs as os
 from CommonDataClass.FdfClass import EfiSectionClassObject
-import shutil
 from Common import EdkLogger
 from Common.BuildToolError import *
 from Common.Misc import PeImageClass
+from Common.LongFilePathSupport import OpenLongFilePath as open
+from Common.LongFilePathSupport import CopyLongFilePath
 
 ## generate rule section
 #
@@ -237,14 +238,14 @@ class EfiSection (EfiSectionClassObject):
                         if os.path.exists(MapFile):
                             CopyMapFile = os.path.join(OutputPath, ModuleName + '.map')
                             if not os.path.exists(CopyMapFile) or \
-                                (os.path.getmtime(MapFile) > os.path.getmtime(CopyMapFile)):
-                                shutil.copyfile(MapFile, CopyMapFile)
+                                   (os.path.getmtime(MapFile) > os.path.getmtime(CopyMapFile)):
+                                CopyLongFilePath(MapFile, CopyMapFile)
 
                     if not NoStrip:
                         FileBeforeStrip = os.path.join(OutputPath, ModuleName + '.efi')
                         if not os.path.exists(FileBeforeStrip) or \
                             (os.path.getmtime(File) > os.path.getmtime(FileBeforeStrip)):
-                            shutil.copyfile(File, FileBeforeStrip)
+                            CopyLongFilePath(File, FileBeforeStrip)
                         StrippedFile = os.path.join(OutputPath, ModuleName + '.stripped')
                         GenFdsGlobalVariable.GenerateFirmwareImage(
                                                 StrippedFile,

@@ -249,7 +249,7 @@ Returns:
   //
   // Open the file containing the FV
   //
-  InputFile = fopen (argv[0], "rb");
+  InputFile = fopen (LongFilePath (argv[0]), "rb");
   if (InputFile == NULL) {
     Error (NULL, 0, 0001, "Error opening the input file", argv[0]);
     return GetUtilityStatus ();

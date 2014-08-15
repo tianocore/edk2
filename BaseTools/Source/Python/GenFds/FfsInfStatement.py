@@ -1,7 +1,7 @@
 ## @file
 # process FFS generation from INF statement
 #
-#  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,8 +16,7 @@
 # Import Modules
 #
 import Rule
-import os
-import shutil
+import Common.LongFilePathOs as os
 import StringIO
 from struct import *
 from GenFdsGlobalVariable import GenFdsGlobalVariable
@@ -38,6 +37,8 @@ from FvImageSection import FvImageSection
 from Common.Misc import PeImageClass
 from AutoGen.GenDepex import DependencyExpression
 from PatchPcdValue.PatchPcdValue import PatchBinaryFile
+from Common.LongFilePathSupport import CopyLongFilePath
+from Common.LongFilePathSupport import OpenLongFilePath as open
 
 ## generate FFS from INF
 #
@@ -322,7 +323,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
             return EfiFile
         Basename = os.path.basename(EfiFile)
         Output = os.path.join(self.OutputPath, Basename)
-        shutil.copy(EfiFile, Output)
+        CopyLongFilePath(EfiFile, Output)
         for Pcd in self.PatchPcds:
             RetVal, RetStr = PatchBinaryFile(Output, int(Pcd.Offset, 0), Pcd.DatumType, Pcd.DefaultValue, Pcd.MaxDatumSize)
             if RetVal:
@@ -648,8 +649,8 @@ class FfsInfStatement(FfsInfStatementClassObject):
                 if not NoStrip:
                     FileBeforeStrip = os.path.join(self.OutputPath, ModuleName + '.reloc')
                     if not os.path.exists(FileBeforeStrip) or \
-                        (os.path.getmtime(File) > os.path.getmtime(FileBeforeStrip)):
-                        shutil.copyfile(File, FileBeforeStrip)
+                           (os.path.getmtime(File) > os.path.getmtime(FileBeforeStrip)):
+                        CopyLongFilePath(File, FileBeforeStrip)
                     StrippedFile = os.path.join(self.OutputPath, ModuleName + '.stipped')
                     GenFdsGlobalVariable.GenerateFirmwareImage(
                                             StrippedFile,
@@ -687,8 +688,9 @@ class FfsInfStatement(FfsInfStatementClassObject):
             if not NoStrip:
                 FileBeforeStrip = os.path.join(self.OutputPath, ModuleName + '.reloc')
                 if not os.path.exists(FileBeforeStrip) or \
-                    (os.path.getmtime(GenSecInputFile) > os.path.getmtime(FileBeforeStrip)):
-                    shutil.copyfile(GenSecInputFile, FileBeforeStrip)
+                       (os.path.getmtime(GenSecInputFile) > os.path.getmtime(FileBeforeStrip)):
+                    CopyLongFilePath(GenSecInputFile, FileBeforeStrip)
+
                 StrippedFile = os.path.join(self.OutputPath, ModuleName + '.stipped')
                 GenFdsGlobalVariable.GenerateFirmwareImage(
                                         StrippedFile,

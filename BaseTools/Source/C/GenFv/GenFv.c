@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -97,7 +97,7 @@ Returns:
   //
   // Copyright declaration
   // 
-  fprintf (stdout, "Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.\n\n");
+  fprintf (stdout, "Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.\n\n");
 
   //
   // Details Option
@@ -603,7 +603,7 @@ Returns:
     if (OutFileName == NULL) {
       FpFile = stdout;
     } else {
-      FpFile = fopen (OutFileName, "w");
+      FpFile = fopen (LongFilePath (OutFileName), "w");
       if (FpFile == NULL) {
         Error (NULL, 0, 0001, "Error opening file", OutFileName);
         return STATUS_ERROR;
@@ -672,7 +672,7 @@ Returns:
   //  update boot driver address and runtime driver address in address file
   //
   if (Status == EFI_SUCCESS && AddrFileName != NULL && mFvBaseAddressNumber > 0) {
-    FpFile = fopen (AddrFileName, "w");
+    FpFile = fopen (LongFilePath (AddrFileName), "w");
     if (FpFile == NULL) {
       Error (NULL, 0, 0001, "Error opening file", AddrFileName);
       return STATUS_ERROR;

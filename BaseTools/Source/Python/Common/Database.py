@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create a database used by ECC tool
 #
-# Copyright (c) 2007 - 2008, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -15,7 +15,7 @@
 # Import Modules
 #
 import sqlite3
-import os
+import Common.LongFilePathOs as os
 
 import EdkLogger as EdkLogger
 from CommonDataClass.DataClass import *

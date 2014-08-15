@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -243,13 +243,13 @@ return:
   //
   // Open files
   //
-  PageFile = fopen (PageFileName, "w+b");
+  PageFile = fopen (LongFilePath (PageFileName), "w+b");
   if (PageFile == NULL) {
     Error (NoPageFileName, 0, 0x4002, "Invalid parameter option", "Output File %s open failure", PageFileName);
     return -1;
   }
 
-  NoPageFile = fopen (NoPageFileName, "r+b");
+  NoPageFile = fopen (LongFilePath (NoPageFileName), "r+b");
   if (NoPageFile == NULL) {
     Error (NoPageFileName, 0, 0x4002, "Invalid parameter option", "Input File %s open failure", NoPageFileName);
     fclose (PageFile);

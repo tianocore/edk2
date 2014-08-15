@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -25,6 +25,7 @@ Abstract:
 #include <stdlib.h>
 #include "EfiUtilityMsgs.h"
 #include "ParseInf.h"
+#include "CommonLib.h"
 
 CHAR8 *
 ReadLine (
@@ -46,7 +47,7 @@ Routine Description:
 Arguments:
 
   InputFile     Memory file image.
-  InputBuffer   Buffer to read into, must be _MAX_PATH size.
+  InputBuffer   Buffer to read into, must be MaxLength size.
   MaxLength     The maximum size of the input buffer.
 
 Returns:
@@ -165,7 +166,7 @@ Returns:
 
 --*/
 {
-  CHAR8 InputBuffer[_MAX_PATH];
+  CHAR8 InputBuffer[MAX_LONG_FILE_PATH];
   CHAR8 *CurrentToken;
 
   //
@@ -188,7 +189,7 @@ Returns:
     //
     // Read a line
     //
-    ReadLine (InputFile, InputBuffer, _MAX_PATH);
+    ReadLine (InputFile, InputBuffer, MAX_LONG_FILE_PATH);
 
     //
     // Check if the section is found
@@ -222,7 +223,7 @@ Arguments:
   Section   The section to search for, a string within [].
   Token     The token to search for, e.g. EFI_PEIM_RECOVERY, followed by an = in the INF file.
   Instance  The instance of the token to search for.  Zero is the first instance.
-  Value     The string that holds the value following the =.  Must be _MAX_PATH in size.
+  Value     The string that holds the value following the =.  Must be MAX_LONG_FILE_PATH in size.
 
 Returns:
 
@@ -234,7 +235,7 @@ Returns:
 
 --*/
 {
-  CHAR8   InputBuffer[_MAX_PATH];
+  CHAR8   InputBuffer[MAX_LONG_FILE_PATH];
   CHAR8   *CurrentToken;
   CHAR8   *Delimiter;
   BOOLEAN ParseError;
@@ -274,7 +275,7 @@ Returns:
       //
       // Read a line from the file
       //
-      if (ReadLine (InputFile, InputBuffer, _MAX_PATH) == NULL) {
+      if (ReadLine (InputFile, InputBuffer, MAX_LONG_FILE_PATH) == NULL) {
         //
         // Error reading from input file
         //
@@ -604,7 +605,7 @@ Routine Description:
 Arguments:
 
   InputFile     Stream pointer.
-  InputBuffer   Buffer to read into, must be _MAX_PATH size.
+  InputBuffer   Buffer to read into, must be MAX_LONG_FILE_PATH size.
 
 Returns:
 
@@ -624,7 +625,7 @@ Returns:
   //
   // Read a line
   //
-  if (fgets (InputBuffer, _MAX_PATH, InputFile) == NULL) {
+  if (fgets (InputBuffer, MAX_LONG_FILE_PATH, InputFile) == NULL) {
     return NULL;
   }
   //
@@ -670,7 +671,7 @@ Returns:
 
 --*/
 {
-  CHAR8 InputBuffer[_MAX_PATH];
+  CHAR8 InputBuffer[MAX_LONG_FILE_PATH];
   CHAR8 *CurrentToken;
 
   //

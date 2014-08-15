@@ -1,7 +1,7 @@
 ## @file
 # process FD Region generation
 #
-#  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -19,10 +19,11 @@ from struct import *
 from GenFdsGlobalVariable import GenFdsGlobalVariable
 import StringIO
 from CommonDataClass.FdfClass import RegionClassObject
-import os
+import Common.LongFilePathOs as os
 from stat import *
 from Common import EdkLogger
 from Common.BuildToolError import *
+from Common.LongFilePathSupport import OpenLongFilePath as open
 
 ## generate Region
 #

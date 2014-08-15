@@ -1,7 +1,7 @@
 ## @file
 # process APRIORI file data and generate PEI/DXE APRIORI file
 #
-#  Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,7 +16,7 @@
 # Import Modules
 #
 from struct import *
-import os
+import Common.LongFilePathOs as os
 import StringIO
 import FfsFileStatement
 from GenFdsGlobalVariable import GenFdsGlobalVariable

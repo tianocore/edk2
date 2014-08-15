@@ -1,7 +1,7 @@
 ## @file
 # build a platform or a module
 #
-#  Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -15,7 +15,7 @@
 ##
 # Import Modules
 #
-import os
+import Common.LongFilePathOs as os
 import re
 import StringIO
 import sys
@@ -31,6 +31,8 @@ from optparse import OptionParser
 from subprocess import *
 from Common import Misc as Utils
 
+from Common.LongFilePathSupport import OpenLongFilePath as open
+from Common.LongFilePathSupport import LongFilePath
 from Common.TargetTxtClassObject import *
 from Common.ToolDefClassObject import *
 from Common.DataType import *
@@ -49,7 +51,7 @@ import Common.GlobalData as GlobalData
 # Version and Copyright
 VersionNumber = "0.51" + ' ' + gBUILD_VERSION
 __version__ = "%prog Version " + VersionNumber
-__copyright__ = "Copyright (c) 2007 - 2013, Intel Corporation  All rights reserved."
+__copyright__ = "Copyright (c) 2007 - 2014, Intel Corporation  All rights reserved."
 
 ## standard targets of build command
 gSupportedTarget = ['all', 'genc', 'genmake', 'modules', 'libraries', 'fds', 'clean', 'cleanall', 'cleanlib', 'run']
@@ -1028,7 +1030,7 @@ class Build():
                 FvMapBuffer = os.path.join(Wa.FvDir, FvName + '.Fv.map')
                 if not os.path.exists(FvMapBuffer):
                     continue
-                FvMap = open (FvMapBuffer, 'r')
+                FvMap = open(FvMapBuffer, 'r')
                 #skip FV size information
                 FvMap.readline()
                 FvMap.readline()

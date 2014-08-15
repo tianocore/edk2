@@ -2,7 +2,7 @@
 # This file is used to define common parsing related functions used in parsing
 # Inf/Dsc/Makefile process
 #
-# Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -15,7 +15,7 @@
 ##
 # Import Modules
 #
-import os, re
+import Common.LongFilePathOs as os, re
 import Common.EdkLogger as EdkLogger
 from Common.DataType import *
 from CommonDataClass.DataClass import *
@@ -23,6 +23,7 @@ from Common.String import CleanString, GetSplitValueList, ReplaceMacro
 import EotGlobalData
 from Common.Misc import sdict
 from Common.String import GetSplitList
+from Common.LongFilePathSupport import OpenLongFilePath as open
 
 ## PreProcess() method
 #

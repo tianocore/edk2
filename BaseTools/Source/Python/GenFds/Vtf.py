@@ -1,7 +1,7 @@
 ## @file
 # process VTF generation
 #
-#  Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,8 +16,9 @@
 # Import Modules
 #
 from GenFdsGlobalVariable import GenFdsGlobalVariable
-import os
+import Common.LongFilePathOs as os
 from CommonDataClass.FdfClass import VtfClassObject
+from Common.LongFilePathSupport import OpenLongFilePath as open
 T_CHAR_LF = '\n'
 
 ## generate VTF

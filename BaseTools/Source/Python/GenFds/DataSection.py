@@ -1,7 +1,7 @@
 ## @file
 # process data section generation
 #
-#  Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -19,10 +19,10 @@ import Section
 from GenFdsGlobalVariable import GenFdsGlobalVariable
 import subprocess
 from Ffs import Ffs
-import os
+import Common.LongFilePathOs as os
 from CommonDataClass.FdfClass import DataSectionClassObject
 from Common.Misc import PeImageClass
-import shutil
+from Common.LongFilePathSupport import CopyLongFilePath
 
 ## generate data section
 #
@@ -71,9 +71,8 @@ class DataSection (DataSectionClassObject):
             MapFile = Filename.replace('.efi', '.map')
             if os.path.exists(MapFile):
                 CopyMapFile = os.path.join(OutputPath, ModuleName + '.map')
-                if not os.path.exists(CopyMapFile) or \
-                    (os.path.getmtime(MapFile) > os.path.getmtime(CopyMapFile)):
-                    shutil.copyfile(MapFile, CopyMapFile)
+                if not os.path.exists(CopyMapFile) or (os.path.getmtime(MapFile) > os.path.getmtime(CopyMapFile)):
+                    CopyLongFilePath(MapFile, CopyMapFile)
 
         #Get PE Section alignment when align is set to AUTO
         if self.Alignment == 'Auto' and self.SecType in ('TE', 'PE32'):
@@ -92,7 +91,7 @@ class DataSection (DataSectionClassObject):
             FileBeforeStrip = os.path.join(OutputPath, ModuleName + '.efi')
             if not os.path.exists(FileBeforeStrip) or \
                 (os.path.getmtime(self.SectFileName) > os.path.getmtime(FileBeforeStrip)):
-                shutil.copyfile(self.SectFileName, FileBeforeStrip)
+                CopyLongFilePath(self.SectFileName, FileBeforeStrip)
             StrippedFile = os.path.join(OutputPath, ModuleName + '.stripped')
             GenFdsGlobalVariable.GenerateFirmwareImage(
                                     StrippedFile,

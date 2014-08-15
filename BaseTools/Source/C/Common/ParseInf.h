@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -26,10 +26,6 @@ Abstract:
 #include <stdlib.h>
 #include <Common/UefiBaseTypes.h>
 #include <MemoryFile.h>
-
-#ifndef _MAX_PATH
-#define _MAX_PATH 500
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,7 +55,7 @@ Routine Description:
 Arguments:
 
   InputFile     Memory file image.
-  InputBuffer   Buffer to read into, must be _MAX_PATH size.
+  InputBuffer   Buffer to read into, must be MaxLength size.
   MaxLength     The maximum size of the input buffer.
 
 Returns:
@@ -115,7 +111,7 @@ Arguments:
   Section   The section to search for, a string within [].
   Token     The token to search for, e.g. EFI_PEIM_RECOVERY, followed by an = in the INF file.
   Instance  The instance of the token to search for.  Zero is the first instance.
-  Value     The string that holds the value following the =.  Must be _MAX_PATH in size.
+  Value     The string that holds the value following the =.  Must be MAX_LONG_FILE_PATH in size.
 
 Returns:
 
@@ -196,7 +192,7 @@ Routine Description:
 Arguments:
 
   InputFile     Stream pointer.
-  InputBuffer   Buffer to read into, must be _MAX_PATH size.
+  InputBuffer   Buffer to read into, must be MAX_LONG_FILE_PATH size.
 
 Returns:
 

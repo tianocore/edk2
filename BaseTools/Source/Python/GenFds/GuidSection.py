@@ -1,7 +1,7 @@
 ## @file
 # process GUIDed section generation
 #
-#  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -18,7 +18,7 @@
 import Section
 import subprocess
 from Ffs import Ffs
-import os
+import Common.LongFilePathOs as os
 from GenFdsGlobalVariable import GenFdsGlobalVariable
 from CommonDataClass.FdfClass import GuidSectionClassObject
 from Common import ToolDefClassObject
@@ -26,6 +26,7 @@ import sys
 from Common import EdkLogger
 from Common.BuildToolError import *
 from FvImageSection import FvImageSection
+from Common.LongFilePathSupport import OpenLongFilePath as open
 
 ## generate GUIDed section
 #
