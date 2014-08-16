@@ -148,7 +148,7 @@ OrderedCollectionIsEmpty (
   IN CONST RED_BLACK_TREE *Tree
   )
 {
-  return Tree->Root == NULL;
+  return (BOOLEAN)(Tree->Root == NULL);
 }
 
 
@@ -838,7 +838,7 @@ NodeIsNullOrBlack (
   IN CONST RED_BLACK_TREE_NODE *Node
   )
 {
-  return Node == NULL || Node->Color == RedBlackTreeBlack;
+  return (BOOLEAN)(Node == NULL || Node->Color == RedBlackTreeBlack);
 }
 
 
