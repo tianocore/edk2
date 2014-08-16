@@ -504,4 +504,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength
   gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength
+
+[FeaturePcd]
   gEfiMdePkgTokenSpaceGuid.PcdVerifyNodeInList

@@ -45,5 +45,5 @@
   DebugLib
   MemoryAllocationLib
 
-[Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdValidateOrderedCollection ## CONSUMES
+[FeaturePcd]
+  gEfiMdePkgTokenSpaceGuid.PcdValidateOrderedCollection
