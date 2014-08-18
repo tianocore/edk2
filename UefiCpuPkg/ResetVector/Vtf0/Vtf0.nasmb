@@ -41,6 +41,10 @@
 
 %include "PostCodes.inc"
 
+%ifdef ARCH_X64
+%include "X64/PageTables.asm"
+%endif
+
 %ifdef DEBUG_PORT80
   %include "Port80Debug.asm"
 %elifdef DEBUG_SERIAL

@@ -21,9 +21,9 @@ BITS    32
 SetCr3ForPageTables64:
 
     ;
-    ; These pages are built into the ROM image by Tools/FixupForRawSection.py
+    ; These pages are built into the ROM image in X64/PageTables.asm
     ;
-    mov     eax, ((ADDR_OF_START_OF_RESET_CODE & ~0xfff) - 0x1000)
+    mov     eax, ADDR_OF(TopLevelPageDirectory)
     mov     cr3, eax
 
     OneTimeCallRet SetCr3ForPageTables64
