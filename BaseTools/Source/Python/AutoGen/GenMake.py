@@ -1105,6 +1105,7 @@ cleanlib:
         self.IntermediateDirectoryList = []
         self.ModuleBuildDirectoryList = []
         self.LibraryBuildDirectoryList = []
+        self.LibraryMakeCommandList = []
 
     # Compose a dict object containing information used to do replacement in template
     def _CreateTemplateDict(self):
@@ -1128,6 +1129,7 @@ cleanlib:
             Command = self._MAKE_TEMPLATE_[self._FileType] % {"file":Makefile}
             LibraryMakefileList.append(Makefile)
             LibraryMakeCommandList.append(Command)
+        self.LibraryMakeCommandList = LibraryMakeCommandList
 
         ModuleMakefileList = []
         ModuleMakeCommandList = []
@@ -1198,99 +1200,7 @@ cleanlib:
 #
 class TopLevelMakefile(BuildFile):
     ## template used to generate toplevel makefile
-    _TEMPLATE_ = TemplateString('''\
-${makefile_header}
-
-#
-# Platform Macro Definition
-#
-PLATFORM_NAME = ${platform_name}
-PLATFORM_GUID = ${platform_guid}
-PLATFORM_VERSION = ${platform_version}
-
-#
-# Build Configuration Macro Definition
-#
-TOOLCHAIN = ${toolchain_tag}
-TOOLCHAIN_TAG = ${toolchain_tag}
-TARGET = ${build_target}
-
-#
-# Build Directory Macro Definition
-#
-BUILD_DIR = ${platform_build_directory}
-FV_DIR = ${platform_build_directory}${separator}FV
-
-#
-# Shell Command Macro
-#
-${BEGIN}${shell_command_code} = ${shell_command}
-${END}
-
-MAKE = ${make_path}
-MAKE_FILE = ${makefile_path}
-
-#
-# Default target
-#
-all: modules fds
-
-#
-# Initialization target: print build information and create necessary directories
-#
-init:
-\t-@
-\t${BEGIN}-@${create_directory_command}
-\t${END}
-#
-# library build target
-#
-libraries: init
-${BEGIN}\t@cd $(BUILD_DIR)${separator}${arch} && "$(MAKE)" $(MAKE_FLAGS) libraries
-${END}\t@cd $(BUILD_DIR)
-
-#
-# module build target
-#
-modules: init
-${BEGIN}\t@cd $(BUILD_DIR)${separator}${arch} && "$(MAKE)" $(MAKE_FLAGS) modules
-${END}\t@cd $(BUILD_DIR)
-
-#
-# Flash Device Image Target
-#
-fds: init
-\t-@cd $(FV_DIR)
-${BEGIN}\tGenFds -f ${fdf_file} -o $(BUILD_DIR) -t $(TOOLCHAIN) -b $(TARGET) -p ${active_platform} -a ${build_architecture_list} ${extra_options}${END}${BEGIN} -r ${fd} ${END}${BEGIN} -i ${fv} ${END}${BEGIN} -C ${cap} ${END}${BEGIN} -D ${macro} ${END}
-
-#
-# run command for emulator platform only
-#
-run:
-\tcd $(BUILD_DIR)${separator}IA32 && ".${separator}SecMain"
-\tcd $(BUILD_DIR)
-
-#
-# Clean intermediate files
-#
-clean:
-${BEGIN}\t-@${sub_build_command} clean
-${END}\t@cd $(BUILD_DIR)
-
-#
-# Clean all generated files except to makefile
-#
-cleanall:
-${BEGIN}\t${cleanall_command}
-${END}
-
-#
-# Clean all library files
-#
-cleanlib:
-${BEGIN}\t-@${sub_build_command} cleanlib
-${END}\t@cd $(BUILD_DIR)\n
-''')
+    _TEMPLATE_ = TemplateString('''${BEGIN}\tGenFds -f "${fdf_file}" -o "${platform_build_directory}" -t ${toolchain_tag} -b ${build_target} -p "${active_platform}" -a ${build_architecture_list} ${extra_options}${END}${BEGIN} -r ${fd} ${END}${BEGIN} -i ${fv} ${END}${BEGIN} -C ${cap} ${END}${BEGIN} -D ${macro} ${END}''')
 
     ## Constructor of TopLevelMakefile
     #

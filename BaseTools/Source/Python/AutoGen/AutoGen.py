@@ -655,6 +655,8 @@ class WorkspaceAutoGen(AutoGen):
                                     )
                     Count += 1
                                       
+    def _GenFdsCommand(self):
+        return (GenMake.TopLevelMakefile(self)._TEMPLATE_.Replace(GenMake.TopLevelMakefile(self)._TemplateDict)).strip()
 
     ## Create makefile for the platform and modules in it
     #
@@ -662,15 +664,6 @@ class WorkspaceAutoGen(AutoGen):
     #                                       modules will be created as well
     #
     def CreateMakeFile(self, CreateDepsMakeFile=False):
-        # create makefile for platform
-        Makefile = GenMake.TopLevelMakefile(self)
-        if Makefile.Generate():
-            EdkLogger.debug(EdkLogger.DEBUG_9, "Generated makefile for platform [%s] %s\n" %
-                            (self.MetaFile, self.ArchList))
-        else:
-            EdkLogger.debug(EdkLogger.DEBUG_9, "Skipped the generation of makefile for platform [%s] %s\n" %
-                            (self.MetaFile, self.ArchList))
-
         if CreateDepsMakeFile:
             for Pa in self.AutoGenObjectList:
                 Pa.CreateMakeFile(CreateDepsMakeFile)
@@ -705,6 +698,7 @@ class WorkspaceAutoGen(AutoGen):
     FvDir               = property(_GetFvDir)
     MakeFileDir         = property(_GetMakeFileDir)
     BuildCommand        = property(_GetBuildCommand)
+    GenFdsCommand       = property(_GenFdsCommand)
 
 ## AutoGen class for platform
 #
@@ -801,6 +795,9 @@ class PlatformAutoGen(AutoGen):
         self._LibraryAutoGenList = None
         self._BuildCommand = None
 
+        # get library/modules for build
+        self.LibraryBuildDirectoryList = []
+        self.ModuleBuildDirectoryList = []
         # get the original module/package/platform objects
         self.BuildDatabase = Workspace.BuildDatabase
         return True
@@ -827,6 +824,10 @@ class PlatformAutoGen(AutoGen):
         # don't do this twice
         self.IsCodeFileCreated = True
 
+    ## Generate Fds Command
+    def _GenFdsCommand(self):
+        return self.Workspace.GenFdsCommand
+		
     ## Create makefile for the platform and mdoules in it
     #
     #   @param      CreateModuleMakeFile    Flag indicating if the makefile for
@@ -844,14 +845,11 @@ class PlatformAutoGen(AutoGen):
         if self.IsMakeFileCreated:
             return
 
-        # create makefile for platform
+        # create library/module build dirs for platform
         Makefile = GenMake.PlatformMakefile(self)
-        if Makefile.Generate():
-            EdkLogger.debug(EdkLogger.DEBUG_9, "Generated makefile for platform [%s] [%s]\n" %
-                            (self.MetaFile, self.Arch))
-        else:
-            EdkLogger.debug(EdkLogger.DEBUG_9, "Skipped the generation of makefile for platform [%s] [%s]\n" %
-                            (self.MetaFile, self.Arch))
+        self.LibraryBuildDirectoryList = Makefile.GetLibraryBuildDirectoryList()
+        self.ModuleBuildDirectoryList = Makefile.GetModuleBuildDirectoryList()
+
         self.IsMakeFileCreated = True
 
     ## Deal with Shared FixedAtBuild Pcds
