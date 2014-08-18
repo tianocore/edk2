@@ -440,6 +440,22 @@
       otool -t $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.slib | hex2bin.py ${dst}
       
 
+[Nasm-to-Binary-Code-File]
+    <InputFile>
+        ?.nasmb, ?.NASMB
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_base}.bin
+
+    <Command>
+        "$(PP)" $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
+        Trim --source-code --convert-hex -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
+        "$(NASM)" -I${s_path}(+) -l ${d_path}(+)${s_base}.lst $(NASMB_FLAGS) -o $dst ${d_path}(+)${s_base}.iii
+
+
 [Microcode-File.USER_DEFINED, Microcode-File.Microcode]
     <InputFile>
         ?.txt, ?.TXT, ?.Txt, ?.mut, ?.inc
