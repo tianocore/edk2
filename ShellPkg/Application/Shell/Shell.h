@@ -1,6 +1,7 @@
 /** @file
   function definitions for internal to shell functions.
 
+  (C) Copyright 2014, Hewlett-Packard Development Company, L.P.
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -96,7 +97,7 @@ typedef struct {
 
 typedef struct {
   EFI_SHELL_PARAMETERS_PROTOCOL *NewShellParametersProtocol;
-  EFI_SHELL_PROTOCOL21          *NewEfiShellProtocol;
+  EFI_SHELL_PROTOCOL            *NewEfiShellProtocol;
   BOOLEAN                       PageBreakEnabled;
   BOOLEAN                       RootShellInstance;
   SHELL_INIT_SETTINGS           ShellInitSettings;

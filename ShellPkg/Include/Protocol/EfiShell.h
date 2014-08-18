@@ -1,6 +1,7 @@
 /** @file
   EFI Shell protocol as defined in the UEFI Shell 2.0 specification including errata.
 
+  (C) Copyright 2014, Hewlett-Packard Development Company, L.P.
   Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1051,6 +1052,30 @@ EFI_STATUS
   IN VOID                       *Buffer
   );
 
+//
+// EFI_SHELL_PROTOCOL has been updated since UEFI Shell Spec 2.0
+// Usage of this protocol will require version checking before attempting
+// to use any new members.  There is no need to check the version for
+// members that existed in UEFI Shell Spec 2.0.
+//
+// Update below for any future UEFI Shell spec changes to this protocol.
+//
+// Check EFI_SHELL_PROTOCOL MajorVersion and MinorVersion:
+// if ((2 == gEfiShellProtocol->MajorVersion) &&
+//     (0 == gEfiShellProtocol->MinorVersion)) {
+//   //
+//   // Cannot call:
+//   // RegisterGuidName - UEFI Shell 2.1
+//   // GetGuidName      - UEFI Shell 2.1
+//   // GetGuidFromName  - UEFI Shell 2.1
+//   // GetEnvEx         - UEFI Shell 2.1
+//   //
+// } else {
+//   //
+//   // Can use all members
+//   //
+// }
+//
 typedef struct _EFI_SHELL_PROTOCOL {
   EFI_SHELL_EXECUTE                         Execute;
   EFI_SHELL_GET_ENV                         GetEnv;
@@ -1094,60 +1119,12 @@ typedef struct _EFI_SHELL_PROTOCOL {
   EFI_EVENT                                 ExecutionBreak;
   UINT32                                    MajorVersion;
   UINT32                                    MinorVersion;
-} EFI_SHELL_PROTOCOL;
-
-//
-// The new structure with extra functions for UEFI Shell Specification 2.1
-//
-typedef struct _EFI_SHELL_PROTOCOL21 {
-  EFI_SHELL_EXECUTE                         Execute;
-  EFI_SHELL_GET_ENV                         GetEnv;
-  EFI_SHELL_SET_ENV                         SetEnv;
-  EFI_SHELL_GET_ALIAS                       GetAlias;
-  EFI_SHELL_SET_ALIAS                       SetAlias;
-  EFI_SHELL_GET_HELP_TEXT                   GetHelpText;
-  EFI_SHELL_GET_DEVICE_PATH_FROM_MAP        GetDevicePathFromMap;
-  EFI_SHELL_GET_MAP_FROM_DEVICE_PATH        GetMapFromDevicePath;
-  EFI_SHELL_GET_DEVICE_PATH_FROM_FILE_PATH  GetDevicePathFromFilePath;
-  EFI_SHELL_GET_FILE_PATH_FROM_DEVICE_PATH  GetFilePathFromDevicePath;
-  EFI_SHELL_SET_MAP                         SetMap;
-  EFI_SHELL_GET_CUR_DIR                     GetCurDir;
-  EFI_SHELL_SET_CUR_DIR                     SetCurDir;
-  EFI_SHELL_OPEN_FILE_LIST                  OpenFileList;
-  EFI_SHELL_FREE_FILE_LIST                  FreeFileList;
-  EFI_SHELL_REMOVE_DUP_IN_FILE_LIST         RemoveDupInFileList;
-  EFI_SHELL_BATCH_IS_ACTIVE                 BatchIsActive;
-  EFI_SHELL_IS_ROOT_SHELL                   IsRootShell;
-  EFI_SHELL_ENABLE_PAGE_BREAK               EnablePageBreak;
-  EFI_SHELL_DISABLE_PAGE_BREAK              DisablePageBreak;
-  EFI_SHELL_GET_PAGE_BREAK                  GetPageBreak;
-  EFI_SHELL_GET_DEVICE_NAME                 GetDeviceName;
-  EFI_SHELL_GET_FILE_INFO                   GetFileInfo;
-  EFI_SHELL_SET_FILE_INFO                   SetFileInfo;
-  EFI_SHELL_OPEN_FILE_BY_NAME               OpenFileByName;
-  EFI_SHELL_CLOSE_FILE                      CloseFile;
-  EFI_SHELL_CREATE_FILE                     CreateFile;
-  EFI_SHELL_READ_FILE                       ReadFile;
-  EFI_SHELL_WRITE_FILE                      WriteFile;
-  EFI_SHELL_DELETE_FILE                     DeleteFile;
-  EFI_SHELL_DELETE_FILE_BY_NAME             DeleteFileByName;
-  EFI_SHELL_GET_FILE_POSITION               GetFilePosition;
-  EFI_SHELL_SET_FILE_POSITION               SetFilePosition;
-  EFI_SHELL_FLUSH_FILE                      FlushFile;
-  EFI_SHELL_FIND_FILES                      FindFiles;
-  EFI_SHELL_FIND_FILES_IN_DIR               FindFilesInDir;
-  EFI_SHELL_GET_FILE_SIZE                   GetFileSize;
-  EFI_SHELL_OPEN_ROOT                       OpenRoot;
-  EFI_SHELL_OPEN_ROOT_BY_HANDLE             OpenRootByHandle;
-  EFI_EVENT                                 ExecutionBreak;
-  UINT32                                    MajorVersion;
-  UINT32                                    MinorVersion;
   // Added for Shell 2.1
-  EFI_SHELL_REGISTER_GUID_NAME             RegisterGuidName;
-  EFI_SHELL_GET_GUID_NAME                  GetGuidName;
-  EFI_SHELL_GET_GUID_FROM_NAME             GetGuidFromName;
-  EFI_SHELL_GET_ENV_EX                     GetEnvEx;
-} EFI_SHELL_PROTOCOL21;
+  EFI_SHELL_REGISTER_GUID_NAME              RegisterGuidName;
+  EFI_SHELL_GET_GUID_NAME                   GetGuidName;
+  EFI_SHELL_GET_GUID_FROM_NAME              GetGuidFromName;
+  EFI_SHELL_GET_ENV_EX                      GetEnvEx;
+} EFI_SHELL_PROTOCOL;
 
 extern EFI_GUID gEfiShellProtocolGuid;
 

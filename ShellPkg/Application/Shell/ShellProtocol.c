@@ -2,6 +2,7 @@
   Member functions of EFI_SHELL_PROTOCOL and functions for creation,
   manipulation, and initialization of EFI_SHELL_PROTOCOL.
 
+  (C) Copyright 2014, Hewlett-Packard Development Company, L.P.
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -3379,7 +3380,7 @@ EfiShellSetAlias(
 
 // Pure FILE_HANDLE operations are passed to FileHandleLib
 // these functions are indicated by the *
-EFI_SHELL_PROTOCOL21         mShellProtocol = {
+EFI_SHELL_PROTOCOL         mShellProtocol = {
   EfiShellExecute,
   EfiShellGetEnv,
   EfiShellSetEnv,
@@ -3420,8 +3421,8 @@ EFI_SHELL_PROTOCOL21         mShellProtocol = {
   EfiShellOpenRoot,
   EfiShellOpenRootByHandle,
   NULL,
-  2, // SHELL_MAJOR_VERSION,
-  1, // SHELL_MINOR_VERSION,
+  SHELL_MAJOR_VERSION,
+  SHELL_MINOR_VERSION,
 
   // New for UEFI Shell 2.1
   EfiShellRegisterGuidName,
@@ -3447,7 +3448,7 @@ EFI_SHELL_PROTOCOL21         mShellProtocol = {
 EFI_STATUS
 EFIAPI
 CreatePopulateInstallShellProtocol (
-  IN OUT EFI_SHELL_PROTOCOL21  **NewShell
+  IN OUT EFI_SHELL_PROTOCOL  **NewShell
   )
 {
   EFI_STATUS                  Status;
@@ -3574,7 +3575,7 @@ CreatePopulateInstallShellProtocol (
 EFI_STATUS
 EFIAPI
 CleanUpShellProtocol (
-  IN OUT EFI_SHELL_PROTOCOL21  *NewShell
+  IN OUT EFI_SHELL_PROTOCOL  *NewShell
   )
 {
   EFI_STATUS                        Status;
