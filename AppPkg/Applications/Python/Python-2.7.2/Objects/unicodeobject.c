@@ -1865,7 +1865,7 @@ char utf8_code_length[256] = {
        illegal prefix.  See RFC 3629 for details */
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, /* 00-0F */
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -2221,7 +2221,7 @@ PyUnicode_DecodeUTF32Stateful(const char *s,
 #endif
     PyObject *errorHandler = NULL;
     PyObject *exc = NULL;
-    
+
     q = (unsigned char *)s;
     e = q + size;
 
@@ -8295,9 +8295,9 @@ PyObject *PyUnicode_Format(PyObject *format,
             Py_UNICODE c = '\0';
             Py_UNICODE fill;
             int isnumok;
-            PyObject *v = NULL;
-            PyObject *temp = NULL;
-            Py_UNICODE *pbuf;
+            PyObject *v       = NULL;
+            PyObject *temp    = NULL;
+            Py_UNICODE *pbuf  = NULL;
             Py_UNICODE sign;
             Py_ssize_t len;
             Py_UNICODE formatbuf[FORMATBUFLEN]; /* For format{int,char}() */

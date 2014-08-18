@@ -4263,9 +4263,9 @@ PyString_Format(PyObject *format, PyObject *args)
             int c = '\0';
             int fill;
             int isnumok;
-            PyObject *v = NULL;
-            PyObject *temp = NULL;
-            char *pbuf;
+            PyObject *v     = NULL;
+            PyObject *temp  = NULL;
+            char *pbuf      = NULL;
             int sign;
             Py_ssize_t len;
             char formatbuf[FORMATBUFLEN];

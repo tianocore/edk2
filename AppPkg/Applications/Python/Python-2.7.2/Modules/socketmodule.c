@@ -1369,9 +1369,9 @@ getsockaddrarg(PySocketSockObject *s, PyObject *args,
         {
             struct sockaddr_hci *addr = (struct sockaddr_hci *)addr_ret;
 #if defined(__NetBSD__) || defined(__DragonFly__)
-			char *straddr = PyBytes_AS_STRING(args);
+      char *straddr = PyBytes_AS_STRING(args);
 
-			_BT_HCI_MEMB(addr, family) = AF_BLUETOOTH;
+      _BT_HCI_MEMB(addr, family) = AF_BLUETOOTH;
             if (straddr == NULL) {
                 PyErr_SetString(socket_error, "getsockaddrarg: "
                     "wrong format");
@@ -2824,7 +2824,7 @@ static PyObject *
 sock_sendto(PySocketSockObject *s, PyObject *args)
 {
     Py_buffer pbuf;
-    PyObject *addro;
+    PyObject *addro = NULL;
     char *buf;
     Py_ssize_t len;
     sock_addr_t addrbuf;

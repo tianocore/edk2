@@ -470,11 +470,11 @@ PyObject_Str(PyObject *v)
 PyObject *
 PyObject_Unicode(PyObject *v)
 {
-    PyObject *res;
-    PyObject *func;
-    PyObject *str;
+    PyObject *res       = NULL;
+    PyObject *func      = NULL;
+    PyObject *str       = NULL;
     int unicode_method_found = 0;
-    static PyObject *unicodestr;
+    static PyObject *unicodestr   = NULL;
 
     if (v == NULL) {
         res = PyString_FromString("<NULL>");
