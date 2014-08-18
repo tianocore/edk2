@@ -1,7 +1,7 @@
 /** @file
   EFI PEI Core Security services
   
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -100,9 +100,16 @@ VerifyPeim (
   EFI_STATUS                      Status;
   BOOLEAN                         DeferExection;
 
-
+  Status = EFI_NOT_FOUND;
   if (PrivateData->PrivateSecurityPpi == NULL) {
-    Status = EFI_NOT_FOUND;
+    //
+    // Check AuthenticationStatus first.
+    //
+    if ((AuthenticationStatus & EFI_AUTH_STATUS_IMAGE_SIGNED) != 0) {
+      if ((AuthenticationStatus & (EFI_AUTH_STATUS_TEST_FAILED | EFI_AUTH_STATUS_NOT_TESTED)) != 0) {
+        Status = EFI_SECURITY_VIOLATION;
+      }
+    }
   } else {
     //
     // Check to see if the image is OK

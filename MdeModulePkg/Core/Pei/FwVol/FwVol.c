@@ -735,6 +735,7 @@ ProcessSection (
   BOOLEAN                                 SectionCached;
   VOID                                    *TempOutputBuffer;
   UINT32                                  TempAuthenticationStatus;
+  UINT16                                  GuidedSectionAttributes;
 
   PrivateData   = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
   *OutputBuffer = NULL;
@@ -834,9 +835,11 @@ ProcessSection (
         Authentication = 0;
         if (Section->Type == EFI_SECTION_GUID_DEFINED) {
           if (IS_SECTION2 (Section)) {
-            SectionDefinitionGuid = &((EFI_GUID_DEFINED_SECTION2 *)Section)->SectionDefinitionGuid;
+            SectionDefinitionGuid   = &((EFI_GUID_DEFINED_SECTION2 *)Section)->SectionDefinitionGuid;
+            GuidedSectionAttributes = ((EFI_GUID_DEFINED_SECTION2 *)Section)->Attributes;
           } else {
-            SectionDefinitionGuid = &((EFI_GUID_DEFINED_SECTION *)Section)->SectionDefinitionGuid;
+            SectionDefinitionGuid   = &((EFI_GUID_DEFINED_SECTION *)Section)->SectionDefinitionGuid;
+            GuidedSectionAttributes = ((EFI_GUID_DEFINED_SECTION *)Section)->Attributes;
           }
           if (VerifyGuidedSectionGuid (SectionDefinitionGuid, &GuidSectionPpi)) {
             Status = GuidSectionPpi->ExtractSection (
@@ -846,6 +849,21 @@ ProcessSection (
                                        &PpiOutputSize,
                                        &Authentication
                                        );
+          } else if ((GuidedSectionAttributes & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) == 0) {
+            //
+            // Figure out the proper authentication status for GUIDED section without processing required
+            //
+            Status = EFI_SUCCESS;
+            if ((GuidedSectionAttributes & EFI_GUIDED_SECTION_AUTH_STATUS_VALID) == EFI_GUIDED_SECTION_AUTH_STATUS_VALID) {
+              Authentication |= EFI_AUTH_STATUS_IMAGE_SIGNED | EFI_AUTH_STATUS_NOT_TESTED;
+            }
+            if (IS_SECTION2 (Section)) {
+              PpiOutputSize = SECTION2_SIZE (Section) - ((EFI_GUID_DEFINED_SECTION2 *) Section)->DataOffset;
+              PpiOutput     = (UINT8 *) Section + ((EFI_GUID_DEFINED_SECTION2 *) Section)->DataOffset;
+            } else {
+              PpiOutputSize = SECTION_SIZE (Section) - ((EFI_GUID_DEFINED_SECTION *) Section)->DataOffset;
+              PpiOutput     = (UINT8 *) Section + ((EFI_GUID_DEFINED_SECTION *) Section)->DataOffset;
+            }
           }
         } else if (Section->Type == EFI_SECTION_COMPRESSION) {
           Status = PeiServicesLocatePpi (&gEfiPeiDecompressPpiGuid, 0, NULL, (VOID **) &DecompressPpi);
