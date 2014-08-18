@@ -35,11 +35,15 @@ PrintDynamicCommandHelp(
   )
 {
   EFI_STATUS                          Status;
-  BOOLEAN                             Found = FALSE;
-  EFI_HANDLE                          *CommandHandleList = NULL;
+  BOOLEAN                             Found;
+  EFI_HANDLE                          *CommandHandleList;
   EFI_HANDLE                          *NextCommand;
   EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL  *DynamicCommand;
-  CHAR16                              *OutText = NULL;
+  CHAR16                              *OutText;
+  
+  Found = FALSE;
+  CommandHandleList = NULL;
+  OutText = NULL;
 
   CommandHandleList = GetHandleListByProtocol(&gEfiShellDynamicCommandProtocolGuid);
 

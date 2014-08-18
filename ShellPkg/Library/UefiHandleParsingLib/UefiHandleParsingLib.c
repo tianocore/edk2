@@ -820,8 +820,8 @@ InternalShellGetNodeFromGuid(
 Function to add a new GUID/Name mapping.
 
 @param[in] Guid       The Guid
-@param[in] NameId     The STRING id of the HII string to use
-@param[in] Dump       The pointer to the dump function
+@param[in] NameID     The STRING id of the HII string to use
+@param[in] DumpFunc   The pointer to the dump function
 
 
 @retval EFI_SUCCESS           The operation was sucessful

@@ -215,7 +215,7 @@ ShellCommandLibDestructor (
 }
 
 /**
-  Find a dynamic command protocol instance given a command name string
+  Find a dynamic command protocol instance given a command name string.
 
   @param CommandString  the command name string
 
@@ -277,7 +277,7 @@ ShellCommandDynamicCommandExists (
   IN CONST CHAR16 *CommandString
   )
 {
-  return (ShellCommandFindDynamicCommand(CommandString) != NULL);
+  return (BOOLEAN) ((ShellCommandFindDynamicCommand(CommandString) != NULL));
 }
 
 /**

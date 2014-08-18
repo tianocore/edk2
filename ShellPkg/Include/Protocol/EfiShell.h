@@ -431,8 +431,8 @@ CONST CHAR16 *
                                 multiple environment variables are being returned, Attributes
                                 is undefined.
 
-  @retval NULL                  The environment variable doesn’t exist.  
-  @return                       The environment variable’s value. The returned pointer does not 
+  @retval NULL                  The environment variable doesn't exist.  
+  @return                       The environment variable's value. The returned pointer does not 
                                 need to be freed by the caller.  
 **/
 typedef

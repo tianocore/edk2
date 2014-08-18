@@ -2054,7 +2054,7 @@ EfiShellFindFilesInDir(
   }
   SHELL_FREE_NON_NULL(BasePath);
   return(Status);
-  }
+}
 
 /**
   Get the GUID value from a human readable name.
@@ -2586,8 +2586,8 @@ EfiShellOpenFileList(
                                 multiple environment variables are being returned, Attributes
                                 is undefined.
 
-  @retval NULL                  The environment variable doesn’t exist.
-  @return                       A non-NULL value points to the variable’s value. The returned
+  @retval NULL                  The environment variable doesn't exist.
+  @return                       A non-NULL value points to the variable's value. The returned
                                 pointer does not need to be freed by the caller.
 **/
 CONST CHAR16 *
