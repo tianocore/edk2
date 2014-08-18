@@ -36,7 +36,7 @@ for arch in ('ia32', 'x64'):
             '-D', 'ARCH_%s' % arch.upper(),
             '-D', 'DEBUG_%s' % str(debugType).upper(),
             '-o', output,
-            'ResetVectorCode.asm',
+            'Vtf0.nasmb',
             )
         ret = RunCommand(commandLine)
         print '\tASM\t' + output

@@ -13,6 +13,21 @@
 ;
 ;------------------------------------------------------------------------------
 
+;
+; If neither ARCH_IA32 nor ARCH_X64 are defined, then try to include
+; Base.h to use the C pre-processor to determine the architecture.
+;
+%ifndef ARCH_IA32
+  %ifndef ARCH_X64
+    #include <Base.h>
+    #if defined (MDE_CPU_IA32)
+      %define ARCH_IA32
+    #elif defined (MDE_CPU_X64)
+      %define ARCH_X64
+    #endif
+  %endif
+%endif
+
 %ifdef ARCH_IA32
   %ifdef ARCH_X64
     %error "Only one of ARCH_IA32 or ARCH_X64 can be defined."
@@ -26,14 +41,12 @@
 
 %include "PostCodes.inc"
 
-%ifdef DEBUG_NONE
-  %include "DebugDisabled.asm"
-%elifdef DEBUG_PORT80
+%ifdef DEBUG_PORT80
   %include "Port80Debug.asm"
 %elifdef DEBUG_SERIAL
   %include "SerialDebug.asm"
 %else
-  %error "No debug type was specified."
+  %include "DebugDisabled.asm"
 %endif
 
 %include "Ia32/SearchForBfvBase.asm"
