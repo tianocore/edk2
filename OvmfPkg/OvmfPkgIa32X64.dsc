@@ -343,6 +343,8 @@
 #
 ################################################################################
 [Components.IA32]
+  OvmfPkg/ResetVector/ResetVector.inf
+
   #
   # SEC Phase modules
   #

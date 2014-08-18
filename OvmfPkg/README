@@ -30,6 +30,7 @@ Pre-requisites:
 * A properly configured ASL compiler:
   - Intel ASL compiler: Available from http://www.acpica.org
   - Microsoft ASL compiler: Available from http://www.acpi.info
+* NASM: http://www.nasm.us/
 
 Update Conf/target.txt ACTIVE_PLATFORM for OVMF:
                              PEI arch   DXE arch   UEFI interfaces
