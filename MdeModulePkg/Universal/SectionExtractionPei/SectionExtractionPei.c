@@ -19,9 +19,60 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PeiServicesLib.h>
 
-//
-// Function prototype for Section Extraction PPI service
-//
+/**
+  The ExtractSection() function processes the input section and
+  returns a pointer to the section contents. If the section being
+  extracted does not require processing (if the section
+  GuidedSectionHeader.Attributes has the
+  EFI_GUIDED_SECTION_PROCESSING_REQUIRED field cleared), then
+  OutputBuffer is just updated to point to the start of the
+  section's contents. Otherwise, *Buffer must be allocated
+  from PEI permanent memory.
+
+  @param This                   Indicates the
+                                EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI instance.
+                                Buffer containing the input GUIDed section to be
+                                processed. OutputBuffer OutputBuffer is
+                                allocated from PEI permanent memory and contains
+                                the new section stream.
+  @param InputSection           A pointer to the input buffer, which contains
+                                the input section to be processed.
+  @param OutputBuffer           A pointer to a caller-allocated buffer, whose
+                                size is specified by the contents of OutputSize.
+  @param OutputSize             A pointer to a caller-allocated
+                                UINTN in which the size of *OutputBuffer
+                                allocation is stored. If the function
+                                returns anything other than EFI_SUCCESS,
+                                the value of OutputSize is undefined.
+  @param AuthenticationStatus   A pointer to a caller-allocated
+                                UINT32 that indicates the
+                                authentication status of the
+                                output buffer. If the input
+                                section's GuidedSectionHeader.
+                                Attributes field has the
+                                EFI_GUIDED_SECTION_AUTH_STATUS_VALID 
+                                bit as clear,
+                                AuthenticationStatus must return
+                                zero. These bits reflect the
+                                status of the extraction
+                                operation. If the function
+                                returns anything other than
+                                EFI_SUCCESS, the value of
+                                AuthenticationStatus is
+                                undefined.
+  
+  @retval EFI_SUCCESS           The InputSection was
+                                successfully processed and the
+                                section contents were returned.
+  
+  @retval EFI_OUT_OF_RESOURCES  The system has insufficient
+                                resources to process the request.
+  
+  @retval EFI_INVALID_PARAMETER The GUID in InputSection does
+                                not match this instance of the
+                                GUIDed Section Extraction PPI.
+
+**/
 EFI_STATUS
 EFIAPI
 CustomGuidedSectionExtract (
