@@ -28,6 +28,9 @@ def usage():
 	print "-t,--trace: Location of the Trace file"
 	print "-s,--symbols: Location of the symbols and modules"
 
+def get_address_from_string(address):
+	return int(address.strip("S:").strip("N:").strip("EL2:").strip("EL1:"), 16)
+
 def get_module_from_addr(modules, addr):
 	for key,value in modules.items():
 		if (value['start'] <= addr) and (addr <= value['end']):
@@ -174,8 +177,13 @@ try:
 			line = info_file_str.readline().strip('\n')
 			while (line != '') and ("Symbols from" not in line):
 				if ("ER_RO" in line):
-					modules[module_name]['start'] = int(line.split()[0].strip("S:"), 16)
-					modules[module_name]['end']   = int(line.split()[2].strip("S:"), 16)
+					modules[module_name]['start'] = get_address_from_string(line.split()[0])
+					modules[module_name]['end']   = get_address_from_string(line.split()[2])
+					line = info_file_str.readline().strip('\n')
+					break;
+				if (".text" in line):
+					modules[module_name]['start'] = get_address_from_string(line.split()[0])
+					modules[module_name]['end']   = get_address_from_string(line.split()[2])
 					line = info_file_str.readline().strip('\n')
 					break;
 				line = info_file_str.readline().strip('\n')
@@ -191,6 +199,14 @@ try:
 	line = info_func_str.readline().strip('\n')
 	func_prev = None
 	while line != '':
+		# We ignore all the functions after 'Functions in'
+		if ("Functions in " in line):
+			line = info_func_str.readline().strip('\n')
+			while line != '':
+				line = info_func_str.readline().strip('\n')
+			line = info_func_str.readline().strip('\n')
+			continue
+
 		if ("Low-level symbols" in line):
 			# We need to fixup the last function of the module
 			if func_prev is not None:
@@ -199,9 +215,11 @@ try:
 
 			line = info_func_str.readline().strip('\n')
 			continue
+
 		func_name = line.split()[1]
-		func_start = int(line.split()[0].strip("S:"), 16)
+		func_start = get_address_from_string(line.split()[0])
 		module_name = get_module_from_addr(modules, func_start)
+
 		if func_name not in functions.keys():
 			functions[func_name] = {}
 		functions[func_name][module_name] = {}
@@ -263,7 +281,7 @@ prev_callee = None
 while line:
 	try:
 		func_name = line.split('\t')[column_function].strip()
-		address   = int(line.split('\t')[column_addr].strip("S:"), 16)
+		address   = get_address_from_string(line.split('\t')[column_addr])
 		cycles    = int(line.split('\t')[column_cycles])
 		callee = add_cycles_to_function(functions, func_name, address, cycles)
 		if (prev_callee != None) and (prev_callee != callee):
