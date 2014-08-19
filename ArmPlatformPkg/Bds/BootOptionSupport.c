@@ -296,7 +296,7 @@ BootDeviceGetType (
   }
 
   if (IsEfiApp) {
-    Print(L"Is your application is an OS loader? ");
+    Print(L"Is your application an OS loader? ");
     Status = GetHIInputBoolean (&IsBootLoader);
     if (EFI_ERROR(Status)) {
       return EFI_ABORTED;
